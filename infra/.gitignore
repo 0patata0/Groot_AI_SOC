@@ -1,0 +1,6 @@
+# 자격증명·로그·데이터는 커밋 금지
+.env
+*/.env
+**/logs/
+**/*-data/
+suricata/etc/rules/

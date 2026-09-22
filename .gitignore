@@ -1,0 +1,10 @@
+# 자격증명·로그·데이터·OS 파일 커밋 금지
+.env
+**/.env
+**/logs/
+**/*-data/
+.DS_Store
+**/.DS_Store
+
+# Claude Code 개인 로컬 설정
+.claude/settings.local.json

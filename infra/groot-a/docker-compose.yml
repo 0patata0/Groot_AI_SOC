@@ -1,0 +1,49 @@
+# capstone_Groot_A — 보안장비 (관문)
+# IPS(Suricata) + WAF(ModSecurity+OWASP CRS). FW는 호스트 nftables(아래 nftables.rules 참고).
+# 트래픽: Kali(EXT) → [호스트 nftables] → Suricata(IPS) → ModSecurity(WAF) → Groot_C(DVWA)
+# 주의: 이미지 태그는 구축 시 확인 후 고정.
+
+services:
+  # WAF: ModSecurity v3 + OWASP CRS (nginx 리버스 프록시)
+  waf:
+    # TODO: 태그 고정
+    image: owasp/modsecurity-crs:nginx
+    container_name: waf
+    restart: unless-stopped
+    environment:
+      - PARANOIA=1
+      # 초기엔 DetectionOnly로 오탐 관찰 후 On 전환
+      - MODSEC_RULE_ENGINE=DetectionOnly
+      - BACKEND=http://172.16.20.10:80        # Groot_C DVWA
+      - SERVER_NAME=localhost
+    ports:
+      - "80:8080"      # EXT에서 들어오는 웹 트래픽 수신
+      - "443:8443"
+    volumes:
+      - ./logs/modsec:/var/log/modsecurity     # audit log → Wazuh Agent 수집
+    networks: [waf-net]
+
+  # IPS: Suricata. 초기 IDS(passive, af-packet)로 시작 → 안정화 후 inline(NFQUEUE) 전환
+  suricata:
+    # TODO: 태그 고정 (jasonish/suricata)
+    image: jasonish/suricata:latest
+    container_name: suricata
+    restart: unless-stopped
+    network_mode: host          # 인터페이스 직접 관측 위해 host 네트워크
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE
+    command: >
+      -i ${MON_IFACE}           # TODO: DMZ/EXT 관측 인터페이스명 (예: ens160)
+    volumes:
+      - ./suricata/etc:/etc/suricata          # suricata.yaml, 룰 경로
+      - ./logs/suricata:/var/log/suricata     # eve.json → Wazuh Agent 수집
+    # ET Open 룰은 suricata-update로 갱신
+
+networks:
+  waf-net:
+    driver: bridge
+
+# nftables(FW)는 컨테이너가 아니라 Groot_A 호스트에서 적용한다: nftables.rules 참조.
+# Response Tool은 host의 nft 'agent_block' 체인에 drop 규칙을 추가한다.

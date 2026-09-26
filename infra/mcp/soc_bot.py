@@ -101,6 +101,43 @@ def vulns(agent="002", size=8):
              (h["_source"].get("package", {}) or {}).get("name", "")) for h in hits], None
 
 
+def vuln_count(agent="groot-web"):
+    try:
+        r = json.load(_req("%s/wazuh-states-vulnerabilities-*/_count?q=agent.name:%s" % (IDX, agent), IDX_USER, IDX_PASS))
+        return r.get("count")
+    except Exception:
+        return None
+
+
+def build_summary(hours=12):
+    """정기 상태 요약 — 이상 없어도 항상 payload 반환(정상이면 초록)."""
+    mins = hours * 60
+    ag, _ = list_agents()
+    act = sum(1 for x in (ag or []) if x[2] == "active"); tot = len(ag or [])
+    disc = [x[1] for x in (ag or []) if x[2] != "active"]
+    agg, _ = agg_alerts(mins, min_level=5)
+    total = (agg or {}).get("total", 0)
+    vc = vuln_count("groot-web")
+    if total == 0 and not disc:
+        color, status = "#28a745", "🟢 이상 없음"
+    elif total >= 20 or disc:
+        color, status = "#d24b4b", "🔴 주의"
+    else:
+        color, status = "#e0a800", "🟡 관찰"
+    fields = [{"short": True, "title": "에이전트", "value": "%d/%d active%s" % (act, tot, (" ⚠%s" % ",".join(disc)) if disc else "")},
+              {"short": True, "title": "경보(level≥5, %dh)" % hours, "value": str(total)}]
+    if agg and agg.get("rules"):
+        fields.append({"short": False, "title": "상위 규칙", "value": "\n".join("• %s — %d" % (k, v) for k, v in agg["rules"][:5])})
+    if agg and agg.get("src"):
+        fields.append({"short": True, "title": "출처 IP", "value": "\n".join("%s(%d)" % (k, v) for k, v in agg["src"][:5]) or "-"})
+    if vc is not None:
+        fields.append({"short": True, "title": "취약점(groot-web)", "value": str(vc)})
+    text = "정기 상태 요약 — %s. 최근 %dh: level≥5 경보 %d건. %s" % (
+        status, hours, total, "추가 조치 없음(정상)" if (total == 0 and not disc) else "상세: 대시보드 / `/soc alerts`")
+    return {"username": "SOC-Agent", "attachments": [{"color": color, "title": "%s · SOC 정기 상태 요약" % status,
+            "text": text, "fields": fields, "footer": "capstone SOC agent (정기)", "ts": int(time.time())}]}
+
+
 def post_mm(payload):
     if not MM_WEBHOOK:
         return False, "MM_WEBHOOK unset"
@@ -145,7 +182,7 @@ def handle_slash(text):
     arg = parts[1] if len(parts) > 1 else None
     if cmd in ("help", ""):
         return "ephemeral", ("**/soc** 명령: `alerts [분]` 최근 경보 · `agents` 에이전트 · `vulns [id]` 취약점 · "
-                             "`status` 요약 · `report [분]` 채널에 인시던트 보고 게시")
+                             "`status` 한줄 요약 · `report [분]` 인시던트 보고 게시 · `summary [시간]` 정기 상태요약 게시")
     if cmd == "alerts":
         m = int(arg) if (arg and arg.isdigit()) else 15
         agg, err = agg_alerts(m)
@@ -167,6 +204,10 @@ def handle_slash(text):
         ag, _ = list_agents(); agg, _ = agg_alerts(60)
         act = sum(1 for x in (ag or []) if x[2] == "active")
         return "in_channel", "**SOC 상태**: 에이전트 %d/%d active · 최근60분 경보 %d건" % (act, len(ag or []), (agg or {}).get("total", 0))
+    if cmd == "summary":
+        h = int(arg) if (arg and arg.isdigit()) else 12
+        ok, d = post_mm(build_summary(h))
+        return "ephemeral", ("정기 상태 요약을 채널에 게시했습니다." if ok else "요약 게시 실패: %s" % d)
     if cmd == "report":
         m = int(arg) if (arg and arg.isdigit()) else 15
         rep = build_report(m)
@@ -205,6 +246,9 @@ def main():
         if "error" in rep:
             print("report error:", rep["error"]); sys.exit(1)
         ok, d = post_mm(rep); print("report posted:" if ok else "failed:", d); sys.exit(0 if ok else 1)
+    if mode == "summary":
+        h = int(sys.argv[2]) if len(sys.argv) > 2 else 12
+        ok, d = post_mm(build_summary(h)); print("summary posted:" if ok else "failed:", d); sys.exit(0 if ok else 1)
     if mode == "serve":
         host, port = LISTEN.split(":"); srv = HTTPServer((host, int(port)), Handler)
         print("soc_bot serve on %s" % LISTEN, file=sys.stderr); srv.serve_forever()

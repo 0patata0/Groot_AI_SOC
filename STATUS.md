@@ -12,7 +12,8 @@
 | 관리포털(Wazuh) | A:10443 DNAT→B:443 | ✅ 캠퍼스 `https://wazuh.groot.lab:10443`, VPN은 `ssh -N groot-b-int`→localhost:18443. 443=비움 |
 | 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`** 캠퍼스·VPN 동일, 웹소켓 101(실시간). 데스크톱 앱 서버 동일 URL. 맨 IP 443은 444 |
 | SOC 챗봇 | B `soc-bot`(systemd) + MM 슬래시 `/soc` | ✅ `/soc status\|alerts\|agents\|vulns\|report`. 읽기전용(mcp-ro), 대응은 groot-resp 분리. NL은 LLM 연결 후 |
-| 주기 보고 | B `soc-report.timer`(hourly) | ✅ 매시 인시던트 보고서 자동 게시(SOC-Agent). 경보 0이면 미게시(스팸 방지). 주기·window 조정 가능 |
+| 주기 인시던트 보고 | B `soc-report.timer`(hourly) | ✅ 매시 인시던트 보고서 자동 게시. 경보 0이면 미게시(스팸 방지) |
+| 정기 상태 요약 | B `soc-summary.timer`(하루 2회, 00·12 UTC=09·21 KST) | ✅ **이상 없어도 항상** 상태 요약 게시(🟢/🟡/🔴, 에이전트·경보·취약점). `/soc summary [h]` 수동 |
 | DVWA(웹 서비스) | A:80 WAF→C | ✅ `http://192.168.16.230/`(302) IP 접근 + **URL `http://dvwa.groot.lab/`**(WAF Host 서빙 검증; 클라이언트 hosts 적용 후) |
 
 ## 완료된 것

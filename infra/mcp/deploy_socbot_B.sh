@@ -102,6 +102,34 @@ EOF
 systemctl daemon-reload; systemctl enable --now soc-report.timer >/dev/null
 systemctl list-timers soc-report.timer --no-pager --no-legend | awk '{print "  report timer:", $1, $2, $3, $4}'
 
+say "P5 정기 상태요약 타이머(soc-summary) — 하루 2회, 이상 없어도 항상 게시(heartbeat)"
+SUMMARY_HOURS=${SUMMARY_HOURS:-12}; SUMMARY_ONCAL=${SUMMARY_ONCAL:-*-*-* 00,12:00:00}   # UTC 00,12시 = KST 09,21시
+cat > /etc/systemd/system/soc-summary.service <<EOF
+[Unit]
+Description=capstone SOC periodic STATUS SUMMARY (always posts) to Mattermost
+After=docker.service network-online.target
+[Service]
+Type=oneshot
+User=socbot
+Group=socbot
+SupplementaryGroups=mcp
+EnvironmentFile=/etc/mcp/wazuh-ro.env
+EnvironmentFile=/etc/socbot/soc_bot.env
+ExecStart=/usr/bin/python3 /opt/socbot/soc_bot.py summary $SUMMARY_HOURS
+EOF
+cat > /etc/systemd/system/soc-summary.timer <<EOF
+[Unit]
+Description=SOC status summary twice daily
+[Timer]
+OnCalendar=$SUMMARY_ONCAL
+Persistent=true
+AccuracySec=1min
+[Install]
+WantedBy=timers.target
+EOF
+systemctl daemon-reload; systemctl enable --now soc-summary.timer >/dev/null
+systemctl list-timers soc-summary.timer --no-pager --no-legend | awk '{print "  summary timer next:", $1, $2, $3}'
+
 say "V1 슬래시 명령 시뮬레이션(token 검증 + 응답)"
 curl -s -m8 -X POST "http://$LISTEN" -H 'Content-Type: application/x-www-form-urlencoded' \
   --data-urlencode "token=$STOKEN" --data-urlencode "text=status" | python3 -c 'import json,sys;d=json.load(sys.stdin);print("  status ->",d.get("text","")[:100])'

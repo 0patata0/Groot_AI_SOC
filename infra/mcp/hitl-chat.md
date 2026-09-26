@@ -51,7 +51,14 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
 
 ## 상태 (2026-09-27 갱신)
 - **Tier 1 배치 완료(B)**: Mattermost TE 11.11.1 + PostgreSQL 16(오프라인 반입), 팀 `soc`/채널 `soc-alerts`, incoming webhook 생성, A `/etc/resp/hitl.env`=http 연동. **실 검증**: `ssh -T groot-resp` block/unblock → `soc-alerts` 채널 게시 확인. 브라우저 `ssh -N groot-mm`→http://localhost:18065(로그인 200). 배치: `infra/groot-b/{mattermost-compose.yml, deploy_mattermost_B.sh}`. 계정/웹훅/비번은 CREDENTIALS.local.md.
-- **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커) — 런타임 결정 후. Hermes면 인터랙티브 승인 내장(PR #29373) 활용, Claude Code면 터미널 elicitation 또는 소형 브로커.
+### SOC 챗봇/에이전트 상호작용 (2026-09-27)
+- **에이전트 보고**: `soc_bot.py report [분]` → 최근 경보를 조사(인덱서 mcp-ro)해 **인시던트 보고서(첨부)** 를 채널에 게시(SOC-Agent 명의). 규칙 트리거 후 실측 게시.
+- **대화형 챗봇**: Mattermost 슬래시 명령 **`/soc`** → B의 `soc-bot` 서비스(soc_bot.py serve, systemd, socbot 사용자). `/soc alerts [분] | agents | vulns [id] | status | report [분] | help`. 읽기전용(mcp-ro), 토큰 검증. block 등 대응은 응답 MCP(groot-resp)로 분리 유지.
+  - 도달 경로: MM(컨테이너)→봇 콜백은 mm-net 게이트웨이 `http://172.19.0.1:8090`, 봇은 0.0.0.0:8090. **MM SSRF 보호** 때문에 `MM_SERVICESETTINGS_ALLOWEDUNTRUSTEDINTERNALCONNECTIONS` 에 172.19.0.1 필요(compose에 설정). `EnableCommands=true`.
+  - 배치: `infra/mcp/{soc_bot.py, deploy_socbot_B.sh, soc_bot.env.example}`. 실측: `/soc status|alerts|agents|vulns` 응답 확인.
+  - NL(자연어) 대화는 LLM 런타임(Claude/Hermes) 연결 후. 지금은 명령형 봇(오프라인 동작).
+
+- **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커), NL 에이전트(LLM 연결), `/soc block`(응답 MCP 연동) — 런타임 결정 후. Hermes면 인터랙티브 승인 내장(PR #29373).
 - 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.10.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
 
 ### VPN·캠퍼스 클린 접속 — A:443 이름 기반 리버스 프록시 (2026-09-27 확정)

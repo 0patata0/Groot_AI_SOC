@@ -8,13 +8,14 @@
 |---|---|---|
 | **Groot_A** `groot-sec` 192.168.16.230 / 10.10.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답 MCP | ✅ waf(healthy)·suricata(running), wazuh-agent active, nft(capstone_gw/fwd/fw), capstone-nat·chrony·리퍼 타이머 active, nftables.service **masked**, 차단 0건 |
 | **Groot_B** `groot-siem` 10.10.10.10 | Wazuh SIEM + 읽기 MCP + 채팅 | ✅ manager·indexer·dashboard Up, **에이전트 3대 Active**, 읽기 서버 `/opt/mcp`, **Mattermost+PostgreSQL(mm-app/mm-postgres) Up** — HITL 알림 채널 |
-| **Groot_C** `groot-web` 10.10.10.20 | DVWA + CVE 랩 | ✅ apache active, DVWA 200, `log4shell-lab` 컨테이너, wazuh-agent active |
+| **Groot_C** `groot-web` 10.10.10.20 | DVWA + CVE 랩 | ✅ apache active, DVWA 200, `log4shell-lab` 컨테이너(**C 내부 전용 바인딩** `10.10.10.20:8080` — 캠퍼스/VPN 직접 도달 차단), wazuh-agent active |
 | 관리포털(Wazuh) | A:10443 DNAT→B:443 | ✅ 캠퍼스 `https://wazuh.groot.lab:10443`, VPN은 `ssh -N groot-b-int`→localhost:18443. 443=비움 |
 | 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`** 캠퍼스·VPN 동일, 웹소켓 101(실시간). 데스크톱 앱 서버 동일 URL. 맨 IP 443은 444 |
 | SOC 챗봇 | B `soc-bot`(systemd) + MM 슬래시 `/soc` | ✅ `/soc status\|alerts\|agents\|vulns\|report`. 읽기전용(mcp-ro), 대응은 groot-resp 분리. NL은 LLM 연결 후 |
 | 주기 인시던트 보고 | B `soc-report.timer`(hourly) | ✅ 매시 인시던트 보고서 자동 게시. 경보 0이면 미게시(스팸 방지) |
 | 정기 상태 요약 | B `soc-summary.timer`(하루 2회, 00·12 UTC=09·21 KST) | ✅ **이상 없어도 항상** 상태 요약 게시(🟢/🟡/🔴, 에이전트·경보·취약점). `/soc summary [h]` 수동 |
 | DVWA(웹 서비스) | A:80 WAF→C | ✅ `http://192.168.16.230/`(302) IP 접근 + **URL `http://dvwa.groot.lab/`**(WAF Host 서빙 검증; 클라이언트 hosts 적용 후) |
+| Log4Shell 랩 경로 | 평상시 C 내부 전용 / 시나리오 때 A 경유 | ⚙️ 토글 `sudo scenario_log4shell_route.sh on\|off\|status`(A). ON=`http://192.168.16.230:8080/`→Suricata 검사→C(캠퍼스/Kali만, VPN 불통). 런타임 전용(재부팅=자동 OFF). 소스 `infra/groot-a/scenario_log4shell_route.sh` |
 
 ## 완료된 것
 - **네트워크/게이트웨이**: A NAT(masquerade) + 관리 포트포워딩(A:443→B 대시보드, WAF TLS 8443). VPN은 A로 22/80/443만 통과.
@@ -40,7 +41,7 @@
 - **보류(2)**: B/C 임시 NIC(ens192) 제거 + 기본라우트 A로 전환(콜드부트) — **다른 작업자 세팅 중**. 완료 시 never_block의 .233/.234, ssh `groot-mcp-direct` 정리.
 - **다음 후보**:
   1. 에이전트 런타임 결정(Claude Code vs Hermes) → `groot-mcp`+`groot-resp` 등록.
-  2. 시나리오 실제 실행(선행조건: DVWA `low`, Log4Shell 경로 결정, C sudo 버전, Kali 세그먼트 직결).
+  2. 시나리오 실제 실행(선행조건: DVWA `low`, ~~Log4Shell 경로~~ → **결정됨**(A 경유 토글 준비, `scenario_log4shell_route.sh`), C sudo 버전, Kali 세그먼트 직결).
   3. 응답툴 확장(`isolate_host`·`notify`) + 고위험 동작 사람 승인.
 - **HITL 채널**: Slack/Discord 등 클라우드 채팅 전부 불가(아웃바운드 443 차단, 실측). → **온프레미스 Mattermost를 B에 배치(Tier 1 완료, 2026-09-27)**: 브라우저 `ssh -N groot-mm`→http://localhost:18065, SOC 경보가 `soc-alerts` 채널에 실시간(응답 서버 block/unblock→채널 게시 검증). 승인=MCP elicitation(런타임), 알림 채널 교체는 `/etc/resp/hitl.env` 1블록. 남은 것: Tier 2(채팅 내 승인 버튼) — 런타임 결정 후(Hermes면 내장).
 - **주의**: 공격성 테스트 트래픽은 캠퍼스 VPN 경유 금지(캠퍼스 FW가 차단). `never_block`에 관리 VPN 대역(192.168.15.0/24) 포함 — VPN 대역 바뀌면 갱신.

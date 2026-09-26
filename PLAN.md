@@ -15,7 +15,7 @@
 - **A**: Docker(오프라인)·**NAT 게이트웨이 완료**·**Wazuh Agent(001 Active)**·**Suricata IDS + ModSecurity WAF 배치·검증 완료(2026-09-26)** → eve.json/audit.log가 Wazuh로 흐름.
 - **B**: **Wazuh 4.14.8 스택 기동 완료**(비번 통일) + A 보안스택용 로컬 룰(`infra/groot-b/local_rules.xml`) 적용·경보 인덱싱 검증 완료.
 - ⚠️ 운영 제약(2026-09-26 실제 발생): **공격성 테스트 트래픽을 캠퍼스 VPN 경유로 보내면 캠퍼스 FW가 (VPN IP↔A) 쌍을 차단**해 A 관리접속이 끊김. IDS/WAF 테스트는 반드시 Kali/B/C 등 **VM 세그먼트 안**에서. A 복구 경로: `ssh -J groot-b groot_a@10.10.10.1`.
-- **C**: OS·네트워크·DVWA(베어메탈, 별도 담당) 설치됨. Docker 대기(하이브리드: CVE만 컨테이너).
+- **C**: OS·네트워크·DVWA(베어메탈)·**Docker+log4shell-lab 완료**, **Wazuh Agent 002 Active**·취약점 2,422건 인덱싱. Log4Shell 랩은 **C 내부 전용 격리**(시나리오 때만 A 경유 토글).
 - **MCP**: 읽기 서버(B, `ssh -T groot-mcp`) + **응답 서버(A, `ssh -T groot-resp`, block_ip→agent_block) 배치·계약 테스트 완료(2026-09-27)**. 클라이언트 설정은 각 한 줄(런타임 불가지론). 런타임(Claude Code vs Hermes) 결정은 보류.
 - 제약: 이 망 outbound 웹(80/443)·DGX(11434) 전면 차단 → 모든 반입 오프라인. DGX 연결 보류(관리자 permit 대기).
 - 주요 결정 확정: LLM=DGX Spark(A-1)/보류 시 로컬 Ollama, 오케스트레이션=Docker Compose(B-1), 보안장비=nftables/Suricata/ModSecurity+CRS, Wazuh=4.14.8.
@@ -188,9 +188,9 @@ capstone_project/
 
 ### 1-2. 2026_capstone_Groot_B (Wazuh + MCP)
 - [x] Wazuh all-in-one 설치 (Manager+Indexer+Dashboard) — **기동 완료(2026-09-26)**: 4.14.8 single-node compose, 인증서는 오프라인 `wazuh-certs-tool.sh`(openssl)로 생성. 인덱서 green·대시보드 302·API 토큰 OK. 절차 `infra/groot-b/README.md` (⚠️ 인증서 권한 644 필수). **기본 비번 교체 완료**(3계정 통일, 데모계정 삭제, 값은 CREDENTIALS.local.md)
-- [ ] Groot_A/C의 Agent 등록, Dashboard에서 Active 확인 — **A 완료**(001 groot-sec Active, 2026-09-26). C는 담당자(`infra/groot-c/C_구축_표준설정.md`, 매니저 `groot-siem:1514`)
+- [x] Groot_A/C의 Agent 등록, Dashboard에서 Active 확인 — **완료**: 001 groot-sec(A)·002 groot-web(C) 모두 Active(2026-09-26, 2026-09-27 재확인). 매니저 000 포함 3대
 - [x] Suricata eve / ModSecurity 감사로그 수집 룰 확인, MITRE 태그 확인 — **완료(2026-09-26)**: Suricata는 내장 86601(lv3) 위에 severity별 100110(lv9)/100111(lv6)+버스트 100112, ModSecurity는 내장 룰 없음 → JSON 필드 기반 100100~100103(CRS 히트 lv7, 임계 초과 lv10, 버스트 lv12), MITRE T1190/T1595. `infra/groot-b/local_rules.xml`(wazuh-logtest·`analysisd -t` 검증 후 적용). B에서 A로 프로브 → **alerts.json·인덱서(`rule.groups:capstone`) 5건 실측**
-- [ ] Vulnerability Detection 활성화 (OS 패키지 CVE 매핑 확인)
+- [x] Vulnerability Detection 활성화 (OS 패키지 CVE 매핑 확인) — **완료**: C(002) 취약점 상태 2,422건 인덱싱, 대시보드 Vulnerability Inventory 확인, `/soc vulns` 조회
 - [x] MCP Server 배치 (자격증명은 여기에만). LLM 실행처에서 접근 확인 — **읽기 서버 배치·검증 완료(2026-09-26)**: `mcp-server-wazuh` v0.3.0(sha256 검증) `/opt/mcp/`, 전용 사용자 `mcp` + sshd ForceCommand + authorized_keys restrict, 읽기전용 계정 `mcp-ro`(API readonly / 인덱서 readall, 쓰기 403 실증), 자격증명은 B `/etc/mcp/wazuh-ro.env`에만. Mac에서 `ssh -T groot-mcp`(A 점프 전용 키)로 **계약 테스트 PASS**(initialize·14 tools·get_wazuh_alert_summary 실경보 반환). `infra/mcp/deploy_mcp_B.sh`(적대적 리뷰 5관점 반영), `contract_test.py`. 차단(block_ip)은 소형 응답서버로 별도
 
 ### 1-3. 2026_capstone_Groot_C (메인서버)
@@ -203,7 +203,7 @@ capstone_project/
 - [ ] nmap/nikto/sqlmap/hydra, Log4Shell PoC + 악성 LDAP(marshalsec) 준비
 
 ### 1-5. 경보 검증
-- [~] 시나리오 1~3 실행 → IPS/WAF/Wazuh 경보 발생 확인, rule id 기록(`scenarios/alerts.md`) — **시나리오·탐지 검증 문서 완비(2026-09-27)**: `scenarios/`(README·scenario-1 웹, scenario-2 Log4Shell, scenario-3 privesc, alerts 매트릭스, references). 공격 생성 절차는 공개 표준(OWASP WSTG, Wazuh PoC, 앱 README, ET/CRS) 링크로 인용, 우리 룰 id에 매핑. **실행은 선행조건 해결 후**: DVWA level low(C 담당), Log4Shell 경로(A 경유 DNAT vs ens192 제거), sudo 취약 버전 확인, Kali 세그먼트 직결
+- [~] 시나리오 1~3 실행 → IPS/WAF/Wazuh 경보 발생 확인, rule id 기록(`scenarios/alerts.md`) — **시나리오·탐지 검증 문서 완비(2026-09-27)**: `scenarios/`(README·scenario-1 웹, scenario-2 Log4Shell, scenario-3 privesc, alerts 매트릭스, references). 공격 생성 절차는 공개 표준(OWASP WSTG, Wazuh PoC, 앱 README, ET/CRS) 링크로 인용, 우리 룰 id에 매핑. **실행은 선행조건 해결 후**: DVWA level low(C 담당), Log4Shell 경로 **결정됨**(A 경유 토글 `scenario_log4shell_route.sh`, 평상시 랩은 C 내부 격리), sudo 취약 버전 확인, Kali 세그먼트 직결
 - [x] FW 자동 차단(nftables) 동작 확인 → Baseline 대응 — `agent_block`/`inet capstone_fw` 완료·실차단 검증(1-1 참조). 대응 룰 100121/100126~100129
 
 ---
@@ -215,7 +215,7 @@ capstone_project/
 ### 2-1. MCP Server (Groot_B)
 설계 원칙(A안): MCP Server는 Agent와 별도 머신(Groot_B)에서 실행, 자격증명(Wazuh API, FW/IPS 접근, Slack)은 여기에만.
 **클라이언트 불가지론(pluggable agent)**: 서버는 어떤 AI가 붙는지 모르게 설계 — 에이전트 런타임/LLM 교체는 클라이언트 설정 1블록만 변경(전송 계약: 1차 stdio over SSH → 확장 HTTP). 설계·템플릿·계약테스트: `infra/mcp/README.md`. 읽기 서버는 기성 `gbrigandi/mcp-server-wazuh` v0.3.0(리뷰 완료), 응답 서버는 소형 커스텀(별도 자격증명).
-- [ ] Wazuh Tool: `search_alerts`, `get_alert`, `get_agent_status`, `get_vulnerabilities`
+- [x] Wazuh Tool: `search_alerts`, `get_alert`, `get_agent_status`, `get_vulnerabilities` — **읽기 MCP 서버 14툴로 커버**(계약테스트 PASS) + SOC 챗봇 `/soc alerts|agents|vulns`로 실사용
 - [ ] CVE Tool: `cve_lookup` → NVD + CISA KEV — **CISA KEV 오프라인 반입·리뷰 완료**(B `~/capstone/kev`, 1,726건, CC0, 시나리오 CVE 포함 · `infra/groot-b/kev-data.md`). NVD 상세는 보완 예정
 - [ ] Server Tool: 프로세스/포트/FIM/인증 (Wazuh API, 내부망이라 SSH 읽기전용도 가능)
 - [ ] Network Tool: `search_suricata`(IPS), WAF 로그 조회, FW 로그 조회 (AWS Flow Logs 대체)
@@ -280,6 +280,12 @@ capstone_project/
 
 ## 진행 로그
 최신 항목을 위에 둔다. (세부 이력은 `대화기록/YYYY-MM-DD.md`)
+
+### 2026-09-27 (HITL 채팅 · SOC 챗봇/자동 보고 · Log4Shell 노출 하드닝)
+- **HITL 알림 채널(Tier 1)**: 온프레미스 Mattermost(B, TE 11.11.1+PG16 오프라인) + A `/etc/resp/hitl.env`=http 연동, block/unblock→채널 게시 검증. 캠퍼스·VPN 공통 접속 위해 **A:443 nginx 리버스 프록시**(`https://chat.groot.lab`, 웹소켓 101, 데스크톱 앱 동일 URL). 대시보드는 보안상 VPN 직접노출 안 함.
+- **SOC 챗봇 + 자동 보고**: 채팅 슬래시 `/soc`(alerts/agents/vulns/status/report, 읽기전용 mcp-ro) + 에이전트 인시던트 보고서 게시 + **주기 보고**(B `soc-report.timer` 매시, 경보 0이면 스킵) + **정기 상태 요약 heartbeat**(B `soc-summary.timer` 하루 2회, 이상 없어도 게시). `infra/mcp/soc_bot.py`.
+- **Log4Shell 노출 하드닝**: C 컨테이너 `0.0.0.0:8080`→`10.10.10.20:8080` 내부 전용 바인딩(외부·VPN 직접 차단, Mac·A·B 3방향 실측). 시나리오용 A 경유 토글 `infra/groot-a/scenario_log4shell_route.sh`(A:8080→C DNAT+SNAT+forward, 런타임 전용=재부팅 자동 OFF, 캠퍼스/Kali만) 설치·on/off 검증, 평상시 OFF.
+- 다음: 에이전트 런타임 결정(→ NL 대화·`/soc block`·Tier 2 승인 버튼), 시나리오 실제 실행(DVWA low), 네트워크 최종화(B/C ens192 제거), 공개 전 비번 교체.
 
 ### 2026-09-27 (A 방화벽 2단계 + agent_block · 관리 포트포워딩 · 시계 체인 · C 연동)
 - **A 호스트 방화벽 Phase 2 + `agent_block` 완료**: `inet capstone_fw`(input 기본 drop + raw prerouting 차단 셋 + never_block 잠금가드 + 로그 미터), CLI `agent_block`(검증·TTL 상한·활성 SSH 출발지 거부·원자적 갱신·상태파일·감사로그), `capstone-nat.sh`가 부팅 시 원자적 로드·차단목록 복원. 적대적 리뷰 4관점(잠금·Docker 공존·CLI 오용·SIEM 도착) 반영, 데드맨+`.pending`으로 무잠금 적용 후 외부 검증·확정. B에 디코더(`local_decoder.xml`)+룰 100120~100130(차단/해제/거부/flush/reload/데드맨/드롭 버스트). 실차단 테스트 통과.

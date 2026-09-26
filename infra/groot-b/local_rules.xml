@@ -1,0 +1,126 @@
+<!-- Local rules -->
+<!-- Modify it at your will. -->
+<!-- Copyright (C) 2015, Wazuh Inc. -->
+
+<!-- capstone Agentic SOC — Groot_B Wazuh manager /var/ossec/etc/rules/local_rules.xml (2026-09-26)
+     A(groot-sec)에서 오는 보안스택 로그의 등급화. Suricata는 내장 0475-suricata_rules.xml(86600 base, 86601 alert lv3) 위에 severity별 세분화,
+     ModSecurity는 내장 룰이 없어 JSON 필드 기반 신규 룰. Wazuh는 상위 레벨 룰을 먼저 평가하므로 generic 1002(lv2)보다 우선한다.
+     ModSecurity JSON 감사로그의 messages 배열은 JSON 디코더가 문자열로 평탄화한다 → 부분문자열 매칭.
+     검증: wazuh-logtest 로 각 샘플 확인 후 적용. -->
+
+<group name="ids,suricata,capstone,">
+  <!-- ET severity: 1=high 2=medium 3=low (classification.config priority) -->
+  <rule id="100110" level="9">
+    <if_sid>86601</if_sid>
+    <field name="alert.severity">^1$</field>
+    <description>Suricata IDS high: $(alert.signature) [$(alert.category)] $(src_ip) -> $(dest_ip):$(dest_port)</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+  <rule id="100111" level="6">
+    <if_sid>86601</if_sid>
+    <field name="alert.severity">^2$</field>
+    <description>Suricata IDS medium: $(alert.signature) [$(alert.category)] $(src_ip) -> $(dest_ip):$(dest_port)</description>
+  </rule>
+  <rule id="100112" level="12" frequency="8" timeframe="120">
+    <if_matched_sid>86601</if_matched_sid>
+    <same_field>src_ip</same_field>
+    <description>Suricata IDS: 8+ alerts from $(src_ip) within 2 min (scan/attack burst)</description>
+    <mitre><id>T1595</id></mitre>
+  </rule>
+</group>
+
+<group name="modsecurity,waf,web,attack,capstone,">
+  <rule id="100100" level="0">
+    <decoded_as>json</decoded_as>
+    <field name="transaction.producer.modsecurity">^ModSecurity</field>
+    <description>ModSecurity WAF audit record (base)</description>
+  </rule>
+  <rule id="100101" level="7">
+    <if_sid>100100</if_sid>
+    <field name="transaction.messages">ruleId</field>
+    <description>WAF CRS hit: $(transaction.client_ip) $(transaction.request.method) $(transaction.request.uri) -> HTTP $(transaction.response.http_code) [engine $(transaction.producer.secrules_engine)]</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+  <rule id="100102" level="10">
+    <if_sid>100101</if_sid>
+    <field name="transaction.messages">Inbound Anomaly Score Exceeded</field>
+    <description>WAF anomaly threshold exceeded: $(transaction.client_ip) $(transaction.request.method) $(transaction.request.uri) [engine $(transaction.producer.secrules_engine)]</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+  <rule id="100103" level="12" frequency="6" timeframe="120">
+    <if_matched_sid>100102</if_matched_sid>
+    <same_field>transaction.client_ip</same_field>
+    <description>WAF: 6+ anomaly-threshold hits from $(transaction.client_ip) within 2 min (web attack burst)</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+</group>
+
+<!-- A 호스트 방화벽(Phase 2) + 대응 차단 도구 agent_block 감사 (2026-09-27). 디코더: local_decoder.xml(agent_block), 내장 iptables(nft 커널 로그) -->
+<group name="capstone,response,firewall,">
+  <rule id="100120" level="3">
+    <decoded_as>agent_block</decoded_as>
+    <description>Groot_A agent_block: $(action) result=$(result)</description>
+  </rule>
+  <rule id="100121" level="5">
+    <if_sid>100120</if_sid>
+    <action>add</action>
+    <field name="result">^ok$</field>
+    <description>Response: $(srcip) BLOCKED on Groot_A for $(ttl) (reason $(reason), by $(by))</description>
+  </rule>
+  <rule id="100122" level="4">
+    <if_sid>100120</if_sid>
+    <action>del</action>
+    <description>Response: $(srcip) unblocked on Groot_A (result $(result), reason $(reason))</description>
+  </rule>
+  <rule id="100123" level="8">
+    <if_sid>100120</if_sid>
+    <field name="result">^rejected$|^invalid$|^nftfail$</field>
+    <description>Response tool call NOT applied on Groot_A: action=$(action) ip=$(srcip) result=$(result) reason=$(reason)</description>
+  </rule>
+  <rule id="100124" level="10">
+    <if_sid>100120</if_sid>
+    <action>flush</action>
+    <description>Response: ALL blocks flushed on Groot_A</description>
+  </rule>
+  <rule id="100125" level="5">
+    <if_sid>100120</if_sid>
+    <action>reload</action>
+    <description>Groot_A firewall reloaded; blocks restored (see log)</description>
+  </rule>
+  <rule id="100131" level="4">
+    <if_sid>100120</if_sid>
+    <action>expire</action>
+    <description>Response: $(srcip) block expired on Groot_A (auto-unblock, TTL)</description>
+  </rule>
+  <rule id="100130" level="12">
+    <program_name>^capstone-fw$</program_name>
+    <match>DEADMAN fired</match>
+    <description>Groot_A host firewall rolled back by dead-man timer (unconfirmed deploy)</description>
+  </rule>
+</group>
+
+<group name="capstone,firewall,nft,">
+  <!-- 내장 4100(iptables/firewall base, level 0)의 자식. level 1 = 인덱스 안 됨(잡음 방지), frequency 룰의 재료로만 -->
+  <rule id="100126" level="1">
+    <if_sid>4100</if_sid>
+    <match>AGENT_BLOCK </match>
+    <description>Groot_A dropped packet from blocked IP $(srcip) -> $(dstip):$(dstport)</description>
+  </rule>
+  <!-- A 의 로그 미터가 출발지당 6/min(버스트 3)으로 AGENT_BLOCK 로그를 제한하므로 임계는 6 -->
+  <rule id="100127" level="6" frequency="6" timeframe="60">
+    <if_matched_sid>100126</if_matched_sid>
+    <same_srcip />
+    <description>Blocked attacker $(srcip) keeps hitting Groot_A (6+ logged drops/min) — block is holding</description>
+  </rule>
+  <rule id="100128" level="1">
+    <if_sid>4100</if_sid>
+    <match>FW_DROP_IN </match>
+    <description>Groot_A host firewall dropped inbound from $(srcip) to $(dstport)/$(protocol)</description>
+  </rule>
+  <rule id="100129" level="6" frequency="16" timeframe="60">
+    <if_matched_sid>100128</if_matched_sid>
+    <same_srcip />
+    <description>Groot_A host firewall: 16+ dropped inbound from $(srcip) in 60s (port scan?)</description>
+    <mitre><id>T1046</id></mitre>
+  </rule>
+</group>

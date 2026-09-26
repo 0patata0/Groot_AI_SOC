@@ -1,0 +1,54 @@
+# Hermes Agent 설정 예시 — ~/.hermes/config.yaml
+# 우리 SOC MCP Server(Groot_B)를 등록한다.
+# 핵심(A안): Wazuh API 키·FW 접근 등 "실제 자격증명"은 여기 두지 않는다.
+#   → 그건 MCP Server(Groot_B) 프로세스의 env/secret에만. 여기엔 MCP 엔드포인트
+#     접근용 토큰(전송 인증)만 둔다. LLM/Hermes는 실제 자격증명을 못 본다.
+
+mcp_servers:
+  soc:
+    # Groot_B의 MCP Server 엔드포인트 (내부 MGMT 망)
+    url: "http://GROOT_B_IP:8080/mcp"          # TODO: Groot_B MGMT IP/포트로 교체
+    transport: "sse"                            # 생략 시 기본 Streamable HTTP
+    headers:
+      # MCP 엔드포인트 보호용 토큰(전송 인증). Wazuh/FW 자격증명 아님.
+      Authorization: "Bearer ${env:SOC_MCP_TOKEN}"
+    connect_timeout: 60
+    timeout: 180                                # Tool 호출 타임아웃(초)
+    supports_parallel_tool_calls: false
+    enabled: true
+    tools:
+      # 조사(읽기) + 대응(쓰기) 노출. 쓰기(block/isolate)의 자동/승인/거부
+      # 결정적 게이팅은 서버 안 Policy Engine이 담당(여기서 막지 않아도 안전).
+      include:
+        - search_alerts
+        - get_alert
+        - get_agent_status
+        - get_vulnerabilities
+        - cve_lookup
+        - get_processes
+        - get_open_ports
+        - get_fim_events
+        - get_auth_events
+        - search_suricata
+        - block_ip
+        - isolate_host
+        - notify
+      exclude: []
+      resources: false     # MCP resource 유틸 비활성(불필요)
+      prompts: false        # MCP prompt 유틸 비활성
+    # 등록되는 툴 이름은 mcp__soc__<tool> 형태 (예: mcp__soc__block_ip)
+
+# ── 모델(LLM) 연결 ──
+# DGX Ollama(OpenAI 호환)를 프로바이더로. `hermes model`로 설정하거나 provider 설정.
+#   endpoint: http://211.170.162.100:11434/v1   (부하분산 시 .101도)
+#   주의: Hermes는 64k 컨텍스트 필요 → Ollama를 `-c 65536`로 기동
+#   모델: 교수 제공(요청). tool calling + 긴 컨텍스트 지원 확인.
+
+# ── 평가(측정) 모드: 학습 비활성화로 회차 독립성 확보 ──
+# (자기개선·크로스세션 메모리가 켜져 있으면 회차가 서로 영향 → 측정 오염)
+memory:
+  memory_enabled: false            # 크로스세션 메모리 끔
+# 스킬 자기개선 끔:  런타임에 `/skills approval off`
+# 더 강하게:  agent.disabled_toolsets: [memory, skills]   # 키는 공식 config 문서로 확인
+
+# 실제 운영(측정 아님)에선 memory_enabled: true로 두어 학습 효과를 별도 실험으로 측정 가능.

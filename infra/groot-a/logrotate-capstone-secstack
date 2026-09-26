@@ -1,0 +1,15 @@
+# /etc/logrotate.d/capstone-secstack — Groot_A 보안스택 로그 회전 (Suricata eve.json/stats.log, ModSecurity audit.log)
+# copytruncate: 컨테이너가 append 모드로 계속 쓰므로 파일 교체 대신 잘라낸다. Wazuh logcollector는 truncate를 감지해 처음부터 다시 읽는다.
+# 압축본은 Wazuh가 읽지 않음(원본만 localfile). 필요 시 maxsize 조정.
+/home/groot_a/capstone/secstack/logs/suricata/*.json
+/home/groot_a/capstone/secstack/logs/suricata/*.log
+/home/groot_a/capstone/secstack/logs/modsec/*.log {
+    daily
+    rotate 14
+    maxsize 500M
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+}

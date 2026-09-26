@@ -1,0 +1,13 @@
+[Unit]
+Description=Capstone Groot_A NAT gateway (masquerade + DOCKER-USER forward)
+Documentation=file:///etc/nftables.d/capstone-gw.nft
+After=docker.service network-online.target
+Wants=docker.service network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/capstone-nat.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

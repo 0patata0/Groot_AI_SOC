@@ -1,0 +1,17 @@
+# capstone 내부 이름 (groot.lab) — 단일 진실 원본(single source of truth).
+# 지금: 각 클라이언트 /etc/hosts 에 apply_hosts.sh 로 주입(또는 수동으로 아래 줄 추가). 나중: A/B 의 dnsmasq addn-hosts 로 이 파일 그대로 재사용.
+# 형식: <IP> <name>   (hosts 와 dnsmasq addn-hosts 공용). 한 IP 에 여러 이름은 공백으로 나열 가능(쉼표 X).
+#
+# 도달성(중요):
+#  - 캠퍼스 세그먼트(192.168.16.x 직접 연결): 세 이름 모두 포트까지 접근 가능.
+#  - VPN(GlobalProtect): A 로 22/80/443 만 통과 → dvwa(80)만 이름으로 접근. wazuh(10443)/chat(8065)은 SSH 터널 사용.
+#      wazuh: ssh -N groot-b-int → https://localhost:18443 / chat: ssh -N groot-mm → http://localhost:18065
+
+192.168.16.230 dvwa.groot.lab
+192.168.16.230 wazuh.groot.lab
+192.168.16.230 chat.groot.lab
+
+# 접근 요약:
+#   http://dvwa.groot.lab/                  DVWA (공개 웹, 캠퍼스·VPN 모두)
+#   https://wazuh.groot.lab:10443/          Wazuh 대시보드 (캠퍼스 직접; VPN 은 터널)
+#   http://chat.groot.lab:8065/             Mattermost 채팅 (캠퍼스 직접; VPN 은 터널)

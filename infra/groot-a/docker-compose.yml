@@ -1,49 +1,74 @@
-# capstone_Groot_A — 보안장비 (관문)
-# IPS(Suricata) + WAF(ModSecurity+OWASP CRS). FW는 호스트 nftables(아래 nftables.rules 참고).
-# 트래픽: Kali(EXT) → [호스트 nftables] → Suricata(IPS) → ModSecurity(WAF) → Groot_C(DVWA)
-# 주의: 이미지 태그는 구축 시 확인 후 고정.
+# capstone_Groot_A — 보안장비 (관문)  ※ 2026-09-26 이미지 실물·리뷰 반영 확정본
+# IPS(Suricata 8.0.6, 1단계 IDS/passive on ens192) + WAF(ModSecurity v3 + OWASP CRS, nginx 리버스 프록시 → groot-web:80). FW는 호스트 nftables.
+# 배치 경로(A): /home/groot_a/capstone/secstack/  (logs/ 상대경로; Wazuh 에이전트가 수집)
+# 이미지: 오프라인 반입본(jasonish/suricata:latest=8.0.6, owasp/modsecurity-crs:nginx). egress 차단 → 태그 변경 금지.
+#
+# ⚠️ 이미지 특성(실물 확인) — 어기면 기동 실패/무증상:
+#  - suricata 엔트리포인트는 set -e 로 /etc/suricata,/var/lib/suricata,/var/log/suricata 를 chown -R 한다 → 그 안에 :ro 마운트 금지.
+#    룰은 /rules:ro 로 밖에 두고 -S 로 배타 로드. classification/reference는 이미지 기본으로 충분(ET 8.0 classtype 전부 포함).
+#  - 기본 HOME_NET=[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12] → 공격자(192.168.16.x)가 '내부'로 잡혀 $EXTERNAL_NET 룰이 전부 무매치(경보 0).
+#    --set 으로 HOME_NET을 보호 대상(내부망 + A 외부IP)만으로 좁힌다.
+#  - modsecurity-crs:nginx 는 uid 101(nginx) 비root → logs/modsec 디렉터리를 101 소유로 만들어야 audit.log 생성 가능.
 
 services:
-  # WAF: ModSecurity v3 + OWASP CRS (nginx 리버스 프록시)
   waf:
-    # TODO: 태그 고정
     image: owasp/modsecurity-crs:nginx
     container_name: waf
     restart: unless-stopped
     environment:
-      - PARANOIA=1
-      # 초기엔 DetectionOnly로 오탐 관찰 후 On 전환
-      - MODSEC_RULE_ENGINE=DetectionOnly
-      - BACKEND=http://172.16.20.10:80        # Groot_C DVWA
-      - SERVER_NAME=localhost
+      - BACKEND=http://groot-web:80          # Groot_C DVWA (extra_hosts로 해석, 기동 시 정적 resolve)
+      - SERVER_NAME=groot-web                # 표시용(listen default_server라 어떤 Host도 수신)
+      - PORT=8080
+      - SSL_PORT=8443
+      - NGINX_X_FORWARDED_PORT=80
+      - BLOCKING_PARANOIA=1
+      - MODSEC_RULE_ENGINE=DetectionOnly     # 관찰 단계. 차단 전환 시 On
+      - MODSEC_AUDIT_ENGINE=RelevantOnly
+      - MODSEC_AUDIT_LOG_FORMAT=JSON         # 1 JSON/line → Wazuh <log_format>json</log_format>
+      - MODSEC_AUDIT_LOG_TYPE=Serial
+      - MODSEC_AUDIT_LOG=/var/log/modsecurity/audit.log
+    extra_hosts:
+      - "groot-web:10.10.10.20"
     ports:
-      - "80:8080"      # EXT에서 들어오는 웹 트래픽 수신
-      - "443:8443"
+      - "80:8080"       # 외부(공격자) 유입. 내부(ens160)에도 노출됨 — 제한하려면 "192.168.16.230:80:8080"+"127.0.0.1:80:8080"
+      - "8443:8443"     # WAF TLS. 2026-09-26: A:443 은 Wazuh 대시보드 DNAT(→B:443)로 양보(VPN 경로는 22/80/443만 통과). Kali/캠퍼스 세그먼트는 8443 사용
     volumes:
-      - ./logs/modsec:/var/log/modsecurity     # audit log → Wazuh Agent 수집
+      - ./logs/modsec:/var/log/modsecurity   # 호스트 디렉터리 소유 101:101 필수 (deploy 스크립트가 처리)
     networks: [waf-net]
 
-  # IPS: Suricata. 초기 IDS(passive, af-packet)로 시작 → 안정화 후 inline(NFQUEUE) 전환
   suricata:
-    # TODO: 태그 고정 (jasonish/suricata)
-    image: jasonish/suricata:latest
+    image: jasonish/suricata:latest          # 8.0.6
     container_name: suricata
     restart: unless-stopped
-    network_mode: host          # 인터페이스 직접 관측 위해 host 네트워크
+    network_mode: host                       # ens192 직접 관측
     cap_add:
       - NET_ADMIN
       - NET_RAW
       - SYS_NICE
-    command: >
-      -i ${MON_IFACE}           # TODO: DMZ/EXT 관측 인터페이스명 (예: ens160)
+    command:
+      - "-i"
+      - "${MON_IFACE:-ens192}"
+      - "-S"
+      - "/rules/suricata.rules"
+      - "--set"
+      - "vars.address-groups.HOME_NET=[10.10.10.0/24,192.168.16.230/32]"
+      - "--set"
+      - "stats.interval=60"                   # 기본 8s → eve.json/stats.log 폭증 + Wazuh 잡음. 60s면 하루 1,440건
     volumes:
-      - ./suricata/etc:/etc/suricata          # suricata.yaml, 룰 경로
-      - ./logs/suricata:/var/log/suricata     # eve.json → Wazuh Agent 수집
-    # ET Open 룰은 suricata-update로 갱신
+      - /home/groot_a/capstone/suricata/ruleset:/rules:ro     # ET Open 합본(suricata.rules). chown 대상 트리 밖 → :ro 가능
+      - ./logs/suricata:/var/log/suricata                     # eve.json (엔트리포인트가 chown)
+      - suricata-lib:/var/lib/suricata                        # Hyperscan MPM 캐시 보존(재생성 시 재컴파일 방지)
 
 networks:
   waf-net:
     driver: bridge
 
-# nftables(FW)는 컨테이너가 아니라 Groot_A 호스트에서 적용한다: nftables.rules 참조.
-# Response Tool은 host의 nft 'agent_block' 체인에 drop 규칙을 추가한다.
+volumes:
+  suricata-lib: {}
+
+# 검증 요령: Suricata는 localhost 트래픽을 못 본다(lo). 실경보 테스트는 ens192 건너편 — 반드시 같은 VM 세그먼트(Kali, 또는 B/C의 ens192)에서:
+#   curl -A 'sqlmap/1.0' http://192.168.16.230/dvwa/  → eve.json 에 signature_id 2008538 (ET SCAN Sqlmap)   [2026-09-26 검증됨]
+#   ⚠️ 공격성 트래픽을 캠퍼스 VPN(GlobalProtect) 경유로 보내지 말 것 — 캠퍼스 방화벽이 (VPN클라IP↔A) 쌍을 차단해 A 관리접속이 끊긴다(실제 발생).
+# WAF는 localhost:80 으로 검증 가능(CRS 942100 등이 audit.log에 기록, DetectionOnly라 응답은 통과). DVWA 경로는 /dvwa/ (C 배치 기준).
+# 외부 클라이언트 IP는 audit.log transaction.client_ip 에 실제 IP로 남는다(Docker DNAT). localhost 테스트만 172.18.0.1.
+# Wazuh 에이전트(A) localfile: ./logs/suricata/eve.json (json), ./logs/modsec/audit.log (json) — agent_localfile.sh

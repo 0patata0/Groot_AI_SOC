@@ -1,0 +1,10 @@
+{
+  "_comment": "Claude Code 프로젝트 MCP 설정 예시 — 프로젝트 루트 .mcp.json 으로 복사하거나 `claude mcp add --transport stdio wazuh-ro -- ssh -T groot-mcp`. 서버는 B에서 실행되고 자격증명은 B에만 있다(A안). 이 파일에는 비밀이 없다. 런타임 확정 전에는 등록하지 않는다.",
+  "mcpServers": {
+    "wazuh-ro": {
+      "type": "stdio",
+      "command": "ssh",
+      "args": ["-T", "groot-mcp"]
+    }
+  }
+}

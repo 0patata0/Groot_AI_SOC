@@ -1,0 +1,75 @@
+#!/usr/sbin/nft -f
+# capstone_Groot_A — Phase 2 호스트 방화벽 + 대응 차단(agent_block). 배포: /etc/nftables.d/capstone-fw.nft (capstone-nat.sh 가 부팅 시 원자적으로 로드)
+# 적대적 리뷰 4관점 반영본(2026-09-27).
+#
+# 원칙
+#  - 'flush ruleset' 금지: Docker 가 같은 커널에 ip nat / ip filter(FORWARD policy drop, DOCKER-USER) 를 관리한다. 이 파일은 독립 테이블 inet capstone_fw 만 만든다.
+#    (nftables.service 는 /etc/nftables.conf 의 flush ruleset 때문에 fw_phase2.sh 가 mask 한다)
+#  - forward 정책은 여기서 중복 정의하지 않는다(같은 훅의 모든 베이스 체인을 통과해야 하므로 잠금 위험). 외부→내부 forward 는 Docker FORWARD(drop) + DOCKER-USER 가 담당.
+#  - Docker published 포트(80/8443 → WAF)와 관리 DNAT(443→B)는 prerouting 에서 목적지가 바뀌어 forward 경로로 가므로 input 과 무관.
+#
+# 체인
+#  - prerouting_block(raw 우선순위 = conntrack·NAT 보다 먼저): agent_block 셋의 출발지는 A 로 오든 A 를 지나든(WAF·DNAT·내부망 포함) 전부 drop.
+#      ⚠ raw 훅이라 ct state 는 항상 untracked — 이 체인에서 established 예외는 만들 수 없다(기존 SSH 세션도 즉시 끊김). 그래서 never_block 이 잠금 방지의 전부다.
+#      로그 "AGENT_BLOCK ..." 의 DST= 는 DNAT 전 주소(192.168.16.230). SIEM 상관은 SRC 기준.
+#  - input(A 자신): 기본 drop. 허용 = lo, established/related, ICMP(제한), 내부망→NTP(chrony), SSH(내부망·ens192 관리).
+#      캠퍼스 L2 잡음(브로드캐스트/멀티캐스트/디스커버리)은 로그 없이 drop. 나머지는 출발지별 1/s(버스트 5) + 전체 5/s 로 "FW_DROP_IN" 로그 후 drop.
+#
+# 운용: 차단은 /usr/local/sbin/agent_block add|del|list|flush 로만(직접 nft 수정 금지). 재적용은 capstone-nat.sh(커널 셋/상태파일에서 차단 목록 복원).
+
+table inet capstone_fw {
+    set never_block {
+        type ipv4_addr
+        flags interval
+        comment "lock-out guard: never blockable (internal, docker, lo, A, GW, ESXi, NTP, DNS, mgmt VPN, B/C temp ext)"
+        elements = { 10.10.10.0/24, 172.16.0.0/12, 127.0.0.0/8,
+                     192.168.16.230, 192.168.16.129, 192.168.16.130, 192.168.16.131,
+                     168.126.63.1,
+                     192.168.15.0/24,
+                     192.168.16.233, 192.168.16.234 }
+    }
+
+    set agent_block {
+        type ipv4_addr
+        flags timeout
+        comment "attacker IPs blocked by agent_block add <ip> <ttl>; expire; restored at boot from agent_block.state"
+    }
+
+    set block_log_meter {
+        type ipv4_addr
+        flags dynamic
+        timeout 1m
+        size 65535
+    }
+
+    set dropin_meter {
+        type ipv4_addr
+        flags dynamic
+        timeout 1m
+        size 65535
+    }
+
+    chain prerouting_block {
+        type filter hook prerouting priority raw; policy accept;
+        ip saddr @never_block accept
+        ip saddr @agent_block update @block_log_meter { ip saddr limit rate 6/minute burst 3 packets } log prefix "AGENT_BLOCK " level notice
+        ip saddr @agent_block counter drop
+    }
+
+    chain input {
+        type filter hook input priority filter; policy drop;
+        iif "lo" accept
+        ct state established,related accept
+        ct state invalid counter drop
+        icmp type { echo-request, echo-reply, destination-unreachable, time-exceeded, parameter-problem } limit rate 20/second accept
+        icmpv6 type { echo-request, echo-reply, destination-unreachable, packet-too-big, time-exceeded, parameter-problem, nd-neighbor-solicit, nd-neighbor-advert, nd-router-advert, mld-listener-query, mld-listener-report } accept
+        iifname "ens160" udp dport 123 accept comment "chrony serving B/C"
+        iifname "ens160" tcp dport 22 accept comment "SSH from internal net"
+        iifname "ens192" tcp dport 22 accept comment "management SSH (campus segment / VPN)"
+        meta pkttype { broadcast, multicast } counter drop comment "campus L2 noise (NetBIOS/mDNS/SSDP/IGMP/MLD) - never logged"
+        fib daddr type { broadcast, multicast } counter drop comment "directed broadcast"
+        udp dport { 67, 68, 137, 138, 1900, 3702, 5353, 5355, 17500 } counter drop comment "unicast discovery noise - never logged"
+        update @dropin_meter { ip saddr limit rate 1/second burst 5 packets } limit rate 5/second burst 5 packets log prefix "FW_DROP_IN " level notice
+        counter drop
+    }
+}

@@ -1,0 +1,35 @@
+<!-- Local Decoders -->
+
+<!-- capstone Agentic SOC — Groot_B Wazuh manager /var/ossec/etc/decoders/local_decoder.xml (2026-09-27)
+     A(groot-sec)의 대응 차단 도구 agent_block 감사 라인(syslog tag agent_block, key=value) 디코딩.
+     예) agent_block[1234]: action=add ip=203.0.113.7 ttl=600s result=ok reason=alert:1790... by=root
+         agent_block[1234]: action=add ip=10.10.10.10 ttl=5m result=rejected reason=protected by=root
+         agent_block[1234]: action=del ip=203.0.113.7 result=ok reason=none by=root
+         agent_block[1234]: action=flush count=3 result=ok reason=none by=root
+         agent_block[1234]: action=reload restored=2 source=statefile result=ok by=capstone-nat
+     nft 커널 로그(AGENT_BLOCK/FW_DROP_IN ... IN= OUT= SRC= DST= ...)는 내장 iptables 디코더가 처리(별도 디코더 불필요). -->
+
+<decoder name="agent_block">
+  <program_name>^agent_block$</program_name>
+</decoder>
+
+<decoder name="agent_block-add">
+  <parent>agent_block</parent>
+  <prematch>^action=add ip=\S+ ttl=\S+ result=ok</prematch>
+  <regex>^action=(\w+) ip=(\S+) ttl=(\S+) result=(\w+) reason=(\S+) by=(\S+)</regex>
+  <order>action, srcip, ttl, result, reason, by</order>
+</decoder>
+
+<decoder name="agent_block-with-ip">
+  <parent>agent_block</parent>
+  <prematch>^action=\w+ ip=\S+ </prematch>
+  <regex>^action=(\w+) ip=(\S+) \.*result=(\w+) \.*reason=(\S+)</regex>
+  <order>action, srcip, result, reason</order>
+</decoder>
+
+<decoder name="agent_block-no-ip">
+  <parent>agent_block</parent>
+  <prematch>^action=\w+ </prematch>
+  <regex>^action=(\w+) \.*result=(\w+)</regex>
+  <order>action, result</order>
+</decoder>

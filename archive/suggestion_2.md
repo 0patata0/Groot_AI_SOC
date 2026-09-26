@@ -1,6 +1,6 @@
 # 제안서 — Kubernetes(k3s) 변형 (suggestion_2)
 
-이 문서는 [suggestion.md](suggestion.md)의 **오케스트레이션 k3s 변형**이다. 프로젝트 목표·배경·모델(Qwen3-30B-A3B)·MCP 보안경계·공격 시나리오(DVWA+CVE)·평가 방법은 suggestion.md와 동일하며, 여기서는 컨테이너를 Kubernetes(k3s)로 배포할 때 달라지는 구성만 서술한다. 실행 절차는 [PLAN_2.md](PLAN_2.md)·[인프라_구축순서_2.md](인프라_구축순서_2.md) 참조.
+이 문서는 [suggestion.md](../suggestion.md)의 **오케스트레이션 k3s 변형**이다. 프로젝트 목표·배경·모델(Qwen3-30B-A3B)·MCP 보안경계·공격 시나리오(DVWA+CVE)·평가 방법은 suggestion.md와 동일하며, 여기서는 컨테이너를 Kubernetes(k3s)로 배포할 때 달라지는 구성만 서술한다. 실행 절차는 [PLAN_2.md](PLAN_2.md)·[인프라_구축순서_2.md](인프라_구축순서_2.md) 참조.
 
 > 공유(변경 없음): 1장 배경, 2장 목표, 7장 AI Agent(DGX Spark), 9장 차별점, 10장 Policy Engine, 11장 Fine-tuning, 12장 취약점, 13장 시나리오, 14장 평가, 15·16장 → suggestion.md 그대로. 아래는 3~6·8장의 k3s 변형.
 

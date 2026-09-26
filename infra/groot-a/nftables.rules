@@ -1,55 +1,29 @@
 #!/usr/sbin/nft -f
-# capstone_Groot_A 호스트 방화벽/게이트웨이 (FW)
-# 트래픽: EXT → DMZ 는 웹(80/443)만, MGMT는 EXT에서 차단.
-# Response Tool이 조작할 'agent_block' 체인을 미리 만들어 둔다.
-# 주의: 인터페이스명·대역은 실제 VM에 맞게 확정(TODO).
+# capstone_Groot_A — NAT 게이트웨이 (Phase 1, 적용 중)
+# 배포 경로: /etc/nftables.d/capstone-gw.nft  (capstone-nat.service → capstone-nat.sh 가 로드)
+#
+# ⚠️ 'flush ruleset' 절대 금지:
+#    Docker가 같은 커널 netfilter 에 자체 iptables-nft 규칙(ip nat / ip filter, DOCKER-USER 등)을
+#    관리한다. flush 하면 컨테이너 네트워킹이 깨진다. 이 파일은 '독립 테이블'만 추가한다.
+# ⚠️ forward 허용은 이 파일이 아니라 DOCKER-USER 체인에서 처리한다:
+#    Docker 가 FORWARD 정책을 DROP 으로 두고 DOCKER-USER 를 가장 먼저 점프하므로,
+#    내부망→외부 통과 허용은 capstone-nat.sh 가 DOCKER-USER 에 ACCEPT 로 넣는다.
 
-flush ruleset
-
-define IF_EXT  = "ens160"    # TODO: EXT NIC
-define IF_DMZ  = "ens192"    # TODO: DMZ NIC
-define IF_MGMT = "ens224"    # TODO: MGMT NIC
-define DMZ_NET  = 172.16.20.0/24
-define MGMT_NET = 10.10.10.0/24
-
-table inet filter {
-    # Agent(Response Tool)가 drop 규칙을 넣는 전용 체인
-    chain agent_block {
-    }
-
-    chain input {
-        type filter hook input priority 0; policy drop;
-        ct state established,related accept
-        iif "lo" accept
-        # 관리 접근(SSH 등)은 MGMT에서만
-        iifname $IF_MGMT tcp dport 22 accept
-        ip protocol icmp accept
-    }
-
-    chain forward {
-        type filter hook forward priority 0; policy drop;
-        jump agent_block
-        ct state established,related accept
-        # EXT → DMZ: 웹만 허용 (WAF/IPS 검사 경로)
-        iifname $IF_EXT oifname $IF_DMZ tcp dport { 80, 443 } accept
-        # DMZ → MGMT: Wazuh Agent 통신(1514/1515) 허용
-        iifname $IF_DMZ oifname $IF_MGMT tcp dport { 1514, 1515 } accept
-        # EXT → MGMT 직접 접근 차단(정책 drop으로 이미 막힘, 명시)
-        iifname $IF_EXT oifname $IF_MGMT drop
-    }
-
-    chain output {
-        type filter hook output priority 0; policy accept;
+table ip capstone_gw {
+    # 내부망(10.10.10.0/24) → 임시 외부(ens192) 아웃바운드 소스 NAT
+    chain postrouting {
+        type nat hook postrouting priority srcnat; policy accept;
+        ip saddr 10.10.10.0/24 oifname "ens192" masquerade
     }
 }
 
-# NAT: DMZ의 인터넷 아웃바운드가 필요하면 호스트 실제망으로 masquerade (TODO: 필요 시 활성화)
-# table ip nat {
-#     chain postrouting {
-#         type nat hook postrouting priority 100;
-#         oifname "<REAL_NET_IF>" masquerade
-#     }
-# }
-
-# inline IPS(NFQUEUE)로 전환할 때: forward에서 웹 트래픽을 'queue num 0'로 보내 Suricata 검사.
-# 초기에는 Suricata를 IDS(passive)로 두고 위 규칙만 사용.
+# ─────────────────────────────────────────────────────────────────────────────
+# Phase 2 (미적용, 로드맵) : A 를 인라인 보안 어플라이언스(FW→IPS→WAF)로 확장할 때의 설계 초안.
+# ⚠️ 아래를 그대로 적용하지 말 것 — 'flush ruleset' 및 input policy drop 은 Docker/SSH 를 끊는다.
+#   - input : 관리 SSH 는 지정 대역에서만 허용, 그 외 drop (현재 SSH 는 ens192 192.168.16 경유이므로
+#             해당 대역을 반드시 허용해야 함)
+#   - forward : EXT→DMZ 웹(80/443)만 허용, agent_block 체인(Response Tool 이 drop 삽입), conntrack
+#   - inline IPS : forward 웹 트래픽을 'queue num 0' 으로 Suricata(NFQUEUE) 검사
+#   - WAF : ModSecurity 리버스 프록시 경유
+#   상세 설계는 PLAN.md / infra/README.md 참조.
+# ─────────────────────────────────────────────────────────────────────────────

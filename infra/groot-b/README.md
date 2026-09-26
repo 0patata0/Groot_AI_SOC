@@ -1,25 +1,48 @@
-# capstone_Groot_B — SIEM(Wazuh) + MCP Server
+# 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
-## Wazuh (공식 docker 사용 권장)
-Wazuh는 인증서 생성·이미지 구성이 복잡하므로 직접 compose를 쓰지 말고 **공식 wazuh-docker single-node** 배포를 사용한다.
+## Wazuh 4.14.8 single-node — 오프라인 기동 (2026-09-26 완료 ✅)
+공식 **wazuh-docker `v4.14.8` single-node** 구성을 쓰되, 이 망은 **웹 egress 차단**이라 온라인 절차를 그대로 못 쓴다. 아래는 실제로 동작한 오프라인 절차.
 
+### 사전 준비 (완료)
+- 이미지 3종 오프라인 반입·`docker load`: `wazuh/wazuh-manager|indexer|dashboard:4.14.8`
+- 공식 `single-node/` 디렉터리(compose + config) → `~/capstone/wazuh/single-node`
+- 인덱서 필수: `vm.max_map_count=262144` (`/etc/sysctl.d/99-wazuh.conf`)
+
+### 인증서 — ⚠️ 공식 생성기 컨테이너는 오프라인 불가
+`generate-indexer-certs.yml`의 `wazuh-certs-generator`는 **실행 중 `packages.wazuh.com`에서 certs-tool을 내려받기** 때문에 이 망에선 멈춘다.
+→ 대신 **`wazuh-certs-tool.sh`(4.14, 순수 openssl·네트워크 미사용 — 코드리뷰 완료)**를 인터넷 되는 곳에서 받아 B에 넣고 직접 실행한다. `finish_wazuh.sh`가 이걸 수행한다.
+
+### 기동 절차
 ```bash
-git clone https://github.com/wazuh/wazuh-docker.git -b vX.Y.Z   # TODO: 안정 버전 태그
-cd wazuh-docker/single-node
-docker compose -f generate-indexer-certs.yml run --rm generator
-docker compose up -d
+# (인터넷 PC) https://packages.wazuh.com/4.14/wazuh-certs-tool.sh 받아서 B:/tmp/ 로, finish_wazuh.sh도 B:/tmp/
+sudo bash /tmp/finish_wazuh.sh
+#  → certs.yml을 config.yml로 복사 → certs-tool -A → 인증서를 config/wazuh_indexer_ssl_certs/에 배치
+#    (+ root-ca-manager.pem 사본) → chmod 644 → docker compose up -d → ps
 ```
-- 접속: https://<Groot_B MGMT IP> (Dashboard), Server API 55000, Indexer 9200
-- 리소스: Indexer가 병목 → RAM 16G 할당(PLAN.md 1.5). `OPENSEARCH_JAVA_OPTS` 힙 절반 이하로 설정.
-- Agent 등록: Groot_A/C에 Agent 설치, Manager=이 VM MGMT IP.
+- ⚠️ **인증서 권한은 반드시 644.** `640 root:root`로 두면 컨테이너 내부 비root 유저(wazuh-indexer)가 `root-ca.pem`을 못 읽어 보안 플러그인 로드 실패 → 인덱서 크래시 루프 → 대시보드 연쇄 재시작. (1차 기동 실패 원인)
+- 접속: Dashboard `:443`, Server API `:55000`, Indexer `:9200`, Agent `:1514`. **최종 주소는 내부망 `10.10.10.10`만** — 임시외부 `192.168.16.233`(ens192)은 설치 후 제거 대상(인라인 설계: 외부에서 B/C 직접 접근 불가, A가 유일 출입구). 운영자는 A 경유(SSH ProxyJump/포트포워딩, 예: `ssh -N groot-b-int` → `https://localhost:18443`). 2026-09-26 검증: A 경유로 22/443/1514/55000 도달, 대시보드 로그인 200.
+- 리소스: 인덱서 힙 `-Xms1g -Xmx1g`(compose 기본). B RAM 여유 커서 필요 시 상향.
+
+### 검증 결과 (2026-09-26)
+- 3컨테이너 안정 Up / 인덱서 `_cluster/health` **green** (22 shards) / Dashboard **302** / API `POST /security/user/authenticate` **JWT 발급** / `wazuh-states-*`, `wazuh-monitoring-*` 인덱스 자동 생성(매니저↔인덱서 연동 OK)
+
+### 계정 — 기본값 교체 완료 (2026-09-26)
+`admin`(indexer) · `kibanaserver`(dashboard 서비스) · `wazuh-wui`(API) 세 계정을 **팀 공용 비밀번호로 통일**(값은 `CREDENTIALS.local.md`, 커밋 금지). 데모 계정 4개(kibanaro/logstash/readall/snapshotrestore, 공개 기본비번)는 **삭제**. 롤백 아티팩트: `secbak-<ts>/`(라이브 보안인덱스 덤프) + `*.bak-<ts>`.
+- API 비번 정책: 8~64자 + 대·소문자·숫자·기호 필수 (`framework/wazuh/security.py` 정규식). 미충족 시 `create_user.py` 실패 → **매니저 컨테이너가 종료**되므로 반드시 준수.
+- 절차는 `chpw_wazuh.sh` (NEWPW/NEWHASH 환경변수로 실행, 게이트형·실패 시 자동 롤백). 해시 생성: `docker exec <indexer> bash -c 'export JAVA_HOME=/usr/share/wazuh-indexer/jdk; bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/hash.sh -p "<pw>"'`.
+- ⚠️ 이 배포에서 검증된 함정 3가지 (4명 독립 리뷰 + 실컨테이너 확인):
+  1. `internal_users.yml`·`config/wazuh_dashboard/wazuh.yml`은 **단일파일 bind mount** → `sed -i`/에디터 저장은 inode를 바꿔 **실행 중 컨테이너가 옛 파일을 계속 봄**(securityadmin이 옛 해시를 "성공" 재적용하는 무증상 실패). 반드시 `cat new > file`로 같은 inode에 덮어쓰고, 컨테이너 안에서 `grep`으로 새 값 확인 후 진행.
+  2. 대시보드의 API 비번은 **env(`API_PASSWORD`)로 안 바뀜** — `/wazuh_app_config.sh`가 마커 `1513629884013`이 있으면 건너뜀. `config/wazuh_dashboard/wazuh.yml`의 `password:`를 직접 수정해야 함(아니면 UI만 401, curl 검증은 통과하는 무증상 실패).
+  3. `securityadmin -cd`는 **보안설정 전부를 덮어써** UI/REST로 만든 사용자·롤을 지움 → `-f <internal_users.yml> -t internalusers`로 내부사용자만 적용하고, 먼저 `-backup`으로 라이브 상태를 덤프.
+- 순서: 파일 편집(compose·wazuh.yml·internal_users) → securityadmin(-f) → **새 비번 200/옛 비번 401 게이트** → `docker compose up -d`(env 변경분 재생성; `restart`는 env를 안 읽음) → filebeat test·API 토큰·대시보드 실제 로그인·데모계정 401 검증.
 
 ## MCP Server (자격증명 보유 — A안)
-- Groot_B에서 Agent(DGX Spark)와 **별도 프로세스**로 실행. 자격증명(Wazuh API 키, FW 접근, Slack)은 여기 `.env`/시크릿에만.
-- 코드는 리포의 `../../mcp-server/`(예정)에 둔다. Tool: Wazuh/Server/Network/CVE/Response.
-- 배포 스타터(예정): `docker-compose.yml`로 MCP Server 컨테이너 1개, `.env`로 자격증명 주입, MGMT에서만 노출.
+- 읽기 서버: `gbrigandi/mcp-server-wazuh`(MIT, 읽기전용, 코드리뷰 완료 @969f36f) 오프라인 배포 예정. Wazuh API :55000 + Indexer :9200에 **읽기전용 계정**으로 접속, 자격증명은 env에만.
+- 응답 서버(차단 `block_ip`/`isolate_host` → Groot_A nftables `agent_block`)는 소형 커스텀으로 별도(최소권한 분리).
+- 참고 데이터: CISA KEV `~/capstone/kev/kev.json` (`kev-data.md`).
 
-## 검증
-- [ ] Dashboard 접속, Server API/Indexer 응답
-- [ ] Groot_A/C Agent Active
+## 검증 체크리스트
+- [x] Dashboard 접속, Server API/Indexer 응답 (2026-09-26)
+- [ ] Groot_A/C Agent 등록·Active (manager `10.10.10.10:1514`)
 - [ ] Vulnerability Detection에서 Groot_C의 CVE-2021-3156 매핑 확인
-- [ ] DGX Spark에서 MCP 읽기 Tool 호출 성공, Agent 프로세스에 자격증명 없음 확인
+- [ ] MCP 읽기 Tool 호출 성공, Agent 프로세스에 자격증명 없음 확인

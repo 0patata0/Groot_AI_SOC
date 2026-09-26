@@ -1,0 +1,65 @@
+#!/bin/bash
+# agent_block — 대응 도구(Response MCP / 운영자)가 호출하는 차단 인터페이스. nft 셋 inet capstone_fw agent_block 만 조작한다. (리뷰 반영 2026-09-27)
+# 배포: /usr/local/sbin/agent_block (root 0755). root 로 실행. 추후 전용 계정 sudoers: NOPASSWD 로 'agent_block add *', 'agent_block del *', 'agent_block list' 만(flush 제외).
+# 사용:
+#   agent_block add <ipv4> [ttl] [reason]   ttl 기본 10m (30s|15m|2h, 10s~24h). 이미 있으면 TTL 갱신(원자적). reason 은 감사용(예 alert:1790..., rule:100112)
+#   agent_block del <ipv4> [-] [reason]
+#   agent_block list                        (IP, 남은 초)
+#   agent_block flush [-] [reason]
+# 거부(exit 3): never_block 셋(내부망·Docker 대역·loopback·A 자신·GW·ESXi·캠퍼스 NTP·DNS·관리 VPN 대역·B/C 임시 외부), 0/224/255 대역,
+#              현재 A 에 SSH 세션이 살아있는 출발지(AGENT_BLOCK_FORCE=1 로만 무시). 잘못된 인자 exit 2. nft 실패 exit 4. 성공 0.
+# 상태: /var/lib/capstone/agent_block.state (ip expiry_epoch) — 재부팅 시 capstone-nat.sh 가 복원. 모든 동작·거부는 syslog(tag agent_block) → journald → Wazuh(A) → B.
+set -euo pipefail
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+T="inet capstone_fw"; S=agent_block; ST=/var/lib/capstone/agent_block.state; LK=/var/lib/capstone/agent_block.lock
+cmd=${1:-none}; ip=${2:-}; ttl=${3:-10m}; [ "$ttl" = "-" ] && ttl=10m
+reason=$(printf '%s' "${4:-}" | tr -cd 'A-Za-z0-9._:/-' | cut -c1-64); reason=${reason:-none}
+who=${AGENT_BLOCK_BY:-${SUDO_USER:-$(id -un)}}
+log(){ logger -t agent_block -p auth.notice -- "$*" || true; echo "$*"; }
+q(){ printf '%q' "${1:0:64}"; }
+bad(){ log "action=$cmd ip=$(q "$ip") result=invalid reason=$1 by=$who"; exit 2; }
+trap 'log "action=$cmd ip=$(q "$ip") result=nftfail line=$LINENO by=$who"; exit 4' ERR
+O='(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])'
+valid_ip(){ [[ $1 =~ ^$O\.$O\.$O\.$O$ ]]; }
+ttl_secs(){ [[ $1 =~ ^([1-9][0-9]{0,5})([smh])$ ]] || return 1; local n=${BASH_REMATCH[1]} u=${BASH_REMATCH[2]} s
+            case $u in s) s=$n;; m) s=$((n*60));; h) s=$((n*3600));; esac; [ "$s" -ge 10 ] && [ "$s" -le 86400 ] && echo "$s"; }
+protected(){ local out; if out=$(nft get element $T never_block "{ $1 }" 2>&1); then return 0; fi
+             if grep -q 'No such file or directory' <<<"$out"; then return 1; fi
+             log "action=$cmd ip=$1 result=nftfail reason=never_block_lookup by=$who"; exit 4; }
+state_write(){ { grep -v "^$1 " "$ST" || true; if [ -n "$2" ]; then echo "$1 $2"; fi; } > "$ST.tmp"; mv -f "$ST.tmp" "$ST"; }
+
+[ "$(id -u)" = 0 ] || { echo "agent_block: must run as root" >&2; exit 1; }
+nft list set $T never_block >/dev/null 2>&1 && nft list set $T $S >/dev/null 2>&1 || { echo "agent_block: $T sets missing (capstone-fw not loaded)" >&2; exit 1; }
+mkdir -p /var/lib/capstone; exec 9>"$LK"; flock -w 5 9 || { echo "agent_block: lock timeout" >&2; exit 4; }
+touch "$ST"
+
+case $cmd in
+  add)
+    valid_ip "$ip" || bad bad_ip
+    secs=$(ttl_secs "$ttl") || bad bad_ttl
+    if protected "$ip" || [[ $ip == 0.* || $ip == 224.* || $ip == 255.* ]]; then log "action=add ip=$ip ttl=$ttl result=rejected reason=protected by=$who"; exit 3; fi
+    if [ "${AGENT_BLOCK_FORCE:-0}" != 1 ] && ss -Htn state established '( sport = :22 )' 2>/dev/null | grep -q " $ip:"; then
+      log "action=add ip=$ip ttl=$ttl result=rejected reason=active_ssh_session by=$who"; exit 3; fi
+    if nft get element $T $S "{ $ip }" >/dev/null 2>&1; then
+      printf 'delete element %s %s { %s }\nadd element %s %s { %s timeout %ss }\n' "$T" "$S" "$ip" "$T" "$S" "$ip" "$secs" | nft -f -
+    else nft add element $T $S "{ $ip timeout ${secs}s }"; fi
+    state_write "$ip" "$(( $(date +%s) + secs ))"
+    log "action=add ip=$ip ttl=${secs}s result=ok reason=$reason by=$who";;
+  del)
+    valid_ip "$ip" || bad bad_ip
+    if nft delete element $T $S "{ $ip }" 2>/dev/null; then r=ok; else r=absent; fi
+    state_write "$ip" ""
+    log "action=del ip=$ip result=$r reason=$reason by=$who";;
+  list)
+    nft -j list set $T $S | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+for o in d.get("nftables", []):
+    for e in (o.get("set") or {}).get("elem", []):
+        if isinstance(e, dict): v = e["elem"]; print(v["val"], "expires_in_s", int(float(v.get("expires", 0))))
+        else: print(e, "expires_in_s", "-")';;
+  flush)
+    n=$(nft -j list set $T $S | grep -o '"val"' | wc -l); nft flush set $T $S; : > "$ST"
+    log "action=flush count=$n result=ok reason=$reason by=$who";;
+  *) bad usage;;
+esac

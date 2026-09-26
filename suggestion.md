@@ -51,19 +51,19 @@ AI Agent가 SOC Analyst의 반복적인 조사 및 분석 업무를 자율적으
             v
 =================  ESXi 호스트  =================
 
-capstone_Groot_A  —  보안장비 (네트워크 관문 / 인라인 검사)
+2026_capstone_Groot_A  —  보안장비 (네트워크 관문 / 인라인 검사)
     |-- FW   : nftables (게이트웨이 netfilter)
     |-- IPS  : Suricata (inline, NFQUEUE)
     +-- WAF  : ModSecurity v3 + OWASP CRS (nginx)
             |  검사 통과 트래픽
             v
-capstone_Groot_C  —  메인 웹서버 (공격 대상)
+2026_capstone_Groot_C  —  메인 웹서버 (공격 대상)
     |-- DVWA               : 웹공격 (SQLi / XSS / 업로드)
     |-- CVE 취약 컨테이너   : Log4Shell(CVE-2021-44228) 등
     +-- Wazuh Agent        : 웹로그 / FIM / Syscollector
             |  로그 · 이벤트
             v
-capstone_Groot_B  —  관제 + 두뇌 인터페이스
+2026_capstone_Groot_B  —  관제 + 두뇌 인터페이스
     |-- Wazuh (Manager + Indexer + Dashboard)
     +-- MCP Server                         [자격증명 보유]
 
@@ -101,7 +101,7 @@ LLM Agent 실행처  (DGX Spark, 확정)   [자격증명 없음]
 
 4. 주요 구성 요소
 
-4.1 보안장비 계층 (capstone_Groot_A)
+4.1 보안장비 계층 (2026_capstone_Groot_A)
 
 Groot_A는 외부/공격자 세그먼트와 DMZ(웹서버) 세그먼트 사이의 관문으로, FW/IPS/WAF를 컨테이너로 실행하여 인라인 검사와 접근제어를 담당한다.
 
@@ -116,9 +116,9 @@ WAF	웹 공격 필터링(SQLi/XSS 등) 및 웹 트래픽 로깅	ModSecurity v3 +
 
 ⸻
 
-5. Main Server (capstone_Groot_C)
+5. Main Server (2026_capstone_Groot_C)
 
-ESXi의 capstone_Groot_C에 Docker 기반의 취약 서비스를 구성한다.
+ESXi의 2026_capstone_Groot_C에 Docker 기반의 취약 서비스를 구성한다.
 
 Groot_C
  ├─ Docker
@@ -156,7 +156,7 @@ Groot_A(FW)에서 nftables drop 실행
 
 6. SIEM — Wazuh
 
-capstone_Groot_B에 Wazuh Manager, Indexer, Dashboard를 all-in-one으로 구축한다.
+2026_capstone_Groot_B에 Wazuh Manager, Indexer, Dashboard를 all-in-one으로 구축한다.
 
 구성 요소	역할	포트
 Wazuh Manager	Agent 데이터 수신, 룰 기반 분석, Alert 생성, Active Response 지시, Server API 제공	1514, 1515, 55000
@@ -195,9 +195,9 @@ Qwen 계열 LLM을 실행하여 AI SOC Agent를 구성한다. LLM 실행 위치�
 항목	내용
 하드웨어	NVIDIA DGX Spark (GB10 Grace Blackwell, 128 GB 통합 메모리, ARM64 CPU)
 OS	DGX OS (Ubuntu 기반)
-추론 서버	vLLM (OpenAI 호환 API, tool calling 파서 지원) 또는 Ollama
+추론 서버	Ollama (DGX Spark, :11434, OpenAI 호환 /v1, tool calling 지원). .100/.101 두 엔드포인트로 부하 분산. vLLM은 대안
 모델	Qwen3-30B-A3B-Instruct-2507 (MoE, 활성 3B) 1차 후보. 비교용으로 Qwen3-32B(Dense). tool calling 지원
-Agent 프레임워크	Qwen-Agent(MCP 지원) 또는 LangGraph + MCP Adapter
+Agent 프레임워크	Hermes Agent (Nous Research, MIT). MCP 네이티브 지원(mcp_servers 등록), Ollama OpenAI 호환 엔드포인트 연결, HITL 승인(elicitation→Slack). 컨텍스트 64k 필요(-c 65536)
 
 DGX Spark 관련 제약
 
@@ -286,6 +286,8 @@ Network Tool
 → 단순 웹 공격인지 실제 서버 침해인지 판단
 
 즉, MCP는 Agent의 동적 조사 능력을 구현하는 Tool Interface이면서, 읽기 권한과 쓰기 권한을 가진 자격증명을 LLM 프로세스 밖으로 격리하는 보안 경계로 기능한다. Response Tool(쓰기)은 이 경계 안에서 다시 Policy Engine의 허용 목록을 거쳐야 실행되므로, LLM 출력이 곧바로 실제 대응으로 이어지지 않는다.
+
+Agent Runtime은 Hermes Agent를 사용한다. Hermes는 우리 MCP Server를 config(mcp_servers)에 등록하여 툴을 자기 registry로 가져와 호출하므로, 위 Tool 설계가 그대로 재사용된다. 쓰기(Response) 시 고위험 동작은 MCP elicitation으로 Hermes 승인 창구(Slack)에 사람 승인을 요청하고, 자동/거부의 결정적 판정은 Response Tool(MCP Server) 안의 Policy Engine이 담당한다. LLM(Ollama on DGX)과 Hermes에는 자격증명을 노출하지 않으므로 경계가 유지된다.
 
 이 경계 설계는 다음 두 가지를 실험으로 확인한다.
 

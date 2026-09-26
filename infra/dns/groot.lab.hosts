@@ -2,10 +2,9 @@
 # 지금: 각 클라이언트 /etc/hosts 에 apply_hosts.sh 로 주입(또는 수동으로 아래 줄 추가). 나중: A/B 의 dnsmasq addn-hosts 로 이 파일 그대로 재사용.
 # 형식: <IP> <name>   (hosts 와 dnsmasq addn-hosts 공용). 한 IP 에 여러 이름은 공백으로 나열 가능(쉼표 X).
 #
-# 도달성(중요):
-#  - 캠퍼스 세그먼트(192.168.16.x 직접 연결): 세 이름 모두 포트까지 접근 가능.
-#  - VPN(GlobalProtect): A 로 22/80/443 만 통과 → dvwa(80)만 이름으로 접근. wazuh(10443)/chat(8065)은 SSH 터널 사용.
-#      wazuh: ssh -N groot-b-int → https://localhost:18443 / chat: ssh -N groot-mm → http://localhost:18065
+# 도달성(중요): 세 이름 모두 192.168.16.230(A) → 위치와 무관하게 동일. A 가 포트/프록시로 뒤에 넘김.
+#  - dvwa(80), chat(443 리버스 프록시): 캠퍼스·VPN 모두 이름으로 접근(VPN 은 80/443 통과).
+#  - wazuh(대시보드): 보안상 VPN 브라우저 직접 노출 안 함 → 캠퍼스는 :10443, VPN 은 SSH 터널(ssh -N groot-b-int → https://localhost:18443).
 
 192.168.16.230 dvwa.groot.lab
 192.168.16.230 wazuh.groot.lab
@@ -13,5 +12,5 @@
 
 # 접근 요약:
 #   http://dvwa.groot.lab/                  DVWA (공개 웹, 캠퍼스·VPN 모두)
-#   https://wazuh.groot.lab:10443/          Wazuh 대시보드 (캠퍼스 직접; VPN 은 터널)
-#   http://chat.groot.lab:8065/             Mattermost 채팅 (캠퍼스 직접; VPN 은 터널)
+#   https://chat.groot.lab/                 Mattermost 채팅 (A:443 리버스 프록시, 캠퍼스·VPN 모두, 실시간 정상). 데스크톱 앱 서버도 이 URL.
+#   https://wazuh.groot.lab:10443/          Wazuh 대시보드 (캠퍼스 직접). VPN 은 ssh -N groot-b-int → https://localhost:18443

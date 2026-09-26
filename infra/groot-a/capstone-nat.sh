@@ -18,8 +18,8 @@ FWD_FILE="/etc/nftables.d/capstone-fwd.nft"
 #  - 공격 경로(DVWA)는 여기 넣지 않는다: WAF(80/8443)·IDS 를 거쳐야 한다.
 PORTFORWARDS=(
   "10443:10.10.10.10:443:Wazuh dashboard (campus: https://192.168.16.230:10443 ; VPN: ssh -N groot-b-int -> https://localhost:18443)"
-  "8065:10.10.10.10:8065:Mattermost chat (campus: http://chat.groot.lab:8065 ; VPN: ssh -N groot-mm -> localhost:18065)"
 )
+# 참고: 채팅(Mattermost)은 A:443 nginx 리버스 프록시(chatproxy, https://chat.groot.lab)로 서비스 → 여기 DNAT 아님. (구 8065 DNAT 제거됨 2026-09-27)
 
 # 1) IP forwarding (런타임). 영구화는 /etc/sysctl.d/99-capstone-nat.conf 가 담당.
 sysctl -w net.ipv4.ip_forward=1 >/dev/null

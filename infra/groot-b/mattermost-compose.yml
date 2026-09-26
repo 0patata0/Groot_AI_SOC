@@ -24,6 +24,7 @@ services:
       MM_SQLSETTINGS_DRIVERNAME: postgres
       MM_SQLSETTINGS_DATASOURCE: "postgres://mmuser:${POSTGRES_PASSWORD}@postgres:5432/mattermost?sslmode=disable&connect_timeout=10"
       MM_SERVICESETTINGS_SITEURL: ${MM_SITEURL}
+      MM_SERVICESETTINGS_ALLOWCORSFROM: ${MM_ALLOWCORSFROM:-}   # 웹소켓 origin 화이트리스트(=SiteURL). A:443 리버스 프록시(chat.groot.lab) 접속용
       MM_SERVICESETTINGS_ENABLEINCOMINGWEBHOOKS: "true"
       MM_SERVICESETTINGS_ENABLEOUTGOINGWEBHOOKS: "true"
       MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION: "false"

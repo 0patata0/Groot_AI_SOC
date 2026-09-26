@@ -52,4 +52,11 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
 ## 상태 (2026-09-27 갱신)
 - **Tier 1 배치 완료(B)**: Mattermost TE 11.11.1 + PostgreSQL 16(오프라인 반입), 팀 `soc`/채널 `soc-alerts`, incoming webhook 생성, A `/etc/resp/hitl.env`=http 연동. **실 검증**: `ssh -T groot-resp` block/unblock → `soc-alerts` 채널 게시 확인. 브라우저 `ssh -N groot-mm`→http://localhost:18065(로그인 200). 배치: `infra/groot-b/{mattermost-compose.yml, deploy_mattermost_B.sh}`. 계정/웹훅/비번은 CREDENTIALS.local.md.
 - **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커) — 런타임 결정 후. Hermes면 인터랙티브 승인 내장(PR #29373) 활용, Claude Code면 터미널 elicitation 또는 소형 브로커.
-- 포트: 10.10.10.10:8065 에만 publish(ens192 미노출). 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
+- 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.10.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
+
+### VPN·캠퍼스 클린 접속 — A:443 이름 기반 리버스 프록시 (2026-09-27 확정)
+Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실측). 사용자 제약(루프백 사용 불가)으로 클라이언트 터널은 배제 → **A:443 nginx 리버스 프록시**로 해결:
+- `https://chat.groot.lab`(443) → A nginx(chatproxy) → B:8065. SiteURL/AllowCorsFrom = `https://chat.groot.lab` → Origin 일치 → **웹소켓 101(VPN·캠퍼스 모두 실측)**.
+- `/etc/hosts` 는 어디서나 `192.168.16.230 chat.groot.lab` 동일(루프백/터널 불필요). 데스크톱 앱 서버도 `https://chat.groot.lab` 하나. 자체서명 인증서 1회 신뢰.
+- 맨 IP(`https://192.168.16.230/`)·다른 Host 는 444(무응답). 구성 `infra/groot-a/chatproxy*`(nginx:1.27-alpine 오프라인). 구 A:8065 DNAT·터널(groot-mm/groot-chat) 제거.
+- ⚠️ MM 은 plain http(8065) 유지(ConnectionSecurity 빈값), nginx 가 TLS 종단 + `X-Forwarded-Proto https`. compose env 변경은 `docker compose up -d --force-recreate` 로 적용(up 만으론 재생성 안 됨 — 실측 함정).

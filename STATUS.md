@@ -10,7 +10,7 @@
 | **Groot_B** `groot-siem` 10.10.10.10 | Wazuh SIEM + 읽기 MCP + 채팅 | ✅ manager·indexer·dashboard Up, **에이전트 3대 Active**, 읽기 서버 `/opt/mcp`, **Mattermost+PostgreSQL(mm-app/mm-postgres) Up** — HITL 알림 채널 |
 | **Groot_C** `groot-web` 10.10.10.20 | DVWA + CVE 랩 | ✅ apache active, DVWA 200, `log4shell-lab` 컨테이너, wazuh-agent active |
 | 관리포털(Wazuh) | A:10443 DNAT→B:443 | ✅ 캠퍼스 `https://wazuh.groot.lab:10443`, VPN은 `ssh -N groot-b-int`→localhost:18443. 443=비움 |
-| 채팅(Mattermost) | A:8065 DNAT→B:8065 | ✅ 캠퍼스 `http://chat.groot.lab:8065`(ping 200), VPN은 `ssh -N groot-mm`→localhost:18065. SiteURL=chat.groot.lab:8065 |
+| 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`** 캠퍼스·VPN 동일, 웹소켓 101(실시간). hosts는 어디서나 `192.168.16.230 chat.groot.lab`. 데스크톱 앱 서버 동일 URL. 맨 IP 443은 444(무응답) |
 | DVWA(웹 서비스) | A:80 WAF→C | ✅ `http://192.168.16.230/`(302) IP 접근 + **URL `http://dvwa.groot.lab/`**(WAF Host 서빙 검증; 클라이언트 hosts 적용 후) |
 
 ## 완료된 것
@@ -28,8 +28,8 @@
 - SIEM 대시보드: 캠퍼스망 `https://192.168.16.230:10443` / VPN `ssh -N groot-b-int` → `https://localhost:18443` (admin, 비번 CREDENTIALS). 443은 비움.
 - 셸: `ssh groot-a` / `ssh groot-b-int` / `ssh groot-c-int`.
 - 내부 이름(클라이언트 /etc/hosts 에 `192.168.16.230 dvwa.groot.lab wazuh.groot.lab chat.groot.lab` 1줄):
-  - 캠퍼스망: `http://dvwa.groot.lab/` · `https://wazuh.groot.lab:10443/` · `http://chat.groot.lab:8065/`
-  - VPN: `http://dvwa.groot.lab/`만 이름으로. 관리/채팅은 터널(`ssh -N groot-b-int`→18443, `ssh -N groot-mm`→18065).
+  - 캠퍼스·VPN 공통: `http://dvwa.groot.lab/` · `https://chat.groot.lab/`(데스크톱 앱 동일 URL)
+  - 대시보드만: 캠퍼스 `https://wazuh.groot.lab:10443/` / VPN `ssh -N groot-b-int`→`https://localhost:18443` (보안상 VPN 직접노출 안 함)
 - 읽기 MCP: `ssh -T groot-mcp` · 응답 MCP: `ssh -T groot-resp` (에이전트 런타임이 이 두 줄만 등록하면 됨).
 - 수동 차단(A): `sudo agent_block add <ip> [ttl] [reason]` / `list` / `del <ip>`.
 

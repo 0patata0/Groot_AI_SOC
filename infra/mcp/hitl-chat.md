@@ -57,6 +57,7 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
   - 도달 경로: MM(컨테이너)→봇 콜백은 mm-net 게이트웨이 `http://172.19.0.1:8090`, 봇은 0.0.0.0:8090. **MM SSRF 보호** 때문에 `MM_SERVICESETTINGS_ALLOWEDUNTRUSTEDINTERNALCONNECTIONS` 에 172.19.0.1 필요(compose에 설정). `EnableCommands=true`.
   - 배치: `infra/mcp/{soc_bot.py, deploy_socbot_B.sh, soc_bot.env.example}`. 실측: `/soc status|alerts|agents|vulns` 응답 확인.
   - NL(자연어) 대화는 LLM 런타임(Claude/Hermes) 연결 후. 지금은 명령형 봇(오프라인 동작).
+- **주기 보고**: B `soc-report.timer`(systemd, 기본 hourly / window 60분) → `soc_bot.py report` 자동 실행 → 채널에 인시던트 보고서 게시. **경보 0이면 게시 안 함**(스팸 방지). 주기/윈도우는 타이머·서비스 유닛에서 조정(REPORT_EVERY/REPORT_WINDOW). 수동은 `/soc report [분]`.
 
 - **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커), NL 에이전트(LLM 연결), `/soc block`(응답 MCP 연동) — 런타임 결정 후. Hermes면 인터랙티브 승인 내장(PR #29373).
 - 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.10.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.

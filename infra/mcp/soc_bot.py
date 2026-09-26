@@ -112,9 +112,12 @@ def post_mm(payload):
 
 
 def build_report(minutes):
+    """payload dict | None(조용: 경보 0 → 게시 안 함) | {'error':...}"""
     agg, err = agg_alerts(minutes)
-    if err or not agg:
-        return {"username": "SOC-Agent", "text": "인시던트 보고 생성 실패: %s" % (err or "no data")}
+    if err:
+        return {"error": err}
+    if not agg or agg.get("total", 0) == 0:
+        return None
     rows, _ = recent_alerts(minutes, size=5)
     fields = []
     if agg["rules"]:
@@ -166,7 +169,12 @@ def handle_slash(text):
         return "in_channel", "**SOC 상태**: 에이전트 %d/%d active · 최근60분 경보 %d건" % (act, len(ag or []), (agg or {}).get("total", 0))
     if cmd == "report":
         m = int(arg) if (arg and arg.isdigit()) else 15
-        ok, d = post_mm(build_report(m))
+        rep = build_report(m)
+        if rep is None:
+            return "ephemeral", "최근 %d분 인시던트 없음 — 게시하지 않음." % m
+        if "error" in rep:
+            return "ephemeral", "보고 생성 실패: %s" % rep["error"]
+        ok, d = post_mm(rep)
         return "ephemeral", ("인시던트 보고를 채널에 게시했습니다." if ok else "보고 게시 실패: %s" % d)
     return "ephemeral", "알 수 없는 명령: %s (`/soc help`)" % cmd
 
@@ -191,7 +199,12 @@ def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "help"
     if mode == "report":
         m = int(sys.argv[2]) if len(sys.argv) > 2 else 15
-        ok, d = post_mm(build_report(m)); print("report posted:" if ok else "failed:", d); sys.exit(0 if ok else 1)
+        rep = build_report(m)
+        if rep is None:
+            print("no incidents in last %dm; nothing posted" % m); sys.exit(0)   # 주기 실행 시 조용하면 스킵
+        if "error" in rep:
+            print("report error:", rep["error"]); sys.exit(1)
+        ok, d = post_mm(rep); print("report posted:" if ok else "failed:", d); sys.exit(0 if ok else 1)
     if mode == "serve":
         host, port = LISTEN.split(":"); srv = HTTPServer((host, int(port)), Handler)
         print("soc_bot serve on %s" % LISTEN, file=sys.stderr); srv.serve_forever()

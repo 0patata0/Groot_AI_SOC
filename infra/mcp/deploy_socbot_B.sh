@@ -74,6 +74,34 @@ systemctl daemon-reload; systemctl enable --now soc-bot >/dev/null; sleep 2
 systemctl is-active soc-bot >/dev/null || { journalctl -u soc-bot --no-pager -n 15; die "soc-bot not active"; }
 ss -ltn | grep -q "$LISTEN" && echo "  listening $LISTEN" || die "not listening on $LISTEN"
 
+say "P4 주기 보고 타이머(soc-report) — REPORT_EVERY(기본 1h), REPORT_WINDOW(기본 60분). 경보 0이면 미게시(스팸 방지)"
+REPORT_EVERY=${REPORT_EVERY:-1h}; REPORT_WINDOW=${REPORT_WINDOW:-60}
+cat > /etc/systemd/system/soc-report.service <<EOF
+[Unit]
+Description=capstone SOC periodic incident report to Mattermost
+After=docker.service network-online.target
+[Service]
+Type=oneshot
+User=socbot
+Group=socbot
+SupplementaryGroups=mcp
+EnvironmentFile=/etc/mcp/wazuh-ro.env
+EnvironmentFile=/etc/socbot/soc_bot.env
+ExecStart=/usr/bin/python3 /opt/socbot/soc_bot.py report $REPORT_WINDOW
+EOF
+cat > /etc/systemd/system/soc-report.timer <<EOF
+[Unit]
+Description=run SOC periodic report every $REPORT_EVERY
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=$REPORT_EVERY
+AccuracySec=30s
+[Install]
+WantedBy=timers.target
+EOF
+systemctl daemon-reload; systemctl enable --now soc-report.timer >/dev/null
+systemctl list-timers soc-report.timer --no-pager --no-legend | awk '{print "  report timer:", $1, $2, $3, $4}'
+
 say "V1 슬래시 명령 시뮬레이션(token 검증 + 응답)"
 curl -s -m8 -X POST "http://$LISTEN" -H 'Content-Type: application/x-www-form-urlencoded' \
   --data-urlencode "token=$STOKEN" --data-urlencode "text=status" | python3 -c 'import json,sys;d=json.load(sys.stdin);print("  status ->",d.get("text","")[:100])'

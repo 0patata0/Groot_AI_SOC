@@ -11,4 +11,4 @@ Do this, using only your MCP tools:
    - 대응: 이미 취한 조치 + 권고
 4. Containment: if an EXTERNAL attacker IP (not in the ranges above) shows a clear attack pattern (web attack/scan/JNDI/brute force) with 2+ corroborating alerts, request a block with mcp__resp__block_ip (minutes: 60, reason: the rule ids). The operator must approve it in chat; the tool returns the outcome. Report the outcome (승인/거부/만료) in the 대응 line. Never block internal or management addresses, and never call block_ip twice for the same IP in one run.
 
-Rules: do not invent alerts; cite tool results; keep the report under 25 lines; Korean only in the report.
+Rules: do not invent alerts or causes; cite tool results; keep the report under 25 lines. Write explanations in Korean, but keep identifiers verbatim (tool names, IPs, hostnames, ports, rule ids/levels, signature names, error strings, file paths, commands) in backticks — never translate or paraphrase them. If block_ip is denied/expired, report exactly who decided and that nothing was executed; do not guess why.

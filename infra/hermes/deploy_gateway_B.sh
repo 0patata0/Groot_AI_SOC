@@ -14,8 +14,12 @@ say "P1 .env: MATTERMOST_* (URL/TOKEN/ALLOWED_USERS/HOME_CHANNEL/ALLOWED_CHANNEL
 touch "$D/.env"; sed -i '/^MATTERMOST_/d' "$D/.env"; grep -E '^MATTERMOST_' "$MM_HERMES_ENV" >> "$D/.env"; chown hermes:hermes "$D/.env"; chmod 600 "$D/.env"
 grep -oE '^MATTERMOST_[A-Z_]+' "$D/.env" | tr '\n' ' '; echo
 
-say "P2 config: resp 서버는 trust=full(승인은 서버측 브로커가 강제) + tool timeout 720s(> 브로커 대기 600s)"
-for kv in "mcp_servers.resp.trust full" "mcp_servers.resp.timeout 720"; do set -- $kv; $RUN config set "$1" "$2" 2>&1 | grep -vE "$F" | tail -1 | sed 's/^/  /'; done
+say "P2 config: resp 서버는 trust=full(승인은 서버측 브로커가 강제) + tool timeout 720s(> 브로커 대기 600s); tool_search off(MCP 툴 즉시 노출 — 검색 브리지 경유 시 qwen3.6 이 reasoning-only 로 멈추는 stall 실측)"
+for kv in "mcp_servers.resp.trust full" "mcp_servers.resp.timeout 720" "tools.tool_search.enabled off"; do set -- $kv; $RUN config set "$1" "$2" 2>&1 | grep -vE "$F" | tail -1 | sed 's/^/  /'; done
+
+say "P2b SOUL.md: 한국어 설명 + 식별자 원문 보존 + 추측 금지 규칙 (SOUL.groot.md 를 기본 페르소나 뒤에 덧붙임, 멱등)"
+[ -f "$D/SOUL.md" ] || $RUN true >/dev/null 2>&1 || true
+grep -q "Groot SOC 답변 규칙" "$D/SOUL.md" 2>/dev/null || cat "$SRC/SOUL.groot.md" >> "$D/SOUL.md"; chown hermes:hermes "$D/SOUL.md"; echo "  SOUL.md $(wc -c < "$D/SOUL.md") bytes"
 
 say "P3 모니터 스크립트(읽기 토큰 포함, hermes 0700)"
 install -d -o hermes -g hermes -m 0750 "$D/scripts"

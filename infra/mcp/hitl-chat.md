@@ -89,3 +89,8 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 - **E2E 실측**: `soc-agent`에 "203.0.113.9 를 1분간 차단" → Hermes `block_ip` → 카드 게시(3s) → 승인 → A 차단(TTL 60s) → Hermes 회신 "BLOCKED … (approved by socadmin)". 브로커 단위 검증: 권한 없는 사용자 거부·중복 클릭 방지·잘못된 nonce 거부.
 - 주의: Mattermost 는 API 로 게시물을 돌려줄 때 버튼 콜백 컨텍스트를 제거하므로 자동 테스트는 브로커의 `/pending`·`/nonce`(브로커 토큰) 로 클릭을 시뮬레이션한다. soc_bot 8090 은 A(10.10.10.10)·MM 컨테이너(172.19.0.1) 양쪽에서 닿아야 하므로 0.0.0.0 바인드 유지(토큰 인증).
 - 비밀 위치: 봇 토큰 B `/opt/hermes-data/.env`, 브로커/읽기 토큰 B `/etc/socbot/soc_bot.env` + A `/etc/resp/hitl.env`. 문서에 값 없음.
+
+### 답변 품질 조정 (2026-09-28 저녁)
+- **증상**: 자연어 질문에 Hermes 가 툴을 부르지 않고 추론만 하다 멈추거나(agent.log `Reasoning-only clean stop`) 가짜 결과(`<status>` 태그, 존재하지 않는 경보)를 내놓음. DGX 에 직접 물으면 12/12 툴 호출 정상 → Hermes 의 **tool_search 브리지(MCP 툴을 검색→설명→호출 3단계로 숨김)** 와 큰 시스템 프롬프트가 원인.
+- **조치**: `tools.tool_search.enabled: off`(툴 스키마 24→54개 즉시 노출) + `SOUL.md` 에 "한국어 설명 / 툴명·IP·규칙id·에러원문·경로·명령은 원문 백틱 / 툴 결과에 없는 원인 추측 금지 / 승인 결과 그대로 보고" 규칙(`infra/hermes/SOUL.groot.md`) + cron 프롬프트 동일 규칙. 재검증: 상태 요약·차단목록+경보 설명 모두 실제 툴 호출, 한국어+식별자 원문, 없는 필드는 "포함되지 않음"으로 정직 보고.
+- 알려진 한계: 읽기 서버의 `get_wazuh_alert_summary` 는 rule.id 를 안 돌려줌(서버 형식) → 규칙 id 가 필요하면 `search_wazuh_manager_logs`/인덱서 조회 툴 보강 검토.

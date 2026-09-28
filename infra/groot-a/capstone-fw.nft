@@ -11,7 +11,7 @@
 # 체인
 #  - prerouting_block(raw 우선순위 = conntrack·NAT 보다 먼저): agent_block 셋의 출발지는 A 로 오든 A 를 지나든(WAF·DNAT·내부망 포함) 전부 drop.
 #      ⚠ raw 훅이라 ct state 는 항상 untracked — 이 체인에서 established 예외는 만들 수 없다(기존 SSH 세션도 즉시 끊김). 그래서 never_block 이 잠금 방지의 전부다.
-#      로그 "AGENT_BLOCK ..." 의 DST= 는 DNAT 전 주소(192.168.16.230). SIEM 상관은 SRC 기준.
+#      로그 "AGENT_BLOCK ..." 의 DST= 는 DNAT 전 주소(192.168.16.71). SIEM 상관은 SRC 기준.
 #  - input(A 자신): 기본 drop. 허용 = lo, established/related, ICMP(제한), 내부망→NTP(chrony), SSH(내부망·ens192 관리).
 #      캠퍼스 L2 잡음(브로드캐스트/멀티캐스트/디스커버리)은 로그 없이 drop. 나머지는 출발지별 1/s(버스트 5) + 전체 5/s 로 "FW_DROP_IN" 로그 후 drop.
 #
@@ -23,10 +23,10 @@ table inet capstone_fw {
         flags interval
         comment "lock-out guard: never blockable (internal, docker, lo, A, GW, ESXi, NTP, DNS, mgmt VPN, B/C temp ext)"
         elements = { 10.10.10.0/24, 172.16.0.0/12, 127.0.0.0/8,
-                     192.168.16.230, 192.168.16.129, 192.168.16.130, 192.168.16.131,
+                     192.168.16.71, 192.168.16.129, 192.168.16.130, 192.168.16.131,
                      168.126.63.1,
                      192.168.15.0/24,
-                     192.168.16.233, 192.168.16.234 }
+                     192.168.16.72, 192.168.16.73 }
     }
 
     set agent_block {

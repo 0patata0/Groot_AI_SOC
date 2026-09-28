@@ -58,7 +58,7 @@ echo "  agent_block self-test (expected non-zero exits below are NOT failures):"
 trap - ERR; set +e
 /usr/local/sbin/agent_block add 203.0.113.7 30s selftest | sed 's/^/    /'
 /usr/local/sbin/agent_block list | grep -q '^203\.0\.113\.7 ' && echo "    list ok" || echo "    !! add/list FAILED"
-for bad in 10.10.10.10 192.168.16.129 172.18.0.2 192.168.16.230; do /usr/local/sbin/agent_block add $bad 5m >/dev/null 2>&1; echo "    protected $bad -> exit $? (expect 3)"; done
+for bad in 10.10.10.10 192.168.16.129 172.18.0.2 192.168.16.71; do /usr/local/sbin/agent_block add $bad 5m >/dev/null 2>&1; echo "    protected $bad -> exit $? (expect 3)"; done
 /usr/local/sbin/agent_block add 010.10.10.10 5m >/dev/null 2>&1; echo "    leading-zero ip -> exit $? (expect 2)"
 /usr/local/sbin/agent_block add 203.0.113.8 99999s >/dev/null 2>&1; echo "    ttl 99999s -> exit $? (expect 2)"
 /usr/local/sbin/agent_block del 203.0.113.7 - selftest | sed 's/^/    /'

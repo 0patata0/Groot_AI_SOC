@@ -64,5 +64,5 @@ echo "audit.log: $(wc -c < $SS/logs/modsec/audit.log) bytes; CRS rule ids in las
 say "V3 Suricata eve.json present (real IDS alert test must come from the far side of ens192, from the SAME VM segment — never via campus VPN)"
 test -f $SS/logs/suricata/eve.json && echo "eve.json events: $(wc -l < $SS/logs/suricata/eve.json)" || echo "(eve.json not yet)"
 echo "alerts so far: $(grep -c '"event_type":"alert"' $SS/logs/suricata/eve.json 2>/dev/null || echo 0)"
-echo "  next: from B  curl -A 'sqlmap/1.0' http://192.168.16.230/dvwa/   -> eve.json sid 2008538 ; then agent_localfile.sh"
+echo "  next: from B  curl -A 'sqlmap/1.0' http://192.168.16.71/dvwa/   -> eve.json sid 2008538 ; then agent_localfile.sh"
 echo; echo "== SECSTACK_DONE =="

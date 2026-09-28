@@ -5,7 +5,7 @@
 #       시나리오 때만 이 스크립트로 A 경유 경로를 열어 Suricata(ens192 af-packet)로 검사되게 한다.
 #
 # ON  = A:ens192:8080 -> C 10.10.10.20:8080 DNAT + DOCKER-USER forward(NEW) 허용 + 회신 SNAT.
-#       공격 경로: Kali(캠퍼스) -> http://192.168.16.230:8080/  ->  A(Suricata 검사)  ->  C 랩.
+#       공격 경로: Kali(캠퍼스) -> http://192.168.16.71:8080/  ->  A(Suricata 검사)  ->  C 랩.
 #       Suricata 는 ens192 에서 inbound 패킷(JNDI/LDAP 페이로드)을 그대로 캡처 → 탐지.
 # OFF = 위 규칙 제거 → 랩은 다시 C 내부(10.10.10.20:8080) 전용.
 #
@@ -57,7 +57,7 @@ table ip $TBL {
 NFT
     du_add
     logger -t scenario-log4shell -p auth.notice -- "action=route-on ext=$EXT_IF:$EXT_PORT dst=$LAB_IP:$LAB_PORT by=$(id -un)" || true
-    echo "ON: 캠퍼스에서 http://192.168.16.230:$EXT_PORT/  ->  (Suricata 검사)  ->  $LAB_IP:$LAB_PORT"
+    echo "ON: 캠퍼스에서 http://192.168.16.71:$EXT_PORT/  ->  (Suricata 검사)  ->  $LAB_IP:$LAB_PORT"
     echo "    (VPN 은 A:8080 불통 — 캠퍼스/Kali 세그먼트에서만. 시나리오 종료 후 반드시 '$0 off')"
     ;;
   off)

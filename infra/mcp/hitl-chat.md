@@ -66,8 +66,8 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
 ### VPN·캠퍼스 클린 접속 — A:443 이름 기반 리버스 프록시 (2026-09-27 확정)
 Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실측). 사용자 제약(루프백 사용 불가)으로 클라이언트 터널은 배제 → **A:443 nginx 리버스 프록시**로 해결:
 - `https://chat.groot.lab`(443) → A nginx(chatproxy) → B:8065. SiteURL/AllowCorsFrom = `https://chat.groot.lab` → Origin 일치 → **웹소켓 101(VPN·캠퍼스 모두 실측)**.
-- `/etc/hosts` 는 어디서나 `192.168.16.230 chat.groot.lab` 동일(루프백/터널 불필요). 데스크톱 앱 서버도 `https://chat.groot.lab` 하나. 자체서명 인증서 1회 신뢰.
-- 맨 IP(`https://192.168.16.230/`)·다른 Host 는 444(무응답). 구성 `infra/groot-a/chatproxy*`(nginx:1.27-alpine 오프라인). 구 A:8065 DNAT·터널(groot-mm/groot-chat) 제거.
+- `/etc/hosts` 는 어디서나 `192.168.16.71 chat.groot.lab` 동일(루프백/터널 불필요). 데스크톱 앱 서버도 `https://chat.groot.lab` 하나. 자체서명 인증서 1회 신뢰.
+- 맨 IP(`https://192.168.16.71/`)·다른 Host 는 444(무응답). 구성 `infra/groot-a/chatproxy*`(nginx:1.27-alpine 오프라인). 구 A:8065 DNAT·터널(groot-mm/groot-chat) 제거.
 - ⚠️ MM 은 plain http(8065) 유지(ConnectionSecurity 빈값), nginx 가 TLS 종단 + `X-Forwarded-Proto https`. compose env 변경은 `docker compose up -d --force-recreate` 로 적용(up 만으론 재생성 안 됨 — 실측 함정).
 
 ### 관리포털(Wazuh 대시보드)도 같은 프록시에 (2026-09-28)
@@ -77,4 +77,4 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 - 미검증: VPN 출발지 403 은 VPN 이 끊긴 상태라 실측 못 함 → VPN 재연결 시 `https://wazuh.groot.lab` 가 403 인지 확인할 것.
 
 ### 팀원 무설정 접속 이름 추가 (2026-09-28)
-- `https://chat.grootlab.duckdns.org`(DuckDNS 공개 DNS → 192.168.16.230) 를 chatproxy 에 별도 블록/인증서로 추가. Mattermost `SiteURL` 은 이 이름(대표, 링크 생성용), `AllowCorsFrom` 은 `https://chat.groot.lab https://chat.grootlab.duckdns.org` → **두 Origin 모두 웹소켓 101 실측**(기존 hosts 사용자·데스크톱 앱 무영향). `docker compose up -d --force-recreate mattermost` 로 앱만 재생성(33s healthy).
+- `https://chat.grootlab.duckdns.org`(DuckDNS 공개 DNS → 192.168.16.71) 를 chatproxy 에 별도 블록/인증서로 추가. Mattermost `SiteURL` 은 이 이름(대표, 링크 생성용), `AllowCorsFrom` 은 `https://chat.groot.lab https://chat.grootlab.duckdns.org` → **두 Origin 모두 웹소켓 101 실측**(기존 hosts 사용자·데스크톱 앱 무영향). `docker compose up -d --force-recreate mattermost` 로 앱만 재생성(33s healthy).

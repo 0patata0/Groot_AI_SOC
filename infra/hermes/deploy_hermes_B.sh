@@ -109,7 +109,9 @@ test_mcp(){
   RUN="docker run --rm -e HERMES_UID=$UID_ -e HERMES_GID=$GID_ -v $DATA:/opt/data $IMG"
   say "T1 container-side contract tests (stdlib)"
   for s in "mcp-b get_wazuh_alert_summary" "resp-a list_blocks"; do set -- $s
-    printf "  %-7s " "$1"; timeout 120 $RUN bash -c "python3 /opt/data/contract_test.py --cmd 'ssh -T -F /opt/data/home/.ssh/config $1' --tool $2 --args '{}' 2>&1 | grep -E '^== RESULT'" | tr -d '\n'; echo
+    echo "  --- $1 ($2) ---"
+    timeout 150 $RUN bash -c "python3 /opt/data/contract_test.py --cmd 'ssh -T -F /opt/data/home/.ssh/config $1' --tool $2 --args '{}' 2>&1 | grep -E 'RESULT|tools/call|tools/list'" 2>&1 \
+      | grep -vE "s6-rc|cont-init|supervise|reconcile|preinit|stage2|Syncing|Done:" | sed 's/^/    /' || true
   done
   say "T2 Hermes own MCP client: chat -q (no model → stops at setup prompt after MCP registration) → agent.log"
   mkdir -p "$DATA/logs"; : > "$DATA/logs/agent.log"; chown "$HUSER:$HUSER" "$DATA/logs/agent.log"

@@ -1,6 +1,6 @@
 # Groot_B — 온프레미스 채팅(Mattermost Team Edition) + PostgreSQL. HITL 알림/승인 채널(내부망 전용).
 # Wazuh 스택과 분리(별도 네트워크 mm-net, 별도 compose). 배치: /home/groot_b/capstone/mattermost/
-# 포트는 내부 IP(10.10.10.10)에만 publish — 임시 ens192(192.168.16.72)에 노출 안 함. 브라우저는 A 점프 터널(-L 18065)로.
+# 포트는 내부 IP(10.10.10.10)에만 publish — 임시 ens192(192.168.16.233)에 노출 안 함. 브라우저는 A 점프 터널(-L 18065)로.
 # 비밀은 같은 폴더 .env (0600, git 미포함). 이미지: 오프라인 반입본(11.11.1 / postgres:16-alpine).
 services:
   postgres:

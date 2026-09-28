@@ -6,13 +6,13 @@
 - CVE-2021-44228 (CISA KEV). Log4j JNDI lookup을 통한 RCE 클래스.
 
 ## 선행조건 — 경로 (2026-09-27 확정: 노출은 C 내부로 좁힘, 시나리오 때 A 경유)
-**평상시 랩은 C 내부 전용**(컨테이너가 `10.10.10.20:8080` 에만 바인딩 — 캠퍼스/VPN 직접 도달 불가, 실측). 즉 구 (C)안 `192.168.16.73:8080` 직접 경로는 **이제 닫혀 있다**. 시나리오 때만 A 경유 경로를 연다:
-- **(A) 인라인 검증 — 채택/준비됨**: A 토글 스크립트로 8080 DNAT 경로를 ON → Kali(캠퍼스)가 `http://192.168.16.71:8080/` 로 치면 **Suricata(ens192 af-packet)가 그대로 검사**. 종료 후 OFF 로 회수.
+**평상시 랩은 C 내부 전용**(컨테이너가 `10.10.10.20:8080` 에만 바인딩 — 캠퍼스/VPN 직접 도달 불가, 실측). 즉 구 (C)안 `192.168.16.234:8080` 직접 경로는 **이제 닫혀 있다**. 시나리오 때만 A 경유 경로를 연다:
+- **(A) 인라인 검증 — 채택/준비됨**: A 토글 스크립트로 8080 DNAT 경로를 ON → Kali(캠퍼스)가 `http://192.168.16.230:8080/` 로 치면 **Suricata(ens192 af-packet)가 그대로 검사**. 종료 후 OFF 로 회수.
   ```bash
   # A(게이트웨이)에서 — 시나리오 시작:
   sudo /usr/local/sbin/scenario_log4shell_route.sh on      # A:8080 -> C 10.10.10.20:8080 (+회신 SNAT, forward 허용)
   sudo /usr/local/sbin/scenario_log4shell_route.sh status  # 활성 규칙 확인
-  # ... Kali(캠퍼스 직결)에서 http://192.168.16.71:8080/ 로 시나리오 수행 ...
+  # ... Kali(캠퍼스 직결)에서 http://192.168.16.230:8080/ 로 시나리오 수행 ...
   # 시나리오 종료:
   sudo /usr/local/sbin/scenario_log4shell_route.sh off     # 경로 회수 → 랩은 다시 C 내부 전용
   ```
@@ -25,7 +25,7 @@
 | 단계 | 능력(레퍼런스) | 기대 탐지 | 기대 대응 |
 |---|---|---|---|
 | 2.1 취약점 존재 | Wazuh Vulnerability Detection PoC | 대시보드 Vulnerability → Inventory에 agent 002의 Log4j/CVE-2021-44228 (Syscollector `<interval>` 주기) | 패치/격리 권고 |
-| 2.2 JNDI 주입 시도 (경로 A ON, Kali→192.168.16.71:8080) | 랩 앱 README 트리거 | Suricata ET JNDI/LDAP 룰(`ET EXPLOIT Apache log4j RCE` 계열), WAF CRS(백엔드 확장 시), Wazuh 네트워크 상관 | `agent_block add <KALI_IP>` |
+| 2.2 JNDI 주입 시도 (경로 A ON, Kali→192.168.16.230:8080) | 랩 앱 README 트리거 | Suricata ET JNDI/LDAP 룰(`ET EXPLOIT Apache log4j RCE` 계열), WAF CRS(백엔드 확장 시), Wazuh 네트워크 상관 | `agent_block add <KALI_IP>` |
 | 2.3 콜백/2차 요청 | README의 LDAP/HTTP 콜백 | A egress는 차단망(대부분 실패) — Suricata가 outbound JNDI/LDAP 흔적, Wazuh | egress 차단이 이미 완화. 소스 차단 |
 | 2.4 엔드포인트 흔적 | Wazuh auditd/프로세스 | agent 002에서 java의 비정상 자식 프로세스/네트워크(auditd 연동 시) | 대응·격리 |
 

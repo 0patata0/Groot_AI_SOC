@@ -11,7 +11,7 @@ FWD_FILE="/etc/nftables.d/capstone-fwd.nft"
 
 # 관리 페이지 포트포워딩: "<A 외부포트>:<내부IP>:<내부포트>:<설명>"  (A의 $EXT_IF 로 들어온 TCP 를 내부로 DNAT)
 #  - 정책(2026-09-27): **웹 VM 서비스(DVWA)만 기본 IP 로 외부 노출**(80). 관리포털(Wazuh 대시보드)은 특정 포트 10443 로 내리고 443 은 비운다.
-#    → https://192.168.16.71/ (443) 는 응답 없음(관리포털이 기본 URL 에 안 뜸 = 하드닝). WAF TLS 는 8443 유지, 80 은 WAF(DVWA HTTP) 그대로.
+#    → https://192.168.16.230/ (443) 는 응답 없음(관리포털이 기본 URL 에 안 뜸 = 하드닝). WAF TLS 는 8443 유지, 80 은 WAF(DVWA HTTP) 그대로.
 #    VPN 경로는 A 로 22/80/443 만 통과(실측) → 10443 은 VPN 브라우저 도달 불가. VPN 에서는 대시보드 경로 없음(정책: VPN 비노출; 루프백 터널은 2026-09-28 제거).
 #    (2026-09-28) 학과망(192.168.12.x)→VM세그먼트도 22/80/443 만 통과(10443 차단, 실측) → 대시보드는 A:443 chatproxy 의 wazuh.groot.lab
 #    서버블록(출발지 allowlist: 학과망·VM세그먼트·내부망, VPN/외부 403)으로 서비스. 아래 10443 DNAT 는 VM세그먼트 직결(Kali/현장PC)용으로 유지.
@@ -19,7 +19,7 @@ FWD_FILE="/etc/nftables.d/capstone-fwd.nft"
 #    (B/C 기본라우트가 아직 ens192 라 비대칭 라우팅 방지; ens192 제거 후에도 그대로 유효). 내부 서버 로그엔 클라이언트가 10.10.10.1 로 보임.
 #  - 공격 경로(DVWA)는 여기 넣지 않는다: WAF(80/8443)·IDS 를 거쳐야 한다.
 PORTFORWARDS=(
-  "10443:10.10.10.10:443:Wazuh dashboard (VM세그먼트 직결용: https://192.168.16.71:10443 ; 학과망/VM세그먼트는 https://wazuh.groot.lab (A:443 chatproxy) ; VPN: 없음(정책))"
+  "10443:10.10.10.10:443:Wazuh dashboard (VM세그먼트 직결용: https://192.168.16.230:10443 ; 학과망/VM세그먼트는 https://wazuh.groot.lab (A:443 chatproxy) ; VPN: 없음(정책))"
 )
 # 참고: 채팅(Mattermost)은 A:443 nginx 리버스 프록시(chatproxy, https://chat.groot.lab)로 서비스 → 여기 DNAT 아님. (구 8065 DNAT 제거됨 2026-09-27)
 

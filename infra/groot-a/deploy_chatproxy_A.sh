@@ -5,7 +5,7 @@
 # 재실행 안전: 인증서는 있으면 유지, nginx.conf 변경은 restart 로 반영(bind mount). nginx -t 실패 시 재시작 전에 중단.
 set -euo pipefail
 CD=/home/groot_a/capstone/chatproxy
-EXT=192.168.16.71
+EXT=192.168.16.230
 say(){ echo; echo "== $* =="; }; die(){ echo "!! ABORT: $*"; exit 1; }
 
 say "G0 preflight"

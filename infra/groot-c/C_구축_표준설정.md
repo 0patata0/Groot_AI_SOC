@@ -41,7 +41,7 @@
 | NIC | 역할 | C의 주소 |
 |---|---|---|
 | `ens160` | **내부망** (10.10.10.0/24) — 프로젝트 상시 사용 | `10.10.10.20/24` |
-| `ens192` | **임시 외부망** (192.168.16.0/24) — 설치용 인터넷. 설치 후 제거 예정 | `192.168.16.73/24` |
+| `ens192` | **임시 외부망** (192.168.16.0/24) — 설치용 인터넷. 설치 후 제거 예정 | `192.168.16.234/24` |
 
 - 임시외부 게이트웨이: `192.168.16.129` (정상 GW MAC = `f4:cf:e2:4c:8f:7e`)
 - **DNS: `168.126.63.1` (KT) 만 사용** (다른 DNS 넣지 말 것)
@@ -57,7 +57,7 @@ network:
     ens160:                      # 내부망 (기본 라우트 없음, 주소만)
       addresses: [10.10.10.20/24]
     ens192:                      # 임시 외부망 (기본 라우트 + DNS는 여기만)
-      addresses: [192.168.16.73/24]
+      addresses: [192.168.16.234/24]
       routes:
         - to: default
           via: 192.168.16.129
@@ -114,7 +114,7 @@ curl -fSL https://github.com/docker/compose/releases/download/v5.5.1/docker-comp
 docker pull --platform linux/amd64 hello-world && docker save hello-world:latest -o hello-world.tar
 #   (인터넷 PC에 docker가 없으면 registry API로 조립해야 함 — 필요하면 A/B 담당에게 hello-world.tar 요청)
 ```
-→ 세 파일을 C로 전송: `scp docker-29.8.1.tgz docker-compose-linux-x86_64 hello-world.tar groot_c@192.168.16.73:/tmp/`
+→ 세 파일을 C로 전송: `scp docker-29.8.1.tgz docker-compose-linux-x86_64 hello-world.tar groot_c@192.168.16.234:/tmp/`
 
 ### 3-2. C에서 설치 (아래 스크립트를 `/tmp/install_docker.sh`로 저장 후 `sudo bash`)
 ```bash
@@ -187,7 +187,7 @@ df -h /                       # 여유 공간 충분
 ```bash
 # 인터넷 PC에서
 curl -fSL http://archive.ubuntu.com/ubuntu/pool/main/n/net-tools/net-tools_2.10-0.1ubuntu4.4_amd64.deb -o net-tools.deb
-scp net-tools.deb groot_c@192.168.16.73:/tmp/
+scp net-tools.deb groot_c@192.168.16.234:/tmp/
 # C에서 (의존성은 libc6뿐 — 이미 있음)
 sudo dpkg -i /tmp/net-tools.deb && rm /tmp/net-tools.deb
 ```
@@ -196,8 +196,8 @@ sudo dpkg -i /tmp/net-tools.deb && rm /tmp/net-tools.deb
 
 ## 5. C 진행자 완료 체크리스트
 - [x] VM 이름 `2026_capstone_Groot_C`, OS Ubuntu 24.04.5, user `groot_c`, host `groot-web`
-- [x] SSH(openssh) 접속 됨 (`192.168.16.73`)
-- [x] netplan: ens160=10.10.10.20, ens192=192.168.16.73(+default GW .129), DNS=168.126.63.1 만
+- [x] SSH(openssh) 접속 됨 (`192.168.16.234`)
+- [x] netplan: ens160=10.10.10.20, ens192=192.168.16.234(+default GW .129), DNS=168.126.63.1 만
 - [x] (NIC 변경 시) init 0 콜드부트로 적용, GW MAC `f4:cf...` 확인, IP 충돌 없음
 - [x] Docker **29.8.1** 설치 (2026-09-26 확인)
 - [x] (선택) net-tools 설치
@@ -211,7 +211,7 @@ sudo dpkg -i /tmp/net-tools.deb && rm /tmp/net-tools.deb
 
 적용한 것 2가지(백업 `/etc/hosts.bak.*`):
 1. `/etc/hosts` 내부 이름 추가: `10.10.10.1 groot-sec groot-a` / `10.10.10.10 groot-siem groot-b` / `10.10.10.20 groot-web groot-c` (A·B와 동일).
-2. **apache `mod_remoteip`** (`/etc/apache2/conf-available/capstone-remoteip.conf`: `RemoteIPHeader X-Forwarded-For`, `RemoteIPInternalProxy 10.10.10.1`). 이유: 공격 트래픽은 A의 WAF(nginx)를 거쳐 오고 WAF 컨테이너는 A의 내부 IP(10.10.10.1)로 SNAT되므로, 이게 없으면 **access.log·Wazuh 경보의 srcip가 전부 10.10.10.1(A)** — 나중에 자동 차단이 A 자신을 막는 사고가 됨(실측). 적용 후 실제 클라이언트 IP(예: 192.168.16.72)로 기록·경보됨을 확인. 직접 접속(127.0.0.1 등)은 그대로 실제 피어.
+2. **apache `mod_remoteip`** (`/etc/apache2/conf-available/capstone-remoteip.conf`: `RemoteIPHeader X-Forwarded-For`, `RemoteIPInternalProxy 10.10.10.1`). 이유: 공격 트래픽은 A의 WAF(nginx)를 거쳐 오고 WAF 컨테이너는 A의 내부 IP(10.10.10.1)로 SNAT되므로, 이게 없으면 **access.log·Wazuh 경보의 srcip가 전부 10.10.10.1(A)** — 나중에 자동 차단이 A 자신을 막는 사고가 됨(실측). 적용 후 실제 클라이언트 IP(예: 192.168.16.233)로 기록·경보됨을 확인. 직접 접속(127.0.0.1 등)은 그대로 실제 피어.
 3. 시계(최종, 사용자 결정): **A ← 캠퍼스 시간 서버 192.168.16.131(chrony), C ← A(10.10.10.1, systemd-timesyncd)**. 외부 NTP는 캠퍼스가 UDP 123을 차단해 불가. C에는 `/etc/systemd/timesyncd.conf.d/capstone.conf`(NTP=10.10.10.1)가 있고 VMware Tools timesync는 **꺼 둠**(두 소스 충돌 방지). 적용 스크립트 `infra/ntp_client.sh`. **C에서 Tools timesync를 다시 켜거나 다른 NTP를 넣지 말 것.** 확인: `timedatectl timesync-status` → Server 10.10.10.1, Packet count ≥ 1. (ens192 제거 후에도 내부망 경로라 그대로 동작)
 
 참고: C 에이전트의 active-response는 기본값(enabled)인데 매니저에 트리거가 없어 동작하지 않음. 설계상 대응은 MCP→A nftables로 하므로 그대로 둠(필요 시 A처럼 disabled로).

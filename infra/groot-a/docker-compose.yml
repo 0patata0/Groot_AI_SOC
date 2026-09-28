@@ -30,7 +30,7 @@ services:
     extra_hosts:
       - "groot-web:10.10.10.20"
     ports:
-      - "80:8080"       # 외부(공격자) 유입. 내부(ens160)에도 노출됨 — 제한하려면 "192.168.16.71:80:8080"+"127.0.0.1:80:8080"
+      - "80:8080"       # 외부(공격자) 유입. 내부(ens160)에도 노출됨 — 제한하려면 "192.168.16.230:80:8080"+"127.0.0.1:80:8080"
       - "8443:8443"     # WAF TLS. 2026-09-26: A:443 은 Wazuh 대시보드 DNAT(→B:443)로 양보(VPN 경로는 22/80/443만 통과). Kali/캠퍼스 세그먼트는 8443 사용
     volumes:
       - ./logs/modsec:/var/log/modsecurity   # 호스트 디렉터리 소유 101:101 필수 (deploy 스크립트가 처리)
@@ -51,7 +51,7 @@ services:
       - "-S"
       - "/rules/suricata.rules"
       - "--set"
-      - "vars.address-groups.HOME_NET=[10.10.10.0/24,192.168.16.71/32]"
+      - "vars.address-groups.HOME_NET=[10.10.10.0/24,192.168.16.230/32]"
       - "--set"
       - "stats.interval=60"                   # 기본 8s → eve.json/stats.log 폭증 + Wazuh 잡음. 60s면 하루 1,440건
     volumes:
@@ -67,7 +67,7 @@ volumes:
   suricata-lib: {}
 
 # 검증 요령: Suricata는 localhost 트래픽을 못 본다(lo). 실경보 테스트는 ens192 건너편 — 반드시 같은 VM 세그먼트(Kali, 또는 B/C의 ens192)에서:
-#   curl -A 'sqlmap/1.0' http://192.168.16.71/dvwa/  → eve.json 에 signature_id 2008538 (ET SCAN Sqlmap)   [2026-09-26 검증됨]
+#   curl -A 'sqlmap/1.0' http://192.168.16.230/dvwa/  → eve.json 에 signature_id 2008538 (ET SCAN Sqlmap)   [2026-09-26 검증됨]
 #   ⚠️ 공격성 트래픽을 캠퍼스 VPN(GlobalProtect) 경유로 보내지 말 것 — 캠퍼스 방화벽이 (VPN클라IP↔A) 쌍을 차단해 A 관리접속이 끊긴다(실제 발생).
 # WAF는 localhost:80 으로 검증 가능(CRS 942100 등이 audit.log에 기록, DetectionOnly라 응답은 통과). DVWA 경로는 /dvwa/ (C 배치 기준).
 # 외부 클라이언트 IP는 audit.log transaction.client_ip 에 실제 IP로 남는다(Docker DNAT). localhost 테스트만 172.18.0.1.

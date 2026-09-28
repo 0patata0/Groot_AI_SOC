@@ -24,7 +24,7 @@ RESP_PUBKEY=$(printf '%s' "$RESP_PUBKEY" | tr -d '\r\n')
 [[ $RESP_PUBKEY =~ ^(ssh-ed25519|ssh-rsa|ecdsa-sha2-nistp256)\ [A-Za-z0-9+/=]+(\ [^[:cntrl:]]*)?$ ]] || die "RESP_PUBKEY not a single public key line"
 ssh-keygen -l -f <(printf '%s\n' "$RESP_PUBKEY") >/dev/null 2>&1 || die "RESP_PUBKEY not parseable"
 KEYBODY=$(awk '{print $2}' <<<"$RESP_PUBKEY")
-CFG=$(sshd -T -C user=resp,host=192.168.16.71,addr=192.168.16.71,laddr=192.168.16.71,lport=22) || die "sshd -T failed"
+CFG=$(sshd -T -C user=resp,host=192.168.16.230,addr=192.168.16.230,laddr=192.168.16.230,lport=22) || die "sshd -T failed"
 grep -qx 'usepam yes' <<<"$CFG" || die "sshd UsePAM must be yes (locked-password pubkey login)"
 grep -qx 'pubkeyauthentication yes' <<<"$CFG" || die "sshd PubkeyAuthentication must be yes"
 grep -q '^authorizedkeysfile .*\.ssh/authorized_keys' <<<"$CFG" || die "sshd AuthorizedKeysFile lacks .ssh/authorized_keys"

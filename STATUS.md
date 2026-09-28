@@ -12,7 +12,7 @@
 | 관리포털(Wazuh) | **A:443 이름 프록시**(chatproxy)→B:443 (+A:10443 DNAT 유지) | ✅ **`https://wazuh.groot.lab`** 학과망·VM세그먼트 OK(로그인 200 실측 2026-09-28). 출발지 allowlist — **VPN(192.168.15.0/24)·외부는 403**(대시보드 VPN 비노출 결정 유지). 학과망(192.168.12.x)은 10443 이 캠퍼스 FW 에 막힘(실측) → 이 경로가 유일. 팀원 무설정 별칭 **`https://wazuh.grootlab.duckdns.org`**(동일 allowlist). 맨 IP 443=444 |
 | 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`**(hosts) + **`https://chat.grootlab.duckdns.org`**(팀원 무설정, DuckDNS) — 둘 다 웹소켓 101 실측(AllowCorsFrom 두 Origin). SiteURL=DuckDNS 이름(대표). 맨 IP 443은 444 |
 | SOC 챗봇 | B `soc-bot`(systemd) + MM 슬래시 `/soc` | ✅ `/soc status\|alerts\|agents\|vulns\|report`. 읽기전용(mcp-ro), 대응은 groot-resp 분리. NL은 LLM 연결 후 |
-| 에이전트 런타임(Hermes) | B Docker `nousresearch/hermes-agent:v2026.9.24`(오프라인 반입, 격리 사용자 hermes) | ✅ **Hermes 가 MCP 2서버 17툴 등록 확인**(agent.log; 읽기 14 + 응답 3, 컨테이너 안 계약 테스트 PASS). 자격증명 격리 유지(SSH 키 1개, ForceCommand 경계). **LLM 미연결**(B egress 없음 → 로컬 llama.cpp/DGX permit/A 프록시 중 택1) |
+| 에이전트 런타임(Hermes) | B Docker `nousresearch/hermes-agent:v2026.9.24`(격리 사용자 hermes) + **LLM = DGX Ollama 211.170.162.110:11434 qwen3.6:35b(256k)** | ✅ **E2E 동작**: Hermes → DGX 추론 → MCP 툴 호출(`get_wazuh_agents`) → 한국어 답변(2026-09-28 실측). MCP 2서버 17툴, 자격증명 격리 유지. 다음: 경보 트리거(폴링) + 응답툴 승인(Tier 2) + 채팅 게이트웨이 연결 |
 | 주기 인시던트 보고 | B `soc-report.timer`(hourly) | ✅ 매시 인시던트 보고서 자동 게시. 경보 0이면 미게시(스팸 방지) |
 | 정기 상태 요약 | B `soc-summary.timer`(하루 2회, 00·12 UTC=09·21 KST) | ✅ **이상 없어도 항상** 상태 요약 게시(🟢/🟡/🔴, 에이전트·경보·취약점). `/soc summary [h]` 수동 |
 | DVWA(웹 서비스) | A:80 WAF→C | ✅ `http://192.168.16.230/`(302) IP 접근 + **URL `http://dvwa.groot.lab/`**(WAF Host 서빙 검증; 클라이언트 hosts 적용 후) |
@@ -42,7 +42,7 @@
 ## 보류 / 다음
 - **보류(2)**: B/C 임시 NIC(ens192) 제거 + 기본라우트 A로 전환(콜드부트) — **다른 작업자 세팅 중**. 완료 시 never_block의 .233/.234, ssh `groot-mcp-direct` 정리.
 - **다음 후보**:
-  1. 에이전트 런타임: **Hermes(B Docker) ↔ MCP 연결 검증 완료(2026-09-28)** → 남은 것은 LLM 연결(B 로컬 llama.cpp / DGX permit / A 경유 프록시 중 택1). 연결되면 NL 대화·`/soc block`·승인(untrusted 서버 툴) 활성화.
+  1. 에이전트: **Hermes(B) + DGX qwen3.6:35b + MCP 툴 호출까지 E2E 완료(2026-09-28)** → 다음은 경보 트리거(인덱서 폴링→조사), 응답툴 사람 승인(Tier 2, Mattermost 연동), NL 챗 게이트웨이.
   2. 시나리오 실제 실행(선행조건: DVWA `low`, ~~Log4Shell 경로~~ → **결정됨**(A 경유 토글 준비, `scenario_log4shell_route.sh`), C sudo 버전, Kali 세그먼트 직결).
   3. 응답툴 확장(`isolate_host`·`notify`) + 고위험 동작 사람 승인.
 - **HITL 채널**: Slack/Discord 등 클라우드 채팅 전부 불가(아웃바운드 443 차단, 실측). → **온프레미스 Mattermost를 B에 배치(Tier 1 완료, 2026-09-27)**: 브라우저 `ssh -N groot-mm`→http://localhost:18065, SOC 경보가 `soc-alerts` 채널에 실시간(응답 서버 block/unblock→채널 게시 검증). 승인=MCP elicitation(런타임), 알림 채널 교체는 `/etc/resp/hitl.env` 1블록. 남은 것: Tier 2(채팅 내 승인 버튼) — 런타임 결정 후(Hermes면 내장).

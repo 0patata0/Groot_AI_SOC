@@ -228,9 +228,9 @@ capstone_project/
 
 직접 구현이 아니라 Hermes Agent를 사용(교수 지정). MCP 네이티브 지원이라 2-1 MCP Server를 그대로 붙인다.
 - [x] Hermes 설치, `~/.hermes/config.yaml`의 `mcp_servers`에 우리 MCP Server 등록(stdio/HTTP) — **2026-09-28 완료**: 설치 위치=B(MCP 서버가 있는 VM; Mac 은 콘솔), 방식=공식 Docker 이미지 `nousresearch/hermes-agent:v2026.9.24`(amd64 968MB) 오프라인 반입(`infra/tools/pull_image.py`, 레지스트리 API·sha256 검증·OCI layout). `infra/hermes/deploy_hermes_B.sh prep` 완료: 격리 사용자 `hermes`(mcp 그룹 아님) + `/opt/hermes-data`(=/opt/data) + 컨테이너용 SSH 키/config + `config.yaml`(wazuh-ro=full, resp=untrusted) + B(mcp)·A(resp) authorized_keys 에 `restrict,command=` 등록. **호스트측 계약 테스트 PASS(읽기 14툴·응답 list_blocks)**. 이미지 반입·load 후 **컨테이너 안 계약 테스트 PASS(읽기·응답) + Hermes 본체 기동 agent.log `MCP: registered 17 tool(s) from 2 server(s)`**(mcp__wazuh_ro__* 14, mcp__resp__* 3). `hermes mcp test` 는 이미지에 mcp[cli](typer) 가 없어 불가 → `deploy_hermes_B.sh test` 방식. 이미지 tar 는 B `~/capstone/hermes/`(재반입용, 1GB)
-- [ ] 모델 프로바이더 = DGX Ollama(211.170.162.100/101 `:11434/v1`, OpenAI 호환). 모델은 교수 제공(요청 필요), tool calling + 64k 컨텍스트 지원 확인. Ollama는 `-c 65536`로 기동
+- [x] 모델 프로바이더 = DGX Ollama **211.170.162.110/111 `:11434/v1`**(OpenAI 호환, 2026-09-28 Mac·A·B 모두 도달 실측, Ollama 0.33.2). 모델 **qwen3.6:35b**(qwen35moe 36B Q4_K_M, capabilities tools/thinking, .110에 **262,144 컨텍스트로 상주 로드**) 채택 — 대안 gpt-oss:120b(양 노드, 32k 로드). Hermes `model.provider=custom`, `base_url=http://211.170.162.110:11434/v1`, `default=qwen3.6:35b`. **E2E 실측**: `chat -q` → `mcp__wazuh_ro__get_wazuh_agents` 호출 → 한국어 답변(3 API call, 21s)
 - [x] Hermes 실행 위치 결정: **Groot_B(Docker)** — MCP 서버와 같은 VM(2026-09-28, 사용자 결정 "에이전트는 MCP 서버가 있는 곳에"). MCP 도달성 확보. LLM 도달성은 미해결(B egress 없음, DGX 11434 불통) → 후보: B 로컬 llama.cpp(오프라인 소형 모델) / DGX permit 후 OpenAI 호환 / A 경유 프록시
-- [ ] Alert 트리거: Hermes cron/스케줄러가 Wazuh Tool로 Indexer 폴링 → 신규 경보로 조사 시작
+- [ ] Alert 트리거: Hermes cron/스케줄러가 Wazuh Tool로 Indexer 폴링 → 신규 경보로 조사 시작 (LLM·MCP 연결 완료로 착수 가능)
 - [ ] 시스템 프롬프트/지침: Tool 결과는 데이터로만, 출력 형식(판단 JSON)
 - [x] Agent(Hermes)·LLM 프로세스에 자격증명 없음 확인 — 컨테이너 데이터에는 SSH 키 1개뿐(`/opt/data/home/.ssh`), 호스트 사용자 hermes 는 mcp 그룹 아님(`/etc/mcp/*.env` 0640 root:mcp 접근 불가), MCP 는 sshd ForceCommand 래퍼로만(2026-09-28 실측)
 - [ ] 조사 trajectory 저장 (평가·파인튜닝 재사용)

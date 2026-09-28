@@ -78,3 +78,6 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 
 ### 팀원 무설정 접속 이름 추가 (2026-09-28)
 - `https://chat.grootlab.duckdns.org`(DuckDNS 공개 DNS → 192.168.16.230) 를 chatproxy 에 별도 블록/인증서로 추가. Mattermost `SiteURL` 은 이 이름(대표, 링크 생성용), `AllowCorsFrom` 은 `https://chat.groot.lab https://chat.grootlab.duckdns.org` → **두 Origin 모두 웹소켓 101 실측**(기존 hosts 사용자·데스크톱 앱 무영향). `docker compose up -d --force-recreate mattermost` 로 앱만 재생성(33s healthy).
+
+### LLM 연결 완료 — Hermes ↔ DGX Spark (2026-09-28)
+- DGX Ollama 새 주소 211.170.162.110/.111:11434 가 VM 에서 도달(이전 .100/.101 은 불통이었음). Hermes(B)를 `custom` 프로바이더 `http://211.170.162.110:11434/v1`, 모델 `qwen3.6:35b`(256k ctx 상주) 로 설정 → **MCP 툴 호출 포함 E2E 응답 확인**. 이제 NL 에이전트·경보 트리거·Tier 2(응답툴 승인, `trust: untrusted`) 구현이 가능.

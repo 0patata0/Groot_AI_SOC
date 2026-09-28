@@ -6,7 +6,7 @@
 | 이름 | → | 접근 |
 |---|---|---|
 | `dvwa.groot.lab` | 192.168.16.230:80 (WAF→DVWA) | 외부 오픈 웹서비스. 캠퍼스·VPN 모두 `http://dvwa.groot.lab/` |
-| `wazuh.groot.lab` | 192.168.16.230:10443 (A→B:443) | 관리포털. 캠퍼스 `https://wazuh.groot.lab:10443` / VPN 은 ssh 터널(18443) |
+| `wazuh.groot.lab` | 192.168.16.230:443 (A chatproxy→B:443, 출발지 allowlist) + :10443 DNAT | 관리포털. 학과망·VM세그먼트 `https://wazuh.groot.lab` / VPN·외부는 403(정책, 터널 없음) |
 | `chat.groot.lab` | 192.168.16.230:8065 (A→B:8065) | Mattermost. 캠퍼스 `http://chat.groot.lab:8065` / VPN 은 ssh 터널(`groot-mm`→18065). SiteURL=http://chat.groot.lab:8065 |
 
 > WAF(nginx)는 `default_server`라 어떤 Host 헤더든 DVWA로 서빙 → 서버 변경 불필요(검증됨: Host `dvwa.groot.lab` → 302/200).

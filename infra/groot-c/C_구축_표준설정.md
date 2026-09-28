@@ -91,7 +91,7 @@ network:
 ```
 - 확인: `getent hosts groot-siem` → `10.10.10.10`. (자기 자신 이름은 Ubuntu 기본 `127.0.1.1` 항목이 먼저 잡혀도 무방)
 - 이후 C의 Wazuh 에이전트는 매니저를 **`groot-siem`(10.10.10.10:1514)** 으로 지정.
-- 운영자 접속(최종): 외부에서 C 직접 접속 없음. Mac에서 `ssh groot-c-int`(A 경유 점프), `ssh -N groot-c-int` → `http://localhost:18080`(DVWA).
+- 운영자 접속(최종): 외부에서 C 직접 접속 없음. Mac에서 `ssh groot-c-int`(A 경유 점프). DVWA 는 브라우저로 `http://dvwa.groot.lab`(A WAF 경유). (구 루프백 터널 `localhost:18080` 은 2026-09-28 제거 — 운영자 루프백 사용 불가)
 
 ### 2-4. ⚠️ 네트워크 변경 시 주의 (A·B에서 실제로 겪음)
 - **NIC/포트그룹/어댑터 변경은 반드시 콜드부트**: `init 6`(웜 리부트)로는 반영 안 됨 → **`init 0`으로 완전 종료 후 다시 시작**해야 적용됨.

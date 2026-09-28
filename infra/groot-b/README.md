@@ -20,7 +20,7 @@ sudo bash /tmp/finish_wazuh.sh
 #    (+ root-ca-manager.pem 사본) → chmod 644 → docker compose up -d → ps
 ```
 - ⚠️ **인증서 권한은 반드시 644.** `640 root:root`로 두면 컨테이너 내부 비root 유저(wazuh-indexer)가 `root-ca.pem`을 못 읽어 보안 플러그인 로드 실패 → 인덱서 크래시 루프 → 대시보드 연쇄 재시작. (1차 기동 실패 원인)
-- 접속: Dashboard `:443`, Server API `:55000`, Indexer `:9200`, Agent `:1514`. **최종 주소는 내부망 `10.10.10.10`만** — 임시외부 `192.168.16.233`(ens192)은 설치 후 제거 대상(인라인 설계: 외부에서 B/C 직접 접근 불가, A가 유일 출입구). 운영자는 A 경유(SSH ProxyJump/포트포워딩, 예: `ssh -N groot-b-int` → `https://localhost:18443`). 2026-09-26 검증: A 경유로 22/443/1514/55000 도달, 대시보드 로그인 200.
+- 접속: Dashboard `:443`, Server API `:55000`, Indexer `:9200`, Agent `:1514`. **최종 주소는 내부망 `10.10.10.10`만** — 임시외부 `192.168.16.233`(ens192)은 설치 후 제거 대상(인라인 설계: 외부에서 B/C 직접 접근 불가, A가 유일 출입구). 운영자는 A 경유(SSH ProxyJump `ssh groot-b-int`; 대시보드 브라우저는 `https://wazuh.groot.lab` = A:443 chatproxy, 루프백 터널은 2026-09-28 제거). 2026-09-26 검증: A 경유로 22/443/1514/55000 도달, 대시보드 로그인 200.
 - 리소스: 인덱서 힙 `-Xms1g -Xmx1g`(compose 기본). B RAM 여유 커서 필요 시 상향.
 
 ### 검증 결과 (2026-09-26)

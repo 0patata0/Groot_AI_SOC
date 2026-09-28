@@ -17,6 +17,8 @@ import os
 import re
 import subprocess
 import sys
+import time
+import urllib.request
 
 try:
     import notifier  # /opt/resp/notifier.py (same dir); optional
@@ -55,6 +57,8 @@ TOOLS = [
             },
             "required": ["ip", "reason"],
         },
+        # 쓰기·파괴적: 브로커가 설정돼 있으면 운영자 승인(Mattermost 버튼) 후에만 실행된다.
+        "annotations": {"title": "Block IP (operator approval required)", "readOnlyHint": False, "destructiveHint": True, "idempotentHint": True},
     },
     {
         "name": "unblock_ip",
@@ -67,13 +71,22 @@ TOOLS = [
             },
             "required": ["ip"],
         },
+        "annotations": {"title": "Unblock IP", "readOnlyHint": False, "destructiveHint": False, "idempotentHint": True},
     },
     {
         "name": "list_blocks",
         "description": "List currently blocked IPv4 addresses and their remaining time (seconds).",
         "inputSchema": {"type": "object", "properties": {}},
+        # 읽기 전용 표시 → Hermes 의 untrusted 신뢰 게이트에서 승인 없이 호출 가능.
+        "annotations": {"title": "List blocks", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
     },
 ]
+
+# --- Tier 2 승인 브로커(B soc_bot) — 차단은 운영자 승인 후에만. env 는 run-response.sh 가 /etc/resp/hitl.env 에서 source ---
+BROKER_URL = os.environ.get("RESP_BROKER_URL", "").rstrip("/")       # 예: http://10.10.10.10:8090
+BROKER_TOKEN = os.environ.get("RESP_BROKER_TOKEN", "")
+APPROVAL_TIMEOUT = max(30, _envint("RESP_APPROVAL_TIMEOUT", 600))    # 초. Hermes 쪽 MCP tool timeout 보다 작아야 함
+APPROVAL_POLL = max(2, _envint("RESP_APPROVAL_POLL", 5))
 
 
 def log(*a):
@@ -118,6 +131,41 @@ def notify_event(ev):
         log("notify error:", e)
 
 
+def _broker(method, path, body=None):
+    req = urllib.request.Request(BROKER_URL + path, data=(json.dumps(body).encode() if body is not None else None), method=method,
+                                 headers={"Content-Type": "application/json", "X-Broker-Token": BROKER_TOKEN})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        return json.load(r)
+
+
+def request_approval(ip, minutes, reason):
+    """운영자 승인(Mattermost 버튼)을 브로커에 요청하고 결정을 기다린다.
+    (status, who): approved | denied | expired | error | unconfigured(브로커 미설정 → 정책상 즉시 실행)."""
+    if not BROKER_URL or not BROKER_TOKEN:
+        return "unconfigured", ""
+    try:
+        r = _broker("POST", "/approval", {"ip": ip, "minutes": minutes, "reason": reason, "requested_by": "hermes"})
+    except Exception as e:
+        return "error", "broker unreachable: %s" % e
+    rid = r.get("req_id")
+    if not rid or not r.get("posted"):
+        return "error", "approval card not posted: %s" % r.get("detail")
+    log("approval requested id=%s ip=%s %dm (waiting up to %ds)" % (rid, ip, minutes, APPROVAL_TIMEOUT))
+    deadline = time.time() + APPROVAL_TIMEOUT
+    while time.time() < deadline:
+        time.sleep(APPROVAL_POLL)
+        try:
+            d = _broker("GET", "/decision/%s" % rid)
+        except Exception as e:
+            log("decision poll error:", e)
+            continue
+        st = d.get("status")
+        if st in ("approved", "denied", "expired"):
+            log("approval id=%s -> %s by %s" % (rid, st, d.get("by", "")))
+            return st, d.get("by", "")
+    return "expired", "timeout %ds" % APPROVAL_TIMEOUT
+
+
 def call_tool(name, args):
     if name == "block_ip":
         ip = str(args.get("ip", "")).strip()
@@ -134,10 +182,19 @@ def call_tool(name, args):
             return tool_text("minutes must be an integer", True)
         if not (1 <= minutes <= MAX_MINUTES):
             return tool_text("minutes out of range (1..%d)" % MAX_MINUTES, True)
+        # Tier 2: 운영자 승인 (브로커 설정 시). 거부/만료/오류 = 실행 안 함(fail-closed).
+        st, who = request_approval(ip, minutes, reason)
+        if st == "denied":
+            notify_event({"kind": "rejected", "action": "block", "ip": ip, "reason": "operator_denied", "by": who})
+            return tool_text("block_ip DENIED by operator %s - NOT executed" % who, True)
+        if st in ("expired", "error"):
+            notify_event({"kind": "rejected", "action": "block", "ip": ip, "reason": "approval_%s" % st, "detail": who})
+            return tool_text("block_ip NOT executed: approval %s (%s). Ask the operator and retry only if they confirm." % (st, who), True)
+        approved_by = who if st == "approved" else "policy-auto"
         rc, out, err = run_agent_block(["add", ip, "%dm" % minutes, reason])
         if rc == 0:
-            notify_event({"kind": "block", "ip": ip, "minutes": minutes, "reason": reason, "by": "mcp"})
-            return tool_text("BLOCKED %s for %dm (%s)" % (ip, minutes, out or "ok"))
+            notify_event({"kind": "block", "ip": ip, "minutes": minutes, "reason": reason, "by": "mcp", "approved_by": approved_by})
+            return tool_text("BLOCKED %s for %dm (approved by %s; %s)" % (ip, minutes, approved_by, out or "ok"))
         if rc == 3:
             notify_event({"kind": "rejected", "action": "block", "ip": ip, "reason": "protected_or_active_session"})
         return tool_text("block_ip failed: %s [%s] %s" % (EXIT_MEANING.get(rc, "error %d" % rc), rc, err or out), True)

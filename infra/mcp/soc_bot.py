@@ -8,8 +8,15 @@
 읽기 전용(mcp-ro 계정)으로 Wazuh 인덱서(경보/취약점) + API(에이전트) 조회. 차단 등 대응은 응답 MCP(groot-resp)로 분리 유지.
 설정은 env(soc_bot.env, 0640): IDX_*, WAPI_*, MM_WEBHOOK, SLASH_TOKEN, LISTEN. 비밀은 repo 에 두지 않음.
 슬래시 명령: /soc help | alerts [분] | agents | vulns [agentId] | status | report [분]
+
+Tier 2 승인 브로커(2026-09-28): 응답 MCP 서버(A)가 차단 전에 여기로 승인을 요청하면 Mattermost 에 [승인][거부] 버튼 카드를 게시하고,
+운영자가 누르면 MM 이 /actions 로 콜백 → 결정 저장 → 응답 서버가 /decision/<id> 를 폴링해 실행/중단. 무인 실행(Hermes cron)에서도 사람 승인이 붙는다.
+  POST /approval   (X-Broker-Token)   {ip, minutes, reason, requested_by} → {req_id}
+  POST /actions    (MM 버튼 콜백; 요청별 nonce 검증 + APPROVERS 검사)
+  GET  /decision/<req_id> (X-Broker-Token) → {status: pending|approved|denied|expired, by}
+  GET  /recent?minutes=&level= (X-Read-Token) → 최신 경보 지문(Hermes cron --monitor-script 용; 새 경보가 생길 때만 바뀜)
 """
-import json, os, ssl, sys, urllib.request, urllib.parse, time
+import json, os, ssl, sys, urllib.request, urllib.parse, time, secrets, threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 CTX = ssl._create_unverified_context()   # 자체서명 인덱서/API
@@ -22,6 +29,14 @@ WAPI_PASS = os.environ.get("WAPI_PASS") or os.environ.get("WAZUH_API_PASSWORD", 
 MM_WEBHOOK = os.environ.get("MM_WEBHOOK", "")
 SLASH_TOKEN = os.environ.get("SLASH_TOKEN", "")
 LISTEN = os.environ.get("LISTEN", "127.0.0.1:8090")
+# --- Tier 2 승인 브로커 / 모니터 지문 ---
+BROKER_TOKEN = os.environ.get("BROKER_TOKEN", "")            # 응답 서버(A) ↔ 브로커 공유 비밀 (헤더 X-Broker-Token)
+READ_TOKEN = os.environ.get("READ_TOKEN", "")                # /recent 읽기 토큰 (Hermes 모니터 스크립트, 헤더 X-Read-Token)
+APPROVERS = [x for x in os.environ.get("APPROVERS", "").split(",") if x]   # 버튼 클릭 허용 MM user id 목록(빈값=누구나)
+MM_ACTION_URL = os.environ.get("MM_ACTION_URL", "http://172.19.0.1:8090")  # MM(컨테이너)→브로커 콜백 베이스(SSRF allowlist 에 있어야 함)
+APPROVAL_TTL = int(os.environ.get("APPROVAL_TTL", "900"))    # 승인 대기 상한(초). 지나면 expired = 미실행
+APPROVALS = {}                                               # req_id → 레코드 (메모리; 재시작 시 대기 중 요청은 소멸=미실행)
+_LOCK = threading.Lock()
 
 
 def _req(url, user=None, pw=None, data=None, headers=None, method=None):
@@ -175,6 +190,88 @@ def build_report(minutes):
                              "footer": "capstone SOC agent", "ts": int(time.time())}]}
 
 
+# ---- Tier 2 승인 브로커 ----
+def _expire_locked():
+    now = time.time()
+    for r in APPROVALS.values():
+        if r["status"] == "pending" and now - r["ts"] > APPROVAL_TTL:
+            r["status"] = "expired"
+
+
+def approval_create(req):
+    """응답 서버 호출: MM 에 [승인][거부] 버튼 카드 게시. (req_id, posted_ok, detail)"""
+    rid, nonce = secrets.token_hex(8), secrets.token_hex(16)
+    ip = str(req.get("ip", ""))[:45]; reason = str(req.get("reason", ""))[:80]; by = str(req.get("requested_by", "agent"))[:40]
+    try:
+        minutes = int(req.get("minutes", 10))
+    except (TypeError, ValueError):
+        minutes = 10
+    rec = {"ip": ip, "minutes": minutes, "reason": reason, "requested_by": by, "nonce": nonce, "status": "pending", "by": "", "ts": time.time()}
+    with _LOCK:
+        _expire_locked(); APPROVALS[rid] = rec
+    def act(name, decision, style):
+        return {"id": decision, "name": name, "style": style,
+                "integration": {"url": MM_ACTION_URL + "/actions", "context": {"req": rid, "nonce": nonce, "decision": decision}}}
+    text = ("에이전트(**%s**)가 **%s** 를 **%d분** 차단하려 합니다.\n사유: `%s`\n요청 id `%s` · %d분 내 응답 없으면 자동 거부(미실행)"
+            % (by, ip, minutes, reason, rid, APPROVAL_TTL // 60))
+    payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800", "title": "⚠️ 차단 승인 요청 (HITL Tier 2)", "text": text,
+               "actions": [act("승인", "approve", "primary"), act("거부", "deny", "danger")], "footer": "capstone SOC HITL", "ts": int(time.time())}]}
+    ok, d = post_mm(payload)
+    if not ok:
+        with _LOCK:
+            rec["status"], rec["by"] = "error", d
+    return rid, ok, d
+
+
+def approval_action(body):
+    """MM 버튼 클릭 콜백. 응답 = 원 카드 갱신(update) + 클릭자에게만 보이는 안내(ephemeral_text)."""
+    ctx = body.get("context") or {}
+    rid, decision = str(ctx.get("req", "")), str(ctx.get("decision", ""))
+    uid, uname = str(body.get("user_id", "")), str(body.get("user_name", ""))
+    with _LOCK:
+        _expire_locked(); rec = APPROVALS.get(rid)
+        if not rec or rec.get("nonce") != ctx.get("nonce"):
+            return {"ephemeral_text": "알 수 없거나 만료된 승인 요청입니다."}
+        if APPROVERS and uid not in APPROVERS:
+            return {"ephemeral_text": "승인 권한이 없는 계정입니다 (@%s)." % uname}
+        if rec["status"] != "pending":
+            return {"ephemeral_text": "이미 처리됨: %s (by %s)" % (rec["status"], rec["by"])}
+        rec["status"] = "approved" if decision == "approve" else "denied"
+        rec["by"] = uname or uid; rec["decided_ts"] = time.time(); st = rec["status"]
+    label = "✅ 승인됨" if st == "approved" else "❌ 거부됨"
+    props = {"attachments": [{"color": "#28a745" if st == "approved" else "#d24b4b",
+             "title": "%s · %s 차단 %d분" % (label, rec["ip"], rec["minutes"]),
+             "text": "결정: **%s** by @%s · 사유 `%s` · id `%s`" % (st, rec["by"], rec["reason"], rid),
+             "footer": "capstone SOC HITL", "ts": int(time.time())}]}
+    return {"update": {"message": "", "props": props}, "ephemeral_text": "%s 처리했습니다." % label}
+
+
+def approval_decision(rid):
+    with _LOCK:
+        _expire_locked(); rec = APPROVALS.get(rid)
+        if not rec:
+            return None
+        return {"req_id": rid, "status": rec["status"], "by": rec["by"], "ip": rec["ip"], "minutes": rec["minutes"]}
+
+
+def recent_fingerprint(minutes=60, min_level=10, n=5):
+    """Hermes cron --monitor-script 용 지문: 최신 n건(level>=min_level, 최근 minutes분)만, 절대 타임스탬프로.
+    새 경보가 생길 때만 바이트가 바뀐다(오래된 경보가 창을 벗어나도 최신 n건은 그대로)."""
+    body = {"size": n, "sort": [{"timestamp": "desc"}, {"rule.id": "desc"}],
+            "query": {"bool": {"filter": [{"range": {"timestamp": {"gte": "now-%dm" % minutes}}},
+                                          {"range": {"rule.level": {"gte": min_level}}}]}}}
+    try:
+        hits = idx_search("wazuh-alerts-*", body)["hits"]["hits"]
+    except Exception as e:
+        return {"error": str(e)}
+    out = []
+    for h in hits:
+        s = h["_source"]; r = s.get("rule", {}); d = s.get("data", {})
+        out.append({"ts": s.get("timestamp", ""), "id": r.get("id"), "level": r.get("level"), "agent": s.get("agent", {}).get("name", ""),
+                    "srcip": d.get("srcip") or (d.get("transaction") or {}).get("client_ip", ""), "desc": r.get("description", "")[:60]})
+    return {"latest": out}
+
+
 # ---- serve (Mattermost slash command) ----
 def handle_slash(text):
     parts = (text or "").split()
@@ -226,9 +323,59 @@ class Handler(BaseHTTPRequestHandler):
         b = json.dumps(obj).encode(); self.send_response(code)
         self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(b)))
         self.end_headers(); self.wfile.write(b)
+    def _body(self):
+        n = int(self.headers.get("Content-Length", 0) or 0)
+        return self.rfile.read(min(n, 1 << 20)).decode() if n else ""
+    def _tok_ok(self, header, expected):
+        return bool(expected) and self.headers.get(header, "") == expected
+    def do_GET(self):
+        u = urllib.parse.urlparse(self.path); q = urllib.parse.parse_qs(u.query)
+        if u.path.startswith("/decision/"):
+            if not self._tok_ok("X-Broker-Token", BROKER_TOKEN):
+                return self._json({"error": "unauthorized"}, 401)
+            d = approval_decision(u.path.rsplit("/", 1)[1])
+            return self._json(d or {"error": "not found"}, 200 if d else 404)
+        if u.path == "/pending":                        # 대기 중 승인 요청 목록 (브로커 토큰)
+            if not self._tok_ok("X-Broker-Token", BROKER_TOKEN):
+                return self._json({"error": "unauthorized"}, 401)
+            with _LOCK:
+                _expire_locked()
+                pend = [{"req_id": k, "ip": v["ip"], "minutes": v["minutes"], "reason": v["reason"], "age_s": int(time.time() - v["ts"])}
+                        for k, v in APPROVALS.items() if v["status"] == "pending"]
+            return self._json({"pending": pend})
+        if u.path.startswith("/nonce/"):                # 자동 검증용: 요청 생성자(브로커 토큰 보유)만 nonce 조회 가능
+            if not self._tok_ok("X-Broker-Token", BROKER_TOKEN):
+                return self._json({"error": "unauthorized"}, 401)
+            with _LOCK:
+                rec = APPROVALS.get(u.path.rsplit("/", 1)[1])
+            return self._json({"nonce": rec["nonce"]} if rec else {"error": "not found"}, 200 if rec else 404)
+        if u.path == "/recent":
+            if not self._tok_ok("X-Read-Token", READ_TOKEN):
+                return self._json({"error": "unauthorized"}, 401)
+            try:
+                m = int(q.get("minutes", ["60"])[0]); lv = int(q.get("level", ["10"])[0])
+            except ValueError:
+                return self._json({"error": "bad query"}, 400)
+            return self._json(recent_fingerprint(m, lv))
+        return self._json({"error": "not found"}, 404)
     def do_POST(self):
-        n = int(self.headers.get("Content-Length", 0)); raw = self.rfile.read(n).decode()
-        form = urllib.parse.parse_qs(raw)
+        u = urllib.parse.urlparse(self.path); raw = self._body()
+        if u.path == "/approval":                       # 응답 서버(A) → 승인 카드 생성
+            if not self._tok_ok("X-Broker-Token", BROKER_TOKEN):
+                return self._json({"error": "unauthorized"}, 401)
+            try:
+                req = json.loads(raw or "{}")
+            except ValueError:
+                return self._json({"error": "bad json"}, 400)
+            rid, ok, d = approval_create(req)
+            return self._json({"req_id": rid, "posted": ok, "detail": d}, 200 if ok else 502)
+        if u.path == "/actions":                        # Mattermost 버튼 클릭 콜백(JSON)
+            try:
+                body = json.loads(raw or "{}")
+            except ValueError:
+                return self._json({"ephemeral_text": "bad request"}, 400)
+            return self._json(approval_action(body if isinstance(body, dict) else {}))
+        form = urllib.parse.parse_qs(raw)               # 슬래시 명령 /soc (form-urlencoded)
         token = (form.get("token", [""])[0])
         if SLASH_TOKEN and token != SLASH_TOKEN:
             return self._json({"response_type": "ephemeral", "text": "unauthorized"}, 401)

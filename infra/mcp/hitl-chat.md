@@ -81,3 +81,11 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 
 ### LLM 연결 완료 — Hermes ↔ DGX Spark (2026-09-28)
 - DGX Ollama 새 주소 211.170.162.110/.111:11434 가 VM 에서 도달(이전 .100/.101 은 불통이었음). Hermes(B)를 `custom` 프로바이더 `http://211.170.162.110:11434/v1`, 모델 `qwen3.6:35b`(256k ctx 상주) 로 설정 → **MCP 툴 호출 포함 E2E 응답 확인**. 이제 NL 에이전트·경보 트리거·Tier 2(응답툴 승인, `trust: untrusted`) 구현이 가능.
+
+### Tier 2 완성 — 채팅 승인 버튼 + Hermes 게이트웨이/경보 트리거 (2026-09-28)
+- **Hermes 게이트웨이**: B 상주 컨테이너 `hermes`(`gateway run`, `/opt/hermes-data`). Mattermost 플러그인(env `MATTERMOST_URL/TOKEN/ALLOWED_USERS/HOME_CHANNEL/ALLOWED_CHANNELS/REQUIRE_MENTION/FREE_RESPONSE_CHANNELS`)이 봇 `@hermes`로 웹소켓 연결. 채널: `soc-agent`(멘션 없이 자연어 대화), `soc-alerts`(보고·승인, `@hermes` 멘션 시만 응답). 실측: 상태 질문에 MCP 툴로 조회해 한국어 답변.
+- **경보 트리거(cron `soc-alert-watch`)**: 5분마다 `--monitor-script recent_alerts.sh`(soc_bot `GET /recent` 지문: 최근 60분 level≥10 최신 5건)를 돌려 **바뀔 때만** LLM 조사 실행 → `soc-alerts`(HOME_CHANNEL)에 인시던트 보고, 내부 잡음이면 `[SILENT]`. 프롬프트 `infra/hermes/soc_alert_watch.prompt`. 배치 `infra/hermes/deploy_gateway_B.sh`.
+- **승인 브로커(soc_bot, B:8090)**: 응답 서버(A)의 `block_ip` → `POST /approval`(X-Broker-Token) → soc_bot 이 웹훅으로 [승인][거부] 버튼 카드 게시(콜백 `http://172.19.0.1:8090/actions`, 요청별 nonce) → 운영자 클릭 → `APPROVERS` 검사·결정 저장·카드 갱신 → A 가 `GET /decision/<id>` 폴링(최대 600s) → 승인 시 `agent_block`, 거부/만료/오류는 미실행(fail-closed). 무인 실행(cron)에서도 사람 승인이 붙는다. Hermes 쪽 `resp` 는 `trust: full`, `timeout: 720`(자체 게이트는 무인 실행에서 자동 거부라 서버측으로 이전). `list_blocks` 는 `readOnlyHint` 로 승인 불필요.
+- **E2E 실측**: `soc-agent`에 "203.0.113.9 를 1분간 차단" → Hermes `block_ip` → 카드 게시(3s) → 승인 → A 차단(TTL 60s) → Hermes 회신 "BLOCKED … (approved by socadmin)". 브로커 단위 검증: 권한 없는 사용자 거부·중복 클릭 방지·잘못된 nonce 거부.
+- 주의: Mattermost 는 API 로 게시물을 돌려줄 때 버튼 콜백 컨텍스트를 제거하므로 자동 테스트는 브로커의 `/pending`·`/nonce`(브로커 토큰) 로 클릭을 시뮬레이션한다. soc_bot 8090 은 A(10.10.10.10)·MM 컨테이너(172.19.0.1) 양쪽에서 닿아야 하므로 0.0.0.0 바인드 유지(토큰 인증).
+- 비밀 위치: 봇 토큰 B `/opt/hermes-data/.env`, 브로커/읽기 토큰 B `/etc/socbot/soc_bot.env` + A `/etc/resp/hitl.env`. 문서에 값 없음.

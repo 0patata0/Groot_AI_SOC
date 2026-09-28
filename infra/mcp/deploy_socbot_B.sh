@@ -43,12 +43,21 @@ else echo "  /soc exists (token reused)"; fi
 say "P3 env + systemd"
 install -d -o root -g socbot -m 0750 /etc/socbot
 umask 027
+BROKER_TOKEN=${BROKER_TOKEN:-$(python3 -c "import secrets;print(secrets.token_hex(24))")}   # 응답 서버(A) hitl.env 의 RESP_BROKER_TOKEN 과 동일해야 함
+READ_TOKEN=${READ_TOKEN:-$(python3 -c "import secrets;print(secrets.token_hex(24))")}       # Hermes 모니터 스크립트(SOC_READ_TOKEN)
+APPROVERS=${APPROVERS:-}                                                                # 승인 버튼 허용 MM user id(쉼표). 빈값=누구나
 cat > /etc/socbot/soc_bot.env <<EOF
-# capstone SOC bot. 읽기 자격은 /etc/mcp/wazuh-ro.env(WAZUH_*) 재사용. 여기엔 웹훅/슬래시토큰/리슨만.
+# capstone SOC bot. 읽기 자격은 /etc/mcp/wazuh-ro.env(WAZUH_*) 재사용. 여기엔 웹훅/슬래시토큰/리슨 + Tier2 브로커 비밀.
 MM_WEBHOOK=$MM_WEBHOOK
 SLASH_TOKEN=$STOKEN
 LISTEN=$LISTEN
+BROKER_TOKEN=$BROKER_TOKEN
+READ_TOKEN=$READ_TOKEN
+APPROVERS=$APPROVERS
+MM_ACTION_URL=$SLASH_URL
+APPROVAL_TTL=900
 EOF
+echo "  broker/read tokens written to /etc/socbot/soc_bot.env (A 의 /etc/resp/hitl.env RESP_BROKER_TOKEN 에 같은 BROKER_TOKEN 을 넣을 것)"
 chown root:socbot /etc/socbot/soc_bot.env; chmod 0640 /etc/socbot/soc_bot.env
 umask 022
 cat > /etc/systemd/system/soc-bot.service <<'EOF'

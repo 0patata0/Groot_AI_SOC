@@ -69,3 +69,9 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 - `/etc/hosts` 는 어디서나 `192.168.16.230 chat.groot.lab` 동일(루프백/터널 불필요). 데스크톱 앱 서버도 `https://chat.groot.lab` 하나. 자체서명 인증서 1회 신뢰.
 - 맨 IP(`https://192.168.16.230/`)·다른 Host 는 444(무응답). 구성 `infra/groot-a/chatproxy*`(nginx:1.27-alpine 오프라인). 구 A:8065 DNAT·터널(groot-mm/groot-chat) 제거.
 - ⚠️ MM 은 plain http(8065) 유지(ConnectionSecurity 빈값), nginx 가 TLS 종단 + `X-Forwarded-Proto https`. compose env 변경은 `docker compose up -d --force-recreate` 로 적용(up 만으론 재생성 안 됨 — 실측 함정).
+
+### 관리포털(Wazuh 대시보드)도 같은 프록시에 (2026-09-28)
+- 학과망(192.168.12.x)에서 A:10443 이 캠퍼스 FW 에 막히고(22/80/443 만 통과, VPN 과 동일 정책 실측) 운영자가 루프백 터널을 못 쓰는 제약 → **chatproxy 에 `wazuh.groot.lab` 서버블록 추가**: `https://wazuh.groot.lab` → B:443(HTTPS 백엔드, `proxy_ssl_verify off`). 인증서는 `tls/wazuh.*` 로 분리(채팅 인증서·데스크톱 앱 재신뢰 불필요).
+- **출발지 allowlist**(nginx `allow/deny`): 학과망 192.168.12.0/24 · VM세그먼트 192.168.16.0/24 · 내부망 10.10.10.0/24 만 허용, 그 외(VPN 192.168.15.0/24·외부 211.x) 403 → "대시보드는 VPN 으로 접근되면 안 됨" 결정 유지. A 는 클라이언트 IP 를 NAT 없이 그대로 본다(실측).
+- 실측(학과망 PC): `/`→302 `/app/login`, `/app/login`→200(Wazuh/OpenSearch), 채팅 회귀 200, 맨 IP 444. 배치: `infra/groot-a/{chatproxy.nginx.conf, deploy_chatproxy_A.sh}`(V4/V5 검증 추가; V2 웹소켓 curl 의 `set -e` 조기종료 버그 수정).
+- 미검증: VPN 출발지 403 은 VPN 이 끊긴 상태라 실측 못 함 → VPN 재연결 시 `https://wazuh.groot.lab` 가 403 인지 확인할 것.

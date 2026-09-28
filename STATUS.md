@@ -9,7 +9,7 @@
 | **Groot_A** `groot-sec` 192.168.16.230 / 10.10.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답 MCP | ✅ waf(healthy)·suricata(running), wazuh-agent active, nft(capstone_gw/fwd/fw), capstone-nat·chrony·리퍼 타이머 active, nftables.service **masked**, 차단 0건 |
 | **Groot_B** `groot-siem` 10.10.10.10 | Wazuh SIEM + 읽기 MCP + 채팅 | ✅ manager·indexer·dashboard Up, **에이전트 3대 Active**, 읽기 서버 `/opt/mcp`, **Mattermost+PostgreSQL(mm-app/mm-postgres) Up** — HITL 알림 채널 |
 | **Groot_C** `groot-web` 10.10.10.20 | DVWA + CVE 랩 | ✅ apache active, DVWA 200, `log4shell-lab` 컨테이너(**C 내부 전용 바인딩** `10.10.10.20:8080` — 캠퍼스/VPN 직접 도달 차단), wazuh-agent active |
-| 관리포털(Wazuh) | A:10443 DNAT→B:443 | ✅ 캠퍼스 `https://wazuh.groot.lab:10443`, VPN은 `ssh -N groot-b-int`→localhost:18443. 443=비움 |
+| 관리포털(Wazuh) | **A:443 이름 프록시**(chatproxy)→B:443 (+A:10443 DNAT 유지) | ✅ **`https://wazuh.groot.lab`** 학과망·VM세그먼트 OK(로그인 200 실측 2026-09-28). 출발지 allowlist — **VPN(192.168.15.0/24)·외부는 403**(대시보드 VPN 비노출 결정 유지). 학과망(192.168.12.x)은 10443 이 캠퍼스 FW 에 막힘(실측) → 이 경로가 유일. 맨 IP 443=444 |
 | 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`** 캠퍼스·VPN 동일, 웹소켓 101(실시간). 데스크톱 앱 서버 동일 URL. 맨 IP 443은 444 |
 | SOC 챗봇 | B `soc-bot`(systemd) + MM 슬래시 `/soc` | ✅ `/soc status\|alerts\|agents\|vulns\|report`. 읽기전용(mcp-ro), 대응은 groot-resp 분리. NL은 LLM 연결 후 |
 | 주기 인시던트 보고 | B `soc-report.timer`(hourly) | ✅ 매시 인시던트 보고서 자동 게시. 경보 0이면 미게시(스팸 방지) |
@@ -29,11 +29,11 @@
 - **문서**: `scenarios/`(탐지 검증 매트릭스 + 공개 표준 레퍼런스), infra README(A/B/C/MCP).
 
 ## 접속 치트시트 (Mac, ssh config 등록됨)
-- SIEM 대시보드: 캠퍼스망 `https://192.168.16.230:10443` / VPN `ssh -N groot-b-int` → `https://localhost:18443` (admin, 비번 CREDENTIALS). 443은 비움.
+- SIEM 대시보드: **`https://wazuh.groot.lab`**(A:443 프록시; 학과망·VM세그먼트만, VPN·외부 403). VM세그먼트 직결이면 `https://192.168.16.230:10443` 도 가능. (admin, 비번 CREDENTIALS)
 - 셸: `ssh groot-a` / `ssh groot-b-int` / `ssh groot-c-int`.
 - 내부 이름(클라이언트 /etc/hosts 에 `192.168.16.230 dvwa.groot.lab wazuh.groot.lab chat.groot.lab` 1줄):
   - 캠퍼스·VPN 공통: `http://dvwa.groot.lab/` · `https://chat.groot.lab/`(데스크톱 앱 동일 URL)
-  - 대시보드만: 캠퍼스 `https://wazuh.groot.lab:10443/` / VPN `ssh -N groot-b-int`→`https://localhost:18443` (보안상 VPN 직접노출 안 함)
+  - 대시보드: `https://wazuh.groot.lab/` (학과망·VM세그먼트만, VPN 403 — 보안상 VPN 비노출 유지). 자체서명 인증서 1회 신뢰(채팅 인증서와 별개)
 - 읽기 MCP: `ssh -T groot-mcp` · 응답 MCP: `ssh -T groot-resp` (에이전트 런타임이 이 두 줄만 등록하면 됨).
 - 수동 차단(A): `sudo agent_block add <ip> [ttl] [reason]` / `list` / `del <ip>`.
 

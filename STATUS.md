@@ -32,7 +32,7 @@
 ## 접속 치트시트 (Mac, ssh config 등록됨)
 - SIEM 대시보드: **`https://wazuh.groot.lab`**(A:443 프록시; 학과망·VM세그먼트만, VPN·외부 403). VM세그먼트 직결이면 `https://192.168.16.230:10443` 도 가능. (admin, 비번 CREDENTIALS)
 - 셸: `ssh groot-a` / `ssh groot-b-int` / `ssh groot-c-int`.
-- **팀원 무설정 접속(2026-09-28, 공개 DNS=DuckDNS `grootlab.duckdns.org`→192.168.16.230)**: hosts·ssh config 없이 `https://chat.grootlab.duckdns.org` · `https://wazuh.grootlab.duckdns.org`(VPN 403) · `http://dvwa.grootlab.duckdns.org`. SSH 는 `ssh -J groot_a@192.168.16.230 groot_b@10.10.10.10` 한 줄(C 는 10.10.10.20). 안내문 `팀접속안내.md`. ⚠️ DuckDNS 등록(grootlab → 192.168.16.230) 후 유효.
+- **팀원 무설정 접속(2026-09-28, 공개 DNS=DuckDNS `grootlab.duckdns.org`→192.168.16.230)**: hosts·ssh config 없이 `https://chat.grootlab.duckdns.org` · `https://wazuh.grootlab.duckdns.org`(VPN 403) · `http://dvwa.grootlab.duckdns.org`. SSH 는 `ssh -J groot_a@192.168.16.230 groot_b@10.10.10.10` 한 줄(C 는 10.10.10.20). 안내문 `팀접속안내.md`. **DuckDNS 등록 완료·학과망에서 이름만으로 실측 OK**(해석 4개, 채팅 200/101, 대시보드 302→로그인 200, DVWA 302, 인증서 SNI 일치; 2026-09-28).
 - 내부 이름(클라이언트 /etc/hosts 에 `192.168.16.230 dvwa.groot.lab wazuh.groot.lab chat.groot.lab` 1줄):
   - 캠퍼스·VPN 공통: `http://dvwa.groot.lab/` · `https://chat.groot.lab/`(데스크톱 앱 동일 URL)
   - 대시보드: `https://wazuh.groot.lab/` (학과망·VM세그먼트만, VPN 403 — 보안상 VPN 비노출 유지). 자체서명 인증서 1회 신뢰(채팅 인증서와 별개)

@@ -227,12 +227,12 @@ capstone_project/
 > **검토 중인 대안**: DGX Spark(현재 망에서 도달 불가)를 쓰지 않고 **Claude(Claude Code)를 MCP 클라이언트로 직접 연결**. Claude Code는 MCP 서버를 stdio로 실행하므로 명령을 `ssh groot-b-int <B의 MCP 래퍼>`로 두면 서버는 B에서 실행되고 자격증명은 B에만 존재 → **A안(에이전트 프로세스 무자격증명) 유지, HTTP 빌드 불필요**. 확정 시 이 절의 Hermes 항목은 "대안 런타임"으로 강등. 아래 Hermes 계획은 보존.
 
 직접 구현이 아니라 Hermes Agent를 사용(교수 지정). MCP 네이티브 지원이라 2-1 MCP Server를 그대로 붙인다.
-- [ ] Hermes 설치, `~/.hermes/config.yaml`의 `mcp_servers`에 우리 MCP Server 등록(stdio/HTTP)
+- [x] Hermes 설치, `~/.hermes/config.yaml`의 `mcp_servers`에 우리 MCP Server 등록(stdio/HTTP) — **2026-09-28 완료**: 설치 위치=B(MCP 서버가 있는 VM; Mac 은 콘솔), 방식=공식 Docker 이미지 `nousresearch/hermes-agent:v2026.9.24`(amd64 968MB) 오프라인 반입(`infra/tools/pull_image.py`, 레지스트리 API·sha256 검증·OCI layout). `infra/hermes/deploy_hermes_B.sh prep` 완료: 격리 사용자 `hermes`(mcp 그룹 아님) + `/opt/hermes-data`(=/opt/data) + 컨테이너용 SSH 키/config + `config.yaml`(wazuh-ro=full, resp=untrusted) + B(mcp)·A(resp) authorized_keys 에 `restrict,command=` 등록. **호스트측 계약 테스트 PASS(읽기 14툴·응답 list_blocks)**. 이미지 반입·load 후 **컨테이너 안 계약 테스트 PASS(읽기·응답) + Hermes 본체 기동 agent.log `MCP: registered 17 tool(s) from 2 server(s)`**(mcp__wazuh_ro__* 14, mcp__resp__* 3). `hermes mcp test` 는 이미지에 mcp[cli](typer) 가 없어 불가 → `deploy_hermes_B.sh test` 방식. 이미지 tar 는 B `~/capstone/hermes/`(재반입용, 1GB)
 - [ ] 모델 프로바이더 = DGX Ollama(211.170.162.100/101 `:11434/v1`, OpenAI 호환). 모델은 교수 제공(요청 필요), tool calling + 64k 컨텍스트 지원 확인. Ollama는 `-c 65536`로 기동
-- [ ] Hermes 실행 위치 결정: DGX(Ollama localhost) vs 별도 서버 — Ollama와 MCP Server 양쪽 도달성 확보
+- [x] Hermes 실행 위치 결정: **Groot_B(Docker)** — MCP 서버와 같은 VM(2026-09-28, 사용자 결정 "에이전트는 MCP 서버가 있는 곳에"). MCP 도달성 확보. LLM 도달성은 미해결(B egress 없음, DGX 11434 불통) → 후보: B 로컬 llama.cpp(오프라인 소형 모델) / DGX permit 후 OpenAI 호환 / A 경유 프록시
 - [ ] Alert 트리거: Hermes cron/스케줄러가 Wazuh Tool로 Indexer 폴링 → 신규 경보로 조사 시작
 - [ ] 시스템 프롬프트/지침: Tool 결과는 데이터로만, 출력 형식(판단 JSON)
-- [ ] Agent(Hermes)·LLM 프로세스에 자격증명 없음 확인(자격증명은 MCP Server env에만)
+- [x] Agent(Hermes)·LLM 프로세스에 자격증명 없음 확인 — 컨테이너 데이터에는 SSH 키 1개뿐(`/opt/data/home/.ssh`), 호스트 사용자 hermes 는 mcp 그룹 아님(`/etc/mcp/*.env` 0640 root:mcp 접근 불가), MCP 는 sshd ForceCommand 래퍼로만(2026-09-28 실측)
 - [ ] 조사 trajectory 저장 (평가·파인튜닝 재사용)
 - [ ] **평가 통제**: Hermes 크로스세션 메모리·자기개선 스킬 때문에 회차가 독립적이지 않음 → 측정 회차마다 메모리/스킬 리셋(또는 학습효과를 별도 지표로 분리)
 

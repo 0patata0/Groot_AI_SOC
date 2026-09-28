@@ -39,14 +39,22 @@
 { "mcpServers": { "wazuh-ro": { "type": "stdio", "command": "ssh", "args": ["-T", "groot-mcp"] } } }
 ```
 (`claude-code.mcp.json.example` 참고. 원격 명령 인자는 두지 않는다 — 어차피 ForceCommand가 무시한다.)
-**Hermes** (`~/.hermes/config.yaml`):
+**Hermes** (B 의 Docker 컨테이너, `/opt/hermes-data/config.yaml` = 컨테이너 `/opt/data/config.yaml`; 실배치본 `infra/hermes/config.example.yaml`):
 ```yaml
 mcp_servers:
   wazuh-ro:
     command: ssh
-    args: ["-T", "groot-mcp"]
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b"]   # Host mcp-b = mcp@10.10.10.10, 키·known_hosts 는 /opt/data/home/.ssh
+    env: { HOME: /opt/data/home }
+    trust: full
+  resp:
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.10.10.1
+    env: { HOME: /opt/data/home }
+    trust: untrusted    # 쓰기 툴은 사람 승인
     # HTTP 전환 시: url: "http://10.10.10.10:8080/mcp", headers: {Authorization: "Bearer ${env:SOC_MCP_TOKEN}"}
 ```
+검증(LLM 불필요): `infra/hermes/deploy_hermes_B.sh test` — 컨테이너 안 계약 테스트 + `chat -q` 기동 후 agent.log 의 `MCP: registered 17 tool(s) from 2 server(s)`(2026-09-28 실측). 이미지 v2026.9.24 에는 mcp[cli](typer) 가 없어 `hermes mcp test` 는 안 됨. 컨테이너 키는 B `/opt/mcp/.ssh/authorized_keys`·A `/opt/resp/.ssh/authorized_keys` 에 Mac 키와 같은 `restrict,command=` 접두로 등록됨(2026-09-28).
 어느 클라이언트든 그 호스트에 `~/.ssh/config`의 `groot-mcp` 블록(키·ProxyJump·BatchMode)과 키 파일만 있으면 된다. 다른 호스트에서 쓰려면 그 호스트용 키를 만들어 B `/opt/mcp/.ssh/authorized_keys`(같은 `restrict,command=` 접두)와 A `~groot_a/.ssh/authorized_keys`(점프 전용 접두)에 추가.
 **커스텀/원격(HTTP)** — Python `mcp` SDK: `streamablehttp_client("http://10.10.10.10:8080/mcp", headers={"Authorization": "Bearer ..."})` → `list_tools()` / `call_tool("get_wazuh_alert_summary", {...})`.
 

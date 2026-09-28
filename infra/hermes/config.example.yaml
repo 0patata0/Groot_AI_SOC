@@ -1,54 +1,43 @@
-# Hermes Agent 설정 예시 — ~/.hermes/config.yaml
-# 우리 SOC MCP Server(Groot_B)를 등록한다.
-# 핵심(A안): Wazuh API 키·FW 접근 등 "실제 자격증명"은 여기 두지 않는다.
-#   → 그건 MCP Server(Groot_B) 프로세스의 env/secret에만. 여기엔 MCP 엔드포인트
-#     접근용 토큰(전송 인증)만 둔다. LLM/Hermes는 실제 자격증명을 못 본다.
+# Hermes Agent 설정 — Groot SOC (실배치본과 동일, 2026-09-28). 위치: Groot_B /opt/hermes-data/config.yaml (컨테이너 /opt/data/config.yaml)
+# 실행: 공식 Docker 이미지 nousresearch/hermes-agent(오프라인 반입), 데이터 볼륨 /opt/hermes-data:/opt/data, HERMES_UID/GID=호스트 hermes 사용자.
+# 핵심(A안): Wazuh API·인덱서·FW 자격증명은 여기 없다. MCP 서버는 sshd ForceCommand 경계(mcp@B, resp@A)로만 붙고,
+#   컨테이너는 그 계정들의 authorized_keys 에 restrict,command= 로 등록된 SSH 키 하나만 가진다(/opt/data/home/.ssh/).
+#   호스트 사용자 hermes 는 mcp 그룹이 아니라 /etc/mcp/*.env 를 읽을 수 없다.
+# 배치·검증: infra/hermes/deploy_hermes_B.sh (prep | load <tar> | test). 검증은 `deploy_hermes_B.sh test`(계약 테스트 + chat -q 후 agent.log). 이미지엔 mcp[cli] 가 없어 `hermes mcp test` 불가. 실측 2026-09-28: 17툴(읽기 14+응답 3) 등록.
 
 mcp_servers:
-  soc:
-    # Groot_B의 MCP Server 엔드포인트 (내부 MGMT 망)
-    url: "http://GROOT_B_IP:8080/mcp"          # TODO: Groot_B MGMT IP/포트로 교체
-    transport: "sse"                            # 생략 시 기본 Streamable HTTP
-    headers:
-      # MCP 엔드포인트 보호용 토큰(전송 인증). Wazuh/FW 자격증명 아님.
-      Authorization: "Bearer ${env:SOC_MCP_TOKEN}"
+  wazuh-ro:                                   # 읽기 MCP 서버(B, gbrigandi/mcp-server-wazuh, 계정 mcp-ro) — 14 툴
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b"]   # ssh config 의 Host mcp-b = mcp@10.10.10.10 (키·known_hosts 는 /opt/data/home/.ssh)
+    env:
+      HOME: /opt/data/home                    # Hermes 는 셸 env 를 전부 넘기지 않으므로 HOME 명시
     connect_timeout: 60
-    timeout: 180                                # Tool 호출 타임아웃(초)
+    timeout: 180
     supports_parallel_tool_calls: false
-    enabled: true
     tools:
-      # 조사(읽기) + 대응(쓰기) 노출. 쓰기(block/isolate)의 자동/승인/거부
-      # 결정적 게이팅은 서버 안 Policy Engine이 담당(여기서 막지 않아도 안전).
-      include:
-        - search_alerts
-        - get_alert
-        - get_agent_status
-        - get_vulnerabilities
-        - cve_lookup
-        - get_processes
-        - get_open_ports
-        - get_fim_events
-        - get_auth_events
-        - search_suricata
-        - block_ip
-        - isolate_host
-        - notify
-      exclude: []
-      resources: false     # MCP resource 유틸 비활성(불필요)
-      prompts: false        # MCP prompt 유틸 비활성
-    # 등록되는 툴 이름은 mcp__soc__<tool> 형태 (예: mcp__soc__block_ip)
+      resources: false
+      prompts: false
+    trust: full                               # 읽기전용 서버
+  resp:                                       # 응답(차단) MCP 서버(A, response-mcp.py, 계정 resp) — block_ip/unblock_ip/list_blocks
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.10.10.1
+    env:
+      HOME: /opt/data/home
+    connect_timeout: 60
+    timeout: 180
+    supports_parallel_tool_calls: false
+    tools:
+      resources: false
+      prompts: false
+    trust: untrusted                          # 쓰기 툴(block_ip 등)은 Hermes 가 사람 승인을 받게 함(HITL) — 서버 정책 엔진과 이중 안전
 
-# ── 모델(LLM) 연결 ──
-# DGX Ollama(OpenAI 호환)를 프로바이더로. `hermes model`로 설정하거나 provider 설정.
-#   endpoint: http://211.170.162.100:11434/v1   (부하분산 시 .101도)
-#   주의: Hermes는 64k 컨텍스트 필요 → Ollama를 `-c 65536`로 기동
-#   모델: 교수 제공(요청). tool calling + 긴 컨텍스트 지원 확인.
+security:
+  allow_lazy_installs: false                  # 오프라인: 런타임 pip 설치 시도 금지
 
-# ── 평가(측정) 모드: 학습 비활성화로 회차 독립성 확보 ──
-# (자기개선·크로스세션 메모리가 켜져 있으면 회차가 서로 영향 → 측정 오염)
-memory:
-  memory_enabled: false            # 크로스세션 메모리 끔
-# 스킬 자기개선 끔:  런타임에 `/skills approval off`
-# 더 강하게:  agent.disabled_toolsets: [memory, skills]   # 키는 공식 config 문서로 확인
+# ── 모델(LLM) — 미결 ──
+# B 는 웹 egress 가 없고 DGX(11434)도 불통 → 외부 API/Ollama 원격은 불가. 후보: (1) B 로컬 llama.cpp(Hermes pm 의 llamacpp-cpu 패키지, 소형 모델 오프라인 반입),
+#   (2) 관리자 permit 후 DGX Ollama(OpenAI 호환 base_url), (3) A 경유 프록시. `hermes model` 로 프로바이더 설정. 툴 콜링 + 64k 컨텍스트 필요.
 
-# 실제 운영(측정 아님)에선 memory_enabled: true로 두어 학습 효과를 별도 실험으로 측정 가능.
+# ── 평가(측정) 모드: 학습 비활성화로 회차 독립성 확보 (infra/hermes/eval_reset.md) ──
+# memory:
+#   memory_enabled: false

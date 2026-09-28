@@ -60,7 +60,7 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
 - **주기 인시던트 보고**: B `soc-report.timer`(systemd, 기본 hourly / window 60분) → `soc_bot.py report` → 채널 게시. **경보 0이면 게시 안 함**(스팸 방지). 수동 `/soc report [분]`.
 - **정기 상태 요약(heartbeat)**: B `soc-summary.timer`(하루 2회, `OnCalendar=*-*-* 00,12:00:00` UTC = 09/21 KST, Persistent) → `soc_bot.py summary 12` → **이상 없어도 항상 게시**(🟢 이상없음 / 🟡 관찰 / 🔴 주의; 에이전트 active·최근 12h 경보·상위규칙·취약점). 수동 `/soc summary [시간]`. 주기/시각은 타이머 유닛에서 조정(SUMMARY_ONCAL/SUMMARY_HOURS).
 
-- **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커), NL 에이전트(LLM 연결), `/soc block`(응답 MCP 연동) — 런타임 결정 후. Hermes면 인터랙티브 승인 내장(PR #29373).
+- **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커), NL 에이전트(LLM 연결), `/soc block`(응답 MCP 연동). **런타임=Hermes(B Docker) 가 MCP 2서버 17툴 등록 확인(2026-09-28)** — 응답 서버는 `trust: untrusted` 로 등록해 쓰기 툴(block_ip)은 Hermes 가 사람 승인을 요구하도록 함(서버 정책 엔진과 이중). 남은 전제는 LLM 연결뿐.
 - 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.10.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
 
 ### VPN·캠퍼스 클린 접속 — A:443 이름 기반 리버스 프록시 (2026-09-27 확정)

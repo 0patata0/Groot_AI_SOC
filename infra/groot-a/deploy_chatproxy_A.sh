@@ -19,17 +19,18 @@ echo "ok: image, compose, B:8065, B:443, port 443"
 
 say "P1 self-signed certs (chat.groot.lab / wazuh.groot.lab — separate)"
 mkdir -p "$CD/tls"
-mkcert(){ # $1=name
+mkcert(){ # $1=file name  $2=FQDN
   if [ ! -f "$CD/tls/$1.crt" ]; then
     openssl req -x509 -newkey rsa:2048 -nodes -days 825 \
       -keyout "$CD/tls/$1.key" -out "$CD/tls/$1.crt" \
-      -subj "/CN=$1.groot.lab" -addext "subjectAltName=DNS:$1.groot.lab" >/dev/null 2>&1
+      -subj "/CN=$2" -addext "subjectAltName=DNS:$2" >/dev/null 2>&1
     chmod 600 "$CD/tls/$1.key"; chmod 644 "$CD/tls/$1.crt"
-    echo "  generated tls/$1.{crt,key}"
+    echo "  generated tls/$1.{crt,key} ($2)"
   else echo "  tls/$1.crt exists (kept)"; fi
   openssl x509 -in "$CD/tls/$1.crt" -noout -subject -ext subjectAltName | sed 's/^/    /'
 }
-mkcert chat; mkcert wazuh
+mkcert chat chat.groot.lab; mkcert wazuh wazuh.groot.lab
+mkcert chatduck chat.grootlab.duckdns.org; mkcert wazuhduck wazuh.grootlab.duckdns.org   # 팀원 무설정 이름(DuckDNS)
 
 say "P2 validate nginx config"
 docker run --rm -v "$CD/nginx.conf:/etc/nginx/nginx.conf:ro" -v "$CD/tls:/etc/nginx/tls:ro" nginx:1.27-alpine nginx -t 2>&1 | sed 's/^/  /' | grep -E 'syntax is ok|successful' || die "nginx -t failed"
@@ -68,4 +69,13 @@ if [ "$code" = 302 ]; then
 fi
 say "V5 allowlist 가 로드된 설정에 존재하는지"
 docker exec chatproxy nginx -T 2>/dev/null | grep -A12 'server_name wazuh.groot.lab' | grep -E 'allow|deny' | sed 's/^/  /'
+say "V6 DuckDNS 이름 (DNS 없이 --resolve 로 서버블록·인증서 검증; 웹소켓 101 은 MM AllowCorsFrom 반영 후)"
+D=grootlab.duckdns.org
+curl -sk --resolve chat.$D:443:$EXT -o /dev/null -w "  https://chat.$D/api/v4/system/ping -> %{http_code} (200 기대)\n" -m 8 https://chat.$D/api/v4/system/ping || true
+KEY2=$(head -c16 /dev/urandom | base64)
+curl -sk --resolve chat.$D:443:$EXT -o /dev/null -w "  websocket(Origin=https://chat.$D) -> %{http_code} (101 기대; 403 이면 MM AllowCorsFrom 미반영)\n" -m 8 \
+  -H "Connection: Upgrade" -H "Upgrade: websocket" -H "Sec-WebSocket-Version: 13" -H "Sec-WebSocket-Key: $KEY2" \
+  -H "Origin: https://chat.$D" https://chat.$D/api/v4/websocket || true
+curl -sk --resolve wazuh.$D:443:$EXT -o /dev/null -w "  https://wazuh.$D/ -> %{http_code} (302 기대)\n" -m 10 https://wazuh.$D/ || true
+echo "  cert CN: $(echo | openssl s_client -servername chat.$D -connect $EXT:443 2>/dev/null | openssl x509 -noout -subject 2>/dev/null)"
 echo; echo "== CHATPROXY_DONE =="

@@ -75,3 +75,6 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 - **출발지 allowlist**(nginx `allow/deny`): 학과망 192.168.12.0/24 · VM세그먼트 192.168.16.0/24 · 내부망 10.10.10.0/24 만 허용, 그 외(VPN 192.168.15.0/24·외부 211.x) 403 → "대시보드는 VPN 으로 접근되면 안 됨" 결정 유지. A 는 클라이언트 IP 를 NAT 없이 그대로 본다(실측).
 - 실측(학과망 PC): `/`→302 `/app/login`, `/app/login`→200(Wazuh/OpenSearch), 채팅 회귀 200, 맨 IP 444. 배치: `infra/groot-a/{chatproxy.nginx.conf, deploy_chatproxy_A.sh}`(V4/V5 검증 추가; V2 웹소켓 curl 의 `set -e` 조기종료 버그 수정).
 - 미검증: VPN 출발지 403 은 VPN 이 끊긴 상태라 실측 못 함 → VPN 재연결 시 `https://wazuh.groot.lab` 가 403 인지 확인할 것.
+
+### 팀원 무설정 접속 이름 추가 (2026-09-28)
+- `https://chat.grootlab.duckdns.org`(DuckDNS 공개 DNS → 192.168.16.230) 를 chatproxy 에 별도 블록/인증서로 추가. Mattermost `SiteURL` 은 이 이름(대표, 링크 생성용), `AllowCorsFrom` 은 `https://chat.groot.lab https://chat.grootlab.duckdns.org` → **두 Origin 모두 웹소켓 101 실측**(기존 hosts 사용자·데스크톱 앱 무영향). `docker compose up -d --force-recreate mattermost` 로 앱만 재생성(33s healthy).

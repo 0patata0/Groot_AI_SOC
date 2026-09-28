@@ -30,3 +30,10 @@ sudo bash infra/dns/apply_hosts.sh
 ## 도달성 요약
 - VPN: 이름으로 `dvwa`(80)만 접근 가능(hosts 필요). 관리포털/채팅은 터널.
 - 캠퍼스 세그먼트: 모든 포트 도달 → 이름+포트로 접근(hosts 또는 dnsmasq).
+
+## 팀원 무설정 접근 — 공개 DNS(DuckDNS) 별칭 (2026-09-28)
+- 배경: 학과망·VPN → A 는 22/80/443 만 통과하고 53 도 막힘(실측) → 내부 DNS 서버는 팀원 PC 에 무용. 팀원 PC 가 이미 쓰는 학과 DNS 가 인터넷에 물어서 답을 받게 하는 방식만 "설정 0" 이 된다. 사설 IP 답을 학과 DNS 가 그대로 전달하는 것도 실측(nip.io).
+- 채택: **DuckDNS `grootlab.duckdns.org` → 192.168.16.230** (하위 이름은 자동으로 같은 IP). 이름: `chat.grootlab.duckdns.org`(채팅), `wazuh.grootlab.duckdns.org`(관제, allowlist 동일·VPN 403), `dvwa.grootlab.duckdns.org`(웹표적, 80 WAF). 기존 `*.groot.lab`(hosts) 은 별칭으로 유지.
+- A 측: `infra/groot-a/chatproxy.nginx.conf` 에 DuckDNS 이름용 server 블록 2개(별도 인증서 `tls/chatduck.*`, `tls/wazuhduck.*` → 기존 인증서 신뢰 무영향). B 측: Mattermost `MM_SITEURL`=DuckDNS 이름(대표), `MM_ALLOWCORSFROM`=두 Origin → 둘 다 웹소켓 101.
+- 등록(1회, 팀장 계정): duckdns.org 로그인 → domains 에 `grootlab` 추가 → current ip 를 `192.168.16.230` 으로 설정 → update. 확인: `dig +short chat.grootlab.duckdns.org` → 192.168.16.230. IP 가 바뀌지 않으므로 갱신 클라이언트 불필요.
+- 한계: DuckDNS/학과 DNS 장애 시 이름 해석 실패(hosts 별칭이 예비). 정식 도메인으로 갈아타면 Let's Encrypt(DNS 인증) 로 인증서 경고까지 제거 가능.

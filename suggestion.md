@@ -44,7 +44,7 @@ AI Agent가 SOC Analyst의 반복적인 조사 및 분석 업무를 자율적으
 
 3. 전체 시스템 구성
 
-전체 구성은 ESXi 호스트 위의 VM 3대와 공격자 노트북으로 이루어진다. 트래픽은 공격자(Kali)에서 보안장비(Groot_A)의 검사를 거쳐 메인 웹서버(Groot_C)로 향하고, 모든 로그는 Wazuh(Groot_B)로 집중된다. LLM Agent는 Groot_B의 MCP Server를 통해 조사·대응한다.
+전체 구성은 ESXi 호스트 위의 VM 3대와 공격자 노트북으로 이루어진다. 트래픽은 공격자(Kali)에서 보안장비(Groot_A)의 검사를 거쳐 메인 웹서버(Groot_C)로 향하고, 모든 로그는 Wazuh(Groot_B)로 집중된다. Agent Runtime(Hermes)은 `Groot_B`에 상주하며 읽기 MCP(`Groot_B`)와 응답 MCP(`Groot_A`)를 통해 조사·대응한다.
 
     [ 공격자 노트북 : Kali ]
             |  공격 트래픽 (정찰 / 웹공격 / 다단계)
@@ -54,7 +54,9 @@ AI Agent가 SOC Analyst의 반복적인 조사 및 분석 업무를 자율적으
 2026_capstone_Groot_A  —  보안장비 (네트워크 관문 / 인라인 검사)
     |-- FW   : nftables (게이트웨이 netfilter)
     |-- IPS  : Suricata (inline, NFQUEUE)
-    +-- WAF  : ModSecurity v3 + OWASP CRS (nginx)
+    |-- WAF  : ModSecurity v3 + OWASP CRS (nginx)
+    |-- NTP  : chrony (내부 시간 서버)
+    +-- 응답(쓰기) MCP Server + Policy Engine   [자격증명 보유]
             |  검사 통과 트래픽
             v
 2026_capstone_Groot_C  —  메인 웹서버 (공격 대상)
@@ -65,16 +67,17 @@ AI Agent가 SOC Analyst의 반복적인 조사 및 분석 업무를 자율적으
             v
 2026_capstone_Groot_B  —  관제 + 두뇌 인터페이스
     |-- Wazuh (Manager + Indexer + Dashboard)
-    +-- MCP Server                         [자격증명 보유]
+    |-- 읽기 MCP Server                     [자격증명 보유]
+    |-- Agent Runtime : Hermes Agent (MCP Client)   [자격증명 없음]
+    +-- Mattermost (HITL 승인 채팅)
 
 ================================================
 
-            |  MCP 호출 (자격증명 없는 Agent가 조회 / 대응)
+            |  MCP 호출 (자격증명 없는 Hermes Agent가 조회 / 대응)
             v
-LLM Agent 실행처  (DGX Spark, 확정)   [자격증명 없음]
-    |-- vLLM (Qwen3-30B-A3B, OpenAI 호환 API)
-    |-- Agent Runtime (MCP Client)
-    +-- Policy Engine
+LLM 추론 서버  (DGX Spark, 확정)
+    +-- Ollama : qwen3.6:35b (OpenAI 호환 /v1, :11434, 211.170.162.110/.111)
+        (추론만 DGX. Agent Runtime(Hermes)은 Groot_B, Policy Engine은 Groot_A 응답 MCP에 위치)
             |
             v
     조사 / 상관분석 / 판단  ->  대응 계획 수립
@@ -88,9 +91,9 @@ LLM Agent 실행처  (DGX Spark, 확정)   [자격증명 없음]
 구성 시 반드시 반영해야 하는 사항
 
 * 전 구성이 ESXi 호스트 내부망에 있어, 이전 계획의 방화벽 우회·SSH 터널·클라우드 비용이 모두 불필요하다. Wazuh와 Agent, 보안장비가 같은 가상 네트워크에 있어 로그 전달과 API 호출에 제약이 없다.
-* 트래픽 흐름은 Kali -> Groot_A(FW -> IPS -> WAF) -> Groot_C 이며, Groot_A가 외부/DMZ 사이의 게이트웨이 역할을 한다. nftables가 패킷을 Suricata(IPS)로 NFQUEUE하고, 통과분을 ModSecurity(WAF)가 L7 검사 후 DVWA로 프록시한다. ESXi 포트그룹으로 외부·DMZ·관리 세그먼트를 분리하는 것을 권장한다.
+* 트래픽 흐름은 Kali -> Groot_A(FW -> IPS -> WAF) -> Groot_C 이며, Groot_A가 외부/DMZ 사이의 게이트웨이 역할을 한다. nftables가 패킷을 Suricata(IPS)로 NFQUEUE하고, 통과분을 ModSecurity(WAF)가 L7 검사 후 DVWA로 프록시한다. ESXi 포트그룹은 임시 외부망(`192.168.16.0/25`)과 내부망(`10.200.10.0/24`) 2세그먼트로 구성하며, `Groot_A`가 두 세그먼트 사이의 NAT 게이트웨이가 된다(외부·DMZ·관리 3세그먼트 분리는 캠퍼스망 제약·구축 범위상 미채택).
 * 모든 로그(FW/IPS/WAF/서버)는 Groot_B의 Wazuh로 집중한다. MCP Server도 Groot_B에 두어, LLM이 도는 Agent 프로세스에는 자격증명을 주지 않는 보안 경계(자격증명 격리)를 물리적으로 구현한다.
-* LLM Agent는 DGX Spark(A-1)에서 실행하고 관리 세그먼트로 Groot_B의 MCP Server에 접속한다(확정). 과제 정체성과 자격증명 격리에 부합하기 때문이다. ESXi GPU 패스스루(A-2)는 DGX Spark 사용 불가 시 대안으로만 둔다.
+* LLM 추론은 DGX Spark(A-1)의 `Ollama`(`qwen3.6:35b`)에서 수행하고, Agent Runtime(Hermes)은 `Groot_B`에 컨테이너로 상주하여 같은 세그먼트의 읽기 MCP Server 및 `Groot_A`의 응답 MCP Server에 접속한다(확정). 과제 정체성과 자격증명 격리에 부합하기 때문이다. ESXi GPU 패스스루(A-2)는 DGX Spark 사용 불가 시 대안으로만 둔다.
 * 컨테이너 오케스트레이션은 Docker Compose로 한다(VM별 docker-compose 확정). 구축·디버깅이 빠르고 Suricata inline·Wazuh 안정성에 유리하다. k3s는 대안.
 * 온프레미스 전환의 이점: (1) AWS Security Group이 패킷을 관문에서 폐기하던 문제가 사라져 Port Scan이 실제로 탐지된다. (2) FW·IPS·WAF 로그가 더해져 Agent의 상관분석 재료가 늘어난다.
 * Alert 전달은 Agent Runtime이 Wazuh Indexer를 주기적으로 조회하는 pull 방식으로 구현한다. 전 구간 내부망이라 Wazuh Integrator 웹훅으로 전환할 수도 있다.
@@ -171,14 +174,14 @@ Wazuh Dashboard	시각화 및 관리 UI	443
 * Syscollector / FIM / Vulnerability Detection 상태 조회 (Server API)
 * Active Response 원격 실행 (Server API)
 * 보안 이벤트 시각화
-* Slack / Email 알림
+* Mattermost / Email 알림
 * Indexer에 저장된 Alert를 AI Agent가 주기적으로 조회 → 조사 트리거
 
 Alert가 AI Agent로 전달되는 경로는 다음과 같다.
 
 Wazuh Manager → Indexer (wazuh-alerts-* 인덱스에 저장)
-                    ↑ 수 초 간격 조회 (지정 rule level 이상, 마지막 처리 시각 이후)
-          Agent Runtime (LLM 실행처)
+                    ↑ 주기적 조회 (현재 5분 cron `soc-alert-watch`, 지정 rule level 이상, 마지막 처리 시각 이후)
+          Agent Runtime (Hermes, `Groot_B`)
 
 Manager와 Agent가 같은 ESXi 내부망에 있으므로 Integrator 웹훅도 사용 가능하다. 1차 구현은 단순한 pull 방식으로 하고, 실시간성이 필요하면 웹훅으로 전환한다.
 
@@ -188,21 +191,21 @@ Wazuh는 AI Agent가 모든 Raw Log를 직접 처리하지 않도록 하는 중�
 
 7. Qwen 기반 AI SOC Agent
 
-Qwen 계열 LLM을 실행하여 AI SOC Agent를 구성한다. LLM 실행 위치는 NVIDIA DGX Spark(A-1)로 확정한다(ESXi GPU 패스스루 A-2는 DGX Spark 사용 불가 시 대안). MCP Server는 Groot_B에 분리하여 자격증명 격리를 유지한다.
+Qwen 계열 LLM을 추론 서버로 실행하여 AI SOC Agent를 구성한다. LLM 추론 위치는 NVIDIA DGX Spark(A-1)로 확정한다(ESXi GPU 패스스루 A-2는 DGX Spark 사용 불가 시 대안). Agent Runtime(Hermes)은 `Groot_B`에 상주하고, 읽기 MCP Server는 `Groot_B`·응답 MCP Server는 `Groot_A`에 분리하여 자격증명 격리를 유지한다.
 
 7.1 실행 환경
 
 항목	내용
 하드웨어	NVIDIA DGX Spark (GB10 Grace Blackwell, 128 GB 통합 메모리, ARM64 CPU)
 OS	DGX OS (Ubuntu 기반)
-추론 서버	Ollama (DGX Spark, :11434, OpenAI 호환 /v1, tool calling 지원). .100/.101 두 엔드포인트로 부하 분산. vLLM은 대안
-모델	Qwen3-30B-A3B-Instruct-2507 (MoE, 활성 3B) 1차 후보. 비교용으로 Qwen3-32B(Dense). tool calling 지원
-Agent 프레임워크	Hermes Agent (Nous Research, MIT). MCP 네이티브 지원(mcp_servers 등록), Ollama OpenAI 호환 엔드포인트 연결, HITL 승인(elicitation→Slack). 컨텍스트 64k 필요(-c 65536)
+추론 서버	Ollama (DGX Spark, :11434, OpenAI 호환 /v1, tool calling 지원). `211.170.162.110`/`.111` 두 엔드포인트로 부하 분산. vLLM은 대안
+모델	`qwen3.6:35b` 채택 (tool calling·thinking 지원, DGX `Ollama` `211.170.162.110`에 256k 컨텍스트 상주). 초기 계획의 Qwen3-30B-A3B(MoE, 활성 3B)/Qwen3-32B(Dense) 비교에서 실제 상주 모델로 확정
+Agent 프레임워크	Hermes Agent (Nous Research, MIT). MCP 네이티브 지원(mcp_servers 등록), Ollama OpenAI 호환 엔드포인트 연결, HITL 승인(온프레미스 Mattermost 인터랙티브 버튼, Tier 2). 컨텍스트는 DGX `211.170.162.110`에 256k로 상주
 
 DGX Spark 관련 제약
 
 * CPU가 ARM64이므로 컨테이너 이미지와 Python 패키지는 aarch64 빌드를 사용해야 한다. vLLM/Ollama/llama.cpp는 NVIDIA가 DGX Spark용 실행 가이드를 제공한다.
-* 128 GB 통합 메모리로 30B급 모델은 BF16 그대로 실행 가능하다. 다만 메모리 대역폭이 데이터센터 GPU 대비 낮아 토큰마다 전체 파라미터를 읽는 Dense 모델(Qwen3-32B)은 생성 속도가 크게 떨어진다. 토큰당 3B만 활성화되는 MoE 모델(Qwen3-30B-A3B)은 같은 하드웨어에서 수 배 빠르므로 1차 후보로 둔다. Agent는 한 Alert당 수 회~수십 회의 Tool 호출을 수행하므로 생성 속도가 조사 완료 시간(MTTI)에 직접 영향을 주며, 최종 모델은 두 모델의 속도와 판단 품질을 실측한 뒤 결정한다.
+* 128 GB 통합 메모리로 30B급 모델은 BF16 그대로 실행 가능하다. 다만 메모리 대역폭이 데이터센터 GPU 대비 낮아 토큰마다 전체 파라미터를 읽는 Dense 모델(Qwen3-32B)은 생성 속도가 크게 떨어진다. 토큰당 일부 파라미터만 활성화되는 MoE 계열 모델은 같은 하드웨어에서 수 배 빠르다. Agent는 한 Alert당 수 회~수십 회의 Tool 호출을 수행하므로 생성 속도가 조사 완료 시간(MTTI)에 직접 영향을 준다. 이 트레이드오프를 고려해 초기 후보(Qwen3-30B-A3B MoE / Qwen3-32B Dense) 비교 끝에 최종적으로 `qwen3.6:35b`를 채택했다(DGX `211.170.162.110`에 256k 컨텍스트 상주). 배포 모델의 실제 tok/s는 평가 단계에서 실측한다.
 
 7.2 Agent 동작
 
@@ -250,13 +253,13 @@ MCP Client
     |  Tool 호출 (의도만 전달)
 ===== 신뢰 경계 =====================================
     |
-MCP Server  [자격증명 보유, 실제 실행]  (Groot_B)
+MCP Server  [자격증명 보유, 실제 실행]  (읽기=Groot_B / 응답=Groot_A)
     |
     |-- Wazuh Tool     ->  Wazuh Indexer(9200) / Server API(55000) / CVE 목록
     |-- Server Tool    ->  Wazuh API(Syscollector, FIM) / SSH 읽기전용(내부망)
     |-- Network Tool   ->  Suricata·WAF 이벤트(Indexer) / Groot_A FW 로그
     |-- CVE Tool       ->  NVD API(CVSS/설명) / CISA KEV(악용 여부)
-    +-- Response Tool  ->  Wazuh Active Response / Groot_A FW 규칙·격리 / Slack
+    +-- Response Tool  ->  Wazuh Active Response / Groot_A FW 규칙·격리 / Mattermost
 
 Tool별 데이터 소스
 
@@ -265,7 +268,7 @@ Wazuh Tool	특정 IP/기간의 과거 Alert 검색, 룰/MITRE 태그 조회, 호
 Server Tool	프로세스/포트/패키지 인벤토리, 파일 변경, 인증 이벤트 조회	Wazuh Server API(Syscollector, FIM), 필요 시 SSH 읽기 전용 명령 (내부망, 허용 명령 목록 제한)
 Network Tool	Suricata·WAF 탐지 이벤트, 특정 IP와의 연결 이력 조회	Wazuh Indexer(Suricata·WAF 이벤트), Groot_A FW 로그
 CVE Tool	CVE id의 상세 조회 (CVSS 점수, 설명, 실제 악용 여부)	NVD API 2.0(CVSS/설명, API Key), CISA KEV 카탈로그(악용 여부, 공개 JSON)
-Response Tool	IP 차단, 서버 격리, 알림	Wazuh Active Response(firewall-drop), Groot_A FW 규칙 변경/세그먼트 격리, Slack
+Response Tool	IP 차단, 서버 격리, 알림	Wazuh Active Response(firewall-drop), Groot_A FW 규칙 변경/세그먼트 격리, Mattermost
 
 ※ Wazuh Server API(55000)는 Alert 검색 기능을 제공하지 않는다. Alert 검색은 Indexer(OpenSearch 쿼리)를 사용해야 한다.
 
@@ -287,7 +290,7 @@ Network Tool
 
 즉, MCP는 Agent의 동적 조사 능력을 구현하는 Tool Interface이면서, 읽기 권한과 쓰기 권한을 가진 자격증명을 LLM 프로세스 밖으로 격리하는 보안 경계로 기능한다. Response Tool(쓰기)은 이 경계 안에서 다시 Policy Engine의 허용 목록을 거쳐야 실행되므로, LLM 출력이 곧바로 실제 대응으로 이어지지 않는다.
 
-Agent Runtime은 Hermes Agent를 사용한다. Hermes는 우리 MCP Server를 config(mcp_servers)에 등록하여 툴을 자기 registry로 가져와 호출하므로, 위 Tool 설계가 그대로 재사용된다. 쓰기(Response) 시 고위험 동작은 MCP elicitation으로 Hermes 승인 창구(Slack)에 사람 승인을 요청하고, 자동/거부의 결정적 판정은 Response Tool(MCP Server) 안의 Policy Engine이 담당한다. LLM(Ollama on DGX)과 Hermes에는 자격증명을 노출하지 않으므로 경계가 유지된다.
+Agent Runtime은 Hermes Agent를 사용한다. Hermes는 우리 MCP Server를 config(mcp_servers)에 등록하여 툴을 자기 registry로 가져와 호출하므로, 위 Tool 설계가 그대로 재사용된다. 쓰기(Response) 시 고위험 동작은 MCP elicitation으로 Hermes 승인 창구(온프레미스 Mattermost 버튼)에 사람 승인을 요청하고, 자동/거부의 결정적 판정은 Response Tool(MCP Server) 안의 Policy Engine이 담당한다. LLM(Ollama on DGX)과 Hermes에는 자격증명을 노출하지 않으므로 경계가 유지된다.
 
 이 경계 설계는 다음 두 가지를 실험으로 확인한다.
 
@@ -340,16 +343,16 @@ Server Tool (프로세스 / FIM / 인증 로그)
 이벤트 상관분석	자동 수행	읽기 전용 Tool
 위협정보 조회	자동 수행	읽기 전용 Tool
 저위험 IP 차단 (외부 IP, 일정 시간)	정책 범위 내 자동 대응	Active Response firewall-drop (timeout 설정)
-영구 IP 차단	사람 승인	Slack 승인 후 실행
+영구 IP 차단	사람 승인	Mattermost 승인 후 실행
 방화벽 정책 변경	사람 승인	Groot_A FW 규칙
 서버 격리 (세그먼트 차단)	사람 승인	Groot_A FW 규칙
-긴급 상황 (침해 확정 + 외부 유출 징후)	최소 범위 임시 차단 후 사람에게 통보	Active Response + Slack 알림
+긴급 상황 (침해 확정 + 외부 유출 징후)	최소 범위 임시 차단 후 사람에게 통보	Active Response + Mattermost 알림
 
 Policy Engine 규칙
 
 * 쓰기 동작은 Response Tool을 통해서만 가능하며, 허용된 동작 목록(allowlist) 외의 요청은 거부한다.
 * 자동 대응은 되돌릴 수 있는 동작(timeout이 있는 IP 차단)으로 한정한다.
-* 관리 세그먼트/관리자 IP 등 보호 대상 목록은 자동 차단에서 제외한다.
+* 내부망(`10.200.10.0/24`)·관리자 IP·관리 VPN 대역 등 보호 대상 목록(`never_block`)은 자동 차단에서 제외한다.
 * Tool 호출 횟수와 조사 시간에 상한을 두어 Agent가 무한 루프에 빠지지 않도록 한다.
 
 프롬프트 인젝션 대응
@@ -369,7 +372,7 @@ Policy Engine 규칙
 항목	내용
 대상 모델	Qwen3-8B 또는 Qwen3-14B (DGX Spark에서 학습 가능한 범위)
 방법	LoRA / QLoRA 기반 SFT. 전체 파라미터 Fine-tuning은 메모리와 시간 제약으로 수행하지 않음
-학습 데이터 형식	Qwen3 채팅 템플릿의 tool calling 형식(system / user / assistant tool_calls / tool 메시지)을 그대로 사용. 추론 시 vLLM에 전달되는 형식과 동일해야 학습 효과가 전이됨
+학습 데이터 형식	Qwen3 채팅 템플릿의 tool calling 형식(system / user / assistant tool_calls / tool 메시지)을 그대로 사용. 추론 시 추론 서버(`Ollama`)에 전달되는 형식과 동일해야 학습 효과가 전이됨
 데이터 규모 목표	수백 ~ 1,000개 수준의 조사 trajectory
 데이터 생성	(1) 13장의 공격 시나리오를 반복 실행하여 실제 Alert/Tool 결과 수집 (2) 대형 모델(teacher)로 조사 trajectory 초안 생성 (3) 사람이 검토·수정하여 정답 trajectory 확정
 평가	Fine-tuning 전(프롬프트만) / 후 모델을 동일 시나리오에서 14장 지표로 비교
@@ -395,12 +398,12 @@ Response Planning
 11.3 학습 데이터 예시 (내용 예시이며, 실제 저장 형식은 채팅 템플릿 JSON)
 
 [system] SOC 조사 Agent 역할 및 사용 가능한 Tool 정의
-[user] Wazuh Alert: High severity SQL Injection, Source IP 172.16.20.10, rule 31103
-[assistant → tool_call] wazuh_search_alerts(src_ip="172.16.20.10", last="24h")
+[user] Wazuh Alert: High severity SQL Injection, Source IP 203.0.113.10, rule 31103
+[assistant → tool_call] wazuh_search_alerts(src_ip="203.0.113.10", last="24h")
 [tool] Port Scan(2회), SQL Injection(5회), SSH Authentication Failure(37회)
 [assistant → tool_call] server_get_auth_events(since="1h")
 [tool] 성공 로그인 없음
-[assistant → tool_call] network_search_suricata(src_ip="172.16.20.10")
+[assistant → tool_call] network_search_suricata(src_ip="203.0.113.10")
 [tool] ET SCAN Nmap, ET WEB_SERVER SQLi 시그니처 탐지
 [assistant → final]
   판단: 동일 출발지의 정찰 → 웹 공격 → 인증 시도로 이어진 다단계 공격. 서버 침해 증거는 없음.

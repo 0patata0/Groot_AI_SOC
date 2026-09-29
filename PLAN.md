@@ -152,7 +152,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 - [x] ESXi 호스트 사양 확인 (CPU/RAM/디스크, GPU 유무 → 옵션 A-2 가능 여부) — 사양표 1.5, GPU 없음 → A-1 유지
 - [x] VM 3대 생성: 2026_capstone_Groot_A / _B / _C (**Ubuntu Server 24.04.5 LTS**, GUI 없이 동일 버전 통일), Kali는 노트북 호스트 — user groot_a/b/c, host groot-sec/siem/web
-- [ ] ESXi 포트그룹으로 3개 세그먼트(외부/DMZ/관리) 구성, Groot_A를 게이트웨이로 — **부분**: 현재 내부망(10.10.10)+임시외부(192.168.16) 2세그먼트, A NAT 게이트웨이 완료. 3세그먼트 분리는 미완
+- [ ] ESXi 포트그룹으로 3개 세그먼트(외부/DMZ/관리) 구성, Groot_A를 게이트웨이로 — **부분**: 현재 내부망(10.200.10)+임시외부(192.168.16) 2세그먼트, A NAT 게이트웨이 완료. 3세그먼트 분리는 미완
 - [ ] (확정 A-1) DGX Spark ↔ ESXi 관리 세그먼트 연결 확인 — **보류**: VM·운영자 VPN 모두 11434 차단 확인, 관리자 라우팅/permit 대기
 - [x] (확정 B-1) 각 VM에 Docker/Compose 설치 — **A·B 완료**(오프라인 static Docker 29.8.1 + Compose v5.5.1, hello-world 검증). C는 별도 담당 대기
 - [ ] LLM 실행처에서 vLLM으로 Qwen3-30B-A3B 실행, tool calling·tok/s 실측 → 모델 확정 — 보류(DGX 접근 대기; 대안 B 로컬 Ollama)

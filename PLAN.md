@@ -127,7 +127,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 | 항목 | 결정 | 비고 |
 |---|---|---|
-| 모델 | Qwen3-30B-A3B-Instruct-2507 (MoE) 1차 / 32B 비교 | 대역폭상 MoE 우위 |
+| 모델 | **`qwen3.6:35b`** (채택) | tool calling·thinking 지원, DGX Ollama `.110`에 256k ctx 상주. 초기 계획 Qwen3-30B-A3B(MoE)/32B 비교에서 실제 상주 모델로 확정 |
 | 추론 서버 | **Ollama** (:11434, OpenAI 호환 `/v1`) — DGX Spark 211.170.162.110/.111 두 엔드포인트 | Qwen3 tool calling·thinking 지원, `qwen3.6:35b` 채택(.110에 256k ctx 상주). vLLM은 대안 |
 | MCP 역할 | 자격증명 격리 보안 경계 (A안). MCP Server는 Groot_B, Agent는 자격증명 없음 | 온프레미스 분리로 경계 더 명확 |
 | Alert 전달 | Indexer 폴링 (전 구간 내부망이라 웹훅도 가능) | |

@@ -19,7 +19,7 @@ nft -c -f "$SRC/capstone-fw.nft" || die "capstone-fw.nft does not parse"
 bash -n "$SRC/agent_block" && bash -n "$SRC/capstone-nat.sh" && bash -n "$SRC/fw_confirm.sh" || die "script syntax"
 systemctl is-active docker >/dev/null || die "docker not active"
 nft list table ip capstone_gw >/dev/null 2>&1 && nft list table ip capstone_fwd >/dev/null 2>&1 || die "capstone_gw/capstone_fwd tables missing (run capstone-nat first)"
-ip -br addr show ens160 | grep -q '10\.10\.10\.1/' || die "ens160 is not 10.10.10.1"; ip -br addr show ens192 >/dev/null || die "ens192 missing"
+ip -br addr show ens160 | grep -q '10\.10\.10\.1/' || die "ens160 is not 10.200.10.1"; ip -br addr show ens192 >/dev/null || die "ens192 missing"
 command -v systemd-run >/dev/null && command -v logger >/dev/null && command -v flock >/dev/null || die "systemd-run/logger/flock missing"
 src=${SSH_CLIENT:-${SUDO_SSH_CLIENT:-unknown}}; echo "  operator session from: ${src%% *} (ens192 tcp/22 stays allowed; never_block guards mgmt sources)"
 echo "ok"
@@ -50,7 +50,7 @@ nft list chain inet capstone_fw input | grep -E 'policy|dport 22|dport 123' | se
 
 say "V1 local checks (informational — none may abort the run)"
 curl -s -m 5 -o /dev/null -w "  WAF via lo http://127.0.0.1/ -> %{http_code}\n" http://127.0.0.1/ || echo "  WAF via lo: FAILED"
-ping -c 1 -W 2 10.10.10.10 >/dev/null 2>&1 && echo "  ping B (internal) ok" || echo "  ping B FAILED"
+ping -c 1 -W 2 10.200.10.10 >/dev/null 2>&1 && echo "  ping B (internal) ok" || echo "  ping B FAILED"
 ping -c 1 -W 2 192.168.16.129 >/dev/null 2>&1 && echo "  ping campus GW ok" || echo "  ping GW FAILED"
 chronyc -n tracking 2>/dev/null | grep -E 'Reference ID' | sed 's/^/  /' || echo "  chrony tracking unavailable"
 grep -q "status='connected'" /var/ossec/var/run/wazuh-agentd.state 2>/dev/null && echo "  wazuh agent connected" || echo "  wazuh agent NOT connected"
@@ -58,8 +58,8 @@ echo "  agent_block self-test (expected non-zero exits below are NOT failures):"
 trap - ERR; set +e
 /usr/local/sbin/agent_block add 203.0.113.7 30s selftest | sed 's/^/    /'
 /usr/local/sbin/agent_block list | grep -q '^203\.0\.113\.7 ' && echo "    list ok" || echo "    !! add/list FAILED"
-for bad in 10.10.10.10 192.168.16.129 172.18.0.2 192.168.16.230; do /usr/local/sbin/agent_block add $bad 5m >/dev/null 2>&1; echo "    protected $bad -> exit $? (expect 3)"; done
-/usr/local/sbin/agent_block add 010.10.10.10 5m >/dev/null 2>&1; echo "    leading-zero ip -> exit $? (expect 2)"
+for bad in 10.200.10.10 192.168.16.129 172.18.0.2 192.168.16.230; do /usr/local/sbin/agent_block add $bad 5m >/dev/null 2>&1; echo "    protected $bad -> exit $? (expect 3)"; done
+/usr/local/sbin/agent_block add 010.200.10.10 5m >/dev/null 2>&1; echo "    leading-zero ip -> exit $? (expect 2)"
 /usr/local/sbin/agent_block add 203.0.113.8 99999s >/dev/null 2>&1; echo "    ttl 99999s -> exit $? (expect 2)"
 /usr/local/sbin/agent_block del 203.0.113.7 - selftest | sed 's/^/    /'
 grep -c . /var/lib/capstone/agent_block.state | sed 's/^/    state file lines: /'

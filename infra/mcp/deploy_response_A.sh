@@ -119,7 +119,7 @@ send({"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}})
 r=json.loads(p.stdout.readline()); names=[t["name"] for t in r["result"]["tools"]]; assert set(names)=={"block_ip","unblock_ip","list_blocks"}, names; print("  tools:", names)
 send({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"list_blocks","arguments":{}}})
 r=json.loads(p.stdout.readline()); assert r["result"]["isError"] is False, r; print("  list_blocks:", r["result"]["content"][0]["text"][:60])
-send({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"block_ip","arguments":{"ip":"10.10.10.10","minutes":5,"reason":"deploy-selftest-protected"}}})
+send({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"block_ip","arguments":{"ip":"10.200.10.10","minutes":5,"reason":"deploy-selftest-protected"}}})
 r=json.loads(p.stdout.readline()); assert r["result"]["isError"] is True and "rejected" in r["result"]["content"][0]["text"], r; print("  block protected -> rejected (good):", r["result"]["content"][0]["text"][:70])
 p.stdin.close(); p.wait(timeout=10); print("  PASS")
 PY

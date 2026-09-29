@@ -1,5 +1,5 @@
 #!/bin/bash
-# Groot_A: Wazuh agent 4.14.8 오프라인 설치 + 매니저(groot-siem=10.10.10.10) 등록. 게이트형(리뷰 반영). sudo bash로 실행.
+# Groot_A: Wazuh agent 4.14.8 오프라인 설치 + 매니저(groot-siem=10.200.10.10) 등록. 게이트형(리뷰 반영). sudo bash로 실행.
 # 전제: /tmp/wazuh-agent_4.14.8-1_amd64.deb (인터넷 PC에서 packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/ 받아 전송, sha256 확인),
 #       /etc/hosts에 groot-siem, 매니저 authd(1515, use_password=no) 기동. fresh 설치여야 배포변수(WAZUH_MANAGER 등)가 적용됨.
 # 롤백: systemctl disable --now wazuh-agent; dpkg -P wazuh-agent; (B) manage_agents -r <id>  ※ agent_control -r 은 삭제가 아니라 rootcheck
@@ -16,7 +16,7 @@ dpkg -s wazuh-agent >/dev/null 2>&1 && die "already installed (non-fresh: deploy
 rm -rf /tmp/wz-ctl; dpkg-deb -e "$DEB" /tmp/wz-ctl
 grep -q 'register_configure_agent.sh' /tmp/wz-ctl/postinst || die "postinst lacks register_configure_agent.sh"
 rm -rf /tmp/wz-ctl
-getent hosts $MGR | grep -q '10.10.10.10' || die "$MGR unresolved"
+getent hosts $MGR | grep -q '10.200.10.10' || die "$MGR unresolved"
 # docker-proxy 뒤라 TCP connect는 가짜 PASS → authd TLS 인증서로 실서비스 확인
 timeout 6 openssl s_client -connect $MGR:1515 </dev/null 2>/dev/null | grep -q 'BEGIN CERTIFICATE' || die "authd TLS on $MGR:1515 not answering"
 timeout 4 bash -c "exec 3<>/dev/tcp/$MGR/1514" 2>/dev/null || die "$MGR:1514 unreachable"

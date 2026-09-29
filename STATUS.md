@@ -1,14 +1,15 @@
-# 인프라 현황 스냅샷 — 2026-09-29 (대시보드 allowlist 갱신)
+# 인프라 현황 스냅샷 — 2026-09-29 (내부망 10.200.10.0/24 로 변경 + 대시보드 allowlist 갱신)
 
 > Agentic SOC 캡스톤. 상세 계획·체크리스트는 [PLAN.md](PLAN.md), 날짜별 작업로그는 [대화기록/](대화기록/), 자격증명은 `CREDENTIALS.local.md`(git 미커밋).
 > 이 파일은 "지금 살아있는 상태"의 한 장 요약이다.
+> **내부망은 2026-09-29 부터 `10.200.10.0/24`(A .1 / B .10 / C .20)** — 캠퍼스 코어가 쓰는 10.10.10.0/24 와의 중복을 없앴다(런북 `infra/internal_net_change.md`).
 
 ## 라이브 헬스 (방금 점검)
 | 호스트 | 역할 | 상태 |
 |---|---|---|
-| **Groot_A** `groot-sec` 192.168.16.230 / 10.10.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답 MCP | ✅ waf(healthy)·suricata(running), wazuh-agent active, nft(capstone_gw/fwd/fw), capstone-nat·chrony·리퍼 타이머 active, nftables.service **masked**, 차단 0건 |
-| **Groot_B** `groot-siem` 10.10.10.10 | Wazuh SIEM + 읽기 MCP + 채팅 | ✅ manager·indexer·dashboard Up, **에이전트 3대 Active**, 읽기 서버 `/opt/mcp`, **Mattermost+PostgreSQL(mm-app/mm-postgres) Up** — HITL 알림 채널 |
-| **Groot_C** `groot-web` 10.10.10.20 | DVWA + CVE 랩 | ✅ apache active, DVWA 200, `log4shell-lab` 컨테이너(**C 내부 전용 바인딩** `10.10.10.20:8080` — 캠퍼스/VPN 직접 도달 차단), wazuh-agent active |
+| **Groot_A** `groot-sec` 192.168.16.230 / 10.200.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답 MCP | ✅ waf(healthy)·suricata(running), wazuh-agent active, nft(capstone_gw/fwd/fw), capstone-nat·chrony·리퍼 타이머 active, nftables.service **masked**, 차단 0건 |
+| **Groot_B** `groot-siem` 10.200.10.10 | Wazuh SIEM + 읽기 MCP + 채팅 | ✅ manager·indexer·dashboard Up, **에이전트 3대 Active**, 읽기 서버 `/opt/mcp`, **Mattermost+PostgreSQL(mm-app/mm-postgres) Up** — HITL 알림 채널 |
+| **Groot_C** `groot-web` 10.200.10.20 | DVWA + CVE 랩 | ✅ apache active, DVWA 200, `log4shell-lab` 컨테이너(**C 내부 전용 바인딩** `10.200.10.20:8080` — 캠퍼스/VPN 직접 도달 차단), wazuh-agent active |
 | 관리포털(Wazuh) | **A:443 이름 프록시**(chatproxy)→B:443 (+A:10443 DNAT 유지) | ✅ **`https://wazuh.groot.lab`** 학과망·VM세그먼트 OK(로그인 200 실측 2026-09-28). 출발지 allowlist(학과망 **192.168.10.0/24·192.168.12.0/24**·VM세그먼트·내부망) — **VPN(192.168.15.0/24)·외부는 403**(대시보드 VPN 비노출 결정 유지). 2026-09-29 학과망이 192.168.10.x 로 배정되어 403 → allowlist 에 추가·chatproxy 재시작으로 해결. 학과망(192.168.12.x)은 10443 이 캠퍼스 FW 에 막힘(실측) → 이 경로가 유일. 팀원 무설정 별칭 **`https://wazuh.grootlab.duckdns.org`**(동일 allowlist). 맨 IP 443=444 |
 | 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`**(hosts) + **`https://chat.grootlab.duckdns.org`**(팀원 무설정, DuckDNS) — 둘 다 웹소켓 101 실측(AllowCorsFrom 두 Origin). SiteURL=DuckDNS 이름(대표). 맨 IP 443은 444 |
 | SOC 챗봇 | B `soc-bot`(systemd) + MM 슬래시 `/soc` | ✅ `/soc status\|alerts\|agents\|vulns\|report`. 읽기전용(mcp-ro), 대응은 groot-resp 분리. NL은 LLM 연결 후 |
@@ -32,7 +33,7 @@
 ## 접속 치트시트 (Mac, ssh config 등록됨)
 - SIEM 대시보드: **`https://wazuh.groot.lab`**(A:443 프록시; 학과망·VM세그먼트만, VPN·외부 403). VM세그먼트 직결이면 `https://192.168.16.230:10443` 도 가능. (admin, 비번 CREDENTIALS)
 - 셸: `ssh groot-a` / `ssh groot-b-int` / `ssh groot-c-int`.
-- **팀원 무설정 접속(2026-09-28, 공개 DNS=DuckDNS `grootlab.duckdns.org`→192.168.16.230)**: hosts·ssh config 없이 `https://chat.grootlab.duckdns.org` · `https://wazuh.grootlab.duckdns.org`(VPN 403) · `http://dvwa.grootlab.duckdns.org`. SSH 는 `ssh -J groot_a@grootlab.duckdns.org groot_b@10.10.10.10` 한 줄(C 는 10.10.10.20; 이름 기반이라 A IP 변경과 무관). 안내문 `팀접속안내.md`. **DuckDNS 등록 완료·학과망에서 이름만으로 실측 OK**(해석 4개, 채팅 200/101, 대시보드 302→로그인 200, DVWA 302, 인증서 SNI 일치; 2026-09-28).
+- **팀원 무설정 접속(2026-09-28, 공개 DNS=DuckDNS `grootlab.duckdns.org`→192.168.16.230)**: hosts·ssh config 없이 `https://chat.grootlab.duckdns.org` · `https://wazuh.grootlab.duckdns.org`(VPN 403) · `http://dvwa.grootlab.duckdns.org`. SSH 는 `ssh -J groot_a@grootlab.duckdns.org groot_b@10.200.10.10` 한 줄(C 는 10.200.10.20; 이름 기반이라 A IP 변경과 무관). 안내문 `팀접속안내.md`. **DuckDNS 등록 완료·학과망에서 이름만으로 실측 OK**(해석 4개, 채팅 200/101, 대시보드 302→로그인 200, DVWA 302, 인증서 SNI 일치; 2026-09-28).
 - 내부 이름(클라이언트 /etc/hosts 에 `192.168.16.230 dvwa.groot.lab wazuh.groot.lab chat.groot.lab` 1줄):
   - 캠퍼스·VPN 공통: `http://dvwa.groot.lab/` · `https://chat.groot.lab/`(데스크톱 앱 동일 URL)
   - 대시보드: `https://wazuh.groot.lab/` (학과망·VM세그먼트만, VPN 403 — 보안상 VPN 비노출 유지). 자체서명 인증서 1회 신뢰(채팅 인증서와 별개)

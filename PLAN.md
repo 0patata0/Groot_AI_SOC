@@ -14,7 +14,7 @@
 - 인프라 구축 진행 중(순차). VM 3대(Ubuntu 24.04.5) 생성 완료.
 - **A**: Docker(오프라인)·**NAT 게이트웨이 완료**·**Wazuh Agent(001 Active)**·**Suricata IDS + ModSecurity WAF 배치·검증 완료(2026-09-26)** → eve.json/audit.log가 Wazuh로 흐름.
 - **B**: **Wazuh 4.14.8 스택 기동 완료**(비번 통일) + A 보안스택용 로컬 룰(`infra/groot-b/local_rules.xml`) 적용·경보 인덱싱 검증 완료.
-- ⚠️ 운영 제약(2026-09-26 실제 발생): **공격성 테스트 트래픽을 캠퍼스 VPN 경유로 보내면 캠퍼스 FW가 (VPN IP↔A) 쌍을 차단**해 A 관리접속이 끊김. IDS/WAF 테스트는 반드시 Kali/B/C 등 **VM 세그먼트 안**에서. A 복구 경로: `ssh -J groot-b groot_a@10.10.10.1`.
+- ⚠️ 운영 제약(2026-09-26 실제 발생): **공격성 테스트 트래픽을 캠퍼스 VPN 경유로 보내면 캠퍼스 FW가 (VPN IP↔A) 쌍을 차단**해 A 관리접속이 끊김. IDS/WAF 테스트는 반드시 Kali/B/C 등 **VM 세그먼트 안**에서. A 복구 경로: `ssh -J groot-b groot_a@10.200.10.1`.
 - **C**: OS·네트워크·DVWA(베어메탈)·**Docker+log4shell-lab 완료**, **Wazuh Agent 002 Active**·취약점 2,422건 인덱싱. Log4Shell 랩은 **C 내부 전용 격리**(시나리오 때만 A 경유 토글).
 - **MCP**: 읽기 서버(B, `ssh -T groot-mcp`) + **응답 서버(A, `ssh -T groot-resp`, block_ip→agent_block) 배치·계약 테스트 완료(2026-09-27)**. 클라이언트 설정은 각 한 줄(런타임 불가지론). 런타임(Claude Code vs Hermes) 결정은 보류.
 - 제약: 이 망 outbound 웹(80/443)·DGX(11434) 전면 차단 → 모든 반입 오프라인. DGX 연결 보류(관리자 permit 대기).
@@ -180,9 +180,9 @@ capstone_project/
 목표: 공격 시나리오 실행 시 Wazuh에 FW/IPS/WAF/서버 경보가 뜬다.
 
 ### 1-1. 2026_capstone_Groot_A (보안장비)
-- [x] 게이트웨이 역할 설정 (외부↔DMZ 라우팅, IP 포워딩) — NAT masquerade(10.10.10.0/24→ens192) + DOCKER-USER forward + ip_forward 영구화, `capstone-nat.service`, B 경유 검증 완료
+- [x] 게이트웨이 역할 설정 (외부↔DMZ 라우팅, IP 포워딩) — NAT masquerade(10.200.10.0/24→ens192) + DOCKER-USER forward + ip_forward 영구화, `capstone-nat.service`, B 경유 검증 완료
 - [x] FW: nftables 규칙(기본 차단+웹 허용). Response Tool이 규칙을 조작할 인터페이스 마련 — **완료(2026-09-27)**: NAT(`capstone_gw`) + 관리 포트포워딩(`capstone_fwd`: **웹서비스 DVWA만 기본 IP 노출(80)**, 관리포털은 특정포트 **A:10443→B:443**(캠퍼스 `https://192.168.16.230:10443`), **443 비움**, VPN 관리는 SSH 터널, WAF TLS 8443) + **Phase 2 호스트 방화벽 `inet capstone_fw`**(`capstone-fw.nft`: input 기본 drop, 허용=lo/established/ICMP/내부 NTP/SSH; 캠퍼스 L2 잡음 무로그 drop; 출발지별 미터 로그 `FW_DROP_IN`) + **`agent_block`**(raw prerouting drop 셋 + `never_block` 잠금가드 + CLI `/usr/local/sbin/agent_block add|del|list|flush`, TTL 10s~24h, 상태파일로 재부팅 복원, 모든 동작 syslog→Wazuh). 외부→내부 forward 는 Docker FORWARD(drop)+DOCKER-USER 선별 허용. 데드맨 타이머+`.pending` 방식으로 잠금 없이 적용(`fw_phase2.sh`/`fw_confirm.sh`), `nftables.service` mask. **실측**: B 외부IP 90s 차단→A 경유 전면 차단·내부 무영향·해제·복원, B 경보 100121/100122/100125. 인라인 IPS(NFQUEUE) 전환은 미정
-- [x] IPS: Suricata — **1단계 IDS(passive, ens192) 배치 완료(2026-09-26)**: 8.0.6, ET Open 52,483룰 `-S` 배타 로드, `HOME_NET=[10.10.10.0/24,192.168.16.230/32]`(기본값이면 공격자 대역이 내부로 잡혀 경보 0), `stats.interval=60`, Hyperscan 캐시 볼륨. B에서 `curl -A sqlmap/1.0` → **sid 2008538 경보 실측**. inline(NFQUEUE) 전환은 Phase2. `infra/groot-a/docker-compose.yml`·`deploy_secstack.sh`(리뷰 반영 게이트형). **ET Open 룰셋 오프라인 반입·리뷰 완료**(`~/capstone/suricata/rules`, md5검증, lua 0 · `suricata-rules.md`)
+- [x] IPS: Suricata — **1단계 IDS(passive, ens192) 배치 완료(2026-09-26)**: 8.0.6, ET Open 52,483룰 `-S` 배타 로드, `HOME_NET=[10.200.10.0/24,192.168.16.230/32]`(기본값이면 공격자 대역이 내부로 잡혀 경보 0), `stats.interval=60`, Hyperscan 캐시 볼륨. B에서 `curl -A sqlmap/1.0` → **sid 2008538 경보 실측**. inline(NFQUEUE) 전환은 Phase2. `infra/groot-a/docker-compose.yml`·`deploy_secstack.sh`(리뷰 반영 게이트형). **ET Open 룰셋 오프라인 반입·리뷰 완료**(`~/capstone/suricata/rules`, md5검증, lua 0 · `suricata-rules.md`)
 - [x] WAF: ModSecurity v3 + OWASP CRS 4.29 — **배치 완료(2026-09-26)**: nginx 리버스 프록시 :80/:443 → `groot-web:80`(DVWA, 경로 `/dvwa/`), DetectionOnly(차단 전환은 `MODSEC_RULE_ENGINE=On`), JSON 감사로그 `logs/modsec/audit.log`(uid 101 소유 필수). 실 클라이언트 IP 기록 확인, CRS 913100/942100/949110 실측
 - [x] Wazuh Agent 설치 — **완료(2026-09-26)**: 4.14.8 오프라인 dpkg(배포변수 WAZUH_MANAGER=groot-siem), authd 자동등록 → 매니저 **ID 001 groot-sec Active**. 기본 active-response는 비활성(응답은 MCP→nft `agent_block` 로만). 스크립트 `infra/groot-a/install_agent.sh`. **IPS/WAF 로그 전송 완료**: `agent_localfile.sh`(eve.json·audit.log json localfile, label capstone.source) → B 도착 검증. 로그 회전 `logrotate-capstone-secstack`(daily/500M/14, copytruncate). FW(nft) 로그는 Phase2 차단정책과 함께
 
@@ -196,7 +196,7 @@ capstone_project/
 ### 1-3. 2026_capstone_Groot_C (메인서버)
 - [x] DVWA 실행 (웹공격 대상) — **베어메탈로 설치·구동 중**(별도 담당). 하이브리드: DVWA 베어메탈 유지, 재현성은 ESXi 스냅샷+DVWA Reset
 - [x] CVE 취약 컨테이너 실행: Log4Shell(CVE-2021-44228) 취약 앱 — **C 담당자 완료 확인(2026-09-26)**: Docker 29.8.1 + `log4shell-lab`(:8080) 가동. 권한상승용 취약 패키지(sudo Baron Samedit)는 VM OS 수준에 구성(대기)
-- [x] Wazuh Agent 설치, 웹로그·FIM·Syscollector·인증로그 수집 — **담당자 완료 + 연동 보완(2026-09-26)**: 에이전트 4.14.8 → 매니저 10.10.10.10 내부망, **ID 002 groot-web Active**, apache access/error(`apache` 포맷)·journald 수집, 인벤토리(764패키지·포트)·취약점 상태 2,422건 인덱싱, SCA/rootcheck 동작. 웹 룰 실측(31101/31103/31105). **보완**: `c_integrate.sh` — 내부 호스트명 + **apache mod_remoteip**(WAF의 X-Forwarded-For 복원; 이전엔 C 경보 srcip가 전부 A=10.10.10.1이라 차단 대응이 A를 막을 위험) → srcip 실제 클라이언트로 확인. 시계(최종): 캠퍼스가 외부 NTP(UDP 123) 차단 → **A ← 192.168.16.131(캠퍼스 시간 서버, chrony 오프라인 반입) ; B/C ← A(10.10.10.1, timesyncd)** 체인. `infra/groot-a/ntp_server.sh`, `infra/ntp_client.sh`. 남은 것: DVWA 기본 보안레벨 impossible → 시나리오 시 low(담당자 협의)
+- [x] Wazuh Agent 설치, 웹로그·FIM·Syscollector·인증로그 수집 — **담당자 완료 + 연동 보완(2026-09-26)**: 에이전트 4.14.8 → 매니저 10.200.10.10 내부망, **ID 002 groot-web Active**, apache access/error(`apache` 포맷)·journald 수집, 인벤토리(764패키지·포트)·취약점 상태 2,422건 인덱싱, SCA/rootcheck 동작. 웹 룰 실측(31101/31103/31105). **보완**: `c_integrate.sh` — 내부 호스트명 + **apache mod_remoteip**(WAF의 X-Forwarded-For 복원; 이전엔 C 경보 srcip가 전부 A=10.200.10.1이라 차단 대응이 A를 막을 위험) → srcip 실제 클라이언트로 확인. 시계(최종): 캠퍼스가 외부 NTP(UDP 123) 차단 → **A ← 192.168.16.131(캠퍼스 시간 서버, chrony 오프라인 반입) ; B/C ← A(10.200.10.1, timesyncd)** 체인. `infra/groot-a/ntp_server.sh`, `infra/ntp_client.sh`. 남은 것: DVWA 기본 보안레벨 impossible → 시나리오 시 low(담당자 협의)
 
 ### 1-4. 공격자 (Kali)
 - [ ] 노트북에 Kali, ESXi 외부 세그먼트에 연결
@@ -284,7 +284,7 @@ capstone_project/
 ### 2026-09-27 (HITL 채팅 · SOC 챗봇/자동 보고 · Log4Shell 노출 하드닝)
 - **HITL 알림 채널(Tier 1)**: 온프레미스 Mattermost(B, TE 11.11.1+PG16 오프라인) + A `/etc/resp/hitl.env`=http 연동, block/unblock→채널 게시 검증. 캠퍼스·VPN 공통 접속 위해 **A:443 nginx 리버스 프록시**(`https://chat.groot.lab`, 웹소켓 101, 데스크톱 앱 동일 URL). 대시보드는 보안상 VPN 직접노출 안 함.
 - **SOC 챗봇 + 자동 보고**: 채팅 슬래시 `/soc`(alerts/agents/vulns/status/report, 읽기전용 mcp-ro) + 에이전트 인시던트 보고서 게시 + **주기 보고**(B `soc-report.timer` 매시, 경보 0이면 스킵) + **정기 상태 요약 heartbeat**(B `soc-summary.timer` 하루 2회, 이상 없어도 게시). `infra/mcp/soc_bot.py`.
-- **Log4Shell 노출 하드닝**: C 컨테이너 `0.0.0.0:8080`→`10.10.10.20:8080` 내부 전용 바인딩(외부·VPN 직접 차단, Mac·A·B 3방향 실측). 시나리오용 A 경유 토글 `infra/groot-a/scenario_log4shell_route.sh`(A:8080→C DNAT+SNAT+forward, 런타임 전용=재부팅 자동 OFF, 캠퍼스/Kali만) 설치·on/off 검증, 평상시 OFF.
+- **Log4Shell 노출 하드닝**: C 컨테이너 `0.0.0.0:8080`→`10.200.10.20:8080` 내부 전용 바인딩(외부·VPN 직접 차단, Mac·A·B 3방향 실측). 시나리오용 A 경유 토글 `infra/groot-a/scenario_log4shell_route.sh`(A:8080→C DNAT+SNAT+forward, 런타임 전용=재부팅 자동 OFF, 캠퍼스/Kali만) 설치·on/off 검증, 평상시 OFF.
 - 다음: 에이전트 런타임 결정(→ NL 대화·`/soc block`·Tier 2 승인 버튼), 시나리오 실제 실행(DVWA low), 네트워크 최종화(B/C ens192 제거), 공개 전 비번 교체.
 
 ### 2026-09-27 (A 방화벽 2단계 + agent_block · 관리 포트포워딩 · 시계 체인 · C 연동)
@@ -295,7 +295,7 @@ capstone_project/
 ### 2026-09-26 세션3 (② A 보안스택 배치 · Wazuh 파이프라인 완성)
 - A에 Suricata 8.0.6 IDS(ens192, ET Open 52,483룰, HOME_NET 교정) + ModSecurity v3/CRS 4.29 WAF(→ groot-web `/dvwa/`, DetectionOnly) 배치. 배치 전 적대적 검증 5건(`:ro`+chown 크래시, HOME_NET 무매치, uid 101, localhost 검증 불가, 재실행 포트 게이트) 실물 확인 후 반영. `infra/groot-a/deploy_secstack.sh`.
 - Wazuh 파이프라인: A `agent_localfile.sh`(eve.json·audit.log) → B `local_rules.xml`(Suricata severity 100110/100111/100112, ModSecurity 100100~100103) → B에서 A로 프로브 → alerts.json·인덱서 `rule.groups:capstone` 5건 실측. 튜닝 `stats.interval=60`, logrotate.
-- ⚠️ 사고: Mac(VPN)에서 sqlmap UA 프로브 직후 **캠퍼스 FW가 (VPN IP↔A) 쌍 차단**(A ens192 tcpdump 0패킷). A 작업은 `ssh -J groot-b groot_a@10.10.10.1`로 완료. **공격 테스트는 VM 세그먼트에서만** 규칙화. 세션 종료 시 미해제.
+- ⚠️ 사고: Mac(VPN)에서 sqlmap UA 프로브 직후 **캠퍼스 FW가 (VPN IP↔A) 쌍 차단**(A ens192 tcpdump 0패킷). A 작업은 `ssh -J groot-b groot_a@10.200.10.1`로 완료. **공격 테스트는 VM 세그먼트에서만** 규칙화. 세션 종료 시 미해제.
 - 다음: ③ MCP 읽기 서버(B). 런타임(Claude/Hermes) 결정 보류 유지.
 
 ### 2026-09-26 (A·B 이미지 반입 · MCP 선정)
@@ -310,7 +310,7 @@ capstone_project/
 
 ### 2026-09-24 (오프라인 Docker · 네트워크)
 - 웹 egress 차단 발견 → A·B에 Docker(static 29.8.1 + Compose v5.5.1) 오프라인 설치, net-tools 오프라인. C 핸드오프 문서 `infra/groot-c/C_구축_표준설정.md`.
-- VM 네트워크 확정: A .230/10.10.10.1, B .233/10.10.10.10, C .234/10.10.10.20, DNS 168.126.63.1(KT), NIC 변경은 콜드부트(init 0).
+- VM 네트워크 확정: A .230/10.200.10.1, B .233/10.200.10.10, C .234/10.200.10.20, DNS 168.126.63.1(KT), NIC 변경은 콜드부트(init 0).
 
 ### 2026-09-23 (OS/git)
 - VM OS Ubuntu Server 24.04.5 확정, git 로컬 저장소 초기화(원격 미연결).

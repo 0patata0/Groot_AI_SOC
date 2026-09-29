@@ -8,7 +8,7 @@
 mcp_servers:
   wazuh-ro:                                   # 읽기 MCP 서버(B, gbrigandi/mcp-server-wazuh, 계정 mcp-ro) — 14 툴
     command: ssh
-    args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b"]   # ssh config 의 Host mcp-b = mcp@10.10.10.10 (키·known_hosts 는 /opt/data/home/.ssh)
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b"]   # ssh config 의 Host mcp-b = mcp@10.200.10.10 (키·known_hosts 는 /opt/data/home/.ssh)
     env:
       HOME: /opt/data/home                    # Hermes 는 셸 env 를 전부 넘기지 않으므로 HOME 명시
     connect_timeout: 60
@@ -20,7 +20,7 @@ mcp_servers:
     trust: full                               # 읽기전용 서버
   resp:                                       # 응답(차단) MCP 서버(A, response-mcp.py, 계정 resp) — block_ip/unblock_ip/list_blocks
     command: ssh
-    args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.10.10.1
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.200.10.1
     env:
       HOME: /opt/data/home
     connect_timeout: 60

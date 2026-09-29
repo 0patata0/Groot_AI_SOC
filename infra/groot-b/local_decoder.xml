@@ -3,7 +3,7 @@
 <!-- capstone Agentic SOC — Groot_B Wazuh manager /var/ossec/etc/decoders/local_decoder.xml (2026-09-27)
      A(groot-sec)의 대응 차단 도구 agent_block 감사 라인(syslog tag agent_block, key=value) 디코딩.
      예) agent_block[1234]: action=add ip=203.0.113.7 ttl=600s result=ok reason=alert:1790... by=root
-         agent_block[1234]: action=add ip=10.10.10.10 ttl=5m result=rejected reason=protected by=root
+         agent_block[1234]: action=add ip=10.200.10.10 ttl=5m result=rejected reason=protected by=root
          agent_block[1234]: action=del ip=203.0.113.7 result=ok reason=none by=root
          agent_block[1234]: action=flush count=3 result=ok reason=none by=root
          agent_block[1234]: action=reload restored=2 source=statefile result=ok by=capstone-nat

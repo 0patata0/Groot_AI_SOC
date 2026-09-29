@@ -1,6 +1,6 @@
 # Groot_A (groot-sec) — 보안 게이트웨이 구성 요약 (2026-09-27 기준)
 
-A = 외부(ens192 192.168.16.230, 캠퍼스 세그먼트) ↔ 내부(ens160 10.10.10.1) 관문. NAT·포워딩·호스트 방화벽·차단 셋·IDS·WAF·NTP 서버·Wazuh 에이전트가 여기 있다.
+A = 외부(ens192 192.168.16.230, 캠퍼스 세그먼트) ↔ 내부(ens160 10.200.10.1) 관문. NAT·포워딩·호스트 방화벽·차단 셋·IDS·WAF·NTP 서버·Wazuh 에이전트가 여기 있다.
 
 | 구성 | 파일(repo → A) | 요점 |
 |---|---|---|
@@ -10,7 +10,7 @@ A = 외부(ens192 192.168.16.230, 캠퍼스 세그먼트) ↔ 내부(ens160 10.1
 | FW 배치 절차 | `fw_phase2.sh`, `fw_confirm.sh` | 규칙을 `.pending`으로 적용 + 데드맨 타이머(300s) → 외부에서 SSH/대시보드/WAF/NTP/MCP 검증 → `sudo fw_confirm.sh`(확정). 미확인 시 자동 원복(부팅 파일도 없음) |
 | IDS + WAF | `docker-compose.yml`, `deploy_secstack.sh`, `suricata-rules.md` | Suricata 8.0.6 IDS(ens192, ET Open, HOME_NET 교정) + ModSecurity CRS(80→C DVWA, TLS 8443). 로그 `~/capstone/secstack/logs/` |
 | Wazuh 에이전트 | `install_agent.sh`, `agent_localfile.sh`, `logrotate-capstone-secstack` | ID 001 groot-sec. eve.json·audit.log·journald(커널 nft 로그, agent_block 감사) 수집 |
-| NTP 서버 | `ntp_server.sh` | chrony ← 캠퍼스 192.168.16.131, B/C 에 10.10.10.1:123 서비스(`bindaddress`) |
+| NTP 서버 | `ntp_server.sh` | chrony ← 캠퍼스 192.168.16.131, B/C 에 10.200.10.1:123 서비스(`bindaddress`) |
 | 응답(차단) MCP 서버 | `../mcp/{response-mcp.py, run-response.sh, deploy_response_A.sh}`, `agent_block_reaper.sh` | 사용자 `resp` + sshd ForceCommand + sudoers(agent_block add/del/list). 에이전트가 `ssh -T groot-resp` 로 block_ip/unblock_ip/list_blocks 호출 → `agent_block`. TTL 만료 리퍼(타이머 `capstone-block-reaper`) → Wazuh 100131 |
 
 ## 자주 쓰는 명령 (A에서, sudo)

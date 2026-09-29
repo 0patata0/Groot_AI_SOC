@@ -28,7 +28,7 @@ services:
       - MODSEC_AUDIT_LOG_TYPE=Serial
       - MODSEC_AUDIT_LOG=/var/log/modsecurity/audit.log
     extra_hosts:
-      - "groot-web:10.10.10.20"
+      - "groot-web:10.200.10.20"
     ports:
       - "80:8080"       # 외부(공격자) 유입. 내부(ens160)에도 노출됨 — 제한하려면 "192.168.16.230:80:8080"+"127.0.0.1:80:8080"
       - "8443:8443"     # WAF TLS. 2026-09-26: A:443 은 Wazuh 대시보드 DNAT(→B:443)로 양보(VPN 경로는 22/80/443만 통과). Kali/캠퍼스 세그먼트는 8443 사용
@@ -51,7 +51,7 @@ services:
       - "-S"
       - "/rules/suricata.rules"
       - "--set"
-      - "vars.address-groups.HOME_NET=[10.10.10.0/24,192.168.16.230/32]"
+      - "vars.address-groups.HOME_NET=[10.200.10.0/24,192.168.16.230/32]"
       - "--set"
       - "stats.interval=60"                   # 기본 8s → eve.json/stats.log 폭증 + Wazuh 잡음. 60s면 하루 1,440건
     volumes:

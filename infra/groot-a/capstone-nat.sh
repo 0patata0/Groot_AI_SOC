@@ -5,7 +5,7 @@ set -e
 
 EXT_IF="ens192"            # 임시 외부(인터넷) NIC. 향후 관리자 NAT 시 변경 가능
 INT_IF="ens160"           # 내부망 NIC
-INT_NET="10.10.10.0/24"   # 내부망 대역 (B=.10, C=.20, GW(A)=.1)
+INT_NET="10.200.10.0/24"   # 내부망 대역 (B=.10, C=.20, GW(A)=.1)
 NFT_FILE="/etc/nftables.d/capstone-gw.nft"
 FWD_FILE="/etc/nftables.d/capstone-fwd.nft"
 
@@ -16,10 +16,10 @@ FWD_FILE="/etc/nftables.d/capstone-fwd.nft"
 #    (2026-09-28) 학과망(192.168.12.x)→VM세그먼트도 22/80/443 만 통과(10443 차단, 실측) → 대시보드는 A:443 chatproxy 의 wazuh.groot.lab
 #    서버블록(출발지 allowlist: 학과망·VM세그먼트·내부망, VPN/외부 403)으로 서비스. 아래 10443 DNAT 는 VM세그먼트 직결(Kali/현장PC)용으로 유지.
 #  - 회신은 A 를 거쳐 돌아와야 하므로 DNAT 된 연결은 $INT_IF 로 나갈 때 SNAT(masquerade) 한다
-#    (B/C 기본라우트가 아직 ens192 라 비대칭 라우팅 방지; ens192 제거 후에도 그대로 유효). 내부 서버 로그엔 클라이언트가 10.10.10.1 로 보임.
+#    (B/C 기본라우트가 아직 ens192 라 비대칭 라우팅 방지; ens192 제거 후에도 그대로 유효). 내부 서버 로그엔 클라이언트가 10.200.10.1 로 보임.
 #  - 공격 경로(DVWA)는 여기 넣지 않는다: WAF(80/8443)·IDS 를 거쳐야 한다.
 PORTFORWARDS=(
-  "10443:10.10.10.10:443:Wazuh dashboard (VM세그먼트 직결용: https://192.168.16.230:10443 ; 학과망/VM세그먼트는 https://wazuh.groot.lab (A:443 chatproxy) ; VPN: 없음(정책))"
+  "10443:10.200.10.10:443:Wazuh dashboard (VM세그먼트 직결용: https://192.168.16.230:10443 ; 학과망/VM세그먼트는 https://wazuh.groot.lab (A:443 chatproxy) ; VPN: 없음(정책))"
 )
 # 참고: 채팅(Mattermost)은 A:443 nginx 리버스 프록시(chatproxy, https://chat.groot.lab)로 서비스 → 여기 DNAT 아님. (구 8065 DNAT 제거됨 2026-09-27)
 

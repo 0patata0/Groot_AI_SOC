@@ -1,6 +1,6 @@
 #!/bin/bash
 # Groot_A: 내부망 NTP 서버(chrony) 구성 — 게이트형, 멱등(적대적 리뷰 3관점 반영 2026-09-26). sudo bash 로 실행.
-# 구조(사용자 결정): A ← 192.168.16.131(캠퍼스 시간 서버, 192.168.16.0/24에서 유일한 NTP 응답자) ; B/C ← A(10.10.10.1)
+# 구조(사용자 결정): A ← 192.168.16.131(캠퍼스 시간 서버, 192.168.16.0/24에서 유일한 NTP 응답자) ; B/C ← A(10.200.10.1)
 # 전제(최초 1회): /tmp/ntp/ 에 chrony·tzdata-legacy(·libcap2-bin) deb + SHA256SUMS(우분투 아카이브 인덱스 값). 오프라인 dpkg 설치.
 #   - chrony 는 systemd-timesyncd 패키지와 'time-daemon' 충돌 → timesyncd 패키지를 먼저 제거(apt 가 하던 일을 수동으로).
 #   - tzdata-legacy 는 tzdata 와 동일 버전 고정 → G0 에서 검사.
@@ -33,8 +33,8 @@ xmt = w[10] - 2208988800 + w[11] / 2**32; rdelay = w[1] / 65536; rdisp = w[2] / 
 print("  upstream %s: leap=%d stratum=%d offset=%+.3fs rootdelay=%.3fs rootdisp=%.3fs refid=%s" % (ip, li, st, xmt - time.time(), rdelay, rdisp, ".".join(str(b) for b in d[12:16])))
 sys.exit(0 if (0 < st < 16 and li != 3) else 1)
 PY
-ip -br addr show ens160 | grep -q '10\.10\.10\.1/' || die "ens160 is not 10.10.10.1"
-if nft list ruleset 2>/dev/null | grep -q 'hook input'; then echo "  note: nft input hook exists — ensure udp/123 from 10.10.10.0/24 is allowed"; fi
+ip -br addr show ens160 | grep -q '10\.10\.10\.1/' || die "ens160 is not 10.200.10.1"
+if nft list ruleset 2>/dev/null | grep -q 'hook input'; then echo "  note: nft input hook exists — ensure udp/123 from 10.200.10.0/24 is allowed"; fi
 echo "ok"
 
 say "P1 packages (offline dpkg): remove systemd-timesyncd (time-daemon conflict), install debs"
@@ -59,16 +59,16 @@ installed chrony || die "chrony not installed"
 [ -z "$(dpkg -C 2>/dev/null)" ] || { dpkg -C; die "dpkg reports broken packages after install"; }
 chronyd --version | head -1 | sed 's/^/  /'
 
-say "P2 chrony.conf (upstream $UP, serve 10.10.10.0/24 on ens160 only, local fallback)"
+say "P2 chrony.conf (upstream $UP, serve 10.200.10.0/24 on ens160 only, local fallback)"
 [ -f /etc/chrony/chrony.conf ] || : > /etc/chrony/chrony.conf
 [ -f /etc/chrony/chrony.conf.orig ] || cp -a /etc/chrony/chrony.conf /etc/chrony/chrony.conf.orig
 cat > /etc/chrony/chrony.conf <<EOF
 # capstone Groot_A — 내부망 NTP 서버 (generated $(date -u +%F)). 원본: chrony.conf.orig
-# 상류: 캠퍼스 시간 서버(192.168.16.0/24에서 유일한 NTP 응답자). 하류: B/C (10.10.10.0/24, systemd-timesyncd → 10.10.10.1)
+# 상류: 캠퍼스 시간 서버(192.168.16.0/24에서 유일한 NTP 응답자). 하류: B/C (10.200.10.0/24, systemd-timesyncd → 10.200.10.1)
 server $UP iburst
 # 서버 소켓은 내부 인터페이스에만(캠퍼스 세그먼트에 NTP 서비스 노출 안 함). 상류 질의용 클라이언트 소켓은 별개.
-bindaddress 10.10.10.1
-allow 10.10.10.0/24
+bindaddress 10.200.10.1
+allow 10.200.10.0/24
 # 상류 불통 시에도 내부에 시간을 계속 제공(내부 일관성 우선; stratum 10 으로 표시됨)
 local stratum 10
 driftfile /var/lib/chrony/chrony.drift
@@ -99,16 +99,16 @@ chronyc -n tracking | grep -E 'Reference ID|Stratum|System time|Last offset|Leap
 chronyc -n tracking | grep -q "Reference ID.*($UP)" || { chronyc -n sources -v | tail -5; die "not synced to $UP (upstream answered in G0 but chrony did not select it — check rootdisp/leap above)"; }
 chronyc -n sources | sed 's/^/  /' || true
 
-say "V2 serving: udp/123 bound on 10.10.10.1 and answers a self-query"
-ss -ulnp | grep -E '10\.10\.10\.1:123 ' | sed 's/^/  /' || die "chronyd is not listening on 10.10.10.1:123 (bindaddress/allow)"
-python3 - <<'PY' || die "chrony does not answer on 10.10.10.1:123"
+say "V2 serving: udp/123 bound on 10.200.10.1 and answers a self-query"
+ss -ulnp | grep -E '10\.10\.10\.1:123 ' | sed 's/^/  /' || die "chronyd is not listening on 10.200.10.1:123 (bindaddress/allow)"
+python3 - <<'PY' || die "chrony does not answer on 10.200.10.1:123"
 import socket, struct, sys, time
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.settimeout(3)
 try:
-    s.sendto(b"\x1b" + 47 * b"\0", ("10.10.10.1", 123)); d, _ = s.recvfrom(48)
+    s.sendto(b"\x1b" + 47 * b"\0", ("10.200.10.1", 123)); d, _ = s.recvfrom(48)
 except socket.timeout: sys.exit(2)
 w = struct.unpack("!12I", d); li = d[0] >> 6; st = d[1]; xmt = w[10] - 2208988800 + w[11] / 2**32
-print("  10.10.10.1 answers: leap=%d stratum=%d offset=%+.3fs" % (li, st, xmt - time.time()))
+print("  10.200.10.1 answers: leap=%d stratum=%d offset=%+.3fs" % (li, st, xmt - time.time()))
 sys.exit(0 if (0 < st < 16 and li != 3) else 1)
 PY
 echo; echo "== NTP_SERVER_DONE =="

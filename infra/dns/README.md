@@ -22,7 +22,7 @@ sudo bash infra/dns/apply_hosts.sh
 
 ## 나중: dnsmasq 확장 (캠퍼스 세그먼트 클라이언트가 많아질 때)
 같은 원본 파일을 그대로 재사용:
-1. A(또는 B)에 dnsmasq 오프라인 설치(deb 반입). 설정: `addn-hosts=/etc/capstone/groot.lab.hosts`, `listen-address=10.10.10.1`(및 필요 시 192.168.16.230), `bind-interfaces`, `no-resolv`+상위 `server=168.126.63.1`(외부 이름 포워딩용, egress 막혀 있으니 사실상 내부만).
+1. A(또는 B)에 dnsmasq 오프라인 설치(deb 반입). 설정: `addn-hosts=/etc/capstone/groot.lab.hosts`, `listen-address=10.200.10.1`(및 필요 시 192.168.16.230), `bind-interfaces`, `no-resolv`+상위 `server=168.126.63.1`(외부 이름 포워딩용, egress 막혀 있으니 사실상 내부만).
 2. A 호스트 방화벽에 세그먼트→UDP/TCP 53 허용 룰 추가(`capstone-fw.nft` input 에 `iifname ens160 udp dport 53 accept` 등; 캠퍼스 세그먼트 대상이면 ens192 쪽도).
 3. 클라이언트 resolver 를 그 DNS 로(캠퍼스 세그먼트 한정). **VPN 클라이언트는 53 도달 불가(22/80/443만) → 계속 hosts 사용.**
 - 즉 dnsmasq 는 캠퍼스 세그먼트 클라이언트에만 실익. VPN 브라우저(내 Mac)는 어느 경우든 hosts 필요.

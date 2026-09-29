@@ -12,8 +12,8 @@ say "G0 preflight"
 [ "$(id -u)" = 0 ] || die "run as root"
 docker image inspect nginx:1.27-alpine >/dev/null 2>&1 || die "nginx image missing"
 [ -f "$CD/docker-compose.yml" ] && [ -f "$CD/nginx.conf" ] || die "compose/nginx.conf missing at $CD"
-timeout 5 bash -c 'exec 3<>/dev/tcp/10.10.10.10/8065' 2>/dev/null || die "B Mattermost 10.10.10.10:8065 unreachable"
-timeout 5 bash -c 'exec 3<>/dev/tcp/10.10.10.10/443'  2>/dev/null || die "B Wazuh dashboard 10.10.10.10:443 unreachable"
+timeout 5 bash -c 'exec 3<>/dev/tcp/10.200.10.10/8065' 2>/dev/null || die "B Mattermost 10.200.10.10:8065 unreachable"
+timeout 5 bash -c 'exec 3<>/dev/tcp/10.200.10.10/443'  2>/dev/null || die "B Wazuh dashboard 10.200.10.10:443 unreachable"
 if [ -z "$(docker ps -q -f name='^chatproxy$')" ] && ss -ltn | awk '{print $4}' | grep -qE ':443$'; then die "port 443 busy by a non-chatproxy process"; fi
 echo "ok: image, compose, B:8065, B:443, port 443"
 
@@ -41,7 +41,7 @@ docker compose restart chatproxy >/dev/null 2>&1 || true
 sleep 3
 [ "$(docker inspect -f '{{.State.Status}}' chatproxy 2>/dev/null)" = running ] || { docker logs --tail 20 chatproxy 2>&1; die "chatproxy not running"; }
 [ "$(docker inspect -f '{{.RestartCount}}' chatproxy)" = 0 ] || { docker logs --tail 20 chatproxy; die "chatproxy restarting (config error?)"; }
-echo -n "  container->B:8065: "; docker exec chatproxy wget -qO- -T5 http://10.10.10.10:8065/api/v4/system/ping 2>/dev/null | grep -q '"status":"OK"' && echo "reachable" || die "chatproxy container cannot reach 10.10.10.10:8065 (bridge egress/FORWARD)"
+echo -n "  container->B:8065: "; docker exec chatproxy wget -qO- -T5 http://10.200.10.10:8065/api/v4/system/ping 2>/dev/null | grep -q '"status":"OK"' && echo "reachable" || die "chatproxy container cannot reach 10.200.10.10:8065 (bridge egress/FORWARD)"
 
 say "V1 chat.groot.lab (from A, --resolve to A ext IP)"
 curl -sk --resolve chat.groot.lab:443:$EXT -o /dev/null -w "  https://chat.groot.lab/api/v4/system/ping -> %{http_code}\n" -m 8 https://chat.groot.lab/api/v4/system/ping

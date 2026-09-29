@@ -4,7 +4,7 @@
 # 전제: /tmp/soc_bot.py, /etc/mcp/wazuh-ro.env(mcp-ro 자격), Mattermost 가동. 입력 env: MM_ADMIN_PW(=socadmin 비번), MM_WEBHOOK.
 set -euo pipefail
 : "${MM_ADMIN_PW:?MM_ADMIN_PW unset}" "${MM_WEBHOOK:?MM_WEBHOOK unset (report 게시용 incoming webhook URL; 값은 CREDENTIALS.local.md)}"
-MM=http://10.10.10.10:8065; API=$MM/api/v4
+MM=http://10.200.10.10:8065; API=$MM/api/v4
 LISTEN=${LISTEN:-0.0.0.0:8090}                          # 봇 리슨(모든 IF). MM 컨테이너가 게이트웨이로 도달
 SLASH_URL=${SLASH_URL:-http://172.19.0.1:8090}          # MM(컨테이너)→봇 콜백 주소 = mm-net 게이트웨이(호스트). ⚠️ MM 은 사설IP 아웃바운드를 기본 차단(SSRF)
 # → mattermost-compose.yml 의 MM_SERVICESETTINGS_ALLOWEDUNTRUSTEDINTERNALCONNECTIONS 에 이 IP 가 있어야 함(172.19.0.1). EnableCommands=true 도 필요(compose 에 설정).

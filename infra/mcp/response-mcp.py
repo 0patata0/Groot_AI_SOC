@@ -83,7 +83,7 @@ TOOLS = [
 ]
 
 # --- Tier 2 승인 브로커(B soc_bot) — 차단은 운영자 승인 후에만. env 는 run-response.sh 가 /etc/resp/hitl.env 에서 source ---
-BROKER_URL = os.environ.get("RESP_BROKER_URL", "").rstrip("/")       # 예: http://10.10.10.10:8090
+BROKER_URL = os.environ.get("RESP_BROKER_URL", "").rstrip("/")       # 예: http://10.200.10.10:8090
 BROKER_TOKEN = os.environ.get("RESP_BROKER_TOKEN", "")
 APPROVAL_TIMEOUT = max(30, _envint("RESP_APPROVAL_TIMEOUT", 600))    # 초. Hermes 쪽 MCP tool timeout 보다 작아야 함
 APPROVAL_POLL = max(2, _envint("RESP_APPROVAL_POLL", 5))

@@ -22,7 +22,7 @@ prep(){
   cat > "$DATA/home/.ssh/config" <<CFG
 # Hermes(컨테이너) → MCP 서버. 경로는 컨테이너 기준(/opt/data). sshd ForceCommand 경계 유지 — 자격증명은 서버 쪽에만.
 Host mcp-b
-    HostName 10.10.10.10
+    HostName 10.200.10.10
     User mcp
     IdentityFile /opt/data/home/.ssh/id_ed25519
     IdentitiesOnly yes
@@ -31,7 +31,7 @@ Host mcp-b
     StrictHostKeyChecking accept-new
     ServerAliveInterval 30
 Host resp-a
-    HostName 10.10.10.1
+    HostName 10.200.10.1
     User resp
     IdentityFile /opt/data/home/.ssh/id_ed25519
     IdentitiesOnly yes
@@ -83,7 +83,7 @@ YML
   install -m 644 -o "$HUSER" -g "$HUSER" "$(dirname "$0")/contract_test.py" "$DATA/contract_test.py" 2>/dev/null || cp /opt/mcp/contract_test.py "$DATA/contract_test.py"
   chown "$HUSER:$HUSER" "$DATA/contract_test.py"
   SSHOPTS="-T -i $KEY -o IdentitiesOnly=yes -o BatchMode=yes -o UserKnownHostsFile=$DATA/home/.ssh/known_hosts -o StrictHostKeyChecking=accept-new"
-  runuser -u "$HUSER" -- python3 "$DATA/contract_test.py" --cmd "ssh $SSHOPTS mcp@10.10.10.10" 2>&1 | tail -6
+  runuser -u "$HUSER" -- python3 "$DATA/contract_test.py" --cmd "ssh $SSHOPTS mcp@10.200.10.10" 2>&1 | tail -6
   chown "$HUSER:$HUSER" "$DATA/home/.ssh/known_hosts" 2>/dev/null || true
   echo "PREP_DONE uid=$(id -u "$HUSER") gid=$(id -g "$HUSER")"
 }

@@ -13,7 +13,7 @@ Slack은 이 망에서 불가(아웃바운드 443 차단, 2026-09-27 실측). �
 - ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**.
 
 ## 구성 요소
-- **Mattermost 서버 + PostgreSQL** (Docker, 오프라인 이미지 반입 — 기존 방식과 동일). 배치 후보: **Groot_B**(디스크 145G 여유) 또는 소형 전용 VM. 내부망 전용(10.10.10.x), 접근은 대시보드처럼 A 점프(`ssh -L`).
+- **Mattermost 서버 + PostgreSQL** (Docker, 오프라인 이미지 반입 — 기존 방식과 동일). 배치 후보: **Groot_B**(디스크 145G 여유) 또는 소형 전용 VM. 내부망 전용(10.200.10.x), 접근은 대시보드처럼 A 점프(`ssh -L`).
 - **알림**: 이미 완성 — `notifier.py` http 백엔드가 Mattermost incoming webhook URL로 POST. `/etc/resp/hitl.env` 에 `RESP_NOTIFY_BACKEND=http` + `RESP_NOTIFY_URL=<webhook>` 한 블록.
 - **승인 브로커**(Tier 2에서 추가): 내부 소형 HTTP 리스너(B). Mattermost 버튼 클릭의 action 콜백을 받아 (a) 클릭 사용자 검증(허용 승인자 목록), (b) request-id 별 결정(승인/거부) 저장. 응답 MCP 서버는 고위험 동작 시 request-id 생성→버튼 메시지 게시→브로커 결정 대기→진행/중단.
 
@@ -35,7 +35,7 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
   → 승인자 검증 + request-id 결정 저장
 응답 서버: 결정 폴링/수신 → 승인이면 agent_block, 거부면 중단 → 결과를 채널에 회신
 ```
-모든 화살표가 내부망(10.10.10.x) — 인터넷 불필요.
+모든 화살표가 내부망(10.200.10.x) — 인터넷 불필요.
 
 ## 교체 용이성(기존 원칙 유지)
 - 알림 대상 교체 = `hitl.env` 의 URL 한 줄(Mattermost↔Rocket.Chat↔사내웹훅↔이메일).
@@ -61,7 +61,7 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
 - **정기 상태 요약(heartbeat)**: B `soc-summary.timer`(하루 2회, `OnCalendar=*-*-* 00,12:00:00` UTC = 09/21 KST, Persistent) → `soc_bot.py summary 12` → **이상 없어도 항상 게시**(🟢 이상없음 / 🟡 관찰 / 🔴 주의; 에이전트 active·최근 12h 경보·상위규칙·취약점). 수동 `/soc summary [시간]`. 주기/시각은 타이머 유닛에서 조정(SUMMARY_ONCAL/SUMMARY_HOURS).
 
 - **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커), NL 에이전트(LLM 연결), `/soc block`(응답 MCP 연동). **런타임=Hermes(B Docker) 가 MCP 2서버 17툴 등록 확인(2026-09-28)** — 응답 서버는 `trust: untrusted` 로 등록해 쓰기 툴(block_ip)은 Hermes 가 사람 승인을 요구하도록 함(서버 정책 엔진과 이중). 남은 전제는 LLM 연결뿐.
-- 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.10.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
+- 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.200.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
 
 ### VPN·캠퍼스 클린 접속 — A:443 이름 기반 리버스 프록시 (2026-09-27 확정)
 Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실측). 사용자 제약(루프백 사용 불가)으로 클라이언트 터널은 배제 → **A:443 nginx 리버스 프록시**로 해결:
@@ -72,7 +72,7 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 
 ### 관리포털(Wazuh 대시보드)도 같은 프록시에 (2026-09-28)
 - 학과망(192.168.12.x)에서 A:10443 이 캠퍼스 FW 에 막히고(22/80/443 만 통과, VPN 과 동일 정책 실측) 운영자가 루프백 터널을 못 쓰는 제약 → **chatproxy 에 `wazuh.groot.lab` 서버블록 추가**: `https://wazuh.groot.lab` → B:443(HTTPS 백엔드, `proxy_ssl_verify off`). 인증서는 `tls/wazuh.*` 로 분리(채팅 인증서·데스크톱 앱 재신뢰 불필요).
-- **출발지 allowlist**(nginx `allow/deny`): 학과망 192.168.10.0/24(2026-09-29 추가 — 학과망 PC 가 이 대역으로도 배정됨, 403 실측 후 반영) · 192.168.12.0/24 · VM세그먼트 192.168.16.0/24 · 내부망 10.10.10.0/24 만 허용, 그 외(VPN 192.168.15.0/24·외부 211.x) 403 → "대시보드는 VPN 으로 접근되면 안 됨" 결정 유지. A 는 클라이언트 IP 를 NAT 없이 그대로 본다(실측).
+- **출발지 allowlist**(nginx `allow/deny`): 학과망 192.168.10.0/24(2026-09-29 추가 — 학과망 PC 가 이 대역으로도 배정됨, 403 실측 후 반영) · 192.168.12.0/24 · VM세그먼트 192.168.16.0/24 · 내부망 10.200.10.0/24 만 허용, 그 외(VPN 192.168.15.0/24·외부 211.x) 403 → "대시보드는 VPN 으로 접근되면 안 됨" 결정 유지. A 는 클라이언트 IP 를 NAT 없이 그대로 본다(실측).
 - 실측(학과망 PC): `/`→302 `/app/login`, `/app/login`→200(Wazuh/OpenSearch), 채팅 회귀 200, 맨 IP 444. 배치: `infra/groot-a/{chatproxy.nginx.conf, deploy_chatproxy_A.sh}`(V4/V5 검증 추가; V2 웹소켓 curl 의 `set -e` 조기종료 버그 수정).
 - 미검증: VPN 출발지 403 은 VPN 이 끊긴 상태라 실측 못 함 → VPN 재연결 시 `https://wazuh.groot.lab` 가 403 인지 확인할 것.
 
@@ -87,7 +87,7 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 - **경보 트리거(cron `soc-alert-watch`)**: 5분마다 `--monitor-script recent_alerts.sh`(soc_bot `GET /recent` 지문: 최근 60분 level≥10 최신 5건)를 돌려 **바뀔 때만** LLM 조사 실행 → `soc-alerts`(HOME_CHANNEL)에 인시던트 보고, 내부 잡음이면 `[SILENT]`. 프롬프트 `infra/hermes/soc_alert_watch.prompt`. 배치 `infra/hermes/deploy_gateway_B.sh`.
 - **승인 브로커(soc_bot, B:8090)**: 응답 서버(A)의 `block_ip` → `POST /approval`(X-Broker-Token) → soc_bot 이 웹훅으로 [승인][거부] 버튼 카드 게시(콜백 `http://172.19.0.1:8090/actions`, 요청별 nonce) → 운영자 클릭 → `APPROVERS` 검사·결정 저장·카드 갱신 → A 가 `GET /decision/<id>` 폴링(최대 600s) → 승인 시 `agent_block`, 거부/만료/오류는 미실행(fail-closed). 무인 실행(cron)에서도 사람 승인이 붙는다. Hermes 쪽 `resp` 는 `trust: full`, `timeout: 720`(자체 게이트는 무인 실행에서 자동 거부라 서버측으로 이전). `list_blocks` 는 `readOnlyHint` 로 승인 불필요.
 - **E2E 실측**: `soc-agent`에 "203.0.113.9 를 1분간 차단" → Hermes `block_ip` → 카드 게시(3s) → 승인 → A 차단(TTL 60s) → Hermes 회신 "BLOCKED … (approved by socadmin)". 브로커 단위 검증: 권한 없는 사용자 거부·중복 클릭 방지·잘못된 nonce 거부.
-- 주의: Mattermost 는 API 로 게시물을 돌려줄 때 버튼 콜백 컨텍스트를 제거하므로 자동 테스트는 브로커의 `/pending`·`/nonce`(브로커 토큰) 로 클릭을 시뮬레이션한다. soc_bot 8090 은 A(10.10.10.10)·MM 컨테이너(172.19.0.1) 양쪽에서 닿아야 하므로 0.0.0.0 바인드 유지(토큰 인증).
+- 주의: Mattermost 는 API 로 게시물을 돌려줄 때 버튼 콜백 컨텍스트를 제거하므로 자동 테스트는 브로커의 `/pending`·`/nonce`(브로커 토큰) 로 클릭을 시뮬레이션한다. soc_bot 8090 은 A(10.200.10.10)·MM 컨테이너(172.19.0.1) 양쪽에서 닿아야 하므로 0.0.0.0 바인드 유지(토큰 인증).
 - 비밀 위치: 봇 토큰 B `/opt/hermes-data/.env`, 브로커/읽기 토큰 B `/etc/socbot/soc_bot.env` + A `/etc/resp/hitl.env`. 문서에 값 없음.
 
 ### 답변 품질 조정 (2026-09-28 저녁)

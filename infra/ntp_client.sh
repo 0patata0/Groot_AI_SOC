@@ -1,14 +1,14 @@
 #!/bin/bash
-# Groot_B / Groot_C: 시계를 A(10.10.10.1, chrony)에 동기 — systemd-timesyncd 클라이언트. 게이트형, 멱등(리뷰 반영 2026-09-26). sudo bash 로 실행.
+# Groot_B / Groot_C: 시계를 A(10.200.10.1, chrony)에 동기 — systemd-timesyncd 클라이언트. 게이트형, 멱등(리뷰 반영 2026-09-26). sudo bash 로 실행.
 # 구조: A ← 캠퍼스 192.168.16.131 ; B/C ← A. ens192 제거 후에도 내부망 경로라 그대로 유효.
 # 시계 기준은 timesyncd→A 하나뿐: VMware Tools timesync(주기 동기)는 끄고 확인. 성공 판정은 "재시작 후 A로부터 실제 응답 수신"으로.
 set -euo pipefail
-SRV=${NTP_SERVER:-10.10.10.1}
+SRV=${NTP_SERVER:-10.200.10.1}
 say(){ echo; echo "== $* =="; }; die(){ echo "!! ABORT: $*"; exit 1; }
 
 say "G0 preflight"
 [ "$(id -u)" = 0 ] || die "run as root"
-ip -br addr show ens160 | grep -qE '10\.10\.10\.(10|20)/' || die "ens160 is not an internal 10.10.10.x address"
+ip -br addr show ens160 | grep -qE '10\.10\.10\.(10|20)/' || die "ens160 is not an internal 10.200.10.x address"
 [ ! -x /usr/sbin/chronyd ] || die "chronyd is installed on this host — timesyncd would not start (this script is for B/C clients)"
 python3 - "$SRV" <<'PY' || die "$SRV does not answer NTP (is chrony on A up and synced?)"
 import socket, struct, sys, time

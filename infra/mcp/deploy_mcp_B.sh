@@ -56,7 +56,7 @@ TK=$(cu "$API_ADMIN_USER" "$API_ADMIN_PW" -X POST "$API/security/user/authentica
 R=$(cu "$IDX_ADMIN_USER" "$IDX_ADMIN_PW" "$IDX/_cluster/health") && grep -q '"status"' <<<"$R" || die "indexer admin auth/health failed"
 RID=$(cb "$API/security/roles" | python3 -c 'import json,sys; print(next((r["id"] for r in json.load(sys.stdin)["data"]["affected_items"] if r["name"]=="readonly"), ""))'); [ -n "$RID" ] || die "readonly role not found"
 R=$(cu "$IDX_ADMIN_USER" "$IDX_ADMIN_PW" "$IDX/_plugins/_security/api/rolesmapping/readall") && python3 -c 'import json,sys; d=json.load(sys.stdin); assert "readall" in d["readall"]["backend_roles"], d' <<<"$R" 2>/dev/null || die "rolesmapping readall (backend_role readall) missing — cannot map via backend_roles"
-CFG=$(sshd -T -C user=mcp,host=10.10.10.10,addr=10.10.10.10,laddr=10.10.10.10,lport=22) || die "sshd -T failed"
+CFG=$(sshd -T -C user=mcp,host=10.200.10.10,addr=10.200.10.10,laddr=10.200.10.10,lport=22) || die "sshd -T failed"
 grep -qx 'pubkeyauthentication yes' <<<"$CFG" || die "sshd: PubkeyAuthentication must be yes"
 grep -qx 'usepam yes' <<<"$CFG" || die "sshd: UsePAM must be yes"
 grep -q '^authorizedkeysfile .*\.ssh/authorized_keys' <<<"$CFG" || die "sshd: AuthorizedKeysFile lacks .ssh/authorized_keys"
@@ -161,7 +161,7 @@ LINE="restrict,command=\"$WRAP\" $MCP_PUBKEY"
 touch "$AK"; grep -qF -- "$KEYBODY" "$AK" || printf '%s\n' "$LINE" >> "$AK"
 chown root:mcp "$AK"; chmod 0640 "$AK"
 if grep -vqE "^restrict,command=\"$WRAP\" " "$AK"; then die "unrestricted line in $AK"; fi
-sshd -T -C user=mcp,host=10.10.10.10,addr=10.10.10.10,laddr=10.10.10.10,lport=22 | grep -E '^(forcecommand|permittty|allowtcpforwarding|passwordauthentication) ' | sed 's/^/  effective: /'
+sshd -T -C user=mcp,host=10.200.10.10,addr=10.200.10.10,laddr=10.200.10.10,lport=22 | grep -E '^(forcecommand|permittty|allowtcpforwarding|passwordauthentication) ' | sed 's/^/  effective: /'
 cut -c1-80 "$AK" | sed 's/^/  /'
 
 say "V1 mcp-ro is read-only on the API (every endpoint the MCP tools use must be 200, writes 403)"

@@ -4,7 +4,7 @@
 # 비밀: postgres pw 는 .env(0600), 관리자 pw 는 인자(ADMIN_PW) 또는 생성 후 1회 출력(→ CREDENTIALS.local.md). argv 노출 최소화 위해 stdin 주입 권장.
 set -euo pipefail
 CD=/home/groot_b/capstone/mattermost
-IP=10.10.10.10; PORT=8065; API="http://$IP:$PORT/api/v4"
+IP=10.200.10.10; PORT=8065; API="http://$IP:$PORT/api/v4"
 ADMIN_USER=${ADMIN_USER:-socadmin}; ADMIN_EMAIL=${ADMIN_EMAIL:-soc-admin@groot.local}
 TEAM=${TEAM:-soc}; CHAN=${CHAN:-soc-alerts}
 say(){ echo; echo "== $* =="; }; die(){ echo "!! ABORT: $*"; exit 1; }

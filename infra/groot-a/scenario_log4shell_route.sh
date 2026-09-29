@@ -1,13 +1,13 @@
 #!/bin/bash
 # 시나리오 전용: Log4Shell 랩(C)을 A 경유로 노출/회수. 평상시 OFF(재부팅에도 안 남음 — 런타임 테이블).
 #
-# 배경: 평상시 랩은 C 내부 전용(10.10.10.20:8080 바인딩) — 캠퍼스/VPN 직접 도달 불가.
+# 배경: 평상시 랩은 C 내부 전용(10.200.10.20:8080 바인딩) — 캠퍼스/VPN 직접 도달 불가.
 #       시나리오 때만 이 스크립트로 A 경유 경로를 열어 Suricata(ens192 af-packet)로 검사되게 한다.
 #
-# ON  = A:ens192:8080 -> C 10.10.10.20:8080 DNAT + DOCKER-USER forward(NEW) 허용 + 회신 SNAT.
+# ON  = A:ens192:8080 -> C 10.200.10.20:8080 DNAT + DOCKER-USER forward(NEW) 허용 + 회신 SNAT.
 #       공격 경로: Kali(캠퍼스) -> http://192.168.16.230:8080/  ->  A(Suricata 검사)  ->  C 랩.
 #       Suricata 는 ens192 에서 inbound 패킷(JNDI/LDAP 페이로드)을 그대로 캡처 → 탐지.
-# OFF = 위 규칙 제거 → 랩은 다시 C 내부(10.10.10.20:8080) 전용.
+# OFF = 위 규칙 제거 → 랩은 다시 C 내부(10.200.10.20:8080) 전용.
 #
 # 주의:
 #  - 별도 nft 테이블 `capstone_scenario` 사용(capstone_fw/capstone_fwd 를 건드리지 않음). 멱등.
@@ -19,7 +19,7 @@ set -e
 
 EXT_IF="ens192"          # A 외부(캠퍼스) NIC
 INT_IF="ens160"          # A 내부망 NIC
-LAB_IP="10.10.10.20"     # C 내부 IP
+LAB_IP="10.200.10.20"     # C 내부 IP
 LAB_PORT="8080"          # C 랩 포트
 EXT_PORT="8080"          # A 외부 노출 포트 (host 8080 은 미사용 — WAF 는 host 80/8443)
 TBL="capstone_scenario"

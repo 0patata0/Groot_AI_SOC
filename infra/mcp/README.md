@@ -23,7 +23,7 @@
 
 ## 전송 계약
 - **1차(지금): stdio over SSH** — 클라이언트가 `ssh -T groot-mcp`를 MCP 명령으로 실행(원격 명령 인자 없음: B의 sshd `Match User mcp` ForceCommand + authorized_keys `restrict,command=`가 래퍼 `/opt/mcp/run-wazuh-ro.sh`를 강제). 서버 프로세스는 **B에서** 뜨고, Wazuh 자격증명은 B의 `/etc/mcp/wazuh-ro.env`에만 → 클라이언트 호스트(Mac 등)에 자격증명 없음(A안). Claude Code·Claude Desktop·Hermes 모두 지원. 빌드 불필요(릴리스 바이너리 stdio 전용). 클라이언트 키(`~/.ssh/groot_mcp_ed25519`)는 A에서는 B:22 점프 전용(`restrict,permitopen`), B에서는 mcp 계정 래퍼 전용.
-- **확장: HTTP(streamable)** `http://10.10.10.10:8080/mcp` + `Authorization: Bearer <token>` — 프로세스를 못 띄우는 원격/커스텀 API 클라이언트용. `mcp-server-wazuh`를 `--features http`로 빌드해 B에 systemd 서비스로 상주(전용 사용자, `127.0.0.1` 또는 내부 IP 바인드). 같은 코드·같은 툴.
+- **확장: HTTP(streamable)** `http://10.200.10.10:8080/mcp` + `Authorization: Bearer <token>` — 프로세스를 못 띄우는 원격/커스텀 API 클라이언트용. `mcp-server-wazuh`를 `--features http`로 빌드해 B에 systemd 서비스로 상주(전용 사용자, `127.0.0.1` 또는 내부 IP 바인드). 같은 코드·같은 툴.
 - 어느 쪽이든 **툴 목록·자격증명·권한은 동일** → 클라이언트 교체 비용 = 설정 1블록.
 
 ## 서버 측(B) 배치 원칙
@@ -44,19 +44,19 @@
 mcp_servers:
   wazuh-ro:
     command: ssh
-    args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b"]   # Host mcp-b = mcp@10.10.10.10, 키·known_hosts 는 /opt/data/home/.ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b"]   # Host mcp-b = mcp@10.200.10.10, 키·known_hosts 는 /opt/data/home/.ssh
     env: { HOME: /opt/data/home }
     trust: full
   resp:
     command: ssh
-    args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.10.10.1
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.200.10.1
     env: { HOME: /opt/data/home }
     trust: untrusted    # 쓰기 툴은 사람 승인
-    # HTTP 전환 시: url: "http://10.10.10.10:8080/mcp", headers: {Authorization: "Bearer ${env:SOC_MCP_TOKEN}"}
+    # HTTP 전환 시: url: "http://10.200.10.10:8080/mcp", headers: {Authorization: "Bearer ${env:SOC_MCP_TOKEN}"}
 ```
 검증(LLM 불필요): `infra/hermes/deploy_hermes_B.sh test` — 컨테이너 안 계약 테스트 + `chat -q` 기동 후 agent.log 의 `MCP: registered 17 tool(s) from 2 server(s)`(2026-09-28 실측). 이미지 v2026.9.24 에는 mcp[cli](typer) 가 없어 `hermes mcp test` 는 안 됨. 컨테이너 키는 B `/opt/mcp/.ssh/authorized_keys`·A `/opt/resp/.ssh/authorized_keys` 에 Mac 키와 같은 `restrict,command=` 접두로 등록됨(2026-09-28).
 어느 클라이언트든 그 호스트에 `~/.ssh/config`의 `groot-mcp` 블록(키·ProxyJump·BatchMode)과 키 파일만 있으면 된다. 다른 호스트에서 쓰려면 그 호스트용 키를 만들어 B `/opt/mcp/.ssh/authorized_keys`(같은 `restrict,command=` 접두)와 A `~groot_a/.ssh/authorized_keys`(점프 전용 접두)에 추가.
-**커스텀/원격(HTTP)** — Python `mcp` SDK: `streamablehttp_client("http://10.10.10.10:8080/mcp", headers={"Authorization": "Bearer ..."})` → `list_tools()` / `call_tool("get_wazuh_alert_summary", {...})`.
+**커스텀/원격(HTTP)** — Python `mcp` SDK: `streamablehttp_client("http://10.200.10.10:8080/mcp", headers={"Authorization": "Bearer ..."})` → `list_tools()` / `call_tool("get_wazuh_alert_summary", {...})`.
 
 ## AI와 무관한 검증(서버 계약 테스트)
 어떤 AI를 붙이기 전에 표준 클라이언트로 서버를 먼저 검증한다: `contract_test.py`(표준 라이브러리만, 오프라인) — `python3 infra/mcp/contract_test.py --cmd "ssh -T groot-mcp" --tool get_wazuh_alert_summary --args '{"limit":3}'` → initialize/tools/list/tools/call + stdout 순수성 검사. (`npx @modelcontextprotocol/inspector`나 Python `mcp` SDK도 동일하게 쓸 수 있다.) 통과하면 "서버는 검증됨"이고, 이후 런타임 교체는 클라이언트 설정만 바꿔 같은 호출을 재현하면 된다. B에도 `/opt/mcp/contract_test.py`가 있어 서버 로컬에서 `runuser -u mcp`로 재검증 가능.

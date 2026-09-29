@@ -10,10 +10,10 @@
 #    내부망→외부 통과 허용은 capstone-nat.sh 가 DOCKER-USER 에 ACCEPT 로 넣는다.
 
 table ip capstone_gw {
-    # 내부망(10.10.10.0/24) → 임시 외부(ens192) 아웃바운드 소스 NAT
+    # 내부망(10.200.10.0/24) → 임시 외부(ens192) 아웃바운드 소스 NAT
     chain postrouting {
         type nat hook postrouting priority srcnat; policy accept;
-        ip saddr 10.10.10.0/24 oifname "ens192" masquerade
+        ip saddr 10.200.10.0/24 oifname "ens192" masquerade
     }
 }
 

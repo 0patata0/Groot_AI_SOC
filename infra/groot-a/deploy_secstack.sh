@@ -13,7 +13,7 @@ docker images --format '{{.Repository}}:{{.Tag}}' | grep -q '^owasp/modsecurity-
 [ -f $SS/docker-compose.yml ] || die "compose missing at $SS"
 N=$(ls $BASE/suricata/rules/*.rules 2>/dev/null | wc -l); [ "$N" -gt 0 ] || die "ET rules not staged"
 ip link show ens192 >/dev/null 2>&1 || die "ens192 missing"
-getent hosts groot-web | grep -q 10.10.10.20 || die "groot-web unresolved"
+getent hosts groot-web | grep -q 10.200.10.20 || die "groot-web unresolved"
 timeout 5 bash -c 'exec 3<>/dev/tcp/groot-web/80' 2>/dev/null || die "groot-web:80 unreachable"
 if [ -z "$(docker ps -q -f name='^waf$')" ] && ss -ltn | awk '{print $4}' | grep -qE ':(80|443)$'; then die "port 80/443 in use by a non-stack process"; fi
 MU=$(docker inspect owasp/modsecurity-crs:nginx --format '{{.Config.User}}'); [ "$MU" = "nginx" ] || echo "note: modsec image user=$MU"

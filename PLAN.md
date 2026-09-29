@@ -134,7 +134,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 | MCP 역할 | 자격증명 격리 보안 경계 (A안). MCP Server는 Groot_B, Agent는 자격증명 없음 | 온프레미스 분리로 경계 더 명확 |
 | Alert 전달 | Indexer 폴링 (전 구간 내부망이라 웹훅도 가능) | |
 | 공격 시나리오 | DVWA(웹공격) + CVE 컨테이너(Log4Shell 등) 병행 | KEV 등재 CVE |
-| 대응 | 자동은 되돌릴 수 있는 동작만, 고위험은 사람 승인 | Policy Engine + HITL(⚠️Slack 불가, 443 차단 — 터미널/온프레미스 채팅으로 대체 예정) |
+| 대응 | 자동은 되돌릴 수 있는 동작만, 고위험은 사람 승인 | Policy Engine + HITL(⚠️Slack 불가, 443 차단 — 온프레미스 Mattermost 로 대체 완료, Tier 2 승인) |
 | Fine-tuning | 확장 목표 (LoRA/QLoRA) | 없어도 완결 |
 
 확정: LLM=DGX Spark(A-1), 오케스트레이션=Docker Compose(B-1).

@@ -91,7 +91,7 @@ LLM 추론 서버  (DGX Spark, 확정)
 구성 시 반드시 반영해야 하는 사항
 
 * 전 구성이 ESXi 호스트 내부망에 있어, 이전 계획의 방화벽 우회·SSH 터널·클라우드 비용이 모두 불필요하다. Wazuh와 Agent, 보안장비가 같은 가상 네트워크에 있어 로그 전달과 API 호출에 제약이 없다.
-* 트래픽 흐름은 Kali -> Groot_A(FW -> IPS -> WAF) -> Groot_C 이며, Groot_A가 외부/DMZ 사이의 게이트웨이 역할을 한다. nftables가 패킷을 Suricata(IPS)로 NFQUEUE하고, 통과분을 ModSecurity(WAF)가 L7 검사 후 DVWA로 프록시한다. ESXi 포트그룹은 임시 외부망(`192.168.16.0/25`)과 내부망(`10.200.10.0/24`) 2세그먼트로 구성하며, `Groot_A`가 두 세그먼트 사이의 NAT 게이트웨이가 된다(외부·DMZ·관리 3세그먼트 분리는 캠퍼스망 제약·구축 범위상 미채택).
+* 트래픽 흐름은 Kali -> Groot_A(FW -> IPS -> WAF) -> Groot_C 이며, Groot_A가 임시 외부망과 내부망 사이의 NAT 게이트웨이 역할을 한다. nftables가 패킷을 Suricata(IPS)로 NFQUEUE하고, 통과분을 ModSecurity(WAF)가 L7 검사 후 DVWA로 프록시한다. ESXi 포트그룹은 임시 외부망(`192.168.16.0/25`)과 내부망(`10.200.10.0/24`) 2세그먼트로 구성하며, `Groot_A`가 두 세그먼트 사이의 NAT 게이트웨이가 된다(외부·DMZ·관리 3세그먼트 분리는 캠퍼스망 제약·구축 범위상 미채택).
 * 모든 로그(FW/IPS/WAF/서버)는 Groot_B의 Wazuh로 집중한다. MCP Server도 Groot_B에 두어, LLM이 도는 Agent 프로세스에는 자격증명을 주지 않는 보안 경계(자격증명 격리)를 물리적으로 구현한다.
 * LLM 추론은 DGX Spark(A-1)의 `Ollama`(`qwen3.6:35b`)에서 수행하고, Agent Runtime(Hermes)은 `Groot_B`에 컨테이너로 상주하여 같은 세그먼트의 읽기 MCP Server 및 `Groot_A`의 응답 MCP Server에 접속한다(확정). 과제 정체성과 자격증명 격리에 부합하기 때문이다. ESXi GPU 패스스루(A-2)는 DGX Spark 사용 불가 시 대안으로만 둔다.
 * 컨테이너 오케스트레이션은 Docker Compose로 한다(VM별 docker-compose 확정). 구축·디버깅이 빠르고 Suricata inline·Wazuh 안정성에 유리하다. k3s는 대안.

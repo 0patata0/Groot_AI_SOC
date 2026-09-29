@@ -238,6 +238,6 @@ BF16: 3B × 2 byte = 6 GB/token
 - [ ] 공개 익스플로릿으로 실제 공격 재현, Wazuh/Suricata Alert의 rule id 기록
 - [ ] Wazuh Vuln Detection이 CVE-2021-3156을 실제로 매핑하는지 확인
 - [ ] MTTI/MTTR/토큰/속도 실측으로 6장 수치 대체
-- [ ] Qwen3-30B-A3B vs 32B 판단 품질 비교
+- [ ] 채택 모델 `qwen3.6:35b` 판단 품질 실측 (필요 시 대안 모델 비교)
 - [ ] Scenario 0(정상) 오탐률, Scenario 5(인젝션) 방어 확인
 - [ ] 10회 반복으로 일관성(편차) 측정

@@ -19,7 +19,7 @@
 | 에이전트 런타임 | 그 런타임의 MCP 클라이언트 설정(명령 또는 URL) | 없음 |
 | 전송(stdio↔HTTP) | 서버 기동 방식(플래그/서비스) | 툴·자격증명 동일 |
 | **알림 채널**(HITL notify) | A `/etc/resp/hitl.env` 의 `RESP_NOTIFY_BACKEND` + 엔드포인트 1블록 | 없음(코드·정책 불변) |
-| **승인 창구**(HITL approve) | MCP elicitation — 런타임/클라이언트가 표시(터미널·온프레미스 채팅 등) | 없음(서버는 채널을 모름) |
+| **승인 창구**(HITL approve) | **Tier 2 구현: 응답 MCP→soc_bot 브로커(`RESP_BROKER_URL`)→Mattermost [승인]/[거부] 버튼**(승인 시만 실행, fail-closed). 원 설계는 MCP elicitation | 없음(브로커 URL 1블록, 서버 코드는 채널을 모름) |
 
 ## 전송 계약
 - **1차(지금): stdio over SSH** — 클라이언트가 `ssh -T groot-mcp`를 MCP 명령으로 실행(원격 명령 인자 없음: B의 sshd `Match User mcp` ForceCommand + authorized_keys `restrict,command=`가 래퍼 `/opt/mcp/run-wazuh-ro.sh`를 강제). 서버 프로세스는 **B에서** 뜨고, Wazuh 자격증명은 B의 `/etc/mcp/wazuh-ro.env`에만 → 클라이언트 호스트(Mac 등)에 자격증명 없음(A안). Claude Code·Claude Desktop·Hermes 모두 지원. 빌드 불필요(릴리스 바이너리 stdio 전용). 클라이언트 키(`~/.ssh/groot_mcp_ed25519`)는 A에서는 B:22 점프 전용(`restrict,permitopen`), B에서는 mcp 계정 래퍼 전용.
@@ -72,7 +72,7 @@ mcp_servers:
 
 ### 알림/승인 채널도 교체 용이(엔드포인트만)
 읽기·응답 서버와 같은 원칙을 HITL 에도 적용 — **두 층으로 분리**:
-- **승인(approve)** = MCP **elicitation**. 서버는 "사람 승인 필요"만 요청하고, *어디에* 띄울지는 런타임/클라이언트가 정함 → 서버는 채널을 모름(가장 강한 분리). 터미널(Claude Code)·온프레미스 채팅 등 무엇이든.
+- **승인(approve)** = **Tier 2 완료(2026-09-28)**: 응답 MCP `request_approval()` 이 soc_bot 브로커(`RESP_BROKER_URL`)를 폴링, 브로커가 Mattermost 에 [승인]/[거부] 카드를 띄우고 승인 시에만 `block_ip` 실행(거부/만료=미실행, fail-closed). *어디에* 띄울지는 브로커/런타임이 정하므로 서버 코드는 채널을 모름(원 설계 MCP elicitation 원칙 유지). 상세 [hitl-chat.md](hitl-chat.md).
 - **알림(notify/감사 푸시)** = `notifier.py`(stdlib) 백엔드 추상화. `/etc/resp/hitl.env` 의 `RESP_NOTIFY_BACKEND`(none|http|email|slack) + 엔드포인트만 바꾸면 채널 교체(코드·정책·서버 불변). run-response.sh 가 세션마다 이 파일을 source → **재시작 없이** 다음 연결부터 반영. 예시 `hitl.env.example`.
   - `http`: 내부 Mattermost/Rocket.Chat incoming webhook 또는 사내 웹훅(내부망) — 권장. **채팅 채널 상세 설계(양방향 웹훅·인터랙티브 승인)는 [hitl-chat.md](hitl-chat.md)**.
   - `email`: 이 망은 아웃바운드 587 열림.

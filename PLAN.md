@@ -57,16 +57,18 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
   └───────────────┼────────────────────────────────────┘
                   │ MCP 호출 (자격증명 없는 Agent가 조회/대응)
                   ▼
-      [ LLM Agent 실행 위치 — 아래 옵션 참조 ]
-        vLLM(Qwen) + Agent Runtime + Policy Engine
+      [ DGX Spark — LLM 추론 전용 ]
+        Ollama · qwen3.6:35b (OpenAI 호환 /v1, 256k ctx)
+   ↳ 실제 배포: Agent Runtime(Hermes)은 Groot_B 상주(MCP와 같은 세그먼트),
+      Policy Engine 은 응답 MCP(Groot_A) 안. DGX 는 추론만 담당.
 ```
 
 트래픽 흐름: Kali → Groot_A(FW→WAF→IPS 검사) → Groot_C(DVWA/CVE). 로그는 전부 Groot_B의 Wazuh로 집중. LLM Agent는 Groot_B의 MCP Server를 통해 조사·대응.
 
-네트워크 세그먼트(ESXi 포트그룹으로 분리 권장):
-- 외부/공격자 세그먼트 (Kali ↔ Groot_A)
-- DMZ 세그먼트 (Groot_A ↔ Groot_C)
-- 관리 세그먼트 (Groot_B Wazuh/MCP, Agent)
+네트워크 세그먼트(실제 구성 = 2세그먼트, 2026-09-29 확정):
+- 임시 외부망 세그먼트 `192.168.16.0/25` (Kali·운영자 ↔ Groot_A 관문, A가 NAT)
+- 내부망 세그먼트 `10.200.10.0/24` (Groot_A ↔ Groot_B/Groot_C — Wazuh/MCP/Hermes)
+- 외부/DMZ/관리 3세그먼트 분리는 캠퍼스망 제약·구축 범위상 미채택
 
 ### 온프레미스 전환의 이점 (AWS 대비)
 - **Port Scan이 실제로 탐지된다.** AWS Security Group이 패킷을 관문에서 버리던 문제가 사라져 IPS가 스캔을 관측.
@@ -104,7 +106,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 | | A-1. DGX Spark 유지 (권장) | A-2. ESXi GPU 패스스루 |
 |---|---|---|
-| 구성 | DGX Spark에서 vLLM+Agent+Policy 실행, ESXi 관리 세그먼트로 Groot_B(MCP) 접속 | ESXi 호스트 GPU를 VM 하나에 패스스루하여 vLLM 실행 |
+| 구성 | DGX Spark에서 **Ollama** 추론(`qwen3.6:35b`), Agent Runtime(Hermes)은 Groot_B 상주(MCP와 같은 세그먼트), Policy Engine은 응답 MCP(Groot_A) 안 | ESXi 호스트 GPU를 VM 하나에 패스스루하여 추론 실행 |
 | 장점 | 제안서 "DGX Spark 기반" 정체성 유지, 128GB로 30B 여유, 관제망과 물리 분리 | 전 구성이 한 호스트에 모임, 관리 단순 |
 | 단점 | DGX Spark ↔ ESXi 네트워크 연결 필요 | 제안서 전제(DGX Spark)와 어긋남, ESXi 호스트에 충분한 GPU 필요, 패스스루 설정 |
 | 공통 | 어느 쪽이든 MCP Server는 Groot_B(별도 머신)에 두어 자격증명 격리(A안) 유지. Agent 프로세스에는 자격증명 없음 | |

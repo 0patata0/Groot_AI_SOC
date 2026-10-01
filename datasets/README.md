@@ -48,6 +48,47 @@
 - `phase_window` 는 **"그 단계 구간에 발생한 경보"** 라벨(구간 내 노이즈 포함) = 조사 트래젝터리의 컨텍스트/정답 단계용. 경보 단위 악성 여부 라벨이 아님.
 - SALAD 는 val 분할만 균형화. train(645MB) 받으면 같은 정책 적용, test 는 평가 전용.
 
+## 1-C. 2차 수집 (2026-10-01) — 반입·검증 완료, `datasets/raw/` 누적 2.3GB
+
+검증: HF LFS sha256·Zenodo md5·크기 대조, 아카이브 CRC, 전수 파싱·구조·카운트 — **58/58 PASS**.
+
+### 툴콜·에이전트 트레이스 (형식)
+| 디렉터리 | 출처·라이선스 | 규모 | 형식·메모 |
+|---|---|---|---|
+| `glaive-fc-v2/` | glaiveai/glaive-function-calling-v2 · Apache-2.0 | 271MB · **112,960** | `{system, chat}` 문자열(USER/ASSISTANT/FUNCTION RESPONSE 마커, `<functioncall>`) → ShareGPT/Hermes 변환 필요(변환본 `hiyouga/glaive-function-calling-v2-sharegpt` 존재). hermes-fc-v1 의 glaive-5k 와 중복 가능 → dedupe |
+| `hermes-agent-traces-filtered/` | DJLougen (lambda 트레이스 품질필터본) · Apache-2.0 | 366MB · **3,679** | **Hermes Agent 하네스** 다중턴, 전부 `<think>` 포함, 유효 assistant 툴콜 **67,963**(불량 0). 시스템 프롬프트의 형식 예시 `<tool_call>{"name": <function-name>…}` 는 플레이스홀더(파서에서 제외할 것) |
+
+### 보안 도메인 지시 (학습)
+| 디렉터리 | 출처·라이선스 | 규모 | 형식·메모 |
+|---|---|---|---|
+| `sevenllm/` | Multilingual-Multimodal-NLP/SEVENLLM-Dataset · Apache-2.0 | 190MB · train **91,401** / test 1,300 | `{id, category, instruction, input, output, thought}` — **28개 보안 이벤트 분석 과제**(Threat Analysis 8,301·Key Entity Recognition·Time Element·Malware Feature Extraction·Event Classification…), **`thought` 추론 필드 포함**. 이중언어: 중국어 포함 44,241(약 48%), 나머지 영어 → 영어 서브셋 우선, 중국어는 Qwen 이 처리 가능하나 출력은 한국어 teacher 변환 |
+| `attacklm/` | Veedubin/attacklm-dataset(GitHub) · 레코드별 원출처 라이선스 명시 | 7.7MB · jsonl **46,209** 레코드(81 데이터파일, `questions.jsonl`·`balanced_*.jsonl`) | ATT&CK 근거 레드/블루 QA(Atomic·Sigma·Elastic·Splunk·Mordor·NIST IR 출처). 레코드의 `license` 필드로 필터 가능 |
+| `salad-soc/` (train·test 추가) | nutthakorn7/SALAD-SOC · CC-BY-4.0 | train 645MB · **1,944,887** / test 138MB · 416,781 | val 과 동일 29열. train 은 `prep.py` 균형 정책 적용 대상, **test 는 평가 전용** |
+
+### 평가 전용 (학습 금지 — 라이선스/누출)
+| 디렉터리 | 출처·라이선스 | 규모 | 메모 |
+|---|---|---|---|
+| `cybermetric/` | tihanyin/CyberMetric · Apache-2.0 | 10,180 / 2,000 / 500 / 80 MCQ | `{question, answers, solution}` 보안 지식 MCQ |
+| `cti-bench/` | AI4Sec/cti-bench · **CC-BY-NC-SA-4.0** | MCQ 2,500·RCM 1,000(+2021 1,000)·VSP 1,000·ATE 60·TAA 50 | CTI 추론 벤치(NeurIPS'24). **비상업 라이선스 → 평가만** |
+| `secqa/` | zefang-liu/secqa · **CC-BY-NC-SA-4.0** | v1 test 110 / v2 test 100 (+dev/val) | 보안 MCQ. **평가만** |
+
+### 룰·지식 원천 (합성·RAG용, 우리 스택 직결)
+| 디렉터리 | 출처·라이선스 | 규모·검증 | 용도 |
+|---|---|---|---|
+| `wazuh-ruleset/` | wazuh/wazuh **v4.14.8** `ruleset/rules`+`decoders` (git sparse) · GPL-2.0 | 룰 xml 168 · `<rule id>` **4,515** · 디코더 120. **우리 경보 룰 31101/31151(web)·86601(suricata)·5710(sshd) 존재 확인** | 경보 룰 id → 의미/그룹/MITRE 설명 합성(에이전트가 "31101 이 뭔지" 아는 지식) |
+| `et-open/` | Emerging Threats Open(suricata-7.0.3) · ET Open 라이선스(BSD계, 비상업 조항 확인) | 54 룰파일 · **52,536** alert 룰 | sid → 시그니처 설명 합성(A 에 반입된 것과 동일 계열) |
+| `coreruleset/` | OWASP CRS **v4.29.0** · Apache-2.0 | 27 conf · **750** SecRule | WAF 룰 id(9xxxxx) → 공격 유형 설명(A WAF 와 동일 버전) |
+| `sigma/` | SigmaHQ/sigma master · 룰 DRL-1.1(코드 MIT) | 룰 yml **4,244** | 탐지 로직·ATT&CK 태그 → "무엇을 조사할지" 합성 |
+| `atomic-red-team/` | redcanaryco (git sparse `atomics/`) · MIT | 기법 **344** `T*.yaml`(354MB, 테스트 바이너리 포함) | 기법 → 실행 명령·기대 증거 쌍(공격→증거 합성) |
+| `attack-stix/` | mitre-attack/attack-stix-data `enterprise-attack.json` · ATT&CK 이용약관 | 객체 26,086 · **활성 기법 697** | 기법/전술/탐지/완화 텍스트 |
+| `cisa-kev/` | CISA KEV JSON(2026-09-30) · 공개 | **1,730** CVE(시나리오 CVE-2021-44228·CVE-2021-3156 포함 확인) | 취약점 우선순위 근거 |
+| `loghub/` | loghub-2.0(Zenodo) Linux·Apache·OpenSSH · CC-BY-4.0 | 로그 23,921 / 51,977 / **638,946** 줄 | 리눅스·웹·SSH 원로그 이해(우리 호스트 로그와 동종) |
+
+### 미확보·보류
+- **CyberLLMInstruct**(54,928쌍, Apache-2.0): 공식 GitHub(Adelsamir01)엔 생성 스크립트만 있고 데이터 파일 없음 → 미확보. 논문이 "파인튜닝 시 안전성 저하"를 보고(pseudo-malicious) → 쓰더라도 방어 과제만 선별.
+- **lambda/hermes-agent-reasoning-traces 원본**(1.6GB): 필터본으로 대체. **ToolMind**(4GB)·**OTRF Security-Datasets**(810MB, Windows 위주)·**AIT-LDSv2 원로그**: 보류.
+- **Primus-Instruct/Reasoning**, **xLAM-60k**: HF 게이트(계정 동의+토큰) — 토큰 주시면 반입.
+
 ## 2. 추가 후보 (미반입 — 명령은 §6)
 
 | 데이터셋 | 라이선스 | 게이트 | 크기 | 내용 | 우선순위 |

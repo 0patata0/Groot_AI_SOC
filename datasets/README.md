@@ -121,6 +121,25 @@
 | `cisa_kev.jsonl` | **1,730** | 원본 필드 그대로(시나리오 CVE 2건 존재) |
 | (loghub) | 미처리 | 원로그 3종은 raw 그대로(로그 이해 합성 시 사용) |
 
+## 1-E. 방어(Defense) 지식 — ATT&CK 의 방어 레이어 + 방어 전용 데이터셋 (2026-10-01, `prep.py --stages defense`, 검증 8/8 PASS)
+
+> 질문 "ATT&CK STIX 의 방어 쪽 데이터셋은 없나?" 에 대한 답: **ATT&CK STIX 자체에 방어 객체가 들어 있고**(v19.2: 완화책 `course-of-action`, 탐지 전략 `x-mitre-detection-strategy`, 분석 `x-mitre-analytic`, 데이터 컴포넌트, `mitigates`/`detects` 관계) 1-C 에선 공격 기법만 뽑았었다. 여기에 **D3FEND**(ATT&CK 의 공식 방어 대응 온톨로지), **CAR**, **CTID 통제 매핑**, **RE&CT**(대응 액션)를 더했다.
+
+| 파일 (`processed/knowledge/`) | 출처·라이선스 | 건수 | 내용 |
+|---|---|---|---|
+| `attack_defense.jsonl` | ATT&CK v19.2 STIX · ATT&CK 이용약관 | **697 기법** (완화 보유 586 · 탐지전략 보유 **697 전부**) | 기법별 `mitigations[{id,name,how}]`(관계 설명 100% 존재) + `detection_strategies[{name, analytics[{name, description, platforms, log_sources{data_component,channel}, mutable_elements}]}]` + `data_components`. 예 T1190: 완화 8(M1016 취약점 스캔…), 탐지전략 "multi-signal correlation" 분석 7 — **Linux 분석 0220 = "access log 의심 요청 → 5xx/WAF 차단 급증 → 웹서버가 셸 생성/egress"**, 로그소스 `/var/log/apache2/access.log`·`execve`·HTTP 페이로드(SQLi/LFI/**JNDI**), 튜닝 `WebProcList/ChildToolList/BurstThreshold` → 우리 Wazuh 웹룰+Suricata+C 프로세스 조사와 1:1 |
+| `attack_mitigations.jsonl` | 〃 | **44** | M-id, 이름, 설명, 적용 기법 수(M1031 네트워크 침입방지 59개) |
+| `attack_detection_strategies.jsonl` / `attack_analytics.jsonl` | 〃 | **697 / 1,758**(Linux 358) | 전략→분석 전개 / 분석 단건(플랫폼·로그소스·튜닝). v18+ 에서 `x_mitre_detection` 텍스트를 대체한 체계 |
+| `d3fend_mappings.jsonl` / `d3fend_by_technique.jsonl` | D3FEND full mappings(`next.d3fend.mitre.org` API) · MITRE 공개 | **16,164 매핑 / 426 공격기법 커버** | 공격기법(ID·아티팩트·관계) ↔ 방어기법(전술 Harden/Detect/Isolate/Deceive/Evict/Model/Restore, 기법, 아티팩트). 예 T1190: 14개(Detect: Application Protocol Command Analysis, Inbound Session Volume Analysis…) |
+| `d3fend_techniques.jsonl` | `d3fend.csv` | **271** | D3FEND 기법 ID·전술·계층·정의 |
+| `car_analytics.jsonl` | mitre-attack/car · Apache-2.0 | **102**(Linux 15) | 분석 제목·설명·플랫폼·커버리지(기법/서브기법/수준)·구현 수. 최소 YAML 파서 |
+| `ctid_control_mappings.jsonl` | CTID Mappings Explorer · Apache-2.0 | **14,031**(nist_800_53 5,410·cri_profile 2,152·veris 1,270·kev 1,183·azure 972·csa_ccm 940·m365 806·gcp 540·aws 497·intel-vpro 261) | 프레임워크별 **최신 ATT&CK 버전** 파일만: 통제 ID·설명·그룹·`mapping_type`(mitigates/detects/exploitation_technique/secondary_impact…) ↔ 기법. 예 NIST 800-53 rev5(ATT&CK 16.1) T1190 통제 29개; **KEV: CVE-2021-44228 ↔ T1190(exploitation) + T1496/T1486/T1608.001(secondary impact)** |
+| `react_response_actions.jsonl` / `react_stages.jsonl` | atc-project/atc-react · Apache-2.0 | **216 / 6** (preparation 103·identification 63·**containment 26**·eradication 8·recovery 14·lessons 2) | 대응 액션 ID·단계·설명·워크플로우. 예 **RA3101 "block external IP address"** = 우리 `block_ip` 와 동일 동작 → 에이전트 대응 어휘·정당화 근거 |
+
+**에이전트 활용**: 조사 중 기법(ATT&CK id)이 잡히면 → (1) 탐지 전략·분석으로 "다음에 어떤 로그/프로세스를 봐야 하는지"(조사 계획), (2) 완화·D3FEND·통제로 "무엇을 권고할지"(대응 계획), (3) RE&CT 로 "어떤 대응 액션을 어떤 단계에서"(승인 요청 문구). 합성 트래젝터리의 판단 JSON(`attack_chain`/`actions`/`remediation`) 근거 텍스트로 직결.
+
+**주의**: ATT&CK 분석(1,758)은 Windows/Linux/macOS 혼재 → Linux 358 우선. CTID 는 프레임워크마다 ATT&CK 기준 버전이 다름(기법 id 는 대체로 안정). CAR·RE&CT 는 최소 파서(`parser: minimal`). D3FEND 는 `d3fend.mitre.org/api/...` 가 404, `next.` 호스트에서 제공(실측).
+
 ## 2. 추가 후보 (미반입 — 명령은 §6)
 
 | 데이터셋 | 라이선스 | 게이트 | 크기 | 내용 | 우선순위 |

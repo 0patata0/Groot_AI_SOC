@@ -10,13 +10,14 @@
   ait       AIT-ADS phase_window 라벨 + 환경 단위 split + 단계 상한          → ait/<env>.labeled.jsonl, ait/split.json
   eval      평가셋 통일 스키마(학습 금지)                                   → eval/*.jsonl
   knowledge 룰·지식 JSONL(Wazuh/ET Open/CRS/Sigma/Atomic/ATT&CK/KEV)       → knowledge/*.jsonl
+  defense   방어 지식: ATT&CK 완화·탐지전략·분석, D3FEND 매핑, CAR, CTID 통제 매핑, RE&CT 응답 액션 → knowledge/*.jsonl
 """
 import argparse, csv, hashlib, io, json, os, random, re, zipfile, tarfile, collections, datetime, glob, sys
 ap=argparse.ArgumentParser()
 ap.add_argument('--stages',default='all'); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--benign-ratio',type=float,default=1.0)
 ap.add_argument('--ait-normal-cap',type=int,default=20000); ap.add_argument('--ait-phase-cap',type=int,default=5000); ap.add_argument('--ait-window-pad',type=float,default=0.0)
 ap.add_argument('--ait-val',default='wheeler'); ap.add_argument('--ait-holdout',default='wilson')
-A=ap.parse_args(); ST=set(A.stages.split(',')) if A.stages!='all' else {'hermes','glaive2','traces','sevenllm','attacklm','salad','ait','eval','knowledge'}
+A=ap.parse_args(); ST=set(A.stages.split(',')) if A.stages!='all' else {'hermes','glaive2','traces','sevenllm','attacklm','salad','ait','eval','knowledge','defense'}
 R='datasets/raw'; O='datasets/processed'
 for d in ['', 'ait','eval','knowledge']: os.makedirs(f'{O}/{d}',exist_ok=True)
 random.seed(A.seed); stats=json.load(open(f'{O}/STATS.json'))['stats'] if os.path.exists(f'{O}/STATS.json') else {}
@@ -385,6 +386,103 @@ if 'knowledge' in ST:
     kev=json.load(open(f'{R}/cisa-kev/known_exploited_vulnerabilities.json')); rows=kev.get('vulnerabilities',[])
     wjsonl(f'{O}/knowledge/cisa_kev.jsonl',rows); kn['cisa_kev']=len(rows)
     stats['knowledge']=kn; print(f"[knowledge] {kn}")
+
+
+# ---------- defense (ATT&CK 방어 레이어 + D3FEND + CAR + CTID + RE&CT) ----------
+if 'defense' in ST:
+    kd={}
+    def yload_min(text):
+        """최소 YAML: 최상위 'key: value' 스칼라, 'key: |/>' 블록, 'key:' 뒤 '  - item' 리스트. 중첩 리스트-딕트(coverage)는 별도 처리."""
+        d={}; cur=None; block=None; lines=text.splitlines()
+        for line in lines:
+            if block is not None:
+                if line.startswith('  ') or line.strip()=='' : d[block]=(d.get(block,'')+line.strip()+' ').strip(); continue
+                block=None
+            m=re.match(r'^([A-Za-z_][\w ]*):\s*(.*)$',line)
+            if m and not line.startswith(' '):
+                k,v=m.group(1).strip(),m.group(2).strip(); cur=k
+                if v in ('|','>','|-','>-'): block=k; d[k]=''
+                elif v=='' : d[k]=[]
+                else: d[k]=v.strip('\'"')
+                continue
+            m2=re.match(r'^\s+-\s+(.*)$',line)
+            if m2 and cur and isinstance(d.get(cur),list): d[cur].append(m2.group(1).strip().strip('\'"'))
+        return d
+    # 1) ATT&CK STIX 방어 객체
+    st=json.load(open(f'{R}/attack-stix/enterprise-attack.json')); objs=st['objects']; ids={o['id']:o for o in objs}
+    def ext_id(o): return next((e.get('external_id') for e in o.get('external_references',[]) if e.get('source_name')=='mitre-attack'),None)
+    active=lambda o: not o.get('revoked') and not o.get('x_mitre_deprecated')
+    tech={o['id']:o for o in objs if o.get('type')=='attack-pattern' and active(o)}
+    coa={o['id']:o for o in objs if o.get('type')=='course-of-action' and active(o)}
+    dstr={o['id']:o for o in objs if o.get('type')=='x-mitre-detection-strategy' and active(o)}
+    anal={o['id']:o for o in objs if o.get('type')=='x-mitre-analytic' and active(o)}
+    dcomp={o['id']:o for o in objs if o.get('type')=='x-mitre-data-component'}
+    def an_row(a):
+        return {'name':a.get('name'),'description':a.get('description',''),'platforms':a.get('x_mitre_platforms',[]),
+                'log_sources':[{'data_component':dcomp.get(l.get('x_mitre_data_component_ref'),{}).get('name'),'name':l.get('name'),'channel':l.get('channel')} for l in a.get('x_mitre_log_source_references',[])],
+                'mutable_elements':a.get('x_mitre_mutable_elements',[])}
+    mit_by_t=collections.defaultdict(list); ds_by_t=collections.defaultdict(list)
+    for r in objs:
+        if r.get('type')!='relationship': continue
+        if r.get('relationship_type')=='mitigates' and r['source_ref'] in coa and r['target_ref'] in tech:
+            c=coa[r['source_ref']]; mit_by_t[r['target_ref']].append({'mitigation_id':ext_id(c),'name':c.get('name'),'how':r.get('description','')})
+        if r.get('relationship_type')=='detects' and r['source_ref'] in dstr and r['target_ref'] in tech:
+            d=dstr[r['source_ref']]; ds_by_t[r['target_ref']].append({'strategy_id':ext_id(d),'name':d.get('name'),'analytics':[an_row(anal[a]) for a in d.get('x_mitre_analytic_refs',[]) if a in anal]})
+    rows=[]
+    for tid,o in tech.items():
+        rows.append({'technique_id':ext_id(o),'name':o.get('name'),'tactics':[k.get('phase_name') for k in o.get('kill_chain_phases',[])],'platforms':o.get('x_mitre_platforms',[]),
+                     'mitigations':mit_by_t.get(tid,[]),'detection_strategies':ds_by_t.get(tid,[]),
+                     'data_components':sorted({ls['data_component'] for d in ds_by_t.get(tid,[]) for a in d['analytics'] for ls in a['log_sources'] if ls['data_component']})})
+    wjsonl(f'{O}/knowledge/attack_defense.jsonl',rows); kd['attack_defense_techniques']=len(rows); kd['techniques_with_mitigation']=sum(1 for r in rows if r['mitigations']); kd['techniques_with_detection']=sum(1 for r in rows if r['detection_strategies'])
+    wjsonl(f'{O}/knowledge/attack_mitigations.jsonl',[{'mitigation_id':ext_id(c),'name':c.get('name'),'description':c.get('description',''),'techniques':sum(1 for v in mit_by_t.values() for m in v if m['mitigation_id']==ext_id(c))} for c in coa.values()]); kd['attack_mitigations']=len(coa)
+    wjsonl(f'{O}/knowledge/attack_detection_strategies.jsonl',[{'strategy_id':ext_id(d),'name':d.get('name'),'analytics':[an_row(anal[a]) for a in d.get('x_mitre_analytic_refs',[]) if a in anal]} for d in dstr.values()]); kd['attack_detection_strategies']=len(dstr)
+    wjsonl(f'{O}/knowledge/attack_analytics.jsonl',[dict(an_row(a),analytic_id=ext_id(a)) for a in anal.values()]); kd['attack_analytics']=len(anal); kd['attack_analytics_linux']=sum(1 for a in anal.values() if 'Linux' in a.get('x_mitre_platforms',[]))
+    # 2) D3FEND
+    d=json.load(open(f'{R}/d3fend/d3fend-full-mappings.json')); b=d['results']['bindings']; rows=[]; byt=collections.defaultdict(set)
+    for x in b:
+        g=lambda k:(x.get(k) or {}).get('value')
+        r={'off_tech_id':g('off_tech_id'),'off_tech':g('off_tech_label'),'off_tactic':g('off_tactic_label'),'off_artifact':g('off_artifact_label'),'off_artifact_rel':g('off_artifact_rel_label'),
+           'def_tactic':g('def_tactic_label'),'def_tech':g('def_tech_label'),'def_tech_top':g('top_def_tech_label'),'def_tech_query':g('query_def_tech_label'),'def_artifact':g('def_artifact_label'),'def_artifact_rel':g('def_artifact_rel_label'),'framework':g('framework_key')}
+        rows.append(r)
+        if r['off_tech_id']: byt[r['off_tech_id']].add((r['def_tactic'],r['def_tech']))
+    wjsonl(f'{O}/knowledge/d3fend_mappings.jsonl',rows); kd['d3fend_mappings']=len(rows)
+    wjsonl(f'{O}/knowledge/d3fend_by_technique.jsonl',[{'technique_id':t,'defenses':[{'tactic':a,'technique':b} for a,b in sorted(v)]} for t,v in sorted(byt.items())]); kd['d3fend_techniques_covered']=len(byt)
+    rows=[]
+    for r in csv.DictReader(open(f'{R}/d3fend/d3fend.csv',encoding='utf-8')):
+        if r.get('ID'): rows.append({'id':r['ID'],'tactic':r.get('D3FEND Tactic'),'technique':r.get('D3FEND Technique'),'level0':r.get('D3FEND Technique Level 0'),'level1':r.get('D3FEND Technique Level 1'),'definition':r.get('Definition','')})
+    wjsonl(f'{O}/knowledge/d3fend_techniques.jsonl',rows); kd['d3fend_techniques']=len(rows)
+    # 3) CAR (minimal YAML + coverage 블록 별도 파싱)
+    rows=[]
+    for f in sorted(glob.glob(f'{R}/car/analytics/*.yaml')):
+        txt=open(f,encoding='utf-8',errors='ignore').read(); d=yload_min(txt); cov=[]
+        m=re.search(r'^coverage:\n((?:[ \t]+.*\n?)+)',txt,re.M)
+        if m:
+            for blk in re.split(r'\n\s*- technique:',('\n'+m.group(1)))[1:]:
+                t=blk.strip().split('\n')[0].strip(); cov.append({'technique':t,'subtechniques':re.findall(r'-\s*(T\d+\.\d+)',blk),'coverage':(re.search(r'coverage:\s*(\w+)',blk) or [None,None])[1]})
+        rows.append({'id':d.get('id') or os.path.basename(f)[:-5],'title':d.get('title'),'description':d.get('description',''),'platforms':d.get('platforms',[]),'analytic_types':d.get('analytic_types',[]),'coverage':cov,'implementations':len(re.findall(r'^\s*- (?:name|type):',txt,re.M)),'parser':'minimal'})
+    wjsonl(f'{O}/knowledge/car_analytics.jsonl',rows); kd['car_analytics']=len(rows); kd['car_linux']=sum(1 for r in rows if 'Linux' in r['platforms'])
+    # 4) CTID Mappings Explorer: 프레임워크별 최신 ATT&CK 버전 파일
+    rows=[]; per=collections.Counter()
+    for fw in sorted(os.listdir(f'{R}/mappings-explorer/mappings')):
+        files=glob.glob(f'{R}/mappings-explorer/mappings/{fw}/**/*.json',recursive=True)
+        if not files: continue
+        def ver(p): m=re.search(r'attack-(\d+(?:\.\d+)?)',p); return float(m.group(1)) if m else 0
+        latest=max(ver(p) for p in files); sel=[p for p in files if ver(p)==latest and 'enterprise' in p] or [p for p in files if ver(p)==latest]
+        for p in sel:
+            d=json.load(open(p)); md=d.get('metadata',{})
+            for m in d.get('mapping_objects',[]):
+                rows.append({'framework':fw,'framework_version':md.get('mapping_framework_version'),'attack_version':md.get('attack_version'),'capability_id':m.get('capability_id'),'capability':m.get('capability_description'),'capability_group':m.get('capability_group'),'mapping_type':m.get('mapping_type'),'technique_id':m.get('attack_object_id'),'technique':m.get('attack_object_name'),'comments':m.get('comments',''),'file':os.path.basename(p)}); per[fw]+=1
+    wjsonl(f'{O}/knowledge/ctid_control_mappings.jsonl',rows); kd['ctid_control_mappings']=len(rows); kd['ctid_per_framework']=dict(per)
+    # 5) RE&CT
+    zf=zipfile.ZipFile(f'{R}/atc-react/atc-react-master.zip'); rows=[]; stages=[]
+    for n in zf.namelist():
+        if n.endswith('.yml') and '/response_actions/' in n:
+            d=yload_min(zf.read(n).decode('utf-8','ignore')); rows.append({'id':d.get('id'),'title':d.get('title'),'stage':d.get('stage'),'description':d.get('description',''),'workflow':d.get('workflow',''),'author':d.get('author'),'requirements':d.get('requirements',[]),'file':n.split('/',1)[1],'parser':'minimal'})
+        if n.endswith('.yml') and '/response_stages/' in n:
+            d=yload_min(zf.read(n).decode('utf-8','ignore')); stages.append({'id':d.get('id'),'title':d.get('title'),'description':d.get('description','')})
+    wjsonl(f'{O}/knowledge/react_response_actions.jsonl',rows); wjsonl(f'{O}/knowledge/react_stages.jsonl',stages)
+    kd['react_response_actions']=len(rows); kd['react_stages']=len(stages); kd['react_by_stage']=dict(collections.Counter(r['stage'] for r in rows))
+    stats['defense']=kd; print(f"[defense] {kd}")
 
 json.dump({'args':vars(A),'stats':stats},open(f'{O}/STATS.json','w'),ensure_ascii=False,indent=1)
 print("STATS →", f'{O}/STATS.json')

@@ -17,6 +17,21 @@
 
 > AIT-ADS 주의: 논문은 Suricata 경보도 포함한다고 하나 zip 엔 `aminer`/`wazuh` 파일만 있음 — Suricata 경보가 Wazuh 수집본(`rule.groups`)에 섞여 있는지 압축 해제 후 확인 필요. 환경 이름(fox/harrison/…)별 공격 변형이 다름.
 
+## 1-A. 재검증 결과 (2026-10-01, 2차 — 체크섬·전수 파싱·내용 분포)
+
+| 검사 | 결과 |
+|---|---|
+| **공식 체크섬 대조** | **9/9 PASS** — HF LFS sha256(hermes 3파일·ToolACE·SALAD val), Zenodo md5(ait_ads.zip·labels.csv). 비-LFS 소형 2파일은 크기 일치 |
+| hermes-fc-v1 전수 파싱 | 11,578 샘플 전부 파싱, 역할 오류 0, 툴콜 JSON 오류 0. glaive 에 **미정의 툴 호출 3건**(필터 대상). 툴콜 없는 응답 샘플(거절/확인 질문) 다수 — 정상 음성 예시 |
+| hermes-fc-v1 **중복** | `func-calling-singleturn`(전부 3턴)과 `func-calling`(5턴 927·3턴 793·4턴 173)이 **793개를 공유**. 5파일 전체 교차중복 **836 → 고유 10,742**. **학습 전 conversations 해시로 dedupe 필수** |
+| ToolACE 전수 파싱 | 11,300 샘플, 역할 오류 0, `tool` 턴 1,367, 다중턴(assistant≥2) 800 — 대부분 "호출 생성"만 있고 실행 결과 턴은 적음(형식 학습용) |
+| AIT-ADS 무결성 | zip CRC PASS. `labels.csv` 79행 = 8환경 × 10단계(wheeler 9): `network_scans→service_scans→dirb→wpscan→webshell→cracking→reverse_shell→privilege_escalation→service_stop→dnsteal` |
+| AIT-ADS Wazuh 전수 파싱(소형 2환경) | russellmitchell 41,488행 / shaw 68,539행, **파싱 오류 0**. level≥10 각 736 / 806 |
+| **AIT-ADS Suricata 포함 여부(해소)** | **포함됨** — Wazuh 수집본 안에 `rule.groups: suricata, ids`, `decoder: json/snort`, **rule.id 86601**(Wazuh 의 Suricata 통합 룰 = 우리 B 로컬 룰의 베이스와 동일 id). 웹 룰 **31101/31151** 도 우리 C 시나리오 룰과 겹침 → 스키마·룰 id 수준에서 우리 스택과 호환 |
+| SALAD val 전수 파싱 | 416,756행, 열 수 불일치 0, 중복 alert_id 0. **극심한 불균형**: suppress 78.8% / escalate 14.4% / investigate 6.9%, is_malicious 21%. 양성 행은 `mitre_technique` 없음(정상). `alert_description` 은 템플릿형 문장(언어 다양성 낮음) → **라벨 지도용으로만**, 양성 다운샘플 필요. CICIDS2017 편중(90.7%) |
+
+**학습 전 처리 체크리스트**: hermes 5파일 해시 dedupe(→10,742) · glaive 미정의툴 3건 제거 · ToolACE 는 형식용으로만 · AIT-ADS 는 `labels.csv` 시각 구간으로 경보에 공격단계 라벨 부여 후 환경 단위로 train/holdout 분리 · SALAD 는 클래스 균형(양성 다운샘플) 후 트리아지 라벨만 사용, test 분할은 평가 전용.
+
 ## 2. 추가 후보 (미반입 — 명령은 §6)
 
 | 데이터셋 | 라이선스 | 게이트 | 크기 | 내용 | 우선순위 |

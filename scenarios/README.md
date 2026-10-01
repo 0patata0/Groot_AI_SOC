@@ -25,6 +25,9 @@
 | — | [alerts.md](alerts.md) | 전체 탐지·대응 매트릭스(실행 중 체크) | — |
 | — | [references.md](references.md) | 트래픽 생성용 공개 권위 레퍼런스(OWASP/Wazuh/앱 README/룰) | — |
 
+## 평가 정답표
+- [ground-truth.md](ground-truth.md) / [ground-truth.json](ground-truth.json): 시나리오 단계 ↔ ATT&CK 기법 + 기대 탐지(rule id) + 정답 판단(verdict/attack_chain/대응). 3단계 채점 기준.
+
 ## Wazuh에서 검증하는 법 (공통)
 - 대시보드 → Threat Hunting / Discover, 인덱스 `wazuh-alerts-*`.
 - 유용한 필터: `rule.groups: capstone`(우리 로컬 룰), `agent.name: groot-web`(C), `agent.name: groot-sec`(A), `rule.id: 100121`(차단 대응), `data.srcip: <Kali IP>`.

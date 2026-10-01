@@ -1,0 +1,117 @@
+#!/usr/sbin/nft -f
+# capstone_Groot_A — 호스트 방화벽 v2 (빡빡한 룰 초안, 2026-10-01). **초안 — 아직 미적용.**
+# 배포 경로(적용 시): /etc/nftables.d/capstone-fw.nft (capstone-nat.sh v2 가 부팅·재적용 시 원자적으로 로드)
+#
+# v1 대비 변경(보안룰_취합.md 0-B 의 P 번호):
+#  P4  SSH(ens192) 출발지를 mgmt_src 셋으로 제한 + 신규연결 레이트리밋(FW_SSH_RATE 로그)
+#  P5  안티스푸핑: ens192 에서 내부/루프백/자기주소/멀티캐스트 출발지 drop, ens160 에서 비내부 출발지 drop (SPOOF 로그, raw 훅 = conntrack 이전)
+#  P7  IPv6 미사용 → input/output 에서 조용히 drop (sysctl 로 ens192/ens160 v6 비활성화와 병행)
+#  P3  output 체인 신설 — 기본 **섀도 모드**(policy accept + FW_SHADOW_OUT 로그만). 강제 전환은 fw_apply_v2.sh --enforce-output
+#  P12 never_block 의 172.16.0.0/12 → 실제 Docker 브리지 /16 셋으로 축소, 관리 대역(학과망 2개) 추가(잠금 방지)
+#  forward 는 여기서 정의하지 않는다(같은 훅 2중 체인 = 잠금 위험). P1/P2/P8/P9/P11 은 capstone-nat.sh v2 의 CAPSTONE-FWD(iptables) 담당.
+#
+# 원칙
+#  - 'flush ruleset' 금지(Docker 가 ip nat/filter 관리). 이 파일은 inet capstone_fw 만.
+#  - prerouting_block 은 raw 우선순위라 ct state 사용 불가 → 스푸핑·agent_block 은 무조건 drop. never_block 이 잠금 방지의 전부.
+#    ⚠ 스푸핑 검사는 never_block accept **앞**에 둔다(never_block 에 10.200.10.0/24 가 있어 스푸핑된 내부 출발지가 먼저 허용되면 안 됨).
+#  - 운용: 차단은 agent_block add|del|list|flush 로만. 재적용은 capstone-nat.sh(차단 목록 커널/상태파일에서 복원).
+#
+# ⚠ 잠금 주의: 적용 전에 **지금 접속한 출발지가 mgmt_src 에 포함**되는지 확인(fw_apply_v2.sh 가 자동 검사). 현장 PC(192.168.16.x)에서 관리하려면 주석 해제.
+
+table inet capstone_fw {
+    set never_block {
+        type ipv4_addr
+        flags interval
+        comment "lock-out guard: never blockable (internal, docker bridges, lo, A/B/C ext, GW, ESXi, NTP, DNS, mgmt VPN, dept LANs)"
+        elements = { 10.200.10.0/24, 127.0.0.0/8,
+                     172.17.0.0/16, 172.18.0.0/16, 172.19.0.0/16,
+                     192.168.16.230, 192.168.16.231, 192.168.16.232,
+                     192.168.16.129, 192.168.16.130, 192.168.16.131,
+                     168.126.63.1,
+                     192.168.15.0/24, 192.168.10.0/24, 192.168.12.0/24 }
+    }
+
+    # P4: SSH to A over ens192 is allowed only from mgmt_src. On-site PCs on 192.168.16.0/25 are intentionally
+    #     excluded (Kali shares that segment) — add "192.168.16.0/25" to elements to allow (weakens P4).
+    set mgmt_src {
+        type ipv4_addr
+        flags interval
+        comment "mgmt SSH sources for ens192 (P4): VPN, dept LANs, ESXi. 192.168.16.0/25 excluded on purpose"
+        elements = { 192.168.15.0/24, 192.168.10.0/24, 192.168.12.0/24, 192.168.16.130 }
+    }
+
+    set spoof_src_ext {
+        type ipv4_addr
+        flags interval
+        comment "never a valid source on ens192 (P5): internal net, loopback, this-net, multicast, A's own external IP"
+        elements = { 10.200.10.0/24, 127.0.0.0/8, 0.0.0.0/8, 224.0.0.0/4, 192.168.16.230 }
+    }
+
+    set agent_block {
+        type ipv4_addr
+        flags timeout
+        comment "attacker IPs blocked by agent_block add <ip> <ttl>; expire; restored at boot from agent_block.state"
+    }
+
+    set block_log_meter { type ipv4_addr; flags dynamic; timeout 1m; size 65535; }
+    set dropin_meter    { type ipv4_addr; flags dynamic; timeout 1m; size 65535; }
+    set dropout_meter   { type ipv4_addr; flags dynamic; timeout 1m; size 65535; }
+    set spoof_meter     { type ipv4_addr; flags dynamic; timeout 1m; size 65535; }
+    set ssh_new_meter   { type ipv4_addr; flags dynamic; timeout 10m; size 65535; }
+
+    chain prerouting_block {
+        type filter hook prerouting priority raw; policy accept;
+        # P5 anti-spoof — before never_block
+        iifname "ens160" ip saddr 169.254.0.0/16 counter drop comment "link-local noise from internal hosts - never logged"
+        iifname "ens192" ip saddr @spoof_src_ext update @spoof_meter { ip saddr limit rate 6/minute burst 3 packets } log prefix "SPOOF " level notice
+        iifname "ens192" ip saddr @spoof_src_ext counter drop
+        iifname "ens160" ip saddr != 10.200.10.0/24 update @spoof_meter { ip saddr limit rate 6/minute burst 3 packets } log prefix "SPOOF " level notice
+        iifname "ens160" ip saddr != 10.200.10.0/24 counter drop
+        # agent containment (v1)
+        ip saddr @never_block accept
+        ip saddr @agent_block update @block_log_meter { ip saddr limit rate 6/minute burst 3 packets } log prefix "AGENT_BLOCK " level notice
+        ip saddr @agent_block counter drop
+    }
+
+    chain input {
+        type filter hook input priority filter; policy drop;
+        iif "lo" accept
+        ct state established,related accept
+        ct state invalid counter drop
+        meta nfproto ipv6 counter drop comment "P7: IPv6 unused on A - never logged"
+        icmp type { echo-request, echo-reply, destination-unreachable, time-exceeded, parameter-problem } limit rate 20/second accept
+        iifname "ens160" udp dport 123 accept comment "chrony serving B/C"
+        iifname "ens160" tcp dport 22 accept comment "SSH from internal net (Hermes@B -> resp@A ForceCommand)"
+        # P4: management SSH over ens192 — source-restricted + per-source new-connection rate limit
+        iifname "ens192" tcp dport 22 ct state new ip saddr @mgmt_src update @ssh_new_meter { ip saddr limit rate 6/minute burst 10 packets } accept comment "mgmt SSH (VPN / dept LAN / ESXi)"
+        iifname "ens192" tcp dport 22 ct state new ip saddr @mgmt_src log prefix "FW_SSH_RATE " level notice drop comment "mgmt source over SSH rate limit"
+        # non-mgmt sources to 22 fall through to the logged default drop (FW_DROP_IN) — a scan signal
+        meta pkttype { broadcast, multicast } counter drop comment "campus L2 noise (NetBIOS/mDNS/SSDP/IGMP/MLD) - never logged"
+        fib daddr type { broadcast, multicast } counter drop comment "directed broadcast"
+        udp dport { 67, 68, 137, 138, 1900, 3702, 5353, 5355, 17500 } counter drop comment "unicast discovery noise - never logged"
+        update @dropin_meter { ip saddr limit rate 1/second burst 5 packets } limit rate 5/second burst 5 packets log prefix "FW_DROP_IN " level notice
+        counter drop
+    }
+
+    # P3: A's own egress. SHADOW mode by default (nothing dropped, would-be-drops logged as FW_SHADOW_OUT).
+    # fw_apply_v2.sh --enforce-output turns this into policy drop + FW_DROP_OUT + final drop after shadow logs are reviewed.
+    chain output {
+        type filter hook output priority filter; policy accept; # OUT_MODE
+        oif "lo" accept
+        ct state established,related accept
+        ct state invalid counter drop
+        meta nfproto ipv6 counter drop comment "P7"
+        icmp type { echo-request, destination-unreachable, time-exceeded, parameter-problem } accept comment "health pings / path errors"
+        oifname "ens192" ip daddr 192.168.16.131 udp dport 123 accept comment "chrony upstream (campus NTP)"
+        oifname "ens192" ip daddr 168.126.63.1 udp dport 53 accept comment "DNS (systemd-resolved upstream)"
+        oifname "ens192" ip daddr 168.126.63.1 tcp dport 53 accept comment "DNS tcp fallback"
+        oifname "ens160" ip daddr 10.200.10.10 tcp dport { 1514, 1515 } accept comment "wazuh-agent -> manager (events / enrollment)"
+        oifname "ens160" ip daddr 10.200.10.10 tcp dport { 8090, 8065 } accept comment "response MCP -> soc_bot broker / Mattermost webhook"
+        oifname "ens160" ip daddr 10.200.10.0/24 tcp dport 22 accept comment "operator ProxyJump A -> B/C"
+        oifname "docker0" accept comment "host <-> containers (docker-proxy, healthchecks)"
+        oifname "br-*" accept comment "host <-> compose bridges"
+        # future: local apt repo on the internal net -> add 'oifname "ens160" ip daddr <repo> tcp dport 80 accept'
+        update @dropout_meter { ip saddr limit rate 1/second burst 5 packets } limit rate 5/second burst 5 packets log prefix "FW_SHADOW_OUT " level notice comment "shadow: would be dropped in enforce mode"
+        # OUT_DROP (inserted by --enforce-output):  counter drop
+    }
+}

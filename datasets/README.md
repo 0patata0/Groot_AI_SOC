@@ -32,6 +32,22 @@
 
 **학습 전 처리 체크리스트**: hermes 5파일 해시 dedupe(→10,742) · glaive 미정의툴 3건 제거 · ToolACE 는 형식용으로만 · AIT-ADS 는 `labels.csv` 시각 구간으로 경보에 공격단계 라벨 부여 후 환경 단위로 train/holdout 분리 · SALAD 는 클래스 균형(양성 다운샘플) 후 트리아지 라벨만 사용, test 분할은 평가 전용.
 
+## 1-B. 전처리 산출물 (2026-10-01) — `datasets/prep.py` → `datasets/processed/` (gitignore, 385MB)
+
+재현: `python3 datasets/prep.py` (기본값: `--seed 42 --benign-ratio 1.0 --ait-normal-cap 20000 --ait-phase-cap 5000 --ait-window-pad 0 --ait-val wheeler --ait-holdout wilson`). 약 30초.
+
+| 산출물 | 처리 | 결과(검증 PASS) |
+|---|---|---|
+| `hermes_fc_v1.dedup.jsonl` | 5파일 conversations 해시 dedupe(-836) + 미정의 툴 호출 제거(-3) | **10,739** 고유(파일별 singleturn 1,893 / multiturn 1,100 / glaive 5,204 / json-agentic 1,301 / json-single 1,241). `_source_file` 필드 추가 |
+| `salad_val.balanced.csv` | 악성 전부 + 양성을 `source_dataset` 층화 다운샘플(1:1) | **177,096**행 = 악성 88,548 + 양성 88,548, 중복 id 0. triage: suppress 88,548 / escalate 59,979 / investigate 28,569 |
+| `ait/<env>.labeled.jsonl` ×8 + `ait/split.json` | `labels.csv` 시각 구간으로 `phase_window` 라벨(`ait_env` 추가), **단계당 reservoir 상한 5,000**, normal 환경당 20,000 샘플, **환경 단위 분리** | train 6(fox·harrison·russellmitchell·santos·shaw·wardbeck) / val `wheeler` / holdout `wilson`, 환경 중복 0. 환경당 26~36K행, 총 279MB |
+
+**AIT-ADS 라벨링에서 확인된 데이터 특성(중요)**
+- **dirb 경보 홍수**: 큰 4환경(fox·harrison·wheeler·wilson)은 `dirb`(디렉터리 무차별)가 17~20분 돌며 요청마다 웹 로그 경보(31101)를 만들어 **40만 건(전체의 ~90%)**. 작은 4환경은 0.4분 → 4.4K. 라벨링 버그가 아니라 데이터 본성(논문의 alert flood). → 단계당 상한 5,000으로 억제(`--ait-phase-cap`), 희소 단계는 전부 보존(손실 0 검증).
+- **희소 단계**: `webshell`·`reverse_shell`·`privilege_escalation`·`service_stop` 은 구간이 수 초~1분이라 Wazuh 경보가 **환경당 0~49건**(service_stop 은 거의 0). 이 단계의 트래젝터리 합성은 AMiner 경보(`*_aminer.json`, 미처리) 병합이나 `--ait-window-pad`(탐지 지연 보정, 기본 0)로 보강 필요.
+- `phase_window` 는 **"그 단계 구간에 발생한 경보"** 라벨(구간 내 노이즈 포함) = 조사 트래젝터리의 컨텍스트/정답 단계용. 경보 단위 악성 여부 라벨이 아님.
+- SALAD 는 val 분할만 균형화. train(645MB) 받으면 같은 정책 적용, test 는 평가 전용.
+
 ## 2. 추가 후보 (미반입 — 명령은 §6)
 
 | 데이터셋 | 라이선스 | 게이트 | 크기 | 내용 | 우선순위 |

@@ -89,6 +89,38 @@
 - **lambda/hermes-agent-reasoning-traces 원본**(1.6GB): 필터본으로 대체. **ToolMind**(4GB)·**OTRF Security-Datasets**(810MB, Windows 위주)·**AIT-LDSv2 원로그**: 보류.
 - **Primus-Instruct/Reasoning**, **xLAM-60k**: HF 게이트(계정 동의+토큰) — 토큰 주시면 반입.
 
+## 1-D. 전처리 확장 (2026-10-01) — `prep.py` 스테이지별 산출물, `datasets/processed/` 1.7GB (검증 15/15 PASS)
+
+실행: `python3 datasets/prep.py [--stages hermes,glaive2,traces,sevenllm,attacklm,salad,ait,eval,knowledge]` (기본 전부, 외부 패키지 없음). 통계 `processed/STATS.json`.
+
+### 학습용
+| 산출물 | 처리 | 결과 |
+|---|---|---|
+| `hermes_fc_v1.dedup.jsonl` | (1-B) | 10,739 |
+| `glaive_fc_v2.hermes.jsonl` | `{system,chat}` 문자열 → ShareGPT/Hermes(`<tools>` 시스템 블록, `<tool_call>` JSON(인자 dict 파싱), `<tool_response>`) 변환 → **중복 제거 키 = 사용자 발화 + 툴콜 객체 + 사용 가능한 툴 이름** → 내부중복 35,996·hermes 중복 7,252 제거 | **35,979**(툴콜 있는 대화만). 툴 없는 일반 잡담 **33,733**은 `glaive_fc_v2.chat_only.jsonl` 로 분리(학습 기본 제외) |
+| `hermes_agent_traces.jsonl` | 툴콜 유효성(미정의 툴 30건 제거), hermes 중복 0 | **3,649**(assistant 툴콜 67,963) |
+| `sevenllm_en.jsonl` / `sevenllm_all.jsonl` | (instruction,input,output) dedupe(-100) + `lang` 태그 | en **47,154** / all 91,301 (zh 44,141·ko 6), 28 범주 |
+| `attacklm.jsonl` / `attacklm.permissive.jsonl` | 원천 버킷(`buckets/sources/**`)만(balanced 파생본·bench 제외) dedupe(-218), `license`·`source`·`mitre_ids` 보존 | **26,241** / 관대 라이선스만 **23,396**(Elastic-2.0 1,908·GPL-3.0 937 제외) |
+| `salad_val.balanced.csv` / `salad_train.balanced.csv` | 2-pass 스트리밍: 악성 전부 + 양성 `source_dataset` 층화 reservoir(1:1) | 177,096 / **826,498**(악성 413,249). test 미처리(평가 전용) |
+| `ait/<env>.labeled.jsonl` + `split.json` | (1-B) | 8환경, train 6 / val wheeler / holdout wilson |
+
+**중복 제거 키 결정 근거(실측)**: glaive-v2 는 템플릿 반복이 심해 전체 대화 해시로는 4,884 만 잡히고, "사용자 발화+툴콜"만 쓰면 툴 맥락이 다른 거절 예시("항공편 예약해줘", 3,847개 그룹)까지 과잉 병합됨 → 툴 이름을 키에 포함. 독립 재계산으로 키 퇴화(빈 키) 0 확인.
+
+### 평가 전용 (`processed/eval/`, 학습 금지)
+`cybermetric.jsonl` 10,200(2000/500/80 은 10000 부분집합 → 질문 dedupe, `subsets` 태그) · `cti_mcq` 2,500 · `cti_rcm` 1,000 · `cti_rcm_2021` 1,000 · `cti_vsp` 1,000 · `cti_ate` 60 · `cti_taa` 50 · `secqa` 210 · `attacklm_bench` 100. 통일 스키마 `{source, question|prompt, options, answer}`. CTIBench·SecQA 는 CC-BY-NC-SA.
+
+### 룰·지식 (`processed/knowledge/`, 합성·RAG 원천)
+| 파일 | 건수 | 필드·메모 |
+|---|---|---|
+| `wazuh_rules.jsonl` | **4,515** | `rule_id, level, description, groups, mitre, if_sid, if_group, file` — 정규식 파서(파일이 다중 루트라 XML 파서 불가). 우리 룰 31101("Web server 400 error code", lv5)·86601("Suricata: Alert - $(alert.signature)") 확인 |
+| `et_open_rules.jsonl` | **52,536** | `sid, msg, classtype, proto, src, dst, severity, cve, attack_target, reference`. Log4Shell JNDI 룰 7개(예 sid 2034716, CVE_2021_44228, Major) |
+| `crs_rules.jsonl` | **622** (msg 354) | 백슬래시 연속행 결합 후 파싱. `id, msg, severity, tags, paranoia_level, attack, control`. 체인 룰(id 없음) 128 제외. 942100='SQL Injection Attack Detected via libinjection' CRITICAL PL1 |
+| `sigma_rules.jsonl` | **3,783** (linux 248) | **최소 라인 파서**(PyYAML 없음): `title,id,status,description,level,logsource{product,category,service},tags,attack,falsepositives`. `regression_data/*/info.yml`(461, 테스트 메타) 제외 |
+| `atomic_tests.jsonl` | **344 기법 / 1,839 테스트 (linux 385)** | **최소 파서**: 기법·display_name·테스트명·설명·플랫폼·executor·command. 중첩 YAML 이라 best-effort(`parser: minimal`) |
+| `attack_techniques.jsonl` | **697** | `technique_id, name, description, tactics, platforms, detection, data_sources, is_subtechnique, url`. 최신 STIX 는 `x_mitre_detection` 이 비어 있는 기법 다수(ATT&CK 탐지 전략 체계로 이관) |
+| `cisa_kev.jsonl` | **1,730** | 원본 필드 그대로(시나리오 CVE 2건 존재) |
+| (loghub) | 미처리 | 원로그 3종은 raw 그대로(로그 이해 합성 시 사용) |
+
 ## 2. 추가 후보 (미반입 — 명령은 §6)
 
 | 데이터셋 | 라이선스 | 게이트 | 크기 | 내용 | 우선순위 |

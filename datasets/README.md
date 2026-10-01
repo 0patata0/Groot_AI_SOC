@@ -140,6 +140,24 @@
 
 **주의**: ATT&CK 분석(1,758)은 Windows/Linux/macOS 혼재 → Linux 358 우선. CTID 는 프레임워크마다 ATT&CK 기준 버전이 다름(기법 id 는 대체로 안정). CAR·RE&CT 는 최소 파서(`parser: minimal`). D3FEND 는 `d3fend.mitre.org/api/...` 가 404, `next.` 호스트에서 제공(실측).
 
+## 1-F. ATT&CK 보강 (2026-10-01, `prep.py --stages attack`, 검증 11/11 PASS)
+
+> "ATT&CK 부분도 보강됐나?" → 1-C(기법)·1-E(방어)에 더해 **STIX 에 남아 있던 위협 인텔 층과 텍스트→기법 라벨 데이터**를 채웠다. 이제 ATT&CK 는 기법·전술·방어·절차·행위자·사건체인·문장라벨까지 전 층 보유.
+
+| 파일 | 출처·라이선스 | 건수 | 내용 |
+|---|---|---|---|
+| `knowledge/attack_procedures.jsonl` | ATT&CK v19.2 STIX `uses` 관계 | **17,136** (텍스트 100%) | 행위자(그룹 4,628·악성코드 10,493·툴 869·캠페인 1,146) → 기법의 **절차 예시**(실제 사용 서술). T1190 만 75건. 공격 서사 합성·귀속(attribution) 근거 |
+| `knowledge/attack_groups.jsonl` | 〃 `intrusion-set` | **176** | id·이름·별칭·설명·사용 기법·소프트웨어 (예 G0016 APT29: 기법 66·소프트웨어 49) |
+| `knowledge/attack_software.jsonl` | 〃 `malware`+`tool` | **825** | (예 S0002 Mimikatz 기법 17) |
+| `knowledge/attack_campaigns.jsonl` | 〃 `campaign` | **56** | 시기·기법 |
+| `knowledge/attack_tactics.jsonl` | 〃 `x-mitre-tactic` | **15** | 전술 설명 |
+| `knowledge/attack_revoked_map.jsonl` | 〃 `revoked-by` | **157** | 폐기 id → 대체 id (CTID 14~16 매핑 등 **구버전 id 를 19.2 로 정규화**할 때 사용) |
+| `knowledge/tram_sentences.jsonl` | CTID **TRAM** bootstrap+merged+tram2(single/multi) · Apache-2.0 | **47,805 문장** (라벨 22,286, 다중 799, 비라벨 25,519=음성) | **문장 → 기법 ID** 주석(disposition=accept 만). **미지 기법 ID 0**(활성+폐기 id 로 검증). 로그/경보 텍스트에서 `attack_chain` 을 뽑는 능력의 지도 데이터 |
+| `knowledge/attack_flows.jsonl` | CTID **Attack Flow** corpus(.afb 빌더 포맷) · Apache-2.0 | **41 사건** (액션 952, 간선 610) | 실제 사건의 **기법 순서 체인**(anchor/latch 로 간선 복원, BFS 순서). 예 Black Basta 38액션·37간선. **T1190 포함 사건 7개**(CISA Iranian APT, FIN13…). 간선 복원 실패 2건(Conti CISA Alert·Example Attack Tree: 순서 없이 액션만) |
+| `reference/ttp_mapping.jsonl` | tumeteor/Security-TTP-Mapping | 3,519 | 절차 문장→기법. **라이선스 모호(README 배지 CC-BY-NC-SA vs 본문 CC-BY) → 학습 제외, 참고/평가용** |
+
+**남은 ATT&CK 관련 공백(스크랩으로 안 됨, 작성 필요)**: 우리 시나리오↔기법 정답표(S1 T1595/T1190/T1110, S2 T1190/T1059/T1071, S3 T1068/T1548 등)를 `scenarios/alerts.md` 룰 매트릭스와 함께 ground truth 로 작성해야 한다. 한국어 ATT&CK 번역은 공식본 없음.
+
 ## 2. 추가 후보 (미반입 — 명령은 §6)
 
 | 데이터셋 | 라이선스 | 게이트 | 크기 | 내용 | 우선순위 |

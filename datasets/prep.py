@@ -11,13 +11,14 @@
   eval      평가셋 통일 스키마(학습 금지)                                   → eval/*.jsonl
   knowledge 룰·지식 JSONL(Wazuh/ET Open/CRS/Sigma/Atomic/ATT&CK/KEV)       → knowledge/*.jsonl
   defense   방어 지식: ATT&CK 완화·탐지전략·분석, D3FEND 매핑, CAR, CTID 통제 매핑, RE&CT 응답 액션 → knowledge/*.jsonl
+  attack    ATT&CK 보강: 절차 예시(uses)·그룹·소프트웨어·캠페인·전술·폐기 매핑 + TRAM 문장→기법 + Attack Flow 사건 체인 (+TTP-Mapping 참고용) → knowledge/, reference/
 """
 import argparse, csv, hashlib, io, json, os, random, re, zipfile, tarfile, collections, datetime, glob, sys
 ap=argparse.ArgumentParser()
 ap.add_argument('--stages',default='all'); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--benign-ratio',type=float,default=1.0)
 ap.add_argument('--ait-normal-cap',type=int,default=20000); ap.add_argument('--ait-phase-cap',type=int,default=5000); ap.add_argument('--ait-window-pad',type=float,default=0.0)
 ap.add_argument('--ait-val',default='wheeler'); ap.add_argument('--ait-holdout',default='wilson')
-A=ap.parse_args(); ST=set(A.stages.split(',')) if A.stages!='all' else {'hermes','glaive2','traces','sevenllm','attacklm','salad','ait','eval','knowledge','defense'}
+A=ap.parse_args(); ST=set(A.stages.split(',')) if A.stages!='all' else {'hermes','glaive2','traces','sevenllm','attacklm','salad','ait','eval','knowledge','defense','attack'}
 R='datasets/raw'; O='datasets/processed'
 for d in ['', 'ait','eval','knowledge']: os.makedirs(f'{O}/{d}',exist_ok=True)
 random.seed(A.seed); stats=json.load(open(f'{O}/STATS.json'))['stats'] if os.path.exists(f'{O}/STATS.json') else {}
@@ -483,6 +484,109 @@ if 'defense' in ST:
     wjsonl(f'{O}/knowledge/react_response_actions.jsonl',rows); wjsonl(f'{O}/knowledge/react_stages.jsonl',stages)
     kd['react_response_actions']=len(rows); kd['react_stages']=len(stages); kd['react_by_stage']=dict(collections.Counter(r['stage'] for r in rows))
     stats['defense']=kd; print(f"[defense] {kd}")
+
+
+# ---------- attack (ATT&CK 보강: 절차 예시·그룹·소프트웨어·캠페인·전술·폐기 + TRAM + Attack Flow) ----------
+if 'attack' in ST:
+    os.makedirs(f'{O}/reference',exist_ok=True); ka={}
+    st=json.load(open(f'{R}/attack-stix/enterprise-attack.json')); objs=st['objects']; ids={o['id']:o for o in objs}
+    def ext_id(o): return next((e.get('external_id') for e in o.get('external_references',[]) if e.get('source_name')=='mitre-attack'),None)
+    active=lambda o: not o.get('revoked') and not o.get('x_mitre_deprecated')
+    tech_all={o['id']:o for o in objs if o.get('type')=='attack-pattern'}; tech={k:v for k,v in tech_all.items() if active(v)}
+    actors={o['id']:o for o in objs if o.get('type') in ('intrusion-set','malware','tool','campaign') and active(o)}
+    # 폐기/대체 매핑
+    rev=[{'old_id':ext_id(ids[r['source_ref']]),'old_name':ids[r['source_ref']].get('name'),'new_id':ext_id(ids[r['target_ref']]),'new_name':ids[r['target_ref']].get('name'),'object_type':ids[r['source_ref']].get('type')} for r in objs if r.get('type')=='relationship' and r.get('relationship_type')=='revoked-by' and r['source_ref'] in ids and r['target_ref'] in ids]
+    wjsonl(f'{O}/knowledge/attack_revoked_map.jsonl',rev); ka['revoked_map']=len(rev)
+    known_ids={ext_id(o) for o in tech_all.values() if ext_id(o)} | {r['old_id'] for r in rev}
+    # 전술
+    tac=[{'tactic_id':ext_id(o),'name':o.get('name'),'shortname':o.get('x_mitre_shortname'),'description':o.get('description','')} for o in objs if o.get('type')=='x-mitre-tactic']
+    wjsonl(f'{O}/knowledge/attack_tactics.jsonl',tac); ka['tactics']=len(tac)
+    # 절차 예시 (uses: actor → technique, 설명 = procedure example)
+    proc=[]; by_actor=collections.defaultdict(lambda: {'techniques':set(),'software':set()})
+    for r in objs:
+        if r.get('type')!='relationship' or r.get('relationship_type')!='uses' or r['source_ref'] not in actors: continue
+        a=actors[r['source_ref']]; t=ids.get(r['target_ref'])
+        if not t: continue
+        if t.get('type')=='attack-pattern':
+            proc.append({'actor_type':a['type'],'actor_id':ext_id(a),'actor_name':a.get('name'),'technique_id':ext_id(t),'technique':t.get('name'),'technique_active':active(t),'procedure':r.get('description','')})
+            by_actor[r['source_ref']]['techniques'].add(ext_id(t))
+        elif t.get('type') in ('malware','tool'): by_actor[r['source_ref']]['software'].add(t.get('name'))
+    wjsonl(f'{O}/knowledge/attack_procedures.jsonl',proc); ka['procedures']=len(proc); ka['procedures_with_text']=sum(1 for x in proc if x['procedure'])
+    # 그룹 / 소프트웨어 / 캠페인
+    def actor_row(o):
+        b=by_actor.get(o['id'],{'techniques':set(),'software':set()})
+        return {'id':ext_id(o),'type':o['type'],'name':o.get('name'),'aliases':o.get('aliases') or o.get('x_mitre_aliases') or [],'description':o.get('description',''),'platforms':o.get('x_mitre_platforms',[]),
+                'first_seen':o.get('first_seen'),'last_seen':o.get('last_seen'),'techniques':sorted(t for t in b['techniques'] if t),'software':sorted(b['software'])}
+    for typ,fn in [('intrusion-set','attack_groups.jsonl'),('campaign','attack_campaigns.jsonl')]:
+        rows=[actor_row(o) for o in actors.values() if o['type']==typ]; wjsonl(f'{O}/knowledge/{fn}',rows); ka[fn.split('.')[0]]=len(rows)
+    rows=[actor_row(o) for o in actors.values() if o['type'] in ('malware','tool')]; wjsonl(f'{O}/knowledge/attack_software.jsonl',rows); ka['attack_software']=len(rows)
+    # TRAM: 문장 → 기법 (Apache-2.0). 3종 통합·dedupe·id 검증
+    import ast
+    rows=[]; seen=set(); unknown=collections.Counter(); empty=0
+    def add(text,labels,src,doc=None,conf=None):
+        global empty
+        text=(text or '').strip()
+        if not text or text in seen: return
+        seen.add(text); labs=[l for l in labels if l]; unk=[l for l in labs if l not in known_ids]
+        for u in unk: unknown[u]+=1
+        if not labs: empty+=1
+        rows.append({'text':text,'techniques':labs,'unknown_ids':unk,'source':src,'doc_title':doc,'confidence':conf})
+    for fn in ['bootstrap-training-data.json','attack_may_2023_merged_bootstrap_data2.json']:
+        d=json.load(open(f'{R}/tram/{fn}')); items=d.get('sentences') or next((v for v in d.values() if isinstance(v,list)),[])
+        for it in items:
+            m=it.get('mappings'); 
+            try: m=ast.literal_eval(m) if isinstance(m,str) else (m or [])
+            except Exception: m=[]
+            if it.get('disposition') and it.get('disposition')!='accept': continue
+            add(it.get('text'),[x.get('attack_id') for x in m if isinstance(x,dict)],f'tram/{fn}',conf=[x.get('confidence') for x in m if isinstance(x,dict)])
+    for it in json.load(open(f'{R}/tram/single_label.json')): add(it.get('text'),[it.get('label')],'tram2/single_label',it.get('doc_title'))
+    for it in json.load(open(f'{R}/tram/multi_label.json')):
+        labs=it.get('labels'); 
+        try: labs=ast.literal_eval(labs) if isinstance(labs,str) else (labs or [])
+        except Exception: labs=[]
+        add(it.get('sentence'),labs,'tram2/multi_label',it.get('doc_title'))
+    wjsonl(f'{O}/knowledge/tram_sentences.jsonl',rows); ka['tram_sentences']=len(rows); ka['tram_labeled']=len(rows)-empty; ka['tram_unlabeled']=empty; ka['tram_unknown_ids']=dict(unknown.most_common(5))
+    # TTP-Mapping (라이선스 모호: 배지 CC-BY-NC-SA vs 본문 CC-BY) → reference/ 로만
+    rows=[]
+    for sp in ['train','dev','test']:
+        for r in csv.reader(open(f'{R}/ttp-mapping/derived_procedure_{sp}.tsv',encoding='utf-8'),delimiter='\t'):
+            if len(r)<2 or r[0].lower().startswith('text'): continue
+            try: labs=ast.literal_eval(r[1])
+            except Exception: labs=[r[1]]
+            rows.append({'text':r[0],'techniques':labs,'split':sp,'source':'tumeteor/Security-TTP-Mapping','license_note':'README 배지 CC-BY-NC-SA-4.0 vs 본문 CC-BY-4.0 모호 → 학습 제외, 참고/평가용'})
+    wjsonl(f'{O}/reference/ttp_mapping.jsonl',rows); ka['ttp_mapping_reference']=len(rows)
+    # Attack Flow (빌더 .afb): action 노드 + latch/anchor 로 간선 복원 → 순서
+    flows=[]
+    for f in sorted(glob.glob(f'{R}/attack-flow/*.afb')):
+        try: d=json.load(open(f,encoding='utf-8'))
+        except Exception: continue
+        objs2=d.get('objects',[]); P=lambda o: {k:v for k,v in (o.get('properties') or []) if isinstance(k,str)}
+        root=next((o for o in objs2 if o.get('id')=='flow'),None); meta=P(root) if root else {}
+        nodes={o['instance']:o for o in objs2 if o.get('id') in ('action','process','tool','asset','condition','operator','infrastructure','vulnerability','malware','url','file','ipv4-addr','domain-name','email-addr','network-traffic','process','user-account','windows-registry-key','directory','artifact','software','note')}
+        anchor2node={}; 
+        for inst,o in nodes.items():
+            for a in (o.get('anchors') or {}).values(): anchor2node[a]=inst
+        latch2node={}
+        for o in objs2:
+            if o.get('id') in ('vertical_anchor','horizontal_anchor') and o['instance'] in anchor2node:
+                for l in o.get('latches',[]): latch2node[l]=anchor2node[o['instance']]
+        edges=[(latch2node.get(o.get('source')),latch2node.get(o.get('target'))) for o in objs2 if o.get('id')=='dynamic_line']
+        edges=[(a,b) for a,b in edges if a and b and a!=b]
+        acts={inst:o for inst,o in nodes.items() if o.get('id')=='action'}
+        # 순서: 진입 간선 없는 액션부터 BFS
+        indeg=collections.Counter(b for a,b in edges if b in acts); order=[]; seen2=set()
+        q=[i for i in acts if indeg[i]==0]
+        while q:
+            i=q.pop(0)
+            if i in seen2: continue
+            seen2.add(i); order.append(i)
+            for a,b in edges:
+                if a==i and b in acts and b not in seen2: q.append(b)
+        order+= [i for i in acts if i not in seen2]
+        steps=[{'name':P(acts[i]).get('name'),'technique_id':P(acts[i]).get('technique_id'),'tactic_id':P(acts[i]).get('tactic_id'),'description':P(acts[i]).get('description',''),'confidence':P(acts[i]).get('confidence')} for i in order]
+        flows.append({'flow':meta.get('name') or os.path.basename(f)[:-4],'description':meta.get('description',''),'author':meta.get('author'),'n_actions':len(acts),'n_edges':len([e for e in edges if e[0] in acts and e[1] in acts]),'steps':steps,'techniques':sorted({s['technique_id'] for s in steps if s['technique_id']}),'file':os.path.basename(f),'parser':'afb-builder minimal'})
+    wjsonl(f'{O}/knowledge/attack_flows.jsonl',flows); ka['attack_flows']=len(flows); ka['attack_flow_actions']=sum(x['n_actions'] for x in flows); ka['attack_flow_edges']=sum(x['n_edges'] for x in flows)
+    stats['attack']=ka; print(f"[attack] {ka}")
 
 json.dump({'args':vars(A),'stats':stats},open(f'{O}/STATS.json','w'),ensure_ascii=False,indent=1)
 print("STATS →", f'{O}/STATS.json')

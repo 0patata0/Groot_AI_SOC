@@ -7,7 +7,7 @@
 ## 라이브 헬스 (방금 점검)
 | 호스트 | 역할 | 상태 |
 |---|---|---|
-| **Groot_A** `groot-sec` 192.168.16.230 / 10.200.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답 MCP | ✅ waf(healthy)·suricata(running), wazuh-agent active, nft(capstone_gw/fwd/fw), capstone-nat·chrony·리퍼 타이머 active, nftables.service **masked**, 차단 0건 |
+| **Groot_A** `groot-sec` 192.168.16.230 / 10.200.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답 MCP | ✅ waf(healthy)·suricata(running), wazuh-agent active, nft(capstone_gw/fwd/fw), capstone-nat·chrony·리퍼 타이머 active, nftables.service **masked**, 차단 0건. **FW 감사(2026-10-01, 읽기전용)**: input/NAT/DNAT/never_block/영속성 정상·드리프트 0·옛주소 0 — 단 **FORWARD 정책 ACCEPT**(deny-by-default 미적용) 발견 → IPS/WAF 룰 취합 시 일괄 반영 보류(`보안룰_취합.md`) |
 | **Groot_B** `groot-siem` 10.200.10.10 | Wazuh SIEM + 읽기 MCP + 채팅 | ✅ manager·indexer·dashboard Up, **에이전트 3대 Active**, 읽기 서버 `/opt/mcp`, **Mattermost+PostgreSQL(mm-app/mm-postgres) Up** — HITL 알림 채널 |
 | **Groot_C** `groot-web` 10.200.10.20 | DVWA + CVE 랩 | ✅ apache active, DVWA 200, `log4shell-lab` 컨테이너(**C 내부 전용 바인딩** `10.200.10.20:8080` — 캠퍼스/VPN 직접 도달 차단), wazuh-agent active |
 | 관리포털(Wazuh) | **A:443 이름 프록시**(chatproxy)→B:443 (+A:10443 DNAT 유지) | ✅ **`https://wazuh.groot.lab`** 학과망·VM세그먼트 OK(로그인 200 실측 2026-09-28). 출발지 allowlist(학과망 **192.168.10.0/24·192.168.12.0/24**·VM세그먼트·내부망) — **VPN(192.168.15.0/24)·외부는 403**(대시보드 VPN 비노출 결정 유지). 2026-09-29 학과망이 192.168.10.x 로 배정되어 403 → allowlist 에 추가·chatproxy 재시작으로 해결. 학과망(192.168.12.x)은 10443 이 캠퍼스 FW 에 막힘(실측) → 이 경로가 유일. 팀원 무설정 별칭 **`https://wazuh.grootlab.duckdns.org`**(동일 allowlist). 맨 IP 443=444 |

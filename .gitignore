@@ -12,3 +12,6 @@
 # 자격증명 노트 (git 커밋 금지)
 *CREDENTIALS*.md
 *credentials*.md
+
+# datasets/ 디렉터리 압축본(로컬 전용, 추적 안 함)
+datasets.zip

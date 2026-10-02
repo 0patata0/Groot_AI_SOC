@@ -28,15 +28,23 @@ usage(){ echo "usage: $0 {on|off|status}"; exit 1; }
 [ "$(id -u)" = "0" ] || { echo "root 필요: sudo $0 $*" >&2; exit 1; }
 [ $# -ge 1 ] || usage
 
-du_add(){  # DOCKER-USER forward NEW 허용 (Docker FORWARD policy DROP 우회)
+# F6: 관측용 egress 대상(C 아웃바운드 JNDI 콜백/유출을 Suricata 가 ens192 에서 보게). v2 FORWARD DROP 에서 필수.
+OBS_SEG="192.168.16.0/25"   # 공격자(Kali)가 있는 VM 세그먼트
+du_add(){  # inbound(DNAT 경로) + outbound(관측) DOCKER-USER NEW 허용. FORWARD DROP(v2) 아래서도 동작하게 맨 위 삽입.
   iptables -L DOCKER-USER -n >/dev/null 2>&1 || { echo "WARN: DOCKER-USER 없음 (docker 미기동?) — forward 허용 건너뜀" >&2; return 0; }
   iptables -C DOCKER-USER -d "$LAB_IP" -i "$EXT_IF" -o "$INT_IF" -p tcp --dport "$LAB_PORT" -m conntrack --ctstate NEW -j ACCEPT 2>/dev/null \
     || iptables -I DOCKER-USER -d "$LAB_IP" -i "$EXT_IF" -o "$INT_IF" -p tcp --dport "$LAB_PORT" -m conntrack --ctstate NEW -j ACCEPT
+  # C -> 공격자 세그먼트 아웃바운드(콜백/유출) 관측 허용 — 없으면 v2 FORWARD DROP 이 유출 leg 를 끊어 Suricata 가 못 봄
+  iptables -C DOCKER-USER -s "$LAB_IP" -i "$INT_IF" -o "$EXT_IF" -d "$OBS_SEG" -j ACCEPT 2>/dev/null \
+    || iptables -I DOCKER-USER -s "$LAB_IP" -i "$INT_IF" -o "$EXT_IF" -d "$OBS_SEG" -j ACCEPT
 }
 du_del(){
   iptables -L DOCKER-USER -n >/dev/null 2>&1 || return 0
   while iptables -C DOCKER-USER -d "$LAB_IP" -i "$EXT_IF" -o "$INT_IF" -p tcp --dport "$LAB_PORT" -m conntrack --ctstate NEW -j ACCEPT 2>/dev/null; do
     iptables -D DOCKER-USER -d "$LAB_IP" -i "$EXT_IF" -o "$INT_IF" -p tcp --dport "$LAB_PORT" -m conntrack --ctstate NEW -j ACCEPT
+  done
+  while iptables -C DOCKER-USER -s "$LAB_IP" -i "$INT_IF" -o "$EXT_IF" -d "$OBS_SEG" -j ACCEPT 2>/dev/null; do
+    iptables -D DOCKER-USER -s "$LAB_IP" -i "$INT_IF" -o "$EXT_IF" -d "$OBS_SEG" -j ACCEPT
   done
 }
 

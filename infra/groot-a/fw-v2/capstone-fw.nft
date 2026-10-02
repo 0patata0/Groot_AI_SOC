@@ -100,7 +100,7 @@ table inet capstone_fw {
         oif "lo" accept
         ct state established,related accept
         ct state invalid counter drop
-        meta nfproto ipv6 counter drop comment "P7"
+        oifname { "ens192", "ens160" } meta nfproto ipv6 counter drop comment "P7: 노출 NIC 만 v6 drop (docker/lo v6 보존 — F3)"
         icmp type { echo-request, destination-unreachable, time-exceeded, parameter-problem } accept comment "health pings / path errors"
         oifname "ens192" ip daddr 192.168.16.131 udp dport 123 accept comment "chrony upstream (campus NTP)"
         oifname "ens192" ip daddr 168.126.63.1 udp dport 53 accept comment "DNS (systemd-resolved upstream)"

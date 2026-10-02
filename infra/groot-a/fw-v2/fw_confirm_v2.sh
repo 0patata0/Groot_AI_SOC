@@ -9,6 +9,6 @@ nft list table inet capstone_fw >/dev/null 2>&1 || { echo "!! inet capstone_fw n
 systemctl stop capstone-fw-deadman.timer capstone-fw-deadman.service >/dev/null 2>&1 || true
 if [ -f "$PEND" ]; then mv -f "$PEND" "$FINAL"; fi
 [ -f "$FINAL" ] || { echo "!! $FINAL missing"; exit 1; }
-rm -f "$NATBAK"
+# F4: v1 백업을 지우지 않고 보존(추후 롤백용). rm -f "$NATBAK"  ← 제거
 logger -t capstone-fw "confirmed v2: inet capstone_fw + FORWARD DROP/CAPSTONE-FWD + sysctl v2 active and enabled at boot"
 echo "confirmed v2: dead-man disarmed; boot file $(ls -l "$FINAL" | awk '{print $NF, $5"B"}'); FORWARD $(iptables -S FORWARD | head -1 | awk '{print $3}')"

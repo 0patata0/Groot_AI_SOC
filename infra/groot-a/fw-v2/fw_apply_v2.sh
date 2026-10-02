@@ -29,8 +29,14 @@ ip -br addr show ens160 | grep -q ' 10\.200\.10\.1/' || die "ens160 is not 10.20
 ip -br addr show ens192 >/dev/null || die "ens192 missing"
 command -v systemd-run >/dev/null && command -v logger >/dev/null && command -v python3 >/dev/null || die "systemd-run/logger/python3 missing"
 # 잠금 가드: 지금 접속한 출발지가 mgmt_src 에 있어야 한다(ens192 SSH 가 출발지 제한되므로)
+# F2: sudo 는 SSH_CLIENT 를 지운다 → utmp(who -m)에서 로그인 피어 IP 복구. 그래도 불명이면 콘솔 확인 아니면 중단(묵시 통과 금지)
 src=${SSH_CLIENT:-${SUDO_SSH_CLIENT:-}}; src=${src%% *}
-if [ -n "$src" ]; then
+[ -n "$src" ] || src=$(who -m 2>/dev/null | grep -oE '\(([0-9]{1,3}\.){3}[0-9]{1,3}\)' | tr -d '()' | head -1)
+[ -n "$src" ] || src=$(who 2>/dev/null | grep -oE '\(([0-9]{1,3}\.){3}[0-9]{1,3}\)' | tr -d '()' | head -1)
+if [ -z "$src" ]; then
+  if [ -t 0 ]; then read -r -p "  원격 피어를 못 찾음(콘솔?). 잠금 안 되는 걸 확인했으면 YES 입력: " _a; [ "$_a" = YES ] || die "출발지 미확인 — 중단"
+  else die "출발지 산출 불가(sudo 가 SSH_CLIENT 제거, who -m 비어있음). 'sudo -E bash $0' 로 재실행(SSH_CLIENT 보존) 또는 콘솔에서 실행"; fi
+else
   python3 - "$src" "$SRC/capstone-fw.nft" <<'PY' || die "operator source $src is NOT in mgmt_src — you would lock yourself out. Add it to mgmt_src first."
 import sys,re,ipaddress
 ip=ipaddress.ip_address(sys.argv[1]); txt=open(sys.argv[2]).read()
@@ -41,8 +47,6 @@ ok = ok or ip in ipaddress.ip_network('10.200.10.0/24')
 sys.exit(0 if ok else 1)
 PY
   echo "  operator session from $src: in mgmt_src (or internal) — ok"
-else
-  echo "  (no SSH_CLIENT — console session)"
 fi
 echo "ok"
 
@@ -59,7 +63,9 @@ if [ "$ENFORCE_OUT" = 1 ]; then
 else
   install -o root -g root -m 0644 "$SRC/capstone-fw.nft" "$PEND"; echo "  output chain: SHADOW (log only)"
 fi
-[ -f "$NATBAK" ] || cp -p "$NAT" "$NATBAK"
+# F4: 현재 NAT 가 v1(마커 없음)일 때만 백업 → 재실행(이미 v2) 시 v1 백업을 v2 로 덮지 않음. 백업은 pristine 로 보존.
+if [ ! -f "$NATBAK" ] && ! grep -q CAPSTONE_NAT_V2 "$NAT" 2>/dev/null; then cp -p "$NAT" "$NATBAK"; fi
+[ -f "$NATBAK" ] || echo "  (주의: v1 백업 없음 — 롤백은 git 의 v1 로)"
 install -o root -g root -m 0755 "$SRC/capstone-nat.sh" "$NAT"
 install -o root -g root -m 0755 "$SRC/fw_confirm_v2.sh" /usr/local/sbin/fw_confirm_v2.sh
 install -o root -g root -m 0644 "$SRC/99-capstone-fw.conf" "$SYS"
@@ -69,7 +75,7 @@ ls -l "$PEND" "$NAT" "$NATBAK" "$SYS" | sed 's/^/  /'
 say "P2 arm dead-man (${DEADMAN}s): full v2 rollback unless confirmed"
 systemctl stop capstone-fw-deadman.timer capstone-fw-deadman.service >/dev/null 2>&1 || true
 systemctl reset-failed capstone-fw-deadman.timer capstone-fw-deadman.service >/dev/null 2>&1 || true
-ROLLBACK="nft delete table inet capstone_fw; rm -f $PEND; iptables -P FORWARD ACCEPT; iptables -D DOCKER-USER -j CAPSTONE-FWD 2>/dev/null; iptables -F CAPSTONE-FWD 2>/dev/null; iptables -X CAPSTONE-FWD 2>/dev/null; cp -f $NATBAK $NAT; $NAT >/dev/null 2>&1; rm -f $SYS; sysctl --system >/dev/null 2>&1; logger -t capstone-fw 'DEADMAN fired: v2 rolled back (fw table removed, FORWARD ACCEPT, nat v1 restored, sysctl v2 removed)'"
+ROLLBACK="nft delete table inet capstone_fw; rm -f $PEND; iptables -P FORWARD ACCEPT; iptables -D DOCKER-USER -j CAPSTONE-FWD 2>/dev/null; iptables -F CAPSTONE-FWD 2>/dev/null; iptables -X CAPSTONE-FWD 2>/dev/null; cp -f $NATBAK $NAT; $NAT >/dev/null 2>&1; rm -f $SYS; [ -f /run/capstone-fw-sysctl.restore ] && sysctl -p /run/capstone-fw-sysctl.restore >/dev/null 2>&1; sysctl --system >/dev/null 2>&1; logger -t capstone-fw 'DEADMAN fired: v2 rolled back (fw table removed, FORWARD ACCEPT, nat v1 restored, sysctl runtime restored from snapshot)'"
 systemd-run --on-active="$DEADMAN" --timer-property=AccuracySec=1s --unit=capstone-fw-deadman --description="rollback FW v2 if not confirmed" /bin/sh -c "$ROLLBACK" \
   || die "systemd-run failed"
 systemctl list-timers capstone-fw-deadman.timer --no-pager --no-legend | grep -q capstone-fw-deadman || die "dead-man not armed"
@@ -77,6 +83,11 @@ echo "  armed: $(systemctl list-timers capstone-fw-deadman.timer --no-pager --no
 trap 'echo; echo "== dead-man armed (${DEADMAN}s). Verify from OUTSIDE (V list), then: sudo fw_confirm_v2.sh"' EXIT
 
 say "P3 apply: sysctl v2, then capstone-nat.sh v2 with FW_FILE=$PEND (atomic fw load; FORWARD DROP; CAPSTONE-FWD rebuilt)"
+# F5: 바꿀 키의 현재 런타임 값을 스냅샷 → 데드맨이 이 파일로 복원(파일 rm+--system 만으론 런타임 미복구)
+: > /run/capstone-fw-sysctl.restore
+for _k in net.ipv4.conf.all.rp_filter net.ipv4.conf.default.rp_filter net.ipv4.conf.ens192.rp_filter net.ipv4.conf.ens160.rp_filter net.ipv4.conf.all.send_redirects net.ipv4.conf.default.send_redirects net.ipv4.conf.all.accept_redirects net.ipv4.conf.all.secure_redirects net.ipv4.conf.all.accept_source_route net.ipv4.conf.all.log_martians net.ipv4.conf.default.log_martians net.ipv4.tcp_syncookies net.ipv4.icmp_echo_ignore_broadcasts net.ipv4.icmp_ignore_bogus_error_responses net.ipv6.conf.ens192.disable_ipv6 net.ipv6.conf.ens160.disable_ipv6 net.ipv6.conf.all.forwarding; do
+  echo "$_k = $(sysctl -n $_k 2>/dev/null)" >> /run/capstone-fw-sysctl.restore 2>/dev/null
+done
 sysctl --system >/dev/null; sysctl -n net.ipv4.conf.all.rp_filter net.ipv4.conf.all.send_redirects net.ipv6.conf.ens192.disable_ipv6 | paste -sd' ' | sed 's/^/  rp_filter send_redirects v6off(ens192): /'
 FW_FILE="$PEND" "$NAT" | sed 's/^/  /'
 nft list table inet capstone_fw >/dev/null || die "capstone_fw not loaded"

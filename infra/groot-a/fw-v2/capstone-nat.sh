@@ -1,5 +1,6 @@
 #!/bin/bash
 # Groot_A NAT 게이트웨이 + forward 정책 v2 (빡빡한 룰 초안, 2026-10-01). **초안 — 아직 미적용.** 멱등(idempotent).
+# CAPSTONE_NAT_V2  (F4: apply 가 이 마커로 v1/v2 구분해 v1 원본만 백업)
 # capstone-nat.service 가 docker.service 이후 실행. 수동 재적용도 안전.
 #
 # v1 대비 변경(보안룰_취합.md 0-B):

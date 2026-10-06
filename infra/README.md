@@ -1,6 +1,6 @@
 # infra — Docker 기반 배포 (B-1)
 
-각 ESXi VM(Groot_A/B/C)의 Docker Compose·설정·운영 문서. 아래 배포 순서는 최초 구축 이력이다. 배포 순서·검증은 [../인프라_구축순서.md](../인프라_구축순서.md), 사양은 [../PLAN.md](../PLAN.md) 1.5 참조.
+각 ESXi VM(Groot_A/B/C)의 Docker Compose·설정·운영 문서. 아래 배포 순서는 최초 구축 이력이다. 현재 단계와 사양은 [PLAN.md](../PLAN.md), 호스트별 절차는 [A](groot-a/README.md)·[B](groot-b/README.md)·[C](groot-c/C_구축_표준설정.md) 문서를 참조한다.
 
 ## 현재 상태 (2026-10-06 기록 및 이번 SSH 재확인)
 - B/C의 `ens192` vNIC는 제거됐고 기본 경로는 A(`10.200.10.1`)를 지난다. 외부망 주소 `.231`/`.232`는 과거 설치 주소다.
@@ -17,7 +17,7 @@ infra/
 ```
 
 ## 배포 순서 (요약)
-1. 네트워크·게이트웨이(Groot_A 호스트 nftables) → 인프라_구축순서.md Phase 1~2
+1. 네트워크·게이트웨이(Groot_A 호스트 nftables) → [PLAN.md](../PLAN.md) 1단계와 [A 운영 문서](groot-a/README.md)
 2. `groot-a`: nftables 적용 후 `docker compose up -d` (Suricata·WAF)
 3. `groot-c`: [C 표준 설정](groot-c/C_구축_표준설정.md)에 따라 베어메탈 DVWA와 Log4Shell 랩 컨테이너 구성·검증. 이전 DVWA/DB/CVE 통합 Compose 초안은 현 배포와 달라 제거했다.
 4. `groot-b`: Wazuh 공식 single-node 배포 후 MCP Server, Agent를 A·C에 설치

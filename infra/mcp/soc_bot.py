@@ -17,6 +17,7 @@ Tier 2 승인 브로커(2026-09-28): 응답 MCP 서버(A)가 차단 전에 여�
   GET  /recent?minutes=&level= (X-Read-Token) → 최신 경보 지문(Hermes cron --monitor-script 용; 새 경보가 생길 때만 바뀜)
 """
 import json, os, ssl, sys, urllib.request, urllib.parse, time, secrets, threading
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 CTX = ssl._create_unverified_context()   # 자체서명 인덱서/API
@@ -37,6 +38,7 @@ MM_ACTION_URL = os.environ.get("MM_ACTION_URL", "http://172.19.0.1:8090")  # MM(
 APPROVAL_TTL = int(os.environ.get("APPROVAL_TTL", "900"))    # 승인 대기 상한(초). 지나면 expired = 미실행
 APPROVALS = {}                                               # req_id → 레코드 (메모리; 재시작 시 대기 중 요청은 소멸=미실행)
 _LOCK = threading.Lock()
+KST = timezone(timedelta(hours=9), "KST")
 
 
 def _req(url, user=None, pw=None, data=None, headers=None, method=None):
@@ -57,6 +59,19 @@ def wapi_token():
     return _req("%s/security/user/authenticate?raw=true" % WAPI, WAPI_USER, WAPI_PASS, method="POST").read().decode()
 
 
+def _alert_time_kst(value):
+    """Wazuh 경보의 절대 시각을 보고서 표시용 KST로 변환한다."""
+    if not value:
+        return "시각 없음"
+    try:
+        dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(KST).strftime("%Y-%m-%d %H:%M:%S KST")
+    except ValueError:
+        return "시각 형식 확인 필요"
+
+
 def recent_alerts(minutes=15, min_level=5, size=200):
     body = {"size": size, "sort": [{"timestamp": "desc"}],
             "query": {"bool": {"filter": [
@@ -69,7 +84,7 @@ def recent_alerts(minutes=15, min_level=5, size=200):
     rows = []
     for h in hits:
         s = h["_source"]; r = s.get("rule", {}); d = s.get("data", {})
-        rows.append({"ts": s.get("timestamp", "")[11:19], "id": r.get("id"), "level": r.get("level"),
+        rows.append({"ts": _alert_time_kst(s.get("timestamp", "")), "id": r.get("id"), "level": r.get("level"),
                      "desc": r.get("description", ""), "agent": s.get("agent", {}).get("name", ""),
                      "srcip": d.get("srcip") or (d.get("transaction") or {}).get("client_ip", ""),
                      "groups": r.get("groups", [])})

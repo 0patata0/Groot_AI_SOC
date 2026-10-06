@@ -1,9 +1,10 @@
-# Hermes Agent 설정 — Groot SOC (실배치본과 동일, 2026-09-28). 위치: Groot_B /opt/hermes-data/config.yaml (컨테이너 /opt/data/config.yaml)
+# Hermes Agent 설정 템플릿 — Groot SOC. 실배치 경로: Groot_B /opt/hermes-data/config.yaml (컨테이너 /opt/data/config.yaml)
 # 실행: 공식 Docker 이미지 nousresearch/hermes-agent(오프라인 반입), 데이터 볼륨 /opt/hermes-data:/opt/data, HERMES_UID/GID=호스트 hermes 사용자.
 # 핵심(A안): Wazuh API·인덱서·FW 자격증명은 여기 없다. MCP 서버는 sshd ForceCommand 경계(mcp@B, resp@A)로만 붙고,
 #   컨테이너는 그 계정들의 authorized_keys 에 restrict,command= 로 등록된 SSH 키 하나만 가진다(/opt/data/home/.ssh/).
 #   호스트 사용자 hermes 는 mcp 그룹이 아니라 /etc/mcp/*.env 를 읽을 수 없다.
-# 배치·검증: infra/hermes/deploy_hermes_B.sh (prep | load <tar> | test). 검증은 `deploy_hermes_B.sh test`(계약 테스트 + chat -q 후 agent.log). 이미지엔 mcp[cli] 가 없어 `hermes mcp test` 불가. 실측 2026-09-28: 17툴(읽기 14+응답 3) 등록.
+# 배치·검증: infra/hermes/deploy_hermes_B.sh (prep | load <tar> | test). 이미지엔 mcp[cli] 가 없어 `hermes mcp test` 불가.
+# 2026-09-28 실측은 17툴/2서버(읽기 14+응답 3). security-events 2툴은 2026-10-06 B 배치·원격 조회 검증 후 Hermes 실설정에 등록했다. `hermes mcp list`의 3서버 enabled와 LLM의 새 도구 2개 실제 호출을 확인했다.
 
 mcp_servers:
   wazuh-ro:                                   # 읽기 MCP 서버(B, gbrigandi/mcp-server-wazuh, 계정 mcp-ro) — 14 툴
@@ -18,6 +19,18 @@ mcp_servers:
       resources: false
       prompts: false
     trust: full                               # 읽기전용 서버
+  security-events:                            # 보안 이벤트 MCP(B, 같은 mcp 계정/키, 정확한 원격 명령만 분기) — 읽기 2툴
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b", "security-events"]
+    env:
+      HOME: /opt/data/home
+    connect_timeout: 60
+    timeout: 180
+    supports_parallel_tool_calls: false
+    tools:
+      resources: false
+      prompts: false
+    trust: full
   resp:                                       # 응답(차단) MCP 서버(A, response-mcp.py, 계정 resp) — block_ip/unblock_ip/list_blocks
     command: ssh
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.200.10.1
@@ -29,7 +42,7 @@ mcp_servers:
     tools:
       resources: false
       prompts: false
-    trust: untrusted                          # 쓰기 툴(block_ip 등)은 Hermes 가 사람 승인을 받게 함(HITL) — 서버 정책 엔진과 이중 안전
+    trust: full                               # 라이브는 서버측 승인 브로커가 block_ip 승인 강제(2026-09-28 실측)
 
 security:
   allow_lazy_installs: false                  # 오프라인: 런타임 pip 설치 시도 금지

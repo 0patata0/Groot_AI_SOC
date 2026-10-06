@@ -31,7 +31,7 @@ services:
       MM_SERVICESETTINGS_ENABLEOUTGOINGWEBHOOKS: "true"
       MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION: "false"
       MM_LOGSETTINGS_CONSOLELEVEL: "WARN"
-      TZ: "UTC"
+      TZ: "Asia/Seoul"
     ports:
       - "10.200.10.10:8065:8065"
     volumes:

@@ -1,10 +1,10 @@
 # 탐지·대응 검증 매트릭스 (실행 중 기록)
 
-각 실행에서 UTC 시각·Kali IP·실제로 뜬 rule id를 적고 Verified 박스를 채운다. "(예상, 미검증)"은 아직 실측 안 된 항목.
+각 실행에서 날짜와 `+09:00` 오프셋을 포함한 KST 시각(예: `2026-10-06 21:00:00+09:00`)·Kali IP·실제로 뜬 rule id를 적고 Verified 박스를 채운다. Wazuh 원본 `timestamp`가 UTC로 보이면 같은 절대 시각으로 변환해 비교한다. "(예상, 미검증)"은 아직 실측 안 된 항목.
 
-> 2026-10-06 SSH 점검에서 B의 로컬 디코더·룰에는 신규 신호 전용 항목이 없었다. IPS 로컬 SID가 기존 Suricata 룰로 분류되는지는 미확인이다. 아래 표는 기대치이며 신규 룰의 실제 Wazuh 경보 발화는 검증하지 않았다.
+> 2026-10-06 SSH 점검에서 B의 로컬 디코더·룰에는 신규 신호 전용 항목이 없었다. 이후 읽기 전용 조회에서 Suricata 로컬 SID `1000010`→Wazuh `100110`, ModSecurity CRS `920350`→Wazuh `100101` 경보를 확인했다. 이번 점검에서 아래 시나리오의 공격 트래픽을 새로 실행하지 않았으므로 Verified는 비워 둔다. GROOT WAF 커스텀 ID `10100`대와 다른 신규 룰 발화는 미확인이다.
 
-- 실행 세션: 날짜 ____ / Kali IP ____ / DVWA level ____ / WAF mode ____ (DetectionOnly|On)
+- 실행 세션: 시작 시각(KST, +09:00) ____ / Kali IP ____ / DVWA level ____ / WAF mode ____ (DetectionOnly|On)
 
 | 시나리오·단계 | 공격 행위 | Suricata sid | WAF/CRS 룰 | Wazuh 룰 id (lv) | 대응 룰 | Verified |
 |---|---|---|---|---|---|---|

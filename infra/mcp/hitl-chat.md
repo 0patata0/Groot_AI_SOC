@@ -58,9 +58,9 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
   - 배치: `infra/mcp/{soc_bot.py, deploy_socbot_B.sh, soc_bot.env.example}`. 실측: `/soc status|alerts|agents|vulns` 응답 확인.
   - NL(자연어) 대화는 LLM 런타임(Claude/Hermes) 연결 후. 지금은 명령형 봇(오프라인 동작).
 - **주기 인시던트 보고**: B `soc-report.timer`(systemd, 기본 hourly / window 60분) → `soc_bot.py report` → 채널 게시. **경보 0이면 게시 안 함**(스팸 방지). 수동 `/soc report [분]`.
-- **정기 상태 요약(heartbeat)**: B `soc-summary.timer`(하루 2회, `OnCalendar=*-*-* 00,12:00:00` UTC = 09/21 KST, Persistent) → `soc_bot.py summary 12` → **이상 없어도 항상 게시**(🟢 이상없음 / 🟡 관찰 / 🔴 주의; 에이전트 active·최근 12h 경보·상위규칙·취약점). 수동 `/soc summary [시간]`. 주기/시각은 타이머 유닛에서 조정(SUMMARY_ONCAL/SUMMARY_HOURS).
+- **정기 상태 요약(heartbeat)**: B `soc-summary.timer`(하루 2회, `OnCalendar=*-*-* 09,21:00:00 Asia/Seoul`, Persistent) → `soc_bot.py summary 12` → **이상 없어도 항상 게시**(🟢 이상없음 / 🟡 관찰 / 🔴 주의; 에이전트 active·최근 12h 경보·상위규칙·취약점). 수동 `/soc summary [시간]`. 주기/시각은 타이머 유닛에서 조정(SUMMARY_ONCAL/SUMMARY_HOURS). 2026-10-06 A/B/C 호스트 KST·NTP 동기화를 확인했고 B `soc-bot`은 최근 경보 시각을 KST로 표시한다. Mattermost 컨테이너는 `TZ=Asia/Seoul` 재생성 후 healthy를 확인했다. 다른 컨테이너 내부 시계 표시는 UTC일 수 있다.
 
-- **남은 것**: Tier 2(채팅 내 [승인][거부] 버튼 + 승인 브로커), NL 에이전트(LLM 연결), `/soc block`(응답 MCP 연동). **런타임=Hermes(B Docker) 가 MCP 2서버 17툴 등록 확인(2026-09-28)** — 응답 서버는 `trust: untrusted` 로 등록해 쓰기 툴(block_ip)은 Hermes 가 사람 승인을 요구하도록 함(서버 정책 엔진과 이중). 남은 전제는 LLM 연결뿐.
+- **이후 진행**: 2026-09-28 Hermes의 MCP 2서버 17툴 등록, NL 대화 및 Tier 2 승인 브로커의 차단 E2E를 검증했다(아래 절). 라이브 응답 MCP는 `trust: full`이며 서버측 브로커가 고위험 `block_ip` 승인과 거부/만료 시 미실행을 강제한다. `/soc block` 슬래시 명령은 별도 범위다.
 - 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.200.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
 
 ### VPN·캠퍼스 클린 접속 — A:443 이름 기반 리버스 프록시 (2026-09-27 확정)
@@ -94,3 +94,8 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 - **증상**: 자연어 질문에 Hermes 가 툴을 부르지 않고 추론만 하다 멈추거나(agent.log `Reasoning-only clean stop`) 가짜 결과(`<status>` 태그, 존재하지 않는 경보)를 내놓음. DGX 에 직접 물으면 12/12 툴 호출 정상 → Hermes 의 **tool_search 브리지(MCP 툴을 검색→설명→호출 3단계로 숨김)** 와 큰 시스템 프롬프트가 원인.
 - **조치**: `tools.tool_search.enabled: off`(툴 스키마 24→54개 즉시 노출) + `SOUL.md` 에 "한국어 설명 / 툴명·IP·규칙id·에러원문·경로·명령은 원문 백틱 / 툴 결과에 없는 원인 추측 금지 / 승인 결과 그대로 보고" 규칙(`infra/hermes/SOUL.groot.md`) + cron 프롬프트 동일 규칙. 재검증: 상태 요약·차단목록+경보 설명 모두 실제 툴 호출, 한국어+식별자 원문, 없는 필드는 "포함되지 않음"으로 정직 보고.
 - 알려진 한계: 읽기 서버의 `get_wazuh_alert_summary` 는 rule.id 를 안 돌려줌(서버 형식) → 규칙 id 가 필요하면 `search_wazuh_manager_logs`/인덱서 조회 툴 보강 검토.
+
+### 보안 이벤트 전용 읽기 MCP·KST 적용 (2026-10-06)
+- B에 `security-events-mcp.py`를 배치했다. `ssh -T groot-mcp security-events`의 2툴 목록과 `search_suricata_alerts`·`search_modsecurity_alerts`의 실제 인덱서 조회가 계약 테스트를 통과했다. 기존 `ssh -T groot-mcp`의 14툴도 회귀 검증했다. 새 도구는 이미 인덱싱된 Wazuh 경보의 제한된 필드만 KST 시각으로 반환하며, Suricata EVE·ModSecurity 감사 원본이나 장비 설정은 읽지 않는다.
+- 읽기 전용 결과에서 Suricata 로컬 SID `1000010`→Wazuh `100110`, ModSecurity CRS `920350`→Wazuh `100101`을 확인했다. WAF는 `DetectionOnly`다. GROOT 커스텀 WAF ID `10100`대의 발화와 시나리오별 공격 재현은 아직 확인하지 않았다.
+- Hermes 실설정에서 보안 이벤트 서버를 세 번째 MCP 서버로 등록하고 컨테이너 재시작 후 `hermes mcp list`의 3서버 enabled를 확인했다. `hermes chat -q` LLM 대화에서도 `mcp__security_events__search_suricata_alerts`(최근 60분, SID `1000010`→Wazuh `100110`)와 `mcp__security_events__search_modsecurity_alerts`(최근 24시간, CRS `920350`→Wazuh `100101`)를 각각 실제 호출했다. 서버 계약 테스트와 LLM 호출 검증을 모두 통과했다.

@@ -2,7 +2,7 @@
 
 이 폴더는 **블루팀 탐지 검증(detection validation)** 문서다. 각 시나리오는 "공격 단계 → 우리 인프라에서 떠야 하는 탐지(Suricata sid / ModSecurity·CRS 룰 / Wazuh 룰 id) → 대응(agent_block)"을 짝지어, 팀이 Kali에서 실행하고 Wazuh에서 실제로 보이는지 체크리스트로 확인하도록 만든다.
 
-> **현황(2026-10-06 기록 및 이번 SSH 재확인):** A의 FW v2는 `FORWARD=DROP`으로 적용·확정됐다. WAF GROOT 룰은 `DetectionOnly`, Suricata ET+로컬 룰과 Phase-A는 passive로 로드됐다. B/C의 외부 `ens192`는 제거됐다. B 로컬 파일에 신규 신호 전용 항목은 없으나 IPS 로컬 SID의 기존 Suricata 룰 분류 여부는 미확인이고 공격 트래픽 실발화도 미검증이다. A의 Log4Shell 경로 토글은 OFF이며 설치된 스크립트에는 저장소의 `OBS_SEG` 코드가 없다. [기존 기록](../대화기록/2026-10-06.md)
+> **현황(2026-10-06 라이브 점검):** A의 FW v2는 `FORWARD=DROP`으로 적용·확정됐다. WAF GROOT 룰은 `DetectionOnly`, Suricata ET+로컬 룰과 Phase-A는 passive로 로드됐다. B/C의 외부 `ens192`는 제거됐다. B의 Wazuh 인덱스에는 Suricata 로컬 SID `1000010`→`100110` 및 ModSecurity CRS `920350`→`100101` 경보가 관측됐지만, 이번 점검에서 시나리오 공격 트래픽은 새로 실행하지 않았다. GROOT WAF 커스텀 ID `10100`대 및 다른 신규 룰의 발화는 미검증이다. A의 Log4Shell 경로 토글은 OFF이며 설치된 스크립트에는 저장소의 `OBS_SEG` 코드가 없다. [작업 기록](../대화기록/2026-10-06.md)
 
 **공격 트래픽을 어떻게 만드는지(how-to)는 이 문서가 직접 쓰지 않는다.** 대신 공개된 권위 있는 표준 문서(OWASP WSTG, Wazuh 공식 PoC 가이드, 취약 앱의 공식 README, Emerging Threats/CRS 룰)를 `references.md`에 링크로 정리하고, 팀은 그 절차를 따른다. 이 문서는 그 결과로 **우리 SOC가 무엇을 봐야 하는지**를 정의한다.
 
@@ -10,7 +10,7 @@
 - **승인된 캡스톤 실습 환경 전용.** 대상은 우리가 구축한 격리 랩 호스트뿐: Groot_A(192.168.16.230), Groot_C DVWA(A 경유 `http://192.168.16.230/` → `/dvwa/`), Groot_C Log4Shell 랩(A의 시나리오 경로 토글을 켠 동안만 A:8080→C:8080). B/C의 과거 외부 IP로 직접 접근하는 경로는 제거됐다. 그 외 어떤 시스템도 대상 아님.
 - **Kali는 설계상 캠퍼스 VM 외부 세그먼트 `192.168.16.0/25`에 직접 연결한다.** A의 `ens192`는 `192.168.16.230/25`(직결 `192.168.16.128/25`)지만 10443 DNAT 허용 소스와 저장소 `OBS_SEG`는 `192.168.16.0/25`로 설정돼 있다. Kali의 실제 주소·라우팅은 아직 미확인이다. 공격 전에 출발지와 A까지의 왕복 경로를 확인한다. 캠퍼스 VPN(GlobalProtect) 경유 공격 트래픽은 캠퍼스 방화벽이 연결 쌍을 차단해 관리 접속까지 끊긴다(2026-09-26 실측). → [[campus-vpn-no-attack-traffic]]
 - **재현성**: 시나리오 전후로 ESXi 스냅샷 + DVWA "Create/Reset Database". 파괴적 단계(권한상승 등)는 스냅샷 복원으로 원복.
-- **관측 시간대**: 실행 시각(UTC)을 기록해 Wazuh 필터 `timestamp` 범위와 맞춘다. A/B/C 시계는 동기화됨(A←캠퍼스 NTP, B/C←A).
+- **관측 시간대**: 실행·탐지·대응 시각을 날짜와 `+09:00` 오프셋이 포함된 KST로 기록한다. Wazuh `timestamp`는 절대 시각이므로 대시보드 표시 시간대를 확인하고 같은 순간에 해당하는 범위로 필터한다. A/B/C 호스트는 2026-10-06부터 `Asia/Seoul`이며 NTP 동기화됨(A←캠퍼스 NTP, B/C←A). Mattermost 컨테이너는 KST로 재배포했고, 다른 컨테이너 내부 표시는 UTC일 수 있다.
 
 ## 실행 전 반드시 해결할 선행조건 (팀 확인 필요)
 1. **DVWA 보안 레벨**: 현재 `impossible`(config `DEFAULT_SECURITY_LEVEL`). 웹 공격 시나리오(1) 전에 **`low`**로 낮춰야 SQLi/XSS가 성립. C 담당자와 협의.
@@ -35,6 +35,6 @@
 - 유용한 필터: `rule.groups: capstone`(우리 로컬 룰), `agent.name: groot-web`(C), `agent.name: groot-sec`(A), `rule.id: 100121`(차단 대응), `data.srcip: <Kali IP>`.
 - 취약점: 대시보드 Vulnerability Detection → Inventory/Events (agent 002).
 - 우리 로컬 룰 요약: 100102 WAF 임계초과, 100103 WAF 버스트, 100111 Suricata medium, 100121 agent_block 차단, 100126/100127 차단 IP 계속 타격, 100128/100129 호스트 FW inbound drop/스캔. 내장: 31103 SQLi, 31105 XSS, 31101 4xx, 5710/5712 SSH 무차별.
-- B의 `local_decoder.xml`·`local_rules.xml`에는 신규 FW `SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`, WAF `GROOT_A/*`, IPS 로컬 SID 1000xxx를 위한 전용 항목이 없다. **IPS SID가 기존 Suricata 룰로 분류되는지는 미확인**이므로 먼저 `alerts.json`·대시보드를 대조하고 빠진 분류만 추가한다. [alerts.md](alerts.md)의 Verified는 실제 경보를 확인한 뒤 표시한다.
+- B의 `local_decoder.xml`·`local_rules.xml`에는 신규 FW `SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`, WAF `GROOT_A/*`, IPS 로컬 SID 1000xxx를 위한 전용 항목이 없다. **SID `1000010`은 기존 Suricata 룰 `100110`으로 분류됨을 확인**했고, 나머지 신규 ID는 `alerts.json`·대시보드와 대조해 빠진 분류만 추가한다. [alerts.md](alerts.md)의 Verified는 해당 시나리오에서 공격·탐지·대응을 실제 확인한 뒤 표시한다.
 
 *이 문서군은 팀이 소유한 격리 실습 인프라의 방어 검증용이다.*

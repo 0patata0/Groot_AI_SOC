@@ -112,7 +112,8 @@ systemctl daemon-reload; systemctl enable --now soc-report.timer >/dev/null
 systemctl list-timers soc-report.timer --no-pager --no-legend | awk '{print "  report timer:", $1, $2, $3, $4}'
 
 say "P5 정기 상태요약 타이머(soc-summary) — 하루 2회, 이상 없어도 항상 게시(heartbeat)"
-SUMMARY_HOURS=${SUMMARY_HOURS:-12}; SUMMARY_ONCAL=${SUMMARY_ONCAL:-*-*-* 00,12:00:00}   # UTC 00,12시 = KST 09,21시
+SUMMARY_HOURS=${SUMMARY_HOURS:-12}
+SUMMARY_ONCAL=${SUMMARY_ONCAL:-"*-*-* 09,21:00:00 Asia/Seoul"}   # 호스트 타임존 변경과 무관하게 KST 09·21시
 cat > /etc/systemd/system/soc-summary.service <<EOF
 [Unit]
 Description=capstone SOC periodic STATUS SUMMARY (always posts) to Mattermost

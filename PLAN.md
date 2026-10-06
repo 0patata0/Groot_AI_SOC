@@ -9,15 +9,16 @@
 
 > **한 장 요약은 [STATUS.md](STATUS.md)** (라이브 헬스·접속 치트시트·다음 할 일).
 
-## 현재 상태 (2026-09-27)
+## 현재 상태 (2026-10-06 SSH 재점검 기준)
 
-- 인프라 구축 진행 중(순차). VM 3대(Ubuntu 24.04.5) 생성 완료.
-- **A**: Docker(오프라인)·**NAT 게이트웨이 완료**·**Wazuh Agent(001 Active)**·**Suricata IDS + ModSecurity WAF 배치·검증 완료(2026-09-26)** → eve.json/audit.log가 Wazuh로 흐름.
-- **B**: **Wazuh 4.14.8 스택 기동 완료**(비번 통일) + A 보안스택용 로컬 룰(`infra/groot-b/local_rules.xml`) 적용·경보 인덱싱 검증 완료.
+- A/B/C를 2026-10-06 05:05~05:07 UTC(14:05~14:07 KST)에 SSH로 읽기 전용 재점검했다. 10/6 선행 배치 세부 내용은 [같은 날 작업 기록](대화기록/2026-10-06.md) 참조. 공격 프로브·차단 전환은 이번에 실행하지 않았다.
+- VM 3대(Ubuntu 24.04.5)와 NAT 게이트웨이, Wazuh·MCP·Hermes·Mattermost 경로가 구축됐다. B/C의 임시 외부 NIC `ens192`는 제거됐고 기본 경로는 A다.
+- **A**: FW v2 적용(`FORWARD=DROP`, `CAPSTONE-FWD` 14룰, nft `SPOOF`/`FW_SSH_RATE`/output 체인). WAF healthy·`nginx -t` 통과·`REQUEST-948-GROOT_A_WAF.conf` 마운트(DetectionOnly), Suricata ET+local 합본·Phase-A(`-i ens192`, passive), eve.json 갱신을 SSH로 확인했다. 선행 10/6 기록에 `community_id` 275건이 있다. 신규 공격 경보 실발화는 미확인.
+- **B**: Wazuh 000/001/002 Active, manager·indexer·dashboard·Mattermost·Hermes Up, DGX API 200을 SSH로 확인했다. **라이브 `local_decoder.xml`/`local_rules.xml`에 신규 FW 프리픽스·WAF 100200+ 룰이 없다.** IPS local SID의 분류는 미확인.
 - ⚠️ 운영 제약(2026-09-26 실제 발생): **공격성 테스트 트래픽을 캠퍼스 VPN 경유로 보내면 캠퍼스 FW가 (VPN IP↔A) 쌍을 차단**해 A 관리접속이 끊김. IDS/WAF 테스트는 반드시 Kali/B/C 등 **VM 세그먼트 안**에서. A 복구 경로: `ssh -J groot-b groot_a@10.200.10.1`.
-- **C**: OS·네트워크·DVWA(베어메탈)·**Docker+log4shell-lab 완료**, **Wazuh Agent 002 Active**·취약점 2,422건 인덱싱. Log4Shell 랩은 **C 내부 전용 격리**(시나리오 때만 A 경유 토글).
-- **MCP**: 읽기 서버(B, `ssh -T groot-mcp`) + **응답 서버(A, `ssh -T groot-resp`, block_ip→agent_block) 배치·계약 테스트 완료(2026-09-27)**. 클라이언트 설정은 각 한 줄(런타임 불가지론). 런타임(Claude Code vs Hermes) 결정은 보류.
-- 제약: 이 망 outbound 웹(80/443)·DGX(11434) 전면 차단 → 모든 반입 오프라인. DGX 연결 보류(관리자 permit 대기).
+- **C**: `ens192` 제거·기본 경로 A, Apache·Wazuh Agent active, DVWA 302, `log4shell-lab` 가동(`10.200.10.20:8080` 내부 바인딩), NTP 동기화를 SSH로 확인했다. 취약점 2,422건 인덱싱은 이전 기록의 수치다.
+- **MCP·Agent**: 읽기 서버(B)와 응답 서버(A) 배치·계약 테스트 완료. 런타임은 Hermes(B)로 결정·배치했고 DGX 추론, 경보 조사, Tier 2 승인→차단 경로를 2026-09-28에 E2E 검증했다.
+- 제약: 일반 웹(80/443) 반출 제한으로 이미지·패키지는 오프라인 반입. DGX `:11434` 연결은 확보됐다.
 - 주요 결정 확정: LLM=DGX Spark(A-1)/보류 시 로컬 Ollama, 오케스트레이션=Docker Compose(B-1), 보안장비=nftables/Suricata/ModSecurity+CRS, Wazuh=4.14.8.
 
 ---
@@ -36,14 +37,14 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
   │  ┌──────────────────────────┐                      │
   │  │ 2026_capstone_Groot_A          │  ← 네트워크 관문/검사 │
   │  │  보안장비 (Docker)         │                      │
-  │  │  ├─ FW  (nftables/OPNsense)│                     │
-  │  │  ├─ IPS (Suricata inline)  │                     │
+  │  │  ├─ FW  (nftables)         │                     │
+  │  │  ├─ IPS (Suricata passive) │                     │
   │  │  └─ WAF (ModSecurity+CRS)  │                     │
   │  └────────────┬─────────────┘                      │
   │               ▼ (검사 통과 트래픽)                   │
   │  ┌──────────────────────────┐                      │
   │  │ 2026_capstone_Groot_C          │  ← 메인 웹서버        │
-  │  │  ├─ DVWA (Docker)          │  (웹공격 대상)        │
+  │  │  ├─ DVWA (베어메탈)        │  (웹공격 대상)        │
   │  │  ├─ CVE 취약 컨테이너       │  (Log4Shell 등)      │
   │  │  └─ Wazuh Agent            │                      │
   │  └────────────┬─────────────┘                      │
@@ -63,11 +64,12 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
       Policy Engine 은 응답 MCP(Groot_A) 안. DGX 는 추론만 담당.
 ```
 
-트래픽 흐름: Kali → Groot_A(FW→WAF→IPS 검사) → Groot_C(DVWA/CVE). 로그는 전부 Groot_B의 Wazuh로 집중. LLM Agent는 Groot_B의 MCP Server를 통해 조사·대응.
+트래픽 흐름: Kali → Groot_A의 FW·WAF → Groot_C(DVWA/CVE). Suricata는 A 외부 인터페이스에서 passive로 관찰한다. WAF는 DetectionOnly다. 로그는 Groot_B의 Wazuh로 집중하고, Hermes(B)는 MCP를 통해 조사·대응한다.
 
 네트워크 세그먼트(실제 구성 = 2세그먼트, 2026-09-29 확정):
-- 임시 외부망 세그먼트 `192.168.16.0/25` (Kali·운영자 ↔ Groot_A 관문, A가 NAT)
+- A 외부 NIC의 **실측 직결망은 `192.168.16.128/25`**(`192.168.16.230/25`, GW `.129`). A의 10443 DNAT 출발지 허용목록은 별도 `192.168.16.0/25`이며, Kali 주소·라우팅은 아직 확인되지 않았다. Kali→A 경로를 검증하기 전 두 대역을 같은 직결 세그먼트로 취급하지 않는다.
 - 내부망 세그먼트 `10.200.10.0/24` (Groot_A ↔ Groot_B/Groot_C — Wazuh/MCP/Hermes)
+- B/C는 2026-10-02에 외부 NIC `ens192` 물리 제거를 완료했고, 10/6 SSH 재점검에서 NIC 부재와 기본 경로 A를 재확인했다.
 - 외부/DMZ/관리 3세그먼트 분리는 캠퍼스망 제약·구축 범위상 미채택
 
 ### 온프레미스 전환의 이점 (AWS 대비)
@@ -84,17 +86,17 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 이 호스트에는 Groot_A/B/C만 올린다(DGX Spark는 ARM 외부장비, Kali는 노트북 → 호스트 자원 미사용).
 
-| VM | 역할 | 목표(이 프로젝트) | NIC(세그먼트) |
+| VM | 역할 | 목표(이 프로젝트) | 운용 NIC(10/6 기록) |
 |---|---|---|---|
-| Groot_A | 보안장비(FW/IPS/WAF) | **2C / 6G / 60G** | EXT, DMZ, MGMT |
-| Groot_B | SIEM + MCP | **4C / 16G / 150G** | MGMT |
-| Groot_C | 웹서버(DVWA/DB/CVE) | **2C / 6G / 60G** | DMZ, MGMT |
+| Groot_A | 보안장비(FW/IPS/WAF) | **2C / 6G / 60G** | 외부 `ens192`·내부 `ens160` |
+| Groot_B | SIEM + MCP | **4C / 16G / 150G** | 내부 `ens160` |
+| Groot_C | 웹서버(DVWA/DB/CVE) | **2C / 6G / 60G** | 내부 `ens160` |
 | 우리 몫 합계 | | **8C / 28G / 270G** | 호스트 CPU의 ~40%, RAM의 ~11% |
 | 남는 여유 | 다른 서버용 | 약 12C / 228G | |
 
 배분 원칙:
 - RAM은 256G로 남아돌아 병목인 Groot_B(Wazuh Indexer)에 16G를 넉넉히 준다(RAM으로 병목 해소). CPU는 공유 자원이라 8 vCPU로 보수적.
-- 인터넷 경로: 관리 NIC 하나를 호스트 실제망(192.168.16.0/24, GW .129)에 연결해 패키지·NGC·NVD/KEV 접근 확보.
+- 네트워크 경로: A가 외부망과 내부망 사이의 관문이며 B/C의 기본 경로는 A다. 일반 웹 반출은 제한돼 패키지·이미지는 오프라인 반입했다.
 - 확인 필요: 데이터스토어 여유 ≥ 300G (이미지에 디스크 용량 미표시).
 - 외부 고정: DGX Spark(GB10, 128G 통합, 30B BF16 여유), Kali 노트북(2C/4G).
 - 주요 SW: Groot_A(nftables/Suricata/ModSecurity+nginx/Wazuh Agent), Groot_B(Wazuh Mgr·Indexer·Dash/MCP Server), Groot_C(DVWA/DB/CVE/Wazuh Agent).
@@ -109,7 +111,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 | 구성 | DGX Spark에서 **Ollama** 추론(`qwen3.6:35b`), Agent Runtime(Hermes)은 Groot_B 상주(MCP와 같은 세그먼트), Policy Engine은 응답 MCP(Groot_A) 안 | ESXi 호스트 GPU를 VM 하나에 패스스루하여 추론 실행 |
 | 장점 | 제안서 "DGX Spark 기반" 정체성 유지, 128GB로 30B 여유, 관제망과 물리 분리 | 전 구성이 한 호스트에 모임, 관리 단순 |
 | 단점 | DGX Spark ↔ ESXi 네트워크 연결 필요 | 제안서 전제(DGX Spark)와 어긋남, ESXi 호스트에 충분한 GPU 필요, 패스스루 설정 |
-| 공통 | 어느 쪽이든 MCP Server는 Groot_B(별도 머신)에 두어 자격증명 격리(A안) 유지. Agent 프로세스에는 자격증명 없음 | |
+| 공통 | 읽기 MCP는 Groot_B, 응답 MCP는 Groot_A에 두어 자격증명 격리(A안) 유지. Agent 프로세스에는 자격증명 없음 | |
 
 → **결정: A-1 (DGX Spark).** 과제 정체성과 자격증명 격리에 가장 잘 맞음. A-2는 DGX Spark 사용 불가 시 대안.
 
@@ -131,7 +133,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 |---|---|---|
 | 모델 | **`qwen3.6:35b`** (채택) | tool calling·thinking 지원, DGX Ollama `.110`에 256k ctx 상주. 초기 계획 Qwen3-30B-A3B(MoE)/32B 비교에서 실제 상주 모델로 확정 |
 | 추론 서버 | **Ollama** (:11434, OpenAI 호환 `/v1`) — DGX Spark 211.170.162.110/.111 두 엔드포인트 | Qwen3 tool calling·thinking 지원, `qwen3.6:35b` 채택(.110에 256k ctx 상주). vLLM은 대안 |
-| MCP 역할 | 자격증명 격리 보안 경계 (A안). MCP Server는 Groot_B, Agent는 자격증명 없음 | 온프레미스 분리로 경계 더 명확 |
+| MCP 역할 | 자격증명 격리 보안 경계 (A안). 읽기 MCP는 Groot_B, 응답 MCP는 Groot_A, Agent는 자격증명 없음 | 온프레미스 분리로 경계 더 명확 |
 | Alert 전달 | Indexer 폴링 (전 구간 내부망이라 웹훅도 가능) | |
 | 공격 시나리오 | DVWA(웹공격) + CVE 컨테이너(Log4Shell 등) 병행 | KEV 등재 CVE |
 | 대응 | 자동은 되돌릴 수 있는 동작만, 고위험은 사람 승인 | Policy Engine + HITL(⚠️Slack 불가, 443 차단 — 온프레미스 Mattermost 로 대체 완료, Tier 2 승인) |
@@ -143,10 +145,10 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 | 역할 | 제품 | 비고 |
 |---|---|---|
 | FW | nftables (게이트웨이 netfilter) | Response Tool이 drop 규칙 조작. 대안 OPNsense |
-| IPS | Suricata (inline, NFQUEUE) + ET Open 룰 | eve.json → Wazuh |
-| WAF | ModSecurity v3 + OWASP CRS (nginx 리버스 프록시) | DVWA 앞단, 감사로그 → Wazuh |
+| IPS | Suricata passive + ET Open·local 룰(인라인 NFQUEUE 전환 예정) | eve.json → Wazuh |
+| WAF | ModSecurity v3 + OWASP CRS + 신규 룰(nginx 리버스 프록시) | DetectionOnly 유지, 감사로그 → Wazuh |
 
-트래픽 순서: Kali → Groot_A(FW → IPS → WAF) → Groot_C.
+트래픽 경로: Kali → Groot_A의 FW·WAF → Groot_C. Suricata는 현재 passive 관찰 중이다.
 
 ---
 
@@ -154,9 +156,9 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 - [x] ESXi 호스트 사양 확인 (CPU/RAM/디스크, GPU 유무 → 옵션 A-2 가능 여부) — 사양표 1.5, GPU 없음 → A-1 유지
 - [x] VM 3대 생성: 2026_capstone_Groot_A / _B / _C (**Ubuntu Server 24.04.5 LTS**, GUI 없이 동일 버전 통일), Kali는 노트북 호스트 — user groot_a/b/c, host groot-sec/siem/web
-- [x] ESXi 포트그룹 세그먼트 구성 — **2세그먼트로 확정(2026-09-29)**: 내부망(10.200.10.0/24) + 임시 외부망(192.168.16.0/25), Groot_A가 NAT 게이트웨이. 캠퍼스망 제약·구축 범위상 외부/DMZ/관리 3세그먼트 분리는 하지 않기로 결정(파이프라인은 2세그먼트로 완결)
-- [x] (확정 B-1) 각 VM에 Docker/Compose 설치 — **A·B 완료**(오프라인 static Docker 29.8.1 + Compose v5.5.1, hello-world 검증). C는 별도 담당 대기
-- [x] (확정) 보안장비 이미지 준비: nftables(FW), Suricata inline(IPS, ET Open), ModSecurity+OWASP CRS(WAF, 공식 이미지) — A에 `jasonish/suricata:latest`·`owasp/modsecurity-crs:nginx`, B에 Wazuh 4.14.8 오프라인 반입 완료. nftables 네이티브
+- [x] ESXi 포트그룹 세그먼트 구성 — **2세그먼트로 확정(2026-09-29)**: 내부망(10.200.10.0/24) + A 외부 직결망(`192.168.16.128/25`, 10/6 SSH 재확인), Groot_A가 NAT 게이트웨이. A의 10443 허용 출발지 `192.168.16.0/25`는 직결망과 다르며 Kali 경로 확인이 남았다. 캠퍼스망 제약·구축 범위상 외부/DMZ/관리 3세그먼트 분리는 하지 않기로 결정.
+- [x] (확정 B-1) 각 VM에 Docker/Compose 설치 — A·B 오프라인 설치·검증, C Docker와 `log4shell-lab` 가동(2026-09-26 담당자 확인)
+- [x] (확정) 보안장비 이미지 준비: nftables(FW), Suricata passive IDS(ET Open+local, 인라인 IPS는 후속 전환), ModSecurity+OWASP CRS(WAF, 공식 이미지) — A에 `jasonish/suricata:latest`·`owasp/modsecurity-crs:nginx`, B에 Wazuh 4.14.8 오프라인 반입 완료. nftables 네이티브
 - [x] 저장소 디렉터리 구조 생성 — infra/groot-a·b·c 등
 
 디렉터리 구조 (초안)
@@ -181,17 +183,18 @@ capstone_project/
 
 ### 1-1. 2026_capstone_Groot_A (보안장비)
 - [x] 게이트웨이 역할 설정 (외부↔DMZ 라우팅, IP 포워딩) — NAT masquerade(10.200.10.0/24→ens192) + DOCKER-USER forward + ip_forward 영구화, `capstone-nat.service`, B 경유 검증 완료
-- [x] FW: nftables 규칙(기본 차단+웹 허용). Response Tool이 규칙을 조작할 인터페이스 마련 — **완료(2026-09-27)**: NAT(`capstone_gw`) + 관리 포트포워딩(`capstone_fwd`: **웹서비스 DVWA만 기본 IP 노출(80)**, 관리포털은 특정포트 **A:10443→B:443**(캠퍼스 `https://192.168.16.230:10443`), **443 비움**, VPN 관리는 SSH 터널, WAF TLS 8443) + **Phase 2 호스트 방화벽 `inet capstone_fw`**(`capstone-fw.nft`: input 기본 drop, 허용=lo/established/ICMP/내부 NTP/SSH; 캠퍼스 L2 잡음 무로그 drop; 출발지별 미터 로그 `FW_DROP_IN`) + **`agent_block`**(raw prerouting drop 셋 + `never_block` 잠금가드 + CLI `/usr/local/sbin/agent_block add|del|list|flush`, TTL 10s~24h, 상태파일로 재부팅 복원, 모든 동작 syslog→Wazuh). 외부→내부 forward 는 Docker FORWARD(drop)+DOCKER-USER 선별 허용 — **⚠️ 2026-10-01 감사: 실제 FORWARD 정책이 ACCEPT 로 deny-by-default 미적용(비허용 라우팅 forward 통과, WAF 우회 가능). 담당자 IPS/WAF 룰과 취합 시 DROP 반영 예정 → `보안룰_취합.md` F-1**. 데드맨 타이머+`.pending` 방식으로 잠금 없이 적용(`fw_phase2.sh`/`fw_confirm.sh`), `nftables.service` mask. **실측**: B 외부IP 90s 차단→A 경유 전면 차단·내부 무영향·해제·복원, B 경보 100121/100122/100125. 인라인 IPS(NFQUEUE) 전환은 미정
-- [x] IPS: Suricata — **1단계 IDS(passive, ens192) 배치 완료(2026-09-26)**: 8.0.6, ET Open 52,483룰 `-S` 배타 로드, `HOME_NET=[10.200.10.0/24,192.168.16.230/32]`(기본값이면 공격자 대역이 내부로 잡혀 경보 0), `stats.interval=60`, Hyperscan 캐시 볼륨. B에서 `curl -A sqlmap/1.0` → **sid 2008538 경보 실측**. inline(NFQUEUE) 전환은 Phase2. `infra/groot-a/docker-compose.yml`·`deploy_secstack.sh`(리뷰 반영 게이트형). **ET Open 룰셋 오프라인 반입·리뷰 완료**(`~/capstone/suricata/rules`, md5검증, lua 0 · `suricata-rules.md`)
-- [x] WAF: ModSecurity v3 + OWASP CRS 4.29 — **배치 완료(2026-09-26)**: nginx 리버스 프록시 :80/:443 → `groot-web:80`(DVWA, 경로 `/dvwa/`), DetectionOnly(차단 전환은 `MODSEC_RULE_ENGINE=On`), JSON 감사로그 `logs/modsec/audit.log`(uid 101 소유 필수). 실 클라이언트 IP 기록 확인, CRS 913100/942100/949110 실측
-- [x] Wazuh Agent 설치 — **완료(2026-09-26)**: 4.14.8 오프라인 dpkg(배포변수 WAZUH_MANAGER=groot-siem), authd 자동등록 → 매니저 **ID 001 groot-sec Active**. 기본 active-response는 비활성(응답은 MCP→nft `agent_block` 로만). 스크립트 `infra/groot-a/install_agent.sh`. **IPS/WAF 로그 전송 완료**: `agent_localfile.sh`(eve.json·audit.log json localfile, label capstone.source) → B 도착 검증. 로그 회전 `logrotate-capstone-secstack`(daily/500M/14, copytruncate). FW(nft) 로그는 Phase2 차단정책과 함께
+- [x] FW: nftables 게이트웨이·`agent_block` — 2026-09-27 NAT·호스트 input 기본 차단·관리 DNAT·응답 CLI와 실차단 검증 완료. **2026-10-06 기록상 FW v2 적용·확정**: `FORWARD=DROP`, `CAPSTONE-FWD` 14룰, `capstone_fw` v2(SPOOF·SSH rate·output 체인), 데드맨 타이머 0. 대시보드 DNAT와 A→B:443·A→C:80 경로 보존. 10/1의 FORWARD=ACCEPT 감사 결과는 이 적용으로 해소됨. 신규 FW 로그의 B 분류·실발화는 미확인.
+- [x] IPS: Suricata — 2026-09-26 passive IDS/ET Open 배치와 기존 sid 2008538 경보 실측 완료. **2026-10-06 기록상** `-S /rules/all.rules`(ET+local) 및 Phase-A(community-id·ja3/ja4·threshold) 적용, eve `community_id` 275건 확인. **local SID 1000xxx의 공격 발화는 미검증**, NFQUEUE 인라인 전환은 후속 게이트.
+- [x] WAF: ModSecurity v3 + OWASP CRS 4.29 — 2026-09-26 기본 배치·기존 CRS 경보 실측 완료. **2026-10-06 기록상** `REQUEST-948-GROOT_A_WAF.conf`의 SecRule 11개 로드·`nginx -t` 통과, 리버스프록시 정상. **DetectionOnly 유지**; 신규 `GROOT_A/*` 룰의 audit→Wazuh 실발화 및 `On` 전환은 후속 검증.
+- [x] Wazuh Agent 설치 — **완료(2026-09-26)**: 4.14.8 오프라인 dpkg(배포변수 WAZUH_MANAGER=groot-siem), authd 자동등록 → 매니저 **ID 001 groot-sec Active**. 기본 active-response는 비활성(응답은 MCP→nft `agent_block` 로만). 스크립트 `infra/groot-a/install_agent.sh`. **기존 IPS/WAF 로그 전송 완료**: `agent_localfile.sh`(eve.json·audit.log json localfile, label capstone.source) → B 도착 검증. 로그 회전 `logrotate-capstone-secstack`(daily/500M/14, copytruncate). FW Phase 2 로그는 B 기존 룰로 수집됐고, FW v2 신규 접두사 분류와 실발화는 미검증.
 
 ### 1-2. 2026_capstone_Groot_B (Wazuh + MCP)
 - [x] Wazuh all-in-one 설치 (Manager+Indexer+Dashboard) — **기동 완료(2026-09-26)**: 4.14.8 single-node compose, 인증서는 오프라인 `wazuh-certs-tool.sh`(openssl)로 생성. 인덱서 green·대시보드 302·API 토큰 OK. 절차 `infra/groot-b/README.md` (⚠️ 인증서 권한 644 필수). **기본 비번 교체 완료**(3계정 통일, 데모계정 삭제, 값은 CREDENTIALS.local.md)
 - [x] Groot_A/C의 Agent 등록, Dashboard에서 Active 확인 — **완료**: 001 groot-sec(A)·002 groot-web(C) 모두 Active(2026-09-26, 2026-09-27 재확인). 매니저 000 포함 3대
 - [x] Suricata eve / ModSecurity 감사로그 수집 룰 확인, MITRE 태그 확인 — **완료(2026-09-26)**: Suricata는 내장 86601(lv3) 위에 severity별 100110(lv9)/100111(lv6)+버스트 100112, ModSecurity는 내장 룰 없음 → JSON 필드 기반 100100~100103(CRS 히트 lv7, 임계 초과 lv10, 버스트 lv12), MITRE T1190/T1595. `infra/groot-b/local_rules.xml`(wazuh-logtest·`analysisd -t` 검증 후 적용). B에서 A로 프로브 → **alerts.json·인덱서(`rule.groups:capstone`) 5건 실측**
+- [ ] **신규 신호 Wazuh 디코더·룰 보완**: 10/6 SSH 점검에서 B 라이브 `local_decoder.xml`/`local_rules.xml`에 FW `SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`와 WAF `GROOT_A/*` 100200–299용 항목이 없음을 확인했다. 추가 후 대시보드 분류를 검증한다. IPS local SID 1000xxx 분류는 별도 확인.
 - [x] Vulnerability Detection 활성화 (OS 패키지 CVE 매핑 확인) — **완료**: C(002) 취약점 상태 2,422건 인덱싱, 대시보드 Vulnerability Inventory 확인, `/soc vulns` 조회
-- [x] MCP Server 배치 (자격증명은 여기에만). LLM 실행처에서 접근 확인 — **읽기 서버 배치·검증 완료(2026-09-26)**: `mcp-server-wazuh` v0.3.0(sha256 검증) `/opt/mcp/`, 전용 사용자 `mcp` + sshd ForceCommand + authorized_keys restrict, 읽기전용 계정 `mcp-ro`(API readonly / 인덱서 readall, 쓰기 403 실증), 자격증명은 B `/etc/mcp/wazuh-ro.env`에만. Mac에서 `ssh -T groot-mcp`(A 점프 전용 키)로 **계약 테스트 PASS**(initialize·14 tools·get_wazuh_alert_summary 실경보 반환). `infra/mcp/deploy_mcp_B.sh`(적대적 리뷰 5관점 반영), `contract_test.py`. 차단(block_ip)은 소형 응답서버로 별도
+- [x] 읽기 MCP Server 배치(B의 읽기 자격증명 격리), LLM 실행처에서 접근 확인 — **읽기 서버 배치·검증 완료(2026-09-26)**: `mcp-server-wazuh` v0.3.0(sha256 검증) `/opt/mcp/`, 전용 사용자 `mcp` + sshd ForceCommand + authorized_keys restrict, 읽기전용 계정 `mcp-ro`(API readonly / 인덱서 readall, 쓰기 403 실증), 자격증명은 B `/etc/mcp/wazuh-ro.env`에만. Mac에서 `ssh -T groot-mcp`(A 점프 전용 키)로 **계약 테스트 PASS**(initialize·14 tools·get_wazuh_alert_summary 실경보 반환). `infra/mcp/deploy_mcp_B.sh`(적대적 리뷰 5관점 반영), `contract_test.py`. 차단 권한·승인 브로커 설정은 A의 별도 응답 MCP 경계에 있다.
 
 ### 1-3. 2026_capstone_Groot_C (메인서버)
 - [x] DVWA 실행 (웹공격 대상) — **베어메탈로 설치·구동 중**(별도 담당). 하이브리드: DVWA 베어메탈 유지, 재현성은 ESXi 스냅샷+DVWA Reset
@@ -203,7 +206,9 @@ capstone_project/
 - [ ] nmap/nikto/sqlmap/hydra, Log4Shell PoC + 악성 LDAP(marshalsec) 준비
 
 ### 1-5. 경보 검증
-- [~] 시나리오 1~3 실행 → IPS/WAF/Wazuh 경보 발생 확인, rule id 기록(`scenarios/alerts.md`) — **시나리오·탐지 검증 문서 완비(2026-09-27)**: `scenarios/`(README·scenario-1 웹, scenario-2 Log4Shell, scenario-3 privesc, alerts 매트릭스, references). 공격 생성 절차는 공개 표준(OWASP WSTG, Wazuh PoC, 앱 README, ET/CRS) 링크로 인용, 우리 룰 id에 매핑. **실행은 선행조건 해결 후**: DVWA level low(C 담당), Log4Shell 경로 **결정됨**(A 경유 토글 `scenario_log4shell_route.sh`, 평상시 랩은 C 내부 격리), sudo 취약 버전 확인, Kali 세그먼트 직결
+- [~] 시나리오 1~3 실행 → IPS/WAF/Wazuh 경보 발생 확인, rule id 기록(`scenarios/alerts.md`) — **시나리오·탐지 검증 문서 완비(2026-09-27), 실행은 미완료**. 선행조건: DVWA level low(C 담당), A Log4Shell 토글 설치본의 `OBS_SEG` 동기화와 경로 확인, C sudo 패키지의 CVE 취약성 확인(현재 1.8.31 버전 문자열만 관측), Kali 주소·라우팅 확인과 VPN을 통하지 않는 실습 경로.
+- [ ] **신규 룰 실발화 확인**: VM 세그먼트에서 공격 프로브를 실행해 WAF audit·IPS eve·FW 로그→B Wazuh alerts 경로를 실측한다(캠퍼스 VPN 경유 금지).
+- [ ] **앱 계층 차단 전환**: WAF `On`·Suricata NFQUEUE 인라인 drop은 현재 미적용. 탐지 실측 후 별도 게이트에서 전환·검증한다. 시나리오 `OBS_SEG`는 저장소 스크립트에 있으나 A 설치본에는 없으며, 허용 목적지 `192.168.16.0/25`가 실제 Kali 대역인지 확인한 뒤 배포한다.
 - [x] FW 자동 차단(nftables) 동작 확인 → Baseline 대응 — `agent_block`/`inet capstone_fw` 완료·실차단 검증(1-1 참조). 대응 룰 100121/100126~100129
 
 ---
@@ -212,13 +217,13 @@ capstone_project/
 
 목표: 경보 발생 시 Agent가 자동 조사하고 판단·대응 제안을 산출.
 
-### 2-1. MCP Server (Groot_B)
-설계 원칙(A안): MCP Server는 Agent와 별도 머신(Groot_B)에서 실행, 자격증명(Wazuh API, FW/IPS 접근, Mattermost 봇 토큰)은 여기에만.
+### 2-1. MCP Server (읽기 Groot_B, 응답 Groot_A)
+설계 원칙(A안): Hermes는 B의 격리 컨테이너에서, 읽기 MCP는 B의 별도 계정·프로세스에서, 응답 MCP·Policy Engine은 A의 별도 계정·프로세스에서 실행한다. Wazuh 읽기 자격증명은 B의 MCP 환경에, 차단 권한과 승인 브로커 설정은 A의 응답 경계에 두며 Hermes에는 주지 않는다.
 **클라이언트 불가지론(pluggable agent)**: 서버는 어떤 AI가 붙는지 모르게 설계 — 에이전트 런타임/LLM 교체는 클라이언트 설정 1블록만 변경(전송 계약: 1차 stdio over SSH → 확장 HTTP). 설계·템플릿·계약테스트: `infra/mcp/README.md`. 읽기 서버는 기성 `gbrigandi/mcp-server-wazuh` v0.3.0(리뷰 완료), 응답 서버는 소형 커스텀(별도 자격증명).
 - [x] Wazuh Tool: `search_alerts`, `get_alert`, `get_agent_status`, `get_vulnerabilities` — **읽기 MCP 서버 14툴로 커버**(계약테스트 PASS) + SOC 챗봇 `/soc alerts|agents|vulns`로 실사용
 - [ ] CVE Tool: `cve_lookup` → NVD + CISA KEV — **CISA KEV 오프라인 반입·리뷰 완료**(B `~/capstone/kev`, 1,726건, CC0, 시나리오 CVE 포함 · `infra/groot-b/kev-data.md`). NVD 상세는 보완 예정
 - [x] Server Tool: 프로세스/포트/FIM/인증 — **읽기 MCP 서버로 커버**(계약테스트 PASS): 프로세스·포트는 `get_wazuh_agent_processes`/`get_wazuh_agent_ports`, FIM·인증 이벤트는 Wazuh 알림·매니저 로그 조회(`get_wazuh_alert_summary`/`search_wazuh_manager_logs`)로 확인. 경보 조사 프롬프트에서 실사용
-- [x] Network Tool: IPS(Suricata)·WAF·FW 로그 조회 — **Wazuh 집중 로그로 커버**: 세 소스 모두 `Groot_B` Wazuh 로 모여 `get_wazuh_alert_summary`·`search_wazuh_manager_logs`(`rule.groups=capstone`, Suricata/ModSecurity/nft 라벨)로 조회. 별도 `search_suricata` 툴 대신 SIEM 단일 조회로 통합
+- [x] Network Tool: IPS(Suricata)·WAF·FW 로그 조회 — 기존 세 소스의 Wazuh 집중 로그를 읽기 MCP로 조회 가능. **2026-10-06 SSH 점검에서 B 신규 FW·WAF 디코더/룰 부재 확인**; 추가 후 MCP 조회 결과를 검증한다. IPS local SID 분류는 미확인.
 - [x] Response Tool `block_ip`/`unblock_ip`/`list_blocks` — **완료(2026-09-27)**: 응답 MCP 서버(A, 파이썬 stdlib stdio, `infra/mcp/response-mcp.py`), 전용 사용자 `resp`(sshd ForceCommand + authorized_keys restrict) + sudoers(agent_block add/del/list 만, flush 금지) → nft `agent_block`. 정책 엔진(TTL 상한 RESP_MAX_MINUTES=120, reason 필수·정규화, IP 검증, flush 미노출). TTL 만료 리퍼(systemd 타이머)로 auto-unblock 감사(action=expire→B 100131). 자격증명 격리 유지(에이전트=키만, 차단 능력=A sudoers). Mac `ssh -T groot-resp` 계약 테스트 PASS: block→100121, 거부(보호IP)→100123, unblock→100122, 만료→100131. 적대적 리뷰 3관점 반영. `deploy_response_A.sh`(데드맨 롤백 트랩). — [ ] `isolate_host`·`notify`(Mattermost)는 추후
 - [ ] `cve_lookup` 등 조사 툴 확장(읽기 서버 14툴 + KEV)
 - [x] 각 Tool 단독 테스트 — **계약테스트 PASS**: 읽기 14툴·응답 3툴(`block_ip`/`unblock_ip`/`list_blocks`) 초기화·호출 검증(`infra/mcp/contract_test.py`), 컨테이너 안 재검증(2026-09-28)
@@ -229,7 +234,7 @@ capstone_project/
 직접 구현이 아니라 Hermes Agent를 사용(교수 지정). MCP 네이티브 지원이라 2-1 MCP Server를 그대로 붙인다.
 - [x] Hermes 설치, `~/.hermes/config.yaml`의 `mcp_servers`에 우리 MCP Server 등록(stdio/HTTP) — **2026-09-28 완료**: 설치 위치=B(MCP 서버가 있는 VM; Mac 은 콘솔), 방식=공식 Docker 이미지 `nousresearch/hermes-agent:v2026.9.24`(amd64 968MB) 오프라인 반입(`infra/tools/pull_image.py`, 레지스트리 API·sha256 검증·OCI layout). `infra/hermes/deploy_hermes_B.sh prep` 완료: 격리 사용자 `hermes`(mcp 그룹 아님) + `/opt/hermes-data`(=/opt/data) + 컨테이너용 SSH 키/config + `config.yaml`(wazuh-ro=full, resp=untrusted) + B(mcp)·A(resp) authorized_keys 에 `restrict,command=` 등록. **호스트측 계약 테스트 PASS(읽기 14툴·응답 list_blocks)**. 이미지 반입·load 후 **컨테이너 안 계약 테스트 PASS(읽기·응답) + Hermes 본체 기동 agent.log `MCP: registered 17 tool(s) from 2 server(s)`**(mcp__wazuh_ro__* 14, mcp__resp__* 3). `hermes mcp test` 는 이미지에 mcp[cli](typer) 가 없어 불가 → `deploy_hermes_B.sh test` 방식. 이미지 tar 는 B `~/capstone/hermes/`(재반입용, 1GB)
 - [x] 모델 프로바이더 = DGX Ollama **211.170.162.110/111 `:11434/v1`**(OpenAI 호환, 2026-09-28 Mac·A·B 모두 도달 실측, Ollama 0.33.2). 모델 **qwen3.6:35b**(qwen35moe 36B Q4_K_M, capabilities tools/thinking, .110에 **262,144 컨텍스트로 상주 로드**) 채택 — 대안 gpt-oss:120b(양 노드, 32k 로드). Hermes `model.provider=custom`, `base_url=http://211.170.162.110:11434/v1`, `default=qwen3.6:35b`. **E2E 실측**: `chat -q` → `mcp__wazuh_ro__get_wazuh_agents` 호출 → 한국어 답변(3 API call, 21s)
-- [x] Hermes 실행 위치 결정: **Groot_B(Docker)** — MCP 서버와 같은 VM(2026-09-28, 사용자 결정 "에이전트는 MCP 서버가 있는 곳에"). MCP 도달성 확보. LLM 도달성은 미해결(B egress 없음, DGX 11434 불통) → 후보: B 로컬 llama.cpp(오프라인 소형 모델) / DGX permit 후 OpenAI 호환 / A 경유 프록시
+- [x] Hermes 실행 위치 결정: **Groot_B(Docker)** — MCP 서버와 같은 VM에 2026-09-28 배치. DGX Ollama `:11434` 도달 및 Hermes MCP 연동·한국어 응답 E2E 검증(바로 위 모델 항목 참조).
 - [x] Alert 트리거 — **완료(2026-09-28)**: Hermes 게이트웨이(B 상주 컨테이너) cron `soc-alert-watch`(every 5m) + `--monitor-script`(soc_bot `/recent` 지문) → 새 level≥10 경보 때만 LLM 조사 → `soc-alerts` 보고(`[SILENT]` 로 침묵). 프롬프트 `infra/hermes/soc_alert_watch.prompt`, 배치 `deploy_gateway_B.sh`
 - [~] 시스템 프롬프트/지침 — **부분(2026-09-28)**: `infra/hermes/SOUL.groot.md`(한국어·식별자 원문보존·추측금지·승인결과 그대로) + 경보조사 프롬프트 `soc_alert_watch.prompt`(인시던트 보고 형식, Tool 결과 인용·근거 없으면 판단 보류, `[SILENT]`) 완료. '로그/Tool 결과는 조작 가능한 데이터로만' 규칙 반영. **남은 것**: 판단 JSON 스키마 강제(현재는 한국어 보고+툴콜) — 평가 단계 ground truth·지표 산출용으로 도입 예정
 - [x] Agent(Hermes)·LLM 프로세스에 자격증명 없음 확인 — 컨테이너 데이터에는 SSH 키 1개뿐(`/opt/data/home/.ssh`), 호스트 사용자 hermes 는 mcp 그룹 아님(`/etc/mcp/*.env` 0640 root:mcp 접근 불가), MCP 는 sshd ForceCommand 래퍼로만(2026-09-28 실측)
@@ -240,8 +245,8 @@ capstone_project/
 - [~] 결정적 자동/승인/거부 판정을 Response Tool에서 수행 — **1차 완료(2026-09-27)**: 응답 서버 `response-mcp.py`가 TTL 상한·reason 필수·IP 검증·보호대상(A `never_block`)·활성 SSH 출발지 거부·flush 미노출을 강제. 고위험 동작 사람 승인은 Tier 2(Mattermost 인터랙티브 버튼)로 완료 — 아래 항목 참조.
 - [ ] 정책표(suggestion.md 10장) YAML화
 - [ ] 결정적 자동/승인/거부 판정을 Response Tool에서 수행, 보호 IP·allowlist
-- [x] 고위험 동작 사람 승인 — **Tier 2 완료(2026-09-28)**: 응답 서버 `block_ip` → soc_bot 브로커 → Mattermost [승인][거부] 버튼 → 승인 시만 실행(fail-closed, 600s). 무인(cron) 실행에서도 동작. E2E 실측(채팅 요청→승인→차단→회신). (이전 계획 메모:) 고위험 동작은 MCP elicitation → 사람 승인. ⚠️ **Slack 무효(2026-09-27 실측: 아웃바운드 443 전면 차단)** — 외부 SaaS 도달 불가(587/853만 열림). **채널을 교체 용이하게 구현 완료(2026-09-27)**: 승인=MCP elicitation(서버가 채널 모름, 런타임이 표시) + 알림=`notifier.py` 백엔드 추상화(`/etc/resp/hitl.env` 의 `RESP_NOTIFY_BACKEND`+엔드포인트 1블록으로 none|http|email|slack 교체, 재시작 불필요, 코드 불변). http(내부 Mattermost/웹훅)로 스왑·수신 검증. **알림 채널 Tier 1 배치 완료(2026-09-27)**: 온프레미스 **Mattermost**(B, TE 11.11.1+PG16 오프라인 반입) → 채널 `soc-alerts`, A `/etc/resp/hitl.env`=http 연동, block/unblock→채널 게시 검증. 브라우저 `ssh -N groot-mm`→http://localhost:18065. 설계·상태 `infra/mcp/hitl-chat.md`. 남은 것: Tier 2(채팅 내 승인 버튼) — 런타임 결정 후(Hermes면 내장 PR #29373)
-- [ ] Response dry-run 해제
+- [x] 고위험 동작 사람 승인 — **Tier 2 완료(2026-09-28)**: 응답 서버 `block_ip` → soc_bot 브로커 → Mattermost [승인][거부] 버튼 → 승인 시 실행(fail-closed, 600s). 무인(cron)에서도 동작하며 채팅 요청→승인→차단→회신 E2E 실측. 이번 SSH 점검은 브로커 설정·신규 승인 동작까지 재검증하지 않음.
+- [x] Response 실차단 게이트 검증 — 2026-09-28 승인→차단 E2E를 실측했다. 새 WAF·IPS·FW v2 경보에서 시작하는 자동/승인 경로는 신규 분류 룰과 시나리오 경보 실발화 후 별도로 검증한다.
 
 ### 2-4. 통합 테스트
 - [ ] 시나리오 1~4 실행, Agent 조사 완결 확인
@@ -253,7 +258,7 @@ capstone_project/
 - [ ] 시나리오별 ground truth 정의 (공격여부·단계·침해·적절대응)
 - [ ] 시나리오 0(정상) 포함, 자동 실행 스크립트, 각 10회 이상 반복
 - [ ] **Hermes 상태 리셋으로 회차 독립성 확보** (학습 off + 회차마다 초기화). 절차: `infra/hermes/eval_reset.md`
-- [ ] Baseline(Wazuh 룰+FW/IPS 자동차단+사람 수동 조사) vs Agentic SOC 측정
+- [ ] Baseline(Wazuh 룰+FW/IPS 자동차단+사람 수동 조사) vs Agentic SOC 측정 — 비교군의 WAF·IPS 모드를 동일하게 통제한다. 2026-10-06 기준 WAF DetectionOnly·IPS passive이므로 자체 차단 효과를 측정하려면 별도 인라인 전환·실측이 필요하다.
 - [ ] 지표: MTTI, MTTR, Triage/Correlation/Compromise 정확도, 대응 적절성, 인젝션 방어, Tool 효율, 추론비용
 - [ ] (보조) 학습 on + 반복으로 Hermes 자기개선 효과(학습 곡선) 별도 측정
 - [ ] 결과표·그래프, 실패사례 분석
@@ -271,7 +276,7 @@ capstone_project/
 |---|---|
 | ESXi 리소스 부족 (VM 3대+GPU) | VM 사양 조정, LLM은 DGX Spark(A-1)로 분리 |
 | GPU 패스스루 실패(A-2) | A-1(DGX Spark)로 전환 |
-| Suricata inline/WAF 프록시 구성 난이도 | 우선 passive(IDS)로 시작 후 inline 전환 |
+| Suricata inline/WAF 차단 전환 | 현재 passive/DetectionOnly. 신규 로그 분류·실발화 검증 뒤 별도 차단 게이트에서 전환 |
 | DGX Spark 속도 부족 | 모델 축소, Tool 응답 요약 |
 | K8s 구축 지연(B-2) | Docker Compose로 회귀 |
 | 일정 초과 | Fine-tuning 제외해도 완결되게 설계 |
@@ -280,6 +285,15 @@ capstone_project/
 
 ## 진행 로그
 최신 항목을 위에 둔다. (세부 이력은 `대화기록/YYYY-MM-DD.md`)
+
+### 2026-10-06 (05:05~05:07 UTC SSH 읽기 전용 재점검)
+- A의 FW v2 `FORWARD=DROP`·CAPSTONE-FWD 14룰, WAF 룰 마운트·DetectionOnly, Suricata 합본 룰·Phase-A passive 및 eve 갱신을 재확인했다. B/C의 `ens192` 부재·A 기본 경로, B 스택/에이전트 3대·DGX API 200, C DVWA·랩·Agent·NTP 정상도 확인했다.
+- **새 확인 사항**: B 라이브 `local_decoder.xml`/`local_rules.xml`에 신규 FW 프리픽스와 WAF 100200+ 룰이 없다. 추가 배포 뒤 공격 프로브로 실제 발화 확인이 필요하다. IPS local SID의 분류는 아직 확인되지 않았다.
+
+### 2026-10-06 (세션 1: 이전 배치 적용 상태 확인)
+- 세션 1 실측 기록상 FW v2 `FORWARD=DROP` 확정, WAF SecRule 11개 DetectionOnly 로드, IPS ET+local/Phase-A passive 적용, B/C `ens192` 제거·기본 경로 A 유지.
+- 이 시점에는 신규 FW·WAF·IPS 룰의 B 분류와 공격 시 실제 발화가 미확인이었다. 같은 날 위 SSH 재점검에서 FW·WAF 신규 디코더/룰 부재를 확인했다. WAF `On`·IPS 인라인 drop 및 Log4Shell egress 관찰용 `OBS_SEG`는 후속 작업.
+- 같은 날 세션 2에서 탐지 모드로 현재 에이전트 조사·`agent_block` 평가를 진행할 수 있으나, 최종 차단 성능 주장에는 별도 전환 검증이 필요하다고 정리했다.
 
 ### 2026-09-27 (HITL 채팅 · SOC 챗봇/자동 보고 · Log4Shell 노출 하드닝)
 - **HITL 알림 채널(Tier 1)**: 온프레미스 Mattermost(B, TE 11.11.1+PG16 오프라인) + A `/etc/resp/hitl.env`=http 연동, block/unblock→채널 게시 검증. 캠퍼스·VPN 공통 접속 위해 **A:443 nginx 리버스 프록시**(`https://chat.groot.lab`, 웹소켓 101, 데스크톱 앱 동일 URL). 대시보드는 보안상 VPN 직접노출 안 함.

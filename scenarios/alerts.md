@@ -2,6 +2,8 @@
 
 각 실행에서 UTC 시각·Kali IP·실제로 뜬 rule id를 적고 Verified 박스를 채운다. "(예상, 미검증)"은 아직 실측 안 된 항목.
 
+> 2026-10-06 SSH 점검에서 B의 로컬 디코더·룰에는 신규 신호 전용 항목이 없었다. IPS 로컬 SID가 기존 Suricata 룰로 분류되는지는 미확인이다. 아래 표는 기대치이며 신규 룰의 실제 Wazuh 경보 발화는 검증하지 않았다.
+
 - 실행 세션: 날짜 ____ / Kali IP ____ / DVWA level ____ / WAF mode ____ (DetectionOnly|On)
 
 | 시나리오·단계 | 공격 행위 | Suricata sid | WAF/CRS 룰 | Wazuh 룰 id (lv) | 대응 룰 | Verified |
@@ -12,21 +14,24 @@
 | 1.4 SQLi 수동 | UNION/error | (예상) | 942xxx | 31103(7) | 100121 | [ ] |
 | 1.5 XSS | 반사형 XSS | (예상) | 941xxx | 31105(6) | (On 시 WAF 403) | [ ] |
 | 1.6 인증 무차별 | hydra→DVWA login | — | (예상) | 31101 다발·100103(12) | 100121 | [ ] |
-| 1.7 SSH 무차별 | hydra→C SSH | — | — | 5710/5712/5551 | 100121(경계 소스) | [ ] |
-| 2.1 취약점 존재 | (스캔 주기) | — | — | Vuln Detection(agent 002) | 패치 권고 | [ ] |
-| 2.2 Log4Shell 주입 | JNDI 트리거(경로 A/B) | ET log4j/JNDI(예상) | (On 시) | 네트워크 상관(예상) | 100121 | [ ] |
-| 2.3 콜백 | LDAP/HTTP 콜백 | ET JNDI outbound(예상) | — | (egress 차단) | 소스 차단 | [ ] |
+| 1.7 SSH 무차별 | C SSH(시험 경로 미정) | — | — | 5710/5712/5551(예상) | 차단 위치 별도 결정 | [ ] |
+| 2.1 취약점 존재 | C 컨테이너의 Log4j JAR 버전 확인 | — | — | Vuln Detection(agent 002)은 조건부(내장 JAR은 인벤토리에 없을 수 있음) | 패치 권고 | [ ] |
+| 2.2 Log4Shell 주입 | JNDI 트리거(A:8080 토글 ON→C) | ET/로컬 log4j/JNDI(예상) | —(현재 경로) | 네트워크 상관(예상) | 100121(별도 대응) | [ ] |
+| 2.3 콜백 | LDAP/HTTP 콜백 | ET/로컬 JNDI outbound(예상, OBS_SEG 경로 확인 후) | — | Wazuh 상관(미검증) | 소스 차단 판단 | [ ] |
 | 3.1 취약점 존재 | (스캔 주기) | — | — | Vuln Detection CVE-2021-3156 | 패치 권고 | [ ] |
 | 3.2 privesc 실행 | Baron Samedit PoC | — | — | auditd/sudo(예상) | 호스트 격리 | [ ] |
 | 3.3 지속성 | 파일 변경 | — | — | syscheck/rootcheck(예상) | 대응 | [ ] |
 
 ## 관찰 vs 차단 비교 (WAF 모드 전환 실험)
-| 단계 | DetectionOnly 결과 | On(차단) 결과 | audit.log rule id |
-|---|---|---|---|
-| 1.3 SQLi | 통과(200/302) + 경보 | 403 차단 + 경보 | 942100 |
-| 1.5 XSS | 통과 + 경보 | 403 차단 + 경보 | 941xxx |
+아래는 **예상 결과이며 아직 이 모드 비교를 실측하지 않았다.** 403 여부는 실제 매치·임계치·엔진 설정에 따라 확인한다.
 
-## 측정 지표 (시뮬레이션 수치 → 실측 대체용, PLAN 참조)
-- MTTI(탐지까지): 공격 시각 → Wazuh 경보 시각.
+| 단계 | DetectionOnly 예상 결과 | On 예상 결과 | 예상 audit.log rule id |
+|---|---|---|---|
+| 1.3 SQLi | 통과(200/302) + 경보 | 임계치 충족 시 403 차단 + 경보 | 942100 |
+| 1.5 XSS | 통과 + 경보 | 임계치 충족 시 403 차단 + 경보 | 941xxx |
+
+## 측정 지표 (실측 기록, PLAN·ground-truth 참조)
+- 탐지 지연: 공격 시각 → Wazuh 경보 시각.
+- MTTI(조사·판단까지): Wazuh 경보 → 에이전트 판단 시각.
 - MTTR(대응까지): 경보 → agent_block 적용 시각(100121).
 - 각 시나리오 실행 로그를 여기에 누적.

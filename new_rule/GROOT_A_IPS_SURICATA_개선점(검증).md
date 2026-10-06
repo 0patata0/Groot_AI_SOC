@@ -1,7 +1,11 @@
 # Groot_A IPS(Suricata) 개선점 — **검증 반영판** (FW·WAF·IPS 합본 대비)
 
+> **후속 상태(2026-10-06 이번 세션 SSH 재점검):** 이 문서의 “현재 상태”와 §2 수치는 2026-09-29 읽기 전용 감사 스냅샷이다. A에서 ET+local 합본 `/rules/all.rules`(47,694,450B, local SID 11개) 단일 `-S` 로딩과 Phase-A 옵션·threshold 파일, passive `-i ens192`를 재확인했다. 앞선 [세션 1 기록](../대화기록/2026-10-06.md)에는 eve `community_id` 생성도 확인돼 있다. 따라서 아래 “로컬 SID 0개”와 “community-id 없음”, `-S /rules/suricata.rules`는 **현재 상태가 아니다**. B manager의 local SID 분류 여부는 이번 점검에서 확정하지 못했으며 공격 실발화 검증도 필요하다. NFQUEUE 인라인/drop은 미완료다.
+>
+> 10월 6일 기록은 이 문서의 Phase A **전체 항목**이나 Phase B **전체 항목** 완료를 뜻하지 않는다. 실제 확인된 것은 위 합본 로딩과 `--set` 범위다. 아래 개선안·통합 변경표는 9월 29일 감사 당시의 제안으로 보존한다.
+
 > 작성일 **2026-09-29** · 대상 **Groot_A (`groot-sec`)** · 계층 **IPS = Suricata 8.0.6 (Docker `jasonish/suricata:latest`)**
-> 방식 **읽기 전용 원격 점검(SSH)** — **아무것도 변경하지 않았음.** 아래는 "손봐야 할 것"의 **식별·제안**이며 적용은 하지 않음.
+> 방식 **2026-09-29 읽기 전용 원격 점검(SSH)** — **당시 아무것도 변경하지 않았음.** 아래는 해당 시점에 식별·제안한 개선안이다.
 > 점검자 security05@ync.ac.kr · 접속 근거 `팀접속안내.md`
 >
 > ---
@@ -291,6 +295,6 @@
 
 - **접속:** `팀접속안내.md`의 `ssh groot_a@grootlab.duckdns.org`(호스트키 `SHA256:nWtZ…sy24`). Windows에서 비대화형 실행을 위해 PuTTY `plink`를 세션 스크래치패드에 임시 사용. **비밀번호는 이 문서에 기록하지 않음.**
 - **수행한 것(원 점검 + 2026-09-29 재검증, 전부 읽기 전용):** `docker inspect/exec`, `suricatasc -c dump-counters`, 룰 파일 통계(`wc/grep -P/awk`), `suricata.yaml`·`update.yaml` grep, 로그(`suricata.log/stats.log/fast.log/eve.json`) 파싱, `ip addr/route`, `ss`, `nft list ruleset`, `iptables -t nat -S`/`iptables -S`, WAF `env`, compose 파일 열람.
-- **변경한 것:** **없음.** 위 항목은 전부 "식별·제안"이며, 실제 적용은 FW·WAF 개선안과 합쳐 별도 승인·점검 창에서 수행.
+- **2026-09-29 점검 중 변경한 것:** **없음.** 위 항목은 당시 "식별·제안"이다. 10월 6일 후속 적용 상태는 문서 상단 주석을 참조한다.
 - **검증 결과(2026-09-29):** 구조·설정·룰카운트·이웃계층 **전 항목 EXACT 일치**. 정정 2건(IPS-02 IP 오기·sqlmap 발화이력)은 본문에 ✏️로 반영. 러닝 카운터(총패킷 195k·TLS 2,651·ARP 31,528·unknown_ethertype 10,887)는 시점값으로 갱신. 상세는 `GROOT_A_IPS_검증리포트.md`.
 - **분석 방식:** (원본) 8개 관점 병렬 리뷰 → 적대적 검증(36→20건). (검증판) groot_a 라이브 재접속해 20개 findings의 정량·설정 주장을 EXACT 대조, 정적 리뷰의 가설(IPS-11 16/10 혼선)까지 라이브로 반증/확증.

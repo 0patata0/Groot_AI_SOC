@@ -1,9 +1,13 @@
 # GROOT_A IPS Phase-A 변경셋 — 무중단 탐지/로깅/자산 (2026-10-02, 검증 반영)
 
+> **후속 상태(2026-10-06 이번 세션 SSH 재점검):** A의 Suricata가 passive `-i ens192`로 ET+local 합본 `/rules/all.rules`(47,694,450B)를 단일 `-S`로 로드하며 Phase-A 옵션을 적용한 것을 재확인했다. 합본에 local SID 11개가 있고 threshold 파일도 존재한다. 앞선 [세션 1 기록](../대화기록/2026-10-06.md)에는 eve.json 갱신과 `community_id` 275건 확인도 있다. B manager의 local SID 1000xxx 분류 여부는 이번 점검에서 확정하지 못했다. 이를 확인하고 VM 세그먼트 공격 프로브로 실발화를 검증해야 한다. NFQUEUE/drop 전환은 미완료다.
+>
+> 아래 §1~§7은 **10월 2일 작성한 변경안·샌드박스 검증·당시 적용 절차**다. 특히 예시의 `-S /rules/suricata.rules`와 `/etc/suricata/threshold.in`은 10월 6일 기록의 라이브 경로(`/rules/all.rules`, `/rules/threshold.in`)와 다르므로 현재 재배포 명령으로 그대로 사용하지 않는다.
+
 > 대상 Groot_A `groot-sec` / Suricata 8.0.6 (Docker). **차단 전환 없음**(여전히 passive `-i ens192`).
 > 목적: 탐지 정확도·교차도구 상관·로그 신호 품질만 향상. 전부 라이브 무중단(출력/앱계층 설정 변경은 **짧은 컨테이너 재시작** 필요).
 > 근거 문서 `GROOT_A_IPS_SURICATA_개선점(검증).md` Phase A: IPS-09/11/12/13/14/15/16/17/18/19.
-> 모든 `--set`/파일은 **throwaway 컨테이너에서 실측 검증**(§7). 적용은 사용자 승인/점검 창에서.
+> 모든 `--set`/파일은 **2026-10-02 throwaway 컨테이너에서 실측 검증**(§7). 아래 적용 절차는 당시 계획이다.
 
 ## 1. compose `--set` 추가 (선언형, yaml 미편집 — **검증됨**)
 
@@ -50,7 +54,7 @@ suricata -i ens192 -S /rules/suricata.rules \
 - **IPS-09 HOME_NET 단일 진실원:** 보호망 정의를 `secstack/.env` 한 곳에서 compose `--set HOME_NET`·nftables 스코프·WAF `BACKEND`이 참조. 유효 on-wire HOME_NET=192.168.16.230/32(ens192)이고 10.200.10.0/24 절반은 ens160 감시(IPS-01, Phase B/C) 전까진 aspirational임을 주석.
 - **IPS-15 HTTP_PORTS(게이트):** 현재 `80` 유지. ens160 감시(IPS-01)가 들어올 때 DMZ 포트집합으로 확장(같은 `--set`으로 병합). 지금은 변경 없음.
 
-## 6. 적용 순서 & 검증 명령
+## 6. 2026-10-02 당시 적용 순서 & 검증 명령 (배치 완료 기록, 재실행용 아님)
 ```bash
 # 1) threshold.in 반입
 sudo install -m0644 GROOT_A_suricata_threshold.in \

@@ -7,6 +7,8 @@
 
 > 이 문서는 **모의(paper) 시뮬레이션**이다. 인프라(Groot_A/B/C, Wazuh SIEM, Suricata IPS, ModSecurity WAF, Hermes↔DGX↔MCP, Mattermost 승인)는 실제로 구축·검증되어 에이전트 E2E가 동작하는 상태이지만, 이 다단계 공격 시나리오 자체는 아직 공개 익스플로릿으로 재현하지 않았다(10장 참조). 따라서 아래 로그와 모델 출력은 실제 수집물이 아니라, 실제 CVE의 공개된 동작을 근거로 설계대로 동작했을 때의 흐름을 재구성한 것이다. 성능 수치는 아래 6장에 계산 근거를 제시하되, 실제 측정으로 대체되어야 한다.
 
+> **2026-10-06 SSH 확인 범위**: A FW v2는 기본 `FORWARD=DROP`, WAF는 `DetectionOnly`, Suricata는 passive이며 B의 신규 FW·WAF 분류 룰은 아직 없다. C에서 확인한 `sudo` 버전은 1.8.31이나 CVE-2021-3156 취약성은 검증하지 않았다. 아래의 침투 성공·경보·자동 차단·유출 흐름은 모두 시뮬레이션 가정이며 현재 실측 결과가 아니다.
+
 ---
 
 ## 1. 시뮬레이션 개요
@@ -16,8 +18,8 @@
 | 시나리오 | Scenario 4 — 실제 CVE 기반 다단계 공격 |
 | 초기 침투 CVE | **CVE-2021-44228 (Log4Shell)** — CVSS 10.0, CISA KEV 등재 |
 | 권한 상승 CVE | **CVE-2021-3156 (sudo Baron Samedit)** — CVSS 7.8, CISA KEV 등재 |
-| 공격자 | Kali (공격자, 192.168.10.20), VM 세그먼트(공격 트래픽은 캠퍼스 VPN 경유 금지). 공개 PoC + 악성 LDAP 서버 |
-| 피해 대상 | Groot_C (웹서버 VM `groot-web`, 10.200.10.20, Wazuh agent `002`), DVWA + 취약 log4j 번들 웹앱 + 취약 sudo 패키지 |
+| 공격자 | Kali (시뮬레이션 예시 주소 `192.168.10.20`; 라이브 Kali 주소·라우팅 미확인). 공격 트래픽은 캠퍼스 VPN 경유 금지. 공개 PoC + 실험용 LDAP 서버 |
+| 피해 대상 | Groot_C (웹서버 VM `groot-web`, 10.200.10.20, Wazuh agent `002`), DVWA + Log4Shell 실험 앱 + sudo 권한 상승 검증 후보(`sudo` 1.8.31 관측, CVE 취약성 미검증) |
 | 트리거 | Suricata Log4j JNDI 시그니처 → Wazuh Alert (level 12) → Indexer 폴링으로 Agent 수신 |
 | Ground Truth | 다단계 공격 성공, log4shell로 코드 실행, sudo로 root 권한 상승, 데이터 유출. 적절 대응 = 출발지/유출지 차단(자동) + 서버 격리(사람 승인) |
 
@@ -213,7 +215,7 @@ BF16: 3B × 2 byte = 6 GB/token
 | 한계 | 내용 |
 |---|---|
 | paper 시뮬레이션 | 실제 모델·로그를 돌린 결과가 아니다. Tool 응답과 판단은 CVE의 공개 동작을 근거로 한 재구성이다 |
-| Wazuh log4j 미탐 가능성 | 앱 jar 번들 log4j는 패키지 인벤토리에 없어 Wazuh Vuln Detection이 못 잡을 수 있다. 그래서 초기 침투는 Suricata 시그니처로 탐지하도록 설계했다. sudo CVE는 OS 패키지라 잡힌다 |
+| Wazuh log4j 미탐 가능성 | 앱 jar 번들 log4j는 패키지 인벤토리에 없어 Wazuh Vuln Detection이 못 잡을 수 있다. 그래서 초기 침투는 Suricata 시그니처로 탐지하도록 설계했다. sudo 패키지 인벤토리의 CVE 매핑과 실제 취약성은 별도 검증이 필요하다 |
 | 최선 경로 가정 | 모든 Tool이 정답을 준 경우다. 실제로는 오탐/유실로 헤맬 수 있다(9장) |
 | 성능 수치 | 대역폭 계산 기반 추정. 실측 필요 |
 
@@ -234,7 +236,8 @@ BF16: 3B × 2 byte = 6 GB/token
 
 ## 10. 남은 검증 과제 (실물 실험으로 대체)
 
-- [ ] 취약 이미지 배포: log4shell 취약 앱(log4j 2.14.x), sudo 1.9.5 취약 패키지
+- [x] C의 Log4Shell 실험 앱 컨테이너 배포·가동(10/6 SSH 확인, 내부 `10.200.10.20:8080` 바인딩). 실제 Log4j 구성·취약성 재현은 미검증
+- [ ] sudo 권한 상승 실험의 취약성 확인 또는 격리 랩 스테이징(C의 `sudo --version` 1.8.31만 관측)
 - [ ] 공개 익스플로릿으로 실제 공격 재현, Wazuh/Suricata Alert의 rule id 기록
 - [ ] Wazuh Vuln Detection이 CVE-2021-3156을 실제로 매핑하는지 확인
 - [ ] MTTI/MTTR/토큰/속도 실측으로 6장 수치 대체

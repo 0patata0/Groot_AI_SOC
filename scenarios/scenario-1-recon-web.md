@@ -14,7 +14,7 @@
 | 1.4 SQLi 수동 | UNION/에러기반 (WSTG-INPV-05) | DVWA SQLi 페이지 | CRS 942xxx, Wazuh 31103 | 동일 |
 | 1.5 XSS | 반사형 XSS (WSTG-INPV-01) | DVWA XSS 페이지 | CRS 941xxx, Wazuh **31105** | (차단 전환 시) WAF 403 |
 | 1.6 인증 무차별 | 로그인 무차별 (Hydra, WSTG-ATHN-03) | DVWA `login.php` | 웹 로그 다발 4xx/POST → **31101** 다발, 로컬 WAF 버스트 **100103** | `agent_block add <KALI_IP>` |
-| 1.7 (선택) SSH 무차별 | Hydra (Wazuh 무차별 PoC) | C의 SSH(내부) | Wazuh **5710/5712/5551** (PAM 상관) | `agent_block`(단, C는 내부 — 대응은 A 경계에서 소스 차단) |
+| 1.7 (선택) SSH 무차별 | Hydra (Wazuh 무차별 PoC) | C의 SSH(내부) | Wazuh **5710/5712/5551** (PAM 상관) | 실험 경로·차단 위치를 먼저 설계(현재 Kali→C 직접 경로 없음) |
 
 ## 검증 포인트
 - 실행 직후 Wazuh Discover에서 `data.srcip: <KALI_IP>` + 시간창으로 위 룰 id가 실제로 뜨는지 대조.
@@ -23,5 +23,5 @@
 - WAF `MODSEC_RULE_ENGINE=On` 전환 실험 시: 1.3/1.5가 **403**으로 바뀌고 audit.log의 rule id 동일 — "관찰 vs 차단" 비교표를 `alerts.md`에 기록.
 
 ## 주의
-- 1.7 SSH 무차별은 C의 내부 IP(10.200.10.20)를 향하므로 A의 경계 탐지가 아니라 C 엔드포인트(agent 002) 탐지다. Kali가 C SSH에 직접 도달 가능한 경로가 있는지 먼저 확인(과도기엔 C ens192 192.168.16.232).
+- 1.7 SSH 무차별은 C의 내부 IP(10.200.10.20)를 향하므로 C 엔드포인트(agent 002) 탐지다. 과도기의 C `ens192`/`192.168.16.232` 직접 경로는 2026-10-02 제거됐고, A의 FW v2는 `FORWARD=DROP`이다. 실행 전에 별도 승인된 내부 테스트 경로와 차단 위치를 정해야 한다. 현재 경로로 외부 Kali에서 C SSH를 직접 시험할 수 있다고 가정하지 않는다.
 - 모든 파괴 없는 단계지만, DVWA 상태가 바뀌면 "Create/Reset Database"로 원복.

@@ -1,5 +1,7 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
+> **현황(2026-10-06 기록 및 이번 SSH 재확인):** B의 `ens192` vNIC는 제거됐고 `ens160=10.200.10.10`의 기본 경로가 A(`10.200.10.1`)를 지난다. Wazuh 에이전트 000/001/002는 Active다. B의 `local_decoder.xml`·`local_rules.xml`에는 신규 신호 전용 항목이 없지만, IPS 로컬 SID가 기존 Suricata 룰로 분류되는지는 미확인이다. 공격 프로브 발화도 미검증이다. [기존 기록](../../대화기록/2026-10-06.md)
+
 ## Wazuh 4.14.8 single-node — 오프라인 기동 (2026-09-26 완료 ✅)
 공식 **wazuh-docker `v4.14.8` single-node** 구성을 쓰되, 이 망은 **웹 egress 차단**이라 온라인 절차를 그대로 못 쓴다. 아래는 실제로 동작한 오프라인 절차.
 
@@ -20,7 +22,7 @@ sudo bash /tmp/finish_wazuh.sh
 #    (+ root-ca-manager.pem 사본) → chmod 644 → docker compose up -d → ps
 ```
 - ⚠️ **인증서 권한은 반드시 644.** `640 root:root`로 두면 컨테이너 내부 비root 유저(wazuh-indexer)가 `root-ca.pem`을 못 읽어 보안 플러그인 로드 실패 → 인덱서 크래시 루프 → 대시보드 연쇄 재시작. (1차 기동 실패 원인)
-- 접속: Dashboard `:443`, Server API `:55000`, Indexer `:9200`, Agent `:1514`. **최종 주소는 내부망 `10.200.10.10`만** — 임시외부 `192.168.16.231`(ens192)은 설치 후 제거 대상(인라인 설계: 외부에서 B/C 직접 접근 불가, A가 유일 출입구). 운영자는 A 경유(SSH ProxyJump `ssh groot-b-int`; 대시보드 브라우저는 `https://wazuh.groot.lab` = A:443 chatproxy, 루프백 터널은 2026-09-28 제거). 2026-09-26 검증: A 경유로 22/443/1514/55000 도달, 대시보드 로그인 200.
+- 접속: Dashboard `:443`, Server API `:55000`, Indexer `:9200`, Agent `:1514`. **현재 B 주소는 내부망 `10.200.10.10`만** — 옛 임시외부 `192.168.16.231`(ens192)은 제거 완료. 운영자는 A 경유 SSH ProxyJump(`ssh groot-b-int`); A:10443→B:443 DNAT 룰은 확인됐지만 허용 소스가 `192.168.16.0/25`여서 Kali의 실제 도달성은 미검증이다. 저장소 `fw-v2/capstone-nat.sh`는 A:443 chatproxy 경로도 설명하지만 이번 SSH 점검에서 해당 응답 경로는 구분하지 않았다. 2026-09-26 검증: A 경유로 22/443/1514/55000 도달, 대시보드 로그인 200.
 - 리소스: 인덱서 힙 `-Xms1g -Xmx1g`(compose 기본). B RAM 여유 커서 필요 시 상향.
 
 ### 검증 결과 (2026-09-26)
@@ -37,12 +39,13 @@ sudo bash /tmp/finish_wazuh.sh
 - 순서: 파일 편집(compose·wazuh.yml·internal_users) → securityadmin(-f) → **새 비번 200/옛 비번 401 게이트** → `docker compose up -d`(env 변경분 재생성; `restart`는 env를 안 읽음) → filebeat test·API 토큰·대시보드 실제 로그인·데모계정 401 검증.
 
 ## MCP Server (자격증명 보유 — A안)
-- 읽기 서버: `gbrigandi/mcp-server-wazuh`(MIT, 읽기전용, 코드리뷰 완료 @969f36f) 오프라인 배포 예정. Wazuh API :55000 + Indexer :9200에 **읽기전용 계정**으로 접속, 자격증명은 env에만.
-- 응답 서버(차단 `block_ip`/`isolate_host` → Groot_A nftables `agent_block`)는 소형 커스텀으로 별도(최소권한 분리).
+- 읽기 서버: `gbrigandi/mcp-server-wazuh`(MIT, 읽기전용, 코드리뷰 완료 @969f36f)를 2026-09-26 B `/opt/mcp/`에 오프라인 배포했다. Wazuh API :55000 + Indexer :9200에 **읽기전용 계정**으로 접속하며 자격증명은 B `/etc/mcp/wazuh-ro.env`에 둔다. 읽기 14툴 계약 테스트와 Hermes 컨테이너 연결을 9/28까지 검증했다.
+- 응답 서버는 A의 별도 MCP/Policy Engine이며 `block_ip`/`unblock_ip`/`list_blocks`→nftables `agent_block` 경로가 9/28 승인→차단 E2E까지 검증됐다. `isolate_host`는 후속 목표다. Hermes는 B의 별도 계정·컨테이너에서 실행하고 MCP 자격증명은 갖지 않는다.
 - 참고 데이터: CISA KEV `~/capstone/kev/kev.json` (`kev-data.md`).
 
 ## 검증 체크리스트
 - [x] Dashboard 접속, Server API/Indexer 응답 (2026-09-26)
-- [ ] Groot_A/C Agent 등록·Active (manager `10.200.10.10:1514`)
+- [x] Groot_A/C Agent 등록·Active (manager `10.200.10.10:1514`, 2026-10-06 기록)
+- [ ] 신규 FW 프리픽스·WAF GROOT 룰·IPS 로컬 SID의 기존 디코더/룰 분류 여부 확인 → 빠진 항목만 추가 → VM 세그먼트 공격 프로브로 경보 실발화 검증
 - [ ] Vulnerability Detection에서 Groot_C의 CVE-2021-3156 매핑 확인
-- [ ] MCP 읽기 Tool 호출 성공, Agent 프로세스에 자격증명 없음 확인
+- [x] MCP 읽기 14툴 호출 성공, Hermes 프로세스에 MCP 자격증명 없음 확인(2026-09-28 기록). 이번 SSH에서는 이 계약 테스트를 재실행하지 않았다.

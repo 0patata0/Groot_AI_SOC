@@ -1,5 +1,7 @@
 # GROOT layer A (WAF) integration contract
 
+> **Status from the 2026-10-06 SSH recheck in this session.** The WAF service is healthy, its custom GROOT conf is mounted, `nginx -t` passes, and it remains `DetectionOnly`. The live custom conf has **11 rule IDs**; chained rules make `SecRule` appear on 12 directive lines. FW v2 has `FORWARD=DROP`; Suricata is passive with `/rules/all.rules`, 11 local SIDs, and Phase-A options. B manager's `local_decoder.xml` and `local_rules.xml` lack the new WAF 100200+ and FW-prefix classifications; local IPS SID classification was not established by this check. Verify each before claiming end-to-end alerts. WAF `On` and IPS inline/drop remain pending. The original contract below predates deployment; the intended blocking integration uses `agent_block` and the approval broker. Broker URL and token environment variables are set on A. A generic Tier 2 approval-to-block path was verified on 2026-09-28, but this SSH recheck did not repeat it and the new WAF-alert-triggered path is unverified.
+
 Owner: WAF rules. Counterparts: FW (nftables) owner, IPS (Suricata) owner.
 Applies to `GROOT_A_WAF.conf` v1.0.0.
 
@@ -7,7 +9,7 @@ Applies to `GROOT_A_WAF.conf` v1.0.0.
 
 | Item | Value |
 |---|---|
-| Log file | `/var/log/modsec/modsec_audit.json` on the nginx host |
+| Log file | `/var/log/modsecurity/audit.log` in the WAF container, mounted to `logs/modsec/audit.log` on the A host (base configuration inherited after the 2026-10-02 rule fix) |
 | Format | one JSON object per line (ModSecurity v3 `SecAuditLogFormat JSON`) |
 | Written when | a GROOT or CRS rule matches, or the backend returns 5xx / 4xx (not 404) |
 | Source address field | `transaction.client_ip` (REMOTE_ADDR as seen by nginx) |
@@ -17,9 +19,7 @@ Applies to `GROOT_A_WAF.conf` v1.0.0.
 | CVE field | tag `CVE-YYYY-NNNN` when the rule targets a named CVE |
 | Human label | `details.msg` starts with `WAF-<CAT>-<NNN>` |
 
-The WAF runs in DetectionOnly. It never blocks and never changes firewall state.
-Any blocking derived from WAF alerts must be done by Wazuh active response
-against the FW owner's nftables set, not by the WAF.
+The WAF currently runs in DetectionOnly. It does not block requests or change firewall state in that mode. The project's IP response path is response MCP → approval broker/Tier 2 → FW `agent_block`; the broker URL/token are configured on A, and the generic path passed an end-to-end test on 2026-09-28. Triggering that path from a new WAF alert still needs verification. Wazuh active response is not the configured automatic blocking path in the project record.
 
 ## 2. Namespaces (agree once, never overlap)
 
@@ -53,9 +53,7 @@ block decision on an address or port, it is FW.
 
 - Allow 80/443 inbound to the nginx host and nginx -> DVWA on the backend port.
 - Allow the Wazuh agent on the nginx host to reach the manager (1514/tcp, 1515/tcp).
-- Provide an nftables **set with a timeout** that Wazuh active response can add
-  addresses to. Suggested name `groot_block`, element type `ipv4_addr`,
-  timeout 10 minutes for the tuning phase. The WAF never writes to it.
+- Use the FW owner's existing timeout-capable nftables `agent_block` set for approved IP responses. The original `groot_block` / direct Wazuh active-response proposal has not been adopted. The WAF never writes to the set.
 - Do not NAT the client address before nginx. If the client IP is rewritten,
   `transaction.client_ip` becomes useless for correlation.
 
@@ -70,10 +68,10 @@ block decision on an address or port, it is FW.
 
 ## 6. Correlation rule the Wazuh owner should write (whoever that is)
 
-Escalate when the same source hits two layers within 5 minutes:
+The following was the original correlation proposal. The B manager's local decoder and rule files currently lack the new classifications, so multi-layer correlation still needs implementation and testing. A correlated alert can inform the agent's investigation; automatic insertion into `agent_block` has not been demonstrated.
 
 ```
-WAF high  (100201)   + any IPS alert from same src_ip  -> level 13, add to groot_block
+WAF high  (100201)   + any IPS alert from same src_ip  -> proposed level 13 / response candidate
 WAF high  (100201)   + FW drop log from same saddr     -> level 12
 WAF medium (100202) x3 in 5 min from same src          -> level 10
 ```
@@ -85,5 +83,4 @@ Join key is the client IP in all three logs.
 - Rule changes to `GROOT_A_WAF.conf` bump the `ver:` field and the header version.
 - New rule ids stay inside the blocks in section 2. Tell the Wazuh owner when a
   new `GROOT_A/category/*` tag is introduced.
-- Nobody switches `SecRuleEngine` to On without the FW owner confirming the
-  nftables set exists, because active response will start calling it.
+- Switching `SecRuleEngine` to On is a separate WAF blocking gate. Verify the rule load, benign traffic, malicious-request blocking, and rollback together with the IPS inline plan. Confirm the FW response path and broker configuration separately; `On` does not itself invoke active response.

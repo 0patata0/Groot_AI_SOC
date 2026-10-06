@@ -119,7 +119,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 | | B-1. Docker Compose (권장) | B-2. Kubernetes (k3s) |
 |---|---|---|
-| 구성 | VM별 `docker-compose.yml` | 경량 K8s(k3s)로 파드 배포 |
+| 구성 | A 보안 스택·B Wazuh는 Docker Compose, C는 DVWA 베어메탈+Log4Shell 랩 컨테이너 | 경량 K8s(k3s)로 파드 배포 |
 | 장점 | 구축·디버깅 빠름, 캡스톤 규모에 적합, Wazuh/Suricata 공식 compose 예제 풍부 | 오케스트레이션 학습 효과, 선언적 배포 |
 | 단점 | 다중 노드 오케스트레이션 학습은 약함 | 구축 복잡도·시간 증가, Suricata inline·Wazuh의 K8s 네트워킹이 까다로움 |
 
@@ -161,19 +161,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 - [x] (확정) 보안장비 이미지 준비: nftables(FW), Suricata passive IDS(ET Open+local, 인라인 IPS는 후속 전환), ModSecurity+OWASP CRS(WAF, 공식 이미지) — A에 `jasonish/suricata:latest`·`owasp/modsecurity-crs:nginx`, B에 Wazuh 4.14.8 오프라인 반입 완료. nftables 네이티브
 - [x] 저장소 디렉터리 구조 생성 — infra/groot-a·b·c 등
 
-디렉터리 구조 (초안)
-```
-capstone_project/
-├── PLAN.md, suggestion.md, ...
-├── infra/
-│   ├── groot-a/   # FW/IPS/WAF compose 또는 k8s manifest
-│   ├── groot-b/   # Wazuh + MCP Server compose
-│   └── groot-c/   # DVWA + CVE 컨테이너 compose
-├── mcp-server/    # MCP Server (Groot_B 배포). 자격증명 보유, Agent와 분리
-├── agent/         # Agent Runtime + Policy Engine (LLM 실행처 배포). 자격증명 없음
-├── scenarios/     # 공격 스크립트, ground truth
-└── eval/          # 평가 스크립트, 결과
-```
+현재 배포 파일 구조와 A/B/C 역할은 [infra/README.md](infra/README.md)를 따른다. 초기 구상에는 C의 DVWA/DB/CVE 통합 Compose가 있었으나, 실제 C는 DVWA 베어메탈과 Log4Shell 랩 컨테이너로 구성됐다.
 
 ---
 

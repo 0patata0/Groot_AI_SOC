@@ -13,13 +13,13 @@
 infra/
 ├── groot-a/   # 보안장비: nftables(FW, 호스트) + Suricata(IPS) + ModSecurity(WAF)
 ├── groot-b/   # SIEM+MCP: Wazuh(공식 docker) + MCP Server
-└── groot-c/   # 웹서버: DVWA + DB + CVE 취약 컨테이너
+└── groot-c/   # 웹서버: DVWA 베어메탈 + CVE 실험 컨테이너 연동
 ```
 
 ## 배포 순서 (요약)
 1. 네트워크·게이트웨이(Groot_A 호스트 nftables) → 인프라_구축순서.md Phase 1~2
 2. `groot-a`: nftables 적용 후 `docker compose up -d` (Suricata·WAF)
-3. `groot-c`: `docker compose up -d` (DVWA·DB·CVE)
+3. `groot-c`: [C 표준 설정](groot-c/C_구축_표준설정.md)에 따라 베어메탈 DVWA와 Log4Shell 랩 컨테이너 구성·검증. 이전 DVWA/DB/CVE 통합 Compose 초안은 현 배포와 달라 제거했다.
 4. `groot-b`: Wazuh 공식 single-node 배포 후 MCP Server, Agent를 A·C에 설치
 
 ## 공통 주의 (구축 시 확정 = TODO)

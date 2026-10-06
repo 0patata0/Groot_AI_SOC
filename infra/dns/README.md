@@ -36,4 +36,9 @@ sudo bash infra/dns/apply_hosts.sh
 - 채택: **DuckDNS `grootlab.duckdns.org` → 192.168.16.230** (하위 이름은 자동으로 같은 IP). 이름: `chat.grootlab.duckdns.org`(채팅), `wazuh.grootlab.duckdns.org`(관제, allowlist 동일·VPN 403), `dvwa.grootlab.duckdns.org`(웹표적, 80 WAF). 기존 `*.groot.lab`(hosts) 은 별칭으로 유지.
 - A 측: `infra/groot-a/chatproxy.nginx.conf` 에 DuckDNS 이름용 server 블록 2개(별도 인증서 `tls/chatduck.*`, `tls/wazuhduck.*` → 기존 인증서 신뢰 무영향). B 측: Mattermost `MM_SITEURL`=DuckDNS 이름(대표), `MM_ALLOWCORSFROM`=두 Origin → 둘 다 웹소켓 101.
 - 등록(1회, 팀장 계정): duckdns.org 로그인 → domains 에 `grootlab` 추가 → current ip 를 `192.168.16.230` 으로 설정 → update. 확인: `dig +short chat.grootlab.duckdns.org` → 192.168.16.230. IP 가 바뀌지 않으므로 갱신 클라이언트 불필요.
-- 한계: DuckDNS/학과 DNS 장애 시 이름 해석 실패(hosts 별칭이 예비). 정식 도메인으로 갈아타면 Let's Encrypt(DNS 인증) 로 인증서 경고까지 제거 가능.
+- 한계: DuckDNS/학과 DNS 장애 시 이름 해석 실패(hosts 별칭이 예비). 현재 DuckDNS 이름도 TXT API를 통한 Let's Encrypt `DNS-01` 인증으로 공인 인증서를 받을 수 있다. 다만 아직 발급·배포하지 않았으므로 현재는 자체서명 인증서를 사용한다.
+
+### DuckDNS 공인 인증서 전환 검토 (2026-10-06, 미적용)
+- 공개 DNS의 `chat.grootlab.duckdns.org`·`wazuh.grootlab.duckdns.org`는 현재 `192.168.16.230`(사설 IP)을 가리킨다. A의 80번은 WAF, 443번은 Docker `chatproxy`가 사용한다. 일반 호스트 Nginx용 `certbot --nginx`와 HTTP-01 검증을 그대로 실행하지 않는다.
+- DuckDNS의 [TXT API](https://www.duckdns.org/spec.jsp)로 DNS-01 챌린지를 자동 갱신하는 방식을 검토한다. [`acme.sh` DuckDNS 플러그인](https://github.com/acmesh-official/acme.sh/blob/master/dnsapi/dns_duckdns.sh)이 있으며, `*.grootlab.duckdns.org` 인증서 1장으로 채팅·Wazuh DuckDNS 이름을 포함할 수 있다(루트 `grootlab.duckdns.org`와 내부 `*.groot.lab`은 별개).
+- 발급·갱신 주체의 ACME/DuckDNS HTTPS 도달성을 먼저 확인한다. 인증서가 나오면 A의 Docker 마운트 `chatproxy/tls/`에 체인·개인키를 권한 제한해 설치하고 `nginx -t` 후 프록시를 재로드한다. 갱신 시에도 배포·재로드가 필요하다. DuckDNS 토큰과 개인키는 저장소에 넣지 않는다. 대시보드 출발지 허용목록은 유지한다. [Let's Encrypt의 DNS-01 설명](https://letsencrypt.org/docs/challenge-types/).

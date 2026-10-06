@@ -15,5 +15,10 @@
 *CREDENTIALS*.md
 *credentials*.md
 
+# 공인 인증서 개인키·ACME 작업 상태는 저장소에 넣지 않음
+*.key
+*.pem
+.acme-state/
+
 # datasets/ 디렉터리 압축본(로컬 전용, 추적 안 함)
 datasets.zip

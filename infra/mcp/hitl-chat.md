@@ -10,7 +10,7 @@ Slack은 이 망에서 불가(아웃바운드 443 차단, 2026-09-27 실측). �
 - 자체 호스팅(Docker), incoming/outgoing webhook + **interactive message buttons**(승인/거부) + slash command + bot API 지원. air-gapped 배포 문서 존재.
 - **Hermes 에이전트에 Mattermost 인터랙티브 승인 버튼이 이미 구현**(NousResearch/hermes-agent PR #29373, issue #27587) → 런타임=Hermes면 승인 창구가 사실상 내장.
 - 대안: Rocket.Chat(유사). 초경량이 필요하면 채팅 없이 "승인 인박스" 웹페이지도 가능하지만 사용자가 채팅 형태를 원함.
-- ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**.
+- ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**. 모바일 앱 로그인은 현재 자체서명 인증서 때문에 실패하며, 공인 인증서 발급 후 학교 Wi-Fi/VPN에서 검증할 예정이다. 앱 접속과 푸시 알림은 별개다.
 
 ## 구성 요소
 - **Mattermost 서버 + PostgreSQL** (Docker, 오프라인 이미지 반입 — 기존 방식과 동일). 배치 후보: **Groot_B**(디스크 145G 여유) 또는 소형 전용 VM. 내부망 전용(10.200.10.x), 접근은 대시보드처럼 A 점프(`ssh -L`).

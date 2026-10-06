@@ -17,6 +17,19 @@ Log4Shell 경로는 이번 SSH 점검에서 **토글 OFF**(A:8080 NAT·DOCKER-US
 | NTP 서버 | `ntp_server.sh` | chrony ← 캠퍼스 192.168.16.131, B/C 에 10.200.10.1:123 서비스(`bindaddress`) |
 | 응답(차단) MCP 서버 | `../mcp/{response-mcp.py, run-response.sh, deploy_response_A.sh}`, `agent_block_reaper.sh` | 사용자 `resp` + sshd ForceCommand + sudoers(agent_block add/del/list). 에이전트가 `ssh -T groot-resp` 로 block_ip/unblock_ip/list_blocks 호출 → `agent_block`. TTL 만료 리퍼(타이머 `capstone-block-reaper`) → Wazuh 100131. 이번 SSH 점검에서 A의 `/etc/resp/hitl.env`에 브로커 URL·토큰이 설정된 것은 확인했으나 승인 후 차단 종단 간 동작은 재시험하지 않았다. |
 
+## DuckDNS 채팅 공인 인증서 설치
+
+ACME·DuckDNS HTTPS에 도달할 수 있는 장치에서 DNS-01 방식으로 `chat.grootlab.duckdns.org` 또는 `*.grootlab.duckdns.org` 인증서를 발급한다. A는 발급에 필요한 외부 HTTPS에 도달하지 못하므로, 발급된 `fullchain.pem`과 암호 없는 `privkey.pem`을 A에 안전하게 복사한 뒤 다음 명령을 A에서 실행한다. 개인키와 DuckDNS 토큰은 저장소에 넣지 않는다.
+
+```bash
+sudo bash deploy_chatduck_cert_A.sh --check-only /root/certs/fullchain.pem /root/certs/privkey.pem
+sudo bash deploy_chatduck_cert_A.sh /root/certs/fullchain.pem /root/certs/privkey.pem
+```
+
+`deploy_chatduck_cert_A.sh`는 호스트명 SAN·남은 유효기간·키 일치·신뢰 체인을 검증하고, 기존 `chatduck.crt/key`를 권한 제한 백업한 뒤 두 파일을 교체한다. 이어서 `nginx -t`, 재로드, 실제 SNI 인증서와 CA 검증을 사용하는 Mattermost ping을 확인하며, 실패하면 기존 파일을 복원하고 다시 재로드한다. `chat.groot.lab`·Wazuh 인증서 및 대시보드 허용목록은 건드리지 않는다. 갱신된 인증서도 같은 절차로 다시 배포해야 한다.
+
+스크립트의 체인 검증은 **A 호스트의 신뢰 저장소 기준**이다. 모바일 앱이 신뢰하는 공인 인증서인지 확인하려면 Let's Encrypt로 발급한 체인을 사용하고, 설치 후 학교 Wi-Fi와 VPN에서 실제 모바일 앱 로그인을 각각 시험한다.
+
 ## 자주 쓰는 명령 (A에서, sudo)
 ```
 agent_block add 203.0.113.7 10m alert:1790431732.31   # 차단(사유는 감사용)

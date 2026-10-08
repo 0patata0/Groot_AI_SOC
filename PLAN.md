@@ -175,6 +175,8 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 - [x] FW: nftables 게이트웨이·`agent_block` — 2026-09-27 NAT·호스트 input 기본 차단·관리 DNAT·응답 CLI와 실차단 검증 완료. **2026-10-06 기록상 FW v2 적용·확정**: `FORWARD=DROP`, `CAPSTONE-FWD` 14룰, `capstone_fw` v2(SPOOF·SSH rate·output 체인), 데드맨 타이머 0. 대시보드 DNAT와 A→B:443·A→C:80 경로 보존. 10/1의 FORWARD=ACCEPT 감사 결과는 이 적용으로 해소됨. 신규 FW 로그의 B 분류·실발화는 미확인.
 - [x] IPS: Suricata — 2026-09-26 passive IDS/ET Open 배치와 기존 sid 2008538 경보 실측 완료. **2026-10-06 기록상** `-S /rules/all.rules`(ET+local) 및 Phase-A(community-id·ja3/ja4·threshold) 적용, eve `community_id` 275건 확인. **local SID 1000xxx의 공격 발화는 미검증**, NFQUEUE 인라인 전환은 후속 게이트.
 - [x] WAF: ModSecurity v3 + OWASP CRS 4.29 — 2026-09-26 기본 배치·기존 CRS 경보 실측 완료. **2026-10-06 재집계 기준** `REQUEST-948-GROOT_A_WAF.conf`의 활성 고유 ID 10개(`SecRule` 지시자 12줄) 로드·`nginx -t` 통과, 리버스프록시 정상. 기존 11개 기록은 오집계이며 `id:10010`은 주석 처리돼 활성 룰이 아니다. **DetectionOnly 유지**; 신규 `GROOT_A/*` 룰의 audit→Wazuh 실발화 및 `On` 전환은 후속 검증.
+- [x] 채팅 DuckDNS 공인 인증서 — 2026-10-08 Mac 임시 `acme.sh`와 DuckDNS DNS-01으로 `chat.grootlab.duckdns.org` 단일 이름 Let's Encrypt 인증서를 발급해 A `chatproxy`에 배포했다. 사전 인증서·체인 검사, `nginx -t`/재로드, 실제 SNI·CA 검증 Mattermost ping, Mac `curl` HTTP 200을 확인했다. 만료 2027-01-06 15:02 KST. Mac에 패키지·ACME 상태는 남기지 않았다. [운영 기록](infra/dns/README.md).
+- [ ] 채팅 인증서 모바일·갱신 — 학교 Wi-Fi·VPN에서 Mattermost 모바일 앱 로그인을 각각 시험한다. 2026-12 초에 새 임시 ACME 환경으로 재발급하고 A 재배포를 준비한다(현재 자동 갱신 없음).
 - [x] Wazuh Agent 설치 — **완료(2026-09-26)**: 4.14.8 오프라인 dpkg(배포변수 WAZUH_MANAGER=groot-siem), authd 자동등록 → 매니저 **ID 001 groot-sec Active**. 기본 active-response는 비활성(응답은 MCP→nft `agent_block` 로만). 스크립트 `infra/groot-a/install_agent.sh`. **기존 IPS/WAF 로그 전송 완료**: `agent_localfile.sh`(eve.json·audit.log json localfile, label capstone.source) → B 도착 검증. 로그 회전 `logrotate-capstone-secstack`(daily/500M/14, copytruncate). FW Phase 2 로그는 B 기존 룰로 수집됐고, FW v2 신규 접두사 분류와 실발화는 미검증.
 
 ### 1-2. 2026_capstone_Groot_B (Wazuh + MCP)
@@ -275,6 +277,10 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 ## 진행 로그
 최신 항목을 위에 둔다. (세부 이력은 `대화기록/YYYY-MM-DD.md`)
+
+### 2026-10-08 (약 16:02 KST, 채팅 공인 인증서 배포)
+- Mac의 패키지 설치 없이 임시 `acme.sh` 3.1.6과 DuckDNS DNS-01으로 `chat.grootlab.duckdns.org` Let's Encrypt 인증서를 발급했다. A `chatproxy`에 체인·키를 적용하고 SNI·CA 검증 Mattermost ping과 Mac HTTPS HTTP 200을 확인했다.
+- Mac·A의 임시 발급/전송 파일을 삭제하고 Mac에 ACME 계정·갱신 상태를 남기지 않았다. 만료는 2027-01-06 15:02 KST. 자동 갱신과 학교 Wi-Fi·VPN 모바일 앱 실사용 검증은 남았다. [작업 기록](대화기록/2026-10-08.md)
 
 ### 2026-10-08 (약 12:58 KST, 승인형 룰 변경 MCP 배포)
 - B 승인 브로커와 A/B `rulechg` 전용 SSH 강제 명령·root helper·worker timer를 배포했다. Hermes에 `rule-a`·`rule-b`를 추가하고 기존 읽기·응답 MCP 서버를 유지했다.

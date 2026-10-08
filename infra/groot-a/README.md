@@ -24,6 +24,8 @@ Log4Shell 경로는 이번 SSH 점검에서 **토글 OFF**(A:8080 NAT·DOCKER-US
 
 ## DuckDNS 채팅 공인 인증서 설치
 
+**2026-10-08 라이브 적용:** `chat.grootlab.duckdns.org` 단일 이름 Let's Encrypt 인증서를 설치했다(만료 2027-01-06 15:02 KST). 배포 스크립트의 SNI·CA 검증 Mattermost ping과 Mac `curl` HTTP 200/인증서 검증을 통과했다. Mac·A의 임시 발급/전송 파일은 삭제했다. 자동 갱신 및 학교 Wi-Fi·VPN 모바일 앱 실사용 검증은 남아 있다. [발급·운영 이력](../dns/README.md).
+
 ACME·DuckDNS HTTPS에 도달할 수 있는 장치에서 DNS-01 방식으로 `chat.grootlab.duckdns.org` 또는 `*.grootlab.duckdns.org` 인증서를 발급한다. A는 발급에 필요한 외부 HTTPS에 도달하지 못하므로, 발급된 `fullchain.pem`과 암호 없는 `privkey.pem`을 A에 안전하게 복사한 뒤 다음 명령을 A에서 실행한다. 개인키와 DuckDNS 토큰은 저장소에 넣지 않는다.
 
 ```bash

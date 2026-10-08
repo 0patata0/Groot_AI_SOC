@@ -1,10 +1,11 @@
-# 인프라 현황 스냅샷 — 2026-10-08 SSH 재점검·룰 변경 MCP 배포 기준
+# 인프라 현황 스냅샷 — 2026-10-08 SSH 재점검·룰 변경 MCP·채팅 인증서 배포 기준
 
 > Agentic SOC 캡스톤. 상세 계획·체크리스트는 [PLAN.md](PLAN.md), 날짜별 작업로그는 [대화기록/](대화기록/), 자격증명은 `CREDENTIALS.local.md`(git 미커밋).
 > A/B/C는 2026-10-08 11:53~11:59 KST에 관리 SSH로 읽기 전용 재점검했다. 이어 약 12:58 KST B 승인 브로커, A/B 룰 변경 MCP·worker, Hermes 등록을 배포·검증했다. 세부 근거는 [작업 기록](대화기록/2026-10-08.md)에, 이전 기능별 E2E 실측은 해당 날짜 기록에 구분했다. 공격 프로브·차단 전환·실제 Mattermost 승인→룰 적용 E2E는 실행하지 않았다.
 > **시간대 변경(2026-10-06 15:59 KST, 라이브 확인):** A/B/C 호스트를 `Asia/Seoul`(KST, UTC+09:00)로 통일했고 NTP 동기화를 확인했다. B의 `soc-summary.timer`는 당시 `09,21:00 Asia/Seoul`로 설정했고 다음 실행이 같은 날 21:00 KST임을 확인했다. B `soc-bot`은 최근 경보 시각을 KST로 표시하며, Mattermost 컨테이너는 `TZ=Asia/Seoul`로 재생성 후 healthy를 확인했다. 다른 컨테이너의 내부 시간대는 UTC일 수 있으며, Wazuh 원본 타임스탬프와 표시 시간대는 구분한다. 10/08 세 호스트의 KST·NTP 동기화는 재확인했다.
 > **내부망은 2026-09-29 부터 `10.200.10.0/24`(A .1 / B .10 / C .20)** — 캠퍼스 코어가 쓰는 10.10.10.0/24 와의 중복을 없앴다(런북 `infra/internal_net_change.md`).
 > **외부 주소 확인 주의:** 10/08 SSH에서 A `ens192=192.168.16.230/25`, 직결 라우트 `192.168.16.128/25`, 기본 게이트웨이 `.129`를 재확인했다. 10/06에 확인한 A:10443 DNAT·`CAPSTONE-FWD`의 허용 출발지 `192.168.16.0/25`는 **다른 대역**이다. Kali 주소·라우팅이 미확인이므로 이 허용목록이 의도대로 작동하는지는 시나리오 전에 검증해야 한다.
+> **채팅 인증서(2026-10-08 약 16:02 KST, 라이브 배포):** `chat.grootlab.duckdns.org`에 Let's Encrypt 인증서를 적용했다. 만료 2027-01-06 15:02 KST. A 배포 스크립트의 SNI·CA 검증 ping과 Mac의 `curl` HTTP 200/TLS 검증 결과 0을 확인했다. 실제 모바일 앱의 학교 Wi-Fi·VPN 로그인은 미검증이고 갱신은 미자동화다. [운영 기록](infra/dns/README.md).
 
 ## 라이브 헬스 (A/B/C 호스트는 2026-10-08 SSH 재점검)
 | 호스트 | 역할 | 상태 |
@@ -36,7 +37,7 @@
 ## 접속 치트시트 (Mac, ssh config 등록됨)
 - SIEM 대시보드: **`https://wazuh.groot.lab`**(A:443 프록시; 학과망·VM세그먼트만, VPN·외부 403). VM세그먼트 직결이면 `https://192.168.16.230:10443` 도 가능. (admin, 비번 CREDENTIALS)
 - 셸: `ssh groot-a` / `ssh groot-b-int` / `ssh groot-c-int`.
-- **팀원 무설정 접속(2026-09-28, 공개 DNS=DuckDNS `grootlab.duckdns.org`→192.168.16.230)**: hosts·ssh config 없이 `https://chat.grootlab.duckdns.org` · `https://wazuh.grootlab.duckdns.org`(VPN 403) · `http://dvwa.grootlab.duckdns.org`. SSH 는 `ssh -J groot_a@grootlab.duckdns.org groot_b@10.200.10.10` 한 줄(C 는 10.200.10.20; 이름 기반이라 A IP 변경과 무관). 안내문 `팀접속안내.md`. **DuckDNS 등록 완료·학과망에서 이름만으로 실측 OK**(해석 4개, 채팅 200/101, 대시보드 302→로그인 200, DVWA 302, 인증서 SNI 일치; 2026-09-28).
+- **팀원 무설정 접속(2026-09-28, 공개 DNS=DuckDNS `grootlab.duckdns.org`→192.168.16.230)**: hosts·ssh config 없이 `https://chat.grootlab.duckdns.org` · `https://wazuh.grootlab.duckdns.org`(VPN 403) · `http://dvwa.grootlab.duckdns.org`. SSH 는 `ssh -J groot_a@grootlab.duckdns.org groot_b@10.200.10.10` 한 줄(C 는 10.200.10.20; 이름 기반이라 A IP 변경과 무관). 안내문 `팀접속안내.md`. **DuckDNS 등록 완료·학과망에서 이름만으로 실측 OK**(해석 4개, 채팅 200/101, 대시보드 302→로그인 200, DVWA 302, 당시 인증서 SNI 일치; 2026-09-28). 채팅 DuckDNS 이름은 10/08 공인 인증서로 전환했다.
 - 내부 이름(클라이언트 /etc/hosts 에 `192.168.16.230 dvwa.groot.lab wazuh.groot.lab chat.groot.lab` 1줄):
   - 캠퍼스·VPN 공통: `http://dvwa.groot.lab/` · `https://chat.groot.lab/`(데스크톱 앱 동일 URL)
   - 대시보드: `https://wazuh.groot.lab/` (학과망·VM세그먼트만, VPN 403 — 보안상 VPN 비노출 유지). 자체서명 인증서 1회 신뢰(채팅 인증서와 별개)
@@ -44,6 +45,7 @@
 - 수동 차단(A): `sudo agent_block add <ip> [ttl] [reason]` / `list` / `del <ip>`.
 
 ## 보류 / 다음
+- **채팅 인증서 후속:** 학교 Wi-Fi와 VPN에서 `https://chat.grootlab.duckdns.org`로 Mattermost 모바일 앱 로그인을 각각 검증한다. 만료 2027-01-06 전에 재발급·A 재배포한다(2026-12 초 준비 권장). Mac 임시 ACME 상태는 삭제했으므로 무인 갱신은 없다.
 - **다음 작업·검증**: B 라이브 룰 파일에 없는 신규 FW(`SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`)·WAF(`GROOT_A/*` 100200–299) 디코더·룰을 추가하고 IPS local SID 1000xxx의 나머지 분류도 확인. SID `1000010`→Wazuh `100110`은 이미 관측했다. 이어 VM 세그먼트 공격 프로브로 WAF audit·IPS eve·FW 로그→Wazuh alerts 실발화를 시나리오별로 검증.
 - **별도 전환**: WAF `On`과 IPS 인라인 drop은 아직 적용하지 않았다. 탐지 검증 후 차단 게이트와 평가 범위를 결정. Log4Shell egress 관찰용 `OBS_SEG` 룰은 저장소에만 있고 A 설치본에는 없다.
 - **승인형 규칙 변경 MCP 후속 검증**: 11:46 KST에는 라이브 MCP 목록에 읽기 16툴·IP 차단 응답 3툴만 있었으나, 약 12:58 KST A/B 변경기·worker·Hermes 연결 배포를 완료했다. A의 WAF·Suricata와 B의 Wazuh **로컬 룰**만 조회·제안 대상으로 허용한다. 서버 간 승인 API는 nonce·양방향 HMAC을 사용하고, 지정 승인자가 Mattermost의 변경 전후 diff·해시 카드를 승인한 정확한 제안만 1회 적용하도록 구현했다. HMAC·읽기 조회를 확인하고 기존 읽기·응답 서버를 유지했지만 **실제 승인 버튼 클릭→룰 변경·복구 E2E는 미검증**이다. 운영 룰 해시는 배포 전후 동일하다. 기존 IP 차단 브로커의 설정 누락 시 즉시 실행 제약은 별개로 남아 있다. 상세 `infra/mcp/README.md`.

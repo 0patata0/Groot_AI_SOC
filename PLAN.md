@@ -9,7 +9,7 @@
 
 > **한 장 요약은 [STATUS.md](STATUS.md)** (라이브 헬스·접속 치트시트·다음 할 일).
 
-## 현재 상태 (2026-10-06 SSH 재점검 기준)
+## 현재 상태 (2026-10-06 인프라 SSH 재점검·2026-10-08 룰 변경 MCP 배포 기준)
 
 - A/B/C를 2026-10-06 05:05~05:07 UTC(14:05~14:07 KST)에 SSH로 읽기 전용 재점검했다. 10/6 선행 배치 세부 내용은 [같은 날 작업 기록](대화기록/2026-10-06.md) 참조. 공격 프로브·차단 전환은 이번에 실행하지 않았다.
 - VM 3대(Ubuntu 24.04.5)와 NAT 게이트웨이, Wazuh·MCP·Hermes·Mattermost 경로가 구축됐다. B/C의 임시 외부 NIC `ens192`는 제거됐고 기본 경로는 A다.
@@ -18,6 +18,7 @@
 - ⚠️ 운영 제약(2026-09-26 실제 발생): **공격성 테스트 트래픽을 캠퍼스 VPN 경유로 보내면 캠퍼스 FW가 (VPN IP↔A) 쌍을 차단**해 A 관리접속이 끊김. IDS/WAF 테스트는 반드시 Kali/B/C 등 **VM 세그먼트 안**에서. A 복구 경로: `ssh -J groot-b groot_a@10.200.10.1`.
 - **C**: `ens192` 제거·기본 경로 A, Apache·Wazuh Agent active, DVWA 302, `log4shell-lab` 가동(`10.200.10.20:8080` 내부 바인딩), NTP 동기화를 SSH로 확인했다. 취약점 2,422건 인덱싱은 이전 기록의 수치다.
 - **MCP·Agent**: 읽기 서버(B)와 응답 서버(A) 배치·계약 테스트 완료. 런타임은 Hermes(B)로 결정·배치했고 DGX 추론, 경보 조사, Tier 2 승인→차단 경로를 2026-09-28에 E2E 검증했다.
+- **승인형 룰 변경(2026-10-08 약 12:58 KST)**: B 승인 브로커와 A/B 전용 `rulechg`·worker timer를 배포하고 Hermes에 `rule-a`·`rule-b`를 추가했다. HMAC 통신 및 WAF·Suricata·Wazuh 로컬 룰 대상의 읽기 조회를 확인했고 운영 룰 해시는 그대로다. 실제 Mattermost 승인→룰 적용 E2E는 아직 검증하지 않았다.
 - 제약: 일반 웹(80/443) 반출 제한으로 이미지·패키지는 오프라인 반입. DGX `:11434` 연결은 확보됐다.
 - 주요 결정 확정: LLM=DGX Spark(A-1)/보류 시 로컬 Ollama, 오케스트레이션=Docker Compose(B-1), 보안장비=nftables/Suricata/ModSecurity+CRS, Wazuh=4.14.8.
 
@@ -205,15 +206,15 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 목표: 경보 발생 시 Agent가 자동 조사하고 판단·대응 제안을 산출.
 
-### 2-1. MCP Server (읽기 Groot_B, 응답 Groot_A)
-설계 원칙(A안): Hermes는 B의 격리 컨테이너에서, 읽기 MCP는 B의 별도 계정·프로세스에서, 응답 MCP·Policy Engine은 A의 별도 계정·프로세스에서 실행한다. Wazuh 읽기 자격증명은 B의 MCP 환경에, 차단 권한과 승인 브로커 설정은 A의 응답 경계에 두며 Hermes에는 주지 않는다.
+### 2-1. MCP Server (읽기 Groot_B, 응답 Groot_A, 승인형 로컬 룰 변경 A/B)
+설계 원칙(A안): Hermes는 B의 격리 컨테이너에서, 읽기 MCP는 B의 별도 계정·프로세스에서, 응답 MCP·Policy Engine은 A의 별도 계정·프로세스에서 실행한다. 승인형 로컬 룰 변경 MCP는 A/B의 또 다른 전용 계정·root helper와 B의 브로커에 둔다. Wazuh 읽기 자격증명은 B의 MCP 환경에, 차단 권한과 승인 브로커 설정은 A의 응답 경계에 두며 Hermes에는 주지 않는다.
 **클라이언트 불가지론(pluggable agent)**: 서버는 어떤 AI가 붙는지 모르게 설계 — 에이전트 런타임/LLM 교체는 클라이언트 설정 1블록만 변경(전송 계약: 1차 stdio over SSH → 확장 HTTP). 설계·템플릿·계약테스트: `infra/mcp/README.md`. 읽기 서버는 기성 `gbrigandi/mcp-server-wazuh` v0.3.0(리뷰 완료), 응답 서버는 소형 커스텀(별도 자격증명).
 - [x] Wazuh Tool: `search_alerts`, `get_alert`, `get_agent_status`, `get_vulnerabilities` — **읽기 MCP 서버 14툴로 커버**(계약테스트 PASS) + SOC 챗봇 `/soc alerts|agents|vulns`로 실사용
 - [ ] CVE Tool: `cve_lookup` → NVD + CISA KEV — **CISA KEV 오프라인 반입·리뷰 완료**(B `~/capstone/kev`, 1,726건, CC0, 시나리오 CVE 포함 · `infra/groot-b/kev-data.md`). NVD 상세는 보완 예정
 - [x] Server Tool: 프로세스/포트/FIM/인증 — **읽기 MCP 서버로 커버**(계약테스트 PASS): 프로세스·포트는 `get_wazuh_agent_processes`/`get_wazuh_agent_ports`, FIM·인증 이벤트는 Wazuh 알림·매니저 로그 조회(`get_wazuh_alert_summary`/`search_wazuh_manager_logs`)로 확인. 경보 조사 프롬프트에서 실사용
 - [x] Network Tool: IPS(Suricata)·WAF·FW 로그 조회 — 기존 세 소스의 Wazuh 집중 로그를 읽기 MCP로 조회 가능. **2026-10-06 SSH 점검에서 B 신규 FW·WAF 디코더/룰 부재 확인**; 추가 후 MCP 조회 결과를 검증한다. IPS local SID 분류는 미확인.
 - [x] Response Tool `block_ip`/`unblock_ip`/`list_blocks` — **완료(2026-09-27)**: 응답 MCP 서버(A, 파이썬 stdlib stdio, `infra/mcp/response-mcp.py`), 전용 사용자 `resp`(sshd ForceCommand + authorized_keys restrict) + sudoers(agent_block add/del/list 만, flush 금지) → nft `agent_block`. 정책 엔진(TTL 상한 RESP_MAX_MINUTES=120, reason 필수·정규화, IP 검증, flush 미노출). TTL 만료 리퍼(systemd 타이머)로 auto-unblock 감사(action=expire→B 100131). 자격증명 격리 유지(에이전트=키만, 차단 능력=A sudoers). Mac `ssh -T groot-resp` 계약 테스트 PASS: block→100121, 거부(보호IP)→100123, unblock→100122, 만료→100131. 적대적 리뷰 3관점 반영. `deploy_response_A.sh`(데드맨 롤백 트랩). — [ ] `isolate_host`·`notify`(Mattermost)는 추후
-- [~] 승인형 규칙 변경 MCP — **2026-10-08 저장소 구현·오프라인 검증, 라이브 미배포**: 기존 읽기 MCP는 유지하고 A(WAF·Suricata)와 B(Wazuh)에 별도 전용 계정·고정 대상 변경기를 작성했다. 현재 전문·해시 조회 → 원본 해시가 맞는 전체 후보 제안 → Mattermost 전체 diff/해시 카드 → 지정 승인자 클릭 → 일회성 승인 소비 → 적용 전 재검사·백업·엔진 검사·재로드/재시작·읽기 해시 확인·실패 복구 흐름이다. A↔B 승인 API는 평문 토큰을 보내지 않고 일회성 nonce·양방향 HMAC 서명을 검사한다. 로컬 테스트 통과 후에도 **브로커·A/B 변경기·Hermes 배포 및 실제 버튼 클릭 E2E는 별도 검증 작업으로 남았다**. nft 전체 정책과 WAF/IPS 차단 모드 전환은 범위 밖이다. 세부 범위와 한계는 `infra/mcp/README.md` 참조.
+- [~] 승인형 규칙 변경 MCP — **2026-10-08 저장소 구현·오프라인 검증·라이브 배포 및 읽기/인증 점검 완료**: 기존 읽기 MCP는 유지하고 A(WAF·Suricata)와 B(Wazuh)에 별도 전용 계정·고정 대상 변경기를 배포했다. 현재 전문·해시 조회 → 원본 해시가 맞는 전체 후보 제안 → Mattermost 전체 diff/해시 카드 → 지정 승인자 클릭 → 일회성 승인 소비 → 적용 전 재검사·백업·엔진 검사·재로드/재시작·읽기 해시 확인·실패 복구 흐름이다. A↔B 승인 API는 평문 토큰을 보내지 않고 일회성 nonce·양방향 HMAC 서명을 검사한다. B 브로커·A/B `rulechg`/worker timer가 동작하고 Hermes에 `rule-a`·`rule-b`가 등록됐다. HMAC 통신·세 대상 읽기 조회를 통과했으며 운영 룰 해시는 배포 전후 동일하다. **실제 Mattermost 승인 버튼 클릭→룰 적용·복구 E2E는 별도 검증 작업으로 남았다.** nft 전체 정책과 WAF/IPS 차단 모드 전환은 범위 밖이다. 세부 범위와 한계는 `infra/mcp/README.md` 참조.
 - [ ] `cve_lookup` 등 조사 툴 확장(읽기 서버 14툴 + KEV)
 - [x] 각 Tool 단독 테스트 — **계약테스트 PASS**: 읽기 14툴·응답 3툴(`block_ip`/`unblock_ip`/`list_blocks`) 초기화·호출 검증(`infra/mcp/contract_test.py`), 컨테이너 안 재검증(2026-09-28)
 
@@ -274,6 +275,10 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 ## 진행 로그
 최신 항목을 위에 둔다. (세부 이력은 `대화기록/YYYY-MM-DD.md`)
+
+### 2026-10-08 (약 12:58 KST, 승인형 룰 변경 MCP 배포)
+- B 승인 브로커와 A/B `rulechg` 전용 SSH 강제 명령·root helper·worker timer를 배포했다. Hermes에 `rule-a`·`rule-b`를 추가하고 기존 읽기·응답 MCP 서버를 유지했다.
+- HMAC health와 WAF·Suricata·Wazuh 로컬 룰 대상의 읽기 조회가 통과했다. A/B worker timer는 active/enabled이며 운영 룰 파일 해시는 배포 전후 동일하다. 실제 Mattermost 승인 버튼→룰 적용·복구 E2E는 아직 실행하지 않았다. [작업 기록](대화기록/2026-10-08.md)
 
 ### 2026-10-06 (05:05~05:07 UTC SSH 읽기 전용 재점검)
 - A의 FW v2 `FORWARD=DROP`·CAPSTONE-FWD 14룰, WAF 룰 마운트·DetectionOnly, Suricata 합본 룰·Phase-A passive 및 eve 갱신을 재확인했다. B/C의 `ens192` 부재·A 기본 경로, B 스택/에이전트 3대·DGX API 200, C DVWA·랩·Agent·NTP 정상도 확인했다.

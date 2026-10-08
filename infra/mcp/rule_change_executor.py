@@ -32,6 +32,7 @@ import xml.etree.ElementTree as ET
 
 CONFIG_PATH = Path("/etc/rule-change/config.json")
 STATE_DIR = Path("/var/lib/rule-change")
+DOCKER = "/usr/local/bin/docker"  # fixed path on the live A/B hosts
 MAX_CANDIDATE = 128 * 1024
 MAX_DIFF = 8 * 1024
 MAX_REQUEST = 256 * 1024
@@ -318,7 +319,7 @@ class Engine:
         return record
 
     def _inspect(self, spec):
-        raw = self.runner.call(["/usr/bin/docker", "inspect", spec["container"]], timeout=15)
+        raw = self.runner.call([DOCKER, "inspect", spec["container"]], timeout=15)
         try:
             info = json.loads(raw)[0]
         except (ValueError, IndexError, KeyError, TypeError):
@@ -355,11 +356,11 @@ class Engine:
             expected_remote = aux["all_sha256"]
         else:
             expected_remote = sha256(current)
-        remote = self.runner.call(["/usr/bin/docker", "exec", spec["container"], "sha256sum", spec["container_path"]]).decode().split()
+        remote = self.runner.call([DOCKER, "exec", spec["container"], "sha256sum", spec["container_path"]]).decode().split()
         if not remote or remote[0] != expected_remote:
             raise RuleChangeError("host and live container rule content differ")
         if spec["kind"] == "waf":
-            remote_inode = self.runner.call(["/usr/bin/docker", "exec", "waf", "stat", "-c", "%i", spec["container_path"]]).decode().strip()
+            remote_inode = self.runner.call([DOCKER, "exec", "waf", "stat", "-c", "%i", spec["container_path"]]).decode().strip()
             if remote_inode != str(st.st_ino):
                 raise RuleChangeError("WAF host path inode differs from live bind mount")
         return current, st, aux
@@ -385,7 +386,7 @@ class Engine:
                     os.fchmod(out.fileno(), 0o644)
                     os.fsync(out.fileno())
                 container_file = "/rules/" + staged
-                self.runner.call(["/usr/bin/docker", "exec", "suricata", "suricata", "-T", "-S", container_file], timeout=180)
+                self.runner.call([DOCKER, "exec", "suricata", "suricata", "-T", "-S", container_file], timeout=180)
                 return "offline guards and Suricata -T on staged ET+candidate passed; active all.rules unchanged"
             finally:
                 os.unlink(staged, dir_fd=directory)
@@ -525,11 +526,11 @@ class Engine:
             raise RuleChangeError("live file changed since proposal")
         if kind == "waf":
             _inplace_bytes(spec["path"], candidate, record["base_file"]["inode"])
-            remote_hash = self.runner.call(["/usr/bin/docker", "exec", "waf", "sha256sum", spec["container_path"]]).decode().split()[0]
+            remote_hash = self.runner.call([DOCKER, "exec", "waf", "sha256sum", spec["container_path"]]).decode().split()[0]
             if remote_hash != sha256(candidate):
                 raise RuleChangeError("WAF bind-mounted content hash mismatch")
-            self.runner.call(["/usr/bin/docker", "exec", "waf", "nginx", "-t"], timeout=60)
-            self.runner.call(["/usr/bin/docker", "exec", "waf", "nginx", "-s", "reload"], timeout=30)
+            self.runner.call([DOCKER, "exec", "waf", "nginx", "-t"], timeout=60)
+            self.runner.call([DOCKER, "exec", "waf", "nginx", "-s", "reload"], timeout=30)
         elif kind == "suricata":
             et, _ = _read_regular(spec["et_path"], MAX_RULESET)
             all_rules, all_st = _read_regular(spec["all_path"], MAX_RULESET)
@@ -539,12 +540,12 @@ class Engine:
                 raise RuleChangeError("Suricata combined rules drifted")
             _atomic_bytes(spec["path"], candidate, st)
             _atomic_bytes(spec["all_path"], et + candidate, all_st)
-            self.runner.call(["/usr/bin/docker", "exec", "suricata", "suricata", "-T", "-S", "/rules/all.rules"], timeout=180)
-            self.runner.call(["/usr/bin/docker", "exec", "suricata", "suricatasc", "-c", "reload-rules"], timeout=180)
+            self.runner.call([DOCKER, "exec", "suricata", "suricata", "-T", "-S", "/rules/all.rules"], timeout=180)
+            self.runner.call([DOCKER, "exec", "suricata", "suricatasc", "-c", "reload-rules"], timeout=180)
         elif kind == "wazuh":
             _atomic_bytes(spec["path"], candidate, st)
-            self.runner.call(["/usr/bin/docker", "exec", spec["container"], "/var/ossec/bin/wazuh-analysisd", "-t"], timeout=60)
-            self.runner.call(["/usr/bin/docker", "restart", spec["container"]], timeout=120)
+            self.runner.call([DOCKER, "exec", spec["container"], "/var/ossec/bin/wazuh-analysisd", "-t"], timeout=60)
+            self.runner.call([DOCKER, "restart", spec["container"]], timeout=120)
             self._wait_wazuh_manager(spec)
         else:
             raise RuleChangeError("unsupported target kind")
@@ -552,7 +553,7 @@ class Engine:
         final, _ = _read_regular(spec["path"])
         if sha256(final) != sha256(candidate):
             raise RuleChangeError("post-apply file hash mismatch")
-        remote = self.runner.call(["/usr/bin/docker", "exec", spec["container"], "sha256sum", spec["container_path"]]).decode().split()
+        remote = self.runner.call([DOCKER, "exec", spec["container"], "sha256sum", spec["container_path"]]).decode().split()
         if kind == "suricata":
             et, _ = _read_regular(spec["et_path"], MAX_RULESET)
             all_rules, _ = _read_regular(spec["all_path"], MAX_RULESET)
@@ -569,7 +570,7 @@ class Engine:
         while self.clock() < deadline:
             try:
                 self._inspect(spec)
-                status = self.runner.call(["/usr/bin/docker", "exec", spec["container"],
+                status = self.runner.call([DOCKER, "exec", spec["container"],
                                            "/var/ossec/bin/wazuh-control", "status"], timeout=15).decode("utf-8", "replace")
                 if all("%s is running" % process in status for process in ("wazuh-analysisd", "wazuh-remoted", "wazuh-db")):
                     return
@@ -673,7 +674,7 @@ class Engine:
         spec = self.spec(record["payload"]["target"])
         try:
             if spec["kind"] in ("waf", "wazuh"):
-                remote = self.runner.call(["/usr/bin/docker", "exec", spec["container"], "sha256sum", spec["container_path"]]).decode().split()
+                remote = self.runner.call([DOCKER, "exec", spec["container"], "sha256sum", spec["container_path"]]).decode().split()
                 if not remote or not HEX_SHA.fullmatch(remote[0]):
                     raise RuleChangeError("container readback unavailable")
                 readback_sha = remote[0]
@@ -711,12 +712,12 @@ class Engine:
 
     def _reload_after_restore(self, spec):
         if spec["kind"] == "waf":
-            self.runner.call(["/usr/bin/docker", "exec", "waf", "nginx", "-t"], timeout=60)
-            self.runner.call(["/usr/bin/docker", "exec", "waf", "nginx", "-s", "reload"])
+            self.runner.call([DOCKER, "exec", "waf", "nginx", "-t"], timeout=60)
+            self.runner.call([DOCKER, "exec", "waf", "nginx", "-s", "reload"])
         elif spec["kind"] == "suricata":
-            self.runner.call(["/usr/bin/docker", "exec", "suricata", "suricatasc", "-c", "reload-rules"], timeout=180)
+            self.runner.call([DOCKER, "exec", "suricata", "suricatasc", "-c", "reload-rules"], timeout=180)
         elif spec["kind"] == "wazuh":
-            self.runner.call(["/usr/bin/docker", "restart", spec["container"]], timeout=120)
+            self.runner.call([DOCKER, "restart", spec["container"]], timeout=120)
             self._wait_wazuh_manager(spec)
         self._inspect(spec)
 

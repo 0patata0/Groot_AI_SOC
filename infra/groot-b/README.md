@@ -4,6 +4,8 @@
 
 > **2026-10-08 관리 SSH 직접 재확인:** Wazuh 000/001/002는 계속 Active이고 경보 파일이 갱신 중이다. Hermes의 3개 MCP 서버가 enabled, SOC 봇·보고/요약 타이머가 active다. B 브로커 토큰·허용 승인자 목록은 비어 있지 않다. 로컬 룰 파일은 저장소와 해시가 같고 디코더는 주석의 옛 예시 IP 한 줄만 다르다. 신규 FW 접두어·WAF 100200대 분류는 여전히 없다. [오늘 기록](../../대화기록/2026-10-08.md)
 
+> **같은 날 약 12:58 KST 후속 배포:** B `soc-bot`에 별도 룰 승인 API를 배포하고 `rulechg` SSH 강제 명령·root helper·`rule-change-worker.timer`를 설치했다(active/enabled). Hermes에는 기존 3개 MCP 서버를 유지하면서 `rule-a`·`rule-b`를 추가했다. A/B↔브로커 HMAC 통신과 로컬 룰 대상 읽기 조회가 통과했고, Wazuh 운영 룰 해시는 배포 전후 동일하다. 실제 Mattermost 승인 버튼→룰 적용·복구 E2E는 아직 검증하지 않았다. [배포 절차](../mcp/rule-change-deploy.md)
+
 ## Wazuh 4.14.8 single-node — 오프라인 기동 (2026-09-26 완료 ✅)
 공식 **wazuh-docker `v4.14.8` single-node** 구성을 쓰되, 이 망은 **웹 egress 차단**이라 온라인 절차를 그대로 못 쓴다. 아래는 실제로 동작한 오프라인 절차.
 
@@ -43,6 +45,7 @@ sudo bash /tmp/finish_wazuh.sh
 ## MCP Server (자격증명 보유 — A안)
 - 읽기 서버: `gbrigandi/mcp-server-wazuh`(MIT, 읽기전용, 코드리뷰 완료 @969f36f)를 2026-09-26 B `/opt/mcp/`에 오프라인 배포했다. Wazuh API :55000 + Indexer :9200에 **읽기전용 계정**으로 접속하며 자격증명은 B `/etc/mcp/wazuh-ro.env`에 둔다. 읽기 14툴 계약 테스트와 Hermes 컨테이너 연결을 9/28까지 검증했다.
 - 응답 서버는 A의 별도 MCP/Policy Engine이며 `block_ip`/`unblock_ip`/`list_blocks`→nftables `agent_block` 경로가 9/28 승인→차단 E2E까지 검증됐다. `isolate_host`는 후속 목표다. Hermes는 B의 별도 계정·컨테이너에서 실행하고 MCP 자격증명은 갖지 않는다.
+- 승인형 로컬 룰 변경은 기존 읽기 MCP 권한을 올리지 않고 B 승인 브로커와 A/B의 별도 `rulechg` 계정·root helper로 처리한다. B에서는 Wazuh `local_rules.xml`만 변경 대상으로 허용한다. 10/08 HMAC health·대상 읽기 조회는 통과했으며 실제 승인→적용은 미검증이다.
 - 참고 데이터: CISA KEV `~/capstone/kev/kev.json` (`kev-data.md`).
 
 ## 검증 체크리스트
@@ -51,3 +54,5 @@ sudo bash /tmp/finish_wazuh.sh
 - [ ] 신규 FW 프리픽스·WAF GROOT 룰·IPS 로컬 SID의 기존 디코더/룰 분류 여부 확인 → 빠진 항목만 추가 → VM 세그먼트 공격 프로브로 경보 실발화 검증
 - [ ] Vulnerability Detection에서 Groot_C의 CVE-2021-3156 매핑 확인
 - [x] MCP 읽기 14툴 호출 성공, Hermes 프로세스에 MCP 자격증명 없음 확인(2026-09-28 기록). 이번 SSH에서는 이 계약 테스트를 재실행하지 않았다.
+- [x] 승인형 룰 변경 브로커·A/B 변경기와 Hermes `rule-a`·`rule-b` 배포, HMAC·읽기 조회 확인(2026-10-08). 운영 룰 해시는 그대로.
+- [ ] 지정 승인자의 Mattermost 버튼 클릭→Wazuh 로컬 룰 적용·복구 E2E 검증.

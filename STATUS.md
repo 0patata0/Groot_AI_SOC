@@ -1,7 +1,7 @@
-# 인프라 현황 스냅샷 — 2026-10-08 SSH 재점검 기준
+# 인프라 현황 스냅샷 — 2026-10-08 SSH 재점검·룰 변경 MCP 배포 기준
 
 > Agentic SOC 캡스톤. 상세 계획·체크리스트는 [PLAN.md](PLAN.md), 날짜별 작업로그는 [대화기록/](대화기록/), 자격증명은 `CREDENTIALS.local.md`(git 미커밋).
-> A/B/C는 2026-10-08 11:53~11:59 KST에 관리 SSH로 읽기 전용 재점검했다. 오늘의 서비스·룰·승인 설정 확인은 [작업 기록](대화기록/2026-10-08.md)에, 이전 기능별 E2E 실측은 해당 날짜 기록에 구분했다. 공격 프로브·차단 전환·승인→차단 E2E는 이번에 실행하지 않았다.
+> A/B/C는 2026-10-08 11:53~11:59 KST에 관리 SSH로 읽기 전용 재점검했다. 이어 약 12:58 KST B 승인 브로커, A/B 룰 변경 MCP·worker, Hermes 등록을 배포·검증했다. 세부 근거는 [작업 기록](대화기록/2026-10-08.md)에, 이전 기능별 E2E 실측은 해당 날짜 기록에 구분했다. 공격 프로브·차단 전환·실제 Mattermost 승인→룰 적용 E2E는 실행하지 않았다.
 > **시간대 변경(2026-10-06 15:59 KST, 라이브 확인):** A/B/C 호스트를 `Asia/Seoul`(KST, UTC+09:00)로 통일했고 NTP 동기화를 확인했다. B의 `soc-summary.timer`는 당시 `09,21:00 Asia/Seoul`로 설정했고 다음 실행이 같은 날 21:00 KST임을 확인했다. B `soc-bot`은 최근 경보 시각을 KST로 표시하며, Mattermost 컨테이너는 `TZ=Asia/Seoul`로 재생성 후 healthy를 확인했다. 다른 컨테이너의 내부 시간대는 UTC일 수 있으며, Wazuh 원본 타임스탬프와 표시 시간대는 구분한다. 10/08 세 호스트의 KST·NTP 동기화는 재확인했다.
 > **내부망은 2026-09-29 부터 `10.200.10.0/24`(A .1 / B .10 / C .20)** — 캠퍼스 코어가 쓰는 10.10.10.0/24 와의 중복을 없앴다(런북 `infra/internal_net_change.md`).
 > **외부 주소 확인 주의:** 10/08 SSH에서 A `ens192=192.168.16.230/25`, 직결 라우트 `192.168.16.128/25`, 기본 게이트웨이 `.129`를 재확인했다. 10/06에 확인한 A:10443 DNAT·`CAPSTONE-FWD`의 허용 출발지 `192.168.16.0/25`는 **다른 대역**이다. Kali 주소·라우팅이 미확인이므로 이 허용목록이 의도대로 작동하는지는 시나리오 전에 검증해야 한다.
@@ -9,8 +9,8 @@
 ## 라이브 헬스 (A/B/C 호스트는 2026-10-08 SSH 재점검)
 | 호스트 | 역할 | 상태 |
 |---|---|---|
-| **Groot_A** `groot-sec` 192.168.16.230 / 10.200.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답 MCP | ✅ 10/08: **FORWARD=DROP**, `CAPSTONE-FWD` 14룰, nft input DROP·output ACCEPT, 임시 차단 목록 비어 있음. WAF healthy·`nginx -t` 통과·커스텀 ID 10개·**DetectionOnly**. Suricata `-i ens192 -S /rules/all.rules`·로컬 SID 11개, 인라인 queue 0개, eve.json 갱신. WAF/Suricata 로컬 룰 해시는 저장소와 일치. A의 설정 토큰으로 B 브로커 `GET /pending` HTTP 200(대기 0건) |
-| **Groot_B** `groot-siem` 10.200.10.10 | Wazuh SIEM + 읽기 MCP + 채팅 | ✅ 10/08: `ens192` 없음·기본 경로 A, Wazuh 000/001/002 Active, manager·indexer·dashboard·Mattermost·Hermes Up, `soc-bot`·보고/요약 타이머 active. Hermes의 `wazuh-ro`·`security-events`·`resp` 3서버 enabled, `alerts.json` 갱신 중. 브로커 토큰·지정 승인자 목록 값이 비어 있지 않음. **신규 FW 접두어·WAF 100200+ 분류는 여전히 없음**. 라이브 룰은 저장소와 해시 일치, 디코더 차이는 주석 예시 IP 한 줄뿐 |
+| **Groot_A** `groot-sec` 192.168.16.230 / 10.200.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답·룰 변경 MCP | ✅ 10/08: **FORWARD=DROP**, `CAPSTONE-FWD` 14룰, nft input DROP·output ACCEPT, 임시 차단 목록 비어 있음. WAF healthy·`nginx -t` 통과·커스텀 ID 10개·**DetectionOnly**. Suricata `-i ens192 -S /rules/all.rules`·로컬 SID 11개, 인라인 queue 0개, eve.json 갱신. WAF/Suricata 운영 룰 해시는 배포 전후 동일. A `rulechg`·worker timer active/enabled, HMAC 통신·읽기 전용 대상 조회 통과. 기존 차단 브로커 `GET /pending` HTTP 200 확인 |
+| **Groot_B** `groot-siem` 10.200.10.10 | Wazuh SIEM + 읽기·룰 변경 MCP + 채팅 | ✅ 10/08: `ens192` 없음·기본 경로 A, Wazuh 000/001/002 Active, manager·indexer·dashboard·Mattermost·Hermes Up, `soc-bot`·보고/요약 타이머 active. 11:53~11:59 KST에는 Hermes 기존 3서버 enabled였고, 약 12:58 배포 뒤 `rule-a`·`rule-b`가 추가됐다. B `rulechg`·worker timer active/enabled, 승인 브로커 HMAC·읽기 전용 대상 조회 통과. Wazuh 운영 룰 해시는 배포 전후 동일. **신규 FW 접두어·WAF 100200+ 분류는 여전히 없음**. 디코더 차이는 주석 예시 IP 한 줄뿐 |
 | **Groot_C** `groot-web` 10.200.10.20 | DVWA + CVE 랩 | ✅ 10/08: `ens192` 없음·기본 경로 A, Apache·Wazuh Agent·Docker active, DVWA 로그인 HTTP 200, `log4shell-lab` 실행 중(`10.200.10.20:8080` 내부 바인딩·HTTP 응답 확인), A NTP 동기화. C→B Wazuh 1514/tcp 연결 ESTAB; 랩 기능 전체 재현 시험은 하지 않음 |
 | 관리포털(Wazuh) | **A:443 이름 프록시**(chatproxy)→B:443 (+A:10443 DNAT 유지) | ✅ **`https://wazuh.groot.lab`** 학과망·VM세그먼트 OK(로그인 200 실측 2026-09-28). 출발지 allowlist(학과망 **192.168.10.0/24·192.168.12.0/24**·VM세그먼트·내부망) — **VPN(192.168.15.0/24)·외부는 403**(대시보드 VPN 비노출 결정 유지). 2026-09-29 학과망이 192.168.10.x 로 배정되어 403 → allowlist 에 추가·chatproxy 재시작으로 해결. 학과망(192.168.12.x)은 10443 이 캠퍼스 FW 에 막힘(실측) → 이 경로가 유일. 팀원 무설정 별칭 **`https://wazuh.grootlab.duckdns.org`**(동일 allowlist). 맨 IP 443=444 |
 | 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`**(hosts) + **`https://chat.grootlab.duckdns.org`**(팀원 무설정, DuckDNS) — 둘 다 웹소켓 101 실측(AllowCorsFrom 두 Origin). SiteURL=DuckDNS 이름(대표). 맨 IP 443은 444 |
@@ -30,6 +30,7 @@
 - **A 호스트 방화벽 Phase 2 + agent_block**: input 기본 drop, raw prerouting 차단 셋 + never_block 잠금가드, CLI, 데드맨 적용, 실차단 검증. B 룰 100120~100131.
 - **MCP 읽기 서버**(B, `ssh -T groot-mcp`): 기존 Wazuh 14툴 계약 테스트 PASS. 별도 `ssh -T groot-mcp security-events` 보안 이벤트 2툴을 B에 배치하고 Suricata·ModSecurity 조회 계약 테스트 PASS. 둘 다 읽기전용 `mcp-ro` 인덱서 권한을 사용한다. Hermes 실설정에 세 번째 서버를 추가해 재시작했고 `hermes mcp list`에서 3서버 enabled를 확인했다. Hermes LLM 대화의 두 새 도구 호출도 PASS(SID `1000010`, CRS `920350`).
 - **MCP 응답 서버**(A, `ssh -T groot-resp`): block_ip/unblock_ip/list_blocks → agent_block, 정책 엔진, TTL 만료 리퍼, 계약 테스트 PASS(차단 100121 / 거부 100123 / 해제 100122 / 만료 100131).
+- **승인형 룰 변경 MCP**(A/B, 2026-10-08 약 12:58 KST): B 브로커에 별도 룰 승인 API를 배포하고 A/B에 `rulechg` 강제 명령·root helper·worker timer를 설치했다. Hermes에 `rule-a`·`rule-b`를 추가하면서 기존 읽기·응답 MCP 서버를 유지했다. HMAC health와 세 로컬 룰 대상의 읽기 조회가 통과했고 운영 룰 해시는 배포 전후 동일했다. 실제 Mattermost 버튼 승인→룰 적용은 아직 검증하지 않았다.
 - **문서**: `scenarios/`(탐지 검증 매트릭스 + 공개 표준 레퍼런스), infra README(A/B/C/MCP).
 
 ## 접속 치트시트 (Mac, ssh config 등록됨)
@@ -39,13 +40,13 @@
 - 내부 이름(클라이언트 /etc/hosts 에 `192.168.16.230 dvwa.groot.lab wazuh.groot.lab chat.groot.lab` 1줄):
   - 캠퍼스·VPN 공통: `http://dvwa.groot.lab/` · `https://chat.groot.lab/`(데스크톱 앱 동일 URL)
   - 대시보드: `https://wazuh.groot.lab/` (학과망·VM세그먼트만, VPN 403 — 보안상 VPN 비노출 유지). 자체서명 인증서 1회 신뢰(채팅 인증서와 별개)
-- 읽기 MCP: 기존 Wazuh `ssh -T groot-mcp`, Suricata·ModSecurity 경보 `ssh -T groot-mcp security-events` · 응답 MCP: `ssh -T groot-resp`. Hermes 3서버 enabled 및 새 읽기 도구 2개의 LLM 호출 확인.
+- 읽기 MCP: 기존 Wazuh `ssh -T groot-mcp`, Suricata·ModSecurity 경보 `ssh -T groot-mcp security-events` · 응답 MCP: `ssh -T groot-resp`. 10/06 읽기 도구 2개의 LLM 호출을 확인했다. 10/08 룰 변경 전용 `rule-a`·`rule-b`를 추가해 Hermes에 총 5개 서버를 등록했고, 룰 대상의 읽기 조회를 확인했다.
 - 수동 차단(A): `sudo agent_block add <ip> [ttl] [reason]` / `list` / `del <ip>`.
 
 ## 보류 / 다음
 - **다음 작업·검증**: B 라이브 룰 파일에 없는 신규 FW(`SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`)·WAF(`GROOT_A/*` 100200–299) 디코더·룰을 추가하고 IPS local SID 1000xxx의 나머지 분류도 확인. SID `1000010`→Wazuh `100110`은 이미 관측했다. 이어 VM 세그먼트 공격 프로브로 WAF audit·IPS eve·FW 로그→Wazuh alerts 실발화를 시나리오별로 검증.
 - **별도 전환**: WAF `On`과 IPS 인라인 drop은 아직 적용하지 않았다. 탐지 검증 후 차단 게이트와 평가 범위를 결정. Log4Shell egress 관찰용 `OBS_SEG` 룰은 저장소에만 있고 A 설치본에는 없다.
-- **승인형 규칙 변경 MCP(2026-10-08, 저장소 구현·라이브 미배포)**: 오늘 라이브 MCP 목록에는 읽기 16툴·IP 차단 응답 3툴만 있었다. 이후 저장소에 A의 WAF·Suricata와 B의 Wazuh 로컬 룰 전용 조회/제안/상태 도구, 해시 결속 승인 브로커, 일회성 적용·복구 worker와 배포 스크립트를 작성했다. 새 전용 토큰은 HTTP로 전송하지 않고 nonce·양방향 HMAC으로 승인 API를 인증한다. 실제 서버에는 아직 새 권한·키·worker·Hermes 도구를 설치하지 않았으므로 라이브 에이전트의 룰 수정은 여전히 불가하다. 기존 IP 차단 브로커의 설정 누락 시 즉시 실행 제약은 별개로 남아 있다. 상세 `infra/mcp/README.md`.
+- **승인형 규칙 변경 MCP 후속 검증**: 11:46 KST에는 라이브 MCP 목록에 읽기 16툴·IP 차단 응답 3툴만 있었으나, 약 12:58 KST A/B 변경기·worker·Hermes 연결 배포를 완료했다. A의 WAF·Suricata와 B의 Wazuh **로컬 룰**만 조회·제안 대상으로 허용한다. 서버 간 승인 API는 nonce·양방향 HMAC을 사용하고, 지정 승인자가 Mattermost의 변경 전후 diff·해시 카드를 승인한 정확한 제안만 1회 적용하도록 구현했다. HMAC·읽기 조회를 확인하고 기존 읽기·응답 서버를 유지했지만 **실제 승인 버튼 클릭→룰 변경·복구 E2E는 미검증**이다. 운영 룰 해시는 배포 전후 동일하다. 기존 IP 차단 브로커의 설정 누락 시 즉시 실행 제약은 별개로 남아 있다. 상세 `infra/mcp/README.md`.
 - **다음 후보**:
   1. 에이전트: **경보 트리거·Tier 2 승인·채팅 게이트웨이까지 완료(2026-09-28)** → 다음은 시나리오 실측(사용자 직접), 평가(MTTI/MTTR), 승인자 목록의 실제 팀원 구성·권한 검증.
   2. 시나리오 실제 실행(선행조건: DVWA `low`, A Log4Shell 토글 설치본 동기화·경로 검증, C sudo CVE 취약성 검증, Kali VM 세그먼트 직결). C의 `sudo --version`은 10/6에 **1.8.31**로 관측했으나 버전만으로 CVE-2021-3156 취약 여부를 확정하지 않는다.

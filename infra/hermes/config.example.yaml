@@ -1,10 +1,11 @@
 # Hermes Agent 설정 템플릿 — Groot SOC. 실배치 경로: Groot_B /opt/hermes-data/config.yaml (컨테이너 /opt/data/config.yaml)
 # 실행: 공식 Docker 이미지 nousresearch/hermes-agent(오프라인 반입), 데이터 볼륨 /opt/hermes-data:/opt/data, HERMES_UID/GID=호스트 hermes 사용자.
-# 핵심(A안): Wazuh API·인덱서·FW 자격증명은 여기 없다. MCP 서버는 sshd ForceCommand 경계(mcp@B, resp@A)로만 붙고,
-#   컨테이너는 그 계정들의 authorized_keys 에 restrict,command= 로 등록된 SSH 키 하나만 가진다(/opt/data/home/.ssh/).
+# 핵심(A안): Wazuh API·인덱서·FW 자격증명은 여기 없다. MCP 서버는 sshd ForceCommand 경계(mcp@B, resp@A, rulechg@A/B)로만 붙고,
+#   컨테이너는 계정별 authorized_keys 에 restrict,command= 로 등록된 전용 SSH 키만 가진다(/opt/data/home/.ssh/).
 #   호스트 사용자 hermes 는 mcp 그룹이 아니라 /etc/mcp/*.env 를 읽을 수 없다.
 # 배치·검증: infra/hermes/deploy_hermes_B.sh (prep | load <tar> | test). 이미지엔 mcp[cli] 가 없어 `hermes mcp test` 불가.
 # 2026-09-28 실측은 17툴/2서버(읽기 14+응답 3). security-events 2툴은 2026-10-06 B 배치·원격 조회 검증 후 Hermes 실설정에 등록했다. `hermes mcp list`의 3서버 enabled와 LLM의 새 도구 2개 실제 호출을 확인했다.
+# 2026-10-08 라이브 배포: 별도 승인형 로컬 룰 변경 MCP rule-a/rule-b(각 3툴)를 추가했고 Hermes에서 5서버 enabled와 양쪽 읽기 전용 SSH 조회를 확인했다. 실제 승인→룰 적용 E2E는 미검증이다.
 
 mcp_servers:
   wazuh-ro:                                   # 읽기 MCP 서버(B, gbrigandi/mcp-server-wazuh, 계정 mcp-ro) — 14 툴
@@ -43,6 +44,24 @@ mcp_servers:
       resources: false
       prompts: false
     trust: full                               # 라이브는 서버측 승인 브로커가 block_ip 승인 강제(2026-09-28 실측)
+  # rule-change-mcp:start
+  rule-a:                                     # A의 WAF·Suricata 로컬 룰 전용, 별도 rulechg 계정/키
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-a"]
+    env: {HOME: /opt/data/home}
+    connect_timeout: 60
+    timeout: 240
+    supports_parallel_tool_calls: false
+    trust: full                               # 승인 강제는 서버측 브로커·root 실행기
+  rule-b:                                     # B의 Wazuh 로컬 룰 전용, 같은 전용 클라이언트 키
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-b"]
+    env: {HOME: /opt/data/home}
+    connect_timeout: 60
+    timeout: 240
+    supports_parallel_tool_calls: false
+    trust: full
+  # rule-change-mcp:end
 
 security:
   allow_lazy_installs: false                  # 오프라인: 런타임 pip 설치 시도 금지

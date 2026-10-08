@@ -6,6 +6,8 @@ A = 외부(ens192 192.168.16.230, 캠퍼스 세그먼트) ↔ 내부(ens160 10.2
 
 > **2026-10-08 관리 SSH 직접 재확인:** WAF 커스텀 ID 10개·Suricata 로컬 SID 11개의 라이브 파일 해시가 저장소와 각각 일치한다. WAF는 여전히 `DetectionOnly`, Suricata는 passive이고 인라인 queue 룰은 0개다. FW `FORWARD DROP`·14룰, nft input DROP·output ACCEPT이며 현재 임시 IP 차단은 0건이다. A 브로커 URL·토큰이 설정됐고 A→B 인증된 `GET /pending` HTTP 200이었다(승인→차단 E2E 미시험). [오늘 기록](../../대화기록/2026-10-08.md)
 
+> **같은 날 약 12:58 KST 후속 배포:** A에 별도 `rulechg` SSH 강제 명령·root 소유 고정 대상 helper·`rule-change-worker.timer`를 배포했다(active/enabled). B 승인 브로커와의 HMAC 통신 및 WAF·Suricata 로컬 룰 **읽기 조회**가 통과했다. 두 운영 룰 해시는 배포 전후 동일하다. 실제 Mattermost 승인 버튼→룰 적용·복구 E2E는 아직 검증하지 않았다. [배포 절차](../mcp/rule-change-deploy.md)
+
 Log4Shell 경로는 이번 SSH 점검에서 **토글 OFF**(A:8080 NAT·DOCKER-USER 시나리오 룰 없음)였다. 저장소의 `scenario_log4shell_route.sh`에는 C→`OBS_SEG` 관찰 룰이 있으나 A에 설치된 `/usr/local/sbin/scenario_log4shell_route.sh`에는 없다. A `ens192`는 `192.168.16.230/25`(직결 `192.168.16.128/25`)인데, 라이브 10443 DNAT/CAPSTONE-FWD 출발지 제한과 저장소 `OBS_SEG`는 `192.168.16.0/25`다. Kali 주소·왕복 경로를 확인하고 설치본을 동기화한 뒤 시나리오를 검증해야 한다.
 
 | 구성 | 파일(repo → A) | 요점 |
@@ -18,6 +20,7 @@ Log4Shell 경로는 이번 SSH 점검에서 **토글 OFF**(A:8080 NAT·DOCKER-US
 | Wazuh 에이전트 | `install_agent.sh`, `agent_localfile.sh`, `logrotate-capstone-secstack` | ID 001 groot-sec. eve.json·audit.log·journald(커널 nft 로그, agent_block 감사) 수집 |
 | NTP 서버 | `ntp_server.sh` | chrony ← 캠퍼스 192.168.16.131, B/C 에 10.200.10.1:123 서비스(`bindaddress`) |
 | 응답(차단) MCP 서버 | `../mcp/{response-mcp.py, run-response.sh, deploy_response_A.sh}`, `agent_block_reaper.sh` | 사용자 `resp` + sshd ForceCommand + sudoers(agent_block add/del/list). 에이전트가 `ssh -T groot-resp` 로 block_ip/unblock_ip/list_blocks 호출 → `agent_block`. TTL 만료 리퍼(타이머 `capstone-block-reaper`) → Wazuh 100131. 이번 SSH 점검에서 A의 `/etc/resp/hitl.env`에 브로커 URL·토큰이 설정된 것은 확인했으나 승인 후 차단 종단 간 동작은 재시험하지 않았다. |
+| 승인형 로컬 룰 변경 MCP | `../mcp/{rule_change_mcp.py,rule_change_executor.py,deploy_rule_change_A.sh}` | `rulechg` 전용 계정·SSH 강제 명령과 root helper로 WAF·Suricata 로컬 룰만 처리한다. B 브로커가 승인한 제안을 10초 worker가 확인한다. HMAC·읽기 조회 통과, 실제 승인→룰 적용 E2E는 미검증. |
 
 ## DuckDNS 채팅 공인 인증서 설치
 

@@ -10,7 +10,7 @@ Slack은 이 망에서 불가(아웃바운드 443 차단, 2026-09-27 실측). �
 - 자체 호스팅(Docker), incoming/outgoing webhook + **interactive message buttons**(승인/거부) + slash command + bot API 지원. air-gapped 배포 문서 존재.
 - **Hermes 에이전트에 Mattermost 인터랙티브 승인 버튼이 이미 구현**(NousResearch/hermes-agent PR #29373, issue #27587) → 런타임=Hermes면 승인 창구가 사실상 내장.
 - 대안: Rocket.Chat(유사). 초경량이 필요하면 채팅 없이 "승인 인박스" 웹페이지도 가능하지만 사용자가 채팅 형태를 원함.
-- ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**. 2026-10-08 DuckDNS 채팅 이름에 Let's Encrypt 인증서를 적용해 Mac의 HTTPS 검증을 통과했다. 사용자의 휴대폰 GlobalProtect 로그인은 실패했고 원인은 미확인이다. 현재는 A에 도달하는 학교 내부 Wi-Fi에서 실제 Mattermost 앱 로그인을 시험해야 한다. 앱 접속과 푸시 알림은 별개다.
+- ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**. 2026-10-08 DuckDNS 채팅 이름에 Let's Encrypt 인증서를 적용해 Mac의 HTTPS 검증을 통과했다. 사용자 보고에 따르면 학교 관리자가 관리 범위 확대를 이유로 모바일 GlobalProtect 지원을 거절했고 휴대폰 VPN 로그인도 실패했다. 현재는 A에 도달하는 학교 내부 Wi-Fi에서 실제 Mattermost 앱 로그인을 시험해야 한다. 앱 접속과 푸시 알림은 별개다.
 
 ## 구성 요소
 - **Mattermost 서버 + PostgreSQL** (Docker, 오프라인 이미지 반입 — 기존 방식과 동일). 배치 후보: **Groot_B**(디스크 145G 여유) 또는 소형 전용 VM. 내부망 전용(10.200.10.x), 접근은 대시보드처럼 A 점프(`ssh -L`).

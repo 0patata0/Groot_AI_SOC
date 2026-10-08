@@ -45,7 +45,7 @@
 - 수동 차단(A): `sudo agent_block add <ip> [ttl] [reason]` / `list` / `del <ip>`.
 
 ## 보류 / 다음
-- **채팅 인증서 후속:** A 사설 IP에 도달하는 학교 Wi-Fi에서 `https://chat.grootlab.duckdns.org`로 Mattermost 모바일 앱 로그인을 검증한다. GlobalProtect iOS/Android 앱은 존재하지만 10/08 사용자 휴대폰의 학교 VPN 로그인은 실패했다. 원인과 학교 포털의 휴대폰 허용 여부는 미확인이며, 이 실패는 채팅 인증서 시험 결과가 아니다. 모바일 VPN 경로는 보류한다. 만료 2027-01-06 전에 재발급·A 재배포한다(2026-12 초 준비 권장). Mac 임시 ACME 상태는 삭제했으므로 무인 갱신은 없다.
+- **채팅 인증서 후속:** A 사설 IP에 도달하는 학교 Wi-Fi에서 `https://chat.grootlab.duckdns.org`로 Mattermost 모바일 앱 로그인을 검증한다. 사용자 보고에 따르면 학교 관리자는 관리 범위 확대를 이유로 모바일 GlobalProtect 지원을 거절했고, 사용자 휴대폰의 VPN 로그인도 실패했다. 기술적 실패 원인은 미확인이나 운영상 모바일 VPN 경로는 계획에서 제외한다. 이 실패는 채팅 인증서 시험 결과가 아니다. 만료 2027-01-06 전에 재발급·A 재배포한다(2026-12 초 준비 권장). Mac 임시 ACME 상태는 삭제했으므로 무인 갱신은 없다.
 - **다음 작업·검증**: B 라이브 룰 파일에 없는 신규 FW(`SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`)·WAF(`GROOT_A/*` 100200–299) 디코더·룰을 추가하고 IPS local SID 1000xxx의 나머지 분류도 확인. SID `1000010`→Wazuh `100110`은 이미 관측했다. 이어 VM 세그먼트 공격 프로브로 WAF audit·IPS eve·FW 로그→Wazuh alerts 실발화를 시나리오별로 검증.
 - **별도 전환**: WAF `On`과 IPS 인라인 drop은 아직 적용하지 않았다. 탐지 검증 후 차단 게이트와 평가 범위를 결정. Log4Shell egress 관찰용 `OBS_SEG` 룰은 저장소에만 있고 A 설치본에는 없다.
 - **승인형 규칙 변경 MCP 후속 검증**: 11:46 KST에는 라이브 MCP 목록에 읽기 16툴·IP 차단 응답 3툴만 있었으나, 약 12:58 KST A/B 변경기·worker·Hermes 연결 배포를 완료했다. A의 WAF·Suricata와 B의 Wazuh **로컬 룰**만 조회·제안 대상으로 허용한다. 서버 간 승인 API는 nonce·양방향 HMAC을 사용하고, 지정 승인자가 Mattermost의 변경 전후 diff·해시 카드를 승인한 정확한 제안만 1회 적용하도록 구현했다. HMAC·읽기 조회를 확인하고 기존 읽기·응답 서버를 유지했지만 **실제 승인 버튼 클릭→룰 변경·복구 E2E는 미검증**이다. 운영 룰 해시는 배포 전후 동일하다. 기존 IP 차단 브로커의 설정 누락 시 즉시 실행 제약은 별개로 남아 있다. 상세 `infra/mcp/README.md`.

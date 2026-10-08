@@ -64,20 +64,6 @@ private final class Canvas {
         NSBezierPath(rect: rect(x, top, w, h)).fill()
     }
 
-    func dashedLine(_ x1: CGFloat, _ top: CGFloat, _ x2: CGFloat,
-                    color: RGB, width: CGFloat = 2.7) {
-        let path = NSBezierPath()
-        path.move(to: NSPoint(x: x1, y: height - top))
-        path.line(to: NSPoint(x: x2, y: height - top))
-        let dash: [CGFloat] = [13, 8]
-        dash.withUnsafeBufferPointer { buffer in
-            path.setLineDash(buffer.baseAddress, count: buffer.count, phase: 0)
-        }
-        color.color.setStroke()
-        path.lineWidth = width
-        path.stroke()
-    }
-
     func text(_ value: String, _ x: CGFloat, _ top: CGFloat, _ w: CGFloat,
               size: CGFloat, color: RGB, bold: Bool = false, centered: Bool = true) {
         let fontName = bold ? "AppleSDGothicNeo-Bold" : "AppleSDGothicNeo-Regular"
@@ -118,8 +104,8 @@ do {
     try c.write("groot_soc_network_architecture_rule_mcp.png")
 }
 
-// 2834 × 790 logical bus preview. Kali's actual L2 segment is not verified:
-// keep the path in place but mark its undetermined span as a dashed logical route.
+// 2834 × 790 logical bus preview. Preserve the original Attack Segment line
+// and remove only its outdated subnet caption; the Kali subnet is unverified.
 do {
     let c = try Canvas("groot_soc_topology_bus_preview.png")
     c.panel(443, 206, 298, 44, radius: 3, line: 1.3)
@@ -138,16 +124,7 @@ do {
     c.clear(438, 565, 174, 24, fill: white)
     c.text("10.200.10.0/24", 442, 567, 170, size: 14, color: black, bold: true, centered: false)
 
-    c.clear(260, 615, 167, 31, fill: white)
-    c.text("Attack Path", 261, 617, 165, size: 17, color: black, bold: true)
-    c.clear(438, 635, 240, 24, fill: white)
-    c.text("A ens192: 192.168.16.230/25", 442, 637, 236, size: 14,
-           color: black, bold: true, centered: false)
-
-    c.clear(713, 626, 1556, 8, fill: white)
-    c.dashedLine(713, 630, 2269, color: RGB(r: 240, g: 151, b: 66))
-    c.text("* A 직결망 192.168.16.128/25 · GW 192.168.16.129 | Kali 주소·경로 미확인 · 점선은 논리 경로", 1750, 729, 980, size: 15,
-           color: RGB(r: 90, g: 90, b: 90), centered: false)
+    c.clear(438, 635, 166, 24, fill: white)
     try c.write("groot_soc_topology_bus_rule_mcp.png")
 }
 

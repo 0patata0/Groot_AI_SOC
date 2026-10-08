@@ -2,9 +2,13 @@
 
 > 2026-10-02 별도 검증 폴더에서 작성된 고유 메모는 [검증 차이 기록](검증_차이_2026-10-02.md)에 보존했다. 그 폴더의 raw/processed 데이터는 이 디렉터리의 파일과 바이트 단위로 일치해 중복본을 정리했다. 검증 스크립트는 [validate_and_clean.py](validate_and_clean.py)로 옮겼다.
 
-> 대상 에이전트: Hermes Agent(B) + `qwen3.6:35b`(DGX Ollama), MCP 툴콜(읽기 14툴: Wazuh 경보/에이전트/프로세스/포트/취약점, 응답 3툴: `block_ip`/`unblock_ip`/`list_blocks`)로 **경보 이후 조사·상관분석·침해판단·대응(승인)** 을 한국어로 수행.
+> 대상 에이전트: Hermes Agent(B) + `qwen3.6:35b`(DGX Ollama)로 **경보 이후 조사·상관분석·침해판단·대응(승인)** 을 한국어로 수행. 10/08 배포 기준 MCP는 읽기 `wazuh-ro`·`security-events`, IP 대응 `resp`, 승인형 로컬 룰 변경 `rule-a`·`rule-b`의 5서버다. 초기 17툴 목록은 전체 현행 목록이 아니므로 학습 데이터는 실제 도구 이름·스키마를 다시 조회해 맞춘다. [현재 MCP 구성](../infra/mcp/README.md).
 > 파인튜닝 원칙(PLAN 4단계): **핵심 데이터 = 우리 시나리오 실측 트래젝터리**(Hermes 세션 → teacher 초안 → 사람 검수 → Qwen 챗 템플릿 → LoRA/QLoRA). 공개 데이터는 **보조**(툴콜 형식 능력·보안 추론·합성 원천). 없어도 프로젝트는 완결(확장 목표).
 > 저장: `datasets/raw/`(gitignore, 342MB 반입 완료). 라이선스·용량·게이트 여부는 HF/Zenodo API 로 **실측 확인**(2026-10-01).
+
+> **10/08 학습 준비도·범위:** 아래 공개 자료와 전처리 도구가 준비돼 있다는 사실을 실제 SOC 학습셋·파인튜닝 모델 완성으로 해석하지 않는다. 우리 현재 MCP 조사·승인 경로의 검수된 trajectory와 독립 평가셋은 후속 준비 항목이다. 사용자는 서버 업로드를 이번 검토 범위에서 제외했다. 직접 확인한 로컬 Mac은 M3·16 GiB이며, 지원되는 소형 모델의 양자화 LoRA부터 메모리·정확도·지연을 비교하는 안을 검토한다. 구체적 모델 선택·패키지 설치·학습·서버 변경은 아직 하지 않았다. 학습 시 임시 환경과 캐시를 격리하고 작업 후 정리한다는 기존 Mac 사용 제약을 따른다. [계획](../PLAN.md) · [MLX LoRA 문서](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/LORA.md).
+
+> **후속 우선순위(사용자 최종 정정 반영):** 사용자는 여기서 학습하지 말고 **30B 파인튜닝 모델과 현재 35B의 속도·정확도**를 먼저 비교하라고 했다. 직전 35B 표기는 오타였다고 정정했으므로 동일 35B의 튜닝 전후 비교로 해석했던 내용은 철회한다. 현재는 30B의 정확한 베이스/체크포인트와 학습에 쓰이지 않은 SOC 평가셋이 필요한 단계다. 실제 비교 실험이나 우열 판정은 아직 없으며, 학습 준비 제안은 참고로 보존한다.
 
 ---
 
@@ -184,7 +188,7 @@ MITRE ATT&CK(STIX JSON), **Atomic Red Team**(MIT — 기법별 테스트 → "�
 ## 4. 우리 에이전트용 활용 설계
 | 단계 | 데이터 | 목적 | 비고 |
 |---|---|---|---|
-| A 형식 | hermes-function-calling-v1 + ToolACE (+ hermes-agent-traces) | Hermes `<tool_call>` 포맷·다중턴·JSON 출력 안정화 | 툴 스키마를 **우리 17개 MCP 툴 시그니처**로 치환한 변형 생성 권장 |
+| A 형식 | hermes-function-calling-v1 + ToolACE (+ hermes-agent-traces) | 선택 모델의 챗 템플릿·tool_calls·다중턴·JSON 출력 안정화 | **현재 Hermes가 노출하는 MCP 도구 이름·스키마**와 맞추고, 도구 이름만 바꾸지 말고 호출 인자·응답·판단의 의미까지 검수 |
 | B 도메인 | Primus-Instruct(`alert_explanation` 등) + Primus-Reasoning + attacklm | 경보 해석·명령 분석·ATT&CK 매핑 추론 | ODC-BY 표기 |
 | C 과제 합성 | **AIT-ADS wazuh.json + labels.csv** → "경보 묶음(툴 응답) → 조사 툴콜 → 판단 JSON(verdict/attack_chain/actions)" teacher 합성; SALAD 로 트리아지 결정 보강 | 우리 스키마·툴명 그대로 학습 | 공격 단계 라벨이 정답 체인 |
 | D 핵심 | **우리 시나리오 실측 트래젝터리**(Hermes `sessions/`·`agent.log`) 검수본 | 실제 환경 분포 | 회차 독립성(`eval_reset`) 유지한 채 수집 |

@@ -4,6 +4,8 @@ A = 외부(ens192 192.168.16.230, 캠퍼스 세그먼트) ↔ 내부(ens160 10.2
 
 > **2026-10-06 기록 및 이번 SSH 재확인:** FW v2 적용·확정(`FORWARD=DROP`, `CAPSTONE-FWD` 14룰), WAF GROOT 룰 마운트·healthy·`nginx -t` 통과(`DetectionOnly`), Suricata `-i ens192 -S /rules/all.rules` 및 Phase-A(passive). B 로컬 파일에 신규 신호 전용 분류 항목은 없고, IPS 로컬 SID의 기존 Suricata 룰 처리 여부와 공격 프로브 발화는 미확인이다. WAF `On`·IPS 인라인 전환은 남아 있다. [기존 확인 기록](../../대화기록/2026-10-06.md)
 
+> **2026-10-08 관리 SSH 직접 재확인:** WAF 커스텀 ID 10개·Suricata 로컬 SID 11개의 라이브 파일 해시가 저장소와 각각 일치한다. WAF는 여전히 `DetectionOnly`, Suricata는 passive이고 인라인 queue 룰은 0개다. FW `FORWARD DROP`·14룰, nft input DROP·output ACCEPT이며 현재 임시 IP 차단은 0건이다. A 브로커 URL·토큰이 설정됐고 A→B 인증된 `GET /pending` HTTP 200이었다(승인→차단 E2E 미시험). [오늘 기록](../../대화기록/2026-10-08.md)
+
 Log4Shell 경로는 이번 SSH 점검에서 **토글 OFF**(A:8080 NAT·DOCKER-USER 시나리오 룰 없음)였다. 저장소의 `scenario_log4shell_route.sh`에는 C→`OBS_SEG` 관찰 룰이 있으나 A에 설치된 `/usr/local/sbin/scenario_log4shell_route.sh`에는 없다. A `ens192`는 `192.168.16.230/25`(직결 `192.168.16.128/25`)인데, 라이브 10443 DNAT/CAPSTONE-FWD 출발지 제한과 저장소 `OBS_SEG`는 `192.168.16.0/25`다. Kali 주소·왕복 경로를 확인하고 설치본을 동기화한 뒤 시나리오를 검증해야 한다.
 
 | 구성 | 파일(repo → A) | 요점 |

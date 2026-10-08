@@ -65,7 +65,7 @@ private final class Canvas {
     }
 
     func text(_ value: String, _ x: CGFloat, _ top: CGFloat, _ w: CGFloat,
-              size: CGFloat, color: RGB, bold: Bool = false) {
+              size: CGFloat, color: RGB, bold: Bool = false, centered: Bool = true) {
         let fontName = bold ? "AppleSDGothicNeo-Bold" : "AppleSDGothicNeo-Regular"
         let font = NSFont(name: fontName, size: size)
             ?? (bold ? NSFont.boldSystemFont(ofSize: size) : NSFont.systemFont(ofSize: size))
@@ -74,7 +74,7 @@ private final class Canvas {
             .foregroundColor: color.color
         ])
         let measured = value.size()
-        value.draw(at: NSPoint(x: x + (w - measured.width) / 2,
+        value.draw(at: NSPoint(x: centered ? x + (w - measured.width) / 2 : x,
                                y: height - top - measured.height))
     }
 
@@ -104,7 +104,7 @@ do {
     try c.write("groot_soc_network_architecture_rule_mcp.png")
 }
 
-// 2834 × 790 logical bus preview. No bus, NIC, or subnet labels are changed.
+// 2834 × 790 logical bus preview. Update its old address labels without moving the buses.
 do {
     let c = try Canvas("groot_soc_topology_bus_preview.png")
     c.panel(443, 206, 298, 44, radius: 3, line: 1.3)
@@ -117,6 +117,16 @@ do {
 
     c.clear(837, 359, 181, 25, fill: RGB(r: 255, g: 255, b: 255))
     c.text("soc-bot · HMAC 승인", 835, 362, 187, size: 13, color: RGB(r: 30, g: 30, b: 30))
+
+    let white = RGB(r: 255, g: 255, b: 255)
+    let black = RGB(r: 30, g: 30, b: 30)
+    c.clear(438, 565, 174, 24, fill: white)
+    c.text("10.200.10.0/24", 442, 567, 170, size: 14, color: black, bold: true, centered: false)
+    c.clear(438, 635, 240, 24, fill: white)
+    c.text("192.168.16.128/25 (A 직결망)", 442, 637, 236, size: 14,
+           color: black, bold: true, centered: false)
+    c.text("* Kali 주소·라우팅 미확인", 2260, 731, 420, size: 13,
+           color: RGB(r: 90, g: 90, b: 90), centered: false)
     try c.write("groot_soc_topology_bus_rule_mcp.png")
 }
 

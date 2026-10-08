@@ -10,7 +10,7 @@ Slack은 이 망에서 불가(아웃바운드 443 차단, 2026-09-27 실측). �
 - 자체 호스팅(Docker), incoming/outgoing webhook + **interactive message buttons**(승인/거부) + slash command + bot API 지원. air-gapped 배포 문서 존재.
 - **Hermes 에이전트에 Mattermost 인터랙티브 승인 버튼이 이미 구현**(NousResearch/hermes-agent PR #29373, issue #27587) → 런타임=Hermes면 승인 창구가 사실상 내장.
 - 대안: Rocket.Chat(유사). 초경량이 필요하면 채팅 없이 "승인 인박스" 웹페이지도 가능하지만 사용자가 채팅 형태를 원함.
-- ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**. 2026-10-08 DuckDNS 채팅 이름에 Let's Encrypt 인증서를 적용해 Mac의 HTTPS 검증을 통과했다. 휴대폰의 실제 앱 로그인은 아직 미시험이며 학교 내부 Wi-Fi 또는 학교가 모바일 접속을 허용한 GlobalProtect VPN에서 확인해야 한다. 앱 접속과 푸시 알림은 별개다.
+- ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**. 2026-10-08 DuckDNS 채팅 이름에 Let's Encrypt 인증서를 적용해 Mac의 HTTPS 검증을 통과했다. 사용자의 휴대폰 GlobalProtect 로그인은 실패했고 원인은 미확인이다. 현재는 A에 도달하는 학교 내부 Wi-Fi에서 실제 Mattermost 앱 로그인을 시험해야 한다. 앱 접속과 푸시 알림은 별개다.
 
 ## 구성 요소
 - **Mattermost 서버 + PostgreSQL** (Docker, 오프라인 이미지 반입 — 기존 방식과 동일). 배치 후보: **Groot_B**(디스크 145G 여유) 또는 소형 전용 VM. 내부망 전용(10.200.10.x), 접근은 대시보드처럼 A 점프(`ssh -L`).
@@ -61,7 +61,7 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
 - **정기 상태 요약(heartbeat)**: B `soc-summary.timer`(하루 2회, `OnCalendar=*-*-* 09,21:00:00 Asia/Seoul`, Persistent) → `soc_bot.py summary 12` → **이상 없어도 항상 게시**(🟢 이상없음 / 🟡 관찰 / 🔴 주의; 에이전트 active·최근 12h 경보·상위규칙·취약점). 수동 `/soc summary [시간]`. 주기/시각은 타이머 유닛에서 조정(SUMMARY_ONCAL/SUMMARY_HOURS). 2026-10-06 A/B/C 호스트 KST·NTP 동기화를 확인했고 B `soc-bot`은 최근 경보 시각을 KST로 표시한다. Mattermost 컨테이너는 `TZ=Asia/Seoul` 재생성 후 healthy를 확인했다. 다른 컨테이너 내부 시계 표시는 UTC일 수 있다.
 
 - **이후 진행**: 2026-09-28 Hermes의 MCP 2서버 17툴 등록, NL 대화 및 Tier 2 승인 브로커의 차단 E2E를 검증했다(아래 절). 라이브 응답 MCP는 `trust: full`이며 서버측 브로커가 고위험 `block_ip` 승인과 거부/만료 시 미실행을 강제한다. `/soc block` 슬래시 명령은 별도 범위다.
-- 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.200.10.10:8065. 모바일 푸시(인터넷 필요) 미사용 — 웹/데스크톱만.
+- 포트: **A:443 nginx 리버스 프록시(chatproxy) → B:8065**. 내부 바인드 10.200.10.10:8065. 모바일 푸시(인터넷 필요)는 미사용이고 모바일 앱 로그인은 실기기 미검증.
 
 ### VPN·캠퍼스 클린 접속 — A:443 이름 기반 리버스 프록시 (2026-09-27 확정)
 Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실측). 사용자 제약(루프백 사용 불가)으로 클라이언트 터널은 배제 → **A:443 nginx 리버스 프록시**로 해결:

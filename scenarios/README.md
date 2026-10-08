@@ -4,6 +4,8 @@
 
 > **현황(2026-10-06 라이브 점검):** A의 FW v2는 `FORWARD=DROP`으로 적용·확정됐다. WAF GROOT 룰은 `DetectionOnly`, Suricata ET+로컬 룰과 Phase-A는 passive로 로드됐다. B/C의 외부 `ens192`는 제거됐다. B의 Wazuh 인덱스에는 Suricata 로컬 SID `1000010`→`100110` 및 ModSecurity CRS `920350`→`100101` 경보가 관측됐지만, 이번 점검에서 시나리오 공격 트래픽은 새로 실행하지 않았다. GROOT WAF 커스텀 ID `10100`대 및 다른 신규 룰의 발화는 미검증이다. A의 Log4Shell 경로 토글은 OFF이며 설치된 스크립트에는 저장소의 `OBS_SEG` 코드가 없다. [작업 기록](../대화기록/2026-10-06.md)
 
+> **10/08 후속 기록:** A/B/C의 서비스·탐지 모드와 B 신규 FW/WAF 분류 부재를 SSH로 재확인했다. A/B 승인형 로컬 룰 변경 MCP를 배포했지만 운영 룰 해시는 그대로이며 시나리오 실행·실제 승인→룰 적용 E2E는 아직 하지 않았다. 따라서 아래 선행조건과 `alerts.md`의 미검증 표시는 유지한다. 룰 변경 도구는 WAF On·IPS 인라인 모드 전환을 제공하지 않는다. [현황](../STATUS.md) · [10/08 기록](../대화기록/2026-10-08.md)
+
 **공격 트래픽을 어떻게 만드는지(how-to)는 이 문서가 직접 쓰지 않는다.** 대신 공개된 권위 있는 표준 문서(OWASP WSTG, Wazuh 공식 PoC 가이드, 취약 앱의 공식 README, Emerging Threats/CRS 룰)를 `references.md`에 링크로 정리하고, 팀은 그 절차를 따른다. 이 문서는 그 결과로 **우리 SOC가 무엇을 봐야 하는지**를 정의한다.
 
 ## 승인·범위 (Rules of Engagement)

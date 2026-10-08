@@ -1,10 +1,12 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
-> **현황(2026-10-06 기록 및 이번 SSH 재확인):** B의 `ens192` vNIC는 제거됐고 `ens160=10.200.10.10`의 기본 경로가 A(`10.200.10.1`)를 지난다. Wazuh 에이전트 000/001/002는 Active다. B의 `local_decoder.xml`·`local_rules.xml`에는 신규 신호 전용 항목이 없지만, IPS 로컬 SID가 기존 Suricata 룰로 분류되는지는 미확인이다. 공격 프로브 발화도 미검증이다. [기존 기록](../../대화기록/2026-10-06.md)
+> **현황(2026-10-06 기록 및 10/08 SSH 재확인):** B의 `ens192` vNIC는 제거됐고 `ens160=10.200.10.10`의 기본 경로가 A(`10.200.10.1`)를 지난다. Wazuh 에이전트 000/001/002는 Active다. 신규 FW 접두어·WAF 100200대 전용 분류는 없으나 보안 이벤트 읽기 조회에서 Suricata 로컬 SID `1000010`→Wazuh `100110`과 ModSecurity CRS `920350`→Wazuh `100101`을 확인했다. 나머지 로컬 룰 분류와 시나리오별 공격 프로브 발화는 미검증이다. [기존 기록](../../대화기록/2026-10-06.md)
 
-> **2026-10-08 관리 SSH 직접 재확인:** Wazuh 000/001/002는 계속 Active이고 경보 파일이 갱신 중이다. Hermes의 3개 MCP 서버가 enabled, SOC 봇·보고/요약 타이머가 active다. B 브로커 토큰·허용 승인자 목록은 비어 있지 않다. 로컬 룰 파일은 저장소와 해시가 같고 디코더는 주석의 옛 예시 IP 한 줄만 다르다. 신규 FW 접두어·WAF 100200대 분류는 여전히 없다. [오늘 기록](../../대화기록/2026-10-08.md)
+> **2026-10-08 11:53~11:59 KST 관리 SSH 직접 재확인:** Wazuh 000/001/002는 계속 Active이고 경보 파일이 갱신 중이다. 당시 Hermes의 기존 3개 MCP 서버가 enabled였고, SOC 봇·보고/요약 타이머가 active였다. B 브로커 토큰·허용 승인자 목록은 비어 있지 않다. 로컬 룰 파일은 저장소와 해시가 같고 디코더는 주석의 옛 예시 IP 한 줄만 다르다. 신규 FW 접두어·WAF 100200대 분류는 여전히 없다. [오늘 기록](../../대화기록/2026-10-08.md)
 
 > **같은 날 약 12:58 KST 후속 배포:** B `soc-bot`에 별도 룰 승인 API를 배포하고 `rulechg` SSH 강제 명령·root helper·`rule-change-worker.timer`를 설치했다(active/enabled). Hermes에는 기존 3개 MCP 서버를 유지하면서 `rule-a`·`rule-b`를 추가했다. A/B↔브로커 HMAC 통신과 로컬 룰 대상 읽기 조회가 통과했고, Wazuh 운영 룰 해시는 배포 전후 동일하다. 실제 Mattermost 승인 버튼→룰 적용·복구 E2E는 아직 검증하지 않았다. [배포 절차](../mcp/rule-change-deploy.md)
+
+> **채팅·시간:** Mattermost는 B `10.200.10.10:8065`에서 동작하고 A:443 chatproxy로 접근한다. 대표 이름 `https://chat.grootlab.duckdns.org`의 Let's Encrypt 인증서는 10/08 A에 배포됐다. 학교 내부 Wi-Fi의 모바일 앱 로그인은 미검증이며, 관리자 지원 거절(사용자 보고)로 모바일 VPN 경로는 제외한다. B 호스트는 KST·NTP 동기화, Mattermost는 `TZ=Asia/Seoul`, 상태 요약은 09·21 KST다. 일부 컨테이너·원본 로그의 UTC 표시는 별개다.
 
 ## Wazuh 4.14.8 single-node — 오프라인 기동 (2026-09-26 완료 ✅)
 공식 **wazuh-docker `v4.14.8` single-node** 구성을 쓰되, 이 망은 **웹 egress 차단**이라 온라인 절차를 그대로 못 쓴다. 아래는 실제로 동작한 오프라인 절차.
@@ -26,7 +28,7 @@ sudo bash /tmp/finish_wazuh.sh
 #    (+ root-ca-manager.pem 사본) → chmod 644 → docker compose up -d → ps
 ```
 - ⚠️ **인증서 권한은 반드시 644.** `640 root:root`로 두면 컨테이너 내부 비root 유저(wazuh-indexer)가 `root-ca.pem`을 못 읽어 보안 플러그인 로드 실패 → 인덱서 크래시 루프 → 대시보드 연쇄 재시작. (1차 기동 실패 원인)
-- 접속: Dashboard `:443`, Server API `:55000`, Indexer `:9200`, Agent `:1514`. **현재 B 주소는 내부망 `10.200.10.10`만** — 옛 임시외부 `192.168.16.231`(ens192)은 제거 완료. 운영자는 A 경유 SSH ProxyJump(`ssh groot-b-int`); A:10443→B:443 DNAT 룰은 확인됐지만 허용 소스가 `192.168.16.0/25`여서 Kali의 실제 도달성은 미검증이다. 저장소 `fw-v2/capstone-nat.sh`는 A:443 chatproxy 경로도 설명하지만 이번 SSH 점검에서 해당 응답 경로는 구분하지 않았다. 2026-09-26 검증: A 경유로 22/443/1514/55000 도달, 대시보드 로그인 200.
+- 접속: Dashboard `:443`, Server API `:55000`, Indexer `:9200`, Agent `:1514`. **현재 B 주소는 내부망 `10.200.10.10`만** — 옛 임시외부 `192.168.16.231`(ens192)은 제거 완료. 운영자는 A 경유 SSH ProxyJump(`ssh groot-b-int`). 대시보드 대표 경로는 A:443 chatproxy→B:443이며 `https://wazuh.grootlab.duckdns.org`로 학과망·VM세그먼트에서 접근한다(VPN 403 정책). 9/28 이름 기반 대시보드 로그인 200을 확인했다. A:10443→B:443 DNAT 룰도 있지만 허용 소스가 `192.168.16.0/25`여서 Kali의 실제 도달성은 미검증이다.
 - 리소스: 인덱서 힙 `-Xms1g -Xmx1g`(compose 기본). B RAM 여유 커서 필요 시 상향.
 
 ### 검증 결과 (2026-09-26)
@@ -44,6 +46,7 @@ sudo bash /tmp/finish_wazuh.sh
 
 ## MCP Server (자격증명 보유 — A안)
 - 읽기 서버: `gbrigandi/mcp-server-wazuh`(MIT, 읽기전용, 코드리뷰 완료 @969f36f)를 2026-09-26 B `/opt/mcp/`에 오프라인 배포했다. Wazuh API :55000 + Indexer :9200에 **읽기전용 계정**으로 접속하며 자격증명은 B `/etc/mcp/wazuh-ro.env`에 둔다. 읽기 14툴 계약 테스트와 Hermes 컨테이너 연결을 9/28까지 검증했다.
+- 보안 이벤트 읽기 서버: 같은 `mcp` 계정의 `security-events` 강제 명령 분기로 Suricata·ModSecurity 경보 2툴을 제공한다. 이미 Wazuh에 인덱싱된 이벤트만 조회하며, 10/06 계약 테스트·기존 14툴 회귀 및 Hermes LLM의 두 새 도구 호출을 확인했다.
 - 응답 서버는 A의 별도 MCP/Policy Engine이며 `block_ip`/`unblock_ip`/`list_blocks`→nftables `agent_block` 경로가 9/28 승인→차단 E2E까지 검증됐다. `isolate_host`는 후속 목표다. Hermes는 B의 별도 계정·컨테이너에서 실행하고 MCP 자격증명은 갖지 않는다.
 - 승인형 로컬 룰 변경은 기존 읽기 MCP 권한을 올리지 않고 B 승인 브로커와 A/B의 별도 `rulechg` 계정·root helper로 처리한다. B에서는 Wazuh `local_rules.xml`만 변경 대상으로 허용한다. 10/08 HMAC health·대상 읽기 조회는 통과했으며 실제 승인→적용은 미검증이다.
 - 참고 데이터: CISA KEV `~/capstone/kev/kev.json` (`kev-data.md`).
@@ -51,7 +54,7 @@ sudo bash /tmp/finish_wazuh.sh
 ## 검증 체크리스트
 - [x] Dashboard 접속, Server API/Indexer 응답 (2026-09-26)
 - [x] Groot_A/C Agent 등록·Active (manager `10.200.10.10:1514`, 2026-10-06 기록)
-- [ ] 신규 FW 프리픽스·WAF GROOT 룰·IPS 로컬 SID의 기존 디코더/룰 분류 여부 확인 → 빠진 항목만 추가 → VM 세그먼트 공격 프로브로 경보 실발화 검증
+- [ ] 신규 FW 프리픽스·WAF GROOT 룰·나머지 IPS 로컬 SID의 디코더/룰 분류 여부 확인 → 빠진 항목만 추가 → VM 세그먼트 공격 프로브로 경보 실발화 검증. SID `1000010`→Wazuh `100110` 조회는 완료.
 - [ ] Vulnerability Detection에서 Groot_C의 CVE-2021-3156 매핑 확인
 - [x] MCP 읽기 14툴 호출 성공, Hermes 프로세스에 MCP 자격증명 없음 확인(2026-09-28 기록). 이번 SSH에서는 이 계약 테스트를 재실행하지 않았다.
 - [x] 승인형 룰 변경 브로커·A/B 변경기와 Hermes `rule-a`·`rule-b` 배포, HMAC·읽기 조회 확인(2026-10-08). 운영 룰 해시는 그대로.

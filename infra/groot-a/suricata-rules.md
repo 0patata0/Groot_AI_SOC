@@ -1,5 +1,7 @@
 # Suricata IPS 룰셋 (ET Open) — 반입 기록
 
+> **현재 로딩 경로(2026-10-08 SSH·배포 기록):** A의 `/home/groot_a/capstone/suricata/ruleset/`을 컨테이너 `/rules`로 마운트하고, `suricata.rules`(ET)+`GROOT_A_local.rules`(로컬 SID 11개)를 합친 `all.rules`를 `-S /rules/all.rules`로 로드한다. 아래 스테이징·반입 절차는 9/26 기록이며 현재 로딩 경로와 다르다. ET 갱신 때에는 운영 합본 재작성·구문 검사·리로드까지 검증해야 한다. 배포된 승인형 `rule-a`는 로컬 룰 변경용이며 ET 자동 갱신 기능은 아니다. 실제 승인→적용 E2E는 미검증이다. [현재 운영 문서](README.md) · [승인형 변경 대상](../mcp/rule-change-deploy.md).
+
 Suricata 8.0.6(jasonish/suricata:latest)용 **ET Open** 룰셋. 이 망은 outbound 웹 차단이라 `suricata-update` 온라인 갱신 불가 → **오프라인 반입**.
 
 ## 출처 / 버전 / 무결성

@@ -142,8 +142,8 @@
    "cve": [
     "CVE-2021-44228"
    ],
-   "correct_response": "block_ip(source+exfil) auto; quarantine_server=HUMAN APPROVAL (irreversible)",
-   "remediation": "Log4j 2.17.1+ / formatMsgNoLookups",
+   "correct_response": "request block_ip(policy-eligible external source+exfil) through Tier 2 approval; quarantine_server=HUMAN APPROVAL and manual response (isolate_host not implemented)",
+   "remediation": "verify actual bundled JAR and applicable upstream patch/mitigation guidance in scenarios/scenario-2-log4shell.md",
    "evidence_refs": [
     "knowledge/et_open_rules.jsonl:sid2034716",
     "knowledge/cisa_kev.jsonl:CVE-2021-44228",
@@ -157,7 +157,8 @@
       "T1190"
      ],
      "detect": [
-      "wazuh:vuln_detection:CVE-2021-44228:agent002"
+      "container:actual_Log4j_JAR_version_and_CVE_mapping",
+      "wazuh:vuln_detection:CVE-2021-44228:agent002(conditional; bundled JAR may be absent from inventory)"
      ],
      "response": "patch/isolate advisory (not an alert)"
     },
@@ -168,10 +169,10 @@
       "T1190"
      ],
      "detect": [
-      "suricata:ET_log4j_jndi(expected)",
-      "crs:if_on"
+      "suricata:ET_log4j_jndi(expected)"
      ],
-     "response": "block_ip"
+     "note": "current A:8080 toggle path bypasses WAF regardless of DetectionOnly/On",
+     "response": "block_ip(Tier 2 approval)"
     },
     {
      "step": "2.3",

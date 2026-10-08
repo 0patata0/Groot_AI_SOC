@@ -1,5 +1,11 @@
 # HITL 채팅 채널 설계 — 온프레미스 Mattermost (오프라인, 양방향 웹훅)
 
+> **현재 운영 기준(2026-10-08 확인 기록):** Mattermost·Hermes·`soc-bot`은 B에 배포돼 있고, 채팅은 A:443 chatproxy→B:8065로 접근한다. 대표 주소는 `https://chat.grootlab.duckdns.org`다. 같은 날 Let's Encrypt 인증서를 A에 배포해 HTTPS 검증을 통과했다(만료 2027-01-06 15:02 KST). 자동 갱신은 없으며 2026-12 초 재발급·A 재배포를 준비한다. 모바일은 관리자 GlobalProtect 지원 거절(사용자 보고)에 따라 A에 도달하는 학교 내부 Wi-Fi에서 시험하며 앱 로그인은 미검증이다.
+>
+> Hermes에는 읽기 `wazuh-ro`·`security-events`, IP 대응 `resp`, 승인형 로컬 룰 변경 `rule-a`·`rule-b` 총 5개 MCP 서버가 연결됐다. 기존 IP 차단의 승인 E2E는 9/28 검증했고, 10/08 신규 룰 변경 기능은 배포·HMAC·읽기 조회까지 확인했다. 실제 Mattermost 승인→룰 적용·복구 E2E는 미검증이다. 현재 승인 처리는 B의 별도 `soc-bot` 브로커가 맡는다.
+
+아래 초기 설계와 날짜별 구축 기록은 당시 판단을 보존한다. '배치 후보', '남는 작업', '지금은 명령형 봇', 예전 터널 경로는 현재 운영 안내가 아니며 위 요약과 후속 배포 기록을 우선한다.
+
 Slack은 이 망에서 불가(아웃바운드 443 차단, 2026-09-27 실측). 대신 **자체 호스팅 채팅**을 내부망에 두면 Slack과 같은 UX를 인터넷 0으로 재현한다. 자체 호스팅이라 웹훅이 **양방향**으로 동작한다:
 - **나가는 방향(알림)** = incoming webhook: 우리 서비스 → Mattermost 채널.
 - **들어오는 방향(승인/명령)** = interactive message buttons / outgoing webhook / slash command: 운영자 클릭 → 우리 내부 엔드포인트.
@@ -12,12 +18,12 @@ Slack은 이 망에서 불가(아웃바운드 443 차단, 2026-09-27 실측). �
 - 대안: Rocket.Chat(유사). 초경량이 필요하면 채팅 없이 "승인 인박스" 웹페이지도 가능하지만 사용자가 채팅 형태를 원함.
 - ⚠️ 무료판의 **모바일 푸시**는 Mattermost 호스티드 프록시(인터넷) 필요 → 우리는 안 씀. **웹/데스크톱 클라이언트는 완전 오프라인 동작**. 2026-10-08 DuckDNS 채팅 이름에 Let's Encrypt 인증서를 적용해 Mac의 HTTPS 검증을 통과했다. 사용자 보고에 따르면 학교 관리자가 관리 범위 확대를 이유로 모바일 GlobalProtect 지원을 거절했고 휴대폰 VPN 로그인도 실패했다. 현재는 A에 도달하는 학교 내부 Wi-Fi에서 실제 Mattermost 앱 로그인을 시험해야 한다. 앱 접속과 푸시 알림은 별개다.
 
-## 구성 요소
+## 초기 설계의 구성 요소
 - **Mattermost 서버 + PostgreSQL** (Docker, 오프라인 이미지 반입 — 기존 방식과 동일). 배치 후보: **Groot_B**(디스크 145G 여유) 또는 소형 전용 VM. 내부망 전용(10.200.10.x), 접근은 대시보드처럼 A 점프(`ssh -L`).
 - **알림**: 이미 완성 — `notifier.py` http 백엔드가 Mattermost incoming webhook URL로 POST. `/etc/resp/hitl.env` 에 `RESP_NOTIFY_BACKEND=http` + `RESP_NOTIFY_URL=<webhook>` 한 블록.
 - **승인 브로커**(Tier 2에서 추가): 내부 소형 HTTP 리스너(B). Mattermost 버튼 클릭의 action 콜백을 받아 (a) 클릭 사용자 검증(허용 승인자 목록), (b) request-id 별 결정(승인/거부) 저장. 응답 MCP 서버는 고위험 동작 시 request-id 생성→버튼 메시지 게시→브로커 결정 대기→진행/중단.
 
-## 두 단계로 나눠 도입
+## 초기 도입 계획
 **Tier 1 — 알림 피드(지금 바로, 저비용)**
 - Mattermost 세우고 채널 하나 + incoming webhook 생성 → `hitl.env` http 로 스왑.
 - 모든 SOC 이벤트(경보, 자동/정책 차단, 거부, 리로드)가 채팅에 흐른다. 승인은 런타임(터미널/Hermes)에서.
@@ -37,7 +43,7 @@ Agent(고위험 판단) → 응답 MCP 서버: request-id 생성
 ```
 모든 화살표가 내부망(10.200.10.x) — 인터넷 불필요.
 
-## 교체 용이성(기존 원칙 유지)
+## 초기 교체 설계
 - 알림 대상 교체 = `hitl.env` 의 URL 한 줄(Mattermost↔Rocket.Chat↔사내웹훅↔이메일).
 - 승인 창구 교체 = 런타임의 HITL 설정(터미널↔Mattermost) — 서버는 채널을 모름(elicitation).
 - Slack이 나중에 열리면(443 허용) backend=slack 한 줄로.
@@ -100,3 +106,7 @@ Mattermost 웹소켓은 **Origin == SiteURL** 일 때만 수락(그 외 403, 실
 - B에 `security-events-mcp.py`를 배치했다. `ssh -T groot-mcp security-events`의 2툴 목록과 `search_suricata_alerts`·`search_modsecurity_alerts`의 실제 인덱서 조회가 계약 테스트를 통과했다. 기존 `ssh -T groot-mcp`의 14툴도 회귀 검증했다. 새 도구는 이미 인덱싱된 Wazuh 경보의 제한된 필드만 KST 시각으로 반환하며, Suricata EVE·ModSecurity 감사 원본이나 장비 설정은 읽지 않는다.
 - 읽기 전용 결과에서 Suricata 로컬 SID `1000010`→Wazuh `100110`, ModSecurity CRS `920350`→Wazuh `100101`을 확인했다. WAF는 `DetectionOnly`다. GROOT 커스텀 WAF ID `10100`대의 발화와 시나리오별 공격 재현은 아직 확인하지 않았다.
 - Hermes 실설정에서 보안 이벤트 서버를 세 번째 MCP 서버로 등록하고 컨테이너 재시작 후 `hermes mcp list`의 3서버 enabled를 확인했다. `hermes chat -q` LLM 대화에서도 `mcp__security_events__search_suricata_alerts`(최근 60분, SID `1000010`→Wazuh `100110`)와 `mcp__security_events__search_modsecurity_alerts`(최근 24시간, CRS `920350`→Wazuh `100101`)를 각각 실제 호출했다. 서버 계약 테스트와 LLM 호출 검증을 모두 통과했다.
+
+### 기록 정정·현재 경계 (2026-10-08 문서 점검)
+- 위 9/28 주의 문단의 `A(10.200.10.10)` 표기는 B 주소를 잘못 적은 것이다. 10/08 SSH 확인 기준 A는 `10.200.10.1`, B는 `10.200.10.10`이다. Mattermost 컨테이너는 `172.19.0.2`, 콜백이 향하는 B Docker 게이트웨이는 `172.19.0.1`로 구분한다. 신규 룰 승인 콜백은 실제 컨테이너 주소 `172.19.0.2/32`만 허용하며 컨테이너 재생성 뒤 IP가 바뀌면 재설정이 필요하다. [배포 기록·절차](rule-change-deploy.md).
+- 9/28 기존 IP 차단 승인 성공은 모든 쓰기 작업이 항상 승인을 거친다는 의미가 아니다. 현 코드의 `block_ip`는 브로커 URL·토큰이 없으면 즉시 실행하고 `unblock_ip`는 승인 없이 실행한다. 10/08 오전에는 실제 브로커 설정이 존재함을 확인했다. 새 `rule-a`·`rule-b` 경계는 전용 토큰·명시적 승인자·정확한 제안 해시를 강제하며 설정 누락·거부·만료 시 적용하지 않는다.

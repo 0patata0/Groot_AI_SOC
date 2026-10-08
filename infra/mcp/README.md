@@ -7,10 +7,14 @@
       ^
 [에이전트 런타임]   Claude Code | Claude Desktop | Hermes | 커스텀   <- MCP 클라이언트 설정
       ^   MCP 표준 (stdio | HTTP streamable)
-[MCP 서버 @Groot_B]  Wazuh 읽기 14툴 + 보안 이벤트 읽기 2툴; 응답 서버는 A에서 block_ip -> nft agent_block
+[MCP 읽기 @B]      wazuh-ro 14툴 + security-events 2툴 -> Wazuh API/Indexer
+[MCP IP 대응 @A]   resp 3툴 -> nft agent_block
+[MCP 룰 변경 @A/B] rule-a / rule-b -> B 승인 브로커 -> 지정 승인 -> 고정 로컬 룰 적용
       ^
-[Wazuh API/Indexer @B, nftables @A]
+[데이터/대상]       Wazuh @B, nftables·WAF·Suricata @A, Wazuh 로컬 룰 @B
 ```
+
+2026-10-08 약 12:58 KST 배포 후 Hermes에 위 5개 MCP 서버가 enabled임을 확인했다. 룰 변경 경로는 HMAC 통신·현재 룰 읽기 조회까지 검증했고, 실제 Mattermost 승인 버튼→룰 적용·복구 E2E는 아직 미검증이다.
 
 ## 교체 지점
 | 바꾸고 싶은 것 | 어디를 고치나 | 서버 변경 |
@@ -39,7 +43,7 @@
 { "mcpServers": { "wazuh-ro": { "type": "stdio", "command": "ssh", "args": ["-T", "groot-mcp"] } } }
 ```
 (`claude-code.mcp.json.example`는 기존 Wazuh 서버 설정. 보안 이벤트 서버는 같은 SSH 설정에 원격 명령 인자 `security-events`를 추가한다.)
-**Hermes** (B 의 Docker 컨테이너, `/opt/hermes-data/config.yaml` = 컨테이너 `/opt/data/config.yaml`; 아래는 `infra/hermes/config.example.yaml` 템플릿):
+**Hermes** (B 의 Docker 컨테이너, `/opt/hermes-data/config.yaml` = 컨테이너 `/opt/data/config.yaml`; 아래는 [전체 템플릿](../hermes/config.example.yaml)의 SSH 연결 부분 요약):
 ```yaml
 mcp_servers:
   wazuh-ro:
@@ -56,8 +60,18 @@ mcp_servers:
     command: ssh
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.200.10.1
     env: { HOME: /opt/data/home }
-    trust: full         # 라이브는 응답 MCP의 승인 브로커가 쓰기 툴 승인을 강제
+    trust: full         # block_ip는 브로커 설정 시 승인 경유; unblock_ip는 승인 없음
     # HTTP 전환 시: url: "http://10.200.10.10:8080/mcp", headers: {Authorization: "Bearer ${env:SOC_MCP_TOKEN}"}
+  rule-a:
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-a"]
+    env: { HOME: /opt/data/home }
+    trust: full         # 지정 승인 강제는 별도 브로커·root 실행기
+  rule-b:
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-b"]
+    env: { HOME: /opt/data/home }
+    trust: full
 ```
 기존 `17 tool(s) from 2 server(s)`는 2026-09-28 실측이다. 2026-10-06 라이브 `/opt/hermes-data/config.yaml`에 `security-events`를 추가하고 Hermes 컨테이너를 재시작했다. `docker exec hermes hermes mcp list`에서 `wazuh-ro`·`security-events`·`resp`가 모두 enabled임을 확인했다. `hermes chat -q` LLM 대화에서 새 `search_suricata_alerts`·`search_modsecurity_alerts` 도구가 각각 실제 호출되어 결과를 반환했다. 전체 도구 수는 별도로 계수하지 않았다. 검증 경로: `infra/hermes/deploy_hermes_B.sh test` — 컨테이너 안 계약 테스트 + `chat -q` 기동 후 agent.log 확인. 컨테이너 키는 B `/opt/mcp/.ssh/authorized_keys`·A `/opt/resp/.ssh/authorized_keys` 에 Mac 키와 같은 `restrict,command=` 접두로 등록됨(2026-09-28).
 어느 클라이언트든 그 호스트에 `~/.ssh/config`의 `groot-mcp` 블록(키·ProxyJump·BatchMode)과 키 파일만 있으면 된다. 다른 호스트에서 쓰려면 그 호스트용 키를 만들어 B `/opt/mcp/.ssh/authorized_keys`(같은 `restrict,command=` 접두)와 A `~groot_a/.ssh/authorized_keys`(점프 전용 접두)에 추가.
@@ -113,3 +127,4 @@ WAF 규칙 ID 필터는 최근 후보 경보 최대 250건을 검사한다. 해�
 - 2026-09-28: Hermes에서 기존 17툴/2서버 등록 실측.
 - 2026-10-06: 보안 이벤트 2툴 서버를 B에 배치하고 원격 목록·Suricata·ModSecurity 조회 및 기존 14툴 회귀 계약 테스트 통과. Hermes 세 번째 서버 enabled 및 LLM의 새 도구 2개 실제 호출 확인.
 - 2026-10-08: A/B 관리 SSH로 실제 구성 재확인. A 응답 MCP의 브로커 URL·토큰, B의 브로커 토큰·허용 승인자 목록은 비어 있지 않다(값 비출력). A에서 해당 토큰으로 B `GET /pending`을 호출해 HTTP 200·대기 0건을 확인했다. Hermes의 `wazuh-ro`·`security-events`·`resp` 3서버가 enabled이고 규칙 변경 MCP는 없다. 승인 카드→클릭→차단은 이번 점검에서 실행하지 않았다. 미설정 시 즉시 실행하는 코드 경로는 여전히 남아 있다.
+- **2026-10-08 후속 정정:** 바로 위 항목은 **11:53~11:59 KST 배포 전 점검**의 기록이다. 약 12:58 KST B 룰 승인 브로커·A/B 변경기/worker·Hermes `rule-a`·`rule-b`를 배포해 총 5서버 enabled, HMAC 통신·읽기 조회를 확인했다. 운영 룰 해시는 그대로이고 실제 룰 승인·적용 E2E는 미검증이다. 기존 IP 차단 경로의 설정 누락 시 즉시 실행 제약은 남아 있다.

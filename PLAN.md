@@ -1,7 +1,7 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
 제안서: [suggestion.md](suggestion.md) · 검토메모: [suggestion_review.md](suggestion_review.md) · 시뮬레이션: [simulation_report.md](simulation_report.md)
-변경 배경: `plan_changed.md`로 인프라를 AWS에서 ESXi 온프레미스로 전환. 이전 AWS 계획 백업: `대화기록/PLAN_aws_backup_2026-09-22.md`
+변경 배경: 인프라를 AWS에서 ESXi 온프레미스로 전환했다. 전환 경위는 [대화·변경이력](대화기록/대화_및_변경이력.md), 이전 AWS 계획은 [당시 백업](대화기록/PLAN_aws_backup_2026-09-22.md)을 참조한다.
 
 이 문서는 실행 순서·체크리스트·진행 로그를 관리한다. 작업마다 체크박스와 진행 로그를 갱신한다.
 
@@ -9,16 +9,18 @@
 
 > **한 장 요약은 [STATUS.md](STATUS.md)** (라이브 헬스·접속 치트시트·다음 할 일).
 
-## 현재 상태 (2026-10-06 인프라 SSH 재점검·2026-10-08 룰 변경 MCP 배포 기준)
+## 현재 상태 (2026-10-08 인프라 SSH 재점검·룰 변경 MCP·채팅 인증서 배포 기준)
 
-- A/B/C를 2026-10-06 05:05~05:07 UTC(14:05~14:07 KST)에 SSH로 읽기 전용 재점검했다. 10/6 선행 배치 세부 내용은 [같은 날 작업 기록](대화기록/2026-10-06.md) 참조. 공격 프로브·차단 전환은 이번에 실행하지 않았다.
+- A/B/C를 2026-10-08 11:53~11:59 KST에 SSH로 읽기 전용 재점검했다. 이후 룰 변경 MCP와 채팅 인증서를 배포했다. [10/08 작업 기록](대화기록/2026-10-08.md)과 [현황 스냅샷](STATUS.md)을 기준으로 하며, 공격 프로브·차단 전환·실제 룰 승인→적용 E2E는 실행하지 않았다.
 - VM 3대(Ubuntu 24.04.5)와 NAT 게이트웨이, Wazuh·MCP·Hermes·Mattermost 경로가 구축됐다. B/C의 임시 외부 NIC `ens192`는 제거됐고 기본 경로는 A다.
 - **A**: FW v2 적용(`FORWARD=DROP`, `CAPSTONE-FWD` 14룰, nft `SPOOF`/`FW_SSH_RATE`/output 체인). WAF healthy·`nginx -t` 통과·`REQUEST-948-GROOT_A_WAF.conf` 마운트(DetectionOnly), Suricata ET+local 합본·Phase-A(`-i ens192`, passive), eve.json 갱신을 SSH로 확인했다. 선행 10/6 기록에 `community_id` 275건이 있다. 신규 공격 경보 실발화는 미확인.
-- **B**: Wazuh 000/001/002 Active, manager·indexer·dashboard·Mattermost·Hermes Up, DGX API 200을 SSH로 확인했다. **라이브 `local_decoder.xml`/`local_rules.xml`에 신규 FW 프리픽스·WAF 100200+ 룰이 없다.** IPS local SID의 분류는 미확인.
+- **B**: 10/08 Wazuh 000/001/002 Active, manager·indexer·dashboard·Mattermost·Hermes Up을 SSH로 확인했다. DGX API 200은 10/06 확인 결과다. **라이브 `local_decoder.xml`/`local_rules.xml`에 신규 FW 프리픽스·WAF 100200+ 룰이 없다.** 10/06 읽기 조회에서 Suricata local SID `1000010`→Wazuh `100110`, CRS `920350`→`100101` 수집을 확인했으며 다른 신규 ID의 재현 검증은 남았다.
 - ⚠️ 운영 제약(2026-09-26 실제 발생): **공격성 테스트 트래픽을 캠퍼스 VPN 경유로 보내면 캠퍼스 FW가 (VPN IP↔A) 쌍을 차단**해 A 관리접속이 끊김. IDS/WAF 테스트는 반드시 Kali/B/C 등 **VM 세그먼트 안**에서. A 복구 경로: `ssh -J groot-b groot_a@10.200.10.1`.
-- **C**: `ens192` 제거·기본 경로 A, Apache·Wazuh Agent active, DVWA 302, `log4shell-lab` 가동(`10.200.10.20:8080` 내부 바인딩), NTP 동기화를 SSH로 확인했다. 취약점 2,422건 인덱싱은 이전 기록의 수치다.
+- **C**: 10/08 `ens192` 제거·기본 경로 A, Apache·Wazuh Agent active, DVWA 로그인 HTTP 200, `log4shell-lab` 가동(`10.200.10.20:8080` 내부 바인딩·HTTP 응답), NTP 동기화를 SSH로 확인했다. 취약점 2,422건 인덱싱은 이전 기록의 수치다. 랩 취약성·공격 재현은 미검증이다.
 - **MCP·Agent**: 읽기 서버(B)와 응답 서버(A) 배치·계약 테스트 완료. 런타임은 Hermes(B)로 결정·배치했고 DGX 추론, 경보 조사, Tier 2 승인→차단 경로를 2026-09-28에 E2E 검증했다.
 - **승인형 룰 변경(2026-10-08 약 12:58 KST)**: B 승인 브로커와 A/B 전용 `rulechg`·worker timer를 배포하고 Hermes에 `rule-a`·`rule-b`를 추가했다. HMAC 통신 및 WAF·Suricata·Wazuh 로컬 룰 대상의 읽기 조회를 확인했고 운영 룰 해시는 그대로다. 실제 Mattermost 승인→룰 적용 E2E는 아직 검증하지 않았다.
+- **채팅 인증서(10/08 약 16:02 KST)**: `chat.grootlab.duckdns.org`에 Let's Encrypt 인증서를 배포하고 Mac HTTPS ping HTTP 200·TLS 검증을 확인했다. 만료는 2027-01-06 15:02 KST, 자동 갱신은 없다. 모바일은 학교 내부 Wi-Fi에서 미검증이며, 사용자 보고로 관리자가 모바일 GlobalProtect 지원을 거절해 모바일 VPN은 검증 계획에서 제외했다.
+- **시간대**: A/B/C 호스트는 10/06부터 `Asia/Seoul`이며 10/08 KST·NTP 동기화를 재확인했다. Mattermost와 SOC 보고 표시도 KST로 맞췄지만 다른 컨테이너 내부 표시는 UTC일 수 있다.
 - 제약: 일반 웹(80/443) 반출 제한으로 이미지·패키지는 오프라인 반입. DGX `:11434` 연결은 확보됐다.
 - 주요 결정 확정: LLM=DGX Spark(A-1)/보류 시 로컬 Ollama, 오케스트레이션=Docker Compose(B-1), 보안장비=nftables/Suricata/ModSecurity+CRS, Wazuh=4.14.8.
 
@@ -134,7 +136,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 |---|---|---|
 | 모델 | **`qwen3.6:35b`** (채택) | tool calling·thinking 지원, DGX Ollama `.110`에 256k ctx 상주. 초기 계획 Qwen3-30B-A3B(MoE)/32B 비교에서 실제 상주 모델로 확정 |
 | 추론 서버 | **Ollama** (:11434, OpenAI 호환 `/v1`) — DGX Spark 211.170.162.110/.111 두 엔드포인트 | Qwen3 tool calling·thinking 지원, `qwen3.6:35b` 채택(.110에 256k ctx 상주). vLLM은 대안 |
-| MCP 역할 | 자격증명 격리 보안 경계 (A안). 읽기 MCP는 Groot_B, 응답 MCP는 Groot_A, Agent는 자격증명 없음 | 온프레미스 분리로 경계 더 명확 |
+| MCP 역할 | 자격증명 격리 보안 경계 (A안). 읽기 MCP는 Groot_B, IP 차단 응답 MCP는 Groot_A, 승인형 로컬 룰 변경 MCP는 A/B. Hermes에는 서버 관리 자격증명을 주지 않음 | 기존 읽기·응답 경계를 유지하고 `rule-a`·`rule-b`를 별도 추가 |
 | Alert 전달 | Indexer 폴링 (전 구간 내부망이라 웹훅도 가능) | |
 | 공격 시나리오 | DVWA(웹공격) + CVE 컨테이너(Log4Shell 등) 병행 | KEV 등재 CVE |
 | 대응 | 자동은 되돌릴 수 있는 동작만, 고위험은 사람 승인 | Policy Engine + HITL(⚠️Slack 불가, 443 차단 — 온프레미스 Mattermost 로 대체 완료, Tier 2 승인) |
@@ -183,7 +185,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 - [x] Wazuh all-in-one 설치 (Manager+Indexer+Dashboard) — **기동 완료(2026-09-26)**: 4.14.8 single-node compose, 인증서는 오프라인 `wazuh-certs-tool.sh`(openssl)로 생성. 인덱서 green·대시보드 302·API 토큰 OK. 절차 `infra/groot-b/README.md` (⚠️ 인증서 권한 644 필수). **기본 비번 교체 완료**(3계정 통일, 데모계정 삭제, 값은 CREDENTIALS.local.md)
 - [x] Groot_A/C의 Agent 등록, Dashboard에서 Active 확인 — **완료**: 001 groot-sec(A)·002 groot-web(C) 모두 Active(2026-09-26, 2026-09-27 재확인). 매니저 000 포함 3대
 - [x] Suricata eve / ModSecurity 감사로그 수집 룰 확인, MITRE 태그 확인 — **완료(2026-09-26)**: Suricata는 내장 86601(lv3) 위에 severity별 100110(lv9)/100111(lv6)+버스트 100112, ModSecurity는 내장 룰 없음 → JSON 필드 기반 100100~100103(CRS 히트 lv7, 임계 초과 lv10, 버스트 lv12), MITRE T1190/T1595. `infra/groot-b/local_rules.xml`(wazuh-logtest·`analysisd -t` 검증 후 적용). B에서 A로 프로브 → **alerts.json·인덱서(`rule.groups:capstone`) 5건 실측**
-- [ ] **신규 신호 Wazuh 디코더·룰 보완**: 10/6 SSH 점검에서 B 라이브 `local_decoder.xml`/`local_rules.xml`에 FW `SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`와 WAF `GROOT_A/*` 100200–299용 항목이 없음을 확인했다. 추가 후 대시보드 분류를 검증한다. IPS local SID 1000xxx 분류는 별도 확인.
+- [ ] **신규 신호 Wazuh 디코더·룰 보완**: 10/08 SSH 재점검에서도 B 라이브 `local_decoder.xml`/`local_rules.xml`에 FW `SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`와 WAF `GROOT_A/*` 100200–299용 항목이 없었다. 추가 후 대시보드 분류를 검증한다. IPS local SID `1000010`→`100110` 수집은 10/06 확인했으며 나머지 SID 분류는 별도 확인한다.
 - [x] Vulnerability Detection 활성화 (OS 패키지 CVE 매핑 확인) — **완료**: C(002) 취약점 상태 2,422건 인덱싱, 대시보드 Vulnerability Inventory 확인, `/soc vulns` 조회
 - [x] 읽기 MCP Server 배치(B의 읽기 자격증명 격리), LLM 실행처에서 접근 확인 — **읽기 서버 배치·검증 완료(2026-09-26)**: `mcp-server-wazuh` v0.3.0(sha256 검증) `/opt/mcp/`, 전용 사용자 `mcp` + sshd ForceCommand + authorized_keys restrict, 읽기전용 계정 `mcp-ro`(API readonly / 인덱서 readall, 쓰기 403 실증), 자격증명은 B `/etc/mcp/wazuh-ro.env`에만. Mac에서 `ssh -T groot-mcp`(A 점프 전용 키)로 **계약 테스트 PASS**(initialize·14 tools·get_wazuh_alert_summary 실경보 반환). `infra/mcp/deploy_mcp_B.sh`(적대적 리뷰 5관점 반영), `contract_test.py`. 차단 권한·승인 브로커 설정은 A의 별도 응답 MCP 경계에 있다.
 
@@ -214,7 +216,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 - [x] Wazuh Tool: `search_alerts`, `get_alert`, `get_agent_status`, `get_vulnerabilities` — **읽기 MCP 서버 14툴로 커버**(계약테스트 PASS) + SOC 챗봇 `/soc alerts|agents|vulns`로 실사용
 - [ ] CVE Tool: `cve_lookup` → NVD + CISA KEV — **CISA KEV 오프라인 반입·리뷰 완료**(B `~/capstone/kev`, 1,726건, CC0, 시나리오 CVE 포함 · `infra/groot-b/kev-data.md`). NVD 상세는 보완 예정
 - [x] Server Tool: 프로세스/포트/FIM/인증 — **읽기 MCP 서버로 커버**(계약테스트 PASS): 프로세스·포트는 `get_wazuh_agent_processes`/`get_wazuh_agent_ports`, FIM·인증 이벤트는 Wazuh 알림·매니저 로그 조회(`get_wazuh_alert_summary`/`search_wazuh_manager_logs`)로 확인. 경보 조사 프롬프트에서 실사용
-- [x] Network Tool: IPS(Suricata)·WAF·FW 로그 조회 — 기존 세 소스의 Wazuh 집중 로그를 읽기 MCP로 조회 가능. **2026-10-06 SSH 점검에서 B 신규 FW·WAF 디코더/룰 부재 확인**; 추가 후 MCP 조회 결과를 검증한다. IPS local SID 분류는 미확인.
+- [x] Network Tool: IPS(Suricata)·WAF·FW 로그 조회 — 기존 Wazuh 14툴에 더해 10/06 별도 `security-events` MCP의 `search_suricata_alerts`·`search_modsecurity_alerts`를 배포하고 Hermes LLM 호출을 검증했다. SID `1000010`→`100110`, CRS `920350`→`100101`을 확인했다. **색인된 경보만 조회**하며 B 신규 FW·GROOT WAF 전용 분류는 10/08에도 없어 추가·검증이 필요하다.
 - [x] Response Tool `block_ip`/`unblock_ip`/`list_blocks` — **완료(2026-09-27)**: 응답 MCP 서버(A, 파이썬 stdlib stdio, `infra/mcp/response-mcp.py`), 전용 사용자 `resp`(sshd ForceCommand + authorized_keys restrict) + sudoers(agent_block add/del/list 만, flush 금지) → nft `agent_block`. 정책 엔진(TTL 상한 RESP_MAX_MINUTES=120, reason 필수·정규화, IP 검증, flush 미노출). TTL 만료 리퍼(systemd 타이머)로 auto-unblock 감사(action=expire→B 100131). 자격증명 격리 유지(에이전트=키만, 차단 능력=A sudoers). Mac `ssh -T groot-resp` 계약 테스트 PASS: block→100121, 거부(보호IP)→100123, unblock→100122, 만료→100131. 적대적 리뷰 3관점 반영. `deploy_response_A.sh`(데드맨 롤백 트랩). — [ ] `isolate_host`·`notify`(Mattermost)는 추후
 - [~] 승인형 규칙 변경 MCP — **2026-10-08 저장소 구현·오프라인 검증·라이브 배포 및 읽기/인증 점검 완료**: 기존 읽기 MCP는 유지하고 A(WAF·Suricata)와 B(Wazuh)에 별도 전용 계정·고정 대상 변경기를 배포했다. 현재 전문·해시 조회 → 원본 해시가 맞는 전체 후보 제안 → Mattermost 전체 diff/해시 카드 → 지정 승인자 클릭 → 일회성 승인 소비 → 적용 전 재검사·백업·엔진 검사·재로드/재시작·읽기 해시 확인·실패 복구 흐름이다. A↔B 승인 API는 평문 토큰을 보내지 않고 일회성 nonce·양방향 HMAC 서명을 검사한다. B 브로커·A/B `rulechg`/worker timer가 동작하고 Hermes에 `rule-a`·`rule-b`가 등록됐다. HMAC 통신·세 대상 읽기 조회를 통과했으며 운영 룰 해시는 배포 전후 동일하다. **실제 Mattermost 승인 버튼 클릭→룰 적용·복구 E2E는 별도 검증 작업으로 남았다.** nft 전체 정책과 WAF/IPS 차단 모드 전환은 범위 밖이다. 세부 범위와 한계는 `infra/mcp/README.md` 참조.
 - [ ] `cve_lookup` 등 조사 툴 확장(읽기 서버 14툴 + KEV)
@@ -223,8 +225,10 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 ### 2-2. Agent Runtime = Hermes Agent (Nous Research) — **채택·배치 완료 (2026-09-28)**
 > **해소(2026-09-28)**: Hermes Agent 를 `Groot_B` 에 컨테이너로 배치 완료(공식 이미지 오프라인 반입) → DGX Ollama(`211.170.162.110/.111`) 연결·MCP 17툴 등록·경보 트리거·Tier 2 승인까지 E2E 실측(아래 항목 참조). 초기엔 DGX 도달 불가로 Claude Code 직결을 대안으로 검토했으나 DGX 엔드포인트가 열려 불필요해졌다.
 
+> **현재 등록 상태(2026-10-08)**: 아래 17툴·2서버는 9/28 최초 배치 기록이다. 현재는 `wazuh-ro`·`security-events`·`resp`·`rule-a`·`rule-b` **5서버 enabled**를 확인했다. 신규 룰 변경 서버의 도구 노출·읽기·인증은 검증했으며 실제 사람 승인→룰 적용 E2E는 남아 있다.
+
 직접 구현이 아니라 Hermes Agent를 사용(교수 지정). MCP 네이티브 지원이라 2-1 MCP Server를 그대로 붙인다.
-- [x] Hermes 설치, `~/.hermes/config.yaml`의 `mcp_servers`에 우리 MCP Server 등록(stdio/HTTP) — **2026-09-28 완료**: 설치 위치=B(MCP 서버가 있는 VM; Mac 은 콘솔), 방식=공식 Docker 이미지 `nousresearch/hermes-agent:v2026.9.24`(amd64 968MB) 오프라인 반입(`infra/tools/pull_image.py`, 레지스트리 API·sha256 검증·OCI layout). `infra/hermes/deploy_hermes_B.sh prep` 완료: 격리 사용자 `hermes`(mcp 그룹 아님) + `/opt/hermes-data`(=/opt/data) + 컨테이너용 SSH 키/config + `config.yaml`(wazuh-ro=full, resp=untrusted) + B(mcp)·A(resp) authorized_keys 에 `restrict,command=` 등록. **호스트측 계약 테스트 PASS(읽기 14툴·응답 list_blocks)**. 이미지 반입·load 후 **컨테이너 안 계약 테스트 PASS(읽기·응답) + Hermes 본체 기동 agent.log `MCP: registered 17 tool(s) from 2 server(s)`**(mcp__wazuh_ro__* 14, mcp__resp__* 3). `hermes mcp test` 는 이미지에 mcp[cli](typer) 가 없어 불가 → `deploy_hermes_B.sh test` 방식. 이미지 tar 는 B `~/capstone/hermes/`(재반입용, 1GB)
+- [x] Hermes 설치, `~/.hermes/config.yaml`의 `mcp_servers`에 우리 MCP Server 등록(stdio/HTTP) — **2026-09-28 완료**: 설치 위치=B(MCP 서버가 있는 VM; Mac 은 콘솔), 방식=공식 Docker 이미지 `nousresearch/hermes-agent:v2026.9.24`(amd64 968MB) 오프라인 반입(`infra/tools/pull_image.py`, 레지스트리 API·sha256 검증·OCI layout). `infra/hermes/deploy_hermes_B.sh prep` 완료: 격리 사용자 `hermes`(mcp 그룹 아님) + `/opt/hermes-data`(=/opt/data) + 컨테이너용 SSH 키/config + `config.yaml`(wazuh-ro=full, resp=untrusted) + B(mcp)·A(resp) authorized_keys 에 `restrict,command=` 등록. **호스트측 계약 테스트 PASS(읽기 14툴·응답 list_blocks)**. 이미지 반입·load 후 **컨테이너 안 계약 테스트 PASS(읽기·응답) + Hermes 본체 기동 agent.log `MCP: registered 17 tool(s) from 2 server(s)`**(mcp__wazuh_ro__* 14, mcp__resp__* 3). `hermes mcp test` 는 이미지에 `mcp[cli]`(typer) 가 없어 불가 → `deploy_hermes_B.sh test` 방식. 이미지 tar 는 B `~/capstone/hermes/`(재반입용, 1GB)
 - [x] 모델 프로바이더 = DGX Ollama **211.170.162.110/111 `:11434/v1`**(OpenAI 호환, 2026-09-28 Mac·A·B 모두 도달 실측, Ollama 0.33.2). 모델 **qwen3.6:35b**(qwen35moe 36B Q4_K_M, capabilities tools/thinking, .110에 **262,144 컨텍스트로 상주 로드**) 채택 — 대안 gpt-oss:120b(양 노드, 32k 로드). Hermes `model.provider=custom`, `base_url=http://211.170.162.110:11434/v1`, `default=qwen3.6:35b`. **E2E 실측**: `chat -q` → `mcp__wazuh_ro__get_wazuh_agents` 호출 → 한국어 답변(3 API call, 21s)
 - [x] Hermes 실행 위치 결정: **Groot_B(Docker)** — MCP 서버와 같은 VM에 2026-09-28 배치. DGX Ollama `:11434` 도달 및 Hermes MCP 연동·한국어 응답 E2E 검증(바로 위 모델 항목 참조).
 - [x] Alert 트리거 — **완료(2026-09-28)**: Hermes 게이트웨이(B 상주 컨테이너) cron `soc-alert-watch`(every 5m) + `--monitor-script`(soc_bot `/recent` 지문) → 새 level≥10 경보 때만 LLM 조사 → `soc-alerts` 보고(`[SILENT]` 로 침묵). 프롬프트 `infra/hermes/soc_alert_watch.prompt`, 배치 `deploy_gateway_B.sh`
@@ -237,7 +241,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 - [~] 결정적 자동/승인/거부 판정을 Response Tool에서 수행 — **1차 완료(2026-09-27)**: 응답 서버 `response-mcp.py`가 TTL 상한·reason 필수·IP 검증·보호대상(A `never_block`)·활성 SSH 출발지 거부·flush 미노출을 강제. 고위험 동작 사람 승인은 Tier 2(Mattermost 인터랙티브 버튼)로 완료 — 아래 항목 참조.
 - [ ] 정책표(suggestion.md 10장) YAML화
 - [ ] 결정적 자동/승인/거부 판정을 Response Tool에서 수행, 보호 IP·allowlist
-- [x] 고위험 동작 사람 승인 경로 — **Tier 2 E2E 검증(2026-09-28)**: 응답 서버 `block_ip` → soc_bot 브로커 → Mattermost [승인][거부] 버튼 → 승인 시 실행. 무인(cron)에서도 채팅 요청→승인→차단→회신을 실측했다. **2026-10-08 코드 재확인:** 브로커 미설정이면 `block_ip`는 즉시 실행하며 `APPROVERS` 미설정이면 승인자를 제한하지 않는다. 전체 설정에 대해 fail-closed라고 볼 수 없고, 오늘은 라이브 승인 설정·동작을 재시험하지 않았다.
+- [x] 고위험 동작 사람 승인 경로 — **Tier 2 E2E 검증(2026-09-28)**: 응답 서버 `block_ip` → soc_bot 브로커 → Mattermost [승인][거부] 버튼 → 승인 시 실행. 무인(cron)에서도 채팅 요청→승인→차단→회신을 실측했다. **2026-10-08 코드 재확인:** 브로커 미설정이면 `block_ip`는 즉시 실행하며 `APPROVERS` 미설정이면 승인자를 제한하지 않는다. 전체 설정에 대해 fail-closed라고 볼 수 없다. 10/08 라이브에서는 브로커 URL·토큰·승인자 목록의 비어 있지 않음과 `GET /pending` HTTP 200을 확인했으나 승인 클릭→차단 E2E는 재시험하지 않았다.
 - [x] Response 실차단 게이트 검증 — 2026-09-28 승인→차단 E2E를 실측했다. 새 WAF·IPS·FW v2 경보에서 시작하는 자동/승인 경로는 신규 분류 룰과 시나리오 경보 실발화 후 별도로 검증한다.
 
 ### 2-4. 통합 테스트
@@ -277,6 +281,9 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 
 ## 진행 로그
 최신 항목을 위에 둔다. (세부 이력은 `대화기록/YYYY-MM-DD.md`)
+
+### 2026-10-08 (모바일 검증 경로 후속 정정)
+- 사용자 보고로 학교 관리자가 관리 범위 확대를 이유로 모바일 GlobalProtect 지원을 이미 거절했음을 반영했다. 아래 인증서 배포 당시 기록의 Wi-Fi·VPN 양쪽 검증 계획은 **학교 내부 Wi-Fi에서만 모바일 검증**하는 계획으로 변경됐다. 휴대폰 VPN 로그인 실패는 채팅 인증서 실패를 뜻하지 않는다.
 
 ### 2026-10-08 (약 16:02 KST, 채팅 공인 인증서 배포)
 - Mac의 패키지 설치 없이 임시 `acme.sh` 3.1.6과 DuckDNS DNS-01으로 `chat.grootlab.duckdns.org` Let's Encrypt 인증서를 발급했다. A `chatproxy`에 체인·키를 적용하고 SNI·CA 검증 Mattermost ping과 Mac HTTPS HTTP 200을 확인했다.

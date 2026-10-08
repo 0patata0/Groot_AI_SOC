@@ -1,5 +1,7 @@
 # GROOT_A IPS Phase-A 변경셋 — 무중단 탐지/로깅/자산 (2026-10-02, 검증 반영)
 
+> **2026-10-08 후속 상태:** 같은 날 SSH 점검에서 아래 ET+local 합본·Phase-A·로컬 SID 11개·passive 설정을 재확인했다. 10/06 후반 보안 이벤트 MCP 및 Hermes 조회에서는 로컬 SID `1000010`이 Wazuh `100110`으로 인덱싱된 것을 확인했으므로 아래의 “local SID 분류 미확정”은 이전 점검 시점의 한계다. 나머지 SID와 시나리오별 공격 발화는 미검증이다. A의 승인형 로컬 룰 변경 MCP `rule-a`는 배포·읽기 조회까지 완료했고, 실제 승인→적용·복구 E2E는 남아 있다. [최신 상태](../STATUS.md) · [배포 기록](../대화기록/2026-10-08.md).
+
 > **후속 상태(2026-10-06 이번 세션 SSH 재점검):** A의 Suricata가 passive `-i ens192`로 ET+local 합본 `/rules/all.rules`(47,694,450B)를 단일 `-S`로 로드하며 Phase-A 옵션을 적용한 것을 재확인했다. 합본에 local SID 11개가 있고 threshold 파일도 존재한다. 앞선 [세션 1 기록](../대화기록/2026-10-06.md)에는 eve.json 갱신과 `community_id` 275건 확인도 있다. B manager의 local SID 1000xxx 분류 여부는 이번 점검에서 확정하지 못했다. 이를 확인하고 VM 세그먼트 공격 프로브로 실발화를 검증해야 한다. NFQUEUE/drop 전환은 미완료다.
 >
 > 아래 §1~§7은 **10월 2일 작성한 변경안·샌드박스 검증·당시 적용 절차**다. 특히 예시의 `-S /rules/suricata.rules`와 `/etc/suricata/threshold.in`은 10월 6일 기록의 라이브 경로(`/rules/all.rules`, `/rules/threshold.in`)와 다르므로 현재 재배포 명령으로 그대로 사용하지 않는다.

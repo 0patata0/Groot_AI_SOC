@@ -4,6 +4,8 @@
 > 성격: **블루팀 탐지·대응 검증 자료**(공격 수행 절차 아님 — 절차는 `scenarios/*.md` + `references.md`의 공개 표준 인용). 기법 ID 는 ATT&CK v19.2 에 실재·비폐기 확인(2026-10-02).
 > 기계판: `scenarios/ground-truth.json`. 룰 id 상세는 `alerts.md`·`README.md`, 기법 설명은 `datasets/processed/knowledge/attack_techniques.jsonl`.
 
+> **현재 운영과 기대 결과(2026-10-08 기록):** 이 표는 평가 정답 초안이며 시나리오 실측 완료를 뜻하지 않는다. WAF는 DetectionOnly, Suricata는 passive이고 `isolate_host`는 미구현이므로 격리는 사람이 수행할 대응 권고다. IP 차단의 Tier 2 승인 경로와 새 로컬 룰 변경 승인 경로는 별개다. 새 변경 MCP는 배포·읽기 검증까지 완료했으며 실제 승인→룰 적용 E2E는 남았다. [현황](../STATUS.md)
+
 ## 범례
 - **tactic**: ATT&CK 전술(TA). **technique**: 기법 ID + 이름.
 - **기대 탐지**: 떠야 하는 Suricata sid / CRS 룰 / Wazuh 룰 id. "(예상)"은 미실측(실행 시 `alerts.md`에 확정).
@@ -37,12 +39,12 @@
 
 | 단계 | tactic | technique | 기대 탐지 | 정답 대응 |
 |---|---|---|---|---|
-| 2.1 취약점 존재 | — (자산 상태) | 대상=**T1190** | Wazuh Vulnerability Detection: agent 002 Inventory 에 Log4j / **CVE-2021-44228** | 패치/격리 권고(공격 아님 → 경보 아님) |
-| 2.2 JNDI 주입(A 경유) | TA0001 Initial Access | **T1190** Exploit Public-Facing Application | Suricata ET log4j/JNDI 룰(예상), (WAF On 시 CRS) | `block_ip <KALI>` |
+| 2.1 취약점 존재 | — (자산 상태) | 대상=**T1190** | C 컨테이너의 실제 Log4j JAR 버전·CVE 매핑을 확인. agent 002 Vulnerability Inventory 표시는 조건부이며 내장 JAR은 미수집 가능 | 패치/격리 권고(공격 아님 → 경보 아님) |
+| 2.2 JNDI 주입(A 경유) | TA0001 Initial Access | **T1190** Exploit Public-Facing Application | Suricata ET log4j/JNDI 룰(예상). A:8080 토글 경로는 WAF를 통과하지 않음 | `block_ip <KALI>`(Tier 2 승인) |
 | 2.3 코드 실행 | TA0002 Execution | **T1059.004** Unix Shell (+**T1203**) | C(002) 프로세스: `java`→`sh`/`python3` 비정상 자식(예상) | 서버 격리(사람 승인) |
 | 2.4 아웃바운드 콜백/유출 | TA0011 C2 / TA0010 Exfiltration | **T1071.001** Web Protocols·**T1105** Ingress Tool Transfer (→ **T1041**) | C→외부 LDAP/HTTP 아웃바운드(예상, egress 통제 전엔 미관측 가능) | 유출지 `block_ip` + 격리 승인 |
 
-- **정답 verdict**: `malicious`(critical). attack_chain: `T1190 → T1059.004 → T1071.001 → T1041`. compromised `true`(RCE). 대응: 출발지+유출지 `block_ip`(자동) + **서버 격리 = 사람 승인 필수**(비가역). remediation: Log4j 2.17.1+/`formatMsgNoLookups`.
+- **정답 verdict**: `malicious`(critical). attack_chain: `T1190 → T1059.004 → T1071.001 → T1041`. compromised `true`는 RCE 증거가 확인된 경우다. 대응: 정책상 차단 가능한 외부 출발지·유출지의 `block_ip`를 Tier 2 승인 경로로 요청하고, 서버 격리는 사람 승인을 거친 수동 대응으로 권고한다(`isolate_host` 미구현). 구체적인 패치·완화 방법은 [시나리오 2](scenario-2-log4shell.md)의 공개 권고와 실제 JAR 구성을 확인해 결정한다.
 - **근거 데이터**: ET JNDI 룰(`knowledge/et_open_rules.jsonl` sid 2034716 등), KEV(`cisa_kev.jsonl`), T1190 Linux 분석 0220(`attack_defense.jsonl`: access log→5xx→웹서버 셸 생성→egress) = 이 체인의 탐지 근거.
 
 ## 시나리오 3 — 권한상승 (CVE-2021-3156 Baron Samedit, C 호스트, 엔드포인트 텔레메트리)

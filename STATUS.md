@@ -5,7 +5,7 @@
 > **시간대 변경(2026-10-06 15:59 KST, 라이브 확인):** A/B/C 호스트를 `Asia/Seoul`(KST, UTC+09:00)로 통일했고 NTP 동기화를 확인했다. B의 `soc-summary.timer`는 당시 `09,21:00 Asia/Seoul`로 설정했고 다음 실행이 같은 날 21:00 KST임을 확인했다. B `soc-bot`은 최근 경보 시각을 KST로 표시하며, Mattermost 컨테이너는 `TZ=Asia/Seoul`로 재생성 후 healthy를 확인했다. 다른 컨테이너의 내부 시간대는 UTC일 수 있으며, Wazuh 원본 타임스탬프와 표시 시간대는 구분한다. 10/08 세 호스트의 KST·NTP 동기화는 재확인했다.
 > **내부망은 2026-09-29 부터 `10.200.10.0/24`(A .1 / B .10 / C .20)** — 캠퍼스 코어가 쓰는 10.10.10.0/24 와의 중복을 없앴다(런북 `infra/internal_net_change.md`).
 > **외부 주소 확인 주의:** 10/08 SSH에서 A `ens192=192.168.16.230/25`, 직결 라우트 `192.168.16.128/25`, 기본 게이트웨이 `.129`를 재확인했다. 10/06에 확인한 A:10443 DNAT·`CAPSTONE-FWD`의 허용 출발지 `192.168.16.0/25`는 **다른 대역**이다. Kali 주소·라우팅이 미확인이므로 이 허용목록이 의도대로 작동하는지는 시나리오 전에 검증해야 한다.
-> **채팅 인증서(2026-10-08 약 16:02 KST, 라이브 배포):** `chat.grootlab.duckdns.org`에 Let's Encrypt 인증서를 적용했다. 만료 2027-01-06 15:02 KST. A 배포 스크립트의 SNI·CA 검증 ping과 Mac의 `curl` HTTP 200/TLS 검증 결과 0을 확인했다. 실제 모바일 앱의 학교 Wi-Fi·VPN 로그인은 미검증이고 갱신은 미자동화다. [운영 기록](infra/dns/README.md).
+> **채팅 인증서(2026-10-08 약 16:02 KST, 라이브 배포):** `chat.grootlab.duckdns.org`에 Let's Encrypt 인증서를 적용했다. 만료 2027-01-06 15:02 KST. A 배포 스크립트의 SNI·CA 검증 ping과 Mac의 `curl` HTTP 200/TLS 검증 결과 0을 확인했다. 이번 문서 점검에서도 Mac HTTPS ping은 HTTP 200·TLS 검증 결과 0·접속 IP `192.168.16.230`으로 재확인했다. 실제 모바일 앱은 A에 도달하는 학교 내부 Wi-Fi에서 검증해야 한다. 사용자 보고로 관리자가 모바일 GlobalProtect 지원을 거절했으므로 모바일 VPN은 검증 계획에서 제외했고, 인증서 갱신은 미자동화다. [운영 기록](infra/dns/README.md).
 
 ## 라이브 헬스 (A/B/C 호스트는 2026-10-08 SSH 재점검)
 | 호스트 | 역할 | 상태 |
@@ -29,7 +29,7 @@
 - **에이전트**: A(001)·C(002) Active, 로그·인벤토리·취약점 수집. B/C는 `ens192` 물리 제거·기본 경로 A 전환 완료.
 - **시계**: A/B/C 호스트 `Asia/Seoul`(KST), NTP 동기화 확인(2026-10-06 15:59 KST). A(chrony)←캠퍼스 192.168.16.131, B/C(timesyncd)←A. 외부 NTP·VMware Tools timesync 미사용.
 - **A 호스트 방화벽 Phase 2 + agent_block**: input 기본 drop, raw prerouting 차단 셋 + never_block 잠금가드, CLI, 데드맨 적용, 실차단 검증. B 룰 100120~100131.
-- **MCP 읽기 서버**(B, `ssh -T groot-mcp`): 기존 Wazuh 14툴 계약 테스트 PASS. 별도 `ssh -T groot-mcp security-events` 보안 이벤트 2툴을 B에 배치하고 Suricata·ModSecurity 조회 계약 테스트 PASS. 둘 다 읽기전용 `mcp-ro` 인덱서 권한을 사용한다. Hermes 실설정에 세 번째 서버를 추가해 재시작했고 `hermes mcp list`에서 3서버 enabled를 확인했다. Hermes LLM 대화의 두 새 도구 호출도 PASS(SID `1000010`, CRS `920350`).
+- **MCP 읽기 서버**(B, `ssh -T groot-mcp`): 기존 Wazuh 14툴과 별도 `ssh -T groot-mcp security-events`의 Suricata·ModSecurity 경보 검색 2툴이 배치돼 계약 테스트를 통과했다. 둘 다 읽기전용 `mcp-ro` 인덱서 권한을 사용한다. 10/06 Hermes LLM 대화의 두 새 도구 호출도 PASS(SID `1000010`, CRS `920350`). 당시 읽기 2개·응답 1개 서버 구성이었고, 10/08 룰 변경 서버 2개 추가 후 Hermes에는 총 5개 MCP 서버가 enabled다.
 - **MCP 응답 서버**(A, `ssh -T groot-resp`): block_ip/unblock_ip/list_blocks → agent_block, 정책 엔진, TTL 만료 리퍼, 계약 테스트 PASS(차단 100121 / 거부 100123 / 해제 100122 / 만료 100131).
 - **승인형 룰 변경 MCP**(A/B, 2026-10-08 약 12:58 KST): B 브로커에 별도 룰 승인 API를 배포하고 A/B에 `rulechg` 강제 명령·root helper·worker timer를 설치했다. Hermes에 `rule-a`·`rule-b`를 추가하면서 기존 읽기·응답 MCP 서버를 유지했다. HMAC health와 세 로컬 룰 대상의 읽기 조회가 통과했고 운영 룰 해시는 배포 전후 동일했다. 실제 Mattermost 버튼 승인→룰 적용은 아직 검증하지 않았다.
 - **문서**: `scenarios/`(탐지 검증 매트릭스 + 공개 표준 레퍼런스), infra README(A/B/C/MCP).

@@ -87,15 +87,16 @@ WAF 규칙 ID 필터는 최근 후보 경보 최대 250건을 검사한다. 해�
 - 감사: 모든 add/del/거부 → syslog(agent_block) → Wazuh 100120~100123, reload 100125, **TTL 만료 100131**(리퍼). 차단 시작↔종료가 SIEM 타임라인에 남음.
 - 계약 테스트: `python3 infra/mcp/contract_test.py --cmd "ssh -T groot-resp" --tool list_blocks --args '{}'`.
 
-## 승인형 규칙 변경 MCP — 권고안, 미구현 (2026-10-08)
-2026-10-08 11:46 KST 원격 MCP `tools/list`에서 B의 Wazuh 조회 14툴·보안 이벤트 조회 2툴과 A의 응답 3툴을 확인했다. 현재 규칙 파일 변경 도구는 없다. 기존 B 읽기 계정의 권한을 높이지 않고, 규칙 변경 전용 MCP 경계를 추가하는 방향을 권고한다. 여기서 '변경 전용'은 적용 전 상태·해시·차이를 확인하는 최소 조회도 포함하며, 임의 파일 쓰기·셸 실행 권한을 뜻하지 않는다.
+## 승인형 규칙 변경 MCP — 저장소 구현, 라이브 미배포 (2026-10-08)
+2026-10-08 11:46 KST 라이브 MCP 목록에는 B의 읽기 16툴과 A의 IP 차단 응답 3툴만 있었다. 이후 **저장소에** 별도 승인형 변경 경계를 구현했다. 아래는 코드·오프라인 테스트 상태이며, 서버 배치·Hermes 등록·실제 승인 클릭·운영 룰 변경을 완료했다는 뜻이 아니다.
 
-- A(WAF·Suricata)와 B(Wazuh)의 전용 OS 계정·SSH 키·강제 명령·적용 helper를 분리한다. 최초 대상은 로컬 사용자 규칙 파일로 제한한다. nft 전체 정책 변경, WAF `DetectionOnly`→`On`, Suricata 인라인/drop 전환은 별도 고위험 절차로 남긴다. 기존 임시 IP 차단은 `resp` MCP가 담당한다.
-- 에이전트는 변경안을 **제안**한다. 서버가 대상·룰 ID·변경 전후 diff·base/candidate SHA-256·검증 결과를 고정해 Mattermost 승인 카드에 표시한다. 지정 승인자가 승인한 **동일 변경안**만 1회 적용한다. 승인 뒤에도 현재 파일 해시와 제안 시점의 base 해시를 비교하고, 불일치·거부·만료·브로커 미설정/오류는 미실행한다. 백업·구문/샘플 검사·서비스별 재로드/재시작·상태 확인·실패 시 복구·감사 기록을 포함한다.
-- 현행 차단 브로커는 규칙 변경에 그대로 재사용할 수 없다. `response-mcp.py`의 `block_ip`는 브로커 URL/토큰 미설정 시 `policy-auto`로 실행하고, `unblock_ip`는 승인 없이 실행한다. `soc_bot.py`의 `APPROVERS`가 비면 지정 승인자 검사를 하지 않으며 승인 카드도 IP/분 단위 차단 전용이다. 새 변경 경로는 브로커와 승인자 목록을 필수로 하고, 승인 콜백의 출처·사용자 신원을 검증하며 승인 결정과 변경안 해시를 서버 측에서 결속해야 한다.
-- Wazuh API에는 `rules:read`와 `rules:update`가 구분돼 있지만, [공식 RBAC 표](https://documentation.wazuh.com/current/user-manual/api/rbac/reference.html)의 `rules:update`는 특정 로컬 파일별로 좁혀진 권한이 아니다. B 변경기는 별도 OS 계정·SSH 키와 파일 허용목록을 가진 제한된 helper로 설계하고, 기존 `mcp-ro` 계정은 그대로 유지한다.
-
-이 항목은 설계 권고만 기록한 것이다. 변경 MCP 설치·권한 부여·운영 룰 수정은 아직 하지 않았다.
+- 대상은 A의 `GROOT_A_WAF.conf`·`GROOT_A_local.rules`와 B의 Wazuh `local_rules.xml` 세 로컬 룰 파일로 고정했다. `get_rule_change_target`이 현재 전문·SHA-256·컨테이너 상태를 조회하고, `propose_rule_change`가 조회 시점 해시와 전체 후보 파일을 받아 diff·영향·검증 상태를 보여주고 Mattermost 승인을 요청한다. `get_rule_change_status`로 거부·만료·적용·복구 결과를 확인한다. 임의 경로·셸 명령·nft 정책·WAF 차단 모드·Suricata 인라인/drop 전환은 노출하지 않는다.
+- `rule_change_mcp.py`는 전용 SSH 사용자로 실행하고, root 소유 `rule_change_executor.py`의 **인자 없는 고정 sudo 명령**만 호출한다. 읽기 MCP의 권한은 올리지 않는다. 실행기는 호스트/대상 허용목록, 컨테이너 마운트·원본 해시, WAF DetectionOnly·Suricata passive 상태를 검사한다. 승인 전 Suricata 후보는 임시 결합 파일로 `suricata -T`를 시험하며, WAF/Wazuh는 구조 검사 후 승인된 적용 단계에서 엔진 구문 검사를 수행한다. 임시 Suricata 검증 파일은 활성 `all.rules`를 교체하지 않고 검사 후 삭제한다.
+- `soc_bot.py`의 **별도 룰 승인 API**는 전용 토큰·명시적 승인자·Mattermost 콜백 출처를 필수로 한다. 카드에는 변경 전/후 SHA-256과 전체 diff·영향·사유·만료 시각을 표시하며, 표시 한도를 넘으면 제안을 거부한다. 승인된 정확한 변경안 digest를 1회 소비하고, 실행 직전 원본·ET/결합 룰 상태를 다시 비교한다. 변경 백업, WAF 단일 파일 bind inode 보존, Suricata 결합 룰 재작성, Wazuh manager 재시작, 엔진 검사·읽기 해시·프로세스 상태 검사, 실패 시 복구와 결과 카드 게시를 구현했다. 브로커 장애·설정 누락·거부·만료·해시 불일치는 적용하지 않는다.
+- 배치 순서: B의 브로커 코드/전용 토큰·승인자·Mattermost 출처 설정 → A/B의 `deploy_rule_change_{A,B}.sh`로 전용 사용자·SSH 강제 명령·sudoers·root 전용 상태/백업·10초 worker 설치 → 전용 키로 SSH 계약 테스트 → B Hermes 설정과 SOUL의 룰 변경 지침 등록. 배치 스크립트와 구체적 명령은 이 절과 스크립트 주석을 함께 검토한다. 배포 전 세 장비의 라이브 경로·마운트·모드를 다시 확인한다.
+- 실제 실행 순서와 점검 명령은 [rule-change-deploy.md](rule-change-deploy.md)에 정리했다. A↔B 승인 API는 HTTP 위에 일회성 nonce와 요청·응답 HMAC을 적용해 승인 위조를 막는다. HTTP 본문 내용의 기밀성은 제공하지 않으므로 후보 룰에 비밀 값을 넣지 않는다.
+- **남은 검증/한계:** 오프라인 테스트는 라이브 버튼 클릭·룰 적용을 대신하지 않는다. 브로커는 승인 상태를 메모리에 두므로 재시작하면 대기/승인 건은 소실되어 적용이 중단된다. 승인 소비 뒤 브로커가 재시작되면 실행기 로컬 결과는 남아도 Mattermost 결과 카드가 누락될 수 있다. 승인 후 적용 전 원본·마운트 드리프트로 중단되면 변경기는 `/abort`로 승인권을 폐기하고 실제 읽기 해시와 미적용 사유 카드를 게시한다. 브로커 장애로 카드 게시가 실패하면 로컬 상태에 미적용 결과가 남고, 같은 보고를 제한 횟수만 재시도한다. Hermes가 실제 사람 발화를 했는지는 MCP가 독립적으로 인증하지 못하므로 SOUL/자동 경보 프롬프트에서 자발적 제안을 금지하고, 서버에서는 지정 승인자의 버튼 클릭을 최종 강제한다.
+- 기존 IP 차단은 별도 `resp` MCP가 담당하며 기존 경로의 미설정 시 즉시 실행 제약은 이번 룰 변경 구현과 별개로 남아 있다. Wazuh API의 [`rules:update` 권한](https://documentation.wazuh.com/current/user-manual/api/rbac/reference.html)은 파일 단위로 좁히기 어렵기에 새 경계는 고정 파일 helper를 쓴다.
 
 ### 알림/승인 채널도 교체 용이(엔드포인트만)
 읽기·응답 서버와 같은 원칙을 HITL 에도 적용 — **두 층으로 분리**:

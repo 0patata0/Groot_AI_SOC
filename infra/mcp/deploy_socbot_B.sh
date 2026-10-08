@@ -12,6 +12,14 @@ say(){ echo; echo "== $* =="; }; die(){ echo "!! ABORT: $*"; exit 1; }
 
 say "G0 preflight"
 [ "$(id -u)" = 0 ] || die "run as root"
+# This older installer rewrites the entire env file. Once the dedicated rule
+# broker has been enabled, rerunning it would erase RULE_BROKER_TOKEN,
+# RULE_APPROVERS, and the Mattermost callback source restriction. Fail before
+# any mutation; update the original soc-bot through the gated rule-broker
+# installer or migrate the env with a reviewed procedure instead.
+if [ -f /etc/socbot/soc_bot.env ] && grep -q '^RULE_BROKER_TOKEN=' /etc/socbot/soc_bot.env; then
+  die "rule-change broker settings are present; deploy_socbot_B.sh would remove them. Use deploy_rule_broker_B.sh for rule broker updates"
+fi
 [ -f /tmp/soc_bot.py ] || die "/tmp/soc_bot.py missing"
 python3 -m py_compile /tmp/soc_bot.py || die "soc_bot.py syntax"
 [ -r /etc/mcp/wazuh-ro.env ] || die "/etc/mcp/wazuh-ro.env missing (read creds)"

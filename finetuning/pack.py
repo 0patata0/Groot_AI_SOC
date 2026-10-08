@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+"""Create a portable training bundle from an explicit file allowlist (no weights/secrets)."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import tarfile
+
+from train import ROOT, check_data, read_config
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=ROOT / "bundles" / "soc-finetuning.tar.gz")
+    opts = parser.parse_args()
+    raw = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
+    if any(Path(raw[key]).is_absolute() for key in ("data_dir", "output_dir")):
+        parser.error("Use relative data_dir/output_dir paths for a portable bundle")
+    config = read_config(ROOT / "config.json")
+    if Path(config["data_dir"]).resolve() != ROOT / "data":
+        parser.error("Portable bundle requires data_dir=data in config.json")
+    if not Path(config["output_dir"]).resolve().is_relative_to(ROOT):
+        parser.error("Portable bundle requires an output_dir inside finetuning/")
+    check_data(config)
+    names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
+             "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "evaluate.py",
+             "pack.py", "preparation_summary.json", "data/manifest.json",
+             "data/train.jsonl", "data/validation.jsonl", "data/test.jsonl"]
+    paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))
+    for path in paths:
+        if not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(ROOT):
+            parser.error(f"Missing or unsafe bundle input: {path.relative_to(ROOT)}")
+    output = opts.output.resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    # Exclusive creation prevents overwriting an earlier handoff.
+    with output.open("xb") as handle, tarfile.open(fileobj=handle, mode="w:gz") as archive:
+        for path in paths:
+            archive.add(path, arcname=str(Path("finetuning") / path.relative_to(ROOT)), recursive=False)
+    digest = hashlib.sha256()
+    with output.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    print(f"{output}\nSHA256 {digest.hexdigest()}")
+
+
+if __name__ == "__main__":
+    main()

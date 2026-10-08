@@ -1,0 +1,209 @@
+{
+  "config": {
+    "group_policy": "whitespace-normalized first user prompt, across sources",
+    "length_unit": "Unicode characters in canonical messages+tools JSON; not tokens",
+    "max_chars": 60000,
+    "max_per_source": 5000,
+    "sampling": "lowest SHA256(seed,source,conversation) per source before group split",
+    "seed": 42,
+    "test_ratio": 0.05,
+    "think_policy": "remove explicit think blocks; omit SEVENLLM thought field",
+    "validation_ratio": 0.05
+  },
+  "evaluation_exclusion_inputs": {
+    "processed/eval/attacklm_bench.jsonl": {
+      "rows": 100,
+      "sha256": "9435b9c2dcd7e783dfdf865ce4d204db4b1fe46545716164238a456d508cd4b6"
+    },
+    "processed/eval/cti_ate.jsonl": {
+      "rows": 60,
+      "sha256": "c1ea639626c7f5d5c966ebc7f29acfeb6e159c8522fcae8c35ba90e65bfc75da"
+    },
+    "processed/eval/cti_mcq.jsonl": {
+      "rows": 2500,
+      "sha256": "852c536ee329bf7293dd45190cede5086e30972f9f26e025f43315fbbdb6fdc7"
+    },
+    "processed/eval/cti_rcm.jsonl": {
+      "rows": 1000,
+      "sha256": "b4cb75bd24c192e6239bddb809019c37bc25d8cd7e6382911436cf55cd29e13b"
+    },
+    "processed/eval/cti_rcm_2021.jsonl": {
+      "rows": 1000,
+      "sha256": "c711e73bdfba7e22fbb57162bc02fdbb96aa6d5bdd6ca78ef9e87c39a9c57ff7"
+    },
+    "processed/eval/cti_taa.jsonl": {
+      "rows": 50,
+      "sha256": "e1fc20647a6ccc9f5ebf28241eb2fb04b7516dd2e893b25bc8aca8e1fb8623ed"
+    },
+    "processed/eval/cti_vsp.jsonl": {
+      "rows": 1000,
+      "sha256": "86167daeec8672f3e5a05e4f4f7f47384ebfb1043d569303e2d0fcf5ebd86031"
+    },
+    "processed/eval/cybermetric.jsonl": {
+      "rows": 10200,
+      "sha256": "bf6f44f4b2480fa801035d560427bd4ffb077d147046c2cb517c4b83295c3dda"
+    },
+    "processed/eval/secqa.jsonl": {
+      "rows": 210,
+      "sha256": "104e01bd50ce7e5cabc4c30d93f9ea3ecf81dd23f047ee803303860c149559eb"
+    },
+    "raw/sevenllm/test.jsonl": {
+      "rows": 1300,
+      "sha256": "08a27277386b1f205ed0814d379bb0db9bdce8f39bde099020a1f8044d404d7b"
+    }
+  },
+  "evaluation_exclusion_prompt_groups": 20396,
+  "excluded_categories": [
+    "raw alerts",
+    "CSV flows",
+    "knowledge",
+    "reference",
+    "evaluation",
+    "unlisted sources"
+  ],
+  "format_version": 1,
+  "inputs": {
+    "attacklm.permissive.jsonl": {
+      "eligible_unique_rows": 23395,
+      "input_rows": 23396,
+      "path": "processed/attacklm.permissive.jsonl",
+      "rejected": {
+        "over_max_chars": 1,
+        "source_cap": 18395
+      },
+      "selected_rows": 5000,
+      "sha256": "0b24ea4924c2cf2b14b2f30714a008ab02ca46d6d63dea00428eb57fcd422e2d",
+      "split_rows": {
+        "test": 236,
+        "train": 4496,
+        "validation": 268
+      }
+    },
+    "glaive_fc_v2.hermes.jsonl": {
+      "eligible_unique_rows": 27193,
+      "input_rows": 35979,
+      "path": "processed/glaive_fc_v2.hermes.jsonl",
+      "rejected": {
+        "arguments_schema_mismatch": 594,
+        "duplicate_tool_name": 74,
+        "invalid_tool_schema": 41,
+        "invalid_turn_order": 5379,
+        "no_terminal_assistant": 1034,
+        "orphan_tool_response": 162,
+        "source_cap": 22193,
+        "tool_parameters_not_object": 1462,
+        "undefined_tool": 22,
+        "unparseable_arguments": 1,
+        "unsupported_schema_constraint": 17
+      },
+      "selected_rows": 5000,
+      "sha256": "7230d0f1c4ea2b3336cad8622e8b917bc0575ac5a811f1a1e0f212fdcd8b3fc0",
+      "split_rows": {
+        "test": 184,
+        "train": 4597,
+        "validation": 219
+      }
+    },
+    "hermes_agent_traces.jsonl": {
+      "eligible_unique_rows": 784,
+      "input_rows": 3649,
+      "path": "processed/hermes_agent_traces.jsonl",
+      "rejected": {
+        "ambiguous_tool_response": 1891,
+        "arguments_schema_mismatch": 41,
+        "empty_assistant": 1,
+        "no_terminal_assistant": 222,
+        "over_max_chars": 710,
+        "source_cap": 0
+      },
+      "selected_rows": 784,
+      "sha256": "e604ad86c316261a96736de22d8b546e908219163f5767dad82301562943bde2",
+      "split_rows": {
+        "test": 56,
+        "train": 639,
+        "validation": 89
+      }
+    },
+    "hermes_fc_v1.dedup.jsonl": {
+      "eligible_unique_rows": 7987,
+      "input_rows": 10739,
+      "path": "processed/hermes_fc_v1.dedup.jsonl",
+      "rejected": {
+        "ambiguous_tool_response": 584,
+        "arguments_schema_mismatch": 105,
+        "duplicate_tool_name": 79,
+        "invalid_tool_schema": 875,
+        "malformed_record": 1,
+        "no_terminal_assistant": 305,
+        "orphan_tool_response": 10,
+        "source_cap": 2987,
+        "unparseable_tool_call": 732,
+        "unparseable_tools": 61
+      },
+      "selected_rows": 5000,
+      "sha256": "85ff6b92b3ca6bd4af6e41411f6a9838f16638fb851eadf7b05d74da5873f1ce",
+      "split_rows": {
+        "test": 210,
+        "train": 4612,
+        "validation": 178
+      }
+    },
+    "sevenllm_en.jsonl": {
+      "eligible_unique_rows": 47152,
+      "input_rows": 47154,
+      "path": "processed/sevenllm_en.jsonl",
+      "rejected": {
+        "missing_messages": 2,
+        "source_cap": 42152
+      },
+      "selected_rows": 5000,
+      "sha256": "210eab56a3f42e554e75c2e6b5724f271a19fe121c6a6845867b50ba1666a343",
+      "split_rows": {
+        "test": 246,
+        "train": 4528,
+        "validation": 226
+      }
+    }
+  },
+  "limitations": [
+    "Exact normalized prompt overlap only; no semantic or scenario-level leakage guarantee",
+    "Public corpus held-out splits are not an independent SOC operational benchmark",
+    "No tokenizer loaded; training must reject overlength examples without truncating tool conversations",
+    "Retain datasets/README.md and original license notices for attribution"
+  ],
+  "outputs": {
+    "test": {
+      "path": "test.jsonl",
+      "records": 932,
+      "rows": 932,
+      "sha256": "15b9f79720b78dce1f7c60f4388c683512c01e9c124d65ee82a052a0bd1b23cf"
+    },
+    "train": {
+      "path": "train.jsonl",
+      "records": 18872,
+      "rows": 18872,
+      "sha256": "76bd506368e9a88a3d3c362a215de346d2b1236eef17890fc5ebda6b84b84dda"
+    },
+    "validation": {
+      "path": "validation.jsonl",
+      "records": 980,
+      "rows": 980,
+      "sha256": "81f3819e415b3bd0fc752efe831218d188ba605215338cbdea969e7cd8e39a47"
+    }
+  },
+  "split_prompt_groups": {
+    "test": 744,
+    "train": 13729,
+    "validation": 745
+  },
+  "totals": {
+    "cross_split_prompt_overlap": 0,
+    "input_rows": 120917,
+    "selected_rows": 20784,
+    "split_rows": {
+      "test": 932,
+      "train": 18872,
+      "validation": 980
+    }
+  }
+}

@@ -1,0 +1,13 @@
+.venv/
+.cache/
+data/
+data-*/
+outputs/
+models/
+bundles/
+__pycache__/
+*.pyc
+*.safetensors
+*.bin
+*.gguf
+*.tar.gz

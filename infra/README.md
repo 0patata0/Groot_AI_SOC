@@ -2,6 +2,8 @@
 
 각 ESXi VM(Groot_A/B/C)의 Docker Compose·설정·운영 문서. 아래 배포 순서는 최초 구축 이력이다. 현재 단계와 사양은 [PLAN.md](../PLAN.md), 호스트별 절차는 [A](groot-a/README.md)·[B](groot-b/README.md)·[C](groot-c/C_구축_표준설정.md) 문서를 참조한다.
 
+시각 자료: [현재 배포 네트워크 토폴로지](diagrams/current-network-topology-2026-10-08.png) · [버스형 토폴로지 개념도](diagrams/bus-topology-concept-2026-10-08.png). 버스형 그림은 실제 물리 배선이 아니라 내부망을 설명하기 위한 재배치다.
+
 ## 현재 상태 (2026-10-06 기록 및 이번 SSH 재확인)
 - B/C의 `ens192` vNIC는 제거됐고 기본 경로는 A(`10.200.10.1`)를 지난다. 외부망 주소 `.231`/`.232`는 과거 설치 주소다.
 - A의 FW v2는 적용·확정됐다(`FORWARD=DROP`, `CAPSTONE-FWD` 14룰). WAF의 GROOT 커스텀 룰 마운트·`DetectionOnly`·`nginx -t` 통과와 Suricata의 ET+로컬 `all.rules`·Phase-A 수동 탐지 설정을 SSH로 재확인했다.

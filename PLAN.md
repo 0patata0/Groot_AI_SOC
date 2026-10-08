@@ -213,6 +213,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 - [x] Server Tool: 프로세스/포트/FIM/인증 — **읽기 MCP 서버로 커버**(계약테스트 PASS): 프로세스·포트는 `get_wazuh_agent_processes`/`get_wazuh_agent_ports`, FIM·인증 이벤트는 Wazuh 알림·매니저 로그 조회(`get_wazuh_alert_summary`/`search_wazuh_manager_logs`)로 확인. 경보 조사 프롬프트에서 실사용
 - [x] Network Tool: IPS(Suricata)·WAF·FW 로그 조회 — 기존 세 소스의 Wazuh 집중 로그를 읽기 MCP로 조회 가능. **2026-10-06 SSH 점검에서 B 신규 FW·WAF 디코더/룰 부재 확인**; 추가 후 MCP 조회 결과를 검증한다. IPS local SID 분류는 미확인.
 - [x] Response Tool `block_ip`/`unblock_ip`/`list_blocks` — **완료(2026-09-27)**: 응답 MCP 서버(A, 파이썬 stdlib stdio, `infra/mcp/response-mcp.py`), 전용 사용자 `resp`(sshd ForceCommand + authorized_keys restrict) + sudoers(agent_block add/del/list 만, flush 금지) → nft `agent_block`. 정책 엔진(TTL 상한 RESP_MAX_MINUTES=120, reason 필수·정규화, IP 검증, flush 미노출). TTL 만료 리퍼(systemd 타이머)로 auto-unblock 감사(action=expire→B 100131). 자격증명 격리 유지(에이전트=키만, 차단 능력=A sudoers). Mac `ssh -T groot-resp` 계약 테스트 PASS: block→100121, 거부(보호IP)→100123, unblock→100122, 만료→100131. 적대적 리뷰 3관점 반영. `deploy_response_A.sh`(데드맨 롤백 트랩). — [ ] `isolate_host`·`notify`(Mattermost)는 추후
+- [ ] 승인형 규칙 변경 MCP — **2026-10-08 권고안, 미구현**: 기존 읽기 MCP의 권한을 높이지 않고 A(WAF·Suricata)와 B(Wazuh)에 제한된 변경 전용 경계를 설계한다. 로컬 룰만 허용하고, 제안된 diff·기존/후보 해시·검증 결과를 Mattermost 지정 승인자에게 표시한 뒤 동일 변경만 1회 적용한다. 거부·브로커 오류·만료·해시 불일치는 미실행, 적용 실패 시 복구한다. nft 전체 정책과 WAF/IPS 차단 모드 전환은 별도 절차로 둔다. 세부 설계와 현행 브로커 제약은 `infra/mcp/README.md` 참조.
 - [ ] `cve_lookup` 등 조사 툴 확장(읽기 서버 14툴 + KEV)
 - [x] 각 Tool 단독 테스트 — **계약테스트 PASS**: 읽기 14툴·응답 3툴(`block_ip`/`unblock_ip`/`list_blocks`) 초기화·호출 검증(`infra/mcp/contract_test.py`), 컨테이너 안 재검증(2026-09-28)
 
@@ -233,7 +234,7 @@ ESXi 호스트 위에 VM 3대 + 공격자 노트북. 컨테이너로 각 역할 
 - [~] 결정적 자동/승인/거부 판정을 Response Tool에서 수행 — **1차 완료(2026-09-27)**: 응답 서버 `response-mcp.py`가 TTL 상한·reason 필수·IP 검증·보호대상(A `never_block`)·활성 SSH 출발지 거부·flush 미노출을 강제. 고위험 동작 사람 승인은 Tier 2(Mattermost 인터랙티브 버튼)로 완료 — 아래 항목 참조.
 - [ ] 정책표(suggestion.md 10장) YAML화
 - [ ] 결정적 자동/승인/거부 판정을 Response Tool에서 수행, 보호 IP·allowlist
-- [x] 고위험 동작 사람 승인 — **Tier 2 완료(2026-09-28)**: 응답 서버 `block_ip` → soc_bot 브로커 → Mattermost [승인][거부] 버튼 → 승인 시 실행(fail-closed, 600s). 무인(cron)에서도 동작하며 채팅 요청→승인→차단→회신 E2E 실측. 이번 SSH 점검은 브로커 설정·신규 승인 동작까지 재검증하지 않음.
+- [x] 고위험 동작 사람 승인 경로 — **Tier 2 E2E 검증(2026-09-28)**: 응답 서버 `block_ip` → soc_bot 브로커 → Mattermost [승인][거부] 버튼 → 승인 시 실행. 무인(cron)에서도 채팅 요청→승인→차단→회신을 실측했다. **2026-10-08 코드 재확인:** 브로커 미설정이면 `block_ip`는 즉시 실행하며 `APPROVERS` 미설정이면 승인자를 제한하지 않는다. 전체 설정에 대해 fail-closed라고 볼 수 없고, 오늘은 라이브 승인 설정·동작을 재시험하지 않았다.
 - [x] Response 실차단 게이트 검증 — 2026-09-28 승인→차단 E2E를 실측했다. 새 WAF·IPS·FW v2 경보에서 시작하는 자동/승인 경로는 신규 분류 룰과 시나리오 경보 실발화 후 별도로 검증한다.
 
 ### 2-4. 통합 테스트

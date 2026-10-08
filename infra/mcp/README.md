@@ -19,7 +19,7 @@
 | 에이전트 런타임 | 그 런타임의 MCP 클라이언트 설정(명령 또는 URL) | 없음 |
 | 전송(stdio↔HTTP) | 서버 기동 방식(플래그/서비스) | 툴·자격증명 동일 |
 | **알림 채널**(HITL notify) | A `/etc/resp/hitl.env` 의 `RESP_NOTIFY_BACKEND` + 엔드포인트 1블록 | 없음(코드·정책 불변) |
-| **승인 창구**(HITL approve) | **Tier 2 구현: 응답 MCP→soc_bot 브로커(`RESP_BROKER_URL`)→Mattermost [승인]/[거부] 버튼**(승인 시만 실행, fail-closed). 원 설계는 MCP elicitation | 없음(브로커 URL 1블록, 서버 코드는 채널을 모름) |
+| **승인 창구**(HITL approve) | **Tier 2 구현: 응답 MCP→soc_bot 브로커(`RESP_BROKER_URL`)→Mattermost [승인]/[거부] 버튼**. 현재 `block_ip`는 브로커가 설정된 경우 거부·만료·오류 시 미실행하지만, 미설정 시 즉시 실행하는 경로가 있다(아래 현행 제약 참조). 원 설계는 MCP elicitation | 없음(브로커 URL 1블록, 서버 코드는 채널을 모름) |
 
 ## 전송 계약
 - **stdio over SSH** — 운영 중인 기본 읽기 서버는 `ssh -T groot-mcp`(원격 명령 인자 없음), 보안 이벤트 읽기 서버는 `ssh -T groot-mcp security-events`. B의 sshd `Match User mcp` ForceCommand + authorized_keys `restrict,command=`가 두 경우 모두 래퍼 `/opt/mcp/run-wazuh-ro.sh`를 강제한다. 래퍼는 `SSH_ORIGINAL_COMMAND`가 정확히 `security-events`일 때만 2툴 보조 서버로 분기하고, 다른 명령은 기존 Wazuh 14툴 서버로 보낸다. 서버 프로세스는 **B에서** 뜨고, 읽기 자격증명은 B의 `/etc/mcp/wazuh-ro.env`에만 → 클라이언트 호스트(Mac 등)에 자격증명 없음(A안). 클라이언트 키(`~/.ssh/groot_mcp_ed25519`)는 A에서는 B:22 점프 전용(`restrict,permitopen`), B에서는 mcp 계정 래퍼 전용.
@@ -87,9 +87,19 @@ WAF 규칙 ID 필터는 최근 후보 경보 최대 250건을 검사한다. 해�
 - 감사: 모든 add/del/거부 → syslog(agent_block) → Wazuh 100120~100123, reload 100125, **TTL 만료 100131**(리퍼). 차단 시작↔종료가 SIEM 타임라인에 남음.
 - 계약 테스트: `python3 infra/mcp/contract_test.py --cmd "ssh -T groot-resp" --tool list_blocks --args '{}'`.
 
+## 승인형 규칙 변경 MCP — 권고안, 미구현 (2026-10-08)
+2026-10-08 11:46 KST 원격 MCP `tools/list`에서 B의 Wazuh 조회 14툴·보안 이벤트 조회 2툴과 A의 응답 3툴을 확인했다. 현재 규칙 파일 변경 도구는 없다. 기존 B 읽기 계정의 권한을 높이지 않고, 규칙 변경 전용 MCP 경계를 추가하는 방향을 권고한다. 여기서 '변경 전용'은 적용 전 상태·해시·차이를 확인하는 최소 조회도 포함하며, 임의 파일 쓰기·셸 실행 권한을 뜻하지 않는다.
+
+- A(WAF·Suricata)와 B(Wazuh)의 전용 OS 계정·SSH 키·강제 명령·적용 helper를 분리한다. 최초 대상은 로컬 사용자 규칙 파일로 제한한다. nft 전체 정책 변경, WAF `DetectionOnly`→`On`, Suricata 인라인/drop 전환은 별도 고위험 절차로 남긴다. 기존 임시 IP 차단은 `resp` MCP가 담당한다.
+- 에이전트는 변경안을 **제안**한다. 서버가 대상·룰 ID·변경 전후 diff·base/candidate SHA-256·검증 결과를 고정해 Mattermost 승인 카드에 표시한다. 지정 승인자가 승인한 **동일 변경안**만 1회 적용한다. 승인 뒤에도 현재 파일 해시와 제안 시점의 base 해시를 비교하고, 불일치·거부·만료·브로커 미설정/오류는 미실행한다. 백업·구문/샘플 검사·서비스별 재로드/재시작·상태 확인·실패 시 복구·감사 기록을 포함한다.
+- 현행 차단 브로커는 규칙 변경에 그대로 재사용할 수 없다. `response-mcp.py`의 `block_ip`는 브로커 URL/토큰 미설정 시 `policy-auto`로 실행하고, `unblock_ip`는 승인 없이 실행한다. `soc_bot.py`의 `APPROVERS`가 비면 지정 승인자 검사를 하지 않으며 승인 카드도 IP/분 단위 차단 전용이다. 새 변경 경로는 브로커와 승인자 목록을 필수로 하고, 승인 콜백의 출처·사용자 신원을 검증하며 승인 결정과 변경안 해시를 서버 측에서 결속해야 한다.
+- Wazuh API에는 `rules:read`와 `rules:update`가 구분돼 있지만, [공식 RBAC 표](https://documentation.wazuh.com/current/user-manual/api/rbac/reference.html)의 `rules:update`는 특정 로컬 파일별로 좁혀진 권한이 아니다. B 변경기는 별도 OS 계정·SSH 키와 파일 허용목록을 가진 제한된 helper로 설계하고, 기존 `mcp-ro` 계정은 그대로 유지한다.
+
+이 항목은 설계 권고만 기록한 것이다. 변경 MCP 설치·권한 부여·운영 룰 수정은 아직 하지 않았다.
+
 ### 알림/승인 채널도 교체 용이(엔드포인트만)
 읽기·응답 서버와 같은 원칙을 HITL 에도 적용 — **두 층으로 분리**:
-- **승인(approve)** = **Tier 2 완료(2026-09-28)**: 응답 MCP `request_approval()` 이 soc_bot 브로커(`RESP_BROKER_URL`)를 폴링, 브로커가 Mattermost 에 [승인]/[거부] 카드를 띄우고 승인 시에만 `block_ip` 실행(거부/만료=미실행, fail-closed). *어디에* 띄울지는 브로커/런타임이 정하므로 서버 코드는 채널을 모름(원 설계 MCP elicitation 원칙 유지). 상세 [hitl-chat.md](hitl-chat.md).
+- **승인(approve)** = **Tier 2 경로 E2E 검증(2026-09-28)**: 응답 MCP `request_approval()` 이 soc_bot 브로커(`RESP_BROKER_URL`)를 폴링, 브로커가 Mattermost 에 [승인]/[거부] 카드를 띄운다. 브로커 설정 시 승인 결과만 `block_ip`를 실행하고 거부/만료/오류는 미실행한다. 다만 브로커 미설정 시 즉시 실행하는 현행 코드 경로가 있어 전체 설정에 대해 fail-closed라고 할 수 없다. *어디에* 띄울지는 브로커/런타임이 정한다. 상세 [hitl-chat.md](hitl-chat.md).
 - **알림(notify/감사 푸시)** = `notifier.py`(stdlib) 백엔드 추상화. `/etc/resp/hitl.env` 의 `RESP_NOTIFY_BACKEND`(none|http|email|slack) + 엔드포인트만 바꾸면 채널 교체(코드·정책·서버 불변). run-response.sh 가 세션마다 이 파일을 source → **재시작 없이** 다음 연결부터 반영. 예시 `hitl.env.example`.
   - `http`: 내부 Mattermost/Rocket.Chat incoming webhook 또는 사내 웹훅(내부망) — 권장. **채팅 채널 상세 설계(양방향 웹훅·인터랙티브 승인)는 [hitl-chat.md](hitl-chat.md)**.
   - `email`: 이 망은 아웃바운드 587 열림.

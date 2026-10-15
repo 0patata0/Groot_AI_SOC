@@ -7,6 +7,9 @@
 
 > **2026-10-08 관리 SSH 직접 재확인:** 내부 NIC만 사용하고 A 경유 기본 경로·KST/NTP 동기화가 유지된다. Apache·Docker·Wazuh agent active, DVWA 로그인 HTTP 200, B 매니저 1514/tcp 연결 ESTAB이다. `log4shell-lab`은 내부 주소 8080에서 HTTP 400으로 응답했으며 취약점 기능 재현까지 확인한 것은 아니다. [오늘 기록](../../대화기록/2026-10-08.md)
 
+
+> **2026-10-15 13:20 KST UI 적용·직접 확인:** 기존 Apache/PHP에 `/log4shell/` 요청 실습 화면을 추가했다. 접속은 **http://192.168.16.230/log4shell/** 이며 정상 헤더200·헤더누락400, 응답·KST·브라우저 최근20개를 확인할 수 있다. 실제 HTTP9검사와 브라우저 두 요청을 통과했고 C Apache/Docker/Wazuh active·DVWA200·기존 내부8080 컨테이너와 A 경로가 유지된다. 새 패키지·컨테이너·서비스 재시작·방화벽 변경은 없다. 신규 환경용 루트 설치기는 별도 Docker internal lab 구성으로 같은 UI를 제공하며, 새 VM 실제 구축과 공격 탐지 E2E는 미실행이다. [사용·회수 안내](log4shell-ui/README.md) · [검증 기록](log4shell-ui/deployment-validation-20261015.json).
+
 ---
 
 ## 0. ⚠️ 가장 먼저 알아야 할 환경 제약 — 이 망은 웹이 막혀 있다

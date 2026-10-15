@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "scope": "Existing Groot_C UI deployment and portable installer extension",
+  "live_url": "http://192.168.16.230/log4shell/",
+  "initial_deployed_at": "2026-10-15T13:10:19+09:00",
+  "initial_receipt": "/var/backups/capstone-log4shell-ui/20261015T131019+0900",
+  "live_c_postcheck": {
+    "checked_at": "2026-10-15T13:19:51+09:00",
+    "receipt": "/var/backups/capstone-log4shell-ui/20261015T131949+0900-final",
+    "services": {
+      "apache2": "active",
+      "docker": "active",
+      "wazuh-agent": "active"
+    },
+    "dvwa_http": 200,
+    "public_sha256": {
+      "api.php": "15563b20aa419cd5eee93021184fb965a9d01e38108d4457d6e7452dd8635198",
+      "app.css": "71fdaada57360a977620f3f6917cb6acb0fbc9a0cdeb540ca781a31962ff0d5d",
+      "app.js": "4aa7b840dd041981b5a26d9658e5829848f37115254c85acf9cb73e8259338a5",
+      "index.html": "dc19c9fcab5d30d3af145794fae535aa7401457bc240f2c1111470fca62a7d1c"
+    },
+    "source_sha256": {
+      "README.md": "ed49f4a3e31483db9a3b75e474906df0b63dd3aad751f11874065bd7974b1f78",
+      "install.sh": "06775d6f61e7d51b0a8908a64b9f060e4c0bd6dd7efc6df0e0b5b03b7028b2b7",
+      "verify.py": "985eb5272b3bed2332025d3a4cf823a7947707e9f2b3667154a0a4837e3786cb",
+      "public/index.html": "dc19c9fcab5d30d3af145794fae535aa7401457bc240f2c1111470fca62a7d1c",
+      "public/app.css": "71fdaada57360a977620f3f6917cb6acb0fbc9a0cdeb540ca781a31962ff0d5d",
+      "public/app.js": "4aa7b840dd041981b5a26d9658e5829848f37115254c85acf9cb73e8259338a5",
+      "public/api.php": "15563b20aa419cd5eee93021184fb965a9d01e38108d4457d6e7452dd8635198"
+    },
+    "lab_image_id": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+    "lab_running": true,
+    "lab_started_at": "2026-09-29T01:46:52.483673503Z",
+    "lab_restart_count": 0,
+    "lab_ports": {
+      "8080/tcp": [
+        {
+          "HostIp": "10.200.10.20",
+          "HostPort": "8080"
+        }
+      ]
+    },
+    "http_checks": [
+      {
+        "test": "bootstrap",
+        "status": "PASS",
+        "http_status": 200
+      },
+      {
+        "test": "csrf_missing",
+        "status": "PASS",
+        "http_status": 403
+      },
+      {
+        "test": "unknown_target_key",
+        "status": "PASS",
+        "http_status": 400
+      },
+      {
+        "test": "header_crlf",
+        "status": "PASS",
+        "http_status": 400
+      },
+      {
+        "test": "header_dollar_braces",
+        "status": "PASS",
+        "http_status": 400
+      },
+      {
+        "test": "method_put",
+        "status": "PASS",
+        "http_status": 405
+      },
+      {
+        "test": "normal_request",
+        "status": "PASS",
+        "http_status": 200,
+        "app_status": 200
+      },
+      {
+        "test": "immediate_rate_limit",
+        "status": "PASS",
+        "http_status": 429
+      },
+      {
+        "test": "missing_header",
+        "status": "PASS",
+        "http_status": 200,
+        "app_status": 400
+      }
+    ],
+    "generated_php_lint": 2
+  },
+  "live_a_postcheck": {
+    "checked_at": "2026-10-15T13:18:23+09:00",
+    "waf": "healthy",
+    "suricata": "running",
+    "dvwa_http": 200,
+    "scenario_table": "absent",
+    "unchanged_sha256": {
+      "secstack/docker-compose.yml": "cb4e6f9bc8e472e22d87fab956cba44e03038f8e150d7cf6710aaaf0527f217f",
+      "scenario_log4shell_route.sh": "67f305ff0f0c72fb4d40e5afb0f36b0062f50976cc59463bf06f0ddc23b7f33b"
+    }
+  },
+  "browser_verification": {
+    "browser": "existing macOS Safari",
+    "checked_at": "2026-10-15T13:20:00+09:00",
+    "route": "Mac browser -> A WAF:80 -> C Apache:80 -> C Log4Shell:8080",
+    "normal": {
+      "http_status": 200,
+      "body": "Hello, world!"
+    },
+    "missing_header": {
+      "http_status": 400
+    },
+    "kst_display": true,
+    "history_count_after_two_requests": 2,
+    "history_retained_after_reload": true,
+    "final_copy_loaded": true,
+    "screenshot_visually_reviewed": true,
+    "early_native_tool_failure": "Initial black capture/no element frames; later real rendering and both clicks succeeded."
+  },
+  "portable_installer_verification": {
+    "controller_tests": 12,
+    "service_function_tests": 25,
+    "generated_php_lint_on_c": 2,
+    "shell_syntax": "passed",
+    "javascript_syntax": "passed",
+    "frontend_mock_cases": 13,
+    "verifier_timing_mock_cases": 7,
+    "fresh_three_vm_deployment": "not_run",
+    "nonroot_java_runtime_on_new_image": "not_run"
+  },
+  "changes": {
+    "new_mac_packages": 0,
+    "new_live_server_packages": 0,
+    "live_container_changes": 0,
+    "live_service_restarts": 0,
+    "firewall_changes": 0,
+    "live_public_files": 4
+  },
+  "limitations": [
+    "Only normal and missing-header HTTP requests are relayed; no exploit or callback scenario is included.",
+    "UI internal backend traffic does not traverse the security server external Suricata NIC.",
+    "Browser history is local metadata, not Wazuh alerts.",
+    "Initial installer uses a different pinned app image from the current existing live container.",
+    "Fresh VM deployment, attack detection E2E and responsive mobile browser rendering have not been tested.",
+    "Rate-limit timing checks explicitly SKIP if the one-second observation window expires; the final live run had nine PASS and zero SKIP."
+  ]
+}

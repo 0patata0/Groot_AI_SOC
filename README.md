@@ -26,7 +26,7 @@
 |---|---|
 | security | Suricata 수동 IDS, ModSecurity DetectionOnly WAF, GROOT 규칙, Wazuh agent, 별도 nft 기본 허용 테이블 |
 | siem | Wazuh manager/indexer/dashboard, Mattermost/PostgreSQL, Hermes, 읽기 전용 MCP |
-| service | DVWA/MariaDB, security 서버만 허용하는 웹 접근 설정, Wazuh agent |
+| service | DVWA/MariaDB, 내부 Log4Shell 앱·실습 웹 UI, security 서버만 허용하는 웹 접근 설정, Wazuh agent |
 
 **패키지·이미지·SSH 준비는 아래 절차로 먼저 수동 완료해야 합니다.** 배포 셸은 apt/pip/npm 설치나 이미지 pull/build를 실행하지 않습니다. 패키지·이미지·입력 자료의 정적 사전검사를 세 서버 모두 통과해야 서비스 구성을 시작합니다. 런타임 검사와 서비스 연결 검증은 해당 단계에서 추가 수행합니다.
 
@@ -40,7 +40,7 @@
 - 외부 LLM/Ollama는 별도로 준비합니다. 기본 설정은 별도 API 키를 요구하지 않는 내부 OpenAI 호환 `/v1` API이며 siem에서 접근 가능해야 합니다. 모델 다운로드·학습·DGX 구축은 이 셸의 작업이 아닙니다.
 - Suricata는 security의 지정 NIC를 관측합니다. 다른 VM의 트래픽도 관측하려면 가상 스위치 미러링이나 security를 경유하는 라우팅을 관리자가 먼저 구성합니다.
 - WAF/IDS는 탐지 모드입니다. nft 구성은 기존 방화벽을 지우지 않는 ACCEPT-only 테이블이며, 기존 운영망의 FORWARD 차단·NAT 정책을 그대로 이식하지 않습니다.
-- DVWA는 실습용 취약 애플리케이션입니다. 이 배포는 security에서만 웹 요청을 받도록 설정하고 DB 포트를 호스트에 게시하지 않습니다. 별도 공용 서비스로 노출하지 않습니다.
+- DVWA와 Log4Shell은 실습용 취약 애플리케이션입니다. 웹 요청은 security를 거쳐 받으며 DB와 Log4Shell 앱 포트를 호스트에 게시하지 않습니다. Log4Shell 실습 UI는 기존 WAF 주소의 `/log4shell/`에서 정상 헤더·헤더 누락 요청을 비교합니다. 별도의 외부8080 포트를 열지 않습니다.
 
 권장 초기 자원은 SIEM 4 vCPU/8GiB RAM 이상과 충분한 로그 디스크입니다. 실제 보존기간·수집량에 따라 늘립니다. Wazuh의 Docker 요구조건은 [공식 문서](https://documentation.wazuh.com/current/deployment-options/docker/wazuh-container.html)를 함께 확인합니다.
 
@@ -136,14 +136,17 @@ Suricata와 호환되는 **검토된 ET 룰 파일**을 `/opt/capstone-prereqs/s
 
 ### service
 
-[DVWA 공식 Compose](https://github.com/digininja/DVWA/blob/master/compose.yml)에 사용하는 이미지를 수동 준비합니다.
+[DVWA 공식 Compose](https://github.com/digininja/DVWA/blob/master/compose.yml)와 [Log4Shell 앱 공식 README](https://github.com/christophetd/log4shell-vulnerable-app/blob/main/README.md)의 이미지를 **service 또는 Linux 준비 서버에서 수동으로** 준비합니다.
 
 ```bash
 sudo docker pull ghcr.io/digininja/dvwa:latest
 sudo docker pull mariadb:10
+sudo docker pull --platform linux/amd64 ghcr.io/christophetd/log4shell-vulnerable-app@sha256:6f88430688108e512f7405ac3c73d47f5c370780b94182854ea2cddc6bd59929
 ```
 
-초기 DB와 관리자 암호는 서버에서 새로 생성합니다. 기본 취약 수준은 `impossible`이며 실습 시 운영자가 변경합니다. Log4Shell 서비스는 이번 설치 범위에 포함하지 않습니다.
+초기 DB와 관리자 암호는 서버에서 새로 생성합니다. DVWA의 기본 취약 수준은 `impossible`이며 실습 시 운영자가 변경합니다. Log4Shell UI는 DVWA 이미지의 기존 Apache/PHP에 읽기 전용으로 마운트합니다. PHP8.1 이상과 curl/session 확장이 필요하며 설치기가 누락 확장이나 패키지를 설치하지 않습니다. 수동 확인·오프라인 반입·`LOG4SHELL_IMAGE` 설정은 [자료 준비](deployment/setup-packages-artifacts.md)를 따릅니다.
+
+신규 환경의 UI 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`입니다(기본 WAF 포트8080). UI는 별도 `internal: true` Docker lab 네트워크의 고정 대상 `log4shell:8080`만 호출합니다. 정상 헤더는 대상 HTTP200, 필수 헤더 누락은 대상 HTTP400을 비교하고 브라우저 최근20개 기록을 KST로 표시합니다. 직접 공격·LDAP 콜백·탐지 E2E는 별도 실습이며 기본 설치에서 실행하지 않습니다. 기존 운영망 UI의 `http://192.168.16.230/log4shell/` 주소와 혼용하지 않습니다.
 
 ### siem
 
@@ -226,7 +229,7 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 
 `--plan`은 로컬 입력 검사만 수행하고 SSH 연결을 하지 않습니다. `--check`는 원격 임시폴더에서 읽기 사전검사를 하고 정리합니다. `--apply`는 설치·시작·검증, `--verify`는 기존 구성 확인입니다.
 
-같은 프로필의 완료된 역할은 검증 경로로 처리하며, 중간 실패 흔적이나 다른 설정·기존 서비스가 발견되면 자동 덮어쓰기하지 않습니다. 실패한 역할의 상태와 서버 내 제한된 로그를 검토한 뒤 재개합니다. 자동 롤백을 명목으로 기존 컨테이너·볼륨·agent 키를 삭제하지 않습니다.
+같은 프로필의 완료된 역할은 검증 경로로 처리하며, 중간 실패 흔적이나 다른 설정·기존 서비스가 발견되면 자동 덮어쓰기하지 않습니다. Log4Shell·UI를 포함한 service 상태는 schema2이며 이전 schema1의 자동 이관은 지원하지 않습니다. 실패한 역할의 상태와 서버 내 제한된 로그를 검토한 뒤 재개합니다. 자동 롤백을 명목으로 기존 컨테이너·볼륨·agent 키를 삭제하지 않습니다.
 
 ## 검증 범위와 운영 이식
 
@@ -235,15 +238,16 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 ```bash
 python3 -B deployment/tests/test_controller.py
 bash deployment/roles/siem-test.sh
+bash deployment/roles/service-test.sh
 ```
 
-새 Ubuntu VM 세 대에서 실제 구축 완료를 확인하기 전에는 해당 결과를 운영 검증으로 표시하지 않습니다. 이번 자동 구성 범위는 위 표의 **새 환경 기본 SOC**입니다. 실제 컨테이너 기동, Wazuh 에이전트 등록, DVWA 초기 DB 생성, Mattermost/Hermes 연결은 새 Ubuntu VM에서 추가 검증해야 합니다. 적용 중에는 native 엔진 구문검사와 서비스 검증이 실패하면 후속 단계를 중단합니다. `--check`는 전체 기능 E2E 시험이 아니며, Hermes 이미지 import 검사는 apply 시작 시 격리된 로컬 컨테이너에서 수행합니다.
+새 Ubuntu VM 세 대에서 실제 구축 완료를 확인하기 전에는 해당 결과를 운영 검증으로 표시하지 않습니다. 이번 자동 구성 범위는 위 표의 **새 환경 기본 SOC**입니다. 실제 컨테이너 기동, Wazuh 에이전트 등록, DVWA 초기 DB 생성, Log4Shell 앱·UI, Mattermost/Hermes 연결은 새 Ubuntu VM에서 추가 검증해야 합니다. 적용 중에는 native 엔진 구문검사와 서비스 검증이 실패하면 후속 단계를 중단합니다. `--check`는 전체 기능 E2E 시험이 아니며, Hermes 이미지 import 검사는 apply 시작 시 격리된 로컬 컨테이너에서 수행합니다.
 
 다음 운영 기능은 소스가 저장소에 있지만 이 셸에서 자동 이식하지 않습니다.
 
 - 승인형 쓰기 MCP·브로커·worker, nft 선차단/Native AR, 운영망 FORWARD/NAT 정책
 - Vector 정제·원본 세대 회전·백업 이관·보존/용량 감시·Indexer 상관분석의 운영 정책
-- 기존 DGX/Imperva 고정 주소 예외, 정기 보고·인증서 감시, Log4Shell 실습 서비스
+- 기존 DGX/Imperva 고정 주소 예외, 정기 보고·인증서 감시, Log4Shell 직접 공격·LDAP 콜백·탐지 E2E 시나리오
 - 공개 인증서·채팅 HTTPS·모바일 푸시·SSL VPN, 모델 학습/업로드
 
-Docker 자체 JSON 로그에는 역할별 제한이 있지만 Suricata/WAF 원본의 장기 회전·보존은 별도 설정해야 합니다. 새 환경에는 읽기 MCP 두 개만 연결되며 LLM에 일반 sudo나 Docker 권한을 주지 않습니다. 기존 운영 서버는 변경하지 않습니다.
+Docker 자체 JSON 로그에는 역할별 제한이 있지만 Suricata/WAF 원본의 장기 회전·보존은 별도 설정해야 합니다. 새 환경에는 읽기 MCP 두 개만 연결되며 LLM에 일반 sudo나 Docker 권한을 주지 않습니다. 이 새 환경 설치기로 기존 운영 서버를 업그레이드하지 않습니다. 기존 C의 Apache/PHP UI 추가 배포는 [별도 운영 절차](infra/groot-c/log4shell-ui/README.md)와 작업 기록으로 구분합니다.

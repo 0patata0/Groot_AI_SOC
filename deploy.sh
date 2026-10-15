@@ -25,6 +25,7 @@ WAF_IMAGE=
 ET_RULES_FILE=
 DVWA_IMAGE=
 MARIADB_IMAGE=
+LOG4SHELL_IMAGE=
 WORK=
 RUN_ID=
 REMOTE_STAGE=
@@ -65,7 +66,7 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         ;;
@@ -116,6 +117,7 @@ done
 [[ $LLM_BASE_URL =~ ^https?://[a-zA-Z0-9.-]+(:[0-9]+)?/v1/?$ ]] || die 'LLM_BASE_URL must be an HTTP(S) /v1 URL without credentials, query or fragment'
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
 say '순서: 세 서버 사전검사 → siem → 등록 CA/암호 전달 → service → security → 전체 검증'
+say 'service 구성: DVWA/MariaDB + Log4Shell 실습 앱과 요청 UI + Wazuh agent'
 say '패키지/이미지 자동 다운로드 없음. 기존 IP·라우팅·SSH 설정은 변경하지 않습니다.'
 [[ $MODE != plan ]] || exit 0
 
@@ -150,7 +152,7 @@ for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_B
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
-for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE; do
+for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE LOG4SHELL_IMAGE; do
   value=${!key}
   [[ -z $value ]] || printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done

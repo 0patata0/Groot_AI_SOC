@@ -96,11 +96,15 @@ resolvectl status
                     ├─ siem
                     └─ service
 실습 클라이언트 ── WAF:8080@security ── HTTP:80@service
+                                         ├─ DVWA
+                                         └─ /log4shell/ UI ── private lab ── Log4Shell:8080
 security / service ── Wazuh:1514,1515@siem
 관리자 ── Dashboard:443 / Mattermost:8065@siem
 Hermes@siem ── LLM:11434 또는 지정 포트
 Hermes 컨테이너@siem ── siem 자신의 SSH 포트 ── 읽기 MCP
 ```
+
+Log4Shell 앱의8080은 service 내부 Docker `lab` 네트워크에서만 사용합니다. 해당 네트워크는 `internal: true`이며 앱의 호스트 포트는 게시하지 않습니다. 기존 WAF 포트의 `/log4shell/`로 UI를 이용하므로 새 외부8080 허용이나 DNAT 토글이 필요하지 않습니다. UI→앱 내부 통신은 security 감시 NIC를 지나지 않으며, UI 정상 응답은 공격 탐지 검증과 구분합니다.
 
 다음은 **접근 정책을 작성할 때의 허용 관계**입니다. 현재 설치기가 방화벽에 이 표를 자동 반영하는 것은 아닙니다.
 
@@ -108,7 +112,7 @@ Hermes 컨테이너@siem ── siem 자신의 SSH 포트 ── 읽기 MCP
 |---|---|---|
 | 관리 컴퓨터 → 세 서버 | 공통 `SSH_PORT` | 키 기반 배포·조회 |
 | security/service → siem | `1514`, `1515` | agent 로그·TLS 등록 |
-| security → service | `WEB_BACKEND_PORT` 기본 `80` | WAF backend; 일반 클라이언트 직접 접근은 허용하지 않음 |
+| security → service | `WEB_BACKEND_PORT` 기본 `80` | DVWA·Log4Shell UI의 WAF backend; 일반 클라이언트 직접 접근은 허용하지 않음 |
 | 승인된 실습 클라이언트 → security | `WAF_PORT` 기본 `8080` | WAF를 통한 실습 HTTP |
 | 관리자 → siem | `443`, `8065` | Dashboard·Mattermost |
 | siem/Hermes → 외부 LLM | API URL의 포트 | 모델 추론 |

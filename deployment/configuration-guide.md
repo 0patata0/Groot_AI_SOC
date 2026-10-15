@@ -82,13 +82,14 @@ LLM_MODEL=qwen3.6:35b
 | `SSH_IDENTITY` | 개인키 절대 경로. 빈 값이면 기존 ssh-agent/기본 키 사용. 암호화 키는 미리 ssh-agent에 등록 |
 | `SSH_KNOWN_HOSTS` | 콘솔 fingerprint와 대조한 키 파일의 절대 경로. 새 host key 자동 수락 없음 |
 | `MONITOR_INTERFACE` | security의 감시 NIC 또는 `auto` |
-| `WEB_BACKEND_PORT` | service의 DVWA 게시 포트, 기본80. 22/1514/1515 예약 포트 금지 |
+| `WEB_BACKEND_PORT` | service의 DVWA·`/log4shell/` UI 게시 포트, 기본80. 22/1514/1515 예약 포트 금지 |
 | `WAF_PORT` | security의 WAF 게시 포트, 기본8080 |
 | `LLM_BASE_URL` | `http://호스트:포트/v1` 또는 신뢰된 HTTPS. API 키·쿼리 금지 |
 | `LLM_MODEL` | 모델 API에서 확인한 정확한 ID. 대화형 기본값은 `qwen3.6:35b` |
 | `SURICATA_IMAGE`, `WAF_IMAGE` | 생략 가능. 각각 `jasonish/suricata:latest`, `owasp/modsecurity-crs:nginx` 로컬 이미지 |
 | `ET_RULES_FILE` | 생략 가능. security의 `/opt/capstone-prereqs/suricata.rules` 기본 |
 | `DVWA_IMAGE`, `MARIADB_IMAGE` | 생략 가능. 각각 `ghcr.io/digininja/dvwa:latest`, `mariadb:10` 로컬 이미지 |
+| `LOG4SHELL_IMAGE` | 생략하면 공식 고정 digest 이미지 사용. `registry/image@sha256:64자리` 또는 검토한 로컬 `sha256:64자리` image ID만 허용하며 태그는 거절. [수동 자료 준비](setup-packages-artifacts.md)를 따르며 실행 중 pull/build 없음 |
 
 설정은 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, `~`, `$HOME`, `$(...)`를 쓰지 않는다. 줄 맨 앞 `#`는 주석이며 LF 줄바꿈을 사용한다. 알 수 없는 키는 거절한다. `source deployment/site.local.conf`로 실행할 필요가 없다. Wazuh/Mattermost/PostgreSQL 버전과 `/opt/capstone` 경로는 이번 설치기에서 고정돼 있다.
 
@@ -177,11 +178,15 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 | 1 | 세 호스트 전체 사전검사, 서로 다른 machine-id 확인 | 역할 혼용·준비 누락 거절 |
 | 2 | SIEM 준비 이미지 격리 검사, 새 CA/계정·Wazuh/Mattermost/MCP/Hermes 구성 | SIEM 서비스·읽기 MCP 검증 |
 | 3 | SIEM의 등록 CA·암호를 SSH 파이프로 service/security에 전달 | 관리 컴퓨터에 암호 파일 저장 없음 |
-| 4 | service의 DB/DVWA 초기화, 웹 접근 제한, Wazuh 등록 | backend·agent 검증 |
+| 4 | service의 DB/DVWA 초기화, 내부 Log4Shell·UI 구성, 웹 접근 제한, Wazuh 등록 | backend·UI·내부 lab·agent 검증 |
 | 5 | security의 WAF/IDS 규칙·탐지 모드·별도 nft 테이블·Wazuh 등록 | 엔진·웹·agent 검증 |
 | 6 | SIEM 최종 검증 | 구축 완료 주소 출력 |
 
 자동 생성물은 `/opt/capstone/{siem,service,security}`와 소스 보존용 `/opt/capstone/releases/…`에 있다. 전달받은 CA/등록 파일은 각 서버 `/opt/capstone-prereqs/`에 남는다. 정상 설치의 필요한 운영 자료이므로 임시파일처럼 지우지 않는다. 임시 전송 폴더는 `/var/tmp/capstone-bootstrap-…`이며 설치기가 종료 시 정리한다.
+
+Log4Shell UI 접속 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`이며 기본 예시는 `http://192.0.2.10:8080/log4shell/`다. DVWA Apache/PHP에 읽기 전용 UI 파일을 추가하고 private lab 네트워크의 `http://log4shell:8080/`만 요청한다. Log4Shell 앱은 호스트 포트를 게시하지 않으므로 service:8080이나 새 방화벽 허용 규칙을 만들지 않는다. 기존 운영망 `http://192.168.16.230/log4shell/`은 기존 A:80 경로이며 신규 환경의 WAF 기본8080과 구분한다.
+
+UI는 정상 헤더 HTTP200·헤더 누락 HTTP400, 응답 시간·본문, 최근20개 브라우저 기록의 KST 표시를 제공한다. 기본 구성은 직접 공격이나 LDAP 콜백을 실행하지 않으며, UI 응답 성공이 WAF/Suricata/Wazuh 탐지 E2E 성공을 뜻하지 않는다. 자세한 정상 동작 시험은 [검증 절차](verify-troubleshoot.md)를 따른다.
 
 ### 대화형 실행
 
@@ -202,5 +207,7 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 성공 기준은 종료 코드0과 `세 역할 검증 완료.`다. 최초 로그인, 서비스별 확인, 모델 응답 시험, 장애 진단은 [검증·장애 대응](verify-troubleshoot.md)을 따른다. 설치기가 검사한 범위와 실제 보안 경보 전달·모델 응답 시험을 각각 기록한다.
 
 검증 중에는 처음 쓴 이미지 ID·규칙·입력·스크립트가 유지돼야 한다. image pull, 소스 업데이트, 입력 변경 뒤에는 같은 설치를 그대로 재검증하지 못할 수 있다. `changed_inputs`·`profile_changed`·부분 설치 오류를 없애려고 manifest/receipt나 DB 볼륨을 지우지 않는다. 소스 커밋·로컬 설정·준비 자료를 보존하고 의도한 변경을 별도 이관 작업으로 처리한다.
+
+Log4Shell·UI를 포함한 service의 `input.json`과 `manifest.json`은 **schema2**다. 기존 DVWA/DB만 구성했던 service의 schema1을 자동 업그레이드하지 않으며 재실행하면 입력/manifest 불일치로 거절한다. 기존 service는 데이터·계정·agent 등록을 보존하는 별도 이관이 필요하다. 이 service 상태 버전과 SIEM 준비 파일 `siem.json`의 `schema_version: 1`은 서로 다른 형식이므로 혼동해 수정하지 않는다.
 
 사전검사 실패는 원인을 고친 뒤 재실행할 수 있다. 적용 시작 후 실패했다면 [부분 실패 처리](verify-troubleshoot.md)의 상태 확인부터 수행한다. 새 VM 세 대에서 실제 설치가 성공했다는 검증은 이 문서 작성 시 아직 하지 않았다.

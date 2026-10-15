@@ -1,5 +1,12 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+## Log4Shell UI·초기 설치기 완료 범위 (2026-10-15 13:20 KST)
+
+- 기존 C에 요청 실습 웹 화면을 적용했다. 접속 주소는 http://192.168.16.230/log4shell/ . 정상200/헤더누락400·응답 본문·KST·최근20개를 제공하며 실제 브라우저 동작, localhost9검사, 기존 DVWA/서비스 정상과 A 경로 불변을 확인했다.
+- 신규 `deploy.sh` service 역할에 격리된 Log4Shell 앱과 읽기 전용 UI 마운트, PHP/이미지 사전검사·manifest schema2·실제200/400 확인을 추가했다. 수동 이미지/패키지 준비와 상세 설정 문서도 갱신했다. 컨트롤러12·서비스25회귀, 생성 PHP2개 native lint가 통과했다.
+- 다음 신규 구축 검증은 깨끗한 Ubuntu VM3대에서 수동 준비→check→apply→verify 순으로 수행한다. 새 이미지의 비root Java 구동과 전체 서비스 연동은 아직 실측하지 않았다. 기존 schema1 설치는 자동 마이그레이션하지 않는다.
+- UI 기본 요청 확인과 실제 Log4Shell 공격/탐지 실습은 구분한다. 직접 공격·LDAP 콜백·탐지 E2E는 별도 기존 시나리오 검증으로 남긴다. 이번 변경은 Git 커밋·푸시 대상으로 정리하고 대화기록은 로컬 전용으로 유지한다. [구성·사용](infra/groot-c/log4shell-ui/README.md) · [검증](infra/groot-c/log4shell-ui/deployment-validation-20261015.json).
+
 ## 대화기록 Git 제외 후속 (2026-10-15 12:50 KST)
 
 - 사용자 요청으로 `대화기록/`을 로컬 보존·Git 추적 제외하고 과거 공개 main에서도 제거했다. 이후 대화 기록은 로컬에서 계속하며 강제 추가하지 않는다.

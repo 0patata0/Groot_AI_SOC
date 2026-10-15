@@ -30,6 +30,9 @@ elif 'tar --no-same-owner -xf -' in command or '/receive-enrollment.sh' in comma
     if 'tar --no-same-owner -xf -' in command:
         with tarfile.open(fileobj=io.BytesIO(data)) as outer:
             source=outer.extractfile('source.tar').read()
+            site_env=outer.extractfile('site.env').read().decode()
+        with open(os.environ['PAYLOAD_LOG'],'a') as f:
+            f.write(json.dumps({'host':host,'site_env':site_env})+'\n')
         with tarfile.open(fileobj=io.BytesIO(source)) as archive:
             names=archive.getnames()
         if any('CREDENTIALS' in n or n.endswith(('.env','.key','.pem','.local.conf')) for n in names): sys.exit(44)
@@ -52,6 +55,7 @@ class ControllerContract(unittest.TestCase):
         self.known = self.root / 'known_hosts'
         self.known.write_text('fixture host keys\n')
         self.log = self.root / 'transport.jsonl'
+        self.payload_log = self.root / 'payload.jsonl'
         ssh = self.root / 'bin' / 'ssh'
         ssh.write_text(FAKE_SSH)
         ssh.chmod(0o700)
@@ -62,6 +66,7 @@ class ControllerContract(unittest.TestCase):
             'LLM_BASE_URL=http://192.0.2.40:11434/v1\n')
         self.env = dict(os.environ, PATH=str(self.root / 'bin') + os.pathsep + os.environ['PATH'],
                         TMPDIR=str(self.root / 'tmp'), TRANSPORT_LOG=str(self.log),
+                        PAYLOAD_LOG=str(self.payload_log),
                         PYTHONDONTWRITEBYTECODE='1')
 
     def run_controller(self, mode='--apply', **env):
@@ -74,6 +79,9 @@ class ControllerContract(unittest.TestCase):
     def phases(self):
         return [' '.join(e['command'].split()[-2:]) for e in self.events()
                 if '/deployment/remote.sh ' in e['command']]
+
+    def payloads(self):
+        return [json.loads(line) for line in self.payload_log.read_text().splitlines()] if self.payload_log.exists() else []
 
     def assert_clean(self):
         self.assertEqual(list((self.root / 'tmp').iterdir()), [])
@@ -140,6 +148,30 @@ class ControllerContract(unittest.TestCase):
         result = self.run_controller('--plan')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.events(), [])
+        self.assertIn('DVWA/MariaDB + Log4Shell', result.stdout)
+        self.assertIn('요청 UI', result.stdout)
+        self.assert_clean()
+
+    def test_log4shell_image_override_reaches_staged_hosts(self):
+        image = 'registry.example.org/labs/log4shell@sha256:' + 'a' * 64
+        with self.config.open('a') as f:
+            f.write('LOG4SHELL_IMAGE=' + image + '\n')
+        result = self.run_controller('--check')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        payloads = self.payloads()
+        self.assertEqual([p['host'] for p in payloads], ['192.0.2.10', '192.0.2.20', '192.0.2.30'])
+        for payload in payloads:
+            self.assertIn('export LOG4SHELL_IMAGE=' + image, payload['site_env'].splitlines())
+        self.assert_clean()
+
+    def test_empty_log4shell_image_keeps_role_default(self):
+        with self.config.open('a') as f:
+            f.write('LOG4SHELL_IMAGE=\n')
+        result = self.run_controller('--check')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(len(self.payloads()), 3)
+        for payload in self.payloads():
+            self.assertNotIn('LOG4SHELL_IMAGE=', payload['site_env'])
         self.assert_clean()
 
     def test_url_credentials_rejected_without_echo(self):

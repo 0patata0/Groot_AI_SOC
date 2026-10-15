@@ -9,7 +9,7 @@
 | 세 대상 서버 모두 | 공통 명령, Docker Engine·Compose, 시간대 |
 | security·service | 미등록 Wazuh agent 4.14.8 |
 | security | Suricata·WAF 이미지, 검증한 ET/Open 룰 |
-| service | DVWA·MariaDB 이미지 |
+| service | DVWA·MariaDB·고정 digest Log4Shell 이미지, DVWA 이미지의 PHP/curl/session 확인 |
 | siem | bcrypt·커널 설정, Wazuh·Mattermost·PostgreSQL 이미지, Wazuh 원본, 읽기 MCP, 준비된 Hermes 이미지, `siem.json` |
 
 이 문서 작성 시 공식 설치 문서·공개 릴리스 메타데이터와 저장소 스크립트를 대조했다. 실제 패키지 설치, 바이너리 다운로드, 이미지 빌드 및 새 VM 구축은 수행하지 않았다. 아래에 명시한 SHA는 확인한 공개 배포 자료의 값이며 운영 비밀 값이 아니다.
@@ -176,6 +176,7 @@ sudo docker pull --platform linux/amd64 owasp/modsecurity-crs:nginx
 # service에서만
 sudo docker pull --platform linux/amd64 ghcr.io/digininja/dvwa:latest
 sudo docker pull --platform linux/amd64 mariadb:10
+sudo docker pull --platform linux/amd64 ghcr.io/christophetd/log4shell-vulnerable-app@sha256:6f88430688108e512f7405ac3c73d47f5c370780b94182854ea2cddc6bd59929
 
 # siem에서만
 sudo docker pull --platform linux/amd64 wazuh/wazuh-manager:4.14.8
@@ -187,14 +188,15 @@ sudo docker pull --platform linux/amd64 mattermost/mattermost-team-edition:11.11
 
 이미지 이름은 역할 스크립트와 [Suricata 이미지 배포자](https://github.com/jasonish/docker-suricata), [CRS 컨테이너](https://github.com/coreruleset/modsecurity-crs-docker), [DVWA 공식 Compose](https://github.com/digininja/DVWA/blob/master/compose.yml)에 대조한다. SIEM의 다섯 이미지 참조는 현재 스크립트의 고정 계약이다. Hermes는 아래 별도 절차로 준비한다.
 
-각 서버에서 역할 값을 지정해 필요한 이미지의 OS·아키텍처를 검사하고 비밀이 없는 메타데이터만 저장한다.
+각 서버에서 역할 값을 지정해 필요한 이미지의 OS·아키텍처를 검사하고 비밀이 없는 메타데이터만 저장한다. 아래 service 목록은 온라인 준비의 기본 digest를 사용한다. 오프라인 반입 후 `LOG4SHELL_IMAGE`를 로컬 image ID로 재정의했다면 목록의 마지막 Log4Shell 참조도 같은 검토된 `sha256:…` 값으로 바꾼다.
 
 ```bash
 set -euo pipefail
 read -r -p '현재 서버 역할(security/siem/service): ' image_role
 case "$image_role" in
   security) images=(jasonish/suricata:latest owasp/modsecurity-crs:nginx) ;;
-  service) images=(ghcr.io/digininja/dvwa:latest mariadb:10) ;;
+  service) images=(ghcr.io/digininja/dvwa:latest mariadb:10 \
+    ghcr.io/christophetd/log4shell-vulnerable-app@sha256:6f88430688108e512f7405ac3c73d47f5c370780b94182854ea2cddc6bd59929) ;;
   siem) images=(wazuh/wazuh-manager:4.14.8 wazuh/wazuh-indexer:4.14.8 \
     wazuh/wazuh-dashboard:4.14.8 postgres:16-alpine \
     mattermost/mattermost-team-edition:11.11.1) ;;
@@ -211,6 +213,25 @@ unset image_role ref images
 ```
 
 컨테이너의 `docker inspect` 전체 출력에는 환경변수 비밀 값이 포함될 수 있으므로 운영 증거 수집에 통째로 사용하지 않는다. 위 명령은 **이미지**의 지정 필드만 기록한다.
+
+### service의 Log4Shell·UI 준비
+
+위 Log4Shell digest는 [앱 공식 README](https://github.com/christophetd/log4shell-vulnerable-app/blob/main/README.md)에 명시된 배포 참조다. 태그 `latest`로 임의 대체하지 않는다. UI는 기존 DVWA Apache/PHP에 읽기 전용 마운트되며 **PHP8.1 이상과 curl/session 확장**이 필요하다. [DVWA 공식 Dockerfile](https://github.com/digininja/DVWA/blob/master/Dockerfile)의 기반 이미지를 쓰더라도 실제로 반입한 image ID의 기능을 아래처럼 확인한다.
+
+**실행 위치: service 또는 Linux 준비 서버.** 이 수동 검사는 이미지를 격리된 일회용 컨테이너에서 실행할 뿐 패키지를 설치하거나 이미지를 다운로드하지 않는다.
+
+```bash
+set -euo pipefail
+dvwa_id=$(sudo docker image inspect --format '{{.Id}}' ghcr.io/digininja/dvwa:latest)
+sudo docker run --rm --pull never --network none --read-only \
+  --cap-drop ALL --security-opt no-new-privileges --entrypoint php "$dvwa_id" \
+  -r 'if (PHP_VERSION_ID < 80100 || !extension_loaded("curl") || !extension_loaded("session")) { fwrite(STDERR, "PHP 8.1+/curl/session required\n"); exit(1); } echo "PHP UI prerequisites OK\n";'
+unset dvwa_id
+```
+
+출력 `PHP UI prerequisites OK`와 종료 코드0이 기준이다. 실패하면 검토된 DVWA 이미지의 의존성을 Linux 준비 환경에서 먼저 해결한다. 새 환경 실행기가 apt/pip/pull/build로 보충하거나 Mac에 PHP를 설치하지 않는다.
+
+새 환경에서는 Log4Shell 앱을 private `lab` Docker 네트워크(`internal: true`)에만 연결하고 호스트 포트를 게시하지 않는다. 앱의8080은 UI의 고정 backend일 뿐 추가 외부 접속 포트가 아니다. 기본 설치로 정상/헤더 누락 응답과 UI를 준비하며, 공격 재현·LDAP 콜백·탐지 E2E는 별도 시나리오다.
 
 ### 오프라인 이미지 반입
 
@@ -255,6 +276,38 @@ unset target_dir
 ```
 
 load 후의 image ID와 `linux/amd64`가 준비 서버 기록과 같아야 한다. archive의 자체 계산 SHA만 일치하는 것은 배포자의 출처 인증을 대신하지 않는다. 준비 서버에서 원본 출처를 확인하고, 반입 양쪽에서 바이트 동일성을 추가로 확인하는 것이다. 성공 증거 보존 후 양쪽의 이번 archive와 임시폴더를 마지막 정리 절차로 삭제한다. 사용 중인 Docker 이미지·볼륨·기존 cache를 `prune`하지 않는다.
+
+Log4Shell을 오프라인 반입하면 Docker `save/load` 후 원래 `RepoDigests` 참조가 복원되지 않을 수 있다. 이 경우 준비 서버에서 **공식 digest로 받은 image ID를 기록**하고 archive 전송용 로컬 태그를 붙여 보존한다. 이 태그는 `save/load`의 식별 용도이며 `LOG4SHELL_IMAGE` 입력에는 사용할 수 없다.
+
+```bash
+# Linux 준비 서버: 위 공식 digest 이미지가 이미 준비된 상태
+set -euo pipefail
+umask 077
+lab_ref=ghcr.io/christophetd/log4shell-vulnerable-app@sha256:6f88430688108e512f7405ac3c73d47f5c370780b94182854ea2cddc6bd59929
+lab_id=$(sudo docker image inspect --format '{{.Id}}' "$lab_ref")
+test -z "$(sudo docker image ls --quiet capstone-log4shell:reviewed-20261015)"
+sudo docker image tag "$lab_id" capstone-log4shell:reviewed-20261015
+lab_work=$(mktemp -d /var/tmp/capstone-lab-image.XXXXXXXX)
+sudo docker image save capstone-log4shell:reviewed-20261015 > "$lab_work/log4shell-image.tar"
+printf 'reviewed image ID: %s\n' "$lab_id"
+sha256sum "$lab_work/log4shell-image.tar"
+```
+
+앞의 검증된 SSH 전송·archive SHA 대조 순서로 service에 전달하고 `docker image load --input 실제반입경로/log4shell-image.tar`를 수동 실행한다. 이어서 다음 조회의 image ID가 준비 서버에서 별도 기록한 값과 같은지 확인한다.
+
+```bash
+# service 대상 서버
+set -euo pipefail
+read -r -p '준비 서버에서 별도로 확인한 Log4Shell image ID(sha256:...): ' expected_lab_id
+[[ $expected_lab_id =~ ^sha256:[0-9a-f]{64}$ ]]
+lab_loaded_id=$(sudo docker image inspect --format '{{.Id}}' capstone-log4shell:reviewed-20261015)
+test "$lab_loaded_id" = "$expected_lab_id"
+test "$(sudo docker image inspect --format '{{.Os}}/{{.Architecture}}' "$lab_loaded_id")" = linux/amd64
+printf 'LOG4SHELL_IMAGE=%s\n' "$lab_loaded_id"
+unset expected_lab_id lab_loaded_id
+```
+
+동일성을 확인한 뒤 출력된 `LOG4SHELL_IMAGE=sha256:…` 한 줄을 관리 컴퓨터의 `deployment/site.local.conf`에 넣는다. 설치기가 허용하는 참조는 repository digest 또는 로컬 image ID뿐이며 태그 입력은 `log4shell_digest_or_image_id_required`로 거절한다. 기본 digest 참조가 존재하는 경우에는 재정의가 필요 없다. 설치기는 실제 로컬 image ID를 저장한다. archive 검증·반입 후 양쪽 작업 폴더의 이번 archive를 삭제하고, 준비 서버의 `lab_work`도 아래 정리 기준에 맞춰 제거한다. 운영 이미지와 metadata 증거는 보존한다.
 
 ## 6. security용 ET/Open 룰 생성·검증
 
@@ -509,6 +562,7 @@ PY
 | 패키지 | Docker/Compose 정상, 공통 명령 존재, SIEM bcrypt·sysctl 통과 |
 | agent | security·service 4.14.8, 중지·미등록, mask 없음 |
 | 이미지 | 역할별 이미지가 로컬에 존재하고 linux/amd64, ID 증거 보존 |
+| service UI | Log4Shell 로컬 이미지 참조 확인, DVWA PHP8.1+/curl/session 수동 검사 통과 |
 | ET | security의 `suricata.rules`, root 소유·0644, SHA·엔진 시험 증거 |
 | Wazuh 입력 | SIEM의 공식 v4.14.8 single-node 원본, root 소유, symlink 없음 |
 | MCP | SIEM의 검증된 ELF와 hash-only `.sha256`, 출처·SHA·아키텍처 확인 |
@@ -525,6 +579,6 @@ test ! -e "$et_work"
 unset et_work suri_id
 ```
 
-같은 방식으로 `image_work`의 `capstone-images.*`, `image_in`의 `capstone-image-in.*`, `wazuh_work`의 `capstone-wazuh-src.*`, `mcp_work`의 `capstone-mcp.*`, `mcp_build`의 `capstone-mcp-build.*` 각각을 확인해 제거한다. source build 환경변수 `RUSTUP_HOME`, `CARGO_HOME`, `CARGO_TARGET_DIR`는 정리 후 `unset`한다. 소스 빌드에만 쓴 별도 VM이면 운영 자료를 반입하지 않은 상태에서 VM 자체 폐기도 가능하다. 기존 사용자 cache·다른 Docker 이미지·공용 APT cache를 일괄 삭제하지 않는다.
+같은 방식으로 `image_work`의 `capstone-images.*`, `image_in`의 `capstone-image-in.*`, `lab_work`의 `capstone-lab-image.*`, `wazuh_work`의 `capstone-wazuh-src.*`, `mcp_work`의 `capstone-mcp.*`, `mcp_build`의 `capstone-mcp-build.*` 각각을 확인해 제거한다. source build 환경변수 `RUSTUP_HOME`, `CARGO_HOME`, `CARGO_TARGET_DIR`는 정리 후 `unset`한다. 소스 빌드에만 쓴 별도 VM이면 운영 자료를 반입하지 않은 상태에서 VM 자체 폐기도 가능하다. 기존 사용자 cache·다른 Docker 이미지·공용 APT cache를 일괄 삭제하지 않는다.
 
 이 경로를 따르면 Mac에는 서버 패키지 반입물이 생성되지 않는다. 배포 소스·설정·문서·작업 기록은 정리 대상이 아니다. 최종 기록에는 설치 버전, image ID/digest, ET/MCP SHA, 공개 출처, 검사 결과와 임시폴더 제거 결과를 남기고 암호·토큰·키는 남기지 않는다.

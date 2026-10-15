@@ -1,5 +1,13 @@
 # 인프라 현황 — 2026-10-15 작업 마감
 
+## Log4Shell 실습 UI 적용·신규 설치기 반영 (2026-10-15 13:20 KST)
+
+현재 실습망/VPN에서 **http://192.168.16.230/log4shell/** 로 접속할 수 있다. 기존 C Apache/PHP에 정상 헤더·헤더 누락 요청, HTTP 상태·본문·처리 시간·KST, 브라우저 최근20개 요약 화면을 적용했다. 실제 브라우저에서200/400과 새로고침 후 이력 유지, C localhost HTTP9개, 공개4파일 SHA를 확인했다. C Apache/Docker/Wazuh active·DVWA200·기존 Log4Shell 이미지/기동시각 유지, A WAF healthy·Suricata running·기존 라우팅 해시 유지도 직접 확인했다. 라이브 패키지 추가·컨테이너 변경·서비스 재시작·방화벽 변경은 없다.
+
+`deploy.sh`의 신규 service 구성에도 Log4Shell 앱과 UI를 포함했다. 공식 고정 digest 또는 검토한 로컬 image ID를 수동 준비하며 설치기에서 pull/build/패키지 설치를 하지 않는다. 앱은 호스트 포트 없이 전용 internal lab 네트워크에 두고, DVWA Apache에 UI를 읽기 전용으로 마운트한다. 주소는 새 환경의 `http://SECURITY_HOST:WAF_PORT/log4shell/`이다. service schema2를 사용하며 이전 schema1을 자동 변경하지 않는다. README·상세 준비/설정/검증 문서도 갱신했다.
+
+컨트롤러12개·서비스 함수25개 회귀, 생성 PHP2개 C native lint, Bash/JS 구문 검사를 통과했다. 응답 지연을 제한 실패로 오판하던 검증기를 보완했고 시간창이 지나면 SKIP로 구분한다. 최종 라이브 검사는9PASS/0SKIP다. **새 VM3대 실제 구축·새 이미지의 비root Java 구동·공격/보안 탐지 E2E는 미실행**이다. UI는 무해한 두 요청 비교용이며 C 내부 backend 호출이 A 외부 Suricata를 지나가는 것은 아니다. [사용·구성](infra/groot-c/log4shell-ui/README.md) · [직접 검증 기록](infra/groot-c/log4shell-ui/deployment-validation-20261015.json). 이전 운영 잔여 과제와 보류 항목은 아래 기록을 유지한다.
+
 ## 대화기록 로컬 전용 전환 (2026-10-15 12:50 KST)
 
 사용자 요청으로 `대화기록/` 전체를 로컬에 보존하고 Git 추적과 과거 공개 main 이력에서 제외했다. 일별 대화·작업 기록은 계속 작성하며 `.gitignore`와 AGENTS.md에 로컬 전용 원칙을 반영했다. 공개 문서에서 날짜별 대화기록을 참조하는 기존 링크는 로컬 보관 자료를 뜻하며 새 클론에는 해당 자료가 포함되지 않는다. 상세 구축 안내와 운영 소스는 그대로 유지한다.

@@ -2,7 +2,7 @@
 
 2026 capstone project — nftables, Suricata, ModSecurity, Wazuh, Mattermost, Hermes 기반 실습 SOC.
 
-현재 운영 이력은 [STATUS.md](STATUS.md), 진행 계획은 [PLAN.md](PLAN.md), 날짜별 작업은 [대화기록](대화기록/대화_및_변경이력.md)에 있습니다. 이 문서의 새 환경 구축과 기존 운영 서버의 변경 이력을 구분합니다.
+현재 운영 이력은 [STATUS.md](STATUS.md), 진행 계획은 [PLAN.md](PLAN.md)에 있습니다. 날짜별 대화·작업 기록은 로컬 전용 `대화기록/`에 보관하며 Git에는 포함하지 않습니다. 이 문서의 새 환경 구축과 기존 운영 서버의 변경 이력을 구분합니다.
 
 ## 처음 구축할 때 읽는 순서
 

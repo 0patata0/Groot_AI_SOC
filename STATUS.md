@@ -1,5 +1,9 @@
 # 인프라 현황 — 2026-10-15 작업 마감
 
+## 대화기록 로컬 전용 전환 (2026-10-15 12:50 KST)
+
+사용자 요청으로 `대화기록/` 전체를 로컬에 보존하고 Git 추적과 과거 공개 main 이력에서 제외한다. 일별 대화·작업 기록은 계속 작성하며 `.gitignore`와 AGENTS.md에 로컬 전용 원칙을 반영했다. 공개 문서에서 날짜별 대화기록을 참조하는 기존 링크는 로컬 보관 자료를 뜻하며 새 클론에는 해당 자료가 포함되지 않는다. 상세 구축 안내와 운영 소스는 그대로 유지한다. 과거 경로·blob 조사에서는 파일15개·blob122개를 확인했고 폴더 밖 동일 blob이나 이전 폴더명은 발견되지 않았다. 원격 반영 결과는 검증 후 갱신한다.
+
 ## 상세 구축 안내 보완 및 Git 정리 (2026-10-15 12:43 KST)
 
 [README](README.md)에 신규 환경 구축 안내를 연결했다. [네트워크·SSH](deployment/setup-network-ssh.md), [패키지·이미지·공식 자료](deployment/setup-packages-artifacts.md), [환경값·실행](deployment/configuration-guide.md), [최초 접속·검증·장애 진단](deployment/verify-troubleshoot.md) 4개 문서를 추가하고 기존 Hermes 이미지 안내와 연결했다. 공개 Wazuh 설정의 컨테이너 읽기 권한과 SIEM 내부 SSH 접근 조건도 구현과 대조해 보완했다.

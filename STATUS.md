@@ -1,5 +1,13 @@
 # 인프라 현황 — 2026-10-15 작업 마감
 
+## 상세 구축 안내 보완 및 Git 정리 (2026-10-15 12:43 KST)
+
+[README](README.md)에 신규 환경 구축 안내를 연결했다. [네트워크·SSH](deployment/setup-network-ssh.md), [패키지·이미지·공식 자료](deployment/setup-packages-artifacts.md), [환경값·실행](deployment/configuration-guide.md), [최초 접속·검증·장애 진단](deployment/verify-troubleshoot.md) 4개 문서를 추가하고 기존 Hermes 이미지 안내와 연결했다. 공개 Wazuh 설정의 컨테이너 읽기 권한과 SIEM 내부 SSH 접근 조건도 구현과 대조해 보완했다.
+
+문서의 Bash 86블록·JSON 2블록·Python 4블록 구문과 상대 파일 링크 29개를 확인했다. 이번 변경은 문서와 Git 제외 설정이며 서버 접속·배포·패키지 설치는 하지 않았다. 새 VM 실제 구축과 전체 서비스 E2E 검증은 여전히 남아 있다.
+
+`업무분담.md`는 로컬에 보존하고 Git 추적·재추가에서 제외했다. 사용자 추가 요청으로 과거 공개 main 이력에서도 정확한 파일 경로를 제거하기로 했다. 현재 main의 101개 커밋 중 100개에 해당 파일이 있고, 이전 이름이나 동일 내용의 다른 경로는 발견되지 않았다. 이력 재작성과 원격 반영 결과는 후속 기록한다. 이전의 ‘과거 이력 유지’ 결정은 이번 요청으로 대체된다.
+
 ## 새 환경 SSH 구축 자동화 — 로컬 구현 (2026-10-15 12:17 KST)
 
 사용자 후속 요청으로 로컬 구축 도구·문서·Git 게시 작업을 재개했다. `deploy.sh` 하나를 실행하면 security→siem→service 초기 IPv4를 입력받고, 검증된 SSH 키/host key와 sudo를 이용해 전체 사전검사 후 SIEM→service→security 순으로 구성한다. [README](README.md)에 패키지·이미지·공식 자료·SSH/sudo 수동 선행 준비와 실행 절차를 기록했다. 실행기는 패키지 설치나 이미지 다운로드를 하지 않는다.

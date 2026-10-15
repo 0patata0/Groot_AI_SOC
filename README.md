@@ -4,6 +4,20 @@
 
 현재 운영 이력은 [STATUS.md](STATUS.md), 진행 계획은 [PLAN.md](PLAN.md), 날짜별 작업은 [대화기록](대화기록/대화_및_변경이력.md)에 있습니다. 이 문서의 새 환경 구축과 기존 운영 서버의 변경 이력을 구분합니다.
 
+## 처음 구축할 때 읽는 순서
+
+아래 상세 문서는 **어느 컴퓨터에서 실행하는지, 입력값, 실행 명령, 기대 결과, 실패 시 돌아갈 단계**를 함께 설명합니다. 실제 주소·NIC·게이트웨이·DNS는 관리자가 할당받은 값으로 바꿉니다. 문서의 예시 명령을 이번 작업에서 서버에 실행한 것은 아닙니다.
+
+| 순서 | 상세 문서 | 내용 |
+|---|---|---|
+| 1 | [VM·네트워크·SSH 준비](deployment/setup-network-ssh.md) | VM 식별, 고정 IP, 경로·포트·미러링, 계정·공개키·host key, SSH 포트, sudo 설정·회수 |
+| 2 | [패키지·배포 자료 준비](deployment/setup-packages-artifacts.md) | Docker 저장소/설치, Wazuh agent 고정 버전, 이미지 반입, ET 규칙, MCP 바이너리·해시 |
+| 3 | [Hermes 이미지 준비](deployment/hermes-image.md) | 기반 이미지 확인, 한국어 가드·의존성, 수동 빌드와 정리 |
+| 4 | [환경값 입력·설치 실행](deployment/configuration-guide.md) | 설정 키 전체 설명, LLM 연결, SIEM 계정 JSON, plan/check/apply/verify와 성공 기준 |
+| 5 | [초기 접속·검증·장애 대응](deployment/verify-troubleshoot.md) | 최초 로그인, 사설 CA, 서비스/agent/MCP 확인, 오류별 진단, 부분 실패 처리 |
+
+아래 내용은 같은 절차의 요약입니다. 실행 명령을 한 번에 모두 붙여넣지 말고 상세 문서의 실행 위치와 성공 조건을 확인하며 순서대로 진행합니다. 최초 설치 후 사용할 소스 버전과 로컬 설정을 보존합니다.
+
 ## 단일 셸로 세 서버 구축
 
 관리 컴퓨터에서 `bash deploy.sh`를 한 번 실행하고 **security → siem → service 초기 IPv4 주소**를 입력합니다. 같은 SSH 계정·포트를 세 서버에서 사용하며, 셸이 SSH로 자료를 전달하고 역할별 구성을 적용합니다. IPv4/라우팅/SSH 설정 자체는 바꾸지 않습니다.
@@ -41,7 +55,7 @@ sudo systemctl enable --now ssh
 sudo timedatectl set-timezone Asia/Seoul
 ```
 
-세 서버에 동일한 배포용 계정(기본 `ubuntu`)을 준비하고 관리 컴퓨터의 공개키를 각 계정의 `~/.ssh/authorized_keys`에 등록합니다. 디렉터리 권한은700, 파일은600으로 설정합니다. 개인키를 서버나 저장소에 복사하지 않습니다. 방화벽의 SSH 포트는 관리 컴퓨터 주소에만 허용합니다.
+세 서버에 동일한 배포용 계정(기본 `ubuntu`)을 준비하고 관리 컴퓨터의 공개키를 각 계정의 `~/.ssh/authorized_keys`에 등록합니다. 디렉터리 권한은700, 파일은600으로 설정합니다. 개인키를 서버나 저장소에 복사하지 않습니다. 외부의 관리용 SSH 접근은 관리 컴퓨터 주소로 제한합니다. SIEM에는 Hermes 컨테이너에서 호스트 자신의 SSH 포트로 접속하는 읽기 MCP 경로도 별도로 허용해야 합니다. 실제 출발지와 정책은 [네트워크·SSH 상세 절차](deployment/setup-network-ssh.md)를 따릅니다.
 
 자동 설치는 root 작업이 필요하므로 해당 계정에서 `sudo -n`이 가능해야 합니다. 관리자가 `sudo visudo -f /etc/sudoers.d/capstone-bootstrap`로 배포용 계정의 **일시적인 관리자 권한**을 준비합니다. 예를 들어 계정명이 `ubuntu`라면:
 
@@ -95,13 +109,7 @@ security/service에는 **Wazuh agent 4.14.8**을 [공식 Linux agent 설치 절�
 sudo systemctl stop wazuh-agent
 ```
 
-siem에는 비밀번호 해시 생성용 `python3-bcrypt`도 수동 설치합니다. Wazuh indexer의 커널 설정도 준비합니다.
-
-```bash
-sudo apt-get install -y python3-bcrypt
-printf 'vm.max_map_count=262144\n' | sudo tee /etc/sysctl.d/99-wazuh.conf
-sudo sysctl --system
-```
+siem에는 비밀번호 해시 생성용 `python3-bcrypt`도 수동 설치하고, Wazuh indexer용 `vm.max_map_count`를 262144 이상으로 준비합니다. 기존에 더 높은 값이 있으면 유지합니다. [SIEM 패키지·커널 설정 상세 명령](deployment/setup-packages-artifacts.md)을 따릅니다.
 
 역할별 이미지·공식 배포 자료·Python 의존성의 정확한 준비 목록은 아래 역할별 절차를 따릅니다. 다운로드할 수 없는 내부망에서는 인터넷이 가능한 준비 환경에서 검증한 이미지/자료를 가져와 `docker load` 등으로 수동 반입합니다. 실행 중 다운로드로 보충하지 않습니다.
 
@@ -151,14 +159,21 @@ sudo docker pull mattermost/mattermost-team-edition:11.11.1
 
 ```bash
 # git이 이미 준비된 Linux에서 수동으로 실행하는 예시
+set -euo pipefail
+umask 077
 work_dir=$(mktemp -d)
 git clone --depth 1 --branch v4.14.8 https://github.com/wazuh/wazuh-docker.git "$work_dir/wazuh-docker"
+test "$(git -C "$work_dir/wazuh-docker" rev-parse HEAD)" = 5f5951b795578cb0844f4601b66df890860c20f3
+sudo test ! -e /opt/capstone-prereqs/wazuh-docker/single-node
 sudo install -d -m 0700 /opt/capstone-prereqs/wazuh-docker
 sudo cp -R "$work_dir/wazuh-docker/single-node" /opt/capstone-prereqs/wazuh-docker/
 sudo chown -R root:root /opt/capstone-prereqs/wazuh-docker
-sudo chmod -R go-w /opt/capstone-prereqs/wazuh-docker
+sudo find /opt/capstone-prereqs/wazuh-docker -type d -exec chmod 0755 {} +
+sudo find /opt/capstone-prereqs/wazuh-docker -type f -exec chmod 0644 {} +
 rm -rf -- "$work_dir"
 ```
+
+상위 `/opt/capstone-prereqs`는 `0700`으로 유지합니다. 공개 Wazuh 원본의 `0644` 파일 권한은 컨테이너 내부 프로세스가 개별 마운트된 설정을 읽기 위해 필요합니다. 실제 암호가 들어가는 `siem.json`은 아래와 같이 `0600`으로 관리합니다.
 
 Hermes는 [수동 이미지 준비 절차](deployment/hermes-image.md)에 따라 Linux에서 먼저 준비합니다. Python3.13, MCP SDK, 프로젝트 한국어 가드와 검증된 `regex`가 포함된 이미지여야 하며, 그 **로컬 `sha256:…` 이미지 ID 또는 registry digest**를 아래 JSON에 넣습니다. 실행기는 자체 다운로드나 누락 의존성 설치를 하지 않습니다.
 
@@ -186,7 +201,7 @@ Hermes는 [수동 이미지 준비 절차](deployment/hermes-image.md)에 따라
 
 설치기는 원본 자료를 보존하고 `/opt/capstone/siem`에 복사한 뒤 비밀번호 설정, 새 사설 CA와 입력 SIEM IP SAN 인증서, Wazuh 등록 암호, Mattermost 관리자·팀·채널·봇, 읽기 전용 계정/MCP와 Hermes 연결을 구성합니다. **공인 HTTPS 인증서는 발급하지 않습니다.** Dashboard는 새 사설 CA를 신뢰해야 하며, Mattermost는 내부망 HTTP8065 기본 구성입니다. 공개 인증서·HTTPS 역방향 프록시·모바일 푸시는 별도 설정합니다.
 
-SIEM의 SSH는 Hermes 전용 키에 읽기 MCP만 허용하는 계정/ForceCommand를 추가하고 구문 검사 후 reload합니다. 기존 관리 계정이나 SSH 포트는 변경하지 않습니다. 기존 `AllowUsers/AllowGroups/DenyUsers/DenyGroups` 제한이 있으면 사전검사에서 멈추므로 관리자가 전용 계정 허용 정책을 먼저 검토해야 합니다.
+SIEM의 SSH는 Hermes 전용 키에 읽기 MCP만 허용하는 계정/ForceCommand를 추가하고 구문 검사 후 reload합니다. 기존 관리 계정이나 SSH 포트는 변경하지 않습니다. 현재 설치기는 `AllowUsers/AllowGroups/DenyUsers/DenyGroups`가 있는 SIEM 구성을 거절합니다. 허용 목록에 계정만 추가해도 이 검사는 통과하지 않습니다. 해당 정책을 유지해야 하는 환경은 설치기의 별도 지원·검증이 필요하며, 검사를 통과하려고 기존 운영 SSH 정책을 제거하지 않습니다.
 
 ## 5. 실행
 

@@ -27,3 +27,6 @@ datasets.zip
 deployment/*.local.conf
 **/*secrets*.env
 **/enrollment.pass
+
+# 업무분담 문서는 로컬에만 보관
+/업무분담.md

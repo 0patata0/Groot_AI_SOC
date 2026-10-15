@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "verification_kind": "live_read_only_metadata_observation",
+  "host": "Groot_B",
+  "date_kst": "2026-10-14",
+  "scope": {
+    "cutoff_epoch": 1791972903,
+    "cutoff_kst": "2026-10-14T19:15:03+09:00",
+    "recent_start_epoch": 1791954903,
+    "recent_start_kst": "2026-10-14T14:15:03+09:00",
+    "observer_start_epoch": 1791914241,
+    "observer_start_kst": "2026-10-14T02:57:21+09:00"
+  },
+  "conclusion": {
+    "runtime_and_source_match_prior_deployment": true,
+    "metadata_interventions_observed": 0,
+    "recent_five_hours_stored_activity_rows": 0,
+    "actual_use_recurrence_status": "insufficient_recent_usage_sample",
+    "stored_fallback_notices_observed": 0,
+    "full_send_mixed_language_rate_established": false,
+    "full_send_text_or_quotation_classification_performed": false
+  },
+  "container": {
+    "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "status": "running",
+    "pid": 1896873,
+    "started_at_utc": "2026-10-13T16:37:16.547543503Z",
+    "oom_killed": false,
+    "restarting": false,
+    "running_pid_and_start_unchanged_across_both_queries": true
+  },
+  "source_files": {
+    "/opt/hermes/capstone_korean_output_guard.py": {
+      "sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+      "bytes": 22157,
+      "uid": 0,
+      "gid": 0,
+      "mode": "0644",
+      "matches_repository": true
+    },
+    "/opt/hermes/plugins/platforms/mattermost/adapter.py": {
+      "sha256": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+      "bytes": 41562,
+      "uid": 0,
+      "gid": 0,
+      "mode": "0644",
+      "matches_prior_deployment": true
+    },
+    "/opt/hermes/gateway/run_turn.py": {
+      "sha256": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a",
+      "bytes": 256255,
+      "uid": 0,
+      "gid": 0,
+      "mode": "0644",
+      "matches_prior_deployment": true
+    },
+    "/opt/capstone-automation/hermes-guard/guard-metadata.awk": {
+      "sha256": "6865d2f3b259959b19f3f19acf5eb38f721aa2ef0252a6cd85fbfc35d15d2d08",
+      "bytes": 690,
+      "uid": 0,
+      "gid": 0,
+      "mode": "0600",
+      "matches_repository": true
+    }
+  },
+  "services": {
+    "capstone-hermes-guard-observe.service": {
+      "active_state": "active",
+      "sub_state": "running",
+      "unit_file_state": "enabled",
+      "result": "success",
+      "exec_main_status": 0,
+      "n_restarts": 0,
+      "started_at_kst": "2026-10-14T02:57:21+09:00"
+    },
+    "capstone-hermes-guard-reapply.timer": {
+      "active_state": "active",
+      "sub_state": "waiting",
+      "unit_file_state": "enabled",
+      "result": "success",
+      "active_since_kst": "2026-10-14T02:57:20+09:00"
+    },
+    "capstone-hermes-guard-reapply.service": {
+      "active_state": "inactive",
+      "sub_state": "dead",
+      "unit_file_state": "static",
+      "oneshot_inactive_expected": true,
+      "result": "success",
+      "exec_main_status": 0,
+      "n_restarts": 0,
+      "last_started_at_kst": "2026-10-14T19:12:58+09:00"
+    }
+  },
+  "gateway_state_metadata": {
+    "gateway_state": "running",
+    "active_agents": 0,
+    "active_work_present": false,
+    "updated_at_utc": "2026-10-14T10:14:19.515922+00:00"
+  },
+  "journal_metadata": {
+    "counts": {
+      "since_observer_start": {
+        "filtered": 0,
+        "retained": 0,
+        "requested_foreign": 0,
+        "oversize": 0
+      },
+      "recent_five_hours": {
+        "filtered": 0,
+        "retained": 0,
+        "requested_foreign": 0,
+        "oversize": 0
+      }
+    },
+    "records_read": 0,
+    "bytes_read": 0,
+    "unexpected_metadata_rows": 0,
+    "bounded_query_complete": true,
+    "exit_code": 0,
+    "first_last_kst": {
+      "since_observer_start": [],
+      "recent_five_hours": []
+    }
+  },
+  "gateway_log": {
+    "path": "/opt/hermes-data/logs/gateway.log",
+    "bytes_read": 133477,
+    "sha256": "67e204a226c371b0740492bb638c9b73269870f9e0e219f8329d02fa6edb3511",
+    "mtime_kst": "2026-10-14T06:29:24.768653+09:00",
+    "complete_current_file": true,
+    "numbered_or_gzip_rotations_present": false,
+    "counts": {
+      "since_observer_start": {
+        "filtered": 0,
+        "retained": 0,
+        "requested_foreign": 0,
+        "oversize": 0
+      },
+      "recent_five_hours": {
+        "filtered": 0,
+        "retained": 0,
+        "requested_foreign": 0,
+        "oversize": 0
+      }
+    },
+    "guard_marker_rows_all_file": 0,
+    "guard_marker_rows_rejected_by_exact_filter": 0
+  },
+  "database_aggregates": {
+    "since_observer_start": {
+      "stored_assistant": {
+        "rows": 12,
+        "content_bytes_examined_bound": 7188,
+        "first_last_kst": [
+          "2026-10-14T03:01:58.008272+09:00",
+          "2026-10-14T05:28:50.153157+09:00"
+        ],
+        "fallback_notice_rows": 0,
+        "source_groups": {
+          "cron": 9,
+          "mattermost": 3
+        }
+      },
+      "mattermost_delivery_ledger": {
+        "created_rows": 2,
+        "content_bytes_examined_bound": 4058,
+        "created_first_last_kst": [
+          "2026-10-14T05:27:07.494829+09:00",
+          "2026-10-14T05:28:50.178442+09:00"
+        ],
+        "fallback_notice_rows": 0,
+        "state_counts": {
+          "delivered": 2
+        }
+      }
+    },
+    "recent_five_hours": {
+      "stored_assistant": {
+        "rows": 0,
+        "content_bytes_examined_bound": 0,
+        "first_last_kst": [
+          null,
+          null
+        ],
+        "fallback_notice_rows": 0,
+        "source_groups": {}
+      },
+      "mattermost_delivery_ledger": {
+        "created_rows": 0,
+        "content_bytes_examined_bound": 0,
+        "created_first_last_kst": [
+          null,
+          null
+        ],
+        "fallback_notice_rows": 0,
+        "state_counts": {}
+      }
+    }
+  },
+  "query_bounds": {
+    "journal_max_bytes": 16777216,
+    "journal_max_records": 50000,
+    "journal_timeout_seconds": 15,
+    "gateway_log_max_bytes": 1048576,
+    "database_query_timeout_seconds": 5,
+    "database_max_rows_per_window_per_table": 5000,
+    "database_max_content_bytes_per_window_per_table": 8388608
+  },
+  "interpretation_limits": [
+    "The metadata observer follows new gateway.log lines; missing metadata is not proof that every delivery path was observed.",
+    "Clean Korean responses produce no guard diagnostic, and multiple checks may run for one response; no full-response denominator exists.",
+    "The filtered verdict covers both successful correction and fallback; correction failure is not separately counted.",
+    "No assistant or Mattermost delivery ledger rows exist within the recent five-hour window; this is not an actual-use recurrence test.",
+    "Stored assistant rows are not final-send transcripts. The delivery ledger need not cover independent cron or direct-platform delivery.",
+    "Fallback string presence is an aggregate over bounded saved rows. No full-send Han/Kana surface scan or current-turn evidence/quotation reconstruction was performed.",
+    "Journal retention and observer start/follow behavior limit historical coverage; no mixed-language rate or universal clean-output claim is established."
+  ],
+  "effects": {
+    "read_only_server_queries": 2,
+    "chat_posts": 0,
+    "model_calls": 0,
+    "package_installs": 0,
+    "source_or_service_changes": false,
+    "raw_dialogue_or_tokens_exported": false,
+    "operation_data_restored": false
+  },
+  "server_evidence_directory": "/var/tmp/capstone-short-priority-20261014/step1-hermes",
+  "server_evidence_files": [
+    "scope.json",
+    "metadata-first.json",
+    "metadata-counts.json"
+  ],
+  "local_task_scripts": [
+    "/private/tmp/capstone-short-priority-20261014.trt3rndm/observe-hermes-metadata-b.sh",
+    "/private/tmp/capstone-short-priority-20261014.trt3rndm/observe-hermes-counts-b.sh"
+  ],
+  "cleanup": {
+    "other_agent_specific_mac_downloads_caches_venvs_or_bytecode_created": false,
+    "shared_temp_cleanup_owner": "root agent",
+    "server_evidence_metadata_only": true
+  }
+}

@@ -1,0 +1,104 @@
+[[tests]]
+name = "collection_counter_excludes_private_tags"
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"component_errors_total","counter":{"value":2.0},"tags":{"component_id":"waf_audit","vector_pid":"123","error_code":"reading_line_from_file","file":"/private/input","reason":"private-payload"},"raw":"private-payload"}'''
+[[tests.outputs]]
+extract_from = "collection_health_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_collection_health.value, 2.0)
+assert_eq!(.capstone_collection_health.labels, {"error_code":"reading_line_from_file"})
+assert_eq!(length(keys(.)), 1)
+assert!(!contains(encode_json(.), "private"))
+assert!(ends_with(string!(.capstone_collection_health.observed_at_kst), "+09:00"))
+'''
+
+[[tests]]
+name = "collection_gauge"
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"buffer_size_bytes","gauge":{"value":4096.0},"tags":{"component_id":"normalized","vector_pid":"456","buffer_type":"disk"}}'''
+[[tests.outputs]]
+extract_from = "collection_health_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = 'assert_eq!(.capstone_collection_health.value, 4096.0)'
+
+[[tests]]
+name = "collection_heartbeat_invocation_bound"
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"uptime_seconds","gauge":{"value":12.0},"tags":{"vector_pid":"789"}}'''
+[[tests.outputs]]
+extract_from = "collection_health_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_collection_health.component, "vector")
+assert_eq!(.capstone_collection_health.metric, "uptime_seconds")
+assert!(match(string!(.capstone_collection_health.invocation_id), r'^[a-f0-9]{32}$'))
+'''
+
+[[tests]]
+name = "collection_bad_label"
+no_outputs_from = ["collection_health_metadata"]
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"component_errors_total","counter":{"value":1.0},"tags":{"component_id":"waf_audit","vector_pid":"123","error_code":"raw content should fail"}}'''
+
+[[tests]]
+name = "collection_bad_component"
+no_outputs_from = ["collection_health_metadata"]
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"component_errors_total","counter":{"value":1.0},"tags":{"component_id":"private-component","vector_pid":"123"}}'''
+
+[[tests]]
+name = "collection_bad_value"
+no_outputs_from = ["collection_health_metadata"]
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"component_errors_total","counter":{"value":-1.0},"tags":{"component_id":"waf_audit","vector_pid":"123"}}'''
+
+[[tests]]
+name = "collection_eof_series_preserved"
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"files_unwatched_bytes_unread_total","counter":{"value":42.0},"tags":{"component_id":"suricata_eve","vector_pid":"123","reached_eof":"false"}}'''
+[[tests.outputs]]
+extract_from = "collection_health_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = 'assert_eq!(.capstone_collection_health.labels, {"reached_eof":"false"})'
+
+[[tests]]
+name = "collection_invalid_eof_label"
+no_outputs_from = ["collection_health_metadata"]
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"files_unwatched_bytes_unread_total","counter":{"value":42.0},"tags":{"component_id":"suricata_eve","vector_pid":"123","reached_eof":"not-bool"}}'''
+
+[[tests]]
+name = "collection_evidence_buffer_gauge"
+[[tests.inputs]]
+insert_at = "collection_health_metadata"
+type = "vrl"
+source = '''. = {"timestamp":"2026-10-14T04:00:00+09:00","name":"buffer_size_bytes","gauge":{"value":201326616.0},"tags":{"component_id":"evidence","vector_pid":"456","buffer_type":"disk"}}'''
+[[tests.outputs]]
+extract_from = "collection_health_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_collection_health.component, "evidence")
+assert_eq!(.capstone_collection_health.value, 201326616.0)
+'''

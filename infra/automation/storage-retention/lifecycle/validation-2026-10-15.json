@@ -1,0 +1,119 @@
+{
+  "automatic_deletion": false,
+  "checkpoint_mutation": false,
+  "deletion_not_performed_reasons": [
+    "30_days_since_first_strict_verification_not_elapsed",
+    "full_strict_history_reference_consumption_proof_not_established_for_these_bundles",
+    "no_deletion_executor"
+  ],
+  "fixed_archive_root": "/var/backups/capstone-raw-retention",
+  "live_archive_or_transfer_proven": true,
+  "observations": {
+    "linux_bundle_attempt1": {
+      "case": "bundle_unsafe_mode",
+      "cause": "fixture bundle basename contained underscore; production regular expression correctly rejected it",
+      "hosts": [
+        "a",
+        "b"
+      ],
+      "operational_files_touched": false,
+      "passed_before_failure": 12,
+      "reported_by": "parent live execution",
+      "source_library_sha256": "dabdd8fcfc4409904abd8a56fce6ee1f94a8aea5525fd35f0c249d1bce2237e7",
+      "status": "failed",
+      "test_sha256": "f9e5c57f4b77c415a1a834625bba9d1e9f683209a220cd7502bd5e4866a6dc15"
+    },
+    "linux_bundle_attempt2": {
+      "hosts": {
+        "a": 16,
+        "b": 16
+      },
+      "operational_files_touched": false,
+      "private_fixture_only": true,
+      "reported_by": "parent live execution",
+      "source_library_sha256": "c7094e67bd012ca0be08cb5feee6d50538f06b172513f25eb59c75f20d0b81f8",
+      "status": "passed",
+      "test_sha256": "e884a28bc29ba4ff569f582d12709b94aa4b27749cf45696c00d0635dff7c8fc"
+    },
+    "live_archive": {
+      "a_preservation_of_b_receipts": "pending_parent_confirmation",
+      "bundles": 5,
+      "evidence_file": "live-archive-2026-10-15.json",
+      "evidence_sha256": "29cd50ef5af9aedadb05d2ddbeac83d44ffad7b53b8139321aecba23964b73cb",
+      "gzip_bytes": 1556116,
+      "kernel_history_sender_changed": false,
+      "local_catalog_remote_receipt_pairs_verified": 5,
+      "mac_payload_files": 0,
+      "parent_reported_prepost_checks": [
+        "A_shared_vector_lock",
+        "fixed_container_writer_writable_fd_zero",
+        "raw_states_sha256_unchanged",
+        "raw_sources_identity_unchanged"
+      ],
+      "source_bytes": 21157373,
+      "source_deleted": false,
+      "status": "A_to_B_preserved_and_restore_verified",
+      "transport_bytes": 1576960,
+      "transport_sha256": "147dbcf6ac1d0bbdd43dac0920c4035e178db4bef55482ecbd6419f4538adf18"
+    },
+    "local_bash_syntax": {
+      "status": "passed"
+    },
+    "local_policy": {
+      "cases": 51,
+      "execution": "local synthetic JSON only",
+      "status": "passed"
+    }
+  },
+  "operational_source_deletion": false,
+  "remaining_unimplemented": [
+    "general_backup_transfer",
+    "scheduled_lifecycle_review",
+    "automatic_deletion_executor"
+  ],
+  "schema_version": 1,
+  "scope": "sealed_raw_copy_and_remote_restore_validated_deletion_review_candidate",
+  "source_sha256": {
+    "bundle-lib.sh": "c7094e67bd012ca0be08cb5feee6d50538f06b172513f25eb59c75f20d0b81f8",
+    "evaluate.sh": "e5ed82c785ffed9c6abf635a34816e6c85a9c1d62b20e73a6d117ecb897fb602",
+    "policy.jq": "e00ce0f09172e99bccaa07c186a89d1ac3608324e0a087caa558715ee663106d",
+    "test-bundle-native.sh": "e884a28bc29ba4ff569f582d12709b94aa4b27749cf45696c00d0635dff7c8fc",
+    "test-policy.sh": "9f686a2f5f849374c08c4a91dbe0a8a003ce63f1df20eb3249f7ff1ac2069276"
+  },
+  "ssh_or_timer_code_added": false,
+  "followup_at_kst": "2026-10-15T10:21:29+09:00",
+  "a_copies_of_b_receipts_verified": 5,
+  "repeated_restore_verified": {
+    "a": 5,
+    "b": 5
+  },
+  "inventory_relocation": {
+    "a": {
+      "bytes": 34367,
+      "sha256": "c54986c058b68edbf6d9ed0ff366f2a72f24993abb80f1a27bfcc7260203b49f"
+    },
+    "b": {
+      "bytes": 1719512,
+      "sha256": "e198635e5dbf9dd2d0d5cd27dd8f9bda231edc9b7704ae8277d37f994b0df08c"
+    },
+    "from": "/var/backups/capstone-tools-inventory-{host}-20261015.json",
+    "to": "/var/backups/capstone-tools-followup-20261015-final/capstone-tools-inventory-{host}-20261015.json",
+    "content_inode_preserved": true
+  },
+  "storage_after": {
+    "a": {
+      "status": "ok",
+      "scan_status": "complete",
+      "backup_bytes": 31043922,
+      "used_percent": 18,
+      "available_bytes": 47597305856
+    },
+    "b": {
+      "status": "ok",
+      "scan_status": "complete",
+      "backup_bytes": 23607238,
+      "used_percent": 26,
+      "available_bytes": 109351014400
+    }
+  }
+}

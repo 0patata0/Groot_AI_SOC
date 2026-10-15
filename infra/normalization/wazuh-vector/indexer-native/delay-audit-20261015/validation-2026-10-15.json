@@ -1,0 +1,1497 @@
+{
+  "actions_configured": 0,
+  "actual_1800s_outage_tested": false,
+  "adapted_helper_sha256": "04e7536292923c6897d7352174040a293d309cb16696cf7f6e02b65056ae7d90",
+  "age_fixture_is_wallclock_delay": false,
+  "cleanup": {
+    "failures": [],
+    "index_deleted_verified": true,
+    "monitor_deleted_verified": true
+  },
+  "client_process_restart_performed": false,
+  "completed_at_epoch_ms": 1792028169022,
+  "current_case": "historical_marker_is_excluded",
+  "elapsed_seconds": 322.292,
+  "final_identity": {
+    "cid": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+    "image": "sha256:b14c00fcbe01829afed0a44f184ca9aae0b72ebe412e878f047f8ba432533b75",
+    "pid": 1822,
+    "restart_count": 0,
+    "started_at": "2026-09-28T06:19:48.729016621Z"
+  },
+  "fixture_sha256": "02db0dee80d8545a5fb28492a773f511ebfd2c7692525ea27c2f7332d9446dbe",
+  "index": "capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e",
+  "index_uuid": "Kouc3LGrRXmfwodBmxIM4w",
+  "indexer_container_id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+  "indexer_restart_persistence_proven": false,
+  "initial_identity": {
+    "cid": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+    "image": "sha256:b14c00fcbe01829afed0a44f184ca9aae0b72ebe412e878f047f8ba432533b75",
+    "pid": 1822,
+    "restart_count": 0,
+    "started_at": "2026-09-28T06:19:48.729016621Z"
+  },
+  "lifecycle": [
+    {
+      "alerts": [
+        {
+          "end_time": null,
+          "id": "RHYvPaEBERDGWPLCA5Ww",
+          "start_time": 1792027853744,
+          "state": "ACTIVE",
+          "trigger_id": "capstone-observation-match-v1"
+        }
+      ],
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 0,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027853657,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true,
+      "step": "first_match"
+    },
+    {
+      "alerts": [
+        {
+          "end_time": null,
+          "id": "RHYvPaEBERDGWPLCA5Ww",
+          "start_time": 1792027853744,
+          "state": "ACTIVE",
+          "trigger_id": "capstone-observation-match-v1"
+        }
+      ],
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 30
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 30,
+          "duplicate_documents": 15,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027854141,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true,
+      "step": "same_event_replay"
+    },
+    {
+      "alerts": [
+        {
+          "end_time": null,
+          "id": "RHYvPaEBERDGWPLCA5Ww",
+          "start_time": 1792027853744,
+          "state": "ACTIVE",
+          "trigger_id": "capstone-observation-match-v1"
+        }
+      ],
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 30
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 30,
+          "duplicate_documents": 15,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027855203,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true,
+      "step": "fresh_client_readback"
+    },
+    {
+      "alerts": [
+        {
+          "end_time": 1792027855769,
+          "id": "RHYvPaEBERDGWPLCA5Ww",
+          "start_time": 1792027853744,
+          "state": "COMPLETED",
+          "trigger_id": "capstone-observation-match-v1"
+        },
+        {
+          "end_time": null,
+          "id": "YXYvPaEBERDGWPLCC5WZ",
+          "start_time": 1792027855769,
+          "state": "ACTIVE",
+          "trigger_id": "capstone-observation-unavailable-v1"
+        }
+      ],
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 31
+        },
+        "metric": {
+          "cross_source_services": -1,
+          "documents": -1,
+          "duplicate_documents": -1,
+          "match": false,
+          "matched_services": -1,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "identity_conflict",
+          "repeat_services": -1,
+          "services": -1,
+          "unique_events": -1,
+          "valid": false
+        },
+        "observation_match": false,
+        "observation_unavailable": true,
+        "period_end_epoch_ms": 1792027855683,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true,
+      "step": "identity_conflict"
+    },
+    {
+      "alerts": [
+        {
+          "end_time": 1792027855769,
+          "id": "RHYvPaEBERDGWPLCA5Ww",
+          "start_time": 1792027853744,
+          "state": "COMPLETED",
+          "trigger_id": "capstone-observation-match-v1"
+        },
+        {
+          "end_time": 1792027856501,
+          "id": "YXYvPaEBERDGWPLCC5WZ",
+          "start_time": 1792027855769,
+          "state": "COMPLETED",
+          "trigger_id": "capstone-observation-unavailable-v1"
+        },
+        {
+          "end_time": null,
+          "id": "aHYvPaEBERDGWPLCDpV2",
+          "start_time": 1792027856501,
+          "state": "ACTIVE",
+          "trigger_id": "capstone-observation-match-v1"
+        }
+      ],
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 0,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027856403,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true,
+      "step": "same_events_after_unavailable"
+    }
+  ],
+  "monitor_id": "PXYvPaEBERDGWPLCApUW",
+  "mutations": [
+    {
+      "http_status": 200,
+      "method": "PUT",
+      "operation": "create_test_index",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e",
+      "request_sha256": "8f1b04bece63e892798a90b5f0ea7722dddf8c560a7aa8e9b6e9cbed12ad18ab",
+      "response_sha256": "e0a24d9bbe5c0a448cb72d5cd9d3c0c660edf3150ebfcd43e047b477852d1441",
+      "started_at_epoch_ms": 1792027846757
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "1e9d14fcfb492685ebeb66a4b6bbee3e6228912c356511ba7a78413c7822db7b",
+      "started_at_epoch_ms": 1792027847223
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "c82cbe9068fb520a07b6f7464d6c8f5127c208e09b936dca87091e43e1f48c54",
+      "response_sha256": "a5b4c93aa34b4e56477fd81c2f35d14a56532333715a9d7bab4393595d58292f",
+      "started_at_epoch_ms": 1792027847345
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027847343ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "e65fb6f82732ad607905e0941f51decbcccfb2e97d1c9cb9bb94a65d4706618a",
+      "started_at_epoch_ms": 1792027847466
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "b07ed500eb8a4ee0b241169f20808583b66e844d6d547d8edd4be6c51ac571ee",
+      "started_at_epoch_ms": 1792027847709
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "4b25508222f5183aa087f1afddb263803b69e101fa9840809b834ccefa579b28",
+      "response_sha256": "773bf3bba24dfcbbe15388c196c45baf60d2fe2ce837dea8f746615e800c3007",
+      "started_at_epoch_ms": 1792027847831
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027847829ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "859bd1e76fb88ad06d615b1f0f8346bd7964cad8b9e7f1f09dbe5c9fe3ee6053",
+      "started_at_epoch_ms": 1792027847952
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "7b45dee23fd1457ebfadd00c8e525720e7885fa142290b711970ee8337663cac",
+      "started_at_epoch_ms": 1792027848195
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "e1767454658320acba2e3afa8ed629fe50386875eb77b0c08a005a5a6cd66d97",
+      "response_sha256": "729bdf329680a59d1efb4948d206fdd81248f6913701ebdc3814f403af134da4",
+      "started_at_epoch_ms": 1792027848318
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027848316ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "4ab9f161fc110bce916c787d5900ca875cf62da76d3abebc302aa909f571e342",
+      "started_at_epoch_ms": 1792027848439
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "5b4ff7d9e44e4847be562a34550ac21b15180e1e775b15891441b28482f8ecc0",
+      "started_at_epoch_ms": 1792027848682
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "695b1f6607b34c05da7f3c95141c5fac48321863d06edbfb94fd25c83cc70ef8",
+      "response_sha256": "1afb29db5eb5e185ffc167a495e558e25636646f313e2859ba6fd1ea98981aeb",
+      "started_at_epoch_ms": 1792027848806
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027848803ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "3b14cd27a08e6bc9b4e4d2bf8439618bc6e616c3b6e94e27b7bfe6482d63382e",
+      "started_at_epoch_ms": 1792027848927
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "53b2af4824b690e11a0c0656959877ffda17f95872423dd5782fe626dae2da9c",
+      "started_at_epoch_ms": 1792027849169
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "45d7463b251fedefbf2768d422e5345f8bd9d898a5ec955bfaac0fae79f3bc23",
+      "response_sha256": "575d32f3f4ae38eca252df70b9d20ee29e2797764389114403bc2ae4370d02d4",
+      "started_at_epoch_ms": 1792027849294
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027849290ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "baf3e83c3415538c12e34f85a1bf08bd88dc8f297dcc0dc555563a1ff2d323df",
+      "started_at_epoch_ms": 1792027849415
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "de51d50648bba88d0586fe94138682e7c8693ed471b4e16f6fdf677c76f5a6fc",
+      "started_at_epoch_ms": 1792027849658
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "6cb7bf52eb3ce54d4843f37c6801434aa63d959547354fbd9a00c01d4e44ed88",
+      "response_sha256": "232b511ce06e389ab8fcff011787463dc48fd6b5d0de64823e49ab6b74832aa8",
+      "started_at_epoch_ms": 1792027849784
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027849780ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "476cb0cff39c71045a47f382351b6a129a9f2d927fe1fdbde33893a0ff0efe05",
+      "started_at_epoch_ms": 1792027849905
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "b07ed500eb8a4ee0b241169f20808583b66e844d6d547d8edd4be6c51ac571ee",
+      "started_at_epoch_ms": 1792027850147
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "de46413c01c74fe4467692d0b28e85dc40f88466bfa2e16ea2483c4d15466227",
+      "response_sha256": "0412f848575668377fcbaa4d7ceecda8a789e3005c1ee5e1254a0cd93ae292b9",
+      "started_at_epoch_ms": 1792027850272
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027850267ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "2088f3639cd1e729cff4994db67e61eaa95487b265b7f20f80632977294df0f9",
+      "started_at_epoch_ms": 1792027850400
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "de51d50648bba88d0586fe94138682e7c8693ed471b4e16f6fdf677c76f5a6fc",
+      "started_at_epoch_ms": 1792027850644
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "eda45788c2b8ed94d4b42909e1868b0830eff6ad553b609688a984da40e50421",
+      "response_sha256": "80d2f65677a739f80fcb55c5cfb8fbc525674bf88c82f253b4a3fd95a7ed3946",
+      "started_at_epoch_ms": 1792027850771
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027850766ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "658bf0f4aa5e19cfdab3833c64719ba834d1c82e5c15ec37cf2fb8e5335fd4c7",
+      "started_at_epoch_ms": 1792027850892
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "de51d50648bba88d0586fe94138682e7c8693ed471b4e16f6fdf677c76f5a6fc",
+      "started_at_epoch_ms": 1792027851138
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "53e916a83f8b88da18c0fa39a72f69d9cae7ea7fdbb6bd675630f6de15f3f2c3",
+      "response_sha256": "4698e74bf9b68afb3a365adce41d1aebc83dca675a1467f38722ceed42d0190b",
+      "started_at_epoch_ms": 1792027851267
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027851261ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "12569410afeeef9e1610a5ef96e82f5ef19e8276d92a56165b9c3bc13962843d",
+      "started_at_epoch_ms": 1792027851388
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "b07ed500eb8a4ee0b241169f20808583b66e844d6d547d8edd4be6c51ac571ee",
+      "started_at_epoch_ms": 1792027851630
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "9b2e86f4889f24ece78cdfd68fd1b14b5b8865ed6c91598521deecacdea6aefb",
+      "response_sha256": "7ae966f3e6e8fa3fe4718b3b0c7b17f492f6191f338dedf8ca55f98901a0645e",
+      "started_at_epoch_ms": 1792027851763
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027851753ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "ef471cd2e9c66e7e3b24bba4199db04bc253254a46250f9ac8aa24d677982087",
+      "started_at_epoch_ms": 1792027851886
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "e8f47a0d785e6281a71d9b3df00b07c4166ce87f4122f1cade81b2e07baea0fa",
+      "started_at_epoch_ms": 1792027852131
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "43c6a8c8af304d75d29b008b461f6195022d983e4a56b167ddb2b2b176295834",
+      "response_sha256": "cb5e6b9d52571ec6d444e0f8258e3533804554f390b89f7c8925471f8c2914f0",
+      "started_at_epoch_ms": 1792027852262
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027852255ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "1626c56a22057f5a2acaa0d16223e0561706c6cd231535b5ec16662da21516ad",
+      "started_at_epoch_ms": 1792027852384
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "bf4ff14a4c52e87c2a8ae124b0ef475d4b616e60d3cc092e40cd938052660971",
+      "started_at_epoch_ms": 1792027852628
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_age",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "2463cb8574e9d8dd8ac34ae16661645d7c1a44926db683584eb860f4085131c8",
+      "response_sha256": "9c8eff402ab0129191466148a8ab249ede8861e0cd2969693d47749976c4a4ab",
+      "started_at_epoch_ms": 1792027852758
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027852750ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "6f25991a7ea83c7eee8b2eedeea163b3d03b16d3bee06c0faf9534a7e06eb289",
+      "started_at_epoch_ms": 1792027852880
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "b07ed500eb8a4ee0b241169f20808583b66e844d6d547d8edd4be6c51ac571ee",
+      "started_at_epoch_ms": 1792027853122
+    },
+    {
+      "http_status": 201,
+      "method": "POST",
+      "operation": "save_disabled_test_monitor",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "0179d6c33f262322782bb57d199799f760ca10ed0cf8e4a2e1ea62d3cf9eb53f",
+      "started_at_epoch_ms": 1792027853244
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_first",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "2946eebfd38ceb9682eba30b6dcb8dacf4dd7a8f9e1a0d9934f0700b59afaf0b",
+      "response_sha256": "27d7c5acf95471edef47e819081d2b1ba3df89c67603a5da70a07554f6422201",
+      "started_at_epoch_ms": 1792027853537
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "execute_saved_disabled_monitor",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/PXYvPaEBERDGWPLCApUW/_execute?period_end=1792027853657ms",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "9b7c5ec4ca395a25c100c9536d3deea711ded145e1b6d6667ef3d9fdde1ff517",
+      "started_at_epoch_ms": 1792027853658
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_replay",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "dbcf485b67c357d4a0fbff48a8eebe7db45cc68e1d9f35acc9ac3e5f7fb15efc",
+      "response_sha256": "5287717bb36729c8ba04485bcf74aa052325ee2118adc0e26fe46142386cb938",
+      "started_at_epoch_ms": 1792027854020
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "execute_saved_disabled_monitor",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/PXYvPaEBERDGWPLCApUW/_execute?period_end=1792027854141ms",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "f3cda6a031f2ab4898f07ddc31bd4c3314000c07193b5cfa18998d6599ca4cec",
+      "started_at_epoch_ms": 1792027854141
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "execute_saved_disabled_monitor",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/PXYvPaEBERDGWPLCApUW/_execute?period_end=1792027855203ms",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "08153002384d69dd886cea66f7b745f2c51badc3feddb83d5d2518a488114597",
+      "started_at_epoch_ms": 1792027855203
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_conflict",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "c1610f92544df8ceec8d5c82987e7963ae54a63119149a61915f02e53cc9edab",
+      "response_sha256": "9db534114e96e8d448c307766c82396e72b6287e03c306000f2dc08d863aa4c4",
+      "started_at_epoch_ms": 1792027855562
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "execute_saved_disabled_monitor",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/PXYvPaEBERDGWPLCApUW/_execute?period_end=1792027855683ms",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "07126a3df7d06aed26149dc3c1d701e1cce83aa08a8c4b58101c0c73073a1d71",
+      "started_at_epoch_ms": 1792027855683
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "3c3880c11b65df0aa40f6c1cdde3cac40ce9bbe1afe7cdda4984b9a9c4e3f3a5",
+      "started_at_epoch_ms": 1792027856159
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_restored",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=true",
+      "request_sha256": "4b630023ff85b95323716ab311003b84d00c1e97ec4432268fc3ff621e9872f3",
+      "response_sha256": "50d1be53ef0c1b879ebaa85ecd79447beda5b09b5864d2ce6b6acc132efa4f23",
+      "started_at_epoch_ms": 1792027856282
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "execute_saved_disabled_monitor",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/PXYvPaEBERDGWPLCApUW/_execute?period_end=1792027856403ms",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "f85b32f8101338db92de49c306aac4f78fb10d3356217cb4b0879e7acd5d38cb",
+      "started_at_epoch_ms": 1792027856403
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "clear_owned_synthetic_documents",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_delete_by_query?refresh=true",
+      "request_sha256": "baa6846b65b050d71831bb2e4cd6e6f1593902f6d82b16a6c1f9979d14cfcd12",
+      "response_sha256": "0b28665cd5b7cca88608e524f2e5fe06a7087871a4e82900d8e9571abc27cf07",
+      "started_at_epoch_ms": 1792027856878
+    },
+    {
+      "http_status": 200,
+      "method": "PUT",
+      "operation": "disable_refresh_owned_test_index_only",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_settings",
+      "request_sha256": "7157c0958effbd934dc87945164f75fa3d8d13c0557b3377c1008ab668b85f6c",
+      "response_sha256": "d06de181e00f95b13dba28fafee631cbb8e0a3cc44387a783b766df3bf0feb5e",
+      "started_at_epoch_ms": 1792027857120
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "synthetic_bulk_delayed",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_bulk?refresh=false",
+      "request_sha256": "b0c75229c4b318f5405e6e69beba6b0ea60addeb41e5025d662d81088da85a96",
+      "response_sha256": "68844c98014755c329bb068b39ef9ec0b091a212c48c27ee5a5c528174853df2",
+      "started_at_epoch_ms": 1792027857244
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "publish_owned_synthetic_index_after_130s",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e/_refresh",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "bf1b2dc3a37dd86da47f0b23fb36de8d6670c28973946598ce376bb9fb5ac253",
+      "started_at_epoch_ms": 1792027987601
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792027987841ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "9d82f2ba1b1b91802952f464b70d92e74bf4c619138edd15be6dd46512ef3cd9",
+      "started_at_epoch_ms": 1792027987841
+    },
+    {
+      "http_status": 200,
+      "method": "POST",
+      "operation": "inline_native_dryrun",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/_execute?dryrun=true&period_end=1792028167967ms",
+      "request_sha256": "3d896a2c713027e86fbaebb4d7062eab1aa4785bce0049897881ce33ab85086f",
+      "response_sha256": "6fab0d36572762b317373b78803acf072d1eb9f318d797c0a5b72b541f0fbe66",
+      "started_at_epoch_ms": 1792028167968
+    },
+    {
+      "http_status": 200,
+      "method": "DELETE",
+      "operation": "delete_owned_test_monitor",
+      "outcome": "response_received",
+      "path": "/_plugins/_alerting/monitors/PXYvPaEBERDGWPLCApUW",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "931089eb3ee35e3ea53c34c39fa6e0ff8df072af91ee9551c8cc33e7f8c3ca79",
+      "started_at_epoch_ms": 1792028168351
+    },
+    {
+      "http_status": 200,
+      "method": "DELETE",
+      "operation": "delete_owned_test_index",
+      "outcome": "response_received",
+      "path": "/capstone-test-indexer-delay-20261015-b344e799f7d34c9bbb6e0d1d9416090e",
+      "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "response_sha256": "d06de181e00f95b13dba28fafee631cbb8e0a3cc44387a783b766df3bf0feb5e",
+      "started_at_epoch_ms": 1792028168707
+    }
+  ],
+  "policy": "indexer-delay-audit-v1",
+  "production_inputs_written": false,
+  "production_service_restart_performed": false,
+  "query_cases": [
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 15,
+        "duplicate_documents": 0,
+        "match": true,
+        "matched_services": 3,
+        "reason": "ok",
+        "repeat_services": 3,
+        "services": 3,
+        "unique_events": 15,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "three_groups_five_unique",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 0,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027847343,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 12,
+        "duplicate_documents": 0,
+        "match": false,
+        "matched_services": 0,
+        "reason": "ok",
+        "repeat_services": 0,
+        "services": 3,
+        "unique_events": 12,
+        "valid": true
+      },
+      "loaded_documents": 12,
+      "name": "three_groups_four_unique",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 12
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 12,
+          "duplicate_documents": 0,
+          "match": false,
+          "matched_services": 0,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 0,
+          "services": 3,
+          "unique_events": 12,
+          "valid": true
+        },
+        "observation_match": false,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027847829,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 15,
+        "duplicate_documents": 9,
+        "match": false,
+        "matched_services": 0,
+        "reason": "ok",
+        "repeat_services": 0,
+        "services": 3,
+        "unique_events": 6,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "false_repeat_four_a_one_b",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 9,
+          "match": false,
+          "matched_services": 0,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 0,
+          "services": 3,
+          "unique_events": 6,
+          "valid": true
+        },
+        "observation_match": false,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027848316,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 30,
+        "duplicate_documents": 15,
+        "match": true,
+        "matched_services": 3,
+        "reason": "ok",
+        "repeat_services": 3,
+        "services": 3,
+        "unique_events": 15,
+        "valid": true
+      },
+      "loaded_documents": 30,
+      "name": "same_events_different_index_document_ids",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 30
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 30,
+          "duplicate_documents": 15,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027848803,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 15,
+        "duplicate_documents": 0,
+        "match": true,
+        "matched_services": 3,
+        "reason": "ok",
+        "repeat_services": 3,
+        "services": 3,
+        "unique_events": 15,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "event_age_120s_processing_now",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 0,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027849290,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 15,
+        "duplicate_documents": 0,
+        "match": true,
+        "matched_services": 3,
+        "reason": "ok",
+        "repeat_services": 3,
+        "services": 3,
+        "unique_events": 15,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "event_age_300s_processing_now",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 0,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027849780,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 0,
+        "duplicate_documents": 0,
+        "match": false,
+        "matched_services": 0,
+        "reason": "ok",
+        "repeat_services": 0,
+        "services": 0,
+        "unique_events": 0,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "event_age_1800s_processing_now",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 0
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 0,
+          "duplicate_documents": 0,
+          "match": false,
+          "matched_services": 0,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 0,
+          "services": 0,
+          "unique_events": 0,
+          "valid": true
+        },
+        "observation_match": false,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027850267,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 15,
+        "duplicate_documents": 0,
+        "match": true,
+        "matched_services": 3,
+        "reason": "ok",
+        "repeat_services": 3,
+        "services": 3,
+        "unique_events": 15,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "processing_age_120s_event_recent",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 0,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027850766,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 15,
+        "duplicate_documents": 0,
+        "match": true,
+        "matched_services": 3,
+        "reason": "ok",
+        "repeat_services": 3,
+        "services": 3,
+        "unique_events": 15,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "processing_age_300s_event_recent",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 15
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 15,
+          "duplicate_documents": 0,
+          "match": true,
+          "matched_services": 3,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 3,
+          "services": 3,
+          "unique_events": 15,
+          "valid": true
+        },
+        "observation_match": true,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027851261,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 0,
+        "duplicate_documents": 0,
+        "match": false,
+        "matched_services": 0,
+        "reason": "ok",
+        "repeat_services": 0,
+        "services": 0,
+        "unique_events": 0,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "processing_age_1800s_event_recent",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 0
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 0,
+          "duplicate_documents": 0,
+          "match": false,
+          "matched_services": 0,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 0,
+          "services": 0,
+          "unique_events": 0,
+          "valid": true
+        },
+        "observation_match": false,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027851753,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 0,
+        "duplicate_documents": 0,
+        "match": false,
+        "matched_services": 0,
+        "reason": "ok",
+        "repeat_services": 0,
+        "services": 0,
+        "unique_events": 0,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "event_older_than_300s_by_one_microsecond",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 0
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 0,
+          "duplicate_documents": 0,
+          "match": false,
+          "matched_services": 0,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 0,
+          "services": 0,
+          "unique_events": 0,
+          "valid": true
+        },
+        "observation_match": false,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027852255,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    },
+    {
+      "expected": {
+        "cross_source_services": 0,
+        "documents": 0,
+        "duplicate_documents": 0,
+        "match": false,
+        "matched_services": 0,
+        "reason": "ok",
+        "repeat_services": 0,
+        "services": 0,
+        "unique_events": 0,
+        "valid": true
+      },
+      "loaded_documents": 15,
+      "name": "historical_marker_is_excluded",
+      "observed": {
+        "hits": {
+          "relation": "eq",
+          "value": 0
+        },
+        "metric": {
+          "cross_source_services": 0,
+          "documents": 0,
+          "duplicate_documents": 0,
+          "match": false,
+          "matched_services": 0,
+          "policy": "event-window-v2",
+          "precision": "microseconds",
+          "reason": "ok",
+          "repeat_services": 0,
+          "services": 0,
+          "unique_events": 0,
+          "valid": true
+        },
+        "observation_match": false,
+        "observation_unavailable": false,
+        "period_end_epoch_ms": 1792027852750,
+        "shards": {
+          "failed": 0,
+          "skipped": 0,
+          "successful": 2,
+          "total": 2
+        },
+        "terminated_early": false
+      },
+      "passed": true
+    }
+  ],
+  "schema_version": 1,
+  "source_sha256": {
+    "fixtures.py": "3452610c790c8ca9b03d41d303c8c5f7f6d10b286f75e3b5da45a1ad956b3bcc",
+    "monitor.json": "acc8ac9649cc8b974872a30cf4bcc8f2e52adf0caf56ed197e8b95066d657c7f",
+    "native-verify-b.py": "4d596e890b32299b1a0a06eb39caa4e7386c3d3557954bcfd9ecc1dcb0304d3e"
+  },
+  "sources_unchanged": true,
+  "started_at_epoch_ms": 1792027846731,
+  "status": "passed",
+  "strict_tls": true,
+  "timed": {
+    "actual_service_outage": false,
+    "after_evaluation_gap": {
+      "hits": {
+        "relation": "eq",
+        "value": 0
+      },
+      "metric": {
+        "cross_source_services": 0,
+        "documents": 0,
+        "duplicate_documents": 0,
+        "match": false,
+        "matched_services": 0,
+        "policy": "event-window-v2",
+        "precision": "microseconds",
+        "reason": "ok",
+        "repeat_services": 0,
+        "services": 0,
+        "unique_events": 0,
+        "valid": true
+      },
+      "observation_match": false,
+      "observation_unavailable": false,
+      "period_end_epoch_ms": 1792028167967,
+      "shards": {
+        "failed": 0,
+        "skipped": 0,
+        "successful": 2,
+        "total": 2
+      },
+      "terminated_early": false
+    },
+    "after_refresh": {
+      "hits": {
+        "relation": "eq",
+        "value": 15
+      },
+      "metric": {
+        "cross_source_services": 0,
+        "documents": 15,
+        "duplicate_documents": 0,
+        "match": true,
+        "matched_services": 3,
+        "policy": "event-window-v2",
+        "precision": "microseconds",
+        "reason": "ok",
+        "repeat_services": 3,
+        "services": 3,
+        "unique_events": 15,
+        "valid": true
+      },
+      "observation_match": true,
+      "observation_unavailable": false,
+      "period_end_epoch_ms": 1792027987841,
+      "shards": {
+        "failed": 0,
+        "skipped": 0,
+        "successful": 2,
+        "total": 2
+      },
+      "terminated_early": false
+    },
+    "evaluation_gap_seconds": 180.243,
+    "passed": true,
+    "phase": "completed",
+    "production_monitor_paused": false,
+    "underlying_visible_documents": 15,
+    "valid_empty_does_not_prove_coverage": true,
+    "visibility_delay_seconds": 130.357
+  },
+  "timed_requested": true,
+  "uncertain_mutations": [],
+  "v1_comparison": []
+}

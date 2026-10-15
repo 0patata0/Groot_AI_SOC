@@ -1,0 +1,83 @@
+{
+  "scope": "2026-10-14 Imperva exception, evidence/Indexer observation and bounded history preservation final archive and cleanup",
+  "permanent_source_a": {
+    "at": "2026-10-14T06:29:06.792149+09:00",
+    "machine_id": "096e90b6243e438aa8a7b392be754732",
+    "source_files_verified": 236,
+    "archive_files_updated": 115,
+    "all_sha_match": true,
+    "source_bytes": 1141760,
+    "project_root": "/opt/capstone-automation/project",
+    "operational_configs_changed": false,
+    "root_verification_files_preserved": 5
+  },
+  "permanent_source_b": {
+    "at": "2026-10-14T06:29:08.356225+09:00",
+    "machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+    "source_files_verified": 236,
+    "archive_files_updated": 115,
+    "all_sha_match": true,
+    "source_bytes": 1141760,
+    "project_root": "/opt/capstone-automation/project",
+    "operational_configs_changed": false,
+    "root_verification_files_preserved": 8
+  },
+  "server_cleanup_a": {
+    "at": "2026-10-14T06:30:06.861707+09:00",
+    "host": "a",
+    "source_files_verified": 236,
+    "source_and_evidence_sha_verified": true,
+    "packages_installed_on_mac": 0,
+    "history_batch_preserved": true,
+    "temporary_regular_files_removed": 349,
+    "temporary_bytes_removed": 1911222,
+    "temporary_path_absent": true,
+    "services_after_cleanup": {
+      "capstone-vector.service": "active",
+      "wazuh-agent.service": "active",
+      "capstone-vector-maintenance.timer": "active",
+      "rule-change-worker.timer": "active"
+    }
+  },
+  "server_cleanup_b": {
+    "at": "2026-10-14T06:30:05.283101+09:00",
+    "host": "b",
+    "source_files_verified": 236,
+    "source_and_evidence_sha_verified": true,
+    "packages_installed_on_mac": 0,
+    "permanent_source_monitor_inspect_passed": true,
+    "temporary_regular_files_removed": 370,
+    "temporary_bytes_removed": 1631787,
+    "temporary_path_absent": true,
+    "services_after_cleanup": {
+      "capstone-hermes-guard-reapply.timer": "active",
+      "capstone-hermes-guard-observe.service": "active",
+      "rule-change-worker.timer": "active"
+    }
+  },
+  "mac_cleanup": {
+    "at": "2026-10-14T06:30:46.154909+09:00",
+    "task_temporary_regular_files_removed": 392,
+    "task_temporary_bytes_removed": 1626573,
+    "mac_packages_installed": 0,
+    "task_temporary_path_absent": true,
+    "infra_package_or_bytecode_files": []
+  },
+  "separately_reported_agent_cleanup": {
+    "monitor_scripts_removed": 8,
+    "vector_files_removed": 9,
+    "vector_directory_removed": 1,
+    "included_in_parent_counts": false
+  },
+  "preserved": [
+    "Operational rule/config files and services",
+    "Root-only rollback backups",
+    "A previous-boot closed batch",
+    "A/B permanent source and validation evidence",
+    "B enabled monitor/state"
+  ],
+  "limitations": [
+    "Cleanup proves absence of this task's temporary directory only; pre-existing user caches were not removed",
+    "Final cleanup summary was written locally after the 236-file archive; each server also stores its own cleanup.json"
+  ]
+}

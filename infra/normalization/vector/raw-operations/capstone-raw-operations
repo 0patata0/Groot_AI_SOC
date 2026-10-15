@@ -1,0 +1,17 @@
+#!/bin/bash
+# Fixed administrator entrypoint. Not granted to the LLM/MCP user.
+set -euo pipefail
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C TZ=UTC
+umask 077
+[[ $EUID == 0 && $OSTYPE == linux* && $# == 2 &&
+   $1 =~ ^(check|run|resume|force)$ && $2 =~ ^(suricata|modsecurity)$ &&
+   $(/usr/bin/cat /etc/machine-id) == 096e90b6243e438aa8a7b392be754732 ]] || exit 77
+library=/usr/local/lib/capstone-raw-operations
+for path in /usr /usr/local /usr/local/lib "$library"; do
+    [[ -d $path && ! -L $path && $(/usr/bin/stat -c %u "$path") == 0 ]] || exit 77
+    (( (8#$(/usr/bin/stat -c %a "$path") & 0022)==0 )) || exit 77
+done
+[[ -f $library/coordinator.sh && ! -L $library/coordinator.sh &&
+   $(/usr/bin/stat -c %u:%g:%a:%h "$library/coordinator.sh") == 0:0:400:1 ]] || exit 77
+exec /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin LC_ALL=C TZ=UTC \
+    /bin/bash --noprofile --norc "$library/coordinator.sh" "$1" "$2"

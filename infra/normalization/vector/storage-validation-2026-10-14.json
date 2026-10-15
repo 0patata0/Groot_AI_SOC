@@ -1,0 +1,27 @@
+{
+  "date_kst": "2026-10-14",
+  "host": "A",
+  "controlled_rotation": {
+    "started_at_kst": "2026-10-14T02:51:11+09:00",
+    "elapsed_seconds": 85,
+    "closed_writer_bytes": 493119,
+    "archive_sha256_matches_closed_writer": true,
+    "old_inode_identity": "64512:417631",
+    "new_inode_identity": "64512:415848",
+    "archive_mode": "0600",
+    "vector_active": true,
+    "agent_active": true,
+    "timer_active": true,
+    "automatic_restart_count": 0,
+    "recovery_pending": false
+  },
+  "guard_checks": {
+    "direct_prepare_without_parent_exit": 77,
+    "concurrent_deployment_lock_exit": 75,
+    "refusals_preserved_vector_pid_and_invocation": true
+  },
+  "native_checks": ["bash -n", "logrotate --debug", "systemd-analyze verify"],
+  "reapply_changed": 0,
+  "scope": "Local file rotation and logical reader checkpoint only; no durable remote receipt or power-loss guarantee.",
+  "raw_rotation_changed": false
+}

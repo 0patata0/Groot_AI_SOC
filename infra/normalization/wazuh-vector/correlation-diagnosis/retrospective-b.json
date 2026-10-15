@@ -1,0 +1,357 @@
+{
+  "checked_at_kst": "2026-10-14T12:48:23+09:00",
+  "kind": "correlation_old_runs_readonly_retrospective",
+  "runs": [
+    {
+      "run_id": "5f54ed9eb8c9fdd4586cfb97fd4f6cdd",
+      "indexer_count": 1,
+      "indexer_rule_ids": [
+        "100293"
+      ],
+      "indexer_records": [
+        {
+          "rule_id": "100293",
+          "level": 3,
+          "event_id": "0000000000000000000000000000000000000000000000000000000000000005"
+        }
+      ],
+      "indexer_shards": {
+        "total": 57,
+        "successful": 57,
+        "skipped": 0,
+        "failed": 0
+      },
+      "indexer_total_relation": "eq",
+      "indexer_timed_out": false,
+      "indexer_all_returned": true,
+      "strict_ca_and_hostname_validation": true,
+      "exact_agent_location_kind_run": true,
+      "bounded_manager_count": 1,
+      "bounded_manager_rule_ids": [
+        "100293"
+      ],
+      "bounded_manager_records": [
+        {
+          "rule_id": "100293",
+          "level": 3,
+          "event_id": "0000000000000000000000000000000000000000000000000000000000000005"
+        }
+      ],
+      "manager_indexer_records_equal_in_current_scope": true
+    },
+    {
+      "run_id": "96803cd646c5fb8e85833f2cb859b267",
+      "indexer_count": 2,
+      "indexer_rule_ids": [
+        "100293",
+        "100294"
+      ],
+      "indexer_records": [
+        {
+          "rule_id": "100293",
+          "level": 3,
+          "event_id": "0000000000000000000000000000000000000000000000000000000000000005"
+        },
+        {
+          "rule_id": "100294",
+          "level": 3,
+          "event_id": "0000000000000000000000000000000000000000000000000000000000000002"
+        }
+      ],
+      "indexer_shards": {
+        "total": 57,
+        "successful": 57,
+        "skipped": 0,
+        "failed": 0
+      },
+      "indexer_total_relation": "eq",
+      "indexer_timed_out": false,
+      "indexer_all_returned": true,
+      "strict_ca_and_hostname_validation": true,
+      "exact_agent_location_kind_run": true,
+      "bounded_manager_count": 2,
+      "bounded_manager_rule_ids": [
+        "100293",
+        "100294"
+      ],
+      "bounded_manager_records": [
+        {
+          "rule_id": "100293",
+          "level": 3,
+          "event_id": "0000000000000000000000000000000000000000000000000000000000000005"
+        },
+        {
+          "rule_id": "100294",
+          "level": 3,
+          "event_id": "0000000000000000000000000000000000000000000000000000000000000002"
+        }
+      ],
+      "manager_indexer_records_equal_in_current_scope": true
+    }
+  ],
+  "manager_scope": {
+    "path": "current alerts.json",
+    "last_max_rows": 10000,
+    "byte_limit": 16777216,
+    "rows_read": 528,
+    "bytes_read": 540348,
+    "does_not_prove_lifetime_absence": true
+  },
+  "installed_global_configuration": {
+    "logall": [
+      "no"
+    ],
+    "logall_json": [
+      "no"
+    ],
+    "jsonout_output": [
+      "yes"
+    ],
+    "alerts_log": [
+      "yes"
+    ]
+  },
+  "configuration_sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+  "configuration_unchanged_during_read": true,
+  "runtime_setting_confirmation": "installed ossec.conf only; no restart or runtime reconfiguration",
+  "archives_metadata": [
+    {
+      "relative_path": "2026/Oct/ossec-archive-04.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791158411.0146584530"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-04.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791158411.0146584530"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-08.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791504011.2566772850"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-07.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791417610.6383288520"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-02.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1790985611.0583357330"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-12.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791849611.0811076290"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-01.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1790899211.2746012710"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-06.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791331210.9386026290"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-06.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791331210.9386026290"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-02.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1790985611.0583357330"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-10.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791676810.6058847030"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-01.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1790899211.2746012710"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-12.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791849611.0811076290"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-05.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791244811.4643528630"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-10.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791676810.6058847030"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-03.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791072010.5760022070"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-08.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791504011.2566772850"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-07.log.sum",
+      "bytes": 638,
+      "mtime_epoch": "1791417610.6383288520"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-09.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791590410.9259647440"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-11.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791763211.3841830860"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-07.log.gz",
+      "bytes": 20,
+      "mtime_epoch": "1791417610.6383288520"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-03.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791072010.5760022070"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-11.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791763211.3841830860"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-05.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791244811.4643528630"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-14.log",
+      "bytes": 0,
+      "mtime_epoch": "1791936001.5642942100"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-13.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791936010.5410962140"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-13.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1791936010.5410962140"
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-09.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1791590410.9259647440"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-29.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1790726411.1676822400"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-28.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1790640010.9149307650"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-26.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1790467210.4367445380"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-28.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1790640010.9149307650"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-26.log.gz",
+      "bytes": 20,
+      "mtime_epoch": "1790467210.4367445380"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-30.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1790812811.1974422900"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-29.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1790726411.1676822400"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-26.json.sum",
+      "bytes": 393,
+      "mtime_epoch": "1790467210.4367445380"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-27.log.sum",
+      "bytes": 514,
+      "mtime_epoch": "1790553611.0275155920"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-30.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1790812811.1974422900"
+    },
+    {
+      "relative_path": "2026/Sep/ossec-archive-27.json.sum",
+      "bytes": 517,
+      "mtime_epoch": "1790553611.0275155920"
+    },
+    {
+      "relative_path": "archives.log",
+      "bytes": 0,
+      "mtime_epoch": "1791936001.5642942100"
+    }
+  ],
+  "archives_inventory_max_depth": 4,
+  "archives_content_read": false,
+  "archives_file_count": 40,
+  "archives_total_bytes": 18598,
+  "logall_and_logall_json_explicitly_disabled": true,
+  "historical_13_rows_reconstructability": "No individual receipt/order reconstruction is proven by current settings and metadata; no_log base records are absent from alerts; archives contents were not read.",
+  "rule_file_sha256": {
+    "local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+    "capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+  },
+  "rules_and_container_ids_unchanged": true,
+  "operational_input_write": false,
+  "configuration_or_service_change": false,
+  "indexer_write": false,
+  "raw_or_credentials_exported": false,
+  "current_archives_path_metadata": [
+    {
+      "relative_path": "archives.log",
+      "kind": "regular",
+      "resolved_regular_bytes": 0
+    },
+    {
+      "relative_path": "archives.json",
+      "kind": "absent",
+      "resolved_regular_bytes": null
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-14.log",
+      "kind": "regular",
+      "resolved_regular_bytes": 0
+    },
+    {
+      "relative_path": "2026/Oct/ossec-archive-14.json",
+      "kind": "absent",
+      "resolved_regular_bytes": null
+    }
+  ],
+  "current_date_archives_payload_available": false
+}

@@ -1,0 +1,281 @@
+{
+  "schema_version": "1",
+  "B_batch_preflight": {
+    "checked_at_kst": "2026-10-14T11:50:32+09:00",
+    "kind": "B_preserved_batch_and_canary_readonly_preflight",
+    "batches": [
+      {
+        "batch_id": "67f858b9c78551e3ca95cd3bc9948cf9ded19834d1e0d9d9f78b4bb4c95fd33a",
+        "records": 1000,
+        "message_strings": 1000,
+        "nft_selector_candidates": 0,
+        "non_target_kernel_records": 1000,
+        "payload_sha_verified": true,
+        "manifest_sha_verified": true
+      },
+      {
+        "batch_id": "bf58e25ad123f6d84c54b66ced22e186750c2328f67d59439b1bccb4c47fae68",
+        "records": 481,
+        "message_strings": 481,
+        "nft_selector_candidates": 0,
+        "non_target_kernel_records": 481,
+        "payload_sha_verified": true,
+        "manifest_sha_verified": true
+      }
+    ],
+    "total_records": 1481,
+    "total_nft_selector_candidates": 0,
+    "wazuh_active_response_blocks": 0,
+    "wazuh_integration_blocks": 0,
+    "log_alert_level": [
+      "3"
+    ],
+    "email_alert_level": [
+      "12"
+    ],
+    "canary_rule_ids": [
+      "100293",
+      "100294"
+    ],
+    "canary_level": 3,
+    "canary_no_email_and_no_full_log": true,
+    "soc_report_min_level": 5,
+    "soc_summary_min_level": 5,
+    "soc_monitor_default_min_level": 10,
+    "soc_bot_source_sha256": "8db6244c1cede29d9f3a154243fb8e53878281977a0bb9ab9b41c478308b52e1",
+    "vector_rules_sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+    "operational_input_written": false,
+    "indexer_write": false,
+    "raw_or_cursor_exported": false
+  },
+  "native_sequence_audit": {
+    "checked_at_kst": "2026-10-14T11:56:43+09:00",
+    "kind": "synthetic_canary_native_sequence_audit",
+    "profiles": [
+      {
+        "profile": "combined",
+        "input_rows": 13,
+        "phase1_rows": 13,
+        "rule_ids": [
+          100291,
+          100291,
+          100291,
+          100291,
+          100293,
+          100291,
+          100294,
+          100291,
+          100291,
+          100291,
+          100291,
+          100291
+        ]
+      },
+      {
+        "profile": "canary-repeat",
+        "input_rows": 5,
+        "phase1_rows": 5,
+        "rule_ids": [
+          100291,
+          100291,
+          100291,
+          100291,
+          100293
+        ]
+      },
+      {
+        "profile": "canary-cross",
+        "input_rows": 2,
+        "phase1_rows": 2,
+        "rule_ids": [
+          100291,
+          100294
+        ]
+      },
+      {
+        "profile": "canary-repeat-duplicate",
+        "input_rows": 5,
+        "phase1_rows": 5,
+        "rule_ids": [
+          100291,
+          100291,
+          100291,
+          100291,
+          100291
+        ]
+      },
+      {
+        "profile": "canary-historical",
+        "input_rows": 1,
+        "phase1_rows": 1,
+        "rule_ids": []
+      },
+      {
+        "profile": "reversed_cross",
+        "input_rows": 2,
+        "phase1_rows": 2,
+        "rule_ids": [
+          100292,
+          100291
+        ]
+      },
+      {
+        "profile": "cross_first",
+        "input_rows": 13,
+        "phase1_rows": 13,
+        "rule_ids": [
+          100291,
+          100294,
+          100291,
+          100291,
+          100291,
+          100291,
+          100293,
+          100291,
+          100291,
+          100291,
+          100291,
+          100291
+        ]
+      },
+      {
+        "profile": "duplicate_first",
+        "input_rows": 13,
+        "phase1_rows": 13,
+        "rule_ids": [
+          100291,
+          100291,
+          100291,
+          100291,
+          100291,
+          100291,
+          100291,
+          100291,
+          100291,
+          100293,
+          100291,
+          100294
+        ]
+      }
+    ],
+    "manager_container_unchanged": true,
+    "rule_files_unchanged": true,
+    "operational_input_written": false,
+    "indexer_write": false,
+    "raw_or_cursor_exported": false
+  },
+  "paced_canary": {
+    "checked_at_kst": "2026-10-14T12:00:39+09:00",
+    "kind": "selected_canary_evidence_readonly",
+    "run_id": "96803cd646c5fb8e85833f2cb859b267",
+    "expected_synthetic_rows_from_writer_contract": 13,
+    "manager_retained_tail_matches": 2,
+    "manager_search_scope": "current alerts.json last 10000 rows bounded 16MiB",
+    "indexer_documents": 2,
+    "indexer_shards": {
+      "total": 57,
+      "successful": 57,
+      "skipped": 0,
+      "failed": 0
+    },
+    "exact_total_relation": "eq",
+    "indexer_timed_out": false,
+    "exact_event_ids_match": true,
+    "expected_rule_ids": [
+      "100293",
+      "100294"
+    ],
+    "levels": [
+      3
+    ],
+    "strict_ca_and_hostname_validation": true,
+    "mounted_existing_client_identity": true,
+    "manager_and_indexer_container_ids_unchanged": true,
+    "rule_files_unchanged": true,
+    "logtest_location_and_single_rule_assertion_supported": true,
+    "operational_input_written_by_verifier": false,
+    "indexer_write": false,
+    "new_probe_generated_by_verifier": false,
+    "new_delivery_requires_separate_writer_evidence": true,
+    "raw_or_cursor_exported": false,
+    "writer_records": 13,
+    "writer_split_records": [
+      6,
+      7
+    ],
+    "writer_split_delay_seconds": 3,
+    "current_new_delivery_tested": true,
+    "writer_evidence_owner": "parent"
+  },
+  "retained_old_canary_attempt": {
+    "status": "not_verified",
+    "phase": "manager_retained_tail",
+    "operational_input_written": false,
+    "indexer_write": false
+  },
+  "burst_canary_strict_attempt": {
+    "status": "not_verified",
+    "phase": "indexer_search",
+    "operational_input_written": false,
+    "indexer_write": false
+  },
+  "actual_history_scope": {
+    "preserved_records": 1481,
+    "nft_selector_candidates_on_A_and_B": 0,
+    "Vector_real_normalized_outputs_on_A": 0,
+    "real_history_logtest_records": 0,
+    "real_history_indexer_ID_queries": 0,
+    "operational_history_reinjection": false,
+    "classification": "not_selected_by_current_nft_policy",
+    "all_general_kernel_semantics_proven_harmless": false,
+    "source_of_A_result": "infra/normalization/vector/history-replay/validation-2026-10-14.json"
+  },
+  "burst_canary_diagnostics": {
+    "run_id": "5f54ed9eb8c9fdd4586cfb97fd4f6cdd",
+    "writer_records": 13,
+    "manager_retained_tail_matches": 1,
+    "indexer_documents": 1,
+    "rule_ids": [
+      "100293"
+    ],
+    "event_id_suffix": "0005",
+    "level": 3,
+    "all_exact_agent_location_kind_run": true,
+    "indexer_shards": {
+      "total": 57,
+      "successful": 57,
+      "skipped": 0,
+      "failed": 0
+    },
+    "total_relation": "eq",
+    "timed_out": false,
+    "expected_canary_alerts": 2,
+    "expected_count_passed": false,
+    "observed_manager_to_indexer_documents_match": true,
+    "missing_second_alert_root_cause": "not_proven"
+  },
+  "aggregate_counters": {
+    "checked_at_kst": "2026-10-14T12:00:20+09:00",
+    "analysisd_events_dropped": 0,
+    "remoted_discarded_count": 0,
+    "remoted_dequeued_after_close": 0,
+    "all_observed_queue_usage_zero": true,
+    "configured_event_threads": 0,
+    "configured_rule_matching_threads": 0,
+    "individual_canary_ack": false,
+    "aggregate_snapshot_only": true
+  },
+  "limits": [
+    "Original 1481 records are outside the existing nft selector; no synthetic security event is substituted for them.",
+    "The isolated logtest session does not write production alerts or prove Indexer storage.",
+    "Paced canary success is one observation, not an ordering, exactly-once, loss-free, or durable transport ACK guarantee.",
+    "Burst canary expectation of two alerts failed at the manager; one observed alert was indexed correctly.",
+    "Aggregate drop counters of zero cannot identify or acknowledge an individual canary row.",
+    "The older retained canary lookup passed the exact Indexer stage but did not satisfy bounded current manager tail matching; no overall retained E2E claim is made."
+  ],
+  "source_sha256": {
+    "preflight-b.sh": "af4b93fff5c76c468faa561f95b22510ba19a34ee2bf73d33d81c5dad0ceb84f",
+    "verify-retained-canary-b.sh": "559af6e20e5d24d7664408ed2380ab2ba74c2d78365a14feed6f142e61e4527b",
+    "native-canary-b.sh": "de7e654f9a3691be1935513d8820944ece3c906b0877560a7508871578fbb65c"
+  }
+}

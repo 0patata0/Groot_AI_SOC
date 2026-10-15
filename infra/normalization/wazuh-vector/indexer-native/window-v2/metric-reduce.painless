@@ -1,0 +1,91 @@
+boolean boundedInteger(def value, long maximum) {
+    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;
+}
+boolean stableKey(def value) {
+    if (!(value instanceof String) || value.length() != 64) return false;
+    for (int i = 0; i < 64; ++i) {
+        int c = value.charAt(i);
+        if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102))) return false;
+    }
+    return true;
+}
+def unavailable(String reason) {
+    return ['policy': 'event-window-v2', 'precision': 'microseconds', 'valid': false,
+            'reason': reason, 'match': false, 'documents': -1L, 'unique_events': -1L,
+            'duplicate_documents': -1L, 'services': -1L, 'matched_services': -1L,
+            'repeat_services': -1L, 'cross_source_services': -1L];
+}
+try {
+    if (!(states instanceof List) || states.size() > 64) return unavailable('shard_limit');
+    long endMs = Long.parseLong(params.period_end);
+    if (endMs < 300000 || endMs > 9223372036854775L) return unavailable('record_invalid');
+    long endUs = endMs * 1000L;
+    long documents = 0L;
+    def unique = new HashMap();
+    def services = new HashMap();
+    for (def shard : states) {
+        // A shard with no matching documents may supply null.
+        if (shard == null) continue;
+        if (!(shard instanceof Map) || shard.size() != 4 || shard.valid != true) {
+            if (shard instanceof Map && shard.valid == false &&
+                (shard.reason == 'document_limit' || shard.reason == 'service_limit' || shard.reason == 'record_invalid')) {
+                return unavailable(shard.reason);
+            }
+            return unavailable('state_invalid');
+        }
+        if (shard.reason != 'ok' || !boundedInteger(shard.documents, 10000) ||
+            !(shard.rows instanceof List) || shard.rows.size() != shard.documents) return unavailable('state_invalid');
+        documents += shard.documents;
+        if (documents > 10000) return unavailable('document_limit');
+        for (def row : shard.rows) {
+            if (!(row instanceof List) || row.size() != 4 || !boundedInteger(row[0], endUs) ||
+                row[0] < endUs - 300000000L || (row[1] != 'suricata' && row[1] != 'nftables') ||
+                !stableKey(row[2]) || !(row[3] instanceof String) || row[3].length() != 64) return unavailable('record_invalid');
+            String identity = row[1] + ':' + row[2];
+            if (unique.containsKey(identity)) {
+                def previous = unique[identity];
+                if (previous[0] != row[0] || previous[3] != row[3]) return unavailable('identity_conflict');
+                continue;
+            }
+            unique[identity] = row;
+            if (!services.containsKey(row[3])) {
+                if (!stableKey(row[3])) return unavailable('record_invalid');
+                if (services.size() >= 100) return unavailable('service_limit');
+                services[row[3]] = new ArrayList();
+            }
+            services[row[3]].add(row);
+        }
+    }
+    long matched = 0L;
+    long repeat = 0L;
+    long cross = 0L;
+    for (def events : services.values()) {
+        events.sort((a, b) -> a[0] < b[0] ? -1 : (a[0] > b[0] ? 1 : 0));
+        int left = 0;
+        int suricata = 0;
+        int nftables = 0;
+        boolean repeated = false;
+        boolean crossed = false;
+        for (int right = 0; right < events.size(); ++right) {
+            def current = events[right];
+            if (current[1] == 'suricata') ++suricata; else ++nftables;
+            // Inclusive 60 seconds; 60.000001 seconds is outside the window.
+            while (current[0] - events[left][0] > 60000000L) {
+                if (events[left][1] == 'suricata') --suricata; else --nftables;
+                ++left;
+            }
+            if (suricata >= 5 || nftables >= 5) repeated = true;
+            if (suricata > 0 && nftables > 0) crossed = true;
+        }
+        if (repeated) ++repeat;
+        if (crossed) ++cross;
+        if (repeated || crossed) ++matched;
+    }
+    return ['policy': 'event-window-v2', 'precision': 'microseconds', 'valid': true,
+            'reason': 'ok', 'match': matched > 0, 'documents': documents,
+            'unique_events': (long)unique.size(), 'duplicate_documents': documents - unique.size(),
+            'services': (long)services.size(), 'matched_services': matched,
+            'repeat_services': repeat, 'cross_source_services': cross];
+} catch (Exception e) {
+    return unavailable('state_invalid');
+}

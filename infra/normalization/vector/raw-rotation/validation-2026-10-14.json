@@ -1,0 +1,163 @@
+{
+  "schema": "capstone-native-raw-rotation-validation-v1",
+  "date_kst": "2026-10-14",
+  "status": "passed",
+  "scope": "synthetic_existing_binaries_only",
+  "operating_rotator_deployed": false,
+  "manager_or_indexer_ack": false,
+  "forced_crash_or_power_loss_tested": false,
+  "local_validation": {
+    "shell_syntax": "passed",
+    "fixed_pcap_port_cases": 7,
+    "pcap_bytes_per_case": 86,
+    "packet_bytes_per_case": 46,
+    "temporary_fixture_files_removed": true,
+    "mac_packages_installed": false
+  },
+  "readonly_preflight": {
+    "suricata_version": "8.0.6",
+    "vector_version": "0.59.0",
+    "wazuh_version": "4.14.8",
+    "suricata_container_id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+    "suricata_main_host_pid": 1534179,
+    "wazuh_binary_sha256": "bd4e4c31e8846a6bc43f7ffc4b8eec7df312ee9d31b02ad69106c413144d4b21",
+    "wazuh_root_devino": "64512:411936",
+    "wazuh_queue_devino": "64512:411946",
+    "wazuh_private_library_files": 12,
+    "changes": false
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "runner_sha256": "f571961c5e5914b45d5e0370c4a57f4a81d402e24d630c886750e32a367572b3",
+      "status": "failed",
+      "phase": "initial_record",
+      "cause": "Invalid synthetic pcap tenant-id=0/delay=0 logged range errors; delay retained its 30-second default, beyond the 20-second fixture deadline.",
+      "correction": "Removed tenant-id and invalid delay. This was a fixture timing/configuration problem, not a demonstrated operating engine failure.",
+      "cleanup_verified": true,
+      "server_result_basename": "result-attempt1.json",
+      "server_result_sha256": "97a23e7e4ee0f951af99902708f4a6609e7acfe4da2f35bee848f89097abf46c"
+    },
+    {
+      "attempt": 2,
+      "runner_sha256": "11d5f1f35f97f493a4c86fd87d9f13e8c57b18239c27b2e871019420f6ba4d29",
+      "status": "failed",
+      "phase": "initial_record",
+      "cause": "Default pcap-file.delay=30 remained longer than the 20-second fixture deadline.",
+      "correction": "Verified Suricata 8.0.6 source and set the test-only valid delay=1.",
+      "cleanup_verified": true,
+      "server_result_basename": "result-attempt2.json",
+      "server_result_sha256": "eb3b8c68eff0026d5b87c33a88afdfea55526b2859104e72c6cd8935d071be14"
+    },
+    {
+      "attempt": 3,
+      "runner_sha256": "5122e95729e3f2f0b961944cee42b3010025c33478ace52b77c0977ed993e235",
+      "status": "failed",
+      "phase": "initial_record",
+      "cause": "Both private Wazuh readers consumed the synthetic row, but the private Vector queue adapter rejected the native datagram terminating NUL as trailing JSON characters.",
+      "evidence": {
+        "vector_good_ports": [
+          41001
+        ],
+        "vector_naive_ports": [
+          41001
+        ],
+        "both_wazuh_logical_offsets": 625,
+        "both_wazuh_prefix_sha1": "ddfa9d2be59a0a35dde4af0773eb9b5127fc29b4",
+        "suricata_packets_processed": 1
+      },
+      "correction": "Strip exactly one terminal NUL in the test queue adapter; ignore unrelated control-message locations before parsing JSON.",
+      "cleanup_verified": true,
+      "server_result_basename": "result-attempt3.json",
+      "server_result_sha256": "d1187defbe83529c5f83f29adf1f0a7d9dee6d4c607cf9783339aa4a5200321d"
+    },
+    {
+      "attempt": 4,
+      "runner_sha256": "458c73b522e57e18407a4efbec639f868520d77e0914793f07be4e5db32c1b61",
+      "status": "passed",
+      "server_result_basename": "result-attempt4.json",
+      "server_result_sha256": "36ebcc0b91d6ee3e2e64457da789f533256b6fff00647d63a0e2c3775e47471d",
+      "cleanup_verified": true
+    }
+  ],
+  "final_source_sha256": {
+    "make-pcap.sh": "cdf420ca166940e00baa3437a8fe4ac39ae0e4360610826381a0a17cdc295803",
+    "preflight-a.sh": "32fda4647cd7f1b4e778c62f56200878d1f28c5dc22a2d945630f2b11477ae61",
+    "run-probe-a.sh": "458c73b522e57e18407a4efbec639f868520d77e0914793f07be4e5db32c1b61",
+    "wazuh-isolated.sh": "237ec3a25013574040ceb7ad44efe12be50ed4665e5ee5b8277d29e625ca51e1"
+  },
+  "references": [
+    "https://github.com/OISF/suricata/blob/suricata-8.0.6/src/source-pcap-file.c#L324-L343",
+    "https://github.com/wazuh/wazuh/blob/v4.14.8/src/shared/mq_op.c",
+    "https://github.com/wazuh/wazuh/blob/v4.14.8/src/logcollector/logcollector.c"
+  ],
+  "verified_at": "2026-10-14T12:22:28+09:00",
+  "final_result": {
+    "status": "passed",
+    "kind": "native_raw_rotation_isolated",
+    "synthetic_only": true,
+    "offline_packets_only": true,
+    "container_id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+    "test_writer_host_pid": 1752894,
+    "test_writer_start_ticks": "137593364",
+    "gated_vector_ports": [
+      41001,
+      41002,
+      41003,
+      41004,
+      41005,
+      41006
+    ],
+    "gated_wazuh_queue_ports": [
+      41001,
+      41002,
+      41003,
+      41004,
+      41005,
+      41006
+    ],
+    "naive_wazuh_queue_ports": [
+      41001,
+      41003,
+      41005,
+      41006
+    ],
+    "naive_vector_ports": [
+      41001,
+      41003,
+      41005,
+      41006
+    ],
+    "closed_generation_sha256": [
+      "8a4ae10876aef3f6d7a5f6c4ff47a7a3db2dc614a2e32732c72382eef1b7b5d7",
+      "1145ce77901df1e9b7ef90ecb4e22e0626bfe4c408eac92fd02695549b7718c9",
+      "1a10664e76441e4752ac3c71e47da29e2ca703e3267151254e36cec280ba111d"
+    ],
+    "late_old_write_missing_from_naive_wazuh": true,
+    "closed_writer_fd_verified": true,
+    "logical_eof_and_sha_verified": true,
+    "two_pending_generations_published_in_order": true,
+    "graceful_reader_restart_verified": true,
+    "forced_crash_or_power_loss_tested": false,
+    "operating_pids_unchanged": true,
+    "operating_wazuh_root_and_queue_unchanged": true,
+    "operating_rotator_deployed": false,
+    "manager_or_indexer_ack": false,
+    "cleanup_verified": true
+  },
+  "cleanup_recheck": {
+    "verified_at": "2026-10-14T12:22:28+09:00",
+    "host_fixture_directories_remaining": 0,
+    "container_fixture_directories_remaining": 0,
+    "test_writer_gone": true,
+    "operating_wazuh_root_and_queue_unchanged": true
+  },
+  "remaining_operating_conditions": [
+    "Durable ordered generation metadata and recovery after controller restart",
+    "Writer/reader path migration and checkpoint continuity",
+    "Operational Vector completion proof beyond private marker sink",
+    "Alias-switch crash and forced reader crash tests",
+    "Capacity/retention and withheld-generation recovery policy",
+    "Wazuh manager/Indexer delivery acknowledgement; no proof from local EOF"
+  ]
+}

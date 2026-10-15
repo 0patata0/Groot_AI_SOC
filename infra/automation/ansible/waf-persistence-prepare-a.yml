@@ -1,0 +1,942 @@
+[
+  {
+    "name": "Prepare persistent WAF source binds without recreating any container",
+    "hosts": "capstone_vector_a",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "baseline": "/var/backups/capstone-waf-recreation-20261015",
+      "prepare": "/var/backups/capstone-waf-recreation-20261015/prepare-persistence-attempt2",
+      "waf_cid": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+      "baseline_pins": [
+        {
+          "name": "before-compose.yml",
+          "sha": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+          "bytes": 5118
+        },
+        {
+          "name": "before-inspect.json",
+          "sha": "fd0bd4029be0999c467e70404257b681a98a4c4c3a9136f65303451d88eccdf8",
+          "bytes": 17717
+        },
+        {
+          "name": "image-inspect.json",
+          "sha": "ebc43957a8e89697e4aae61430adef03e440d55d39b117e69c67dc76fe97b5b8",
+          "bytes": 10191
+        },
+        {
+          "name": "rendered-compose.json",
+          "sha": "f2a6af6693b706e7eabf1b43f71ffb3ea83b5e6e49e897ac2599713eff9db924",
+          "bytes": 3455
+        }
+      ],
+      "persistent_inputs": [
+        {
+          "name": "override-template",
+          "source": "/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template",
+          "host": "/etc/capstone-waf/modsecurity-override-v2.conf.template",
+          "sha": "814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb",
+          "bytes": 155
+        },
+        {
+          "name": "producer",
+          "source": "/etc/nginx/conf.d/zz-capstone-evidence.conf",
+          "host": "/etc/capstone-waf/zz-capstone-evidence-v2.conf",
+          "sha": "1e4c37a9bcedd730e693029fa4b40a6fd5e68a93b206ea161f458e11d7e6e212",
+          "bytes": 773
+        }
+      ],
+      "imperva_line": "      - /etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf:ro",
+      "producer_line": "      - /etc/capstone-waf/zz-capstone-evidence-v2.conf:/etc/nginx/conf.d/zz-capstone-evidence.conf:ro",
+      "template_line": "      - /etc/capstone-waf/modsecurity-override-v2.conf.template:/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template:ro",
+      "compose_lf": "\n",
+      "compose_cr": "\r"
+    },
+    "tasks": [
+      {
+        "name": "Require fixed root operator and shared-lock entrypoint",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '096e90b6243e438aa8a7b392be754732'",
+            "waf_prepare_operator_lock | default(false) | bool",
+            "not ansible_check_mode"
+          ]
+        }
+      },
+      {
+        "name": "Verify existing private baseline and persistent source directories",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "directories",
+        "loop": [
+          "/var/backups/capstone-waf-recreation-20261015",
+          "/etc/capstone-waf"
+        ]
+      },
+      {
+        "name": "Require real root-owned non-writable directory parents",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isdir",
+            "not item.stat.islnk",
+            "item.stat.uid == 0",
+            "item.stat.gid == 0",
+            "item.stat.mode in ['0700', '0755']"
+          ]
+        },
+        "loop": "{{ directories.results }}"
+      },
+      {
+        "name": "Pin all four previously captured baseline files",
+        "ansible.builtin.stat": {
+          "path": "{{ baseline }}/{{ item.name }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "baseline_files",
+        "loop": "{{ baseline_pins }}"
+      },
+      {
+        "name": "Require exact baseline bytes and root-only metadata",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.nlink == 1",
+            "item.stat.uid == 0 and item.stat.gid == 0",
+            "item.stat.mode == '0400'",
+            "item.stat.size == item.item.bytes",
+            "item.stat.checksum == item.item.sha"
+          ]
+        },
+        "loop": "{{ baseline_files.results }}"
+      },
+      {
+        "name": "Pin original live compose before preparation",
+        "ansible.builtin.stat": {
+          "path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "compose_before"
+      },
+      {
+        "name": "Require reviewed live compose and existing owner",
+        "ansible.builtin.assert": {
+          "that": [
+            "compose_before.stat.isreg",
+            "not compose_before.stat.islnk",
+            "compose_before.stat.nlink == 1",
+            "compose_before.stat.uid == 1000 and compose_before.stat.gid == 1000",
+            "compose_before.stat.mode == '0644'",
+            "compose_before.stat.checksum == '5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60'"
+          ]
+        }
+      },
+      {
+        "name": "Read baseline container and source privately",
+        "ansible.builtin.slurp": {
+          "src": "{{ baseline }}/{{ item }}"
+        },
+        "loop": [
+          "before-inspect.json",
+          "before-compose.yml"
+        ],
+        "register": "baseline_content",
+        "no_log": true
+      },
+      {
+        "name": "Decode pinned baseline without emitting environment or configuration",
+        "ansible.builtin.set_fact": {
+          "old_inspect": "{{ (baseline_content.results[0].content | b64decode | from_json)[0] }}",
+          "old_compose": "{{ baseline_content.results[1].content | b64decode }}"
+        },
+        "no_log": true
+      },
+      {
+        "name": "Inspect exact running WAF without printing full inspect",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e"
+          ]
+        },
+        "changed_when": false,
+        "no_log": true,
+        "register": "inspect_before",
+        "timeout": 30
+      },
+      {
+        "name": "Require exact existing WAF profile and unchanged init",
+        "ansible.builtin.assert": {
+          "that": [
+            "(inspect_before.stdout | from_json | length) == 1",
+            "(inspect_before.stdout | from_json)[0].Id == '02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e'",
+            "(inspect_before.stdout | from_json)[0].Name == '/waf'",
+            "(inspect_before.stdout | from_json)[0].State.Pid == 2377669",
+            "(inspect_before.stdout | from_json)[0].State.Running",
+            "(inspect_before.stdout | from_json)[0].State.Health.Status == 'healthy'",
+            "(inspect_before.stdout | from_json)[0].State.StartedAt == old_inspect.State.StartedAt",
+            "(inspect_before.stdout | from_json)[0].Image == old_inspect.Image",
+            "(inspect_before.stdout | from_json)[0].Config == old_inspect.Config",
+            "(inspect_before.stdout | from_json)[0].HostConfig == old_inspect.HostConfig",
+            "(inspect_before.stdout | from_json)[0].Mounts == old_inspect.Mounts",
+            "(inspect_before.stdout | from_json)[0].NetworkSettings == old_inspect.NetworkSettings"
+          ]
+        },
+        "no_log": true
+      },
+      {
+        "name": "Snapshot unchanged host configuration and raw state metadata",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "protected_before",
+        "loop": [
+          "/etc/capstone-vector/vector.toml",
+          "/etc/capstone-vector/vector.env",
+          "/etc/capstone-vector/waf-binding.json",
+          "/etc/capstone-vector/raw-line-binding.json",
+          "/var/ossec/etc/ossec.conf",
+          "/var/lib/capstone-raw-operations/suricata/state.json",
+          "/var/lib/capstone-raw-operations/modsecurity/state.json",
+          "/var/lib/capstone-raw-migration/start-barrier.json",
+          "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed/audit-path.conf",
+          "/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf",
+          "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf"
+        ],
+        "no_log": true
+      },
+      {
+        "name": "Require regular existing protected files",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.nlink == 1"
+          ]
+        },
+        "loop": "{{ protected_before.results }}",
+        "no_log": true
+      },
+      {
+        "name": "Snapshot reader unit identities",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemctl",
+            "show",
+            "capstone-vector.service",
+            "wazuh-agent.service",
+            "--property=Id,MainPID,InvocationID,ActiveState,SubState,Result"
+          ]
+        },
+        "changed_when": false,
+        "register": "readers_before",
+        "timeout": 30
+      },
+      {
+        "name": "Snapshot actual WAF Vector Wazuh and Suricata process identities",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/sh",
+            "-ec",
+            "set -eu; for p in 2377669 2406117 1909632 1990031; do test -d /proc/$p; printf '%s ' \"$p\"; readlink /proc/$p/exe; awk '{print $22}' /proc/$p/stat; done"
+          ]
+        },
+        "changed_when": false,
+        "register": "processes_before",
+        "timeout": 30
+      },
+      {
+        "name": "Verify both source files inside the exact current container",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "--user",
+            "0:0",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "/bin/sh",
+            "-ec",
+            "p=\"$1\"; test ! -L \"$p\"; test \"$(stat -c %u:%g:%a:%h:%s \"$p\")\" = \"0:0:644:1:$2\"; test \"$(sha256sum \"$p\" | cut -d \" \" -f 1)\" = \"$3\"",
+            "sh",
+            "{{ item.source }}",
+            "{{ item.bytes | string }}",
+            "{{ item.sha }}"
+          ]
+        },
+        "changed_when": false,
+        "loop": "{{ persistent_inputs }}",
+        "timeout": 30
+      },
+      {
+        "name": "Reject any conflicting existing persistent host sources",
+        "ansible.builtin.stat": {
+          "path": "{{ item.host }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "host_sources",
+        "loop": "{{ persistent_inputs }}"
+      },
+      {
+        "name": "Allow absent source or exact already-preserved root0444 bytes",
+        "ansible.builtin.assert": {
+          "that": [
+            "not (item.stat.islnk | default(false))",
+            "not item.stat.exists or (item.stat.isreg and item.stat.uid == 0 and item.stat.gid == 0 and item.stat.mode == '0444' and item.stat.nlink == 1 and item.stat.size == item.item.bytes and item.stat.checksum == item.item.sha)"
+          ]
+        },
+        "loop": "{{ host_sources.results }}"
+      },
+      {
+        "name": "Check dedicated one-time prepare evidence path",
+        "ansible.builtin.stat": {
+          "path": "{{ prepare }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "prepare_existing"
+      },
+      {
+        "name": "Never reuse an earlier partial or completed prepare directory",
+        "ansible.builtin.assert": {
+          "that": [
+            "not prepare_existing.stat.exists",
+            "not (prepare_existing.stat.islnk | default(false))"
+          ]
+        }
+      },
+      {
+        "name": "Create private evidence directory preserving prior baseline",
+        "ansible.builtin.file": {
+          "path": "{{ prepare }}",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Synchronize newly created evidence directory and its parent",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/sync",
+            "--",
+            "{{ prepare }}",
+            "{{ baseline }}"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30
+      },
+      {
+        "name": "Preserve pinned original compose bytes",
+        "ansible.builtin.copy": {
+          "src": "{{ baseline }}/before-compose.yml",
+          "dest": "{{ prepare }}/compose.before.yml",
+          "remote_src": true,
+          "owner": "0",
+          "group": "0",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Snapshot only the two public container configurations",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e:{{ item.source }}",
+            "{{ prepare }}/{{ item.name }}.conf"
+          ]
+        },
+        "changed_when": false,
+        "loop": "{{ persistent_inputs }}",
+        "timeout": 30
+      },
+      {
+        "name": "Make captured source snapshots root-only",
+        "ansible.builtin.file": {
+          "path": "{{ prepare }}/{{ item.name }}.conf",
+          "owner": "0",
+          "group": "0",
+          "mode": "0400"
+        },
+        "loop": "{{ persistent_inputs }}"
+      },
+      {
+        "name": "Hash captured immutable source snapshots",
+        "ansible.builtin.stat": {
+          "path": "{{ prepare }}/{{ item.name }}.conf",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "snapshots",
+        "loop": "{{ persistent_inputs }}"
+      },
+      {
+        "name": "Require captured source bytes before use",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.uid == 0 and item.stat.gid == 0",
+            "item.stat.mode == '0400'",
+            "item.stat.nlink == 1",
+            "item.stat.size == item.item.bytes",
+            "item.stat.checksum == item.item.sha"
+          ]
+        },
+        "loop": "{{ snapshots.results }}"
+      },
+      {
+        "name": "Require one existing Imperva bind line and no new source names",
+        "ansible.builtin.assert": {
+          "that": [
+            "(old_compose.split(imperva_line + compose_lf) | length) == 2",
+            "old_compose.endswith(compose_lf)",
+            "compose_cr not in old_compose",
+            "'/etc/capstone-waf/zz-capstone-evidence-v2.conf' not in old_compose",
+            "'/etc/capstone-waf/modsecurity-override-v2.conf.template' not in old_compose"
+          ]
+        },
+        "no_log": true
+      },
+      {
+        "name": "Add exactly two mount lines after the existing Imperva bind",
+        "ansible.builtin.copy": {
+          "content": "{{ old_compose | replace(imperva_line + compose_lf, imperva_line + compose_lf + producer_line + compose_lf + template_line + compose_lf) }}",
+          "dest": "{{ prepare }}/compose.candidate.yml",
+          "owner": "0",
+          "group": "0",
+          "mode": "0400",
+          "force": false
+        },
+        "no_log": true
+      },
+      {
+        "name": "Validate candidate with native Compose without creating containers",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "compose",
+            "--project-directory",
+            "/home/groot_a/capstone/secstack",
+            "-f",
+            "{{ prepare }}/compose.candidate.yml",
+            "config",
+            "--quiet"
+          ]
+        },
+        "changed_when": false,
+        "no_log": true,
+        "timeout": 30
+      },
+      {
+        "name": "Render current and candidate Compose privately",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "compose",
+            "--project-directory",
+            "/home/groot_a/capstone/secstack",
+            "-f",
+            "{{ item }}",
+            "config",
+            "--format",
+            "json"
+          ]
+        },
+        "changed_when": false,
+        "loop": [
+          "/home/groot_a/capstone/secstack/docker-compose.yml",
+          "{{ prepare }}/compose.candidate.yml"
+        ],
+        "no_log": true,
+        "register": "rendered",
+        "timeout": 30
+      },
+      {
+        "name": "Preserve rendered comparison inputs privately",
+        "ansible.builtin.copy": {
+          "content": "{{ item.stdout }}\n",
+          "dest": "{{ prepare }}/{{ item.item | basename }}.rendered.json",
+          "owner": "0",
+          "group": "0",
+          "mode": "0400",
+          "force": false
+        },
+        "loop": "{{ rendered.results }}",
+        "no_log": true
+      },
+      {
+        "name": "Require only two new read-only WAF binds and preserve every other rendered field",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/jq",
+            "-n",
+            "-e",
+            "--slurpfile",
+            "old",
+            "{{ baseline }}/rendered-compose.json",
+            "--slurpfile",
+            "now",
+            "{{ prepare }}/docker-compose.yml.rendered.json",
+            "--slurpfile",
+            "new",
+            "{{ prepare }}/compose.candidate.yml.rendered.json",
+            "def newmount($s;$t): .type==\"bind\" and .source==$s and .target==$t and .read_only==true and ((keys-[\"type\",\"source\",\"target\",\"read_only\",\"bind\"])|length)==0 and ((.bind // {})=={} or .bind=={\"create_host_path\":true});\n($old|length)==1 and ($now|length)==1 and ($new|length)==1 and\n$old[0]==$now[0] and\n($new[0]|del(.services.waf.volumes))==($old[0]|del(.services.waf.volumes)) and\n($old[0].services.waf.volumes|length)==3 and ($new[0].services.waf.volumes|length)==5 and\n$new[0].services.waf.volumes[0:3]==$old[0].services.waf.volumes and\n($new[0].services.waf.volumes[3]|newmount(\"/etc/capstone-waf/zz-capstone-evidence-v2.conf\";\"/etc/nginx/conf.d/zz-capstone-evidence.conf\")) and\n($new[0].services.waf.volumes[4]|newmount(\"/etc/capstone-waf/modsecurity-override-v2.conf.template\";\"/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template\"))"
+          ]
+        },
+        "changed_when": false,
+        "no_log": true,
+        "timeout": 30
+      },
+      {
+        "name": "Pin exact candidate compose bytes",
+        "ansible.builtin.stat": {
+          "path": "{{ prepare }}/compose.candidate.yml",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "candidate"
+      },
+      {
+        "name": "Preserve exact source files for a future controlled recreation",
+        "ansible.builtin.copy": {
+          "src": "{{ prepare }}/{{ item.name }}.conf",
+          "dest": "{{ item.host }}",
+          "remote_src": true,
+          "owner": "0",
+          "group": "0",
+          "mode": "0444",
+          "force": false,
+          "unsafe_writes": false
+        },
+        "loop": "{{ persistent_inputs }}"
+      },
+      {
+        "name": "Verify durable host sources before compose publication",
+        "ansible.builtin.stat": {
+          "path": "{{ item.host }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "host_published",
+        "loop": "{{ persistent_inputs }}"
+      },
+      {
+        "name": "Require exact persistent host bytes and permissions",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.nlink == 1",
+            "item.stat.uid == 0 and item.stat.gid == 0",
+            "item.stat.mode == '0444'",
+            "item.stat.size == item.item.bytes",
+            "item.stat.checksum == item.item.sha"
+          ]
+        },
+        "loop": "{{ host_published.results }}"
+      },
+      {
+        "name": "Synchronize source files and backup before compose publication",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/sync",
+            "--",
+            "/etc/capstone-waf/zz-capstone-evidence-v2.conf",
+            "/etc/capstone-waf/modsecurity-override-v2.conf.template",
+            "/etc/capstone-waf",
+            "{{ prepare }}/override-template.conf",
+            "{{ prepare }}/producer.conf",
+            "{{ prepare }}/compose.before.yml",
+            "{{ prepare }}/compose.candidate.yml",
+            "{{ prepare }}",
+            "{{ baseline }}"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30
+      },
+      {
+        "name": "Publish future mount configuration with bounded CAS recovery only",
+        "block": [
+          {
+            "name": "Recheck live compose immediately before atomic replacement",
+            "ansible.builtin.stat": {
+              "path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "compose_cas"
+          },
+          {
+            "name": "Refuse live compose drift before publication",
+            "ansible.builtin.assert": {
+              "that": [
+                "compose_cas.stat.isreg",
+                "not compose_cas.stat.islnk",
+                "compose_cas.stat.nlink == 1",
+                "compose_cas.stat.uid == 1000 and compose_cas.stat.gid == 1000",
+                "compose_cas.stat.mode == '0644'",
+                "compose_cas.stat.checksum == '5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60'"
+              ]
+            }
+          },
+          {
+            "name": "Persist compose publication intent before replacing bytes",
+            "ansible.builtin.copy": {
+              "content": "{{ {'schema_version': 1, 'phase': 'compose_publication_intent', 'old_sha256': compose_before.stat.checksum, 'new_sha256': candidate.stat.checksum, 'container_id': waf_cid, 'container_pid': 2377669, 'container_lifecycle_calls': 0, 'binding_reissued': false} | to_json }}\n",
+              "dest": "{{ prepare }}/intent.json",
+              "owner": "0",
+              "group": "0",
+              "mode": "0400",
+              "force": false
+            }
+          },
+          {
+            "name": "Synchronize publication intent",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sync",
+                "--",
+                "{{ prepare }}/intent.json",
+                "{{ prepare }}"
+              ]
+            },
+            "changed_when": false,
+            "timeout": 30
+          },
+          {
+            "name": "Record this invocation is about to publish compose",
+            "ansible.builtin.set_fact": {
+              "waf_compose_attempted": true
+            }
+          },
+          {
+            "name": "Atomically publish exactly the validated Compose candidate",
+            "ansible.builtin.copy": {
+              "src": "{{ prepare }}/compose.candidate.yml",
+              "dest": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "remote_src": true,
+              "owner": "1000",
+              "group": "1000",
+              "mode": "0644",
+              "unsafe_writes": false
+            }
+          },
+          {
+            "name": "Verify published Compose identity",
+            "ansible.builtin.stat": {
+              "path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "installed"
+          },
+          {
+            "name": "Require exact published candidate and original project ownership",
+            "ansible.builtin.assert": {
+              "that": [
+                "installed.stat.isreg",
+                "not installed.stat.islnk",
+                "installed.stat.nlink == 1",
+                "installed.stat.uid == 1000 and installed.stat.gid == 1000",
+                "installed.stat.mode == '0644'",
+                "installed.stat.checksum == candidate.stat.checksum"
+              ]
+            }
+          },
+          {
+            "name": "Validate installed compose without creating or starting anything",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "compose",
+                "--project-directory",
+                "/home/groot_a/capstone/secstack",
+                "-f",
+                "/home/groot_a/capstone/secstack/docker-compose.yml",
+                "config",
+                "--quiet"
+              ]
+            },
+            "changed_when": false,
+            "no_log": true,
+            "timeout": 30
+          },
+          {
+            "name": "Inspect current WAF after prepare",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "inspect",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e"
+              ]
+            },
+            "changed_when": false,
+            "no_log": true,
+            "register": "inspect_after",
+            "timeout": 30
+          },
+          {
+            "name": "Require current container remains unchanged",
+            "ansible.builtin.assert": {
+              "that": [
+                "(inspect_after.stdout | from_json)[0].State.Pid == 2377669",
+                "(inspect_after.stdout | from_json)[0].State.Running",
+                "(inspect_after.stdout | from_json)[0].State.Health.Status == 'healthy'",
+                "(inspect_after.stdout | from_json)[0].State.StartedAt == old_inspect.State.StartedAt",
+                "(inspect_after.stdout | from_json)[0].Id == (inspect_before.stdout | from_json)[0].Id",
+                "(inspect_after.stdout | from_json)[0].Name == (inspect_before.stdout | from_json)[0].Name",
+                "(inspect_after.stdout | from_json)[0].Image == (inspect_before.stdout | from_json)[0].Image",
+                "(inspect_after.stdout | from_json)[0].Config == (inspect_before.stdout | from_json)[0].Config",
+                "(inspect_after.stdout | from_json)[0].HostConfig == (inspect_before.stdout | from_json)[0].HostConfig",
+                "(inspect_after.stdout | from_json)[0].Mounts == (inspect_before.stdout | from_json)[0].Mounts",
+                "(inspect_after.stdout | from_json)[0].NetworkSettings == (inspect_before.stdout | from_json)[0].NetworkSettings"
+              ]
+            },
+            "no_log": true
+          },
+          {
+            "name": "Recheck all four operating processes",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "-ec",
+                "set -eu; for p in 2377669 2406117 1909632 1990031; do test -d /proc/$p; printf '%s ' \"$p\"; readlink /proc/$p/exe; awk '{print $22}' /proc/$p/stat; done"
+              ]
+            },
+            "changed_when": false,
+            "register": "processes_after",
+            "timeout": 30
+          },
+          {
+            "name": "Recheck reader unit identities",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/bin/systemctl",
+                "show",
+                "capstone-vector.service",
+                "wazuh-agent.service",
+                "--property=Id,MainPID,InvocationID,ActiveState,SubState,Result"
+              ]
+            },
+            "changed_when": false,
+            "register": "readers_after",
+            "timeout": 30
+          },
+          {
+            "name": "Require process and reader identity unchanged",
+            "ansible.builtin.assert": {
+              "that": [
+                "processes_after.stdout == processes_before.stdout",
+                "readers_after.stdout == readers_before.stdout"
+              ]
+            }
+          },
+          {
+            "name": "Recheck protected files and state without modifying checkpoints",
+            "ansible.builtin.stat": {
+              "path": "{{ item }}",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "protected_after",
+            "loop": [
+              "/etc/capstone-vector/vector.toml",
+              "/etc/capstone-vector/vector.env",
+              "/etc/capstone-vector/waf-binding.json",
+              "/etc/capstone-vector/raw-line-binding.json",
+              "/var/ossec/etc/ossec.conf",
+              "/var/lib/capstone-raw-operations/suricata/state.json",
+              "/var/lib/capstone-raw-operations/modsecurity/state.json",
+              "/var/lib/capstone-raw-migration/start-barrier.json",
+              "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed/audit-path.conf",
+              "/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf",
+              "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf"
+            ],
+            "no_log": true
+          },
+          {
+            "name": "Require exact protected metadata and bytes unchanged",
+            "ansible.builtin.assert": {
+              "that": [
+                "item.0.item == item.1.item",
+                "item.0.stat.checksum == item.1.stat.checksum",
+                "item.0.stat.dev == item.1.stat.dev",
+                "item.0.stat.inode == item.1.stat.inode",
+                "item.0.stat.uid == item.1.stat.uid",
+                "item.0.stat.gid == item.1.stat.gid",
+                "item.0.stat.mode == item.1.stat.mode",
+                "item.0.stat.nlink == item.1.stat.nlink",
+                "item.0.stat.size == item.1.stat.size"
+              ]
+            },
+            "loop": "{{ protected_before.results | zip(protected_after.results) | list }}",
+            "no_log": true
+          },
+          {
+            "name": "Recheck unchanged container source bytes",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "--user",
+                "0:0",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "/bin/sh",
+                "-ec",
+                "p=\"$1\"; test ! -L \"$p\"; test \"$(stat -c %u:%g:%a:%h:%s \"$p\")\" = \"0:0:644:1:$2\"; test \"$(sha256sum \"$p\" | cut -d \" \" -f 1)\" = \"$3\"",
+                "sh",
+                "{{ item.source }}",
+                "{{ item.bytes | string }}",
+                "{{ item.sha }}"
+              ]
+            },
+            "changed_when": false,
+            "loop": "{{ persistent_inputs }}",
+            "timeout": 30
+          },
+          {
+            "name": "Synchronize published compose and directory",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sync",
+                "--",
+                "/home/groot_a/capstone/secstack/docker-compose.yml",
+                "/home/groot_a/capstone/secstack"
+              ]
+            },
+            "changed_when": false,
+            "timeout": 30
+          },
+          {
+            "name": "Store bounded prepare-only completion receipt",
+            "ansible.builtin.copy": {
+              "content": "{{ {'schema_version': 1, 'status': 'prepared_without_recreation', 'old_compose_sha256': compose_before.stat.checksum, 'new_compose_sha256': candidate.stat.checksum, 'persistent_inputs': persistent_inputs, 'container_id': waf_cid, 'container_pid': 2377669, 'running_container_unchanged': true, 'raw_states_and_reader_identities_unchanged': true, 'new_read_only_compose_binds': 2, 'container_lifecycle_calls': 0, 'binding_reissued': false, 'new_container_persistence_tested': false, 'new_cid_binding_and_both_raw_state_pins_require_separate_handoff': true} | to_json }}\n",
+              "dest": "{{ prepare }}/result.json",
+              "owner": "0",
+              "group": "0",
+              "mode": "0400",
+              "force": false
+            }
+          },
+          {
+            "name": "Synchronize final receipt",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sync",
+                "--",
+                "{{ prepare }}/result.json",
+                "{{ prepare }}",
+                "{{ baseline }}"
+              ]
+            },
+            "changed_when": false,
+            "timeout": 30
+          }
+        ],
+        "rescue": [
+          {
+            "name": "Inspect compose after a failed publication or postcheck",
+            "ansible.builtin.stat": {
+              "path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "compose_failed",
+            "when": "waf_compose_attempted | default(false) | bool"
+          },
+          {
+            "name": "Never overwrite an unrecognized compose during recovery",
+            "ansible.builtin.assert": {
+              "that": [
+                "compose_failed.stat.isreg",
+                "not compose_failed.stat.islnk",
+                "compose_failed.stat.nlink == 1",
+                "compose_failed.stat.uid == 1000 and compose_failed.stat.gid == 1000",
+                "compose_failed.stat.mode == '0644'",
+                "compose_failed.stat.checksum in [compose_before.stat.checksum, candidate.stat.checksum]"
+              ]
+            },
+            "when": "waf_compose_attempted | default(false) | bool"
+          },
+          {
+            "name": "Restore only our exact candidate to pinned original compose",
+            "ansible.builtin.copy": {
+              "src": "{{ prepare }}/compose.before.yml",
+              "dest": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "remote_src": true,
+              "owner": "1000",
+              "group": "1000",
+              "mode": "0644",
+              "unsafe_writes": false
+            },
+            "when": "(waf_compose_attempted | default(false) | bool) and compose_failed.stat.checksum == candidate.stat.checksum"
+          },
+          {
+            "name": "Synchronize restored original compose",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sync",
+                "--",
+                "/home/groot_a/capstone/secstack/docker-compose.yml",
+                "/home/groot_a/capstone/secstack"
+              ]
+            },
+            "changed_when": false,
+            "when": "waf_compose_attempted | default(false) | bool",
+            "timeout": 30
+          },
+          {
+            "name": "Recheck original compose after bounded recovery",
+            "ansible.builtin.stat": {
+              "path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "compose_restored",
+            "when": "waf_compose_attempted | default(false) | bool"
+          },
+          {
+            "name": "Require original compose restoration bytes and metadata",
+            "ansible.builtin.assert": {
+              "that": [
+                "compose_restored.stat.isreg",
+                "not compose_restored.stat.islnk",
+                "compose_restored.stat.uid == 1000 and compose_restored.stat.gid == 1000",
+                "compose_restored.stat.mode == '0644'",
+                "compose_restored.stat.nlink == 1",
+                "compose_restored.stat.checksum == compose_before.stat.checksum"
+              ]
+            },
+            "when": "waf_compose_attempted | default(false) | bool"
+          },
+          {
+            "name": "Report failed prepare while retaining private evidence and exact host sources",
+            "ansible.builtin.fail": {
+              "msg": "WAF persistence prepare failed; no lifecycle calls were requested. Compose restoration is attempted only after this invocation begins publication and only for recognized bytes. Private evidence and exact host sources remain; inspect before retry."
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

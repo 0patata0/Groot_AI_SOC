@@ -1,0 +1,87 @@
+[[tests]]
+name = "fresh_now"
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_dedupe_key\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\", \"protected_asset\": false, \"quality_flags\": []}}\n.capstone_norm.event_time_kst = format_timestamp!(now(), format: \"%+\")"
+[[tests.outputs]]
+extract_from = "current_time_gate"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.audit.allowed_at_this_transform, true)\nassert_eq!(.audit.operational_promotion_authorized, false)"
+
+[[tests]]
+name = "stale_fresh_label"
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_dedupe_key\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\", \"protected_asset\": false, \"quality_flags\": []}}\n.capstone_norm.event_time_kst = \"2000-01-01T00:00:00+09:00\""
+[[tests.outputs]]
+extract_from = "current_time_gate"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.audit.allowed_at_this_transform, false)\nassert_eq!(.audit.operational_promotion_authorized, false)"
+
+[[tests]]
+name = "future_fresh_label"
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_dedupe_key\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\", \"protected_asset\": false, \"quality_flags\": []}}\n.capstone_norm.event_time_kst = \"2999-01-01T00:00:00+09:00\""
+[[tests.outputs]]
+extract_from = "current_time_gate"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.audit.allowed_at_this_transform, false)\nassert_eq!(.audit.operational_promotion_authorized, false)"
+
+[[tests]]
+name = "upstream_ineligible"
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_dedupe_key\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"correlation_eligible\": false, \"correlation_time_class\": \"fresh\", \"protected_asset\": false, \"quality_flags\": []}}\n.capstone_norm.event_time_kst = format_timestamp!(now(), format: \"%+\")"
+[[tests.outputs]]
+extract_from = "current_time_gate"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.audit.allowed_at_this_transform, false)\nassert_eq!(.audit.operational_promotion_authorized, false)"
+
+[[tests]]
+name = "protected"
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_dedupe_key\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\", \"protected_asset\": true, \"quality_flags\": []}}\n.capstone_norm.event_time_kst = format_timestamp!(now(), format: \"%+\")"
+[[tests.outputs]]
+extract_from = "current_time_gate"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.audit.allowed_at_this_transform, false)\nassert_eq!(.audit.operational_promotion_authorized, false)"
+
+[[tests]]
+name = "quality_error"
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_dedupe_key\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\", \"protected_asset\": false, \"quality_flags\": [\"source_ip_invalid\"]}}\n.capstone_norm.event_time_kst = format_timestamp!(now(), format: \"%+\")"
+[[tests.outputs]]
+extract_from = "current_time_gate"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.audit.allowed_at_this_transform, false)\nassert_eq!(.audit.operational_promotion_authorized, false)"
+
+[[tests]]
+name = "invalid_time"
+no_outputs_from = ["current_time_gate"]
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_dedupe_key\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\", \"protected_asset\": false, \"quality_flags\": []}}\n.capstone_norm.event_time_kst = \"bad\""
+
+[[tests]]
+name = "missing_key"
+no_outputs_from = ["current_time_gate"]
+[[tests.inputs]]
+insert_at = "current_time_gate"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\", \"protected_asset\": false, \"quality_flags\": []}}\n.capstone_norm.event_time_kst = format_timestamp!(now(), format: \"%+\")"

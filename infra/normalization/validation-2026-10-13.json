@@ -1,0 +1,751 @@
+{
+  "validation_date_kst": "2026-10-13",
+  "deployment_decision": "not_ready",
+  "operational_deployment_performed": false,
+  "local_unit_tests": {
+    "passed": 62,
+    "failed": 0,
+    "normalization_tests": 49,
+    "validation_tool_tests": 13
+  },
+  "wazuh_decoder": {
+    "engine": "installed wazuh-logtest",
+    "scope": "JSON decoding only",
+    "operational_input_written": false,
+    "rules_installed": false,
+    "exit_code": 0,
+    "input_count": 10,
+    "decoded_block_count": 10,
+    "cli_error_reported": false,
+    "cases": [
+      {
+        "name": "synthetic_suricata",
+        "serialized_bytes": 683,
+        "decoder": "json",
+        "expected_fields": 21,
+        "decoded_fields": 21,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "synthetic_modsecurity",
+        "serialized_bytes": 758,
+        "decoder": "json",
+        "expected_fields": 23,
+        "decoded_fields": 23,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "synthetic_nftables",
+        "serialized_bytes": 654,
+        "decoder": "json",
+        "expected_fields": 20,
+        "decoded_fields": 20,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "sanitized_live_suricata_1",
+        "serialized_bytes": 853,
+        "decoder": "json",
+        "expected_fields": 27,
+        "decoded_fields": 27,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "sanitized_live_suricata_2",
+        "serialized_bytes": 810,
+        "decoder": "json",
+        "expected_fields": 25,
+        "decoded_fields": 25,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "sanitized_live_nftables_1",
+        "serialized_bytes": 650,
+        "decoder": "json",
+        "expected_fields": 20,
+        "decoded_fields": 20,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "sanitized_live_nftables_2",
+        "serialized_bytes": 664,
+        "decoder": "json",
+        "expected_fields": 20,
+        "decoded_fields": 20,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "missing_ips_and_quality_flags",
+        "serialized_bytes": 669,
+        "decoder": "json",
+        "expected_fields": 19,
+        "decoded_fields": 19,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "waf_missing_timezone_multiple_ids",
+        "serialized_bytes": 766,
+        "decoder": "json",
+        "expected_fields": 22,
+        "decoded_fields": 22,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      },
+      {
+        "name": "project_output_limit_32768_bytes",
+        "serialized_bytes": 32768,
+        "decoder": "json",
+        "expected_fields": 21,
+        "decoded_fields": 21,
+        "mismatch_fields": [],
+        "extra_fields": [],
+        "duplicate_decoded_fields": [],
+        "phase2_completed": true,
+        "rule_match_reported": false,
+        "passed": true
+      }
+    ],
+    "passed": true,
+    "sample_provenance": "synthetic plus sanitized shapes from initial A sample at 21:10 KST"
+  },
+  "postcheck_A": {
+    "checked_at_kst": "2026-10-13T21:21:18.725494+09:00",
+    "containers": {
+      "suricata": {
+        "id": "39ce628179fb",
+        "status": "running",
+        "started_at": "2026-10-13T10:50:28.696240875Z",
+        "oom_killed": false
+      },
+      "waf": {
+        "id": "02fb9ec3db38",
+        "status": "running",
+        "started_at": "2026-10-05T10:18:45.433754298Z",
+        "oom_killed": false
+      }
+    },
+    "hashes": {
+      "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+      "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+      "/etc/nftables.conf": "60dac93ffe0ea440fc4a8941a080b6fb8d2c8655d47baf856e97182a0d1ca29a",
+      "/etc/nftables.d/capstone-fw.nft": "6c73c480371ba2cecc5548938e76b88a0aec92d3b2e055fcb6dc9bc88d2c336e"
+    },
+    "waf_header_discard_diagnostics": [
+      {
+        "line": 1,
+        "diagnostic_copy_only": true,
+        "result": "normalized",
+        "time_status": "timezone_missing",
+        "quality_flags": [
+          "source_time_timezone_missing"
+        ],
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_count": 2
+      },
+      {
+        "line": 2,
+        "diagnostic_copy_only": true,
+        "result": "normalized",
+        "time_status": "timezone_missing",
+        "quality_flags": [
+          "source_time_timezone_missing"
+        ],
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_count": 2
+      },
+      {
+        "line": 3,
+        "diagnostic_copy_only": true,
+        "result": "normalized",
+        "time_status": "timezone_missing",
+        "quality_flags": [
+          "source_time_timezone_missing"
+        ],
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_count": 2
+      },
+      {
+        "line": 4,
+        "diagnostic_copy_only": true,
+        "result": "normalized",
+        "time_status": "timezone_missing",
+        "quality_flags": [
+          "source_time_timezone_missing"
+        ],
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_count": 1
+      }
+    ],
+    "nft_log_neighbors": [
+      {
+        "prefixes": [
+          "SPOOF "
+        ],
+        "chain": "prerouting_block",
+        "same_rule_verdicts": [],
+        "next_rule_verdicts": [
+          "drop"
+        ]
+      },
+      {
+        "prefixes": [
+          "SPOOF "
+        ],
+        "chain": "prerouting_block",
+        "same_rule_verdicts": [],
+        "next_rule_verdicts": [
+          "drop"
+        ]
+      },
+      {
+        "prefixes": [
+          "AGENT_BLOCK "
+        ],
+        "chain": "prerouting_block",
+        "same_rule_verdicts": [],
+        "next_rule_verdicts": [
+          "drop"
+        ]
+      },
+      {
+        "prefixes": [
+          "FW_SSH_RATE "
+        ],
+        "chain": "input",
+        "same_rule_verdicts": [
+          "drop"
+        ],
+        "next_rule_verdicts": [
+          "drop"
+        ]
+      },
+      {
+        "prefixes": [
+          "FW_DROP_IN "
+        ],
+        "chain": "input",
+        "same_rule_verdicts": [],
+        "next_rule_verdicts": [
+          "drop"
+        ]
+      },
+      {
+        "prefixes": [
+          "FW_SHADOW_OUT "
+        ],
+        "chain": "output",
+        "same_rule_verdicts": [],
+        "next_rule_verdicts": []
+      }
+    ]
+  },
+  "postcheck_B": {
+    "checked_at_kst": "2026-10-13T21:21:21.914001+09:00",
+    "container": {
+      "id": "45b85672e0fe",
+      "status": "running",
+      "started_at": "2026-09-28T06:19:48.672047166Z",
+      "oom_killed": false
+    },
+    "hashes": {
+      "/var/lib/docker/volumes/single-node_wazuh_etc/_data/ossec.conf": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+      "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+      "/var/lib/docker/volumes/single-node_wazuh_etc/_data/decoders/local_decoder.xml": "bbaa73dcf87767474aa74c7b7e6bf4e2c901909be719b98961b08f46086a61ee"
+    },
+    "queue_snapshot": {
+      "wazuh-analysisd": {
+        "syscheck_queue_usage": "0.00",
+        "syscheck_queue_size": "16384",
+        "syscollector_queue_usage": "0.00",
+        "syscollector_queue_size": "16384",
+        "rootcheck_queue_usage": "0.00",
+        "rootcheck_queue_size": "16384",
+        "sca_queue_usage": "0.00",
+        "sca_queue_size": "16384",
+        "hostinfo_queue_usage": "0.00",
+        "hostinfo_queue_size": "16384",
+        "winevt_queue_usage": "0.00",
+        "winevt_queue_size": "16384",
+        "dbsync_queue_usage": "0.00",
+        "dbsync_queue_size": "16384",
+        "upgrade_queue_usage": "0.00",
+        "upgrade_queue_size": "16384",
+        "event_queue_usage": "0.00",
+        "event_queue_size": "16384",
+        "rule_matching_queue_usage": "0.00",
+        "rule_matching_queue_size": "16384",
+        "alerts_queue_usage": "0.00",
+        "alerts_queue_size": "16384",
+        "firewall_queue_usage": "0.00",
+        "firewall_queue_size": "16384",
+        "statistical_queue_usage": "0.00",
+        "statistical_queue_size": "16384",
+        "archives_queue_usage": "0.00",
+        "archives_queue_size": "16384"
+      },
+      "wazuh-remoted": {
+        "queue_size": "0",
+        "total_queue_size": "131072",
+        "discarded_count": "0",
+        "dequeued_after_close": "2",
+        "ctrl_msg_queue_usage": "0",
+        "ctrl_msg_queue_inserted": "131729",
+        "ctrl_msg_queue_replaced": "11",
+        "ctrl_msg_queue_processed": "131729"
+      }
+    }
+  },
+  "waf_raw_diagnosis": {
+    "sample_count": 4,
+    "strict_parser_accepted": 0,
+    "duplicate_path": "transaction.response.headers.Server",
+    "duplicate_count_per_record": 1,
+    "timestamp_offset_present": false,
+    "strict_parser_relaxed": false
+  },
+  "source_sha256": {
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "test_normalize_events.py": "bf943d8d1baa926f88719f72a1febcebb461c0dcc911bbb2639fa6602aa80f4c",
+    "test_predeployment_edges.py": "e795655995b813eaa23cc951cdb7db5f775dbd0352a8e3c476be5e08da77d09f",
+    "validate_live_samples.py": "60cf41c83f4c8193b7423290bced4092955c8074d4fed492700dca50533592fd",
+    "validate_wazuh_decoder.py": "0a7c69f9d1be013b24e240ef5b3703e393e7c6ed6aa5ad245140b9988ccca27e",
+    "test_validate_wazuh_decoder.py": "72dabd3b60dfbd422448de9520763ab206d6bfb3018face898cc92a5541c44cb",
+    "test_validate_live_samples.py": "22837f59b95e7e45c1ad3610df25f5a25046175851a40dcac596ffe40d5cd49d"
+  },
+  "source_sampling_initial": {
+    "observed_at_kst": "2026-10-13T21:10:32.425645+09:00",
+    "sources": {
+      "suricata": {
+        "file_size_bytes": 16855823,
+        "read_bytes": 16775291,
+        "tail_bound_bytes": 16777216,
+        "selected": 29,
+        "counts": {
+          "non_alert_other": 217,
+          "non_alert_flow": 3920,
+          "non_alert_stats": 1262,
+          "non_alert_tls": 1312,
+          "non_alert_dns": 2374,
+          "non_alert_fileinfo": 316,
+          "non_alert_http": 188,
+          "candidate_records": 29,
+          "non_alert_anomaly": 2,
+          "accepted": 29
+        },
+        "rejections": {},
+        "quality_flags": {},
+        "actions": {
+          "allowed": 29
+        },
+        "time_status": {
+          "source": 29
+        },
+        "protocols": {
+          "tcp": 27,
+          "udp": 2
+        },
+        "normalization_seconds": 0.011431,
+        "output_bytes_min": 822,
+        "output_bytes_max": 872,
+        "sanitized_normalized_samples": [
+          {
+            "capstone_norm": {
+              "schema_version": "1",
+              "source": "suricata",
+              "sensor": "validation-a",
+              "record_id": "suricata:validation:1",
+              "observed_at_kst": "2026-10-13T21:10:32.425632+09:00",
+              "direction": "unknown",
+              "action": "allowed",
+              "quality_flags": [],
+              "rule_ids": [
+                "2013031"
+              ],
+              "native_severity_scale": "suricata_1_3",
+              "native_severity_value": [
+                "2"
+              ],
+              "time_status": "source",
+              "event_time_kst": "2026-10-13T19:53:37.364825+09:00",
+              "source_ip": "192.0.2.1",
+              "destination_ip": "192.0.2.2",
+              "source_port": 39162,
+              "destination_port": 11434,
+              "protocol": "tcp",
+              "flow_source_ip": "192.0.2.1",
+              "flow_destination_ip": "192.0.2.2",
+              "flow_source_port": 39162,
+              "flow_destination_port": 11434,
+              "http_method": "POST",
+              "http_status": 200,
+              "protected_asset": true,
+              "raw_sha256": "fae6e55cda7abbc1c119cfc6f5e0ca09c7760d0aa2ce4124d92c4d8ae4a27705",
+              "event_id": "77658ef5da52d3e22fe443b20a784f0e2f2c69dcbdaed6efba17675ba2049c9b"
+            }
+          },
+          {
+            "capstone_norm": {
+              "schema_version": "1",
+              "source": "suricata",
+              "sensor": "validation-a",
+              "record_id": "suricata:validation:27",
+              "observed_at_kst": "2026-10-13T21:10:32.425632+09:00",
+              "direction": "unknown",
+              "action": "allowed",
+              "quality_flags": [],
+              "rule_ids": [
+                "2022918"
+              ],
+              "native_severity_scale": "suricata_1_3",
+              "native_severity_value": [
+                "3"
+              ],
+              "time_status": "source",
+              "event_time_kst": "2026-10-13T11:38:23.457788+09:00",
+              "source_ip": "192.0.2.1",
+              "destination_ip": "192.0.2.3",
+              "source_port": 54813,
+              "destination_port": 53,
+              "protocol": "udp",
+              "flow_source_ip": "192.0.2.1",
+              "flow_destination_ip": "192.0.2.3",
+              "flow_source_port": 54813,
+              "flow_destination_port": 53,
+              "protected_asset": false,
+              "raw_sha256": "95ca0a80f5eead314e2568d0257453c4afdc49a6733300d2084542e9946efb8d",
+              "event_id": "6cc7b1f47a62bd621ffdde98f5eac3e7e949173072c530147d0ae437340b7e96"
+            }
+          }
+        ]
+      },
+      "modsecurity": {
+        "file_size_bytes": 8432,
+        "read_bytes": 8432,
+        "tail_bound_bytes": 16777216,
+        "selected": 0,
+        "counts": {
+          "unparseable_raw_line": 4
+        },
+        "rejections": {},
+        "quality_flags": {},
+        "actions": {},
+        "time_status": {},
+        "protocols": {},
+        "normalization_seconds": 4e-06,
+        "output_bytes_min": null,
+        "output_bytes_max": null,
+        "sanitized_normalized_samples": []
+      },
+      "nftables": {
+        "journal_limit": 200,
+        "since": "-24h",
+        "selected": 200,
+        "counts": {
+          "candidate_records": 200,
+          "accepted": 200
+        },
+        "rejections": {},
+        "quality_flags": {},
+        "actions": {
+          "observed": 159,
+          "would_drop": 41
+        },
+        "time_status": {
+          "source": 200
+        },
+        "protocols": {
+          "udp": 159,
+          "tcp": 41
+        },
+        "normalization_seconds": 0.050779,
+        "output_bytes_min": 650,
+        "output_bytes_max": 670,
+        "sanitized_normalized_samples": [
+          {
+            "capstone_norm": {
+              "schema_version": "1",
+              "source": "nftables",
+              "sensor": "validation-a",
+              "record_id": "nftables:validation:1",
+              "observed_at_kst": "2026-10-13T21:10:32.425632+09:00",
+              "direction": "unknown",
+              "action": "observed",
+              "quality_flags": [],
+              "rule_ids": [
+                "SPOOF"
+              ],
+              "source_ip": "192.0.2.4",
+              "destination_ip": "192.0.2.5",
+              "source_port": 68,
+              "destination_port": 67,
+              "protocol": "udp",
+              "ingress_interface": "ens192",
+              "time_status": "source",
+              "event_time_kst": "2026-10-13T20:44:08.123239+09:00",
+              "protected_asset": false,
+              "raw_sha256": "b8375fedefd26777fce178ae70ebe60f31afa7b6a6727a5d26f52b3e29145ae0",
+              "event_id": "49f55b5f2c69edb8f86a730921cf9f3057a6efe50367d4b148092ab4c9a7ca94"
+            }
+          },
+          {
+            "capstone_norm": {
+              "schema_version": "1",
+              "source": "nftables",
+              "sensor": "validation-a",
+              "record_id": "nftables:validation:10",
+              "observed_at_kst": "2026-10-13T21:10:32.425632+09:00",
+              "direction": "unknown",
+              "action": "would_drop",
+              "quality_flags": [],
+              "rule_ids": [
+                "FW_SHADOW_OUT"
+              ],
+              "source_ip": "192.0.2.1",
+              "destination_ip": "192.0.2.6",
+              "source_port": 39334,
+              "destination_port": 443,
+              "protocol": "tcp",
+              "egress_interface": "ens192",
+              "time_status": "source",
+              "event_time_kst": "2026-10-13T20:45:26.467241+09:00",
+              "protected_asset": false,
+              "raw_sha256": "dffe34407829898bce312bf26c8187cea286fd4a06116dd79baabee0835d5935",
+              "event_id": "64489fc838548bf194ec9028a07a8dc6636bcb8cab1084ffa02962eb7e397ae1"
+            }
+          }
+        ]
+      }
+    },
+    "raw_data_exported": false,
+    "sample_identity": "synthetic; not original hashes"
+  },
+  "source_sampling_final": {
+    "observed_at_kst": "2026-10-13T21:27:06.885602+09:00",
+    "sources": {
+      "suricata": {
+        "file_size_bytes": 17080909,
+        "read_bytes": 16777216,
+        "complete_line_bytes": 16776450,
+        "tail_bound_bytes": 16777216,
+        "selected": 29,
+        "counts": {
+          "non_alert_other": 226,
+          "non_alert_flow": 3945,
+          "non_alert_stats": 1255,
+          "non_alert_dns": 2406,
+          "non_alert_tls": 1336,
+          "non_alert_fileinfo": 316,
+          "non_alert_http": 188,
+          "candidate_records": 29,
+          "non_alert_anomaly": 2,
+          "accepted": 29
+        },
+        "rejections": {},
+        "quality_flags": {},
+        "actions": {
+          "allowed": 29
+        },
+        "time_status": {
+          "source": 29
+        },
+        "protocols": {
+          "tcp": 27,
+          "udp": 2
+        },
+        "normalization_seconds": 0.006779,
+        "output_bytes_min": 822,
+        "output_bytes_max": 872,
+        "sanitized_normalized_samples": [
+          {
+            "capstone_norm": {
+              "schema_version": "1",
+              "source": "suricata",
+              "sensor": "validation-a",
+              "record_id": "suricata:validation:1",
+              "observed_at_kst": "2026-10-13T21:27:06.885590+09:00",
+              "direction": "unknown",
+              "action": "allowed",
+              "quality_flags": [],
+              "rule_ids": [
+                "2013031"
+              ],
+              "native_severity_scale": "suricata_1_3",
+              "native_severity_value": [
+                "2"
+              ],
+              "time_status": "source",
+              "event_time_kst": "2026-10-13T19:53:37.364825+09:00",
+              "source_ip": "192.0.2.1",
+              "destination_ip": "192.0.2.2",
+              "source_port": 39162,
+              "destination_port": 11434,
+              "protocol": "tcp",
+              "flow_source_ip": "192.0.2.1",
+              "flow_destination_ip": "192.0.2.2",
+              "flow_source_port": 39162,
+              "flow_destination_port": 11434,
+              "http_method": "POST",
+              "http_status": 200,
+              "protected_asset": true,
+              "raw_sha256": "9fb81e8b7e6a992a8efc49f540f361360e68e01e2c204c3c7f0ceab9d49c6d65",
+              "event_id": "ca7374aabae3b1b26ba919e91d7cb04bfac55d6333be96e848045fecf89d230b"
+            }
+          },
+          {
+            "capstone_norm": {
+              "schema_version": "1",
+              "source": "suricata",
+              "sensor": "validation-a",
+              "record_id": "suricata:validation:27",
+              "observed_at_kst": "2026-10-13T21:27:06.885590+09:00",
+              "direction": "unknown",
+              "action": "allowed",
+              "quality_flags": [],
+              "rule_ids": [
+                "2022918"
+              ],
+              "native_severity_scale": "suricata_1_3",
+              "native_severity_value": [
+                "3"
+              ],
+              "time_status": "source",
+              "event_time_kst": "2026-10-13T11:38:23.457788+09:00",
+              "source_ip": "192.0.2.1",
+              "destination_ip": "192.0.2.3",
+              "source_port": 54813,
+              "destination_port": 53,
+              "protocol": "udp",
+              "flow_source_ip": "192.0.2.1",
+              "flow_destination_ip": "192.0.2.3",
+              "flow_source_port": 54813,
+              "flow_destination_port": 53,
+              "protected_asset": false,
+              "raw_sha256": "2dbcb9737b03418b72fd5f596e8b206a27ee65a90b678a4765401d5592c2962c",
+              "event_id": "00c3791aa1aa6049a80ca33488077110894b5e66fa87ec92bb81444e2a93044f"
+            }
+          }
+        ]
+      },
+      "modsecurity": {
+        "file_size_bytes": 8432,
+        "read_bytes": 8432,
+        "complete_line_bytes": 8432,
+        "tail_bound_bytes": 16777216,
+        "selected": 0,
+        "counts": {
+          "unparseable_raw_line": 4
+        },
+        "rejections": {},
+        "quality_flags": {},
+        "actions": {},
+        "time_status": {},
+        "protocols": {},
+        "normalization_seconds": 3e-06,
+        "output_bytes_min": null,
+        "output_bytes_max": null,
+        "sanitized_normalized_samples": []
+      },
+      "nftables": {
+        "journal_limit": 200,
+        "since": "-24h",
+        "selected": 200,
+        "counts": {
+          "candidate_records": 200,
+          "accepted": 200
+        },
+        "rejections": {},
+        "quality_flags": {},
+        "actions": {
+          "observed": 200
+        },
+        "time_status": {
+          "source": 200
+        },
+        "protocols": {
+          "udp": 200
+        },
+        "normalization_seconds": 0.031027,
+        "output_bytes_min": 650,
+        "output_bytes_max": 652,
+        "sanitized_normalized_samples": [
+          {
+            "capstone_norm": {
+              "schema_version": "1",
+              "source": "nftables",
+              "sensor": "validation-a",
+              "record_id": "nftables:validation:1",
+              "observed_at_kst": "2026-10-13T21:27:06.885590+09:00",
+              "direction": "unknown",
+              "action": "observed",
+              "quality_flags": [],
+              "rule_ids": [
+                "SPOOF"
+              ],
+              "source_ip": "192.0.2.4",
+              "destination_ip": "192.0.2.5",
+              "source_port": 68,
+              "destination_port": 67,
+              "protocol": "udp",
+              "ingress_interface": "ens192",
+              "time_status": "source",
+              "event_time_kst": "2026-10-13T20:53:49.044660+09:00",
+              "protected_asset": false,
+              "raw_sha256": "6bacdeb39b6caf2853ab2aa98a134fa0f9a72144e7b7688a4da24659063b10c5",
+              "event_id": "e37747b1b9a51620c05f2d72decb05b0bb4e872387619808acc7f36fd1fb9850"
+            }
+          }
+        ]
+      }
+    },
+    "raw_data_exported": false,
+    "sample_identity": "synthetic; not original hashes"
+  }
+}

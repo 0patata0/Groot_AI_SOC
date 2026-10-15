@@ -1,0 +1,72 @@
+{
+  "211.170.162.110": {
+    "native_fast": {
+      "requests": 18,
+      "errors": 0,
+      "correct_complete": 18,
+      "format_valid": 16,
+      "length_terminated": 0,
+      "wall_p50_seconds": 0.6045716039952822,
+      "first_event_p50_seconds": 0.22522010398097336,
+      "first_answer_p50_seconds": 0.22522010398097336,
+      "decode_tps_p50": 73.70182044050489
+    },
+    "native_thinking": {
+      "requests": 9,
+      "errors": 0,
+      "correct_complete": 9,
+      "format_valid": 9,
+      "length_terminated": 0,
+      "wall_p50_seconds": 9.419804541976191,
+      "first_event_p50_seconds": 0.17335608298890293,
+      "first_answer_p50_seconds": 9.014519624994136,
+      "decode_tps_p50": 73.05915543616315
+    },
+    "openai_default": {
+      "requests": 4,
+      "errors": 0,
+      "correct_complete": 4,
+      "format_valid": 4,
+      "length_terminated": 0,
+      "wall_p50_seconds": 4.1605042914743535,
+      "first_event_p50_seconds": 0.3541005624574609,
+      "first_answer_p50_seconds": 4.150914000463672,
+      "decode_tps_p50": null
+    }
+  },
+  "211.170.162.111": {
+    "native_fast": {
+      "requests": 18,
+      "errors": 0,
+      "correct_complete": 18,
+      "format_valid": 16,
+      "length_terminated": 0,
+      "wall_p50_seconds": 0.738018270523753,
+      "first_event_p50_seconds": 0.5054180625011213,
+      "first_answer_p50_seconds": 0.5054180625011213,
+      "decode_tps_p50": 111.89217430393293
+    },
+    "native_thinking": {
+      "requests": 9,
+      "errors": 0,
+      "correct_complete": 9,
+      "format_valid": 9,
+      "length_terminated": 0,
+      "wall_p50_seconds": 10.95530300005339,
+      "first_event_p50_seconds": 0.44718229200225323,
+      "first_answer_p50_seconds": 10.687110500060953,
+      "decode_tps_p50": 100.63709413596573
+    },
+    "openai_default": {
+      "requests": 4,
+      "errors": 0,
+      "correct_complete": 4,
+      "format_valid": 4,
+      "length_terminated": 0,
+      "wall_p50_seconds": 3.5324116874835454,
+      "first_event_p50_seconds": 0.6170646665268578,
+      "first_answer_p50_seconds": 3.5317421664949507,
+      "decode_tps_p50": null
+    }
+  }
+}

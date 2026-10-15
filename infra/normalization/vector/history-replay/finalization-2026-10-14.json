@@ -1,0 +1,78 @@
+{
+  "recorded_at_kst": "2026-10-14T12:28:14.722641+09:00",
+  "scope": "historical_classification_canary_and_isolated_suricata_rotation",
+  "source_preservation": {
+    "files_each_server": 38,
+    "bytes_each_server": 621689,
+    "changed_each_server": 33,
+    "unchanged_each_server": 5,
+    "source_manifest_sha256": "89fcf262688e1802f5a1d62d4c4bf4d156bc01d95ead88ccc7287aa6b114110a",
+    "source_sha_verified_on_both_servers": true,
+    "backups": "/var/backups/capstone-replay-source-20261014",
+    "evidence_root": "/opt/capstone-automation/project/evidence/replay-20261014",
+    "original_metadata_files_A": 9,
+    "original_metadata_files_B": 6,
+    "B_additional_canonical_verifier_result": "canonical-verifier-check.json",
+    "source_snapshot_precedes_this_cleanup_record_and_final_document_notes": true
+  },
+  "servers": {
+    "a": {
+      "cleanup_at_kst": "2026-10-14T12:26:39+09:00",
+      "removed_files": 106,
+      "removed_bytes": 3240180
+    },
+    "b": {
+      "cleanup_at_kst": "2026-10-14T12:26:50+09:00",
+      "removed_files": 133,
+      "removed_bytes": 750101
+    }
+  },
+  "mac": {
+    "path": "/private/tmp/capstone-replay-20261014.57zei3s8",
+    "files": 67,
+    "bytes": 682912,
+    "new_packages_installed": 0,
+    "path_absent_after_cleanup": true
+  },
+  "agent_extra_mac_cleanup": {
+    "B_private_scripts_removed": 7,
+    "raw_review_private_files_removed": 5,
+    "raw_review_directory_absent": true
+  },
+  "canonical_B_verifier": {
+    "checked_at_kst": "2026-10-14T12:26:20+09:00",
+    "retained_existing_run_only": true,
+    "manager_alerts": 2,
+    "indexer_documents": 2,
+    "successful_shards": 57,
+    "failed_shards": 0,
+    "timed_out": false,
+    "total_relation": "eq",
+    "exact_event_ids_match": true,
+    "strict_ca_and_hostname_validation": true
+  },
+  "final_checks": {
+    "services_pid_invocation_unchanged": true,
+    "container_ids_started_health_unchanged": true,
+    "original_batch_payload_manifest_unchanged": true,
+    "preserved_source_and_evidence_hashes_rechecked_before_cleanup": true,
+    "task_processes_remaining": 0,
+    "raw_fixture_host_container_directories_remaining": 0,
+    "related_services_active_after_cleanup": true,
+    "operational_batches_receipts_canary_records_and_backups_preserved": true,
+    "new_packages_installed": 0,
+    "Mac_raw_or_cursor_export": false,
+    "operating_raw_rotator_deployed": false,
+    "force_crash_or_power_loss_tested": false,
+    "burst_canary_missing_second_alert_root_cause_proven": false
+  },
+  "local_final_validation": {
+    "json_parsed": 4,
+    "runtime_source_hashes_matched": 11,
+    "shell_syntax_passed": 11,
+    "document_links_checked": 194,
+    "missing_links": 0,
+    "task_Mac_directories_absent": true,
+    "infra_wheels_or_bytecode": 0
+  }
+}

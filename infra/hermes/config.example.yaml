@@ -6,6 +6,9 @@
 # 배치·검증: infra/hermes/deploy_hermes_B.sh (prep | load <tar> | test). 이미지엔 mcp[cli] 가 없어 `hermes mcp test` 불가.
 # 2026-09-28 실측은 17툴/2서버(읽기 14+응답 3). security-events 2툴은 2026-10-06 B 배치·원격 조회 검증 후 Hermes 실설정에 등록했다. `hermes mcp list`의 3서버 enabled와 LLM의 새 도구 2개 실제 호출을 확인했다.
 # 2026-10-08 라이브 배포: 별도 승인형 로컬 룰 변경 MCP rule-a/rule-b(각 3툴)를 추가했고 Hermes에서 5서버 enabled와 양쪽 읽기 전용 SSH 조회를 확인했다. 실제 승인→룰 적용 E2E는 미검증이다.
+# 2026-10-13 19:14 후속: rule-a/rule-b 각8툴(propose_rule_edit 추가)·실제 UID 조회/잘못된 편집 거절 검증. timeout420·기존 모델 유지. 새 부분편집 승인→적용 E2E는 후속 확인.
+# 2026-10-13 19:50~19:54 후속: DGX 두 주소 예외를 승인 후 worker가 적용했다. Suricata 시작 19:50:28·로드 19:50:41.988, 19:51 applied·19:54 승인 소비/결과 게시/로드 성공 52,497건·failed/skipped 0 확인.
+# Hermes endpoint를 .110에서 .111로 전환했고 모델·MCP timeout 420초는 유지했다. 실제 UID로 rule-a/rule-b 각 8개 도구와 세 룰 대상 조회를 재확인했다.
 
 mcp_servers:
   wazuh-ro:                                   # 읽기 MCP 서버(B, gbrigandi/mcp-server-wazuh, 계정 mcp-ro) — 14 툴
@@ -50,7 +53,7 @@ mcp_servers:
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-a"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 240
+    timeout: 420                            # 2026-10-13 라이브: 후보 검사·분할 검토 게시 허용 시간
     supports_parallel_tool_calls: false
     trust: full                               # 승인 강제는 서버측 브로커·root 실행기
   rule-b:                                     # B의 Wazuh 로컬 룰 전용, 같은 전용 클라이언트 키
@@ -58,7 +61,7 @@ mcp_servers:
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-b"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 240
+    timeout: 420
     supports_parallel_tool_calls: false
     trust: full
   # rule-change-mcp:end
@@ -66,14 +69,34 @@ mcp_servers:
 security:
   allow_lazy_installs: false                  # 오프라인: 런타임 pip 설치 시도 금지
 
-# ── 모델(LLM) — DGX Spark Ollama (2026-09-28 연결) ──
-# 두 노드 211.170.162.110 / .111 :11434 (OpenAI 호환 /v1, 인증 없음). Mac·A·B 모두 도달. `hermes config set` 으로 설정한 실배치 값:
+# ── 모델(LLM) — DGX Spark Ollama (2026-09-28 최초 연결, 2026-10-13 19:51 .111 전환) ──
+# 두 노드 211.170.162.110 / .111 :11434 (OpenAI 호환 /v1, 인증 없음). 아래는 10/13 19:51:45 KST resolver로 확인한 실배치 값이다.
 model:
   provider: custom
-  base_url: http://211.170.162.110:11434/v1     # 장애 시 .111 로 교체(qwen3.6:35b·gpt-oss:120b 양 노드 공통)
-  default: qwen3.6:35b                          # qwen35moe 36B Q4_K_M, tools/thinking, .110 에 262,144 ctx 상주. 대안 gpt-oss:120b
-# E2E 실측: chat -q → mcp__wazuh_ro__get_wazuh_agents 호출 → 답변(3 API call, 21s).
+  base_url: http://211.170.162.111:11434/v1     # 이전 운영 endpoint는 .110. 기존 대화 DB·.env·SOUL·cron을 보존하고 전환했다.
+  default: qwen3.6:35b                        # qwen35moe 36B Q4_K_M, tools/thinking. 동일 태그지만 노드별 패키징·Ollama 버전은 다름(STATUS.md 참조).
+# .111은 언어 모델+projector 분리 패키지이며 합계 파라미터 수는 .110과 같다. 작은 모델로 교체한 것으로 해석하지 않는다.
+# 2026-09-28 당시 .110 E2E 실측: chat -q → mcp__wazuh_ro__get_wazuh_agents 호출 → 답변(3 API call, 21s).
+# 2026-10-13 동일 Hermes 컨테이너 StartedAt=19:51:42.745 KST, Mattermost WebSocket 재연결 19:51:54·.111 API HTTP 200/한국어 응답 19:53 확인.
+# .111 전환 후 체감 속도·실제 채팅 왕복은 별도 미측정.
+
+# 2026-10-15 후속: 동일 합성 도구 입력에서 medium은 추론만 하다 상한 종료,
+# none은 정확한 native 호출 반환. 현재 모델만 지정하며 다른 모델 기본값은 유지한다.
+# gateway는 요청마다 다시 읽는다. 세션별 /reasoning 설정이 있으면 그 값이 우선한다.
+agent:
+  reasoning_overrides:
+    "qwen3.6:35b": "none"
 
 # ── 평가(측정) 모드: 학습 비활성화로 회차 독립성 확보 (infra/hermes/eval_reset.md) ──
 # memory:
 #   memory_enabled: false
+
+# 2026-10-13: Mattermost 설명은 한국어 출력 검사를 마친 뒤 전송한다.
+# 별도 이미지 코드 패치도 필요: korean-output-guard.md 참조.
+display:
+  platforms:
+    mattermost:
+      streaming: false
+      interim_assistant_messages: false
+      show_reasoning: false
+      thinking_progress: false

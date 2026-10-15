@@ -1,0 +1,757 @@
+{
+  "schema": 1,
+  "checked_at_kst": "2026-10-14T00:44:42.245067+09:00",
+  "passed": true,
+  "scope": "isolated_durable_inbox_and_explicit_waf_reprocess",
+  "regression_tests": 285,
+  "production_wazuh_input_changed": false,
+  "production_rotation_changed": false,
+  "wazuh_analysis_confirmed": false,
+  "code_sha256": {
+    "probe_delivery_source.py": "b557c61dca4519f77889bebb84781916f49ce7ecc969ae517863a2016dab6739",
+    "collector_file_reader.py": "40d2882d664d5563394eec8f9fd597337729775aa4ad5a901b3846f42950c8ad",
+    "validate_live_samples.py": "60cf41c83f4c8193b7423290bced4092955c8074d4fed492700dca50533592fd",
+    "collector_waf_evidence.py": "c21441304fbf40b86f118a6219ae6306630781b54f54414b70cd774d6275fdfd",
+    "delivery_stdio.py": "c25c0c39d4e0c5e83edb9e967f572525d7e17dc55398e4b7947382515e6ae837",
+    "waf_input_adapter.py": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b",
+    "collector.py": "60283680696f0537fcc1f8114f0e58a76ce1ce180adf397bb0c77113ab40adba",
+    "collector_delivery.py": "1172ddcb754b08cb5990069ef9fc8d130be9b674f69566af52648a58be053672",
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "verify_waf_reprocess.py": "a2cce24479add0244b76639123d96d4a24201f3bc7ad3d1e47d4b3c8bb3ff79d",
+    "collector_delivery_gate.py": "98d028cf36f737f911d097c61ac467ea18973e1071855469c334513f5ea76c7f",
+    "validate_wazuh_decoder.py": "0a7c69f9d1be013b24e240ef5b3703e393e7c6ed6aa5ad245140b9988ccca27e",
+    "collector_rotation_proof.py": "cead5a188b4a3a2a61653cd8bd06d7e068c0b099b3e84a03846d117a14f75752",
+    "collector_rotation.py": "0e3e6de7483ea526f9ca3d5df5d7ca8e3c85251f1b002d1856f6756cb63393ea",
+    "probe_waf_rotation.py": "9cdcba56d8d030f24e5830df4b3a91f4c3d1b64a7731438d5822e7424dc93bd7",
+    "collector_reprocess.py": "b68abbe23e03e7111f0a981e24ceeffa16acf4b7fd7e545c208008b893f26db8",
+    "probe_suricata_rotation.py": "d6b6ebc388cdf488efd5efba6594bb4d2a123c06467811b4d0a5c99c2884107c",
+    "collector_journal_reader.py": "645e2e321610964e46a0ad44b6f529ec9da734e5f6291c744272f51b50cac552",
+    "verify_waf_time_evidence.py": "89a5d40dc9c20a193a6ccc3809deafa60acc0727370e5b434dff543249052c06",
+    "collector_delivery_transport.py": "f6e5eb8692d09831116e31cc5fd33a658f1991ff3a2d47f5b4896dfdc5bf03b0",
+    "collector_store.py": "0b0575a1cc0facc21d2313be25005a28c657089282334852cc8c7ecfaf5ad776"
+  },
+  "handoff_source_sha256": {
+    "collector.py": "60283680696f0537fcc1f8114f0e58a76ce1ce180adf397bb0c77113ab40adba",
+    "collector_delivery.py": "1172ddcb754b08cb5990069ef9fc8d130be9b674f69566af52648a58be053672",
+    "collector_delivery_gate.py": "98d028cf36f737f911d097c61ac467ea18973e1071855469c334513f5ea76c7f",
+    "collector_delivery_transport.py": "f6e5eb8692d09831116e31cc5fd33a658f1991ff3a2d47f5b4896dfdc5bf03b0",
+    "collector_file_reader.py": "40d2882d664d5563394eec8f9fd597337729775aa4ad5a901b3846f42950c8ad",
+    "collector_journal_reader.py": "645e2e321610964e46a0ad44b6f529ec9da734e5f6291c744272f51b50cac552",
+    "collector_reprocess.py": "b68abbe23e03e7111f0a981e24ceeffa16acf4b7fd7e545c208008b893f26db8",
+    "collector_rotation.py": "0e3e6de7483ea526f9ca3d5df5d7ca8e3c85251f1b002d1856f6756cb63393ea",
+    "collector_rotation_proof.py": "cead5a188b4a3a2a61653cd8bd06d7e068c0b099b3e84a03846d117a14f75752",
+    "collector_store.py": "0b0575a1cc0facc21d2313be25005a28c657089282334852cc8c7ecfaf5ad776",
+    "collector_waf_evidence.py": "c21441304fbf40b86f118a6219ae6306630781b54f54414b70cd774d6275fdfd",
+    "delivery_stdio.py": "c25c0c39d4e0c5e83edb9e967f572525d7e17dc55398e4b7947382515e6ae837",
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "probe_delivery_source.py": "b557c61dca4519f77889bebb84781916f49ce7ecc969ae517863a2016dab6739",
+    "probe_suricata_rotation.py": "d6b6ebc388cdf488efd5efba6594bb4d2a123c06467811b4d0a5c99c2884107c",
+    "probe_waf_rotation.py": "9cdcba56d8d030f24e5830df4b3a91f4c3d1b64a7731438d5822e7424dc93bd7",
+    "validate_live_samples.py": "60cf41c83f4c8193b7423290bced4092955c8074d4fed492700dca50533592fd",
+    "validate_wazuh_decoder.py": "0a7c69f9d1be013b24e240ef5b3703e393e7c6ed6aa5ad245140b9988ccca27e",
+    "verify_waf_reprocess.py": "e271366b680a973f36069d82e04a0183fbf5f41b892e7189588d5261bc13dd21",
+    "verify_waf_time_evidence.py": "89a5d40dc9c20a193a6ccc3809deafa60acc0727370e5b434dff543249052c06",
+    "waf_input_adapter.py": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b"
+  },
+  "final_waf_source_sha256": {
+    "collector.py": "60283680696f0537fcc1f8114f0e58a76ce1ce180adf397bb0c77113ab40adba",
+    "collector_delivery.py": "1172ddcb754b08cb5990069ef9fc8d130be9b674f69566af52648a58be053672",
+    "collector_delivery_gate.py": "98d028cf36f737f911d097c61ac467ea18973e1071855469c334513f5ea76c7f",
+    "collector_delivery_transport.py": "f6e5eb8692d09831116e31cc5fd33a658f1991ff3a2d47f5b4896dfdc5bf03b0",
+    "collector_file_reader.py": "40d2882d664d5563394eec8f9fd597337729775aa4ad5a901b3846f42950c8ad",
+    "collector_journal_reader.py": "645e2e321610964e46a0ad44b6f529ec9da734e5f6291c744272f51b50cac552",
+    "collector_reprocess.py": "b68abbe23e03e7111f0a981e24ceeffa16acf4b7fd7e545c208008b893f26db8",
+    "collector_rotation.py": "0e3e6de7483ea526f9ca3d5df5d7ca8e3c85251f1b002d1856f6756cb63393ea",
+    "collector_rotation_proof.py": "cead5a188b4a3a2a61653cd8bd06d7e068c0b099b3e84a03846d117a14f75752",
+    "collector_store.py": "0b0575a1cc0facc21d2313be25005a28c657089282334852cc8c7ecfaf5ad776",
+    "collector_waf_evidence.py": "c21441304fbf40b86f118a6219ae6306630781b54f54414b70cd774d6275fdfd",
+    "delivery_stdio.py": "c25c0c39d4e0c5e83edb9e967f572525d7e17dc55398e4b7947382515e6ae837",
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "probe_delivery_source.py": "b557c61dca4519f77889bebb84781916f49ce7ecc969ae517863a2016dab6739",
+    "probe_suricata_rotation.py": "d6b6ebc388cdf488efd5efba6594bb4d2a123c06467811b4d0a5c99c2884107c",
+    "probe_waf_rotation.py": "9cdcba56d8d030f24e5830df4b3a91f4c3d1b64a7731438d5822e7424dc93bd7",
+    "validate_live_samples.py": "60cf41c83f4c8193b7423290bced4092955c8074d4fed492700dca50533592fd",
+    "validate_wazuh_decoder.py": "0a7c69f9d1be013b24e240ef5b3703e393e7c6ed6aa5ad245140b9988ccca27e",
+    "verify_waf_reprocess.py": "a2cce24479add0244b76639123d96d4a24201f3bc7ad3d1e47d4b3c8bb3ff79d",
+    "verify_waf_time_evidence.py": "89a5d40dc9c20a193a6ccc3809deafa60acc0727370e5b434dff543249052c06",
+    "waf_input_adapter.py": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b"
+  },
+  "receiver_runtime_sha256": {
+    "collector_delivery.py": "1172ddcb754b08cb5990069ef9fc8d130be9b674f69566af52648a58be053672",
+    "collector_store.py": "0b0575a1cc0facc21d2313be25005a28c657089282334852cc8c7ecfaf5ad776",
+    "delivery_stdio.py": "c25c0c39d4e0c5e83edb9e967f572525d7e17dc55398e4b7947382515e6ae837",
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00"
+  },
+  "source_version_note": "Only verify_waf_reprocess.py changed after handoff; bounded read/identity checks and installed Docker path were revalidated in the separate final WAF run.",
+  "handoff": {
+    "delivered": [
+      {
+        "delivery_id": "fc51ed362a3d41f07f3b306d36d2a66bc765e9e1ce316749c2e31845d496c5e9",
+        "event_id": "e262234ea7f2e45c421011740afe0f783531bef0ef2f3591bfcd25ada6f0c4e1",
+        "normalized_sha256": "79d7f9d042959152044af1e5115293faf5a8d210aa77a6517241a7d6210521fa",
+        "raw_bytes_sha256": "081ab1cae33c2f1dbcc90a2cb583229ec777a535c21d0700d16d286cfbfa77c6",
+        "record_id": "journal:00322eab73e91e00b057bb5f3bcffb93fcfabefd2e057b4ecc42df1ecb4e711d",
+        "source_key": "probe-kernel"
+      },
+      {
+        "delivery_id": "49149b4923f40629db01fb4ef191519bd6cd43f90e565bc12dbea92832f7157c",
+        "event_id": "bccca55be25e9c1f023bdf020a9d8d4836c1b23d215eeea77070bf7be4a7b384",
+        "normalized_sha256": "5a7bd6f3f3493591aa7eb7f98de93ae8b19ddc8cda207ed0a97902514a41495c",
+        "raw_bytes_sha256": "645e9559d75993a886d26d6e2f9a13061f6a67df0cf8778a52a2f64371841274",
+        "record_id": "journal:00a8798d6594e787f3cbb2112d70ae1dedaafc08dfcc96bfb8df97fc4c3e8326",
+        "source_key": "probe-kernel"
+      },
+      {
+        "delivery_id": "ffad11185624f3ef932e5eccf532240039ee1d888c6b3e82a046aa6cfc7093ca",
+        "event_id": "bee43d8c12471ee447694c518dae2e7b4741582f232ca9183b9a1e0ec3694a2c",
+        "normalized_sha256": "5ee0fe1ccd7b03415b08571b08fc1be6403b149c78927d7ed4feef53e78dd0b5",
+        "raw_bytes_sha256": "b21728e4c901860f747299adce183c491d9f480823b28a3ac8339ac953b140ee",
+        "record_id": "journal:013e8b94125f7aaad229bd35174a5afd70db7d643fe021c8f479ba29d624adce",
+        "source_key": "probe-kernel"
+      },
+      {
+        "delivery_id": "3d7080603382576e3405fb1ac5a99c3c5d59e9f06d06cf5b3cda3847223812a4",
+        "event_id": "1be58ab8eed741191e955ad69719bc5d2b6270ddd42065f9f3685620012c538e",
+        "normalized_sha256": "94763021873c44e636f936cdd6d5469602482ba4d33ed861c4ff8685dc961e99",
+        "raw_bytes_sha256": "cdc17130640cda8b49916d6a6c888dc603bda2aba8518bb059b444dd2331776e",
+        "record_id": "file:e1ee8a46b336429ea06001187cfa0335:0:632",
+        "source_key": "probe-suricata"
+      }
+    ],
+    "durable_receipts": 4,
+    "expected_inbox_records": 4,
+    "kernel_collection": {
+      "blocked": null,
+      "ignored": 0,
+      "inserted": 200,
+      "notices": [
+        "bootstrap_at_beginning"
+      ],
+      "quarantine": 0,
+      "ready": 200,
+      "replayed": 0
+    },
+    "kernel_window": "latest_200_existing_records",
+    "lost_reply_simulated": true,
+    "ok": true,
+    "outbox_reopened_after_lost_reply": true,
+    "retained_raw_and_event_ids_unchanged": true,
+    "source_records": 202,
+    "suricata": {
+      "active_gate": "delivery_generation_not_verified",
+      "active_withheld": 1,
+      "before_gate": "delivery_generation_not_verified",
+      "closed_sequence": 1,
+      "closed_sha256": "cdc17130640cda8b49916d6a6c888dc603bda2aba8518bb059b444dd2331776e",
+      "released": 1
+    },
+    "transport_calls": 5,
+    "wazuh_analysis_confirmed": false
+  },
+  "receiver": {
+    "rows": [
+      {
+        "delivery_id": "3d7080603382576e3405fb1ac5a99c3c5d59e9f06d06cf5b3cda3847223812a4",
+        "event_id": "1be58ab8eed741191e955ad69719bc5d2b6270ddd42065f9f3685620012c538e",
+        "normalized_sha256": "94763021873c44e636f936cdd6d5469602482ba4d33ed861c4ff8685dc961e99",
+        "payload_sha256": "db390e20942a6e56702ae3e4daefde4c02e763c61ef81d284088cf33492c2515",
+        "source_key": "probe-suricata"
+      },
+      {
+        "delivery_id": "49149b4923f40629db01fb4ef191519bd6cd43f90e565bc12dbea92832f7157c",
+        "event_id": "bccca55be25e9c1f023bdf020a9d8d4836c1b23d215eeea77070bf7be4a7b384",
+        "normalized_sha256": "5a7bd6f3f3493591aa7eb7f98de93ae8b19ddc8cda207ed0a97902514a41495c",
+        "payload_sha256": "cfb42d6fe5095dfc68a22d0f2581d963e23ae892a7b893705111f4a47eed66e1",
+        "source_key": "probe-kernel"
+      },
+      {
+        "delivery_id": "fc51ed362a3d41f07f3b306d36d2a66bc765e9e1ce316749c2e31845d496c5e9",
+        "event_id": "e262234ea7f2e45c421011740afe0f783531bef0ef2f3591bfcd25ada6f0c4e1",
+        "normalized_sha256": "79d7f9d042959152044af1e5115293faf5a8d210aa77a6517241a7d6210521fa",
+        "payload_sha256": "bdf469004a86dfdf74e3eb3b629c96a712dd3480d262ac15839fcb38cc230a85",
+        "source_key": "probe-kernel"
+      },
+      {
+        "delivery_id": "ffad11185624f3ef932e5eccf532240039ee1d888c6b3e82a046aa6cfc7093ca",
+        "event_id": "bee43d8c12471ee447694c518dae2e7b4741582f232ca9183b9a1e0ec3694a2c",
+        "normalized_sha256": "5ee0fe1ccd7b03415b08571b08fc1be6403b149c78927d7ed4feef53e78dd0b5",
+        "payload_sha256": "a8a6076567704b0810ee942247ea3e0d0fb0171ad6b119ca760137ad2e8605b4",
+        "source_key": "probe-kernel"
+      }
+    ],
+    "runtime_sources": {
+      "collector_delivery.py": "1172ddcb754b08cb5990069ef9fc8d130be9b674f69566af52648a58be053672",
+      "collector_store.py": "0b0575a1cc0facc21d2313be25005a28c657089282334852cc8c7ecfaf5ad776",
+      "delivery_stdio.py": "c25c0c39d4e0c5e83edb9e967f572525d7e17dc55398e4b7947382515e6ae837",
+      "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00"
+    },
+    "stats": {
+      "by_status": {
+        "ignored": 4,
+        "quarantine": 0,
+        "ready": 0
+      },
+      "db_bytes": 49152,
+      "effective_by_status": {
+        "ignored": 4,
+        "quarantine": 0,
+        "ready": 0
+      },
+      "logical_bytes": 6629,
+      "max_bytes": 67108864,
+      "max_records": 100000,
+      "physical_limit_bytes": 134283264,
+      "recovered_count": 0,
+      "reprocess_attempt_count": 0,
+      "state_count": 1,
+      "total_records": 4
+    },
+    "test_root_removed": true
+  },
+  "waf_reprocess": {
+    "delivered": 0,
+    "export_withheld": "delivery_plain_file_unsealed",
+    "finished_at": "2026-10-13T15:43:21.616138+00:00",
+    "original_bytes": 8432,
+    "original_quarantine": 4,
+    "original_record_and_checkpoint_unchanged": true,
+    "original_sha256": "d28540b45327860cf0d6b30e0f60a8e5bda78b763dc3b7514ff3ac4b12150aa9",
+    "passed": true,
+    "recovered_ready": 4,
+    "replay_extra_attempts": 0,
+    "rows": [
+      {
+        "event_id": "ad9417c687ec78f2082465b4de13ef14e4210a2436077101916493bb80f3aeb6",
+        "event_time_kst": "2026-10-13T03:00:36.000000+09:00",
+        "processing_revision": 1,
+        "raw_bytes_sha256": "03180c056697ca6ddbe0091fe3a3cc21008358008df0ed1f59f8bb58b3f41c36",
+        "record_id": "file:5af4079028d14a70b8bc7696caddb7c0:0:2189",
+        "time_evidence_ref": "waf-access:b9443c9c6dcf69e35d1e5eb0fb4c537b1f4cc0d2aadb6a1fbe889f50f482a9bd"
+      },
+      {
+        "event_id": "d3ba39afffcad035f990a9666e902bf00ff00092207f443590d67cfbfc5efd16",
+        "event_time_kst": "2026-10-13T03:00:56.000000+09:00",
+        "processing_revision": 1,
+        "raw_bytes_sha256": "32c71c8109a78ada60b406cd04f388b05d5826ef3c4be169736ca9f7f216f0bd",
+        "record_id": "file:5af4079028d14a70b8bc7696caddb7c0:2189:4378",
+        "time_evidence_ref": "waf-access:f7835b834d12d7b5ff544b48b99a92ef235ef4dcc3dc5b34fd4cec7a47fafe19"
+      },
+      {
+        "event_id": "3788c8e35520a22047989d30b6e1be34e8907f771349a058d3b7d2ce30b1aefc",
+        "event_time_kst": "2026-10-13T03:04:43.000000+09:00",
+        "processing_revision": 1,
+        "raw_bytes_sha256": "ad75ebce122be2d75fc0eea7fc8558c8dd68fd2e42e56d5d3cbf2dfd260849a8",
+        "record_id": "file:5af4079028d14a70b8bc7696caddb7c0:4378:6566",
+        "time_evidence_ref": "waf-access:731e60cc5a06fb6a9d57391cf19cfbbc953b7d4f33b63de1b1845592c2cd2408"
+      },
+      {
+        "event_id": "7f9d10222d52776b8945fc48b1e8fa05bb497aec27ff3efe157ca1376c053bc1",
+        "event_time_kst": "2026-10-13T03:04:45.000000+09:00",
+        "processing_revision": 1,
+        "raw_bytes_sha256": "c7839c4949c40685da87a905fd786748bdcbbfb72ca981fb5f18816ffe4e16c6",
+        "record_id": "file:5af4079028d14a70b8bc7696caddb7c0:6566:8432",
+        "time_evidence_ref": "waf-access:366bca1f040d3b76cc46fc356af18a6430b05c3809051d9f4f6a7edae4f381d3"
+      }
+    ],
+    "source_unchanged": true,
+    "started_at": "2026-10-13T15:43:21.489119+00:00"
+  },
+  "earlier_attempts": [
+    {
+      "time": "2026-10-13T15:35:56.712351+00:00",
+      "error": "probe_insufficient_ready_kernel_records",
+      "sent": 0,
+      "cleanup": true,
+      "resolution": "Use explicitly bounded latest 200 kernel records for the isolated fixture, not boot records."
+    },
+    {
+      "time": "2026-10-13T15:37:43.534802+00:00",
+      "error": "waf_verification_source_limit",
+      "handoff_passed": true,
+      "cleanup": true,
+      "resolution": "Active audit was empty after midnight rotation; retained audit.log.1 has the prior 8432-byte SHA."
+    },
+    {
+      "time": "2026-10-13T15:42:03.319506+00:00",
+      "error": "waf_verification_evidence_not_recovered",
+      "cleanup": true,
+      "resolution": "Correct verifier Docker executable to observed /usr/local/bin/docker; four supporting access rows exist."
+    }
+  ],
+  "live_before": {
+    "a": {
+      "containers": [
+        {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "name": "/suricata",
+          "pid": 1534179,
+          "running": true,
+          "started": "2026-10-13T10:50:28.696240875Z"
+        },
+        {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "name": "/waf",
+          "pid": 647700,
+          "running": true,
+          "started": "2026-10-05T10:18:45.433754298Z"
+        },
+        {
+          "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+          "name": "/chatproxy",
+          "pid": 84380,
+          "running": true,
+          "started": "2026-09-29T01:44:03.48454989Z"
+        }
+      ],
+      "files": {
+        "/etc/logrotate.d/capstone-secstack": {
+          "sha256": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a"
+        },
+        "/home/groot_a/capstone/secstack/docker-compose.yml": {
+          "sha256": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+        },
+        "/var/ossec/etc/ossec.conf": {
+          "sha256": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef"
+        }
+      },
+      "hostname": "groot-sec",
+      "localfiles": [
+        {
+          "command": "df -P",
+          "frequency": "360",
+          "log_format": "command"
+        },
+        {
+          "alias": "netstat listening ports",
+          "command": "netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ \\+[[:digit:]]\\+\\ \\+[[:digit:]]\\+\\ \\+\\(.*\\):\\([[:digit:]]*\\)\\ \\+\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "command": "last -n 20",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "location": "journald",
+          "log_format": "journald"
+        },
+        {
+          "location": "/var/ossec/logs/active-responses.log",
+          "log_format": "syslog"
+        },
+        {
+          "location": "/var/log/dpkg.log",
+          "log_format": "syslog"
+        },
+        {
+          "label": "suricata",
+          "location": "/home/groot_a/capstone/secstack/logs/suricata/eve.json",
+          "log_format": "json"
+        },
+        {
+          "label": "modsecurity",
+          "location": "/home/groot_a/capstone/secstack/logs/modsec/audit.log",
+          "log_format": "json"
+        }
+      ],
+      "time": "2026-10-14T00:18:49+09:00"
+    },
+    "b": {
+      "containers": [
+        {
+          "id": "567a3c832d2d400641ab27175a64c27103c0148575cdbad76300d367638e8230",
+          "name": "/mm-app",
+          "pid": 888847,
+          "running": true,
+          "started": "2026-10-06T07:09:17.358679291Z"
+        },
+        {
+          "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "name": "/hermes",
+          "pid": 1864025,
+          "running": true,
+          "started": "2026-10-13T11:51:04.311748393Z"
+        },
+        {
+          "id": "f92af50a014e088e87caf34e330929fa986f66c25807ef18d668cfbc82d2f5de",
+          "name": "/mm-postgres",
+          "pid": 1799,
+          "running": true,
+          "started": "2026-09-28T06:19:48.728322004Z"
+        },
+        {
+          "id": "62fcd6e31e7e7dae9f195d69b5cfd50d5acac60c7d6d5ab9ec6d8f83413fd3cb",
+          "name": "/single-node-wazuh.dashboard-1",
+          "pid": 1789629,
+          "running": true,
+          "started": "2026-10-13T02:15:15.675929841Z"
+        },
+        {
+          "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+          "name": "/single-node-wazuh.manager-1",
+          "pid": 1793,
+          "running": true,
+          "started": "2026-09-28T06:19:48.672047166Z"
+        },
+        {
+          "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+          "name": "/single-node-wazuh.indexer-1",
+          "pid": 1822,
+          "running": true,
+          "started": "2026-09-28T06:19:48.729016621Z"
+        }
+      ],
+      "files": {},
+      "hostname": "groot-siem",
+      "manager_config_sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+      "manager_groups": [],
+      "manager_localfiles": [
+        {
+          "command": "df -P",
+          "frequency": "360",
+          "log_format": "command"
+        },
+        {
+          "alias": "netstat listening ports",
+          "command": "netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ \\+[[:digit:]]\\+\\ \\+[[:digit:]]\\+\\ \\+\\(.*\\):\\([[:digit:]]*\\)\\ \\+\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "command": "last -n 20",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "location": "/var/ossec/logs/active-responses.log",
+          "log_format": "syslog"
+        }
+      ],
+      "manager_settings": {
+        "email_alert_level": [
+          "12"
+        ],
+        "jsonout_output": [
+          "yes"
+        ],
+        "log_alert_level": [
+          "3"
+        ],
+        "logall": [
+          "no"
+        ],
+        "logall_json": [
+          "no"
+        ]
+      },
+      "time": "2026-10-14T00:18:52+09:00"
+    }
+  },
+  "live_after_handoff": {
+    "a": {
+      "containers": [
+        {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "name": "/suricata",
+          "pid": 1534179,
+          "running": true,
+          "started": "2026-10-13T10:50:28.696240875Z"
+        },
+        {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "name": "/waf",
+          "pid": 647700,
+          "running": true,
+          "started": "2026-10-05T10:18:45.433754298Z"
+        },
+        {
+          "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+          "name": "/chatproxy",
+          "pid": 84380,
+          "running": true,
+          "started": "2026-09-29T01:44:03.48454989Z"
+        }
+      ],
+      "files": {
+        "/etc/logrotate.d/capstone-secstack": {
+          "sha256": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a"
+        },
+        "/home/groot_a/capstone/secstack/docker-compose.yml": {
+          "sha256": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+        },
+        "/var/ossec/etc/ossec.conf": {
+          "sha256": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef"
+        }
+      },
+      "hostname": "groot-sec",
+      "localfiles": [
+        {
+          "command": "df -P",
+          "frequency": "360",
+          "log_format": "command"
+        },
+        {
+          "alias": "netstat listening ports",
+          "command": "netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ \\+[[:digit:]]\\+\\ \\+[[:digit:]]\\+\\ \\+\\(.*\\):\\([[:digit:]]*\\)\\ \\+\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "command": "last -n 20",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "location": "journald",
+          "log_format": "journald"
+        },
+        {
+          "location": "/var/ossec/logs/active-responses.log",
+          "log_format": "syslog"
+        },
+        {
+          "location": "/var/log/dpkg.log",
+          "log_format": "syslog"
+        },
+        {
+          "label": "suricata",
+          "location": "/home/groot_a/capstone/secstack/logs/suricata/eve.json",
+          "log_format": "json"
+        },
+        {
+          "label": "modsecurity",
+          "location": "/home/groot_a/capstone/secstack/logs/modsec/audit.log",
+          "log_format": "json"
+        }
+      ],
+      "time": "2026-10-14T00:42:24+09:00"
+    },
+    "b": {
+      "containers": [
+        {
+          "id": "567a3c832d2d400641ab27175a64c27103c0148575cdbad76300d367638e8230",
+          "name": "/mm-app",
+          "pid": 888847,
+          "running": true,
+          "started": "2026-10-06T07:09:17.358679291Z"
+        },
+        {
+          "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "name": "/hermes",
+          "pid": 1864025,
+          "running": true,
+          "started": "2026-10-13T11:51:04.311748393Z"
+        },
+        {
+          "id": "f92af50a014e088e87caf34e330929fa986f66c25807ef18d668cfbc82d2f5de",
+          "name": "/mm-postgres",
+          "pid": 1799,
+          "running": true,
+          "started": "2026-09-28T06:19:48.728322004Z"
+        },
+        {
+          "id": "62fcd6e31e7e7dae9f195d69b5cfd50d5acac60c7d6d5ab9ec6d8f83413fd3cb",
+          "name": "/single-node-wazuh.dashboard-1",
+          "pid": 1789629,
+          "running": true,
+          "started": "2026-10-13T02:15:15.675929841Z"
+        },
+        {
+          "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+          "name": "/single-node-wazuh.manager-1",
+          "pid": 1793,
+          "running": true,
+          "started": "2026-09-28T06:19:48.672047166Z"
+        },
+        {
+          "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+          "name": "/single-node-wazuh.indexer-1",
+          "pid": 1822,
+          "running": true,
+          "started": "2026-09-28T06:19:48.729016621Z"
+        }
+      ],
+      "files": {},
+      "hostname": "groot-siem",
+      "manager_config_sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+      "manager_groups": [],
+      "manager_localfiles": [
+        {
+          "command": "df -P",
+          "frequency": "360",
+          "log_format": "command"
+        },
+        {
+          "alias": "netstat listening ports",
+          "command": "netstat -tulpn | sed 's/\\([[:alnum:]]\\+\\)\\ \\+[[:digit:]]\\+\\ \\+[[:digit:]]\\+\\ \\+\\(.*\\):\\([[:digit:]]*\\)\\ \\+\\([0-9\\.\\:\\*]\\+\\).\\+\\ \\([[:digit:]]*\\/[[:alnum:]\\-]*\\).*/\\1 \\2 == \\3 == \\4 \\5/' | sort -k 4 -g | sed 's/ == \\(.*\\) ==/:\\1/' | sed 1,2d",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "command": "last -n 20",
+          "frequency": "360",
+          "log_format": "full_command"
+        },
+        {
+          "location": "/var/ossec/logs/active-responses.log",
+          "log_format": "syslog"
+        }
+      ],
+      "manager_settings": {
+        "email_alert_level": [
+          "12"
+        ],
+        "jsonout_output": [
+          "yes"
+        ],
+        "log_alert_level": [
+          "3"
+        ],
+        "logall": [
+          "no"
+        ],
+        "logall_json": [
+          "no"
+        ]
+      },
+      "time": "2026-10-14T00:42:21+09:00"
+    }
+  },
+  "configuration_and_container_identity_unchanged": true,
+  "rotation_inventory": {
+    "audit_files": [
+      {
+        "ino": 1441923,
+        "mtime_ns": 1791730804258507549,
+        "name": "audit.log.3.gz",
+        "sha256": "43f7774af5cfab7e5b70d1860628e5137449904fbf0792392b5f9bb14041814a",
+        "size": 1461
+      },
+      {
+        "ino": 1441950,
+        "mtime_ns": 1791072022264624386,
+        "name": "audit.log.11.gz",
+        "sha256": "745d4329a98756de48cf2b39db6f9e016ab5eec769e9316126c0bb1680c7d998",
+        "size": 1455
+      },
+      {
+        "ino": 1441964,
+        "mtime_ns": 1791158422293221736,
+        "name": "audit.log.10.gz",
+        "sha256": "a2524066322465fc0986269e394e3aba9112e93c0c70f8f926ac27a973da234d",
+        "size": 1445
+      },
+      {
+        "ino": 1441974,
+        "mtime_ns": 1791385203921173362,
+        "name": "audit.log.7.gz",
+        "sha256": "15bda904a2fb11a73da22ad5a0c4ffa0866923aed31687e398d8dbe1f2aadbbc",
+        "size": 1456
+      },
+      {
+        "ino": 1441944,
+        "mtime_ns": 1790899222242118355,
+        "name": "audit.log.13.gz",
+        "sha256": "4efea29ad20c3fcd1677d64a3e6050294490aa6b21f483ba892f6c65204f9fa6",
+        "size": 1449
+      },
+      {
+        "ino": 1441987,
+        "mtime_ns": 1791558005270460475,
+        "name": "audit.log.5.gz",
+        "sha256": "0d9dddf953c917959518eaa245de9a8acba0dfc5d336be32462a294bdd5b7c76",
+        "size": 1468
+      },
+      {
+        "ino": 1441992,
+        "mtime_ns": 1791817201234630330,
+        "name": "audit.log.2.gz",
+        "sha256": "fe22691e157fd9bbb5c4cae8c8f11c3ff3a48c01a2007b39ffb9a737114a8194",
+        "size": 1464
+      },
+      {
+        "ino": 1441912,
+        "mtime_ns": 1791644402360276486,
+        "name": "audit.log.4.gz",
+        "sha256": "9bd0520a8fd966a0bdd1d83fa650bddfaf179a04f4167b685d4d398d99821a29",
+        "size": 1463
+      },
+      {
+        "ino": 1441881,
+        "mtime_ns": 1791903608473955176,
+        "name": "audit.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size": 0
+      },
+      {
+        "ino": 1441982,
+        "mtime_ns": 1791471602314864549,
+        "name": "audit.log.6.gz",
+        "sha256": "1199c9b2bedbe267de80fbd5a0ca6135d17d4922110de5d4608784d4597b32ef",
+        "size": 1456
+      },
+      {
+        "ino": 1441931,
+        "mtime_ns": 1790812822424979871,
+        "name": "audit.log.14.gz",
+        "sha256": "3cf097feef980a3298b2abd0cea10242f2c64202bf410bc2a840f48815b919b9",
+        "size": 1448
+      },
+      {
+        "ino": 1441968,
+        "mtime_ns": 1791244832287876251,
+        "name": "audit.log.9.gz",
+        "sha256": "28e4ddefde2b17609c4bd1b6f96aa56afe369bc9ada77e5e24f8cd38d5f0a882",
+        "size": 2959
+      },
+      {
+        "ino": 1441947,
+        "mtime_ns": 1790985602367132824,
+        "name": "audit.log.12.gz",
+        "sha256": "5f2287c9c052a188b67d1e2f81840cceb1463015a9a33035449a3c1e4e102b21",
+        "size": 2343
+      },
+      {
+        "ino": 1441971,
+        "mtime_ns": 1791298804486277951,
+        "name": "audit.log.8.gz",
+        "sha256": "eb2b2ff023689db0955621b80ba9af921e9f63585bbaf94f530983f16280c82b",
+        "size": 1731
+      },
+      {
+        "ino": 1441893,
+        "mtime_ns": 1791903608472955090,
+        "name": "audit.log.1",
+        "sha256": "d28540b45327860cf0d6b30e0f60a8e5bda78b763dc3b7514ff3ac4b12150aa9",
+        "size": 8432
+      }
+    ],
+    "host_probe_roots": [],
+    "probe_directories": [],
+    "processes": [
+      "84380 nginx",
+      "647700 nginx",
+      "648343 nginx",
+      "648344 nginx",
+      "910627 nginx",
+      "910628 nginx"
+    ]
+  },
+  "cleanup": {
+    "a_handoff_root_removed": true,
+    "b_inbox_root_removed": true,
+    "a_waf_root_removed": true,
+    "isolated_engine_directories_remaining": [],
+    "mac_scratch_removed": true
+  },
+  "limitations": [
+    "Inbox receipt is not Wazuh analysis/indexing/notification confirmation.",
+    "No production Wazuh publishing or raw input cutover occurred.",
+    "File generations are withheld until sealed EOF verification; no real-time latency bound is established.",
+    "The recent kernel fixture tests handoff, not a full journal-history/cursor migration.",
+    "WAF reprocessed rows remain withheld because the archive is not bound to a trusted rotation manifest.",
+    "No raw/outbox/inbox purge, daemon scheduling, production credential provisioning or power-loss/load validation.",
+    "The source spool v2 is not readable by the previous v1 code."
+  ]
+}

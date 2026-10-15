@@ -1,0 +1,339 @@
+# Native Vector tests. Execute with vector.toml; no source reading or sink writes.
+
+[[tests]]
+name = "suricata_KST_and_no_raw"
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-10-13T11:00:00.123456+00:00\",\"event_type\":\"alert\",\"src_ip\":\"192.0.2.40\",\"src_port\":42000,\"dest_ip\":\"198.51.100.20\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":1000999,\"severity\":2,\"action\":\"allowed\"},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.schema_version, "vector-1")
+assert_eq!(.capstone_norm.pipeline, "vector")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-13T20:00:00.123456+09:00")
+assert_eq!(.capstone_norm.rule_ids, ["1000999"])
+assert_eq!(.capstone_norm.source_ip, "192.0.2.40")
+assert_eq!(.capstone_norm.destination_port, 443)
+assert_eq!(.capstone_norm.action, "allowed")
+assert_eq!(.capstone_norm.http_status, 403)
+assert!(!exists(.message) && !exists(.payload) && !exists(.capstone_norm.payload))
+assert_eq!(length(string!(.capstone_norm.message_sha256)), 64)
+assert!(!contains(encode_json(.), "MUST_NOT_LEAK"))
+'''
+
+[[tests]]
+name = "suricata_reject_missing_offset"
+no_outputs_from = ["suricata_alerts"]
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-10-13T20:00:00\",\"event_type\":\"alert\",\"src_ip\":\"192.0.2.40\",\"src_port\":42000,\"dest_ip\":\"198.51.100.20\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":1000999,\"severity\":2,\"action\":\"allowed\"},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "suricata_reject_invalid_date"
+no_outputs_from = ["suricata_alerts"]
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-99-13T20:00:00+09:00\",\"event_type\":\"alert\",\"src_ip\":\"192.0.2.40\",\"src_port\":42000,\"dest_ip\":\"198.51.100.20\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":1000999,\"severity\":2,\"action\":\"allowed\"},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "suricata_reject_string_sid"
+no_outputs_from = ["suricata_alerts"]
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-10-13T11:00:00.123456+00:00\",\"event_type\":\"alert\",\"src_ip\":\"192.0.2.40\",\"src_port\":42000,\"dest_ip\":\"198.51.100.20\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":\"1000999\",\"severity\":2},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "suricata_reject_bad_severity"
+no_outputs_from = ["suricata_alerts"]
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-10-13T11:00:00.123456+00:00\",\"event_type\":\"alert\",\"src_ip\":\"192.0.2.40\",\"src_port\":42000,\"dest_ip\":\"198.51.100.20\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":1000999,\"severity\":9},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "suricata_invalid_IP_omitted"
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-10-13T11:00:00.123456+00:00\",\"event_type\":\"alert\",\"src_ip\":\"unknown\",\"src_port\":42000,\"dest_ip\":\"198.51.100.20\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":1000999,\"severity\":2,\"action\":\"allowed\"},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(!exists(.capstone_norm.source_ip))
+assert!(includes(array!(.capstone_norm.quality_flags), "source_ip_invalid"))
+'''
+
+[[tests]]
+name = "suricata_protected_asset_is_metadata_only"
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-10-13T11:00:00.123456+00:00\",\"event_type\":\"alert\",\"src_ip\":\"192.0.2.40\",\"src_port\":42000,\"dest_ip\":\"211.170.162.111\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":1000999,\"severity\":2,\"action\":\"allowed\"},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.protected_asset, true)
+assert_eq!(.capstone_norm.action, "allowed")
+assert_eq!(.capstone_norm.destination_ip, "211.170.162.111")
+'''
+
+[[tests]]
+name = "suricata_flow_tuple_preserved"
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"timestamp\":\"2026-10-13T11:00:00.123456+00:00\",\"event_type\":\"alert\",\"src_ip\":\"192.0.2.40\",\"src_port\":42000,\"dest_ip\":\"198.51.100.20\",\"dest_port\":443,\"proto\":\"TCP\",\"alert\":{\"signature_id\":1000999,\"severity\":2,\"action\":\"allowed\"},\"http\":{\"http_method\":\"GET\",\"status\":403},\"payload\":\"MUST_NOT_LEAK\",\"http_private\":\"MUST_NOT_LEAK\",\"flow\":{\"src_ip\":\"211.170.162.110\",\"dest_ip\":\"192.0.2.41\"}}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.source_ip, "192.0.2.40")
+assert_eq!(.capstone_norm.flow_source_ip, "211.170.162.110")
+assert_eq!(.capstone_norm.protected_asset, true)
+'''
+
+[[tests]]
+name = "suricata_invalid_JSON_quarantine"
+no_outputs_from = ["suricata_alerts"]
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{not-json"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.message, "{not-json")
+'''
+
+[[tests]]
+name = "suricata_non_alert_ignored"
+no_outputs_from = ["suricata_alerts"]
+[[tests.inputs]]
+insert_at = "suricata_normalize"
+type = "vrl"
+source = '''
+. = {"message": "{\"event_type\":\"stats\"}"}
+'''
+[[tests.outputs]]
+extract_from = "suricata_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.ignored_source_event, true)
+'''
+
+[[tests]]
+name = "nft_kernel_cursor_KST"
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-13T20:00:00.000000+09:00")
+assert_eq!(.capstone_norm.source, "nftables")
+assert_eq!(.capstone_norm.action, "logged_drop")
+assert_eq!(.capstone_norm.source_ip, "192.0.2.40")
+assert_eq!(.capstone_norm.destination_port, 443)
+assert_eq!(.capstone_norm.identity_scope, "journal_cursor")
+assert!(!exists(.message) && !exists(.__CURSOR))
+'''
+
+[[tests]]
+name = "nft_reject_non_kernel"
+no_outputs_from = ["nft_normalize"]
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "stdout", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(._TRANSPORT, "stdout")
+'''
+
+[[tests]]
+name = "nft_reject_missing_cursor"
+no_outputs_from = ["nft_normalize"]
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "nft_reject_missing_time"
+no_outputs_from = ["nft_normalize"]
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "nft_reject_duplicate_SRC"
+no_outputs_from = ["nft_normalize"]
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443 SRC=192.0.2.41"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "nft_reject_duplicate_DPT"
+no_outputs_from = ["nft_normalize"]
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443 DPT=444"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "nft_reject_multiple_messages"
+no_outputs_from = ["nft_normalize"]
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443\nFW_DROP_IN IN=evil"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''
+
+[[tests]]
+name = "nft_shadow_is_not_actual_drop"
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_SHADOW_OUT IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.action, "would_drop")
+'''
+
+[[tests]]
+name = "nft_reject_repeated_prefix"
+no_outputs_from = ["nft_normalize"]
+[[tests.inputs]]
+insert_at = "nft_normalize"
+type = "vrl"
+source = '''
+. = {"_TRANSPORT": "kernel", "__REALTIME_TIMESTAMP": "1791889200000000", "__CURSOR": "s=test;i=42;b=test;m=1;t=2;x=3", "message": "FW_DROP_IN IN=ens192 OUT= SRC=192.0.2.40 DST=198.51.100.20 PROTO=TCP SPT=42000 DPT=443 FW_DROP_IN"}
+'''
+[[tests.outputs]]
+extract_from = "nft_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message))
+'''

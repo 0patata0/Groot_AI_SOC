@@ -1,0 +1,65 @@
+# This is a collector observation, not the Python sealed-generation proof.
+raw = string!(.message)
+assert!(length(raw) <= 1048576, "input_size")
+event = object!(parse_json!(raw, max_depth: 32, lossy: false))
+if event.event_type != "alert" {
+  . = {"ignored_source_event": true}
+} else {
+  sensor = get_env_var!("CAPSTONE_SENSOR")
+  assert!(match(sensor, r'^[A-Za-z0-9_.:-]{1,80}$'), "sensor_invalid")
+  stamp = string!(event.timestamp)
+  assert!(match(stamp, r'(Z|[+-][0-9]{2}:?[0-9]{2})$'), "timestamp_offset_missing")
+  event_time = parse_timestamp!(stamp, format: "%+")
+  alert = object!(event.alert)
+  sid = int!(alert.signature_id)
+  assert!(sid >= 0 && sid <= 4294967295, "signature_id_invalid")
+  severity = int!(alert.severity)
+  assert!(severity >= 1 && severity <= 3, "severity_invalid")
+  record_id = uuid_v4()
+  norm = {
+    "schema_version": "vector-1",
+    "pipeline": "vector",
+    "source": "suricata",
+    "sensor": sensor,
+    "record_id": record_id,
+    "event_id": sha2(encode_json([sensor, "suricata", record_id]), variant: "SHA-256"),
+    "message_sha256": sha2(raw, variant: "SHA-256"),
+    "hash_scope": "vector_message_without_line_delimiter",
+    "identity_scope": "vector_observation_not_source_generation",
+    "provenance_level": "collector_observation",
+    "observed_at_kst": format_timestamp!(now(), format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul"),
+    "event_time_kst": format_timestamp!(event_time, format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul"),
+    "time_status": "explicit_offset",
+    "rule_ids": [to_string(sid)],
+    "native_severity_value": [to_string(severity)],
+    "native_severity_scale": "suricata_1_3",
+    "direction": "unknown",
+    "action": "observed",
+    "quality_flags": [],
+    "protected_asset": false
+  }
+  if alert.action == "allowed" || alert.action == "blocked" { norm.action = alert.action }
+  for_each({"source_ip": event.src_ip, "destination_ip": event.dest_ip, "flow_source_ip": event.flow.src_ip, "flow_destination_ip": event.flow.dest_ip}) -> |key, value| {
+    ip = string(value) ?? ""
+    if is_ipv4(ip) || is_ipv6(ip) {
+      norm = set!(norm, [key], value)
+      if value == "211.170.162.110" || value == "211.170.162.111" { norm.protected_asset = true }
+    } else if value != null {
+      norm.quality_flags = push(norm.quality_flags, key + "_invalid")
+    }
+  }
+  for_each({"source_port": event.src_port, "destination_port": event.dest_port, "flow_source_port": event.flow.src_port, "flow_destination_port": event.flow.dest_port}) -> |key, value| {
+    port = int(value) ?? -1
+    if port >= 0 && port <= 65535 { norm = set!(norm, [key], port) }
+    else if value != null { norm.quality_flags = push(norm.quality_flags, key + "_invalid") }
+  }
+  proto = upcase(string(event.proto) ?? "")
+  if includes(["TCP", "UDP", "ICMP", "ICMPV6", "IGMP", "SCTP"], proto) { norm.protocol = downcase(proto) }
+  else if event.proto != null { norm.quality_flags = push(norm.quality_flags, "protocol_invalid") }
+  method = string(event.http.http_method) ?? ""
+  if includes(["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH", "CONNECT", "TRACE"], method) { norm.http_method = method }
+  status = int(event.http.status) ?? 0
+  if status >= 100 && status <= 599 { norm.http_status = status }
+  . = {"capstone_norm": norm}
+  assert!(length(encode_json(.)) <= 32768, "normalized_size")
+}

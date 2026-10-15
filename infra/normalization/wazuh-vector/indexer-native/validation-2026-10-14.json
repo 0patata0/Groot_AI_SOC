@@ -1,0 +1,96 @@
+{
+  "observed_date_kst": "2026-10-14",
+  "scope": "existing Indexer read-only searches; no monitor/index/mapping/rule/action mutation",
+  "node_version": "2.19.6",
+  "root_api_compatibility_version": "7.10.2",
+  "alerting_plugin": "2.19.6.0",
+  "job_scheduler_plugin": "2.19.6.0",
+  "monitor_config_search": {
+    "status": 404,
+    "reason": "Configured indices are not found: [.opendistro-alerting-config]"
+  },
+  "restricted_account": {
+    "search": true,
+    "field_caps": true,
+    "node_metadata": false,
+    "monitor_search": false
+  },
+  "mapping": {
+    "timestamp": "date",
+    "data.timestamp": "date",
+    "data.capstone_norm.event_time_kst": "keyword",
+    "data.capstone_norm.correlation_dedupe_key": "keyword",
+    "full_log": "text"
+  },
+  "last24h_initial": {
+    "documents": 2817,
+    "raw_suricata": 57,
+    "raw_modsecurity": 5,
+    "normalized": 2
+  },
+  "last24h_followup": {
+    "raw_suricata": 58,
+    "with_event_time_and_flow_and_tuple": 58,
+    "protected_address_involved": 27,
+    "normalized_canary_only": 2
+  },
+  "existing_canary_query": {
+    "date_keyword_parse_matches": 2,
+    "terms_groups": 2,
+    "unique_ids_per_group": [
+      1,
+      1
+    ],
+    "source_counts_per_group": [
+      1,
+      1
+    ],
+    "group_omitted_docs": 0,
+    "current120s_matches": 0,
+    "failed_shards": 0,
+    "timed_out": false
+  },
+  "raw_content_terms_query": {
+    "diagnostic_window": "last24h",
+    "documents": 31,
+    "groups": 2,
+    "group_documents": [
+      29,
+      2
+    ],
+    "with_full_log": [
+      29,
+      1
+    ],
+    "distinct_content_buckets_capped_at5": [
+      5,
+      1
+    ],
+    "current120s_documents": 0,
+    "successful_shards": 54,
+    "total_shards": 54,
+    "failed_shards": 0,
+    "timed_out": false,
+    "identity_contract": "exact indexed full_log string, not guaranteed packet identity"
+  },
+  "negative_findings": [
+    "raw flow_id identifies a flow, not an event",
+    "Wazuh id is not stable across reprocessing",
+    "one raw document has no full_log",
+    "normalized production no_log inputs are not indexed",
+    "existing normalized date field is keyword",
+    "native shadow final matches can consume rows before a simple parent evidence rule logs them"
+  ],
+  "mutations": {
+    "operating_rules": false,
+    "index_mapping": false,
+    "monitor": false,
+    "notifications": false,
+    "blocking": false
+  },
+  "cleanup": {
+    "remote_query_temp_dirs": "EXIT trap removed",
+    "local_scripts": "owned scripts removed; parent remote.py/session directory preserved",
+    "mac_packages_installed": false
+  }
+}

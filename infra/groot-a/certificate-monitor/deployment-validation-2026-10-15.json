@@ -1,0 +1,677 @@
+{
+  "schema_version": 1,
+  "status": "live_monitor_and_wazuh_rules_verified_archived_and_cleaned",
+  "readiness_a": {
+    "certificate": {
+      "bytes": 4841,
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o644",
+      "links": 1,
+      "sha256": "0babec3a5fab7273df7b5a3be60346510e64db9656d52580fad35f2c2e8dd54a",
+      "metadata": "notBefore=Oct  8 06:02:34 2026 GMT\nnotAfter=Jan  6 06:02:33 2027 GMT\nsha256 Fingerprint=54:58:66:F0:C4:44:07:0A:1C:F6:1A:33:0D:AA:D8:47:32:67:5F:28:F5:46:43:C6:95:B5:3A:BF:6A:44:49:66\nX509v3 Subject Alternative Name: \n    DNS:chat.grootlab.duckdns.org\n"
+    },
+    "journald_inputs": [
+      {
+        "log_format": "journald",
+        "location": "journald",
+        "filters": []
+      }
+    ],
+    "openssl": "OpenSSL 3.0.13 30 Jan 2024 (Library: OpenSSL 3.0.13 30 Jan 2024)",
+    "existing_monitor_paths": {
+      "/usr/local/sbin/capstone-cert-monitor": false,
+      "/etc/systemd/system/capstone-cert-monitor.service": false,
+      "/etc/systemd/system/capstone-cert-monitor.timer": false,
+      "/var/lib/capstone-cert-monitor": false
+    },
+    "wazuh_config_sha256": "b27ec250b19ef0fe9cc1f999467dc24176b82035e763080b33f037a063d4ce0a"
+  },
+  "readiness_b": {
+    "manager": {
+      "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+      "pid": 2186684,
+      "running": true,
+      "started_at": "2026-10-14T12:14:36.63544802Z",
+      "image": "sha256:f845c782483d6b439d3cde5dc05c0c9cff500b2f713b4a6e39337b8f8c48ce30"
+    },
+    "dedicated_rule_files": {
+      "local_rules.xml": {
+        "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+        "bytes": 6122,
+        "uid": 999,
+        "gid": 999,
+        "mode": "0o660"
+      },
+      "capstone_vector_rules.xml": {
+        "sha256": "9f76264a8038c5c377b4c24a53ab2e3acc0eaf3fce7632df07f921cabdd26995",
+        "bytes": 21722,
+        "uid": 999,
+        "gid": 999,
+        "mode": "0o660"
+      }
+    },
+    "candidate_ids_existing": [],
+    "config_sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce"
+  },
+  "native_initial_failure": {
+    "passed_before_failure": 8,
+    "failed_case": "wrong_hostname",
+    "confirmed": "OpenSSL 3.0.13 x509-checkhost prints mismatch but returns 0",
+    "operating_changes": 0
+  },
+  "packages_installed": {
+    "mac": 0,
+    "servers": 0
+  },
+  "automatic_renewal": false,
+  "private_key_read": false,
+  "a_deployment": {
+    "automatic_renewal": false,
+    "certificate_file_sha256": "0babec3a5fab7273df7b5a3be60346510e64db9656d52580fad35f2c2e8dd54a",
+    "certificate_unchanged": true,
+    "completed_at_kst": "2026-10-15T04:51:02+09:00",
+    "first_probe_verified": true,
+    "native_tests": 26,
+    "other_services_restarted": false,
+    "private_key_read": false,
+    "schedule": "09:00 Asia/Seoul daily",
+    "scheduled_execution_observed": false,
+    "schema_version": 1,
+    "status": "certificate_monitor_installed",
+    "status_sha256": "1dfc989b514755c0e798af62a155468b3dd5c0a138b990f655586266c2642f36",
+    "timer_active": true,
+    "timer_enabled": true
+  },
+  "a_final_observation": {
+    "status": {
+      "automatic_renewal": false,
+      "certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966",
+      "domain": "chat.grootlab.duckdns.org",
+      "expiry_status": "ok",
+      "not_after_epoch": 1799215353,
+      "not_after_kst": "2027-01-06T15:02:33+09:00",
+      "observed_at_kst": "2026-10-15T04:51:02+09:00",
+      "observed_at_utc": "2026-10-14T19:51:02Z",
+      "probe_status": "verified",
+      "reason": "verified",
+      "schema_version": 1,
+      "seconds_remaining": 7207891,
+      "served_certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966"
+    },
+    "service": {
+      "Result": "success",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "UnitFileState": "static"
+    },
+    "timer": {
+      "TimersCalendar": "{ OnCalendar=*-*-* 09:00:00 Asia/Seoul ; next_elapse=Thu 2026-10-15 09:00:00 KST }",
+      "NextElapseUSecRealtime": "Thu 2026-10-15 09:00:00 KST",
+      "Result": "success",
+      "Persistent": "yes",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "UnitFileState": "enabled"
+    },
+    "journal": [
+      {
+        "identifier": "capstone-cert-monitor",
+        "program_pid_present": false,
+        "message_sha256": "d32d5b752b3ab534872dd01724e3fe6487439c3faa7289acad438fa57e5277d2",
+        "status": "ok",
+        "probe": "verified",
+        "observed_at_kst": "2026-10-15T04:51:02+09:00"
+      }
+    ],
+    "original_service_states": {
+      "capstone-vector.service": "active",
+      "wazuh-agent.service": "active"
+    }
+  },
+  "b_initial_install_failure": {
+    "automatic_retry": false,
+    "cleanup": "exact_new_file_removed",
+    "expired_live_e2e_tested": false,
+    "new_operating_input": 0,
+    "new_rule_removed": true,
+    "phase": "candidate_native_51",
+    "policy": "fixed-B-certificate-rules-v1",
+    "reason": "native_certificate_fixture_failed",
+    "restart_calls": 0,
+    "restart_may_have_occurred": false,
+    "schema_version": 1,
+    "status": "incomplete_inspect_required",
+    "unrelated_files_changed": false
+  },
+  "b_initial_failure_diagnosis": {
+    "phase1_program": "capstone-cert-monitor",
+    "phase2": "No decoder matched",
+    "candidate_native_passed": 0,
+    "candidate_rules_removed": true,
+    "manager_restarted": false,
+    "fix": "dedicated program_name JSON_Decoder XML"
+  },
+  "b_second_install_failure": {
+    "automatic_retry": false,
+    "cleanup": "exact_new_files_removed",
+    "expired_live_e2e_tested": false,
+    "new_files_removed": [
+      "rules/capstone_certificate_rules.xml",
+      "decoders/capstone_certificate_decoders.xml"
+    ],
+    "new_operating_input": 0,
+    "phase": "candidate_native_51",
+    "policy": "fixed-B-certificate-decoder-rules-v2",
+    "reason": "native_certificate_fixture_failed",
+    "restart_calls": 0,
+    "restart_may_have_occurred": false,
+    "schema_version": 1,
+    "status": "incomplete_inspect_required",
+    "unrelated_files_changed": false
+  },
+  "b_second_failure_diagnosis": {
+    "phase2": "capstone_certificate_json and all 13 fields decoded",
+    "phase3": "no rule matched",
+    "candidate_files_removed": true,
+    "manager_restarted": false,
+    "hypothesis": "Wazuh OS_XML retains &gt; literally in location while Python ET decodes it",
+    "next_change": "literal > in exact location; no predicate widening",
+    "status": "confirmed_by_minimal_literal_location_fix_and_native_51_pass"
+  },
+  "b_native_install": {
+    "candidate": {
+      "decoders/capstone_certificate_decoders.xml": {
+        "bytes": 363,
+        "device": 64512,
+        "gid": 999,
+        "inode": 6318923,
+        "mode": "0660",
+        "sha256": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c",
+        "uid": 999
+      },
+      "rules/capstone_certificate_rules.xml": {
+        "bytes": 3583,
+        "device": 64512,
+        "gid": 999,
+        "inode": 6318967,
+        "mode": "0660",
+        "sha256": "40dc486283cd5dc9e5aaf57bc79ed78be233528c44375914ea2620d31dc1df2d",
+        "uid": 999
+      }
+    },
+    "candidate_sha256": "40dc486283cd5dc9e5aaf57bc79ed78be233528c44375914ea2620d31dc1df2d",
+    "decoder_sha256": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c",
+    "expired_live_e2e_tested": false,
+    "manager_before": {
+      "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+      "image": "sha256:f845c782483d6b439d3cde5dc05c0c9cff500b2f713b4a6e39337b8f8c48ce30",
+      "mounts": [
+        {
+          "Destination": "/etc/filebeat",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_filebeat_etc/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/etc/ssl/filebeat.key",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager-key.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/etc/ssl/filebeat.pem",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/etc/ssl/root-ca.pem",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/root-ca-manager.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/var/lib/filebeat",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_filebeat_var/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/active-response/bin",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_active_response/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/agentless",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_agentless/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/api/configuration",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_api_configuration/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/etc",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_etc/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/integrations",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_integrations/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/logs",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_logs/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/queue",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_queue/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/var/multigroups",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_var_multigroups/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/wodles",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_wodles/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/wazuh-config-mount/etc/ossec.conf",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_cluster/wazuh_manager.conf",
+          "Type": "bind"
+        }
+      ],
+      "name": "/single-node-wazuh.manager-1",
+      "pid": 2186684,
+      "restarting": false,
+      "running": true,
+      "start_ticks": 140370986,
+      "started_at": "2026-10-14T12:14:36.63544802Z"
+    },
+    "native_cases": 51,
+    "new_operating_input": 0,
+    "policy": "fixed-B-certificate-decoder-rules-v3",
+    "protected": {
+      "decoders/local_decoder.bak.1790438799": {
+        "bytes": 815,
+        "gid": 0,
+        "mode": "0660",
+        "sha256": "21f5e1ff2ea096f2b1b6acdc1fc25bcac46734614b253f6ad1352d9c2a1c5c13",
+        "uid": 0
+      },
+      "decoders/local_decoder.xml": {
+        "bytes": 1654,
+        "gid": 999,
+        "mode": "0660",
+        "sha256": "bbaa73dcf87767474aa74c7b7e6bf4e2c901909be719b98961b08f46086a61ee",
+        "uid": 999
+      },
+      "internal_options.conf": {
+        "bytes": 14961,
+        "gid": 999,
+        "mode": "0640",
+        "sha256": "2f434217b2f894a4cf3164ef6a1f4471d9196e5ad21f19c2e21c5be97b16e26a",
+        "uid": 0
+      },
+      "local_internal_options.conf": {
+        "bytes": 380,
+        "gid": 999,
+        "mode": "0640",
+        "sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+        "uid": 0
+      },
+      "ossec.conf": {
+        "bytes": 8741,
+        "gid": 999,
+        "mode": "0660",
+        "sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+        "uid": 0
+      },
+      "rules/capstone_vector_rules.xml": {
+        "bytes": 21722,
+        "gid": 999,
+        "mode": "0660",
+        "sha256": "9f76264a8038c5c377b4c24a53ab2e3acc0eaf3fce7632df07f921cabdd26995",
+        "uid": 999
+      },
+      "rules/local_rules.xml": {
+        "bytes": 6122,
+        "gid": 999,
+        "mode": "0660",
+        "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+        "uid": 999
+      }
+    },
+    "restart_calls": 0,
+    "schema_version": 1,
+    "status": "installed_and_native_validated_restart_pending",
+    "test_sha256": "6444e7946b671528ff7d7e263ff5d576e984f4fb082c4207066e9af1da1906f2",
+    "unrelated_files_changed": false
+  },
+  "b_restart": {
+    "candidate_sha256": "40dc486283cd5dc9e5aaf57bc79ed78be233528c44375914ea2620d31dc1df2d",
+    "candidate_unchanged": true,
+    "decoder_sha256": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c",
+    "expired_live_e2e_tested": false,
+    "health": {
+      "exit_code": 1,
+      "mandatory_running": true,
+      "output_sha256": "f11438487a8d339e83dded75f21701de08dda006e44844c2e62100b9d037ff54"
+    },
+    "manager_after": {
+      "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+      "image": "sha256:f845c782483d6b439d3cde5dc05c0c9cff500b2f713b4a6e39337b8f8c48ce30",
+      "mounts": [
+        {
+          "Destination": "/etc/filebeat",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_filebeat_etc/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/etc/ssl/filebeat.key",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager-key.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/etc/ssl/filebeat.pem",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/etc/ssl/root-ca.pem",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/root-ca-manager.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/var/lib/filebeat",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_filebeat_var/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/active-response/bin",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_active_response/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/agentless",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_agentless/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/api/configuration",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_api_configuration/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/etc",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_etc/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/integrations",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_integrations/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/logs",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_logs/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/queue",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_queue/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/var/multigroups",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_var_multigroups/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/wodles",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_wodles/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/wazuh-config-mount/etc/ossec.conf",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_cluster/wazuh_manager.conf",
+          "Type": "bind"
+        }
+      ],
+      "name": "/single-node-wazuh.manager-1",
+      "pid": 2267662,
+      "restarting": false,
+      "running": true,
+      "start_ticks": 143162075,
+      "started_at": "2026-10-14T19:59:47.530820603Z"
+    },
+    "manager_before": {
+      "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+      "image": "sha256:f845c782483d6b439d3cde5dc05c0c9cff500b2f713b4a6e39337b8f8c48ce30",
+      "mounts": [
+        {
+          "Destination": "/etc/filebeat",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_filebeat_etc/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/etc/ssl/filebeat.key",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager-key.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/etc/ssl/filebeat.pem",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/wazuh.manager.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/etc/ssl/root-ca.pem",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_indexer_ssl_certs/root-ca-manager.pem",
+          "Type": "bind"
+        },
+        {
+          "Destination": "/var/lib/filebeat",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_filebeat_var/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/active-response/bin",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_active_response/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/agentless",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_agentless/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/api/configuration",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_api_configuration/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/etc",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_etc/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/integrations",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_integrations/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/logs",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_logs/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/queue",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_queue/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/var/multigroups",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_var_multigroups/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/var/ossec/wodles",
+          "RW": true,
+          "Source": "/var/lib/docker/volumes/single-node_wazuh_wodles/_data",
+          "Type": "volume"
+        },
+        {
+          "Destination": "/wazuh-config-mount/etc/ossec.conf",
+          "RW": true,
+          "Source": "/home/groot_b/capstone/wazuh/single-node/config/wazuh_cluster/wazuh_manager.conf",
+          "Type": "bind"
+        }
+      ],
+      "name": "/single-node-wazuh.manager-1",
+      "pid": 2186684,
+      "restarting": false,
+      "running": true,
+      "start_ticks": 140370986,
+      "started_at": "2026-10-14T12:14:36.63544802Z"
+    },
+    "native_cases_before_restart": 51,
+    "new_operating_input": 0,
+    "policy": "fixed-B-certificate-decoder-rules-v3",
+    "processes_after": {
+      "wazuh-analysisd": {
+        "pid": 2268440,
+        "start_ticks": 143162751,
+        "threads": 44
+      },
+      "wazuh-db": {
+        "pid": 2268387,
+        "start_ticks": 143162646,
+        "threads": 25
+      },
+      "wazuh-logcollector": {
+        "pid": 2268576,
+        "start_ticks": 143162959,
+        "threads": 8
+      },
+      "wazuh-remoted": {
+        "pid": 2268516,
+        "start_ticks": 143162857,
+        "threads": 27
+      }
+    },
+    "protected_unchanged": true,
+    "restart_calls": 1,
+    "schema_version": 1,
+    "status": "one_restart_healthy_verified",
+    "unrelated_files_changed": false
+  },
+  "b_final_observation": {
+    "actual_A_status_logtest": {
+      "id": "100300",
+      "level": 0,
+      "decoder": "capstone_certificate_json",
+      "diagnostic_sha256": "fbe7f6bc485f7df2ed720e604b66b4ab81e18092afe2d30ac94ecdc6322f5401",
+      "operating_log_injection": false
+    },
+    "agent001_active": true,
+    "remote_expired_alert_ack_verified": false
+  },
+  "limits": [
+    "09:00 KST natural scheduled run not yet observed",
+    "Real expired-certificate event/remote Indexer ACK not injected or tested",
+    "Automatic renewal intentionally not configured"
+  ],
+  "source_sha256": {
+    "capstone-cert-monitor.timer": "1261726216beca13383a3ef3dcc071f0a9f347a4c90f1341788244a9a15f1703",
+    "test-certificate-rules.py": "6444e7946b671528ff7d7e263ff5d576e984f4fb082c4207066e9af1da1906f2",
+    "capstone_certificate_decoders.xml": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c",
+    "capstone-cert-monitor.service": "d8357b4979398ae4bc2e1f699c1513b5509c447ae0ebd563acf76a2a609e8f64",
+    "test-monitor.sh": "ff81804c7a26573d96063abd149382dcc5da81049bb227113a7a9e220b7f5b84",
+    "monitor.sh": "91c0ed1025beb3f7bbc59ec38b58c705add1637c8e5c69216eb489d62e65a540",
+    "capstone_certificate_rules.xml": "40dc486283cd5dc9e5aaf57bc79ed78be233528c44375914ea2620d31dc1df2d"
+  },
+  "server_cleanup": {
+    "a": {
+      "receipt": {
+        "status": "stage6_evidence_preserved",
+        "host": "a",
+        "files": 77,
+        "bytes": 766601,
+        "manifest_sha256": "79fdd0463b8022c5eb4a38ddaf02960c37fc369ff67d7ee17073470ca63b38df",
+        "operating_changes": 0
+      },
+      "preservation_sha256": "cf41a73274b9f359ca056598705d56dcf907cf561520a3dae35e424dbf21e3a1",
+      "cleanup_sha256": "a349add6cf369bf27feaddaca2da0d257d8e662ce03f849b87fb63f0448698f6",
+      "stage_absent": true,
+      "backup": "/var/backups/capstone-certificate-monitor-validation-20261015"
+    },
+    "b": {
+      "receipt": {
+        "status": "stage6_evidence_preserved",
+        "host": "b",
+        "files": 80,
+        "bytes": 804888,
+        "manifest_sha256": "b1c31832abea2f990c68c1294b6703b90996e04e4bad406abec88c7d086f1f8e",
+        "operating_changes": 0
+      },
+      "preservation_sha256": "7034a8cf489ca0e52082f898fe5123024f88822007ac64c7875487c23dcf51ca",
+      "cleanup_sha256": "6635a0ef40b938ca668b0d6a74c7ffd5ca38de1ee909cdc4197689426ab2c258",
+      "stage_absent": true,
+      "backup": "/var/backups/capstone-certificate-monitor-validation-20261015"
+    }
+  },
+  "mac_cleanup": {
+    "files": 127,
+    "bytes": 969026,
+    "path": "/private/tmp/capstone-cert-monitor-20261015.cv616pcs",
+    "new_packages_installed": 0,
+    "path_absent": true
+  },
+  "completed_at_kst": "2026-10-15T05:03:49.865288+09:00"
+}

@@ -1,0 +1,281 @@
+<!-- Vector shadow correlation. The ready lane remains no_log. Operational
+     health rules and a separate root-only synthetic canary can emit alerts.
+     Wazuh timeframe is processing time, not source event time. -->
+<group name="capstone_vector,package_shadow,">
+  <rule id="100200" level="1">
+    <decoded_as>json</decoded_as>
+    <location type="pcre2">^\(groot-sec\) any->/var/log/capstone-vector/ready/normalized\.jsonl$</location>
+    <field name="capstone_norm.schema_version" type="pcre2">^vector-1$</field>
+    <field name="capstone_norm.pipeline" type="pcre2">^vector$</field>
+    <field name="capstone_norm.source" type="pcre2">^(suricata|nftables|modsecurity)$</field>
+    <description>Capstone Vector normalized shadow input</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100201" level="1">
+    <if_sid>100200</if_sid>
+    <location type="pcre2">^\(groot-sec\) any->/var/log/capstone-vector/ready/normalized\.jsonl$</location>
+    <field name="capstone_norm.correlation_eligible" type="pcre2">^true$</field>
+    <field name="capstone_norm.correlation_time_class" type="pcre2">^fresh$</field>
+    <field name="capstone_norm.protected_asset" type="pcre2">^false$</field>
+    <field name="capstone_norm.correlation_key" type="pcre2">^[0-9a-f]{64}$</field>
+    <field name="capstone_norm.correlation_dedupe_key" type="pcre2">^[0-9a-f]{64}$</field>
+    <field name="capstone_norm.sensor" type="pcre2">^groot-sec$</field>
+    <field name="capstone_norm.protocol" type="pcre2">^(tcp|udp)$</field>
+    <description>Fresh normalized service-direction observation; shadow only</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100210" level="1">
+    <if_sid>100201</if_sid>
+    <field name="capstone_norm.source" type="pcre2">^suricata$</field>
+    <field name="capstone_norm.action" type="pcre2">^(allowed|observed|blocked)$</field>
+    <description>Eligible suricata service observation; shadow only</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100211" level="1">
+    <if_sid>100201</if_sid>
+    <field name="capstone_norm.source" type="pcre2">^nftables$</field>
+    <field name="capstone_norm.action" type="pcre2">^logged_drop$</field>
+    <description>Eligible nftables service observation; shadow only</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100220" level="2" frequency="5" timeframe="60">
+    <if_sid>100210</if_sid>
+    <if_matched_sid>100210</if_matched_sid>
+    <same_field>capstone_norm.sensor</same_field>
+    <same_field>capstone_norm.correlation_key</same_field>
+    <different_field>capstone_norm.correlation_dedupe_key</different_field>
+    <description>Shadow: repeated Suricata observations on the same service direction (processing-time window)</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100221" level="2" frequency="5" timeframe="60">
+    <if_sid>100211</if_sid>
+    <if_matched_sid>100211</if_matched_sid>
+    <same_field>capstone_norm.sensor</same_field>
+    <same_field>capstone_norm.correlation_key</same_field>
+    <different_field>capstone_norm.correlation_dedupe_key</different_field>
+    <description>Shadow: repeated nftables observations on the same service direction (processing-time window)</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100230" level="2" frequency="2" timeframe="60">
+    <if_sid>100211</if_sid>
+    <if_matched_sid>100210</if_matched_sid>
+    <same_field>capstone_norm.sensor</same_field>
+    <same_field>capstone_norm.correlation_key</same_field>
+    <description>Shadow: Suricata then nftables on the same service direction (processing-time window)</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100231" level="2" frequency="2" timeframe="60">
+    <if_sid>100210</if_sid>
+    <if_matched_sid>100211</if_matched_sid>
+    <same_field>capstone_norm.sensor</same_field>
+    <same_field>capstone_norm.correlation_key</same_field>
+    <description>Shadow: nftables then Suricata on the same service direction (processing-time window)</description>
+    <options>no_log</options>
+  </rule>
+</group>
+<group name="capstone_vector_canary,capstone_validation,">
+  <!-- Root-only synthetic health input, independent of production base 100200. -->
+  <rule id="100290" level="1">
+    <decoded_as>json</decoded_as>
+    <field name="capstone_norm.schema_version" type="pcre2">^vector-1$</field>
+    <field name="capstone_norm.pipeline" type="pcre2">^vector$</field>
+    <field name="capstone_norm.source" type="pcre2">^(suricata|nftables)$</field>
+    <location type="pcre2">^\(groot-sec\) any->/var/log/capstone-vector/canary/normalized\.jsonl$</location>
+    <field name="capstone_validation.kind" type="pcre2">^correlation-e2e$</field>
+    <field name="capstone_validation.run_id" type="pcre2">^[0-9a-f]{32}$</field>
+    <field name="capstone_norm.sensor" type="pcre2">^capstone-canary$</field>
+    <field name="capstone_norm.source_ip" type="pcre2">^192\.0\.2\.40$</field>
+    <field name="capstone_norm.destination_ip" type="pcre2">^198\.51\.100\.20$</field>
+    <field name="capstone_norm.destination_port" type="pcre2">^8443$</field>
+    <field name="capstone_norm.protocol" type="pcre2">^tcp$</field>
+    <field name="capstone_norm.correlation_eligible" type="pcre2">^true$</field>
+    <field name="capstone_norm.correlation_time_class" type="pcre2">^fresh$</field>
+    <field name="capstone_norm.correlation_key" type="pcre2">^[0-9a-f]{64}$</field>
+    <field name="capstone_norm.correlation_dedupe_key" type="pcre2">^[0-9a-f]{64}$</field>
+    <description>Synthetic Vector E2E canary base; not an attack</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100291" level="1">
+    <if_sid>100290</if_sid>
+    <field name="capstone_norm.source" type="pcre2">^suricata$</field>
+    <description>Synthetic suricata canary observation</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100292" level="1">
+    <if_sid>100290</if_sid>
+    <field name="capstone_norm.source" type="pcre2">^nftables$</field>
+    <description>Synthetic nftables canary observation</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100293" level="3" frequency="5" timeframe="60">
+    <if_sid>100291</if_sid>
+    <if_matched_sid>100291</if_matched_sid>
+    <same_field>capstone_norm.sensor</same_field>
+    <same_field>capstone_norm.correlation_key</same_field>
+    <same_field>capstone_validation.run_id</same_field>
+    <different_field>capstone_norm.correlation_dedupe_key</different_field>
+    <description>CAPSTONE SYNTHETIC CANARY repeat; run=$(capstone_validation.run_id); not an attack</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+    <group>capstone_validation,</group>
+  </rule>
+  <rule id="100294" level="3" frequency="2" timeframe="60">
+    <if_sid>100292</if_sid>
+    <if_matched_sid>100291</if_matched_sid>
+    <same_field>capstone_norm.sensor</same_field>
+    <same_field>capstone_norm.correlation_key</same_field>
+    <same_field>capstone_validation.run_id</same_field>
+    <different_field>capstone_norm.correlation_dedupe_key</different_field>
+    <description>CAPSTONE SYNTHETIC CANARY cross-source; run=$(capstone_validation.run_id); not an attack</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+    <group>capstone_validation,</group>
+  </rule>
+</group>
+
+<!-- Native journal health messages from the fixed storage wrapper. No synthetic
+     operational messages are emitted by the test suite. -->
+<group name="capstone_vector_health,">
+  <rule id="100240" level="0">
+    <program_name type="pcre2">^capstone-vector-storage$</program_name>
+    <location type="pcre2">^\(groot-sec\) any->journald$</location>
+    <description>Capstone Vector storage maintenance status</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100241" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=disk_space_low$</match>
+    <description>Vector storage free space is low</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100242" level="5" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=disk_space_critical$</match>
+    <description>Vector storage free space is critically low</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100243" level="5" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=vector_not_active$</match>
+    <description>Vector normalization service is not active</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100244" level="5" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=rotation_failed_pending_recovery$</match>
+    <description>Vector output rotation failed; recovery is pending</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100245" level="5" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=reader_not_at_current_eof$</match>
+    <description>Vector output rotation waiting for verified Wazuh read position</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100246" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_telemetry_missing$</match>
+    <description>Vector collection telemetry is unavailable for the current invocation</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100247" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_telemetry_stale$</match>
+    <description>Vector collection heartbeat is stale</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100248" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_telemetry_invalid$</match>
+    <description>Vector collection telemetry metadata failed validation</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100249" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_error_seen$</match>
+    <description>Vector collection error counter observed in current invocation</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100250" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_loss_signal_seen$</match>
+    <description>Vector collection drop or unread-file signal observed in current invocation</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100251" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_buffer_pressure$</match>
+    <description>Vector collection buffer pressure observed</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100252" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_raw_line_oversize_seen$</match>
+    <description>Raw source line exceeds the byte limit in the inspected snapshot range</description>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100253" level="3" ignore="900">
+    <if_sid>100240</if_sid>
+    <match type="pcre2">^status=collection_raw_line_scan_unavailable$</match>
+    <description>Bounded raw source line inspection could not establish a stable result</description>
+    <options>no_email_alert</options>
+  </rule>
+</group>
+
+<!-- Indexable metadata observations only. Independent from every shadow
+     correlation child; no attack confirmation or automatic response. Vector
+     owns JSON type/empty-quality validation; JSON decoder stringifies values. -->
+<group name="capstone_vector_evidence,capstone_observation,">
+  <rule id="100260" level="1">
+    <decoded_as>json</decoded_as>
+    <location type="pcre2">\A\(groot-sec\) any->/var/log/capstone-vector/evidence/normalized\.jsonl\z</location>
+    <field name="capstone_norm.schema_version" type="pcre2">\Avector-1\z</field>
+    <field name="capstone_norm.pipeline" type="pcre2">\Avector\z</field>
+    <field name="capstone_norm.sensor" type="pcre2">\Agroot-sec\z</field>
+    <field name="capstone_norm.evidence_lane" type="pcre2">\Aindexer-observation-v1\z</field>
+    <description>Capstone Vector evidence input boundary</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100261" level="3">
+    <if_sid>100260</if_sid>
+    <field name="capstone_norm.source" type="pcre2">\Asuricata\z</field>
+    <field name="capstone_norm.action" type="pcre2">\A(allowed|observed|blocked)\z</field>
+    <field name="capstone_norm.correlation_eligible" type="pcre2">\Atrue\z</field>
+    <field name="capstone_norm.correlation_time_class" type="pcre2">\Afresh\z</field>
+    <field name="capstone_norm.protected_asset" type="pcre2">\Afalse\z</field>
+    <field name="capstone_norm.correlation_key" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.correlation_dedupe_key" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.event_id" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.message_sha256" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.source_ip" type="pcre2">\A(?!211\.170\.162\.(?:110|111)\z)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,7}:|(?:[0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,5}(?::[0-9A-Fa-f]{1,4}){1,2}|(?:[0-9A-Fa-f]{1,4}:){1,4}(?::[0-9A-Fa-f]{1,4}){1,3}|(?:[0-9A-Fa-f]{1,4}:){1,3}(?::[0-9A-Fa-f]{1,4}){1,4}|(?:[0-9A-Fa-f]{1,4}:){1,2}(?::[0-9A-Fa-f]{1,4}){1,5}|[0-9A-Fa-f]{1,4}:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|:(?:(?::[0-9A-Fa-f]{1,4}){1,7}|:)|(?:[0-9A-Fa-f]{1,4}:){6}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|::(?:[0-9A-Fa-f]{1,4}:){0,5}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){1}:(?:[0-9A-Fa-f]{1,4}:){0,4}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){2}:(?:[0-9A-Fa-f]{1,4}:){0,3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){3}:(?:[0-9A-Fa-f]{1,4}:){0,2}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){4}:(?:[0-9A-Fa-f]{1,4}:){0,1}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){5}:(?:[0-9A-Fa-f]{1,4}:){0,0}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})\z</field>
+    <field name="capstone_norm.destination_ip" type="pcre2">\A(?!211\.170\.162\.(?:110|111)\z)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,7}:|(?:[0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,5}(?::[0-9A-Fa-f]{1,4}){1,2}|(?:[0-9A-Fa-f]{1,4}:){1,4}(?::[0-9A-Fa-f]{1,4}){1,3}|(?:[0-9A-Fa-f]{1,4}:){1,3}(?::[0-9A-Fa-f]{1,4}){1,4}|(?:[0-9A-Fa-f]{1,4}:){1,2}(?::[0-9A-Fa-f]{1,4}){1,5}|[0-9A-Fa-f]{1,4}:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|:(?:(?::[0-9A-Fa-f]{1,4}){1,7}|:)|(?:[0-9A-Fa-f]{1,4}:){6}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|::(?:[0-9A-Fa-f]{1,4}:){0,5}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){1}:(?:[0-9A-Fa-f]{1,4}:){0,4}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){2}:(?:[0-9A-Fa-f]{1,4}:){0,3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){3}:(?:[0-9A-Fa-f]{1,4}:){0,2}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){4}:(?:[0-9A-Fa-f]{1,4}:){0,1}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){5}:(?:[0-9A-Fa-f]{1,4}:){0,0}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})\z</field>
+    <field name="capstone_norm.destination_port" type="pcre2">\A(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\z</field>
+    <field name="capstone_norm.protocol" type="pcre2">\A(tcp|udp)\z</field>
+    <field name="capstone_norm.quality_flags" type="pcre2">\A\[\s*\]\z</field>
+    <field name="capstone_norm.event_time_kst" type="pcre2">\A[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,9})?\+09:00\z</field>
+    <description>Capstone suricata normalized evidence observation; not an attack decision</description>
+    <options>no_full_log</options>
+    <options>no_email_alert</options>
+  </rule>
+  <rule id="100262" level="3">
+    <if_sid>100260</if_sid>
+    <field name="capstone_norm.source" type="pcre2">\Anftables\z</field>
+    <field name="capstone_norm.action" type="pcre2">\Alogged_drop\z</field>
+    <field name="capstone_norm.correlation_eligible" type="pcre2">\Atrue\z</field>
+    <field name="capstone_norm.correlation_time_class" type="pcre2">\Afresh\z</field>
+    <field name="capstone_norm.protected_asset" type="pcre2">\Afalse\z</field>
+    <field name="capstone_norm.correlation_key" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.correlation_dedupe_key" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.event_id" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.message_sha256" type="pcre2">\A[0-9a-f]{64}\z</field>
+    <field name="capstone_norm.source_ip" type="pcre2">\A(?!211\.170\.162\.(?:110|111)\z)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,7}:|(?:[0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,5}(?::[0-9A-Fa-f]{1,4}){1,2}|(?:[0-9A-Fa-f]{1,4}:){1,4}(?::[0-9A-Fa-f]{1,4}){1,3}|(?:[0-9A-Fa-f]{1,4}:){1,3}(?::[0-9A-Fa-f]{1,4}){1,4}|(?:[0-9A-Fa-f]{1,4}:){1,2}(?::[0-9A-Fa-f]{1,4}){1,5}|[0-9A-Fa-f]{1,4}:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|:(?:(?::[0-9A-Fa-f]{1,4}){1,7}|:)|(?:[0-9A-Fa-f]{1,4}:){6}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|::(?:[0-9A-Fa-f]{1,4}:){0,5}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){1}:(?:[0-9A-Fa-f]{1,4}:){0,4}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){2}:(?:[0-9A-Fa-f]{1,4}:){0,3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){3}:(?:[0-9A-Fa-f]{1,4}:){0,2}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){4}:(?:[0-9A-Fa-f]{1,4}:){0,1}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){5}:(?:[0-9A-Fa-f]{1,4}:){0,0}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})\z</field>
+    <field name="capstone_norm.destination_ip" type="pcre2">\A(?!211\.170\.162\.(?:110|111)\z)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,7}:|(?:[0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,5}(?::[0-9A-Fa-f]{1,4}){1,2}|(?:[0-9A-Fa-f]{1,4}:){1,4}(?::[0-9A-Fa-f]{1,4}){1,3}|(?:[0-9A-Fa-f]{1,4}:){1,3}(?::[0-9A-Fa-f]{1,4}){1,4}|(?:[0-9A-Fa-f]{1,4}:){1,2}(?::[0-9A-Fa-f]{1,4}){1,5}|[0-9A-Fa-f]{1,4}:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|:(?:(?::[0-9A-Fa-f]{1,4}){1,7}|:)|(?:[0-9A-Fa-f]{1,4}:){6}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|::(?:[0-9A-Fa-f]{1,4}:){0,5}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){1}:(?:[0-9A-Fa-f]{1,4}:){0,4}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){2}:(?:[0-9A-Fa-f]{1,4}:){0,3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){3}:(?:[0-9A-Fa-f]{1,4}:){0,2}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){4}:(?:[0-9A-Fa-f]{1,4}:){0,1}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|(?:[0-9A-Fa-f]{1,4}:){5}:(?:[0-9A-Fa-f]{1,4}:){0,0}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3})\z</field>
+    <field name="capstone_norm.destination_port" type="pcre2">\A(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])\z</field>
+    <field name="capstone_norm.protocol" type="pcre2">\A(tcp|udp)\z</field>
+    <field name="capstone_norm.quality_flags" type="pcre2">\A\[\s*\]\z</field>
+    <field name="capstone_norm.event_time_kst" type="pcre2">\A[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,9})?\+09:00\z</field>
+    <description>Capstone nftables normalized evidence observation; not an attack decision</description>
+    <options>no_full_log</options>
+    <options>no_email_alert</options>
+  </rule>
+</group>

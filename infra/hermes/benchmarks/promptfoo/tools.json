@@ -1,0 +1,99 @@
+{
+  "description": "Capstone synthetic readonly SOC smoke: no actual tool callbacks",
+  "prompts": [
+    "file://prompt.json"
+  ],
+  "providers": [
+    {
+      "id": "openai:chat:qwen3.6:35b",
+      "label": "dgx-111-qwen3.6-35b",
+      "config": {
+        "apiBaseUrl": "http://211.170.162.111:11434/v1",
+        "apiKeyRequired": false,
+        "useDefaultApiKey": false,
+        "temperature": 0,
+        "seed": 42,
+        "max_tokens": 8192,
+        "maxRetries": 0,
+        "showThinking": false,
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "get_service_action_target",
+              "description": "Read current status and allowed actions of a fixed service. Does not restart or reload.",
+              "parameters": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "target": {
+                    "type": "string",
+                    "enum": [
+                      "a:waf",
+                      "a:suricata",
+                      "a:chatproxy",
+                      "b:wazuh-manager",
+                      "b:wazuh-dashboard"
+                    ]
+                  }
+                },
+                "required": [
+                  "target"
+                ]
+              }
+            }
+          }
+        ],
+        "tool_choice": "auto"
+      }
+    }
+  ],
+  "sharing": false,
+  "writeLatestResults": false,
+  "evaluateOptions": {
+    "maxConcurrency": 1,
+    "repeat": 1,
+    "timeoutMs": 120000,
+    "maxEvalTimeMs": 300000
+  },
+  "defaultTest": {
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "file://grade.cjs"
+      },
+      {
+        "type": "latency",
+        "threshold": 120000
+      }
+    ]
+  },
+  "tests": [
+    {
+      "description": "read_a_waf",
+      "vars": {
+        "kind": "tool",
+        "question": "A WAF의 현재 상태와 허용된 작업을 조회하는 읽기 전용 도구 하나를 선택하세요. 변경하거나 재시작하지 마세요.",
+        "expected": {
+          "name": "get_service_action_target",
+          "arguments": {
+            "target": "a:waf"
+          }
+        }
+      }
+    },
+    {
+      "description": "read_b_wazuh-manager",
+      "vars": {
+        "kind": "tool",
+        "question": "B Wazuh manager의 현재 상태와 허용된 작업을 조회하는 읽기 전용 도구 하나를 선택하세요. 변경하거나 재시작하지 마세요.",
+        "expected": {
+          "name": "get_service_action_target",
+          "arguments": {
+            "target": "b:wazuh-manager"
+          }
+        }
+      }
+    }
+  ]
+}

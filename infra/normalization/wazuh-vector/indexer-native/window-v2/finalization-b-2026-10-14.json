@@ -1,0 +1,100 @@
+{
+  "kind": "step2_b_finalization",
+  "status": "complete",
+  "at_kst": "2026-10-14T19:45:21.701122+09:00",
+  "permanent_evidence_directory": "/opt/capstone-automation/project/evidence/short-priority-20261014",
+  "source_files": 114,
+  "source_bytes": 1519219,
+  "all_source_sha_matched": true,
+  "record_sha256": {
+    "preservation-manifest.json": "3f5b6a78c10ac72758f50e359607c242af40840a0d74c43dc5548a709e874f62",
+    "preservation.json": "6d9749420ce14543cd26599f0b8422867168662408b753e3b9140fab9b3e3fec",
+    "cleanup.json": "cf069debff5f0e12acc95012a74ba186721c4e44ae105add83f4aa02acfa1e5f",
+    "postcleanup.json": "c684a9f3d59e2dd0277b014168c407a1dcf608527895604c3053cbc7536c104b"
+  },
+  "executed_wrapper_sha256": "0677cc6902872c24c71f7eb3add5be917beae52418b989aac408c645d14c68fc",
+  "container_count": 6,
+  "all_container_cid_pid_startedat_unchanged": true,
+  "active_services": [
+    "capstone-hermes-guard-reapply.timer",
+    "capstone-hermes-guard-observe.service",
+    "rule-change-worker.timer"
+  ],
+  "service_identity_unchanged": true,
+  "manager_init_pid": 2132232,
+  "analysisd_pid": 2132985,
+  "analysisd_start_ticks": "139486022",
+  "protected_manager_files": {
+    "etc/ossec.conf": {
+      "sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+      "bytes": 8741,
+      "uid": 0,
+      "gid": 999,
+      "mode": "0o660"
+    },
+    "etc/local_internal_options.conf": {
+      "sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+      "bytes": 380,
+      "uid": 0,
+      "gid": 999,
+      "mode": "0o640"
+    },
+    "etc/rules/local_rules.xml": {
+      "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+      "bytes": 6122,
+      "uid": 999,
+      "gid": 999,
+      "mode": "0o660"
+    },
+    "etc/rules/capstone_vector_rules.xml": {
+      "sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+      "bytes": 21125,
+      "uid": 999,
+      "gid": 999,
+      "mode": "0o660"
+    }
+  },
+  "analysisd_options": {
+    "analysisd.event_threads": 1,
+    "analysisd.rule_matching_threads": 1
+  },
+  "events_dropped": 0,
+  "managed_monitor_revision": {
+    "_id": "-HYdN6EBERDGWPLCrWpE",
+    "_seq_no": 12,
+    "_primary_term": 1
+  },
+  "managed_monitor_config_sha256": "f6a69b0fcb14b5873e9404b3386c0d642ff0085a5303e6af2d18a40cfbed2d37",
+  "managed_state_file_sha256": "4793d675f52ea74d1488e2744089f10e57cd084d900c5c4bf568cd479357064b",
+  "protected_backup_path": "/var/backups/capstone-indexer-window-1791974321357239229",
+  "protected_backup_files": 5,
+  "protected_source_backup_path": "/var/backups/capstone-short-priority-source-20261014",
+  "protected_source_backup_files": 17,
+  "backup_and_live_state_sha_unchanged": true,
+  "stage_removed": "/var/tmp/capstone-short-priority-20261014",
+  "stage_absent": true,
+  "source_or_service_changes": false,
+  "raw_or_credentials_exported": false,
+  "new_packages_installed": 0,
+  "chat_posts": 0,
+  "model_calls": 0,
+  "evidence_file_mode": "0400",
+  "evidence_directory_mode": "0700",
+  "evidence_owner": "root",
+  "metadata_export_sha256": "e807f8a7fc37f165631d216a57a32d4dd102ff6ca27926da02785036a260bd32",
+  "monitor_revision_evidence": "Local managed state matched saved post-upgrade API observation; this cleanup did not call the Indexer API.",
+  "original_runtime_baseline": "step2/preflight.json and step2/post-upgrade-observation.json, now preserved under permanent_evidence_directory",
+  "source_snapshot_boundary": "The parent preserved 42 final project source/doc files before this cleanup. This finalization JSON is subsequent metadata, not a member of that earlier source snapshot.",
+  "local_temp_items_for_parent_cleanup": [
+    "preserve-step2-preflight-b.sh",
+    "step2-preservation-preflight-result.json",
+    "finalize-step2-b-body.py",
+    "finalize-step2-b.sh",
+    "step2-finalization-b-result.json",
+    "step2-finalize-input/"
+  ],
+  "mac_shared_task_directory_preserved": "/private/tmp/capstone-short-priority-20261014.trt3rndm",
+  "mac_package_cache_venv_bytecode_created": false,
+  "other_private_temp_created": false,
+  "permanent_wrapper_path": "/opt/capstone-automation/project/evidence/short-priority-20261014/finalization-input/step2-finalize-input/finalize-step2-b.sh"
+}

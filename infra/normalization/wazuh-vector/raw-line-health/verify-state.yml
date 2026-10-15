@@ -1,0 +1,44 @@
+---
+- name: Inspect the same name before mutation or validation completion
+  ansible.builtin.command:
+    argv: ["{{ docker_bin }}", inspect, "{{ manager_name }}"]
+  changed_when: false
+  register: current_manager
+  no_log: true
+- name: Require exact container and persistent volume identity
+  ansible.builtin.assert:
+    that:
+      - (current_manager.stdout | from_json)[0].Id == pin.manager_id
+      - not (require_running | default(true)) or (current_manager.stdout | from_json)[0].State.Running
+      - (current_manager.stdout | from_json)[0].Mounts == manager_before.Mounts
+  no_log: true
+- name: Recheck protected files without following links
+  ansible.builtin.stat:
+    path: "{{ item }}"
+    follow: false
+    checksum_algorithm: sha256
+  loop: "{{ protected_paths }}"
+  register: protected_now
+  no_log: true
+- name: Refuse unrelated bytes or permission changes
+  ansible.builtin.assert:
+    that:
+      - item.1.stat.exists and item.1.stat.isreg and not item.1.stat.islnk and item.1.stat.nlink == 1
+      - item.0.stat.checksum == item.1.stat.checksum
+      - item.0.stat.uid == item.1.stat.uid and item.0.stat.gid == item.1.stat.gid
+      - item.0.stat.mode == item.1.stat.mode
+  loop: "{{ protected_before.results | zip(protected_now.results) | list }}"
+  no_log: true
+- name: Recheck dedicated rule bytes and metadata
+  ansible.builtin.stat:
+    path: "{{ rule_path }}"
+    follow: false
+    checksum_algorithm: sha256
+  register: rule_now
+- name: Require only transaction-owned rule versions
+  ansible.builtin.assert:
+    that:
+      - rule_now.stat.exists and rule_now.stat.isreg and not rule_now.stat.islnk and rule_now.stat.nlink == 1
+      - rule_now.stat.uid == 999 and rule_now.stat.gid == 999 and rule_now.stat.mode == '0660'
+      - rule_now.stat.checksum in accepted_rule_hashes
+    fail_msg: 'Unrelated file or container drift; refuse automatic overwrite or restart.'

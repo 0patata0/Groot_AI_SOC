@@ -1,0 +1,22 @@
+{
+  "actual_warning_delivery_proven": false,
+  "alerts_last24h": {
+    "relation": "eq",
+    "value": 0
+  },
+  "all_shards_success": {
+    "failed": 0,
+    "skipped": 0,
+    "successful": 60,
+    "total": 60
+  },
+  "by_rule": [],
+  "installed_source_sha256": {
+    "decoders/capstone_certificate_decoders.xml": "3a7d37d2ce9979da70b196b17adcfed9f33285bb604979c2e7416b7a3c5d281c",
+    "rules/capstone_certificate_rules.xml": "40dc486283cd5dc9e5aaf57bc79ed78be233528c44375914ea2620d31dc1df2d"
+  },
+  "normal_status_expected_not_indexed": true,
+  "observed_at_kst": "2026-10-15T10:49:18.370708+09:00",
+  "operational_changes": false,
+  "synthetic_warning_injected": false
+}

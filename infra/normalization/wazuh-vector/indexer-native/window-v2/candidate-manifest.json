@@ -1,0 +1,84 @@
+{
+  "status": "native_validated_and_deployed",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 10297,
+      "sha256": "3ef26e41def52087f5f8f4e4e3e9e2f688ebd53ab4c15342f0bdcbbcc9bbed2b"
+    },
+    {
+      "path": "build.py",
+      "bytes": 3296,
+      "sha256": "84770bf7f79b012abe3b9bb1d1842da0663c6f669b06770374815757c862e8b6"
+    },
+    {
+      "path": "fixtures.py",
+      "bytes": 8348,
+      "sha256": "3452610c790c8ca9b03d41d303c8c5f7f6d10b286f75e3b5da45a1ad956b3bcc"
+    },
+    {
+      "path": "fixture-manifest.json",
+      "bytes": 17029,
+      "sha256": "e9cde4b06c410de9cb6d907e421160139ad83f89778ba53734102aa2d88e82b1"
+    },
+    {
+      "path": "metric-init.painless",
+      "bytes": 125,
+      "sha256": "7b63a16af0259378c12962030ef0609ab1f78b2c749186d0fb205ea660c57a88"
+    },
+    {
+      "path": "metric-map.painless",
+      "bytes": 2198,
+      "sha256": "0384a7c420f84d833f59c6d674c55221e216084e8bf95d59d488602ab9f975b8"
+    },
+    {
+      "path": "metric-combine.painless",
+      "bytes": 567,
+      "sha256": "211839e582d532fc7f0f3e69a6d5cbad43113147e88718544b5a5d49708898b9"
+    },
+    {
+      "path": "metric-reduce.painless",
+      "bytes": 4478,
+      "sha256": "253a5a9e519854f08048e01cc7d0e511dae844a4cc2ce9e43aba81ff59bfc50b"
+    },
+    {
+      "path": "monitor-query.painless",
+      "bytes": 1262,
+      "sha256": "f44d65794f67ad2af62c2aec911deefab2363a82f2d6fee5fd1639c58424d098"
+    },
+    {
+      "path": "trigger-common.painless",
+      "bytes": 3033,
+      "sha256": "fbf9bbb1a08f04119f39da17f1b5e9a95c763277f1b085780be8f491bd72e7ad"
+    },
+    {
+      "path": "monitor-match.painless",
+      "bytes": 3250,
+      "sha256": "982bb42c68e56fa463702175c281b2e3308333988fb8ad4258bdc71931cc1f03"
+    },
+    {
+      "path": "monitor-unavailable.painless",
+      "bytes": 3201,
+      "sha256": "a7bf19d1a3a1d3dde69f34d900735c966bd9b24a781b2d566c8beff1d0b39abf"
+    },
+    {
+      "path": "monitor.json",
+      "bytes": 23597,
+      "sha256": "acc8ac9649cc8b974872a30cf4bcc8f2e52adf0caf56ed197e8b95066d657c7f"
+    },
+    {
+      "path": "test_contract.py",
+      "bytes": 8700,
+      "sha256": "e3e5c726afbc88c93a8d410e62c202e2f445237ed127ab60ea6baef5d7c152ec"
+    },
+    {
+      "path": "offline-validation.json",
+      "bytes": 990,
+      "sha256": "b8160f55a428fb3a36bdb8ade223cc429f067105542887851c3d4e154420a5f5"
+    }
+  ],
+  "creation_snapshot_status": "candidate_frozen_pending_native_validation",
+  "creation_manifest_sha256": "e3e1956fafecc518d1f0585302b775ba3bf5a94d847aadf1974038043314e873",
+  "deployment_evidence": "deployment-2026-10-14.json",
+  "post_creation_documentation_note": "README current-state header added after successful deployment; executable candidate unchanged; creation version preserved in installed source package evidence."
+}

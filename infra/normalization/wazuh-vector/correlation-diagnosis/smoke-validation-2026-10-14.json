@@ -1,0 +1,307 @@
+{
+  "kind": "isolated_analysisd_smoke_attempts",
+  "attempts": [
+    {
+      "kind": "private_native_analysisd_correlation_diagnosis",
+      "mode": "smoke",
+      "production_before": {
+        "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "init_pid": 2002301,
+        "started_at": "2026-10-13T20:52:37.692259701Z",
+        "analysisd_pid": 2003045,
+        "analysisd_start": "134839674",
+        "root": [
+          52,
+          5669366
+        ],
+        "queue": [
+          64512,
+          6317390
+        ],
+        "hashes": {
+          "bin/wazuh-analysisd": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+          "etc/ossec.conf": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+          "etc/rules/local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "etc/rules/capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+        }
+      },
+      "arms": [],
+      "operational_input_written": false,
+      "native_children_cleaned": true,
+      "agent000_is_not_agent001_transport_equivalence": true,
+      "fixture_directory": "/var/tmp/capstone-correlation-20261014/analysisd-4a3fdad597",
+      "error": "native_startup_exited",
+      "production_unchanged": true,
+      "checked_at_kst": "2026-10-14T12:54:57.234040+09:00",
+      "source_sha256": "01aba0180340bc26a79d585c79218be5d3e8dff77a24e043d666aa38f08186a1",
+      "result_path": "/var/tmp/capstone-correlation-20261014/analysisd-4a3fdad597/result.json"
+    },
+    {
+      "kind": "private_native_analysisd_correlation_diagnosis",
+      "mode": "smoke",
+      "production_before": {
+        "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "init_pid": 2002301,
+        "started_at": "2026-10-13T20:52:37.692259701Z",
+        "analysisd_pid": 2003045,
+        "analysisd_start": "134839674",
+        "root": [
+          52,
+          5669366
+        ],
+        "queue": [
+          64512,
+          6317390
+        ],
+        "host_identity_files": {
+          "/etc/group": {
+            "devino": [
+              64512,
+              3147434
+            ],
+            "sha256": "0c4168e8a563cc2ecee24aa855c9012cdbd503f9c7baa7f227f61c4f2652f9a8",
+            "uid": 0,
+            "gid": 0,
+            "mode": 420
+          },
+          "/etc/passwd": {
+            "devino": [
+              64512,
+              3147441
+            ],
+            "sha256": "42f5d73ed6ff90c87075294aeea54f3dbbd25384f9eb94a7b125f7b2c4ddfe5f",
+            "uid": 0,
+            "gid": 0,
+            "mode": 420
+          }
+        },
+        "hashes": {
+          "bin/wazuh-analysisd": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+          "etc/ossec.conf": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+          "etc/rules/local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "etc/rules/capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+        }
+      },
+      "arms": [],
+      "operational_input_written": false,
+      "native_children_cleaned": true,
+      "agent000_is_not_agent001_transport_equivalence": true,
+      "fixture_directory": "/var/tmp/capstone-correlation-20261014/analysisd-eb403795e4",
+      "error": "unexpected_native_fd",
+      "production_unchanged": true,
+      "checked_at_kst": "2026-10-14T12:57:37.447794+09:00",
+      "source_sha256": "058c6937cec1680904ed0e42567352088a6eb0c15d40670f4dddca4f3a131787",
+      "result_path": "/var/tmp/capstone-correlation-20261014/analysisd-eb403795e4/result.json"
+    },
+    {
+      "kind": "private_native_analysisd_correlation_diagnosis",
+      "mode": "smoke",
+      "production_before": {
+        "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "init_pid": 2002301,
+        "started_at": "2026-10-13T20:52:37.692259701Z",
+        "analysisd_pid": 2003045,
+        "analysisd_start": "134839674",
+        "root": [
+          52,
+          5669366
+        ],
+        "queue": [
+          64512,
+          6317390
+        ],
+        "host_identity_files": {
+          "/etc/group": {
+            "devino": [
+              64512,
+              3147434
+            ],
+            "sha256": "0c4168e8a563cc2ecee24aa855c9012cdbd503f9c7baa7f227f61c4f2652f9a8",
+            "uid": 0,
+            "gid": 0,
+            "mode": 420
+          },
+          "/etc/passwd": {
+            "devino": [
+              64512,
+              3147441
+            ],
+            "sha256": "42f5d73ed6ff90c87075294aeea54f3dbbd25384f9eb94a7b125f7b2c4ddfe5f",
+            "uid": 0,
+            "gid": 0,
+            "mode": 420
+          }
+        },
+        "hashes": {
+          "bin/wazuh-analysisd": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+          "etc/ossec.conf": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+          "etc/rules/local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "etc/rules/capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+        }
+      },
+      "arms": [],
+      "operational_input_written": false,
+      "native_children_cleaned": true,
+      "agent000_is_not_agent001_transport_equivalence": true,
+      "fixture_directory": "/var/tmp/capstone-correlation-20261014/analysisd-210fddc962",
+      "error": "unexpected_native_fd",
+      "production_unchanged": true,
+      "checked_at_kst": "2026-10-14T12:58:59.670065+09:00",
+      "source_sha256": "3728130a46347ec8cc7f0a0dc9467967dbd5bd26cb1686490ef011cfd213ccd9",
+      "result_path": "/var/tmp/capstone-correlation-20261014/analysisd-210fddc962/result.json"
+    },
+    {
+      "kind": "private_native_analysisd_correlation_diagnosis",
+      "mode": "smoke",
+      "production_before": {
+        "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "init_pid": 2002301,
+        "started_at": "2026-10-13T20:52:37.692259701Z",
+        "analysisd_pid": 2003045,
+        "analysisd_start": "134839674",
+        "root": [
+          52,
+          5669366
+        ],
+        "queue": [
+          64512,
+          6317390
+        ],
+        "host_identity_files": {
+          "/etc/group": {
+            "devino": [
+              64512,
+              3147434
+            ],
+            "sha256": "0c4168e8a563cc2ecee24aa855c9012cdbd503f9c7baa7f227f61c4f2652f9a8",
+            "uid": 0,
+            "gid": 0,
+            "mode": 420
+          },
+          "/etc/passwd": {
+            "devino": [
+              64512,
+              3147441
+            ],
+            "sha256": "42f5d73ed6ff90c87075294aeea54f3dbbd25384f9eb94a7b125f7b2c4ddfe5f",
+            "uid": 0,
+            "gid": 0,
+            "mode": 420
+          }
+        },
+        "hashes": {
+          "bin/wazuh-analysisd": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+          "etc/ossec.conf": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+          "etc/rules/local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "etc/rules/capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+        }
+      },
+      "arms": [
+        {
+          "profile": "auto",
+          "hashes": {
+            "config_sha256": "885aaf0c8a8c814b40be6d6139365d0d25fc250b6147a544572fa880a2f8379d",
+            "local_options_sha256": "552bd2b259a95c7566035e3a09a7be754fb95c062ba5deb0c59e7c16f50ce04a",
+            "binary_sha256": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+            "rules_sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+          },
+          "runtime": {
+            "pid": 2082811,
+            "open_file_paths_private_or_device_allowlist": true,
+            "production_socket_inodes_disjoint": true,
+            "start_ticks": "137407256",
+            "threads": 50,
+            "root_private": true,
+            "mount_namespace_private": true,
+            "network_namespace_private": true
+          },
+          "cases": [
+            {
+              "run_id": "f9047d75b96a4bb9a136ed7edc60a09c",
+              "profile_number": 0,
+              "identities": "reused",
+              "order": "forward",
+              "pacing": "cross-gap",
+              "agent_id": "000",
+              "input_rows": 13,
+              "sent_rows": 13,
+              "archive_rows": 13,
+              "archive_delivery_order": [
+                1,
+                2,
+                5,
+                6,
+                3,
+                4,
+                8,
+                9,
+                7,
+                10,
+                12,
+                11,
+                13
+              ],
+              "archive_exact_payloads": true,
+              "logtest_rule_ids": [
+                "100291",
+                "100291",
+                "100291",
+                "100291",
+                "100293",
+                "100291",
+                "100294",
+                "100291",
+                "100291",
+                "100291",
+                "100291",
+                "100291",
+                ""
+              ],
+              "archive_rule_ids": [
+                "100291",
+                "100291",
+                "100291",
+                "100291",
+                "100291",
+                "100293",
+                "100291",
+                "100291",
+                "100294",
+                "100291",
+                "100291",
+                "100291",
+                ""
+              ],
+              "archive_leaf_counts": {
+                "100293": 1,
+                "100294": 1
+              },
+              "alert_rule_counts": {
+                "100293": 1,
+                "100294": 1
+              },
+              "alert_writer_drained": true,
+              "alert_writer_wait_seconds": 0.0,
+              "expected_alert_rule_counts": {
+                "100293": 1,
+                "100294": 1
+              },
+              "analysis_matches_sequential_expectation": true,
+              "alerts_match_sequential_expectation": true,
+              "socket_send_is_analysis_ack": false,
+              "archive_order_is_receive_order": false
+            }
+          ]
+        }
+      ],
+      "operational_input_written": false,
+      "native_children_cleaned": true,
+      "agent000_is_not_agent001_transport_equivalence": true,
+      "fixture_directory": "/var/tmp/capstone-correlation-20261014/analysisd-00c52707a7",
+      "production_unchanged": true,
+      "checked_at_kst": "2026-10-14T13:01:14.105375+09:00",
+      "source_sha256": "06334689c9663841b46d18ce2489b9198e2da064cbf8cce6a24706e24a46673b",
+      "result_path": "/var/tmp/capstone-correlation-20261014/analysisd-00c52707a7/result.json"
+    }
+  ]
+}

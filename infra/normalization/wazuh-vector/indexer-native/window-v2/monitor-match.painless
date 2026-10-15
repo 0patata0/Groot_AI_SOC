@@ -1,0 +1,51 @@
+// Byte-identical prefix in both triggers; no deployment/test bypass parameters.
+boolean boundedInteger(def value, long maximum) {
+    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;
+}
+boolean observationAvailable(def ctx) {
+    try {
+        long now = new Date().getTime();
+        long end = ctx.periodEnd.toEpochMilli();
+        if (end < 300000 || end > now + 5000 || end < now - 15000 || ctx.error != null ||
+            !(ctx.results instanceof List) || ctx.results.size() != 1) return false;
+        def result = ctx.results[0];
+        if (!(result instanceof Map) || result.timed_out != false ||
+            (result.containsKey('terminated_early') && result.terminated_early != false) ||
+            !(result._shards instanceof Map)) return false;
+        def shards = result._shards;
+        if (!boundedInteger(shards.total, 64) || shards.total < 1 ||
+            !boundedInteger(shards.successful, 64) || shards.successful != shards.total ||
+            !boundedInteger(shards.skipped, shards.total) || !boundedInteger(shards.failed, 0)) return false;
+        if (!(result.hits instanceof Map) || !(result.hits.total instanceof Map) ||
+            result.hits.total.relation != 'eq' || !boundedInteger(result.hits.total.value, 10000) ||
+            !(result.hits.hits instanceof List) || result.hits.hits.size() != 0 ||
+            !(result.aggregations instanceof Map) || !(result.aggregations.observation instanceof Map)) return false;
+        def metric = result.aggregations.observation.value;
+        if (!(metric instanceof Map) || metric.size() != 12 || metric.policy != 'event-window-v2' ||
+            metric.precision != 'microseconds' || metric.valid != true || metric.reason != 'ok' ||
+            !(metric.match instanceof Boolean) || !boundedInteger(metric.documents, 10000) ||
+            metric.documents != result.hits.total.value || !boundedInteger(metric.unique_events, metric.documents) ||
+            !boundedInteger(metric.duplicate_documents, metric.documents) ||
+            metric.unique_events + metric.duplicate_documents != metric.documents ||
+            !boundedInteger(metric.services, 100) || metric.services > metric.unique_events ||
+            !boundedInteger(metric.matched_services, metric.services) ||
+            !boundedInteger(metric.repeat_services, metric.matched_services) ||
+            !boundedInteger(metric.cross_source_services, metric.matched_services) ||
+            metric.repeat_services + metric.cross_source_services < metric.matched_services ||
+            metric.match != (metric.matched_services > 0)) return false;
+        if ((metric.documents == 0) != (metric.unique_events == 0) ||
+            (metric.unique_events == 0) != (metric.services == 0)) return false;
+        if (metric.repeat_services > 0 && metric.unique_events < 5) return false;
+        if (metric.cross_source_services > 0 && metric.unique_events < 2) return false;
+        return true;
+    } catch (Exception e) {
+        return false;
+    }
+}
+
+// Decision: observation_match. Metadata observation, never containment.
+try {
+    return observationAvailable(ctx) && ctx.results[0].aggregations.observation.value.match;
+} catch (Exception e) {
+    return false;
+}

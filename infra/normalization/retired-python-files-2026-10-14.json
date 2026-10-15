@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "retired_at_date_kst": "2026-10-14",
+  "reason": "User requested removal of superseded, unused custom Python normalization prototypes and dedicated tests after Vector/Wazuh package path adoption.",
+  "scope": "Local source only; no server/runtime changes.",
+  "counts": {
+    "implementation_and_probe_python": 21,
+    "dedicated_test_python": 16,
+    "synthetic_examples": 1,
+    "total_files": 38
+  },
+  "source_backup_created": false,
+  "git_recovery_note": "All removed files were untracked at deletion; this metadata is not source content and does not guarantee recovery from Git.",
+  "removed_files": [
+    {
+      "path": "infra/normalization/collector.py",
+      "bytes": 9716,
+      "sha256": "60283680696f0537fcc1f8114f0e58a76ce1ce180adf397bb0c77113ab40adba",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_delivery.py",
+      "bytes": 14233,
+      "sha256": "1172ddcb754b08cb5990069ef9fc8d130be9b674f69566af52648a58be053672",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_delivery_gate.py",
+      "bytes": 7790,
+      "sha256": "98d028cf36f737f911d097c61ac467ea18973e1071855469c334513f5ea76c7f",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_delivery_transport.py",
+      "bytes": 4647,
+      "sha256": "f6e5eb8692d09831116e31cc5fd33a658f1991ff3a2d47f5b4896dfdc5bf03b0",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_file_reader.py",
+      "bytes": 12292,
+      "sha256": "40d2882d664d5563394eec8f9fd597337729775aa4ad5a901b3846f42950c8ad",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_journal_reader.py",
+      "bytes": 12195,
+      "sha256": "645e2e321610964e46a0ad44b6f529ec9da734e5f6291c744272f51b50cac552",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_reprocess.py",
+      "bytes": 6677,
+      "sha256": "b68abbe23e03e7111f0a981e24ceeffa16acf4b7fd7e545c208008b893f26db8",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_rotation.py",
+      "bytes": 17564,
+      "sha256": "0e3e6de7483ea526f9ca3d5df5d7ca8e3c85251f1b002d1856f6756cb63393ea",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_rotation_proof.py",
+      "bytes": 10949,
+      "sha256": "cead5a188b4a3a2a61653cd8bd06d7e068c0b099b3e84a03846d117a14f75752",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_store.py",
+      "bytes": 28417,
+      "sha256": "0b0575a1cc0facc21d2313be25005a28c657089282334852cc8c7ecfaf5ad776",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/collector_waf_evidence.py",
+      "bytes": 5858,
+      "sha256": "c21441304fbf40b86f118a6219ae6306630781b54f54414b70cd774d6275fdfd",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/delivery_stdio.py",
+      "bytes": 2107,
+      "sha256": "c25c0c39d4e0c5e83edb9e967f572525d7e17dc55398e4b7947382515e6ae837",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/normalize_events.py",
+      "bytes": 17972,
+      "sha256": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/probe_delivery_source.py",
+      "bytes": 14326,
+      "sha256": "b557c61dca4519f77889bebb84781916f49ce7ecc969ae517863a2016dab6739",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/probe_suricata_rotation.py",
+      "bytes": 21777,
+      "sha256": "d6b6ebc388cdf488efd5efba6594bb4d2a123c06467811b4d0a5c99c2884107c",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/probe_waf_rotation.py",
+      "bytes": 23946,
+      "sha256": "9cdcba56d8d030f24e5830df4b3a91f4c3d1b64a7731438d5822e7424dc93bd7",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector.py",
+      "bytes": 10674,
+      "sha256": "b5b5222c2f008f9b745f0387508390f55be41b78c5f4b3ecadf0652b45eead57",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_delivery.py",
+      "bytes": 14384,
+      "sha256": "9f34be273294bcec52c4c33fac6007f0f452db09d83b9a20a3a840f0184224bd",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_delivery_gate.py",
+      "bytes": 12683,
+      "sha256": "ba02154b0ad0b60d32969f632b54fc861e99f952a44db12f85f3c787b6f9dc28",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_file_reader.py",
+      "bytes": 12576,
+      "sha256": "8189f33e97571776b7db81366c157a0c6b46359f1226becb15f070b84a086113",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_journal_reader.py",
+      "bytes": 14607,
+      "sha256": "b316c9b236222a957aa78122305e331108929181a17235d56633d155e170185a",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_reprocess.py",
+      "bytes": 20396,
+      "sha256": "d974a534397d2f0961c7de0dfb0249f19a4e0766f071dbf308efddf0c757c68b",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_rotation.py",
+      "bytes": 17603,
+      "sha256": "b720360bb244175f0bd3965c8fb5626c9fe942a0617df676c3f91ec42fd9f2f2",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_rotation_proof.py",
+      "bytes": 7731,
+      "sha256": "601950359b5a98cab1ec84c2ec0c321f0bd12e61f0304364822776551fe47103",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_collector_store.py",
+      "bytes": 16520,
+      "sha256": "ed5c757585bdeadc1470adb21c1104462202413e71b7e3940ca71ab0172c4e01",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_normalize_events.py",
+      "bytes": 23429,
+      "sha256": "bf943d8d1baa926f88719f72a1febcebb461c0dcc911bbb2639fa6602aa80f4c",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_predeployment_edges.py",
+      "bytes": 13352,
+      "sha256": "e795655995b813eaa23cc951cdb7db5f775dbd0352a8e3c476be5e08da77d09f",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_validate_live_samples.py",
+      "bytes": 4571,
+      "sha256": "22837f59b95e7e45c1ad3610df25f5a25046175851a40dcac596ffe40d5cd49d",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_validate_wazuh_decoder.py",
+      "bytes": 5183,
+      "sha256": "72dabd3b60dfbd422448de9520763ab206d6bfb3018face898cc92a5541c44cb",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_verify_waf_reprocess.py",
+      "bytes": 7260,
+      "sha256": "f3f8f661167a8e0aa9ccec9158649449190c557f8d6a48b319ed37a11a56d439",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_waf_input_adapter.py",
+      "bytes": 13949,
+      "sha256": "84aae7e240097b40750449af912c7a72424680457932a9a43f4aa82c4c601eb5",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/test_waf_time_context.py",
+      "bytes": 13775,
+      "sha256": "173d0bfd67fd3da174ca0518990def1591a1fe16ffe8d0f5c0c3c5eca65b9f79",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/validate_live_samples.py",
+      "bytes": 6667,
+      "sha256": "60cf41c83f4c8193b7423290bced4092955c8074d4fed492700dca50533592fd",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/validate_wazuh_decoder.py",
+      "bytes": 3983,
+      "sha256": "0a7c69f9d1be013b24e240ef5b3703e393e7c6ed6aa5ad245140b9988ccca27e",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/verify_waf_reprocess.py",
+      "bytes": 8658,
+      "sha256": "a2cce24479add0244b76639123d96d4a24201f3bc7ad3d1e47d4b3c8bb3ff79d",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/verify_waf_time_evidence.py",
+      "bytes": 7035,
+      "sha256": "89a5d40dc9c20a193a6ccc3809deafa60acc0727370e5b434dff543249052c06",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/waf_input_adapter.py",
+      "bytes": 7677,
+      "sha256": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b",
+      "tracked_before": false
+    },
+    {
+      "path": "infra/normalization/examples.jsonl",
+      "bytes": 1058,
+      "sha256": "9555a2774473fd70060de81d418645743982fae0bd97ccab13fc06d147bf61bf",
+      "tracked_before": false
+    }
+  ],
+  "preserved_evidence": [
+    {
+      "path": "infra/normalization/collector-validation-2026-10-13.json",
+      "sha256": "1c93ca2dc1f2621de3735137c791cc73ed911e916e19d246aa20c06342e90f16"
+    },
+    {
+      "path": "infra/normalization/delivery-validation-2026-10-14.json",
+      "sha256": "bc5d6bf5a16dd5b8f1f12ad63215e2f8f97be84bb01338f25c67b2700997fd6b"
+    },
+    {
+      "path": "infra/normalization/rotation-validation-2026-10-13.json",
+      "sha256": "9b2cb9f535d5ced3c1974f09445eb35008f1b1f1acd85adf65a84d61812281b7"
+    },
+    {
+      "path": "infra/normalization/validation-2026-10-13.json",
+      "sha256": "5aae5062d7776f10dc614d58744d326eafea7fac9e620600cd750f3e066d16ed"
+    },
+    {
+      "path": "infra/normalization/waf-adapter-validation-2026-10-13.json",
+      "sha256": "f70dcf540a9600ba5404a281e5e40a74c76b3990696ddf263c42e18d3f07b1d5"
+    },
+    {
+      "path": "infra/normalization/waf-time-validation-2026-10-13.json",
+      "sha256": "ca7cabb6dc5888d1ea94e21d6ddc8f4ba633a82651717a53c3db95a439c0ee83"
+    }
+  ],
+  "protected_runtime_directories": [
+    "infra/normalization/vector/",
+    "infra/normalization/wazuh-vector/"
+  ]
+}

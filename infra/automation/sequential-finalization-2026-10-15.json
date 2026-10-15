@@ -1,0 +1,95 @@
+{
+  "all_remaining_work_completed": false,
+  "closeout_note_created_after_server_snapshot": true,
+  "credential_incident": {
+    "credential_value_exposed_in_earlier_tool_output": true,
+    "password_rotation_performed": false,
+    "secret_value_recorded_here": false
+  },
+  "git_commit_performed": false,
+  "mac_cleanup": {
+    "new_package_installs": 0,
+    "path_absent_verified": true,
+    "raw_archive_payload_files_saved": 0,
+    "regular_bytes_removed": 4197704,
+    "regular_files_removed": 71,
+    "task_temp_path": "/private/tmp/capstone-sequential-20261015.q20bgmz1"
+  },
+  "observed_at_kst": "2026-10-15T10:55:57.351214+09:00",
+  "postcheck_health": {
+    "a": {
+      "errors": [],
+      "observed_at_kst": "2026-10-15T10:52:02.786923+09:00",
+      "status": "observed"
+    },
+    "b": {
+      "errors": [],
+      "observed_at_kst": "2026-10-15T10:52:00.530940+09:00",
+      "status": "observed"
+    }
+  },
+  "remaining": [
+    "scheduled_raw_archive_and_general_backup_transfer",
+    "strict_retention_deletion_executor_and_mature_proof",
+    "natural_chat_latency_quality_and_exact_imperva_request_observation",
+    "controlled_kali_access_for_actual_containment_and_approval_lifecycle",
+    "long_gap_coverage_recovery_and_persistent_dedup",
+    "esxi_recovery_access_for_actual_host_reboot_power_loss",
+    "real_certificate_warning_delivery_and_manual_renewal"
+  ],
+  "server_snapshots": {
+    "a": {
+      "bytes": 1909023,
+      "files": 29,
+      "manifest_sha256": "03fafb775b1eedcbc45e85fb64d10dba5549d87016dcf8cd2febc34eb9850bcb",
+      "path": "/var/backups/capstone-sequential-closeout-20261015",
+      "storage_status": {
+        "automatic_deletion": false,
+        "available_bytes": 47578079232,
+        "backup_bytes": 35541859,
+        "backup_review_due_count": 0,
+        "checkpoint_changed": false,
+        "history_bytes": 6518123,
+        "host": "a",
+        "machine_id": "096e90b6243e438aa8a7b392be754732",
+        "observed_at_utc": "2026-10-15T01:54:31Z",
+        "policy": "capstone-storage-retention-v1",
+        "raw_archive_review_due_count": 0,
+        "raw_bytes": 30198513,
+        "reason": "healthy",
+        "retention_days": 30,
+        "scan_status": "complete",
+        "schema_version": 1,
+        "status": "ok",
+        "used_percent": 18
+      }
+    },
+    "b": {
+      "bytes": 1909023,
+      "files": 29,
+      "manifest_sha256": "9b5b2fa7b2a9723ef8215d7c94b4fe0f8b62432b4bf58d67c30cf015f501d8c8",
+      "path": "/var/backups/capstone-sequential-closeout-20261015",
+      "storage_status": {
+        "automatic_deletion": false,
+        "available_bytes": 109203361792,
+        "backup_bytes": 162642749,
+        "backup_review_due_count": 0,
+        "checkpoint_changed": false,
+        "history_bytes": 7090593,
+        "host": "b",
+        "machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+        "observed_at_utc": "2026-10-15T01:54:52Z",
+        "policy": "capstone-storage-retention-v1",
+        "raw_archive_review_due_count": 0,
+        "raw_bytes": 0,
+        "reason": "healthy",
+        "retention_days": 90,
+        "scan_status": "complete",
+        "schema_version": 1,
+        "status": "ok",
+        "used_percent": 26
+      }
+    }
+  },
+  "status": "feasible_sequential_scope_verified_and_cleaned"
+}

@@ -1,0 +1,6 @@
+# Reviewed runtime: Hermes CPython 3.13, Linux x86_64/glibc.
+# Offline install only, using an operator-staged wheel and --no-deps --require-hashes.
+# No source distribution/build or platform-agnostic hash is authorized by this lock.
+# PyPI: https://pypi.org/project/regex/2026.9.29/#files
+# regex-2026.9.29-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+regex==2026.9.29 --hash=sha256:d49c18f1ea294cf4adde2e5ac256e98c82ea9d708462ce4bf799dffa7cfe8a2c

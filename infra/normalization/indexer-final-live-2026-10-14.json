@@ -1,0 +1,75 @@
+{
+  "scope": "Read-only final service/container/Imperva verification; no credentials or raw logs",
+  "a": {
+    "at": "2026-10-14T06:22:57.423601+09:00",
+    "host": "a",
+    "services": {
+      "capstone-vector.service": "active",
+      "wazuh-agent.service": "active",
+      "capstone-vector-maintenance.timer": "active",
+      "rule-change-worker.timer": "active"
+    },
+    "containers": {
+      "waf": {
+        "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "started_at": "2026-10-05T10:18:45.433754298Z",
+        "running": true,
+        "health": "healthy"
+      },
+      "suricata": {
+        "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+        "started_at": "2026-10-13T10:50:28.696240875Z",
+        "running": true,
+        "health": null
+      },
+      "chatproxy": {
+        "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+        "started_at": "2026-09-29T01:44:03.48454989Z",
+        "running": true,
+        "health": null
+      }
+    },
+    "imperva_rule_sha256": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+    "imperva_host_and_container_match": true
+  },
+  "b": {
+    "at": "2026-10-14T06:22:59.169372+09:00",
+    "host": "b",
+    "services": {
+      "capstone-hermes-guard-reapply.timer": "active",
+      "capstone-hermes-guard-observe.service": "active",
+      "rule-change-worker.timer": "active"
+    },
+    "containers": {
+      "single-node-wazuh.manager-1": {
+        "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "started_at": "2026-10-13T20:52:37.692259701Z",
+        "running": true,
+        "health": null
+      },
+      "single-node-wazuh.indexer-1": {
+        "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+        "started_at": "2026-09-28T06:19:48.729016621Z",
+        "running": true,
+        "health": null
+      },
+      "hermes": {
+        "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+        "started_at": "2026-10-13T16:37:16.547543503Z",
+        "running": true,
+        "health": null
+      }
+    },
+    "imperva_alerts_after_apply": {
+      "value": 0,
+      "relation": "eq"
+    },
+    "imperva_query_shards": {
+      "total": 54,
+      "successful": 54,
+      "skipped": 0,
+      "failed": 0
+    },
+    "natural_scan_execution_confirmed": false
+  }
+}

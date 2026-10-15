@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "scope": "additional_tools_and_priorities_1_to_5",
+  "server_preservation": {
+    "a": {
+      "schema_version": 1,
+      "status": "preserved",
+      "host": "a",
+      "inventory_sha256": "4f041bedadeb24f6ed5f91356b067fbebd243144338f1a13a93dfd7e06e8b580",
+      "files": 183,
+      "copy_bytes": 2201692,
+      "excluded_packages": 0,
+      "already_durable": 0,
+      "task_deleted": false,
+      "promptfoo_synthetic_outputs_preserved": false,
+      "promptfoo_aux_cleanup_authorized": false,
+      "all_saved_content_server_private": true,
+      "receipt_sha256": "f4ccd507b904fb9f02cfb4ae76960109618076603b15518571b442318f223410"
+    },
+    "b": {
+      "schema_version": 1,
+      "status": "preserved",
+      "host": "b",
+      "inventory_sha256": "5aa66a6708a1f2f0bb856f831227a1f8b6a0f6ac184d8740a419c4e820178445",
+      "files": 603,
+      "copy_bytes": 9755621,
+      "excluded_packages": 2454,
+      "already_durable": 0,
+      "task_deleted": false,
+      "promptfoo_synthetic_outputs_preserved": true,
+      "promptfoo_aux_cleanup_authorized": false,
+      "all_saved_content_server_private": true,
+      "receipt_sha256": "21ca39f08025fb5bc6462e849be05077f5f4ca875ed9a7bb2c4d9dfdf6492d62"
+    }
+  },
+  "server_cleanup": {
+    "a": {
+      "schema_version": 1,
+      "status": "task_stage_removed",
+      "host": "a",
+      "preservation_receipt_sha256": "f4ccd507b904fb9f02cfb4ae76960109618076603b15518571b442318f223410",
+      "removed_path": "/var/tmp/capstone-tools-followup-20261015",
+      "backup_retained": "/var/backups/capstone-tools-followup-20261015-final",
+      "promptfoo_aux_removed": false,
+      "operating_services_or_backups_modified": false,
+      "post_service_health_check": "parent_separate_readonly_step"
+    },
+    "b": {
+      "schema_version": 1,
+      "status": "task_stage_removed",
+      "host": "b",
+      "preservation_receipt_sha256": "21ca39f08025fb5bc6462e849be05077f5f4ca875ed9a7bb2c4d9dfdf6492d62",
+      "removed_path": "/var/tmp/capstone-tools-followup-20261015",
+      "backup_retained": "/var/backups/capstone-tools-followup-20261015-final",
+      "promptfoo_aux_removed": false,
+      "operating_services_or_backups_modified": false,
+      "post_service_health_check": "parent_separate_readonly_step"
+    }
+  },
+  "promptfoo_aux_cleanup": {
+    "status": "promptfoo_task_aux_removed",
+    "verified_entries": 46,
+    "synthetic_outputs_durably_preserved": true,
+    "runtime_removed": false
+  },
+  "native_cleanup": {
+    "checkpoint": {
+      "status": "checkpoint_native_archived_and_removed",
+      "files": 62,
+      "archive_bytes": 55827,
+      "archive_sha256": "6732f0ddec7c03281522abfc3800e79d689ea69942932e61ef93e17a94c21cf1"
+    },
+    "stats": {
+      "status": "private_native_evidence_archived_and_removed",
+      "files": 651,
+      "archive_sha256": "c5733cff3b8ceef7f3517feb3fabfe919c314e496212c2a06ca7ff092b128d80",
+      "archive_bytes": 798466,
+      "container_unchanged": true
+    },
+    "updater": {
+      "archive_sha256": "a4b053b79460b503fd1d0cd01db254215f9e8699bbbb0bf50a2fec8573cb6392",
+      "operating_unchanged": true,
+      "rules_changed": false,
+      "schema_version": 1,
+      "service_signals": 0,
+      "status": "fixed_staging_removed",
+      "tree_count": 17
+    }
+  },
+  "postcleanup_health": {
+    "a": [
+      {
+        "schema_version": 1,
+        "status": "ready",
+        "reason": "reader_start_guard",
+        "engine": "modsecurity",
+        "raw_deleted": false,
+        "checkpoint_rewritten": false,
+        "delivery_acknowledged": false
+      },
+      {
+        "schema_version": 1,
+        "status": "ready",
+        "reason": "reader_start_guard",
+        "engine": "modsecurity",
+        "raw_deleted": false,
+        "checkpoint_rewritten": false,
+        "delivery_acknowledged": false
+      },
+      {
+        "capstone-raw-operations@modsecurity.timer": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "capstone-raw-operations@suricata.timer": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "capstone-storage-monitor.timer": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "capstone-vector-maintenance.timer": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "capstone-vector.service": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "running",
+          "UnitFileState": "enabled"
+        },
+        "storage_status": {
+          "automatic_deletion": false,
+          "available_bytes": 47604580352,
+          "backup_bytes": 27084621,
+          "backup_review_due_count": 0,
+          "checkpoint_changed": false,
+          "history_bytes": 6518123,
+          "host": "a",
+          "machine_id": "096e90b6243e438aa8a7b392be754732",
+          "observed_at_utc": "2026-10-15T00:32:01Z",
+          "policy": "capstone-storage-retention-v1",
+          "raw_archive_review_due_count": 0,
+          "raw_bytes": 28891127,
+          "reason": "healthy",
+          "retention_days": 30,
+          "scan_status": "complete",
+          "schema_version": 1,
+          "status": "ok",
+          "used_percent": 18
+        },
+        "suricata": {
+          "health": null,
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "pid": 1990031
+        },
+        "waf": {
+          "health": "healthy",
+          "id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+          "pid": 2532279
+        },
+        "wazuh-agent.service": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "running",
+          "UnitFileState": "enabled"
+        }
+      }
+    ],
+    "b": [
+      {
+        "agent001_active": true,
+        "capstone-hermes-guard-observe.service": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "running",
+          "UnitFileState": "enabled"
+        },
+        "capstone-hermes-guard-reapply.timer": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "capstone-history-auto-transfer.timer": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "capstone-storage-monitor.timer": {
+          "ActiveState": "active",
+          "Result": "success",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "hermes": {
+          "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "pid": 2248019
+        },
+        "history_status": {
+          "automatic_input_retry": false,
+          "bytes": 5799184,
+          "discovered_batches": 18,
+          "new_receipts": 0,
+          "observed_at_kst": "2026-10-15T09:33:22+09:00",
+          "policy": "capstone-history-auto-transfer-v1",
+          "receipt_catalog_sha256": "ce91c297dc354e8b74ba5d83cf9ce8b0e8b6be84296b47f43568512b5597da91",
+          "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+          "records": 13741,
+          "reused_receipts": 18,
+          "schema_version": 1,
+          "scope": "completed_batch_manifest_snapshot",
+          "security_delivery_acknowledged": false,
+          "source_acknowledged": false,
+          "source_changed": false,
+          "source_machine_id": "096e90b6243e438aa8a7b392be754732",
+          "status": "remote_files_preserved",
+          "verified_receipts": 18
+        },
+        "manager_config_sha256": "09cd17e4e846b73b6ea6a17038982783de74a768fe100e4403cb74482e93c604",
+        "required_manager_processes": [
+          "wazuh-analysisd",
+          "wazuh-db",
+          "wazuh-execd",
+          "wazuh-logcollector",
+          "wazuh-remoted"
+        ],
+        "storage_status": {
+          "automatic_deletion": false,
+          "available_bytes": 108564254720,
+          "backup_bytes": 7529542,
+          "backup_review_due_count": 0,
+          "checkpoint_changed": false,
+          "history_bytes": 7090593,
+          "host": "b",
+          "machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+          "observed_at_utc": "2026-10-15T00:32:00Z",
+          "policy": "capstone-storage-retention-v1",
+          "raw_archive_review_due_count": 0,
+          "raw_bytes": 0,
+          "reason": "healthy",
+          "retention_days": 90,
+          "scan_status": "complete",
+          "schema_version": 1,
+          "status": "ok",
+          "used_percent": 27
+        },
+        "wazuh": {
+          "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+          "pid": 2315523
+        }
+      }
+    ]
+  },
+  "mac_new_package_installs": 0,
+  "project_source_snapshot_files": 88,
+  "project_source_snapshot_manifest_sha256": "511b4c25ae1995f56f3d529699637eb094418477770c57f413a783276e76437e",
+  "remaining": [
+    "model_tool_call_latency_and_output_format",
+    "exact_Imperva_exception_effectiveness_needs_detailed_natural_sample",
+    "raw_backup_archive_and_delete_lifecycle_not_enabled",
+    "previous_priorities_6_8_not_started"
+  ],
+  "live_attack_or_chat_test_sent": false,
+  "suricata_operating_rules_changed": false,
+  "production_model_config_changed": false,
+  "closeout_notes_created_after_server_source_snapshot": true,
+  "mac_cleanup": {
+    "status": "task_temp_and_cache_removed",
+    "directories": {
+      "capstone-tools-followup-20261015.wyshzwkl": {
+        "files": 5405,
+        "bytes": 2042937157
+      },
+      "capstone-tools-final-mac-snapshot-20261015": {
+        "files": 357,
+        "bytes": 5863491
+      }
+    }
+  },
+  "closed_at_kst": "2026-10-15T09:39:52+09:00"
+}

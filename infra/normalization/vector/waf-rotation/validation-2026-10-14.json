@@ -1,0 +1,463 @@
+{
+  "at_kst": "2026-10-14T20:45:16.873736+09:00",
+  "kind": "waf_rotation_isolated_stage1",
+  "runs": [
+    {
+      "status": "failed",
+      "phase": "first_generation_and_private_readers",
+      "failure_code": "bounded_command_failed",
+      "cleanup": {
+        "errors": [],
+        "private_runtime_paths_removed": true,
+        "test_writer_processes_remaining": 0
+      },
+      "source_sha256": {
+        "run-probe-a.py": "2dba3a7da1041dc74cfa63be60d608bb4c59421e98e481fa18743ff30d857a0d",
+        "wazuh-isolated.sh": "2d9f4dcb9b92dd1c537021b89647202a0836ba773f60edde656ef87438fc50c1"
+      },
+      "wazuh_serialization_library_sha256": "67b1a082450474c1e47e72d78c510d2b8ec2411cc37143aa4ca67231e3b025e4",
+      "wazuh_comparison": "exact_installed_cJSON_PrintUnformatted_bytes_not_original_JSONL_bytes",
+      "run": "run-01",
+      "request_count": 0,
+      "publication_count": 0,
+      "result_sha256": "654e5697c464eeceaf7e4a53a7f1559e3f27cc9e0f4d78c070c3a65255fdd4ab",
+      "evidence": {
+        "manifest_sha256": "a2550bb2d9cfe2bfd0a73986fe2acce0a4af63532ece8c76ea5deac16fda1d7a",
+        "generations": 1,
+        "request_counts": [
+          0
+        ]
+      }
+    },
+    {
+      "status": "failed",
+      "phase": "first_generation_and_private_readers",
+      "failure_code": "ValueError",
+      "cleanup": {
+        "errors": [],
+        "private_runtime_paths_removed": true,
+        "test_writer_processes_remaining": 0
+      },
+      "source_sha256": {
+        "run-probe-a.py": "d836c30e01bafa9b51c9d18dde5479fc96d54c67f578914441fc3fda9559db71",
+        "wazuh-isolated.sh": "2d9f4dcb9b92dd1c537021b89647202a0836ba773f60edde656ef87438fc50c1"
+      },
+      "wazuh_serialization_library_sha256": "67b1a082450474c1e47e72d78c510d2b8ec2411cc37143aa4ca67231e3b025e4",
+      "wazuh_comparison": "exact_installed_cJSON_PrintUnformatted_bytes_not_original_JSONL_bytes",
+      "run": "run-02",
+      "request_count": 0,
+      "publication_count": 0,
+      "result_sha256": "5f01a47ded330b7a6825564c41c4da0b2dfa293b8acf64266ce42ffbae7d9551",
+      "evidence": {
+        "manifest_sha256": "4827e169e00f2a25a4f3c55260af5a1e86667d89ec358feb7a6e6717a42b1b79",
+        "generations": 1,
+        "request_counts": [
+          0
+        ]
+      }
+    },
+    {
+      "status": "failed",
+      "phase": "old_request_accepted_then_new_path_reload",
+      "failure_code": "wazuh_logical_eof_sha_mismatch",
+      "failure_frames": [
+        {
+          "file": "run-probe-a.py",
+          "function": "inner",
+          "line": 1019
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "execute",
+          "line": 915
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "publish",
+          "line": 795
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "wait_eof",
+          "line": 781
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "wait",
+          "line": 450
+        }
+      ],
+      "cleanup": {
+        "errors": [],
+        "private_runtime_paths_removed": true,
+        "test_writer_processes_remaining": 0
+      },
+      "source_sha256": {
+        "run-probe-a.py": "b567eb87d9d57329a4c1012917680f37af2926e7e132f93f42539ad4d4bab5a9",
+        "wazuh-isolated.sh": "2d9f4dcb9b92dd1c537021b89647202a0836ba773f60edde656ef87438fc50c1"
+      },
+      "wazuh_serialization_library_sha256": "67b1a082450474c1e47e72d78c510d2b8ec2411cc37143aa4ca67231e3b025e4",
+      "wazuh_comparison": "exact_installed_cJSON_PrintUnformatted_bytes_not_original_JSONL_bytes",
+      "run": "run-03",
+      "request_count": 3,
+      "publication_count": 0,
+      "result_sha256": "dff18ac6e54262970a52e0fb5a914898af2bb27663ccf6ab2dd5f3a3031631e0",
+      "evidence": {
+        "manifest_sha256": "c64950f379ca7f29196be2bf1d727833d9789485f9b88cdb464bd3128182c208",
+        "generations": 2,
+        "request_counts": [
+          2,
+          1
+        ]
+      }
+    },
+    {
+      "status": "failed",
+      "phase": "graceful_reader_restart",
+      "failure_code": "graceful_reader_stop_failed",
+      "failure_frames": [
+        {
+          "file": "run-probe-a.py",
+          "function": "inner",
+          "line": 1047
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "execute",
+          "line": 945
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "stop_readers",
+          "line": 857
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "stop_child",
+          "line": 853
+        },
+        {
+          "file": "run-probe-a.py",
+          "function": "need",
+          "line": 41
+        }
+      ],
+      "cleanup": {
+        "errors": [],
+        "private_runtime_paths_removed": true,
+        "test_writer_processes_remaining": 0
+      },
+      "source_sha256": {
+        "run-probe-a.py": "9ad9e8f976ccdc0e8d7be7ab45e06bed2f3ddb92b222f9a41821fdfd2480e1bd",
+        "wazuh-isolated.sh": "2d9f4dcb9b92dd1c537021b89647202a0836ba773f60edde656ef87438fc50c1"
+      },
+      "wazuh_serialization_library_sha256": "67b1a082450474c1e47e72d78c510d2b8ec2411cc37143aa4ca67231e3b025e4",
+      "wazuh_comparison": "exact_installed_cJSON_PrintUnformatted_bytes_not_original_JSONL_bytes",
+      "run": "run-04",
+      "request_count": 5,
+      "publication_count": 3,
+      "result_sha256": "c53d7a20115f2a6ffc01cb6207392927e8e684bfac42fa620981b3b998c4ede7",
+      "evidence": {
+        "manifest_sha256": "95f46233de11db66b70bfc72dd745cf1eda70298b21e2f432b08c4b20b7e9448",
+        "generations": 4,
+        "request_counts": [
+          2,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "status": "passed",
+      "phase": "verified",
+      "verification": {
+        "all_http_response_and_reader_request_ids_equal": true,
+        "duplicates": 0,
+        "generation_bindings_distinct": true,
+        "graceful_reader_restart": true,
+        "old_audit_and_access_write_fds_zero": true,
+        "raw_access_records": 6,
+        "raw_audit_records": 6,
+        "two_pending_generations_in_order": true,
+        "vector_access_exact_records": 6,
+        "vector_audit_exact_records": 6,
+        "vector_original_message_sha256_equal": true,
+        "wazuh_audit_exact_records": 6,
+        "wazuh_native_serialized_message_sha256_equal": true
+      },
+      "cleanup": {
+        "errors": [],
+        "private_runtime_paths_removed": true,
+        "test_writer_processes_remaining": 0
+      },
+      "source_sha256": {
+        "run-probe-a.py": "ae12559a4641e596c647bc009a7f0d68906e2890d8201d18fca75537e324f7fe",
+        "wazuh-isolated.sh": "2d9f4dcb9b92dd1c537021b89647202a0836ba773f60edde656ef87438fc50c1"
+      },
+      "operating_after": {
+        "identity_config_service_pids_equal": true,
+        "operating_raw_inode_prefix_equal": true,
+        "scope": "eight_explicit_config_hashes_and_bounded_raw_prefixes_not_entire_CRS_tree"
+      },
+      "wazuh_serialization_library_sha256": "67b1a082450474c1e47e72d78c510d2b8ec2411cc37143aa4ca67231e3b025e4",
+      "wazuh_comparison": "exact_installed_cJSON_PrintUnformatted_bytes_not_original_JSONL_bytes",
+      "stop_results": [
+        {
+          "elapsed_seconds": 0.003868,
+          "file_status_exact_final_eof": true,
+          "file_status_read_error": null,
+          "file_status_sha256_after_stop": "3d0ea6f6341848d07a2f04df0efdeff3828473c6ad94c02dc791d0b59b7f7c22",
+          "forced": false,
+          "graceful_required": false,
+          "name": "naive-wazuh",
+          "pid": 1870711,
+          "returncode": 1,
+          "start_ticks": 140604844,
+          "term_sent": true
+        },
+        {
+          "elapsed_seconds": 0.003812,
+          "file_status_exact_final_eof": true,
+          "file_status_read_error": null,
+          "file_status_sha256_after_stop": "743a9443c061095a5ab7149b7cf828ef74b6595d5ac4fc7fa9acf019f334266f",
+          "forced": false,
+          "graceful_required": true,
+          "name": "wazuh",
+          "pid": 1870685,
+          "returncode": 1,
+          "start_ticks": 140604833,
+          "term_sent": true
+        },
+        {
+          "elapsed_seconds": 0.007561,
+          "file_status_exact_final_eof": false,
+          "file_status_read_error": null,
+          "file_status_sha256_after_stop": null,
+          "forced": false,
+          "graceful_required": true,
+          "name": "vector",
+          "pid": 1870677,
+          "returncode": 0,
+          "start_ticks": 140604822,
+          "term_sent": true
+        },
+        {
+          "elapsed_seconds": 0.003908,
+          "file_status_exact_final_eof": true,
+          "file_status_read_error": null,
+          "file_status_sha256_after_stop": "db8fefceb0a4afe5253e46d89abce4f2ec57ebbe34bcedf6215200ed23208d91",
+          "forced": false,
+          "graceful_required": false,
+          "name": "wazuh",
+          "pid": 1872332,
+          "returncode": 1,
+          "start_ticks": 140656064,
+          "term_sent": true
+        },
+        {
+          "elapsed_seconds": 0.003752,
+          "file_status_exact_final_eof": false,
+          "file_status_read_error": null,
+          "file_status_sha256_after_stop": null,
+          "forced": false,
+          "graceful_required": false,
+          "name": "vector",
+          "pid": 1872321,
+          "returncode": 0,
+          "start_ticks": 140656053,
+          "term_sent": true
+        },
+        {
+          "elapsed_seconds": 2.2e-05,
+          "file_status_exact_final_eof": false,
+          "file_status_read_error": null,
+          "file_status_sha256_after_stop": null,
+          "forced": false,
+          "graceful_required": false,
+          "name": "nginx_master",
+          "pid": 1870737,
+          "returncode": 0,
+          "start_ticks": 140604855,
+          "term_sent": false
+        }
+      ],
+      "run": "run-05",
+      "request_count": 6,
+      "publication_count": 3,
+      "result_sha256": "ca681c8425b812c455c4f20f794d1feadb5802ca86d6462018bb35e8d16c8822",
+      "evidence": {
+        "manifest_sha256": "0d97475a0ec65e5b27229932ddc5b1626b5a0ea2149c64440365f33ac6b03a07",
+        "generations": 4,
+        "request_counts": [
+          2,
+          1,
+          1,
+          2
+        ]
+      }
+    }
+  ],
+  "pair": {
+    "status": "passed",
+    "kind": "native_generation_pair_verification",
+    "manifest_sha256": "0d97475a0ec65e5b27229932ddc5b1626b5a0ea2149c64440365f33ac6b03a07",
+    "at_kst": "2026-10-14T20:44:05.084948+09:00",
+    "vrl_sha256": {
+      "waf_json_guard.vrl": "d70de8b923c7cd31db1acd68404210a796ebe53e5d5de16737b5638c5680e898",
+      "waf_audit_part.vrl": "18829d82be5ca8abcb1f11fa750d0f0f3a7eac49af6e22aa1eb131da637c44b8",
+      "waf_access_part.vrl": "9f9700e970579ca1f2acc683fa6a12d6629a48088f780cde63877c49b0b288e5",
+      "waf_pair_normalize.vrl": "df6ddbc0d6773a94110e7edc0e21e6b68643030df8df11b05dd8da491cac1b0f"
+    },
+    "vector_version": "vector 0.59.0 (x86_64-unknown-linux-musl a3231c7 2026-10-06 13:52:51.733983360)",
+    "generations": 4,
+    "requests": 6,
+    "cases": [
+      {
+        "name": "generation-1",
+        "counts": {
+          "ready": 2,
+          "ignored": 0,
+          "quarantine": 0
+        },
+        "vector_validate_exit": 0,
+        "vector_exit": 0,
+        "elapsed_seconds": 2.518,
+        "access_append_after_quarantine_seconds": null,
+        "config_sha256": "5a28cff14f3af8771c4713b46739449706f56e8e53f8417bc16a617da2b49d10",
+        "child_reaped": true,
+        "scope": "generation_archive_replay_with_manifest_source_metadata",
+        "exact_identity_time_hash_tuple_match": true
+      },
+      {
+        "name": "generation-2",
+        "counts": {
+          "ready": 1,
+          "ignored": 0,
+          "quarantine": 0
+        },
+        "vector_validate_exit": 0,
+        "vector_exit": 0,
+        "elapsed_seconds": 2.516,
+        "access_append_after_quarantine_seconds": null,
+        "config_sha256": "484a6c4d4185c7e543542a03044db8c9553668df1c7152222188b683ce027043",
+        "child_reaped": true,
+        "scope": "generation_archive_replay_with_manifest_source_metadata",
+        "exact_identity_time_hash_tuple_match": true
+      },
+      {
+        "name": "generation-3",
+        "counts": {
+          "ready": 1,
+          "ignored": 0,
+          "quarantine": 0
+        },
+        "vector_validate_exit": 0,
+        "vector_exit": 0,
+        "elapsed_seconds": 2.518,
+        "access_append_after_quarantine_seconds": null,
+        "config_sha256": "2ea4c24c7b0c111006cc4d3268d85d18b1b5d75db94f4bad1fcd6c93468f132b",
+        "child_reaped": true,
+        "scope": "generation_archive_replay_with_manifest_source_metadata",
+        "exact_identity_time_hash_tuple_match": true
+      },
+      {
+        "name": "generation-4",
+        "counts": {
+          "ready": 2,
+          "ignored": 0,
+          "quarantine": 0
+        },
+        "vector_validate_exit": 0,
+        "vector_exit": 0,
+        "elapsed_seconds": 2.518,
+        "access_append_after_quarantine_seconds": null,
+        "config_sha256": "57ede1bf92b327806c9aa54a5925681dde9698096884a622f65656e4e62c65c8",
+        "child_reaped": true,
+        "scope": "generation_archive_replay_with_manifest_source_metadata",
+        "exact_identity_time_hash_tuple_match": true
+      },
+      {
+        "name": "old-binding-new-environment",
+        "counts": {
+          "ready": 0,
+          "ignored": 0,
+          "quarantine": 4
+        },
+        "vector_validate_exit": 0,
+        "vector_exit": 0,
+        "elapsed_seconds": 0.51,
+        "access_append_after_quarantine_seconds": null,
+        "config_sha256": "e53a5853513be82ea9adf6730e0f0e76c55e661c31ff64461ed711b029f66ebd",
+        "child_reaped": true,
+        "scope": "old_producer_binding_rejected_with_new_binding_config_environment",
+        "exact_raw_identity_and_binding_failure_marker": true
+      },
+      {
+        "name": "pair-after-expiration",
+        "counts": {
+          "ready": 0,
+          "ignored": 1,
+          "quarantine": 1
+        },
+        "vector_validate_exit": 0,
+        "vector_exit": 0,
+        "elapsed_seconds": 6.638,
+        "access_append_after_quarantine_seconds": 2.51,
+        "config_sha256": "10e650127fa9bdff9cde16813f6eae56e6ee9c16a62d996d4dcafeb7ddbbca36",
+        "child_reaped": true,
+        "scope": "actual_private_reduce_TTL_with_staggered_file_appends",
+        "expired_audit_retained": true,
+        "late_access_ignored": true,
+        "proves_original_live_pipeline_pair_continuity": false
+      }
+    ],
+    "original_archives_unchanged": true,
+    "production_vrl_unchanged": true,
+    "original_metadata_reconstructed_from_manifest": true,
+    "proves_real_time_pair_continuity_across_rotation": false,
+    "runtime_source": "private archive file inputs only",
+    "operating_ready_or_checkpoints_written": false,
+    "services_changed": false,
+    "raw_or_request_ids_exported": false,
+    "packages_installed": 0,
+    "child_processes_reaped": true
+  },
+  "postflight": {
+    "at_kst": "2026-10-14T20:44:38.838238+09:00",
+    "comparisons": {
+      "containers": true,
+      "services": true,
+      "host_protected": true,
+      "waf_configuration_and_binary_sha256": true,
+      "logcollector": true,
+      "vector": true,
+      "operating_root_queue": true,
+      "versions": true
+    },
+    "all_equal": true,
+    "host_files": 8,
+    "container_files": 51
+  },
+  "production_rotation_deployed": false,
+  "realtime_pair_continuity_proven": false,
+  "crash_reboot_recovery_proven": false,
+  "remote_analysis_or_indexer_receipts_proven": false,
+  "production_uid101_equivalence": false,
+  "raw_or_request_ids_exported": false,
+  "packages_installed": 0,
+  "stage1_verified": true,
+  "scope": "native private WAF writer and raw readers; separate per-generation archive replay",
+  "waf_rule_scope": "single synthetic audit rule, not full production CRS or load",
+  "documentation": "README.md",
+  "preservation": {
+    "at_kst": "2026-10-14T20:45:57.736023+09:00",
+    "files": 205,
+    "bytes": 619600,
+    "sha256_all_equal": true,
+    "original_prefix": "/var/tmp/capstone-sequential-20261014/step1",
+    "preserved_prefix": "/opt/capstone-automation/project/evidence/sequential-20261014/step1",
+    "embedded_original_paths_are_historical": true,
+    "raw_preserved_on_A_only": true
+  }
+}

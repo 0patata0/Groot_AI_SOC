@@ -1,0 +1,113 @@
+{
+  "kind": "B_native_candidate_validation_before_operational_apply",
+  "preflight_generated_at_epoch": 1791971009,
+  "preflight_generated_at_kst": "2026-10-14T18:43:29+09:00",
+  "operational_apply_performed_by_this_validator": false,
+  "packages_installed": false,
+  "container_configuration_changed": false,
+  "candidate_sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+  "original_options_sha256": "73252a6f47fff93d8ce62ca70a8f9196a216d5e09dc2228758fcf0b0ac77133f",
+  "unrelated_lines_byte_identical": true,
+  "manager_id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+  "manager_id_started_at_and_options_unchanged": true,
+  "final_source_sha256": {
+    "apply-b.yml": "6263115c9be1db2d9a9fe0ef218fbabe4270c2b24eef4bc426e70c72cdb6c260",
+    "run-b.sh": "3d9789b41ad246240daa9aef09fce50ccc5a10435383aeb5bb7cbd5c6d60aeee",
+    "test-options-policy.py": "76ab1ce6d4195289854206834c929e444316be122bed7f18cdac3711811a412d"
+  },
+  "initial_manifest_sha256": "71bc326717087d1e3c44ad1b374532db4abbb1cb1ae6a1ba31ed233058ab9c2f",
+  "final_manifest_sha256": "ec86b31c63986a91129db30c15a30f103b7b78220c553d776b71fc3882b456c8",
+  "initial_payload_files": 94,
+  "initial_payload_bytes": 141064,
+  "final_payload_files": 94,
+  "final_payload_bytes": 143365,
+  "attempts": [
+    {
+      "revision": 1,
+      "source_sha256": "c7a30040e20b2989f9e32be217f15f15fc90ef3be7f7bf6e51b081a7f8034e7b",
+      "syntax_exit": 0,
+      "policy_exit": 1,
+      "check_exit": 2,
+      "check_changed": 0,
+      "cause": "YAML decoded the CR escape into a literal control character before Jinja evaluated the framing condition",
+      "logs_suffix": "native-check.7V8Hzh"
+    },
+    {
+      "revision": 2,
+      "source_sha256": "90f27751e9716b3a8d5d220887de7c55d11834e4c1a481fa1edcb4181d90a965",
+      "syntax_exit": 0,
+      "policy_exit": 0,
+      "check_exit": 0,
+      "check_changed": 0,
+      "option_policy_cases": 11,
+      "logs_suffix": "native-check.hhsjug",
+      "subsequent_readonly_finding": "native status exits 1 with required processes running; rc0-only health would cause needless rollback"
+    },
+    {
+      "revision": 3,
+      "source_sha256": "6263115c9be1db2d9a9fe0ef218fbabe4270c2b24eef4bc426e70c72cdb6c260",
+      "syntax_exit": 0,
+      "policy_exit": 0,
+      "check_exit": 0,
+      "check_recap": {
+        "ok": 15,
+        "changed": 0,
+        "unreachable": 0,
+        "failed": 0,
+        "skipped": 28,
+        "rescued": 0,
+        "ignored": 0
+      },
+      "option_policy_cases": 11,
+      "health_condition_cases": 10,
+      "logs_suffix": "native-check.9Uu88k"
+    }
+  ],
+  "native_option_cases": [
+    "append_both",
+    "replace_both",
+    "append_one",
+    "whitespace_comment",
+    "idempotent",
+    "unrelated_utf8",
+    "duplicate_event_reject",
+    "duplicate_rule_reject",
+    "no_final_lf_reject",
+    "crlf_reject",
+    "nul_reject"
+  ],
+  "negative_option_cases_stop_before_transform": true,
+  "native_health_cases_per_main_and_rescue": [
+    "all_running_zero",
+    "all_running_disabled_optional",
+    "missing_required",
+    "timeout_even_with_output",
+    "required_not_running"
+  ],
+  "observed_manager_status_exit": 1,
+  "observed_manager_status_lines": [
+    "wazuh-clusterd not running...",
+    "wazuh-modulesd is running...",
+    "wazuh-monitord is running...",
+    "wazuh-logcollector is running...",
+    "wazuh-remoted is running...",
+    "wazuh-syscheckd is running...",
+    "wazuh-analysisd is running...",
+    "wazuh-maild not running...",
+    "wazuh-execd is running...",
+    "wazuh-db is running...",
+    "wazuh-authd is running...",
+    "wazuh-agentlessd not running...",
+    "wazuh-integratord not running...",
+    "wazuh-csyslogd not running...",
+    "wazuh-apid is running..."
+  ],
+  "remote_metadata_path": "/var/tmp/capstone-correlation-fix-20261014/operator/deploy-bundle/correlation-fix/candidate-metadata.ugpde_h3/result.json",
+  "remote_validation_path": "/var/tmp/capstone-correlation-fix-20261014/operator/deploy-bundle/correlation-fix/native-check.9Uu88k/result.json",
+  "limitations": [
+    "Native -t does not execute event_threads initialization in Wazuh 4.14.8",
+    "104 native rule scenarios and actual manager restart belong to the separate operational apply",
+    "Health policy fixtures are not a live induced-failure rollback trial",
+    "Transfer refusal was resolved by the user retry request; no bypass was used"
+  ]
+}

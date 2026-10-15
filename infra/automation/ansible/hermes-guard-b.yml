@@ -1,0 +1,31 @@
+[
+  {
+    "name": "Operator reapplies the approved Hermes language guard on B",
+    "hosts": "capstone_hermes_b",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "capstone_guard_source_dir": "{{ playbook_dir }}/../../hermes",
+      "capstone_guard_core_sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+      "capstone_guard_wheel": "/opt/capstone-automation/artifacts/regex-2026.9.29-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "capstone_guard_wheel_sha256": "d49c18f1ea294cf4adde2e5ac256e98c82ea9d708462ce4bf799dffa7cfe8a2c",
+      "capstone_guard_source_pairs": [
+        [
+          "4f05be68777068d7b454187c7323f2c471aac6412b830f11761b4013eed702c8",
+          "5bdee5c82c00e02f664516f9da0af99674e23493ec2a30eff06cb03afc6718a0"
+        ],
+        [
+          "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+          "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a"
+        ]
+      ]
+    },
+    "roles": [
+      "hermes_guard"
+    ]
+  }
+]

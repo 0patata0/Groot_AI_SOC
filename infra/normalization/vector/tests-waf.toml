@@ -1,0 +1,1127 @@
+# Isolated native tests; never activate this synthetic topology as a service.
+[sources.waf_test_input]
+type = "demo_logs"
+format = "json"
+count = 0
+
+[transforms.waf_json_guard]
+type = "remap"
+inputs = ["waf_test_input"]
+file = "transforms/waf_json_guard.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[sinks.waf_test_discard]
+type = "blackhole"
+inputs = ["waf_json_guard", "waf_json_guard.dropped", "waf_audit_guard.dropped", "waf_access_guard.dropped", "waf_audit_part.dropped", "waf_access_part.dropped", "waf_ready", "waf_pair_normalize.dropped"]
+
+[[tests]]
+name = "waf_json_simple"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"Server\":\"nginx\"}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 0)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_duplicate"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"Server\":\"nginx\",\"Server\":\"test\"}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 1)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_escaped_server_duplicate"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"Server\":\"nginx\",\"\\u0053erver\":\"test\"}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 1)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_three"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"Server\":\"a\",\"Server\":\"b\",\"Server\":\"c\"}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 2)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_same_key_different_object"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"a\":{\"x\":1},\"b\":{\"x\":2}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 0)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_same_key_array_objects"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"items\":[{\"x\":1},{\"x\":2}]}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 0)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_strings_are_not_structure"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\": \"{\\\"nested\\\":2, \\\"duplicate\\\": \\\"value\\\"}\", \"a\": {\"y\": \"brace} ] { \\\\\\\"\"}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 0)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_nested_arrays"
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":[[[{\"a\":1}]],{\"a\":2}]}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_allowed_server_duplicates, 0)
+assert!(is_object(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_arbitrary_duplicate"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":1,\"x\":2}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_duplicate_same_value"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":1,\"x\":1}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_duplicate_false"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":false,\"x\":true}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_duplicate_null"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":null,\"x\":null}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_escaped_equivalent_key"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"client_ip\":\"a\",\"\\u0063lient_ip\":\"b\"}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_surrogate_equivalent_key"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"\\ud83d\\ude00\":1,\"😀\":2}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_request_forbidden"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"request\":{\"headers\":{\"Server\":\"a\",\"Server\":\"b\"}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_root_forbidden"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"Server\":\"a\",\"Server\":\"b\"}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_numeric_first"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"Server\":2,\"Server\":\"test\"}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_numeric_second"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"Server\":\"test\",\"Server\":2}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_null_first"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"Server\":null,\"Server\":\"test\"}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_nested_forbidden"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":{\"headers\":{\"x\":{\"Server\":\"a\",\"Server\":\"b\"}}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_server_array_forbidden"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"response\":[{\"headers\":{\"Server\":\"a\",\"Server\":\"b\"}}]}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_nested_decision_duplicate"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"messages\":[{\"details\":{\"ruleId\":1,\"ruleId\":2}}]}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_malformed"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":1,}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_invalid_escape"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":\"\\q\"}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_not_object"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "[1,2]"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_too_deep"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":{\"x\":1}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_too_many_tokens"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"x\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}"}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[[tests]]
+name = "waf_json_too_large"
+no_outputs_from = ["waf_json_guard"]
+[[tests.inputs]]
+insert_at = "waf_json_guard"
+type = "vrl"
+source = '''
+padding = "aaaaaaaaaaaaaaaa"
+for_each([1,2,3,4,5,6,7,8,9,10,11,12,13,14]) -> |_i, _v| { padding = padding + padding }
+. = {"message": encode_json({"x": padding})}
+'''
+[[tests.outputs]]
+extract_from = "waf_json_guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_json))
+'''
+
+[sources.waf_audit_test_input]
+type = "demo_logs"
+format = "json"
+count = 0
+[sources.waf_access_test_input]
+type = "demo_logs"
+format = "json"
+count = 0
+[transforms.waf_audit_guard]
+type = "remap"
+inputs = ["waf_audit_test_input"]
+file = "transforms/waf_json_guard.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+[transforms.waf_access_guard]
+type = "remap"
+inputs = ["waf_access_test_input"]
+file = "transforms/waf_json_guard.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+[transforms.waf_audit_part]
+type = "remap"
+inputs = ["waf_audit_guard"]
+file = "transforms/waf_audit_part.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+[transforms.waf_access_part]
+type = "remap"
+inputs = ["waf_access_guard"]
+file = "transforms/waf_access_part.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+[transforms.waf_join]
+type = "reduce"
+inputs = ["waf_audit_part", "waf_access_part"]
+group_by = ["waf_join_key"]
+merge_strategies.waf_parts = "array"
+expire_after_ms = 2000
+end_every_period_ms = 5000
+flush_period_ms = 100
+max_events = 4
+[transforms.waf_pair_normalize]
+type = "remap"
+inputs = ["waf_join"]
+file = "transforms/waf_pair_normalize.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[[tests]]
+name = "waf_pair_valid"
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.source, "modsecurity")
+assert_eq!(.capstone_norm.action, "observed")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-13T20:00:00.123000+09:00")
+assert_eq!(.capstone_norm.time_status, "trusted_access_completion")
+assert!(!contains(encode_json(.), "DO_NOT_LEAK"))
+assert_eq!(.capstone_norm.event_id, "9fe75cb2e7af13b39723dff9a98b05877f52e9d11f8c8201107639db37392a1b")
+assert_eq!(.capstone_norm.omitted_response_server_duplicates, 1)
+assert_eq!(.capstone_norm.quality_flags, [])
+'''
+
+[[tests]]
+name = "waf_pair_reordered"
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.source, "modsecurity")
+assert_eq!(.capstone_norm.action, "observed")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-13T20:00:00.123000+09:00")
+assert_eq!(.capstone_norm.time_status, "trusted_access_completion")
+assert!(!contains(encode_json(.), "DO_NOT_LEAK"))
+assert_eq!(.capstone_norm.event_id, "9fe75cb2e7af13b39723dff9a98b05877f52e9d11f8c8201107639db37392a1b")
+assert_eq!(.capstone_norm.omitted_response_server_duplicates, 1)
+assert_eq!(.capstone_norm.quality_flags, [])
+'''
+
+[[tests]]
+name = "waf_pair_missing_access"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_two_audit"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_extra_partner"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_request_id"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_instance_id"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_configuration_sha256"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_source_ip"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.2", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_source_port"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54322, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_http_status"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 404, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_http_method"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "POST", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_mismatch_source_file"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/untrusted/log", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_time_mismatch"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 19:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_invalid_date"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Feb 31 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_pair_missing_evidence_offset"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.waf_parts) && !exists(.capstone_norm))
+'''
+
+[[tests]]
+name = "waf_access_valid"
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_parts.kind, "access")
+'''
+
+[[tests]]
+name = "waf_access_extra_field"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\", \"uri\": \"DO_NOT_LEAK\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_access_time_without_offset"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_access_offset_epoch_disagree"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+00:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_access_client_request_id"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"client-supplied\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_access_duration_over_limit"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"3600.001\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_access_duration_negative"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"-1.000\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_access_port_wrong_type"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": 54321, \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_access_msec_exponent"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1.7918892e9\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_audit_valid"
+[[tests.inputs]]
+insert_at = "waf_audit_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\": {\"unique_id\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-cccccccccccccccccccccccccccccccc\", \"time_stamp\": \"Tue Oct 13 20:00:00 2026\", \"client_ip\": \"192.0.2.1\", \"client_port\": 54321, \"host_ip\": \"198.51.100.1\", \"host_port\": 443, \"request\": {\"method\": \"GET\", \"uri\": \"DO_NOT_LEAK\", \"headers\": {\"Host\": \"DO_NOT_LEAK\"}}, \"response\": {\"http_code\": 403}, \"producer\": {\"secrules_engine\": \"DetectionOnly\"}, \"messages\": [{\"details\": {\"ruleId\": \"1000001\", \"severity\": \"2\", \"data\": \"DO_NOT_LEAK\"}}]}}", "source_file": "/test/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "waf_audit_part"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.waf_parts.kind, "audit")
+assert_eq!(.waf_parts.rule_ids, ["1000001"])
+'''
+
+[[tests]]
+name = "waf_audit_untrusted_path"
+no_outputs_from = ["waf_audit_part"]
+[[tests.inputs]]
+insert_at = "waf_audit_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\": {\"unique_id\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-cccccccccccccccccccccccccccccccc\", \"time_stamp\": \"Tue Oct 13 20:00:00 2026\", \"client_ip\": \"192.0.2.1\", \"client_port\": 54321, \"host_ip\": \"198.51.100.1\", \"host_port\": 443, \"request\": {\"method\": \"GET\", \"uri\": \"DO_NOT_LEAK\", \"headers\": {\"Host\": \"DO_NOT_LEAK\"}}, \"response\": {\"http_code\": 403}, \"producer\": {\"secrules_engine\": \"DetectionOnly\"}, \"messages\": [{\"details\": {\"ruleId\": \"1000001\", \"severity\": \"2\", \"data\": \"DO_NOT_LEAK\"}}]}}", "source_file": "/untrusted/log"}
+'''
+[[tests.outputs]]
+extract_from = "waf_audit_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(exists(.message) && !exists(.waf_parts))
+'''
+
+[[tests]]
+name = "waf_full_audit_first"
+[[tests.inputs]]
+insert_at = "waf_audit_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\": {\"unique_id\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-cccccccccccccccccccccccccccccccc\", \"time_stamp\": \"Tue Oct 13 20:00:00 2026\", \"client_ip\": \"192.0.2.1\", \"client_port\": 54321, \"host_ip\": \"198.51.100.1\", \"host_port\": 443, \"request\": {\"method\": \"GET\", \"uri\": \"DO_NOT_LEAK\", \"headers\": {\"Host\": \"DO_NOT_LEAK\"}}, \"response\": {\"http_code\": 403}, \"producer\": {\"secrules_engine\": \"DetectionOnly\"}, \"messages\": [{\"details\": {\"ruleId\": \"1000001\", \"severity\": \"2\", \"data\": \"DO_NOT_LEAK\"}}]}}", "source_file": "/test/audit.log"}
+'''
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.source, "modsecurity")
+assert!(!contains(encode_json(.), "DO_NOT_LEAK"))
+'''
+
+[[tests]]
+name = "waf_full_access_first"
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.inputs]]
+insert_at = "waf_audit_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\": {\"unique_id\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-cccccccccccccccccccccccccccccccc\", \"time_stamp\": \"Tue Oct 13 20:00:00 2026\", \"client_ip\": \"192.0.2.1\", \"client_port\": 54321, \"host_ip\": \"198.51.100.1\", \"host_port\": 443, \"request\": {\"method\": \"GET\", \"uri\": \"DO_NOT_LEAK\", \"headers\": {\"Host\": \"DO_NOT_LEAK\"}}, \"response\": {\"http_code\": 403}, \"producer\": {\"secrules_engine\": \"DetectionOnly\"}, \"messages\": [{\"details\": {\"ruleId\": \"1000001\", \"severity\": \"2\", \"data\": \"DO_NOT_LEAK\"}}]}}", "source_file": "/test/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.source, "modsecurity")
+assert!(!contains(encode_json(.), "DO_NOT_LEAK"))
+'''
+
+[transforms.waf_ready]
+type = "filter"
+inputs = ["waf_pair_normalize"]
+condition = '.capstone_norm.source == "modsecurity"'
+
+[[tests]]
+name = "waf_access_only_RelevantOnly_ignored"
+no_outputs_from = ["waf_ready"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '. = {"waf_parts":[{"kind":"access"}]}'
+[[tests.outputs]]
+extract_from = "waf_pair_normalize"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = 'assert_eq!(.ignored_waf_access, true)'
+
+[[tests]]
+name = "waf_audit_old_producer_binding"
+no_outputs_from = ["waf_audit_part"]
+[[tests.inputs]]
+insert_at = "waf_audit_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\": {\"unique_id\": \"0000000000000000000000000000000000000000000000000000000000000000-cccccccccccccccccccccccccccccccc\", \"time_stamp\": \"Tue Oct 13 20:00:00 2026\", \"client_ip\": \"192.0.2.1\", \"client_port\": 54321, \"host_ip\": \"198.51.100.1\", \"host_port\": 443, \"request\": {\"method\": \"GET\", \"uri\": \"DO_NOT_LEAK\", \"headers\": {\"Host\": \"DO_NOT_LEAK\"}}, \"response\": {\"http_code\": 403}, \"producer\": {\"secrules_engine\": \"DetectionOnly\"}, \"messages\": [{\"details\": {\"ruleId\": \"1000001\", \"severity\": \"2\", \"data\": \"DO_NOT_LEAK\"}}]}}", "source_file": "/test/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "waf_audit_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = 'assert!(exists(.message) && !exists(.waf_parts))'
+
+[[tests]]
+name = "waf_access_old_producer_binding"
+no_outputs_from = ["waf_access_part"]
+[[tests.inputs]]
+insert_at = "waf_access_guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"capstone_waf_access_version\": \"1\", \"deployment_binding\": \"0000000000000000000000000000000000000000000000000000000000000000\", \"request_id\": \"cccccccccccccccccccccccccccccccc\", \"time_iso8601\": \"2026-10-13T20:00:00+09:00\", \"msec\": \"1791889200.123\", \"request_time\": \"0.123\", \"source_ip\": \"192.0.2.1\", \"destination_ip\": \"198.51.100.1\", \"source_port\": \"54321\", \"destination_port\": \"443\", \"http_method\": \"GET\", \"http_status\": \"403\"}", "source_file": "/test/access.jsonl"}
+'''
+[[tests.outputs]]
+extract_from = "waf_access_part.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = 'assert!(exists(.message) && !exists(.waf_parts))'
+
+[[tests]]
+name = "waf_pair_old_deployment_binding"
+no_outputs_from = ["waf_pair_normalize"]
+[[tests.inputs]]
+insert_at = "waf_pair_normalize"
+type = "vrl"
+source = '''
+. = {"waf_parts": [{"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "0000000000000000000000000000000000000000000000000000000000000000", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "audit", "source_file": "/test/audit.log", "naive_time": "Tue Oct 13 20:00:00 2026", "rule_ids": ["1000001"], "severities": ["2"], "engine_mode": "DetectionOnly", "allowed_server_duplicates": 1, "observed_at_kst": "2026-10-13T20:00:01+09:00"}, {"sensor": "groot-sec", "instance_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "deployment_binding": "0000000000000000000000000000000000000000000000000000000000000000", "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "request_id": "cccccccccccccccccccccccccccccccc", "source_ip": "192.0.2.1", "destination_ip": "198.51.100.1", "source_port": 54321, "destination_port": 443, "http_method": "GET", "http_status": 403, "message_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", "raw": "DO_NOT_LEAK", "kind": "access", "source_file": "/test/access.jsonl", "offset": "+09:00", "epoch_ms": 1791889200123, "duration_ms": 123}]}
+'''
+[[tests.outputs]]
+extract_from = "waf_pair_normalize.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = 'assert!(exists(.waf_parts) && !exists(.capstone_norm))'

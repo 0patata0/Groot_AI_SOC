@@ -1,0 +1,136 @@
+{
+  "container_config": {
+    "AttachStderr": false,
+    "AttachStdin": false,
+    "AttachStdout": false,
+    "Cmd": [
+      "gateway",
+      "run"
+    ],
+    "Domainname": "",
+    "Entrypoint": [
+      "/opt/hermes/docker/entrypoint-dispatch.sh"
+    ],
+    "ExposedPorts": null,
+    "Healthcheck": null,
+    "OpenStdin": false,
+    "StdinOnce": false,
+    "StopSignal": null,
+    "StopTimeout": null,
+    "Tty": false,
+    "User": "root",
+    "Volumes": {
+      "/opt/data": {}
+    },
+    "WorkingDir": "/opt/hermes",
+    "hostname_is_container_prefix": true,
+    "label_keys": [
+      "org.opencontainers.image.revision"
+    ]
+  },
+  "container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+  "environment": {
+    "added_keys": [
+      "HERMES_GID",
+      "HERMES_UID"
+    ],
+    "changed_image_keys": [],
+    "full_value_list_sha256": "196a5e0784cfad989a5f12f121808aa9bc11ce1117eed1b28fb98dd3ad5f0398",
+    "invalid_entry_count": 0,
+    "missing_image_keys": [],
+    "total_entries": 14,
+    "unique_keys": 14
+  },
+  "host_config": {
+    "AutoRemove": false,
+    "Binds": [
+      "/opt/hermes-data:/opt/data"
+    ],
+    "CapAdd": null,
+    "CapDrop": null,
+    "CgroupnsMode": "private",
+    "CpuPeriod": 0,
+    "CpuQuota": 0,
+    "CpuRealtimePeriod": 0,
+    "CpuRealtimeRuntime": 0,
+    "CpuShares": 0,
+    "CpusetCpus": "",
+    "CpusetMems": "",
+    "DeviceCgroupRules": null,
+    "DeviceRequests": null,
+    "Devices": [],
+    "Dns": null,
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "ExtraHosts": null,
+    "GroupAdd": null,
+    "Init": null,
+    "IpcMode": "private",
+    "Isolation": "",
+    "Links": null,
+    "LogConfig": {
+      "Config": {},
+      "Type": "json-file"
+    },
+    "MaskedPaths": [
+      "/proc/acpi",
+      "/proc/asound",
+      "/proc/interrupts",
+      "/proc/kcore",
+      "/proc/keys",
+      "/proc/latency_stats",
+      "/proc/sched_debug",
+      "/proc/scsi",
+      "/proc/timer_list",
+      "/proc/timer_stats",
+      "/sys/devices/virtual/powercap",
+      "/sys/firmware"
+    ],
+    "Memory": 0,
+    "MemoryReservation": 0,
+    "MemorySwap": 0,
+    "MemorySwappiness": null,
+    "Mounts": null,
+    "NanoCpus": 0,
+    "NetworkMode": "bridge",
+    "OomKillDisable": null,
+    "OomScoreAdj": 0,
+    "PidMode": "",
+    "PidsLimit": null,
+    "PortBindings": {},
+    "Privileged": false,
+    "PublishAllPorts": false,
+    "ReadonlyPaths": [
+      "/proc/bus",
+      "/proc/fs",
+      "/proc/irq",
+      "/proc/sys",
+      "/proc/sysrq-trigger"
+    ],
+    "ReadonlyRootfs": false,
+    "RestartPolicy": {
+      "MaximumRetryCount": 0,
+      "Name": "unless-stopped"
+    },
+    "Runtime": "runc",
+    "SecurityOpt": null,
+    "ShmSize": 67108864,
+    "StorageOpt": null,
+    "Sysctls": null,
+    "Tmpfs": null,
+    "UTSMode": "",
+    "Ulimits": null,
+    "UsernsMode": "",
+    "VolumesFrom": null
+  },
+  "image_id": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+  "network_endpoints": {
+    "bridge": {
+      "aliases": null,
+      "driver_opts": null,
+      "ipam_config": null,
+      "links": null
+    }
+  },
+  "observed_at_utc": "2026-10-13T19:39:06.071586+00:00"
+}

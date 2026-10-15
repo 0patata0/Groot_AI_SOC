@@ -1,0 +1,93 @@
+// Identical validation prefix is embedded in the unavailable trigger.
+boolean boundedInteger(def value, long maximum) {
+    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;
+}
+
+boolean stableKey(def value) {
+    if (!(value instanceof String) || value.length() != 64) return false;
+    for (int i = 0; i < 64; ++i) {
+        int c = value.charAt(i);
+        if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102))) return false;
+    }
+    return true;
+}
+
+boolean uniqueKeysValid(def aggregate, long documents) {
+    if (!(aggregate instanceof Map) || !(aggregate.buckets instanceof List) ||
+        aggregate.buckets.size() < 1 || aggregate.buckets.size() > 5 ||
+        !boundedInteger(aggregate.doc_count_error_upper_bound, 0) ||
+        !boundedInteger(aggregate.sum_other_doc_count, documents)) return false;
+    long counted = 0;
+    String previous = '';
+    for (def bucket : aggregate.buckets) {
+        if (!(bucket instanceof Map) || !stableKey(bucket.key) ||
+            bucket.key.compareTo(previous) <= 0 || !boundedInteger(bucket.doc_count, documents) ||
+            bucket.doc_count < 1) return false;
+        counted += bucket.doc_count;
+        previous = bucket.key;
+    }
+    // A sixth distinct key is intentionally omitted, not an incomplete search.
+    return counted + aggregate.sum_other_doc_count == documents;
+}
+
+boolean observationAvailable(def ctx) {
+    try {
+        long now = new Date().getTime();
+        long end = ctx.periodEnd.toEpochMilli();
+        if (end < 60000 || end > now + 5000 || end < now - 15000 || ctx.error != null ||
+            !(ctx.results instanceof List) || ctx.results.size() != 1) return false;
+        def result = ctx.results[0];
+        if (!(result instanceof Map) || result.timed_out != false ||
+            (result.containsKey('terminated_early') && result.terminated_early != false) ||
+            !(result._shards instanceof Map)) return false;
+        def shards = result._shards;
+        if (!boundedInteger(shards.total, 64) || shards.total < 1 ||
+            !boundedInteger(shards.successful, 64) || shards.successful != shards.total ||
+            !boundedInteger(shards.skipped, shards.total) || !boundedInteger(shards.failed, 0)) return false;
+        if (!(result.hits instanceof Map) || !(result.hits.total instanceof Map) ||
+            result.hits.total.relation != 'eq' || !boundedInteger(result.hits.total.value, 10000) ||
+            !(result.hits.hits instanceof List) || result.hits.hits.size() != 0 ||
+            !(result.aggregations instanceof Map) || !(result.aggregations.services instanceof Map)) return false;
+        long documents = result.hits.total.value;
+        def services = result.aggregations.services;
+        if (!(services.buckets instanceof List) || services.buckets.size() > 100 ||
+            !boundedInteger(services.doc_count_error_upper_bound, 0) ||
+            !boundedInteger(services.sum_other_doc_count, 0)) return false;
+        long counted = 0;
+        String previous = '';
+        for (def service : services.buckets) {
+            if (!(service instanceof Map) || !stableKey(service.key) ||
+                service.key.compareTo(previous) <= 0 || !boundedInteger(service.doc_count, documents) ||
+                service.doc_count < 1 || !uniqueKeysValid(service.unique_ids, service.doc_count) ||
+                !(service.sources instanceof Map)) return false;
+            previous = service.key;
+            counted += service.doc_count;
+            def sources = service.sources;
+            if (!(sources.buckets instanceof List) || sources.buckets.size() < 1 || sources.buckets.size() > 2 ||
+                !boundedInteger(sources.doc_count_error_upper_bound, 0) ||
+                !boundedInteger(sources.sum_other_doc_count, 0)) return false;
+            long sourceCounted = 0;
+            String previousSource = '';
+            for (def source : sources.buckets) {
+                if (!(source instanceof Map) || !(source.key instanceof String) ||
+                    (source.key != 'nftables' && source.key != 'suricata') ||
+                    source.key.compareTo(previousSource) <= 0 ||
+                    !boundedInteger(source.doc_count, service.doc_count) || source.doc_count < 1 ||
+                    !uniqueKeysValid(source.unique_ids, source.doc_count)) return false;
+                sourceCounted += source.doc_count;
+                previousSource = source.key;
+            }
+            if (sourceCounted != service.doc_count) return false;
+        }
+        return counted == documents;
+    } catch (Exception e) {
+        return false;
+    }
+}
+
+// Decision: observation_unavailable. No result is an ingestion health proof.
+try {
+    return !observationAvailable(ctx);
+} catch (Exception e) {
+    return true;
+}

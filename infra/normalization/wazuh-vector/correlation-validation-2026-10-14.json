@@ -1,0 +1,152 @@
+{
+  "evidence_date_kst": "2026-10-14",
+  "kind": "native_wazuh_shadow_correlation_and_manual_canary_e2e",
+  "wazuh_version": "4.14.8",
+  "ansible_core": "2.21.5",
+  "native_validation": {
+    "base_cases": 9,
+    "correlation_scenarios": 24,
+    "correlation_rows": 76,
+    "health_cases": 10,
+    "total_scenarios": 43,
+    "before_restart_pass": true,
+    "after_restart_pass": true,
+    "wrong_agent_and_bare_location_rejected": true,
+    "source_modsecurity_base_no_log": true,
+    "production_correlation_no_log": true
+  },
+  "a": {
+    "raw_localfile_count": 8,
+    "raw_localfiles_unchanged": true,
+    "agent_config_sha256": "740fb0d8ea45e1b302d11862f55f2d9f29e86bdd22f5a5e202f04d3ffb36e21e",
+    "agent_config_mode": "0660",
+    "uid": 0,
+    "gid": 110,
+    "canary_directory_mode": "0700",
+    "canary_file_mode": "0600",
+    "canary_owner": "root:root",
+    "apply_changed": 5,
+    "second_apply_changed": 1,
+    "second_apply_change_scope": "candidate copy only; no live mutation or agent restart",
+    "third_apply_changed": 0,
+    "agent_identity_preserved_on_reapply": true
+  },
+  "b": {
+    "manager_container_id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+    "manager_started_at": "2026-10-13T18:08:09.523852509Z",
+    "local_rules_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+    "local_rules_bytes_and_metadata_unchanged": true,
+    "vector_rules_sha256": "95d2ebceafce434cf7ef7ca9d7d4b8255b812439897a6c1148b3cee3e3657687",
+    "vector_rules_mode": "0660",
+    "uid": 999,
+    "gid": 999,
+    "final_apply_changed": 2,
+    "second_final_apply_changed": 0,
+    "same_container_and_started_at_on_reapply": true,
+    "required_processes_running": [
+      "wazuh-analysisd",
+      "wazuh-remoted",
+      "wazuh-db",
+      "wazuh-logcollector"
+    ]
+  },
+  "approval_boundary": {
+    "a_and_b_helpers_config_sudoers_worker_bytes_and_metadata_unchanged": true,
+    "new_mcp_or_llm_privilege": false
+  },
+  "canary": {
+    "run_id": "1507d4e26aa74ca590aae9ea9c4f187d",
+    "synthetic_rows": 13,
+    "bytes": 11528,
+    "manager_alerts": 2,
+    "indexer_documents": 2,
+    "rule_ids": [
+      "100293",
+      "100294"
+    ],
+    "levels": [
+      3
+    ],
+    "event_ids": [
+      "0000000000000000000000000000000000000000000000000000000000000002",
+      "0000000000000000000000000000000000000000000000000000000000000005"
+    ],
+    "same_event_ids": true,
+    "transport": "existing A agent to B manager to existing Indexer",
+    "duplicate_current_rows": 5,
+    "historical_rows": 1,
+    "expected_negative_cases_created_no_additional_alert": true,
+    "actual_attack_or_raw_ready_write": false,
+    "chat_or_blocking_requested": false
+  },
+  "failures_and_corrections": [
+    {
+      "run_id": "4c42cf8b95214c2896efe153d254616f",
+      "synthetic_rows": 13,
+      "manager_alerts": 0,
+      "indexer_documents": 0,
+      "cause": "bare-path location matched direct logtest only; real agent transport uses (groot-sec) any-> prefix",
+      "correction": "exact transport prefix required; wrong-agent and bare input rejection native tests added"
+    },
+    {
+      "kind": "candidate_native_validation_failure",
+      "cause": "Wazuh custom XML parser retained &gt; in regex",
+      "live_candidate_accepted": false,
+      "automatic_rollback_verified": true,
+      "required_manager_processes_recovered": true,
+      "correction": "valid XML literal -> in location expression"
+    }
+  ],
+  "limits": [
+    "production normalized correlation remains no_log",
+    "Wazuh timeframe uses processing time and trusts upstream freshness; post-normalization delay is not reevaluated",
+    "different_field is not global uniqueness; A,A,A,A,B can reach frequency",
+    "no exactly-once or end-to-end remote acknowledgement contract",
+    "manual synthetic canary tests normalized transport, not packets or raw-to-Vector normalization",
+    "health native fixtures were not injected into live journal; no health alert E2E assertion",
+    "first failed canary rows are retained separately by run id; no reinjection of the failed run"
+  ],
+  "artifact_sha256": {
+    "agent-localfile.xml": "955d2296401a840a7d25396b25e4d0b6e56288b98b5e261c971c53fa9fa84348",
+    "apply-a.yml": "f03134a7a5ae802e020ccb745b64fb23247807523aa84ac8ad4efd511913f2c0",
+    "apply-b.yml": "a8af897a5f276dc73a62714f43b579622b33244b844a43cf6cb82a4a89dd0526",
+    "capstone_vector_rules.xml": "95d2ebceafce434cf7ef7ca9d7d4b8255b812439897a6c1148b3cee3e3657687",
+    "fixtures/correlation/canary-cross.jsonl": "1ff2615c3c1cd8aa365d13c4125f86bdc5bf1dd5823b3c703c32e455a8359e7c",
+    "fixtures/correlation/canary-historical.jsonl": "dfeb3224ef59e47d20c7e6b1157dbe911d51b9dfadf333079d8dd850459633a3",
+    "fixtures/correlation/canary-production-location.jsonl": "d57735b5a298ae06bde2899dbe8f512d04f51c2c513bad3695b228666b63aad6",
+    "fixtures/correlation/canary-repeat-duplicate.jsonl": "4660b20d4ef1233d9dbcff6f67da81b0261fc380e1a60ecfb9161cdcdc5eacc2",
+    "fixtures/correlation/canary-repeat.jsonl": "6fd45116feb2d957a84b169eacceaed71bd290580b9274f4c2bc9bd46f0bd6bc",
+    "fixtures/correlation/canary-wrong-ip.jsonl": "1eb45bba54334fc0fadf4043691bc6156a1396a626ab99c1badcd9e1532318c0",
+    "fixtures/correlation/cross-nft-suricata.jsonl": "1c5c1940e0832a97a75078916090c4f1e7c9990208f6b8482b71f9b019de3ed2",
+    "fixtures/correlation/cross-suricata-nft.jsonl": "c12995fd7bdc191b6677b1730be3832afb97e4d1e1a808710b2fcb759f5c108b",
+    "fixtures/correlation/different-direction.jsonl": "45533d604d4a268ebc1bbb369653687e6853f3ca57ed4d774c2edd94899e7ae6",
+    "fixtures/correlation/different-sensor.jsonl": "482cad129ee5f64f2d2b051fd1431dbe2bd003c6821a4cc020be5051d92b1b44",
+    "fixtures/correlation/different-service.jsonl": "549466e24d7bf6efcf0f27b5dee5f50c489fd1afe0d74df6907370f20c32eec7",
+    "fixtures/correlation/different-source.jsonl": "e33417dd68197d7d151c18515fc0fa5e6f26ad4a3eb2469d4f5691e386e629d9",
+    "fixtures/correlation/duplicate-current.jsonl": "ed50a42bf023b1e461fafbdbfff7c36d9d0bd33d53e0fd90a1e96727bd7f94f6",
+    "fixtures/correlation/duplicate-history-limitation.jsonl": "8f557dd2bb0edc15b808523a56c4cd3150d0d9d2da0a450dee0c702233a1b4ca",
+    "fixtures/correlation/expected.tsv": "aa22132fd8f74c733ce46cfb0c5cc71c077b7f26dbe948efbc7baada2a4cd867",
+    "fixtures/correlation/future.jsonl": "b75b055146960ddd64e8a18f472bad068375c90bb3e3de8a4ddd1a1a0ec2ad8b",
+    "fixtures/correlation/historical.jsonl": "352a5db7e932557f38bf21bc66b5f6e3d29b88c98529778ef7ab7fae841d811a",
+    "fixtures/correlation/ineligible.jsonl": "c6f8696e6c8b0d950873a0caa3dbb88fb5403cfbf1b30ebed5c21966bc4aecec",
+    "fixtures/correlation/missing-key.jsonl": "0c83351f7f5f9ed1b451e0bc927830014cb76fdf0ce94c7a7b7670ca800419c4",
+    "fixtures/correlation/missing-time-class.jsonl": "d19f2d6421e40df33926bc0cf9a5ff63484b3c794f2358d6b031d70591a120b9",
+    "fixtures/correlation/processing-time-only.jsonl": "348a38ae80b0ce36599c578656d2e31447d2f949a37cc4a5a534599092c9c031",
+    "fixtures/correlation/protected.jsonl": "5c876f7b2dab20384ad37f04d2027ef05a2884632bea745297eb7956e7ac687c",
+    "fixtures/correlation/raw-isolation.jsonl": "d15af64057115eaf1cf3e711098456fbe6f3570e21dc0b4006b69975d6fb0b46",
+    "fixtures/correlation/repeat-nftables.jsonl": "8afe8f991c18294a89f6b515839cfeaa23093bb5981f8c6fddd2fc3474f0648b",
+    "fixtures/correlation/repeat-suricata.jsonl": "6a71d2e650efb77ccc44fec642d687f41549bce289b28f2ea70079763d4ba184",
+    "fixtures/positive-modsecurity.jsonl": "628f661909368fe413b75e3a834b8131e9ac7eb92975c864e6884d93e8f21f7a",
+    "fixtures/positive-nftables.jsonl": "26551b1195f9724219fc69ec349db4010851b2dff0307e84aed4636e4e1e849b",
+    "fixtures/positive-suricata.jsonl": "c5aa7d3900fc73ada5490de0994f4878aca7cb01861c9259259d2dda06b02d13",
+    "fixtures/wrong-pipeline.jsonl": "c49d92e70ff4b0cd1f4e74921cedcd5d0e52f436a8a9f54fbf271e7ea374aa14",
+    "fixtures/wrong-schema.jsonl": "c2720bed1ec47d67d2bd9a8bfb9f9fa71fc59f1be9490fc5e0ddfd7ed5bf639a",
+    "fixtures/wrong-source.jsonl": "43c44fa98378b18c6d835d89ff273a5df1a2b8fd6338ad401e453b4bbe2b2810",
+    "run-local.sh": "efecb2a120997866ef9d72830dbc4dc735e4e79f74a12fe1395f244b319f62e6",
+    "tests/test-correlation-manager.sh": "19e007dc393688b70c7d3dfb80c30d94427bec9bcba8a929ca5f5c4207918ce6",
+    "tests/test-health-manager.sh": "a6aeb19039687f86511ebd13b9306879dfbf1d6d518d15ab4ecdef100dba7d50",
+    "tests/test-installed-manager.sh": "77a79f5eff42d41de4e1841aa9a2c043c1aa35b15d0df548e1d930cd274b0d5e",
+    "tests/verify-canary-b.sh": "79ca25751f2587b3503c4d6ed358e8e2207b07ddfcab5de1c2d756554d07479b",
+    "tests/write-canary-a.sh": "bdc7ceac1116a01b382ab0399421330546764a9980913afedcbf82bbcc9e821d"
+  }
+}

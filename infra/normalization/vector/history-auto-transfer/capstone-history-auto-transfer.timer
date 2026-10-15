@@ -1,0 +1,11 @@
+[Unit]
+Description=Poll A closed history batches every 15 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitInactiveSec=15min
+AccuracySec=30s
+Unit=capstone-history-auto-transfer.service
+
+[Install]
+WantedBy=timers.target

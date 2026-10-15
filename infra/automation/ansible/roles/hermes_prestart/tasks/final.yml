@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Read committed metadata",
+    "ansible.builtin.include_tasks": "load.yml"
+  },
+  {
+    "name": "Require verified terminal phase",
+    "ansible.builtin.assert": {
+      "that": [
+        "hp_state.phase in ['committed','rolled-back']",
+        "hp_state.intent == None"
+      ]
+    }
+  },
+  {
+    "name": "Fresh final inventory before watcher commit",
+    "ansible.builtin.include_tasks": "observe.yml"
+  },
+  {
+    "name": "Require one active named Hermes with the terminal ID",
+    "ansible.builtin.assert": {
+      "that": [
+        "(hp_inspect.stdout | from_json | selectattr('Name','equalto','/hermes') | map(attribute='Id') | list) == [hp_state.candidate_id if hp_state.phase == 'committed' else hp_old]",
+        "(hp_inspect.stdout | from_json | selectattr('Name','equalto','/hermes') | map(attribute='State.Running') | list) == [true]"
+      ]
+    },
+    "no_log": true
+  },
+  {
+    "name": "Inspect watcher marker without following links",
+    "ansible.builtin.stat": {
+      "path": "/var/lib/capstone-automation/hermes-guard/last-container-id",
+      "follow": false
+    },
+    "register": "hp_last"
+  },
+  {
+    "name": "Require protected existing watcher marker",
+    "ansible.builtin.assert": {
+      "that": [
+        "hp_last.stat.isreg",
+        "not hp_last.stat.islnk",
+        "hp_last.stat.uid == 0",
+        "hp_last.stat.gid == 0",
+        "hp_last.stat.mode == '0600'",
+        "hp_last.stat.nlink == 1"
+      ]
+    }
+  },
+  {
+    "name": "Commit only the verified active ID for the existing watcher",
+    "ansible.builtin.copy": {
+      "content": "{{ (hp_state.candidate_id if hp_state.phase == 'committed' else hp_old) + '\n' }}",
+      "dest": "/var/lib/capstone-automation/hermes-guard/last-container-id",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600",
+      "backup": true
+    }
+  },
+  {
+    "name": "Synchronize watcher receipt",
+    "ansible.builtin.command": {
+      "argv": [
+        "/bin/sync",
+        "--",
+        "/var/lib/capstone-automation/hermes-guard/last-container-id",
+        "/var/lib/capstone-automation/hermes-guard"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90
+  },
+  {
+    "name": "Report bounded metadata only",
+    "ansible.builtin.debug": {
+      "msg": {
+        "phase": "{{ hp_state.phase }}",
+        "candidate_id": "{{ hp_state.candidate_id }}",
+        "database_restored": false,
+        "original_container_deleted": false
+      }
+    }
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "native-stderr.log": {
+    "bytes": 1772,
+    "sha256": "b9f3675fcce9f24a794d998145ccde67a9551852843be7f2d9ceb0391a2e3958",
+    "termination_lines": [
+      "2026/10/15 10:47:43 wazuh-analysisd: INFO: (1225): SIGNAL [(15)-(Terminated)] Received. Exit Cleaning..."
+    ]
+  },
+  "root/logs/ossec.log": {
+    "bytes": 1772,
+    "sha256": "b9f3675fcce9f24a794d998145ccde67a9551852843be7f2d9ceb0391a2e3958",
+    "termination_lines": [
+      "2026/10/15 10:47:43 wazuh-analysisd: INFO: (1225): SIGNAL [(15)-(Terminated)] Received. Exit Cleaning..."
+    ]
+  }
+}

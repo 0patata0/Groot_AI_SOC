@@ -1,0 +1,64 @@
+{
+  "recorded_at_kst": "2026-10-14T11:02:30+09:00",
+  "servers": {
+    "a": {
+      "at": "2026-10-14T11:01:45.102916+09:00",
+      "host": "a",
+      "removed": [
+        {
+          "path": "/var/tmp/capstone-history-20261014",
+          "files": 137,
+          "bytes": 935541
+        }
+      ],
+      "task_fixture_or_sender_leftovers": 0,
+      "operational_sources_batches_receipts_and_backups_preserved": true,
+      "related_services_active_after_cleanup": true,
+      "new_packages_installed": 0
+    },
+    "b": {
+      "at": "2026-10-14T11:01:44.675333+09:00",
+      "host": "b",
+      "removed": [
+        {
+          "path": "/var/tmp/capstone-history-20261014",
+          "files": 110,
+          "bytes": 890982
+        },
+        {
+          "path": "/var/tmp/capstone-history-upload-20261014",
+          "files": 6,
+          "bytes": 626845
+        }
+      ],
+      "task_fixture_or_sender_leftovers": 0,
+      "operational_sources_batches_receipts_and_backups_preserved": true,
+      "related_services_active_after_cleanup": true,
+      "new_packages_installed": 0
+    }
+  },
+  "mac": {
+    "path": "/private/tmp/capstone-history-20261014.wwytkpr_",
+    "files": 97,
+    "bytes": 825492,
+    "path_absent_after_cleanup": true,
+    "new_packages_installed": 0
+  },
+  "preservation": {
+    "source_and_document_files_each_server": 43,
+    "source_bytes_each_server": 628972,
+    "source_sha_verified": true,
+    "evidence_root": "/opt/capstone-automation/project/evidence/history-20261014",
+    "changed_source_backups": "/var/backups/capstone-history-source-20261014",
+    "server_cleanup_metadata": "cleanup.json",
+    "final_local_cleanup_record_written_after_source_snapshot": true
+  },
+  "validation": {
+    "json_parsed_before_this_record": 9,
+    "latest_document_links_checked": 198,
+    "missing_links": 0,
+    "infra_wheel_or_bytecode_files": 0
+  },
+  "operational_batches_receipts_backups_preserved": true,
+  "source_packages_installed_on_mac": 0
+}

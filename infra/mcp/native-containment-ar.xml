@@ -1,0 +1,17 @@
+<!-- Candidate only: merge after exact manager/agent preflight and native tests.
+     Stateless notification: all TTL/ownership/keep/release stays in existing helper.
+     Do not add level/rules_group: Wazuh combines those with rules_id using OR. -->
+<ossec_config>
+  <command>
+    <name>capstone-containment</name>
+    <executable>capstone-containment</executable>
+    <timeout_allowed>no</timeout_allowed>
+  </command>
+  <active-response>
+    <disabled>no</disabled>
+    <command>capstone-containment</command>
+    <location>defined-agent</location>
+    <agent_id>001</agent_id>
+    <rules_id>100110</rules_id>
+  </active-response>
+</ossec_config>

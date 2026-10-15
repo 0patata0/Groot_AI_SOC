@@ -46,7 +46,7 @@ LISTEN = os.environ.get("LISTEN", "127.0.0.1:8090")
 # --- Tier 2 승인 브로커 / 모니터 지문 ---
 BROKER_TOKEN = os.environ.get("BROKER_TOKEN", "")            # 응답 서버(A) ↔ 브로커 공유 비밀 (헤더 X-Broker-Token)
 READ_TOKEN = os.environ.get("READ_TOKEN", "")                # /recent 읽기 토큰 (Hermes 모니터 스크립트, 헤더 X-Read-Token)
-APPROVERS = [x for x in os.environ.get("APPROVERS", "").split(",") if x]   # 버튼 클릭 허용 MM user id 목록(빈값=누구나)
+APPROVERS = [x.strip() for x in os.environ.get("APPROVERS", "").split(",") if x.strip()]  # Empty disables approval.
 MM_ACTION_URL = os.environ.get("MM_ACTION_URL", "http://172.19.0.1:8090")  # MM(컨테이너)→브로커 콜백 베이스(SSRF allowlist 에 있어야 함)
 APPROVAL_TTL = int(os.environ.get("APPROVAL_TTL", "900"))    # 승인 대기 상한(초). 지나면 expired = 미실행
 APPROVALS = {}                                               # req_id → 레코드 (메모리; 재시작 시 대기 중 요청은 소멸=미실행)
@@ -69,8 +69,11 @@ RULE_MM_SOURCES = _rule_source_networks(os.environ.get("RULE_MM_SOURCE_CIDRS", "
 RULE_TARGETS = frozenset(("a:modsecurity-custom", "a:suricata-local", "b:wazuh-local-rules"))
 RULE_APPROVALS = {}
 RULE_NONCES = {}                # authenticated request nonce → arrival time; replay cache
-RULE_DIFF_MAX_BYTES = 8 * 1024     # Mattermost Blocks 는 전체 텍스트가 16,000자를 넘으면 잘릴 수 있다.
+RULE_DIFF_MAX_BYTES = 512 * 1024  # Complete diff; large reviews are posted in numbered parts.
+RULE_REVIEW_PART_MAX_BYTES = 8 * 1024  # Bound both raw UTF-8 and the indented display.
 RULE_CARD_MAX_CHARS = 12_000
+RULE_POST_MAX_SECONDS = 90
+RULE_CREATE_BODY_MAX_BYTES = 4 * 1024 * 1024  # Includes JSON escaping of a 512 KiB diff.
 _LOCK = threading.Lock()
 KST = timezone(timedelta(hours=9), "KST")
 
@@ -94,14 +97,14 @@ def wapi_token():
 
 
 def _alert_time_kst(value):
-    """Wazuh 경보의 절대 시각을 보고서 표시용 KST로 변환한다."""
+    """명시된 offset으로만 KST 표시를 만들고, 시간대 없는 시각은 추정하지 않는다."""
     if not value:
         return "시각 없음"
     try:
         dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        return dt.astimezone(KST).strftime("%Y-%m-%d %H:%M:%S KST")
+            return "%s (시간대 확인 필요)" % dt.isoformat(sep=" ")
+        return dt.astimezone(KST).strftime("%Y-%m-%d %H:%M:%S" + (".%f" if dt.microsecond else "") + " KST")
     except ValueError:
         return "시각 형식 확인 필요"
 
@@ -242,55 +245,92 @@ def build_report(minutes):
 # ---- Tier 2 승인 브로커 ----
 def _expire_locked():
     now = time.time()
-    for r in APPROVALS.values():
-        if r["status"] == "pending" and now - r["ts"] > APPROVAL_TTL:
+    for rid, r in list(APPROVALS.items()):
+        if r["status"] in ("posting", "pending", "approved") and now - r["ts"] >= APPROVAL_TTL:
             r["status"] = "expired"
+        if r["status"] not in ("posting", "pending", "approved") and now - r["ts"] > APPROVAL_TTL + 3600:
+            del APPROVALS[rid]
+
+
+def _legacy_approval_enabled():
+    return bool(BROKER_TOKEN and APPROVERS and RULE_MM_SOURCES and MM_WEBHOOK and MM_ACTION_URL)
+
+
+def _approval_public(rid, rec):
+    return {"req_id": rid, "request_id": rid, "status": rec["status"], "by": rec["by"],
+            "action": rec["action"], "ip": rec["ip"], "minutes": rec["minutes"]}
 
 
 def approval_create(req):
     """응답 서버 호출: MM 에 [승인][거부] 버튼 카드 게시. (req_id, posted_ok, detail)"""
-    rid, nonce = secrets.token_hex(8), secrets.token_hex(16)
-    ip = str(req.get("ip", ""))[:45]; reason = str(req.get("reason", ""))[:80]; by = str(req.get("requested_by", "agent"))[:40]
+    if not _legacy_approval_enabled():
+        return "", False, "approval is not configured"
+    if not isinstance(req, dict) or set(req) - {"ip", "minutes", "reason", "requested_by", "action"}:
+        return "", False, "invalid approval fields"
+    action = req.get("action", "block")
+    ip, minutes = req.get("ip"), req.get("minutes", 10)
+    reason, by = req.get("reason", ""), req.get("requested_by", "agent")
     try:
-        minutes = int(req.get("minutes", 10))
-    except (TypeError, ValueError):
-        minutes = 10
-    rec = {"ip": ip, "minutes": minutes, "reason": reason, "requested_by": by, "nonce": nonce, "status": "pending", "by": "", "ts": time.time()}
+        address = ipaddress.ip_address(ip)
+        if (not isinstance(ip, str) or str(address) != ip or action not in ("block", "unblock") or
+                type(minutes) is not int or (not 1 <= minutes <= 1440 if action == "block" else minutes != 0) or
+                not isinstance(reason, str) or not 1 <= len(reason) <= 200 or
+                any(unicodedata.category(c) in ("Cc", "Cf", "Cs", "Zl", "Zp") for c in reason) or
+                not isinstance(by, str) or not re.fullmatch(r"[a-zA-Z0-9_.:@-]{1,80}", by)):
+            return "", False, "invalid approval action, IP, duration or reason"
+    except (ValueError, TypeError):
+        return "", False, "invalid approval IP"
+    rid, nonce = secrets.token_hex(8), secrets.token_hex(16)
+    rec = {"action": action, "ip": ip, "minutes": minutes, "reason": reason, "requested_by": by,
+           "nonce": nonce, "status": "posting", "by": "", "ts": time.time()}
     with _LOCK:
-        _expire_locked(); APPROVALS[rid] = rec
+        _expire_locked()
+        if sum(r["status"] in ("posting", "pending", "approved") for r in APPROVALS.values()) >= 64:
+            return "", False, "too many active approvals"
+        APPROVALS[rid] = rec
     def act(name, decision, style):
         return {"id": decision, "name": name, "style": style,
-                "integration": {"url": MM_ACTION_URL + "/actions", "context": {"req": rid, "nonce": nonce, "decision": decision}}}
-    text = ("에이전트(**%s**)가 **%s** 를 **%d분** 차단하려 합니다.\n사유: `%s`\n요청 id `%s` · %d분 내 응답 없으면 자동 거부(미실행)"
-            % (by, ip, minutes, reason, rid, APPROVAL_TTL // 60))
-    payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800", "title": "⚠️ 차단 승인 요청 (HITL Tier 2)", "text": text,
+                "integration": {"url": MM_ACTION_URL + "/actions", "context": {
+                    "req": rid, "nonce": nonce, "decision": decision, "action": action}}}
+    operation = "%d분 차단" % minutes if action == "block" else "차단 해제"
+    text = ("에이전트 `%s`가 `%s`에 %s 작업을 요청했습니다.\n작업: `%s`\n사유:\n\n    %s\n\n"
+            "요청 id `%s` · %d분 내 응답 없으면 미실행. 이 IP의 해당 작업 한 번만 승인합니다." %
+            (by, ip, operation, action, reason, rid, APPROVAL_TTL // 60))
+    payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800", "title": "⚠️ %s 승인 요청 (HITL Tier 2)" % operation, "text": text,
                "actions": [act("승인", "approve", "primary"), act("거부", "deny", "danger")], "footer": "capstone SOC HITL", "ts": int(time.time())}]}
-    ok, d = post_mm(payload)
-    if not ok:
-        with _LOCK:
-            rec["status"], rec["by"] = "error", d
-    return rid, ok, d
+    posted, _ = post_mm(payload)
+    with _LOCK:
+        _expire_locked()
+        if rec["status"] == "posting":
+            rec["status"] = "pending" if posted else "error"
+        ok = posted and rec["status"] == "pending"
+    return rid, ok, "ok" if ok else "approval card failed or expired; approval is disabled"
 
 
-def approval_action(body):
+def approval_action(body, peer_ip):
     """MM 버튼 클릭 콜백. 응답 = 원 카드 갱신(update) + 클릭자에게만 보이는 안내(ephemeral_text)."""
-    ctx = body.get("context") or {}
-    rid, decision = str(ctx.get("req", "")), str(ctx.get("decision", ""))
-    uid, uname = str(body.get("user_id", "")), str(body.get("user_name", ""))
+    if not _legacy_approval_enabled() or not _rule_source_ok(peer_ip) or not isinstance(body, dict):
+        return {"ephemeral_text": "승인 설정 또는 콜백 출처가 허용되지 않았습니다."}
+    ctx = body.get("context")
+    if not isinstance(ctx, dict):
+        return {"ephemeral_text": "유효하지 않은 승인 요청입니다."}
+    rid, decision, uid = ctx.get("req"), ctx.get("decision"), body.get("user_id")
+    if not isinstance(rid, str) or decision not in ("approve", "deny") or not isinstance(uid, str) or uid not in APPROVERS:
+        return {"ephemeral_text": "승인 권한 또는 결정 값이 유효하지 않습니다."}
     with _LOCK:
         _expire_locked(); rec = APPROVALS.get(rid)
-        if not rec or rec.get("nonce") != ctx.get("nonce"):
+        if (not rec or not isinstance(ctx.get("nonce"), str) or
+                not secrets.compare_digest(rec["nonce"], ctx["nonce"]) or ctx.get("action") != rec["action"]):
             return {"ephemeral_text": "알 수 없거나 만료된 승인 요청입니다."}
-        if APPROVERS and uid not in APPROVERS:
-            return {"ephemeral_text": "승인 권한이 없는 계정입니다 (@%s)." % uname}
         if rec["status"] != "pending":
             return {"ephemeral_text": "이미 처리됨: %s (by %s)" % (rec["status"], rec["by"])}
         rec["status"] = "approved" if decision == "approve" else "denied"
-        rec["by"] = uname or uid; rec["decided_ts"] = time.time(); st = rec["status"]
+        rec["by"] = uid; rec["decided_ts"] = time.time(); st = rec["status"]
     label = "✅ 승인됨" if st == "approved" else "❌ 거부됨"
     props = {"attachments": [{"color": "#28a745" if st == "approved" else "#d24b4b",
-             "title": "%s · %s 차단 %d분" % (label, rec["ip"], rec["minutes"]),
-             "text": "결정: **%s** by @%s · 사유 `%s` · id `%s`" % (st, rec["by"], rec["reason"], rid),
+             "title": "%s · %s %s" % (label, rec["ip"], rec["action"]),
+             "text": "결정: `%s` · 승인자 ID: `%s` · 작업: `%s` · 기간: %d분\n사유:\n\n    %s\n\n요청 ID: `%s`" %
+                     (st, rec["by"], rec["action"], rec["minutes"], rec["reason"], rid),
              "footer": "capstone SOC HITL", "ts": int(time.time())}]}
     return {"update": {"message": "", "props": props}, "ephemeral_text": "%s 처리했습니다." % label}
 
@@ -300,7 +340,26 @@ def approval_decision(rid):
         _expire_locked(); rec = APPROVALS.get(rid)
         if not rec:
             return None
-        return {"req_id": rid, "status": rec["status"], "by": rec["by"], "ip": rec["ip"], "minutes": rec["minutes"]}
+        return _approval_public(rid, rec)
+
+
+def approval_consume(req):
+    if not _legacy_approval_enabled():
+        return {"error": "approval is not configured"}, 503
+    if not isinstance(req, dict) or set(req) != {"request_id", "action", "ip", "minutes"} or \
+            not isinstance(req.get("request_id"), str) or type(req.get("minutes")) is not int:
+        return {"error": "invalid approval consume fields"}, 400
+    with _LOCK:
+        _expire_locked()
+        rid = req["request_id"]
+        rec = APPROVALS.get(rid)
+        if not rec:
+            return {"error": "approval not found"}, 404
+        if rec["status"] != "approved" or any(req[key] != rec[key] for key in ("action", "ip", "minutes")):
+            return {"error": "approval is not approved or binding differs"}, 409
+        rec["status"] = "consumed"
+        rec["consumed_ts"] = time.time()
+        return _approval_public(rid, rec), 200
 
 
 # ---- 승인형 보안 룰 변경: 변경 바이트의 해시와 표시된 전체 diff에 결속 ----
@@ -346,15 +405,16 @@ def _rule_audit(event, rid, rec):
 def _rule_expire_locked():
     now = time.time()
     for rid, rec in list(RULE_APPROVALS.items()):
-        if rec["status"] in ("pending", "approved") and now >= rec["expires_at"]:
+        if rec["status"] in ("posting", "pending", "approved") and now >= rec["expires_at"]:
             rec["status"] = "expired"
             rec["decided_ts"] = now
             _rule_audit("expired", rid, rec)
-        if rec["status"] != "pending" and now - rec.get("decided_ts", rec["expires_at"]) > 3600:
+        if rec["status"] not in ("posting", "pending") and now - rec.get("decided_ts", rec["expires_at"]) > 3600:
             del RULE_APPROVALS[rid]
     # Decisions also go to the service journal; cap transient in-memory state.
     if len(RULE_APPROVALS) > 256:
-        terminal = sorted(((rid, rec) for rid, rec in RULE_APPROVALS.items() if rec["status"] != "pending"),
+        terminal = sorted(((rid, rec) for rid, rec in RULE_APPROVALS.items()
+                           if rec["status"] not in ("posting", "pending")),
                           key=lambda item: item[1].get("decided_ts", item[1]["ts"]))
         for rid, _ in terminal[:len(RULE_APPROVALS) - 256]:
             del RULE_APPROVALS[rid]
@@ -394,10 +454,49 @@ def _rule_public(rid, rec):
             "target": rec["target"], "base_sha256": rec["base_sha256"],
             "candidate_sha256": rec["candidate_sha256"], "diff_sha256": rec["diff_sha256"],
             "expires_at": rec["expires_at"], "by": rec["by"],
+            "review_parts": rec.get("review_parts", 0),
+            "review_parts_posted": rec.get("review_parts_posted", 0),
             "result_posted": rec.get("result_posted", False),
             "result_status": rec.get("result_status", ""),
             "result_attempts": rec.get("result_attempts", 0),
             "readback_sha256": rec.get("readback_sha256", "")}
+
+
+def _rule_diff_display(diff):
+    return "\n".join("    " + line for line in diff.split("\n"))
+
+
+def _rule_review_parts(diff):
+    """Losslessly split at UTF-8 character boundaries, preferring complete lines.
+
+    Byte ranges and individual hashes identify fragments of a long physical line;
+    no newline or other content is inserted into the original review fragments.
+    """
+    parts = []
+    start = cursor = 0
+    last_newline = 0
+    display_bytes = 4
+    while cursor < len(diff):
+        char = diff[cursor]
+        cost = len(char.encode("utf-8")) + (4 if char == "\n" else 0)
+        if display_bytes + cost > RULE_REVIEW_PART_MAX_BYTES:
+            end = last_newline if last_newline > start else cursor
+            parts.append(diff[start:end])
+            start = cursor = end
+            last_newline = end
+            display_bytes = 4
+            continue
+        display_bytes += cost
+        cursor += 1
+        if char == "\n":
+            last_newline = cursor
+    if start < len(diff):
+        parts.append(diff[start:])
+    return parts
+
+
+def _rule_card_fits(text):
+    return len(text) <= RULE_CARD_MAX_CHARS and len(text.encode("utf-8")) <= RULE_CARD_MAX_CHARS
 
 
 def rule_change_create(req):
@@ -409,17 +508,26 @@ def rule_change_create(req):
     except (ValueError, UnicodeError) as e:
         return {"error": str(e)}, 400
     rid, nonce = secrets.token_hex(16), secrets.token_hex(32)
-    rec = dict(req, proposal_digest=digest, nonce=nonce, status="pending", by="", ts=time.time())
-    # Each line is shown in an indented code block. A proposal whose entire card
-    # cannot be shown is rejected rather than posted with a misleading truncation.
-    diff_display = "\n".join("    " + line for line in req["diff"].split("\n"))
+    rec = dict(req, proposal_digest=digest, nonce=nonce, status="posting", by="", ts=time.time(),
+               review_parts=0, review_parts_posted=0)
     expiry_kst = datetime.fromtimestamp(req["expires_at"], KST).strftime("%Y-%m-%d %H:%M:%S KST")
-    card_text = ("요청자: `%s`\n대상: `%s`\n변경 전 SHA-256: `%s`\n변경 후 SHA-256: `%s`\n"
+    header = ("요청자: `%s`\n대상: `%s`\n변경 전 SHA-256: `%s`\n변경 후 SHA-256: `%s`\n"
                  "Diff SHA-256: `%s`\n제안 SHA-256: `%s`\n만료: `%s`\n요청 ID: `%s`\n"
-                 "라이브 구문 검사와 재로드 검증은 승인 후 적용 단계에서 수행됩니다.\n\n"
-                 "변경 영향·사유 및 전후 전체 diff:\n\n%s" % (req["requested_by"], req["target"], req["base_sha256"],
-                    req["candidate_sha256"], req["diff_sha256"], digest, expiry_kst, rid, diff_display))
-    if len(card_text) > RULE_CARD_MAX_CHARS or len(card_text.encode("utf-8")) > RULE_CARD_MAX_CHARS:
+                 "라이브 구문 검사와 재로드 검증은 승인 후 적용 단계에서 수행됩니다." %
+              (req["requested_by"], req["target"], req["base_sha256"], req["candidate_sha256"],
+               req["diff_sha256"], digest, expiry_kst, rid))
+    card_text = header + "\n\n변경 영향·사유 및 전후 전체 diff:\n\n" + _rule_diff_display(req["diff"])
+    parts = []
+    if len(req["diff"].encode("utf-8")) > RULE_REVIEW_PART_MAX_BYTES or not _rule_card_fits(card_text):
+        parts = _rule_review_parts(req["diff"])
+        rec["review_parts"] = len(parts)
+        card_text = (header + "\n\n전체 변경 내용은 같은 요청 ID와 Diff SHA-256이 표시된 검토 메시지 "
+                     "1/%d ~ %d/%d에 순서대로 게시했습니다. 모든 부분을 확인한 뒤 이 카드에서 "
+                     "전체 변경 한 건을 승인하거나 거부하세요. 일부만 승인할 수 없습니다.\n"
+                     "전체 diff: %d UTF-8 bytes. 각 부분의 byte 범위는 시작 포함·끝 제외이며, "
+                     "긴 줄은 여러 부분에 이어질 수 있습니다." %
+                     (len(parts), len(parts), len(parts), len(req["diff"].encode("utf-8"))))
+    if not _rule_card_fits(card_text):
         return {"error": "approval card too large to display completely"}, 400
     rec["card_text"] = card_text
     def action(name, decision, style):
@@ -433,18 +541,68 @@ def rule_change_create(req):
         "footer": "capstone SOC rule change HITL", "ts": int(time.time())}]}
     with _LOCK:
         _rule_expire_locked()
-        if sum(r["status"] == "pending" for r in RULE_APPROVALS.values()) >= 64:
+        if sum(r["status"] in ("posting", "pending") for r in RULE_APPROVALS.values()) >= 64:
             return {"error": "too many pending proposals"}, 429
         RULE_APPROVALS[rid] = rec
-    posted, _ = post_mm(payload)
-    if not posted:
+    deadline = time.monotonic() + RULE_POST_MAX_SECONDS
+
+    def ready_to_post():
         with _LOCK:
-            rec["status"] = "error"
-            rec["decided_ts"] = time.time()
-            _rule_audit("post_error", rid, rec)
-        return {"error": "approval card was not posted"}, 502
-    _rule_audit("created", rid, rec)
-    return {"proposal_id": rid, "proposal_digest": digest, "expires_at": req["expires_at"], "posted": True}, 200
+            _rule_expire_locked()
+            if rec["status"] != "posting":
+                return False
+            if time.monotonic() >= deadline:
+                rec["status"] = "error"
+                rec["decided_ts"] = time.time()
+                _rule_audit("post_timeout", rid, rec)
+                return False
+            return True
+
+    def failed_post():
+        with _LOCK:
+            if rec["status"] == "posting":
+                rec["status"] = "error"
+                rec["decided_ts"] = time.time()
+                _rule_audit("post_error", rid, rec)
+        return {"error": "complete review and approval card were not posted; approval is disabled"}, 502
+
+    offset = 0
+    for index, part in enumerate(parts, 1):
+        raw = part.encode("utf-8")
+        end = offset + len(raw)
+        review_text = (header + "\n\n검토 부분: %d/%d\n원문 UTF-8 byte 범위: [%d, %d)\n"
+                       "부분 SHA-256: `%s`\n전체 변경을 검토한 뒤 마지막 승인 카드에서 결정하세요.\n\n%s" %
+                       (index, len(parts), offset, end, hashlib.sha256(raw).hexdigest(),
+                        _rule_diff_display(part)))
+        if not _rule_card_fits(review_text) or not ready_to_post():
+            return failed_post()
+        review_payload = {"username": "SOC-Agent", "attachments": [{
+            "color": "#e0a800", "title": "보안 룰 변경 검토 · %d/%d" % (index, len(parts)),
+            "text": review_text, "footer": "capstone SOC rule change HITL", "ts": int(time.time())}]}
+        posted, _ = post_mm(review_payload)
+        if not posted or not ready_to_post():
+            return failed_post()
+        with _LOCK:
+            rec["review_parts_posted"] = index
+        offset = end
+    if not ready_to_post():
+        return failed_post()
+    posted, _ = post_mm(payload)
+    if not posted or not ready_to_post():
+        return failed_post()
+    with _LOCK:
+        # Recheck while holding the lock so a concurrent expiry cannot resurrect a proposal.
+        _rule_expire_locked()
+        if rec["status"] != "posting" or time.monotonic() >= deadline:
+            if rec["status"] == "posting":
+                rec["status"] = "error"
+                rec["decided_ts"] = time.time()
+                _rule_audit("post_timeout", rid, rec)
+            return {"error": "proposal expired or review posting timed out; approval is disabled"}, 502
+        rec["status"] = "pending"
+        _rule_audit("created", rid, rec)
+    return {"proposal_id": rid, "proposal_digest": digest, "expires_at": req["expires_at"],
+            "posted": True, "review_parts": len(parts)}, 200
 
 
 def rule_change_action(body, peer_ip):
@@ -631,7 +789,7 @@ def rule_change_result(rid, req):
 
 def recent_fingerprint(minutes=60, min_level=10, n=5):
     """Hermes cron --monitor-script 용 지문: 최신 n건(level>=min_level, 최근 minutes분)만, 절대 타임스탬프로.
-    새 경보가 생길 때만 바이트가 바뀐다(오래된 경보가 창을 벗어나도 최신 n건은 그대로)."""
+    ts는 모니터 캐시용 원본을 유지하고, ts_kst는 사용자 표시용이다."""
     body = {"size": n, "sort": [{"timestamp": "desc"}, {"rule.id": "desc"}],
             "query": {"bool": {"filter": [{"range": {"timestamp": {"gte": "now-%dm" % minutes}}},
                                           {"range": {"rule.level": {"gte": min_level}}}]}}}
@@ -642,7 +800,8 @@ def recent_fingerprint(minutes=60, min_level=10, n=5):
     out = []
     for h in hits:
         s = h["_source"]; r = s.get("rule", {}); d = s.get("data", {})
-        out.append({"ts": s.get("timestamp", ""), "id": r.get("id"), "level": r.get("level"), "agent": s.get("agent", {}).get("name", ""),
+        out.append({"ts": s.get("timestamp", ""), "ts_kst": _alert_time_kst(s.get("timestamp", "")),
+                    "id": r.get("id"), "level": r.get("level"), "agent": s.get("agent", {}).get("name", ""),
                     "srcip": d.get("srcip") or (d.get("transaction") or {}).get("client_ip", ""), "desc": r.get("description", "")[:60]})
     return {"latest": out}
 
@@ -692,6 +851,41 @@ def handle_slash(text):
     return "ephemeral", "알 수 없는 명령: %s (`/soc help`)" % cmd
 
 
+def _operation_audit(event, rec):
+    row = {"event": event, "operation_id": rec["request_id"], "kind": rec["kind"],
+           "target": rec["target"], "proposal_digest": rec["proposal_digest"],
+           "status": rec["status"], "approver_id": rec["by"], "at": int(time.time())}
+    print("operation_approval_audit " + json.dumps(row, sort_keys=True), file=sys.stderr, flush=True)
+
+
+# Load only the adjacent deployed module, independent of the caller's import path.
+import importlib.util as _import_util
+_operations_spec = _import_util.spec_from_file_location(
+    "capstone_operations_approval", os.path.join(os.path.dirname(os.path.abspath(__file__)), "operations_approval.py"))
+_operations_module = _import_util.module_from_spec(_operations_spec)
+_operations_spec.loader.exec_module(_operations_module)
+OPERATIONS = _operations_module.OperationsBroker(
+    post=lambda payload: post_mm(payload), enabled=_rule_enabled, source_ok=_rule_source_ok,
+    approvers=lambda: RULE_APPROVERS, action_url=lambda: MM_ACTION_URL, audit=_operation_audit)
+
+
+def _rule_health_counts():
+    with _LOCK:
+        _rule_expire_locked()
+        _expire_locked()
+        counts = {}
+        active = ("posting", "pending", "approved", "consumed", "reporting", "report_error",
+                  "abort_reporting", "abort_report_error")
+        for rec in RULE_APPROVALS.values():
+            counts[rec["status"]] = counts.get(rec["status"], 0) + 1
+        legacy_counts = {}
+        for rec in APPROVALS.values():
+            legacy_counts[rec["status"]] = legacy_counts.get(rec["status"], 0) + 1
+        return {"active_rule_changes": sum(counts.get(status, 0) for status in active),
+                "rule_status_counts": counts, "legacy_approval_status_counts": legacy_counts,
+                "active_legacy_approvals": sum(legacy_counts.get(status, 0) for status in ("posting", "pending", "approved"))}
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a): pass
     def setup(self):
@@ -705,9 +899,12 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers(); self.wfile.write(b)
     def _body(self):
         n = int(self.headers.get("Content-Length", 0) or 0)
-        if not 0 <= n <= 1 << 20:
+        limit = RULE_CREATE_BODY_MAX_BYTES if urllib.parse.urlparse(self.path).path == "/rule-changes" else 1 << 20
+        if not 0 <= n <= limit:
             raise ValueError("invalid request length")
         self._request_body_bytes = self.rfile.read(n) if n else b""
+        if len(self._request_body_bytes) != n:
+            raise ValueError("incomplete request body")
         return self._request_body_bytes.decode()
     def _tok_ok(self, header, expected):
         return bool(expected) and secrets.compare_digest(self.headers.get(header, ""), expected)
@@ -745,7 +942,16 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == "/rule-changes/health":
             if not self._rule_auth("GET"):
                 return
-            return self._json({"status": "ready", "approval_configured": True})
+            return self._json({"status": "ready", "approval_configured": True, **_rule_health_counts()})
+        if u.path == "/operations/health":
+            if not self._rule_auth("GET"):
+                return
+            return self._json({**OPERATIONS.health(), **_rule_health_counts()})
+        if re.fullmatch(r"/operations/[0-9a-f]{32}", u.path):
+            if not self._rule_auth("GET"):
+                return
+            response, status = OPERATIONS.get(u.path.rsplit("/", 1)[1])
+            return self._json(response, status)
         if re.fullmatch(r"/rule-changes/[0-9a-f]{32}", u.path):
             if not self._rule_auth("GET"):
                 return
@@ -763,13 +969,11 @@ class Handler(BaseHTTPRequestHandler):
                 _expire_locked()
                 pend = [{"req_id": k, "ip": v["ip"], "minutes": v["minutes"], "reason": v["reason"], "age_s": int(time.time() - v["ts"])}
                         for k, v in APPROVALS.items() if v["status"] == "pending"]
-            return self._json({"pending": pend})
-        if u.path.startswith("/nonce/"):                # 자동 검증용: 요청 생성자(브로커 토큰 보유)만 nonce 조회 가능
-            if not self._tok_ok("X-Broker-Token", BROKER_TOKEN):
-                return self._json({"error": "unauthorized"}, 401)
-            with _LOCK:
-                rec = APPROVALS.get(u.path.rsplit("/", 1)[1])
-            return self._json({"nonce": rec["nonce"]} if rec else {"error": "not found"}, 200 if rec else 404)
+                counts = {}
+                for rec in APPROVALS.values():
+                    counts[rec["status"]] = counts.get(rec["status"], 0) + 1
+            return self._json({"pending": pend, "status_counts": counts,
+                               "active": sum(counts.get(status, 0) for status in ("posting", "pending", "approved"))})
         if u.path == "/recent":
             if not self._tok_ok("X-Read-Token", READ_TOKEN):
                 return self._json({"error": "unauthorized"}, 401)
@@ -785,6 +989,25 @@ class Handler(BaseHTTPRequestHandler):
             raw = self._body()
         except (ValueError, TimeoutError):
             return self._json({"error": "invalid or incomplete request body"}, 400)
+        if u.path == "/operations" or re.fullmatch(r"/operations/[0-9a-f]{32}/(?:consume|result)", u.path):
+            if not self._rule_auth("POST", self._request_body_bytes):
+                return
+            try:
+                req = json.loads(raw or "{}")
+            except ValueError:
+                return self._json({"error": "bad json"}, 400)
+            if u.path == "/operations":
+                response, status = OPERATIONS.create(req)
+            else:
+                oid, operation = u.path.split("/")[2:]
+                response, status = getattr(OPERATIONS, operation)(oid, req)
+            return self._json(response, status)
+        if u.path == "/operation-actions":
+            try:
+                body = json.loads(raw or "{}")
+            except ValueError:
+                return self._json({"ephemeral_text": "bad request"}, 400)
+            return self._json(OPERATIONS.action(body, self.client_address[0]))
         if u.path == "/rule-changes":
             if not self._rule_auth("POST", self._request_body_bytes):
                 return
@@ -830,18 +1053,30 @@ class Handler(BaseHTTPRequestHandler):
         if u.path == "/approval":                       # 응답 서버(A) → 승인 카드 생성
             if not self._tok_ok("X-Broker-Token", BROKER_TOKEN):
                 return self._json({"error": "unauthorized"}, 401)
+            if not _legacy_approval_enabled():
+                return self._json({"error": "approval is not configured"}, 503)
             try:
                 req = json.loads(raw or "{}")
             except ValueError:
                 return self._json({"error": "bad json"}, 400)
             rid, ok, d = approval_create(req)
-            return self._json({"req_id": rid, "posted": ok, "detail": d}, 200 if ok else 502)
+            status = 200 if ok else (502 if rid else (429 if d == "too many active approvals" else 400))
+            return self._json({"req_id": rid, "posted": ok, "detail": d}, status)
+        if u.path == "/consume":
+            if not self._tok_ok("X-Broker-Token", BROKER_TOKEN):
+                return self._json({"error": "unauthorized"}, 401)
+            try:
+                req = json.loads(raw or "{}")
+            except ValueError:
+                return self._json({"error": "bad json"}, 400)
+            response, status = approval_consume(req)
+            return self._json(response, status)
         if u.path == "/actions":                        # Mattermost 버튼 클릭 콜백(JSON)
             try:
                 body = json.loads(raw or "{}")
             except ValueError:
                 return self._json({"ephemeral_text": "bad request"}, 400)
-            return self._json(approval_action(body if isinstance(body, dict) else {}))
+            return self._json(approval_action(body, self.client_address[0]))
         form = urllib.parse.parse_qs(raw)               # 슬래시 명령 /soc (form-urlencoded)
         token = (form.get("token", [""])[0])
         if SLASH_TOKEN and token != SLASH_TOKEN:

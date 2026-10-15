@@ -1,0 +1,395 @@
+[
+  {
+    "name": "Install guarded output rotation and capacity monitoring on A",
+    "hosts": "capstone_vector_a",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "tasks": [
+      {
+        "name": "Require fixed root operator on A",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '096e90b6243e438aa8a7b392be754732'"
+          ]
+        }
+      },
+      {
+        "name": "Inspect raw migration barriers before any legacy v1 storage change",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "get_checksum": false,
+          "get_mime": false,
+          "get_attributes": false
+        },
+        "loop": [
+          "/var/lib/capstone-raw-operations",
+          "/var/lib/capstone-raw-migration",
+          "/var/backups/capstone-raw-operations-initial-20261014/migration.json"
+        ],
+        "register": "capstone_v1_raw_barriers",
+        "tags": [
+          "always"
+        ]
+      },
+      {
+        "name": "Refuse legacy v1 storage deployment after raw migration is armed",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.exists is defined",
+            "not item.stat.exists",
+            "not (item.stat.islnk | default(false))"
+          ],
+          "fail_msg": "Legacy v1 deployment is blocked by raw migration/state metadata. Use the reviewed raw-operations procedure; do not remove its barrier to force a v1 overwrite."
+        },
+        "loop": "{{ capstone_v1_raw_barriers.results }}",
+        "loop_control": {
+          "label": "{{ item.item }}"
+        },
+        "tags": [
+          "always"
+        ]
+      },
+      {
+        "name": "Read reviewed raw-source config and environment identities",
+        "ansible.builtin.stat": {
+          "path": "{{ item.path }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          {
+            "path": "/etc/capstone-vector/vector.toml",
+            "sha256": "{{ raw_line_reviewed_config_sha256 }}"
+          },
+          {
+            "path": "/etc/capstone-vector/vector.env",
+            "sha256": "{{ raw_line_reviewed_env_sha256 }}"
+          }
+        ],
+        "register": "raw_line_contract_before",
+        "no_log": true
+      },
+      {
+        "name": "Require the exact reviewed three-source paths and 1 MiB source limits",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.exists",
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.uid == 0",
+            "item.stat.nlink == 1",
+            "item.stat.mode == '0600'",
+            "item.stat.checksum == item.item.sha256"
+          ]
+        },
+        "loop": "{{ raw_line_contract_before.results }}",
+        "no_log": true
+      },
+      {
+        "name": "Inspect private storage destinations without following links",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false
+        },
+        "loop": [
+          "/var/lib/capstone-vector-maintenance",
+          "/var/log/capstone-vector",
+          "/var/log/capstone-vector/telemetry",
+          "/etc/capstone-vector",
+          "/var/log/capstone-vector/evidence"
+        ],
+        "register": "storage_directories_before"
+      },
+      {
+        "name": "Reject unsafe existing storage directories",
+        "ansible.builtin.assert": {
+          "that": [
+            "not item.stat.exists or (item.stat.isdir and not item.stat.islnk and item.stat.uid == 0 and item.stat.mode[-2] in ['0', '1', '4', '5'] and item.stat.mode[-1] in ['0', '1', '4', '5'])"
+          ]
+        },
+        "loop": "{{ storage_directories_before.results }}",
+        "loop_control": {
+          "label": "{{ item.item }}"
+        }
+      },
+      {
+        "name": "Inspect existing numeric telemetry file without following links",
+        "ansible.builtin.stat": {
+          "path": "/var/log/capstone-vector/telemetry/health.jsonl",
+          "follow": false
+        },
+        "register": "storage_telemetry_before"
+      },
+      {
+        "name": "Reject unsafe existing numeric telemetry file",
+        "ansible.builtin.assert": {
+          "that": [
+            "not storage_telemetry_before.stat.exists or (storage_telemetry_before.stat.isreg and not storage_telemetry_before.stat.islnk and storage_telemetry_before.stat.uid == 0 and storage_telemetry_before.stat.nlink == 1 and storage_telemetry_before.stat.mode == '0600')"
+          ]
+        }
+      },
+      {
+        "name": "Create private maintenance state",
+        "ansible.builtin.file": {
+          "path": "/var/lib/capstone-vector-maintenance",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Inspect existing evidence file without following links",
+        "ansible.builtin.stat": {
+          "path": "/var/log/capstone-vector/evidence/normalized.jsonl",
+          "follow": false
+        },
+        "register": "storage_evidence_before"
+      },
+      {
+        "name": "Reject unsafe existing evidence file",
+        "ansible.builtin.assert": {
+          "that": [
+            "not storage_evidence_before.stat.exists or (storage_evidence_before.stat.isreg and not storage_evidence_before.stat.islnk and storage_evidence_before.stat.uid == 0 and storage_evidence_before.stat.nlink == 1 and storage_evidence_before.stat.mode == '0600')"
+          ]
+        }
+      },
+      {
+        "name": "Create private evidence directory",
+        "ansible.builtin.file": {
+          "path": "/var/log/capstone-vector/evidence",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Create private numeric telemetry directory",
+        "ansible.builtin.file": {
+          "path": "/var/log/capstone-vector/telemetry",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Install reviewed metadata-only health predicates",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/../../normalization/vector/collection-health.jq",
+          "dest": "/etc/capstone-vector/collection-health.jq",
+          "owner": "0",
+          "group": "0",
+          "mode": "0600",
+          "backup": true
+        }
+      },
+      {
+        "name": "Inspect bounded raw-line health deployment destinations",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false
+        },
+        "loop": [
+          "/etc/capstone-vector/line-length-lib.sh",
+          "/etc/capstone-vector/raw-line-status.jq",
+          "/usr/local/sbin/capstone-vector-raw-lines",
+          "/etc/capstone-vector/raw-line-binding.json",
+          "/var/lib/capstone-vector-maintenance/raw-lines.json"
+        ],
+        "register": "raw_line_destinations_before"
+      },
+      {
+        "name": "Reject replaced or untrusted raw-line health destinations",
+        "ansible.builtin.assert": {
+          "that": [
+            "not item.stat.exists or (item.stat.isreg and not item.stat.islnk and item.stat.uid == 0 and item.stat.nlink == 1 and item.stat.mode[-2] in ['0','1','4','5'] and item.stat.mode[-1] in ['0','1','4','5'])"
+          ]
+        },
+        "loop": "{{ raw_line_destinations_before.results }}",
+        "loop_control": {
+          "label": "{{ item.item }}"
+        }
+      },
+      {
+        "name": "Install bounded native raw-line scanner and predicate without restarting Vector",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/../../normalization/vector/collection/line-length/{{ item.source }}",
+          "dest": "{{ item.dest }}",
+          "owner": "0",
+          "group": "0",
+          "mode": "{{ item.mode }}",
+          "validate": "{{ item.validate }}",
+          "backup": true
+        },
+        "loop": [
+          {
+            "source": "line-length-lib.sh",
+            "dest": "/etc/capstone-vector/line-length-lib.sh",
+            "mode": "0644",
+            "validate": "/bin/bash -n %s"
+          },
+          {
+            "source": "raw-line-status.jq",
+            "dest": "/etc/capstone-vector/raw-line-status.jq",
+            "mode": "0644",
+            "validate": "/usr/bin/jq -n -f %s"
+          },
+          {
+            "source": "scan-raw-lines.sh",
+            "dest": "/usr/local/sbin/capstone-vector-raw-lines",
+            "mode": "0755",
+            "validate": "/bin/bash -n %s"
+          }
+        ]
+      },
+      {
+        "name": "Recheck raw-source contract immediately before binding it",
+        "ansible.builtin.stat": {
+          "path": "{{ item.item.path }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": "{{ raw_line_contract_before.results }}",
+        "register": "raw_line_contract_after",
+        "no_log": true
+      },
+      {
+        "name": "Reject concurrent config or environment replacement",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.exists",
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.uid == 0",
+            "item.stat.nlink == 1",
+            "item.stat.mode == '0600'",
+            "item.stat.checksum == item.item.stat.checksum",
+            "item.stat.inode == item.item.stat.inode",
+            "item.stat.dev == item.item.stat.dev"
+          ]
+        },
+        "loop": "{{ raw_line_contract_after.results }}",
+        "no_log": true
+      },
+      {
+        "name": "Atomically pin reviewed raw-source runtime hashes",
+        "ansible.builtin.copy": {
+          "content": "{{ raw_line_binding | to_nice_json }}\n",
+          "dest": "/etc/capstone-vector/raw-line-binding.json",
+          "owner": "0",
+          "group": "0",
+          "mode": "0600",
+          "backup": true
+        }
+      },
+      {
+        "name": "Install reviewed fixed maintenance wrapper",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/../../normalization/vector/capstone-vector-maintenance.sh",
+          "dest": "/usr/local/sbin/capstone-vector-maintenance",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700",
+          "validate": "/bin/bash -n %s",
+          "backup": true
+        }
+      },
+      {
+        "name": "Install isolated logrotate configuration",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/../../normalization/vector/logrotate.conf",
+          "dest": "/etc/capstone-vector/logrotate.conf",
+          "owner": "0",
+          "group": "0",
+          "mode": "0600",
+          "backup": true
+        }
+      },
+      {
+        "name": "Validate rotation config without changes",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/sbin/logrotate",
+            "--debug",
+            "--state",
+            "/var/lib/capstone-vector-maintenance/logrotate.status",
+            "/etc/capstone-vector/logrotate.conf"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Install native maintenance units",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/../../normalization/vector/{{ item }}",
+          "dest": "/etc/systemd/system/{{ item }}",
+          "owner": "0",
+          "group": "0",
+          "mode": "0644",
+          "backup": true
+        },
+        "loop": [
+          "capstone-vector-maintenance.service",
+          "capstone-vector-maintenance.timer"
+        ],
+        "register": "storage_units"
+      },
+      {
+        "name": "Validate native unit syntax",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemd-analyze",
+            "verify",
+            "/etc/systemd/system/capstone-vector-maintenance.service",
+            "/etc/systemd/system/capstone-vector-maintenance.timer"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Reload systemd if units changed",
+        "ansible.builtin.systemd_service": {
+          "daemon_reload": true
+        },
+        "when": "storage_units.changed"
+      },
+      {
+        "name": "Run read-only storage preflight",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/sbin/capstone-vector-maintenance",
+            "check"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Enable native rotation and monitor schedule",
+        "ansible.builtin.systemd_service": {
+          "name": "capstone-vector-maintenance.timer",
+          "enabled": true,
+          "state": "started"
+        }
+      }
+    ],
+    "vars": {
+      "raw_line_reviewed_config_sha256": "5ac09dd5cb708833fe0c2259c85aa0a587a42a67e78a1f507429dd9b825e56f7",
+      "raw_line_reviewed_env_sha256": "f435a687b985f41c89e90ae1b36c63894a0cd96b337693b77b9017850dafc194",
+      "raw_line_binding": {
+        "schema_version": 1,
+        "policy": "periodic-snapshot-tail-v1",
+        "vector_config_sha256": "{{ raw_line_reviewed_config_sha256 }}",
+        "vector_env_sha256": "{{ raw_line_reviewed_env_sha256 }}"
+      }
+    }
+  }
+]

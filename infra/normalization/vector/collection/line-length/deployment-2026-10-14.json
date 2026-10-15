@@ -1,0 +1,495 @@
+{
+  "kind": "raw_line_length_stage2_deployment",
+  "a": {
+    "at_kst": "2026-10-14T21:18:20.216576+09:00",
+    "status": "applied",
+    "backup": "/var/backups/capstone-raw-line-monitor-20261014",
+    "new_files": 4,
+    "maintenance_updated": true,
+    "vector_identity_unchanged": true,
+    "idempotent_changed": 0,
+    "raw_line_check": {
+      "schema_version": 1,
+      "scope": "periodic_snapshot_tail",
+      "observed_at_kst": "2026-10-14T21:18:03+09:00",
+      "binding_verified": true,
+      "statuses": [],
+      "sources": [
+        {
+          "source": "suricata",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 18047155,
+          "snapshot_bytes": 18047155,
+          "scanned_bytes": 18047155,
+          "max_line_bytes": 8903,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_audit",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 10072,
+          "snapshot_bytes": 10072,
+          "scanned_bytes": 10072,
+          "max_line_bytes": 2188,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_access",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 810,
+          "snapshot_bytes": 810,
+          "scanned_bytes": 810,
+          "max_line_bytes": 405,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "protected_existing_other_than_maintenance_unchanged": true,
+    "packages_installed": 0,
+    "raw_source_or_checkpoint_written": false
+  },
+  "b": {
+    "at_kst": "2026-10-14T21:16:46.386313+09:00",
+    "status": "applied",
+    "transaction": {
+      "after_sha256": "9f76264a8038c5c377b4c24a53ab2e3acc0eaf3fce7632df07f921cabdd26995",
+      "before_sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+      "level": 3,
+      "manager_id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+      "new_rule_ids": [
+        100252,
+        100253
+      ],
+      "operational_events_injected": 0,
+      "restarted": true,
+      "rollback_artifacts": "/var/backups/capstone-raw-line-health-co5uu1do",
+      "status": "validated"
+    },
+    "log_sha256": "77e9880c42028876095effca3798c31266ea98ef4bf6eedb57df450b35051f8d"
+  },
+  "a_systemd_observation": {
+    "at_kst": "2026-10-14T21:19:26.917245+09:00",
+    "manual_existing_oneshot_run": true,
+    "unit": {
+      "Result": "success",
+      "ExecMainStartTimestamp": "Wed 2026-10-14 21:19:25 KST",
+      "ExecMainExitTimestamp": "Wed 2026-10-14 21:19:26 KST",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "timer": {
+      "NextElapseUSecMonotonic": "2w 2d 7h 24min 47.849551s",
+      "LastTriggerUSec": "Wed 2026-10-14 21:14:51 KST",
+      "ActiveState": "active",
+      "SubState": "waiting"
+    },
+    "snapshot": {
+      "schema_version": 1,
+      "scope": "periodic_snapshot_tail",
+      "observed_at_kst": "2026-10-14T21:19:26+09:00",
+      "binding_verified": true,
+      "statuses": [],
+      "sources": [
+        {
+          "source": "suricata",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 18058977,
+          "snapshot_bytes": 18058977,
+          "scanned_bytes": 18058977,
+          "max_line_bytes": 8903,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_audit",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 10072,
+          "snapshot_bytes": 10072,
+          "scanned_bytes": 10072,
+          "max_line_bytes": 2188,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_access",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 810,
+          "snapshot_bytes": 810,
+          "scanned_bytes": 810,
+          "max_line_bytes": 405,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "snapshot_mode": "0600",
+    "snapshot_uid": 0,
+    "snapshot_sha256": "3e74c0a66e8627712c27c08c2bc54b256fb011ea8af20766669c400369c94732",
+    "operating_synthetic_input": 0
+  },
+  "postflight_a": {
+    "at_kst": "2026-10-14T21:20:16.987449+09:00",
+    "comparisons": {
+      "containers": true,
+      "services": true,
+      "host_protected": true,
+      "waf_configuration_and_binary_sha256": true,
+      "logcollector": true,
+      "vector": true,
+      "operating_root_queue": true,
+      "versions": true
+    },
+    "all_equal": true,
+    "host_files": 8,
+    "container_files": 51
+  },
+  "postflight_b": {
+    "analysisd": {
+      "pid": 2187436,
+      "start_ticks": 140371682,
+      "state_metrics": {
+        "alerts_queue_usage": 0.0,
+        "archives_queue_usage": 0.0,
+        "dbsync_queue_usage": 0.0,
+        "event_queue_usage": 0.0,
+        "events_dropped": 0,
+        "events_processed": 475,
+        "events_received": 654,
+        "firewall_queue_usage": 0.0,
+        "hostinfo_queue_usage": 0.0,
+        "rootcheck_queue_usage": 0.0,
+        "rule_matching_queue_usage": 0.0,
+        "sca_queue_usage": 0.0,
+        "statistical_queue_usage": 0.0,
+        "syscheck_queue_usage": 0.0,
+        "syscollector_queue_usage": 0.0,
+        "total_events_decoded": 653,
+        "upgrade_queue_usage": 0.0,
+        "winevt_queue_usage": 0.0
+      },
+      "state_scope": "single cumulative snapshot and instantaneous sampled queue usage; not a zero-loss or drain guarantee",
+      "threads": 44
+    },
+    "at_kst": "2026-10-14T21:20:14.311755+09:00",
+    "container_comparison": {
+      "five_nonmanager_states_identical": true,
+      "manager_restart_observed": true,
+      "only_manager_pid_and_started_at_may_change": true,
+      "same_six_container_ids": true
+    },
+    "containers": {
+      "/hermes": {
+        "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+        "pid": 1896873,
+        "running": true,
+        "started_at": "2026-10-13T16:37:16.547543503Z"
+      },
+      "/mm-app": {
+        "id": "567a3c832d2d400641ab27175a64c27103c0148575cdbad76300d367638e8230",
+        "pid": 888847,
+        "running": true,
+        "started_at": "2026-10-06T07:09:17.358679291Z"
+      },
+      "/mm-postgres": {
+        "id": "f92af50a014e088e87caf34e330929fa986f66c25807ef18d668cfbc82d2f5de",
+        "pid": 1799,
+        "running": true,
+        "started_at": "2026-09-28T06:19:48.728322004Z"
+      },
+      "/single-node-wazuh.dashboard-1": {
+        "id": "62fcd6e31e7e7dae9f195d69b5cfd50d5acac60c7d6d5ab9ec6d8f83413fd3cb",
+        "pid": 1789629,
+        "running": true,
+        "started_at": "2026-10-13T02:15:15.675929841Z"
+      },
+      "/single-node-wazuh.indexer-1": {
+        "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+        "pid": 1822,
+        "running": true,
+        "started_at": "2026-09-28T06:19:48.729016621Z"
+      },
+      "/single-node-wazuh.manager-1": {
+        "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "pid": 2186684,
+        "running": true,
+        "started_at": "2026-10-14T12:14:36.63544802Z"
+      }
+    },
+    "kind": "raw_line_health_b_postflight",
+    "mandatory_health": {
+      "returncode": 1,
+      "running": [
+        "wazuh-analysisd",
+        "wazuh-remoted",
+        "wazuh-db",
+        "wazuh-logcollector"
+      ]
+    },
+    "native_rule_tests_repeated": 0,
+    "operational_events_injected": 0,
+    "options_1_1": true,
+    "protected": {
+      "/etc/sudoers.d/capstone-rule-change": {
+        "bytes": 199,
+        "gid": 0,
+        "links": 1,
+        "mode": "0o440",
+        "sha256": "41d81849cb526930ee9f4aa23fd5d9c77ff661467f232d080780860bf5bef93b",
+        "uid": 0
+      },
+      "/opt/rule-change/rule_change_mcp.py": {
+        "bytes": 13502,
+        "gid": 985,
+        "links": 1,
+        "mode": "0o750",
+        "sha256": "2926ee95218fb889dd7f77bcccd36bdec4ed15f58aa7ae0b3e82426fc0209682",
+        "uid": 0
+      },
+      "/usr/local/sbin/rule-change-executor": {
+        "bytes": 67661,
+        "gid": 0,
+        "links": 1,
+        "mode": "0o750",
+        "sha256": "d937c7def4d2938d7655e445cb5cf9cd7858837aebebaf4278feae5fb69965a2",
+        "uid": 0
+      },
+      "/var/lib/docker/volumes/single-node_wazuh_etc/_data/local_internal_options.conf": {
+        "bytes": 380,
+        "gid": 999,
+        "links": 1,
+        "mode": "0o640",
+        "sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+        "uid": 0
+      },
+      "/var/lib/docker/volumes/single-node_wazuh_etc/_data/ossec.conf": {
+        "bytes": 8741,
+        "gid": 999,
+        "links": 1,
+        "mode": "0o660",
+        "sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+        "uid": 0
+      },
+      "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/capstone_vector_rules.xml": {
+        "bytes": 21722,
+        "gid": 999,
+        "links": 1,
+        "mode": "0o660",
+        "sha256": "9f76264a8038c5c377b4c24a53ab2e3acc0eaf3fce7632df07f921cabdd26995",
+        "uid": 999
+      },
+      "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml": {
+        "bytes": 6122,
+        "gid": 999,
+        "links": 1,
+        "mode": "0o660",
+        "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+        "uid": 999
+      }
+    },
+    "protected_comparison": {
+      "approval_boundary_three_files_unchanged": true,
+      "candidate_only_change": true,
+      "other_six_files_exact": true,
+      "permissions_and_links_preserved": true
+    },
+    "soc_safety": {
+      "active_response_blocks": 0,
+      "health_rules": {
+        "100252": {
+          "exact_status_match": true,
+          "ignore_seconds": 900,
+          "level": 3,
+          "no_email_alert": true,
+          "parent": 100240
+        },
+        "100253": {
+          "exact_status_match": true,
+          "ignore_seconds": 900,
+          "level": 3,
+          "no_email_alert": true,
+          "parent": 100240
+        }
+      },
+      "integration_blocks": 0,
+      "monitor_container_override_level": null,
+      "monitor_file_override_levels": [],
+      "monitor_script_default": 10,
+      "monitor_script_sha256": "773c6110a2398387b1af20c90cfdcc5e821c5a39194123497dd8873fd9c52b76",
+      "scope": "current configured automatic report/summary/monitor thresholds; no manual query guarantee; SOC source preflight SHA not supplied",
+      "soc_minimum_levels": {
+        "monitor_function_default": 10,
+        "report": 5,
+        "summary": 5
+      },
+      "soc_source_sha256": "8db6244c1cede29d9f3a154243fb8e53878281977a0bb9ab9b41c478308b52e1"
+    },
+    "status": "passed"
+  },
+  "scope": "bounded_periodic_current_tail_observation_not_loss_recovery",
+  "operating_deployment_verified": true,
+  "source_evidence_preservation_cleanup_pending": false,
+  "new_llm_privileges": false,
+  "packages_installed": 0,
+  "operating_synthetic_input": 0,
+  "evidence_preservation": {
+    "a": {
+      "at_kst": "2026-10-14T21:24:05.808300+09:00",
+      "host": "a",
+      "files": 149,
+      "bytes": 260208,
+      "sha256_all_equal": true,
+      "original_prefix": "/var/tmp/capstone-sequential-20261014/step2",
+      "preserved_prefix": "/opt/capstone-automation/project/evidence/sequential-20261014/step2",
+      "embedded_original_paths_are_historical": true
+    },
+    "b": {
+      "at_kst": "2026-10-14T21:24:08.467789+09:00",
+      "host": "b",
+      "files": 107,
+      "bytes": 215335,
+      "sha256_all_equal": true,
+      "original_prefix": "/var/tmp/capstone-sequential-20261014/step2",
+      "preserved_prefix": "/opt/capstone-automation/project/evidence/sequential-20261014/step2",
+      "embedded_original_paths_are_historical": true
+    }
+  },
+  "a_natural_timer_observation": {
+    "at_kst": "2026-10-14T21:27:52.868466+09:00",
+    "manual_existing_oneshot_run": false,
+    "read_only_timer_observation": true,
+    "unit": {
+      "Result": "success",
+      "ExecMainStartTimestamp": "Wed 2026-10-14 21:24:31 KST",
+      "ExecMainExitTimestamp": "Wed 2026-10-14 21:24:32 KST",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead"
+    },
+    "timer": {
+      "NextElapseUSecMonotonic": "2w 2d 7h 29min 53.984073s",
+      "LastTriggerUSec": "Wed 2026-10-14 21:24:31 KST",
+      "ActiveState": "active",
+      "SubState": "waiting"
+    },
+    "snapshot": {
+      "schema_version": 1,
+      "scope": "periodic_snapshot_tail",
+      "observed_at_kst": "2026-10-14T21:24:32+09:00",
+      "binding_verified": true,
+      "statuses": [],
+      "sources": [
+        {
+          "source": "suricata",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 18136108,
+          "snapshot_bytes": 18136108,
+          "scanned_bytes": 18136108,
+          "max_line_bytes": 8903,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_audit",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 10072,
+          "snapshot_bytes": 10072,
+          "scanned_bytes": 10072,
+          "max_line_bytes": 2188,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_access",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 810,
+          "snapshot_bytes": 810,
+          "scanned_bytes": 810,
+          "max_line_bytes": 405,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "snapshot_mode": "0600",
+    "snapshot_uid": 0,
+    "snapshot_sha256": "0b00878f7491644a17f04cdd75aa5f957233fc89e8e06b56e136db60dce7ceae",
+    "operating_synthetic_input": 0
+  },
+  "finalization_reference": "finalization-2026-10-14.json"
+}

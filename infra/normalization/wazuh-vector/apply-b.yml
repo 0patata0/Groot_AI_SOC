@@ -1,0 +1,472 @@
+[
+  {
+    "name": "Operator connects Vector shadow input to Wazuh on B",
+    "hosts": "local",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "candidate_dir": "/var/lib/capstone-automation/ansible/wazuh-vector-candidate",
+      "rule_path": "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/capstone_vector_rules.xml"
+    },
+    "tasks": [
+      {
+        "name": "Require fixed local root operator and reviewed host",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '1e143067c98a44ffba6eaa925dc038d7'",
+            "ansible_version.full is version('2.21', '>=')",
+            "ansible_version.full is version('2.22', '<')"
+          ]
+        }
+      },
+      {
+        "name": "Snapshot existing approval boundary",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/usr/local/sbin/rule-change-executor",
+          "/opt/rule-change/rule_change_mcp.py",
+          "/opt/rule-change/run-rule-change.sh",
+          "/etc/rule-change/config.json",
+          "/etc/sudoers.d/capstone-rule-change",
+          "/etc/systemd/system/rule-change-worker.service",
+          "/etc/systemd/system/rule-change-worker.timer"
+        ],
+        "register": "boundary_before",
+        "no_log": true
+      },
+      {
+        "name": "Inspect private candidate directory",
+        "ansible.builtin.stat": {
+          "path": "{{ candidate_dir }}",
+          "follow": false
+        },
+        "register": "candidate_before"
+      },
+      {
+        "name": "Reject replaced candidate directory",
+        "ansible.builtin.assert": {
+          "that": [
+            "not candidate_before.stat.exists or (candidate_before.stat.isdir and not candidate_before.stat.islnk and candidate_before.stat.uid == 0)"
+          ]
+        }
+      },
+      {
+        "name": "Create private candidate directory",
+        "ansible.builtin.file": {
+          "path": "{{ candidate_dir }}",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Snapshot unchanged existing local_rules.xml",
+        "ansible.builtin.stat": {
+          "path": "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "local_rules_before"
+      },
+      {
+        "name": "Inspect dedicated new rule file",
+        "ansible.builtin.stat": {
+          "path": "{{ rule_path }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "rule_before"
+      },
+      {
+        "name": "Reject unsafe rule destination",
+        "ansible.builtin.assert": {
+          "that": [
+            "not rule_before.stat.exists or (rule_before.stat.isreg and not rule_before.stat.islnk and rule_before.stat.nlink == 1)",
+            "local_rules_before.stat.exists",
+            "local_rules_before.stat.isreg"
+          ]
+        }
+      },
+      {
+        "name": "Record existing manager container identity",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "--format",
+            "{{ '{{' }}.Id{{ '}}' }}",
+            "single-node-wazuh.manager-1"
+          ]
+        },
+        "changed_when": false,
+        "register": "manager_before"
+      },
+      {
+        "name": "Check all dedicated rule IDs are absent from other files",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "single-node-wazuh.manager-1",
+            "grep",
+            "-R",
+            "-E",
+            "--include=*.xml",
+            "--exclude=capstone_vector_rules.xml",
+            "id[[:space:]]*=[[:space:]]*[\"']1002(00|01|10|11|20|21|30|31|40|41|42|43|44|45|46|47|48|49|50|51|52|53|60|61|62|90|91|92|93|94)[\"']",
+            "/var/ossec/etc/rules",
+            "/var/ossec/ruleset/rules"
+          ]
+        },
+        "register": "rule_id_scan",
+        "changed_when": false,
+        "failed_when": "rule_id_scan.rc != 1",
+        "no_log": true
+      },
+      {
+        "name": "Recheck manager identity before rule installation",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "--format",
+            "{{ '{{' }}.Id{{ '}}' }}",
+            "single-node-wazuh.manager-1"
+          ]
+        },
+        "changed_when": false,
+        "register": "manager_preinstall"
+      },
+      {
+        "name": "Reject manager replacement before installation",
+        "ansible.builtin.assert": {
+          "that": [
+            "manager_before.stdout == manager_preinstall.stdout"
+          ]
+        }
+      },
+      {
+        "name": "Recheck dedicated rules immediately before installation",
+        "ansible.builtin.stat": {
+          "path": "{{ rule_path }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "rule_preinstall"
+      },
+      {
+        "name": "Reject concurrent dedicated rule changes",
+        "ansible.builtin.assert": {
+          "that": [
+            "rule_before.stat.exists == rule_preinstall.stat.exists",
+            "(rule_before.stat.checksum | default('')) == (rule_preinstall.stat.checksum | default(''))",
+            "(rule_before.stat.uid | default(-1)) == (rule_preinstall.stat.uid | default(-1))",
+            "(rule_before.stat.gid | default(-1)) == (rule_preinstall.stat.gid | default(-1))",
+            "(rule_before.stat.mode | default('')) == (rule_preinstall.stat.mode | default(''))",
+            "not rule_preinstall.stat.exists or (rule_preinstall.stat.isreg and not rule_preinstall.stat.islnk and rule_preinstall.stat.nlink == 1)"
+          ]
+        }
+      },
+      {
+        "name": "Install dedicated shadow evidence and canary rules with rollback",
+        "when": "not ansible_check_mode",
+        "block": [
+          {
+            "name": "Atomically install the reviewed new rule with backup",
+            "ansible.builtin.copy": {
+              "src": "{{ playbook_dir }}/capstone_vector_rules.xml",
+              "dest": "{{ rule_path }}",
+              "owner": "999",
+              "group": "999",
+              "mode": "0660",
+              "backup": true
+            },
+            "register": "rule_install"
+          },
+          {
+            "name": "Validate complete live ruleset before restart",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "single-node-wazuh.manager-1",
+                "/var/ossec/bin/wazuh-analysisd",
+                "-t"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Run nine synthetic native rule tests before restart",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-installed-manager.sh"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Run isolated synthetic correlation scenarios",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-correlation-manager.sh"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Test native journal storage and collection health rules without journal injection",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-health-manager.sh"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Test independent indexable evidence boundary without live injection",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-evidence-manager.sh"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Restart the same existing manager container after a rule change",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "restart",
+                "--time",
+                "30",
+                "single-node-wazuh.manager-1"
+              ]
+            },
+            "when": "rule_install.changed"
+          },
+          {
+            "name": "Check required manager processes",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "single-node-wazuh.manager-1",
+                "/var/ossec/bin/wazuh-control",
+                "status"
+              ]
+            },
+            "changed_when": false,
+            "register": "manager_status",
+            "failed_when": false,
+            "until": "'wazuh-analysisd is running' in manager_status.stdout and 'wazuh-remoted is running' in manager_status.stdout and 'wazuh-db is running' in manager_status.stdout and 'wazuh-logcollector is running' in manager_status.stdout",
+            "retries": 20,
+            "delay": 3
+          },
+          {
+            "name": "Record manager container identity after reload",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "inspect",
+                "--format",
+                "{{ '{{' }}.Id{{ '}}' }}",
+                "single-node-wazuh.manager-1"
+              ]
+            },
+            "changed_when": false,
+            "register": "manager_after"
+          },
+          {
+            "name": "Require the original container identity",
+            "ansible.builtin.assert": {
+              "that": [
+                "manager_before.stdout == manager_after.stdout"
+              ]
+            }
+          },
+          {
+            "name": "Retest rule matching in the restarted manager",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-installed-manager.sh"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Run isolated synthetic correlation scenarios",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-correlation-manager.sh"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Test native journal storage and collection health rules without journal injection",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-health-manager.sh"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Test independent indexable evidence boundary without live injection",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/sh",
+                "{{ playbook_dir }}/tests/test-evidence-manager.sh"
+              ]
+            },
+            "changed_when": false
+          }
+        ],
+        "rescue": [
+          {
+            "name": "Restore previous dedicated rule when a backup exists",
+            "ansible.builtin.copy": {
+              "src": "{{ rule_install.backup_file }}",
+              "remote_src": true,
+              "dest": "{{ rule_path }}",
+              "owner": "999",
+              "group": "999",
+              "mode": "0660"
+            },
+            "when": "rule_install is defined and rule_install.backup_file is defined"
+          },
+          {
+            "name": "Remove only the newly created rule on failed first installation",
+            "ansible.builtin.file": {
+              "path": "{{ rule_path }}",
+              "state": "absent"
+            },
+            "when": "not rule_before.stat.exists and rule_install is defined and rule_install.changed | default(false)"
+          },
+          {
+            "name": "Validate restored original ruleset",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "single-node-wazuh.manager-1",
+                "/var/ossec/bin/wazuh-analysisd",
+                "-t"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Restart original container after rollback",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "restart",
+                "--time",
+                "30",
+                "single-node-wazuh.manager-1"
+              ]
+            },
+            "when": "rule_install is defined and rule_install.changed | default(false)"
+          },
+          {
+            "name": "Check required manager processes",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "single-node-wazuh.manager-1",
+                "/var/ossec/bin/wazuh-control",
+                "status"
+              ]
+            },
+            "changed_when": false,
+            "register": "manager_status",
+            "failed_when": false,
+            "until": "'wazuh-analysisd is running' in manager_status.stdout and 'wazuh-remoted is running' in manager_status.stdout and 'wazuh-db is running' in manager_status.stdout and 'wazuh-logcollector is running' in manager_status.stdout",
+            "retries": 20,
+            "delay": 3
+          },
+          {
+            "name": "Report restored manager deployment failure",
+            "ansible.builtin.fail": {
+              "msg": "Wazuh Vector rule deployment failed; dedicated rule restored or removed, original container restarted. Check native health."
+            }
+          }
+        ]
+      },
+      {
+        "name": "Recheck existing local_rules.xml",
+        "ansible.builtin.stat": {
+          "path": "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "local_rules_after"
+      },
+      {
+        "name": "Require unchanged local_rules.xml bytes and metadata",
+        "ansible.builtin.assert": {
+          "that": [
+            "local_rules_before.stat.checksum == local_rules_after.stat.checksum",
+            "local_rules_before.stat.uid == local_rules_after.stat.uid",
+            "local_rules_before.stat.gid == local_rules_after.stat.gid",
+            "local_rules_before.stat.mode == local_rules_after.stat.mode"
+          ]
+        }
+      },
+      {
+        "name": "Recheck unchanged approval boundary",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/usr/local/sbin/rule-change-executor",
+          "/opt/rule-change/rule_change_mcp.py",
+          "/opt/rule-change/run-rule-change.sh",
+          "/etc/rule-change/config.json",
+          "/etc/sudoers.d/capstone-rule-change",
+          "/etc/systemd/system/rule-change-worker.service",
+          "/etc/systemd/system/rule-change-worker.timer"
+        ],
+        "register": "boundary_after",
+        "no_log": true
+      },
+      {
+        "name": "Require identical approval files and permissions",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.0.stat.exists == item.1.stat.exists",
+            "(item.0.stat.checksum | default('')) == (item.1.stat.checksum | default(''))",
+            "(item.0.stat.uid | default(-1)) == (item.1.stat.uid | default(-1))",
+            "(item.0.stat.gid | default(-1)) == (item.1.stat.gid | default(-1))",
+            "(item.0.stat.mode | default('')) == (item.1.stat.mode | default(''))"
+          ]
+        },
+        "loop": "{{ boundary_before.results | zip(boundary_after.results) | list }}",
+        "no_log": true
+      }
+    ]
+  }
+]

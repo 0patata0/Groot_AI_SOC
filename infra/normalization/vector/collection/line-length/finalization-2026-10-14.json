@@ -1,0 +1,81 @@
+{
+  "at_kst": "2026-10-14T21:29:41.588553+09:00",
+  "status": "stage2_complete",
+  "evidence": {
+    "a": {
+      "at_kst": "2026-10-14T21:24:05.808300+09:00",
+      "host": "a",
+      "files": 149,
+      "bytes": 260208,
+      "sha256_all_equal": true,
+      "original_prefix": "/var/tmp/capstone-sequential-20261014/step2",
+      "preserved_prefix": "/opt/capstone-automation/project/evidence/sequential-20261014/step2",
+      "embedded_original_paths_are_historical": true
+    },
+    "b": {
+      "at_kst": "2026-10-14T21:24:08.467789+09:00",
+      "host": "b",
+      "files": 107,
+      "bytes": 215335,
+      "sha256_all_equal": true,
+      "original_prefix": "/var/tmp/capstone-sequential-20261014/step2",
+      "preserved_prefix": "/opt/capstone-automation/project/evidence/sequential-20261014/step2",
+      "embedded_original_paths_are_historical": true
+    }
+  },
+  "source_and_server_temp_cleanup": {
+    "a": {
+      "at_kst": "2026-10-14T21:29:12.355337+09:00",
+      "source_files": 120,
+      "source_bytes": 709780,
+      "changed": 24,
+      "source_sha_verified": true,
+      "evidence_sha_verified": true,
+      "backup": "/var/backups/capstone-raw-line-source-20261014",
+      "removed": [
+        {
+          "path": "/var/tmp/capstone-sequential-20261014/step2",
+          "files": 149,
+          "absent": true
+        },
+        {
+          "path": "/var/tmp/capstone-sequential-20261014/closure-step2",
+          "files": 121,
+          "absent": true
+        }
+      ],
+      "operating_configuration_changed_by_closure": false,
+      "stage2_operating_deployment_previously_verified": true,
+      "packages_installed": 0,
+      "mac_cleanup_deferred_until_shared_session_end": true
+    },
+    "b": {
+      "at_kst": "2026-10-14T21:29:13.421907+09:00",
+      "source_files": 120,
+      "source_bytes": 709780,
+      "changed": 24,
+      "source_sha_verified": true,
+      "evidence_sha_verified": true,
+      "backup": "/var/backups/capstone-raw-line-source-20261014",
+      "removed": [
+        {
+          "path": "/var/tmp/capstone-sequential-20261014/step2",
+          "files": 107,
+          "absent": true
+        },
+        {
+          "path": "/var/tmp/capstone-sequential-20261014/closure-step2",
+          "files": 121,
+          "absent": true
+        }
+      ],
+      "operating_configuration_changed_by_closure": false,
+      "stage2_operating_deployment_previously_verified": true,
+      "packages_installed": 0,
+      "mac_cleanup_deferred_until_shared_session_end": true
+    }
+  },
+  "source_snapshot_predates_this_finalization": true,
+  "mac_task_temporary_root_retained_for_next_stage": true,
+  "packages_installed": 0
+}

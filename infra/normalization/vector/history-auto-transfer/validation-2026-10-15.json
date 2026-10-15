@@ -1,0 +1,208 @@
+{
+  "date_kst": "2026-10-15",
+  "deployment_helper_native": {
+    "account_changes": 0,
+    "cases": 20,
+    "executed": true,
+    "failed": 0,
+    "network_calls": 0,
+    "passed": 20,
+    "platform": "B Linux root private fixture",
+    "provenance": "parent operator direct execution recorded in conversation log",
+    "test_sha256": "350b89cf99ba55e3623247581f33799c966fd37dc9092bbcf3dad7c14c37ca40",
+    "unit_calls": 0
+  },
+  "first_transfer": {
+    "automatic_input_retry": false,
+    "bytes": 5799184,
+    "discovered_batches": 18,
+    "new_receipts": 18,
+    "observed_at_kst": "2026-10-15T09:16:58+09:00",
+    "policy": "capstone-history-auto-transfer-v1",
+    "receipt_catalog_sha256": "e5d14ff6e577b8276f439d9e3d4e565b5d91fa77ac7ee5d4128c04826dd0c0bc",
+    "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+    "records": 13741,
+    "reused_receipts": 0,
+    "schema_version": 1,
+    "scope": "completed_batch_manifest_snapshot",
+    "security_delivery_acknowledged": false,
+    "source_acknowledged": false,
+    "source_changed": false,
+    "source_machine_id": "096e90b6243e438aa8a7b392be754732",
+    "status": "remote_files_preserved",
+    "verified_receipts": 18
+  },
+  "idempotence": {
+    "first_and_second_envelope_catalogs_differ": true,
+    "preexisting_manual_batch_file_hashes_unchanged": true,
+    "preexisting_manual_batches": 2,
+    "provenance": "parent directly verified stored files with sha256sum before and after second run",
+    "reason": "the reused response-envelope flag changes; stored canonical receipts remain byte-identical",
+    "stored_canonical_receipt_hashes_unchanged": true
+  },
+  "installation": {
+    "a": {
+      "account": "capstone-hist",
+      "at_kst": "2026-10-15T09:14:52+09:00",
+      "exporter_sha256": "dc4fc243116d27702b99613630a5488969a95033a7674d79eee137336fd00725",
+      "forced_readonly": true,
+      "negative_sudo_command_rejected": true,
+      "password_locked": true,
+      "public_key_input_sha256": "07363c9157653c2863b4841e7b7659a296aea07a22488d9718848a80018486a0",
+      "schema_version": 1,
+      "source_batches_changed": false,
+      "ssh_reload_calls": 0,
+      "status": "sender_installed",
+      "transfer_executed": false
+    },
+    "b": {
+      "at_kst": "2026-10-15T09:15:09+09:00",
+      "existing_receipts_changed": false,
+      "host_public_key_input_sha256": "c25952cbd358f5acf97c383aa39ebce812c0762fb6c0ca28d855b79c3f1c9cec",
+      "private_key_exported": false,
+      "receiver_source_changed": false,
+      "runtime_manifest_sha256": "141364913b6ae08a4a13064e8f6f3b57c774b9aee6ec8ef5995bca3a1db5c421",
+      "schema_version": 1,
+      "status": "pull_installed_timer_disabled",
+      "timer_enabled": false,
+      "transfer_executed": false
+    },
+    "b_key_created_at_kst": "2026-10-15T09:14:15+09:00",
+    "private_key_exported": false,
+    "real_ssh_arbitrary_command_exit_code": 65,
+    "runtime_and_installer_sources_changed_after_native": false
+  },
+  "installed": true,
+  "installer_source_sha256": {
+    "common.sh": "74935efe4693dd2b99eff2a400d82f33335df5db15a9f0790b0db06b629b843b",
+    "deploy-a.sh": "bd231056567db7ad29737d3cbae1c63312c79dd353fa9fbed45cf1ee825329d8",
+    "deploy-b.sh": "53d13a5665d8a0627a505449d64b495bf6f7c0bcd13469105e7dffd08054820f",
+    "source-pins.sha256": "98cc1749d0d6437b37fd37bf890ee6d83f1c937fbd33d3c7f2ab343319ac4587"
+  },
+  "local_bash_syntax": {
+    "files": 11,
+    "passed": 11
+  },
+  "native_runtime": {
+    "actual_rsync_no_network_argv_cases": 2,
+    "cases": 33,
+    "failed": 0,
+    "operating_source_mutations": 0,
+    "passed": 33,
+    "platform": "B Linux existing rsync 3.2.7",
+    "provenance": "parent operator reported direct B execution; this agent performed no SSH",
+    "real_ssh_calls": 0,
+    "receiver_fixture_generator_sha256": "9e5fdfcb8c171a78ec7a696b55966df0f2a67d218c2408511692cd6993da753a",
+    "remote_test_path": "/var/tmp/capstone-tools-followup-20261015/history-src-v2/history-auto-transfer/test-native.sh"
+  },
+  "operator_check_corrections": [
+    {
+      "corrected_file_count": 207,
+      "issue": "expected 36 payload/manifest files but source snapshot includes metadata files",
+      "source_changed": false
+    },
+    {
+      "issue": "negative SSH probe without -n consumed operator script stdin",
+      "pulls_in_failed_attempt": 0,
+      "resolution": "one-off SSH probe used -n before successful first transfer",
+      "runtime_changed": false
+    }
+  ],
+  "parent_metadata_evidence_sha256": {
+    "history-first-v2-b.json": "ab51d0344cf50704b049ce5645ca78a5d5766d7dbe00c2b498e51acbc47fd5f1",
+    "history-installed-a.json": "2674960db5bfd6bed31ad6ee322b0dc85a2a6b8545c4a358709a1071e7b0e411",
+    "history-installed-b.json": "bc09f245535971c05492460f27c2cab1b2becca28ee6d5e5f0e42b944c4a7ef6",
+    "history-second-b.json": "39bd8dc28a730590c89d8e23c58918de32d26a429032dc706da32696cd7f583e",
+    "history-source-check-a.json": "e1ac556f062d8cec6b15fb4676bfb65367f14b2115e9051544b1957a162b338a"
+  },
+  "permanent_evidence_finalization": {
+    "archive_completed": false,
+    "cleanup_completed": false,
+    "status": "in_progress"
+  },
+  "real_transfer_executed": true,
+  "resolved_native_cli_mismatch": {
+    "rejected_argument": "--no-delete",
+    "resolution": "omit unsupported argument; no deletion flag; A rrsync -ro retained"
+  },
+  "runtime_and_test_sha256": {
+    "capstone-history-auto-transfer.service": "b1c3b9a1836d0283ad81a121f181c2ea6b59d9b2f8dce02d455969609852876f",
+    "capstone-history-auto-transfer.timer": "5b757e05080d0bb62ee846a285bde086156deab0c16bfaf7d0c9f0d42ecf4fe0",
+    "export-a.sh": "dc4fc243116d27702b99613630a5488969a95033a7674d79eee137336fd00725",
+    "run-b.sh": "8e1c9a6bbc695fa5581021b00963c2f2176b23766cae16bd45d03b0588ac4cf2",
+    "runtime.sha256": "141364913b6ae08a4a13064e8f6f3b57c774b9aee6ec8ef5995bca3a1db5c421",
+    "ssh-b.sh": "7ea52f7d15e77a241aec04c9c77544d2553d61e7b343b9bdf607a543e296bd85",
+    "ssh-gate-a.sh": "878ac8112bf3b5419c4da1b9bcbce20deb0e844808dab44340e0eda5a8ab56a8",
+    "test-native.sh": "b1938a1c30ffa0fab6de1f0e74b228eefd9bf0ee73b261474402ca8d1cdd9852",
+    "transfer-lib.sh": "012411c7a2f1a1b27f0e9ce5a120198a32bb9632f6f09a06ebcf6a86d4b733c2",
+    "worker-b.sh": "7e783365c4af1ba44ec4b5b5705a336402632760cfb05b2e060b020e9bd80e59"
+  },
+  "schema_version": 1,
+  "second_transfer": {
+    "automatic_input_retry": false,
+    "bytes": 5799184,
+    "discovered_batches": 18,
+    "new_receipts": 0,
+    "observed_at_kst": "2026-10-15T09:17:29+09:00",
+    "policy": "capstone-history-auto-transfer-v1",
+    "receipt_catalog_sha256": "ce91c297dc354e8b74ba5d83cf9ce8b0e8b6be84296b47f43568512b5597da91",
+    "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+    "records": 13741,
+    "reused_receipts": 18,
+    "schema_version": 1,
+    "scope": "completed_batch_manifest_snapshot",
+    "security_delivery_acknowledged": false,
+    "source_acknowledged": false,
+    "source_changed": false,
+    "source_machine_id": "096e90b6243e438aa8a7b392be754732",
+    "status": "remote_files_preserved",
+    "verified_receipts": 18
+  },
+  "security_delivery_acknowledged": false,
+  "source_acknowledged": false,
+  "source_preservation": {
+    "batches": 18,
+    "compared_fields": [
+      "path",
+      "sha256",
+      "bytes",
+      "inode"
+    ],
+    "files": 207,
+    "scope": "files directly under the 18 completed A batch directories",
+    "snapshot_sha256": "061c78c08ddff76396134f3c5a3613626e241b5d8b6cfa312df5e315d13aeb5d",
+    "source_unchanged": true
+  },
+  "status": "installed_manual_and_initial_automatic_preservation_verified_natural_tick_pending",
+  "timer": {
+    "accuracy_seconds": 30,
+    "active": true,
+    "enabled": true,
+    "immediate_automatic_execution_verified": true,
+    "initial_automatic_tick": {
+      "exit_code": 0,
+      "finished_at_kst": "2026-10-15T09:18:04+09:00",
+      "invocation_id": "0d8a7084178e4696bb8753bd85942a57",
+      "new_receipts": 0,
+      "provenance": "parent directly observed service execution and metadata",
+      "records": 13741,
+      "reused_receipts": 18,
+      "started_at_kst": "2026-10-15T09:17:57+09:00"
+    },
+    "next_natural_tick_expected_kst": "2026-10-15T09:33:04+09:00",
+    "observation_status": "initial_automatic_tick_passed_next_15min_tick_pending",
+    "on_boot_seconds": 180,
+    "on_unit_inactive_seconds": 900,
+    "subsequent_natural_tick_verified": false
+  },
+  "timer_enabled": true,
+  "natural_15minute_followup": {
+    "start_kst": "2026-10-15T09:33:15+09:00",
+    "end_kst": "2026-10-15T09:33:22+09:00",
+    "invocation_id": "c9e8e4e93b5b4ba593138707ef77bdc1",
+    "exit_code": 0,
+    "new_receipts": 0,
+    "reused_receipts": 18,
+    "records": 13741
+  }
+}

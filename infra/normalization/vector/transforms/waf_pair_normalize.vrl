@@ -1,0 +1,60 @@
+# Candidate after reduce merge_strategies.waf_parts="array". A missing,
+# duplicate, mismatched, or ambiguous partner must be quarantined intact.
+parts = array!(.waf_parts)
+if length(parts) == 1 && parts[0].kind == "access" {
+  # RelevantOnly legitimately produces no audit for ordinary access requests.
+  # The separate access file remains the recovery source.
+  . = {"ignored_waf_access": true}
+} else {
+  assert!(length(parts) == 2, "waf_pair_cardinality")
+audit = {}
+access = {}
+audit_count = 0
+access_count = 0
+for_each(parts) -> |_index, part| {
+  if part.kind == "audit" { audit = object!(part); audit_count = audit_count + 1 }
+  if part.kind == "access" { access = object!(part); access_count = access_count + 1 }
+}
+assert!(audit_count == 1 && access_count == 1, "waf_pair_kinds")
+for_each(["sensor", "instance_id", "configuration_sha256", "deployment_binding", "request_id", "source_ip", "destination_ip", "source_port", "destination_port", "http_method", "http_status"]) -> |_index, key| {
+  assert!(get!(audit, [key]) != null && get!(audit, [key]) == get!(access, [key]), "waf_pair_binding_mismatch")
+}
+assert!(audit.source_file == get_env_var!("WAF_AUDIT_PATH") && access.source_file == get_env_var!("WAF_ACCESS_PATH"), "waf_pair_source_binding")
+assert!(audit.instance_id == get_env_var!("WAF_INSTANCE_ID") && audit.configuration_sha256 == get_env_var!("WAF_CONFIG_SHA256") && audit.sensor == get_env_var!("CAPSTONE_SENSOR"), "waf_pair_current_binding")
+assert!(audit.deployment_binding == get_env_var!("WAF_DEPLOYMENT_BINDING"), "waf_pair_producer_binding")
+audit_time = parse_timestamp!(string!(audit.naive_time) + " " + string!(access.offset), format: "%a %b %e %T %Y %:z")
+audit_ms = to_unix_timestamp(audit_time, unit: "milliseconds")
+end_ms = int!(access.epoch_ms)
+start_ms = end_ms - int!(access.duration_ms)
+# asctime has one-second precision; request start and log end use the same
+# independently offset-qualified nginx clock. Clock jumps fail this check.
+assert!(audit_ms >= start_ms - 2000 && audit_ms <= end_ms + 1000, "waf_pair_time_mismatch")
+event_time = from_unix_timestamp!(end_ms, unit: "milliseconds")
+sensor = string!(audit.sensor)
+request_id = string!(audit.request_id)
+event_id = sha2(encode_json([sensor, "modsecurity", audit.instance_id, audit.deployment_binding, request_id]), variant: "SHA-256")
+norm = {
+  "schema_version": "vector-1", "pipeline": "vector", "source": "modsecurity",
+  "sensor": sensor, "record_id": string!(audit.deployment_binding) + "-" + request_id, "event_id": event_id,
+  "message_sha256": audit.message_sha256, "time_evidence_sha256": access.message_sha256,
+  "hash_scope": "vector_message_without_line_delimiter",
+  "identity_scope": "deployment_binding_request_id", "provenance_level": "collector_paired_observation",
+  "writer_instance_id": audit.instance_id, "configuration_sha256": audit.configuration_sha256,
+  "deployment_binding": audit.deployment_binding,
+  "observed_at_kst": audit.observed_at_kst,
+  "event_time_kst": format_timestamp!(event_time, format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul"),
+  "time_status": "trusted_access_completion", "rule_ids": audit.rule_ids,
+  "native_severity_value": audit.severities, "native_severity_scale": "modsecurity_0_7",
+  "source_ip": audit.source_ip, "destination_ip": audit.destination_ip,
+  "source_port": audit.source_port, "destination_port": audit.destination_port,
+  "http_method": audit.http_method, "http_status": audit.http_status,
+  "protocol": "tcp", "direction": "unknown", "action": "observed",
+  "engine_mode": audit.engine_mode, "quality_flags": [],
+  "time_basis": "nginx_access_completion", "source_replay_deduplicated": false,
+  "omitted_response_server_duplicates": audit.allowed_server_duplicates,
+  "protected_asset": includes(["211.170.162.110", "211.170.162.111"], audit.source_ip) || includes(["211.170.162.110", "211.170.162.111"], audit.destination_ip)
+}
+. = {"capstone_norm": norm}
+assert!(length(encode_json(.)) <= 32768, "normalized_size")
+
+}

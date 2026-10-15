@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodically preserve one bounded previous-boot kernel batch
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=5min
+AccuracySec=10s
+Unit=capstone-vector-history-auto.service
+
+[Install]
+WantedBy=timers.target

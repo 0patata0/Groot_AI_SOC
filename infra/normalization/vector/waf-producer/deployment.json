@@ -1,0 +1,14 @@
+{
+  "schema": "waf-producer-deployment-1",
+  "machine_id": "096e90b6243e438aa8a7b392be754732",
+  "container_name": "waf",
+  "instance_id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+  "deployment_binding": "9c747413278ffafd4ceb315e09ea616ae6880e80c40349a182766a0888a58807",
+  "configuration_sha256": "6b987c4684338e7c8210eeb7540f6ffb7b0a5e75f6b86e16f0671ceef8b99593",
+  "configuration_hash_scope": "exact_bytes_of_zz-capstone-evidence.conf",
+  "existing_nginx_digest": "99913d3dee149d96408fe5874a4dcc67ebbac34899373f4e9069539a558e5aad",
+  "custom_rules_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+  "audit_path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log",
+  "access_path": "/home/groot_a/capstone/secstack/logs/modsec/capstone-access.log",
+  "container_target": "/etc/nginx/conf.d/zz-capstone-evidence.conf"
+}

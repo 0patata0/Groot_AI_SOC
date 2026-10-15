@@ -1,0 +1,28 @@
+[Unit]
+Description=Observe fixed Capstone storage capacity and retention review counts
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+ExecStart=/usr/local/lib/capstone-storage-monitor/monitor.sh run
+StandardOutput=null
+StandardError=journal
+TimeoutStartSec=45s
+TimeoutStopSec=2s
+SuccessExitStatus=2 75
+StateDirectory=capstone-storage-monitor
+StateDirectoryMode=0700
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/capstone-storage-monitor
+RestrictAddressFamilies=AF_UNIX
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true

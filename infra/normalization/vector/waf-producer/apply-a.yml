@@ -1,0 +1,150 @@
+[
+  {
+    "name": "Install fixed WAF evidence producer on existing A container",
+    "hosts": "local",
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "become": false,
+    "any_errors_fatal": true,
+    "tasks": [
+      {
+        "name": "Require the reviewed local root host and Ansible version",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '096e90b6243e438aa8a7b392be754732'",
+            "ansible_version.full is version('2.21', '>=')",
+            "ansible_version.full is version('2.22', '<')"
+          ]
+        }
+      },
+      {
+        "name": "Validate or apply exact producer inside the pinned existing container",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/sh",
+            "{{ playbook_dir }}/apply-producer.sh",
+            "{{ ansible_check_mode | ternary('check', 'apply') }}"
+          ]
+        },
+        "check_mode": false,
+        "register": "producer_result",
+        "changed_when": "producer_result.rc == 0 and (producer_result.stdout | from_json).changed"
+      },
+      {
+        "name": "Report native validation and process preservation metadata",
+        "ansible.builtin.debug": {
+          "var": "producer_result.stdout"
+        }
+      },
+      {
+        "name": "Require the helper to confirm loaded producer descriptors",
+        "ansible.builtin.assert": {
+          "that": [
+            "(producer_result.stdout | from_json).producer_master_worker_fd_verified | default(false)"
+          ]
+        },
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Recheck live container identity before publishing binding",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "--type",
+            "container",
+            "waf"
+          ]
+        },
+        "register": "container_after",
+        "changed_when": false,
+        "no_log": true,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Require the same running full container identity",
+        "ansible.builtin.assert": {
+          "that": [
+            "(container_after.stdout | from_json)[0].Id == deployment.instance_id",
+            "(container_after.stdout | from_json)[0].State.Running"
+          ]
+        },
+        "no_log": true,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Recheck exact installed producer bytes and safe metadata",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "-u",
+            "0",
+            "{{ deployment.instance_id }}",
+            "sh",
+            "-c",
+            "set -eu; target=/etc/nginx/conf.d/zz-capstone-evidence.conf; test -f \"$target\"; test ! -L \"$target\"; stat -c \"%u:%g:%a:%h\" \"$target\"; sha256sum \"$target\""
+          ]
+        },
+        "register": "installed_after",
+        "changed_when": false,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Require reviewed producer SHA and a sole regular root-owned file",
+        "ansible.builtin.assert": {
+          "that": [
+            "installed_after.stdout_lines[0] == '0:0:644:1'",
+            "installed_after.stdout_lines[1].split()[0] == deployment.configuration_sha256"
+          ]
+        },
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Inspect binding directory and destination without following links",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false
+        },
+        "loop": [
+          "/etc/capstone-vector",
+          "/etc/capstone-vector/waf-binding.json"
+        ],
+        "register": "binding_paths",
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Require existing protected Vector directory and safe binding file",
+        "ansible.builtin.assert": {
+          "that": [
+            "binding_paths.results[0].stat.isdir | default(false)",
+            "not binding_paths.results[0].stat.islnk",
+            "binding_paths.results[0].stat.uid == 0",
+            "binding_paths.results[0].stat.mode == '0700'",
+            "not binding_paths.results[1].stat.exists or (binding_paths.results[1].stat.isreg and not binding_paths.results[1].stat.islnk and binding_paths.results[1].stat.uid == 0 and binding_paths.results[1].stat.nlink == 1)"
+          ]
+        },
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Publish verified deployment binding atomically for Vector",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/deployment.json",
+          "dest": "/etc/capstone-vector/waf-binding.json",
+          "owner": "0",
+          "group": "0",
+          "mode": "0600",
+          "backup": true
+        },
+        "when": "not ansible_check_mode"
+      }
+    ],
+    "vars": {
+      "deployment": "{{ lookup('ansible.builtin.file', playbook_dir + '/deployment.json') | from_json }}"
+    }
+  }
+]

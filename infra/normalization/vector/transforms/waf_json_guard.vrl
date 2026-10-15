@@ -1,0 +1,47 @@
+# Candidate only. Native JSON validation precedes a bounded duplicate-key audit.
+# This preserves the history that parse_json's object representation discards.
+raw = string!(.message)
+assert!(length(raw) <= 131072, "waf_json_input_limit")
+parsed = object!(parse_json!(raw, max_depth: 32, lossy: false))
+tokens = parse_regex_all!(raw, r'(?P<string>"(?:[^"\\]|\\.)*")|(?P<open>[\{\[])|(?P<close>[\}\]])|(?P<colon>:)|(?P<comma>,)|(?P<literal>true|false|null|-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)')
+assert!(length(tokens) <= 16384, "waf_json_token_limit")
+stack = []
+allowed_server_duplicates = 0
+for_each(tokens) -> |index, token| {
+  if token.open != null {
+    scope_path = []
+    if length(stack) > 0 {
+      parent = object!(get!(stack, [length(stack) - 1]))
+      scope_path = array!(parent.path)
+      if parent.kind == "{" { scope_path = push(scope_path, string!(parent.pending_key)) }
+      else { scope_path = push(scope_path, "[]") }
+    }
+    stack = push(stack, {"kind": token.open, "path": scope_path, "keys": {}, "pending_key": ""})
+    assert!(length(stack) <= 32, "waf_json_depth_limit")
+  } else if token.close != null {
+    assert!(length(stack) > 0, "waf_json_scope_underflow")
+    stack = pop(stack)
+  } else if token.string != null {
+    next_token = get!(tokens, [index + 1])
+    if next_token.colon != null {
+      frame_index = length(stack) - 1
+      frame = object!(get!(stack, [frame_index]))
+      assert!(frame.kind == "{", "waf_json_key_outside_object")
+      key = string!(parse_json!(string!(token.string), lossy: false))
+      value_token = get!(tokens, [index + 2])
+      value_is_string = value_token.string != null
+      seen = object!(frame.keys)
+      previous = get!(seen, [key])
+      if previous != null {
+        assert!(frame.path == ["transaction", "response", "headers"] && key == "Server" && previous == true && value_is_string, "waf_duplicate_key")
+        allowed_server_duplicates = allowed_server_duplicates + 1
+      }
+      frame.keys = set!(seen, [key], value_is_string)
+      frame.pending_key = key
+      stack = set!(stack, [frame_index], frame)
+    }
+  }
+}
+assert!(length(stack) == 0, "waf_json_scope_unclosed")
+.waf_json = parsed
+.waf_allowed_server_duplicates = allowed_server_duplicates

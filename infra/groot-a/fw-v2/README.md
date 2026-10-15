@@ -1,9 +1,33 @@
 # FW v2 — Groot_A "빡빡한 룰" (2026-10-01 설계, 2026-10-06 상태 갱신)
 
+## 2026-10-13 19:30 KST — DGX 자동 차단 보호 반영
+
+A의 라이브 `never_block`과 영구 설정 `/etc/nftables.d/capstone-fw.nft`에 **`211.170.162.110/32`·`211.170.162.111/32` 두 주소를 추가했다.** 영구 파일 SHA-256은 `6c73c480…`, 백업은 `/var/backups/dgx-never-block-20261013.74xh6tzc`다. 저장소 사본에도 같은 두 보호 주소를 반영했다.
+
+변경 범위는 해당 집합의 두 원소이며 기존 체인·`agent_block`은 불변이다. 이후 input/forward 정책과 두 DGX의 TCP 11434 허용 경로도 유지한다. 이 보호는 자동 차단 대상에서 제외하는 것으로, 모든 포트나 서비스를 허용하는 규칙은 아니다. 아래 10/06 상태와 초기 설계·적용 기록은 당시 사실로 보존한다.
+
 > **상태(2026-10-06 이번 세션 SSH 재점검): FW v2 적용·확정.** A의 `FORWARD=DROP`, `CAPSTONE-FWD` 14룰, nft v2 체인(`SPOOF`·`FW_SSH_RATE`·output)을 05:05~05:07 UTC에 재확인했다. 앞선 [세션 1 기록](../../../대화기록/2026-10-06.md)에는 데드맨 타이머 0, 대시보드 DNAT·A→B/C 경로 확인도 있다. **라이브 파일과 이 저장소 사본의 동일성은 대조하지 않았다.**
 > A의 실측 외부 주소는 `192.168.16.230/25`(직결망 `192.168.16.128/25`, GW `.129`)인데, 라이브 10443 DNAT/`CAPSTONE-FWD`의 출발지 허용목록은 별도 `192.168.16.0/25`다. 이 값은 아래 P11의 설계와 같지만 Kali IP·라우팅이 미확인이라 의도한 실습 출발지를 허용하는지 판단할 수 없다. 시나리오 `OBS_SEG` 목적지도 동일한 `0/25`이므로 실제 경로를 확인한 뒤 재배포한다.
 >
 > 아래 파일 설명·절차·롤백은 2026-10-01~02의 설계 및 적용 준비 기록이다. 당시 `nft -c`(트랜잭션 형태)와 `bash -n`을 통과했다. 이번 SSH 재점검과 룰 수 재집계에서 WAF DetectionOnly/활성 커스텀 고유 ID 10개(기존 11개 기록은 오집계; `id:10010`은 주석 처리)와 IPS 합본(local SID 11개)·Phase-A passive를 확인했다. WAF `On`·IPS 인라인/drop 전환은 미완료다. B manager의 로컬 디코더·룰 파일에는 신규 FW 접두사·WAF 100200+ 분류가 **없다**. IPS local SID 분류는 별도 확인이 필요하며, 모두 공격 실발화 검증이 남았다. A의 브로커 URL·토큰 환경 변수는 설정돼 있고 일반 Tier 2 승인→차단 E2E는 9/28에 검증됐지만 이번 SSH에서 재시험하지 않았다.
+
+## 2026-10-13 B→TPNS 외부 연결 정책 추가
+
+**11:49:12 KST 라이브 적용:** 기존 `FORWARD=DROP`·`CAPSTONE-FWD` 정책 앞에 독립 `CAPSTONE-PUSH` 경로를 추가했다. `DOCKER-USER` 맨 앞의 정확한 jump 1개는 B `10.200.10.10/32`의 `ens160`→`ens192` TCP443에만 적용된다. 따라서 기존 ESTABLISHED 허용도 이 트래픽의 목적지·만료 검사를 우회하지 못하며, 로더가 `CAPSTONE-FWD`를 재구성해도 jump는 유지된다. DGX·DNS·관리 경로를 포함한 다른 filter 규칙은 배포 전후 동일했다.
+
+- `../capstone-push-egress.py` → `/usr/local/sbin/capstone-push-egress.py`: 고정 `push-test.mattermost.com`의 공인 IPv4 최대 16개, 전용 체인과 정확한 jump만 `iptables-restore --noflush`로 원자 갱신·read-back. 전용 체인만 transaction 안에서 명시적으로 flush한다.
+- `../capstone-push-egress.service`·`.timer` → `/etc/systemd/system/`: 5분 갱신, DNS 마지막 성공 후 최대 1시간의 UTC `xt_time --datestop`. DNS 실패 시 기존 기한을 연장하지 않으며 초기 실패는 DROP-only다. updater 중단 후에도 커널 기한이 적용된다.
+- `../capstone-push-egress-nat.conf` → `/etc/systemd/system/capstone-nat.service.d/20-push-egress.conf`: `ExecStartPost`로 부팅·NAT 서비스 재실행 뒤 helper를 실행한다. **기존 `/usr/local/sbin/capstone-nat.sh` 파일과 해시는 변경하지 않았다.** 저장소 로더에도 별도 hook을 넣지 않았다.
+
+백업은 `/var/backups/mattermost-push-egress-20261013.o73oufbn`, helper SHA-256은 `083d56822e71dc773c308cd470f90036f46690e2c4adcc01ed95f341d434de16`이다. 라이브 `--check`·최초 적용·반복 적용·systemd 실행과 read-back이 통과했고, 목적지 3개 ACCEPT + DROP 1개, 첫 jump 1개, 타이머 active/enabled와 `ExecMainStatus=0`을 확인했다. 당시 기한 `03:49:11 UTC`는 `12:49:11 KST`이며 이후 갱신 때 이동한다. B의 실제 HTTPS 접속과 모바일 푸시 수신은 이 정책 검증 범위에 포함하지 않는다.
+
+**11:49:31 KST 후속 실측:** B `mm-app`의 실제 네트워크 namespace에서 푸시 준비 도구 `--check`를 실행했으나 TPNS IPv4 3개 모두 TCP timeout이었다. A `ens160`에서 B SYN을 목적지별 5회 수신 → `ens192`에서 NAT SYN을 각각 5회 송신했고 외부 회신은 0건이었다. 전용 체인 ACCEPT 카운터는 각 목적지에서 5패킷/300바이트 증가해 **로컬 A 허용 정책 통과를 확인했다. 상위 경로는 미확보이며 Mattermost 푸시는 `false`를 유지한다.** 실제 모바일 수신 복구 완료로 판단하지 않는다.
+
+**11:56:53 KST 자동 갱신 확인:** 타이머 active/enabled·마지막 실행 `11:54:12 KST`, 같은 시각 서비스 실행의 `Result=success`·`ExecMainStatus=0`을 확인했다. 목적지 3개 `datestop`이 `03:54:11 UTC` = `12:54:11 KST`로 자동 갱신돼 수동 적용뿐 아니라 실제 타이머 동작도 검증했다. 외부 연결은 위 timeout 관측 상태다.
+
+제거 순서는 `systemctl disable --now capstone-push-egress.timer` → `systemctl stop capstone-push-egress.service` → 위 drop-in 파일만 제거 → `systemctl daemon-reload` → `python3 -B /usr/local/sbin/capstone-push-egress.py --remove`이다(A root 권한). 이어 `iptables -S DOCKER-USER`·`iptables -S CAPSTONE-FWD`로 원래 jump/정책을 확인한다. **아래 10/02 전체 FW v2 롤백 명령을 이 추가 정책 제거에 사용하지 않는다.** conntrack 엔트리는 삭제하지 않으며 회신은 기존 정책을 따른다. 적용 후 read-back 오류에는 helper 자체 자동 복구가 없으므로 상태를 확인하고 전용 범위로 조치한다.
+
+이 정책은 DNS에서 얻은 목적지 IP를 허용하므로 같은 CDN IP의 다른 HTTPS 호스트나 B의 다른 프로세스를 구별하는 L7 통제가 아니다. TLS 호스트명 검증은 Mattermost에서 유지해야 한다. [전체 설치 목록·점검·제거 명령](../README.md#b-모바일-푸시용-제한적-외부-연결-정책).
 
 ## 파일
 | 파일 | 역할 | 배포 경로(적용 시) |

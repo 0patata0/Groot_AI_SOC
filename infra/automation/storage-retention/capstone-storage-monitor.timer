@@ -1,0 +1,11 @@
+[Unit]
+Description=Observe Capstone capacity every fifteen minutes in Korea time
+
+[Timer]
+OnCalendar=*-*-* *:2/15:00 Asia/Seoul
+AccuracySec=1s
+Persistent=false
+Unit=capstone-storage-monitor.service
+
+[Install]
+WantedBy=timers.target

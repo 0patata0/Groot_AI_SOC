@@ -1,0 +1,113 @@
+[
+  {
+    "name": "Require fixed operator scope and reviewed controller",
+    "ansible.builtin.assert": {
+      "that": [
+        "ansible_facts.user_id == 'root'",
+        "ansible_facts.machine_id == '1e143067c98a44ffba6eaa925dc038d7'",
+        "ansible_connection == 'local'",
+        "ansible_version.full is version('2.21', '>=')",
+        "ansible_version.full is version('2.22', '<')",
+        "capstone_prestart_token is match('^[0-9a-f]{12}$')",
+        "capstone_prestart_phase in ['prepare','cutover','fallback','inspect']",
+        "not ansible_check_mode",
+        "capstone_prestart_operator_lock | default(false) | bool"
+      ],
+      "fail_msg": "Fixed Hermes operator contract rejected."
+    }
+  },
+  {
+    "name": "Bind fixed private paths",
+    "ansible.builtin.set_fact": {
+      "hp_source": "{{ playbook_dir }}/../../hermes",
+      "hp_root": "/var/backups/hermes-prestart-{{ capstone_prestart_token }}",
+      "hp_old": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+      "hp_new_name": "hermes-prestart-{{ capstone_prestart_token }}",
+      "hp_old_name": "hermes-retained-{{ capstone_prestart_token }}"
+    }
+  },
+  {
+    "name": "Hash local helpers before execution",
+    "ansible.builtin.stat": {
+      "path": "{{ hp_source }}/{{ item.key }}",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "loop": "{{ capstone_prestart_sources | dict2items }}",
+    "register": "hp_hashes"
+  },
+  {
+    "name": "Require exact root-owned immutable reviewed helpers",
+    "ansible.builtin.assert": {
+      "that": [
+        "item.stat.isreg",
+        "not item.stat.islnk",
+        "item.stat.uid == 0",
+        "item.stat.gid == 0",
+        "item.stat.nlink == 1",
+        "item.stat.mode in ['0400','0600','0644','0700','0755']",
+        "item.stat.checksum == item.item.value"
+      ]
+    },
+    "loop": "{{ hp_hashes.results }}"
+  },
+  {
+    "name": "Hash fixed read-only MCP probe before execution",
+    "ansible.builtin.stat": {
+      "path": "{{ role_path }}/files/mcp-readonly.py",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "register": "hp_mcp_hash"
+  },
+  {
+    "name": "Require reviewed root-owned read-only probe",
+    "ansible.builtin.assert": {
+      "that": [
+        "hp_mcp_hash.stat.isreg",
+        "not hp_mcp_hash.stat.islnk",
+        "hp_mcp_hash.stat.uid == 0",
+        "hp_mcp_hash.stat.gid == 0",
+        "hp_mcp_hash.stat.nlink == 1",
+        "hp_mcp_hash.stat.mode in ['0400','0600','0644']",
+        "hp_mcp_hash.stat.checksum == capstone_prestart_mcp_sha256"
+      ]
+    }
+  },
+  {
+    "name": "Inspect transaction path without following links",
+    "ansible.builtin.stat": {
+      "path": "{{ hp_root }}",
+      "follow": false
+    },
+    "register": "hp_dir"
+  },
+  {
+    "name": "Refuse reuse of an incomplete prepare directory",
+    "ansible.builtin.assert": {
+      "that": [
+        "not hp_dir.stat.exists if capstone_prestart_phase == 'prepare' else hp_dir.stat.isdir and not hp_dir.stat.islnk and hp_dir.stat.uid == 0 and hp_dir.stat.mode == '0700'"
+      ]
+    }
+  },
+  {
+    "name": "Create the exclusive operator evidence directory",
+    "ansible.builtin.file": {
+      "path": "{{ hp_root }}",
+      "state": "directory",
+      "owner": "root",
+      "group": "root",
+      "mode": "0700"
+    },
+    "when": "capstone_prestart_phase == 'prepare'"
+  },
+  {
+    "name": "Run the requested fixed phase",
+    "ansible.builtin.include_tasks": "{{ capstone_prestart_phase }}.yml"
+  },
+  {
+    "name": "Finalize verified active identity only",
+    "ansible.builtin.include_tasks": "final.yml",
+    "when": "capstone_prestart_phase in ['cutover','fallback']"
+  }
+]

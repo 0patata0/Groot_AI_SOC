@@ -1,0 +1,5 @@
+<localfile>
+    <log_format>json</log_format>
+    <location>/home/groot_a/capstone/secstack/logs/suricata/eve.json</location>
+    <label key="capstone.source">suricata</label>
+  </localfile>

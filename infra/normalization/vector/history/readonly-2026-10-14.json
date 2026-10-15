@@ -1,0 +1,52 @@
+{
+  "checked_at": "2026-10-14T06:14:59+09:00",
+  "host": "Groot_A",
+  "scope": "read_only_boot_metadata_candidate_hash_and_storage_preflight",
+  "previous_boot_id": "b807aba1a92547ffb0c429771628b521",
+  "current_boot_id": "bfafc2dda0fe42ada088e7fe6c576486",
+  "retained_boots": 10,
+  "fixed_until_epoch_us": "1791926099107280",
+  "cutoff_basis": "read_only_preflight_current_realtime",
+  "store": {
+    "path": "/var/lib/capstone-vector-history",
+    "exists": false,
+    "symlink": false,
+    "metadata": null,
+    "completed_batches": 0,
+    "partial_attempts": 0
+  },
+  "parent_filesystem_stat_type": "ext2/ext3",
+  "parent_available_bytes": 47791169536,
+  "required_free_bytes": 41943040,
+  "free_space_sufficient_at_check": true,
+  "candidate_sha256_matches_mac_and_a_staging": true,
+  "candidate_sha256": {
+    "export-previous-boot.sh": "b79f7554265f2fe935f2ce9896f21d3ac99513e42d38662de4765ced07ef3839",
+    "history-lib.sh": "64300f6de6bf5ee71066ef4368b64b041e6399a28827fc963b7349f1b7644ee5",
+    "history-run.sh": "d900dfdcf4847074c889bc53ffa915ccbe46dd72c0617e61802dab0c6736dac0",
+    "validate-records.jq": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9",
+    "test-native.sh": "c14e9a63e4e5b9bcb7eb8f1d4da6ff32abfe22b1af1e34c5ebe9222ffa81d7e2"
+  },
+  "source_status": "frozen_pending_explicit_operational_execution_signal",
+  "production_export_executed": false,
+  "event_payload_or_cursor_output": false,
+  "production_checkpoint_changed": false,
+  "services_changed": false,
+  "b_transfer_implemented": false,
+  "b_transfer_executed": false,
+  "remote_file_receipt_implemented": false,
+  "vector_reinjection_implemented": false,
+  "end_to_end_recovery_complete": false,
+  "limitations": [
+    "This is preflight metadata, not proof that an actual previous-boot batch has been preserved",
+    "The candidate performs A-only preservation; B delivery and durable remote receipt are not implemented",
+    "No operational ready input, Wazuh input or existing Vector checkpoint is modified",
+    "Availability and free space can change after this read-only check"
+  ],
+  "temporary_files": {
+    "remote_readonly_directory": "removed_by_exit_trap",
+    "mac_script": "/private/tmp/capstone-indexer-20261014.68sog8hh/history-readonly-a.sh",
+    "candidate_staging": "/var/tmp/capstone-indexer-20261014/history-candidate/history",
+    "remaining_cleanup_owner": "parent_final_cleanup"
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "status": "partially_deployed_paused_by_user",
+  "date_kst": "2026-10-14",
+  "suites": [
+    {
+      "name": "writer_gates",
+      "passed": 20,
+      "scope": "private native FD fixtures with container metadata stubs"
+    },
+    {
+      "name": "line_length_v2",
+      "passed": 59,
+      "legacy_cases": 34,
+      "scope": "private native bytes and exact hardlinks"
+    },
+    {
+      "name": "checkpoint_gates",
+      "passed": 53,
+      "scope": "private native files and synthetic checkpoint metadata"
+    },
+    {
+      "name": "state_persistence",
+      "passed": 34,
+      "scope": "private native state CAS/fsync failure injection",
+      "previous_attempt": "test shim failed to inject sync -- path error; no operating state mutation"
+    },
+    {
+      "name": "coordinator",
+      "passed": 30,
+      "scope": "dispatch/service gates mocked; native private hardlink and common-prefix comparisons"
+    },
+    {
+      "name": "vector_v2_full_configuration",
+      "exit": 0,
+      "environment_checks": false
+    },
+    {
+      "name": "raw_line_scan_v2",
+      "passed": 39,
+      "scope": "private generation/state/native byte scans; live wrapper not executed"
+    },
+    {
+      "name": "systemd_reader_start_retry",
+      "passed": true,
+      "guard_failures": 1,
+      "automatic_retries": 1,
+      "successful_starts": 1,
+      "retry_interval_seconds": 30.02,
+      "manual_stop_observation_seconds": 35,
+      "manual_stop_remained_stopped": true,
+      "private_process_reaped": true,
+      "fixture_removed": true,
+      "production_services_called": false,
+      "actual_reboot": false
+    },
+    {
+      "name": "legacy_role_version_guard",
+      "expected_accept": 1,
+      "expected_reject": 2,
+      "ansible_ok": 8,
+      "changed": 0,
+      "failed": 0,
+      "rescued": 2
+    },
+    {
+      "name": "coordinator_stop_intent",
+      "passed": 24,
+      "scope": "actual private state fsync and child SIGKILL; stub systemd/checkpoints; no operating changes"
+    },
+    {
+      "name": "initial_prepare_synthetic",
+      "passed": 11,
+      "live_readonly_check": "passed",
+      "actual_prepare_executed": false
+    },
+    {
+      "name": "initial_cutover_disabled",
+      "cli_checks": 7,
+      "expected_exit": 78,
+      "operating_actions": false
+    }
+  ],
+  "live_checkpoint_observations": [
+    {
+      "schema_version": 1,
+      "gate": "vector_current",
+      "verdict": "pass",
+      "reason": "current_offset_valid",
+      "source_identity": {
+        "device": 64512,
+        "inode": 1441879,
+        "bytes": 19225054,
+        "uid": 998,
+        "gid": 998,
+        "mode": "644",
+        "links": 1
+      },
+      "source_stable": true,
+      "checkpoint_sha256": "9b22d17b3b51ae08f45b43725ae182979ae318b0970c13aade4c5245d6185dc5",
+      "checkpoint_kind": "stable",
+      "offset": 19224620,
+      "stored_sha1": null,
+      "prefix_sha1": null,
+      "expected_seek": 19224620,
+      "backlog_bytes": 434,
+      "scanned_bytes": null,
+      "max_line_bytes": null,
+      "eof_lf": null,
+      "line_limit_bytes": null,
+      "timeout_seconds": 30,
+      "delivery_acknowledged": false,
+      "source": "suricata_eve",
+      "reader": "vector",
+      "exit": 0
+    },
+    {
+      "schema_version": 1,
+      "gate": "wazuh_cold",
+      "verdict": "pass",
+      "reason": "existing_inode_resume",
+      "source_identity": {
+        "device": 64512,
+        "inode": 1441879,
+        "bytes": 19225054,
+        "uid": 998,
+        "gid": 998,
+        "mode": "644",
+        "links": 1
+      },
+      "source_stable": true,
+      "checkpoint_sha256": "602d9721edd211eca0bbcb9e1f43a23e8e04714e9a958fb7e608f47db9b98161",
+      "checkpoint_kind": "wazuh",
+      "offset": 19224620,
+      "stored_sha1": "faf1dfeecbc35a92da65bc134cf55dd5018738df",
+      "prefix_sha1": "faf1dfeecbc35a92da65bc134cf55dd5018738df",
+      "expected_seek": 19224620,
+      "backlog_bytes": 434,
+      "scanned_bytes": 19224620,
+      "max_line_bytes": null,
+      "eof_lf": null,
+      "line_limit_bytes": null,
+      "timeout_seconds": 30,
+      "delivery_acknowledged": false,
+      "source": "suricata_eve",
+      "reader": "wazuh",
+      "exit": 0
+    },
+    {
+      "schema_version": 1,
+      "gate": "vector_current",
+      "verdict": "pass",
+      "reason": "current_offset_valid",
+      "source_identity": {
+        "device": 64512,
+        "inode": 1441881,
+        "bytes": 10072,
+        "uid": 101,
+        "gid": 101,
+        "mode": "644",
+        "links": 1
+      },
+      "source_stable": true,
+      "checkpoint_sha256": "7a9e2ef6b3807e20067d8bb4aba26fe097725fcbde15f6a35023c3e553d52bce",
+      "checkpoint_kind": "stable",
+      "offset": 10072,
+      "stored_sha1": null,
+      "prefix_sha1": null,
+      "expected_seek": 10072,
+      "backlog_bytes": 0,
+      "scanned_bytes": null,
+      "max_line_bytes": null,
+      "eof_lf": null,
+      "line_limit_bytes": null,
+      "timeout_seconds": 30,
+      "delivery_acknowledged": false,
+      "source": "waf_audit",
+      "reader": "vector",
+      "exit": 0
+    },
+    {
+      "schema_version": 1,
+      "gate": "wazuh_cold",
+      "verdict": "pass",
+      "reason": "existing_inode_resume",
+      "source_identity": {
+        "device": 64512,
+        "inode": 1441881,
+        "bytes": 10072,
+        "uid": 101,
+        "gid": 101,
+        "mode": "644",
+        "links": 1
+      },
+      "source_stable": true,
+      "checkpoint_sha256": "602d9721edd211eca0bbcb9e1f43a23e8e04714e9a958fb7e608f47db9b98161",
+      "checkpoint_kind": "wazuh",
+      "offset": 10072,
+      "stored_sha1": "327f86bab662852a73db00432de05758db96ed47",
+      "prefix_sha1": "327f86bab662852a73db00432de05758db96ed47",
+      "expected_seek": 10072,
+      "backlog_bytes": 0,
+      "scanned_bytes": 10072,
+      "max_line_bytes": null,
+      "eof_lf": null,
+      "line_limit_bytes": null,
+      "timeout_seconds": 30,
+      "delivery_acknowledged": false,
+      "source": "waf_audit",
+      "reader": "wazuh",
+      "exit": 0
+    }
+  ],
+  "sources": {
+    "writer-gates.sh": "c8a4f766c8cff125115f4d6413b746309004d608fdc1db370ec4dfe456cb1667",
+    "test-writer-gates-native.sh": "758d008c0217dbd5362bcf298f352ff75550e999b6acb69ca3f03b6ecae8533b",
+    "line-length-lib-v2.sh": "848acb15609d859d0643aebd02dd71554245ea5771cb80b6b9a4dec4b61dcf10",
+    "test-line-length-v2.sh": "3c2da49607372d3da7b0c236fa5c534ece9c653c4da6d9e4eeb2fb1cdf9cbc83",
+    "checkpoint-gates.sh": "92acb7ce322d109bc7e70c32bb42a17cf5cddd1b7f5b6d7f23871e89cbaa4af6",
+    "checkpoint-gates.jq": "ebc3022b44dae2a79845e35b5b26439d369162715644a720ce35257a1e22d8e6",
+    "test-checkpoint-gates-native.sh": "4288418f04b6e71710bce5ee30f93f286dde26060b44844b98b4a6f36e640935",
+    "state-lib.sh": "d754d17726310a56c77e5d37c41f0ae3883881dfbc91bfa20b7ef916fe428f3a",
+    "state.jq": "3db6baef5c679521bdc257cbe1aca66fd6884714f734a1778ca27b249e40a775",
+    "state-native-test.sh": "7a35c1950f6c86408d32f22ceba5db17189d8db4206f09554b5d175ea7e0e005",
+    "coordinator.sh": "95f86e2db4115b929193fa9fac5c81fd4ad5cc98afc65ed3cad42dd7c950063e",
+    "guard.sh": "7f78865f4be32dbd647b46f15c4d5118471ef5eca607e6f966aa4579b9b3037e",
+    "test-coordinator-native.sh": "3ecf27ca30392e52df7706bb3e0a444bb240091e7f6a6d84428582876ad0fc54",
+    "vector-v2.toml": "6602dcefef13b0b9f31310b8f3afe77b66b20795517135911ee38056968e93d8",
+    "raw-line-scan-v2.sh": "c6c9cee577cba76e0d6e153748c2d881a4adaac26180a73b03b128acac1b5430",
+    "test-raw-line-scan-v2.sh": "9204b77de1d1506f2ad05e7c23807a6ddcddb9d8d66347456d31d5199e3682be",
+    "test-reader-start-retry-native.sh": "c5f4c8b671e0b8e20dcaee30f499daa346233b9a194ce4973951f4084983e58b",
+    "test-stop-intent-native.sh": "2df2b4b9b6b2e720dcc2173e516cab13a0263646496378b32d8f858cc5615018",
+    "deploy-raw-operations-a.py": "4fc02f8713477e73cb292c099ebaf322f1503eea5de05ebd57b940ef1fb56798",
+    "test-deploy-raw-operations.py": "4ac840af0e3aaad15dc0ab057e6658e1e7b2ffaefaf0d4753ea846f043cf02ea",
+    "cutover-raw-operations-a.py": "56ea2a530a13399a9b3475d0466a7a8596da2c4115f2f8d5d1253a319f936350",
+    "INITIAL-MIGRATION.md": "cf952a4d136b367e0434c5f1d48ad0b8f179138edbf693d3786849fe4ddb57e6",
+    "capstone-raw-operations": "1f5c13ed2ea2b2a0553ff8102c0517a3640da586ee2b50f2e393cc34c2952537",
+    "capstone-raw-operations@.service": "5aa92d31a72fa82d3175772f01207dcebecd33cb1537db25042117d692f8352b",
+    "capstone-raw-operations@.timer": "5c6b117373178f2065eec0b4823f9c26ed7ae9883bf298f0a340f2349579996e",
+    "vector-start-guard.conf": "d898cc44dd37ae03ae4dd769c5d4c7b6dfd400529193c276e9da51c2c9374d43",
+    "wazuh-start-guard.conf": "693ae007f3bde50c11ad9e147a639bdbbdfdd1f7100d79aa3c42e080ba86d12a"
+  },
+  "raw_operating_rotation_deployed": false,
+  "actual_host_reboot_tested": false,
+  "remote_delivery_acknowledged": false,
+  "new_packages_installed": false,
+  "coordinator_followup": {
+    "status": "native_passed_not_deployed",
+    "reason": "durable Vector stop intent validated with stub service/checkpoint boundary",
+    "first_stop_intent_attempt": "fixture unbound variable; runtime unchanged; failed log retained",
+    "stop_intent_cases": 24,
+    "actual_service_actions": false
+  },
+  "current_status": "candidate tests completed; operating migration paused before prepare"
+}

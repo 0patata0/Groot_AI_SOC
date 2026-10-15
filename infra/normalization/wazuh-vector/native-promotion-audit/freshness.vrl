@@ -1,0 +1,13 @@
+# Experimental read-time gate only; not referenced by the operating pipeline.
+# Its decision cannot expire an event after it leaves this transform.
+norm = object!(.capstone_norm)
+assert!(norm.schema_version == "vector-1" && norm.pipeline == "vector", "schema")
+assert!(norm.sensor == "groot-sec", "sensor")
+assert!(includes(["suricata", "nftables"], norm.source), "source")
+key = string!(norm.correlation_dedupe_key)
+assert!(match(key, r'^[0-9a-f]{64}$'), "stable_key")
+event_time = parse_timestamp!(string!(norm.event_time_kst), format: "%+")
+checked = now()
+age_ms = to_unix_timestamp(checked, unit: "milliseconds") - to_unix_timestamp(event_time, unit: "milliseconds")
+allow = norm.correlation_eligible == true && norm.quality_flags == [] && norm.protected_asset == false && age_ms >= -5000 && age_ms <= 120000
+.audit = {"allowed_at_this_transform": allow, "age_ms": age_ms, "checked_at": format_timestamp!(checked, format: "%+"), "operational_promotion_authorized": false}

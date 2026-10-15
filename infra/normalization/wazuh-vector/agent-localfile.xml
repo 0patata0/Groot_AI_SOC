@@ -1,0 +1,25 @@
+<ossec_config>
+  <localfile>
+    <location>/var/log/capstone-vector/ready/normalized.jsonl</location>
+    <log_format>json</log_format>
+    <only-future-events max-size="2GB">no</only-future-events>
+  </localfile>
+</ossec_config>
+
+<!-- Separate indexable observation lane; raw and ready inputs stay unchanged. -->
+<ossec_config>
+  <localfile>
+    <location>/var/log/capstone-vector/evidence/normalized.jsonl</location>
+    <log_format>json</log_format>
+    <only-future-events max-size="2GB">no</only-future-events>
+  </localfile>
+</ossec_config>
+
+<!-- Root-only manual synthetic health input. No timer or generator is installed. -->
+<ossec_config>
+  <localfile>
+    <location>/var/log/capstone-vector/canary/normalized.jsonl</location>
+    <log_format>json</log_format>
+    <only-future-events>yes</only-future-events>
+  </localfile>
+</ossec_config>

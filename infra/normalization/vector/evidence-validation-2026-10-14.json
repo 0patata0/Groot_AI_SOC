@@ -1,0 +1,146 @@
+{
+  "date_kst": "2026-10-14",
+  "stage": "operational_deployed_and_dual_reader_rotation_verified",
+  "operational_configuration_changed": true,
+  "raw_security_payload_exported": false,
+  "vector_version": "0.59.0",
+  "main_native_tests_passed": 49,
+  "waf_native_tests_passed": 61,
+  "total_native_tests_passed": 110,
+  "existing_native_tests_preserved": 97,
+  "evidence_selection_tests": 12,
+  "additional_evidence_metric_test": 1,
+  "health_predicate_tests_passed": 18,
+  "existing_health_predicate_tests_preserved": 16,
+  "isolated_real_fd_checkpoint_rotation_tests_passed": 9,
+  "native_validate_passed": true,
+  "bash_syntax_passed": true,
+  "systemd_unit_validation_passed": true,
+  "logrotate_debug_passed": true,
+  "ansible_two_playbook_syntax_passed": true,
+  "disk_buffers_configured_bytes": 805306464,
+  "disk_buffer_count": 3,
+  "evidence_disk_buffer_when_full": "block",
+  "ready_branch_marker_absence_tested": true,
+  "evidence_lane": "indexer-observation-v1",
+  "operational_evidence_reader_rotation_tested": true,
+  "manager_or_indexer_delivery_tested": true,
+  "deployment": {
+    "started_at_kst": "2026-10-14T05:58:51+09:00",
+    "completed_at_kst": "2026-10-14T06:01:27+09:00",
+    "managed_files_backed_up": 15,
+    "frozen_bundle_files_sha_verified": 208,
+    "empty_evidence_reader_before_writer": true,
+    "first_apply": {
+      "cumulative_after_vector_playbook": {
+        "ok": 49,
+        "changed": 3
+      },
+      "cumulative_final_after_storage_playbook": {
+        "ok": 68,
+        "changed": 5
+      }
+    },
+    "repeat_apply": {
+      "cumulative_after_vector_playbook": {
+        "ok": 48,
+        "changed": 0
+      },
+      "cumulative_final_after_storage_playbook": {
+        "ok": 67,
+        "changed": 0
+      }
+    },
+    "failed": 0,
+    "rescued": 0,
+    "repeat_pid_and_invocation_unchanged": true,
+    "protected_boundaries_unchanged": true,
+    "rollback_exercised": false,
+    "raw_or_buffer_data_purged": false,
+    "backup_path": "/var/backups/capstone-vector-evidence-20261014-t05607rd",
+    "ansible_recap_semantics": "cumulative within one invocation across vector-shadow-a.yml then vector-storage-a.yml; do not sum recaps"
+  },
+  "first_live_observation": {
+    "at_kst": "2026-10-14T06:01:58+09:00",
+    "evidence_records": 12,
+    "evidence_all_eligible_fresh_protected_excluded_quality_empty_kst": true,
+    "ready_sample_records": 517,
+    "ready_evidence_marker_records": 0,
+    "current_invocation_heartbeats": 2,
+    "evidence_sink_metric_records": 2,
+    "collection_warning_codes": []
+  },
+  "reader_observation": {
+    "at_kst": "2026-10-14T06:03:59+09:00",
+    "ready_bytes": 621850,
+    "evidence_bytes": 30400,
+    "both_logical_and_fd_offsets_at_eof": true,
+    "both_full_sha1_match": true,
+    "agent_connected": true,
+    "agent_send_buffer": 0,
+    "last_10m_errors": 0,
+    "last_10m_warnings": 0,
+    "remote_ack_guarantee": false
+  },
+  "live_types": {
+    "at_kst": "2026-10-14T06:04:51+09:00",
+    "nft_spoof_observed": 30,
+    "suricata_allowed": 1,
+    "nft_logged_drop": 0,
+    "nft_rule_100262_observed_exclusion_expected": true
+  },
+  "end_to_end_observation": {
+    "source": "suricata",
+    "observed_records": 1,
+    "wazuh_rule_id": 100261,
+    "rule_level": 3,
+    "manager_and_indexer_record_seen": true,
+    "a_record_match_at_kst": "2026-10-14T06:06:06+09:00",
+    "event_id_source_event_time_dedupe_key_exact_match": true,
+    "raw_payload_exported": false,
+    "remote_durable_ack": false,
+    "all_sources_proven": false
+  },
+  "live_dual_reader_rotation": {
+    "started_at_kst": "2026-10-14T06:06:21+09:00",
+    "completed_at_kst": "2026-10-14T06:08:09+09:00",
+    "forced_rotation_count": 1,
+    "elapsed_seconds": 108,
+    "ready_archive_bytes": 638200,
+    "ready_archive_sha256": "18ee9d0dd7bee7c14e058b576d688492fe47bf59d4621c6502aff945d1631776",
+    "evidence_archive_bytes": 47324,
+    "evidence_archive_sha256": "78bb20698104df13ab440db98a6798c0baee9d30c8ab2a8671957cd8f1e73b95",
+    "archives_match_paused_writer": true,
+    "new_files_root0600": true,
+    "new_readers_unique_and_offset_zero": true,
+    "wazuh_agent_restarted": false,
+    "vector_resumed": true,
+    "vector_automatic_restarts": 0,
+    "pending_marker": false,
+    "configuration_unchanged": true,
+    "manager_or_indexer_ack": false
+  },
+  "remaining_limits": [
+    "raw copytruncate races unchanged",
+    "oversize file line at EOF may lack a native loss counter",
+    "current boot only journald source; earlier boots not replayed",
+    "evidence disk backpressure may propagate to ready/common source",
+    "Vector eligibility and Wazuh nft logged_drop action gate have different scope",
+    "remote durable receipt and persistent deduplication not implemented",
+    "one Suricata end-to-end observation does not prove all sources or zero loss"
+  ],
+  "post_rotation_observation": {
+    "at_kst": "2026-10-14T06:09:10+09:00",
+    "evidence_bytes": 23172,
+    "evidence_sampled_records": 19,
+    "evidence_all_eligible_and_kst": true,
+    "ready_sampled_records": 19,
+    "ready_evidence_marker_records": 0,
+    "current_invocation_heartbeats": 1,
+    "evidence_sink_metric_records": 2,
+    "collection_warning_codes": [],
+    "recovery_pending": false,
+    "available_bytes": 47791575040,
+    "long_term_peak_load_tested": false
+  }
+}

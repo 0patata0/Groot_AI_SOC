@@ -1,0 +1,113 @@
+{
+  "checked_at_kst": "2026-10-13T21:47:13.262996+09:00",
+  "phase": "1-waf-duplicate-header",
+  "sample_file_bytes": 8432,
+  "raw_source_unchanged": true,
+  "source_metadata_unchanged": true,
+  "runtime_and_config_unchanged": true,
+  "before": {
+    "container_id": "02fb9ec3db38",
+    "status": "running",
+    "started_at": "2026-10-05T10:18:45.433754298Z",
+    "config_hashes": {
+      "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+      "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a"
+    }
+  },
+  "after": {
+    "container_id": "02fb9ec3db38",
+    "status": "running",
+    "started_at": "2026-10-05T10:18:45.433754298Z",
+    "config_hashes": {
+      "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+      "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a"
+    }
+  },
+  "rows": [
+    {
+      "line": 1,
+      "strict_parser": "duplicate_json_key",
+      "adapter": "accepted",
+      "raw_bytes_hash_matches": true,
+      "raw_bytes_length": 2189,
+      "time_status": "timezone_missing",
+      "has_event_time": false,
+      "quality_flags": [
+        "source_time_timezone_missing",
+        "duplicate_response_server_header"
+      ],
+      "rule_count": 2,
+      "action": "observed",
+      "engine_mode": "DetectionOnly",
+      "output_bytes": 955,
+      "payload_fields_exported": false
+    },
+    {
+      "line": 2,
+      "strict_parser": "duplicate_json_key",
+      "adapter": "accepted",
+      "raw_bytes_hash_matches": true,
+      "raw_bytes_length": 2189,
+      "time_status": "timezone_missing",
+      "has_event_time": false,
+      "quality_flags": [
+        "source_time_timezone_missing",
+        "duplicate_response_server_header"
+      ],
+      "rule_count": 2,
+      "action": "observed",
+      "engine_mode": "DetectionOnly",
+      "output_bytes": 955,
+      "payload_fields_exported": false
+    },
+    {
+      "line": 3,
+      "strict_parser": "duplicate_json_key",
+      "adapter": "accepted",
+      "raw_bytes_hash_matches": true,
+      "raw_bytes_length": 2188,
+      "time_status": "timezone_missing",
+      "has_event_time": false,
+      "quality_flags": [
+        "source_time_timezone_missing",
+        "duplicate_response_server_header"
+      ],
+      "rule_count": 2,
+      "action": "observed",
+      "engine_mode": "DetectionOnly",
+      "output_bytes": 955,
+      "payload_fields_exported": false
+    },
+    {
+      "line": 4,
+      "strict_parser": "duplicate_json_key",
+      "adapter": "accepted",
+      "raw_bytes_hash_matches": true,
+      "raw_bytes_length": 1866,
+      "time_status": "timezone_missing",
+      "has_event_time": false,
+      "quality_flags": [
+        "source_time_timezone_missing",
+        "duplicate_response_server_header"
+      ],
+      "rule_count": 1,
+      "action": "observed",
+      "engine_mode": "DetectionOnly",
+      "output_bytes": 942,
+      "payload_fields_exported": false
+    }
+  ],
+  "module_sha256": {
+    "normalize_events": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "waf_input_adapter": "9f2522be6a59aeecf66cc9212bfd79124ad1806f1ea7543251861858a0d679ec"
+  },
+  "operational_input_written": false,
+  "source_timezone_inferred": false,
+  "local_tests": {
+    "adapter": 17,
+    "existing": 62,
+    "total": 79,
+    "failed": 0
+  },
+  "test_sha256": "84aae7e240097b40750449af912c7a72424680457932a9a43f4aa82c4c601eb5"
+}

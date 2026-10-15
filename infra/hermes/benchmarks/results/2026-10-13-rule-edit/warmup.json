@@ -1,0 +1,15 @@
+[
+  {
+    "host": "211.170.162.110",
+    "at_kst": "2026-10-13T18:52:34+09:00",
+    "model": "qwen3.6:35b",
+    "status": "ok",
+    "done": true,
+    "done_reason": "stop",
+    "load_duration": 8387910342,
+    "total_duration": 9110443012,
+    "prompt_eval_count": 23,
+    "eval_count": 6,
+    "wall_seconds": 9.17988279205747
+  }
+]

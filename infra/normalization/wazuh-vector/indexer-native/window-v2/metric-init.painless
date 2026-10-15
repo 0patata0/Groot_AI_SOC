@@ -1,0 +1,5 @@
+state.valid = true;
+state.reason = 'ok';
+state.documents = 0L;
+state.rows = new ArrayList();
+state.services = new HashMap();

@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh the bounded TPNS DNS allowlist every five minutes
+
+[Timer]
+OnBootSec=90s
+OnUnitActiveSec=5min
+AccuracySec=5s
+Unit=capstone-push-egress.service
+
+[Install]
+WantedBy=timers.target

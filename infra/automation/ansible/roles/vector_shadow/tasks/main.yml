@@ -1,0 +1,676 @@
+[
+  {
+    "name": "Require operator root, supported host, and explicit machine identity",
+    "ansible.builtin.assert": {
+      "that": [
+        "ansible_facts.user_id == 'root'",
+        "ansible_connection == 'local'",
+        "ansible_facts.distribution == 'Ubuntu'",
+        "ansible_facts.distribution_version == '24.04'",
+        "capstone_expected_machine_id is defined",
+        "capstone_expected_machine_id is match('^[0-9a-f]{32}$')",
+        "ansible_facts.machine_id == capstone_expected_machine_id",
+        "ansible_version.full is version('2.21', '>=')",
+        "ansible_version.full is version('2.22', '<')",
+        "capstone_sensor is match('^[A-Za-z0-9._-]{1,64}$')",
+        "capstone_suricata_eve_path is match('^/[A-Za-z0-9._/-]+$')",
+        "capstone_waf_audit_path is match('^/[A-Za-z0-9._/-]+$')",
+        "'..' not in capstone_suricata_eve_path.split('/')",
+        "'..' not in capstone_waf_audit_path.split('/')"
+      ],
+      "fail_msg": "Host/controller or fixed Vector input contract does not match."
+    }
+  },
+  {
+    "name": "Inspect raw migration barriers before any legacy v1 Vector change",
+    "ansible.builtin.stat": {
+      "path": "{{ item }}",
+      "follow": false,
+      "get_checksum": false,
+      "get_mime": false,
+      "get_attributes": false
+    },
+    "loop": [
+      "/var/lib/capstone-raw-operations",
+      "/var/lib/capstone-raw-migration",
+      "/var/backups/capstone-raw-operations-initial-20261014/migration.json"
+    ],
+    "register": "capstone_v1_raw_barriers",
+    "tags": [
+      "always"
+    ]
+  },
+  {
+    "name": "Refuse legacy v1 Vector deployment after raw migration is armed",
+    "ansible.builtin.assert": {
+      "that": [
+        "item.stat.exists is defined",
+        "not item.stat.exists",
+        "not (item.stat.islnk | default(false))"
+      ],
+      "fail_msg": "Legacy v1 deployment is blocked by raw migration/state metadata. Use the reviewed raw-operations procedure; do not remove its barrier to force a v1 overwrite."
+    },
+    "loop": "{{ capstone_v1_raw_barriers.results }}",
+    "loop_control": {
+      "label": "{{ item.item }}"
+    },
+    "tags": [
+      "always"
+    ]
+  },
+  {
+    "name": "Inspect operator-managed WAF producer binding",
+    "ansible.builtin.stat": {
+      "path": "/etc/capstone-vector/waf-binding.json",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "register": "capstone_waf_binding_stat"
+  },
+  {
+    "name": "Require a private regular root binding manifest",
+    "ansible.builtin.assert": {
+      "that": [
+        "capstone_waf_binding_stat.stat.exists",
+        "capstone_waf_binding_stat.stat.isreg",
+        "not capstone_waf_binding_stat.stat.islnk",
+        "capstone_waf_binding_stat.stat.uid == 0",
+        "capstone_waf_binding_stat.stat.mode == '0600'"
+      ]
+    }
+  },
+  {
+    "name": "Read exact producer binding",
+    "ansible.builtin.slurp": {
+      "src": "/etc/capstone-vector/waf-binding.json"
+    },
+    "register": "capstone_waf_binding_raw"
+  },
+  {
+    "name": "Bind parsed manifest bytes to the checked file checksum",
+    "ansible.builtin.assert": {
+      "that": [
+        "(capstone_waf_binding_raw.content | b64decode | hash('sha256')) == capstone_waf_binding_stat.stat.checksum"
+      ]
+    }
+  },
+  {
+    "name": "Decode trusted producer metadata",
+    "ansible.builtin.set_fact": {
+      "capstone_waf_binding": "{{ capstone_waf_binding_raw.content | b64decode | from_json }}"
+    }
+  },
+  {
+    "name": "Require fixed WAF metadata contract",
+    "ansible.builtin.assert": {
+      "that": [
+        "(capstone_waf_binding.schema | default('')) == 'waf-producer-deployment-1'",
+        "capstone_waf_binding.instance_id is match('^[0-9a-f]{64}$')",
+        "capstone_waf_binding.configuration_sha256 is match('^[0-9a-f]{64}$')",
+        "capstone_waf_binding.deployment_binding is match('^[0-9a-f]{64}$')",
+        "capstone_waf_binding.access_path == '/home/groot_a/capstone/secstack/logs/modsec/capstone-access.log'"
+      ],
+      "fail_msg": "This legacy role deploys the v1 paired WAF pipeline only. A v2 producer requires the reviewed raw-operations deployment; do not overwrite its pipeline with this role."
+    }
+  },
+  {
+    "name": "Read the current WAF container identity",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "inspect",
+        "--format",
+        "{{ '{{.Id}}' }}",
+        "waf"
+      ]
+    },
+    "register": "capstone_waf_live_id",
+    "changed_when": false,
+    "check_mode": false
+  },
+  {
+    "name": "Read the current evidence producer checksum",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "waf",
+        "sha256sum",
+        "/etc/nginx/conf.d/zz-capstone-evidence.conf"
+      ]
+    },
+    "register": "capstone_waf_live_sha",
+    "changed_when": false,
+    "check_mode": false
+  },
+  {
+    "name": "Bind Vector to this installed WAF producer",
+    "ansible.builtin.assert": {
+      "that": [
+        "capstone_waf_live_id.stdout == capstone_waf_binding.instance_id",
+        "capstone_waf_live_sha.stdout.split()[0] == capstone_waf_binding.configuration_sha256"
+      ]
+    }
+  },
+  {
+    "name": "Read installed Vector version without installing anything",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/vector",
+        "--version"
+      ]
+    },
+    "register": "capstone_vector_version",
+    "changed_when": false,
+    "check_mode": false
+  },
+  {
+    "name": "Record approval boundary before deployment",
+    "ansible.builtin.stat": {
+      "path": "{{ item }}",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "loop": "{{ capstone_protected_paths }}",
+    "register": "capstone_boundary_before",
+    "no_log": true
+  },
+  {
+    "name": "Require the existing approval boundary to exist",
+    "ansible.builtin.assert": {
+      "that": [
+        "item.stat.exists",
+        "item.stat.isreg",
+        "not item.stat.islnk"
+      ]
+    },
+    "loop": "{{ capstone_boundary_before.results }}",
+    "no_log": true
+  },
+  {
+    "name": "Enumerate reviewed VRL files on the controller",
+    "ansible.builtin.set_fact": {
+      "capstone_vrl_sources": "{{ lookup('ansible.builtin.fileglob', capstone_vector_source_dir + '/transforms/*.vrl', wantlist=True) | sort }}"
+    }
+  },
+  {
+    "name": "Require a nonempty reviewed transform bundle",
+    "ansible.builtin.assert": {
+      "that": [
+        "capstone_vrl_sources | length > 0"
+      ]
+    }
+  },
+  {
+    "name": "Inspect fixed destination directories before managing them",
+    "ansible.builtin.stat": {
+      "path": "{{ item }}",
+      "follow": false
+    },
+    "loop": [
+      "/etc/capstone-vector",
+      "/etc/capstone-vector/transforms",
+      "/var/lib/capstone-vector",
+      "/var/log/capstone-vector",
+      "/var/log/capstone-vector/ready",
+      "/var/log/capstone-vector/quarantine",
+      "/var/log/capstone-vector/evidence",
+      "/var/log/capstone-vector/telemetry",
+      "{{ capstone_vector_candidate_dir }}"
+    ],
+    "register": "capstone_dirs_before"
+  },
+  {
+    "name": "Reject symlink or non-directory destinations",
+    "ansible.builtin.assert": {
+      "that": [
+        "not item.stat.exists or (item.stat.isdir and not item.stat.islnk)"
+      ]
+    },
+    "loop": "{{ capstone_dirs_before.results }}",
+    "loop_control": {
+      "label": "{{ item.item }}"
+    }
+  },
+  {
+    "name": "Inspect numeric telemetry path before starting writer",
+    "ansible.builtin.stat": {
+      "path": "/var/log/capstone-vector/telemetry/health.jsonl",
+      "follow": false
+    },
+    "register": "capstone_telemetry_before"
+  },
+  {
+    "name": "Reject unsafe existing numeric telemetry output",
+    "ansible.builtin.assert": {
+      "that": [
+        "not capstone_telemetry_before.stat.exists or (capstone_telemetry_before.stat.isreg and not capstone_telemetry_before.stat.islnk and capstone_telemetry_before.stat.uid == 0 and capstone_telemetry_before.stat.nlink == 1 and capstone_telemetry_before.stat.mode == '0600')"
+      ]
+    }
+  },
+  {
+    "name": "Inspect evidence output before starting writer",
+    "ansible.builtin.stat": {
+      "path": "/var/log/capstone-vector/evidence/normalized.jsonl",
+      "follow": false
+    },
+    "register": "capstone_evidence_before"
+  },
+  {
+    "name": "Reject unsafe existing evidence output",
+    "ansible.builtin.assert": {
+      "that": [
+        "not capstone_evidence_before.stat.exists or (capstone_evidence_before.stat.isreg and not capstone_evidence_before.stat.islnk and capstone_evidence_before.stat.uid == 0 and capstone_evidence_before.stat.nlink == 1 and capstone_evidence_before.stat.mode == '0600')"
+      ]
+    }
+  },
+  {
+    "name": "Create dedicated root-owned Vector directories",
+    "ansible.builtin.file": {
+      "path": "{{ item }}",
+      "state": "directory",
+      "owner": "root",
+      "group": "root",
+      "mode": "0700"
+    },
+    "loop": [
+      "/etc/capstone-vector",
+      "/etc/capstone-vector/transforms",
+      "/var/lib/capstone-vector",
+      "/var/log/capstone-vector",
+      "/var/log/capstone-vector/ready",
+      "/var/log/capstone-vector/quarantine",
+      "/var/log/capstone-vector/evidence",
+      "/var/log/capstone-vector/telemetry",
+      "{{ capstone_vector_candidate_dir }}",
+      "{{ capstone_vector_candidate_dir }}/transforms",
+      "{{ capstone_vector_candidate_dir }}/collection"
+    ]
+  },
+  {
+    "name": "Ensure evidence file exists without changing existing content",
+    "ansible.builtin.copy": {
+      "content": "",
+      "dest": "/var/log/capstone-vector/evidence/normalized.jsonl",
+      "force": false,
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    }
+  },
+  {
+    "name": "Stage reviewed config, tests and service",
+    "ansible.builtin.copy": {
+      "src": "{{ capstone_vector_source_dir }}/{{ item }}",
+      "dest": "{{ capstone_vector_candidate_dir }}/{{ item }}",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    },
+    "loop": [
+      "vector.toml",
+      "tests.toml",
+      "tests-correlation.toml",
+      "tests-waf.toml",
+      "capstone-vector.service",
+      "tests-collection.toml",
+      "collection-health.jq",
+      "collection/test-health-predicates.sh",
+      "tests-evidence.toml",
+      "capstone-vector-maintenance.sh",
+      "collection/test-reader-gate.sh"
+    ],
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Stage reviewed VRL files",
+    "ansible.builtin.copy": {
+      "src": "{{ item }}",
+      "dest": "{{ capstone_vector_candidate_dir }}/transforms/{{ item | basename }}",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    },
+    "loop": "{{ capstone_vrl_sources }}",
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Stage the validated fixed input environment",
+    "ansible.builtin.template": {
+      "src": "vector.env.j2",
+      "dest": "{{ capstone_vector_candidate_dir }}/vector.env",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    },
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Validate candidate Vector config without opening production sources",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/vector",
+        "validate",
+        "--no-environment",
+        "vector.toml"
+      ],
+      "chdir": "{{ capstone_vector_candidate_dir }}"
+    },
+    "environment": {
+      "CAPSTONE_SENSOR": "{{ capstone_sensor }}",
+      "SURICATA_EVE_PATH": "{{ capstone_suricata_eve_path }}",
+      "WAF_AUDIT_PATH": "{{ capstone_waf_audit_path }}",
+      "VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION": "true",
+      "WAF_ACCESS_PATH": "{{ capstone_waf_binding.access_path }}",
+      "WAF_INSTANCE_ID": "{{ capstone_waf_binding.instance_id }}",
+      "WAF_CONFIG_SHA256": "{{ capstone_waf_binding.configuration_sha256 }}",
+      "WAF_DEPLOYMENT_BINDING": "{{ capstone_waf_binding.deployment_binding }}",
+      "INVOCATION_ID": "cccccccccccccccccccccccccccccccc"
+    },
+    "changed_when": false,
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Run synthetic Vector unit tests before deploying",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/vector",
+        "test",
+        "vector.toml",
+        "tests.toml",
+        "tests-correlation.toml",
+        "tests-collection.toml",
+        "tests-evidence.toml"
+      ],
+      "chdir": "{{ capstone_vector_candidate_dir }}"
+    },
+    "environment": {
+      "CAPSTONE_SENSOR": "{{ capstone_sensor }}",
+      "SURICATA_EVE_PATH": "{{ capstone_suricata_eve_path }}",
+      "WAF_AUDIT_PATH": "{{ capstone_waf_audit_path }}",
+      "VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION": "true",
+      "WAF_ACCESS_PATH": "{{ capstone_waf_binding.access_path }}",
+      "WAF_INSTANCE_ID": "{{ capstone_waf_binding.instance_id }}",
+      "WAF_CONFIG_SHA256": "{{ capstone_waf_binding.configuration_sha256 }}",
+      "WAF_DEPLOYMENT_BINDING": "{{ capstone_waf_binding.deployment_binding }}",
+      "INVOCATION_ID": "cccccccccccccccccccccccccccccccc"
+    },
+    "changed_when": false,
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Run isolated WAF duplicate/time/pair tests with fixture bindings",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/vector",
+        "test",
+        "tests-waf.toml"
+      ],
+      "chdir": "{{ capstone_vector_candidate_dir }}"
+    },
+    "environment": {
+      "CAPSTONE_SENSOR": "groot-sec",
+      "WAF_AUDIT_PATH": "/test/audit.log",
+      "WAF_ACCESS_PATH": "/test/access.jsonl",
+      "WAF_INSTANCE_ID": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "WAF_CONFIG_SHA256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "WAF_DEPLOYMENT_BINDING": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION": "true"
+    },
+    "changed_when": false,
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Validate bounded collection-health predicates with synthetic metadata",
+    "ansible.builtin.command": {
+      "argv": [
+        "/bin/bash",
+        "collection/test-health-predicates.sh",
+        "collection-health.jq"
+      ],
+      "chdir": "{{ capstone_vector_candidate_dir }}"
+    },
+    "changed_when": false,
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Validate both-reader rotation gate without opening production paths",
+    "ansible.builtin.command": {
+      "argv": [
+        "/bin/bash",
+        "collection/test-reader-gate.sh",
+        "capstone-vector-maintenance.sh"
+      ],
+      "chdir": "{{ capstone_vector_candidate_dir }}"
+    },
+    "changed_when": false,
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Validate candidate systemd unit",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/systemd-analyze",
+        "verify",
+        "{{ capstone_vector_candidate_dir }}/capstone-vector.service"
+      ]
+    },
+    "changed_when": false,
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Describe the fixed managed file set",
+    "ansible.builtin.set_fact": {
+      "capstone_managed_files": [
+        {
+          "src": "{{ capstone_vector_source_dir }}/vector.toml",
+          "dest": "/etc/capstone-vector/vector.toml",
+          "mode": "0600"
+        },
+        {
+          "src": "{{ capstone_vector_source_dir }}/capstone-vector.service",
+          "dest": "/etc/systemd/system/capstone-vector.service",
+          "mode": "0644"
+        },
+        {
+          "src": "{{ capstone_vector_source_dir }}/collection-health.jq",
+          "dest": "/etc/capstone-vector/collection-health.jq",
+          "mode": "0600"
+        }
+      ]
+    }
+  },
+  {
+    "name": "Add only reviewed VRL filenames to the managed file set",
+    "ansible.builtin.set_fact": {
+      "capstone_managed_files": "{{ capstone_managed_files + [{'src': item, 'dest': '/etc/capstone-vector/transforms/' + (item | basename), 'mode': '0600'}] }}"
+    },
+    "loop": "{{ capstone_vrl_sources }}"
+  },
+  {
+    "name": "Inspect managed files and environment path",
+    "ansible.builtin.stat": {
+      "path": "{{ item }}",
+      "follow": false
+    },
+    "loop": "{{ (capstone_managed_files | map(attribute='dest') | list) + ['/etc/capstone-vector/vector.env'] }}",
+    "register": "capstone_files_before"
+  },
+  {
+    "name": "Reject nonregular existing managed files",
+    "ansible.builtin.assert": {
+      "that": [
+        "not item.stat.exists or (item.stat.isreg and not item.stat.islnk)"
+      ]
+    },
+    "loop": "{{ capstone_files_before.results }}",
+    "loop_control": {
+      "label": "{{ item.item }}"
+    }
+  },
+  {
+    "name": "Before installation: Inspect operator-managed WAF producer binding",
+    "ansible.builtin.stat": {
+      "path": "/etc/capstone-vector/waf-binding.json",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "register": "capstone_waf_binding_final"
+  },
+  {
+    "name": "Before installation: Read the current WAF container identity",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "inspect",
+        "--format",
+        "{{ '{{.Id}}' }}",
+        "waf"
+      ]
+    },
+    "register": "capstone_waf_final_id",
+    "changed_when": false,
+    "check_mode": false
+  },
+  {
+    "name": "Before installation: Read the current evidence producer checksum",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "waf",
+        "sha256sum",
+        "/etc/nginx/conf.d/zz-capstone-evidence.conf"
+      ]
+    },
+    "register": "capstone_waf_final_sha",
+    "changed_when": false,
+    "check_mode": false
+  },
+  {
+    "name": "Reject WAF producer or binding changes during candidate validation",
+    "ansible.builtin.assert": {
+      "that": [
+        "capstone_waf_binding_final.stat.exists",
+        "capstone_waf_binding_final.stat.isreg",
+        "not capstone_waf_binding_final.stat.islnk",
+        "capstone_waf_binding_final.stat.uid == capstone_waf_binding_stat.stat.uid",
+        "capstone_waf_binding_final.stat.gid == capstone_waf_binding_stat.stat.gid",
+        "capstone_waf_binding_final.stat.mode == capstone_waf_binding_stat.stat.mode",
+        "capstone_waf_binding_final.stat.checksum == capstone_waf_binding_stat.stat.checksum",
+        "capstone_waf_final_id.stdout == capstone_waf_binding.instance_id",
+        "capstone_waf_final_sha.stdout.split()[0] == capstone_waf_binding.configuration_sha256"
+      ]
+    }
+  },
+  {
+    "name": "Install exactly the tested sources with backups and atomic writes",
+    "ansible.builtin.copy": {
+      "src": "{{ item.src if ansible_check_mode else capstone_vector_candidate_dir + '/' + ('transforms/' if item.dest.startswith('/etc/capstone-vector/transforms/') else '') + (item.src | basename) }}",
+      "dest": "{{ item.dest }}",
+      "remote_src": "{{ not ansible_check_mode }}",
+      "owner": "root",
+      "group": "root",
+      "mode": "{{ item.mode }}",
+      "backup": true,
+      "unsafe_writes": false
+    },
+    "loop": "{{ capstone_managed_files }}",
+    "register": "capstone_config_install"
+  },
+  {
+    "name": "Predict environment changes without staging in check mode",
+    "ansible.builtin.template": {
+      "src": "vector.env.j2",
+      "dest": "/etc/capstone-vector/vector.env",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600",
+      "backup": true,
+      "unsafe_writes": false
+    },
+    "register": "capstone_env_check",
+    "when": "ansible_check_mode"
+  },
+  {
+    "name": "Install the exact tested environment with backup",
+    "ansible.builtin.copy": {
+      "src": "{{ capstone_vector_candidate_dir }}/vector.env",
+      "dest": "/etc/capstone-vector/vector.env",
+      "remote_src": true,
+      "owner": "root",
+      "group": "root",
+      "mode": "0600",
+      "backup": true,
+      "unsafe_writes": false
+    },
+    "register": "capstone_env_install",
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Reload systemd and restart only the changed Vector shadow service",
+    "ansible.builtin.systemd_service": {
+      "name": "capstone-vector.service",
+      "daemon_reload": true,
+      "state": "restarted",
+      "enabled": true
+    },
+    "when": "not ansible_check_mode and (capstone_config_install.changed or capstone_env_install.changed)"
+  },
+  {
+    "name": "Ensure the reviewed Vector shadow service is enabled and running",
+    "ansible.builtin.systemd_service": {
+      "name": "capstone-vector.service",
+      "state": "started",
+      "enabled": true
+    },
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Verify Vector remains active after startup",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/systemctl",
+        "is-active",
+        "capstone-vector.service"
+      ]
+    },
+    "register": "capstone_vector_active",
+    "changed_when": false,
+    "retries": 5,
+    "delay": 1,
+    "until": "capstone_vector_active.rc == 0",
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Record approval boundary after deployment",
+    "ansible.builtin.stat": {
+      "path": "{{ item }}",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "loop": "{{ capstone_protected_paths }}",
+    "register": "capstone_boundary_after",
+    "no_log": true
+  },
+  {
+    "name": "Verify helper, forced command, sudoers and worker boundary were preserved",
+    "ansible.builtin.assert": {
+      "that": [
+        "item.1.stat.exists == item.0.stat.exists",
+        "item.1.stat.checksum == item.0.stat.checksum",
+        "item.1.stat.mode == item.0.stat.mode",
+        "item.1.stat.uid == item.0.stat.uid",
+        "item.1.stat.gid == item.0.stat.gid"
+      ]
+    },
+    "loop": "{{ capstone_boundary_before.results | zip(capstone_boundary_after.results) | list }}",
+    "no_log": true
+  },
+  {
+    "name": "Report the precise verification scope",
+    "ansible.builtin.debug": {
+      "msg": "Vector shadow only; existing Wazuh input and MCP approval authority unchanged. Check mode predicts copies only; candidate validation and runtime checks run in apply mode."
+    }
+  }
+]

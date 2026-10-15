@@ -1,0 +1,952 @@
+[
+  {
+    "name": "Require fixed operator host and native controller",
+    "ansible.builtin.assert": {
+      "that": [
+        "ansible_facts.user_id == 'root'",
+        "ansible_connection == 'local'",
+        "capstone_expected_machine_id is match('^[0-9a-f]{32}$')",
+        "ansible_facts.machine_id == capstone_expected_machine_id",
+        "ansible_version.full is version('2.21', '>=')",
+        "ansible_version.full is version('2.22', '<')"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    }
+  },
+  {
+    "name": "Hash reviewed guard before loading it",
+    "ansible.builtin.stat": {
+      "path": "{{ capstone_guard_source_dir }}/korean_output_guard.py",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "register": "guard_core_source"
+  },
+  {
+    "name": "Require exact approved core source",
+    "ansible.builtin.assert": {
+      "that": [
+        "guard_core_source.stat.isreg",
+        "not guard_core_source.stat.islnk",
+        "guard_core_source.stat.checksum == capstone_guard_core_sha256"
+      ]
+    }
+  },
+  {
+    "name": "Read fixed Hermes container identity",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "inspect",
+        "hermes"
+      ]
+    },
+    "register": "guard_inspect",
+    "changed_when": false,
+    "check_mode": false,
+    "no_log": true,
+    "timeout": 90
+  },
+  {
+    "name": "Retain only private inspected container state",
+    "ansible.builtin.set_fact": {
+      "guard_container": "{{ (guard_inspect.stdout | from_json)[0] }}"
+    },
+    "no_log": true
+  },
+  {
+    "name": "Require the reviewed image, command and persistent data mount",
+    "ansible.builtin.assert": {
+      "that": [
+        "guard_container.Id is match('^[0-9a-f]{64}$')",
+        "guard_container.Image == 'sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283'",
+        "guard_container.State.Running",
+        "not guard_container.State.OOMKilled",
+        "guard_container.Config.User == 'root'",
+        "guard_container.Config.Entrypoint == ['/opt/hermes/docker/entrypoint-dispatch.sh']",
+        "guard_container.Config.Cmd == ['gateway', 'run']",
+        "guard_container.Mounts | selectattr('Destination', 'equalto', '/opt/data') | list | length == 1",
+        "(guard_container.Mounts | selectattr('Destination', 'equalto', '/opt/data') | first).Source == '/opt/hermes-data'",
+        "(guard_container.Mounts | selectattr('Destination', 'equalto', '/opt/data') | first).Type == 'bind'",
+        "(guard_container.Mounts | selectattr('Destination', 'equalto', '/opt/data') | first).RW",
+        "(guard_container.Mounts | selectattr('Destination', 'equalto', '/opt/data') | first).Propagation == 'rprivate'"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    },
+    "no_log": true
+  },
+  {
+    "name": "Resolve real Hermes service account",
+    "ansible.builtin.getent": {
+      "database": "passwd",
+      "key": "hermes"
+    }
+  },
+  {
+    "name": "Read source and immutable draft configuration checks",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "-i",
+        "{{ guard_container.Id }}",
+        "python3",
+        "-B",
+        "-c",
+        "import sys,types; m=types.ModuleType('guard_checks'); exec(compile(sys.stdin.read(),'guard_checks.py','exec'),m.__dict__); import json; print(json.dumps(m.container(),sort_keys=True))"
+      ],
+      "stdin": "{{ lookup('ansible.builtin.file', capstone_guard_source_dir + '/hermes_guard_checks.py', rstrip=False) }}",
+      "stdin_add_newline": false
+    },
+    "register": "guard_probe",
+    "changed_when": false,
+    "check_mode": false,
+    "no_log": true,
+    "timeout": 90
+  },
+  {
+    "name": "Decode metadata only",
+    "ansible.builtin.set_fact": {
+      "guard_current": "{{ guard_probe.stdout | from_json }}",
+      "guard_uid": "{{ ansible_facts.getent_passwd.hermes[1] }}:{{ ansible_facts.getent_passwd.hermes[2] }}"
+    },
+    "no_log": true
+  },
+  {
+    "name": "Reject any unknown source pair or core",
+    "ansible.builtin.assert": {
+      "that": [
+        "[guard_current.files['plugins/platforms/mattermost/adapter.py'].sha256, guard_current.files['gateway/run_turn.py'].sha256] in capstone_guard_source_pairs",
+        "not guard_current.files['capstone_korean_output_guard.py'].exists or guard_current.files['capstone_korean_output_guard.py'].sha256 == capstone_guard_core_sha256"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    },
+    "no_log": true
+  },
+  {
+    "name": "Record desired hashes",
+    "ansible.builtin.set_fact": {
+      "guard_desired": {
+        "plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+        "gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a",
+        "capstone_korean_output_guard.py": "{{ capstone_guard_core_sha256 }}"
+      },
+      "guard_needs_code": "{{ not guard_current.files['capstone_korean_output_guard.py'].exists or guard_current.files['plugins/platforms/mattermost/adapter.py'].sha256 != '1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b' }}"
+    }
+  },
+  {
+    "name": "Check fresh heartbeat and active leases",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ capstone_guard_source_dir }}/hermes_guard_checks.py",
+        "idle"
+      ]
+    },
+    "register": "guard_idle",
+    "changed_when": false,
+    "check_mode": false,
+    "timeout": 90
+  },
+  {
+    "name": "Detect the one permitted private package target",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "{{ guard_container.Id }}",
+        "test",
+        "-d",
+        "/opt/capstone-guard-runtime/regex-2026.9.29/lib/python3.13/site-packages"
+      ]
+    },
+    "register": "guard_engine_target",
+    "changed_when": false,
+    "failed_when": "guard_engine_target.rc not in [0, 1]",
+    "check_mode": false,
+    "timeout": 90
+  },
+  {
+    "name": "Check mode cannot restore an absent private engine",
+    "ansible.builtin.assert": {
+      "that": [
+        "not ansible_check_mode or guard_engine_target.rc == 0"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    }
+  },
+  {
+    "name": "Inspect operator-reviewed pinned wheel",
+    "ansible.builtin.stat": {
+      "path": "{{ capstone_guard_wheel }}",
+      "follow": false,
+      "checksum_algorithm": "sha256"
+    },
+    "register": "guard_wheel",
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Require exact offline wheel, owned only by root",
+    "ansible.builtin.assert": {
+      "that": [
+        "guard_wheel.stat.exists",
+        "guard_wheel.stat.isreg",
+        "not guard_wheel.stat.islnk",
+        "guard_wheel.stat.uid == 0",
+        "guard_wheel.stat.mode in ['0400', '0600', '0644']",
+        "guard_wheel.stat.checksum == capstone_guard_wheel_sha256"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    },
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Inspect root-only automation state directory",
+    "ansible.builtin.stat": {
+      "path": "/var/lib/capstone-automation/hermes-guard",
+      "follow": false
+    },
+    "register": "guard_state_dir"
+  },
+  {
+    "name": "Reject unsafe existing state path",
+    "ansible.builtin.assert": {
+      "that": [
+        "not guard_state_dir.stat.exists or (guard_state_dir.stat.isdir and not guard_state_dir.stat.islnk and guard_state_dir.stat.uid == 0 and guard_state_dir.stat.mode == '0700')"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    }
+  },
+  {
+    "name": "Create operator-only state directory",
+    "ansible.builtin.file": {
+      "path": "/var/lib/capstone-automation/hermes-guard",
+      "state": "directory",
+      "owner": "root",
+      "group": "root",
+      "mode": "0700"
+    }
+  },
+  {
+    "name": "Create fresh private candidate and rollback workspace",
+    "ansible.builtin.tempfile": {
+      "state": "directory",
+      "path": "/var/backups",
+      "prefix": "hermes-ansible-guard-"
+    },
+    "register": "guard_stage",
+    "when": "not ansible_check_mode and guard_needs_code"
+  },
+  {
+    "name": "Create private source and candidate trees",
+    "ansible.builtin.file": {
+      "path": "{{ guard_stage.path }}/{{ item }}",
+      "state": "directory",
+      "mode": "0700"
+    },
+    "loop": [
+      "original/plugins/platforms/mattermost",
+      "original/gateway",
+      "candidate"
+    ],
+    "when": "not ansible_check_mode and guard_needs_code"
+  },
+  {
+    "name": "Copy fixed reviewed artifact",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "{{ guard_container.Id }}:/opt/hermes/{{ item }}",
+        "{{ guard_stage.path }}/original/{{ item }}"
+      ]
+    },
+    "loop": [
+      "plugins/platforms/mattermost/adapter.py",
+      "gateway/run_turn.py"
+    ],
+    "when": "not ansible_check_mode and guard_needs_code",
+    "timeout": 90
+  },
+  {
+    "name": "Copy fixed reviewed artifact",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "{{ guard_container.Id }}:/opt/hermes/capstone_korean_output_guard.py",
+        "{{ guard_stage.path }}/original/capstone_korean_output_guard.py"
+      ]
+    },
+    "when": "not ansible_check_mode and guard_current.files['capstone_korean_output_guard.py'].exists and guard_needs_code",
+    "timeout": 90
+  },
+  {
+    "name": "Build SHA-pinned candidates without deploying",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ capstone_guard_source_dir }}/patch_korean_output_guard.py",
+        "--source-root",
+        "{{ guard_stage.path }}/original",
+        "--output-root",
+        "{{ guard_stage.path }}/candidate"
+      ]
+    },
+    "register": "guard_built",
+    "changed_when": false,
+    "when": "not ansible_check_mode and guard_needs_code",
+    "timeout": 90
+  },
+  {
+    "name": "Stage reviewed guard core",
+    "ansible.builtin.copy": {
+      "src": "{{ capstone_guard_source_dir }}/korean_output_guard.py",
+      "dest": "{{ guard_stage.path }}/candidate/capstone_korean_output_guard.py",
+      "mode": "0644"
+    },
+    "when": "not ansible_check_mode and guard_needs_code"
+  },
+  {
+    "name": "Restore the fixed dependency only when missing",
+    "when": "not ansible_check_mode and guard_engine_target.rc == 1",
+    "block": [
+      {
+        "name": "Create fixed transient engine staging directory",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "{{ guard_container.Id }}",
+            "mktemp",
+            "-d",
+            "/tmp/capstone-guard-engine.XXXXXXXX"
+          ]
+        },
+        "register": "guard_engine_stage",
+        "timeout": 90
+      },
+      {
+        "name": "Copy fixed reviewed artifact",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ capstone_guard_wheel }}",
+            "{{ guard_container.Id }}:{{ guard_engine_stage.stdout }}/regex.whl"
+          ]
+        },
+        "timeout": 90
+      },
+      {
+        "name": "Copy fixed reviewed artifact",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ capstone_guard_source_dir }}/korean-output-guard-requirements.txt",
+            "{{ guard_container.Id }}:{{ guard_engine_stage.stdout }}/requirements.txt"
+          ]
+        },
+        "timeout": 90
+      },
+      {
+        "name": "Give the wheel its verified distribution filename",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "{{ guard_container.Id }}",
+            "mv",
+            "{{ guard_engine_stage.stdout }}/regex.whl",
+            "{{ guard_engine_stage.stdout }}/{{ capstone_guard_wheel | basename }}"
+          ]
+        },
+        "timeout": 90
+      },
+      {
+        "name": "Restore only pinned regex into the isolated target",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "{{ guard_container.Id }}",
+            "/usr/local/bin/uv",
+            "--no-config",
+            "pip",
+            "install",
+            "--python",
+            "/opt/hermes/.venv/bin/python",
+            "--target",
+            "/opt/capstone-guard-runtime/regex-2026.9.29/lib/python3.13/site-packages",
+            "--no-deps",
+            "--no-index",
+            "--find-links",
+            "{{ guard_engine_stage.stdout }}",
+            "--only-binary=:all:",
+            "--require-hashes",
+            "--no-cache",
+            "--link-mode=copy",
+            "-r",
+            "{{ guard_engine_stage.stdout }}/requirements.txt"
+          ]
+        },
+        "no_log": true,
+        "timeout": 180
+      }
+    ],
+    "always": [
+      {
+        "name": "Remove only this package staging directory",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "{{ guard_container.Id }}",
+            "rm",
+            "-rf",
+            "--",
+            "{{ guard_engine_stage.stdout }}"
+          ]
+        },
+        "changed_when": false,
+        "when": "guard_engine_stage is defined and guard_engine_stage.rc == 0",
+        "timeout": 90
+      }
+    ]
+  },
+  {
+    "name": "Import candidate package engine as actual service UID",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "-i",
+        "-u",
+        "{{ guard_uid }}",
+        "-e",
+        "HOME=/opt/data/home",
+        "{{ guard_container.Id }}",
+        "python3",
+        "-B",
+        "-c",
+        "import sys,types,json; m=types.ModuleType('guard_candidate'); sys.modules[m.__name__]=m; exec(compile(sys.stdin.read(),'guard_candidate.py','exec'),m.__dict__); print(json.dumps(m.detector_metadata()))"
+      ],
+      "stdin": "{{ lookup('ansible.builtin.file', capstone_guard_source_dir + '/korean_output_guard.py', rstrip=False) }}",
+      "stdin_add_newline": false
+    },
+    "register": "guard_engine",
+    "changed_when": false,
+    "check_mode": false,
+    "timeout": 90
+  },
+  {
+    "name": "Require actual compiled isolated Unicode engine",
+    "ansible.builtin.assert": {
+      "that": [
+        "(guard_engine.stdout | from_json).package == 'regex'",
+        "(guard_engine.stdout | from_json).version == '2026.9.29'",
+        "(guard_engine.stdout | from_json).backend == 'regex._regex'",
+        "(guard_engine.stdout | from_json).origin == 'isolated_runtime'"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    }
+  },
+  {
+    "name": "Recheck source and configuration before entering mutation block",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "-i",
+        "{{ guard_container.Id }}",
+        "python3",
+        "-B",
+        "-c",
+        "import sys,types; m=types.ModuleType('guard_checks'); exec(compile(sys.stdin.read(),'guard_checks.py','exec'),m.__dict__); import json; print(json.dumps(m.container(),sort_keys=True))"
+      ],
+      "stdin": "{{ lookup('ansible.builtin.file', capstone_guard_source_dir + '/hermes_guard_checks.py', rstrip=False) }}",
+      "stdin_add_newline": false
+    },
+    "register": "guard_probe_now",
+    "changed_when": false,
+    "check_mode": false,
+    "no_log": true,
+    "timeout": 90,
+    "when": "not ansible_check_mode and guard_needs_code"
+  },
+  {
+    "name": "Reject concurrent source or configuration changes before mutation",
+    "ansible.builtin.assert": {
+      "that": [
+        "guard_probe_now.stdout == guard_probe.stdout"
+      ]
+    },
+    "when": "not ansible_check_mode and guard_needs_code",
+    "no_log": true
+  },
+  {
+    "name": "Recheck freshness immediately before stop",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ capstone_guard_source_dir }}/hermes_guard_checks.py",
+        "idle"
+      ]
+    },
+    "changed_when": false,
+    "timeout": 90,
+    "when": "not ansible_check_mode and guard_needs_code"
+  },
+  {
+    "name": "Recheck name binding before touching the saved container",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "inspect",
+        "--format",
+        "{{ \"{{.Id}}\" }}",
+        "hermes"
+      ]
+    },
+    "register": "guard_identity_now",
+    "changed_when": false,
+    "timeout": 90,
+    "when": "not ansible_check_mode and guard_needs_code"
+  },
+  {
+    "name": "Reject concurrent replacement",
+    "ansible.builtin.assert": {
+      "that": [
+        "guard_identity_now.stdout == guard_container.Id"
+      ],
+      "fail_msg": "Hermes guard contract rejected; no payload is logged."
+    },
+    "when": "not ansible_check_mode and guard_needs_code"
+  },
+  {
+    "name": "Deploy candidate with native rollback",
+    "when": "not ansible_check_mode and guard_needs_code",
+    "block": [
+      {
+        "name": "Stop only the verified idle Hermes container",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "stop",
+            "-t",
+            "30",
+            "{{ guard_container.Id }}"
+          ]
+        },
+        "timeout": 90
+      },
+      {
+        "name": "Seal stopped configuration and database bytes",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "{{ capstone_guard_source_dir }}/hermes_guard_checks.py",
+            "snapshot"
+          ]
+        },
+        "register": "guard_stopped_snapshot",
+        "changed_when": false,
+        "timeout": 90
+      },
+      {
+        "name": "Keep private preservation metadata in backup",
+        "ansible.builtin.copy": {
+          "content": "{{ guard_stopped_snapshot.stdout }}\n",
+          "dest": "{{ guard_stage.path }}/protected.json",
+          "mode": "0600"
+        }
+      },
+      {
+        "name": "Copy fixed reviewed artifact",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ guard_stage.path }}/candidate/{{ item }}",
+            "{{ guard_container.Id }}:/opt/hermes/{{ item }}"
+          ]
+        },
+        "loop": [
+          "plugins/platforms/mattermost/adapter.py",
+          "gateway/run_turn.py",
+          "capstone_korean_output_guard.py"
+        ],
+        "timeout": 90
+      },
+      {
+        "name": "Confirm config and DB bytes unchanged before restart",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "{{ capstone_guard_source_dir }}/hermes_guard_checks.py",
+            "snapshot"
+          ]
+        },
+        "register": "guard_snapshot_after",
+        "changed_when": false,
+        "timeout": 90
+      },
+      {
+        "name": "Never start after configuration or database drift",
+        "ansible.builtin.assert": {
+          "that": [
+            "guard_snapshot_after.stdout == guard_stopped_snapshot.stdout"
+          ],
+          "fail_msg": "Hermes guard contract rejected; no payload is logged."
+        }
+      },
+      {
+        "name": "Copy fixed reviewed artifact",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ guard_container.Id }}:/opt/hermes/{{ item }}",
+            "{{ guard_stage.path }}/verify-{{ item | basename }}"
+          ]
+        },
+        "loop": [
+          "plugins/platforms/mattermost/adapter.py",
+          "gateway/run_turn.py",
+          "capstone_korean_output_guard.py"
+        ],
+        "timeout": 90
+      },
+      {
+        "name": "Hash copied-back installed files",
+        "ansible.builtin.stat": {
+          "path": "{{ guard_stage.path }}/verify-{{ item | basename }}",
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "plugins/platforms/mattermost/adapter.py",
+          "gateway/run_turn.py",
+          "capstone_korean_output_guard.py"
+        ],
+        "register": "guard_written"
+      },
+      {
+        "name": "Verify exact installed candidates before startup",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.checksum == guard_desired[item.item]"
+          ],
+          "fail_msg": "Hermes guard contract rejected; no payload is logged."
+        },
+        "loop": "{{ guard_written.results }}"
+      },
+      {
+        "name": "Start the same existing Hermes container",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "start",
+            "{{ guard_container.Id }}"
+          ]
+        },
+        "timeout": 90
+      },
+      {
+        "name": "Remember successful candidate startup",
+        "ansible.builtin.set_fact": {
+          "guard_candidate_started": true
+        }
+      },
+      {
+        "name": "Validate actual installed transports using fake HTTP only",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "-i",
+            "-u",
+            "{{ guard_uid }}",
+            "-e",
+            "HOME=/opt/data/home",
+            "{{ guard_container.Id }}",
+            "python3",
+            "-B",
+            "-c",
+            "import sys; exec(compile(sys.stdin.read(),'guard_runtime_verify.py','exec'),{'__name__':'__main__'})"
+          ],
+          "stdin": "{{ lookup('ansible.builtin.file', capstone_guard_source_dir + '/verify_korean_output_guard_runtime.py', rstrip=False) }}",
+          "stdin_add_newline": false
+        },
+        "register": "guard_runtime",
+        "changed_when": false,
+        "timeout": 90
+      },
+      {
+        "name": "Wait for new gateway heartbeat without modifying its state",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "{{ capstone_guard_source_dir }}/hermes_guard_checks.py",
+            "idle"
+          ]
+        },
+        "register": "guard_health",
+        "changed_when": false,
+        "retries": 8,
+        "delay": 5,
+        "until": "guard_health.rc == 0",
+        "timeout": 90
+      }
+    ],
+    "rescue": [
+      {
+        "name": "Stop candidate before restoring the integration",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "stop",
+            "-t",
+            "30",
+            "{{ guard_container.Id }}"
+          ]
+        },
+        "timeout": 90
+      },
+      {
+        "name": "Copy fixed reviewed artifact",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ guard_stage.path }}/original/{{ item }}",
+            "{{ guard_container.Id }}:/opt/hermes/{{ item }}"
+          ]
+        },
+        "loop": [
+          "plugins/platforms/mattermost/adapter.py",
+          "gateway/run_turn.py"
+        ],
+        "timeout": 90
+      },
+      {
+        "name": "Copy fixed reviewed artifact",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ guard_stage.path }}/original/capstone_korean_output_guard.py",
+            "{{ guard_container.Id }}:/opt/hermes/capstone_korean_output_guard.py"
+          ]
+        },
+        "when": "guard_current.files['capstone_korean_output_guard.py'].exists",
+        "timeout": 90
+      },
+      {
+        "name": "Copy fixed reviewed artifact",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ guard_container.Id }}:/opt/hermes/{{ item }}",
+            "{{ guard_stage.path }}/rollback-{{ item | basename }}"
+          ]
+        },
+        "loop": [
+          "plugins/platforms/mattermost/adapter.py",
+          "gateway/run_turn.py"
+        ],
+        "timeout": 90
+      },
+      {
+        "name": "Hash restored integration",
+        "ansible.builtin.stat": {
+          "path": "{{ guard_stage.path }}/rollback-{{ item | basename }}",
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "plugins/platforms/mattermost/adapter.py",
+          "gateway/run_turn.py"
+        ],
+        "register": "guard_rollback_hashes"
+      },
+      {
+        "name": "Only exact original integrations may restart",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.checksum == guard_current.files[item.item].sha256"
+          ],
+          "fail_msg": "Hermes guard contract rejected; no payload is logged."
+        },
+        "loop": "{{ guard_rollback_hashes.results }}"
+      },
+      {
+        "name": "Read back restored original core",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "cp",
+            "{{ guard_container.Id }}:/opt/hermes/capstone_korean_output_guard.py",
+            "{{ guard_stage.path }}/rollback-core.py"
+          ]
+        },
+        "when": "guard_current.files['capstone_korean_output_guard.py'].exists",
+        "timeout": 90
+      },
+      {
+        "name": "Hash restored original core",
+        "ansible.builtin.stat": {
+          "path": "{{ guard_stage.path }}/rollback-core.py",
+          "checksum_algorithm": "sha256"
+        },
+        "register": "guard_rollback_core",
+        "when": "guard_current.files['capstone_korean_output_guard.py'].exists"
+      },
+      {
+        "name": "Require exact original core before recovery",
+        "ansible.builtin.assert": {
+          "that": [
+            "guard_rollback_core.stat.checksum == guard_current.files['capstone_korean_output_guard.py'].sha256"
+          ]
+        },
+        "when": "guard_current.files['capstone_korean_output_guard.py'].exists"
+      },
+      {
+        "name": "Recheck protected stopped bytes before rollback restart",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "{{ capstone_guard_source_dir }}/hermes_guard_checks.py",
+            "snapshot"
+          ]
+        },
+        "register": "guard_rollback_snapshot",
+        "changed_when": false,
+        "timeout": 90
+      },
+      {
+        "name": "Leave stopped if preservation cannot be proved",
+        "ansible.builtin.assert": {
+          "that": [
+            "guard_stopped_snapshot is defined",
+            "(guard_stopped_snapshot.stdout | from_json | dict2items | rejectattr('key', 'match', '^state[.]db') | list) == (guard_rollback_snapshot.stdout | from_json | dict2items | rejectattr('key', 'match', '^state[.]db') | list)",
+            "guard_candidate_started | default(false) or guard_stopped_snapshot.stdout == guard_rollback_snapshot.stdout"
+          ],
+          "fail_msg": "Hermes guard contract rejected; no payload is logged."
+        }
+      },
+      {
+        "name": "Restart only verified original integration",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "start",
+            "{{ guard_container.Id }}"
+          ]
+        },
+        "timeout": 90
+      },
+      {
+        "name": "Remove unused newly added core after an original-source rollback",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "{{ guard_container.Id }}",
+            "rm",
+            "-f",
+            "--",
+            "/opt/hermes/capstone_korean_output_guard.py"
+          ]
+        },
+        "when": "not guard_current.files['capstone_korean_output_guard.py'].exists",
+        "timeout": 90
+      },
+      {
+        "name": "Report failed deployment even when rollback succeeded",
+        "ansible.builtin.fail": {
+          "msg": "Candidate failed; original integration restored. Root-only backup retained; inspect metadata."
+        }
+      }
+    ]
+  },
+  {
+    "name": "Validate actual installed transports using fake HTTP only",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "-i",
+        "-u",
+        "{{ guard_uid }}",
+        "-e",
+        "HOME=/opt/data/home",
+        "{{ guard_container.Id }}",
+        "python3",
+        "-B",
+        "-c",
+        "import sys; exec(compile(sys.stdin.read(),'guard_runtime_verify.py','exec'),{'__name__':'__main__'})"
+      ],
+      "stdin": "{{ lookup('ansible.builtin.file', capstone_guard_source_dir + '/verify_korean_output_guard_runtime.py', rstrip=False) }}",
+      "stdin_add_newline": false
+    },
+    "register": "guard_runtime",
+    "changed_when": false,
+    "when": "not ansible_check_mode and not guard_needs_code",
+    "timeout": 90
+  },
+  {
+    "name": "Wait for new gateway heartbeat without modifying its state",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ capstone_guard_source_dir }}/hermes_guard_checks.py",
+        "idle"
+      ]
+    },
+    "register": "guard_health",
+    "changed_when": false,
+    "retries": 8,
+    "delay": 5,
+    "until": "guard_health.rc == 0",
+    "when": "not ansible_check_mode and not guard_needs_code",
+    "timeout": 90
+  },
+  {
+    "name": "Record only verified container identity for recreation detection",
+    "ansible.builtin.copy": {
+      "content": "{{ guard_container.Id }}\n",
+      "dest": "/var/lib/capstone-automation/hermes-guard/last-container-id",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    },
+    "when": "not ansible_check_mode"
+  },
+  {
+    "name": "Publish safe reapplication summary",
+    "ansible.builtin.debug": {
+      "msg": {
+        "container": "{{ guard_container.Id[:12] }}",
+        "code_changed": "{{ guard_needs_code }}",
+        "check_only": "{{ ansible_check_mode }}",
+        "policy_database_migration": false,
+        "protected_configuration": "unchanged",
+        "unicode_engine": "{{ guard_engine.stdout | from_json }}"
+      }
+    }
+  },
+  {
+    "name": "Prepare native timer and observer definitions",
+    "ansible.builtin.include_tasks": "persist.yml",
+    "when": "not ansible_check_mode and capstone_guard_enable_watch | default(false) | bool"
+  }
+]

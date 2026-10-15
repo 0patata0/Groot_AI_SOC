@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "date_kst": "2026-10-14",
+  "smoke": {
+    "status": "passed",
+    "phase": "verified",
+    "verification": {
+      "context_msec_iso_and_audit_time_verified": true,
+      "duplicates": 0,
+      "full_v2_unique_ids_preserved": true,
+      "generations": 1,
+      "late_old_context_precedes_release": false,
+      "late_old_verified": false,
+      "production_v2_vrl_executed": false,
+      "realtime_pair_join_proven": false,
+      "requests": 1,
+      "same_binding": true,
+      "stable_format_same_in_all_generations": true,
+      "time_metadata": [
+        {
+          "audit_naive_difference_ms": -664,
+          "epoch_ms": 1791982437664,
+          "iso_epoch_difference_ms": 664,
+          "unique_id_bytes": 141
+        }
+      ],
+      "unique_id_lengths": [
+        141
+      ],
+      "vector_access_records": 1,
+      "vector_audit_records": 1,
+      "vector_original_message_sha_equal": true,
+      "wazuh_audit_records": 1,
+      "wazuh_native_cjson_sha_equal": true,
+      "writer_uid_gid": 101
+    },
+    "cleanup": {
+      "errors": [],
+      "private_runtime_paths_removed": true,
+      "test_writer_processes_remaining": 0
+    },
+    "source_result_path": "/var/tmp/capstone-sequential-20261014/step3/producer-v2/run-smoke-01/result.json",
+    "source_result_sha256": "d1f9e6332ecc6a7cb78dee08159ec4906947f004e074d855aaaebe33b9c73f42"
+  },
+  "rotate": {
+    "status": "passed",
+    "phase": "verified",
+    "verification": {
+      "context_msec_iso_and_audit_time_verified": true,
+      "duplicates": 0,
+      "full_v2_unique_ids_preserved": true,
+      "generations": 2,
+      "late_old_context_precedes_release": true,
+      "late_old_verified": true,
+      "production_v2_vrl_executed": false,
+      "realtime_pair_join_proven": false,
+      "requests": 3,
+      "same_binding": true,
+      "stable_format_same_in_all_generations": true,
+      "time_metadata": [
+        {
+          "audit_naive_difference_ms": -231,
+          "epoch_ms": 1791982523231,
+          "iso_epoch_difference_ms": 231,
+          "unique_id_bytes": 141
+        },
+        {
+          "audit_naive_difference_ms": -952,
+          "epoch_ms": 1791982524952,
+          "iso_epoch_difference_ms": 952,
+          "unique_id_bytes": 141
+        },
+        {
+          "audit_naive_difference_ms": -228,
+          "epoch_ms": 1791982525228,
+          "iso_epoch_difference_ms": 228,
+          "unique_id_bytes": 141
+        }
+      ],
+      "unique_id_lengths": [
+        141
+      ],
+      "vector_access_records": 3,
+      "vector_audit_records": 3,
+      "vector_original_message_sha_equal": true,
+      "wazuh_audit_records": 3,
+      "wazuh_native_cjson_sha_equal": true,
+      "writer_uid_gid": 101
+    },
+    "cleanup": {
+      "errors": [],
+      "private_runtime_paths_removed": true,
+      "test_writer_processes_remaining": 0
+    },
+    "source_result_path": "/var/tmp/capstone-sequential-20261014/step3/producer-v2/run-rotate-01/result.json",
+    "source_result_sha256": "333f33adb1b7e7a554d1c5a8e05477b4b5dc0715627aac8a3c298ba75ace74eb"
+  },
+  "vrl_synthetic": {
+    "passed": 25,
+    "failed": 0
+  },
+  "actual_audit_vrl": {
+    "observed_at_kst": "2026-10-14T22:02:37+09:00",
+    "ready": 3,
+    "missing": 0,
+    "duplicates": 0,
+    "quarantine": 0,
+    "raw_and_producer_hashes_matched": true,
+    "access_used_for_time": false,
+    "source_unchanged": true,
+    "private_children_reaped": true,
+    "remote_result": "/var/tmp/capstone-sequential-20261014/step3/producer-v2/run-rotate-01/evidence/context-tests/context-validation.json",
+    "manifest_sha256": "46f7bf37ca1df98d6e62b965ff3ce12e7173ca3cf7f0ea8955f4cfe7045f8d46"
+  },
+  "full_vector_configuration": {
+    "exit": 0,
+    "environment_checks": false
+  },
+  "production_deployed": false,
+  "packages_installed": false,
+  "source_sha256": {
+    "probe-native-a.py": "68c8556b36432d6f355fba0752a5ecbdaba4a4f92e5d8412a6e14ad75944b61c",
+    "wazuh-isolated.sh": "73a520416dff0f40e3b32e6914260ef23a29e0c1ee68d2cc243e7250f83619db",
+    "verify-context-a.py": "474f2725500a3e77de89c02d4408c12f4dd2b35e3eea10eef2e149943fdee909",
+    "audit-context.vrl": "bf858467aa62e3dd7da7e9135af8ac36d8bcee0e4d0415d7a13ff0dac52cd219",
+    "tests-context.toml": "690ae00a15844b718765903656940f102eaa495a5c0d1dae51250fb255c5f6f0"
+  }
+}

@@ -1,0 +1,278 @@
+{
+  "type": "monitor",
+  "name": "capstone-evidence-observation-v1",
+  "monitor_type": "query_level_monitor",
+  "enabled": false,
+  "schedule": {
+    "period": {
+      "interval": 1,
+      "unit": "MINUTES"
+    }
+  },
+  "inputs": [
+    {
+      "search": {
+        "indices": [
+          "wazuh-alerts-*"
+        ],
+        "query": {
+          "size": 0,
+          "_source": false,
+          "timeout": "10s",
+          "track_total_hits": true,
+          "terminate_after": 10001,
+          "query": {
+            "bool": {
+              "filter": [
+                {
+                  "term": {
+                    "agent.id": "001"
+                  }
+                },
+                {
+                  "term": {
+                    "location": "/var/log/capstone-vector/evidence/normalized.jsonl"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.schema_version": "vector-1"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.pipeline": "vector"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.sensor": "groot-sec"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.evidence_lane": "indexer-observation-v1"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.correlation_eligible": "true"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.correlation_time_class": "fresh"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.protected_asset": "false"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.correlation_policy": "directional-service-v1"
+                  }
+                },
+                {
+                  "terms": {
+                    "data.capstone_norm.protocol": [
+                      "tcp",
+                      "udp"
+                    ]
+                  }
+                },
+                {
+                  "range": {
+                    "timestamp": {
+                      "gte": "now-360s",
+                      "lte": "now+5s"
+                    }
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.correlation_key": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.correlation_dedupe_key": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.event_id": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.message_sha256": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "bool": {
+                          "filter": [
+                            {
+                              "term": {
+                                "rule.id": "100261"
+                              }
+                            },
+                            {
+                              "term": {
+                                "data.capstone_norm.source": "suricata"
+                              }
+                            },
+                            {
+                              "terms": {
+                                "data.capstone_norm.action": [
+                                  "allowed",
+                                  "observed",
+                                  "blocked"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "bool": {
+                          "filter": [
+                            {
+                              "term": {
+                                "rule.id": "100262"
+                              }
+                            },
+                            {
+                              "term": {
+                                "data.capstone_norm.source": "nftables"
+                              }
+                            },
+                            {
+                              "term": {
+                                "data.capstone_norm.action": "logged_drop"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "script": {
+                    "script": {
+                      "lang": "painless",
+                      "source": "// Producer marker/leaf retain the v1 trust boundary. One docvalue is not proof\n// of scalar original JSON. Only exactly representable microsecond times enter.\ntry {\n    for (String suffix : params.single_fields) {\n        String field = 'data.capstone_norm.' + suffix;\n        if (!doc.containsKey(field) || doc[field].size() != 1) return false;\n    }\n    if (!doc.containsKey('agent.id') || doc['agent.id'].size() != 1 ||\n        !doc.containsKey('location') || doc['location'].size() != 1 ||\n        !doc.containsKey('rule.id') || doc['rule.id'].size() != 1) return false;\n    long endMs = Long.parseLong(params.period_end);\n    if (endMs < 300000 || endMs > 9223372036854775L) return false;\n    def instant = ZonedDateTime.parse(doc['data.capstone_norm.event_time_kst'].value).toInstant();\n    long seconds = instant.getEpochSecond();\n    if (seconds < 0 || seconds > 9223372036853L || instant.getNano() % 1000 != 0) return false;\n    long eventUs = seconds * 1000000L + instant.getNano() / 1000;\n    long endUs = endMs * 1000L;\n    long port = Long.parseLong(doc['data.capstone_norm.destination_port'].value.toString());\n    return eventUs >= endUs - 300000000L && eventUs <= endUs && port >= 1 && port <= 65535;\n} catch (Exception e) {\n    return false;\n}\n",
+                      "params": {
+                        "period_end": "{{period_end}}",
+                        "single_fields": [
+                          "schema_version",
+                          "pipeline",
+                          "sensor",
+                          "evidence_lane",
+                          "source",
+                          "action",
+                          "correlation_eligible",
+                          "correlation_time_class",
+                          "protected_asset",
+                          "correlation_policy",
+                          "source_ip",
+                          "destination_ip",
+                          "destination_port",
+                          "protocol",
+                          "event_time_kst",
+                          "correlation_key",
+                          "correlation_dedupe_key",
+                          "event_id",
+                          "message_sha256"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "must_not": [
+                {
+                  "terms": {
+                    "data.capstone_norm.source_ip": [
+                      "211.170.162.110",
+                      "211.170.162.111"
+                    ]
+                  }
+                },
+                {
+                  "terms": {
+                    "data.capstone_norm.destination_ip": [
+                      "211.170.162.110",
+                      "211.170.162.111"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "aggs": {
+            "observation": {
+              "scripted_metric": {
+                "params": {
+                  "period_end": "{{period_end}}"
+                },
+                "init_script": {
+                  "lang": "painless",
+                  "source": "state.valid = true;\nstate.reason = 'ok';\nstate.documents = 0L;\nstate.rows = new ArrayList();\nstate.services = new HashMap();\n"
+                },
+                "map_script": {
+                  "lang": "painless",
+                  "source": "boolean stableKey(def value) {\n    if (!(value instanceof String) || value.length() != 64) return false;\n    for (int i = 0; i < 64; ++i) {\n        int c = value.charAt(i);\n        if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102))) return false;\n    }\n    return true;\n}\n\n// Counters saturate at the first rejected document. No row/key is emitted.\nif (!state.valid) return;\nstate.documents += 1L;\nif (state.documents > 10000) {\n    state.valid = false; state.reason = 'document_limit'; return;\n}\ntry {\n    for (String suffix : ['event_time_kst', 'source', 'correlation_dedupe_key', 'correlation_key']) {\n        String field = 'data.capstone_norm.' + suffix;\n        if (!doc.containsKey(field) || doc[field].size() != 1) {\n            state.valid = false; state.reason = 'record_invalid'; return;\n        }\n    }\n    String source = doc['data.capstone_norm.source'].value;\n    String key = doc['data.capstone_norm.correlation_dedupe_key'].value;\n    String service = doc['data.capstone_norm.correlation_key'].value;\n    if ((source != 'suricata' && source != 'nftables') || !stableKey(key) || !stableKey(service)) {\n        state.valid = false; state.reason = 'record_invalid'; return;\n    }\n    long endMs = Long.parseLong(params.period_end);\n    def instant = ZonedDateTime.parse(doc['data.capstone_norm.event_time_kst'].value).toInstant();\n    long seconds = instant.getEpochSecond();\n    if (endMs < 300000 || endMs > 9223372036854775L || seconds < 0 ||\n        seconds > 9223372036853L || instant.getNano() % 1000 != 0) {\n        state.valid = false; state.reason = 'record_invalid'; return;\n    }\n    long eventUs = seconds * 1000000L + instant.getNano() / 1000;\n    long endUs = endMs * 1000L;\n    if (eventUs < endUs - 300000000L || eventUs > endUs) {\n        state.valid = false; state.reason = 'record_invalid'; return;\n    }\n    if (!state.services.containsKey(service)) {\n        if (state.services.size() >= 100) {\n            state.valid = false; state.reason = 'service_limit'; return;\n        }\n        state.services[service] = true;\n    }\n    state.rows.add([eventUs, source, key, service]);\n} catch (Exception e) {\n    state.valid = false; state.reason = 'record_invalid';\n}\n"
+                },
+                "combine_script": {
+                  "lang": "painless",
+                  "source": "// Each shard sends at most 10,000 compact rows, never original documents.\nif (state.valid != true) return ['valid': false, 'reason': state.reason, 'documents': -1L, 'rows': []];\nif (state.documents < 0 || state.documents > 10000 || state.rows.size() != state.documents) {\n    return ['valid': false, 'reason': 'document_limit', 'documents': -1L, 'rows': []];\n}\nif (state.services.size() > 100) return ['valid': false, 'reason': 'service_limit', 'documents': -1L, 'rows': []];\nreturn ['valid': true, 'reason': 'ok', 'documents': state.documents, 'rows': state.rows];\n"
+                },
+                "reduce_script": {
+                  "lang": "painless",
+                  "source": "boolean boundedInteger(def value, long maximum) {\n    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;\n}\nboolean stableKey(def value) {\n    if (!(value instanceof String) || value.length() != 64) return false;\n    for (int i = 0; i < 64; ++i) {\n        int c = value.charAt(i);\n        if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102))) return false;\n    }\n    return true;\n}\ndef unavailable(String reason) {\n    return ['policy': 'event-window-v2', 'precision': 'microseconds', 'valid': false,\n            'reason': reason, 'match': false, 'documents': -1L, 'unique_events': -1L,\n            'duplicate_documents': -1L, 'services': -1L, 'matched_services': -1L,\n            'repeat_services': -1L, 'cross_source_services': -1L];\n}\ntry {\n    if (!(states instanceof List) || states.size() > 64) return unavailable('shard_limit');\n    long endMs = Long.parseLong(params.period_end);\n    if (endMs < 300000 || endMs > 9223372036854775L) return unavailable('record_invalid');\n    long endUs = endMs * 1000L;\n    long documents = 0L;\n    def unique = new HashMap();\n    def services = new HashMap();\n    for (def shard : states) {\n        // A shard with no matching documents may supply null.\n        if (shard == null) continue;\n        if (!(shard instanceof Map) || shard.size() != 4 || shard.valid != true) {\n            if (shard instanceof Map && shard.valid == false &&\n                (shard.reason == 'document_limit' || shard.reason == 'service_limit' || shard.reason == 'record_invalid')) {\n                return unavailable(shard.reason);\n            }\n            return unavailable('state_invalid');\n        }\n        if (shard.reason != 'ok' || !boundedInteger(shard.documents, 10000) ||\n            !(shard.rows instanceof List) || shard.rows.size() != shard.documents) return unavailable('state_invalid');\n        documents += shard.documents;\n        if (documents > 10000) return unavailable('document_limit');\n        for (def row : shard.rows) {\n            if (!(row instanceof List) || row.size() != 4 || !boundedInteger(row[0], endUs) ||\n                row[0] < endUs - 300000000L || (row[1] != 'suricata' && row[1] != 'nftables') ||\n                !stableKey(row[2]) || !(row[3] instanceof String) || row[3].length() != 64) return unavailable('record_invalid');\n            String identity = row[1] + ':' + row[2];\n            if (unique.containsKey(identity)) {\n                def previous = unique[identity];\n                if (previous[0] != row[0] || previous[3] != row[3]) return unavailable('identity_conflict');\n                continue;\n            }\n            unique[identity] = row;\n            if (!services.containsKey(row[3])) {\n                if (!stableKey(row[3])) return unavailable('record_invalid');\n                if (services.size() >= 100) return unavailable('service_limit');\n                services[row[3]] = new ArrayList();\n            }\n            services[row[3]].add(row);\n        }\n    }\n    long matched = 0L;\n    long repeat = 0L;\n    long cross = 0L;\n    for (def events : services.values()) {\n        events.sort((a, b) -> a[0] < b[0] ? -1 : (a[0] > b[0] ? 1 : 0));\n        int left = 0;\n        int suricata = 0;\n        int nftables = 0;\n        boolean repeated = false;\n        boolean crossed = false;\n        for (int right = 0; right < events.size(); ++right) {\n            def current = events[right];\n            if (current[1] == 'suricata') ++suricata; else ++nftables;\n            // Inclusive 60 seconds; 60.000001 seconds is outside the window.\n            while (current[0] - events[left][0] > 60000000L) {\n                if (events[left][1] == 'suricata') --suricata; else --nftables;\n                ++left;\n            }\n            if (suricata >= 5 || nftables >= 5) repeated = true;\n            if (suricata > 0 && nftables > 0) crossed = true;\n        }\n        if (repeated) ++repeat;\n        if (crossed) ++cross;\n        if (repeated || crossed) ++matched;\n    }\n    return ['policy': 'event-window-v2', 'precision': 'microseconds', 'valid': true,\n            'reason': 'ok', 'match': matched > 0, 'documents': documents,\n            'unique_events': (long)unique.size(), 'duplicate_documents': documents - unique.size(),\n            'services': (long)services.size(), 'matched_services': matched,\n            'repeat_services': repeat, 'cross_source_services': cross];\n} catch (Exception e) {\n    return unavailable('state_invalid');\n}\n"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "query_level_trigger": {
+        "id": "capstone-observation-match-v1",
+        "name": "observation_match",
+        "severity": "5",
+        "condition": {
+          "script": {
+            "lang": "painless",
+            "source": "// Byte-identical prefix in both triggers; no deployment/test bypass parameters.\nboolean boundedInteger(def value, long maximum) {\n    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;\n}\nboolean observationAvailable(def ctx) {\n    try {\n        long now = new Date().getTime();\n        long end = ctx.periodEnd.toEpochMilli();\n        if (end < 300000 || end > now + 5000 || end < now - 15000 || ctx.error != null ||\n            !(ctx.results instanceof List) || ctx.results.size() != 1) return false;\n        def result = ctx.results[0];\n        if (!(result instanceof Map) || result.timed_out != false ||\n            (result.containsKey('terminated_early') && result.terminated_early != false) ||\n            !(result._shards instanceof Map)) return false;\n        def shards = result._shards;\n        if (!boundedInteger(shards.total, 64) || shards.total < 1 ||\n            !boundedInteger(shards.successful, 64) || shards.successful != shards.total ||\n            !boundedInteger(shards.skipped, shards.total) || !boundedInteger(shards.failed, 0)) return false;\n        if (!(result.hits instanceof Map) || !(result.hits.total instanceof Map) ||\n            result.hits.total.relation != 'eq' || !boundedInteger(result.hits.total.value, 10000) ||\n            !(result.hits.hits instanceof List) || result.hits.hits.size() != 0 ||\n            !(result.aggregations instanceof Map) || !(result.aggregations.observation instanceof Map)) return false;\n        def metric = result.aggregations.observation.value;\n        if (!(metric instanceof Map) || metric.size() != 12 || metric.policy != 'event-window-v2' ||\n            metric.precision != 'microseconds' || metric.valid != true || metric.reason != 'ok' ||\n            !(metric.match instanceof Boolean) || !boundedInteger(metric.documents, 10000) ||\n            metric.documents != result.hits.total.value || !boundedInteger(metric.unique_events, metric.documents) ||\n            !boundedInteger(metric.duplicate_documents, metric.documents) ||\n            metric.unique_events + metric.duplicate_documents != metric.documents ||\n            !boundedInteger(metric.services, 100) || metric.services > metric.unique_events ||\n            !boundedInteger(metric.matched_services, metric.services) ||\n            !boundedInteger(metric.repeat_services, metric.matched_services) ||\n            !boundedInteger(metric.cross_source_services, metric.matched_services) ||\n            metric.repeat_services + metric.cross_source_services < metric.matched_services ||\n            metric.match != (metric.matched_services > 0)) return false;\n        if ((metric.documents == 0) != (metric.unique_events == 0) ||\n            (metric.unique_events == 0) != (metric.services == 0)) return false;\n        if (metric.repeat_services > 0 && metric.unique_events < 5) return false;\n        if (metric.cross_source_services > 0 && metric.unique_events < 2) return false;\n        return true;\n    } catch (Exception e) {\n        return false;\n    }\n}\n\n// Decision: observation_match. Metadata observation, never containment.\ntry {\n    return observationAvailable(ctx) && ctx.results[0].aggregations.observation.value.match;\n} catch (Exception e) {\n    return false;\n}\n"
+          }
+        },
+        "actions": []
+      }
+    },
+    {
+      "query_level_trigger": {
+        "id": "capstone-observation-unavailable-v1",
+        "name": "observation_unavailable",
+        "severity": "5",
+        "condition": {
+          "script": {
+            "lang": "painless",
+            "source": "// Byte-identical prefix in both triggers; no deployment/test bypass parameters.\nboolean boundedInteger(def value, long maximum) {\n    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;\n}\nboolean observationAvailable(def ctx) {\n    try {\n        long now = new Date().getTime();\n        long end = ctx.periodEnd.toEpochMilli();\n        if (end < 300000 || end > now + 5000 || end < now - 15000 || ctx.error != null ||\n            !(ctx.results instanceof List) || ctx.results.size() != 1) return false;\n        def result = ctx.results[0];\n        if (!(result instanceof Map) || result.timed_out != false ||\n            (result.containsKey('terminated_early') && result.terminated_early != false) ||\n            !(result._shards instanceof Map)) return false;\n        def shards = result._shards;\n        if (!boundedInteger(shards.total, 64) || shards.total < 1 ||\n            !boundedInteger(shards.successful, 64) || shards.successful != shards.total ||\n            !boundedInteger(shards.skipped, shards.total) || !boundedInteger(shards.failed, 0)) return false;\n        if (!(result.hits instanceof Map) || !(result.hits.total instanceof Map) ||\n            result.hits.total.relation != 'eq' || !boundedInteger(result.hits.total.value, 10000) ||\n            !(result.hits.hits instanceof List) || result.hits.hits.size() != 0 ||\n            !(result.aggregations instanceof Map) || !(result.aggregations.observation instanceof Map)) return false;\n        def metric = result.aggregations.observation.value;\n        if (!(metric instanceof Map) || metric.size() != 12 || metric.policy != 'event-window-v2' ||\n            metric.precision != 'microseconds' || metric.valid != true || metric.reason != 'ok' ||\n            !(metric.match instanceof Boolean) || !boundedInteger(metric.documents, 10000) ||\n            metric.documents != result.hits.total.value || !boundedInteger(metric.unique_events, metric.documents) ||\n            !boundedInteger(metric.duplicate_documents, metric.documents) ||\n            metric.unique_events + metric.duplicate_documents != metric.documents ||\n            !boundedInteger(metric.services, 100) || metric.services > metric.unique_events ||\n            !boundedInteger(metric.matched_services, metric.services) ||\n            !boundedInteger(metric.repeat_services, metric.matched_services) ||\n            !boundedInteger(metric.cross_source_services, metric.matched_services) ||\n            metric.repeat_services + metric.cross_source_services < metric.matched_services ||\n            metric.match != (metric.matched_services > 0)) return false;\n        if ((metric.documents == 0) != (metric.unique_events == 0) ||\n            (metric.unique_events == 0) != (metric.services == 0)) return false;\n        if (metric.repeat_services > 0 && metric.unique_events < 5) return false;\n        if (metric.cross_source_services > 0 && metric.unique_events < 2) return false;\n        return true;\n    } catch (Exception e) {\n        return false;\n    }\n}\n\n// Decision: observation_unavailable. An empty result is not ingestion health.\ntry {\n    return !observationAvailable(ctx);\n} catch (Exception e) {\n    return true;\n}\n"
+          }
+        },
+        "actions": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "phase": "3-collector-candidate-validation",
+  "scope": "isolated temporary spool; no operational Wazuh input/service deployment",
+  "inspection": {
+    "checked_at_kst": "2026-10-13T22:48:02.846633+09:00",
+    "files": {
+      "/etc/logrotate.d/capstone-secstack": {
+        "sha256": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "size": 669
+      },
+      "/var/ossec/etc/ossec.conf": {
+        "sha256": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "size": 6356
+      },
+      "/home/groot_a/capstone/secstack/docker-compose.yml": {
+        "sha256": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b",
+        "size": 4986
+      }
+    },
+    "containers": {
+      "waf": {
+        "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "started_at": "2026-10-05T10:18:45.433754298Z",
+        "status": "running",
+        "log_driver": "json-file",
+        "log_path_exists": true
+      },
+      "suricata": {
+        "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+        "started_at": "2026-10-13T10:50:28.696240875Z",
+        "status": "running",
+        "log_driver": "json-file",
+        "log_path_exists": true
+      }
+    },
+    "logrotate_config": "# /etc/logrotate.d/capstone-secstack — Groot_A 보안스택 로그 회전 (Suricata eve.json/stats.log, ModSecurity audit.log)\n# copytruncate: 컨테이너가 append 모드로 계속 쓰므로 파일 교체 대신 잘라낸다. Wazuh logcollector는 truncate를 감지해 처음부터 다시 읽는다.\n# 압축본은 Wazuh가 읽지 않음(원본만 localfile). 필요 시 maxsize 조정.\n/home/groot_a/capstone/secstack/logs/suricata/*.json\n/home/groot_a/capstone/secstack/logs/suricata/*.log\n/home/groot_a/capstone/secstack/logs/modsec/*.log {\n    daily\n    rotate 14\n    maxsize 500M\n    missingok\n    notifempty\n    compress\n    delaycompress\n    copytruncate\n}\n",
+    "journalctl_version": "systemd 255 (255.4-1ubuntu8.17)",
+    "oldest_journal_query": {
+      "exit": 0,
+      "rows": 2,
+      "cursor_present": true,
+      "boot_ids_present": true,
+      "times": [
+        "1790158540428082",
+        "1790158540428111"
+      ]
+    },
+    "inclusive_cursor_query": {
+      "exit": 0,
+      "rows": 2,
+      "first_matches": true
+    },
+    "disk": "Avail\n48008552448"
+  },
+  "live_validation": {
+    "checked_at_kst": "2026-10-13T22:57:40.399336+09:00",
+    "before": {
+      "configs": {
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+      },
+      "containers": {
+        "waf": {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "started_at": "2026-10-05T10:18:45.433754298Z",
+          "status": "running"
+        },
+        "suricata": {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "started_at": "2026-10-13T10:50:28.696240875Z",
+          "status": "running"
+        }
+      }
+    },
+    "eve_pass": {
+      "inserted": 29,
+      "replayed": 0,
+      "ready": 29,
+      "quarantine": 0,
+      "ignored": 0,
+      "blocked": null,
+      "notices": [
+        "bootstrap_at_beginning"
+      ]
+    },
+    "waf_pass": {
+      "inserted": 4,
+      "replayed": 0,
+      "ready": 4,
+      "quarantine": 0,
+      "ignored": 0,
+      "blocked": null,
+      "notices": [
+        "bootstrap_at_beginning"
+      ]
+    },
+    "nft_pass": {
+      "inserted": 132,
+      "replayed": 0,
+      "ready": 130,
+      "quarantine": 0,
+      "ignored": 2,
+      "blocked": null,
+      "notices": []
+    },
+    "first_stats": {
+      "total_records": 165,
+      "state_count": 3,
+      "logical_bytes": 304534,
+      "by_status": {
+        "ignored": 2,
+        "quarantine": 0,
+        "ready": 163
+      },
+      "max_bytes": 67108864,
+      "max_records": 100000,
+      "physical_limit_bytes": 134283264,
+      "db_bytes": 790528
+    },
+    "waf_times": [
+      "2026-10-13T03:00:36.000000+09:00",
+      "2026-10-13T03:00:56.000000+09:00",
+      "2026-10-13T03:04:43.000000+09:00",
+      "2026-10-13T03:04:45.000000+09:00"
+    ],
+    "eve_restart": {
+      "inserted": 0,
+      "replayed": 0,
+      "ready": 0,
+      "quarantine": 0,
+      "ignored": 0,
+      "blocked": null,
+      "notices": []
+    },
+    "waf_restart": {
+      "inserted": 0,
+      "replayed": 0,
+      "ready": 0,
+      "quarantine": 0,
+      "ignored": 0,
+      "blocked": null,
+      "notices": []
+    },
+    "nft_restart": {
+      "inserted": 0,
+      "replayed": 0,
+      "ready": 0,
+      "quarantine": 0,
+      "ignored": 0,
+      "blocked": null,
+      "notices": []
+    },
+    "final_stats": {
+      "total_records": 165,
+      "state_count": 3,
+      "logical_bytes": 304534,
+      "by_status": {
+        "ignored": 2,
+        "quarantine": 0,
+        "ready": 163
+      },
+      "max_bytes": 67108864,
+      "max_records": 100000,
+      "physical_limit_bytes": 134283264,
+      "db_bytes": 790528
+    },
+    "retained_first_ids": true,
+    "private_modes": {
+      "spool.lock": "0o600",
+      "spool.sqlite3": "0o600"
+    },
+    "eve_selected_count": 29,
+    "eve_snapshot_sha256": "01c0aa176cff7325997838521b76c3a1ff2aa0b7f976c532b7640cc8e2408d44",
+    "after": {
+      "configs": {
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+      },
+      "containers": {
+        "waf": {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "started_at": "2026-10-05T10:18:45.433754298Z",
+          "status": "running"
+        },
+        "suricata": {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "started_at": "2026-10-13T10:50:28.696240875Z",
+          "status": "running"
+        }
+      }
+    },
+    "runtime_and_config_unchanged": true,
+    "waf_raw_unchanged": true,
+    "operational_inputs_written": false,
+    "passed": true,
+    "remote_temporary_state_removed": true
+  },
+  "live_source_sha256": {
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "collector_file_reader.py": "40d2882d664d5563394eec8f9fd597337729775aa4ad5a901b3846f42950c8ad",
+    "collector_store.py": "cabba11715476c2500aabb16d7137617aa916f02014636456afd329881fd722a",
+    "collector_journal_reader.py": "645e2e321610964e46a0ad44b6f529ec9da734e5f6291c744272f51b50cac552",
+    "waf_input_adapter.py": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b",
+    "collector.py": "e3898e8b535a474ae3a5d140ec0824a6c7b1687010067dcec6715b57a2e78b2e",
+    "collector_waf_evidence.py": "c21441304fbf40b86f118a6219ae6306630781b54f54414b70cd774d6275fdfd"
+  },
+  "current_source_sha256": {
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "collector_file_reader.py": "40d2882d664d5563394eec8f9fd597337729775aa4ad5a901b3846f42950c8ad",
+    "collector_store.py": "cabba11715476c2500aabb16d7137617aa916f02014636456afd329881fd722a",
+    "collector_journal_reader.py": "645e2e321610964e46a0ad44b6f529ec9da734e5f6291c744272f51b50cac552",
+    "waf_input_adapter.py": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b",
+    "collector.py": "e34a03a4383ed7fada5492c695f4bb717723fe1048bffe2dc8953eea14584773",
+    "collector_waf_evidence.py": "c21441304fbf40b86f118a6219ae6306630781b54f54414b70cd774d6275fdfd"
+  },
+  "regression_tests": {
+    "total": 188,
+    "base": 94,
+    "file_reader": 26,
+    "journal_reader": 28,
+    "store": 19,
+    "coordinator_and_waf_evidence": 21,
+    "command": "python3 -B -m unittest discover -s infra/normalization -p 'test_*.py'",
+    "passed": true
+  },
+  "after_live_change": "Added rejection of invalid collector observed_at before reading/committing; one regression added. Valid observed_at path unchanged. Current vs live source hashes retained separately.",
+  "findings_fixed": [
+    "journalctl JSON field order changes between queries; canonical selected fields + schema 2",
+    "per-commit whole-table totals scan replaced with atomic O(1) counters",
+    "WAF evidence command count budget defers next row without checkpoint advance"
+  ],
+  "limitations": [
+    "live copytruncate unchanged; no guarantee for truncate/regrow entirely between polls",
+    "automatic rename advance requires inode-bound proof that old writer closed; CLI pauses",
+    "no spool drain/ack/purge or quarantine reprocess yet",
+    "missing independent WAF time evidence is quarantined; no blanket UTC default",
+    "journal raw means canonical selected fields, not binary journal or original stdout",
+    "end-to-end Wazuh delivery/dedup/time windows/indexing not validated here",
+    "source disk/journal/archive retention must outlast collector pauses; spool cannot undo upstream loss",
+    "rotation_closed at reader level does not prove that intermediate generations are absent; deployment handshake must verify the sequence"
+  ],
+  "packages_installed": false
+}

@@ -1,0 +1,78 @@
+{
+  "date_kst": "2026-10-14",
+  "vector_version": "0.59.0",
+  "native_candidate": {
+    "validate": "passed",
+    "existing_suricata_nft_tests": 19,
+    "common_correlation_tests": 9,
+    "isolated_waf_tests": 61,
+    "total_tests": 89,
+    "systemd_analyze_verify": "passed",
+    "ansible_syntax": "passed"
+  },
+  "live_pipeline_applied": true,
+  "notes": [
+    "Production Wazuh correlation remains no_log.",
+    "Native synthetic-source ACK warnings are separate from operational source behavior.",
+    "Local readback and canary do not provide a durable remote receipt or global uniqueness guarantee."
+  ],
+  "apply": {
+    "first": {
+      "ok": 42,
+      "changed": 6,
+      "failed": 0
+    },
+    "repeat": {
+      "ok": 41,
+      "changed": 0,
+      "failed": 0
+    },
+    "repeat_pid_and_invocation_unchanged": true,
+    "operator_backup": "/var/backups/capstone-vector-transition-20261014-CQ4Lct"
+  },
+  "observed_at_kst": "2026-10-14T03:29:04+09:00",
+  "runtime": {
+    "state": "active/running",
+    "main_pid": 1621310,
+    "automatic_restarts": 0,
+    "error_lines_this_invocation": 0,
+    "memory_current_bytes": 28016640,
+    "memory_peak_bytes": 28540928,
+    "memory_high_bytes": 402653184,
+    "memory_max_bytes": 536870912,
+    "disk_used_percent": 18,
+    "available_bytes": 47810785280,
+    "rotation_recovery_pending": false
+  },
+  "ready_observation": {
+    "new_contract_records": 11,
+    "sources": {
+      "nftables": 10,
+      "modsecurity": 1
+    },
+    "time_classes": {
+      "fresh": 11
+    },
+    "kst_and_whitelist_failures": 0,
+    "max_recursive_leaves": 41,
+    "below_current_wazuh_field_limit": true,
+    "waf_record_is_normal_head_probe": true,
+    "waf_probe_audit_access_ready_same_request_id": true
+  },
+  "approval_boundary_sha256": {
+    "helper": "d937c7def4d2938d7655e445cb5cf9cd7858837aebebaf4278feae5fb69965a2",
+    "mcp": "2926ee95218fb889dd7f77bcccd36bdec4ed15f58aa7ae0b3e82426fc0209682",
+    "sudoers": "41d81849cb526930ee9f4aa23fd5d9c77ff661467f232d080780860bf5bef93b"
+  },
+  "artifact_sha256": {
+    "vector.toml": "bb48ab849fc91ccf06137173a97af83840804714236adab115c01ddb586f0f26",
+    "capstone-vector.service": "7eb6356ca67bebdab7ff2b681a011dcb9bde7a3f7e94cb01e85af7872873b7a6",
+    "transforms/correlation.vrl": "e8da4312819ca8442fb6183d40e7e1d14d8256bbcf2d6136c73e3aa69e92434d",
+    "transforms/nftables.vrl": "8450cefe8d884522b6e817acd7fb963efccfb8a0c93a023a854befdc75c715e5",
+    "transforms/suricata.vrl": "861c998eb2ab3dc6c8902d405f4058dc69c7bb07ce1b0569359adba6e0e09dcc",
+    "transforms/waf_access_part.vrl": "9f9700e970579ca1f2acc683fa6a12d6629a48088f780cde63877c49b0b288e5",
+    "transforms/waf_audit_part.vrl": "18829d82be5ca8abcb1f11fa750d0f0f3a7eac49af6e22aa1eb131da637c44b8",
+    "transforms/waf_json_guard.vrl": "d70de8b923c7cd31db1acd68404210a796ebe53e5d5de16737b5638c5680e898",
+    "transforms/waf_pair_normalize.vrl": "df6ddbc0d6773a94110e7edc0e21e6b68643030df8df11b05dd8da491cac1b0f"
+  }
+}

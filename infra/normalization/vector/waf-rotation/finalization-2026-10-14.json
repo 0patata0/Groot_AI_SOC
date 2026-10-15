@@ -1,0 +1,48 @@
+{
+  "at_kst": "2026-10-14T20:52:11.505154+09:00",
+  "source_files": 13,
+  "source_bytes": 569115,
+  "changed": 13,
+  "source_sha_verified": true,
+  "evidence_sha_verified": true,
+  "backup": "/var/backups/capstone-waf-rotation-source-20261014",
+  "removed": [
+    {
+      "path": "/var/tmp/capstone-sequential-20261014/step1",
+      "files": 205,
+      "absent": true
+    },
+    {
+      "path": "/var/tmp/capstone-sequential-20261014/source/waf-rotation",
+      "files": 5,
+      "absent": true
+    },
+    {
+      "path": "/var/tmp/capstone-sequential-20261014/closure",
+      "files": 14,
+      "absent": true
+    }
+  ],
+  "operating_configuration_changed": false,
+  "packages_installed": 0,
+  "mac_cleanup_deferred_until_shared_session_end": true,
+  "postcleanup": {
+    "at_kst": "2026-10-14T20:52:19.398120+09:00",
+    "comparisons": {
+      "containers": true,
+      "services": true,
+      "host_protected": true,
+      "waf_configuration_and_binary_sha256": true,
+      "logcollector": true,
+      "vector": true,
+      "operating_root_queue": true,
+      "versions": true
+    },
+    "all_equal": true,
+    "host_files": 8,
+    "container_files": 51
+  },
+  "stage1_complete": true,
+  "scope": "isolated_rotation_and_archived_pair_only",
+  "local_finalization_written_after_server_source_snapshot": true
+}

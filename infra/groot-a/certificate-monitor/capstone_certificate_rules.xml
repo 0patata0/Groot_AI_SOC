@@ -1,0 +1,53 @@
+<!-- Separate candidate rules. Native fixture only until explicitly installed.
+     Exact predecoded program/location and the monitor's canonical 13-key JSON
+     are routing/shape checks, not cryptographic source authentication. Expiry
+     seconds and fingerprint equality are computed by the fixed A monitor.
+     Expiry leaves and the probe-failure leaf are disjoint: a failed TLS probe
+     cannot lower a within-7-days or expired alert to level 5. -->
+<group name="capstone_certificate_health,">
+  <rule id="100300" level="0">
+    <decoded_as>capstone_certificate_json</decoded_as>
+    <program_name type="pcre2">^capstone-cert-monitor$</program_name>
+    <location type="pcre2">^\(groot-sec\) any->journald$</location>
+    <match type="pcre2">\A\{"automatic_renewal":false,"certificate_sha256":(?:null|"[0-9a-f]{64}"),"domain":"chat\.grootlab\.duckdns\.org","expiry_status":"(?:ok|within_30_days|within_14_days|within_7_days|expired|unknown)","not_after_epoch":(?:null|[0-9]{1,12}),"not_after_kst":(?:null|"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+09:00"),"observed_at_kst":"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\+09:00","observed_at_utc":"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z","probe_status":"(?:verified|mismatch|unavailable)","reason":"(?:certificate_unavailable|certificate_changed|certificate_invalid|hostname_invalid|not_yet_valid|checkend_failed|tls_verification_failed|tls_timeout|served_certificate_invalid|served_certificate_mismatch|verified)","schema_version":1,"seconds_remaining":(?:null|-?[0-9]{1,12}),"served_certificate_sha256":(?:null|"[0-9a-f]{64}")\}\z</match>
+    <description>Fixed chat TLS certificate monitor status</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100301" level="3" ignore="900">
+    <if_sid>100300</if_sid>
+    <field name="expiry_status" type="pcre2">^within_30_days$</field>
+    <field name="probe_status" type="pcre2">^verified$</field>
+    <description>chat.grootlab.duckdns.org certificate expires within 30 days</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+  <rule id="100302" level="5" ignore="900">
+    <if_sid>100300</if_sid>
+    <field name="expiry_status" type="pcre2">^within_14_days$</field>
+    <description>chat.grootlab.duckdns.org certificate expires within 14 days; probe=$(probe_status)</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+  <rule id="100303" level="7" ignore="900">
+    <if_sid>100300</if_sid>
+    <field name="expiry_status" type="pcre2">^within_7_days$</field>
+    <description>chat.grootlab.duckdns.org certificate expires within 7 days; probe=$(probe_status)</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+  <rule id="100304" level="10" ignore="900">
+    <if_sid>100300</if_sid>
+    <field name="expiry_status" type="pcre2">^expired$</field>
+    <description>chat.grootlab.duckdns.org certificate has expired; probe=$(probe_status)</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+  <rule id="100305" level="5" ignore="900">
+    <if_sid>100300</if_sid>
+    <field name="expiry_status" type="pcre2">^(ok|within_30_days|unknown)$</field>
+    <field name="probe_status" type="pcre2">^(mismatch|unavailable)$</field>
+    <description>chat.grootlab.duckdns.org certificate observation failed; probe=$(probe_status); reason=$(reason)</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+</group>

@@ -1,0 +1,141 @@
+{
+  "installation": {
+    "at_epoch_ms": 1791974055949,
+    "files": 20,
+    "bytes": 117419,
+    "manifest_sha256": "6893eb79e8ce020f9527ced0d0c95ceb6fd7cda0a34f5bff4fd5a0cabcc4d6f4",
+    "destination": "/opt/capstone-automation/project/infra/normalization/wazuh-vector/indexer-native/window-v2",
+    "monitor_changed": false,
+    "inspection": {
+      "candidate_sha256": "f0262be494e605edcb22fb32f71f4854014dd4f671b035803886a5b1036bafd1",
+      "enabled": true,
+      "exact_name_count": 1,
+      "managed_config_verified": true,
+      "monitor_ids": [
+        "-HYdN6EBERDGWPLCrWpE"
+      ],
+      "mutated": false,
+      "operation": "inspect",
+      "state_phase": "enabled",
+      "version": "v1"
+    }
+  },
+  "upgrade-result": {
+    "actions": 0,
+    "after_revision": {
+      "_id": "-HYdN6EBERDGWPLCrWpE",
+      "_primary_term": 1,
+      "_seq_no": 12
+    },
+    "backup": "/var/backups/capstone-indexer-window-1791974321357239229",
+    "before_revision": {
+      "_id": "-HYdN6EBERDGWPLCrWpE",
+      "_primary_term": 1,
+      "_seq_no": 5
+    },
+    "changed": true,
+    "enabled": true,
+    "independent_readback": true,
+    "monitor_id": "-HYdN6EBERDGWPLCrWpE",
+    "operation": "upgrade",
+    "server_config_sha256": "f6a69b0fcb14b5873e9404b3386c0d642ff0085a5303e6af2d18a40cfbed2d37",
+    "version": "v2",
+    "process_returncode": 0,
+    "at_epoch_ms": 1791974321735
+  },
+  "post-upgrade-observation": {
+    "at_epoch_ms": 1791974433320,
+    "monitor_id": "-HYdN6EBERDGWPLCrWpE",
+    "enabled": true,
+    "actions": 0,
+    "version": "v2",
+    "revision": {
+      "_id": "-HYdN6EBERDGWPLCrWpE",
+      "_seq_no": 12,
+      "_primary_term": 1
+    },
+    "config_sha256": "f6a69b0fcb14b5873e9404b3386c0d642ff0085a5303e6af2d18a40cfbed2d37",
+    "scheduler_distinct_post_upgrade": [
+      1791974365196,
+      1791974425196
+    ],
+    "scheduler_does_not_prove_query_delivery": true,
+    "dryrun": {
+      "at_epoch_ms": 1791974432748,
+      "hits": {
+        "value": 0,
+        "relation": "eq"
+      },
+      "shards": {
+        "total": 57,
+        "failed": 0,
+        "successful": 57,
+        "skipped": 0
+      },
+      "metric": {
+        "valid": true,
+        "matched_services": 0,
+        "reason": "ok",
+        "duplicate_documents": 0,
+        "unique_events": 0,
+        "documents": 0,
+        "precision": "microseconds",
+        "match": false,
+        "repeat_services": 0,
+        "services": 0,
+        "cross_source_services": 0,
+        "policy": "event-window-v2"
+      },
+      "trigger_decisions": {
+        "observation_match": false,
+        "observation_unavailable": false
+      },
+      "strict_tls": true
+    },
+    "alert_metadata": [],
+    "containers_unchanged": true,
+    "analysisd_pid_unchanged": true,
+    "manager_hashes_unchanged": true,
+    "services_unchanged": true,
+    "events_dropped": "0",
+    "operating_inputs_written": 0,
+    "service_restarts": 0,
+    "new_packages": 0
+  },
+  "schema_version": 1,
+  "status": "deployed_and_observed",
+  "at_kst": "2026-10-14T19:40:33.320000+09:00",
+  "source_sha256": {
+    "manage-monitor-b.py": "24aae40dc683f1cef8a133a29bcfe95d222646b7e5149e4e3231163991fc1014",
+    "monitor.json": "acc8ac9649cc8b974872a30cf4bcc8f2e52adf0caf56ed197e8b95066d657c7f",
+    "monitor-query.painless": "f44d65794f67ad2af62c2aec911deefab2363a82f2d6fee5fd1639c58424d098",
+    "metric-init.painless": "7b63a16af0259378c12962030ef0609ab1f78b2c749186d0fb205ea660c57a88",
+    "metric-map.painless": "0384a7c420f84d833f59c6d674c55221e216084e8bf95d59d488602ab9f975b8",
+    "metric-combine.painless": "211839e582d532fc7f0f3e69a6d5cbad43113147e88718544b5a5d49708898b9",
+    "metric-reduce.painless": "253a5a9e519854f08048e01cc7d0e511dae844a4cc2ce9e43aba81ff59bfc50b",
+    "monitor-match.painless": "982bb42c68e56fa463702175c281b2e3308333988fb8ad4258bdc71931cc1f03",
+    "monitor-unavailable.painless": "a7bf19d1a3a1d3dde69f34d900735c966bd9b24a781b2d566c8beff1d0b39abf",
+    "native-verify-b.py": "4d596e890b32299b1a0a06eb39caa4e7386c3d3557954bcfd9ecc1dcb0304d3e",
+    "native-guard-verify-b.py": "a56a924e1cc1312bac8b773ef33106df6ad7a3f767dfaf7c5d1367732ed341b1"
+  },
+  "validation": {
+    "native_search_cases": 41,
+    "native_lifecycle_steps": 4,
+    "native_guard_contexts": 66,
+    "offline_contract_tests": 9,
+    "migration_boundary_tests": 14,
+    "native_files": {
+      "native-validation-2026-10-14.json": "ddb18cc02859f9d08067124cac93ac9be4a3572559f42c8369954bc7e98fb53d",
+      "guard-validation-2026-10-14.json": "4fff6bc7cc49f854ca86d7553f93273cc41742d5cc155059933c7711c2046f3d",
+      "migration-tests-2026-10-14.json": "a30b2bf226e7b156b86e15d317206c3e16d392c023cf43acb4f16a58fe4245bc"
+    }
+  },
+  "limitations": [
+    "300-second horizon assumes total event-to-searchable delay <=120 seconds and successful evaluations <=120 seconds apart",
+    "no durable exactly-once per-service event state or long-outage replay",
+    "scheduler timestamps do not prove detailed query or ingestion completion",
+    "empty native production query does not establish ingestion health or natural positive-case efficacy",
+    "finite load tests and two scheduler periods do not guarantee sustained capacity",
+    "rollback boundary was verified with local fake API; no actual operating rollback or power-loss test"
+  ]
+}

@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "status": "live_recreation_verified_archived_and_cleaned",
+  "current_original_cid": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+  "current_original_pid": 2377669,
+  "source_release": "/opt/capstone-automation/releases/waf-recreation-20261015-38cacdde2db4",
+  "source_manifest_sha256": "38cacdde2db49de3e2c3b225b52d3710470939216eb32829873913e78681ced4",
+  "source_files": 11,
+  "source_bytes": 103074,
+  "native_profile_tests": 17,
+  "native_profile_rc": 0,
+  "native_profile_log_sha256": "b4856a31b26bf5a220d14234d86cfd7f3b4f44fe060e973fe78ddfbef45e0a84",
+  "ansible_prepare_syntax_rc": 0,
+  "ansible_candidate_syntax_rc": 0,
+  "new_container_started": true,
+  "new_cid_reader_handoff_verified": true,
+  "packages_installed": 0,
+  "observations": {
+    "readiness": "recreation-readiness-2026-10-15.json",
+    "profile": "recreation-profile-2026-10-15.json",
+    "docker_network": [
+      {
+        "version": "29.8.1",
+        "api": "1.56"
+      },
+      {
+        "id": "aaadd71ccea72ed484e217ace846752bcaf465412116f3806de5b14834138654",
+        "name": "secstack_waf-net",
+        "driver": "bridge",
+        "ipam": {
+          "Config": [
+            {
+              "Gateway": "172.18.0.1",
+              "Subnet": "172.18.0.0/16"
+            }
+          ],
+          "Driver": "default",
+          "Options": null
+        },
+        "configonly": false,
+        "configfrom": {
+          "Network": ""
+        },
+        "options": {},
+        "internal": false,
+        "ipv4": true,
+        "ipv6": false
+      }
+    ]
+  },
+  "initial_readiness_corrections": [
+    "optional Docker template fields Health/StopSignal/StopTimeout",
+    "exact container CRS symlink to /opt/owasp-crs; remain inside container root"
+  ],
+  "source_promotion_initial_refusal": "A releases parent absent; no release created before refusal; then root-owned parent created/fsynced",
+  "evidence_backup": "/var/backups/capstone-waf-recreation-20261015",
+  "validation_limits": [
+    "new CID and log-binding transition not performed yet",
+    "no natural Imperva scan or new security-event remote ACK evidence"
+  ],
+  "prepare_attempt1": {
+    "rc": 2,
+    "ok": 28,
+    "changed": 3,
+    "failed": 1,
+    "failure_task": "Require one existing Imperva bind line and no new source names",
+    "log_sha256": "fbcbea86cf34140c478395b873498ffb11c933cc0f53f52fe03d8290f6af11f6",
+    "evidence_path": "/var/backups/capstone-waf-recreation-20261015/prepare-persistence",
+    "host_files_still_absent": true,
+    "compose_sha256_unchanged": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+    "native_line_checks_all_passed": true,
+    "reason_under_investigation": false,
+    "container_lifecycle_calls": 0,
+    "reason_confirmed": "Ansible inline CR/LF literal interpretation; exact native file bytes and SHA unchanged"
+  },
+  "prepare_attempt2": {
+    "release": "/opt/capstone-automation/releases/waf-recreation-20261015-492727fa9ab1",
+    "manifest_sha256": "492727fa9ab1e916fb75280fb5728234eea59d943ae2a3f89dc579e6f52ca5a8",
+    "files": 12,
+    "bytes": 108235,
+    "rc": 0,
+    "ok": 59,
+    "changed": 9,
+    "failed": 0,
+    "native_prepare_cases": 13,
+    "native_profile_cases": 17,
+    "log_sha256": "29497385cfc7c98de067f116df4160b8d483eebc7b7645e5bbd7a812f382bdbb",
+    "compose_before_sha256": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+    "compose_after_sha256": "cb4e6f9bc8e472e22d87fab956cba44e03038f8e150d7cf6710aaaf0527f217f",
+    "new_read_only_compose_binds": 2,
+    "new_host_sources_root0444": 2,
+    "operating_container_and_reader_identities_unchanged": true,
+    "protected_states_unchanged": true,
+    "container_lifecycle_calls": 0
+  },
+  "stopped_candidate": {
+    "cid": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+    "pid": 0,
+    "status": "created",
+    "started_at": "0001-01-01T00:00:00Z",
+    "create_calls": 1,
+    "start_calls": 0,
+    "stop_calls": 0,
+    "initial_postcheck_rc": 2,
+    "log_sha256": "3534c7f03e81459ed6368ed75829743b0c35162250360ffe73538703c07b32f1",
+    "inspect_sha256": "b96c80a08b97830e929af3c9d710aff94f12d914d136c78d37876634989c242f",
+    "postcheck_difference": "8 named empty HostConfig collection fields: old null versus created []",
+    "fields": [
+      "BlkioDeviceReadBps",
+      "BlkioDeviceReadIOps",
+      "BlkioDeviceWriteBps",
+      "BlkioDeviceWriteIOps",
+      "BlkioWeightDevice",
+      "Devices",
+      "DnsOptions",
+      "DnsSearch"
+    ],
+    "new_creation_retry_authorized": false,
+    "postcheck": {
+      "rc": 0,
+      "ok": 35,
+      "changed": 7,
+      "failed": 0,
+      "new_create_calls": 0,
+      "start_calls": 0,
+      "stop_calls": 0,
+      "log_sha256": "9146b6a03afa0cfc55ea90813947a4879e2b0e8ff3afd95e260bdfe0ac28bc90",
+      "native_profile_cases": 43,
+      "native_profile_log_sha256": "5ab09e547602f91ecb265c77dd12f0fe7c1125f81578d8d8278fba768eba8c50"
+    }
+  },
+  "metadata_fixture_attempt1": {
+    "passed": 31,
+    "failed": 1,
+    "failure": "prepare_success: jq has(null) on final blank line",
+    "log_sha256": "2fc00bd62b8a8225d4daf044b86ceeacfd7108a2d81f53bd9f05d0fff95648f3",
+    "production_access": false,
+    "public_entrypoint_blocked": true
+  },
+  "metadata_prepare_fix": {
+    "related_native_cases": 6,
+    "rc": 0,
+    "log_sha256": "c40cffed095613aaac3553aa0f6350c9c2394b82f36f73d050c14deeb880ca54",
+    "unmodified_prior_cases_passed": 31,
+    "latest_all_cases_rerun": false,
+    "installed_helper_sha256": "884dbf89cf1a031ae3193100a13832cb76437cf466e02857221c014bb7e550ca",
+    "public_entrypoint_env_cases": 2,
+    "public_entrypoint_env_log_sha256": "4ab81b30e963a520e444ce0317c3d4c4a3b2e4c6e546524b3687cfb89c19f48e",
+    "installation_signals": 0
+  },
+  "cutover_native": {
+    "private_transaction_cases": 22,
+    "rc": 0,
+    "log_sha256": "29cd3ac2eb7000718737db3c579dc5fb97019d4e2066938b390c0ca2e572346a",
+    "contract_cases": 42,
+    "contract_log_sha256": "3d08a0ddb133710071789ea2bcb4ca4e76f7a6d794eb2fe5d7f7646077a24455",
+    "live_boundaries_stubbed_in_private_tests": true
+  },
+  "cutover_syntax_v4": {
+    "rc": 1,
+    "cause": "LC_ALL=C rejected by Ansible UTF-8 requirement",
+    "log_sha256": "febb51d1e19e30a44698b764df87292af99ac2c844cd565730df57a096366c05",
+    "operating_mutations": 0,
+    "fix": "public wrapper LC_ALL=C.UTF-8; function bodies unchanged",
+    "new_wrapper_sha256": "dfcec89a025fd80ca261130cb47f2af5ac86d82c63822eaf7f0df1d8a858053f"
+  },
+  "cutover_progress": {
+    "release": "/opt/capstone-automation/releases/waf-recreation-20261015-1b706c0acda8",
+    "manifest_sha256": "1b706c0acda8e0d3b00558b22601058c9372e00b0195e7ff13632c647d789623",
+    "canonical_native_tests": 42,
+    "canonical_native_log_sha256": "7669eff8156b3137dffdb86ebc32de4f9d0df4223cf4e54237d22be28353cf8d",
+    "first_vector_stop_verified": true,
+    "stop_proof_sha256": "8175cc24021279ed7900cbc1cc1fe867e732821932451381a1c76fe328af4224",
+    "start_new_log_sha256": "147c3b8c8f6814198a85eb307bae38fb9265cb439debf01769593b3578171129",
+    "metadata_prepare_log_sha256": "3792ad00cbf2991d316051bdb54b833a73a6d2df224a688fa1a239fc7e5a22f2",
+    "metadata_apply_log_sha256": "03e6c4f882ab53649a3ba22b56039e5dacf182ca9d11f9ecb51a889e08344ea5",
+    "publish_first_postcheck_failure_log_sha256": "6a4918b12f2669e336e3daa3985d6a8eaec37f48a13b6a3a88d3bb30c44b22e0",
+    "publish_mutation_completed": true,
+    "publish_later_postcheck_rc": 0,
+    "checkpoint_rewritten": false,
+    "benign_request": {
+      "requests": 1,
+      "status": 405,
+      "audit_rows": 1,
+      "messages": 1,
+      "rule_ids": [
+        920350
+      ],
+      "original_expected_zero_messages_failed": true,
+      "saved_evidence_postcheck_passed": true,
+      "new_binding_verified": true,
+      "delivery_acknowledged": false,
+      "normalized_ready_rows": 1,
+      "normalized_row_sha256": "3a24371a030295414e8d11cbdd60901dcfa5dd38ca8722bc7e40c67c943813db",
+      "event_time_kst": "2026-10-15T04:18:30.219000+09:00",
+      "correlation_eligible": false,
+      "wazuh_ready_cp_offset": 1222571,
+      "normalized_line_end_offset": 1079503,
+      "wazuh_ready_prefix_matches": true
+    },
+    "resume_first_log_sha256": "f450b10b2bcc4fd76bd7d4a8f5cd3af4ec9306937c9a110465fc02373dd50424",
+    "resume_final_rc": 0,
+    "resume_final_log_sha256": "1dcae5ec70c9d20645218093cdb45ca8be691a78a65d2acf3c0a30e87aa19f23",
+    "complete_log_sha256": "aaedcb355b536dcc57acd82a298e56c127120754524c7090de6d00ae6a6d8146",
+    "complete_result_sha256": "7e8cc729ca2f52bb7374199fb4a40e6f7bad1b0b5f57ab18a4c01377a5451864",
+    "complete_receipt_sha256": "6fa5d83ef4c1fc63a0a83c9e786b37d549a445cbb91c0aa337a8966bb123c5b9",
+    "vector_pid": 2627991,
+    "vector_invocation": "595ef6a1d5a1499a8e6793edf50b06c9",
+    "suricata_generation_revision": [
+      1,
+      6
+    ],
+    "waf_generation_revision": [
+      4,
+      13
+    ],
+    "timers_enabled": 3,
+    "timers_waiting_observed": 3,
+    "raw_first_timer_ticks_deferred_due_to_operation_lock": true,
+    "legacy_guard_deployed_sha256": "f0dcc47d3ba9268b89f8c6794ced022e5c9dad22f1a815e9446bac396f06ffb6",
+    "timer_stagger": {
+      "status": "installed_natural_ticks_pending",
+      "period_minutes": 5,
+      "calendar_kst_minutes": {
+        "suricata": "00/5",
+        "modsecurity": "01/5",
+        "maintenance": "03/5"
+      },
+      "reader_service_restarts": 0,
+      "timer_restarts": 3,
+      "accuracy_seconds": 1,
+      "persistent": false,
+      "first_two_synchronized_raw_ticks": "coordinator_busy",
+      "native_calendar_and_systemd_verify_passed": true
+    },
+    "waf_pid": 2532279,
+    "final_activation_postcheck_sha256": "33f1fb7fee4e0c08ee6ea1e3a19f3df4034856fb82ba11bb7d57c26cbed5ca41"
+  },
+  "final_snapshot": {
+    "path": "recreation-final-snapshot-2026-10-15.json",
+    "sha256": "d41aad14b95c53cf1e770056ea3fbb2dffeac3853193781ee5b0e986d25d6743",
+    "observed_at_kst": "2026-10-15T04:45:34.083352+09:00",
+    "status": "verified"
+  },
+  "timer_natural_ticks": {
+    "capstone-raw-operations@modsecurity.timer": {
+      "last_trigger": "Thu 2026-10-15 04:41:00 KST",
+      "exit": "0",
+      "invocation": "cf9aa8aa890148d682d73824a79a3d92",
+      "calendar": "{ OnCalendar=*-*-* *:01/5:00 Asia/Seoul ; next_elapse=Thu 2026-10-15 04:46:00 KST }"
+    },
+    "capstone-raw-operations@suricata.timer": {
+      "last_trigger": "Thu 2026-10-15 04:45:00 KST",
+      "exit": "0",
+      "invocation": "bdba9a82535b4e8f823fa2748a8b2606",
+      "calendar": "{ OnCalendar=*-*-* *:00/5:00 Asia/Seoul ; next_elapse=Thu 2026-10-15 04:50:00 KST }"
+    },
+    "capstone-vector-maintenance.timer": {
+      "last_trigger": "Thu 2026-10-15 04:43:00 KST",
+      "exit": "0",
+      "invocation": "e236efc351c14863935b7d7555579b2d",
+      "calendar": "{ OnCalendar=*-*-* *:03/5:00 Asia/Seoul ; next_elapse=Thu 2026-10-15 04:48:00 KST }"
+    }
+  },
+  "transient_suricata_native_checkpoint": {
+    "status": "resolved_on_later_snapshot_cause_unconfirmed",
+    "guard_failure_reason": "same_inode_prefix_changed",
+    "failed_offset": 3399532,
+    "failed_stored_sha1": "246c1541a8e1a2ae0d3827f0cec408d956356671",
+    "failed_prefix_sha1": "047ed148133c1e9d2a9ab8c09f8d6d092b4bfc40",
+    "failed_checkpoint_sha256": "4fc3461e0c2fd1e067fdf9fa8a9dae60cf788d02618c40fa4d787ea1a79181fc",
+    "subsequent_offset": 3422150,
+    "subsequent_stored_and_prefix_sha1": "2b9dd707005b799fd87507a0b2f005619ba76e23",
+    "checkpoint_modified": false,
+    "reader_restart": false,
+    "guard_weakened": false
+  },
+  "evidence_finalization": {
+    "preservation": {
+      "status": "stage5_evidence_preserved",
+      "files": 319,
+      "bytes": 2660278,
+      "manifest_sha256": "c148f8775ab0977655ec5494b55ad63afefe8978d8758bb9b5a699054d776f19",
+      "source": "/var/tmp/capstone-resume-20261014/step5",
+      "backup": "/var/backups/capstone-waf-recreation-validation-20261015",
+      "operating_changes": 0
+    },
+    "preservation_sha256": "6fbc222396ed7dfc42482cb294e52ec5d838e7fac3147456022fbc69680a6baf",
+    "cleanup_sha256": "6b0183b1ceee82006aa4264691e650aa9cae74ccc45e87f6b575230fdb18439f",
+    "stage_absent": true
+  },
+  "mac_cleanup": {
+    "files": 363,
+    "bytes": 2879578,
+    "packages_installed": 0,
+    "path_absent": true
+  }
+}

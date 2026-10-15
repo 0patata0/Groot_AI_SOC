@@ -1,0 +1,22 @@
+{
+  "at_kst": "2026-10-14T19:13:32.626704+09:00",
+  "kind": "imperva_post_exception_indexed_alerts_readonly",
+  "since": "2026-10-14T05:50:15+09:00",
+  "cutoff": "2026-10-14T10:13:32.626704+00:00",
+  "exact_total": 0,
+  "recent_five_hours_total": 0,
+  "rules": {},
+  "recent_five_hours_rules": {},
+  "shards": {
+    "total": 57,
+    "successful": 57,
+    "skipped": 51,
+    "failed": 0
+  },
+  "strict_tls": true,
+  "records": [],
+  "indexer_id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+  "indexer_unchanged": true,
+  "natural_scan_execution_proven_by_this_query": false,
+  "new_operational_input": 0
+}

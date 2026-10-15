@@ -29,6 +29,8 @@ cat >> $C <<EOF
   <localfile>
     <log_format>json</log_format>
     <location>$EVE</location>
+    <!-- Engine counters remain in eve.json; native JSON decoder has a bounded field count. -->
+    <!-- Keep stats in native reader: Wazuh 4.14.8 ignore can desynchronize hash/offset. Manager rule 86600 handles stats at level 0. -->
     <label key="capstone.source">suricata</label>
   </localfile>
   <localfile>

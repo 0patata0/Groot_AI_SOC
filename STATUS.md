@@ -1,4 +1,571 @@
-# 인프라 현황 스냅샷 — 2026-10-08 SSH 재점검·룰 변경 MCP·채팅 인증서 배포 기준
+# 인프라 현황 — 2026-10-15 작업 마감
+
+## 새 환경 SSH 구축 자동화 — 로컬 구현 (2026-10-15 12:17 KST)
+
+사용자 후속 요청으로 로컬 구축 도구·문서·Git 게시 작업을 재개했다. `deploy.sh` 하나를 실행하면 security→siem→service 초기 IPv4를 입력받고, 검증된 SSH 키/host key와 sudo를 이용해 전체 사전검사 후 SIEM→service→security 순으로 구성한다. [README](README.md)에 패키지·이미지·공식 자료·SSH/sudo 수동 선행 준비와 실행 절차를 기록했다. 실행기는 패키지 설치나 이미지 다운로드를 하지 않는다.
+
+기본 자동 구성은 탐지 WAF/IDS, Wazuh 3종+agent, Mattermost/PostgreSQL, 가드가 포함된 Hermes+읽기 MCP2개, DVWA/MariaDB다. 새 주소·CA·등록 암호·계정으로 구성하며 기존 운영 비밀·상태를 복제하지 않는다. 승인형 쓰기 MCP/AR, Vector 회전·정제·상관 정책, 운영망 NAT, 고정 IP 예외·공개 인증서·모바일 푸시는 별도 이식 대상이다. 기존 라이브에 적용한 기능 전체를 자동 복제하는 설치기는 아니다.
+
+실제 셸+가짜 SSH 회귀10개와 SIEM 실제 함수 기반 격리 회귀20개, Bash/내장 Python 구문 검사를 통과했다. 역할별 생성 설정의 독립 검토도 마쳤다. **새 Ubuntu VM3대에서 실제 구축·전체 서비스 E2E는 미실행**이며 이번 작업의 기존 라이브 SSH 접속·변경도0이다. 아래10:52/10:54 상태는 과거 직접 확인이다. Git 공개 전 현재 파일의 알려진 비밀/키 패턴 매칭0, 과거 문서 blob1개에 비밀번호와 같은 값이 확인돼 공개 이력 제거를 진행한다. 비밀번호 교체는 하지 않았다.
+
+## 사용자 요청에 따른 작업 종료 (2026-10-15 11:12 KST)
+
+오늘의 구현·배포·검증 작업은 여기서 종료한다. 이번 마감 문답에서는 로컬 문서만 갱신했고, 추가 SSH 접속·서버 변경은 하지 않았다. 아래 정상 상태의 근거는 **10:52 KST A/B 서비스 점검과 10:54 KST 용량 감시**다. 11:12에 새로 라이브 상태를 점검한 것으로 해석하지 않는다.
+
+마지막 확인에서 A의 WAF·Suricata·Vector·Wazuh와 수집 가드, B의 Wazuh 필수 프로세스·agent001 연결·Hermes 및 정기 타이머가 정상이다. 용량은 A18%·B26%, 감시 상태는 양쪽 `ok/complete`였다. 모델 설정 개선은 운영에 반영했고, 로그 보관·복원, Imperva 격리 요청, 제한 부하·지연, 인증서 예약 실행 검증까지 마쳤다. 세부 완료 범위와 미완료 항목은 바로 아래 표를 따른다.
+
+다음 재개 시 첫 구현 대상은 **주기 보관·일반 백업 이관**, 이후 **긴 장애의 누락 감시·회수 및 재시작 후 중복 방지**다. 실제 차단 흐름은 통제 Kali 접속 정보, 호스트 재부팅은 ESXi 복구 콘솔 정보가 필요하다. 실제 채팅 품질·Imperva 자연 요청·인증서 경고 전달은 관찰 과제로 남는다. 비밀번호의 앞선 도구 출력 노출은 값 없이 기록했으며 **비밀번호 교체는 미실행**이다.
+
+서버 검증 자료와 최종 문서 스냅샷은 보관했고 Mac 작업용 임시71파일은 제거했다. 새 Mac 패키지 설치0, 이번 마감 문답의 Git 커밋0이다. 기존 정기 감시·이관 설정은 유지한다. 모델 학습·업로드, 프로젝트 SSL VPN/이중 VPN, 모바일 푸시의 보류도 유지한다. [최종 점검·정리 근거](infra/automation/sequential-finalization-2026-10-15.json) · [대화기록](대화기록/2026-10-15.md). 이 종료 문구는 앞선 서버 스냅샷 이후 로컬에서 추가했다.
+
+## 잔여 7개 순차 진행 결과 (2026-10-15 10:49 KST)
+
+이번 작업에서 직접 확인한 결과다. 실제 시험을 마친 범위와 후속 작업을 구분하며, 아래 이전 시점 기록은 보존한다.
+
+| 순서 | 적용·검증 결과 | 남은 작업 |
+|---|---|---|
+| 1. 모델 도구 호출·지연 | `.111 qwen3.6:35b`에 모델별 추론 `none` 적용. 같은 합성 읽기에서 약22초/호출0 → 약0.7초/정확 호출1. 실제 제한 Hermes 읽기 대화6.14초, 한국어6문항 통과. 재시작0. | 실제 채팅·승인 전체 지연과 장기 품질 관찰. [검증](infra/hermes/benchmarks/native-tools-20261015/README.md) |
+| 2. 보관 수명주기 | 봉인본5개 약21.16MB → gzip 약1.56MB, A/B 각각 복원·SHA 대조 완료. 용량 감시도 `ok`로 복구. | 원본 삭제0. 일반 백업 전수 이관, 주기 보관 worker와 삭제 executor는 미구현. 삭제 proof·최초 검증시각부터30일 조건도 미충족. [정책·실측](infra/automation/storage-retention/lifecycle/README.md) |
+| 3. Imperva 예외 | 현재 설치 예외·엔진을 격리해42요청/21쌍 통과: 양성2·조건 이탈17·XSS2. 운영 요청·신호0. | 최근24h `.9` 접근4건의 상세 정보가 부족해 자연 스캔의 정확 예외 적중은 미입증. [실측](infra/groot-a/imperva-exception/revalidate-20261015/README.md) |
+| 4. Native AR | agent001/rule100110 연결·활성화와 현재 차단0을 확인. 독립3-flow·600초 TTL·승인 경계 유지. | 실제 차단→승인 유지/해제→만료 시험에 통제 Kali 주소·접속 경로가 필요. 학과망 `211.170.162.0/24` 보호는 임의 해제하지 않음. [정책](infra/mcp/native-containment-ar.md) |
+| 5. 지연·부하 | 지연322.292초: 시간 경계12개·lifecycle5단계·실제130초 비가시성/180초 평가 공백 검증. 부하50EPS×600초: 원문30,000건·경보4,000건 전수 일치, drop0·최종 queue 표본0, 운영 불변·시험 정리 완료. | 검색창을 넘는 긴 공백은 valid empty가 될 수 있음. 긴 장애의 누락 감시·회수와 재시작을 넘는 영구 중복 방지는 미완료. agent001→Indexer 전체 부하 시험도 별도. [지연](infra/normalization/wazuh-vector/indexer-native/delay-audit-20261015/README.md) · [부하](infra/normalization/wazuh-vector/indexer-native/delay-audit-20261015/load/README.md) |
+| 6. 실제 호스트 재부팅 | 미실행. | 부팅 실패 시 사용할 ESXi 콘솔 접속·복구 경로 정보가 필요. [복구 계약](infra/normalization/vector/raw-operations/README.md) |
+| 7. 인증서 후속 | 오늘09:00 KST 예약 실행 exit0, 현재 실제 TLS `ok/verified`. 만료2027-01-06 15:02:33 KST. B 규칙 유지·경보0건(정상 no_log에 부합). | 실제 경고 전달·색인 미실증, 자동 갱신 미구성. 12월 초 수동 갱신 준비. [실측·절차](infra/groot-a/certificate-monitor/README.md) |
+
+다음 구현 대상은 2번 주기 보관·일반 백업 이관과 5번 긴 공백 감시·복구/영속 중복 방지다. 4·6번은 앞서 요청한 접속 정보가 필요하며, 1·3번 자연 사용 관찰과 7번 실제 경고·갱신은 별도로 남는다. 모델 학습·업로드, 프로젝트 SSL VPN/이중 VPN, 모바일 푸시는 기존 보류를 유지한다. 10:52 KST 마지막 점검에서 A 양 수집 가드·WAF/Suricata/Vector/Wazuh와 예약 타이머, B manager 필수5프로세스·agent001 Active·Hermes 설정/PID가 모두 정상이다. [A 점검](infra/automation/sequential-health-a-2026-10-15.json) · [B 점검](infra/automation/sequential-health-b-2026-10-15.json). 10:55:57 KST 마감: A/B에 최종 소스·문서29파일/1,909,023B씩을 해시 검증 보관했고 최신 용량 감시는 양쪽 `ok/complete`다. Mac 작업용 임시71파일/4,197,704B를 삭제·경로 부재 확인했으며 새 패키지 설치0이다. [마감 기록](infra/automation/sequential-finalization-2026-10-15.json). 이 마감 문구와 로컬 정리 영수증은 서버 스냅샷 이후 작성됐다.
+
+> **2026-10-15 10:06 KST 후속:** 잔여 작업 순차 진행 중 1번 모델 도구 호출·지연 개선을 적용했다. 현재 `.111 qwen3.6:35b`만 추론 `none`으로 설정, 재시작0·권한/승인/가드 유지. 동일 native 읽기2건 medium22초/호출0 → none0.7초/정확호출각1, 한국어6/6·0.96~1.75초, 실제 제한 Hermes 읽기1건 대화6.14초(초기화 포함12.25초). 실제 채팅/승인 전체 지연과 장기 혼입률은 후속 관찰이며 합성 수치를 확대하지 않는다. 다음은 2번 보관 수명주기다. [검증·한계](infra/hermes/benchmarks/native-tools-20261015/README.md).
+
+> **2026-10-15T09:39:52+09:00 마감:** 추가 도구와 우선순위1~5의 적용·관측을 마쳤다. A183파일/2,201,692B·B603파일/9,755,621B를영구보존하고서버taskstage·평가aux를제거했다. 정리후양guard·WAFhealthy/보안서비스·agent001/자동timer정상. Mac이번작업임시2경로와패키지캐시를삭제했고새Mac패키지설치0이다. 도구호출지연/형식실패,정확Imperva예외실증,자동보관삭제수명주기는잔여이며6~8/학습/VPN/모바일푸시는미착수다. [증거](infra/automation/followup-finalization-2026-10-15.json).
+
+## 2026-10-15 추가 도구와 우선순위 1~5 결과
+
+| 항목 | 현재 결과 |
+|---|---|
+| 추가 도구 | Suricata 기존 updater1.3.8을 후보 생성·동일성·엔진 검증 경로로 도입, B에 promptfoo0.124.1/Node22.22.0 격리 설치. Native Wazuh AR은 기존 제한 containment/승인 흐름에 연결. 자동 ET 룰 배포는 하지 않는다. |
+| 1. 체크포인트 | stats ignore의 hash/offset 처리 차이를 native로 재현·제거. B decoder 상한1024 보완, 실제504/505필드와 자연 통계2주기·27관측 정상. |
+| 2. 보존·용량 | A/B 예약 감시·Wazuh 수신 적용. A30/B90일은 보존 검토 기준이며 자동 삭제·일반 백업 자동 이관은 미구성. |
+| 3. 이전 부팅 로그 | 18배치·13,741건·5,799,184B를 B에 보관. 재실행 중복0·A207파일 불변, 15분 자동 이관 활성화 및 첫 자동 실행 정상. |
+| 4. Imperva | 예외 설정 유지, 최근24h 접근4건·검증 가능한 관련 감사경보0. 최근5h 접근0. 상세 요청 표본이 없어 정확 예외 적중의 완전 실증은 미완료. |
+| 5. .111 언어·지연 | 실제 저장시각 간격 표본1개60.32초. promptfoo 한국어 품질6/6 통과(13.82~22.33초), 도구선택은2048·8192 조건 모두0/2. 8192에서 하나는출력상한종료, 다른하나는프로토콜형식실패(84.05/60.28초). 도구사용 개선은 남은 문제다. |
+
+운영 모델·일반 sudo/Docker 권한은 변경하지 않았다. B 설정 배포 중 파일 권한 오류는0660 복원과 프로세스 기동으로 복구했다. 뒤 통계 옵션 적용에서는 manager 자체 감시가 같은 컨테이너를 재기동했고 필수5프로세스·agent001 Active를 확인했다. 실패 기록은 성공 결과와 함께 보존한다.
+
+**정리 진행:** 개별 native/updater 임시 경로는 보존 후 제거했다. 전체 task stage·Mac 캐시 정리와 마지막 상태 확인은 마감 중이다. 기존 6~8의 장기부하·실제 호스트 재부팅·인증서 후속, 학습·VPN·모바일 푸시는 착수하지 않았다.
+
+
+> **2026-10-15 09:14 KST 최신:** 우선1 CP 원인 수정과 실제 stats 504/505필드 한도 보완 완료. 수정 후27개 CP관측/통계2주기 불일치0·manager decoder오류0·agent001Active. 우선2 A/B용량 감시 자연실행·B수집 확인 완료(자동삭제false). 우선3 이전boot 보관분 B자동이관 설치 중이며4~5는 후속이다.
+
+> **2026-10-15 08:53 KST 최신:** 우선1 CP 수정·단일 agent 재시작과 제한 AR 활성화 완료, 27개 관측/통계2주기 불일치0. updater 후보52,495개 exact·엔진 구문검증 통과, promptfoo 설치 완료. 우선2 A/B용량 감시 설치, B전용 Wazuh 연결 활성화 중이며3~5는 후속 진행한다.
+
+> **2026-10-15 08:09 KST 진행 재개:** 사용자 지시로 추가 도구(suricata-update·promptfoo·승인/Active Response 연계) 보류를 해제했다. 최신 잔여 우선순위1~5(CP·보존/용량·이전boot/B이관·Imperva·.111언어/지연)까지만 순차 수행한다. 아래 이전 보류/완료 문구는 당시 기록이다. 학습·VPN·모바일 푸시는 보류 유지.
+
+> 05:03 KST 최종 마감: 인증서 단계의 서버 증거 A77파일/766601B·B80파일/804888B를 각각 영구 백업에 전수 해시 대조·fsync 보존하고 stage6를 제거했다. Mac 임시 127파일/969026B도 제거·경로부재를 확인했다. 새 패키지 설치0이다. 계획한1~6단계의 해당 범위 적용·검증·문서·정리를 마쳤으며 첫09:00예약실행·CP일시불일치 재발·실제사용 효과는 관찰대기다.
+
+## 순차 작업 1~6 운영·검증 완료 (2026-10-15 05:00 KST)
+
+원본 회전·복구, Hermes 첫 시작과 복귀, 새 WAF의 Imperva 예외 유지 확인을 마쳤다. WAF·Vector·Wazuh 수집은 정상이며 세 회전 점검 타이머는 분산된 예약 실행에서 모두 정상 종료했다. 인증서 감시와 Wazuh 전용 디코더·규칙100300~100305를 적용했다. A의 실제 TLS·native26, B의 native51 및 실제 감시 JSON1건이 통과했고 manager는04:59:47에정상재시작1회후필수4프로세스·agent001 Active를확인했다. 기존규칙/config/인증서는유지한다. 만료는2027-01-06 15:02:33KST, timer는매일09:00KST다. 첫예약실행과실제만료경보의원격색인ACK는미관측이며자동갱신은하지않는다. 증거 보존·임시 정리를 마감한다. 아래는 이전 시점 기록이다.
+
+
+> 04:48 WAF 단계 마감: 서버 증거 319파일/2660278B를 /var/backups/capstone-waf-recreation-validation-20261015에 보존·해시대조·fsync한 뒤 stage5를 제거했다. Mac 임시 363파일/2879578B도 제거·경로부재 확인했다. 패키지 설치0. 마지막 인증서 단계에 착수한다.
+
+
+## 남은 확인과 보류 항목 (2026-10-15 05:00 KST)
+
+| 구분 | 남은 항목 | 현재 판단 |
+|---|---|---|
+| 다음 예약 확인 | 인증서 timer의 첫 09:00 KST 실행 | 수동 oneshot·실제 TLS·KST 예약은 검증 완료, 자연 실행은 아직 시간 전이다. |
+| 재발 관찰 | Suricata Wazuh CP offset/hash 일시 불일치 | 후속 저장에서 해소·최종 양가드 통과. 정확 원인은 미확정, CP 수정·검사 완화 없음. 반복 시 원인 분석 대상이다. |
+| 실사용 관찰 | Imperva 자연 스캔 오탐, 언어 혼입, 처리 지연·queue/drop·상관/색인 지연 | 해당 사건이 없는 구간을 실제 효과 검증으로 세지 않는다. 현재 적용·합성 검증과 구분한다. |
+| 별도 실증 | 실제 호스트 재부팅·장시간 부하/지연, 실제 만료 경보의 원격 색인 ACK | 이번 검증 범위 밖이다. 기존 native 복구·회전·상관 검증 결과와 혼동하지 않는다. |
+| 보류 | 모델 학습·업로드, 이중 SSL VPN, 모바일 푸시, 추가 도구5번 | 기존 사용자 결정 유지. 상위 방화벽 변경 없음. |
+
+## WAF 재생성 검증 완료 (2026-10-15 04:45 KST)
+
+새 WAF6c72d5a5…의 실제 Imperva 예외·producer·template 연결과 원본 인계를 확인했다. Vector2627991·Wazuh1909632·Suricata1990031은 정상이고 원본은 gen1/rev6·gen4/rev13 active다. 세 점검 timer를 5분 간격 안에서 0·1·3분으로 분산하여 실제 예약 실행 exit0를 모두 확인했다. 04:45 양 시작가드가 통과했다. 일시적인 Suricata CP offset/hash 불일치는 후속 저장에서 해소됐으나 정확 원인은 미확정이며 가드·CP는 변경하지 않았다. 증거 보존·임시 정리 후 인증서 관리로 이동한다. 실제 자연 스캔 효과·원격 경보 ACK·호스트 재부팅은 별도 관찰 항목이다. 아래는 이전 시점 기록이다.
+
+
+## WAF 새 컨테이너 전환 완료·마감 확인 중 (2026-10-15 04:31 KST)
+
+새 WAF6c72d5a5…가 healthy이며 Imperva 예외·로그 producer·시작 template을 실제 읽기 전용 bind로 유지한다. Vector2627991과 Wazuh1909632가 실행 중이고 원본 상태는 Suricata gen1/rev6·WAF gen4/rev13 active다. 무해 요청1건의 v2 감사·KST 정제1행 및 Wazuh 로컬 소비를 확인했다. 기존 WAF는 정지 보존, CP·원문 수동 재작성은 없다. 자동 timer3개와 구형 배포 보호도 반영했고 다음 예약 실행·영구 증거 보존·임시 정리를 마감 확인한다. 실제 Imperva 자연 스캔 효과와 원격 보안경보 ACK, 호스트 재부팅은 이번 확인과 구분한다. 아래는 이전 시점 기록이다.
+
+
+## 현재 진행 — 새 WAF 실행·수집 인계 (2026-10-15 04:20 KST)
+
+새 WAF6c72d5a5…가 첫 시작 후 healthy이며 Imperva 예외·producer·template의 호스트 연결과 새 감사 로그 생성을 확인했다. 기존 WAF는 정상 정지 보존한다. Vector 중지 전 JSON 정렬 오류는 원문 보존 후 수정했고, Vector는 정상 중지된 상태에서 새 CID·원본 세대 메타데이터를 인계 중이다. 무해 빈 POST는405·감사1행을 생성했으며 숫자형 Host에 대한 CRS920350 경고1개가 있어 messages0 검증 기대를 정정한다. HTTP 재전송 없이 저장 증거로 확인하고 수집 재개→timer복원을 진행한다. 아래는 이전 시점 기록이다.
+
+
+## 현재 진행 — WAF 전환 중 (2026-10-15 04:05 KST 이후)
+
+기존 WAF는 SIGQUIT로 정상 종료됐고 새 후보는 아직 미시작이다. 마지막 감사 로그는 봉인·EOF 검증을 마쳤다. Vector는 기존 PID2406117로 실행 중이며, 중지 직전 JSON 정렬 검사 오류로 절차가 보류됐다. 저장한 상태의 원문을 보존하고 정렬 형식만 보완하여 첫 Vector 중지와 새 WAF 시작을 이어가는 중이다. 자동 회전 timer3개는 일시 중지, reader 새 시작은 임시 가드로 차단했다. 아래는 전환 전 상태다.
+
+## WAF 지속성 작업 진행 (2026-10-15 03:54 KST)
+
+호스트 producer/template 두 파일과 실제 compose의 읽기 전용 연결을 반영했다. 기존 WAF·Suricata·Vector·Wazuh는 계속 실행 중이다. 새 WAF 정지 후보6c72d5a5…를 한 번 생성했고 PID0·미시작 상태를 유지한다. Docker의 빈 목록 표현 차이를 확인한 후조건 검사와 새 CID 로그 인계 도구 검증을 진행 중이다. 기존 WAF 중지·새 후보 시작은 아직 하지 않았다. 인증서 관리는 이 단계 완료 후 마지막으로 진행한다. [실측·진행 기록](infra/groot-a/imperva-exception/recreation-validation-2026-10-15.json). 아래는 이전 시점 기록이다.
+
+## 최신 확인 — WAF 재생성 지속성 보완 착수 (2026-10-15 03:20 KST)
+
+WAF·Vector·Wazuh·Suricata와 원본 회전 timer 3개는 정상이다. Imperva 예외는 현재 적용돼 있으나 read-only bind는 compose에만 있고, v2 로그 producer와 시작 template은 현재 컨테이너 내부에만 있다. 따라서 host 원본·compose bind를 보완한 뒤 새 CID의 원본 로그·수집기 결속을 인계해야 한다. 실제 생성 프로필은 서버에 비공개 보존했으며 현재는 준비 중이다. 컨테이너 교체·중지·운영 설정 변경은 아직 없다. [읽기 점검](infra/groot-a/imperva-exception/recreation-readiness-2026-10-15.json) · [비밀 제외 생성 프로필](infra/groot-a/imperva-exception/recreation-profile-2026-10-15.json). 아래는 이전 시점이다.
+
+## 최신 확인 — Hermes 단계 보존·정리 완료 (2026-10-15 03:17 KST)
+
+Hermes 실제 첫 시작·복귀 및 구형 배포 우회 차단을 검증하고 마감했다. 서버 증거406개/2,709,137B를 root 전용 백업에 전수 해시 대조·fsync로 보관한 뒤 임시 stage를 제거했다. Mac 작업파일432개/2,505,123B도 제거했고 패키지 설치0, 기존 Hermes PID2248019와 정지 후보 상태는 유지됐다. [검증·정리 기록](infra/automation/ansible/hermes-prestart-validation-2026-10-15.json). 이 마감 문구는 소스·문서105개 서버 스냅샷 이후 작성됐으며 서버에는 별도 정리 영수증이 있다. 다음은 WAF 새 CID 재생성 시 Imperva 예외·원본 로그 결속 지속성 확인이다. 아래는 이전 시점이다.
+
+## 최신 확인 — Hermes 첫 시작 가드·실제 복귀 완료 (2026-10-15 03:02 KST)
+
+정지 후보에 가드·의존 파일17개를 먼저 설치한 뒤 실제 첫 시작과 의도적 실패 복귀를 검증했다. 새 프로세스와 복귀한 기존 프로세스 각각에서 UID995의 언어 가드11개·MCP5개 읽기 연결·새 heartbeat·DB 검사가 통과했다. 현재 기존CID6c2ed…/PID2248019가 실행 중이고 후보47aa31c8…는 정지 보존한다. 원래 plan·현재DB를 유지했고 강제kill·DB과거복원·컨테이너삭제는 없었다.
+
+구형 deploy의 prep/test/all은 관리 상태가 있으면 즉시78로 중단하도록 B 실제 사본에 반영했다. 기존 gateway 재생성 스크립트도 저장소에서 동일하게 보호했다(검색한 B 경로에는 사본 없음). 현재 PID 불변·native41개와 실제 설치본의 보호된 사본 검증을 확인했다. 고정 root 운영 경로의 보장이며 임의 Docker 명령의 전역 통제·일반 crash 자동복구는 아니다. 증거·문서 보존과 임시 정리를 마친 뒤5단계로 이동한다. 아래는 이전 시점이다.
+
+## 최신 확인 — Hermes 정지 후보 검증 진행 (2026-10-15)
+
+기존 Hermes CID6c2ed…/PID1896873은 실행 중이며, 새 후보47aa31c8…는 created/PID0로 한 번도 시작하지 않았다. SDK2 응답 필드명 오류는 수정했고 실제 MCP5개 읽기 연결과 B native50개 검사를 통과했다. Docker create의 stdout/stderr 기본값과 시작 시 OOM 설정 표현 차이를 확인해 후보에만 적용하는 좁은 검증을 보완 중이다. 기존 create 의도·원장·plan은 보존하며 중복 생성하지 않는다. 실제 첫 시작·복귀는 아직 미완료이고, 5·6단계 운영 변경은 시작하지 않았다. 아래는 이전 시점이다.
+
+## 최신 확인 — 원본·출력 회전 타이머 정상 운영 (2026-10-15 02:15 KST)
+
+Suricata·WAF 원본 회전과 정제 출력 유지보수 timer 3개를 활성화했다. 원본 두 종류의 첫 실행은 아직 회전 기준 미도달로 정상 완료됐으며, 출력은 정상 일일 회전 후 Vector PID2406117/Invocation12314ddc…로 재시작됐다. 이전 출력 3개의 inode·검사한 접두 기록 보존, Wazuh1909632·WAF2377669·Suricata1990031 및 raw gen1/rev5·gen3/rev11 유지, 양 가드·저장 점검을 확인했다. 출력 timer 복구 뒤 다음 실행은 not_due로 끝나 추가 회전·Vector 재시작이 없었다.
+
+중간 logger 한 행의 systemd 귀속 누락과 종료 unit의 실행메타 초기화 때문에 검증기 사후 확인을 보완했다. 원래 실패 증거는 보존했고 실제 실행 exit0·동일 Invocation의 시작/완료 journal·파일 보존 증거로 완료를 확인했다. **02:20 KST 최종 보존·정리 완료:** 소스·문서267개 해시를 대조해 보관하고 A 작업515파일·격리8파일을 백업 후 정리했다. B 조회 임시2파일과 Mac 임시650파일을 제거했고, 미사용 v1 가드만 삭제했다. 정리 후 양 시작가드·저장 점검·timer3개 정상을 재확인했다. 이 마감 문구는 서버 소스 스냅샷 이후 작성했다. Hermes 4단계는 후보 구현 중이며 운영 전환 전이다. 실제 호스트 재부팅·새 WAF CID·이번 자연 보안사건의 원격 ACK는 검증하지 않았다. 아래는 이전 시점이다.
+
+## 최신 확인 — WAF 재시작 후 로그·설정 유지 검증 (2026-10-15 01:49 KST)
+
+같은 WAF 컨테이너를 정상 종료 신호로 한 번 재시작했고 새 master PID2377669·healthy를 확인했다. 시작 템플릿/중간본/실제 override, custom·Imperva 규칙과 producer가 유지됐고, gen3 원본 inode·기존 기록 및 봉인 세대도 보존됐다. Vector2368467·Wazuh1909632는 재시작하지 않았으며 양 guard가 전후 통과했다. raw state는 Suricata gen1/rev5·WAF gen3/rev11 active다. 자동 timer 활성화와 최종 보존·정리를 이어간다. 호스트 재부팅·새 CID 생성 시험은 아니며 아래는 이전 시점이다.
+
+## 최신 확인 — 출력 회전·WAF 시작 설정 보완 (2026-10-15 01:40 KST)
+
+Suricata gen1/rev5·WAF gen3/rev11이 active이며 Vector PID2368467·Wazuh logcollector PID1909632가 실행 중이다. 지속 HUP 의도 및 조용한 새 로그의 중지 방지 보완을 반영했고, 출력 유지보수의 새 사전 가드와 실제 회전도 검증했다(127.617초, pending0). WAF 재시작 시 구판 override로 돌아가던 시작 템플릿·중간본 두 파일을 격리 검증 후 현재 설정과 일치시켰다. 실제 WAF 재시작과 자동 timer 활성화는 다음 확인 항목이다.
+
+이번 시간창에는 원격 보안경보의 선정 조건을 만족한 자연 사건이 없어 새 ACK는 확인하지 않았다. 실제 호스트 재부팅은 하지 않았다. 3단계 마무리 후 Hermes→재생성 예외 지속성→인증서 순서를 유지한다. 아래는 이전 시점 기록이다.
+
+## 최신 확인 — 두 원본 실제 회전 완료 (2026-10-15 01:07 KST)
+
+Suricata는 gen1/rev5, WAF는 gen2/rev6의 active 상태로 실제 회전을 마쳤다. Vector PID2180571·Wazuh logcollector PID1909632가 실행 중이고 양 시작 가드 및 기존 maintenance check가 정상이다. WAF의 재개 HUP 반복을 막는 FD 대조 수정은 native24개와 전후 검사를 통과했다. 파일 교체 중 Wazuh 체크포인트 경로가 일시 누락돼 Vector 재개가 보류됐으나, 정상 저장을 기다린 뒤 수동 CP 수정·Wazuh 재시작 없이 완료했다.
+
+자동 원본·출력 timer는 아직 비활성이다. 기존 출력 로그의 실제 회전/재시작 호환 검증과 불확실 HUP의 지속 의도 기록 보완을 진행한다. 원본/체크포인트 수동 재작성0이며 실제 호스트 재부팅 및 이번 입력의 원격 분석·색인 ACK는 아직 확인하지 않았다. 4~6단계는 대기한다. 아래는 이전 시점 기록이다.
+
+## 최신 확인 — 원본 세대 전환 적용·운영 회전 검증 중 (2026-10-15 00:44 KST)
+
+초기 migration의 guard 인계(seq18)와 WAF 새 세대 공개를 완료했다. Vector PID2055688/Invocation34141a149fdb40ac92d2e9de3c9091cf 및 Wazuh가 실행 중이며 두 engine 상태는 active다. 새 체크포인트 저장 대기와 일시 가드 거절 뒤 세 번째 resume에서 정상 완료됐고 추가 WAF HUP은 없었다. 이전 WAF 원본10072B는 root/0400으로 보존했다.
+
+Suricata entrypoint의 관리 폴더 제외를 적용했고, WAF native 설정 검사의 계정을 실제 nginx UID101:101로 맞췄다. runtime 한 줄 수정은 native12개(내부30+24 회귀 포함) 및 전후 양 가드를 통과했다. 원래 plan/source/ledger와 수정 전 사본은 보존했으며 원문·CP 수동 재작성은 없다. 자동 회전 timer와 기존 출력 유지보수 timer는 아직 비활성이다. Suricata·WAF 실제 한 세대 회전과 운영 확인 후 활성화를 검토한다. 4~6단계는 대기한다. 아래는 이전 시점 기록이다.
+
+## 최신 확인 — Vector 수집 재개 (2026-10-15 00:28 KST)
+
+제한 가드 통과 후 명시 start 한 번으로 Vector PID2011863이 active/running 상태로 돌아왔다. 기동 직후 controller 후검사가 거절돼 원래 차단 가드는 복원됐고 한시 권한은 폐기됐다. 별도 조회에서 같은 Invocation의 실제 guard PASS와 raw3개 체크포인트 유효성, 새 ready/evidence의 Wazuh EOF 소비를 확인했다. 추가 기동 없이 증거와 pending 후처리를 마무리한다. 출력 유지보수 timer는 계속 disabled/inactive이며 WAF·Suricata·Wazuh도 실행 중이다. 아래 중지 상태는 복구 전 기록이다.
+
+## 최신 복구 진행 — 출력 회전과 초기 전환 경합 (2026-10-15 00:13 KST)
+
+초기 시작 가드·legacy 회전 대상 분리를 적용한 뒤 Suricata를 같은 컨테이너에서 한 번 재시작했다. 원본 inode/하드링크는 보존됐으나 entrypoint 재귀 chown의 관리 디렉터리 충돌이 발견돼 후검증을 보류했다. 좁은 수정본은 실제 컨테이너 native6개를 통과했으며 운영 패치는 아직 전이다.
+
+그 사이 00:01 기존 출력 회전이 Vector를 정상 중지한 뒤 blocked 가드 때문에 재시작하지 못했다. 현재 **Vector는 명시 중지된 상태이며, Wazuh·Suricata·WAF는 실행 중**이다. 원본·현재 체크포인트·회전 출력은 보존했고 raw3개 Vector CP의 유효성을 확인했다. Wazuh는 새 ready/evidence 빈 파일을 각각 FD1개·pos0로 열고 있다. 출력 회전 timer의 원래 enabled 상태를 기록한 후 임시 disable했다. 제한된 v1 복구 가드와 새 Invocation 재결속을 검증해 Vector를 먼저 복구하며, 원본/CP 복원 덮어쓰기나 추가 회전은 하지 않는다. 4~6단계는 대기한다. 아래는 이전 시점 기록이다.
+
+## 작업 재개 — 3단계 초기 회전 전환 보완 (2026-10-14 23:43 KST)
+
+사용자 재개 지시에 따라 3단계부터 순차 실행한다. 구 배포 도구의 v1 덮어쓰기 방지를 A 프로젝트 소스에 반영했고 실제 Ansible26개 검사를 통과했다. 초기 시작 가드31개와 별도 systemd 재시도/수동중지 시험도 통과했다. 23:43 실제 prepare에서 WAF·Suricata 격리 설정 검사2개와 운영 설정/서비스/원본 불변 확인을 완료했다. 앞선 실패2회는 별도 백업에 보존했으며 실제 원본 전환은 아직 시작하지 않았다. 초기 전환의 중단/재개 트랜잭션 검증을 계속하고, 운영 copytruncate/WAF v1은 유지한다. 23:34 자동 보존 표본은13,741건·완료9/대기0/보류0(발견한 이전 boot의 고정 cutoff 범위)이다. 4~6단계는 아직 시작하지 않았으며 아래 마감 기록은 이전 상태다.
+
+**23:59 KST 운영 전환 진행 상황:** 초기 가드와 legacy 회전 대상 분리는 적용했다. 같은 Suricata 컨테이너를 한 번 재시작했고 원본 inode·하드링크·reader는 유지됐다. 컨테이너 entrypoint의 재귀 chown이 관리 디렉터리 소유권을 바꾸는 충돌을 실제 확인해 후검증에서 보류 중이다. 관리 트리와 `eve.json`을 제외하는 좁은 시작 스크립트 보완을 검증하고 있다. Vector/WAF v1은 유지하며 추가 재시작·WAF 전환은 아직 하지 않았다. 위 23:43의 원본 전환 전 상태와 아래 마감 기록은 이전 시점이다.
+
+## 현재 작업 마감 — 3단계 부분 적용·운영 회전 전환 보류 (2026-10-14 23:03 KST 확인)
+
+사용자 요청으로 현재 진행분을 마감하며 **4~6단계는 시작하지 않는다**. 1·2단계는 완료했다. 3단계는 이전 부트 자동 보존과 Wazuh raw 두 입력의 재시작 복원 옵션을 A에 적용했지만, 원본 회전 전환 전체는 미완료다. 기존 copytruncate·운영 WAF/Vector v1을 유지한다.
+
+마지막 라이브 확인에서 자동 보존은 10,323건/4,362,173bytes, 9개 이전 부트 중 고정 범위 완료6·대기3·보류0이다. 타이머는 계속 정상 운영한다. Wazuh는 connected·msg_buffer0, Vector·WAF·Suricata는 기존 PID/CID를 유지했고, 감시의 23:00:50 표본도 정상이다. 13개 보호 파일 SHA가 기대값과 일치했다. 추가 서비스 재시작은 하지 않았다.
+
+회전 조정기의 최신 합성30개와 중단 의도 복구24개가 통과했다. 실제 초기 전환의 시작 차단·reader 인계·부분 설치 복구는 미완성이므로 cutover CLI를 exit78로 차단했다. 실제 prepare·운영 v2 설치·회전 타이머 활성화·재부팅 시험은 하지 않았다. 다음 재개는 [초기 전환의 남은 경계](infra/normalization/vector/raw-operations/INITIAL-MIGRATION.md)부터이며, 이후 Hermes→Imperva 재생성 지속성→인증서 관리 순서다. [검증·마감 기록](infra/normalization/vector/raw-operations/finalization-2026-10-14.json). 아래는 이전 시점 기록이다.
+
+**23:10 KST 마감 완료:** A에 소스·문서92개(1,201,878bytes)를 해시 대조해 보관하고 변경 전 원본을 백업했다. 증거314개를 보존한 뒤 서버 임시407개와 Mac 임시606개를 제거했다. 정리 후 운영 설정·PID/CID·연결·감시는 정상이며, 자동 보존 최신 표본은10,806건/4,566,236bytes·완료7/대기2/보류0이다. 새 패키지 설치0·추가 운영 전환0. 이 마감 문구와 최종 JSON은 서버92파일 스냅샷 이후 작성됐고 서버에는 별도 source-closure/postcleanup 증거가 있다.
+
+## 최신 진행 방향 — 인증서 관리를 마지막으로 이동 (2026-10-14)
+
+사용자 지시로 **WAF 회전 격리 → 과대 EOF 행 감시 → 운영 raw 회전/영속 복구 → Hermes 시작 전 가드/복귀 → 재생성 예외 지속성 → 인증서 관리** 순서로 진행한다. 각 단계 검증·기록을 끝낸 뒤 다음 단계로 이동하며, 현재 1단계 WAF 회전 격리 검증을 통과했다. 네 세대·6요청과 두 reader, 보관본 pair6건·음성 대조가 일치했고 운영 보호59파일·서비스/PID/CID는 사전 상태와 같다. 원본205파일과 소스·문서13파일을 A에 보관했고 시험224파일을 정리한 뒤20:52 운영 불변을 재확인했다. 2단계도 A의 기존5분 감시와 B의 상태 규칙100252/100253에 반영했다. 검사기34개·통합12개·B104/116/116검사를 통과했고 A의실제oneshot 상태저장·재적용changed0·기존Vector무재시작을 확인했다. 21:29 A/B 소스·문서120파일씩을 보관하고 A270/B228개 작업 파일을 제거해 2단계를 마감했다. 자연 타이머 실행도 확인했으며 3단계 설계·운영 경로 대조를 시작한다. 운영 copytruncate는 유지하고 실시간 pair·crash/재부팅·원격 ACK는 후속 단계다. 이전 Indexer v2 적용·두 주기 검증 결과는 유지한다. [최신 실행 계획](PLAN.md#최신-순차-실행--인증서-관리-마지막-2026-10-14). 아래는 이전 시점 기록이다.
+
+**3단계 후속 운영 반영:** 이전 boot 자동 보존기를 A에 설치하고 5분 timer를 활성화했다. 최초 수동/자동 회차로 1,488건·625,132bytes, 9개 boot 중 complete1/ready8/blocked0을 확인했다(22:07 표본). raw Suricata/WAF audit 두 입력은 no/2GB로 변경했으며 새 logcollector PID1909632·fresh manager 연결·기존 원본 inode/접두 SHA 보존을 확인했다. WAF v2는 실제 격리 원문3건 정제까지 통과했지만 운영 producer/Vector 변경은 아직 전이다. 22:34 후속 표본은 5,876건/2,495,151bytes·complete3/ready6/blocked0이다. 체크포인트53·상태34·감시통합39 및 private systemd 재시도/수동중지 검증도 통과했다. 원본 회전 controller는 stop과 상태 커밋 사이 중단 복구를 추가 보완 중이며 기존 copytruncate는 유지한다. 초기 전환 설치기는 check/prepare만 검토 완료로, 아직 운영 전환은 실행하지 않았다. 4~6단계는 아직 시작하지 않았다.
+
+**19:46 KST 마감:** 서버소스/문서42개 반영·증거A33/B114파일 보존과 서버작업stage·Mac135개 임시파일 정리를 마쳤다. 설치0·운영상태 유지이며 [전체 마감 기록](infra/normalization/wazuh-vector/indexer-native/window-v2/finalization-2026-10-14.json)을 남겼다. 이 마감 문구/JSON은42파일 서버스냅샷 이후 작성됐고 서버에는 별도 정리 증거가 있다.
+
+## 단기1 점검 완료·단기2 Indexer 시간창 운영 반영 (2026-10-14 19:38 KST)
+
+**단기1 조회는 완료했고 자연 사용 표본은 관찰 대기다.** A 보존17파일·358행에서 Imperva 예외 적용 이후/최근5시간의 자연 요청은0건이며 B 경보도정확0건이었다. WAF healthy·현재예외결속은 유지됐다. Hermes 최근5시간의 저장 assistant/전송은0건이고 가드·타이머·설치소스는 정상이다. 실제 스캔/사용 표본이 없어 오탐·언어혼입의 영구 해결이나 혼입률0을 주장하지 않는다. [Imperva 결과](infra/groot-a/imperva-exception/followup-2026-10-14.json) · [Hermes 결과](infra/automation/ansible/hermes-observation-2026-10-14.json).
+
+**단기2는19:38:41에 같은 운영 monitor ID로 v2를 반영했다.** 최근300초 후보 중 정확한60초 구간의 고유 사건을 native Painless로 판정하며, processing 창도360초로 늘려 선행 사건을 보존한다. 실제2shard 검색41개·경보수명주기4단계·응답guard66개·관리변경기14개 검사를 통과했다. ID/권한/활성 상태/1분 주기/actions0·enabled_time을보존했고 원본백업/CAS/독립GET을확인했다. 이후 정기 실행과 runtime 결과는 [배포 증거](infra/normalization/wazuh-vector/indexer-native/window-v2/deployment-2026-10-14.json)를 따른다.
+
+300초 보완은 사건→검색가능 지연120초 및 성공평가 간격120초 이하라는 조건부다. 같은 trigger의 연속 true는 같은 active 경보를 유지하지만 서비스별 영속 중복 제거/정확히1회 전달은 아니다. 새 Python상시엔진·패키지·LLM권한·외부통지·운영시험입력·서비스재시작은 없다. [판정 계약](infra/normalization/wazuh-vector/indexer-native/window-v2/README.md) · [현재 관리/복구 명령](infra/normalization/wazuh-vector/indexer-native/window-v2/OPERATIONS.md).
+
+다음은 **WAF 두 reader 회전 격리 검증 → 인증서 만료 감시/수동 갱신 정리**다. 이후 과대 EOF 행 감시, raw 운영 회전/영속복구·전달확인, Hermes 첫실행 전 가드/복귀를 진행한다. 오탐/언어혼입 및 Wazuh 장기부하 관찰은 병행하고 기존 보류는 유지한다.  **19:40:33 후속 확인 완료:** 변경 후 정기실행2회/on_time, 별도dryrun57/57shard·유효empty·두trigger false·내부alert0·drop0, 서비스/컨테이너/analysisd PID/보호hash불변을확인했다. 아래는 각 시점의 이력이다.
+
+## 남은 항목의 실행 순서 재정리 (2026-10-14)
+
+사용자 요청으로 단기 확인·수정을 우선한다. **① Imperva/한국어 가드의 실제 재발 로그 확인 → ② Indexer 검색 시간 경계·색인 지연·반복 판정 보완 → ③ WAF writer와 두 reader의 격리 회전 검증 → ④ 인증서 만료 감시·수동 갱신 절차 정리** 순서다. ①은 확인 작업이고 ②가 우선 개선이다. 자연 스캔이 없으면 재발 없음으로 판정하지 않는다.
+
+과대 행 EOF 감시 사각, 원본 회전의 운영 전환·영속 복구, Hermes 재생성 전 가드/실제 복귀는 별도 설계·구현 과제다. Wazuh 1/1의 장기 처리량·상관 누락과 오탐·언어 혼입 관찰은 단기 작업과 병행한다. 학습·VPN·모바일 푸시·추가 도구는 보류다. [단계별 완료 기준](PLAN.md#단기-완료-항목-우선-실행-순서-2026-10-14).
+
+이번 정리는 저장된 최신 라이브 결과와 문서 대조에 따른 계획 변경이다. 추가 SSH·서버 변경·새 패키지 설치는 없다. 아래 18:56 검증과 19:02 정리 결과는 그대로 유효하다.
+
+
+## 운영 분석기 1/1 적용·실제 20회 종단 검증 완료 (2026-10-14 18:56 KST)
+
+B의 `analysisd.event_threads=1`, `analysisd.rule_matching_threads=1`을 **18:48:55 KST에 운영 적용**했다. 같은 manager 컨테이너를 한 번 재시작했고, 기존 native 규칙 104개 검사를 적용 전후 각각 통과했다. 18:49:04에 새 analysisd PID `2132985`와 전체 스레드 **44개**를 확인했다. 다른 컨테이너와 보호 대상 규칙·설정 해시는 유지됐다.
+
+canary를 포함하지 않은 **60.000186초 운영 관찰**에서 60건(약 1 EPS)을 수신했고, drop 증가 0·queue 표본 최댓값 0이었다. 분석기 CPU 사용은 단일 코어 대비 약 0.0333%였다. 이 짧은 표본을 장기 무누락이나 지속 처리량 보장으로 확대하지 않는다.
+
+**실제 종단 검증 완료(18:56:08 KST):** 사용자 명시 승인 후 A agent001에 동일 20개 run ID × 13행, 총 260행을 각각 한 번만 입력했다. **manager 40건 / Indexer 40건**, 반복 `100293` 20건·교차 `100294` 20건, level 3·negative 시나리오 경보 0건을 확인했다. 57/57 shard와 strict CA·호스트명 검증, 각 run 및 전체 canonical tuple이 정확히 일치했다. 첫 조회 회차에서 11.3초 만에 확인했고 입력 재시도는 0회다. A의 원래 52행 접두 구간·inode·보호 설정과 B의 옵션·룰·CID·SOC 안전 조건은 유지됐다. 이는 승인된 20회 시험의 성공이며 일반 트래픽의 장기 무손실 보장은 아니다.
+
+기존 격리 500 EPS 시험의 1/1 결과는 기대 경보 4,000/4,000이었다. 동시에 queue 최대 표본 24%·최대 archive 관측 지연 약 10.04초를 확인했으므로 지속 500 EPS 처리 보장은 아니다. [운영 적용·관찰 증거](infra/normalization/wazuh-vector/correlation-fix/deployment-resume-2026-10-14.json) · [격리 부하와 한계](infra/normalization/wazuh-vector/correlation-fix/LOAD-VALIDATION.md). 아래 18:18/18:27의 반입·배포 대기는 이전 시점 기록이다.
+
+**19:00~19:02 KST 보관·정리 완료:** A/B에 관련 소스·문서136개씩(1,754,010bytes)을 해시 대조해 보관했고 각 변경45/유지91개다. 원본 소스와 운영 옵션 복구 백업, 합성 시험 기록을 보존했다. 서버 작업임시 A165개/B316개와 Mac298개를 제거하고 경로 부재·운영 상태 보존을 확인했다. Mac 패키지 설치0·기존 사용자 환경/캐시 삭제0이다. 이 마감 문구와 정리 JSON은 서버 소스 스냅샷 이후 작성됐으며 서버에는 별도 preservation/cleanup/postcleanup 기록이 있다. [마감 증거](infra/normalization/wazuh-vector/correlation-fix/finalization-resume-2026-10-14.json).
+
+
+## 상관 누락 보완 검증 완료·운영 적용 대기 (2026-10-14 18:18 KST)
+
+검증기의 고정 사건 ID 가정을 수정했고 합성47개 및 기존 성공/누락 회차 대조를 통과했다. 같은 입력을 사용한 격리 부하 시험은 각30,000행을 전부 수신·처리했다. 디코딩/판정 worker1/1은 예상 상관 경보4,000건 전부 생성했고, 자동 병렬 설정은1,362건만 생성했다. 두 설정 모두 입력 drop0이므로 이번 시험의 상관 판정 누락을 전송 유실과 구분한다.
+
+**처리량 한계:** 500EPS를60초 동안 보낸1/1시험에서 queue최대표본24%, 송신→archive관측 지연 p95약9.10초/최대10.04초가 나타났다. 송신 종료약10초 뒤 전량 처리됐으며, 지속500EPS 처리능력을 보증하지 않는다. 변경 전 운영60초 평균은1.23EPS였다. agent000 직접큐·격리프로세스 시험이므로 실제001/Indexer 종단과 동일하지 않다.
+
+**운영 적용 미완료:** 두 옵션만 바꾸는 Ansible 후보·원본백업/복구 절차는 준비했다. 그러나 후보·기존합성시험94파일/141,064bytes의B task경로 반입을 자동 승인 검토가 두 번 거절했다. 구체적인 전송 승인을 사용자에게 요청했으며 답변 전에는 우회하거나 배포하지 않는다. B native Ansible 검사·104규칙 전후회귀·manager 재시작·실제20회burst 종단 검증은 남아 있다. 18:18 B조회에서 원본옵션SHA·manager/analysisd PID·기존규칙이 같고drop/queue0이었다.
+
+[보완 내용과 실측](infra/normalization/wazuh-vector/correlation-fix/README.md) · [배포/복구 절차](infra/normalization/wazuh-vector/correlation-fix/DEPLOYMENT.md). 아래는 이전 시점 기록이다.
+
+**18:27 KST 정리:** 서버 증거 보존 후 A임시2/B1,051파일과 Mac임시137파일을 제거하고 경로 부재·운영 불변을 확인했다. 패키지 설치0·배포소스 반입0·새운영입력0이며 사용자 전송 승인 대기는 유지한다. [정리 및 미실행 항목](infra/normalization/wazuh-vector/correlation-fix/finalization-2026-10-14.json).
+
+## 상관 경보 누락 조사 — 병렬 판정에서 재현 (2026-10-14 13:12 KST)
+
+과거 문제 회차는 현재도 **manager 1건 / Indexer 1건**으로 일치한다. 생성된 경보의 색인 유실은 관측되지 않았다. 당시 13행의 전체 처리 기록은 남아 있지 않아 그 회차의 세부 원인은 확정하지 않는다.
+
+B의 설치 Wazuh 4.14.8 바이너리·규칙 복사본을 격리해 비교했다. 사전 logtest 없는 자동 설정 20회에서 **반복 100293 누락 8회·교차 100294 누락 7회**를 재현했다(둘 다 누락 2회, 기대 불일치 13회). 디코딩·판정 작업자를 각각 1개로 둔 별도 20회는 모두 기대 경보 2건과 일치했다. 40회×13행의 archives 원문과 전달번호가 전부 일치하고, 최종 판정과 alerts도 같아 입력 유실·경보 출력 지연과 구분된다. 별도 4조합 48회에서도 판정 병렬군에서만 반복 경보 4개가 누락됐다.
+
+**판단:** 병렬 규칙 판정과 선행 상관 상태 등록의 순서 경쟁이 유력하다. agent 000 직접 큐·별도 UID·private WDB 없음 조건의 유한 시험이므로 운영 001의 전체 경로와 동등하거나 과거 원인이 확정됐다고 표현하지 않는다. 관측 수치를 운영 누락률·단일 작업자 완전 해결로 확대하지 않는다.
+
+기존 검증기가 반복 경보의 사건 ID를 항상 다섯 번째로 가정하는 문제도 확인했다. 다음은 **검증기의 규칙·시나리오·허용 사건 ID 결속 보완 → 판정 작업자 1개 후보의 처리량·지연·큐·기존 규칙 회귀 검증**이다. 운영 스레드·규칙 변경과 manager 재시작은 없으며 A 13:11 / B 13:12의 서비스·컨테이너·canary/설정/룰 해시는 조사 전과 같다. [진단·실측·한계](infra/normalization/wazuh-vector/correlation-diagnosis/README.md).
+
+**13:17 KST 보관·정리 완료:** A/B에 소스·문서23개씩 731,286bytes를 해시 대조해 보관했다(각 변경18/유지5). 변경 전 사본은 `/var/backups/capstone-correlation-source-20261014/`, 증거는 `/opt/capstone-automation/project/evidence/correlation-20261014/`에 있다. 보관 해시와 시험 프로세스 종료를 재확인한 뒤 A 임시27파일·B3,538파일·Mac51파일을 삭제했고 각 경로 부재를 확인했다. 패키지 설치0, 운영 입력·설정 변경0이다. [마감 증거](infra/normalization/wazuh-vector/correlation-diagnosis/finalization-2026-10-14.json). 이 마감 문구와 정리 JSON은23파일 서버 스냅샷 이후 작성됐으며, 서버에는 별도 preservation/cleanup 기록을 보관했다.
+
+사용자 요청에 따라 WAF 회전보다 상관 누락 조사를 우선했다. 아래는 이전 시점의 기록이다.
+
+## 보존 자료 전수 판정·현재 전달 경로 재검증 (2026-10-14 12:00 KST)
+
+보존한 두 배치 **1,481건·621,820bytes**를 A/B에서 독립 대조했다. 원본·manifest 해시가 일치하며, 모두 현재 nft 선택 조건의 비대상으로 후보와 실제 정제 보안 이벤트는 **0건**이다. 이는 모든 kernel 로그가 무해하다는 판정이 아니다. 실제 자료의 Wazuh 재주입·Indexer 쓰기는 수행하지 않았으며, 이 1,481건을 색인 완료로 표시하지 않는다.
+
+- **격리 정제:** A의 실제 Vector 전수 분기와 별도 합성14건을 검증했다. 합성은 정제 성공9건·예상 실패3건·비대상2건이며, 성공9건 모두 historical/replay이고 운영 상관 대상에서 제외했다. [전수 판정·검증](infra/normalization/vector/history-replay/README.md).
+- **현재 전달 경로:** 별도 합성 canary13행을 6행/7행 사이 3초 간격으로 보낸 회차에서 manager2건·Indexer2건의 정확한 사건ID와 규칙100293/100294를 확인했다. strict TLS 조회의 57/57 shard가 성공했고 timeout은 없었다. 앞선 연속13행 회차는 manager1건·Indexer1건만 관측됐으며 원인은 미확정이다. native Wazuh8개 순서 시험에서는 두 상관 규칙이 재현되어, 간격을 둔 성공1회가 무손실·순서·원격 ACK 보장을 의미하지 않는다. [분석·색인 검증과 한계](infra/normalization/wazuh-vector/history-replay-b/README.md).
+
+**12:22 KST Suricata 후속 검증 완료:** 실제 설치 바이너리의 격리 시험에서 지연 공개 방식은 Vector/Wazuh 각각6건을 정확히1회 수집했다. 단순 rename 대조군은 늦은 옛파일 기록과 중간 세대2건을 놓쳤다. writer old FD0·논리 EOF/SHA·연속2회전·정상재시작을 검증했고 운영 PID와 Wazuh root/queue는 유지됐다. 운영 raw 회전은 **copytruncate를 유지**한다. 다음은 WAF audit/access와 두 reader의 별도 격리 검증이며, 운영 교체 전 세대 순서의 영속 저장·강제 종료/재부팅 복구·초기 checkpoint 이전이 필요하다. [회전 실측과 경계](infra/normalization/vector/raw-rotation/README.md). 아래10:57의 '격리 정제 예정'은 위 결과로 후속 완료됐고, 나머지 기록은 각 시점의 상태다.
+
+**12:28 KST 보관·정리 완료:** A/B에 관련 소스·문서38개씩(621,689bytes)과 증거를 보관하고 SHA를 대조했다. 변경 전 소스는 root 백업에 보존했다. 삭제 전 보관 해시를 다시 검사한 뒤 A 임시106파일·B133파일·Mac 공용67파일을 정리했고, 담당자 별도 임시물도 제거했다. B의 보관된 확인 도구로 기존 시험2건/2건·57shard를 다시 확인했다. 운영 서비스/컨테이너·원본 배치/수신증은 유지됐으며 신규 패키지 설치는0이다. [마감 증거](infra/normalization/vector/history-replay/finalization-2026-10-14.json). 이 마감 문구와 정리 JSON은38파일 서버 스냅샷 이후 작성했고 서버에는 별도 cleanup.json을 보관했다.
+
+## 이전 부팅 로그 후속 회수·B 파일 보관 완료 (2026-10-14 10:57 KST)
+
+고정 이전 boot/kernel/cutoff의 남은481건을 회수해 기존1,000건과 합계 **1,481건·621,820bytes**를 보존했다. 두 배치를 기존 SSH/rsync로 A→B 직접 전송하고, SHA 대조·파일/디렉터리 fsync·원자 저장 후 B 수신증을 A에도 별도로 보관했다. 양쪽1,481개 cursor가 서로 중복되지 않으며 원본·manifest·수신증 해시가 일치했다.
+
+native 합성144개(기존export25/후속24/수신41/승격33/A수신증21)와 실제 합성3건의 응답 유실→재조회·수신증 재사용을 확인했다. 실제 두 배치도 재조회·재저장을 통과했고 A/B 서비스·컨테이너는 전후 같았다. 새 계정·SSH키·sudo/MCP권한·데몬·패키지는 추가하지 않았다. 원문/cursor의 Mac 반출과 운영 ready 재주입은 없다.
+
+**완료 경계는 B 파일 보관**이며 Wazuh 분석·Indexer 색인 ACK는 아니다. 고정 범위의 관측 끝을 확인했지만 과거 vacuum/이미 소실된 원문까지 복구한 의미는 아니다. 다음은 보존 배치의 격리 정제, Suricata→WAF 원천 회전과 두 reader 검증, 이후 Hermes 시작 전 lifecycle·실제 복구 시험이다. [보관·검증·운영 경계](infra/normalization/vector/history-transfer/README.md) · [실측](infra/normalization/vector/history-transfer/deployment-2026-10-14.json). 아래 기록은 각각 당시 상태다.
+
+**11:02 KST 정리 완료:** A/B에 관련 소스·문서43개씩과 검증 증거를 보관하고 SHA를 대조했다. A 임시137파일, B 임시110파일+업로드6파일, Mac 작업임시97파일을 삭제하고 경로 부재를 확인했다. 운영 배치·수신증·백업은 보존하며 Mac 신규 설치와 infra 패키지/bytecode 잔존은0이다. 정리 후 관련서비스도active다. [정리 집계](infra/normalization/vector/history-transfer/cleanup-2026-10-14.json).
+
+## Imperva 정기 점검 오탐 예외 적용 (2026-10-14 05:50 KST)
+
+사용자가 확인한 실습망 Imperva `211.170.162.9`의 최근5시간 경보4건을 실제 로그와 대조했다. HTTP/1.0의 Host 누락3건과 HTTP/1.1의 숫자 Host1건이 각각 기본 CRS920280/920350에 걸렸으며, 커스텀 공격룰 발화는 없었다.
+
+정확한 `.9 → 172.18.0.2:8080`, `GET /`, 관측된 protocol/Host·CL/TE없음 조건에만 early CRS10020/10021 예외를 적용했다. 다른 IP·경로·헤더 및 SQLi/XSS·949110·nft 정책을 유지한다. 격리21쌍/42요청을 통과했고 운영 nginx862룰·healthy·기존 컨테이너/시작 시각·정상HEAD302를 확인했다. 향후 단일read-only bind를 실제 compose에 반영했으며 현재 컨테이너는 재생성 없이 파일 설치/reload했다. **다음 실제 정기 스캔의 재발 여부는 아직 관찰 전**이다. [범위·검증·복구](infra/groot-a/imperva-exception/README.md).
+
+06:22:59 KST 재조회에서도 호스트/컨테이너 예외 SHA와 WAF healthy를 확인했고 적용 이후 `.9`의 새 색인 경보는0건이었다(54/54 shard). 실제 다음 점검의 실행을 확인한 것은 아니므로 자연 스캔 검증은 계속 남는다.
+
+## 별도 evidence·Indexer 관측 모니터 적용 (2026-10-14 06:23 KST)
+
+- A 별도 evidence 입력과 B100260~100262를 배포했다. 기존 localfile10개·local_rules·권한을 보존하고 Wazuh native104개를 배포 전후 각각 통과했다. 자연 Suricata1건의 A→manager→Indexer 사건ID·시각·고유 키가 일치했다. nft `SPOOF/observed`는100262의`logged_drop`조건에 따라 색인하지 않는다.
+- Vector110/jq18/reader9 통과, 두 playbook의 최종 누적 첫 적용changed5/재적용0이다. 네 출력·두 reader의 실제 회전108초, ready638,200bytes/evidence47,324bytes의 보관 SHA와 수집 재개를 확인했다. [입력·회전·원격ACK 한계](infra/normalization/vector/EVIDENCE.md).
+- 기존 Indexer에 `capstone-evidence-observation-v1` 한 개를 활성화했다. 60초 사건 시각·정확한 고유 키와 조회 한도를 검사하며 두 trigger 모두 actions가 없다. 06:22:25/06:23:25 두 주기의 실행 시각 갱신과 on_time=true, 내부alert0을 확인했다. 별도06:23:37 수동 dryrun은54/54shard·1건·두trigger false·오류0을 확인했다. 새 이메일·채팅·차단은 없다. [모니터·실패 복구·검증](infra/normalization/wazuh-vector/indexer-native/README.md).
+
+기존 Wazuh 공격 상관의 no_log는 유지한다. 처음 활성화 때 Indexer가 schema_version을0→8로 바꾸어 검증이 중단됐고 동일ID를비활성복구한 뒤 고정변화만 허용하는 보완을 적용했다. 최종 배포검사30개·검색38개·응답판정23개를 통과했다. 주기 실행 시각은 해당 회차의 상세 query 결과나 원격 수신증이 아니다. 이 구성은 영속 수신증·자동 대응·장기 부하 검증을 완료한 것이 아니다. 06:25 KST에는 다음 순서의 첫 작업으로 이전boot kernel1,000건(418,810bytes)을 A root 전용 경로에 보존하고 SHA·cursor 경계·서비스 무변경을 확인했다. 범위가 더 남아 있어 전체boot 회수는 아니다. 다음은 후속배치/격리정제·B 파일 보관, Suricata→WAF raw 회전, 그다음 Hermes 시작 전 lifecycle이다. [이전boot 보존 결과](infra/normalization/vector/history/README.md). 아래04:54 기록은 이전 단계다.
+
+
+**06:30 KST 정리 완료:** A/B 각각 최신소스236개(1,141,760bytes)와 배포 증거를 영구 보관하고 SHA를 확인했다. 서버 작업임시 A349개/B370개, Mac392개(1,626,573bytes)를 삭제하고 경로 부재를 확인했다. 별도 agent 임시물도 정리했고 Mac 신규 설치0·infra wheel/bytecode0이다. 보관된 소스로 B모니터 enabled/설정 검증과 A이전boot 배치 보존을 다시 확인했다. 정리 후 A/B 감시·서비스는 active다. [정리 집계](infra/normalization/indexer-cleanup-validation-2026-10-14.json).
+
+## 잔여 작업 후속 — 오류 해소·수집 감시 적용 (2026-10-14 04:54 KST)
+
+- **Wazuh 필드 초과 오류 해결:** 매분 Suricata stats 504개 필드와 출처 label 1개가 기본 한도 256개를 넘어 오류 249건을 만들던 원인을 확인했다. A의 고정 형식 stats 전송만 native ignore로 제외했다. 원본 통계·보안 이벤트·decoder 기본값은 유지하며, 적용 후 약 29분 동안 새 오류 0건을 확인했다. [검증](infra/normalization/wazuh-vector/stats-filter/README.md).
+- **수집 상태 감시 적용:** Vector의 원문 포함 file-source 진단을 제한하고 숫자 telemetry·현재 PID/InvocationID·180초 신선도·오류/손실 신호·buffer 감시를 연결했다. B의 100246~100251은 level 3/ignore 900초이며 자동 차단하지 않는다. Vector native 97개, jq 16개, Wazuh native 51개 검사를 통과했다. Vector/storage/manager 재적용은 모두 changed=0이다. [한계·직접 증거](infra/normalization/vector/collection/README.md).
+- **새 상태 로그 회전 검증:** 실제 회전 89.452초 동안 ready 928,838bytes의 보관 SHA, reader의 논리 EOF, telemetry 7행 보관을 확인했다. 새 Vector heartbeat 2건·KST·NRestarts=0·상태 이상 없음을 확인했고, agent·보안 컨테이너·승인 권한을 유지했다. [보존 절차](infra/normalization/vector/STORAGE.md).
+- **상관·복구 검증:** Vector dedupe/reduce의 재집계·전송 지연 한계를 native 시험 16개로 확인해 공격 상관의 no_log를 유지했다. 기존 Indexer 2.19.6의 사건 시각·정확한 키 조회를 검증하고 [별도 evidence와 actions 없는 monitor 후보](infra/normalization/wazuh-vector/indexer-native/README.md)를 준비했다. Hermes는 native 복구 16개·경계 7개·cold 엔진 13개·prestart 계약 9개 검사를 통과했으며 운영 재생성은 실시하지 않았다. [복구 검증](infra/automation/ansible/hermes-recovery-validation.md).
+
+**다음 순서:** (1) 별도 evidence와 actions 없는 Indexer 상관 관찰 연결, (2) 이전 boot 보존·B 파일 수신 확인·Suricata→WAF raw 회전 검증, (3) Hermes 시작 전 가드 lifecycle 구현과 실제 중단/복구 시험, 장기 관찰. EOF의 과대 행은 counter에서도 누락될 수 있어 무손실 수집을 완료한 것은 아니다. [수집 잔여 실행안](infra/normalization/wazuh-vector/NEXT-RELIABILITY.md) · [Hermes 준비 상태](infra/automation/ansible/hermes-prestart-plan.md). 5번 추가 도구·학습·VPN·모바일 푸시는 계속 보류한다. 아래 내용은 이전 단계 기록이다.
+
+**05:00 KST 정리 완료:** A/B 소스 149개씩과 실측 증거를 영구 보관한 뒤 서버 임시 A340개/B206개·Mac 임시300개를 삭제했다. Mac 신규 설치0·infra wheel/pyc 잔존0이며 운영 의존성·복구 백업은 보존했다. 정리 후 A/B 서비스·감시 정상 상태를 확인했다. [정리 집계](infra/normalization/next-cleanup-validation-2026-10-14.json).
+
+## 후속 실행 — 1~4번 우선 진행 (2026-10-14)
+
+사용자가 **5번 추가 도구 도입은 보류하고 1~4번을 진행**하도록 지시했다. 저장 안전성부터 적용하고 WAF 정제·상관 종단·배포 자동화를 진행했다. 아래 첫 도구 전환 및 이전 Python 검증 기록은 각각 당시 상태다.
+
+- **출력 보관 적용:** native logrotate·5분 systemd timer·용량 경보를 설치했다. Vector만 일시 정지하고 Wazuh의 논리 offset/파일 SHA1을 확인한 뒤 rename/create한다. 실제 회전85초·493,119bytes 보관 SHA-256 일치·새 reader 전환·서비스 정상·재적용changed0을 확인했다. [보존 정책과 한계](infra/normalization/vector/STORAGE.md).
+- **WAF 정제 통합 적용:** 중복 키·request ID·양쪽 배포 ID·독립 access 시각을 확인하는 Vector 경로를 활성화했고 총89개 native 검사를 통과했다. 첫 producer 시도는 FD 조회 권한 때문에 복구됐고, 같은 nginx UID로 조회하도록 보완한 최종 적용은 changed2/재적용changed0이다. 기존 master·룰을 보존하고 정상 HEAD의 access1건·허용12필드·binding을 확인했다. Vector 통합 첫 적용은 changed6, 재적용changed0·PID/InvocationID 불변이다. 03:29 새 출력11건(nft10+WAF1)의 KST/허용필드·최대41leaf/ERROR0을 확인했다. WAF1건은 정상 HEAD의 audit/access/ready가 같은 request ID로 결속된 실물 검증이다. 장기 부하는 별도 관찰 대상이다. [상세 상태](infra/normalization/vector/WAF.md).
+- **Wazuh 종단 완료:** 실제 agent 출처 접두사 때문에 기초 규칙이 불일치하던 문제를 수정했다. native43개 시나리오 통과, 전용 합성13행→manager2건→Indexer2건·동일event ID를 확인했다. 기존 raw8개·local_rules·승인권한 경계 유지, A/B 최종재실행changed0이다. 정제 공격 상관은 **no_log 관찰 상태**이며 WAF는 base만 수용한다. [근거](infra/normalization/wazuh-vector/CORRELATION.md).
+- **배포·언어 자동화 적용:** Hermes 가드를 Ansible로 이관하고 5분 재생성 감지/고정 이미지 재적용 timer·metadata observer를 설치했다. Hermes 재시작 없이 최종changed0, 전송검증11개·MCP5개 연결조회 통과, config/.env/SOUL 유지·DB 정상이다. DB/cron 증가분은 기존 예약작업 실행으로 구분했다. 구 Python 배포기1개를 추가 삭제했다. [절차·한계](infra/automation/ansible/hermes-guard.md).
+
+**남은 검증·보완:** no_log 상관의 운영 경보 승격, 전체 고유 집계·정제 후 전송 지연 재평가, raw copytruncate와 이전 부팅 journal 회수, 과대 입력·장기 부하·전원 장애/영속 수신증, 실제 컨테이너 재생성/강제 롤백 및 사용자 채팅 장기 관찰이다. 재생성 timer는 시작 전 가드 적용을 보장하지 않으며 약5분 주기와 유휴 대기 동안 공백이 있을 수 있다. B에서 JSON decoder 필드 초과 오류를 관측했지만 원천은 미확정으로, 제한값을 임의로 올리지 않았다. 추가 도구·학습·VPN·모바일 푸시는 보류한다.
+
+**후속 반입 정리 완료(03:38 KST):** A/B 각각 최종 소스·검증 자료102개를 영구 경로에 보관하고 SHA-256을 확인했다. 서버 임시 파일 A230개/B172개와 Mac 작업 임시190개(1,538,114bytes)를 삭제하고 경로 부재를 확인했다. 병렬 작업의 별도 임시34파일·1디렉터리도 정리됐다. Mac 패키지 설치0·프로젝트 wheel/pyc 잔존0이며 서버 운영 의존성·복구 백업은 보존한다. 정리 후 B Hermes/Wazuh 실행·가드 timer/observer·승인 timer active를 확인했다.
+
+## 최신 적용 — Vector·Ansible·승인 정책 유지·언어 검사 패키지 (2026-10-14)
+
+사용자가 비교 단계 뒤 우선순위 3개와 한자·일본어 혼입 검사 교체를 승인하여 **운영 적용을 진행했다.** 아래의 '설치·배포 없음'은 이전 비교 시점의 기록이다.
+
+- **로그 정제:** A에 Vector 0.59.0을 설치하고 별도 서비스로 가동했다. Suricata·nftables를 공통 JSONL/KST로 출력한다. native 22개 검사와 실제 입력 복사본 Suricata3·nft10건 정제가 통과했다. WAF4건은 격리4/정제0으로 확인했으며, WAF 정제 완료로 간주하지 않는다. 초기 운영 관찰 ready20건·오류/경고0·재시작0. 기존 raw 수집·보안 엔진과 copytruncate는 유지한다. [설정·한계](infra/normalization/vector/README.md).
+- **Wazuh 연결:** B에 전용 `100200` level1/no_log 규칙, A에 normalized localfile 1개를 추가했다. native 양성2/음성4 검사와 A 실제 파일 FD/수집 시작을 확인했다. 기존 raw 입력8개·local_rules SHA 보존, 기존 manager/agent만 필요한 재시작 후 정상이다. B 두 번째 적용 변경0, A는 후보 캐시가 한 번 갱신된 뒤 세 번째 적용 변경0·운영 PID 불변. `no_log`는 분석/Indexer 종단 수신증이나 신규 상관분석 완료를 뜻하지 않는다. [연결 검증](infra/normalization/wazuh-vector/README.md).
+- **반복 배포:** A/B에 운영자 전용 Ansible core 2.21.5 환경을 격리 설치했다. 고정 호스트·파일·검증·백업·복구 범위를 사용하며 LLM/MCP에 Ansible 실행 권한을 추가하지 않았다. A Vector 첫 적용 변경7건, 동일 재실행 변경0건·PID 불변. [배포 절차·증거](infra/automation/ansible/README.md).
+- **승인·보호 정책:** 기존 해시 결속 승인과 제한 sudo 실행기를 유지했다. MCP 회귀175개, A/B 실제 제한 계정의 3개 대상 조회·HMAC 확인·패키지/컨테이너 구성/일반 shell 거절 검사를 통과했다. helper·MCP·sudoers와 DGX .110/.111 보호가 유지됐다. 이번에는 실제 차단이나 승인 카드 게시를 하지 않았다.
+- **언어 검사:** 01:37 KST B Hermes의 직접 문자 범위 검사를 외부 `regex==2026.9.29` Unicode Script 엔진으로 교체했다. 회귀51개·설치본 전송/실제 DGX 교정12개 통과, Mattermost 연결·.111·MCP5개·대화 DB 무결성을 확인했다. 인용/코드/식별자 보존과 전송 제어는 얇은 Python 연동 코드로 남는다. 백업과 재적용 방법은 [언어 검사 운영 문서](infra/hermes/korean-output-guard.md)에 기록했다.
+
+**후속 범위:** WAF의 중복 키·독립 시각 근거를 보존하는 패키지 정제, 신규 장비 간 상관 룰/시간창·분석/색인 종단 검증, 출력 파일 회전/보존/용량 경보, 원천 copytruncate·이전 부팅 journal·재전송 중복/유실 계약, 남은 배포기의 Ansible 이관, 실제 사용자 채팅의 장기 혼입률은 남는다. 사용자 추가 지시에 따라 이전 미배포 Python 정제 구현·전용 테스트와 완료한 일회성 성능 비교 실행기는 정리하고 검증 결과/기록만 보존한다. 학습·VPN·모바일 푸시 보류도 유지한다.
+
+**정리 완료:** 미사용 Python40개(정제 구현/검증21·전용 테스트16·일회성 비교3)와 전용 예제1개를 삭제했다. [삭제 목록](infra/normalization/RETIRED-2026-10-14.md) 및 [과거 성능 결과](infra/hermes/benchmarks/README.md)는 보존한다. Mac 신규 패키지 설치0·이번 반입 임시84파일/약258MB 삭제와 A/B 임시 반입 경로 제거를 확인했다. 추후에도 같은 원칙을 적용하도록 AGENTS.md에 기록했다. 프로젝트 소스·문서와 서버 운영 의존성·복구 백업은 유지한다.
+
+## 최신 검토 — 자체 Python 구현과 기존 도구 비교 (2026-10-14)
+
+사용자가 구현 진행 전에 패키지 대안을 비교하도록 요청했고, 로그 정제 외 최근 Python 문제 해결 코드까지 검토 범위를 넓혔다. **추가 구현·운영 전환보다 도구 선정이 우선**이다. 저장소 코드와 공식 자료를 대조한 설계 검토이며 이번에 SSH 라이브 재조회·패키지 설치·성능 실측·배포는 하지 않았다.
+
+로그 정제의 첫 검증 후보는 **Vector + 기존 Wazuh agent/manager**다. 추가 프로그램을 최소화하는 Wazuh 기본 수집·decoder/rule 구성, Fluent Bit, Logstash, syslog-ng/rsyslog도 비교했다. WAF 객체 배열 평탄화는 별도 정제 필요성이 있고, 기존 Python의 중복 키 정책·독립 시간 근거·원문/재처리 이력·영속 수신증은 패키지 기본 기능으로 동등하게 대체된다고 확인하지 못했다. 추천은 선정·호환 검증 완료를 뜻하지 않는다.
+
+설정 배포는 Ansible, Suricata 룰셋 관리는 suricata-update, 모델 비교는 promptfoo가 대체 후보다. 승인된 후보의 해시 결속·보호 주소 정책과 한국어 원문 보존 검사는 전용 로직이 남는다. sudoers/systemd/nftables 등 이미 활용 중인 기본 기능과 일회성 배포·검증 스크립트를 상시 Python 서비스와 구분했다. 기존 코드·과거 검증 결과는 보존하고 모바일 푸시·VPN·학습 보류도 유지한다. [상세 비교와 근거](대화기록/2026-10-14.md#python-자체-구현과-패키지대체-비교).
+
+## 최신 진행 — 별도 inbox 전달·수신 확인, WAF 격리 재처리 검증 (2026-10-14 00:43 KST)
+
+**2026-10-14 00:43 KST — 전달·수신 확인과 격리 재처리 분리 검증 완료.** A→B 임시 inbox에 실제 journal3건·격리 Suricata1건을 보내고, 첫 응답 유실 뒤 재전송까지 총5회 통신에서 B의 유일4행·일치 수신증4개를 확인했다. WAF 보관 원문4건은 독립 시간 근거로 재처리하여 KST를 복구했고 원래 격리 판정·원문·사건ID·체크포인트를 보존했다. 전체285회귀 통과. `durable_inbox`는 B 저장 확인이며 Wazuh 분석/색인 확인은 아니다. 기존 Wazuh 입력과 copytruncate는 유지하며 다음은 Wazuh 전달·신규 상관/시간창·재전송 및 기존 입력의 이중 집계 검증이다.
+
+수신 응답 유실·B 프로세스 재실행·A outbox 재개방을 시험했으며 원문은 외부 전송에 포함하지 않았다. WAF 원문은 자정 회전된 `audit.log.1`에서 이전8,432bytes SHA와 일치했다. 재처리한4건은 아직 일반 파일 입력이므로 배출을 보류했다. 파일 전달은 전체 검증이 끝난 폐쇄 세대만 허용하므로 실시간 처리는 후속 설계가 필요하다.
+
+운영 설정 해시·컨테이너 ID/시작 시각은 전후 같고 별도 시험 저장소·프로세스는 정리했다. 새 패키지·계정·키·컨테이너는 설치하지 않았다. [계약·실측·남은 조건](infra/normalization/DELIVERY.md) · [검증 집계](infra/normalization/delivery-validation-2026-10-14.json). 아래 기록은 당시 상태다.
+
+## 최신 진행 — 회전 방식·수집기 연동 분리 검증 완료 (2026-10-13 23:47 KST)
+
+Suricata8.0.6의 rename+SIGHUP 후 새 inode 전환을 실제 설치본의 별도 PCAP 프로세스로 확인했다. WAF는 **USR1과 같은 감사 경로의 HUP 모두 이전 파일에 계속 기록**했으며, **새 감사 경로+HUP**에서 전환됐다. 전환 전 대기한 요청도 이전 파일에 늦게 기록되는 것을 확인한 뒤 쓰기 FD0을 확인해 봉인했다.
+
+수집기에 root 소유 manifest의 닫힘 근거·연속 순번·이전 링크 해시·archive 전체 해시 검증을 추가했다. 중간 세대를 건너뛰지 않고 이어 읽는다. **전체227회귀 통과**, 별도 시험 원문 **11건(Suricata2 ready, WAF9 quarantine)** 전부 보존·저장소 재오픈 추가0건이다. WAF는 회전 시험에 별도 시각 근거를 연결하지 않아 격리했으며 정제 완료9건으로 표현하지 않는다.
+
+**운영 copytruncate는 유지한다.** 기존 Wazuh4.14.8 localfile의 inode 교체 경로에는 이전 FD를 끝까지 읽는 보장이 없어 단순 rename 전환만으로 기존 경보 수집을 안전하게 바꿀 수 없다. 이는 소스에서 확인한 위험이며 실제 운영 로그 유실을 관측했다는 뜻이 아니다. 다음은 **안전한 출력/전달·수신 확인과 기존 Wazuh 원천 경로 이전 검증**이다. 운영 자동 회전기·전달기는 미배포다.
+
+23:48 확인 시 운영 Nginx master/worker·Suricata PID, 컨테이너 ID/시작 시각, 확인 대상 설정 SHA와 WAF 원문은 유지됐다. 시험 프로세스·파일·스풀은 제거했다. 새 패키지·컨테이너는 설치하지 않았다. [회전 계약·결과](infra/normalization/ROTATION.md) · [검증 집계](infra/normalization/rotation-validation-2026-10-13.json).
+
+## 최신 진행 — 수집기 구현·분리 검증 완료, 운영 연결 보류 (2026-10-13 22:57 KST)
+
+3단계 수집기 후보를 구현했다. 파일 세대·위치와 journal 커서 추적, 원문/정제 결과/체크포인트의 원자 저장, 재시작 중복 방지, 불량·시각 미확인 입력 격리, 저장 한도 도달 시 중단을 포함한다. WAF는 지정 컨테이너의 독립 접근 로그와 레코드별로 대조하며 미래 로그 전체에 UTC를 가정하지 않는다.
+
+**전체188개 테스트 통과.** A의 별도 임시 저장소에서 Suricata29·WAF4·nft130건을 정제하고 일반 kernel2건을 ignored로 보존했다. 저장소 재오픈 후 세 입력 모두 추가 저장0건, WAF4건 KST·원문/ID 계약 유지. 실제 journal JSON 키 순서 변동에 따른 거짓 변경 판정과 누적량에 비례하던 DB 합계 스캔을 검증 중 찾아 수정했다.
+
+**운영 배포는 아직 하지 않았다.** 22:48/22:57 직접 조회한 운영 logrotate는 여전히 `copytruncate`다. 수집기는 관찰된 잘림/anchor 불일치/회전 누락을 중단시키지만 이 회전 방식의 원천 유실까지 해결했다고 할 수 없다. 다음은 **엔진별 안전한 회전·이전 파일 닫힘 확인 검증**이며, 이후 배출/격리 재처리와 Wazuh 상관 룰·실제 전달·중복 집계 검증을 진행한다. A 확인 대상 설정 해시·컨테이너 ID/시작 시각은 전후 동일하고 임시 검증 원문/DB는 삭제했다. Mac 패키지 설치는 없다.
+
+[수집기 계약·남은 조건](infra/normalization/COLLECTOR.md) · [실제 검증 집계](infra/normalization/collector-validation-2026-10-13.json). 아래 시각별 기록은 당시 상태로 보존한다.
+
+
+## 최신 진행 — 정제 순차 보완 2단계 완료 (2026-10-13 22:09 KST)
+
+WAF 과거4건을 동일 요청의 Nginx 접근 로그(명시적+0000)와 Docker UTC 시각에 대조해 **UTC 근거를 확인하고 KST 변환을 검증했다.** 예: 10/12 18:00:36 → 10/13 03:00:36+09:00. 현재 컨테이너 UTC라는 사실만으로 과거를 결정하지 않았다.
+
+어댑터에 원문 SHA와 근거 참조에 결속된 선택 `time_context`를 추가했다. 원문 명시 offset 우선·근거없음/잘못된 시각의 상태 유지, 보정 여부/정책버전 표시, 원문해시·사건ID 불변을 확인했다. **전체94개 회귀·실제4건 통과**, 원문·확인대상 설정·WAF실행 상태는 불변이다. 새 프로그램 설치·운영수집 연결은 하지 않았다.
+
+다음은 **3단계 수집기의 회전·체크포인트·재전송·미래 레코드 시간 근거 처리**다. 새 시간 필드의 실제 전달/상관 룰은 후속검증이다. [2단계 계약·결과](infra/normalization/README.md) · [직접 검증 기록](infra/normalization/waf-time-validation-2026-10-13.json).
+
+
+## 최신 진행 — 정제 순차 보완 1단계 완료 (2026-10-13 21:47 KST)
+
+사용자가 한 번에 진행하지 말고 순차적으로 처리하도록 지시해 **WAF 중복 헤더 입력 어댑터만** 보완했다. 정확한 `transaction.response.headers.Server` 문자열 중복을 구별해 응답 헤더를 정제에서 제외하고, 다른 경로·판단 필드 중복 거절은 유지한다. 원문 바이트 해시·별도 ID 계약으로 추적 근거를 남긴다.
+
+신규17+기존62=**79개 회귀 통과**, A 실제 WAF 원문 **4/4 수용·원문 해시 일치**를 확인했다. 원문 파일·WAF 실행 상태·확인 대상 수집 설정은 불변이며 운영 수집에는 연결하지 않았다. 다음은 **2단계: 무offset 원천 시각의 시간대 근거 확인**이다. 현재 네 건의 시간대 누락 표시는 유지한다. [1단계 계약·결과](infra/normalization/README.md#순차-보완-1단계--waf-중복-헤더-1013-2147-kst).
+
+## 최신 검증 — 로그 정제 운영 연결 보류 (2026-10-13 21:27 KST)
+
+적용 전 검증에서 로컬 변환 회귀49개·검증기 회귀13개 **총62개**, 실제 Suricata **29건**·nft **200건** 정제와 B Wazuh 4.14.8의 JSON 디코딩 **10건**이 통과했다. 잘못된 offset, 숫자/문자 프로토콜 불일치, WAF ID 처리 비용, 출력 상한을 로컬에서 보완했다.
+
+**WAF 원문 4건은 모두 중복 `response.headers.Server` 때문에 strict 파싱이 거절됐고, 원천 시각도 offset이 없었다.** 입력 처리 정책·원천 시간대 근거와 수집기 회전/체크포인트/재전송/부하, 신규 상관 룰·시간창·실제 전달/인덱싱 검증이 남아 운영 연결은 보류한다. 기본 디코딩 통과를 신규 상관분석 완료로 간주하지 않는다.
+
+이번에는 운영 설정·룰·서비스를 변경하지 않았다. A/B 확인 대상 설정 해시·컨테이너 ID/시작 시각이 같고, 마지막 Wazuh 큐는 0이었다. [상세 결과·남은 조건](infra/normalization/VALIDATION-2026-10-13.md) · [모듈 안내](infra/normalization/README.md).
+
+## 최신 반영 — 한국어 전송 검사 배포·로그 정제 준비 (2026-10-13 20:52 KST)
+
+상관분석용 공통 JSONL 정제 모듈·예제·문서와 32개 검증을 준비했다. 원본 수집은 유지하며 장비별 IP·시간·룰·탐지/차단 의미를 구별한다. **아직 운영 수집기나 Wazuh에 배포하지 않았다.** 회전/체크포인트/부하 처리와 실제 logtest를 거친 연결이 남아 있다. [정제 모듈 안내](infra/normalization/README.md).
+
+실제 `以下步骤` 재발 사례를 근거로 **Mattermost 전송 전 한국어 검사·교정을 배포했다.** 제보 문장은 정확 치환하고, 다른 혼입은 외국어 조각만 한 번 교정한다. IP·숫자·명령·기존 한국어 상태는 보존하며 실패한 줄은 안내문으로 대체한다. 정상 답변에는 추가 API 호출이 없다. 확인된 현재 원문 인용은 보호하고 이전 요청의 언어 허용이 다음 요청으로 넘어가지 않게 했다.
+
+20:51:04 같은 Hermes 재시작→20:51:15 Mattermost 연결→20:51:17 gateway 정상. 20:52 `.111`·기존 모델/MCP 5개·DB quick_check ok·active agent/lease 0 확인, 로컬 **42개**와 설치본 가짜 HTTP/실제 교정 **10개** 검증 통과. 실제 채팅 게시 시험은 하지 않았다. 중간 설명·텍스트 스트리밍·추론 표시를 Mattermost에서 끄고 검사 후 전달한다. **컨테이너 재생성 시 재적용이 필요**하며 독립 cron은 원문 근거가 없어 한자 인용도 안내로 대체될 수 있다. [범위·한계·백업](infra/hermes/korean-output-guard.md).
+
+
+## 추가 검토 — Wazuh 상관분석 룰 (2026-10-13 20:04 KST 이후)
+
+Wazuh의 시간·횟수·같은 IP/필드에 따른 상관 룰은 기존 `rule-b` → `b:wazuh-local-rules` → `propose_rule_edit`로 추가·수정할 수 있다. 현재 파일에도 Suricata·WAF·방화벽 반복 경보를 묶는 룰이 있다. 파일 SHA는 직전 라이브 조회와 일치하며 이번 확인은 코드·공식 문서 대조다.
+
+장비 간 상관분석에는 서로 다른 IP 필드·NAT·에이전트 범위를 대조하고 정상/공격 이벤트열을 재현하는 검증이 필요하다. 현재 MCP의 사전 검사는 XML 구조 중심이며 전체 엔진 검사는 승인 후 재시작 전에 수행한다. 사전 logtest 자동화나 새로운 상관 룰은 아직 배포하지 않았다. 기존 승인·권한·차단 정책을 유지하며 구체 보완 범위를 확인 중이다. [현재 룰](infra/groot-b/local_rules.xml) · [검토·제약·다음 단계](대화기록/2026-10-13.md).
+
+## 최신 완료 — DGX .111 전환·두 주소 차단 보호 (2026-10-13 19:54 KST)
+
+- **운영 모델:** Hermes의 실제 resolver가 `http://211.170.162.111:11434/v1`·`qwen3.6:35b`를 사용한다. 19:51 같은 컨테이너 재시작 후 Mattermost/WebSocket 재연결과 실제 실행 계정의 OpenAI 호환 API HTTP 200·한국어 응답을 확인했다. 모델명·추론 설정·MCP 5개·대화 이력은 보존했다.
+- **차단 방지:** `.110/.111` 두 `/32`가 A의 라이브·영구 `never_block`에 등록됐다. 현재 두 주소는 차단되지 않았고 전체 `agent_block`도 비어 있다. 이 보호는 다른 방화벽 통신 정책이나 전체 보안 탐지를 해제하지 않는다.
+- **Suricata 예외:** `192.168.16.230 → [.110,.111]:11434/TCP`의 기존 선택 6종 SID 예외가 실제 활성화됐다. 기존 `.110` 범위를 유지하며 지정 `.111`을 추가했다. 전체 ET 검사와 기존/후보 각각 27개 PCAP 사례 통과, 19:50:41 실제 로드 **52,497·실패/skip 0**, ET 원본 불변을 확인했다. 로컬 룰 SHA `82f41d65…`, 합본 `8669bab4…`다.
+- **부분 편집 실제 적용 확인:** 새 `propose_rule_edit`로 전체 diff 게시 → 실제 관리자 카드 승인 → worker의 1회 적용 → readback 확인·결과 게시까지 완료했다. 제안 `d466dc53aef84540443266a3a6db786b`는 `applied`, `approval_consumed=true`, `result_posted=true`다. Hermes의 기존 승인 정책은 유지한다.
+- **현재 상태:** A/B worker success·timer active, SOC 봇 active, Wazuh analysisd 큐 사용률 0.00·폐기 0, remoted 큐/폐기 0. 모델 전환 후 실제 사용자 채팅 전체 지연과 장기 오탐 추이는 후속 관찰 대상이다. `.110` 공유 부하가 지연 원인이라는 설명은 아직 사용자 추정이다.
+
+아래 승인 대기·`.110` 유지 내용은 각 확인 시점의 이력이다. 이번 사용자 직접 관리 작업에도 추가 카드 승인이 반드시 필요하다고 안내한 것은 과도한 해석이었음을 정정했다. 실제 룰은 재조회 사이 들어온 정상 카드 승인으로 적용됐으며 별도 직접 적용이나 승인 상태 변경은 하지 않았다. [백업·해시·검증·정정 기록](대화기록/2026-10-13.md).
+
+## 추가 요청 진행 — DGX .111 전환·차단 방지 (2026-10-13 19:40 KST)
+
+사용자가 공유 부하를 의심해 `.111` 전환과 해당 주소의 화이트리스트 추가를 요청했다. 공유 트래픽이 실제 지연 원인인지는 아직 확인되지 않았다. 아래 19:14 `.110` 유지 결정은 이 추가 요청 이전 상태다.
+
+- **차단 방지 완료:** `.110/.111` 두 /32를 A의 라이브·영구 `never_block`에 추가했다. 자동 선차단 코드의 DGX 보호는 기존에도 있었지만 수동 차단 목록에는 빠져 있어 함께 보완했다. 다른 방화벽 정의·차단 상태는 그대로다.
+- **Suricata 승인 대기:** 기존 `.110`의 선택6종 예외를 유지하고 `.111:11434`도 추가하는 후보가 전체 ET 구문 검사 및 기존/후보 각각27개 PCAP 사례를 통과했다. 새 부분 편집 MCP로 제안 **`d466dc53aef84540443266a3a6db786b`**를 게시했다(만료19:50:28 KST). 지정 관리자 카드 승인 전 실제 센서 룰은 기존 `.110`만 포함한다.
+- **모델 전환 준비:** `.111` `qwen3.6:35b` 접근·한국어 응답을 확인했고 URL 한 곳 변경·기존 대화 보존·동일 Hermes 재시작/실제 resolver 검증을 준비했다. 현재 운영 endpoint는 아직 `.110`이며, 예외 적용 확인 뒤 전환한다. 마지막사용 경로를 기록하는 세션 메타데이터는 일괄 덮어쓰지 않는다.
+- **코드 검증:** 고정 `.110/rev1` 또는 정확한 `[.110,.111]/rev2`만 허용하는 helper를 A/B에 배포했다. 전체 MCP175개 테스트 통과. 일반IP·대역·추가포트 허용이나 승인 경계 확대는 없다. [배포·백업·승인 상태](대화기록/2026-10-13.md).
+
+## 최신 반영 — 부분 편집 MCP 배포 완료 (2026-10-13 19:10~19:14 KST)
+
+사용자의 전체 룰 재생성 지연 개선 요청으로 작업을 재개해 **`propose_rule_edit`를 A/B에 배포했다.** 아래 16:52 마감·미구현 표시는 그 시점의 기록이며 이 후속 반영이 현재 상태다.
+
+- **변경 방식:** 작은 수정은 현재 파일 SHA와 고유한 원문/교체 문자열만 제출한다. MCP가 원본 바이트를 보존해 전체 후보를 구성하므로 모델이 파일 전체를 다시 출력할 필요가 없다. 최대 16개 편집·old/new 합계 64 KiB·최종 후보 128 KiB이며 누락/중복/겹침/기준 변경은 거절한다. 전체 파일 재작성 API는 의도적인 대규모 교체용으로 유지한다.
+- **승인 유지:** 전체 diff와 변경 전후 해시는 기존 Mattermost 승인 채널에 게시하고 지정 관리자 승인 뒤 worker가 한 번 적용한다. 새 도구는 모델에 짧은 제안 정보만 반환해 전체 diff 중복 출력을 줄인다. 엔진 검사·기준 재확인·복구 경계를 유지했다.
+- **검증:** 전체 MCP 172개·정책 갱신 6개 로컬 테스트와 독립 검토 통과. 실제 Hermes UID에서 양쪽 버전 0.3.0·각 8개 도구, 세 대상 조회 및 없는 문맥의 편집 거절을 확인했다. 전후 승인 상태 0·룰 해시/런타임 불변, worker success·timer active·SOC 봇 active다. 기존 컨테이너로 재시작한 Hermes는 19:11:10 KST Mattermost/WebSocket 재연결을 확인했다.
+- **기존 대화 반영:** 현재 Mattermost 36세션의 정책 캐시와 SOUL·cron 지침을 갱신했다. 이력·기존 prompt blob·라우팅 등 나머지 DB 보존, integrity ok, 실제 SOUL 로더의 전체 8035자 무잘림을 확인했다. `.110` `qwen3.6:35b`, 5개 MCP 설정, rule timeout 420초, 권한·보안 룰·컨테이너 구성은 유지한다.
+- **성능 근거:** 같은 22 KB 합성 파일의 주석 추가에서 `.110` API 평균 **120.13 → 90.62초(약 24.6% 감소)**, 모델이 반환한 룰 텍스트 **22,695 → 158바이트**였다. 부분 편집 2건 모두 최종 LF까지 정확히 재구성됐다. 시각·스키마/입력이 다른 소규모 시험이며 실제 채팅·승인·적용 전체 시간은 아니다. 긴 모델 추론은 여전히 관측됐다.
+- **남은 확인:** 실제로 필요한 다음 수정에서 부분 편집 전체 diff 게시 → 관리자 승인 → 적용·결과 보고와 사용자 체감 지연을 확인한다. 이번 배포 검증을 위해 유효 제안·승인 카드·운영 룰 변경을 만들지는 않았다. `.111` 전환·학습·VPN·모바일 푸시는 기존 보류 범위를 유지한다.
+
+[사용법·한도](infra/mcp/README.md) · [측정 조건과 결과](infra/hermes/benchmarks/README.md#부분편집-비교) · [배포 해시·백업·검증 기록](대화기록/2026-10-13.md).
+
+## 작업 마감과 재개 지점 (2026-10-13 16:52 KST)
+
+사용자 요청으로 이번 작업은 여기서 마무리한다. 마지막 작업은 쓰기 지연 조사와 기존·보조 DGX의 후보 생성 비교이며, 아래 실측 결과와 재현 자료를 저장했다. 이 마감 시각에 서버를 다시 조회한 것은 아니다.
+
+- **완료:** 라이브 로그·승인 worker 대조, 합성 SOC 응답 62건 비교, 긴 전체 후보 생성 4건 비교, 관련 현황·일정·대화 기록 정리. 긴 후보 생성 평균은 `.110` 120.13초, `.111` 83.93초이며 실제 승인·적용 시간은 제외한다.
+- **유지:** 마지막 확인 기준 운영 모델은 `.110`의 `qwen3.6:35b`다. 기존 승인형 MCP·관리자 승인·엔진 검증 경계를 유지한다. 이번 성능 조사에 따른 서버 전환·추가 권한·운영 코드 배포는 없었다.
+- **다음 재개 지점:** 쓰기 MCP의 제한적 부분 편집 지원 설계·구현 검토. 모델이 변경 부분을 제출하고 서버가 기준 SHA를 대조해 전체 후보를 구성하도록 하되, 전체 diff 검토·관리자 승인·엔진 검사는 유지한다. 아직 구현하거나 배포하지 않았다.
+- **별도 미완료:** `.111` 운영 전환은 미실행이며 선택 시 해당 주소의 오탐 예외·검증기 정렬과 실제 채팅 경로 검증이 필요하다. 학습은 보류, SSL VPN·모바일 푸시는 추후 발전과제로 유지한다.
+- **보존 상태:** 결과 파일은 작업 폴더에 저장했고 SSH 조사용 임시 파일은 삭제했다. Mac 패키지 설치는 없으며 Git 변경 사항은 아직 커밋하지 않았다.
+
+## 최신 확인 (2026-10-13 KST)
+
+### 쓰기 지연 재조사 (16:24~16:33 KST 라이브 조회)
+
+확인한 과거 쓰기 요청은 **MCP 호출 전에 전체 수정 후보를 포함한 모델 응답을 기다리는 시간이 컸다.** 13:28 WAF 후보 16,116바이트 생성 응답은 124.9초(입력 49,995/출력 6,297토큰), 이후 재작성은 119.0초였다. 첫 후보는 MCP에서 기존 8KiB 제한으로 0.309초 만에 거절됐으므로 정상 검증·승인 게시가 항상 빠르다는 근거는 아니다. 이 쓰기 기록은 14:25 개선 배포 이전이다.
+
+- **현재 지연 근거:** 배포 후 15:19/15:33의 룰 읽기 요청에서 도구 조회 합계는 약 3.10/2.86초였으나 이후 모델 API는 119.5/36.5초였다. 입력은 각각 약 42,000토큰이다. API 경과시간은 입력 처리·추론·출력·대기를 포함하며 순수 생성 시간으로 단정하지 않는다.
+- **현재 서비스:** Hermes running·OOM false·14:27 시작 유지, active_agents=0. A/B 룰 pending=0, worker 최근 실행 success·timer active/waiting. 운영 endpoint `.110`·모델 유지, rule-a/rule-b timeout=420초다. 저장소 예제의 오래된 240초 표기만 맞췄다.
+- **한계와 개선 방향:** 16:31까지 14:30 이후 실제 룰/서비스 제안 호출 기록은 없다. 새 버전의 전체 쓰기 경로를 측정한 것은 아니다. 현재 전체 파일 제출 방식을 기준 SHA에 결속된 제한적 편집으로 보완하거나, 승인 브로커가 게시한 diff의 모델 재출력을 줄이는 방안을 검토할 수 있다. 전체 diff 검토·관리자 승인·엔진 검사는 유지해야 한다. 운영 개선 코드 변경·배포는 아직 하지 않았다.
+
+**16:40~16:44 현재 모델로 쓰기 후보 생성 모의 비교:** 22,652바이트 합성 WAF 파일에 주석 한 줄을 추가한 전체 후보를 실제 도구 스키마로 생성하도록 요청했다. 준비 호출 후 두 서버에 같은 입력을 각 2회 전송했으며 실제 MCP·승인·적용은 실행하지 않았다.
+
+| 모델 응답 완료 시간 | 기존 `.110` | 보조 `.111` |
+|---|---:|---:|
+| 1회 / 2회 | 120.49 / 119.77초 | 85.59 / 82.28초 |
+| 평균 | 120.13초 | 83.93초 |
+
+- 보조는 이 시험에서 약 **30.1% 단축**했지만 여전히 1분 이상 걸렸다. 도구 인자는 두 서버 모두 전체 응답 완료 직전에 처음 도착했다. 작은 수정에도 긴 파일 전체를 모델이 출력하는 비용이 현재 API에서도 재현됐다.
+- **정확성 구분:** 4건 모두 156개 규칙·순서·대상·기준 SHA를 보존했으나 파일 끝 줄바꿈 1바이트를 누락했다. 정확한 바이트 재현은 양쪽 0/2, 규칙 본문 누락은 0건이다. 성공률이나 일반 SOC 정확도를 주장하지 않는다.
+- 입력 8,742토큰의 합성 파일 시험이며 실제 운영의 더 긴 문맥·도구 실행·카드 게시·사람 승인·적용 시간은 포함하지 않는다. `.111` 초기 로드 약 8.1초는 별도 준비 요청으로 분리했다. 운영 endpoint·권한·승인 정책은 변경하지 않았다. [측정 방법과 결과](infra/hermes/benchmarks/README.md#전체-후보-생성-비교).
+
+### 쓰기 MCP의 권한과 Docker 적용 구조 (15:38 KST 문서 정리)
+
+**현재 구조는 전용 MCP 계정에 고정 실행기만 호출할 수 있는 제한된 sudo 권한을 부여한 방식이다.** `rule-a`·`rule-b`의 비특권 계정 `rulechg`는 인자 없이 `/usr/local/sbin/rule-change-executor` 하나만 `sudo`로 호출한다. SSH도 MCP 실행 명령으로 고정돼 있다. 실제 승인된 룰 적용은 root로 동작하는 `rule-change-worker`가 처리한다. LLM/Hermes에는 일반 root 셸·임의 sudo·Docker 소켓 권한을 주지 않았다.
+
+```text
+사용자 요청 → Hermes가 전용 MCP로 현재 룰 조회·후보 제출
+           → 변경 전후 diff·영향·해시가 포함된 Mattermost 승인 카드
+           → 지정 관리자 승인
+           → root worker가 기준 상태 재확인·백업·승인 1회 소비
+           → 고정 실행기로 파일 반영·엔진 검사·적용·결과 확인/보고
+```
+
+- **권한 부족 판단 보완:** 승인형 룰 MCP는 10/08 이미 배포돼 있었다. 10/13에는 Hermes가 일반 sudo/docker 부재만으로 작업 불가를 단정하지 않고 `get_rule_change_target`부터 호출하도록 SOUL·운영 지침과 기존 대화 34개의 지침 캐시를 갱신했다. 모델 학습으로 Docker 지식을 추가한 작업은 아니다.
+- **구성 지식의 위치:** 실행기 코드에 허용 대상, 호스트 파일, 컨테이너 이름·내부 경로, 마운트, 검사·재적재 명령을 고정했다. 실제 마운트·운영 모드·파일 해시를 대조하며, LLM이 경로나 임의 Docker 명령을 만들어 실행하는 방식은 지원하지 않는다.
+
+| 룰 대상 | 실행기가 처리하는 Docker별 적용 방식 |
+|---|---|
+| A ModSecurity 커스텀 룰 | 단일 파일 bind mount가 이전 파일을 계속 보는 문제를 피하도록 inode를 유지해 기록하고, 컨테이너 파일 해시 확인·`nginx -t`·reload 수행. `DetectionOnly` 유지. |
+| A Suricata 로컬 룰 | ET 원본을 보존하며 로컬 파일과 `all.rules=ET+local`을 함께 갱신. 전체 룰 검사 후 기존 컨테이너 재시작, 실제 룰 로드 시각·실패/skip 0 검증. `-S`의 hot reload 거부를 성공으로 오판하던 결함을 10/13 수정. |
+| B Wazuh 로컬 룰 | 고정 Docker 볼륨의 `local_rules.xml`을 갱신하고 analysisd 구문 검사·기존 manager 컨테이너 재시작·프로세스 및 파일 확인. |
+
+- **승인과 제한:** 승인된 정확한 후보만 한 번 적용하며 기준 파일 변경·거부·만료·검증 실패를 성공으로 처리하지 않는다. 룰 적용 실패 시 백업 복구를 시도하고 복구 실패도 별도로 보고한다. 후보 128KiB·diff 512KiB, 긴 검토 메시지는 자동 분할하되 최종 승인은 전체 후보에 대해 한 번 받는다. 패키지 설치와 컨테이너 생성·삭제·재구성은 제외한다. 별도 임시 선차단은 아래의 사전 허용 정책에만 해당한다.
+- **검증 근거:** 13:18 Suricata ET 두 SID 예외는 실제 지정 승인→worker 자동 적용·재시작→엔진 로드 검증→결과 보고까지 확인했다. 14:25~14:30 추가 기능 배포는 154개 로컬 테스트와 실제 MCP 읽기·인증·worker 상태를 확인했다. 새 대형 승인 카드, 별도 서비스 작업·선차단의 실제 실행, WAF/Wazuh 룰 변경 및 운영 실패 복구 E2E는 미검증이다.
+- **이번 확인 범위:** 저장소 코드와 위 배포 기록을 대조한 설명·문서 갱신이다. 15:38에 서버 상태를 새로 실측하거나 권한을 추가한 것은 아니다. [실행기](infra/mcp/rule_change_executor.py) · [sudoers/worker 배포 정의](infra/mcp/deploy_rule_change_common.sh) · [운영 범위](infra/mcp/approved-operations.md).
+
+### 기존·보조 DGX 실측 비교 완료 (16:09~16:12 KST)
+
+동일한 합성 SOC 사례 9종으로 서버당 31회, 총 62회 API 응답을 비교했다. 최초 준비 요청 2건은 별도로 기록했다. 31쌍 모두 입력 SHA가 같고 두 서버 모두 내용 정답 **31/31**, 오류·출력 상한 종료 0건이었다. 반복을 포함한 작은 평가로 일반 정확도가 같다고 결론 내리지 않는다.
+
+| 조건 | 기존 `.110` 평균 완료 시간 | 보조 `.111` 평균 완료 시간 | 해석 |
+|---|---:|---:|---|
+| 추론 끔, 9종×2회 | 0.829초 | 0.957초 | 기존 서버가 평균 약 0.13초 빠름 |
+| 추론 켬, 9종×1회 | 11.878초 | 9.936초 | 보조 서버가 평균 약 16.3% 빠름; 9건 중 7건 우세 |
+| OpenAI 호환 도구 호출, 2종×2회 | 4.212초 | 3.553초 | 보조 서버가 평균 약 15.7% 빠름; 4건 모두 우세 |
+
+- 추론 모드의 중앙값은 `.110` 9.420초 / `.111` 10.955초로 평균과 순위가 다르다. 요청별 추론 길이가 달랐으며 보조가 항상 빠른 것은 아니다. native 추론 모드의 생성 속도 중앙값은 73.1 / 100.6 token/s였다.
+- 준비 시 `.111`에 모델이 없어 첫 응답 8.576초 중 8.131초가 로드 시간이었다. 본 비교 통계에서는 제외했다. 긴 입력은 양쪽 10,050토큰(추론 켬 10,048)으로 일치했고 컨텍스트 262,144·모델 digest 전후 불변을 확인했다.
+- 두 서버 모두 코드펜스 JSON 2건이 있어 직접 파싱 형식 진단은 29/31이다. 내용은 맞으며 해당 문제는 JSON만 출력하도록 제한하지 않았으므로 이를 오답으로 계산하지 않았다. 독립 검토와 bool 타입을 구별한 재채점에서도 점수 변화가 없었다.
+- **측정 범위:** Mac→Ollama 직접 API이며 Mattermost→Hermes→MCP 전체 경로 실측은 아니다. 모델 파일·Ollama 버전·기존 MTP 설정·캐시·공유 서버 부하가 포함된 배포 조합 비교다. 한국어 자유 서술 품질·복잡한 실전 SOC 판단은 별도 평가가 필요하다.
+- **운영 결정:** 이번에는 실측만 완료했으며 Hermes endpoint·모델·추론 정책·보안 룰은 변경하지 않았다. 실제 지연 세션의 추론 길이·대화 길이·도구 호출 횟수/대기를 확인하는 것이 다음 조사 항목이다. 전환 시 `.111` 오탐 예외 범위도 검토한다. [상세 보고서·재현 자료](infra/hermes/benchmarks/results/2026-10-13-1609/REPORT.md).
+
+### 보조 DGX `.111` 모델 확인 (15:45:26 KST API 직접 조회)
+
+사용자는 응답 지연 때문에 보조 DGX 전환 가능성을 문의한 뒤, 우선 `.111`에 설치된 모델부터 확인하도록 요청했다. Ollama의 `/api/tags`·`/api/show`·`/api/ps`를 직접 조회했다. 운영 Hermes의 endpoint·모델은 변경하지 않았다.
+
+| 설치 태그 | 메타데이터상 파라미터 | 양자화 | 저장 크기(GB, 10진) | 메타데이터상 컨텍스트 |
+|---|---|---|---|---|
+| `qwen3.6:35b` | 35.5B | Q4_K_M | 22.62 | 262,144 |
+| `ipsi-qwen3.6:35b` | 35.5B | Q4_K_M | 22.62 | 262,144 |
+| `gpt-oss:120b` | 116.8B | MXFP4 | 65.37 | 131,072 |
+
+- 세 모델 모두 completion·tools·thinking 기능을 표시하며 Qwen 두 태그에는 vision도 표시된다. 이는 서버 메타데이터이며 Hermes의 전체 도구 실행 호환성 검증 결과는 아니다. `ipsi-qwen3.6:35b`는 parent가 `qwen3.6:35b`인 파생 태그이며 이름만으로 용도·파인튜닝 여부를 단정하지 않는다.
+- `.110`과 `.111`의 `qwen3.6:35b`는 이름은 같지만 모델 정보가 다르다. `.110`은 36.0B·23.94GB, `.111`은 35.5B·22.62GB다. 단순 주소 변경으로 동일한 모델·출력 특성이 유지된다고 가정하지 않는다.
+- **15:54~15:56 집계 범위 보완(추가 API 직접 조회):** 위 36.0B/35.5B는 모델 규모 축소의 증거가 아니다. `.110`은 비전 포함 `35,951,822,704`개, `.111`은 본체 `35,505,251,456`개와 별도 비전 projector `446,571,248`개로 **합계가 정확히 같다.** 텐서 수도 `.110` 전체 1,194개에서 비전 441개를 빼면 `.111` 본체 753개와 일치한다. `.110`은 통합 GGUF, `.111`은 본체+projector 분리 구성으로 확인했다. 실제 파일 해시는 다르며 가중치 값 전체의 동일성·학습 이력까지 검증한 것은 아니다.
+- **실행·변환 차이:** 양쪽 모두 Q4_K_M·qwen35moe·256 experts 중 8 사용·컨텍스트 262,144이고, API가 반환한 템플릿 문자열 해시는 같다. MTP 텐서는 두 서버 모두 존재하되 `.110`은 `mtp.*`, `.111`은 `blk.40.*`/`nextn_predict_layers=1` 형태다. `.111`에만 `draft_num_predict 2`가 모델 설정으로 명시돼 있다. 이는 단계당 최대 2개의 초안 토큰을 예측하는 설정이며 속도 2배를 뜻하지 않는다. `.110`의 요청별 override 여부는 미확인이다. Ollama 버전도 `.110` 0.33.2, `.111` 0.32.4로 다르다. [Ollama 파라미터 설명](https://docs.ollama.com/modelfile).
+- **짧은 비교 표본:** Mac에서 같은 짧은 한국어 요청을 thinking 비활성·최대 96토큰으로 보냈다. 두 번째 요청 전체 시간은 `.110` 0.927초, `.111` 1.170초였다. `.111` 첫 요청 9.403초에는 모델 로드 약 8.33초가 포함됐다. 작은 표본으로 실제 Hermes 대화 속도나 정확도 우열을 결론 내리지 않는다. 15:45 조회 때 `.111`의 Qwen 기본 모델은 앞선 비교 요청으로 로드된 상태였다.
+- **전환 검토 조건:** 현재 오탐 예외와 ET override 검증기는 A→`.110:11434`에 고정돼 있다. `.111` 전환 시 같은 LLM 본문으로 경보가 다시 생길 수 있어 예외 정책도 승인 경로에 맞춰 검토해야 한다. 짧은 OpenAI 호환 도구 호출 시험에서 `.111`은 192 출력토큰 제한으로 도구 호출 전에 종료했으므로 호환 불가로 단정하지 않으며 실제 설정·충분한 출력 예산에서 검증이 남는다. 이번 사용자 지시에 따라 우선 모델 목록을 보고하고 추가 전환은 수행하지 않았다.
+
+### 운영 현황과 후속 범위
+
+**추후 발전과제 이관(10/13 사용자 결정):** 프로젝트 SSL VPN 원격접속 시나리오와 모바일 푸시 복구는 현재 완료 범위에서 제외하고 사용자가 재개를 요청할 때 진행한다. VPN은 미구축·중첩 접속 호환성 미검증이며, 학과의 폐쇄 정책으로 호환이 어려울 것이라는 판단은 사용자 예상이다. Android·iOS 로그인·채팅 성공은 기존 사용자 확인 사항이고 푸시는 `SendPushNotifications=false`·수신 미복구 상태다. 배포된 설정과 목적지 DNS 갱신 타이머는 유지하며 이번 결정에 따른 추가 라이브 점검·배포는 없다. [발전과제와 재개 조건](PLAN.md#추후-발전과제-2026-10-13-사용자-결정).
+
+**프로젝트 망 정의(10/13 사용자 명확화):** 외부는 학과 실습망, 내부는 이미 구성된 `10.200.10.0/24` 서버망과 Docker 가상 NIC·네트워크 영역이다. Docker 가상 NIC 전체가 같은 IP 대역이라는 뜻은 아니다. 새 가상 스위치 구축을 전제로 하지 않는다. 학과망 관리자 단말→프로젝트 SSL VPN→기존 내부 서비스라는 원격근무 모의가 가능하며, 실제 인터넷/학교 상위 방화벽 접속 문제와 구별한다. VPN은 가능성 검토 단계이고 구축을 진행한 것은 아니다.
+
+**선차단의 남은 정렬 사항:** 현재 배포된 공인 IPv4 제한으로는 학과 실습망 공격을 자동 차단하지 않는다. 논리적 외부망 정의에 맞춘 지정 공격 대상/보호 주소 기준 조정이 필요하며, 이번 VPN 상담에서 차단 범위를 변경하지 않았다.
+
+- **승인형 운영 개선 배포 완료(14:25~14:29):** A/B에 큰 diff 자동 분할 검토·전체 후보 1회 승인, 지정 서비스 작업, 서버 증거 기반 임시 차단을 배포했다. 전체 후보 128KiB·diff 512KiB이며 모든 검토 메시지 게시 후 승인할 수 있다. 패키지 설치·컨테이너 생성/구성 변경은 사용자 지시로 제외했다. A WAF/chatproxy reload·restart, A Suricata/B Wazuh manager/dashboard restart만 사전 승인 대상이다. 기존 수동 IP 차단·해제도 승인과 1회 소비가 필수다.
+- **선차단 범위:** 공인 외부 IPv4의 최근 5분 Suricata severity 1 공격 흐름 3개를 서버가 검증해야 10분 임시 차단한다. 이후 유지 승인 시 결정 시각부터 60분, 무응답은 만료, 해제 요청은 worker 처리다. 사설 Attack Segment·내부/관리/DGX/DNS·활성 SSH는 제외한다. 공유 worker가 다른 작업 중이면 해제는 지연될 수 있으나 원래 커널 TTL은 유지한다. [운영 범위와 복구 절차](infra/mcp/approved-operations.md).
+- **검증:** 로컬 154개 테스트·독립 코드 검토 통과. 실제 Hermes UID 995에서 rule MCP 각각 7개 도구·지정 서비스 5개 읽기 조회, resp 목록 조회 성공. 기존 대화 34개의 이력/라우팅을 보존하고 지침 캐시를 갱신했다. 설치 SOUL 로더의 새 정책 무잘림·DB integrity·5 MCP enabled·Mattermost 연결을 확인했다. 룰 해시·방화벽 차단 목록·대상 컨테이너 시작 상태는 불변이었다. 신규 대형 카드의 실제 관리자 클릭, 실제 서비스 동작·선차단/유지/해제 E2E는 미시험이다. [해시·백업·검증 기록](대화기록/2026-10-13.md).
+
+- **한국어 응답 지침 배포 완료(13:49~13:50):** SOUL·자동 보고에 한글 설명과 전송 전 혼입 점검을 추가했다. 진행 중 작업이 끝난 뒤 현재 Mattermost 34개 세션의 저장 지침도 갱신하고 Hermes만 재기동했다. 대화·도구 이력·기존 페르소나·라우팅·모델/샘플링은 보존했다. 실제 DGX 후보 시험의 한국어 설명 3건은 혼입 없이 응답했고 원문 로그 보존·명시적 일본어 번역 1건도 통과했다. 설치 로더의 정책 포함/무잘림, 캐시 해시·DB 정상·5 MCP enabled·채팅 연결을 확인했다. 짧은 언어 시험이며 모든 사실 판단 개선이나 장기 무재발을 보장하지 않는다. [적용·복구 기록](대화기록/2026-10-13.md).
+
+- **WAF 보고와 라이브 대조(13:43~13:45, 읽기 전용):** A WAF는 healthy·`nginx -T` 통과이며 커스텀 파일 **59줄**·기반 설정·컨테이너 환경 모두 `DetectionOnly`다. 저장소·호스트·컨테이너 SHA `62c855cf…`가 일치하고 v1.0.0·활성 커스텀 룰 10개를 유지한다. Section 0 예외, XSS-002/-003, LFI-003과 별도 RCE 확장은 반영되지 않았다. 현재 설정과 저장소 기록만으로 과거 `On` 전환 이력이 전혀 없었다고 단정할 수는 없다. 전체 `candidate_content`는 **128KiB까지 제출 가능**하며 8KiB는 설명을 포함한 **승인 카드 전체 diff** 제한이다. 원래 확장 diff를 확보하지 못해 그 묶음의 실제 제한 초과는 미확인이다. 필요한 경우 변경 단위마다 전체 후보 제출→개별 승인·적용→새 기준 SHA 조회 순으로 나누며, 이번 점검에서는 WAF 룰·모드·서비스를 변경하지 않았다. [상세 대조](infra/groot-a/README.md) · [제안 제한](infra/mcp/rule-change-deploy.md).
+- **fwupd 목록 갱신 타이머 중지 완료(13:16):** 사용자 지시로 A/B의 `fwupd-refresh.timer`만 disabled/inactive로 전환하고 해당 서비스의 failed 표시를 정리했다. Wazuh 40704·레벨 5의 원천은 A `fwupd-refresh.service`이며 최근 24시간 경보 24건과 일치했다. A/B의 외부 LVFS TCP443 연결 시간 초과가 관측돼 제한망 갱신 실패가 가장 유력하다. 상세 stderr가 보존되지 않아 과거 실패 원인 전체를 확정하지 않는다. 이 작업은 펌웨어 설치가 아닌 메타데이터 갱신이며, fwupd 데몬·APT 업데이트·Wazuh 규칙·다른 서비스와 과거 경보는 유지했다. [조사·조치·복구 기록](대화기록/2026-10-13.md).
+- **ET 두 SID 예외 자동 적용 완료(13:18):** ET `2034806/2034802` 각각 3건을 정상 API 흐름과 대조했다. 기존 marker 범위에서만 제외하는 원본과 동일한 local override(rev 3)는 17개 PCAP 사례·전체 ET 합본 검사를 통과했다. 제안 `90ff6d8cf37547f7451c81e0caf1cd73`의 지정 승인 후 새 helper `81597b11…`가 파일 교체·재시작·엔진 검증·결과 게시를 자동 수행했다. 실제 로드 **13:18:09.056041 KST**, 로드 카운터 **52,497·실패/skip 0**, passive 유지다. local SHA `cabbac45…`, 합본 `ea160e90…`, ET 원본 `f11a97da…` 불변을 A 직접 조회와 Hermes 조회로 검증했다. 52,497은 기존 SID를 대체하는 높은 rev 정의 2개도 포함한 로드 카운터다. 13:24:45까지 적용 후 LLM HTTP 200 응답 2건·새 경보 0건을 확인했다. 짧은 실사용 표본이며 장기 재발 관찰은 남는다.
+
+- **Suricata 커스텀 룰 오탐 예외 적용 완료(12:32):** 새 제안의 지정 승인 후 A→DGX `.110:11434` 흐름에 SID `1000032/33/70/71`만 예외를 적용했다. 무알림 marker 1개를 추가해 로컬 12개·전체 52,495룰, 실패·skip 0·passive 유지다. 현재 local SHA `98146db1…`는 저장소와 일치한다. 파일 교체 후 hot reload가 실제로 거부된 결함을 확인하고 Suricata만 재시작해 12:32:35.865415 KST 실제 로드를 확인했다. **12:43 변경기 수정본 A 배포 완료:** 적용·복구 시 기존 컨테이너 재시작과 JSON 응답·실제 로드 검증을 수행한다. 관련 40개 테스트·독립 리뷰와 라이브 읽기/인증 검증을 통과했다. [적용·검증 기록](대화기록/2026-10-13.md).
+- **적용 후 관찰(12:44):** 새 LLM 흐름 3개·HTTP 200 응답 4건에서 대상 네 SID 경보는 0건이다. 다만 같은 API 통신에서 별도 ET Log4j 탐지 SID `2034806`·`2034802`가 각 2건 발생했다. ET는 승인 범위 밖이므로 그대로이며 전체 오탐 해소로 간주하지 않는다. A 커널 드롭·경보 큐 overflow 0, B Wazuh 큐 사용률·드롭 0을 확인했다.
+
+- **모바일 푸시 작업 마무리 — 사용자 요청:** 이번 작업은 서버 측 준비 완료·외부 통신 제약으로 푸시 활성화와 수신 검증을 보류한 상태에서 마무리한다. 로그인·채팅은 정상이며 배포한 DNS·푸시 목적지/내용·A 전달 정책과 자동 갱신은 유지한다. `SendPushNotifications=false`, 실제 모바일 알림은 미복구다. 외부 푸시 경로 확보 후 사용자가 재개하면 연결 검사→활성화→Android/iOS 수신 검증을 진행한다. 이번 마무리에서는 서버 설정을 추가 변경하지 않았다.
+
+- **내부 전용망·외부 연결 제한 — 사용자 설명:** 가상 서버들은 상위 방화벽 안의 내부 전용망에 있으며 외부 통신은 일부만 허용된다. 기존 실측의 B→DGX API HTTP 200·DNS 응답 성공과 TPNS 연결 무응답은 이 설명과 일치한다. 학교 방화벽의 개별 허용·차단 룰을 직접 조회한 결과는 아니다. 현재 모바일 푸시의 남은 제약은 외부 푸시 서비스에 도달할 수 있는 경로이며, 채팅 인증서·로그인은 정상이다. 허용된 경로 확보 전에는 푸시 비활성·수신 미검증 상태를 유지한다.
+
+- **상위 방화벽 변경 불가 — 사용자 확인:** 프로젝트 서버 관리 권한과 상위망 장비의 관리 권한은 별개다. 상위 장비 직접 접속·변경 계획은 제외하며, 기존에 허용된 외부 통신용 프록시/중계가 있는지 확인하는 것으로 남은 작업을 정정한다. 현재 직결 경로에서 TPNS 응답을 받지 못했고 푸시는 false다. 허용된 대체 경로도 없다면 현재 망에서 공식 Android/iOS 앱의 백그라운드 푸시를 복구할 수 없다. 이번 확인으로 서버 설정을 추가 변경하지 않았다.
+
+- **모바일 접속 재확인:** 사용자가 일시 로그인 실패를 보고했다가 Wi-Fi 끊김 때문이라고 정정했으며 재연결 후 접속 정상·알림 불가 경고 지속을 확인했다. 같은 시점 Mac 채팅 ping도 HTTP 200·TLS 검증 0이었다. 서버 변경을 되돌리지 않았고, 남은 작업은 아래 외부 푸시 경로 복구·활성화다.
+
+- **모바일 복구 직접 진행(11:41~11:51):** 사용자가 모든 서버 담당자임을 확인하고 추가 승인 없이 복구 진행을 지시했다. B에 TPNS HTTPS 주소·`generic_no_channel`을 반영했고 A에 **B /32→TPNS 동적 IPv4 TCP443만** 허용하는 전용 체인·5분 DNS 갱신·최대 1시간 만료·부팅 재적용을 배포했다. 기존 filter 규칙·NAT 로더는 그대로다. 실제 B의 요청은 허용 카운터에 잡히고 A 외부로 목적지별 SYN 5회씩 나갔으나 회신은 0건이었다. **남은 차단점은 A 바깥 경로이며 푸시는 아직 false**, 상위 장비 관리 접속 정보가 저장소에 없어 사용자에게 위치를 질문했다. 11:51 Mattermost healthy·ping 200, DGX API 200, Wazuh·Hermes running·SOC 봇 active를 확인했다. [설정·남은 작업](infra/groot-b/README.md).
+
+- **모바일 재점검(11:25~11:28):** 사용자가 Android·iOS 모두 인증서를 인식해 로그인·채팅은 가능하고 알림만 실패한다고 확인했다. B 푸시 비활성·URL 공란은 그대로이며 최근 30분 빈 URL 오류 16건이었다. A에서 TPNS 세 주소로 SYN이 각 6회 외부 송신됐지만 회신은 0건, 같은 시각 Mac의 각 주소 HTTPS는 HTTP 200·TLS 검증 0이었다. 상위 방화벽/반환 경로 확인이 필요하며 정확한 차단 장비는 미확인이다. 채팅 인증서 재발급은 필요하지 않은 것으로 판단했고 푸시·방화벽은 아직 변경하지 않았다. [관리자 요청 범위·재개 절차](infra/groot-b/README.md).
+
+- **KST 표시 수정 완료(11:15~11:17):** A/B/C 호스트 `Asia/Seoul`·NTP 동기화를 재확인했다. Wazuh 원본 UTC와 KST는 같은 절대 시각이며, 대시보드의 빠진 시간대 설정을 `Asia/Seoul`로 강제 고정하고 재시작 후 설정 API의 `isOverridden=true`·상태 green을 확인했다. SOC `/recent`에 원본 `ts`를 보존하면서 `ts_kst`를 추가하고 Hermes 감시·보고 지침을 배포했다. 실제 경보 5건의 소수부 포함 변환, 승인 브로커 HMAC, Hermes 정상 실행을 확인했다. 원본 로그·인덱스의 UTC는 보존하며 대시보드 탭은 새로고침해야 한다. [운영·복구 절차](infra/groot-b/README.md) · [배포 기록](대화기록/2026-10-13.md).
+
+- **모바일 알림 후속(10:49~10:58):** 채팅 HTTPS는 Mac에서 HTTP 200·TLS 검증 0, A nginx 검사 통과. Mattermost 실제 푸시는 비활성·URL 공란이며 빈 URL의 push proxy 오류가 반복됐다. B의 DNS 누락은 `168.126.63.1`로 복구했고 호스트·Mattermost 네트워크 DNS 응답과 채팅 healthy를 확인했다. A의 B→외부 HTTPS 전달은 허용되지 않으며 A 자체의 TPNS TCP 443도 세 주소 모두 시간 초과다(Mac에서는 TPNS HTTPS 200). **푸시 활성화·실제 수신은 미완료**, 상위 경로 확인과 목적지를 제한한 A 정책 변경이 필요하다. [조치·재개 절차](infra/groot-b/README.md).
+
+- **사용자 보고와 확인 범위:** DGX가 서버를 스캔한다는 의심, 반복 오탐과 큐 포화, LLM의 sudo/docker 권한 부족을 조사했다. 현재 큐 포화는 재현되지 않았으며 과거 포화 여부·원인은 미확정이다. 학습은 사용자 요청으로 계속 보류한다.
+- **원천 경보:** A의 `eve.json`·회전 파일에서 10/12 11:01~12:18 KST의 SID `1000032` 16건, `1000033` 31건, `1000070` 10건, `1000071` 10건을 확인했다. 합계 67건·19개 TCP 흐름 모두 `192.168.16.230 → 211.170.162.110:11434`였고, 같은 흐름의 HTTP 기록 24개를 찾았으며, 조회한 최근 5개 표본에서 `POST /v1/chat/completions`, HTTP 200을 대조했다. 관측 방향과 API 경로는 A를 통해 나가는 평문 LLM 요청을 가리키며, 이 경보를 DGX가 Log4Shell 랩을 스캔한 증거로 보지 않는다.
+- **현재 부하:** 10:12 A Suricata 8.0.6 passive, 컨테이너 Up 2 days·OOM=false, `kernel_drops=0`, `alert_queue_overflow=0`, 룰 로드 52,494·실패 0. 10:14 B `analysisd` 모든 큐 사용률 0.00·`events_dropped=0`, `remoted` 큐/폐기 0. 10:24 A agent `msg_buffer=0`. Hermes 보존 cron 기록 1,000건은 모두 completed, 실행 중 agent 0·대기 메시지 0이었다. 설정 용량과 현재 사용량은 구별한다.
+- **권한 경로:** 10:23 Hermes 실제 UID 995에서 `rule-a`의 Suricata 및 `rule-b`의 Wazuh `get_rule_change_target` 조회가 성공했다. 일반 sudo/docker 권한은 추가하지 않았고 큐·경보 이력도 삭제하지 않았다. 기존 승인형 MCP가 룰 수정·검증·reload를 수행하는 경로다.
+- **오탐 예외 준비 당시(10:27):** 무알림 SID `1000000`과 `1000032/33/70/71` rev 2 후보는 12개 오프라인 사례를 통과했고 첫 승인 카드를 게시했다. 당시 라이브는 원본 `4422a0c1…`, 후보는 `98146db1…`로 달랐다. 첫 카드 만료 이후의 실제 적용은 위 최신 12:32 기록을 따른다.
+- **Hermes 지침 배포 완료(10:26):** 권한 부재 단정 전 MCP 조회, 실제 이벤트와 룰 설명 구분, 큐 용량과 사용량 구분, 승인 경로 준수를 SOUL 관리 블록에 보완했다. 실행 agent 0을 다시 확인한 뒤 나머지 페르소나를 보존해 배포·Hermes 재시작했고 5개 MCP enabled를 재확인했다. 백업은 `/var/backups/hermes-policy-20261013.h9viljuc/SOUL.md`다.
+
+아래 10/08 구축·배포 기록은 당시 확인한 사실로 보존한다. 최신 룰 상태는 위 10/13 실제 적용 결과를 따른다.
+
+**10:29:11 KST 재확인:** 제안 상태와 승인 상태 모두 `pending`, 라이브 로컬 룰 SHA-256은 원본 `4422a0c1…` 그대로였다. 승인 전 적용은 하지 않았다.
+
+**이전 카드 상태 — 10:51:34 KST:** 첫 제안 `b17074c82fe506065789849596292050`은 expired·당시 원본 유지였다. 이후 새 제안 `7676bcb16b819d23f949f126a9e16c7d`을 승인받아 12:32 실제 엔진에 반영했다.
+
+**예외의 한계:** 센서가 NAT 뒤 B/C를 구별하지 못하므로 A `.230`으로 변환된 모든 DGX `.110:11434` 연결에서 해당 4개 SID가 제외된다. API 경로·프로세스를 인증하지 않으며, “다른 클라이언트”는 센서에서 출발지 IP가 다르게 보이는 경우를 뜻한다.
 
 > Agentic SOC 캡스톤. 상세 계획·체크리스트는 [PLAN.md](PLAN.md), 날짜별 작업로그는 [대화기록/](대화기록/), 자격증명은 `CREDENTIALS.local.md`(git 미커밋).
 > A/B/C는 2026-10-08 11:53~11:59 KST에 관리 SSH로 읽기 전용 재점검했다. 이어 약 12:58 KST B 승인 브로커, A/B 룰 변경 MCP·worker, Hermes 등록을 배포·검증했다. 세부 근거는 [작업 기록](대화기록/2026-10-08.md)에, 이전 기능별 E2E 실측은 해당 날짜 기록에 구분했다. 공격 프로브·차단 전환·실제 Mattermost 승인→룰 적용 E2E는 실행하지 않았다.
@@ -13,16 +580,16 @@
 
 사용자 요청으로 [finetuning/](finetuning/README.md)에 30B 후보의 별도 GPU 장비용 학습 폴더를 준비했다. 기본값은 `Qwen/Qwen3-30B-A3B`·NF4 LoRA이며, 기존 `datasets/`에서 train 18,872 / validation 980 / test 932개를 정제했다. 최종 산출물은 원본 모델이 필요한 LoRA 어댑터이고 전체 모델 병합 스크립트도 포함한다. 로컬 학습·패키지 설치·모델 다운로드·서버 업로드는 하지 않았다. 실제 GPU 학습·현 35B 대비 속도/정확도 검증은 미착수다. 운영 모델은 계속 `qwen3.6:35b`다.
 
-## 라이브 헬스 (A/B/C 호스트는 2026-10-08 SSH 재점검)
+## 라이브 헬스 (A/B는 2026-10-13 추가 점검, C는 10/08 기록)
 | 호스트 | 역할 | 상태 |
 |---|---|---|
-| **Groot_A** `groot-sec` 192.168.16.230 / 10.200.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답·룰 변경 MCP | ✅ 10/08: **FORWARD=DROP**, `CAPSTONE-FWD` 14룰, nft input DROP·output ACCEPT, 임시 차단 목록 비어 있음. WAF healthy·`nginx -t` 통과·커스텀 ID 10개·**DetectionOnly**. Suricata `-i ens192 -S /rules/all.rules`·로컬 SID 11개, 인라인 queue 0개, eve.json 갱신. WAF/Suricata 운영 룰 해시는 배포 전후 동일. A `rulechg`·worker timer active/enabled, HMAC 통신·읽기 전용 대상 조회 통과. 기존 차단 브로커 `GET /pending` HTTP 200 확인 |
-| **Groot_B** `groot-siem` 10.200.10.10 | Wazuh SIEM + 읽기·룰 변경 MCP + 채팅 | ✅ 10/08: `ens192` 없음·기본 경로 A, Wazuh 000/001/002 Active, manager·indexer·dashboard·Mattermost·Hermes Up, `soc-bot`·보고/요약 타이머 active. 11:53~11:59 KST에는 Hermes 기존 3서버 enabled였고, 약 12:58 배포 뒤 `rule-a`·`rule-b`가 추가됐다. B `rulechg`·worker timer active/enabled, 승인 브로커 HMAC·읽기 전용 대상 조회 통과. Wazuh 운영 룰 해시는 배포 전후 동일. **신규 FW 접두어·WAF 100200+ 분류는 여전히 없음**. 디코더 차이는 주석 예시 IP 한 줄뿐 |
+| **Groot_A** `groot-sec` 192.168.16.230 / 10.200.10.1 | FW/IPS/WAF 게이트웨이 + NTP + 응답·룰 변경 MCP | ✅ **10/13 13:18:** 커스텀 네 SID·ET 두 SID 예외 자동 적용, Suricata 8.0.6 passive·로드 카운터 52,497·실패/skip 0·OOM false. local SHA `cabbac45…`, ET 불변·합본 일치. **13:16:** fwupd 목록 갱신 타이머 중지. **11:49:** B→TPNS 한정 전달 정책·자동 갱신 적용, 외부 회신 없음. **기존 상태:** FW FORWARD=DROP·CAPSTONE-FWD 14룰, WAF DetectionOnly. |
+| **Groot_B** `groot-siem` 10.200.10.10 | Wazuh SIEM + 읽기·룰 변경 MCP + 채팅 | ✅ **10/13 10:14:** analysisd 모든 큐 사용률 0.00·events dropped 0, remoted 큐/폐기 0. 10:23 Hermes UID의 Wazuh 룰 조회 성공. **10/08 기록:** `ens192` 없음·기본 경로 A, Wazuh 000/001/002 Active, manager·indexer·dashboard·Mattermost·Hermes Up, `soc-bot`·보고/요약 타이머 active. 11:53~11:59 KST에는 Hermes 기존 3서버 enabled였고, 약 12:58 배포 뒤 `rule-a`·`rule-b`가 추가됐다. B `rulechg`·worker timer active/enabled, 승인 브로커 HMAC·읽기 전용 대상 조회 통과. Wazuh 운영 룰 해시는 배포 전후 동일. **신규 FW 접두어·WAF 100200+ 분류는 여전히 없음**. 디코더 차이는 주석 예시 IP 한 줄뿐 |
 | **Groot_C** `groot-web` 10.200.10.20 | DVWA + CVE 랩 | ✅ 10/08: `ens192` 없음·기본 경로 A, Apache·Wazuh Agent·Docker active, DVWA 로그인 HTTP 200, `log4shell-lab` 실행 중(`10.200.10.20:8080` 내부 바인딩·HTTP 응답 확인), A NTP 동기화. C→B Wazuh 1514/tcp 연결 ESTAB; 랩 기능 전체 재현 시험은 하지 않음 |
 | 관리포털(Wazuh) | **A:443 이름 프록시**(chatproxy)→B:443 (+A:10443 DNAT 유지) | ✅ **`https://wazuh.groot.lab`** 학과망·VM세그먼트 OK(로그인 200 실측 2026-09-28). 출발지 allowlist(학과망 **192.168.10.0/24·192.168.12.0/24**·VM세그먼트·내부망) — **VPN(192.168.15.0/24)·외부는 403**(대시보드 VPN 비노출 결정 유지). 2026-09-29 학과망이 192.168.10.x 로 배정되어 403 → allowlist 에 추가·chatproxy 재시작으로 해결. 학과망(192.168.12.x)은 10443 이 캠퍼스 FW 에 막힘(실측) → 이 경로가 유일. 팀원 무설정 별칭 **`https://wazuh.grootlab.duckdns.org`**(동일 allowlist). 맨 IP 443=444 |
 | 채팅(Mattermost) | A:443 nginx 리버스 프록시(chatproxy)→B:8065 | ✅ **`https://chat.groot.lab`**(hosts) + **`https://chat.grootlab.duckdns.org`**(팀원 무설정, DuckDNS) — 둘 다 웹소켓 101 실측(AllowCorsFrom 두 Origin). SiteURL=DuckDNS 이름(대표). 맨 IP 443은 444 |
 | SOC 챗봇 | B `soc-bot`(systemd) + MM 슬래시 `/soc` | ✅ `/soc status\|alerts\|agents\|vulns\|report`는 읽기전용(mcp-ro). 자연어 대화는 별도 `@hermes` 게이트웨이, 대응은 groot-resp 분리 |
-| 에이전트 런타임(Hermes) | B 상주 컨테이너 `hermes`(gateway) + DGX qwen3.6:35b(256k) + Mattermost 봇 `@hermes` | ✅ **채팅 NL 대화(`soc-agent`)·경보 트리거 cron(5분, 변화 시만 조사→`soc-alerts` 보고)·Tier 2 승인([승인][거부] 버튼→A 차단) 전부 E2E 실측(2026-09-28)**. 자격증명 격리 유지. 배치 `infra/hermes/deploy_gateway_B.sh`, 브로커 `infra/mcp/soc_bot.py` |
+| 에이전트 런타임(Hermes) | B 상주 컨테이너 `hermes`(gateway) + DGX qwen3.6:35b(256k) + Mattermost 봇 `@hermes` | ✅ **10/13:** 보존 cron 1,000건 completed·실행 agent/대기 메시지 0. 10:26 SOUL 정책 배포·재시작·5개 MCP enabled 확인. **이전 실측:** 채팅 NL 대화(`soc-agent`)·경보 트리거 cron(5분, 변화 시만 조사→`soc-alerts` 보고)·Tier 2 승인([승인][거부] 버튼→A 차단) 전부 E2E 실측(2026-09-28). 자격증명 격리 유지. 배치 `infra/hermes/deploy_gateway_B.sh`, 브로커 `infra/mcp/soc_bot.py` |
 | 주기 인시던트 보고 | B `soc-report.timer`(hourly) | ✅ 매시 인시던트 보고서 자동 게시. 경보 0이면 미게시(스팸 방지) |
 | 정기 상태 요약 | B `soc-summary.timer`(하루 2회, 09·21 KST) | ✅ **이상 없어도 항상** 상태 요약 게시(🟢/🟡/🔴, 에이전트·경보·취약점). `/soc summary [h]` 수동 |
 | DVWA(웹 서비스) | A:80 WAF→C | ✅ `http://192.168.16.230/`(302) IP 접근 + **URL `http://dvwa.groot.lab/`**(WAF Host 서빙 검증; 클라이언트 hosts 적용 후) |
@@ -51,10 +618,12 @@
 - 수동 차단(A): `sudo agent_block add <ip> [ttl] [reason]` / `list` / `del <ip>`.
 
 ## 보류 / 다음
-- **채팅 인증서 후속:** A 사설 IP에 도달하는 학교 Wi-Fi에서 `https://chat.grootlab.duckdns.org`로 Mattermost 모바일 앱 로그인을 검증한다. 사용자 보고에 따르면 학교 관리자는 관리 범위 확대를 이유로 모바일 GlobalProtect 지원을 거절했고, 사용자 휴대폰의 VPN 로그인도 실패했다. 기술적 실패 원인은 미확인이나 운영상 모바일 VPN 경로는 계획에서 제외한다. 이 실패는 채팅 인증서 시험 결과가 아니다. 만료 2027-01-06 전에 재발급·A 재배포한다(2026-12 초 준비 권장). Mac 임시 ACME 상태는 삭제했으므로 무인 갱신은 없다.
+- **10/13 오탐 조치 후속:** 커스텀 네 SID와 ET 두 SID의 좁은 예외가 모두 승인·적용됐다. payload 부재로 실제 본문 매칭 원인은 미확정이며 API 흐름 상관관계와 합성 회귀 검증에 근거했다. 적용 후 새 LLM 요청에서 여섯 SID의 재발과 다른 흐름의 탐지·큐를 관찰한다. IP 전체/ET 전체 허용은 하지 않았고, 앞으로 ET 원본을 갱신하면 두 override를 새 원본에 맞춰 재생성·검증해야 한다. 큐 삭제·학습 재개는 하지 않았다.
+- **추후 발전과제:** SSL VPN 원격접속과 모바일 푸시는 위 10/13 사용자 결정에 따라 현재 완료 범위에서 제외했다. 추가 조사·구축·활성화·수신 시험은 사용자 재개 요청 후 진행하며 미완료 상태를 유지한다. 모바일 GlobalProtect는 기존 지원 거절·실패 보고에 따라 경로에서 제외한다. [발전과제와 재개 조건](PLAN.md#추후-발전과제-2026-10-13-사용자-결정).
+- **채팅 인증서 운영:** 10/13 사용자 확인으로 Android·iOS 인증서 인식·로그인·채팅은 성공했다. 채팅 인증서 갱신 관리는 모바일 푸시 이관과 별개로 유지하며 만료 2027-01-06 전에 재발급·A 재배포한다(2026-12 초 준비 권장). Mac 임시 ACME 상태는 삭제했으므로 무인 갱신은 없다.
 - **다음 작업·검증**: B 라이브 룰 파일에 없는 신규 FW(`SPOOF`/`FW_SSH_RATE`/`FW_DROP_FWD`/`FW_SHADOW_OUT`)·WAF(`GROOT_A/*` 100200–299) 디코더·룰을 추가하고 IPS local SID 1000xxx의 나머지 분류도 확인. SID `1000010`→Wazuh `100110`은 이미 관측했다. 이어 VM 세그먼트 공격 프로브로 WAF audit·IPS eve·FW 로그→Wazuh alerts 실발화를 시나리오별로 검증.
 - **별도 전환**: WAF `On`과 IPS 인라인 drop은 아직 적용하지 않았다. 탐지 검증 후 차단 게이트와 평가 범위를 결정. Log4Shell egress 관찰용 `OBS_SEG` 룰은 저장소에만 있고 A 설치본에는 없다.
-- **승인형 규칙 변경 MCP 후속 검증**: 11:46 KST에는 라이브 MCP 목록에 읽기 16툴·IP 차단 응답 3툴만 있었으나, 약 12:58 KST A/B 변경기·worker·Hermes 연결 배포를 완료했다. A의 WAF·Suricata와 B의 Wazuh **로컬 룰**만 조회·제안 대상으로 허용한다. 서버 간 승인 API는 nonce·양방향 HMAC을 사용하고, 지정 승인자가 Mattermost의 변경 전후 diff·해시 카드를 승인한 정확한 제안만 1회 적용하도록 구현했다. HMAC·읽기 조회를 확인하고 기존 읽기·응답 서버를 유지했지만 **실제 승인 버튼 클릭→룰 변경·복구 E2E는 미검증**이다. 운영 룰 해시는 배포 전후 동일하다. 기존 IP 차단 브로커의 설정 누락 시 즉시 실행 제약은 별개로 남아 있다. 상세 `infra/mcp/README.md`.
+- **승인형 규칙 변경 MCP 후속 검증:** 12:32 첫 커스텀 예외는 기존 hot reload 성공 오판 때문에 관리 SSH 재시작으로 완료했다. 수정 후 **13:18 ET 예외는 지정 승인→후보 1회 소비→백업/파일 교체→worker 재시작→실제 로드 검증→결과 게시까지 자동 적용 경로를 확인**했다. 실제 실패를 유발한 운영 복구 E2E는 아직 별도 검증 범위이며 WAF/Wazuh 룰 변경 E2E까지 완료한 뜻은 아니다. [운영 문서](infra/mcp/README.md).
 - **다음 후보**:
   1. 에이전트: **경보 트리거·Tier 2 승인·채팅 게이트웨이까지 완료(2026-09-28)** → 다음은 시나리오 실측(사용자 직접), 평가(MTTI/MTTR), 승인자 목록의 실제 팀원 구성·권한 검증.
   2. 시나리오 실제 실행(선행조건: DVWA `low`, A Log4Shell 토글 설치본 동기화·경로 검증, C sudo CVE 취약성 검증, Kali VM 세그먼트 직결). C의 `sudo --version`은 10/6에 **1.8.31**로 관측했으나 버전만으로 CVE-2021-3156 취약 여부를 확정하지 않는다.

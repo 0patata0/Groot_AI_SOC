@@ -1,0 +1,7 @@
+<localfile>
+    <log_format>json</log_format>
+    <location>/home/groot_a/capstone/secstack/logs/suricata/eve.json</location>
+    <!-- Engine counters stay in eve.json; exclude only canonical stats from Wazuh. -->
+    <ignore type="PCRE2">^\{"timestamp":"[0-9T:.+-]+","event_type":"stats","stats":\{</ignore>
+    <label key="capstone.source">suricata</label>
+  </localfile>

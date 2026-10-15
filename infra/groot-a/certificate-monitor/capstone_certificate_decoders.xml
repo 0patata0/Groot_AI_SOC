@@ -1,0 +1,7 @@
+<!-- The journal/syslog predecoder strips its header before this plugin.
+     Exact program routing is required; unrelated syslog JSON is unchanged. -->
+<decoder name="capstone_certificate_json">
+  <program_name type="pcre2">^capstone-cert-monitor$</program_name>
+  <prematch type="pcre2">^\{</prematch>
+  <plugin_decoder>JSON_Decoder</plugin_decoder>
+</decoder>

@@ -1,0 +1,295 @@
+{
+  "type": "monitor",
+  "name": "capstone-evidence-observation-v1",
+  "monitor_type": "query_level_monitor",
+  "enabled": false,
+  "schedule": {
+    "period": {
+      "interval": 1,
+      "unit": "MINUTES"
+    }
+  },
+  "inputs": [
+    {
+      "search": {
+        "indices": [
+          "wazuh-alerts-*"
+        ],
+        "query": {
+          "size": 0,
+          "_source": false,
+          "timeout": "10s",
+          "track_total_hits": true,
+          "terminate_after": 10001,
+          "query": {
+            "bool": {
+              "filter": [
+                {
+                  "term": {
+                    "agent.id": "001"
+                  }
+                },
+                {
+                  "term": {
+                    "location": "/var/log/capstone-vector/evidence/normalized.jsonl"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.schema_version": "vector-1"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.pipeline": "vector"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.sensor": "groot-sec"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.evidence_lane": "indexer-observation-v1"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.correlation_eligible": "true"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.correlation_time_class": "fresh"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.protected_asset": "false"
+                  }
+                },
+                {
+                  "term": {
+                    "data.capstone_norm.correlation_policy": "directional-service-v1"
+                  }
+                },
+                {
+                  "terms": {
+                    "data.capstone_norm.protocol": [
+                      "tcp",
+                      "udp"
+                    ]
+                  }
+                },
+                {
+                  "range": {
+                    "timestamp": {
+                      "gte": "now-120s",
+                      "lte": "now"
+                    }
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.correlation_key": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.correlation_dedupe_key": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.event_id": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "regexp": {
+                    "data.capstone_norm.message_sha256": "[0-9a-f]{64}"
+                  }
+                },
+                {
+                  "bool": {
+                    "minimum_should_match": 1,
+                    "should": [
+                      {
+                        "bool": {
+                          "filter": [
+                            {
+                              "term": {
+                                "rule.id": "100261"
+                              }
+                            },
+                            {
+                              "term": {
+                                "data.capstone_norm.source": "suricata"
+                              }
+                            },
+                            {
+                              "terms": {
+                                "data.capstone_norm.action": [
+                                  "allowed",
+                                  "observed",
+                                  "blocked"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "bool": {
+                          "filter": [
+                            {
+                              "term": {
+                                "rule.id": "100262"
+                              }
+                            },
+                            {
+                              "term": {
+                                "data.capstone_norm.source": "nftables"
+                              }
+                            },
+                            {
+                              "term": {
+                                "data.capstone_norm.action": "logged_drop"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "script": {
+                    "script": {
+                      "lang": "painless",
+                      "source": "// The marker and source-specific Wazuh leaf are the producer trust boundary.\n// One distinct doc value does NOT prove that original JSON was a scalar.\ntry {\n    for (String suffix : params.single_fields) {\n        String field = 'data.capstone_norm.' + suffix;\n        if (!doc.containsKey(field) || doc[field].size() != 1) return false;\n    }\n    if (!doc.containsKey('agent.id') || doc['agent.id'].size() != 1 ||\n        !doc.containsKey('location') || doc['location'].size() != 1 ||\n        !doc.containsKey('rule.id') || doc['rule.id'].size() != 1) return false;\n    long end = Long.parseLong(params.period_end);\n    long event = ZonedDateTime.parse(doc['data.capstone_norm.event_time_kst'].value).toInstant().toEpochMilli();\n    long port = Long.parseLong(doc['data.capstone_norm.destination_port'].value.toString());\n    return end >= 60000 && event >= end - 60000 && event <= end && port >= 1 && port <= 65535;\n} catch (Exception e) {\n    return false;\n}\n",
+                      "params": {
+                        "period_end": "{{period_end}}",
+                        "single_fields": [
+                          "schema_version",
+                          "pipeline",
+                          "sensor",
+                          "evidence_lane",
+                          "source",
+                          "action",
+                          "correlation_eligible",
+                          "correlation_time_class",
+                          "protected_asset",
+                          "correlation_policy",
+                          "source_ip",
+                          "destination_ip",
+                          "destination_port",
+                          "protocol",
+                          "event_time_kst",
+                          "correlation_key",
+                          "correlation_dedupe_key",
+                          "event_id",
+                          "message_sha256"
+                        ]
+                      }
+                    }
+                  }
+                }
+              ],
+              "must_not": [
+                {
+                  "terms": {
+                    "data.capstone_norm.source_ip": [
+                      "211.170.162.110",
+                      "211.170.162.111"
+                    ]
+                  }
+                },
+                {
+                  "terms": {
+                    "data.capstone_norm.destination_ip": [
+                      "211.170.162.110",
+                      "211.170.162.111"
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          "aggs": {
+            "services": {
+              "terms": {
+                "field": "data.capstone_norm.correlation_key",
+                "size": 101,
+                "order": {
+                  "_key": "asc"
+                }
+              },
+              "aggs": {
+                "unique_ids": {
+                  "terms": {
+                    "field": "data.capstone_norm.correlation_dedupe_key",
+                    "size": 5,
+                    "order": {
+                      "_key": "asc"
+                    }
+                  }
+                },
+                "sources": {
+                  "terms": {
+                    "field": "data.capstone_norm.source",
+                    "size": 3,
+                    "order": {
+                      "_key": "asc"
+                    }
+                  },
+                  "aggs": {
+                    "unique_ids": {
+                      "terms": {
+                        "field": "data.capstone_norm.correlation_dedupe_key",
+                        "size": 5,
+                        "order": {
+                          "_key": "asc"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "triggers": [
+    {
+      "query_level_trigger": {
+        "id": "capstone-observation-match-v1",
+        "name": "observation_match",
+        "severity": "5",
+        "condition": {
+          "script": {
+            "lang": "painless",
+            "source": "// Identical validation prefix is embedded in the unavailable trigger.\nboolean boundedInteger(def value, long maximum) {\n    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;\n}\n\nboolean stableKey(def value) {\n    if (!(value instanceof String) || value.length() != 64) return false;\n    for (int i = 0; i < 64; ++i) {\n        int c = value.charAt(i);\n        if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102))) return false;\n    }\n    return true;\n}\n\nboolean uniqueKeysValid(def aggregate, long documents) {\n    if (!(aggregate instanceof Map) || !(aggregate.buckets instanceof List) ||\n        aggregate.buckets.size() < 1 || aggregate.buckets.size() > 5 ||\n        !boundedInteger(aggregate.doc_count_error_upper_bound, 0) ||\n        !boundedInteger(aggregate.sum_other_doc_count, documents)) return false;\n    long counted = 0;\n    String previous = '';\n    for (def bucket : aggregate.buckets) {\n        if (!(bucket instanceof Map) || !stableKey(bucket.key) ||\n            bucket.key.compareTo(previous) <= 0 || !boundedInteger(bucket.doc_count, documents) ||\n            bucket.doc_count < 1) return false;\n        counted += bucket.doc_count;\n        previous = bucket.key;\n    }\n    // A sixth distinct key is intentionally omitted, not an incomplete search.\n    return counted + aggregate.sum_other_doc_count == documents;\n}\n\nboolean observationAvailable(def ctx) {\n    try {\n        long now = new Date().getTime();\n        long end = ctx.periodEnd.toEpochMilli();\n        if (end < 60000 || end > now + 5000 || end < now - 15000 || ctx.error != null ||\n            !(ctx.results instanceof List) || ctx.results.size() != 1) return false;\n        def result = ctx.results[0];\n        if (!(result instanceof Map) || result.timed_out != false ||\n            (result.containsKey('terminated_early') && result.terminated_early != false) ||\n            !(result._shards instanceof Map)) return false;\n        def shards = result._shards;\n        if (!boundedInteger(shards.total, 64) || shards.total < 1 ||\n            !boundedInteger(shards.successful, 64) || shards.successful != shards.total ||\n            !boundedInteger(shards.skipped, shards.total) || !boundedInteger(shards.failed, 0)) return false;\n        if (!(result.hits instanceof Map) || !(result.hits.total instanceof Map) ||\n            result.hits.total.relation != 'eq' || !boundedInteger(result.hits.total.value, 10000) ||\n            !(result.hits.hits instanceof List) || result.hits.hits.size() != 0 ||\n            !(result.aggregations instanceof Map) || !(result.aggregations.services instanceof Map)) return false;\n        long documents = result.hits.total.value;\n        def services = result.aggregations.services;\n        if (!(services.buckets instanceof List) || services.buckets.size() > 100 ||\n            !boundedInteger(services.doc_count_error_upper_bound, 0) ||\n            !boundedInteger(services.sum_other_doc_count, 0)) return false;\n        long counted = 0;\n        String previous = '';\n        for (def service : services.buckets) {\n            if (!(service instanceof Map) || !stableKey(service.key) ||\n                service.key.compareTo(previous) <= 0 || !boundedInteger(service.doc_count, documents) ||\n                service.doc_count < 1 || !uniqueKeysValid(service.unique_ids, service.doc_count) ||\n                !(service.sources instanceof Map)) return false;\n            previous = service.key;\n            counted += service.doc_count;\n            def sources = service.sources;\n            if (!(sources.buckets instanceof List) || sources.buckets.size() < 1 || sources.buckets.size() > 2 ||\n                !boundedInteger(sources.doc_count_error_upper_bound, 0) ||\n                !boundedInteger(sources.sum_other_doc_count, 0)) return false;\n            long sourceCounted = 0;\n            String previousSource = '';\n            for (def source : sources.buckets) {\n                if (!(source instanceof Map) || !(source.key instanceof String) ||\n                    (source.key != 'nftables' && source.key != 'suricata') ||\n                    source.key.compareTo(previousSource) <= 0 ||\n                    !boundedInteger(source.doc_count, service.doc_count) || source.doc_count < 1 ||\n                    !uniqueKeysValid(source.unique_ids, source.doc_count)) return false;\n                sourceCounted += source.doc_count;\n                previousSource = source.key;\n            }\n            if (sourceCounted != service.doc_count) return false;\n        }\n        return counted == documents;\n    } catch (Exception e) {\n        return false;\n    }\n}\n\n// Decision: observation_match. This is not an attack/containment decision.\ntry {\n    if (!observationAvailable(ctx)) return false;\n    for (def service : ctx.results[0].aggregations.services.buckets) {\n        if (service.sources.buckets.size() == 2) return true;\n        for (def source : service.sources.buckets) {\n            if (source.unique_ids.buckets.size() >= 5) return true;\n        }\n    }\n    return false;\n} catch (Exception e) {\n    return false;\n}\n"
+          }
+        },
+        "actions": []
+      }
+    },
+    {
+      "query_level_trigger": {
+        "id": "capstone-observation-unavailable-v1",
+        "name": "observation_unavailable",
+        "severity": "5",
+        "condition": {
+          "script": {
+            "lang": "painless",
+            "source": "// Identical validation prefix is embedded in the unavailable trigger.\nboolean boundedInteger(def value, long maximum) {\n    return (value instanceof Integer || value instanceof Long) && value >= 0 && value <= maximum;\n}\n\nboolean stableKey(def value) {\n    if (!(value instanceof String) || value.length() != 64) return false;\n    for (int i = 0; i < 64; ++i) {\n        int c = value.charAt(i);\n        if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102))) return false;\n    }\n    return true;\n}\n\nboolean uniqueKeysValid(def aggregate, long documents) {\n    if (!(aggregate instanceof Map) || !(aggregate.buckets instanceof List) ||\n        aggregate.buckets.size() < 1 || aggregate.buckets.size() > 5 ||\n        !boundedInteger(aggregate.doc_count_error_upper_bound, 0) ||\n        !boundedInteger(aggregate.sum_other_doc_count, documents)) return false;\n    long counted = 0;\n    String previous = '';\n    for (def bucket : aggregate.buckets) {\n        if (!(bucket instanceof Map) || !stableKey(bucket.key) ||\n            bucket.key.compareTo(previous) <= 0 || !boundedInteger(bucket.doc_count, documents) ||\n            bucket.doc_count < 1) return false;\n        counted += bucket.doc_count;\n        previous = bucket.key;\n    }\n    // A sixth distinct key is intentionally omitted, not an incomplete search.\n    return counted + aggregate.sum_other_doc_count == documents;\n}\n\nboolean observationAvailable(def ctx) {\n    try {\n        long now = new Date().getTime();\n        long end = ctx.periodEnd.toEpochMilli();\n        if (end < 60000 || end > now + 5000 || end < now - 15000 || ctx.error != null ||\n            !(ctx.results instanceof List) || ctx.results.size() != 1) return false;\n        def result = ctx.results[0];\n        if (!(result instanceof Map) || result.timed_out != false ||\n            (result.containsKey('terminated_early') && result.terminated_early != false) ||\n            !(result._shards instanceof Map)) return false;\n        def shards = result._shards;\n        if (!boundedInteger(shards.total, 64) || shards.total < 1 ||\n            !boundedInteger(shards.successful, 64) || shards.successful != shards.total ||\n            !boundedInteger(shards.skipped, shards.total) || !boundedInteger(shards.failed, 0)) return false;\n        if (!(result.hits instanceof Map) || !(result.hits.total instanceof Map) ||\n            result.hits.total.relation != 'eq' || !boundedInteger(result.hits.total.value, 10000) ||\n            !(result.hits.hits instanceof List) || result.hits.hits.size() != 0 ||\n            !(result.aggregations instanceof Map) || !(result.aggregations.services instanceof Map)) return false;\n        long documents = result.hits.total.value;\n        def services = result.aggregations.services;\n        if (!(services.buckets instanceof List) || services.buckets.size() > 100 ||\n            !boundedInteger(services.doc_count_error_upper_bound, 0) ||\n            !boundedInteger(services.sum_other_doc_count, 0)) return false;\n        long counted = 0;\n        String previous = '';\n        for (def service : services.buckets) {\n            if (!(service instanceof Map) || !stableKey(service.key) ||\n                service.key.compareTo(previous) <= 0 || !boundedInteger(service.doc_count, documents) ||\n                service.doc_count < 1 || !uniqueKeysValid(service.unique_ids, service.doc_count) ||\n                !(service.sources instanceof Map)) return false;\n            previous = service.key;\n            counted += service.doc_count;\n            def sources = service.sources;\n            if (!(sources.buckets instanceof List) || sources.buckets.size() < 1 || sources.buckets.size() > 2 ||\n                !boundedInteger(sources.doc_count_error_upper_bound, 0) ||\n                !boundedInteger(sources.sum_other_doc_count, 0)) return false;\n            long sourceCounted = 0;\n            String previousSource = '';\n            for (def source : sources.buckets) {\n                if (!(source instanceof Map) || !(source.key instanceof String) ||\n                    (source.key != 'nftables' && source.key != 'suricata') ||\n                    source.key.compareTo(previousSource) <= 0 ||\n                    !boundedInteger(source.doc_count, service.doc_count) || source.doc_count < 1 ||\n                    !uniqueKeysValid(source.unique_ids, source.doc_count)) return false;\n                sourceCounted += source.doc_count;\n                previousSource = source.key;\n            }\n            if (sourceCounted != service.doc_count) return false;\n        }\n        return counted == documents;\n    } catch (Exception e) {\n        return false;\n    }\n}\n\n// Decision: observation_unavailable. No result is an ingestion health proof.\ntry {\n    return !observationAvailable(ctx);\n} catch (Exception e) {\n    return true;\n}\n"
+          }
+        },
+        "actions": []
+      }
+    }
+  ]
+}

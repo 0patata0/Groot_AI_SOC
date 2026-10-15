@@ -1,0 +1,1214 @@
+{
+  "schema_version": 1,
+  "host": "Groot_B",
+  "native_versions": {
+    "opensearch": "2.19.6",
+    "alerting": "2.19.6.0"
+  },
+  "production_query_compile": {
+    "execute_error": null,
+    "input_error": null,
+    "hits_total": {
+      "value": 0,
+      "relation": "eq"
+    },
+    "timed_out": false,
+    "terminated_early": false,
+    "shards": {
+      "total": 54,
+      "failed": 0,
+      "successful": 54,
+      "skipped": 0
+    },
+    "triggers": {
+      "observation_match": {
+        "triggered": false,
+        "error": null,
+        "action_count": 0
+      },
+      "observation_unavailable": {
+        "triggered": false,
+        "error": null,
+        "action_count": 0
+      }
+    }
+  },
+  "native_run": {
+    "schema_version": 1,
+    "status": "passed",
+    "started_at_kst": "2026-10-14T05:46:44.026427+09:00",
+    "test_index": "capstone-test-indexer-observation-20261014-25ce6b4a37f644c4b87800bd07069ecd",
+    "candidate_sha256": "f0262be494e605edcb22fb32f71f4854014dd4f671b035803886a5b1036bafd1",
+    "production_monitor_saved": false,
+    "production_monitor_enabled": false,
+    "production_alert_documents_written": false,
+    "actions_executed": 0,
+    "query_cases": [
+      {
+        "name": "empty",
+        "loaded_documents": 0,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "duplicate_a_a_a_a_b",
+        "loaded_documents": 5,
+        "hits": {
+          "value": 5,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "distinct_five",
+        "loaded_documents": 5,
+        "hits": {
+          "value": 5,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": true,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "distinct_six",
+        "loaded_documents": 6,
+        "hits": {
+          "value": 6,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": true,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "same_service_cross_source",
+        "loaded_documents": 2,
+        "hits": {
+          "value": 2,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": true,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "different_service_cross_source",
+        "loaded_documents": 2,
+        "hits": {
+          "value": 2,
+          "relation": "eq"
+        },
+        "services": 2,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "retransmit_twenty_same_five",
+        "loaded_documents": 20,
+        "hits": {
+          "value": 20,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": true,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "old_event",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "future_event",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "invalid_date",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "missing_event_time",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "missing_source_ip",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "wrong_marker",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "wrong_policy",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "ineligible",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "historical_label",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "flagged_protected",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "protected_source_110",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "protected_source_111",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "protected_destination_110",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "protected_destination_111",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "port_zero",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "port_65536",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "invalid_key",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "multiple_source_values",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "multiple_destination_values",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "multiple_key_values",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "processing_old",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "processing_future",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "wrong_agent",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "wrong_location",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "wrong_source_rule",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "nft_wrong_action",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "services": 0,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "documented_same_value_array_limit",
+        "loaded_documents": 1,
+        "hits": {
+          "value": 1,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "services_100",
+        "loaded_documents": 100,
+        "hits": {
+          "value": 100,
+          "relation": "eq"
+        },
+        "services": 100,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "services_101",
+        "loaded_documents": 101,
+        "hits": {
+          "value": 101,
+          "relation": "eq"
+        },
+        "services": 101,
+        "match": false,
+        "unavailable": true,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "documents_10000_one_key",
+        "loaded_documents": 10000,
+        "hits": {
+          "value": 10000,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": false,
+        "unavailable": false,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      },
+      {
+        "name": "documents_10001_one_key",
+        "loaded_documents": 10001,
+        "hits": {
+          "value": 10001,
+          "relation": "eq"
+        },
+        "services": 1,
+        "match": false,
+        "unavailable": true,
+        "timed_out": false,
+        "terminated_early": false,
+        "shards": {
+          "total": 1,
+          "failed": 0,
+          "successful": 1,
+          "skipped": 0
+        }
+      }
+    ],
+    "validator_cases": [
+      {
+        "name": "valid",
+        "available": true,
+        "expected_available": true,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "lag_14900ms",
+        "available": true,
+        "expected_available": true,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "lag_15100ms",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "future_4900ms",
+        "available": true,
+        "expected_available": true,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "future_5100ms",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "old_period",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "context_error",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "empty_results",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "timeout",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "early_termination",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "failed_shard",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "incomplete_shards",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "shards_64",
+        "available": true,
+        "expected_available": true,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "shards_65",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "hits_gte",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "hits_10001",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "outer_omission",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "fractional_count",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "bad_bucket_key",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "source_sum_mismatch",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "duplicate_key",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "missing_aggregate",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      },
+      {
+        "name": "nonempty_hits",
+        "available": false,
+        "expected_available": false,
+        "kind": "synthetic_ctx_exact_production_validator"
+      }
+    ],
+    "load_checks": [
+      {
+        "phase": "before_index_creation",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 55,
+            "cpu_percent": 2
+          }
+        ]
+      },
+      {
+        "phase": "services_100_before",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 41,
+            "cpu_percent": 43
+          }
+        ]
+      },
+      {
+        "phase": "services_100_after",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 41,
+            "cpu_percent": 43
+          }
+        ]
+      },
+      {
+        "phase": "services_101_before",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 41,
+            "cpu_percent": 43
+          }
+        ]
+      },
+      {
+        "phase": "services_101_after",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 41,
+            "cpu_percent": 43
+          }
+        ]
+      },
+      {
+        "phase": "documents_10000_one_key_before",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 45,
+            "cpu_percent": 34
+          }
+        ]
+      },
+      {
+        "phase": "documents_10000_one_key_after",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 28,
+            "cpu_percent": 44
+          }
+        ]
+      },
+      {
+        "phase": "documents_10001_one_key_before",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 28,
+            "cpu_percent": 44
+          }
+        ]
+      },
+      {
+        "phase": "documents_10001_one_key_after",
+        "attempt": 1,
+        "quiet_for_test": true,
+        "nodes": [
+          {
+            "write_active": 0,
+            "write_queue": 0,
+            "search_active": 0,
+            "search_queue": 0,
+            "heap_percent": 23,
+            "cpu_percent": 43
+          }
+        ]
+      }
+    ],
+    "cleanup": {
+      "index_deleted": true,
+      "head_status": 404,
+      "delete_acknowledged": true
+    },
+    "fixture_field_caps": {
+      "rule.id": {
+        "keyword": {
+          "type": "keyword",
+          "searchable": true,
+          "aggregatable": true
+        }
+      },
+      "data": {
+        "object": {
+          "type": "object",
+          "searchable": false,
+          "aggregatable": false
+        }
+      },
+      "data.capstone_norm": {
+        "object": {
+          "type": "object",
+          "searchable": false,
+          "aggregatable": false
+        }
+      },
+      "data.capstone_norm.event_time_kst": {
+        "keyword": {
+          "type": "keyword",
+          "searchable": true,
+          "aggregatable": true
+        }
+      },
+      "rule": {
+        "object": {
+          "type": "object",
+          "searchable": false,
+          "aggregatable": false
+        }
+      },
+      "data.capstone_norm.destination_port": {
+        "keyword": {
+          "type": "keyword",
+          "searchable": true,
+          "aggregatable": true
+        }
+      },
+      "timestamp": {
+        "date": {
+          "type": "date",
+          "searchable": true,
+          "aggregatable": true
+        }
+      }
+    },
+    "finished_at_kst": "2026-10-14T05:47:05.279489+09:00"
+  },
+  "initial_failed_runs": [
+    {
+      "schema_version": 1,
+      "status": "failed",
+      "started_at_kst": "2026-10-14T05:45:44.090784+09:00",
+      "test_index": "capstone-test-indexer-observation-20261014-f4cd53888bf94ad8aae0f7ca40e6441f",
+      "candidate_sha256": "f0262be494e605edcb22fb32f71f4854014dd4f671b035803886a5b1036bafd1",
+      "production_monitor_saved": false,
+      "production_monitor_enabled": false,
+      "production_alert_documents_written": false,
+      "actions_executed": 0,
+      "query_cases": [
+        {
+          "name": "empty",
+          "loaded_documents": 0,
+          "hits": {
+            "value": 0,
+            "relation": "eq"
+          },
+          "services": 0,
+          "match": false,
+          "unavailable": false,
+          "timed_out": false,
+          "terminated_early": false,
+          "shards": {
+            "total": 1,
+            "failed": 0,
+            "successful": 1,
+            "skipped": 0
+          }
+        },
+        {
+          "name": "duplicate_a_a_a_a_b",
+          "loaded_documents": 5,
+          "hits": {
+            "value": 0,
+            "relation": "eq"
+          },
+          "services": 0,
+          "match": false,
+          "unavailable": false,
+          "timed_out": false,
+          "terminated_early": false,
+          "shards": {
+            "total": 1,
+            "failed": 0,
+            "successful": 1,
+            "skipped": 0
+          }
+        }
+      ],
+      "validator_cases": [],
+      "load_checks": [
+        {
+          "phase": "before_index_creation",
+          "attempt": 1,
+          "quiet_for_test": true,
+          "nodes": [
+            {
+              "write_active": 0,
+              "write_queue": 0,
+              "search_active": 0,
+              "search_queue": 0,
+              "heap_percent": 43,
+              "cpu_percent": 0
+            }
+          ]
+        }
+      ],
+      "cleanup": {
+        "index_deleted": true,
+        "head_status": 404,
+        "delete_acknowledged": true
+      },
+      "failure": "unexpected_query_decision_duplicate_a_a_a_a_b",
+      "finished_at_kst": "2026-10-14T05:45:45.090573+09:00"
+    }
+  ],
+  "source_sha256": {
+    "monitor-query.painless": "0300c577fb2d9596540965f2598bd61b374181b882090c9c065aa5f67052b8e4",
+    "monitor-unavailable.painless": "11b9e35a2ce1f5927ee61e64ddc755f04d63ec8640a773a6fd6b5c7238158252",
+    "monitor.json": "f0262be494e605edcb22fb32f71f4854014dd4f671b035803886a5b1036bafd1",
+    "monitor-match.painless": "e65368221e12c759af40aef3f29442e8f4b4c53231785afd6fba58f1dfc35ef7",
+    "monitor-native-tests.json": "afad8bb3f5589ee61ebaea0ff20fdd596a84d9afd0751cc843c9c23d454e8288"
+  },
+  "limitations": [
+    "Temporary keyword fixture first ran with date autodetection and matched zero; rerun disabled date detection and verified keyword field caps. Monitor source unchanged.",
+    "Native query tests use one real temporary shard. 64/65-shard, timeout, and failure checks execute the exact validator against a synthetic context, without creating cluster failures.",
+    "Clock margin checks use 100ms inside/outside the 15s lag and 5s future boundaries; exact millisecond edge is not deterministic between clock reads.",
+    "No monitor was saved or enabled. Inline dryrun may initialize native alert infrastructure; actions remained empty.",
+    "No persistent-delivery ACK, every-window detection, per-service lifecycle, notification cooldown, or full ingestion-health proof is claimed."
+  ],
+  "source_sha256_scope": "Remote staged snapshot used for native execution; the plan document status is updated afterward. Candidate monitor and Painless sources unchanged.",
+  "fixture_failure_diagnosis": "Initial auto-date mapping was not retrieved before cleanup; date-detection explanation is a diagnosis. Rerun explicitly disabled date detection and field_caps verified production-compatible keyword types.",
+  "offline_contract_tests": {
+    "passed": 7,
+    "executes_painless": false
+  },
+  "temporary_artifact_cleanup": {
+    "mac_own_scripts_removed": [
+      "monitor-native-compile-b.sh",
+      "monitor-native-synthetic-b.sh",
+      "monitor-native-fetch-b.sh"
+    ],
+    "shared_mac_remote_helper_preserved": true,
+    "remote_test_indices_deleted": true,
+    "remote_staging_retained_for_parent_followup": "/var/tmp/capstone-indexer-20261014/monitor-test",
+    "new_mac_packages_installed": false
+  }
+}

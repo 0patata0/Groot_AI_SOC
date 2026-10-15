@@ -1,0 +1,93 @@
+{
+  "deployment": {
+    "applied_at": "2026-10-15T10:06:02.419889+09:00",
+    "change": "agent.reasoning_overrides.qwen3.6:35b=none",
+    "before_sha256": "89ec0f90c2e421e67eed90bfc631eced42167efff1e0160cdeea91464b819d96",
+    "after_sha256": "00722d3cd7346a08c4489d9da42badba1c2f65899bff9074c13eb40136a149a4",
+    "config_uid": 995,
+    "config_gid": 986,
+    "config_mode": "0o640",
+    "container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "pid": 2248019,
+    "started_at": "2026-10-14T18:01:25.884012857Z",
+    "container_restarts": 0,
+    "guard_or_permission_changes": 0,
+    "protected_files_unchanged": true,
+    "backup": "/var/backups/capstone-hermes-reasoning-20261015",
+    "live_chat_after_change_observed": false
+  },
+  "hermes_readonly": {
+    "agent_closed": true,
+    "api_calls": 2,
+    "chat_posts": 0,
+    "config_sha256": "84b506620f32c4864aae1043e1b4b99b945a9f2ac6398f9d84c2fb022afff5ed",
+    "conversation_seconds": 6.135178742930293,
+    "denied_dispatches": 0,
+    "denied_wire_calls": 0,
+    "dispatch_attempts": 1,
+    "final_response_characters": 450,
+    "final_response_sha256": "f17f131dfce3b546d4e35869a5a4848490660e27a81398c41abf4ff267d5c9e5",
+    "initialization_seconds": 5.978673938894644,
+    "input_tokens": 5643,
+    "language_guard_checked": false,
+    "mcp_dispatch_seconds": 0.4175341201480478,
+    "mcp_shutdown_completed": true,
+    "mcp_wire_attempts": 1,
+    "mcp_wire_seconds": 0.4128660149872303,
+    "model_api_seconds": null,
+    "model_facing_tools": 1,
+    "operating_config_changed": false,
+    "output_tokens": 282,
+    "phase": "complete",
+    "readonly_observation_verified": true,
+    "status": "passed",
+    "tool_name": "mcp__rule_a__get_service_action_target",
+    "tool_schema_sha256": "39d13acc13d50b824a7e5bff39b1618318462a375e0d2e2938be3aab28c80f2b",
+    "total_seconds": 12.254039963008836,
+    "total_tokens": 5925
+  },
+  "synthetic_write_initial": {
+    "seconds": 2.181958,
+    "http_status": 200,
+    "usage": {
+      "prompt_tokens": 826,
+      "completion_tokens": 165,
+      "total_tokens": 991
+    },
+    "reasoning_characters": 0,
+    "content_characters": 0,
+    "tool_call_count": 1,
+    "actual_mcp_calls": 0,
+    "pass": false
+  },
+  "synthetic_write_semantic": {
+    "checks": {
+      "exact_argument_fixture_match": false,
+      "expected_fields_only": true,
+      "target_match": true,
+      "base_sha_match": true,
+      "reason_match": true,
+      "one_edit": true,
+      "candidate_exact": true,
+      "native_tool_call": true
+    },
+    "semantic_pass": true,
+    "executor_sha256": "d937c7def4d2938d7655e445cb5cf9cd7858837aebebaf4278feae5fb69965a2",
+    "actual_mcp_calls": 0,
+    "actual_rule_changes": 0,
+    "explanation": "Model used a unique anchor without the trailing newline. The installed pure edit functions reconstruct exactly the expected file; the initial exact-argument fixture was unnecessarily narrow."
+  },
+  "language_check": {
+    "foreign_script_matches": 0,
+    "hangul_present": true,
+    "detector": {
+      "package": "regex",
+      "version": "2026.9.29",
+      "backend": "regex._regex",
+      "origin": "isolated_runtime",
+      "policy": "han-kana-script-v1"
+    },
+    "final_sha256": "f17f131dfce3b546d4e35869a5a4848490660e27a81398c41abf4ff267d5c9e5",
+    "guard_source_sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c"
+  }
+}

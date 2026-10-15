@@ -1,0 +1,2890 @@
+{
+  "kind": "private_native_analysisd_correlation_diagnosis",
+  "mode": "native-only",
+  "production_before": {
+    "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+    "init_pid": 2002301,
+    "started_at": "2026-10-13T20:52:37.692259701Z",
+    "analysisd_pid": 2003045,
+    "analysisd_start": "134839674",
+    "root": [
+      52,
+      5669366
+    ],
+    "queue": [
+      64512,
+      6317390
+    ],
+    "host_identity_files": {
+      "/etc/group": {
+        "devino": [
+          64512,
+          3147434
+        ],
+        "sha256": "0c4168e8a563cc2ecee24aa855c9012cdbd503f9c7baa7f227f61c4f2652f9a8",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420
+      },
+      "/etc/passwd": {
+        "devino": [
+          64512,
+          3147441
+        ],
+        "sha256": "42f5d73ed6ff90c87075294aeea54f3dbbd25384f9eb94a7b125f7b2c4ddfe5f",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420
+      }
+    },
+    "hashes": {
+      "bin/wazuh-analysisd": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+      "etc/ossec.conf": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+      "etc/rules/local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+      "etc/rules/capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+    }
+  },
+  "arms": [
+    {
+      "profile": "auto",
+      "hashes": {
+        "config_sha256": "885aaf0c8a8c814b40be6d6139365d0d25fc250b6147a544572fa880a2f8379d",
+        "local_options_sha256": "552bd2b259a95c7566035e3a09a7be754fb95c062ba5deb0c59e7c16f50ce04a",
+        "binary_sha256": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+        "rules_sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+      },
+      "runtime": {
+        "pid": 2084387,
+        "open_file_paths_private_or_device_allowlist": true,
+        "production_socket_inodes_disjoint": true,
+        "start_ticks": "137456443",
+        "threads": 50,
+        "root_private": true,
+        "mount_namespace_private": true,
+        "network_namespace_private": true
+      },
+      "cases": [
+        {
+          "run_id": "fc06d4329b6f4842b0b68924e5d015cc",
+          "profile_number": 0,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            3,
+            2,
+            1,
+            4,
+            5,
+            6,
+            9,
+            8,
+            7,
+            11,
+            10,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "1daa083dd2ed4bd68e3ac24616e97afd",
+          "profile_number": 1,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            2,
+            1,
+            5,
+            4,
+            3,
+            6,
+            8,
+            7,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 4
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "10f331bb6c5b41f5abff56da9291bddd",
+          "profile_number": 2,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            4,
+            3,
+            6,
+            8,
+            5,
+            9,
+            10,
+            11,
+            12,
+            13,
+            7
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100294"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "89e94062ce6d40269355084d259d6654",
+          "profile_number": 3,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            7,
+            2,
+            8,
+            9,
+            12,
+            11,
+            13,
+            10
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100292",
+            "100293",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 2
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "f19d26df742b4b62bec00358c2b29071",
+          "profile_number": 4,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            2,
+            4,
+            1,
+            5,
+            6,
+            10,
+            7,
+            8,
+            9,
+            11,
+            13,
+            12,
+            3
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "c20ee20687bd44c98f0bbb4543841e59",
+          "profile_number": 5,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            5,
+            7,
+            6,
+            8,
+            4,
+            9,
+            11,
+            12,
+            10,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100292",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 4
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "89510029f58a42a297495f31fc9cad97",
+          "profile_number": 6,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            3,
+            2,
+            5,
+            7,
+            1,
+            8,
+            9,
+            10,
+            11,
+            13,
+            12,
+            4,
+            6
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100292",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100293",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 4
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "3f2df70e630a4dc291b08688abae7fa1",
+          "profile_number": 7,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            5,
+            7,
+            6,
+            10,
+            9,
+            11,
+            13,
+            12,
+            8,
+            4
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100292",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291",
+            "100293"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 4
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "82d40d79f83741169c81c7e03a22976a",
+          "profile_number": 8,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            3,
+            1,
+            6,
+            5,
+            8,
+            9,
+            7,
+            10,
+            11,
+            12,
+            13,
+            2,
+            4
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100293"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            },
+            {
+              "rule_id": "100293",
+              "delivery_seq": 4
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1,
+            "100293": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1,
+            "100293": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "4a1ef712cf1d4b69af701fec07dcfb7a",
+          "profile_number": 9,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            3,
+            5,
+            4,
+            7,
+            8,
+            9,
+            10,
+            2,
+            11,
+            12,
+            13,
+            6
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100292",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [],
+          "archive_leaf_counts": {},
+          "alert_rule_counts": {},
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "fab8df687bce4730afcf6ed6ffedb5d9",
+          "profile_number": 10,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            3,
+            2,
+            4,
+            5,
+            8,
+            9,
+            10,
+            11,
+            13,
+            12,
+            1,
+            6,
+            7
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291",
+            "100291",
+            "100294"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "bbe44e67ac6c417c85edca1097edb8fa",
+          "profile_number": 11,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            3,
+            2,
+            4,
+            6,
+            5,
+            7,
+            8,
+            12,
+            13,
+            11,
+            9,
+            10
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100294",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "0ec702e1f182400e9a37dbd00f6d324d",
+          "profile_number": 12,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            3,
+            1,
+            2,
+            5,
+            9,
+            8,
+            7,
+            10,
+            11,
+            13,
+            6,
+            12,
+            4
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100292",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291",
+            "100293"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 4
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "68faa09ba0224245a16e7bc80949cc70",
+          "profile_number": 13,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            5,
+            7,
+            8,
+            9,
+            10,
+            13,
+            11,
+            12
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "4a77d23ed1bc43879c9ab5a9a50f3013",
+          "profile_number": 14,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            3,
+            4,
+            1,
+            6,
+            2,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            13,
+            12
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "51b275f8092d4d769bc82b8758058a90",
+          "profile_number": 15,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            2,
+            1,
+            6,
+            4,
+            5,
+            7,
+            8,
+            9,
+            10,
+            11,
+            13,
+            12,
+            3
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100293"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            },
+            {
+              "rule_id": "100293",
+              "delivery_seq": 3
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1,
+            "100293": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1,
+            "100293": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "b9410f268189434f9069ebe8da27aec6",
+          "profile_number": 16,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            2,
+            3,
+            4,
+            1,
+            5,
+            6,
+            8,
+            7,
+            9,
+            10,
+            13,
+            11,
+            12
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100292",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [],
+          "archive_leaf_counts": {},
+          "alert_rule_counts": {},
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "18489521e42a4ce690501b2729c8d939",
+          "profile_number": 17,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            3,
+            5,
+            1,
+            2,
+            6,
+            4,
+            7,
+            10,
+            11,
+            9,
+            13,
+            12,
+            8
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "700584cacda345e5b44f89b525eb38cc",
+          "profile_number": 18,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            2,
+            1,
+            6,
+            3,
+            7,
+            8,
+            4,
+            9,
+            5,
+            12,
+            10,
+            11,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "21edbeff2e43424db04b12224a94c5b2",
+          "profile_number": 19,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            2,
+            1,
+            4,
+            6,
+            5,
+            7,
+            10,
+            11,
+            13,
+            12,
+            9,
+            8,
+            3
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "",
+            "100291",
+            "100291",
+            "100291",
+            "100291"
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": false,
+          "alerts_match_sequential_expectation": false,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        }
+      ]
+    },
+    {
+      "profile": "single",
+      "hashes": {
+        "config_sha256": "885aaf0c8a8c814b40be6d6139365d0d25fc250b6147a544572fa880a2f8379d",
+        "local_options_sha256": "387036d2fb4fe2c1512846ba689490fc046bf964a1895025aa9f35d1a19f62be",
+        "binary_sha256": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+        "rules_sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+      },
+      "runtime": {
+        "pid": 2084520,
+        "open_file_paths_private_or_device_allowlist": true,
+        "production_socket_inodes_disjoint": true,
+        "start_ticks": "137461526",
+        "threads": 44,
+        "root_private": true,
+        "mount_namespace_private": true,
+        "network_namespace_private": true
+      },
+      "cases": [
+        {
+          "run_id": "8c85a7f8352940abb18437ee4817b652",
+          "profile_number": 0,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "350f3d30ab9c4a73b237067def581635",
+          "profile_number": 1,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "48455b8c9b844166b10276296ecd1027",
+          "profile_number": 2,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "2929237500174a7ead0dd94426ddc319",
+          "profile_number": 3,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "813fc716a3e14ce29a05519fadcd0149",
+          "profile_number": 4,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "f167e98e5abf43e5b7c9c7bfb27f769d",
+          "profile_number": 5,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.0,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "4fab3c3b03824814a5384219bce8f6d9",
+          "profile_number": 6,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "d86b95bd77bc45df8a0607bf05e60901",
+          "profile_number": 7,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "83326a557b314da997284a6f713c2a4e",
+          "profile_number": 8,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "6e453c3d518243cfa705b27ca508d0a8",
+          "profile_number": 9,
+          "identities": "reused",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "bfd169529fc84705a51c4e18c6e1c41c",
+          "profile_number": 10,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "98a2a7c6a5a741d887276b8c409691f7",
+          "profile_number": 11,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "d8db697efb0e4965acaa0f1eefef2723",
+          "profile_number": 12,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "78f32f9b1e8b479cbf887c955ba060d9",
+          "profile_number": 13,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "c0cea37d3adb4f659aeceaddfe254fd8",
+          "profile_number": 14,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "8069d254de074ac4a36482f078a732d3",
+          "profile_number": 15,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "187ec83bd8ae490bb99b9a8e6792aadc",
+          "profile_number": 16,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "ff6828db19f14cf7aea223a60eafbea5",
+          "profile_number": 17,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "0f01c2939abe46c08ced8a93c43b5e48",
+          "profile_number": 18,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        },
+        {
+          "run_id": "a6b940058cad4dc3bb4991c1f0b5e1fe",
+          "profile_number": 19,
+          "identities": "fresh",
+          "order": "forward",
+          "pacing": "burst",
+          "agent_id": "000",
+          "input_rows": 13,
+          "sent_rows": 13,
+          "archive_rows": 13,
+          "archive_delivery_order": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "archive_exact_payloads": true,
+          "logtest_executed": false,
+          "logtest_rule_ids": null,
+          "archive_rule_ids": [
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100293",
+            "100291",
+            "100294",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            "100291",
+            ""
+          ],
+          "archive_leaf_delivery_sequences": [
+            {
+              "rule_id": "100293",
+              "delivery_seq": 5
+            },
+            {
+              "rule_id": "100294",
+              "delivery_seq": 7
+            }
+          ],
+          "archive_leaf_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "alert_writer_drained": true,
+          "alert_writer_wait_seconds": 0.001,
+          "expected_alert_rule_counts": {
+            "100293": 1,
+            "100294": 1
+          },
+          "analysis_matches_sequential_expectation": true,
+          "alerts_match_sequential_expectation": true,
+          "socket_send_is_analysis_ack": false,
+          "archive_order_is_receive_order": false
+        }
+      ]
+    }
+  ],
+  "operational_input_written": false,
+  "native_children_cleaned": true,
+  "agent000_is_not_agent001_transport_equivalence": true,
+  "fixture_directory": "/var/tmp/capstone-correlation-20261014/analysisd-1338f3b217",
+  "current_case": {
+    "profile": "single",
+    "number": 19,
+    "identities": "fresh",
+    "order": "forward",
+    "pacing": "burst"
+  },
+  "production_unchanged": true,
+  "checked_at_kst": "2026-10-14T13:10:32.897870+09:00",
+  "source_sha256": "605f5296dc104c16b528cf6639dbe0a8167bdd5b0d13b8431b4d20f4759f3821",
+  "result_path": "/var/tmp/capstone-correlation-20261014/analysisd-1338f3b217/result.json"
+}

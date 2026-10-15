@@ -1,0 +1,52 @@
+# Candidate: a separate nginx-generated whitelist log, not client-supplied JSON.
+assert!(.source_file == get_env_var!("WAF_ACCESS_PATH"), "waf_access_source_binding")
+sensor = get_env_var!("CAPSTONE_SENSOR")
+instance = get_env_var!("WAF_INSTANCE_ID")
+configuration = get_env_var!("WAF_CONFIG_SHA256")
+binding = get_env_var!("WAF_DEPLOYMENT_BINDING")
+assert!(match(sensor, r'^[A-Za-z0-9_.:-]{1,80}$') && match(instance, r'^[a-f0-9]{64}$') && match(configuration, r'^[a-f0-9]{64}$') && match(binding, r'^[a-f0-9]{64}$'), "waf_deployment_binding")
+event = object!(.waf_json)
+allowed_keys = ["capstone_waf_access_version", "deployment_binding", "request_id", "time_iso8601", "msec", "request_time", "source_ip", "destination_ip", "source_port", "destination_port", "http_method", "http_status"]
+assert!(length(keys(event)) == length(allowed_keys), "waf_access_field_count")
+for_each(keys(event)) -> |_index, key| { assert!(includes(allowed_keys, key), "waf_access_field_unknown") }
+assert!(event.capstone_waf_access_version == "1", "waf_access_version")
+assert!(event.deployment_binding == binding, "waf_access_producer_binding")
+request_id = string!(event.request_id)
+assert!(match(request_id, r'^[a-f0-9]{32}$'), "waf_generated_request_id")
+stamp = string!(event.time_iso8601)
+offset = string(parse_regex!(stamp, r'(?P<offset>[+-][0-9]{2}:[0-9]{2})$').offset)
+explicit_time = parse_timestamp!(stamp, format: "%+")
+msec = string!(event.msec)
+request_duration = string!(event.request_time)
+assert!(match(msec, r'^[0-9]{10,12}\.[0-9]{3}$') && match(request_duration, r'^[0-9]{1,5}\.[0-9]{3}$'), "waf_access_clock_format")
+epoch_ms = parse_int!(replace(msec, ".", ""), base: 10)
+duration_ms = parse_int!(replace(request_duration, ".", ""), base: 10)
+assert!(duration_ms <= 3600000, "waf_access_duration_limit")
+explicit_ms = to_unix_timestamp(explicit_time, unit: "milliseconds")
+assert!(epoch_ms >= explicit_ms && epoch_ms - explicit_ms < 1000, "waf_access_clock_mismatch")
+source_ip = string!(event.source_ip)
+destination_ip = string!(event.destination_ip)
+assert!((is_ipv4(source_ip) || is_ipv6(source_ip)) && (is_ipv4(destination_ip) || is_ipv6(destination_ip)), "waf_access_ip")
+source_port_text = string!(event.source_port)
+destination_port_text = string!(event.destination_port)
+status_text = string!(event.http_status)
+assert!(match(source_port_text, r'^[0-9]{1,5}$') && match(destination_port_text, r'^[0-9]{1,5}$') && match(status_text, r'^[0-9]{3}$'), "waf_access_numeric_format")
+source_port = parse_int!(source_port_text, base: 10)
+destination_port = parse_int!(destination_port_text, base: 10)
+status = parse_int!(status_text, base: 10)
+assert!(source_port >= 1 && source_port <= 65535 && destination_port >= 1 && destination_port <= 65535 && status >= 100 && status <= 599, "waf_access_numeric_range")
+method = string!(event.http_method)
+assert!(includes(["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH", "CONNECT", "TRACE"], method), "waf_access_method")
+raw = string!(.message)
+part = {
+  "kind": "access", "request_id": request_id, "sensor": sensor,
+  "instance_id": instance, "configuration_sha256": configuration,
+  "deployment_binding": binding,
+  "source_file": string!(.source_file), "raw": raw,
+  "message_sha256": sha2(raw, variant: "SHA-256"),
+  "epoch_ms": epoch_ms, "duration_ms": duration_ms, "offset": offset,
+  "source_ip": source_ip, "destination_ip": destination_ip,
+  "source_port": source_port, "destination_port": destination_port,
+  "http_method": method, "http_status": status
+}
+. = {"waf_join_key": sha2(encode_json([sensor, instance, configuration, request_id]), variant: "SHA-256"), "waf_parts": part}

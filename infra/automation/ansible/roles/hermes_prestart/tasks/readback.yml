@@ -1,0 +1,81 @@
+[
+  {
+    "name": "Prepare private readback directories",
+    "ansible.builtin.file": {
+      "path": "{{ hp_root }}/readback/{{ item }}",
+      "state": "directory",
+      "owner": "root",
+      "group": "root",
+      "mode": "0755"
+    },
+    "loop": [
+      "hermes/plugins/platforms/mattermost",
+      "hermes/gateway"
+    ]
+  },
+  {
+    "name": "Read back three exact installed source files",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "--archive",
+        "{{ hp_verify_id }}:/opt/hermes/{{ item }}",
+        "{{ hp_root }}/readback/hermes/{{ item }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "loop": [
+      "capstone_korean_output_guard.py",
+      "plugins/platforms/mattermost/adapter.py",
+      "gateway/run_turn.py"
+    ]
+  },
+  {
+    "name": "Remove only previous private package readback",
+    "ansible.builtin.file": {
+      "path": "{{ hp_root }}/readback/capstone-guard-runtime",
+      "state": "absent"
+    }
+  },
+  {
+    "name": "Read back the isolated runtime package",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "--archive",
+        "{{ hp_verify_id }}:/opt/capstone-guard-runtime",
+        "{{ hp_root }}/readback/capstone-guard-runtime"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90
+  },
+  {
+    "name": "Validate exact source and complete package bytes without execution",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "tree",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_tree"
+  },
+  {
+    "name": "Bind current readback proof",
+    "ansible.builtin.set_fact": {
+      "hp_guard_sha": "{{ (hp_tree.stdout | from_json).guard_sha256 }}"
+    }
+  }
+]

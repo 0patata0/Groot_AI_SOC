@@ -1,0 +1,216 @@
+[
+  {
+    "name": "One-time postcondition of already installed stopped candidate; no installation replay",
+    "hosts": "capstone_hermes_b",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "capstone_prestart_sources": {
+        "hermes_prestart_contract.py": "b9cb0dfdbbfb600cb9e1d9c7b24f9e138190e2aef0c1e3d41862c4676d737554",
+        "hermes_prestart_transaction.py": "e51a66f6209b9d25565d1dea8ef0d5e31bc6850d7d03a0d2859c4c60d81446e9",
+        "hermes_guard_checks.py": "74843987843dd5ef447d09896ba894ea580da2e5dc56b9bf0d48749f091e0cb5",
+        "patch_korean_output_guard.py": "d6e1ea2e594ae958a33005127a618d52907e93408b786a437e163214dfaec17b",
+        "korean_output_guard.py": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+        "verify_korean_output_guard_runtime.py": "7af8e0bb63cd9a4545d1d906c328a6ba43a1a71788efb652d42a8717d512fac9"
+      },
+      "hp_commands": {
+        "create": [
+          "/usr/local/bin/docker",
+          "create",
+          "--pull=never",
+          "--name",
+          "{{ hp_new_name }}",
+          "--restart",
+          "unless-stopped",
+          "--network",
+          "bridge",
+          "--user",
+          "root",
+          "--workdir",
+          "/opt/hermes",
+          "--entrypoint",
+          "/opt/hermes/docker/entrypoint-dispatch.sh",
+          "--env-file",
+          "{{ hp_root }}/container.env",
+          "--volume",
+          "/opt/hermes-data:/opt/data",
+          "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+          "gateway",
+          "run"
+        ],
+        "stop-old": [
+          "/usr/local/bin/docker",
+          "stop",
+          "--time",
+          "60",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b"
+        ],
+        "retain-old": [
+          "/usr/local/bin/docker",
+          "rename",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "{{ hp_old_name }}"
+        ],
+        "name-new": [
+          "/usr/local/bin/docker",
+          "rename",
+          "{{ hp_state.candidate_id }}",
+          "hermes"
+        ],
+        "start-new": [
+          "/usr/local/bin/docker",
+          "start",
+          "{{ hp_state.candidate_id }}"
+        ],
+        "stop-new": [
+          "/usr/local/bin/docker",
+          "stop",
+          "--time",
+          "60",
+          "{{ hp_state.candidate_id }}"
+        ],
+        "park-new": [
+          "/usr/local/bin/docker",
+          "rename",
+          "{{ hp_state.candidate_id }}",
+          "{{ hp_new_name }}"
+        ],
+        "restore-name": [
+          "/usr/local/bin/docker",
+          "rename",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "hermes"
+        ],
+        "start-old": [
+          "/usr/local/bin/docker",
+          "start",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b"
+        ]
+      },
+      "capstone_prestart_mcp_sha256": "f8fcee9975c9e29feef6722dbeadcb7d910fe6d75d8b4d7d95909604c808ca56",
+      "capstone_prestart_phase": "inspect",
+      "capstone_prestart_token": "a6591545313d",
+      "capstone_prestart_operator_lock": true
+    },
+    "roles": [
+      "hermes_prestart"
+    ],
+    "tasks": [
+      {
+        "name": "Require exact unresolved install transaction",
+        "ansible.builtin.assert": {
+          "that": [
+            "hp_state.phase == 'created'",
+            "hp_state.revision == 3",
+            "hp_state.candidate_id == '47aa31c88f9d93adb0aa28a00b40b125df6ebd1b235605ee5274661509e21342'",
+            "hp_state.intent.action == 'install'",
+            "hp_state.intent.issued_at_ns == 1792000287356001238"
+          ]
+        }
+      },
+      {
+        "name": "Inspect preserved install ledger and original plan",
+        "ansible.builtin.stat": {
+          "path": "{{ hp_root }}/{{ item.name }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          {
+            "name": "ledger.json",
+            "sha": "84bccc0ed96b694a1869ad90b0819c903c7fbad467b9c4ac0ba7d2dd7ac178bd"
+          },
+          {
+            "name": "plan.json",
+            "sha": "116e24939a67657e83ebc3900740182ed491db41d42fcb9fc68e9a52f83ee37d"
+          }
+        ],
+        "register": "recovery_pins"
+      },
+      {
+        "name": "Require original unedited protected evidence",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.uid == 0",
+            "item.stat.gid == 0",
+            "item.stat.mode == '0600'",
+            "item.stat.nlink == 1",
+            "item.stat.checksum == item.item.sha"
+          ]
+        },
+        "loop": "{{ recovery_pins.results }}"
+      },
+      {
+        "name": "Read back installed files without copying into candidate",
+        "ansible.builtin.include_role": {
+          "name": "hermes_prestart",
+          "tasks_from": "readback.yml"
+        },
+        "vars": {
+          "hp_verify_id": "47aa31c88f9d93adb0aa28a00b40b125df6ebd1b235605ee5274661509e21342"
+        }
+      },
+      {
+        "name": "Refresh identities current data and Docker capability",
+        "ansible.builtin.include_role": {
+          "name": "hermes_prestart",
+          "tasks_from": "observe.yml"
+        }
+      },
+      {
+        "name": "Record bounded postinstall correction",
+        "ansible.builtin.copy": {
+          "content": "{\"reason\": \"include exact preexisting empty protected uv site-packages lock in complete readback\", \"prior_ledger_sha256\": \"84bccc0ed96b694a1869ad90b0819c903c7fbad467b9c4ac0ba7d2dd7ac178bd\", \"candidate_id\": \"47aa31c88f9d93adb0aa28a00b40b125df6ebd1b235605ee5274661509e21342\", \"installation_replayed\": false, \"docker_lifecycle_calls\": 0}\n",
+          "dest": "{{ hp_root }}/postinstall-adjudication.json",
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Finish only the proven previous install postcondition",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/python3",
+            "-B",
+            "{{ hp_source }}/hermes_prestart_transaction.py",
+            "finish",
+            "--token",
+            "a6591545313d",
+            "--action",
+            "install"
+          ],
+          "stdin": "{{ hp_observation | combine({'guard_sha256':hp_guard_sha}) | to_json }}",
+          "stdin_add_newline": true
+        },
+        "changed_when": true,
+        "timeout": 30,
+        "no_log": true
+      },
+      {
+        "name": "Inspect completed stopped preparation",
+        "ansible.builtin.include_role": {
+          "name": "hermes_prestart",
+          "tasks_from": "inspect.yml"
+        }
+      },
+      {
+        "name": "Require fully guarded never-started candidate",
+        "ansible.builtin.assert": {
+          "that": [
+            "hp_state.phase == 'guarded'",
+            "hp_state.intent == None",
+            "hp_state.candidate_id == '47aa31c88f9d93adb0aa28a00b40b125df6ebd1b235605ee5274661509e21342'"
+          ]
+        }
+      }
+    ]
+  }
+]

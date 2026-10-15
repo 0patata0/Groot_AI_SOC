@@ -1,0 +1,52 @@
+{
+  "scope": "synthetic native fixture only; no live journal or service calls",
+  "files": [
+    {
+      "path": "infra/normalization/vector/history-auto/auto-worker.sh",
+      "bytes": 4885,
+      "sha256": "cc096d9da2617a58e4517d9073f205d8c191e96387dcef8c8c9d338dbbdcd4af"
+    },
+    {
+      "path": "infra/normalization/vector/history-auto/auto-lib.sh",
+      "bytes": 9475,
+      "sha256": "2604d5c6f9a7044f58d2c8c66995bf696d5bbdee69f49c9e48984556d1636ddf"
+    },
+    {
+      "path": "infra/normalization/vector/history-auto/state.jq",
+      "bytes": 1453,
+      "sha256": "826ca427ae7a2295fb638c9738d754e49826bcd01cce2765f28ee3d20acc4212"
+    },
+    {
+      "path": "infra/normalization/vector/history-auto/test-native.sh",
+      "bytes": 10518,
+      "sha256": "b5b6c10c40f534e27451c789202d6c456f3b03c6be01a5bf6028e4f8e1cb7cba"
+    },
+    {
+      "path": "infra/normalization/vector/history/history-lib.sh",
+      "bytes": 10614,
+      "sha256": "64300f6de6bf5ee71066ef4368b64b041e6399a28827fc963b7349f1b7644ee5"
+    },
+    {
+      "path": "infra/normalization/vector/history/history-run.sh",
+      "bytes": 261,
+      "sha256": "d900dfdcf4847074c889bc53ffa915ccbe46dd72c0617e61802dab0c6736dac0"
+    },
+    {
+      "path": "infra/normalization/vector/history/continuation-lib.sh",
+      "bytes": 4605,
+      "sha256": "e52c0464fa28c4502a7c1ebaef7cd5c3fcc24642104fca288e8031183aea6379"
+    },
+    {
+      "path": "infra/normalization/vector/history/continue-run.sh",
+      "bytes": 7890,
+      "sha256": "dca32656caf0f9ae458ed07e0b86688f550e92a28f14b868b60f944d05180654"
+    },
+    {
+      "path": "infra/normalization/vector/history/validate-records.jq",
+      "bytes": 1360,
+      "sha256": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9"
+    }
+  ],
+  "total_bytes": 51061,
+  "revision": "explicit-validation-and-resync-before-job-commit"
+}

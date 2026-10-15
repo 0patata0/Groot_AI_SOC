@@ -1,0 +1,33 @@
+{
+  "created_at_kst": "2026-10-13T18:52:33+09:00",
+  "model": "qwen3.6:35b",
+  "target": "a:modsecurity-custom",
+  "synthetic_bytes": 22652,
+  "synthetic_rule_count": 156,
+  "prior_full_file_fixture": "infra/hermes/benchmarks/results/2026-10-13-write-candidate/input-synthetic.conf",
+  "prior_fixture_checked": true,
+  "real_rule_content_read_or_sent": false,
+  "base_sha256": "96a72b32496ebabb94403298ca792ed2eaaa6dfd6d6b47e23cc8bf85913f152a",
+  "expected_bytes": 22696,
+  "expected_sha256": "2ffa7e827c3ca066e9e838f61efb3ae4d8e09e1e6f27a18787a6b3d8b720cff4",
+  "added_prefix": "# Benchmark comment: offline candidate only\n",
+  "request_bytes": 29111,
+  "request_sha256": "ddef276a343777db2a4c88f43f7d3815817b1222484badfc42896cc2126ea5d1",
+  "max_tokens": 12288,
+  "transport_source_sha256": "2c60a506b0ea9f85785bf8fb791af6434bcb01f0b37d65f985e603ba7b82f42c",
+  "schema_source": "infra/mcp/rule_change_mcp.py",
+  "schema_source_sha256": "2926ee95218fb889dd7f77bcccd36bdec4ed15f58aa7ae0b3e82426fc0209682",
+  "limitations": [
+    "Same synthetic input file and requested comment as the full-file benchmark; tool schema and instructions necessarily differ.",
+    "Only model API generation is timed; reconstruction and validation here are local test operations, not deployed MCP execution.",
+    "No approval request, privileged executor, server file write or reload is performed.",
+    "Does not reproduce production initial API input (~25k tokens) or later history (~42–88k tokens).",
+    "No main-request thinking override, num_ctx, keep_alive, model or draft-setting change.",
+    "Two rounds per selected host; workload and cache may differ from the earlier full-file measurement.",
+    "12288 completion-token cap matches the earlier full-file task by default; length-terminated results are failures.",
+    "Uses the unchanged full-file stream transport with a separate literal-edit scoring callback."
+  ],
+  "hosts": [
+    "211.170.162.110"
+  ]
+}

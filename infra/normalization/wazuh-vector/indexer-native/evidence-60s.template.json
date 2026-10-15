@@ -1,0 +1,193 @@
+{
+  "size": 0,
+  "timeout": "10s",
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "agent.id": "001"
+          }
+        },
+        {
+          "term": {
+            "location": "/var/log/capstone-vector/evidence/normalized.jsonl"
+          }
+        },
+        {
+          "term": {
+            "data.capstone_norm.schema_version": "vector-1"
+          }
+        },
+        {
+          "term": {
+            "data.capstone_norm.pipeline": "vector"
+          }
+        },
+        {
+          "term": {
+            "data.capstone_norm.sensor": "groot-sec"
+          }
+        },
+        {
+          "term": {
+            "data.capstone_norm.correlation_eligible": "true"
+          }
+        },
+        {
+          "term": {
+            "data.capstone_norm.correlation_time_class": "fresh"
+          }
+        },
+        {
+          "term": {
+            "data.capstone_norm.protected_asset": "false"
+          }
+        },
+        {
+          "terms": {
+            "data.capstone_norm.source": [
+              "suricata",
+              "nftables"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "data.capstone_norm.protocol": [
+              "tcp",
+              "udp"
+            ]
+          }
+        },
+        {
+          "regexp": {
+            "data.capstone_norm.correlation_key": "[0-9a-f]{64}"
+          }
+        },
+        {
+          "regexp": {
+            "data.capstone_norm.correlation_dedupe_key": "[0-9a-f]{64}"
+          }
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "bool": {
+                  "filter": [
+                    {
+                      "term": {
+                        "data.capstone_norm.source": "suricata"
+                      }
+                    },
+                    {
+                      "terms": {
+                        "data.capstone_norm.action": [
+                          "allowed",
+                          "observed",
+                          "blocked"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "bool": {
+                  "filter": [
+                    {
+                      "term": {
+                        "data.capstone_norm.source": "nftables"
+                      }
+                    },
+                    {
+                      "term": {
+                        "data.capstone_norm.action": "logged_drop"
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "minimum_should_match": 1
+          }
+        },
+        {
+          "script": {
+            "script": {
+              "lang": "painless",
+              "source": "for (String suffix : params.single_fields) { String field='data.capstone_norm.'+suffix; if (!doc.containsKey(field) || doc[field].size()!=1) return false; } try { long event=ZonedDateTime.parse(doc['data.capstone_norm.event_time_kst'].value).toInstant().toEpochMilli(); return params.upper > params.lower && params.upper-params.lower==60000 && event>=params.lower && event<=params.upper; } catch (Exception e) { return false; }",
+              "params": {
+                "lower": 0,
+                "upper": 0,
+                "single_fields": [
+                  "correlation_key",
+                  "correlation_dedupe_key",
+                  "source",
+                  "sensor",
+                  "event_time_kst"
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "exists": {
+            "field": "data.capstone_norm.quality_flags"
+          }
+        },
+        {
+          "terms": {
+            "data.capstone_norm.source_ip": [
+              "211.170.162.110",
+              "211.170.162.111"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "data.capstone_norm.destination_ip": [
+              "211.170.162.110",
+              "211.170.162.111"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "services": {
+      "terms": {
+        "field": "data.capstone_norm.correlation_key",
+        "size": 101,
+        "order": {
+          "_key": "asc"
+        }
+      },
+      "aggs": {
+        "unique_ids": {
+          "terms": {
+            "field": "data.capstone_norm.correlation_dedupe_key",
+            "size": 5,
+            "order": {
+              "_key": "asc"
+            }
+          }
+        },
+        "sources": {
+          "terms": {
+            "field": "data.capstone_norm.source",
+            "size": 3,
+            "order": {
+              "_key": "asc"
+            }
+          }
+        }
+      }
+    }
+  }
+}

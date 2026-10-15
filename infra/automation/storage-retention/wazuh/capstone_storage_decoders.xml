@@ -1,0 +1,6 @@
+<!-- Syslog program predecoder then JSON; does not claim journal authenticity. -->
+<decoder name="capstone_storage_json">
+  <program_name type="pcre2">^capstone-storage$</program_name>
+  <prematch type="pcre2">^\{</prematch>
+  <plugin_decoder>JSON_Decoder</plugin_decoder>
+</decoder>

@@ -1,0 +1,703 @@
+{
+  "purpose": "synthetic_native_verification_plan_not_execution_evidence",
+  "reference_period_end_ms": 1791975600000,
+  "cases": [
+    {
+      "name": "empty",
+      "documents": 0,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "four_distinct_not_five",
+      "documents": 4,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 4,
+        "unique_events": 4,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "five_same_timestamp",
+      "documents": 5,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 5,
+        "unique_events": 5,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 1,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "same_key_twenty_retransmissions",
+      "documents": 20,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 20,
+        "unique_events": 1,
+        "duplicate_documents": 19,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "four_a_one_b",
+      "documents": 5,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 5,
+        "unique_events": 2,
+        "duplicate_documents": 3,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "five_over_240_seconds_not_a_window",
+      "documents": 5,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 5,
+        "unique_events": 5,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "old_sixty_second_window_retained",
+      "documents": 5,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 5,
+        "unique_events": 5,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 1,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "repeat_microsecond_boundary_below",
+      "documents": 5,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 5,
+        "unique_events": 5,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 1,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "cross_microsecond_boundary_below",
+      "documents": 2,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 2,
+        "unique_events": 2,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 0,
+        "cross_source_services": 1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "repeat_microsecond_boundary_equal",
+      "documents": 5,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 5,
+        "unique_events": 5,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 1,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "cross_microsecond_boundary_equal",
+      "documents": 2,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 2,
+        "unique_events": 2,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 0,
+        "cross_source_services": 1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "repeat_microsecond_boundary_above",
+      "documents": 5,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 5,
+        "unique_events": 5,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "cross_microsecond_boundary_above",
+      "documents": 2,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 2,
+        "unique_events": 2,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "delayed_companion_beyond_old_processing_120s",
+      "documents": 2,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 2,
+        "unique_events": 2,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 0,
+        "cross_source_services": 1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "reverse_arrival_order",
+      "documents": 2,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 2,
+        "unique_events": 2,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 0,
+        "cross_source_services": 1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "two_sources_different_service",
+      "documents": 2,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 2,
+        "unique_events": 2,
+        "duplicate_documents": 0,
+        "services": 2,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "repeat_and_cross_same_service",
+      "documents": 6,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 6,
+        "unique_events": 6,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 1,
+        "cross_source_services": 1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "cross_duplicate_retransmissions",
+      "documents": 20,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 20,
+        "unique_events": 2,
+        "duplicate_documents": 18,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 0,
+        "cross_source_services": 1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "same_source_key_different_time",
+      "documents": 2,
+      "expected": {
+        "valid": false,
+        "reason": "identity_conflict",
+        "match": false,
+        "documents": -1,
+        "unique_events": -1,
+        "duplicate_documents": -1,
+        "services": -1,
+        "matched_services": -1,
+        "repeat_services": -1,
+        "cross_source_services": -1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "same_source_key_different_service",
+      "documents": 2,
+      "expected": {
+        "valid": false,
+        "reason": "identity_conflict",
+        "match": false,
+        "documents": -1,
+        "unique_events": -1,
+        "duplicate_documents": -1,
+        "services": -1,
+        "matched_services": -1,
+        "repeat_services": -1,
+        "cross_source_services": -1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "identity_is_source_plus_key",
+      "documents": 2,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 2,
+        "unique_events": 2,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 0,
+        "cross_source_services": 1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "event_at_lookback_edge",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 1,
+        "unique_events": 1,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "event_older_than_lookback",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "event_after_period_end",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "submicrosecond_input_rejected",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "wrong_marker",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "protected_source",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "protected_destination",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "historical_class",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "bad_action",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "bad_port",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "bad_key",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "source_leaf_mismatch",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "wrong_location",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "processing_older_than_360s",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "processing_more_than_5s_future",
+      "documents": 1,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 0,
+        "unique_events": 0,
+        "duplicate_documents": 0,
+        "services": 0,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 1
+    },
+    {
+      "name": "hundred_services_allowed",
+      "documents": 100,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 100,
+        "unique_events": 100,
+        "duplicate_documents": 0,
+        "services": 100,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "hundred_one_services_unavailable",
+      "documents": 101,
+      "expected": {
+        "valid": false,
+        "reason": "service_limit",
+        "match": false,
+        "documents": -1,
+        "unique_events": -1,
+        "duplicate_documents": -1,
+        "services": -1,
+        "matched_services": -1,
+        "repeat_services": -1,
+        "cross_source_services": -1
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "ten_thousand_retransmissions_allowed",
+      "documents": 10000,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": false,
+        "documents": 10000,
+        "unique_events": 1,
+        "duplicate_documents": 9999,
+        "services": 1,
+        "matched_services": 0,
+        "repeat_services": 0,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "ten_thousand_distinct_allowed",
+      "documents": 10000,
+      "expected": {
+        "valid": true,
+        "reason": "ok",
+        "match": true,
+        "documents": 10000,
+        "unique_events": 10000,
+        "duplicate_documents": 0,
+        "services": 1,
+        "matched_services": 1,
+        "repeat_services": 1,
+        "cross_source_services": 0
+      },
+      "query_excluded": 0
+    },
+    {
+      "name": "ten_thousand_one_documents_unavailable",
+      "documents": 10001,
+      "expected": {
+        "valid": false,
+        "reason": "document_limit",
+        "match": false,
+        "documents": -1,
+        "unique_events": -1,
+        "duplicate_documents": -1,
+        "services": -1,
+        "matched_services": -1,
+        "repeat_services": -1,
+        "cross_source_services": -1
+      },
+      "query_excluded": 0
+    }
+  ]
+}

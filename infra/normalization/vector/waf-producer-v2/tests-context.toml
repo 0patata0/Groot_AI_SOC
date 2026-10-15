@@ -1,0 +1,455 @@
+# Isolated native unit tests. This topology must never be a production service.
+[sources.test_input]
+type = "demo_logs"
+format = "json"
+count = 0
+[transforms.guard]
+type = "remap"
+inputs = ["test_input"]
+file = "../transforms/waf_json_guard.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+[transforms.context]
+type = "remap"
+inputs = ["guard"]
+file = "audit-context.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+[sinks.discard]
+type = "blackhole"
+inputs = ["context", "context.dropped", "guard.dropped"]
+
+[[tests]]
+name = "context_kst"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.producer_format_version, "2")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-14T12:00:00.123000+09:00")
+assert_eq!(.capstone_norm.time_basis, "nginx_modsecurity_context_creation")
+assert_eq!(.capstone_norm.time_status, "trusted_context_creation")
+assert_eq!(.capstone_norm.identity_scope, "deployment_binding_request_id")
+assert_eq!(.capstone_norm.source_replay_deduplicated, false)
+assert!(is_null(.capstone_norm.time_evidence_sha256))
+'''
+
+[[tests]]
+name = "context_utc"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T03:00:00+00:00\",\"time_stamp\":\"Wed Oct 14 03:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.producer_format_version, "2")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-14T12:00:00.123000+09:00")
+assert_eq!(.capstone_norm.time_basis, "nginx_modsecurity_context_creation")
+assert_eq!(.capstone_norm.time_status, "trusted_context_creation")
+assert_eq!(.capstone_norm.identity_scope, "deployment_binding_request_id")
+assert_eq!(.capstone_norm.source_replay_deduplicated, false)
+assert!(is_null(.capstone_norm.time_evidence_sha256))
+'''
+
+[[tests]]
+name = "protected_source"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"211.170.162.111\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.producer_format_version, "2")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-14T12:00:00.123000+09:00")
+assert_eq!(.capstone_norm.time_basis, "nginx_modsecurity_context_creation")
+assert_eq!(.capstone_norm.time_status, "trusted_context_creation")
+assert_eq!(.capstone_norm.identity_scope, "deployment_binding_request_id")
+assert_eq!(.capstone_norm.source_replay_deduplicated, false)
+assert!(is_null(.capstone_norm.time_evidence_sha256))
+assert_eq!(.capstone_norm.protected_asset, true)
+'''
+
+[[tests]]
+name = "audit_second_rounding"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:01 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.producer_format_version, "2")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-14T12:00:00.123000+09:00")
+assert_eq!(.capstone_norm.time_basis, "nginx_modsecurity_context_creation")
+assert_eq!(.capstone_norm.time_status, "trusted_context_creation")
+assert_eq!(.capstone_norm.identity_scope, "deployment_binding_request_id")
+assert_eq!(.capstone_norm.source_replay_deduplicated, false)
+assert!(is_null(.capstone_norm.time_evidence_sha256))
+'''
+
+[[tests]]
+name = "stable_identity"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert_eq!(.capstone_norm.producer_format_version, "2")
+assert_eq!(.capstone_norm.event_time_kst, "2026-10-14T12:00:00.123000+09:00")
+assert_eq!(.capstone_norm.time_basis, "nginx_modsecurity_context_creation")
+assert_eq!(.capstone_norm.time_status, "trusted_context_creation")
+assert_eq!(.capstone_norm.identity_scope, "deployment_binding_request_id")
+assert_eq!(.capstone_norm.source_replay_deduplicated, false)
+assert!(is_null(.capstone_norm.time_evidence_sha256))
+assert_eq!(.capstone_norm.record_id, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-dddddddddddddddddddddddddddddddd")
+assert_eq!(.capstone_norm.event_id, sha2(encode_json(["synthetic-a", "modsecurity", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "dddddddddddddddddddddddddddddddd"]), variant: "SHA-256"))
+'''
+
+[[tests]]
+name = "legacy_v1"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-dddddddddddddddddddddddddddddddd\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "bad_binding"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "short_request"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:ddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "upper_request"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "bad_epoch"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:x:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "epoch_iso_disagree"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946801.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "bad_date"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-02-30T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "no_offset"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "trailing_text"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00x\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "prefix_text"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"xv2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "newline_id"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\\n\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "wrong_source_path"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/other.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "wrong_audit_clock"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:03 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "missing_audit_stamp"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "empty_rules"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "bad_port"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":65536,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "invalid_ip"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"invalid\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "bad_engine"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"unknown\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"5\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "bad_severity"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{\"transaction\":{\"unique_id\":\"v2:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb:dddddddddddddddddddddddddddddddd:1791946800.123:2026-10-14T12:00:00+09:00\",\"time_stamp\":\"Wed Oct 14 12:00:00 2026\",\"client_ip\":\"198.18.0.1\",\"host_ip\":\"10.200.10.2\",\"client_port\":42000,\"host_port\":8080,\"request\":{\"method\":\"GET\"},\"response\":{\"http_code\":200,\"headers\":{\"Server\":\"nginx\"}},\"producer\":{\"secrules_engine\":\"DetectionOnly\"},\"messages\":[{\"details\":{\"ruleId\":\"9900992\",\"severity\":\"9\"}}]}}", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "context.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''
+
+[[tests]]
+name = "malformed_json"
+[[tests.inputs]]
+insert_at = "guard"
+type = "vrl"
+source = '''
+. = {"message": "{", "source_file": "/synthetic/audit.log"}
+'''
+[[tests.outputs]]
+extract_from = "guard.dropped"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = '''
+assert!(is_null(.capstone_norm))
+'''

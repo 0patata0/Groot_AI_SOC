@@ -1,0 +1,89 @@
+{
+  "checked_at_kst": "2026-10-14T03:10:49+09:00",
+  "host": "B",
+  "ansible_core": "2.21.5",
+  "apply": {
+    "first": {
+      "ok": 41,
+      "changed": 9,
+      "failed": 0
+    },
+    "initial_repeat": {
+      "ok": 40,
+      "changed": 0,
+      "failed": 0
+    },
+    "lock_status_fix": {
+      "ok": 41,
+      "changed": 3,
+      "failed": 0
+    },
+    "final_repeat": {
+      "ok": 40,
+      "changed": 0,
+      "failed": 0
+    }
+  },
+  "container": {
+    "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "restarted": false,
+    "recreated": false,
+    "core_sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c"
+  },
+  "preservation": {
+    "exact_database_and_protected_files_at_kst": "2026-10-14T03:00:24+09:00",
+    "initial_counts": {
+      "sessions": 99,
+      "messages": 1021
+    },
+    "final_config_env_soul_unchanged": true,
+    "later_natural_cron_sessions": [
+      {
+        "started_at_kst": "2026-10-14T03:01:31+09:00",
+        "ended_at_kst": "2026-10-14T03:02:28+09:00",
+        "messages": 8
+      },
+      {
+        "started_at_kst": "2026-10-14T03:07:30+09:00",
+        "ended_at_kst": "2026-10-14T03:08:32+09:00",
+        "messages": 9
+      }
+    ],
+    "quick_check": "ok",
+    "database_restored": false
+  },
+  "runtime_fake_http_passed": 11,
+  "real_chat_posts": 0,
+  "model_111_tag_available": true,
+  "mcp_initialize_tools_list": {
+    "rule-a": 8,
+    "rule-b": 8,
+    "security-events": 2,
+    "wazuh-ro": 14,
+    "resp": 3
+  },
+  "mcp_tools_called": 0,
+  "synthetic_unknown_image_source_rejected_without_change": true,
+  "read_only_helper_tests_passed": 5,
+  "systemd": {
+    "timer": "active/enabled",
+    "observer": "active/enabled",
+    "lock_held_result": "success/75",
+    "same_container_result": "success/0"
+  },
+  "observation": {
+    "started_at_kst": "2026-10-14T02:57:21+09:00",
+    "ended_at_kst": "2026-10-14T03:10:49+09:00",
+    "filtered": 0,
+    "retained": 0,
+    "requested_foreign": 0,
+    "oversize": 0,
+    "response_denominator_available": false
+  },
+  "not_tested": [
+    "actual_container_recreation",
+    "forced_failure_live_rollback",
+    "long_term_mixed_language_rate"
+  ]
+}

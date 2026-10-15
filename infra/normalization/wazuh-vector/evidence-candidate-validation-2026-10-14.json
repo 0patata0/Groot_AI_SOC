@@ -1,0 +1,97 @@
+{
+  "kind": "candidate_validation_only",
+  "at_kst": "2026-10-14T05:31:54+09:00",
+  "operational_apply": false,
+  "existing_rule_tree_sha256": "b693dbec37f1a1cd497390e0a36513a97bba37ef62c3798b18d1b2cc7229eaf2",
+  "existing_rule_tree_preserved": true,
+  "local_static_tests": {
+    "passed": 6,
+    "failed": 0,
+    "covers_native_engine": false
+  },
+  "native_syntax_checks": {
+    "host": "B",
+    "playbooks": [
+      "apply-a.yml",
+      "apply-b.yml"
+    ],
+    "passed": 2,
+    "operation": "syntax-check only"
+  },
+  "native_existing_decoder_probe": {
+    "empty_array": "[]",
+    "string_containing_brackets": "[]",
+    "absent_quality_field": "missing",
+    "nonempty_array": "different",
+    "can_enforce_original_json_types": false
+  },
+  "native_candidate_rule_tests": {
+    "prepared_cases": 53,
+    "executed": false,
+    "legacy_scenarios_preserved": 51,
+    "type_loss_demonstration_cases": 2
+  },
+  "fixtures": {
+    "source": "synthetic_only",
+    "never_written_to_collected_files": true,
+    "count": 53,
+    "aggregate_name_sha256": "3d5671005d42a5426e0b9e7c7d8bc7c51c0af4a2a98f664cfb3a786b13f5b16e",
+    "field_keys": [
+      "action",
+      "correlation_dedupe_key",
+      "correlation_eligible",
+      "correlation_key",
+      "correlation_time_class",
+      "destination_ip",
+      "destination_port",
+      "event_id",
+      "event_time_kst",
+      "evidence_lane",
+      "message_sha256",
+      "pipeline",
+      "protected_asset",
+      "protocol",
+      "quality_flags",
+      "schema_version",
+      "sensor",
+      "source",
+      "source_ip"
+    ]
+  },
+  "boundaries": {
+    "ready_rules_unchanged": true,
+    "raw_config_edited": false,
+    "stats_filter_edited": false,
+    "rule_id_leaf": [
+      100261,
+      100262
+    ],
+    "base_rule_id": 100260,
+    "new_input": "/var/log/capstone-vector/evidence/normalized.jsonl",
+    "evidence_lane": "indexer-observation-v1",
+    "source_port_required": false,
+    "destination_port_range": [
+      1,
+      65535
+    ],
+    "upstream_owns_json_types": true,
+    "new_final_indexer_time_check_required": true
+  },
+  "file_sha256": {
+    "apply-a.yml": "54f8c6d48da8b1a8a23ed45a9aa29effcf6fb5284dc0ce5d7a213bf34f7797dd",
+    "apply-b.yml": "0aa44813ce59fc96aee3c649fc5e3956da8c5b1ad1fbd2fe25146475a707d21f",
+    "agent-localfile.xml": "04b2bd883021d25883d2caaa7fe953149f68a98cc430bbccdb4a65f65a35bdb0",
+    "capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+    "tests/test-evidence-manager.sh": "9b140d3744fb7a170993a19492cb37c443eb60d55c3a80ac84e4688cb71d32c5",
+    "tests/test_evidence_contract.py": "673123bbbd5c826fa74844f2cd864f4c9958826c81e3a1f7c4c495de11197ecc",
+    "fixtures/evidence/expected.tsv": "94dfa9e0064206207312649c00aec7383fbcdd2032f638f7f9844bde2688a09e"
+  },
+  "independent_review": "no additional blocker; native candidate and actual indexing remain pending",
+  "pending": [
+    "parent native rule transaction",
+    "actual leaf level3/no_full_log Indexer validation",
+    "A stats-ignore live before/after preservation"
+  ],
+  "no_package_install": true,
+  "no_chat_or_block": true
+}

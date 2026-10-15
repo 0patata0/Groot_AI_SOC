@@ -1,0 +1,73 @@
+[
+  {
+    "name": "Refresh state before cutover",
+    "ansible.builtin.include_tasks": "load.yml"
+  },
+  {
+    "name": "Require fully prepared candidate",
+    "ansible.builtin.assert": {
+      "that": [
+        "hp_state.phase == 'guarded'",
+        "hp_state.intent == None"
+      ]
+    }
+  },
+  {
+    "name": "Stop retain rename and first-start with independent durable intents",
+    "ansible.builtin.include_tasks": "action.yml",
+    "loop": [
+      "stop-old",
+      "retain-old",
+      "name-new",
+      "start-new"
+    ],
+    "loop_control": {
+      "loop_var": "hp_action"
+    }
+  },
+  {
+    "name": "Verify actual firststart then choose commit or bounded fallback proof",
+    "rescue": [
+      {
+        "name": "Fallback only after fresh proven identity and safe stop",
+        "ansible.builtin.include_tasks": "fallback.yml"
+      }
+    ],
+    "block": [
+      {
+        "name": "Verify firststarted guarded candidate",
+        "ansible.builtin.include_tasks": "ready.yml",
+        "vars": {
+          "hp_active_id": "{{ hp_state.candidate_id }}"
+        }
+      },
+      {
+        "name": "Record explicit fallback exercise request only after actual readiness",
+        "ansible.builtin.copy": {
+          "content": "{\"reason\":\"operator_requested_after_verified_firststart\",\"real_firststart\":true}\n",
+          "dest": "{{ hp_root }}/fallback-exercise.json",
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        },
+        "when": "capstone_prestart_probe_fallback | default(false) | bool"
+      },
+      {
+        "name": "Enter the requested fallback exercise after successful firststart",
+        "ansible.builtin.fail": {
+          "msg": "Controlled readiness rejection after verified firststart."
+        },
+        "when": "capstone_prestart_probe_fallback | default(false) | bool"
+      },
+      {
+        "name": "Commit verified new active identity",
+        "ansible.builtin.include_tasks": "ready.yml",
+        "vars": {
+          "hp_active_id": "{{ hp_state.candidate_id }}",
+          "hp_ready_operation": "commit"
+        }
+      }
+    ]
+  }
+]

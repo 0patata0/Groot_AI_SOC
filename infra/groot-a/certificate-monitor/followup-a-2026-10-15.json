@@ -1,0 +1,75 @@
+{
+  "certificate_changed": false,
+  "current_tls_check": {
+    "automatic_renewal": false,
+    "certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966",
+    "domain": "chat.grootlab.duckdns.org",
+    "expiry_status": "ok",
+    "not_after_epoch": 1799215353,
+    "not_after_kst": "2027-01-06T15:02:33+09:00",
+    "observed_at_kst": "2026-10-15T10:48:58+09:00",
+    "observed_at_utc": "2026-10-15T01:48:58Z",
+    "probe_status": "verified",
+    "reason": "verified",
+    "schema_version": 1,
+    "seconds_remaining": 7186415,
+    "served_certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966"
+  },
+  "observed_at_kst": "2026-10-15T10:48:58.339088+09:00",
+  "persisted_status": {
+    "automatic_renewal": false,
+    "certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966",
+    "domain": "chat.grootlab.duckdns.org",
+    "expiry_status": "ok",
+    "not_after_epoch": 1799215353,
+    "not_after_kst": "2027-01-06T15:02:33+09:00",
+    "observed_at_kst": "2026-10-15T09:00:01+09:00",
+    "observed_at_utc": "2026-10-15T00:00:01Z",
+    "probe_status": "verified",
+    "reason": "verified",
+    "schema_version": 1,
+    "seconds_remaining": 7192952,
+    "served_certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966"
+  },
+  "private_key_read": false,
+  "public_certificate_file_sha256": "0babec3a5fab7273df7b5a3be60346510e64db9656d52580fad35f2c2e8dd54a",
+  "scheduled_window_messages": [
+    {
+      "payload": {
+        "automatic_renewal": false,
+        "certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966",
+        "domain": "chat.grootlab.duckdns.org",
+        "expiry_status": "ok",
+        "not_after_epoch": 1799215353,
+        "not_after_kst": "2027-01-06T15:02:33+09:00",
+        "observed_at_kst": "2026-10-15T09:00:01+09:00",
+        "observed_at_utc": "2026-10-15T00:00:01Z",
+        "probe_status": "verified",
+        "reason": "verified",
+        "schema_version": 1,
+        "seconds_remaining": 7192952,
+        "served_certificate_sha256": "545866f0c444070a1cf61a330daad84732675f28f54643c695b53abf6a444966"
+      },
+      "realtime_us": "1792022401516781"
+    }
+  ],
+  "synthetic_warning_injected": false,
+  "units": {
+    "capstone-cert-monitor.service": {
+      "ActiveState": "inactive",
+      "ExecMainStartTimestamp": "Thu 2026-10-15 09:00:00 KST",
+      "ExecMainStatus": "0",
+      "Result": "success",
+      "SubState": "dead",
+      "UnitFileState": "static"
+    },
+    "capstone-cert-monitor.timer": {
+      "ActiveState": "active",
+      "LastTriggerUSec": "Thu 2026-10-15 09:00:00 KST",
+      "NextElapseUSecRealtime": "Fri 2026-10-16 09:00:00 KST",
+      "Result": "success",
+      "SubState": "waiting",
+      "UnitFileState": "enabled"
+    }
+  }
+}

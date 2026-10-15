@@ -1,0 +1,11 @@
+[Unit]
+Description=Capstone periodic raw log rotation (%i)
+
+[Timer]
+OnBootSec=3min
+OnUnitInactiveSec=5min
+AccuracySec=10s
+Unit=capstone-raw-operations@%i.service
+
+[Install]
+WantedBy=timers.target

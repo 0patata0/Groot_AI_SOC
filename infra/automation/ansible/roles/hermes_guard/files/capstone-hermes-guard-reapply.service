@@ -1,0 +1,18 @@
+[Unit]
+Description=Reapply reviewed Hermes guard after administrator container replacement
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+UMask=0077
+SuccessExitStatus=75
+ExecStart=/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/hermes-guard-local-b.sh watch
+TimeoutStartSec=240
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=true
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=capstone-hermes-guard-reapply

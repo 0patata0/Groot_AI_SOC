@@ -1,0 +1,67 @@
+{
+  "schema_version": "1",
+  "recorded_at_kst": "2026-10-14T10:50:56+09:00",
+  "validation_kind": "B_native_synthetic",
+  "suite": "native_history_receiver_synthetic",
+  "passed": 41,
+  "failed": 0,
+  "fixture_remaining": 0,
+  "operational_receiver_called": false,
+  "actual_history_transferred_by_this_test": false,
+  "raw_payload_exported": false,
+  "new_packages_installed": false,
+  "tools": {
+    "bash": "5.2.21(1)-release",
+    "jq": "1.7",
+    "coreutils": "9.4"
+  },
+  "limits": {
+    "nice": 10,
+    "external_timeout_seconds": 180,
+    "payload_bytes_per_batch": 33554432,
+    "manifest_bytes": 65536,
+    "records_per_batch": 1000
+  },
+  "receiver_source_path_on_B": "/var/tmp/capstone-history-20261014/receiver-candidate/history-transfer",
+  "source_sha256": {
+    "receive-batch.sh": "e024ec0d28490f6eba57a83809eafc97c08437883ef54cd9701381471dd40152",
+    "receive-run.sh": "28ab8e9f50fe478b11b6b69b16a100d1538d9d3cab1bdf059b5fd7a3aaa072e3",
+    "receive-lib.sh": "d6056aa404508352abda247f09e3242615fe8cfcdb16a9333c1863c8d4dd884e",
+    "validate-manifest.jq": "84583156c2389c1fbc213b614c05e2f51e5d8979c6488b5691be68d2685c2ae3",
+    "test-native.sh": "9e5fdfcb8c171a78ec7a696b55966df0f2a67d218c2408511692cd6993da753a"
+  },
+  "dependency_sha256": {
+    "../history/validate-records.jq": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9"
+  },
+  "verified": [
+    "v1_and_continuation_v1_self_consistency",
+    "immutable_receipt_retry_with_or_without_incoming",
+    "payload_manifest_id_conflict_rejection",
+    "manifest_types_limits_duplicate_scalar_path_rejection",
+    "record_metadata_and_source_size_matching",
+    "truncation_missing_file_symlink_hardlink_fifo_rejection",
+    "bounded_copy_source_mutation_rejection",
+    "per_batch_limits_and_minimum_free_space",
+    "pre_rename_file_fsync_failure_without_success_reply",
+    "rename_failure_and_mv_n_noop_detection",
+    "post_rename_parent_fsync_failure_then_fixed_receipt_recovery",
+    "response_loss_retry_with_identical_receipt",
+    "retry_fsync_failure_without_success_reply",
+    "stored_payload_manifest_receipt_tamper_rejection",
+    "raw_parser_error_diagnostic_suppressed"
+  ],
+  "not_verified": [
+    "real_power_loss_or_storage_device_failure",
+    "production_wrapper_execution",
+    "A_to_B_rsync_delivery",
+    "source_boot_completeness_or_parent_journal_cursor_execution",
+    "Wazuh_or_Indexer_ack",
+    "whole_store_quota_or_automatic_retention"
+  ],
+  "receipt_scope": {
+    "stage": "remote_file_preserved",
+    "sha_scope": "canonical_jq_cS_receipt_json_with_LF_excluding_response_only_receipt_sha256_and_reused",
+    "same_id_different_expected_hashes": "rejected",
+    "source_manifest": "unchanged_remote_receipt_false"
+  }
+}

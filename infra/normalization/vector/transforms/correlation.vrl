@@ -1,0 +1,35 @@
+# Metadata only: no memory dedupe and no automatic block/alert decision.
+norm = object!(.capstone_norm)
+assert!(norm.schema_version == "vector-1" && norm.pipeline == "vector", "correlation_schema")
+observed = parse_timestamp!(string!(norm.observed_at_kst), format: "%+")
+event_time = parse_timestamp!(string!(norm.event_time_kst), format: "%+")
+age = to_unix_timestamp(observed, unit: "milliseconds") - to_unix_timestamp(event_time, unit: "milliseconds")
+norm.correlation_age_ms = age
+norm.correlation_time_class = "fresh"
+if age > 120000 { norm.correlation_time_class = "historical" }
+else if age < -5000 { norm.correlation_time_class = "future" }
+norm.correlation_policy = "directional-service-v1"
+norm.correlation_eligible = false
+source_ip = string(norm.source_ip) ?? ""
+destination_ip = string(norm.destination_ip) ?? ""
+port = int(norm.destination_port) ?? -1
+protocol = string(norm.protocol) ?? ""
+sensor = string!(norm.sensor)
+valid_tuple = (is_ipv4(source_ip) || is_ipv6(source_ip)) &&
+              (is_ipv4(destination_ip) || is_ipv6(destination_ip)) &&
+              port >= 1 && port <= 65535 && includes(["tcp", "udp"], protocol)
+if valid_tuple {
+  norm.correlation_key = sha2(encode_json([sensor, source_ip, destination_ip, port, protocol]), variant: "SHA-256")
+}
+if norm.source == "nftables" {
+  norm.correlation_dedupe_key = string!(norm.event_id)
+} else {
+  message_hash = string!(norm.message_sha256)
+  assert!(match(message_hash, r'^[a-f0-9]{64}$'), "correlation_message_hash")
+  norm.correlation_dedupe_key = sha2(encode_json([sensor, norm.source, message_hash]), variant: "SHA-256")
+}
+if norm.correlation_time_class == "fresh" && valid_tuple && norm.quality_flags == [] && norm.protected_asset == false {
+  norm.correlation_eligible = true
+}
+. = {"capstone_norm": norm}
+assert!(length(encode_json(.)) <= 32768, "normalized_size")

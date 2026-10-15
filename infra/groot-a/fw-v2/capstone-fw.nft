@@ -19,15 +19,17 @@
 # ⚠ 잠금 주의: 적용 전에 **지금 접속한 출발지가 mgmt_src 에 포함**되는지 확인(fw_apply_v2.sh 가 자동 검사). 현장 PC(192.168.16.x)에서 관리하려면 주석 해제.
 
 table inet capstone_fw {
+    # Protect the two DGX Ollama endpoints from agent_block; later input/forward policies still apply.
     set never_block {
         type ipv4_addr
         flags interval
-        comment "lock-out guard: never blockable (internal, docker bridges, lo, A/B/C ext, GW, ESXi, NTP, DNS, mgmt VPN, dept LANs)"
+        comment "lock-out guard: internal, docker, lo, A/B/C ext, GW, ESXi, NTP, DNS, mgmt VPN, dept LANs, DGX Ollama /32"
         elements = { 10.200.10.0/24, 127.0.0.0/8,
                      172.17.0.0/16, 172.18.0.0/16, 172.19.0.0/16,
                      192.168.16.230, 192.168.16.231, 192.168.16.232,
                      192.168.16.129, 192.168.16.130, 192.168.16.131,
                      168.126.63.1,
+                     211.170.162.110/32, 211.170.162.111/32,
                      192.168.15.0/24, 192.168.10.0/24, 192.168.12.0/24 }
     }
 

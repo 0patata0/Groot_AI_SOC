@@ -3,6 +3,13 @@
 # 전제: 이미지 반입됨, ET 룰 ~/capstone/suricata/rules/*.rules, compose 파일 /home/groot_a/capstone/secstack/docker-compose.yml, /etc/hosts groot-web.
 # 재실행 안전: 기존 스택이 떠 있으면 포트 점검을 건너뛰고 compose up 이 변경분만 재생성한다.
 set -euo pipefail
+# BEGIN managed-raw legacy gate
+if [[ -e /var/lib/capstone-raw-operations || -L /var/lib/capstone-raw-operations ||
+      -e /var/backups/capstone-waf-recreation-20261015/rebind || -L /var/backups/capstone-waf-recreation-20261015/rebind ]]; then
+  printf '%s\n' 'Legacy secstack deployment blocked: managed raw state or WAF rebind evidence exists. Use the reviewed fixed operator handoff in infra/normalization/vector/raw-operations/waf-rebind-contract.md.' >&2
+  exit 78
+fi
+# END managed-raw legacy gate
 BASE=/home/groot_a/capstone
 SS=$BASE/secstack
 say(){ echo; echo "== $* =="; }; die(){ echo "!! ABORT: $*"; exit 1; }

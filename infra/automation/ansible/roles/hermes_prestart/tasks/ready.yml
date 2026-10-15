@@ -1,0 +1,90 @@
+[
+  {
+    "name": "Read back active guard files",
+    "ansible.builtin.include_tasks": "readback.yml",
+    "vars": {
+      "hp_verify_id": "{{ hp_active_id }}"
+    }
+  },
+  {
+    "name": "Run existing eleven fake-HTTP checks at the actual service UID",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "--user",
+        "995:986",
+        "--workdir",
+        "/opt/hermes",
+        "-i",
+        "{{ hp_active_id }}",
+        "/opt/hermes/.venv/bin/python",
+        "-B",
+        "-c",
+        "import os,sys; assert os.getuid()==995 and os.getgid()==986; sys.argv=['runtime_verify']; exec(compile(sys.stdin.read(),'runtime_verify.py','exec'),{'__name__':'__main__'})"
+      ],
+      "stdin": "{{ lookup('ansible.builtin.file', hp_source + '/verify_korean_output_guard_runtime.py', rstrip=False) }}",
+      "stdin_add_newline": false
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_runtime"
+  },
+  {
+    "name": "Verify unchanged MCP connection and tool metadata",
+    "ansible.builtin.include_tasks": "mcp.yml",
+    "vars": {
+      "hp_mcp_id": "{{ hp_active_id }}"
+    }
+  },
+  {
+    "name": "Wait for a fresh heartbeat produced after this exact firststart",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "heartbeat",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_ready_idle",
+    "until": "hp_ready_idle.rc == 0",
+    "retries": 12,
+    "delay": 5
+  },
+  {
+    "name": "Recheck identities and protected state after runtime checks",
+    "ansible.builtin.include_tasks": "observe.yml"
+  },
+  {
+    "name": "Bind verified service-UID runtime receipt",
+    "ansible.builtin.set_fact": {
+      "hp_ready_evidence": "{{ hp_observation | combine({'idle': hp_ready_idle.stdout | from_json,'runtime': hp_runtime.stdout | from_json,'runtime_uid':995,'runtime_gid':986,'guard_sha256':hp_guard_sha,'mcp':hp_mcp_result.stdout | from_json}) }}"
+    },
+    "no_log": true
+  },
+  {
+    "name": "Persist readiness evidence",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "{{ hp_ready_operation | default(\"ready\") }}",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ],
+      "stdin": "{{ hp_ready_evidence | to_json }}",
+      "stdin_add_newline": true
+    },
+    "changed_when": true,
+    "no_log": true,
+    "timeout": 30
+  }
+]

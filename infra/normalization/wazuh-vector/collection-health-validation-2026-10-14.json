@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-10-14T04:44:26.888168+09:00",
+  "rule_sha256": "b693dbec37f1a1cd497390e0a36513a97bba37ef62c3798b18d1b2cc7229eaf2",
+  "new_rules": [
+    100246,
+    100247,
+    100248,
+    100249,
+    100250,
+    100251
+  ],
+  "level": 3,
+  "ignore_seconds": 900,
+  "native_scenarios": 51,
+  "first_apply_changed": 2,
+  "repeat_changed": 0,
+  "manager_running": true,
+  "manager_started_at": "2026-10-13T19:38:55.382757398Z",
+  "local_rules_unchanged": true,
+  "active_response_blocks": 0,
+  "integration_blocks": 0,
+  "synthetic_operational_alerts_injected": false,
+  "correlation_remains_no_log": true
+}

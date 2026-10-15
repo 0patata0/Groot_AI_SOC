@@ -1,0 +1,597 @@
+{
+  "evidence_kind": "metadata_projection_of_A_native_result",
+  "independently_checked_locally": true,
+  "limits": [
+    "private Unix datagram receipt, not manager/indexer acknowledgment",
+    "one run per five boundaries and two profiles",
+    "no power-loss/reboot/disk-failure durability test",
+    "first registration and byte-identical generation remain ambiguous",
+    "native checkpoints were not rewritten"
+  ],
+  "observed_at_kst": "2026-10-14T22:00:43.263653+09:00",
+  "raw_result_remained_on_A": true,
+  "result": {
+    "cleanup_errors": [],
+    "native_children_stopped": true,
+    "operating_unchanged": true,
+    "phase": "recover:cold_new_inode_identical_bytes",
+    "private_stage_removed": true,
+    "profiles": [
+      {
+        "cases": [
+          {
+            "duplicate_sequences": [],
+            "expectation": "observation_only_no_saved_cursor",
+            "name": "first_registration",
+            "offline_missing": [
+              1,
+              2
+            ],
+            "offline_sequences": [
+              1,
+              2
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "3": 1
+            },
+            "within_case_repeats": {}
+          },
+          {
+            "duplicate_sequences": [],
+            "name": "graceful_stop_offline_append",
+            "native_cursor_used": true,
+            "offline_missing": [
+              4,
+              5
+            ],
+            "offline_sequences": [
+              4,
+              5
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "6": 1
+            },
+            "within_case_repeats": {}
+          },
+          {
+            "duplicate_sequences": [],
+            "memory_only_received_sequences": [
+              7,
+              8
+            ],
+            "name": "forced_stop_stale_native_checkpoint",
+            "offline_missing": [
+              9,
+              10
+            ],
+            "offline_sequences": [
+              9,
+              10
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "11": 1
+            },
+            "replayed_memory_sequences": [],
+            "stale_checkpoint_established": true,
+            "within_case_repeats": {}
+          },
+          {
+            "distinct_sha256": true,
+            "duplicate_sequences": [],
+            "equal_size": true,
+            "name": "cold_new_inode_same_size_distinct_bytes",
+            "native_checkpoint_unmodified": true,
+            "new_inode": [
+              64512,
+              417607
+            ],
+            "offline_missing": [
+              12,
+              13
+            ],
+            "offline_sequences": [
+              12,
+              13
+            ],
+            "previous_inode": [
+              64512,
+              417701
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "14": 1
+            },
+            "within_case_repeats": {}
+          },
+          {
+            "duplicate_sequences": [],
+            "expected": "observe_generation_ambiguity",
+            "identical_previous_bytes": true,
+            "name": "cold_new_inode_identical_bytes",
+            "new_inode": [
+              64512,
+              417747
+            ],
+            "offline_missing": [
+              12,
+              13,
+              14
+            ],
+            "offline_sequences": [
+              12,
+              13,
+              14
+            ],
+            "previous_inode": [
+              64512,
+              417607
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "15": 1
+            },
+            "within_case_repeats": {}
+          }
+        ],
+        "checkpoints": [
+          {
+            "file_sha256": "db2dcab2afc4f2a3f3649089b056761d69e66c0b4c9914c2507abddd6b0f0a22",
+            "hash": "92d2dc441a9aa15f301a99f8c5dbf99a127bc384",
+            "label": "initial",
+            "offset": 369
+          },
+          {
+            "file_sha256": "3a0de94534537395c566588148378cc25de8446fe5cc5a9fc5455a16f672929b",
+            "hash": "d3718dd6db71f1b1b80759adea33872c31e6f6c4",
+            "label": "graceful",
+            "offset": 738
+          },
+          {
+            "file_sha256": "3a0de94534537395c566588148378cc25de8446fe5cc5a9fc5455a16f672929b",
+            "hash": "d3718dd6db71f1b1b80759adea33872c31e6f6c4",
+            "label": "before-kill",
+            "offset": 738
+          },
+          {
+            "file_sha256": "3a0de94534537395c566588148378cc25de8446fe5cc5a9fc5455a16f672929b",
+            "hash": "d3718dd6db71f1b1b80759adea33872c31e6f6c4",
+            "label": "after-kill",
+            "offset": 738
+          },
+          {
+            "file_sha256": "20bb4afb5c3aee9ce0a6e344171ef792d7d8df6abe3026319e83d350fb037fb6",
+            "hash": "cad2628ecf9e5ac0c6c67cd78cae7d93201efe56",
+            "label": "postkill-restart",
+            "offset": 1355
+          },
+          {
+            "file_sha256": "99f29dc5a4a70dc6c4c503446c5a7fa0b356ff9d198a8b7ea5aa60903250d1fd",
+            "hash": "821a4761146a8a909c09818e5a3de4a873354af2",
+            "label": "new-generation",
+            "offset": 1479
+          },
+          {
+            "file_sha256": "67f4b97d855f3d562f5d16e34fa15283ebbf3d30a30a0a4e41d413544e7e3579",
+            "hash": "223bbe72117723c0617b5f7be6e4cc3b9c4aa14b",
+            "label": "identical-generation",
+            "offset": 1603
+          }
+        ],
+        "completed": true,
+        "exact_synthetic_payloads": true,
+        "max_size": "native_default",
+        "only_future_events": "unset_default_yes",
+        "profile": "default",
+        "receipts": 7,
+        "received_counts_total": {
+          "11": 1,
+          "14": 1,
+          "15": 1,
+          "3": 1,
+          "6": 1,
+          "7": 1,
+          "8": 1
+        },
+        "stops": [
+          {
+            "checkpoint": {
+              "file_sha256": "db2dcab2afc4f2a3f3649089b056761d69e66c0b4c9914c2507abddd6b0f0a22",
+              "hash": "92d2dc441a9aa15f301a99f8c5dbf99a127bc384",
+              "offset": 369
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003745,
+            "pid": 1895156,
+            "reader_start": 1,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141106573
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "3a0de94534537395c566588148378cc25de8446fe5cc5a9fc5455a16f672929b",
+              "hash": "d3718dd6db71f1b1b80759adea33872c31e6f6c4",
+              "offset": 738
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003609,
+            "pid": 1895183,
+            "reader_start": 2,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141107036
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "3a0de94534537395c566588148378cc25de8446fe5cc5a9fc5455a16f672929b",
+              "hash": "d3718dd6db71f1b1b80759adea33872c31e6f6c4",
+              "offset": 738
+            },
+            "checkpoint_exact_eof": false,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.001507,
+            "pid": 1895214,
+            "reader_start": 3,
+            "requested_signal": "SIGKILL",
+            "returncode": -9,
+            "signal_sent": true,
+            "start_ticks": 141107498
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "20bb4afb5c3aee9ce0a6e344171ef792d7d8df6abe3026319e83d350fb037fb6",
+              "hash": "cad2628ecf9e5ac0c6c67cd78cae7d93201efe56",
+              "offset": 1355
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003707,
+            "pid": 1895265,
+            "reader_start": 4,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141107770
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "99f29dc5a4a70dc6c4c503446c5a7fa0b356ff9d198a8b7ea5aa60903250d1fd",
+              "hash": "821a4761146a8a909c09818e5a3de4a873354af2",
+              "offset": 1479
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003866,
+            "pid": 1895292,
+            "reader_start": 5,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141108233
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "67f4b97d855f3d562f5d16e34fa15283ebbf3d30a30a0a4e41d413544e7e3579",
+              "hash": "223bbe72117723c0617b5f7be6e4cc3b9c4aa14b",
+              "offset": 1603
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003805,
+            "pid": 1895329,
+            "reader_start": 6,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141108695
+          }
+        ]
+      },
+      {
+        "cases": [
+          {
+            "duplicate_sequences": [],
+            "expectation": "observation_only_no_saved_cursor",
+            "name": "first_registration",
+            "offline_missing": [
+              1,
+              2
+            ],
+            "offline_sequences": [
+              1,
+              2
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "3": 1
+            },
+            "within_case_repeats": {}
+          },
+          {
+            "duplicate_sequences": [],
+            "name": "graceful_stop_offline_append",
+            "native_cursor_used": true,
+            "offline_missing": [],
+            "offline_sequences": [
+              4,
+              5
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "4": 1,
+              "5": 1,
+              "6": 1
+            },
+            "within_case_repeats": {}
+          },
+          {
+            "duplicate_sequences": [
+              7,
+              8
+            ],
+            "memory_only_received_sequences": [
+              7,
+              8
+            ],
+            "name": "forced_stop_stale_native_checkpoint",
+            "offline_missing": [],
+            "offline_sequences": [
+              9,
+              10
+            ],
+            "prior_case_replays": [
+              7,
+              8
+            ],
+            "received_counts": {
+              "10": 1,
+              "11": 1,
+              "7": 1,
+              "8": 1,
+              "9": 1
+            },
+            "replayed_memory_sequences": [
+              7,
+              8
+            ],
+            "stale_checkpoint_established": true,
+            "within_case_repeats": {}
+          },
+          {
+            "distinct_sha256": true,
+            "duplicate_sequences": [],
+            "equal_size": true,
+            "name": "cold_new_inode_same_size_distinct_bytes",
+            "native_checkpoint_unmodified": true,
+            "new_inode": [
+              64512,
+              417610
+            ],
+            "offline_missing": [],
+            "offline_sequences": [
+              12,
+              13
+            ],
+            "previous_inode": [
+              64512,
+              417768
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "12": 1,
+              "13": 1,
+              "14": 1
+            },
+            "within_case_repeats": {}
+          },
+          {
+            "duplicate_sequences": [],
+            "expected": "observe_generation_ambiguity",
+            "identical_previous_bytes": true,
+            "name": "cold_new_inode_identical_bytes",
+            "new_inode": [
+              64512,
+              417835
+            ],
+            "offline_missing": [
+              12,
+              13,
+              14
+            ],
+            "offline_sequences": [
+              12,
+              13,
+              14
+            ],
+            "previous_inode": [
+              64512,
+              417610
+            ],
+            "prior_case_replays": [],
+            "received_counts": {
+              "15": 1
+            },
+            "within_case_repeats": {}
+          }
+        ],
+        "checkpoints": [
+          {
+            "file_sha256": "a24f44dbb56681562669ee06b87b85dbd96e0a7eb187c5db297cffcf0a6a52f6",
+            "hash": "3e073b9c6e0cdeb0a41f8fffb7b6c3159ce6bc01",
+            "label": "initial",
+            "offset": 369
+          },
+          {
+            "file_sha256": "424814fd887aea0b3010dc8875f13d6e2ff6bdb30ed2a6371e3cf0d5b1ff37b2",
+            "hash": "6ce754404a9c6d3b194d8f16ed9bb7f292e83f5b",
+            "label": "graceful",
+            "offset": 738
+          },
+          {
+            "file_sha256": "424814fd887aea0b3010dc8875f13d6e2ff6bdb30ed2a6371e3cf0d5b1ff37b2",
+            "hash": "6ce754404a9c6d3b194d8f16ed9bb7f292e83f5b",
+            "label": "before-kill",
+            "offset": 738
+          },
+          {
+            "file_sha256": "424814fd887aea0b3010dc8875f13d6e2ff6bdb30ed2a6371e3cf0d5b1ff37b2",
+            "hash": "6ce754404a9c6d3b194d8f16ed9bb7f292e83f5b",
+            "label": "after-kill",
+            "offset": 738
+          },
+          {
+            "file_sha256": "ef958d1bc56d161496037ab89efe6200e9af30d17bd303e085b7089a2d1cc70b",
+            "hash": "2d70b28d26a9be7b9697f2efdf394c69f79ae2d1",
+            "label": "postkill-restart",
+            "offset": 1355
+          },
+          {
+            "file_sha256": "ef33d7fce821702767a32a511c3348d6e1fcfe57972159a2bf3f6826ba3008af",
+            "hash": "55a00ddb2fea33944550499558e3e4ede9d34a00",
+            "label": "new-generation",
+            "offset": 1479
+          },
+          {
+            "file_sha256": "37158bc54f91378be71310199c1650de239dbced1256a5bc88685b5428f4aaae",
+            "hash": "1c6dd62327792e40b1de8df59e24ffb9777d85de",
+            "label": "identical-generation",
+            "offset": 1603
+          }
+        ],
+        "completed": true,
+        "exact_synthetic_payloads": true,
+        "max_size": "2GB",
+        "only_future_events": "no",
+        "profile": "recover",
+        "receipts": 15,
+        "received_counts_total": {
+          "10": 1,
+          "11": 1,
+          "12": 1,
+          "13": 1,
+          "14": 1,
+          "15": 1,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 1,
+          "7": 2,
+          "8": 2,
+          "9": 1
+        },
+        "stops": [
+          {
+            "checkpoint": {
+              "file_sha256": "a24f44dbb56681562669ee06b87b85dbd96e0a7eb187c5db297cffcf0a6a52f6",
+              "hash": "3e073b9c6e0cdeb0a41f8fffb7b6c3159ce6bc01",
+              "offset": 369
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003646,
+            "pid": 1895372,
+            "reader_start": 1,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141109172
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "424814fd887aea0b3010dc8875f13d6e2ff6bdb30ed2a6371e3cf0d5b1ff37b2",
+              "hash": "6ce754404a9c6d3b194d8f16ed9bb7f292e83f5b",
+              "offset": 738
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003674,
+            "pid": 1895412,
+            "reader_start": 2,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141109635
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "424814fd887aea0b3010dc8875f13d6e2ff6bdb30ed2a6371e3cf0d5b1ff37b2",
+              "hash": "6ce754404a9c6d3b194d8f16ed9bb7f292e83f5b",
+              "offset": 738
+            },
+            "checkpoint_exact_eof": false,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.001448,
+            "pid": 1895439,
+            "reader_start": 3,
+            "requested_signal": "SIGKILL",
+            "returncode": -9,
+            "signal_sent": true,
+            "start_ticks": 141110097
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "ef958d1bc56d161496037ab89efe6200e9af30d17bd303e085b7089a2d1cc70b",
+              "hash": "2d70b28d26a9be7b9697f2efdf394c69f79ae2d1",
+              "offset": 1355
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003765,
+            "pid": 1895466,
+            "reader_start": 4,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141110369
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "ef33d7fce821702767a32a511c3348d6e1fcfe57972159a2bf3f6826ba3008af",
+              "hash": "55a00ddb2fea33944550499558e3e4ede9d34a00",
+              "offset": 1479
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.003741,
+            "pid": 1895520,
+            "reader_start": 5,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141110834
+          },
+          {
+            "checkpoint": {
+              "file_sha256": "37158bc54f91378be71310199c1650de239dbced1256a5bc88685b5428f4aaae",
+              "hash": "1c6dd62327792e40b1de8df59e24ffb9777d85de",
+              "offset": 1603
+            },
+            "checkpoint_exact_eof": true,
+            "cleanup_forced": false,
+            "elapsed_seconds": 0.00381,
+            "pid": 1895547,
+            "reader_start": 6,
+            "requested_signal": "SIGTERM",
+            "returncode": 1,
+            "signal_sent": true,
+            "start_ticks": 141111297
+          }
+        ]
+      }
+    ],
+    "source_result_path": "/var/tmp/capstone-sequential-20261014/step3/raw-restart/run-01/result.json",
+    "source_result_sha256": "1b20dee9c3282a104bbf62ae9cfde509bc655bc97188bec01e6d7b4e32b72b88",
+    "source_sha256": {
+      "run-probe-a.py": "4886142c41408978438cdee641ba50c2e6eb27fee119e743802a176fd5d9ea83",
+      "wazuh-isolated.sh": "a9001ac1fb2755dcb94409817d44038665fbfb0c508469e0a428747cef6593cd"
+    },
+    "status": "completed_observations"
+  }
+}

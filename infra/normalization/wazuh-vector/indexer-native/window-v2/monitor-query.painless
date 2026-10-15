@@ -1,0 +1,22 @@
+// Producer marker/leaf retain the v1 trust boundary. One docvalue is not proof
+// of scalar original JSON. Only exactly representable microsecond times enter.
+try {
+    for (String suffix : params.single_fields) {
+        String field = 'data.capstone_norm.' + suffix;
+        if (!doc.containsKey(field) || doc[field].size() != 1) return false;
+    }
+    if (!doc.containsKey('agent.id') || doc['agent.id'].size() != 1 ||
+        !doc.containsKey('location') || doc['location'].size() != 1 ||
+        !doc.containsKey('rule.id') || doc['rule.id'].size() != 1) return false;
+    long endMs = Long.parseLong(params.period_end);
+    if (endMs < 300000 || endMs > 9223372036854775L) return false;
+    def instant = ZonedDateTime.parse(doc['data.capstone_norm.event_time_kst'].value).toInstant();
+    long seconds = instant.getEpochSecond();
+    if (seconds < 0 || seconds > 9223372036853L || instant.getNano() % 1000 != 0) return false;
+    long eventUs = seconds * 1000000L + instant.getNano() / 1000;
+    long endUs = endMs * 1000L;
+    long port = Long.parseLong(doc['data.capstone_norm.destination_port'].value.toString());
+    return eventUs >= endUs - 300000000L && eventUs <= endUs && port >= 1 && port <= 65535;
+} catch (Exception e) {
+    return false;
+}

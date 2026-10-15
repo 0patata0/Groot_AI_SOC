@@ -1,0 +1,72 @@
+{
+  "validated_at": "2026-10-14T06:07:44+09:00",
+  "scope": "A existing native tools with synthetic fake journalctl only",
+  "candidate_status": "prepared_not_operationally_executed",
+  "suite": "native_previous_boot_synthetic",
+  "passed": 25,
+  "failed": 0,
+  "bash_syntax": "passed_four_scripts",
+  "tools": {
+    "bash": "5.2.21(1)-release x86_64-pc-linux-gnu",
+    "jq": "1.7",
+    "coreutils": "9.4",
+    "systemd": "255.4-1ubuntu8.17"
+  },
+  "source_sha256": {
+    "export-previous-boot.sh": "b79f7554265f2fe935f2ce9896f21d3ac99513e42d38662de4765ced07ef3839",
+    "history-lib.sh": "64300f6de6bf5ee71066ef4368b64b041e6399a28827fc963b7349f1b7644ee5",
+    "history-run.sh": "d900dfdcf4847074c889bc53ffa915ccbe46dd72c0617e61802dab0c6736dac0",
+    "validate-records.jq": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9",
+    "test-native.sh": "c14e9a63e4e5b9bcb7eb8f1d4da6ff32abfe22b1af1e34c5ebe9222ffa81d7e2"
+  },
+  "cases": [
+    "short_batch_exhausted",
+    "1000_of_1001_complete_batch_not_exhausted",
+    "exact_1000_exhausted",
+    "repeat_no_producer_call",
+    "tampered_completed_payload_refused",
+    "timeout_preserved_partial",
+    "producer_failure_preserved_partial",
+    "producer_sigpipe_preserved_partial",
+    "first_cursor_nearest_substitute_refused",
+    "last_cursor_nearest_substitute_refused",
+    "truncated_json_partial",
+    "missing_final_lf_partial",
+    "wrong_transport_partial",
+    "wrong_boot_partial",
+    "record_after_fixed_cutoff_partial",
+    "duplicate_cursor_partial",
+    "verification_bytes_share_capture_budget",
+    "buffered_producer_exit_zero_overflow_partial",
+    "real_32MiB_cap_preserved",
+    "overflow_producer_exit141_consumer_exit0_distinguished",
+    "partial_retry_keeps_both_attempts",
+    "empty_range_unproven_partial",
+    "public_output_directory_refused",
+    "symlink_output_directory_refused",
+    "stdout_has_no_raw_marker_or_cursor"
+  ],
+  "production_journal_read": false,
+  "production_export_executed": false,
+  "production_checkpoint_changed": false,
+  "services_changed": false,
+  "remote_transfer_or_reinjection": false,
+  "packages_installed": false,
+  "mac_raw_payload_exported": false,
+  "mac_python_bytecode_created": false,
+  "temporary_fixture_cleanup": "test EXIT trap removes its own synthetic data directory",
+  "staging_cleanup_owner": "parent final cleanup",
+  "remaining_staging": [
+    "A:/var/tmp/capstone-indexer-20261014/history-candidate/history",
+    "Mac:/private/tmp/capstone-indexer-20261014.68sog8hh/history-test-a.sh"
+  ],
+  "limitations": [
+    "15 seconds is shared capture and JSON-validation budget; final hashing, manifest and fsync may take longer",
+    "Power loss, actual fsync failure and real journal cursor seek were not exercised",
+    "Complete batch is not recovery of the entire previous boot or proof of a known missing ACK boundary",
+    "Surviving first and last cursors do not prove that no intermediate journal file was vacuumed",
+    "Source EOF is only for the selected kernel boot and fixed cutoff",
+    "Unexpected I/O failure or SIGKILL can leave a partial directory without a complete manifest",
+    "No B receipt, replay, correlation, daemon, timer or LLM execution privilege was added"
+  ]
+}

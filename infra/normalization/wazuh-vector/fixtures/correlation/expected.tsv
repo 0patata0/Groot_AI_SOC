@@ -1,0 +1,25 @@
+# name|location-kind|expected ordered rule IDs (empty means no custom match)
+repeat-suricata|ready|100210 100210 100210 100210 100220
+repeat-nftables|ready|100211 100211 100211 100211 100221
+duplicate-current|ready|100210 100210 100210 100210 100210
+duplicate-history-limitation|ready|100210 100210 100210 100210 100220
+cross-suricata-nft|ready|100210 100230
+cross-nft-suricata|ready|100211 100231
+different-direction|ready|100210 100211
+different-service|ready|100210 100211
+different-source|ready|100210 100211
+different-sensor|ready|100210 100200
+historical|ready|100200 100200 100200 100200 100200
+future|ready|100200 100200 100200 100200 100200
+protected|ready|100200 100200 100200 100200 100200
+ineligible|ready|100200 100200 100200 100200 100200
+missing-key|ready|100200
+missing-time-class|ready|100200
+processing-time-only|ready|100210 100210 100210 100210 100220
+raw-isolation|ready|100110 100211
+canary-repeat|canary|100291 100291 100291 100291 100293
+canary-cross|canary|100291 100294
+canary-wrong-ip|canary|
+canary-production-location|ready|100200
+canary-repeat-duplicate|canary|100291 100291 100291 100291 100291
+canary-historical|canary|

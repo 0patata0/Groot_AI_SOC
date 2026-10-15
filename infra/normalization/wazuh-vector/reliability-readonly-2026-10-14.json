@@ -1,0 +1,63 @@
+{
+  "observed_date_kst": "2026-10-14",
+  "a_observed_time_kst": "04:44:36",
+  "method": "read-only live metadata; no operational replay/transfer/configuration mutation",
+  "a": {
+    "vector": "0.59.0",
+    "systemd": "255.4-1ubuntu8.17",
+    "raw_copytruncate": true,
+    "raw_rotate_count": 14,
+    "raw_maxsize": "500M",
+    "raw_suricata_and_waf_globs_present": true,
+    "file_fingerprint": "device_and_inode",
+    "file_read_from": "beginning",
+    "journal_current_boot_only": true,
+    "journal_since_now": true,
+    "journal_emit_cursor": true,
+    "persistent_journal_directory": true,
+    "retained_boots": 10,
+    "explicit_journald_storage_limits": {},
+    "agent_buffer_enabled": true,
+    "agent_buffer_queue_size": 5000,
+    "agent_buffer_events_per_second": 500,
+    "vector_active": true,
+    "wazuh_agent_active": true,
+    "rsync": "3.2.7",
+    "rsync_fsync_option": true
+  },
+  "b": {
+    "filebeat": "7.10.2",
+    "filebeat_explicit_queue_keys": [],
+    "rsync": "3.2.7",
+    "rsync_fsync_option": true,
+    "native_tools_present": [
+      "rsync",
+      "curl",
+      "jq",
+      "sync",
+      "sha256sum"
+    ]
+  },
+  "not_proven": [
+    "A-to-B restricted SSH authentication path",
+    "previous-boot complete missing-event boundary",
+    "new durable remote artifact implementation",
+    "raw writer plus both operational reader rotation transition",
+    "Wazuh per-event durable delivery acknowledgement",
+    "power-loss end-to-end recovery"
+  ],
+  "changes": {
+    "operating_files": false,
+    "services": false,
+    "raw_data_to_mac": false,
+    "new_packages": false,
+    "permanent_python_services": false
+  },
+  "temporary_local_files": [
+    "inspect-reliability-a.sh",
+    "inspect-reliability-b.sh",
+    "inspect-rsync-versions.sh"
+  ],
+  "remote_temporary_files_created": false,
+  "temporary_local_files_status": "owned scripts removed after metadata evidence saved; parent remote helper preserved"
+}

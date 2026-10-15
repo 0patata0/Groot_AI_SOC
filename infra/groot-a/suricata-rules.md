@@ -1,6 +1,10 @@
 # Suricata IPS 룰셋 (ET Open) — 반입 기록
 
+> **2026-10-13 19:54 최신 확인:** SID 1000000의 고정 Ollama 흐름 목적지를 `[211.170.162.110,211.170.162.111]:11434/TCP`·rev 2로 갱신해 기존 선택 6종 예외를 `.111`에도 적용했다. 원본 출발지 `192.168.16.230`·기존 guard·ET 원본을 유지했고 전체 검사와 기존/후보 각각 27개 PCAP 사례를 통과했다. 부분 편집의 실제 카드 승인 후 같은 컨테이너가 재시작했고 19:50:41 실제 로드 52,497·실패/skip 0, local SHA `82f41d65…`·all `8669bab4…`를 확인했다. 아래 `.110` 단독·이전 해시 설명은 당시 기록이다. [현재 룰](../../new_rule/GROOT_A_local.rules) · [회귀 검사 생성기](../mcp/validate_dgx_endpoint_transition.py).
+
 > **현재 로딩 경로(2026-10-08 SSH·배포 기록):** A의 `/home/groot_a/capstone/suricata/ruleset/`을 컨테이너 `/rules`로 마운트하고, `suricata.rules`(ET)+`GROOT_A_local.rules`(로컬 SID 11개)를 합친 `all.rules`를 `-S /rules/all.rules`로 로드한다. 아래 스테이징·반입 절차는 9/26 기록이며 현재 로딩 경로와 다르다. ET 갱신 때에는 운영 합본 재작성·구문 검사·리로드까지 검증해야 한다. 배포된 승인형 `rule-a`는 로컬 룰 변경용이며 ET 자동 갱신 기능은 아니다. 실제 승인→적용 E2E는 미검증이다. [현재 운영 문서](README.md) · [승인형 변경 대상](../mcp/rule-change-deploy.md).
+
+> **2026-10-13 13:18 후속:** 자체 로컬 SID 12개와 ET `2034806/2034802`의 정확한 local override(rev 3)를 운영 합본에 반영했다. ET 원본은 불변이고 로드 카운터 52,497·실패/skip 0이다. 카운터에는 같은 SID의 높은 rev로 대체된 두 정의도 포함된다. 현재 `-S` 실행에서는 hot reload가 거부돼 승인형 worker가 기존 컨테이너를 재시작하고 실제 로드 시각·룰 통계를 검증한다. 이번 지정 승인→자동 적용 E2E는 확인했고 실제 실패 복구는 미검증이다. **ET를 갱신할 때는 두 override를 새 원본과 대조해 guard 추가·rev+1만 한 파생본으로 재생성하고, 합본/회귀 검사와 승인 후 재시작까지 검증해야 한다.** ET 원본만 교체하거나 기존 override를 그대로 재사용하지 않는다. 최신 local SHA `cabbac45…`, all `ea160e90…`; [검증·복구 기록](../../대화기록/2026-10-13.md).
 
 Suricata 8.0.6(jasonish/suricata:latest)용 **ET Open** 룰셋. 이 망은 outbound 웹 차단이라 `suricata-update` 온라인 갱신 불가 → **오프라인 반입**.
 

@@ -1,0 +1,107 @@
+[[tests]]
+name = "correlation_fresh"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"fresh\")\nassert_eq!(.capstone_norm.correlation_eligible, true)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_120sec"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:02:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"fresh\")\nassert_eq!(.capstone_norm.correlation_eligible, true)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_historical"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:02:00.001+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"historical\")\nassert_eq!(.capstone_norm.correlation_eligible, false)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_future"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T01:59:54.999+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"future\")\nassert_eq!(.capstone_norm.correlation_eligible, false)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_protected"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": true}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"fresh\")\nassert_eq!(.capstone_norm.correlation_eligible, false)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_bad_ip"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"bad\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"fresh\")\nassert_eq!(.capstone_norm.correlation_eligible, false)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_quality"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [\"port_invalid\"], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"fresh\")\nassert_eq!(.capstone_norm.correlation_eligible, false)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_non_transport"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"icmp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"fresh\")\nassert_eq!(.capstone_norm.correlation_eligible, false)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"
+
+[[tests]]
+name = "correlation_nft_cursor"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"nftables\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.correlation_time_class, \"fresh\")\nassert_eq!(.capstone_norm.correlation_eligible, true)\nassert_eq!(length(string!(.capstone_norm.correlation_dedupe_key)), 64)"

@@ -1,0 +1,374 @@
+[
+  {
+    "name": "Operator connects Vector shadow input to Wazuh on A",
+    "hosts": "local",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "candidate_dir": "/var/lib/capstone-automation/ansible/wazuh-vector-candidate",
+      "rule_path": "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/capstone_vector_rules.xml"
+    },
+    "tasks": [
+      {
+        "name": "Require fixed local root operator and reviewed host",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '096e90b6243e438aa8a7b392be754732'",
+            "ansible_version.full is version('2.21', '>=')",
+            "ansible_version.full is version('2.22', '<')"
+          ]
+        }
+      },
+      {
+        "name": "Snapshot existing approval boundary",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/usr/local/sbin/rule-change-executor",
+          "/opt/rule-change/rule_change_mcp.py",
+          "/opt/rule-change/run-rule-change.sh",
+          "/etc/rule-change/config.json",
+          "/etc/sudoers.d/capstone-rule-change",
+          "/etc/systemd/system/rule-change-worker.service",
+          "/etc/systemd/system/rule-change-worker.timer"
+        ],
+        "register": "boundary_before",
+        "no_log": true
+      },
+      {
+        "name": "Inspect private candidate directory",
+        "ansible.builtin.stat": {
+          "path": "{{ candidate_dir }}",
+          "follow": false
+        },
+        "register": "candidate_before"
+      },
+      {
+        "name": "Reject replaced candidate directory",
+        "ansible.builtin.assert": {
+          "that": [
+            "not candidate_before.stat.exists or (candidate_before.stat.isdir and not candidate_before.stat.islnk and candidate_before.stat.uid == 0)"
+          ]
+        }
+      },
+      {
+        "name": "Create private candidate directory",
+        "ansible.builtin.file": {
+          "path": "{{ candidate_dir }}",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Inspect fixed manual canary paths",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false
+        },
+        "loop": [
+          "/var/log/capstone-vector",
+          "/var/log/capstone-vector/canary",
+          "/var/log/capstone-vector/canary/normalized.jsonl"
+        ],
+        "register": "canary_paths"
+      },
+      {
+        "name": "Require installed Vector directory and safe canary destinations",
+        "ansible.builtin.assert": {
+          "that": [
+            "canary_paths.results[0].stat.isdir | default(false)",
+            "canary_paths.results[0].stat.uid == 0",
+            "not canary_paths.results[0].stat.islnk",
+            "not canary_paths.results[1].stat.exists or (canary_paths.results[1].stat.isdir and not canary_paths.results[1].stat.islnk and canary_paths.results[1].stat.uid == 0)",
+            "not canary_paths.results[2].stat.exists or (canary_paths.results[2].stat.isreg and not canary_paths.results[2].stat.islnk and canary_paths.results[2].stat.uid == 0 and canary_paths.results[2].stat.nlink == 1)"
+          ]
+        }
+      },
+      {
+        "name": "Create root-only manual canary directory",
+        "ansible.builtin.file": {
+          "path": "/var/log/capstone-vector/canary",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Create or preserve root-only canary input without truncation",
+        "ansible.builtin.file": {
+          "path": "/var/log/capstone-vector/canary/normalized.jsonl",
+          "state": "touch",
+          "owner": "0",
+          "group": "0",
+          "mode": "0600",
+          "access_time": "preserve",
+          "modification_time": "preserve"
+        }
+      },
+      {
+        "name": "Inspect preinstalled evidence paths without following links",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false
+        },
+        "loop": [
+          "/var/log/capstone-vector/evidence",
+          "/var/log/capstone-vector/evidence/normalized.jsonl"
+        ],
+        "register": "evidence_paths"
+      },
+      {
+        "name": "Require root managed evidence output before attaching input",
+        "ansible.builtin.assert": {
+          "that": [
+            "evidence_paths.results[0].stat.isdir | default(false)",
+            "evidence_paths.results[0].stat.uid == 0",
+            "not evidence_paths.results[0].stat.islnk",
+            "evidence_paths.results[1].stat.isreg | default(false)",
+            "evidence_paths.results[1].stat.uid == 0",
+            "not evidence_paths.results[1].stat.islnk",
+            "evidence_paths.results[1].stat.nlink == 1",
+            "evidence_paths.results[0].stat.gid == 0",
+            "evidence_paths.results[0].stat.mode == '0700'",
+            "evidence_paths.results[1].stat.gid == 0",
+            "evidence_paths.results[1].stat.mode == '0600'"
+          ]
+        }
+      },
+      {
+        "name": "Inspect live agent config without following links",
+        "ansible.builtin.stat": {
+          "path": "/var/ossec/etc/ossec.conf",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "agent_before"
+      },
+      {
+        "name": "Require existing regular agent configuration",
+        "ansible.builtin.assert": {
+          "that": [
+            "agent_before.stat.exists",
+            "agent_before.stat.isreg",
+            "not agent_before.stat.islnk",
+            "agent_before.stat.uid == 0",
+            "agent_before.stat.gid == 110",
+            "agent_before.stat.mode == '0660'"
+          ]
+        }
+      },
+      {
+        "name": "Read existing config privately to avoid duplicate localfile",
+        "ansible.builtin.slurp": {
+          "src": "/var/ossec/etc/ossec.conf"
+        },
+        "register": "agent_original",
+        "no_log": true
+      },
+      {
+        "name": "Reject an unmanaged duplicate normalized input",
+        "ansible.builtin.assert": {
+          "that": [
+            "((agent_original.content | b64decode) | regex_findall('<!-- BEGIN CAPSTONE VECTOR INPUT -->') | length) <= 1",
+            "((agent_original.content | b64decode) | regex_findall('<!-- BEGIN CAPSTONE VECTOR INPUT -->') | length) == ((agent_original.content | b64decode) | regex_findall('<!-- END CAPSTONE VECTOR INPUT -->') | length)",
+            "'/var/log/capstone-vector/ready/normalized.jsonl' not in ((agent_original.content | b64decode) | regex_replace('(?s)<!-- BEGIN CAPSTONE VECTOR INPUT -->.*?<!-- END CAPSTONE VECTOR INPUT -->', ''))",
+            "'/var/log/capstone-vector/canary/normalized.jsonl' not in ((agent_original.content | b64decode) | regex_replace('(?s)<!-- BEGIN CAPSTONE VECTOR INPUT -->.*?<!-- END CAPSTONE VECTOR INPUT -->', ''))",
+            "'/var/log/capstone-vector/evidence/normalized.jsonl' not in ((agent_original.content | b64decode) | regex_replace('(?s)<!-- BEGIN CAPSTONE VECTOR INPUT -->.*?<!-- END CAPSTONE VECTOR INPUT -->', ''))"
+          ]
+        },
+        "no_log": true
+      },
+      {
+        "name": "Stage the complete current config privately",
+        "ansible.builtin.copy": {
+          "src": "/var/ossec/etc/ossec.conf",
+          "remote_src": true,
+          "dest": "{{ candidate_dir }}/ossec.conf",
+          "owner": "0",
+          "group": "0",
+          "mode": "0600"
+        },
+        "no_log": true,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Append one dedicated reviewed ossec_config block to candidate",
+        "ansible.builtin.blockinfile": {
+          "path": "{{ candidate_dir }}/ossec.conf",
+          "marker": "<!-- {mark} CAPSTONE VECTOR INPUT -->",
+          "insertafter": "EOF",
+          "block": "{{ lookup('ansible.builtin.file', playbook_dir + '/agent-localfile.xml') }}",
+          "validate": "/var/ossec/bin/wazuh-logcollector -t -c %s"
+        },
+        "no_log": true,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Validate complete candidate using installed logcollector",
+        "ansible.builtin.command": {
+          "argv": [
+            "/var/ossec/bin/wazuh-logcollector",
+            "-t",
+            "-c",
+            "{{ candidate_dir }}/ossec.conf"
+          ]
+        },
+        "changed_when": false,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Install validated agent input and recover on restart failure",
+        "when": "not ansible_check_mode",
+        "block": [
+          {
+            "name": "Recheck agent config immediately before installation",
+            "ansible.builtin.stat": {
+              "path": "/var/ossec/etc/ossec.conf",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "agent_preinstall"
+          },
+          {
+            "name": "Reject concurrent agent configuration changes",
+            "ansible.builtin.assert": {
+              "that": [
+                "agent_preinstall.stat.exists",
+                "agent_preinstall.stat.isreg",
+                "not agent_preinstall.stat.islnk",
+                "agent_before.stat.checksum == agent_preinstall.stat.checksum",
+                "agent_before.stat.uid == agent_preinstall.stat.uid",
+                "agent_before.stat.gid == agent_preinstall.stat.gid",
+                "agent_before.stat.mode == agent_preinstall.stat.mode"
+              ]
+            }
+          },
+          {
+            "name": "Atomically install candidate with original owner and backup",
+            "ansible.builtin.copy": {
+              "src": "{{ candidate_dir }}/ossec.conf",
+              "remote_src": true,
+              "dest": "/var/ossec/etc/ossec.conf",
+              "owner": "0",
+              "group": "110",
+              "mode": "0660",
+              "backup": true,
+              "validate": "/var/ossec/bin/wazuh-logcollector -t -c %s"
+            },
+            "register": "agent_install",
+            "no_log": true
+          },
+          {
+            "name": "Restart only existing agent if its configuration changed",
+            "ansible.builtin.systemd_service": {
+              "name": "wazuh-agent.service",
+              "state": "restarted"
+            },
+            "when": "agent_install.changed"
+          },
+          {
+            "name": "Verify agent active",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/bin/systemctl",
+                "is-active",
+                "--quiet",
+                "wazuh-agent.service"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Check required agent processes",
+            "ansible.builtin.command": {
+              "argv": [
+                "/var/ossec/bin/wazuh-control",
+                "status"
+              ]
+            },
+            "register": "agent_status",
+            "changed_when": false,
+            "failed_when": false,
+            "until": "'wazuh-agentd is running' in agent_status.stdout and 'wazuh-logcollector is running' in agent_status.stdout",
+            "retries": 10,
+            "delay": 2
+          }
+        ],
+        "rescue": [
+          {
+            "name": "Restore previous config after failed application",
+            "ansible.builtin.copy": {
+              "src": "{{ agent_install.backup_file }}",
+              "remote_src": true,
+              "dest": "/var/ossec/etc/ossec.conf",
+              "owner": "0",
+              "group": "110",
+              "mode": "0660"
+            },
+            "when": "agent_install is defined and agent_install.backup_file is defined",
+            "no_log": true
+          },
+          {
+            "name": "Restart agent with restored config",
+            "ansible.builtin.systemd_service": {
+              "name": "wazuh-agent.service",
+              "state": "restarted"
+            },
+            "when": "agent_install is defined and agent_install.changed | default(false)"
+          },
+          {
+            "name": "Report recovered deployment failure",
+            "ansible.builtin.fail": {
+              "msg": "Agent input deployment failed; previous configuration restored when changed. Inspect native service health."
+            }
+          }
+        ]
+      },
+      {
+        "name": "Recheck unchanged approval boundary",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/usr/local/sbin/rule-change-executor",
+          "/opt/rule-change/rule_change_mcp.py",
+          "/opt/rule-change/run-rule-change.sh",
+          "/etc/rule-change/config.json",
+          "/etc/sudoers.d/capstone-rule-change",
+          "/etc/systemd/system/rule-change-worker.service",
+          "/etc/systemd/system/rule-change-worker.timer"
+        ],
+        "register": "boundary_after",
+        "no_log": true
+      },
+      {
+        "name": "Require identical approval files and permissions",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.0.stat.exists == item.1.stat.exists",
+            "(item.0.stat.checksum | default('')) == (item.1.stat.checksum | default(''))",
+            "(item.0.stat.uid | default(-1)) == (item.1.stat.uid | default(-1))",
+            "(item.0.stat.gid | default(-1)) == (item.1.stat.gid | default(-1))",
+            "(item.0.stat.mode | default('')) == (item.1.stat.mode | default(''))"
+          ]
+        },
+        "loop": "{{ boundary_before.results | zip(boundary_after.results) | list }}",
+        "no_log": true
+      }
+    ]
+  }
+]

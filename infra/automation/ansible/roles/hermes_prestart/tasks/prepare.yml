@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Read full original baseline privately",
+    "ansible.builtin.include_tasks": "observe.yml"
+  },
+  {
+    "name": "Record existing actual MCP connectivity before any create",
+    "ansible.builtin.include_tasks": "mcp.yml",
+    "vars": {
+      "hp_mcp_id": "{{ hp_old }}"
+    }
+  },
+  {
+    "name": "Persist original baseline and private create environment",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "init",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ],
+      "stdin": "{{ hp_observation | combine({'mcp':hp_mcp_result.stdout | from_json}) | to_json }}",
+      "stdin_add_newline": true
+    },
+    "changed_when": true,
+    "no_log": true,
+    "timeout": 30
+  },
+  {
+    "name": "Create then guard without starting",
+    "ansible.builtin.include_tasks": "action.yml",
+    "loop": [
+      "create",
+      "install"
+    ],
+    "loop_control": {
+      "loop_var": "hp_action"
+    }
+  }
+]

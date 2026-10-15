@@ -1,0 +1,209 @@
+# Vector 0.59.0. Run from /etc/capstone-vector; see README before activation.
+data_dir = "/var/lib/capstone-vector"
+timezone = "Asia/Seoul"
+
+[acknowledgements]
+enabled = true
+
+[sources.suricata_eve]
+type = "file"
+include = ["${SURICATA_EVE_PATH}"]
+# Every newly discovered rotated inode must start at byte zero. First deployment
+# therefore backfills the current file; correlation stays disabled until caught up.
+read_from = "beginning"
+ignore_checkpoints = false
+max_line_bytes = 1048576
+max_read_bytes = 262144
+file_key = "source_file"
+offset_key = "source_offset"
+fingerprint.strategy = "device_and_inode"
+
+[sources.waf_audit]
+type = "file"
+include = ["${WAF_AUDIT_PATH}"]
+read_from = "beginning"
+ignore_checkpoints = false
+max_line_bytes = 1048576
+max_read_bytes = 262144
+file_key = "source_file"
+offset_key = "source_offset"
+fingerprint.strategy = "device_and_inode"
+
+[sources.kernel_journal]
+type = "journald"
+# systemd 255 on A: Vector rejects all-boots follow on systemd 250..257.
+# Previous boots are preserved by the separate history-auto service; no automatic reinjection.
+current_boot_only = true
+since_now = true
+emit_cursor = true
+batch_size = 16
+include_matches._TRANSPORT = ["kernel"]
+
+[transforms.suricata_normalize]
+type = "remap"
+inputs = ["suricata_eve"]
+file = "transforms/suricata.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[transforms.suricata_alerts]
+type = "filter"
+inputs = ["suricata_normalize"]
+condition = '.capstone_norm.source == "suricata"'
+
+[transforms.nft_select]
+type = "filter"
+inputs = ["kernel_journal"]
+condition = '''match(string(.message) ?? "", r'^(AGENT_BLOCK|FW_DROP_IN|FW_DROP_OUT|FW_DROP_FWD|FW_SHADOW_OUT|FW_SSH_RATE|SPOOF)\s')'''
+
+[transforms.nft_normalize]
+type = "remap"
+inputs = ["nft_select"]
+file = "transforms/nftables.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[transforms.waf_audit_guard]
+type = "remap"
+inputs = ["waf_audit"]
+file = "transforms/waf_json_guard.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[transforms.waf_audit_context]
+type = "remap"
+inputs = ["waf_audit_guard"]
+file = "transforms/waf_audit_context.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[transforms.waf_ready]
+type = "filter"
+inputs = ["waf_audit_context"]
+condition = '.capstone_norm.source == "modsecurity"'
+
+[transforms.correlation_metadata]
+type = "remap"
+inputs = ["suricata_alerts", "nft_normalize", "waf_ready"]
+file = "transforms/correlation.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[sinks.normalized]
+type = "file"
+inputs = ["correlation_metadata"]
+path = "/var/log/capstone-vector/ready/normalized.jsonl"
+encoding.codec = "json"
+buffer.type = "disk"
+buffer.max_size = 268435488
+buffer.when_full = "block"
+
+# Only the already-qualified security subset is observable in the Indexer lane.
+# The original ready branch keeps its bytes/fields and no_log behavior.
+[transforms.evidence_select]
+type = "filter"
+inputs = ["correlation_metadata"]
+condition = '''
+.capstone_norm.schema_version == "vector-1" && .capstone_norm.pipeline == "vector" &&
+includes(["suricata", "nftables"], .capstone_norm.source) &&
+.capstone_norm.correlation_eligible == true && .capstone_norm.correlation_time_class == "fresh" &&
+.capstone_norm.protected_asset == false && .capstone_norm.quality_flags == []
+'''
+
+[transforms.evidence_marker]
+type = "remap"
+inputs = ["evidence_select"]
+source = '.capstone_norm.evidence_lane = "indexer-observation-v1"'
+
+[sinks.evidence]
+type = "file"
+inputs = ["evidence_marker"]
+path = "/var/log/capstone-vector/evidence/normalized.jsonl"
+encoding.codec = "json"
+# Three disk buffers total 805306464 configured bytes (~768MiB); output files
+# and allocation overhead are additional. A stalled evidence sink can block
+# the shared source/ready flow. Numeric health covers this sink too.
+buffer.type = "disk"
+buffer.max_size = 268435488
+buffer.when_full = "block"
+
+[sinks.quarantine]
+type = "file"
+inputs = ["suricata_normalize.dropped", "nft_normalize.dropped", "waf_audit_guard.dropped", "waf_audit_context.dropped", "correlation_metadata.dropped"]
+path = "/var/log/capstone-vector/quarantine/quarantine.jsonl"
+encoding.codec = "json"
+buffer.type = "disk"
+buffer.max_size = 268435488
+buffer.when_full = "block"
+
+# Internal numeric telemetry; no raw internal_logs source.
+[sources.collection_metrics]
+type = "internal_metrics"
+scrape_interval_secs = 60
+tags.host_key = ""
+tags.pid_key = "vector_pid"
+
+[transforms.collection_metrics_select]
+type = "filter"
+inputs = ["collection_metrics"]
+condition = '''
+.name == "uptime_seconds" || (includes(["suricata_eve", "waf_audit", "kernel_journal", "normalized", "quarantine", "evidence"], .tags.component_id) &&
+includes(["component_errors_total", "component_discarded_events_total", "files_unwatched_bytes_unread_total", "files_unwatched_with_unknown_bytes_total", "buffer_size_bytes", "buffer_size_events", "buffer_discarded_events_total"], .name))
+'''
+
+[transforms.collection_metrics_to_log]
+type = "metric_to_log"
+inputs = ["collection_metrics_select"]
+
+[transforms.collection_health_metadata]
+type = "remap"
+inputs = ["collection_metrics_to_log"]
+drop_on_error = true
+drop_on_abort = true
+source = '''
+raw_value = if exists(.counter.value) { .counter.value } else { .gauge.value }
+assert!(is_integer(raw_value) || is_float(raw_value), "collection_metric_not_numeric")
+value = to_float!(raw_value)
+assert!(value >= 0.0, "collection_metric_negative")
+metric_name = string!(.name)
+component = if metric_name == "uptime_seconds" { "vector" } else { string!(.tags.component_id) }
+assert!(component == "vector" || includes(["suricata_eve", "waf_audit", "kernel_journal", "normalized", "quarantine", "evidence"], component), "collection_component_invalid")
+assert!(includes(["component_errors_total", "component_discarded_events_total", "files_unwatched_bytes_unread_total", "files_unwatched_with_unknown_bytes_total", "buffer_size_bytes", "buffer_size_events", "buffer_discarded_events_total", "uptime_seconds"], metric_name), "collection_metric_invalid")
+labels = {}
+for_each(["error_code", "error_type", "stage", "intentional", "buffer_type", "reached_eof"]) -> |_i, key| {
+  label = get!(.tags, [key])
+  if label != null {
+    label = string!(label)
+    assert!(length(label) <= 80 && match(label, r'^[A-Za-z0-9_.:-]+$'), "collection_metric_label_invalid")
+    if key == "reached_eof" { assert!(label == "true" || label == "false", "collection_eof_label_invalid") }
+    labels = set!(labels, [key], label)
+  }
+}
+pid = string!(.tags.vector_pid)
+assert!(match(pid, r'^[0-9]{1,10}$'), "collection_metric_pid_invalid")
+collected_time = if is_timestamp(.timestamp) { timestamp!(.timestamp) } else { parse_timestamp!(string!(.timestamp), format: "%+") }
+invocation = get_env_var!("INVOCATION_ID")
+assert!(match(invocation, r'^[a-f0-9]{32}$'), "collection_invocation_invalid")
+. = {"capstone_collection_health": {
+  "schema_version": "1", "metric": metric_name, "component": component,
+  "value": value, "vector_pid": pid, "invocation_id": invocation, "labels": labels,
+  "observed_unix": to_unix_timestamp(collected_time),
+  "observed_at_kst": format_timestamp!(collected_time, format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul")
+}}
+'''
+
+[sinks.collection_health_file]
+type = "file"
+inputs = ["collection_health_metadata"]
+acknowledgements.enabled = false
+path = "/var/log/capstone-vector/telemetry/health.jsonl"
+encoding.codec = "json"
+# Telemetry must not demand a new 256MiB disk buffer or hold security events.
+buffer.type = "memory"
+buffer.max_events = 128
+buffer.when_full = "drop_newest"

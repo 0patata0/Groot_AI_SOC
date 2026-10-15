@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "kind": "readonly_observation_native_fixture_validation",
+  "date_kst": "2026-10-15",
+  "reported_by": "parent_operator_actual_A_execution",
+  "host": "a",
+  "platform": "Linux",
+  "effective_uid": 0,
+  "source_sha256": "8cba4be079fe6b01b1d2382a8d537715b7e6533f3d948707983db613595315a5",
+  "fixture_sha256": "123d9d333440b180c8d6442dd5bf5b790375955f4742b47259eafc15d2b55aea",
+  "tests": {
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0
+  },
+  "private_db_wal_fixture_included": true,
+  "private_db_source_unchanged_assertion_passed": true,
+  "private_db_temporary_cleanup_assertion_passed": true,
+  "fixture_operating_source_access": false,
+  "fixture_docker_or_service_calls": false,
+  "model_calls": 0,
+  "chat_messages_sent": 0,
+  "operational_changes": false,
+  "live_observation_results": "separate_parent_evidence_pending_at_this_record",
+  "limitations": [
+    "The synthetic fixture does not establish live source completeness or activity counts.",
+    "A private stored-timestamp interval is not actual message delivery or approval latency."
+  ],
+  "followup_native_runs": [
+    {
+      "version": "v3",
+      "source_sha256": "09dffd58ec76aef68e0a0dbcc4890a256010f65df2eade22f624e719b7711b6c",
+      "fixture_sha256": "5ddf55e635ed302c5c8b1d485fc2bbaf7a944d9d07c667e141e452f1cb40e8e1",
+      "reported_by": "parent_operator_actual_A_execution",
+      "tests": {
+        "passed": 13,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actual_a_observation": "partial_9_access_v2_rows_rejected",
+      "actual_b_observation": "succeeded_source_pins_and_private_db_original_unchanged"
+    },
+    {
+      "version": "v4",
+      "source_sha256": "b3b4eb5668bd4d8ebd5e332fb99b59a1779ebb60a57d9633e63cc4ede422b27b",
+      "fixture_sha256": "0c028ea106b6a09ad7566face6d9ae9c7c4a0a1c04dabe0748c51278da936507",
+      "reported_by": "parent_operator_actual_A_execution",
+      "tests": {
+        "passed": 15,
+        "failed": 0,
+        "skipped": 0
+      },
+      "actual_a_observation": "observed_subset_invalid_zero",
+      "cutoff_kst": "2026-10-15T09:25:43.386507+09:00"
+    }
+  ],
+  "latest": {
+    "source_version": "v4",
+    "source_sha256": "b3b4eb5668bd4d8ebd5e332fb99b59a1779ebb60a57d9633e63cc4ede422b27b",
+    "native_tests": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    "operational_changes": false,
+    "generated_requests": 0,
+    "model_calls": 0,
+    "chat_messages_sent": 0,
+    "security_or_chat_raw_exported": false,
+    "results": {
+      "imperva": {
+        "path": "results/imperva-2026-10-15.json",
+        "sha256": "5d733627341447623328de8d1bc17547837a31177a9344a3f6a702bd6d5bab01",
+        "source_version": "v4",
+        "cutoff_kst": "2026-10-15T09:25:43.386507+09:00",
+        "coverage_complete_claimed": false
+      },
+      "hermes": {
+        "path": "results/hermes-2026-10-15.json",
+        "sha256": "8046fc13e22a4ce27f4b441cc578a30e03e386be80b74e924ad9ca8b0ccc6733",
+        "source_version": "v3",
+        "cutoff_kst": "2026-10-15T09:22:31.344234+09:00",
+        "coverage_complete_claimed": false
+      }
+    },
+    "interpretation": [
+      "A 24h target access records=4; timed target audit=0 does not prove the full exception predicate or suppression effect.",
+      "A 56 retained target audit rows lack verified offset and remain excluded from the 5h/24h counts.",
+      "B stored interval samples=1 is not an actual delivery/approval duration or a latency distribution.",
+      "B zero guarded journal rows has no complete response denominator and is not a language contamination rate."
+    ]
+  }
+}

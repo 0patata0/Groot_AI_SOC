@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "date_kst": "2026-10-14",
+  "scope": "private Linux synthetic history orchestration; no live journal, runtime install, service or input changes",
+  "native_runs": [
+    {
+      "revision": "initial-30",
+      "result_source": "parent root reported A native execution",
+      "exit_code": 0,
+      "suite": "native_history_auto_synthetic",
+      "passed": 30,
+      "failed": 0,
+      "source_manifest": "native-payload-v1-manifest.json",
+      "source_manifest_sha256": "b7c8fde5f27b982f888a8db177e319d9bb8f3dd7ef81cb3189630a41ae2f5a32",
+      "payload_files": 9,
+      "payload_bytes": 48931,
+      "remote_log": "/var/tmp/capstone-sequential-20261014/step3/step3-history-auto-native/test-native.log",
+      "real_journal_read": false,
+      "production_execution": false
+    },
+    {
+      "revision": "explicit-validation-and-resync-before-job-commit",
+      "result_source": "parent root reported A native execution",
+      "exit_code": 0,
+      "suite": "native_history_auto_synthetic",
+      "passed": 33,
+      "failed": 0,
+      "source_manifest": "native-payload-manifest.json",
+      "source_manifest_sha256": "9b0e4101878c83a2a3795176f9397f47ac0d13f29fd0f3b1e0e5eade8dbdb7c2",
+      "payload_files": 9,
+      "payload_bytes": 51061,
+      "remote_log": "/var/tmp/capstone-sequential-20261014/step3/step3-history-auto-native-v3/test-native.log",
+      "real_journal_read": false,
+      "production_execution": false,
+      "final_source_sha256": {
+        "auto-worker.sh": "cc096d9da2617a58e4517d9073f205d8c191e96387dcef8c8c9d338dbbdcd4af",
+        "auto-lib.sh": "2604d5c6f9a7044f58d2c8c66995bf696d5bbdee69f49c9e48984556d1636ddf",
+        "state.jq": "826ca427ae7a2295fb638c9738d754e49826bcd01cce2765f28ee3d20acc4212",
+        "test-native.sh": "b5b6c10c40f534e27451c789202d6c456f3b03c6be01a5bf6028e4f8e1cb7cba",
+        "history-lib.sh": "64300f6de6bf5ee71066ef4368b64b041e6399a28827fc963b7349f1b7644ee5",
+        "history-run.sh": "d900dfdcf4847074c889bc53ffa915ccbe46dd72c0617e61802dab0c6736dac0",
+        "continuation-lib.sh": "e52c0464fa28c4502a7c1ebaef7cd5c3fcc24642104fca288e8031183aea6379",
+        "continue-run.sh": "dca32656caf0f9ae458ed07e0b86688f550e92a28f14b868b60f944d05180654",
+        "validate-records.jq": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9"
+      }
+    }
+  ],
+  "post_initial_review_fixes": [
+    {
+      "issue": "Recovered completed batch lacked source file/directory resync before publishing job head",
+      "change": "require payload/manifest/batch/store sync success before atomic job update",
+      "regression": "private source-clone sync failure keeps inflight/head null; unmodified retry reuses batch without journal record reread"
+    },
+    {
+      "issue": "Conditional subshell call disables errexit for standalone head manifest SHA comparison",
+      "change": "explicit nonzero returns at validation steps",
+      "regression": "manifest whitespace-only change leaves payload/JSON valid but exact SHA mismatch blocks before more records are read"
+    }
+  ],
+  "final_candidate": {
+    "status": "native_passed",
+    "expected_tests": 33,
+    "source_manifest": "native-payload-manifest.json",
+    "source_manifest_sha256": "9b0e4101878c83a2a3795176f9397f47ac0d13f29fd0f3b1e0e5eade8dbdb7c2",
+    "payload_files": 9,
+    "payload_bytes": 51061,
+    "passed": 33,
+    "failed": 0
+  },
+  "operational_installation": true,
+  "raw_payload_exported": false,
+  "new_packages_installed": false,
+  "local_validation": {
+    "bash_syntax": "passed",
+    "state_schema_valid_sample": "passed",
+    "installer_12_source_pins": "matched"
+  },
+  "operational_installation_evidence": "deployment-2026-10-14.json"
+}

@@ -1,0 +1,172 @@
+{
+  "contract_version": 1,
+  "status": "executed_native_query_and_validator_2026-10-14",
+  "method": "Temporary synthetic index and inline disabled monitor with actions empty; never write fixtures into production files or wazuh-alerts indices",
+  "temporary_index_prefix": "capstone-test-indexer-observation-20261014-",
+  "index_settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mapping": "date_detection=false; timestamp=date; agent.id/location/rule.id and all data.capstone_norm fields used by the query=keyword",
+  "time_base": "B clock immediately before each inline execute, epoch milliseconds; event_time_kst=T-1s; timestamp=T-1s",
+  "default_document": {
+    "agent": {
+      "id": "001"
+    },
+    "location": "/var/log/capstone-vector/evidence/normalized.jsonl",
+    "rule": {
+      "id": "100261"
+    },
+    "data": {
+      "capstone_norm": {
+        "schema_version": "vector-1",
+        "pipeline": "vector",
+        "sensor": "groot-sec",
+        "evidence_lane": "indexer-observation-v1",
+        "source": "suricata",
+        "action": "observed",
+        "correlation_eligible": "true",
+        "correlation_time_class": "fresh",
+        "protected_asset": "false",
+        "correlation_policy": "directional-service-v1",
+        "source_ip": "192.0.2.40",
+        "destination_ip": "198.51.100.80",
+        "destination_port": "443",
+        "protocol": "tcp"
+      }
+    }
+  },
+  "runtime_fields": {
+    "timestamp": "T-1s ISO date",
+    "event_time_kst": "T-1s ISO offset +09:00",
+    "correlation_key": "64 lowercase hex of deterministic synthetic service identity",
+    "correlation_dedupe_key": "64 lowercase hex of deterministic synthetic source/event identity",
+    "event_id": "64 lowercase hex per document",
+    "message_sha256": "64 lowercase hex of synthetic metadata only"
+  },
+  "query_cases": [
+    {
+      "name": "empty",
+      "documents": 0,
+      "match": false,
+      "unavailable": false
+    },
+    {
+      "name": "duplicate_a_a_a_a_b",
+      "documents": 5,
+      "distinct_source_keys": 2,
+      "match": false,
+      "unavailable": false
+    },
+    {
+      "name": "distinct_a_b_c_d_e",
+      "documents": 5,
+      "distinct_source_keys": 5,
+      "match": true,
+      "unavailable": false
+    },
+    {
+      "name": "distinct_six",
+      "documents": 6,
+      "distinct_source_keys": 6,
+      "match": true,
+      "unavailable": false
+    },
+    {
+      "name": "same_service_cross_source",
+      "documents": 2,
+      "sources": [
+        "suricata",
+        "nftables"
+      ],
+      "match": true,
+      "unavailable": false
+    },
+    {
+      "name": "different_service_cross_source",
+      "documents": 2,
+      "sources": [
+        "suricata",
+        "nftables"
+      ],
+      "services": 2,
+      "match": false,
+      "unavailable": false
+    },
+    {
+      "name": "retransmit_distinct_five",
+      "documents": 20,
+      "distinct_source_keys": 5,
+      "match": true,
+      "unavailable": false
+    },
+    {
+      "name": "services_100",
+      "documents": 100,
+      "services": 100,
+      "match": false,
+      "unavailable": false
+    },
+    {
+      "name": "services_101",
+      "documents": 101,
+      "services": 101,
+      "match": false,
+      "unavailable": true
+    },
+    {
+      "name": "documents_10000_one_key",
+      "documents": 10000,
+      "distinct_source_keys": 1,
+      "match": false,
+      "unavailable": false
+    },
+    {
+      "name": "documents_10001_one_key",
+      "documents": 10001,
+      "distinct_source_keys": 1,
+      "match": false,
+      "unavailable": true
+    }
+  ],
+  "query_rejection_cases": [
+    "event older than 60s with still-fresh label",
+    "future event later than periodEnd",
+    "processing timestamp older than 120s",
+    "invalid date or missing required field",
+    "missing/wrong producer marker or correlation policy",
+    "wrong agent or ready/canary/unrelated location",
+    "source mismatched to rule.id",
+    "nftables action other than logged_drop",
+    "protected source or destination .110/.111",
+    "destination port zero or 65536",
+    "multiple distinct values in source/key/tuple fields",
+    "invalid 64-hex key"
+  ],
+  "source_type_limit": "A repeated-identical keyword array can have one docvalue and is not rejected by docvalues alone; actual producer validation and Wazuh leaf provenance remain required",
+  "validator_cases_without_inducing_cluster_failure": [
+    "clock end at now-15s/now+5s allowed; beyond either bound unavailable",
+    "old periodEnd unavailable even if fake result contains matching service",
+    "ctx.error present or missing results unavailable",
+    "timed_out=true unavailable",
+    "terminated_early=true unavailable",
+    "failed shard or successful!=total unavailable",
+    "64 successful shards allowed; 65 unavailable",
+    "hits relation gte or 10001 documents unavailable",
+    "service terms omitted documents or 101 buckets unavailable",
+    "malformed bucket/key/count, unsorted or duplicate keys unavailable",
+    "source count sum differs from service count unavailable",
+    "unique-key sum_other_doc_count positive with five returned keys remains available"
+  ],
+  "validator_method": "Use the exact production validation-function prefix in an inline test trigger with a separately constructed synthetic ctx map and Instant.ofEpochMilli. Label this as validator execution, not a real shard failure or query replay. Never add bypass/test parameters to production monitor.",
+  "outputs": "Scenario name, candidate hashes, aggregate counts, Boolean decisions, and fixed error category only; no documents or credentials",
+  "cleanup": "Delete only the exact random temporary index created by this run; verify removal. No monitor is saved and no production index/template/mapping is changed. Inline dryrun can initialize native alert infrastructure and is not described as wholly read-only.",
+  "validation_result": "monitor-validation-2026-10-14.json",
+  "validation_counts": {
+    "query_cases": 38,
+    "synthetic_context_validator_cases": 23
+  },
+  "mapping_options": {
+    "date_detection": false
+  }
+}

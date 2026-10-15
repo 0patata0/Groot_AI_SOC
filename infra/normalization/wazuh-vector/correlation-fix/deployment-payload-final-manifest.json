@@ -1,0 +1,482 @@
+{
+  "purpose": "Fixed root B Ansible syntax/check and synthetic option-policy validation; no apply in this step",
+  "destination": "/var/tmp/capstone-correlation-fix-20261014/operator/deploy-bundle",
+  "files": [
+    {
+      "path": "ansible.cfg",
+      "bytes": 226,
+      "sha256": "c8d7f025dca3f269f328a6e2a7bcc2d6b73fd6afe0ef2bc9b28ebc64618e638c"
+    },
+    {
+      "path": "correlation-fix/apply-b.yml",
+      "bytes": 22389,
+      "sha256": "6263115c9be1db2d9a9fe0ef218fbabe4270c2b24eef4bc426e70c72cdb6c260"
+    },
+    {
+      "path": "correlation-fix/run-b.sh",
+      "bytes": 2410,
+      "sha256": "3d9789b41ad246240daa9aef09fce50ccc5a10435383aeb5bb7cbd5c6d60aeee"
+    },
+    {
+      "path": "correlation-fix/test-options-policy.py",
+      "bytes": 6830,
+      "sha256": "76ab1ce6d4195289854206834c929e444316be122bed7f18cdac3711811a412d"
+    },
+    {
+      "path": "fixtures/correlation/canary-cross.jsonl",
+      "bytes": 1714,
+      "sha256": "1ff2615c3c1cd8aa365d13c4125f86bdc5bf1dd5823b3c703c32e455a8359e7c"
+    },
+    {
+      "path": "fixtures/correlation/canary-historical.jsonl",
+      "bytes": 861,
+      "sha256": "dfeb3224ef59e47d20c7e6b1157dbe911d51b9dfadf333079d8dd850459633a3"
+    },
+    {
+      "path": "fixtures/correlation/canary-production-location.jsonl",
+      "bytes": 855,
+      "sha256": "d57735b5a298ae06bde2899dbe8f512d04f51c2c513bad3695b228666b63aad6"
+    },
+    {
+      "path": "fixtures/correlation/canary-repeat-duplicate.jsonl",
+      "bytes": 4275,
+      "sha256": "4660b20d4ef1233d9dbcff6f67da81b0261fc380e1a60ecfb9161cdcdc5eacc2"
+    },
+    {
+      "path": "fixtures/correlation/canary-repeat.jsonl",
+      "bytes": 4275,
+      "sha256": "6fd45116feb2d957a84b169eacceaed71bd290580b9274f4c2bc9bd46f0bd6bc"
+    },
+    {
+      "path": "fixtures/correlation/canary-wrong-ip.jsonl",
+      "bytes": 855,
+      "sha256": "1eb45bba54334fc0fadf4043691bc6156a1396a626ab99c1badcd9e1532318c0"
+    },
+    {
+      "path": "fixtures/correlation/cross-nft-suricata.jsonl",
+      "bytes": 1516,
+      "sha256": "1c5c1940e0832a97a75078916090c4f1e7c9990208f6b8482b71f9b019de3ed2"
+    },
+    {
+      "path": "fixtures/correlation/cross-suricata-nft.jsonl",
+      "bytes": 1516,
+      "sha256": "c12995fd7bdc191b6677b1730be3832afb97e4d1e1a808710b2fcb759f5c108b"
+    },
+    {
+      "path": "fixtures/correlation/different-direction.jsonl",
+      "bytes": 1516,
+      "sha256": "45533d604d4a268ebc1bbb369653687e6853f3ca57ed4d774c2edd94899e7ae6"
+    },
+    {
+      "path": "fixtures/correlation/different-sensor.jsonl",
+      "bytes": 1519,
+      "sha256": "482cad129ee5f64f2d2b051fd1431dbe2bd003c6821a4cc020be5051d92b1b44"
+    },
+    {
+      "path": "fixtures/correlation/different-service.jsonl",
+      "bytes": 1515,
+      "sha256": "549466e24d7bf6efcf0f27b5dee5f50c489fd1afe0d74df6907370f20c32eec7"
+    },
+    {
+      "path": "fixtures/correlation/different-source.jsonl",
+      "bytes": 1516,
+      "sha256": "e33417dd68197d7d151c18515fc0fa5e6f26ad4a3eb2469d4f5691e386e629d9"
+    },
+    {
+      "path": "fixtures/correlation/duplicate-current.jsonl",
+      "bytes": 3780,
+      "sha256": "ed50a42bf023b1e461fafbdbfff7c36d9d0bd33d53e0fd90a1e96727bd7f94f6"
+    },
+    {
+      "path": "fixtures/correlation/duplicate-history-limitation.jsonl",
+      "bytes": 3780,
+      "sha256": "8f557dd2bb0edc15b808523a56c4cd3150d0d9d2da0a450dee0c702233a1b4ca"
+    },
+    {
+      "path": "fixtures/correlation/expected.tsv",
+      "bytes": 1152,
+      "sha256": "aa22132fd8f74c733ce46cfb0c5cc71c077b7f26dbe948efbc7baada2a4cd867"
+    },
+    {
+      "path": "fixtures/correlation/future.jsonl",
+      "bytes": 3755,
+      "sha256": "b75b055146960ddd64e8a18f472bad068375c90bb3e3de8a4ddd1a1a0ec2ad8b"
+    },
+    {
+      "path": "fixtures/correlation/historical.jsonl",
+      "bytes": 3775,
+      "sha256": "352a5db7e932557f38bf21bc66b5f6e3d29b88c98529778ef7ab7fae841d811a"
+    },
+    {
+      "path": "fixtures/correlation/ineligible.jsonl",
+      "bytes": 3785,
+      "sha256": "c6f8696e6c8b0d950873a0caa3dbb88fb5403cfbf1b30ebed5c21966bc4aecec"
+    },
+    {
+      "path": "fixtures/correlation/missing-key.jsonl",
+      "bytes": 692,
+      "sha256": "0c83351f7f5f9ed1b451e0bc927830014cb76fdf0ce94c7a7b7670ca800419c4"
+    },
+    {
+      "path": "fixtures/correlation/missing-time-class.jsonl",
+      "bytes": 751,
+      "sha256": "d19f2d6421e40df33926bc0cf9a5ff63484b3c794f2358d6b031d70591a120b9"
+    },
+    {
+      "path": "fixtures/correlation/processing-time-only.jsonl",
+      "bytes": 3745,
+      "sha256": "348a38ae80b0ce36599c578656d2e31447d2f949a37cc4a5a534599092c9c031"
+    },
+    {
+      "path": "fixtures/correlation/protected.jsonl",
+      "bytes": 3775,
+      "sha256": "5c876f7b2dab20384ad37f04d2027ef05a2884632bea745297eb7956e7ac687c"
+    },
+    {
+      "path": "fixtures/correlation/raw-isolation.jsonl",
+      "bytes": 1023,
+      "sha256": "d15af64057115eaf1cf3e711098456fbe6f3570e21dc0b4006b69975d6fb0b46"
+    },
+    {
+      "path": "fixtures/correlation/repeat-nftables.jsonl",
+      "bytes": 3800,
+      "sha256": "8afe8f991c18294a89f6b515839cfeaa23093bb5981f8c6fddd2fc3474f0648b"
+    },
+    {
+      "path": "fixtures/correlation/repeat-suricata.jsonl",
+      "bytes": 3780,
+      "sha256": "6a71d2e650efb77ccc44fec642d687f41549bce289b28f2ea70079763d4ba184"
+    },
+    {
+      "path": "fixtures/evidence/bad-action.jsonl",
+      "bytes": 766,
+      "sha256": "8af59a6f8226349c81dca8ec4646736c7118aa9473ee212b18c0ce3f84f6cdc6"
+    },
+    {
+      "path": "fixtures/evidence/bad-correlation_dedupe_key.jsonl",
+      "bytes": 765,
+      "sha256": "b7234788f298fa05d8214b4317ff17b04e4d0c162441ce06a25bee09c9f487d5"
+    },
+    {
+      "path": "fixtures/evidence/bad-correlation_eligible.jsonl",
+      "bytes": 764,
+      "sha256": "84cd88afbb6cc740ede166bf227ab6d31bea870fc99b19ae318bd686ee69fe5a"
+    },
+    {
+      "path": "fixtures/evidence/bad-correlation_key.jsonl",
+      "bytes": 763,
+      "sha256": "174c6fe65a295ba114aa8ea6a132fec062c3f246b68af99cb3d481113d009fcb"
+    },
+    {
+      "path": "fixtures/evidence/bad-correlation_time_class.jsonl",
+      "bytes": 768,
+      "sha256": "810e63a746fa41aab5eda9e314a81f36ef2befd847fe88cfbd829fc011fb24e3"
+    },
+    {
+      "path": "fixtures/evidence/bad-destination_ip.jsonl",
+      "bytes": 767,
+      "sha256": "bf0f18afc581786b74527850ec4743b5b39f9604658519ab2d2630f50f9f3d0a"
+    },
+    {
+      "path": "fixtures/evidence/bad-destination_port.jsonl",
+      "bytes": 764,
+      "sha256": "7ccce3250693f042b485b009a01d846e2655905d1611eb300279d0dee6bcc54b"
+    },
+    {
+      "path": "fixtures/evidence/bad-event_id.jsonl",
+      "bytes": 762,
+      "sha256": "5a8c01c8307fa28b5676d30c6e992fcaee433735580f589bf644c09d329ce779"
+    },
+    {
+      "path": "fixtures/evidence/bad-event_time_kst.jsonl",
+      "bytes": 750,
+      "sha256": "6b9e4fa5e4a69fe2b1822c5f784473fe6e63af5a83bd927994c2025fde487e3c"
+    },
+    {
+      "path": "fixtures/evidence/bad-evidence_lane.jsonl",
+      "bytes": 746,
+      "sha256": "a8c5ce8affa62590a4bfe1da68e7220a420a7f93d2d970c4ae2fe0dd40a978f6"
+    },
+    {
+      "path": "fixtures/evidence/bad-message_sha256.jsonl",
+      "bytes": 764,
+      "sha256": "9f22f32d2297fe17683373eab88cf00669ba49a648ab0c8ce82cc40e3fa48512"
+    },
+    {
+      "path": "fixtures/evidence/bad-pipeline.jsonl",
+      "bytes": 763,
+      "sha256": "514966b72a5c861dbcb557b32ee56fc4875677e240537da86f2f845763d1e200"
+    },
+    {
+      "path": "fixtures/evidence/bad-protected_asset.jsonl",
+      "bytes": 762,
+      "sha256": "e45c803def0d40543a420d65279600b66f796803c1357b09c1fe057f417f22c9"
+    },
+    {
+      "path": "fixtures/evidence/bad-protocol.jsonl",
+      "bytes": 764,
+      "sha256": "d2a1e3b77a3b03286dd01a094fe1288693a8289238590374a59ccbb65ae9a17d"
+    },
+    {
+      "path": "fixtures/evidence/bad-quality_flags.jsonl",
+      "bytes": 782,
+      "sha256": "013ff53bb2348cddc1de85ccf853841d3867f23dd6e2a4c8d0877206a168bcfe"
+    },
+    {
+      "path": "fixtures/evidence/bad-schema_version.jsonl",
+      "bytes": 756,
+      "sha256": "0a1ff0f594d8ed79ae2f783f626af761ea2ae67f3fde2f0b2b55ccf8ab5a8980"
+    },
+    {
+      "path": "fixtures/evidence/bad-sensor.jsonl",
+      "bytes": 759,
+      "sha256": "4407cffda6072dfb504dc2cc13801c53f66860ce2e3c293ff75e353a719b1f51"
+    },
+    {
+      "path": "fixtures/evidence/bad-source.jsonl",
+      "bytes": 766,
+      "sha256": "115cc205f7caa45b20a52811ccafb82b158fa215e57d2fb2ffcbc36366fe20f6"
+    },
+    {
+      "path": "fixtures/evidence/bad-source_ip.jsonl",
+      "bytes": 762,
+      "sha256": "c9be4b7574cf8fc196cc0e8f9a470ca961dccc840a52ec0cc223ab4d97a2ae9e"
+    },
+    {
+      "path": "fixtures/evidence/decoder-string-array-limitation.jsonl",
+      "bytes": 765,
+      "sha256": "c073de4d156a41d04eeb511fb6b61157be35d1659d1efcb9357501cbed50b3be"
+    },
+    {
+      "path": "fixtures/evidence/decoder-string-bool-limitation.jsonl",
+      "bytes": 765,
+      "sha256": "1a52762a25b5e661605647a2c13521e96b9ded183b9c57045514cda6acd81088"
+    },
+    {
+      "path": "fixtures/evidence/expected.tsv",
+      "bytes": 1851,
+      "sha256": "94dfa9e0064206207312649c00aec7383fbcdd2032f638f7f9844bde2688a09e"
+    },
+    {
+      "path": "fixtures/evidence/future.jsonl",
+      "bytes": 764,
+      "sha256": "6408a20cc9ac5a9c23aa53e44be79c4bc9afc3f06dbd519a4f34eb5633e0123b"
+    },
+    {
+      "path": "fixtures/evidence/invalid-ip-leading-zero.jsonl",
+      "bytes": 762,
+      "sha256": "0622a0c9f826b5301491ea21c45fa89a853a154ccf6a57c629c73dc330388176"
+    },
+    {
+      "path": "fixtures/evidence/invalid-v6-double-compress.jsonl",
+      "bytes": 765,
+      "sha256": "88492030b9359c3c68a124c8ccaf7ceacd5d2400fee47b497e2470da77b1e2b6"
+    },
+    {
+      "path": "fixtures/evidence/ipv6-embedded.jsonl",
+      "bytes": 782,
+      "sha256": "3a526f5c60983e328186801fa3fdd11d02ba523b8d74e86b32d6e2f3f74f9386"
+    },
+    {
+      "path": "fixtures/evidence/ipv6.jsonl",
+      "bytes": 772,
+      "sha256": "b6c2d9f1719f35bfd22b39b8da2ac86496161f6ab74a0fa80c0e1983deebd266"
+    },
+    {
+      "path": "fixtures/evidence/location-bare.jsonl",
+      "bytes": 763,
+      "sha256": "11f56b74587ae40d8a1c5efbd026e78e4751f841ec017f80e90b4aeb126602a1"
+    },
+    {
+      "path": "fixtures/evidence/location-canary.jsonl",
+      "bytes": 763,
+      "sha256": "11f56b74587ae40d8a1c5efbd026e78e4751f841ec017f80e90b4aeb126602a1"
+    },
+    {
+      "path": "fixtures/evidence/location-other-agent.jsonl",
+      "bytes": 763,
+      "sha256": "11f56b74587ae40d8a1c5efbd026e78e4751f841ec017f80e90b4aeb126602a1"
+    },
+    {
+      "path": "fixtures/evidence/location-ready.jsonl",
+      "bytes": 763,
+      "sha256": "11f56b74587ae40d8a1c5efbd026e78e4751f841ec017f80e90b4aeb126602a1"
+    },
+    {
+      "path": "fixtures/evidence/location-unrelated.jsonl",
+      "bytes": 763,
+      "sha256": "11f56b74587ae40d8a1c5efbd026e78e4751f841ec017f80e90b4aeb126602a1"
+    },
+    {
+      "path": "fixtures/evidence/missing-correlation_key.jsonl",
+      "bytes": 678,
+      "sha256": "ffc2cdeca7e97443a37df3aeeead356aa777523a3ee94eba55d6d67b357e54c4"
+    },
+    {
+      "path": "fixtures/evidence/missing-destination_port.jsonl",
+      "bytes": 739,
+      "sha256": "06f6cf8edd90f6641e12f85bbf85e2bdd6a441cca66849672e37a6e92fd5f2d6"
+    },
+    {
+      "path": "fixtures/evidence/missing-event_time_kst.jsonl",
+      "bytes": 711,
+      "sha256": "a14b2e86090d6b16aafa3113d0ffdb1fe425c953e95f0f97a07365551f431fc9"
+    },
+    {
+      "path": "fixtures/evidence/missing-evidence_lane.jsonl",
+      "bytes": 722,
+      "sha256": "c5183c97a2a3d8840f2c3acfa9f8e91d91ce32450181e4b3502f53519b212dbd"
+    },
+    {
+      "path": "fixtures/evidence/missing-quality_flags.jsonl",
+      "bytes": 744,
+      "sha256": "61d5b7e2d620e23118a3e1e5538b62a77482f6ad60b9db8d788d8f5708e2814f"
+    },
+    {
+      "path": "fixtures/evidence/missing-source_ip.jsonl",
+      "bytes": 738,
+      "sha256": "7470988b32ba1284169dcd4f3ab406a59520e10d914be144a4cce156e2dc284e"
+    },
+    {
+      "path": "fixtures/evidence/newline-correlation_key.jsonl",
+      "bytes": 765,
+      "sha256": "cdbb543abc0da08c1f4b94717fb8cc6f221dde9891f664dd082208da58177845"
+    },
+    {
+      "path": "fixtures/evidence/newline-schema_version.jsonl",
+      "bytes": 765,
+      "sha256": "9a8c2c65ee613c2aff089cc114ccb8046a47e02e7875862173dfa9ef29d3ce11"
+    },
+    {
+      "path": "fixtures/evidence/newline-source_ip.jsonl",
+      "bytes": 765,
+      "sha256": "498de70e1f09856a36a2763d9e3b7003ac2de3d778d9f1250223ac5fc480237d"
+    },
+    {
+      "path": "fixtures/evidence/nft-observed.jsonl",
+      "bytes": 764,
+      "sha256": "11b675776282c4c204c49fb5955dc06cb6efff4193ee17da0f9dca567e7afbe7"
+    },
+    {
+      "path": "fixtures/evidence/nft-shadow.jsonl",
+      "bytes": 766,
+      "sha256": "e0ecaf97d8a1c3a3b6de5ca8a41f22814ccd2268f68e53df623ad88c85c75ecc"
+    },
+    {
+      "path": "fixtures/evidence/nftables.jsonl",
+      "bytes": 767,
+      "sha256": "085aef1a5d45a9a984f240c4c92030bf2f47f8f8b6cd84a0b6a93c95397f7e17"
+    },
+    {
+      "path": "fixtures/evidence/port-max.jsonl",
+      "bytes": 764,
+      "sha256": "39aaf3126d65bd75a2c6ff6690e5058d8b65092a02d7e3baf5d7907662b813f0"
+    },
+    {
+      "path": "fixtures/evidence/port-negative.jsonl",
+      "bytes": 761,
+      "sha256": "789fc5f5b9e721cea3759f1c8b860f2ba299f60c3a1679898681527786103743"
+    },
+    {
+      "path": "fixtures/evidence/port-zero.jsonl",
+      "bytes": 760,
+      "sha256": "5f5e4cc402b65b387807798d37eca81691bc478fbf4bfeef0f214f08c9930c05"
+    },
+    {
+      "path": "fixtures/evidence/protected-destination.jsonl",
+      "bytes": 765,
+      "sha256": "c9bc0dba2936d9e193c17a1ebfdd3808ed82c9259caf346b1ba0054251165460"
+    },
+    {
+      "path": "fixtures/evidence/protected-source.jsonl",
+      "bytes": 768,
+      "sha256": "b75d54d95fac948d37e601809e68871567318496043935d2799a9f0742a6cf2c"
+    },
+    {
+      "path": "fixtures/evidence/quality-object.jsonl",
+      "bytes": 775,
+      "sha256": "4f2b0bcc4e71023181686fb5573c700ed5a8b43d606ccc4414f010075060a6e7"
+    },
+    {
+      "path": "fixtures/evidence/suricata-blocked.jsonl",
+      "bytes": 763,
+      "sha256": "9e7a69c81e45b46363fb21f3f4c13842c7ea7f500816e96cab78eb5160f16b27"
+    },
+    {
+      "path": "fixtures/evidence/suricata-observed.jsonl",
+      "bytes": 764,
+      "sha256": "5776b6b4aac13f70b6425e46bd7e989c621df08520297e421a079090a32cf265"
+    },
+    {
+      "path": "fixtures/evidence/suricata.jsonl",
+      "bytes": 763,
+      "sha256": "11f56b74587ae40d8a1c5efbd026e78e4751f841ec017f80e90b4aeb126602a1"
+    },
+    {
+      "path": "fixtures/evidence/udp-port-min.jsonl",
+      "bytes": 760,
+      "sha256": "62af1f9d4d8984fd5b31700c7240223437c7372ac8e6d10fe7de90d07dbb0796"
+    },
+    {
+      "path": "fixtures/positive-modsecurity.jsonl",
+      "bytes": 354,
+      "sha256": "628f661909368fe413b75e3a834b8131e9ac7eb92975c864e6884d93e8f21f7a"
+    },
+    {
+      "path": "fixtures/positive-nftables.jsonl",
+      "bytes": 350,
+      "sha256": "26551b1195f9724219fc69ec349db4010851b2dff0307e84aed4636e4e1e849b"
+    },
+    {
+      "path": "fixtures/positive-suricata.jsonl",
+      "bytes": 350,
+      "sha256": "c5aa7d3900fc73ada5490de0994f4878aca7cb01861c9259259d2dda06b02d13"
+    },
+    {
+      "path": "fixtures/wrong-pipeline.jsonl",
+      "bytes": 349,
+      "sha256": "c49d92e70ff4b0cd1f4e74921cedcd5d0e52f436a8a9f54fbf271e7ea374aa14"
+    },
+    {
+      "path": "fixtures/wrong-schema.jsonl",
+      "bytes": 343,
+      "sha256": "c2720bed1ec47d67d2bd9a8bfb9f9fa71fc59f1be9490fc5e0ddfd7ed5bf639a"
+    },
+    {
+      "path": "fixtures/wrong-source.jsonl",
+      "bytes": 360,
+      "sha256": "43c44fa98378b18c6d835d89ff273a5df1a2b8fd6338ad401e453b4bbe2b2810"
+    },
+    {
+      "path": "inventory.ini",
+      "bytes": 87,
+      "sha256": "76ce012be1ae749f0b8c88a040101aaad093ed9090550347b05fb7ae9c933265"
+    },
+    {
+      "path": "tests/test-correlation-manager.sh",
+      "bytes": 1452,
+      "sha256": "19e007dc393688b70c7d3dfb80c30d94427bec9bcba8a929ca5f5c4207918ce6"
+    },
+    {
+      "path": "tests/test-evidence-manager.sh",
+      "bytes": 1874,
+      "sha256": "9b140d3744fb7a170993a19492cb37c443eb60d55c3a80ac84e4688cb71d32c5"
+    },
+    {
+      "path": "tests/test-health-manager.sh",
+      "bytes": 2143,
+      "sha256": "795be7b4064989330d8f6536562136ae1999b69d8278cc986ebf3215c87d6f74"
+    },
+    {
+      "path": "tests/test-installed-manager.sh",
+      "bytes": 2221,
+      "sha256": "77a79f5eff42d41de4e1841aa9a2c043c1aa35b15d0df548e1d930cd274b0d5e"
+    }
+  ],
+  "only_synthetic_test_data": true,
+  "operational_logs_or_credentials": false,
+  "file_count": 94,
+  "total_bytes": 143365,
+  "revision": "native-framing-and-required-health-v3",
+  "initial_manifest_sha256": "71bc326717087d1e3c44ad1b374532db4abbb1cb1ae6a1ba31ed233058ab9c2f"
+}

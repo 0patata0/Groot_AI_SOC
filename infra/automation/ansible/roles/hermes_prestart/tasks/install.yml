@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Create private original and candidate trees",
+    "ansible.builtin.file": {
+      "path": "{{ hp_root }}/{{ item }}",
+      "state": "directory",
+      "owner": "root",
+      "group": "root",
+      "mode": "0755"
+    },
+    "loop": [
+      "upstream/plugins/platforms/mattermost",
+      "upstream/gateway",
+      "candidate/hermes",
+      "candidate/runtime"
+    ]
+  },
+  {
+    "name": "Copy the actual image originals from never-started candidate",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "{{ hp_state.candidate_id }}:/opt/hermes/{{ item }}",
+        "{{ hp_root }}/upstream/{{ item }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "loop": [
+      "plugins/platforms/mattermost/adapter.py",
+      "gateway/run_turn.py"
+    ]
+  },
+  {
+    "name": "Build accepted source patches with the existing pure patcher",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/patch_korean_output_guard.py",
+        "--source-root",
+        "{{ hp_root }}/upstream",
+        "--output-root",
+        "{{ hp_root }}/candidate/hermes"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90
+  },
+  {
+    "name": "Stage the approved core",
+    "ansible.builtin.copy": {
+      "src": "{{ hp_source }}/korean_output_guard.py",
+      "dest": "{{ hp_root }}/candidate/hermes/capstone_korean_output_guard.py",
+      "owner": "root",
+      "group": "root",
+      "mode": "0644"
+    }
+  },
+  {
+    "name": "Copy the already installed pinned package from original",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b:/opt/capstone-guard-runtime",
+        "{{ hp_root }}/candidate/runtime/capstone-guard-runtime"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90
+  },
+  {
+    "name": "Copy exactly three guarded files before any first start",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "{{ hp_root }}/candidate/hermes/{{ item }}",
+        "{{ hp_state.candidate_id }}:/opt/hermes/{{ item }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "loop": [
+      "capstone_korean_output_guard.py",
+      "plugins/platforms/mattermost/adapter.py",
+      "gateway/run_turn.py"
+    ]
+  },
+  {
+    "name": "Copy the isolated dependency before any first start",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "cp",
+        "{{ hp_root }}/candidate/runtime/capstone-guard-runtime",
+        "{{ hp_state.candidate_id }}:/opt/"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90
+  }
+]

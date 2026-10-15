@@ -15,7 +15,8 @@ import sys
 PROTOCOL = "2025-06-18"
 SUPPORTED = {"2024-11-05", "2025-03-26", PROTOCOL}
 HELPER = "/usr/local/sbin/rule-change-executor"
-MAX_INPUT = 256 * 1024
+MAX_INPUT = 1024 * 1024
+MAX_OUTPUT = 4 * 1024 * 1024
 
 TOOLS = [
     {
@@ -29,8 +30,34 @@ TOOLS = [
         "annotations": {"title": "Read local rule target", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
     },
     {
+        "name": "propose_rule_edit",
+        "description": "Preferred for small or localized rule changes: submit only exact text replacements, not the whole file. The server checks the current SHA-256, reconstructs the complete candidate, validates it, and posts the full diff for one operator approval. Each old_text must occur exactly once in the original file; edits must not overlap. All edits refer to the original, never another edit's output. To insert, replace a unique existing anchor with the anchor plus the new text. To delete, use an empty new_text. Returns compact approval metadata; the full diff is already posted to Mattermost. Does not apply before approval.",
+        "inputSchema": {
+            "type": "object", "additionalProperties": False,
+            "properties": {
+                "target": {"type": "string", "enum": ["a:modsecurity-custom", "a:suricata-local", "b:wazuh-local-rules"]},
+                "base_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Copy the exact SHA-256 returned by get_rule_change_target"},
+                "edits": {
+                    "type": "array", "minItems": 1, "maxItems": 16,
+                    "description": "Exact original-text replacements; combined old_text and new_text must fit 64 KiB UTF-8. Final reconstructed file must fit 128 KiB.",
+                    "items": {
+                        "type": "object", "additionalProperties": False,
+                        "properties": {
+                            "old_text": {"type": "string", "minLength": 1, "description": "A nonempty unique literal excerpt from the original file, preserving all whitespace and newlines"},
+                            "new_text": {"type": "string", "description": "Exact replacement; keep the anchor when inserting, or empty to delete"},
+                        },
+                        "required": ["old_text", "new_text"],
+                    },
+                },
+                "reason": {"type": "string", "minLength": 1, "maxLength": 200},
+            },
+            "required": ["target", "base_sha256", "edits", "reason"],
+        },
+        "annotations": {"title": "Propose exact rule edits", "readOnlyHint": False, "destructiveHint": False, "idempotentHint": False},
+    },
+    {
         "name": "propose_rule_change",
-        "description": "Show the exact before/after diff and request a one-time operator approval. Does not apply a rule.",
+        "description": "For intentional whole-file rewrites only; prefer propose_rule_edit for localized changes to avoid regenerating unchanged rules. Submit the complete candidate file (up to 128 KiB UTF-8) and request one operator approval for that exact change. Large diffs are automatically shown in multiple review messages before a single approval card. Do not split the rule change merely because its diff exceeds 8 KiB. Does not apply a rule before approval.",
         "inputSchema": {
             "type": "object", "additionalProperties": False,
             "properties": {
@@ -56,6 +83,44 @@ TOOLS = [
 ]
 
 
+SERVICE_TARGETS = ["a:waf", "a:suricata", "a:chatproxy", "b:wazuh-manager", "b:wazuh-dashboard"]
+TOOLS.extend([
+    {
+        "name": "get_service_action_target",
+        "description": "Read the current state and allowed restart/reload actions of one fixed service. Package installation and container creation/configuration are unsupported.",
+        "inputSchema": {"type": "object", "additionalProperties": False,
+                        "properties": {"target": {"type": "string", "enum": SERVICE_TARGETS}}, "required": ["target"]},
+        "annotations": {"title": "Read allowed service", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
+    },
+    {
+        "name": "propose_service_action",
+        "description": "Request operator approval for a fixed restart/reload action, bound to the current service state. A worker executes once after approval and verifies the result. No arbitrary commands, package installation, or container configuration changes.",
+        "inputSchema": {"type": "object", "additionalProperties": False, "properties": {
+            "target": {"type": "string", "enum": SERVICE_TARGETS},
+            "action": {"type": "string", "enum": ["restart", "reload"]},
+            "base_state_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "reason": {"type": "string", "minLength": 1, "maxLength": 200}},
+            "required": ["target", "action", "base_state_sha256", "reason"]},
+        "annotations": {"title": "Propose service action", "readOnlyHint": False, "destructiveHint": True, "idempotentHint": False},
+    },
+    {
+        "name": "temporarily_contain_ip",
+        "description": "On rule-a only, temporarily block a public external attacker IPv4 for 10 minutes if server-verified recent Suricata attack evidence meets the fixed threshold. Immediately ask the operator to keep it for 60 minutes or request release. Protected/private/management/DGX and active SSH addresses are refused. Repeated requests never extend the expiry. This is the only pre-approved emergency action; no rule or service changes occur.",
+        "inputSchema": {"type": "object", "additionalProperties": False, "properties": {
+            "ip": {"type": "string"}, "reason": {"type": "string", "minLength": 1, "maxLength": 200}},
+            "required": ["ip", "reason"]},
+        "annotations": {"title": "Temporary evidence-checked containment", "readOnlyHint": False, "destructiveHint": True, "idempotentHint": True},
+    },
+    {
+        "name": "get_operation_status",
+        "description": "Read the approval, execution, verification, and expiry state of a service action or temporary containment by request_id.",
+        "inputSchema": {"type": "object", "additionalProperties": False,
+                        "properties": {"request_id": {"type": "string", "pattern": "^[0-9a-f]{32}$"}}, "required": ["request_id"]},
+        "annotations": {"title": "Read operation status", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
+    },
+])
+
+
 def _result(data, error=False):
     return {"content": [{"type": "text", "text": json.dumps(data, ensure_ascii=False, sort_keys=True)}], "isError": error}
 
@@ -67,11 +132,11 @@ def _call_helper(payload):
     try:
         proc = subprocess.run(
             ["/usr/bin/sudo", "-n", HELPER], input=request, capture_output=True,
-            timeout=240 if payload.get("operation") == "propose" else 45, check=False,
+            timeout=360 if payload.get("operation") in {"propose", "propose-edit", "service-propose", "contain-ip", "service-get"} else 45, check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
         return _result({"error": "rule-change helper unavailable"}, True)
-    if len(proc.stdout) > MAX_INPUT:
+    if len(proc.stdout) > MAX_OUTPUT:
         return _result({"error": "rule-change helper response too large"}, True)
     try:
         data = json.loads(proc.stdout)
@@ -93,7 +158,7 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if requested in SUPPORTED else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-rule-change-mcp", "version": "0.1.0"},
+            "serverInfo": {"name": "capstone-rule-change-mcp", "version": "0.3.0"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None
@@ -111,6 +176,11 @@ def handle(message):
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:
                 result = _call_helper({"operation": "get", **args})
+        elif name == "propose_rule_edit":
+            if set(args) != {"target", "base_sha256", "edits", "reason"}:
+                result = _result({"error": "required/unsupported arguments"}, True)
+            else:
+                result = _call_helper({"operation": "propose-edit", **args})
         elif name == "propose_rule_change":
             if set(args) != {"target", "base_sha256", "candidate_content", "reason"}:
                 result = _result({"error": "required/unsupported arguments"}, True)
@@ -121,6 +191,14 @@ def handle(message):
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:
                 result = _call_helper({"operation": "status", **args})
+        elif name in {"get_service_action_target", "propose_service_action", "temporarily_contain_ip", "get_operation_status"}:
+            operation, required = {
+                "get_service_action_target": ("service-get", {"target"}),
+                "propose_service_action": ("service-propose", {"target", "action", "base_state_sha256", "reason"}),
+                "temporarily_contain_ip": ("contain-ip", {"ip", "reason"}),
+                "get_operation_status": ("operation-status", {"request_id"}),
+            }[name]
+            result = _call_helper({"operation": operation, **args}) if set(args) == required else _result({"error": "required/unsupported arguments"}, True)
         else:
             return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "unknown tool"}}
         return {"jsonrpc": "2.0", "id": mid, "result": result}

@@ -1,0 +1,37 @@
+<!-- Routing and exact monitor JSON shape only; not source authentication.
+     The monitor computes thresholds. No command/action/active response here.
+     B's explicit localfile route requires a separately verified host relay. -->
+<group name="capstone_storage_health,">
+  <rule id="100310" level="0">
+    <decoded_as>capstone_storage_json</decoded_as>
+    <program_name type="pcre2">^capstone-storage$</program_name>
+    <location type="pcre2">^(?:\(groot-sec\) any->journald|/var/ossec/logs/capstone-storage-b\.log)$</location>
+    <match type="pcre2">\A(?=.*(?:"host":"a","machine_id":"096e90b6243e438aa8a7b392be754732".*"retention_days":30,|"host":"b","machine_id":"1e143067c98a44ffba6eaa925dc038d7".*"retention_days":90,))(?=.*(?:"reason":"healthy".*"scan_status":"complete".*"status":"ok"|"reason":"capacity_warning".*"scan_status":"complete".*"status":"warning"|"reason":"capacity_critical".*"status":"critical"|"reason":"scan_unavailable".*"scan_status":"unavailable".*"status":"unavailable"))(?!(?=.*"scan_status":"complete")(?=.*:null))\{"automatic_deletion":false,"available_bytes":(?:null|0|[1-9][0-9]{0,15}),"backup_bytes":(?:null|0|[1-9][0-9]{0,15}),"backup_review_due_count":(?:null|0|[1-9][0-9]{0,15}),"checkpoint_changed":false,"history_bytes":(?:null|0|[1-9][0-9]{0,15}),"host":"(?:a|b)","machine_id":"(?:096e90b6243e438aa8a7b392be754732|1e143067c98a44ffba6eaa925dc038d7)","observed_at_utc":"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z","policy":"capstone-storage-retention-v1","raw_archive_review_due_count":(?:null|0|[1-9][0-9]{0,15}),"raw_bytes":(?:null|0|[1-9][0-9]{0,15}),"reason":"(?:healthy|capacity_warning|capacity_critical|scan_unavailable)","retention_days":(?:30|90),"scan_status":"(?:complete|unavailable)","schema_version":1,"status":"(?:ok|warning|critical|unavailable)","used_percent":(?:null|100|[1-9]?[0-9])\}\z</match>
+    <description>Fixed A/B storage monitor status</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100311" level="5">
+    <if_sid>100310</if_sid>
+    <match type="pcre2">"status":"warning","used_percent":</match>
+    <field name="reason" type="pcre2">^capacity_warning$</field>
+    <description>Storage warning: host=$(host); scan=$(scan_status); used_percent=$(used_percent); available_bytes=$(available_bytes); raw_bytes=$(raw_bytes); backup_bytes=$(backup_bytes)</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+  <rule id="100312" level="10">
+    <if_sid>100310</if_sid>
+    <match type="pcre2">"status":"critical","used_percent":</match>
+    <field name="reason" type="pcre2">^capacity_critical$</field>
+    <description>Storage critical: host=$(host); scan=$(scan_status); used_percent=$(used_percent); available_bytes=$(available_bytes); raw_bytes=$(raw_bytes); backup_bytes=$(backup_bytes)</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+  <rule id="100313" level="5">
+    <if_sid>100310</if_sid>
+    <match type="pcre2">"status":"unavailable","used_percent":</match>
+    <field name="reason" type="pcre2">^scan_unavailable$</field>
+    <description>Storage unavailable: host=$(host); scan=$(scan_status); used_percent=$(used_percent); available_bytes=$(available_bytes); raw_bytes=$(raw_bytes); backup_bytes=$(backup_bytes)</description>
+    <options>no_email_alert</options>
+    <options>no_full_log</options>
+  </rule>
+</group>

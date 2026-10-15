@@ -1,0 +1,51 @@
+{
+  "cases": 6,
+  "passed": 6,
+  "response_text_exported": false,
+  "result_sha256": "2fd2ce4ac10e6f635feabc3d849eaa1e08017567c65048b99b00076f1fc039fa",
+  "rows": [
+    {
+      "failure_reason": 0,
+      "latency_ms": 22325,
+      "named_scores": {},
+      "passed": true,
+      "test_index": 0
+    },
+    {
+      "failure_reason": 0,
+      "latency_ms": 16851,
+      "named_scores": {},
+      "passed": true,
+      "test_index": 1
+    },
+    {
+      "failure_reason": 0,
+      "latency_ms": 14668,
+      "named_scores": {},
+      "passed": true,
+      "test_index": 2
+    },
+    {
+      "failure_reason": 0,
+      "latency_ms": 13820,
+      "named_scores": {},
+      "passed": true,
+      "test_index": 3
+    },
+    {
+      "failure_reason": 0,
+      "latency_ms": 19383,
+      "named_scores": {},
+      "passed": true,
+      "test_index": 4
+    },
+    {
+      "failure_reason": 0,
+      "latency_ms": 19550,
+      "named_scores": {},
+      "passed": true,
+      "test_index": 5
+    }
+  ],
+  "suite": "quality"
+}

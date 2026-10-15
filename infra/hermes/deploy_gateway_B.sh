@@ -3,6 +3,13 @@
 # 전제: deploy_hermes_B.sh prep/load 완료(/opt/hermes-data, 이미지), Mattermost 봇 계정 토큰 발급(팀장 계정 API), soc_bot 브로커 배치(READ_TOKEN).
 # 입력 env: MM_HERMES_ENV=<MATTERMOST_* 줄이 든 파일>, SOC_READ_TOKEN=<soc_bot READ_TOKEN>  (둘 다 비밀 → repo 에 두지 않음)
 set -euo pipefail
+# BEGIN managed-prestart legacy gate
+if [[ -e /etc/capstone-hermes-guard || -L /etc/capstone-hermes-guard ||
+      -e /var/lib/capstone-automation/hermes-guard || -L /var/lib/capstone-automation/hermes-guard ]]; then
+  printf '%s\n' 'Legacy Hermes deployment blocked: managed guard state exists. Review the fixed root prestart path infra/automation/ansible/hermes-prestart-local-b.sh.' >&2
+  exit 78
+fi
+# END managed-prestart legacy gate
 : "${MM_HERMES_ENV:?MM_HERMES_ENV unset}" "${SOC_READ_TOKEN:?SOC_READ_TOKEN unset}"
 IMG=${IMG:-nousresearch/hermes-agent:v2026.9.24}; D=/opt/hermes-data; SRC=${SRC:-$(dirname "$0")}
 U=$(id -u hermes); G=$(id -g hermes); RUN="docker run --rm -e HERMES_UID=$U -e HERMES_GID=$G -v $D:/opt/data $IMG"

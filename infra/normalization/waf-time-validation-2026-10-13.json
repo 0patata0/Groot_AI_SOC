@@ -1,0 +1,360 @@
+{
+  "live_verification": {
+    "checked_at_kst": "2026-10-13T22:09:31.521822+09:00",
+    "phase": "2-waf-timezone",
+    "evidence_method": "unique access match: client_ip/method/uri/http_status/wall_time; explicit access offset and Docker UTC <1s",
+    "source_bytes": 8432,
+    "source_sha256": "d28540b45327860cf0d6b30e0f60a8e5bda78b763dc3b7514ff3ac4b12150aa9",
+    "before": {
+      "container_id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+      "started_at": "2026-10-05T10:18:45.433754298Z",
+      "status": "running",
+      "config_hashes": {
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a"
+      }
+    },
+    "after": {
+      "container_id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+      "started_at": "2026-10-05T10:18:45.433754298Z",
+      "status": "running",
+      "config_hashes": {
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a"
+      }
+    },
+    "runtime_and_config_unchanged": true,
+    "raw_source_unchanged": true,
+    "rows": [
+      {
+        "line": 1,
+        "audit_wall_time": "Mon Oct 12 18:00:36 2026",
+        "match_count": 1,
+        "evidence": {
+          "access_time": "2026-10-12T18:00:36+00:00",
+          "docker_time_utc": "2026-10-12T18:00:36.052386570Z",
+          "docker_delay_seconds": 0.052386,
+          "source_utc_offset": "+00:00"
+        },
+        "context": {
+          "source_utc_offset": "+00:00",
+          "evidence_ref": "waf-time:20261013:audit-line-1",
+          "raw_bytes_sha256": "03180c056697ca6ddbe0091fe3a3cc21008358008df0ed1f59f8bb58b3f41c36"
+        },
+        "event_time_kst": "2026-10-13T03:00:36.000000+09:00",
+        "time_status": "source_with_verified_timezone",
+        "time_policy_version": "waf-time-v1",
+        "quality_flags": [
+          "duplicate_response_server_header",
+          "source_timezone_supplied"
+        ],
+        "identity_and_hashes_unchanged": true,
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_ids_unchanged": true,
+        "passed": true
+      },
+      {
+        "line": 2,
+        "audit_wall_time": "Mon Oct 12 18:00:56 2026",
+        "match_count": 1,
+        "evidence": {
+          "access_time": "2026-10-12T18:00:56+00:00",
+          "docker_time_utc": "2026-10-12T18:00:56.551165638Z",
+          "docker_delay_seconds": 0.551165,
+          "source_utc_offset": "+00:00"
+        },
+        "context": {
+          "source_utc_offset": "+00:00",
+          "evidence_ref": "waf-time:20261013:audit-line-2",
+          "raw_bytes_sha256": "32c71c8109a78ada60b406cd04f388b05d5826ef3c4be169736ca9f7f216f0bd"
+        },
+        "event_time_kst": "2026-10-13T03:00:56.000000+09:00",
+        "time_status": "source_with_verified_timezone",
+        "time_policy_version": "waf-time-v1",
+        "quality_flags": [
+          "duplicate_response_server_header",
+          "source_timezone_supplied"
+        ],
+        "identity_and_hashes_unchanged": true,
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_ids_unchanged": true,
+        "passed": true
+      },
+      {
+        "line": 3,
+        "audit_wall_time": "Mon Oct 12 18:04:43 2026",
+        "match_count": 1,
+        "evidence": {
+          "access_time": "2026-10-12T18:04:43+00:00",
+          "docker_time_utc": "2026-10-12T18:04:43.200278483Z",
+          "docker_delay_seconds": 0.200278,
+          "source_utc_offset": "+00:00"
+        },
+        "context": {
+          "source_utc_offset": "+00:00",
+          "evidence_ref": "waf-time:20261013:audit-line-3",
+          "raw_bytes_sha256": "ad75ebce122be2d75fc0eea7fc8558c8dd68fd2e42e56d5d3cbf2dfd260849a8"
+        },
+        "event_time_kst": "2026-10-13T03:04:43.000000+09:00",
+        "time_status": "source_with_verified_timezone",
+        "time_policy_version": "waf-time-v1",
+        "quality_flags": [
+          "duplicate_response_server_header",
+          "source_timezone_supplied"
+        ],
+        "identity_and_hashes_unchanged": true,
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_ids_unchanged": true,
+        "passed": true
+      },
+      {
+        "line": 4,
+        "audit_wall_time": "Mon Oct 12 18:04:45 2026",
+        "match_count": 1,
+        "evidence": {
+          "access_time": "2026-10-12T18:04:45+00:00",
+          "docker_time_utc": "2026-10-12T18:04:45.741429065Z",
+          "docker_delay_seconds": 0.741429,
+          "source_utc_offset": "+00:00"
+        },
+        "context": {
+          "source_utc_offset": "+00:00",
+          "evidence_ref": "waf-time:20261013:audit-line-4",
+          "raw_bytes_sha256": "c7839c4949c40685da87a905fd786748bdcbbfb72ca981fb5f18816ffe4e16c6"
+        },
+        "event_time_kst": "2026-10-13T03:04:45.000000+09:00",
+        "time_status": "source_with_verified_timezone",
+        "time_policy_version": "waf-time-v1",
+        "quality_flags": [
+          "duplicate_response_server_header",
+          "source_timezone_supplied"
+        ],
+        "identity_and_hashes_unchanged": true,
+        "action": "observed",
+        "engine_mode": "DetectionOnly",
+        "rule_ids_unchanged": true,
+        "passed": true
+      }
+    ],
+    "verified_contexts": [
+      {
+        "source_utc_offset": "+00:00",
+        "evidence_ref": "waf-time:20261013:audit-line-1",
+        "raw_bytes_sha256": "03180c056697ca6ddbe0091fe3a3cc21008358008df0ed1f59f8bb58b3f41c36"
+      },
+      {
+        "source_utc_offset": "+00:00",
+        "evidence_ref": "waf-time:20261013:audit-line-2",
+        "raw_bytes_sha256": "32c71c8109a78ada60b406cd04f388b05d5826ef3c4be169736ca9f7f216f0bd"
+      },
+      {
+        "source_utc_offset": "+00:00",
+        "evidence_ref": "waf-time:20261013:audit-line-3",
+        "raw_bytes_sha256": "ad75ebce122be2d75fc0eea7fc8558c8dd68fd2e42e56d5d3cbf2dfd260849a8"
+      },
+      {
+        "source_utc_offset": "+00:00",
+        "evidence_ref": "waf-time:20261013:audit-line-4",
+        "raw_bytes_sha256": "c7839c4949c40685da87a905fd786748bdcbbfb72ca981fb5f18816ffe4e16c6"
+      }
+    ],
+    "operational_input_written": false,
+    "future_timezone_default_created": false,
+    "passed": true
+  },
+  "environment_evidence": {
+    "checked_at_kst": "2026-10-13T22:03:15.736153+09:00",
+    "container": {
+      "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+      "image_id": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+      "created": "2026-10-05T10:18:45.124155378Z",
+      "started_at": "2026-10-05T10:18:45.433754298Z",
+      "status": "running",
+      "tz_environment": [],
+      "timezone_mounts": []
+    },
+    "config_hashes": {
+      "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b",
+      "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+      "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a"
+    },
+    "host_clock": {
+      "exit": 0,
+      "out": "2026-10-13T22:03:15+09:00 KST",
+      "err": ""
+    },
+    "container_clock": {
+      "exit": 0,
+      "out": "2026-10-13T13:03:15+00:00 UTC",
+      "err": ""
+    },
+    "timezone_files": {
+      "exit": 0,
+      "out": "/etc/localtime 2026-09-18 00:00:00.000000000 +0000\n/usr/share/zoneinfo/Etc/UTC\n8b85846791ab2c8a5463c83a5be3c043e2570d7448434d41398969ed47e3e6f2  /etc/localtime",
+      "err": ""
+    },
+    "nginx_version": {
+      "exit": 0,
+      "out": "",
+      "err": "nginx version: nginx/1.30.5"
+    },
+    "audit_bytes": 8432,
+    "audit_sha256": "d28540b45327860cf0d6b30e0f60a8e5bda78b763dc3b7514ff3ac4b12150aa9",
+    "docker_log_query": {
+      "exit": 0,
+      "line_count": 5,
+      "byte_count": 460
+    },
+    "samples": [
+      {
+        "line": 1,
+        "audit_wall_time": "Mon Oct 12 18:00:36 2026",
+        "unique_id_present": true,
+        "matched_errors": [],
+        "response_date_utc": "2026-10-12T18:00:36+00:00"
+      },
+      {
+        "line": 2,
+        "audit_wall_time": "Mon Oct 12 18:00:56 2026",
+        "unique_id_present": true,
+        "matched_errors": [],
+        "response_date_utc": "2026-10-12T18:00:56+00:00"
+      },
+      {
+        "line": 3,
+        "audit_wall_time": "Mon Oct 12 18:04:43 2026",
+        "unique_id_present": true,
+        "matched_errors": [],
+        "response_date_utc": "2026-10-12T18:04:43+00:00"
+      },
+      {
+        "line": 4,
+        "audit_wall_time": "Mon Oct 12 18:04:45 2026",
+        "unique_id_present": true,
+        "matched_errors": [],
+        "response_date_utc": "2026-10-12T18:04:45+00:00"
+      }
+    ]
+  },
+  "access_evidence": {
+    "checked_at_kst": "2026-10-13T22:06:53.924630+09:00",
+    "query_exit": 0,
+    "line_count": 5,
+    "samples": [
+      {
+        "line": 1,
+        "raw_bytes_sha256": "03180c056697ca6ddbe0091fe3a3cc21008358008df0ed1f59f8bb58b3f41c36",
+        "audit_wall_time": "Mon Oct 12 18:00:36 2026",
+        "modsecurity_version": "ModSecurity v3.0.16 (Linux)",
+        "access_match_count": 1,
+        "matches": [
+          {
+            "access_time": "2026-10-12T18:00:36+00:00",
+            "docker_time_utc": "2026-10-12T18:00:36.052386570Z",
+            "docker_delay_seconds": 0.052386,
+            "matched_fields": [
+              "client_ip",
+              "method",
+              "uri",
+              "http_status",
+              "wall_time"
+            ],
+            "source_utc_offset": "+00:00"
+          }
+        ]
+      },
+      {
+        "line": 2,
+        "raw_bytes_sha256": "32c71c8109a78ada60b406cd04f388b05d5826ef3c4be169736ca9f7f216f0bd",
+        "audit_wall_time": "Mon Oct 12 18:00:56 2026",
+        "modsecurity_version": "ModSecurity v3.0.16 (Linux)",
+        "access_match_count": 1,
+        "matches": [
+          {
+            "access_time": "2026-10-12T18:00:56+00:00",
+            "docker_time_utc": "2026-10-12T18:00:56.551165638Z",
+            "docker_delay_seconds": 0.551165,
+            "matched_fields": [
+              "client_ip",
+              "method",
+              "uri",
+              "http_status",
+              "wall_time"
+            ],
+            "source_utc_offset": "+00:00"
+          }
+        ]
+      },
+      {
+        "line": 3,
+        "raw_bytes_sha256": "ad75ebce122be2d75fc0eea7fc8558c8dd68fd2e42e56d5d3cbf2dfd260849a8",
+        "audit_wall_time": "Mon Oct 12 18:04:43 2026",
+        "modsecurity_version": "ModSecurity v3.0.16 (Linux)",
+        "access_match_count": 1,
+        "matches": [
+          {
+            "access_time": "2026-10-12T18:04:43+00:00",
+            "docker_time_utc": "2026-10-12T18:04:43.200278483Z",
+            "docker_delay_seconds": 0.200278,
+            "matched_fields": [
+              "client_ip",
+              "method",
+              "uri",
+              "http_status",
+              "wall_time"
+            ],
+            "source_utc_offset": "+00:00"
+          }
+        ]
+      },
+      {
+        "line": 4,
+        "raw_bytes_sha256": "c7839c4949c40685da87a905fd786748bdcbbfb72ca981fb5f18816ffe4e16c6",
+        "audit_wall_time": "Mon Oct 12 18:04:45 2026",
+        "modsecurity_version": "ModSecurity v3.0.16 (Linux)",
+        "access_match_count": 1,
+        "matches": [
+          {
+            "access_time": "2026-10-12T18:04:45+00:00",
+            "docker_time_utc": "2026-10-12T18:04:45.741429065Z",
+            "docker_delay_seconds": 0.741429,
+            "matched_fields": [
+              "client_ip",
+              "method",
+              "uri",
+              "http_status",
+              "wall_time"
+            ],
+            "source_utc_offset": "+00:00"
+          }
+        ]
+      }
+    ],
+    "nginx_config_test_exit": 0,
+    "logging_directives": [
+      "access_log off;",
+      "access_log off;",
+      "log_format main '$realip_remote_addr - $remote_user [$time_local] \"$request\" '",
+      "access_log /var/log/nginx/access.log main;",
+      "access_log /dev/null combined;",
+      "error_log /var/log/nginx/error.log warn;"
+    ]
+  },
+  "local_tests": {
+    "existing": 79,
+    "time_context": 15,
+    "total": 94,
+    "failed": 0
+  },
+  "source_sha256": {
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "waf_input_adapter.py": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b",
+    "verify_waf_time_evidence.py": "89a5d40dc9c20a193a6ccc3809deafa60acc0727370e5b434dff543249052c06",
+    "test_waf_time_context.py": "173d0bfd67fd3da174ca0518990def1591a1fe16ffe8d0f5c0c3c5eca65b9f79"
+  }
+}

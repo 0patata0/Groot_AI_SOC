@@ -1,0 +1,3 @@
+# Operator installs this in a dedicated SERVER venv; no Mac installation.
+# Record the exact resolved patch/dependencies in the deployment evidence.
+ansible-core==2.21.5

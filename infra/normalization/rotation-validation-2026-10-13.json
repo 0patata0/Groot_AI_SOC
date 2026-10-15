@@ -1,0 +1,823 @@
+{
+  "phase": "3b-rotation-writer-and-collector-validation",
+  "scope": "same installed binaries, separate synthetic processes and private files; no operating log rotation policy deployed",
+  "inspection": {
+    "checked_at_kst": "2026-10-13T23:30:48.965568+09:00",
+    "configs": {
+      "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+      "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+      "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+    },
+    "containers": {
+      "waf": {
+        "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "image": "owasp/modsecurity-crs:nginx",
+        "image_id": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "pid": 647700,
+        "started_at": "2026-10-05T10:18:45.433754298Z",
+        "status": "running",
+        "mounts": [
+          {
+            "source": "/home/groot_a/capstone/secstack/logs/modsec",
+            "destination": "/var/log/modsecurity",
+            "rw": true
+          },
+          {
+            "source": "/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf",
+            "destination": "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf",
+            "rw": false
+          }
+        ],
+        "processes": {
+          "exit": 0,
+          "output": "PID                 PPID                COMMAND\n647700              647676              nginx\n648343              647700              nginx\n648344              647700              nginx\n"
+        },
+        "binary": {
+          "exit": 0,
+          "output": "nginx version: nginx/1.30.5\nbuilt by gcc 14.2.0 (Debian 14.2.0-19) \nbuilt with OpenSSL 3.5.6 7 Apr 2026 (running with OpenSSL 3.5.7 9 Jun 2026)\nTLS SNI support enabled\nconfigure arguments: --prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/run/nginx.pid --lock-path=/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-http_v3_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module --with-cc-opt='-g -O2 -Werror=implicit-function-declaration -ffile-prefix-map=/home/builder/debuild/nginx-1.30.5/debian/debuild-base/nginx-1.30.5=. -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -fcf-protection -Wp,-D_FORTIFY_SOURCE=2 -fPIC' --with-ld-opt='-Wl,-z,relro -Wl,-z,now -Wl,--as-needed -pie'\n"
+        },
+        "modules_audit": {
+          "exit": 2,
+          "output": "PATH /etc/nginx/nginx.conf\nload_module modules/ngx_http_modsecurity_module.so;\nload_module modules/ngx_http_modsecurity_module.so;\nload_module modules/ngx_http_headers_more_filter_module.so;\nPATH /etc/nginx/conf.d/default.conf\nPATH /etc/modsecurity.d/modsecurity.conf\n# https://github.com/owasp-modsecurity/ModSecurity/blob/v3/master/modsecurity.conf-recommended\nSecTmpDir /tmp/modsecurity/tmp\nSecDataDir /tmp/modsecurity/data\nSecAuditEngine RelevantOnly\nSecAuditLogRelevantStatus \"^(?:5|4(?!04))\"\nSecAuditLogParts ABIJDEFHZ\nSecAuditLogType Serial\nSecAuditLog /var/log/modsecurity/audit.log\nSecAuditLog /var/log/modsecurity/audit.log\nSecAuditLogFormat JSON\nSecAuditLogStorageDir /var/log/modsecurity/audit/\nSecAuditLogStorageDir /var/log/modsecurity/audit/\nSecUploadDir /tmp/modsecurity/upload\nlrwxrwxrwx 1 nginx root   22 Sep 15 14:07 /etc/nginx/modules -> /usr/lib/nginx/modules\n\n/usr/lib/nginx/modules:\ntotal 9172\n-rw-r--r-- 1 root root   20232 Sep 15 14:07 ngx_http_geoip_module-debug.so\n-rw-r--r-- 1 root root   20232 Sep 15 14:07 ngx_http_geoip_module.so\n-rwxr-xr-x 1 root root   28736 Sep 24 11:55 ngx_http_headers_more_filter_module.so\n-rw-r--r-- 1 root root   27568 Sep 15 14:07 ngx_http_image_filter_module-debug.so\n-rw-r--r-- 1 root root   27568 Sep 15 14:07 ngx_http_image_filter_module.so\n-rw-r--r-- 1 root root 2315872 Sep 15 14:07 ngx_http_js_module-debug.so\n-rw-r--r-- 1 root root 2307584 Sep 15 14:07 ngx_http_js_module.so\n-rwxr-xr-x 1 root root   24016 Sep 24 11:55 ngx_http_modsecurity_module.so\n-rw-r--r-- 1 root root   23400 Sep 15 14:07 ngx_http_xslt_filter_module-debug.so\n-rw-r--r-- 1 root root   23400 Sep 15 14:07 ngx_http_xslt_filter_module.so\n-rw-r--r-- 1 root root   19864 Sep 15 14:07 ngx_stream_geoip_module-debug.so\n-rw-r--r-- 1 root root   19864 Sep 15 14:07 ngx_stream_geoip_module.so\n-rw-r--r-- 1 root root 2258912 Sep 15 14:07 ngx_stream_js_module-debug.so\n-rw-r--r-- 1 root root 2254720 Sep 15 14:07 ngx_stream_js_module.so\n\n/usr/local/modsecurity/lib:\ntotal 2556\nlrwxrwxrwx 1 root root      51 Sep 24 11:55 libmodsecurity.so -> /usr/local/modsecurity/lib/libmodsecurity.so.3.0.16\nlrwxrwxrwx 1 root root      51 Sep 24 11:55 libmodsecurity.so.3 -> /usr/local/modsecurity/lib/libmodsecurity.so.3.0.16\nlrwxrwxrwx 1 root root      51 Sep 24 11:55 libmodsecurity.so.3.0 -> /usr/local/modsecurity/lib/libmodsecurity.so.3.0.16\n-rwxr-xr-x 1 root root 2614208 Sep 24 11:55 libmodsecurity.so.3.0.16\n"
+        }
+      },
+      "suricata": {
+        "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+        "image": "jasonish/suricata:latest",
+        "image_id": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+        "pid": 1534179,
+        "started_at": "2026-10-13T10:50:28.696240875Z",
+        "status": "running",
+        "mounts": [
+          {
+            "source": "/home/groot_a/capstone/suricata/ruleset",
+            "destination": "/rules",
+            "rw": false
+          },
+          {
+            "source": "/var/lib/docker/volumes/0162cd3f813fc41957536eab8d148385f88ae6de95e692a290b8801ace2aabba/_data",
+            "destination": "/etc/suricata",
+            "rw": true
+          },
+          {
+            "source": "/var/lib/docker/volumes/secstack_suricata-lib/_data",
+            "destination": "/var/lib/suricata",
+            "rw": true
+          },
+          {
+            "source": "/home/groot_a/capstone/secstack/logs/suricata",
+            "destination": "/var/log/suricata",
+            "rw": true
+          },
+          {
+            "source": "/var/lib/docker/volumes/f2d8a924f6d6ee57caef421f883c936ecf4c47c73be96dbcb2dc72c9e85e5af2/_data",
+            "destination": "/var/run/suricata",
+            "rw": true
+          }
+        ],
+        "processes": {
+          "exit": 0,
+          "output": "PID                 PPID                COMMAND\n1534179             1534156             Suricata-Main\n"
+        },
+        "binary": {
+          "exit": 0,
+          "output": "This is Suricata version 8.0.6 RELEASE\nFeatures: NFQ PCAP_SET_BUFF AF_PACKET HAVE_PACKET_FANOUT LIBCAP_NG LIBNET1.1 HAVE_HTP_URI_NORMALIZE_HOOK PCRE_JIT HAVE_NSS HTTP2_DECOMPRESSION HAVE_LUA HAVE_JA3 HAVE_JA4 HAVE_LIBJANSSON TLS TLS_C11 MAGIC RUST POPCNT64 \nSIMD support: SSE_4_2 SSE_4_1 SSE_3 SSE_2 \nAtomic intrinsics: 1 2 4 8 16 byte(s)\n64-bits, Little-endian architecture\nGCC version 11.5.0 20240719 (Red Hat 11.5.0-14), C version 201112\ncompiled with _FORTIFY_SOURCE=0\nL1 cache line size (CLS)=64\nthread local storage method: _Thread_local\ncompiled with LibHTP v8.0.6\n\nSuricata Configuration:\n  AF_PACKET support:                       yes\n  AF_XDP support:                          no\n  DPDK support:                            yes\n  eBPF support:                            yes\n  XDP support:                             yes\n  PF_RING support:                         no\n  NFQueue support:                         yes\n  NFLOG support:                           no\n  IPFW support:                            no\n  Netmap support:                          no \n  DAG enabled:                             no\n  Napatech enabled:                        no\n  WinDivert enabled:                       no\n  Npcap support:                           \n\n  Unix socket enabled:                     yes\n  Detection enabled:                       yes\n\n  Libmagic support:                        yes\n  libjansson support:                      yes\n  hiredis support:                         yes\n  hiredis async with libevent:             yes\n  PCRE jit:                                yes\n  GeoIP2 support:                          yes\n  JA3 support:                             yes\n  JA4 support:                             yes\n  Hyperscan support:                       yes\n  Hwloc support:                           no\n  Libnet support:                          yes\n  liblz4 support:                          yes\n  Landlock support:                        yes\n  Systemd support:                         yes\n\n  Rust strict mode:                        no\n  Rust compiler path:                      /usr/bin/rustc\n  Rust compiler version:                   rustc 1.92.0 (ded5c06cf 2025-12-08) (Red Hat 1.92.0-2.el9_8)\n  Cargo path:                              /usr/bin/cargo\n  Cargo version:                           cargo 1.92.0 (344c4567c 2025-10-21) (Red Hat 1.92.0-2.el9_8)\n\n  Python support:                          yes\n  Python path:                             /usr/bin/python3\n  Install suricatactl:                     yes\n  Install suricatasc:                      yes\n  Install suricata-update:                 yes\n\n  Profiling enabled:                       no\n  Profiling locks enabled:                 no\n  Profiling rules enabled:                 yes\n\n  Plugin support (experimental):           yes\n  DPDK Bond PMD:                           no\n\nPlugins:\n  nDPI:                                    no\n\nDevelopment settings:\n  Coccinelle / spatch:                     no\n  Unit tests enabled:                      no\n  Debug output enabled:                    no\n  Debug validation enabled:                no\n  QA-simulation enabled:                   no\n  Fuzz targets enabled:                    no\n\nGeneric build parameters:\n  Installation prefix:                     /usr\n  Configuration directory:                 /etc/suricata/\n  Log directory:                           /var/log/suricata/\n\n  --prefix                                 /usr\n  --sysconfdir                             /etc\n  --localstatedir                          /var\n  --datarootdir                            /usr/share\n\n  Host:                                    x86_64-pc-linux-gnu\n  Compiler:                                gcc (exec name) / g++ (real)\n  GCC Protect enabled:                     no\n  GCC march native enabled:                no\n  GCC Profile enabled:                     no\n  Position Independent Executable enabled: no\n  CFLAGS                                   -g -O2 -fPIC -DOS_LINUX -std=c11 -I/usr/include/dpdk -include rte_config.h -march=corei7 -mrtm \n  PCAP_CFLAGS                              \n  SECCFLAGS                                \n"
+        },
+        "paths": {
+          "exit": 2,
+          "output": "/usr/bin/suricata\n-rw------- 1 suricata suricata 93895 Sep 26 00:00 /etc/suricata/suricata.yaml\nsrw-rw---- 1 suricata suricata     0 Oct 13 10:50 /var/run/suricata/suricata-command.socket\n"
+        }
+      }
+    },
+    "logs": {
+      "/home/groot_a/capstone/secstack/logs/modsec/audit.log": {
+        "dev": 64512,
+        "ino": 1441881,
+        "size": 8432,
+        "mode": "0o644",
+        "uid": 101,
+        "gid": 101
+      },
+      "/home/groot_a/capstone/secstack/logs/suricata/eve.json": {
+        "dev": 64512,
+        "ino": 1441879,
+        "size": 18723702,
+        "mode": "0o644",
+        "uid": 998,
+        "gid": 998
+      }
+    },
+    "localfile_paths": [
+      "<log_format>command</log_format>",
+      "<log_format>full_command</log_format>",
+      "<log_format>full_command</log_format>",
+      "<log_format>plain</log_format>",
+      "<log_format>journald</log_format>",
+      "<location>journald</location>",
+      "<log_format>syslog</log_format>",
+      "<location>/var/ossec/logs/active-responses.log</location>",
+      "<log_format>syslog</log_format>",
+      "<location>/var/log/dpkg.log</location>",
+      "<log_format>json</log_format>",
+      "<location>/home/groot_a/capstone/secstack/logs/suricata/eve.json</location>",
+      "<log_format>json</log_format>",
+      "<location>/home/groot_a/capstone/secstack/logs/modsec/audit.log</location>"
+    ]
+  },
+  "first_attempt": {
+    "checked_at_kst": "2026-10-13T23:41:58.098045+09:00",
+    "before": {
+      "configs": {
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+      },
+      "containers": {
+        "waf": {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "pid": 647700,
+          "started_at": "2026-10-05T10:18:45.433754298Z",
+          "status": "running"
+        },
+        "suricata": {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "pid": 1534179,
+          "started_at": "2026-10-13T10:50:28.696240875Z",
+          "status": "running"
+        }
+      }
+    },
+    "collector": {},
+    "suricata": {
+      "ok": false,
+      "error": "ProbeError:probe_failed"
+    },
+    "waf": {
+      "probe": "waf_serial_rotation_v1",
+      "ok": false,
+      "operating_config_changed": false,
+      "container_restarted": false,
+      "stage": "initial_requests",
+      "operating_container_before": {
+        "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "host_pid": 647700,
+        "started_at": "2026-10-05T10:18:45.433754298Z"
+      },
+      "test_master": {
+        "host_pid": 1558432,
+        "namespace_pid": 258801,
+        "parent_pid": 647700,
+        "start_ticks": 133094493
+      },
+      "test_listener": {
+        "address": "127.0.0.1",
+        "port": 36805
+      },
+      "test_config_sha256": "03c5e28f4f7a2f86cfe8d62ec4bc9d1d9f74c10c7a39bea0478f9236b65a9b2f",
+      "error": "probe_unexpected_failure",
+      "error_type": "SpoolError",
+      "cleanup_error": "test_process_cleanup_not_verified",
+      "test_processes_cleaned": false,
+      "retained_test_directory": "/proc/647700/root/tmp/capstone-waf-rotation-9qjgpg4o",
+      "operating_container_unchanged": true
+    },
+    "after": {
+      "configs": {
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+      },
+      "containers": {
+        "waf": {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "pid": 647700,
+          "started_at": "2026-10-05T10:18:45.433754298Z",
+          "status": "running"
+        },
+        "suricata": {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "pid": 1534179,
+          "started_at": "2026-10-13T10:50:28.696240875Z",
+          "status": "running"
+        }
+      }
+    },
+    "operating_state_unchanged": true,
+    "operational_policy_changed": false,
+    "passed": false
+  },
+  "first_attempt_cleanup": {
+    "master": null,
+    "active_test_processes": [],
+    "files_before": [
+      "uwsgi",
+      "fastcgi",
+      "rotation-metadata",
+      "rotation-spool",
+      "access.log",
+      "nginx.conf",
+      "audit.log",
+      "error.log",
+      "scgi",
+      "www",
+      "client",
+      "modsecurity.conf",
+      "proxy"
+    ],
+    "removed": true,
+    "master_after": null
+  },
+  "final_attempt": {
+    "checked_at_kst": "2026-10-13T23:47:00.046675+09:00",
+    "before": {
+      "configs": {
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+      },
+      "containers": {
+        "waf": {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "pid": 647700,
+          "started_at": "2026-10-05T10:18:45.433754298Z",
+          "status": "running"
+        },
+        "suricata": {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "pid": 1534179,
+          "started_at": "2026-10-13T10:50:28.696240875Z",
+          "status": "running"
+        }
+      }
+    },
+    "collector": {
+      "suricata": {
+        "before": {
+          "inserted": 1,
+          "replayed": 0,
+          "ready": 1,
+          "quarantine": 0,
+          "ignored": 0,
+          "blocked": null,
+          "notices": [
+            "bootstrap_at_beginning"
+          ]
+        },
+        "after_passes": [
+          {
+            "inserted": 0,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 0,
+            "ignored": 0,
+            "blocked": null,
+            "notices": [
+              "reading_attested_closed_generation",
+              "rotation_advanced_with_close_proof"
+            ]
+          },
+          {
+            "inserted": 1,
+            "replayed": 0,
+            "ready": 1,
+            "quarantine": 0,
+            "ignored": 0,
+            "blocked": null,
+            "notices": []
+          },
+          {
+            "inserted": 0,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 0,
+            "ignored": 0,
+            "blocked": null,
+            "notices": []
+          }
+        ],
+        "restart": {
+          "inserted": 0,
+          "replayed": 0,
+          "ready": 0,
+          "quarantine": 0,
+          "ignored": 0,
+          "blocked": null,
+          "notices": []
+        },
+        "stats": {
+          "total_records": 2,
+          "state_count": 1,
+          "logical_bytes": 4434,
+          "by_status": {
+            "ignored": 0,
+            "quarantine": 0,
+            "ready": 2
+          },
+          "max_bytes": 67108864,
+          "max_records": 100000,
+          "physical_limit_bytes": 134283264,
+          "db_bytes": 28672
+        },
+        "all_synthetic_raw_preserved": true,
+        "proof": {
+          "method": "writer-fd-close-v1",
+          "writer_kind": "suricata",
+          "instance_id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "writer_pid": 1559211,
+          "writer_start_ticks": 133124266,
+          "checked_at": "2026-10-13T14:47:05.777361+00:00",
+          "writable_fd_count": 0,
+          "next_writable_fd_count": 1,
+          "configuration_sha256": "3a3c7b4884eb8f66596ab00ce5226aaf86ffa5c06b55aaf57f2ecd114a09c978"
+        },
+        "closed": {
+          "basename": "eve.json.closed",
+          "dev": 47,
+          "ino": 415790,
+          "size": 632,
+          "sha256": "a63d63c1dccab7403db9b272ff2581945cae6ddc25fd02a0fd26176d8cb31767"
+        },
+        "next": {
+          "dev": 47,
+          "ino": 415631
+        }
+      },
+      "modsecurity": {
+        "before": {
+          "inserted": 2,
+          "replayed": 0,
+          "ready": 0,
+          "quarantine": 2,
+          "ignored": 0,
+          "blocked": null,
+          "notices": [
+            "bootstrap_at_beginning"
+          ]
+        },
+        "after_passes": [
+          {
+            "inserted": 5,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 5,
+            "ignored": 0,
+            "blocked": null,
+            "notices": [
+              "reading_attested_closed_generation",
+              "rotation_advanced_with_close_proof"
+            ]
+          },
+          {
+            "inserted": 2,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 2,
+            "ignored": 0,
+            "blocked": null,
+            "notices": []
+          },
+          {
+            "inserted": 0,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 0,
+            "ignored": 0,
+            "blocked": null,
+            "notices": []
+          }
+        ],
+        "restart": {
+          "inserted": 0,
+          "replayed": 0,
+          "ready": 0,
+          "quarantine": 0,
+          "ignored": 0,
+          "blocked": null,
+          "notices": []
+        },
+        "stats": {
+          "total_records": 9,
+          "state_count": 1,
+          "logical_bytes": 13778,
+          "by_status": {
+            "ignored": 0,
+            "quarantine": 9,
+            "ready": 0
+          },
+          "max_bytes": 67108864,
+          "max_records": 100000,
+          "physical_limit_bytes": 134283264,
+          "db_bytes": 65536
+        },
+        "all_synthetic_raw_preserved": true,
+        "proof": {
+          "method": "writer-fd-close-v1",
+          "writer_kind": "modsecurity",
+          "instance_id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "writer_pid": 1559294,
+          "writer_start_ticks": 133124914,
+          "checked_at": "2026-10-13T14:47:07.756417+00:00",
+          "writable_fd_count": 0,
+          "next_writable_fd_count": 1,
+          "configuration_sha256": "b87dc96bbf934287d7057e57cfbae1116800cdca5482f29b645b515c4ada1897"
+        },
+        "closed": {
+          "basename": "audit.sealed-1.log",
+          "dev": 49,
+          "ino": 415791,
+          "size": 7470,
+          "sha256": "0e18bfedbc7dfa1846656dbf709f94783beab4dc84d3e40fe8cb624a15251e20"
+        },
+        "next": {
+          "dev": 49,
+          "ino": 415799
+        }
+      }
+    },
+    "suricata": {
+      "writer_pid": 1559211,
+      "writer_start_ticks": 133124266,
+      "writer_namespace_pid": 168,
+      "container_id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+      "container_init_pid": 1534179,
+      "container_init_start_ticks": 131705083,
+      "pid_namespace_inode": 4026532724,
+      "binary_inode": [
+        47,
+        403841
+      ],
+      "binary_sha256": "c2f2ec727be9d6f925e9164b59786ba5bf6f6b61452a6901a4013c996a06aa8d",
+      "binary_version": "8.0.6",
+      "config_sha256": "3a3c7b4884eb8f66596ab00ce5226aaf86ffa5c06b55aaf57f2ecd114a09c978",
+      "rules_sha256": "86ff1b3454c6170b391e8e0b573bf0adc67068a1714e53659d36f6bac4309093",
+      "writer_kind": "suricata",
+      "proof_kind": "suricata-offline-rotation-v1",
+      "capture_mode": "pcap-file",
+      "runmode": "single",
+      "address_space_limit_kib": 524288,
+      "old_writer_fds": [],
+      "new_writer_fds": [
+        3
+      ],
+      "old_inode": 415790,
+      "new_inode": 415631,
+      "old_device": 47,
+      "new_device": 47,
+      "closed_sha256": "a63d63c1dccab7403db9b272ff2581945cae6ddc25fd02a0fd26176d8cb31767",
+      "next_sha256": "39fcaede0687bafe79ba828834e97a99cf6ae03139e0bab165a28d31630741a7",
+      "closed_size": 632,
+      "next_size": 632,
+      "ok": true,
+      "before_records": [
+        {
+          "offset": 0,
+          "length": 632,
+          "raw_sha256": "a63d63c1dccab7403db9b272ff2581945cae6ddc25fd02a0fd26176d8cb31767",
+          "source_port": 41001
+        }
+      ],
+      "after_records": [
+        {
+          "offset": 0,
+          "length": 632,
+          "raw_sha256": "39fcaede0687bafe79ba828834e97a99cf6ae03139e0bab165a28d31630741a7",
+          "source_port": 41002
+        }
+      ]
+    },
+    "waf": {
+      "probe": "waf_serial_rotation_v1",
+      "ok": true,
+      "operating_config_changed": false,
+      "container_restarted": false,
+      "stage": "verified",
+      "operating_container_before": {
+        "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "host_pid": 647700,
+        "started_at": "2026-10-05T10:18:45.433754298Z"
+      },
+      "test_master": {
+        "host_pid": 1559294,
+        "namespace_pid": 258932,
+        "parent_pid": 647700,
+        "start_ticks": 133124914,
+        "state": "S"
+      },
+      "test_listener": {
+        "address": "127.0.0.1",
+        "port": 34969
+      },
+      "test_config_sha256": "683c0a6dba907cca125d4cb8125d4f2b4719d572a2c757d4a58556386e15cdf1",
+      "verification_before": {
+        "inserted": 2,
+        "replayed": 0,
+        "ready": 0,
+        "quarantine": 2,
+        "ignored": 0,
+        "blocked": null,
+        "notices": [
+          "bootstrap_at_beginning"
+        ]
+      },
+      "rename_usr1": {
+        "closed_markers": [
+          "before-001",
+          "before-002",
+          "usr1-001",
+          "usr1-002"
+        ],
+        "active_markers": [],
+        "closed_writer_fds": [
+          {
+            "host_pid": 1559294,
+            "namespace_pid": 258932,
+            "parent_pid": 647700,
+            "start_ticks": 133124914,
+            "state": "S",
+            "fd": 5
+          },
+          {
+            "host_pid": 1559295,
+            "namespace_pid": 258933,
+            "parent_pid": 1559294,
+            "start_ticks": 133124914,
+            "state": "S",
+            "fd": 5
+          }
+        ]
+      },
+      "same_path_hup": {
+        "closed_markers": [
+          "before-001",
+          "before-002",
+          "usr1-001",
+          "usr1-002",
+          "samepath-hup-001",
+          "samepath-hup-002"
+        ],
+        "active_markers": [],
+        "closed_writer_fds": [
+          {
+            "host_pid": 1559294,
+            "namespace_pid": 258932,
+            "parent_pid": 647700,
+            "start_ticks": 133124914,
+            "state": "S",
+            "fd": 5
+          },
+          {
+            "host_pid": 1559299,
+            "namespace_pid": 258934,
+            "parent_pid": 1559294,
+            "start_ticks": 133124946,
+            "state": "S",
+            "fd": 5
+          }
+        ]
+      },
+      "old_writer_before_late_completion": [
+        {
+          "host_pid": 1559299,
+          "namespace_pid": 258934,
+          "parent_pid": 1559294,
+          "start_ticks": 133124946,
+          "state": "S",
+          "fd": 5
+        }
+      ],
+      "new_path_hup": {
+        "closed_markers": [
+          "before-001",
+          "before-002",
+          "usr1-001",
+          "usr1-002",
+          "samepath-hup-001",
+          "samepath-hup-002",
+          "late-old"
+        ],
+        "next_markers": [
+          "newpath-hup-001",
+          "newpath-hup-002"
+        ],
+        "closed_source": {
+          "dev": 49,
+          "ino": 415791,
+          "size": 7470,
+          "sha256": "0e18bfedbc7dfa1846656dbf709f94783beab4dc84d3e40fe8cb624a15251e20",
+          "nlink": 1
+        },
+        "next_source": {
+          "dev": 49,
+          "ino": 415799,
+          "size": 2150,
+          "sha256": "23d36a404206a0f91f460f842b2a6ab1d4f7a45f063b2121266494bb6909f100",
+          "nlink": 1
+        },
+        "late_status": 405,
+        "old_writer_fds_after": [],
+        "old_workers": [
+          {
+            "host_pid": 1559299,
+            "namespace_pid": 258934,
+            "parent_pid": 1559294,
+            "start_ticks": 133124946,
+            "state": "S"
+          }
+        ],
+        "new_workers": [
+          {
+            "host_pid": 1559328,
+            "namespace_pid": 258940,
+            "parent_pid": 1559294,
+            "start_ticks": 133124971,
+            "state": "S"
+          }
+        ]
+      },
+      "verification_after": {
+        "after_passes": [
+          {
+            "inserted": 5,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 5,
+            "ignored": 0,
+            "blocked": null,
+            "notices": [
+              "reading_attested_closed_generation",
+              "rotation_advanced_with_close_proof"
+            ]
+          },
+          {
+            "inserted": 2,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 2,
+            "ignored": 0,
+            "blocked": null,
+            "notices": []
+          },
+          {
+            "inserted": 0,
+            "replayed": 0,
+            "ready": 0,
+            "quarantine": 0,
+            "ignored": 0,
+            "blocked": null,
+            "notices": []
+          }
+        ],
+        "restart": {
+          "inserted": 0,
+          "replayed": 0,
+          "ready": 0,
+          "quarantine": 0,
+          "ignored": 0,
+          "blocked": null,
+          "notices": []
+        },
+        "stats": {
+          "total_records": 9,
+          "state_count": 1,
+          "logical_bytes": 13778,
+          "by_status": {
+            "ignored": 0,
+            "quarantine": 9,
+            "ready": 0
+          },
+          "max_bytes": 67108864,
+          "max_records": 100000,
+          "physical_limit_bytes": 134283264,
+          "db_bytes": 65536
+        },
+        "all_synthetic_raw_preserved": true,
+        "proof": {
+          "method": "writer-fd-close-v1",
+          "writer_kind": "modsecurity",
+          "instance_id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "writer_pid": 1559294,
+          "writer_start_ticks": 133124914,
+          "checked_at": "2026-10-13T14:47:07.756417+00:00",
+          "writable_fd_count": 0,
+          "next_writable_fd_count": 1,
+          "configuration_sha256": "b87dc96bbf934287d7057e57cfbae1116800cdca5482f29b645b515c4ada1897"
+        },
+        "closed": {
+          "basename": "audit.sealed-1.log",
+          "dev": 49,
+          "ino": 415791,
+          "size": 7470,
+          "sha256": "0e18bfedbc7dfa1846656dbf709f94783beab4dc84d3e40fe8cb624a15251e20"
+        },
+        "next": {
+          "dev": 49,
+          "ino": 415799
+        }
+      },
+      "test_live_processes_after_cleanup": [],
+      "test_processes_cleaned": true,
+      "temporary_artifacts_removed": true,
+      "operating_container_unchanged": true
+    },
+    "after": {
+      "configs": {
+        "/etc/logrotate.d/capstone-secstack": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "/var/ossec/etc/ossec.conf": "cdc79a88f713d1a8d2d23486b433477c4656bb5f93e157aa6690e9adbc0e27ef",
+        "/home/groot_a/capstone/secstack/docker-compose.yml": "92bb5f4cd492837f53f7840b36ffcc5bb4c21b13a3802b504056f189de17163b"
+      },
+      "containers": {
+        "waf": {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "pid": 647700,
+          "started_at": "2026-10-05T10:18:45.433754298Z",
+          "status": "running"
+        },
+        "suricata": {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "pid": 1534179,
+          "started_at": "2026-10-13T10:50:28.696240875Z",
+          "status": "running"
+        }
+      }
+    },
+    "operating_state_unchanged": true,
+    "operational_policy_changed": false,
+    "passed": true,
+    "host_spool_removed": true
+  },
+  "final_cleanup_check": {
+    "checked_at_kst": "2026-10-13T23:48:56.264481+09:00",
+    "containers": {
+      "waf": {
+        "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "pid": 647700,
+        "started_at": "2026-10-05T10:18:45.433754298Z",
+        "status": "running",
+        "remaining_test_directories": [],
+        "processes": "PID                 PPID                COMMAND\n647700              647676              nginx\n648343              647700              nginx\n648344              647700              nginx\n"
+      },
+      "suricata": {
+        "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+        "pid": 1534179,
+        "started_at": "2026-10-13T10:50:28.696240875Z",
+        "status": "running",
+        "remaining_test_directories": [],
+        "processes": "PID                 PPID                COMMAND\n1534179             1534156             Suricata-Main\n"
+      }
+    },
+    "remaining_host_spools": [],
+    "production_audit": {
+      "size": 8432,
+      "sha256": "d28540b45327860cf0d6b30e0f60a8e5bda78b763dc3b7514ff3ac4b12150aa9"
+    },
+    "copytruncate_present": true
+  },
+  "source_sha256": {
+    "normalize_events.py": "b6da7d299ba5670b218bea1d71a43c920c1481730712fda88ffb7f0168166a00",
+    "collector_file_reader.py": "40d2882d664d5563394eec8f9fd597337729775aa4ad5a901b3846f42950c8ad",
+    "collector_store.py": "cabba11715476c2500aabb16d7137617aa916f02014636456afd329881fd722a",
+    "collector_journal_reader.py": "645e2e321610964e46a0ad44b6f529ec9da734e5f6291c744272f51b50cac552",
+    "waf_input_adapter.py": "2e2ea85587646f90fbd15b85dc763b336363cfa6b14edceb847f66b416a9592b",
+    "collector.py": "21531da43e465cd0adac4a9b4f49ad9168bae7b9878fb61c2a53a019e0a81d2b",
+    "collector_waf_evidence.py": "c21441304fbf40b86f118a6219ae6306630781b54f54414b70cd774d6275fdfd",
+    "collector_rotation.py": "0e3e6de7483ea526f9ca3d5df5d7ca8e3c85251f1b002d1856f6756cb63393ea",
+    "collector_rotation_proof.py": "cead5a188b4a3a2a61653cd8bd06d7e068c0b099b3e84a03846d117a14f75752",
+    "probe_suricata_rotation.py": "d6b6ebc388cdf488efd5efba6594bb4d2a123c06467811b4d0a5c99c2884107c",
+    "probe_waf_rotation.py": "9cdcba56d8d030f24e5830df4b3a91f4c3d1b64a7731438d5822e7424dc93bd7"
+  },
+  "regression_tests": {
+    "previous": 188,
+    "rotation_chain": 26,
+    "closure_and_publication": 13,
+    "total": 227,
+    "passed": true,
+    "command": "python3 -B -m unittest discover -s infra/normalization -p 'test_*.py'"
+  },
+  "findings_fixed": [
+    "unrelated PID holding new file could falsely satisfy writer proof; now require specified writer PID FD twice",
+    "bootstrap active-path replacement race rejected after reading",
+    "probe SQLite spool moved out of /proc/container/root path to actual host temporary path after SpoolError",
+    "probe cleanup verifies live vs zombie state, tracks worker identities, and uses pidfd signals"
+  ],
+  "interpretation": {
+    "suricata": "rename + SIGHUP + subsequent write switched inode in isolated continuous offline PCAP process",
+    "modsecurity_usr1": "did not reopen serial audit; later markers stayed in old inode",
+    "modsecurity_same_path_hup": "did not reopen serial audit; later markers stayed in old inode",
+    "modsecurity_new_path_hup": "new writer used new inode; pending old request still completed into old inode; old FD closure subsequently confirmed",
+    "retained_synthetic_records": 11,
+    "suricata_ready": 2,
+    "waf_quarantine": 9,
+    "waf_quarantine_reason": "independent production Docker time resolver deliberately not configured for private synthetic probe audit; raw bytes retained",
+    "restart_additional_records": 0
+  },
+  "operational_limitations": [
+    "copytruncate remains configured for existing operating raw Wazuh inputs",
+    "Wazuh 4.14.8 source review identifies old FD drain gap; actual dropped operating logs were not observed in this test",
+    "no automatic production rotator/restart recovery or Wazuh path migration deployed",
+    "new WAF pathname used a test-only hardlink active alias; lifecycle under operational restart/next rotations remains to validate",
+    "spool output/ack/quarantine reprocessing and Wazuh end-to-end correlation remain next steps",
+    "archive rows may be retained before full EOF hash verification; future output must require closed generation completion"
+  ],
+  "passed": true,
+  "packages_installed": false
+}

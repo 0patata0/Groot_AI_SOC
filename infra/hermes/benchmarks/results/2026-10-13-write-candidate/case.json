@@ -1,0 +1,26 @@
+{
+  "created_at_kst": "2026-10-13T16:40:01+09:00",
+  "target": "a:modsecurity-custom",
+  "model": "qwen3.6:35b",
+  "length_reference": "new_rule/GROOT_A_WAF.conf",
+  "reference_bytes": 22652,
+  "real_rule_content_read_or_sent": false,
+  "synthetic_rule_count": 156,
+  "base_sha256": "96a72b32496ebabb94403298ca792ed2eaaa6dfd6d6b47e23cc8bf85913f152a",
+  "expected_sha256": "2ffa7e827c3ca066e9e838f61efb3ae4d8e09e1e6f27a18787a6b3d8b720cff4",
+  "expected_bytes": 22696,
+  "added_prefix": "# Benchmark comment: offline candidate only\n",
+  "request_sha256": "07a9a6a0b1801d669ea01c8e2fbf0b7fda2d1c796bd3fae4231faf8d0188a9e4",
+  "request_bytes": 27995,
+  "schema_source": "infra/mcp/rule_change_mcp.py",
+  "schema_source_sha256": "8540800120dc65cba43b4a2766bc93e019ce7253eaf93cdd6a70771ca99d8dba",
+  "limitations": [
+    "Model API only; no MCP dispatch, approval, file write, validation or reload on servers.",
+    "Synthetic file, not the actual operational rule file.",
+    "Does not reproduce the production system prompt (~25k) or history (~42–88k).",
+    "Does not isolate model weights, Ollama versions, hardware or other server workload.",
+    "Two rounds only; no forced unload or thinking-mode override for main requests.",
+    "Separate short native non-thinking warmup; does not reproduce production history caching.",
+    "Socket timeout 180 s; wall limit checked on each received stream line (300 s), so a stalled read can overrun it."
+  ]
+}

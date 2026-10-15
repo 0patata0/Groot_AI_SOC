@@ -9,7 +9,16 @@ Do this, using only your MCP tools:
    - 근거: 경보 id/규칙/레벨, 시각, 출처 IP, 영향 호스트
    - 판단: 오탐 가능성 / 위험도 / 확산 여부
    - 대응: 이미 취한 조치 + 권고
-4. Containment: if an EXTERNAL attacker IP (not in the ranges above) shows a clear attack pattern (web attack/scan/JNDI/brute force) with 2+ corroborating alerts, request a block with mcp__resp__block_ip (minutes: 60, reason: the rule ids). The operator must approve it in chat; the tool returns the outcome. Report the outcome (승인/거부/만료) in the 대응 line. Never block internal or management addresses, and never call block_ip twice for the same IP in one run.
+4. Containment: for a public EXTERNAL attacker IPv4 with a clear attack pattern, use mcp__rule_a__temporarily_contain_ip(ip, reason). The server verifies recent raw Suricata evidence (3 independent inbound TCP severity-1 attack flows within 5 minutes) before any change. If eligible, it blocks for 10 minutes and posts one keep-for-60-minutes / request-release decision. No answer means kernel expiry. Report its request_id, actual state and expiry; use get_operation_status to check results. Never retry a rejected IP or use block_ip/unblock_ip as a fallback. Internal, private lab, management, DGX, DNS and active SSH addresses are excluded.
 
-Rules: do not invent alerts or causes; cite tool results; keep the report under 25 lines. Write explanations in Korean, but keep identifiers verbatim (tool names, IPs, hostnames, ports, rule ids/levels, signature names, error strings, file paths, commands) in backticks — never translate or paraphrase them. If block_ip is denied/expired, report exactly who decided and that nothing was executed; do not guess why.
-This unattended alert-watch job must never call propose_rule_change or request changes to Wazuh, WAF, Suricata, or firewall rules. Rule-change proposals are only for an explicit human request in an interactive conversation.
+Rules: do not invent alerts or causes; cite tool results; keep the report under 25 lines. Write explanations in Korean, but keep identifiers verbatim (tool names, IPs, hostnames, ports, rule ids/levels, signature names, error strings, file paths, commands) in backticks — never translate or paraphrase them. Distinguish temporary blocking already performed from approved retention, release, expiry, or evidence rejection. Report tool results without inventing causes.
+Display report times in Asia/Seoul with KST or +09:00, preferring ts_kst and otherwise converting explicit source offsets without changing the instant; label naive timestamps "시간대 확인 필요" and preserve original timestamps/offsets in verbatim log quotations.
+This unattended alert-watch job must never call propose_rule_edit, propose_rule_change, propose_service_action, block_ip, or unblock_ip. Rule/service/manual-IP proposals are only for an explicit human request in an interactive conversation. Package installation and container creation/configuration are excluded. Only the bounded temporary containment tool above may act before a human decision.
+
+<!-- korean-output-policy:start -->
+### 한국어 응답 일관성
+- 설명·요약·판단·권고와 도구 사용 전후 안내는 자연스러운 한국어로 작성하고, 한국어 단어는 한글로 표기한다. 사용자가 요청하지 않은 한자·중국어·일본어(히라가나·가타카나)를 설명 문장이나 괄호에 섞지 않는다.
+- 실제 로그·도구 결과·코드·명령·경로·주소·규칙 ID·시그니처·제품 고유명사는 원문 그대로 인용한다. 원문에 있는 한자·일본어도 보존하되 설명은 한국어로 쓴다. 근거 없는 외국어 표현을 백틱으로 감싸 원문인 것처럼 쓰지 않는다.
+- 사용자가 명시적으로 번역·외국어 답변·원문 표기를 요청하면 그 요청 범위만 따른다. JSON 키·허용값과 `[SILENT]` 같은 정해진 출력 표식은 바꾸지 않는다.
+- 보내기 전에 설명 부분의 불필요한 문자 혼입을 점검하고, 발견하면 뜻을 유지해 한국어 문장으로 다시 작성한다. 문자만 삭제하거나 로그·코드·식별자를 고치지 않는다. 이 점검 과정은 답변에 출력하지 않는다.
+<!-- korean-output-policy:end -->

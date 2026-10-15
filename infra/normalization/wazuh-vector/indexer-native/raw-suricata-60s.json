@@ -1,0 +1,115 @@
+{
+  "size": 0,
+  "timeout": "10s",
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "agent.id": "001"
+          }
+        },
+        {
+          "term": {
+            "location": "/home/groot_a/capstone/secstack/logs/suricata/eve.json"
+          }
+        },
+        {
+          "term": {
+            "data.capstone.source": "suricata"
+          }
+        },
+        {
+          "term": {
+            "data.event_type": "alert"
+          }
+        },
+        {
+          "range": {
+            "data.timestamp": {
+              "gte": "now-60s",
+              "lte": "now+5s"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "terms": {
+            "data.src_ip": [
+              "211.170.162.110",
+              "211.170.162.111"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "data.dest_ip": [
+              "211.170.162.110",
+              "211.170.162.111"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "services": {
+      "composite": {
+        "size": 101,
+        "sources": [
+          {
+            "source_ip": {
+              "terms": {
+                "field": "data.src_ip"
+              }
+            }
+          },
+          {
+            "destination_ip": {
+              "terms": {
+                "field": "data.dest_ip"
+              }
+            }
+          },
+          {
+            "destination_port": {
+              "terms": {
+                "field": "data.dest_port"
+              }
+            }
+          },
+          {
+            "protocol": {
+              "terms": {
+                "field": "data.proto"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "contents": {
+          "terms": {
+            "script": {
+              "lang": "painless",
+              "source": "def s=params._source; if (s==null || !(s['full_log'] instanceof String) || s['full_log'].length()>65536) return null; return s['full_log'];"
+            },
+            "size": 5,
+            "order": {
+              "_key": "asc"
+            }
+          }
+        },
+        "has_full_log": {
+          "filter": {
+            "exists": {
+              "field": "full_log"
+            }
+          }
+        }
+      }
+    }
+  }
+}

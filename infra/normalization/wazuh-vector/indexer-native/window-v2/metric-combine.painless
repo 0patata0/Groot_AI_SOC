@@ -1,0 +1,7 @@
+// Each shard sends at most 10,000 compact rows, never original documents.
+if (state.valid != true) return ['valid': false, 'reason': state.reason, 'documents': -1L, 'rows': []];
+if (state.documents < 0 || state.documents > 10000 || state.rows.size() != state.documents) {
+    return ['valid': false, 'reason': 'document_limit', 'documents': -1L, 'rows': []];
+}
+if (state.services.size() > 100) return ['valid': false, 'reason': 'service_limit', 'documents': -1L, 'rows': []];
+return ['valid': true, 'reason': 'ok', 'documents': state.documents, 'rows': state.rows];

@@ -1,0 +1,438 @@
+[
+  {
+    "name": "Fixed WAF new CID cutover: uncertain actions require inspect",
+    "hosts": "localhost",
+    "gather_facts": false,
+    "become": false,
+    "any_errors_fatal": true,
+    "tasks": [
+      {
+        "name": "Require fixed reviewed operator phase",
+        "ansible.builtin.assert": {
+          "that": [
+            "capstone_waf_operator_lock | default(false) | bool",
+            "not ansible_check_mode",
+            "waf_cutover_phase in ['preflight','inspect','initialize','barrier','stop-old','drain-stop','prepare-new','retain-old','name-new','start-new','publish','unblock','complete']"
+          ]
+        }
+      },
+      {
+        "name": "Read fixed candidate result privately",
+        "ansible.builtin.slurp": {
+          "src": "/var/backups/capstone-waf-recreation-20261015/candidate-create/result.json"
+        },
+        "register": "candidate_raw",
+        "no_log": true
+      },
+      {
+        "name": "Decode fixed candidate identifier",
+        "ansible.builtin.set_fact": {
+          "waf_candidate_cid": "{{ (candidate_raw.content | b64decode | from_json).candidate_cid }}"
+        },
+        "no_log": true
+      },
+      {
+        "name": "Reject nonexact target identifier",
+        "ansible.builtin.assert": {
+          "that": [
+            "waf_candidate_cid is match('^[a-f0-9]{64}$')",
+            "waf_candidate_cid != '02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e'"
+          ]
+        }
+      },
+      {
+        "name": "Read-only preflight before creating cutover artifacts or stopping old WAF",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_preflight\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"preflight\"",
+        "timeout": 300,
+        "changed_when": false,
+        "no_log": true
+      },
+      {
+        "name": "Read only current protected fixed identities",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_load\nwrc_inspect \"$WRC_OLD\"\nwrc_inspect \"$WRC_NEW\"\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"inspect\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Initialize immutable cutover evidence without lifecycle mutation",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_initialize\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"initialize\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Arm explicit two-reader barrier transaction",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_pre barrier\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"barrier\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Pause only the original three timers",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemctl",
+            "disable",
+            "--now",
+            "{{ item }}"
+          ]
+        },
+        "when": "waf_cutover_phase == \"barrier\"",
+        "timeout": 90,
+        "loop": [
+          "capstone-raw-operations@suricata.timer",
+          "capstone-raw-operations@modsecurity.timer",
+          "capstone-vector-maintenance.timer"
+        ]
+      },
+      {
+        "name": "Install additional fixed false prestart without changing original guards",
+        "ansible.builtin.copy": {
+          "dest": "/etc/systemd/system/{{ item }}.d/99-capstone-waf-rebind-block.conf",
+          "content": "[Service]\nExecStartPre=/usr/bin/false\n",
+          "owner": "0",
+          "group": "0",
+          "mode": "0644",
+          "force": false
+        },
+        "loop": [
+          "capstone-vector.service",
+          "wazuh-agent.service"
+        ],
+        "when": "waf_cutover_phase == \"barrier\""
+      },
+      {
+        "name": "Synchronize both added barrier files before daemon reload",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nsync -- /etc/systemd/system/capstone-vector.service.d/99-capstone-waf-rebind-block.conf /etc/systemd/system/wazuh-agent.service.d/99-capstone-waf-rebind-block.conf /etc/systemd/system/capstone-vector.service.d /etc/systemd/system/wazuh-agent.service.d\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"barrier\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Load added barriers without restarting readers",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemctl",
+            "daemon-reload"
+          ]
+        },
+        "when": "waf_cutover_phase == \"barrier\"",
+        "timeout": 90
+      },
+      {
+        "name": "Verify actual startup barriers and timer inactivity",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_post barrier\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"barrier\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Persist single-action intent and validate stop-old",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_pre stop-old\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"stop-old\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Execute exactly one stop-old request",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/timeout",
+            "--signal=TERM",
+            "--kill-after=1s",
+            "70s",
+            "/usr/local/bin/docker",
+            "stop",
+            "--signal",
+            "SIGQUIT",
+            "--timeout",
+            "-1",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e"
+          ]
+        },
+        "when": "waf_cutover_phase == \"stop-old\"",
+        "timeout": 75,
+        "no_log": true
+      },
+      {
+        "name": "Verify and commit stop-old",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_post stop-old\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"stop-old\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Persist single-action intent and validate retain-old",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_pre retain-old\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"retain-old\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Execute exactly one retain-old request",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "rename",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "waf-before-20261015"
+          ]
+        },
+        "when": "waf_cutover_phase == \"retain-old\"",
+        "timeout": 90,
+        "no_log": true
+      },
+      {
+        "name": "Verify and commit retain-old",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_post retain-old\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"retain-old\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Persist single-action intent and validate name-new",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_pre name-new\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"name-new\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Execute exactly one name-new request",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "rename",
+            "{{ waf_candidate_cid }}",
+            "waf"
+          ]
+        },
+        "when": "waf_cutover_phase == \"name-new\"",
+        "timeout": 90,
+        "no_log": true
+      },
+      {
+        "name": "Verify and commit name-new",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_post name-new\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"name-new\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Persist single-action intent and validate start-new",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_pre start-new\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"start-new\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Execute exactly one start-new request",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "start",
+            "{{ waf_candidate_cid }}"
+          ]
+        },
+        "when": "waf_cutover_phase == \"start-new\"",
+        "timeout": 90,
+        "no_log": true
+      },
+      {
+        "name": "Wait using read-only candidate health observations",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "--format",
+            "{{ \"{{\" }} .State.Running {{ \"}}\" }} {{ \"{{\" }} .State.Health.Status {{ \"}}\" }}",
+            "{{ waf_candidate_cid }}"
+          ]
+        },
+        "when": "waf_cutover_phase == \"start-new\"",
+        "timeout": 15,
+        "register": "candidate_health",
+        "changed_when": false,
+        "until": "candidate_health.rc == 0 and candidate_health.stdout == 'true healthy'",
+        "retries": 30,
+        "delay": 2
+      },
+      {
+        "name": "Verify and commit start-new",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_post start-new\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"start-new\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Seal old generation and persist actual Vector stop ownership",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_pre drain-stop\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"drain-stop\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Stop the exact Vector unit once after fresh precondition",
+        "when": "waf_cutover_phase == \"drain-stop\"",
+        "timeout": 180,
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_stop_dispatch_guard\n/usr/bin/timeout --signal=TERM --kill-after=1s 45s /usr/bin/systemctl stop capstone-vector.service\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "no_log": true
+      },
+      {
+        "name": "Verify native EOF and save clean stop receipt",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_post drain-stop\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"drain-stop\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Prepare one new generation and producer binding before first start",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_prepare_new\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"prepare-new\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Publish verified alias with real stopped invocation handoff",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_publish\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"publish\"",
+        "timeout": 360,
+        "no_log": true
+      },
+      {
+        "name": "Arm removal of only our exact temporary barrier",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_unblock_pre\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"unblock\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Remove exact temporary barriers while keeping all existing guards",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nfor unit in \"${WRC_READERS[@]}\"; do\n p=/etc/systemd/system/$unit.d/99-capstone-waf-rebind-block.conf\n wrc_file \"$p\" 644\n cmp -s \"$p\" <(printf \"%s\" \"$WRC_BARRIER\")\n rm -- \"$p\"\n sync -- \"${p%/*}\"\ndone\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"unblock\"",
+        "timeout": 180,
+        "no_log": true
+      },
+      {
+        "name": "Reload original start guard policy without reader signals",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemctl",
+            "daemon-reload"
+          ]
+        },
+        "when": "waf_cutover_phase == \"unblock\"",
+        "timeout": 90
+      },
+      {
+        "name": "Verify restored effective guards",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_unblock_post\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"unblock\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Require active native handoff before final policy",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_complete_pre\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"complete\"",
+        "timeout": 240,
+        "no_log": true
+      },
+      {
+        "name": "Restore original restart policy on exact new CID once",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "update",
+            "--restart",
+            "unless-stopped",
+            "{{ waf_candidate_cid }}"
+          ]
+        },
+        "when": "waf_cutover_phase == \"complete\"",
+        "timeout": 90,
+        "no_log": true
+      },
+      {
+        "name": "Verify and commit final restart policy; keep timers for separate native activation",
+        "ansible.builtin.shell": "set -euo pipefail\nsource \"{{ playbook_dir }}/waf-recreate-cutover-local-a.sh\"\nwrc_complete_post\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "when": "waf_cutover_phase == \"complete\"",
+        "timeout": 240,
+        "no_log": true
+      }
+    ]
+  }
+]

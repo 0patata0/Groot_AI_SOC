@@ -47,7 +47,7 @@ TOOLS = [
     {
         "name": "block_ip",
         "description": "Block a source IPv4 at the Groot_A gateway firewall for a limited time (nftables agent_block set). "
-                       "Refuses protected/management addresses and IPs with an active SSH session. Use for external attacker IPs seen in Wazuh alerts.",
+                       "Requires operator approval and refuses protected/management addresses and IPs with an active SSH session. Use for external attacker IPs seen in Wazuh alerts.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -57,12 +57,12 @@ TOOLS = [
             },
             "required": ["ip", "reason"],
         },
-        # 쓰기·파괴적: 브로커가 설정돼 있으면 운영자 승인(Mattermost 버튼) 후에만 실행된다.
+        # 쓰기·파괴적: 승인 브로커 설정과 운영자 승인(Mattermost 버튼)이 반드시 필요하다.
         "annotations": {"title": "Block IP (operator approval required)", "readOnlyHint": False, "destructiveHint": True, "idempotentHint": True},
     },
     {
         "name": "unblock_ip",
-        "description": "Remove a previously blocked IPv4 from the Groot_A firewall.",
+        "description": "Request operator approval to remove a previously blocked IPv4 from the Groot_A firewall.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -138,32 +138,50 @@ def _broker(method, path, body=None):
         return json.load(r)
 
 
-def request_approval(ip, minutes, reason):
-    """운영자 승인(Mattermost 버튼)을 브로커에 요청하고 결정을 기다린다.
-    (status, who): approved | denied | expired | error | unconfigured(브로커 미설정 → 정책상 즉시 실행)."""
+def request_approval(ip, minutes, reason, action="block"):
+    """Wait for a bound operator decision and consume it once. Always fail closed."""
     if not BROKER_URL or not BROKER_TOKEN:
-        return "unconfigured", ""
+        return "error", "approval broker is not configured"
+    if action not in {"block", "unblock"} or (action == "unblock" and minutes != 0):
+        return "error", "invalid approval action"
+    identity = {"action": action, "ip": ip, "minutes": minutes}
     try:
-        r = _broker("POST", "/approval", {"ip": ip, "minutes": minutes, "reason": reason, "requested_by": "hermes"})
-    except Exception as e:
-        return "error", "broker unreachable: %s" % e
+        r = _broker("POST", "/approval", {**identity, "reason": reason, "requested_by": "hermes"})
+    except Exception:
+        return "error", "approval broker unavailable"
+    if not isinstance(r, dict):
+        return "error", "invalid approval response"
     rid = r.get("req_id")
-    if not rid or not r.get("posted"):
-        return "error", "approval card not posted: %s" % r.get("detail")
-    log("approval requested id=%s ip=%s %dm (waiting up to %ds)" % (rid, ip, minutes, APPROVAL_TIMEOUT))
-    deadline = time.time() + APPROVAL_TIMEOUT
-    while time.time() < deadline:
+    if not isinstance(rid, str) or not re.fullmatch(r"[0-9a-f]{16}", rid) or not r.get("posted"):
+        return "error", "approval card was not posted"
+    log("approval requested id=%s action=%s (waiting up to %ds)" % (rid, action, APPROVAL_TIMEOUT))
+    deadline = time.monotonic() + APPROVAL_TIMEOUT
+    while time.monotonic() < deadline:
         time.sleep(APPROVAL_POLL)
         try:
             d = _broker("GET", "/decision/%s" % rid)
-        except Exception as e:
-            log("decision poll error:", e)
+        except Exception:
             continue
+        if not isinstance(d, dict) or any(d.get(k) != v for k, v in identity.items()) or d.get("req_id") != rid:
+            return "error", "approval identity mismatch"
         st = d.get("status")
-        if st in ("approved", "denied", "expired"):
-            log("approval id=%s -> %s by %s" % (rid, st, d.get("by", "")))
+        if st in {"denied", "expired"}:
             return st, d.get("by", "")
-    return "expired", "timeout %ds" % APPROVAL_TIMEOUT
+        if st == "approved":
+            if not isinstance(d.get("by"), str) or not d["by"]:
+                return "error", "missing approving operator"
+            try:
+                consumed = _broker("POST", "/consume", {"request_id": rid, **identity})
+            except Exception:
+                return "error", "approval could not be consumed"
+            if (not isinstance(consumed, dict) or consumed.get("status") != "consumed"
+                    or consumed.get("req_id") != rid or consumed.get("by") != d["by"]
+                    or any(consumed.get(k) != v for k, v in identity.items())):
+                return "error", "invalid approval consumption"
+            return "approved", d["by"]
+        if st not in {"pending", "posting"}:
+            return "error", "approval is not executable"
+    return "expired", "approval wait timed out"
 
 
 def call_tool(name, args):
@@ -182,15 +200,15 @@ def call_tool(name, args):
             return tool_text("minutes must be an integer", True)
         if not (1 <= minutes <= MAX_MINUTES):
             return tool_text("minutes out of range (1..%d)" % MAX_MINUTES, True)
-        # Tier 2: 운영자 승인 (브로커 설정 시). 거부/만료/오류 = 실행 안 함(fail-closed).
+        # Tier 2: 지정 승인자의 일회성 승인 없이는 실행하지 않는다.
         st, who = request_approval(ip, minutes, reason)
         if st == "denied":
             notify_event({"kind": "rejected", "action": "block", "ip": ip, "reason": "operator_denied", "by": who})
             return tool_text("block_ip DENIED by operator %s - NOT executed" % who, True)
-        if st in ("expired", "error"):
+        if st != "approved":
             notify_event({"kind": "rejected", "action": "block", "ip": ip, "reason": "approval_%s" % st, "detail": who})
             return tool_text("block_ip NOT executed: approval %s (%s). Ask the operator and retry only if they confirm." % (st, who), True)
-        approved_by = who if st == "approved" else "policy-auto"
+        approved_by = who
         rc, out, err = run_agent_block(["add", ip, "%dm" % minutes, reason])
         if rc == 0:
             notify_event({"kind": "block", "ip": ip, "minutes": minutes, "reason": reason, "by": "mcp", "approved_by": approved_by})
@@ -203,6 +221,9 @@ def call_tool(name, args):
         reason = norm_reason(args.get("reason", "manual"), "manual")
         if not IPRE.match(ip):
             return tool_text("Invalid IPv4: %r" % ip, True)
+        st, who = request_approval(ip, 0, reason, action="unblock")
+        if st != "approved":
+            return tool_text("unblock_ip NOT executed: approval %s (%s)" % (st, who), True)
         rc, out, err = run_agent_block(["del", ip, "-", reason])
         if rc == 0:
             notify_event({"kind": "unblock", "ip": ip, "reason": reason})
@@ -230,7 +251,7 @@ def handle(msg):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": ver,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-response-mcp", "version": "1.0.0"},
+            "serverInfo": {"name": "capstone-response-mcp", "version": "1.1.0"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None  # notification, no reply

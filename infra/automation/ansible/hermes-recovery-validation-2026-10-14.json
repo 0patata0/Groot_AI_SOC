@@ -1,0 +1,274 @@
+{
+  "recorded_at_kst": "2026-10-14T04:25:00+09:00",
+  "host": "B",
+  "controller": "/opt/capstone-automation/venv/bin/ansible-playbook",
+  "boundary_tests": {
+    "mac_stdlib_passed": 7,
+    "b_server_stdlib_passed": 7
+  },
+  "native_fixture": {
+    "cases": [
+      {
+        "case": "success",
+        "fixture_running": true,
+        "fixture_starts": 1,
+        "fixture_stops": 1,
+        "native_exit": 0,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "missing_core_success",
+        "fixture_running": true,
+        "fixture_starts": 1,
+        "fixture_stops": 1,
+        "native_exit": 0,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "unknown_image",
+        "fixture_running": true,
+        "fixture_starts": 0,
+        "fixture_stops": 0,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "unknown_source",
+        "fixture_running": true,
+        "fixture_starts": 0,
+        "fixture_stops": 0,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "source_changed",
+        "fixture_running": true,
+        "fixture_starts": 0,
+        "fixture_stops": 0,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "busy",
+        "fixture_running": true,
+        "fixture_starts": 0,
+        "fixture_stops": 0,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "container_changed",
+        "fixture_running": true,
+        "fixture_starts": 0,
+        "fixture_stops": 0,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "copy_failure",
+        "fixture_running": true,
+        "fixture_starts": 1,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "copied_hash_mismatch",
+        "fixture_running": true,
+        "fixture_starts": 1,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "database_drift",
+        "fixture_running": false,
+        "fixture_starts": 0,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": [
+          "state.db"
+        ]
+      },
+      {
+        "case": "runtime_failure",
+        "fixture_running": true,
+        "fixture_starts": 2,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "missing_core_runtime_failure",
+        "fixture_running": true,
+        "fixture_starts": 2,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "started_database_progress",
+        "fixture_running": true,
+        "fixture_starts": 2,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": [
+          "state.db"
+        ]
+      },
+      {
+        "case": "started_config_drift",
+        "fixture_running": false,
+        "fixture_starts": 1,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": [
+          "config.yaml"
+        ]
+      },
+      {
+        "case": "rollback_hash_mismatch",
+        "fixture_running": false,
+        "fixture_starts": 0,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      },
+      {
+        "case": "first_stop_failure",
+        "fixture_running": false,
+        "fixture_starts": 0,
+        "fixture_stops": 2,
+        "native_exit": 2,
+        "passed": true,
+        "protected_changed": []
+      }
+    ],
+    "fixture_source_sha256": "2440f4bb0d3abd5666d5689663ba3e669342034193450fb464ece8dfe00f5ac5",
+    "helper_source_sha256": "74843987843dd5ef447d09896ba894ea580da2e5dc56b9bf0d48749f091e0cb5",
+    "limitations": [
+      "synthetic command effects, not a real container recreation",
+      "dependency installation and timer scheduling not exercised",
+      "controller termination and power loss not exercised"
+    ],
+    "mode": "native_fixture",
+    "production_task_names": [
+      "Require the reviewed image, command and persistent data mount",
+      "Reject any unknown source pair or core",
+      "Recheck source and configuration before entering mutation block",
+      "Reject concurrent source or configuration changes before mutation",
+      "Recheck freshness immediately before stop",
+      "Recheck name binding before touching the saved container",
+      "Reject concurrent replacement",
+      "Deploy candidate with native rollback"
+    ],
+    "production_task_sha256": "945e8c891b481d5d0ddb47517862eac4ab3b6f52fa11ce9d6e16e6e7c4ddecbc",
+    "real_chat_posts": 0,
+    "real_docker_calls": 0,
+    "real_hermes_changes": 0
+  },
+  "live_read_only_observation": {
+    "container": {
+      "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "oom_killed": false,
+      "running": true,
+      "started_at": "2026-10-13T16:37:16.547543503Z"
+    },
+    "inspection_only": true,
+    "observed_at_utc": "2026-10-13T19:25:00.232692+00:00",
+    "observer": {
+      "counts": {
+        "filtered": 0,
+        "oversize": 0,
+        "requested_foreign": 0,
+        "retained": 0
+      },
+      "other_journal_records": 0,
+      "query_limit_reached": false,
+      "response_denominator": null,
+      "since_utc": "2026-10-13T18:55:00.232692+00:00",
+      "until_utc": "2026-10-13T19:25:00.232692+00:00"
+    },
+    "protected_configuration": {
+      ".env": {
+        "mode": "0o600",
+        "sha256": "509150dcc80c5770a479bf180f5ca321f41cef65503e854387876f57f7ce4b92"
+      },
+      "SOUL.md": {
+        "mode": "0o644",
+        "sha256": "b2581d8b89f27541e6a5a2abdc71c17c624c9a2995de374c1fbe00b453e9d97f"
+      },
+      "config.yaml": {
+        "mode": "0o640",
+        "sha256": "89ec0f90c2e421e67eed90bfc631eced42167efff1e0160cdeea91464b819d96"
+      }
+    },
+    "units": {
+      "capstone-hermes-guard-observe.service": {
+        "ActiveEnterTimestamp": "Wed 2026-10-14 02:57:21 KST",
+        "ActiveState": "active",
+        "ExecMainStatus": "0",
+        "Result": "success",
+        "SubState": "running"
+      },
+      "capstone-hermes-guard-reapply.service": {
+        "ActiveEnterTimestamp": "",
+        "ActiveState": "inactive",
+        "ExecMainStatus": "0",
+        "Result": "success",
+        "SubState": "dead"
+      },
+      "capstone-hermes-guard-reapply.timer": {
+        "ActiveEnterTimestamp": "Wed 2026-10-14 02:57:20 KST",
+        "ActiveState": "active",
+        "Result": "success",
+        "SubState": "waiting"
+      }
+    }
+  },
+  "attempts": [
+    {
+      "scope": "initial smoke test",
+      "cases": [
+        "success",
+        "copy_failure"
+      ],
+      "passed": 2,
+      "fixture_sha256": "c92092bb87517a6821b71e664a35cba959c1738b0cd2991e4aa955678af55660"
+    },
+    {
+      "scope": "final 16 cases",
+      "passed": 16,
+      "failed": 0,
+      "fixture_sha256": "2440f4bb0d3abd5666d5689663ba3e669342034193450fb464ece8dfe00f5ac5"
+    }
+  ],
+  "production_changes": [],
+  "cleanup": {
+    "generated_suite": "TemporaryDirectory removed on normal completion",
+    "mac_owned_fixture_staging": "Removed after results were retained; no packages or bytecode installed",
+    "staging": "Pending parent cleanup of the task-owned remote staging tree"
+  },
+  "limitations": [
+    "Actual Docker lifecycle is replaced with a synthetic test double; no actual recreation or restart was performed.",
+    "This is not an additional real transport/model test; runtime failure is injected by the shim.",
+    "The production Ansible file was read without modification. Synthetic hash variables exercise the original assertions and control flow.",
+    "Host observer counts have no response denominator and are not a mixed-language rate."
+  ]
+}

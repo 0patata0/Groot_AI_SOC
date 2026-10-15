@@ -1,0 +1,34 @@
+{
+  "at_kst": "2026-10-14T19:29:44.464968+09:00",
+  "scope": "local finite mutation-boundary tests; native query validation is separate",
+  "tests_passed": 14,
+  "failed": 0,
+  "server_calls": 0,
+  "uncertain_put_retry": false,
+  "source_sha256": {
+    "manage-monitor-b.py": "24aae40dc683f1cef8a133a29bcfe95d222646b7e5149e4e3231163991fc1014",
+    "test_manage_monitor.py": "d3db4bb6e8de25b94c777deaa22970ce1581d98e25fe890ce767b21dd8bab8a7",
+    "monitor.json": "acc8ac9649cc8b974872a30cf4bcc8f2e52adf0caf56ed197e8b95066d657c7f"
+  },
+  "review_findings_resolved": [
+    "execute exact hash-verified source bytes without import cache",
+    "enabled_time must remain unchanged",
+    "acknowledged/readback directory fsync before state commit"
+  ],
+  "cases": [
+    "upgrade identity/permissions/trigger metadata",
+    "idempotent verified no-op",
+    "CAS rollback same ID",
+    "remote revision conflict before PUT",
+    "unknown state",
+    "pending state",
+    "uncertain PUT no retry",
+    "permission rewrite refusal",
+    "enabled_time rewrite refusal",
+    "action rewrite refusal",
+    "changed independent GET",
+    "server empty script defaults",
+    "script params remain semantic",
+    "stored script or unknown script field refusal"
+  ]
+}

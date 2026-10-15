@@ -1,0 +1,1021 @@
+{
+  "api": "POST /_scripts/painless/_execute",
+  "candidate_unchanged": true,
+  "cases": [
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "6ea14c67f00a4a5e19c4ea821d0759f3e287d9d325d4a3f83bb88cdddb81a279",
+      "name": "valid_repeat",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "b39ba2899bf7bacdf6ab2be511542eb13e6e5de4115e88d8bbf480e02083ffc5",
+      "name": "valid_cross_source",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        false,
+        false
+      ],
+      "fixture_sha256": "0be9425c0f3b1e02e498de802ba933a54a6447274727d6ea758fd1e42548597d",
+      "name": "empty_valid_is_not_unavailable_or_match",
+      "observed": [
+        true,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        false,
+        false
+      ],
+      "fixture_sha256": "84ec194e0b8868cd71faf670f7e8cb1a9c87ba3fccd22ec95735e3554d359f57",
+      "name": "valid_unmatched_nonempty",
+      "observed": [
+        true,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "555ce2bde8fb1c872845d40e2321c9830cac997fd3861458ec8f050fdb332a59",
+      "name": "exact_10000_documents_100_services_64_shards",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "91d00be761d589e24633a2d042a0543984c74c889ed4209eca129ebbf707dfd3",
+      "name": "valid_duplicates_are_accounted",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "238f50af991325ea8e8e423e8e3181500a8a98acff162ebdf2dbaf8696e4dd27",
+      "name": "valid_skipped_shards_count",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "a5c238e22f0d01063ea358d548a24f82e57afd7537b81e072b5eea5e733cfbd4",
+      "name": "valid_missing_terminated_early",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "303d1b4bd11db9eb0fbafb40bf64684b710e8709c3795c453987d46754ecebf1",
+      "name": "period_end_within_future_budget",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        true,
+        true,
+        false
+      ],
+      "fixture_sha256": "fdf225b3525b8bd9b81594fb8379f42a886aec2c28ef37c91dd6ae5aa83536ea",
+      "name": "period_end_within_lag_budget",
+      "observed": [
+        true,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "73bec5741aa0108010f49a4a0630e4c6756ba8c2da9aeb688a37c70b0bb3b3d9",
+      "name": "period_end_stale",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "44dacc2131f1d3122bd8d7d753c1c056d9a317b70203269736fd9d42658b1ddc",
+      "name": "period_end_future",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "fbc63dbaa79d676c0fe43afd41018bcfd3dff621b014614ff1cad2a96215108b",
+      "name": "period_end_ancient",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "f155cd15deb4c5064671aef6e2760455ba7f6d9885a1e1b67c5ba6682be2924f",
+      "name": "period_end_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "aae064f4466daebce5f9ff84a7f9f41e84946a1447eb1b83e4010c36e295f300",
+      "name": "period_end_wrong_type",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "94417f715094648bdaf24d3772141b828404418c59457f80ed2c9d97373a8653",
+      "name": "ctx_error",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "297d3b2860a49b3ecc6681a875cb7133526a5f1102cf5718a2e53a7a761edbc2",
+      "name": "results_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "6d1f0847f1146ec3ee1e4bb306822c39bc7fdb067c0bbd571a639208be04bf36",
+      "name": "results_empty",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "a8c8bb7d3c89feb9c19052e934ceefbd538fc76e1073f4fe6a4c12f8763da375",
+      "name": "results_multiple",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "b5823566be20d6b085a696fe8ac03f2fb184bb58ecb2cd7f5852688eab410a7e",
+      "name": "results_wrong_type",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "1cd6f04a57180e7560763e261b20c10d4777a7ed3d8d1773b894a6e02a471029",
+      "name": "result_wrong_type",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "0b72d260d0690e4d807a35d3e2e2ea10bddc26d79b1271afed646bdd1c592ffa",
+      "name": "timed_out",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "e0ec09de8a0c4d3d053a3f4e54b41e8a80dff09ee820b063afc5b9c2de63ab13",
+      "name": "timed_out_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "8bc6ccb14e28dee09f18e394f152407aedb292947dba214a00776cfa4eecf071",
+      "name": "terminated_early",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "49bfd184140d8b6769d1a01c17a7c1609a5640fb858ae3e433ef66c8280e4808",
+      "name": "terminated_early_null",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "b067c5e4309d501cfacc3247afea4bdde83b15928c034fe9f3b7ac37a6aa2ca5",
+      "name": "shards_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "75506cf27a60d8927f0167e4be5f0928d06fcc4b0ba0a7a862f5027d891f250f",
+      "name": "shards_zero",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "3d7b023d7c21a68c522150980493683b544a325ae3f682de9160dd3c89b33ad4",
+      "name": "shards_65",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "75ec9e62d22d95788b98ffc12f4bf70975acae1bef918f426e012c359f0a1c34",
+      "name": "shards_partial",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "659e8b8c3ca1699cb1286f00abbd36bef2f6b869b2017ef97ceae9ccea23a7ed",
+      "name": "shards_failed",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "0d4759f1f92fd00bd27b77c375fa80fd55e9f08ddae7e162fd306da66cef1d3e",
+      "name": "shards_skipped_over_total",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "58a96abf79e910831038becb274fb6c0d90068426c2ecad115798e18aaa473cf",
+      "name": "shards_string_total",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "08c9f9499196a82b3f55d5f89ac36084c54aafaee330e7238d11412d1b588dc6",
+      "name": "shards_float_total",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "0c3d1a5e7952ab35b57defef03f88ee766cf1359026805aa65fcb3fc364e11c2",
+      "name": "shards_boolean_total",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "bba8e0d4ca39d23654f4ed93e9b0d147fa7373f2d8d47459b6e95bfb799adc92",
+      "name": "shards_negative_failed",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "e605e85db262109d31503c3dae205432185948e044da55e0662ea7f93b502850",
+      "name": "hits_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "6c21106dd5bb95c679d9b5d253073c97d64dbb71db968f56cf5f852a170d4066",
+      "name": "total_lower_bound",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "35d8887171e1a0cfcfc21b92b8277a3c0ea95c6df068bc708625c1d759627fb3",
+      "name": "total_negative",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "de9c9eb4335570bd4b8d906f726418323eea4e28c194d5fc683bde6332a8726d",
+      "name": "total_string",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "24a85776c94b8a48de94359d97dd7127e2aeb59c4d3a7b694c3833cad08fab15",
+      "name": "total_float",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "4628149d8d461561df640049dd6c040f87131d62fefd9f3c896430ac593169f0",
+      "name": "total_boolean",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "5877fed8421ea49902a95664792c0877d9f64794a8fc3a58c19001c263039ede",
+      "name": "10001_documents",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "985ed256747355e17c75ef95b395ab4c02359181f7ee7b3c0dafd4eb9a2324d6",
+      "name": "unexpected_hits_source",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "5f519279e89ad394748ce13383a5df433213b3ffd428f863c4ad9801465d9ecb",
+      "name": "aggregations_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "1b1d574df13da1f87dc41c6eb11823d76f94d6d6979b3292ff32cac46e0aff98",
+      "name": "metric_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "eb627eb7bd197c7ccc871732196b547307b02e9a9536855dec836a3514eafe27",
+      "name": "metric_wrong_type",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "e7ac0d79743777b41064ce89d1907825a00c07f9a55dc945f72a75d407bd00e5",
+      "name": "metric_extra_field",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "773f43c211c4c58250fff2295f7a18a4abba7c980b3b3c925917c209c78f947a",
+      "name": "metric_field_missing",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "155c80b8e41c16821e69671b96f4e5ff19b29937120b9230a2ed094d5bd09ab2",
+      "name": "metric_policy_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "aaa6a73fdec39725bc161d120a62e66e6c89b1204c9d3b115b18c545b32eef7e",
+      "name": "metric_precision_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "4f5cd3f0e3fac869a9b49e85855b99f6d01406515ad752f503cb0a9d6f657b94",
+      "name": "metric_valid_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "cc5ca23a78323f68adb0a9eb5ce589144a247ece6879ffc403e5d7979735b8bf",
+      "name": "metric_reason_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "ceb845259fab94f64e912ebcfda727e9e8869d9d29ed45f464e364cd85904d33",
+      "name": "metric_match_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "b10a547dfbda04c1bb621184a3a8f29d190cff542b1c0ce127ec92db2d229e2f",
+      "name": "metric_documents_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "920d59c43e2ecf8f3a97d1a1439805b3837c4dbfc4cbf6e0da952b07173c0c4f",
+      "name": "metric_unique_events_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "28b2b4fb3be603ccfc7c452efd7ef3b6759300e8f7bd1ccea9d2c6fac3152d1e",
+      "name": "metric_duplicate_documents_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "a735c54f5357c326043e80314b6e1f9eb481b0c04c766db241159162767ad538",
+      "name": "metric_services_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "1a2ea7c490db6272a8f4d6e7641777249e5c90bfdc04f397920418ef9d8b640d",
+      "name": "metric_matched_services_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "9850440f143883c9b0da65d5ea78dfba085f9b019437361b4b662802e0501296",
+      "name": "metric_repeat_services_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "c09fc025510233a3db88e33ce4793be83b6cc51c7d258b7e02f0722cae45c73e",
+      "name": "metric_cross_source_services_invalid",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "7b01bf33774ce5cd9780752f844bca2edc8508e0ff061b725d75dfe3322c550b",
+      "name": "metric_101_services",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "4b9a040fef3c74d6f68323c13e6ec8c9465e172874791c3e016f841dfdddc60f",
+      "name": "metric_no_matching_reason",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "f3994f49dc274f40fb4faac42c289418537b4f9ff883893658534efc02065c8c",
+      "name": "metric_false_with_matched_service",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "b65ff8707ae5901d92860a2a08e923dd6fc2e734cdae32ec13e652a47ebc0509",
+      "name": "metric_repeat_with_under_five_unique",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "9b94bb8074a5c107edfb76bb8a3af3142009bcfae63737db18bdef145af7af10",
+      "name": "metric_cross_with_under_two_unique",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "expected": [
+        false,
+        false,
+        true
+      ],
+      "fixture_sha256": "b0cd8a2d7eddc80a39f0ea67b9405e669dd5ad8e6952bfe8be32de3e60cba16a",
+      "name": "metric_nonzero_documents_without_unique",
+      "observed": [
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    }
+  ],
+  "completed_at_epoch_ms": 1791974289651,
+  "context": "painless_test",
+  "index_monitor_stored_script_mutations": 0,
+  "indexer_container_id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+  "limitations": [
+    "Synthetic ctx guard decisions; no real shard failure or outage was induced.",
+    "Exact frozen common and decision bodies are wrapped in test functions, not edited.",
+    "Clock checks use 1-second margin from bounds; exact equality is not a wall-clock timing claim.",
+    "Availability and unavailability are complements; match is false for healthy empty/unmatched results."
+  ],
+  "native_calculations": 66,
+  "passed_cases": 66,
+  "schema_version": 1,
+  "source_sha256": {
+    "monitor-match.painless": "982bb42c68e56fa463702175c281b2e3308333988fb8ad4258bdc71931cc1f03",
+    "monitor-unavailable.painless": "a7bf19d1a3a1d3dde69f34d900735c966bd9b24a781b2d566c8beff1d0b39abf",
+    "monitor.json": "acc8ac9649cc8b974872a30cf4bcc8f2e52adf0caf56ed197e8b95066d657c7f",
+    "trigger-common.painless": "fbf9bbb1a08f04119f39da17f1b5e9a95c763277f1b085780be8f491bd72e7ad"
+  },
+  "started_at_epoch_ms": 1791974281718,
+  "status": "pass",
+  "strict_tls": true,
+  "total_cases": 66,
+  "verifier_sha256": "a56a924e1cc1312bac8b773ef33106df6ad7a3f767dfaf7c5d1367732ed341b1",
+  "wrapper_sha256": "095cb4f1ef03b47f0aa5782c06dc2477f8ffb23a739cc81d3e8e93732d05cf07"
+}

@@ -1,0 +1,408 @@
+---
+- name: Serialize the two Wazuh analysis stages in the existing B manager
+  hosts: local
+  connection: local
+  become: false
+  gather_facts: true
+  gather_subset: [min]
+  any_errors_fatal: true
+  vars:
+    manager_name: single-node-wazuh.manager-1
+    docker_bin: /usr/local/bin/docker
+    options_path: /var/lib/docker/volumes/single-node_wazuh_etc/_data/local_internal_options.conf
+    etc_root: /var/lib/docker/volumes/single-node_wazuh_etc/_data
+    pin: "{{ lookup('ansible.builtin.file', playbook_dir + '/preflight.json') | from_json }}"
+    option_pattern: '(?m)^[ \t]*analysisd\.(?:event_threads|rule_matching_threads)[ \t]*=[^\n]*\n'
+    protected_paths:
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/ossec.conf
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/internal_options.conf
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/capstone_vector_rules.xml
+      - /usr/local/sbin/rule-change-executor
+      - /opt/rule-change/rule_change_mcp.py
+      - /opt/rule-change/run-rule-change.sh
+      - /etc/rule-change/config.json
+      - /etc/sudoers.d/capstone-rule-change
+      - /etc/systemd/system/rule-change-worker.service
+      - /etc/systemd/system/rule-change-worker.timer
+    regression_scripts:
+      - test-installed-manager.sh
+      - test-correlation-manager.sh
+      - test-health-manager.sh
+      - test-evidence-manager.sh
+  tasks:
+    - name: Require fixed root B and the installed Ansible minor version
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.user_uid == 0
+          - ansible_facts.machine_id == '1e143067c98a44ffba6eaa925dc038d7'
+          - ansible_connection == 'local'
+          - ansible_version.full is version('2.21', '>=')
+          - ansible_version.full is version('2.22', '<')
+          - pin.keys() | sort == ['generated_at_epoch', 'local_rules_sha256', 'manager_id', 'options_sha256', 'ossec_conf_sha256', 'vector_rules_sha256']
+          - pin.manager_id is match('^[0-9a-f]{64}$')
+          - pin.options_sha256 is match('^[0-9a-f]{64}$')
+          - pin.local_rules_sha256 is match('^[0-9a-f]{64}$')
+          - pin.vector_rules_sha256 is match('^[0-9a-f]{64}$')
+          - pin.ossec_conf_sha256 is match('^[0-9a-f]{64}$')
+          - pin.generated_at_epoch is integer
+          - ansible_facts.date_time.epoch | int >= pin.generated_at_epoch
+          - ansible_facts.date_time.epoch | int - pin.generated_at_epoch <= 1800
+    - name: Record fixed manager binding and persistent etc volume
+      ansible.builtin.command:
+        argv: ["{{ docker_bin }}", inspect, "{{ manager_name }}"]
+      changed_when: false
+      check_mode: false
+      register: manager_inspect
+      no_log: true
+    - name: Decode only the required inspect fields
+      ansible.builtin.set_fact:
+        manager_before: "{{ (manager_inspect.stdout | from_json)[0] }}"
+      no_log: true
+    - name: Require the pinned running container and the exact existing volume
+      ansible.builtin.assert:
+        that:
+          - manager_before.Id == pin.manager_id
+          - manager_before.State.Running
+          - manager_before.State.Pid | int > 1
+          - manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | list | length == 1
+          - (manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | first).Type == 'volume'
+          - (manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | first).Source == etc_root
+          - (manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | first).RW
+      no_log: true
+    - name: Record protected configuration and approval boundary
+      ansible.builtin.stat:
+        path: "{{ item }}"
+        follow: false
+        checksum_algorithm: sha256
+      loop: "{{ protected_paths }}"
+      register: protected_before
+      no_log: true
+    - name: Require the pinned config and dedicated rules
+      ansible.builtin.assert:
+        that:
+          - protected_before.results[0].stat.checksum == pin.ossec_conf_sha256
+          - protected_before.results[2].stat.checksum == pin.local_rules_sha256
+          - protected_before.results[3].stat.checksum == pin.vector_rules_sha256
+      no_log: true
+    - name: Record original local options without following a symlink
+      ansible.builtin.stat:
+        path: "{{ options_path }}"
+        follow: false
+        checksum_algorithm: sha256
+      register: options_before
+    - name: Require the fresh original file and known ownership
+      ansible.builtin.assert:
+        that:
+          - options_before.stat.exists and options_before.stat.isreg and not options_before.stat.islnk
+          - options_before.stat.nlink == 1
+          - options_before.stat.uid == 0 and options_before.stat.gid == 999
+          - options_before.stat.mode == '0640'
+          - options_before.stat.size <= 65536
+          - options_before.stat.checksum == pin.options_sha256
+    - name: Read bounded options for the two-line edit
+      ansible.builtin.slurp:
+        src: "{{ options_path }}"
+      register: original_options
+      no_log: true
+    - name: Decode original options
+      ansible.builtin.set_fact:
+        original_text: "{{ original_options.content | b64decode }}"
+      no_log: true
+    - name: Refuse ambiguous definitions or unsupported file framing
+      ansible.builtin.assert:
+        that:
+          - original_text.endswith('\n')
+          - "'\\r' not in original_text and '\\x00' not in original_text"
+          - original_text | hash('sha256') == pin.options_sha256
+          - original_text | regex_findall('(?m)^[ \t]*analysisd\.event_threads[ \t]*=') | length <= 1
+          - original_text | regex_findall('(?m)^[ \t]*analysisd\.rule_matching_threads[ \t]*=') | length <= 1
+      no_log: true
+    - name: Construct only the two reviewed option changes
+      ansible.builtin.set_fact:
+        candidate_text: "{{ original_text | regex_replace('(?m)^[ \\t]*analysisd\\.event_threads[ \\t]*=[^\\n]*$', 'analysisd.event_threads=1') | regex_replace('(?m)^[ \\t]*analysisd\\.rule_matching_threads[ \\t]*=[^\\n]*$', 'analysisd.rule_matching_threads=1') }}{{ '' if original_text | regex_search('(?m)^[ \\t]*analysisd\\.event_threads[ \\t]*=') else 'analysisd.event_threads=1\n' }}{{ '' if original_text | regex_search('(?m)^[ \\t]*analysisd\\.rule_matching_threads[ \\t]*=') else 'analysisd.rule_matching_threads=1\n' }}"
+      no_log: true
+    - name: Require exact values and byte-equivalent unrelated lines
+      ansible.builtin.assert:
+        that:
+          - candidate_text | regex_findall('(?m)^analysisd\.event_threads=1$') | length == 1
+          - candidate_text | regex_findall('(?m)^analysisd\.rule_matching_threads=1$') | length == 1
+          - (original_text | regex_replace(option_pattern, '')) == (candidate_text | regex_replace(option_pattern, ''))
+      no_log: true
+    - name: Describe check-mode without running native processes or changing options
+      ansible.builtin.debug:
+        msg: "Candidate changes only event_threads and rule_matching_threads; manager restart required={{ candidate_text != original_text }}. Check mode is not native validation."
+      when: ansible_check_mode
+    - name: Validate current production configuration without restarting
+      ansible.builtin.command:
+        argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+      changed_when: false
+      when: not ansible_check_mode
+      no_log: true
+    - name: Run existing 104 native rule scenarios before changing options
+      ansible.builtin.command:
+        argv: [/usr/bin/timeout, -k, '5', '420', /bin/sh, "{{ playbook_dir }}/../tests/{{ item }}"]
+      loop: "{{ regression_scripts }}"
+      changed_when: false
+      when: not ansible_check_mode
+    - name: Allocate a private transaction directory
+      ansible.builtin.tempfile:
+        state: directory
+        path: /var/backups
+        prefix: capstone-correlation-fix-
+      register: transaction
+      when: not ansible_check_mode and candidate_text != original_text
+    - name: Preserve original bytes as a root-only rollback artifact
+      ansible.builtin.copy:
+        content: "{{ original_text }}"
+        dest: "{{ transaction.path }}/local_internal_options.conf.before"
+        owner: '0'
+        group: '0'
+        mode: '0600'
+      when: not ansible_check_mode and candidate_text != original_text
+      no_log: true
+    - name: Keep the proposed bytes separately from the operational path
+      ansible.builtin.copy:
+        content: "{{ candidate_text }}"
+        dest: "{{ transaction.path }}/local_internal_options.conf.candidate"
+        owner: '0'
+        group: '0'
+        mode: '0600'
+      when: not ansible_check_mode and candidate_text != original_text
+      no_log: true
+    - name: Verify stored rollback bytes
+      ansible.builtin.stat:
+        path: "{{ transaction.path }}/local_internal_options.conf.before"
+        checksum_algorithm: sha256
+      register: backup_stat
+      when: not ansible_check_mode and candidate_text != original_text
+    - name: Require the original backup before entering the mutation block
+      ansible.builtin.assert:
+        that: [backup_stat.stat.checksum == pin.options_sha256]
+      when: not ansible_check_mode and candidate_text != original_text
+    - name: Recheck original file immediately before mutation
+      ansible.builtin.stat:
+        path: "{{ options_path }}"
+        follow: false
+        checksum_algorithm: sha256
+      register: options_cas
+      when: not ansible_check_mode and candidate_text != original_text
+    - name: Recheck protected files immediately before mutation
+      ansible.builtin.stat:
+        path: "{{ item }}"
+        follow: false
+        checksum_algorithm: sha256
+      loop: "{{ protected_paths }}"
+      register: protected_cas
+      no_log: true
+      when: not ansible_check_mode and candidate_text != original_text
+    - name: Refuse unrelated configuration drift before mutation
+      ansible.builtin.assert:
+        that:
+          - item.0.stat.exists == item.1.stat.exists
+          - item.0.stat.checksum | default('') == item.1.stat.checksum | default('')
+          - item.0.stat.uid | default(-1) == item.1.stat.uid | default(-1)
+          - item.0.stat.gid | default(-1) == item.1.stat.gid | default(-1)
+          - item.0.stat.mode | default('') == item.1.stat.mode | default('')
+          - item.0.stat.islnk | default(false) == item.1.stat.islnk | default(false)
+      loop: "{{ protected_before.results | zip(protected_cas.results) | list }}"
+      when: not ansible_check_mode and candidate_text != original_text
+      no_log: true
+    - name: Recheck name binding immediately before mutation
+      ansible.builtin.command:
+        argv: ["{{ docker_bin }}", inspect, --format, "{{ '{{' }}.Id{{ '}}' }}", "{{ manager_name }}"]
+      register: manager_cas
+      changed_when: false
+      when: not ansible_check_mode and candidate_text != original_text
+    - name: Refuse changed identity or options without entering rollback
+      ansible.builtin.assert:
+        that:
+          - manager_cas.stdout == pin.manager_id
+          - options_cas.stat.isreg and not options_cas.stat.islnk and options_cas.stat.nlink == 1
+          - options_cas.stat.checksum == options_before.stat.checksum
+          - options_cas.stat.uid == options_before.stat.uid and options_cas.stat.gid == options_before.stat.gid
+          - options_cas.stat.mode == options_before.stat.mode
+      when: not ansible_check_mode and candidate_text != original_text
+    - name: Apply two options and validate the same manager
+      when: not ansible_check_mode and candidate_text != original_text
+      block:
+        - name: Atomically install candidate bytes with original ownership
+          ansible.builtin.copy:
+            src: "{{ transaction.path }}/local_internal_options.conf.candidate"
+            remote_src: true
+            dest: "{{ options_path }}"
+            owner: '0'
+            group: '999'
+            mode: '0640'
+            unsafe_writes: false
+          register: options_install
+          no_log: true
+        - name: Validate installed configuration before restart
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+          changed_when: false
+          no_log: true
+        - name: Mark the beginning of a restart attempt
+          ansible.builtin.set_fact:
+            restart_attempted: true
+          when: options_install.changed
+        - name: Restart only the pinned existing manager container
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '90', "{{ docker_bin }}", restart, --time, '30', "{{ pin.manager_id }}"]
+          when: options_install.changed
+        - name: Wait for the required manager processes
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '2', '10', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-control, status]
+          changed_when: false
+          register: manager_health
+          failed_when: false
+          until: "manager_health.rc in [0, 1] and 'wazuh-analysisd is running' in manager_health.stdout and 'wazuh-remoted is running' in manager_health.stdout and 'wazuh-db is running' in manager_health.stdout and 'wazuh-logcollector is running' in manager_health.stdout"
+          retries: 20
+          delay: 3
+        - name: Confirm name still identifies the original container
+          ansible.builtin.command:
+            argv: ["{{ docker_bin }}", inspect, --format, "{{ '{{' }}.Id{{ '}}' }}", "{{ manager_name }}"]
+          register: manager_after
+          changed_when: false
+        - name: Require unchanged manager identity
+          ansible.builtin.assert:
+            that: [manager_after.stdout == pin.manager_id]
+        - name: Recheck existing 104 native rule scenarios after restart
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '420', /bin/sh, "{{ playbook_dir }}/../tests/{{ item }}"]
+          loop: "{{ regression_scripts }}"
+          changed_when: false
+        - name: Validate restarted configuration
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+          changed_when: false
+          no_log: true
+        - name: Recheck protected files
+          ansible.builtin.stat:
+            path: "{{ item }}"
+            follow: false
+            checksum_algorithm: sha256
+          loop: "{{ protected_paths }}"
+          register: protected_after
+          no_log: true
+        - name: Require unchanged protected bytes and permissions
+          ansible.builtin.assert:
+            that:
+              - item.0.stat.exists == item.1.stat.exists
+              - item.0.stat.checksum | default('') == item.1.stat.checksum | default('')
+              - item.0.stat.uid | default(-1) == item.1.stat.uid | default(-1)
+              - item.0.stat.gid | default(-1) == item.1.stat.gid | default(-1)
+              - item.0.stat.mode | default('') == item.1.stat.mode | default('')
+              - item.0.stat.islnk | default(false) == item.1.stat.islnk | default(false)
+          loop: "{{ protected_before.results | zip(protected_after.results) | list }}"
+          no_log: true
+        - name: Check final option digest and permissions
+          ansible.builtin.stat:
+            path: "{{ options_path }}"
+            follow: false
+            checksum_algorithm: sha256
+          register: options_after
+        - name: Require exact candidate bytes and original file metadata
+          ansible.builtin.assert:
+            that:
+              - options_after.stat.checksum == candidate_text | hash('sha256')
+              - options_after.stat.uid == 0 and options_after.stat.gid == 999 and options_after.stat.mode == '0640'
+              - options_after.stat.isreg and not options_after.stat.islnk and options_after.stat.nlink == 1
+        - name: Record successful deployment metadata without file contents
+          ansible.builtin.copy:
+            dest: "{{ transaction.path }}/result.json"
+            owner: '0'
+            group: '0'
+            mode: '0600'
+            content: "{{ {'status': 'validated', 'manager_id': pin.manager_id, 'before_sha256': pin.options_sha256, 'after_sha256': options_after.stat.checksum, 'restarted': options_install.changed, 'native_rule_scenarios_before': 104, 'native_rule_scenarios_after': 104, 'event_threads': 1, 'rule_matching_threads': 1, 'native_test_event_threads_limitation': true} | to_nice_json }}\n"
+        - name: Report rollback artifact location
+          ansible.builtin.debug:
+            msg: "Validated same-container deployment; rollback artifacts={{ transaction.path }}; restarted={{ options_install.changed }}. Runtime worker counts and sustained queue performance require separate observation."
+      rescue:
+        - name: Inspect current name before any recovery action
+          ansible.builtin.command:
+            argv: ["{{ docker_bin }}", inspect, --format, "{{ '{{' }}.Id{{ '}}' }}", "{{ manager_name }}"]
+          changed_when: false
+          register: recovery_manager
+        - name: Inspect the current option file before rollback
+          ansible.builtin.stat:
+            path: "{{ options_path }}"
+            follow: false
+            checksum_algorithm: sha256
+          register: recovery_options
+        - name: Recheck rollback artifact bytes
+          ansible.builtin.stat:
+            path: "{{ transaction.path }}/local_internal_options.conf.before"
+            follow: false
+            checksum_algorithm: sha256
+          register: recovery_backup
+        - name: Stop recovery on replacement or unrelated file modification
+          ansible.builtin.assert:
+            that:
+              - recovery_manager.stdout == pin.manager_id
+              - recovery_backup.stat.isreg and not recovery_backup.stat.islnk and recovery_backup.stat.nlink == 1
+              - recovery_backup.stat.uid == 0 and recovery_backup.stat.mode == '0600'
+              - recovery_backup.stat.checksum == pin.options_sha256
+              - recovery_options.stat.isreg and not recovery_options.stat.islnk and recovery_options.stat.nlink == 1
+              - recovery_options.stat.checksum in [pin.options_sha256, candidate_text | hash('sha256')]
+              - recovery_options.stat.uid == 0 and recovery_options.stat.gid == 999 and recovery_options.stat.mode == '0640'
+            fail_msg: 'Recovery refused: manager identity or options changed outside this transaction. Retained root backup requires manual review.'
+        - name: Restore only the original local options
+          ansible.builtin.copy:
+            src: "{{ transaction.path }}/local_internal_options.conf.before"
+            remote_src: true
+            dest: "{{ options_path }}"
+            owner: '0'
+            group: '999'
+            mode: '0640'
+            unsafe_writes: false
+          no_log: true
+        - name: Validate restored configuration before any recovery restart
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+          changed_when: false
+          no_log: true
+          when: not restart_attempted | default(false)
+        - name: Restart restored options only after an operational restart was attempted
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '90', "{{ docker_bin }}", restart, --time, '30', "{{ pin.manager_id }}"]
+          when: restart_attempted | default(false)
+        - name: Wait for recovery health
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '2', '10', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-control, status]
+          changed_when: false
+          failed_when: false
+          register: recovery_health
+          until: "recovery_health.rc in [0, 1] and 'wazuh-analysisd is running' in recovery_health.stdout and 'wazuh-remoted is running' in recovery_health.stdout and 'wazuh-db is running' in recovery_health.stdout and 'wazuh-logcollector is running' in recovery_health.stdout"
+          retries: 20
+          delay: 3
+        - name: Validate recovered configuration
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+          changed_when: false
+          no_log: true
+        - name: Verify recovered bytes and original name binding
+          ansible.builtin.stat:
+            path: "{{ options_path }}"
+            follow: false
+            checksum_algorithm: sha256
+          register: recovered_options
+        - name: Check recovered name binding
+          ansible.builtin.command:
+            argv: ["{{ docker_bin }}", inspect, --format, "{{ '{{' }}.Id{{ '}}' }}", "{{ manager_name }}"]
+          changed_when: false
+          register: recovered_manager
+        - name: Require the verified original options after recovery
+          ansible.builtin.assert:
+            that:
+              - recovered_manager.stdout == pin.manager_id
+              - recovered_options.stat.checksum == pin.options_sha256
+              - recovered_options.stat.isreg and not recovered_options.stat.islnk and recovered_options.stat.nlink == 1
+              - recovered_options.stat.uid == 0 and recovered_options.stat.gid == 999 and recovered_options.stat.mode == '0640'
+        - name: Report failed deployment after recovery
+          ansible.builtin.fail:
+            msg: "Thread-option deployment failed. Original options restored; recovery health passed. Retained rollback artifacts={{ transaction.path }}. No rule or conversation data was restored."
+    - name: Report already-correct options without creating backups or restarting
+      ansible.builtin.debug:
+        msg: 'Both options were already 1; native configuration and 104 rule scenarios passed. No options write or manager restart was performed.'
+      when: not ansible_check_mode and candidate_text == original_text

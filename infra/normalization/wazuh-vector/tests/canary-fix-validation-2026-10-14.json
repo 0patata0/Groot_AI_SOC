@@ -1,0 +1,48 @@
+{
+  "kind": "canary_verifier_writer_fix_validation",
+  "checked_at_kst": "2026-10-14T18:10:25+09:00",
+  "scope": "native B synthetic fixtures and existing runs read-only; no operational canary append",
+  "native_tool": "jq-1.7",
+  "verifier_synthetic_passed": 42,
+  "append_synthetic_passed": 5,
+  "candidate_manifest_sha256": "a0a15f28c14e6114e640d6145cb62a1f0218ad40adbce380a66efb64495c2bb8",
+  "source_sha256": {
+    "history-replay-b/verify-retained-canary-b.sh": "bced97c2560877f121b9f4121432df8f85d871794fe5582f48d25c2f6693e6e2",
+    "history-replay-b/canary-validation.jq": "023c59258899b05f918735d2741669243bb4e31480f1ac359681fef6840b78e8",
+    "tests/write-canary-a.sh": "e5d2066843147d62eb06128aeb75906c5e702958136deab46a0c109656fec0ad",
+    "tests/canary-append-lib.sh": "3f5832d0653d7b75ceccf69f4c4b52d9f86f8cbfa3646b8fbac070cf51061e51",
+    "tests/test-canary-validation.sh": "201af6952eccf81ef28437abad6c70a9e55a27745b3274086cd53ef4ecfda63c",
+    "tests/test-canary-append.sh": "cd36284fc9de89d538ddc4871fcfdae2d320a7bb1ab977991602b92d6af32a79"
+  },
+  "old_paced": {
+    "run_id": "96803cd646c5fb8e85833f2cb859b267",
+    "manager_count": 2,
+    "indexer_count": 2,
+    "shards_total": 57,
+    "shards_successful": 57,
+    "shards_failed": 0,
+    "timed_out": false,
+    "exact_canonical_tuples_match": true,
+    "strict_ca_and_hostname_validation": true,
+    "event_identity_contract": "rule-scenario-input-membership-v2"
+  },
+  "old_burst": {
+    "run_id": "5f54ed9eb8c9fdd4586cfb97fd4f6cdd",
+    "status": "not_verified",
+    "phase": "indexer_search",
+    "expected_rejection": true
+  },
+  "server_full_metadata": "/var/tmp/capstone-correlation-fix-20261014/canary-candidate-validation.json",
+  "fixture_temporary_paths_clean": true,
+  "rule_files_and_container_ids_unchanged": true,
+  "new_canary_input": false,
+  "operational_configuration_or_service_change": false,
+  "mac_package_install": false,
+  "raw_or_credentials_exported": false,
+  "limits": [
+    "Existing burst has one observed alert; fixing verifier input-ID membership does not repair that missing correlation.",
+    "The manager query remains bounded to current alerts.json last 10000 rows and 16MiB; absence outside this scope is not proved.",
+    "Append SHA/size/line verification proves local file append and sync, not manager or Indexer receipt.",
+    "Native append uses only a private synthetic file; operational writer burst has not been executed by this task."
+  ]
+}

@@ -1,0 +1,8 @@
+<!-- Candidate fragment only. A already uses its existing journald localfile.
+     B requires this exact manager-visible syslog file plus a verified host relay.
+     This fragment does not create the file or provide that relay. -->
+<localfile>
+  <log_format>syslog</log_format>
+  <location>/var/ossec/logs/capstone-storage-b.log</location>
+  <only-future-events>yes</only-future-events>
+</localfile>

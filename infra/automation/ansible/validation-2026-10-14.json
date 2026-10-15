@@ -1,0 +1,165 @@
+{
+  "status": "passed",
+  "observed_seconds": 31.46,
+  "service": {
+    "MainPID": "1572704",
+    "NRestarts": "0",
+    "ActiveState": "active",
+    "SubState": "running",
+    "FragmentPath": "/etc/systemd/system/capstone-vector.service",
+    "DropInPaths": "",
+    "InvocationID": "d3efd056daef49878cb82e744269b24b"
+  },
+  "journal_records_checked": 17,
+  "error_records": 0,
+  "warning_records": 0,
+  "existing_security_container_identity_starttime_unchanged": true,
+  "ready": {
+    "exists": true,
+    "bytes": 18065,
+    "complete_records_scanned": 20,
+    "malformed": 0,
+    "partial_tail": false,
+    "bounded_snapshot": true,
+    "bytes_scanned": 18065,
+    "limit_reached": false,
+    "counts": {
+      "suricata": 5,
+      "nftables": 15
+    },
+    "records_with_raw_fields": 0,
+    "invalid_kst_records": 0
+  },
+  "quarantine": {
+    "exists": false,
+    "bytes": 0,
+    "complete_records_scanned": 0,
+    "malformed": 0,
+    "partial_tail": false,
+    "bounded_snapshot": true,
+    "bytes_scanned": 0,
+    "limit_reached": false,
+    "counts": {}
+  },
+  "artifacts": {
+    "/etc/capstone-vector/vector.toml": {
+      "sha256": "6686716e2dfb8a3be8178cf0b795ea57c40726bae34c537f3d251142683236b7",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600"
+    },
+    "/etc/capstone-vector/vector.env": {
+      "sha256": "b587b63e0d7bd83cc5a3cea52200c29d9187b53e26220f7d3144c857bb1f0155",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600"
+    },
+    "/etc/systemd/system/capstone-vector.service": {
+      "sha256": "f4cac7cb3d50f979d5bd8c9ac09a9b011db5e7d79c86484b82afe53f309ba2f7",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o644"
+    },
+    "/etc/capstone-vector/transforms/nftables.vrl": {
+      "sha256": "8450cefe8d884522b6e817acd7fb963efccfb8a0c93a023a854befdc75c715e5",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600"
+    },
+    "/etc/capstone-vector/transforms/suricata.vrl": {
+      "sha256": "861c998eb2ab3dc6c8902d405f4058dc69c7bb07ce1b0569359adba6e0e09dcc",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600"
+    },
+    "/etc/capstone-vector/transforms/waf_quarantine.vrl": {
+      "sha256": "3607c6d08df74eddff4009f31c13a62e862ee0c256bad0da4b16c3d0a45114ad",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600"
+    }
+  },
+  "directory_modes": {
+    "/opt/capstone-automation/project": "root:root 0700",
+    "/etc/capstone-vector": "root:root 0700",
+    "/var/lib/capstone-vector": "root:root 0700",
+    "/var/log/capstone-vector": "root:root 0700",
+    "/var/log/capstone-vector/ready": "root:root 0700",
+    "/var/log/capstone-vector/quarantine": "root:root 0700"
+  },
+  "verified_at_kst": "2026-10-14T01:37:59.904269+09:00",
+  "idempotency": {
+    "second_apply_changed": 0,
+    "failed": 0,
+    "unreachable": 0,
+    "same_mainpid_and_invocation": true
+  },
+  "approval_boundary_after": {
+    "/usr/local/sbin/rule-change-executor": {
+      "sha256": "d937c7def4d2938d7655e445cb5cf9cd7858837aebebaf4278feae5fb69965a2",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o750"
+    },
+    "/opt/rule-change/rule_change_mcp.py": {
+      "sha256": "2926ee95218fb889dd7f77bcccd36bdec4ed15f58aa7ae0b3e82426fc0209682",
+      "uid": 0,
+      "gid": 987,
+      "mode": "0o750"
+    },
+    "/opt/rule-change/run-rule-change.sh": {
+      "sha256": "72083335ae3417f8b26c1ccc11290d83a845e44c6373c0bd235c8d4710dfd74d",
+      "uid": 0,
+      "gid": 987,
+      "mode": "0o750"
+    },
+    "/etc/rule-change/config.json": {
+      "sha256": "59a3caf4148a1c7946ce3628a4ef4f9bec9763a807cfc4196643390f90456135",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o600"
+    },
+    "/etc/sudoers.d/capstone-rule-change": {
+      "sha256": "41d81849cb526930ee9f4aa23fd5d9c77ff661467f232d080780860bf5bef93b",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o440"
+    },
+    "/etc/systemd/system/rule-change-worker.service": {
+      "sha256": "1460e1383c4a79fa289d5733d85f47be322ef7ac6b19a7bfc054dc649f4d3c7c",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o644"
+    },
+    "/etc/systemd/system/rule-change-worker.timer": {
+      "sha256": "16f2f314c89fab36020f75cd76853a74b2290bde1888a946dc0b947f46f2cc52",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0o644"
+    }
+  },
+  "approval_boundary_unchanged_on_both_applies": true,
+  "ansible": {
+    "version": "2.21.5",
+    "first_apply": {
+      "ok": 28,
+      "changed": 7,
+      "unreachable": 0,
+      "failed": 0
+    },
+    "second_apply": {
+      "ok": 27,
+      "changed": 0,
+      "unreachable": 0,
+      "failed": 0
+    },
+    "native_tests_per_apply": 22
+  },
+  "scope": {
+    "host": "A",
+    "pipeline": "Vector parallel collection",
+    "wazuh_input_switched": false,
+    "llm_authority_expanded": false,
+    "raw_log_values_exported": false
+  }
+}

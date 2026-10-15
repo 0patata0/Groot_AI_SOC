@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Korea-time ChatDuck certificate expiry observation
+
+[Timer]
+OnCalendar=*-*-* 09:00:00 Asia/Seoul
+Persistent=true
+AccuracySec=1min
+Unit=capstone-cert-monitor.service
+
+[Install]
+WantedBy=timers.target

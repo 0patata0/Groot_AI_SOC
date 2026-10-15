@@ -1,0 +1,92 @@
+{
+  "operation": "isolated_previous_boot_vector_classification",
+  "started_at": "2026-10-14T11:54:49+09:00",
+  "finished_at": "2026-10-14T11:54:50+09:00",
+  "private_stage": "/var/tmp/capstone-replay-20261014/history-replay-rRr7BC",
+  "vector_version": "0.59.0",
+  "input_records": 1481,
+  "input_bytes": 621820,
+  "string_message_records": 1481,
+  "nft_prefix_candidates": 0,
+  "non_target_kernel_records": 1481,
+  "normalization_attempts": 0,
+  "normalization_failures": 0,
+  "normalized_security_records": 0,
+  "production_indexer_candidate_records": 0,
+  "input_sha256": "2ef75063b23f2ab9f1f8f7d97e261985874ca9be37abeb3ad2c26dbb6323c598",
+  "sorted_event_id_ledger_sha256": "75aa72ed1fc4ca65bdf86fde3a42f87cc2819452085e53b6bbb0dedd018cb58c",
+  "probe_config_sha256": "d9e760891dd90929b673003253b3cdcae43c57c859ac38deebaa57b022974a96",
+  "batches": [
+    {
+      "batch_id": "67f858b9c78551e3ca95cd3bc9948cf9ded19834d1e0d9d9f78b4bb4c95fd33a",
+      "payload_sha256": "4f3fd39e4bd0e63eca07e00e5dac4515f59b473a401c97e84ed206d568f1128d",
+      "manifest_sha256": "067728c72a202e44c7244a29b3c403a6ca7533587d4ad18d1d11984f8d531ec3",
+      "records": 1000
+    },
+    {
+      "batch_id": "bf58e25ad123f6d84c54b66ced22e186750c2328f67d59439b1bccb4c47fae68",
+      "payload_sha256": "5e96e0e71bb8c67bf5e751c5d71fca467d26058440229503fe45c8036e70fe58",
+      "manifest_sha256": "18c79f4f8473da11bd7edf5e6f472e22aeb4d43c5fb2dcc5e08117ea87f4e697",
+      "records": 481
+    }
+  ],
+  "batch_record_metadata_matches_manifest": true,
+  "cursor_uniqueness_across_batches": true,
+  "child_parent_binding_matches": true,
+  "four_boundary_event_and_record_id_hashes_independently_verified": true,
+  "synthetic": {
+    "records": 14,
+    "selector_candidates": 12,
+    "non_target": 2,
+    "normalized": 9,
+    "normalization_failed": 3,
+    "quality_flagged": 1,
+    "protected_asset": 1,
+    "historical": 9,
+    "production_correlation_eligible": 0
+  },
+  "source_payload_and_manifest_sha_unchanged": true,
+  "live_transform_hashes_matched": true,
+  "live_selector_exactly_matched": true,
+  "vector_and_wazuh_service_pid_invocation_state_unchanged": true,
+  "operational_checkpoint_write": false,
+  "operational_input_write": false,
+  "network_sink": false,
+  "wazuh_reinjection": false,
+  "indexer_write": false,
+  "raw_or_cursor_returned_to_mac": false,
+  "limitations": [
+    "Actual preserved records contain no known nft alert prefix; this does not prove their raw content is universally benign.",
+    "Synthetic pipeline controls are separate from actual records and do not prove historical Wazuh/Indexer ingestion.",
+    "The string-only journal adapter is deliberately limited to the verified input field types; binary-array fields are refused.",
+    "No completeness claim about journal entries removed before the original preservation.",
+    "Operational sources continue naturally; no claim that live checkpoints remain byte-identical over time."
+  ],
+  "source_sha256": {
+    "replay.toml": "d9e760891dd90929b673003253b3cdcae43c57c859ac38deebaa57b022974a96",
+    "run-isolated.sh": "21825c263dc1ce322ef16f2351b455341512da9593f4caaf690e1844b58133fe",
+    "synthetic.jq": "9eed08fbb65d47333e5459fb6cbea78d84c20f36a1bf520d465022c8be252efe",
+    "verify-a.sh": "a016cd06ef06ddbbfc2c88d47a2be6ad7c779c166cb31ab89ae7624315119746"
+  },
+  "dependency_sha256": {
+    "infra/normalization/vector/history/validate-records.jq": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9",
+    "infra/normalization/vector/transforms/nftables.vrl": "8450cefe8d884522b6e817acd7fb963efccfb8a0c93a023a854befdc75c715e5",
+    "infra/normalization/vector/transforms/correlation.vrl": "e8da4312819ca8442fb6183d40e7e1d14d8256bbcf2d6136c73e3aa69e92434d"
+  },
+  "prior_candidate_attempts": [
+    {
+      "outcome": "refused_before_vector_run",
+      "reason": "VRL remap.file loaded before environment interpolation",
+      "fixed": "render private absolute file paths before validation"
+    },
+    {
+      "outcome": "classification_assertion_refused",
+      "reason": "Vector internal JSON stdout logs mixed with console sink output",
+      "actual_selector_records": 1481,
+      "actual_nft_candidates": 0,
+      "fixed": "separate private file sink from internal logs"
+    }
+  ],
+  "service_check_contract": "capstone-vector active/MainPID>0 and unchanged; wazuh-agent active/Invocation unchanged, its unit MainPID=0 is normal; actual wazuh-logcollector PID/starttick unchanged",
+  "scope": "Read-only preserved-source classification with isolated native Vector and separate synthetic controls; no Wazuh/Indexer write"
+}

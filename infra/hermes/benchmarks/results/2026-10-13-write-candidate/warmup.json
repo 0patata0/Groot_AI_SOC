@@ -1,0 +1,28 @@
+[
+  {
+    "host": "211.170.162.110",
+    "at_kst": "2026-10-13T16:40:03+09:00",
+    "model": "qwen3.6:35b",
+    "status": "ok",
+    "done": true,
+    "done_reason": "stop",
+    "load_duration": 1518566,
+    "total_duration": 217707681,
+    "prompt_eval_count": 23,
+    "eval_count": 6,
+    "wall_seconds": 0.31043754098936915
+  },
+  {
+    "host": "211.170.162.111",
+    "at_kst": "2026-10-13T16:40:03+09:00",
+    "model": "qwen3.6:35b",
+    "status": "ok",
+    "done": true,
+    "done_reason": "stop",
+    "load_duration": 8108748212,
+    "total_duration": 8471989310,
+    "prompt_eval_count": 23,
+    "eval_count": 6,
+    "wall_seconds": 8.543450041092001
+  }
+]

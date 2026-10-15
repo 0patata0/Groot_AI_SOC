@@ -1,0 +1,330 @@
+[
+  {
+    "name": "Install bounded previous-boot preservation using existing native tools",
+    "hosts": "capstone_vector_a",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "history_auto_files": [
+        {
+          "source": "auto-worker.sh",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/auto-worker.sh",
+          "sha256": "cc096d9da2617a58e4517d9073f205d8c191e96387dcef8c8c9d338dbbdcd4af",
+          "mode": "0400"
+        },
+        {
+          "source": "auto-lib.sh",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/auto-lib.sh",
+          "sha256": "2604d5c6f9a7044f58d2c8c66995bf696d5bbdee69f49c9e48984556d1636ddf",
+          "mode": "0400"
+        },
+        {
+          "source": "state.jq",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/state.jq",
+          "sha256": "826ca427ae7a2295fb638c9738d754e49826bcd01cce2765f28ee3d20acc4212",
+          "mode": "0400"
+        },
+        {
+          "source": "../history/history-lib.sh",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/history/history-lib.sh",
+          "sha256": "64300f6de6bf5ee71066ef4368b64b041e6399a28827fc963b7349f1b7644ee5",
+          "mode": "0400"
+        },
+        {
+          "source": "../history/history-run.sh",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/history/history-run.sh",
+          "sha256": "d900dfdcf4847074c889bc53ffa915ccbe46dd72c0617e61802dab0c6736dac0",
+          "mode": "0400"
+        },
+        {
+          "source": "../history/continuation-lib.sh",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/history/continuation-lib.sh",
+          "sha256": "e52c0464fa28c4502a7c1ebaef7cd5c3fcc24642104fca288e8031183aea6379",
+          "mode": "0400"
+        },
+        {
+          "source": "../history/continue-run.sh",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/history/continue-run.sh",
+          "sha256": "dca32656caf0f9ae458ed07e0b86688f550e92a28f14b868b60f944d05180654",
+          "mode": "0400"
+        },
+        {
+          "source": "../history/validate-records.jq",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/history/validate-records.jq",
+          "sha256": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9",
+          "mode": "0400"
+        },
+        {
+          "source": "runtime.sha256",
+          "destination": "/usr/local/lib/capstone-vector-history-auto/runtime.sha256",
+          "sha256": "5e6448f7cc4fd65c19ca2dfbc74ba286a249011e8f5a02274dbd535e4aca0926",
+          "mode": "0400"
+        },
+        {
+          "source": "run-a.sh",
+          "destination": "/usr/local/sbin/capstone-vector-history-auto",
+          "sha256": "67521ba0e931c17789391d4d2b8352d69dd58ce5a4e0a72b10a9caf1515ed0cf",
+          "mode": "0500"
+        },
+        {
+          "source": "capstone-vector-history-auto.service",
+          "destination": "/etc/systemd/system/capstone-vector-history-auto.service",
+          "sha256": "4f3f9bf478a6360b145ea86b56ad54044d49ec85e80d6a9b0d538bf3305401a0",
+          "mode": "0644"
+        },
+        {
+          "source": "capstone-vector-history-auto.timer",
+          "destination": "/etc/systemd/system/capstone-vector-history-auto.timer",
+          "sha256": "2c42d4c8ef4f760ac46ee6036a1d3536e39e6b0583c6141c5769bcd82f6306e8",
+          "mode": "0644"
+        }
+      ]
+    },
+    "tasks": [
+      {
+        "name": "Require the fixed root operator on A",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '096e90b6243e438aa8a7b392be754732'",
+            "history_auto_enable is not defined or history_auto_enable is boolean"
+          ]
+        }
+      },
+      {
+        "name": "Check existing native dependencies without installing packages",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/bash",
+            "-c",
+            "set -eu; for command in journalctl jq timeout sha256sum stat find head awk sort flock sync date systemd-analyze; do command -v \"$command\" >/dev/null; done"
+          ]
+        },
+        "changed_when": false,
+        "check_mode": false
+      },
+      {
+        "name": "Read every reviewed candidate source identity",
+        "ansible.builtin.stat": {
+          "path": "{{ playbook_dir }}/{{ item.source }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": "{{ history_auto_files }}",
+        "register": "source_stats"
+      },
+      {
+        "name": "Require exact reviewed source bytes",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.exists",
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.nlink == 1",
+            "item.stat.checksum == item.item.sha256"
+          ]
+        },
+        "loop": "{{ source_stats.results }}",
+        "loop_control": {
+          "label": "{{ item.item.source }}"
+        }
+      },
+      {
+        "name": "Inspect fixed ancestor directories",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false
+        },
+        "loop": [
+          "/usr",
+          "/usr/local",
+          "/usr/local/lib",
+          "/usr/local/sbin",
+          "/etc",
+          "/etc/systemd",
+          "/etc/systemd/system",
+          "/var",
+          "/var/lib"
+        ],
+        "register": "ancestors"
+      },
+      {
+        "name": "Reject redirected or untrusted system ancestors",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.exists",
+            "item.stat.isdir",
+            "not item.stat.islnk",
+            "item.stat.uid == 0",
+            "item.stat.mode[-2] in ['0','1','4','5']",
+            "item.stat.mode[-1] in ['0','1','4','5']"
+          ]
+        },
+        "loop": "{{ ancestors.results }}",
+        "loop_control": {
+          "label": "{{ item.item }}"
+        }
+      },
+      {
+        "name": "Inspect private runtime and automatic store directories",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false
+        },
+        "loop": [
+          "/usr/local/lib/capstone-vector-history-auto",
+          "/usr/local/lib/capstone-vector-history-auto/history",
+          "/var/lib/capstone-vector-history-auto",
+          "/var/lib/capstone-vector-history-auto/jobs",
+          "/var/lib/capstone-vector-history-auto/store"
+        ],
+        "register": "private_dirs"
+      },
+      {
+        "name": "Preserve only trusted existing private directories",
+        "ansible.builtin.assert": {
+          "that": [
+            "not (item.stat.islnk | default(false))",
+            "not item.stat.exists or (item.stat.isdir and not item.stat.islnk and item.stat.uid == 0 and item.stat.gid == 0 and item.stat.mode == '0700')"
+          ]
+        },
+        "loop": "{{ private_dirs.results }}",
+        "loop_control": {
+          "label": "{{ item.item }}"
+        }
+      },
+      {
+        "name": "Inspect runtime destinations before any copy",
+        "ansible.builtin.stat": {
+          "path": "{{ item.destination }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": "{{ history_auto_files }}",
+        "register": "destinations"
+      },
+      {
+        "name": "Reject unknown installed sources instead of automatically upgrading them",
+        "ansible.builtin.assert": {
+          "that": [
+            "not (item.stat.islnk | default(false))",
+            "not item.stat.exists or (item.stat.isreg and not item.stat.islnk and item.stat.uid == 0 and item.stat.gid == 0 and item.stat.nlink == 1 and item.stat.mode == item.item.mode and item.stat.checksum == item.item.sha256)"
+          ]
+        },
+        "loop": "{{ destinations.results }}",
+        "loop_control": {
+          "label": "{{ item.item.destination }}"
+        }
+      },
+      {
+        "name": "Inspect the automatic orchestrator lock",
+        "ansible.builtin.stat": {
+          "path": "/var/lib/capstone-vector-history-auto/.lock",
+          "follow": false
+        },
+        "register": "auto_lock"
+      },
+      {
+        "name": "Reject unsafe existing lock",
+        "ansible.builtin.assert": {
+          "that": [
+            "not (auto_lock.stat.islnk | default(false))",
+            "not auto_lock.stat.exists or (auto_lock.stat.isreg and not auto_lock.stat.islnk and auto_lock.stat.uid == 0 and auto_lock.stat.gid == 0 and auto_lock.stat.nlink == 1 and auto_lock.stat.mode == '0600')"
+          ]
+        }
+      },
+      {
+        "name": "Create only the reviewed private directories",
+        "ansible.builtin.file": {
+          "path": "{{ item.item }}",
+          "state": "directory",
+          "owner": "root",
+          "group": "root",
+          "mode": "0700"
+        },
+        "loop": "{{ private_dirs.results }}",
+        "loop_control": {
+          "label": "{{ item.item }}"
+        }
+      },
+      {
+        "name": "Initialize a lock without replacing existing bytes",
+        "ansible.builtin.copy": {
+          "dest": "/var/lib/capstone-vector-history-auto/.lock",
+          "content": "",
+          "force": false,
+          "owner": "root",
+          "group": "root",
+          "mode": "0600"
+        }
+      },
+      {
+        "name": "Install exact frozen runtime and unit files",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/{{ item.source }}",
+          "dest": "{{ item.destination }}",
+          "owner": "root",
+          "group": "root",
+          "mode": "{{ item.mode }}",
+          "backup": true
+        },
+        "loop": "{{ history_auto_files }}",
+        "loop_control": {
+          "label": "{{ item.destination }}"
+        },
+        "register": "installed_files"
+      },
+      {
+        "name": "Validate service and timer with the existing systemd parser",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemd-analyze",
+            "verify",
+            "/etc/systemd/system/capstone-vector-history-auto.service",
+            "/etc/systemd/system/capstone-vector-history-auto.timer"
+          ]
+        },
+        "changed_when": false,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Validate installed source hashes and inspect metadata only",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/sbin/capstone-vector-history-auto",
+            "inspect"
+          ]
+        },
+        "changed_when": false,
+        "when": "not ansible_check_mode"
+      },
+      {
+        "name": "Reload units only after files changed",
+        "ansible.builtin.systemd_service": {
+          "daemon_reload": true
+        },
+        "when": [
+          "not ansible_check_mode",
+          "installed_files.changed"
+        ]
+      },
+      {
+        "name": "Enable the finite timer only with explicit operator deployment flag",
+        "ansible.builtin.systemd_service": {
+          "name": "capstone-vector-history-auto.timer",
+          "enabled": true,
+          "state": "started"
+        },
+        "when": [
+          "not ansible_check_mode",
+          "history_auto_enable | default(false) | bool"
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,50 @@
+boolean stableKey(def value) {
+    if (!(value instanceof String) || value.length() != 64) return false;
+    for (int i = 0; i < 64; ++i) {
+        int c = value.charAt(i);
+        if (!((c >= 48 && c <= 57) || (c >= 97 && c <= 102))) return false;
+    }
+    return true;
+}
+
+// Counters saturate at the first rejected document. No row/key is emitted.
+if (!state.valid) return;
+state.documents += 1L;
+if (state.documents > 10000) {
+    state.valid = false; state.reason = 'document_limit'; return;
+}
+try {
+    for (String suffix : ['event_time_kst', 'source', 'correlation_dedupe_key', 'correlation_key']) {
+        String field = 'data.capstone_norm.' + suffix;
+        if (!doc.containsKey(field) || doc[field].size() != 1) {
+            state.valid = false; state.reason = 'record_invalid'; return;
+        }
+    }
+    String source = doc['data.capstone_norm.source'].value;
+    String key = doc['data.capstone_norm.correlation_dedupe_key'].value;
+    String service = doc['data.capstone_norm.correlation_key'].value;
+    if ((source != 'suricata' && source != 'nftables') || !stableKey(key) || !stableKey(service)) {
+        state.valid = false; state.reason = 'record_invalid'; return;
+    }
+    long endMs = Long.parseLong(params.period_end);
+    def instant = ZonedDateTime.parse(doc['data.capstone_norm.event_time_kst'].value).toInstant();
+    long seconds = instant.getEpochSecond();
+    if (endMs < 300000 || endMs > 9223372036854775L || seconds < 0 ||
+        seconds > 9223372036853L || instant.getNano() % 1000 != 0) {
+        state.valid = false; state.reason = 'record_invalid'; return;
+    }
+    long eventUs = seconds * 1000000L + instant.getNano() / 1000;
+    long endUs = endMs * 1000L;
+    if (eventUs < endUs - 300000000L || eventUs > endUs) {
+        state.valid = false; state.reason = 'record_invalid'; return;
+    }
+    if (!state.services.containsKey(service)) {
+        if (state.services.size() >= 100) {
+            state.valid = false; state.reason = 'service_limit'; return;
+        }
+        state.services[service] = true;
+    }
+    state.rows.add([eventUs, source, key, service]);
+} catch (Exception e) {
+    state.valid = false; state.reason = 'record_invalid';
+}

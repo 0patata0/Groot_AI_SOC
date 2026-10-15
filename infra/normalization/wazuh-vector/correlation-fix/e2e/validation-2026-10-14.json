@@ -1,0 +1,24 @@
+{
+  "kind": "local_synthetic_e2e_aggregate_check",
+  "passed": 10,
+  "source_ast_valid": true,
+  "synthetic_runs": 20,
+  "expected_tuples": 40,
+  "remote_connection": false,
+  "operational_input": false,
+  "driver_runtime_validation": false,
+  "date_kst": "2026-10-14",
+  "status": "local_candidate_only",
+  "new_remote_uploads": 0,
+  "new_remote_executions": 0,
+  "new_operational_input_rows": 0,
+  "linux_driver_runtime_verified": false,
+  "deployment_pins_created": false,
+  "approval_pending": true,
+  "source_sha256": {
+    "README.md": "e6b97bba66b12bdf83c704209d88bf9b12029a0e2f5321aa8e653396ebd90778",
+    "e2e-burst.py": "5035657d883e15afde0b3d4c41a18d4e4e4e5d06cf49d9f833cde81c968ed528",
+    "run-manifest.json": "b76b1003b5dc4733b92f4235c6e7a449152e18bc52d19c83b23ee4551648c0bd",
+    "test-e2e-contract.py": "ecdfa81b32338e67ddd78fcb24c176335ea9f9281ae588b41633311d39077890"
+  }
+}

@@ -1,0 +1,18 @@
+---
+- name: Wait for the four required manager processes with a bounded status call
+  ansible.builtin.command:
+    argv: [/usr/bin/timeout, -k, '2', '10', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-control, status]
+  changed_when: false
+  register: health
+  failed_when: false
+  until: "health.rc in [0, 1] and 'wazuh-analysisd is running' in health.stdout and 'wazuh-remoted is running' in health.stdout and 'wazuh-db is running' in health.stdout and 'wazuh-logcollector is running' in health.stdout"
+  retries: 20
+  delay: 3
+- name: Require valid status code and all mandatory processes
+  ansible.builtin.assert:
+    that:
+      - health.rc in [0, 1]
+      - "'wazuh-analysisd is running' in health.stdout"
+      - "'wazuh-remoted is running' in health.stdout"
+      - "'wazuh-db is running' in health.stdout"
+      - "'wazuh-logcollector is running' in health.stdout"

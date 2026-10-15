@@ -1,0 +1,248 @@
+{
+  "kind": "raw_line_length_stage2_validation",
+  "scope": "bounded_periodic_tail_observation",
+  "source_sha256": {
+    "test-native.sh": "a68d83c790bf5064ec6eb25f6cc4b34a088ad933a0e42025d1bf89850190c16d",
+    "scan-raw-lines.sh": "6e694ee02ed983e105d38dfd22fa2f27b11e4ef4e678a670e10c7394ebb9f3ea",
+    "raw-line-status.jq": "a7e624a8d95877adf1c1ef997de7c3c56c59bf045e87c5a66bb762b582d445ca",
+    "line-length-lib.sh": "028ac32906a2a7964d46c01a81f42f23e975b25bc6b99593ef97c4bb3676b447"
+  },
+  "early_probe": {
+    "at_kst": "2026-10-14T21:01:19+09:00",
+    "source_sha256": "5d02062c863899821759782d4cde13387f00fde88b135304592d3acbcbbfdcfe",
+    "synthetic_cases_passed": 3,
+    "live_sources": {
+      "suricata": {
+        "verdict": "within_scanned_range",
+        "reason": "range_within_limit",
+        "observed_positive": false,
+        "file_stable": true,
+        "complete_snapshot_range": true,
+        "full_file_scan": true,
+        "range_start": 0,
+        "range_end": 17814378,
+        "snapshot_bytes": 17814378,
+        "scanned_bytes": 17814378,
+        "max_line_bytes": 8903,
+        "line_limit_bytes": 1048576,
+        "scan_budget_bytes": 33554432,
+        "timeout_seconds": 5,
+        "leading_fragment_possible": false
+      },
+      "waf_audit": {
+        "verdict": "within_scanned_range",
+        "reason": "range_within_limit",
+        "observed_positive": false,
+        "file_stable": true,
+        "complete_snapshot_range": true,
+        "full_file_scan": true,
+        "range_start": 0,
+        "range_end": 10072,
+        "snapshot_bytes": 10072,
+        "scanned_bytes": 10072,
+        "max_line_bytes": 2188,
+        "line_limit_bytes": 1048576,
+        "scan_budget_bytes": 33554432,
+        "timeout_seconds": 5,
+        "leading_fragment_possible": false
+      },
+      "waf_access": {
+        "verdict": "within_scanned_range",
+        "reason": "range_within_limit",
+        "observed_positive": false,
+        "file_stable": true,
+        "complete_snapshot_range": true,
+        "full_file_scan": true,
+        "range_start": 0,
+        "range_end": 810,
+        "snapshot_bytes": 810,
+        "scanned_bytes": 810,
+        "max_line_bytes": 405,
+        "line_limit_bytes": 1048576,
+        "scan_budget_bytes": 33554432,
+        "timeout_seconds": 5,
+        "leading_fragment_possible": false
+      }
+    },
+    "operating_changes": false,
+    "packages_installed": 0
+  },
+  "native_final": {
+    "status": "passed",
+    "native_tests": 34,
+    "synthetic_only": true,
+    "live_wrapper_executed": false,
+    "production_sources_opened": false,
+    "production_paths_changed": false,
+    "original_library_and_predicate_unchanged": true,
+    "raw_payload_exported": false
+  },
+  "integration": {
+    "case_count": 12,
+    "cases": [
+      {
+        "case": "normal",
+        "elapsed_seconds": 0.667,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": []
+      },
+      {
+        "case": "oversize_eof",
+        "elapsed_seconds": 0.766,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_oversize_seen"
+        ]
+      },
+      {
+        "case": "missing_binding",
+        "elapsed_seconds": 0.465,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "config_drift",
+        "elapsed_seconds": 0.465,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "env_drift",
+        "elapsed_seconds": 0.517,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "malformed_binding",
+        "elapsed_seconds": 0.517,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "duplicate_binding",
+        "elapsed_seconds": 0.467,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "helper_exit9",
+        "elapsed_seconds": 0.466,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "empty_response",
+        "elapsed_seconds": 0.466,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "multiple_json",
+        "elapsed_seconds": 0.466,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "oversized_response",
+        "elapsed_seconds": 0.616,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      },
+      {
+        "case": "raw_marker_projection",
+        "elapsed_seconds": 0.517,
+        "logger_calls": 0,
+        "metadata_only": true,
+        "status": "passed",
+        "statuses": [
+          "collection_raw_line_scan_unavailable"
+        ]
+      }
+    ],
+    "check_only": true,
+    "deadline_scope": "230 second monotonic work deadline; each case wait is capped at 40 seconds; cleanup and bounded postflight are separate, not an enforced 240 second global kill",
+    "driver_work_deadline_seconds": 230,
+    "elapsed_seconds": 7.491,
+    "fixture_cleanup_verified": true,
+    "logger_calls": 0,
+    "logging_proof_scope": "check ran with a private logger stub; no invocation observed; not a claim that unrelated host services emitted no logs",
+    "max_case_seconds": 40,
+    "operating_input_written": false,
+    "operating_raw_inode_prefix_unchanged": true,
+    "operational_log_injection": false,
+    "raw_state_unchanged": true,
+    "schema_version": 1,
+    "source_and_operating_config_hashes_unchanged": true,
+    "source_sha256": {
+      "capstone-vector-maintenance.sh": "8413fb43747a9ddb98f8a8ed1d6df2cf67dd695698b8a81d429c13e3fcdf8f95",
+      "collection/line-length/line-length-lib.sh": "028ac32906a2a7964d46c01a81f42f23e975b25bc6b99593ef97c4bb3676b447",
+      "collection/line-length/raw-line-status.jq": "a7e624a8d95877adf1c1ef997de7c3c56c59bf045e87c5a66bb762b582d445ca",
+      "collection/line-length/scan-raw-lines.sh": "6e694ee02ed983e105d38dfd22fa2f27b11e4ef4e678a670e10c7394ebb9f3ea"
+    },
+    "status": "passed",
+    "whole_driver_hard_timeout_enforced": false
+  },
+  "ansible_check_a": {
+    "at_kst": "2026-10-14T21:09:33.039737+09:00",
+    "syntax": "passed",
+    "check": "passed",
+    "operating_changes": false,
+    "logs": {
+      "storage-syntax.log": "cfed96676a4546d7900d2f776faa19151439a82719f9a5016a213a41e5f24250",
+      "storage-check.log": "aab0478fcf3d2d0ed3db338cb0806876a931b54bbcac7b800872867118728b6b"
+    }
+  },
+  "ansible_check_b": {
+    "at_kst": "2026-10-14T21:08:29.751497+09:00",
+    "syntax": "passed",
+    "check": "passed",
+    "operating_changes": false,
+    "logs": {
+      "ansible-syntax.log": "202d868813d012f025ecaa649becd1ba2b59040f68f63ea74eb439a8b787fb99",
+      "ansible-check.log": "452694e2379973628dfc2bdcb43532f3cd6262d608e4c225790b55d066956bca"
+    }
+  },
+  "operating_deployment_complete": true,
+  "operating_deployment_complete_at_validation_capture": false,
+  "deployment_evidence": "deployment-2026-10-14.json"
+}

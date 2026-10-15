@@ -1,0 +1,25 @@
+# Finite synthetic stdin/stdout experiment. Never load with the operating config.
+# A deliberately tiny cache reproduces eviction without load generation.
+data_dir = "${CAPSTONE_AUDIT_DATA}"
+[sources.synthetic]
+type = "stdin"
+decoding.codec = "json"
+[transforms.current_time_gate]
+type = "remap"
+inputs = ["synthetic"]
+file = "freshness.vrl"
+drop_on_error = true
+[transforms.eligible_here]
+type = "filter"
+inputs = ["current_time_gate"]
+condition = '.audit.allowed_at_this_transform == true'
+[transforms.bounded_dedupe]
+type = "dedupe"
+inputs = ["eligible_here"]
+fields.match = ["capstone_norm.sensor", "capstone_norm.source", "capstone_norm.correlation_dedupe_key"]
+cache.num_events = 2
+[sinks.synthetic_stdout]
+type = "console"
+inputs = ["bounded_dedupe"]
+target = "stdout"
+encoding.codec = "json"

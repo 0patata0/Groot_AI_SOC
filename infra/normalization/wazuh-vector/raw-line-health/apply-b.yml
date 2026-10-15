@@ -1,0 +1,343 @@
+---
+- name: Add only two bounded raw-line health rules to the existing B manager
+  hosts: local
+  connection: local
+  become: false
+  gather_facts: true
+  gather_subset: [min]
+  any_errors_fatal: true
+  vars:
+    manager_name: single-node-wazuh.manager-1
+    docker_bin: /usr/local/bin/docker
+    etc_root: /var/lib/docker/volumes/single-node_wazuh_etc/_data
+    rule_path: /var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/capstone_vector_rules.xml
+    extra_rules: |2
+        <rule id="100252" level="3" ignore="900">
+          <if_sid>100240</if_sid>
+          <match type="pcre2">^status=collection_raw_line_oversize_seen$</match>
+          <description>Raw source line exceeds the byte limit in the inspected snapshot range</description>
+          <options>no_email_alert</options>
+        </rule>
+        <rule id="100253" level="3" ignore="900">
+          <if_sid>100240</if_sid>
+          <match type="pcre2">^status=collection_raw_line_scan_unavailable$</match>
+          <description>Bounded raw source line inspection could not establish a stable result</description>
+          <options>no_email_alert</options>
+        </rule>
+    protected_paths:
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/ossec.conf
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/internal_options.conf
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/local_internal_options.conf
+      - /var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml
+      - /usr/local/sbin/rule-change-executor
+      - /opt/rule-change/rule_change_mcp.py
+      - /opt/rule-change/run-rule-change.sh
+      - /etc/rule-change/config.json
+      - /etc/sudoers.d/capstone-rule-change
+      - /etc/systemd/system/rule-change-worker.service
+      - /etc/systemd/system/rule-change-worker.timer
+    regression_scripts:
+      - test-installed-manager.sh
+      - test-correlation-manager.sh
+      - test-health-manager.sh
+      - test-evidence-manager.sh
+  tasks:
+    - name: Freeze reviewed metadata and candidate bytes once for this transaction
+      ansible.builtin.set_fact:
+        pin: "{{ lookup('ansible.builtin.file', playbook_dir + '/preflight.json') | from_json }}"
+        candidate_text: "{{ lookup('ansible.builtin.file', playbook_dir + '/../capstone_vector_rules.xml', rstrip=False) }}"
+    - name: Require fixed B root controller and fresh metadata
+      ansible.builtin.assert:
+        that:
+          - ansible_connection == 'local' and ansible_facts.user_uid == 0
+          - ansible_facts.machine_id == '1e143067c98a44ffba6eaa925dc038d7'
+          - ansible_version.full is version('2.21', '>=')
+          - ansible_version.full is version('2.22', '<')
+          - pin.manager_id is match('^[a-f0-9]{64}$')
+          - pin.options_1_1 == true
+          - pin.new_rule_ids_absent == [100252, 100253]
+          - ansible_facts.date_time.epoch | int >= (pin.at_kst | to_datetime('%Y-%m-%dT%H:%M:%S.%f%z')).timestamp() | int
+          - ansible_facts.date_time.epoch | int - ((pin.at_kst | to_datetime('%Y-%m-%dT%H:%M:%S.%f%z')).timestamp() | int) <= 1800
+          - pin.protected[rule_path].sha256 == '20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900'
+    - name: Require exact two-rule addition and byte-identical remaining rules
+      ansible.builtin.assert:
+        that:
+          - candidate_text | length <= 131072
+          - candidate_text.count(extra_rules) == 1
+          - candidate_text.replace(extra_rules, '') | hash('sha256') == pin.protected[rule_path].sha256
+        fail_msg: 'Candidate must add exactly the reviewed 100252 and 100253 blocks to the pinned original.'
+    - name: Record manager and persistent volume binding
+      ansible.builtin.command:
+        argv: ["{{ docker_bin }}", inspect, "{{ manager_name }}"]
+      register: manager_inspect
+      changed_when: false
+      check_mode: false
+      no_log: true
+    - name: Decode required manager metadata
+      ansible.builtin.set_fact:
+        manager_before: "{{ (manager_inspect.stdout | from_json)[0] }}"
+      no_log: true
+    - name: Require the exact running container and existing writable etc volume
+      ansible.builtin.assert:
+        that:
+          - manager_before.Id == pin.manager_id
+          - manager_before.State.Running and manager_before.State.Pid | int > 1
+          - manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | list | length == 1
+          - (manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | first).Type == 'volume'
+          - (manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | first).Source == etc_root
+          - (manager_before.Mounts | selectattr('Destination', 'equalto', '/var/ossec/etc') | first).RW
+      no_log: true
+    - name: Snapshot unrelated configuration and approval boundary
+      ansible.builtin.stat:
+        path: "{{ item }}"
+        follow: false
+        checksum_algorithm: sha256
+      loop: "{{ protected_paths }}"
+      register: protected_before
+      no_log: true
+    - name: Require regular unchanged protected files from the fresh preflight
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists and item.stat.isreg and not item.stat.islnk and item.stat.nlink == 1
+          - item.item not in pin.protected or item.stat.checksum == pin.protected[item.item].sha256
+          - item.item not in pin.protected or item.stat.uid == pin.protected[item.item].uid
+          - item.item not in pin.protected or item.stat.gid == pin.protected[item.item].gid
+          - item.item not in pin.protected or item.stat.mode | int(base=8) == pin.protected[item.item].mode | regex_replace('^0o', '') | int(base=8)
+      loop: "{{ protected_before.results }}"
+      no_log: true
+    - name: Snapshot the dedicated rules without following links
+      ansible.builtin.stat:
+        path: "{{ rule_path }}"
+        follow: false
+        checksum_algorithm: sha256
+      register: rule_before
+    - name: Refuse unexpected rule bytes or ownership
+      ansible.builtin.assert:
+        that:
+          - rule_before.stat.exists and rule_before.stat.isreg and not rule_before.stat.islnk
+          - rule_before.stat.nlink == 1 and rule_before.stat.uid == 999 and rule_before.stat.gid == 999
+          - rule_before.stat.mode == '0660' and rule_before.stat.size <= 131072
+          - rule_before.stat.checksum in [pin.protected[rule_path].sha256, candidate_text | hash('sha256')]
+    - name: Check mode describes the exact candidate without running native tests
+      ansible.builtin.debug:
+        msg: "Only health rules 100252/100253 may change; restart required={{ rule_before.stat.checksum != candidate_text | hash('sha256') }}. Check mode is not native validation."
+      when: ansible_check_mode
+    - name: Prepare and validate fixed native fixture copies
+      when: not ansible_check_mode
+      block:
+        - name: Create a private rollback and validation directory
+          ansible.builtin.tempfile:
+            state: directory
+            path: /var/backups
+            prefix: capstone-raw-line-health-
+          register: transaction
+        - name: Require an owned private transaction directory
+          ansible.builtin.file:
+            path: "{{ transaction.path }}"
+            owner: '0'
+            group: '0'
+            mode: '0700'
+        - name: Copy only synthetic fixtures for the four native scripts
+          ansible.builtin.copy:
+            src: "{{ playbook_dir }}/../fixtures/"
+            dest: "{{ transaction.path }}/fixtures/"
+            owner: '0'
+            group: '0'
+            mode: '0600'
+            directory_mode: '0700'
+        - name: Create private script directory
+          ansible.builtin.file:
+            path: "{{ transaction.path }}/tests"
+            state: directory
+            owner: '0'
+            group: '0'
+            mode: '0700'
+        - name: Verify each original native script has exactly one known manager assignment
+          ansible.builtin.assert:
+            that:
+              - lookup('ansible.builtin.file', playbook_dir + '/../tests/' + item, rstrip=False) | regex_findall('(?m)^manager=single-node-wazuh\.manager-1$') | length == 1
+          loop: "{{ regression_scripts | reject('equalto', 'test-health-manager.sh') | list }}"
+        - name: Bind the three unchanged native scripts to the exact container ID
+          ansible.builtin.copy:
+            content: "{{ lookup('ansible.builtin.file', playbook_dir + '/../tests/' + item, rstrip=False) | regex_replace('(?m)^manager=single-node-wazuh\\.manager-1$', 'manager=' + pin.manager_id) }}"
+            dest: "{{ transaction.path }}/tests/{{ item }}"
+            owner: '0'
+            group: '0'
+            mode: '0600'
+          loop: "{{ regression_scripts | reject('equalto', 'test-health-manager.sh') | list }}"
+        - name: Copy baseline-aware health fixtures unchanged
+          ansible.builtin.copy:
+            src: "{{ playbook_dir }}/../tests/test-health-manager.sh"
+            dest: "{{ transaction.path }}/tests/test-health-manager.sh"
+            owner: '0'
+            group: '0'
+            mode: '0600'
+        - name: Validate the installed original configuration
+          ansible.builtin.command:
+            argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+          changed_when: false
+          no_log: true
+        - name: Run all four baseline native scripts before any rule change
+          ansible.builtin.command:
+            argv: "{{ ['/usr/bin/timeout', '-k', '5', '420', '/bin/sh', transaction.path + '/tests/' + item] + (['--baseline'] if item == 'test-health-manager.sh' else []) }}"
+          environment:
+            CAPSTONE_WAZUH_MANAGER: "{{ pin.manager_id }}"
+          loop: "{{ regression_scripts }}"
+          changed_when: false
+        - name: Refuse new IDs used outside the dedicated rule file
+          ansible.builtin.command:
+            argv: ["{{ docker_bin }}", exec, "{{ pin.manager_id }}", grep, -R, -E, '--include=*.xml', '--exclude=capstone_vector_rules.xml', 'id[[:space:]]*=["'']10025[23]["'']', /var/ossec/etc/rules, /var/ossec/ruleset/rules]
+          register: collisions
+          changed_when: false
+          failed_when: collisions.rc != 1
+          no_log: true
+        - name: Preserve original rules with original bytes and private backup permissions
+          ansible.builtin.copy:
+            src: "{{ rule_path }}"
+            remote_src: true
+            dest: "{{ transaction.path }}/rules.before"
+            owner: '0'
+            group: '0'
+            mode: '0600'
+        - name: Freeze proposed bytes in the same transaction
+          ansible.builtin.copy:
+            content: "{{ candidate_text }}"
+            dest: "{{ transaction.path }}/rules.candidate"
+            owner: '0'
+            group: '0'
+            mode: '0600'
+        - name: Verify frozen original and candidate digests
+          ansible.builtin.stat:
+            path: "{{ transaction.path }}/{{ item }}"
+            follow: false
+            checksum_algorithm: sha256
+          loop: [rules.before, rules.candidate]
+          register: stored
+        - name: Require exact stored transaction bytes before mutation
+          ansible.builtin.assert:
+            that:
+              - stored.results[0].stat.checksum == rule_before.stat.checksum
+              - stored.results[1].stat.checksum == candidate_text | hash('sha256')
+        - name: Verify current identity and protected files immediately before installation
+          ansible.builtin.include_tasks: verify-state.yml
+          vars:
+            accepted_rule_hashes: "{{ [rule_before.stat.checksum] }}"
+        - name: Change only dedicated health rules and validate the same manager
+          when: rule_before.stat.checksum != candidate_text | hash('sha256')
+          block:
+            - name: Atomically install the frozen candidate
+              ansible.builtin.copy:
+                src: "{{ transaction.path }}/rules.candidate"
+                remote_src: true
+                dest: "{{ rule_path }}"
+                owner: '999'
+                group: '999'
+                mode: '0660'
+                unsafe_writes: false
+              register: rule_install
+            - name: Validate complete candidate configuration before restart
+              ansible.builtin.command:
+                argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+              changed_when: false
+              no_log: true
+            - name: Run the full expanded native suite before restart
+              ansible.builtin.include_tasks: native-tests.yml
+            - name: Verify candidate and identity before restart
+              ansible.builtin.include_tasks: verify-state.yml
+              vars:
+                accepted_rule_hashes: "{{ [candidate_text | hash('sha256')] }}"
+            - name: Mark operational restart attempt before invoking Docker
+              ansible.builtin.set_fact:
+                restart_attempted: true
+            - name: Restart only the pinned existing container once
+              ansible.builtin.command:
+                argv: [/usr/bin/timeout, -k, '5', '90', "{{ docker_bin }}", restart, --time, '30', "{{ pin.manager_id }}"]
+            - name: Require healthy mandatory processes after restart
+              ansible.builtin.include_tasks: health.yml
+            - name: Validate restarted native configuration
+              ansible.builtin.command:
+                argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+              changed_when: false
+              no_log: true
+            - name: Run the full expanded native suite after restart
+              ansible.builtin.include_tasks: native-tests.yml
+            - name: Require candidate and protected boundary after restart
+              ansible.builtin.include_tasks: verify-state.yml
+              vars:
+                accepted_rule_hashes: "{{ [candidate_text | hash('sha256')] }}"
+          rescue:
+            - name: Refuse recovery if identity or unrelated protected files drifted
+              ansible.builtin.include_tasks: verify-state.yml
+              vars:
+                accepted_rule_hashes: "{{ [rule_before.stat.checksum, candidate_text | hash('sha256')] }}"
+                require_running: false
+            - name: Recheck original backup before restoration
+              ansible.builtin.stat:
+                path: "{{ transaction.path }}/rules.before"
+                follow: false
+                checksum_algorithm: sha256
+              register: recovery_backup
+            - name: Require the private exact original backup
+              ansible.builtin.assert:
+                that:
+                  - recovery_backup.stat.isreg and not recovery_backup.stat.islnk and recovery_backup.stat.nlink == 1
+                  - recovery_backup.stat.uid == 0 and recovery_backup.stat.gid == 0 and recovery_backup.stat.mode == '0600'
+                  - recovery_backup.stat.checksum == rule_before.stat.checksum
+            - name: Restore only the original dedicated rule file
+              ansible.builtin.copy:
+                src: "{{ transaction.path }}/rules.before"
+                remote_src: true
+                dest: "{{ rule_path }}"
+                owner: '999'
+                group: '999'
+                mode: '0660'
+                unsafe_writes: false
+            - name: Validate restored configuration when no restart was attempted
+              ansible.builtin.command:
+                argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+              when: not restart_attempted | default(false)
+              changed_when: false
+              no_log: true
+            - name: Reload restored rules only if an operational restart was attempted
+              ansible.builtin.command:
+                argv: [/usr/bin/timeout, -k, '5', '90', "{{ docker_bin }}", restart, --time, '30', "{{ pin.manager_id }}"]
+              when: restart_attempted | default(false)
+            - name: Verify mandatory process health after recovery
+              ansible.builtin.include_tasks: health.yml
+            - name: Validate recovered configuration
+              ansible.builtin.command:
+                argv: [/usr/bin/timeout, -k, '5', '60', "{{ docker_bin }}", exec, "{{ pin.manager_id }}", /var/ossec/bin/wazuh-analysisd, -t]
+              changed_when: false
+              no_log: true
+            - name: Run the original baseline suite after recovery
+              ansible.builtin.command:
+                argv: "{{ ['/usr/bin/timeout', '-k', '5', '420', '/bin/sh', transaction.path + '/tests/' + item] + (['--baseline'] if item == 'test-health-manager.sh' else []) }}"
+              environment:
+                CAPSTONE_WAZUH_MANAGER: "{{ pin.manager_id }}"
+              loop: "{{ regression_scripts }}"
+              changed_when: false
+            - name: Require restored bytes and unchanged protected boundary
+              ansible.builtin.include_tasks: verify-state.yml
+              vars:
+                accepted_rule_hashes: "{{ [rule_before.stat.checksum] }}"
+            - name: Report failed deployment even after verified restoration
+              ansible.builtin.fail:
+                msg: "Health-rule deployment failed; original dedicated rules and recovery health verified. Private artifacts={{ transaction.path }}."
+        - name: Check an already installed candidate without another restart
+          when: rule_before.stat.checksum == candidate_text | hash('sha256')
+          block:
+            - ansible.builtin.include_tasks: health.yml
+            - ansible.builtin.include_tasks: native-tests.yml
+            - ansible.builtin.include_tasks: verify-state.yml
+              vars:
+                accepted_rule_hashes: "{{ [candidate_text | hash('sha256')] }}"
+        - name: Record bounded successful deployment metadata
+          ansible.builtin.copy:
+            dest: "{{ transaction.path }}/result.json"
+            owner: '0'
+            group: '0'
+            mode: '0600'
+            content: "{{ {'status': 'validated', 'manager_id': pin.manager_id, 'before_sha256': rule_before.stat.checksum, 'after_sha256': candidate_text | hash('sha256'), 'restarted': restart_attempted | default(false), 'new_rule_ids': [100252, 100253], 'level': 3, 'operational_events_injected': 0, 'rollback_artifacts': transaction.path} | to_nice_json }}\n"
+        - name: Report exact change scope
+          ansible.builtin.debug:
+            msg: "Only rules 100252/100253 changed. Native suites and protected-file checks passed. Restarted={{ restart_attempted | default(false) }}; artifacts={{ transaction.path }}."

@@ -1,0 +1,1281 @@
+{
+  "first_failed_attempt": {
+    "cases": [],
+    "cleanup": {
+      "errors": [],
+      "known_private_writers_remaining": 0,
+      "private_runtime_removed": true
+    },
+    "failure_code": "operating_output_reference_remaining",
+    "phase": "native_comparison",
+    "status": "failed"
+  },
+  "native": {
+    "arms": {
+      "baseline": {
+        "included_files": [
+          "/etc/modsecurity.d/setup.conf",
+          "/etc/modsecurity.d/modsecurity.conf",
+          "/etc/modsecurity.d/modsecurity-override.conf",
+          "/etc/modsecurity.d/owasp-crs/crs-setup.conf",
+          "/etc/modsecurity.d/owasp-crs/plugins/empty-config.conf",
+          "/etc/modsecurity.d/owasp-crs/plugins/empty-before.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-INITIALIZATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-905-COMMON-EXCEPTIONS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-911-METHOD-ENFORCEMENT.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-913-SCANNER-DETECTION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-921-PROTOCOL-ATTACK.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-922-MULTIPART-ATTACK.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-930-APPLICATION-ATTACK-LFI.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-931-APPLICATION-ATTACK-RFI.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-932-APPLICATION-ATTACK-RCE.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-934-APPLICATION-ATTACK-GENERIC.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-944-APPLICATION-ATTACK-JAVA.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-999-COMMON-EXCEPTIONS-AFTER.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-950-DATA-LEAKAGES.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-951-DATA-LEAKAGES-SQL.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-952-DATA-LEAKAGES-JAVA.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-953-DATA-LEAKAGES-PHP.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-954-DATA-LEAKAGES-IIS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-955-WEB-SHELLS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-956-DATA-LEAKAGES-RUBY.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-959-BLOCKING-EVALUATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-980-CORRELATION.conf",
+          "/etc/modsecurity.d/owasp-crs/plugins/empty-after.conf"
+        ],
+        "setup_sha256": "3673457a2d9b7e9c0b57815d5c90326f19332e7b026c2bde1b0198eafb42ce9d",
+        "writer_uid_gid": 101
+      },
+      "candidate": {
+        "included_files": [
+          "/etc/modsecurity.d/setup.conf",
+          "/etc/modsecurity.d/modsecurity.conf",
+          "/etc/modsecurity.d/modsecurity-override.conf",
+          "/etc/modsecurity.d/owasp-crs/crs-setup.conf",
+          "/etc/modsecurity.d/owasp-crs/plugins/empty-config.conf",
+          "/etc/modsecurity.d/owasp-crs/plugins/empty-before.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-INITIALIZATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-905-COMMON-EXCEPTIONS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-911-METHOD-ENFORCEMENT.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-913-SCANNER-DETECTION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-921-PROTOCOL-ATTACK.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-922-MULTIPART-ATTACK.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-930-APPLICATION-ATTACK-LFI.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-931-APPLICATION-ATTACK-RFI.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-932-APPLICATION-ATTACK-RCE.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-934-APPLICATION-ATTACK-GENERIC.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-944-APPLICATION-ATTACK-JAVA.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/REQUEST-999-COMMON-EXCEPTIONS-AFTER.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-950-DATA-LEAKAGES.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-951-DATA-LEAKAGES-SQL.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-952-DATA-LEAKAGES-JAVA.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-953-DATA-LEAKAGES-PHP.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-954-DATA-LEAKAGES-IIS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-955-WEB-SHELLS.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-956-DATA-LEAKAGES-RUBY.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-959-BLOCKING-EVALUATION.conf",
+          "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-980-CORRELATION.conf",
+          "/etc/modsecurity.d/owasp-crs/plugins/empty-after.conf"
+        ],
+        "setup_sha256": "4171dbaa7afde6369befd41a6fc7b3b27c31653a4e7a67720f7fb7e659cac644",
+        "writer_uid_gid": 101
+      }
+    },
+    "cases": [
+      {
+        "http_status": 200,
+        "mode": "exception",
+        "name": "missing-host",
+        "phase": "baseline",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-neighbor-source",
+        "phase": "baseline",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 405,
+        "mode": "must_remain",
+        "name": "missing-host-post",
+        "phase": "baseline",
+        "rule_ids": [
+          920180,
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 404,
+        "mode": "must_remain",
+        "name": "missing-host-nonroot",
+        "phase": "baseline",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-query",
+        "phase": "baseline",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-content-length-zero",
+        "phase": "baseline",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-other-destination",
+        "phase": "baseline",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-other-port",
+        "phase": "baseline",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "xss",
+        "name": "missing-host-xss-control",
+        "phase": "baseline",
+        "rule_ids": [
+          10300,
+          920280,
+          941100,
+          941110,
+          941160,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "exception",
+        "name": "numeric-host",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-neighbor-source",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 405,
+        "mode": "must_remain",
+        "name": "numeric-host-post",
+        "phase": "baseline",
+        "rule_ids": [
+          920180,
+          920350,
+          949110
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 404,
+        "mode": "must_remain",
+        "name": "numeric-host-nonroot",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-query",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-content-length-zero",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-destination",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-port",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-protocol",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-host",
+        "phase": "baseline",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-transfer-encoding",
+        "phase": "baseline",
+        "rule_ids": [
+          920171,
+          920350,
+          949110
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "xss",
+        "name": "numeric-host-xss-control",
+        "phase": "baseline",
+        "rule_ids": [
+          10300,
+          920350,
+          941100,
+          941110,
+          941160,
+          949110
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "exception",
+        "name": "missing-host",
+        "phase": "candidate",
+        "rule_ids": [],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-neighbor-source",
+        "phase": "candidate",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 405,
+        "mode": "must_remain",
+        "name": "missing-host-post",
+        "phase": "candidate",
+        "rule_ids": [
+          920180,
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 404,
+        "mode": "must_remain",
+        "name": "missing-host-nonroot",
+        "phase": "candidate",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-query",
+        "phase": "candidate",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-content-length-zero",
+        "phase": "candidate",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-other-destination",
+        "phase": "candidate",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "missing-host-other-port",
+        "phase": "candidate",
+        "rule_ids": [
+          920280,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "xss",
+        "name": "missing-host-xss-control",
+        "phase": "candidate",
+        "rule_ids": [
+          10300,
+          941100,
+          941110,
+          941160,
+          949110
+        ],
+        "target_rule": 920280
+      },
+      {
+        "http_status": 200,
+        "mode": "exception",
+        "name": "numeric-host",
+        "phase": "candidate",
+        "rule_ids": [],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-neighbor-source",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 405,
+        "mode": "must_remain",
+        "name": "numeric-host-post",
+        "phase": "candidate",
+        "rule_ids": [
+          920180,
+          920350,
+          949110
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 404,
+        "mode": "must_remain",
+        "name": "numeric-host-nonroot",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-query",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-content-length-zero",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-destination",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-port",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-protocol",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-other-host",
+        "phase": "candidate",
+        "rule_ids": [
+          920350
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "must_remain",
+        "name": "numeric-host-transfer-encoding",
+        "phase": "candidate",
+        "rule_ids": [
+          920171,
+          920350,
+          949110
+        ],
+        "target_rule": 920350
+      },
+      {
+        "http_status": 200,
+        "mode": "xss",
+        "name": "numeric-host-xss-control",
+        "phase": "candidate",
+        "rule_ids": [
+          10300,
+          941100,
+          941110,
+          941160,
+          949110
+        ],
+        "target_rule": 920350
+      }
+    ],
+    "cleanup": {
+      "errors": [],
+      "known_private_writers_remaining": 0,
+      "private_runtime_removed": true
+    },
+    "natural_scan_verified": false,
+    "network_after": {
+      "default_routes": 0,
+      "external_interfaces": 0,
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_addresses": [
+        "127.0.0.1",
+        "172.18.0.2",
+        "172.18.0.3",
+        "211.170.162.8",
+        "211.170.162.9"
+      ],
+      "netns": "net:[4026532739]",
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "172.18.0.2",
+          "flags": [],
+          "prefsrc": "172.18.0.2",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "172.18.0.3",
+          "flags": [],
+          "prefsrc": "172.18.0.3",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "211.170.162.8",
+          "flags": [],
+          "prefsrc": "211.170.162.8",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "211.170.162.9",
+          "flags": [],
+          "prefsrc": "211.170.162.9",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "routes6": [
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ]
+    },
+    "network_before": {
+      "default_routes": 0,
+      "external_interfaces": 0,
+      "interfaces": [
+        "lo"
+      ],
+      "ipv4_addresses": [
+        "127.0.0.1",
+        "172.18.0.2",
+        "172.18.0.3",
+        "211.170.162.8",
+        "211.170.162.9"
+      ],
+      "netns": "net:[4026532739]",
+      "routes": [
+        {
+          "dev": "lo",
+          "dst": "127.0.0.0/8",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.0.0.1",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "127.255.255.255",
+          "flags": [],
+          "prefsrc": "127.0.0.1",
+          "protocol": "kernel",
+          "scope": "link",
+          "table": "local",
+          "type": "broadcast"
+        },
+        {
+          "dev": "lo",
+          "dst": "172.18.0.2",
+          "flags": [],
+          "prefsrc": "172.18.0.2",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "172.18.0.3",
+          "flags": [],
+          "prefsrc": "172.18.0.3",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "211.170.162.8",
+          "flags": [],
+          "prefsrc": "211.170.162.8",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "211.170.162.9",
+          "flags": [],
+          "prefsrc": "211.170.162.9",
+          "protocol": "kernel",
+          "scope": "host",
+          "table": "local",
+          "type": "local"
+        },
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ],
+      "routes6": [
+        {
+          "dev": "lo",
+          "dst": "::1",
+          "flags": [],
+          "metric": 0,
+          "pref": "medium",
+          "protocol": "kernel",
+          "table": "local",
+          "type": "local"
+        }
+      ]
+    },
+    "operating_services_and_sources_unchanged": true,
+    "operating_signals": 0,
+    "phase": "verified",
+    "private_container_path": "/tmp/capstone-imperva-revalidate.yce4der8",
+    "production_requests": 0,
+    "source_sha256": {
+      "/etc/modsecurity.d/modsecurity-override.conf": "814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb",
+      "/etc/modsecurity.d/modsecurity.conf": "a0dc08ae01c58b68e54a881a039359dc09008e50c101a2c4d4b01823b5a5e178",
+      "/etc/modsecurity.d/owasp-crs/crs-setup.conf": "9d66c49bfe32077c57cbd998835c596c57589c65b76218d03b7880bd8d14a0f0",
+      "/etc/modsecurity.d/owasp-crs/plugins/empty-after.conf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/etc/modsecurity.d/owasp-crs/plugins/empty-before.conf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/etc/modsecurity.d/owasp-crs/plugins/empty-config.conf": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-INITIALIZATION.conf": "d91b389e6db96886a9264730199b48484a51c1bf90baecbf9a02ed1381190e46",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-905-COMMON-EXCEPTIONS.conf": "6d4473b03a02d1deb8d1c702088fe4ef51df19b5bc7b9de5a7920810cd05f697",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-911-METHOD-ENFORCEMENT.conf": "d14dbe993ef493ae678853cba1ed70091fea15694fde09bdc20240d68cff0d7d",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-913-SCANNER-DETECTION.conf": "1dbbd3bab8ecf41b7a243bf85ba41b26a46723c12049d4972125471785a08e59",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf": "0ec96b00cdf7a9f32e5cbe6e7e58591564531def6d66de0af4556b5944097daa",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-921-PROTOCOL-ATTACK.conf": "e5ab0df126a9611a918961c647a4d66362b08d313df6ff89b3c421a0f0d43865",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-922-MULTIPART-ATTACK.conf": "7c9cd15dac7509c7572f2aa22c56acde120991ee83504c9a4092bf2e600a0b0e",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-930-APPLICATION-ATTACK-LFI.conf": "e5e1359be3bfd8db2d367bea60751e2171aacb35f2fda7831635e66f7134b3a3",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-931-APPLICATION-ATTACK-RFI.conf": "d2c2709035c68f4582068210935046051645ce7d8655812dc87a420f5350436a",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-932-APPLICATION-ATTACK-RCE.conf": "e3f6eeb31f5905553bd22e92ffda45f75d4b8c34862f2574974fe5705286e47e",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-933-APPLICATION-ATTACK-PHP.conf": "47c168c5e5b5edc32d75b4ea82bd511c3b636529acf6f9bf5b4037be54e3a62d",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-934-APPLICATION-ATTACK-GENERIC.conf": "e7b676f48876c9e78214f12988d3e1154f40a96b84e6d6c898010a7b90a5f5c4",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf": "5f4eeac7e23ce19a81bfa81bdfe6024cce2f26ae7a7560fffe705b790f842a93",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf": "8f92ff1745385a571ddecc20d83679a67cbb44dc61a6d136af9d77ab4ea315a3",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf": "c7a0307de5eb7ef345e56f87ec71a01c1449adda361b17e9fac4ed095d11a782",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-944-APPLICATION-ATTACK-JAVA.conf": "14d6c2ee608b9deb8fe86aae2075c64adb88523ed9771ec40f9fee21b1525b27",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf": "ce06254032d3d00aca142e22fc53d30518af646173c99537e595c4e349f0c6cd",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-999-COMMON-EXCEPTIONS-AFTER.conf": "097ee5c6a8141528576f1f2cc916424561b729099e3e757f5faa188f71083d6f",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-950-DATA-LEAKAGES.conf": "b62c8df444c9e4d499d2d98518d1374ed98a2dca12ee25595d8aa3eecf03eec8",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-951-DATA-LEAKAGES-SQL.conf": "29f14398b96294bd20324cd61a78d89661d09e83344a791f1087d761fb4abbd5",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-952-DATA-LEAKAGES-JAVA.conf": "8e70a1f3d47f29b6231b8fe2ad5264ea3aa6ea5b0f2cb5bced59c27a3b7ef49f",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-953-DATA-LEAKAGES-PHP.conf": "1805e2871bd1d216fd0433e2cb797ed18ace4a89e41f015f1c17ccaab6b4687d",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-954-DATA-LEAKAGES-IIS.conf": "6ae7034b9f592d38b9ad4cc68e8db24686cd421d0e31ecc629d88d79158b6c01",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-955-WEB-SHELLS.conf": "b2eca954d963a357b6fa9405e05243fd46cde5217a80b2ecba7bbbb1b300bc2d",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-956-DATA-LEAKAGES-RUBY.conf": "c96abf7cb8663865def741ece21088d47279a80e552be3ffc72b7caac32763d3",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-959-BLOCKING-EVALUATION.conf": "d74a29977d31fc7f0eeebd790faafde3804b98bcaa831887b31227fade92a76b",
+      "/etc/modsecurity.d/owasp-crs/rules/RESPONSE-980-CORRELATION.conf": "b0cd1266159b177100a3a88d37b59a79eb0aa48e3238f2a13b151f196beb2068",
+      "/etc/modsecurity.d/owasp-crs/rules/ai-critical-artifacts.data": "9352bbfff2c5dd86311dfbefaf76a71597402a2eba9cad33bc736b3d2560311a",
+      "/etc/modsecurity.d/owasp-crs/rules/asp-dotnet-errors.data": "a3bb53002692e86fdb06e7045b64bc8f7c74972f824106f566ec48bd528884aa",
+      "/etc/modsecurity.d/owasp-crs/rules/iis-errors.data": "3eac5008e5dee373d0b876e92405af04cc4ce0f73625e7510499f708b516aa40",
+      "/etc/modsecurity.d/owasp-crs/rules/java-classes.data": "e939e4af2b219a695f84d905cae484698718beabc0efdbe4236ae1d8dc9e2ca3",
+      "/etc/modsecurity.d/owasp-crs/rules/lfi-os-files.data": "dc2844ab45a00e240cf5fbbee42ab184eda165cd6dc8d63d36d7f8e8bafdc827",
+      "/etc/modsecurity.d/owasp-crs/rules/php-errors.data": "2c614f73c190bafa8cd4580fa54ac61f198ed295e23c390e318841888bf93dac",
+      "/etc/modsecurity.d/owasp-crs/rules/php-function-names-933150.data": "0331ce6dbb5d72dff674ab713248ea392020c8cfaeaf868e4c284fdbb273fc8e",
+      "/etc/modsecurity.d/owasp-crs/rules/php-variables.data": "07ffd3c28d5d79e18e3844352fc3dd122af7e0037dbfebe6ed4dad403e9a95de",
+      "/etc/modsecurity.d/owasp-crs/rules/restricted-files.data": "ec748c0cb8dc63661d873498d4d39c03fc90a61b09a5418065de30f25b9e4fa0",
+      "/etc/modsecurity.d/owasp-crs/rules/restricted-upload.data": "ae69b132c08eb819a7369803bd5d48be709f95f9772710422383f81d273bd1a6",
+      "/etc/modsecurity.d/owasp-crs/rules/ruby-errors.data": "caf826022886052069d54946b3f8f6608b5672225db203a448589bd2bfc195a1",
+      "/etc/modsecurity.d/owasp-crs/rules/scanners-user-agents.data": "efdb35b4df7c076ebe5324c81b42e3579766c4f36356241cc483d7971a319ab5",
+      "/etc/modsecurity.d/owasp-crs/rules/sql-errors.data": "ba9f3f7070f4c2c6c2d6165da06566f18aee19756c510ccde99aeff57fd5ca1a",
+      "/etc/modsecurity.d/owasp-crs/rules/ssrf-no-scheme.data": "753805c3b3284a28c2d834c9ce32aab8f3d24257e66c2d64b3308bd8f4aacbd4",
+      "/etc/modsecurity.d/owasp-crs/rules/ssrf.data": "6305d2a07d3b7997112358a38986fe30c55faa11f9002c3479a687a718bfc66a",
+      "/etc/modsecurity.d/owasp-crs/rules/unix-shell-aliases.data": "7860d692ba74be8465972e1c348d06b9ba41f61243406cfc7fed82db6fc26bee",
+      "/etc/modsecurity.d/owasp-crs/rules/unix-shell-builtins.data": "7c7b600b457b06940a440095cf594f0e28de1891020de9840fc9ea7cf1e00e57",
+      "/etc/modsecurity.d/owasp-crs/rules/unix-shell.data": "50c3d09036e762249534348d77fa05d4e12725a6b34202fca271503cfa4d5215",
+      "/etc/modsecurity.d/owasp-crs/rules/web-shells-asp.data": "4ebbd5ab8fe4d10f18dd69b56e9e935eb861c1bf327893532221578feaa5c0cc",
+      "/etc/modsecurity.d/owasp-crs/rules/web-shells-php.data": "6a9f64c8000c567b9bf87f183895526ecd689937f672f7ee2e7e0fb99668cefc",
+      "/etc/modsecurity.d/owasp-crs/rules/windows-powershell-commands.data": "5055ffeb4ce22869dee0f611045991e64365e980bba68649f4468aea86476d93",
+      "/etc/modsecurity.d/setup.conf": "5e8dd2dab4517701be865f68467df491f54805d331cdff0dd3092a30f5022876",
+      "/etc/modsecurity.d/unicode.mapping": "5e4500ef82e45c49d8edd9513648939710d6c8cc2d5997513b32866dc5d9be23"
+    },
+    "status": "passed",
+    "stops": [
+      {
+        "forced": false,
+        "returncode": 0
+      },
+      {
+        "forced": false,
+        "returncode": 0
+      }
+    ],
+    "verification": {
+      "exact_original_exception_sha256": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+      "native_requests": 42,
+      "negative": 17,
+      "paired_cases": 21,
+      "positive": 2,
+      "xss_controls": 2
+    }
+  },
+  "native_source_sha256": "9cc774e18ea79a82e5e83e2d183fdc0e578bae6403772220e87a034f0870c98e",
+  "natural": {
+    "chat_messages_sent": 0,
+    "container": {
+      "id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+      "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+      "pid": 2532279,
+      "running": true,
+      "start_ticks": "143378447",
+      "started_at": "2026-10-14T19:16:02.328349981Z"
+    },
+    "coverage_complete": false,
+    "cutoff_epoch": 1792027298.2488258,
+    "cutoff_kst": "2026-10-15T10:21:38.248826+09:00",
+    "decoded_bytes": 155779,
+    "errors": {},
+    "exception_sources": {
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf": {
+        "expected_match": true,
+        "gid": 0,
+        "mode": "0o444",
+        "sha256": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+        "uid": 0
+      }
+    },
+    "generated_requests": 0,
+    "hardlink_aliases_deduplicated": 1,
+    "kind": "imperva_retained_source_observation",
+    "limits": [
+      "Only bounded retained files; retention/copytruncate gaps are not disproved.",
+      "RelevantOnly may omit requests. Zero audit/alerts is not exception-effectiveness proof.",
+      "No offset is inferred for legacy audit time; these rows are outside timed counts.",
+      "Audit URI shape is not independent proof of REQUEST_URI_RAW. Minimal access lacks headers/URI.",
+      "Natural traffic provenance cannot be proved solely from an IP address. No requests were generated."
+    ],
+    "model_calls": 0,
+    "operational_changes": false,
+    "schema_version": 1,
+    "security_or_chat_raw_exported": false,
+    "source_inventory": [
+      {
+        "decoded_bytes": 1849,
+        "metadata": {
+          "ctime_ns": 1792005668521699841,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441993,
+          "mode": 33188,
+          "mtime_ns": 1792005510223289193,
+          "nlink": 2,
+          "sha256": "f304f692cfd20db5be6ca9f5116a3481c6b6250e3c33352b7c6b33d1f11a465c",
+          "size": 1849,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log",
+        "records": 1
+      },
+      {
+        "decoded_bytes": 8432,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441893,
+          "mode": 33188,
+          "mtime_ns": 1791903608472955090,
+          "nlink": 1,
+          "sha256": "d28540b45327860cf0d6b30e0f60a8e5bda78b763dc3b7514ff3ac4b12150aa9",
+          "size": 8432,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.1",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8344,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441964,
+          "mode": 33188,
+          "mtime_ns": 1791158422293221736,
+          "nlink": 1,
+          "sha256": "a2524066322465fc0986269e394e3aba9112e93c0c70f8f926ac27a973da234d",
+          "size": 1445,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.10.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8345,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441950,
+          "mode": 33188,
+          "mtime_ns": 1791072022264624386,
+          "nlink": 1,
+          "sha256": "745d4329a98756de48cf2b39db6f9e016ab5eec769e9316126c0bb1680c7d998",
+          "size": 1455,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.11.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 16940,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441947,
+          "mode": 33188,
+          "mtime_ns": 1790985602367132824,
+          "nlink": 1,
+          "sha256": "5f2287c9c052a188b67d1e2f81840cceb1463015a9a33035449a3c1e4e102b21",
+          "size": 2343,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.12.gz",
+        "records": 7
+      },
+      {
+        "decoded_bytes": 8343,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441944,
+          "mode": 33188,
+          "mtime_ns": 1790899222242118355,
+          "nlink": 1,
+          "sha256": "4efea29ad20c3fcd1677d64a3e6050294490aa6b21f483ba892f6c65204f9fa6",
+          "size": 1449,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.13.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8345,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441931,
+          "mode": 33188,
+          "mtime_ns": 1790812822424979871,
+          "nlink": 1,
+          "sha256": "3cf097feef980a3298b2abd0cea10242f2c64202bf410bc2a840f48815b919b9",
+          "size": 1448,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.14.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8432,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441992,
+          "mode": 33188,
+          "mtime_ns": 1791817201234630330,
+          "nlink": 1,
+          "sha256": "fe22691e157fd9bbb5c4cae8c8f11c3ff3a48c01a2007b39ffb9a737114a8194",
+          "size": 1464,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.2.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8433,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441923,
+          "mode": 33188,
+          "mtime_ns": 1791730804258507549,
+          "nlink": 1,
+          "sha256": "43f7774af5cfab7e5b70d1860628e5137449904fbf0792392b5f9bb14041814a",
+          "size": 1461,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.3.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8433,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441912,
+          "mode": 33188,
+          "mtime_ns": 1791644402360276486,
+          "nlink": 1,
+          "sha256": "9bd0520a8fd966a0bdd1d83fa650bddfaf179a04f4167b685d4d398d99821a29",
+          "size": 1463,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.4.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8430,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441987,
+          "mode": 33188,
+          "mtime_ns": 1791558005270460475,
+          "nlink": 1,
+          "sha256": "0d9dddf953c917959518eaa245de9a8acba0dfc5d336be32462a294bdd5b7c76",
+          "size": 1468,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.5.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8431,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441982,
+          "mode": 33188,
+          "mtime_ns": 1791471602314864549,
+          "nlink": 1,
+          "sha256": "1199c9b2bedbe267de80fbd5a0ca6135d17d4922110de5d4608784d4597b32ef",
+          "size": 1456,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.6.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 8432,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441974,
+          "mode": 33188,
+          "mtime_ns": 1791385203921173362,
+          "nlink": 1,
+          "sha256": "15bda904a2fb11a73da22ad5a0c4ffa0866923aed31687e398d8dbe1f2aadbbc",
+          "size": 1456,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.7.gz",
+        "records": 4
+      },
+      {
+        "decoded_bytes": 5352,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441971,
+          "mode": 33188,
+          "mtime_ns": 1791298804486277951,
+          "nlink": 1,
+          "sha256": "eb2b2ff023689db0955621b80ba9af921e9f63585bbaf94f530983f16280c82b",
+          "size": 1731,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.8.gz",
+        "records": 3
+      },
+      {
+        "decoded_bytes": 21117,
+        "metadata": {
+          "ctime_ns": 1791903608472955090,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441968,
+          "mode": 33188,
+          "mtime_ns": 1791244832287876251,
+          "nlink": 1,
+          "sha256": "28e4ddefde2b17609c4bd1b6f96aa56afe369bc9ada77e5e24f8cd38d5f0a882",
+          "size": 2959,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log.9.gz",
+        "records": 8
+      },
+      {
+        "decoded_bytes": 4470,
+        "metadata": {
+          "ctime_ns": 1792005510223289193,
+          "dev": 64512,
+          "gid": 101,
+          "ino": 1441928,
+          "mode": 33184,
+          "mtime_ns": 1792005510223289193,
+          "nlink": 1,
+          "sha256": "ac486ac00a1024e01fb095656352931a98f8f5874c2455fc251d4e324447ec2f",
+          "size": 4470,
+          "uid": 101
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/capstone-access.log",
+        "records": 11
+      },
+      {
+        "decoded_bytes": 10072,
+        "metadata": {
+          "ctime_ns": 1791992380733739562,
+          "dev": 64512,
+          "gid": 0,
+          "ino": 1441881,
+          "mode": 33024,
+          "mtime_ns": 1791916009928808593,
+          "nlink": 1,
+          "sha256": "ded2910950e354e110486dd6b107e1cf3f1a24572b56953d4edbfad8cdab93f6",
+          "size": 10072,
+          "uid": 0
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed/generation-0000000000.jsonl",
+        "records": 5
+      },
+      {
+        "decoded_bytes": 1193,
+        "metadata": {
+          "ctime_ns": 1791993738791301712,
+          "dev": 64512,
+          "gid": 0,
+          "ino": 1441997,
+          "mode": 33024,
+          "mtime_ns": 1791992242755388877,
+          "nlink": 1,
+          "sha256": "a5e6537f2a152f602d5cd1a3e133b6bc69d915826253dbf48204bf20a9f766d4",
+          "size": 1193,
+          "uid": 0
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed/generation-0000000001.jsonl",
+        "records": 1
+      },
+      {
+        "decoded_bytes": 1193,
+        "metadata": {
+          "ctime_ns": 1791994951055379214,
+          "dev": 64512,
+          "gid": 0,
+          "ino": 1442000,
+          "mode": 33024,
+          "mtime_ns": 1791993089533185470,
+          "nlink": 1,
+          "sha256": "3582d508bfd084a5fa8c1276ea911fbcac656b48ced2615bd8094059c4222e33",
+          "size": 1193,
+          "uid": 0
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed/generation-0000000002.jsonl",
+        "records": 1
+      },
+      {
+        "decoded_bytes": 1193,
+        "metadata": {
+          "ctime_ns": 1792005668521699841,
+          "dev": 64512,
+          "gid": 0,
+          "ino": 1441998,
+          "mode": 33024,
+          "mtime_ns": 1791994907289452475,
+          "nlink": 1,
+          "sha256": "357c1188aa1e0e01c92c1c3ab087b406af1d9413e4384e640ea053ea208850de",
+          "size": 1193,
+          "uid": 0
+        },
+        "path": "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed/generation-0000000003.jsonl",
+        "records": 1
+      }
+    ],
+    "source_records": 82,
+    "status": "observed_subset",
+    "target_audits_without_verified_offset": 56,
+    "windows": {
+      "recent24h": {
+        "access_requests": 9,
+        "end_epoch": 1792027298.2488258,
+        "end_kst": "2026-10-15T10:21:38.248826+09:00",
+        "start_epoch": 1791940898.2488258,
+        "start_kst": "2026-10-14T10:21:38.248826+09:00",
+        "target_access_requests": 4,
+        "target_audit_shape_counts": {},
+        "target_rule_counts": {},
+        "target_timed_audits": 0
+      },
+      "recent5h": {
+        "access_requests": 0,
+        "end_epoch": 1792027298.2488258,
+        "end_kst": "2026-10-15T10:21:38.248826+09:00",
+        "start_epoch": 1792009298.2488258,
+        "start_kst": "2026-10-15T05:21:38.248826+09:00",
+        "target_access_requests": 0,
+        "target_audit_shape_counts": {},
+        "target_rule_counts": {},
+        "target_timed_audits": 0
+      }
+    }
+  },
+  "server_evidence_path": "/var/backups/capstone-imperva-revalidate-20261015",
+  "stage_removed": true
+}

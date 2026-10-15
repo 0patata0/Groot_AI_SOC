@@ -1,0 +1,213 @@
+[
+  {
+    "name": "Inspect persistent operator-owned destinations",
+    "ansible.builtin.stat": {
+      "path": "{{ item }}",
+      "follow": false
+    },
+    "loop": [
+      "/opt/capstone-automation/hermes-guard",
+      "/opt/capstone-automation/hermes-guard/project",
+      "/opt/capstone-automation/hermes-guard/project/infra",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/tasks",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/files",
+      "/opt/capstone-automation/hermes-guard/project/infra/hermes",
+      "/etc/capstone-hermes-guard"
+    ],
+    "register": "guard_persist_dirs"
+  },
+  {
+    "name": "Reject unsafe persistent directory ownership or links",
+    "ansible.builtin.assert": {
+      "that": [
+        "not item.stat.exists or (item.stat.isdir and not item.stat.islnk and item.stat.uid == 0 and item.stat.mode in ['0700', '0750', '0755'])"
+      ]
+    },
+    "loop": "{{ guard_persist_dirs.results }}",
+    "no_log": true
+  },
+  {
+    "name": "Create private persistent playbook tree",
+    "ansible.builtin.file": {
+      "path": "{{ item }}",
+      "state": "directory",
+      "owner": "root",
+      "group": "root",
+      "mode": "0700"
+    },
+    "loop": [
+      "/opt/capstone-automation/hermes-guard",
+      "/opt/capstone-automation/hermes-guard/project",
+      "/opt/capstone-automation/hermes-guard/project/infra",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/tasks",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/files",
+      "/opt/capstone-automation/hermes-guard/project/infra/hermes",
+      "/etc/capstone-hermes-guard"
+    ]
+  },
+  {
+    "name": "Inspect fixed persistent file destinations",
+    "ansible.builtin.stat": {
+      "path": "{{ item }}",
+      "follow": false
+    },
+    "loop": [
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/hermes-guard-b.yml",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/hermes-guard-local-b.sh",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/hermes-local-b.ini",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/ansible.cfg",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/tasks/main.yml",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/tasks/persist.yml",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/files/guard-metadata.awk",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/files/capstone-hermes-guard-reapply.service",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/files/capstone-hermes-guard-reapply.timer",
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/files/capstone-hermes-guard-observe.service",
+      "/opt/capstone-automation/hermes-guard/project/infra/hermes/korean_output_guard.py",
+      "/opt/capstone-automation/hermes-guard/project/infra/hermes/patch_korean_output_guard.py",
+      "/opt/capstone-automation/hermes-guard/project/infra/hermes/hermes_guard_checks.py",
+      "/opt/capstone-automation/hermes-guard/project/infra/hermes/verify_korean_output_guard_runtime.py",
+      "/opt/capstone-automation/hermes-guard/project/infra/hermes/korean-output-guard-requirements.txt",
+      "/etc/capstone-hermes-guard/machine-id",
+      "/opt/capstone-automation/hermes-guard/guard-metadata.awk",
+      "/etc/systemd/system/capstone-hermes-guard-reapply.service",
+      "/etc/systemd/system/capstone-hermes-guard-reapply.timer",
+      "/etc/systemd/system/capstone-hermes-guard-observe.service"
+    ],
+    "register": "guard_persist_files"
+  },
+  {
+    "name": "Reject links or nonregular existing persistent files",
+    "ansible.builtin.assert": {
+      "that": [
+        "not item.stat.exists or (item.stat.isreg and not item.stat.islnk and item.stat.uid == 0 and item.stat.mode in ['0400', '0600', '0644', '0700', '0755'])"
+      ]
+    },
+    "loop": "{{ guard_persist_files.results }}",
+    "no_log": true
+  },
+  {
+    "name": "Retain fixed Ansible entry points",
+    "ansible.builtin.copy": {
+      "src": "{{ playbook_dir }}/{{ item }}",
+      "dest": "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/{{ item }}",
+      "owner": "root",
+      "group": "root",
+      "mode": "0700"
+    },
+    "loop": [
+      "hermes-guard-b.yml",
+      "hermes-guard-local-b.sh",
+      "hermes-local-b.ini",
+      "ansible.cfg"
+    ]
+  },
+  {
+    "name": "Retain reviewed native role",
+    "ansible.builtin.copy": {
+      "src": "{{ role_path }}/{{ item }}/",
+      "dest": "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/roles/hermes_guard/{{ item }}/",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600",
+      "directory_mode": "0700"
+    },
+    "loop": [
+      "tasks",
+      "files"
+    ]
+  },
+  {
+    "name": "Retain reviewed policy and read-only checks",
+    "ansible.builtin.copy": {
+      "src": "{{ capstone_guard_source_dir }}/{{ item }}",
+      "dest": "/opt/capstone-automation/hermes-guard/project/infra/hermes/{{ item }}",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    },
+    "loop": [
+      "korean_output_guard.py",
+      "patch_korean_output_guard.py",
+      "hermes_guard_checks.py",
+      "verify_korean_output_guard_runtime.py",
+      "korean-output-guard-requirements.txt"
+    ]
+  },
+  {
+    "name": "Pin native watcher to the actual B host",
+    "ansible.builtin.copy": {
+      "content": "{{ capstone_expected_machine_id }}\n",
+      "dest": "/etc/capstone-hermes-guard/machine-id",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    }
+  },
+  {
+    "name": "Install allowlisted metadata filter",
+    "ansible.builtin.copy": {
+      "src": "guard-metadata.awk",
+      "dest": "/opt/capstone-automation/hermes-guard/guard-metadata.awk",
+      "owner": "root",
+      "group": "root",
+      "mode": "0600"
+    }
+  },
+  {
+    "name": "Validate native service definitions before install",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/systemd-analyze",
+        "verify",
+        "{{ role_path }}/files/capstone-hermes-guard-reapply.service",
+        "{{ role_path }}/files/capstone-hermes-guard-reapply.timer",
+        "{{ role_path }}/files/capstone-hermes-guard-observe.service"
+      ]
+    },
+    "changed_when": false
+  },
+  {
+    "name": "Install fixed timer and metadata observer",
+    "ansible.builtin.copy": {
+      "src": "{{ item }}",
+      "dest": "/etc/systemd/system/{{ item }}",
+      "owner": "root",
+      "group": "root",
+      "mode": "0644",
+      "backup": true
+    },
+    "loop": [
+      "capstone-hermes-guard-reapply.service",
+      "capstone-hermes-guard-reapply.timer",
+      "capstone-hermes-guard-observe.service"
+    ],
+    "register": "guard_units"
+  },
+  {
+    "name": "Reload native units only when definitions change",
+    "ansible.builtin.systemd_service": {
+      "daemon_reload": true
+    },
+    "when": "guard_units.changed"
+  },
+  {
+    "name": "Enable recreation detection and metadata-only observation",
+    "ansible.builtin.systemd_service": {
+      "name": "{{ item }}",
+      "enabled": true,
+      "state": "started"
+    },
+    "loop": [
+      "capstone-hermes-guard-reapply.timer",
+      "capstone-hermes-guard-observe.service"
+    ]
+  }
+]

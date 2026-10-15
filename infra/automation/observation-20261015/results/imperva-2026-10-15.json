@@ -1,0 +1,66 @@
+{
+  "chat_messages_sent": 0,
+  "container": {
+    "id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+    "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+    "pid": 2532279,
+    "running": true,
+    "start_ticks": "143378447",
+    "started_at": "2026-10-14T19:16:02.328349981Z"
+  },
+  "coverage_complete": false,
+  "cutoff_epoch": 1792023943.386507,
+  "cutoff_kst": "2026-10-15T09:25:43.386507+09:00",
+  "decoded_bytes": 155779,
+  "errors": {},
+  "exception_sources": {
+    "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf": {
+      "expected_match": true,
+      "gid": 0,
+      "mode": "0o444",
+      "sha256": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+      "uid": 0
+    }
+  },
+  "generated_requests": 0,
+  "hardlink_aliases_deduplicated": 1,
+  "kind": "imperva_retained_source_observation",
+  "limits": [
+    "Only bounded retained files; retention/copytruncate gaps are not disproved.",
+    "RelevantOnly may omit requests. Zero audit/alerts is not exception-effectiveness proof.",
+    "No offset is inferred for legacy audit time; these rows are outside timed counts.",
+    "Audit URI shape is not independent proof of REQUEST_URI_RAW. Minimal access lacks headers/URI.",
+    "Natural traffic provenance cannot be proved solely from an IP address. No requests were generated."
+  ],
+  "model_calls": 0,
+  "operational_changes": false,
+  "schema_version": 1,
+  "security_or_chat_raw_exported": false,
+  "source_records": 82,
+  "status": "observed_subset",
+  "target_audits_without_verified_offset": 56,
+  "windows": {
+    "recent24h": {
+      "access_requests": 9,
+      "end_epoch": 1792023943.386507,
+      "end_kst": "2026-10-15T09:25:43.386507+09:00",
+      "start_epoch": 1791937543.386507,
+      "start_kst": "2026-10-14T09:25:43.386507+09:00",
+      "target_access_requests": 4,
+      "target_audit_shape_counts": {},
+      "target_rule_counts": {},
+      "target_timed_audits": 0
+    },
+    "recent5h": {
+      "access_requests": 0,
+      "end_epoch": 1792023943.386507,
+      "end_kst": "2026-10-15T09:25:43.386507+09:00",
+      "start_epoch": 1792005943.386507,
+      "start_kst": "2026-10-15T04:25:43.386507+09:00",
+      "target_access_requests": 0,
+      "target_audit_shape_counts": {},
+      "target_rule_counts": {},
+      "target_timed_audits": 0
+    }
+  }
+}

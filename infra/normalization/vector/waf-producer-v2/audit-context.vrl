@@ -1,0 +1,80 @@
+# Candidate v2: one guarded audit contains server-generated context-creation time.
+# This file is not yet deployed; v1 pairing and saved records remain unchanged.
+assert!(.source_file == get_env_var!("WAF_AUDIT_PATH"), "waf_audit_source_binding")
+sensor = get_env_var!("CAPSTONE_SENSOR")
+instance = get_env_var!("WAF_INSTANCE_ID")
+configuration = get_env_var!("WAF_CONFIG_SHA256")
+binding = get_env_var!("WAF_DEPLOYMENT_BINDING")
+assert!(match(sensor, r'^[A-Za-z0-9_.:-]{1,80}$') && match(instance, r'^[a-f0-9]{64}$') && match(configuration, r'^[a-f0-9]{64}$') && match(binding, r'^[a-f0-9]{64}$'), "waf_deployment_binding")
+tx = object!(.waf_json.transaction)
+producer_id = string!(tx.unique_id)
+identity = parse_regex!(producer_id, r'^v2:(?P<binding>[a-f0-9]{64}):(?P<request_id>[a-f0-9]{32}):(?P<msec>[0-9]{10,12}\.[0-9]{3}):(?P<iso>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?P<offset>[+-][0-9]{2}:[0-9]{2}))$')
+request_id = string(identity.request_id)
+assert!(identity.binding == binding, "waf_audit_producer_binding")
+naive_time = string!(tx.time_stamp)
+assert!(match(naive_time, r'^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) +[0-9]{1,2} [0-9]{2}:[0-9]{2}:[0-9]{2} [0-9]{4}$'), "waf_audit_time_format")
+source_ip = string!(tx.client_ip)
+destination_ip = string!(tx.host_ip)
+assert!((is_ipv4(source_ip) || is_ipv6(source_ip)) && (is_ipv4(destination_ip) || is_ipv6(destination_ip)), "waf_audit_ip")
+source_port = int!(tx.client_port)
+destination_port = int!(tx.host_port)
+assert!(source_port >= 1 && source_port <= 65535 && destination_port >= 1 && destination_port <= 65535, "waf_audit_port")
+method = string!(tx.request.method)
+assert!(includes(["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH", "CONNECT", "TRACE"], method), "waf_audit_method")
+status = int!(tx.response.http_code)
+assert!(status >= 100 && status <= 599, "waf_audit_status")
+engine = string!(tx.producer.secrules_engine)
+assert!(includes(["DetectionOnly", "Enabled", "Disabled"], engine), "waf_audit_engine")
+messages = array!(tx.messages)
+assert!(length(messages) > 0 && length(messages) <= 256, "waf_audit_message_limit")
+rule_ids = []
+severities = []
+for_each(messages) -> |_index, message| {
+  sid = string!(message.details.ruleId)
+  severity = string!(message.details.severity)
+  assert!(match(sid, r'^[0-9]{1,10}$') && parse_int!(sid, base: 10) <= 4294967295, "waf_rule_id")
+  assert!(match(severity, r'^[0-7]$'), "waf_severity")
+  rule_ids = push(rule_ids, sid)
+  severities = push(severities, severity)
+}
+raw = string!(.message)
+# The clock is evaluated by the Nginx connector before transaction creation.
+# ISO has second precision; $msec carries milliseconds from the same server clock.
+# Keep context creation separate from the old access-completion contract.
+explicit_time = parse_timestamp!(string(identity.iso), format: "%+")
+epoch_ms = parse_int!(replace(string(identity.msec), ".", ""), base: 10)
+iso_ms = to_unix_timestamp(explicit_time, unit: "milliseconds")
+assert!(epoch_ms >= iso_ms && epoch_ms - iso_ms < 1000, "waf_context_clock_mismatch")
+audit_time = parse_timestamp!(naive_time + " " + string(identity.offset), format: "%a %b %e %T %Y %:z")
+audit_ms = to_unix_timestamp(audit_time, unit: "milliseconds")
+assert!(audit_ms >= epoch_ms - 2000 && audit_ms <= epoch_ms + 2000, "waf_context_audit_clock_mismatch")
+event_time = from_unix_timestamp!(epoch_ms, unit: "milliseconds")
+event_id = sha2(encode_json([sensor, "modsecurity", instance, binding, request_id]), variant: "SHA-256")
+norm = {
+  "schema_version": "vector-1", "pipeline": "vector", "source": "modsecurity",
+  "producer_format_version": "2",
+  "sensor": sensor, "record_id": binding + "-" + request_id, "event_id": event_id,
+  "message_sha256": sha2(raw, variant: "SHA-256"),
+  "producer_time_evidence_sha256": sha2(producer_id, variant: "SHA-256"),
+  "producer_time_hash_scope": "exact_audit_unique_id_utf8",
+  "hash_scope": "vector_message_without_line_delimiter",
+  "identity_scope": "deployment_binding_request_id",
+  "provenance_level": "collector_embedded_producer_time",
+  "writer_instance_id": instance, "configuration_sha256": configuration,
+  "configuration_hash_scope": "exact_stable_producer_format_configuration",
+  "deployment_binding": binding,
+  "observed_at_kst": format_timestamp!(now(), format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul"),
+  "event_time_kst": format_timestamp!(event_time, format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul"),
+  "time_status": "trusted_context_creation", "rule_ids": unique(rule_ids),
+  "native_severity_value": unique(severities), "native_severity_scale": "modsecurity_0_7",
+  "source_ip": source_ip, "destination_ip": destination_ip,
+  "source_port": source_port, "destination_port": destination_port,
+  "http_method": method, "http_status": status,
+  "protocol": "tcp", "direction": "unknown", "action": "observed",
+  "engine_mode": engine, "quality_flags": [],
+  "time_basis": "nginx_modsecurity_context_creation", "source_replay_deduplicated": false,
+  "omitted_response_server_duplicates": int!(.waf_allowed_server_duplicates),
+  "protected_asset": includes(["211.170.162.110", "211.170.162.111"], source_ip) || includes(["211.170.162.110", "211.170.162.111"], destination_ip)
+}
+. = {"capstone_norm": norm}
+assert!(length(encode_json(.)) <= 32768, "normalized_size")

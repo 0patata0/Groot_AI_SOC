@@ -1,0 +1,98 @@
+{
+  "kind": "correlation-investigation-finalization",
+  "preservation": {
+    "a": {
+      "host": "a",
+      "at_kst": "2026-10-14T13:16:55.215727+09:00",
+      "source_files": 23,
+      "source_bytes": 731286,
+      "changed": 18,
+      "unchanged": 5,
+      "operational_settings_changed": false,
+      "evidence_files": 3,
+      "evidence_path": "/opt/capstone-automation/project/evidence/correlation-20261014"
+    },
+    "b": {
+      "host": "b",
+      "at_kst": "2026-10-14T13:16:58.749125+09:00",
+      "source_files": 23,
+      "source_bytes": 731286,
+      "changed": 18,
+      "unchanged": 5,
+      "operational_settings_changed": false,
+      "evidence_files": 219,
+      "evidence_path": "/opt/capstone-automation/project/evidence/correlation-20261014"
+    }
+  },
+  "cleanup": {
+    "a": {
+      "host": "a",
+      "at_kst": "2026-10-14T13:17:26.255345+09:00",
+      "temporary_files_removed": 27,
+      "temporary_bytes_removed": 768434,
+      "source_and_evidence_reverified": true,
+      "private_processes_before_cleanup": [],
+      "unchanged_checks": {
+        "services": true,
+        "containers": true,
+        "canary_file_records": true,
+        "canary_file_bytes": true,
+        "canary_file_sha256": true
+      },
+      "temporary_path_absent": true
+    },
+    "b": {
+      "host": "b",
+      "at_kst": "2026-10-14T13:17:29.684803+09:00",
+      "temporary_files_removed": 3538,
+      "temporary_bytes_removed": 172598071,
+      "source_and_evidence_reverified": true,
+      "private_processes_before_cleanup": [],
+      "unchanged_checks": {
+        "services": true,
+        "containers": true,
+        "hashes": true,
+        "manager_root_devino": true,
+        "manager_queue_devino": true,
+        "manager_identity": true
+      },
+      "temporary_path_absent": true
+    },
+    "mac": {
+      "at_kst": "2026-10-14T13:17:56.081606+09:00",
+      "temporary_files_removed": 51,
+      "temporary_bytes_removed": 853878,
+      "new_packages_installed": 0,
+      "temporary_path_absent": true
+    }
+  },
+  "validation": {
+    "native_cases": 89,
+    "native_input_rows": 1157,
+    "exact_archive_rows": 1157,
+    "source_files_per_server": 23,
+    "source_bytes_per_server": 731286,
+    "relative_links_checked": 160,
+    "result_json_files_before_finalization": 5,
+    "native_only_logtest_calls": 0,
+    "operational_input_writes": 0,
+    "operational_rules_or_threads_changed": false,
+    "manager_restarted": false,
+    "git_commit_created": false
+  },
+  "limitations": [
+    "Private agent 000 and direct queue are not equivalent to the operational agent 001 transport.",
+    "Historical burst run has no complete retained per-row analysis receipt; its specific execution order is unproven.",
+    "Finite trial counts are not operational failure-rate estimates or a single-thread reliability/performance guarantee.",
+    "Verifier still assumes fixed repeat event ID; a scoped correction and throughput/regression checks remain.",
+    "Final cleanup JSON and closing documentation were written after the 23-file server source snapshot; server evidence contains separate preservation and cleanup records."
+  ],
+  "final_local_checks": {
+    "json_files": 6,
+    "relative_links": 161,
+    "missing_links": 0,
+    "runner_sha_matches_executed_source": true,
+    "mac_task_path_absent": true,
+    "infra_bytecode_or_wheels": 0
+  }
+}

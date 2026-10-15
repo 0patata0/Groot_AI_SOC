@@ -1,0 +1,255 @@
+{
+  "host": "B",
+  "read_only_readiness": {
+    "compose_labels": {},
+    "container_cmd": [
+      "gateway",
+      "run"
+    ],
+    "container_entrypoint": [
+      "/opt/hermes/docker/entrypoint-dispatch.sh"
+    ],
+    "container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "diff": {
+      "categories": {
+        "/etc": 5,
+        "/opt/capstone-guard-runtime": 23,
+        "/opt/hermes": 8,
+        "/run": 218,
+        "/tmp": 3,
+        "other": 1
+      },
+      "known_changes": {
+        "/etc/group": "C",
+        "/etc/passwd": "C",
+        "/opt/hermes/capstone_korean_output_guard.py": "A",
+        "/opt/hermes/gateway/run_turn.py": "C",
+        "/opt/hermes/plugins/platforms/mattermost/adapter.py": "C"
+      },
+      "noncache_categories": {
+        "/etc": 5,
+        "/opt/capstone-guard-runtime": 23,
+        "/opt/hermes": 8,
+        "/run": 218,
+        "/tmp": 3,
+        "other": 1
+      },
+      "regular_file_bytes_by_category": {
+        "/etc": 2674,
+        "/opt/capstone-guard-runtime": 3057701,
+        "/opt/hermes": 319974,
+        "/run": 24689,
+        "/tmp": 5195
+      },
+      "stat_unavailable": 0,
+      "total": 258,
+      "types": {
+        "A": 242,
+        "C": 16
+      }
+    },
+    "docker_storage_driver": null,
+    "graph_driver_data_keys": [],
+    "image_bytes": 3968227258,
+    "image_cmd": null,
+    "image_entrypoint": [
+      "/opt/hermes/docker/entrypoint-dispatch.sh"
+    ],
+    "image_id": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "image_rootfs_layers": 42,
+    "image_tags": [
+      "nousresearch/hermes-agent:v2026.9.24"
+    ],
+    "known_artifacts": {
+      "/opt/capstone-automation/artifacts/regex-2026.9.29-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl": {
+        "bytes": 807902,
+        "sha256": "d49c18f1ea294cf4adde2e5ac256e98c82ea9d708462ce4bf799dffa7cfe8a2c"
+      },
+      "/opt/hermes/docker/entrypoint-dispatch.sh": {
+        "bytes": 1123,
+        "sha256": "d6f8e569fd2bfbf8d1f45619243681b9a1390c5bd3c9c584532692893b1d4fcd"
+      },
+      "/opt/hermes/docker/entrypoint.sh": {
+        "bytes": 1723,
+        "sha256": "6b158947ab0083de092058835f91ba5b94cea88eeaedc3bc6d891c69ec8b088a"
+      }
+    },
+    "mounts": [
+      {
+        "Destination": "/opt/data",
+        "Propagation": "rprivate",
+        "RW": true,
+        "Source": "/opt/hermes-data",
+        "Type": "bind"
+      }
+    ],
+    "observed_at_utc": "2026-10-13T19:28:48.037106+00:00",
+    "runtime_path_env": {
+      "HERMES_GID": "986",
+      "HERMES_HOME": "/opt/data",
+      "HERMES_UID": "995",
+      "PATH": "/opt/hermes/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    }
+  },
+  "accepted_backup": {
+    "root": "/var/backups/hermes-korean-guard-cooj_d_2",
+    "metadata": {
+      "exists": true,
+      "files": [
+        {
+          "bytes": 17752,
+          "mode": "0o644",
+          "relative_path": "new/capstone_korean_output_guard.py",
+          "sha256": "87d5bb10ea5364642d5f52e781d3534b5d16e3acb18f09e7ec91c6ba8f883e29",
+          "uid": 0
+        },
+        {
+          "bytes": 41562,
+          "mode": "0o644",
+          "relative_path": "new/plugins/platforms/mattermost/adapter.py",
+          "sha256": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+          "uid": 0
+        },
+        {
+          "bytes": 256255,
+          "mode": "0o644",
+          "relative_path": "new/gateway/run_turn.py",
+          "sha256": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a",
+          "uid": 0
+        },
+        {
+          "bytes": 39518,
+          "mode": "0o600",
+          "relative_path": "original/plugins/platforms/mattermost/adapter.py",
+          "sha256": "4f05be68777068d7b454187c7323f2c471aac6412b830f11761b4013eed702c8",
+          "uid": 0
+        },
+        {
+          "bytes": 254700,
+          "mode": "0o600",
+          "relative_path": "original/gateway/run_turn.py",
+          "sha256": "5bdee5c82c00e02f664516f9da0af99674e23493ec2a30eff06cb03afc6718a0",
+          "uid": 0
+        }
+      ],
+      "mode": "0o700",
+      "uid": 0
+    }
+  },
+  "outside_bind_other_changes": [
+    {
+      "basename_sha256": "9c97bac5e775c3337e316c73ba54fad950969ce30914de129af3558944e4af9c",
+      "bytes": null,
+      "category": "temporary",
+      "kind": "C",
+      "type": "directory"
+    },
+    {
+      "basename_sha256": "0693c30d8f168cc6ae607d4fb6febeab605a101dc5b136e2d0444ac045d14e1f",
+      "bytes": 5195,
+      "category": "temporary",
+      "kind": "A",
+      "type": "regular"
+    },
+    {
+      "basename_sha256": null,
+      "bytes": 875,
+      "category": "/etc/passwd",
+      "kind": "C",
+      "type": "regular"
+    },
+    {
+      "basename_sha256": null,
+      "bytes": 877,
+      "category": "account_runtime_other",
+      "kind": "C",
+      "type": "regular"
+    },
+    {
+      "basename_sha256": null,
+      "bytes": 460,
+      "category": "/etc/group",
+      "kind": "C",
+      "type": "regular"
+    },
+    {
+      "basename_sha256": null,
+      "bytes": 462,
+      "category": "account_runtime_other",
+      "kind": "C",
+      "type": "regular"
+    }
+  ],
+  "cold_fixture": {
+    "accepted_original": {
+      "gateway/run_turn.py": "5bdee5c82c00e02f664516f9da0af99674e23493ec2a30eff06cb03afc6718a0",
+      "plugins/platforms/mattermost/adapter.py": "4f05be68777068d7b454187c7323f2c471aac6412b830f11761b4013eed702c8"
+    },
+    "container": {
+      "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "started_at": "2026-10-13T16:37:16.547543503Z"
+    },
+    "core_sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+    "generated_candidates": {
+      "gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a",
+      "plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b"
+    },
+    "model_mcp_chat_calls": 0,
+    "native_engine": {
+      "backend": "regex._regex",
+      "negative_passed": 5,
+      "origin": "disposable_cold_target",
+      "package": "regex",
+      "positive_passed": 8,
+      "production_guard_imported": false,
+      "uid": 995,
+      "version": "2026.9.29"
+    },
+    "no_persistent_cache": true,
+    "observed_at_utc": "2026-10-13T19:34:17.974480+00:00",
+    "offline": true,
+    "operational_bytes_unchanged": true,
+    "patcher_sha256": "d6e1ea2e594ae958a33005127a618d52907e93408b786a437e163214dfaec17b",
+    "real_container_recreated": false,
+    "runtime_gateway_imported": false,
+    "temporary_files_removed": true,
+    "test_target_was_separate": true,
+    "wheel_bytes": 807902,
+    "wheel_sha256": "d49c18f1ea294cf4adde2e5ac256e98c82ea9d708462ce4bf799dffa7cfe8a2c",
+    "fixture_source_sha256": "14625de0d03e8d99cab7188e0ffa54a60b221faed26449f47e9718f2a3d99a3b"
+  },
+  "immutable_fields_checked": [
+    "container full ID/image/StartedAt",
+    "production guard core and adapter/run_turn",
+    "operational isolated regex tree",
+    "config.yaml/.env/SOUL.md"
+  ],
+  "not_tested": [
+    "actual image source extraction",
+    "new container creation/first start",
+    "live engine stop/copy/start failure",
+    "full production guard import from the cold target",
+    "model/MCP/chat roundtrip"
+  ],
+  "conclusions": {
+    "compose_metadata": "No Compose labels on the inspected container; repository deployment script uses direct docker run.",
+    "persistent_data": "The only declared bind is /opt/hermes-data:/opt/data; HERMES_HOME=/opt/data. Changed code and regex outside that bind require prestart restoration.",
+    "temporary_file": "One changed regular file under /tmp was not opened; operational necessity is not established.",
+    "prestart_gate": "Not implemented or exercised. Current timer cannot ensure guard before first response.",
+    "legacy_deployer": "Do not rerun deploy_gateway_B.sh to recreate the present service: it edits persistent config and removes the existing container before running a new unguarded one."
+  },
+  "cleanup": {
+    "container_cold_target": "Removed and absence checked",
+    "host_cold_fixture": "TemporaryDirectory removed",
+    "mac_staging": "Removed; no Mac packages or bytecode installed",
+    "remote_staging": "Parent cleanup pending"
+  },
+  "post_cold_diff_check": {
+    "observed_at_utc": "2026-10-13T19:37:19.733405+00:00",
+    "total": 258,
+    "categories_equal_to_initial": true,
+    "regular_bytes_by_category_equal_to_initial": true,
+    "venv_changes_observed": false
+  }
+}

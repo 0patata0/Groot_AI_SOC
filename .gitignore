@@ -22,3 +22,8 @@
 
 # datasets/ 디렉터리 압축본(로컬 전용, 추적 안 함)
 datasets.zip
+
+# Per-environment deployment input and credentials
+deployment/*.local.conf
+**/*secrets*.env
+**/enrollment.pass

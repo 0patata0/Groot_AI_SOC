@@ -1,0 +1,16 @@
+{
+  "at_kst": "2026-10-14T05:00:17.446328+09:00",
+  "mac_temporary_files_removed": 300,
+  "mac_temporary_bytes_removed": 1350390,
+  "mac_packages_or_venvs_installed": 0,
+  "server_A_source_files": 149,
+  "server_B_source_files": 149,
+  "server_A_evidence_files": 15,
+  "server_B_evidence_files": 10,
+  "server_A_staging_files_removed": 340,
+  "server_A_staging_bytes_removed": 1822163,
+  "server_B_staging_files_removed": 206,
+  "server_B_staging_bytes_removed": 949801,
+  "mac_task_staging_absent": true,
+  "infra_wheel_or_bytecode_remaining": 0
+}

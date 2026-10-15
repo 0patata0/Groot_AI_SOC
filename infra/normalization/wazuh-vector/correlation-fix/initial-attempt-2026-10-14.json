@@ -1,0 +1,104 @@
+{
+  "kind": "private_native_correlation_load_trial",
+  "arms": [
+    {
+      "profile": "single",
+      "hashes": {
+        "config_sha256": "885aaf0c8a8c814b40be6d6139365d0d25fc250b6147a544572fa880a2f8379d",
+        "local_options_sha256": "387036d2fb4fe2c1512846ba689490fc046bf964a1895025aa9f35d1a19f62be",
+        "binary_sha256": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+        "rules_sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+        "thread_options": {
+          "analysisd.event_threads": "1",
+          "analysisd.rule_matching_threads": "1"
+        }
+      },
+      "runtime": {
+        "pid": 2117891,
+        "open_file_paths_private_or_device_allowlist": true,
+        "production_socket_inodes_disjoint": true,
+        "start_ticks": "139271580",
+        "threads": 44,
+        "root_private": true,
+        "mount_namespace_private": true,
+        "network_namespace_private": true
+      },
+      "progress": {
+        "phase": "ready"
+      }
+    }
+  ],
+  "production_before": {
+    "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+    "init_pid": 2002301,
+    "started_at": "2026-10-13T20:52:37.692259701Z",
+    "analysisd_pid": 2003045,
+    "analysisd_start": "134839674",
+    "root": [
+      52,
+      5669366
+    ],
+    "queue": [
+      64512,
+      6317390
+    ],
+    "host_identity_files": {
+      "/etc/group": {
+        "devino": [
+          64512,
+          3147434
+        ],
+        "sha256": "0c4168e8a563cc2ecee24aa855c9012cdbd503f9c7baa7f227f61c4f2652f9a8",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420
+      },
+      "/etc/passwd": {
+        "devino": [
+          64512,
+          3147441
+        ],
+        "sha256": "42f5d73ed6ff90c87075294aeea54f3dbbd25384f9eb94a7b125f7b2c4ddfe5f",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420
+      }
+    },
+    "hashes": {
+      "bin/wazuh-analysisd": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+      "etc/ossec.conf": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+      "etc/rules/local_rules.xml": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+      "etc/rules/capstone_vector_rules.xml": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900"
+    }
+  },
+  "capacity_before": {
+    "MemAvailable": 12492764,
+    "SwapFree": 4194300,
+    "disk_free_bytes": 111484469248,
+    "cpu_affinity_count": 4
+  },
+  "input_rows_per_arm": 30000,
+  "same_input_bytes_both_arms": true,
+  "source_sha256": "c801ca17ab9ee55235c66d58ac3516914e592d71f37113e2f513f735259c8424",
+  "historical_helper_sha256": "605f5296dc104c16b528cf6639dbe0a8167bdd5b0d13b8431b4d20f4759f3821",
+  "input_sha256": "cecb61db179e26e43e5334220fbae6aeb25fccf0cead7c73cc7aa58fe5a1ab2a",
+  "agent_id": "000",
+  "agent001_transport_equivalence": false,
+  "private_wdb_started": false,
+  "operational_inputs_written": false,
+  "native_children_cleaned": true,
+  "trial_directory": "/var/tmp/capstone-correlation-fix-20261014/load-2841acb66e93",
+  "error": "native_state_samples_missing",
+  "production_unchanged": true,
+  "checked_at_kst": "2026-10-14T18:11:53.378913+09:00",
+  "result_path": "/var/tmp/capstone-correlation-fix-20261014/load-2841acb66e93/result.json",
+  "server_result_sha256": "ec2b744eb24d3f5b3cb611aac2c9e37e7d8b000800c79e3521535f7a236d6d3b",
+  "metadata_projection_excludes_private_diagnostics": true,
+  "subsequent_private_metadata_confirmed": {
+    "send_receipts_exists": false,
+    "sent_rows": 0,
+    "current_native_logs_regular_files": true,
+    "native_log_nlink": 2,
+    "root_cause": "reader_rejected_native_private_dated_hardlinks; summary then masked first failure with missing state samples"
+  }
+}

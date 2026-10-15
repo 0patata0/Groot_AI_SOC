@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Inventory all declared container data users",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "ps",
+        "--all",
+        "--quiet",
+        "--no-trunc"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_ids"
+  },
+  {
+    "name": "Require a bounded nonempty exact-ID inventory",
+    "ansible.builtin.assert": {
+      "that": [
+        "hp_ids.stdout_lines | length > 0",
+        "hp_ids.stdout_lines | length <= 128",
+        "hp_ids.stdout_lines | select('match','^[0-9a-f]{64}$') | list | length == hp_ids.stdout_lines | length"
+      ]
+    }
+  },
+  {
+    "name": "Read full private inspect without exporting environment values",
+    "ansible.builtin.command": {
+      "argv": "{{ ['/usr/local/bin/docker','inspect'] + hp_ids.stdout_lines }}"
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_inspect"
+  },
+  {
+    "name": "Project unrelated containers before evidence persistence",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "project",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ],
+      "stdin": "{{ {'containers':hp_inspect.stdout | from_json,'candidate_id':hp_state.candidate_id | default(none)} | to_json }}"
+    },
+    "register": "hp_projection",
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 30
+  },
+  {
+    "name": "Read protected metadata and database integrity",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "data",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_data",
+    "until": "hp_data.rc == 0",
+    "retries": 3,
+    "delay": 2
+  },
+  {
+    "name": "Observe the fixed host OOM capability and cgroup version",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "info",
+        "--format",
+        "{% raw %}{\"oom_kill_disable\":{{json .OomKillDisable}},\"cgroup_version\":{{json .CgroupVersion}}}{% endraw %}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 30,
+    "register": "hp_docker_host"
+  },
+  {
+    "name": "Build private observation",
+    "ansible.builtin.set_fact": {
+      "hp_observation": "{{ (hp_data.stdout | from_json) | combine({'containers': hp_projection.stdout | from_json, 'docker_host': hp_docker_host.stdout | from_json}) }}"
+    },
+    "no_log": true
+  }
+]

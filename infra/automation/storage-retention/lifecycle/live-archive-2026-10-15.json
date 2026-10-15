@@ -1,0 +1,190 @@
+{
+  "status": "A_to_B_preserved_and_restore_verified",
+  "bundles": 5,
+  "source_bytes": 21157373,
+  "gzip_bytes": 1556116,
+  "transport_bytes": 1576960,
+  "transport_sha256": "147dbcf6ac1d0bbdd43dac0920c4035e178db4bef55482ecbd6419f4538adf18",
+  "mac_payload_files": 0,
+  "a_source_deleted": false,
+  "kernel_history_sender_changed": false,
+  "catalog": [
+    {
+      "archive": {
+        "gzip_bytes": 1552343,
+        "gzip_sha256": "e56f9493978cf28e3becee4885549615505deca0cbebc6b20a4b7fd5b1f33db3",
+        "local_restore_bytes": 21143722,
+        "local_restore_sha256": "a5d8dba6b48be71e831037b15c7d3d0b4a7e677a0e52aa69da963f3557e012f4",
+        "manifest_sha256": "e48bad3a8b333c23044ab1e0ed36489b00309f0ae4ce84134672ad066166466d",
+        "policy": "capstone-sealed-raw-archive-v1",
+        "schema_version": 1,
+        "source": {
+          "basename": "generation-0000000000.jsonl",
+          "bytes": 21143722,
+          "device": 64512,
+          "inode": 1441879,
+          "sha256": "a5d8dba6b48be71e831037b15c7d3d0b4a7e677a0e52aa69da963f3557e012f4"
+        }
+      },
+      "copy_verified_at_epoch": 1792027046,
+      "engine": "suricata",
+      "name": "suricata-0000000000-a5d8dba6b48be71e831037b15c7d3d0b4a7e677a0e52aa69da963f3557e012f4",
+      "source_deleted": false
+    },
+    {
+      "archive": {
+        "gzip_bytes": 1655,
+        "gzip_sha256": "e7abe722a2a48dc45a4022c1c3f951995b6f80f9b32b614f232f20fce738a837",
+        "local_restore_bytes": 10072,
+        "local_restore_sha256": "ded2910950e354e110486dd6b107e1cf3f1a24572b56953d4edbfad8cdab93f6",
+        "manifest_sha256": "0cee0a088dfd57c40cdd80e2585d03e99809a28c2ec85354a7eb9fc4f2ba97dc",
+        "policy": "capstone-sealed-raw-archive-v1",
+        "schema_version": 1,
+        "source": {
+          "basename": "generation-0000000000.jsonl",
+          "bytes": 10072,
+          "device": 64512,
+          "inode": 1441881,
+          "sha256": "ded2910950e354e110486dd6b107e1cf3f1a24572b56953d4edbfad8cdab93f6"
+        }
+      },
+      "copy_verified_at_epoch": 1792027049,
+      "engine": "modsecurity",
+      "name": "modsecurity-0000000000-ded2910950e354e110486dd6b107e1cf3f1a24572b56953d4edbfad8cdab93f6",
+      "source_deleted": false
+    },
+    {
+      "archive": {
+        "gzip_bytes": 706,
+        "gzip_sha256": "595bdd99f7a6dc01bade1605b09083cfb3521871b7afe2db8ecc877b83b9d144",
+        "local_restore_bytes": 1193,
+        "local_restore_sha256": "a5e6537f2a152f602d5cd1a3e133b6bc69d915826253dbf48204bf20a9f766d4",
+        "manifest_sha256": "7407f3dcb6bbff64b76287cd7430c414979ee78552596f5f09fd30bd32d9b813",
+        "policy": "capstone-sealed-raw-archive-v1",
+        "schema_version": 1,
+        "source": {
+          "basename": "generation-0000000001.jsonl",
+          "bytes": 1193,
+          "device": 64512,
+          "inode": 1441997,
+          "sha256": "a5e6537f2a152f602d5cd1a3e133b6bc69d915826253dbf48204bf20a9f766d4"
+        }
+      },
+      "copy_verified_at_epoch": 1792027052,
+      "engine": "modsecurity",
+      "name": "modsecurity-0000000001-a5e6537f2a152f602d5cd1a3e133b6bc69d915826253dbf48204bf20a9f766d4",
+      "source_deleted": false
+    },
+    {
+      "archive": {
+        "gzip_bytes": 706,
+        "gzip_sha256": "7b32951c0ab5010f62c2855a401e11ec17388340b08ab1b93e635c6bd2344861",
+        "local_restore_bytes": 1193,
+        "local_restore_sha256": "3582d508bfd084a5fa8c1276ea911fbcac656b48ced2615bd8094059c4222e33",
+        "manifest_sha256": "5193b9300d973de168715f257fba7c61b77e7221409da8e54078ae2b91c7787b",
+        "policy": "capstone-sealed-raw-archive-v1",
+        "schema_version": 1,
+        "source": {
+          "basename": "generation-0000000002.jsonl",
+          "bytes": 1193,
+          "device": 64512,
+          "inode": 1442000,
+          "sha256": "3582d508bfd084a5fa8c1276ea911fbcac656b48ced2615bd8094059c4222e33"
+        }
+      },
+      "copy_verified_at_epoch": 1792027055,
+      "engine": "modsecurity",
+      "name": "modsecurity-0000000002-3582d508bfd084a5fa8c1276ea911fbcac656b48ced2615bd8094059c4222e33",
+      "source_deleted": false
+    },
+    {
+      "archive": {
+        "gzip_bytes": 706,
+        "gzip_sha256": "f68cc063b5bc223150adb17563ac0a97899559b41bf9de6277629b144472c0ef",
+        "local_restore_bytes": 1193,
+        "local_restore_sha256": "357c1188aa1e0e01c92c1c3ab087b406af1d9413e4384e640ea053ea208850de",
+        "manifest_sha256": "07f6a2792bb93bd2ae31931f69b3205d140725886837f332ac39219ece779044",
+        "policy": "capstone-sealed-raw-archive-v1",
+        "schema_version": 1,
+        "source": {
+          "basename": "generation-0000000003.jsonl",
+          "bytes": 1193,
+          "device": 64512,
+          "inode": 1441998,
+          "sha256": "357c1188aa1e0e01c92c1c3ab087b406af1d9413e4384e640ea053ea208850de"
+        }
+      },
+      "copy_verified_at_epoch": 1792027058,
+      "engine": "modsecurity",
+      "name": "modsecurity-0000000003-357c1188aa1e0e01c92c1c3ab087b406af1d9413e4384e640ea053ea208850de",
+      "source_deleted": false
+    }
+  ],
+  "remote_receipts": [
+    {
+      "gzip_bytes": 1655,
+      "gzip_sha256": "e7abe722a2a48dc45a4022c1c3f951995b6f80f9b32b614f232f20fce738a837",
+      "manifest_sha256": "0cee0a088dfd57c40cdd80e2585d03e99809a28c2ec85354a7eb9fc4f2ba97dc",
+      "policy": "capstone-sealed-raw-receipt-v1",
+      "received_at_epoch": 1792027156,
+      "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+      "restore_verified_at_epoch": 1792027156,
+      "restored_bytes": 10072,
+      "restored_sha256": "ded2910950e354e110486dd6b107e1cf3f1a24572b56953d4edbfad8cdab93f6",
+      "schema_version": 1,
+      "stage": "remote_preserved_and_restore_verified"
+    },
+    {
+      "gzip_bytes": 706,
+      "gzip_sha256": "595bdd99f7a6dc01bade1605b09083cfb3521871b7afe2db8ecc877b83b9d144",
+      "manifest_sha256": "7407f3dcb6bbff64b76287cd7430c414979ee78552596f5f09fd30bd32d9b813",
+      "policy": "capstone-sealed-raw-receipt-v1",
+      "received_at_epoch": 1792027156,
+      "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+      "restore_verified_at_epoch": 1792027157,
+      "restored_bytes": 1193,
+      "restored_sha256": "a5e6537f2a152f602d5cd1a3e133b6bc69d915826253dbf48204bf20a9f766d4",
+      "schema_version": 1,
+      "stage": "remote_preserved_and_restore_verified"
+    },
+    {
+      "gzip_bytes": 706,
+      "gzip_sha256": "7b32951c0ab5010f62c2855a401e11ec17388340b08ab1b93e635c6bd2344861",
+      "manifest_sha256": "5193b9300d973de168715f257fba7c61b77e7221409da8e54078ae2b91c7787b",
+      "policy": "capstone-sealed-raw-receipt-v1",
+      "received_at_epoch": 1792027157,
+      "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+      "restore_verified_at_epoch": 1792027157,
+      "restored_bytes": 1193,
+      "restored_sha256": "3582d508bfd084a5fa8c1276ea911fbcac656b48ced2615bd8094059c4222e33",
+      "schema_version": 1,
+      "stage": "remote_preserved_and_restore_verified"
+    },
+    {
+      "gzip_bytes": 706,
+      "gzip_sha256": "f68cc063b5bc223150adb17563ac0a97899559b41bf9de6277629b144472c0ef",
+      "manifest_sha256": "07f6a2792bb93bd2ae31931f69b3205d140725886837f332ac39219ece779044",
+      "policy": "capstone-sealed-raw-receipt-v1",
+      "received_at_epoch": 1792027157,
+      "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+      "restore_verified_at_epoch": 1792027157,
+      "restored_bytes": 1193,
+      "restored_sha256": "357c1188aa1e0e01c92c1c3ab087b406af1d9413e4384e640ea053ea208850de",
+      "schema_version": 1,
+      "stage": "remote_preserved_and_restore_verified"
+    },
+    {
+      "gzip_bytes": 1552343,
+      "gzip_sha256": "e56f9493978cf28e3becee4885549615505deca0cbebc6b20a4b7fd5b1f33db3",
+      "manifest_sha256": "e48bad3a8b333c23044ab1e0ed36489b00309f0ae4ce84134672ad066166466d",
+      "policy": "capstone-sealed-raw-receipt-v1",
+      "received_at_epoch": 1792027156,
+      "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+      "restore_verified_at_epoch": 1792027156,
+      "restored_bytes": 21143722,
+      "restored_sha256": "a5d8dba6b48be71e831037b15c7d3d0b4a7e677a0e52aa69da963f3557e012f4",
+      "schema_version": 1,
+      "stage": "remote_preserved_and_restore_verified"
+    }
+  ]
+}

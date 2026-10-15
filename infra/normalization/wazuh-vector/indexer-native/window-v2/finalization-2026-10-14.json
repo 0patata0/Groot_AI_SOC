@@ -1,0 +1,72 @@
+{
+  "at_kst": "2026-10-14T19:46:55.176114+09:00",
+  "status": "completed",
+  "steps": {
+    "1": "live log review complete; no retained post-exception natural Imperva scan or recent Hermes-use sample, continued observation required",
+    "2": "v2 operating monitor deployed, same ID/permissions/enabled/actions0, CAS and independent GET, two scheduler periods and native production dryrun verified"
+  },
+  "server_preservation": {
+    "a": {
+      "files": 33,
+      "bytes": 274906,
+      "stage_absent": true
+    },
+    "b": {
+      "files": 114,
+      "bytes": 1519219,
+      "stage_absent": true
+    },
+    "evidence_root": "/opt/capstone-automation/project/evidence/short-priority-20261014",
+    "project_snapshot_b": {
+      "files": 42,
+      "bytes": 930326,
+      "changed": 25,
+      "unchanged": 17,
+      "all_current_local_hashes_matched_before_final_notes": true
+    },
+    "independent_finalization_sha256": {
+      "infra/groot-a/imperva-exception/step1-finalization-a-2026-10-14.json": "22618cb0892772cb49b2f4de23958b94cec69cdfaf311aaf03f8169fcf881229",
+      "infra/normalization/wazuh-vector/indexer-native/window-v2/finalization-b-2026-10-14.json": "1196596181a3afbe88eeb1f9c368026cb61b43198725e5347b06facbbba7345e",
+      "infra/normalization/wazuh-vector/indexer-native/window-v2/deployment-2026-10-14.json": "14164b61a0e8518877d86db92c36b775a4ce3e353c96e13b49bb53e94cc2a8e7"
+    }
+  },
+  "mac_cleanup": {
+    "directory": "/private/tmp/capstone-short-priority-20261014.trt3rndm",
+    "files_deleted": 135,
+    "bytes_deleted": 1511990,
+    "directory_absent": true,
+    "packages_installed": 0,
+    "user_environment_or_cache_removed": false,
+    "raw_operating_logs_exported": 0,
+    "secrets_exported": 0
+  },
+  "local_validation": {
+    "json_valid": 12,
+    "python_ast_valid": 7,
+    "candidate_manifest_sources": 15,
+    "deployment_source_hashes": 11,
+    "relative_links_valid": 335,
+    "new_wheels_or_bytecode": 0
+  },
+  "git_commit_created": false,
+  "snapshot_boundary": "This finalization JSON and closing documentation were written after the 42-file B project snapshot; server evidence contains independent preservation/cleanup/postcleanup metadata.",
+  "remaining_order": [
+    "WAF writer and dual-reader isolated rotation",
+    "certificate expiry monitoring and manual renewal procedure",
+    "oversized EOF line visibility",
+    "operating raw rotation and durable restart/replay/receipt design",
+    "Hermes prestart and actual recovery",
+    "exception persistence across recreation"
+  ],
+  "parallel_observation": [
+    "Wazuh throughput, delay, queue/drop and correlation recurrence",
+    "natural Imperva scans and language-guard use",
+    "Indexer total indexing delay, evaluation gaps and unavailable results"
+  ],
+  "deferred": [
+    "model training",
+    "project SSL VPN",
+    "mobile push",
+    "additional evaluation tools item 5"
+  ]
+}

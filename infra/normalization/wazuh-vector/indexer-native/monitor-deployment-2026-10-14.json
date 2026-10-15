@@ -1,0 +1,162 @@
+{
+  "verified_at_kst": "2026-10-14T06:25:28.280236+09:00",
+  "status": "enabled_actions_free_observation",
+  "monitor_id": "-HYdN6EBERDGWPLCrWpE",
+  "name": "capstone-evidence-observation-v1",
+  "exact_name_count": 1,
+  "enabled": true,
+  "schedule": {
+    "period": {
+      "interval": 1,
+      "unit": "MINUTES"
+    }
+  },
+  "schema_version": 8,
+  "monitor_source_sha256": "f0262be494e605edcb22fb32f71f4854014dd4f671b035803886a5b1036bafd1",
+  "deployment_helper_sha256": "0318e0ab4231b32de9624466b19bb07c6324ae6277311d5bf528460a774d6f80",
+  "server_config_sha256": "e30b8f56e96ec3f86cadbf456af9a67cf4a9bcef41002164f020f6dbabfcdd35",
+  "enabled_at_kst": "2026-10-14T06:21:26.415660+09:00",
+  "scheduled_observations": [
+    {
+      "last_execution_epoch_ms": 1791926545196,
+      "last_execution_kst": "2026-10-14T06:22:25.196+09:00",
+      "observed_at_kst": "2026-10-14T06:22:40.779372+09:00",
+      "running_on_time": true,
+      "internal_alert_count": 0
+    },
+    {
+      "last_execution_epoch_ms": 1791926605196,
+      "last_execution_kst": "2026-10-14T06:23:25.196+09:00",
+      "observed_at_kst": "2026-10-14T06:23:37.161107+09:00",
+      "running_on_time": true,
+      "internal_alert_count": 0
+    }
+  ],
+  "scheduled_timestamps_are_query_or_delivery_success_ack": false,
+  "adjacent_manual_dryrun": {
+    "execution_kind": "manual_dryrun_after_two_scheduler_observations",
+    "shards": {
+      "total": 54,
+      "successful": 54,
+      "failed": 0,
+      "skipped": 0
+    },
+    "hits": {
+      "value": 1,
+      "relation": "eq"
+    },
+    "service_bucket_count": 1,
+    "timed_out": false,
+    "terminated_early": false,
+    "monitor_error": false,
+    "input_error": false,
+    "triggers": {
+      "observation_match": {
+        "triggered": false,
+        "error": false,
+        "action_results_count": 0
+      },
+      "observation_unavailable": {
+        "triggered": false,
+        "error": false,
+        "action_results_count": 0
+      }
+    }
+  },
+  "idempotent_enable": {
+    "changed": false,
+    "state_bytes_unchanged": true
+  },
+  "validation": {
+    "offline_contract_tests": 7,
+    "offline_deployment_tests": 23,
+    "offline_total_passed": 30,
+    "native_candidate_evidence": "monitor-validation-2026-10-14.json",
+    "monitor_query_and_trigger_sources_unchanged_after_native_test": true,
+    "independent_review_completed": true
+  },
+  "deployment_corrections": [
+    {
+      "issue": "missing_config_index_wrapped_404",
+      "observed_before_monitor_creation": true,
+      "resolution": "Accept only the exact installed Alerting exception for the missing .opendistro-alerting-config index."
+    },
+    {
+      "issue": "docker_exec_get_inherited_operator_stdin",
+      "resolution": "Use DEVNULL when there is no HTTP body; use an exact input pipe only for JSON payloads."
+    },
+    {
+      "issue": "first_update_schema_zero_to_eight",
+      "initial_enable_reached_server": true,
+      "same_id_cas_disabled_before_repair": true,
+      "all_query_trigger_actions_checks_passed": true,
+      "prior_hash_reproduced_by_only_schema_8_to_0": true,
+      "resolution": "Permit only schema 0 to 8 when every other configuration value equals the prior hash; other schema, query, permissions, or actions changes remain refused."
+    }
+  ],
+  "operator_transfer_review": {
+    "initial_upload_rejected_before_execution": true,
+    "reason": "Initial project-folder payload and existing B destination authorization evidence was insufficient for automatic review.",
+    "resolved_by_same_review_mechanism": true,
+    "approved_payload": "Exact five source files plus SHA manifest; no credentials or raw event records."
+  },
+  "permanent_server_evidence_directory": "/opt/capstone-automation/project/evidence/indexer-20261014",
+  "permanent_server_source_directory": "/opt/capstone-automation/project/evidence/indexer-20261014/monitor-source",
+  "server_files": {
+    "monitor-deployment-final.json": {
+      "sha256": "1d51025e8d9fb19c7304ac354e87aac64ab97b963d19c99be117ed3a1ec6d973",
+      "bytes": 4981
+    },
+    "monitor-installed-final.json": {
+      "sha256": "defab796e1d92db6b615f5f38b542b1c2ece08fb4a14491a8e107a94af5f9cbd",
+      "bytes": 25237
+    },
+    "monitor-adjacent-manual-dryrun.json": {
+      "sha256": "b4d99c30d38c5a9d98beb71355617ed3701f57d631058238a9c8ac67e524bd1d",
+      "bytes": 2426
+    },
+    "monitor-enable-recovery.json": {
+      "sha256": "ea1f8fc2dc7f754b996d81b6943f511816d38a791d06764f33373a1360faff09",
+      "bytes": 1109
+    },
+    "monitor-lifecycle-diagnosis.json": {
+      "sha256": "2d90e88592f7cdbaf6dd6e9f61c8f366c4b6991bf870a693e2dec8c23d2e46e4",
+      "bytes": 509
+    }
+  },
+  "permissions": {
+    "state": "root0600",
+    "evidence_files": "root0600",
+    "source_directory": "root0700",
+    "source_files": "root0600"
+  },
+  "boundaries": {
+    "external_notifications_or_blocks": 0,
+    "raw_event_documents_exported": 0,
+    "production_monitor_count_created": 1,
+    "cross_source_production_match_observed": false,
+    "synthetic_cross_source_test_passed": true,
+    "empty_query_is_collection_health_proof": false,
+    "completed_alert_state_proves_incident_resolution": false,
+    "global_exactly_once_or_remote_receipt_ack": false,
+    "accounts_or_role_mappings_changed": false,
+    "existing_wazuh_event_index_mapping_changes": false,
+    "native_alerting_internal_index_initialization_is_part_of_api": true
+  },
+  "cleanup": {
+    "all_own_ssh_calls_completed": true,
+    "mac_packages_or_persistent_python_services_added": false,
+    "server_staging_cleanup_owner": "root coordinator; retained evidence and monitor-source are permanent",
+    "own_mac_temporary_scripts_removed": [
+      "monitor-deploy-create-b.sh",
+      "monitor-deploy-error-shape-b.sh",
+      "monitor-deploy-absence-b.sh",
+      "monitor-deploy-enable-b.sh",
+      "monitor-deploy-recover-b.sh",
+      "monitor-deploy-config-diff-b.sh",
+      "monitor-deploy-observe-b.sh",
+      "monitor-deploy-finalize-b.sh"
+    ],
+    "own_mac_temporary_script_paths_absent": true
+  }
+}

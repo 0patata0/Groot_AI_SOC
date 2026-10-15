@@ -1,0 +1,24 @@
+{
+  "delay_status": "passed",
+  "kept_native_bytes": 235048513,
+  "kept_native_regular_files": 344,
+  "load_status": "passed",
+  "manifest_files": 364,
+  "manifest_sha256": "014070dd61f4b807a47cd9c9f522514d571f679c78dabeb68f2579c977039aec",
+  "manifest_verified": true,
+  "observed_at_kst": "2026-10-15T10:48:24.300241+09:00",
+  "operating_files_deleted": false,
+  "private_children_cleaned": true,
+  "proc_fd_permission_skips": 0,
+  "remaining_stage_fd_in_accessible_proc": false,
+  "removed_private_copies_or_runtime": [
+    "load-01/single/root/bin",
+    "load-01/single/root/lib",
+    "load-01/single/root/queue",
+    "load-01/single/root/stats",
+    "load-01/single/root/tmp"
+  ],
+  "server_evidence_path": "/var/backups/capstone-delay-audit-20261015",
+  "stage_removed": true,
+  "status": "preserved_and_private_runtime_removed"
+}

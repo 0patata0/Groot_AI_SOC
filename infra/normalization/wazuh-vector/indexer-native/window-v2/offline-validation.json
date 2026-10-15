@@ -1,0 +1,20 @@
+{
+  "status": "offline_contract_pass_native_required",
+  "date_kst": "2026-10-14",
+  "tests": 9,
+  "passed": 9,
+  "elapsed_seconds": 0.467,
+  "native_fixture_cases": 41,
+  "native_painless_execution_performed_by_candidate_author": false,
+  "monitor_sha256": "acc8ac9649cc8b974872a30cf4bcc8f2e52adf0caf56ed197e8b95066d657c7f",
+  "historical_monitor_sha256": "f0262be494e605edcb22fb32f71f4854014dd4f671b035803886a5b1036bafd1",
+  "artifacts_match_build": true,
+  "small_fixture_expected_results_checked_with": "independent brute-force endpoint window oracle",
+  "server_calls": 0,
+  "packages_installed": 0,
+  "operational_changes": 0,
+  "notes": [
+    "Initial offline assertion searched _source as a substring and incorrectly matched cross_source_services. The assertion was narrowed to actual source-access syntax, then all 9 tests passed. No candidate logic changed for that test correction.",
+    "No Painless/native execution or performance claim is established by Python checks."
+  ]
+}

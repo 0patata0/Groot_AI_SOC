@@ -1,0 +1,123 @@
+[
+  {
+    "name": "Refresh transaction state",
+    "ansible.builtin.include_tasks": "load.yml"
+  },
+  {
+    "name": "Refresh exact identities and data",
+    "ansible.builtin.include_tasks": "observe.yml"
+  },
+  {
+    "name": "Refresh stopped candidate readback before critical transition",
+    "ansible.builtin.include_tasks": "readback.yml",
+    "vars": {
+      "hp_verify_id": "{{ hp_state.candidate_id }}"
+    },
+    "when": "hp_action in ['stop-old','start-new']"
+  },
+  {
+    "name": "Refresh identity after readback and immediately before intent",
+    "ansible.builtin.include_tasks": "observe.yml"
+  },
+  {
+    "name": "Read fresh idle and lease evidence before stopping original",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "idle",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_idle",
+    "until": "hp_idle.rc == 0",
+    "retries": 12,
+    "delay": 5,
+    "when": "hp_action == 'stop-old'"
+  },
+  {
+    "name": "Extend current operation evidence",
+    "ansible.builtin.set_fact": {
+      "hp_evidence": "{{ hp_observation | combine({'guard_sha256': hp_guard_sha | default(''), 'idle': (hp_idle.stdout | default('{}')) | from_json}) }}"
+    },
+    "no_log": true
+  },
+  {
+    "name": "Persist fsynced one-shot intent before native mutation",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "arm",
+        "--token",
+        "{{ capstone_prestart_token }}",
+        "--action",
+        "{{ hp_action }}"
+      ],
+      "stdin": "{{ hp_evidence | to_json }}",
+      "stdin_add_newline": true
+    },
+    "changed_when": true,
+    "no_log": true,
+    "timeout": 30
+  },
+  {
+    "name": "Apply the never-started candidate files",
+    "ansible.builtin.include_tasks": "install.yml",
+    "when": "hp_action == 'install'"
+  },
+  {
+    "name": "Issue this exact Docker lifecycle operation once",
+    "ansible.builtin.command": {
+      "argv": "{{ hp_commands[hp_action] }}"
+    },
+    "changed_when": true,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_operation",
+    "when": "hp_action != 'install'",
+    "failed_when": "hp_operation.rc != 0 and hp_action != 'start-new'"
+  },
+  {
+    "name": "Read back never-started candidate guard after copy",
+    "ansible.builtin.include_tasks": "readback.yml",
+    "vars": {
+      "hp_verify_id": "{{ hp_state.candidate_id }}"
+    },
+    "when": "hp_action == 'install'"
+  },
+  {
+    "name": "Verify native postconditions",
+    "ansible.builtin.include_tasks": "observe.yml"
+  },
+  {
+    "name": "Persist exact observed postcondition",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "finish",
+        "--token",
+        "{{ capstone_prestart_token }}",
+        "--action",
+        "{{ hp_action }}"
+      ],
+      "stdin": "{{ hp_observation | combine({'guard_sha256': hp_guard_sha | default(''), 'command_container_id': hp_operation.stdout | default('') | trim}) | to_json }}",
+      "stdin_add_newline": true
+    },
+    "changed_when": true,
+    "no_log": true,
+    "timeout": 30
+  },
+  {
+    "name": "Refresh committed metadata",
+    "ansible.builtin.include_tasks": "load.yml"
+  }
+]

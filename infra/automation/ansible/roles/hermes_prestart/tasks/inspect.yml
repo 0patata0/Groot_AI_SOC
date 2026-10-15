@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Read transaction only",
+    "ansible.builtin.include_tasks": "load.yml"
+  },
+  {
+    "name": "Report fixed transaction metadata",
+    "ansible.builtin.debug": {
+      "msg": "{{ hp_state }}"
+    }
+  }
+]

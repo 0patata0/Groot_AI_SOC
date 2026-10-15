@@ -1,0 +1,1264 @@
+{
+  "schema_version": 1,
+  "status": "completed_with_documented_validation_limits",
+  "resumed_at_kst": "2026-10-14T23:16:31+09:00",
+  "fresh_live": {
+    "at_kst": "2026-10-14T23:18:09.158622+09:00",
+    "boot_id": "bfafc2dd-a0fe-42ad-a088-e7fe6c576486",
+    "protected": {
+      "/etc/logrotate.d/capstone-secstack": {
+        "sha256": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "previous_sha256": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/vector.toml": {
+        "sha256": "5ac09dd5cb708833fe0c2259c85aa0a587a42a67e78a1f507429dd9b825e56f7",
+        "previous_sha256": "5ac09dd5cb708833fe0c2259c85aa0a587a42a67e78a1f507429dd9b825e56f7",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/vector.env": {
+        "sha256": "f435a687b985f41c89e90ae1b36c63894a0cd96b337693b77b9017850dafc194",
+        "previous_sha256": "f435a687b985f41c89e90ae1b36c63894a0cd96b337693b77b9017850dafc194",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/waf-binding.json": {
+        "sha256": "e11b0778f62478bc951a11fb93102f06f3f567aa1d9b91269f5a640c34109d95",
+        "previous_sha256": "e11b0778f62478bc951a11fb93102f06f3f567aa1d9b91269f5a640c34109d95",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/raw-line-binding.json": {
+        "sha256": "0bd6e002aafd0ced247e0a25cee372685d364d544bc8bef20f22557e13fcfe41",
+        "previous_sha256": "0bd6e002aafd0ced247e0a25cee372685d364d544bc8bef20f22557e13fcfe41",
+        "unchanged": true
+      },
+      "/var/ossec/etc/ossec.conf": {
+        "sha256": "b27ec250b19ef0fe9cc1f999467dc24176b82035e763080b33f037a063d4ce0a",
+        "previous_sha256": "b27ec250b19ef0fe9cc1f999467dc24176b82035e763080b33f037a063d4ce0a",
+        "unchanged": true
+      },
+      "/var/ossec/etc/local_internal_options.conf": {
+        "sha256": "73252a6f47fff93d8ce62ca70a8f9196a216d5e09dc2228758fcf0b0ac77133f",
+        "previous_sha256": "73252a6f47fff93d8ce62ca70a8f9196a216d5e09dc2228758fcf0b0ac77133f",
+        "unchanged": true
+      },
+      "/usr/local/sbin/capstone-vector-maintenance": {
+        "sha256": "8413fb43747a9ddb98f8a8ed1d6df2cf67dd695698b8a81d429c13e3fcdf8f95",
+        "previous_sha256": "8413fb43747a9ddb98f8a8ed1d6df2cf67dd695698b8a81d429c13e3fcdf8f95",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/logrotate.conf": {
+        "sha256": "c3c806d78b167b6ebebc26bdf00775ea57f14a9e8f150555056fda321e4b9a64",
+        "previous_sha256": "c3c806d78b167b6ebebc26bdf00775ea57f14a9e8f150555056fda321e4b9a64",
+        "unchanged": true
+      },
+      "/etc/systemd/system/capstone-vector.service": {
+        "sha256": "b6eda101c1b86e5236f6d25338895e460466556fd32426898adc53938f593854",
+        "previous_sha256": "b6eda101c1b86e5236f6d25338895e460466556fd32426898adc53938f593854",
+        "unchanged": true
+      },
+      "/etc/systemd/system/capstone-vector-maintenance.service": {
+        "sha256": "1a6c7b07f295a53c8db68bba660510fcd50c8e11b1a212355479beb296bad4ab",
+        "previous_sha256": "1a6c7b07f295a53c8db68bba660510fcd50c8e11b1a212355479beb296bad4ab",
+        "unchanged": true
+      },
+      "/home/groot_a/capstone/secstack/docker-compose.yml": {
+        "sha256": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+        "previous_sha256": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+        "unchanged": true
+      },
+      "/opt/capstone-automation/project/infra/automation/ansible/roles/vector_shadow/tasks/main.yml": {
+        "sha256": "a011019623035fdadbe883bedf0e6cd152b6538ae17b3f659977ac04bcb7d97f",
+        "previous_sha256": "a011019623035fdadbe883bedf0e6cd152b6538ae17b3f659977ac04bcb7d97f",
+        "unchanged": true
+      }
+    },
+    "services": {
+      "capstone-vector.service": {
+        "MainPID": "1695314",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "active",
+        "SubState": "running",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "a032d3ca65464eb0b05450592b0d34b4"
+      },
+      "wazuh-agent.service": {
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "active",
+        "SubState": "running",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "38e7db23496a4fae82ca10ffaa0765eb"
+      },
+      "capstone-vector-maintenance.timer": {
+        "LastTriggerUSec": "Wed 2026-10-14 23:16:01 KST",
+        "Result": "success",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "a22628b9b1e44b49b37e51acfca0ad1d"
+      },
+      "capstone-vector-maintenance.service": {
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "DropInPaths": "",
+        "UnitFileState": "static",
+        "InvocationID": "6fc7791b94164113aa445ee2d7419f93"
+      },
+      "capstone-vector-history-auto.timer": {
+        "LastTriggerUSec": "Wed 2026-10-14 23:18:01 KST",
+        "Result": "success",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "0dd3fc2740c84a3f929cd9599b11117b"
+      },
+      "capstone-vector-history-auto.service": {
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "DropInPaths": "",
+        "UnitFileState": "disabled",
+        "InvocationID": "da40f545085f4ec585653416979d1a55"
+      },
+      "rule-change-worker.timer": {
+        "LastTriggerUSec": "Wed 2026-10-14 23:18:01 KST",
+        "Result": "success",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "93e35f31ee8b43049c5c977973ee831d"
+      }
+    },
+    "containers": {
+      "waf": {
+        "cid": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "pid": 647700,
+        "running": true,
+        "health": "healthy",
+        "start_ticks": 62394757
+      },
+      "suricata": {
+        "cid": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+        "image": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+        "pid": 1534179,
+        "running": true,
+        "health": null,
+        "start_ticks": 131705083
+      }
+    },
+    "raw": {
+      "suricata/eve.json": {
+        "device": 64512,
+        "inode": 1441879,
+        "links": 1,
+        "bytes": 19820618
+      },
+      "modsec/audit.log": {
+        "device": 64512,
+        "inode": 1441881,
+        "links": 1,
+        "bytes": 10072
+      },
+      "modsec/capstone-access.log": {
+        "device": 64512,
+        "inode": 1441928,
+        "links": 1,
+        "bytes": 810
+      }
+    },
+    "logcollector_pids": [
+      1909632
+    ],
+    "agent": {
+      "status": "'connected'",
+      "last_keepalive": "'2026-10-14 23:17:58'",
+      "last_ack": "'2026-10-14 23:17:58'",
+      "msg_buffer": "'0'"
+    },
+    "history": {
+      "policy": "bounded-previous-kernel-auto-v1",
+      "jobs": 9,
+      "ready": 1,
+      "inflight": 0,
+      "complete": 8,
+      "blocked": 0,
+      "records": 12258,
+      "bytes": 5176539,
+      "raw_payload_exported": false,
+      "operational_checkpoint_changed": false,
+      "reinjected": false,
+      "remote_receipt": false
+    },
+    "raw_line_snapshot": {
+      "schema_version": 1,
+      "scope": "periodic_snapshot_tail",
+      "observed_at_kst": "2026-10-14T23:16:02+09:00",
+      "binding_verified": true,
+      "statuses": [],
+      "sources": [
+        {
+          "source": "suricata",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 19794261,
+          "snapshot_bytes": 19794261,
+          "scanned_bytes": 19794261,
+          "max_line_bytes": 8903,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_audit",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 10072,
+          "snapshot_bytes": 10072,
+          "scanned_bytes": 10072,
+          "max_line_bytes": 2188,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_access",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 810,
+          "snapshot_bytes": 810,
+          "scanned_bytes": 810,
+          "max_line_bytes": 405,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "migration_paths_absent": {
+      "/var/lib/capstone-raw-operations": true,
+      "/usr/local/lib/capstone-raw-operations": true,
+      "/usr/local/sbin/capstone-raw-operations": true,
+      "/var/backups/capstone-raw-operations-initial-20261014": true,
+      "/etc/systemd/system/capstone-raw-operations@.timer": true,
+      "/home/groot_a/capstone/secstack/logs/suricata/capstone-managed": true,
+      "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed": true
+    },
+    "operating_changes": false
+  },
+  "legacy_redeploy_guard": {
+    "native_cases": 26,
+    "deployment": {
+      "at_kst": "2026-10-14T23:30:20.022059+09:00",
+      "status": "source_applied",
+      "files": {
+        "infra/automation/ansible/vector-storage-a.yml": {
+          "before": "bdbc43df0fbb1f186fe7c53519a4a6e63f477d408f7c3e0e7c6ddd45dc86a51d",
+          "after": "b0c8bfb9fa47d6df6d7a9eb51782f699f462213ccee1afd92f98fe33583ce9aa"
+        },
+        "infra/automation/ansible/roles/vector_shadow/tasks/main.yml": {
+          "before": "a011019623035fdadbe883bedf0e6cd152b6538ae17b3f659977ac04bcb7d97f",
+          "after": "92da7439ae8a27dd707baef94e28525a274220768592042f7024165653e92d6e"
+        }
+      },
+      "backup": "/var/backups/capstone-raw-v1-redeploy-guard-20261014",
+      "services_restarted": false,
+      "operating_pipeline_changed": false
+    }
+  },
+  "initial_prepare_first_attempt": {
+    "status": "failed_before_engine_launch",
+    "reason": "container root not represented correctly by host namespace bind",
+    "original_installer_sha256": "4fc02f8713477e73cb292c099ebaf322f1503eea5de05ebd57b940ef1fb56798",
+    "preserved_at": "/var/backups/capstone-raw-operations-initial-20261014.failed-native-1",
+    "files": 45,
+    "bytes": 496466,
+    "sha_verified": true
+  },
+  "startup_barrier": {
+    "metadata_native_cases_passed": 31,
+    "actual_private_systemd": {
+      "status": "passed",
+      "guard_failures": 1,
+      "automatic_retries": 1,
+      "normal_guard_delegations": 1,
+      "successful_starts": 1,
+      "retry_interval_seconds": 30.06,
+      "manual_stop_seconds": 35,
+      "manual_stop_remained_stopped": true,
+      "fixture_removed": true,
+      "operating_guard_used": false
+    },
+    "operating_deployment": false
+  },
+  "operating_raw_rotation_deployed": true,
+  "mac_packages_installed": 0,
+  "post_native_failure_live": {
+    "at_kst": "2026-10-14T23:34:01.750224+09:00",
+    "boot_id": "bfafc2dd-a0fe-42ad-a088-e7fe6c576486",
+    "protected": {
+      "/etc/logrotate.d/capstone-secstack": {
+        "sha256": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "previous_sha256": "d352dd02da79da1da6c132cc1d7ca16dd8a19398d219547eea6fc18396a1ee3a",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/vector.toml": {
+        "sha256": "5ac09dd5cb708833fe0c2259c85aa0a587a42a67e78a1f507429dd9b825e56f7",
+        "previous_sha256": "5ac09dd5cb708833fe0c2259c85aa0a587a42a67e78a1f507429dd9b825e56f7",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/vector.env": {
+        "sha256": "f435a687b985f41c89e90ae1b36c63894a0cd96b337693b77b9017850dafc194",
+        "previous_sha256": "f435a687b985f41c89e90ae1b36c63894a0cd96b337693b77b9017850dafc194",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/waf-binding.json": {
+        "sha256": "e11b0778f62478bc951a11fb93102f06f3f567aa1d9b91269f5a640c34109d95",
+        "previous_sha256": "e11b0778f62478bc951a11fb93102f06f3f567aa1d9b91269f5a640c34109d95",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/raw-line-binding.json": {
+        "sha256": "0bd6e002aafd0ced247e0a25cee372685d364d544bc8bef20f22557e13fcfe41",
+        "previous_sha256": "0bd6e002aafd0ced247e0a25cee372685d364d544bc8bef20f22557e13fcfe41",
+        "unchanged": true
+      },
+      "/var/ossec/etc/ossec.conf": {
+        "sha256": "b27ec250b19ef0fe9cc1f999467dc24176b82035e763080b33f037a063d4ce0a",
+        "previous_sha256": "b27ec250b19ef0fe9cc1f999467dc24176b82035e763080b33f037a063d4ce0a",
+        "unchanged": true
+      },
+      "/var/ossec/etc/local_internal_options.conf": {
+        "sha256": "73252a6f47fff93d8ce62ca70a8f9196a216d5e09dc2228758fcf0b0ac77133f",
+        "previous_sha256": "73252a6f47fff93d8ce62ca70a8f9196a216d5e09dc2228758fcf0b0ac77133f",
+        "unchanged": true
+      },
+      "/usr/local/sbin/capstone-vector-maintenance": {
+        "sha256": "8413fb43747a9ddb98f8a8ed1d6df2cf67dd695698b8a81d429c13e3fcdf8f95",
+        "previous_sha256": "8413fb43747a9ddb98f8a8ed1d6df2cf67dd695698b8a81d429c13e3fcdf8f95",
+        "unchanged": true
+      },
+      "/etc/capstone-vector/logrotate.conf": {
+        "sha256": "c3c806d78b167b6ebebc26bdf00775ea57f14a9e8f150555056fda321e4b9a64",
+        "previous_sha256": "c3c806d78b167b6ebebc26bdf00775ea57f14a9e8f150555056fda321e4b9a64",
+        "unchanged": true
+      },
+      "/etc/systemd/system/capstone-vector.service": {
+        "sha256": "b6eda101c1b86e5236f6d25338895e460466556fd32426898adc53938f593854",
+        "previous_sha256": "b6eda101c1b86e5236f6d25338895e460466556fd32426898adc53938f593854",
+        "unchanged": true
+      },
+      "/etc/systemd/system/capstone-vector-maintenance.service": {
+        "sha256": "1a6c7b07f295a53c8db68bba660510fcd50c8e11b1a212355479beb296bad4ab",
+        "previous_sha256": "1a6c7b07f295a53c8db68bba660510fcd50c8e11b1a212355479beb296bad4ab",
+        "unchanged": true
+      },
+      "/home/groot_a/capstone/secstack/docker-compose.yml": {
+        "sha256": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+        "previous_sha256": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+        "unchanged": true
+      },
+      "/opt/capstone-automation/project/infra/automation/ansible/roles/vector_shadow/tasks/main.yml": {
+        "sha256": "92da7439ae8a27dd707baef94e28525a274220768592042f7024165653e92d6e",
+        "previous_sha256": "a011019623035fdadbe883bedf0e6cd152b6538ae17b3f659977ac04bcb7d97f",
+        "unchanged": false
+      }
+    },
+    "services": {
+      "capstone-vector.service": {
+        "MainPID": "1695314",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "active",
+        "SubState": "running",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "a032d3ca65464eb0b05450592b0d34b4"
+      },
+      "wazuh-agent.service": {
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "active",
+        "SubState": "running",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "38e7db23496a4fae82ca10ffaa0765eb"
+      },
+      "capstone-vector-maintenance.timer": {
+        "LastTriggerUSec": "Wed 2026-10-14 23:31:11 KST",
+        "Result": "success",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "a22628b9b1e44b49b37e51acfca0ad1d"
+      },
+      "capstone-vector-maintenance.service": {
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "DropInPaths": "",
+        "UnitFileState": "static",
+        "InvocationID": "59aab2bc19d64c518b76b205f98e47c4"
+      },
+      "capstone-vector-history-auto.timer": {
+        "LastTriggerUSec": "Wed 2026-10-14 23:33:21 KST",
+        "Result": "success",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "0dd3fc2740c84a3f929cd9599b11117b"
+      },
+      "capstone-vector-history-auto.service": {
+        "MainPID": "0",
+        "Result": "success",
+        "ExecMainStatus": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "DropInPaths": "",
+        "UnitFileState": "disabled",
+        "InvocationID": "c6f0c68d787f4f879a4c0abf30f46480"
+      },
+      "rule-change-worker.timer": {
+        "LastTriggerUSec": "Wed 2026-10-14 23:33:54 KST",
+        "Result": "success",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "DropInPaths": "",
+        "UnitFileState": "enabled",
+        "InvocationID": "93e35f31ee8b43049c5c977973ee831d"
+      }
+    },
+    "containers": {
+      "waf": {
+        "cid": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "pid": 647700,
+        "running": true,
+        "health": "healthy",
+        "start_ticks": 62394757
+      },
+      "suricata": {
+        "cid": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+        "image": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+        "pid": 1534179,
+        "running": true,
+        "health": null,
+        "start_ticks": 131705083
+      }
+    },
+    "raw": {
+      "suricata/eve.json": {
+        "device": 64512,
+        "inode": 1441879,
+        "links": 1,
+        "bytes": 20070550
+      },
+      "modsec/audit.log": {
+        "device": 64512,
+        "inode": 1441881,
+        "links": 1,
+        "bytes": 10072
+      },
+      "modsec/capstone-access.log": {
+        "device": 64512,
+        "inode": 1441928,
+        "links": 1,
+        "bytes": 810
+      }
+    },
+    "logcollector_pids": [
+      1909632
+    ],
+    "agent": {
+      "status": "'connected'",
+      "last_keepalive": "'2026-10-14 23:33:57'",
+      "last_ack": "'2026-10-14 23:33:57'",
+      "msg_buffer": "'0'"
+    },
+    "history": {
+      "policy": "bounded-previous-kernel-auto-v1",
+      "jobs": 9,
+      "ready": 0,
+      "inflight": 0,
+      "complete": 9,
+      "blocked": 0,
+      "records": 13741,
+      "bytes": 5799184,
+      "raw_payload_exported": false,
+      "operational_checkpoint_changed": false,
+      "reinjected": false,
+      "remote_receipt": false
+    },
+    "raw_line_snapshot": {
+      "schema_version": 1,
+      "scope": "periodic_snapshot_tail",
+      "observed_at_kst": "2026-10-14T23:31:12+09:00",
+      "binding_verified": true,
+      "statuses": [],
+      "sources": [
+        {
+          "source": "suricata",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 20029925,
+          "snapshot_bytes": 20029925,
+          "scanned_bytes": 20029925,
+          "max_line_bytes": 8903,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_audit",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 10072,
+          "snapshot_bytes": 10072,
+          "scanned_bytes": 10072,
+          "max_line_bytes": 2188,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        },
+        {
+          "source": "waf_access",
+          "verdict": "within_scanned_range",
+          "reason": "range_within_limit",
+          "observed_positive": false,
+          "file_stable": true,
+          "complete_snapshot_range": true,
+          "full_file_scan": true,
+          "leading_fragment_possible": false,
+          "range_start": 0,
+          "range_end": 810,
+          "snapshot_bytes": 810,
+          "scanned_bytes": 810,
+          "max_line_bytes": 405,
+          "line_limit_bytes": 1048576,
+          "scan_budget_bytes": 33554432,
+          "timeout_seconds": 5
+        }
+      ]
+    },
+    "migration_paths_absent": {
+      "/var/lib/capstone-raw-operations": true,
+      "/usr/local/lib/capstone-raw-operations": true,
+      "/usr/local/sbin/capstone-raw-operations": true,
+      "/var/backups/capstone-raw-operations-initial-20261014": true,
+      "/etc/systemd/system/capstone-raw-operations@.timer": true,
+      "/home/groot_a/capstone/secstack/logs/suricata/capstone-managed": true,
+      "/home/groot_a/capstone/secstack/logs/modsec/capstone-managed": true
+    },
+    "operating_changes": false
+  },
+  "prepare_native_second_attempt": {
+    "installer_sha256": "d4bf4f38388dadc93ff9df6a7e2f2cb0b229cf74c85052cdb16d6e8ab30f6cf2",
+    "status": "failed_before_engine_launch",
+    "exit_code": 70,
+    "diagnostic": "private_proc_not_readonly",
+    "cause": "findmnt returned both hidden old rw proc and visible new ro proc; opened FD mount ID matched visible ro mount on both engines",
+    "production_signals": 0,
+    "raw_cutover_started": false,
+    "backup_preserved": "/var/backups/capstone-raw-operations-initial-20261014.failed-native-2",
+    "preserved_files": 38,
+    "preserved_bytes": 403288,
+    "all_sha_equal": true,
+    "private_scratch_preserved": true
+  },
+  "prepare_native_success": {
+    "after_comparison": {
+      "boot_id": true,
+      "containers": true,
+      "files": true,
+      "source_sha256": true,
+      "units": true
+    },
+    "at_kst": "2026-10-14T23:43:04.394235+09:00",
+    "installer_sha256": "6dcf1556f89c8882a422cf92a3c8caa90bbdcdf71b809d0224587fe45b17db15",
+    "migration_ledger_exists": false,
+    "native": {
+      "suricata": {
+        "container_root_identity_verified": true,
+        "daemon_started": false,
+        "diagnostic_sha256": "92a314f67c2346ca1ba73e444099c5b8663120f08caceb97af554a53aa168aa8",
+        "exit_code": 0,
+        "failure_code": null,
+        "operating_configuration_unchanged": true,
+        "private_namespace": true,
+        "private_tmp_path": "/tmp/capstone-native-config-1791988924464540774",
+        "private_tmp_preserved": false,
+        "private_tmp_removed": true,
+        "production_signals": 0,
+        "protection_scope": "engine_configuration_and_container_identity"
+      },
+      "waf": {
+        "container_root_identity_verified": true,
+        "daemon_started": false,
+        "diagnostic_sha256": "a25fae63d349ebc287c2d188aa102e6eac0882f31cc75c1f69c26178611be704",
+        "exit_code": 0,
+        "failure_code": null,
+        "operating_configuration_unchanged": true,
+        "private_namespace": true,
+        "private_tmp_path": "/tmp/capstone-native-config-1791988923689938646",
+        "private_tmp_preserved": false,
+        "private_tmp_removed": true,
+        "production_signals": 0,
+        "protection_scope": "engine_configuration_and_container_identity"
+      }
+    },
+    "plan_sha256": "39ec7c6829888a3394217b98b5fbea05c89c0fc94e480ccd309fe72af7c9f40f",
+    "raw_cutover_started": false,
+    "raw_identity": {
+      "suricata": {
+        "after": {
+          "bytes": 20192561,
+          "ctime_ns": 1791988920906083336,
+          "device": 64512,
+          "gid": 998,
+          "inode": 1441879,
+          "links": 1,
+          "mode": 420,
+          "mtime_ns": 1791988920906083336,
+          "uid": 998
+        },
+        "before": {
+          "bytes": 20192561,
+          "ctime_ns": 1791988920906083336,
+          "device": 64512,
+          "gid": 998,
+          "inode": 1441879,
+          "links": 1,
+          "mode": 420,
+          "mtime_ns": 1791988920906083336,
+          "uid": 998
+        }
+      },
+      "waf": {
+        "after": {
+          "bytes": 10072,
+          "ctime_ns": 1791916009928808593,
+          "device": 64512,
+          "gid": 101,
+          "inode": 1441881,
+          "links": 1,
+          "mode": 420,
+          "mtime_ns": 1791916009928808593,
+          "uid": 101
+        },
+        "before": {
+          "bytes": 10072,
+          "ctime_ns": 1791916009928808593,
+          "device": 64512,
+          "gid": 101,
+          "inode": 1441881,
+          "links": 1,
+          "mode": 420,
+          "mtime_ns": 1791916009928808593,
+          "uid": 101
+        }
+      }
+    }
+  },
+  "initial_transaction_native": {
+    "status": "passed",
+    "tests": 32,
+    "seconds": 0.528,
+    "cutover_draft_sha256": "3156ea837162c947637bf1c81f9dcb4d4dd4bad1e1f48db551e38e932259c4bd",
+    "test_sha256": "58a88771ce2f155d2402ca1d6993d561223914f375cee5a07e865a9d48208ac0",
+    "native_filesystem_cases": 6,
+    "service_and_phase_adapters": "mocked",
+    "operating_service_calls": 0,
+    "operating_raw_access": 0,
+    "fixture_removed": true,
+    "evidence": "/var/tmp/capstone-resume-20261014/step3/cutover-test-v1/native.log",
+    "cutover_cli_disabled_during_test": true
+  },
+  "activated_cli_native": {
+    "status": "passed",
+    "tests": 34,
+    "seconds": 0.48,
+    "cutover_sha256": "2edba40717cb2482b0e286b2ed89298bbbc2da3a2153ab068b10ab9381776d44",
+    "test_sha256": "4a8ceeeb393d58db377c190919bf20f1f4744190252d8a35d067dc989ac8aa22",
+    "phase_functions_unchanged_ast": true,
+    "fixture_removed": true,
+    "first_actual_inspect": "prepared_not_started"
+  },
+  "first_install_barrier_attempt": {
+    "status": "refused_before_operating_change",
+    "reason": "configuration_permissions_changed",
+    "scanner_actual_mode": "0755",
+    "scanner_draft_expected_mode": "0700",
+    "scanner_sha256_unchanged": true,
+    "ledger_exists": false,
+    "barrier_exists": false,
+    "failed_source_preserved": "/var/backups/capstone-raw-operations-initial-20261014/operator-attempt-scanner-mode/cutover-raw-operations-a.py"
+  },
+  "actual_initial_progress": {
+    "plan_sha256": "39ec7c6829888a3394217b98b5fbea05c89c0fc94e480ccd309fe72af7c9f40f",
+    "barrier_installed": true,
+    "legacy_raw_aliases_excluded": true,
+    "suricata_same_container_restarts_sent": 1,
+    "suricata_pid_after": 1990031,
+    "suricata_raw_inode_preserved": true,
+    "ledger_sequence": 18,
+    "phase": "guards_installed",
+    "pending_intent": null,
+    "signal_armed": true,
+    "suricata_postcheck_blocker": "entrypoint recursive chown changed managed directory owner",
+    "waf_writer_switched": true,
+    "v2_readers_installed": true,
+    "suricata_entrypoint_fix": {
+      "applied_at_kst": "2026-10-15T00:30:18+09:00",
+      "installed_sha256": "eb6820266481f699306eb5730b9fd4b9276f37705450ff5cefe2eb9e3aaa9d47",
+      "managed_directory_owner_mode": "0:0:711",
+      "additional_restarts": 0,
+      "same_pid": 1990031,
+      "recreation_verified": false
+    },
+    "waf_native_owner_correction": {
+      "original_root_test": "EACCES at /tmp/nginx.pid",
+      "actual_uid_gid": "101:101",
+      "pidfile_owner": "101:101",
+      "tmp_mode": "1777",
+      "fs_protected_regular": 2,
+      "same_owner_native_test_exit": 0,
+      "separate_override_ledger_sha256": "4f78b896aaab4657890bbca850276f1f3c8d010d6ea189a06bc59caaff35d959",
+      "hup_count": 1,
+      "result_sequence": 11
+    },
+    "migration_sha256": "e8cd96edf518dcd61541088fbb6389f3fcc3014ed0221da5194e22abe1ff3cde",
+    "runtime_initial_resume_attempts": [
+      {
+        "attempt": 1,
+        "result": "new_reader_checkpoint_pending",
+        "vector_active": true
+      },
+      {
+        "attempt": 2,
+        "result": "reader_restart_guard_failed",
+        "vector_active": true,
+        "underlying_cause": "not retained; independent guards later passed"
+      },
+      {
+        "attempt": 3,
+        "result": "completed",
+        "state_active_verified": true
+      }
+    ],
+    "vector_pid_after_initial": 2055688
+  },
+  "midnight_maintenance_incident": {
+    "observed_at_kst": "2026-10-15",
+    "cause": "Output maintenance timer stopped Vector and rotated outputs between initial migration phases; blocked migration guard refused restart.",
+    "maintenance_timer": "disabled_inactive_pending_migration_completion",
+    "previous_timer_state": "enabled_active",
+    "raw_preserved": true,
+    "checkpoint_manually_rewritten": false,
+    "original_plan_before_preserved": true,
+    "recovery_guard_native_cases": 34,
+    "recovery_guard_sha256": "979cb2f390c3ebcc5dd2f314df0bf3b76b66e7a6e6b9013f2dccc81ecac0c5a6",
+    "cutover_recovery_native_cases": 45,
+    "cutover_recovery_sha256": "9109d81e28674a2329a7fb4ecafef7df8fd12511b2afdd81b6d73238af0f6266",
+    "controller_cas_native_cases": 6,
+    "controller_sha256": "ab170769a1e215a44908ff6a3d289c6ac097ceeb6312c6d7e647a99a59f12b9c",
+    "explicit_start_attempts": 1,
+    "controller_result": "poststart_check_refused; blocked guard restored and authority revoked",
+    "vector_live_after": {
+      "pid": 2011863,
+      "invocation_id": "806a7519d6cd438493b190646f09a7b0",
+      "active_state": "active",
+      "sub_state": "running",
+      "result": "success"
+    },
+    "actual_invocation_guard_pass_count": 1,
+    "poststart_only_completion": "pass",
+    "poststart_raw_current_gates_pass": 3,
+    "poststart_output_wazuh_eof_gates_pass": 2,
+    "remote_delivery_receipt_claimed": false,
+    "receipt_sha256": "b1df6e39b345156bf9e13904aa5c31a9dc8eafe41eb937897677c7ddda9c43a8",
+    "pending_archived_and_removed": true,
+    "original_blocked_guard_restored": true,
+    "authority_revoked": true,
+    "source_upgrade_sequence": 7,
+    "source_upgrade_ledger_sha256": "00f1eb063282786fa1f024235303c269f620b096a8989cfaa73b02386305328f"
+  },
+  "runtime_owner_fix": {
+    "applied_at_kst": "2026-10-15T00:44:30+09:00",
+    "original_sha256": "95f86e2db4115b929193fa9fac5c81fd4ad5cc98afc65ed3cad42dd7c950063e",
+    "installed_sha256": "2f8fdfc42c14ad7b7abd8643644a76005b415ce0f1f06cebbe6e2fc9233e3914",
+    "exact_change": "nginx -t --user 0 to --user 101:101",
+    "native_tests": 12,
+    "included_existing_regressions": [
+      30,
+      24
+    ],
+    "guards_before_after_pass": true,
+    "other_runtime_configs_states_units_unchanged": true,
+    "service_signals_sent": 0,
+    "original_plan_sources_ledger_preserved": true
+  },
+  "operating_rotation_validation": {
+    "suricata": {
+      "force_attempt": 1,
+      "first_result": "old_writer_reopen_pending",
+      "old_writer_later_closed": true,
+      "new_writer_open": true,
+      "old_inode": 1441879,
+      "new_inode": 1441999,
+      "old_bytes": 21143722,
+      "resume_1": "new_reader_checkpoint_pending",
+      "phase": "publish_pending",
+      "revision": 4,
+      "vector_pid": 2112792
+    },
+    "modsecurity": "not_started",
+    "timers_enabled": false,
+    "suricata_final": {
+      "phase": "active",
+      "revision": 5,
+      "generation": 1,
+      "inode": 1441999,
+      "old_sealed_bytes": 21143722
+    },
+    "modsecurity_final": {
+      "phase": "active",
+      "revision": 6,
+      "generation": 2,
+      "inode": 1442000,
+      "old_sealed_bytes": 1193,
+      "resume_attempts": 4,
+      "last_resume_hup_sent": 0
+    },
+    "vector": {
+      "pid": 2180571,
+      "invocation_id": "e2da354f62064b07be91f7155ea34fbe",
+      "active": true
+    },
+    "wazuh_logcollector_pid": 1909632,
+    "temporary_wazuh_path_checkpoint_missing": {
+      "recovered_naturally": true,
+      "manual_checkpoint_rewrite": false,
+      "wazuh_restart": false,
+      "exact_internal_schedule_confirmed": false
+    },
+    "post_start_guards": "both_pass",
+    "maintenance_check": {
+      "at_kst": "2026-10-15T01:05:16+09:00",
+      "binding_verified": true,
+      "collection_statuses": [],
+      "raw_line_statuses": []
+    },
+    "waf_gen2_benign_probe": {
+      "http_status": 405,
+      "bytes": 1193,
+      "messages": 0,
+      "quarantine_matches": 1,
+      "quarantine_reason": "waf_audit_message_limit",
+      "remote_alert_acknowledged": false
+    }
+  },
+  "runtime_writer_reopen_fix": {
+    "at_kst": "2026-10-15T01:01:50.199592+09:00",
+    "installed_sha256": "1400f4a255438f5b3f191ef36cfd345a5ab52b9efb71f63becd8a6a33df7a7a3",
+    "native_tests": 24,
+    "duration_seconds": 33.878,
+    "included_regressions": [
+      30,
+      24
+    ],
+    "before_after_guards": "pass",
+    "installation_service_signals": 0,
+    "original_sources_plan_ledger_preserved": true,
+    "all_uncertain_hup_retries_prevented": false
+  },
+  "operating_output_rotation": {
+    "at_kst": "2026-10-15T01:10:56.680584+09:00",
+    "status": "completed",
+    "force_calls": 1,
+    "elapsed_seconds": 92.979,
+    "preflight_refusals": 2,
+    "operation_rc": 0,
+    "vector_pid": 2212780,
+    "vector_invocation_id": "f1f9f8f275fe435493e4bd9e97717fff",
+    "wazuh_invocation_unchanged": true,
+    "output_pending": false,
+    "raw_stop_intent": false,
+    "states_unchanged": true,
+    "before_after_guards": "both_pass",
+    "maintenance_check_rc": 0,
+    "evidence_path": "/var/backups/capstone-raw-operations-initial-20261014/operating-output-rotation-attempt3",
+    "worst_case_300sec_completion_guaranteed": false
+  },
+  "delivery_observation": {
+    "cutoff_kst": "2026-10-15T00:45:00+09:00",
+    "a_at_kst": "2026-10-15T01:11:01+09:00",
+    "a_evidence_records": 153,
+    "a_files": 2,
+    "a_scanned_prefix_bytes": 340527,
+    "all_observed_nftables": true,
+    "indexable_security_leaf_records": 0,
+    "b_at_kst": "2026-10-15T01:13:10+09:00",
+    "manager_exact_hits": 0,
+    "indexer_exact_hits": 0,
+    "indexer_shards_total": 57,
+    "indexer_shards_successful": 57,
+    "indexer_timed_out": false,
+    "agent001_active": true,
+    "analysisd_dropped_events": 0,
+    "analysisd_queue_sample": 0,
+    "remoted_discarded": 0,
+    "remoted_queue_sample": 0,
+    "current_window_security_ack_verified": false,
+    "reason": "no_indexable_natural_events_in_window",
+    "new_inputs_injected": false,
+    "metadata_paths": {
+      "a": "/var/tmp/capstone-resume-20261014/step3/delivery-observation/selection-a.json",
+      "b": "/var/tmp/capstone-resume-20261014/step3/delivery-observation/result-b.json"
+    },
+    "metadata_sha256": {
+      "a": "ec35b2dbaf9d8968819e0cd55f446d01d250e955747a4127018f72a00dae37c0",
+      "b": "3f407e3dbddbf641d86ae02cdcfcbb14315b42ba47f292cbe5677934f74552cd",
+      "b_query": "21ce9595277bd30a2413092a46e1d1fdf22edb28c3ee317de53db3888515c060"
+    },
+    "b_permanent_evidence": "/var/backups/capstone-raw-operations-delivery-20261015",
+    "b_temporary_cleanup": {
+      "status": "cleaned",
+      "file_count": 2,
+      "exact_preserved_sha_verified": true,
+      "temporary_leaf_absent": true,
+      "permanent_evidence_preserved": true,
+      "operating_files_modified": false
+    }
+  },
+  "runtime_writer_intent_fix": {
+    "at_kst": "2026-10-15T01:19:54.769549+09:00",
+    "installed_sha256": "4b741931945035d1a99d953998cf2543c35d406a647ccaffcb6deb8158ee39c0",
+    "previous_sha256": "1400f4a255438f5b3f191ef36cfd345a5ab52b9efb71f63becd8a6a33df7a7a3",
+    "native_tests": [
+      28,
+      30,
+      24
+    ],
+    "native_duration_seconds": 72.43,
+    "source_tests": 2,
+    "before_after_guards": "both_pass",
+    "installation_service_signals": 0,
+    "other_runtime_configs_states_units_unchanged": true,
+    "evidence_path": "/var/backups/capstone-raw-operations-initial-20261014/runtime-writer-intent-fix"
+  },
+  "operating_writer_intent_rotation": {
+    "status": "completed",
+    "force1_result": "old_writer_observation_invalid",
+    "durable_signal_intent_preserved": true,
+    "resume1_result": "next_prefix_not_yet_distinguishable",
+    "phase_after_resume1": "old_closed",
+    "revision_after_resume1": 8,
+    "generation_pending": 3,
+    "pending_inode": 1441998,
+    "empty_next_bytes": 0,
+    "vector_pid_unchanged_during_empty_wait": 2212780,
+    "writer_intent_after_observed_reopen": false,
+    "additional_hup_on_resume1": 0,
+    "probe": {
+      "requests": 1,
+      "http_status": 405,
+      "bytes": 1193,
+      "sha256": "357c1188aa1e0e01c92c1c3ab087b406af1d9413e4384e640ea053ea208850de",
+      "messages": 0
+    },
+    "total_benign_http_requests_this_resumption": 4,
+    "phase": "active",
+    "revision": 11,
+    "current_generation": 3,
+    "inode": 1441998,
+    "resume_attempts": 4,
+    "vector_pid": 2316372,
+    "vector_auto_restart_observed": true,
+    "wazuh_restart": false,
+    "checkpoint_manual_rewrite": false,
+    "transient_other_source_guard_refusal": "existing_native_cursor_unsafe"
+  },
+  "maintenance_raw_guard_fix": {
+    "at_kst": "2026-10-15T01:26:44.569383+09:00",
+    "original_sha256": "8413fb43747a9ddb98f8a8ed1d6df2cf67dd695698b8a81d429c13e3fcdf8f95",
+    "installed_sha256": "2334ba3697cd98a445a5ab83dfa4ba044775868e9ed7a2be9e8ed0cceef0a921",
+    "native_tests": 36,
+    "before_after_guards": "both_pass",
+    "installation_service_signals": 0,
+    "other_runtime_configs_states_units_unchanged": true,
+    "actual_force_validation": {
+      "status": "completed",
+      "at_kst": "2026-10-15T01:31:13.161321+09:00",
+      "actual_force_calls": 1,
+      "elapsed_seconds": 127.617,
+      "operation_rc": 0,
+      "vector_pid": 2368467,
+      "vector_invocation_id": "335851e515254887946d926a6676e6e8",
+      "wazuh_invocation_unchanged": true,
+      "output_pending": false,
+      "raw_stop_intent": false,
+      "states_unchanged": true,
+      "after_guards": "both_pass",
+      "maintenance_check_rc": 0,
+      "evidence_path": "/var/backups/capstone-raw-operations-initial-20261014/operating-output-rotation-guarded-attempt2",
+      "additional_external_preflight_refusals": 1
+    }
+  },
+  "waf_coldstart_review": {
+    "status": "same_container_restart_passed_timers_pending",
+    "current_running_target_sha256": "814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb",
+    "old_template_and_intermediate_sha256": "1063145a6a20922d17b7c75afee4938883d6d57f2b7584b33a085cf8291c3198",
+    "actual_restart_performed": true,
+    "reason": "startup envsubst and copy would restore old override",
+    "native_verification": {
+      "completed_at_kst": "2026-10-15T01:37:08.774241+09:00",
+      "status": "passed",
+      "verifier_sha256": "4ffef980cc3f04e5ab0dc505e7339e8e20f32904e2d588a287bf6182ce1590d8",
+      "result_sha256": "139fa3cb223f7fc506ef616d44c3a3a5f7ad62bad0e67299dac636274d64deae",
+      "cas_plan_sha256": "0a81a7d0ac59458e4b32f96f80c1fe8ebf03f3330151a4c54b235aec71c823a1",
+      "private_tree_removed": true,
+      "operating_sources_unchanged": true
+    },
+    "applied_at_kst": "2026-10-15T01:40:23.212179+09:00",
+    "apply_script_sha256": "e9eb5bd33aa0478c87ff4746128c1bfe219c27785ce0ee739ba6ffb6af9a9662",
+    "changed_paths": [
+      "/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template",
+      "/etc/nginx/modsecurity.d/modsecurity-override.conf"
+    ],
+    "template_first": true,
+    "live_target_producer_configs_states_runtime_raw_identity_unchanged": true,
+    "service_signals_sent": 0,
+    "evidence_path": "/var/backups/capstone-raw-operations-initial-20261014/waf-coldstart-override-fix",
+    "apply_result_sha256": "dc62bdbe9de017db775172991bb3db6d9b31fce5de46d2a25c8016128c6bf1cb",
+    "actual_restart": {
+      "at_kst": "2026-10-15T01:48:58.037427+09:00",
+      "status": "passed",
+      "script_sha256": "4f8592b1627344fed0366fc81e69300ee07ff67d1795677f64a07529c55f1f63",
+      "result_sha256": "9f2e2811e04da112c3155557a0f261ec25cb0b2886813c4d56e600bed226e1ee",
+      "old_pid": 647700,
+      "new_pid": 2377669,
+      "same_container": true,
+      "healthy": true,
+      "restart_requests": 1,
+      "graceful_exit_zero": true,
+      "forced_kill_observed": false,
+      "guards_before_after": "passed",
+      "raw_prefix_and_sealed_generations_preserved": true,
+      "configs_states_and_readers_unchanged": true,
+      "host_reboot_tested": false,
+      "new_container_creation_tested": false,
+      "evidence_path": "/var/backups/capstone-raw-operations-initial-20261014/waf-coldstart-validation"
+    }
+  },
+  "timer_activation": {
+    "status": "passed",
+    "attempts": [
+      {
+        "at_kst": "2026-10-15T01:51:50.319152+09:00",
+        "script_sha256": "166c227a30e84a697dcf1f62d8b451b23dfe1bddbe1ac4ec78fe87814fa2e0f0",
+        "reason": "configuration_permissions_changed",
+        "cause": "verification expected CLI0700 while installed administrator executable is0500",
+        "enable_calls": 0
+      },
+      {
+        "at_kst": "2026-10-15T01:53:16.436048+09:00",
+        "script_sha256": "e1894627b1430e789264e9a68721e8450f34dfd0ba59aa3aeaa06db0c6821c52",
+        "reason": "output_rotation_already_due_or_unknown",
+        "enable_calls": 0
+      }
+    ],
+    "output_debug": {
+      "at_kst": "2026-10-15T01:54:29+09:00",
+      "read_only": true,
+      "previous_stored_rotation": "2026-10-14 16:29",
+      "current_local_time": "2026-10-15 01:54",
+      "due": [
+        "ready",
+        "evidence",
+        "telemetry"
+      ],
+      "not_due_empty": [
+        "quarantine"
+      ],
+      "interpretation": "Prior administrator force used UTC environment; timer uses host KST, so daily calendar rotation is due. No manual state editing; next verification allows normal maintenance rotation."
+    },
+    "v3": {
+      "script_sha256": "e7059f4ae143b7dc95953c9de0404dce6626000ae35a4cd8b75d141e00a97c68",
+      "failure_at_utc": "2026-10-14T17:06:28.166466+00:00",
+      "failure": "maintenance_rotation_events_not_exact",
+      "raw_timers_enabled_and_first_ticks_passed": 2,
+      "maintenance_timer_disabled_after_postcheck_failure": true,
+      "maintenance_service_result": "success",
+      "maintenance_service_exit_status": 0,
+      "vector_pid": 2406117,
+      "vector_invocation": "12314ddc66e14e0083b08db2e51fc831",
+      "actual_journal_observation": {
+        "same_unit_invocation": "62e8df3a5c524c8c9446502a2661a9ba",
+        "trusted_unit_events": [
+          "writer_paused_reader_drained",
+          "rotation_completed"
+        ],
+        "intermediate_tagged_event": "rotated_current_reader_ready",
+        "intermediate_event_unit_and_invocation_fields_present": false
+      },
+      "original_activation_not_repeated": true,
+      "evidence_path": "/var/backups/capstone-raw-operations-initial-20261014/timer-activation"
+    },
+    "postcheck_attempts": [
+      {
+        "source_sha256": "7014db596cbd81b841a6bd6d92c2adf1fdebe39ab013fe5780ff87979ff28ca4",
+        "at_utc": "2026-10-14T17:12:45.245468+00:00",
+        "status": "preflight_refused",
+        "reason": "maintenance_service_changed_since_v3",
+        "enable_calls": 0,
+        "fresh_service_observation": {
+          "ActiveState": "inactive",
+          "SubState": "dead",
+          "MainPID": "0",
+          "Result": "success",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "ExecMainStartTimestampMonotonic": "0",
+          "ExecMainExitTimestampMonotonic": "0",
+          "InvocationID": ""
+        },
+        "interpretation": "inactive unit execution metadata reset; saved completion and journal remain authoritative for the finished run"
+      },
+      {
+        "source_sha256": "a89136442585ff820395259d50150ddc76a4c8b6fa0539fa56fc544c93b91498",
+        "at_utc": "2026-10-14T17:14:30.960476+00:00",
+        "status": "preflight_deferred",
+        "reason": "start_guard_deferred",
+        "enable_calls": 0,
+        "followup_both_guards": "ready",
+        "followup_storage_check": "ok",
+        "postcheck_evidence_directory_absent": true,
+        "original_guard_failure_internal_reason": "not captured; transient checkpoint update is an inference"
+      }
+    ],
+    "completion": {
+      "at_kst": "2026-10-15T02:15:39.053777+09:00",
+      "source_sha256": "a89136442585ff820395259d50150ddc76a4c8b6fa0539fa56fc544c93b91498",
+      "status": "passed",
+      "completed_timers": [
+        "capstone-raw-operations@suricata.timer",
+        "capstone-raw-operations@modsecurity.timer",
+        "capstone-vector-maintenance.timer"
+      ],
+      "prior_raw_initial_ticks": 2,
+      "prior_normal_maintenance_rotation_verified": true,
+      "rotated_outputs": 3,
+      "new_maintenance_tick": "not_due",
+      "new_enable_calls": 1,
+      "raw_timer_enable_calls": 0,
+      "raw_state_unchanged": true,
+      "wazuh_identity_unchanged": true,
+      "final_vector_pid": 2406117,
+      "final_vector_invocation_id": "12314ddc66e14e0083b08db2e51fc831",
+      "original_v3_failure_preserved": true,
+      "auxiliary_logger_event_is_invocation_receipt": false,
+      "force_requested": false,
+      "checkpoint_rewritten": false,
+      "raw_deleted": false,
+      "host_reboot_tested": false,
+      "delivery_acknowledged": false,
+      "evidence_path": "/var/backups/capstone-raw-operations-initial-20261014/timer-activation-postcheck",
+      "postcheck_sha256": "ca91732793baf73afb6fb1bd5d40df52b90c453b15d448c8ef3c2f680256587c",
+      "result_sha256": "a0725c8085ba8bc7bf0c717eb5e3d6a96ae23393d1bdedd8f0d05672783edc8d",
+      "final_three_timers": "enabled/active/waiting"
+    }
+  },
+  "closure": {
+    "completed_at_kst": "2026-10-15T02:20:55+09:00",
+    "source_snapshot": {
+      "files": 267,
+      "bytes": 2077701,
+      "manifest_sha256": "c11d9bc089d4602a75e1abd8c6cc57a09e7d1c80d45681bff3719bac3f8f7422",
+      "all_hashes_verified": true
+    },
+    "archive": {
+      "path": "/var/backups/capstone-raw-operations-initial-20261014/resume-evidence-20261015",
+      "step3_files": 515,
+      "step3_bytes": 4621609,
+      "leftover_files": 8,
+      "leftover_bytes": 98071,
+      "receipt_sha256": "649c4ccdadff9123f62dd66046d40cdb62a38e7da9b641e53c0133738c53f55b"
+    },
+    "a_cleanup": {
+      "at_kst": "2026-10-15T02:19:46.479150+09:00",
+      "receipt_sha256": "e2bd4362c18a2a18ed729191bad4dcce261607354bb79657b3d9edafd8d9deb5",
+      "step3_removed": true,
+      "leftover_removed": true,
+      "unused_v1_recovery_guard_removed": true,
+      "migration_start_guard_preserved": true,
+      "operating_unchanged": true,
+      "services_signalled": false,
+      "checkpoint_rewritten": false
+    },
+    "mac_cleanup": {
+      "removed_files": 650,
+      "removed_directories_including_root": 55,
+      "bytes": 5318295,
+      "path_absent": true,
+      "packages_installed": 0,
+      "next_stage_ssh_helper_only_in_separate_temporary_directory": true
+    },
+    "postcleanup": {
+      "both_migration_guards": "ready",
+      "storage": "ok",
+      "vector": "active",
+      "recovery": "no",
+      "collection": [],
+      "raw_line_statuses": [],
+      "three_timers": "enabled/active/waiting",
+      "additional_source_snapshot_scripts_checksums": "all_equal"
+    },
+    "documentation_note": "This closure and later documents postdate the 267-file archived snapshot; permanent live cleanup receipt is separate."
+  }
+}

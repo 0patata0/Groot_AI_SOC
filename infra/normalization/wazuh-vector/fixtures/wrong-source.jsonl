@@ -1,0 +1,1 @@
+{"capstone_norm":{"schema_version":"vector-1","pipeline":"vector","source":"unsupported-device","sensor":"synthetic-validation","event_id":"0000000000000000000000000000000000000000000000000000000000000000","source_ip":"192.0.2.40","destination_ip":"198.51.100.20","rule_ids":["1000999"],"action":"allowed","event_time_kst":"2026-10-14T01:00:00.000000+09:00"}}

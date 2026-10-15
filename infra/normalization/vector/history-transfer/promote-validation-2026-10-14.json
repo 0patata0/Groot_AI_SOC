@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "suite": "native_history_upload_promotion_synthetic",
+  "verified_at_kst": "2026-10-14T10:55:48.783489+09:00",
+  "host": "B",
+  "passed": 33,
+  "failed": 0,
+  "public_wrapper_called": false,
+  "operational_paths_used": false,
+  "source_user_uid": 1000,
+  "raw_payload_exported": false,
+  "synthetic_fixture_residual_count": 0,
+  "tools": {
+    "bash": "GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)",
+    "coreutils": "dd (coreutils) 9.4",
+    "jq": "jq-1.7"
+  },
+  "source_sha256": {
+    "history-transfer/promote-upload.sh": "66f9dfc4be7b04717b64a690e05fd8e6fe208993ded7875fa613071532362924",
+    "history-transfer/receive-lib.sh": "d6056aa404508352abda247f09e3242615fe8cfcdb16a9333c1863c8d4dd884e",
+    "history-transfer/test-promote.sh": "317f50ead4c2715915c03e0191cf4b5c66d09f59914c32b71a2f6dfd3c27a003",
+    "history-transfer/validate-manifest.jq": "84583156c2389c1fbc213b614c05e2f51e5d8979c6488b5691be68d2685c2ae3",
+    "history/validate-records.jq": "2470fab15dfde40540d60a3e47f4de8a6f5520f46acb231d1067895c770ffaa9"
+  },
+  "coverage": [
+    "exact payload and manifest hashes, manifest policy and internal metadata",
+    "root 0700 directories and 0400 single-link promoted files",
+    "UID 1000 source ownership, private modes, symlink, hardlink, FIFO and extra-file refusal",
+    "32 MiB payload and 64 KiB manifest limits, free-space refusal",
+    "shared receiver lock contention",
+    "source file and directory change during bounded snapshot",
+    "partial copy cleanup and original upload preservation",
+    "file fsync failure, rename failure, no-clobber rename no-op refusal",
+    "post-publication fsync failure with exact idempotent retry",
+    "lost response followed by reuse without duplicate publication",
+    "existing destination tamper refusal without overwrite",
+    "existing destination reuse even after the upload is unavailable"
+  ],
+  "earlier_fixture_failure": {
+    "reason": "The synthetic manifest contained a 35-character boot ID; the source records and validator argument used the required 32 characters.",
+    "resolution": "Corrected the fixture literal and reran all 33 cases successfully. The promotion implementation did not change.",
+    "operational_effect": "none"
+  },
+  "limits": [
+    "Synthetic fault hooks do not prove hardware persistence across real power loss or disk failure.",
+    "promoted_input is a root-private receiver input publication, not a remote file receipt or a Wazuh/Indexer acknowledgement.",
+    "Batch limits and free-space checks are enforced; no whole-store quota or automatic retention is introduced.",
+    "This evidence does not claim an operational journal transfer. Parent-coordinated network and operational tests are recorded separately."
+  ]
+}

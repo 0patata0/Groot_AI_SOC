@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh Groot_B Mattermost TPNS-only IPv4 egress
+After=network-online.target docker.service capstone-nat.service
+Wants=network-online.target capstone-nat.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -B /usr/local/sbin/capstone-push-egress.py --apply
+TimeoutStartSec=45
+UMask=0077
+NoNewPrivileges=true

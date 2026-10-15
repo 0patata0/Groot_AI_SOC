@@ -1,0 +1,135 @@
+{
+  "kind": "isolated_analysisd_diagnosis_summary",
+  "checked_at_kst": "2026-10-14T13:10:32.897870+09:00",
+  "scope": "synthetic_agent000_private_analysisd_only",
+  "production_changes": false,
+  "packages_installed": false,
+  "new_accounts_or_services": false,
+  "studies": [
+    {
+      "artifact": "matrix-validation-2026-10-14.json",
+      "sha256": "9e352640f224d9980c995109bad76dcac9cdb3e81d78714b68b78de88a332741",
+      "mode": "matrix",
+      "source_sha256": "2771db067de4ad64c35727a19ba5bf52940d9a8dfe33d556b421a76e6d30052b",
+      "arms": [
+        {
+          "profile": "auto",
+          "cases": 12,
+          "input_and_exact_archive_rows": 156,
+          "runtime_total_threads": 50,
+          "mismatch_cases": 1,
+          "missing_repeat_100293_cases": 1,
+          "missing_forward_100294_cases": 0,
+          "unexpected_reverse_100294_cases": 0,
+          "expected_leaf_events": 18,
+          "actual_leaf_events": 17,
+          "all_alert_writers_drained": true,
+          "mismatch_by_identity": {
+            "reused": 1,
+            "fresh": 0
+          }
+        },
+        {
+          "profile": "decode-single",
+          "cases": 12,
+          "input_and_exact_archive_rows": 156,
+          "runtime_total_threads": 47,
+          "mismatch_cases": 3,
+          "missing_repeat_100293_cases": 3,
+          "missing_forward_100294_cases": 0,
+          "unexpected_reverse_100294_cases": 0,
+          "expected_leaf_events": 18,
+          "actual_leaf_events": 15,
+          "all_alert_writers_drained": true,
+          "mismatch_by_identity": {
+            "reused": 1,
+            "fresh": 2
+          }
+        },
+        {
+          "profile": "rules-single",
+          "cases": 12,
+          "input_and_exact_archive_rows": 156,
+          "runtime_total_threads": 47,
+          "mismatch_cases": 0,
+          "missing_repeat_100293_cases": 0,
+          "missing_forward_100294_cases": 0,
+          "unexpected_reverse_100294_cases": 0,
+          "expected_leaf_events": 18,
+          "actual_leaf_events": 18,
+          "all_alert_writers_drained": true,
+          "mismatch_by_identity": {
+            "reused": 0,
+            "fresh": 0
+          }
+        },
+        {
+          "profile": "single",
+          "cases": 12,
+          "input_and_exact_archive_rows": 156,
+          "runtime_total_threads": 44,
+          "mismatch_cases": 0,
+          "missing_repeat_100293_cases": 0,
+          "missing_forward_100294_cases": 0,
+          "unexpected_reverse_100294_cases": 0,
+          "expected_leaf_events": 18,
+          "actual_leaf_events": 18,
+          "all_alert_writers_drained": true,
+          "mismatch_by_identity": {
+            "reused": 0,
+            "fresh": 0
+          }
+        }
+      ]
+    },
+    {
+      "artifact": "native-only-validation-2026-10-14.json",
+      "sha256": "8751b0e78fd8ba7ab801c335d648b88ae4816ef8651c39ea4692971710597ba5",
+      "mode": "native-only",
+      "source_sha256": "605f5296dc104c16b528cf6639dbe0a8167bdd5b0d13b8431b4d20f4759f3821",
+      "arms": [
+        {
+          "profile": "auto",
+          "cases": 20,
+          "input_and_exact_archive_rows": 260,
+          "runtime_total_threads": 50,
+          "mismatch_cases": 13,
+          "missing_repeat_100293_cases": 8,
+          "missing_forward_100294_cases": 7,
+          "unexpected_reverse_100294_cases": 0,
+          "expected_leaf_events": 40,
+          "actual_leaf_events": 25,
+          "all_alert_writers_drained": true,
+          "mismatch_by_identity": {
+            "reused": 6,
+            "fresh": 7
+          }
+        },
+        {
+          "profile": "single",
+          "cases": 20,
+          "input_and_exact_archive_rows": 260,
+          "runtime_total_threads": 44,
+          "mismatch_cases": 0,
+          "missing_repeat_100293_cases": 0,
+          "missing_forward_100294_cases": 0,
+          "unexpected_reverse_100294_cases": 0,
+          "expected_leaf_events": 40,
+          "actual_leaf_events": 40,
+          "all_alert_writers_drained": true,
+          "mismatch_by_identity": {
+            "reused": 0,
+            "fresh": 0
+          }
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "No operational remoted/agent001/WDB/Indexer/notification path was exercised.",
+    "Bounded observations do not prove production loss rate or unconditional serial-mode correctness.",
+    "Past canary full input receipts are unavailable; its exact interleaving cannot be reconstructed.",
+    "Archive order is not an input dequeue or history insertion order trace.",
+    "Production thread settings and existing rule files were not changed."
+  ]
+}

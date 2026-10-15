@@ -1,0 +1,92 @@
+{
+  "recorded_at_kst": "2026-10-14T10:56:22+09:00",
+  "operation": "previous_boot_closed_batch_file_preservation_A_to_B",
+  "native_synthetic_tests": {
+    "history_export": 25,
+    "history_continuation": 24,
+    "receiver": 41,
+    "promotion": 33,
+    "source_receipt": 21
+  },
+  "network_fixture": {
+    "records": 3,
+    "bytes": 666,
+    "strict_ssh_pin": true,
+    "direct_A_to_B_rsync": true,
+    "first_receive_reply_discarded": true,
+    "retry_reused_first_receipt": true,
+    "unique_B_batches": 1,
+    "source_receipt_repeat_reused": true,
+    "receipt_sha256": "6c4b79aaaa4c6d9e8202a0d3e40d2f4ae69c524303739929114c8010dbbd30ca"
+  },
+  "actual": {
+    "batches": 2,
+    "records": 1481,
+    "payload_bytes": 621820,
+    "receipts": [
+      {
+        "batch_id": "67f858b9c78551e3ca95cd3bc9948cf9ded19834d1e0d9d9f78b4bb4c95fd33a",
+        "bytes": 418810,
+        "manifest_sha256": "067728c72a202e44c7244a29b3c403a6ca7533587d4ad18d1d11984f8d531ec3",
+        "payload_sha256": "4f3fd39e4bd0e63eca07e00e5dac4515f59b473a401c97e84ed206d568f1128d",
+        "receipt_sha256": "77ca04a6d2c98dac34df4e5d196cfca82331efb16153c72a0078c4bc8dd7e0a5",
+        "received_at_kst": "2026-10-14T10:55:45+09:00",
+        "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+        "records": 1000,
+        "reused": true,
+        "schema_version": "1",
+        "source_machine_id": "096e90b6243e438aa8a7b392be754732",
+        "source_policy": "previous-kernel-batch-v1",
+        "stage": "remote_file_preserved",
+        "store_id": "capstone-history-receipts-v1"
+      },
+      {
+        "batch_id": "bf58e25ad123f6d84c54b66ced22e186750c2328f67d59439b1bccb4c47fae68",
+        "bytes": 203010,
+        "manifest_sha256": "18c79f4f8473da11bd7edf5e6f472e22aeb4d43c5fb2dcc5e08117ea87f4e697",
+        "payload_sha256": "5e96e0e71bb8c67bf5e751c5d71fca467d26058440229503fe45c8036e70fe58",
+        "receipt_sha256": "cb2c58d790774b723506d0bcea67c2384137fb5252c50cabd733b7ec199bb42d",
+        "received_at_kst": "2026-10-14T10:55:46+09:00",
+        "receiver_machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+        "records": 481,
+        "reused": true,
+        "schema_version": "1",
+        "source_machine_id": "096e90b6243e438aa8a7b392be754732",
+        "source_policy": "previous-kernel-continuation-v1",
+        "stage": "remote_file_preserved",
+        "store_id": "capstone-history-receipts-v1"
+      }
+    ],
+    "receiver_repeat_reused": true,
+    "source_receipt_first_and_repeat_succeeded": true,
+    "original_payload_and_manifest_unchanged": true,
+    "fixed_source_range_observed_end": true
+  },
+  "source_transport": {
+    "existing_ssh_and_rsync": true,
+    "new_accounts_keys_sudo_or_mcp_permissions": false,
+    "root_sealed_memfd_for_one_operation": true,
+    "secret_regular_file_argv_environment_or_log_written": false,
+    "raw_or_cursor_exported_to_mac": false,
+    "metadata_receipt_relay_via_authenticated_management_ssh": true
+  },
+  "boundaries": {
+    "stage": "remote_file_preserved",
+    "wazuh_analysis_ack": false,
+    "indexer_ack": false,
+    "reinjected": false,
+    "operational_checkpoint_changed": false,
+    "source_deleted": false,
+    "power_failure_tested": false,
+    "physical_disk_failure_tested": false,
+    "original_missing_ack_boundary_known": false,
+    "automatic_daemon_or_timer_added": false
+  },
+  "post_verification": {
+    "checked_at_kst": "2026-10-14T10:57:35+09:00",
+    "A_B_services_and_containers_unchanged": true,
+    "unique_cursors_each_copy": 1481,
+    "all_payload_manifest_receipt_sha_verified": true
+  },
+  "finalization_record": "cleanup-2026-10-14.json"
+}

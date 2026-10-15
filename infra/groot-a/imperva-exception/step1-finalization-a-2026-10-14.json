@@ -1,0 +1,103 @@
+{
+  "kind": "step1_a_finalization",
+  "status": "complete",
+  "at_kst": "2026-10-14T19:36:37.911533+09:00",
+  "permanent_evidence_directory": "/opt/capstone-automation/project/evidence/short-priority-20261014",
+  "source_files": 33,
+  "source_bytes": 274906,
+  "original_step1_files": 25,
+  "original_step1_bytes": 221158,
+  "raw_snapshots": 17,
+  "all_source_sha_matched": true,
+  "project_documents": [
+    {
+      "relative_path": "infra/groot-a/imperva-exception/README.md",
+      "before": {
+        "sha256": "298bda5dfea0c58ec43191867c51ae8a780ff1d94985ad6c41e3405081ac6cb5",
+        "bytes": 11196,
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o600"
+      },
+      "after_sha256": "a5ac9fd215a5b7794091464b17da627ba0f0be1e60026f9307d8c8df8def115a",
+      "after_bytes": 12895
+    },
+    {
+      "relative_path": "infra/groot-a/imperva-exception/followup-2026-10-14.json",
+      "before": null,
+      "after_sha256": "4165c89a5c99d8365678ede4b79833ebc561860c0c843ab2ef194d91e0705cfc",
+      "after_bytes": 10469
+    },
+    {
+      "relative_path": "infra/groot-a/imperva-exception/indexer-followup-2026-10-14.json",
+      "before": null,
+      "after_sha256": "515af3e00fa8928a8c238e929f94bb8c1d0dd1c1dd06c6ca9ade13a16cd72b27",
+      "after_bytes": 630
+    }
+  ],
+  "record_sha256": {
+    "preservation-manifest.json": "c23c2be5c5e82c6b4ff318ddb0f81619f1a5c1931dc6d7a2ef48d754bc37b8df",
+    "preservation.json": "0d74bc4343c92840db6458636dd9cc53da6219490bdff0d776a972e534e48645",
+    "cleanup.json": "d72287ccb2f4a58e2e99f990a8b704163e8187bdcf3459f1d9b691ea0b596d9c",
+    "postcleanup.json": "9d9d370e925df5ff4ecf094064e60aa31ea237d24b9ee6c5b2bcfa09350cd52b"
+  },
+  "original_result_sha256": "01668ca5958817b813fdcbdbb1ae62539a367748e36e914601e9e656a3a227d3",
+  "original_analysis_sha256": "0052cf8aea03c1f3363f9ad2440979ca48621d98cc1e95eba7fe86703d11c8ac",
+  "waf": {
+    "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+    "pid": 647700,
+    "started_at": "2026-10-05T10:18:45.433754298Z",
+    "running": true,
+    "health": "healthy"
+  },
+  "all_container_identity_pid_startedat_unchanged": true,
+  "four_services_active_and_identity_unchanged": true,
+  "protected_file_count": 14,
+  "protected_files_sha_metadata_unchanged": true,
+  "exception_sha256": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+  "compose_sha256": "5f41d56c42f00d625b2ec3bec3f355f9599e8a38fa824f9baa193bcce2dd5d60",
+  "original_step1_waf_identity_exception_match": true,
+  "all_service_pids_compared_only_across_preservation_interval": true,
+  "stage_removed": "/var/tmp/capstone-short-priority-20261014",
+  "stage_absent": true,
+  "operational_changes": false,
+  "raw_exported": false,
+  "B_accessed": false,
+  "new_packages_installed": 0,
+  "chat_posts": 0,
+  "model_calls": 0,
+  "initial_preflight_attempts": [
+    {
+      "outcome": "stopped_before_copy",
+      "cause": "host_proc_root_absolute_symlink_resolution",
+      "fix": "fixed_CID_docker_exec_sha256sum_stat_only"
+    }
+  ],
+  "evidence_file_mode": "0400",
+  "evidence_directory_mode": "0700",
+  "evidence_owner": "root:root",
+  "raw_snapshot_bytes": 117782,
+  "server_project_document_backups_directory": "/opt/capstone-automation/project/evidence/short-priority-20261014/project-backup",
+  "initial_preflight_failed_runs": 2,
+  "initial_preflight_failure_detail": "Both pre-copy checks stopped while resolving a container intermediate absolute symlink via host /proc/PID/root. The Docker mount destination was correct. Fixed-CID sha256sum/stat inside the existing container resolved it without editing runtime files.",
+  "raw_snapshot_new_path": "/opt/capstone-automation/project/evidence/short-priority-20261014/step1-a/raw-snapshot",
+  "analysis_source_new_path": "/opt/capstone-automation/project/evidence/short-priority-20261014/step1-a/analysis-source.py",
+  "old_stage_paths_in_preserved_history_are_historical": true,
+  "interpretation": "This verifies evidence preservation and cleanup, not natural Imperva exception effectiveness. No new target request was observed in the earlier bounded read-only follow-up.",
+  "current_metadata_export_sha256": "59477440a7a23816411420f7035f93a257701f8eaa6bdee58acc61420c766831",
+  "temporary_paths": {
+    "A_task_stage_removed": "/var/tmp/capstone-short-priority-20261014",
+    "B_touched": false,
+    "mac_shared_task_directory_preserved": "/private/tmp/capstone-short-priority-20261014.trt3rndm",
+    "new_local_items_for_parent_cleanup": [
+      "preserve-step1-preflight-a.sh",
+      "identify-groot-path-a.sh",
+      "finalize-step1-a-body.py",
+      "finalize-step1-a.sh",
+      "step1-finalization-a-result.json",
+      "step1-finalize-input/"
+    ],
+    "mac_package_cache_venv_bytecode_created": false,
+    "other_private_temp_created": false
+  }
+}

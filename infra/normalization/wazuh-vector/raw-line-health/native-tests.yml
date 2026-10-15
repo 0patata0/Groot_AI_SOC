@@ -1,0 +1,8 @@
+---
+- name: Run installed, correlation, health and evidence native fixtures only
+  ansible.builtin.command:
+    argv: [/usr/bin/timeout, -k, '5', '420', /bin/sh, "{{ transaction.path }}/tests/{{ item }}"]
+  environment:
+    CAPSTONE_WAZUH_MANAGER: "{{ pin.manager_id }}"
+  loop: "{{ regression_scripts }}"
+  changed_when: false

@@ -1,0 +1,45 @@
+[Unit]
+Description=Capstone Vector security log normalization
+After=local-fs.target systemd-journald.service
+RequiresMountsFor=/var/lib/capstone-vector /var/log/capstone-vector
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=simple
+User=root
+Group=root
+UMask=0077
+WorkingDirectory=/etc/capstone-vector
+EnvironmentFile=/etc/capstone-vector/vector.env
+Environment=VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION=true
+# 0.59 file-source errors can contain raw truncated bytes. Keep numeric metrics.
+Environment="VECTOR_LOG=info,vector::internal_events::file::source=off"
+ExecStartPre=/usr/local/bin/vector validate --no-environment /etc/capstone-vector/vector.toml
+ExecStart=/usr/local/bin/vector --config /etc/capstone-vector/vector.toml
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=60
+# Bound process memory; this is host protection, not a throughput guarantee.
+MemoryHigh=384M
+MemoryMax=512M
+StateDirectory=capstone-vector
+StateDirectoryMode=0700
+LogsDirectory=capstone-vector
+LogsDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/capstone-vector /var/log/capstone-vector
+PrivateTmp=true
+PrivateDevices=true
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

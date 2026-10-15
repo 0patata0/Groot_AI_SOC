@@ -1,0 +1,24 @@
+[Unit]
+Description=Preserve A closed kernel history batches on B
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+Environment=TZ=Asia/Seoul
+ExecStart=/usr/local/sbin/capstone-history-auto-transfer run
+TimeoutStartSec=620
+KillMode=control-group
+Restart=no
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/capstone-history-auto-transfer /var/lib/capstone-history-receipts
+RestrictAddressFamilies=AF_UNIX AF_INET
+LimitNOFILE=256
+MemoryMax=512M
+

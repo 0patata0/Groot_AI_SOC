@@ -1,0 +1,165 @@
+{
+  "chat_messages_sent": 0,
+  "container": {
+    "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+    "pid": 2248019,
+    "running": true,
+    "start_ticks": "142451910",
+    "started_at": "2026-10-14T18:01:25.884012857Z"
+  },
+  "cutoff_epoch": 1792023751.3442335,
+  "cutoff_kst": "2026-10-15T09:22:31.344234+09:00",
+  "generated_requests": 0,
+  "guard_journal": {
+    "all_response_denominator_available": false,
+    "correction_failures_separately_observable": false,
+    "fallback_notices_separately_observable": false,
+    "journal_records": 0,
+    "other_tag_records_ignored": 0,
+    "status": "observed_subset",
+    "windows": {
+      "recent24h": {
+        "end_epoch": 1792023751.3442335,
+        "end_kst": "2026-10-15T09:22:31.344234+09:00",
+        "start_epoch": 1791937351.3442335,
+        "start_kst": "2026-10-14T09:22:31.344234+09:00",
+        "verdict_counts": {
+          "filtered": 0,
+          "oversize": 0,
+          "requested_foreign": 0,
+          "retained": 0
+        }
+      },
+      "recent5h": {
+        "end_epoch": 1792023751.3442335,
+        "end_kst": "2026-10-15T09:22:31.344234+09:00",
+        "start_epoch": 1792005751.3442335,
+        "start_kst": "2026-10-15T04:22:31.344234+09:00",
+        "verdict_counts": {
+          "filtered": 0,
+          "oversize": 0,
+          "requested_foreign": 0,
+          "retained": 0
+        }
+      }
+    }
+  },
+  "guard_sources": {
+    "/opt/hermes/capstone_korean_output_guard.py": {
+      "expected_match": true,
+      "gid": 0,
+      "mode": "0o644",
+      "sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+      "uid": 0
+    },
+    "/opt/hermes/gateway/run_turn.py": {
+      "expected_match": true,
+      "gid": 0,
+      "mode": "0o644",
+      "sha256": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a",
+      "uid": 0
+    },
+    "/opt/hermes/plugins/platforms/mattermost/adapter.py": {
+      "expected_match": true,
+      "gid": 0,
+      "mode": "0o644",
+      "sha256": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+      "uid": 0
+    }
+  },
+  "kind": "hermes_production_metadata_observation",
+  "limits": [
+    "Observer reports only guarded cases; zero filtered is not a full-response language contamination rate.",
+    "filtered combines correction and fallback; no transcript or fallback text is read.",
+    "retained/requested_foreign may be legitimate quoted or explicitly requested text.",
+    "Stored timestamp intervals are not measured send latency, model latency or approval duration.",
+    "Retained DB/journal may omit earlier/deleted data; no complete denominator or window coverage is claimed."
+  ],
+  "model_calls": 0,
+  "observer_source_sha256": "6865d2f3b259959b19f3f19acf5eb38f721aa2ef0252a6cd85fbfc35d15d2d08",
+  "operational_changes": false,
+  "schema_version": 1,
+  "security_or_chat_raw_exported": false,
+  "stored_metadata": {
+    "all_response_denominator_available": false,
+    "content_queried": false,
+    "database_quick_check": "ok",
+    "intervals_with_multiple_candidate_assistants": 0,
+    "original_files_unchanged": true,
+    "original_sqlite_connections": 0,
+    "private_copy_removed": true,
+    "rows_examined": 20,
+    "status": "observed_subset",
+    "windows": {
+      "recent24h": {
+        "delivery_obligation_states": {
+          "delivered": 1
+        },
+        "end_epoch": 1792023751.3442335,
+        "end_kst": "2026-10-15T09:22:31.344234+09:00",
+        "start_epoch": 1791937351.3442335,
+        "start_kst": "2026-10-14T09:22:31.344234+09:00",
+        "stored_interval_proxy": {
+          "actual_delivery_or_approval_latency": false,
+          "basis": "user_row_to_last_non_tool_assistant_row_before_next_user",
+          "p50_seconds": 60.319994,
+          "p95_seconds": 60.319994,
+          "recent3_seconds": [
+            60.319994
+          ],
+          "samples": 1
+        },
+        "stored_roles": {
+          "assistant": 8,
+          "tool": 10,
+          "user": 1
+        }
+      },
+      "recent5h": {
+        "delivery_obligation_states": {
+          "delivered": 1
+        },
+        "end_epoch": 1792023751.3442335,
+        "end_kst": "2026-10-15T09:22:31.344234+09:00",
+        "start_epoch": 1792005751.3442335,
+        "start_kst": "2026-10-15T04:22:31.344234+09:00",
+        "stored_interval_proxy": {
+          "actual_delivery_or_approval_latency": false,
+          "basis": "user_row_to_last_non_tool_assistant_row_before_next_user",
+          "p50_seconds": 60.319994,
+          "p95_seconds": 60.319994,
+          "recent3_seconds": [
+            60.319994
+          ],
+          "samples": 1
+        },
+        "stored_roles": {
+          "assistant": 8,
+          "tool": 10,
+          "user": 1
+        }
+      }
+    }
+  },
+  "units": {
+    "capstone-hermes-guard-observe.service": {
+      "ActiveEnterTimestampMonotonic": "1337874697668",
+      "ActiveState": "active",
+      "Result": "success",
+      "SubState": "running"
+    },
+    "capstone-hermes-guard-reapply.service": {
+      "ActiveEnterTimestampMonotonic": "0",
+      "ActiveState": "inactive",
+      "Result": "success",
+      "SubState": "dead"
+    },
+    "capstone-hermes-guard-reapply.timer": {
+      "ActiveEnterTimestampMonotonic": "1337873902381",
+      "ActiveState": "active",
+      "Result": "success",
+      "SubState": "waiting"
+    }
+  }
+}

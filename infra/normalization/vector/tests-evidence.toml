@@ -1,0 +1,113 @@
+[[tests]]
+name = "evidence_pipeline_suricata"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert!(!exists(.capstone_norm.evidence_lane))\nassert_eq!(.capstone_norm.correlation_eligible, true)"
+[[tests.outputs]]
+extract_from = "evidence_marker"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.evidence_lane, \"indexer-observation-v1\")\nassert_eq!(.capstone_norm.source, \"suricata\")"
+
+[[tests]]
+name = "evidence_pipeline_nftables"
+[[tests.inputs]]
+insert_at = "correlation_metadata"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"nftables\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false}}"
+[[tests.outputs]]
+extract_from = "correlation_metadata"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert!(!exists(.capstone_norm.evidence_lane))\nassert_eq!(.capstone_norm.correlation_eligible, true)"
+[[tests.outputs]]
+extract_from = "evidence_marker"
+[[tests.outputs.conditions]]
+type = "vrl"
+source = "assert_eq!(.capstone_norm.evidence_lane, \"indexer-observation-v1\")\nassert_eq!(.capstone_norm.source, \"nftables\")"
+
+[[tests]]
+name = "evidence_reject_waf"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"modsecurity\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false, \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\"}}"
+
+[[tests]]
+name = "evidence_reject_historical"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false, \"correlation_eligible\": true, \"correlation_time_class\": \"historical\"}}"
+
+[[tests]]
+name = "evidence_reject_future"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false, \"correlation_eligible\": true, \"correlation_time_class\": \"future\"}}"
+
+[[tests]]
+name = "evidence_reject_protected"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": true, \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\"}}"
+
+[[tests]]
+name = "evidence_reject_ineligible"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false, \"correlation_eligible\": false, \"correlation_time_class\": \"fresh\"}}"
+
+[[tests]]
+name = "evidence_reject_quality"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [\"bad\"], \"protected_asset\": false, \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\"}}"
+
+[[tests]]
+name = "evidence_reject_schema"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"unknown\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false, \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\"}}"
+
+[[tests]]
+name = "evidence_reject_pipeline"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"unknown\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false, \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\"}}"
+
+[[tests]]
+name = "evidence_reject_bool_string"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": false, \"correlation_eligible\": \"true\", \"correlation_time_class\": \"fresh\"}}"
+
+[[tests]]
+name = "evidence_reject_missing_protection"
+no_outputs_from = ["evidence_marker"]
+[[tests.inputs]]
+insert_at = "evidence_select"
+type = "vrl"
+source = ". = {\"capstone_norm\": {\"schema_version\": \"vector-1\", \"pipeline\": \"vector\", \"sensor\": \"groot-sec\", \"source\": \"suricata\", \"message_sha256\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"event_id\": \"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"event_time_kst\": \"2026-10-14T02:00:00+09:00\", \"observed_at_kst\": \"2026-10-14T02:01:00+09:00\", \"source_ip\": \"192.0.2.10\", \"destination_ip\": \"198.51.100.20\", \"destination_port\": 443, \"protocol\": \"tcp\", \"quality_flags\": [], \"protected_asset\": null, \"correlation_eligible\": true, \"correlation_time_class\": \"fresh\"}}"

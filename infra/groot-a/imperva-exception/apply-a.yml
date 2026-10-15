@@ -1,0 +1,922 @@
+[
+  {
+    "name": "Operator deploys the narrow Imperva scan exception",
+    "hosts": "local",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "tasks": [
+      {
+        "name": "Require fixed root operator and reviewed A",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '096e90b6243e438aa8a7b392be754732'",
+            "ansible_version.full is version('2.21', '>=')",
+            "ansible_version.full is version('2.22', '<')"
+          ]
+        }
+      },
+      {
+        "name": "Read current WAF identity",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "waf"
+          ]
+        },
+        "changed_when": false,
+        "register": "waf_before",
+        "no_log": true
+      },
+      {
+        "name": "Require reviewed live WAF",
+        "ansible.builtin.assert": {
+          "that": [
+            "(waf_before.stdout | from_json)[0].Id == '02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e'",
+            "(waf_before.stdout | from_json)[0].State.Status == 'running'",
+            "(waf_before.stdout | from_json)[0].State.Health.Status == 'healthy'"
+          ]
+        }
+      },
+      {
+        "name": "Check existing nginx configuration",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "nginx",
+            "-t"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Check GROOT and setup binding",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "sha256sum",
+            "/etc/modsecurity.d/setup.conf",
+            "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf"
+          ]
+        },
+        "changed_when": false,
+        "register": "bindings"
+      },
+      {
+        "name": "Require unchanged reviewed load order and existing rules",
+        "ansible.builtin.assert": {
+          "that": [
+            "'5e8dd2dab4517701be865f68467df491f54805d331cdff0dd3092a30f5022876' in bindings.stdout",
+            "'62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf' in bindings.stdout"
+          ]
+        }
+      },
+      {
+        "name": "Reject collisions outside the dedicated scanner file",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "sh",
+            "-c",
+            "if grep -R -E --include='*.conf' --exclude='REQUEST-900-CAPSTONE-SCANNER.conf' 'id:[[:space:]]*(10020|10021)([,[:space:]]|$)' /etc/modsecurity.d/owasp-crs; then exit 8; else result=$?; test \"$result\" -eq 1; fi"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Inspect source candidate",
+        "ansible.builtin.stat": {
+          "path": "{{ playbook_dir }}/REQUEST-900-CAPSTONE-SCANNER.conf",
+          "checksum_algorithm": "sha256",
+          "follow": false
+        },
+        "register": "candidate"
+      },
+      {
+        "name": "Require immutable reviewed candidate bytes",
+        "ansible.builtin.assert": {
+          "that": [
+            "candidate.stat.isreg",
+            "not candidate.stat.islnk",
+            "candidate.stat.uid == 0",
+            "candidate.stat.nlink == 1",
+            "candidate.stat.mode[-2] in ['0','1','4','5']",
+            "candidate.stat.mode[-1] in ['0','1','4','5']",
+            "candidate.stat.checksum == reviewed_sha"
+          ]
+        }
+      },
+      {
+        "name": "Inspect current early rule",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "sh",
+            "-c",
+            "p=/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf; if [ -L \"$p\" ]; then exit 8; elif [ -e \"$p\" ]; then test -f \"$p\" && test \"$(stat -c %u:%g:%a:%h \"$p\")\" = 0:0:444:1 && sha256sum \"$p\"; else exit 3; fi"
+          ]
+        },
+        "changed_when": false,
+        "register": "early_before",
+        "failed_when": "early_before.rc not in [0, 3]"
+      },
+      {
+        "name": "Require absent or identical current exception",
+        "ansible.builtin.assert": {
+          "that": [
+            "early_before.rc == 3 or early_before.stdout.split()[0] == candidate.stat.checksum"
+          ]
+        }
+      },
+      {
+        "name": "Inspect fixed host destinations",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/etc/capstone-waf",
+          "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf",
+          "/home/groot_a/capstone/secstack/docker-compose.yml"
+        ],
+        "register": "paths"
+      },
+      {
+        "name": "Reject unsafe paths",
+        "ansible.builtin.assert": {
+          "that": [
+            "not paths.results[0].stat.exists or (paths.results[0].stat.isdir and not paths.results[0].stat.islnk and paths.results[0].stat.uid == 0 and paths.results[0].stat.gid == 0 and paths.results[0].stat.mode == '0755')",
+            "not paths.results[1].stat.exists or (paths.results[1].stat.isreg and not paths.results[1].stat.islnk and paths.results[1].stat.nlink == 1 and paths.results[1].stat.uid == 0 and paths.results[1].stat.gid == 0 and paths.results[1].stat.mode == '0444' and paths.results[1].stat.checksum == reviewed_sha)",
+            "paths.results[2].stat.isreg and not paths.results[2].stat.islnk and paths.results[2].stat.nlink == 1"
+          ]
+        }
+      },
+      {
+        "name": "Require existing GROOT mount in compose",
+        "ansible.builtin.command": {
+          "argv": [
+            "grep",
+            "-Fxc",
+            "      - ./conf/GROOT_A_WAF.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf:ro",
+            "/home/groot_a/capstone/secstack/docker-compose.yml"
+          ]
+        },
+        "changed_when": false,
+        "register": "groot_mount",
+        "failed_when": "groot_mount.rc != 0 or groot_mount.stdout != '1'"
+      },
+      {
+        "name": "Create private rollback directory",
+        "ansible.builtin.tempfile": {
+          "state": "directory",
+          "path": "/var/backups",
+          "prefix": "capstone-imperva-20261014-"
+        },
+        "register": "backup"
+      },
+      {
+        "name": "Snapshot compose before the transaction",
+        "ansible.builtin.copy": {
+          "src": "/home/groot_a/capstone/secstack/docker-compose.yml",
+          "dest": "{{ backup.path }}/docker-compose.yml",
+          "remote_src": true,
+          "mode": "0600"
+        }
+      },
+      {
+        "name": "Check private compose backup is the inspected version",
+        "ansible.builtin.stat": {
+          "path": "{{ backup.path }}/docker-compose.yml",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "compose_backup"
+      },
+      {
+        "name": "Reject compose changes while taking backup",
+        "ansible.builtin.assert": {
+          "that": [
+            "compose_backup.stat.checksum == paths.results[2].stat.checksum"
+          ]
+        }
+      },
+      {
+        "name": "Stage future compose with original relative-path base",
+        "ansible.builtin.copy": {
+          "src": "{{ backup.path }}/docker-compose.yml",
+          "dest": "{{ backup.path }}/candidate-compose.yml",
+          "remote_src": true,
+          "mode": "0600"
+        }
+      },
+      {
+        "name": "Add only the fixed future mount to staged compose",
+        "ansible.builtin.lineinfile": {
+          "path": "{{ backup.path }}/candidate-compose.yml",
+          "line": "      - /etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf:ro",
+          "insertafter": "^      - ./conf/GROOT_A_WAF.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf:ro$"
+        }
+      },
+      {
+        "name": "Validate staged compose without applying containers",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "compose",
+            "--project-directory",
+            "/home/groot_a/capstone/secstack",
+            "-f",
+            "{{ backup.path }}/candidate-compose.yml",
+            "config",
+            "--quiet"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Pin staged future compose bytes",
+        "ansible.builtin.stat": {
+          "path": "{{ backup.path }}/candidate-compose.yml",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "compose_candidate"
+      },
+      {
+        "name": "Capture original master identity",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "sh",
+            "-c",
+            "m=$(cat /tmp/nginx.pid); test \"$m\" -gt 0; printf \"%s \" \"$m\"; awk '{print $22}' /proc/\"$m\"/stat"
+          ]
+        },
+        "changed_when": false,
+        "register": "master_before"
+      },
+      {
+        "name": "Capture original nginx worker PIDs",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "sh",
+            "-c",
+            "m=$(cat /tmp/nginx.pid); cat /proc/\"$m\"/task/\"$m\"/children"
+          ]
+        },
+        "changed_when": false,
+        "register": "workers_before"
+      },
+      {
+        "name": "Require existing live master and workers",
+        "ansible.builtin.assert": {
+          "that": [
+            "master_before.stdout.split() | length == 2",
+            "workers_before.stdout.split() | length > 0"
+          ]
+        }
+      },
+      {
+        "name": "Capture unchanged producer and permission boundaries",
+        "ansible.builtin.command": {
+          "argv": [
+            "sha256sum",
+            "/usr/local/sbin/rule-change-executor",
+            "/opt/rule-change/rule_change_mcp.py",
+            "/etc/sudoers.d/capstone-rule-change",
+            "/etc/capstone-vector/waf-binding.json"
+          ]
+        },
+        "changed_when": false,
+        "register": "authority_before"
+      },
+      {
+        "name": "Capture producer configuration bytes",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "exec",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+            "sha256sum",
+            "/etc/nginx/conf.d/zz-capstone-evidence.conf"
+          ]
+        },
+        "changed_when": false,
+        "register": "producer_before"
+      },
+      {
+        "name": "Apply only the reviewed early exception with checked rollback",
+        "block": [
+          {
+            "name": "Create root-owned persistent exception source directory",
+            "ansible.builtin.file": {
+              "path": "/etc/capstone-waf",
+              "state": "directory",
+              "owner": "0",
+              "group": "0",
+              "mode": "0755"
+            }
+          },
+          {
+            "name": "Recheck persistent host source before installing",
+            "ansible.builtin.stat": {
+              "path": "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "host_recheck"
+          },
+          {
+            "name": "Require host source compare-and-swap",
+            "ansible.builtin.assert": {
+              "that": [
+                "host_recheck.stat.exists == paths.results[1].stat.exists",
+                "not host_recheck.stat.exists or (host_recheck.stat.isreg and not host_recheck.stat.islnk and host_recheck.stat.nlink == 1 and host_recheck.stat.uid == 0 and host_recheck.stat.gid == 0 and host_recheck.stat.mode == '0444' and host_recheck.stat.checksum == reviewed_sha)"
+              ]
+            }
+          },
+          {
+            "name": "Install reviewed host exception",
+            "ansible.builtin.copy": {
+              "src": "REQUEST-900-CAPSTONE-SCANNER.conf",
+              "dest": "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf",
+              "owner": "0",
+              "group": "0",
+              "mode": "0444"
+            },
+            "register": "host_installed"
+          },
+          {
+            "name": "Recheck compose immediately before replacement",
+            "ansible.builtin.stat": {
+              "path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "compose_recheck"
+          },
+          {
+            "name": "Require compose checksum and metadata compare-and-swap",
+            "ansible.builtin.assert": {
+              "that": [
+                "compose_recheck.stat.isreg",
+                "not compose_recheck.stat.islnk",
+                "compose_recheck.stat.nlink == 1",
+                "compose_recheck.stat.uid == paths.results[2].stat.uid",
+                "compose_recheck.stat.gid == paths.results[2].stat.gid",
+                "compose_recheck.stat.mode == paths.results[2].stat.mode",
+                "compose_recheck.stat.checksum == paths.results[2].stat.checksum"
+              ]
+            }
+          },
+          {
+            "name": "Mark compose write attempt for bounded rescue",
+            "ansible.builtin.set_fact": {
+              "compose_attempted": true
+            }
+          },
+          {
+            "name": "Install exactly the validated future compose",
+            "ansible.builtin.copy": {
+              "src": "{{ backup.path }}/candidate-compose.yml",
+              "dest": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "remote_src": true,
+              "owner": "{{ paths.results[2].stat.uid }}",
+              "group": "{{ paths.results[2].stat.gid }}",
+              "mode": "{{ paths.results[2].stat.mode }}",
+              "unsafe_writes": false
+            },
+            "register": "compose_changed"
+          },
+          {
+            "name": "Recheck current-container rule before installation",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "p=/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf; if [ -L \"$p\" ]; then exit 8; elif [ -e \"$p\" ]; then test -f \"$p\" && test \"$(stat -c %u:%g:%a:%h \"$p\")\" = 0:0:444:1 && sha256sum \"$p\"; else exit 3; fi"
+              ]
+            },
+            "changed_when": false,
+            "register": "early_recheck",
+            "failed_when": "early_recheck.rc not in [0, 3]"
+          },
+          {
+            "name": "Require current rule compare-and-swap",
+            "ansible.builtin.assert": {
+              "that": [
+                "early_recheck.rc == early_before.rc",
+                "early_recheck.rc == 3 or early_recheck.stdout == early_before.stdout"
+              ]
+            }
+          },
+          {
+            "name": "Create root-private container candidate directory",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "-u",
+                "0",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "mktemp",
+                "-d",
+                "/tmp/capstone-imperva-install.XXXXXX"
+              ]
+            },
+            "changed_when": false,
+            "register": "container_stage",
+            "when": "early_before.rc == 3"
+          },
+          {
+            "name": "Copy candidate only into its private container stage",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "cp",
+                "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e:{{ container_stage.stdout }}/candidate.conf"
+              ]
+            },
+            "changed_when": false,
+            "when": "early_before.rc == 3"
+          },
+          {
+            "name": "Install verified early exception without overwriting any current path",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "-u",
+                "0",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "stage=\"$1\"; target=\"/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf\"; case \"$stage\" in /tmp/capstone-imperva-install.*) ;; *) exit 77;; esac; test \"$(sha256sum \"$stage/candidate.conf\" | cut -d \" \" -f 1)\" = \"d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d\"; chown 0:0 \"$stage/candidate.conf\"; chmod 0444 \"$stage/candidate.conf\"; ln \"$stage/candidate.conf\" \"$target\"; rm \"$stage/candidate.conf\"",
+                "sh",
+                "{{ container_stage.stdout }}"
+              ]
+            },
+            "changed_when": true,
+            "when": "early_before.rc == 3",
+            "register": "installed"
+          },
+          {
+            "name": "Verify exact current-container exception",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "p=/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf; if [ -L \"$p\" ]; then exit 8; elif [ -e \"$p\" ]; then test -f \"$p\" && test \"$(stat -c %u:%g:%a:%h \"$p\")\" = 0:0:444:1 && sha256sum \"$p\"; else exit 3; fi"
+              ]
+            },
+            "changed_when": false,
+            "register": "early_after",
+            "failed_when": "early_after.rc not in [0, 3]"
+          },
+          {
+            "name": "Require same candidate bytes and metadata",
+            "ansible.builtin.assert": {
+              "that": [
+                "early_after.rc == 0",
+                "early_after.stdout.split()[0] == reviewed_sha"
+              ]
+            }
+          },
+          {
+            "name": "Validate full native nginx and ModSecurity configuration",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "nginx",
+                "-t"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Require unchanged master before reload",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "m=$(cat /tmp/nginx.pid); test \"$m\" -gt 0; printf \"%s \" \"$m\"; awk '{print $22}' /proc/\"$m\"/stat"
+              ]
+            },
+            "changed_when": false,
+            "register": "master_recheck"
+          },
+          {
+            "name": "Require pinned master before signal",
+            "ansible.builtin.assert": {
+              "that": [
+                "master_recheck.stdout == master_before.stdout"
+              ]
+            }
+          },
+          {
+            "name": "Capture worker generation immediately before reload",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "m=$(cat /tmp/nginx.pid); cat /proc/\"$m\"/task/\"$m\"/children"
+              ]
+            },
+            "changed_when": false,
+            "register": "workers_reload_before"
+          },
+          {
+            "name": "Reload every apply to recover an interrupted prior file install",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "nginx",
+                "-s",
+                "reload"
+              ]
+            },
+            "changed_when": true,
+            "register": "reloaded"
+          },
+          {
+            "name": "Wait for genuinely new worker IDs after reload",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "m=$(cat /tmp/nginx.pid); cat /proc/\"$m\"/task/\"$m\"/children"
+              ]
+            },
+            "changed_when": false,
+            "register": "workers_after",
+            "until": "workers_after.stdout.split() | difference(workers_reload_before.stdout.split()) | length > 0",
+            "retries": 15,
+            "delay": 1
+          },
+          {
+            "name": "Verify master identity after reload",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "m=$(cat /tmp/nginx.pid); test \"$m\" -gt 0; printf \"%s \" \"$m\"; awk '{print $22}' /proc/\"$m\"/stat"
+              ]
+            },
+            "changed_when": false,
+            "register": "master_after"
+          },
+          {
+            "name": "Require the same master process and start tick",
+            "ansible.builtin.assert": {
+              "that": [
+                "master_after.stdout == master_before.stdout"
+              ]
+            }
+          },
+          {
+            "name": "Verify pinned container health without recreation",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "inspect",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e"
+              ]
+            },
+            "changed_when": false,
+            "register": "waf_after",
+            "no_log": true
+          },
+          {
+            "name": "Require same healthy container and start time",
+            "ansible.builtin.assert": {
+              "that": [
+                "(waf_after.stdout | from_json)[0].Id == fixed_cid",
+                "(waf_after.stdout | from_json)[0].State.StartedAt == (waf_before.stdout | from_json)[0].State.StartedAt",
+                "(waf_after.stdout | from_json)[0].State.Status == 'running'",
+                "(waf_after.stdout | from_json)[0].State.Health.Status == 'healthy'"
+              ]
+            }
+          },
+          {
+            "name": "Verify unchanged producer and permission boundaries",
+            "ansible.builtin.command": {
+              "argv": [
+                "sha256sum",
+                "/usr/local/sbin/rule-change-executor",
+                "/opt/rule-change/rule_change_mcp.py",
+                "/etc/sudoers.d/capstone-rule-change",
+                "/etc/capstone-vector/waf-binding.json"
+              ]
+            },
+            "changed_when": false,
+            "register": "authority_after"
+          },
+          {
+            "name": "Verify unchanged load order and GROOT rules",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sha256sum",
+                "/etc/modsecurity.d/setup.conf",
+                "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf"
+              ]
+            },
+            "changed_when": false,
+            "register": "bindings_after"
+          },
+          {
+            "name": "Verify unchanged producer configuration",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sha256sum",
+                "/etc/nginx/conf.d/zz-capstone-evidence.conf"
+              ]
+            },
+            "changed_when": false,
+            "register": "producer_after"
+          },
+          {
+            "name": "Require unchanged authority and producer binding",
+            "ansible.builtin.assert": {
+              "that": [
+                "authority_after.stdout == authority_before.stdout",
+                "bindings_after.stdout == bindings.stdout",
+                "producer_after.stdout == producer_before.stdout"
+              ]
+            }
+          },
+          {
+            "name": "Report bounded scope and private rollback location",
+            "ansible.builtin.debug": {
+              "msg": {
+                "backup": "{{ backup.path }}",
+                "sha256": "{{ reviewed_sha }}",
+                "container_recreated": false,
+                "reload_every_apply": true,
+                "compose_content_changed": "{{ compose_changed is changed }}",
+                "early_file_installed": "{{ installed is defined and installed is changed }}"
+              }
+            }
+          }
+        ],
+        "rescue": [
+          {
+            "name": "Inspect live compose before any rollback",
+            "ansible.builtin.stat": {
+              "path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "compose_failed"
+          },
+          {
+            "name": "Inspect persistent host source before any rollback",
+            "ansible.builtin.stat": {
+              "path": "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "host_failed"
+          },
+          {
+            "name": "Inspect pinned container exception before any rollback",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "p=/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf; if [ -L \"$p\" ]; then exit 8; elif [ -e \"$p\" ]; then test -f \"$p\" && test \"$(stat -c %u:%g:%a:%h \"$p\")\" = 0:0:444:1 && sha256sum \"$p\"; else exit 3; fi"
+              ]
+            },
+            "changed_when": false,
+            "register": "early_failed",
+            "failed_when": "early_failed.rc not in [0, 3]"
+          },
+          {
+            "name": "Refuse rollback over concurrent compose or host changes",
+            "ansible.builtin.assert": {
+              "that": [
+                "compose_failed.stat.isreg",
+                "not compose_failed.stat.islnk",
+                "compose_failed.stat.nlink == 1",
+                "compose_failed.stat.uid == paths.results[2].stat.uid",
+                "compose_failed.stat.gid == paths.results[2].stat.gid",
+                "compose_failed.stat.mode == paths.results[2].stat.mode",
+                "compose_failed.stat.checksum in [paths.results[2].stat.checksum, compose_candidate.stat.checksum]",
+                "not host_failed.stat.exists or (host_failed.stat.isreg and not host_failed.stat.islnk and host_failed.stat.nlink == 1 and host_failed.stat.uid == 0 and host_failed.stat.gid == 0 and host_failed.stat.mode == '0444' and host_failed.stat.checksum == reviewed_sha)",
+                "early_failed.rc == 3 or early_failed.stdout.split()[0] == reviewed_sha",
+                "not paths.results[1].stat.exists or host_failed.stat.exists",
+                "early_before.rc != 0 or early_failed.rc == 0"
+              ]
+            }
+          },
+          {
+            "name": "Restore only our candidate compose from private backup",
+            "ansible.builtin.copy": {
+              "src": "{{ backup.path }}/docker-compose.yml",
+              "dest": "/home/groot_a/capstone/secstack/docker-compose.yml",
+              "remote_src": true,
+              "owner": "{{ paths.results[2].stat.uid }}",
+              "group": "{{ paths.results[2].stat.gid }}",
+              "mode": "{{ paths.results[2].stat.mode }}",
+              "unsafe_writes": false
+            },
+            "when": "compose_attempted | default(false) and compose_failed.stat.checksum == compose_candidate.stat.checksum and compose_failed.stat.checksum != paths.results[2].stat.checksum"
+          },
+          {
+            "name": "Remove only an exact new container exception",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "-u",
+                "0",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "p=\"/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf\"; test ! -L \"$p\"; test \"$(stat -c %u:%g:%a:%h \"$p\")\" = 0:0:444:1; test \"$(sha256sum \"$p\" | cut -d \" \" -f 1)\" = \"d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d\"; rm -- \"$p\""
+              ]
+            },
+            "changed_when": true,
+            "when": "early_before.rc == 3 and early_failed.rc == 0"
+          },
+          {
+            "name": "Remove new exact persistent source after metadata and SHA check",
+            "ansible.builtin.file": {
+              "path": "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf",
+              "state": "absent"
+            },
+            "when": "not paths.results[1].stat.exists and host_failed.stat.exists"
+          },
+          {
+            "name": "Validate restored native configuration",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "nginx",
+                "-t"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Capture workers before restoring loaded configuration",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "m=$(cat /tmp/nginx.pid); cat /proc/\"$m\"/task/\"$m\"/children"
+              ]
+            },
+            "changed_when": false,
+            "register": "rollback_workers_before"
+          },
+          {
+            "name": "Reload restored configuration on the pinned container",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "nginx",
+                "-s",
+                "reload"
+              ]
+            },
+            "changed_when": true
+          },
+          {
+            "name": "Wait for restored configuration worker generation",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "m=$(cat /tmp/nginx.pid); cat /proc/\"$m\"/task/\"$m\"/children"
+              ]
+            },
+            "changed_when": false,
+            "register": "rollback_workers_after",
+            "until": "rollback_workers_after.stdout.split() | difference(rollback_workers_before.stdout.split()) | length > 0",
+            "retries": 15,
+            "delay": 1
+          },
+          {
+            "name": "Verify original master after rollback",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "m=$(cat /tmp/nginx.pid); test \"$m\" -gt 0; printf \"%s \" \"$m\"; awk '{print $22}' /proc/\"$m\"/stat"
+              ]
+            },
+            "changed_when": false,
+            "register": "rollback_master"
+          },
+          {
+            "name": "Require original master after rollback",
+            "ansible.builtin.assert": {
+              "that": [
+                "rollback_master.stdout == master_before.stdout"
+              ]
+            }
+          },
+          {
+            "name": "Stop after checked rollback",
+            "ansible.builtin.fail": {
+              "msg": "Apply failed. Checked compose/exception rollback and native reload completed; an empty root-owned /etc/capstone-waf directory may remain. Inspect private backup. A concurrent-state mismatch aborts rollback rather than overwriting it."
+            }
+          }
+        ],
+        "always": [
+          {
+            "name": "Remove only this private container staging directory",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/local/bin/docker",
+                "exec",
+                "-u",
+                "0",
+                "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+                "sh",
+                "-c",
+                "stage=\"$1\"; case \"$stage\" in /tmp/capstone-imperva-install.*) ;; *) exit 77;; esac; test ! -L \"$stage\"; test -d \"$stage\"; test \"$(stat -c %u \"$stage\")\" = 0; rm -rf -- \"$stage\"",
+                "sh",
+                "{{ container_stage.stdout }}"
+              ]
+            },
+            "changed_when": false,
+            "when": "container_stage is defined and container_stage.stdout is defined and container_stage.stdout | length > 0"
+          }
+        ]
+      }
+    ],
+    "vars": {
+      "fixed_cid": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+      "reviewed_sha": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+      "compose_path": "/home/groot_a/capstone/secstack/docker-compose.yml",
+      "early_path": "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf",
+      "host_source": "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf"
+    }
+  }
+]

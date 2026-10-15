@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Verify only five MCP initialize/tools-list connections at actual UID",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/local/bin/docker",
+        "exec",
+        "--user",
+        "995:986",
+        "--workdir",
+        "/opt/hermes",
+        "-i",
+        "{{ hp_mcp_id }}",
+        "/opt/hermes/.venv/bin/python",
+        "-B",
+        "-c",
+        "import sys; exec(compile(sys.stdin.read(),'mcp_readonly.py','exec'),{'__name__':'__main__'})"
+      ],
+      "stdin": "{{ lookup('ansible.builtin.file', role_path + '/files/mcp-readonly.py', rstrip=False) }}",
+      "stdin_add_newline": false
+    },
+    "register": "hp_mcp_result",
+    "no_log": true,
+    "changed_when": false,
+    "timeout": 180
+  }
+]

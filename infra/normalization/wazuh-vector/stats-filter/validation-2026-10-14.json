@@ -1,0 +1,79 @@
+{
+  "checked_at_kst": "2026-10-14T04:34:37+09:00",
+  "status": "applied",
+  "wazuh_version": "4.14.8",
+  "decoder_order_size": 256,
+  "source_sample": {
+    "rows": 1500,
+    "stats_fields_max": 504,
+    "agent_label_fields": 1,
+    "alert_fields_max": 48,
+    "normalized_fields_max": 41
+  },
+  "observed_natural_errors": {
+    "cadence_seconds": 60,
+    "errors_per_stats_record": 249
+  },
+  "last_preflight": {
+    "rows": 1500,
+    "excluded_stats": 127,
+    "preserved_alert": 19,
+    "preserved_other": 1354,
+    "native_config_valid": true,
+    "pcre_positive": 1,
+    "pcre_negative": 7
+  },
+  "apply": {
+    "first_ok": 25,
+    "first_changed": 4,
+    "repeat_ok": 24,
+    "repeat_changed": 0,
+    "failed": 0,
+    "completed_kst": "2026-10-14T04:24:16+09:00",
+    "config_before_sha256": "740fb0d8ea45e1b302d11862f55f2d9f29e86bdd22f5a5e202f04d3ffb36e21e",
+    "config_after_sha256": "6198f7860c2dc6b5f21bc54a22c2df506c0adb2cacae697e7cafd4300a6b93e0",
+    "backup_path": "/var/ossec/etc/ossec.conf.1631221.2026-10-14@04:23:57~",
+    "changed_localfiles": 1,
+    "other_localfiles_preserved": 9,
+    "security_containers_preserved": true,
+    "agent_connected": true,
+    "vector_active": true
+  },
+  "error_observation_before_next_health_change": {
+    "baseline_kst": "2026-10-14T04:23:42+09:00",
+    "elapsed_seconds": 655.15,
+    "baseline_includes_pre_apply_error_count": 249,
+    "field_errors_after_apply_completed": 0,
+    "manager_identity_and_start_unchanged": true,
+    "decoder_override_unchanged": true
+  },
+  "authorization_review": {
+    "raw_stats_transfer_to_mac_rejected": true,
+    "transfer_executed": false,
+    "safer_alternative": "server-side counts and timestamps plus synthetic decoder boundaries"
+  },
+  "limitations": [
+    "Canonical engine stats format only; future format changes may pass through.",
+    "Other input sources can independently exceed decoder capacity.",
+    "Native logtest boundary tests wrote diagnostic errors at distinct recorded timestamps; no alert queue injection.",
+    "No forced live rollback test."
+  ],
+  "artifact_sha256": {
+    "before.xml": "c45d29c58689a5a5b9465389214e293e7a687901076c403752ecbb1d781a7363",
+    "apply-a.yml": "cc16a7baade131d4b525c40de8929e0f8e664e27ffbbaa3580e739ac080194f2",
+    "after.xml": "e8799fa728feae4b572fed8db7122aae735eb71d77f8217d83b8e152b78ec2de",
+    "stats-pattern.txt": "b97d7470835edd1a3e20c3ca55f75b5623cde2aab4776805cfdb4a58c89918aa",
+    "README.md": "66e6a2f38059e7d58cd4cd3f50a222e6b333fcbdc883e305d8a76d1b3cde9cb1",
+    "test-pattern-a.sh": "0499ae7c3cf5532be44e1db3130ea82981131f5c2a5d6dbb5f8021a9a1c32ad2",
+    "run-a.sh": "6f6cf14fa2b64a90ed30d9468be7f7fbcf8609d9d9f6861d1d7de9db7e9823e5"
+  },
+  "final_after_health_rule_deployment": {
+    "baseline_observation_seconds": 1773.36,
+    "field_errors_after_filter_completed": 0,
+    "pre_filter_error_count": 249,
+    "pre_filter_error_second_utc": "2026/10/13 19:23:42",
+    "new_log_bytes": 31645,
+    "decoder_limit_override_unchanged": true,
+    "manager_restarted_for_later_health_rule_change": true
+  }
+}

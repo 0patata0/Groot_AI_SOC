@@ -1,0 +1,32 @@
+[Unit]
+Description=Observe the fixed local ChatDuck TLS certificate
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+ExecStart=/usr/local/sbin/capstone-cert-monitor run
+# Explicit logger supplies one journal event; avoid a duplicate stdout event.
+StandardOutput=null
+StandardError=journal
+TimeoutStartSec=30s
+TimeoutStopSec=1s
+SuccessExitStatus=2 75
+StateDirectory=capstone-cert-monitor
+StateDirectoryMode=0700
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/capstone-cert-monitor
+InaccessiblePaths=-/home/groot_a/capstone/chatproxy/tls/chatduck.key
+RestrictAddressFamilies=AF_INET AF_UNIX
+IPAddressDeny=any
+IPAddressAllow=127.0.0.1/32
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true

@@ -1,0 +1,100 @@
+[
+  {
+    "name": "Fixed operator-only Hermes prestart lifecycle candidate",
+    "hosts": "capstone_hermes_b",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "capstone_prestart_sources": {
+        "hermes_prestart_contract.py": "b9cb0dfdbbfb600cb9e1d9c7b24f9e138190e2aef0c1e3d41862c4676d737554",
+        "hermes_prestart_transaction.py": "e51a66f6209b9d25565d1dea8ef0d5e31bc6850d7d03a0d2859c4c60d81446e9",
+        "hermes_guard_checks.py": "74843987843dd5ef447d09896ba894ea580da2e5dc56b9bf0d48749f091e0cb5",
+        "patch_korean_output_guard.py": "d6e1ea2e594ae958a33005127a618d52907e93408b786a437e163214dfaec17b",
+        "korean_output_guard.py": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+        "verify_korean_output_guard_runtime.py": "7af8e0bb63cd9a4545d1d906c328a6ba43a1a71788efb652d42a8717d512fac9"
+      },
+      "hp_commands": {
+        "create": [
+          "/usr/local/bin/docker",
+          "create",
+          "--pull=never",
+          "--name",
+          "{{ hp_new_name }}",
+          "--restart",
+          "unless-stopped",
+          "--network",
+          "bridge",
+          "--user",
+          "root",
+          "--workdir",
+          "/opt/hermes",
+          "--entrypoint",
+          "/opt/hermes/docker/entrypoint-dispatch.sh",
+          "--env-file",
+          "{{ hp_root }}/container.env",
+          "--volume",
+          "/opt/hermes-data:/opt/data",
+          "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+          "gateway",
+          "run"
+        ],
+        "stop-old": [
+          "/usr/local/bin/docker",
+          "stop",
+          "--time",
+          "60",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b"
+        ],
+        "retain-old": [
+          "/usr/local/bin/docker",
+          "rename",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "{{ hp_old_name }}"
+        ],
+        "name-new": [
+          "/usr/local/bin/docker",
+          "rename",
+          "{{ hp_state.candidate_id }}",
+          "hermes"
+        ],
+        "start-new": [
+          "/usr/local/bin/docker",
+          "start",
+          "{{ hp_state.candidate_id }}"
+        ],
+        "stop-new": [
+          "/usr/local/bin/docker",
+          "stop",
+          "--time",
+          "60",
+          "{{ hp_state.candidate_id }}"
+        ],
+        "park-new": [
+          "/usr/local/bin/docker",
+          "rename",
+          "{{ hp_state.candidate_id }}",
+          "{{ hp_new_name }}"
+        ],
+        "restore-name": [
+          "/usr/local/bin/docker",
+          "rename",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "hermes"
+        ],
+        "start-old": [
+          "/usr/local/bin/docker",
+          "start",
+          "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b"
+        ]
+      },
+      "capstone_prestart_mcp_sha256": "f8fcee9975c9e29feef6722dbeadcb7d910fe6d75d8b4d7d95909604c808ca56"
+    },
+    "roles": [
+      "hermes_prestart"
+    ]
+  }
+]

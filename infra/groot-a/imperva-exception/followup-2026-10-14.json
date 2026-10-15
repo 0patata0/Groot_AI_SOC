@@ -1,0 +1,277 @@
+{
+  "kind": "imperva_natural_scan_source_followup",
+  "cutoff_kst": "2026-10-14T19:13:21+09:00",
+  "cutoff_epoch_us": 1791972801779713,
+  "windows": {
+    "since_apply": {
+      "start_kst": "2026-10-14T05:49:41+09:00",
+      "end_kst": "2026-10-14T19:13:21+09:00",
+      "all_minimal_access_requests": 1,
+      "target_minimal_access_requests": 0,
+      "all_docker_standard_access_requests": 1,
+      "target_docker_standard_access_requests": 0,
+      "target_audit_with_explicit_time_evidence": 0,
+      "target_audit_rule_counts": {},
+      "target_audit_exception_shape_counts": {}
+    },
+    "since_verified_ready": {
+      "start_kst": "2026-10-14T05:50:15+09:00",
+      "end_kst": "2026-10-14T19:13:21+09:00",
+      "all_minimal_access_requests": 0,
+      "target_minimal_access_requests": 0,
+      "all_docker_standard_access_requests": 0,
+      "target_docker_standard_access_requests": 0,
+      "target_audit_with_explicit_time_evidence": 0,
+      "target_audit_rule_counts": {},
+      "target_audit_exception_shape_counts": {}
+    },
+    "recent5h": {
+      "start_kst": "2026-10-14T14:13:21+09:00",
+      "end_kst": "2026-10-14T19:13:21+09:00",
+      "all_minimal_access_requests": 0,
+      "target_minimal_access_requests": 0,
+      "all_docker_standard_access_requests": 0,
+      "target_docker_standard_access_requests": 0,
+      "target_audit_with_explicit_time_evidence": 0,
+      "target_audit_rule_counts": {},
+      "target_audit_exception_shape_counts": {}
+    }
+  },
+  "source_inventory": [
+    {
+      "name": "audit.log",
+      "snapshot_bytes": 10072,
+      "decoded_bytes": 10072,
+      "records": 5,
+      "snapshot_sha256": "ded2910950e354e110486dd6b107e1cf3f1a24572b56953d4edbfad8cdab93f6",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-14T03:26:49+09:00"
+    },
+    {
+      "name": "audit.log.1",
+      "snapshot_bytes": 8432,
+      "decoded_bytes": 8432,
+      "records": 4,
+      "snapshot_sha256": "d28540b45327860cf0d6b30e0f60a8e5bda78b763dc3b7514ff3ac4b12150aa9",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-14T00:00:08+09:00"
+    },
+    {
+      "name": "audit.log.10.gz",
+      "snapshot_bytes": 1445,
+      "decoded_bytes": 8344,
+      "records": 4,
+      "snapshot_sha256": "a2524066322465fc0986269e394e3aba9112e93c0c70f8f926ac27a973da234d",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-05T09:00:22+09:00"
+    },
+    {
+      "name": "audit.log.11.gz",
+      "snapshot_bytes": 1455,
+      "decoded_bytes": 8345,
+      "records": 4,
+      "snapshot_sha256": "745d4329a98756de48cf2b39db6f9e016ab5eec769e9316126c0bb1680c7d998",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-04T09:00:22+09:00"
+    },
+    {
+      "name": "audit.log.12.gz",
+      "snapshot_bytes": 2343,
+      "decoded_bytes": 16940,
+      "records": 7,
+      "snapshot_sha256": "5f2287c9c052a188b67d1e2f81840cceb1463015a9a33035449a3c1e4e102b21",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-03T09:00:02+09:00"
+    },
+    {
+      "name": "audit.log.13.gz",
+      "snapshot_bytes": 1449,
+      "decoded_bytes": 8343,
+      "records": 4,
+      "snapshot_sha256": "4efea29ad20c3fcd1677d64a3e6050294490aa6b21f483ba892f6c65204f9fa6",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-02T09:00:22+09:00"
+    },
+    {
+      "name": "audit.log.14.gz",
+      "snapshot_bytes": 1448,
+      "decoded_bytes": 8345,
+      "records": 4,
+      "snapshot_sha256": "3cf097feef980a3298b2abd0cea10242f2c64202bf410bc2a840f48815b919b9",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-01T09:00:22+09:00"
+    },
+    {
+      "name": "audit.log.2.gz",
+      "snapshot_bytes": 1464,
+      "decoded_bytes": 8432,
+      "records": 4,
+      "snapshot_sha256": "fe22691e157fd9bbb5c4cae8c8f11c3ff3a48c01a2007b39ffb9a737114a8194",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-13T00:00:01+09:00"
+    },
+    {
+      "name": "audit.log.3.gz",
+      "snapshot_bytes": 1461,
+      "decoded_bytes": 8433,
+      "records": 4,
+      "snapshot_sha256": "43f7774af5cfab7e5b70d1860628e5137449904fbf0792392b5f9bb14041814a",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-12T00:00:04+09:00"
+    },
+    {
+      "name": "audit.log.4.gz",
+      "snapshot_bytes": 1463,
+      "decoded_bytes": 8433,
+      "records": 4,
+      "snapshot_sha256": "9bd0520a8fd966a0bdd1d83fa650bddfaf179a04f4167b685d4d398d99821a29",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-11T00:00:02+09:00"
+    },
+    {
+      "name": "audit.log.5.gz",
+      "snapshot_bytes": 1468,
+      "decoded_bytes": 8430,
+      "records": 4,
+      "snapshot_sha256": "0d9dddf953c917959518eaa245de9a8acba0dfc5d336be32462a294bdd5b7c76",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-10T00:00:05+09:00"
+    },
+    {
+      "name": "audit.log.6.gz",
+      "snapshot_bytes": 1456,
+      "decoded_bytes": 8431,
+      "records": 4,
+      "snapshot_sha256": "1199c9b2bedbe267de80fbd5a0ca6135d17d4922110de5d4608784d4597b32ef",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-09T00:00:02+09:00"
+    },
+    {
+      "name": "audit.log.7.gz",
+      "snapshot_bytes": 1456,
+      "decoded_bytes": 8432,
+      "records": 4,
+      "snapshot_sha256": "15bda904a2fb11a73da22ad5a0c4ffa0866923aed31687e398d8dbe1f2aadbbc",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-08T00:00:03+09:00"
+    },
+    {
+      "name": "audit.log.8.gz",
+      "snapshot_bytes": 1731,
+      "decoded_bytes": 5352,
+      "records": 3,
+      "snapshot_sha256": "eb2b2ff023689db0955621b80ba9af921e9f63585bbaf94f530983f16280c82b",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-07T00:00:04+09:00"
+    },
+    {
+      "name": "audit.log.9.gz",
+      "snapshot_bytes": 2959,
+      "decoded_bytes": 21117,
+      "records": 8,
+      "snapshot_sha256": "28e4ddefde2b17609c4bd1b6f96aa56afe369bc9ada77e5e24f8cd38d5f0a882",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-06T09:00:32+09:00"
+    },
+    {
+      "name": "capstone-access.log",
+      "snapshot_bytes": 810,
+      "decoded_bytes": 810,
+      "records": 2,
+      "snapshot_sha256": "b62553b59a8f0be96944b2f2643c519b92feb5b89649d5ef2cfce8d22a4ad461",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-14T05:50:14+09:00"
+    },
+    {
+      "name": "docker-current.jsonl",
+      "snapshot_bytes": 76870,
+      "decoded_bytes": 76870,
+      "records": 289,
+      "snapshot_sha256": "b8d6f300eb9df938e17c38172846a21ab38011d9d6a8dfac314aa939b15481e6",
+      "source_prefix_stable": true,
+      "source_mtime_kst": "2026-10-14T05:50:14+09:00"
+    }
+  ],
+  "bounds": {
+    "max_compressed_or_plain_file_bytes": 1048576,
+    "max_decompressed_file_bytes": 4194304,
+    "max_total_decoded_bytes": 16777216,
+    "max_total_records": 10000
+  },
+  "actual_decoded_bytes": 223561,
+  "actual_records": 358,
+  "minimal_access_records_total": 2,
+  "audit_records_total": 67,
+  "docker_json_records_total": 289,
+  "docker_standard_requests_total": 231,
+  "docker_envelope_first_kst": "2026-10-05T19:18:45+09:00",
+  "docker_envelope_last_kst": "2026-10-14T05:50:14+09:00",
+  "target_audit_total_in_retained_files": 56,
+  "target_audit_without_explicit_time_evidence": 56,
+  "duplicate_json_objects_preserved": 67,
+  "duplicate_header_name_counts": {
+    "Server": 67,
+    "other": 4
+  },
+  "audit_configuration_observed": [
+    [
+      "SecAuditEngine",
+      "RelevantOnly"
+    ],
+    [
+      "SecAuditLogFormat",
+      "JSON"
+    ]
+  ],
+  "live_exception_host_and_container_sha256": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+  "container_identity_unchanged": true,
+  "waf_health": "healthy",
+  "natural_post_apply_target_requests_observed": false,
+  "interpretation": "No new target request in the retained post-apply source evidence means natural exception effectiveness remains unobserved, not proven from zero alerts.",
+  "limits": [
+    "Minimal access omits raw URI/protocol/Host/CL/TE; access alone cannot prove the full exception predicate.",
+    "Audit timestamps without offsets are not assumed UTC or KST; only matching explicit access or Docker warning envelope provides range evidence.",
+    "Audit request.uri is reported as audit shape, not independent proof of REQUEST_URI_RAW equality.",
+    "Only retained bounded files were inspected. Existing copytruncate and any earlier retention gaps are not repaired or disproved.",
+    "RelevantOnly can omit ordinary transactions, so audit absence alone does not prove request absence."
+  ],
+  "raw_snapshots_server_only": "/var/tmp/capstone-short-priority-20261014/step1-a/raw-snapshot",
+  "analysis_source_sha256": "0052cf8aea03c1f3363f9ad2440979ca48621d98cc1e95eba7fe86703d11c8ac",
+  "operational_changes": false,
+  "generated_requests": 0,
+  "chat_messages_sent": 0,
+  "raw_or_credentials_exported": false,
+  "retained_target_audit_metadata_summary": {
+    "records": 56,
+    "time_offsets_missing": true,
+    "naive_time_min": "2026-09-30T18:00:30",
+    "naive_time_max": "2026-10-13T18:05:04",
+    "protocol_counts": {
+      "HTTP/1.0": 42,
+      "HTTP/1.1": 14
+    },
+    "exception_audit_shape_counts": {
+      "10020": 42,
+      "10021": 14
+    },
+    "rule_id_counts": {
+      "920280": 42,
+      "949110": 42,
+      "920350": 14
+    },
+    "these_unoffset_times_are_not_used_to_assert_KST_windows": true
+  },
+  "server_result_path": "/var/tmp/capstone-short-priority-20261014/step1-a/result.json",
+  "server_result_sha256": "01668ca5958817b813fdcbdbb1ae62539a367748e36e914601e9e656a3a227d3",
+  "source_file_count": 17,
+  "snapshot_input_bytes": 117782,
+  "read_only_followup_complete": true,
+  "natural_exception_effectiveness": "not_observed_no_new_target_requests",
+  "script_preservation": {
+    "executed_analysis_source_on_A": "/var/tmp/capstone-short-priority-20261014/step1-a/analysis-source.py",
+    "executed_source_sha256": "0052cf8aea03c1f3363f9ad2440979ca48621d98cc1e95eba7fe86703d11c8ac",
+    "original_raw_snapshots_remain_on_A_only": true,
+    "mac_local_files": "Only task-shared temporary scripts and projected metadata; parent final cleanup owns the shared task directory."
+  },
+  "decision": "Read-only follow-up complete. No operational adjustment is justified by these observations; wait for a natural target request before claiming live exception effectiveness."
+}

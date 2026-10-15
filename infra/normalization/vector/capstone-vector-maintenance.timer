@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Vector output rotation and capacity every five minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+AccuracySec=15s
+Unit=capstone-vector-maintenance.service
+
+[Install]
+WantedBy=timers.target

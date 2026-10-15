@@ -1,0 +1,67 @@
+{
+  "date_kst": "2026-10-14",
+  "installed_wazuh_version": "4.14.8",
+  "scope": "shadow agent input and level-1 no_log base only",
+  "rule": {
+    "id": 100200,
+    "count": 1,
+    "level": 1,
+    "no_log": true,
+    "correlation_enabled": false,
+    "native_positive_cases": 2,
+    "native_negative_cases": 4,
+    "native_tests_before_and_after_restart": "passed"
+  },
+  "a": {
+    "native_full_candidate": "passed",
+    "original_raw_localfile_count": 8,
+    "original_raw_localfile_sha256_preserved": true,
+    "new_input_count": 1,
+    "open_fd_count": 1,
+    "startup_log_confirmed": true,
+    "config_mode": "0660",
+    "config_uid": 0,
+    "config_gid": 110,
+    "apply_changed_counts": [
+      5,
+      1,
+      0
+    ],
+    "second_apply_change_scope": "candidate file only; no operational config change or restart",
+    "reapply_process_pid_start_ticks_unchanged": true
+  },
+  "b": {
+    "local_rules_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+    "local_rules_sha256_and_metadata_unchanged": true,
+    "apply_changed_counts": [
+      3,
+      0
+    ],
+    "container_id_preserved": true,
+    "reapply_started_at_preserved": true,
+    "required_processes_healthy": true,
+    "observed_alert_rows": 1861,
+    "observed_vector_alerts": 0,
+    "observed_alert_bytes": 1878275
+  },
+  "approval_boundary": {
+    "helper_config_sudoers_worker_files_and_permissions_unchanged": true,
+    "worker_lock_shared_for_initial_a_and_reapply_b": true
+  },
+  "not_verified": [
+    "per-event durable remote receipt",
+    "indexer end-to-end visibility",
+    "fault-injected rollback",
+    "rotation exactly-once",
+    "first registration history replay",
+    "WAF normalized ingestion",
+    "new correlation rule behavior"
+  ],
+  "artifacts_sha256": {
+    "agent-localfile.xml": "944d18bccc3c69c5469a3c4e4daea062c41703637fccebfaff5973a404cff0f6",
+    "capstone_vector_rules.xml": "de0c42674577cbd8aef3b7be23b66d11d07cff5f1bf6652ab42a18542ba832c2",
+    "apply-a.yml": "b1fda3cac7a0fe7cd32422cf3a2fcf7b0ab98040f91aa9614717e4f3e4564b27",
+    "apply-b.yml": "feb09d36e68a9c8eff6d14b835b31e10536d48b2aa2cd0faaf916fa43ff94f56",
+    "run-local.sh": "efecb2a120997866ef9d72830dbc4dc735e4e79f74a12fe1395f244b319f62e6"
+  }
+}

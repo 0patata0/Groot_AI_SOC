@@ -1,0 +1,538 @@
+{
+  "kind": "existing_engine_isolated_netns",
+  "container_id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+  "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+  "production": {
+    "Id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+    "Image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+    "pid": 647700,
+    "started_at": "2026-10-05T10:18:45.433754298Z"
+  },
+  "candidate_sha256": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+  "test_script_sha256": "b8bb97c0cf45fc0ad50ca0a7832a7da5749bc12d1ac76da8ab16d5e104290be3",
+  "at_kst": "2026-10-14T05:48:26+09:00",
+  "netns": "net:[4026532740]",
+  "interfaces": [
+    "lo"
+  ],
+  "proxy_backend": false,
+  "cases": [
+    {
+      "phase": "baseline",
+      "name": "missing-host",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "exception",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-neighbor-source",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-post",
+      "http_status": 405,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920180,
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-nonroot",
+      "http_status": 404,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-query",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-content-length-zero",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-other-destination",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-other-port",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "missing-host-xss-control",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "xss",
+      "rule_ids": [
+        10300,
+        920280,
+        941100,
+        941110,
+        941160,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "exception",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-neighbor-source",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-post",
+      "http_status": 405,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920180,
+        920350,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-nonroot",
+      "http_status": 404,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-query",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-content-length-zero",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-other-destination",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-other-port",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-other-protocol",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-other-host",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-transfer-encoding",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920171,
+        920350,
+        949110
+      ]
+    },
+    {
+      "phase": "baseline",
+      "name": "numeric-host-xss-control",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "xss",
+      "rule_ids": [
+        10300,
+        920350,
+        941100,
+        941110,
+        941160,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "exception",
+      "rule_ids": []
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-neighbor-source",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-post",
+      "http_status": 405,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920180,
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-nonroot",
+      "http_status": 404,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-query",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-content-length-zero",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-other-destination",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-other-port",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "must_remain",
+      "rule_ids": [
+        920280,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "missing-host-xss-control",
+      "http_status": 200,
+      "target_rule": 920280,
+      "mode": "xss",
+      "rule_ids": [
+        10300,
+        941100,
+        941110,
+        941160,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "exception",
+      "rule_ids": []
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-neighbor-source",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-post",
+      "http_status": 405,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920180,
+        920350,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-nonroot",
+      "http_status": 404,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-query",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-content-length-zero",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-other-destination",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-other-port",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-other-protocol",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-other-host",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920350
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-transfer-encoding",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "must_remain",
+      "rule_ids": [
+        920171,
+        920350,
+        949110
+      ]
+    },
+    {
+      "phase": "candidate",
+      "name": "numeric-host-xss-control",
+      "http_status": 200,
+      "target_rule": 920350,
+      "mode": "xss",
+      "rule_ids": [
+        10300,
+        941100,
+        941110,
+        941160,
+        949110
+      ]
+    }
+  ],
+  "json_raw_payload_exported": false,
+  "baseline": {
+    "nginx_test": true,
+    "private_writable_fd_count": 10,
+    "setup_sha256": "de1b44221d280e4d5217f96d0bbd1c5e776195fe95f5f4a0dcac23a45436b147",
+    "nginx_sha256": "de565692b826848202d14ac35726cd47137b36434d6d9356cbe66a7d31470d78"
+  },
+  "candidate": {
+    "nginx_test": true,
+    "private_writable_fd_count": 10,
+    "setup_sha256": "f26a7f1ddab30b061b1fc6cb0a68dba911523e3d6ad07783c594b39b40cf534a",
+    "nginx_sha256": "53488476a83a70e96111d364e1e86756992e0fbd88863e06e80de282f33c0a40"
+  },
+  "passed": 21,
+  "failed": 0,
+  "policy_files_sha256": {
+    "etc/modsecurity.d/modsecurity-override.conf": "1063145a6a20922d17b7c75afee4938883d6d57f2b7584b33a085cf8291c3198",
+    "etc/modsecurity.d/modsecurity.conf": "a0dc08ae01c58b68e54a881a039359dc09008e50c101a2c4d4b01823b5a5e178",
+    "etc/modsecurity.d/setup.conf": "5e8dd2dab4517701be865f68467df491f54805d331cdff0dd3092a30f5022876",
+    "etc/nginx/nginx.conf": "9c07debd0e6c63bf1a646744a1166218e6b4e51f652c61950a207e83b22680ea",
+    "etc/modsecurity.d/unicode.mapping": "5e4500ef82e45c49d8edd9513648939710d6c8cc2d5997513b32866dc5d9be23"
+  },
+  "production_identity_unchanged": true,
+  "production_policy_unchanged": true,
+  "private_container_tmp_removed": true,
+  "namespace_processes_after_cleanup": 0,
+  "production_after_outer_cleanup": {
+    "Id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+    "Image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+    "pid": 647700,
+    "started_at": "2026-10-05T10:18:45.433754298Z"
+  },
+  "all_probe_tmp_paths_remaining": 0,
+  "final_validation_source_sha256": "b8bb97c0cf45fc0ad50ca0a7832a7da5749bc12d1ac76da8ab16d5e104290be3",
+  "scope_notes": [
+    "21 paired scenarios / 42 requests in the final run; only loopback interfaces existed in the anonymous netns.",
+    "GET static fixture response 200; production upstream response 302 was not recreated or contacted.",
+    "No-Host HTTP/1.1 and duplicate Host rejection by nginx core are not claimed as ModSecurity-chain coverage.",
+    "No operational reload/restart, new container, package install, model/MCP/chat or block action.",
+    "The host-side pathlib inventory does not follow the container CRS directory symlink. production_policy_unchanged applies only to the five explicitly listed files; no full CRS/custom hash preservation is claimed by this test.",
+    "Normal successful cleanup was directly verified. An outer hard timeout can skip inner finally and leave private files; hard-timeout recovery is not validated."
+  ],
+  "preflight_failures_corrected": [
+    "Private base.conf initially lacked relative unicode.mapping; copied existing mapping into private tree.",
+    "nginx -t created an empty private PID file; startup now waits for a numeric PID and verifies process identity."
+  ],
+  "policy_hash_scope": "base_setup_override_nginx_unicode_only_not_CRS_symlink_tree",
+  "policy_hash_file_count": 5,
+  "post_validation_source_hardening": {
+    "tested_source_sha256": "b8bb97c0cf45fc0ad50ca0a7832a7da5749bc12d1ac76da8ab16d5e104290be3",
+    "current_source_sha256": "64ac65da6ab011a438f7791da9c93b6b46fe140c9b506be1303af3aefcbf48d7",
+    "native_rerun_performed": false,
+    "reason": "Production deployment began; do not alter or replay the live baseline.",
+    "changes": [
+      "Emergency process-group signal only while child remains alive; no signal to a reaped old PGID.",
+      "Explicitly limit policy hash inventory to the five files actually traversed."
+    ]
+  }
+}

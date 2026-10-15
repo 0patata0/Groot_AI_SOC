@@ -1,0 +1,80 @@
+{
+  "verified_date_kst": "2026-10-14",
+  "status": "evidence_input_deployed",
+  "b_rules": {
+    "completed_at": "2026-10-14T05:54:28+09:00",
+    "recap": {
+      "ok": 33,
+      "changed": 2,
+      "failed": 0,
+      "rescued": 0
+    },
+    "native_scenarios_before": 104,
+    "native_scenarios_after": 104,
+    "sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+    "local_rules_preserved_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+    "manager_started_at_utc": "2026-10-13T20:52:37.692259701Z",
+    "manager_container_recreated": false,
+    "repeat_apply_performed": false
+  },
+  "a_localfile": {
+    "completed_at": "2026-10-14T05:55:27+09:00",
+    "recap": {
+      "ok": 27,
+      "changed": 4,
+      "failed": 0,
+      "rescued": 0
+    },
+    "existing_localfile_elements_preserved": 10,
+    "outside_managed_block_bytes_preserved": true,
+    "evidence_path": "/var/log/capstone-vector/evidence/normalized.jsonl",
+    "sha256": "8fcfeb935e1d706fe37ce6b89b5de5ad0189023d1c3dc40693a68803f9769984",
+    "before_writer_fd_count": 1,
+    "before_writer_fd_offset": 0
+  },
+  "natural_suricata_end_to_end": {
+    "manager_observed_at": "2026-10-14T06:04:08+09:00",
+    "indexer_observed_at": "2026-10-14T06:04:32+09:00",
+    "record_match_verified_at": "2026-10-14T06:06:06+09:00",
+    "rule_id": "100261",
+    "level": 3,
+    "event_id": "2e5b08baa3752801f4364d488033fd2702a18d4e49aabcbc32bf1acb0b4b02e8",
+    "event_time_kst": "2026-10-14T06:03:42.471233+09:00",
+    "a_b_event_source_time_dedupe_match": true,
+    "matching_records": 1,
+    "full_log_present": false,
+    "successful_shards": 54,
+    "total_shards": 54,
+    "timed_out": false
+  },
+  "nft_observation": {
+    "at": "2026-10-14T06:04:51+09:00",
+    "evidence_rows": 31,
+    "nft_spoof_observed_rows": 30,
+    "suricata_allowed_rows": 1,
+    "indexer_nft_rows": 0,
+    "reason": "100262 additionally requires action=logged_drop; SPOOF/observed is intentionally excluded",
+    "action_inference_or_rule_widening": false
+  },
+  "notifications": {
+    "new_email_or_active_response": false,
+    "manager_integrations": 0,
+    "manager_active_response_entries": 0,
+    "soc_build_report_min_level": 5,
+    "soc_build_summary_min_level": 5,
+    "chat_messages_sent": 0
+  },
+  "error_review": {
+    "after_cutoff": "2026-10-14T05:54:28+09:00",
+    "decoder_field_limit_errors": 0,
+    "other_error_count": 1,
+    "other_error_component": "wazuh-modulesd",
+    "other_error_cause": "not investigated or attributed to this change"
+  },
+  "limitations": [
+    "Local reader EOF is not a remote durable receipt",
+    "No natural cross-source match or nft logged_drop positive observed",
+    "Existing no_log shadow rules, raw input and approval authority preserved",
+    "Monitor deployment has a separate result file"
+  ]
+}

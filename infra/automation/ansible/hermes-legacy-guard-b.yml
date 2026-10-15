@@ -1,0 +1,339 @@
+[
+  {
+    "name": "Block legacy unguarded Hermes reconfiguration on the managed B host",
+    "hosts": "capstone_hermes_b",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "tasks": [
+      {
+        "name": "Require exact operator and completed original active container",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '1e143067c98a44ffba6eaa925dc038d7'",
+            "ansible_connection == 'local'",
+            "not ansible_check_mode"
+          ]
+        }
+      },
+      {
+        "name": "Read current original container identity",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "--format",
+            "{% raw %}{{json .Id}} {{json .State.Pid}} {{json .State.Running}} {{json .Name}}{% endraw %}",
+            "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b"
+          ]
+        },
+        "changed_when": false,
+        "register": "legacy_before"
+      },
+      {
+        "name": "Require original restored instance",
+        "ansible.builtin.assert": {
+          "that": [
+            "legacy_before.stdout == '\"6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b\" 2248019 true \"/hermes\"'"
+          ]
+        }
+      },
+      {
+        "name": "Check managed boundary exists",
+        "ansible.builtin.stat": {
+          "path": "/etc/capstone-hermes-guard",
+          "follow": false
+        },
+        "register": "managed"
+      },
+      {
+        "name": "Require actual guarded host",
+        "ansible.builtin.assert": {
+          "that": [
+            "managed.stat.isdir",
+            "not managed.stat.islnk",
+            "managed.stat.uid == 0"
+          ]
+        }
+      },
+      {
+        "name": "Check exact existing source and reviewed replacement",
+        "ansible.builtin.stat": {
+          "path": "{{ item.path }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          {
+            "path": "/home/groot_b/capstone/hermes/deploy_hermes_B.sh",
+            "sha": "b68902bd07190b1e518207e82e0ccbc28adf906231de10e8a6733771d557a97b",
+            "uid": 1000,
+            "gid": 1000,
+            "mode": "0664"
+          },
+          {
+            "path": "{{ playbook_dir }}/../../hermes/deploy_hermes_B.sh",
+            "sha": "6065fa7fd7d4e896a9d2da5e22f44746970fc80dc4cd2aed8992ae0f40649460",
+            "uid": 0,
+            "gid": 0,
+            "mode": "0400"
+          }
+        ],
+        "register": "legacy_hashes"
+      },
+      {
+        "name": "Require exact unchanged content owner and mode",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.nlink == 1",
+            "item.stat.uid == item.item.uid",
+            "item.stat.gid == item.item.gid",
+            "item.stat.mode == item.item.mode",
+            "item.stat.checksum == item.item.sha"
+          ]
+        },
+        "loop": "{{ legacy_hashes.results }}"
+      },
+      {
+        "name": "Check new shell syntax",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/bash",
+            "-n",
+            "{{ playbook_dir }}/../../hermes/deploy_hermes_B.sh"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Check exclusive backup location",
+        "ansible.builtin.stat": {
+          "path": "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard",
+          "follow": false
+        },
+        "register": "backup_stat"
+      },
+      {
+        "name": "Refuse repeat of completed legacy update",
+        "ansible.builtin.assert": {
+          "that": [
+            "not backup_stat.stat.exists"
+          ]
+        }
+      },
+      {
+        "name": "Create private preserved original directory",
+        "ansible.builtin.file": {
+          "path": "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard",
+          "state": "directory",
+          "owner": "root",
+          "group": "root",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Preserve exact original source",
+        "ansible.builtin.copy": {
+          "src": "/home/groot_b/capstone/hermes/deploy_hermes_B.sh",
+          "dest": "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/deploy_hermes_B.sh.before",
+          "remote_src": true,
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Recheck backup and live preimage before installation",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/deploy_hermes_B.sh.before",
+          "/home/groot_b/capstone/hermes/deploy_hermes_B.sh"
+        ],
+        "register": "legacy_preimage"
+      },
+      {
+        "name": "Require both exact preimages immediately before install",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.stat.isreg",
+            "not item.stat.islnk",
+            "item.stat.nlink == 1",
+            "item.stat.checksum == 'b68902bd07190b1e518207e82e0ccbc28adf906231de10e8a6733771d557a97b'",
+            "(item.item == '/home/groot_b/capstone/hermes/deploy_hermes_B.sh' and item.stat.uid == 1000 and item.stat.gid == 1000 and item.stat.mode == '0664') or (item.item != '/home/groot_b/capstone/hermes/deploy_hermes_B.sh' and item.stat.uid == 0 and item.stat.gid == 0 and item.stat.mode == '0400')"
+          ]
+        },
+        "loop": "{{ legacy_preimage.results }}"
+      },
+      {
+        "name": "Install early legacy gate preserving project ownership",
+        "ansible.builtin.copy": {
+          "src": "{{ playbook_dir }}/../../hermes/deploy_hermes_B.sh",
+          "dest": "/home/groot_b/capstone/hermes/deploy_hermes_B.sh",
+          "owner": "1000",
+          "group": "1000",
+          "mode": "0664",
+          "unsafe_writes": false
+        }
+      },
+      {
+        "name": "Verify installed source digest",
+        "ansible.builtin.stat": {
+          "path": "/home/groot_b/capstone/hermes/deploy_hermes_B.sh",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "installed"
+      },
+      {
+        "name": "Require installed protected expected script",
+        "ansible.builtin.assert": {
+          "that": [
+            "installed.stat.isreg",
+            "not installed.stat.islnk",
+            "installed.stat.nlink == 1",
+            "installed.stat.uid == 1000",
+            "installed.stat.gid == 1000",
+            "installed.stat.mode == '0664'",
+            "installed.stat.checksum == \"6065fa7fd7d4e896a9d2da5e22f44746970fc80dc4cd2aed8992ae0f40649460\""
+          ]
+        }
+      },
+      {
+        "name": "Capture installed bytes in private root-only snapshot",
+        "ansible.builtin.copy": {
+          "src": "/home/groot_b/capstone/hermes/deploy_hermes_B.sh",
+          "dest": "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/deploy_hermes_B.sh.installed",
+          "remote_src": true,
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Hash protected installed snapshot before root execution",
+        "ansible.builtin.stat": {
+          "path": "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/deploy_hermes_B.sh.installed",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "legacy_snapshot"
+      },
+      {
+        "name": "Require exact immutable snapshot for root invocation",
+        "ansible.builtin.assert": {
+          "that": [
+            "legacy_snapshot.stat.isreg",
+            "not legacy_snapshot.stat.islnk",
+            "legacy_snapshot.stat.nlink == 1",
+            "legacy_snapshot.stat.uid == 0",
+            "legacy_snapshot.stat.gid == 0",
+            "legacy_snapshot.stat.mode == '0400'",
+            "legacy_snapshot.stat.checksum == \"6065fa7fd7d4e896a9d2da5e22f44746970fc80dc4cd2aed8992ae0f40649460\""
+          ]
+        }
+      },
+      {
+        "name": "Verify exact root-owned snapshot rejects managed prep test all before actions",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/bash",
+            "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/deploy_hermes_B.sh.installed",
+            "{{ item }}"
+          ]
+        },
+        "loop": [
+          "prep",
+          "test",
+          "all"
+        ],
+        "register": "legacy_gate",
+        "changed_when": false,
+        "failed_when": "legacy_gate.rc != 78",
+        "timeout": 10
+      },
+      {
+        "name": "Read original running identity after gate validation",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "--format",
+            "{% raw %}{{json .Id}} {{json .State.Pid}} {{json .State.Running}} {{json .Name}}{% endraw %}",
+            "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b"
+          ]
+        },
+        "changed_when": false,
+        "register": "legacy_after"
+      },
+      {
+        "name": "Require no container lifecycle change",
+        "ansible.builtin.assert": {
+          "that": [
+            "legacy_before.stdout == legacy_after.stdout"
+          ]
+        }
+      },
+      {
+        "name": "Recheck live installed digest after safe snapshot invocation",
+        "ansible.builtin.stat": {
+          "path": "/home/groot_b/capstone/hermes/deploy_hermes_B.sh",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "legacy_live_final"
+      },
+      {
+        "name": "Require live installed script still matches checked snapshot",
+        "ansible.builtin.assert": {
+          "that": [
+            "legacy_live_final.stat.isreg",
+            "not legacy_live_final.stat.islnk",
+            "legacy_live_final.stat.nlink == 1",
+            "legacy_live_final.stat.uid == 1000",
+            "legacy_live_final.stat.gid == 1000",
+            "legacy_live_final.stat.mode == '0664'",
+            "legacy_live_final.stat.checksum == \"6065fa7fd7d4e896a9d2da5e22f44746970fc80dc4cd2aed8992ae0f40649460\""
+          ]
+        }
+      },
+      {
+        "name": "Persist bounded completion receipt",
+        "ansible.builtin.copy": {
+          "content": "{\"status\": \"managed_legacy_prep_test_all_blocked\", \"old_sha256\": \"b68902bd07190b1e518207e82e0ccbc28adf906231de10e8a6733771d557a97b\", \"new_sha256\": \"6065fa7fd7d4e896a9d2da5e22f44746970fc80dc4cd2aed8992ae0f40649460\", \"destination\": \"/home/groot_b/capstone/hermes/deploy_hermes_B.sh\", \"blocked_exit_code\": 78, \"original_pid_unchanged\": 2248019, \"container_lifecycle_calls\": 0, \"load_only_retained\": true}\n",
+          "dest": "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/result.json",
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Synchronize backup and completion receipt",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/sync",
+            "--",
+            "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard",
+            "/home/groot_b/capstone/hermes/deploy_hermes_B.sh",
+            "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/deploy_hermes_B.sh.before",
+            "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/deploy_hermes_B.sh.installed",
+            "/var/backups/hermes-prestart-a6591545313d/legacy-deploy-guard/result.json"
+          ]
+        },
+        "changed_when": false
+      }
+    ]
+  }
+]

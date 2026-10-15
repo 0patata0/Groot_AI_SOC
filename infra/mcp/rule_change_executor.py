@@ -2,7 +2,8 @@
 """Root-owned, fixed-target executor for human-approved rule changes.
 
 The stdio MCP user may invoke this file *without arguments* via one sudoers
-entry. It accepts only ``get``, ``propose``, and ``status`` JSON on stdin. A root-only
+entry. It accepts fixed JSON operations, including full-file ``propose`` and
+literal ``propose-edit``, on stdin. A root-only
 systemd timer invokes ``--once`` to complete approved proposals. No MCP field
 is a filesystem path, container name, command, URL, or approval identity.
 
@@ -11,10 +12,12 @@ fail closed when the broker, approver, validation, or live base has changed.
 """
 
 import contextlib
+from datetime import datetime
 import difflib
 import fcntl
 import hashlib
 import hmac
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -34,11 +37,26 @@ CONFIG_PATH = Path("/etc/rule-change/config.json")
 STATE_DIR = Path("/var/lib/rule-change")
 DOCKER = "/usr/local/bin/docker"  # fixed path on the live A/B hosts
 MAX_CANDIDATE = 128 * 1024
-MAX_DIFF = 8 * 1024
-MAX_REQUEST = 256 * 1024
+MAX_DIFF = 512 * 1024
+MAX_EDITS = 16
+MAX_EDIT_TEXT = 64 * 1024
+# JSON escaping can expand a bounded UTF-8 candidate or stored diff. Keep
+# transport/state limits separate from the unchanged rule-file size limit.
+MAX_REQUEST = 1024 * 1024
+MAX_STATE = 4 * 1024 * 1024
 MAX_RULESET = 64 * 1024 * 1024
 PROPOSAL_ID = re.compile(r"^[0-9a-f]{16,64}$")
 HEX_SHA = re.compile(r"^[0-9a-f]{64}$")
+SURICATA_ET_OVERRIDES = frozenset((2034806, 2034802))
+SURICATA_LLM_BIT = b"groot_llm_api"
+# Exact destination/revision pairs: legacy endpoint or the approved two-endpoint list.
+# Other lists, list spellings, subnets and free revisions are not accepted.
+SURICATA_LLM_MARKER_PROFILES = (
+    (b"211.170.162.110", b"1"),
+    (b"[211.170.162.110,211.170.162.111]", b"2"),
+)
+EXTENSION_DIR = Path("/opt/rule-change")
+_EXTENSIONS = {}
 
 TARGETS = {
     "a:modsecurity-custom": {
@@ -53,7 +71,7 @@ TARGETS = {
         "all_path": "/home/groot_a/capstone/suricata/ruleset/all.rules",
         "container": "suricata", "container_path": "/rules/all.rules",
         "mount_source": "/home/groot_a/capstone/suricata/ruleset", "mount_dest": "/rules",
-        "impact": "Suricata passive local rules and loaded all.rules are replaced together; syntax test and rule reload follow. No inline/drop transition.",
+        "impact": "Suricata passive local rules and all.rules are replaced together and syntax-tested. Only ET2034806/2034802 exact upstream-derived overrides with the fixed Ollama flowbit guard are allowed; the ET source file stays unchanged. The existing Suricata container restarts because -S prevents hot reload; detection pauses briefly. Runtime rule statistics and load time are checked. No inline/drop transition.",
     },
     "b:wazuh-local-rules": {
         "host": "b", "kind": "wazuh", "path": "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml",
@@ -70,6 +88,69 @@ class RuleChangeError(Exception):
 
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
+
+
+def proposal_limits():
+    return {"max_candidate_utf8_bytes": MAX_CANDIDATE,
+            "max_diff_utf8_bytes": MAX_DIFF,
+            "max_edits": MAX_EDITS,
+            "max_edit_text_utf8_bytes": MAX_EDIT_TEXT,
+            "edit_matching": "exactly_once_in_original_nonoverlapping",
+            "review_presentation": "automatic_multipart_if_needed",
+            "approval_scope": "entire_candidate_once"}
+
+
+def _validated_edits(edits):
+    """Validate the bounded literal-edit protocol before acquiring a live lock."""
+    if not isinstance(edits, list) or not 1 <= len(edits) <= MAX_EDITS:
+        raise RuleChangeError("edits must contain 1..16 literal replacements")
+    encoded, total = [], 0
+    for edit in edits:
+        if not isinstance(edit, dict) or set(edit) != {"old_text", "new_text"}:
+            raise RuleChangeError("each edit must contain only old_text and new_text")
+        old, new = edit["old_text"], edit["new_text"]
+        if not isinstance(old, str) or not old or not isinstance(new, str):
+            raise RuleChangeError("old_text must be nonempty text and new_text must be text")
+        if old == new:
+            raise RuleChangeError("an edit must change its matched text")
+        try:
+            old, new = old.encode("utf-8"), new.encode("utf-8")
+        except UnicodeEncodeError:
+            raise RuleChangeError("edit text must be valid UTF-8") from None
+        total += len(old) + len(new)
+        if total > MAX_EDIT_TEXT:
+            raise RuleChangeError("combined old_text and new_text exceed 64 KiB UTF-8")
+        encoded.append((old, new))
+    return encoded
+
+
+def _edit_candidate(current, edits):
+    """Resolve every edit in the original bytes, then splice once without normalization."""
+    spans = []
+    size = len(current)
+    for index, (old, new) in enumerate(edits, 1):
+        start = current.find(old)
+        if start < 0:
+            raise RuleChangeError("edit %d old_text is absent from the original file" % index)
+        # Searching one byte after the first start also detects overlapping matches.
+        if current.find(old, start + 1) >= 0:
+            raise RuleChangeError("edit %d old_text must match exactly once in the original file" % index)
+        spans.append((start, start + len(old), new))
+        size += len(new) - len(old)
+    spans.sort(key=lambda span: span[0])
+    if any(right[0] < left[1] for left, right in zip(spans, spans[1:])):
+        raise RuleChangeError("edit ranges overlap in the original file")
+    if not 0 < size <= MAX_CANDIDATE:
+        raise RuleChangeError("assembled candidate must be nonempty and <=128 KiB UTF-8")
+    parts, cursor = [], 0
+    for start, end, new in spans:
+        parts.extend((current[cursor:start], new))
+        cursor = end
+    parts.append(current[cursor:])
+    try:
+        return b"".join(parts).decode("utf-8")
+    except UnicodeDecodeError:
+        raise RuleChangeError("assembled candidate must be valid UTF-8") from None
 
 
 def proposal_digest(payload):
@@ -165,6 +246,113 @@ def _inplace_bytes(path, data, expected_inode):
             os.close(fd)
 
 
+def _suricata_lines(data):
+    """Join only explicit backslash-newline continuations; omit whole comments."""
+    pending, single_line = b"", True
+    for line in data.split(b"\n"):
+        if not line.strip() or line.lstrip().startswith(b"#"):
+            continue
+        # The engine silently skips indented first lines, unlike continuation
+        # lines. Never count such a marker/signature as an active rule.
+        if not pending and line[:1] in (b" ", b"\t"):
+            raise RuleChangeError("Suricata rule must start at column zero")
+        if line.endswith(b"\\"):
+            pending += line[:-1]
+            single_line = False
+            continue
+        yield pending + line, single_line
+        pending, single_line = b"", True
+    if pending:
+        raise RuleChangeError("unterminated Suricata rule continuation")
+
+
+def _suricata_rule(line, single_line=True):
+    """Read option boundaries without treating quoted msg/content/PCRE as options."""
+    opening, closing = line.find(b"("), line.rfind(b")")
+    if opening < 0 or closing <= opening or line[closing + 1:].strip():
+        raise RuleChangeError("invalid Suricata rule boundary")
+    options, start, quoted, escaped = [], opening + 1, False, False
+    for pos in range(start, closing):
+        char = line[pos]
+        if escaped:
+            escaped = False
+        elif char == 92:
+            escaped = True
+        elif char == 34:
+            quoted = not quoted
+        elif char == 59 and not quoted:
+            token_start = start + len(line[start:pos]) - len(line[start:pos].lstrip())
+            token = line[token_start:pos]
+            key, colon, value = token.partition(b":")
+            if not re.fullmatch(rb"[A-Za-z0-9_.]+", key.strip()):
+                raise RuleChangeError("invalid Suricata option boundary")
+            value_start = token_start + len(key) + len(colon) + len(value) - len(value.lstrip())
+            options.append((key.strip().lower(), value.strip(), token_start, value_start,
+                            value_start + len(value.strip())))
+            start = pos + 1
+    if quoted or escaped or line[start:closing].strip():
+        raise RuleChangeError("unterminated Suricata option")
+    return {"line": line, "single_line": single_line, "header": line[:opening].split(), "options": options}
+
+
+def _suricata_number(rule, key):
+    found = [option for option in rule["options"] if option[0] == key]
+    if len(found) != 1 or not re.fullmatch(rb"[0-9]+", found[0][1]):
+        raise RuleChangeError("Suricata rule requires one numeric " + key.decode("ascii"))
+    return int(found[0][1]), found[0]
+
+
+def _validate_suricata_overrides(candidate, et):
+    rules = [_suricata_rule(*line) for line in _suricata_lines(candidate)]
+    overrides = {sid: rule for rule in rules
+                 for sid, _ in [_suricata_number(rule, b"sid")] if sid in SURICATA_ET_OVERRIDES}
+    if not overrides:
+        return  # Existing local-only files and removal of overrides remain supported.
+    marker = [rule for rule in rules if _suricata_number(rule, b"sid")[0] == 1000000]
+    fixed_options = [
+        (b"msg", b'"GROOT-LOCAL observed Ollama API transport marker (noalert)"'),
+        (b"flow", b"to_server,established"), (b"flowbits", b"set,groot_llm_api"),
+        (b"flowbits", b"noalert"), (b"sid", b"1000000")]
+    if len(marker) != 1 or not any(
+            marker[0]["header"] == b"alert tcp 192.168.16.230 any ->".split() + [address, b"11434"] and
+            [(key, value) for key, value, *_ in marker[0]["options"]] == fixed_options + [(b"rev", revision)]
+            for address, revision in SURICATA_LLM_MARKER_PROFILES):
+        raise RuleChangeError("ET overrides require one exact narrow Ollama marker profile (.110/rev1 or [.110,.111]/rev2)")
+
+    vendor = {sid: [] for sid in SURICATA_ET_OVERRIDES}
+    for line, single_line in _suricata_lines(et):
+        if SURICATA_LLM_BIT not in line and not any(str(sid).encode("ascii") in line for sid in vendor):
+            continue
+        rule = _suricata_rule(line, single_line)
+        sid, _ = _suricata_number(rule, b"sid")
+        if sid in vendor:
+            vendor[sid].append(rule)
+        # The private flowbit may be written only by the fixed local marker.
+        for key, value, *_ in rule["options"]:
+            if key == b"flowbits" and SURICATA_LLM_BIT in re.findall(rb"[A-Za-z0-9_.]+", value):
+                raise RuleChangeError("ET source unexpectedly uses the private Ollama flowbit")
+    if any(len(matches) != 1 for matches in vendor.values()):
+        raise RuleChangeError("ET overrides require exactly one current signature for each fixed ET SID")
+    for rule in rules:
+        for key, value, *_ in rule["options"]:
+            if key == b"flowbits" and SURICATA_LLM_BIT in re.findall(rb"[A-Za-z0-9_.]+", value) and \
+                    value != b"isnotset,groot_llm_api" and rule is not marker[0]:
+                raise RuleChangeError("additional Ollama flowbit writer or unsupported operation")
+    for sid, candidate_rule in overrides.items():
+        original = vendor[sid][0]
+        _, sid_option = _suricata_number(original, b"sid")
+        revision, rev_option = _suricata_number(original, b"rev")
+        if not 0 < revision < 2**32 - 1:
+            raise RuleChangeError("ET signature revision cannot be incremented")
+        edits = [(sid_option[2], sid_option[2], b"flowbits:isnotset,groot_llm_api; "),
+                 (rev_option[3], rev_option[4], str(revision + 1).encode("ascii"))]
+        expected = original["line"]
+        for start, end, replacement in sorted(edits, reverse=True):
+            expected = expected[:start] + replacement + expected[end:]
+        if not original["single_line"] or not candidate_rule["single_line"] or candidate_rule["line"] != expected:
+            raise RuleChangeError("ET override must exactly preserve upstream bytes except guard and revision +1")
+
+
 def _validate_candidate(kind, content):
     if not isinstance(content, str):
         raise RuleChangeError("candidate_content must be text")
@@ -185,11 +373,13 @@ def _validate_candidate(kind, content):
         if re.search(r"(?i)\bexec\s*:|\bctl\s*:\s*ruleEngine\b", active):
             raise RuleChangeError("WAF exec/ruleEngine override action is forbidden")
     elif kind == "suricata":
-        if re.search(r"(?im)^\s*(?:drop|reject|rejectsrc|rejectdst|pass|bypass)\s", active):
+        rules = [_suricata_rule(*line) for line in _suricata_lines(encoded)]
+        if any(not rule["header"] or rule["header"][0] != b"alert" for rule in rules):
             raise RuleChangeError("Suricata local rules must remain alert-only")
-        sids = [int(x) for x in re.findall(r"(?i)\bsid\s*:\s*(\d+)\s*;", active)]
-        if not sids or len(sids) != len(set(sids)) or any(not 1000000 <= sid <= 1000099 for sid in sids):
-            raise RuleChangeError("Suricata local SIDs must be unique and within 1000000..1000099")
+        sids = [_suricata_number(rule, b"sid")[0] for rule in rules]
+        if not sids or len(sids) != len(set(sids)) or any(
+                not 1000000 <= sid <= 1000099 and sid not in SURICATA_ET_OVERRIDES for sid in sids):
+            raise RuleChangeError("Suricata SIDs must be unique local IDs or the two fixed ET overrides")
     elif kind == "wazuh":
         if re.search(r"<!\s*(?:DOCTYPE|ENTITY)", content, re.IGNORECASE):
             raise RuleChangeError("XML entity/DOCTYPE directives are forbidden")
@@ -227,7 +417,12 @@ class Broker:
             "X-Rule-Signature": signature, "Content-Type": "application/json",
         })
         try:
-            with self.opener.open(req, timeout=12) as res:
+            # A large proposal posts all review parts before its single
+            # approval card. The broker bounds that sequence below 120 s.
+            timeout = 120 if method == "POST" and path == "/rule-changes" else (
+                30 if method == "POST" and (path == "/operations" or
+                    re.fullmatch(r"/operations/[0-9a-f]{32}/result", path)) else 12)
+            with self.opener.open(req, timeout=timeout) as res:
                 raw = res.read(65537)
                 status = res.status
                 response_signature = res.headers.get("X-Rule-Response-Signature", "")
@@ -309,25 +504,31 @@ class Engine:
 
     def _save(self, record):
         path = self._record_path(record["proposal_id"])
-        _atomic_bytes(path, json.dumps(record, ensure_ascii=False, sort_keys=True).encode("utf-8"), mode=0o600)
+        data = json.dumps(record, ensure_ascii=False, sort_keys=True).encode("utf-8")
+        if len(data) > MAX_STATE:
+            raise RuleChangeError("proposal state exceeds 4 MiB storage limit")
+        _atomic_bytes(path, data, mode=0o600)
 
     def _load(self, rid):
-        data, _ = _read_regular(self._record_path(rid), limit=MAX_REQUEST)
+        data, _ = _read_regular(self._record_path(rid), limit=MAX_STATE)
         record = json.loads(data)
         if record.get("proposal_id") != rid:
             raise RuleChangeError("corrupt proposal record")
         return record
 
-    def _inspect(self, spec):
-        raw = self.runner.call([DOCKER, "inspect", spec["container"]], timeout=15)
+    def _inspect(self, spec, timeout=15, recovering=False):
+        raw = self.runner.call([DOCKER, "inspect", spec["container"]], timeout=timeout)
         try:
             info = json.loads(raw)[0]
         except (ValueError, IndexError, KeyError, TypeError):
             raise RuleChangeError("invalid container inspection") from None
-        if not info.get("State", {}).get("Running"):
+        # A failed Suricata start may leave this same container stopped. Recovery
+        # still checks its identity, mounts and passive command before restarting.
+        recovering = recovering and spec["kind"] == "suricata"
+        if not recovering and not info.get("State", {}).get("Running"):
             raise RuleChangeError("target container is not running")
         health = info.get("State", {}).get("Health", {}).get("Status")
-        if health and health != "healthy":
+        if not recovering and health and health != "healthy":
             raise RuleChangeError("target container health is not healthy")
         mounts = info.get("Mounts") or []
         expected_rw = spec["kind"] == "wazuh"
@@ -342,6 +543,13 @@ class Engine:
             cmd = info.get("Config", {}).get("Cmd") or []
             if "-S" not in cmd or "/rules/all.rules" not in cmd or "-q" in cmd:
                 raise RuleChangeError("Suricata runtime no longer matches passive all.rules contract")
+            if not recovering and (info["State"].get("OOMKilled") or info["State"].get("Restarting")):
+                raise RuleChangeError("Suricata container is OOM-killed or restarting")
+            if not isinstance(info.get("Id"), str) or not HEX_SHA.fullmatch(info["Id"]):
+                raise RuleChangeError("invalid Suricata container identity")
+            return {"container": spec["container"], "running": bool(info["State"].get("Running")),
+                    "health": health or "not_reported", "container_id": info["Id"],
+                    "started_at": info["State"].get("StartedAt")}
         return {"container": spec["container"], "running": True, "health": health or "not_reported"}
 
     def _snapshot(self, spec):
@@ -375,6 +583,7 @@ class Engine:
         if spec["kind"] != "suricata":
             return "offline guard checks passed; full engine syntax test after approval and before reload"
         et, _ = _read_regular(spec["et_path"], MAX_RULESET)
+        _validate_suricata_overrides(candidate, et)
         with _parent_fd(spec["all_path"]) as directory:
             staged = ".rule-change-probe-%s.rules" % secrets.token_hex(12)
             fd = os.open(staged, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0), 0o600, dir_fd=directory)
@@ -401,9 +610,10 @@ class Engine:
             except UnicodeDecodeError:
                 raise RuleChangeError("current local rule file is not UTF-8") from None
             return {"target": target, "content": content, "sha256": sha256(current),
-                    "runtime": runtime, "impact": spec["impact"], "related_hashes": aux}
+                    "runtime": runtime, "impact": spec["impact"], "related_hashes": aux,
+                    "limits": proposal_limits()}
 
-    def propose(self, target, base_sha256, candidate_content, reason):
+    def _proposal_spec(self, target, base_sha256, reason):
         spec = self.spec(target)
         if not isinstance(base_sha256, str) or not HEX_SHA.fullmatch(base_sha256):
             raise RuleChangeError("base_sha256 must be a SHA-256 from get_rule_change_target")
@@ -411,54 +621,90 @@ class Engine:
             raise RuleChangeError("reason must be 1..200 printable characters")
         if any(unicodedata.category(ch) == "Cf" for ch in reason):
             raise RuleChangeError("reason contains invisible Unicode format controls")
+        return spec
+
+    def _proposal_snapshot(self, spec, base_sha256):
+        """Caller holds the same lock used by the approval worker."""
+        pending = sum(1 for path in self.state_dir.glob("*.json") if self._load(path.stem).get("status") == "pending")
+        if pending >= 10:
+            raise RuleChangeError("too many pending proposals")
+        runtime = self._inspect(spec)
+        current, st, aux = self._snapshot(spec)
+        if sha256(current) != base_sha256:
+            raise RuleChangeError("target changed since it was read; fetch current content and retry")
+        return current, st, aux, runtime
+
+    def propose(self, target, base_sha256, candidate_content, reason):
+        spec = self._proposal_spec(target, base_sha256, reason)
         candidate = _validate_candidate(spec["kind"], candidate_content)
         with self.locked():
-            pending = sum(1 for path in self.state_dir.glob("*.json") if self._load(path.stem).get("status") == "pending")
-            if pending >= 10:
-                raise RuleChangeError("too many pending proposals")
-            runtime = self._inspect(spec)
-            current, st, aux = self._snapshot(spec)
-            if sha256(current) != base_sha256:
-                raise RuleChangeError("target changed since it was read; fetch current content and retry")
-            if current == candidate:
-                raise RuleChangeError("candidate is identical to the live rule file")
-            validation = self._candidate_preflight(spec, candidate)
-            diff = "".join(difflib.unified_diff(
-                current.decode("utf-8").splitlines(keepends=True), candidate_content.splitlines(keepends=True),
-                fromfile=target + " before", tofile=target + " after",
-            ))
-            mode = {"waf": "DetectionOnly", "suricata": "passive", "wazuh": "manager"}[spec["kind"]]
-            diff = ("Impact: " + spec["impact"] + "\nReason: " + reason.strip() +
-                    "\nPreflight: " + validation + "\nRuntime: " + runtime["container"] +
-                    " running, health=" + runtime["health"] + ", mode=" + mode + "\n" + diff)
-            if len(diff.encode("utf-8")) > MAX_DIFF:
-                raise RuleChangeError("diff exceeds 8 KiB approval-card limit; split the edit")
-            payload = {
-                "target": target, "base_sha256": sha256(current), "candidate_sha256": sha256(candidate),
-                "diff_sha256": sha256(diff.encode("utf-8")), "diff": diff,
-                "requested_by": "hermes-rule-change", "expires_at": int(self.clock()) + 600,
-            }
-            digest = proposal_digest(payload)
-            answer = self.broker.request("POST", "/rule-changes", payload)
-            rid = answer.get("proposal_id")
-            if not answer.get("posted") or not isinstance(rid, str) or not PROPOSAL_ID.fullmatch(rid):
-                raise RuleChangeError("broker did not post a valid approval card")
-            if answer.get("proposal_digest") != digest or answer.get("expires_at") != payload["expires_at"]:
-                raise RuleChangeError("broker proposal binding mismatch")
-            if self._record_path(rid).exists():
-                raise RuleChangeError("duplicate proposal ID")
-            record = {
-                "proposal_id": rid, "payload": payload, "proposal_digest": digest,
-                "candidate_content": candidate_content, "aux": aux, "status": "pending",
-                "base_file": {"inode": st.st_ino, "uid": st.st_uid, "gid": st.st_gid,
-                              "mode": stat.S_IMODE(st.st_mode)},
-                "created_at": int(self.clock()), "result": "",
-            }
-            self._save(record)
-            return {"proposal_id": rid, "status": "pending", "target": target,
-                    "before_sha256": payload["base_sha256"], "after_sha256": payload["candidate_sha256"],
-                    "diff": diff, "runtime_before": runtime, "approval_expires_at": payload["expires_at"],
-                    "validation": validation}
+            current, st, aux, runtime = self._proposal_snapshot(spec, base_sha256)
+            return self._propose_candidate(target, spec, current, st, aux, runtime,
+                                           candidate_content, candidate, reason)
+
+    def propose_edit(self, target, base_sha256, edits, reason):
+        spec = self._proposal_spec(target, base_sha256, reason)
+        validated = _validated_edits(edits)
+        with self.locked():
+            current, st, aux, runtime = self._proposal_snapshot(spec, base_sha256)
+            candidate_content = _edit_candidate(current, validated)
+            candidate = _validate_candidate(spec["kind"], candidate_content)
+            return self._propose_candidate(target, spec, current, st, aux, runtime,
+                                           candidate_content, candidate, reason, edit_count=len(validated))
+
+    def _propose_candidate(self, target, spec, current, st, aux, runtime,
+                           candidate_content, candidate, reason, edit_count=None):
+        """Shared complete-candidate approval path; caller must hold the live-state lock."""
+        if current == candidate:
+            raise RuleChangeError("candidate is identical to the live rule file")
+        validation = self._candidate_preflight(spec, candidate)
+        diff = "".join(difflib.unified_diff(
+            current.decode("utf-8").splitlines(keepends=True), candidate_content.splitlines(keepends=True),
+            fromfile=target + " before", tofile=target + " after",
+        ))
+        mode = {"waf": "DetectionOnly", "suricata": "passive", "wazuh": "manager"}[spec["kind"]]
+        diff = ("Impact: " + spec["impact"] + "\nReason: " + reason.strip() +
+                "\nPreflight: " + validation + "\nRuntime: " + runtime["container"] +
+                " running, health=" + runtime["health"] + ", mode=" + mode + "\n" + diff)
+        diff_bytes = diff.encode("utf-8")
+        if len(diff_bytes) > MAX_DIFF:
+            raise RuleChangeError("complete approval diff exceeds 512 KiB UTF-8 limit")
+        payload = {
+            "target": target, "base_sha256": sha256(current), "candidate_sha256": sha256(candidate),
+            "diff_sha256": sha256(diff_bytes), "diff": diff,
+            "requested_by": "hermes-rule-change", "expires_at": int(self.clock()) + 600,
+        }
+        digest = proposal_digest(payload)
+        answer = self.broker.request("POST", "/rule-changes", payload)
+        rid = answer.get("proposal_id")
+        if not answer.get("posted") or not isinstance(rid, str) or not PROPOSAL_ID.fullmatch(rid):
+            raise RuleChangeError("broker did not post a valid approval card")
+        if answer.get("proposal_digest") != digest or answer.get("expires_at") != payload["expires_at"]:
+            raise RuleChangeError("broker proposal binding mismatch")
+        if self._record_path(rid).exists():
+            raise RuleChangeError("duplicate proposal ID")
+        record = {
+            "proposal_id": rid, "payload": payload, "proposal_digest": digest,
+            "candidate_content": candidate_content, "aux": aux, "status": "pending",
+            "base_file": {"inode": st.st_ino, "uid": st.st_uid, "gid": st.st_gid,
+                          "mode": stat.S_IMODE(st.st_mode)},
+            "created_at": int(self.clock()), "result": "",
+        }
+        self._save(record)
+        result = {"proposal_id": rid, "status": "pending", "target": target,
+                  "before_sha256": payload["base_sha256"], "after_sha256": payload["candidate_sha256"],
+                  "runtime_before": runtime, "approval_expires_at": payload["expires_at"],
+                  "validation": validation, "limits": proposal_limits(),
+                  "review_posted": True, "review_location": "Mattermost approval channel"}
+        if edit_count is None:
+            result["diff"] = diff  # Preserve the existing full-file proposal response.
+        else:
+            # The authenticated broker has already posted the complete review.
+            # Return its identifiers rather than sending the file/diff back to the model.
+            result.update(proposal_digest=digest, diff_sha256=payload["diff_sha256"],
+                          diff_utf8_bytes=len(diff_bytes), candidate_utf8_bytes=len(candidate),
+                          edit_count=edit_count)
+        return result
 
     def _checked_decision(self, record):
         payload = record["payload"]
@@ -538,10 +784,11 @@ class Engine:
                 raise RuleChangeError("Suricata ET/loaded rules changed since proposal")
             if all_rules != et + primary:
                 raise RuleChangeError("Suricata combined rules drifted")
+            _validate_suricata_overrides(candidate, et)
             _atomic_bytes(spec["path"], candidate, st)
             _atomic_bytes(spec["all_path"], et + candidate, all_st)
             self.runner.call([DOCKER, "exec", "suricata", "suricata", "-T", "-S", "/rules/all.rules"], timeout=180)
-            self.runner.call([DOCKER, "exec", "suricata", "suricatasc", "-c", "reload-rules"], timeout=180)
+            self._restart_suricata(spec)
         elif kind == "wazuh":
             _atomic_bytes(spec["path"], candidate, st)
             self.runner.call([DOCKER, "exec", spec["container"], "/var/ossec/bin/wazuh-analysisd", "-t"], timeout=60)
@@ -557,13 +804,77 @@ class Engine:
         if kind == "suricata":
             et, _ = _read_regular(spec["et_path"], MAX_RULESET)
             all_rules, _ = _read_regular(spec["all_path"], MAX_RULESET)
-            if all_rules != et + candidate:
+            if sha256(et) != record["aux"]["et_sha256"] or all_rules != et + candidate:
                 raise RuleChangeError("post-apply loaded Suricata rules mismatch")
             expected_remote = sha256(all_rules)
         else:
             expected_remote = sha256(candidate)
         if not remote or remote[0] != expected_remote:
             raise RuleChangeError("container readback hash mismatch")
+
+    @staticmethod
+    def _suricata_time(value):
+        try:
+            if not isinstance(value, str):
+                raise ValueError
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            if parsed.tzinfo is None:
+                raise ValueError
+            return parsed.timestamp()
+        except (ValueError, OverflowError):
+            raise RuleChangeError("invalid or timezone-free Suricata runtime timestamp") from None
+
+    def _suricata_socket(self, command, timeout):
+        raw = self.runner.call([DOCKER, "exec", "suricata", "suricatasc", "-c", command], timeout=timeout)
+        try:
+            answer = json.loads(raw)
+            rows = answer["message"]
+            if answer["return"] != "OK" or not isinstance(rows, list) or len(rows) != 1 or \
+                    not isinstance(rows[0], dict) or type(rows[0].get("id")) is not int or rows[0]["id"] != 0:
+                raise ValueError
+            return rows[0]
+        except (ValueError, KeyError, TypeError):
+            # suricatasc 8 can exit zero even when its JSON response is NOK.
+            raise RuleChangeError("Suricata socket rejected request or returned an invalid single-tenant response") from None
+
+    def _restart_suricata(self, spec):
+        before = self._inspect(spec, recovering=True)
+        requested_at = self.clock()
+        self.runner.call([DOCKER, "restart", "--time", "30", spec["container"]], timeout=120)
+        deadline = time.monotonic() + 90
+        last_error = "runtime not ready"
+
+        def remaining():
+            seconds = deadline - time.monotonic()
+            if seconds <= 0:
+                raise RuleChangeError("Suricata readiness deadline exceeded")
+            return min(10, seconds)
+
+        while time.monotonic() < deadline:
+            try:
+                runtime = self._inspect(spec, timeout=remaining())
+                if runtime["container_id"] != before["container_id"] or runtime["started_at"] == before["started_at"]:
+                    raise RuleChangeError("Suricata existing container restart was not observed")
+                started_at = self._suricata_time(runtime["started_at"])
+                stats = self._suricata_socket("ruleset-stats", remaining())
+                if any(type(stats.get(key)) is not int or stats[key] < 0
+                       for key in ("rules_loaded", "rules_failed", "rules_skipped")) or \
+                        stats["rules_loaded"] == 0 or stats["rules_failed"] != 0 or stats["rules_skipped"] != 0:
+                    raise RuleChangeError("Suricata runtime rules are absent, failed, skipped or malformed")
+                loaded_at = self._suricata_time(self._suricata_socket("ruleset-reload-time", remaining()).get("last_reload"))
+                now = self.clock()
+                if not requested_at - 1 <= started_at <= loaded_at <= now + 5:
+                    raise RuleChangeError("Suricata runtime rule load time is stale or inconsistent")
+                after = self._inspect(spec, timeout=remaining())
+                if (after["container_id"], after["started_at"]) != (runtime["container_id"], runtime["started_at"]):
+                    raise RuleChangeError("Suricata restarted during runtime verification")
+                return
+            except RuleChangeError as exc:
+                if time.monotonic() >= deadline:
+                    break
+                last_error = str(exc)
+            time.sleep(max(0, min(2, deadline - time.monotonic())))
+        raise RuleChangeError("Suricata did not become ready: " + last_error)
 
     def _wait_wazuh_manager(self, spec):
         deadline = self.clock() + 90
@@ -589,6 +900,9 @@ class Engine:
                 st.st_ino != base_file["inode"] or st.st_uid != base_file["uid"] or
                 st.st_gid != base_file["gid"] or stat.S_IMODE(st.st_mode) != base_file["mode"]):
             raise RuleChangeError("live state changed since proposal")
+        if spec["kind"] == "suricata":
+            et, _ = _read_regular(spec["et_path"], MAX_RULESET)
+            _validate_suricata_overrides(candidate, et)
         # Durable backup before consuming the one-use approval.
         self._backup(record, "primary", spec["path"])
         if spec["kind"] == "suricata":
@@ -715,7 +1029,7 @@ class Engine:
             self.runner.call([DOCKER, "exec", "waf", "nginx", "-t"], timeout=60)
             self.runner.call([DOCKER, "exec", "waf", "nginx", "-s", "reload"])
         elif spec["kind"] == "suricata":
-            self.runner.call([DOCKER, "exec", "suricata", "suricatasc", "-c", "reload-rules"], timeout=180)
+            self._restart_suricata(spec)
         elif spec["kind"] == "wazuh":
             self.runner.call([DOCKER, "restart", spec["container"]], timeout=120)
             self._wait_wazuh_manager(spec)
@@ -843,6 +1157,45 @@ def _secure_config(path=CONFIG_PATH):
     return conf["host"], Broker(conf["broker_url"], token)
 
 
+def _load_extension(name):
+    """Never import an operation executor from cwd, PYTHONPATH or caller input."""
+    if name not in ("service_action_executor", "incident_containment"):
+        raise RuleChangeError("unsupported operation extension")
+    if name in _EXTENSIONS:
+        return _EXTENSIONS[name]
+    path = EXTENSION_DIR / (name + ".py")
+    for directory in (EXTENSION_DIR, *EXTENSION_DIR.parents):
+        st = directory.lstat()
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid != 0 or stat.S_IMODE(st.st_mode) & 0o022:
+            raise RuleChangeError("operation extension directory must be root-owned and not writable by others")
+    _, st = _read_regular(path, 256 * 1024)
+    if st.st_uid != 0 or stat.S_IMODE(st.st_mode) & 0o022:
+        raise RuleChangeError("operation extension must be root-owned and not writable by others")
+    spec = importlib.util.spec_from_file_location("_capstone_" + name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    _EXTENSIONS[name] = module
+    return module
+
+
+def _operation_services(engine):
+    services = [_load_extension("service_action_executor").ServiceActionService(engine)]
+    if engine.host == "a":
+        services.append(_load_extension("incident_containment").ContainmentService(engine))
+    return services
+
+
+def _operation_status(engine, request_id):
+    if not isinstance(request_id, str) or not re.fullmatch(r"[0-9a-f]{32}", request_id):
+        raise RuleChangeError("invalid operation request ID")
+    matches = [service for service in _operation_services(engine)
+               if (getattr(service, "state_dir", getattr(service, "directory", None)) / (request_id + ".json")).exists()]
+    if len(matches) != 1:
+        raise RuleChangeError("operation request is missing or ambiguous")
+    return matches[0].status(request_id)
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if os.geteuid() != 0:
@@ -855,7 +1208,14 @@ def main(argv=None):
     elif argv == ["--check"]:
         result = engine.check()
     elif argv == ["--once"]:
-        result = {"processed": engine.worker_once()}
+        services = _operation_services(engine)
+        result = {"processed": [], "operations": []}
+        # Reconcile time-bounded containment before potentially slow rule
+        # syntax tests or service readiness waits. Kernel TTL is independent.
+        if engine.host == "a":
+            result["operations"].extend(services[1].worker_once())
+        result["processed"] = engine.worker_once()
+        result["operations"].extend(services[0].worker_once())
     elif not argv:
         raw = sys.stdin.buffer.read(MAX_REQUEST + 1)
         if len(raw) > MAX_REQUEST:
@@ -867,8 +1227,21 @@ def main(argv=None):
             result = engine.get_target(request["target"])
         elif request.get("operation") == "propose" and set(request) == {"operation", "target", "base_sha256", "candidate_content", "reason"}:
             result = engine.propose(request["target"], request["base_sha256"], request["candidate_content"], request["reason"])
+        elif request.get("operation") == "propose-edit" and set(request) == {"operation", "target", "base_sha256", "edits", "reason"}:
+            result = engine.propose_edit(request["target"], request["base_sha256"], request["edits"], request["reason"])
         elif request.get("operation") == "status" and set(request) == {"operation", "proposal_id"}:
             result = engine.status(request["proposal_id"])
+        elif request.get("operation") == "service-get" and set(request) == {"operation", "target"}:
+            result = _load_extension("service_action_executor").ServiceActionService(engine).get_target(request["target"])
+        elif request.get("operation") == "service-propose" and set(request) == {"operation", "target", "action", "base_state_sha256", "reason"}:
+            result = _load_extension("service_action_executor").ServiceActionService(engine).propose(
+                request["target"], request["action"], request["base_state_sha256"], request["reason"])
+        elif request.get("operation") == "contain-ip" and set(request) == {"operation", "ip", "reason"}:
+            if engine.host != "a":
+                raise RuleChangeError("temporary containment is available only on host a")
+            result = _load_extension("incident_containment").ContainmentService(engine).propose(request["ip"], request["reason"])
+        elif request.get("operation") == "operation-status" and set(request) == {"operation", "request_id"}:
+            result = _operation_status(engine, request["request_id"])
         else:
             raise RuleChangeError("unsupported operation or arguments")
     else:

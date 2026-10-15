@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "host": "groot-a",
+  "date_kst": "2026-10-14",
+  "status": "installed_timer_enabled",
+  "installation": {
+    "ansible_syntax": "passed",
+    "ansible_check": "passed",
+    "apply": {
+      "ok": 19,
+      "changed": 3,
+      "failed": 0,
+      "skipped": 1
+    },
+    "initial_enable": false,
+    "first_manual_records": 1000,
+    "timer_enabled_at_kst": "2026-10-14T22:06:55+09:00"
+  },
+  "latest_observation": {
+    "at_kst": "2026-10-14T23:10:22.394912+09:00",
+    "inspect": {
+      "policy": "bounded-previous-kernel-auto-v1",
+      "jobs": 9,
+      "ready": 2,
+      "inflight": 0,
+      "complete": 7,
+      "blocked": 0,
+      "records": 10806,
+      "bytes": 4566236,
+      "raw_payload_exported": false,
+      "operational_checkpoint_changed": false,
+      "reinjected": false,
+      "remote_receipt": false
+    },
+    "timer": {
+      "LastTriggerUSec": "Wed 2026-10-14 23:07:51 KST",
+      "Result": "success",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "DropInPaths": "",
+      "UnitFileState": "enabled",
+      "InvocationID": "0dd3fc2740c84a3f929cd9599b11117b"
+    },
+    "service": {
+      "MainPID": "0",
+      "Result": "success",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "DropInPaths": "",
+      "UnitFileState": "disabled",
+      "InvocationID": "1861694a13fe452d989d201b56debf78"
+    }
+  },
+  "evidence_stage": "/var/tmp/capstone-sequential-20261014/step3/step3-history-auto-install",
+  "reader_pids_unchanged_during_install": true,
+  "automatic_reinjection": false,
+  "remote_transfer": false,
+  "new_packages_installed": false,
+  "mac_packages_installed": false,
+  "source_sha256": {
+    "auto-worker.sh": "cc096d9da2617a58e4517d9073f205d8c191e96387dcef8c8c9d338dbbdcd4af",
+    "auto-lib.sh": "2604d5c6f9a7044f58d2c8c66995bf696d5bbdee69f49c9e48984556d1636ddf",
+    "state.jq": "826ca427ae7a2295fb638c9738d754e49826bcd01cce2765f28ee3d20acc4212",
+    "install-a.yml": "8b6ef24f74a99f1832086e4d01ed0a030a80e3ec87cee847da2376b529be5137"
+  },
+  "evidence_preserved_prefix": "/opt/capstone-automation/project/evidence/sequential-20261014/step3",
+  "evidence_stage_is_historical": true,
+  "temporary_evidence_stage_removed": true,
+  "source_closure_note": "Latest observation added after server source snapshot; server postcleanup-live.json contains this observation"
+}

@@ -1,0 +1,23 @@
+{
+  "cases": 2,
+  "passed": 0,
+  "response_text_exported": false,
+  "result_sha256": "0e0e0d2c0352dd5549cd57b6cd878347a0da71b037f2e528f478fe14ef44b0e0",
+  "rows": [
+    {
+      "failure_reason": 1,
+      "latency_ms": 84053,
+      "named_scores": {},
+      "passed": false,
+      "test_index": 0
+    },
+    {
+      "failure_reason": 1,
+      "latency_ms": 60281,
+      "named_scores": {},
+      "passed": false,
+      "test_index": 1
+    }
+  ],
+  "suite": "tools"
+}

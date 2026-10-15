@@ -1,0 +1,26 @@
+[Unit]
+Description=Guarded Vector output rotation and storage check
+After=wazuh-agent.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+ExecStart=/usr/local/sbin/capstone-vector-maintenance run
+# A deployment or another maintenance pass owns the shared lock; retry next tick.
+SuccessExitStatus=75
+TimeoutStartSec=300
+Nice=10
+IOSchedulingClass=idle
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectHome=read-only
+ProtectSystem=strict
+ReadWritePaths=/var/log/capstone-vector /var/lib/capstone-vector-maintenance /var/lib/capstone-automation/ansible
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+

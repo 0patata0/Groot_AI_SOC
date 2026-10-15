@@ -1,0 +1,572 @@
+{
+  "kind": "correlation_thread_configuration_applied_and_live_e2e_passed",
+  "recorded_at_kst": "2026-10-14T18:59:57.616781+09:00",
+  "operator_payload_transfer_authorized_by_user_retry": true,
+  "native_validation": {
+    "syntax_check": true,
+    "check_mode_changed": 0,
+    "option_cases_passed": 11,
+    "health_cases_passed": 10,
+    "rule_cases_before": 104,
+    "rule_cases_after": 104
+  },
+  "operational_apply": {
+    "completed_at_kst": "2026-10-14T18:48:55.180147+09:00",
+    "exit_code": 0,
+    "ansible_recap": {
+      "ok": 41,
+      "changed": 6,
+      "failed": 0,
+      "rescued": 0,
+      "skipped": 2
+    },
+    "options": {
+      "analysisd.event_threads": 1,
+      "analysisd.rule_matching_threads": 1
+    },
+    "original_sha256": "73252a6f47fff93d8ce62ca70a8f9196a216d5e09dc2228758fcf0b0ac77133f",
+    "applied_sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+    "same_manager_container_restart_count": 1,
+    "rollback_executed": false,
+    "backup_path": "/var/backups/capstone-correlation-fix-nsgyviqo"
+  },
+  "runtime_after_apply": {
+    "role": "b",
+    "at_kst": "2026-10-14T18:49:04.179014+09:00",
+    "hashes": {
+      "etc/ossec.conf": {
+        "sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+        "bytes": 8741,
+        "uid": 0,
+        "gid": 999,
+        "mode": "0o660"
+      },
+      "etc/internal_options.conf": {
+        "sha256": "2f434217b2f894a4cf3164ef6a1f4471d9196e5ad21f19c2e21c5be97b16e26a",
+        "bytes": 14961,
+        "uid": 0,
+        "gid": 999,
+        "mode": "0o640"
+      },
+      "etc/local_internal_options.conf": {
+        "sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+        "bytes": 380,
+        "uid": 0,
+        "gid": 999,
+        "mode": "0o640"
+      },
+      "etc/rules/local_rules.xml": {
+        "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+        "bytes": 6122,
+        "uid": 999,
+        "gid": 999,
+        "mode": "0o660"
+      },
+      "etc/rules/capstone_vector_rules.xml": {
+        "sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+        "bytes": 21125,
+        "uid": 999,
+        "gid": 999,
+        "mode": "0o660"
+      },
+      "bin/wazuh-analysisd": {
+        "sha256": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+        "bytes": 1231472,
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o750"
+      },
+      "lib/libwazuhext.so": {
+        "sha256": "8464d938735b471885780b12e65b6d48407edbc51e377ab77ff9df9b843730e5",
+        "bytes": 12780224,
+        "uid": 0,
+        "gid": 999,
+        "mode": "0o750"
+      }
+    },
+    "services": {
+      "capstone-hermes-guard-reapply.timer": {
+        "ActiveState": "active",
+        "InvocationID": "8770728417374ab7b7ec123b2a8a9991"
+      },
+      "capstone-hermes-guard-observe.service": {
+        "MainPID": "1924334",
+        "NRestarts": "0",
+        "ActiveState": "active",
+        "InvocationID": "8ffb244e89be455e85363d8ca5bdba58"
+      },
+      "rule-change-worker.timer": {
+        "ActiveState": "active",
+        "InvocationID": "43a01acbd71349fcb35fd72d2a027dc7"
+      }
+    },
+    "containers": [
+      {
+        "id": "567a3c832d2d400641ab27175a64c27103c0148575cdbad76300d367638e8230",
+        "name": "/mm-app",
+        "started_at": "2026-10-06T07:09:17.358679291Z",
+        "status": "running",
+        "health": "healthy"
+      },
+      {
+        "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+        "name": "/hermes",
+        "started_at": "2026-10-13T16:37:16.547543503Z",
+        "status": "running",
+        "health": null
+      },
+      {
+        "id": "f92af50a014e088e87caf34e330929fa986f66c25807ef18d668cfbc82d2f5de",
+        "name": "/mm-postgres",
+        "started_at": "2026-09-28T06:19:48.728322004Z",
+        "status": "running",
+        "health": null
+      },
+      {
+        "id": "62fcd6e31e7e7dae9f195d69b5cfd50d5acac60c7d6d5ab9ec6d8f83413fd3cb",
+        "name": "/single-node-wazuh.dashboard-1",
+        "started_at": "2026-10-13T02:15:15.675929841Z",
+        "status": "running",
+        "health": null
+      },
+      {
+        "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "name": "/single-node-wazuh.manager-1",
+        "started_at": "2026-10-14T09:47:00.096328621Z",
+        "status": "running",
+        "health": null
+      },
+      {
+        "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+        "name": "/single-node-wazuh.indexer-1",
+        "started_at": "2026-09-28T06:19:48.729016621Z",
+        "status": "running",
+        "health": null
+      }
+    ],
+    "states": {
+      "wazuh-analysisd.state": {
+        "total_events_decoded": "309",
+        "syscheck_events_decoded": "2",
+        "syscollector_events_decoded": "0",
+        "rootcheck_events_decoded": "2",
+        "sca_events_decoded": "2",
+        "winevt_events_decoded": "0",
+        "dbsync_messages_dispatched": "164",
+        "other_events_decoded": "139",
+        "events_processed": "144",
+        "events_received": "310",
+        "events_dropped": "0",
+        "alerts_written": "5",
+        "firewall_written": "12",
+        "fts_written": "0",
+        "syscheck_queue_usage": "0.00",
+        "syscheck_queue_size": "16384",
+        "syscollector_queue_usage": "0.00",
+        "syscollector_queue_size": "16384",
+        "rootcheck_queue_usage": "0.00",
+        "rootcheck_queue_size": "16384",
+        "sca_queue_usage": "0.00",
+        "sca_queue_size": "16384",
+        "hostinfo_queue_usage": "0.00",
+        "hostinfo_queue_size": "16384",
+        "winevt_queue_usage": "0.00",
+        "winevt_queue_size": "16384",
+        "dbsync_queue_usage": "0.00",
+        "dbsync_queue_size": "16384",
+        "upgrade_queue_usage": "0.00",
+        "upgrade_queue_size": "16384",
+        "event_queue_usage": "0.00",
+        "event_queue_size": "16384",
+        "rule_matching_queue_usage": "0.00",
+        "rule_matching_queue_size": "16384",
+        "alerts_queue_usage": "0.00",
+        "alerts_queue_size": "16384",
+        "firewall_queue_usage": "0.00",
+        "firewall_queue_size": "16384",
+        "statistical_queue_usage": "0.00",
+        "statistical_queue_size": "16384",
+        "archives_queue_usage": "0.00",
+        "archives_queue_size": "16384"
+      },
+      "wazuh-remoted.state": {
+        "queue_size": "0",
+        "total_queue_size": "131072",
+        "tcp_sessions": "2",
+        "evt_count": "133",
+        "ctrl_msg_count": "14",
+        "discarded_count": "0",
+        "sent_bytes": "1246",
+        "recv_bytes": "48186",
+        "dequeued_after_close": "0",
+        "ctrl_msg_queue_usage": "0",
+        "ctrl_msg_queue_inserted": "14",
+        "ctrl_msg_queue_replaced": "0",
+        "ctrl_msg_queue_processed": "14"
+      }
+    },
+    "manager": {
+      "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+      "init_pid": 2132232,
+      "started_at": "2026-10-14T09:47:00.096328621Z",
+      "analysisd_pid": 2132985,
+      "start_ticks": "139486022",
+      "threads": 44
+    },
+    "thread_options": {
+      "internal_options.conf": [
+        "analysisd.event_threads=0",
+        "analysisd.rule_matching_threads=0"
+      ],
+      "local_internal_options.conf": [
+        "analysisd.event_threads=1",
+        "analysisd.rule_matching_threads=1"
+      ]
+    },
+    "native_health": {
+      "rc": 1,
+      "running": [
+        "wazuh-analysisd",
+        "wazuh-apid",
+        "wazuh-authd",
+        "wazuh-db",
+        "wazuh-execd",
+        "wazuh-logcollector",
+        "wazuh-modulesd",
+        "wazuh-monitord",
+        "wazuh-remoted",
+        "wazuh-syscheckd"
+      ]
+    },
+    "same_manager_only_restarted": true,
+    "other_container_and_service_metadata_unchanged": true
+  },
+  "post_apply_60s_observation": {
+    "kind": "post_change_60s_operational_observation",
+    "duration_seconds": 60.0001863038633,
+    "received_delta": 60,
+    "dropped_delta": 0,
+    "max_sampled_queue_usage": 0.0,
+    "analysisd_cpu_core_fraction": 0.00033333229831508437,
+    "sustained_capacity_proven": false,
+    "average_received_eps": 0.999996894945253,
+    "live_canary_included": false,
+    "raw_metadata_note": "Original may_overlap field represented the plan; canary input was blocked during these samples."
+  },
+  "live_e2e": {
+    "explicit_user_input_approval_received": true,
+    "approval_channel": "Codex conversation; no Mattermost or MCP approval message sent",
+    "initial_automatic_review_rejected_before_process_start": true,
+    "status": "passed",
+    "completed_at_kst": "2026-10-14T18:56:08+09:00",
+    "new_runs": 20,
+    "new_rows": 260,
+    "new_bytes": 230560,
+    "existing_rows_preserved": 52,
+    "final_canary_rows": 312,
+    "manager_alerts": 40,
+    "indexer_documents": 40,
+    "observed_rule_counts": {
+      "100293": 20,
+      "100294": 20
+    },
+    "negative_scenario_alerts": 0,
+    "strict_tls": true,
+    "shards_successful": 57,
+    "shards_total": 57,
+    "canonical_tuples_exact": true,
+    "verification_read_rounds": 1,
+    "verification_seconds": 11.3,
+    "input_retries": 0,
+    "source_file_sync_is_not_analysis_ack": true,
+    "evidence": "e2e/live-validation-2026-10-14.json"
+  },
+  "new_packages_installed": 0,
+  "limitations": [
+    "Finite tests do not guarantee permanent absence of correlation loss.",
+    "Earlier isolated 500 EPS single-worker load had sampled queue maximum 24 percent and observed send-to-archive maximum 10.04 seconds.",
+    "Sustained 500 EPS capacity and actual rollback under induced failure are unproven."
+  ],
+  "evidence_destination": "/opt/capstone-automation/project/evidence/correlation-fix-resume-20261014",
+  "final_live_metadata": {
+    "a": {
+      "role": "a",
+      "at_kst": "2026-10-14T18:57:41.688982+09:00",
+      "hashes": {
+        "/var/ossec/etc/ossec.conf": {
+          "sha256": "8fcfeb935e1d706fe37ce6b89b5de5ad0189023d1c3dc40693a68803f9769984",
+          "bytes": 7462,
+          "lines": 250,
+          "devino": [
+            64512,
+            417661
+          ]
+        },
+        "/etc/capstone-vector/vector.toml": {
+          "sha256": "5ac09dd5cb708833fe0c2259c85aa0a587a42a67e78a1f507429dd9b825e56f7",
+          "bytes": 8749,
+          "lines": 255,
+          "devino": [
+            64512,
+            2361078
+          ]
+        },
+        "/var/log/capstone-vector/canary/normalized.jsonl": {
+          "sha256": "84e02db90cdbddbae9b7ccbd5d21b59122fc7fac94b6f14c21e83eaf189d789f",
+          "bytes": 276672,
+          "lines": 312,
+          "devino": [
+            64512,
+            415918
+          ]
+        }
+      },
+      "services": {
+        "capstone-vector.service": {
+          "MainPID": "1695314",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "InvocationID": "a032d3ca65464eb0b05450592b0d34b4"
+        },
+        "wazuh-agent.service": {
+          "MainPID": "0",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "InvocationID": "184f1879fb114078a23adbca4124666e"
+        },
+        "rule-change-worker.timer": {
+          "ActiveState": "active",
+          "InvocationID": "93e35f31ee8b43049c5c977973ee831d"
+        }
+      },
+      "containers": [
+        {
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "name": "/suricata",
+          "started_at": "2026-10-13T10:50:28.696240875Z",
+          "status": "running",
+          "health": null
+        },
+        {
+          "id": "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e",
+          "name": "/waf",
+          "started_at": "2026-10-05T10:18:45.433754298Z",
+          "status": "running",
+          "health": "healthy"
+        },
+        {
+          "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+          "name": "/chatproxy",
+          "started_at": "2026-09-29T01:44:03.48454989Z",
+          "status": "running",
+          "health": null
+        }
+      ],
+      "states": {
+        "agent": {
+          "status": "'connected'",
+          "msg_count": "'49994'",
+          "msg_sent": "'52343'",
+          "msg_buffer": "'0'"
+        }
+      },
+      "protected_state_matches_expected_after_e2e": true
+    },
+    "b": {
+      "role": "b",
+      "at_kst": "2026-10-14T18:57:40.421960+09:00",
+      "hashes": {
+        "etc/ossec.conf": {
+          "sha256": "b137a003c617aee4a980e9eb132ced34c746a7807089a67a107dbbae74518fce",
+          "bytes": 8741,
+          "uid": 0,
+          "gid": 999,
+          "mode": "0o660"
+        },
+        "etc/internal_options.conf": {
+          "sha256": "2f434217b2f894a4cf3164ef6a1f4471d9196e5ad21f19c2e21c5be97b16e26a",
+          "bytes": 14961,
+          "uid": 0,
+          "gid": 999,
+          "mode": "0o640"
+        },
+        "etc/local_internal_options.conf": {
+          "sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+          "bytes": 380,
+          "uid": 0,
+          "gid": 999,
+          "mode": "0o640"
+        },
+        "etc/rules/local_rules.xml": {
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "bytes": 6122,
+          "uid": 999,
+          "gid": 999,
+          "mode": "0o660"
+        },
+        "etc/rules/capstone_vector_rules.xml": {
+          "sha256": "20848771f884e5dfdc144a7cc104b056e8d4b5caab8627703df0d1d569701900",
+          "bytes": 21125,
+          "uid": 999,
+          "gid": 999,
+          "mode": "0o660"
+        },
+        "bin/wazuh-analysisd": {
+          "sha256": "2cf9e9abf7cba809ab525004338513c7f0c442904f1e57e534b06594b1cf2019",
+          "bytes": 1231472,
+          "uid": 0,
+          "gid": 0,
+          "mode": "0o750"
+        },
+        "lib/libwazuhext.so": {
+          "sha256": "8464d938735b471885780b12e65b6d48407edbc51e377ab77ff9df9b843730e5",
+          "bytes": 12780224,
+          "uid": 0,
+          "gid": 999,
+          "mode": "0o750"
+        }
+      },
+      "services": {
+        "capstone-hermes-guard-reapply.timer": {
+          "ActiveState": "active",
+          "InvocationID": "8770728417374ab7b7ec123b2a8a9991"
+        },
+        "capstone-hermes-guard-observe.service": {
+          "MainPID": "1924334",
+          "NRestarts": "0",
+          "ActiveState": "active",
+          "InvocationID": "8ffb244e89be455e85363d8ca5bdba58"
+        },
+        "rule-change-worker.timer": {
+          "ActiveState": "active",
+          "InvocationID": "43a01acbd71349fcb35fd72d2a027dc7"
+        }
+      },
+      "containers": [
+        {
+          "id": "567a3c832d2d400641ab27175a64c27103c0148575cdbad76300d367638e8230",
+          "name": "/mm-app",
+          "started_at": "2026-10-06T07:09:17.358679291Z",
+          "status": "running",
+          "health": "healthy"
+        },
+        {
+          "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+          "name": "/hermes",
+          "started_at": "2026-10-13T16:37:16.547543503Z",
+          "status": "running",
+          "health": null
+        },
+        {
+          "id": "f92af50a014e088e87caf34e330929fa986f66c25807ef18d668cfbc82d2f5de",
+          "name": "/mm-postgres",
+          "started_at": "2026-09-28T06:19:48.728322004Z",
+          "status": "running",
+          "health": null
+        },
+        {
+          "id": "62fcd6e31e7e7dae9f195d69b5cfd50d5acac60c7d6d5ab9ec6d8f83413fd3cb",
+          "name": "/single-node-wazuh.dashboard-1",
+          "started_at": "2026-10-13T02:15:15.675929841Z",
+          "status": "running",
+          "health": null
+        },
+        {
+          "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+          "name": "/single-node-wazuh.manager-1",
+          "started_at": "2026-10-14T09:47:00.096328621Z",
+          "status": "running",
+          "health": null
+        },
+        {
+          "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+          "name": "/single-node-wazuh.indexer-1",
+          "started_at": "2026-09-28T06:19:48.729016621Z",
+          "status": "running",
+          "health": null
+        }
+      ],
+      "states": {
+        "wazuh-analysisd.state": {
+          "total_events_decoded": "1252",
+          "syscheck_events_decoded": "2",
+          "syscollector_events_decoded": "0",
+          "rootcheck_events_decoded": "2",
+          "sca_events_decoded": "2",
+          "winevt_events_decoded": "0",
+          "dbsync_messages_dispatched": "170",
+          "other_events_decoded": "1076",
+          "events_processed": "1081",
+          "events_received": "1253",
+          "events_dropped": "0",
+          "alerts_written": "95",
+          "firewall_written": "64",
+          "fts_written": "0",
+          "syscheck_queue_usage": "0.00",
+          "syscheck_queue_size": "16384",
+          "syscollector_queue_usage": "0.00",
+          "syscollector_queue_size": "16384",
+          "rootcheck_queue_usage": "0.00",
+          "rootcheck_queue_size": "16384",
+          "sca_queue_usage": "0.00",
+          "sca_queue_size": "16384",
+          "hostinfo_queue_usage": "0.00",
+          "hostinfo_queue_size": "16384",
+          "winevt_queue_usage": "0.00",
+          "winevt_queue_size": "16384",
+          "dbsync_queue_usage": "0.00",
+          "dbsync_queue_size": "16384",
+          "upgrade_queue_usage": "0.00",
+          "upgrade_queue_size": "16384",
+          "event_queue_usage": "0.00",
+          "event_queue_size": "16384",
+          "rule_matching_queue_usage": "0.00",
+          "rule_matching_queue_size": "16384",
+          "alerts_queue_usage": "0.00",
+          "alerts_queue_size": "16384",
+          "firewall_queue_usage": "0.00",
+          "firewall_queue_size": "16384",
+          "statistical_queue_usage": "0.00",
+          "statistical_queue_size": "16384",
+          "archives_queue_usage": "0.00",
+          "archives_queue_size": "16384"
+        },
+        "wazuh-remoted.state": {
+          "queue_size": "0",
+          "total_queue_size": "131072",
+          "tcp_sessions": "2",
+          "evt_count": "1068",
+          "ctrl_msg_count": "66",
+          "discarded_count": "0",
+          "sent_bytes": "5874",
+          "recv_bytes": "407844",
+          "dequeued_after_close": "0",
+          "ctrl_msg_queue_usage": "0",
+          "ctrl_msg_queue_inserted": "66",
+          "ctrl_msg_queue_replaced": "0",
+          "ctrl_msg_queue_processed": "66"
+        }
+      },
+      "manager": {
+        "cid": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+        "init_pid": 2132232,
+        "started_at": "2026-10-14T09:47:00.096328621Z",
+        "analysisd_pid": 2132985,
+        "start_ticks": "139486022",
+        "threads": 44
+      },
+      "thread_options": {
+        "internal_options.conf": [
+          "analysisd.event_threads=0",
+          "analysisd.rule_matching_threads=0"
+        ],
+        "local_internal_options.conf": [
+          "analysisd.event_threads=1",
+          "analysisd.rule_matching_threads=1"
+        ]
+      },
+      "protected_state_matches_expected_after_e2e": true
+    }
+  },
+  "preservation_note": "Source/evidence snapshot and cleanup are recorded separately after this deployment result."
+}

@@ -1,0 +1,17 @@
+// The marker and source-specific Wazuh leaf are the producer trust boundary.
+// One distinct doc value does NOT prove that original JSON was a scalar.
+try {
+    for (String suffix : params.single_fields) {
+        String field = 'data.capstone_norm.' + suffix;
+        if (!doc.containsKey(field) || doc[field].size() != 1) return false;
+    }
+    if (!doc.containsKey('agent.id') || doc['agent.id'].size() != 1 ||
+        !doc.containsKey('location') || doc['location'].size() != 1 ||
+        !doc.containsKey('rule.id') || doc['rule.id'].size() != 1) return false;
+    long end = Long.parseLong(params.period_end);
+    long event = ZonedDateTime.parse(doc['data.capstone_norm.event_time_kst'].value).toInstant().toEpochMilli();
+    long port = Long.parseLong(doc['data.capstone_norm.destination_port'].value.toString());
+    return end >= 60000 && event >= end - 60000 && event <= end && port >= 1 && port <= 65535;
+} catch (Exception e) {
+    return false;
+}

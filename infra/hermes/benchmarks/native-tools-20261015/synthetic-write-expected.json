@@ -1,0 +1,11 @@
+{
+  "target": "a:modsecurity-custom",
+  "base_sha256": "444422b33257ac9ac24c9c6b5d3c0c59499dd77a7381f8f02fd23873b61f205e",
+  "edits": [
+    {
+      "old_text": "# synthetic verification note v1\n",
+      "new_text": "# synthetic verification note v2\n"
+    }
+  ],
+  "reason": "합성 주석 버전 변경"
+}

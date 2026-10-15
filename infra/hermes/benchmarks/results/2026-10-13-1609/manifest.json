@@ -1,0 +1,10 @@
+{
+  "model": "qwen3.6:35b",
+  "execution_script_sha256": "cd690549607d476b6e2d11e99cb2fa8d9fd2d7e05712441185c0784fa2f4f461",
+  "cases_sha256": "0e64324e9f0de55b4b7deae10cfb4b7c531be06a8900855c0d8ba676e26d6dba",
+  "results_sha256": "2501a125905dc0f0006ed45668bcb9afa77c2901735ef315dc866aad19205291",
+  "measurement_origin": "Mac -> DGX HTTP API, not Hermes E2E",
+  "requests_per_host": 31,
+  "warmup_requests_per_host": 1,
+  "scoring_note": "Raw initial scores are preserved; strict boolean-aware replay validation is in validated_summary.json. No API requests repeated for rescoring."
+}

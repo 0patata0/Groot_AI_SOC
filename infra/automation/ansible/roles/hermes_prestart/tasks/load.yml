@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Read durable transaction metadata",
+    "ansible.builtin.command": {
+      "argv": [
+        "/usr/bin/python3",
+        "-B",
+        "{{ hp_source }}/hermes_prestart_transaction.py",
+        "inspect",
+        "--token",
+        "{{ capstone_prestart_token }}"
+      ]
+    },
+    "changed_when": false,
+    "no_log": true,
+    "timeout": 90,
+    "register": "hp_state_raw"
+  },
+  {
+    "name": "Keep metadata-only transaction state",
+    "ansible.builtin.set_fact": {
+      "hp_state": "{{ hp_state_raw.stdout | from_json }}"
+    },
+    "no_log": true
+  }
+]

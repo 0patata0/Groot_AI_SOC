@@ -1,0 +1,36 @@
+[
+  {
+    "name": "Load current durable state for fallback",
+    "ansible.builtin.include_tasks": "load.yml"
+  },
+  {
+    "name": "Require actually firststarted candidate and no ambiguous pending operation",
+    "ansible.builtin.assert": {
+      "that": [
+        "hp_state.phase == 'new-started'",
+        "hp_state.intent == None"
+      ]
+    }
+  },
+  {
+    "name": "Stop candidate before restoring old name and gateway",
+    "ansible.builtin.include_tasks": "action.yml",
+    "loop": [
+      "stop-new",
+      "park-new",
+      "restore-name",
+      "start-old"
+    ],
+    "loop_control": {
+      "loop_var": "hp_action"
+    }
+  },
+  {
+    "name": "Verify fresh original runtime and heartbeat without database restore",
+    "ansible.builtin.include_tasks": "ready.yml",
+    "vars": {
+      "hp_active_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+      "hp_ready_operation": "commit"
+    }
+  }
+]

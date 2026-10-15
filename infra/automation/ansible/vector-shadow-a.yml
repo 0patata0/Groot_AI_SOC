@@ -1,0 +1,31 @@
+[
+  {
+    "name": "Operator deploys the reviewed Vector shadow pipeline on A",
+    "hosts": "capstone_vector_a",
+    "become": false,
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "any_errors_fatal": true,
+    "vars": {
+      "capstone_vector_source_dir": "{{ playbook_dir }}/../../normalization/vector",
+      "capstone_vector_candidate_dir": "/var/lib/capstone-automation/ansible/vector-candidate",
+      "capstone_sensor": "groot-sec",
+      "capstone_suricata_eve_path": "/home/groot_a/capstone/secstack/logs/suricata/eve.json",
+      "capstone_waf_audit_path": "/home/groot_a/capstone/secstack/logs/modsec/audit.log",
+      "capstone_protected_paths": [
+        "/usr/local/sbin/rule-change-executor",
+        "/opt/rule-change/rule_change_mcp.py",
+        "/opt/rule-change/run-rule-change.sh",
+        "/etc/rule-change/config.json",
+        "/etc/sudoers.d/capstone-rule-change",
+        "/etc/systemd/system/rule-change-worker.service",
+        "/etc/systemd/system/rule-change-worker.timer"
+      ]
+    },
+    "roles": [
+      "vector_shadow"
+    ]
+  }
+]

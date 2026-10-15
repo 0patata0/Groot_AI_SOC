@@ -1,0 +1,925 @@
+{
+  "completed_at_kst": "2026-10-15T01:53:18+09:00",
+  "current_facts": {
+    "all_wheel_code_and_payload_files_match": true,
+    "database": {
+      "active_turn_leases": 0,
+      "quick_check": "ok"
+    },
+    "declared_data_mount_users": 1,
+    "env_digest_matches_previous_observation": true,
+    "guard_units_match_repository": {
+      "capstone-hermes-guard-observe.service": true,
+      "capstone-hermes-guard-reapply.service": true,
+      "capstone-hermes-guard-reapply.timer": true
+    },
+    "idle": {
+      "active_leases": 0,
+      "heartbeat_age_seconds": 4.68,
+      "idle": true
+    },
+    "installed_record_all_hashes_valid": true,
+    "previous_host_option_differences": [],
+    "prior_container_image_pid_start_unchanged": true,
+    "protected_names_changed_within_query": [],
+    "pure_prestart_contract": "pass",
+    "source_three_hashes_match": true,
+    "uid_abi_native_import": {
+      "architecture": "x86_64",
+      "backend_path": "/opt/capstone-guard-runtime/regex-2026.9.29/lib/python3.13/site-packages/regex/_regex.cpython-313-x86_64-linux-gnu.so",
+      "cache_tag": "cpython-313",
+      "gid": 986,
+      "python": [
+        3,
+        13,
+        5
+      ],
+      "regex_version": "2026.9.29",
+      "soabi": "cpython-313-x86_64-linux-gnu",
+      "uid": 995
+    }
+  },
+  "effects": {
+    "container_creation_restart": 0,
+    "model_mcp_chat_calls": 0,
+    "new_mac_packages_caches_or_venvs": false,
+    "operating_source_service_state_changes": false,
+    "package_installations": 0,
+    "remote_read_only_queries": 2,
+    "secret_values_or_message_text_exported": false,
+    "server_evidence_files_created_by_queries": 0
+  },
+  "evidence_files": [
+    {
+      "bytes": 13450,
+      "file": "read-hermes-stage4-preflight-b.sh",
+      "sha256": "dce347ab002603ffc8c9c6aa803cf8d293d57cdecac4962ea61d86f2cd5810c0"
+    },
+    {
+      "bytes": 5362,
+      "file": "read-hermes-stage4-regex-b.sh",
+      "sha256": "24a495cd63367105722346b06c996294018ed3635ab495f1b436fc29cfb93178"
+    },
+    {
+      "bytes": 15026,
+      "file": "hermes-stage4-preflight-b.json",
+      "sha256": "a47fce578ac388bd1403f0b56a1ac28b587f424601ea345329a4c8062898bf50"
+    },
+    {
+      "bytes": 1317,
+      "file": "hermes-stage4-regex-b.json",
+      "sha256": "945436ba46c7ac488242dc79fcf73a71b0891a79b1a9b0e0a5e06a8a12bb80a1"
+    }
+  ],
+  "full_metadata_first": {
+    "accepted_original_backups": {
+      "gateway/run_turn.py": {
+        "bytes": 254700,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 6852377,
+        "links": 1,
+        "mode": "0600",
+        "sha256": "5bdee5c82c00e02f664516f9da0af99674e23493ec2a30eff06cb03afc6718a0",
+        "uid": 0
+      },
+      "plugins/platforms/mattermost/adapter.py": {
+        "bytes": 39518,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 6852375,
+        "links": 1,
+        "mode": "0600",
+        "sha256": "4f05be68777068d7b454187c7323f2c471aac6412b830f11761b4013eed702c8",
+        "uid": 0
+      }
+    },
+    "changed_protected_names": [],
+    "container": {
+      "config": {
+        "AttachStderr": false,
+        "AttachStdin": false,
+        "AttachStdout": false,
+        "Cmd": [
+          "gateway",
+          "run"
+        ],
+        "Entrypoint": [
+          "/opt/hermes/docker/entrypoint-dispatch.sh"
+        ],
+        "ExposedPorts": null,
+        "OpenStdin": false,
+        "StdinOnce": false,
+        "StopSignal": null,
+        "StopTimeout": null,
+        "Tty": false,
+        "User": "root",
+        "Volumes": {
+          "/opt/data": {}
+        },
+        "WorkingDir": "/opt/hermes"
+      },
+      "environment": {
+        "entries": 14,
+        "full_value_list_sha256": "196a5e0784cfad989a5f12f121808aa9bc11ce1117eed1b28fb98dd3ad5f0398",
+        "keys": [
+          "HERMES_DISABLE_LAZY_INSTALLS",
+          "HERMES_GID",
+          "HERMES_HOME",
+          "HERMES_LAZY_INSTALL_TARGET",
+          "HERMES_TUI_DIR",
+          "HERMES_UID",
+          "HERMES_WEB_DIST",
+          "HERMES_WRITE_SAFE_ROOT",
+          "PATH",
+          "PLAYWRIGHT_BROWSERS_PATH",
+          "PYTHONDONTWRITEBYTECODE",
+          "PYTHONUNBUFFERED",
+          "XDG_RUNTIME_DIR",
+          "npm_config_install_links"
+        ],
+        "unique_keys": 14
+      },
+      "host_option_keys": [
+        "AutoRemove",
+        "Binds",
+        "BlkioDeviceReadBps",
+        "BlkioDeviceReadIOps",
+        "BlkioDeviceWriteBps",
+        "BlkioDeviceWriteIOps",
+        "BlkioWeight",
+        "BlkioWeightDevice",
+        "CapAdd",
+        "CapDrop",
+        "Cgroup",
+        "CgroupParent",
+        "CgroupnsMode",
+        "ConsoleSize",
+        "ContainerIDFile",
+        "CpuCount",
+        "CpuPercent",
+        "CpuPeriod",
+        "CpuQuota",
+        "CpuRealtimePeriod",
+        "CpuRealtimeRuntime",
+        "CpuShares",
+        "CpusetCpus",
+        "CpusetMems",
+        "DeviceCgroupRules",
+        "DeviceRequests",
+        "Devices",
+        "Dns",
+        "DnsOptions",
+        "DnsSearch",
+        "ExtraHosts",
+        "GroupAdd",
+        "IOMaximumBandwidth",
+        "IOMaximumIOps",
+        "IpcMode",
+        "Isolation",
+        "Links",
+        "LogConfig",
+        "MaskedPaths",
+        "Memory",
+        "MemoryReservation",
+        "MemorySwap",
+        "MemorySwappiness",
+        "NanoCpus",
+        "NetworkMode",
+        "OomKillDisable",
+        "OomScoreAdj",
+        "PidMode",
+        "PidsLimit",
+        "PortBindings",
+        "Privileged",
+        "PublishAllPorts",
+        "ReadonlyPaths",
+        "ReadonlyRootfs",
+        "RestartPolicy",
+        "Runtime",
+        "SecurityOpt",
+        "ShmSize",
+        "UTSMode",
+        "Ulimits",
+        "UsernsMode",
+        "VolumeDriver",
+        "VolumesFrom"
+      ],
+      "host_options": {
+        "AutoRemove": false,
+        "Binds": [
+          "/opt/hermes-data:/opt/data"
+        ],
+        "CapAdd": null,
+        "CapDrop": null,
+        "CgroupnsMode": "private",
+        "ConsoleSize": [
+          0,
+          0
+        ],
+        "CpuPeriod": 0,
+        "CpuQuota": 0,
+        "CpuRealtimePeriod": 0,
+        "CpuRealtimeRuntime": 0,
+        "CpuShares": 0,
+        "CpusetCpus": "",
+        "CpusetMems": "",
+        "DeviceCgroupRules": null,
+        "DeviceRequests": null,
+        "Devices": [],
+        "Dns": null,
+        "DnsOptions": [],
+        "DnsSearch": [],
+        "ExtraHosts": null,
+        "GroupAdd": null,
+        "Init": null,
+        "IpcMode": "private",
+        "Isolation": "",
+        "Links": null,
+        "MaskedPaths": [
+          "/proc/acpi",
+          "/proc/asound",
+          "/proc/interrupts",
+          "/proc/kcore",
+          "/proc/keys",
+          "/proc/latency_stats",
+          "/proc/sched_debug",
+          "/proc/scsi",
+          "/proc/timer_list",
+          "/proc/timer_stats",
+          "/sys/devices/virtual/powercap",
+          "/sys/firmware"
+        ],
+        "Memory": 0,
+        "MemoryReservation": 0,
+        "MemorySwap": 0,
+        "MemorySwappiness": null,
+        "Mounts": null,
+        "NanoCpus": 0,
+        "NetworkMode": "bridge",
+        "OomKillDisable": null,
+        "OomScoreAdj": 0,
+        "PidMode": "",
+        "PidsLimit": null,
+        "PortBindings": {},
+        "Privileged": false,
+        "PublishAllPorts": false,
+        "ReadonlyPaths": [
+          "/proc/bus",
+          "/proc/fs",
+          "/proc/irq",
+          "/proc/sys",
+          "/proc/sysrq-trigger"
+        ],
+        "ReadonlyRootfs": false,
+        "RestartPolicy": {
+          "MaximumRetryCount": 0,
+          "Name": "unless-stopped"
+        },
+        "Runtime": "runc",
+        "ShmSize": 67108864,
+        "StorageOpt": null,
+        "Sysctls": null,
+        "Tmpfs": null,
+        "UTSMode": "",
+        "Ulimits": null,
+        "UsernsMode": "",
+        "VolumesFrom": null
+      },
+      "host_options_sha256": "516ab25603f6ba4a8c214cee51adeb75d405fa617038a26a17be5619236fd9e2",
+      "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "label_keys": [
+        "org.opencontainers.image.revision"
+      ],
+      "log_config_keys": [],
+      "log_config_type": "json-file",
+      "mounts": [
+        {
+          "Destination": "/opt/data",
+          "Propagation": "rprivate",
+          "RW": true,
+          "Source": "/opt/hermes-data",
+          "Type": "bind"
+        }
+      ],
+      "networks": {
+        "bridge": {
+          "Gateway": "172.17.0.1",
+          "IPAddress": "172.17.0.2",
+          "NetworkID": "2003424de9db641fc5a59b1e9639cbb5366acb713cca0bce1d1dfc1f73684990",
+          "aliases_present": false,
+          "driver_option_keys": [],
+          "ipam_config_present": false,
+          "links_present": false
+        }
+      },
+      "security_options_count": 0,
+      "state": {
+        "Dead": false,
+        "ExitCode": 0,
+        "FinishedAt": "2026-10-13T16:37:16.251552891Z",
+        "OOMKilled": false,
+        "Paused": false,
+        "Pid": 1896873,
+        "Restarting": false,
+        "Running": true,
+        "StartedAt": "2026-10-13T16:37:16.547543503Z",
+        "Status": "running"
+      }
+    },
+    "container_guard_check": {
+      "architecture": "x86_64",
+      "config": {
+        "exists": true,
+        "gid": 986,
+        "mode": 416,
+        "sha256": "89ec0f90c2e421e67eed90bfc631eced42167efff1e0160cdeea91464b819d96",
+        "size": 1778,
+        "uid": 995
+      },
+      "draft_surfaces_disabled": true,
+      "files": {
+        "capstone_korean_output_guard.py": {
+          "exists": true,
+          "gid": 0,
+          "mode": 420,
+          "sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+          "size": 22157,
+          "uid": 0
+        },
+        "gateway/run_turn.py": {
+          "exists": true,
+          "gid": 0,
+          "mode": 420,
+          "sha256": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a",
+          "size": 256255,
+          "uid": 0
+        },
+        "plugins/platforms/mattermost/adapter.py": {
+          "exists": true,
+          "gid": 0,
+          "mode": 420,
+          "sha256": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+          "size": 41562,
+          "uid": 0
+        }
+      },
+      "python": [
+        3,
+        13,
+        5
+      ]
+    },
+    "container_identity_unchanged": true,
+    "data_mount_users": [
+      {
+        "container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+        "mounts": [
+          {
+            "Destination": "/opt/data",
+            "Propagation": "rprivate",
+            "RW": true,
+            "Source": "/opt/hermes-data",
+            "Type": "bind"
+          }
+        ],
+        "name": "/hermes",
+        "running": true
+      }
+    ],
+    "database": {
+      "active_turn_leases": 0,
+      "quick_check": "ok"
+    },
+    "deployment_lock": {
+      "bytes": 0,
+      "device": 64512,
+      "exists": true,
+      "gid": 0,
+      "inode": 7359116,
+      "links": 1,
+      "mode": "0600",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uid": 0
+    },
+    "entrypoints": {
+      "/opt/hermes/docker/entrypoint-dispatch.sh": {
+        "bytes": 1123,
+        "device": 55,
+        "exists": true,
+        "gid": 0,
+        "inode": 7358382,
+        "links": 1,
+        "mode": "0755",
+        "sha256": "d6f8e569fd2bfbf8d1f45619243681b9a1390c5bd3c9c584532692893b1d4fcd",
+        "uid": 0
+      },
+      "/opt/hermes/docker/entrypoint.sh": {
+        "bytes": 1723,
+        "device": 55,
+        "exists": true,
+        "gid": 0,
+        "inode": 7354066,
+        "links": 1,
+        "mode": "0755",
+        "sha256": "6b158947ab0083de092058835f91ba5b94cea88eeaedc3bc6d891c69ec8b088a",
+        "uid": 0
+      }
+    },
+    "finished_at_utc": "2026-10-14T16:51:50.913297+00:00",
+    "guard_checks_source": {
+      "bytes": 5288,
+      "device": 64512,
+      "exists": true,
+      "gid": 0,
+      "inode": 7359039,
+      "links": 1,
+      "mode": "0600",
+      "sha256": "74843987843dd5ef447d09896ba894ea580da2e5dc56b9bf0d48749f091e0cb5",
+      "uid": 0
+    },
+    "guard_installed_files": {
+      "/etc/systemd/system/capstone-hermes-guard-observe.service": {
+        "bytes": 598,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 7359158,
+        "links": 1,
+        "mode": "0644",
+        "sha256": "f5fc50ec715ef6a6b3a3ea19bea146beb266516992cb31bb3606e2f53ebe5308",
+        "uid": 0
+      },
+      "/etc/systemd/system/capstone-hermes-guard-reapply.service": {
+        "bytes": 479,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 7359035,
+        "links": 1,
+        "mode": "0644",
+        "sha256": "b670441c5873cf38b92cad2a4b434554c81bf79139adf77eb038e205aab50812",
+        "uid": 0
+      },
+      "/etc/systemd/system/capstone-hermes-guard-reapply.timer": {
+        "bytes": 229,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 7359152,
+        "links": 1,
+        "mode": "0644",
+        "sha256": "f86fbb78c0c77e5dd69de212c64d0ee605e26064e97df0f8d52c8cb4b3ec4b98",
+        "uid": 0
+      },
+      "/opt/capstone-automation/hermes-guard/guard-metadata.awk": {
+        "bytes": 690,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 7359099,
+        "links": 1,
+        "matches_repository": true,
+        "mode": "0600",
+        "sha256": "6865d2f3b259959b19f3f19acf5eb38f721aa2ef0252a6cd85fbfc35d15d2d08",
+        "uid": 0
+      },
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/hermes-guard-b.yml": {
+        "bytes": 1144,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 7358617,
+        "links": 1,
+        "matches_repository": true,
+        "mode": "0700",
+        "sha256": "307ff1deace832ea4db068e71a2dae79ee092efa1207cf43e30f386b92a2de6e",
+        "uid": 0
+      },
+      "/opt/capstone-automation/hermes-guard/project/infra/automation/ansible/hermes-guard-local-b.sh": {
+        "bytes": 2402,
+        "device": 64512,
+        "exists": true,
+        "gid": 0,
+        "inode": 7359126,
+        "links": 1,
+        "matches_repository": true,
+        "mode": "0700",
+        "sha256": "43c5f272709203a2dfcf4352c301f2aad3b640a11e8c0b98126e86dedf53da8d",
+        "uid": 0
+      }
+    },
+    "idle": {
+      "active_leases": 0,
+      "heartbeat_age_seconds": 4.68,
+      "idle": true
+    },
+    "kind": "hermes_stage4_read_only_preflight",
+    "last_container_id": {
+      "bytes": 65,
+      "device": 64512,
+      "exists": true,
+      "gid": 0,
+      "inode": 7358863,
+      "links": 1,
+      "matches_current": true,
+      "mode": "0600",
+      "sha256": "480bdc87d0d096a003614077766c535adc8ca7b6a6c07ec48a3d0914f7ad45ce",
+      "uid": 0
+    },
+    "machine_id": "1e143067c98a44ffba6eaa925dc038d7",
+    "model_mcp_chat_calls": 0,
+    "observed_at_utc": "2026-10-14T16:51:50.300658+00:00",
+    "only_one_declared_data_mount_user": true,
+    "operating_changes": false,
+    "package_installs": 0,
+    "probe_failures": [],
+    "process": {
+      "exe": "/package/admin/s6-2.15.0.0/command/s6-svscan",
+      "gid": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "mount_ns": "mnt:[4026532519]",
+      "pid": 1896873,
+      "pid_ns": "pid:[4026532641]",
+      "start_ticks": 133306977,
+      "state": "S",
+      "uid": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "protected_snapshot_after": {
+      ".env": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "509150dcc80c5770a479bf180f5ca321f41cef65503e854387876f57f7ce4b92",
+        "size": 26900,
+        "uid": 995
+      },
+      "SOUL.md": {
+        "exists": true,
+        "gid": 986,
+        "mode": 420,
+        "sha256": "b2581d8b89f27541e6a5a2abdc71c17c624c9a2995de374c1fbe00b453e9d97f",
+        "size": 14908,
+        "uid": 995
+      },
+      "config.yaml": {
+        "exists": true,
+        "gid": 986,
+        "mode": 416,
+        "sha256": "89ec0f90c2e421e67eed90bfc631eced42167efff1e0160cdeea91464b819d96",
+        "size": 1778,
+        "uid": 995
+      },
+      "cron/jobs.json": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "f5cd8771d6b4cb30e9c4a8a6b15b9ba30ddbb797a2f7f7910d527a3948704768",
+        "size": 5850,
+        "uid": 995
+      },
+      "state.db": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "70d7db20f48296ecaf540e778bae4bfeb0c8cdc93a140bdc75e3cf149ac5c8e6",
+        "size": 7237632,
+        "uid": 995
+      },
+      "state.db-shm": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "87227d41e2e626b213dd37d41c2ae2240a0ba2d3cfcb06614490e46940681a1b",
+        "size": 32768,
+        "uid": 995
+      },
+      "state.db-wal": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "6f55f93af01625a021bdcb91c9ff20025a8b4dfefa8a65724eee1c626bac047e",
+        "size": 2525592,
+        "uid": 995
+      }
+    },
+    "protected_snapshot_before": {
+      ".env": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "509150dcc80c5770a479bf180f5ca321f41cef65503e854387876f57f7ce4b92",
+        "size": 26900,
+        "uid": 995
+      },
+      "SOUL.md": {
+        "exists": true,
+        "gid": 986,
+        "mode": 420,
+        "sha256": "b2581d8b89f27541e6a5a2abdc71c17c624c9a2995de374c1fbe00b453e9d97f",
+        "size": 14908,
+        "uid": 995
+      },
+      "config.yaml": {
+        "exists": true,
+        "gid": 986,
+        "mode": 416,
+        "sha256": "89ec0f90c2e421e67eed90bfc631eced42167efff1e0160cdeea91464b819d96",
+        "size": 1778,
+        "uid": 995
+      },
+      "cron/jobs.json": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "f5cd8771d6b4cb30e9c4a8a6b15b9ba30ddbb797a2f7f7910d527a3948704768",
+        "size": 5850,
+        "uid": 995
+      },
+      "state.db": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "70d7db20f48296ecaf540e778bae4bfeb0c8cdc93a140bdc75e3cf149ac5c8e6",
+        "size": 7237632,
+        "uid": 995
+      },
+      "state.db-shm": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "87227d41e2e626b213dd37d41c2ae2240a0ba2d3cfcb06614490e46940681a1b",
+        "size": 32768,
+        "uid": 995
+      },
+      "state.db-wal": {
+        "exists": true,
+        "gid": 986,
+        "mode": 384,
+        "sha256": "6f55f93af01625a021bdcb91c9ff20025a8b4dfefa8a65724eee1c626bac047e",
+        "size": 2525592,
+        "uid": 995
+      }
+    },
+    "raw_dialogue_or_secret_values_exported": false,
+    "regex_manifest": {
+      "all_wheel_files_match": false,
+      "files": [
+        {
+          "bytes": 75,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex/__init__.py",
+          "sha256": "039934ae6f0b9fb1cab1f1bef2c11661e85e93ccc22847bab105b94065009925",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 33410,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex/_main.py",
+          "sha256": "b3ef1c11f7a7721e6e0fe462d8bba85b32fb814ca6210d07bb17da1bb128e436",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 2597504,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex/_regex.cpython-313-x86_64-linux-gnu.so",
+          "sha256": "b9289d43031fd883e8f81c97e802ffb7d82d719f99d86efec09288a81eaa1ce5",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 147335,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex/_regex_core.py",
+          "sha256": "604eb46253402336c66362f32c4a20af095d3bd0b5505501b44e6077e92951a2",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 225809,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex/tests/test_regex.py",
+          "sha256": "884e1739f884a56ac62835192120f1971362f98d2b5fc28f1fcc80c293132db2",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 40564,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex-2026.9.29.dist-info/METADATA",
+          "sha256": "33859377dbf8dd38ee3de73fd97faebf4a63d50576e3cc1a9dfe44df08b0936a",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 190,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex-2026.9.29.dist-info/WHEEL",
+          "sha256": "c9f40ea4fad9d1394edad3bfbbf1c00797bb851385b78581694571fa1b4b36b9",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 6,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex-2026.9.29.dist-info/top_level.txt",
+          "sha256": "6909a20cc84d4c5dba7022b8ffb0fea9a56f85bc42946d30c824e7121933601b",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        },
+        {
+          "bytes": 1095,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex-2026.9.29.dist-info/RECORD",
+          "sha256": "430530948963bb732b05064b80becabb82f24d17d76a5a0f2c8a94947297a955",
+          "uid": 0,
+          "wheel_bytes_equal": false
+        },
+        {
+          "bytes": 11584,
+          "gid": 0,
+          "mode": "0644",
+          "path": "regex-2026.9.29.dist-info/licenses/LICENSE.txt",
+          "sha256": "bff55ef4cdcc8c14ce259f8e8ab60e264418440d6335f4dc138273fbd506144d",
+          "uid": 0,
+          "wheel_bytes_equal": true
+        }
+      ],
+      "manifest_sha256": "89ed1e0d15b0d4133426001ee5aaf3706c24f90205097ce330ee64179833b7bc"
+    },
+    "schema_version": 1,
+    "services": {
+      "capstone-hermes-guard-observe.service": {
+        "ActiveEnterTimestamp": "Wed 2026-10-14 02:57:21 KST",
+        "ActiveState": "active",
+        "DropInPaths": "",
+        "ExecMainStartTimestamp": "Wed 2026-10-14 02:57:21 KST",
+        "ExecMainStatus": "0",
+        "FragmentPath": "/etc/systemd/system/capstone-hermes-guard-observe.service",
+        "InvocationID": "8ffb244e89be455e85363d8ca5bdba58",
+        "MainPID": "1924334",
+        "NRestarts": "0",
+        "Result": "success",
+        "SubState": "running",
+        "UnitFileState": "enabled"
+      },
+      "capstone-hermes-guard-reapply.service": {
+        "ActiveEnterTimestamp": "",
+        "ActiveState": "inactive",
+        "DropInPaths": "",
+        "ExecMainStartTimestamp": "Thu 2026-10-15 01:48:04 KST",
+        "ExecMainStatus": "0",
+        "FragmentPath": "/etc/systemd/system/capstone-hermes-guard-reapply.service",
+        "InvocationID": "f0075f1f1fa34e8aaff8de1a21b2fe81",
+        "MainPID": "0",
+        "NRestarts": "0",
+        "Result": "success",
+        "SubState": "dead",
+        "UnitFileState": "static"
+      },
+      "capstone-hermes-guard-reapply.timer": {
+        "ActiveEnterTimestamp": "Wed 2026-10-14 02:57:20 KST",
+        "ActiveState": "active",
+        "DropInPaths": "",
+        "FragmentPath": "/etc/systemd/system/capstone-hermes-guard-reapply.timer",
+        "InvocationID": "8770728417374ab7b7ec123b2a8a9991",
+        "Result": "success",
+        "SubState": "waiting",
+        "UnitFileState": "enabled"
+      }
+    },
+    "source_files": {
+      "capstone_korean_output_guard.py": {
+        "bytes": 22157,
+        "device": 55,
+        "exists": true,
+        "gid": 0,
+        "inode": 6852102,
+        "links": 1,
+        "matches_expected": true,
+        "mode": "0644",
+        "sha256": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
+        "uid": 0
+      },
+      "gateway/run_turn.py": {
+        "bytes": 256255,
+        "device": 55,
+        "exists": true,
+        "gid": 0,
+        "inode": 7358864,
+        "links": 1,
+        "matches_expected": true,
+        "mode": "0644",
+        "sha256": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a",
+        "uid": 0
+      },
+      "plugins/platforms/mattermost/adapter.py": {
+        "bytes": 41562,
+        "device": 55,
+        "exists": true,
+        "gid": 0,
+        "inode": 7358862,
+        "links": 1,
+        "matches_expected": true,
+        "mode": "0644",
+        "sha256": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+        "uid": 0
+      }
+    },
+    "status": "observed",
+    "wheel": {
+      "bytes": 807902,
+      "device": 64512,
+      "exists": true,
+      "gid": 0,
+      "inode": 8652184,
+      "links": 1,
+      "mode": "0600",
+      "sha256": "d49c18f1ea294cf4adde2e5ac256e98c82ea9d708462ce4bf799dffa7cfe8a2c",
+      "uid": 0
+    }
+  },
+  "full_metadata_regex": {
+    "container_identity_unchanged": true,
+    "kind": "hermes_regex_record_and_read_only_abi",
+    "native_import": {
+      "architecture": "x86_64",
+      "backend_path": "/opt/capstone-guard-runtime/regex-2026.9.29/lib/python3.13/site-packages/regex/_regex.cpython-313-x86_64-linux-gnu.so",
+      "cache_tag": "cpython-313",
+      "gid": 986,
+      "python": [
+        3,
+        13,
+        5
+      ],
+      "regex_version": "2026.9.29",
+      "soabi": "cpython-313-x86_64-linux-gnu",
+      "uid": 995
+    },
+    "observed_at_utc": "2026-10-14T16:53:17.804093+00:00",
+    "operating_changes": false,
+    "package_installs": 0,
+    "prestart_contract": {
+      "result": {
+        "container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+        "fingerprint": "f32c8e119b4ceb3360514e6281bc2a4957d90541b092ad14760d4cc06c87c6dd",
+        "profile": "hermes-prestart-v1"
+      },
+      "source_sha256": "cc0a8214872149f322980fab4468e9cd61741343fcc509e5f9e2a37d0df5b34d",
+      "status": "pass"
+    },
+    "record": {
+      "additional_install_metadata_paths": [
+        "regex-2026.9.29.dist-info/INSTALLER",
+        "regex-2026.9.29.dist-info/REQUESTED",
+        "regex-2026.9.29.dist-info/uv_cache.json"
+      ],
+      "all_referenced_hashes_and_sizes_valid": true,
+      "installed_rows": 13,
+      "manifest_sha256": "7577f7b398ab1d033a9a73706169ba73c0316d7209213a9c93626b80f150908c",
+      "record_sha256": "430530948963bb732b05064b80becabb82f24d17d76a5a0f2c8a94947297a955",
+      "self_hash_intentionally_empty": true,
+      "wheel_files": 10,
+      "wheel_payloads_exact": true
+    },
+    "status": "pass"
+  },
+  "host": "Groot_B",
+  "interpretation": {
+    "idle_is_admission_lock": false,
+    "protected_live_hash_match_is_stopped_snapshot": false,
+    "ready_to_recreate_without_additional_work": false,
+    "record_difference": "uv adds INSTALLER/REQUESTED/uv_cache metadata and rewrites RECORD; all 10 wheel files except RECORD are byte-identical, all 13 installed RECORD entries validate.",
+    "remaining_work": [
+      "Existing prestart metadata contract is reusable; native create/first-start/cutover/recovery lifecycle remains unimplemented and untested.",
+      "Current reapply timer is post-creation detection; it does not prevent the first unguarded response.",
+      "Any future transition needs fresh locked identity/source/idle checks and preserved live DB; current read-only observation does not authorize or perform the transition."
+    ]
+  },
+  "kind": "stage4_hermes_preparation_read_only",
+  "observed_at_kst": "2026-10-15T01:51:50+09:00",
+  "schema_version": 1
+}

@@ -25,6 +25,39 @@ def proposal(diff="--- before\n+++ after\n-old\n+new\n"):
             "diff": diff, "requested_by": "hermes", "expires_at": int(time.time()) + 120}
 
 
+class AlertTimestampTest(unittest.TestCase):
+    def test_known_offsets_convert_but_naive_time_is_not_assumed_utc(self):
+        for value in ("2026-10-13T02:05:06Z", "2026-10-13T02:05:06+0000",
+                      "2026-10-13T11:05:06+09:00", "2026-10-12T22:05:06-04:00"):
+            with self.subTest(value=value):
+                self.assertEqual(bot._alert_time_kst(value), "2026-10-13 11:05:06 KST")
+        self.assertEqual(bot._alert_time_kst("2026-10-13T02:05:06"),
+                         "2026-10-13 02:05:06 (시간대 확인 필요)")
+        self.assertEqual(bot._alert_time_kst(""), "시각 없음")
+        self.assertEqual(bot._alert_time_kst("invalid"), "시각 형식 확인 필요")
+
+    def test_display_conversion_preserves_raw_fingerprint_and_source(self):
+        raw = "2026-10-13T02:05:06.123+0000"
+        source = {"timestamp": raw, "rule": {"id": "100001", "level": 12}}
+        with patch.object(bot, "idx_search", return_value={"hits": {"hits": [{"_source": source}]}}):
+            report_rows, error = bot.recent_alerts()
+            fingerprint = bot.recent_fingerprint()["latest"][0]
+        self.assertIsNone(error)
+        self.assertEqual(report_rows[0]["ts"], "2026-10-13 11:05:06.123000 KST")
+        self.assertEqual(fingerprint["ts_kst"], report_rows[0]["ts"])
+        self.assertEqual(fingerprint["ts"], raw)
+        self.assertEqual(source["timestamp"], raw)
+
+    def test_subsecond_events_remain_distinct_and_represent_the_same_instant(self):
+        originals = ("2026-10-13T02:05:06.124+0000", "2026-10-13T02:05:06.125+0000")
+        converted = [bot._alert_time_kst(value) for value in originals]
+        self.assertNotEqual(*converted)
+        for original, display in zip(originals, converted):
+            with self.subTest(original=original):
+                self.assertEqual(bot.datetime.fromisoformat(original).timestamp(),
+                                 bot.datetime.fromisoformat(display.replace(" KST", "+09:00")).timestamp())
+
+
 class RuleBrokerTest(unittest.TestCase):
     def setUp(self):
         self.saved = (bot.RULE_BROKER_TOKEN, bot.BROKER_TOKEN, bot.RULE_APPROVERS,
@@ -77,6 +110,141 @@ class RuleBrokerTest(unittest.TestCase):
         self.assertNotIn(nonce, text)
         self.assertEqual(result["proposal_digest"], hashlib.sha256(json.dumps(
             req, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()).hexdigest())
+
+    def test_large_review_is_lossless_numbered_and_approved_as_one_proposal(self):
+        req = proposal("--- before\n+++ after\n" + "-기존 규칙\n+새 규칙과 😀\n" * 1200)
+        created = self._create(req)
+        parts = bot._rule_review_parts(req["diff"])
+        self.assertEqual("".join(parts), req["diff"])
+        self.assertEqual(created["review_parts"], len(parts))
+        self.assertEqual(len(self.cards), len(parts) + 1)
+        offset = 0
+        for index, (part, payload) in enumerate(zip(parts, self.cards), 1):
+            with self.subTest(index=index):
+                attachment = payload["attachments"][0]
+                text = attachment["text"]
+                raw = part.encode("utf-8")
+                self.assertNotIn("actions", attachment)
+                self.assertIn("검토 부분: %d/%d" % (index, len(parts)), text)
+                self.assertIn("[%d, %d)" % (offset, offset + len(raw)), text)
+                self.assertIn(hashlib.sha256(raw).hexdigest(), text)
+                for value in (created["proposal_id"], created["proposal_digest"], req["diff_sha256"]):
+                    self.assertIn(value, text)
+                self.assertTrue(text.endswith(bot._rule_diff_display(part)))
+                self.assertLessEqual(len(raw), bot.RULE_REVIEW_PART_MAX_BYTES)
+                self.assertLessEqual(len(bot._rule_diff_display(part).encode()), bot.RULE_REVIEW_PART_MAX_BYTES)
+                self.assertLess(len(text.encode()), 14_000)
+                offset += len(raw)
+        self.assertEqual(offset, len(req["diff"].encode()))
+        public = bot.rule_change_decision(created["proposal_id"])
+        self.assertEqual((public["status"], public["review_parts_posted"]), ("pending", len(parts)))
+        self.assertIn("인증", self._click(proposal_digest="0" * 64)["ephemeral_text"])
+        self.assertIn("승인됨", self._click()["ephemeral_text"])
+        rid, digest = created["proposal_id"], created["proposal_digest"]
+        self.assertEqual(bot.rule_change_consume(rid, {"proposal_digest": "0" * 64})[1], 409)
+        self.assertEqual(bot.rule_change_consume(rid, {"proposal_digest": digest})[1], 200)
+        result = {"proposal_digest": digest, "status": "applied", "before_sha256": req["base_sha256"],
+                  "after_sha256": req["candidate_sha256"], "readback_sha256": req["candidate_sha256"],
+                  "detail": "구문 검사와 재로드 검증 완료"}
+        self.assertEqual(bot.rule_change_result(rid, result)[1], 200)
+        self.assertLess(len(self.cards[-1]["attachments"][0]["text"].encode()), 14_000)
+        self.assertIn(req["diff_sha256"], self.cards[-1]["attachments"][0]["text"])
+
+    def test_split_handles_long_lines_newlines_and_exact_utf8_limit(self):
+        examples = ("😀" * (bot.RULE_DIFF_MAX_BYTES // 4), "\n" * (9 * 1024),
+                    "x" * (9 * 1024), "가\n" * 10000, "x" * 8188 + "가\nnext\n")
+        for diff in examples:
+            with self.subTest(length=len(diff)):
+                parts = bot._rule_review_parts(diff)
+                self.assertEqual("".join(parts), diff)
+                self.assertTrue(all(parts))
+                self.assertTrue(all(len(bot._rule_diff_display(p).encode()) <=
+                                    bot.RULE_REVIEW_PART_MAX_BYTES for p in parts))
+        limit = "😀" * (bot.RULE_DIFF_MAX_BYTES // 4)
+        self.assertEqual(bot.rule_change_create(proposal(limit))[1], 200)
+        self.assertEqual(bot.rule_change_create(proposal(limit + "x"))[1], 400)
+
+    def test_small_diff_with_many_lines_uses_review_parts_without_truncation(self):
+        req = proposal("\n" * 4000)
+        created = self._create(req)
+        self.assertGreater(created["review_parts"], 1)
+        self.assertEqual("".join(bot._rule_review_parts(req["diff"])), req["diff"])
+
+    def test_partial_review_or_final_post_failure_cannot_be_approved(self):
+        req = proposal("-old\n+new\n" * 2000)
+        total = len(bot._rule_review_parts(req["diff"])) + 1
+        for fail_at in (1, 2, total):
+            with self.subTest(fail_at=fail_at):
+                bot.RULE_APPROVALS.clear()
+                self.cards.clear()
+                def post(payload):
+                    self.cards.append(payload)
+                    return (len(self.cards) != fail_at), "secret detail"
+                with patch.object(bot, "post_mm", side_effect=post):
+                    response, status = bot.rule_change_create(req)
+                self.assertEqual(status, 502)
+                self.assertNotIn("secret detail", str(response))
+                self.assertEqual(len(self.cards), fail_at)
+                rid, rec = next(iter(bot.RULE_APPROVALS.items()))
+                self.assertEqual(rec["status"], "error")
+                ctx = {"proposal_id": rid, "proposal_digest": rec["proposal_digest"],
+                       "nonce": rec["nonce"], "decision": "approve"}
+                rejected = bot.rule_change_action({"user_id": "allowed-user", "context": ctx}, "127.0.0.1")
+                self.assertIn("처리", rejected["ephemeral_text"])
+                self.assertEqual(bot.rule_change_consume(rid, {"proposal_digest": rec["proposal_digest"]})[1], 409)
+
+    def test_approval_is_disabled_until_final_post_has_succeeded(self):
+        for diff in ("-old\n+new\n", "-old\n+new\n" * 2000):
+            with self.subTest(large=len(diff) > 8192):
+                bot.RULE_APPROVALS.clear()
+                self.cards.clear()
+                def post(payload):
+                    rid, rec = next(iter(bot.RULE_APPROVALS.items()))
+                    self.assertEqual(rec["status"], "posting")
+                    ctx = {"proposal_id": rid, "proposal_digest": rec["proposal_digest"],
+                           "nonce": rec["nonce"], "decision": "approve"}
+                    rejected = bot.rule_change_action({"user_id": "allowed-user", "context": ctx}, "127.0.0.1")
+                    self.assertIn("처리", rejected["ephemeral_text"])
+                    self.assertEqual(bot.rule_change_consume(rid, {"proposal_digest": rec["proposal_digest"]})[1], 409)
+                    self.cards.append(payload)
+                    return True, "ok"
+                with patch.object(bot, "post_mm", side_effect=post):
+                    created = self._create(proposal(diff))
+                self.assertEqual(bot.rule_change_decision(created["proposal_id"])["status"], "pending")
+
+    def test_expiry_and_posting_deadline_never_leave_approvable_cards(self):
+        for large, final, expiry in ((True, False, True), (True, True, True),
+                                     (True, False, False), (True, True, False),
+                                     (False, True, False)):
+            with self.subTest(large=large, final=final, expiry=expiry):
+                bot.RULE_APPROVALS.clear()
+                self.cards.clear()
+                wall = [time.time()]
+                monotonic = [1000.0]
+                req = proposal("x" * (20000 if large else 10))
+                def post(payload):
+                    self.cards.append(payload)
+                    if not final or "actions" in payload["attachments"][0]:
+                        if expiry:
+                            wall[0] = req["expires_at"] + 1
+                        else:
+                            monotonic[0] += bot.RULE_POST_MAX_SECONDS
+                    return True, "ok"
+                with patch.object(bot.time, "time", side_effect=lambda: wall[0]), \
+                     patch.object(bot.time, "monotonic", side_effect=lambda: monotonic[0]), \
+                     patch.object(bot, "post_mm", side_effect=post):
+                    self.assertEqual(bot.rule_change_create(req)[1], 502)
+                self.assertEqual(next(iter(bot.RULE_APPROVALS.values()))["status"],
+                                 "expired" if expiry else "error")
+
+    def test_posting_proposals_reserve_capacity(self):
+        created = self._create()
+        source = bot.RULE_APPROVALS[created["proposal_id"]]
+        bot.RULE_APPROVALS.clear()
+        bot.RULE_APPROVALS.update({str(i): dict(source, status="posting") for i in range(64)})
+        before = len(self.cards)
+        self.assertEqual(bot.rule_change_create(proposal())[1], 429)
+        self.assertEqual(len(self.cards), before)
 
     def test_rejects_unconfigured_broker_and_approvers(self):
         bot.RULE_BROKER_TOKEN = ""
@@ -314,6 +482,35 @@ class RuleBrokerTest(unittest.TestCase):
                                       signed=True)
         self.assertEqual((status, reported["status"], reported["result_posted"]),
                          (200, "applied", True))
+        large = proposal("😀" * (bot.RULE_DIFF_MAX_BYTES // 4))
+        self.assertGreater(len(json.dumps(large).encode()), 1 << 20)
+        status, large_created, _ = request("POST", "/rule-changes", large, signed=True)
+        self.assertEqual(status, 200)
+        self.assertGreater(large_created["review_parts"], 1)
+        self.assertEqual(request("GET", "/rule-changes/" + large_created["proposal_id"],
+                                 signed=True)[1]["status"], "pending")
+
+    def test_http_body_limit_is_route_specific_and_rejects_incomplete_body(self):
+        handler = object.__new__(bot.Handler)
+        handler.path = "/rule-changes"
+        data = b" " * bot.RULE_CREATE_BODY_MAX_BYTES
+        handler.headers = {"Content-Length": str(len(data))}
+        handler.rfile = io.BytesIO(data)
+        self.assertEqual(len(handler._body()), len(data))
+        handler.headers["Content-Length"] = str(len(data) + 1)
+        handler.rfile = io.BytesIO(data)
+        with self.assertRaisesRegex(ValueError, "length"):
+            handler._body()
+        handler.path = "/rule-actions"
+        handler.headers["Content-Length"] = str((1 << 20) + 1)
+        handler.rfile = io.BytesIO(b"")
+        with self.assertRaisesRegex(ValueError, "length"):
+            handler._body()
+        handler.path = "/rule-changes"
+        handler.headers["Content-Length"] = "10"
+        handler.rfile = io.BytesIO(b"short")
+        with self.assertRaisesRegex(ValueError, "incomplete"):
+            handler._body()
 
     def test_hmac_tamper_replay_and_clock_skew_are_rejected(self):
         request_body = json.dumps(proposal()).encode()

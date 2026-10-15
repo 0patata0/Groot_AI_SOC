@@ -1,0 +1,343 @@
+[
+  {
+    "name": "Exclude only Suricata engine stats at native Wazuh input",
+    "hosts": "local",
+    "gather_facts": true,
+    "gather_subset": [
+      "min"
+    ],
+    "become": false,
+    "any_errors_fatal": true,
+    "tasks": [
+      {
+        "name": "Require fixed root operator and A host",
+        "ansible.builtin.assert": {
+          "that": [
+            "ansible_connection == 'local'",
+            "ansible_facts.user_id == 'root'",
+            "ansible_facts.machine_id == '096e90b6243e438aa8a7b392be754732'",
+            "ansible_version.full is version('2.21', '>=')",
+            "ansible_version.full is version('2.22', '<')"
+          ]
+        }
+      },
+      {
+        "name": "Snapshot approval boundary",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/usr/local/sbin/rule-change-executor",
+          "/opt/rule-change/rule_change_mcp.py",
+          "/etc/sudoers.d/capstone-rule-change"
+        ],
+        "register": "boundary_before",
+        "no_log": true
+      },
+      {
+        "name": "Inspect agent config",
+        "ansible.builtin.stat": {
+          "path": "/var/ossec/etc/ossec.conf",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "agent_before"
+      },
+      {
+        "name": "Require reviewed regular config",
+        "ansible.builtin.assert": {
+          "that": [
+            "agent_before.stat.isreg",
+            "not agent_before.stat.islnk",
+            "agent_before.stat.nlink == 1",
+            "agent_before.stat.uid == 0",
+            "agent_before.stat.gid == 110",
+            "agent_before.stat.mode == '0660'"
+          ]
+        }
+      },
+      {
+        "name": "Read agent config privately",
+        "ansible.builtin.slurp": {
+          "src": "/var/ossec/etc/ossec.conf"
+        },
+        "register": "original",
+        "no_log": true
+      },
+      {
+        "name": "Load exact before and after fragments",
+        "ansible.builtin.set_fact": {
+          "old_block": "{{ lookup('ansible.builtin.file', playbook_dir + '/before.xml') }}",
+          "new_block": "{{ lookup('ansible.builtin.file', playbook_dir + '/after.xml') }}",
+          "original_text": "{{ original.content | b64decode }}"
+        },
+        "no_log": true
+      },
+      {
+        "name": "Require one reviewed old or already applied fragment",
+        "ansible.builtin.assert": {
+          "that": [
+            "(original_text.count(old_block) == 1 and original_text.count(new_block) == 0) or (original_text.count(old_block) == 0 and original_text.count(new_block) == 1)"
+          ]
+        },
+        "no_log": true
+      },
+      {
+        "name": "Build minimal candidate in memory",
+        "ansible.builtin.set_fact": {
+          "candidate_text": "{{ original_text.replace(old_block, new_block) }}"
+        },
+        "no_log": true
+      },
+      {
+        "name": "Native PCRE filter positive and negative checks",
+        "ansible.builtin.command": {
+          "argv": [
+            "/bin/bash",
+            "{{ playbook_dir }}/test-pattern-a.sh"
+          ]
+        },
+        "changed_when": false
+      },
+      {
+        "name": "Inspect private state path",
+        "ansible.builtin.stat": {
+          "path": "/var/lib/capstone-automation/ansible/stats-filter",
+          "follow": false
+        },
+        "register": "stage_before"
+      },
+      {
+        "name": "Require safe state directory",
+        "ansible.builtin.assert": {
+          "that": [
+            "not stage_before.stat.exists or (stage_before.stat.isdir and not stage_before.stat.islnk and stage_before.stat.uid == 0)"
+          ]
+        }
+      },
+      {
+        "name": "Prepare root private state",
+        "ansible.builtin.file": {
+          "path": "/var/lib/capstone-automation/ansible/stats-filter",
+          "state": "directory",
+          "owner": "0",
+          "group": "0",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Stage and native validate full candidate",
+        "ansible.builtin.copy": {
+          "content": "{{ candidate_text }}",
+          "dest": "/var/lib/capstone-automation/ansible/stats-filter/ossec.conf",
+          "owner": "0",
+          "group": "0",
+          "mode": "0600",
+          "validate": "/var/ossec/bin/wazuh-logcollector -t -c %s"
+        },
+        "no_log": true
+      },
+      {
+        "name": "Recheck live config immediately before install",
+        "ansible.builtin.stat": {
+          "path": "/var/ossec/etc/ossec.conf",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "register": "agent_current"
+      },
+      {
+        "name": "Reject changes since snapshot",
+        "ansible.builtin.assert": {
+          "that": [
+            "agent_current.stat.checksum == agent_before.stat.checksum",
+            "agent_current.stat.uid == agent_before.stat.uid",
+            "agent_current.stat.gid == agent_before.stat.gid",
+            "agent_current.stat.mode == agent_before.stat.mode",
+            "not agent_current.stat.islnk",
+            "agent_current.stat.nlink == 1"
+          ]
+        }
+      },
+      {
+        "name": "Install and recover existing agent configuration",
+        "block": [
+          {
+            "name": "Install only reviewed stats exclusion with backup",
+            "ansible.builtin.copy": {
+              "content": "{{ candidate_text }}",
+              "dest": "/var/ossec/etc/ossec.conf",
+              "owner": "0",
+              "group": "110",
+              "mode": "0660",
+              "backup": true,
+              "validate": "/var/ossec/bin/wazuh-logcollector -t -c %s"
+            },
+            "register": "install_result",
+            "no_log": true
+          },
+          {
+            "name": "Restart only existing agent when changed",
+            "ansible.builtin.systemd_service": {
+              "name": "wazuh-agent.service",
+              "state": "restarted"
+            },
+            "when": "install_result.changed"
+          },
+          {
+            "name": "Verify agent active",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/bin/systemctl",
+                "is-active",
+                "wazuh-agent.service"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Verify required native agent processes",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/bash",
+                "-c",
+                "pgrep -x wazuh-agentd >/dev/null && pgrep -x wazuh-logcollec >/dev/null"
+              ]
+            },
+            "changed_when": false
+          },
+          {
+            "name": "Verify agent manager connection",
+            "ansible.builtin.command": {
+              "argv": [
+                "/usr/bin/grep",
+                "-q",
+                "status='connected'",
+                "/var/ossec/var/run/wazuh-agentd.state"
+              ]
+            },
+            "register": "connection",
+            "until": "connection.rc == 0",
+            "retries": 12,
+            "delay": 3,
+            "changed_when": false
+          },
+          {
+            "name": "Check exact final config hash",
+            "ansible.builtin.stat": {
+              "path": "/var/ossec/etc/ossec.conf",
+              "checksum_algorithm": "sha256",
+              "follow": false
+            },
+            "register": "final_config"
+          },
+          {
+            "name": "Verify installed bytes equal complete candidate",
+            "ansible.builtin.assert": {
+              "that": [
+                "final_config.stat.checksum == (candidate_text | hash('sha256'))"
+              ]
+            }
+          }
+        ],
+        "rescue": [
+          {
+            "name": "Inspect config before rollback",
+            "ansible.builtin.stat": {
+              "path": "/var/ossec/etc/ossec.conf",
+              "follow": false,
+              "checksum_algorithm": "sha256"
+            },
+            "register": "rollback_current",
+            "when": "install_result is defined and install_result.changed | default(false)"
+          },
+          {
+            "name": "Refuse to overwrite concurrent config during rollback",
+            "ansible.builtin.assert": {
+              "that": [
+                "rollback_current.stat.isreg",
+                "not rollback_current.stat.islnk",
+                "rollback_current.stat.nlink == 1",
+                "rollback_current.stat.checksum == (candidate_text | hash('sha256'))"
+              ]
+            },
+            "when": "install_result is defined and install_result.changed | default(false)"
+          },
+          {
+            "name": "Restore exact original config after mutation failure",
+            "ansible.builtin.copy": {
+              "content": "{{ original_text }}",
+              "dest": "/var/ossec/etc/ossec.conf",
+              "owner": "0",
+              "group": "110",
+              "mode": "0660",
+              "validate": "/var/ossec/bin/wazuh-logcollector -t -c %s"
+            },
+            "when": "install_result is defined and install_result.changed | default(false)",
+            "no_log": true
+          },
+          {
+            "name": "Restart restored agent",
+            "ansible.builtin.systemd_service": {
+              "name": "wazuh-agent.service",
+              "state": "restarted"
+            },
+            "when": "install_result is defined and install_result.changed | default(false)"
+          },
+          {
+            "name": "Verify restored agent processes and connection",
+            "ansible.builtin.command": {
+              "argv": [
+                "/bin/bash",
+                "-c",
+                "systemctl is-active --quiet wazuh-agent.service && pgrep -x wazuh-agentd >/dev/null && pgrep -x wazuh-logcollec >/dev/null && grep -q \"status='connected'\" /var/ossec/var/run/wazuh-agentd.state"
+              ]
+            },
+            "register": "recovered",
+            "until": "recovered.rc == 0",
+            "retries": 12,
+            "delay": 3,
+            "changed_when": false,
+            "when": "install_result is defined and install_result.changed | default(false)"
+          },
+          {
+            "name": "Report failed deployment after recovery",
+            "ansible.builtin.fail": {
+              "msg": "Stats filter deployment failed; if mutation occurred original config was restored. Inspect agent state."
+            }
+          }
+        ]
+      },
+      {
+        "name": "Snapshot approval boundary after",
+        "ansible.builtin.stat": {
+          "path": "{{ item }}",
+          "follow": false,
+          "checksum_algorithm": "sha256"
+        },
+        "loop": [
+          "/usr/local/sbin/rule-change-executor",
+          "/opt/rule-change/rule_change_mcp.py",
+          "/etc/sudoers.d/capstone-rule-change"
+        ],
+        "register": "boundary_after",
+        "no_log": true
+      },
+      {
+        "name": "Require preserved approval boundary",
+        "ansible.builtin.assert": {
+          "that": [
+            "item.0.stat.checksum == item.1.stat.checksum",
+            "item.0.stat.uid == item.1.stat.uid",
+            "item.0.stat.gid == item.1.stat.gid",
+            "item.0.stat.mode == item.1.stat.mode"
+          ]
+        },
+        "loop": "{{ boundary_before.results | zip(boundary_after.results) | list }}",
+        "no_log": true
+      }
+    ]
+  }
+]

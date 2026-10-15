@@ -1,0 +1,70 @@
+assert!(._TRANSPORT == "kernel", "not_kernel_transport")
+raw = string!(.message)
+assert!(length(raw) <= 65536 && !contains(raw, "\n") && !contains(raw, "\r"), "kernel_message_invalid")
+parsed = parse_regex!(raw, r'^(?P<prefix>AGENT_BLOCK|FW_DROP_IN|FW_DROP_OUT|FW_DROP_FWD|FW_SHADOW_OUT|FW_SSH_RATE|SPOOF)\s+(?P<fields>.+)$')
+prefix = parsed.prefix
+fields = parse_key_value!(parsed.fields, whitespace: "strict")
+# Duplicate selected keys are arrays in VRL and must never become one IP.
+for_each(["IN", "OUT", "SRC", "DST", "PROTO"]) -> |_index, key| {
+  value = get!(fields, [key])
+  assert!(is_string(value), "missing_or_duplicate_kernel_field")
+}
+for_each(["SPT", "DPT"]) -> |_index, key| {
+  value = get!(fields, [key])
+  assert!(value == null || is_string(value), "duplicate_kernel_port")
+}
+assert!(!match(parsed.fields, r'(^|\s)(AGENT_BLOCK|FW_DROP_IN|FW_DROP_OUT|FW_DROP_FWD|FW_SHADOW_OUT|FW_SSH_RATE|SPOOF)(\s|$)'), "repeated_kernel_prefix")
+sensor = get_env_var!("CAPSTONE_SENSOR")
+assert!(match(sensor, r'^[A-Za-z0-9_.:-]{1,80}$'), "sensor_invalid")
+cursor = string!(.__CURSOR)
+assert!(length(cursor) > 0 && length(cursor) <= 4096, "journal_cursor_invalid")
+micros = string!(.__REALTIME_TIMESTAMP)
+assert!(match(micros, r'^[0-9]{1,18}$'), "journal_timestamp_invalid")
+event_time = from_unix_timestamp!(to_int!(micros), unit: "microseconds")
+record_id = sha2(encode_json([sensor, cursor]), variant: "SHA-256")
+norm = {
+  "schema_version": "vector-1",
+  "pipeline": "vector",
+  "source": "nftables",
+  "sensor": sensor,
+  "record_id": record_id,
+  "event_id": sha2(encode_json([sensor, "nftables", cursor]), variant: "SHA-256"),
+  "message_sha256": sha2(raw, variant: "SHA-256"),
+  "hash_scope": "vector_decoded_journal_MESSAGE",
+  "identity_scope": "journal_cursor",
+  "provenance_level": "kernel_journal_cursor",
+  "observed_at_kst": format_timestamp!(now(), format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul"),
+  "event_time_kst": format_timestamp!(event_time, format: "%Y-%m-%dT%H:%M:%S%.6f%:z", timezone: "Asia/Seoul"),
+  "time_status": "journal_realtime",
+  "rule_ids": [prefix],
+  "direction": "unknown",
+  "action": "observed",
+  "quality_flags": [],
+  "protected_asset": false
+}
+if includes(["FW_DROP_IN", "FW_DROP_OUT", "FW_DROP_FWD", "FW_SSH_RATE"], prefix) { norm.action = "logged_drop" }
+if prefix == "FW_SHADOW_OUT" { norm.action = "would_drop" }
+for_each({"source_ip": fields.SRC, "destination_ip": fields.DST}) -> |key, value| {
+  value = string!(value)
+  if is_ipv4(value) || is_ipv6(value) {
+    norm = set!(norm, [key], value)
+    if value == "211.170.162.110" || value == "211.170.162.111" { norm.protected_asset = true }
+  } else { norm.quality_flags = push(norm.quality_flags, key + "_invalid") }
+}
+for_each({"source_port": fields.SPT, "destination_port": fields.DPT}) -> |key, value| {
+  if value != null {
+    port, err = parse_int(string!(value), base: 10)
+    if err == null && match(string!(value), r'^[0-9]{1,5}$') && port >= 0 && port <= 65535 { norm = set!(norm, [key], port) }
+    else { norm.quality_flags = push(norm.quality_flags, key + "_invalid") }
+  }
+}
+for_each({"ingress_interface": fields.IN, "egress_interface": fields.OUT}) -> |key, value| {
+  value = string!(value)
+  if match(value, r'^[A-Za-z0-9_.:@-]{1,32}$') { norm = set!(norm, [key], value) }
+  else if value != "" { norm.quality_flags = push(norm.quality_flags, key + "_invalid") }
+}
+proto = upcase(string!(fields.PROTO))
+if includes(["TCP", "UDP", "ICMP", "ICMPV6", "IGMP", "SCTP"], proto) { norm.protocol = downcase(proto) }
+else { norm.quality_flags = push(norm.quality_flags, "protocol_invalid") }
+. = {"capstone_norm": norm}
+assert!(length(encode_json(.)) <= 32768, "normalized_size")

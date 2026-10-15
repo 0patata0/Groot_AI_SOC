@@ -1,0 +1,89 @@
+# Private one-shot stdin graph. Never use operational data_dir or output paths.
+data_dir = "${REPLAY_WORK}/data"
+timezone = "Asia/Seoul"
+[sources.history]
+type = "stdin"
+decoding.codec = "json"
+framing.method = "newline_delimited"
+framing.newline_delimited.max_length = 1048576
+
+[transforms.journal_string_mapping]
+type = "remap"
+inputs = ["history"]
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+source = '''
+# This probe admits only string-valued journal objects, checked before launch.
+# Vector v0.59.0 journald::create_log_event removes MESSAGE into message.
+assert!(is_string(.MESSAGE) && !exists(.message), "probe_string_mapping_scope")
+.message = del(.MESSAGE)
+'''
+
+[transforms.selector_observation]
+type = "remap"
+inputs = ["journal_string_mapping"]
+source = '''
+sensor = get_env_var!("CAPSTONE_SENSOR")
+cursor = string!(.__CURSOR)
+selected = match(string(.message) ?? "", r'^(AGENT_BLOCK|FW_DROP_IN|FW_DROP_OUT|FW_DROP_FWD|FW_SHADOW_OUT|FW_SSH_RATE|SPOOF)\s')
+. = {"replay_stage":"selector", "selected":selected,
+     "record_id":sha2(encode_json([sensor,cursor]), variant:"SHA-256"),
+     "event_id":sha2(encode_json([sensor,"nftables",cursor]), variant:"SHA-256")}
+'''
+
+[transforms.nft_select]
+type = "filter"
+inputs = ["journal_string_mapping"]
+condition = '''match(string(.message) ?? "", r'^(AGENT_BLOCK|FW_DROP_IN|FW_DROP_OUT|FW_DROP_FWD|FW_SHADOW_OUT|FW_SSH_RATE|SPOOF)\s')'''
+
+[transforms.nft_normalize]
+type = "remap"
+inputs = ["nft_select"]
+file = "${REPLAY_WORK}/nftables.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[transforms.correlation_metadata]
+type = "remap"
+inputs = ["nft_normalize"]
+file = "${REPLAY_WORK}/correlation.vrl"
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+
+[transforms.replay_marker]
+type = "remap"
+inputs = ["correlation_metadata"]
+source = '''
+.capstone_norm.replay = true
+.capstone_norm.replay_lane = "previous-boot-analysis-v1"
+.capstone_norm.correlation_eligible = false
+.replay_stage = "normalized"
+'''
+
+[transforms.mapping_failed]
+type = "remap"
+inputs = ["journal_string_mapping.dropped"]
+source = '. = {"replay_stage":"mapping_failed"}'
+
+[transforms.normalization_failed]
+type = "remap"
+inputs = ["nft_normalize.dropped"]
+source = '''
+sensor = get_env_var!("CAPSTONE_SENSOR")
+cursor = string!(.__CURSOR)
+. = {"replay_stage":"normalization_failed", "event_id":sha2(encode_json([sensor,"nftables",cursor]), variant:"SHA-256")}
+'''
+
+[transforms.correlation_failed]
+type = "remap"
+inputs = ["correlation_metadata.dropped"]
+source = '. = {"replay_stage":"correlation_failed", "event_id":string!(.capstone_norm.event_id)}'
+
+[sinks.result]
+type = "file"
+inputs = ["selector_observation", "replay_marker", "mapping_failed", "normalization_failed", "correlation_failed"]
+path = "${REPLAY_WORK}/result.jsonl"
+encoding.codec = "json"

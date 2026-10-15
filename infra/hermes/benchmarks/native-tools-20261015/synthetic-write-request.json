@@ -1,0 +1,83 @@
+{
+  "model": "qwen3.6:35b",
+  "temperature": 0,
+  "seed": 42,
+  "max_tokens": 2048,
+  "stream": false,
+  "reasoning_effort": "none",
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "mcp__rule_a__propose_rule_edit",
+        "description": "Preferred for small or localized rule changes: submit only exact text replacements, not the whole file. The server checks the current SHA-256, reconstructs the complete candidate, validates it, and posts the full diff for one operator approval. Each old_text must occur exactly once in the original file; edits must not overlap. All edits refer to the original, never another edit's output. To insert, replace a unique existing anchor with the anchor plus the new text. To delete, use an empty new_text. Returns compact approval metadata; the full diff is already posted to Mattermost. Does not apply before approval.",
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "target": {
+              "type": "string",
+              "enum": [
+                "a:modsecurity-custom",
+                "a:suricata-local",
+                "b:wazuh-local-rules"
+              ]
+            },
+            "base_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$",
+              "description": "Copy the exact SHA-256 returned by get_rule_change_target"
+            },
+            "edits": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "description": "Exact original-text replacements; combined old_text and new_text must fit 64 KiB UTF-8. Final reconstructed file must fit 128 KiB.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "old_text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "A nonempty unique literal excerpt from the original file, preserving all whitespace and newlines"
+                  },
+                  "new_text": {
+                    "type": "string",
+                    "description": "Exact replacement; keep the anchor when inserting, or empty to delete"
+                  }
+                },
+                "required": [
+                  "old_text",
+                  "new_text"
+                ]
+              }
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "target",
+            "base_sha256",
+            "edits",
+            "reason"
+          ]
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto",
+  "messages": [
+    {
+      "role": "system",
+      "content": "합성 도구 호출 형식 검증입니다. 주어진 상태를 바탕으로 승인용 부분 편집 도구를 정확히 한 번 호출하세요. 전체 파일 재작성은 하지 마세요. 실제 도구 실행은 시험기가 수행하지 않습니다. 도구 호출 이외의 설명은 쓰지 마세요."
+    },
+    {
+      "role": "user",
+      "content": "아래는 합성 파일과 그 변경 요청입니다. 제시한 SHA를 그대로 사용하고 주석의 v1만 v2로 바꾸는 편집 하나를 만드세요. 사유는 정확히 \"합성 주석 버전 변경\"으로 쓰세요.\n{\"target\": \"a:modsecurity-custom\", \"current_content\": \"# synthetic verification note v1\\n\", \"base_sha256\": \"444422b33257ac9ac24c9c6b5d3c0c59499dd77a7381f8f02fd23873b61f205e\"}"
+    }
+  ]
+}

@@ -1,0 +1,465 @@
+[
+  {
+    "name": "Prepare one fixed stopped WAF candidate",
+    "hosts": "localhost",
+    "gather_facts": false,
+    "become": false,
+    "any_errors_fatal": true,
+    "tasks": [
+      {
+        "name": "Require fixed operator lock and actual A",
+        "ansible.builtin.assert": {
+          "that": [
+            "capstone_waf_operator_lock | default(false) | bool"
+          ],
+          "quiet": true
+        }
+      },
+      {
+        "name": "Verify A machine id",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/cat",
+            "/etc/machine-id"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "machine"
+      },
+      {
+        "name": "Refuse other host",
+        "ansible.builtin.assert": {
+          "that": [
+            "machine.stdout == '096e90b6243e438aa8a7b392be754732'"
+          ],
+          "quiet": true
+        }
+      },
+      {
+        "name": "Pin protected baseline and comparison source",
+        "ansible.builtin.shell": "set -euo pipefail\n[[ $EUID == 0 && $(stat -c %u:%g:%a /var/backups/capstone-waf-recreation-20261015) == 0:0:700 && ! -L /var/backups/capstone-waf-recreation-20261015 ]]\n[[ $(stat -c %u:%g:%a:%h /var/backups/capstone-waf-recreation-20261015/before-inspect.json) == 0:0:400:1 && ! -L /var/backups/capstone-waf-recreation-20261015/before-inspect.json ]]\n[[ $(sha256sum /var/backups/capstone-waf-recreation-20261015/before-inspect.json | cut -d ' ' -f1) == fd0bd4029be0999c467e70404257b681a98a4c4c3a9136f65303451d88eccdf8 ]]\n[[ $(sha256sum '{{ playbook_dir }}/waf-candidate-profile.jq' | cut -d ' ' -f1) == 59b8205437c59804111bf512fb3fb86d45ccd625aaa500476e07982dcea7372c ]]\n[[ $(stat -c %u:%g:%a:%h /var/backups/capstone-waf-recreation-20261015/image-inspect.json) == 0:0:400:1 && ! -L /var/backups/capstone-waf-recreation-20261015/image-inspect.json ]]\n[[ $(sha256sum /var/backups/capstone-waf-recreation-20261015/image-inspect.json | cut -d ' ' -f1) == ebc43957a8e89697e4aae61430adef03e440d55d39b117e69c67dc76fe97b5b8 ]]\n[[ ! -e /var/backups/capstone-waf-recreation-20261015/candidate-create && ! -L /var/backups/capstone-waf-recreation-20261015/candidate-create ]]\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "changed_when": false,
+        "timeout": 30
+      },
+      {
+        "name": "Observe existing WAF privately",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "live",
+        "no_log": true
+      },
+      {
+        "name": "Read fixed private baseline",
+        "ansible.builtin.slurp": {
+          "src": "/var/backups/capstone-waf-recreation-20261015/before-inspect.json"
+        },
+        "register": "baseline",
+        "no_log": true
+      },
+      {
+        "name": "Decode fixed profiles privately",
+        "ansible.builtin.set_fact": {
+          "prior": "{{ (baseline.content | b64decode | from_json)[0] }}",
+          "current": "{{ (live.stdout | from_json)[0] }}"
+        },
+        "no_log": true
+      },
+      {
+        "name": "Require original operating profile unchanged",
+        "ansible.builtin.assert": {
+          "that": [
+            "current.Id == '02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e'",
+            "current.Image == 'sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650'",
+            "current.Name == '/waf'",
+            "current.State.Running and not current.State.Restarting",
+            "current.State.Pid == 2377669",
+            "current.State.Health.Status == 'healthy'",
+            "current.Config == prior.Config",
+            "current.HostConfig == prior.HostConfig",
+            "current.Mounts == prior.Mounts",
+            "current.NetworkSettings == prior.NetworkSettings"
+          ],
+          "quiet": true
+        },
+        "no_log": true
+      },
+      {
+        "name": "Require supported actual daemon",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "version",
+            "--format",
+            "{% raw %}{{.Server.Version}}:{{.Server.APIVersion}}{% endraw %}"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "version"
+      },
+      {
+        "name": "Require reviewed Docker version",
+        "ansible.builtin.assert": {
+          "that": [
+            "version.stdout == '29.8.1:1.56'"
+          ],
+          "quiet": true
+        }
+      },
+      {
+        "name": "Read actual OOM support",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "info",
+            "--format",
+            "{% raw %}{{.OomKillDisable}}:{{.CgroupVersion}}{% endraw %}"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "oom"
+      },
+      {
+        "name": "Require exact OOM default context",
+        "ansible.builtin.assert": {
+          "that": [
+            "oom.stdout == 'false:2'"
+          ],
+          "quiet": true
+        }
+      },
+      {
+        "name": "Check unused candidate name",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "ps",
+            "-a",
+            "--filter",
+            "name=^/waf-prestart-20261015$",
+            "--format",
+            "{% raw %}{{.ID}}{% endraw %}"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "existing"
+      },
+      {
+        "name": "Never reuse or replace a candidate",
+        "ansible.builtin.assert": {
+          "that": [
+            "existing.stdout == ''"
+          ],
+          "quiet": true
+        }
+      },
+      {
+        "name": "Pin host mounts and current managed state",
+        "ansible.builtin.shell": "set -euo pipefail\nfor row in  'REQUEST-900-CAPSTONE-SCANNER.conf:d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d'  'zz-capstone-evidence-v2.conf:1e4c37a9bcedd730e693029fa4b40a6fd5e68a93b206ea161f458e11d7e6e212'  'modsecurity-override-v2.conf.template:814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb'; do\n file=/etc/capstone-waf/${row%%:*}; sha=${row#*:}\n [[ ! -L $file && $(stat -c %u:%g:%a:%h \"$file\") == 0:0:444:1 && $(sha256sum \"$file\" | cut -d ' ' -f1) == \"$sha\" ]]\ndone\nfor engine in suricata modsecurity; do\n path=/var/lib/capstone-raw-operations/$engine/state.json\n jq -e '.phase==\"active\" and .pending==null' \"$path\" >/dev/null\n [[ ! -e /var/lib/capstone-raw-operations/$engine/writer-reopen-intent.json && ! -L /var/lib/capstone-raw-operations/$engine/writer-reopen-intent.json ]]\n sha256sum \"$path\"\ndone\n[[ ! -e /var/lib/capstone-raw-operations/vector-stop-intent.json && ! -L /var/lib/capstone-raw-operations/vector-stop-intent.json && ! -e /var/lib/capstone-vector-maintenance/resume.pending && ! -L /var/lib/capstone-vector-maintenance/resume.pending ]]\n[[ $(readlink /proc/1909632/exe) == /var/ossec/bin/wazuh-logcollector ]]\nawk '{sub(/^.*\\) /, \"\"); print $20}' /proc/1909632/stat\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "states_before"
+      },
+      {
+        "name": "Observe reader identity",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemctl",
+            "show",
+            "capstone-vector.service",
+            "wazuh-agent.service",
+            "-p",
+            "Id,ActiveState,MainPID,InvocationID"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "readers_before"
+      },
+      {
+        "name": "Create private create evidence directory",
+        "ansible.builtin.file": {
+          "path": "/var/backups/capstone-waf-recreation-20261015/candidate-create",
+          "state": "directory",
+          "owner": "root",
+          "group": "root",
+          "mode": "0700"
+        }
+      },
+      {
+        "name": "Persist one create intent",
+        "ansible.builtin.copy": {
+          "dest": "/var/backups/capstone-waf-recreation-20261015/candidate-create/intent.json",
+          "content": "{\"candidate_name\":\"waf-prestart-20261015\",\"image\":\"sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650\",\"operating_start_authorized\":false,\"operation\":\"docker_create_stopped_candidate\",\"original_cid\":\"02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e\",\"profile_filter_sha256\":\"59b8205437c59804111bf512fb3fb86d45ccd625aaa500476e07982dcea7372c\",\"retry_authorized\":false,\"schema_version\":1}\n",
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Synchronize create intent and parent",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/sync",
+            "--",
+            "/var/backups/capstone-waf-recreation-20261015/candidate-create/intent.json",
+            "/var/backups/capstone-waf-recreation-20261015/candidate-create",
+            "/var/backups/capstone-waf-recreation-20261015"
+          ]
+        },
+        "changed_when": true,
+        "timeout": 30
+      },
+      {
+        "name": "Create exactly one stopped candidate without starting",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "create",
+            "--pull=never",
+            "--name",
+            "waf-prestart-20261015",
+            "--restart",
+            "no",
+            "--label",
+            "capstone.waf.recreation=20261015",
+            "--network",
+            "secstack_waf-net",
+            "--network-alias",
+            "waf",
+            "--ip",
+            "172.18.0.2",
+            "--publish",
+            "80:8080",
+            "--publish",
+            "8443:8443",
+            "--add-host",
+            "groot-web:10.200.10.20",
+            "--env",
+            "BACKEND=http://groot-web:80",
+            "--env",
+            "BLOCKING_PARANOIA=1",
+            "--env",
+            "MODSEC_AUDIT_ENGINE=RelevantOnly",
+            "--env",
+            "MODSEC_AUDIT_LOG=/var/log/modsecurity/audit.log",
+            "--env",
+            "MODSEC_AUDIT_LOG_FORMAT=JSON",
+            "--env",
+            "MODSEC_AUDIT_LOG_TYPE=Serial",
+            "--env",
+            "MODSEC_RULE_ENGINE=DetectionOnly",
+            "--env",
+            "NGINX_X_FORWARDED_PORT=80",
+            "--env",
+            "PORT=8080",
+            "--env",
+            "SERVER_NAME=groot-web",
+            "--env",
+            "SSL_PORT=8443",
+            "--volume",
+            "/home/groot_a/capstone/secstack/logs/modsec:/var/log/modsecurity:rw",
+            "--volume",
+            "/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf:ro",
+            "--volume",
+            "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf:ro",
+            "--volume",
+            "/etc/capstone-waf/zz-capstone-evidence-v2.conf:/etc/nginx/conf.d/zz-capstone-evidence.conf:ro",
+            "--volume",
+            "/etc/capstone-waf/modsecurity-override-v2.conf.template:/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template:ro",
+            "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650"
+          ]
+        },
+        "changed_when": true,
+        "timeout": 45,
+        "register": "created"
+      },
+      {
+        "name": "Require full returned CID",
+        "ansible.builtin.assert": {
+          "that": [
+            "created.stdout is match('^[a-f0-9]{64}$')"
+          ],
+          "quiet": true
+        }
+      },
+      {
+        "name": "Persist create result",
+        "ansible.builtin.copy": {
+          "dest": "/var/backups/capstone-waf-recreation-20261015/candidate-create/created-cid",
+          "content": "{{ created.stdout }}\n",
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Read stopped candidate privately",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "{{ created.stdout }}"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "candidate",
+        "no_log": true
+      },
+      {
+        "name": "Preserve stopped candidate profile",
+        "ansible.builtin.copy": {
+          "dest": "/var/backups/capstone-waf-recreation-20261015/candidate-create/candidate-inspect.json",
+          "content": "{{ candidate.stdout }}\n",
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        },
+        "no_log": true
+      },
+      {
+        "name": "Validate exact bounded creation differences",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/jq",
+            "-e",
+            "--slurpfile",
+            "before",
+            "/var/backups/capstone-waf-recreation-20261015/before-inspect.json",
+            "--slurpfile",
+            "image",
+            "/var/backups/capstone-waf-recreation-20261015/image-inspect.json",
+            "-f",
+            "{{ playbook_dir }}/waf-candidate-profile.jq",
+            "/var/backups/capstone-waf-recreation-20261015/candidate-create/candidate-inspect.json"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "profile_check"
+      },
+      {
+        "name": "Observe original unchanged after create",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/local/bin/docker",
+            "inspect",
+            "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "after",
+        "no_log": true
+      },
+      {
+        "name": "Require original profile and PID preserved",
+        "ansible.builtin.assert": {
+          "that": [
+            "(after.stdout | from_json)[0].Config == current.Config",
+            "(after.stdout | from_json)[0].HostConfig == current.HostConfig",
+            "(after.stdout | from_json)[0].Mounts == current.Mounts",
+            "(after.stdout | from_json)[0].NetworkSettings == current.NetworkSettings",
+            "(after.stdout | from_json)[0].State.Pid == current.State.Pid",
+            "(after.stdout | from_json)[0].State.Running"
+          ],
+          "quiet": true
+        },
+        "no_log": true
+      },
+      {
+        "name": "Observe reader identity after create",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/systemctl",
+            "show",
+            "capstone-vector.service",
+            "wazuh-agent.service",
+            "-p",
+            "Id,ActiveState,MainPID,InvocationID"
+          ]
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "readers_after"
+      },
+      {
+        "name": "Recheck state and host mounts",
+        "ansible.builtin.shell": "set -euo pipefail\nfor row in  'REQUEST-900-CAPSTONE-SCANNER.conf:d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d'  'zz-capstone-evidence-v2.conf:1e4c37a9bcedd730e693029fa4b40a6fd5e68a93b206ea161f458e11d7e6e212'  'modsecurity-override-v2.conf.template:814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb'; do\n file=/etc/capstone-waf/${row%%:*}; sha=${row#*:}\n [[ ! -L $file && $(stat -c %u:%g:%a:%h \"$file\") == 0:0:444:1 && $(sha256sum \"$file\" | cut -d ' ' -f1) == \"$sha\" ]]\ndone\nfor engine in suricata modsecurity; do\n path=/var/lib/capstone-raw-operations/$engine/state.json\n jq -e '.phase==\"active\" and .pending==null' \"$path\" >/dev/null\n [[ ! -e /var/lib/capstone-raw-operations/$engine/writer-reopen-intent.json && ! -L /var/lib/capstone-raw-operations/$engine/writer-reopen-intent.json ]]\n sha256sum \"$path\"\ndone\n[[ ! -e /var/lib/capstone-raw-operations/vector-stop-intent.json && ! -L /var/lib/capstone-raw-operations/vector-stop-intent.json && ! -e /var/lib/capstone-vector-maintenance/resume.pending && ! -L /var/lib/capstone-vector-maintenance/resume.pending ]]\n[[ $(readlink /proc/1909632/exe) == /var/ossec/bin/wazuh-logcollector ]]\nawk '{sub(/^.*\\) /, \"\"); print $20}' /proc/1909632/stat\n",
+        "args": {
+          "executable": "/bin/bash"
+        },
+        "changed_when": false,
+        "timeout": 30,
+        "register": "states_after"
+      },
+      {
+        "name": "Require reader and state identities unchanged",
+        "ansible.builtin.assert": {
+          "that": [
+            "states_before.stdout == states_after.stdout",
+            "readers_before.stdout == readers_after.stdout"
+          ],
+          "quiet": true
+        }
+      },
+      {
+        "name": "Preserve completed stopped-create receipt",
+        "ansible.builtin.copy": {
+          "dest": "/var/backups/capstone-waf-recreation-20261015/candidate-create/result.json",
+          "content": "{{ {\"schema_version\":1,\"status\":\"stopped_candidate_profile_verified\",\"candidate_cid\":created.stdout,\"original_cid\":\"02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e\",\"old_pid\":2377669,\"create_calls\":1,\"start_calls\":0,\"stop_calls\":0,\"profile_sha256\":\"59b8205437c59804111bf512fb3fb86d45ccd625aaa500476e07982dcea7372c\",\"new_ipam_config\":\"172.18.0.2\",\"actual_ip_assignment_verified\":false,\"new_binding_installed\":false,\"next\":\"prepare fixed rebind and cutover\"} | to_json }}\n",
+          "owner": "root",
+          "group": "root",
+          "mode": "0400",
+          "force": false
+        }
+      },
+      {
+        "name": "Synchronize completion evidence",
+        "ansible.builtin.command": {
+          "argv": [
+            "/usr/bin/sync",
+            "--",
+            "/var/backups/capstone-waf-recreation-20261015/candidate-create/created-cid",
+            "/var/backups/capstone-waf-recreation-20261015/candidate-create/candidate-inspect.json",
+            "/var/backups/capstone-waf-recreation-20261015/candidate-create/result.json",
+            "/var/backups/capstone-waf-recreation-20261015/candidate-create"
+          ]
+        },
+        "changed_when": true,
+        "timeout": 30
+      },
+      {
+        "name": "Report stopped candidate only",
+        "ansible.builtin.debug": {
+          "msg": {
+            "status": "stopped_candidate_profile_verified",
+            "cid": "{{ created.stdout }}",
+            "old_pid": 2377669,
+            "start_calls": 0
+          }
+        }
+      }
+    ]
+  }
+]

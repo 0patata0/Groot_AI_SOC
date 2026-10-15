@@ -1,0 +1,31 @@
+{
+  "recorded_at_kst": "2026-10-14T18:51:01+09:00",
+  "kind": "E2E_live_input_approval_review_result",
+  "b_latest_preflight": {
+    "at": "2026-10-14T18:49:47+09:00",
+    "status": "passed",
+    "options_sha256": "f77426cbe8f1b2a304593fb48c6c3b42355c03c42bf9c2e540786ee2473b2079",
+    "manager_id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+    "manager_init_pid": 2132232,
+    "config_and_rule_pins_match": true,
+    "canary_level": 3,
+    "active_response_blocks": 0,
+    "integration_blocks": 0,
+    "soc_report_summary_min_level": 5,
+    "monitor_default_min_level": 10,
+    "input_written": false
+  },
+  "attempted_action": "Execute e2e-send-a.sh via the root SSH helper; append 20 new run IDs x 13 rows to the fixed operational canary file once",
+  "target": "/var/log/capstone-vector/canary/normalized.jsonl",
+  "requested_rows": 260,
+  "requested_mode": "burst",
+  "source_driver_sha256": "e2704de2da149ed7d3e95972740f6e4a06b61df85eca0018fd54140d86f7d5e5",
+  "run_manifest_sha256": "b76b1003b5dc4733b92f4235c6e7a449152e18bc52d19c83b23ee4551648c0bd",
+  "approval_review": "rejected_before_process_creation",
+  "rejection_reason": "This action irreversibly appends 260 synthetic records to an operational canary file and may trigger live processing; the transcript lacks trusted user approval for this exact production-side input, so the prior retry instruction does not authorize it.",
+  "remote_input_rows_added_by_rejected_call": 0,
+  "input_retries": 0,
+  "workaround_used": false,
+  "new_run_manager_indexer_verification_executed": false,
+  "remaining": "Exact production-side canary input approval, then one input execution and read-only verification. No input retry on missing results."
+}

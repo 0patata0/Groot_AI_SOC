@@ -5,6 +5,17 @@
 #   test        : 컨테이너에서 MCP 연결 검증(LLM 불필요) — 계약 테스트 + chat -q 기동 후 agent.log 'MCP: registered …' 확인
 # 자격증명 격리(A안): hermes 사용자는 mcp 그룹이 아님 → /etc/mcp/*.env 접근 불가. MCP 는 sshd ForceCommand 경계(mcp@B, resp@A)로만.
 set -euo pipefail
+# BEGIN managed-prestart legacy gate
+case "${1:-}" in
+  prep|test|all)
+    if [[ -e /etc/capstone-hermes-guard || -L /etc/capstone-hermes-guard ||
+          -e /var/lib/capstone-automation/hermes-guard || -L /var/lib/capstone-automation/hermes-guard ]]; then
+      printf '%s\n' 'Legacy Hermes deployment blocked: managed guard state exists. Review the fixed root prestart path infra/automation/ansible/hermes-prestart-local-b.sh.' >&2
+      exit 78
+    fi
+    ;;
+esac
+# END managed-prestart legacy gate
 IMG=${IMG:-nousresearch/hermes-agent:v2026.9.24}
 DATA=/opt/hermes-data          # 컨테이너의 /opt/data (HERMES_HOME)
 HUSER=hermes

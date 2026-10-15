@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-14T18:44:31+09:00",
+  "kind": "E2E_native_private_preparation",
+  "source_sha256": {
+    "e2e-burst.py": "e2704de2da149ed7d3e95972740f6e4a06b61df85eca0018fd54140d86f7d5e5",
+    "run-manifest.json": "b76b1003b5dc4733b92f4235c6e7a449152e18bc52d19c83b23ee4551648c0bd"
+  },
+  "aggregate_fixture_passed": 10,
+  "timeout_fixture_passed": 4,
+  "orphan_pipe_cleanup_seconds": 5.207,
+  "orphan_active_remaining": 0,
+  "temporary_fixture_removed": true,
+  "safety": {
+    "active_response_blocks": 0,
+    "integration_blocks": 0,
+    "canary_level": 3,
+    "soc_minimum_levels": {
+      "report": 5,
+      "summary": 5,
+      "monitor": 10
+    },
+    "soc_source_sha256": "8db6244c1cede29d9f3a154243fb8e53878281977a0bb9ab9b41c478308b52e1",
+    "monitor_script_sha256": "773c6110a2398387b1af20c90cfdcc5e821c5a39194123497dd8873fd9c52b76",
+    "monitor_default_min_level": 10,
+    "monitor_file_override_levels": [],
+    "monitor_container_override_level": null,
+    "monitor_scope": "configured recent_alerts.sh; manual HTTP level queries are not constrained here"
+  },
+  "new_operational_input_rows": 0,
+  "new_configuration_changes": 0,
+  "driver_main_e2e_executed": false,
+  "server_result_path": "/var/tmp/capstone-correlation-fix-20261014/e2e-native-preparation.json",
+  "executed_preparation_script_sha256": "07389cdad800ca2cb8162d62094596af2f33dbe22964fa37c12d9fbcea93e0a2",
+  "previous_local_candidate_driver_sha256": "5035657d883e15afde0b3d4c41a18d4e4e5d06cf49d9f833cde81c968ed528",
+  "previous_local_validation_preserved": true,
+  "a_readonly_preflight": {
+    "at": "2026-10-14T18:45:38+09:00",
+    "status": "preflight_passed",
+    "existing_canary_rows": 52,
+    "existing_canary_bytes": 46112,
+    "existing_canary_sha256": "8508fc22650137e2d839f2c85596072c49d39555b5bd2d4c1af6222662d31e62",
+    "new_run_ids_unused": 20,
+    "reader_count": 1,
+    "input_written": false
+  },
+  "transfers": {
+    "a_canary_files": 11,
+    "a_canary_bytes": 35702,
+    "a_canary_manifest_sha256": "4e03f3b6546c59b204d94f86105d9612114bb5a7ef9d0e3d96c0434c0f9ed29d",
+    "b_canary_reused_server_copy_files": 11,
+    "b_canary_bytes": 35702,
+    "b_canary_original_manifest_sha256": "a0a15f28c14e6114e640d6145cb62a1f0218ad40adbce380a66efb64495c2bb8",
+    "e2e_files_per_host": 2,
+    "e2e_bytes_per_host": 23362
+  },
+  "limits": [
+    "Only private synthetic fixtures and read-only preflight ran. Live 20-run canary input is pending deployment and parent instruction.",
+    "No Indexer document was created by these tests.",
+    "Monitor threshold check covers the configured script/env; it does not prohibit manual authenticated lower-level queries."
+  ]
+}

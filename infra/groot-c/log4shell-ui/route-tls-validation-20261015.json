@@ -1,0 +1,80 @@
+{
+  "date_kst": "2026-10-15",
+  "evidence": "Direct SSH and Mac HTTP/TLS checks; no browser screenshot claimed",
+  "http": {
+    "primary_url": "http://log4shell.grootlab.duckdns.org/",
+    "final_path": "/log4shell/",
+    "wrong_dvwa_path_redirected": true,
+    "dvwa_domain_still_dvwa": true,
+    "hosts_alias_preserved": true,
+    "apache_reloads": 3,
+    "final_applied_at_kst": "2026-10-15T14:22:58+09:00",
+    "backup": "/var/backups/capstone-log4shell-ui/20261015T142257+0900-final-route",
+    "default_vhost_unchanged": true,
+    "api_js_css_unchanged": true,
+    "existing_apache_collection_logs_preserved": true
+  },
+  "https": {
+    "url": "https://log4shell.grootlab.duckdns.org/",
+    "applied_at_kst": "2026-10-15T14:33:38+09:00",
+    "backup": "/var/backups/capstone-log4shell-tls/20261015T143336+0900",
+    "san": [
+      "*.grootlab.duckdns.org"
+    ],
+    "issuer": "Lets Encrypt YE1",
+    "not_after_kst": "2027-01-13T13:25:12+09:00",
+    "certificate_shared_with": "chat.grootlab.duckdns.org",
+    "leaf_sha256": "fc60af2246e3633412a1a2553234ed7ebb536b065e973f4b7da7507d31a41427",
+    "mac_system_curl_tls_verification_result": 0,
+    "log4shell_status": 200,
+    "chat_ping_status": 200,
+    "redirect_preserves_https": true,
+    "upstream": "existing A:80 WAF -> C:80 UI",
+    "nginx_reload_count": 1,
+    "container_recreation_count": 0,
+    "final_container_network_changes": 0,
+    "default_gateway_changed": false,
+    "forward_rules_added": 1,
+    "other_forward_rules_unchanged": true,
+    "forward_rule_scope": "exact chatproxy IP/bridge -> exact WAF IP/bridge TCP8080, NEW/ORIGINAL, original destination 192.168.16.230:80",
+    "raw_lab_8080_exposure_enabled": false,
+    "certificate_monitor_manual_result": "success, exit0; existing chat SNI scope",
+    "automatic_certificate_renewal": false,
+    "mac_system_ca_two_sni_fingerprints_equal": true
+  },
+  "validation": {
+    "direct_c_api_tests_passed": 9,
+    "direct_c_api_tests_skipped": 0,
+    "mac_http_normal_and_missing_header": "application 200 and 400",
+    "installer_service_tests_passed": 30,
+    "installer_controller_tests_passed": 15,
+    "forward_discovery_mock_cases_passed": 14,
+    "waf_health": "healthy",
+    "chatproxy": "running, restart_count0",
+    "apache_wazuh_agent_docker_on_c": "active",
+    "mac_https_normal_and_missing_header": "application 200 and 400",
+    "https_cookie_flags": [
+      "Secure",
+      "HttpOnly",
+      "SameSite=Strict"
+    ]
+  },
+  "known_limits": [
+    "HTTP is unencrypted and can display a browser insecure-connection label.",
+    "Existing WAF rewrites JSON 403 Content-Type to text/html: strict Mac full verifier stops at csrf_missing despite correct JSON rejection body; C direct tests pass.",
+    "First Mac Python TLS probe had no default CA file; system curl validates successfully; no TLS verification bypass used.",
+    "No new three-VM deployment, actual attack/correlation E2E, mobile browser or mobile push verification.",
+    "Certificate monitor checks shared certificate expiry through chat SNI; Log4Shell SNI has manual validation only."
+  ],
+  "failed_preflight_recovered": [
+    "BusyBox ip route filtering returned all routes; corrected to the default route line.",
+    "Temporary WAF-network attachment did not bypass CAPSTONE-FWD; disconnected and retained original networks.",
+    "iptables rejected unsupported ctstatus DNAT before applying a rule; corrected to supported exact original and translated destination constraints."
+  ],
+  "source_sha256": {
+    "infra/groot-c/log4shell-ui/log4shell-vhost.conf": "3658a13f0e5dfbc54f880179013f06a3b2548e55e0d6bf8fae2cffb8c714e1ef",
+    "infra/groot-c/log4shell-ui/public/index.html": "38d09c0e94f501fd7569fe937af6f70e3633231275aa2092c7917a90840100b2",
+    "infra/groot-a/chatproxy.nginx.conf": "e59af7f174d5ff163eeaa486e404ab2f3adbab059a3f17869ec3a80250b9af88",
+    "infra/groot-a/fw-v2/capstone-nat.sh": "aaef0ef3bad07bd768273185fd95b08840acff4608461ceb6237f1468714dfab"
+  }
+}

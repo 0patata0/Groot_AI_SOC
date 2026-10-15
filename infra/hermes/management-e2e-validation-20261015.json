@@ -1,0 +1,1136 @@
+{
+  "schema": 1,
+  "observed_at_kst": "2026-10-15T15:59:32.543269+09:00",
+  "scope": "Controlled operator-directed comment-only rule management E2E using actual .111 LLM, native Hermes, MCP, designated human Mattermost decisions, privileged worker and automatic same-case read-only resumption.",
+  "outcome": {
+    "approved_add": true,
+    "expired_first_restore_without_apply": true,
+    "renewed_restore_after_explicit_user_request": true,
+    "denied_without_apply_or_reproposal": true,
+    "original_waf_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+    "test_markers_absent": true,
+    "waf_healthy": true,
+    "management_timer_active": true
+  },
+  "operator_interventions": [
+    "First add attempt used nonunique edits and an invented SHA; server guards rejected it with no proposal or live write. Operator reviewed the failure and supplied exact one-edit JSON for one retry in the same case/session.",
+    "First restoration card expired without a decision. Automatic loop stopped needs_review. After explicit user continuation, a read-only operator review closed that expired attempt, then a new incident/case requested fresh restoration with a new human card.",
+    "Actual human approval/denial was observed from broker/executor state; no callback impersonation, synthetic approvals or approval database writes were used."
+  ],
+  "fixes": [
+    {
+      "host": "B",
+      "problem": "ProtectSystem=strict blocked soc-bot outbox writes (POST incident503 OperationalError) despite valid Unix ownership.",
+      "change": "ReadWritePaths=/var/lib/socbot in dedicated systemd drop-in; daemon-reload and soc-bot restart after zero active approvals; other sandbox protections retained.",
+      "verified_by": "Subsequent authenticated incident registration, durable queue ingestion and broker state transitions succeeded."
+    }
+  ],
+  "limits": [
+    "Synthetic incident registration and operator-directed harmless edits do not prove autonomous attack detection, containment or ransomware response time.",
+    "Initial model edit required operator correction. Some generated narration included an ID typo or unrelated policy text; actual tool receipts, hashes and runtime checks determine the result.",
+    "Original expired case was closed by an explicit read-only review; that review was not separately posted to Mattermost (delivered=0). Approved add, renewed restore and denial final reports were posted.",
+    "No fresh three-VM deployment, reboot recovery, prolonged outage replay or actual attack-to-block E2E was performed."
+  ],
+  "executor": {
+    "observed_at_kst": "2026-10-15T15:59:32.543269+09:00",
+    "target": {
+      "target": "a:modsecurity-custom",
+      "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+      "runtime": {
+        "container": "waf",
+        "running": true,
+        "health": "healthy"
+      }
+    },
+    "mode_lines": [
+      "SecRuleEngine DetectionOnly"
+    ],
+    "restored_to_original": true,
+    "test_markers_absent": true,
+    "proposals": [
+      {
+        "proposal_id": "0a058662b6eea6a40ccad1cb04b2898c",
+        "status": {
+          "proposal_id": "0a058662b6eea6a40ccad1cb04b2898c",
+          "target": "a:modsecurity-custom",
+          "status": "denied",
+          "before_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "after_sha256": "e0fa4433f61b30e0f62df2202c6d13e2a019be7fc30ca3119429c8b671b4c8ab"
+        },
+        "decision": {
+          "proposal_id": "0a058662b6eea6a40ccad1cb04b2898c",
+          "status": "denied",
+          "proposal_digest": "dd433f0e60b03d66c4046d1f4a1cb157487adf7edf08e1586e2dcc05d0fe061f",
+          "target": "a:modsecurity-custom",
+          "base_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "candidate_sha256": "e0fa4433f61b30e0f62df2202c6d13e2a019be7fc30ca3119429c8b671b4c8ab",
+          "diff_sha256": "379a794c83ae91758c0da6574ce9c86db59143f7bf6512fa405d56d24c92ac3d",
+          "expires_at": 1792048017,
+          "result_posted": false,
+          "result_status": "",
+          "result_attempts": 0,
+          "readback_sha256": "",
+          "designated_user_recorded": true
+        },
+        "candidate_without_test_markers_matches_original": true,
+        "change_summary": "One test comment line added or removed; no functional rule edit",
+        "approval_consumed": false,
+        "result_posted": false,
+        "record_status": "denied"
+      },
+      {
+        "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+        "status": {
+          "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+          "target": "a:modsecurity-custom",
+          "status": "applied",
+          "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+          "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+        },
+        "decision": {
+          "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+          "status": "applied",
+          "proposal_digest": "30443d3ef93c10c6b96de5eb5beaad5637f3cffec7a9c4853f3d07f216fca747",
+          "target": "a:modsecurity-custom",
+          "base_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+          "candidate_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "diff_sha256": "02c23825eec6f721d292a2c6391a10f812c5719700e6e3a1425e238879ecdfee",
+          "expires_at": 1792047839,
+          "result_posted": true,
+          "result_status": "applied",
+          "result_attempts": 1,
+          "readback_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "designated_user_recorded": true
+        },
+        "candidate_without_test_markers_matches_original": true,
+        "change_summary": "One test comment line added or removed; no functional rule edit",
+        "approval_consumed": true,
+        "result_posted": true,
+        "record_status": "applied"
+      },
+      {
+        "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+        "status": {
+          "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+          "target": "a:modsecurity-custom",
+          "status": "expired",
+          "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+          "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+        },
+        "decision": {
+          "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+          "status": "expired",
+          "proposal_digest": "ee5eca1be83d92aee72a232619874783033f14203923a93b0701b7c7015a20dd",
+          "target": "a:modsecurity-custom",
+          "base_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+          "candidate_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "diff_sha256": "eafe0956d427717ebc37ac81a19eb3cc6389e921e78b4401076e8b8c4bb61619",
+          "expires_at": 1792046481,
+          "result_posted": false,
+          "result_status": "",
+          "result_attempts": 0,
+          "readback_sha256": "",
+          "designated_user_recorded": false
+        },
+        "candidate_without_test_markers_matches_original": true,
+        "change_summary": "One test comment line added or removed; no functional rule edit",
+        "approval_consumed": false,
+        "result_posted": false,
+        "record_status": "expired"
+      },
+      {
+        "proposal_id": "7894ccd347236580ab4f44430478b459",
+        "status": {
+          "proposal_id": "7894ccd347236580ab4f44430478b459",
+          "target": "a:modsecurity-custom",
+          "status": "applied",
+          "before_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "after_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12"
+        },
+        "decision": {
+          "proposal_id": "7894ccd347236580ab4f44430478b459",
+          "status": "applied",
+          "proposal_digest": "455398b19ddbd854d815f73b84bd2804c786b5726a15b4fec33de73b45c9343a",
+          "target": "a:modsecurity-custom",
+          "base_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "candidate_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+          "diff_sha256": "503ad74cdfdc9b4f40440834f65e762ae012acae0d39663abb2a080ae07c11c3",
+          "expires_at": 1792046141,
+          "result_posted": true,
+          "result_status": "applied",
+          "result_attempts": 1,
+          "readback_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+          "designated_user_recorded": true
+        },
+        "candidate_without_test_markers_matches_original": true,
+        "change_summary": "One test comment line added or removed; no functional rule edit",
+        "approval_consumed": true,
+        "result_posted": true,
+        "record_status": "applied"
+      }
+    ],
+    "suricata_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+    "container_status": [
+      "/waf running 2026-10-14T19:16:02.328349981Z 0",
+      "/suricata running 2026-10-14T14:54:24.549491773Z 0"
+    ]
+  },
+  "controller": {
+    "observed_at_kst": "2026-10-15T15:59:31.487398+09:00",
+    "cases": [
+      {
+        "id": "8244c8470b079b83bd55b323bd1eb3e9",
+        "state": "completed",
+        "mode": "verify",
+        "run_count": 5,
+        "detail": "model_completed_investigation",
+        "delivered": 1,
+        "phase": "add",
+        "registration": {
+          "queued": true,
+          "event_key": "incident:8f17eaf14c4e2df0751f1bde1c8ffdce0fa8f87433482a6760cc0e1d849b33f8",
+          "seq": 1
+        },
+        "proposals": [
+          {
+            "id": "7894ccd347236580ab4f44430478b459",
+            "tool": "mcp__rule_a__propose_rule_edit",
+            "status": "applied",
+            "result_status": "",
+            "target": "a:modsecurity-custom"
+          }
+        ],
+        "same_session_for_all_runs": true,
+        "runs": [
+          {
+            "id": "b9cfa3c5bf752fb277ac9c8a7c0f6fbe",
+            "state": "completed",
+            "started": 1792045359.7142773,
+            "finished": 1792045416.8491917,
+            "detail": "model_tool_failure_requires_review",
+            "elapsed_seconds": 57.135,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 1,
+                "is_write": 1
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 1,
+                "is_write": 1
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 1,
+                "is_write": 1
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 1,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 1,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 1,
+                "is_write": 1
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "6ea3a1a63a9c348608b644d17cbb75ca",
+            "state": "completed",
+            "started": 1792045522.2086298,
+            "finished": 1792045552.0582073,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 29.85,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 1
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "9bbadabd13c5848192b4663dcbcf8e6a",
+            "state": "completed",
+            "started": 1792045552.2294698,
+            "finished": 1792045595.0092514,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 42.78,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "7894ccd347236580ab4f44430478b459",
+                "status": "pending",
+                "approval_status": "pending",
+                "before_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "after_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "7e473107895a8e38f3f8e5d85f69f717",
+            "state": "completed",
+            "started": 1792045722.244616,
+            "finished": 1792045749.9412205,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 27.697,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "7894ccd347236580ab4f44430478b459",
+                "status": "pending",
+                "approval_status": "pending",
+                "before_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "after_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "19aa2295affe8fc9e46603db98768e20",
+            "state": "completed",
+            "started": 1792045765.2790034,
+            "finished": 1792045795.521644,
+            "detail": "model_completed_investigation",
+            "elapsed_seconds": 30.243,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "7894ccd347236580ab4f44430478b459",
+                "status": "applied",
+                "before_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "after_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "c20f2c59d90b3f8936b32f40e376adb6",
+        "state": "completed",
+        "mode": "verify",
+        "run_count": 7,
+        "detail": "model_completed_investigation",
+        "delivered": 0,
+        "phase": "restore",
+        "registration": {
+          "queued": true,
+          "event_key": "incident:a82ec7bac995631d2f6a7e01e3faec81a4f2a99a2b5fbf80c2ab0d532c0e7971",
+          "seq": 6
+        },
+        "proposals": [
+          {
+            "id": "ebc9db225aae2601ae52f3cd65a0f29e",
+            "tool": "mcp__rule_a__propose_rule_edit",
+            "status": "expired",
+            "result_status": "",
+            "target": "a:modsecurity-custom"
+          }
+        ],
+        "same_session_for_all_runs": true,
+        "runs": [
+          {
+            "id": "c9a1c2f1ce7db4be6bb4d06424854795",
+            "state": "completed",
+            "started": 1792045861.91544,
+            "finished": 1792045889.2867105,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 27.371,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 1
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "8a1eff409ffca4c5d20185951f889818",
+            "state": "completed",
+            "started": 1792045889.5374298,
+            "finished": 1792045919.5061538,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 29.969,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+                "status": "pending",
+                "approval_status": "pending",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              }
+            ]
+          },
+          {
+            "id": "b12f3133d72bfc78ff569125436ed2ec",
+            "state": "completed",
+            "started": 1792046047.2397301,
+            "finished": 1792046069.8000622,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 22.56,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+                "status": "pending",
+                "approval_status": "pending",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "8cdebc287c1ba4ffbff606df9096a078",
+            "state": "completed",
+            "started": 1792046197.232539,
+            "finished": 1792046216.7971594,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 19.565,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+                "status": "pending",
+                "approval_status": "pending",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              }
+            ]
+          },
+          {
+            "id": "a19dbed276199ffef88f1a72381e1cff",
+            "state": "completed",
+            "started": 1792046343.239673,
+            "finished": 1792046361.9686272,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 18.729,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+                "status": "pending",
+                "approval_status": "pending",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              }
+            ]
+          },
+          {
+            "id": "9819ae90614784df7f8cef59917b2317",
+            "state": "completed",
+            "started": 1792046488.2344441,
+            "finished": 1792046507.9904726,
+            "detail": "model_needs_review",
+            "elapsed_seconds": 19.756,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+                "status": "expired",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              }
+            ]
+          },
+          {
+            "id": "77ac8531919cd5412497910e72b45383",
+            "state": "completed",
+            "started": 1792047129.9329963,
+            "finished": 1792047185.0212533,
+            "detail": "model_completed_investigation",
+            "elapsed_seconds": 55.088,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+                "status": "expired",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "1ecb10936f9979cd40b54a9533f9d7df",
+        "state": "completed",
+        "mode": "verify",
+        "run_count": 3,
+        "detail": "model_completed_investigation",
+        "delivered": 1,
+        "phase": "restore-renewed",
+        "registration": {
+          "queued": true,
+          "event_key": "incident:cb9089f1a998e3a95c16029b6447209de72dcfbf1a5dfb55d79a396dd8c4cad5",
+          "seq": 9
+        },
+        "proposals": [
+          {
+            "id": "06a19e26a36212e02e6e5769f19d9c4e",
+            "tool": "mcp__rule_a__propose_rule_edit",
+            "status": "applied",
+            "result_status": "",
+            "target": "a:modsecurity-custom"
+          }
+        ],
+        "same_session_for_all_runs": true,
+        "runs": [
+          {
+            "id": "5902884e5fc7ca2e113b4157243cad36",
+            "state": "completed",
+            "started": 1792047217.2351146,
+            "finished": 1792047247.614289,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 30.379,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 1
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "bd45b90e210f157430b8b209bb2149ad",
+            "state": "completed",
+            "started": 1792047247.8486335,
+            "finished": 1792047283.3528976,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 35.504,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+                "status": "pending",
+                "approval_status": "approved",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "db940b7f0d6b4af4e55548be7a335790",
+            "state": "completed",
+            "started": 1792047299.2321692,
+            "finished": 1792047325.8029025,
+            "detail": "model_completed_investigation",
+            "elapsed_seconds": 26.571,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+                "status": "applied",
+                "before_sha256": "f39402cfaa1a937460156c51e60b25e2057de6148271b60d624ac3783f9d2b12",
+                "after_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "60ea1581b7f9ad459fcf49f06326ef7a",
+        "state": "completed",
+        "mode": "verify",
+        "run_count": 3,
+        "detail": "model_completed_investigation",
+        "delivered": 1,
+        "phase": "deny",
+        "registration": {
+          "queued": true,
+          "event_key": "incident:767343c718bf1d123e21f1e0c62852bd00688173c1c701441de8a8bc28bfb156",
+          "seq": 14
+        },
+        "proposals": [
+          {
+            "id": "0a058662b6eea6a40ccad1cb04b2898c",
+            "tool": "mcp__rule_a__propose_rule_edit",
+            "status": "denied",
+            "result_status": "",
+            "target": "a:modsecurity-custom"
+          }
+        ],
+        "same_session_for_all_runs": true,
+        "runs": [
+          {
+            "id": "c78ebb6880a132be3afb028ea949b05a",
+            "state": "completed",
+            "started": 1792047398.6301482,
+            "finished": 1792047428.786581,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 30.156,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__propose_rule_edit",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 1
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "462b541a814d153a4365b0e44dcea6a9",
+            "state": "completed",
+            "started": 1792047428.9870713,
+            "finished": 1792047465.5883946,
+            "detail": "awaiting_broker_event",
+            "elapsed_seconds": 36.601,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "0a058662b6eea6a40ccad1cb04b2898c",
+                "status": "pending",
+                "approval_status": "pending",
+                "before_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "after_sha256": "e0fa4433f61b30e0f62df2202c6d13e2a019be7fc30ca3119429c8b671b4c8ab"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          },
+          {
+            "id": "fc5c6b8ecdb00adefa57ee84d37be639",
+            "state": "completed",
+            "started": 1792047513.2317297,
+            "finished": 1792047539.0491202,
+            "detail": "model_completed_investigation",
+            "elapsed_seconds": 25.817,
+            "tool_calls": [
+              {
+                "name": "mcp__rule_a__get_rule_change_status",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__rule_a__get_rule_change_target",
+                "completed": 1,
+                "is_error": 0,
+                "is_write": 0
+              }
+            ],
+            "read_receipts": [
+              {
+                "tool": "mcp__rule_a__get_rule_change_status",
+                "target": "a:modsecurity-custom",
+                "proposal_id": "0a058662b6eea6a40ccad1cb04b2898c",
+                "status": "denied",
+                "before_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "after_sha256": "e0fa4433f61b30e0f62df2202c6d13e2a019be7fc30ca3119429c8b671b4c8ab"
+              },
+              {
+                "tool": "mcp__rule_a__get_rule_change_target",
+                "target": "a:modsecurity-custom",
+                "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+                "runtime": {
+                  "container": "waf",
+                  "running": true,
+                  "health": "healthy"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "authenticated_broker_transitions": [
+      {
+        "seq": 2,
+        "at": 1792045542,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "7894ccd347236580ab4f44430478b459",
+          "target": "a:modsecurity-custom",
+          "status": "pending",
+          "result_status": "",
+          "proposal_digest": "455398b19ddbd854d815f73b84bd2804c786b5726a15b4fec33de73b45c9343a",
+          "event": "created"
+        }
+      },
+      {
+        "seq": 3,
+        "at": 1792045739,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "7894ccd347236580ab4f44430478b459",
+          "target": "a:modsecurity-custom",
+          "status": "approved",
+          "result_status": "",
+          "proposal_digest": "455398b19ddbd854d815f73b84bd2804c786b5726a15b4fec33de73b45c9343a",
+          "event": "decision"
+        }
+      },
+      {
+        "seq": 4,
+        "at": 1792045745,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "7894ccd347236580ab4f44430478b459",
+          "target": "a:modsecurity-custom",
+          "status": "consumed",
+          "result_status": "",
+          "proposal_digest": "455398b19ddbd854d815f73b84bd2804c786b5726a15b4fec33de73b45c9343a",
+          "event": "consumed"
+        }
+      },
+      {
+        "seq": 5,
+        "at": 1792045745,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "7894ccd347236580ab4f44430478b459",
+          "target": "a:modsecurity-custom",
+          "status": "applied",
+          "result_status": "applied",
+          "proposal_digest": "455398b19ddbd854d815f73b84bd2804c786b5726a15b4fec33de73b45c9343a",
+          "event": "result"
+        }
+      },
+      {
+        "seq": 7,
+        "at": 1792045881,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+          "target": "a:modsecurity-custom",
+          "status": "pending",
+          "result_status": "",
+          "proposal_digest": "ee5eca1be83d92aee72a232619874783033f14203923a93b0701b7c7015a20dd",
+          "event": "created"
+        }
+      },
+      {
+        "seq": 8,
+        "at": 1792046488,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "ebc9db225aae2601ae52f3cd65a0f29e",
+          "target": "a:modsecurity-custom",
+          "status": "expired",
+          "result_status": "",
+          "proposal_digest": "ee5eca1be83d92aee72a232619874783033f14203923a93b0701b7c7015a20dd",
+          "event": "expired"
+        }
+      },
+      {
+        "seq": 10,
+        "at": 1792047239,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+          "target": "a:modsecurity-custom",
+          "status": "pending",
+          "result_status": "",
+          "proposal_digest": "30443d3ef93c10c6b96de5eb5beaad5637f3cffec7a9c4853f3d07f216fca747",
+          "event": "created"
+        }
+      },
+      {
+        "seq": 11,
+        "at": 1792047266,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+          "target": "a:modsecurity-custom",
+          "status": "approved",
+          "result_status": "",
+          "proposal_digest": "30443d3ef93c10c6b96de5eb5beaad5637f3cffec7a9c4853f3d07f216fca747",
+          "event": "decision"
+        }
+      },
+      {
+        "seq": 12,
+        "at": 1792047274,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+          "target": "a:modsecurity-custom",
+          "status": "consumed",
+          "result_status": "",
+          "proposal_digest": "30443d3ef93c10c6b96de5eb5beaad5637f3cffec7a9c4853f3d07f216fca747",
+          "event": "consumed"
+        }
+      },
+      {
+        "seq": 13,
+        "at": 1792047274,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "06a19e26a36212e02e6e5769f19d9c4e",
+          "target": "a:modsecurity-custom",
+          "status": "applied",
+          "result_status": "applied",
+          "proposal_digest": "30443d3ef93c10c6b96de5eb5beaad5637f3cffec7a9c4853f3d07f216fca747",
+          "event": "result"
+        }
+      },
+      {
+        "seq": 15,
+        "at": 1792047417,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "0a058662b6eea6a40ccad1cb04b2898c",
+          "target": "a:modsecurity-custom",
+          "status": "pending",
+          "result_status": "",
+          "proposal_digest": "dd433f0e60b03d66c4046d1f4a1cb157487adf7edf08e1586e2dcc05d0fe061f",
+          "event": "created"
+        }
+      },
+      {
+        "seq": 16,
+        "at": 1792047513,
+        "kind": "rule_change",
+        "payload": {
+          "proposal_id": "0a058662b6eea6a40ccad1cb04b2898c",
+          "target": "a:modsecurity-custom",
+          "status": "denied",
+          "result_status": "",
+          "proposal_digest": "dd433f0e60b03d66c4046d1f4a1cb157487adf7edf08e1586e2dcc05d0fe061f",
+          "event": "decision"
+        }
+      }
+    ],
+    "timer": "active"
+  }
+}

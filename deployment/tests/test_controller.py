@@ -174,6 +174,35 @@ class ControllerContract(unittest.TestCase):
             self.assertNotIn('LOG4SHELL_IMAGE=', payload['site_env'])
         self.assert_clean()
 
+    def test_http_hostname_reaches_hosts_and_is_reported(self):
+        with self.config.open('a') as f:
+            f.write('LOG4SHELL_HOSTNAME=log4shell.example.org\nWAF_PORT=9080\n')
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('http://log4shell.example.org:9080/', result.stdout)
+        for payload in self.payloads():
+            self.assertIn('export LOG4SHELL_HOSTNAME=log4shell.example.org', payload['site_env'].splitlines())
+        self.assert_clean()
+
+    def test_hostname_invalid_values_are_rejected_before_ssh(self):
+        original = self.config.read_text()
+        for value in ('https://lab.example.org','lab.example.org:80','192.0.2.10','*.example.org','bad..org','UPPER.example.org'):
+            with self.subTest(value=value):
+                self.config.write_text(original + 'LOG4SHELL_HOSTNAME=' + value + '\n')
+                result = self.run_controller('--plan')
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(self.events(), [])
+
+    def test_empty_hostname_preserves_ip_path_and_default_role(self):
+        with self.config.open('a') as f:
+            f.write('LOG4SHELL_HOSTNAME=\n')
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('http://192.0.2.10:8080/log4shell/', result.stdout)
+        for payload in self.payloads():
+            self.assertNotIn('LOG4SHELL_HOSTNAME=', payload['site_env'])
+        self.assert_clean()
+
     def test_url_credentials_rejected_without_echo(self):
         with self.config.open('a') as f:
             f.write('LLM_BASE_URL=http://person:secretvalue@example.com/v1\n')

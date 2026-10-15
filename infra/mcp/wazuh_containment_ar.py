@@ -1,10 +1,11 @@
 #!/usr/bin/python3 -I
-"""Stateless native Wazuh adapter. Existing containment owns every action.
+"""Stateless native Wazuh adapter: register evidence for LLM investigation only.
 
 No shell, arbitrary operation/argument/path, firewall command, sudo, approval
 token, delete command or independent retry. Never print the alert or source IP.
 """
 from datetime import datetime
+import hashlib
 import ipaddress
 import json
 import os
@@ -21,9 +22,6 @@ HELPER = Path("/usr/local/sbin/rule-change-executor")
 PROGRAM = "/var/ossec/active-response/bin/capstone-containment"
 LOCATION = "/home/groot_a/capstone/secstack/logs/suricata/eve.json"
 MAX_INPUT = 64 * 1024
-PROTECTED = tuple(ipaddress.ip_network(x) for x in (
-    "211.170.162.0/24", "168.126.63.1/32", "168.126.63.2/32", "8.8.8.8/32",
-    "8.8.4.4/32", "1.1.1.1/32", "1.0.0.1/32", "9.9.9.9/32"))
 
 
 class Refused(ValueError):
@@ -80,13 +78,25 @@ def request(raw, now):
         need(isinstance(source, str), "source_type")
         ip = ipaddress.IPv4Address(source)
     except (ValueError, ipaddress.AddressValueError):
-        raise Refused("public_ipv4_required") from None
-    need(str(ip) == source and ip.is_global and not ip.is_multicast and not ip.is_reserved and
-         not any(ip in network for network in PROTECTED), "protected_or_nonpublic_source")
-    # The alert is only a wake-up hint. The existing helper independently reads
-    # fixed managed sensor bytes and applies its unchanged 3-flow policy.
-    return {"operation": "contain-ip", "ip": source,
-            "reason": "Wazuh native rule 100110 agent 001; independently verify fixed sensor evidence"}
+        raise Refused("ipv4_required") from None
+    need(str(ip) == source, "canonical_ipv4_required")
+    # An internal/protected address is still evidence worth investigating.
+    # This registration path cannot invoke containment or approve a change.
+    incident = {"timestamp": value, "agent_id": "001", "rule_id": "100110",
+                "level": 9, "src_ip": source, "location": LOCATION}
+    if "id" in alert:
+        event_id = alert["id"]
+        need(isinstance(event_id, str) and
+             re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", event_id), "event_id_invalid")
+    else:
+        flow = data.get("flow_id")
+        need(type(flow) is int or (isinstance(flow, str) and
+             re.fullmatch(r"[0-9]{1,20}", flow)), "fallback_flow_id_required")
+        need(0 <= int(flow) < 2**64, "fallback_flow_id_invalid")
+        canonical = json.dumps(dict(incident, flow_id=str(int(flow))),
+                               sort_keys=True, separators=(",", ":")).encode("utf-8")
+        event_id = "sha256:" + hashlib.sha256(canonical).hexdigest()
+    return {"operation": "submit-incident", "incident": dict(incident, event_id=event_id)}
 
 
 def helper_metadata():
@@ -101,6 +111,8 @@ def helper_metadata():
 
 
 def dispatch(payload):
+    need(type(payload) is dict and set(payload) == {"operation", "incident"} and
+         payload["operation"] == "submit-incident", "registration_only")
     helper_metadata()
     data = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode() + b"\n"
     proc = subprocess.Popen([str(HELPER)], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
@@ -118,7 +130,8 @@ def dispatch(payload):
         # so a delivered signal cannot cause killpg of a reused leader PID.
         completed = True
         code = proc.wait(timeout=3)
-        return {"status": "existing_helper_returned", "helper_exit_code": code,
+        return {"status": "incident_registration_helper_returned", "helper_exit_code": code,
+                "containment_requested": False,
                 "automatic_retry": False, "native_delete_supported": False}, 0 if code == 0 else 75
     finally:
         if not completed:

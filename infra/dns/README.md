@@ -1,5 +1,7 @@
 # 접속 이름과 채팅 인증서 — DuckDNS 대표 이름·hosts 예비 별칭
 
+> 2026-10-15 14:33:38 KST 공용 인증서 적용: Mac에서 발급한 SAN `*.grootlab.duckdns.org` 한 이름의 Let's Encrypt 인증서를 A의 `chatduck.crt/key`에 설치했다. 채팅·Log4Shell DuckDNS HTTPS를 시스템 CA 검증을 켜고 확인했으며 만료는 **2027-01-13 13:25:12 KST**다. 기본 실습 주소는 계속 **`http://log4shell.grootlab.duckdns.org/`**이고 HTTPS는 선택 접근이다. 아래 10/08의 단일 채팅 인증서 발급·만료 기록은 당시 이력이다. 채팅 인증서 감시는 공유 파일을 읽되 채팅 SNI만 매일 검사하며 Log4Shell SNI는 배포·갱신 때 별도 검사한다. 자동 갱신은 없고 2026년 12월 중순에 새 인증서 재발급을 준비한다.
+
 > 2026-10-15: 채팅 인증서 만료 감시를 A(매일09:00KST)에, 전용 XML 디코더·규칙100300~100305를 B에 적용·검증했다. 만료일2027-01-06 15:02:33KST, 갱신은 수동이다. [현재 구성·갱신 절차](../groot-a/certificate-monitor/README.md). 아래 기록은 해당 시점의 이력이다.
 
 현재 대표 접속 이름은 공개 DNS의 `*.grootlab.duckdns.org`이며 사설 IP `192.168.16.230`을 반환한다(2026-09-28 학과망 이름 해석·접속 확인, 10/08 Mac 재확인). 학교망이나 PC VPN으로 해당 IP에 도달해야 하며 공개 DNS 등록이 인터넷 공개 접속을 뜻하지는 않는다. 내부 `*.groot.lab` 이름은 `groot.lab.hosts`를 이용한 hosts 예비 별칭으로 유지한다. A의 ACME·DuckDNS HTTPS egress 제한은 DNS 이름 해석과 별개다.
@@ -8,10 +10,15 @@
 | 이름 | → | 접근 |
 |---|---|---|
 | `dvwa.groot.lab` | 192.168.16.230:80 (WAF→DVWA) | 외부 오픈 웹서비스. 캠퍼스·VPN 모두 `http://dvwa.groot.lab/` |
+| `log4shell.groot.lab` | 192.168.16.230:80 (WAF→C Apache) | Log4Shell UI. 같은 이름의 `/log4shell/`로 이동; DNS 장애 시 hosts 별칭 또는 IP의 `/log4shell/` 사용 |
 | `wazuh.groot.lab` | 192.168.16.230:443 (A chatproxy→B:443, 출발지 allowlist) + :10443 DNAT | 관리포털. 학과망·VM세그먼트 `https://wazuh.groot.lab` / VPN·외부는 403(정책, 터널 없음) |
 | `chat.groot.lab` | 192.168.16.230:443 (A chatproxy→B:8065) | Mattermost hosts 별칭. 캠퍼스·PC VPN `https://chat.groot.lab`; 대표 SiteURL은 `https://chat.grootlab.duckdns.org`. 내부 별칭 인증서는 공인 전환 대상이 아님 |
 
 > WAF(nginx)는 `default_server`라 어떤 Host 헤더든 DVWA로 서빙 → 서버 변경 불필요(검증됨: Host `dvwa.groot.lab` → 302/200).
+
+**2026-10-15 Log4Shell 이름 분리:** 대표 주소는 `http://log4shell.grootlab.duckdns.org/`이며 DVWA처럼 HTTP80을 사용한다. A WAF가 전달한 Host를 C Apache가 구분해 해당 이름의 루트와 `/dvwa/login.php` 등 UI 밖의 경로를 같은 이름의 `/log4shell/`로 이동한다. 기존 DVWA 기본 가상호스트·IP 루트는 유지한다. 앞의 모든 Host가 DVWA로 간다는 설명은 이 별도 가상호스트 추가 이전 구성이다. 신규 환경에서는 관리자가 자신의 `LOG4SHELL_HOSTNAME`과 security 주소를 DNS/hosts에 준비하며 기존 운영 DuckDNS 이름을 복제하지 않는다.
+
+`https://log4shell.grootlab.duckdns.org/`도 A:443 `chatproxy`에서 같은 인증서로 선택적으로 제공한다. HTTPS를 기본으로 강제 전환하지 않으며, 신규 범용 `deploy.sh`의 `LOG4SHELL_HOSTNAME` 설정은 HTTP 이름 경로까지만 구성한다. 범용 배포에서 TLS 인증서 발급·설치는 별도의 수동 작업이다. 와일드카드의 범위는 `chat`·`log4shell`처럼 `grootlab.duckdns.org` 바로 아래 한 단계 이름이며 루트 `grootlab.duckdns.org`와 내부 `*.groot.lab`은 포함하지 않는다.
 
 ## 예비 접속: hosts 방식 (내부 별칭을 사용할 클라이언트별 1회)
 각 클라이언트에서 원본을 /etc/hosts 에 주입(멱등):
@@ -36,8 +43,8 @@ sudo bash infra/dns/apply_hosts.sh
 
 ## 팀원 무설정 접근 — 공개 DNS(DuckDNS) 별칭 (2026-09-28)
 - 배경: 학과망·VPN → A 는 22/80/443 만 통과하고 53 도 막힘(실측) → 내부 DNS 서버는 팀원 PC 에 무용. 팀원 PC 가 이미 쓰는 학과 DNS 가 인터넷에 물어서 답을 받게 하는 방식만 "설정 0" 이 된다. 사설 IP 답을 학과 DNS 가 그대로 전달하는 것도 실측(nip.io).
-- 채택: **DuckDNS `grootlab.duckdns.org` → 192.168.16.230** (하위 이름은 자동으로 같은 IP). 이름: `chat.grootlab.duckdns.org`(채팅), `wazuh.grootlab.duckdns.org`(관제, allowlist 동일·VPN 403), `dvwa.grootlab.duckdns.org`(웹표적, 80 WAF). 기존 `*.groot.lab`(hosts) 은 별칭으로 유지.
-- A 측: `infra/groot-a/chatproxy.nginx.conf` 에 DuckDNS 이름용 server 블록 2개(별도 인증서 `tls/chatduck.*`, `tls/wazuhduck.*` → 기존 인증서 신뢰 무영향). B 측: Mattermost `MM_SITEURL`=DuckDNS 이름(대표), `MM_ALLOWCORSFROM`=두 Origin → 둘 다 웹소켓 101.
+- 채택: **DuckDNS `grootlab.duckdns.org` → 192.168.16.230** (하위 이름은 자동으로 같은 IP). 이름: `chat.grootlab.duckdns.org`(채팅), `wazuh.grootlab.duckdns.org`(관제, allowlist 동일·VPN 403), `dvwa.grootlab.duckdns.org`(웹표적, 80 WAF). 2026-10-15 `log4shell.grootlab.duckdns.org`(실습 UI, HTTP80)을 추가한다. 기존 `*.groot.lab`(hosts) 은 별칭으로 유지.
+- A 측: `infra/groot-a/chatproxy.nginx.conf`에서 채팅과 Log4Shell DuckDNS HTTPS 이름은 `tls/chatduck.*`의 공용 인증서를 사용하고 Wazuh 이름은 별도 `tls/wazuhduck.*`를 사용한다. B 측: Mattermost `MM_SITEURL`=DuckDNS 이름(대표), `MM_ALLOWCORSFROM`=두 Origin → 둘 다 웹소켓 101.
 - 등록(1회, 팀장 계정): duckdns.org 로그인 → domains 에 `grootlab` 추가 → current ip 를 `192.168.16.230` 으로 설정 → update. 확인: `dig +short chat.grootlab.duckdns.org` → 192.168.16.230. IP 가 바뀌지 않으므로 갱신 클라이언트 불필요.
 - 한계: DuckDNS/학과 DNS 장애 시 이름 해석 실패(hosts 별칭이 예비). 채팅 DuckDNS 이름은 2026-10-08부터 Let's Encrypt 공인 인증서를 사용한다. Wazuh 및 `*.groot.lab` 인증서는 이번 전환 대상이 아니다.
 
@@ -53,6 +60,12 @@ sudo bash infra/dns/apply_hosts.sh
 - 라이브 채팅 인증서: **Let's Encrypt YE1**, SAN `chat.grootlab.duckdns.org`, 만료 **2027-01-06 06:02:33 UTC**(15:02:33 KST). A `chatduck.crt/key`는 각각 `644/600`; 이전 인증서는 A의 제한된 백업 디렉터리에 남겼다. A 임시 전송 파일과 Mac 임시 ACME 소스·계정·인증서 사본은 삭제했다. Mac의 `~/.acme.sh`와 PATH의 `acme.sh`는 생성되지 않았다. 사용자가 넣은 Git 제외 토큰 파일은 남겨 두었다.
 - **갱신은 미자동화:** Mac 임시 ACME 계정·상태를 삭제했으므로 다음에는 새 임시 디렉터리에서 재발급해 A로 다시 전송·배포해야 한다. 2026-12 초에 갱신을 준비하고 만료 전에 완료한다. A 사설 IP에 도달하는 학교 Wi-Fi의 실제 모바일 앱 로그인은 아직 시험하지 않았다. 사용자 보고에 따르면 학교 관리자가 관리 범위 확대를 이유로 모바일 GlobalProtect 지원을 거절했고 휴대폰 로그인도 실패했으므로 모바일 VPN 경로는 프로젝트 검증 계획에서 제외한다(기술적 원인 미확인). `chat.groot.lab`·Wazuh 인증서는 변경하지 않았다. 상세 [10/08 기록](../../대화기록/2026-10-08.md).
 - **같은 날 문서 점검 중 Mac 재확인:** CA 검증을 생략하지 않은 `GET https://chat.grootlab.duckdns.org/api/v4/system/ping`이 HTTP 200·TLS 검증 결과 0, 접속 IP `192.168.16.230`을 반환했다. 이 결과는 Mac 경로의 확인이며 휴대폰 Wi-Fi·Mattermost 앱 성공을 뜻하지 않는다.
+
+### 공용 와일드카드 인증서 (2026-10-15, A 적용·검증 완료)
+
+- Mac의 전용 권한 0700 임시 디렉터리에서 공식 `acme.sh` 3.1.6 태그 소스를 **설치하지 않고** 사용했다. DuckDNS DNS-01으로 `*.grootlab.duckdns.org` 한 이름의 Let's Encrypt ECC 인증서를 발급해 임시 `fullchain.pem`·`privkey.pem`으로 내보냈다. 기존 채팅·신규 Log4Shell 이름이 SAN 검증을 통과했고 루트 이름은 포함되지 않는다. 발급 전과 TXT 제거 후 공개 DNS 두 곳에서 비어 있지 않은 검증 TXT가 없음을 확인했다. 발급 시각은 2026-10-15, 만료는 **2027-01-13 04:25:12 UTC**(13:25:12 KST)다.
+- A 14:33:38 KST에 기존 `chatduck.crt/key`를 교체하고 `chatproxy`를 한 번 재로드했다. Mac의 시스템 CA 검증 `curl`에서 채팅 `/api/v4/system/ping` 200과 Log4Shell HTTPS의 `/dvwa/login.php`→`/log4shell/` 최종 200이 나왔다. 기존 인증서는 A `/var/backups/capstone-log4shell-tls/20261015T143336+0900`에 보존했다. 기존 채팅 인증서 만료 감시기는 공유 파일을 동적으로 읽고 수동 실행 exit0으로 새 인증서·채팅 SNI를 확인했으나 Log4Shell SNI·백엔드는 주기 감시 대상이 아니다. Wazuh·`*.groot.lab` 인증서는 별개다.
+- A는 ACME·DuckDNS 외부 HTTPS 도달이 제한되어 Mac에서 수동 재발급·A 재배포를 반복한다. Mac에는 Homebrew 패키지·상주 ACME 계정·cron을 남기지 않는다. 2026년 12월 중순에 다음 재발급을 준비한다. 토큰·키 값은 저장소와 운영 문서에 적지 않는다.
 
 ### 모바일 알림 후속 점검 (2026-10-13)
 - 초기에는 사용자가 모바일에서 알림을 받을 수 없다는 안내를 보고했다. Mac의 채팅 HTTPS는 HTTP 200·TLS 검증 0, A Nginx 구문 검사도 통과했다. 당시 휴대폰 로그인·인증서 오류 원문은 확인하지 못했다.

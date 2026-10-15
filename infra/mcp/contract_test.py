@@ -9,7 +9,7 @@
   python3 contract_test.py                                   # 기본: ssh -T groot-mcp
   python3 contract_test.py --cmd "ssh -T groot-mcp-direct"
   python3 contract_test.py --tool get_wazuh_alert_summary --args '{"limit": 5}'
-  python3 contract_test.py --tool get_wazuh_agents --args '{}'
+  python3 contract_test.py --tool get_wazuh_agents --args '{"status":"active"}'
 종료코드 0 = 계약 통과.
 """
 import argparse, json, queue, shlex, subprocess, sys, threading, time

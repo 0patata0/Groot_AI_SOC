@@ -18,6 +18,7 @@ import fcntl
 import hashlib
 import hmac
 import importlib.util
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -57,6 +58,7 @@ SURICATA_LLM_MARKER_PROFILES = (
 )
 EXTENSION_DIR = Path("/opt/rule-change")
 _EXTENSIONS = {}
+INCIDENT_LOCATION = "/home/groot_a/capstone/secstack/logs/suricata/eve.json"
 
 TARGETS = {
     "a:modsecurity-custom": {
@@ -1196,11 +1198,68 @@ def _operation_status(engine, request_id):
     return matches[0].status(request_id)
 
 
+def _unique_request(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise RuleChangeError("duplicate request field")
+        result[key] = value
+    return result
+
+
+def _submit_incident(host, broker, incident):
+    """Root AR evidence registration, with no engine, approval or firewall path."""
+    if host != "a" or os.geteuid() != 0 or "SUDO_USER" in os.environ:
+        raise RuleChangeError("incident registration requires direct root on host a")
+    fields = {"event_id", "timestamp", "agent_id", "rule_id", "level", "src_ip", "location"}
+    if type(incident) is not dict or set(incident) != fields:
+        raise RuleChangeError("invalid incident fields")
+    if (incident["agent_id"] != "001" or incident["rule_id"] != "100110" or
+            type(incident["level"]) is not int or incident["level"] != 9 or
+            incident["location"] != INCIDENT_LOCATION or
+            not isinstance(incident["event_id"], str) or
+            not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", incident["event_id"])):
+        raise RuleChangeError("invalid incident source or identity")
+    try:
+        source, timestamp = incident["src_ip"], incident["timestamp"]
+        if not isinstance(source, str) or str(ipaddress.IPv4Address(source)) != source:
+            raise ValueError("invalid IPv4")
+        if not isinstance(timestamp, str) or not 1 <= len(timestamp) <= 40:
+            raise ValueError("invalid timestamp")
+        dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        now = time.time()
+        if dt.tzinfo is None or not now - 300 <= dt.timestamp() <= now + 2:
+            raise ValueError("stale timestamp")
+    except (ValueError, OverflowError):
+        raise RuleChangeError("invalid or stale incident evidence") from None
+    identity = {key: incident[key] for key in ("event_id", "agent_id", "rule_id", "location")}
+    event_key = "incident:" + sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode())
+    result = broker.request("POST", "/management/incidents", incident)
+    if (type(result) is not dict or set(result) != {"queued", "event_key", "seq"} or
+            result["queued"] is not True or result["event_key"] != event_key or
+            type(result["seq"]) is not int or result["seq"] <= 0):
+        raise RuleChangeError("incident queue receipt invalid")
+    return result
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if os.geteuid() != 0:
         raise RuleChangeError("root helper must run as root")
     host, broker = _secure_config()
+    if not argv:
+        raw = sys.stdin.buffer.read(MAX_REQUEST + 1)
+        if len(raw) > MAX_REQUEST:
+            raise RuleChangeError("request too large")
+        request = json.loads(raw, object_pairs_hook=_unique_request)
+        if not isinstance(request, dict):
+            raise RuleChangeError("request must be a JSON object")
+        if request.get("operation") == "submit-incident":
+            if set(request) != {"operation", "incident"}:
+                raise RuleChangeError("invalid incident request fields")
+            result = _submit_incident(host, broker, request["incident"])
+            print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+            return
     engine = Engine(host, broker, read_only=argv in (["--check"], ["--broker-check"]))
     if argv == ["--broker-check"]:
         broker.health()
@@ -1217,12 +1276,6 @@ def main(argv=None):
         result["processed"] = engine.worker_once()
         result["operations"].extend(services[0].worker_once())
     elif not argv:
-        raw = sys.stdin.buffer.read(MAX_REQUEST + 1)
-        if len(raw) > MAX_REQUEST:
-            raise RuleChangeError("request too large")
-        request = json.loads(raw)
-        if not isinstance(request, dict):
-            raise RuleChangeError("request must be a JSON object")
         if request.get("operation") == "get" and set(request) == {"operation", "target"}:
             result = engine.get_target(request["target"])
         elif request.get("operation") == "propose" and set(request) == {"operation", "target", "base_sha256", "candidate_content", "reason"}:
@@ -1239,7 +1292,10 @@ def main(argv=None):
         elif request.get("operation") == "contain-ip" and set(request) == {"operation", "ip", "reason"}:
             if engine.host != "a":
                 raise RuleChangeError("temporary containment is available only on host a")
-            result = _load_extension("incident_containment").ContainmentService(engine).propose(request["ip"], request["reason"])
+            if os.environ.get("SUDO_USER") != "rulechg":
+                raise RuleChangeError("temporary containment requires the restricted MCP caller")
+            result = _load_extension("incident_containment").ContainmentService(engine).propose(
+                request["ip"], request["reason"], requested_by="hermes-mcp")
         elif request.get("operation") == "operation-status" and set(request) == {"operation", "request_id"}:
             result = _operation_status(engine, request["request_id"])
         else:

@@ -1,0 +1,295 @@
+{
+  "checked_at_kst": "2026-10-15T19:05:25.263393+09:00",
+  "initial_deployment": {
+    "at_kst": "2026-10-15T18:52:18.140630+09:00",
+    "source_sha256": {
+      "soc_bot.py": "a00e332e23953c82e735c186c2fd6ea583a8fe01c493ee2d5d8d479a06b3394a",
+      "operations_approval.py": "d202e951e3c238f5e1144f1d18b712e0e657b4087660bbc4c08a49fb3e463b3f",
+      "soc_management_events.py": "54a09faa461f240d5e81d75a6de8fe5d6a9c7b164edb5c9bcfb3c78944b3dc38",
+      "approval_card_cleanup.py": "08f1352c7fc2d2bdc3855b00d8f8f1badc8f32562cbf20cd0c63c99dad25992f"
+    },
+    "previous_source_sha256": {
+      "soc_bot.py": "451668d8cb0a498a5daf213a86264ecc4452bba3251554645f0b5ea393c363f7",
+      "operations_approval.py": "1cba196fd9f2ff254ce71c9820db33aebe7fc148637de9c5d872ce3052519680",
+      "soc_management_events.py": "54a09faa461f240d5e81d75a6de8fe5d6a9c7b164edb5c9bcfb3c78944b3dc38"
+    },
+    "backup": "/var/backups/capstone-card-cleanup/20261015T185214",
+    "active_approvals_before": 0,
+    "post_health": {
+      "status": "ready",
+      "approval_configured": true,
+      "active_operations": 0,
+      "operation_status_counts": {},
+      "active_rule_changes": 0,
+      "rule_status_counts": {},
+      "legacy_approval_status_counts": {},
+      "active_legacy_approvals": 0
+    },
+    "cleanup_enabled": true,
+    "interval_seconds": 5,
+    "token_values_disclosed": false,
+    "security_services_restarted": 0,
+    "soc_bot_restarted": 1,
+    "hermes_pause_resume": 1,
+    "existing_approval_users_and_sources_preserved": true,
+    "database_permissions": "socbot 0600 under socbot 0700 directory"
+  },
+  "first_live_validation": {
+    "at_kst": "2026-10-15T18:54:43.314364+09:00",
+    "test_cards": 2,
+    "test_replies": 1,
+    "expired_card_state": "protected",
+    "reason": "cleanup_readback_mismatch",
+    "automatic_worker_attempts": 1,
+    "expired_message_matches": true,
+    "expired_attachments_empty": false,
+    "root_not_deleted": true,
+    "reply_not_deleted": true,
+    "reply_content_preserved": true,
+    "protected_state": "protected",
+    "protected_card_unchanged": true,
+    "wrong_mapping_rejected": "live_card_binding_mismatch",
+    "wrong_bot_rejected": "bot_identity_mismatch",
+    "real_approval_or_rule_api_calls": 0,
+    "expiry_to_update_seconds": 1.815,
+    "repeat_poll_no_extra_update": false,
+    "passed": false
+  },
+  "normalization_deployment": {
+    "at_kst": "2026-10-15T19:01:33.639730+09:00",
+    "backup": "/var/backups/capstone-card-cleanup/20261015T190129-normalization",
+    "source_sha256": "e8d37b65ef220871d0406ff13c2420288c8d9fceb7745ca73fd5406c1139db92",
+    "previous_sha256": "08f1352c7fc2d2bdc3855b00d8f8f1badc8f32562cbf20cd0c63c99dad25992f",
+    "env_unchanged": true,
+    "health": {
+      "status": "ready",
+      "approval_configured": true,
+      "active_operations": 0,
+      "operation_status_counts": {},
+      "active_rule_changes": 0,
+      "rule_status_counts": {},
+      "legacy_approval_status_counts": {},
+      "active_legacy_approvals": 0
+    },
+    "soc_bot_restarted": 1,
+    "hermes_pause_resume": 1,
+    "security_services_restarted": 0
+  },
+  "live_validation": {
+    "at_kst": "2026-10-15T19:02:18.886383+09:00",
+    "test_cards": 2,
+    "test_replies": 1,
+    "expired_card_state": "cleaned",
+    "reason": "cleaned",
+    "automatic_worker_attempts": 1,
+    "expired_message_matches": true,
+    "expired_attachments_empty": true,
+    "root_not_deleted": true,
+    "reply_not_deleted": true,
+    "reply_content_preserved": true,
+    "protected_state": "protected",
+    "protected_card_unchanged": true,
+    "wrong_mapping_rejected": "live_card_binding_mismatch",
+    "wrong_bot_rejected": "bot_identity_mismatch",
+    "real_approval_or_rule_api_calls": 0,
+    "expiry_to_update_seconds": 2.368,
+    "repeat_poll_no_extra_update": true,
+    "protected_test_controls_cleared_by_operator": true,
+    "test_ledger_still_protected": true,
+    "passed": true
+  },
+  "test_housekeeping": {
+    "at_kst": "2026-10-15T19:03:04.672157+09:00",
+    "test_cleanup": [
+      {
+        "fixture": "initial_expired",
+        "content_already_cleared": true,
+        "failure_audit_retained": true
+      },
+      {
+        "fixture": "initial_protected",
+        "controls_cleared_by_operator": true,
+        "ledger_protected_unchanged": true
+      },
+      {
+        "fixture": "initial",
+        "reply_preserved": true
+      },
+      {
+        "fixture": "final",
+        "reply_preserved": true
+      }
+    ],
+    "ledger_states": {
+      "cleaned": 1,
+      "protected": 3
+    },
+    "audit_entries": 19,
+    "database_quick_check": "ok",
+    "approved_state_fabricated": false,
+    "real_approval_or_rule_api_calls": 0
+  },
+  "initial_health_check": {
+    "services": {
+      "soc-bot.service": {
+        "NRestarts": "0",
+        "ActiveState": "active",
+        "SubState": "running"
+      },
+      "capstone-management.timer": {
+        "ActiveState": "active",
+        "SubState": "waiting"
+      },
+      "capstone-hermes-guard-reapply.timer": {
+        "ActiveState": "active",
+        "SubState": "waiting"
+      }
+    },
+    "containers": {
+      "hermes": {
+        "status": "running",
+        "restarting": false,
+        "health": null,
+        "restart_count": 0
+      },
+      "mm-app": {
+        "status": "running",
+        "restarting": false,
+        "health": "healthy",
+        "restart_count": 0
+      }
+    },
+    "gateway": {
+      "state": "running",
+      "age_seconds": 47.18,
+      "needs_attention": null,
+      "active_agents": 0
+    },
+    "ledger": {
+      "quick_check": "ok",
+      "states": {
+        "cleaned": 1,
+        "protected": 3
+      },
+      "audit_entries": 19
+    },
+    "broker": {
+      "status": "ready",
+      "approval_configured": true,
+      "active_operations": 0,
+      "operation_status_counts": {},
+      "active_rule_changes": 0,
+      "rule_status_counts": {},
+      "legacy_approval_status_counts": {},
+      "active_legacy_approvals": 0
+    },
+    "passed": false
+  },
+  "health_check_correction": "Initial check used deployment-idle cutoff 45s; installed gateway/run.py housekeeping=60s and gateway/status.py stale TTL=120s, confirmed heartbeat advancing. No runtime setting changed.",
+  "final_health": {
+    "services": {
+      "soc-bot.service": {
+        "NRestarts": "0",
+        "ActiveState": "active",
+        "SubState": "running"
+      },
+      "capstone-management.timer": {
+        "ActiveState": "active",
+        "SubState": "waiting"
+      },
+      "capstone-hermes-guard-reapply.timer": {
+        "ActiveState": "active",
+        "SubState": "waiting"
+      }
+    },
+    "containers": {
+      "hermes": {
+        "status": "running",
+        "restarting": false,
+        "health": null,
+        "restart_count": 0
+      },
+      "mm-app": {
+        "status": "running",
+        "restarting": false,
+        "health": "healthy",
+        "restart_count": 0
+      }
+    },
+    "gateway": {
+      "state": "running",
+      "age_seconds": 36.667,
+      "active_agents": 0,
+      "interval_seconds": 60,
+      "stale_threshold_seconds": 120,
+      "platforms": {
+        "mattermost": {
+          "state": "connected",
+          "needs_attention": false
+        },
+        "api_server": {
+          "state": "connected",
+          "needs_attention": false
+        }
+      }
+    },
+    "ledger": {
+      "quick_check": "ok",
+      "states": {
+        "cleaned": 1,
+        "protected": 3
+      },
+      "audit_entries": 19
+    },
+    "broker": {
+      "status": "ready",
+      "approval_configured": true,
+      "active_operations": 0,
+      "operation_status_counts": {},
+      "active_rule_changes": 0,
+      "rule_status_counts": {},
+      "legacy_approval_status_counts": {},
+      "active_legacy_approvals": 0
+    },
+    "passed": true
+  },
+  "source_sha256": {
+    "soc_bot.py": "a00e332e23953c82e735c186c2fd6ea583a8fe01c493ee2d5d8d479a06b3394a",
+    "operations_approval.py": "d202e951e3c238f5e1144f1d18b712e0e657b4087660bbc4c08a49fb3e463b3f",
+    "soc_management_events.py": "54a09faa461f240d5e81d75a6de8fe5d6a9c7b164edb5c9bcfb3c78944b3dc38",
+    "approval_card_cleanup.py": "e8d37b65ef220871d0406ff13c2420288c8d9fceb7745ca73fd5406c1139db92"
+  },
+  "server_staging_remaining": 0,
+  "local_validation": {
+    "approval_tests_passed": 90,
+    "cleanup_tests_passed": 39,
+    "existing_approval_tests_passed": 51,
+    "deployment_shell_syntax": "passed",
+    "source_matches_live": true
+  },
+  "scope": {
+    "automatic_cleanup": "new exactly tracked unanswered expired cards only",
+    "post_deletion": false,
+    "placeholder": "만료된 승인 요청",
+    "thread_replies_preserved": true,
+    "approved_denied_results_and_audits_preserved": true,
+    "historical_untracked_webhook_cards": "excluded",
+    "real_admin_approval_e2e_in_this_validation": false,
+    "new_mac_packages_installed": 0,
+    "new_server_packages_installed": 0,
+    "commit_push_performed": false
+  },
+  "interpretation": {
+    "initial_empty_attachment_check": "The initial false was []-only comparison; live readback was JSON null and no attachments remained. Initial failure/audit retained.",
+    "timing": "2.368 seconds is one low-load expiry observation, not a maximum guarantee.",
+    "protected_test": "Fixture used cleanup protection, not a real administrator approval or denial."
+  },
+  "temporary_cleanup": {
+    "at_kst": "2026-10-15T19:06:37.306875+09:00",
+    "mac_task_directory_removed": true,
+    "mac_files_removed": 16,
+    "mac_bytes_removed": 253288,
+    "server_staging_remaining": 0,
+    "operational_sources_state_and_backups_preserved": true
+  }
+}

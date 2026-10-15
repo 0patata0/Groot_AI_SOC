@@ -11,6 +11,8 @@ MODE=${1:-apply}
 [[ $# -le 1 && $(id -u) == 0 ]] || { echo 'run as root with one optional mode' >&2; exit 1; }
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 SRC=${RULE_SOCBOT_SRC:-$HERE/soc_bot.py}
+SRC_DIR=$(dirname -- "$SRC")
+MODULES=(operations_approval.py soc_management_events.py approval_card_cleanup.py)
 DST=/opt/socbot/soc_bot.py
 ENV=/etc/socbot/soc_bot.env
 BROKER=http://127.0.0.1:8090
@@ -18,13 +20,18 @@ BACKUP=; MODIFIED=0
 die(){ echo "rule broker deploy: $*" >&2; exit 1; }
 for bin in python3 docker curl systemctl stat; do command -v "$bin" >/dev/null || die "missing command: $bin"; done
 [[ -f $SRC && ! -L $SRC && -f $DST && ! -L $DST && -f $ENV && ! -L $ENV ]] || die 'staged/live soc-bot or env missing/symlink'
-python3 - "$SRC" <<'PY' || die 'staged soc_bot.py and its directory must be root-controlled'
-import os, pathlib, stat, sys
+python3 - "$SRC" "${MODULES[@]}" <<'PY' || die 'staged soc-bot bundle must be root-controlled and syntax-valid'
+import ast, os, pathlib, stat, sys
 path=pathlib.Path(sys.argv[1])
-for item,kind in ((path,stat.S_ISREG),(path.parent,stat.S_ISDIR)):
+files=[path]+[path.parent/name for name in sys.argv[2:]]
+for item,kind in [(file,stat.S_ISREG) for file in files]+[(path.parent,stat.S_ISDIR)]:
     info=os.lstat(item)
     assert kind(info.st_mode) and info.st_uid==0 and not(stat.S_IMODE(info.st_mode)&0o022)
+for file in files: ast.parse(file.read_text(encoding='utf-8'))
 PY
+for module in "${MODULES[@]}"; do
+  [[ ! -L /opt/socbot/$module && ( ! -e /opt/socbot/$module || -f /opt/socbot/$module ) ]] || die 'live adjacent module is not a regular file'
+done
 id socbot >/dev/null 2>&1 || die 'socbot account missing'
 systemctl is-active --quiet soc-bot || die 'existing soc-bot service is not active'
 python3 - "$SRC" <<'PY' || die 'staged soc_bot.py syntax or rule endpoints invalid'
@@ -125,10 +132,20 @@ fi
 BACKUP=$(mktemp -d /var/backups/rule-broker-deploy.XXXXXX)
 cp -a "$DST" "$BACKUP/soc_bot.py"
 cp -a "$ENV" "$BACKUP/soc_bot.env"
+for module in "${MODULES[@]}"; do
+  if [[ -f /opt/socbot/$module ]]; then cp -a "/opt/socbot/$module" "$BACKUP/$module"; fi
+done
 rollback(){
   set +e
   cp -a "$BACKUP/soc_bot.py" "$DST"
   cp -a "$BACKUP/soc_bot.env" "$ENV"
+  for module in "${MODULES[@]}"; do
+    if [[ -f $BACKUP/$module ]]; then
+      cp -a "$BACKUP/$module" "/opt/socbot/$module"
+    else
+      rm -f -- "/opt/socbot/$module"
+    fi
+  done
   systemctl restart soc-bot >/dev/null 2>&1
   echo "rule broker B: installation failed; code/env restored from $BACKUP" >&2
 }
@@ -142,6 +159,9 @@ trap cleanup EXIT
 trap 'exit 1' HUP INT TERM
 MODIFIED=1
 install -o root -g socbot -m 0750 "$SRC" "$DST"
+for module in "${MODULES[@]}"; do
+  install -o root -g socbot -m 0750 "$SRC_DIR/$module" "/opt/socbot/$module"
+done
 python3 - "$ENV" "$RULE_BROKER_TOKEN_FILE" "$RULE_APPROVERS" "$CIDR" <<'PY'
 import os, pathlib, sys, tempfile
 dest=pathlib.Path(sys.argv[1]); token=pathlib.Path(sys.argv[2]).read_text().strip(); approvers,cidr=sys.argv[3:]

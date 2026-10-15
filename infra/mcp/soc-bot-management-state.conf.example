@@ -1,0 +1,5 @@
+# Install as /etc/systemd/system/soc-bot.service.d/management-state.conf.
+# Only the dedicated event outbox directory is writable under ProtectSystem=strict.
+# Prepare /var/lib/socbot as socbot:socbot 0700 before restarting the service.
+[Service]
+ReadWritePaths=/var/lib/socbot

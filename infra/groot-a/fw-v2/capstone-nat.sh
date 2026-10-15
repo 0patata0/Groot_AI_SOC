@@ -42,6 +42,54 @@ EASTWEST_ALLOW=(
   "${B_IP}:tcp:8065,443:chatproxy -> Mattermost / Wazuh dashboard backend"
 )
 
+# BEGIN LOG4SHELL_TLS_WAF_HELPERS
+# Read-only discovery; an absent/stopped/ambiguous endpoint adds no allow rule.
+# This block can be sourced alone for a reviewed one-rule insertion via F().
+capstone_tls_ipv4(){
+  local value=$1 octet; local -a octets
+  [[ $value =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || return 1
+  IFS=. read -r -a octets <<<"$value"
+  for octet in "${octets[@]}"; do
+    [[ $octet == 0 || $octet =~ ^[1-9][0-9]{0,2}$ ]] && ((10#$octet<=255)) || return 1
+  done
+  ((10#${octets[0]}>0 && 10#${octets[0]}<224 && 10#${octets[0]}!=127))
+}
+capstone_tls_endpoint(){
+  local container=$1 network=$2 endpoint running address network_id extra metadata found_id found_name driver bridge
+  endpoint=$(docker inspect --type container --format '{{.State.Running}}|{{with index .NetworkSettings.Networks "'"$network"'"}}{{.IPAddress}}|{{.NetworkID}}{{end}}' "$container" 2>/dev/null) || return 1
+  [[ $endpoint != *$'\n'* ]] || return 1
+  IFS='|' read -r running address network_id extra <<<"$endpoint"
+  [[ $running == true && $network_id =~ ^[a-f0-9]{64}$ && -z $extra ]] || return 1
+  capstone_tls_ipv4 "$address" || return 1
+  metadata=$(docker network inspect --format '{{.Id}}|{{.Name}}|{{.Driver}}|{{index .Options "com.docker.network.bridge.name"}}' "$network_id" 2>/dev/null) || return 1
+  [[ $metadata != *$'\n'* ]] || return 1
+  IFS='|' read -r found_id found_name driver bridge extra <<<"$metadata"
+  [[ $found_id == "$network_id" && $found_name == "$network" && $driver == bridge && -z $extra ]] || return 1
+  if [[ -z $bridge || $bridge == '<no value>' ]]; then bridge="br-${network_id:0:12}"; fi
+  # '+' would be an iptables interface wildcard; only an exact Linux name is valid.
+  [[ $bridge =~ ^[A-Za-z0-9_.:-]{1,15}$ && $bridge != . && $bridge != .. ]] || return 1
+  printf '%s %s\n' "$address" "$bridge"
+}
+capstone_log4shell_tls_waf_forward(){
+  local source destination source_ip source_bridge destination_ip destination_bridge
+  if ! source=$(capstone_tls_endpoint chatproxy chatproxy_chat-net) || \
+     ! destination=$(capstone_tls_endpoint waf secstack_waf-net); then
+    echo 'WARN: Log4Shell TLS WAF endpoints unavailable; narrow forward rule omitted' >&2
+    return 0
+  fi
+  read -r source_ip source_bridge <<<"$source"
+  read -r destination_ip destination_bridge <<<"$destination"
+  if [[ $source_ip == "$destination_ip" ]]; then
+    echo 'WARN: Log4Shell TLS WAF endpoint addresses overlap; narrow forward rule omitted' >&2
+    return 0
+  fi
+  F -s "$source_ip/32" -i "$source_bridge" -d "$destination_ip/32" -o "$destination_bridge" \
+    -p tcp --dport 8080 -m conntrack --ctstate NEW --ctdir ORIGINAL \
+    --ctorigdst 192.168.16.230 --ctorigdstport 80 \
+    -m comment --comment capstone-log4shell-tls-waf -j ACCEPT
+}
+# END LOG4SHELL_TLS_WAF_HELPERS
+
 # 1) IP forwarding (런타임). 영구화는 /etc/sysctl.d/99-capstone-nat.conf (+ v2: 99-capstone-fw.conf)
 sysctl -w net.ipv4.ip_forward=1 >/dev/null
 
@@ -99,6 +147,8 @@ if iptables -L DOCKER-USER -n >/dev/null 2>&1; then
   for e in "${EASTWEST_ALLOW[@]}"; do IFS=: read -r dst proto ports desc <<<"$e"
     F -i 'br-+' -o "$INT_IF" -d "$dst" -p "$proto" -m multiport --dports "$ports" -m conntrack --ctstate NEW -j ACCEPT
   done
+  # TLS proxy -> existing public WAF DNAT only; never a general bridge-to-bridge allow.
+  capstone_log4shell_tls_waf_forward
   # 그 외(컨테이너→외부, 내부→컨테이너, 비허용 ext→int, 내부→비허용 외부) : 로그 후 drop (P9)
   F -m limit --limit 5/min --limit-burst 10 -j LOG --log-prefix "FW_DROP_FWD " --log-level notice
   F -j DROP

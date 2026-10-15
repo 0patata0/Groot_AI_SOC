@@ -26,6 +26,7 @@ ET_RULES_FILE=
 DVWA_IMAGE=
 MARIADB_IMAGE=
 LOG4SHELL_IMAGE=
+LOG4SHELL_HOSTNAME=
 WORK=
 RUN_ID=
 REMOTE_STAGE=
@@ -66,7 +67,7 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_HOSTNAME)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         ;;
@@ -93,6 +94,7 @@ if [[ $BATCH == 0 && -t 0 && -z $CONFIG ]]; then
   printf 'SSH 개인키 경로 [기존 ssh-agent/기본키 사용]: ' >&2; IFS= read -r SSH_IDENTITY || die 'input cancelled'
   printf 'security 감시 인터페이스 [auto]: ' >&2; IFS= read -r answer || die 'input cancelled'
   [[ -z $answer ]] || MONITOR_INTERFACE=$answer
+  printf 'Log4Shell HTTP 호스트명 [생략하면 기존 IP와 /log4shell/ 경로]: ' >&2; IFS= read -r LOG4SHELL_HOSTNAME || die 'input cancelled'
 fi
 prompt LLM_BASE_URL 'Ollama/OpenAI 호환 API 주소 (예: http://192.0.2.40:11434/v1)'
 ipv4() {
@@ -106,18 +108,30 @@ ipv4() {
   IFS=$old_ifs
   [[ $ip != 0.* && $ip != 127.* && $ip != 255.255.255.255 ]]
 }
+hostname_valid() {
+  local name=$1 label; local -a labels
+  [[ $name =~ ^[a-z0-9.-]+$ ]] || return 1
+  [[ ${#name} -le 253 && $name == *.* && $name != .* && $name != *. && $name != *..* ]] || return 1
+  IFS=. read -r -a labels <<<"$name"
+  for label in "${labels[@]}"; do [[ $label =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] || return 1; done
+  [[ ${labels[${#labels[@]}-1]} =~ [a-z] ]]
+}
 for host in "$SECURITY_HOST" "$SIEM_HOST" "$SERVICE_HOST"; do ipv4 "$host" || die 'server addresses must be usable IPv4 literals'; done
 [[ $SECURITY_HOST != "$SIEM_HOST" && $SECURITY_HOST != "$SERVICE_HOST" && $SIEM_HOST != "$SERVICE_HOST" ]] || die 'three separate server addresses are required'
 [[ $SSH_USER =~ ^[a-z_][a-z0-9_-]*$ && ${#SSH_USER} -le 32 ]] || die 'invalid SSH user'
 for port in "$SSH_PORT" "$WEB_BACKEND_PORT" "$WAF_PORT"; do
   [[ $port =~ ^[1-9][0-9]*$ && ${#port} -le 5 && $port -le 65535 ]] || die 'invalid TCP port'
 done
+[[ -z $LOG4SHELL_HOSTNAME ]] || hostname_valid "$LOG4SHELL_HOSTNAME" || die 'LOG4SHELL_HOSTNAME must be a lowercase DNS name without scheme, port or path'
 [[ $MONITOR_INTERFACE == auto || $MONITOR_INTERFACE =~ ^[a-zA-Z0-9_.:-]+$ ]] || die 'invalid monitor interface'
 [[ $LLM_MODEL =~ ^[a-zA-Z0-9_./:-]+$ ]] || die 'invalid model name'
 [[ $LLM_BASE_URL =~ ^https?://[a-zA-Z0-9.-]+(:[0-9]+)?/v1/?$ ]] || die 'LLM_BASE_URL must be an HTTP(S) /v1 URL without credentials, query or fragment'
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
 say '순서: 세 서버 사전검사 → siem → 등록 CA/암호 전달 → service → security → 전체 검증'
 say 'service 구성: DVWA/MariaDB + Log4Shell 실습 앱과 요청 UI + Wazuh agent'
+if [[ -n $LOG4SHELL_HOSTNAME ]]; then
+  say "Log4Shell HTTP 이름: $LOG4SHELL_HOSTNAME (DNS/hosts → $SECURITY_HOST 사전 준비 필요)"
+fi
 say '패키지/이미지 자동 다운로드 없음. 기존 IP·라우팅·SSH 설정은 변경하지 않습니다.'
 [[ $MODE != plan ]] || exit 0
 
@@ -152,7 +166,7 @@ for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_B
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
-for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE LOG4SHELL_IMAGE; do
+for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE LOG4SHELL_IMAGE LOG4SHELL_HOSTNAME; do
   value=${!key}
   [[ -z $value ]] || printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
@@ -220,4 +234,10 @@ remote_role "$SECURITY_HOST" security apply
 remote_role "$SECURITY_HOST" security verify
 remote_role "$SIEM_HOST" siem verify
 say "구축 완료. WAF: http://$SECURITY_HOST:$WAF_PORT / SIEM: https://$SIEM_HOST / Mattermost: http://$SIEM_HOST:8065"
+if [[ -n $LOG4SHELL_HOSTNAME ]]; then
+  lab_origin="http://$LOG4SHELL_HOSTNAME"; [[ $WAF_PORT == 80 ]] || lab_origin="$lab_origin:$WAF_PORT"
+  say "Log4Shell: $lab_origin/ → $lab_origin/log4shell/"
+else
+  say "Log4Shell: http://$SECURITY_HOST:$WAF_PORT/log4shell/"
+fi
 say '인증 정보는 서버의 root 전용 경로에 보관합니다. 결과와 지원 범위는 README를 확인하세요.'

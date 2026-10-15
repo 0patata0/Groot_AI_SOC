@@ -3,6 +3,7 @@
 set -euo pipefail
 exec python3 -B - "$(dirname "$0")/siem.sh" <<'PY'
 import ast,copy,hashlib,json,os,pathlib,stat,sys,tempfile,types,unittest
+from unittest import mock
 source=pathlib.Path(sys.argv[1]).read_text().split("<<'PY'\n",1)[1].rsplit('\nPY',1)[0]
 tree=ast.parse(source)
 nodes=[n for n in tree.body if isinstance(n,(ast.Import,ast.ImportFrom,ast.FunctionDef,ast.ClassDef))]
@@ -159,6 +160,136 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(intents),len(set(intents)))
         self.assertFalse(any('/posts' in u or '/notify' in u for u,_,_ in calls))
         self.assertEqual(len([u for u,m,_ in calls if '/api/v4/users' in u and m=='POST' and u.endswith('/tokens')]),1)
+    def test_mattermost_extensions_install_with_scoped_identity_and_native_paths(self):
+        written={};created=[];reads=[]
+        self.n['mkdir']=lambda p,mode,uid,gid:created.append((p,mode,uid,gid))
+        self.n['publish']=lambda p,data,mode,uid,gid:written.update({str(p):(data,mode,uid,gid)})
+        def read(path,*args):
+            reads.append(str(path));return ('source:'+str(path)).encode()
+        self.n['read']=read
+        creds={name:'a'*26 for name in ('mattermost_admin_id','mattermost_team_id','mattermost_channel_id','mattermost_bot_id')}
+        creds['mattermost_bot_token']='synthetic-bot-token'
+        user=types.SimpleNamespace(pw_uid=995,pw_gid=986)
+        config={'mcp_servers':{'only-readonly':{}},'toolsets':['mcp-wazuh-ro']}
+        baseline=copy.deepcopy(config)
+        env=self.n['install_hermes_extensions'](self.n['DEST']/'bot',user,creds,config)
+        self.assertEqual(len(written),5)
+        self.assertEqual(len(reads),5)
+        self.assertEqual({pathlib.Path(p).name for p in written},{'__init__.py','plugin.yaml','channel_sync.py','HOOK.yaml','handler.py'})
+        self.assertTrue(any('/plugins/groot-mattermost-context/' in p for p in written))
+        self.assertTrue(any('/hooks/groot-mattermost-channel-sync/' in p for p in written))
+        self.assertTrue(all(value[1:]==(0o600,995,986) for value in written.values()))
+        self.assertTrue(all(value[1:]==(0o700,995,986) for value in created))
+        self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context']})
+        self.assertEqual({k:v for k,v in config.items() if k!='plugins'},baseline)
+        self.assertEqual(env['MATTERMOST_ALLOWED_USERS'],creds['mattermost_admin_id'])
+        self.assertEqual(env['MATTERMOST_ALLOWED_CHANNELS'],'')
+        self.assertEqual(env['MATTERMOST_REQUIRE_MENTION'],'true')
+        self.assertEqual(env['MATTERMOST_REPLY_MODE'],'thread')
+        self.assertEqual(env['MATTERMOST_FREE_RESPONSE_CHANNELS'],'')
+        self.assertEqual(env['MATTERMOST_HOME_CHANNEL'],creds['mattermost_channel_id'])
+        self.assertEqual(env['CAPSTONE_MM_TEAM_ID'],creds['mattermost_team_id'])
+        self.assertEqual(env['CAPSTONE_MM_BOT_ID'],creds['mattermost_bot_id'])
+    def test_extension_identity_validation_precedes_filesystem_mutation(self):
+        calls=[];self.n['mkdir']=lambda *a,**k:calls.append(a)
+        user=types.SimpleNamespace(pw_uid=995,pw_gid=986)
+        for key in ('mattermost_admin_id','mattermost_team_id','mattermost_channel_id','mattermost_bot_id'):
+            creds={name:'a'*26 for name in ('mattermost_admin_id','mattermost_team_id','mattermost_channel_id','mattermost_bot_id')}
+            creds[key]='../../invalid'
+            self.reject(lambda:self.n['install_hermes_extensions'](self.n['DEST'],user,creds,{}))
+        self.assertEqual(calls,[])
+    def test_extension_sources_participate_in_immutable_profile(self):
+        values={'extension':b'first'}
+        def read(path,*args,**kwargs):
+            return values['extension'] if 'mattermost-context' in str(path) else b'unchanged'
+        self.n['read']=read
+        first=self.n['profile']({},self.images)
+        values['extension']=b'second'
+        second=self.n['profile']({},self.images)
+        changed={key for key,value in first['source_sha256'].items() if value!=second['source_sha256'][key]}
+        self.assertEqual(changed,set(self.n['hermes_extension_files']()))
+    def response_policy(self):
+        return (pathlib.Path(sys.argv[1]).resolve().parents[2]/'infra/hermes/SOUL.groot.md').read_bytes()
+    def test_response_format_extracts_only_exact_shared_four_bullets(self):
+        raw=self.response_policy();block=self.n['hermes_response_format'](raw)
+        expected='### SOC 응답 서식\n'+raw.decode().split('### SOC 응답 서식\n',1)[1].split('\n## 보안 룰 변경 요청\n',1)[0].strip()+'\n'
+        self.assertEqual(block,expected)
+        self.assertEqual(sum(line.startswith('- ') for line in block.splitlines()),4)
+        for text in ('`**요약**`','`**확인 내역**`','`**조치 및 다음 단계**`'):
+            self.assertIn(text,block)
+        self.assertNotIn('get_rule_change_target',block)
+        self.assertNotIn('propose_rule_edit',block)
+        self.assertNotIn('LLM이 SOC 운영의 관리 주체다',block)
+    def test_response_format_fails_closed_for_missing_duplicate_or_changed_structure(self):
+        raw=self.response_policy()
+        start='<!-- rule-change-policy:start -->\n### SOC 응답 서식\n'.encode()
+        end='\n## 보안 룰 변경 요청\n'.encode()
+        variants=(raw.replace(start,b'',1),raw+start,raw.replace(end,b'',1),raw+end,
+                  raw.replace(end,b'\n- extra policy\n'+end,1),
+                  raw.replace(end,b'\n## unexpected capability\n'+end,1),b'\xff',
+                  end+raw.replace(end,b'',1))
+        for invalid in variants:
+            with self.subTest(case=variants.index(invalid)):
+                self.reject(lambda:self.n['hermes_response_format'](invalid))
+    def test_response_format_read_is_bounded_and_readonly_soul_retains_capabilities(self):
+        calls=[]
+        def read(path,cap):
+            calls.append((path,cap));return self.response_policy()
+        self.n['read']=read;soul=self.n['readonly_soul']()
+        self.assertEqual(calls,[(self.n['SOURCE']/'infra/hermes/SOUL.groot.md',512*1024)])
+        self.assertTrue(soul.startswith('# SOC 읽기 보조자\n'))
+        self.assertIn('현재 제공된 Wazuh 읽기 MCP와 security-events MCP에서 확인한 사실만 보고한다.',soul)
+        self.assertIn('이 환경에는 쓰기 승인·차단·규칙 수정 도구가 배포되지 않았다. 수행했다고 주장하지 않는다.',soul)
+        self.assertTrue(soul.endswith(self.n['hermes_response_format'](self.response_policy())))
+        self.assertNotIn('propose_rule_edit',soul)
+    def test_response_format_source_hash_changes_deployment_profile(self):
+        values={'policy':b'first'}
+        self.n['read']=lambda path,*a,**k:values['policy'] if path.name=='SOUL.groot.md' else b'unchanged'
+        first=self.n['profile']({},self.images);values['policy']=b'second'
+        second=self.n['profile']({},self.images)
+        changed={key for key,value in first['source_sha256'].items() if value!=second['source_sha256'][key]}
+        self.assertEqual(changed,{'infra/hermes/SOUL.groot.md'})
+    def test_response_format_preflight_runs_before_container_image_operations(self):
+        preflight=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='preflight')
+        calls=[n for n in ast.walk(preflight) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name)]
+        format_calls=[n for n in calls if n.func.id=='hermes_response_format']
+        self.assertEqual(len(format_calls),1)
+        self.assertLess(format_calls[0].lineno,min(n.lineno for n in calls if n.func.id=='image_id'))
+        self.assertIn('infra/hermes/SOUL.groot.md',ast.unparse(preflight))
+    def test_prepared_image_native_contract_accepts_supported_and_rejects_unsafe_image(self):
+        codes=[n.value.value for n in ast.walk(tree) if isinstance(n,ast.Assign)
+               and any(isinstance(t,ast.Name) and t.id=='code' for t in n.targets)
+               and isinstance(n.value,ast.Constant) and isinstance(n.value.value,str)]
+        whole=next(value for value in codes if 'VALID_HOOKS' in value)
+        code=whole[whole.index('from hermes_cli.plugins import'):whole.index('from hermes_cli.tools_config import')]
+        plugins=types.ModuleType('hermes_cli.plugins')
+        plugins.PluginContext=types.SimpleNamespace(register_hook=lambda:None)
+        plugins.VALID_HOOKS={'pre_gateway_dispatch'}
+        hooks=types.ModuleType('gateway.hooks')
+        hooks.HookRegistry=types.SimpleNamespace(discover_and_load=lambda:None,emit=lambda:None,emit_collect=lambda:None)
+        events=types.ModuleType('gateway.platforms.event')
+        events.MessageEvent=types.SimpleNamespace(__dataclass_fields__={key:None for key in
+            ('internal','reply_to_text','reply_to_message_id','channel_context')},is_command=lambda:False)
+        inbound=types.ModuleType('gateway.run_inbound')
+        authz=types.ModuleType('gateway.authz_mixin')
+        authz.GatewayAuthorizationMixin=types.SimpleNamespace(_intake_adapter_for=lambda source:None)
+        prepare=lambda:None;quote=lambda:None
+        inbound.GatewayInboundMixin=types.SimpleNamespace(_prepare_inbound_message_text=prepare,
+                                                          _prepend_inbound_reply_context=quote)
+        sources={prepare:'_expand_inbound_context_references before _prepend_inbound_reply_context',
+                 quote:'reply_to_text and reply_to_message_id'}
+        scope={'inspect':types.SimpleNamespace(getsource=lambda fn:sources[fn])}
+        modules={'hermes_cli':types.ModuleType('hermes_cli'),'gateway':types.ModuleType('gateway'),
+                 'gateway.platforms':types.ModuleType('gateway.platforms'),
+                 'hermes_cli.plugins':plugins,'gateway.hooks':hooks,'gateway.platforms.event':events,
+                 'gateway.run_inbound':inbound,'gateway.authz_mixin':authz}
+        with mock.patch.dict(sys.modules,modules):
+            exec(code,scope)
+            plugins.VALID_HOOKS=set()
+            with self.assertRaises(AssertionError):exec(code,scope)
+            plugins.VALID_HOOKS={'pre_gateway_dispatch'}
+            sources[prepare]='_prepend_inbound_reply_context before _expand_inbound_context_references'
+            with self.assertRaises(AssertionError):exec(code,scope)
     def test_embedded_programs_compile(self):
         found=0
         for n in ast.walk(tree):

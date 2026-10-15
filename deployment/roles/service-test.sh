@@ -124,6 +124,51 @@ class RuntimeTests(unittest.TestCase):
         s=snapshot('dvwa');next(m for m in s['Mounts'] if m['Destination']=='/var/lib/capstone-log4shell-ui')['RW']=False
         self.assertFalse(self.accepted('dvwa',s))
 
+class HTTPHostnameTests(unittest.TestCase):
+    def config(self,name='',port='8080'):
+        result=shell('SECURITY_HOST=192.0.2.10; LOG4SHELL_HOSTNAME="$1"; WAF_PORT="$2"; apache_document',None,name,port)
+        self.assertEqual(result.returncode,0,result.stderr)
+        return result.stdout
+    def test_default_remains_one_dvwa_vhost_without_redirect(self):
+        result=self.config()
+        self.assertEqual(result.count('<VirtualHost *:80>'),1)
+        self.assertIn('Alias /dvwa /var/www/html',result)
+        self.assertNotIn('RedirectMatch',result)
+        self.assertNotIn('grootlab.duckdns.org',result)
+    def test_named_host_is_second_vhost_and_preserves_default_exactly(self):
+        original=self.config();result=self.config('log4shell.example.org')
+        self.assertTrue(result.startswith(original))
+        second=result[len(original):]
+        self.assertEqual(second.count('<VirtualHost *:80>'),1)
+        self.assertIn('ServerName log4shell.example.org\n',second)
+        self.assertNotIn('ServerAlias',second)
+        self.assertIn('RedirectMatch 302 "^/(?!log4shell/).*" "http://log4shell.example.org:8080/log4shell/"',second)
+        self.assertIn("%{CONN_REMOTE_ADDR} == '192.0.2.10'",second)
+        self.assertIn('LogFormat ',second)
+        self.assertIn('CustomLog /var/log/capstone-service/access.log capstone_combined',second)
+        self.assertIn('ErrorLog /var/log/capstone-service/error.log',second)
+        self.assertNotIn('https:',second)
+        # Apache chooses the first vhost for unmatched names, exact ServerName for this host.
+        vhosts=re.findall(r'<VirtualHost \*:80>(.*?)</VirtualHost>',result,re.S)
+        for host,index in [('log4shell.example.org',1),('dvwa.example.org',0),('192.0.2.10',0),('other.example.org',0)]:
+            selected=next((i for i,block in enumerate(vhosts) if 'ServerName '+host+'\n' in block),0)
+            self.assertEqual(selected,index)
+    def test_log4shell_host_redirects_wrong_dvwa_path_without_redirecting_its_assets(self):
+        second=self.config('log4shell.example.org').split('<VirtualHost *:80>')[2]
+        pattern,target=re.search(r'RedirectMatch 302 "([^"]+)" "([^"]+)"',second).groups()
+        self.assertEqual(target,'http://log4shell.example.org:8080/log4shell/')
+        for path in ('/','/log4shell','/dvwa/login.php','/index.php','/other'):
+            with self.subTest(path=path):self.assertIsNotNone(re.search(pattern,path))
+        for path in ('/log4shell/','/log4shell/app.css','/log4shell/app.js','/log4shell/api.php'):
+            with self.subTest(path=path):self.assertIsNone(re.search(pattern,path))
+    def test_http_default_port_omitted_but_custom_port_preserved(self):
+        self.assertIn('"http://log4shell.example.org/log4shell/"',self.config('log4shell.example.org','80'))
+        self.assertIn('"http://log4shell.example.org:9080/log4shell/"',self.config('log4shell.example.org','9080'))
+    def test_host_injection_ip_wildcard_scheme_and_bad_labels_refused(self):
+        for name in ('http://log4shell.example.org','log4shell.example.org:80','log4shell.example.org/x','*.example.org',
+                     '192.0.2.10','example..org','-bad.example.org','a'*64+'.org','example.org\nListen 443', 'UPPER.example.org'):
+            with self.subTest(name=name):self.assertNotEqual(shell('hostname_valid "$1"',None,name).returncode,0)
+
 class UISourceTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(prefix='capstone-service-pure-');self.root=pathlib.Path(self.temp.name)
@@ -164,7 +209,7 @@ class ManifestTests(unittest.TestCase):
           'config/log4shell-ui/app.css','config/log4shell-ui/app.js','config/log4shell-ui/index.html',
           'config/ossec.conf.candidate','config/verify-log4shell.php','credentials/admin-password',
           'credentials/app.env','credentials/db-password','credentials/db-root-password','credentials/db.env','input.json']
-        self.manifest={'schema':2,'role':'service','state':'complete','files':{n:'a'*64 for n in names},
+        self.manifest={'schema':3,'role':'service','state':'complete','files':{n:'a'*64 for n in names},
           'agent_config_sha256':'b'*64,'enrollment_ca_sha256':'c'*64,'enrollment_pass_sha256':'d'*64,'script_sha256':'e'*64}
     def accepted(self):
         return subprocess.run(['jq','-e',self.query],input=json.dumps(self.manifest),text=True,capture_output=True).returncode==0
@@ -174,7 +219,8 @@ class ManifestTests(unittest.TestCase):
     def test_dynamic_rate_content_not_a_static_manifest_file(self):
         self.manifest['files']['state/log4shell-ui/request.lock']='f'*64;self.assertFalse(self.accepted())
     def test_old_schema_cannot_be_adopted(self):
-        self.manifest['schema']=1;self.assertFalse(self.accepted())
+        for schema in (1,2):
+            self.manifest['schema']=schema;self.assertFalse(self.accepted())
 
 unittest.main(argv=['service-test'],verbosity=2)
 PY

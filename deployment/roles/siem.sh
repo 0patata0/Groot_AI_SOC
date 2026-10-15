@@ -126,13 +126,61 @@ def cert_check(cert, key, ca):
     kpub = run(['openssl', 'pkey', '-in', str(key), '-pubout'])
     need(pub == kpub, 'certificate_private_key_mismatch')
     run(['openssl', 'x509', '-in', str(cert), '-checkend', '2592000', '-noout'])
+def hermes_extension_files():
+    base = 'infra/hermes/mattermost-context/'
+    return {base + name: 'plugins/groot-mattermost-context/' + name
+            for name in ('__init__.py', 'plugin.yaml', 'channel_sync.py')} | {
+        base + 'startup/' + name: 'hooks/groot-mattermost-channel-sync/' + name
+        for name in ('HOOK.yaml', 'handler.py')}
+def hermes_response_format(raw=None):
+    if raw is None:
+        raw = read(SOURCE/'infra/hermes/SOUL.groot.md',512*1024)
+    try: text = raw.decode('utf-8')
+    except (AttributeError,UnicodeError): raise Refused('SOC_response_format_encoding_invalid')
+    start = '<!-- rule-change-policy:start -->\n### SOC 응답 서식\n'
+    end = '\n## 보안 룰 변경 요청\n'
+    need(text.count(start)==1 and text.count(end)==1, 'SOC_response_format_anchor_invalid')
+    begin = text.index(start)+len(start); finish = text.index(end)
+    need(begin < finish, 'SOC_response_format_order_invalid')
+    body = text[begin:finish].strip()
+    lines = body.splitlines()
+    need(len(lines)==4 and all(line.startswith('- ') and len(line)>2 for line in lines)
+         and len(body)<=16384, 'SOC_response_format_four_bullets_required')
+    return '### SOC 응답 서식\n'+body+'\n'
+def readonly_soul():
+    # Copy only the shared presentation section, never live write-tool policies.
+    return '''# SOC 읽기 보조자
+설명은 한국어로 작성하고 IP, 경로, 규칙 ID, 해시 등 식별자는 원문을 보존한다.
+현재 제공된 Wazuh 읽기 MCP와 security-events MCP에서 확인한 사실만 보고한다.
+이 환경에는 쓰기 승인·차단·규칙 수정 도구가 배포되지 않았다. 수행했다고 주장하지 않는다.
+본문/비밀을 요청하거나 노출하지 말고 필요한 경보 메타데이터만 요약한다.
+시각은 명시된 offset을 기준으로 Asia/Seoul로 변환해 KST 또는 +09:00를 붙인다.
+확인하지 못한 내용과 표본·지연의 한계를 명시한다.
+\n'''+hermes_response_format()
+def install_hermes_extensions(data, hu, creds, hc):
+    for key in ('mattermost_admin_id','mattermost_team_id','mattermost_channel_id','mattermost_bot_id'):
+        need(re.fullmatch(r'[a-z0-9]{26}',creds.get(key,'')), 'invalid_Mattermost_identity_' + key)
+    files = hermes_extension_files()
+    parents = {str(pathlib.PurePosixPath(relative).parent) for relative in files.values()}
+    parents |= {'plugins', 'hooks'}
+    for relative in sorted(parents, key=lambda value: (value.count('/'), value)):
+        mkdir(data / relative,0o700,hu.pw_uid,hu.pw_gid)
+    for source, relative in files.items():
+        publish(data / relative,read(SOURCE/source,512*1024),0o600,hu.pw_uid,hu.pw_gid)
+    hc['plugins'] = {'enabled':['groot-mattermost-context']}
+    return {'MATTERMOST_URL':'http://'+IP+':8065','MATTERMOST_TOKEN':creds['mattermost_bot_token'],
+            'MATTERMOST_ALLOWED_USERS':creds['mattermost_admin_id'],'MATTERMOST_ALLOWED_CHANNELS':'',
+            'MATTERMOST_HOME_CHANNEL':creds['mattermost_channel_id'],'MATTERMOST_REQUIRE_MENTION':'true',
+            'MATTERMOST_FREE_RESPONSE_CHANNELS':'','MATTERMOST_REPLY_MODE':'thread',
+            'CAPSTONE_MM_TEAM_ID':creds['mattermost_team_id'],'CAPSTONE_MM_BOT_ID':creds['mattermost_bot_id']}
 def profile(snap, images):
     return {'hosts':HOSTS,'ssh_port':int(SSH_PORT),'llm_base_url':LLM,'llm_model':MODEL,'images':images,
             'prerequisite_tree_sha256':digest(canonical(snap)),
             'prerequisite_credentials_sha256':digest(read(PRE/'siem.json',16384,True)),
             'source_sha256':{p:digest(read(SOURCE/p)) for p in (
                 'infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
-                'infra/groot-b/local_rules.xml','infra/groot-b/local_decoder.xml')}}
+                'infra/hermes/SOUL.groot.md',
+                'infra/groot-b/local_rules.xml','infra/groot-b/local_decoder.xml', *hermes_extension_files())}}
 def fresh():
     forbidden = [DEST, ROOT/'exports/wazuh-enrollment-ca.pem', ROOT/'secrets/enrollment.pass',
                  pathlib.Path('/etc/ssh/sshd_config.d/65-capstone-mcp.conf'),
@@ -200,8 +248,10 @@ def preflight():
     pin = read(PRE/'mcp/mcp-server-wazuh.sha256', 128).decode().strip()
     need(re.fullmatch(r'[0-9a-f]{64}', pin) and digest(binary) == pin and binary.startswith(b'\x7fELF'), 'reviewed_mcp_binary_SHA_required')
     for p in ('infra/mcp/security-events-mcp.py', 'infra/hermes/korean_output_guard.py',
-              'infra/groot-b/local_rules.xml','infra/groot-b/local_decoder.xml'):
+              'infra/hermes/SOUL.groot.md',
+              'infra/groot-b/local_rules.xml','infra/groot-b/local_decoder.xml', *hermes_extension_files()):
         read(SOURCE/p, 512*1024)
+    hermes_response_format()
     images = {k: image_id(v) for k, v in IMAGES.items()}; images['hermes'] = image_id(cfg['hermes_image'])
     compose = parse(run(compose_args(TREE/'docker-compose.yml') + ['config', '--format', 'json'], 45))
     validate_wazuh(compose)
@@ -541,22 +591,12 @@ os.execve(args[0],args,env)
         'toolsets':tools,'platform_toolsets':{'mattermost':tools,'cli':tools},'tools':{'tool_search':{'enabled':False}},
         'agent':{'reasoning_overrides':{MODEL:'none'}},'display':{'platforms':{'mattermost':{
             'streaming':False,'interim_assistant_messages':False,'show_reasoning':False,'thinking_progress':False}}}}
+    menv=install_hermes_extensions(data,hu,creds,hc)
     publish(data/'config.yaml',canonical(hc),0o600,hu.pw_uid,hu.pw_gid)
-    # No scheduled reports or proactive chat are created by this bootstrap.
-    menv={'MATTERMOST_URL':'http://'+IP+':8065','MATTERMOST_TOKEN':creds['mattermost_bot_token'],
-          'MATTERMOST_ALLOWED_USERS':creds['mattermost_admin_id'],'MATTERMOST_ALLOWED_CHANNELS':creds['mattermost_channel_id'],
-          'MATTERMOST_HOME_CHANNEL':creds['mattermost_channel_id'],'MATTERMOST_REQUIRE_MENTION':'true',
-          'MATTERMOST_FREE_RESPONSE_CHANNELS':'','MATTERMOST_REPLY_MODE':'thread'}
+    # Only public-channel membership sync is started; no proactive chat/report.
     need(all('\n' not in v and '\r' not in v for v in menv.values()),'invalid_Mattermost_environment')
     publish(data/'.env',('\n'.join(k+'='+v for k,v in menv.items())+'\n').encode(),0o600,hu.pw_uid,hu.pw_gid)
-    soul='''# SOC 읽기 보조자
-설명은 한국어로 작성하고 IP, 경로, 규칙 ID, 해시 등 식별자는 원문을 보존한다.
-현재 제공된 Wazuh 읽기 MCP와 security-events MCP에서 확인한 사실만 보고한다.
-이 환경에는 쓰기 승인·차단·규칙 수정 도구가 배포되지 않았다. 수행했다고 주장하지 않는다.
-본문/비밀을 요청하거나 노출하지 말고 필요한 경보 메타데이터만 요약한다.
-시각은 명시된 offset을 기준으로 Asia/Seoul로 변환해 KST 또는 +09:00를 붙인다.
-확인하지 못한 내용과 표본·지연의 한계를 명시한다.
-'''
+    soul=readonly_soul()
     publish(data/'SOUL.md',soul.encode(),0o600,hu.pw_uid,hu.pw_gid)
     c=copy.deepcopy(c)
     c['services']['hermes']={'image':images['hermes'],'pull_policy':'never','container_name':NAMES['hermes'],
@@ -567,13 +607,29 @@ os.execve(args[0],args,env)
     return hu
 def image_probe(image):
     expected=digest(read(SOURCE/'infra/hermes/korean_output_guard.py'))
-    code="""import sys,hashlib,pathlib
+    code="""import sys,hashlib,pathlib,inspect
 sys.path.insert(0,'/opt/capstone-guard-runtime/regex-2026.9.29/lib/python3.13/site-packages')
 import regex,mcp
 assert regex.__version__=='2026.9.29'
 p=pathlib.Path('/opt/hermes/capstone_korean_output_guard.py')
 assert hashlib.sha256(p.read_bytes()).hexdigest()==sys.argv[1]
 assert all('capstone_korean_output_guard' in pathlib.Path('/opt/hermes',q).read_text() for q in ['plugins/platforms/mattermost/adapter.py','gateway/run_turn.py'])
+from hermes_cli.plugins import PluginContext, VALID_HOOKS
+from gateway.hooks import HookRegistry
+from gateway.platforms.event import MessageEvent
+from gateway.run_inbound import GatewayInboundMixin
+from gateway.authz_mixin import GatewayAuthorizationMixin
+assert callable(GatewayAuthorizationMixin._intake_adapter_for)
+assert 'pre_gateway_dispatch' in VALID_HOOKS
+assert callable(PluginContext.register_hook)
+assert all(callable(getattr(HookRegistry,name,None)) for name in ('discover_and_load','emit','emit_collect'))
+assert {'internal','reply_to_text','reply_to_message_id','channel_context'} <= set(MessageEvent.__dataclass_fields__)
+assert callable(MessageEvent.is_command)
+# Quoted history must be appended after native file-reference expansion.
+inbound=inspect.getsource(GatewayInboundMixin._prepare_inbound_message_text)
+assert 0 <= inbound.find('_expand_inbound_context_references') < inbound.find('_prepend_inbound_reply_context')
+quote=inspect.getsource(GatewayInboundMixin._prepend_inbound_reply_context)
+assert 'reply_to_text' in quote and 'reply_to_message_id' in quote
 from hermes_cli.tools_config import _get_platform_tools
 names=['mcp-wazuh-ro','mcp-security-events']
 config={'platform_toolsets':{'mattermost':names},'mcp_servers':{k:{'command':'ssh'} for k in ['wazuh-ro','security-events']}}

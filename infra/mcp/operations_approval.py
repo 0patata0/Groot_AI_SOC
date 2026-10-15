@@ -68,13 +68,16 @@ def _text(value, max_chars=200, max_bytes=500):
 
 
 class OperationsBroker:
-    def __init__(self, *, post, enabled, source_ok, approvers, action_url, audit=None):
+    def __init__(self, *, post, enabled, source_ok, approvers, action_url, audit=None,
+                 post_card=None, card_state=None):
         self.post = post
         self.enabled = enabled
         self.source_ok = source_ok
         self.approvers = approvers
         self.action_url = action_url
         self.audit = audit or (lambda event, record: None)
+        self.post_card = post_card or (lambda record, payload: self.post(payload))
+        self.card_state = card_state or (lambda event, record, body=None: True)
         self.records = {}
         self.lock = threading.Lock()
 
@@ -121,6 +124,7 @@ class OperationsBroker:
         now = time.time()
         for oid, rec in list(self.records.items()):
             if rec["status"] in ("posting", "pending", "approved", "denied") and now >= rec["expires_at"]:
+                self.card_state("expire", rec)
                 rec["status"] = "expired"
                 rec["decided_at"] = now
                 self.audit("expired", rec)
@@ -140,7 +144,7 @@ class OperationsBroker:
     @staticmethod
     def _public(rec):
         keys = ("request_id", "kind", "target", "plan_sha256", "proposal_digest", "expires_at", "status",
-                "decision", "by", "decided_at", "posted", "consumed_decision", "result_posted", "result_attempts")
+                "decision", "by", "decided_at", "posted", "consumed_decision", "result_posted", "result_attempts", "result_status")
         return {**{key: rec.get(key, "") for key in keys}, "operation_id": rec["request_id"],
                 "before_observation_sha256": rec["plan"]["before_observation_sha256"],
                 "after_observation_sha256": rec.get("after_observation_sha256", "")}
@@ -218,12 +222,12 @@ class OperationsBroker:
         payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800",
                    "title": "서비스 작업 승인 요청" if rec["kind"] == "service" else "임시 IP 차단 · 유지 또는 해제",
                    "text": rec["card_text"], "actions": actions, "footer": "capstone operations HITL", "ts": int(time.time())}]}
-        posted, _ = self.post(payload)
+        posted, _ = self.post_card(rec, payload)
         with self.lock:
             self._expire_locked()
             rec["posted"] = bool(posted)
             if rec["status"] == "posting":
-                rec["status"] = "pending" if posted else "error"
+                rec["status"] = "pending" if posted and self.card_state("pending", rec) else "error"
             if rec["status"] != "pending":
                 self.audit("post_error", rec)
                 return {"error": "operation card failed or expired; approval is disabled", **self._public(rec)}, 502
@@ -257,6 +261,8 @@ class OperationsBroker:
                     not secrets.compare_digest(ctx["nonce"], rec["nonce"]) or
                     not secrets.compare_digest(ctx["proposal_digest"], rec["proposal_digest"])):
                 return {"ephemeral_text": "인증되지 않은 작업 승인 요청입니다."}
+            if not self.card_state("decision", rec, body):
+                return {"ephemeral_text": "승인 카드 식별 또는 결정 보존을 확인하지 못했습니다. 결정은 반영되지 않았습니다."}
             rec.update(decision=ctx["decision"], by=uid, decided_at=time.time(),
                        status="approved" if ctx["decision"] in ("approve", "keep") else "denied")
             self.audit("decision", rec)
@@ -278,6 +284,8 @@ class OperationsBroker:
             allowed = ("approved",) if rec["kind"] == "service" else ("approved", "denied", "expired")
             if rec["status"] not in allowed:
                 return {"error": "operation cannot be consumed"}, 409
+            if not self.card_state("protect", rec):
+                return {"error": "approval card state unavailable"}, 503
             rec["consumed_decision"] = "expired" if rec["status"] == "expired" else rec["decision"]
             rec["status"] = "consumed"
             self.audit("consumed", rec)
@@ -315,7 +323,9 @@ class OperationsBroker:
                 return {"error": "operation has not been consumed or result is in progress"}, 409
             if rec["result_attempts"] >= 3:
                 return {"error": "result retries exhausted"}, 429
-            rec.update(status="reporting", result_digest=result_digest,
+            if not self.card_state("protect", rec):
+                return {"error": "approval card state unavailable"}, 503
+            rec.update(status="reporting", result_digest=result_digest, result_status=req["status"],
                        result_attempts=rec["result_attempts"] + 1,
                        after_observation_sha256=req["after_observation_sha256"])
             text = (rec["card_text"] + "\n\n결정: `%s` · 승인자 ID: `%s`\n실행 결과: `%s`\n"

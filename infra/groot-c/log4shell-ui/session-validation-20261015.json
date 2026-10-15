@@ -1,0 +1,61 @@
+{
+  "observed_at_kst": "2026-10-15T15:50:02+09:00",
+  "issue": "HTTP UI bootstrap succeeds but normal POST returns session CSRF403 after HTTPS use",
+  "browser_before": {
+    "browser": "Safari",
+    "http_api_status": 403,
+    "message": "실습 세션을 확인하지 못했습니다. 화면을 새로고침해 주세요.",
+    "existing_https_session_worked": true
+  },
+  "change": {
+    "http_cookie": "groot_log4shell_ui_http",
+    "https_cookie": "__Secure-groot_log4shell_ui_https",
+    "https_secure": true,
+    "http_only": true,
+    "same_site": "Strict",
+    "csrf_retained": true,
+    "tls_hint_grants_trust_or_authority": false,
+    "legacy_cookie_ignored": true
+  },
+  "files": {
+    "infra/groot-c/log4shell-ui/public/api.php": "797788d26ab3dd3c135b247c2cc64b9b5f52893c06943e6948346aa9ca97aa75",
+    "infra/groot-c/log4shell-ui/verify.py": "d305da80da31857eb0e734db66d8ecab6e7d23ef7055983a4b3171ed5f9cf0ba",
+    "infra/groot-a/chatproxy.nginx.conf": "2790ab83df6c4e1b13ac00a277ea8158a16bb767c2c2b1e0a2c5f01b598b8424",
+    "deployment/roles/service.sh": "3e0b84c12532ed23742881e457f538e7b52debb390765472f4482e1d10b17561"
+  },
+  "backups": {
+    "c": "/var/backups/capstone-log4shell-ui/20261015T154643-session",
+    "a": "/var/backups/capstone-log4shell-ui/20261015T154657-session"
+  },
+  "validation": {
+    "php_lint": true,
+    "nginx_configtest": true,
+    "nginx_reload_count": 1,
+    "container_restart_count": 0,
+    "c_direct_api_pass": 9,
+    "initial_service_regression_pass": 30,
+    "dvwa_http": 200,
+    "safari_existing_cookies_preserved": true,
+    "safari_http_normal": 200,
+    "safari_http_missing_header": 400,
+    "safari_https_normal": 200,
+    "safari_return_to_existing_http_tab_normal": 200,
+    "api_shared_cookie_jar_sequence": [
+      "https",
+      "http",
+      "https",
+      "http"
+    ],
+    "api_each_normal": 200,
+    "api_each_missing_header": 400,
+    "api_each_wrong_csrf": 403,
+    "http_forged_tls_hint_only_secure_cookie": true,
+    "http_forged_tls_hint_wrong_csrf": 403,
+    "tls_chain_and_hostname_verified": true
+  },
+  "limitations": [
+    "External WAF retains text/html Content-Type on API403; strict external nine-case verifier is not a full pass.",
+    "This tests inert requests and session handling, not exploitation or attack detection.",
+    "Forged-hint browser cookie rejection follows the Secure-prefix browser contract; live forged-hint probe verified server attributes and CSRF rejection, not browser header injection."
+  ]
+}

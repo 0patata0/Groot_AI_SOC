@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "deployed_at_kst": "2026-10-15T18:11:02.983760+09:00",
+  "server_role": "siem",
+  "mattermost_version": "11.11.1",
+  "files_sha256": {
+    "__init__.py": "e3f899288ea80718aee2219680660384ad5688fb07a2366dde4da76ae8314752",
+    "plugin.yaml": "5bfae95e71616d81f142c143d0350f64969e32a66ba20057e8e511a293233412",
+    "channel_sync.py": "d422cc451c9b585b48b8f000aa18eb2bc58bd202402449d46d4398c95a396d94",
+    "startup/HOOK.yaml": "944158af622103a1deeffde0e51fa1cdb7c27dcbe0def768827acaffa8a92ae1",
+    "startup/handler.py": "677e5ee075bd1ee8b4109b12f36adcf36d9aaaf6f9147b8e5f5aac7a0a78ee69"
+  },
+  "deployment": {
+    "same_hermes_container_restarted": true,
+    "security_services_restarted": false,
+    "admin_allowlist_preserved": true,
+    "home_and_free_response_channel_preserved": true,
+    "public_channels_joined": 4,
+    "public_channels_total": 4,
+    "public_sync_seconds": 300,
+    "private_channels_invitation_required": true,
+    "korean_guard_adapter_and_run_turn_hashes_preserved": true,
+    "backup": "/var/backups/capstone-mattermost-context/20261015"
+  },
+  "verification": {
+    "mock_context_tests": 33,
+    "mock_channel_sync_tests": 20,
+    "native_contract_tests": 7,
+    "new_installer_tests": 24,
+    "live_native_plugin_discovery": true,
+    "native_hook_callbacks": 1,
+    "live_native_report": {
+      "root_characters": 1786,
+      "preceding_comments": 7,
+      "context_characters": 4754,
+      "http_get_calls": 2,
+      "trigger_excluded": true,
+      "routing_unchanged": true
+    },
+    "live_card": {
+      "visible_root_characters": 1483,
+      "action_metadata_excluded": true
+    },
+    "live_top_level_previous_posts": 3,
+    "gateway": "running",
+    "mattermost_connection": "connected",
+    "api_connection": "connected",
+    "database_quick_check": "ok",
+    "model_calls_in_fixtures": 0,
+    "chat_posts_sent_in_fixtures": 0,
+    "live_user_context_events": {
+      "times_kst": [
+        "2026-10-15T18:14:25+09:00",
+        "2026-10-15T18:15:59+09:00"
+      ],
+      "both_status_ok": true,
+      "both_same_thread": true,
+      "both_root_matches_session": true,
+      "assistant_answer_factual_quality_reviewed": false
+    }
+  },
+  "limits": [
+    "Constructed-event native fixtures were followed by two real user messages with verified thread context injection. End-to-end answer factual quality was not evaluated.",
+    "Context is bounded to 12000 characters; root 6000, recent thread replies 25, channel posts 20.",
+    "New public channels are synchronized on gateway startup and every 300 seconds.",
+    "New VM bootstrap was not run."
+  ]
+}

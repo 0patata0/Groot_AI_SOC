@@ -1,0 +1,16 @@
+{
+  "at_kst": "2026-10-15T18:34:45.703104+09:00",
+  "mac_packages_installed": 0,
+  "temporary_directory_removed": "/private/tmp/capstone-wazuh-api-s6vLeQnw",
+  "temporary_files_removed": 46,
+  "temporary_bytes_removed": 312895,
+  "absence_verified": true,
+  "server_temporary_policy_staging_removed": true,
+  "native_fixture_isolated_home_removed": true,
+  "server_operating_files_and_backups_retained": true,
+  "mattermost_context_live": true,
+  "response_format_live": true,
+  "expired_card_cleanup_live": false,
+  "expired_card_cleanup_pending": "User selection of card-content removal with placeholder; preserve replies.",
+  "commit_or_push_performed": false
+}

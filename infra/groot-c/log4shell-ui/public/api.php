@@ -36,11 +36,18 @@ if (!extension_loaded('curl')) {
     reject(503, '실습 요청 기능을 사용할 수 없습니다. 관리자에게 알려 주세요.');
 }
 
-session_name('groot_log4shell_ui');
+// TLS terminates at chatproxy, which always sets this hint on its HTTPS route.
+// The hint only opts into a stricter Secure cookie; it grants no trust or access.
+// A forged HTTP hint cannot plant the __Secure- cookie in a browser. Never use
+// this hint for authorization, redirects, or deciding whether a peer is trusted.
+$secureSession = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || ($_SERVER['HTTP_X_GROOT_LAB_TLS'] ?? '') === '1';
+// Do not reuse the legacy name: an existing Secure cookie blocks HTTP updates.
+session_name($secureSession ? '__Secure-groot_log4shell_ui_https' : 'groot_log4shell_ui_http');
 session_set_cookie_params([
     'lifetime' => 0,
     'path' => '/log4shell/',
-    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+    'secure' => $secureSession,
     'httponly' => true,
     'samesite' => 'Strict',
 ]);

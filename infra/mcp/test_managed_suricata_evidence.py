@@ -203,11 +203,11 @@ class NativeAdapter(unittest.TestCase):
             with self.assertRaises(containment.ContainmentError): containment.read_evidence(PUBLIC, NOW)
             opened.assert_not_called()
 
-    def test_add_maps_only_existing_operation(self):
+    def test_add_maps_only_incident_registration(self):
         result = ar.request(reader.canonical(ar_event()), NOW)
-        self.assertEqual(set(result), {"operation", "ip", "reason"})
-        self.assertEqual(result["operation"], "contain-ip")
-        self.assertEqual(result["ip"], PUBLIC)
+        self.assertEqual(set(result), {"operation", "incident"})
+        self.assertEqual(result["operation"], "submit-incident")
+        self.assertEqual(result["incident"]["src_ip"], PUBLIC)
 
     def test_wrong_envelopes(self):
         for field, value in (("command", "delete"), ("version", True), ("extra", 1)):
@@ -231,8 +231,16 @@ class NativeAdapter(unittest.TestCase):
             with self.subTest(key=key), self.assertRaises(ar.Refused):
                 ar.request(reader.canonical(obj), NOW)
 
-    def test_protected_ips(self):
-        for source in ("211.170.162.111", "8.8.8.8", "10.1.2.3", "127.0.0.1", "::1", "93.184.216.034"):
+    def test_protected_ips_still_register_for_investigation(self):
+        for source in ("211.170.162.111", "8.8.8.8", "10.1.2.3", "127.0.0.1"):
+            obj = ar_event(); obj["parameters"]["alert"]["data"]["src_ip"] = source
+            with self.subTest(source=source):
+                result = ar.request(reader.canonical(obj), NOW)
+                self.assertEqual(result["incident"]["src_ip"], source)
+                self.assertEqual(result["operation"], "submit-incident")
+
+    def test_invalid_ipv4_refused(self):
+        for source in ("::1", "93.184.216.034", "not an IP"):
             obj = ar_event(); obj["parameters"]["alert"]["data"]["src_ip"] = source
             with self.subTest(source=source), self.assertRaises(ar.Refused):
                 ar.request(reader.canonical(obj), NOW)
@@ -245,7 +253,42 @@ class NativeAdapter(unittest.TestCase):
 
     def test_native_string_severity_allowed(self):
         obj = ar_event(); obj["parameters"]["alert"]["data"]["alert"]["severity"] = "1"
-        self.assertEqual(ar.request(reader.canonical(obj), NOW)["ip"], PUBLIC)
+        self.assertEqual(ar.request(reader.canonical(obj), NOW)["incident"]["src_ip"], PUBLIC)
+
+    def test_native_event_id_preserved_and_duplicate_stable(self):
+        obj = ar_event(); obj["parameters"]["alert"]["id"] = "1792033200.1234"
+        first = ar.request(reader.canonical(obj), NOW)
+        self.assertEqual(first["incident"]["event_id"], "1792033200.1234")
+        self.assertEqual(first, ar.request(reader.canonical(obj), NOW + 1))
+
+    def test_fallback_id_stable_by_fields_and_flow(self):
+        obj = ar_event()
+        first = ar.request(reader.canonical(obj), NOW)
+        self.assertRegex(first["incident"]["event_id"], r"^sha256:[0-9a-f]{64}$")
+        obj["parameters"]["alert"]["description"] = "untrusted instruction must not change identity"
+        obj["parameters"]["alert"]["data"]["flow_id"] = str(obj["parameters"]["alert"]["data"]["flow_id"])
+        self.assertEqual(first, ar.request(reader.canonical(obj), NOW))
+        obj["parameters"]["alert"]["data"]["flow_id"] = 9999
+        self.assertNotEqual(first["incident"]["event_id"], ar.request(reader.canonical(obj), NOW)["incident"]["event_id"])
+
+    def test_invalid_ids_refused(self):
+        for value in (None, True, "", "x" * 129, "id\ncommand", "${jndi:x}"):
+            obj = ar_event(); obj["parameters"]["alert"]["id"] = value
+            with self.subTest(value=value), self.assertRaises(ar.Refused):
+                ar.request(reader.canonical(obj), NOW)
+        for value in (None, True, -1, 2**64, "bad"):
+            obj = ar_event(); obj["parameters"]["alert"]["data"]["flow_id"] = value
+            with self.subTest(value=value), self.assertRaises(ar.Refused):
+                ar.request(reader.canonical(obj), NOW)
+
+    def test_dispatch_refuses_containment_before_starting_helper(self):
+        for payload in ({"operation": "contain-ip", "ip": PUBLIC, "reason": "native alert"},
+                        {"operation": "submit-incident", "incident": {}, "approved": True}):
+            with self.subTest(payload=payload), mock.patch.object(ar, "helper_metadata") as metadata, \
+                    mock.patch.object(ar.subprocess, "Popen") as process, self.assertRaises(ar.Refused):
+                ar.dispatch(payload)
+            metadata.assert_not_called()
+            process.assert_not_called()
 
     def test_malformed_bounded_input(self):
         good = reader.canonical(ar_event())

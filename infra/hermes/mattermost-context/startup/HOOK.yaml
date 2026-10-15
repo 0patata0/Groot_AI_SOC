@@ -1,0 +1,4 @@
+name: groot-mattermost-channel-sync
+description: Join this bot to public channels in one explicitly pinned Mattermost team
+events:
+  - gateway:startup

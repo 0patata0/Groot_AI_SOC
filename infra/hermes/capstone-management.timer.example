@@ -1,0 +1,11 @@
+[Unit]
+Description=Poll SOC event transport and resume one pending Hermes case
+
+[Timer]
+OnBootSec=30s
+OnUnitInactiveSec=15s
+AccuracySec=1s
+Unit=capstone-management.service
+
+[Install]
+WantedBy=timers.target

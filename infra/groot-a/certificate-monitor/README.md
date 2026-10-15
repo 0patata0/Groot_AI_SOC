@@ -1,5 +1,7 @@
 # 채팅 인증서 만료 감시·수동 갱신
 
+**2026-10-15 14:33:38 KST 공용 인증서 적용:** Mac의 일회성 private 환경에서 발급한 Let's Encrypt `*.grootlab.duckdns.org` 와일드카드 인증서 한 장을 A의 `chatduck.crt/key`에 설치하고 Nginx를 한 번 재로드했다. SAN은 채팅과 Log4Shell DuckDNS 이름을 모두 포함하며 만료는 **2027-01-13 13:25:12 KST**다. Mac 시스템 CA 검증을 켠 `curl`로 채팅 ping 200과 Log4Shell HTTPS의 `/dvwa/login.php`→`/log4shell/` 최종 200을 확인했다. A 감시기의 수동 실행도 `Result=success`·exit0으로 새 파일과 채팅 SNI를 검증했다. 배포 전 인증서는 A `/var/backups/capstone-log4shell-tls/20261015T143336+0900`에 보존했다. 아래 10:49 라이브 확인의 만료일은 **교체 전 채팅 단일 이름 인증서**의 이력이다. 감시기는 공유 파일 `chatduck.crt`의 만료일·지문을 매번 읽지만 `log4shell.grootlab.duckdns.org`의 SNI·경로는 주기 검사하지 않으므로 배포·갱신 때 별도로 검증한다. 자동 갱신은 없고 **2026년 12월 중순 재발급 준비**가 현재 일정이다.
+
 **2026-10-15 10:49 KST 후속 확인:** 오늘 **09:00:00 KST 예약 실행·exit0**와 09:00:01의 `ok/verified` journal 1건, 같은 상태파일을 대조했다. 다음 예약은 10월 16일 09:00 KST다. 10:48:58 실제 TLS도 CA·hostname·제공 인증서 fingerprint 검증을 통과했고, 만료는 **2027-01-06 15:02:33 KST**로 동일하다. [A 실측](followup-a-2026-10-15.json).
 
 B 설치 decoder/규칙 SHA는 유지됐고, 최근24시간 agent001의 인증서 규칙100300~100305 경보는0건이었다(60/60 shard 성공, timeout/부분결과 없음). 정상100300은 level0/no_log이므로 이 결과는 예상되며, **실제 경고의 원격 전달·색인 완료를 입증하지는 않는다.** 합성 경고 주입·인증서 교체·개인키 읽기·서비스 재시작은 없었다. [B 실측](followup-b-2026-10-15.json). 자동 갱신은 미구성이며 아래 12월 초 수동 갱신 계획을 유지한다. 다음 본문은 이전 시점 기록이다.
@@ -65,7 +67,9 @@ sudo systemctl list-timers capstone-cert-monitor.timer
 
 **2026-10-15 A의 새 읽기 관측에서 현재 공개 인증서 만료를 2027-01-06 15:02:33 KST(+09:00), 즉 06:02:33 UTC로 재확인했다.** 이는 [2026-10-08 DNS 발급 기록](../../dns/README.md#채팅-인증서-배포-2026-10-08-라이브-직접-확인)과 같다. 해당 배포 전 읽기 관측 자체는 native 시험·배포 완료 증거가 아니었다. 이후 설치 결과는 맨 위 04:51:02 KST 기록을 따르며 정기 검사는 매일 **09:00 KST**다. A의 ACME/DuckDNS 외부 HTTPS 제한과 Mac 발급 상태 삭제 때문에 자동 갱신은 구성돼 있지 않다. 2026년 12월 초에 갱신을 준비하고, 경고가 없더라도 만료 전에 완료한다.
 
-1. 접근 가능한 관리자 장치의 **일회성 private 임시 환경**에서 기존 DuckDNS DNS-01 절차로 `chat.grootlab.duckdns.org` 단일 이름 인증서를 발급한다. Mac의 예전 ACME 계정·발급 상태는 삭제됐으므로 남은 상태를 전제로 `--renew`만 실행하지 않는다. 당시 공식 ACME 소스/CA 동작을 다시 확인하며 Homebrew 설치·영구 ACME 상태·무인 SSH 자격증명은 추가하지 않는다. 토큰·개인키는 출력하거나 저장소에 넣지 않는다.
+위 만료일과 12월 초 일정은 **와일드카드 배포 전 채팅 단일 이름 인증서** 기준이다. 10/15 배포 이후 현재 갱신 대상은 `*.grootlab.duckdns.org`, 만료는 **2027-01-13 13:25:12 KST**, 재발급 준비는 **2026년 12월 중순**이다. 감시기는 새 파일의 만료를 읽지만 Log4Shell SNI 검증으로 범위가 확대되지는 않는다.
+
+1. 접근 가능한 관리자 장치의 **일회성 private 임시 환경**에서 DuckDNS DNS-01 절차로 `*.grootlab.duckdns.org` **와일드카드 단일 이름** 인증서를 새로 발급한다. 채팅·Log4Shell 개별 SAN을 같은 ACME 주문에 넣지 않는다(DuckDNS TXT 공유). Mac의 이전 ACME 계정·발급 상태는 삭제되므로 남은 상태를 전제로 `--renew`만 실행하지 않는다. 당시 공식 ACME 소스/CA 동작을 다시 확인하며 Homebrew 설치·영구 ACME 상태·무인 SSH 자격증명은 추가하지 않는다. 토큰·개인키는 출력하거나 저장소에 넣지 않는다.
 2. `fullchain.pem`과 암호 없는 `privkey.pem`을 A의 root0700 임시 디렉터리로 전송한다. 기존 [deploy_chatduck_cert_A.sh](../deploy_chatduck_cert_A.sh)의 `--check-only`를 먼저 실행한다. 이 검사는 DNS SAN/hostname, 만료까지 24시간 초과, 중간 인증서를 포함한 체인, 키 일치 및 호스트 CA 신뢰를 요구한다. `--check-only`는 Docker나 운영 TLS 파일을 변경하지 않는다.
 3. 현재 `chatproxy` CID와 `/etc/nginx/tls` bind가 `/home/groot_a/capstone/chatproxy/tls`를 가리키는지 확인한 뒤 같은 스크립트를 root로 실행한다. 아래 경로는 실제 root private 전송 경로로 바꾼다.
 
@@ -76,7 +80,7 @@ sudo systemctl list-timers capstone-cert-monitor.timer
 
    배포기는 현재 nginx 설정을 검사하고, TLS 디렉터리의 `.chatduck-backup.<시각>.<고유값>/`에 기존 인증서·키를 각각0600으로 보존한다. 새 인증서0644·키0600을 파일별 rename으로 교체한 뒤 `nginx -t`와 reload를 실행한다. 제공 SNI leaf fingerprint 및 **CA 검증을 켠 Mattermost `/api/v4/system/ping`**까지 통과해야 성공한다. 감시기는 이 배포기를 자동 호출하지 않는다.
 4. 교체 후 실패하면 배포기의 EXIT/HUP/INT/TERM 처리에서 백업 두 파일 복원과 nginx 구문 검사·reload를 시도한다. rollback reload 경고가 나오면 즉시 `chatproxy`를 확인한다. 성공 후 수동 복원이 필요하면 출력된 정확한 백업 디렉터리의 `chatduck.crt`·`chatduck.key`를 위 배포기의 입력으로 사용해 `--check-only`부터 다시 수행한다. 이전 인증서도 24시간 초과 유효기간과 CA 신뢰 검사를 통과해야 한다. 복원 시도 메시지만으로 제공 인증서 복구를 판정하지 말고 SNI fingerprint와 HTTPS ping을 다시 확인한다.
-5. 감시기가 설치된 뒤에는 `capstone-cert-monitor check`의 `verified`, 기대 fingerprint·만료일도 확인한다. 임시 발급·전송 자료는 정리하고 서버 백업과 비밀 없는 검증 메타데이터는 보존한다. Wazuh 및 내부 별칭의 별도 인증서는 이 절차에서 바꾸지 않는다.
+5. 감시기가 설치된 뒤에는 `capstone-cert-monitor check`의 `verified`, 기대 fingerprint·만료일도 확인한다. 공유 인증서를 제공하는 Log4Shell HTTPS의 SNI·CA 검증·HTTP 경로는 별도로 확인한다. 감시기는 채팅 이름 하나만 주기 검사하며 Log4Shell vhost 장애를 감지한다고 해석하지 않는다. 임시 발급·전송 자료는 정리하고 서버 백업과 비밀 없는 검증 메타데이터는 보존한다. Wazuh 및 내부 별칭의 별도 인증서는 이 절차에서 바꾸지 않는다.
 
 기존 배포기는 컨테이너 이름 `chatproxy`를 사용하며, 고정 CID CAS나 두 파일을 묶은 원자 교체·fsync 기반 crash 복구를 제공하지 않는다. 실행 중 다른 인증서 배포를 겹치지 않게 하고 SIGKILL·호스트 중단 뒤에는 현재 파일·백업·실제 제공 인증서를 확인한 후 복구한다. 이 한계는 이번 감시 후보로 바뀌지 않는다.
 

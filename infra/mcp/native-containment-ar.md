@@ -1,4 +1,54 @@
-# Native Wazuh → 기존 Containment 연결
+# Native Wazuh 사건 → LLM 판단 → 제한된 Containment
+
+## 현재 운영: LLM 판단 선행 구조 배포 완료 (2026-10-15 14:08 KST)
+
+Native AR의 역할을 **사건 등록**으로 변경하여 운영에 반영했다. 사건의 대응 필요성과 도구 선택은 LLM이 판단하고, 관리자는 보호된 변경의 승인·거부를 결정한다. helper/worker는 고정 정책 검증과 실행을 담당한다. 긴급 임시 차단도 LLM 호출을 먼저 거치며, 모델 지연·장애 때 Native AR가 대신 직접 차단하는 경로는 없다.
+
+```text
+A Wazuh agent001 / rule100110
+  → Native AR: 고정 사건 필드 검사 → submit-incident
+  → B HMAC 사건 등록 / 영속 outbox
+  → B 사건 제어기 → 기존 Hermes 세션에서 LLM 조사·판단
+  → 필요할 때 rule-a MCP temporarily_contain_ip
+  → 서버 원본 증거·보호 주소 검사 → 600초 임시 차단
+  → 기존 관리자 유지/해제 승인 → 고정 worker
+  → 승인·실행 결과 outbox → 같은 사건의 LLM 읽기 전용 검증
+```
+
+### 이번 배포에서 직접 확인한 사실
+
+| 시각(KST) | 적용·확인 |
+|---|---|
+| 13:59:57 | B `soc_bot.py`/operations에 HMAC 사건 등록, SQLite 승인 전이 outbox, level9 이상 최근5분·최대500건 경보 조회를 적용했다. soc-bot 재시작 후 인증된 사건·경보 조회를 확인했다. |
+| 14:00:47 | A adapter와 root executor를 교체했다. adapter는 `submit-incident`만 보내고 직접 root `contain-ip`는 거절한다. 제한 MCP 계정의 호출만 기존 containment 경계로 전달하며 이번 배포의 nft 호출·A 서비스 재시작은0이다. |
+| 14:01:24 / 14:01:35 | Hermes 정책 갱신 후 같은 컨테이너를 재시작하고 채팅 재연결을 확인했다. 기존 최근5개 경보 감시 cron을 비활성화하여 새 사건 처리와 중복 실행하지 않는다. |
+| 14:08 | B `capstone-management.timer` 활성화 후 실제 실행 exit0를 확인했다. 사건 큐와 실제 MCP 제안 ID를 영속 보존하고 승인 결과에 따라 같은 세션을 읽기 전용으로 재개한다. |
+
+현재 native 플랫폼 toolset은 `mcp-resp`, `mcp-rule-a`, `mcp-rule-b`, `mcp-security-events`, `mcp-wazuh-ro`의 정확5개다. 자동 관리 wrapper는 읽기/관리 모드를 코드에서 구분하고 일반 셸·설치·컨테이너 구성 도구를 허용하지 않는다. 기존 동기 승인 대기 `resp.block_ip/unblock_ip`는 자동 관리 실행에서 제외하고 `list_blocks`만 사용한다. [제어기](../hermes/soc_management_controller.py) · [Hermes 실행 경계](../hermes/soc_management_run.py) · [사건 outbox](soc_management_events.py).
+
+### 유지하는 실행 제한과 검증 범위
+
+사건 등록은 A의 직접 root 경로만 허용하고 `SUDO_USER`가 있으면 거절한다. 실제 `contain-ip`는 `SUDO_USER=rulechg`인 제한 MCP 경로만 허용하며 `requested_by=hermes-mcp`로 구분한다. 이 귀속 값만으로 LLM의 판단을 증명하지 않으며 제어기의 실제 모델·도구 호출 이력을 함께 확인한다. 조사 입력에는 보호 IPv4도 들어올 수 있지만, 차단 시에는 기존 보호 주소 정책이 그대로 적용된다.
+
+독립적인 양방향 TCP severity1 flow3개, 최근5분 원본 증거,600초 임시 TTL, 자동 연장 금지,3600초 유지 또는 해제 승인, HMAC/nonce/일회 소비를 유지한다. 큐 수신증은 차단·사건 해결 성공을 뜻하지 않는다. 승인 후 룰 적용 검증은 제안 ID·정확한 대상·예상/실제 SHA·실행 상태를 확인하며 서비스·차단도 실제 상태를 재조회한다. 결과가 불명확한 모델 실행은 자동 쓰기 재실행 없이 검토 상태로 남긴다.
+
+오프라인 회귀 **284개**(제어기33·wrapper25·사건 outbox21·정책7·사건등록10·adapter38·executor53·containment36·MCP10·브로커25·operations12·legacy7·resp7)가 통과했다. 실제 `.111` 모델의 읽기 전용 호출과 같은 세션 재개2회는 **26.469초·17.533초**, 쓰기 요청·Mattermost 전송0으로 확인했다. **실제 적격 경보→LLM 판단→차단→관리자 승인→검증/만료 전체 시험은 아직 미실시**이며 이 읽기 시간을 긴급 대응 성능으로 제시하지 않는다.
+
+경보 `_index/_id`와 Native 사건 ID를 영속 보존하고60초 단위로 묶되, 진행 중 동일 agent/rule/IP 사건에는 최대5분 안에서 합류한다. 최근5분 조회의 공백·500건 초과와 최근40건 문맥 제한은 명시한다. 검색 시간창을 넘는 과거 사건의 자동 회수, 전체 수집 경로의 무손실, 회전 전후5분 원본 증거의 완전성을 보장하지 않는다. managed reader의 현재 generation 한계도 아래 이전 검증과 같다.
+
+아래 후보·오전 설치 설명은 **변경 전 이력**이다. 그 안의 직접 `contain-ip`, 외부 IPv4만 조사 입력으로 받는 설명, 당시 helper/adapter SHA를 현재 동작이나 현재 파일 해시로 사용하지 않는다. 현재 동작은 위14:08 확인을 기준으로 한다.
+
+## 이전 후보 기록: LLM 판단 선행 전환 — 배포 전 로컬 검증 (2026-10-15)
+
+현재 저장소의 adapter는 `contain-ip`를 보내지 않는다. native `add`의 고정 agent001·rule100110/level9·EVE 경로·severity1·명시 시간대와 최근5분 검사를 통과하면 정확7필드 사건을 고정 root helper의 `submit-incident`로 전달한다. helper는 HMAC으로 `POST /management/incidents`에 등록하고 검증한 `queued/event_key/seq` 수신증만 반환한다. 이 경로는 룰 engine·ContainmentService·승인 소비·nft를 실행하지 않으며 새 MCP 도구로도 노출하지 않는다.
+
+사건의 `event_id`는 유효한 Wazuh `alert.id`를 보존한다. ID가 없을 때는 명시된 사건 필드와 정규화한 `flow_id`의 canonical JSON SHA-256으로 만든다. 동일 사건의 재전달은 같은 ID를 사용하며 메시지 본문·원문 명령은 포함하지 않는다. private/관리/DGX 등 보호 IPv4도 **조사 입력**으로 수용한다. 해당 주소의 실제 차단 금지는 기존 containment 정책에서 그대로 강제한다.
+
+등록은 A의 직접 root 실행만 허용하고 `SUDO_USER`가 있는 경로는 거절한다. 반대로 기존 `contain-ip` helper는 `SUDO_USER=rulechg`인 제한 MCP 호출만 허용하고 `requested_by=hermes-mcp`로 기록한다. 기존 Native AR의 직접 root `contain-ip`는 거절한다. 이는 호출 경로의 구분이며, 실제 LLM 판단·도구 호출 이력은 제어기 검증으로 별도 확인해야 한다. root 자체를 비신뢰 주체와 격리한다는 의미는 아니다.
+
+LLM이 사건을 조사·판단한 뒤 필요할 때 기존 `temporarily_contain_ip`를 호출한다. 서버의 독립3-flow·보호 주소·600초 TTL·유지/해제 카드 승인·일회 소비는 유지한다. 큐 등록은 차단이나 사건 해결 성공을 뜻하지 않으며 등록 실패·timeout 때 직접 차단으로 우회하지 않는다. 서버 적용·실제 큐 등록→LLM 판단→차단·후속 승인 E2E는 아직 미실행이다. 아래 내용은 **변경 전 10월15일 오전의 설치·확인 이력**이며 새 후보가 운영에 반영됐다는 뜻이 아니다.
+
+로컬 검증은 사건등록10개·adapter/managed reader38개·룰 executor53개·기존 containment36개·MCP10개, 총147개를 통과했다. native envelope→등록 helper→모의 큐에서 중복 ID의 같은 수신증과 engine/명령 실행0, private 입력 수용, 만료·잘못된 입력 거절, 직접 root 차단 거절·제한 MCP 귀속을 확인했다. 실제 HTTP·nft·채팅·서버 변경 없이 수행한 회귀이며 라이브 검증과 구분한다.
 
 **2026-10-15 설치·설정 활성화 완료, 실제 차단 E2E는 미시험**이다. A 새3파일 설치 후 Linux native69개와 실제 managed current generation 4,015건의 읽기를 확인했다. B는 agent001/rule100110에 한정한 연결의 native 설정3개 통과 후08:31:30 KST 같은CID 재시작·ready를 확인했다. A는08:47 KST CP 정합성 수정과 함께 `<disabled>no</disabled>`를 적용하고 agent를 한 번만 stop/start했으며,08:49:07 후조건에서 활성화·guard PASS·checkpoint 직접 수정0을 확인했다.
 

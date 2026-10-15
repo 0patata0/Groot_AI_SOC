@@ -29,7 +29,7 @@ APPROVERS 또는 RULE_APPROVERS, RULE_MM_SOURCE_CIDRS(Mattermost 서버 TCP peer
   POST /rule-changes/<id>/abort        (HMAC) → 승인됐지만 소비 전 검증 실패 시 미적용 카드
   POST /rule-actions                   (Mattermost callback; 출처 + 비공개 nonce 확인)
 """
-import hashlib, hmac, ipaddress, json, os, re, ssl, sys, unicodedata, urllib.request, urllib.parse, time, secrets, threading
+import hashlib, hmac, ipaddress, json, math, os, re, ssl, sys, unicodedata, urllib.request, urllib.parse, time, secrets, threading
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -76,6 +76,7 @@ RULE_POST_MAX_SECONDS = 90
 RULE_CREATE_BODY_MAX_BYTES = 4 * 1024 * 1024  # Includes JSON escaping of a 512 KiB diff.
 _LOCK = threading.Lock()
 KST = timezone(timedelta(hours=9), "KST")
+MANAGEMENT_OUTBOX_ERROR = False  # Missing transitions must not look like a healthy empty stream.
 
 
 def _req(url, user=None, pw=None, data=None, headers=None, method=None):
@@ -123,7 +124,7 @@ def recent_alerts(minutes=15, min_level=5, size=200):
         s = h["_source"]; r = s.get("rule", {}); d = s.get("data", {})
         rows.append({"ts": _alert_time_kst(s.get("timestamp", "")), "id": r.get("id"), "level": r.get("level"),
                      "desc": r.get("description", ""), "agent": s.get("agent", {}).get("name", ""),
-                     "srcip": d.get("srcip") or (d.get("transaction") or {}).get("client_ip", ""),
+                     "srcip": d.get("src_ip") or d.get("srcip") or (d.get("transaction") or {}).get("client_ip", ""),
                      "groups": r.get("groups", [])})
     return rows, None
 
@@ -177,32 +178,26 @@ def vuln_count(agent="groot-web"):
 
 
 def build_summary(hours=12):
-    """정기 상태 요약 — 이상 없어도 항상 payload 반환(정상이면 초록)."""
+    """Telemetry only: lookup failures and empty results are not SOC judgments."""
     mins = hours * 60
-    ag, _ = list_agents()
+    ag, agent_error = list_agents()
     act = sum(1 for x in (ag or []) if x[2] == "active"); tot = len(ag or [])
     disc = [x[1] for x in (ag or []) if x[2] != "active"]
-    agg, _ = agg_alerts(mins, min_level=5)
-    total = (agg or {}).get("total", 0)
+    agg, alert_error = agg_alerts(mins, min_level=5)
+    total = agg.get("total") if agg is not None and not alert_error else None
     vc = vuln_count("groot-web")
-    if total == 0 and not disc:
-        color, status = "#28a745", "🟢 이상 없음"
-    elif total >= 20 or disc:
-        color, status = "#d24b4b", "🔴 주의"
-    else:
-        color, status = "#e0a800", "🟡 관찰"
-    fields = [{"short": True, "title": "에이전트", "value": "%d/%d active%s" % (act, tot, (" ⚠%s" % ",".join(disc)) if disc else "")},
-              {"short": True, "title": "경보(level≥5, %dh)" % hours, "value": str(total)}]
+    unavailable = bool(agent_error or ag is None or alert_error or agg is None or vc is None)
+    color, status = ("#e0a800", "일부 조회 실패") if unavailable else ("#439fe0", "수집 현황")
+    fields = [{"short": True, "title": "에이전트", "value": "조회 실패" if agent_error or ag is None else "%d/%d active%s" % (act, tot, (" · 비활성: %s" % ",".join(disc)) if disc else "")},
+              {"short": True, "title": "경보(level≥5, %dh)" % hours, "value": str(total) if total is not None else "조회 실패"}]
     if agg and agg.get("rules"):
         fields.append({"short": False, "title": "상위 규칙", "value": "\n".join("• %s — %d" % (k, v) for k, v in agg["rules"][:5])})
     if agg and agg.get("src"):
         fields.append({"short": True, "title": "출처 IP", "value": "\n".join("%s(%d)" % (k, v) for k, v in agg["src"][:5]) or "-"})
-    if vc is not None:
-        fields.append({"short": True, "title": "취약점(groot-web)", "value": str(vc)})
-    text = "정기 상태 요약 — %s. 최근 %dh: level≥5 경보 %d건. %s" % (
-        status, hours, total, "추가 조치 없음(정상)" if (total == 0 and not disc) else "상세: 대시보드 / `/soc alerts`")
+    fields.append({"short": True, "title": "취약점(groot-web)", "value": str(vc) if vc is not None else "조회 실패"})
+    text = "정기 수집 현황 — %s. 최근 %dh의 조회 결과입니다. 위험도·오탐·대응 필요성은 LLM 관리 에이전트가 근거를 조회해 판단합니다. 경보 0건은 정상 판정이 아닙니다." % (status, hours)
     return {"username": "SOC-Agent", "attachments": [{"color": color, "title": "%s · SOC 정기 상태 요약" % status,
-            "text": text, "fields": fields, "footer": "capstone SOC agent (정기)", "ts": int(time.time())}]}
+            "text": text, "fields": fields, "footer": "capstone SOC telemetry (정기)", "ts": int(time.time())}]}
 
 
 def post_mm(payload):
@@ -215,6 +210,36 @@ def post_mm(payload):
         return False, str(e)
 
 
+def _post_approval_card(kind, rid, rec, payload, expires_at):
+    if CARD_CLEANUP_ERROR:
+        return False, "approval card tracking unavailable"
+    if CARD_CLEANUP is None:
+        return post_mm(payload)
+    try:
+        return CARD_CLEANUP.post(kind, rid, rec, payload, math.ceil(expires_at))
+    except Exception:
+        print("approval_card_cleanup posting_unavailable", file=sys.stderr, flush=True)
+        return False, "approval card tracking unavailable"
+
+
+def _card_event(event, kind, rid, rec, body=None):
+    """No network calls here; a decision is protected durably before acceptance."""
+    if CARD_CLEANUP_ERROR:
+        return False
+    if CARD_CLEANUP is None:
+        return True
+    try:
+        if event == "pending":
+            return CARD_CLEANUP.pending(kind, rid)
+        if event == "expire":
+            return CARD_CLEANUP.expire(kind, rid, rec)
+        if event in ("decision", "protect"):
+            return CARD_CLEANUP.protect(kind, rid, body=body, allow_absent=event == "protect")
+    except Exception:
+        print("approval_card_cleanup ledger_unavailable", file=sys.stderr, flush=True)
+    return False
+
+
 def build_report(minutes):
     """payload dict | None(조용: 경보 0 → 게시 안 함) | {'error':...}"""
     agg, err = agg_alerts(minutes)
@@ -222,24 +247,22 @@ def build_report(minutes):
         return {"error": err}
     if not agg or agg.get("total", 0) == 0:
         return None
-    rows, _ = recent_alerts(minutes, size=5)
+    rows, rows_error = recent_alerts(minutes, size=5)
+    if rows_error:
+        return {"error": "경보 집계 조회 성공, 상세 경보 조회 실패; 분석 결과를 생성하지 않았습니다."}
     fields = []
     if agg["rules"]:
         fields.append({"short": False, "title": "탐지 규칙(상위)", "value": "\n".join("• %s — %d건" % (k, v) for k, v in agg["rules"])})
     if agg["src"]:
-        fields.append({"short": True, "title": "공격 출처 IP", "value": "\n".join("%s (%d)" % (k, v) for k, v in agg["src"]) or "-"})
+        fields.append({"short": True, "title": "관측 출처 IP", "value": "\n".join("%s (%d)" % (k, v) for k, v in agg["src"]) or "-"})
     if agg["agent"]:
         fields.append({"short": True, "title": "영향 자산", "value": "\n".join("%s (%d)" % (k, v) for k, v in agg["agent"]) or "-"})
     sample = "\n".join("`%s` id=%s lv%s %s [%s]" % (r["ts"], r["id"], r["level"], r["desc"][:50], r["srcip"]) for r in rows[:5])
-    # 대응 판단(정책): 출처가 내부/관리 대역이면 자동차단 보류
-    srcs = [k for k, _ in agg["src"]]
-    internal = [s for s in srcs if s.startswith(("10.", "192.168.16.", "192.168.15."))]
-    resp = ("자동 차단 보류: 출처(%s)가 내부/관리 대역(never_block) — 분석가 확인 요망." % ", ".join(internal)) if internal \
-        else "권고: 외부 출처 → 응답도구로 차단 검토(`agent_block`/응답 MCP)."
-    text = ("**조사 요약** (최근 %d분, level>=5 경보 %d건)\n%s\n\n**대응**: %s" % (minutes, agg["total"], sample, resp))
+    text = ("**경보 조회 자료** (최근 %d분, level>=5 경보 %d건)\n%s\n\n"
+            "이 자료는 집계·표본입니다. 위험도·오탐·대응 필요성은 LLM 관리 에이전트가 추가 근거와 현재 상태를 조회해 판단합니다." % (minutes, agg["total"], sample))
     return {"username": "SOC-Agent",
-            "attachments": [{"color": "#d24b4b", "title": "🔴 SOC 인시던트 보고", "text": text, "fields": fields,
-                             "footer": "capstone SOC agent", "ts": int(time.time())}]}
+            "attachments": [{"color": "#439fe0", "title": "SOC 경보 조회 자료", "text": text, "fields": fields,
+                             "footer": "capstone SOC telemetry", "ts": int(time.time())}]}
 
 
 # ---- Tier 2 승인 브로커 ----
@@ -247,6 +270,7 @@ def _expire_locked():
     now = time.time()
     for rid, r in list(APPROVALS.items()):
         if r["status"] in ("posting", "pending", "approved") and now - r["ts"] >= APPROVAL_TTL:
+            _card_event("expire", "legacy", rid, r)
             r["status"] = "expired"
         if r["status"] not in ("posting", "pending", "approved") and now - r["ts"] > APPROVAL_TTL + 3600:
             del APPROVALS[rid]
@@ -298,11 +322,11 @@ def approval_create(req):
             (by, ip, operation, action, reason, rid, APPROVAL_TTL // 60))
     payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800", "title": "⚠️ %s 승인 요청 (HITL Tier 2)" % operation, "text": text,
                "actions": [act("승인", "approve", "primary"), act("거부", "deny", "danger")], "footer": "capstone SOC HITL", "ts": int(time.time())}]}
-    posted, _ = post_mm(payload)
+    posted, _ = _post_approval_card("legacy", rid, rec, payload, rec["ts"] + APPROVAL_TTL)
     with _LOCK:
         _expire_locked()
         if rec["status"] == "posting":
-            rec["status"] = "pending" if posted else "error"
+            rec["status"] = "pending" if posted and _card_event("pending", "legacy", rid, rec) else "error"
         ok = posted and rec["status"] == "pending"
     return rid, ok, "ok" if ok else "approval card failed or expired; approval is disabled"
 
@@ -324,6 +348,8 @@ def approval_action(body, peer_ip):
             return {"ephemeral_text": "알 수 없거나 만료된 승인 요청입니다."}
         if rec["status"] != "pending":
             return {"ephemeral_text": "이미 처리됨: %s (by %s)" % (rec["status"], rec["by"])}
+        if not _card_event("decision", "legacy", rid, rec, body):
+            return {"ephemeral_text": "승인 카드 식별 또는 결정 보존을 확인하지 못했습니다. 결정은 반영되지 않았습니다."}
         rec["status"] = "approved" if decision == "approve" else "denied"
         rec["by"] = uid; rec["decided_ts"] = time.time(); st = rec["status"]
     label = "✅ 승인됨" if st == "approved" else "❌ 거부됨"
@@ -357,6 +383,8 @@ def approval_consume(req):
             return {"error": "approval not found"}, 404
         if rec["status"] != "approved" or any(req[key] != rec[key] for key in ("action", "ip", "minutes")):
             return {"error": "approval is not approved or binding differs"}, 409
+        if not _card_event("protect", "legacy", rid, rec):
+            return {"error": "approval card state unavailable"}, 503
         rec["status"] = "consumed"
         rec["consumed_ts"] = time.time()
         return _approval_public(rid, rec), 200
@@ -400,12 +428,34 @@ def _rule_audit(event, rid, rec):
            "proposal_digest": rec["proposal_digest"], "status": rec["status"],
            "approver_id": rec["by"], "at": int(time.time())}
     print("rule_change_audit " + json.dumps(row, sort_keys=True), file=sys.stderr, flush=True)
+    _management_transition("rule_change", event, rid, rec)
+
+
+def _management_transition(kind, event, identity, rec):
+    """Metadata only, bounded durable append under the existing broker lock."""
+    global MANAGEMENT_OUTBOX_ERROR
+    payload = {"proposal_id" if kind == "rule_change" else "request_id": identity,
+               "target": rec["target"], "status": rec["status"],
+               "result_status": rec.get("result_status", ""),
+               "proposal_digest": rec["proposal_digest"], "event": event}
+    key = kind + ":" + hashlib.sha256(_management_module.canonical(payload).encode()).hexdigest()
+    try:
+        _management_module.Outbox().append(key, kind, payload)
+    except Exception as exc:
+        MANAGEMENT_OUTBOX_ERROR = True
+        # A notification failure cannot grant, revoke or replay an approval.
+        # Keep the existing journal audit; the controller treats outbox failure
+        # as unavailable, never as an empty successful incident stream.
+        print("management_outbox_error " + json.dumps({"event_key": key, "kind": kind, "payload": payload,
+              "error_type": type(exc).__name__, "approval_authority_unchanged": True}, sort_keys=True),
+              file=sys.stderr, flush=True)
 
 
 def _rule_expire_locked():
     now = time.time()
     for rid, rec in list(RULE_APPROVALS.items()):
         if rec["status"] in ("posting", "pending", "approved") and now >= rec["expires_at"]:
+            _card_event("expire", "rule", rid, rec)
             rec["status"] = "expired"
             rec["decided_ts"] = now
             _rule_audit("expired", rid, rec)
@@ -587,7 +637,7 @@ def rule_change_create(req):
         offset = end
     if not ready_to_post():
         return failed_post()
-    posted, _ = post_mm(payload)
+    posted, _ = _post_approval_card("rule", rid, rec, payload, rec["expires_at"])
     if not posted or not ready_to_post():
         return failed_post()
     with _LOCK:
@@ -599,6 +649,10 @@ def rule_change_create(req):
                 rec["decided_ts"] = time.time()
                 _rule_audit("post_timeout", rid, rec)
             return {"error": "proposal expired or review posting timed out; approval is disabled"}, 502
+        if not _card_event("pending", "rule", rid, rec):
+            rec["status"] = "error"
+            _rule_audit("post_error", rid, rec)
+            return {"error": "approval card tracking failed; approval is disabled"}, 502
         rec["status"] = "pending"
         _rule_audit("created", rid, rec)
     return {"proposal_id": rid, "proposal_digest": digest, "expires_at": req["expires_at"],
@@ -629,6 +683,8 @@ def rule_change_action(body, peer_ip):
                 not secrets.compare_digest(nonce, rec["nonce"]) or \
                 not secrets.compare_digest(digest, rec["proposal_digest"]):
             return {"ephemeral_text": "인증되지 않은 승인 요청입니다."}
+        if not _card_event("decision", "rule", rid, rec, body):
+            return {"ephemeral_text": "승인 카드 식별 또는 결정 보존을 확인하지 못했습니다. 결정은 반영되지 않았습니다."}
         rec["status"] = "approved" if decision == "approve" else "denied"
         rec["by"] = uid
         rec["decided_ts"] = time.time()
@@ -663,6 +719,8 @@ def rule_change_consume(rid, req):
             return {"error": "proposal is not approved"}, 409
         if not secrets.compare_digest(req["proposal_digest"], rec["proposal_digest"]):
             return {"error": "proposal digest mismatch"}, 409
+        if not _card_event("protect", "rule", rid, rec):
+            return {"error": "approval card state unavailable"}, 503
         rec["status"] = "consumed"
         rec["decided_ts"] = time.time()
         _rule_audit("consumed", rid, rec)
@@ -698,6 +756,8 @@ def rule_change_abort(rid, req):
             return {"error": "proposal was not approved or approval was consumed"}, 409
         if rec.get("result_attempts", 0) >= 3:
             return {"error": "abort card retries exhausted"}, 429
+        if not _card_event("protect", "rule", rid, rec):
+            return {"error": "approval card state unavailable"}, 503
         rec["status"] = "abort_reporting"
         rec["abort_request_digest"] = digest
         rec["result_attempts"] = rec.get("result_attempts", 0) + 1
@@ -762,6 +822,8 @@ def rule_change_result(rid, req):
             return {"error": "approval not consumed or result is in progress"}, 409
         if rec.get("result_attempts", 0) >= 3:
             return {"error": "result card retries exhausted"}, 429
+        if not _card_event("protect", "rule", rid, rec):
+            return {"error": "approval card state unavailable"}, 503
         rec["status"] = "reporting"   # reserve the one result slot before external post
         rec["result_request_digest"] = result_digest
         rec["result_attempts"] = rec.get("result_attempts", 0) + 1
@@ -802,8 +864,68 @@ def recent_fingerprint(minutes=60, min_level=10, n=5):
         s = h["_source"]; r = s.get("rule", {}); d = s.get("data", {})
         out.append({"ts": s.get("timestamp", ""), "ts_kst": _alert_time_kst(s.get("timestamp", "")),
                     "id": r.get("id"), "level": r.get("level"), "agent": s.get("agent", {}).get("name", ""),
-                    "srcip": d.get("srcip") or (d.get("transaction") or {}).get("client_ip", ""), "desc": r.get("description", "")[:60]})
+                    "srcip": d.get("src_ip") or d.get("srcip") or (d.get("transaction") or {}).get("client_ip", ""), "desc": r.get("description", "")[:60]})
     return {"latest": out}
+
+
+def management_alerts(minutes=5, limit=500):
+    """Bounded telemetry; retain real index identity, never fabricate an ID."""
+    if type(minutes) is not int or not 1 <= minutes <= 60 or type(limit) is not int or not 1 <= limit <= 500:
+        raise ValueError("invalid_alert_window")
+    body = {"size": limit, "track_total_hits": True, "sort": [{"timestamp": "asc"}],
+            "query": {"bool": {"filter": [
+                {"range": {"timestamp": {"gte": "now-%dm" % minutes, "lte": "now"}}},
+                {"range": {"rule.level": {"gte": 9}}}]}},
+            "_source": ["id", "timestamp", "agent.id", "agent.name", "rule.id", "rule.level", "rule.description",
+                        "data.src_ip", "data.srcip", "data.transaction.client_ip", "location"]}
+    response = idx_search("wazuh-alerts-*", body)
+    shards = response.get("_shards", {})
+    if (response.get("timed_out") is not False or type(shards.get("failed")) is not int or shards["failed"] != 0
+            or type(shards.get("total")) is not int or type(shards.get("successful")) is not int
+            or shards["total"] < 0 or shards["successful"] != shards["total"]):
+        raise ValueError("indexer_partial_or_invalid_response")
+    hits = response["hits"]
+    total = hits["total"]
+    if (type(total) is not dict or type(total.get("value")) is not int or total["value"] < 0
+            or total.get("relation") not in ("eq", "gte") or type(hits.get("hits")) is not list
+            or len(hits["hits"]) > limit or total["value"] < len(hits["hits"])):
+        raise ValueError("indexer_invalid_total")
+
+    def bounded(value, maximum, empty=True):
+        if not isinstance(value, str) or (not empty and not value) or len(value) > maximum or any(ord(c) < 32 for c in value):
+            raise ValueError("indexer_invalid_identity_or_field")
+        return value
+
+    rows = []
+    identities = set()
+    for hit in hits["hits"]:
+        index, identity = bounded(hit["_index"], 255, False), bounded(hit["_id"], 512, False)
+        if not index.startswith("wazuh-alerts-") or (index, identity) in identities:
+            raise ValueError("indexer_invalid_or_duplicate_identity")
+        identities.add((index, identity))
+        source = hit["_source"]
+        agent, rule, data = source.get("agent", {}), source.get("rule", {}), source.get("data", {})
+        if not all(type(v) is dict for v in (source, agent, rule, data)):
+            raise ValueError("indexer_invalid_source")
+        level = rule.get("level")
+        if type(level) is not int or not 9 <= level <= 16:
+            raise ValueError("indexer_invalid_rule_level")
+        transaction = data.get("transaction") or {}
+        if type(transaction) is not dict:
+            raise ValueError("indexer_invalid_transaction")
+        source_ip = bounded(data.get("src_ip") or data.get("srcip") or transaction.get("client_ip") or "", 64)
+        if source_ip:
+            ipaddress.ip_address(source_ip)
+        description = rule.get("description", "")
+        if not isinstance(description, str):
+            raise ValueError("indexer_invalid_description")
+        rows.append({"_index": index, "_id": identity, "event_id": bounded(source.get("id", ""), 128),
+                     "timestamp": bounded(source["timestamp"], 64, False), "location": bounded(source.get("location", ""), 1024),
+                     "agent": {"id": bounded(agent.get("id", ""), 128), "name": bounded(agent.get("name", ""), 128)},
+                     "rule": {"id": bounded(rule["id"], 128, False), "level": level},
+                     "src_ip": source_ip, "description": description[:512]})
+    return {"alerts": rows, "total": total["value"], "total_relation": total["relation"],
+            "truncated": total["relation"] != "eq" or total["value"] > len(rows)}
 
 
 # ---- serve (Mattermost slash command) ----
@@ -856,6 +978,7 @@ def _operation_audit(event, rec):
            "target": rec["target"], "proposal_digest": rec["proposal_digest"],
            "status": rec["status"], "approver_id": rec["by"], "at": int(time.time())}
     print("operation_approval_audit " + json.dumps(row, sort_keys=True), file=sys.stderr, flush=True)
+    _management_transition("operation", event, rec["request_id"], rec)
 
 
 # Load only the adjacent deployed module, independent of the caller's import path.
@@ -864,9 +987,41 @@ _operations_spec = _import_util.spec_from_file_location(
     "capstone_operations_approval", os.path.join(os.path.dirname(os.path.abspath(__file__)), "operations_approval.py"))
 _operations_module = _import_util.module_from_spec(_operations_spec)
 _operations_spec.loader.exec_module(_operations_module)
+_management_spec = _import_util.spec_from_file_location(
+    "capstone_soc_management_events", os.path.join(os.path.dirname(os.path.abspath(__file__)), "soc_management_events.py"))
+_management_module = _import_util.module_from_spec(_management_spec)
+_management_spec.loader.exec_module(_management_module)
+CARD_CLEANUP, CARD_CLEANUP_ERROR = None, False
+if os.environ.get("SOC_APPROVAL_CARD_CLEANUP", "") == "1":
+    try:
+        _cleanup_spec = _import_util.spec_from_file_location("capstone_approval_card_cleanup",
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "approval_card_cleanup.py"))
+        _cleanup_module = _import_util.module_from_spec(_cleanup_spec)
+        _cleanup_spec.loader.exec_module(_cleanup_module)
+        CARD_CLEANUP = _cleanup_module.configured()
+    except Exception:
+        CARD_CLEANUP_ERROR = True
+        print("approval_card_cleanup configuration_unavailable", file=sys.stderr, flush=True)
 OPERATIONS = _operations_module.OperationsBroker(
     post=lambda payload: post_mm(payload), enabled=_rule_enabled, source_ok=_rule_source_ok,
-    approvers=lambda: RULE_APPROVERS, action_url=lambda: MM_ACTION_URL, audit=_operation_audit)
+    approvers=lambda: RULE_APPROVERS, action_url=lambda: MM_ACTION_URL, audit=_operation_audit,
+    post_card=lambda rec, payload: _post_approval_card("operation", rec["request_id"], rec, payload, rec["expires_at"]),
+    card_state=lambda event, rec, body=None: _card_event(event, "operation", rec["request_id"], rec, body))
+
+
+def _approval_card_cleanup_worker(stop):
+    while not stop.wait(5):
+        try:
+            with _LOCK:
+                _expire_locked()
+                _rule_expire_locked()
+            with OPERATIONS.lock:
+                OPERATIONS._expire_locked()
+            outcomes = CARD_CLEANUP.cleanup_once()
+            if outcomes:
+                print("approval_card_cleanup " + json.dumps({"outcomes": outcomes}), file=sys.stderr, flush=True)
+        except Exception:
+            print("approval_card_cleanup worker_unavailable", file=sys.stderr, flush=True)
 
 
 def _rule_health_counts():
@@ -899,7 +1054,8 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers(); self.wfile.write(b)
     def _body(self):
         n = int(self.headers.get("Content-Length", 0) or 0)
-        limit = RULE_CREATE_BODY_MAX_BYTES if urllib.parse.urlparse(self.path).path == "/rule-changes" else 1 << 20
+        path = urllib.parse.urlparse(self.path).path
+        limit = RULE_CREATE_BODY_MAX_BYTES if path == "/rule-changes" else 4096 if path == "/management/incidents" else 1 << 20
         if not 0 <= n <= limit:
             raise ValueError("invalid request length")
         self._request_body_bytes = self.rfile.read(n) if n else b""
@@ -939,6 +1095,39 @@ class Handler(BaseHTTPRequestHandler):
         return True
     def do_GET(self):
         u = urllib.parse.urlparse(self.path); q = urllib.parse.parse_qs(u.query)
+        if u.path in ("/management/events", "/management/alerts"):
+            if not self._rule_auth("GET"):
+                return
+            try:
+                q = urllib.parse.parse_qs(u.query, keep_blank_values=True, strict_parsing=True)
+                keys = {"after", "limit"} if u.path.endswith("events") else {"minutes", "limit"}
+                if set(q) - keys or any(len(v) != 1 or not re.fullmatch(r"[0-9]{1,19}", v[0]) for v in q.values()):
+                    raise ValueError("invalid_query")
+                if u.path.endswith("events"):
+                    after, limit = int(q.get("after", ["0"])[0]), int(q.get("limit", ["100"])[0])
+                    if not 0 <= after <= 2**63 - 1 or not 1 <= limit <= 100:
+                        raise ValueError("invalid_query")
+                else:
+                    minutes, limit = int(q.get("minutes", ["5"])[0]), int(q.get("limit", ["500"])[0])
+                    if not 1 <= minutes <= 60 or not 1 <= limit <= 500:
+                        raise ValueError("invalid_query")
+            except ValueError:
+                return self._json({"error": "invalid_management_query"}, 400)
+            try:
+                if u.path.endswith("events"):
+                    with _LOCK:
+                        _rule_expire_locked()
+                    with OPERATIONS.lock:
+                        OPERATIONS._expire_locked()
+                    if MANAGEMENT_OUTBOX_ERROR:
+                        raise _management_module.OutboxError("outbox_transition_gap_requires_reconciliation")
+                    result = _management_module.Outbox().read(after, limit)
+                else:
+                    result = management_alerts(minutes, limit)
+            except Exception as exc:
+                print("management_read_error " + json.dumps({"path": u.path, "error_type": type(exc).__name__}), file=sys.stderr, flush=True)
+                return self._json({"error": "management_source_unavailable"}, 503)
+            return self._json(result)
         if u.path == "/rule-changes/health":
             if not self._rule_auth("GET"):
                 return
@@ -989,6 +1178,34 @@ class Handler(BaseHTTPRequestHandler):
             raw = self._body()
         except (ValueError, TimeoutError):
             return self._json({"error": "invalid or incomplete request body"}, 400)
+        if u.path == "/management/incidents":
+            if not self._rule_auth("POST", self._request_body_bytes):
+                return
+            try:
+                def unique_pairs(pairs):
+                    result = {}
+                    for key, value in pairs:
+                        if key in result:
+                            raise ValueError("duplicate_key")
+                        result[key] = value
+                    return result
+                if u.query:
+                    raise ValueError("unexpected_query")
+                req = json.loads(raw, object_pairs_hook=unique_pairs)
+                event_key, payload = _management_module.incident_event(req)
+            except (ValueError, TypeError, OverflowError):
+                return self._json({"error": "invalid_management_incident"}, 400)
+            try:
+                seq = _management_module.Outbox().append(event_key, "incident", payload)
+            except _management_module.OutboxError as exc:
+                if str(exc) == "outbox_event_key_conflict":
+                    return self._json({"error": "incident_identity_conflict"}, 409)
+                print("management_write_error " + json.dumps({"error_type": type(exc).__name__}), file=sys.stderr, flush=True)
+                return self._json({"error": "management_outbox_unavailable"}, 503)
+            except Exception as exc:
+                print("management_write_error " + json.dumps({"error_type": type(exc).__name__}), file=sys.stderr, flush=True)
+                return self._json({"error": "management_outbox_unavailable"}, 503)
+            return self._json({"queued": True, "event_key": event_key, "seq": seq})
         if u.path == "/operations" or re.fullmatch(r"/operations/[0-9a-f]{32}/(?:consume|result)", u.path):
             if not self._rule_auth("POST", self._request_body_bytes):
                 return
@@ -1100,7 +1317,15 @@ def main():
         ok, d = post_mm(build_summary(h)); print("summary posted:" if ok else "failed:", d); sys.exit(0 if ok else 1)
     if mode == "serve":
         host, port = LISTEN.split(":"); srv = ThreadingHTTPServer((host, int(port)), Handler)
-        print("soc_bot serve on %s" % LISTEN, file=sys.stderr); srv.serve_forever()
+        stop = threading.Event()
+        if CARD_CLEANUP is not None:
+            threading.Thread(target=_approval_card_cleanup_worker, args=(stop,), daemon=True,
+                             name="approval-card-cleanup").start()
+        print("soc_bot serve on %s" % LISTEN, file=sys.stderr)
+        try:
+            srv.serve_forever()
+        finally:
+            stop.set()
     print(__doc__)
 
 

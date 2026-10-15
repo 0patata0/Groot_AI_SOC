@@ -1,0 +1,5 @@
+name: groot-mattermost-context
+version: 1.0.0
+description: Bounded read-only Mattermost thread context for authorized gateway requests
+provides_hooks:
+  - pre_gateway_dispatch

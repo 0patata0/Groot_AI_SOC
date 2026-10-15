@@ -131,6 +131,31 @@ class PolicyPatchTest(unittest.TestCase):
             self.update()
         self.assertEqual(self.logical_db(), before)
 
+    def test_management_replaces_both_blocks_and_disables_old_cron(self):
+        start, end = '<!-- bounded-operations-policy:start -->', '<!-- bounded-operations-policy:end -->'
+        old, new = start+'\nold bounded\n'+end, start+'\nLLM decides\n'+end
+        self.source.write_text(self.source.read_text() + '\n' + new)
+        soul = self.data / 'SOUL.md'
+        soul.write_text(soul.read_text() + '\n' + old)
+        with sqlite3.connect(self.data / 'state.db') as db:
+            prompt = db.execute('SELECT prompt FROM system_prompts').fetchone()[0] + '\n' + old
+            digest = m.sha(prompt.encode())
+            db.execute('INSERT INTO system_prompts VALUES(?,?)', (digest, prompt))
+            db.execute('UPDATE sessions SET system_prompt_hash=?', (digest,))
+        prompt_file = self.root / 'prompt'
+        prompt_file.write_text('LLM management policy. ' * 10)
+        result = self.update(management_prompt=prompt_file)
+        self.assertTrue(result['unrelated_tables_unchanged'])
+        self.assertIn(new, soul.read_text())
+        jobs = json.loads((self.data / 'cron/jobs.json').read_text())['jobs']
+        self.assertFalse(jobs[0]['enabled'])
+        self.assertEqual(jobs[0]['id'], 'preserved')
+        self.assertEqual(jobs[0]['prompt'], prompt_file.read_text())
+        with sqlite3.connect(self.data / 'state.db') as db:
+            current = db.execute('SELECT p.prompt FROM sessions s JOIN system_prompts p ON p.hash=s.system_prompt_hash').fetchone()[0]
+            self.assertIn(new, current)
+            self.assertNotIn(old, current)
+
 
 if __name__ == '__main__':
     unittest.main()

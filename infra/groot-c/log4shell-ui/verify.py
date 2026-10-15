@@ -219,8 +219,11 @@ class Verifier:
         body = response.body
         csrf = body.get("csrf") if isinstance(body, dict) else None
         cookie_list = list(self.cookies)
+        secure = urllib.parse.urlsplit(self.base).scheme == "https"
+        cookie_name = "__Secure-groot_log4shell_ui_https" if secure else "groot_log4shell_ui_http"
         session_ok = any(
-            c.name == "groot_log4shell_ui"
+            c.name == cookie_name
+            and c.secure == secure
             and c.path == "/log4shell/"
             and c.has_nonstandard_attr("HttpOnly")
             and str(c.get_nonstandard_attr("SameSite", "")).lower() == "strict"

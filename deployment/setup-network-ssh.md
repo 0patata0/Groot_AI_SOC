@@ -106,6 +106,8 @@ Hermes 컨테이너@siem ── siem 자신의 SSH 포트 ── 읽기 MCP
 
 Log4Shell 앱의8080은 service 내부 Docker `lab` 네트워크에서만 사용합니다. 해당 네트워크는 `internal: true`이며 앱의 호스트 포트는 게시하지 않습니다. 기존 WAF 포트의 `/log4shell/`로 UI를 이용하므로 새 외부8080 허용이나 DNAT 토글이 필요하지 않습니다. UI→앱 내부 통신은 security 감시 NIC를 지나지 않으며, UI 정상 응답은 공격 탐지 검증과 구분합니다.
 
+Log4Shell에 별도 HTTP 이름을 쓰려면 `LOG4SHELL_HOSTNAME`을 설정하기 전에 관리자가 DNS 또는 클라이언트 hosts에 해당 이름→`SECURITY_HOST`를 준비합니다. 예를 들어 문서용 주소라면 `192.0.2.10 log4shell.example.org`이며 실제 환경의 할당 주소로 바꿉니다. 설치기는 DNS/hosts를 수정하지 않습니다. 접속은 `http://호스트명:WAF_PORT/`이고 포트80만 생략합니다. 이름을 준비하지 않았으면 설정을 비워 두고 기존 IP `/log4shell/` 경로를 사용합니다. 인증서·HTTPS·별도 앱 포트 개방은 이 선택값으로 추가되지 않습니다.
+
 다음은 **접근 정책을 작성할 때의 허용 관계**입니다. 현재 설치기가 방화벽에 이 표를 자동 반영하는 것은 아닙니다.
 
 | 출발지 → 목적지 | TCP 포트 | 용도·범위 |

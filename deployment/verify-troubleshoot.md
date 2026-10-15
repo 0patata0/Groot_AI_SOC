@@ -108,7 +108,7 @@ WAF 주소로 로그인하고 기본 보안 수준이 `impossible`인지 확인�
 
 ### Log4Shell 요청 UI 첫 사용
 
-**실행 위치: 승인된 실습 클라이언트의 브라우저.** 신규 환경은 `http://SECURITY_HOST:WAF_PORT/log4shell/`로 접속합니다. 기본 예시는 `http://192.0.2.10:8080/log4shell/`이고 기존 운영망의 `http://192.168.16.230/log4shell/`은 A:80 경로입니다. 서로 다른 배포 주소를 혼용하지 않습니다.
+**실행 위치: 승인된 실습 클라이언트의 브라우저.** 신규 환경은 `http://SECURITY_HOST:WAF_PORT/log4shell/`로 접속합니다. 기본 예시는 `http://192.0.2.10:8080/log4shell/`입니다. 선택 `LOG4SHELL_HOSTNAME=log4shell.example.org`를 지정했다면 `http://log4shell.example.org:8080/`가 같은 이름의 `/log4shell/`로302 이동하는지도 확인합니다. 포트80일 때만 포트를 생략합니다. 기존 운영망의 대표 `http://log4shell.grootlab.duckdns.org/`와 예비 `http://192.168.16.230/log4shell/`은 A:80 경로이며 서로 다른 배포 주소를 혼용하지 않습니다.
 
 1. 화면에서 고정 요청 대상이 신규 환경의 `http://log4shell:8080/`인지 확인합니다. 이 이름은 Docker 내부 DNS이므로 브라우저 주소창에 직접 입력하지 않습니다.
 2. 헤더 값 `1.0`을 두고 **정상 요청 보내기**를 한 번 누릅니다. 대상 HTTP200, 응답 본문·소요 시간·요청 ID가 표시돼야 합니다.
@@ -178,7 +178,7 @@ sudo sed -n "/^status=/p" /var/ossec/var/run/wazuh-agentd.state
 sudo docker exec capstone-service-dvwa apachectl -t
 ```
 
-DVWA와 MariaDB에 해당하는 `capstone-service-dvwa`, `capstone-service-db`는 `healthy`, Log4Shell 서비스는 실행 상태이며 UI의 정상/헤더 누락 요청에 응답해야 합니다. service manifest의 `schema`는 `2`, `state`와 phase는 `complete`여야 합니다. DB와 Log4Shell 앱의 호스트 포트 바인딩은 `{}` 또는 `null`, private/lab 네트워크는 `true`, Wazuh agent는 `active`/`connected`, Apache는 구문 정상이어야 합니다. 실제 DB의 계정·초기화 상태는 `--verify`가 확인합니다. 이전 service schema1은 자동 이관하지 않으므로 manifest 숫자만 고쳐 통과시키지 않습니다.
+DVWA와 MariaDB에 해당하는 `capstone-service-dvwa`, `capstone-service-db`는 `healthy`, Log4Shell 서비스는 실행 상태이며 UI의 정상/헤더 누락 요청에 응답해야 합니다. service manifest의 `schema`는 `3`, `state`와 phase는 `complete`여야 합니다. DB와 Log4Shell 앱의 호스트 포트 바인딩은 `{}` 또는 `null`, private/lab 네트워크는 `true`, Wazuh agent는 `active`/`connected`, Apache는 구문 정상이어야 합니다. 실제 DB의 계정·초기화 상태와 선택한 HTTP hostname의 루트·잘못된 DVWA 경로302와 UI200은 `--verify`가 확인합니다. DNS의 실제 클라이언트 해석은 별도 확인합니다. 이전 service schema1/2는 자동 이관하지 않으므로 manifest 숫자만 고쳐 통과시키지 않습니다.
 
 Log4Shell의 비공개 포트와 UI PHP 의존성을 추가 확인합니다. 출력은 지정된 메타데이터만 읽습니다.
 
@@ -278,6 +278,7 @@ curl --noproxy '*' --connect-timeout 5 --max-time 10 \
 | WAF `502`, backend 연결 실패 | security→service IP/포트/라우트, DVWA·DB health | 백엔드 연결부터 복구한 뒤 WAF 경유 GET 재검증 |
 | WAF 경유 DVWA `403` | service Apache가 보는 실제 TCP peer, security 출발지·NAT | 주소/라우팅을 의도한 구조에 맞춤. ACL을 전체 허용으로 바꾸어 통과시키지 않음 |
 | `/log4shell/` UI가404 또는 PHP 원문 표시 | UI 읽기 전용 마운트·Apache DocumentRoot/DirectoryIndex·PHP 처리 여부 | 설정·마운트와 준비 이미지를 확인. 소스를 공개 상태로 두거나 새 공개8080을 열어 우회하지 않음 |
+| Log4Shell 별도 이름만 실패하거나 DVWA가 나옴 | `LOG4SHELL_HOSTNAME`, DNS/hosts→security 주소, WAF 포트, 요청 Host 확인 | 빈 설정이면 IP `/log4shell/` 사용. 기존 배포의 hostname을 변경하려고 manifest만 수정하거나 역할을 덮어쓰지 않음 |
 | UI502/503, 고정 대상 연결 실패 | DVWA의 PHP8.1+/curl/session, lab 컨테이너 상태·내부 DNS·공유 lab 네트워크, 요청 제어 경로 권한 | 내부 경로와 준비 이미지부터 복구. 실행 중 패키지 설치나 임의 목적지 입력 기능 추가로 우회하지 않음 |
 | 헤더 누락 시험에서 대상400 | UI 응답의 대상 상태와 요청 모드 | 기대 결과. 정상 헤더 모드의200과 구분해 기록 |
 | UI429 또는 기록이 다른 장치에 없음 | 요청 간격·같은 브라우저 저장소 여부 | 1초 이상 기다려 재확인. 최근20개 로컬 기록과 SIEM 로그는 별개 |

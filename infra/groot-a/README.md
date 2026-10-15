@@ -1,5 +1,7 @@
 # Groot_A (groot-sec) — 보안 게이트웨이 구성 요약
 
+> 2026-10-15 14:33:38 KST 인증서 후속: 채팅·Log4Shell DuckDNS 이름이 공유하는 `*.grootlab.duckdns.org` Let's Encrypt 인증서를 A `chatduck.crt/key`에 적용하고 Nginx를 한 번 재로드했다. 만료는 **2027-01-13 13:25:12 KST**다. Mac의 시스템 CA 검증에서 채팅 ping200과 Log4Shell HTTPS 경로 최종200을 확인했다. 기본 Log4Shell 주소는 HTTP80으로 유지하고 HTTPS443은 선택 접근이다. 채팅 인증서 감시기는 동일 `chatduck.crt`의 만료를 읽고 수동 실행 exit0을 확인했지만 Log4Shell SNI는 주기 검사하지 않는다. 자동 갱신은 없으며 다음 재발급은 2026년 12월 중순에 준비한다.
+
 > 2026-10-15: 채팅 인증서 만료 감시를 A(매일09:00KST)에, 전용 XML 디코더·규칙100300~100305를 B에 적용·검증했다. 만료일2027-01-06 15:02:33KST, 갱신은 수동이다. [현재 구성·갱신 절차](certificate-monitor/README.md). 아래 기록은 해당 시점의 이력이다.
 
 ## 2026-10-15 02:15 KST 최신 상태 — 3단계 운영 검증·타이머 활성화 완료
@@ -123,14 +125,16 @@ sudo iptables -S CAPSTONE-FWD
 
 **2026-10-13 후속 확인:** 사용자가 Android·iOS 모두 인증서 인식·로그인·채팅 성공을 확인해 위 모바일 미검증 상태를 갱신했다. 남은 문제는 모바일 알림이며 인증서 재발급은 조치 대상이 아니다. 사용자는 프로젝트 서버의 푸시 복구를 추가 확인 없이 진행하도록 승인했다. 이후 11:49:12 KST A의 B→TPNS 한정 정책을 위와 같이 배포했으며 실제 수신 완료를 뜻하지 않는다. 최신 적용 상태와 상위 경로 확인 사항은 [B 운영 문서](../groot-b/README.md#모바일-푸시--dns-복구외부-https-경로-미확보-2026-10-13)를 따른다.
 
-ACME·DuckDNS HTTPS에 도달할 수 있는 장치에서 DNS-01 방식으로 `chat.grootlab.duckdns.org` 또는 `*.grootlab.duckdns.org` 인증서를 발급한다. A는 발급에 필요한 외부 HTTPS에 도달하지 못하므로, 발급된 `fullchain.pem`과 암호 없는 `privkey.pem`을 A에 안전하게 복사한 뒤 다음 명령을 A에서 실행한다. 개인키와 DuckDNS 토큰은 저장소에 넣지 않는다.
+**2026-10-15 와일드카드 발급·A 적용:** 기존 10/08 인증서는 채팅 이름만 포함해 Log4Shell HTTPS에는 재사용할 수 없었다. Mac에서 DuckDNS DNS-01로 `*.grootlab.duckdns.org` 한 이름을 새로 발급했고 채팅·Log4Shell 호스트명, 신뢰 체인, 개인키 일치를 확인했다. A의 공용 `chatduck.crt/key`에 배포하고 `chatproxy`의 Log4Shell 서버 블록도 같은 파일을 참조한다. Mac 시스템 CA 검증으로 채팅 `/api/v4/system/ping` 200과 Log4Shell HTTPS `/dvwa/login.php`→`/log4shell/` 최종 200을 확인했다. 배포 전 인증서는 `/var/backups/capstone-log4shell-tls/20261015T143336+0900`에 보존했다. 컨테이너 재생성·최종 Docker 네트워크 구성 변경 없이 Nginx 재로드 한 번으로 적용했으며 기존 게이트웨이와 다른 `CAPSTONE-FWD` 규칙은 유지했다. 내부 `*.groot.lab`과 Wazuh의 별도 인증서는 이 인증서의 적용 대상이 아니다. 기존 10/08 발급 기록은 당시 이력으로 유지한다.
+
+ACME·DuckDNS HTTPS에 도달할 수 있는 장치에서 DNS-01 방식으로 **`*.grootlab.duckdns.org` 한 이름**의 인증서를 발급한다. A는 발급에 필요한 외부 HTTPS에 도달하지 못하므로, 발급된 `fullchain.pem`과 암호 없는 `privkey.pem`을 A에 안전하게 복사한 뒤 다음 명령을 A에서 실행한다. 개인키와 DuckDNS 토큰은 저장소에 넣지 않는다. Mac에는 발급 도구·계정 상태를 영구 설치하지 않고 임시 전용 디렉터리를 배포 후 정리한다.
 
 ```bash
 sudo bash deploy_chatduck_cert_A.sh --check-only /root/certs/fullchain.pem /root/certs/privkey.pem
 sudo bash deploy_chatduck_cert_A.sh /root/certs/fullchain.pem /root/certs/privkey.pem
 ```
 
-`deploy_chatduck_cert_A.sh`는 호스트명 SAN·남은 유효기간·키 일치·신뢰 체인을 검증하고, 기존 `chatduck.crt/key`를 권한 제한 백업한 뒤 두 파일을 교체한다. 이어서 `nginx -t`, 재로드, 실제 SNI 인증서와 CA 검증을 사용하는 Mattermost ping을 확인하며, 실패하면 기존 파일을 복원하고 다시 재로드한다. `chat.groot.lab`·Wazuh 인증서 및 대시보드 허용목록은 건드리지 않는다. 갱신된 인증서도 같은 절차로 다시 배포해야 한다.
+`deploy_chatduck_cert_A.sh`는 채팅 호스트명 SAN·남은 유효기간·키 일치·신뢰 체인을 검증하고, 기존 `chatduck.crt/key`를 권한 제한 백업한 뒤 두 파일을 교체한다. 이어서 `nginx -t`, 재로드, 실제 채팅 SNI 인증서와 CA 검증 Mattermost ping을 확인하며, 실패하면 기존 파일을 복원하고 다시 재로드한다. **Log4Shell 이름과 HTTPS 응답은 이 스크립트의 자동 검증 범위가 아니므로 별도 확인**한다. `chat.groot.lab`·Wazuh 인증서 및 대시보드 허용목록은 건드리지 않는다. 갱신된 인증서도 같은 절차로 다시 배포해야 한다.
 
 스크립트의 체인 검증은 **A 호스트의 신뢰 저장소 기준**이다. 새 휴대폰의 접속 확인이나 인증서 갱신 후 검증은 A `192.168.16.230`에 도달하는 학교 내부 Wi-Fi에서 브라우저로 `https://chat.grootlab.duckdns.org/api/v4/system/ping`을 확인한 뒤 Mattermost 앱에 같은 채팅 서버 주소로 로그인하는 순서다. 기존 Android·iOS 성공은 위 10/13 사용자 확인을 따르며, 휴대폰 GlobalProtect 로그인 실패의 기술적 원인은 채팅 인증서 결과와 구분한다.
 
@@ -157,4 +161,4 @@ systemctl list-timers capstone-block-reaper.timer      # TTL 만료 감사 리�
 **2026-10-13 후속 결정 — 추후 발전과제로 보류:** 사용자는 학과망의 폐쇄적 정책 때문에 이중 SSL VPN이 호환되지 않을 가능성을 들어 프로젝트 SSL VPN 원격접속 시나리오를 현재 완료 범위에서 제외했다. 이는 사용자 판단에 따른 보류이며 실제 비호환을 확인한 결과는 아니다. VPN은 미구축, GlobalProtect와의 동시 연결은 미검증 상태로 남긴다. 모바일 푸시 복구도 같은 날 추후 발전과제로 분류했다. Android·iOS의 로그인·채팅 성공은 앞서 사용자가 확인했으나 푸시는 미복구이며 `SendPushNotifications=false`를 유지한다. 이번 결정으로 기존 A/B 설정·타이머는 변경하지 않고 추가 구축·활성화·수신 검증을 보류한다. 상위 방화벽 정책은 프로젝트에서 직접 변경할 수 없다.
 
 ## 포트 정리 (ens192 기준)
-22 SSH(허용된 관리 출발지·MCP 점프) · 80 WAF→DVWA · **443 chatproxy→B 채팅/대시보드**(이름 기반) · 8443 WAF TLS · 10443→B:443 대시보드 DNAT **룰 존재**(허용 소스 `192.168.16.0/25`; Kali에서의 실제 도달성 미검증). 9/28 채팅·대시보드 이름 기반 응답과 10/08 채팅 인증서 배포 후 HTTPS ping을 검증했다. Wazuh 대시보드는 학과망·VM세그먼트 허용, VPN 403 정책을 유지한다. 공격성 트래픽은 캠퍼스 VPN 경유 금지.
+22 SSH(허용된 관리 출발지·MCP 점프) · 80 WAF→DVWA/Log4Shell UI(이름 기반) · **443 chatproxy→채팅/대시보드/선택 Log4Shell HTTPS**(이름 기반) · 8443 WAF TLS · 10443→B:443 대시보드 DNAT **룰 존재**(허용 소스 `192.168.16.0/25`; Kali에서의 실제 도달성 미검증). 9/28 채팅·대시보드 이름 기반 응답, 10/08 채팅 인증서 배포 후 HTTPS ping, 10/15 공용 인증서로 채팅·Log4Shell HTTPS를 검증했다. Wazuh 대시보드는 학과망·VM세그먼트 허용, VPN 403 정책을 유지한다. 공격성 트래픽은 캠퍼스 VPN 경유 금지.

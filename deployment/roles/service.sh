@@ -54,6 +54,63 @@ docker_cmd(){ timeout --kill-after=3s 30s "$DOCKER" "$@"; }
 mark(){ printf '%s\n' "$1" >"$ROLE/phase.next"; sync "$ROLE/phase.next"; mv -T "$ROLE/phase.next" "$ROLE/phase"; sync "$ROLE"; }
 
 lab_reference(){ [[ $1 =~ ^([A-Za-z0-9][A-Za-z0-9._/:-]*@)?sha256:[a-f0-9]{64}$ ]]; }
+hostname_valid(){
+  local name=$1 label; local -a labels
+  [[ $name =~ ^[a-z0-9.-]+$ ]] || return 1
+  [[ ${#name} -le 253 && $name == *.* && $name != .* && $name != *. && $name != *..* ]] || return 1
+  IFS=. read -r -a labels <<<"$name"
+  for label in "${labels[@]}"; do [[ $label =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] || return 1; done
+  [[ ${labels[${#labels[@]}-1]} =~ [a-z] ]]
+}
+apache_document(){
+  cat <<EOF
+# Dedicated service deployment. Authorize the connection peer, not spoofable XFF.
+ServerName capstone-service
+<IfModule !remoteip_module>
+LoadModule remoteip_module /usr/lib/apache2/modules/mod_remoteip.so
+</IfModule>
+RemoteIPHeader X-Forwarded-For
+RemoteIPInternalProxy $SECURITY_HOST
+<VirtualHost *:80>
+DocumentRoot /var/www/html
+<Location "/">
+  Require expr "%{CONN_REMOTE_ADDR} == '$SECURITY_HOST' || %{CONN_REMOTE_ADDR} == '127.0.0.1' || %{CONN_REMOTE_ADDR} == '::1'"
+</Location>
+Alias /dvwa /var/www/html
+<Directory /var/www/html>
+  Options -Indexes
+  AllowOverride All
+  Require all granted
+</Directory>
+LogFormat "%a %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" capstone_combined
+CustomLog /var/log/capstone-service/access.log capstone_combined
+ErrorLog /var/log/capstone-service/error.log
+</VirtualHost>
+EOF
+  if [[ -n ${LOG4SHELL_HOSTNAME:-} ]]; then
+    hostname_valid "$LOG4SHELL_HOSTNAME" || die invalid_log4shell_hostname
+    local origin="http://$LOG4SHELL_HOSTNAME"
+    [[ ${WAF_PORT:-8080} == 80 ]] || origin="$origin:${WAF_PORT:-8080}"
+    cat <<EOF
+<VirtualHost *:80>
+ServerName $LOG4SHELL_HOSTNAME
+DocumentRoot /var/www/html
+RedirectMatch 302 "^/(?!log4shell/).*" "$origin/log4shell/"
+<Location "/">
+  Require expr "%{CONN_REMOTE_ADDR} == '$SECURITY_HOST' || %{CONN_REMOTE_ADDR} == '127.0.0.1' || %{CONN_REMOTE_ADDR} == '::1'"
+</Location>
+<Directory /var/www/html>
+  Options -Indexes
+  AllowOverride All
+  Require all granted
+</Directory>
+LogFormat "%a %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" capstone_combined
+CustomLog /var/log/capstone-service/access.log capstone_combined
+ErrorLog /var/log/capstone-service/error.log
+</VirtualHost>
+EOF
+  fi
+}
 ui_sources(){
   python3 -B - "$CAPSTONE_SOURCE" "${1:-manifest}" "${2:-}" <<'PY'
 import hashlib,json,os,pathlib,re,stat,sys
@@ -137,7 +194,7 @@ settings(){
   [[ $EUID == 0 && $(uname -m) == x86_64 ]] || die root_amd64_required
   [[ $(. /etc/os-release; printf '%s:%s' "$ID" "$VERSION_ID") == ubuntu:24.04 ]] || die ubuntu_24_04_required
   : "${CAPSTONE_ROOT:=/opt/capstone}" "${CAPSTONE_SOURCE:?uploaded_source_required}"
-  : "${SECURITY_HOST:?}" "${SIEM_HOST:?}" "${SERVICE_HOST:?}" "${WEB_BACKEND_PORT:=80}"
+  : "${SECURITY_HOST:?}" "${SIEM_HOST:?}" "${SERVICE_HOST:?}" "${WEB_BACKEND_PORT:=80}" "${WAF_PORT:=8080}" "${LOG4SHELL_HOSTNAME:=}"
   : "${DVWA_IMAGE:=ghcr.io/digininja/dvwa:latest}" "${MARIADB_IMAGE:=mariadb:10}"
   : "${LOG4SHELL_IMAGE:=ghcr.io/christophetd/log4shell-vulnerable-app@sha256:6f88430688108e512f7405ac3c73d47f5c370780b94182854ea2cddc6bd59929}"
   : "${WAZUH_CA_FILE:=/opt/capstone-prereqs/wazuh-root-ca.pem}"
@@ -146,6 +203,8 @@ settings(){
   [[ $SECURITY_HOST != "$SIEM_HOST" && $SECURITY_HOST != "$SERVICE_HOST" && $SIEM_HOST != "$SERVICE_HOST" ]] || die distinct_hosts_required
   [[ $WEB_BACKEND_PORT =~ ^[1-9][0-9]{0,4}$ ]] && ((WEB_BACKEND_PORT<=65535)) || die invalid_backend_port
   [[ $WEB_BACKEND_PORT != 22 && $WEB_BACKEND_PORT != 1514 && $WEB_BACKEND_PORT != 1515 ]] || die reserved_port
+  [[ $WAF_PORT =~ ^[1-9][0-9]{0,4}$ ]] && ((WAF_PORT<=65535)) || die invalid_waf_port
+  [[ -z $LOG4SHELL_HOSTNAME ]] || hostname_valid "$LOG4SHELL_HOSTNAME" || die invalid_log4shell_hostname
   for value in "$DVWA_IMAGE" "$MARIADB_IMAGE"; do [[ $value =~ ^[a-zA-Z0-9][a-zA-Z0-9._/:@-]+$ ]] || die invalid_image_reference; done
   lab_reference "$LOG4SHELL_IMAGE" || die log4shell_digest_or_image_id_required
   safe_path "$CAPSTONE_ROOT"; source_path
@@ -169,8 +228,8 @@ settings(){
   UI_INPUT=$(ui_sources manifest) || die invalid_log4shell_ui_sources
   INPUT=$(jq -cnS --arg root "$CAPSTONE_ROOT" --arg a "$SECURITY_HOST" --arg b "$SIEM_HOST" --arg c "$SERVICE_HOST" \
     --argjson port "$WEB_BACKEND_PORT" --arg app "$APP_ID" --arg db "$DB_ID" --arg lab "$LAB_ID" \
-    --arg labref "$LOG4SHELL_IMAGE" --argjson ui "$UI_INPUT" \
-    '{schema:2,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,lab_image_id:$lab,lab_image_ref:$labref,ui_source_sha256:$ui}')
+    --arg labref "$LOG4SHELL_IMAGE" --argjson ui "$UI_INPUT" --arg labhost "$LOG4SHELL_HOSTNAME" --argjson wafport "$WAF_PORT" \
+    '{schema:3,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,lab_image_id:$lab,lab_image_ref:$labref,ui_source_sha256:$ui,log4shell_hostname:$labhost,public_waf_port:$wafport}')
 }
 
 fresh_agent(){
@@ -215,7 +274,7 @@ assert_managed(){
   [[ $(cat "$ROLE/input.json") == "$INPUT" ]] || die changed_inputs_require_manual_migration
   [[ $(stat -c '%u:%g:%a' "$ROLE/manifest.json") == 0:0:600 ]] || die manifest_permissions_changed
   jq -e 'keys==["agent_config_sha256","enrollment_ca_sha256","enrollment_pass_sha256","files","role","schema","script_sha256","state"] and
-    .schema==2 and .role=="service" and .state=="complete" and
+    .schema==3 and .role=="service" and .state=="complete" and
     ([.agent_config_sha256,.enrollment_ca_sha256,.enrollment_pass_sha256,.script_sha256]|all(type=="string" and test("^[a-f0-9]{64}$"))) and
     (.files|keys)==["compose.json","config/apache.conf","config/bootstrap.php","config/log4shell-ui/api.php","config/log4shell-ui/app.css","config/log4shell-ui/app.js","config/log4shell-ui/index.html","config/ossec.conf.candidate","config/verify-log4shell.php","credentials/admin-password","credentials/app.env","credentials/db-password","credentials/db-root-password","credentials/db.env","input.json"] and
     (.files|all(type=="string" and test("^[a-f0-9]{64}$")))' "$ROLE/manifest.json" >/dev/null || die deployment_incomplete
@@ -268,30 +327,7 @@ write_files(){
     printf 'DB_SERVER=db\nDB_DATABASE=dvwa\nDB_USER=dvwa\nDB_PASSWORD=%s\nDEFAULT_SECURITY_LEVEL=impossible\nTZ=Asia/Seoul\n' \
       "$(cat "$ROLE/credentials/db-password")"
   } >"$ROLE/credentials/app.env"
-  cat >"$ROLE/config/apache.conf" <<EOF
-# Dedicated service deployment. Authorize the connection peer, not spoofable XFF.
-ServerName capstone-service
-<IfModule !remoteip_module>
-LoadModule remoteip_module /usr/lib/apache2/modules/mod_remoteip.so
-</IfModule>
-RemoteIPHeader X-Forwarded-For
-RemoteIPInternalProxy $SECURITY_HOST
-<VirtualHost *:80>
-DocumentRoot /var/www/html
-<Location "/">
-  Require expr "%{CONN_REMOTE_ADDR} == '$SECURITY_HOST' || %{CONN_REMOTE_ADDR} == '127.0.0.1' || %{CONN_REMOTE_ADDR} == '::1'"
-</Location>
-Alias /dvwa /var/www/html
-<Directory /var/www/html>
-  Options -Indexes
-  AllowOverride All
-  Require all granted
-</Directory>
-LogFormat "%a %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\"" capstone_combined
-CustomLog /var/log/capstone-service/access.log capstone_combined
-ErrorLog /var/log/capstone-service/error.log
-</VirtualHost>
-EOF
+  apache_document >"$ROLE/config/apache.conf"
   # No shell interpolation of credentials or arbitrary host paths in Compose.
   compose_document >"$ROLE/compose.json"
   cat >"$ROLE/config/bootstrap.php" <<'PHP'
@@ -349,7 +385,7 @@ function api(string $method, ?array $payload=null, string $cookie='', string $cs
             if(strlen($body)+strlen($chunk)>65536) return 0;
             $body.=$chunk; return strlen($chunk);
         },CURLOPT_HEADERFUNCTION=>static function($h,string $line) use(&$receivedCookie):int {
-            if(preg_match('/^Set-Cookie:\s*(groot_log4shell_ui=[A-Za-z0-9,-]+);/i',$line,$m)) $receivedCookie=$m[1];
+            if(preg_match('/^Set-Cookie:\s*(groot_log4shell_ui_http=[A-Za-z0-9,-]+);/i',$line,$m)) $receivedCookie=$m[1];
             return strlen($line);
         }];
     if($payload!==null){$headers[]='Content-Type: application/json';$options[CURLOPT_HTTPHEADER]=$headers;$options[CURLOPT_POSTFIELDS]=json_encode($payload,JSON_THROW_ON_ERROR);}
@@ -493,10 +529,28 @@ runtime_contract(){
 verify_lab_ui(){
   local deadline=$((SECONDS+90))
   while ((SECONDS<deadline)); do
-    if docker_cmd exec capstone-service-dvwa php /opt/capstone-log4shell-verify.php >/dev/null 2>&1; then return; fi
+    if docker_cmd exec capstone-service-dvwa php /opt/capstone-log4shell-verify.php >/dev/null 2>&1; then
+      verify_lab_hostname
+      return
+    fi
     sleep 2
   done
   die log4shell_ui_normal_or_missing_header_verification_failed
+}
+verify_lab_hostname(){
+  [[ -n ${LOG4SHELL_HOSTNAME:-} ]] || return 0
+  docker_cmd exec --env "CAPSTONE_LAB_HOSTNAME=$LOG4SHELL_HOSTNAME" --env "CAPSTONE_WAF_PORT=$WAF_PORT" \
+    capstone-service-dvwa php -r '
+$name=getenv("CAPSTONE_LAB_HOSTNAME");$port=getenv("CAPSTONE_WAF_PORT");
+$origin="http://".$name.($port==="80"?"":":".$port);
+foreach(["/","/log4shell","/dvwa/login.php","/log4shell/"] as $path){
+  $c=curl_init("http://127.0.0.1".$path);
+  curl_setopt_array($c,[CURLOPT_HTTPHEADER=>["Host: ".$name],CURLOPT_RETURNTRANSFER=>true,
+    CURLOPT_PROXY=>"",CURLOPT_FOLLOWLOCATION=>false,CURLOPT_TIMEOUT=>5]);
+  $body=curl_exec($c);$code=curl_getinfo($c,CURLINFO_RESPONSE_CODE);$redirect=curl_getinfo($c,CURLINFO_REDIRECT_URL);curl_close($c);
+  if($body===false || ($path==="/log4shell/"?($code!==200 || strpos($body,"Log4Shell")===false):
+     ($code!==302 || $redirect!==$origin."/log4shell/")))exit(1);
+}' >/dev/null 2>&1 || die log4shell_hostname_http_route_verification_failed
 }
 verify(){
   assert_managed
@@ -570,7 +624,7 @@ main(){
   jq -nS --argjson files "$files" --arg agent "$(sha /var/ossec/etc/ossec.conf)" \
     --arg script "$(sha "${BASH_SOURCE[0]}")" --arg ca "$(sha /var/ossec/etc/capstone-manager-ca.pem)" \
     --arg pass "$(sha /var/ossec/etc/capstone-enrollment.pass)" \
-    '{schema:2,role:"service",state:"complete",files:$files,agent_config_sha256:$agent,script_sha256:$script,enrollment_ca_sha256:$ca,enrollment_pass_sha256:$pass}' >"$ROLE/manifest.json"
+    '{schema:3,role:"service",state:"complete",files:$files,agent_config_sha256:$agent,script_sha256:$script,enrollment_ca_sha256:$ca,enrollment_pass_sha256:$pass}' >"$ROLE/manifest.json"
   sync "$ROLE/manifest.json" "$ROLE"
   mark complete
   verify

@@ -4,6 +4,10 @@
 
 현재 운영 이력은 [STATUS.md](STATUS.md), 진행 계획은 [PLAN.md](PLAN.md)에 있습니다. 날짜별 대화·작업 기록은 로컬 전용 `대화기록/`에 보관하며 Git에는 포함하지 않습니다. 이 문서의 새 환경 구축과 기존 운영 서버의 변경 이력을 구분합니다.
 
+운영 목표는 **LLM을 SOC 관리 주체로 두는 것**입니다. 사건 조사·대응 판단·구체 변경안·승인 요청·결과 확인을 LLM이 맡고, 관리자는 보호된 변경을 승인하거나 거부합니다. 제한된 helper/worker는 허용 범위와 증거를 검증하고 실행합니다. 긴급 임시 선차단도 LLM 판단을 거칩니다. 2026-10-15 관리 경로 전환의 실제 적용·검증 범위는 STATUS의 최신 항목을 따르며, 아래 기본 설치기가 승인형 운영 경로까지 자동 구성한다는 의미는 아닙니다.
+
+SOC의 조사·상태 답변은 **요약 → 확인 내역 → 조치 및 다음 단계** 순서와 간결한 근거 표를 기본 서식으로 사용합니다. 초기 설치기도 같은 서식4개 지침만 [운영 정책](infra/hermes/SOUL.groot.md)에서 가져오며, 기존 읽기 전용 역할과 MCP2개의 권한은 유지합니다. 원문 구획 검사와 소스 해시 검증이 실패하면 설치를 중단합니다. 라이브 서식은2026-10-15 18:23:59에 반영했고 모델 표본을 확인했으나 모든 답변의 기계적 서식 강제나 정확도 보장은 아닙니다. [채널·스레드 문맥 안내](infra/hermes/mattermost-context/README.md).
+
 ## 처음 구축할 때 읽는 순서
 
 아래 상세 문서는 **어느 컴퓨터에서 실행하는지, 입력값, 실행 명령, 기대 결과, 실패 시 돌아갈 단계**를 함께 설명합니다. 실제 주소·NIC·게이트웨이·DNS는 관리자가 할당받은 값으로 바꿉니다. 문서의 예시 명령을 이번 작업에서 서버에 실행한 것은 아닙니다.
@@ -146,7 +150,9 @@ sudo docker pull --platform linux/amd64 ghcr.io/christophetd/log4shell-vulnerabl
 
 초기 DB와 관리자 암호는 서버에서 새로 생성합니다. DVWA의 기본 취약 수준은 `impossible`이며 실습 시 운영자가 변경합니다. Log4Shell UI는 DVWA 이미지의 기존 Apache/PHP에 읽기 전용으로 마운트합니다. PHP8.1 이상과 curl/session 확장이 필요하며 설치기가 누락 확장이나 패키지를 설치하지 않습니다. 수동 확인·오프라인 반입·`LOG4SHELL_IMAGE` 설정은 [자료 준비](deployment/setup-packages-artifacts.md)를 따릅니다.
 
-신규 환경의 UI 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`입니다(기본 WAF 포트8080). UI는 별도 `internal: true` Docker lab 네트워크의 고정 대상 `log4shell:8080`만 호출합니다. 정상 헤더는 대상 HTTP200, 필수 헤더 누락은 대상 HTTP400을 비교하고 브라우저 최근20개 기록을 KST로 표시합니다. 직접 공격·LDAP 콜백·탐지 E2E는 별도 실습이며 기본 설치에서 실행하지 않습니다. 기존 운영망 UI의 `http://192.168.16.230/log4shell/` 주소와 혼용하지 않습니다.
+신규 환경의 UI 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`입니다(기본 WAF 포트8080). 선택값 `LOG4SHELL_HOSTNAME=log4shell.example.org`를 지정하면 `http://log4shell.example.org:8080/`에서도 `/log4shell/`로 이동합니다. 이 이름이 **자신의 security 주소**를 가리키도록 DNS 또는 클라이언트 hosts를 관리자가 미리 준비합니다. 설치기가 DNS·인증서를 발급하거나 HTTPS를 구성하지는 않습니다. 이름을 생략하면 기존 IP/path만 사용하며 DVWA 기본 가상호스트는 유지합니다.
+
+UI는 별도 `internal: true` Docker lab 네트워크의 고정 대상 `log4shell:8080`만 호출합니다. 정상 헤더는 대상 HTTP200, 필수 헤더 누락은 대상 HTTP400을 비교하고 브라우저 최근20개 기록을 KST로 표시합니다. 직접 공격·LDAP 콜백·탐지 E2E는 별도 실습이며 기본 설치에서 실행하지 않습니다. 기존 운영망의 대표 `http://log4shell.grootlab.duckdns.org/`와 예비 IP 경로 `http://192.168.16.230/log4shell/`는 신규 환경 주소와 구분합니다.
 
 ### siem
 
@@ -229,7 +235,7 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 
 `--plan`은 로컬 입력 검사만 수행하고 SSH 연결을 하지 않습니다. `--check`는 원격 임시폴더에서 읽기 사전검사를 하고 정리합니다. `--apply`는 설치·시작·검증, `--verify`는 기존 구성 확인입니다.
 
-같은 프로필의 완료된 역할은 검증 경로로 처리하며, 중간 실패 흔적이나 다른 설정·기존 서비스가 발견되면 자동 덮어쓰기하지 않습니다. Log4Shell·UI를 포함한 service 상태는 schema2이며 이전 schema1의 자동 이관은 지원하지 않습니다. 실패한 역할의 상태와 서버 내 제한된 로그를 검토한 뒤 재개합니다. 자동 롤백을 명목으로 기존 컨테이너·볼륨·agent 키를 삭제하지 않습니다.
+같은 프로필의 완료된 역할은 검증 경로로 처리하며, 중간 실패 흔적이나 다른 설정·기존 서비스가 발견되면 자동 덮어쓰기하지 않습니다. 선택 HTTP 호스트명·공개 WAF 포트를 포함한 service 상태는 schema3이며 이전 schema1/2의 자동 이관은 지원하지 않습니다. 실패한 역할의 상태와 서버 내 제한된 로그를 검토한 뒤 재개합니다. 자동 롤백을 명목으로 기존 컨테이너·볼륨·agent 키를 삭제하지 않습니다.
 
 ## 검증 범위와 운영 이식
 

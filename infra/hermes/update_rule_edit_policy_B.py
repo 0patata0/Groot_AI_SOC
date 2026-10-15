@@ -38,11 +38,11 @@ def regular(path):
     return st
 
 
-def block(text):
-    require(text.count(START) == text.count(END) == 1, 'policy markers missing or ambiguous')
-    a, b = text.index(START), text.index(END)
+def block(text, start=START, end=END):
+    require(text.count(start) == text.count(end) == 1, 'policy markers missing or ambiguous')
+    a, b = text.index(start), text.index(end)
     require(a < b, 'policy marker order invalid')
-    return text[a:b + len(END)]
+    return text[a:b + len(end)]
 
 
 def replace_block(text, policy):
@@ -154,20 +154,41 @@ def stopped_identity():
     return info['Id'], state.get('StartedAt'), state.get('FinishedAt')
 
 
-def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stopped_identity):
+def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stopped_identity,
+           management_prompt=None):
     """Core is injectable only for isolated tests; production CLI uses fixed data."""
     identity = stopped_check()
 
     def still_stopped():
         require(stopped_check() == identity, 'Hermes identity/lifecycle changed during update')
 
-    policy = block(policy_file.read_text(encoding='utf-8'))
+    source = policy_file.read_text(encoding='utf-8')
+    policy = block(source)
+    def transform(text):
+        updated = replace_block(text, policy)
+        if management_prompt is not None:
+            start, end = '<!-- bounded-operations-policy:start -->', '<!-- bounded-operations-policy:end -->'
+            updated = updated.replace(block(updated, start, end), block(source, start, end), 1)
+        return updated
     files = {'SOUL.md': data / 'SOUL.md', 'jobs.json': data / 'cron/jobs.json',
              'sessions.json': data / 'sessions/sessions.json'}
     metadata = {name: regular(path) for name, path in files.items()}
     original = {name: path.read_bytes() for name, path in files.items()}
-    new_soul = replace_block(original['SOUL.md'].decode('utf-8'), policy).encode('utf-8')
-    new_jobs = cron_patch(original['jobs.json'])
+    new_soul = transform(original['SOUL.md'].decode('utf-8')).encode('utf-8')
+    if management_prompt is None:
+        new_jobs = cron_patch(original['jobs.json'])
+    else:
+        prompt = management_prompt.read_text(encoding='utf-8')
+        require(100 < len(prompt.encode()) < 65536, 'management prompt bounds')
+        cron = json.loads(original['jobs.json'])
+        jobs = cron.get('jobs', cron) if isinstance(cron, dict) else cron
+        jobs = list(jobs.values()) if isinstance(jobs, dict) else jobs
+        selected = [job for job in jobs if job.get('name') == 'soc-alert-watch']
+        require(len(selected) == 1, 'expected one soc-alert-watch job')
+        selected[0]['prompt'], selected[0]['enabled'] = prompt, False
+        # Durable controller replaces the latest-five fingerprint cron; leave
+        # the original job and schedule present but disabled for audit/rollback.
+        new_jobs = (json.dumps(cron, ensure_ascii=False, indent=2) + '\n').encode()
     db_path = data / 'state.db'
     db_metadata = regular(db_path)
     side_metadata = {suffix: regular(Path(str(db_path) + suffix)) for suffix in ('-wal', '-shm')
@@ -191,7 +212,7 @@ def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stoppe
             prompt = old_blobs[old_hash]
             require(sha(prompt.encode()) == old_hash, 'stored prompt hash mismatch')
             require(inline is None or inline == prompt, 'inline prompt differs from blob')
-            new_prompt = replace_block(prompt, policy)
+            new_prompt = transform(prompt)
             new_hash = sha(new_prompt.encode())
             refs.append({'id': session_id, 'system_prompt_hash': old_hash, 'system_prompt': inline})
             updates.append((session_id, new_hash, new_prompt, inline is not None))
@@ -283,13 +304,20 @@ def main():
     parser.add_argument('--backup-dir', required=True, type=Path,
                         help='existing root-controlled parent; a private child backup is created')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--management-prompt', type=Path,
+                        help='also replace bounded policy and disable the superseded alert-watch cron')
     args = parser.parse_args()
     require(os.geteuid() == 0, 'run as root')
     os.umask(0o077)
     source = regular(args.policy_file)
     require(source.st_uid == 0 and not (stat.S_IMODE(source.st_mode) & 0o022),
             'policy source must be root-owned and not writable by others')
-    result = update(DATA, args.policy_file, args.backup_dir, args.dry_run)
+    if args.management_prompt is not None:
+        pstat = regular(args.management_prompt)
+        require(pstat.st_uid == 0 and not stat.S_IMODE(pstat.st_mode) & 0o022,
+                'management prompt must be root-controlled')
+    result = update(DATA, args.policy_file, args.backup_dir, args.dry_run,
+                    management_prompt=args.management_prompt)
     print(json.dumps(result, sort_keys=True))
 
 

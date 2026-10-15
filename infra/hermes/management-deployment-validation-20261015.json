@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "date_kst": "2026-10-15",
+  "scope": "LLM management deployment and read-only native Hermes session resume",
+  "evidence_provenance": {
+    "deployment_and_live_checks": "SSH observations reported by the deploying root task",
+    "source_checksums": "Local source bytes read when this receipt was created",
+    "credentials_or_session_identifiers_included": false
+  },
+  "deployment": [
+    {
+      "role": "siem",
+      "at_kst": "2026-10-15T13:59:57+09:00",
+      "component": "SOC broker and operations event outbox",
+      "result": "applied",
+      "changes": [
+        "HMAC authenticated incident registration",
+        "Persistent SQLite approval and execution event outbox",
+        "Recent five-minute alert query with level >= 9 and limit 500"
+      ],
+      "backup": "/var/backups/capstone-management/20261015T135957"
+    },
+    {
+      "role": "security",
+      "at_kst": "2026-10-15T14:00:47+09:00",
+      "component": "Native AR adapter and restricted root helper",
+      "result": "applied",
+      "changes": [
+        "Native AR submits incidents instead of requesting containment",
+        "Direct root contain-ip route rejected",
+        "Existing restricted MCP containment route retained"
+      ],
+      "firewall_actions_during_deployment": 0,
+      "service_restarts_during_deployment": 0,
+      "backup": "/var/backups/capstone-management/20261015T140047"
+    },
+    {
+      "role": "siem",
+      "at_kst": "2026-10-15T14:01:24+09:00",
+      "component": "Hermes policy and existing conversation policy references",
+      "result": "applied",
+      "same_container_retained": true,
+      "chat_reconnected_at_kst": "2026-10-15T14:01:35+09:00",
+      "old_alert_watch_cron_disabled": true
+    },
+    {
+      "role": "siem",
+      "at_kst_minute": "2026-10-15T14:08+09:00",
+      "component": "capstone-management.timer and controller",
+      "result": "active",
+      "observed_service_exit_status": 0
+    }
+  ],
+  "native_platform_toolsets": [
+    "mcp-resp",
+    "mcp-rule-a",
+    "mcp-rule-b",
+    "mcp-security-events",
+    "mcp-wazuh-ro"
+  ],
+  "automated_management_boundaries": {
+    "llm_decision_before_temporary_containment": true,
+    "approval_result_resume_is_read_only": true,
+    "legacy_synchronous_resp_block_unblock_excluded": true,
+    "general_shell_sudo_or_docker_tools_exposed_to_llm": false,
+    "package_install_or_container_configuration_tools_exposed_to_llm": false,
+    "unknown_model_run_write_retry_enabled": false,
+    "temporary_containment_ttl_seconds": 600,
+    "approved_keep_seconds": 3600,
+    "protected_address_and_independent_flow_checks_retained": true
+  },
+  "offline_regression": {
+    "result": "passed",
+    "total": 284,
+    "breakdown": {
+      "controller": 33,
+      "wrapper": 25,
+      "management_events": 21,
+      "policy_update": 7,
+      "incident_registration": 10,
+      "native_adapter_and_managed_reader": 38,
+      "rule_executor": 53,
+      "containment": 36,
+      "rule_mcp": 10,
+      "broker": 25,
+      "operations": 12,
+      "legacy": 7,
+      "response_mcp": 7
+    }
+  },
+  "live_read_only_validation": {
+    "real_model_used": true,
+    "same_session_resume_verified": true,
+    "write_requests": 0,
+    "mattermost_messages": 0,
+    "probes": [
+      {
+        "phase": "initial_read_only_session",
+        "seconds": 26.469,
+        "completed": true
+      },
+      {
+        "phase": "resume_and_rule_receipt",
+        "state": "completed",
+        "completed": true,
+        "same_session": true,
+        "seconds": 17.533,
+        "tools": [
+          {
+            "name": "get_service_action_target",
+            "completed": 1,
+            "errors": 0
+          },
+          {
+            "name": "get_rule_change_target",
+            "completed": 1,
+            "errors": 0
+          }
+        ],
+        "server_receipt": "/var/backups/capstone-management/read-resume-validation/receipt.json"
+      }
+    ],
+    "timing_scope": "Read-only probes; not attack-to-containment or approval-to-verification latency"
+  },
+  "latest_live_health": {
+    "observed_at_kst": "approximately 2026-10-15 14:20 KST",
+    "management_timer": {
+      "active_state": "active",
+      "sub_state": "waiting"
+    },
+    "management_service": {
+      "type": "oneshot",
+      "active_state": "inactive",
+      "result": "success",
+      "exec_main_status": 0
+    },
+    "soc_bot_active": true,
+    "management_database_integrity_check": "ok"
+  },
+  "local_source_sha256": {
+    "controller": {
+      "path": "infra/hermes/soc_management_controller.py",
+      "sha256": "c61f5b7e6371b206b32cfd5e99f20ff89137f2a79431b847e7672ac3d131d1a4"
+    },
+    "wrapper": {
+      "path": "infra/hermes/soc_management_run.py",
+      "sha256": "725f2d6e71f8a5b7c859d3d9ab100cfea654e62c943811ac799264108efa5a40"
+    },
+    "events": {
+      "path": "infra/mcp/soc_management_events.py",
+      "sha256": "54a09faa461f240d5e81d75a6de8fe5d6a9c7b164edb5c9bcfb3c78944b3dc38"
+    },
+    "native_adapter": {
+      "path": "infra/mcp/wazuh_containment_ar.py",
+      "sha256": "79a24f3d78f3476b4bf507ed7fbab701704bb832f36cd45fc02268a14d4ab529"
+    },
+    "root_helper": {
+      "path": "infra/mcp/rule_change_executor.py",
+      "sha256": "77ca7bc1dd19b0f6906711b96d1853fdbe8b2b5724d5c5362ae7d12ff64b3f87"
+    }
+  },
+  "not_yet_validated": [
+    "Real attack alert through LLM decision, temporary containment, administrator keep/release approval, post-action verification and expiry",
+    "Whole approval and emergency response latency including model and queue delay",
+    "Long outage recovery beyond the five-minute alert search window"
+  ],
+  "cleanup": {
+    "server_management_staging_removed": true,
+    "server_management_staging_files_removed": 8,
+    "mac_cleanup_record": "Task-end cleanup is recorded in the local conversation history."
+  }
+}

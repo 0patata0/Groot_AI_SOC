@@ -1,8 +1,10 @@
 #!/bin/bash
 # Groot_B: SOC 챗봇(soc_bot serve) 배치 + Mattermost 슬래시 명령 /soc 생성. 게이트형. root 로 실행.
 # 읽기전용(mcp-ro)으로 Wazuh 조회 → 채팅에서 /soc 로 상호작용. 대응(차단)은 여기 없음(응답 MCP groot-resp 로 분리).
-# 전제: /tmp/soc_bot.py, /etc/mcp/wazuh-ro.env(mcp-ro 자격), Mattermost 가동. 입력 env: MM_ADMIN_PW(=socadmin 비번), MM_WEBHOOK.
+# 전제: /tmp/에 soc_bot.py 및 아래 MODULES, /etc/mcp/wazuh-ro.env, Mattermost 가동.
+# 입력 env: MM_ADMIN_PW(=socadmin 비번), MM_WEBHOOK. 만료 카드 정리는 자동 활성화하지 않는다.
 set -euo pipefail
+MODULES=(soc_bot.py operations_approval.py soc_management_events.py approval_card_cleanup.py)
 : "${MM_ADMIN_PW:?MM_ADMIN_PW unset}" "${MM_WEBHOOK:?MM_WEBHOOK unset (report 게시용 incoming webhook URL; 값은 CREDENTIALS.local.md)}"
 MM=http://10.200.10.10:8065; API=$MM/api/v4
 LISTEN=${LISTEN:-0.0.0.0:8090}                          # 봇 리슨(모든 IF). MM 컨테이너가 게이트웨이로 도달
@@ -17,11 +19,17 @@ say "G0 preflight"
 # RULE_APPROVERS, and the Mattermost callback source restriction. Fail before
 # any mutation; update the original soc-bot through the gated rule-broker
 # installer or migrate the env with a reviewed procedure instead.
-if [ -f /etc/socbot/soc_bot.env ] && grep -q '^RULE_BROKER_TOKEN=' /etc/socbot/soc_bot.env; then
-  die "rule-change broker settings are present; deploy_socbot_B.sh would remove them. Use deploy_rule_broker_B.sh for rule broker updates"
+if [ -f /etc/socbot/soc_bot.env ] && grep -Eq '^(RULE_BROKER_TOKEN|SOC_APPROVAL_CARD_CLEANUP)=' /etc/socbot/soc_bot.env; then
+  die "protected broker settings are present; deploy_socbot_B.sh would remove them. Use deploy_rule_broker_B.sh for broker updates"
 fi
-[ -f /tmp/soc_bot.py ] || die "/tmp/soc_bot.py missing"
-python3 -m py_compile /tmp/soc_bot.py || die "soc_bot.py syntax"
+python3 -B - "${MODULES[@]}" <<'PY' || die 'soc-bot bundle missing, unsafe, or syntax-invalid'
+import ast, os, pathlib, stat, sys
+for name in sys.argv[1:]:
+    path=pathlib.Path('/tmp')/name
+    info=os.lstat(path)
+    assert stat.S_ISREG(info.st_mode) and info.st_uid==0 and not(stat.S_IMODE(info.st_mode)&0o022)
+    ast.parse(path.read_text(encoding='utf-8'))
+PY
 [ -r /etc/mcp/wazuh-ro.env ] || die "/etc/mcp/wazuh-ro.env missing (read creds)"
 curl -s -m5 "$MM/api/v4/system/ping" | grep -q '"status":"OK"' || die "Mattermost not reachable"
 TK=$(curl -s -D - -o /dev/null -X POST "$API/users/login" -H 'Content-Type: application/json' --data-binary @<(printf '{"login_id":"socadmin","password":"%s"}' "$MM_ADMIN_PW") | awk 'tolower($1)=="token:"{print $2}' | tr -d '\r')
@@ -32,7 +40,9 @@ say "P1 user + install"
 id socbot >/dev/null 2>&1 || useradd -r -M -s /usr/sbin/nologin -G mcp -c "capstone SOC bot" socbot
 usermod -aG mcp socbot 2>/dev/null || true    # /etc/mcp/wazuh-ro.env(0640 root:mcp) 읽기용
 install -d -o root -g socbot -m 0750 /opt/socbot
-install -o root -g socbot -m 0750 /tmp/soc_bot.py /opt/socbot/soc_bot.py
+for module in "${MODULES[@]}"; do
+  install -o root -g socbot -m 0750 "/tmp/$module" "/opt/socbot/$module"
+done
 
 say "P2 Mattermost 슬래시 명령 /soc (없으면 생성) + 토큰 확보"
 TEAMID=$(curl -s -H "Authorization: Bearer $TK" "$API/teams/name/soc" | python3 -c 'import json,sys;d=json.load(sys.stdin);print("" if (not isinstance(d,dict) or d.get("status_code")) else d.get("id",""))')

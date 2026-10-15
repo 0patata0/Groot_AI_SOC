@@ -1,0 +1,32 @@
+{
+  "deployed_at_kst": "2026-10-15T18:23:59.729083+09:00",
+  "policy_sha256": "a0d4fa01972f942b7d4a0c0c48ae86ab9c6812cc851fae3371effc4960fdb1d5",
+  "current_session_prompts_updated": 49,
+  "management_policy_updated": true,
+  "database_integrity": "ok",
+  "unrelated_tables_unchanged": true,
+  "config_env_cron_preserved": true,
+  "same_hermes_container_restart": true,
+  "backup": "/var/backups/capstone-response-format/20261015/rule-edit-policy-53cygqe2",
+  "evaluation": {
+    "method": "isolated actual .111 model with synthetic observations, no tools or chat posts",
+    "model": "qwen3.6:35b",
+    "first_cases": 3,
+    "initial_variation": "bold labels versus Markdown headings despite the same table columns",
+    "revised_cases": 2,
+    "revised_exact_labels_pass": 2,
+    "seconds": [
+      23.929,
+      32.213
+    ],
+    "scope": "format examples, not a universal compliance or security reasoning guarantee"
+  },
+  "followup_verified_at_kst": "2026-10-15T18:27:02+09:00",
+  "routed_prompts_with_format_policy": 49,
+  "gateway": "running",
+  "mattermost": "connected",
+  "api": "connected",
+  "temporary_server_staging_removed": true,
+  "new_installer_tests": 29,
+  "new_vm_installation_performed": false
+}

@@ -25,6 +25,7 @@
 | LLM API | `http://192.0.2.40:11434/v1` | siem에서 아래 모델 목록 조회 |
 | 모델 이름 | `qwen3.6:35b` | API가 반환한 정확한 모델 ID |
 | backend/WAF 포트 | `80` / `8080` | 각 호스트에서 사용 가능한 포트 |
+| Log4Shell HTTP 이름(선택) | `log4shell.example.org` | 클라이언트 DNS/hosts가 security 주소를 반환하는지 확인 |
 
 설치기가 입력받는 주소는 이미 서버 NIC에 할당된 주소다. 설치기는 OS IP·게이트웨이·DNS·SSH 포트를 변경하지 않는다. `MONITOR_INTERFACE=auto`는 SIEM으로 가는 경로의 NIC를 선택하므로 미러 전용 NIC를 쓰면 직접 지정한다. security→service의 출발지 주소는 `SECURITY_HOST`와 일치해야 한다.
 
@@ -69,6 +70,7 @@ SSH_KNOWN_HOSTS=/home/operator/.ssh/known_hosts
 MONITOR_INTERFACE=auto
 WEB_BACKEND_PORT=80
 WAF_PORT=8080
+LOG4SHELL_HOSTNAME=
 LLM_BASE_URL=http://192.0.2.40:11434/v1
 LLM_MODEL=qwen3.6:35b
 ```
@@ -84,6 +86,7 @@ LLM_MODEL=qwen3.6:35b
 | `MONITOR_INTERFACE` | security의 감시 NIC 또는 `auto` |
 | `WEB_BACKEND_PORT` | service의 DVWA·`/log4shell/` UI 게시 포트, 기본80. 22/1514/1515 예약 포트 금지 |
 | `WAF_PORT` | security의 WAF 게시 포트, 기본8080 |
+| `LOG4SHELL_HOSTNAME` | 선택 소문자 DNS 이름. 예: `log4shell.example.org`. scheme·port·path·IP·와일드카드는 금지. 빈 값이면 기존 IP의 `/log4shell/`만 사용. DNS/hosts는 관리자가 security 주소로 사전 준비 |
 | `LLM_BASE_URL` | `http://호스트:포트/v1` 또는 신뢰된 HTTPS. API 키·쿼리 금지 |
 | `LLM_MODEL` | 모델 API에서 확인한 정확한 ID. 대화형 기본값은 `qwen3.6:35b` |
 | `SURICATA_IMAGE`, `WAF_IMAGE` | 생략 가능. 각각 `jasonish/suricata:latest`, `owasp/modsecurity-crs:nginx` 로컬 이미지 |
@@ -92,6 +95,8 @@ LLM_MODEL=qwen3.6:35b
 | `LOG4SHELL_IMAGE` | 생략하면 공식 고정 digest 이미지 사용. `registry/image@sha256:64자리` 또는 검토한 로컬 `sha256:64자리` image ID만 허용하며 태그는 거절. [수동 자료 준비](setup-packages-artifacts.md)를 따르며 실행 중 pull/build 없음 |
 
 설정은 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, `~`, `$HOME`, `$(...)`를 쓰지 않는다. 줄 맨 앞 `#`는 주석이며 LF 줄바꿈을 사용한다. 알 수 없는 키는 거절한다. `source deployment/site.local.conf`로 실행할 필요가 없다. Wazuh/Mattermost/PostgreSQL 버전과 `/opt/capstone` 경로는 이번 설치기에서 고정돼 있다.
+
+Log4Shell 이름을 입력하면 기본 DVWA 가상호스트 뒤에 이름이 정확히 일치하는 HTTP 가상호스트를 추가한다. `WAF_PORT=8080`이면 `http://log4shell.example.org:8080/`가 `/log4shell/`로302 이동하고, 해당 이름의 잘못된 `/dvwa/login.php` 등 UI 밖 경로도 같은 UI로 이동한다. `WAF_PORT=80`이면 포트 없는 `http://log4shell.example.org/`를 사용한다. DNS가 service 주소를 가리키면 WAF를 우회하므로 **security 주소**를 지정한다. 설치기는 DNS/hosts 변경·인증서 발급·HTTPS 구성을 수행하지 않는다. 운영 `grootlab.duckdns.org` 이름을 새 환경에 복사하지 않는다.
 
 ## 3. SIEM 초기 계정 작성 — siem 서버 콘솔
 
@@ -208,6 +213,6 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 
 검증 중에는 처음 쓴 이미지 ID·규칙·입력·스크립트가 유지돼야 한다. image pull, 소스 업데이트, 입력 변경 뒤에는 같은 설치를 그대로 재검증하지 못할 수 있다. `changed_inputs`·`profile_changed`·부분 설치 오류를 없애려고 manifest/receipt나 DB 볼륨을 지우지 않는다. 소스 커밋·로컬 설정·준비 자료를 보존하고 의도한 변경을 별도 이관 작업으로 처리한다.
 
-Log4Shell·UI를 포함한 service의 `input.json`과 `manifest.json`은 **schema2**다. 기존 DVWA/DB만 구성했던 service의 schema1을 자동 업그레이드하지 않으며 재실행하면 입력/manifest 불일치로 거절한다. 기존 service는 데이터·계정·agent 등록을 보존하는 별도 이관이 필요하다. 이 service 상태 버전과 SIEM 준비 파일 `siem.json`의 `schema_version: 1`은 서로 다른 형식이므로 혼동해 수정하지 않는다.
+선택 HTTP 호스트명·공개 WAF 포트를 포함한 service의 `input.json`과 `manifest.json`은 **schema3**다. 기존 service schema1/2를 자동 업그레이드하지 않으며 재실행하면 입력/manifest 불일치로 거절한다. 기존 service는 데이터·계정·agent 등록을 보존하는 별도 이관이 필요하다. 이 service 상태 버전과 SIEM 준비 파일 `siem.json`의 `schema_version: 1`은 서로 다른 형식이므로 혼동해 수정하지 않는다.
 
 사전검사 실패는 원인을 고친 뒤 재실행할 수 있다. 적용 시작 후 실패했다면 [부분 실패 처리](verify-troubleshoot.md)의 상태 확인부터 수행한다. 새 VM 세 대에서 실제 설치가 성공했다는 검증은 이 문서 작성 시 아직 하지 않았다.

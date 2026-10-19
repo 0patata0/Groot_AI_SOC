@@ -1,0 +1,15 @@
+[Unit]
+Description=Close the fixed Wazuh demonstration VPN window
+After=docker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/local/sbin/capstone-wazuh-demo-close close
+TimeoutStartSec=40s
+Restart=on-failure
+RestartSec=15s

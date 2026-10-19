@@ -6,6 +6,10 @@
 
 운영 목표는 **LLM을 SOC 관리 주체로 두는 것**입니다. 사건 조사·대응 판단·구체 변경안·승인 요청·결과 확인을 LLM이 맡고, 관리자는 보호된 변경을 승인하거나 거부합니다. 제한된 helper/worker는 허용 범위와 증거를 검증하고 실행합니다. 긴급 임시 선차단도 LLM 판단을 거칩니다. 2026-10-15 관리 경로 전환의 실제 적용·검증 범위는 STATUS의 최신 항목을 따르며, 아래 기본 설치기가 승인형 운영 경로까지 자동 구성한다는 의미는 아닙니다.
 
+## 시연용 Wazuh VPN 접속 — 2026-10-20 23:59 KST까지
+
+학과 VPN 연결 후 **[Wazuh Dashboard](https://wazuh.grootlab.duckdns.org/)**에 기존 계정으로 로그인한다. 10/19 22:55 KST 실제 VPN 인증서·로그인·대시보드 상태green과 종료 서비스의403을 검증했다. VPN 임시 허용은 **10/20 23:59:00 KST** 자동 종료되며 기존 학과망 접근은 유지한다. [적용 범위·자동 종료·검증 근거](infra/groot-a/wazuh-demo-access/README.md).
+
 ## Log4Shell Java 웹·초기 자동 빌드 — 2026-10-19 완료
 
 기존 C 앱의 JAR·실행 환경을 직접 확인한 기록에서 Spring Boot **2.6.1**, Log4j API/Core 각각 **2.14.1**, Java **8u181**을 확인했습니다. 새 [Spring Boot 실습 웹](infra/groot-c/log4shell-app/README.md)은 화면과 로깅 API를 직접 제공하며, `/log4shell/`에서 입력한 요청 파라미터 또는 헤더를 변경 없이 기록합니다. API는 상태 조회로 받은 CSRF 토큰·쿠키를 사용하는 `POST /log4shell/api/log`이며 이전 앱의 `GET /` 계약과 다릅니다.

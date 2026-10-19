@@ -1,0 +1,418 @@
+{
+  "schema": 1,
+  "recorded_utc": "2026-10-19T13:59:09.249100+00:00",
+  "scope": "Wazuh DuckDNS endpoint temporary existing-department-VPN access",
+  "url": "https://wazuh.grootlab.duckdns.org/",
+  "vpn_cidr": "192.168.15.0/24",
+  "expires_utc": "2026-10-20T14:59:00Z",
+  "expires_kst": "2026-10-20T23:59:00+09:00",
+  "previous_bootstrap_commit_pushed_before_apply": "204c45d163abce07101bda9fc42c538ee92a8ae0",
+  "deployment": {
+    "applied_utc": "2026-10-19T13:52:23.650774+00:00",
+    "baseline_sha256": "2790ab83df6c4e1b13ac00a277ea8158a16bb767c2c2b1e0a2c5f01b598b8424",
+    "certificate_sha256": "233bdb1c87014d9e87120e33c4fa648c206372ae361cb4d9e027d724d1117794",
+    "config_inode": 1441919,
+    "config_sha256": "fbee3603f3e395ac46d78da9e97dc83a119f459cbfbc6d8cecf950bf364bbc01",
+    "container_id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+    "container_time": "2026-10-19T13:52:22+00:00",
+    "http_login_test": "pending",
+    "include_sha256": "01d637a47f1467878edc50e32605526db683aeef5d2ae908ccb9cf87ec1e359d",
+    "next_elapse_utc": "2026-10-20T14:59:00Z",
+    "state_sha256": "b070f6655a61307684c4fb66f7b640c6a5fef24e86120361ef6bf9cb9259cea8",
+    "status": "installed_reload_signalled",
+    "units": [
+      "capstone-wazuh-demo-close.service",
+      "capstone-wazuh-demo-close.timer"
+    ]
+  },
+  "native_nginx": {
+    "baseline_sha256": "2790ab83df6c4e1b13ac00a277ea8158a16bb767c2c2b1e0a2c5f01b598b8424",
+    "candidate_sha256": "fbee3603f3e395ac46d78da9e97dc83a119f459cbfbc6d8cecf950bf364bbc01",
+    "cases": [
+      {
+        "actual": 403,
+        "address": "192.168.15.7",
+        "expected": 403,
+        "name": "day_before",
+        "time": "2026-10-18T23:59:59+00:00"
+      },
+      {
+        "actual": 204,
+        "address": "192.168.15.7",
+        "expected": 204,
+        "name": "first_second",
+        "time": "2026-10-19T00:00:00+00:00"
+      },
+      {
+        "actual": 204,
+        "address": "192.168.15.7",
+        "expected": 204,
+        "name": "first_day_end",
+        "time": "2026-10-19T23:59:59+00:00"
+      },
+      {
+        "actual": 204,
+        "address": "192.168.15.7",
+        "expected": 204,
+        "name": "last_full_hour",
+        "time": "2026-10-20T13:59:59+00:00"
+      },
+      {
+        "actual": 204,
+        "address": "192.168.15.7",
+        "expected": 204,
+        "name": "partial_hour_start",
+        "time": "2026-10-20T14:00:00+00:00"
+      },
+      {
+        "actual": 204,
+        "address": "192.168.15.254",
+        "expected": 204,
+        "name": "last_allowed_second",
+        "time": "2026-10-20T14:58:59+00:00"
+      },
+      {
+        "actual": 403,
+        "address": "192.168.15.7",
+        "expected": 403,
+        "name": "expiry_second",
+        "time": "2026-10-20T14:59:00+00:00"
+      },
+      {
+        "actual": 403,
+        "address": "192.168.15.7",
+        "expected": 403,
+        "name": "expired_hour",
+        "time": "2026-10-20T15:00:00+00:00"
+      },
+      {
+        "actual": 403,
+        "address": "192.168.15.7",
+        "expected": 403,
+        "name": "following_day",
+        "time": "2026-10-21T00:00:00+00:00"
+      },
+      {
+        "actual": 403,
+        "address": "192.168.15.7",
+        "expected": 403,
+        "name": "other_timezone",
+        "time": "2026-10-19T22:00:00+09:00"
+      },
+      {
+        "actual": 403,
+        "address": "192.168.15.7",
+        "expected": 403,
+        "name": "malformed_time",
+        "time": "invalid"
+      },
+      {
+        "actual": 204,
+        "address": "192.168.16.7",
+        "expected": 204,
+        "name": "non_vpn_guard_unaffected",
+        "time": "2026-10-21T00:00:00+00:00"
+      }
+    ],
+    "container_cleanup_verified": true,
+    "expires_utc": "2026-10-20T14:59:00Z",
+    "fixture_only_header_substitution": true,
+    "guard_fixture_sha256": "23786a354bdbde99e723dcc979a6e748fb5a93dee85321b5c05b9b945b1af841",
+    "guard_tests_only_not_full_allowlist": true,
+    "image": "sha256:bd3cc628e59c8865f88a3bbe99c1029c12a9983b2cb88a9b03913f43d4f5aa79",
+    "passed": true,
+    "production_files_changed": false,
+    "schema": 1,
+    "syntax_diagnostics": {
+      "container_exit_code": 0,
+      "container_running": false,
+      "docker_start_exit_code": 0,
+      "docker_state_error": {
+        "text": "",
+        "truncated": false
+      },
+      "stderr": {
+        "text": "nginx: the configuration file /candidate/nginx.conf syntax is ok\nnginx: configuration file /candidate/nginx.conf test is successful\n",
+        "truncated": false
+      },
+      "stdout": {
+        "text": "",
+        "truncated": false
+      }
+    },
+    "syntax_passed": true,
+    "syntax_projection_sha256": "d9d5efc6530c453017a8a518063dd73c5c53ca2867876f6e52523b894a7df4cc",
+    "temporary_directory_removed": true,
+    "tls_copied": false
+  },
+  "manual_close": {
+    "checked_at": "2026-10-19T13:53:02.512551+00:00",
+    "results": [
+      {
+        "command": [
+          "systemctl",
+          "start",
+          "capstone-wazuh-demo-close.service"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "systemctl",
+          "show",
+          "capstone-wazuh-demo-close.service",
+          "--property=Result,ActiveState,SubState,ExecMainStatus"
+        ],
+        "returncode": 0,
+        "stdout": "Result=success\nExecMainStatus=0\nActiveState=inactive\nSubState=dead\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "systemctl",
+          "show",
+          "capstone-wazuh-demo-close.timer",
+          "--property=ActiveState,SubState,NextElapseUSecRealtime"
+        ],
+        "returncode": 0,
+        "stdout": "NextElapseUSecRealtime=Tue 2026-10-20 23:59:00 KST\nActiveState=active\nSubState=waiting\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/usr/local/sbin/capstone-wazuh-demo-close",
+          "check"
+        ],
+        "returncode": 0,
+        "stdout": "{\"expires_utc\": \"2026-10-20T14:59:00Z\", \"include\": \"closed\"}\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "vpn_after_close": {
+    "checked_at": "2026-10-19T13:53:13.157261+00:00",
+    "http_status": 403,
+    "strict_tls": true,
+    "expected": 403,
+    "passed": true
+  },
+  "reopen_within_approved_window": {
+    "reopened_utc": "2026-10-19T13:53:34.625797+00:00",
+    "include": "active",
+    "timer": "NextElapseUSecRealtime=Tue 2026-10-20 14:59:00 UTC\nActiveState=active\nSubState=waiting\n",
+    "include_sha256": "01d637a47f1467878edc50e32605526db683aeef5d2ae908ccb9cf87ec1e359d",
+    "reload_signalled": true
+  },
+  "vpn_final": {
+    "checked_at": "2026-10-19T13:54:29.723447+00:00",
+    "tls_system_ca_and_hostname_verified": true,
+    "checks": [
+      {
+        "test": "unauthenticated_login",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "existing_dashboard_account_login",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "authentication_cookie_issued",
+        "passed": true
+      },
+      {
+        "test": "authenticated_dashboard",
+        "passed": true,
+        "status": 200,
+        "path": "/app/wz-home"
+      },
+      {
+        "test": "authenticated_status_api",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "mattermost_unchanged",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "log4shell_http_unchanged",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "log4shell_https_unchanged",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "legacy_hostname_still_denied",
+        "passed": true,
+        "status": "403",
+        "legacy_only_self_signed_tls_diagnostic": true
+      },
+      {
+        "test": "test_session_logout",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "logout_returned_to_login",
+        "passed": true,
+        "status": 200
+      }
+    ],
+    "dashboard_overall_status": "green",
+    "success": true
+  },
+  "final_hosts": {
+    "groot-a": {
+      "checked_at": "2026-10-19T13:55:05.445637+00:00",
+      "containers": [
+        {
+          "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+          "started_at": "2026-09-29T01:44:03.48454989Z",
+          "running": true,
+          "restart_count": 0
+        }
+      ],
+      "files": {
+        "/home/groot_a/capstone/chatproxy/nginx.conf": "fbee3603f3e395ac46d78da9e97dc83a119f459cbfbc6d8cecf950bf364bbc01",
+        "/home/groot_a/capstone/chatproxy/docker-compose.yml": "b6488e172bbe4da4dc73b4cf7d74feb255b88d8c5a5f90e91c29683bda5a5f8b",
+        "/home/groot_a/capstone/chatproxy/tls/wazuh-vpn-window.allow.conf": "01d637a47f1467878edc50e32605526db683aeef5d2ae908ccb9cf87ec1e359d",
+        "/usr/local/sbin/capstone-wazuh-demo-close": "ffe3137008047c3183232fbd27fe8a8f9a57691b61a2e5bc08863c0ec189eb2b"
+      },
+      "timer_enabled": "enabled",
+      "timer": "NextElapseUSecRealtime=Tue 2026-10-20 14:59:00 UTC\nActiveState=active\nSubState=waiting",
+      "close_check": {
+        "expires_utc": "2026-10-20T14:59:00Z",
+        "include": "active"
+      },
+      "permissions": {
+        "/var/lib/capstone-wazuh-demo-access": {
+          "uid": 0,
+          "mode": "0o700"
+        },
+        "/var/lib/capstone-wazuh-demo-access/state.json": {
+          "uid": 0,
+          "mode": "0o600"
+        },
+        "/usr/local/sbin/capstone-wazuh-demo-close": {
+          "uid": 0,
+          "mode": "0o500"
+        },
+        "/home/groot_a/capstone/chatproxy/tls/wazuh-vpn-window.allow.conf": {
+          "uid": 0,
+          "mode": "0o644"
+        }
+      },
+      "installed_nginx_native_test": true,
+      "passed": true
+    },
+    "groot-b-int": {
+      "checked_at": "2026-10-19T13:55:05.751238+00:00",
+      "containers": [
+        {
+          "id": "62fcd6e31e7e7dae9f195d69b5cfd50d5acac60c7d6d5ab9ec6d8f83413fd3cb",
+          "started_at": "2026-10-13T02:15:15.675929841Z",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+          "started_at": "2026-09-28T06:19:48.729016621Z",
+          "running": true,
+          "restart_count": 0
+        },
+        {
+          "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+          "started_at": "2026-10-15T00:10:50.875022782Z",
+          "running": true,
+          "restart_count": 1
+        }
+      ],
+      "files": {
+        "/home/groot_b/capstone/wazuh/single-node/docker-compose.yml": "1e6ab7a77ff237969dcf3e59966f2eed8aab66f58fc805e16e850d210ba7a1d6",
+        "/home/groot_b/capstone/wazuh/single-node/config/wazuh_dashboard/opensearch_dashboards.yml": "00251479be0841fee49bd01a594d2eb6e2a1be71cf78ed6b9651f566af424136",
+        "/home/groot_b/capstone/wazuh/single-node/config/wazuh_dashboard/wazuh.yml": "c40ca1a81207f9e0eb75ce83500ccf7e0b6aef3b6fab51be903cf2dd33ad59aa"
+      },
+      "passed": true
+    },
+    "groot-c-int": {
+      "checked_at": "2026-10-19T13:55:06.135486+00:00",
+      "containers": [
+        {
+          "id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+          "started_at": "2026-10-19T11:29:31.655644978Z",
+          "running": true,
+          "restart_count": 0
+        }
+      ],
+      "files": {},
+      "passed": true
+    }
+  },
+  "server_source_preservation_and_cleanup": {
+    "sources": {
+      "/var/lib/capstone-wazuh-demo-access/source": {
+        "native_check.py": "266dcb2cad809f6613d52035e5668ee959fa06e5a2603153003e144a25555a1d",
+        "close.py": "ffe3137008047c3183232fbd27fe8a8f9a57691b61a2e5bc08863c0ec189eb2b",
+        "render.py": "15fe4963f66bc76e70c68cc77170ac8baa06b2f084d333e64d897e1393d4903c",
+        "README.md": "b5ce9c0ce6815579df53843d6aa130c2571ea7985c0de20c38335f13d000a996",
+        "test_window.py": "d968d294930e33f56eecc5e0d77f92d53a2aa8dcb47d2a08a029c67a43aef342",
+        "capstone-wazuh-demo-close.timer": "91ffe41e810c2cbd95739e88fdcccc342df9b479cf8a4093d06f594088a9c4e4",
+        "capstone-wazuh-demo-close.service": "0436e65660669df0469b19ef4f71e7bee5818e3a26769f4e23215c1da95d8357",
+        "test_native_check.py": "b2b2cddc24053306ccac70033736b6b9d289e2b1e970e360d3df99004cef3cdf",
+        "apply.py": "2fcbe1d8adff14766615162f83b0b73f849032738a00a5f536459da6764ff488"
+      },
+      "/var/backups/capstone-wazuh-demo/20261019/source": {
+        "native_check.py": "266dcb2cad809f6613d52035e5668ee959fa06e5a2603153003e144a25555a1d",
+        "close.py": "ffe3137008047c3183232fbd27fe8a8f9a57691b61a2e5bc08863c0ec189eb2b",
+        "render.py": "15fe4963f66bc76e70c68cc77170ac8baa06b2f084d333e64d897e1393d4903c",
+        "README.md": "b5ce9c0ce6815579df53843d6aa130c2571ea7985c0de20c38335f13d000a996",
+        "test_window.py": "d968d294930e33f56eecc5e0d77f92d53a2aa8dcb47d2a08a029c67a43aef342",
+        "capstone-wazuh-demo-close.timer": "91ffe41e810c2cbd95739e88fdcccc342df9b479cf8a4093d06f594088a9c4e4",
+        "capstone-wazuh-demo-close.service": "0436e65660669df0469b19ef4f71e7bee5818e3a26769f4e23215c1da95d8357",
+        "test_native_check.py": "b2b2cddc24053306ccac70033736b6b9d289e2b1e970e360d3df99004cef3cdf",
+        "apply.py": "2fcbe1d8adff14766615162f83b0b73f849032738a00a5f536459da6764ff488"
+      }
+    },
+    "stage_files_removed": 7,
+    "stage_bytes_removed": 47894,
+    "stage_removed": true,
+    "native_check_containers_remaining": 0,
+    "native_check_directories_remaining": 0
+  },
+  "offline_tests": {
+    "window": 9,
+    "native_checker": 7,
+    "passed": true
+  },
+  "recovered_fixture_issue": "Initial isolated syntax check failed because tmpfs cache chown required CHOWN. Only syntax fixture received CHOWN, rerun passed; production files unchanged during checks and every owned fixture removed.",
+  "verification_issue": "Initial verifier attempted GET logout (404). Installed plugin contract is POST; final POST logout and return to login passed. No credential or cookie persisted.",
+  "new_packages_installed": 0,
+  "downloads": 0,
+  "private_keys_copied": 0,
+  "limits": [
+    "Scheduled future expiry has not occurred; manual real close/403 and native time-boundary checks are separate evidence.",
+    "No force termination of an already running request or erasure of previously received content.",
+    "On-site department client, host reboot and general Internet access not tested.",
+    "Existing department allows preserved; only temporary VPN allow expires.",
+    "Local task helper directory is retained for the newly requested SOC dashboard task, then will be removed."
+  ],
+  "sources_sha256": {
+    "native_check.py": "266dcb2cad809f6613d52035e5668ee959fa06e5a2603153003e144a25555a1d",
+    "close.py": "ffe3137008047c3183232fbd27fe8a8f9a57691b61a2e5bc08863c0ec189eb2b",
+    "render.py": "15fe4963f66bc76e70c68cc77170ac8baa06b2f084d333e64d897e1393d4903c",
+    "README.md": "b5ce9c0ce6815579df53843d6aa130c2571ea7985c0de20c38335f13d000a996",
+    "test_window.py": "d968d294930e33f56eecc5e0d77f92d53a2aa8dcb47d2a08a029c67a43aef342",
+    "capstone-wazuh-demo-close.timer": "91ffe41e810c2cbd95739e88fdcccc342df9b479cf8a4093d06f594088a9c4e4",
+    "capstone-wazuh-demo-close.service": "0436e65660669df0469b19ef4f71e7bee5818e3a26769f4e23215c1da95d8357",
+    "test_native_check.py": "b2b2cddc24053306ccac70033736b6b9d289e2b1e970e360d3df99004cef3cdf",
+    "apply.py": "2fcbe1d8adff14766615162f83b0b73f849032738a00a5f536459da6764ff488"
+  }
+}

@@ -1,5 +1,12 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+## 시연용 Wazuh VPN 접속 완료·자동 종료 대기 (2026-10-19 22:55 KST)
+
+- 초기 자동 빌드 변경을 `204c45d`로 커밋·main 푸시하고 원격 SHA 일치를 확인한 뒤 Wazuh를 적용했다.
+- 기존 Wazuh DuckDNS 주소에 VPN192.168.15/24를 임시 허용했다. 실제 로그인·상태green·로그아웃, 조기 종료403과 재개, native시간경계12개·오프라인9+7 검증 완료. 학과망 기존 정책과 B/C 기동·설정을 유지했다.
+- **2026-10-20 23:59 KST 자동 종료 예약 enabled/waiting.** 요청 시각 guard가 이후VPN요청을403으로 거부하고 timer가 allow include를 비운다. 예정 시각 도래 후 실제 예약 실행 결과 확인은 아직 남아 있다. [설정·운영·근거](infra/groot-a/wazuh-demo-access/README.md).
+- 신규3VM 전체 초기 설치·호스트 재부팅·실제 공격/탐지/LLM 대응 E2E는 별도 남은 검증이다. 아래22:36의 접속 준비 설명은 당시 기록이다.
+
 ## 초기 Log4Shell 자동 빌드 완료·시연 접속 준비 (2026-10-19 22:36 KST)
 
 - service schema6의 자동 JAR 준비와 기존 JAR 선택을 구현했다. C native 설치 함수에서 운영본과 동일 SHA를 생성하고 동일 산출물 UI/API를 검증했다. controller20·service51·빌더16 회귀 통과, 운영 앱 재시작0·설치/다운로드0·서버 임시자료 정리 완료.

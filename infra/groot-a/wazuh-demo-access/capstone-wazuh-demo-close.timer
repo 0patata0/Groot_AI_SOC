@@ -1,0 +1,12 @@
+[Unit]
+Description=Expire Wazuh VPN access at 2026-10-20 23:59 KST
+
+[Timer]
+OnCalendar=2026-10-20 14:59:00 UTC
+Persistent=true
+AccuracySec=1s
+RandomizedDelaySec=0
+Unit=capstone-wazuh-demo-close.service
+
+[Install]
+WantedBy=timers.target

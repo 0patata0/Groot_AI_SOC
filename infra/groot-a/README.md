@@ -1,5 +1,9 @@
 # Groot_A (groot-sec) — 보안 게이트웨이 구성 요약
 
+## Wazuh 시연용 VPN 한시 허용 — 2026-10-19 22:55 KST 검증
+
+`https://wazuh.grootlab.duckdns.org/`의 VPN192.168.15/24 접근을 **2026-10-20 23:59 KST**까지 허용했다. 기존 공인 `chatduck.crt/key` 참조·요청별 UTC 종료 guard·자동 close timer를 적용했고 실제 VPN 로그인/green·조기 종료403·재개·다른웹 정상까지 확인했다. chatproxy 컨테이너와 기존 파일 inode를 유지한 reload이며 B·C 설정 변경은 없다. 저장소의 [chatproxy.nginx.conf](chatproxy.nginx.conf)는 원본 SHA2790ab83… 기준 파일이고 현재 라이브는 [한시 생성기·종료 도구](wazuh-demo-access/README.md)를 반영한 SHAfbee3603…다. [실측 증거](wazuh-demo-access/deployment-validation-20261019.json). 아래VPN거부 설명은 기존 정책 이력이며 예정 종료 후 다시 적용된다.
+
 > 2026-10-15 14:33:38 KST 인증서 후속: 채팅·Log4Shell DuckDNS 이름이 공유하는 `*.grootlab.duckdns.org` Let's Encrypt 인증서를 A `chatduck.crt/key`에 적용하고 Nginx를 한 번 재로드했다. 만료는 **2027-01-13 13:25:12 KST**다. Mac의 시스템 CA 검증에서 채팅 ping200과 Log4Shell HTTPS 경로 최종200을 확인했다. 기본 Log4Shell 주소는 HTTP80으로 유지하고 HTTPS443은 선택 접근이다. 채팅 인증서 감시기는 동일 `chatduck.crt`의 만료를 읽고 수동 실행 exit0을 확인했지만 Log4Shell SNI는 주기 검사하지 않는다. 자동 갱신은 없으며 다음 재발급은 2026년 12월 중순에 준비한다.
 
 > 2026-10-15: 채팅 인증서 만료 감시를 A(매일09:00KST)에, 전용 XML 디코더·규칙100300~100305를 B에 적용·검증했다. 만료일2027-01-06 15:02:33KST, 갱신은 수동이다. [현재 구성·갱신 절차](certificate-monitor/README.md). 아래 기록은 해당 시점의 이력이다.

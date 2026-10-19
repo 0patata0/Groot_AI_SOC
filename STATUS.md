@@ -1,5 +1,13 @@
 # 인프라 현황 — 2026-10-19 현재 작업 상태
 
+## Wazuh 시연용 VPN 접속 적용 완료 (2026-10-19 22:55 KST 검증)
+
+[https://wazuh.grootlab.duckdns.org/](https://wazuh.grootlab.duckdns.org/)에 기존 학과 VPN `192.168.15.0/24`를 한시 허용했다. 종료는 **2026-10-20 23:59:00 KST**이며 기존 학과망 허용·Wazuh 계정 인증은 유지한다. A의 기존 공인 wildcard 인증서를 참조하고 Nginx만 reload했다. 시간별 요청 거부와 systemd timer의 허용 회수를 함께 적용했다.
+
+실제 VPN에서 인증서·호스트명 검증, 기존 계정 로그인·대시보드200·상태green, 로그아웃을 확인했다. 종료 서비스를 수동 실행한 뒤403을 확인하고 다시 열었으며 timer는 예정 시각으로 enabled/waiting이다. 격리 Nginx의12개 시간 경계와 오프라인9+7을 통과했다. A chatproxy·B Wazuh3개·C Log4Shell의 ID·기동시각, A Compose와 B 설정3개 SHA는 불변이다. 채팅·Log4Shell 정상, legacy Wazuh VPN403도 확인했다.
+
+현재 A 설정 SHA는 `fbee3603f3e395ac46d78da9e97dc83a119f459cbfbc6d8cecf950bf364bbc01`이다. 저장소의 원본 `chatproxy.nginx.conf`에 [한시 설정 생성기](infra/groot-a/wazuh-demo-access/README.md)를 적용한 결과이며 원본은 복구 기준으로 보존한다. 미래 timer 시각 자체·호스트 재부팅·현장 학과 단말은 미시험이다. [실측 증거](infra/groot-a/wazuh-demo-access/deployment-validation-20261019.json). 초기 자동 빌드 변경은 먼저 `204c45d`로 main에 푸시한 후 이 작업을 적용했다.
+
 ## 초기 설치기의 Log4Shell 자동 빌드 완료 (2026-10-19 22:36 KST 검증)
 
 `LOG4SHELL_APP_JAR`를 비워 두거나 생략하면 초기 `deploy.sh`가 전달한 Java 소스와 service 서버의 사전 준비 이미지 JDK8u181·원본 라이브러리로 새 앱을 자동 빌드한다. 별도 JAR 수동 빌드·반입이 기본 조건에서 빠졌다. 제공된 `/opt/*.jar`를 명시하는 선택 방식도 유지한다. service schema6에 소스 지문과 빌드 증거를 저장하며, 완료된 동일 구성 재실행은 재빌드하지 않는다. 패키지와 Docker 이미지·SSH는 계속 사전 준비 대상이다.

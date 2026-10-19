@@ -6,6 +6,12 @@
 
 운영 목표는 **LLM을 SOC 관리 주체로 두는 것**입니다. 사건 조사·대응 판단·구체 변경안·승인 요청·결과 확인을 LLM이 맡고, 관리자는 보호된 변경을 승인하거나 거부합니다. 제한된 helper/worker는 허용 범위와 증거를 검증하고 실행합니다. 긴급 임시 선차단도 LLM 판단을 거칩니다. 2026-10-15 관리 경로 전환의 실제 적용·검증 범위는 STATUS의 최신 항목을 따르며, 아래 기본 설치기가 승인형 운영 경로까지 자동 구성한다는 의미는 아닙니다.
 
+## Log4Shell Java 웹·초기 자동 빌드 — 2026-10-19 완료
+
+기존 C 앱의 JAR·실행 환경을 직접 확인한 기록에서 Spring Boot **2.6.1**, Log4j API/Core 각각 **2.14.1**, Java **8u181**을 확인했습니다. 새 [Spring Boot 실습 웹](infra/groot-c/log4shell-app/README.md)은 화면과 로깅 API를 직접 제공하며, `/log4shell/`에서 입력한 요청 파라미터 또는 헤더를 변경 없이 기록합니다. API는 상태 조회로 받은 CSRF 토큰·쿠키를 사용하는 `POST /log4shell/api/log`이며 이전 앱의 `GET /` 계약과 다릅니다.
+
+초기 설치기는 service 서버에서 새 앱을 자동 빌드하는 **schema6**를 기본으로 사용하며, `LOG4SHELL_APP_JAR`를 지정하면 준비된 JAR을 사용하는 방식도 지원합니다. 기존 운영 C의 Java 웹 교체·정상 요청 검증은19:57 KST 완료했고, 컨테이너 재생성 자동화의 후속 결과는 [STATUS](STATUS.md)에 별도로 기록합니다. 무해한 요청의 응답·로그 확인, 새 VM 구축, 실제 공격·콜백·탐지 E2E는 서로 다른 검증 범위입니다. [이전 PHP 웹의 검증 이력](infra/groot-c/log4shell-ui/README.md)은 당시 결과로 보존합니다.
+
 SOC의 조사·상태 답변은 **요약 → 확인 내역 → 조치 및 다음 단계** 순서와 간결한 근거 표를 기본 서식으로 사용합니다. 초기 설치기도 같은 서식4개 지침만 [운영 정책](infra/hermes/SOUL.groot.md)에서 가져오며, 기존 읽기 전용 역할과 MCP2개의 권한은 유지합니다. 원문 구획 검사와 소스 해시 검증이 실패하면 설치를 중단합니다. 라이브 서식은2026-10-15 18:23:59에 반영했고 모델 표본을 확인했으나 모든 답변의 기계적 서식 강제나 정확도 보장은 아닙니다. [채널·스레드 문맥 안내](infra/hermes/mattermost-context/README.md).
 
 ## 처음 구축할 때 읽는 순서
@@ -30,7 +36,7 @@ SOC의 조사·상태 답변은 **요약 → 확인 내역 → 조치 및 다음
 |---|---|
 | security | Suricata 수동 IDS, ModSecurity DetectionOnly WAF, GROOT 규칙, Wazuh agent, 별도 nft 기본 허용 테이블 |
 | siem | Wazuh manager/indexer/dashboard, Mattermost/PostgreSQL, Hermes, 읽기 전용 MCP |
-| service | DVWA/MariaDB, 내부 Log4Shell 앱·실습 웹 UI, security 서버만 허용하는 웹 접근 설정, Wazuh agent |
+| service | DVWA/MariaDB, 화면·API를 직접 제공하는 내부 Log4Shell Java 앱, security 서버만 허용하는 웹 접근 설정, Wazuh agent |
 
 **패키지·이미지·SSH 준비는 아래 절차로 먼저 수동 완료해야 합니다.** 배포 셸은 apt/pip/npm 설치나 이미지 pull/build를 실행하지 않습니다. 패키지·이미지·입력 자료의 정적 사전검사를 세 서버 모두 통과해야 서비스 구성을 시작합니다. 런타임 검사와 서비스 연결 검증은 해당 단계에서 추가 수행합니다.
 
@@ -44,7 +50,7 @@ SOC의 조사·상태 답변은 **요약 → 확인 내역 → 조치 및 다음
 - 외부 LLM/Ollama는 별도로 준비합니다. 기본 설정은 별도 API 키를 요구하지 않는 내부 OpenAI 호환 `/v1` API이며 siem에서 접근 가능해야 합니다. 모델 다운로드·학습·DGX 구축은 이 셸의 작업이 아닙니다.
 - Suricata는 security의 지정 NIC를 관측합니다. 다른 VM의 트래픽도 관측하려면 가상 스위치 미러링이나 security를 경유하는 라우팅을 관리자가 먼저 구성합니다.
 - WAF/IDS는 탐지 모드입니다. nft 구성은 기존 방화벽을 지우지 않는 ACCEPT-only 테이블이며, 기존 운영망의 FORWARD 차단·NAT 정책을 그대로 이식하지 않습니다.
-- DVWA와 Log4Shell은 실습용 취약 애플리케이션입니다. 웹 요청은 security를 거쳐 받으며 DB와 Log4Shell 앱 포트를 호스트에 게시하지 않습니다. Log4Shell 실습 UI는 기존 WAF 주소의 `/log4shell/`에서 정상 헤더·헤더 누락 요청을 비교합니다. 별도의 외부8080 포트를 열지 않습니다.
+- DVWA와 Log4Shell은 실습용 취약 애플리케이션입니다. 웹 요청은 security를 거쳐 받으며 DB와 Log4Shell 앱 포트를 호스트에 게시하지 않습니다. Log4Shell Java 화면은 기존 WAF 주소의 `/log4shell/`에서 `message` 파라미터 또는 `X-Api-Version` 헤더를 선택해 로깅 요청을 보냅니다. 별도의 외부8080 포트를 열지 않습니다.
 
 권장 초기 자원은 SIEM 4 vCPU/8GiB RAM 이상과 충분한 로그 디스크입니다. 실제 보존기간·수집량에 따라 늘립니다. Wazuh의 Docker 요구조건은 [공식 문서](https://documentation.wazuh.com/current/deployment-options/docker/wazuh-container.html)를 함께 확인합니다.
 
@@ -148,11 +154,13 @@ sudo docker pull mariadb:10
 sudo docker pull --platform linux/amd64 ghcr.io/christophetd/log4shell-vulnerable-app@sha256:6f88430688108e512f7405ac3c73d47f5c370780b94182854ea2cddc6bd59929
 ```
 
-초기 DB와 관리자 암호는 서버에서 새로 생성합니다. DVWA의 기본 취약 수준은 `impossible`이며 실습 시 운영자가 변경합니다. Log4Shell UI는 DVWA 이미지의 기존 Apache/PHP에 읽기 전용으로 마운트합니다. PHP8.1 이상과 curl/session 확장이 필요하며 설치기가 누락 확장이나 패키지를 설치하지 않습니다. 수동 확인·오프라인 반입·`LOG4SHELL_IMAGE` 설정은 [자료 준비](deployment/setup-packages-artifacts.md)를 따릅니다.
+초기 DB와 관리자 암호는 서버에서 새로 생성합니다. DVWA의 기본 취약 수준은 `impossible`이며 실습 시 운영자가 변경합니다. Log4Shell은 기본적으로 service 서버의 준비된 로컬 이미지 안에 있는 JDK·라이브러리를 사용해 [새 앱 소스](infra/groot-c/log4shell-app/README.md)를 자동 빌드합니다. Mac이나 호스트에 JDK·Gradle을 설치하지 않으며 빌드 의존성을 다운로드하지 않습니다. 생성한 JAR의 새 앱 클래스·화면·Log4j API/Core 2.14.1 메타데이터와 전체 해시를 검사한 뒤 `/app/spring-boot-application.jar`에 읽기 전용으로 마운트합니다. 준비된 JAR을 직접 쓰려면 `LOG4SHELL_APP_JAR=/opt/capstone-prereqs/log4shell-app.jar`처럼 service 서버의 root 소유·그룹/다른 사용자 쓰기 금지 파일을 지정합니다.
+
+DVWA에는 기존 PHP·mysqli가 필요하고, Apache에는 `proxy`·`proxy_http` 모듈이 필요합니다. Log4Shell용 PHP 중계·curl/session 조건은 사용하지 않습니다. 수동 확인·오프라인 반입·`LOG4SHELL_IMAGE`·`LOG4SHELL_APP_JAR` 설정은 [자료 준비](deployment/setup-packages-artifacts.md)를 따릅니다.
 
 신규 환경의 UI 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`입니다(기본 WAF 포트8080). 선택값 `LOG4SHELL_HOSTNAME=log4shell.example.org`를 지정하면 `http://log4shell.example.org:8080/`에서도 `/log4shell/`로 이동합니다. 이 이름이 **자신의 security 주소**를 가리키도록 DNS 또는 클라이언트 hosts를 관리자가 미리 준비합니다. 설치기가 DNS·인증서를 발급하거나 HTTPS를 구성하지는 않습니다. 이름을 생략하면 기존 IP/path만 사용하며 DVWA 기본 가상호스트는 유지합니다.
 
-UI는 별도 `internal: true` Docker lab 네트워크의 고정 대상 `log4shell:8080`만 호출합니다. 정상 헤더는 대상 HTTP200, 필수 헤더 누락은 대상 HTTP400을 비교하고 브라우저 최근20개 기록을 KST로 표시합니다. 직접 공격·LDAP 콜백·탐지 E2E는 별도 실습이며 기본 설치에서 실행하지 않습니다. 기존 운영망의 대표 `http://log4shell.grootlab.duckdns.org/`와 예비 IP 경로 `http://192.168.16.230/log4shell/`는 신규 환경 주소와 구분합니다.
+Apache는 `/log4shell/`를 별도 `internal: true` Docker lab 네트워크의 `http://log4shell:8080/log4shell/`로 전달합니다. Java가 정적 화면·상태 API·CSRF를 확인하는 로깅 API를 제공하고, 화면은 서버가 로깅에 전달한 원문·요청 ID·KST 시각을 표시합니다. 설치 검증은 실행 중 Log4j API/Core 버전과 고정된 무해한 파라미터 요청을 확인합니다. 직접 공격·LDAP 콜백·탐지 E2E는 별도 실습이며 기본 설치에서 실행하지 않습니다. 기존 운영망의 대표 `http://log4shell.grootlab.duckdns.org/`와 예비 IP 경로 `http://192.168.16.230/log4shell/`는 신규 환경 주소와 구분합니다.
 
 ### siem
 
@@ -220,7 +228,28 @@ SIEM의 SSH는 Hermes 전용 키에 읽기 MCP만 허용하는 계정/ForceComma
 bash deploy.sh
 ```
 
-주소를 security, siem, service 순으로 입력한 뒤 SSH 사용자, 개인키 경로(기존 agent/default key 사용 시 빈칸), 감시 NIC, LLM API 주소를 입력합니다. 사전 준비가 모두 통과해야 서비스 설치가 시작됩니다.
+옵션을 생략하면 **`--apply`로 실제 설치를 진행**합니다. 메뉴 선택이나 입력 후 별도 최종 확인 질문은 없습니다. 먼저 흐름만 확인하려면 `bash deploy.sh --plan`을 사용합니다. 설정 파일 없이 실행할 때의 입력 예시는 다음과 같습니다. 아래 주소와 출력은 설명용이며 실제 구축 로그가 아닙니다.
+
+```text
+security 서버 초기 IPv4 주소: 192.0.2.10
+siem 서버 초기 IPv4 주소: 192.0.2.20
+service 서버 초기 IPv4 주소: 192.0.2.30
+공통 SSH 사용자 [ubuntu]:
+SSH 개인키 경로 [기존 ssh-agent/기본키 사용]:
+security 감시 인터페이스 [auto]:
+Log4Shell HTTP 호스트명 [생략하면 기존 IP와 /log4shell/ 경로]:
+Ollama/OpenAI 호환 API 주소 (예: http://192.0.2.40:11434/v1): http://192.0.2.40:11434/v1
+```
+
+선택 질문을 빈칸으로 넘긴 예시입니다. 세 서버의 사전 준비가 모두 통과하면 SIEM → 등록 CA/암호 전달 → service → security 순으로 적용·검증하고 마지막에 SIEM을 다시 검증합니다. 기본 포트와 위 예시 주소를 사용한 성공 출력은 다음과 같습니다.
+
+```text
+구축 완료. WAF: http://192.0.2.10:8080 / SIEM: https://192.0.2.20 / Mattermost: http://192.0.2.20:8065
+Log4Shell: http://192.0.2.10:8080/log4shell/
+인증 정보는 서버의 root 전용 경로에 보관합니다. 결과와 지원 범위는 README를 확인하세요.
+```
+
+실행 전에는 패키지·이미지를 준비합니다. **새 Log4Shell JAR은 수동으로 만들 필요 없이 service 단계에서 자동 빌드**합니다. `LOG4SHELL_APP_JAR`를 생략하거나 비워 두면 소스와 빌드 도구가 전송되고, service 서버의 기존 로컬 이미지로 JAR을 만들어 `/opt/capstone/service/config/log4shell-app.jar`에 설치합니다. 준비된 JAR을 지정하는 경우에만 해당 서버에 파일을 미리 배치합니다. 읽기 전용 JAR 마운트를 포함한 `/opt/capstone/service/compose.json`과 Apache 설정도 자동 생성합니다. 선택 호스트명을 입력했다면 DNS/hosts를 security IP로 미리 연결해야 하며, 출력 주소도 `http://<호스트명>:8080/log4shell/`로 바뀝니다.
 
 반복 실행할 환경은 비밀 값이 없는 로컬 설정으로 저장할 수 있습니다. `~`, `$HOME`, 셸 치환, 따옴표를 해석하지 않는 단순 `KEY=value` 형식입니다. 경로는 절대 경로를 사용합니다.
 
@@ -233,9 +262,16 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 bash deploy.sh --verify --batch --config deployment/site.local.conf
 ```
 
-`--plan`은 로컬 입력 검사만 수행하고 SSH 연결을 하지 않습니다. `--check`는 원격 임시폴더에서 읽기 사전검사를 하고 정리합니다. `--apply`는 설치·시작·검증, `--verify`는 기존 구성 확인입니다.
+`--batch --config`를 사용하면 입력 질문 없이 진행합니다.
 
-같은 프로필의 완료된 역할은 검증 경로로 처리하며, 중간 실패 흔적이나 다른 설정·기존 서비스가 발견되면 자동 덮어쓰기하지 않습니다. 선택 HTTP 호스트명·공개 WAF 포트를 포함한 service 상태는 schema3이며 이전 schema1/2의 자동 이관은 지원하지 않습니다. 실패한 역할의 상태와 서버 내 제한된 로그를 검토한 뒤 재개합니다. 자동 롤백을 명목으로 기존 컨테이너·볼륨·agent 키를 삭제하지 않습니다.
+| 모드 | 실행 범위 | 완료 출력 |
+|---|---|---|
+| `--plan` | 로컬 입력 검사·계획 표시, SSH 없음 | 입력·구성·순서 안내 |
+| `--check` | SSH·세 서버 사전 준비와 빌드 소스 정적 검사, 임시 자료 정리, 컴파일·서비스 설치 없음 | `세 서버 사전검사 통과.` |
+| `--apply` (기본) | 사전검사 → 설치·시작·검증 | 위 예시의 접속 주소 |
+| `--verify` | 기존 구성 확인, Log4Shell 무해한 로깅 요청 포함 | `세 역할 검증 완료.` |
+
+자동 빌드의 실제 컴파일은 SIEM 적용 이후 service 적용 단계에서 수행합니다. `--check` 성공만으로 컴파일 성공을 보장하지 않으며, 빌드가 실패하면 SIEM은 이미 구성됐을 수 있습니다. 같은 프로필의 완료된 역할은 재빌드 없이 검증 경로로 처리하며, 중간 실패 흔적이나 다른 설정·기존 서비스가 발견되면 자동 덮어쓰기하지 않습니다. 빌드 모드·소스·빌더 지문, 선택 HTTP 호스트명·공개 WAF 포트·새 Java JAR 및 검증기 해시를 포함한 service 상태는 schema6이며 이전 schema1~5의 자동 이관은 지원하지 않습니다. 실패한 역할의 상태와 서버 내 제한된 로그를 검토한 뒤 재개합니다. 자동 롤백을 명목으로 기존 컨테이너·볼륨·agent 키를 삭제하지 않습니다.
 
 ## 검증 범위와 운영 이식
 
@@ -256,4 +292,4 @@ bash deployment/roles/service-test.sh
 - 기존 DGX/Imperva 고정 주소 예외, 정기 보고·인증서 감시, Log4Shell 직접 공격·LDAP 콜백·탐지 E2E 시나리오
 - 공개 인증서·채팅 HTTPS·모바일 푸시·SSL VPN, 모델 학습/업로드
 
-Docker 자체 JSON 로그에는 역할별 제한이 있지만 Suricata/WAF 원본의 장기 회전·보존은 별도 설정해야 합니다. 새 환경에는 읽기 MCP 두 개만 연결되며 LLM에 일반 sudo나 Docker 권한을 주지 않습니다. 이 새 환경 설치기로 기존 운영 서버를 업그레이드하지 않습니다. 기존 C의 Apache/PHP UI 추가 배포는 [별도 운영 절차](infra/groot-c/log4shell-ui/README.md)와 작업 기록으로 구분합니다.
+Docker 자체 JSON 로그에는 역할별 제한이 있지만 Suricata/WAF 원본의 장기 회전·보존은 별도 설정해야 합니다. 새 환경에는 읽기 MCP 두 개만 연결되며 LLM에 일반 sudo나 Docker 권한을 주지 않습니다. 이 새 환경 설치기로 기존 운영 서버를 업그레이드하지 않습니다. 기존 C의 교체는 [Java 웹 운영 경로](infra/groot-c/log4shell-app/README.md)와 작업 기록으로 구분하며, [이전 PHP 웹 검증 기록](infra/groot-c/log4shell-ui/README.md)은 과거 이력으로 보존합니다.

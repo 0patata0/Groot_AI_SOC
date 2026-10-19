@@ -1,0 +1,555 @@
+{
+  "recorded_at": "2026-10-19T11:07:54.516969+00:00",
+  "scope": "Existing Groot_C Java app and Apache prefix proxy replacement; inert messages only",
+  "rollout": {
+    "started_at": "2026-10-19T10:57:39.687476+00:00",
+    "backup": "/var/backups/capstone-log4shell-java/20261019-replace-php",
+    "checks": [
+      {
+        "internal_java": "log4shell_spring_ready"
+      },
+      {
+        "apache_proxy": "log4shell_spring_ready"
+      },
+      {
+        "dvwa_http": "200"
+      }
+    ],
+    "runtime": {
+      "ok": true,
+      "log4jApiVersion": "2.14.1",
+      "log4jCoreVersion": "2.14.1",
+      "javaVersion": "1.8.0_181",
+      "time": "2026-10-19T19:57:45.075+09:00"
+    },
+    "success": true,
+    "jar_sha256": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053",
+    "original_jar_sha256": "dbb52eaac0ad7ebd93578e7147e10e264be8a342a341a87eb0b08c0ee70fe51e",
+    "container": {
+      "id": "8d1fa1cf0173d59ba9ec609d10f35ca841145a48882354550d2383a350d41447",
+      "image": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+      "ports": {
+        "8080/tcp": [
+          {
+            "HostIp": "10.200.10.20",
+            "HostPort": "8080"
+          }
+        ]
+      },
+      "started_at": "2026-10-19T10:57:40.773565278Z",
+      "restart_count": 0
+    },
+    "removed_runtime_paths": [
+      "/var/www/html/log4shell",
+      "/home/groot_c/capstone/log4shell-ui",
+      "/var/lib/capstone-log4shell-ui"
+    ],
+    "services": {
+      "apache2": "active",
+      "docker": "active",
+      "wazuh-agent": "active"
+    },
+    "finished_at": "2026-10-19T10:57:45.711618+00:00"
+  },
+  "build": {
+    "application_file_count": 8,
+    "base_sha256": "dbb52eaac0ad7ebd93578e7147e10e264be8a342a341a87eb0b08c0ee70fe51e",
+    "classpath_idx": "preserved",
+    "dependencies_unchanged": true,
+    "layers_idx": "preserved",
+    "libraries_sha256": {
+      "BOOT-INF/lib/jackson-annotations-2.13.0.jar": "81f9724d8843e8b08f8f6c0609e7a2b030d00c34861c4ac7e2099a7235047d6f",
+      "BOOT-INF/lib/jackson-core-2.13.0.jar": "348bc59b348df2e807b356f1d62d2afb41a974073328abc773eb0932b855d2c8",
+      "BOOT-INF/lib/jackson-databind-2.13.0.jar": "9c826d27176268777adcf97e1c6e2051c7e33a7aaa2c370c2e8c6077fd9da3f4",
+      "BOOT-INF/lib/jackson-datatype-jdk8-2.13.0.jar": "97350ab6e439d32f9dfbce8b17ff7d670194ae554de408ac765131ba49f46305",
+      "BOOT-INF/lib/jackson-datatype-jsr310-2.13.0.jar": "d839c42eb5b199795820fed8182a42e69fd3368fc1a3ae80100527ae345fd828",
+      "BOOT-INF/lib/jackson-module-parameter-names-2.13.0.jar": "2dbae64f2a997d05c5c2871e42f14d1e8c69cf9e25842d60448d585074c394b0",
+      "BOOT-INF/lib/jakarta.annotation-api-1.3.5.jar": "85fb03fc054cdf4efca8efd9b6712bbb418e1ab98241c4539c8585bbc23e1b8a",
+      "BOOT-INF/lib/jul-to-slf4j-1.7.32.jar": "6dee8d85ad6943aff0600f14897c469e64bae0413ee33a15c448af00432c0642",
+      "BOOT-INF/lib/log4j-api-2.14.1.jar": "8caf58db006c609949a0068110395a33067a2bad707c3da35e959c0473f9a916",
+      "BOOT-INF/lib/log4j-core-2.14.1.jar": "ade7402a70667a727635d5c4c29495f4ff96f061f12539763f6f123973b465b0",
+      "BOOT-INF/lib/log4j-jul-2.14.1.jar": "f1adf70e5af4cb4def92ee0e192e8798a9dc9f5874b79b34a8e871c6ea08efea",
+      "BOOT-INF/lib/log4j-slf4j-impl-2.14.1.jar": "1e466dd397fb7dd903420c5172234a7d88d7f1a85aa4f5573105c0d9ce12fa33",
+      "BOOT-INF/lib/slf4j-api-1.7.32.jar": "3624f8474c1af46d75f98bc097d7864a323c81b3808aa43689a6e1c601c027be",
+      "BOOT-INF/lib/snakeyaml-1.29.jar": "89c5f029811b08c878f0b81dbb05e9626624c1fda4087a26871101e499a217ab",
+      "BOOT-INF/lib/spring-aop-5.3.13.jar": "24e41b42137dfb6bde3aace2d48e45d73c4be13d4167d88a789ba41bf9325f79",
+      "BOOT-INF/lib/spring-beans-5.3.13.jar": "7d0d4e4da5c9e2168ec21d49a94668a1c8a1d22fdae7ddaffc899f3a2859e306",
+      "BOOT-INF/lib/spring-boot-2.6.1.jar": "dddc17a060dfea6aa25acc364cc025750b542006514b78da92188fff7584f085",
+      "BOOT-INF/lib/spring-boot-autoconfigure-2.6.1.jar": "5d3cceab0a47f7fb940f700ce25b600636189f64bc61b8332018aa3019bf7816",
+      "BOOT-INF/lib/spring-boot-jarmode-layertools-2.6.1.jar": "0c007a763234980590625d8bc1742a7b1b9506b5a9bd527d970c734ae9b48dd9",
+      "BOOT-INF/lib/spring-context-5.3.13.jar": "90a5eeff7d1b3b7d407c9697c9a7b6c6ad47d3b391617011974aaa980d6c7e55",
+      "BOOT-INF/lib/spring-core-5.3.13.jar": "f917578c93e5542eced89c4462fda3958230707d842ffbfa61110aa3a897dc98",
+      "BOOT-INF/lib/spring-expression-5.3.13.jar": "53b006b299f4d9788a156a1f4a85b6cabcc85d53c5bad1436b8a136ee44dbfeb",
+      "BOOT-INF/lib/spring-jcl-5.3.13.jar": "19439f135c90d6ab8f59a24e65bcddad41b9f0af0895115b08316a9ca204e5b0",
+      "BOOT-INF/lib/spring-web-5.3.13.jar": "1e9cf607c870099ac109f7f38edc87a2353f7f9b496d3519e4a20aa57ee75779",
+      "BOOT-INF/lib/spring-webmvc-5.3.13.jar": "869f7c868b56fe46dd9446f27271d8804db8daf279952ef0b7e7fd97411cf359",
+      "BOOT-INF/lib/tomcat-embed-core-9.0.55.jar": "b416061261539314cac6c2f63d7fd12d3a17f00beb927b5d65b41356bdddc615",
+      "BOOT-INF/lib/tomcat-embed-el-9.0.55.jar": "2eb5256972e46e4021ee28086f4dfa8be7a5d2611d0bee8ad2281e6f84f3a45f",
+      "BOOT-INF/lib/tomcat-embed-websocket-9.0.55.jar": "eb9c347f18054dbb9f0a6136000edf1ddd562990af965b15940aa0add4f507fd"
+    },
+    "loader_and_metadata_unchanged": true,
+    "log4j": "2.14.1",
+    "output": "/var/tmp/capstone-log4shell-java-20261019-y0qvvdie/candidate.jar",
+    "output_sha256": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053",
+    "spring_boot": "2.6.1",
+    "unindexed_libraries": [
+      "BOOT-INF/lib/spring-boot-jarmode-layertools-2.6.1.jar"
+    ]
+  },
+  "candidate_api": {
+    "checks": [
+      {
+        "test": "welcome_html",
+        "pass": true
+      },
+      {
+        "test": "runtime_versions",
+        "pass": true
+      },
+      {
+        "test": "parameter_unicode_literal_backslash_n",
+        "pass": true,
+        "http_status": 200
+      },
+      {
+        "test": "header_x_api",
+        "pass": true,
+        "http_status": 200
+      },
+      {
+        "test": "header_user_agent",
+        "pass": true,
+        "http_status": 200
+      },
+      {
+        "test": "parameter_empty",
+        "pass": true,
+        "http_status": 200
+      },
+      {
+        "test": "csrf_missing",
+        "pass": true,
+        "http_status": 403
+      },
+      {
+        "test": "csrf_tampered",
+        "pass": true,
+        "http_status": 403
+      },
+      {
+        "test": "source_rejected",
+        "pass": true,
+        "http_status": 400
+      },
+      {
+        "test": "header_name_rejected",
+        "pass": true,
+        "http_status": 400
+      },
+      {
+        "test": "value_missing",
+        "pass": true,
+        "http_status": 400
+      },
+      {
+        "test": "legacy_php_absent",
+        "pass": true,
+        "http_status": 404
+      }
+    ],
+    "all_passed": true,
+    "runtime": {
+      "ok": true,
+      "log4jApiVersion": "2.14.1",
+      "log4jCoreVersion": "2.14.1",
+      "javaVersion": "1.8.0_181",
+      "time": "2026-10-19T19:53:19.728+09:00"
+    },
+    "log_receipts": [
+      {
+        "request_id": "3888df77-7659-4e51-a883-c039bf71933d",
+        "message": "groot-java-native-c4f04ecb 한글\nsecond line"
+      },
+      {
+        "request_id": "b1170a89-efe1-4ccc-9f60-dad180a3c9c8",
+        "message": "groot-java-native-c4f04ecb-xapi"
+      },
+      {
+        "request_id": "d6fca34d-0926-4eeb-b9e2-9f6349c0c08b",
+        "message": "groot-java-native-c4f04ecb-ua"
+      },
+      {
+        "request_id": "6c521892-63b8-4f93-ac19-1fe3f6cf831f",
+        "message": ""
+      }
+    ],
+    "notes": [
+      "The candidate test used literal backslash+n. The final public tests below used a real newline and exact console-event matching."
+    ]
+  },
+  "final_public": {
+    "checked_at": "2026-10-19T11:02:39.411240+00:00",
+    "checks": [
+      {
+        "test": "ui_0",
+        "passed": true,
+        "status": 200,
+        "url": "http://log4shell.grootlab.duckdns.org/log4shell/"
+      },
+      {
+        "test": "app.js_0",
+        "passed": true
+      },
+      {
+        "test": "app.css_0",
+        "passed": true
+      },
+      {
+        "test": "runtime_0",
+        "passed": true
+      },
+      {
+        "test": "cookie_0",
+        "passed": true
+      },
+      {
+        "test": "parameter_0",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_0",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_0",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "old_php_removed_0",
+        "passed": true,
+        "status": 404
+      },
+      {
+        "test": "ui_1",
+        "passed": true,
+        "status": 200,
+        "url": "https://log4shell.grootlab.duckdns.org/log4shell/"
+      },
+      {
+        "test": "app.js_1",
+        "passed": true
+      },
+      {
+        "test": "app.css_1",
+        "passed": true
+      },
+      {
+        "test": "runtime_1",
+        "passed": true
+      },
+      {
+        "test": "cookie_1",
+        "passed": true
+      },
+      {
+        "test": "parameter_1",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_1",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_1",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "old_php_removed_1",
+        "passed": true,
+        "status": 404
+      },
+      {
+        "test": "ui_2",
+        "passed": true,
+        "status": 200,
+        "url": "http://log4shell.grootlab.duckdns.org/log4shell/"
+      },
+      {
+        "test": "app.js_2",
+        "passed": true
+      },
+      {
+        "test": "app.css_2",
+        "passed": true
+      },
+      {
+        "test": "runtime_2",
+        "passed": true
+      },
+      {
+        "test": "cookie_2",
+        "passed": true
+      },
+      {
+        "test": "parameter_2",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_2",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_2",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "old_php_removed_2",
+        "passed": true,
+        "status": 404
+      },
+      {
+        "test": "ui_3",
+        "passed": true,
+        "status": 200,
+        "url": "http://192.168.16.230/log4shell/"
+      },
+      {
+        "test": "app.js_3",
+        "passed": true
+      },
+      {
+        "test": "app.css_3",
+        "passed": true
+      },
+      {
+        "test": "runtime_3",
+        "passed": true
+      },
+      {
+        "test": "cookie_3",
+        "passed": true
+      },
+      {
+        "test": "parameter_3",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_3",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_3",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "old_php_removed_3",
+        "passed": true,
+        "status": 404
+      },
+      {
+        "test": "dvwa",
+        "passed": true,
+        "status": 200,
+        "url": "http://dvwa.grootlab.duckdns.org/dvwa/login.php"
+      },
+      {
+        "test": "dvwa",
+        "passed": true,
+        "status": 200,
+        "url": "http://192.168.16.230/dvwa/login.php"
+      }
+    ],
+    "log_receipts": [
+      {
+        "request_id": "bc7b9d17-b5c2-47bc-ae5c-2c76f01aba0f",
+        "message": "groot-java-final-cbd2e765 한글\nsecond line"
+      },
+      {
+        "request_id": "438344d8-6a9a-4c4f-a774-2a3e0284d179",
+        "message": "groot-java-final-cbd2e765-x-api"
+      },
+      {
+        "request_id": "195f0af6-79f2-4316-a628-27bb0f68ac2e",
+        "message": "groot-java-final-cbd2e765 한글\nsecond line"
+      },
+      {
+        "request_id": "d1d45cd4-7036-48e9-a8a9-657def90cec5",
+        "message": "groot-java-final-cbd2e765-x-api"
+      },
+      {
+        "request_id": "7a01f726-f212-456c-a282-aed66e5650e2",
+        "message": "groot-java-final-cbd2e765 한글\nsecond line"
+      },
+      {
+        "request_id": "d07cba99-a0da-4e9c-914e-87d77c54a1a1",
+        "message": "groot-java-final-cbd2e765-x-api"
+      },
+      {
+        "request_id": "9b818ad7-7cea-40c6-b7bd-0bc694f2c084",
+        "message": "groot-java-final-cbd2e765 한글\nsecond line"
+      },
+      {
+        "request_id": "fa1ac3c2-124b-466f-93c7-1790f4d6db8e",
+        "message": "groot-java-final-cbd2e765-x-api"
+      }
+    ],
+    "all_passed": true
+  },
+  "console": {
+    "checks": [
+      {
+        "request_id": "bc7b9d17-b5c2-47bc-ae5c-2c76f01aba0f",
+        "exact_event_and_message": true
+      },
+      {
+        "request_id": "438344d8-6a9a-4c4f-a774-2a3e0284d179",
+        "exact_event_and_message": true
+      },
+      {
+        "request_id": "195f0af6-79f2-4316-a628-27bb0f68ac2e",
+        "exact_event_and_message": true
+      },
+      {
+        "request_id": "d1d45cd4-7036-48e9-a8a9-657def90cec5",
+        "exact_event_and_message": true
+      },
+      {
+        "request_id": "7a01f726-f212-456c-a282-aed66e5650e2",
+        "exact_event_and_message": true
+      },
+      {
+        "request_id": "d07cba99-a0da-4e9c-914e-87d77c54a1a1",
+        "exact_event_and_message": true
+      },
+      {
+        "request_id": "9b818ad7-7cea-40c6-b7bd-0bc694f2c084",
+        "exact_event_and_message": true
+      },
+      {
+        "request_id": "fa1ac3c2-124b-466f-93c7-1790f4d6db8e",
+        "exact_event_and_message": true
+      }
+    ],
+    "all_passed": true,
+    "real_newline": true
+  },
+  "apache_configtest": "AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globally to suppress this message\nSyntax OK",
+  "apache_sha256": {
+    "/etc/apache2/conf-available/log4shell-java.conf": "3a838ea895d4ee1f4494bf3378019cc2ad9982155105215c00064a09aadbd7b6",
+    "/etc/apache2/sites-available/log4shell.conf": "3658a13f0e5dfbc54f880179013f06a3b2548e55e0d6bf8fae2cffb8c714e1ef",
+    "/etc/apache2/sites-available/000-default.conf": "39fe841a64538ee980ae4ef011bdf6ae7124f63bf44afd65553cf3e0618e952c"
+  },
+  "a_unchanged": {
+    "containers_started_at_unchanged": true,
+    "runtime_nginx_sha_unchanged": true,
+    "waf_mode_unchanged": true,
+    "nft_table_list_unchanged": true,
+    "services": {
+      "docker": "active",
+      "wazuh-agent": "active",
+      "capstone-vector": "active"
+    }
+  },
+  "browser": {
+    "app": "Safari",
+    "checks": [
+      {
+        "scheme": "http",
+        "source": "parameter",
+        "status": 200,
+        "request_id": "0abe6724-8311-4dcf-aeae-b4415fd82a2b"
+      },
+      {
+        "scheme": "http",
+        "source": "header",
+        "status": 200,
+        "request_id": "041578b7-3c0a-46bb-a315-4f5fbfda8a56"
+      },
+      {
+        "scheme": "https",
+        "source": "parameter",
+        "status": 200,
+        "request_id": "4c9bb9c3-f6ed-46ef-a653-3715992992d8"
+      },
+      {
+        "scheme": "http-after-https",
+        "source": "parameter",
+        "status": 200,
+        "request_id": "9491f030-3190-48e5-902a-43640705ce5f"
+      }
+    ],
+    "message": "Groot logging lab",
+    "notes": [
+      "Initial HTTPS navigation showed a blank page; clicking reload displayed the page and the request passed. Native text replacement did not change the value; browser tests used the fixed default value. Unicode/newline was verified separately through HTTP and console."
+    ]
+  },
+  "local_checks": {
+    "service_regression_passed": 38,
+    "controller_regression_passed": 17,
+    "bash_python_js_syntax": "passed",
+    "offline_builder_fixture_rejection_checks": 14,
+    "offline_builder_index_directory_regression_checks": 6,
+    "changed_scope_diff_check": "passed"
+  },
+  "preserved_php_source_archive": {
+    "path": "대화기록/자료/log4shell-php-source-20261019.tar.gz",
+    "sha256": "ae97da06131ddca640e057939b3e8218c7b1159e26fdc36b2d425c7ee0ffb1c2"
+  },
+  "limitations": [
+    "No Gradle dependency-resolution build was run. Existing Java 8 compiler and verified nested libraries were used.",
+    "No new Docker image was built. Recreating the existing container from its original image requires applying the preserved new JAR and external bind configuration.",
+    "Fresh three-VM installation was not run.",
+    "No exploit payload, callback, packet capture, security detection/blocking or attack E2E was performed.",
+    "Existing WAF error-response Content-Type text/html remains.",
+    "A scenario route is OFF; previously recorded OBS_SEG installed-script drift remains."
+  ],
+  "packages_downloaded_or_installed": 0,
+  "cleanup": {
+    "server": {
+      "checked_at": "2026-10-19T11:08:17.798844+00:00",
+      "server_stage_removed": true,
+      "container_stage_removed": true,
+      "server_source_files_verified": 15,
+      "runtime_jar_matches_artifact": true,
+      "container_still_running": true,
+      "backup_preserved": true,
+      "artifact_preserved": true
+    },
+    "mac_cleanup_tracked_in_local_conversation_log": true,
+    "mac_packages_installed": 0,
+    "server_packages_installed": 0
+  },
+  "source_sha256": {
+    "README.md": "63943ab5654c22373c33f2d633edea034610a276ec4e0f83127fd623d359905f",
+    "apache-proxy.conf": "3a838ea895d4ee1f4494bf3378019cc2ad9982155105215c00064a09aadbd7b6",
+    "build.gradle": "bdff597d06c04f308d7f022437ca0aaa548d8913efb1a8c8630b8615fb68f8e2",
+    "existing-container.properties": "5a7df62e2ab3162bb311567eeb20d58b84c3e52971914b99a9c03b4509eb89ad",
+    "settings.gradle": "a948af78eb486500bfc0a09d90869ee1527abfa9f58f29312f9dcf57d3556889",
+    "src/main/java/fr/christophetd/log4shell/vulnerableapp/LabCsrf.java": "e5c6b5d2f73535ad26f6edd860adc61e4cbfc7dddf1b162b0febe51733ca77f3",
+    "src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java": "d83092a35ff8e806f5a515c994059e4af2c67f04bca9f608995005dcd8801ba4",
+    "src/main/java/fr/christophetd/log4shell/vulnerableapp/VulnerableAppApplication.java": "c752513d08c7ff950a4dfb9b89c015779f57d503c777ea97fb2836f2fe4ed918",
+    "src/main/resources/application.properties": "7e6ed7632030fa90e3ce0f605aa64bf7ef54a9c973cb7ba53dd6ed2bb4e6f145",
+    "src/main/resources/log4j2-spring.xml": "435e610928f88512ec1d84f9f7ce1e3c13e387227adfd026ee1b3b4f384070e1",
+    "src/main/resources/static/app.css": "b59f6410c32e1303029edbb11e1e4b7c3423b42cb8ed76de74e6bb722792b2dc",
+    "src/main/resources/static/app.js": "4d06b4292aacba423e8ba7f1519be110612c33bee5ac2cdec89dbda236a97cc6",
+    "src/main/resources/static/index.html": "01125144eb88de03cd4b61822e5a68bf2acec67c619949eca5dd58766ddf6a93",
+    "tools/build_from_existing.py": "65b5a1274b80f4e42624f2775e662366f7350a982027a8c8c5ac05caae35e5c7"
+  },
+  "finalized_at": "2026-10-19T11:10:05.599984+00:00"
+}

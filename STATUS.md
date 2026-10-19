@@ -1,4 +1,36 @@
-# 인프라 현황 — 2026-10-15 현재 작업 상태
+# 인프라 현황 — 2026-10-19 현재 작업 상태
+
+## 초기 설치기의 Log4Shell 자동 빌드 완료 (2026-10-19 22:36 KST 검증)
+
+`LOG4SHELL_APP_JAR`를 비워 두거나 생략하면 초기 `deploy.sh`가 전달한 Java 소스와 service 서버의 사전 준비 이미지 JDK8u181·원본 라이브러리로 새 앱을 자동 빌드한다. 별도 JAR 수동 빌드·반입이 기본 조건에서 빠졌다. 제공된 `/opt/*.jar`를 명시하는 선택 방식도 유지한다. service schema6에 소스 지문과 빌드 증거를 저장하며, 완료된 동일 구성 재실행은 재빌드하지 않는다. 패키지와 Docker 이미지·SSH는 계속 사전 준비 대상이다.
+
+**직접 확인:** C에서 실제 `prepare_lab_jar` 함수를 격리 실행해 운영 JAR와 동일한 SHA `16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053`을 생성했다. 동일 산출물의 비root·읽기 전용 임시 앱에서 웹/버전/CSRF 정상 로깅과 콘솔을 확인했다. 운영 컨테이너 ID·기동시각은 유지했고 컴파일/앱 후보와 서버 임시 소스·시험 JAR를 제거했다. controller20·service51·빌더16 회귀, Bash 검사와 독립 리뷰를 통과했다. 최초 standalone Docker 경로 가정 오류는 컨테이너 생성 전 발견해 실제 PATH 탐색으로 수정했다.
+
+`--check`는 소스·이미지의 정적 검사이며 실제 컴파일은 SIEM 구성 이후 service `apply`에서 수행한다. 실패하면 후속 security 단계가 중단되고 기존 SIEM과 service 실패 근거를 보존한다. 신규3VM 전체 설치·Gradle 의존성 해석·실제 공격 E2E는 미실행이다. [자동 빌드 검증](infra/groot-c/log4shell-app/autobuild-validation-20261019.json). 아래20:30의 JAR 사전 준비 필수 설명은 당시 이력이다.
+
+## Log4Shell Docker 재생성 자동화 완료 (2026-10-19 20:29 적용·20:30 KST 검증)
+
+사용자 요청에 따라 기존 C의 `log4shell-lab`을 영속 Compose 관리로 전환했다. 새 JAR SHA는 `16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053` 그대로이며, `/opt/capstone-log4shell/artifacts/<SHA>.jar`를 읽기 전용 마운트한다. Java 실행 명령·포트·context·로그 설정을 Compose에 명시하므로 컨테이너 쓰기 계층에 JAR를 다시 복사하지 않아도 된다. 원래 로컬 이미지 ID·기본 bridge·`10.200.10.20:8080`·HTTP/HTTPS 주소를 유지하며 UID/GID65532, 읽기 전용 rootfs, capability 제거, CPU/메모리/PID 제한과 로그 회전을 적용했다.
+
+**직접 확인:** 첫 기동, 같은 설정의 `up` 재실행(ID 유지), `recreate`(ID 변경), 컨테이너를 실제 제거한 뒤 `up`(새 ID) 모두 새 Java 웹을 자동 복원했다. 최초 업로드 저장소를 다른 경로로 옮긴 상태에서도 설치된 관리기만으로 성공했다. 최종 ID는 `457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f`, 시작은20:29:31 KST다. 재기동 전 CSRF 토큰 거부·새 토큰 요청 성공, 공개 HTTP→HTTPS→HTTP/IP 38검사·콘솔 원문8건·DVWA200·Apache/Docker/Wazuh active를 확인했다. Apache proxy/vhost SHA는 전환 전과 같으며 A/B·방화벽·시나리오 토글은 변경하지 않았다.
+
+운영 명령은 **C에서** `sudo bash /opt/capstone-log4shell/manage.sh up|recreate|verify` 중 하나를 실행한다. 파일·이미지·ID·project 목록·마운트가 승인된 상태와 다르면 중단한다. 컨테이너 생성 후 ID 기록이 중단된 경우에는 전체 계약·마운트 JAR·실제 HTTP 검증을 통과해야 하는 별도 `recover`를 사용한다. 복구본은 `/var/backups/capstone-log4shell-java/20261019-compose`(root0700)에 보존했고 이전 컨테이너는 검증 후 제거했다. 관리기 설치는 사용자 요청에 따른 운영 작업이며 SOC LLM에 일반 Docker/sudo 권한을 위임한 것이 아니다.
+
+초기3VM `deploy.sh`의 service 역할은 **schema5**로 Java 명령·환경·읽기 전용 JAR 마운트를 생성한다. service40·controller17·관리기21 회귀와 C의 native Compose 검사를 통과했다. `bash deploy.sh`는 기본 `--apply`이며8개 입력 뒤 사전 점검→SIEM→service→security→검증→접속주소를 출력한다. 예시는 [초기 실행 안내](README.md#5-실행)에 있다. 서버 패키지·Docker 이미지와 `LOG4SHELL_APP_JAR`는 사전 준비해야 하며 설치기가 JAR를 빌드하거나 내려받지는 않는다.
+
+**미실행:** 신규3VM 실제 설치·Gradle 의존성 해석 빌드·호스트 재부팅·실제 공격/콜백/탐지/차단 E2E. 최초 `network=none` 임시 후보의 준비 확인은 호스트명 조회 오류로 실패했으며 제거 후 실제 운영과 같은 bridge 후보에서 성공했다. 운영 전환은 성공했고 아래19:57의 재생성 제한은 당시 상태다. [관리 소스·운영 안내](infra/groot-c/log4shell-app/README.md) · [이번 검증 근거](infra/groot-c/log4shell-app/compose-validation-20261019.json).
+
+## Log4Shell Java 웹 교체 완료 (2026-10-19 19:57 KST 적용·20:04 KST 브라우저 확인)
+
+사용자 요청에 따라 기존 PHP 중계 웹을 제거하고 **Spring Boot가 화면과 API를 직접 제공하는 웹**으로 교체했다. 주소는 **http://log4shell.grootlab.duckdns.org/** 및 선택 HTTPS·기존 IP `/log4shell/`를 유지한다. 화면에서 `message` 또는 `X-Api-Version`을 선택하면 서버가 받은 값을 필터·trim 없이 `logger.info(raw)`에 기록한다. 직접 API는 `User-Agent`도 지원한다. 응답은 요청 ID·KST 시각·전달 원문을 표시하며, 로그 호출 완료와 패킷·공격·탐지 결과는 구분한다. 공격 페이로드나 외부 콜백 기능은 추가하지 않았다.
+
+**직접 확인한 실행 버전:** Spring Boot2.6.1, Log4j API/Core2.14.1, Java1.8.0_181. 기존 서버 JDK8과 원래 JAR의 라이브러리28개·Spring loader를 재사용해 오프라인 컴파일·패키징했고, 새 JAR SHA-256은 `16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053`이다. Mac/서버 패키지 설치나 의존성 다운로드 없이 같은 `log4shell-lab`을 stop/start1회 했다. 컨테이너 ID·원본 이미지 ID·`10.200.10.20:8080` 바인딩은 유지한다. 이미지 태그 자체를 새 앱 이미지로 바꾼 것은 아니므로 재생성 시 별도 보존 JAR를 사용해야 한다.
+
+C Apache의 기존 proxy/proxy_http 모듈을 활성화하고 `/log4shell/`를 고정 내부 Java 주소로 프록시하도록 reload했다. 이전 PHP 공개·운영 소스·요청 상태 디렉터리는 활성 경로에서 제거했다. 복구본은 C `/var/backups/capstone-log4shell-java/20261019-replace-php`(root0700), 새 소스는 `/home/groot_c/capstone/log4shell-app`, 배포 JAR는 `/var/lib/capstone-log4shell-java/spring-boot-application.jar`다. DVWA와 기존 Apache vhost는 유지한다.
+
+**검증:** candidate native API12항목, 실제8080·Apache 프록시 verifier, HTTP→HTTPS→HTTP 및 예비 IP의38항목, 요청 ID별 실제 콘솔 원문8건이 통과했다. 한글·실제 줄바꿈은 파라미터로 왕복·로그를 확인했다. Safari에서 HTTP 파라미터/헤더, HTTPS 파라미터, HTTP 복귀 후 파라미터가 모두200으로 표시됐다. CSRF누락403·기존api.php404, DVWA200·C Apache/Docker/Wazuh active를 확인했다. 기존 WAF의403 응답 `text/html` MIME 한계는 남아 있다. HTTP/HTTPS 쿠키는 별도이며 CSRF 검사는 로그 문자열 필터나 로그인 기능이 아니다.
+
+초기 설치기는 사전 준비한 `LOG4SHELL_APP_JAR` 검증·읽기 전용 마운트와 Apache 프록시를 사용하는 **service schema4**로 맞췄다. 서비스38·컨트롤러17 회귀가 통과했다. **Gradle 의존성 해석 빌드, 신규3VM 실제 설치, 실제 공격·콜백·탐지·차단 E2E는 미실행**이다. 별도 A:8080 시나리오 토글은 OFF이며 기존 OBS_SEG 설치본 차이는 이번 웹 교체에서 다루지 않았다. 아래10/15 PHP 화면과 이전 GET /계약은 당시 기록이다. [소스·운영 안내](infra/groot-c/log4shell-app/README.md) · [검증 근거](infra/groot-c/log4shell-app/deployment-validation-20261019.json).
 
 ## 만료 승인 카드 정리 배포·실제 API 검증 완료 (2026-10-15 19:02 KST)
 

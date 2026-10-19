@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Fresh Ubuntu 24.04 amd64 service role. No package/image download or build.
+# Fresh Ubuntu 24.04 amd64 service role. No package/image download or image build.
+# The lab application is compiled offline during apply unless a JAR is supplied.
 # Official contracts: github.com/digininja/DVWA/{compose.yml,config/config.inc.php.dist,setup.php}
 # httpd.apache.org/docs/2.4/expr.html (CONN_REMOTE_ADDR)
 # documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html
@@ -71,8 +72,17 @@ LoadModule remoteip_module /usr/lib/apache2/modules/mod_remoteip.so
 </IfModule>
 RemoteIPHeader X-Forwarded-For
 RemoteIPInternalProxy $SECURITY_HOST
+<IfModule !proxy_module>
+LoadModule proxy_module /usr/lib/apache2/modules/mod_proxy.so
+</IfModule>
+<IfModule !proxy_http_module>
+LoadModule proxy_http_module /usr/lib/apache2/modules/mod_proxy_http.so
+</IfModule>
+ProxyRequests Off
 <VirtualHost *:80>
 DocumentRoot /var/www/html
+ProxyPass /log4shell/ http://log4shell:8080/log4shell/ connectiontimeout=3 timeout=10
+ProxyPassReverse /log4shell/ http://log4shell:8080/log4shell/
 <Location "/">
   Require expr "%{CONN_REMOTE_ADDR} == '$SECURITY_HOST' || %{CONN_REMOTE_ADDR} == '127.0.0.1' || %{CONN_REMOTE_ADDR} == '::1'"
 </Location>
@@ -95,6 +105,8 @@ EOF
 <VirtualHost *:80>
 ServerName $LOG4SHELL_HOSTNAME
 DocumentRoot /var/www/html
+ProxyPass /log4shell/ http://log4shell:8080/log4shell/ connectiontimeout=3 timeout=10
+ProxyPassReverse /log4shell/ http://log4shell:8080/log4shell/
 RedirectMatch 302 "^/(?!log4shell/).*" "$origin/log4shell/"
 <Location "/">
   Require expr "%{CONN_REMOTE_ADDR} == '$SECURITY_HOST' || %{CONN_REMOTE_ADDR} == '127.0.0.1' || %{CONN_REMOTE_ADDR} == '::1'"
@@ -111,52 +123,46 @@ ErrorLog /var/log/capstone-service/error.log
 EOF
   fi
 }
-ui_sources(){
-  python3 -B - "$CAPSTONE_SOURCE" "${1:-manifest}" "${2:-}" <<'PY'
-import hashlib,json,os,pathlib,re,stat,sys
-def ui_assets(source):
-    root=pathlib.Path(source)
-    for part in ('infra','groot-c','log4shell-ui','public'):
-        root=root/part
-        assert root.is_dir() and not root.is_symlink(), 'UI source directory missing or linked'
-    expected={'api.php','index.html','app.js','app.css'}
-    assert {p.name for p in root.iterdir()}==expected, 'Unexpected UI source files'
-    original={}
-    for name in sorted(expected):
-        p=root/name; s=p.lstat()
-        assert stat.S_ISREG(s.st_mode) and s.st_nlink==1 and 0<s.st_size<=262144, 'Invalid UI source file'
-        b=p.read_bytes(); assert b'\0' not in b; b.decode('utf-8')
-        original[name]=b
-    marker=b"const LAB_URL = 'http://10.200.10.20:8080/';"
-    assert original['api.php'].count(marker)==1, 'Expected fixed lab URL missing or duplicated'
-    assert len(re.findall(rb'\bconst\s+LAB_URL\s*=',original['api.php']))==1, 'Ambiguous lab URL declaration'
-    deployed=dict(original)
-    deployed['api.php']=original['api.php'].replace(marker,b"const LAB_URL = 'http://log4shell:8080/';",1)
-    return original,deployed
-original,deployed=ui_assets(sys.argv[1])
-if sys.argv[2]=='manifest':
-    print(json.dumps({name:hashlib.sha256(b).hexdigest() for name,b in original.items()},sort_keys=True,separators=(',',':')))
-elif sys.argv[2]=='install':
-    destination=pathlib.Path(sys.argv[3])
-    assert destination.is_dir() and not destination.is_symlink()
-    assert not list(destination.iterdir()), 'UI destination must be empty'
-    for name,b in deployed.items():
-        with (destination/name).open('xb') as f:
-            f.write(b);f.flush();os.fchmod(f.fileno(),0o644);os.fchown(f.fileno(),0,0);os.fsync(f.fileno())
-else: raise AssertionError('Unknown UI source operation')
-PY
+lab_jar_check(){
+  python3 -B "$CAPSTONE_SOURCE/deployment/validate_log4shell_jar.py" "$1"
+}
+lab_source_check(){
+  python3 -B "$CAPSTONE_SOURCE/infra/groot-c/log4shell-app/tools/prepare_from_image.py" check "$CAPSTONE_SOURCE"
+}
+prepare_lab_jar(){
+  if [[ $LAB_JAR_MODE == auto ]]; then
+    # This is the first preparation step after creating the private role
+    # directories. A compiler failure cannot deploy any service container.
+    if ! python3 -B "$CAPSTONE_SOURCE/infra/groot-c/log4shell-app/tools/prepare_from_image.py" \
+        build "$CAPSTONE_SOURCE" "$LAB_ID" "$ROLE/config/log4shell-app.jar" \
+        --expected-source-sha256 "$LAB_SOURCE_SHA" --docker "$DOCKER" \
+        >"$ROLE/evidence/log4shell-build.json" 2>"$ROLE/evidence/log4shell-build.log"; then
+      die offline_log4shell_build_failed_private_evidence_preserved
+    fi
+    LAB_JAR_SHA=$(lab_jar_check "$ROLE/config/log4shell-app.jar") || die invalid_built_log4shell_jar
+    jq -e --arg source "$LAB_SOURCE_SHA" --arg image "$LAB_ID" --arg jar "$LAB_JAR_SHA" \
+      '.schema==1 and .mode=="offline-image-jdk" and .source_sha256==$source and .image_id==$image and
+       .package.output_sha256==$jar and .package.dependencies_unchanged==true and
+       .package.loader_and_metadata_unchanged==true and .temporary_containers_removed==true' \
+      "$ROLE/evidence/log4shell-build.json" >/dev/null || die offline_build_evidence_mismatch
+  else
+    [[ $(lab_jar_check "$LOG4SHELL_APP_JAR") == "$LAB_JAR_SHA" ]] || die lab_jar_changed_before_copy
+    install -o root -g root -m 0644 "$LOG4SHELL_APP_JAR" "$ROLE/config/log4shell-app.jar"
+    [[ $(sha "$ROLE/config/log4shell-app.jar") == "$LAB_JAR_SHA" ]] || die lab_jar_changed_during_copy
+    jq -nS --arg jar "$LAB_JAR_SHA" '{schema:1,mode:"provided",output_sha256:$jar}' >"$ROLE/evidence/log4shell-build.json"
+  fi
 }
 
-php_image_probe(){
+apache_image_probe(){
   local cid outcome=1
-  cid=$(docker_cmd create --pull never --network none --read-only --user 33:33 \
+  cid=$(docker_cmd create --pull never --network none --read-only \
     --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 32 --memory 128m \
-    --label io.capstone.portable.php-probe=service --entrypoint php "$APP_ID" \
-    -r 'exit(PHP_VERSION_ID>=80100 && extension_loaded("curl") && extension_loaded("session") ? 0 : 1);') || die php_probe_creation_failed
-  [[ $cid =~ ^[a-f0-9]{64}$ ]] || die invalid_php_probe_identity
+    --label io.capstone.portable.apache-probe=service --entrypoint sh "$APP_ID" \
+    -c 'test -r /usr/lib/apache2/modules/mod_proxy.so && test -r /usr/lib/apache2/modules/mod_proxy_http.so && php -m | grep -qx mysqli') || die apache_probe_creation_failed
+  [[ $cid =~ ^[a-f0-9]{64}$ ]] || die invalid_apache_probe_identity
   if timeout --kill-after=2s 20s "$DOCKER" start --attach "$cid" >/dev/null 2>&1; then outcome=0; fi
-  docker_cmd rm --force "$cid" >/dev/null || die php_probe_cleanup_failed
-  [[ $outcome == 0 ]] || die preloaded_dvwa_requires_php_8_1_curl_session
+  docker_cmd rm --force "$cid" >/dev/null || die apache_probe_cleanup_failed
+  [[ $outcome == 0 ]] || die preloaded_dvwa_requires_proxy_modules_and_mysqli
 }
 
 compose_document(){
@@ -166,9 +172,6 @@ compose_document(){
       networks:["front","private","lab"],depends_on:{db:{condition:"service_healthy"},log4shell:{condition:"service_started"}},
       volumes:["./config/apache.conf:/etc/apache2/sites-enabled/000-default.conf:ro",
         "./config/bootstrap.php:/opt/capstone-bootstrap.php:ro",
-        "./config/verify-log4shell.php:/opt/capstone-log4shell-verify.php:ro",
-        "./config/log4shell-ui:/var/www/html/log4shell:ro",
-        "./state/log4shell-ui:/var/lib/capstone-log4shell-ui",
         "./logs:/var/log/capstone-service"],
       labels:{"io.capstone.role":"service"},security_opt:["no-new-privileges:true"],pids_limit:256,
       healthcheck:{test:["CMD","php","-r","exit(strpos(@file_get_contents(\"http://127.0.0.1/login.php\"),\"DVWA\")!==false?0:1);"],interval:"5s",timeout:"3s",retries:24},
@@ -179,10 +182,14 @@ compose_document(){
       labels:{"io.capstone.role":"service"},security_opt:["no-new-privileges:true"],pids_limit:256,
       logging:{driver:"json-file",options:{"max-size":"10m","max-file":"3"}}},
     log4shell:{image:$lab,container_name:"capstone-service-log4shell",pull_policy:"never",restart:"unless-stopped",
+      entrypoint:["java"],command:["-jar","/app/spring-boot-application.jar"],working_dir:"/app",
       user:"65532:65532",read_only:true,cap_drop:["ALL"],security_opt:["no-new-privileges:true"],
       pids_limit:128,mem_limit:"512m",cpus:1.0,dns:["127.0.0.1"],networks:["lab"],
       tmpfs:["/tmp:rw,nosuid,nodev,noexec,size=64m,mode=1777"],healthcheck:{disable:true},
-      environment:{TZ:"Asia/Seoul",JAVA_TOOL_OPTIONS:"-Xms64m -Xmx256m -Duser.timezone=Asia/Seoul"},
+      volumes:[{type:"bind",source:"./config/log4shell-app.jar",target:"/app/spring-boot-application.jar",
+        read_only:true,bind:{create_host_path:false}}],
+      environment:{TZ:"Asia/Seoul",JAVA_TOOL_OPTIONS:"-Xms64m -Xmx256m -Duser.timezone=Asia/Seoul",
+        SERVER_ADDRESS:"0.0.0.0",SERVER_PORT:"8080",SERVER_SERVLET_CONTEXT_PATH:"/log4shell",LOGGING_CONFIG:"classpath:log4j2-spring.xml"},
       labels:{"io.capstone.role":"service"},
       logging:{driver:"json-file",options:{"max-size":"10m","max-file":"3"}}}},
       networks:{front:{},private:{internal:true},lab:{internal:true}},volumes:{database:{}}}'
@@ -197,6 +204,7 @@ settings(){
   : "${SECURITY_HOST:?}" "${SIEM_HOST:?}" "${SERVICE_HOST:?}" "${WEB_BACKEND_PORT:=80}" "${WAF_PORT:=8080}" "${LOG4SHELL_HOSTNAME:=}"
   : "${DVWA_IMAGE:=ghcr.io/digininja/dvwa:latest}" "${MARIADB_IMAGE:=mariadb:10}"
   : "${LOG4SHELL_IMAGE:=ghcr.io/christophetd/log4shell-vulnerable-app@sha256:6f88430688108e512f7405ac3c73d47f5c370780b94182854ea2cddc6bd59929}"
+  : "${LOG4SHELL_APP_JAR:=}"
   : "${WAZUH_CA_FILE:=/opt/capstone-prereqs/wazuh-root-ca.pem}"
   : "${WAZUH_ENROLLMENT_PASS_FILE:=/opt/capstone-prereqs/wazuh-enrollment.pass}"
   for value in "$SECURITY_HOST" "$SIEM_HOST" "$SERVICE_HOST"; do ipv4 "$value" || die literal_ipv4_required; done
@@ -210,7 +218,7 @@ settings(){
   safe_path "$CAPSTONE_ROOT"; source_path
   [[ -d $CAPSTONE_SOURCE/deployment/roles ]] || die uploaded_source_missing
   ROLE=$CAPSTONE_ROOT/service
-  for tool in docker jq python3 openssl timeout ip ss flock sha256sum sync systemctl; do command -v "$tool" >/dev/null || die "preinstall_${tool}_required"; done
+  for tool in docker jq python3 openssl timeout ip ss flock nsenter sha256sum sync systemctl; do command -v "$tool" >/dev/null || die "preinstall_${tool}_required"; done
   DOCKER=$(command -v docker)
   COMPOSE=("$DOCKER" compose --project-name capstone-service --project-directory "$ROLE" -f "$ROLE/compose.json")
   [[ -x /var/ossec/bin/wazuh-agentd && -x /var/ossec/bin/wazuh-logcollector ]] || die preinstall_wazuh_agent_required
@@ -223,13 +231,30 @@ settings(){
   LAB_ID=$(docker_cmd image inspect --format '{{.Id}} {{.Os}} {{.Architecture}}' "$LOG4SHELL_IMAGE") || die preloaded_log4shell_image_required
   [[ $APP_ID =~ ^sha256:[a-f0-9]{64}\ linux\ amd64$ && $DB_ID =~ ^sha256:[a-f0-9]{64}\ linux\ amd64$ && $LAB_ID =~ ^sha256:[a-f0-9]{64}\ linux\ amd64$ ]] || die amd64_images_required
   APP_ID=${APP_ID%% *}; DB_ID=${DB_ID%% *}; LAB_ID=${LAB_ID%% *}
-  docker_cmd image inspect --format '{{json .Config}}' "$LAB_ID" | jq -e \
-    '.Cmd==["java","-jar","/app/spring-boot-application.jar"] and ((.Entrypoint//[])|length)==0' >/dev/null || die reviewed_log4shell_command_required
-  UI_INPUT=$(ui_sources manifest) || die invalid_log4shell_ui_sources
+  # Compose declares Java, arguments and workdir explicitly. The pinned image
+  # supplies the reviewed JDK/JRE; its default entrypoint/CMD are never inherited.
+  regular "$CAPSTONE_SOURCE/deployment/validate_log4shell_jar.py"
+  regular "$CAPSTONE_SOURCE/deployment/verify_log4shell_app.py"
+  LAB_VALIDATOR_SHA=$(sha "$CAPSTONE_SOURCE/deployment/validate_log4shell_jar.py")
+  LAB_VERIFIER_SHA=$(sha "$CAPSTONE_SOURCE/deployment/verify_log4shell_app.py")
+  LAB_JAR_MODE=auto; LAB_JAR_SHA=; LAB_SOURCE_SHA=
+  if [[ -n $LOG4SHELL_APP_JAR ]]; then
+    LAB_JAR_MODE=provided
+    [[ $LOG4SHELL_APP_JAR == /opt/* && $LOG4SHELL_APP_JAR == *.jar ]] || die invalid_log4shell_jar_path
+    safe_path "${LOG4SHELL_APP_JAR%/*}"; regular "$LOG4SHELL_APP_JAR"
+    [[ $(stat -c %u "$LOG4SHELL_APP_JAR") == 0 ]] || die prepared_jar_must_be_root_owned
+    (( (8#$(stat -c %a "$LOG4SHELL_APP_JAR") & 0022) == 0 )) || die prepared_jar_must_not_be_writable
+    LAB_JAR_SHA=$(lab_jar_check "$LOG4SHELL_APP_JAR") || die invalid_prepared_log4shell_jar
+  else
+    # Read-only precheck: no container, compiler, output directory or JAR.
+    LAB_SOURCE_SHA=$(lab_source_check | jq -er '.source_sha256|select(test("^[a-f0-9]{64}$"))') || die offline_lab_sources_invalid
+  fi
   INPUT=$(jq -cnS --arg root "$CAPSTONE_ROOT" --arg a "$SECURITY_HOST" --arg b "$SIEM_HOST" --arg c "$SERVICE_HOST" \
     --argjson port "$WEB_BACKEND_PORT" --arg app "$APP_ID" --arg db "$DB_ID" --arg lab "$LAB_ID" \
-    --arg labref "$LOG4SHELL_IMAGE" --argjson ui "$UI_INPUT" --arg labhost "$LOG4SHELL_HOSTNAME" --argjson wafport "$WAF_PORT" \
-    '{schema:3,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,lab_image_id:$lab,lab_image_ref:$labref,ui_source_sha256:$ui,log4shell_hostname:$labhost,public_waf_port:$wafport}')
+    --arg labref "$LOG4SHELL_IMAGE" --arg jar "$LAB_JAR_SHA" --arg validator "$LAB_VALIDATOR_SHA" --arg verifier "$LAB_VERIFIER_SHA" \
+    --arg jarmode "$LAB_JAR_MODE" --arg source "$LAB_SOURCE_SHA" \
+    --arg labhost "$LOG4SHELL_HOSTNAME" --argjson wafport "$WAF_PORT" \
+    '{schema:6,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,lab_image_id:$lab,lab_image_ref:$labref,lab_jar_mode:$jarmode,lab_source_sha256:$source,lab_jar_sha256:$jar,lab_validator_sha256:$validator,lab_verifier_sha256:$verifier,log4shell_hostname:$labhost,public_waf_port:$wafport}')
 }
 
 fresh_agent(){
@@ -274,9 +299,9 @@ assert_managed(){
   [[ $(cat "$ROLE/input.json") == "$INPUT" ]] || die changed_inputs_require_manual_migration
   [[ $(stat -c '%u:%g:%a' "$ROLE/manifest.json") == 0:0:600 ]] || die manifest_permissions_changed
   jq -e 'keys==["agent_config_sha256","enrollment_ca_sha256","enrollment_pass_sha256","files","role","schema","script_sha256","state"] and
-    .schema==3 and .role=="service" and .state=="complete" and
+    .schema==6 and .role=="service" and .state=="complete" and
     ([.agent_config_sha256,.enrollment_ca_sha256,.enrollment_pass_sha256,.script_sha256]|all(type=="string" and test("^[a-f0-9]{64}$"))) and
-    (.files|keys)==["compose.json","config/apache.conf","config/bootstrap.php","config/log4shell-ui/api.php","config/log4shell-ui/app.css","config/log4shell-ui/app.js","config/log4shell-ui/index.html","config/ossec.conf.candidate","config/verify-log4shell.php","credentials/admin-password","credentials/app.env","credentials/db-password","credentials/db-root-password","credentials/db.env","input.json"] and
+    (.files|keys)==["compose.json","config/apache.conf","config/bootstrap.php","config/log4shell-app.jar","config/ossec.conf.candidate","config/verify-log4shell.py","credentials/admin-password","credentials/app.env","credentials/db-password","credentials/db-root-password","credentials/db.env","evidence/log4shell-build.json","input.json"] and
     (.files|all(type=="string" and test("^[a-f0-9]{64}$")))' "$ROLE/manifest.json" >/dev/null || die deployment_incomplete
   [[ $(sha "${BASH_SOURCE[0]}") == $(jq -r .script_sha256 "$ROLE/manifest.json") ]] || die deployment_script_changed
   local file expected mode
@@ -284,16 +309,21 @@ assert_managed(){
     [[ $file =~ ^[a-zA-Z0-9._/-]+$ && $file != *..* && $file != /* ]] || die manifest_path_invalid
     regular "$ROLE/$file"
     if [[ $file == */* ]]; then safe_path "$ROLE/${file%/*}"; fi
-    mode=600; [[ $file == config/apache.conf || $file == config/bootstrap.php || $file == config/verify-log4shell.php || $file == config/log4shell-ui/* ]] && mode=644
+    mode=600; [[ $file == config/apache.conf || $file == config/bootstrap.php || $file == config/log4shell-app.jar ]] && mode=644
     [[ $(stat -c '%u:%g:%a' "$ROLE/$file") == "0:0:$mode" ]] || die managed_permissions_changed
     [[ $(sha "$ROLE/$file") == "$expected" ]] || die managed_file_changed
   done < <(jq -r '.files|to_entries[]|[.key,.value]|@tsv' "$ROLE/manifest.json")
-  [[ $(stat -c '%u:%g:%a' "$ROLE/config/log4shell-ui") == 0:0:755 ]] || die ui_directory_permissions_changed
-  [[ $(find "$ROLE/config/log4shell-ui" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort) == $'api.php\napp.css\napp.js\nindex.html' ]] || die ui_file_set_changed
-  safe_path "$ROLE/state/log4shell-ui"
-  [[ $(stat -c '%u:%g:%a' "$ROLE/state") == 0:0:700 && $(stat -c '%u:%g:%a' "$ROLE/state/log4shell-ui") == 0:33:750 ]] || die ui_state_directory_permissions_changed
-  regular "$ROLE/state/log4shell-ui/request.lock"
-  [[ $(stat -c '%u:%g:%a' "$ROLE/state/log4shell-ui/request.lock") == 0:33:660 && $(stat -c %s "$ROLE/state/log4shell-ui/request.lock") -le 64 ]] || die ui_rate_file_permissions_changed
+  if [[ $LAB_JAR_MODE == auto ]]; then
+    LAB_JAR_SHA=$(lab_jar_check "$ROLE/config/log4shell-app.jar") || die installed_lab_jar_invalid
+    jq -e --arg source "$LAB_SOURCE_SHA" --arg image "$LAB_ID" --arg jar "$LAB_JAR_SHA" \
+      '.schema==1 and .mode=="offline-image-jdk" and .source_sha256==$source and .image_id==$image and
+       .package.output_sha256==$jar and .package.dependencies_unchanged==true and
+       .package.loader_and_metadata_unchanged==true and .temporary_containers_removed==true' \
+      "$ROLE/evidence/log4shell-build.json" >/dev/null || die installed_lab_build_evidence_changed
+  else
+    [[ $(sha "$ROLE/config/log4shell-app.jar") == "$LAB_JAR_SHA" ]] || die installed_lab_jar_changed
+  fi
+  [[ $(sha "$ROLE/config/verify-log4shell.py") == "$LAB_VERIFIER_SHA" ]] || die installed_lab_verifier_changed
   for file in /var/ossec/etc/ossec.conf /var/ossec/etc/capstone-manager-ca.pem /var/ossec/etc/capstone-enrollment.pass; do
     regular "$file"
     [[ $(stat -c '%U:%G:%a' "$file") == root:wazuh:640 ]] || die managed_agent_permissions_changed
@@ -306,13 +336,9 @@ write_files(){
   mkdir -m 700 "$ROLE"
   mkdir -m 700 "$ROLE/evidence" "$ROLE/credentials" "$ROLE/config"
   mkdir -m 755 "$ROLE/logs"
-  mkdir -m 755 "$ROLE/config/log4shell-ui"
-  mkdir -m 700 "$ROLE/state"
-  install -d -o root -g 33 -m 750 "$ROLE/state/log4shell-ui"
-  install -o root -g 33 -m 660 /dev/null "$ROLE/state/log4shell-ui/request.lock"
-  [[ $(ui_sources manifest) == "$UI_INPUT" ]] || die ui_sources_changed_before_copy
-  ui_sources install "$ROLE/config/log4shell-ui" || die ui_source_copy_failed
-  [[ $(ui_sources manifest) == "$UI_INPUT" ]] || die ui_sources_changed_during_copy
+  prepare_lab_jar
+  install -o root -g root -m 0600 "$CAPSTONE_SOURCE/deployment/verify_log4shell_app.py" "$ROLE/config/verify-log4shell.py"
+  [[ $(sha "$ROLE/config/verify-log4shell.py") == "$LAB_VERIFIER_SHA" ]] || die lab_verifier_changed_during_copy
   printf '%s\n' "$INPUT" >"$ROLE/input.json"
   cp -p /var/ossec/etc/ossec.conf "$ROLE/evidence/ossec.conf.before"
   sha /var/ossec/etc/ossec.conf >"$ROLE/evidence/agent-before.sha256"
@@ -369,57 +395,10 @@ try {
   echo "dvwa_ready\n";
 } catch (Throwable $e) { fwrite(STDERR,"dvwa_bootstrap_or_verification_failed\n"); exit(1); }
 PHP
-  cat >"$ROLE/config/verify-log4shell.php" <<'PHP'
-<?php
-// Benign end-to-end checks through Apache and the real PHP adapter. No exploits.
-declare(strict_types=1);
-function api(string $method, ?array $payload=null, string $cookie='', string $csrf=''): array {
-    $headers=['Accept: application/json']; $receivedCookie=''; $body='';
-    if ($cookie!=='') $headers[]='Cookie: '.$cookie;
-    if ($csrf!=='') $headers[]='X-CSRF-Token: '.$csrf;
-    $url='http://127.0.0.1/log4shell/api.php'.($method==='GET'?'?action=bootstrap':'');
-    $ch=curl_init($url);
-    $options=[CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>$headers,CURLOPT_PROXY=>'',
-        CURLOPT_CONNECTTIMEOUT_MS=>1000,CURLOPT_TIMEOUT_MS=>6000,CURLOPT_FOLLOWLOCATION=>false,
-        CURLOPT_PROTOCOLS=>CURLPROTO_HTTP,CURLOPT_WRITEFUNCTION=>static function($h,string $chunk) use(&$body):int {
-            if(strlen($body)+strlen($chunk)>65536) return 0;
-            $body.=$chunk; return strlen($chunk);
-        },CURLOPT_HEADERFUNCTION=>static function($h,string $line) use(&$receivedCookie):int {
-            if(preg_match('/^Set-Cookie:\s*(groot_log4shell_ui_http=[A-Za-z0-9,-]+);/i',$line,$m)) $receivedCookie=$m[1];
-            return strlen($line);
-        }];
-    if($payload!==null){$headers[]='Content-Type: application/json';$options[CURLOPT_HTTPHEADER]=$headers;$options[CURLOPT_POSTFIELDS]=json_encode($payload,JSON_THROW_ON_ERROR);}
-    curl_setopt_array($ch,$options);$ok=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_RESPONSE_CODE);curl_close($ch);
-    if($ok===false) throw new RuntimeException('request_failed');
-    return [$status,json_decode($body,true,32,JSON_THROW_ON_ERROR),$receivedCookie];
-}
-try {
-    [$status,$bootstrap,$cookie]=api('GET');
-    if($status!==200 || ($bootstrap['ok']??false)!==true || $cookie==='' ||
-       !preg_match('/\A[0-9a-f]{64}\z/',$bootstrap['csrf']??'')) throw new RuntimeException('bootstrap_failed');
-    $csrf=$bootstrap['csrf'];
-    foreach(['normal','missing-header'] as $mode){
-        $payload=['mode'=>$mode];if($mode==='normal') $payload['api_version']='capstone-ui-verification';
-        for($attempt=0;$attempt<2;$attempt++){
-            [$status,$result]=api('POST',$payload,$cookie,$csrf);
-            if($status!==429) break;
-            usleep(1100000);
-        }
-        if($status!==200 || ($result['ok']??false)!==true || ($result['request']['target']??'')!=='http://log4shell:8080/' ||
-           ($result['request']['mode']??'')!==$mode) throw new RuntimeException('adapter_failed');
-        if($mode==='normal'){
-            if(($result['response']['status']??0)!==200 || trim($result['response']['body']??'')!=='Hello, world!' ||
-               ($result['request']['header_value']??'')!=='capstone-ui-verification') throw new RuntimeException('normal_failed');
-            usleep(1100000);
-        } elseif(($result['response']['status']??0)!==400 || ($result['request']['header_value']??null)!==null) throw new RuntimeException('missing_header_failed');
-    }
-    echo "log4shell_ui_ready\n";
-} catch(Throwable $e){fwrite(STDERR,"log4shell_ui_not_ready\n");exit(1);}
-PHP
-  chmod 644 "$ROLE/config/apache.conf" "$ROLE/config/bootstrap.php" "$ROLE/config/verify-log4shell.php"
+  chmod 644 "$ROLE/config/apache.conf" "$ROLE/config/bootstrap.php"
   sync "$ROLE/input.json" "$ROLE/compose.json" "$ROLE/config/apache.conf" "$ROLE/config/bootstrap.php" \
-    "$ROLE/config/verify-log4shell.php" "$ROLE/config/log4shell-ui/"* "$ROLE/config/log4shell-ui" \
-    "$ROLE/state/log4shell-ui/request.lock" "$ROLE/state/log4shell-ui" "$ROLE/state" \
+    "$ROLE/config/log4shell-app.jar" "$ROLE/config/verify-log4shell.py" \
+    "$ROLE/evidence/log4shell-build.json" \
     "$ROLE/credentials/"* "$ROLE/credentials" "$ROLE"
   mark prepared
 }
@@ -492,22 +471,29 @@ runtime_contract(){
   [[ $name == dvwa || $name == db || $name == log4shell ]] || return 1
   jq -e --arg project capstone-service --arg image "$expected" --arg name "$name" \
     --arg root "$ROLE" --arg ip "$SERVICE_HOST" --arg port "$WEB_BACKEND_PORT" '
+    def env_is($key; $value): [.Config.Env[]? | select(startswith($key+"="))]==[$key+"="+$value];
     .State.Running==true and .State.Restarting==false and .Image==$image and
     .Config.Labels["com.docker.compose.project"]==$project and .Config.Labels["com.docker.compose.service"]==$name and
     .HostConfig.Privileged==false and .HostConfig.RestartPolicy.Name=="unless-stopped" and
     ((.HostConfig.SecurityOpt//[])|any(.=="no-new-privileges:true" or .=="no-new-privileges")) and
     (if $name=="log4shell" then
       .State.Health==null and .Config.Healthcheck.Test==["NONE"] and
-      .Config.User=="65532:65532" and .Config.Cmd==["java","-jar","/app/spring-boot-application.jar"] and
-      ((.Config.Entrypoint//[])|length)==0 and .HostConfig.ReadonlyRootfs==true and
+      .Config.User=="65532:65532" and .Config.Cmd==["-jar","/app/spring-boot-application.jar"] and
+      .Config.Entrypoint==["java"] and .Config.WorkingDir=="/app" and .HostConfig.ReadonlyRootfs==true and
       .HostConfig.CapDrop==["ALL"] and ((.HostConfig.CapAdd//[])|length)==0 and
       .HostConfig.PidsLimit==128 and .HostConfig.Memory==536870912 and .HostConfig.NanoCpus==1000000000 and
       .HostConfig.Dns==["127.0.0.1"] and
       .HostConfig.Tmpfs=={"/tmp":"rw,nosuid,nodev,noexec,size=64m,mode=1777"} and
       ((.HostConfig.PortBindings//{})|length)==0 and
       (.NetworkSettings.Networks|keys)==["capstone-service_lab"] and
-      all(.Mounts[]?;.Type=="tmpfs" and .Destination=="/tmp") and
-      (.Config.Env|index("JAVA_TOOL_OPTIONS=-Xms64m -Xmx256m -Duser.timezone=Asia/Seoul")!=null)
+      ((.Mounts|map(select(.Type!="tmpfs")|{Type,Source,Destination,RW}))==[
+        {Type:"bind",Source:($root+"/config/log4shell-app.jar"),Destination:"/app/spring-boot-application.jar",RW:false}]) and
+      all(.Mounts[]?; .Type!="tmpfs" or .Destination=="/tmp") and
+      env_is("TZ"; "Asia/Seoul") and
+      env_is("JAVA_TOOL_OPTIONS"; "-Xms64m -Xmx256m -Duser.timezone=Asia/Seoul") and
+      env_is("SERVER_ADDRESS"; "0.0.0.0") and env_is("SERVER_PORT"; "8080") and
+      env_is("SERVER_SERVLET_CONTEXT_PATH"; "/log4shell") and
+      env_is("LOGGING_CONFIG"; "classpath:log4j2-spring.xml")
     elif $name=="db" then
       .State.Health.Status=="healthy" and ((.HostConfig.PortBindings//{})|length)==0 and
       (.Mounts|length)==1 and .Mounts[0].Type=="volume" and .Mounts[0].Name=="capstone-service_database" and
@@ -520,37 +506,22 @@ runtime_contract(){
       ((.Mounts|map({Type,Source,Destination,RW})|sort_by(.Destination))==([
         {Type:"bind",Source:($root+"/config/apache.conf"),Destination:"/etc/apache2/sites-enabled/000-default.conf",RW:false},
         {Type:"bind",Source:($root+"/config/bootstrap.php"),Destination:"/opt/capstone-bootstrap.php",RW:false},
-        {Type:"bind",Source:($root+"/config/verify-log4shell.php"),Destination:"/opt/capstone-log4shell-verify.php",RW:false},
-        {Type:"bind",Source:($root+"/config/log4shell-ui"),Destination:"/var/www/html/log4shell",RW:false},
-        {Type:"bind",Source:($root+"/state/log4shell-ui"),Destination:"/var/lib/capstone-log4shell-ui",RW:true},
         {Type:"bind",Source:($root+"/logs"),Destination:"/var/log/capstone-service",RW:true}]|sort_by(.Destination)))
     end)' >/dev/null
 }
-verify_lab_ui(){
-  local deadline=$((SECONDS+90))
+verify_lab_app(){
+  local deadline=$((SECONDS+90)) pid
+  pid=$(docker_cmd inspect --format '{{.State.Pid}}' capstone-service-dvwa) || die service_namespace_unavailable
+  [[ $pid =~ ^[1-9][0-9]*$ ]] || die service_namespace_unavailable
   while ((SECONDS<deadline)); do
-    if docker_cmd exec capstone-service-dvwa php /opt/capstone-log4shell-verify.php >/dev/null 2>&1; then
-      verify_lab_hostname
+    # Only enter the network namespace: Python, source and files stay on host.
+    if nsenter --target "$pid" --net -- python3 -B "$ROLE/config/verify-log4shell.py" "http://127.0.0.1/log4shell/" \
+         "$LOG4SHELL_HOSTNAME" "$WAF_PORT" >/dev/null 2>&1; then
       return
     fi
     sleep 2
   done
-  die log4shell_ui_normal_or_missing_header_verification_failed
-}
-verify_lab_hostname(){
-  [[ -n ${LOG4SHELL_HOSTNAME:-} ]] || return 0
-  docker_cmd exec --env "CAPSTONE_LAB_HOSTNAME=$LOG4SHELL_HOSTNAME" --env "CAPSTONE_WAF_PORT=$WAF_PORT" \
-    capstone-service-dvwa php -r '
-$name=getenv("CAPSTONE_LAB_HOSTNAME");$port=getenv("CAPSTONE_WAF_PORT");
-$origin="http://".$name.($port==="80"?"":":".$port);
-foreach(["/","/log4shell","/dvwa/login.php","/log4shell/"] as $path){
-  $c=curl_init("http://127.0.0.1".$path);
-  curl_setopt_array($c,[CURLOPT_HTTPHEADER=>["Host: ".$name],CURLOPT_RETURNTRANSFER=>true,
-    CURLOPT_PROXY=>"",CURLOPT_FOLLOWLOCATION=>false,CURLOPT_TIMEOUT=>5]);
-  $body=curl_exec($c);$code=curl_getinfo($c,CURLINFO_RESPONSE_CODE);$redirect=curl_getinfo($c,CURLINFO_REDIRECT_URL);curl_close($c);
-  if($body===false || ($path==="/log4shell/"?($code!==200 || strpos($body,"Log4Shell")===false):
-     ($code!==302 || $redirect!==$origin."/log4shell/")))exit(1);
-}' >/dev/null 2>&1 || die log4shell_hostname_http_route_verification_failed
+  die log4shell_spring_route_or_logging_verification_failed
 }
 verify(){
   assert_managed
@@ -568,17 +539,17 @@ verify(){
   docker_cmd network inspect --format '{{json .}}' capstone-service_front | jq -e \
     '.Internal==false and ([.Containers[].Name]|sort)==["capstone-service-dvwa"]' >/dev/null || die front_network_changed
   docker_cmd exec capstone-service-dvwa php /opt/capstone-bootstrap.php verify >/dev/null 2>&1 || die dvwa_verification_failed
-  verify_lab_ui
+  verify_lab_app
   systemctl is-active --quiet wazuh-agent || die agent_not_active
   grep -Eq "^status='connected'" /var/ossec/var/run/wazuh-agentd.state || die agent_not_connected
-  note 'verified: DVWA initialized, DB private, isolated Log4Shell/UI normal200 and missing-header400, peer ACL configured, Wazuh connected; no attack test executed'
+  note 'verified: DVWA initialized, DB private, isolated Spring Log4Shell UI/runtime versions and benign logging, peer ACL configured, Wazuh connected; no attack test executed'
 }
 
 main(){
   settings "$@"
   if [[ $MODE == check ]]; then
     if [[ -e $ROLE || -L $ROLE ]]; then assert_managed; else fresh_namespace; fi
-    note 'check passed: installed prerequisites/local images only; enrollment prerequisites required at apply'
+    note "check passed: installed prerequisites/local images; lab JAR mode=$LAB_JAR_MODE (automatic compilation only at apply); enrollment prerequisites required at apply"
     return
   fi
   if [[ $MODE == verify ]]; then verify; return; fi
@@ -597,14 +568,12 @@ main(){
   enrollment_inputs
   timeout --kill-after=2s 12s openssl s_client -connect "$SIEM_HOST:1515" -CAfile "$WAZUH_CA_FILE" \
     -verify_ip "$SIEM_HOST" -verify_return_error -no_ign_eof </dev/null >/dev/null 2>&1 || die enrollment_tls_identity_failed
-  php_image_probe
+  apache_image_probe
   write_files
   logrun compose-config "${COMPOSE[@]}" config --quiet
   mark compose-start-armed
   logrun compose-start "${COMPOSE[@]}" up --detach --pull never --no-build --wait --wait-timeout 120
   logrun apache-check "$DOCKER" exec capstone-service-dvwa apachectl -t
-  logrun lab-php-check "$DOCKER" exec capstone-service-dvwa php -l /var/www/html/log4shell/api.php
-  logrun lab-verifier-php-check "$DOCKER" exec capstone-service-dvwa php -l /opt/capstone-log4shell-verify.php
   mark database-initialization-armed
   # Never repeat this on a partial deployment: existing ROLE without complete
   # manifest is refused at entry, even if the prior command outcome is unknown.
@@ -612,19 +581,19 @@ main(){
        <"$ROLE/credentials/admin-password" >"$ROLE/evidence/db-init.log" 2>&1; then die database_initialization_failed_preserved; fi
   mark database-initialized
   mark lab-verification-armed
-  verify_lab_ui
+  verify_lab_app
   mark lab-ready
   configure_agent
   local files='{}' file
-  for file in input.json compose.json config/apache.conf config/bootstrap.php config/verify-log4shell.php \
-    config/log4shell-ui/api.php config/log4shell-ui/index.html config/log4shell-ui/app.js config/log4shell-ui/app.css \
+  for file in input.json compose.json config/apache.conf config/bootstrap.php config/verify-log4shell.py \
+    config/log4shell-app.jar evidence/log4shell-build.json \
     config/ossec.conf.candidate credentials/db.env credentials/app.env credentials/admin-password credentials/db-password credentials/db-root-password; do
     files=$(jq -cn --argjson old "$files" --arg name "$file" --arg hash "$(sha "$ROLE/$file")" '$old+{($name):$hash}')
   done
   jq -nS --argjson files "$files" --arg agent "$(sha /var/ossec/etc/ossec.conf)" \
     --arg script "$(sha "${BASH_SOURCE[0]}")" --arg ca "$(sha /var/ossec/etc/capstone-manager-ca.pem)" \
     --arg pass "$(sha /var/ossec/etc/capstone-enrollment.pass)" \
-    '{schema:3,role:"service",state:"complete",files:$files,agent_config_sha256:$agent,script_sha256:$script,enrollment_ca_sha256:$ca,enrollment_pass_sha256:$pass}' >"$ROLE/manifest.json"
+    '{schema:6,role:"service",state:"complete",files:$files,agent_config_sha256:$agent,script_sha256:$script,enrollment_ca_sha256:$ca,enrollment_pass_sha256:$pass}' >"$ROLE/manifest.json"
   sync "$ROLE/manifest.json" "$ROLE"
   mark complete
   verify

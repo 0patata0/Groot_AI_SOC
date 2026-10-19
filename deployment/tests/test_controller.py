@@ -31,11 +31,11 @@ elif 'tar --no-same-owner -xf -' in command or '/receive-enrollment.sh' in comma
         with tarfile.open(fileobj=io.BytesIO(data)) as outer:
             source=outer.extractfile('source.tar').read()
             site_env=outer.extractfile('site.env').read().decode()
-        with open(os.environ['PAYLOAD_LOG'],'a') as f:
-            f.write(json.dumps({'host':host,'site_env':site_env})+'\n')
         with tarfile.open(fileobj=io.BytesIO(source)) as archive:
             names=archive.getnames()
-        if any('CREDENTIALS' in n or n.endswith(('.env','.key','.pem','.local.conf')) for n in names): sys.exit(44)
+        with open(os.environ['PAYLOAD_LOG'],'a') as f:
+            f.write(json.dumps({'host':host,'site_env':site_env,'source_names':names})+'\n')
+        if any('CREDENTIALS' in n or n.endswith(('.env','.key','.pem','.local.conf','.jar','.class')) for n in names): sys.exit(44)
 '''
 
 
@@ -49,6 +49,16 @@ class ControllerContract(unittest.TestCase):
             (self.root / name).mkdir()
         (self.root / 'infra' / 'CREDENTIALS.local.md').write_text('must-not-transfer')
         (self.root / 'infra' / '.env').write_text('must-not-transfer')
+        (self.root / 'infra' / 'prepared.jar').write_text('must-not-transfer')
+        (self.root / 'infra' / 'compiled.class').write_text('must-not-transfer')
+        app = self.root / 'infra/groot-c/log4shell-app'
+        for name in ('src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java',
+                     'src/main/resources/static/index.html', 'src/main/resources/application.properties',
+                     'tools/build_from_existing.py', 'tools/prepare_from_image.py', 'build.gradle', 'settings.gradle',
+                     'build/local-output', '.gradle/local-cache'):
+            path = app / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text('source fixture')
         (self.root / 'deployment' / 'siem-secrets.env').write_text('must-not-transfer')
         (self.root / 'deployment' / 'site.local.conf').write_text('must-not-transfer')
         (self.root / 'deployment' / 'private.key').write_text('must-not-transfer')
@@ -110,11 +120,65 @@ class ControllerContract(unittest.TestCase):
         self.assertNotIn('security apply', self.phases())
         self.assert_clean()
 
+    def test_failed_service_apply_stops_later_roles_after_siem(self):
+        result = self.run_controller(FAIL_PHASE='service apply')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
+                                        'siem apply', 'siem verify', 'service apply'])
+        self.assertNotIn('구축 완료.', result.stdout)
+        self.assert_clean()
+
     def test_check_does_not_apply(self):
         result = self.run_controller('--check')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check'])
         self.assert_clean()
+
+    def test_prepared_jar_path_reaches_hosts_without_uploading_jar(self):
+        with self.config.open('a') as f:
+            f.write('LOG4SHELL_APP_JAR=/opt/capstone-prereqs/reviewed-app.jar\n')
+        result = self.run_controller('--check')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('service 서버의 준비 파일 사용', result.stdout)
+        self.assertNotIn('소스로 자동 빌드', result.stdout)
+        for payload in self.payloads():
+            self.assertIn('export LOG4SHELL_APP_JAR=/opt/capstone-prereqs/reviewed-app.jar', payload['site_env'].splitlines())
+        self.assert_clean()
+
+    def test_default_build_transfers_sources_without_local_artifacts(self):
+        result = self.run_controller('--check')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('service 서버에서 전달한 소스로 자동 빌드', result.stdout)
+        self.assertEqual(len(self.payloads()), 3)
+        prefix = 'infra/groot-c/log4shell-app/'
+        for payload in self.payloads():
+            self.assertNotIn('LOG4SHELL_APP_JAR=', payload['site_env'])
+            names = payload['source_names']
+            for name in ('src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java',
+                         'src/main/resources/static/index.html', 'src/main/resources/application.properties',
+                         'tools/build_from_existing.py', 'tools/prepare_from_image.py', 'build.gradle', 'settings.gradle'):
+                self.assertIn(prefix + name, names)
+            self.assertFalse(any(name.startswith((prefix + 'build/', prefix + '.gradle/')) for name in names))
+        self.assert_clean()
+
+    def test_empty_jar_override_selects_automatic_build(self):
+        with self.config.open('a') as f:
+            f.write('LOG4SHELL_APP_JAR=\n')
+        result = self.run_controller('--check')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('자동 빌드', result.stdout)
+        for payload in self.payloads():
+            self.assertNotIn('LOG4SHELL_APP_JAR=', payload['site_env'])
+        self.assert_clean()
+
+    def test_prepared_jar_path_rejects_relative_traversal_and_shell_text(self):
+        original = self.config.read_text()
+        for value in ('relative.jar', '/opt/../tmp/app.jar', '/opt/x;touch.jar', '/opt/app.jar\nPATH=/bad', 'auto'):
+            with self.subTest(value=value):
+                self.config.write_text(original + 'LOG4SHELL_APP_JAR=' + value + '\n')
+                result = self.run_controller('--plan')
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(self.events(), [])
 
     def test_verify_does_not_apply(self):
         result = self.run_controller('--verify')

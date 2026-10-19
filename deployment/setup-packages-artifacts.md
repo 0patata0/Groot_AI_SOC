@@ -1,6 +1,6 @@
 # 패키지·이미지·배포 자료 수동 준비
 
-이 문서는 [루트 README](../README.md)의 패키지 및 역할별 사전 자료 준비를 명령 단위로 설명한다. **모든 설치·다운로드·빌드는 Ubuntu 24.04 amd64 대상 서버 또는 별도 Linux amd64 준비 서버에서 운영자가 수동으로 실행한다.** `deploy.sh`가 아래 명령을 실행하는 것은 아니다. Mac에는 패키지, Rust, Docker Desktop, Python 가상환경을 추가하지 않는다.
+이 문서는 [루트 README](../README.md)의 패키지 및 역할별 사전 자료 준비를 명령 단위로 설명한다. **패키지·이미지 설치·다운로드·빌드는 Ubuntu 24.04 amd64 대상 서버 또는 별도 Linux amd64 준비 서버에서 운영자가 수동으로 실행한다.** `deploy.sh`가 아래 패키지 준비 명령을 실행하는 것은 아니다. 새 Log4Shell 앱 JAR은 예외로, 준비된 로컬 이미지 안의 JDK·라이브러리를 사용해 service 적용 단계에서 자동 빌드한다. Mac에는 패키지, JDK·Gradle, Rust, Docker Desktop, Python 가상환경을 추가하지 않는다.
 
 다음 순서로 진행한다. SSH·고정 주소·라우팅을 먼저 준비하고, 이 문서의 자료 준비를 마친 뒤 `deploy.sh --check`를 실행한다. 예시의 `192.0.2.x`는 실제 배포 주소로 변경한다. 각 코드 블록의 실행 위치를 확인하고 **명령이 실패하면 다음 단계로 넘어가지 않는다.** 운영 중인 서버의 패키지나 agent 등록 정보를 삭제해서 신규 조건에 맞추지 않는다.
 
@@ -9,7 +9,7 @@
 | 세 대상 서버 모두 | 공통 명령, Docker Engine·Compose, 시간대 |
 | security·service | 미등록 Wazuh agent 4.14.8 |
 | security | Suricata·WAF 이미지, 검증한 ET/Open 룰 |
-| service | DVWA·MariaDB·고정 digest Log4Shell 이미지, DVWA 이미지의 PHP/curl/session 확인 |
+| service | DVWA·MariaDB·고정 digest Java 이미지, Apache proxy/proxy_http와 DVWA mysqli 확인. 새 앱 JAR은 기본 자동 빌드, 준비 JAR 지정도 가능 |
 | siem | bcrypt·커널 설정, Wazuh·Mattermost·PostgreSQL 이미지, Wazuh 원본, 읽기 MCP, 준비된 Hermes 이미지, `siem.json` |
 
 이 문서 작성 시 공식 설치 문서·공개 릴리스 메타데이터와 저장소 스크립트를 대조했다. 실제 패키지 설치, 바이너리 다운로드, 이미지 빌드 및 새 VM 구축은 수행하지 않았다. 아래에 명시한 SHA는 확인한 공개 배포 자료의 값이며 운영 비밀 값이 아니다.
@@ -214,24 +214,38 @@ unset image_role ref images
 
 컨테이너의 `docker inspect` 전체 출력에는 환경변수 비밀 값이 포함될 수 있으므로 운영 증거 수집에 통째로 사용하지 않는다. 위 명령은 **이미지**의 지정 필드만 기록한다.
 
-### service의 Log4Shell·UI 준비
+### service의 Spring Boot Log4Shell 준비
 
-위 Log4Shell digest는 [앱 공식 README](https://github.com/christophetd/log4shell-vulnerable-app/blob/main/README.md)에 명시된 배포 참조다. 태그 `latest`로 임의 대체하지 않는다. UI는 기존 DVWA Apache/PHP에 읽기 전용 마운트되며 **PHP8.1 이상과 curl/session 확장**이 필요하다. [DVWA 공식 Dockerfile](https://github.com/digininja/DVWA/blob/master/Dockerfile)의 기반 이미지를 쓰더라도 실제로 반입한 image ID의 기능을 아래처럼 확인한다.
+위 공식 digest 이미지는 검토된 **Java 빌드·실행 환경**으로 유지한다. 기본 설정 `LOG4SHELL_APP_JAR=` 또는 키 생략은 자동 빌드다. controller가 [새 앱 소스](../infra/groot-c/log4shell-app/README.md)와 빌드 도구를 service 서버에 전달하고, service 적용 단계에서 로컬 이미지의 JDK와 기존 Boot JAR의 라이브러리·loader를 사용해 새 앱을 컴파일·패키징한다. Gradle·JDK의 호스트 설치나 네트워크 의존성 다운로드는 필요하지 않다. 기존 이미지 앱 자체를 실행하지 않으며, 검증한 새 JAR을 `/app/spring-boot-application.jar`에 읽기 전용으로 마운트한다.
 
-**실행 위치: service 또는 Linux 준비 서버.** 이 수동 검사는 이미지를 격리된 일회용 컨테이너에서 실행할 뿐 패키지를 설치하거나 이미지를 다운로드하지 않는다.
+`--check`는 소스·빌더 지문과 필수 파일, 로컬 이미지 존재 등 사전 조건만 검사한다. 이미지 안에서 실제 컴파일하는 단계는 SIEM 구성 이후 service `--apply`에 있다. 빌드 실패 시 후속 service/security 설치를 중단하지만 완료된 SIEM을 지우지 않는다. 기존 `LOG4SHELL_IMAGE`를 다른 고정 이미지로 바꾸면 자동 빌드에 필요한 `javac 1.8.0_181`·Boot2.6.1·Log4j2.14.1 라이브러리도 있어야 한다. 새 VM 3대 전체 설치 성공은 로컬 회귀나 기존 C 단독 검증과 별도로 확인해야 한다.
+
+**선택: 사전에 빌드한 JAR 사용.** 기존 JDK·Gradle이 있는 승인된 Linux 준비 서버에서 앱 README의 Java 대상 버전과 고정 의존성으로 `bootJar`를 만들 수 있다. 소스 commit·JAR SHA·실제 Log4j API/core 버전·빌드 도구 버전을 기록하고, 작업용 빌드 산출물·의존성 캐시는 검증·반입 후 정리한다. 검토한 JAR을 service의 작업용 임시 경로로 전달하고 기록한 SHA와 대조한 뒤 아래처럼 배치한다. 아래 경로는 실제 서버 경로로 바꾸며 기존 파일을 임의로 덮어쓰지 않는다. 이 절차는 기본 자동 모드에서는 필요 없다.
+
+```bash
+# service 서버: 파일 출처와 반입 SHA를 먼저 대조한 뒤 수행
+set -euo pipefail
+test ! -e /opt/capstone-prereqs/log4shell-app.jar
+sudo install -o root -g root -m 0644 /검증한-JAR-절대경로 /opt/capstone-prereqs/log4shell-app.jar
+sudo sha256sum /opt/capstone-prereqs/log4shell-app.jar
+```
+
+이 방식을 선택했을 때만 관리 컴퓨터의 `deployment/site.local.conf`에 `LOG4SHELL_APP_JAR=/opt/capstone-prereqs/log4shell-app.jar` 또는 준비한 다른 `/opt/…jar` 절대 경로를 지정한다. 파일은 service 서버의 root 소유·그룹/기타 쓰기 금지 일반 파일이어야 한다. 자동·준비 JAR 모드 모두 ZIP 내부의 새 `MainController`·앱 main class·정적 `index.html/app.js/app.css`, Spring Boot launcher, Log4j API/core 각각의 `2.14.1` 라이브러리 이름·내부 Maven metadata·필수 클래스를 확인한다. 이 정적 검사는 클래스의 모든 동작이나 취약점 악용 성공을 입증하지 않는다. schema6에 빌드 모드·소스/빌더 지문과 결과 JAR 해시를 보존하고 복사 전후·재검증에 대조한다.
+
+DVWA 이미지는 여전히 자체 PHP와 mysqli를 사용하지만 Log4Shell 중계용 PHP8.1/curl/session 조건은 제거됐다. Apache의 `mod_proxy.so`·`mod_proxy_http.so`를 갖춰야 한다. **service 또는 Linux 준비 서버**에서 이미 반입한 이미지만 사용해 확인한다.
 
 ```bash
 set -euo pipefail
 dvwa_id=$(sudo docker image inspect --format '{{.Id}}' ghcr.io/digininja/dvwa:latest)
 sudo docker run --rm --pull never --network none --read-only \
-  --cap-drop ALL --security-opt no-new-privileges --entrypoint php "$dvwa_id" \
-  -r 'if (PHP_VERSION_ID < 80100 || !extension_loaded("curl") || !extension_loaded("session")) { fwrite(STDERR, "PHP 8.1+/curl/session required\n"); exit(1); } echo "PHP UI prerequisites OK\n";'
+  --cap-drop ALL --security-opt no-new-privileges --entrypoint sh "$dvwa_id" \
+  -c 'test -r /usr/lib/apache2/modules/mod_proxy.so && test -r /usr/lib/apache2/modules/mod_proxy_http.so && php -m | grep -qx mysqli'
 unset dvwa_id
 ```
 
-출력 `PHP UI prerequisites OK`와 종료 코드0이 기준이다. 실패하면 검토된 DVWA 이미지의 의존성을 Linux 준비 환경에서 먼저 해결한다. 새 환경 실행기가 apt/pip/pull/build로 보충하거나 Mac에 PHP를 설치하지 않는다.
+실패하면 Linux 준비 환경에서 검토된 DVWA 이미지를 준비한다. 설치기가 실행 중 apt/pip/pull/build로 보충하지 않는다. service 역할은 같은 격리 검사를 첫 apply 전에 수행한다.
 
-새 환경에서는 Log4Shell 앱을 private `lab` Docker 네트워크(`internal: true`)에만 연결하고 호스트 포트를 게시하지 않는다. 앱의8080은 UI의 고정 backend일 뿐 추가 외부 접속 포트가 아니다. 기본 설치로 정상/헤더 누락 응답과 UI를 준비하며, 공격 재현·LDAP 콜백·탐지 E2E는 별도 시나리오다.
+새 앱은 `internal: true`인 `lab` Docker 네트워크에만 연결하고 호스트 포트는 게시하지 않는다. `SERVER_ADDRESS=0.0.0.0`, `SERVER_PORT=8080`, context path `/log4shell`, `LOGGING_CONFIG=classpath:log4j2-spring.xml`, nonroot·읽기 전용 루트·리소스 제한을 고정한다. Compose가 Java entrypoint·JAR 인자·작업 디렉터리 `/app`도 명시하므로 이미지의 기본 명령을 실행하지 않는다. JAR의 long bind는 읽기 전용이며 `create_host_path: false`이므로 재생성 시 소스 JAR이 누락되면 중단한다. Apache가 기존 웹 포트의 `/log4shell/`를 내부 앱에 그대로 전달하므로 외부8080이나 PHP 웹 파일·세션 상태 경로를 만들지 않는다. 설치 검증은 실제 런타임 API/core `2.14.1`과 무해한 파라미터 로깅만 확인한다. 공격 재현·LDAP 콜백·탐지 E2E는 별도 실험이다.
 
 ### 오프라인 이미지 반입
 
@@ -562,7 +576,7 @@ PY
 | 패키지 | Docker/Compose 정상, 공통 명령 존재, SIEM bcrypt·sysctl 통과 |
 | agent | security·service 4.14.8, 중지·미등록, mask 없음 |
 | 이미지 | 역할별 이미지가 로컬에 존재하고 linux/amd64, ID 증거 보존 |
-| service UI | Log4Shell 로컬 이미지 참조 확인, DVWA PHP8.1+/curl/session 수동 검사 통과 |
+| service Spring 앱 | Java 로컬 이미지 참조와 전달할 소스·빌더, Apache proxy/proxy_http·DVWA mysqli 확인. JAR override일 때는 준비 파일 출처·SHA·내부 계약도 확인 |
 | ET | security의 `suricata.rules`, root 소유·0644, SHA·엔진 시험 증거 |
 | Wazuh 입력 | SIEM의 공식 v4.14.8 single-node 원본, root 소유, symlink 없음 |
 | MCP | SIEM의 검증된 ELF와 hash-only `.sha256`, 출처·SHA·아키텍처 확인 |

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+  <title>Log4Shell · GROOT LAB</title>
+  <link rel="stylesheet" href="app.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./"><span class="brand-mark" aria-hidden="true">G</span>GROOT <span>LAB</span></a><span class="lab-label">격리 실습 환경</span></header>
+  <main>
+    <section class="intro">
+      <div class="eyebrow">JAVA LOGGING WORKBENCH</div>
+      <h1>Log4Shell<span class="title-dot">.</span></h1>
+      <p>HTTP 입력이 Java 로그에 기록되는 과정을 살펴봅니다.</p>
+      <div class="runtime" aria-live="polite"><span id="status-dot" class="status-dot"></span><strong id="connection">서버 연결 중</strong><span class="separator"></span><span>Log4j <b id="core-version">—</b></span><span>Java <b id="java-version">—</b></span><button id="refresh" class="text-button" type="button">다시 확인 ↻</button></div>
+    </section>
+    <div class="workspace">
+      <section class="panel input-panel" aria-labelledby="input-title">
+        <div class="panel-heading"><span class="step">01</span><h2 id="input-title">요청 만들기</h2><span class="method">POST</span></div>
+        <form id="request-form">
+          <fieldset><legend>입력 경로</legend><div class="source-options">
+            <label><input type="radio" name="source" value="parameter" checked><span><strong>Request parameter</strong><small>message</small></span></label>
+            <label><input type="radio" name="source" value="header"><span><strong>HTTP header</strong><small>X-Api-Version</small></span></label>
+          </div></fieldset>
+          <div class="field-heading"><label for="input-value">로그에 기록할 값</label><span id="input-kind">message 파라미터</span></div>
+          <textarea id="input-value" name="message" spellcheck="false" rows="6" aria-describedby="input-help">Groot logging lab</textarea>
+          <p id="input-help" class="help">입력값을 변환하거나 이스케이프하지 않고 logger.info()에 전달합니다.</p>
+          <div class="request-path"><span>ENDPOINT</span><code>/log4shell/api/log</code></div>
+          <div class="actions"><button id="submit" class="primary-button" type="submit" disabled>로그 요청 보내기 <span aria-hidden="true">↗</span></button><button id="reset" class="secondary-button" type="button">입력 초기화</button></div>
+        </form>
+      </section>
+      <section class="panel response-panel" aria-labelledby="response-title">
+        <div class="panel-heading"><span class="step">02</span><h2 id="response-title">응답 확인</h2><span id="result-badge" class="result-badge">대기</span></div>
+        <div id="empty-state" class="empty-state"><span class="empty-icon" aria-hidden="true">↳</span><h3>첫 번째 로그를 보내 보세요</h3><p>기록한 원문과 요청 ID,<br>서버 응답 시간을 이곳에서 확인합니다.</p></div>
+        <div id="result" hidden>
+          <dl class="result-meta"><div><dt>HTTP 상태</dt><dd id="http-status">—</dd></div><div><dt>입력 경로</dt><dd id="result-source">—</dd></div><div><dt>요청 시간</dt><dd id="result-time">—</dd></div><div><dt>응답 소요</dt><dd id="elapsed">—</dd></div></dl>
+          <div class="output-label">서버가 로깅에 전달한 원문 <span id="level">INFO</span></div>
+          <pre id="logged-message" tabindex="0"></pre>
+          <div class="request-id">REQUEST ID <code id="request-id">—</code></div>
+        </div>
+        <p id="notice" class="notice" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+    <section class="flow" aria-label="요청 처리 흐름"><span><b>01</b> 브라우저 입력</span><i aria-hidden="true">→</i><span><b>02</b> Spring Boot API</span><i aria-hidden="true">→</i><span><b>03</b> Log4j 2.14.1</span><i aria-hidden="true">→</i><span><b>04</b> Java 콘솔 로그</span></section>
+    <footer><p>의도적으로 구버전 로깅 라이브러리를 사용하는 학습용 웹입니다. 입력 원문은 서버 로그에 남습니다.</p><p>응답 성공은 로그 호출 완료를 뜻합니다. 취약점 재현이나 보안장비 탐지 결과는 별도로 확인합니다.</p></footer>
+  </main>
+</body>
+</html>

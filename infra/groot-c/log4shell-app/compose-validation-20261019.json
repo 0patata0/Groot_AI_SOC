@@ -1,0 +1,526 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-19T11:32:40.534183+00:00",
+  "scope": "Existing C persistent Docker Compose migration and initial 3VM source synchronization; only inert normal HTTP requests",
+  "historical_web_migration_receipt": "deployment-validation-20261019.json",
+  "historical_receipt_sha256": "3e3de36a5eb02bbe19942089e483560c3483ace42038146718b56442c4e2c58d",
+  "versions": {
+    "spring_boot": "2.6.1",
+    "log4j_api": "2.14.1",
+    "log4j_core": "2.14.1",
+    "java": "1.8.0_181",
+    "compose": "5.5.1"
+  },
+  "rollout": {
+    "started_at": "2026-10-19T11:29:08.861443+00:00",
+    "backup": "/var/backups/capstone-log4shell-java/20261019-compose",
+    "steps": [
+      {
+        "action": "up",
+        "container_id": "6235c246e05445fe6f6e923c64b12b4472b0729075a31809c23552d732a14da0",
+        "started_at": "2026-10-19T11:29:11.089384213Z",
+        "result": "managed_files_ok\n{\"container_id\": \"6235c246e05445fe6f6e923c64b12b4472b0729075a31809c23552d732a14da0\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\nlog4shell_managed_runtime_and_http_verified"
+      },
+      {
+        "action": "up",
+        "container_id": "6235c246e05445fe6f6e923c64b12b4472b0729075a31809c23552d732a14da0",
+        "started_at": "2026-10-19T11:29:11.089384213Z",
+        "result": "managed_files_ok\n{\"container_id\": \"6235c246e05445fe6f6e923c64b12b4472b0729075a31809c23552d732a14da0\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\n{\"container_id\": \"6235c246e05445fe6f6e923c64b12b4472b0729075a31809c23552d732a14da0\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\nlog4shell_managed_runtime_and_http_verified"
+      },
+      {
+        "action": "recreate",
+        "container_id": "c1b6e248c9ee72af5f9de0411ab37fb35b5631ece04ebcdaebee26b5a3c4daeb",
+        "started_at": "2026-10-19T11:29:22.199016717Z",
+        "result": "managed_files_ok\n{\"container_id\": \"6235c246e05445fe6f6e923c64b12b4472b0729075a31809c23552d732a14da0\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\n{\"container_id\": \"c1b6e248c9ee72af5f9de0411ab37fb35b5631ece04ebcdaebee26b5a3c4daeb\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\nlog4shell_managed_runtime_and_http_verified"
+      },
+      {
+        "action": "up",
+        "container_id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+        "started_at": "2026-10-19T11:29:31.655644978Z",
+        "result": "managed_files_ok\n{\"container_id\": \"457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\nlog4shell_managed_runtime_and_http_verified"
+      },
+      {
+        "action": "verify",
+        "container_id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+        "started_at": "2026-10-19T11:29:31.655644978Z",
+        "result": "managed_files_ok\n{\"container_id\": \"457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\nlog4shell_spring_ready"
+      }
+    ],
+    "install_output": "managed_files_ok\nlog4shell_files_installed_use_up",
+    "first_web": {
+      "apache_verifier": "log4shell_spring_ready",
+      "dvwa_http": "200"
+    },
+    "csrf_rotation": {
+      "previous_token_rejected": true,
+      "fresh_session_passed": true,
+      "request_id": "02fbc448-a9c1-4dab-8455-5a9811ac7b27"
+    },
+    "recreate_web": {
+      "apache_verifier": "log4shell_spring_ready",
+      "dvwa_http": "200"
+    },
+    "absent_container_up_web": {
+      "apache_verifier": "log4shell_spring_ready",
+      "dvwa_http": "200"
+    },
+    "success": true,
+    "original_id": "8d1fa1cf0173d59ba9ec609d10f35ca841145a48882354550d2383a350d41447",
+    "first_managed_id": "6235c246e05445fe6f6e923c64b12b4472b0729075a31809c23552d732a14da0",
+    "force_recreated_id": "c1b6e248c9ee72af5f9de0411ab37fb35b5631ece04ebcdaebee26b5a3c4daeb",
+    "final_id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+    "image": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+    "jar_sha256": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053",
+    "ports": {
+      "8080/tcp": [
+        {
+          "HostIp": "10.200.10.20",
+          "HostPort": "8080"
+        }
+      ]
+    },
+    "network": "bridge",
+    "read_only": true,
+    "user": "65532:65532",
+    "mounts": [
+      {
+        "Type": "bind",
+        "Source": "/opt/capstone-log4shell/artifacts/16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053.jar",
+        "Destination": "/app/spring-boot-application.jar",
+        "Mode": "",
+        "RW": false,
+        "Propagation": "rprivate"
+      }
+    ],
+    "runtime": {
+      "container_id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+      "image": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+      "schema": 1
+    },
+    "original_repository_needed": false,
+    "previous_container_retained_stopped": true,
+    "services": {
+      "apache2": "active",
+      "docker": "active",
+      "wazuh-agent": "active"
+    },
+    "finished_at": "2026-10-19T11:29:41.004587+00:00"
+  },
+  "final_runtime": {
+    "checked_at": "2026-10-19T11:30:49.483455+00:00",
+    "console_checks": [
+      {
+        "request_id": "a431a58d-6f36-4e48-b1bb-ed3717bd6165",
+        "exact_console_match": true
+      },
+      {
+        "request_id": "8c2ca592-e4d6-40a9-90a2-4e1523a84a45",
+        "exact_console_match": true
+      },
+      {
+        "request_id": "3ef0f447-0660-4b03-b1ae-fbb5a382a058",
+        "exact_console_match": true
+      },
+      {
+        "request_id": "070fc62c-6307-4fba-813e-a6b7c171bb6a",
+        "exact_console_match": true
+      },
+      {
+        "request_id": "07938ad9-7501-4dba-afd8-45d594b75379",
+        "exact_console_match": true
+      },
+      {
+        "request_id": "ffff9851-3cac-4df9-905a-a976da60c662",
+        "exact_console_match": true
+      },
+      {
+        "request_id": "94d2d239-b09e-47b0-b4d2-5550c66fc8a0",
+        "exact_console_match": true
+      },
+      {
+        "request_id": "db3c9025-c68c-4c54-b3aa-69e435f7581c",
+        "exact_console_match": true
+      }
+    ],
+    "apache_configs": {
+      "/etc/apache2/conf-available/log4shell-java.conf": {
+        "sha256": "3a838ea895d4ee1f4494bf3378019cc2ad9982155105215c00064a09aadbd7b6",
+        "unchanged": true
+      },
+      "/etc/apache2/sites-available/log4shell.conf": {
+        "sha256": "3658a13f0e5dfbc54f880179013f06a3b2548e55e0d6bf8fae2cffb8c714e1ef",
+        "unchanged": true
+      }
+    },
+    "managed_files_sha256": {
+      "validate_log4shell_jar.py": "b69df872d08dfffb099a20023b1b58854f68889eb96d6f9efd68c39b96c1d022",
+      "managed_contract.py": "15b045280d631b04f9e8a3dc28f61d56f22d74a849f8e1d9b87568cb28bd20dc",
+      "manifest.json": "05d124a747aaae67c15338dab00dd42835769def1a0c577ee9ff433ce9c23d25",
+      "compose.yaml": "b6c3b85bec2dc738de5b438e630a4b85dc21ca7f5a341660aab725b5c0ac5e8a",
+      "runtime.json": "5786990761bab86914bbdbec5cf606a017f960c5aab1d9b035b356b64ccdcc93",
+      "managed.env": "738c95776eca4f281aae14868e1c737931b820a6cab6e03d637c5a9a1555d7ec",
+      "manage.sh": "8e87eed99d4dc31642a1260f9dbfc9699059faf744dc32430c0270c7f6e3d8bf",
+      "verify_log4shell_app.py": "583b78376970e671e98a995dac591fbb1628e543763b079d7150407564ac3bbf",
+      "artifacts/16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053.jar": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053"
+    },
+    "verify_output": "managed_files_ok\n{\"container_id\": \"457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f\", \"image\": \"sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d\", \"state\": \"running\"}\nlog4shell_spring_ready",
+    "container_id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+    "started_at": "2026-10-19T11:29:31.655644978Z",
+    "restart_count": 0,
+    "limits": {
+      "PidsLimit": 128,
+      "Memory": 536870912,
+      "NanoCpus": 1000000000,
+      "ReadonlyRootfs": true,
+      "CapDrop": [
+        "ALL"
+      ],
+      "SecurityOpt": [
+        "no-new-privileges:true"
+      ],
+      "Tmpfs": {
+        "/tmp": "rw,nosuid,nodev,noexec,size=64m,mode=1777"
+      },
+      "LogConfig": {
+        "Type": "json-file",
+        "Config": {
+          "max-file": "3",
+          "max-size": "10m"
+        }
+      },
+      "RestartPolicy": {
+        "Name": "unless-stopped",
+        "MaximumRetryCount": 0
+      }
+    },
+    "services": {
+      "apache2": "active",
+      "docker": "active",
+      "wazuh-agent": "active"
+    },
+    "retired_container_removed_after_backups_verified": true,
+    "backup": "/var/backups/capstone-log4shell-java/20261019-compose",
+    "docker_enabled": "enabled",
+    "images_downloaded": 0,
+    "packages_installed": 0
+  },
+  "public_http": {
+    "checked_at": "2026-10-19T11:30:00.881778+00:00",
+    "checks": [
+      {
+        "test": "ui_0",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "app.js_0",
+        "passed": true
+      },
+      {
+        "test": "app.css_0",
+        "passed": true
+      },
+      {
+        "test": "runtime_0",
+        "passed": true
+      },
+      {
+        "test": "cookie_0",
+        "passed": true
+      },
+      {
+        "test": "parameter_0",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_0",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_0",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "legacy_removed_0",
+        "passed": true
+      },
+      {
+        "test": "ui_1",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "app.js_1",
+        "passed": true
+      },
+      {
+        "test": "app.css_1",
+        "passed": true
+      },
+      {
+        "test": "runtime_1",
+        "passed": true
+      },
+      {
+        "test": "cookie_1",
+        "passed": true
+      },
+      {
+        "test": "parameter_1",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_1",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_1",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "legacy_removed_1",
+        "passed": true
+      },
+      {
+        "test": "ui_2",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "app.js_2",
+        "passed": true
+      },
+      {
+        "test": "app.css_2",
+        "passed": true
+      },
+      {
+        "test": "runtime_2",
+        "passed": true
+      },
+      {
+        "test": "cookie_2",
+        "passed": true
+      },
+      {
+        "test": "parameter_2",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_2",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_2",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "legacy_removed_2",
+        "passed": true
+      },
+      {
+        "test": "ui_3",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "app.js_3",
+        "passed": true
+      },
+      {
+        "test": "app.css_3",
+        "passed": true
+      },
+      {
+        "test": "runtime_3",
+        "passed": true
+      },
+      {
+        "test": "cookie_3",
+        "passed": true
+      },
+      {
+        "test": "parameter_3",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "header_3",
+        "passed": true,
+        "status": 200
+      },
+      {
+        "test": "csrf_3",
+        "passed": true,
+        "status": 403,
+        "content_type": "text/html; charset=UTF-8"
+      },
+      {
+        "test": "legacy_removed_3",
+        "passed": true
+      },
+      {
+        "test": "dvwa",
+        "passed": true
+      },
+      {
+        "test": "dvwa",
+        "passed": true
+      }
+    ],
+    "receipts": [
+      {
+        "request_id": "a431a58d-6f36-4e48-b1bb-ed3717bd6165",
+        "message": "groot-compose-eb9bb238 한글\nsecond line"
+      },
+      {
+        "request_id": "8c2ca592-e4d6-40a9-90a2-4e1523a84a45",
+        "message": "groot-compose-eb9bb238-header"
+      },
+      {
+        "request_id": "3ef0f447-0660-4b03-b1ae-fbb5a382a058",
+        "message": "groot-compose-eb9bb238 한글\nsecond line"
+      },
+      {
+        "request_id": "070fc62c-6307-4fba-813e-a6b7c171bb6a",
+        "message": "groot-compose-eb9bb238-header"
+      },
+      {
+        "request_id": "07938ad9-7501-4dba-afd8-45d594b75379",
+        "message": "groot-compose-eb9bb238 한글\nsecond line"
+      },
+      {
+        "request_id": "ffff9851-3cac-4df9-905a-a976da60c662",
+        "message": "groot-compose-eb9bb238-header"
+      },
+      {
+        "request_id": "94d2d239-b09e-47b0-b4d2-5550c66fc8a0",
+        "message": "groot-compose-eb9bb238 한글\nsecond line"
+      },
+      {
+        "request_id": "db3c9025-c68c-4c54-b3aa-69e435f7581c",
+        "message": "groot-compose-eb9bb238-header"
+      }
+    ],
+    "all_passed": true
+  },
+  "probe": {
+    "started_at": "2026-10-19T11:17:33.047548+00:00",
+    "network": "bridge",
+    "published_ports": false,
+    "success": true,
+    "candidate_id": "0d8fda19baeebdfe717478d5784ea6e9d5edb10b15be69a8f43b8e4c4f932f80",
+    "unprivileged_user": "65532:65532",
+    "read_only": true,
+    "verifier_output": "log4shell_spring_ready",
+    "probe_removed": true,
+    "stage_removed": true,
+    "finished_at": "2026-10-19T11:17:40.926223+00:00"
+  },
+  "first_probe_failure": {
+    "network": "none",
+    "failure": "Candidate readiness failed after 25 seconds; hostname UnknownHostException in console",
+    "production_changed": false,
+    "probe_and_stage_removed": true,
+    "resolution": "Repeat with existing production bridge network, no published ports, same nonroot and readonly limits; passed"
+  },
+  "validation": {
+    "managed_contract_native_tests": 21,
+    "managed_contract_local_tests": 21,
+    "service_tests": 40,
+    "controller_tests": 17,
+    "bash_syntax": "passed",
+    "native_compose_config": "passed",
+    "independent_review": "No blocking issues in final source; conditional function failure propagation and interrupted ID recording recovery covered",
+    "deploy_help_and_plan_example": "exit 0; --plan performs no SSH or server changes"
+  },
+  "initial_installer": {
+    "service_schema": 5,
+    "default_mode": "apply",
+    "interactive_prompts": 8,
+    "role_order": [
+      "prechecks_all",
+      "siem",
+      "enrollment_material_transfer",
+      "service",
+      "security",
+      "verify"
+    ],
+    "prepared_jar_required": true,
+    "jar_built_or_downloaded_automatically": false,
+    "fresh_3vm_install_performed": false,
+    "source_sha256": {
+      "deploy.sh": "1087fee108988a603b8f542544b6a6e4eac37868efffa1fb439040072fde42e4",
+      "deployment/roles/service.sh": "c8d23d519a73ed11bbffc47c4cb87000a77aba6138ff04b92a6cc8b4bc963ec0",
+      "deployment/roles/service-test.sh": "4361c35931a72876cb6ef507c62923735a3c5ac23565f36597f068a98dffb152",
+      "deployment/tests/test_controller.py": "d106e72bc5df92dbc3f60f0cab1edec42895b30aa7e72f4d5fba93e27a42c616",
+      "deployment/config.example.conf": "355781b2fa088bf20f212b393c4ee9d3d86e3e7ecee8cc6548dce60fffc4ee4a",
+      "deployment/validate_log4shell_jar.py": "b69df872d08dfffb099a20023b1b58854f68889eb96d6f9efd68c39b96c1d022",
+      "deployment/verify_log4shell_app.py": "583b78376970e671e98a995dac591fbb1628e543763b079d7150407564ac3bbf"
+    }
+  },
+  "source_sync_and_server_cleanup": {
+    "source_files_sha256": {
+      "README.md": "2aceda6a52eeabe3aa86c02a7969afd46b64ffeb89856a6d5cb7fb1e4aeb0e31",
+      "apache-proxy.conf": "3a838ea895d4ee1f4494bf3378019cc2ad9982155105215c00064a09aadbd7b6",
+      "build.gradle": "bdff597d06c04f308d7f022437ca0aaa548d8913efb1a8c8630b8615fb68f8e2",
+      "compose.yaml": "b6c3b85bec2dc738de5b438e630a4b85dc21ca7f5a341660aab725b5c0ac5e8a",
+      "deployment-validation-20261019.json": "3e3de36a5eb02bbe19942089e483560c3483ace42038146718b56442c4e2c58d",
+      "existing-container.properties": "5a7df62e2ab3162bb311567eeb20d58b84c3e52971914b99a9c03b4509eb89ad",
+      "manage.sh": "8e87eed99d4dc31642a1260f9dbfc9699059faf744dc32430c0270c7f6e3d8bf",
+      "managed_contract.py": "15b045280d631b04f9e8a3dc28f61d56f22d74a849f8e1d9b87568cb28bd20dc",
+      "settings.gradle": "a948af78eb486500bfc0a09d90869ee1527abfa9f58f29312f9dcf57d3556889",
+      "src/main/java/fr/christophetd/log4shell/vulnerableapp/LabCsrf.java": "e5c6b5d2f73535ad26f6edd860adc61e4cbfc7dddf1b162b0febe51733ca77f3",
+      "src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java": "d83092a35ff8e806f5a515c994059e4af2c67f04bca9f608995005dcd8801ba4",
+      "src/main/java/fr/christophetd/log4shell/vulnerableapp/VulnerableAppApplication.java": "c752513d08c7ff950a4dfb9b89c015779f57d503c777ea97fb2836f2fe4ed918",
+      "src/main/resources/application.properties": "7e6ed7632030fa90e3ce0f605aa64bf7ef54a9c973cb7ba53dd6ed2bb4e6f145",
+      "src/main/resources/log4j2-spring.xml": "435e610928f88512ec1d84f9f7ce1e3c13e387227adfd026ee1b3b4f384070e1",
+      "src/main/resources/static/app.css": "b59f6410c32e1303029edbb11e1e4b7c3423b42cb8ed76de74e6bb722792b2dc",
+      "src/main/resources/static/app.js": "4d06b4292aacba423e8ba7f1519be110612c33bee5ac2cdec89dbda236a97cc6",
+      "src/main/resources/static/index.html": "01125144eb88de03cd4b61822e5a68bf2acec67c619949eca5dd58766ddf6a93",
+      "test_managed_contract.py": "a5ce68df4399c883c5b4bf76d3207a50dd980aca1cd2e0cb13329b14ac3d645c",
+      "tools/build_from_existing.py": "65b5a1274b80f4e42624f2775e662366f7350a982027a8c8c5ac05caae35e5c7"
+    },
+    "server_staging_removed": true,
+    "remaining_task_staging": [],
+    "managed_root_preserved": true,
+    "recovery_backup_preserved": true
+  },
+  "cleanup": {
+    "server_task_staging_removed": true,
+    "old_unmanaged_container_removed_after_verification": true,
+    "operational_managed_root_and_backups_preserved": true,
+    "mac_temporary_cleanup": "Recorded separately in local conversation log after evidence upload; no package download or local tool installation"
+  },
+  "not_performed": [
+    "Gradle dependency resolution build",
+    "fresh three-VM installation",
+    "host reboot test",
+    "attack payload or callback test",
+    "security detection and blocking E2E"
+  ],
+  "unchanged_scope": [
+    "A/B settings",
+    "Apache proxy/vhost configuration",
+    "Firewall and attack scenario toggle",
+    "Existing Java source/JAR from 19:57 web migration",
+    "SOC approval and Docker privilege boundaries"
+  ],
+  "known_limitations": [
+    "Existing WAF 403 JSON response has text/html MIME",
+    "Java console logging is not newly enrolled in Wazuh by this change",
+    "This manager recreates the approved artifact; new-version upgrade is a separate change"
+  ]
+}

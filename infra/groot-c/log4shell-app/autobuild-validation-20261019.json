@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "purpose": "Automatic offline Log4Shell JAR build during initial service installation",
+  "final_native_service_function": {
+    "at": "2026-10-19T13:36:47.783471+00:00",
+    "success": true,
+    "actual_service_prepare_function": true,
+    "built_jar_sha256": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053",
+    "equal_to_current_production_jar": true,
+    "build": {
+      "compiler_version": "javac 1.8.0_181",
+      "files": {
+        "build.gradle": "bdff597d06c04f308d7f022437ca0aaa548d8913efb1a8c8630b8615fb68f8e2",
+        "settings.gradle": "a948af78eb486500bfc0a09d90869ee1527abfa9f58f29312f9dcf57d3556889",
+        "src/main/java/fr/christophetd/log4shell/vulnerableapp/LabCsrf.java": "e5c6b5d2f73535ad26f6edd860adc61e4cbfc7dddf1b162b0febe51733ca77f3",
+        "src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java": "d83092a35ff8e806f5a515c994059e4af2c67f04bca9f608995005dcd8801ba4",
+        "src/main/java/fr/christophetd/log4shell/vulnerableapp/VulnerableAppApplication.java": "c752513d08c7ff950a4dfb9b89c015779f57d503c777ea97fb2836f2fe4ed918",
+        "src/main/resources/application.properties": "7e6ed7632030fa90e3ce0f605aa64bf7ef54a9c973cb7ba53dd6ed2bb4e6f145",
+        "src/main/resources/log4j2-spring.xml": "435e610928f88512ec1d84f9f7ce1e3c13e387227adfd026ee1b3b4f384070e1",
+        "src/main/resources/static/app.css": "b59f6410c32e1303029edbb11e1e4b7c3423b42cb8ed76de74e6bb722792b2dc",
+        "src/main/resources/static/app.js": "4d06b4292aacba423e8ba7f1519be110612c33bee5ac2cdec89dbda236a97cc6",
+        "src/main/resources/static/index.html": "01125144eb88de03cd4b61822e5a68bf2acec67c619949eca5dd58766ddf6a93",
+        "tools/build_from_existing.py": "65b5a1274b80f4e42624f2775e662366f7350a982027a8c8c5ac05caae35e5c7",
+        "tools/prepare_from_image.py": "2a764c6f1fb05e58322bcae8a4761dc97bb6a2c43fb6cb2270de54496f2dbfce"
+      },
+      "image_id": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+      "mode": "offline-image-jdk",
+      "network": "none",
+      "package": {
+        "application_file_count": 8,
+        "base_sha256": "dbb52eaac0ad7ebd93578e7147e10e264be8a342a341a87eb0b08c0ee70fe51e",
+        "classpath_idx": "preserved",
+        "dependencies_unchanged": true,
+        "layers_idx": "preserved",
+        "libraries_sha256": {
+          "BOOT-INF/lib/jackson-annotations-2.13.0.jar": "81f9724d8843e8b08f8f6c0609e7a2b030d00c34861c4ac7e2099a7235047d6f",
+          "BOOT-INF/lib/jackson-core-2.13.0.jar": "348bc59b348df2e807b356f1d62d2afb41a974073328abc773eb0932b855d2c8",
+          "BOOT-INF/lib/jackson-databind-2.13.0.jar": "9c826d27176268777adcf97e1c6e2051c7e33a7aaa2c370c2e8c6077fd9da3f4",
+          "BOOT-INF/lib/jackson-datatype-jdk8-2.13.0.jar": "97350ab6e439d32f9dfbce8b17ff7d670194ae554de408ac765131ba49f46305",
+          "BOOT-INF/lib/jackson-datatype-jsr310-2.13.0.jar": "d839c42eb5b199795820fed8182a42e69fd3368fc1a3ae80100527ae345fd828",
+          "BOOT-INF/lib/jackson-module-parameter-names-2.13.0.jar": "2dbae64f2a997d05c5c2871e42f14d1e8c69cf9e25842d60448d585074c394b0",
+          "BOOT-INF/lib/jakarta.annotation-api-1.3.5.jar": "85fb03fc054cdf4efca8efd9b6712bbb418e1ab98241c4539c8585bbc23e1b8a",
+          "BOOT-INF/lib/jul-to-slf4j-1.7.32.jar": "6dee8d85ad6943aff0600f14897c469e64bae0413ee33a15c448af00432c0642",
+          "BOOT-INF/lib/log4j-api-2.14.1.jar": "8caf58db006c609949a0068110395a33067a2bad707c3da35e959c0473f9a916",
+          "BOOT-INF/lib/log4j-core-2.14.1.jar": "ade7402a70667a727635d5c4c29495f4ff96f061f12539763f6f123973b465b0",
+          "BOOT-INF/lib/log4j-jul-2.14.1.jar": "f1adf70e5af4cb4def92ee0e192e8798a9dc9f5874b79b34a8e871c6ea08efea",
+          "BOOT-INF/lib/log4j-slf4j-impl-2.14.1.jar": "1e466dd397fb7dd903420c5172234a7d88d7f1a85aa4f5573105c0d9ce12fa33",
+          "BOOT-INF/lib/slf4j-api-1.7.32.jar": "3624f8474c1af46d75f98bc097d7864a323c81b3808aa43689a6e1c601c027be",
+          "BOOT-INF/lib/snakeyaml-1.29.jar": "89c5f029811b08c878f0b81dbb05e9626624c1fda4087a26871101e499a217ab",
+          "BOOT-INF/lib/spring-aop-5.3.13.jar": "24e41b42137dfb6bde3aace2d48e45d73c4be13d4167d88a789ba41bf9325f79",
+          "BOOT-INF/lib/spring-beans-5.3.13.jar": "7d0d4e4da5c9e2168ec21d49a94668a1c8a1d22fdae7ddaffc899f3a2859e306",
+          "BOOT-INF/lib/spring-boot-2.6.1.jar": "dddc17a060dfea6aa25acc364cc025750b542006514b78da92188fff7584f085",
+          "BOOT-INF/lib/spring-boot-autoconfigure-2.6.1.jar": "5d3cceab0a47f7fb940f700ce25b600636189f64bc61b8332018aa3019bf7816",
+          "BOOT-INF/lib/spring-boot-jarmode-layertools-2.6.1.jar": "0c007a763234980590625d8bc1742a7b1b9506b5a9bd527d970c734ae9b48dd9",
+          "BOOT-INF/lib/spring-context-5.3.13.jar": "90a5eeff7d1b3b7d407c9697c9a7b6c6ad47d3b391617011974aaa980d6c7e55",
+          "BOOT-INF/lib/spring-core-5.3.13.jar": "f917578c93e5542eced89c4462fda3958230707d842ffbfa61110aa3a897dc98",
+          "BOOT-INF/lib/spring-expression-5.3.13.jar": "53b006b299f4d9788a156a1f4a85b6cabcc85d53c5bad1436b8a136ee44dbfeb",
+          "BOOT-INF/lib/spring-jcl-5.3.13.jar": "19439f135c90d6ab8f59a24e65bcddad41b9f0af0895115b08316a9ca204e5b0",
+          "BOOT-INF/lib/spring-web-5.3.13.jar": "1e9cf607c870099ac109f7f38edc87a2353f7f9b496d3519e4a20aa57ee75779",
+          "BOOT-INF/lib/spring-webmvc-5.3.13.jar": "869f7c868b56fe46dd9446f27271d8804db8daf279952ef0b7e7fd97411cf359",
+          "BOOT-INF/lib/tomcat-embed-core-9.0.55.jar": "b416061261539314cac6c2f63d7fd12d3a17f00beb927b5d65b41356bdddc615",
+          "BOOT-INF/lib/tomcat-embed-el-9.0.55.jar": "2eb5256972e46e4021ee28086f4dfa8be7a5d2611d0bee8ad2281e6f84f3a45f",
+          "BOOT-INF/lib/tomcat-embed-websocket-9.0.55.jar": "eb9c347f18054dbb9f0a6136000edf1ddd562990af965b15940aa0add4f507fd"
+        },
+        "loader_and_metadata_unchanged": true,
+        "log4j": "2.14.1",
+        "output": "/var/tmp/capstone-log4shell-autobuild-20261019-hhln89vx/native-role/config/log4shell-app.jar",
+        "output_sha256": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053",
+        "spring_boot": "2.6.1",
+        "unindexed_libraries": [
+          "BOOT-INF/lib/spring-boot-jarmode-layertools-2.6.1.jar"
+        ]
+      },
+      "schema": 1,
+      "source_sha256": "e164d9bf7dbd5afb2d94f5e3650dda4a02cced6661d72c4646bc80d72091bf17",
+      "temporary_containers_removed": true
+    },
+    "native_unit_tests": {
+      "rc": 0,
+      "output": "................\n----------------------------------------------------------------------\nRan 16 tests in 0.106s\n\nOK\n"
+    },
+    "production_unchanged": true,
+    "build_temporary_resources_removed": true,
+    "service_source_sha256": "40867ab283f91b0692bc4d93881d58236d265487fce6300323e7948b1730e01d"
+  },
+  "same_artifact_runtime_probe": {
+    "candidate": {
+      "id": "dd8f0fb838d4cb3bdedf5442ffb9ad748029ac672a9c4c779235a86c851e7e0d",
+      "ready": true,
+      "verifier": "log4shell_spring_ready",
+      "published_ports": false,
+      "user": "65532:65532",
+      "read_only": true,
+      "console_normal_message_found": true
+    },
+    "artifact_sha256": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053",
+    "probe_removed": true,
+    "production_unchanged": true
+  },
+  "local_tests": {
+    "controller": 20,
+    "service": 51,
+    "offline_builder": 16,
+    "persistent_manager_previous_regression": 21
+  },
+  "first_probe_error": {
+    "error": "Standalone default /usr/bin/docker absent on C; stopped before creating build containers",
+    "resolution": "Service already passes resolved Docker executable; standalone default now resolves the fixed PATH",
+    "production_changed": false
+  },
+  "scope": {
+    "service_schema": 6,
+    "default_jar_mode": "automatic",
+    "provided_jar_override": true,
+    "check_compiles": false,
+    "fresh_3vm_install_performed": false,
+    "gradle_dependency_resolution_performed": false,
+    "package_downloads": 0,
+    "mac_installs": 0,
+    "images_pulled_or_built": 0,
+    "production_container_restarts": 0
+  },
+  "source_sha256": {
+    "deploy.sh": "e24f480dc2499e334acd8ef16809bc863d4f6dfc087c16ae491fac6291b4d201",
+    "deployment/roles/service.sh": "40867ab283f91b0692bc4d93881d58236d265487fce6300323e7948b1730e01d",
+    "deployment/roles/service-test.sh": "f230f4a20dab36626af26e2d015ba8f6b0f741fc4d949853808d571b78da4b2d",
+    "deployment/tests/test_controller.py": "5be11974b9dc4e4955a7421bae7ccb48440eabd799661815cc3aa664c23628b8",
+    "infra/groot-c/log4shell-app/tools/prepare_from_image.py": "2a764c6f1fb05e58322bcae8a4761dc97bb6a2c43fb6cb2270de54496f2dbfce",
+    "infra/groot-c/log4shell-app/tools/test_prepare_from_image.py": "25ebfc8756f000fd7e30dd90ae33a7e9648e114102331f72b44effa95d6f123c"
+  },
+  "cleanup": {
+    "server_source_stage_and_built_test_jars_removed": true,
+    "temporary_containers_removed": true,
+    "operational_source_and_receipt_preserved": true,
+    "mac_task_temporary_directory": "Shared with following Wazuh task; removed at end and recorded in local conversation log"
+  }
+}

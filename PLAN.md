@@ -1,5 +1,23 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+## 초기 Log4Shell 자동 빌드 완료·시연 접속 준비 (2026-10-19 22:36 KST)
+
+- service schema6의 자동 JAR 준비와 기존 JAR 선택을 구현했다. C native 설치 함수에서 운영본과 동일 SHA를 생성하고 동일 산출물 UI/API를 검증했다. controller20·service51·빌더16 회귀 통과, 운영 앱 재시작0·설치/다운로드0·서버 임시자료 정리 완료.
+- 사용자 요청 순서는 관련 변경 커밋·푸시 후 Wazuh Dashboard 임시 VPN 허용이다. `https://wazuh.grootlab.duckdns.org/`의 VPN192.168.15.0/24 허용을 2026-10-20 23:59 KST까지로 한정한다. 학과망 기존 허용과 로그인 인증은 유지한다. 라이브 적용·인증서·로그인·만료 검증은 완료 후 후속 기록을 남긴다.
+- 신규3VM 전체 설치·호스트 재부팅·실제 공격/콜백/탐지/LLM 대응 E2E는 남아 있다. [자동 빌드 근거](infra/groot-c/log4shell-app/autobuild-validation-20261019.json).
+
+## Log4Shell Docker 자동화 적용 후 후속 (2026-10-19 20:30 KST)
+
+- 기존 C의 영속 Compose 전환을 완료했다. `manage.sh up/recreate/verify`가 저장된 이미지·JAR·명령·환경을 검증하고 재생성한다. 실제 재생성·컨테이너 부재 후 기동·원본 저장소 없이 관리, HTTP/HTTPS38검사와 콘솔 원문8건을 통과했다. 과거 쓰기 계층의 JAR 수동 복사 방식은 아래19:57 이력으로 보존한다.
+- 초기 설치기 service schema5, 서비스40·controller17·관리기21 회귀를 확인했다. README에8개 실제 질문·기본apply·성공 출력·네 모드와 사전 JAR 준비를 명시했다. 패키지/이미지/JAR 다운로드·빌드는 자동화 범위에 포함하지 않는다.
+- 다음 검증은 준비된 Linux 환경의 Gradle 빌드, 신규3VM 실제 설치와 별도로 계획한 호스트 재부팅이다. 공격·콜백·탐지·LLM 대응 전체 E2E, 기존 A 시나리오 helper OBS_SEG 차이, 서버 안정화·보류 항목은 남는다. [현황·근거](STATUS.md) · [관리 소스](infra/groot-c/log4shell-app/README.md).
+
+## Log4Shell Java 웹 교체 완료·후속 검증 (2026-10-19)
+
+- 기존 PHP 중계 화면·API를 제거하고 Spring Boot 직접 UI/API로 교체했다. Log4j API/Core2.14.1 강제 의존성, 실제 헤더/파라미터 원문 로깅, 요청 ID·KST·원문 응답을 구현하고 기존 HTTP/HTTPS 주소에19:57 KST 적용했다. 공격 코드·페이로드·콜백 기능은 추가하지 않았다.
+- 기존 JDK8·JAR 의존성 재사용 빌드, 같은 컨테이너 stop/start1회와 C Apache 프록시 전환을 완료했다. PHP 원본·이전 JAR·설정은 복구 백업으로 보존했다. 내부/외부 정상 요청과 CSRF 거부·콘솔 원문·Safari HTTP/HTTPS 전환·DVWA를 확인했다. 신규 설치기 service schema4·사전 JAR 준비 방식으로 동기화했다.
+- 다음 검증은 준비된 Linux 환경의 Gradle 빌드와 신규3VM 실제 설치다. 공격·콜백·탐지·LLM 대응 E2E는 이번 완료 범위에 포함하지 않는다. 기존 A 시나리오 helper의 OBS_SEG 차이와 경로 검증, 서버 안정화·기존 보류 항목은 유지한다. 이전 GET /계약의 공격 절차를 새 POST+CSRF 앱에 그대로 적용하지 않는다. [현황·범위](STATUS.md) · [새 소스](infra/groot-c/log4shell-app/README.md).
+
 ## 만료 승인 카드 정리 완료·운영 관찰 (2026-10-15 19:02 KST)
 
 사용자 승인 뒤18:52 B 브로커에 정리 기능을 배포했다. 18:54 첫 시험에서 본문 변경·댓글 보존은 성공했으나 빈 첨부 응답이 JSON `null`이어서 읽기 검증은 실패했다. 다른 속성 검증을 유지하면서 빈 첨부의 `null`·필드 없음·`[]` 표현만 수용하도록 수정하고19:01:33 재배포했다. 19:02:18 새 카드2개·댓글1개로 재검증해 실제5초 worker의 만료 후2.368초1회 정리, 보호 카드 불변, 댓글 보존,6초 후 추가 PUT0, 잘못된 연결·봇 신원 거부를 확인했다. 회귀90개 통과이며 최초 실패 감사기록도 보존한다.

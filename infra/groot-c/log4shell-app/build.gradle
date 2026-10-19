@@ -1,0 +1,41 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.1'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+group = 'fr.christophetd.log4shell'
+version = '1.0.0'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+// This deliberately vulnerable lab uses the same logging versions as its image.
+ext['log4j2.version'] = '2.14.1'
+configurations.all {
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    resolutionStrategy.force 'org.apache.logging.log4j:log4j-api:2.14.1',
+            'org.apache.logging.log4j:log4j-core:2.14.1'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.1'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2:2.6.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+}
+
+springBoot {
+    mainClass = 'fr.christophetd.log4shell.vulnerableapp.VulnerableAppApplication'
+}
+
+bootJar {
+    archiveFileName = 'spring-boot-application.jar'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

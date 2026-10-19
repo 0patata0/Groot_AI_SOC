@@ -1,5 +1,11 @@
 # 시나리오 2 — Log4Shell (CVE-2021-44228, C:8080 랩)
 
+> **2026-10-19 정정·Java 웹 교체 완료:** 기존 C 앱의 JAR·실행 환경 직접 확인 기록에서 Spring Boot **2.6.1**, Log4j API/Core 각각 **2.14.1**, Java **8u181**을 확인했다. 아래의 “실제 JAR 버전 미확인”은 이전 점검 당시 상태다. 새 [Java 실습 웹](../infra/groot-c/log4shell-app/README.md)은 `/log4shell/` 화면과 API를 직접 제공하며, `GET /log4shell/api/status`에서 받은 CSRF 토큰·쿠키를 사용하는 `POST /log4shell/api/log`로 요청 계약을 바꾼다. 기존 `GET /` 헤더 요청 절차와 호환되지 않는다.
+>
+> 19:57 KST 운영 교체와 무해한 요청 검증을 완료했으며 상세 시각·결과는 [STATUS](../STATUS.md)의 후속 기록을 따른다. 버전 확인과 무해한 정상 요청의 응답·로그 검증은 실제 공격·콜백·탐지·차단 E2E의 증거가 아니다. **아래 경로·공격 절차는 이전 앱 기준의 보존 기록으로, 새 앱에 그대로 적용할 수 없으며 현재 실행 절차를 뜻하지 않는다.** 이번 변경에서 공격 코드·페이로드·콜백 절차를 추가하거나 보완하지 않는다.
+
+## 이전 앱 기준 목표·절차 — 보존 기록
+
 목표: C의 `log4shell-vulnerable-app`(기존 설계상 Log4j 2.14.1, 실제 JAR 버전 미확인)을 대상으로, 취약점의 관측 흔적(네트워크·엔드포인트)을 SOC에서 확인하고 실제 컨테이너의 JAR 버전을 별도 증거로 남긴다. **exploit 체인은 이 저장소에 두지 않는다** — 랩 앱의 [공식 README](https://github.com/christophetd/log4shell-vulnerable-app/blob/main/README.md) 절차와 `references.md`의 CVE/PoC 문서를 격리 랩에서 그대로 따른다.
 
 - 대상 앱: `log4shell-vulnerable-app`(C:8080). 문서화된 주입 지점 = 앱이 로깅하는 요청 헤더/필드(README 참조)에 JNDI 조회 문자열.

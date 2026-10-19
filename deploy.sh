@@ -26,6 +26,7 @@ ET_RULES_FILE=
 DVWA_IMAGE=
 MARIADB_IMAGE=
 LOG4SHELL_IMAGE=
+LOG4SHELL_APP_JAR=
 LOG4SHELL_HOSTNAME=
 WORK=
 RUN_ID=
@@ -46,6 +47,7 @@ Without a config, asks for security, siem, service IPv4 addresses, in that order
 --batch   Require all inputs in the configuration; never prompt.
 
 Packages, images, SSH host keys and sudo access must be prepared manually.
+Log4Shell is built on the service host by default; a prepared JAR is optional.
 See README.md and deployment/config.example.conf. No package manager is run.
 EOF
 }
@@ -67,7 +69,7 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_HOSTNAME)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         ;;
@@ -123,12 +125,18 @@ for port in "$SSH_PORT" "$WEB_BACKEND_PORT" "$WAF_PORT"; do
   [[ $port =~ ^[1-9][0-9]*$ && ${#port} -le 5 && $port -le 65535 ]] || die 'invalid TCP port'
 done
 [[ -z $LOG4SHELL_HOSTNAME ]] || hostname_valid "$LOG4SHELL_HOSTNAME" || die 'LOG4SHELL_HOSTNAME must be a lowercase DNS name without scheme, port or path'
+[[ -z $LOG4SHELL_APP_JAR || ( $LOG4SHELL_APP_JAR =~ ^/opt/[A-Za-z0-9._/-]+\.jar$ && $LOG4SHELL_APP_JAR != *..* && $LOG4SHELL_APP_JAR != *//* ) ]] || die 'LOG4SHELL_APP_JAR must be empty for automatic build or a prepared absolute /opt path on the service host'
 [[ $MONITOR_INTERFACE == auto || $MONITOR_INTERFACE =~ ^[a-zA-Z0-9_.:-]+$ ]] || die 'invalid monitor interface'
 [[ $LLM_MODEL =~ ^[a-zA-Z0-9_./:-]+$ ]] || die 'invalid model name'
 [[ $LLM_BASE_URL =~ ^https?://[a-zA-Z0-9.-]+(:[0-9]+)?/v1/?$ ]] || die 'LLM_BASE_URL must be an HTTP(S) /v1 URL without credentials, query or fragment'
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
 say '순서: 세 서버 사전검사 → siem → 등록 CA/암호 전달 → service → security → 전체 검증'
 say 'service 구성: DVWA/MariaDB + Log4Shell 실습 앱과 요청 UI + Wazuh agent'
+if [[ -n $LOG4SHELL_APP_JAR ]]; then
+  say "Log4Shell JAR: service 서버의 준비 파일 사용 ($LOG4SHELL_APP_JAR)"
+else
+  say 'Log4Shell JAR: service 서버에서 전달한 소스로 자동 빌드 (Mac 빌드·의존성 다운로드 없음)'
+fi
 if [[ -n $LOG4SHELL_HOSTNAME ]]; then
   say "Log4Shell HTTP 이름: $LOG4SHELL_HOSTNAME (DNS/hosts → $SECURITY_HOST 사전 준비 필요)"
 fi
@@ -166,13 +174,13 @@ for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_B
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
-for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE LOG4SHELL_IMAGE LOG4SHELL_HOSTNAME; do
+for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE LOG4SHELL_IMAGE LOG4SHELL_APP_JAR LOG4SHELL_HOSTNAME; do
   value=${!key}
   [[ -z $value ]] || printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
 # Explicit source roots. Credentials, Git history, local configuration and datasets
 # are never sent. Temporary files created by this script live only under WORK.
-tar -C "$HERE" --exclude='*.local.*' --exclude='.env' --exclude='*CREDENTIAL*' --exclude='*credentials*' --exclude='*secrets*.env' --exclude='secrets' --exclude='*.key' --exclude='*.pem' --exclude='__pycache__' --exclude='*.pyc' -cf "$WORK/bundle/source.tar" deployment infra new_rule
+tar -C "$HERE" --exclude='*.local.*' --exclude='.env' --exclude='*CREDENTIAL*' --exclude='*credentials*' --exclude='*secrets*.env' --exclude='secrets' --exclude='*.key' --exclude='*.pem' --exclude='__pycache__' --exclude='*.pyc' --exclude='*.jar' --exclude='*.class' --exclude='.gradle' --exclude='infra/groot-c/log4shell-app/build' -cf "$WORK/bundle/source.tar" deployment infra new_rule
 PAYLOAD_SHA=$(python3 -B - "$WORK/bundle/source.tar" <<'PY'
 import hashlib,sys
 with open(sys.argv[1],'rb') as f:

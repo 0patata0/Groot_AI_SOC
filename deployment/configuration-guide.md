@@ -71,6 +71,7 @@ MONITOR_INTERFACE=auto
 WEB_BACKEND_PORT=80
 WAF_PORT=8080
 LOG4SHELL_HOSTNAME=
+LOG4SHELL_APP_JAR=
 LLM_BASE_URL=http://192.0.2.40:11434/v1
 LLM_MODEL=qwen3.6:35b
 ```
@@ -92,7 +93,8 @@ LLM_MODEL=qwen3.6:35b
 | `SURICATA_IMAGE`, `WAF_IMAGE` | 생략 가능. 각각 `jasonish/suricata:latest`, `owasp/modsecurity-crs:nginx` 로컬 이미지 |
 | `ET_RULES_FILE` | 생략 가능. security의 `/opt/capstone-prereqs/suricata.rules` 기본 |
 | `DVWA_IMAGE`, `MARIADB_IMAGE` | 생략 가능. 각각 `ghcr.io/digininja/dvwa:latest`, `mariadb:10` 로컬 이미지 |
-| `LOG4SHELL_IMAGE` | 생략하면 공식 고정 digest 이미지 사용. `registry/image@sha256:64자리` 또는 검토한 로컬 `sha256:64자리` image ID만 허용하며 태그는 거절. [수동 자료 준비](setup-packages-artifacts.md)를 따르며 실행 중 pull/build 없음 |
+| `LOG4SHELL_APP_JAR` | 기본 빈값 또는 생략은 service 서버에서 소스 자동 빌드. 준비 JAR을 쓰려면 해당 서버의 `/opt/…jar` 절대 경로를 지정하며 root 소유·그룹/기타 쓰기 금지가 필요. Mac 파일 경로가 아니며 기존 JAR 자체는 전송하지 않음 |
+| `LOG4SHELL_IMAGE` | 생략하면 기존 공식 고정 digest 이미지의 JDK·라이브러리로 앱을 빌드하고 같은 이미지를 실행 환경으로 사용. 새 JAR을 읽기 전용 마운트하므로 이미지의 기존 앱은 실행하지 않음. `registry/image@sha256:64자리` 또는 검토한 로컬 `sha256:64자리` image ID만 허용하며 태그는 거절. 자동 빌드는 `javac 1.8.0_181`·기존 Boot JAR도 필요. [자료 준비](setup-packages-artifacts.md)를 따르며 이미지 pull/build 없음 |
 
 설정은 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, `~`, `$HOME`, `$(...)`를 쓰지 않는다. 줄 맨 앞 `#`는 주석이며 LF 줄바꿈을 사용한다. 알 수 없는 키는 거절한다. `source deployment/site.local.conf`로 실행할 필요가 없다. Wazuh/Mattermost/PostgreSQL 버전과 `/opt/capstone` 경로는 이번 설치기에서 고정돼 있다.
 
@@ -183,15 +185,17 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 | 1 | 세 호스트 전체 사전검사, 서로 다른 machine-id 확인 | 역할 혼용·준비 누락 거절 |
 | 2 | SIEM 준비 이미지 격리 검사, 새 CA/계정·Wazuh/Mattermost/MCP/Hermes 구성 | SIEM 서비스·읽기 MCP 검증 |
 | 3 | SIEM의 등록 CA·암호를 SSH 파이프로 service/security에 전달 | 관리 컴퓨터에 암호 파일 저장 없음 |
-| 4 | service의 DB/DVWA 초기화, 내부 Log4Shell·UI 구성, 웹 접근 제한, Wazuh 등록 | backend·UI·내부 lab·agent 검증 |
+| 4 | service에서 Log4Shell 소스 자동 빌드(또는 준비 JAR 검증), DB/DVWA 초기화, 내부 앱·UI 구성, 웹 접근 제한, Wazuh 등록 | backend·UI·내부 lab·agent 검증 |
 | 5 | security의 WAF/IDS 규칙·탐지 모드·별도 nft 테이블·Wazuh 등록 | 엔진·웹·agent 검증 |
 | 6 | SIEM 최종 검증 | 구축 완료 주소 출력 |
 
 자동 생성물은 `/opt/capstone/{siem,service,security}`와 소스 보존용 `/opt/capstone/releases/…`에 있다. 전달받은 CA/등록 파일은 각 서버 `/opt/capstone-prereqs/`에 남는다. 정상 설치의 필요한 운영 자료이므로 임시파일처럼 지우지 않는다. 임시 전송 폴더는 `/var/tmp/capstone-bootstrap-…`이며 설치기가 종료 시 정리한다.
 
-Log4Shell UI 접속 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`이며 기본 예시는 `http://192.0.2.10:8080/log4shell/`다. DVWA Apache/PHP에 읽기 전용 UI 파일을 추가하고 private lab 네트워크의 `http://log4shell:8080/`만 요청한다. Log4Shell 앱은 호스트 포트를 게시하지 않으므로 service:8080이나 새 방화벽 허용 규칙을 만들지 않는다. 기존 운영망 `http://192.168.16.230/log4shell/`은 기존 A:80 경로이며 신규 환경의 WAF 기본8080과 구분한다.
+Log4Shell UI 접속 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`이며 기본 예시는 `http://192.0.2.10:8080/log4shell/`다. DVWA의 Apache가 `/log4shell/`를 private lab 네트워크의 `http://log4shell:8080/log4shell/`로 프록시한다. 화면·상태 API·로깅 API는 새 Spring Boot JAR이 직접 제공하며 PHP 중계 웹은 배치하지 않는다. Log4Shell 앱은 호스트 포트를 게시하지 않으므로 service:8080이나 새 방화벽 허용 규칙을 만들지 않는다. 기존 운영망 `http://192.168.16.230/log4shell/`은 기존 A:80 경로이며 신규 환경의 WAF 기본8080과 구분한다.
 
-UI는 정상 헤더 HTTP200·헤더 누락 HTTP400, 응답 시간·본문, 최근20개 브라우저 기록의 KST 표시를 제공한다. 기본 구성은 직접 공격이나 LDAP 콜백을 실행하지 않으며, UI 응답 성공이 WAF/Suricata/Wazuh 탐지 E2E 성공을 뜻하지 않는다. 자세한 정상 동작 시험은 [검증 절차](verify-troubleshoot.md)를 따른다.
+화면에서는 요청 헤더 또는 요청 파라미터를 Log4j 2.14.1로 기록한다. 설치 검증은 상태 API의 실제 API/core 버전과 고정된 무해 메시지 한 건의 로깅 응답을 확인한다. 외부 콜백·공격 재현은 설치 검증에 포함하지 않으며, 화면 응답 성공이 WAF/Suricata/Wazuh 탐지 E2E 성공을 뜻하지 않는다. 서비스 입력과 manifest는 schema6이며 빌드 모드·소스·빌더 지문, JAR SHA와 검증기 SHA를 고정한다. 이전 service schema1~5는 이 설치기로 자동 이관하지 않는다. 자세한 정상 동작 시험은 [검증 절차](verify-troubleshoot.md)를 따른다.
+
+자동 모드의 `--check`는 전달할 소스·빌드 도구와 로컬 이미지의 사전 조건을 정적으로 확인한다. 컴파일은 SIEM 구성 이후 service `--apply`에서 수행하므로 이후 빌드 실패 시 SIEM은 이미 구성됐을 수 있다. 빌드가 실패하면 후속 역할은 중단하고 부분 service 상태와 비공개 진단을 보존한다. 완료된 같은 프로필의 `--apply`와 `--verify`는 설치된 JAR을 재검증하며 재빌드하지 않는다. 자동 모드의 `input.json`은 빌드 전 소스 지문을 고정하고 `lab_jar_sha256`은 빈값으로 두며, 생성한 JAR SHA는 `evidence/log4shell-build.json`과 manifest 파일 해시에 보존한다. 준비 JAR 모드는 입력에도 미리 검증한 JAR SHA를 기록한다.
 
 ### 대화형 실행
 
@@ -201,9 +205,14 @@ UI는 정상 헤더 HTTP200·헤더 누락 HTTP400, 응답 시간·본문, 최�
 bash deploy.sh
 ```
 
-질문 순서는 **security 주소 → siem 주소 → service 주소 → 공통 SSH 사용자 → 개인키 경로 → 감시 NIC → LLM API 주소**다. SSH 포트·모델·웹 포트는 대화형 질문에 없으므로 다른 값을 쓰려면 앞의 설정 파일 방식을 사용한다. 대화형 명령도 사전검사 후 실제 구성을 적용한다.
+질문 순서는 **security 주소 → siem 주소 → service 주소 → 공통 SSH 사용자 → 개인키 경로 → 감시 NIC → 선택 Log4Shell HTTP 호스트명 → LLM API 주소**다. SSH 포트·모델·웹 포트·준비 JAR 경로는 대화형 질문에 없으므로 다른 값을 쓰려면 앞의 설정 파일 방식을 사용한다. 기본값은 Log4Shell 자동 빌드이며 대화형 명령도 사전검사 후 실제 구성을 적용한다.
 
 ## 6. 재검증과 운영 인계
+
+schema6의 Log4Shell Compose는 `entrypoint: [java]`, `command: [-jar, /app/spring-boot-application.jar]`, `working_dir: /app`을 명시한다. 서버 주소 `0.0.0.0`, 포트 `8080`, context path `/log4shell`, `LOGGING_CONFIG=classpath:log4j2-spring.xml`, KST와 Java 메모리 옵션도 명시하여 이미지의 기본 CMD·ENTRYPOINT·WORKDIR에 의존하지 않는다. 소스의 `application.properties`와 Log4j 설정은 검증한 JAR 안에 포함된다.
+
+JAR은 `/opt/capstone/service/config/log4shell-app.jar`에서 읽기 전용으로 마운트하고 long bind의 `create_host_path: false`를 지정한다. 파일이 없어지면 Compose가 빈 디렉터리를 자동 생성하지 않고 실패해야 한다. 지원하지 않는 Compose 버전은 `config --quiet`에서 중단하며 이 옵션을 지워 통과시키지 않는다. 같은 image ID·JAR·Compose로 운영자가 Log4Shell 컨테이너만 재생성해도 새 앱과 고정 실행 설정을 다시 사용한다. 초기 설치기 `--apply`의 완료된 환경 처리 경로는 재검증이며 자동 재생성·업그레이드를 수행하지 않는다.
+
 
 ```bash
 bash deploy.sh --verify --batch --config deployment/site.local.conf
@@ -213,6 +222,6 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 
 검증 중에는 처음 쓴 이미지 ID·규칙·입력·스크립트가 유지돼야 한다. image pull, 소스 업데이트, 입력 변경 뒤에는 같은 설치를 그대로 재검증하지 못할 수 있다. `changed_inputs`·`profile_changed`·부분 설치 오류를 없애려고 manifest/receipt나 DB 볼륨을 지우지 않는다. 소스 커밋·로컬 설정·준비 자료를 보존하고 의도한 변경을 별도 이관 작업으로 처리한다.
 
-선택 HTTP 호스트명·공개 WAF 포트를 포함한 service의 `input.json`과 `manifest.json`은 **schema3**다. 기존 service schema1/2를 자동 업그레이드하지 않으며 재실행하면 입력/manifest 불일치로 거절한다. 기존 service는 데이터·계정·agent 등록을 보존하는 별도 이관이 필요하다. 이 service 상태 버전과 SIEM 준비 파일 `siem.json`의 `schema_version: 1`은 서로 다른 형식이므로 혼동해 수정하지 않는다.
+빌드 모드·소스·빌더 지문, 선택 HTTP 호스트명·공개 WAF 포트·새 Spring JAR SHA를 포함한 service의 `input.json`과 `manifest.json`은 **schema6**다. 기존 service schema1~5를 자동 업그레이드하지 않으며 재실행하면 입력/manifest 불일치로 거절한다. 기존 service는 데이터·계정·agent 등록을 보존하는 별도 이관이 필요하다. 이 service 상태 버전과 SIEM 준비 파일 `siem.json`의 `schema_version: 1`은 서로 다른 형식이므로 혼동해 수정하지 않는다.
 
 사전검사 실패는 원인을 고친 뒤 재실행할 수 있다. 적용 시작 후 실패했다면 [부분 실패 처리](verify-troubleshoot.md)의 상태 확인부터 수행한다. 새 VM 세 대에서 실제 설치가 성공했다는 검증은 이 문서 작성 시 아직 하지 않았다.

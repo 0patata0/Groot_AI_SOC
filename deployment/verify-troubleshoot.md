@@ -30,7 +30,7 @@ SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출,
 | Wazuh Dashboard | `https://192.0.2.20/` | 사용자 `admin`; SIEM의 `/opt/capstone-prereqs/siem.json` 중 `indexer_password` |
 | Mattermost | `http://192.0.2.20:8065/` | 같은 JSON의 `mattermost_admin_username` / `mattermost_admin_password` |
 | DVWA, WAF 경유 | `http://192.0.2.10:8080/login.php` | 사용자 `admin`; service의 `/opt/capstone/service/credentials/admin-password` |
-| Log4Shell 요청 UI, WAF 경유 | `http://192.0.2.10:8080/log4shell/` | 별도 관리자 로그인 없음; 실습망 웹 접근 범위에서 정상/헤더 누락 요청만 중계 |
+| Log4Shell 요청 UI, WAF 경유 | `http://192.0.2.10:8080/log4shell/` | 별도 관리자 로그인 없음; 실습망 웹 접근 범위에서 Spring Boot 화면·상태 API·무해한 로깅 확인 |
 | Hermes | 별도 웹 로그인 없음 | Mattermost의 `capstone` 팀 → `soc` 채널에서 봇 멘션 |
 
 Dashboard 로그인 암호는 Wazuh API용 `wazuh_api_password`와 다릅니다. `kibanaserver`는 Dashboard의 내부 연결용 계정이므로 관리자 로그인에 사용하지 않습니다. 계정 역할은 [Wazuh 공식 암호 관리 문서](https://documentation.wazuh.com/current/user-manual/user-administration/password-management.html)를 참고합니다.
@@ -110,14 +110,12 @@ WAF 주소로 로그인하고 기본 보안 수준이 `impossible`인지 확인�
 
 **실행 위치: 승인된 실습 클라이언트의 브라우저.** 신규 환경은 `http://SECURITY_HOST:WAF_PORT/log4shell/`로 접속합니다. 기본 예시는 `http://192.0.2.10:8080/log4shell/`입니다. 선택 `LOG4SHELL_HOSTNAME=log4shell.example.org`를 지정했다면 `http://log4shell.example.org:8080/`가 같은 이름의 `/log4shell/`로302 이동하는지도 확인합니다. 포트80일 때만 포트를 생략합니다. 기존 운영망의 대표 `http://log4shell.grootlab.duckdns.org/`와 예비 `http://192.168.16.230/log4shell/`은 A:80 경로이며 서로 다른 배포 주소를 혼용하지 않습니다.
 
-1. 화면에서 고정 요청 대상이 신규 환경의 `http://log4shell:8080/`인지 확인합니다. 이 이름은 Docker 내부 DNS이므로 브라우저 주소창에 직접 입력하지 않습니다.
-2. 헤더 값 `1.0`을 두고 **정상 요청 보내기**를 한 번 누릅니다. 대상 HTTP200, 응답 본문·소요 시간·요청 ID가 표시돼야 합니다.
-3. 1초 이상 기다리고 **헤더 없이 요청**을 누릅니다. 대상 HTTP400이 기대 결과이며 필수 `X-Api-Version` 누락을 비교하는 정상 실습입니다. 이400을 UI 고장이나 WAF 차단으로 기록하지 않습니다.
-4. 최근 요청 기록이 KST로 표시되고 같은 브라우저에 최대20개가 보관되는지 확인합니다. 기록은 브라우저 저장소이므로 다른 장치의 기록이나 SIEM 감사 로그를 대신하지 않습니다. 화면의 기록 지우기로 해당 UI 기록을 삭제할 수 있습니다.
+1. 화면과 상태 API가 열리고 실행 중인 Java·Log4j API/core 버전을 표시하는지 확인합니다. 두 Log4j 버전은 `2.14.1`이어야 합니다.
+2. 요청 파라미터 입력으로 `capstone-spring-verification` 같은 무해한 메시지 한 건을 보냅니다. 실제 앱의 HTTP200·요청 ID·시각·로그 입력 응답을 확인합니다. 상태 API에서 받은 세션 쿠키·CSRF 정보는 브라우저가 사용하며 작업 기록에 복사하지 않습니다.
+3. 요청 헤더 입력은 고정된 `X-Api-Version` 또는 `User-Agent`를 사용합니다. 화면의 응답과 실제 Java 로그는 서로 다른 근거이므로 필요한 경우 서버 로그에서도 같은 요청 ID를 대조합니다.
+4. DVWA를 다시 열어 기존 로그인 페이지가 유지되는지 확인합니다. 기존 PHP 화면의 정상/헤더 누락 비교나 브라우저 이력은 새 앱의 인수 기준으로 사용하지 않습니다.
 
-UI는 허용된 문자로 된 헤더 값만 받으며 URL·목적지·LDAP 콜백 주소를 임의 지정하는 프록시가 아닙니다. 요청 제한에 걸린429는 잠시 기다린 뒤 정상 요청 한 건으로 확인합니다. UI가 서버503/502를 표시하면 아래 진단 표를 따릅니다. DVWA도 다시 열어 기존 로그인 페이지가 유지되는지 확인합니다.
-
-외부 요청은 WAF→DVWA Apache의 UI로 들어오지만 UI→Log4Shell 통신은 service 내부 `lab` 네트워크에서 끝납니다. 이 내부 요청이 security의 Suricata 감시 NIC를 지나간다고 가정하지 않습니다. 정상200/헤더 누락400은 HTTP 처리 확인이며 직접 공격·LDAP 콜백·WAF/Suricata/Wazuh 탐지 E2E 성공의 증거가 아닙니다. 기존 A:8080 DNAT 시나리오 토글과도 별도 경로입니다.
+외부 요청은 WAF→Apache→Spring Boot로 이어집니다. Apache→앱 연결은 service 내부 `lab` 네트워크에서 끝나며 security의 Suricata 감시 NIC를 지나지 않습니다. 상태·로깅 API 성공은 HTTP 처리 확인이며 공격·LDAP 콜백·WAF/Suricata/Wazuh 탐지 E2E의 성공 증거가 아닙니다. 기존 A:8080 DNAT 시나리오 토글과도 별도 경로입니다.
 
 ## 3. 서버별 읽기 검증
 
@@ -178,9 +176,9 @@ sudo sed -n "/^status=/p" /var/ossec/var/run/wazuh-agentd.state
 sudo docker exec capstone-service-dvwa apachectl -t
 ```
 
-DVWA와 MariaDB에 해당하는 `capstone-service-dvwa`, `capstone-service-db`는 `healthy`, Log4Shell 서비스는 실행 상태이며 UI의 정상/헤더 누락 요청에 응답해야 합니다. service manifest의 `schema`는 `3`, `state`와 phase는 `complete`여야 합니다. DB와 Log4Shell 앱의 호스트 포트 바인딩은 `{}` 또는 `null`, private/lab 네트워크는 `true`, Wazuh agent는 `active`/`connected`, Apache는 구문 정상이어야 합니다. 실제 DB의 계정·초기화 상태와 선택한 HTTP hostname의 루트·잘못된 DVWA 경로302와 UI200은 `--verify`가 확인합니다. DNS의 실제 클라이언트 해석은 별도 확인합니다. 이전 service schema1/2는 자동 이관하지 않으므로 manifest 숫자만 고쳐 통과시키지 않습니다.
+DVWA와 MariaDB에 해당하는 `capstone-service-dvwa`, `capstone-service-db`는 `healthy`, Log4Shell 서비스는 실행 상태이며 Spring 상태 API와 무해한 로그 요청에 응답해야 합니다. service manifest의 `schema`는 `6`, `state`와 phase는 `complete`여야 합니다. DB와 Log4Shell 앱의 호스트 포트 바인딩은 `{}` 또는 `null`, private/lab 네트워크는 `true`, Wazuh agent는 `active`/`connected`, Apache는 구문 정상이어야 합니다. 실제 DB의 계정·초기화 상태와 선택한 HTTP hostname의 루트·잘못된 DVWA 경로302와 UI200은 `--verify`가 확인합니다. DNS의 실제 클라이언트 해석은 별도 확인합니다. 이전 service schema1/2/3/4/5는 자동 이관하지 않으므로 manifest 숫자만 고쳐 통과시키지 않습니다.
 
-Log4Shell의 비공개 포트와 UI PHP 의존성을 추가 확인합니다. 출력은 지정된 메타데이터만 읽습니다.
+Log4Shell의 비공개 포트와 새 JAR을 추가 확인합니다. 출력은 지정된 메타데이터만 읽습니다.
 
 ```bash
 set -euo pipefail
@@ -189,10 +187,27 @@ lab_container=$(sudo docker compose --project-name capstone-service \
 test -n "$lab_container"
 sudo docker inspect --format '{{.State.Status}} {{json .HostConfig.PortBindings}}' "$lab_container"
 sudo docker network inspect --format '{{.Internal}}' capstone-service_lab
-sudo docker exec capstone-service-dvwa php -r \
-  'exit(PHP_VERSION_ID >= 80100 && extension_loaded("curl") && extension_loaded("session") ? 0 : 1);'
+sudo sha256sum /opt/capstone/service/config/log4shell-app.jar
+sudo jq -r .lab_jar_sha256 /opt/capstone/service/input.json
 unset lab_container
 ```
+
+`--verify`의 Python 검증기는 host의 `nsenter --net`로 DVWA 네트워크 namespace의 localhost Apache에 요청하고 Spring 앱까지 확인합니다. 호스트 파일시스템과 Python을 사용하므로 컨테이너에 새 도구를 설치하지 않습니다. 이 검증은 무해한 메시지 한 건을 로그에 남기며, 클라이언트→WAF 경로 검증은 위 브라우저 절차와 구분합니다.
+
+### 같은 구성으로 Log4Shell 컨테이너 재생성 확인
+
+다음은 **schema6로 처음 구축한 service 서버**에서 운영자가 해당 작업을 승인한 경우에만 쓰는 범위다. 기존 Groot_C용 Compose·관리 스크립트와 경로가 다르다. 다른 서비스의 컨테이너·DB·agent는 재구성하지 않는다. 먼저 기존 소스와 설정으로 `deploy.sh --verify`가 성공하고 JAR 해시·마운트 소스가 일치하는지 확인한다.
+
+```bash
+# schema6 service 서버: 기존 파일과 입력을 유지한 동일 구성 재생성
+sudo docker compose --project-name capstone-service \
+  --project-directory /opt/capstone/service -f /opt/capstone/service/compose.json \
+  up --detach --no-deps --force-recreate --pull never --no-build log4shell
+```
+
+이후 관리 컴퓨터에서 같은 `deploy.sh --verify --batch --config deployment/site.local.conf`를 실행한다. 검증은 고정 image ID·readonly JAR·Java entrypoint/command·`/app` 작업 디렉터리·환경값과 내부망·권한 제한을 대조하고 화면·API와 무해 로깅을 확인한다. 필수 환경변수의 누락·중복·다른 값도 거절한다. 재생성 완료 메시지만으로 앱 복구나 로그 검증 성공을 주장하지 않는다. 이번 저장소의 로컬 회귀는 이 계약과 거절 조건을 검사하며, 신규 3VM의 실제 재생성 성공을 입증한 기록은 아니다.
+
+JAR·이미지·설정을 새 버전으로 바꾸는 작업은 같은 구성 재생성과 다르다. schema1~5의 manifest를 숫자만 고치거나 현재 바이트로 다시 기록하지 말고 별도 이관을 수행한다. 파일 누락은 원래 해시의 파일을 복구한 뒤 확인하고 빈 디렉터리·원본 이미지 앱으로 대체하지 않는다.
 
 ### security 서버
 
@@ -265,6 +280,11 @@ curl --noproxy '*' --connect-timeout 5 --max-time 10 \
 | `missing package command` / `manual_package_missing_*` | README 수동 목록, Ubuntu/amd64 버전, PATH | 해당 대상 Linux 서버에서 누락 패키지 수동 설치 후 `--check`. Mac에 설치하지 않음 |
 | `Docker daemon unavailable` / `compose_plugin_required` | `systemctl is-active docker`, `docker compose version` | Docker 서비스·plugin 수동 준비 수정. 기존 daemon 데이터 삭제 금지 |
 | `preloaded_*_image_required` / `image_architecture_not_linux_amd64` | 로컬 이미지 존재·참조·OS/Architecture | 검토된 amd64 이미지를 대상 서버에 수동 반입. 실행기가 pull할 것으로 기대하지 않음 |
+| bind source path does not exist / `unsafe_file` | `/opt/capstone/service/config/log4shell-app.jar`의 존재·일반 파일·SHA, override 모드이면 준비 JAR도 확인 | 정확한 기존 파일을 복구. `create_host_path: false` 제거·빈 디렉터리 생성·이미지 기본 앱 실행으로 우회하지 않음 |
+| `offline_lab_sources_invalid` | 자동 빌드 소스·resources·두 빌드 도구의 누락, 소유권·쓰기 권한·symlink 여부 | 원래 소스와 안전한 전송 상태를 복구. `--check`는 실제 컴파일을 하지 않음 |
+| `offline_log4shell_build_failed_private_evidence_preserved` | service의 root 전용 `evidence/log4shell-build.log`, 고정 이미지의 `javac 1.8.0_181`·기존 Boot JAR, 임시 컨테이너 정리 상태 | 후속 역할은 중단됨. 이미 구성된 SIEM과 부분 service 상태를 보존하고 원인을 확인. 이미지 pull·패키지 설치·기존 서비스 삭제로 자동 재시도하지 않음 |
+| `offline_build_evidence_mismatch` / `installed_lab_build_evidence_changed` | `evidence/log4shell-build.json`의 소스 지문·이미지 ID·결과 JAR SHA·라이브러리/loader 보존·임시 컨테이너 정리 근거 | 원래 입력과 파일을 대조. manifest나 증거를 현재 값으로 덮어써 통과시키지 않음 |
+| `invalid_prepared_log4shell_jar` | 새 Spring Boot JAR의 main class·정적 자산·Log4j API/core2.14.1, 중복 라이브러리·SHA | Linux 준비 서버에서 올바른 산출물을 다시 준비. 이전 앱 JAR이나 manifest 숫자로 우회하지 않음 |
 | `log4shell_digest_or_image_id_required` | `LOG4SHELL_IMAGE`가 태그인지 확인 | 검증된 repository digest 또는 로컬 `sha256:64자리` image ID 지정. 오프라인 반입용 태그는 설치 입력에 사용하지 않음 |
 | `prepared_image_validation` 실패 | [Hermes 이미지 준비](hermes-image.md)의 기반 이미지, MCP SDK, regex 버전·가드 해시 | Linux에서 이미지를 올바르게 준비하고 검증. 이 단계가 root 상태 생성 전 실패했는지도 확인 |
 | `existing_*`, `deployment_incomplete`, `partial/different-profile` | 이전 완료/부분 설치 기록, VM이 기존 운영 서버인지 | 현재 상태 보존 후 수동 복구 계획. 디렉터리·receipt·볼륨·agent 키 삭제로 fresh 조건 만들지 않음 |
@@ -277,9 +297,9 @@ curl --noproxy '*' --connect-timeout 5 --max-time 10 \
 | `health_timeout_core` / Indexer 시작 실패 | SIEM 메모리·디스크·vm.max_map_count, 제한된 indexer 로그 | 자원·커널 설정·권한 등 구체적 원인 해결. 초기화/볼륨 제거로 재시도하지 않음 |
 | WAF `502`, backend 연결 실패 | security→service IP/포트/라우트, DVWA·DB health | 백엔드 연결부터 복구한 뒤 WAF 경유 GET 재검증 |
 | WAF 경유 DVWA `403` | service Apache가 보는 실제 TCP peer, security 출발지·NAT | 주소/라우팅을 의도한 구조에 맞춤. ACL을 전체 허용으로 바꾸어 통과시키지 않음 |
-| `/log4shell/` UI가404 또는 PHP 원문 표시 | UI 읽기 전용 마운트·Apache DocumentRoot/DirectoryIndex·PHP 처리 여부 | 설정·마운트와 준비 이미지를 확인. 소스를 공개 상태로 두거나 새 공개8080을 열어 우회하지 않음 |
+| `/log4shell/` 화면/API가404 | Apache proxy/proxy_http, prefix 보존 `/log4shell/` 프록시, Spring context path·새 JAR | PHP 웹 파일을 복원하지 말고 새 앱과 고정 경로를 확인. 새 공개8080을 열지 않음 |
 | Log4Shell 별도 이름만 실패하거나 DVWA가 나옴 | `LOG4SHELL_HOSTNAME`, DNS/hosts→security 주소, WAF 포트, 요청 Host 확인 | 빈 설정이면 IP `/log4shell/` 사용. 기존 배포의 hostname을 변경하려고 manifest만 수정하거나 역할을 덮어쓰지 않음 |
-| UI502/503, 고정 대상 연결 실패 | DVWA의 PHP8.1+/curl/session, lab 컨테이너 상태·내부 DNS·공유 lab 네트워크, 요청 제어 경로 권한 | 내부 경로와 준비 이미지부터 복구. 실행 중 패키지 설치나 임의 목적지 입력 기능 추가로 우회하지 않음 |
+| UI502/503 또는 Spring 상태 검사 실패 | lab 컨테이너·JAR SHA·실제 Log4j 버전, `SERVER_ADDRESS=0.0.0.0`, context path, 내부 DNS·lab 네트워크 | JAR과 고정 프록시 경로부터 대조. 일반 sudo/Docker 권한을 LLM에 추가하거나 공개 포트로 우회하지 않음 |
 | 헤더 누락 시험에서 대상400 | UI 응답의 대상 상태와 요청 모드 | 기대 결과. 정상 헤더 모드의200과 구분해 기록 |
 | UI429 또는 기록이 다른 장치에 없음 | 요청 간격·같은 브라우저 저장소 여부 | 1초 이상 기다려 재확인. 최근20개 로컬 기록과 SIEM 로그는 별개 |
 | Suricata 실행되나 이벤트가 없음 | 감시 NIC, link/패킷 카운터, 가상 스위치 미러링, 트래픽 경로 | 정상 요청이 해당 NIC에 도달하는지부터 확인. 경보 0개만으로 장애/정상 판정하지 않음 |

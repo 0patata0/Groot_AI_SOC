@@ -1,0 +1,46 @@
+name: capstone-log4shell
+services:
+  app:
+    image: ${LOG4SHELL_IMAGE:?installed image ID required}
+    pull_policy: never
+    container_name: log4shell-lab
+    entrypoint: [java]
+    command: [-jar, /app/spring-boot-application.jar]
+    working_dir: /app
+    network_mode: bridge
+    ports:
+      - "${LOG4SHELL_BIND_ADDRESS:-127.0.0.1}:8080:8080"
+    restart: unless-stopped
+    user: "65532:65532"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1.0
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=64m,mode=1777
+    healthcheck:
+      disable: true
+    environment:
+      SERVER_ADDRESS: 0.0.0.0
+      SERVER_PORT: "8080"
+      SERVER_SERVLET_CONTEXT_PATH: /log4shell
+      LOGGING_CONFIG: classpath:log4j2-spring.xml
+      TZ: Asia/Seoul
+      JAVA_TOOL_OPTIONS: -Xms64m -Xmx256m -Duser.timezone=Asia/Seoul
+    volumes:
+      - type: bind
+        source: ./artifacts/${LOG4SHELL_JAR_SHA256:?installed JAR SHA required}.jar
+        target: /app/spring-boot-application.jar
+        read_only: true
+        bind:
+          create_host_path: false
+    labels:
+      io.capstone.role: log4shell-java
+      io.capstone.jar-sha256: ${LOG4SHELL_JAR_SHA256:?installed JAR SHA required}
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

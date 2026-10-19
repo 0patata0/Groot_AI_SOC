@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+## 통합 SOC 대시보드 — 2026-10-19 생성 완료
+
+학과 VPN에서 **[Groot SOC | 통합 탐지 현황](https://wazuh.grootlab.duckdns.org/app/dashboards#/view/groot-soc-20261019-dashboard)**을 연다. WAF·Suricata·Wazuh 기타 알림의 수치·추이·주요 탐지·출발지·최근 알림을 14개 패널로 표시한다. 기본 최근 7일, 30초 자동 갱신이며 실제 브라우저 표시와 API 재조회를 검증했다. [집계 의미·복원 파일·적용 근거](infra/groot-b/soc-dashboard/README.md). VPN 임시 접근 종료 시각은 아래와 같으며 저장된 대시보드는 유지한다.
+
 2026 capstone project — nftables, Suricata, ModSecurity, Wazuh, Mattermost, Hermes 기반 실습 SOC.
 
 현재 운영 이력은 [STATUS.md](STATUS.md), 진행 계획은 [PLAN.md](PLAN.md)에 있습니다. 날짜별 대화·작업 기록은 로컬 전용 `대화기록/`에 보관하며 Git에는 포함하지 않습니다. 이 문서의 새 환경 구축과 기존 운영 서버의 변경 이력을 구분합니다.

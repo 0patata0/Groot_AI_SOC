@@ -1,0 +1,405 @@
+{
+  "schema": 1,
+  "task": "Create integrated WAF / Suricata / Wazuh alert dashboard",
+  "recorded_at_utc": "2026-10-19T14:22:51.224790+00:00",
+  "url": "https://wazuh.grootlab.duckdns.org/app/dashboards#/view/groot-soc-20261019-dashboard",
+  "versions": {
+    "wazuh": "4.14.8",
+    "opensearch_dashboards": "2.19.6"
+  },
+  "saved_objects": 15,
+  "panels": 14,
+  "default_time": {
+    "from": "now-7d",
+    "to": "now",
+    "refresh_ms": 30000,
+    "paused": false,
+    "timezone": "Browser default (KST in verified browser)"
+  },
+  "initial_creation": {
+    "started_utc": "2026-10-19T14:12:08.444154+00:00",
+    "source_sha256": "4f9e84d6137046e6382e595f369ca3ecd4f71bc3e6ccadbc567d15e2c40ec384",
+    "objects": [
+      {
+        "id": "groot-soc-20261019-notice",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-metric-total",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-metric-waf",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-metric-suricata",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-metric-other",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-metric-high",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-trend-network-web",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-source-share",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-suricata-signatures",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-waf-classification",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-waf-sources",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-suricata-sources",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-other-rules",
+        "type": "visualization",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-recent-high",
+        "type": "search",
+        "error": null
+      },
+      {
+        "id": "groot-soc-20261019-dashboard",
+        "type": "dashboard",
+        "error": null
+      }
+    ],
+    "tenant": "default global (multitenancy disabled; header omitted)",
+    "success": true,
+    "valid_queries": 6,
+    "created_objects": 15,
+    "readback_verified": true,
+    "export_sha256": "9afb342e3be710ed74ea9faad31e9931049960f6851eef77eedec58ad4a0fb4c",
+    "dashboard_id": "groot-soc-20261019-dashboard",
+    "finished_utc": "2026-10-19T14:12:13.641711+00:00",
+    "ui_verification": "pending"
+  },
+  "final_refinement": {
+    "started_utc": "2026-10-19T14:15:47.736904+00:00",
+    "updated": [
+      {
+        "id": "groot-soc-20261019-notice",
+        "attributes": [
+          "title",
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-metric-total",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-metric-waf",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-metric-suricata",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-metric-other",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-metric-high",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-trend-network-web",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-source-share",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-suricata-signatures",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-waf-classification",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-waf-sources",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-suricata-sources",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-other-rules",
+        "attributes": [
+          "visState"
+        ]
+      },
+      {
+        "id": "groot-soc-20261019-dashboard",
+        "attributes": [
+          "panelsJSON"
+        ]
+      }
+    ],
+    "success": true,
+    "readback_verified": true,
+    "export_sha256": "c2d9572b796961fa17affea86ed9e803f684d7de3140ed46ab48ca5b75ed61d8",
+    "finished_utc": "2026-10-19T14:16:03.834938+00:00"
+  },
+  "final_api_verification": {
+    "checked_at": "2026-10-19T14:21:19.229221+00:00",
+    "existing_index_patterns_unchanged": [
+      "wazuh-statistics-*",
+      "wazuh-monitoring-*",
+      "wazuh-states-inventory-*",
+      "wazuh-states-vulnerabilities-*",
+      "wazuh-states-inventory-hardware-*",
+      "wazuh-states-inventory-system-*",
+      "wazuh-alerts-*"
+    ],
+    "final_objects_verified": 15,
+    "dashboard_status": "green",
+    "seven_day_counts_at_checked_at": {
+      "high": 270,
+      "other": 14510,
+      "suricata": 300,
+      "waf": 190,
+      "waf_suricata_overlap": 0,
+      "total": 15000
+    },
+    "source_partition_matches_total": true,
+    "success": true
+  },
+  "host_verification": {
+    "schema": 1,
+    "scope": "read-only final host verification; selected Docker state, three config SHA-256 values, and timer properties only",
+    "baseline_file": "groot-b-int-final.json",
+    "baseline_file_sha256": "642c7954004a61d2a550d0b274b73adbf5ac94f2e2dd40cb51c1025ad07b4783",
+    "baseline_checked_at_utc": "2026-10-19T13:55:05.751238+00:00",
+    "operating_mutations": false,
+    "raw_configuration_emitted": false,
+    "credentials_emitted": false,
+    "hosts": {
+      "groot-b-int": {
+        "checked_at_utc": "2026-10-19T14:22:24.389413+00:00",
+        "containers": [
+          {
+            "name": "/single-node-wazuh.dashboard-1",
+            "id": "62fcd6e31e7e7dae9f195d69b5cfd50d5acac60c7d6d5ab9ec6d8f83413fd3cb",
+            "started_at": "2026-10-13T02:15:15.675929841Z",
+            "running": true,
+            "restart_count": 0
+          },
+          {
+            "name": "/single-node-wazuh.indexer-1",
+            "id": "b9b00076fc56e85da1f1d0b1e3d4db00a6e6fd4256e51c4a7be03640055dd773",
+            "started_at": "2026-09-28T06:19:48.729016621Z",
+            "running": true,
+            "restart_count": 0
+          },
+          {
+            "name": "/single-node-wazuh.manager-1",
+            "id": "45b85672e0fe16fd14616e608c99b683e2f651b049efcd71da2b45367b057806",
+            "started_at": "2026-10-15T00:10:50.875022782Z",
+            "running": true,
+            "restart_count": 1
+          }
+        ],
+        "files": {
+          "/home/groot_b/capstone/wazuh/single-node/config/wazuh_dashboard/opensearch_dashboards.yml": "00251479be0841fee49bd01a594d2eb6e2a1be71cf78ed6b9651f566af424136",
+          "/home/groot_b/capstone/wazuh/single-node/config/wazuh_dashboard/wazuh.yml": "c40ca1a81207f9e0eb75ce83500ccf7e0b6aef3b6fab51be903cf2dd33ad59aa",
+          "/home/groot_b/capstone/wazuh/single-node/docker-compose.yml": "1e6ab7a77ff237969dcf3e59966f2eed8aab66f58fc805e16e850d210ba7a1d6"
+        },
+        "read_succeeded": true,
+        "container_state_matches_baseline": true,
+        "all_containers_running": true,
+        "config_sha256_matches_baseline": {
+          "/home/groot_b/capstone/wazuh/single-node/config/wazuh_dashboard/opensearch_dashboards.yml": true,
+          "/home/groot_b/capstone/wazuh/single-node/config/wazuh_dashboard/wazuh.yml": true,
+          "/home/groot_b/capstone/wazuh/single-node/docker-compose.yml": true
+        },
+        "passed": true
+      },
+      "groot-a": {
+        "checked_at_utc": "2026-10-19T14:22:23.677020+00:00",
+        "unit": "capstone-wazuh-demo-close.timer",
+        "properties": {
+          "NextElapseUSecRealtime": "Tue 2026-10-20 14:59:00 UTC",
+          "ActiveState": "active",
+          "SubState": "waiting",
+          "UnitFileState": "enabled"
+        },
+        "read_succeeded": true,
+        "expected_next_elapse_utc": "2026-10-20T14:59:00+00:00",
+        "expected_next_elapse_kst": "2026-10-20T23:59:00+09:00",
+        "enabled": true,
+        "active_waiting": true,
+        "expiry_matches_expected": true,
+        "passed": true
+      }
+    },
+    "completed_at_utc": "2026-10-19T14:22:24.423548+00:00",
+    "passed": true
+  },
+  "field_metadata": {
+    "index_pattern_fields": {
+      "timestamp": {
+        "type": "date",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "rule.id": {
+        "type": "string",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "rule.level": {
+        "type": "number",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "rule.description": {
+        "type": "string",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "rule.groups": {
+        "type": "string",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "agent.name": {
+        "type": "string",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "data.src_ip": {
+        "type": "string",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "data.alert.signature": {
+        "type": "string",
+        "searchable": true,
+        "aggregatable": true
+      },
+      "data.transaction.client_ip": {
+        "type": "string",
+        "searchable": true,
+        "aggregatable": true
+      }
+    },
+    "timezone_settings": [
+      {
+        "id": "2.19.6",
+        "dateFormat:tz": "Browser (default)"
+      }
+    ]
+  },
+  "browser_verification": {
+    "completed": true,
+    "browser": "Safari",
+    "verified_on_kst": "2026-10-19 23:17–23:20",
+    "checks": [
+      "all five metrics visible without clipping",
+      "notice text visible",
+      "stacked time histogram and source donut rendered",
+      "horizontal signature and WAF rule charts rendered without axis value overlap",
+      "WAF and Suricata source tables populated",
+      "full-width Wazuh other alerts chart populated",
+      "full-width recent level >= 7 alert table populated and readable",
+      "last 7 days displayed; URL refreshInterval pause false / value 30000",
+      "no loading error displayed"
+    ],
+    "screenshots_not_committed": "Screenshots include raw events and unrelated user tabs; reviewed in session only"
+  },
+  "independent_review": {
+    "passed": true,
+    "checks": [
+      "builder equals generated JSON and NDJSON",
+      "all 15 live-export attributes and references equal generated objects",
+      "common exclusion query applied to each saved object",
+      "14 panels with complete references",
+      "no unsupported filters customLabel",
+      "7 day / 30 second saved defaults"
+    ]
+  },
+  "source_sha256": {
+    "README.md": "895e01285e37ae51224c9217e56d2549d4c9ccde8504fa1483074b7e4cd37545",
+    "build_dashboard.py": "1ad00a0e5f486def8c8408d94a577388996b10f96b44059e79b31c3430d22f8c",
+    "generated/soc-dashboard.json": "b35422772f7e9765816a19b2414b08dc65d93fd9e972d890efa543c61d31a925",
+    "generated/soc-dashboard.ndjson": "913e4d94b2fc6da7c716e49d73e6299ee7ada38bf5daf39bdb0ef636856c3092",
+    "live-export-20261019.ndjson": "c2d9572b796961fa17affea86ed9e803f684d7de3140ed46ab48ca5b75ed61d8"
+  },
+  "scope": {
+    "new_objects_only": true,
+    "index_pattern_changes": false,
+    "global_setting_changes": false,
+    "package_installs": false,
+    "container_restarts": false,
+    "detection_rule_changes": false,
+    "attack_execution": false,
+    "raw_log_documents_in_export": false
+  },
+  "limitations": [
+    "Counts are alert documents, not unique attacks; historical lab and normal management traffic are included.",
+    "Excluded normalization/evidence/synthetic groups do not identify every historical practice event.",
+    "WAF remains DetectionOnly; detections and HTTP statuses are not proof of blocking.",
+    "WAF source may represent a proxy-observed address.",
+    "Future VPN cutoff has not occurred; timer configuration and earlier manual closure were verified separately."
+  ]
+}

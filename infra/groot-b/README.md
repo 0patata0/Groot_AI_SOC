@@ -1,5 +1,9 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
+## 통합 SOC 대시보드 생성 — 2026-10-19
+
+[Groot SOC | 통합 탐지 현황](https://wazuh.grootlab.duckdns.org/app/dashboards#/view/groot-soc-20261019-dashboard): WAF·Suricata·Wazuh 기타 알림의 14패널, 최근 7일·30초 자동 갱신. 새 객체 15개와 기존 인덱스 패턴 참조를 API·브라우저로 검증했다. [소스·복원·적용 검증](soc-dashboard/README.md). 이번 확인에서 전역 시간대는 Browser 기본값이며 Mac 브라우저에서 KST로 표시된다. 아래 10/13 KST 고정 기록은 당시 이력으로 보존한다.
+
 > 2026-10-15: 채팅 인증서 만료 감시를 A(매일09:00KST)에, 전용 XML 디코더·규칙100300~100305를 B에 적용·검증했다. 만료일2027-01-06 15:02:33KST, 갱신은 수동이다. [현재 구성·갱신 절차](../groot-a/certificate-monitor/README.md). 아래 기록은 해당 시점의 이력이다.
 
 ## 2026-10-14 19:38 KST 후속 — Indexer 시간 경계 보완 반영

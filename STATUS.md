@@ -1,5 +1,11 @@
 # 인프라 현황 — 2026-10-19 현재 작업 상태
 
+## 통합 SOC 대시보드 적용 완료 (2026-10-19 23:21 KST 검증)
+
+[통합 탐지 현황](https://wazuh.grootlab.duckdns.org/app/dashboards#/view/groot-soc-20261019-dashboard)에 새 저장 객체 15개(시각화 13·검색 1·대시보드 1), 14개 패널을 생성했다. 최근 7일·30초 자동 갱신, 공통 관측/증거/합성 검증 제외 조건을 적용했다. 실제 브라우저의 수치·추이·출발지·전체 너비 알림 표와 API 재조회·내보내기 일치를 확인했다. 기존 인덱스 패턴 7개는 변경되지 않았으며 상태는 green이다.
+
+23:21 KST 고정 시점의 최근 7일은 전체 15,000 / WAF 190 / Suricata 300 / 기타 14,510 / 레벨 7 이상 270문서다. 이는 실습·정상 관리 트래픽을 포함하는 알림 문서 수이며 고유 공격 수나 차단 성공 수가 아니다. WAF DetectionOnly를 유지했다. 시간대는 이번 라이브 재조회에서 Browser 기본값이며 과거 KST 고정 기록과 구분한다. [설정·내보내기·검증 근거](infra/groot-b/soc-dashboard/README.md).
+
 ## Wazuh 시연용 VPN 접속 적용 완료 (2026-10-19 22:55 KST 검증)
 
 [https://wazuh.grootlab.duckdns.org/](https://wazuh.grootlab.duckdns.org/)에 기존 학과 VPN `192.168.15.0/24`를 한시 허용했다. 종료는 **2026-10-20 23:59:00 KST**이며 기존 학과망 허용·Wazuh 계정 인증은 유지한다. A의 기존 공인 wildcard 인증서를 참조하고 Nginx만 reload했다. 시간별 요청 거부와 systemd timer의 허용 회수를 함께 적용했다.

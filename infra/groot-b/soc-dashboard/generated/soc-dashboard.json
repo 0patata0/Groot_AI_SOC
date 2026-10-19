@@ -1,0 +1,401 @@
+[
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)\"}}"
+      },
+      "title": "데이터 읽는 기준",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[],\"params\":{\"fontSize\":13,\"markdown\":\"**최근 7일 · 30초 자동 갱신** — WAF·Suricata·Wazuh 통합 알림. 시각은 브라우저 기준입니다.\\n\\n**알림은 고유 공격이나 차단 성공 건수가 아닙니다.** 실습·관리 트래픽에 따른 오탐이 포함되며 WAF는 DetectionOnly입니다.\\n\\n정규화 관측·합성 검증은 집계에서 제외합니다. 상단에서 기간과 필터를 조정할 수 있습니다.\\n\",\"openLinksInNewTab\":true},\"title\":\"데이터 읽는 기준\",\"type\":\"markdown\"}"
+    },
+    "id": "groot-soc-20261019-notice",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "선택 기간의 알림 문서 수입니다. 고유 공격 수가 아닙니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)\"}}"
+      },
+      "title": "전체 탐지 알림",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":30,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"},\"title\":\"전체 탐지 알림\",\"type\":\"metric\"}"
+    },
+    "id": "groot-soc-20261019-metric-total",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "선택 기간의 알림 문서 수입니다. 고유 공격 수가 아닙니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.groups:(waf OR modsecurity))\"}}"
+      },
+      "title": "WAF 알림",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":30,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"},\"title\":\"WAF 알림\",\"type\":\"metric\"}"
+    },
+    "id": "groot-soc-20261019-metric-waf",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "선택 기간의 알림 문서 수입니다. 고유 공격 수가 아닙니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.groups:suricata)\"}}"
+      },
+      "title": "Suricata IDS 알림",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":30,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"},\"title\":\"Suricata IDS 알림\",\"type\":\"metric\"}"
+    },
+    "id": "groot-soc-20261019-metric-suricata",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "선택 기간의 알림 문서 수입니다. 고유 공격 수가 아닙니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (NOT rule.groups:(waf OR modsecurity OR suricata))\"}}"
+      },
+      "title": "Wazuh 기타 알림",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":30,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"},\"title\":\"Wazuh 기타 알림\",\"type\":\"metric\"}"
+    },
+    "id": "groot-soc-20261019-metric-other",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "선택 기간의 알림 문서 수입니다. 고유 공격 수가 아닙니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.level:[7 TO *])\"}}"
+      },
+      "title": "위험도 7 이상",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"}],\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":30,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"},\"title\":\"위험도 7 이상\",\"type\":\"metric\"}"
+    },
+    "id": "groot-soc-20261019-metric-high",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "WAF와 Suricata의 시간별 알림 수입니다. 상단 선택 기간을 사용합니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND ((rule.groups:(waf OR modsecurity)) OR (rule.groups:suricata))\"}}"
+      },
+      "title": "네트워크·웹 탐지 추이",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"시간\",\"drop_partials\":false,\"extended_bounds\":{},\"field\":\"timestamp\",\"interval\":\"auto\",\"min_doc_count\":0,\"scaleMetricValues\":false,\"useNormalizedOpenSearchInterval\":true},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"filters\":[{\"input\":{\"language\":\"lucene\",\"query\":\"rule.groups:(waf OR modsecurity)\"},\"label\":\"WAF\"},{\"input\":{\"language\":\"lucene\",\"query\":\"rule.groups:suricata\"},\"label\":\"Suricata IDS\"}]},\"schema\":\"group\",\"type\":\"filters\"}],\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"filter\":true,\"show\":true,\"truncate\":80},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":false},\"labels\":{\"show\":false},\"legendPosition\":\"bottom\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"알림 수\"},\"drawLinesBetweenPoints\":true,\"lineWidth\":2,\"mode\":\"stacked\",\"show\":true,\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"thresholdLine\":{\"color\":\"#E7664C\",\"show\":false,\"style\":\"full\",\"value\":10,\"width\":1},\"times\":[],\"type\":\"histogram\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"알림 수\"},\"type\":\"value\"}]},\"title\":\"네트워크·웹 탐지 추이\",\"type\":\"histogram\"}"
+    },
+    "id": "groot-soc-20261019-trend-network-web",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "그룹 기준 WAF · Suricata IDS · Wazuh 기타 알림입니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)\"}}"
+      },
+      "title": "탐지 원천 비중",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"filters\":[{\"input\":{\"language\":\"lucene\",\"query\":\"rule.groups:(waf OR modsecurity)\"},\"label\":\"WAF\"},{\"input\":{\"language\":\"lucene\",\"query\":\"rule.groups:suricata\"},\"label\":\"Suricata IDS\"},{\"input\":{\"language\":\"lucene\",\"query\":\"NOT rule.groups:(waf OR modsecurity OR suricata)\"},\"label\":\"Wazuh 기타\"}]},\"schema\":\"segment\",\"type\":\"filters\"}],\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"labels\":{\"last_level\":true,\"show\":true,\"truncate\":100,\"values\":true},\"legendPosition\":\"bottom\",\"type\":\"pie\"},\"title\":\"탐지 원천 비중\",\"type\":\"pie\"}"
+    },
+    "id": "groot-soc-20261019-source-share",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "Suricata 그룹의 원본 탐지 시그니처별 알림 수입니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.groups:suricata)\"}}"
+      },
+      "title": "Suricata 시그니처 상위 8",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"탐지 시그니처\",\"field\":\"data.alert.signature\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"size\":8},\"schema\":\"segment\",\"type\":\"terms\"}],\"params\":{\"addLegend\":false,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"filter\":true,\"show\":true,\"truncate\":45},\"position\":\"left\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":false},\"labels\":{\"show\":false},\"legendPosition\":\"bottom\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"알림 수\"},\"drawLinesBetweenPoints\":true,\"lineWidth\":2,\"mode\":\"normal\",\"show\":true,\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"thresholdLine\":{\"color\":\"#E7664C\",\"show\":false,\"style\":\"full\",\"value\":10,\"width\":1},\"times\":[],\"type\":\"histogram\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":true,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"bottom\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"알림 수\"},\"type\":\"value\"}]},\"title\":\"Suricata 시그니처 상위 8\",\"type\":\"histogram\"}"
+    },
+    "id": "groot-soc-20261019-suricata-signatures",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "Wazuh 규칙 ID 기준 분류입니다. DetectionOnly의 탐지 기록이며 차단 수가 아닙니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.groups:(waf OR modsecurity))\"}}"
+      },
+      "title": "WAF 규칙 분류",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"filters\":[{\"input\":{\"language\":\"lucene\",\"query\":\"rule.id:\\\"100101\\\"\"},\"label\":\"100101 · CRS 탐지\"},{\"input\":{\"language\":\"lucene\",\"query\":\"rule.id:\\\"100102\\\"\"},\"label\":\"100102 · 높은 이상 점수\"},{\"input\":{\"language\":\"lucene\",\"query\":\"rule.id:\\\"100103\\\"\"},\"label\":\"100103 · 반복 탐지\"}]},\"schema\":\"segment\",\"type\":\"filters\"}],\"params\":{\"addLegend\":false,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"filter\":true,\"show\":true,\"truncate\":45},\"position\":\"left\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":false},\"labels\":{\"show\":false},\"legendPosition\":\"bottom\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"알림 수\"},\"drawLinesBetweenPoints\":true,\"lineWidth\":2,\"mode\":\"normal\",\"show\":true,\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"thresholdLine\":{\"color\":\"#E7664C\",\"show\":false,\"style\":\"full\",\"value\":10,\"width\":1},\"times\":[],\"type\":\"histogram\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":true,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"bottom\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"알림 수\"},\"type\":\"value\"}]},\"title\":\"WAF 규칙 분류\",\"type\":\"histogram\"}"
+    },
+    "id": "groot-soc-20261019-waf-classification",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "WAF transaction.client_ip별 알림 수입니다. 필드가 존재하는 문서만 집계합니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.groups:(waf OR modsecurity))\"}}"
+      },
+      "title": "WAF 출발지 상위 8",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"출발지 IP\",\"field\":\"data.transaction.client_ip\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"size\":8},\"schema\":\"bucket\",\"type\":\"terms\"}],\"params\":{\"perPage\":8,\"percentageCol\":\"\",\"showMetricsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"totalFunc\":\"sum\"},\"title\":\"WAF 출발지 상위 8\",\"type\":\"table\"}"
+    },
+    "id": "groot-soc-20261019-waf-sources",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "Suricata src_ip별 알림 수입니다. 필드가 존재하는 문서만 집계합니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.groups:suricata)\"}}"
+      },
+      "title": "Suricata 출발지 상위 8",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"출발지 IP\",\"field\":\"data.src_ip\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"size\":8},\"schema\":\"bucket\",\"type\":\"terms\"}],\"params\":{\"perPage\":8,\"percentageCol\":\"\",\"showMetricsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"totalFunc\":\"sum\"},\"title\":\"Suricata 출발지 상위 8\",\"type\":\"table\"}"
+    },
+    "id": "groot-soc-20261019-suricata-sources",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "WAF·Suricata 그룹을 제외한 Wazuh 알림의 규칙 설명별 집계입니다.",
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (NOT rule.groups:(waf OR modsecurity OR suricata))\"}}"
+      },
+      "title": "Wazuh 기타 탐지 상위 8",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"알림 수\"},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"탐지 내용\",\"field\":\"rule.description\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"size\":8},\"schema\":\"segment\",\"type\":\"terms\"}],\"params\":{\"addLegend\":false,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"filter\":true,\"show\":true,\"truncate\":45},\"position\":\"left\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"grid\":{\"categoryLines\":false},\"labels\":{\"show\":false},\"legendPosition\":\"bottom\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"알림 수\"},\"drawLinesBetweenPoints\":true,\"lineWidth\":2,\"mode\":\"normal\",\"show\":true,\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"thresholdLine\":{\"color\":\"#E7664C\",\"show\":false,\"style\":\"full\",\"value\":10,\"width\":1},\"times\":[],\"type\":\"histogram\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":true,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"bottom\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"알림 수\"},\"type\":\"value\"}]},\"title\":\"Wazuh 기타 탐지 상위 8\",\"type\":\"histogram\"}"
+    },
+    "id": "groot-soc-20261019-other-rules",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "columns": [
+        "timestamp",
+        "agent.name",
+        "rule.level",
+        "rule.description"
+      ],
+      "description": "선택 기간 안에서 최신 알림부터 표시합니다.",
+      "hits": 0,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\",\"query\":{\"language\":\"lucene\",\"query\":\"(NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)) AND (rule.level:[7 TO *])\"},\"version\":true}"
+      },
+      "sort": [
+        [
+          "timestamp",
+          "desc"
+        ]
+      ],
+      "title": "최근 위험도 7 이상 알림",
+      "version": 1
+    },
+    "id": "groot-soc-20261019-recent-high",
+    "references": [
+      {
+        "id": "wazuh-alerts-*",
+        "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+        "type": "index-pattern"
+      }
+    ],
+    "type": "search"
+  },
+  {
+    "attributes": {
+      "description": "WAF·Suricata·Wazuh 원본 알림의 통합 현황. 최근 7일 / 30초 갱신.",
+      "hits": 0,
+      "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"NOT rule.groups:(capstone_vector_evidence OR capstone_observation OR capstone_vector_canary OR capstone_validation OR package_shadow)\"}}"
+      },
+      "optionsJSON": "{\"hidePanelTitles\":false,\"useMargins\":true}",
+      "panelsJSON": "[{\"embeddableConfig\":{},\"gridData\":{\"h\":7,\"i\":\"1\",\"w\":48,\"x\":0,\"y\":0},\"panelIndex\":\"1\",\"panelRefName\":\"panel_0\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"2\",\"w\":10,\"x\":0,\"y\":7},\"panelIndex\":\"2\",\"panelRefName\":\"panel_1\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"3\",\"w\":10,\"x\":10,\"y\":7},\"panelIndex\":\"3\",\"panelRefName\":\"panel_2\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"4\",\"w\":10,\"x\":20,\"y\":7},\"panelIndex\":\"4\",\"panelRefName\":\"panel_3\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"5\",\"w\":9,\"x\":30,\"y\":7},\"panelIndex\":\"5\",\"panelRefName\":\"panel_4\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":8,\"i\":\"6\",\"w\":9,\"x\":39,\"y\":7},\"panelIndex\":\"6\",\"panelRefName\":\"panel_5\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":16,\"i\":\"7\",\"w\":32,\"x\":0,\"y\":15},\"panelIndex\":\"7\",\"panelRefName\":\"panel_6\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":16,\"i\":\"8\",\"w\":16,\"x\":32,\"y\":15},\"panelIndex\":\"8\",\"panelRefName\":\"panel_7\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":17,\"i\":\"9\",\"w\":28,\"x\":0,\"y\":31},\"panelIndex\":\"9\",\"panelRefName\":\"panel_8\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":17,\"i\":\"10\",\"w\":20,\"x\":28,\"y\":31},\"panelIndex\":\"10\",\"panelRefName\":\"panel_9\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"11\",\"w\":24,\"x\":0,\"y\":48},\"panelIndex\":\"11\",\"panelRefName\":\"panel_10\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"12\",\"w\":24,\"x\":24,\"y\":48},\"panelIndex\":\"12\",\"panelRefName\":\"panel_11\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":15,\"i\":\"13\",\"w\":48,\"x\":0,\"y\":63},\"panelIndex\":\"13\",\"panelRefName\":\"panel_12\",\"version\":\"7.3.0\"},{\"embeddableConfig\":{},\"gridData\":{\"h\":19,\"i\":\"14\",\"w\":48,\"x\":0,\"y\":78},\"panelIndex\":\"14\",\"panelRefName\":\"panel_13\",\"version\":\"7.3.0\"}]",
+      "refreshInterval": {
+        "pause": false,
+        "value": 30000
+      },
+      "timeFrom": "now-7d",
+      "timeRestore": true,
+      "timeTo": "now",
+      "title": "Groot SOC | 통합 탐지 현황",
+      "version": 1
+    },
+    "id": "groot-soc-20261019-dashboard",
+    "references": [
+      {
+        "id": "groot-soc-20261019-notice",
+        "name": "panel_0",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-metric-total",
+        "name": "panel_1",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-metric-waf",
+        "name": "panel_2",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-metric-suricata",
+        "name": "panel_3",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-metric-other",
+        "name": "panel_4",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-metric-high",
+        "name": "panel_5",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-trend-network-web",
+        "name": "panel_6",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-source-share",
+        "name": "panel_7",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-suricata-signatures",
+        "name": "panel_8",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-waf-classification",
+        "name": "panel_9",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-waf-sources",
+        "name": "panel_10",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-suricata-sources",
+        "name": "panel_11",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-other-rules",
+        "name": "panel_12",
+        "type": "visualization"
+      },
+      {
+        "id": "groot-soc-20261019-recent-high",
+        "name": "panel_13",
+        "type": "search"
+      }
+    ],
+    "type": "dashboard"
+  }
+]

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Portable, fresh-host IDS/WAF/agent core. No package installation or downloads.
 # Existing managed raw/Vector deployments must use their own upgrade procedure.
-# Deliberately excludes NAT, blocking/AR, MCP grants and the live site's raw-state
+# Deliberately excludes NAT, automatic IP blocking/AR, MCP grants and the live site's raw-state
 # migration. The nft table is additive and ACCEPT-only, not a perimeter firewall.
 set -euo pipefail
 umask 077
@@ -30,6 +30,13 @@ WAZUH_CA_FILE=${WAZUH_CA_FILE:-/opt/capstone-prereqs/wazuh-root-ca.pem}
 WAZUH_ENROLLMENT_PASS_FILE=${WAZUH_ENROLLMENT_PASS_FILE:-/opt/capstone-prereqs/wazuh-enrollment.pass}
 SURICATA_IMAGE=${SURICATA_IMAGE:-jasonish/suricata:latest}
 WAF_IMAGE=${WAF_IMAGE:-owasp/modsecurity-crs:nginx}
+: "${LAB_PUBLIC_ORIGIN:?explicit HTTPS lab origin is required}"
+: "${LAB_ALLOWED_CIDRS:?explicit private client/VPN CIDRs are required}"
+LAB_HTTPS_PORT=${LAB_HTTPS_PORT:-443}
+LAB_PROXY_SUBNET=${LAB_PROXY_SUBNET:-172.30.247.0/29}
+LAB_GATEWAY_PORT=${LAB_GATEWAY_PORT:-18091}
+LAB_TLS_CERT=${LAB_TLS_CERT:-/opt/capstone-prereqs/lab-tls.crt}
+LAB_TLS_KEY=${LAB_TLS_KEY:-/opt/capstone-prereqs/lab-tls.key}
 ROLE_DIR=$CAPSTONE_ROOT/security
 COMPOSE=$ROLE_DIR/compose.json
 STATE=$ROLE_DIR/deployment.json
@@ -37,10 +44,13 @@ CONF=/var/ossec/etc/ossec.conf
 NFT_UNIT=capstone-portable-firewall.service
 WAF_NAME=capstone-security-waf
 SURI_NAME=capstone-security-suricata
+EDGE_NAME=capstone-security-lab-edge
 TEST_NAME=capstone-security-rulecheck
 TEST_CID=''
 export CAPSTONE_ROOT CAPSTONE_SOURCE SECURITY_HOST SIEM_HOST SERVICE_HOST MONITOR_INTERFACE
 export WEB_BACKEND_PORT WAF_PORT ET_RULES_FILE WAZUH_CA_FILE WAZUH_ENROLLMENT_PASS_FILE ROLE_DIR
+export LAB_PUBLIC_ORIGIN LAB_ALLOWED_CIDRS LAB_HTTPS_PORT LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_TLS_CERT LAB_TLS_KEY
+lab_security() { python3 -B "$CAPSTONE_SOURCE/deployment/offline_security.py" "$1"; }
 
 bounded() { timeout --signal=TERM --kill-after=5s "$@"; }
 hash() { local x; x=$(sha256sum -- "$1") || return 1; printf '%s' "${x%% *}"; }
@@ -126,6 +136,11 @@ PY
             (( (8#$(stat -c %a "$name") & 0022)==0 )) || die 'writable deployment directory'
         fi
     done
+    safe_file "$CAPSTONE_SOURCE/deployment/offline_security.py" 2097152
+    safe_file "$CAPSTONE_SOURCE/deployment/validate_lab_site.py" 1048576
+    for name in nginx-log4shell-server.conf waf-log4shell-server.conf REQUEST-900-CAPSTONE-LABS.conf; do
+        safe_file "$CAPSTONE_SOURCE/infra/groot-c/offline-labs/$name" 2097152
+    done
     safe_file "$CAPSTONE_SOURCE/new_rule/GROOT_A_WAF.conf" 2097152
     safe_file "$CAPSTONE_SOURCE/new_rule/GROOT_A_local.rules" 2097152
     safe_file "$ET_RULES_FILE" 100000000
@@ -154,19 +169,23 @@ PY
         [[ $(bounded 10s docker image inspect --format '{{.Os}}:{{.Architecture}}' "$name") == linux:amd64 ]] || die 'preloaded images must be native Linux amd64'
     done
     export SURI_ID WAF_ID
+    LAB_PROFILE=$(lab_security profile) || die 'TLS/private-network/lab source preflight failed'
+    [[ $LAB_PROFILE =~ ^[a-f0-9]{64}$ ]] || die 'invalid lab profile'
+    SECURITY_SCRIPT_SHA=$(hash "${BASH_SOURCE[0]}")
+    export LAB_PROFILE SECURITY_SCRIPT_SHA
     ET_SHA=$(hash "$ET_RULES_FILE"); LOCAL_SHA=$(hash "$CAPSTONE_SOURCE/new_rule/GROOT_A_local.rules")
     WAF_SHA=$(hash "$CAPSTONE_SOURCE/new_rule/GROOT_A_WAF.conf")
     export ET_SHA LOCAL_SHA WAF_SHA CA_SHA
     PROFILE=$(python3 - <<'PY'
 import hashlib,json,os
-keys=('CAPSTONE_ROOT','SECURITY_HOST','SIEM_HOST','SERVICE_HOST','MONITOR_INTERFACE','WEB_BACKEND_PORT','WAF_PORT','SURI_ID','WAF_ID','ET_SHA','LOCAL_SHA','WAF_SHA','CA_SHA','TZ')
+keys=('CAPSTONE_ROOT','SECURITY_HOST','SIEM_HOST','SERVICE_HOST','MONITOR_INTERFACE','WEB_BACKEND_PORT','WAF_PORT','SURI_ID','WAF_ID','ET_SHA','LOCAL_SHA','WAF_SHA','CA_SHA','LAB_PROFILE','SECURITY_SCRIPT_SHA','TZ')
 print(hashlib.sha256(json.dumps({k:os.environ[k] for k in keys},sort_keys=True,separators=(',',':')).encode()).hexdigest())
 PY
 )
     export PROFILE
     if [[ -e $STATE ]]; then
         safe_file "$STATE" 16384
-        jq -e --arg p "$PROFILE" --arg mode "$MODE" '.schema_version==1 and .profile_sha256==$p and (.status=="complete" or ($mode=="verify" and .status=="incomplete"))' "$STATE" >/dev/null ||
+        jq -e --arg p "$PROFILE" --arg mode "$MODE" '.schema_version==2 and .profile_sha256==$p and (.status=="complete" or ($mode=="verify" and .status=="incomplete"))' "$STATE" >/dev/null ||
             die 'partial/different-profile deployment: inspect required; automatic retry forbidden'
         return
     fi
@@ -177,7 +196,7 @@ PY
         [[ ! -e $name && ! -L $name ]] || die 'existing enrollment destination'
     done
     if grep -q 'capstone' "$CONF"; then die 'existing capstone agent configuration'; fi
-    for name in "$WAF_NAME" "$SURI_NAME" "$TEST_NAME"; do
+    for name in "$WAF_NAME" "$SURI_NAME" "$EDGE_NAME" "$TEST_NAME" capstone-security-edgecheck capstone-security-wafcheck; do
         ! bounded 10s docker container inspect "$name" >/dev/null 2>&1 || die 'unowned portable container exists'
     done
     ! bounded 10s docker network inspect capstone-security_waf >/dev/null 2>&1 || die 'unowned portable network exists'
@@ -194,19 +213,21 @@ verify_role() {
 import hashlib,json,os,pathlib,stat,sys
 r=pathlib.Path(sys.argv[1]); m=json.loads((r/'manifest.json').read_text())
 assert set(m)=={'schema_version','profile_sha256','local_rules','site_specific_sids_excluded','files'}
-assert m['schema_version']==1 and m['local_rules']==11 and m['site_specific_sids_excluded']==[1000000,2034802,2034806]
+assert m['schema_version']==2 and m['local_rules']==11 and m['site_specific_sids_excluded']==[1000000,2034802,2034806]
 assert m['profile_sha256']==os.environ['PROFILE']
-assert set(m['files'])=={'compose.json','config/GROOT_A_WAF.conf','config/wazuh-root-ca.pem','config/firewall.nft','rules/suricata.rules','rules/local.rules','rules/all.rules'}
+assert set(m['files'])=={'compose.json','config/GROOT_A_WAF.conf','config/wazuh-root-ca.pem','config/firewall.nft','rules/suricata.rules','rules/local.rules','rules/all.rules','config/lab-edge.conf','config/lab-waf.conf','config/lab-policy.conf','tls/lab.crt','tls/lab.key'}
 for name,sha in m['files'].items():
     p=r/name; s=p.lstat()
-    assert stat.S_ISREG(s.st_mode) and s.st_uid==0 and not(s.st_mode&0o022)
+    assert stat.S_ISREG(s.st_mode) and s.st_nlink==1 and s.st_uid==(101 if name=='tls/lab.key' else 0) and not(s.st_mode&0o022)
+    if name=='tls/lab.key': assert s.st_gid==101 and stat.S_IMODE(s.st_mode)==0o400
     assert hashlib.sha256(p.read_bytes()).hexdigest()==sha, 'managed file changed'
 PY
     local name cid image expected running health
-    for name in "$WAF_NAME" "$SURI_NAME"; do
+    for name in "$WAF_NAME" "$SURI_NAME" "$EDGE_NAME"; do
         cid=$(bounded 10s docker inspect --format '{{.Id}}' "$name") || die 'managed container missing'
+        [[ $(jq -er --arg n "$name" '.container_ids[$n]' "$STATE") == "$cid" ]] || die 'managed full container ID changed'
         image=$(bounded 10s docker inspect --format '{{.Image}}' "$cid")
-        expected=$SURI_ID; [[ $name == "$WAF_NAME" ]] && expected=$WAF_ID
+        expected=$SURI_ID; [[ $name != "$SURI_NAME" ]] && expected=$WAF_ID
         [[ $image == "$expected" ]] || die 'managed image changed'
         bounded 10s docker inspect --format '{{json .Config.Labels}}' "$cid" |
             jq -e --arg p "$PROFILE" '."io.capstone.portable.profile"==$p and ."io.capstone.portable.role"=="security"' >/dev/null || die 'container ownership changed'
@@ -216,7 +237,9 @@ PY
     bounded 10s docker inspect --format '{{json .Mounts}}' "$WAF_NAME" |
         jq -e --arg r "$ROLE_DIR" '[.[]|select(.Type=="bind")|{Source,Destination,RW}]|sort_by(.Destination)==([
           {Source:($r+"/logs/modsecurity"),Destination:"/var/log/modsecurity",RW:true},
-          {Source:($r+"/config/GROOT_A_WAF.conf"),Destination:"/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf",RW:false}
+          {Source:($r+"/config/GROOT_A_WAF.conf"),Destination:"/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf",RW:false},
+          {Source:($r+"/config/lab-waf.conf"),Destination:"/etc/nginx/conf.d/zz-capstone-labs.conf",RW:false},
+          {Source:($r+"/config/lab-policy.conf"),Destination:"/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-LABS.conf",RW:false}
         ]|sort_by(.Destination))' >/dev/null || die 'WAF bind configuration changed'
     bounded 10s docker inspect --format '{{json .HostConfig.PortBindings}}' "$WAF_NAME" |
         jq -e --arg ip "$SECURITY_HOST" --arg port "$WAF_PORT" '.=={"8080/tcp":[{"HostIp":$ip,"HostPort":$port}]}' >/dev/null || die 'WAF published address changed'
@@ -226,6 +249,7 @@ PY
     health=$(bounded 10s docker inspect --format '{{with index .State "Health"}}{{.Status}}{{else}}absent{{end}}' "$WAF_NAME")
     [[ $health == healthy ]] || die 'WAF image healthcheck must be healthy'
     bounded 10s docker exec "$WAF_NAME" sh -c 'test "$(id -u)" = 101 && test -w /var/log/modsecurity' || die 'WAF writer permission mismatch'
+    lab_security verify || die 'TLS edge/proxy network verification failed'
     local engine_log
     engine_log=$(bounded 10s docker logs --tail 500 "$SURI_NAME" 2>&1) || die 'Suricata logs unavailable'
     grep -q 'Engine started' <<< "$engine_log" || die 'Suricata engine startup not observed'
@@ -265,7 +289,7 @@ PY
       ([.nftables[]|.rule?.expr[]? | select(has("drop") or has("reject") or has("jump") or has("goto"))]|length)==0
     ' >/dev/null || die 'additive nft table differs'
     systemctl is-enabled --quiet "$NFT_UNIT" || die 'nft persistence unit not enabled'
-    printf '{"role":"security","status":"verified","waf_mode":"DetectionOnly","suricata_mode":"IDS","agent":"capstone-security","blocking_installed":false,"vector_installed":false}\n'
+    printf '{"role":"security","status":"verified","waf_mode":"DetectionOnly","lab_waf_mode":"enforce_or_signed_session_exempt","suricata_mode":"IDS","agent":"capstone-security","lab_waf_enforcement_installed":true,"automatic_ip_blocking_installed":false,"vector_installed":false}\n'
 }
 
 apply_role() {
@@ -274,10 +298,11 @@ apply_role() {
     bounded 8s bash -c 'exec 3<>"/dev/tcp/$1/1514"' security-check "$SIEM_HOST" || die 'SIEM data listener unavailable'
     bounded 12s openssl s_client -connect "$SIEM_HOST:1515" -CAfile "$WAZUH_CA_FILE" -verify_ip "$SIEM_HOST" -verify_return_error </dev/null >/dev/null 2>&1 || die 'SIEM enrollment TLS identity verification failed'
     bounded 8s bash -c 'exec 3<>"/dev/tcp/$1/$2"' backend-check "$SERVICE_HOST" "$WEB_BACKEND_PORT" || die 'web backend listener unavailable'
+    bounded 8s bash -c 'exec 3<>"/dev/tcp/$1/$2"' lab-gateway-check "$SERVICE_HOST" "$LAB_GATEWAY_PORT" || die 'private lab gateway unavailable'
     [[ -d $CAPSTONE_ROOT ]] || install -d -o root -g root -m 0755 "$CAPSTONE_ROOT"
     mkdir "$ROLE_DIR" || die 'role directory appeared; refuse retry'
     chmod 0755 "$ROLE_DIR"
-    printf '{"schema_version":1,"status":"incomplete","profile_sha256":"%s"}\n' "$PROFILE" >"$STATE"
+    printf '{"schema_version":2,"status":"incomplete","profile_sha256":"%s"}\n' "$PROFILE" >"$STATE"
     sync -f "$STATE"; sync -f "$ROLE_DIR"
     trap 'printf "security: apply incomplete; inspect %s; no automatic retry or cleanup\n" "$ROLE_DIR" >&2' ERR
     trap 'cleanup_native_test || printf "security: private native test cleanup incomplete; inspect recorded CID\n" >&2' EXIT
@@ -333,11 +358,12 @@ compose={'services':{
 addresses=','.join(os.environ[k] for k in ('SECURITY_HOST','SIEM_HOST','SERVICE_HOST'))
 (r/'config/firewall.nft').write_text('table inet capstone_portable {\n set protected_v4 { type ipv4_addr; elements = { '+addresses+' }; }\n chain input { type filter hook input priority -5; policy accept; ct state established,related accept; tcp dport 22 accept; }\n}\n')
 for p in (r/'rules/local.rules',r/'rules/all.rules',r/'compose.json',r/'config/firewall.nft'):p.chmod(0o444)
-manifest={'schema_version':1,'profile_sha256':os.environ['PROFILE'],'local_rules':11,'site_specific_sids_excluded':sorted(skipped),'files':{str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [r/'compose.json',*sorted((r/'config').iterdir()),*sorted((r/'rules').iterdir())]}}
+manifest={'schema_version':2,'profile_sha256':os.environ['PROFILE'],'local_rules':11,'site_specific_sids_excluded':sorted(skipped),'files':{str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [r/'compose.json',*sorted((r/'config').iterdir()),*sorted((r/'rules').iterdir())]}}
 (r/'manifest.json').write_text(json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n')
 for p in [r/'manifest.json',r/'compose.json',*list((r/'config').iterdir()),*list((r/'rules').iterdir())]:
     with p.open('rb') as f:os.fsync(f.fileno())
 PY
+    lab_security render || die 'lab TLS/WAF rendering failed; partial role retained'
     compose config --quiet || die 'generated Compose rejected'
     nft -c -f "$ROLE_DIR/config/firewall.nft" || die 'additive nft syntax rejected'
     # Native -T uses only a private tmpfs log directory, never an operational log.
@@ -350,6 +376,7 @@ PY
     bounded 240s docker start --attach "$TEST_CID" >"$ROLE_DIR/suricata-config-test.log" 2>&1 || die 'Suricata native rule test failed (private log retained)'
     [[ $(bounded 10s docker inspect --format '{{.State.Running}}:{{.State.ExitCode}}' "$TEST_CID") == false:0 ]] || die 'native rule test did not exit successfully'
     cleanup_native_test || die 'private syntax-test cleanup failed'
+    lab_security native || die 'private lab Nginx configuration check failed; private log retained'
     nft -f "$ROLE_DIR/config/firewall.nft"
     cat >"/etc/systemd/system/$NFT_UNIT" <<EOF
 [Unit]
@@ -365,7 +392,19 @@ EOF
     chmod 0644 "/etc/systemd/system/$NFT_UNIT"
     bounded 30s systemctl daemon-reload
     bounded 30s systemctl enable --now "$NFT_UNIT" >/dev/null
-    compose up -d --pull never
+    compose up -d --pull never --no-build
+    python3 - <<'PYIDS'
+import json,os,pathlib,re,subprocess,tempfile
+p=pathlib.Path(os.environ['ROLE_DIR'])/'deployment.json'; value=json.loads(p.read_text()); identities={}
+for name in ('capstone-security-waf','capstone-security-suricata','capstone-security-lab-edge'):
+    item=json.loads(subprocess.check_output(['docker','--host','unix:///var/run/docker.sock','inspect',name],timeout=15))[0]
+    assert re.fullmatch('[a-f0-9]{64}',item['Id']) and item['Config']['Labels'].get('io.capstone.portable.profile')==os.environ['PROFILE']
+    identities[name]=item['Id']
+value['container_ids']=identities
+fd,name=tempfile.mkstemp(prefix='.identities-',dir=p.parent)
+with os.fdopen(fd,'w') as f:json.dump(value,f,sort_keys=True);f.write('\n');f.flush();os.fsync(f.fileno())
+os.replace(name,p)
+PYIDS
     local ready=0 i
     for i in $(seq 1 60); do
         if bounded 10s docker logs --tail 500 "$SURI_NAME" 2>&1 | grep 'Engine started' >/dev/null &&
@@ -435,7 +474,7 @@ PY
 import json,os,pathlib,tempfile
 r=pathlib.Path(os.environ['ROLE_DIR']);fd,name=tempfile.mkstemp(prefix='.complete-',dir=r)
 with os.fdopen(fd,'w') as f:
-    json.dump({'schema_version':1,'status':'complete','profile_sha256':os.environ['PROFILE'],'agent':'capstone-security','package_installations':0,'network_downloads':0,'blocking_installed':False,'vector_installed':False},f,sort_keys=True,separators=(',',':'));f.write('\n');f.flush();os.fsync(f.fileno())
+    json.dump({'schema_version':2,'status':'complete','profile_sha256':os.environ['PROFILE'],'agent':'capstone-security','package_installations':0,'network_downloads':0,'lab_waf_enforcement_installed':True,'automatic_ip_blocking_installed':False,'vector_installed':False,'container_ids':json.loads((r/'deployment.json').read_text())['container_ids']},f,sort_keys=True,separators=(',',':'));f.write('\n');f.flush();os.fsync(f.fileno())
 os.replace(name,r/'deployment.json');fd=os.open(r,os.O_RDONLY|os.O_DIRECTORY);os.fsync(fd);os.close(fd)
 PY
     trap - ERR EXIT

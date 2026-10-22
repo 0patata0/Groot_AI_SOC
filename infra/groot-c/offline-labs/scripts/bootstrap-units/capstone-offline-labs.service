@@ -1,0 +1,24 @@
+[Unit]
+Description=Offline CVE lab FastAPI console
+After=capstone-offline-labs-broker.service
+Requires=capstone-offline-labs-broker.service
+[Service]
+Type=simple
+User=capstone-labs
+Group=capstone-labs
+EnvironmentFile=/etc/capstone-offline-labs/settings.env
+Environment=PYTHONPATH=/opt/capstone-offline-labs/vendor
+Environment=PYTHONDONTWRITEBYTECODE=1
+WorkingDirectory=/opt/capstone-offline-labs
+ExecStart=/usr/bin/python3 -B -m uvicorn app:app --host 127.0.0.1 --port 18090 --workers 1 --no-access-log --no-proxy-headers
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
+[Install]
+WantedBy=multi-user.target

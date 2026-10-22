@@ -1,6 +1,8 @@
-# 패키지·이미지·배포 자료 수동 준비
+# 패키지·이미지·배포 자료 준비
 
-이 문서는 [루트 README](../README.md)의 패키지 및 역할별 사전 자료 준비를 명령 단위로 설명한다. **패키지·이미지 설치·다운로드·빌드는 Ubuntu 24.04 amd64 대상 서버 또는 별도 Linux amd64 준비 서버에서 운영자가 수동으로 실행한다.** `deploy.sh`가 아래 패키지 준비 명령을 실행하는 것은 아니다. 새 Log4Shell 앱 JAR은 예외로, 준비된 로컬 이미지 안의 JDK·라이브러리를 사용해 service 적용 단계에서 자동 빌드한다. Mac에는 패키지, JDK·Gradle, Rust, Docker Desktop, Python 가상환경을 추가하지 않는다.
+현재 기본 설치 경로는 [단일 Bash 초기 설치](bootstrap-guide.md)다. `deploy.sh --apply`가 각 서버의 승인된 `artifacts.json`에 따라 로컬 deb와 Docker archive를 설치한다. 아래 온라인 명령은 **외부 Linux 준비 환경에서 반입 자료를 만들거나 관리자가 사전에 설치할 때의 참고 절차**이며 폐쇄망 설치기가 실행하는 다운로드 명령이 아니다. Mac에는 패키지·JDK·Docker Desktop·가상환경을 설치하지 않는다.
+
+Log4Shell은 schema7부터 현재 콘솔과 검증된3개 웹이미지를 사용한다. 아래 구형 Java 직접Compose/JAR 자동 빌드 설명은 과거 schema6 준비 절차이며 신규 기본 경로가 아니다. 기존 빌드 도구는 Java 이미지 준비에 사용할 수 있다. sudo 고정 rootless bundle·wheel·TLS 자료도 새 가이드에 따라 반입한다.
 
 다음 순서로 진행한다. SSH·고정 주소·라우팅을 먼저 준비하고, 이 문서의 자료 준비를 마친 뒤 `deploy.sh --check`를 실행한다. 예시의 `192.0.2.x`는 실제 배포 주소로 변경한다. 각 코드 블록의 실행 위치를 확인하고 **명령이 실패하면 다음 단계로 넘어가지 않는다.** 운영 중인 서버의 패키지나 agent 등록 정보를 삭제해서 신규 조건에 맞추지 않는다.
 

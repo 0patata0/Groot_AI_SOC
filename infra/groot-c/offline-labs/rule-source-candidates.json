@@ -1,0 +1,1010 @@
+{
+  "schema_version": 1,
+  "version": "researchonly",
+  "checked_on": "2026-10-22",
+  "timezone": "Asia/Seoul",
+  "must_not_auto_install": true,
+  "immutable_release_pin_required": true,
+  "local_engine_test_pending": true,
+  "production_rules_deployed": false,
+  "production_configuration_changed": false,
+  "tests_executed": false,
+  "attack_payloads_included": false,
+  "scope": {
+    "kind": "official_rule_source_candidates_only",
+    "rule_source_text_read_in_memory": true,
+    "downloaded_rule_artifacts_retained": false,
+    "packages_installed": false,
+    "live_engine_queried_by_this_task": false,
+    "reported_target_suricata_version": "8.0.6",
+    "reported_target_suricata_version_source": "deployment owner report; not independently queried in this research",
+    "reported_target_wazuh_version": "4.14.8",
+    "installed_rule_inventory_verified": false
+  },
+  "scenario_map": {
+    "scenario-1": "DVWA 정찰·스캐너·SQL 삽입·XSS 및 인증 시도",
+    "scenario-2": "Log4Shell CVE-2021-44228",
+    "scenario-3": "sudo CVE-2021-3156 탐지 관측 준비; 취약 환경·성공 판정과 분리",
+    "httpd-lab-41773": "Apache HTTP Server 2.4.49 공개 파일 접근 실습",
+    "httpd-lab-42013": "Apache HTTP Server 2.4.50 공개 파일 접근 실습"
+  },
+  "selection_policy": [
+    "공식 원문에서 ID 또는 SID 및 용도를 확인한 후보만 포함한다. 수집·로드·발화 여부는 이번 조사에서 확인하지 않았다.",
+    "연구에 사용한 CRS v4.25.0 commit과 Wazuh v4.14.8 commit은 출처 식별용이다. 현장 릴리스 호환 검토와 정확 후보 승인 없이 설치하지 않는다.",
+    "ET Open은 변경되는 피드이므로 배포 후보의 날짜·Suricata 계열·SID/rev·아티팩트 SHA256을 동결해야 한다. 관찰한 파일 SHA256은 연구 근거이며 승인된 배포 번들이 아니다.",
+    "기존 동일 ID/rev와 제외·억제·화이트리스트를 먼저 대조한다. 기존 룰이 있으면 중복 설치하지 않는다.",
+    "LLM 조사·MCP 정확 후보 승인·보호 주소·임시 차단 TTL 경계를 유지한다. 이 JSON은 실행·승인·룰 설치 입력이 아니다."
+  ],
+  "feed_version_differences": [
+    {
+      "rule_id": 2008538,
+      "suricata_7_feed_revision_observed": 8,
+      "suricata_8_feed_revision_observed": 10
+    },
+    {
+      "rule_id": 2002677,
+      "suricata_7_feed_revision_observed": 14,
+      "suricata_8_feed_revision_observed": 15
+    },
+    {
+      "rule_id": 2034172,
+      "suricata_7_feed_revision_observed": 2,
+      "suricata_8_feed_revision_observed": 3
+    },
+    {
+      "rule_id": 2034173,
+      "suricata_7_feed_revision_observed": 2,
+      "suricata_8_feed_revision_observed": 3
+    },
+    {
+      "rule_id": 2009770,
+      "suricata_7_feed_revision_observed": 6,
+      "suricata_8_feed_revision_observed": 8
+    }
+  ],
+  "qa_references": [
+    {
+      "name": "OWASP CRS go-ftw",
+      "source_url": "https://github.com/coreruleset/go-ftw",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "purpose": "고정된 CRS 회귀 테스트와 실제 WAF 로그의 기대 ID·상태를 격리 환경에서 대조",
+      "limitations": [
+        "이 조사에서는 도구·테스트를 설치하거나 실행하지 않았다.",
+        "HTTP 상태만 보는 모드는 정확한 룰 ID 일치를 증명하지 않는다.",
+        "테스트용 marker 및 우회 설정을 운영 경로에 자동 추가하지 않는다."
+      ]
+    },
+    {
+      "name": "Wazuh logtest",
+      "source_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "purpose": "정제된 로그 샘플의 decoder·필드·규칙·상관 결과 확인",
+      "limitations": [
+        "실제 에이전트 수집·색인·호스트 권한상승·대응 실행의 E2E 증거가 아니다.",
+        "비밀값이나 개인정보가 있는 운영 로그를 공개 테스트 자료로 복사하지 않는다."
+      ]
+    },
+    {
+      "name": "Proofpoint Emerging Threats rule QA",
+      "source_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "purpose": "공급자의 정적 검사·정상/악성 PCAP 성능 확인·지원 엔진 로드 검증 절차 참고",
+      "limitations": [
+        "문서화된 공급자 내부 QA 절차이다. 전체 내부 PCAP·실행 플랫폼이 공개 배포된다고 가정하지 않는다.",
+        "공급자 QA가 현장 Suricata 8.0.6·트래픽·성능·TLS 관측 범위를 보증하지 않는다."
+      ]
+    },
+    {
+      "name": "Suricata 8.0.6 native checks",
+      "source_url": "https://docs.suricata.io/en/suricata-8.0.6/command-line-options.html",
+      "qa_url": "https://docs.suricata.io/en/suricata-8.0.6/command-line-options.html",
+      "checked_on": "2026-10-22",
+      "purpose": "구문 검증(-T)과 승인된 비식별 PCAP의 오프라인 평가(-r)로 엔진 호환·SID 결과·성능 확인",
+      "limitations": [
+        "실행하지 않았으며 테스트 PCAP이나 공격 요청을 이 산출물에 포함하지 않는다.",
+        "구문 성공만으로 탐지율·오탐률·실차단 성공이 입증되지 않는다."
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "modsecurity-crs-913100",
+      "engine": "modsecurity-crs",
+      "rule_id": 913100,
+      "summary": "알려진 보안 스캐너 User-Agent 식별",
+      "scenario": [
+        "scenario-1:1.2"
+      ],
+      "cve_ids": [],
+      "source_url": "https://github.com/coreruleset/coreruleset/blob/aabf675fcfc5e489b424b844e6c9f1b39802df69/rules/REQUEST-913-SCANNER-DETECTION.conf",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "스캐너 표식은 도구 사용 신호이며 공격 성공 증거가 아니다.",
+        "현재 설치된 CRS 릴리스·paranoia level·제외 규칙·본문 파서·anomaly threshold와 대조해야 한다.",
+        "규칙 일치와 실제 차단은 다르며 DetectionOnly 또는 승인된 실습 예외에서는 차단되지 않을 수 있다.",
+        "공식 회귀 검사를 통과해도 현재 HTTPS 프록시 경로 및 실제 애플리케이션의 탐지를 보장하지 않는다."
+      ],
+      "upstream": {
+        "publisher": "OWASP Core Rule Set project",
+        "release": "v4.25.0",
+        "commit": "aabf675fcfc5e489b424b844e6c9f1b39802df69",
+        "paranoia_level": 1,
+        "release_is_research_snapshot_not_latest_recommendation": true
+      }
+    },
+    {
+      "candidate_id": "modsecurity-crs-941100",
+      "engine": "modsecurity-crs",
+      "rule_id": 941100,
+      "summary": "libinjection 기반 XSS 입력 탐지",
+      "scenario": [
+        "scenario-1:1.5"
+      ],
+      "cve_ids": [],
+      "source_url": "https://github.com/coreruleset/coreruleset/blob/aabf675fcfc5e489b424b844e6c9f1b39802df69/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "특정 브라우저에서 스크립트 실행에 성공했음을 증명하지 않는다.",
+        "현재 설치된 CRS 릴리스·paranoia level·제외 규칙·본문 파서·anomaly threshold와 대조해야 한다.",
+        "규칙 일치와 실제 차단은 다르며 DetectionOnly 또는 승인된 실습 예외에서는 차단되지 않을 수 있다.",
+        "공식 회귀 검사를 통과해도 현재 HTTPS 프록시 경로 및 실제 애플리케이션의 탐지를 보장하지 않는다."
+      ],
+      "upstream": {
+        "publisher": "OWASP Core Rule Set project",
+        "release": "v4.25.0",
+        "commit": "aabf675fcfc5e489b424b844e6c9f1b39802df69",
+        "paranoia_level": 1,
+        "release_is_research_snapshot_not_latest_recommendation": true
+      }
+    },
+    {
+      "candidate_id": "modsecurity-crs-942100",
+      "engine": "modsecurity-crs",
+      "rule_id": 942100,
+      "summary": "libinjection 기반 SQL 삽입 입력 탐지",
+      "scenario": [
+        "scenario-1:1.3",
+        "scenario-1:1.4"
+      ],
+      "cve_ids": [],
+      "source_url": "https://github.com/coreruleset/coreruleset/blob/aabf675fcfc5e489b424b844e6c9f1b39802df69/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "DB 질의 실행·데이터 접근 성공은 별도 애플리케이션 증거가 필요하다.",
+        "현재 설치된 CRS 릴리스·paranoia level·제외 규칙·본문 파서·anomaly threshold와 대조해야 한다.",
+        "규칙 일치와 실제 차단은 다르며 DetectionOnly 또는 승인된 실습 예외에서는 차단되지 않을 수 있다.",
+        "공식 회귀 검사를 통과해도 현재 HTTPS 프록시 경로 및 실제 애플리케이션의 탐지를 보장하지 않는다."
+      ],
+      "upstream": {
+        "publisher": "OWASP Core Rule Set project",
+        "release": "v4.25.0",
+        "commit": "aabf675fcfc5e489b424b844e6c9f1b39802df69",
+        "paranoia_level": 1,
+        "release_is_research_snapshot_not_latest_recommendation": true
+      }
+    },
+    {
+      "candidate_id": "modsecurity-crs-944150",
+      "engine": "modsecurity-crs",
+      "rule_id": 944150,
+      "summary": "Log4j 조회 표현식에 의한 명령 실행 시도 후보 탐지",
+      "scenario": [
+        "scenario-2:2.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-44228"
+      ],
+      "source_url": "https://github.com/coreruleset/coreruleset/blob/aabf675fcfc5e489b424b844e6c9f1b39802df69/rules/REQUEST-944-APPLICATION-ATTACK-JAVA.conf",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "모든 난독화·입력 위치를 포괄하지 않으며 취약 Log4j 존재·콜백·코드 실행 성공은 증명하지 않는다.",
+        "현재 설치된 CRS 릴리스·paranoia level·제외 규칙·본문 파서·anomaly threshold와 대조해야 한다.",
+        "규칙 일치와 실제 차단은 다르며 DetectionOnly 또는 승인된 실습 예외에서는 차단되지 않을 수 있다.",
+        "공식 회귀 검사를 통과해도 현재 HTTPS 프록시 경로 및 실제 애플리케이션의 탐지를 보장하지 않는다."
+      ],
+      "upstream": {
+        "publisher": "OWASP Core Rule Set project",
+        "release": "v4.25.0",
+        "commit": "aabf675fcfc5e489b424b844e6c9f1b39802df69",
+        "paranoia_level": 1,
+        "release_is_research_snapshot_not_latest_recommendation": true
+      }
+    },
+    {
+      "candidate_id": "modsecurity-crs-930100",
+      "engine": "modsecurity-crs",
+      "rule_id": 930100,
+      "summary": "일반 경로 탐색 패턴 탐지",
+      "scenario": [
+        "httpd-lab-41773",
+        "httpd-lab-42013"
+      ],
+      "cve_ids": [
+        "CVE-2021-41773",
+        "CVE-2021-42013"
+      ],
+      "source_url": "https://github.com/coreruleset/coreruleset/blob/aabf675fcfc5e489b424b844e6c9f1b39802df69/rules/REQUEST-930-APPLICATION-ATTACK-LFI.conf",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "CVE 전용 규칙이 아니다. HTTPd 2.4.49/2.4.50 및 프록시의 정규화 차이를 포함한 로컬 검증이 필요하다.",
+        "현재 설치된 CRS 릴리스·paranoia level·제외 규칙·본문 파서·anomaly threshold와 대조해야 한다.",
+        "규칙 일치와 실제 차단은 다르며 DetectionOnly 또는 승인된 실습 예외에서는 차단되지 않을 수 있다.",
+        "공식 회귀 검사를 통과해도 현재 HTTPS 프록시 경로 및 실제 애플리케이션의 탐지를 보장하지 않는다."
+      ],
+      "upstream": {
+        "publisher": "OWASP Core Rule Set project",
+        "release": "v4.25.0",
+        "commit": "aabf675fcfc5e489b424b844e6c9f1b39802df69",
+        "paranoia_level": 1,
+        "release_is_research_snapshot_not_latest_recommendation": true
+      }
+    },
+    {
+      "candidate_id": "modsecurity-crs-930110",
+      "engine": "modsecurity-crs",
+      "rule_id": 930110,
+      "summary": "일반 경로 탐색 패턴 탐지의 추가 검사",
+      "scenario": [
+        "httpd-lab-41773",
+        "httpd-lab-42013"
+      ],
+      "cve_ids": [
+        "CVE-2021-41773",
+        "CVE-2021-42013"
+      ],
+      "source_url": "https://github.com/coreruleset/coreruleset/blob/aabf675fcfc5e489b424b844e6c9f1b39802df69/rules/REQUEST-930-APPLICATION-ATTACK-LFI.conf",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "CVE 전용 규칙이 아니다. 인코딩·경로 전달·엔진 변환에 따라 동작이 달라질 수 있다.",
+        "현재 설치된 CRS 릴리스·paranoia level·제외 규칙·본문 파서·anomaly threshold와 대조해야 한다.",
+        "규칙 일치와 실제 차단은 다르며 DetectionOnly 또는 승인된 실습 예외에서는 차단되지 않을 수 있다.",
+        "공식 회귀 검사를 통과해도 현재 HTTPS 프록시 경로 및 실제 애플리케이션의 탐지를 보장하지 않는다."
+      ],
+      "upstream": {
+        "publisher": "OWASP Core Rule Set project",
+        "release": "v4.25.0",
+        "commit": "aabf675fcfc5e489b424b844e6c9f1b39802df69",
+        "paranoia_level": 1,
+        "release_is_research_snapshot_not_latest_recommendation": true
+      }
+    },
+    {
+      "candidate_id": "modsecurity-crs-930120",
+      "engine": "modsecurity-crs",
+      "rule_id": 930120,
+      "summary": "운영체제 파일 접근 시도 식별",
+      "scenario": [
+        "httpd-lab-41773",
+        "httpd-lab-42013"
+      ],
+      "cve_ids": [
+        "CVE-2021-41773",
+        "CVE-2021-42013"
+      ],
+      "source_url": "https://github.com/coreruleset/coreruleset/blob/aabf675fcfc5e489b424b844e6c9f1b39802df69/rules/REQUEST-930-APPLICATION-ATTACK-LFI.conf",
+      "qa_url": "https://github.com/coreruleset/go-ftw",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "일반 OS 파일 패턴 규칙이다. 무해한 harmless.txt fixture 이름 자체의 탐지를 기대하면 안 된다.",
+        "현재 설치된 CRS 릴리스·paranoia level·제외 규칙·본문 파서·anomaly threshold와 대조해야 한다.",
+        "규칙 일치와 실제 차단은 다르며 DetectionOnly 또는 승인된 실습 예외에서는 차단되지 않을 수 있다.",
+        "공식 회귀 검사를 통과해도 현재 HTTPS 프록시 경로 및 실제 애플리케이션의 탐지를 보장하지 않는다."
+      ],
+      "upstream": {
+        "publisher": "OWASP Core Rule Set project",
+        "release": "v4.25.0",
+        "commit": "aabf675fcfc5e489b424b844e6c9f1b39802df69",
+        "paranoia_level": 1,
+        "release_is_research_snapshot_not_latest_recommendation": true
+      }
+    },
+    {
+      "candidate_id": "suricata-et-open-2034647",
+      "engine": "suricata-et-open",
+      "rule_id": 2034647,
+      "summary": "HTTP에서 LDAP 방식 Log4j 조회 시도 식별",
+      "scenario": [
+        "scenario-2:2.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-44228"
+      ],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-exploit.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 1,
+        "source_enabled": true,
+        "source_file_sha256": "1ff56a4a1a6bf55448ff0adf1e4ff2b263a5047e99327a5dbea12f43e1f0adeb",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2034648",
+      "engine": "suricata-et-open",
+      "rule_id": 2034648,
+      "summary": "HTTP에서 RMI 방식 Log4j 조회 시도 식별",
+      "scenario": [
+        "scenario-2:2.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-44228"
+      ],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-exploit.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 1,
+        "source_enabled": true,
+        "source_file_sha256": "1ff56a4a1a6bf55448ff0adf1e4ff2b263a5047e99327a5dbea12f43e1f0adeb",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2034124",
+      "engine": "suricata-et-open",
+      "rule_id": 2034124,
+      "summary": "Apache 2.4.49 경로 탐색 시도 M1",
+      "scenario": [
+        "httpd-lab-41773"
+      ],
+      "cve_ids": [
+        "CVE-2021-41773"
+      ],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-exploit.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 5,
+        "source_enabled": true,
+        "source_file_sha256": "1ff56a4a1a6bf55448ff0adf1e4ff2b263a5047e99327a5dbea12f43e1f0adeb",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2034125",
+      "engine": "suricata-et-open",
+      "rule_id": 2034125,
+      "summary": "Apache 2.4.49 경로 탐색 시도 M2",
+      "scenario": [
+        "httpd-lab-41773"
+      ],
+      "cve_ids": [
+        "CVE-2021-41773"
+      ],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-exploit.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 5,
+        "source_enabled": true,
+        "source_file_sha256": "1ff56a4a1a6bf55448ff0adf1e4ff2b263a5047e99327a5dbea12f43e1f0adeb",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2034128",
+      "engine": "suricata-et-open",
+      "rule_id": 2034128,
+      "summary": "Apache 2.4.49 경로 탐색 시도 M3",
+      "scenario": [
+        "httpd-lab-41773"
+      ],
+      "cve_ids": [
+        "CVE-2021-41773"
+      ],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-exploit.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 3,
+        "source_enabled": true,
+        "source_file_sha256": "1ff56a4a1a6bf55448ff0adf1e4ff2b263a5047e99327a5dbea12f43e1f0adeb",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2034172",
+      "engine": "suricata-et-open",
+      "rule_id": 2034172,
+      "summary": "Apache 불완전 수정 후 경로 탐색 시도 M1",
+      "scenario": [
+        "httpd-lab-42013"
+      ],
+      "cve_ids": [
+        "CVE-2021-42013"
+      ],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-exploit.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 3,
+        "source_enabled": true,
+        "source_file_sha256": "1ff56a4a1a6bf55448ff0adf1e4ff2b263a5047e99327a5dbea12f43e1f0adeb",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2034173",
+      "engine": "suricata-et-open",
+      "rule_id": 2034173,
+      "summary": "Apache 불완전 수정 후 경로 탐색 시도 M2",
+      "scenario": [
+        "httpd-lab-42013"
+      ],
+      "cve_ids": [
+        "CVE-2021-42013"
+      ],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-exploit.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 3,
+        "source_enabled": true,
+        "source_file_sha256": "1ff56a4a1a6bf55448ff0adf1e4ff2b263a5047e99327a5dbea12f43e1f0adeb",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2008538",
+      "engine": "suricata-et-open",
+      "rule_id": 2008538,
+      "summary": "sqlmap 스캐너의 SQL 삽입 검사 표식 탐지",
+      "scenario": [
+        "scenario-1:1.3"
+      ],
+      "cve_ids": [],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-scan.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "sqlmap 표식 탐지이며 모든 수동 SQL 삽입을 탐지하는 일반 규칙이 아니다.",
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 10,
+        "source_enabled": true,
+        "source_file_sha256": "08b5ca3317d17bbf248491d00618ec02d53b681fc11b3a3ad79a03a34b22f9f5",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2002677",
+      "engine": "suricata-et-open",
+      "rule_id": 2002677,
+      "summary": "Nikto 웹 스캐너 표식 탐지",
+      "scenario": [
+        "scenario-1:1.2"
+      ],
+      "cve_ids": [],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-scan.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "User-Agent 등 도구 표식이 달라지면 같은 스캐너도 일치하지 않을 수 있다.",
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 15,
+        "source_enabled": true,
+        "source_file_sha256": "08b5ca3317d17bbf248491d00618ec02d53b681fc11b3a3ad79a03a34b22f9f5",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "suricata-et-open-2009770",
+      "engine": "suricata-et-open",
+      "rule_id": 2009770,
+      "summary": "Cookie 내 SQL 삽입 의심 패턴 후보",
+      "scenario": [
+        "scenario-1:1.3",
+        "scenario-1:1.4"
+      ],
+      "cve_ids": [],
+      "source_url": "https://rules.emergingthreats.net/open/suricata-8.0/rules/emerging-web_server.rules",
+      "qa_url": "https://community.emergingthreats.net/t/rule-performance-and-qa/3020",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "공식 8.0 피드에서 주석 처리되어 있다. 자동 활성화하지 않는다.",
+        "Cookie 검사 범위이므로 DVWA의 request parameter SQL 삽입을 포괄한다고 해석하지 않는다.",
+        "HTTP 평문이 센서에 보여야 한다. TLS 암호문만 관찰하는 인터페이스에서는 이 HTTP 서명의 탐지를 기대할 수 없다.",
+        "HOME_NET·HTTP 포트·프록시·패킷 수집 위치·스트림 재조립 및 기존 SID 중복 여부를 현장 Suricata 8.0.6에서 확인해야 한다.",
+        "서명 일치는 공격 시도 신호이며 취약점 존재·공격 성공·차단 성공을 증명하지 않는다. passive IDS 알림은 IP 차단 명령이 아니다."
+      ],
+      "upstream": {
+        "publisher": "Proofpoint Emerging Threats",
+        "feed": "ET Open / Suricata 8.0",
+        "revision": 8,
+        "source_enabled": false,
+        "source_file_sha256": "89fdf7e8fb38276bae531dfdd74c670d5e5951afa2aff603404adf8c6b5c9fa4",
+        "source_last_modified": "2026-10-21T20:24:17Z",
+        "mutable_feed": true,
+        "immutable_deployment_snapshot": null
+      },
+      "plaintext_visibility_required": true
+    },
+    {
+      "candidate_id": "wazuh-5401",
+      "engine": "wazuh",
+      "rule_id": 5401,
+      "summary": "sudo 실행 실패",
+      "scenario": [
+        "scenario-3:3.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0020-syslog_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "sudo 인증/실행 로그와 해당 decoder 수집",
+        "5400 계열 상위 룰 및 필요한 세션·상관 상태"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-5402",
+      "engine": "wazuh",
+      "rule_id": 5402,
+      "summary": "root 대상 sudo 실행 성공",
+      "scenario": [
+        "scenario-3:3.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0020-syslog_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "sudo 인증/실행 로그와 해당 decoder 수집",
+        "5400 계열 상위 룰 및 필요한 세션·상관 상태"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-5403",
+      "engine": "wazuh",
+      "rule_id": 5403,
+      "summary": "사용자의 최초 sudo 실행",
+      "scenario": [
+        "scenario-3:3.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0020-syslog_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "sudo 인증/실행 로그와 해당 decoder 수집",
+        "5400 계열 상위 룰 및 필요한 세션·상관 상태"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-5404",
+      "engine": "wazuh",
+      "rule_id": 5404,
+      "summary": "sudo 실패 3회 상관",
+      "scenario": [
+        "scenario-3:3.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0020-syslog_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "sudo 인증/실행 로그와 해당 decoder 수집",
+        "5400 계열 상위 룰 및 필요한 세션·상관 상태"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-5405",
+      "engine": "wazuh",
+      "rule_id": 5405,
+      "summary": "권한 없는 사용자의 sudo 시도",
+      "scenario": [
+        "scenario-3:3.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0020-syslog_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "sudo 인증/실행 로그와 해당 decoder 수집",
+        "5400 계열 상위 룰 및 필요한 세션·상관 상태"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-5406",
+      "engine": "wazuh",
+      "rule_id": 5406,
+      "summary": "허용되지 않은 sudo 명령",
+      "scenario": [
+        "scenario-3:3.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0020-syslog_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "sudo 인증/실행 로그와 해당 decoder 수집",
+        "5400 계열 상위 룰 및 필요한 세션·상관 상태"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-5407",
+      "engine": "wazuh",
+      "rule_id": 5407,
+      "summary": "sudo 실행 성공",
+      "scenario": [
+        "scenario-3:3.2"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0020-syslog_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "sudo 인증/실행 로그와 해당 decoder 수집",
+        "5400 계열 상위 룰 및 필요한 세션·상관 상태"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-80711",
+      "engine": "wazuh",
+      "rule_id": 80711,
+      "summary": "Auditd 비정상 프로세스 종료",
+      "scenario": [
+        "scenario-3:3.2",
+        "scenario-2:2.4"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0365-auditd_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "Auditd ANOM_ABEND 이벤트 수집",
+        "80700 상위 룰"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-80721",
+      "engine": "wazuh",
+      "rule_id": 80721,
+      "summary": "Auditd root 전환 이상 이벤트",
+      "scenario": [
+        "scenario-3:3.2",
+        "scenario-2:2.4"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0365-auditd_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "Auditd ANOM_ROOT_TRANS 이벤트 수집",
+        "80700 상위 룰"
+      ]
+    },
+    {
+      "candidate_id": "wazuh-80792",
+      "engine": "wazuh",
+      "rule_id": 80792,
+      "summary": "Auditd 명령 실행 기록",
+      "scenario": [
+        "scenario-3:3.2",
+        "scenario-2:2.4"
+      ],
+      "cve_ids": [
+        "CVE-2021-3156"
+      ],
+      "source_url": "https://github.com/wazuh/wazuh/blob/f470ad7db717b18db7feeed568949643698f0f34/ruleset/rules/0365-auditd_rules.xml",
+      "qa_url": "https://documentation.wazuh.com/current/user-manual/ruleset/testing.html",
+      "checked_on": "2026-10-22",
+      "source_rule_id_and_purpose_verified": true,
+      "local_engine_test_pending": true,
+      "local_loaded_state": "not_checked_in_this_research",
+      "limitations": [
+        "Wazuh 공식 기본 룰 후보이며 CVE-2021-3156 전용 탐지를 보장하지 않는다. 정상 관리 작업도 같은 신호를 발생시킬 수 있다.",
+        "실제 취약 sudo 빌드·패치 상태 확인과 공격 성공 판정은 별도이다.",
+        "로그 수집·decoder·상위 룰·조건이 충족되어야 하며 logtest 성공만으로 실제 수집·색인·대응 경로가 검증되지는 않는다."
+      ],
+      "upstream": {
+        "publisher": "Wazuh",
+        "release": "v4.14.8",
+        "commit": "f470ad7db717b18db7feeed568949643698f0f34"
+      },
+      "cve_specific": false,
+      "prerequisites": [
+        "Auditd 실행 이벤트 수집",
+        "80700 상위 룰과 etc/lists/audit-keys CDB 분류 조건"
+      ]
+    }
+  ],
+  "known_gaps": [
+    "sudo CVE-2021-3156 전용 탐지 규칙·취약 패키지 스테이징을 이 목록이 제공하지 않는다.",
+    "인증 무차별·네트워크 정찰 전체 시나리오를 이 제한된 후보 목록으로 포괄하지 않는다.",
+    "새 httpd 이미지의 정상 응답 확인과 경로 탐색에 대한 WAF/IDS 실발화는 별도이다.",
+    "기존 실습 예외 세션은 HTTP 계층의 정책이다. Suricata와 기존 IP 차단까지 자동으로 면제한다고 해석하지 않는다."
+  ]
+}

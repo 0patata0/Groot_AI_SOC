@@ -1,0 +1,23 @@
+{
+  "bridge": "none",
+  "data-root": "/var/lib/capstone-sudo-runtime/docker",
+  "exec-opts": [
+    "native.cgroupdriver=systemd"
+  ],
+  "exec-root": "/run/user/1991/docker-exec",
+  "hosts": [
+    "unix:///run/user/1991/docker.sock"
+  ],
+  "ip-forward": false,
+  "ip-masq": false,
+  "ip6tables": false,
+  "iptables": false,
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-file": "2",
+    "max-size": "1m"
+  },
+  "pidfile": "/run/user/1991/docker.pid",
+  "storage-driver": "vfs",
+  "userland-proxy": false
+}

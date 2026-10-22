@@ -1,0 +1,413 @@
+{
+  "archive": {
+    "archive": "sudo-1.8.31-1ubuntu1-amd64.tar",
+    "attack_tested": false,
+    "cve_id": "CVE-2021-3156",
+    "image_id": "sha256:3a7816fe014c0a9e33b36b869dcd65b0e9662cb51f78271254b396502dd53ab7",
+    "package_version": "1.8.31-1ubuntu1",
+    "runtime_image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+    "sha256": "db6a201143ad6372d24c91fed6e04f58206abad535941d39e6f5ad2ac79c5389",
+    "size": 28681728,
+    "source_oci_manifest_id": "sha256:3a7816fe014c0a9e33b36b869dcd65b0e9662cb51f78271254b396502dd53ab7",
+    "tag": "groot-labs/sudo:1.8.31-1ubuntu1"
+  },
+  "attack_tested": false,
+  "checked_at": 1792681362,
+  "configuration_sha256": {
+    "daemon_config": {
+      "path": "/etc/capstone-sudo-lab/daemon.json",
+      "sha256": "b883dc3f3a4ff1136d2e0439057d22f1472c6516ab24c2838d4c4c1ed45bb96f"
+    },
+    "lab_config": {
+      "path": "/etc/capstone-sudo-lab/config.json",
+      "sha256": "4d73c02c1c81ff1997db407b911c276b5cb1d05691de58e6f9b8548f18d3e615"
+    },
+    "publisher_timer": {
+      "path": "/etc/systemd/system/capstone-sudo-status.timer",
+      "sha256": "ab08306df7fb004f18465e4511b8a15ed0b0718c1066a4100db9c58c3e7370d4"
+    },
+    "publisher_unit": {
+      "path": "/etc/systemd/system/capstone-sudo-status.service",
+      "sha256": "26ff0f9804ebe7f6da78d85437a8e369466cb5e81834daab03621709196be5ec"
+    },
+    "rootless_apparmor": {
+      "path": "/etc/apparmor.d/opt.capstone-sudo-rootless.29.8.1.bin.rootlesskit",
+      "sha256": "08e5ea44aacce5bee78094a31789c2dc9cb11063f36bdea856bb8dc388371255"
+    },
+    "rootless_dropin": {
+      "path": "/etc/systemd/system/user@1991.service.d/capstone-sudo.conf",
+      "sha256": "e91f5e56e7bd44bfc9049df6f9c0b929966f5776cc969cbc7b4740ecbd5c8ab8"
+    },
+    "rootless_unit": {
+      "path": "/var/lib/capstone-sudo-runtime/.config/systemd/user/capstone-sudo-docker.service",
+      "sha256": "dfd16d9e009ae6ac9770aa2ceeb50025bea5600bdf65c0f8d1d81a844e369e17"
+    }
+  },
+  "current_receipt": {
+    "checked_at": 1792681317,
+    "expires_at": 1792681617,
+    "labs": {
+      "CVE-2021-3156": {
+        "status": "ready"
+      }
+    },
+    "schema": 1
+  },
+  "global_sysctl_unchanged": true,
+  "host_scenario_verified": false,
+  "host_securityfs_visible": true,
+  "host_sudo_revision": "install ok installed|1.8.31-1ubuntu1",
+  "host_sudo_unchanged": true,
+  "image_identity": {
+    "all_oci_layer_digests_verified": true,
+    "archive_sha256": "db6a201143ad6372d24c91fed6e04f58206abad535941d39e6f5ad2ac79c5389",
+    "rootfs_diff_ids_match": true,
+    "runtime_config_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+    "schema": 1,
+    "source_oci_manifest_id": "sha256:3a7816fe014c0a9e33b36b869dcd65b0e9662cb51f78271254b396502dd53ab7"
+  },
+  "installation": {
+    "attack_tested": false,
+    "cgroup_driver": "systemd",
+    "daemon_version": "29.8.1",
+    "environment_ready": false,
+    "global_sysctl_unchanged": true,
+    "host_sudo_unchanged": true,
+    "installed": true,
+    "operator_gid": 1991,
+    "operator_uid": 1991,
+    "packages": {
+      "libsubid4": "install ok installed|1:4.13+dfsg1-4ubuntu3.2",
+      "uidmap": "install ok installed|1:4.13+dfsg1-4ubuntu3.2"
+    },
+    "rootful_unit_unchanged": true,
+    "rootlesskit_version": "rootlesskit version 3.1.0",
+    "schema": 1,
+    "security": [
+      "name=seccomp,profile=builtin",
+      "name=rootless",
+      "name=cgroupns"
+    ],
+    "storage_driver": "vfs",
+    "subid_count": 65536,
+    "subid_start": 231072
+  },
+  "native_checks": {
+    "checks": [
+      {
+        "action": "check",
+        "rc": 0,
+        "result": {
+          "attack_tested": false,
+          "checked_at": 1792680633,
+          "container_id": "2d6dd235aa8c1659af40703fe93b1130009438eae440460aeedd71673198e27d",
+          "cve_id": "CVE-2021-3156",
+          "environment_ready": false,
+          "host_scenario_verified": false,
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "image_present": true,
+          "isolation_verified": false,
+          "package_verified": false,
+          "package_version": "1.8.31-1ubuntu1",
+          "schema": 1,
+          "status": "stopped",
+          "verification": "configuration_only"
+        }
+      },
+      {
+        "action": "up",
+        "rc": 0,
+        "result": {
+          "attack_tested": false,
+          "checked_at": 1792680633,
+          "container_id": "adddeb081d51444896cd6311948a2e3bac8b330fbf2cca5816daaed76b49b797",
+          "cve_id": "CVE-2021-3156",
+          "environment_ready": true,
+          "host_scenario_verified": false,
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "image_present": true,
+          "isolation": {
+            "capability_bounding_set": "00000000000000c0",
+            "host_gid_for_container_root": 1991,
+            "host_uid_for_container_root": 1991,
+            "mapping_verification": "initial-host-proc-uid-gid-maps",
+            "seccomp_mode": 2
+          },
+          "isolation_verified": true,
+          "package_verified": true,
+          "package_version": "1.8.31-1ubuntu1",
+          "schema": 1,
+          "status": "running",
+          "verification": "environment_only"
+        }
+      },
+      {
+        "action": "verify",
+        "rc": 0,
+        "result": {
+          "attack_tested": false,
+          "checked_at": 1792680635,
+          "container_id": "adddeb081d51444896cd6311948a2e3bac8b330fbf2cca5816daaed76b49b797",
+          "cve_id": "CVE-2021-3156",
+          "environment_ready": true,
+          "host_scenario_verified": false,
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "image_present": true,
+          "isolation": {
+            "capability_bounding_set": "00000000000000c0",
+            "host_gid_for_container_root": 1991,
+            "host_uid_for_container_root": 1991,
+            "mapping_verification": "initial-host-proc-uid-gid-maps",
+            "seccomp_mode": 2
+          },
+          "isolation_verified": true,
+          "package_verified": true,
+          "package_version": "1.8.31-1ubuntu1",
+          "schema": 1,
+          "status": "running",
+          "verification": "environment_only"
+        }
+      },
+      {
+        "action": "up",
+        "rc": 0,
+        "result": {
+          "attack_tested": false,
+          "checked_at": 1792680635,
+          "container_id": "adddeb081d51444896cd6311948a2e3bac8b330fbf2cca5816daaed76b49b797",
+          "cve_id": "CVE-2021-3156",
+          "environment_ready": true,
+          "host_scenario_verified": false,
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "image_present": true,
+          "isolation": {
+            "capability_bounding_set": "00000000000000c0",
+            "host_gid_for_container_root": 1991,
+            "host_uid_for_container_root": 1991,
+            "mapping_verification": "initial-host-proc-uid-gid-maps",
+            "seccomp_mode": 2
+          },
+          "isolation_verified": true,
+          "package_verified": true,
+          "package_version": "1.8.31-1ubuntu1",
+          "schema": 1,
+          "status": "running",
+          "verification": "environment_only"
+        }
+      },
+      {
+        "action": "stop",
+        "rc": 0,
+        "result": {
+          "attack_tested": false,
+          "checked_at": 1792680635,
+          "container_id": "adddeb081d51444896cd6311948a2e3bac8b330fbf2cca5816daaed76b49b797",
+          "cve_id": "CVE-2021-3156",
+          "environment_ready": false,
+          "host_scenario_verified": false,
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "image_present": null,
+          "isolation_verified": false,
+          "package_verified": false,
+          "package_version": "1.8.31-1ubuntu1",
+          "schema": 1,
+          "status": "stopped",
+          "verification": "inventory_only"
+        }
+      },
+      {
+        "action": "up",
+        "rc": 0,
+        "result": {
+          "attack_tested": false,
+          "checked_at": 1792680641,
+          "container_id": "a2816c4a65b2414d974a41cf33e2018e863db5eec764a7eafe568c1574c2a47e",
+          "cve_id": "CVE-2021-3156",
+          "environment_ready": true,
+          "host_scenario_verified": false,
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "image_present": true,
+          "isolation": {
+            "capability_bounding_set": "00000000000000c0",
+            "host_gid_for_container_root": 1991,
+            "host_uid_for_container_root": 1991,
+            "mapping_verification": "initial-host-proc-uid-gid-maps",
+            "seccomp_mode": 2
+          },
+          "isolation_verified": true,
+          "package_verified": true,
+          "package_version": "1.8.31-1ubuntu1",
+          "schema": 1,
+          "status": "running",
+          "verification": "environment_only"
+        }
+      },
+      {
+        "action": "verify",
+        "rc": 0,
+        "result": {
+          "attack_tested": false,
+          "checked_at": 1792680642,
+          "container_id": "a2816c4a65b2414d974a41cf33e2018e863db5eec764a7eafe568c1574c2a47e",
+          "cve_id": "CVE-2021-3156",
+          "environment_ready": true,
+          "host_scenario_verified": false,
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "image_present": true,
+          "isolation": {
+            "capability_bounding_set": "00000000000000c0",
+            "host_gid_for_container_root": 1991,
+            "host_uid_for_container_root": 1991,
+            "mapping_verification": "initial-host-proc-uid-gid-maps",
+            "seccomp_mode": 2
+          },
+          "isolation_verified": true,
+          "package_verified": true,
+          "package_version": "1.8.31-1ubuntu1",
+          "schema": 1,
+          "status": "running",
+          "verification": "environment_only"
+        }
+      }
+    ],
+    "complete": true,
+    "native_regression_passed": true,
+    "native_regression_tests": 26,
+    "schema": 1,
+    "stop_up_recreates": true
+  },
+  "publisher_checks": {
+    "attack_tested": false,
+    "checks": [
+      {
+        "expected": "ready",
+        "receipt": {
+          "checked_at": 1792681248,
+          "expires_at": 1792681548,
+          "labs": {
+            "CVE-2021-3156": {
+              "status": "ready"
+            }
+          },
+          "schema": 1
+        }
+      },
+      {
+        "expected": "needs_setup",
+        "receipt": {
+          "checked_at": 1792681253,
+          "expires_at": 1792681553,
+          "labs": {
+            "CVE-2021-3156": {
+              "status": "needs_setup"
+            }
+          },
+          "schema": 1
+        }
+      },
+      {
+        "expected": "ready",
+        "receipt": {
+          "checked_at": 1792681255,
+          "expires_at": 1792681555,
+          "labs": {
+            "CVE-2021-3156": {
+              "status": "ready"
+            }
+          },
+          "schema": 1
+        }
+      }
+    ],
+    "child_rlimit_fsize": [
+      131072,
+      131072
+    ],
+    "final_container_id": "f90aacb7046450fc93aa4e468b847153acb4b1b91a74a2a0daf8b7ebe0c23766",
+    "host_scenario_verified": false,
+    "native_regression_passed": true,
+    "native_regression_tests": 26,
+    "schema": 1,
+    "stop_up_new_cid": true,
+    "timer_active": true,
+    "timer_enabled": true
+  },
+  "rootful_unit_unchanged": true,
+  "schema": 1,
+  "scope": "environment_only",
+  "securityfs_view": {
+    "checked_at": 1792680585,
+    "daemon_version": "29.8.1",
+    "dedicated_user_service_securityfs_hidden": true,
+    "host_apparmor_sysctl_unchanged": true,
+    "host_securityfs_visible": true,
+    "rootful_unit_unchanged": true,
+    "schema": 1,
+    "security_options": [
+      "name=seccomp,profile=builtin",
+      "name=rootless",
+      "name=cgroupns"
+    ]
+  },
+  "signature_verification": {
+    "archive_sha256": "58a0822afa28f429ff3906648db5ca798ae1d21514386ed7121dde766bd8f0e9",
+    "binaries": {
+      "dockerd-rootless-setuptool.sh": {
+        "sha256": "1c9f0dc93ebb3d75255254ec760d26a912affba7f329ab8abffe8e25eb0b3f94",
+        "size": 16631
+      },
+      "dockerd-rootless.sh": {
+        "sha256": "200203633806081a401e60aefdf68a8fa73fc7dc80aa854c52a69d47710a3488",
+        "size": 10704
+      },
+      "rootlesskit": {
+        "sha256": "d3193fceef47224470db5e9b85ed5725fc046279dfc4fb504c9310350efe6b21",
+        "size": 26014296
+      }
+    },
+    "docker": {
+      "packages": [
+        {
+          "Architecture": "amd64",
+          "Depends": "dbus-user-session, libc6 (>= 2.34)",
+          "Filename": "dists/noble/pool/stable/amd64/docker-ce-rootless-extras_29.8.1-1~ubuntu.24.04~noble_amd64.deb",
+          "Package": "docker-ce-rootless-extras",
+          "SHA256": "02897501837b7ff4fec8248decdd5828b7d40d7f591021a91f29673e02d0f982",
+          "Size": "10177712",
+          "Version": "5:29.8.1-1~ubuntu.24.04~noble"
+        }
+      ],
+      "release_date": "Thu, 22 Oct 2026 10:49:34 +0000",
+      "signature_verified": true
+    },
+    "docker_primary_key": "9DC858229FC7DD38854AE2D88D81803C0EBFCD88",
+    "installed": false,
+    "schema": 1,
+    "ubuntu": {
+      "packages": [
+        {
+          "Architecture": "amd64",
+          "Depends": "libaudit1 (>= 1:2.2.1), libc6 (>= 2.38), libselinux1 (>= 3.1~), libsubid4 (>= 1:4.11.1)",
+          "Filename": "pool/main/s/shadow/uidmap_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+          "Package": "uidmap",
+          "SHA256": "a80cb7f72dd18c73cbb0b07b7fbe855504f26bfafae072a9b3d125c89d499b9e",
+          "Size": "26006",
+          "Version": "1:4.13+dfsg1-4ubuntu3.2"
+        },
+        {
+          "Architecture": "amd64",
+          "Depends": "libaudit1 (>= 1:2.2.1), libc6 (>= 2.38), libselinux1 (>= 3.1~)",
+          "Filename": "pool/main/s/shadow/libsubid4_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+          "Package": "libsubid4",
+          "SHA256": "ba97fd28c53560a8d2a2261e8f75a7ab4112535b12f9fe1d50970c30051da0da",
+          "Size": "23442",
+          "Version": "1:4.13+dfsg1-4ubuntu3.2"
+        }
+      ],
+      "release_date": "Thu, 22 Oct 2026 11:25:25 UTC",
+      "signature_verified": true
+    }
+  },
+  "timer_active": true,
+  "timer_enabled": true
+}

@@ -1,4 +1,48 @@
-# 인프라 현황 — 2026-10-19 현재 작업 상태
+# 인프라 현황 — 2026-10-23 현재 작업 상태
+
+## 메인 개편·하위 팔레트·단일 설치기 구현 (2026-10-23 후속)
+
+메인의 큰 제목·수평 탐색·서버 선화·현황 띠를 배포했다. Java의 남은 초록 포커스·그림자·상태 점도 공통 theme 변수로 연결해 Apache 두 버전과 같은 차콜/웜화이트 색상으로 맞췄다. 최신 theme.css SHA는 `d785eabdf42911b869bc7c35ddb791ae72c2f5b51fe7f7478604496db14bc05e`다. 공개 HTTP35개와 origin/Secure쿠키 보완을 포함한 C native66개를 통과했다. 아래64개 결과는 변경 전 단계의 이력이다. 브라우저 창 연결을 복구한 뒤 메인·Java·Apache 두 버전 모두 새로고침하여 다크/화이트 화면을 확인했다. 초기 로딩은 즉시 색상을 적용하고 직접 버튼 전환만180ms로 보완했다.
+
+초기 설치는 루트 deploy.sh 하나에서 로컬 패키지/이미지 준비, SIEM, 공통 admin 키의 SSH 직접 전달, service schema7(독립 DVWA·4항목 콘솔·웹3종·별도sudo), security schema2(TLS edge·WAF)를 자동 연결한다. 실패·충돌은 임의 덮어쓰기 없이 거절하고 설치 receipt를 검증한다. 이후 서버 변경 때 설치 소스·반입 목록·예제·검증도 함께 수정하도록 AGENTS에 기록했다. 이는 상시 서버 감시 데몬이 아니다. [현재 설치 계약](deployment/bootstrap-guide.md).
+
+새 VM3대 전체 apply는 미실행이다. 실제 sudo 공격/호스트 탐지 E2E·새 호스트 재부팅도 별도 검증이다. C의 검증된 sudo 입력10파일 복구 bundle과 vendor 서명/OCI 검증 증거는 운영 경로에 보존했으며 기존 runtime·호스트 sudo를 변경하지 않았다.
+
+## 공통 테마·DVWA 범위 정정 완료 (2026-10-23)
+
+사용자 요청을 정정하여 **카탈로그는 Java·Apache 2.4.49·Apache 2.4.50·sudo 총4항목, 웹 실습은 관리형3개**로 한정한다. DVWA는 원래 독립 주소에서 그대로 유지한다. 같은 Log4Shell 사이트에 추가했던 DVWA 프록시·카탈로그·전용 예외 쿠키·테마 처리를 제거했고 원래 DVWA 앱·DB·독립 접속 설정은 유지했다. 이전5항목 통합은 요청 범위 오해였으며 아래10/22 결과와 증거 JSON은 당시 기록으로 보존한다. 정정 후 C native64개·최종 HTTP35개 검사를 통과했다. 기존 DVWA 독립 주소200·테마 미주입, 제거한 DVWA3경로404·실행/중지unknown_cve409, 기존 HMAC 정상·DVWA 전용 쿠키 미발급, Apache 두 버전 canary403→200→403·sudo ready를 확인했다.
+
+공통 테마는 콘솔·Log4Shell Java·Apache 두 버전에 적용한다. 상단 단일 버튼에 현재 모드 `다크` 또는 `화이트`와 같은16px 달·해 아이콘을 표시한다. 고정96px 버튼 안에서 아이콘 자리를16px 열로 고정하고 별도 글자 슬롯을 가운데 정렬해 모드 전환 때 위치를 유지한다. 색상·아이콘 전환은180ms이며 reduced-motion 설정에서는 끈다. 선택은 같은 사이트의 localStorage로 지속하고 저장소 접근 실패에도 페이지 전환은 동작한다. sudo는 별도CLI로 독립 웹 페이지가 없다. 최신 자산의 서버 SHA 일치와 새로고침한 Safari의4항목·고정 아이콘/글자 가운데 정렬·양방향 전환을 확인했다. Java·Apache 두 버전의 테마 동작도 확인했다. 작업 임시자료의 최종 정리는 별도 마감 중이다.
+
+sudo 후속 실측에서 rootless Docker29.8.1·RootlessKit3.1.0·UID1991 설치, native26회귀와 check/up/verify/중복up/stop/새CID up/verify의7단계 무해 검증을 통과했다. 실제 sudo1.8.31-1ubuntu1·UID/GID 매핑·seccomp·capability·cgroup 제한을 확인했고 기존 호스트 sudo·system Docker unit·전역sysctl은 유지했다. 정식 publisher unit의 실제3단계 `ready → 중지 시 needs_setup → 새 컨테이너 실행 시 ready`를 확인했다. timer는 enabled/active·60초 주기이며 root:root0600 receipt의 TTL은300초다. 전용 user@1991의 securityfs 접근 제한과 publisher의 나머지 sandbox를 유지했다. 환경 준비와 실제 권한 상승·호스트 탐지 E2E는 별개이며 `attack_tested=false`, `host_scenario_verified=false`를 유지한다.
+
+## 다중 웹 실습 확장·sudo 별도 환경 준비 (2026-10-22 당시 이력)
+
+> 아래5항목·DVWA 통합 결과는 정정 전 이력이다. 현재 범위는 위10/23의4항목·DVWA 독립 유지 지시를 따른다. 기존 증거 JSON은 삭제하거나 현재 결과로 바꾸지 않는다.
+
+같은 [HTTPS 관리 주소](https://log4shell.grootlab.duckdns.org/log4shell/)의 카탈로그를 5항목으로 확장했다. Log4Shell과 Apache httpd 2.4.49(CVE-2021-41773)·2.4.50(CVE-2021-42013)은 `managed-http`, 기존 native DVWA는 `existing-http`의 `LAB-DVWA`, sudo CVE-2021-3156은 `local-cli`다. 웹 4항목은 고정 실습 경로로 WAF를 경유한다. DVWA와 sudo의 웹 실행·중지는409로 거부하고 기존 서비스·호스트 sudo를 관리 대상으로 가져오지 않는다. 관리형 앱도 사용자가 중지한 상태를 자동으로 실행하지 않는다.
+
+backend **64개**, 공개 HTTPS **31개** 및 DVWA 예외 경계 **15개** 검사를 통과했다. httpd는 CGI 없는 정적 fixture이며 실제 취약점 공격·RCE·탐지/차단 E2E 검증은 하지 않았다. DVWA는 Safari 기본 실습 계정 로그인·Welcome·Security 페이지를 확인하고 기존 `impossible` 수준을 유지했다. sandbox 전용 예외 cookie의 별도 서명·경로·관리 API/다른 실습 거부·양 cookie 삭제를 확인했다. 새 실습 3개에 대한 합성 WAF 검사9건(각403→200→403)이 Wazuh alerts와 Indexer까지 같은 transaction으로 전달됐다. 이 10/22 단계에서는 sudo의 별도 rootless 런타임 완료 여부가 미확정이었다. 이후 환경 검증과 남은 상태 발행 작업은 위 10/23 후속을 따른다. `ready`가 표시돼도 환경 확인일 뿐 실제 권한 상승·호스트 시나리오 성공을 뜻하지 않는다.
+
+[공식 규칙 후보27개](infra/groot-c/offline-labs/rule-source-candidates.json)는 CRS7·ET Open10·Wazuh10의 조사 자료이며 운영 규칙에 반영하지 않았다. 이미지 export/import는 관리형3개만 처리하고 DVWA·sudo 환경은 포함하지 않는다. 초기3VM `deploy.sh`는 service schema7·TLS/WAF·rootless sudo와 오프라인 패키지/이미지 준비를 단일 진입점으로 통합하는 작업 중이다. 실제 새 VM 전체 적용은 미실행이다. [유형·설치·검증 범위](infra/groot-c/offline-labs/README.md).
+
+## 오프라인 CVE 관리 웹 적용 완료 (2026-10-22)
+
+> 아래는 단일 Log4Shell 항목을 배포한 단계의 기록이다. 현재 항목·후속 검증 범위는 위10/23 정정 기록을 따른다.
+
+기존 [Log4Shell 주소](https://log4shell.grootlab.duckdns.org/log4shell/)에 순수 CSS/JS 다크 관리 화면과 FastAPI를 배포했다. 정적 JSON의 첫 항목은 기존 JAR를 포함한 CVE-2021-44228 / Log4j2.14.1이며 새 이미지 ID는 `sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36`이다. 이미지 archive·manifest·고정 Python wheel의 출처/SHA와 오프라인 save/load 설치기를 제공한다. 다른 CVE 이미지는 준비하지 않았다.
+
+C의 비권한 FastAPI(127.0.0.1:18090), root 고정 기능 Unix broker, 전용 nft guard를 설치했다. 등록된 CVE의 고정 이미지·전체 컨테이너 ID·실행 계약을 검증하고 로컬 이미지만 실행한다. 새 실습은 127.0.0.1:18081, 비root·읽기 전용·리소스 제한이며 외부 송신을 차단한다. 관리 화면에서 키 없이 실행·중지하고 같은 HTTPS 주소의 `/log4shell/labs/CVE-2021-44228/`에서 실습한다.
+
+선택적인 **WAF 차단 예외 키를 기존 Wazuh Dashboard 관리자 암호와 통일**했다. 기존 Wazuh/Mattermost 계정은 변경하지 않았다. 키는 C의 root:capstone-labs·0640 파일에 보관하며 브라우저가 30초 일회용 challenge에 HMAC-SHA-256(SHA-256(UTF-8(키)), message)으로 서명한다. 키 원문·고정 해시는 전송하지 않고 서버는 서명을 대조한다. 성공하면 IP에 묶인 Secure·HttpOnly·SameSite=Strict 쿠키로 10분 예외를 부여한다. 재사용·만료·다른 IP/Host·기존 Bearer 방식은 거절한다. 관리 API는 A HTTPS→C 전용 경로로 WAF를 거치지 않으며, 실제 Java 실습은 WAF를 경유한다.
+
+해당 실습에 한해 키 없음=ModSecurity On, 유효 예외=DetectionOnly로 전환하며 탐지·감사 로그를 유지한다. 다른 WAF 경로의 전역 DetectionOnly는 유지했다. Suricata passive 탐지와 IP 차단의 LLM·MCP·승인·TTL·보호 주소 정책은 별도이며 변경하지 않았다. 기존 L4 IP 차단은 HTTP 키로 해제할 수 없다.
+
+최종 native 회귀43개, TLS 인증서/호스트명 검증을 포함한 실제 HTTPS18개 및 경로 보완 후37개 검사에서 정상 로깅200·무해 합성 검사403·예외200·해제403·서명 재사용401·위조 헤더403을 확인했다. 브라우저에서 무키 콘솔·같은 사이트 Java 실습·정상 로깅200을 확인했고, 프론트 서명은 실제 Node WebCrypto와 독립 HMAC 계산을 대조했다. 초기 단계의 실제 시작·중지·재시작·중복 실행 동일 ID, Java8u181/Log4j2.14.1, 네트워크 격리 및 image save/load 검증도 보존한다. 호스트에서는 접근 가능한 bridge gateway와 A SSH가 실습 network namespace에서는 timeout이었다. 첫 A:80 대조는 호스트도 timeout이라 미확정으로 보존하고 A:22 후속 대조로 확인했다. 합성 차단 검사는 실제 취약점 공격·콜백·LLM 대응 E2E와 구분한다. WAF 감사5건(403×3·200×2)은 Wazuh manager 수신과 Indexer 색인까지 확인했다. 기존 raw 회전 보류는21:51 timer에서 자연 해소되어 양 raw active·Vector/Wazuh 실행 정상이다. URL 정규화 차이로 누락되던 이중슬래시/dot/인코딩 경로는 전용Host 정책으로 보완하고6개 변형의403/200/403을 확인했다.
+
+기존 `log4shell-lab` ID·10/19 기동 시각·내부8080 바인딩은 유지했다. A nginx·WAF와 C Apache는 문법 검사 후 reload했고 원본은 각 서버 `/var/backups/capstone-offline-labs/20261022/`에 보존했다. 현재 A 전체 nginx SHA는 `940e93c7a4fc83319aa9c0813bd2763a9d07fd44a157ce24f952daf23bcfac4e`다. 신규 WAF 파일은 기존 producer 고정 파일을 바꾸지 않고 별도 적용했다. 컨테이너 재시작에는 유지되지만 **WAF 전체 재생성 시 `scripts/apply-waf.py`로 재적용해야 한다**. 아래10/19 SHA·라우팅은 당시 기록이며 저장소의 기존 `infra/groot-a/chatproxy.nginx.conf`도 당시 복구 기준으로 유지한다. 현재 블록은 `infra/groot-c/offline-labs/nginx-log4shell-server.conf`다.
+
+[사용법·설치·복구 범위](infra/groot-c/offline-labs/README.md) · [배포 검증](infra/groot-c/offline-labs/deployment-validation-20261022.json).
 
 ## 통합 SOC 대시보드 적용 완료 (2026-10-19 23:21 KST 검증)
 

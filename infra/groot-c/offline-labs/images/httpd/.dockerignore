@@ -1,0 +1,9 @@
+*
+!Dockerfile
+!httpd.conf
+!site/
+!site/**
+!public/
+!public/**
+!fixture/
+!fixture/**

@@ -1,0 +1,3 @@
+Groot Apache lab: this is a public, harmless Alias example.
+URL path: /lab/alias/hello.txt
+Container path: /lab/public/hello.txt

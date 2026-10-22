@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "operator_uid": 0,
+  "image_id": "REPLACE_WITH_VERIFIED_LOCAL_IMAGE_SHA256",
+  "deb_sha256": "REPLACE_FROM_VERIFIED_PREPARATION_JSON",
+  "preparation_sha256": "REPLACE_WITH_PREPARATION_JSON_SHA256"
+}

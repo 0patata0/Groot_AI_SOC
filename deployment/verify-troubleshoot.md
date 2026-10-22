@@ -17,11 +17,13 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 | 확인 단계 | 확인하는 범위 | 확인하지 않는 범위 |
 |---|---|---|
 | `--plan` | 로컬 입력값, 주소·형식 검사 | SSH, 서버 패키지, 서비스 상태 |
-| `--check` | 세 서버의 패키지·로컬 이미지·원본 자료·기존 상태 등 사전조건 | 신규 컨테이너 실제 기동, Hermes 이미지 import, 전체 연결 |
-| `--apply`의 최종 성공 | 역할별 생성·시작·native 구문검사·등록·연결 및 아래 검증 | 외부 브라우저 접근, 공격 시나리오, LLM 답변의 정확성·지연 |
-| `--verify` | SIEM API/TLS·Indexer·Mattermost·읽기 MCP·Hermes 연결, service DB/ACL·Log4Shell/UI 설정·agent, security 엔진·agent·nft 상태 | 신규 모델 요청, 채팅 메시지 전송, 실제 공격 탐지·운영 보존 정책 |
+| `--check` | 세 서버 artifacts manifest·해시와 역할별 도구·이미지·TLS·wheel·sudo bundle 조건. 일회성 격리 이미지 검사 가능 | 패키지 설치·이미지 load·신규 서비스 구성·전체 연결 |
+| `--apply`의 최종 성공 | 세 서버 반입물 검사→오프라인 패키지/이미지 설치→역할 사전검사→SIEM→공통 키/등록 자격 전달→service→security 및 아래 검증 | 외부 브라우저 접근, 공격 시나리오, LLM 답변의 정확성·지연 |
+| `--verify` | SIEM API/TLS·Indexer·Mattermost·읽기 MCP·Hermes, service schema7의 DB/콘솔/broker/gateway/sudo·agent, security schema2의 TLS/WAF/IDS·agent·nft 상태 | 신규 모델 요청, 채팅 메시지 전송, 실제 공격 탐지·운영 보존 정책 |
 
-SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출, Mattermost 봇 인증, 60초 이내 Hermes heartbeat를 확인합니다. 결과에 `model_requests_sent: 0`, `chat_messages_sent: 0`, `write_approval_configured: false`가 나오는 것이 이 설치 범위에 맞습니다. service는 `verified: DVWA initialized ... Wazuh connected`를, security는 `status: verified`, `waf_mode: DetectionOnly`, `suricata_mode: IDS`를 출력합니다.
+SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출, Mattermost 봇 인증, 60초 이내 Hermes heartbeat를 확인합니다. `model_requests_sent: 0`, `chat_messages_sent: 0`, `write_approval_configured: false`는 초기 설치 범위에 맞는 결과입니다. service는 독립 DVWA/DB, 4항목 카탈로그·고정 웹이미지3개, rootless sudo와 agent를 검사합니다. security는 `waf_mode: DetectionOnly`(DVWA), `lab_waf_mode: enforce_or_signed_session_exempt`(실습), `suricata_mode: IDS`를 구분합니다. 자동 IP 차단·Vector 설치는 포함하지 않습니다.
+
+`--check`는 패키지를 설치하지 않으므로 빈 서버에서 도구 누락으로 실패할 수 있습니다. `--apply`는 먼저 승인된 로컬 deb·이미지를 설치한 뒤 역할 검사를 합니다. 이때 역할 사전검사가 실패해도 앞서 설치한 OS 패키지는 자동 롤백되지 않습니다.
 
 ## 2. 최초 로그인
 
@@ -29,13 +31,14 @@ SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출,
 |---|---|---|
 | Wazuh Dashboard | `https://192.0.2.20/` | 사용자 `admin`; SIEM의 `/opt/capstone-prereqs/siem.json` 중 `indexer_password` |
 | Mattermost | `http://192.0.2.20:8065/` | 같은 JSON의 `mattermost_admin_username` / `mattermost_admin_password` |
-| DVWA, WAF 경유 | `http://192.0.2.10:8080/login.php` | 사용자 `admin`; service의 `/opt/capstone/service/credentials/admin-password` |
-| Log4Shell 요청 UI, WAF 경유 | `http://192.0.2.10:8080/log4shell/` | 별도 관리자 로그인 없음; 실습망 웹 접근 범위에서 Spring Boot 화면·상태 API·무해한 로깅 확인 |
+| DVWA, 독립 WAF 경유 | `http://192.0.2.10:8080/dvwa/` | 사용자 `admin`; service의 `/opt/capstone/service/credentials/admin-password` |
+| Lab Console | `https://lab.example.org/log4shell/` | 무키 실습 가능. 선택 차단 예외 키는 Dashboard `admin` 암호와 같음 |
+| Java 실습 | `https://lab.example.org/log4shell/labs/CVE-2021-44228/` | 콘솔에서 실행 후 같은 HTTPS 경로 사용. CSRF 세션은 앱이 별도로 관리 |
 | Hermes | 별도 웹 로그인 없음 | Mattermost의 `capstone` 팀 → `soc` 채널에서 봇 멘션 |
 
 Dashboard 로그인 암호는 Wazuh API용 `wazuh_api_password`와 다릅니다. `kibanaserver`는 Dashboard의 내부 연결용 계정이므로 관리자 로그인에 사용하지 않습니다. 계정 역할은 [Wazuh 공식 암호 관리 문서](https://documentation.wazuh.com/current/user-manual/user-administration/password-management.html)를 참고합니다.
 
-Dashboard에 로그인한 뒤 에이전트 목록에서 `capstone-security`, `capstone-service`의 연결 상태를 확인합니다. 새 환경에서 탐지 경보가 아직 없거나 보안 이벤트 조회가 빈 결과를 반환하는 것은 가능한 상태입니다. WAF는 `RelevantOnly`로 기록하므로 정상 로그인 페이지 GET마다 WAF 경보가 생기는 것도 아닙니다. 에이전트 연결, 로그 파일 생성, 경보 생성, 색인 표시를 각각 구분하며 실제 탐지 시나리오 시험은 별도 수행합니다.
+Dashboard에 로그인한 뒤 에이전트 목록에서 `capstone-security`, `capstone-service`의 연결 상태를 확인합니다. 새 환경에서 탐지 경보가 아직 없거나 보안 이벤트 조회가 빈 결과를 반환하는 것은 가능한 상태입니다. 독립 DVWA WAF는 `RelevantOnly`로 기록하므로 정상 로그인 페이지 GET마다 WAF 경보가 생기는 것은 아닙니다. 실습 WAF의 검사/감사 경로와 구분합니다. 에이전트 연결, 로그 파일 생성, 경보 생성, 색인 표시를 각각 구분하며 실제 탐지 시나리오 시험은 별도 수행합니다.
 
 ### 필요한 암호 한 개만 확인
 
@@ -106,16 +109,20 @@ Mattermost 관리자 계정은 설치 중 생성됩니다. 최초 화면에서 �
 
 WAF 주소로 로그인하고 기본 보안 수준이 `impossible`인지 확인합니다. 설치기가 DB와 계정을 이미 초기화하므로 `Setup / Reset DB`를 다시 실행하지 않습니다. 일반 관리 컴퓨터에서 `http://192.0.2.30/`에 직접 접근하면 Apache ACL의 `403`이 기대값입니다. 실제 네트워크 방화벽이 먼저 제한하는 환경에서는 연결 자체가 제한될 수도 있습니다. 실습을 위해 보안 수준을 낮추는 것은 별도 실습 작업이며 초기 구축 확인에 필요하지 않습니다.
 
-### Log4Shell 요청 UI 첫 사용
+### Lab Console·Java·선택 예외 키 첫 사용
 
-**실행 위치: 승인된 실습 클라이언트의 브라우저.** 신규 환경은 `http://SECURITY_HOST:WAF_PORT/log4shell/`로 접속합니다. 기본 예시는 `http://192.0.2.10:8080/log4shell/`입니다. 선택 `LOG4SHELL_HOSTNAME=log4shell.example.org`를 지정했다면 `http://log4shell.example.org:8080/`가 같은 이름의 `/log4shell/`로302 이동하는지도 확인합니다. 포트80일 때만 포트를 생략합니다. 기존 운영망의 대표 `http://log4shell.grootlab.duckdns.org/`와 예비 `http://192.168.16.230/log4shell/`은 A:80 경로이며 서로 다른 배포 주소를 혼용하지 않습니다.
+**허용된 내부망/VPN 클라이언트 브라우저**에서 `LAB_PUBLIC_ORIGIN/log4shell/`를 엽니다. 예시는 `https://lab.example.org/log4shell/`입니다. DNS/hosts는 security를 가리키고 인증서가 해당 이름과 일치해야 합니다. 옛 `LOG4SHELL_HOSTNAME`·HTTP 직접 Java 경로는 신규 설정이 아닙니다.
 
-1. 화면과 상태 API가 열리고 실행 중인 Java·Log4j API/core 버전을 표시하는지 확인합니다. 두 Log4j 버전은 `2.14.1`이어야 합니다.
-2. 요청 파라미터 입력으로 `capstone-spring-verification` 같은 무해한 메시지 한 건을 보냅니다. 실제 앱의 HTTP200·요청 ID·시각·로그 입력 응답을 확인합니다. 상태 API에서 받은 세션 쿠키·CSRF 정보는 브라우저가 사용하며 작업 기록에 복사하지 않습니다.
-3. 요청 헤더 입력은 고정된 `X-Api-Version` 또는 `User-Agent`를 사용합니다. 화면의 응답과 실제 Java 로그는 서로 다른 근거이므로 필요한 경우 서버 로그에서도 같은 요청 ID를 대조합니다.
-4. DVWA를 다시 열어 기존 로그인 페이지가 유지되는지 확인합니다. 기존 PHP 화면의 정상/헤더 누락 비교나 브라우저 이력은 새 앱의 인수 기준으로 사용하지 않습니다.
+1. 키 없이 카탈로그4개와 상태가 보이는지 확인합니다. 웹 실습3개는 `not_deployed` 또는 `stopped`여도 설치 상태로 정상일 수 있습니다. 이미지 존재와 `deployment_allowed=true`를 확인합니다. sudo는 별도 CLI 상태이며 웹 실행 버튼을 제공하지 않습니다.
+2. Java 항목을 선택해 실행합니다. 이는 관리자 또는 사용자가 요청한 **실제 컨테이너 기동**입니다. `running`을 확인하고 화면의 같은 HTTPS 링크를 엽니다. 로컬 포트18081을 클라이언트 컴퓨터의 localhost로 오해하지 않으며 SSH 터널이 필수는 아닙니다.
+3. Java·Log4j API/core2.14.1 표시를 확인하고 `capstone-spring-verification` 같은 무해한 메시지 한 건을 기록합니다. HTTP200·요청 ID·시각을 확인하되 CSRF 값·쿠키를 작업 기록에 복사하지 않습니다. Apache 두 버전은 각각 CVE-2021-41773/42013의 같은 origin 링크와 버전·정상 공개 파일만 확인합니다.
+4. 필요한 경우 `차단 예외 키 (선택)`에 Wazuh Dashboard `admin` 암호를 직접 입력합니다. 브라우저 WebCrypto가 30초·1회용 challenge에 HMAC 서명하며, 키 원문이나 고정 키 해시를 서버에 보내지 않습니다. 검증 후 입력/참조를 비우지만 완전한 메모리 삭제를 보장하는 기능은 아닙니다.
+5. 예외 적용 후 `관리자 실습 · 탐지만 기록`, 만료 시각을 확인합니다. 별도 HttpOnly 쿠키는600초 유효하며 같은 브라우저 탭 사이에 공유됩니다. `예외 해제` 후 일반 모드로 돌아오는지 확인합니다. 키·proof·쿠키를 개발자 도구나 로그에서 복사하지 않습니다.
+6. DVWA를 기존 독립 주소로 다시 열어 로그인 페이지가 유지되는지 확인합니다. DVWA는 콘솔 카탈로그와 예외 세션 적용 대상이 아닙니다.
 
-외부 요청은 WAF→Apache→Spring Boot로 이어집니다. Apache→앱 연결은 service 내부 `lab` 네트워크에서 끝나며 security의 Suricata 감시 NIC를 지나지 않습니다. 상태·로깅 API 성공은 HTTP 처리 확인이며 공격·LDAP 콜백·WAF/Suricata/Wazuh 탐지 E2E의 성공 증거가 아닙니다. 기존 A:8080 DNAT 시나리오 토글과도 별도 경로입니다.
+일반 모드는 정상 요청을 허용하고 보안 규칙에 걸릴 때 WAF에서 차단합니다. 콘솔 관리·인증 경로는 실습 WAF를 지나지 않고, 고정된 실제 실습3개 경로만 WAF를 통과합니다. 선택 예외는 해당 WAF 검사 정책만 바꾸며 Suricata·기존 L4/IP 차단·보호 주소·LLM 승인/TTL 정책을 해제하지 않습니다. 기존 IP 차단으로 접속이 끊긴 상태는 키 입력으로 복구할 수 없습니다.
+
+위 정상 요청은 앱 처리와 브라우저 연결의 근거입니다. 실제 취약점 공격·LDAP 콜백·Wazuh 상관/색인 E2E 성공을 의미하지 않습니다. WAF canary 차단/예외 시험과 보안 로그 수신 시험은 승인된 별도 검증으로 기록합니다. 신규 서버의 WAF raw 로그, Wazuh manager 수신, indexer 색인, Dashboard 표시도 각각 확인해야 합니다.
 
 ## 3. 서버별 읽기 검증
 
@@ -171,50 +178,35 @@ sudo jq '{role,state,schema}' /opt/capstone/service/manifest.json
 sudo cat /opt/capstone/service/phase
 sudo docker inspect --format '{{json .HostConfig.PortBindings}}' capstone-service-db
 sudo docker network inspect --format '{{.Internal}}' capstone-service_private
-sudo systemctl is-active wazuh-agent
+sudo systemctl is-active capstone-offline-labs capstone-offline-labs-broker capstone-offline-labs-guard wazuh-agent
 sudo sed -n "/^status=/p" /var/ossec/var/run/wazuh-agentd.state
 sudo docker exec capstone-service-dvwa apachectl -t
 ```
 
-DVWA와 MariaDB에 해당하는 `capstone-service-dvwa`, `capstone-service-db`는 `healthy`, Log4Shell 서비스는 실행 상태이며 Spring 상태 API와 무해한 로그 요청에 응답해야 합니다. service manifest의 `schema`는 `6`, `state`와 phase는 `complete`여야 합니다. DB와 Log4Shell 앱의 호스트 포트 바인딩은 `{}` 또는 `null`, private/lab 네트워크는 `true`, Wazuh agent는 `active`/`connected`, Apache는 구문 정상이어야 합니다. 실제 DB의 계정·초기화 상태와 선택한 HTTP hostname의 루트·잘못된 DVWA 경로302와 UI200은 `--verify`가 확인합니다. DNS의 실제 클라이언트 해석은 별도 확인합니다. 이전 service schema1/2/3/4/5는 자동 이관하지 않으므로 manifest 숫자만 고쳐 통과시키지 않습니다.
+`capstone-service-dvwa`와 `capstone-service-db`는 healthy, `capstone-service-gateway`는 running이어야 합니다. manifest는 `schema:7`, state와 phase는 complete입니다. DB 호스트 포트는 `{}` 또는 null, private 네트워크는 true, agent는 active/connected가 기준입니다. gateway는 service/loopback의 지정18091에 바인딩하며 security 출발지만 허용합니다. 웹 실습 컨테이너는 Compose에 직접 포함되지 않고 제한된 broker가 고정 image ID로 관리합니다.
 
-Log4Shell의 비공개 포트와 새 JAR을 추가 확인합니다. 출력은 지정된 메타데이터만 읽습니다.
-
-```bash
-set -euo pipefail
-lab_container=$(sudo docker compose --project-name capstone-service \
-  --project-directory /opt/capstone/service -f /opt/capstone/service/compose.json ps -q log4shell)
-test -n "$lab_container"
-sudo docker inspect --format '{{.State.Status}} {{json .HostConfig.PortBindings}}' "$lab_container"
-sudo docker network inspect --format '{{.Internal}}' capstone-service_lab
-sudo sha256sum /opt/capstone/service/config/log4shell-app.jar
-sudo jq -r .lab_jar_sha256 /opt/capstone/service/input.json
-unset lab_container
-```
-
-`--verify`의 Python 검증기는 host의 `nsenter --net`로 DVWA 네트워크 namespace의 localhost Apache에 요청하고 Spring 앱까지 확인합니다. 호스트 파일시스템과 Python을 사용하므로 컨테이너에 새 도구를 설치하지 않습니다. 이 검증은 무해한 메시지 한 건을 로그에 남기며, 클라이언트→WAF 경로 검증은 위 브라우저 절차와 구분합니다.
-
-### 같은 구성으로 Log4Shell 컨테이너 재생성 확인
-
-다음은 **schema6로 처음 구축한 service 서버**에서 운영자가 해당 작업을 승인한 경우에만 쓰는 범위다. 기존 Groot_C용 Compose·관리 스크립트와 경로가 다르다. 다른 서비스의 컨테이너·DB·agent는 재구성하지 않는다. 먼저 기존 소스와 설정으로 `deploy.sh --verify`가 성공하고 JAR 해시·마운트 소스가 일치하는지 확인한다.
+같은 서버에서 익명 상태 조회와 sudo의 **무해한 버전·격리 검사**를 확인할 수 있습니다. 실제 설정이 다른 gateway 포트이면 바꿉니다.
 
 ```bash
-# schema6 service 서버: 기존 파일과 입력을 유지한 동일 구성 재생성
-sudo docker compose --project-name capstone-service \
-  --project-directory /opt/capstone/service -f /opt/capstone/service/compose.json \
-  up --detach --no-deps --force-recreate --pull never --no-build log4shell
+curl --noproxy '*' --connect-timeout 5 --max-time 10 -fsS \
+  http://127.0.0.1:18091/_offline-labs/api/status | jq '{deployment_allowed,safety_error,labs}'
+sudo systemctl is-active user@1991.service capstone-sudo-status.timer
+sudo jq '{schema,checked_at,expires_at,labs}' /var/lib/capstone-offline-labs/nonweb-status.json
+sudo runuser -u capstone-sudo -- env XDG_RUNTIME_DIR=/run/user/1991 \
+  PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -B \
+  /opt/capstone-offline-labs/nonweb/sudo/lab.py verify
 ```
 
-이후 관리 컴퓨터에서 같은 `deploy.sh --verify --batch --config deployment/site.local.conf`를 실행한다. 검증은 고정 image ID·readonly JAR·Java entrypoint/command·`/app` 작업 디렉터리·환경값과 내부망·권한 제한을 대조하고 화면·API와 무해 로깅을 확인한다. 필수 환경변수의 누락·중복·다른 값도 거절한다. 재생성 완료 메시지만으로 앱 복구나 로그 검증 성공을 주장하지 않는다. 이번 저장소의 로컬 회귀는 이 계약과 거절 조건을 검사하며, 신규 3VM의 실제 재생성 성공을 입증한 기록은 아니다.
+위 CLI는 기동/중지하지 않습니다. sudo는 별도 UID1991 rootless daemon·network none·hostroot와 다른 UID/GID mapping·builtin seccomp2·최소 capability·자원 제한을 확인합니다. `ready`는 `environment_only`, `attack_tested=false`, `host_scenario_verified=false`이며 실제 권한상승이나 원래 host auditd 시나리오 성공이 아닙니다. 전용 컨테이너는 AppArmor 컨테이너 프로필 격리가 없고, 호스트 전역 AppArmor는 유지합니다. publisher는 root가 읽기 재검증한300초 receipt를60초마다 갱신하며 정지/오류/만료를 ready로 표시하지 않습니다.
 
-JAR·이미지·설정을 새 버전으로 바꾸는 작업은 같은 구성 재생성과 다르다. schema1~5의 manifest를 숫자만 고치거나 현재 바이트로 다시 기록하지 말고 별도 이관을 수행한다. 파일 누락은 원래 해시의 파일을 복구한 뒤 확인하고 빈 디렉터리·원본 이미지 앱으로 대체하지 않는다.
+전체 역할의 최종 검증은 controller `--verify`로 수행합니다. 정지된 웹 실습을 강제로 기동하거나 JAR 해시를 조회하는 구형 schema6 시험은 사용하지 않습니다. Java 이미지/카탈로그를 바꾸거나 관리 컨테이너를 수동 재생성하면 고정 계약/receipt 검사에 걸릴 수 있으므로 웹 broker와 명시된 운영 절차를 따릅니다. sudo의 `stop→up`은 승인된 고정 CLI 계약상 새 CID가 되며, 이 동작도 검증 명령과 구분합니다.
 
 ### security 서버
 
 ```bash
 sudo docker compose --project-name capstone-security \
   --file /opt/capstone/security/compose.json ps
-sudo jq '{status,agent,blocking_installed,vector_installed}' \
+sudo jq '{schema_version,status,agent,lab_waf_enforcement_installed,automatic_ip_blocking_installed,vector_installed}' \
   /opt/capstone/security/deployment.json
 sudo docker exec capstone-security-waf nginx -t
 sudo nft list table inet capstone_portable
@@ -225,7 +217,7 @@ sudo grep -E '^SecRuleEngine[[:space:]]' /opt/capstone/security/config/GROOT_A_W
 sudo docker inspect --format '{{json .Config.Cmd}}' capstone-security-suricata
 ```
 
-`capstone-security-waf`는 `healthy`, `capstone-security-suricata`는 실행 상태여야 합니다. Suricata 이미지에는 Docker healthcheck가 없을 수 있으므로 표에 `healthy`가 없다는 이유만으로 실패로 보지 않습니다. 최상위 검증은 엔진 시작 로그·고정 이미지·마운트·agent 상태를 추가 확인합니다. WAF 규칙 엔진은 `DetectionOnly`, Suricata 명령은 지정 NIC의 IDS 캡처와 `/rules/all.rules` 사용이 기준입니다. nft `capstone_portable`은 허용 테이블이며 차단 엔진이나 전체 방화벽 정책의 정상 판정을 대신하지 않습니다.
+security manifest/deployment는 `schema_version:2`, 완료 상태여야 합니다. `capstone-security-waf`는 healthy, `capstone-security-suricata`와 `capstone-security-lab-edge`는 running이어야 합니다. Suricata 이미지에는 Docker healthcheck가 없을 수 있으므로 표에 `healthy`가 없다는 이유만으로 실패로 보지 않습니다. 최상위 검증은 엔진 시작 로그·고정 이미지·마운트·agent 상태를 추가 확인합니다. 기본 DVWA WAF는 DetectionOnly이며, 별도 Lab Host/경로 정책은 일반 enforce 또는 유효한 서명 세션 exempt입니다. 기본 설정의 SecRuleEngine 한 줄만 보고 Lab 차단이 꺼졌다고 판단하지 않습니다. Suricata는 지정 NIC의 IDS 캡처와 `/rules/all.rules` 사용이 기준입니다. nft `capstone_portable`은 허용 테이블이며 차단 엔진이나 전체 방화벽 정책의 정상 판정을 대신하지 않습니다.
 
 security에서 service의 정상 웹 페이지에 접근해 실제 출발지/라우팅/ACL을 확인합니다.
 
@@ -234,12 +226,27 @@ SECURITY_HOST=192.0.2.10
 SERVICE_HOST=192.0.2.30
 ip route get "$SERVICE_HOST"
 curl --noproxy '*' --interface "$SECURITY_HOST" --connect-timeout 5 --max-time 10 \
-  -sS -o /dev/null -w 'backend HTTP %{http_code}\n' "http://$SERVICE_HOST:80/login.php"
+  -sS -o /dev/null -w 'backend HTTP %{http_code}\n' "http://$SERVICE_HOST:80/dvwa/login.php"
 curl --noproxy '*' --connect-timeout 5 --max-time 10 \
-  -sS -o /dev/null -w 'WAF HTTP %{http_code}\n' "http://$SECURITY_HOST:8080/login.php"
+  -sS -o /dev/null -w 'WAF HTTP %{http_code}\n' "http://$SECURITY_HOST:8080/dvwa/login.php"
 ```
 
 포트는 변경한 설정에 맞춥니다. 정상 DVWA 로그인 페이지는 HTTP `200`이 기준입니다. backend가 `403`이면 service가 실제로 보는 접속 IP와 입력한 security 주소가 다른지 먼저 확인합니다. `X-Forwarded-For`만 바꾸어 우회하지 않습니다. WAF가 정상 요청을 통과시킨다는 사실과 Suricata가 미러링 트래픽을 받는다는 사실도 별도로 확인해야 합니다.
+
+
+### 허용 클라이언트의 HTTPS 확인
+
+승인된 내부망/VPN 클라이언트에서 DNS·인증서 신뢰를 준비하고 읽기 요청을 수행합니다. `curl -k`를 사용하지 않습니다.
+
+```bash
+LAB_PUBLIC_ORIGIN=https://lab.example.org
+curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS \
+  "$LAB_PUBLIC_ORIGIN/log4shell/api/list" | jq 'map(.cve_id)'
+curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS \
+  "$LAB_PUBLIC_ORIGIN/log4shell/api/session" | jq '{mode,expires_at}'
+```
+
+카탈로그4개와 새 클라이언트의 `mode:enforce`, `expires_at:null`이 정상 기준입니다. 유효한 예외 쿠키가 있는 브라우저는 exempt일 수 있으며 위 curl은 브라우저 쿠키를 공유하지 않습니다. security 자체의 `--verify` TLS probe는 Docker SNAT/클라이언트 ACL로200 또는403을 허용하고 `allowed_client_e2e_verified:false`를 출력합니다. 따라서 서버 검사 성공과 허용 클라이언트200을 별도 확인합니다.403을 없애려고 전체 CIDR 허용·프록시 신뢰 범위를 확대하지 않습니다.
 
 ## 4. 파일·로그·완료 기록 위치
 
@@ -260,6 +267,12 @@ curl --noproxy '*' --connect-timeout 5 --max-time 10 \
 | `/opt/capstone/security/backup/ossec.conf.before` | 최초 agent 설정 백업 |
 | `/opt/capstone/service/{phase,manifest.json}` | service 마지막 phase 및 완료 manifest |
 | `/opt/capstone/service/evidence/*.log` | Compose·Apache·DB 초기화·agent 구문검사/시작 진단 |
+| `/opt/capstone/service/evidence/sudo-install.json`, `sudo-install.log` | 별도 rootless 초기 설치 결과/비공개 실패 진단 |
+| `/var/lib/capstone-offline-labs/install-state.json` | 콘솔 설치 stage·고정 파일·환경 receipt |
+| `/var/lib/capstone-offline-labs/nonweb-status.json` | root 발행 sudo 상태·시각·만료. 환경 검증 상태이며 공격 성공 기록 아님 |
+| `/var/lib/capstone-sudo-bootstrap/manifest.json` | sudo 초기 helper의 preparing/complete/verification_failed 상태 |
+| `/var/lib/capstone-sudo-bootstrap/recovery/` | sudo 운영 복구 archive·SHA. 임시파일이 아님 |
+| `/opt/capstone/security/config/lab-{edge,waf,policy}.conf`, `tls/` | schema2 HTTPS 진입점/실습 정책과 운영 TLS. 개인키 공유 금지 |
 | `/opt/capstone/service/evidence/ossec.conf.before` | service의 최초 agent 설정 백업 |
 | `/opt/capstone/service/logs/{access,error}.log` | DVWA Apache 로그 |
 | `/var/ossec/logs/ossec.log` | security/service의 Wazuh agent 진단 |
@@ -277,15 +290,18 @@ curl --noproxy '*' --connect-timeout 5 --max-time 10 \
 | `Permission denied (publickey)` | `SSH_USER`·`SSH_IDENTITY`, 올바른 공개키, 홈/`.ssh` 소유자·권한 | 사전 SSH 등록 절차 수정. 비밀번호 인증을 설치기에서 대신 활성화하지 않음 |
 | `sudo: a password is required` | 동일 계정의 `sudo -n true`, 배포용 sudoers 구문 | 콘솔에서 설치 관리자 권한 준비. LLM 계정에 sudo 권한 추가하지 않음 |
 | `two addresses resolve to the same server` | 세 IP가 같은 VM을 가리키는지, 복제 VM의 machine-id | 실제로 구분된 VM인지 콘솔 점검. 운영 중 machine-id를 임의 변경해 검사를 우회하지 않음 |
-| `missing package command` / `manual_package_missing_*` | README 수동 목록, Ubuntu/amd64 버전, PATH | 해당 대상 Linux 서버에서 누락 패키지 수동 설치 후 `--check`. Mac에 설치하지 않음 |
+| `missing package command` / `manual_package_missing_*` | README 수동 목록, Ubuntu/amd64 버전, PATH | 승인된 로컬 deb/전이 의존성을 artifacts.json에 준비. 새 환경 --apply가 오프라인 설치하며 Mac에는 설치하지 않음 |
 | `Docker daemon unavailable` / `compose_plugin_required` | `systemctl is-active docker`, `docker compose version` | Docker 서비스·plugin 수동 준비 수정. 기존 daemon 데이터 삭제 금지 |
-| `preloaded_*_image_required` / `image_architecture_not_linux_amd64` | 로컬 이미지 존재·참조·OS/Architecture | 검토된 amd64 이미지를 대상 서버에 수동 반입. 실행기가 pull할 것으로 기대하지 않음 |
-| bind source path does not exist / `unsafe_file` | `/opt/capstone/service/config/log4shell-app.jar`의 존재·일반 파일·SHA, override 모드이면 준비 JAR도 확인 | 정확한 기존 파일을 복구. `create_host_path: false` 제거·빈 디렉터리 생성·이미지 기본 앱 실행으로 우회하지 않음 |
-| `offline_lab_sources_invalid` | 자동 빌드 소스·resources·두 빌드 도구의 누락, 소유권·쓰기 권한·symlink 여부 | 원래 소스와 안전한 전송 상태를 복구. `--check`는 실제 컴파일을 하지 않음 |
-| `offline_log4shell_build_failed_private_evidence_preserved` | service의 root 전용 `evidence/log4shell-build.log`, 고정 이미지의 `javac 1.8.0_181`·기존 Boot JAR, 임시 컨테이너 정리 상태 | 후속 역할은 중단됨. 이미 구성된 SIEM과 부분 service 상태를 보존하고 원인을 확인. 이미지 pull·패키지 설치·기존 서비스 삭제로 자동 재시도하지 않음 |
-| `offline_build_evidence_mismatch` / `installed_lab_build_evidence_changed` | `evidence/log4shell-build.json`의 소스 지문·이미지 ID·결과 JAR SHA·라이브러리/loader 보존·임시 컨테이너 정리 근거 | 원래 입력과 파일을 대조. manifest나 증거를 현재 값으로 덮어써 통과시키지 않음 |
-| `invalid_prepared_log4shell_jar` | 새 Spring Boot JAR의 main class·정적 자산·Log4j API/core2.14.1, 중복 라이브러리·SHA | Linux 준비 서버에서 올바른 산출물을 다시 준비. 이전 앱 JAR이나 manifest 숫자로 우회하지 않음 |
-| `log4shell_digest_or_image_id_required` | `LOG4SHELL_IMAGE`가 태그인지 확인 | 검증된 repository digest 또는 로컬 `sha256:64자리` image ID 지정. 오프라인 반입용 태그는 설치 입력에 사용하지 않음 |
+| `preloaded_*_image_required` / `image_architecture_not_linux_amd64` | 로컬 이미지 존재·참조·OS/Architecture | 검토된 amd64 save archive·ID·SHA를 artifacts.json에 준비. --apply는 로컬 load만 하며 pull하지 않음 |
+| `artifact checksum mismatch` / `APT selected an unlisted package/removal` | 역할별 artifacts.json·원본 SHA·누락 전이 의존성 | 서명 검토한 준비 서버의 bundle을 수정. 대상 인터넷 다운로드·강제 의존성 무시 금지 |
+| `schema7_requires_prebuilt_manifest_images_not_legacy_jar_options` | 구형 LOG4SHELL_* 값 잔존 | 새 LAB_* 설정·고정 카탈로그/이미지 사용. 기존 schema6 환경은 별도 이관 |
+| `offline_lab_preflight_failed` / `offline_lab_prerequisites_invalid` | wheel 전체 목록·해시, 4항목 카탈로그, 고정3이미지, nft/systemd 조건 | 오류 원인을 확인하고 정확한 반입물을 복구. latest 대체·guard 생략 금지 |
+| `lab_common_key_precondition_failed` / 공통 키 전달 실패 | SIEM admin 암호 입력 계약·SSH pipe·service 키 root0600·기존 다른 키 | 원문을 로그에 출력하지 않고 연결 정책/권한을 점검. 기존 키를 덮어써 암호 회전하지 않음 |
+| TLS/private-network preflight 실패 | origin/port·SAN·키 일치·유효기간·허용 CIDR·/29 충돌 | DNS·인증서·네트워크 계획 수정. `-k`·전체 허용 CIDR로 우회 금지 |
+| 콘솔404/502 또는 실습503 | HTTPS→edge→gateway→콘솔, 실습 실행 상태·고정 경로 | 관리 API와 실제 WAF 실습 경로를 분리 확인. Java를 DVWA Apache의 직접 JAR 프록시로 복원하지 않음 |
+| 예외 인증401/429 | 입력 키·30초 challenge 만료/재사용·발급 제한·HTTPS/WebCrypto·시각 | 새 challenge로 재입력 또는 제한 시간 후 재시도. raw키/Bearer/고정해시 프로토콜은 거절되는 것이 정상 |
+| `deployment_allowed:false` | `safety_error`, nft guard·network 계약 | 배포가 차단된 원인을 복구. 상태 조회·관리 중지는 별도 가능하며 LLM에 일반 Docker 권한 추가 금지 |
+| sudo `needs_setup` / `sudo_runtime_install_failed_private_evidence_preserved` | UID1991/subid 충돌, OS 전제, 고정 bundle, manifest phase, rootless/publisher receipt TTL | 부분 상태를 보존하고 전용 helper 근거로 복구. host sudo 변경·전역 userns/AppArmor 완화 금지 |
 | `prepared_image_validation` 실패 | [Hermes 이미지 준비](hermes-image.md)의 기반 이미지, MCP SDK, regex 버전·가드 해시 | Linux에서 이미지를 올바르게 준비하고 검증. 이 단계가 root 상태 생성 전 실패했는지도 확인 |
 | `existing_*`, `deployment_incomplete`, `partial/different-profile` | 이전 완료/부분 설치 기록, VM이 기존 운영 서버인지 | 현재 상태 보존 후 수동 복구 계획. 디렉터리·receipt·볼륨·agent 키 삭제로 fresh 조건 만들지 않음 |
 | `*_port_*used*` / `backend_port_in_use` | `sudo ss -lntup`의 해당 포트 소유 프로세스 | 기존 서비스 용도를 확인한 뒤 주소/설치 대상 계획 수정. 프로세스 강제 종료 금지 |
@@ -297,11 +313,6 @@ curl --noproxy '*' --connect-timeout 5 --max-time 10 \
 | `health_timeout_core` / Indexer 시작 실패 | SIEM 메모리·디스크·vm.max_map_count, 제한된 indexer 로그 | 자원·커널 설정·권한 등 구체적 원인 해결. 초기화/볼륨 제거로 재시도하지 않음 |
 | WAF `502`, backend 연결 실패 | security→service IP/포트/라우트, DVWA·DB health | 백엔드 연결부터 복구한 뒤 WAF 경유 GET 재검증 |
 | WAF 경유 DVWA `403` | service Apache가 보는 실제 TCP peer, security 출발지·NAT | 주소/라우팅을 의도한 구조에 맞춤. ACL을 전체 허용으로 바꾸어 통과시키지 않음 |
-| `/log4shell/` 화면/API가404 | Apache proxy/proxy_http, prefix 보존 `/log4shell/` 프록시, Spring context path·새 JAR | PHP 웹 파일을 복원하지 말고 새 앱과 고정 경로를 확인. 새 공개8080을 열지 않음 |
-| Log4Shell 별도 이름만 실패하거나 DVWA가 나옴 | `LOG4SHELL_HOSTNAME`, DNS/hosts→security 주소, WAF 포트, 요청 Host 확인 | 빈 설정이면 IP `/log4shell/` 사용. 기존 배포의 hostname을 변경하려고 manifest만 수정하거나 역할을 덮어쓰지 않음 |
-| UI502/503 또는 Spring 상태 검사 실패 | lab 컨테이너·JAR SHA·실제 Log4j 버전, `SERVER_ADDRESS=0.0.0.0`, context path, 내부 DNS·lab 네트워크 | JAR과 고정 프록시 경로부터 대조. 일반 sudo/Docker 권한을 LLM에 추가하거나 공개 포트로 우회하지 않음 |
-| 헤더 누락 시험에서 대상400 | UI 응답의 대상 상태와 요청 모드 | 기대 결과. 정상 헤더 모드의200과 구분해 기록 |
-| UI429 또는 기록이 다른 장치에 없음 | 요청 간격·같은 브라우저 저장소 여부 | 1초 이상 기다려 재확인. 최근20개 로컬 기록과 SIEM 로그는 별개 |
 | Suricata 실행되나 이벤트가 없음 | 감시 NIC, link/패킷 카운터, 가상 스위치 미러링, 트래픽 경로 | 정상 요청이 해당 NIC에 도달하는지부터 확인. 경보 0개만으로 장애/정상 판정하지 않음 |
 | Mattermost 접속되나 봇 무응답 | 관리자 계정인지, SOC 채널인지, 멘션 여부, gateway heartbeat | 허용 정책과 WebSocket 연결을 먼저 확인한 뒤 모델/MCP 순서로 분리 진단 |
 | Hermes LLM 오류·느림 | `LLM_BASE_URL`의 `/v1`, 실제 모델명, SIEM에서 LLM 경로/지연 | API 모델 목록·서비스 상태를 읽기 조회. 모델 학습·다운로드나 서버 변경을 설치 재실행으로 해결하지 않음 |
@@ -344,7 +355,13 @@ curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS "$LLM_BASE_URL/models"
 
 ```bash
 python3 -B deployment/tests/test_controller.py
+python3 -B deployment/tests/test_prerequisites.py
+python3 -B deployment/tests/test_lab_key.py
+python3 -B deployment/tests/test_offline_security.py
+python3 -B deployment/test_offline_service.py
 bash deployment/roles/siem-test.sh
+bash deployment/roles/service-test.sh
+python3 -B -m unittest discover -s infra/groot-c/offline-labs/nonweb/sudo/runtime -p test_bootstrap.py
 ```
 
-이 검사는 controller의 가짜 SSH 흐름과 SIEM 구성 생성·검증 함수의 회귀를 확인합니다. 통과 결과는 새 VM의 설치 성공, 실제 인증/DB 동작, 패킷 탐지, 모바일 알림 성공을 대신하지 않습니다. 신규 환경의 최종 인수 기록에는 사용 소스 commit, 대상 역할, 수동 준비 버전/이미지 ID, `--verify` 결과, 브라우저 로그인, 정상 웹 요청, 관리자의 봇 질의 결과와 미검증 항목을 나누어 남깁니다. 비밀값은 기록하지 않습니다.
+이 검사는 controller의 가짜 SSH 순서, 반입물·키 프로토콜, SIEM/service/security 설정 생성, sudo bootstrap의 실패·권한 계약을 확인합니다. 통과 결과는 새 VM의 설치 성공, 실제 인증/DB 동작, 패킷 탐지, 모바일 알림 성공을 대신하지 않습니다. 신규 환경의 최종 인수 기록에는 사용 소스 commit, 대상 역할, 수동 준비 버전/이미지 ID, `--verify` 결과, 브라우저 로그인, 정상 웹 요청, 관리자의 봇 질의 결과와 미검증 항목을 나누어 남깁니다. 비밀값은 기록하지 않습니다.

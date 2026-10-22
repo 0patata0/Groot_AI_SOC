@@ -1,0 +1,24 @@
+[Unit]
+Description=Restricted offline lab Docker broker
+After=docker.service capstone-offline-labs-guard.service
+Requires=docker.service capstone-offline-labs-guard.service
+[Service]
+Type=simple
+User=root
+Group=capstone-labs
+EnvironmentFile=/etc/capstone-offline-labs/settings.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+WorkingDirectory=/opt/capstone-offline-labs
+ExecStart=/usr/bin/python3 -B /opt/capstone-offline-labs/broker.py
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=capstone-offline-labs
+RuntimeDirectoryMode=0750
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/run/capstone-offline-labs /var/lib/capstone-offline-labs
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+[Install]
+WantedBy=multi-user.target

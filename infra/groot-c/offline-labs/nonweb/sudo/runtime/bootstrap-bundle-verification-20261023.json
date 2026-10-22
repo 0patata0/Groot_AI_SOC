@@ -1,0 +1,98 @@
+{
+  "before_after": {
+    "config_sha256": {
+      "/etc/apparmor.d/opt.capstone-sudo-rootless.29.8.1.bin.rootlesskit": "08e5ea44aacce5bee78094a31789c2dc9cb11063f36bdea856bb8dc388371255",
+      "/etc/capstone-sudo-lab/config.json": "4d73c02c1c81ff1997db407b911c276b5cb1d05691de58e6f9b8548f18d3e615",
+      "/etc/capstone-sudo-lab/daemon.json": "b883dc3f3a4ff1136d2e0439057d22f1472c6516ab24c2838d4c4c1ed45bb96f",
+      "/etc/systemd/system/capstone-sudo-status.service": "26ff0f9804ebe7f6da78d85437a8e369466cb5e81834daab03621709196be5ec",
+      "/etc/systemd/system/capstone-sudo-status.timer": "ab08306df7fb004f18465e4511b8a15ed0b0718c1066a4100db9c58c3e7370d4",
+      "/etc/systemd/system/user@1991.service.d/capstone-sudo.conf": "e91f5e56e7bd44bfc9049df6f9c0b929966f5776cc969cbc7b4740ecbd5c8ab8",
+      "/opt/capstone-offline-labs/nonweb/sudo/lab.py": "9dcb05226db9fd5464cc0cb2168f4833b009f489171c65fadeaa3ace29378100",
+      "/opt/capstone-offline-labs/nonweb/sudo/publish.py": "4db72b8e3ce05b5adc4bbbe462203bf3bd73a0c96eb7a6039effa09569c6077b"
+    },
+    "host_sudo": "install ok installed|1.8.31-1ubuntu1",
+    "operator_uid": 1991,
+    "runtime_containers": "f90aacb7046450fc93aa4e468b847153acb4b1b91a74a2a0daf8b7ebe0c23766|sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a|running",
+    "services": {
+      "capstone-sudo-status.timer": "active",
+      "docker.service": "active",
+      "user@1991.service": "active"
+    }
+  },
+  "bundle": "/var/lib/capstone-offline-labs/offline-sudo-20261022/bootstrap-bundle",
+  "checked_at": 1792684964,
+  "diff_ids": [
+    "sha256:470b66ea5123c93b0d5606e4213bf9e47d3d426b640d32472e4ac213186c4bb6",
+    "sha256:438da765d9e8e3ea33c511de9ce396980249d57f00d5ec4bdd18077069088e8b",
+    "sha256:379cc5424eb6ff01f91b39543721fd174987182e0d659102208f2c8f4dbbc9d5",
+    "sha256:0a3c8928a0d4dd884ba252ce2ef7df856135582f7a5cbea3491330d08e38bcc4",
+    "sha256:bf2f99f1e6083fe433d98028265c199541d69c31fe1a32e963c73dd5391f28ec"
+  ],
+  "files": {
+    "docker-ce-rootless-extras_29.8.1-1~ubuntu.24.04~noble_amd64.deb": {
+      "sha256": "02897501837b7ff4fec8248decdd5828b7d40d7f591021a91f29673e02d0f982",
+      "size": 10177712
+    },
+    "docker.InRelease": {
+      "sha256": "086b344e5b421b8fc0379a50b46a1842ae52833f1ea8361ff6ebd58778d0d729",
+      "size": 48475
+    },
+    "docker.Packages.gz": {
+      "sha256": "cabe5c7534eb6e767d8dcf244d8567b161190b53dbf5e9f411067a3f791f62d7",
+      "size": 86848
+    },
+    "docker.asc": {
+      "sha256": "1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570",
+      "size": 3817
+    },
+    "preparation.json": {
+      "sha256": "8c69d341e14798ec161d093031f0ae54473d7d089166c3eedba6bbda0ce042ff",
+      "size": 973
+    },
+    "sudo-image.tar": {
+      "sha256": "db6a201143ad6372d24c91fed6e04f58206abad535941d39e6f5ad2ac79c5389",
+      "size": 28681728
+    },
+    "sudo.InRelease": {
+      "sha256": "cc9be89a0984aeca9e3ca40ae0e6decff75aa32653a5925b04956a7c12487e99",
+      "size": 264892
+    },
+    "sudo.Packages.xz": {
+      "sha256": "7757921ff8feed9c3934a0c9936d441ba4a238bee3ea6c8c1df5cbcd43fc9861",
+      "size": 970408
+    },
+    "sudo.deb": {
+      "sha256": "de4106cd19a5b9f8acac9e0ab5f40f218d3ac321cc58143e051baab064a5fb36",
+      "size": 512808
+    },
+    "ubuntu-archive-keyring.gpg": {
+      "sha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31",
+      "size": 3607
+    }
+  },
+  "host_sudo_unchanged": true,
+  "installation_applied": false,
+  "manifest_sha256": "f974ea354d6455ad7da5e25e24f6c3fe0ed22d0c5c41b8ada7700d1fe7c6860d",
+  "new_vm_installation_tested": false,
+  "oci_manifest_id": "sha256:3a7816fe014c0a9e33b36b869dcd65b0e9662cb51f78271254b396502dd53ab7",
+  "runtime_image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+  "runtime_unchanged": true,
+  "schema": 1,
+  "scope": "static-offline-bootstrap-artifact-verification",
+  "signatures": {
+    "docker_signature_verified": true,
+    "scope": "pinned_historical_artifact_authenticity",
+    "ubuntu_signature_verified": true
+  },
+  "source_sha256": {
+    "lab.py": "9dcb05226db9fd5464cc0cb2168f4833b009f489171c65fadeaa3ace29378100",
+    "prepare.py": "824893016dacae08ea5a2c44e4754432845213e843665d9a5fe3be8a0f58bc24",
+    "runtime/bootstrap.py": "d0b3e5c16d53d271845abb4ae557f524332e8297644a0fa039b38b6adacc093f",
+    "source.json": "05aa0e63913c702ed50f4453a61e9620919fc322a30e24b3aa2d63201c7f528b"
+  },
+  "verified_binaries": {
+    "dockerd-rootless-setuptool.sh": "1c9f0dc93ebb3d75255254ec760d26a912affba7f329ab8abffe8e25eb0b3f94",
+    "dockerd-rootless.sh": "200203633806081a401e60aefdf68a8fa73fc7dc80aa854c52a69d47710a3488",
+    "rootlesskit": "d3193fceef47224470db5e9b85ed5725fc046279dfc4fb504c9310350efe6b21"
+  }
+}

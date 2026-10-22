@@ -1,0 +1,11 @@
+[Unit]
+Description=Offline lab network isolation
+After=docker.service
+Requires=docker.service
+Before=capstone-offline-labs-broker.service
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -B /opt/capstone-offline-labs/guard.py install
+RemainAfterExit=yes
+[Install]
+WantedBy=multi-user.target

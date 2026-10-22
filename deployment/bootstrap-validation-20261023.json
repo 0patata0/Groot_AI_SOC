@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "checked_at": 1792686385,
+  "scope": "Single-entry offline initial setup and deployed console theme",
+  "new_three_vm_apply_tested": false,
+  "mock_tests": {
+    "controller": 24,
+    "security": 14,
+    "prerequisites": 12,
+    "common_key": 11,
+    "service": 39,
+    "console_bootstrap": 14,
+    "sudo_bootstrap": 27
+  },
+  "syntax": {
+    "bash": 9,
+    "python_ast": 35,
+    "javascript": true
+  },
+  "native_security": {
+    "after_containers": {
+      "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e": {
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "name": "/waf-before-20261015",
+        "running": false,
+        "started_at": "2026-10-14T16:48:19.627014915Z"
+      },
+      "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403": {
+        "image": "sha256:bd3cc628e59c8865f88a3bbe99c1029c12a9983b2cb88a9b03913f43d4f5aa79",
+        "name": "/chatproxy",
+        "running": true,
+        "started_at": "2026-09-29T01:44:03.48454989Z"
+      },
+      "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d": {
+        "image": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+        "name": "/suricata",
+        "running": true,
+        "started_at": "2026-10-14T14:54:24.549491773Z"
+      },
+      "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81": {
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "name": "/waf",
+        "running": true,
+        "started_at": "2026-10-14T19:16:02.328349981Z"
+      }
+    },
+    "before_containers": {
+      "02fb9ec3db38b01ccc49b61c7ca57d41e745d691cf0acd97a8b9978b16e1f41e": {
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "name": "/waf-before-20261015",
+        "running": false,
+        "started_at": "2026-10-14T16:48:19.627014915Z"
+      },
+      "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403": {
+        "image": "sha256:bd3cc628e59c8865f88a3bbe99c1029c12a9983b2cb88a9b03913f43d4f5aa79",
+        "name": "/chatproxy",
+        "running": true,
+        "started_at": "2026-09-29T01:44:03.48454989Z"
+      },
+      "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d": {
+        "image": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+        "name": "/suricata",
+        "running": true,
+        "started_at": "2026-10-14T14:54:24.549491773Z"
+      },
+      "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81": {
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "name": "/waf",
+        "running": true,
+        "started_at": "2026-10-14T19:16:02.328349981Z"
+      }
+    },
+    "checked_at_utc": "2026-10-22T16:23:20.277546+00:00",
+    "configs_sha256": {
+      "GROOT_A_WAF.conf": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+      "lab-edge.conf": "afa76a13544062ba2678f60735396cd72f2320dec8b62225fd1ae6aae8359adc",
+      "lab-policy.conf": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db",
+      "lab-waf.conf": "3a980dfa8111301780a099424a7424cea8c9ef68e4c91eb3c16ebe6d5b255cdd"
+    },
+    "current_local_helper_matches_tested": true,
+    "edge_followup_file": "security-native-edge-followup.json",
+    "edge_test_only_global_directive": "user root;",
+    "edge_uid101_key_readability_verified": false,
+    "fresh_apply_run": false,
+    "helper_sha256": "fc64cf03d8ba904f8d48a986ce7ae6f8d89ec0a351529bd8657a34ad615264e9",
+    "initial_attempt_file": "security-native-validation-initial.json",
+    "initial_edge_attempt": {
+      "command_returncode": 1,
+      "container_id": "2723317088dc35e93190a8b782665b51a62110a0de1163891f7fa28687d82b85",
+      "diagnostic": [
+        "2026/10/22 16:19:46 [emerg] 1#1: chown(\"/tmp/client\", 101) failed (1: Operation not permitted)",
+        "nginx: [emerg] chown(\"/tmp/client\", 101) failed (1: Operation not permitted)"
+      ],
+      "exit_code": 1,
+      "image_id": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+      "kind": "edge",
+      "log_sha256": "30bdb77456d9026922b9abc3183f905424c00fa688daf5cdad47bc1837d307a3",
+      "network": "none",
+      "passed": false,
+      "published_ports": 0,
+      "read_only_rootfs": true,
+      "syntax_success_marker": false,
+      "user": "0:0"
+    },
+    "network_created": false,
+    "new_three_vm_e2e_verified": false,
+    "notes": [
+      "The existing TLS key remains root:root 0600 on A. Root was used only for the isolated edge syntax test.",
+      "The initial root/cap-drop-ALL test tried to chown a temporary directory to nginx UID 101. The followup added only nginx global user root; to avoid that test-only chown.",
+      "The production candidate specifies user 101:101 and prepares its separately owned key with UID 101 and mode 0400; that fresh-install file ownership and full new-host runtime were not exercised here."
+    ],
+    "operational_configuration_and_tls_bytes_permissions_unchanged": true,
+    "operational_container_identity_unchanged": true,
+    "original_tls_key_readonly_bind": true,
+    "passed": true,
+    "private_key_copied": false,
+    "private_key_exported": false,
+    "private_key_permissions_changed": false,
+    "published_ports": 0,
+    "schema": 1,
+    "scope": "existing_A_image_isolated_nginx_syntax_only",
+    "services_unchanged": true,
+    "temporary_server_directory_removed": true,
+    "test_containers_removed": true,
+    "tests": [
+      {
+        "command_returncode": 0,
+        "container_id": "f050d8b28c200e095dfbccf18e735853ded297aef8174ecb32b543ff3f256c68",
+        "diagnostic": [],
+        "exit_code": 0,
+        "image_id": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "kind": "waf",
+        "log_sha256": "e25b53321280ba61cfc5deff0e15178001cd554bea8d9ba656e1743b6b2f4b78",
+        "network": "none",
+        "passed": true,
+        "published_ports": 0,
+        "read_only_rootfs": false,
+        "syntax_success_marker": true,
+        "user": "nginx"
+      },
+      {
+        "command_returncode": 0,
+        "container_id": "c6cffed2e5cf39455386971460e02b94c059e0dbd8550bd48bcb41cac9365532",
+        "diagnostic": [],
+        "exit_code": 0,
+        "image_id": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "kind": "edge",
+        "log_sha256": "bc0f15d57d6fd0d8aaac8f081fb65074ad361cdedae78e79460b1881a031a6b3",
+        "network": "none",
+        "passed": true,
+        "published_ports": 0,
+        "read_only_rootfs": true,
+        "syntax_success_marker": true,
+        "user": "0:0"
+      }
+    ],
+    "tls_serving_started": false
+  },
+  "ui": {
+    "checked_at": 1792686161,
+    "assets": {
+      "index.html": {
+        "sha256": "f4416dc4cac07e6a4d65220309e232a71e3afd42ec24b7fa957b64ad66ae09a4",
+        "pass": true
+      },
+      "style.css": {
+        "sha256": "3c1c94aa540330c204f9fb59f5cb570e0d0fa8e12577e42b937336a749aa6d97",
+        "pass": true
+      },
+      "theme.js": {
+        "sha256": "85f59895ca4395250ea10f1200a48b7951dcd3b90900bcaa764597ba8b5d9478",
+        "pass": true
+      },
+      "theme.css": {
+        "sha256": "d785eabdf42911b869bc7c35ddb791ae72c2f5b51fe7f7478604496db14bc05e",
+        "pass": true
+      }
+    },
+    "browser": "Safari",
+    "refreshed_before_checks": true,
+    "visual_modes": {
+      "console": [
+        "dark",
+        "light"
+      ],
+      "java": [
+        "dark",
+        "light"
+      ],
+      "httpd49": [
+        "dark",
+        "light"
+      ],
+      "httpd50": [
+        "dark",
+        "light"
+      ]
+    },
+    "temporary_tabs_closed": true,
+    "actual_attack_executed": false
+  },
+  "public_application_checks": 35,
+  "native_application_tests": 66,
+  "secret_scan": {
+    "mode": "tracked working-tree, offline, fully redacted",
+    "raw_candidates": 4,
+    "runtime_generation_expressions": 2,
+    "test_fixtures": 2,
+    "credential_files_excluded": true,
+    "history_scanned": false
+  },
+  "limits": [
+    "No new three-VM installation, reboot or actual vulnerability attack E2E",
+    "Native edge syntax test used root user only; UID101 TLS key readability requires fresh environment verification"
+  ]
+}

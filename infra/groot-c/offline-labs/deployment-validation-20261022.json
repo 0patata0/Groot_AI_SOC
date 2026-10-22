@@ -1,0 +1,1949 @@
+{
+  "schema": 2,
+  "recorded_at": "2026-10-22T13:04:23.180667+00:00",
+  "url": "https://log4shell.grootlab.duckdns.org/log4shell/",
+  "scope": "Offline CVE console and same-origin WAF lab; anonymous lifecycle; one-time HMAC exception using existing Wazuh Dashboard admin password",
+  "host_runtime": {
+    "os": "Ubuntu 24.04 amd64",
+    "python": "3.12.3",
+    "docker": "29.8.1",
+    "docker_path": "/usr/local/bin/docker",
+    "nftables": "1.0.9"
+  },
+  "image": {
+    "checked_at": "2026-10-22T11:30:30.438468+00:00",
+    "tag": "groot-labs/log4shell:2.14.1",
+    "image_id": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36",
+    "base_id": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+    "jar_sha256": "16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053",
+    "archive": "/var/lib/capstone-offline-labs/images/log4shell-2.14.1.tar",
+    "archive_sha256": "9735e6769ff795f2941ebf82d7463971fcdb84789fd76eb8434a4a6dc15a2fc7",
+    "archive_bytes": 139172864,
+    "context_removed": true
+  },
+  "dependency_inventory": "wheel-inventory.json",
+  "dependency_count": 14,
+  "ownership": {
+    "web_user": "capstone-labs",
+    "web_has_docker_socket_or_group": false,
+    "broker_transport": "root-controlled Unix socket with peer UID/GID and fixed manifest actions",
+    "soc_llm_privileges_expanded": false
+  },
+  "resolved_candidate_failures": [
+    "Native nft JSON ct-state is an array; guard semantic validation adjusted before public switch",
+    "Vendor directories were 0750 under umask027; unpacker and installed directories corrected to0755 before public switch",
+    "C-origin access to A:443 timed out; actual authorized Mac client tested with system CA and hostname verification",
+    "Mac Python default trust store lacked issuer; system CA exported in memory without disabling TLS validation",
+    "Immediate check after FastAPI restart returned503; ready-state complete HTTPS checks passed",
+    "Existing raw rotation deferred before change, briefly reader_restart_guard_failed; scheduler later started Vector naturally and Wazuh manager delivery was directly verified",
+    "Raw URI prefix did not match normalized Nginx location for slash/dot/percent-encoded paths; removed redundant URI conditions from dedicated Host rules, verified all six variants in enforce/exempt/disabled modes",
+    "First narrow rule update lacked docker exec --user0 for chmod; restored previous rule and reloaded, then corrected permissions and applied verified update",
+    "Path test GETs rotated Java CSRF cookie; fixture now obtains matching fresh token before POST"
+  ],
+  "limits": [
+    "No exploit/callback or full attack-to-LLM-response E2E; rule10032 is a harmless synthetic policy canary",
+    "No host reboot or new VM complete installation test",
+    "One actual prepared CVE; additional CVEs need compatible local images and reviewed same-origin proxy routes",
+    "WAF exemption is scoped to this lab, not Suricata or pre-existing L4 IP blocks; protected addresses and LLM/MCP/approval/TTL policies unchanged",
+    "Management API bypasses WAF; actual Java practice traverses WAF; only validated mode and Java cookies are forwarded",
+    "New WAF files survive container restart but need explicit apply-waf.py reapplication after full container recreation",
+    "Existing legacy Java container preserved separately, not controlled by new UI",
+    "Source and runtime isolation do not assert that every existing server is physically air-gapped"
+  ],
+  "initial_phase": {
+    "tests": {
+      "native_unit_tests": {
+        "passed": true,
+        "count": 25,
+        "method": "Python3.12 unittest test_app test_broker with installed vendor on C",
+        "output": "test_api_requires_authentication (test_app.AppTests.test_api_requires_authentication) ... Executing <Task finished name='Task-1' coro=<AppTests.asyncSetUp() done, defined at /var/tmp/capstone-offline-labs-20261022/test_app.py:13> result=None created at /usr/lib/python3.12/asyncio/runners.py:100> took 1.041 seconds\nok\ntest_bound_body_and_valid_id (test_app.AppTests.test_bound_body_and_valid_id) ... ok\ntest_cross_origin_write_rejected (test_app.AppTests.test_cross_origin_write_rejected) ... ok\ntest_exact_manifest_and_local_assets (test_app.AppTests.test_exact_manifest_and_local_assets) ... ok\ntest_no_arbitrary_docker_parameters (test_app.AppTests.test_no_arbitrary_docker_parameters) ... ok\ntest_status_dictionary_adapted (test_app.AppTests.test_status_dictionary_adapted) ... ok\ntest_command_environment_and_extra_network_are_rejected (test_broker.Broker.test_command_environment_and_extra_network_are_rejected) ... ok\ntest_deploy_registers_before_start_and_is_idempotent (test_broker.Broker.test_deploy_registers_before_start_and_is_idempotent) ... ok\ntest_foreign_container_is_never_adopted_started_or_stopped (test_broker.Broker.test_foreign_container_is_never_adopted_started_or_stopped) ... ok\ntest_guard_and_network_contract_gate_deploy (test_broker.Broker.test_guard_and_network_contract_gate_deploy) ... ok\ntest_missing_or_retagged_or_volume_image_never_creates (test_broker.Broker.test_missing_or_retagged_or_volume_image_never_creates) ... ok\ntest_receipt_full_id_prevents_same_name_replacement (test_broker.Broker.test_receipt_full_id_prevents_same_name_replacement) ... ok\ntest_running_container_must_have_actual_loopback_port_binding (test_broker.Broker.test_running_container_must_have_actual_loopback_port_binding) ... ok\ntest_runtime_changes_block_restart_and_stop (test_broker.Broker.test_runtime_changes_block_restart_and_stop) ... ok\ntest_status_before_deployment_has_no_mutations (test_broker.Broker.test_status_before_deployment_has_no_mutations) ... ok\ntest_status_preserves_inventory_when_network_contract_is_broken (test_broker.Broker.test_status_preserves_inventory_when_network_contract_is_broken) ... ok\ntest_status_preserves_managed_stop_when_guard_is_broken (test_broker.Broker.test_status_preserves_managed_stop_when_guard_is_broken) ... ok\ntest_stop_is_non_destructive_and_guard_failure_does_not_block_it (test_broker.Broker.test_stop_is_non_destructive_and_guard_failure_does_not_block_it) ... ok\ntest_stopped_container_is_validated_before_restart (test_broker.Broker.test_stopped_container_is_validated_before_restart) ... ok\ntest_unregistered_inputs_cannot_reach_docker_mutation (test_broker.Broker.test_unregistered_inputs_cannot_reach_docker_mutation) ... ok\ntest_defaults_and_low_internal_port (test_broker.Manifest.test_defaults_and_low_internal_port) ... ok\ntest_manifest_rejects_bad_inputs (test_broker.Manifest.test_manifest_rejects_bad_inputs) ... ok\ntest_bounded_single_json_frame (test_broker.Protocol.test_bounded_single_json_frame) ... ok\ntest_docker_errors_hide_stderr_and_clear_environment (test_broker.Protocol.test_docker_errors_hide_stderr_and_clear_environment) ... ok\ntest_peer_uid_and_primary_gid_are_both_checked (test_broker.Protocol.test_peer_uid_and_primary_gid_are_both_checked) ... ok\n\n----------------------------------------------------------------------\nRan 25 tests in 1.301s\n\nOK\n"
+      },
+      "native_lifecycle": {
+        "checked_at": "2026-10-22T11:39:34.372156+00:00",
+        "deploy": [
+          200,
+          {
+            "lab": {
+              "container_id": "eb55ca320453",
+              "image_present": true,
+              "status": "running",
+              "url": "http://127.0.0.1:18081/log4shell/"
+            },
+            "ok": true
+          }
+        ],
+        "deploy_again": [
+          200,
+          {
+            "lab": {
+              "container_id": "eb55ca320453",
+              "image_present": true,
+              "status": "running",
+              "url": "http://127.0.0.1:18081/log4shell/"
+            },
+            "ok": true
+          }
+        ],
+        "java_status": {
+          "ok": true,
+          "log4jApiVersion": "2.14.1",
+          "log4jCoreVersion": "2.14.1",
+          "javaVersion": "1.8.0_181",
+          "time": "2026-10-22T20:39:41.492+09:00"
+        },
+        "java_http": 200,
+        "stop": [
+          200,
+          {
+            "lab": {
+              "container_id": "eb55ca320453",
+              "image_present": true,
+              "status": "stopped",
+              "url": "http://127.0.0.1:18081/log4shell/"
+            },
+            "ok": true
+          }
+        ],
+        "restart": [
+          200,
+          {
+            "lab": {
+              "container_id": "eb55ca320453",
+              "image_present": true,
+              "status": "running",
+              "url": "http://127.0.0.1:18081/log4shell/"
+            },
+            "ok": true
+          }
+        ],
+        "final": [
+          200,
+          {
+            "labs": [
+              {
+                "cve_id": "CVE-2021-44228",
+                "container_id": "eb55ca320453",
+                "image_present": true,
+                "status": "running",
+                "url": "http://127.0.0.1:18081/log4shell/"
+              }
+            ],
+            "checked_at": 1792669182,
+            "offline": true,
+            "deployment_allowed": true,
+            "safety_error": null
+          }
+        ]
+      },
+      "public_https_and_api": {
+        "checked_at": "2026-10-22T11:42:01.166206+00:00",
+        "checks": [
+          {
+            "name": "TLS hostname verification and UI",
+            "passed": true,
+            "status": 200
+          },
+          {
+            "name": "static/style.css",
+            "passed": true,
+            "status": 200
+          },
+          {
+            "name": "static/app.js",
+            "passed": true,
+            "status": 200
+          },
+          {
+            "name": "list requires authentication",
+            "passed": true,
+            "status": 401
+          },
+          {
+            "name": "manifest authorized",
+            "passed": true,
+            "status": 200
+          },
+          {
+            "name": "running and deployment guard",
+            "passed": true,
+            "status": 200
+          },
+          {
+            "name": "cross-origin request denied",
+            "passed": true,
+            "status": 403
+          },
+          {
+            "name": "unlisted CVE denied",
+            "passed": true,
+            "status": 409
+          },
+          {
+            "name": "extra image parameter rejected",
+            "passed": true,
+            "status": 422
+          },
+          {
+            "name": "HTTP redirects including forged TLS hint False",
+            "passed": true,
+            "status": 308
+          },
+          {
+            "name": "HTTP redirects including forged TLS hint True",
+            "passed": true,
+            "status": 308
+          },
+          {
+            "name": "public WAF private backend path denied",
+            "passed": true,
+            "status": 403
+          },
+          {
+            "name": "existing DVWA still responds",
+            "passed": true,
+            "status": 200
+          }
+        ],
+        "passed": true
+      },
+      "network_isolation": {
+        "checked_at_utc": "2026-10-22T11:43:41.386237+00:00",
+        "checks_passed": true,
+        "followup_results": {
+          "checked_at_utc": "2026-10-22T11:46:07.704488+00:00",
+          "container_pid_started_at_unchanged": true,
+          "forward_isolation_verified": true,
+          "host_namespace_baselines": [
+            {
+              "address": "10.200.10.1",
+              "connected": true,
+              "port": 22,
+              "result": "connected"
+            }
+          ],
+          "lab_namespace_probe": {
+            "address": "10.200.10.1",
+            "connected": false,
+            "port": 22,
+            "result": "timeout"
+          },
+          "method": "TCP connect only; successful sockets immediately closed; no SSH or HTTP payload sent",
+          "selected_baseline": [
+            "10.200.10.1",
+            22
+          ]
+        },
+        "guard_verified": true,
+        "host_namespace_baseline": [
+          {
+            "address": "172.18.0.1",
+            "connected": true,
+            "port": 22,
+            "result": "connected"
+          },
+          {
+            "address": "10.200.10.1",
+            "connected": false,
+            "port": 80,
+            "result": "timeout"
+          }
+        ],
+        "initial_checks_passed": false,
+        "java_loopback_status": {
+          "javaVersion": "1.8.0_181",
+          "log4jApiVersion": "2.14.1",
+          "log4jCoreVersion": "2.14.1",
+          "ok": true,
+          "status": 200
+        },
+        "lab_namespace_probes": [
+          {
+            "address": "172.18.0.1",
+            "connected": false,
+            "port": 22,
+            "result": "timeout"
+          },
+          {
+            "address": "10.200.10.1",
+            "connected": false,
+            "port": 80,
+            "result": "timeout"
+          }
+        ],
+        "legacy_container": {
+          "active_ports": {
+            "8080/tcp": [
+              {
+                "HostIp": "10.200.10.20",
+                "HostPort": "8080"
+              }
+            ]
+          },
+          "cap_drop": [
+            "ALL"
+          ],
+          "created": "2026-10-19T11:29:31.624894014Z",
+          "id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+          "image_id": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+          "mounts": [
+            {
+              "Destination": "/app/spring-boot-application.jar",
+              "RW": false,
+              "Source": "/opt/capstone-log4shell/artifacts/16d7efb3d258e4bcb8ceeda6a7768a31d2bdb183134848e7babf0f2ba34ea053.jar",
+              "Type": "bind"
+            }
+          ],
+          "name": "/log4shell-lab",
+          "network_mode": "bridge",
+          "networks": {
+            "bridge": {
+              "Gateway": "172.17.0.1",
+              "IPAddress": "172.17.0.2",
+              "NetworkID": "d499c9028d87c80422f4b12e6669b2f843d890cf0bcff4bcc4022a695c1c2728"
+            }
+          },
+          "pid": 257733,
+          "port_bindings": {
+            "8080/tcp": [
+              {
+                "HostIp": "10.200.10.20",
+                "HostPort": "8080"
+              }
+            ]
+          },
+          "privileged": false,
+          "readonly_rootfs": true,
+          "restart_policy": {
+            "MaximumRetryCount": 0,
+            "Name": "unless-stopped"
+          },
+          "running": true,
+          "security_opt": [
+            "no-new-privileges:true"
+          ],
+          "started_at": "2026-10-19T11:29:31.655644978Z",
+          "user": "65532:65532"
+        },
+        "legacy_expected_id_prefix_match": true,
+        "legacy_id_started_at_unchanged_during_check": true,
+        "new_container": {
+          "active_ports": {
+            "8080/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "18081"
+              }
+            ]
+          },
+          "cap_drop": [
+            "ALL"
+          ],
+          "created": "2026-10-22T11:39:34.505944307Z",
+          "id": "eb55ca320453778dca2985d5cdaa200396a0a8fe5d74be01f9fa0197a98d2665",
+          "image_id": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36",
+          "mounts": [],
+          "name": "/offline-lab-cve-2021-44228",
+          "network_mode": "offline-labs",
+          "networks": {
+            "offline-labs": {
+              "Gateway": "172.18.0.1",
+              "IPAddress": "172.18.0.2",
+              "NetworkID": "5b434787562a5cadcf1e8503f494416d6425755c74bb665b2be38843e01adbf0"
+            }
+          },
+          "pid": 295883,
+          "port_bindings": {
+            "8080/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "18081"
+              }
+            ]
+          },
+          "privileged": false,
+          "readonly_rootfs": true,
+          "restart_policy": {
+            "MaximumRetryCount": 0,
+            "Name": "no"
+          },
+          "running": true,
+          "security_opt": [
+            "no-new-privileges=true"
+          ],
+          "started_at": "2026-10-22T11:39:42.168080476Z",
+          "user": "65532:65532"
+        },
+        "new_id_started_at_unchanged_during_check": true,
+        "nonloopback_publication_probe": {
+          "address": "10.200.10.20",
+          "connected": false,
+          "port": 18081,
+          "result": "refused"
+        },
+        "overall_assessment": "The original 10.200.10.1:80 probe remains inconclusive; forwarding isolation is assessed using the reachable host-namespace endpoint in followup_results.",
+        "schema": 1,
+        "scope": "read-only TCP connectivity, selected Docker metadata, GET Java status, guard and service state",
+        "services": {
+          "apache2": {
+            "returncode": 0,
+            "state": "active"
+          },
+          "docker": {
+            "returncode": 0,
+            "state": "active"
+          },
+          "wazuh-agent": {
+            "returncode": 0,
+            "state": "active"
+          }
+        }
+      },
+      "image_export_import": {
+        "checked_at": "2026-10-22T11:53:02.863628+00:00",
+        "passed": true,
+        "export": "Exported 1 image archives to /var/tmp/capstone-offline-roundtrip-20261022",
+        "import": "Loaded image: groot-labs/log4shell:2.14.1\nLoaded and verified 1 local images. No containers started.",
+        "receipts": [
+          {
+            "file": "image-000.tar",
+            "sha256": "9735e6769ff795f2941ebf82d7463971fcdb84789fd76eb8434a4a6dc15a2fc7",
+            "image_tag": "groot-labs/log4shell:2.14.1",
+            "image_id": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36"
+          }
+        ],
+        "same_container_and_started_at": true,
+        "scope": "Export and re-load the identical existing local image; no container start or remote pull",
+        "temporary_directory": "/var/tmp/capstone-offline-roundtrip-20261022"
+      },
+      "browser": {
+        "pre_auth_safari_visual_verified": true,
+        "authenticated_browser_e2e": false,
+        "authenticated_behaviour": "Native HTTP API and frontend mock DOM/API checks; key never entered by UI automation"
+      }
+    },
+    "routes": [
+      {
+        "host": "c",
+        "applied_at": "2026-10-22T11:40:49.671635+00:00",
+        "path": "/etc/apache2/conf-available/log4shell-java.conf",
+        "backup": "/var/backups/capstone-offline-labs/20261022/log4shell-java.conf",
+        "sha256": "e4c8f8cb721f4880fc6342e0b2d1a39a0f78c9dda21edee7fc2410c436f1a207",
+        "inode_preserved": true
+      },
+      {
+        "host": "a",
+        "applied_at": "2026-10-22T11:40:50.387645+00:00",
+        "path": "/home/groot_a/capstone/chatproxy/nginx.conf",
+        "backup": "/var/backups/capstone-offline-labs/20261022/nginx.conf",
+        "sha256": "ed94048e401f089e7b69e7ced45b3b7bde47aedb8082719e0b684e1b313508e5",
+        "inode_preserved": true
+      }
+    ]
+  },
+  "lab_url": "https://log4shell.grootlab.duckdns.org/log4shell/labs/CVE-2021-44228/",
+  "routes": [
+    {
+      "host": "c",
+      "at": "2026-10-22T12:23:03.414502+00:00",
+      "apache_sha256": "680be80a271aa61f0465ba916f3be000645143ef85404f138d6775973a273f5b",
+      "backup": "/var/backups/capstone-offline-labs/20261022/console-v1/installed-apache.conf",
+      "web_service_restart": true,
+      "apache_reload": true
+    },
+    {
+      "container_id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+      "image_id": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+      "started_at": "2026-10-14T19:16:02.328349981Z",
+      "preserved_sha256": {
+        "/etc/nginx/conf.d/zz-capstone-evidence.conf": "79106971da4174a47eafc04b805cf73b5977616424c51c4444df246f35c3d27f",
+        "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+        "/etc/modsecurity.d/modsecurity.conf": "a0dc08ae01c58b68e54a881a039359dc09008e50c101a2c4d4b01823b5a5e178"
+      },
+      "configuration_sha256": {
+        "waf-log4shell-server.conf": "538dd7e42486bbbba9f53020f472e580407ea86147830619afd0f554f3fc513c",
+        "REQUEST-900-CAPSTONE-LABS.conf": "73e32a36c6b7373df80971b1911f7e69c417fa505b247ed36577cb90925ad50a"
+      },
+      "syntax": "2026/10/22 12:23:04 [warn] 275371#275371: \"ssl_stapling\" ignored, issuer certificate not found for certificate \"/etc/nginx/conf/server.crt\"\nnginx: [warn] \"ssl_stapling\" ignored, issuer certificate not found for certificate \"/etc/nginx/conf/server.crt\"\n2026/10/22 12:23:04 [notice] 275371#275371: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/865/0)\n2026/10/22 12:23:04 [notice] 275371#275371: libmodsecurity3 version 3.0.16\nnginx: the configuration file /etc/nginx/nginx.conf syntax is ok\nnginx: configuration file /etc/nginx/nginx.conf test is successful\n",
+      "reloaded_without_recreation": true,
+      "reapply_after_approved_full_recreation": true,
+      "host": "a-waf",
+      "at": "2026-10-22T12:23:05.601010+00:00",
+      "logrotate_syntax_passed": true
+    },
+    {
+      "host": "a-edge",
+      "at": "2026-10-22T12:23:06.376120+00:00",
+      "nginx_sha256": "940e93c7a4fc83319aa9c0813bd2763a9d07fd44a157ce24f952daf23bcfac4e",
+      "backup": "/var/backups/capstone-offline-labs/20261022/console-v1/nginx.conf",
+      "inode_preserved": true,
+      "reloaded": true
+    }
+  ],
+  "final_waf_path_boundary": {
+    "applied_at": "2026-10-22T12:54:15.133996+00:00",
+    "file_sha256": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db",
+    "backup": "/var/backups/capstone-offline-labs/20261022/waf-path-boundary-v1.conf",
+    "preserved_sha256": {
+      "/etc/nginx/conf.d/zz-capstone-evidence.conf": "79106971da4174a47eafc04b805cf73b5977616424c51c4444df246f35c3d27f",
+      "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+      "/etc/modsecurity.d/modsecurity.conf": "a0dc08ae01c58b68e54a881a039359dc09008e50c101a2c4d4b01823b5a5e178"
+    },
+    "syntax_passed": true,
+    "container_id_unchanged": true,
+    "container_started_at_unchanged": true,
+    "change": "Remove redundant raw URI prefix conditions; scope via exact dedicated Host and normalized Nginx lab location"
+  },
+  "tests": {
+    "native_unit_tests": {
+      "passed": true,
+      "count": 43,
+      "method": "C Python3.12 unittest test_app test_broker test_practice_mode",
+      "output": "test_anonymous_practice_and_enforced_default (test_app.AppTests.test_anonymous_practice_and_enforced_default) ... Executing <Task finished name='Task-1' coro=<AppTests.asyncSetUp() done, defined at /var/tmp/capstone-offline-labs-20261022/test_app.py:15> result=None created at /usr/lib/python3.12/asyncio/runners.py:100> took 0.862 seconds\nok\ntest_bound_body_and_valid_id (test_app.AppTests.test_bound_body_and_valid_id) ... ok\ntest_challenge_expiry_and_ip_binding (test_app.AppTests.test_challenge_expiry_and_ip_binding) ... ok\ntest_challenge_limits_and_cross_origin_denial (test_app.AppTests.test_challenge_limits_and_cross_origin_denial) ... ok\ntest_cross_origin_cannot_enable_observation (test_app.AppTests.test_cross_origin_cannot_enable_observation) ... ok\ntest_cross_origin_write_rejected (test_app.AppTests.test_cross_origin_write_rejected) ... ok\ntest_exact_manifest_and_local_assets (test_app.AppTests.test_exact_manifest_and_local_assets) ... ok\ntest_existing_utf8_password_and_meaningful_spaces_are_supported (test_app.AppTests.test_existing_utf8_password_and_meaningful_spaces_are_supported) ... ok\ntest_gateway_only_returns_validated_mode_and_java_cookie (test_app.AppTests.test_gateway_only_returns_validated_mode_and_java_cookie) ... ok\ntest_invalid_proof_consumes_challenge_and_success_cannot_replay (test_app.AppTests.test_invalid_proof_consumes_challenge_and_success_cannot_replay) ... ok\ntest_legacy_bearer_rejected_even_with_valid_proof (test_app.AppTests.test_legacy_bearer_rejected_even_with_valid_proof) ... ok\ntest_no_arbitrary_docker_parameters (test_app.AppTests.test_no_arbitrary_docker_parameters) ... ok\ntest_password_file_length_bounds (test_app.AppTests.test_password_file_length_bounds) ... ok\ntest_proof_is_only_for_short_lived_observation_session (test_app.AppTests.test_proof_is_only_for_short_lived_observation_session) ... ok\ntest_status_dictionary_adapted (test_app.AppTests.test_status_dictionary_adapted) ... ok\ntest_verification_errors_are_bounded_and_do_not_reflect_input (test_app.AppTests.test_verification_errors_are_bounded_and_do_not_reflect_input) ... ok\ntest_command_environment_and_extra_network_are_rejected (test_broker.Broker.test_command_environment_and_extra_network_are_rejected) ... ok\ntest_deploy_registers_before_start_and_is_idempotent (test_broker.Broker.test_deploy_registers_before_start_and_is_idempotent) ... ok\ntest_foreign_container_is_never_adopted_started_or_stopped (test_broker.Broker.test_foreign_container_is_never_adopted_started_or_stopped) ... ok\ntest_guard_and_network_contract_gate_deploy (test_broker.Broker.test_guard_and_network_contract_gate_deploy) ... ok\ntest_missing_or_retagged_or_volume_image_never_creates (test_broker.Broker.test_missing_or_retagged_or_volume_image_never_creates) ... ok\ntest_receipt_full_id_prevents_same_name_replacement (test_broker.Broker.test_receipt_full_id_prevents_same_name_replacement) ... ok\ntest_running_container_must_have_actual_loopback_port_binding (test_broker.Broker.test_running_container_must_have_actual_loopback_port_binding) ... ok\ntest_runtime_changes_block_restart_and_stop (test_broker.Broker.test_runtime_changes_block_restart_and_stop) ... ok\ntest_status_before_deployment_has_no_mutations (test_broker.Broker.test_status_before_deployment_has_no_mutations) ... ok\ntest_status_preserves_inventory_when_network_contract_is_broken (test_broker.Broker.test_status_preserves_inventory_when_network_contract_is_broken) ... ok\ntest_status_preserves_managed_stop_when_guard_is_broken (test_broker.Broker.test_status_preserves_managed_stop_when_guard_is_broken) ... ok\ntest_stop_is_non_destructive_and_guard_failure_does_not_block_it (test_broker.Broker.test_stop_is_non_destructive_and_guard_failure_does_not_block_it) ... ok\ntest_stopped_container_is_validated_before_restart (test_broker.Broker.test_stopped_container_is_validated_before_restart) ... ok\ntest_unregistered_inputs_cannot_reach_docker_mutation (test_broker.Broker.test_unregistered_inputs_cannot_reach_docker_mutation) ... ok\ntest_defaults_and_low_internal_port (test_broker.Manifest.test_defaults_and_low_internal_port) ... ok\ntest_manifest_rejects_bad_inputs (test_broker.Manifest.test_manifest_rejects_bad_inputs) ... ok\ntest_bounded_single_json_frame (test_broker.Protocol.test_bounded_single_json_frame) ... ok\ntest_docker_errors_hide_stderr_and_clear_environment (test_broker.Protocol.test_docker_errors_hide_stderr_and_clear_environment) ... ok\ntest_peer_uid_and_primary_gid_are_both_checked (test_broker.Protocol.test_peer_uid_and_primary_gid_are_both_checked) ... ok\ntest_capacity_limits_and_expiry_cleanup (test_practice_mode.ChallengeTests.test_capacity_limits_and_expiry_cleanup) ... ok\ntest_concurrent_replay_has_exactly_one_success (test_practice_mode.ChallengeTests.test_concurrent_replay_has_exactly_one_success) ... ok\ntest_invalid_proofs_and_context_consume_challenge (test_practice_mode.ChallengeTests.test_invalid_proofs_and_context_consume_challenge) ... ok\ntest_message_is_unique_context_bound_and_success_is_single_use (test_practice_mode.ChallengeTests.test_message_is_unique_context_bound_and_success_is_single_use) ... ok\ntest_restart_or_key_rotation_invalidates_pending_proof (test_practice_mode.ChallengeTests.test_restart_or_key_rotation_invalidates_pending_proof) ... ok\ntest_wall_clock_and_monotonic_expiry_fail_closed (test_practice_mode.ChallengeTests.test_wall_clock_and_monotonic_expiry_fail_closed) ... ok\ntest_expiry_binding_key_rotation_and_signature (test_practice_mode.ModeTests.test_expiry_binding_key_rotation_and_signature) ... ok\ntest_only_one_valid_java_cookie_is_forwarded (test_practice_mode.ModeTests.test_only_one_valid_java_cookie_is_forwarded) ... ok\n\n----------------------------------------------------------------------\nRan 43 tests in 1.342s\n\nOK\n"
+    },
+    "public_https_and_api": {
+      "checked_at": "2026-10-22T12:41:11.554416+00:00",
+      "probe_id": "capstone-mode-d3e6242310164b3b829023c53c1c8e3c",
+      "checks": [
+        {
+          "name": "anonymous catalog",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous console",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "default enforce",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "same-origin Java page",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "Java version and CSRF",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous normal Java POST",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous canary blocked",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "forged bypass headers blocked",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "public gateway endpoint hidden",
+          "status": 404,
+          "expected": 404,
+          "passed": true
+        },
+        {
+          "name": "one-time challenge",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "signed mode activation",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "secure bounded session cookie",
+          "passed": true
+        },
+        {
+          "name": "exempt canary remains logged and passes",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt Java POST with policy canary",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exception disable",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "same canary blocked after disable",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "consumed challenge replay rejected",
+          "status": 401,
+          "expected": 401,
+          "passed": true
+        },
+        {
+          "name": "legacy raw-key protocol rejected",
+          "status": 401,
+          "expected": 401,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "java": {
+        "log4jApiVersion": "2.14.1",
+        "log4jCoreVersion": "2.14.1",
+        "javaVersion": "1.8.0_181"
+      },
+      "scope": "Mac client HTTPS with system CA and hostname verification; harmless synthetic canary and benign logging only"
+    },
+    "anonymous_lifecycle": {
+      "checked_at": "2026-10-22T12:44:26.551556+00:00",
+      "passed": true,
+      "checks": [
+        {
+          "name": "anonymous runtime status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous idempotent deploy",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous stop",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous restart",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "Java ready after anonymous restart",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous final runtime status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        }
+      ],
+      "before": {
+        "labs": [
+          {
+            "cve_id": "CVE-2021-44228",
+            "container_id": "eb55ca320453",
+            "image_present": true,
+            "status": "running",
+            "url": "http://127.0.0.1:18081/log4shell/"
+          }
+        ],
+        "checked_at": 1792673057,
+        "offline": true,
+        "deployment_allowed": true,
+        "safety_error": null
+      },
+      "after": {
+        "labs": [
+          {
+            "cve_id": "CVE-2021-44228",
+            "container_id": "eb55ca320453",
+            "image_present": true,
+            "status": "running",
+            "url": "http://127.0.0.1:18081/log4shell/"
+          }
+        ],
+        "checked_at": 1792673066,
+        "offline": true,
+        "deployment_allowed": true,
+        "safety_error": null
+      },
+      "idempotent": {
+        "lab": {
+          "container_id": "eb55ca320453",
+          "image_present": true,
+          "status": "running",
+          "url": "http://127.0.0.1:18081/log4shell/"
+        },
+        "ok": true
+      },
+      "stopped": {
+        "lab": {
+          "container_id": "eb55ca320453",
+          "image_present": true,
+          "status": "stopped",
+          "url": "http://127.0.0.1:18081/log4shell/"
+        },
+        "ok": true
+      },
+      "restarted": {
+        "lab": {
+          "container_id": "eb55ca320453",
+          "image_present": true,
+          "status": "running",
+          "url": "http://127.0.0.1:18081/log4shell/"
+        },
+        "ok": true
+      }
+    },
+    "waf_audit_and_preserved_configuration": {
+      "audit": {
+        "enforce403_and_exempt200_canary": true,
+        "files": [
+          {
+            "basename": "generation-0000000009.jsonl",
+            "bytes": 7218,
+            "device": 64512,
+            "inode": 1442023,
+            "scanned_from": 0,
+            "scanned_to": 7218
+          },
+          {
+            "basename": "generation-0000000010.jsonl",
+            "bytes": 19143,
+            "device": 64512,
+            "inode": 1442026,
+            "scanned_from": 0,
+            "scanned_to": 19143
+          }
+        ],
+        "parse_failures": 0,
+        "scan_limit_bytes_per_file": 33554432,
+        "transactions": [
+          {
+            "authorization_absent": true,
+            "canary_rule_10032": true,
+            "client_port": 59454,
+            "client_port_positive": true,
+            "credential_proof_fields_absent": true,
+            "method": "GET",
+            "mode": "enforce",
+            "mode_cookie_absent": true,
+            "only_java_cookie_names": true,
+            "rule_ids": [
+              "10032"
+            ],
+            "status": 403,
+            "timestamp": "Thu Oct 22 12:41:10 2026"
+          },
+          {
+            "authorization_absent": true,
+            "canary_rule_10032": true,
+            "client_port": 59464,
+            "client_port_positive": true,
+            "credential_proof_fields_absent": true,
+            "method": "GET",
+            "mode": "enforce",
+            "mode_cookie_absent": true,
+            "only_java_cookie_names": true,
+            "rule_ids": [
+              "10032"
+            ],
+            "status": 403,
+            "timestamp": "Thu Oct 22 12:41:10 2026"
+          },
+          {
+            "authorization_absent": true,
+            "canary_rule_10032": true,
+            "client_port": 59470,
+            "client_port_positive": true,
+            "credential_proof_fields_absent": true,
+            "method": "GET",
+            "mode": "exempt",
+            "mode_cookie_absent": true,
+            "only_java_cookie_names": true,
+            "rule_ids": [
+              "10032"
+            ],
+            "status": 200,
+            "timestamp": "Thu Oct 22 12:41:11 2026"
+          },
+          {
+            "authorization_absent": true,
+            "canary_rule_10032": true,
+            "client_port": 59474,
+            "client_port_positive": true,
+            "credential_proof_fields_absent": true,
+            "method": "POST",
+            "mode": "exempt",
+            "mode_cookie_absent": true,
+            "only_java_cookie_names": true,
+            "rule_ids": [
+              "10032"
+            ],
+            "status": 200,
+            "timestamp": "Thu Oct 22 12:41:11 2026"
+          },
+          {
+            "authorization_absent": true,
+            "canary_rule_10032": true,
+            "client_port": 59484,
+            "client_port_positive": true,
+            "credential_proof_fields_absent": true,
+            "method": "GET",
+            "mode": "enforce",
+            "mode_cookie_absent": true,
+            "only_java_cookie_names": true,
+            "rule_ids": [
+              "10032"
+            ],
+            "status": 403,
+            "timestamp": "Thu Oct 22 12:41:11 2026"
+          }
+        ]
+      },
+      "checkpoint_rewritten": false,
+      "configuration_mutations": false,
+      "manager_delivery_confirmed": false,
+      "observed_at": "2026-10-22T12:44:20.171981+00:00",
+      "preserved_pins": {
+        "/etc/modsecurity.d/modsecurity.conf": {
+          "actual": "a0dc08ae01c58b68e54a881a039359dc09008e50c101a2c4d4b01823b5a5e178",
+          "expected": "a0dc08ae01c58b68e54a881a039359dc09008e50c101a2c4d4b01823b5a5e178",
+          "matches": true
+        },
+        "/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-CAPSTONE-SCANNER.conf": {
+          "actual": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+          "expected": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+          "matches": true
+        },
+        "/etc/nginx/conf.d/zz-capstone-evidence.conf": {
+          "actual": "79106971da4174a47eafc04b805cf73b5977616424c51c4444df246f35c3d27f",
+          "expected": "79106971da4174a47eafc04b805cf73b5977616424c51c4444df246f35c3d27f",
+          "matches": true
+        }
+      },
+      "probe_id": "capstone-mode-d3e6242310164b3b829023c53c1c8e3c",
+      "raw_exported": false,
+      "raw_operation_recent": {
+        "modsecurity": [
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792670763014260",
+            "raw_deleted": false,
+            "reason": "next_prefix_not_yet_distinguishable",
+            "status": "deferred"
+          },
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792671063131842",
+            "raw_deleted": false,
+            "reason": "next_prefix_not_yet_distinguishable",
+            "status": "deferred"
+          },
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792671363094905",
+            "raw_deleted": false,
+            "reason": "next_prefix_not_yet_distinguishable",
+            "status": "deferred"
+          },
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792671662005320",
+            "raw_deleted": false,
+            "reason": "next_prefix_not_yet_distinguishable",
+            "status": "deferred"
+          },
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792671963101875",
+            "raw_deleted": false,
+            "reason": "next_prefix_not_yet_distinguishable",
+            "status": "deferred"
+          },
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792672262947122",
+            "raw_deleted": false,
+            "reason": "next_prefix_not_yet_distinguishable",
+            "status": "deferred"
+          },
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792672563000956",
+            "raw_deleted": false,
+            "reason": "next_prefix_not_yet_distinguishable",
+            "status": "deferred"
+          },
+          {
+            "checkpoint_rewritten": false,
+            "delivery_acknowledged": false,
+            "engine": "modsecurity",
+            "journal_realtime_usec": "1792672871233239",
+            "raw_deleted": false,
+            "reason": "reader_restart_guard_failed",
+            "status": "deferred"
+          }
+        ],
+        "suricata": []
+      },
+      "raw_states": {
+        "modsecurity": {
+          "alias": {
+            "bytes": 19143,
+            "device": 64512,
+            "exists": true,
+            "gid": 101,
+            "inode": 1442026,
+            "mode": "0o644",
+            "mtime_ns": 1792673060388630557,
+            "uid": 101
+          },
+          "baseline_phase": "old_closed",
+          "baseline_revision": 41,
+          "generations": {
+            "current": {
+              "basename": "generation-0000000009.jsonl",
+              "bytes": 7218,
+              "device": 64512,
+              "exists": true,
+              "gid": 0,
+              "inode": 1442023,
+              "mode": "0o400",
+              "mtime_ns": 1792669322674046368,
+              "number": 9,
+              "uid": 0
+            },
+            "pending": {
+              "basename": "generation-0000000010.jsonl",
+              "bytes": 19143,
+              "device": 64512,
+              "exists": true,
+              "gid": 101,
+              "inode": 1442026,
+              "mode": "0o644",
+              "mtime_ns": 1792673060388630557,
+              "number": 10,
+              "uid": 101
+            }
+          },
+          "phase": "publish_pending",
+          "proof_metadata": {
+            "old_closed": {
+              "boot_id": "bfafc2dda0fe42ada088e7fe6c576486",
+              "bytes": 7218,
+              "device": 64512,
+              "inode": 1442023,
+              "sha256": "97c9ab24da0a139a9f87a57b305bd31f2a2d15cb6c1ee15acdf1448d2906fff0",
+              "writer_fd_zero": true,
+              "writer_pid": 2532279,
+              "writer_start_ticks": 143378447
+            },
+            "publish_guard": {
+              "decision": "different_prefix",
+              "new_prefix_sha1": "279606bfce1d5d79d35a529f5ee5abd853247dbe",
+              "old_offset": 7218,
+              "old_sha1": "9f80d7489b11d127745ad6c9cf05c4a6fb879426",
+              "source_bytes": 4302,
+              "wazuh_checkpoint_sha256": "5fc4a282919547216d88192fb523a95bf34455691da19357ef72a35785cbfaad"
+            },
+            "readers_drained": {
+              "vector_checkpoint_sha256": "f1f627ecb7ed3df1a6bb4b62bb0c269ad04b92eef7f494665569faa5574e46ac",
+              "vector_offset": 7218,
+              "vector_stopped": true,
+              "wazuh_checkpoint_sha256": "5fc4a282919547216d88192fb523a95bf34455691da19357ef72a35785cbfaad",
+              "wazuh_offset": 7218,
+              "wazuh_sha1": "9f80d7489b11d127745ad6c9cf05c4a6fb879426"
+            }
+          },
+          "revision": 43,
+          "source_pins": {
+            "container_id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+            "engine_config_sha256": "814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb",
+            "producer_format_sha256": "79106971da4174a47eafc04b805cf73b5977616424c51c4444df246f35c3d27f",
+            "vector_config_sha256": "6602dcefef13b0b9f31310b8f3afe77b66b20795517135911ee38056968e93d8",
+            "vector_env_sha256": "b170459c26339968383175f6e658854dcb320ebf3be00c865439ecca93386b67",
+            "wazuh_config_sha256": "d65f9da4a3270e573f7505e2dd5cd0bfd0c79d554a73cafd6698d34489aa4b3e"
+          },
+          "state_sha256": "7fc54195470749d10f72b0ed66802042be8cac6b27e35d9477367defb806b144"
+        },
+        "suricata": {
+          "alias": {
+            "bytes": 14490438,
+            "device": 64512,
+            "exists": true,
+            "gid": 998,
+            "inode": 1442025,
+            "mode": "0o644",
+            "mtime_ns": 1792673060383630105,
+            "uid": 998
+          },
+          "baseline_phase": "active",
+          "baseline_revision": 42,
+          "generations": {
+            "current": {
+              "basename": "generation-0000000008.jsonl",
+              "bytes": 14490438,
+              "device": 64512,
+              "exists": true,
+              "gid": 998,
+              "inode": 1442025,
+              "mode": "0o644",
+              "mtime_ns": 1792673060383630105,
+              "number": 8,
+              "uid": 998
+            }
+          },
+          "phase": "active",
+          "proof_metadata": {
+            "old_closed": null,
+            "publish_guard": null,
+            "readers_drained": null
+          },
+          "revision": 42,
+          "source_pins": {
+            "container_id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+            "engine_config_sha256": "8c234811ce9a8d49f3a55c0c7e62c72f28431ad392c75deae910aa917c225ad1",
+            "producer_format_sha256": "8c234811ce9a8d49f3a55c0c7e62c72f28431ad392c75deae910aa917c225ad1",
+            "vector_config_sha256": "6602dcefef13b0b9f31310b8f3afe77b66b20795517135911ee38056968e93d8",
+            "vector_env_sha256": "b170459c26339968383175f6e658854dcb320ebf3be00c865439ecca93386b67",
+            "wazuh_config_sha256": "d65f9da4a3270e573f7505e2dd5cd0bfd0c79d554a73cafd6698d34489aa4b3e"
+          },
+          "state_sha256": "4a950b3c3c5b26ce0e97593b1a82565377899a31c6794f5018ca7a0986910514"
+        }
+      },
+      "read_only": true,
+      "reader_checkpoint_metadata": {
+        "/var/lib/capstone-vector/waf_audit/checkpoints.json": {
+          "bytes": 1099,
+          "device": 64512,
+          "exists": true,
+          "gid": 0,
+          "inode": 420598,
+          "mode": "0o600",
+          "mtime_ns": 1792669587268907570,
+          "uid": 0
+        },
+        "/var/lib/capstone-vector/waf_audit/checkpoints.new.json": {
+          "exists": false
+        },
+        "/var/ossec/queue/logcollector/file_status.json": {
+          "bytes": 917,
+          "device": 64512,
+          "exists": true,
+          "gid": 110,
+          "inode": 411962,
+          "mode": "0o644",
+          "mtime_ns": 1792673002119378091,
+          "uid": 0
+        }
+      },
+      "schema_version": 1,
+      "services": {
+        "capstone-raw-operations@modsecurity.service": {
+          "ActiveState": "inactive",
+          "ExecMainStatus": "2",
+          "InvocationID": "f47acec2fde544f399b7f857159c29fd",
+          "MainPID": "0",
+          "Result": "success",
+          "SubState": "dead"
+        },
+        "capstone-raw-operations@modsecurity.timer": {
+          "ActiveState": "active",
+          "InvocationID": "1572fbbf5c0b43ecbd024df1fb46e847",
+          "LastTriggerUSec": "Thu 2026-10-22 21:41:00 KST",
+          "NextElapseUSecRealtime": "Thu 2026-10-22 21:46:00 KST",
+          "Result": "success",
+          "SubState": "waiting"
+        },
+        "capstone-raw-operations@suricata.service": {
+          "ActiveState": "inactive",
+          "ExecMainStatus": "0",
+          "InvocationID": "5a4f3f597ea14f98a56d4aac8ed1e9ee",
+          "MainPID": "0",
+          "Result": "success",
+          "SubState": "dead"
+        },
+        "capstone-raw-operations@suricata.timer": {
+          "ActiveState": "active",
+          "InvocationID": "ecc009b44f6e4e3cb22ac19575e5affb",
+          "LastTriggerUSec": "Thu 2026-10-22 21:40:00 KST",
+          "NextElapseUSecRealtime": "Thu 2026-10-22 21:45:00 KST",
+          "Result": "success",
+          "SubState": "waiting"
+        },
+        "capstone-vector.service": {
+          "ActiveState": "inactive",
+          "ExecMainStatus": "0",
+          "InvocationID": "c11a3d99a97c4635870d065e7ff0e28b",
+          "MainPID": "0",
+          "Result": "success",
+          "SubState": "dead"
+        },
+        "wazuh-agent.service": {
+          "ActiveState": "active",
+          "ExecMainStatus": "0",
+          "InvocationID": "036b495b87b74a5eb8e2a92f4a6e9328",
+          "MainPID": "0",
+          "Result": "success",
+          "SubState": "running"
+        }
+      },
+      "waf": {
+        "id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "running": true,
+        "same_id": true,
+        "same_image": true,
+        "same_started_at": true,
+        "started_at": "2026-10-14T19:16:02.328349981Z"
+      }
+    },
+    "wazuh_manager_delivery": {
+      "groot-a": {
+        "observed_at": "2026-10-22T12:46:35.643307+00:00",
+        "read_only": true,
+        "mutations": false,
+        "reader_journal": [
+          {
+            "unit": "capstone-vector.service",
+            "entries": [
+              {
+                "status": "ready",
+                "reason": "reader_start_guard",
+                "engine": "modsecurity",
+                "journal_realtime_usec": "1792673176255464"
+              }
+            ]
+          },
+          {
+            "unit": "capstone-raw-operations@modsecurity.service",
+            "entries": [
+              {
+                "status": "deferred",
+                "reason": "reader_restart_guard_failed",
+                "engine": "modsecurity",
+                "journal_realtime_usec": "1792672871233239"
+              },
+              {
+                "status": "deferred",
+                "reason": "new_reader_checkpoint_pending",
+                "engine": "modsecurity",
+                "journal_realtime_usec": "1792673176508278"
+              }
+            ]
+          },
+          {
+            "unit": "capstone-vector-maintenance.service",
+            "entries": []
+          }
+        ],
+        "wazuh_raw_checkpoint": {
+          "match_count": 1,
+          "offset": 26315,
+          "hash": "7bee09904787c6276a67faf553f0600cfb423b6f",
+          "current": {
+            "bytes": 7218,
+            "prefix_matches": false
+          },
+          "pending": {
+            "bytes": 26315,
+            "prefix_matches": true
+          }
+        },
+        "wazuh_raw_fd_matches": [
+          {
+            "pid": 2818879,
+            "fd": 8,
+            "device": 64512,
+            "inode": 1442026,
+            "position": 26315,
+            "bytes": 26315
+          }
+        ],
+        "state_phase": "publish_pending",
+        "state_revision": 43
+      },
+      "groot-b-int": {
+        "observed_at": "2026-10-22T12:46:36.843961+00:00",
+        "read_only": true,
+        "mutations": false,
+        "manager_matches": [
+          {
+            "source": "alerts/alerts.json",
+            "timestamp": "2026-10-22T12:41:14.462+0000",
+            "rule_id": "100101",
+            "rule_level": 7,
+            "agent_id": "001",
+            "http_status": "403"
+          },
+          {
+            "source": "alerts/alerts.json",
+            "timestamp": "2026-10-22T12:41:14.464+0000",
+            "rule_id": "100101",
+            "rule_level": 7,
+            "agent_id": "001",
+            "http_status": "403"
+          },
+          {
+            "source": "alerts/alerts.json",
+            "timestamp": "2026-10-22T12:41:14.466+0000",
+            "rule_id": "100101",
+            "rule_level": 7,
+            "agent_id": "001",
+            "http_status": "200"
+          },
+          {
+            "source": "alerts/alerts.json",
+            "timestamp": "2026-10-22T12:41:14.468+0000",
+            "rule_id": "100101",
+            "rule_level": 7,
+            "agent_id": "001",
+            "http_status": "200"
+          },
+          {
+            "source": "alerts/alerts.json",
+            "timestamp": "2026-10-22T12:41:14.470+0000",
+            "rule_id": "100101",
+            "rule_level": 7,
+            "agent_id": "001",
+            "http_status": "403"
+          }
+        ],
+        "files": [
+          {
+            "path": "/var/ossec/logs/alerts/alerts.json",
+            "exists": true,
+            "bytes": 947501,
+            "scanned_from": 0,
+            "matches": 5
+          },
+          {
+            "path": "/var/ossec/logs/archives/archives.json",
+            "exists": false
+          }
+        ],
+        "manager_container": "single-node-wazuh.manager-1",
+        "manager_delivery_confirmed": true
+      }
+    },
+    "raw_reader_intermediate_observation": {
+      "read_only": true,
+      "configuration_mutations": false,
+      "checkpoint_rewritten": false,
+      "observed_at": "2026-10-22T12:47:43.193472+00:00",
+      "engines": {
+        "modsecurity": {
+          "phase": "publish_pending",
+          "revision": 43,
+          "vector_checkpoints": [
+            {
+              "checkpoint": "checkpoints.json",
+              "generation": "current",
+              "number": 9,
+              "match_count": 1,
+              "positions": [
+                7218
+              ]
+            },
+            {
+              "checkpoint": "checkpoints.json",
+              "generation": "pending",
+              "number": 10,
+              "match_count": 1,
+              "positions": [
+                26315
+              ]
+            }
+          ]
+        },
+        "suricata": {
+          "phase": "active",
+          "revision": 42,
+          "vector_checkpoints": [
+            {
+              "checkpoint": "checkpoints.json",
+              "generation": "current",
+              "number": 8,
+              "match_count": 1,
+              "positions": [
+                14536619
+              ]
+            }
+          ]
+        }
+      },
+      "units": {
+        "capstone-vector.service": {
+          "MainPID": "1482597",
+          "ExecMainStatus": "0",
+          "ActiveState": "active",
+          "SubState": "running"
+        },
+        "wazuh-agent.service": {
+          "MainPID": "0",
+          "ExecMainStatus": "0",
+          "ActiveState": "active",
+          "SubState": "running"
+        },
+        "capstone-raw-operations@modsecurity.timer": {
+          "NextElapseUSecRealtime": "Thu 2026-10-22 21:51:00 KST",
+          "LastTriggerUSec": "Thu 2026-10-22 21:46:00 KST",
+          "ActiveState": "active",
+          "SubState": "waiting"
+        }
+      }
+    },
+    "raw_reader_final_observation": {
+      "read_only": true,
+      "configuration_mutations": false,
+      "checkpoint_rewritten": false,
+      "observed_at": "2026-10-22T12:51:57.712415+00:00",
+      "engines": {
+        "modsecurity": {
+          "phase": "active",
+          "revision": 44,
+          "current_generation": 10,
+          "pending_generation": null
+        },
+        "suricata": {
+          "phase": "active",
+          "revision": 42,
+          "current_generation": 8,
+          "pending_generation": null
+        }
+      },
+      "units": {
+        "capstone-vector.service": {
+          "MainPID": "1482597",
+          "ExecMainStatus": "0",
+          "ActiveState": "active",
+          "SubState": "running"
+        },
+        "wazuh-agent.service": {
+          "MainPID": "0",
+          "ExecMainStatus": "0",
+          "ActiveState": "active",
+          "SubState": "running"
+        },
+        "capstone-raw-operations@modsecurity.service": {
+          "MainPID": "0",
+          "ExecMainStatus": "0",
+          "ActiveState": "inactive",
+          "SubState": "dead"
+        },
+        "capstone-raw-operations@modsecurity.timer": {
+          "NextElapseUSecRealtime": "Thu 2026-10-22 21:56:00 KST",
+          "LastTriggerUSec": "Thu 2026-10-22 21:51:00 KST",
+          "ActiveState": "active",
+          "SubState": "waiting"
+        }
+      }
+    },
+    "wazuh_index_validation": {
+      "read_only": true,
+      "mutations": false,
+      "observed_at": "2026-10-22T12:50:29.899741+00:00",
+      "http_status": 200,
+      "tls_ca_and_hostname_verified": true,
+      "total": {
+        "value": 5,
+        "relation": "eq"
+      },
+      "timed_out": false,
+      "shards": {
+        "total": 81,
+        "successful": 81,
+        "skipped": 0,
+        "failed": 0
+      },
+      "matches": [
+        {
+          "index": "wazuh-alerts-4.x-2026.10.22",
+          "timestamp": "2026-10-22T12:41:14.466+0000",
+          "rule_id": "100101",
+          "rule_level": 7,
+          "agent_id": "001",
+          "http_status": "200"
+        },
+        {
+          "index": "wazuh-alerts-4.x-2026.10.22",
+          "timestamp": "2026-10-22T12:41:14.464+0000",
+          "rule_id": "100101",
+          "rule_level": 7,
+          "agent_id": "001",
+          "http_status": "403"
+        },
+        {
+          "index": "wazuh-alerts-4.x-2026.10.22",
+          "timestamp": "2026-10-22T12:41:14.468+0000",
+          "rule_id": "100101",
+          "rule_level": 7,
+          "agent_id": "001",
+          "http_status": "200"
+        },
+        {
+          "index": "wazuh-alerts-4.x-2026.10.22",
+          "timestamp": "2026-10-22T12:41:14.470+0000",
+          "rule_id": "100101",
+          "rule_level": 7,
+          "agent_id": "001",
+          "http_status": "403"
+        },
+        {
+          "index": "wazuh-alerts-4.x-2026.10.22",
+          "timestamp": "2026-10-22T12:41:14.462+0000",
+          "rule_id": "100101",
+          "rule_level": 7,
+          "agent_id": "001",
+          "http_status": "403"
+        }
+      ],
+      "index_delivery_confirmed": true
+    },
+    "path_variant_regression": {
+      "checked_at": "2026-10-22T12:55:12.652350+00:00",
+      "probe_id": "capstone-path-3cab83bb1cac4225a64941e655cc1736",
+      "checks": [
+        {
+          "name": "anonymous catalog",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous console",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "default enforce",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "same-origin Java page",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "Java version and CSRF",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous normal Java POST",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "anonymous canary blocked",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "anonymous path /log4shell//labs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "anonymous path /log4shell/x/../labs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "anonymous path /log4shell/%78/%2e%2e/labs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "anonymous path /log4shell/%6cabs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "anonymous path /log4shell%2flabs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "anonymous path /log4shell/labs/CVE-2021-44228//api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "forged bypass headers blocked",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "public gateway endpoint hidden",
+          "status": 404,
+          "expected": 404,
+          "passed": true
+        },
+        {
+          "name": "one-time challenge",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "signed mode activation",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "secure bounded session cookie",
+          "passed": true
+        },
+        {
+          "name": "exempt canary remains logged and passes",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt path /log4shell//labs/CVE-2021-44228/api/status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt path /log4shell/x/../labs/CVE-2021-44228/api/status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt path /log4shell/%78/%2e%2e/labs/CVE-2021-44228/api/status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt path /log4shell/%6cabs/CVE-2021-44228/api/status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt path /log4shell%2flabs/CVE-2021-44228/api/status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt path /log4shell/labs/CVE-2021-44228//api/status",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "refresh Java CSRF after path checks",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exempt Java POST with policy canary",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "exception disable",
+          "status": 200,
+          "expected": 200,
+          "passed": true
+        },
+        {
+          "name": "same canary blocked after disable",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "disabled path /log4shell//labs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "disabled path /log4shell/x/../labs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "disabled path /log4shell/%78/%2e%2e/labs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "disabled path /log4shell/%6cabs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "disabled path /log4shell%2flabs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "disabled path /log4shell/labs/CVE-2021-44228//api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "name": "consumed challenge replay rejected",
+          "status": 401,
+          "expected": 401,
+          "passed": true
+        },
+        {
+          "name": "legacy raw-key protocol rejected",
+          "status": 401,
+          "expected": 401,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "java": {
+        "log4jApiVersion": "2.14.1",
+        "log4jCoreVersion": "2.14.1",
+        "javaVersion": "1.8.0_181"
+      },
+      "scope": "Mac client HTTPS with system CA and hostname verification; harmless synthetic canary and benign logging only"
+    },
+    "path_variant_before_fix": {
+      "checks": [
+        {
+          "path": "/log4shell/labs/CVE-2021-44228/api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        },
+        {
+          "path": "/log4shell//labs/CVE-2021-44228/api/status",
+          "status": 200,
+          "expected": 403,
+          "passed": false
+        },
+        {
+          "path": "/log4shell/x/../labs/CVE-2021-44228/api/status",
+          "status": 200,
+          "expected": 403,
+          "passed": false
+        },
+        {
+          "path": "/log4shell/labs/CVE-2021-44228//api/status",
+          "status": 403,
+          "expected": 403,
+          "passed": true
+        }
+      ],
+      "passed": false
+    },
+    "frontend_crypto": {
+      "passed": true,
+      "method": "Actual Node WebCrypto signatures matched independent createHmac; UTF-8 and whitespace preserved; expiration, retry, buffer clearing and unsupported WebCrypto checks",
+      "raw_password_or_static_digest_or_authorization_transmitted": false,
+      "complete_memory_erasure_claimed": false
+    },
+    "browser": {
+      "safari_anonymous_console_verified": true,
+      "same_origin_java_link_verified": true,
+      "benign_logging_status": 200,
+      "authenticated_browser_e2e": false,
+      "exception_verified_by": "Actual HTTPS API plus browser WebCrypto code tests; password never entered via UI automation"
+    }
+  },
+  "key_unification": {
+    "rotated_at": "2026-10-22T12:40:54.315317+00:00",
+    "credential_source": "existing Wazuh Dashboard admin; service credentials unchanged",
+    "readback_equal": true,
+    "owner_root": true,
+    "group": "capstone-labs",
+    "mode": "0o640",
+    "service": "active",
+    "secrets_returned": false
+  },
+  "protocol": {
+    "proof": "HMAC-SHA-256(SHA-256(UTF-8(password)), UTF-8(challenge.message))",
+    "challenge_ttl_seconds": 30,
+    "challenge_single_use": true,
+    "challenge_ip_host_bound": true,
+    "cookie_ttl_seconds": 600,
+    "cookie_ip_bound": true,
+    "cookie_flags": [
+      "Secure",
+      "HttpOnly",
+      "SameSite=Strict"
+    ],
+    "raw_key_or_static_digest_sent": false,
+    "hash_decoding": false,
+    "wazuh_and_mattermost_passwords_changed": false,
+    "future_password_rotation_automatically_synced": false
+  },
+  "final_readback": [
+    {
+      "checked_at": "2026-10-22T12:47:18.808893+00:00",
+      "units": {
+        "capstone-offline-labs": {
+          "active": "active",
+          "enabled": "enabled"
+        },
+        "capstone-offline-labs-broker": {
+          "active": "active",
+          "enabled": "enabled"
+        },
+        "capstone-offline-labs-guard": {
+          "active": "active",
+          "enabled": "enabled"
+        },
+        "apache2": {
+          "active": "active",
+          "enabled": "enabled"
+        },
+        "docker": {
+          "active": "active",
+          "enabled": "enabled"
+        },
+        "wazuh-agent": {
+          "active": "active",
+          "enabled": "enabled"
+        }
+      },
+      "containers": {
+        "offline-lab-cve-2021-44228": {
+          "Id": "eb55ca320453778dca2985d5cdaa200396a0a8fe5d74be01f9fa0197a98d2665",
+          "Image": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36",
+          "state": "running",
+          "started_at": "2026-10-22T12:44:18.960567046Z",
+          "port_bindings": {
+            "8080/tcp": [
+              {
+                "HostIp": "127.0.0.1",
+                "HostPort": "18081"
+              }
+            ]
+          }
+        },
+        "log4shell-lab": {
+          "Id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+          "Image": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+          "state": "running",
+          "started_at": "2026-10-19T11:29:31.655644978Z",
+          "port_bindings": {
+            "8080/tcp": [
+              {
+                "HostIp": "10.200.10.20",
+                "HostPort": "8080"
+              }
+            ]
+          }
+        }
+      },
+      "guard": {
+        "returncode": 0,
+        "stdout": "offline network guard verified\n",
+        "stderr": ""
+      },
+      "apache_sha256": "680be80a271aa61f0465ba916f3be000645143ef85404f138d6775973a273f5b",
+      "root_only_archive": {
+        "exists": true,
+        "bytes": 139172864
+      }
+    },
+    {
+      "checked_at": "2026-10-22T12:47:18.188592+00:00",
+      "nginx_sha256": "940e93c7a4fc83319aa9c0813bd2763a9d07fd44a157ce24f952daf23bcfac4e",
+      "containers": [
+        {
+          "name": "/chatproxy",
+          "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+          "image": "sha256:bd3cc628e59c8865f88a3bbe99c1029c12a9983b2cb88a9b03913f43d4f5aa79",
+          "state": "running",
+          "started_at": "2026-09-29T01:44:03.48454989Z"
+        },
+        {
+          "name": "/waf",
+          "id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+          "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+          "state": "running",
+          "started_at": "2026-10-14T19:16:02.328349981Z"
+        },
+        {
+          "name": "/suricata",
+          "id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+          "image": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+          "state": "running",
+          "started_at": "2026-10-14T14:54:24.549491773Z"
+        }
+      ]
+    }
+  ],
+  "remote_temporary_cleanup": {
+    "checked_at": "2026-10-22T13:02:46.156493+00:00",
+    "source_files_verified": 28,
+    "all_source_hashes_match": true,
+    "temporary_cleanup": [
+      {
+        "path": "/var/tmp/capstone-offline-labs-20261022",
+        "file_count": 506,
+        "removed": true
+      },
+      {
+        "path": "/var/tmp/capstone-offline-roundtrip-20261022",
+        "file_count": 4,
+        "removed": true
+      }
+    ],
+    "operating_source_vendor_archive_backups_preserved": true
+  },
+  "independent_review": {
+    "hmac_review": "No blocking HMAC/session issue found in independent source review",
+    "path_boundary_issue": "Confirmed with harmless canary; dedicated Host rules no longer depend on unnormalized raw request URI",
+    "path_boundary_resolution_sha256": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db",
+    "final_path_regression_passed": true
+  },
+  "public_final_health": {
+    "checked_at": "2026-10-22T12:49:51.103757+00:00",
+    "checks": [
+      {
+        "name": "console",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      },
+      {
+        "name": "same-site Java",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      },
+      {
+        "name": "HTTP to TLS",
+        "status": 308,
+        "expected": 308,
+        "passed": true
+      },
+      {
+        "name": "forged TLS hint",
+        "status": 308,
+        "expected": 308,
+        "passed": true
+      },
+      {
+        "name": "private backend denied",
+        "status": 403,
+        "expected": 403,
+        "passed": true
+      },
+      {
+        "name": "DVWA unchanged",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      },
+      {
+        "name": "Mattermost health",
+        "status": 200,
+        "expected": 200,
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "source_readback": {
+    "source_files_verified": 28,
+    "all_source_hashes_match": true,
+    "checked_at": "2026-10-22T13:02:46.156493+00:00"
+  },
+  "source_sha256": {
+    "Log4Shell.Dockerfile": "65de465ef1ffe831c6be26077a690fe23e8a03743ad0e32ef0518cbaa9483ff7",
+    "README.md": "25e0e742ba9835bfebb6e4a78952acbad2b176b21b380d22d918f89dd32118ee",
+    "REQUEST-900-CAPSTONE-LABS.conf": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db",
+    "apache-proxy.conf": "680be80a271aa61f0465ba916f3be000645143ef85404f138d6775973a273f5b",
+    "app.py": "3c4e999145b26439cfaf1200bfbca16356bae5d933c76dac3c46e4bedc273972",
+    "broker.py": "aceb138ce429753ce95fdbe336c113f67c874382b77b6b6e8418587f13f7a6a3",
+    "challenge.py": "f3fd8f071608978f0de1ca554acbab4765014ca7cb7fb6036743ed099f636c1f",
+    "cve_list.json": "37eafece8a503a74cd00e9a52d6f2c5145925d3d8f8dbbdf098fde55eacd5ef3",
+    "guard.py": "d9f66d20745ab52a411bf25c1c0e7892b6262de4e9b4a48b0c0dbae272857e33",
+    "manifest.py": "c4130dd072a6c3a297c0f1acf00979990a7e7f199325e2235b2ccf847f389e4d",
+    "nginx-log4shell-server.conf": "a17d7528b4d1095e64d9524147020f35173558a3dbbe47cbd080882981a6bf82",
+    "practice_mode.py": "0fff924c105c2867daedff95ba618fa6d9fabea00b45536dcbc12b3b97190b86",
+    "requirements.lock": "280d87e3ef31e6c5fb5c711b397fb7c418bf6799be7cee7906f8f4edac8858f2",
+    "scripts/apply-waf.py": "3f554780ee2d66d723978687a393d49f51661cd54d7fac338ddc68e7bbe4ac0a",
+    "scripts/export-images.sh": "f1ee931d81a9a86bd87e4098f47321f9e1605e85fcbe91f97973671a4ba4ca79",
+    "scripts/import-images.sh": "c278e2274c04d089e3af8ce3d109dec799edf8d2f2c5fc6f15e8c0c9fa485b5c",
+    "scripts/install.sh": "9a6d2bcfbc7cccae5f6c65a91abf076066b91e496b22c5abb5d2f5e13d54f3db",
+    "scripts/prepare-python.sh": "ce919259859569a3d9e86071b53804c18ea4a1552d5e30b2a4bcbcf8d35aaa7e",
+    "scripts/unpack_wheels.py": "891632b92c8ce4cd5b33807a22db90690e5cba7a542dc525cd76ec55e38d1198",
+    "static/app.js": "8a233b7dec0b5e6f02917eb401780d4ff68fcbc853965e1fc319d5b3793df442",
+    "static/index.html": "cc38b694eef2a83afaf12c6e4f9700e4599798e53f65f036c33894292f14da99",
+    "static/style.css": "86a5d84c81b1fb785f71a8f79586c9cf30eb6d3f5f45b2b7dd5a5a7e6699b94f",
+    "test_app.py": "472de550432acdab1b532d0d4fa63978bd9badccb7885c032354a47530f65830",
+    "test_broker.py": "0df9ead81e7784296c48609326396d2fd06e3b9180c91970fea4ce2dff28cd78",
+    "test_practice_mode.py": "017936c5f36f45e247fdf689005eff323c3c979c8c7137c38765074e371a2662",
+    "waf-log4shell-server.conf": "538dd7e42486bbbba9f53020f472e580407ea86147830619afd0f554f3fc513c",
+    "waf-logrotate.conf": "b503e20bf5641340aa3db197e652aaaf0e123fd9243b9dd96f4d9fe84c0d3828",
+    "wheel-inventory.json": "915e3e2b323ddc4fe8c8f6093d87badbdd0bf1b5b3b6b09e7a1726a3e5ad07c0"
+  }
+}

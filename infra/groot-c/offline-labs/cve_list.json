@@ -1,0 +1,44 @@
+[
+  {
+    "cve_id": "CVE-2021-44228",
+    "software": "Apache Log4j / Spring Boot Lab",
+    "vulnerable_version": "2.14.1",
+    "image_tag": "groot-labs/log4shell:2.14.1",
+    "image_id": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36",
+    "host_port": 18081,
+    "container_port": 8080,
+    "description": "기존에 만든 Java 실습 화면입니다. HTTP 헤더·파라미터의 문자열 로깅 동작을 관찰합니다. 공격 페이로드나 콜백 서버는 포함하지 않습니다.",
+    "path": "/log4shell/"
+  },
+  {
+    "type": "managed-http",
+    "cve_id": "CVE-2021-41773",
+    "software": "Apache HTTP Server 경로 처리 실습",
+    "vulnerable_version": "2.4.49",
+    "image_tag": "groot-labs/httpd:2.4.49",
+    "image_id": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b",
+    "host_port": 18082,
+    "container_port": 8080,
+    "path": "/",
+    "description": "Apache 공식 구버전 이미지의 경로 정규화 동작을 관찰합니다. CGI 없이 공개용 실습 파일만 제공하며, 외부 송신을 차단합니다. 버전·구성 확인과 실제 취약점 재현은 별도입니다."
+  },
+  {
+    "type": "managed-http",
+    "cve_id": "CVE-2021-42013",
+    "software": "Apache HTTP Server 경로 처리 실습",
+    "vulnerable_version": "2.4.50",
+    "image_tag": "groot-labs/httpd:2.4.50",
+    "image_id": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2",
+    "host_port": 18083,
+    "container_port": 8080,
+    "path": "/",
+    "description": "Apache 공식 구버전 이미지의 경로 정규화 동작을 관찰합니다. CGI 없이 공개용 실습 파일만 제공하며, 외부 송신을 차단합니다. 버전·구성 확인과 실제 취약점 재현은 별도입니다."
+  },
+  {
+    "type": "local-cli",
+    "cve_id": "CVE-2021-3156",
+    "software": "sudo Baron Samedit · 격리 CLI 실습",
+    "vulnerable_version": "Ubuntu focal sudo 1.8.31-1ubuntu1",
+    "description": "서명된 Ubuntu 패키지를 사용하는 별도 rootless CLI 환경입니다. 웹 명령 실행·호스트 sudo 변경은 제공하지 않습니다. 환경 준비, 실제 권한 상승, 호스트 탐지는 각각 별도 검증합니다."
+  }
+]

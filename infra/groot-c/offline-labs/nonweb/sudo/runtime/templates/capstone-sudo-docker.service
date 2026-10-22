@@ -1,0 +1,26 @@
+[Unit]
+Description=Capstone isolated sudo lab rootless Docker
+After=dbus.socket
+[Service]
+Type=notify
+NotifyAccess=all
+Environment=PATH=/opt/capstone-sudo-rootless/29.8.1/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=DOCKERD=/usr/local/bin/dockerd
+Environment=DOCKERD_ROOTLESS_ROOTLESSKIT_NET=none
+Environment=DOCKERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=none
+Environment=DOCKERD_ROOTLESS_ROOTLESSKIT_DETACH_NETNS=false
+ExecStart=/opt/capstone-sudo-rootless/29.8.1/bin/dockerd-rootless.sh --config-file=/etc/capstone-sudo-lab/daemon.json
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=90
+TimeoutStopSec=30
+KillMode=mixed
+Delegate=cpu memory pids
+UMask=0077
+LimitNOFILE=65536
+TasksMax=256
+MemoryMax=768M
+MemorySwapMax=0
+CPUQuota=100%
+[Install]
+WantedBy=default.target

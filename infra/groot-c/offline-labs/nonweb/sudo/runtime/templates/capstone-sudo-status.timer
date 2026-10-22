@@ -1,0 +1,9 @@
+[Unit]
+Description=Refresh sudo lab environment status every minute
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=60s
+AccuracySec=1s
+Unit=capstone-sudo-status.service
+[Install]
+WantedBy=timers.target

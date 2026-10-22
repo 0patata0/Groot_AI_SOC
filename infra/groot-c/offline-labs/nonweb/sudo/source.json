@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "cve_id": "CVE-2021-3156",
+  "package": "sudo",
+  "package_version": "1.8.31-1ubuntu1",
+  "architecture": "amd64",
+  "fixed_ubuntu_focal_version": "1.8.31-1ubuntu1.2",
+  "deb_path": "pool/main/s/sudo/sudo_1.8.31-1ubuntu1_amd64.deb",
+  "archive": "https://archive.ubuntu.com/ubuntu/",
+  "suite": "focal",
+  "packages_path": "main/binary-amd64/Packages.xz",
+  "base_image": "ubuntu@sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a",
+  "base_index_digest": "sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214",
+  "base_config_digest": "sha256:b7bab04fd9aa0c771e5720bf0cc7cbf993fd6946645983d9096126e5af45d713",
+  "base_metadata_checked_at": "2026-10-22",
+  "base_metadata_scope": "Docker official library/ubuntu:20.04 index and linux/amd64 manifest; manifest bytes SHA256 checked. No config or layer body downloaded.",
+  "references": [
+    "https://ubuntu.com/security/CVE-2021-3156",
+    "https://ubuntu.com/security/notices/USN-4705-1",
+    "https://archive.ubuntu.com/ubuntu/pool/main/s/sudo/",
+    "https://github.com/sudo-project/sudo/blob/SUDO_1_9_5p2/NEWS",
+    "https://blog.qualys.com/vulnerabilities-threat-research/2021/01/26/cve-2021-3156-heap-based-buffer-overflow-in-sudo-baron-samedit",
+    "https://hub.docker.com/_/ubuntu"
+  ]
+}

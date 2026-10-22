@@ -1,0 +1,159 @@
+{
+  "checked_at": 1792681811,
+  "deleted_directories": [
+    "/var/lib/capstone-offline-labs/build-sudo-20261022/assets",
+    "/var/lib/capstone-offline-labs/build-sudo-20261022/context",
+    "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts"
+  ],
+  "deleted_files": [
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/assets/InRelease",
+      "sha256": "cc9be89a0984aeca9e3ca40ae0e6decff75aa32653a5925b04956a7c12487e99",
+      "size": 264892
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/assets/Packages.xz",
+      "sha256": "7757921ff8feed9c3934a0c9936d441ba4a238bee3ea6c8c1df5cbcd43fc9861",
+      "size": 970408
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/assets/download-provenance.json",
+      "sha256": "43625ac697bb2611eb5878e72dea3b613ad0c1e0e141c716b5680b38a1245d23",
+      "size": 877
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/assets/sudo.deb",
+      "sha256": "de4106cd19a5b9f8acac9e0ab5f40f218d3ac321cc58143e051baab064a5fb36",
+      "size": 512808
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/assets/ubuntu-20.04-oci.tar",
+      "sha256": "ca9a65912b7b22b671b32f08265255624d2bc4f143b457e0b2feb309121a353f",
+      "size": 27525120
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/context/Dockerfile",
+      "sha256": "0ab842bb548587037c85bd75e6ace37301802407c7fa2cb33b50a8f270052144",
+      "size": 1322
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/context/check.sh",
+      "sha256": "16a9ddd2d4e2aebde9694269ffa8a32e54eceb08c46d948903d007a0a86d03cf",
+      "size": 523
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/context/preparation.json",
+      "sha256": "8c69d341e14798ec161d093031f0ae54473d7d089166c3eedba6bbda0ce042ff",
+      "size": 973
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/context/source.json",
+      "sha256": "05aa0e63913c702ed50f4453a61e9620919fc322a30e24b3aa2d63201c7f528b",
+      "size": 1306
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/context/sudo.deb",
+      "sha256": "de4106cd19a5b9f8acac9e0ab5f40f218d3ac321cc58143e051baab064a5fb36",
+      "size": 512808
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/acquisition.json",
+      "sha256": "bb3f657309712f79bd0b19c910862522500f61ad425ee505ef9b44a5722aa3d7",
+      "size": 3542
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/docker-ce-rootless-extras_29.8.1-1~ubuntu.24.04~noble_amd64.deb",
+      "sha256": "02897501837b7ff4fec8248decdd5828b7d40d7f591021a91f29673e02d0f982",
+      "size": 10177712
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/docker.InRelease",
+      "sha256": "086b344e5b421b8fc0379a50b46a1842ae52833f1ea8361ff6ebd58778d0d729",
+      "size": 48475
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/docker.Packages.gz",
+      "sha256": "cabe5c7534eb6e767d8dcf244d8567b161190b53dbf5e9f411067a3f791f62d7",
+      "size": 86848
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/docker.asc",
+      "sha256": "1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570",
+      "size": 3817
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/libsubid4_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+      "sha256": "ba97fd28c53560a8d2a2261e8f75a7ab4112535b12f9fe1d50970c30051da0da",
+      "size": 23442
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/ubuntu.InRelease",
+      "sha256": "2e42a61b1e1d106345dca11f646cfe13405e2ad300c4bbe226e91edc8ad920b5",
+      "size": 126125
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/ubuntu.Packages.xz",
+      "sha256": "9ea8ce72e2cc963c2aae53be81fe2b08c4854491a59cd3ffc78ec2b16f758fb0",
+      "size": 1400340
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/artifacts/uidmap_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+      "sha256": "a80cb7f72dd18c73cbb0b07b7fbe855504f26bfafae072a9b3d125c89d499b9e",
+      "size": 26006
+    },
+    {
+      "path": "/var/tmp/capstone-lab-expansion-20261022/rootless-artifacts.tar",
+      "sha256": "58a0822afa28f429ff3906648db5ca798ae1d21514386ed7121dde766bd8f0e9",
+      "size": 11919360
+    },
+    {
+      "path": "/var/tmp/capstone-lab-expansion-20261022/rootless-cli.tar",
+      "sha256": "065d725da275f39971110bac76f1006cc2fbde206c7d25d2362ac215b5341b97",
+      "size": 71680
+    },
+    {
+      "path": "/var/tmp/capstone-lab-expansion-20261022/rootless-final-source.tar",
+      "sha256": "2f4f32f4d97e445b854ccf82a18bde8eeefbf80d7a4cf9800e4b8fc561fbc650",
+      "size": 225280
+    },
+    {
+      "path": "/var/tmp/capstone-lab-expansion-20261022/rootless-publisher.tar",
+      "sha256": "bc3eef8912320869a14647777e9cb10c89107339a692e4ab20a776ca5a6f130c",
+      "size": 71680
+    }
+  ],
+  "mac_cleanup_owner": "root-agent",
+  "operational_archive": {
+    "path": "/var/lib/capstone-offline-labs/offline-sudo-20261022/sudo-1.8.31-1ubuntu1-amd64.tar",
+    "sha256": "db6a201143ad6372d24c91fed6e04f58206abad535941d39e6f5ad2ac79c5389",
+    "unchanged": true
+  },
+  "preserved_metadata": [
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/preparation.json",
+      "sha256": "8c69d341e14798ec161d093031f0ae54473d7d089166c3eedba6bbda0ce042ff"
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/build-sudo-20261022/download-provenance.json",
+      "sha256": "43625ac697bb2611eb5878e72dea3b613ad0c1e0e141c716b5680b38a1245d23"
+    },
+    {
+      "path": "/var/lib/capstone-offline-labs/rootless-runtime-20261022/acquisition.json",
+      "sha256": "bb3f657309712f79bd0b19c910862522500f61ad425ee505ef9b44a5722aa3d7"
+    }
+  ],
+  "receipt": {
+    "checked_at": 1792681781,
+    "expires_at": 1792682081,
+    "labs": {
+      "CVE-2021-3156": {
+        "status": "ready"
+      }
+    },
+    "schema": 1
+  },
+  "removed_bytes": 53975344,
+  "runtime_data_account_source_preserved": true,
+  "schema": 1,
+  "shared_stage_directory_preserved": true
+}

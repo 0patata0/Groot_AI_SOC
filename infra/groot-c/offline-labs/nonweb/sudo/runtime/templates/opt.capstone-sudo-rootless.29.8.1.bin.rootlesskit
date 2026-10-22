@@ -1,0 +1,5 @@
+abi <abi/4.0>,
+include <tunables/global>
+"/opt/capstone-sudo-rootless/29.8.1/bin/rootlesskit" flags=(unconfined) {
+  userns,
+}

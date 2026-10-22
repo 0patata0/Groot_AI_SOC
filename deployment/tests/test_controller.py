@@ -22,6 +22,14 @@ if command=='cat /etc/machine-id':
 elif '/deployment/remote.sh ' in command:
     phase=' '.join(command.split()[-2:])
     if os.environ.get('FAIL_PHASE')==phase: sys.exit(42)
+elif '/deployment/prerequisites.py ' in command:
+    if os.environ.get('FAIL_BUNDLE') == ' '.join(command.split()[-2:]): sys.exit(45)
+elif '/deployment/lab_key.py check' in command:
+    if os.environ.get('FAIL_COMMON_KEY'): sys.exit(47)
+elif '/deployment/lab_key.py export' in command:
+    sys.stdout.buffer.write(b'test-common-key')
+elif '/deployment/lab_key.py receive' in command:
+    if sys.stdin.buffer.read()!=b'test-common-key': sys.exit(46)
 elif 'tar -cf - exports/' in command:
     sys.stdout.buffer.write(b'enrollment-test-stream')
 elif 'tar --no-same-owner -xf -' in command or '/receive-enrollment.sh' in command:
@@ -47,6 +55,7 @@ class ControllerContract(unittest.TestCase):
         shutil.copy2(ROOT / 'deploy.sh', self.root / 'deploy.sh')
         for name in ('deployment', 'infra', 'new_rule', 'bin', 'tmp'):
             (self.root / name).mkdir()
+        shutil.copy2(ROOT / 'deployment/validate_lab_site.py', self.root / 'deployment/validate_lab_site.py')
         (self.root / 'infra' / 'CREDENTIALS.local.md').write_text('must-not-transfer')
         (self.root / 'infra' / '.env').write_text('must-not-transfer')
         (self.root / 'infra' / 'prepared.jar').write_text('must-not-transfer')
@@ -73,7 +82,8 @@ class ControllerContract(unittest.TestCase):
         self.config.write_text(
             'SECURITY_HOST=192.0.2.10\nSIEM_HOST=192.0.2.20\nSERVICE_HOST=192.0.2.30\n'
             'SSH_USER=ubuntu\nSSH_KNOWN_HOSTS=' + str(self.known) + '\n'
-            'LLM_BASE_URL=http://192.0.2.40:11434/v1\n')
+            'LLM_BASE_URL=http://192.0.2.40:11434/v1\n'
+            'LAB_PUBLIC_ORIGIN=https://lab.example.org\nLAB_ALLOWED_CIDRS=192.168.10.0/24\n')
         self.env = dict(os.environ, PATH=str(self.root / 'bin') + os.pathsep + os.environ['PATH'],
                         TMPDIR=str(self.root / 'tmp'), TRANSPORT_LOG=str(self.log),
                         PAYLOAD_LOG=str(self.payload_log),
@@ -134,21 +144,18 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check'])
         self.assert_clean()
 
-    def test_prepared_jar_path_reaches_hosts_without_uploading_jar(self):
+    def test_legacy_build_override_is_rejected_before_ssh(self):
         with self.config.open('a') as f:
             f.write('LOG4SHELL_APP_JAR=/opt/capstone-prereqs/reviewed-app.jar\n')
         result = self.run_controller('--check')
-        self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn('service 서버의 준비 파일 사용', result.stdout)
-        self.assertNotIn('소스로 자동 빌드', result.stdout)
-        for payload in self.payloads():
-            self.assertIn('export LOG4SHELL_APP_JAR=/opt/capstone-prereqs/reviewed-app.jar', payload['site_env'].splitlines())
-        self.assert_clean()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('retired', result.stderr)
+        self.assertEqual(self.events(), [])
 
     def test_default_build_transfers_sources_without_local_artifacts(self):
         result = self.run_controller('--check')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn('service 서버에서 전달한 소스로 자동 빌드', result.stdout)
+        self.assertIn('Lab Console', result.stdout)
         self.assertEqual(len(self.payloads()), 3)
         prefix = 'infra/groot-c/log4shell-app/'
         for payload in self.payloads():
@@ -166,7 +173,7 @@ class ControllerContract(unittest.TestCase):
             f.write('LOG4SHELL_APP_JAR=\n')
         result = self.run_controller('--check')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn('자동 빌드', result.stdout)
+        self.assertIn('웹 실습3개', result.stdout)
         for payload in self.payloads():
             self.assertNotIn('LOG4SHELL_APP_JAR=', payload['site_env'])
         self.assert_clean()
@@ -212,21 +219,15 @@ class ControllerContract(unittest.TestCase):
         result = self.run_controller('--plan')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.events(), [])
-        self.assertIn('DVWA/MariaDB + Log4Shell', result.stdout)
-        self.assertIn('요청 UI', result.stdout)
+        self.assertIn('독립 DVWA/MariaDB + Lab Console', result.stdout)
         self.assert_clean()
 
-    def test_log4shell_image_override_reaches_staged_hosts(self):
-        image = 'registry.example.org/labs/log4shell@sha256:' + 'a' * 64
+    def test_legacy_image_override_rejected(self):
         with self.config.open('a') as f:
-            f.write('LOG4SHELL_IMAGE=' + image + '\n')
+            f.write('LOG4SHELL_IMAGE=sha256:' + 'a' * 64 + '\n')
         result = self.run_controller('--check')
-        self.assertEqual(result.returncode, 0, result.stderr)
-        payloads = self.payloads()
-        self.assertEqual([p['host'] for p in payloads], ['192.0.2.10', '192.0.2.20', '192.0.2.30'])
-        for payload in payloads:
-            self.assertIn('export LOG4SHELL_IMAGE=' + image, payload['site_env'].splitlines())
-        self.assert_clean()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.events(), [])
 
     def test_empty_log4shell_image_keeps_role_default(self):
         with self.config.open('a') as f:
@@ -238,14 +239,44 @@ class ControllerContract(unittest.TestCase):
             self.assertNotIn('LOG4SHELL_IMAGE=', payload['site_env'])
         self.assert_clean()
 
-    def test_http_hostname_reaches_hosts_and_is_reported(self):
+    def test_https_origin_reaches_hosts_and_is_reported(self):
         with self.config.open('a') as f:
-            f.write('LOG4SHELL_HOSTNAME=log4shell.example.org\nWAF_PORT=9080\n')
+            f.write('LAB_PUBLIC_ORIGIN=https://log4shell.example.org:9443\nLAB_HTTPS_PORT=9443\n')
         result = self.run_controller()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn('http://log4shell.example.org:9080/', result.stdout)
+        self.assertIn('https://log4shell.example.org:9443/log4shell/', result.stdout)
         for payload in self.payloads():
-            self.assertIn('export LOG4SHELL_HOSTNAME=log4shell.example.org', payload['site_env'].splitlines())
+            self.assertIn('export LAB_PUBLIC_ORIGIN=https://log4shell.example.org:9443', payload['site_env'].splitlines())
+        self.assert_clean()
+
+    def test_all_bundles_checked_before_first_package_install(self):
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        actions = [' '.join(e['command'].split()[-2:]) for e in self.events() if '/deployment/prerequisites.py ' in e['command']]
+        self.assertEqual(actions, ['check security', 'check siem', 'check service', 'apply security', 'apply siem', 'apply service'])
+
+    def test_bad_bundle_prevents_packages_and_roles(self):
+        result = self.run_controller(FAIL_BUNDLE='check service')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.phases(), [])
+        self.assertFalse(any('/deployment/prerequisites.py apply' in e['command'] for e in self.events()))
+        self.assert_clean()
+
+    def test_common_key_uses_stream_only_after_siem_verify(self):
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        events = self.events()
+        exported = next(i for i,e in enumerate(events) if '/lab_key.py export' in e['command'])
+        verified = next(i for i,e in enumerate(events) if e['command'].endswith('siem verify'))
+        self.assertGreater(exported, verified)
+        self.assertFalse(any('test-common-key' in str(e) for e in events))
+        self.assertNotIn('test-common-key', result.stdout + result.stderr)
+
+    def test_bad_common_key_prevents_package_or_role_install(self):
+        result = self.run_controller(FAIL_COMMON_KEY='1')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.phases(), [])
+        self.assertFalse(any('/deployment/prerequisites.py apply' in e['command'] for e in self.events()))
         self.assert_clean()
 
     def test_hostname_invalid_values_are_rejected_before_ssh(self):
@@ -262,7 +293,7 @@ class ControllerContract(unittest.TestCase):
             f.write('LOG4SHELL_HOSTNAME=\n')
         result = self.run_controller()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn('http://192.0.2.10:8080/log4shell/', result.stdout)
+        self.assertIn('https://lab.example.org/log4shell/', result.stdout)
         for payload in self.payloads():
             self.assertNotIn('LOG4SHELL_HOSTNAME=', payload['site_env'])
         self.assert_clean()

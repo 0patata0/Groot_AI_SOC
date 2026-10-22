@@ -1,0 +1,1513 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-22T14:18:50.854911+00:00",
+  "url": "https://log4shell.grootlab.duckdns.org/log4shell/",
+  "scope": "Add two static Apache HTTP labs, reuse native DVWA under the same public prefix, prepare a separate rootless sudo CLI lab",
+  "catalog": [
+    {
+      "id": "CVE-2021-44228",
+      "type": "managed-http",
+      "image_id": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36"
+    },
+    {
+      "id": "CVE-2021-41773",
+      "type": "managed-http",
+      "image_id": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b"
+    },
+    {
+      "id": "CVE-2021-42013",
+      "type": "managed-http",
+      "image_id": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2"
+    },
+    {
+      "id": "LAB-DVWA",
+      "type": "existing-http",
+      "image_id": null
+    },
+    {
+      "id": "CVE-2021-3156",
+      "type": "local-cli",
+      "image_id": null
+    }
+  ],
+  "initial_native": {
+    "httpd_build": {
+      "2.4.49": {
+        "image_tag": "groot-labs/httpd:2.4.49",
+        "image_id": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b",
+        "base": "docker.io/library/httpd@sha256:4b5cb7697fea2aa6d398504c381b693a54ae9ad5e6317fcdbb7a2d9b8c3b1364",
+        "user": "65532:65532"
+      },
+      "2.4.50": {
+        "image_tag": "groot-labs/httpd:2.4.50",
+        "image_id": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2",
+        "base": "docker.io/library/httpd@sha256:a0a1605656b89fe249c6306e5646d3d3c2d50606e134d411d8e8f732527cbdbb",
+        "user": "65532:65532"
+      }
+    },
+    "httpd_preflight": [
+      {
+        "cve_id": "CVE-2021-41773",
+        "image_id": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b",
+        "health": "groot-httpd-lab-ok",
+        "version": {
+          "software": "Apache HTTP Server",
+          "version": "2.4.49",
+          "cve_id": "CVE-2021-41773",
+          "cgi_enabled": false,
+          "fixture": "/lab/fixture/harmless.txt"
+        },
+        "runtime_contract": true,
+        "cgi_disabled": true,
+        "actual_attack_tested": false
+      },
+      {
+        "cve_id": "CVE-2021-42013",
+        "image_id": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2",
+        "health": "groot-httpd-lab-ok",
+        "version": {
+          "software": "Apache HTTP Server",
+          "version": "2.4.50",
+          "cve_id": "CVE-2021-42013",
+          "cgi_enabled": false,
+          "fixture": "/lab/fixture/harmless.txt"
+        },
+        "runtime_contract": true,
+        "cgi_disabled": true,
+        "actual_attack_tested": false
+      }
+    ],
+    "c_apply": {
+      "applied": true,
+      "catalog_ids": [
+        "CVE-2021-44228",
+        "CVE-2021-41773",
+        "CVE-2021-42013",
+        "LAB-DVWA",
+        "CVE-2021-3156"
+      ],
+      "source_sha256": {
+        "manifest.py": "67d50505cdd298e136b61c009f00f64dfd759e2cb91d5f0c4bd4176db69fceb7",
+        "broker.py": "8a9efa13aaf4bd8d2717152e580ffa46c05e2da792683333633b23da70dbb206",
+        "app.py": "36235a80f8d8120d3a6f3f121c7540bdb19aaf51bd93a84e626b71e213acab4a",
+        "practice_mode.py": "ee6adb5a09415414acd934d25af66483856ac580dbced0c37db226450cd544b3",
+        "cve_list.json": "dc48f20b1668f6355dcb4d96ea67fca10b540b5fd0aa483eb7e6f69679258f08",
+        "static/app.js": "9994756425837970930e098ab0b8307c932967100e762fa6c387d3b4a063bb81",
+        "test_app.py": "e729847626444e77dd09b4ba69d11701f5fc23051086ebd76c3698b2d4b989b6",
+        "test_practice_mode.py": "3c0922b9a5acfa59ce2c9087863aecb97c31c3eefa1e4013f8d84a75bd2970a9",
+        "test_lab_types.py": "29f55c5bdc5b35f15adc4e33ad58ca42c46ce432b0a87bb0912d3051f03ad768",
+        "apache-proxy.conf": "853411bfc2474f639c894e08aec7520c80c71d8d91b8b517995f74a07ca99b77",
+        "nginx-log4shell-server.conf": "337f4c44fdfd7de65cc1808032a052e670ff6a286107595f5ab884457b5a74c3",
+        "waf-log4shell-server.conf": "f8c08ba711c2f0de55a38c5398533323a7870bc8ba924d29ad7ec15d8c1f471b",
+        "scripts/export-images.sh": "dd56d6adaacd68d73d8e13f945776d867ec2fdaed5fd3bc9d523ebec8fbdd438"
+      },
+      "apache_sha256": "853411bfc2474f639c894e08aec7520c80c71d8d91b8b517995f74a07ca99b77",
+      "backup": "/var/backups/capstone-offline-labs/20261022-expansion"
+    },
+    "sudo_build": {
+      "image_tag": "groot-labs/sudo:1.8.31-1ubuntu1",
+      "image_id": "sha256:3a7816fe014c0a9e33b36b869dcd65b0e9662cb51f78271254b396502dd53ab7",
+      "package_version": "1.8.31-1ubuntu1",
+      "signature_and_package_verified": true,
+      "preparation_sha256": "8c69d341e14798ec161d093031f0ae54473d7d089166c3eedba6bbda0ce042ff",
+      "ubuntu_keyring_sha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31",
+      "runtime_ready": false,
+      "actual_attack_tested": false,
+      "host_scenario_verified": false
+    },
+    "web_archives": [
+      {
+        "file": "image-000.tar",
+        "sha256": "9735e6769ff795f2941ebf82d7463971fcdb84789fd76eb8434a4a6dc15a2fc7",
+        "image_tag": "groot-labs/log4shell:2.14.1",
+        "image_id": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36"
+      },
+      {
+        "file": "image-001.tar",
+        "sha256": "864f3d1c18de910b0ad89fd564cc33c5cf12aa602febc10f4ae4e6ccbbda19ed",
+        "image_tag": "groot-labs/httpd:2.4.49",
+        "image_id": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b"
+      },
+      {
+        "file": "image-002.tar",
+        "sha256": "72f0f551d7e5b06fb6d5997faf40bd633d244673b26c4e09db37ef281c7200d5",
+        "image_tag": "groot-labs/httpd:2.4.50",
+        "image_id": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2"
+      }
+    ],
+    "native_tests_summary": [
+      "...........................................................",
+      "----------------------------------------------------------------------",
+      "Ran 59 tests in 1.429s",
+      "",
+      "OK"
+    ]
+  },
+  "public_https_initial": {
+    "checked_at": 1792677831,
+    "checks": [
+      {
+        "name": "catalog HTTP",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "catalog size",
+        "ok": true,
+        "actual": 5,
+        "expected": 5
+      },
+      {
+        "name": "existing Java remains stopped",
+        "ok": true,
+        "actual": "stopped",
+        "expected": "stopped"
+      },
+      {
+        "name": "CVE-2021-41773 anonymous deploy",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "CVE-2021-41773 HTTPS health",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "CVE-2021-42013 anonymous deploy",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "CVE-2021-42013 HTTPS health",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "LAB-DVWA deploy rejected",
+        "ok": true,
+        "actual": 409,
+        "expected": 409
+      },
+      {
+        "name": "LAB-DVWA stop rejected",
+        "ok": true,
+        "actual": 409,
+        "expected": 409
+      },
+      {
+        "name": "CVE-2021-3156 deploy rejected",
+        "ok": true,
+        "actual": 409,
+        "expected": 409
+      },
+      {
+        "name": "CVE-2021-3156 stop rejected",
+        "ok": true,
+        "actual": 409,
+        "expected": 409
+      },
+      {
+        "name": "DVWA login page",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "DVWA opaque sandbox",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "DVWA directory redirect vulnerabilities/sqli",
+        "actual_status": 301,
+        "location": "https://log4shell.grootlab.duckdns.org/log4shell/labs/LAB-DVWA/vulnerabilities/sqli/",
+        "ok": true
+      },
+      {
+        "name": "DVWA directory redirect dvwa",
+        "actual_status": 301,
+        "location": "https://log4shell.grootlab.duckdns.org/log4shell/labs/LAB-DVWA/dvwa/",
+        "ok": true
+      },
+      {
+        "name": "opaque origin management denied",
+        "ok": true,
+        "actual": 403,
+        "expected": 403
+      },
+      {
+        "name": "unknown lab denied",
+        "ok": true,
+        "actual": 404,
+        "expected": 404
+      },
+      {
+        "name": "CVE-2021-41773 anonymous canary despite spoof",
+        "ok": true,
+        "actual": 403,
+        "expected": 403
+      },
+      {
+        "name": "CVE-2021-42013 anonymous canary despite spoof",
+        "ok": true,
+        "actual": 403,
+        "expected": 403
+      },
+      {
+        "name": "LAB-DVWA anonymous canary despite spoof",
+        "ok": true,
+        "actual": 403,
+        "expected": 403
+      },
+      {
+        "name": "challenge",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "existing key HMAC exemption",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "CVE-2021-41773 exempt canary",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "CVE-2021-42013 exempt canary",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "LAB-DVWA exempt canary",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "exemption cleared",
+        "ok": true,
+        "actual": 200,
+        "expected": 200
+      },
+      {
+        "name": "CVE-2021-41773 enforcement restored",
+        "ok": true,
+        "actual": 403,
+        "expected": 403
+      },
+      {
+        "name": "CVE-2021-42013 enforcement restored",
+        "ok": true,
+        "actual": 403,
+        "expected": 403
+      },
+      {
+        "name": "LAB-DVWA enforcement restored",
+        "ok": true,
+        "actual": 403,
+        "expected": 403
+      },
+      {
+        "name": "CVE-2021-41773 stop after validation",
+        "actual": 200,
+        "expected": 200,
+        "ok": true
+      },
+      {
+        "name": "CVE-2021-42013 stop after validation",
+        "actual": 200,
+        "expected": 200,
+        "ok": true
+      }
+    ],
+    "passed": true,
+    "actual_attack_tested": false
+  },
+  "httpd_base_acquisition": {
+    "schema": 1,
+    "sources": [
+      {
+        "repository": "library/httpd",
+        "tag": "2.4.49",
+        "manifest_digest": "sha256:4b5cb7697fea2aa6d398504c381b693a54ae9ad5e6317fcdbb7a2d9b8c3b1364",
+        "config_digest": "sha256:e91425f386186eb981e47f90780083cc2a16179f3ec45581fa7e5ba044b800fb",
+        "layers": [
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 27145994,
+            "digest": "sha256:07aded7c29c6011dfdf02fc98e087c941d3c2661c4e73d134c6491e25231d16c"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 176,
+            "digest": "sha256:05bb40c8f14889e7e53f646b971630940b47458d620a2d23489728b9864c6cc9"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 2794991,
+            "digest": "sha256:0827b74117da10c400a8a41c2e650dda3f544df711daf005dce881af60877955"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 24621294,
+            "digest": "sha256:35a526fdcc7dca451994edc22a1770f5a9b36f85433dd53e48a92c49e378d67c"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 296,
+            "digest": "sha256:59fed288cd328965c61a1e58fed96f7ac63508030afd5999170f9e79e257b91f"
+          }
+        ]
+      },
+      {
+        "repository": "library/httpd",
+        "tag": "2.4.50",
+        "manifest_digest": "sha256:a0a1605656b89fe249c6306e5646d3d3c2d50606e134d411d8e8f732527cbdbb",
+        "config_digest": "sha256:bc9d3c5a7455df2d13d9093f31aaeda04adf4726b2f8a462f4669e9b67330c79",
+        "layers": [
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 27145994,
+            "digest": "sha256:07aded7c29c6011dfdf02fc98e087c941d3c2661c4e73d134c6491e25231d16c"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 176,
+            "digest": "sha256:05bb40c8f14889e7e53f646b971630940b47458d620a2d23489728b9864c6cc9"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 2794991,
+            "digest": "sha256:0827b74117da10c400a8a41c2e650dda3f544df711daf005dce881af60877955"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 24626573,
+            "digest": "sha256:6fdb4ffeaccdc6c3a3452be42d3ccccef09baa62c855a60812ff8041ddb25fb7"
+          },
+          {
+            "mediaType": "application/vnd.docker.image.rootfs.diff.tar.gzip",
+            "size": 298,
+            "digest": "sha256:91182adb0e7950a22db1a4f4130d03049ad413f103eec32e0558e5b9612a3eb6"
+          }
+        ]
+      }
+    ],
+    "archive": "official-httpd-oci.tar",
+    "archive_sha256": "1dee9dbab6e9a4767424bbe001d4e9df3fb6469e12f0325c474c15b68de31054",
+    "size": 79237120,
+    "format": "OCI image layout; original compressed layer and manifest digests preserved"
+  },
+  "browser": {
+    "browser": "Safari",
+    "catalog_five_visible": true,
+    "dvwa_login_verified": true,
+    "dvwa_security_page_verified": true,
+    "dvwa_observed_default": "impossible",
+    "dvwa_default_changed": false,
+    "dvwa_logout_verified": true,
+    "password_saved": false,
+    "opaque_sandbox_retained": true
+  },
+  "rule_research": {
+    "file": "rule-source-candidates.json",
+    "candidates": 27,
+    "production_rules_changed": false,
+    "qualification": "Source and upstream QA research, not local attack detection validation"
+  },
+  "resolved_failures": [
+    "Preserve canonical compressed OCI layers to retain the registry manifest digest on containerd image stores",
+    "Native DVWA DirectorySlash Location required same-public-prefix rewriting",
+    "DVWA opaque CSP origin drops Strict session cookies during form POST; use Secure SameSite=None cookies scoped to the DVWA route, preserving opaque isolation",
+    "Ubuntu focal Packages.xz includes a concatenated XZ stream; bounded multi-stream verification added before signed offline image build"
+  ],
+  "limits": [
+    "No exploit payload or CVE attack-to-detection E2E executed",
+    "Apache labs are static-file profiles with no CGI, not remote-code-execution labs",
+    "DVWA reuses the pre-existing native Apache/PHP/MariaDB service; the console does not start or stop it",
+    "Host sudo package was already 1.8.31-1ubuntu1 at preflight and was not changed",
+    "Rootless sudo environment validation does not prove host privilege escalation or host Wazuh vulnerability inventory coverage",
+    "No full new-VM/bootstrap or host reboot test",
+    "Source/runtime offline behavior does not assert physical isolation of every existing server"
+  ],
+  "finalization_pending": [],
+  "dvwa_http_session": {
+    "status": 200,
+    "url": "https://log4shell.grootlab.duckdns.org/log4shell/labs/LAB-DVWA/index.php",
+    "logged_in": true,
+    "login_failed": false,
+    "cookie_names": [
+      "security",
+      "PHPSESSID"
+    ],
+    "security_page_status": 200,
+    "security_choices": true,
+    "logout_status": 200
+  },
+  "new_lab_canary_delivery": {
+    "schema": 1,
+    "verification": "read-only confirmation of previously generated harmless canaries",
+    "observed_at_utc": "2026-10-22T14:20:14.324516+00:00",
+    "actual_attack_executed": false,
+    "server_configuration_modified": false,
+    "checkpoint_modified": false,
+    "expected_transaction_count": 9,
+    "waf_audit_matches": 9,
+    "wazuh_manager_alert_matches": 9,
+    "wazuh_index_matches": 9,
+    "exact_transaction_hash_sets_match": true,
+    "source_window_utc": [
+      "2026-10-22T14:02:00+00:00",
+      "2026-10-22T14:05:00+00:00"
+    ],
+    "index": "wazuh-alerts-4.x-2026.10.22",
+    "index_search": {
+      "http_status": 200,
+      "tls_ca_and_hostname_verified": true,
+      "candidate_total": 9,
+      "truncated": false
+    },
+    "transactions": [
+      {
+        "path": "/log4shell/labs/CVE-2021-41773/health.txt",
+        "transaction_id_sha256": "4705807ff00081cf51f210f616756d3085855fa9343a195f5aa324e9a1ef9f30",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 403,
+        "waf_timestamp_utc": "2026-10-22T14:03:45+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.854+0000"
+      },
+      {
+        "path": "/log4shell/labs/CVE-2021-42013/health.txt",
+        "transaction_id_sha256": "61b7582776530af74975a2e7cb8f49f3217d12792b118d6d83ebe4dbd4c96080",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 403,
+        "waf_timestamp_utc": "2026-10-22T14:03:45+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.862+0000"
+      },
+      {
+        "path": "/log4shell/labs/LAB-DVWA/login.php",
+        "transaction_id_sha256": "7bc4253633f2a23bdabb09114fbe2a2def8ca2cbafa453abd75133baa7e58221",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 403,
+        "waf_timestamp_utc": "2026-10-22T14:03:45+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.868+0000"
+      },
+      {
+        "path": "/log4shell/labs/CVE-2021-41773/health.txt",
+        "transaction_id_sha256": "f0df29e0b026e4489d89ae935e4f90628248404c64a993f577d0c37ca8e81497",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 200,
+        "waf_timestamp_utc": "2026-10-22T14:03:46+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.870+0000"
+      },
+      {
+        "path": "/log4shell/labs/CVE-2021-42013/health.txt",
+        "transaction_id_sha256": "72389598f3da386686b2b91053c5da205050d8cff81069e9563499210525d534",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 200,
+        "waf_timestamp_utc": "2026-10-22T14:03:46+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.872+0000"
+      },
+      {
+        "path": "/log4shell/labs/LAB-DVWA/login.php",
+        "transaction_id_sha256": "d3df1742c7246cd435cb9b4c3679680669a9857a70782c6751b775351b3e68df",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 200,
+        "waf_timestamp_utc": "2026-10-22T14:03:46+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.875+0000"
+      },
+      {
+        "path": "/log4shell/labs/CVE-2021-41773/health.txt",
+        "transaction_id_sha256": "0ce1683d84f6d028e63800a88d221e3cc464a5dbfd045ddd0adb40a29967f9c8",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 403,
+        "waf_timestamp_utc": "2026-10-22T14:03:46+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.877+0000"
+      },
+      {
+        "path": "/log4shell/labs/CVE-2021-42013/health.txt",
+        "transaction_id_sha256": "e733cb566241537d59a2c2ab034f6640c49a8501558a2f81082da4ef04789dde",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 403,
+        "waf_timestamp_utc": "2026-10-22T14:03:46+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.879+0000"
+      },
+      {
+        "path": "/log4shell/labs/LAB-DVWA/login.php",
+        "transaction_id_sha256": "4215a1d6e61701da12641cb32ec92e415b82b18ea9ebc0bba25657f7224347ae",
+        "waf_rule_id": "10032",
+        "wazuh_rule_id": "100101",
+        "http_status": 403,
+        "waf_timestamp_utc": "2026-10-22T14:03:46+00:00",
+        "wazuh_received_timestamp": "2026-10-22T14:03:46.881+0000"
+      }
+    ],
+    "limitations": [
+      "Harmless policy canary verifies block/exemption/restoration and delivery; it does not prove vulnerability exploitation or attack-specific detection.",
+      "Times retain source precision; manager receive order confirms 403, 200, 403 for each fixed path."
+    ]
+  },
+  "final_source_application": {
+    "applied": true,
+    "native_tests_summary": [
+      "................................................................",
+      "----------------------------------------------------------------------",
+      "Ran 64 tests in 1.519s",
+      "",
+      "OK"
+    ],
+    "sha256": {
+      "apache-proxy.conf": "853411bfc2474f639c894e08aec7520c80c71d8d91b8b517995f74a07ca99b77",
+      "test_lab_types.py": "29f55c5bdc5b35f15adc4e33ad58ca42c46ce432b0a87bb0912d3051f03ad768",
+      "manifest.py": "67d50505cdd298e136b61c009f00f64dfd759e2cb91d5f0c4bd4176db69fceb7",
+      "nginx-log4shell-server.conf": "337f4c44fdfd7de65cc1808032a052e670ff6a286107595f5ab884457b5a74c3",
+      "REQUEST-900-CAPSTONE-LABS.conf": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db",
+      "test_broker.py": "0df9ead81e7784296c48609326396d2fd06e3b9180c91970fea4ce2dff28cd78",
+      "waf-logrotate.conf": "b503e20bf5641340aa3db197e652aaaf0e123fd9243b9dd96f4d9fe84c0d3828",
+      "cve_list.json": "dc48f20b1668f6355dcb4d96ea67fca10b540b5fd0aa483eb7e6f69679258f08",
+      "README.md": "1fd39dab9c1373a51e9a494994ba9e60cc8436ef4abc122753b7f10d08ee47b5",
+      "Log4Shell.Dockerfile": "65de465ef1ffe831c6be26077a690fe23e8a03743ad0e32ef0518cbaa9483ff7",
+      "rule-source-candidates.json": "d3a1f6a6cbc1493cfc74db97dc9a1971ff13ebc0d3f3bcc085b4c3a2843e26e3",
+      "deployment-validation-20261022.json": "6948d482c7f3c1adfc7e3c80fc81e3b28c7b90b618b31c7bd87876f4d299fd79",
+      "app.py": "b857f940a24d71db4affb141e57596d5095701f7d866c78dfc66829fbdd183e7",
+      "waf-log4shell-server.conf": "f13e10123297ca19f1ce22124afda24d183a2ec3336dc0cb9f1a53675b56ff66",
+      "guard.py": "d9f66d20745ab52a411bf25c1c0e7892b6262de4e9b4a48b0c0dbae272857e33",
+      "test_practice_mode.py": "a9cf6bdf26216fc54a7a53015f1eeb95ed8786640d67bc69011896a6434b5710",
+      "wheel-inventory.json": "915e3e2b323ddc4fe8c8f6093d87badbdd0bf1b5b3b6b09e7a1726a3e5ad07c0",
+      "broker.py": "8a9efa13aaf4bd8d2717152e580ffa46c05e2da792683333633b23da70dbb206",
+      "challenge.py": "f3fd8f071608978f0de1ca554acbab4765014ca7cb7fb6036743ed099f636c1f",
+      "test_app.py": "9db93889890414eb9b13f5b1f662c2732a29c29c650aaf8ea23a5de996d5d3cf",
+      "practice_mode.py": "dc099d290cc164e1a4c1c8eafc9c19dd91dedd549f6c036ff3fae18b0d710060",
+      "requirements.lock": "280d87e3ef31e6c5fb5c711b397fb7c418bf6799be7cee7906f8f4edac8858f2",
+      "static/index.html": "cc38b694eef2a83afaf12c6e4f9700e4599798e53f65f036c33894292f14da99",
+      "static/style.css": "86a5d84c81b1fb785f71a8f79586c9cf30eb6d3f5f45b2b7dd5a5a7e6699b94f",
+      "static/app.js": "9994756425837970930e098ab0b8307c932967100e762fa6c387d3b4a063bb81",
+      "scripts/unpack_wheels.py": "891632b92c8ce4cd5b33807a22db90690e5cba7a542dc525cd76ec55e38d1198",
+      "scripts/import-images.sh": "c278e2274c04d089e3af8ce3d109dec799edf8d2f2c5fc6f15e8c0c9fa485b5c",
+      "scripts/install.sh": "9a6d2bcfbc7cccae5f6c65a91abf076066b91e496b22c5abb5d2f5e13d54f3db",
+      "scripts/export-images.sh": "dd56d6adaacd68d73d8e13f945776d867ec2fdaed5fd3bc9d523ebec8fbdd438",
+      "scripts/prepare-python.sh": "ce919259859569a3d9e86071b53804c18ea4a1552d5e30b2a4bcbcf8d35aaa7e",
+      "scripts/apply-waf.py": "3f554780ee2d66d723978687a393d49f51661cd54d7fac338ddc68e7bbe4ac0a",
+      "images/httpd/httpd.conf": "0b5b06ff9c775fd5b0d3dd4ff9e775ecf2abdd467b4f17b288ab316d1c003354",
+      "images/httpd/Dockerfile": "25c884e04e56bc9b87b09a35b3a56bde06a6bb48e5db7e09d58dc681fe676c5a",
+      "images/httpd/README.md": "e563cfe61e41b8930f1ba59e374372a8f042c6813bd013c519c1d93677213813",
+      "images/httpd/.dockerignore": "1071353770cc05e31f2ea00cc0623a25091d54a71b460beaaf1ed527bec18d19",
+      "images/httpd/source-provenance.json": "35d58ad646b47f73f9b214ac5b10bade2b9f1629d608202583a3a1cecdcdeaff",
+      "images/httpd/fixture/harmless.txt": "6754ac92acea12e865759302c88be4a950a8495b2c8ea192e864a9e9a27d6a1a",
+      "images/httpd/public/hello.txt": "2d833daa1e3e7baa7c351443da7c1e63615d24f8ed7629e24dbc535493059189",
+      "images/httpd/site/index.html": "ce0234ff129733946fe24ec5f2c7c66b1cae7eb983e183427a946d6f2a2be6d8",
+      "images/httpd/site/style.css": "f4e8a7e0e1565b6099990f8089095f4e444ce5e3715a78e0b5ceebe454766c7e"
+    },
+    "catalog_count": 5
+  },
+  "dvwa_mirror_validation": {
+    "checked_at": 1792679178,
+    "checks": [
+      {
+        "name": "challenge",
+        "actual": 200,
+        "expected": 200,
+        "ok": true
+      },
+      {
+        "name": "HMAC session",
+        "actual": 200,
+        "expected": 200,
+        "ok": true
+      },
+      {
+        "name": "two mode cookies",
+        "actual": true,
+        "expected": true,
+        "ok": true
+      },
+      {
+        "name": "management Strict",
+        "actual": "strict",
+        "expected": "strict",
+        "ok": true
+      },
+      {
+        "name": "mirror exact path",
+        "actual": "/log4shell/labs/LAB-DVWA/",
+        "expected": "/log4shell/labs/LAB-DVWA/",
+        "ok": true
+      },
+      {
+        "name": "mirror None",
+        "actual": "none",
+        "expected": "none",
+        "ok": true
+      },
+      {
+        "name": "mirror Secure HttpOnly",
+        "actual": true,
+        "expected": true,
+        "ok": true
+      },
+      {
+        "name": "opaque DVWA mirror-only canary",
+        "actual": 200,
+        "expected": 200,
+        "ok": true
+      },
+      {
+        "name": "mirror cannot exempt other lab",
+        "actual": 403,
+        "expected": 403,
+        "ok": true
+      },
+      {
+        "name": "mirror ignored by management",
+        "actual": "enforce",
+        "expected": "enforce",
+        "ok": true
+      },
+      {
+        "name": "mirror signature cannot become management token",
+        "actual": "enforce",
+        "expected": "enforce",
+        "ok": true
+      },
+      {
+        "name": "opaque management mutation denied",
+        "actual": 403,
+        "expected": 403,
+        "ok": true
+      },
+      {
+        "name": "clear session",
+        "actual": 200,
+        "expected": 200,
+        "ok": true
+      },
+      {
+        "name": "both mode cookies cleared",
+        "actual": true,
+        "expected": true,
+        "ok": true
+      },
+      {
+        "name": "DVWA enforcement restored",
+        "actual": 403,
+        "expected": 403,
+        "ok": true
+      }
+    ],
+    "passed": true,
+    "actual_attack_tested": false
+  },
+  "dvwa_mirror_independent_source_review": {
+    "blocking_findings": 0,
+    "live_execution_by_reviewer": false
+  },
+  "http_temporary_cleanup": {
+    "removed_temporary_directories": [
+      "/var/lib/capstone-offline-labs/build-httpd-20261022",
+      "/var/lib/capstone-offline-labs/candidate-20261022",
+      "/var/lib/capstone-offline-labs/final-source-20261022"
+    ],
+    "evidence_backup": "/var/backups/capstone-offline-labs/20261022-expansion/http-evidence",
+    "obsolete_task_images": [
+      {
+        "image_id": "sha256:53b98d83f5649ac5b487dc5cac3990920444b212821e4f211ba0706a3d0f3eae",
+        "result": "removed"
+      },
+      {
+        "image_id": "sha256:c784c592f6adc3d6aa5975a7f5eca9ebbc9d6141361c85edc753ce9fa1bac1e4",
+        "result": "removed"
+      }
+    ],
+    "operational_archives_preserved": "/var/lib/capstone-offline-labs/offline-images-20261022"
+  },
+  "final_a": {
+    "identity": {
+      "waf": {
+        "id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+        "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+        "started": "2026-10-14T19:16:02.328349981Z"
+      },
+      "chatproxy": {
+        "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+        "image": "sha256:bd3cc628e59c8865f88a3bbe99c1029c12a9983b2cb88a9b03913f43d4f5aa79",
+        "started": "2026-09-29T01:44:03.48454989Z"
+      }
+    },
+    "protected_sha256": {
+      "/etc/capstone-waf/zz-capstone-evidence-v2.conf": "79106971da4174a47eafc04b805cf73b5977616424c51c4444df246f35c3d27f",
+      "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+      "/etc/capstone-waf/modsecurity-override-v2.conf.template": "814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb",
+      "/etc/capstone-offline-labs-waf/REQUEST-900-CAPSTONE-LABS.conf": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db"
+    },
+    "tls_sha256": "812f17e07efa9091232a4e58c9fb7668bf93dcba5154bea38c208b67c7a9bb4b",
+    "waf_sha256": "f13e10123297ca19f1ce22124afda24d183a2ec3336dc0cb9f1a53675b56ff66",
+    "nginx_config_tests_passed": true,
+    "stage_removed": true,
+    "stage_file_count": 3,
+    "backup": "/var/backups/capstone-offline-labs/20261022-expansion"
+  },
+  "historical_scope_note": "Earlier 2026-10-22 entries, including DVWA integration/mirror verification, are historical. The user clarified on 2026-10-23 that DVWA must remain at its original independent address. See final_20261023 for the current four-entry catalog.",
+  "final_20261023": {
+    "checked_at": 1792682348,
+    "catalog_ids": [
+      "CVE-2021-44228",
+      "CVE-2021-41773",
+      "CVE-2021-42013",
+      "CVE-2021-3156"
+    ],
+    "native_backend_tests": 64,
+    "public_validation": {
+      "checked_at": 1792682163,
+      "passed": true,
+      "checks": [
+        {
+          "name": "catalog four",
+          "ok": true,
+          "actual": 4,
+          "expected": 4
+        },
+        {
+          "name": "DVWA removed",
+          "ok": true,
+          "actual": false,
+          "expected": false
+        },
+        {
+          "name": "removed DVWA path ",
+          "ok": true,
+          "actual": 404,
+          "expected": 404
+        },
+        {
+          "name": "removed DVWA path /",
+          "ok": true,
+          "actual": 404,
+          "expected": 404
+        },
+        {
+          "name": "removed DVWA path /login.php",
+          "ok": true,
+          "actual": 404,
+          "expected": 404
+        },
+        {
+          "name": "DVWA removed API deploy",
+          "ok": true,
+          "actual": 409,
+          "expected": 409
+        },
+        {
+          "name": "DVWA unknown catalog deploy",
+          "ok": true,
+          "actual": "unknown_cve",
+          "expected": "unknown_cve"
+        },
+        {
+          "name": "DVWA removed API stop",
+          "ok": true,
+          "actual": 409,
+          "expected": 409
+        },
+        {
+          "name": "DVWA unknown catalog stop",
+          "ok": true,
+          "actual": "unknown_cve",
+          "expected": "unknown_cve"
+        },
+        {
+          "name": "original DVWA HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "original DVWA login",
+          "ok": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "name": "original DVWA no injected theme",
+          "ok": true,
+          "actual": false,
+          "expected": false
+        },
+        {
+          "name": "/log4shell/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-44228/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-44228/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-44228/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-41773/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-41773/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-41773/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-42013/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-42013/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-42013/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "CVE-2021-41773 anonymous canary spoof denied",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "CVE-2021-42013 anonymous canary spoof denied",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "primary HMAC session",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "no DVWA mirror issued",
+          "ok": true,
+          "actual": false,
+          "expected": false
+        },
+        {
+          "name": "CVE-2021-41773 primary exempt canary",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "CVE-2021-42013 primary exempt canary",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "CVE-2021-41773 restored enforce canary",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "CVE-2021-42013 restored enforce canary",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "sudo ready",
+          "ok": true,
+          "actual": "ready",
+          "expected": "ready"
+        },
+        {
+          "name": "theme.js exact deployed source",
+          "ok": true,
+          "actual": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078",
+          "expected": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078"
+        },
+        {
+          "name": "theme.css exact deployed source",
+          "ok": true,
+          "actual": "435ef1c426f3695a11c741c83fea83c42e9077e162554b1b22b5a9e219905bdf",
+          "expected": "435ef1c426f3695a11c741c83fea83c42e9077e162554b1b22b5a9e219905bdf"
+        }
+      ],
+      "actual_attack_executed": false
+    },
+    "dvwa_separation": {
+      "original_url": "http://dvwa.grootlab.duckdns.org/",
+      "original_login_status": 200,
+      "log4shell_alias_status": 404,
+      "catalog_entry_removed": true,
+      "apache_alias_removed": true,
+      "mirror_cookie_code_removed": true,
+      "native_dvwa_files_db_and_accounts_changed": false
+    },
+    "sudo_runtime_evidence": "nonweb/sudo/runtime/live-verification-20261023.json",
+    "sudo_runtime_cleanup": "nonweb/sudo/runtime/cleanup-20261023.json",
+    "theme": {
+      "mode_labels": [
+        "다크",
+        "화이트"
+      ],
+      "icon_size_px": 16,
+      "icon_grid_fixed": true,
+      "text_slot_centered": true,
+      "transition_ms": 180,
+      "prefers_reduced_motion_respected": true,
+      "no_external_assets": true,
+      "dvwa_excluded": true,
+      "files_sha256": {
+        "static/theme.js": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078",
+        "static/theme.css": "c1d66941ea7be2f5887d6c9eb65063903f7b8e78545af85e382b3a49ca0681ec"
+      },
+      "browser_checks": {
+        "browser": "Safari",
+        "reload_before_check": true,
+        "console_both_modes": true,
+        "java_both_modes": true,
+        "apache_249_both_modes": true,
+        "apache_250_both_modes": true,
+        "final_icon_and_text_alignment_console": true
+      },
+      "final_asset_http_checks": {
+        "theme.js": {
+          "status": 200,
+          "sha256": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078"
+        },
+        "theme.css": {
+          "status": 200,
+          "sha256": "c1d66941ea7be2f5887d6c9eb65063903f7b8e78545af85e382b3a49ca0681ec"
+        }
+      }
+    },
+    "a_proxy_application": {
+      "applied": true,
+      "identity": {
+        "waf": {
+          "id": "6c72d5a5b8229fc3b6e010c9d046d97ac5c13437cae045c72a330fe0d6d82f81",
+          "image": "sha256:411cc97544ec0af886d3bc2a230564c2d28f08a800152617507476cda6ae9650",
+          "started": "2026-10-14T19:16:02.328349981Z"
+        },
+        "chatproxy": {
+          "id": "2c6923e7a66ebf55ef28f866cda77a3000f3ed26f7937198927cd73d5cd85403",
+          "image": "sha256:bd3cc628e59c8865f88a3bbe99c1029c12a9983b2cb88a9b03913f43d4f5aa79",
+          "started": "2026-09-29T01:44:03.48454989Z"
+        }
+      },
+      "protected_sha256": {
+        "/etc/capstone-waf/zz-capstone-evidence-v2.conf": "79106971da4174a47eafc04b805cf73b5977616424c51c4444df246f35c3d27f",
+        "/etc/capstone-waf/REQUEST-900-CAPSTONE-SCANNER.conf": "d95e75f39d082053543b04de10d538154da4ce8b25e9333014b3b2d858b65f8d",
+        "/etc/capstone-waf/modsecurity-override-v2.conf.template": "814a4af8c52a66e1ee0eed072b0e5dbac9340240cad8ae6118ec7a5e902ea8cb",
+        "/etc/capstone-offline-labs-waf/REQUEST-900-CAPSTONE-LABS.conf": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db"
+      },
+      "tls_sha256": "0e723b47d974632ca1af810928945839b9288ba2838e356ef15e9fb77c0fee1d",
+      "waf_sha256": "463e44a172fc01daf23e9311348b5fa831b389c839d6fb79fefe5d561b61c971",
+      "backup": "/var/backups/capstone-offline-labs/20261022-expansion/dvwa-separation"
+    },
+    "c_application_and_status": {
+      "dvwa_separation": {
+        "applied": true,
+        "native_tests": [
+          "................................................................",
+          "----------------------------------------------------------------------",
+          "Ran 64 tests in 1.507s",
+          "",
+          "OK"
+        ],
+        "catalog_ids": [
+          "CVE-2021-44228",
+          "CVE-2021-41773",
+          "CVE-2021-42013",
+          "CVE-2021-3156"
+        ],
+        "sha256": {
+          "app.py": "4686acc01ea4a1cc600caf396bc1c5173faf8b82aaea9d43fcf9a5f9dd10fe76",
+          "practice_mode.py": "ee6adb5a09415414acd934d25af66483856ac580dbced0c37db226450cd544b3",
+          "cve_list.json": "caecd2e38f89289867dce9fd6305e6daa895435d5b2594f131d24efe0339e38a",
+          "test_app.py": "13074c2014cd35420eee7ab242f6651edb4eb67ea6c4dcbe913b0fbc89d0576d",
+          "test_practice_mode.py": "4ec3ea12b029ddb2ff5eb607d20577722ef7bbf906e3ce7c013f39c45fef488b",
+          "manifest.py": "67d50505cdd298e136b61c009f00f64dfd759e2cb91d5f0c4bd4176db69fceb7",
+          "broker.py": "8a9efa13aaf4bd8d2717152e580ffa46c05e2da792683333633b23da70dbb206",
+          "test_broker.py": "0df9ead81e7784296c48609326396d2fd06e3b9180c91970fea4ce2dff28cd78",
+          "test_lab_types.py": "29f55c5bdc5b35f15adc4e33ad58ca42c46ce432b0a87bb0912d3051f03ad768",
+          "apache-proxy.conf": "3c48512e6444ff02182b22539448216794c58ee34d05b3015ce24e04debc62e4",
+          "nginx-log4shell-server.conf": "b1593b0488a031d4055df71095a53269f120ef1cc5c04fa4e0af6d89b03da488",
+          "waf-log4shell-server.conf": "463e44a172fc01daf23e9311348b5fa831b389c839d6fb79fefe5d561b61c971",
+          "challenge.py": "f3fd8f071608978f0de1ca554acbab4765014ca7cb7fb6036743ed099f636c1f",
+          "static/theme.css": "435ef1c426f3695a11c741c83fea83c42e9077e162554b1b22b5a9e219905bdf",
+          "static/index.html": "cc38b694eef2a83afaf12c6e4f9700e4599798e53f65f036c33894292f14da99",
+          "static/theme.js": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078",
+          "static/style.css": "86a5d84c81b1fb785f71a8f79586c9cf30eb6d3f5f45b2b7dd5a5a7e6699b94f",
+          "static/app.js": "9994756425837970930e098ab0b8307c932967100e762fa6c387d3b4a063bb81"
+        },
+        "native_dvwa_files_changed": false,
+        "apache_alias_removed": true
+      },
+      "status": {
+        "labs": [
+          {
+            "cve_id": "CVE-2021-3156",
+            "attack_tested": false,
+            "checked_at": 1792682330,
+            "container_id": null,
+            "expires_at": 1792682630,
+            "host_scenario_verified": false,
+            "image_present": false,
+            "managed": false,
+            "status": "ready",
+            "type": "local-cli",
+            "url": null,
+            "verification": "environment_only"
+          },
+          {
+            "cve_id": "CVE-2021-41773",
+            "container_id": "cb972561a780",
+            "image_present": true,
+            "status": "running",
+            "url": "http://127.0.0.1:18082/"
+          },
+          {
+            "cve_id": "CVE-2021-42013",
+            "container_id": "31ceda110c75",
+            "image_present": true,
+            "status": "running",
+            "url": "http://127.0.0.1:18083/"
+          },
+          {
+            "cve_id": "CVE-2021-44228",
+            "container_id": "eb55ca320453",
+            "image_present": true,
+            "status": "running",
+            "url": "http://127.0.0.1:18081/log4shell/"
+          }
+        ],
+        "checked_at": 1792682384,
+        "offline": true,
+        "deployment_allowed": true,
+        "safety_error": null
+      },
+      "theme_sha256": {
+        "theme.js": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078",
+        "theme.css": "c1d66941ea7be2f5887d6c9eb65063903f7b8e78545af85e382b3a49ca0681ec"
+      }
+    }
+  },
+  "redesign_and_bootstrap_20261023": {
+    "recorded_at": 1792686233,
+    "native_backend_tests_passed": 66,
+    "public_checks_after_origin_change": {
+      "checked_at": 1792685374,
+      "passed": true,
+      "checks": [
+        {
+          "name": "catalog four",
+          "ok": true,
+          "actual": 4,
+          "expected": 4
+        },
+        {
+          "name": "DVWA removed",
+          "ok": true,
+          "actual": false,
+          "expected": false
+        },
+        {
+          "name": "removed DVWA path ",
+          "ok": true,
+          "actual": 404,
+          "expected": 404
+        },
+        {
+          "name": "removed DVWA path /",
+          "ok": true,
+          "actual": 404,
+          "expected": 404
+        },
+        {
+          "name": "removed DVWA path /login.php",
+          "ok": true,
+          "actual": 404,
+          "expected": 404
+        },
+        {
+          "name": "DVWA removed API deploy",
+          "ok": true,
+          "actual": 409,
+          "expected": 409
+        },
+        {
+          "name": "DVWA unknown catalog deploy",
+          "ok": true,
+          "actual": "unknown_cve",
+          "expected": "unknown_cve"
+        },
+        {
+          "name": "DVWA removed API stop",
+          "ok": true,
+          "actual": 409,
+          "expected": 409
+        },
+        {
+          "name": "DVWA unknown catalog stop",
+          "ok": true,
+          "actual": "unknown_cve",
+          "expected": "unknown_cve"
+        },
+        {
+          "name": "original DVWA HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "original DVWA login",
+          "ok": true,
+          "actual": true,
+          "expected": true
+        },
+        {
+          "name": "original DVWA no injected theme",
+          "ok": true,
+          "actual": false,
+          "expected": false
+        },
+        {
+          "name": "/log4shell/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-44228/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-44228/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-44228/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-41773/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-41773/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-41773/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-42013/ HTTP",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-42013/ theme script once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "/log4shell/labs/CVE-2021-42013/ theme css once",
+          "ok": true,
+          "actual": 1,
+          "expected": 1
+        },
+        {
+          "name": "CVE-2021-41773 anonymous canary spoof denied",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "CVE-2021-42013 anonymous canary spoof denied",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "primary HMAC session",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "no DVWA mirror issued",
+          "ok": true,
+          "actual": false,
+          "expected": false
+        },
+        {
+          "name": "CVE-2021-41773 primary exempt canary",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "CVE-2021-42013 primary exempt canary",
+          "ok": true,
+          "actual": 200,
+          "expected": 200
+        },
+        {
+          "name": "CVE-2021-41773 restored enforce canary",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "CVE-2021-42013 restored enforce canary",
+          "ok": true,
+          "actual": 403,
+          "expected": 403
+        },
+        {
+          "name": "sudo ready",
+          "ok": true,
+          "actual": "ready",
+          "expected": "ready"
+        },
+        {
+          "name": "theme.js exact deployed source",
+          "ok": true,
+          "actual": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078",
+          "expected": "fca9c63f37bf93aad04c646ea12d6241a9d01ce3cf409cafcac3a568ae31c078"
+        },
+        {
+          "name": "theme.css exact deployed source",
+          "ok": true,
+          "actual": "5791e884d3e82bacc9103009377c89fae3131b2c6f83de18b7ed33d71cc0f2c5",
+          "expected": "5791e884d3e82bacc9103009377c89fae3131b2c6f83de18b7ed33d71cc0f2c5"
+        }
+      ],
+      "actual_attack_executed": false
+    },
+    "ui_final": {
+      "checked_at": 1792686161,
+      "assets": {
+        "index.html": {
+          "sha256": "f4416dc4cac07e6a4d65220309e232a71e3afd42ec24b7fa957b64ad66ae09a4",
+          "pass": true
+        },
+        "style.css": {
+          "sha256": "3c1c94aa540330c204f9fb59f5cb570e0d0fa8e12577e42b937336a749aa6d97",
+          "pass": true
+        },
+        "theme.js": {
+          "sha256": "85f59895ca4395250ea10f1200a48b7951dcd3b90900bcaa764597ba8b5d9478",
+          "pass": true
+        },
+        "theme.css": {
+          "sha256": "d785eabdf42911b869bc7c35ddb791ae72c2f5b51fe7f7478604496db14bc05e",
+          "pass": true
+        }
+      },
+      "browser": "Safari",
+      "refreshed_before_checks": true,
+      "visual_modes": {
+        "console": [
+          "dark",
+          "light"
+        ],
+        "java": [
+          "dark",
+          "light"
+        ],
+        "httpd49": [
+          "dark",
+          "light"
+        ],
+        "httpd50": [
+          "dark",
+          "light"
+        ]
+      },
+      "temporary_tabs_closed": true,
+      "actual_attack_executed": false
+    },
+    "initial_setup_tests": {
+      "controller_security_prerequisites_common_key": 61,
+      "service": 39,
+      "console_bootstrap": 14,
+      "sudo_bootstrap": 27
+    },
+    "new_three_vm_apply_tested": false,
+    "sudo_bundle_verification": "nonweb/sudo/runtime/bootstrap-bundle-verification-20261023.json",
+    "cleanup_and_source_sync": {
+      "checked_at": 1792686842,
+      "mac_package_downloads_removed": [
+        {
+          "name": "sudo-bootstrap-bundle-inputs.tar",
+          "regular_files": 1,
+          "bytes": 12165120,
+          "absent": true
+        },
+        {
+          "name": "official-httpd-bases.tar",
+          "regular_files": 1,
+          "bytes": 203898880,
+          "absent": true
+        },
+        {
+          "name": "sudo-assets",
+          "regular_files": 10,
+          "bytes": 56787630,
+          "absent": true
+        },
+        {
+          "name": "base-images",
+          "regular_files": 19,
+          "bytes": 283083696,
+          "absent": true
+        },
+        {
+          "name": "sudo-assets.tar",
+          "regular_files": 1,
+          "bytes": 29286400,
+          "absent": true
+        },
+        {
+          "name": "rootless-artifacts.tar",
+          "regular_files": 1,
+          "bytes": 11919360,
+          "absent": true
+        },
+        {
+          "name": "official-httpd-oci.tar",
+          "regular_files": 1,
+          "bytes": 79237120,
+          "absent": true
+        },
+        {
+          "name": "unused-startup-draft",
+          "regular_files": 5,
+          "bytes": 58185,
+          "absent": true
+        },
+        {
+          "name": "oci-bases",
+          "regular_files": 4,
+          "bytes": 3529,
+          "absent": true
+        },
+        {
+          "name": "rootless-artifacts",
+          "regular_files": 9,
+          "bytes": 11896307,
+          "absent": true
+        }
+      ],
+      "server_cleanup": {
+        "a": {
+          "files": 2,
+          "bytes": 71680,
+          "stage_absent": true
+        },
+        "c": {
+          "stage_files": 25,
+          "stage_bytes": 327355613,
+          "candidate_files": 16,
+          "candidate_bytes": 181865,
+          "stage_and_candidate_absent": true
+        }
+      },
+      "operational_server_archives_and_backups_preserved": true,
+      "operational_containers_unchanged": true,
+      "services_active": true,
+      "source_sync_files": 81,
+      "source_sync_report_on_c": "/var/backups/capstone-offline-labs/20261022-expansion/source-final.json",
+      "remaining_local_task_helpers": "Removed after Git push and read-only DuckDNS review; final result recorded in the local conversation log."
+    }
+  }
+}

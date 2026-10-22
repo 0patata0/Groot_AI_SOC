@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="referrer" content="no-referrer">
+  <title>GROOT LAB · Lab Console</title>
+  <link rel="stylesheet" href="static/style.css">
+  <script src="static/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">본문으로 이동</a>
+  <div class="app-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="GROOT LAB 홈">
+        <svg class="brand-mark" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M18 3 32 11v15l-14 8L4 26V11L18 3Z"/><path d="m4 11 14 8 14-8M18 19v15M11 7l14 8v8l-7 4-7-4v-8l7-4"/></svg>
+        <span>GROOT<span class="brand-light"> LAB</span><small>SECURITY WORKSPACE</small></span>
+      </a>
+      <nav class="main-nav" aria-label="콘솔 탐색"><a href="#lab-workspace">실습 환경 <span aria-hidden="true">↗</span></a><a href="#practice-settings">검사 정책 <span aria-hidden="true">↗</span></a></nav>
+      <span id="connection-badge" class="connection-badge"><span class="status-dot"></span><span id="connection-label">검사 정책 확인 중</span></span>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="tiny-cross" aria-hidden="true"></span> LEARN. OBSERVE. DEFEND.</p>
+          <h1 id="page-title"><span>Lab</span><span>Console<span class="title-dot">.</span></span></h1>
+          <p class="page-description">취약점을 이해하고, 방어를 확인하는 공간.<br>실습 환경을 선택하고 필요한 순간에 실행하세요.</p>
+          <div class="hero-actions"><a class="button button-primary" href="#lab-workspace">실습 선택하기 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></a><a class="hero-secondary" href="#practice-settings">검사 정책 설정 <span aria-hidden="true">↗</span></a></div>
+          <p class="hero-caption"><span class="tiny-dot" aria-hidden="true"></span> 일반 실습은 키 없이 시작할 수 있습니다.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <svg class="lab-illustration" viewBox="0 0 600 440" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs><pattern id="lab-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".8" fill="currentColor"/></pattern></defs>
+            <rect class="art-dots" x="36" y="35" width="528" height="358" fill="url(#lab-grid)"/>
+            <g class="art-construction" stroke="currentColor" stroke-width="1"><path d="M45 318 298 171l256 148-254 147L45 318Z"/><path d="M45 318V115m509 204V116M300 466V243M45 115l254-147 255 148M103 352l255-148M162 386l254-147M221 420l254-147M104 284l253 147M163 250l253 147M221 216l253 147"/><path d="M42 49h12m-6-6v12M542 49h12m-6-6v12M42 397h12m-6-6v12M542 397h12m-6-6v12"/></g>
+            <g class="art-orbit" stroke="currentColor" stroke-width="1.2"><path d="m110 231-60 35 127 74m240-107 113 65-61 35M293 94l40-23 142 82-39 23" stroke-dasharray="4 5"/><circle cx="110" cy="231" r="4"/><circle cx="417" cy="233" r="4"/><circle cx="293" cy="94" r="4"/></g>
+            <g stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">
+              <path class="art-surface" d="m299 106 91 52v176l-91-52V106Z"/><path class="art-side" d="m390 158 63-36v176l-63 36V158Z"/><path class="art-top" d="m299 106 63-36 91 52-63 36-91-52Z"/>
+              <path d="m312 136 65 37v26l-65-37v-26Zm0 42 65 37v26l-65-37v-26Zm0 42 65 37v26l-65-37v-26Zm0 42 65 37v14l-65-37v-14Z"/>
+              <path d="m405 165 32-18m-32 30 32-18m-32 102 32-18m-32 30 32-18"/>
+              <path class="art-surface" d="m194 167 91 52v176l-91-52V167Z"/><path class="art-side" d="m285 219 63-36v176l-63 36V219Z"/><path class="art-top" d="m194 167 63-36 91 52-63 36-91-52Z"/>
+              <path d="m207 197 65 37v26l-65-37v-26Zm0 42 65 37v26l-65-37v-26Zm0 42 65 37v26l-65-37v-26Zm0 42 65 37v14l-65-37v-14Z"/>
+              <path d="m300 226 32-18m-32 30 32-18m-32 102 32-18m-32 30 32-18"/>
+              <path class="art-surface" d="m89 228 91 52v115l-91-52V228Z"/><path class="art-side" d="m180 280 63-36v115l-63 36V280Z"/><path class="art-top" d="m89 228 63-36 91 52-63 36-91-52Z"/>
+              <path d="m102 258 65 37v26l-65-37v-26Zm0 42 65 37v26l-65-37v-26Z"/><path d="m195 287 32-18m-32 30 32-18m-32 54 32-18"/>
+              <path class="art-node" d="m453 323 31-18 31 18-31 18-31-18Z"/><path d="m453 323v12l31 18 31-18v-12m-31 18v12M348 329l46 26 59-32"/>
+              <path class="art-node" d="m121 145 30-17 30 17-30 17-30-17Z"/><path d="m121 145v12l30 17 30-17v-12m-30 17v12m30-29 48-28 70 40"/>
+            </g>
+            <g class="art-led" fill="currentColor"><ellipse cx="321" cy="148" rx="2" ry="3.2" transform="rotate(-30 321 148)"/><ellipse cx="321" cy="190" rx="2" ry="3.2" transform="rotate(-30 321 190)"/><ellipse cx="216" cy="209" rx="2" ry="3.2" transform="rotate(-30 216 209)"/><ellipse cx="216" cy="251" rx="2" ry="3.2" transform="rotate(-30 216 251)"/><ellipse cx="111" cy="270" rx="2" ry="3.2" transform="rotate(-30 111 270)"/><ellipse cx="111" cy="312" rx="2" ry="3.2" transform="rotate(-30 111 312)"/></g>
+            <g class="art-labels" fill="currentColor" font-family="monospace" font-size="10" letter-spacing="1.5"><text x="412" y="84">LAB / 01</text><text x="43" y="202">REQUEST</text><text x="459" y="380">OBSERVE</text></g>
+            <g stroke="currentColor" stroke-width="1"><path d="M409 90h40M43 208h49M459 386h65"/><path d="M520 196h7v7h-7zM534 196h7v7h-7zM548 196h7v7h-7z"/></g>
+          </svg>
+          <div class="art-caption"><span>CONTROLLED ENVIRONMENT</span><span class="cross-cluster">+ + +</span></div>
+        </div>
+      </section>
+        <section class="metrics" aria-label="실습 환경 현황"><div class="metric"><span class="metric-label">등록된 실습</span><div><strong id="metric-total">—</strong><span>LABS</span></div><p>승인된 취약점 목록</p></div><div class="metric"><span class="metric-label">이미지 준비 완료</span><div><strong id="metric-ready">—</strong><span>READY</span></div><p>서버에 저장된 로컬 이미지</p></div><div class="metric"><span class="metric-label"><span class="tiny-dot"></span>실행 중</span><div><strong id="metric-running">—</strong><span>RUNNING</span></div><p id="last-updated">실습 상태 확인 중</p></div></section>
+
+      <div class="workspace-body">
+        <section id="practice-settings" class="auth-panel" aria-labelledby="auth-title">
+          <div class="auth-description"><span class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg></span><div><h2 id="auth-title">차단 예외 키 (선택)</h2><p id="auth-help">일회용 서명으로 검증하며, 키 자체는 전송하지 않습니다.</p><p id="session-expiry" class="field-help">예외는 같은 브라우저의 다른 탭에도 적용되며 10분 후 만료됩니다.</p></div></div>
+          <form id="auth-form" class="auth-form"><label class="sr-only" for="access-key">차단 예외 키 (선택)</label><input id="access-key" type="password" placeholder="차단 예외 키 입력 (선택)" autocomplete="off" autocapitalize="off" spellcheck="false" required aria-describedby="auth-help"><button id="connect-button" class="button button-primary" type="submit"><span id="connect-label">예외 적용</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 10h12m-5-5 5 5-5 5"/></svg></button><button id="disconnect-button" class="button button-secondary" type="button" hidden>예외 해제</button></form>
+        </section>
+
+        <p id="secure-access" class="secure-access" hidden>차단 예외에는 보안 연결과 WebCrypto 지원 브라우저가 필요합니다. 일반 실습은 키 없이 사용할 수 있습니다. <a href="https://log4shell.grootlab.duckdns.org/log4shell/" rel="noreferrer">HTTPS 관리 화면 열기 ↗</a></p>
+
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden><span id="notice-text"></span></div>
+        <div id="safety-notice" class="notice warning" role="status" hidden>격리 설정 확인이 필요해 실습 배포를 차단했습니다. 실행 중인 실습은 중지할 수 있습니다.</div>
+
+        <div id="lab-workspace" class="content-grid">
+          <section class="panel lab-panel" aria-labelledby="selection-title">
+            <div class="panel-heading"><div><span class="section-number">01</span><h2 id="selection-title">실습 환경 선택</h2></div><span class="muted-label">LAB CATALOG</span></div>
+            <div class="panel-body">
+              <label class="field-label" for="lab-select">취약점 / CVE</label><div class="select-wrap"><select id="lab-select" disabled aria-describedby="catalog-help"><option value="CVE-2021-44228">CVE-2021-44228 · Log4Shell</option></select><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></div><p id="catalog-help" class="field-help">등록된 실습 목록을 불러오고 있습니다.</p>
+
+              <article class="lab-detail" aria-labelledby="lab-name"><div class="lab-detail-top"><span id="lab-cve" class="cve-tag">CVE-2021-44228</span><span id="lab-state" class="state-badge state-unknown"><span class="status-dot"></span><span id="lab-state-label">상태 미확인</span></span></div><h3 id="lab-name">Log4Shell</h3><p id="lab-description">준비된 Log4Shell 이미지와 실습 정보를 불러오고 있습니다.</p><dl class="lab-facts"><div><dt>취약 버전</dt><dd id="lab-version">확인 중</dd></div><div><dt>이미지 상태</dt><dd id="lab-image-state">확인 중</dd></div><div><dt>컨테이너 포트</dt><dd id="lab-container-port">—</dd></div><div><dt>컨테이너 ID</dt><dd id="lab-container-id" class="mono">—</dd></div></dl></article>
+
+              <div class="lab-actions"><button id="deploy-button" class="button button-primary button-grow" type="button" disabled><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m7 4 9 6-9 6V4Z"/></svg><span id="deploy-label">실습 실행</span></button><button id="stop-button" class="button button-stop" type="button" disabled><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="5" width="10" height="10" rx="1"/></svg><span id="stop-label">중지</span></button></div><p id="action-help" class="field-help action-help">최신 상태를 확인한 뒤 키 없이 실습을 실행할 수 있습니다.</p>
+            </div>
+          </section>
+
+          <section class="panel access-panel" aria-labelledby="access-title">
+            <div class="panel-heading"><div><span class="section-number">02</span><h2 id="access-title">실습 접속</h2></div><span class="muted-label">WEB ACCESS</span></div>
+            <div class="panel-body"><div class="access-intro"><span class="icon-box small-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></svg></span><p>실습 실행 후 아래 주소로 바로 접속합니다.<br>일반 실습은 정상 요청을 허용하고 WAF 탐지 시 차단합니다.</p></div>
+              <div class="code-block"><div class="code-heading"><span><span class="step-dot">1</span>현재 검사 정책</span><button id="copy-policy" class="copy-button" type="button" disabled aria-label="현재 검사 정책 복사">복사</button></div><pre><code id="policy-summary">현재 WAF 검사 정책을 확인하고 있습니다.</code></pre></div>
+              <div class="code-block"><div class="code-heading"><span><span class="step-dot">2</span>브라우저에서 실습 열기</span><button id="copy-url" class="copy-button" type="button" disabled aria-label="실습 주소 복사">복사</button></div><pre><code id="local-url">실습을 선택하면 접속 주소가 표시됩니다.</code></pre></div>
+              <a id="open-lab" class="button button-open" target="_blank" rel="noopener noreferrer" aria-disabled="true" tabindex="-1"><span>실습 열기</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M11 4h5v5m0-5-8 8M8 4H4v12h12v-4"/></svg></a><p id="access-help" class="field-help">실습이 실행 중일 때 접속 링크가 활성화됩니다.</p>
+              <div class="runtime-details"><div class="runtime-heading"><span class="field-label">로컬 이미지</span><span class="small-tag">NO PULL</span></div><code id="image-tag" class="image-tag">확인 중</code><div class="runtime-row"><span>서버 수신 주소</span><code id="server-address">127.0.0.1:—</code></div><div class="runtime-row"><span>이미지 ID</span><code id="image-id">—</code></div></div>
+            </div>
+          </section>
+        </div>
+        <footer class="page-footer"><span><span class="tiny-dot"></span>준비된 로컬 이미지 · 실습별 실행과 중지</span><span id="refresh-caption">10초마다 상태·정책 갱신</span><button id="refresh-button" class="text-button" type="button" disabled>지금 새로고침<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M16 8a6 6 0 1 0 0 4M16 3v5h-5"/></svg></button></footer>
+      </div>
+    </main>
+  </div>
+  <noscript><div class="noscript">이 콘솔을 사용하려면 브라우저에서 JavaScript를 허용해야 합니다.</div></noscript>
+</body>
+</html>

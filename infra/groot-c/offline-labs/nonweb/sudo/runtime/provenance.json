@@ -1,0 +1,84 @@
+{
+  "next": "C gpgv verification required before extracting or installing",
+  "packages": [
+    {
+      "Architecture": "amd64",
+      "Depends": "libaudit1 (>= 1:2.2.1), libc6 (>= 2.38), libselinux1 (>= 3.1~), libsubid4 (>= 1:4.11.1)",
+      "Filename": "pool/main/s/shadow/uidmap_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+      "Package": "uidmap",
+      "SHA256": "a80cb7f72dd18c73cbb0b07b7fbe855504f26bfafae072a9b3d125c89d499b9e",
+      "Size": "26006",
+      "Version": "1:4.13+dfsg1-4ubuntu3.2"
+    },
+    {
+      "Architecture": "amd64",
+      "Depends": "libaudit1 (>= 1:2.2.1), libc6 (>= 2.38), libselinux1 (>= 3.1~)",
+      "Filename": "pool/main/s/shadow/libsubid4_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+      "Package": "libsubid4",
+      "SHA256": "ba97fd28c53560a8d2a2261e8f75a7ab4112535b12f9fe1d50970c30051da0da",
+      "Size": "23442",
+      "Version": "1:4.13+dfsg1-4ubuntu3.2"
+    },
+    {
+      "Architecture": "amd64",
+      "Depends": "dbus-user-session, libc6 (>= 2.34)",
+      "Filename": "dists/noble/pool/stable/amd64/docker-ce-rootless-extras_29.8.1-1~ubuntu.24.04~noble_amd64.deb",
+      "Package": "docker-ce-rootless-extras",
+      "SHA256": "02897501837b7ff4fec8248decdd5828b7d40d7f591021a91f29673e02d0f982",
+      "Size": "10177712",
+      "Version": "5:29.8.1-1~ubuntu.24.04~noble"
+    }
+  ],
+  "schema": 1,
+  "signature_verified": false,
+  "sources": [
+    {
+      "name": "ubuntu.InRelease",
+      "sha256": "2e42a61b1e1d106345dca11f646cfe13405e2ad300c4bbe226e91edc8ad920b5",
+      "size": 126125,
+      "url": "https://archive.ubuntu.com/ubuntu/dists/noble-updates/InRelease"
+    },
+    {
+      "name": "ubuntu.Packages.xz",
+      "sha256": "9ea8ce72e2cc963c2aae53be81fe2b08c4854491a59cd3ffc78ec2b16f758fb0",
+      "size": 1400340,
+      "url": "https://archive.ubuntu.com/ubuntu/dists/noble-updates/main/binary-amd64/by-hash/SHA256/9ea8ce72e2cc963c2aae53be81fe2b08c4854491a59cd3ffc78ec2b16f758fb0"
+    },
+    {
+      "name": "uidmap_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+      "sha256": "a80cb7f72dd18c73cbb0b07b7fbe855504f26bfafae072a9b3d125c89d499b9e",
+      "size": 26006,
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/s/shadow/uidmap_4.13+dfsg1-4ubuntu3.2_amd64.deb"
+    },
+    {
+      "name": "libsubid4_4.13+dfsg1-4ubuntu3.2_amd64.deb",
+      "sha256": "ba97fd28c53560a8d2a2261e8f75a7ab4112535b12f9fe1d50970c30051da0da",
+      "size": 23442,
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/s/shadow/libsubid4_4.13+dfsg1-4ubuntu3.2_amd64.deb"
+    },
+    {
+      "name": "docker.asc",
+      "sha256": "1500c1f56fa9e26b9b8f42452a553675796ade0807cdce11975eb98170b3a570",
+      "size": 3817,
+      "url": "https://download.docker.com/linux/ubuntu/gpg"
+    },
+    {
+      "name": "docker.InRelease",
+      "sha256": "086b344e5b421b8fc0379a50b46a1842ae52833f1ea8361ff6ebd58778d0d729",
+      "size": 48475,
+      "url": "https://download.docker.com/linux/ubuntu/dists/noble/InRelease"
+    },
+    {
+      "name": "docker.Packages.gz",
+      "sha256": "cabe5c7534eb6e767d8dcf244d8567b161190b53dbf5e9f411067a3f791f62d7",
+      "size": 86848,
+      "url": "https://download.docker.com/linux/ubuntu/dists/noble/stable/binary-amd64/Packages.gz"
+    },
+    {
+      "name": "docker-ce-rootless-extras_29.8.1-1~ubuntu.24.04~noble_amd64.deb",
+      "sha256": "02897501837b7ff4fec8248decdd5828b7d40d7f591021a91f29673e02d0f982",
+      "size": 10177712,
+      "url": "https://download.docker.com/linux/ubuntu/dists/noble/pool/stable/amd64/docker-ce-rootless-extras_29.8.1-1~ubuntu.24.04~noble_amd64.deb"
+    }
+  ]
+}

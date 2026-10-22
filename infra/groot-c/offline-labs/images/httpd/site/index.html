@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@@CVE_ID@@ · Groot Apache 실습</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar"><span class="brand">GROOT <span>SECURITY LAB</span></span><span class="tag">파일 접근 실습</span></header>
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">APACHE HTTP SERVER</p>
+        <h1 id="page-title">URL이 파일 경로가<br>되는 경계를 살펴봅니다.</h1>
+        <p class="intro">구버전 Apache의 경로 정규화와 파일 접근 제어를 관찰하는 격리 실습입니다. 컨테이너 안에 준비된 공개 텍스트 파일만 사용합니다.</p>
+        <div class="chips"><span>비root 프로세스</span><span>읽기 전용 파일시스템</span><span>CGI 없음</span></div>
+      </div>
+      <aside class="version-card" aria-label="실습 버전">
+        <p class="eyebrow">이 컨테이너</p>
+        <p class="version">@@HTTPD_VERSION@@</p>
+        <p class="cve">@@CVE_ID@@</p>
+        <p>2.4.49와 2.4.50은 같은 경로 정규화 결함 계열을 비교합니다. 정상 페이지가 열린다는 사실만으로 취약점 재현이 확인되지는 않습니다.</p>
+      </aside>
+    </section>
+
+    <section class="cards" aria-label="실습 안내">
+      <article class="card"><span class="step">01 / 정상 경로</span><h2>Alias의 기본 동작</h2><p>URL과 실제 저장 경로가 서로 다를 수 있습니다. 다음 링크는 의도적으로 공개한 일반 파일입니다.</p><dl><dt>URL</dt><dd><code>/lab/alias/hello.txt</code></dd><dt>컨테이너 내부</dt><dd><code>/lab/public/hello.txt</code></dd></dl><a class="button" href="lab/alias/hello.txt">공개 파일 열기 <span aria-hidden="true">↗</span></a></article>
+      <article class="card"><span class="step">02 / 관찰 대상</span><h2>무해한 실습 파일</h2><p>일반 웹 경로 밖에 공개용 표식 파일 하나를 두었습니다. 실제 계정 정보나 호스트 파일은 실습 대상으로 사용하지 않습니다.</p><div class="path"><code>/lab/fixture/harmless.txt</code></div><p class="muted">표식: <code>GROOT_PUBLIC_TRAINING_FIXTURE</code><br>이 파일에는 별도 공개 URL을 연결하지 않았습니다.</p></article>
+      <article class="card"><span class="step">03 / 범위와 확인</span><h2>파일 접근에 집중</h2><p>CGI 실행 기능과 공격 스크립트는 포함하지 않습니다. 파일 접근 허용 여부와 WAF·서버 로그를 구분해서 확인하세요.</p><p>앞단 프록시의 경로 정규화나 WAF 차단 때문에 요청이 이 컨테이너에 도달하지 않을 수 있습니다.</p><div class="text-links"><a href="health.txt">정상 응답 확인 ↗</a><a href="version.json">버전 정보 확인 ↗</a></div></article>
+    </section>
+
+    <section class="note" aria-labelledby="notice-title"><h2 id="notice-title">실습 결과를 읽는 기준</h2><p>이 화면의 버전은 이미지 제작 중 실행 파일과 대조한 값입니다. 취약점 재현, WAF 탐지, 차단 성공은 각각 별도의 검증 결과입니다. 공개 학습 파일 이외의 시스템 경로는 접근 거부하도록 구성했습니다.</p></section>
+    <footer><span>Groot · 로컬 방어 훈련용</span><a href="https://httpd.apache.org/security/vulnerabilities_24.html#@@CVE_ID@@" target="_blank" rel="noopener noreferrer">Apache 공식 보안 권고 ↗</a></footer>
+  </main>
+</body>
+</html>

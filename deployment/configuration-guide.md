@@ -1,33 +1,33 @@
 # 환경 값 입력과 단일 셸 실행
 
-이 문서는 새 Ubuntu 24.04 amd64 서버 세 대의 사전 준비를 마친 뒤 수행한다. 명령마다 실행 위치를 표시했다. `192.0.2.0/24`는 문서용 예시이며 실제 할당 주소로 바꾼다. 기존 운영 A/B/C의 주소·비밀번호·등록 키를 복사하지 않는다.
+새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema7**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 인수하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**
 
-먼저 [네트워크·SSH 준비](setup-network-ssh.md), [패키지·자료 준비](setup-packages-artifacts.md), [Hermes 이미지 준비](hermes-image.md)를 완료한다. 실제 입력 파일은 두 개다.
+[네트워크·SSH 준비](setup-network-ssh.md), [오프라인 반입·설치 흐름](bootstrap-guide.md), [Hermes 이미지 준비](hermes-image.md)를 먼저 확인한다. 예시 `192.0.2.0/24`는 문서용이며 실제 할당 주소로 바꾼다. 설치기는 IP·라우팅·DNS·SSH를 자동 변경하지 않는다.
 
-| 파일 | 작성 위치 | 내용 | 권한·보관 |
-|---|---|---|---|
-| `deployment/site.local.conf` | 관리 컴퓨터의 저장소 | 세 서버 주소, SSH, NIC, LLM, 포트 | 0600 권장, Git 제외 |
-| `/opt/capstone-prereqs/siem.json` | siem 서버 | 초기 계정·암호, 준비한 Hermes 이미지 ID | root:root 0600, 서버에만 보관 |
+| 입력 | 위치 | 내용·권한 |
+|---|---|---|
+| `deployment/site.local.conf` | 관리 컴퓨터 저장소 | 주소·SSH·LLM·`LAB_*` 설정. 로컬 전용0600 권장, 비밀번호 금지 |
+| `/opt/capstone-prereqs/artifacts.json` 및 명시된 파일 | 서버마다 | 역할별 승인된 `.deb`·Docker save archive의 버전·SHA·ID. root 소유, group/world 쓰기 금지 |
+| `/opt/capstone-prereqs/siem.json` | SIEM | 초기 계정·암호·Hermes image ID. root:root0600 |
+| wheel 디렉터리·카탈로그·sudo bundle | service | 아래 `LAB_WHEEL_DIR`, `LAB_MANIFEST`, `LAB_SUDO_BUNDLE` |
+| TLS 인증서·개인키 | security | `LAB_PUBLIC_ORIGIN` 이름과 맞는 인증서. 개인키 root:root0600 |
 
-`deploy.sh`는 전자를 읽고, siem 역할은 후자를 서버에서 직접 읽는다. SIEM 암호를 관리 컴퓨터 설정이나 명령 인수에 넣지 않는다.
+반입 manifest의 해시는 관리자가 승인한 파일의 동일성을 확인한다. 공급자 서명 검증은 별도 준비 단계의 책임이며, sudo bundle은 자체 고정 pin·서명 체인을 추가 검사한다. Mac에 패키지를 설치하지 않으며 controller는 반입 바이너리를 자동 다운로드하지 않는다.
 
 ## 1. 입력값 확정
 
-다음 표를 먼저 채운다. 같은 서버에 여러 역할을 지정할 수 없다.
-
 | 항목 | 예시 | 확인 방법 |
 |---|---|---|
-| security 주소 | `192.0.2.10` | 해당 서버 `ip -br -4 address` |
-| siem 주소 | `192.0.2.20` | 해당 서버 `ip -br -4 address` |
-| service 주소 | `192.0.2.30` | 해당 서버 `ip -br -4 address` |
-| 공통 SSH 사용자·포트 | `capdeploy`, `22` | 세 서버 키 인증과 `sudo -n true` 성공 |
-| security 감시 NIC | `ens192` 또는 `auto` | `ip -br link`, 미러링/경유 경로 확인 |
-| LLM API | `http://192.0.2.40:11434/v1` | siem에서 아래 모델 목록 조회 |
-| 모델 이름 | `qwen3.6:35b` | API가 반환한 정확한 모델 ID |
-| backend/WAF 포트 | `80` / `8080` | 각 호스트에서 사용 가능한 포트 |
-| Log4Shell HTTP 이름(선택) | `log4shell.example.org` | 클라이언트 DNS/hosts가 security 주소를 반환하는지 확인 |
+| security / siem / service | `192.0.2.10` / `.20` / `.30` | 서로 다른 VM·machine-id와 NIC 주소 |
+| 공통 SSH 사용자·포트 | `capdeploy`, `22` | host key 대조, 키 인증과 `sudo -n true` |
+| security 감시 NIC | `ens192` 또는 `auto` | 미러링/경유 경로. auto는 SIEM 방향 NIC 선택 |
+| LLM API·모델 | `http://192.0.2.40:11434/v1`, `qwen3.6:35b` | SIEM에서 실제 모델 목록 조회 |
+| DVWA backend / WAF 포트 | `80` / `8080` | 해당 서버에서 포트가 비어 있는지 |
+| Lab HTTPS origin | `https://lab.example.org` | DNS/hosts→security, 인증서 SAN·유효기간·클라이언트 신뢰 |
+| Lab 허용 CIDR | `192.168.10.0/24` | 실제 실습 클라이언트 내부망/VPN 출발지 |
+| Lab 프록시 subnet | `172.30.247.0/29` | 호스트 route·Docker network·허용 CIDR과 겹치지 않는 사설 /29 |
 
-설치기가 입력받는 주소는 이미 서버 NIC에 할당된 주소다. 설치기는 OS IP·게이트웨이·DNS·SSH 포트를 변경하지 않는다. `MONITOR_INTERFACE=auto`는 SIEM으로 가는 경로의 NIC를 선택하므로 미러 전용 NIC를 쓰면 직접 지정한다. security→service의 출발지 주소는 `SECURITY_HOST`와 일치해야 한다.
+security→service의 실제 출발지 주소는 `SECURITY_HOST`와 일치해야 한다. HTTPS 포트를 바꾸면 origin의 포트도 같게 지정한다. 인증서 발급·DNS/hosts 구성은 사전 작업이며, 설치기가 준비된 인증서를 검증·배치한다.
 
 ### LLM 연결 확인 — siem 서버
 
@@ -46,18 +46,16 @@ curl --noproxy '*' --fail --silent --show-error \
 
 ## 2. 관리 컴퓨터 설정 작성
 
-실행 위치: **프로젝트 저장소 루트, Bash**. 이미 있는 설정은 덮어쓰지 않는다.
+저장소 루트에서 기존 파일을 덮어쓰지 않고 예제를 복사한다.
 
 ```bash
-set -euo pipefail
 umask 077
-test -f deploy.sh
 test ! -e deployment/site.local.conf
 cp deployment/config.example.conf deployment/site.local.conf
 chmod 600 deployment/site.local.conf
 ```
 
-텍스트 편집기로 `deployment/site.local.conf`를 수정한다. 기본 예시는 다음과 같다.
+텍스트 편집기에서 실제 값으로 바꾼다. 다음 경로 중 SSH 키·known_hosts만 관리 컴퓨터의 경로이며, `LAB_*` 반입 경로는 대상 서버의 경로다.
 
 ```ini
 SECURITY_HOST=192.0.2.10
@@ -70,35 +68,42 @@ SSH_KNOWN_HOSTS=/home/operator/.ssh/known_hosts
 MONITOR_INTERFACE=auto
 WEB_BACKEND_PORT=80
 WAF_PORT=8080
-LOG4SHELL_HOSTNAME=
-LOG4SHELL_APP_JAR=
+LAB_PUBLIC_ORIGIN=https://lab.example.org
+LAB_HTTPS_PORT=443
+LAB_ALLOWED_CIDRS=192.168.10.0/24
+LAB_PROXY_SUBNET=172.30.247.0/29
+LAB_GATEWAY_PORT=18091
+LAB_WHEEL_DIR=/opt/capstone-prereqs/wheels
+LAB_MANIFEST=/opt/capstone-prereqs/cve_list.json
+LAB_SUDO_BUNDLE=/opt/capstone-prereqs/sudo
+LAB_TLS_CERT=/opt/capstone-prereqs/lab-tls.crt
+LAB_TLS_KEY=/opt/capstone-prereqs/lab-tls.key
 LLM_BASE_URL=http://192.0.2.40:11434/v1
 LLM_MODEL=qwen3.6:35b
 ```
 
-위 `/home/operator`는 예시다. Mac의 기존 키를 사용하는 경우 실제 `/Users/사용자명/...` 절대 경로를 넣는다. 키 파일을 새로 서버에 반입하는 것이 아니라 관리 컴퓨터가 기존 개인키로 인증한다.
-
-| 키 | 의미·제약 |
+| 설정 | 의미·제약 |
 |---|---|
-| `SECURITY_HOST`, `SIEM_HOST`, `SERVICE_HOST` | 서로 다른 IPv4 리터럴. 호스트명·CIDR·SSH 사용자 접두사 금지 |
-| `SSH_USER`, `SSH_PORT` | 세 서버 공통 값. 사용자 기본 `ubuntu`, 포트 기본22. 비기본 포트는 siem 내부 읽기 MCP SSH에도 반영 |
-| `SSH_IDENTITY` | 개인키 절대 경로. 빈 값이면 기존 ssh-agent/기본 키 사용. 암호화 키는 미리 ssh-agent에 등록 |
-| `SSH_KNOWN_HOSTS` | 콘솔 fingerprint와 대조한 키 파일의 절대 경로. 새 host key 자동 수락 없음 |
-| `MONITOR_INTERFACE` | security의 감시 NIC 또는 `auto` |
-| `WEB_BACKEND_PORT` | service의 DVWA·`/log4shell/` UI 게시 포트, 기본80. 22/1514/1515 예약 포트 금지 |
-| `WAF_PORT` | security의 WAF 게시 포트, 기본8080 |
-| `LOG4SHELL_HOSTNAME` | 선택 소문자 DNS 이름. 예: `log4shell.example.org`. scheme·port·path·IP·와일드카드는 금지. 빈 값이면 기존 IP의 `/log4shell/`만 사용. DNS/hosts는 관리자가 security 주소로 사전 준비 |
-| `LLM_BASE_URL` | `http://호스트:포트/v1` 또는 신뢰된 HTTPS. API 키·쿼리 금지 |
-| `LLM_MODEL` | 모델 API에서 확인한 정확한 ID. 대화형 기본값은 `qwen3.6:35b` |
-| `SURICATA_IMAGE`, `WAF_IMAGE` | 생략 가능. 각각 `jasonish/suricata:latest`, `owasp/modsecurity-crs:nginx` 로컬 이미지 |
-| `ET_RULES_FILE` | 생략 가능. security의 `/opt/capstone-prereqs/suricata.rules` 기본 |
-| `DVWA_IMAGE`, `MARIADB_IMAGE` | 생략 가능. 각각 `ghcr.io/digininja/dvwa:latest`, `mariadb:10` 로컬 이미지 |
-| `LOG4SHELL_APP_JAR` | 기본 빈값 또는 생략은 service 서버에서 소스 자동 빌드. 준비 JAR을 쓰려면 해당 서버의 `/opt/…jar` 절대 경로를 지정하며 root 소유·그룹/기타 쓰기 금지가 필요. Mac 파일 경로가 아니며 기존 JAR 자체는 전송하지 않음 |
-| `LOG4SHELL_IMAGE` | 생략하면 기존 공식 고정 digest 이미지의 JDK·라이브러리로 앱을 빌드하고 같은 이미지를 실행 환경으로 사용. 새 JAR을 읽기 전용 마운트하므로 이미지의 기존 앱은 실행하지 않음. `registry/image@sha256:64자리` 또는 검토한 로컬 `sha256:64자리` image ID만 허용하며 태그는 거절. 자동 빌드는 `javac 1.8.0_181`·기존 Boot JAR도 필요. [자료 준비](setup-packages-artifacts.md)를 따르며 이미지 pull/build 없음 |
+| `SECURITY_HOST`, `SIEM_HOST`, `SERVICE_HOST` | 서로 다른 사용 가능한 IPv4 리터럴. 호스트명·CIDR 금지 |
+| `SSH_USER`, `SSH_PORT` | 세 서버 공통. 기본 ubuntu/22. 비기본 SSH 포트는 내부 읽기 MCP에도 반영 |
+| `SSH_IDENTITY`, `SSH_KNOWN_HOSTS` | 관리 컴퓨터의 실제 경로. 빈 identity는 기존 ssh-agent/기본키 사용. host key 자동 수락 없음 |
+| `MONITOR_INTERFACE` | security 감시 NIC 또는 auto |
+| `WEB_BACKEND_PORT`, `WAF_PORT` | 독립 DVWA의 service/backend와 security/WAF 포트. Lab HTTPS와 별개 |
+| `LAB_PUBLIC_ORIGIN`, `LAB_HTTPS_PORT` | 필수 HTTPS DNS origin과 같은 포트. path·사용자정보·query 금지. 기본443은 origin에 생략 |
+| `LAB_ALLOWED_CIDRS` | 쉼표로 구분한 1~32개 고유 RFC1918 IPv4 CIDR. `0.0.0.0/0` 불가 |
+| `LAB_PROXY_SUBNET` | security 전용 프록시의 사설 /29. 호스트 route·기존 Docker·클라이언트 CIDR과 충돌 금지 |
+| `LAB_GATEWAY_PORT` | service 내부 gateway 포트, 기본18091. security와 service loopback만 허용하며 사용자 공개 주소가 아님 |
+| `LAB_WHEEL_DIR` | service의 Python3.12 amd64용 전체 고정 wheel 목록. 설치기는 인터넷 대신 이 입력으로 콘솔 환경 준비 |
+| `LAB_MANIFEST` | service의 고정 4항목 카탈로그. Java/Apache2개는 정확한 로컬 image ID, sudo는 local-cli 상태 항목 |
+| `LAB_SUDO_BUNDLE` | service의 [고정 sudo bundle](../infra/groot-c/offline-labs/nonweb/sudo/runtime/BOOTSTRAP.md). 10파일+manifest와 서명 증빙 필수 |
+| `LAB_TLS_CERT`, `LAB_TLS_KEY` | security의 준비된 인증서/개인키. `/opt/…` 절대 경로. 실제 hostname·키 일치·유효기간 검증 |
+| `LLM_BASE_URL`, `LLM_MODEL` | 내부 `/v1` API와 실제 모델 ID. URL 안의 자격·query 금지 |
+| `SURICATA_IMAGE`, `WAF_IMAGE`, `DVWA_IMAGE`, `MARIADB_IMAGE` | 선택 로컬 이미지 참조. 반입된 ID·플랫폼·역할 계약을 검사하며 pull하지 않음 |
+| `ET_RULES_FILE` | 선택 security 룰 경로. 기본 `/opt/capstone-prereqs/suricata.rules` |
 
-설정은 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, `~`, `$HOME`, `$(...)`를 쓰지 않는다. 줄 맨 앞 `#`는 주석이며 LF 줄바꿈을 사용한다. 알 수 없는 키는 거절한다. `source deployment/site.local.conf`로 실행할 필요가 없다. Wazuh/Mattermost/PostgreSQL 버전과 `/opt/capstone` 경로는 이번 설치기에서 고정돼 있다.
+`LAB_ADMIN_KEY_FILE`은 controller의 고정 전달 경로이며 설정 파일의 입력 키가 아니다. `LAB_ADMIN_KEY`나 비밀번호 값도 넣지 않는다. 구형 `LOG4SHELL_IMAGE`, `LOG4SHELL_APP_JAR`, `LOG4SHELL_HOSTNAME`은 더 이상 쓰지 않으며 값이 있으면 거절한다. schema7은 준비된 관리형 이미지로 실행하고 초기 설치 중 Java JAR를 빌드·마운트하지 않는다.
 
-Log4Shell 이름을 입력하면 기본 DVWA 가상호스트 뒤에 이름이 정확히 일치하는 HTTP 가상호스트를 추가한다. `WAF_PORT=8080`이면 `http://log4shell.example.org:8080/`가 `/log4shell/`로302 이동하고, 해당 이름의 잘못된 `/dvwa/login.php` 등 UI 밖 경로도 같은 UI로 이동한다. `WAF_PORT=80`이면 포트 없는 `http://log4shell.example.org/`를 사용한다. DNS가 service 주소를 가리키면 WAF를 우회하므로 **security 주소**를 지정한다. 설치기는 DNS/hosts 변경·인증서 발급·HTTPS 구성을 수행하지 않는다. 운영 `grootlab.duckdns.org` 이름을 새 환경에 복사하지 않는다.
+설정은 LF의 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, 변수 확장, `~`, 명령 치환을 넣지 않는다. 맨 앞 `#`만 주석이며 알 수 없는 키는 거절한다. 파일을 shell `source`로 실행하지 않는다. 설정 파일에 정의한 경로를 controller가 서버로 업로드하는 것은 아니다.
 
 ## 3. SIEM 초기 계정 작성 — siem 서버 콘솔
 
@@ -134,10 +139,11 @@ sudoedit /opt/capstone-prereqs/siem.json
 |---|---|
 | `schema_version` | 숫자1 |
 | `wazuh_api_username` | 3~32자, 영문자로 시작. 영문/숫자/`.`/`_`/`-` 허용. 예시 `wazuh-wui` |
-| `indexer_username` | `admin` 고정. Dashboard 로그인에도 사용 |
+| `indexer_username` | `admin` 고정. Dashboard 로그인과 실습 차단 예외 키의 공통 계정 |
 | `mattermost_admin_username` | 3~32자, 영문 소문자로 시작. 소문자/숫자/`.`/`_`/`-` 허용 |
 | `mattermost_admin_email` | 운영자가 관리하는 이메일 형식. 이 설정만으로 SMTP가 구성되는 것은 아님 |
 | 네 `*_password` | 각각 새 값, UTF-8 기준16~72바이트. `CHANGE_ME`와 제어문자 금지 |
+| Indexer 암호 추가 조건 | Lab 예외 키와 공통 사용하므로 8자 이상. 원문을 로컬 설정 파일에 넣지 않음 |
 | Wazuh API 암호 추가 조건 | 영문 대문자·소문자·숫자·특수문자 모두 포함 |
 | `hermes_image` | 준비한 로컬 `sha256:64자리` 또는 검증된 `registry/image@sha256:64자리`. 태그만 지정 불가 |
 
@@ -154,74 +160,64 @@ sudo stat -c '%U:%G %a %n' /opt/capstone-prereqs/siem.json
 
 마지막 출력은 `root:root 600`이어야 한다. 위 `jq`는 JSON 구문·최상위 버전만 검사하며 필수 키·암호 조건·이미지 존재 여부는 다음 `--check`에서 검사한다. 추가 키와 중복 키도 설치기가 거절한다.
 
-## 4. 계획과 전체 사전검사 — 관리 컴퓨터
+## 4. 계획·사전검사·적용
 
-저장소 전체를 동일 버전으로 사용한다. `deploy.sh`만 따로 복사하면 역할 파일과 규칙이 없어 실행할 수 없다.
+저장소 전체와 로컬 설정을 함께 사용한다. `deploy.sh`만 복사해서 실행할 수 없다.
 
 ```bash
 bash deploy.sh --plan --batch --config deployment/site.local.conf
-```
-
-주소와 적용 순서가 의도와 같은지 확인한다. 이 단계는 SSH를 호출하지 않는다. 다음으로 세 호스트의 SSH·도구·입력 자료를 확인한다.
-
-```bash
 bash deploy.sh --check --batch --config deployment/site.local.conf
-```
-
-성공 기준은 종료 코드0과 `세 서버 사전검사 통과.`다. 초기 CA/등록 암호는 SIEM 설치 후 전달되므로 fresh security/service 검사에서 아직 없어도 된다. 패키지·이미지·주소·권한·등록된 기존 agent 문제는 해당 사전 준비로 돌아가 수정한다. 체크를 통과해도 실제 DB/API 초기화·Hermes 연결을 검증한 것은 아니다.
-
-`--check`도 파일을 전송하기 위한 root 임시폴더를 원격에 만든 뒤 정리한다. 기존 설치가 있으면 상태/API 조회와 읽기 MCP 검증도 수행할 수 있다. 서비스 설치·채팅 게시·모델 추론은 요청하지 않는다.
-
-## 5. 구성 적용 — 관리 컴퓨터
-
-```bash
+# 준비가 끝난 새 환경에 실제 적용
 bash deploy.sh --apply --batch --config deployment/site.local.conf
 ```
 
-실제 단계는 아래와 같다. 하나가 실패하면 후속 역할은 실행하지 않는다.
+| 모드 | 동작·성공 범위 |
+|---|---|
+| `--plan` | 로컬 입력·주소·순서 출력, SSH 없음 |
+| `--check` | 세 서버 반입물과 역할 사전조건 검사. 패키지·이미지·서비스 설치 없음. 빈 서버의 누락 도구는 실패할 수 있음 |
+| `--apply` | 아래 단계별 설치와 검증. 실패 시 다음 단계 중단, 앞 단계의 변경을 자동 롤백하지 않음 |
+| `--verify` | 완료된 동일 프로필의 파일·이미지·서비스·API·권한 경계를 재검증. 설치나 컨테이너 재생성 없음 |
 
-| 순서 | 수행 내용 | 결과 |
-|---|---|---|
-| 1 | 세 호스트 전체 사전검사, 서로 다른 machine-id 확인 | 역할 혼용·준비 누락 거절 |
-| 2 | SIEM 준비 이미지 격리 검사, 새 CA/계정·Wazuh/Mattermost/MCP/Hermes 구성 | SIEM 서비스·읽기 MCP 검증 |
-| 3 | SIEM의 등록 CA·암호를 SSH 파이프로 service/security에 전달 | 관리 컴퓨터에 암호 파일 저장 없음 |
-| 4 | service에서 Log4Shell 소스 자동 빌드(또는 준비 JAR 검증), DB/DVWA 초기화, 내부 앱·UI 구성, 웹 접근 제한, Wazuh 등록 | backend·UI·내부 lab·agent 검증 |
-| 5 | security의 WAF/IDS 규칙·탐지 모드·별도 nft 테이블·Wazuh 등록 | 엔진·웹·agent 검증 |
-| 6 | SIEM 최종 검증 | 구축 완료 주소 출력 |
+`--check` 성공은 종료 코드0과 `세 서버 사전검사 통과.`다. SSH 전송을 위한 root 임시폴더는 만들고 종료 시 정리한다. 역할에 따라 격리된 일회성 이미지 구문검사나 기존 서비스 읽기 검증을 할 수 있지만 실습 공격·채팅·모델 추론은 수행하지 않는다.
 
-자동 생성물은 `/opt/capstone/{siem,service,security}`와 소스 보존용 `/opt/capstone/releases/…`에 있다. 전달받은 CA/등록 파일은 각 서버 `/opt/capstone-prereqs/`에 남는다. 정상 설치의 필요한 운영 자료이므로 임시파일처럼 지우지 않는다. 임시 전송 폴더는 `/var/tmp/capstone-bootstrap-…`이며 설치기가 종료 시 정리한다.
+적용 순서는 다음과 같다.
 
-Log4Shell UI 접속 주소는 `http://SECURITY_HOST:WAF_PORT/log4shell/`이며 기본 예시는 `http://192.0.2.10:8080/log4shell/`다. DVWA의 Apache가 `/log4shell/`를 private lab 네트워크의 `http://log4shell:8080/log4shell/`로 프록시한다. 화면·상태 API·로깅 API는 새 Spring Boot JAR이 직접 제공하며 PHP 중계 웹은 배치하지 않는다. Log4Shell 앱은 호스트 포트를 게시하지 않으므로 service:8080이나 새 방화벽 허용 규칙을 만들지 않는다. 기존 운영망 `http://192.168.16.230/log4shell/`은 기존 A:80 경로이며 신규 환경의 WAF 기본8080과 구분한다.
+1. 세 호스트의 SSH·machine-id와 각 `artifacts.json`/SHA를 모두 검사한다.
+2. 각 서버의 승인된 로컬 deb를 `apt-get --no-download --no-remove`로 설치하고 이미지 archive를 load한다. 목록 외 패키지·다운그레이드·기존 다른 이미지 태그를 거절한다. 그 다음 세 역할의 사전검사를 수행한다.
+3. SIEM을 구성·검증한 뒤 등록 CA·암호를 security/service로 SSH 파이프 전달한다.
+4. Dashboard `admin`의 `indexer_password`를 service의 `/opt/capstone-prereqs/lab-admin.key` root:root0600에 직접 전달한다. Mac 디스크·명령 인수·로그에 저장하지 않는다.
+5. service에 콘솔·broker·nft guard와 별도 sudo rootless 환경을 설치하고, 독립 DVWA/MariaDB·gateway·Wazuh agent를 구성·검증한다.
+6. security에 Suricata IDS·DVWA WAF와 별도 Lab TLS 진입점/실습 WAF 정책을 설치·검증한다. SIEM을 다시 검증하고 주소를 출력한다.
 
-화면에서는 요청 헤더 또는 요청 파라미터를 Log4j 2.14.1로 기록한다. 설치 검증은 상태 API의 실제 API/core 버전과 고정된 무해 메시지 한 건의 로깅 응답을 확인한다. 외부 콜백·공격 재현은 설치 검증에 포함하지 않으며, 화면 응답 성공이 WAF/Suricata/Wazuh 탐지 E2E 성공을 뜻하지 않는다. 서비스 입력과 manifest는 schema6이며 빌드 모드·소스·빌더 지문, JAR SHA와 검증기 SHA를 고정한다. 이전 service schema1~5는 이 설치기로 자동 이관하지 않는다. 자세한 정상 동작 시험은 [검증 절차](verify-troubleshoot.md)를 따른다.
+운영 파일은 `/opt/capstone/{siem,service,security}`, 소스는 `/opt/capstone/releases/<SHA>`에 보존한다. 콘솔은 `/opt/capstone-offline-labs`, 상태는 `/var/lib/capstone-offline-labs`, sudo 설치 상태는 `/var/lib/capstone-sudo-bootstrap`를 사용한다. 반입된 CA·자격·TLS·운영 복구 archive를 작업 임시파일과 혼동해 지우지 않는다.
 
-자동 모드의 `--check`는 전달할 소스·빌드 도구와 로컬 이미지의 사전 조건을 정적으로 확인한다. 컴파일은 SIEM 구성 이후 service `--apply`에서 수행하므로 이후 빌드 실패 시 SIEM은 이미 구성됐을 수 있다. 빌드가 실패하면 후속 역할은 중단하고 부분 service 상태와 비공개 진단을 보존한다. 완료된 같은 프로필의 `--apply`와 `--verify`는 설치된 JAR을 재검증하며 재빌드하지 않는다. 자동 모드의 `input.json`은 빌드 전 소스 지문을 고정하고 `lab_jar_sha256`은 빈값으로 두며, 생성한 JAR SHA는 `evidence/log4shell-build.json`과 manifest 파일 해시에 보존한다. 준비 JAR 모드는 입력에도 미리 검증한 JAR SHA를 기록한다.
+### 접속과 공통 예외 키
+
+- DVWA는 기존 독립 경로 `http://SECURITY_HOST:WAF_PORT/dvwa/`다. Lab Console 카탈로그에 넣지 않는다.
+- 콘솔은 `LAB_PUBLIC_ORIGIN/log4shell/`, Java는 `/log4shell/labs/CVE-2021-44228/`, Apache 실습은 동일 origin의 해당 CVE 경로다.
+- 정상 무키 요청과 웹 실습 실행·중지는 허용된다. WAF 규칙에 걸린 요청을 차단하며, 키가 없다는 이유만으로 모든 요청을 차단하지 않는다.
+- 선택 예외 키는 Dashboard `admin` 암호와 같다. 브라우저가 30초·1회용 challenge를 HMAC 서명해 보내며 원문·고정 키 해시를 보내지 않는다. 성공 시 별도 HttpOnly 세션 쿠키가600초 유지된다. 같은 브라우저 탭 사이에 공유되며 키 자체가 쿠키에 들어가는 것은 아니다.
+- 관리·인증 API는 Lab WAF를 우회하고 고정된 실제 실습 경로만 WAF를 지난다. 예외는 해당 WAF 차단에만 적용되며 Suricata·기존 IP 차단·보호 주소·LLM 승인/TTL 정책을 해제하지 않는다.
+- sudo는 관리자 전용 CLI 환경의 상태만 표시한다. `ready`도 환경/패키지 검증이며 실제 권한상승·host auditd 시나리오 성공을 뜻하지 않는다.
+
+기본 설치는 웹 실습3개 이미지만 준비하며 자동 기동하지 않는다. 콘솔에서 선택해 실행한 뒤 같은 HTTPS 링크로 접속한다. SSH 포트포워딩은 일반 접속의 필수 절차가 아니다. 추가 CVE는 이미지·카탈로그뿐 아니라 제한된 same-origin 라우트 계약도 별도로 준비해야 한다.
 
 ### 대화형 실행
-
-기본 SSH22·기본 포트·기본 모델을 사용할 때는 다음 한 명령으로 실행할 수 있다.
 
 ```bash
 bash deploy.sh
 ```
 
-질문 순서는 **security 주소 → siem 주소 → service 주소 → 공통 SSH 사용자 → 개인키 경로 → 감시 NIC → 선택 Log4Shell HTTP 호스트명 → LLM API 주소**다. SSH 포트·모델·웹 포트·준비 JAR 경로는 대화형 질문에 없으므로 다른 값을 쓰려면 앞의 설정 파일 방식을 사용한다. 기본값은 Log4Shell 자동 빌드이며 대화형 명령도 사전검사 후 실제 구성을 적용한다.
+설정 파일 없이 터미널에서 실행할 때 질문 순서는 **security 주소 → siem 주소 → service 주소 → 공통 SSH 사용자 → 개인키 경로 → 감시 NIC → Lab HTTPS origin → 허용 내부망/VPN CIDR → LLM API 주소**다. 기본 동작은 실제 `--apply`다. SSH/HTTPS 포트·모델·인증서/번들 경로 등 질문에 없는 값을 바꾸려면 설정 파일을 쓴다. 대화형 실행도 사전 반입물·인증서·자격 JSON을 요구한다.
 
-## 6. 재검증과 운영 인계
-
-schema6의 Log4Shell Compose는 `entrypoint: [java]`, `command: [-jar, /app/spring-boot-application.jar]`, `working_dir: /app`을 명시한다. 서버 주소 `0.0.0.0`, 포트 `8080`, context path `/log4shell`, `LOGGING_CONFIG=classpath:log4j2-spring.xml`, KST와 Java 메모리 옵션도 명시하여 이미지의 기본 CMD·ENTRYPOINT·WORKDIR에 의존하지 않는다. 소스의 `application.properties`와 Log4j 설정은 검증한 JAR 안에 포함된다.
-
-JAR은 `/opt/capstone/service/config/log4shell-app.jar`에서 읽기 전용으로 마운트하고 long bind의 `create_host_path: false`를 지정한다. 파일이 없어지면 Compose가 빈 디렉터리를 자동 생성하지 않고 실패해야 한다. 지원하지 않는 Compose 버전은 `config --quiet`에서 중단하며 이 옵션을 지워 통과시키지 않는다. 같은 image ID·JAR·Compose로 운영자가 Log4Shell 컨테이너만 재생성해도 새 앱과 고정 실행 설정을 다시 사용한다. 초기 설치기 `--apply`의 완료된 환경 처리 경로는 재검증이며 자동 재생성·업그레이드를 수행하지 않는다.
-
+## 5. 재검증과 운영 인계
 
 ```bash
 bash deploy.sh --verify --batch --config deployment/site.local.conf
 ```
 
-성공 기준은 종료 코드0과 `세 역할 검증 완료.`다. 최초 로그인, 서비스별 확인, 모델 응답 시험, 장애 진단은 [검증·장애 대응](verify-troubleshoot.md)을 따른다. 설치기가 검사한 범위와 실제 보안 경보 전달·모델 응답 시험을 각각 기록한다.
+종료 코드0과 `세 역할 검증 완료.`를 확인한 뒤 [검증·장애 대응](verify-troubleshoot.md)에 따라 허용 클라이언트 HTTPS·로그인·정상 웹 요청과 관리자 봇 질의를 별도로 확인한다. server TLS probe의403은 클라이언트 ACL에 의한 결과일 수 있어 외부 허용 클라이언트 검증을 대신하지 않는다.
 
-검증 중에는 처음 쓴 이미지 ID·규칙·입력·스크립트가 유지돼야 한다. image pull, 소스 업데이트, 입력 변경 뒤에는 같은 설치를 그대로 재검증하지 못할 수 있다. `changed_inputs`·`profile_changed`·부분 설치 오류를 없애려고 manifest/receipt나 DB 볼륨을 지우지 않는다. 소스 커밋·로컬 설정·준비 자료를 보존하고 의도한 변경을 별도 이관 작업으로 처리한다.
+완료된 동일 프로필의 `--apply`는 재검증만 수행한다. service schema1~6, security schema1, 기존 수동 설치를 숫자만 바꿔 이관하지 않는다. SIEM 준비 `siem.json`의 `schema_version: 1`은 별도 입력 형식이므로 바꾸지 않는다. 이미지·룰·주소·키·소스 변경은 별도 검토가 필요하며 `changed_inputs`, 부분 설치, 파일 해시 오류를 없애려고 manifest·receipt·DB 볼륨을 삭제하지 않는다.
 
-빌드 모드·소스·빌더 지문, 선택 HTTP 호스트명·공개 WAF 포트·새 Spring JAR SHA를 포함한 service의 `input.json`과 `manifest.json`은 **schema6**다. 기존 service schema1~5를 자동 업그레이드하지 않으며 재실행하면 입력/manifest 불일치로 거절한다. 기존 service는 데이터·계정·agent 등록을 보존하는 별도 이관이 필요하다. 이 service 상태 버전과 SIEM 준비 파일 `siem.json`의 `schema_version: 1`은 서로 다른 형식이므로 혼동해 수정하지 않는다.
-
-사전검사 실패는 원인을 고친 뒤 재실행할 수 있다. 적용 시작 후 실패했다면 [부분 실패 처리](verify-troubleshoot.md)의 상태 확인부터 수행한다. 새 VM 세 대에서 실제 설치가 성공했다는 검증은 이 문서 작성 시 아직 하지 않았다.
+현재 확인한 코드/모의 회귀 및 기존 C sudo 번들의 실제 정적 서명 검증은 **새 VM 3대 전체 설치 성공과 별개**다. 새 환경의 `--apply`, `--verify`, 허용 클라이언트 접속을 실제 수행한 뒤 해당 범위만 인수 기록에 남긴다.

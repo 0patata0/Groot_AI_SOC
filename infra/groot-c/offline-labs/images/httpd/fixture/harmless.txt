@@ -1,0 +1,3 @@
+GROOT_PUBLIC_TRAINING_FIXTURE
+This file is intentionally public training data. It contains no credentials.
+It belongs only to this disposable lab container, not to the host filesystem.

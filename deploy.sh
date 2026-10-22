@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One entry point for a fresh, three-host deployment. Dependencies are manual.
+# One entry point for fresh three-host installation from approved offline artifacts.
 set -euo pipefail
 umask 077
 
@@ -28,6 +28,17 @@ MARIADB_IMAGE=
 LOG4SHELL_IMAGE=
 LOG4SHELL_APP_JAR=
 LOG4SHELL_HOSTNAME=
+LAB_PUBLIC_ORIGIN=
+LAB_HTTPS_PORT=443
+LAB_ALLOWED_CIDRS=
+LAB_PROXY_SUBNET=172.30.247.0/29
+LAB_GATEWAY_PORT=18091
+LAB_WHEEL_DIR=/opt/capstone-prereqs/wheels
+LAB_MANIFEST=/opt/capstone-prereqs/cve_list.json
+LAB_ADMIN_KEY_FILE=/opt/capstone-prereqs/lab-admin.key
+LAB_SUDO_BUNDLE=/opt/capstone-prereqs/sudo
+LAB_TLS_CERT=/opt/capstone-prereqs/lab-tls.crt
+LAB_TLS_KEY=/opt/capstone-prereqs/lab-tls.key
 WORK=
 RUN_ID=
 REMOTE_STAGE=
@@ -40,15 +51,16 @@ usage() {
 Usage: ./deploy.sh [--check|--apply|--verify|--plan] [--config FILE] [--batch]
 
 Without a config, asks for security, siem, service IPv4 addresses, in that order.
---check   SSH and all three prerequisite checks; no service installation.
---apply   Check every host, then deploy siem -> service -> security (default).
+--check   Validate offline bundles and all three roles; never install packages.
+--apply   Validate bundles, install offline prerequisites, then all three roles.
 --verify  Check the existing deployment without applying it again.
 --plan    Validate inputs and print the plan; no SSH or local staging.
 --batch   Require all inputs in the configuration; never prompt.
 
-Packages, images, SSH host keys and sudo access must be prepared manually.
-Log4Shell is built on the service host by default; a prepared JAR is optional.
-See README.md and deployment/config.example.conf. No package manager is run.
+SSH host keys, sudo access and reviewed offline bundles must be prepared first.
+Packages and docker-save images in each server's artifacts.json are installed
+without downloads. Lab wheels, catalog, sudo bundle and TLS files stay on servers.
+See deployment/bootstrap-guide.md and deployment/config.example.conf.
 EOF
 }
 while [[ $# -gt 0 ]]; do
@@ -69,7 +81,7 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         ;;
@@ -96,8 +108,10 @@ if [[ $BATCH == 0 && -t 0 && -z $CONFIG ]]; then
   printf 'SSH 개인키 경로 [기존 ssh-agent/기본키 사용]: ' >&2; IFS= read -r SSH_IDENTITY || die 'input cancelled'
   printf 'security 감시 인터페이스 [auto]: ' >&2; IFS= read -r answer || die 'input cancelled'
   [[ -z $answer ]] || MONITOR_INTERFACE=$answer
-  printf 'Log4Shell HTTP 호스트명 [생략하면 기존 IP와 /log4shell/ 경로]: ' >&2; IFS= read -r LOG4SHELL_HOSTNAME || die 'input cancelled'
+
 fi
+prompt LAB_PUBLIC_ORIGIN 'Log4Shell HTTPS 주소 (예: https://lab.example.org)'
+prompt LAB_ALLOWED_CIDRS '실습 허용 내부망/VPN CIDR (쉼표로 구분)'
 prompt LLM_BASE_URL 'Ollama/OpenAI 호환 API 주소 (예: http://192.0.2.40:11434/v1)'
 ipv4() {
   local ip=$1 part
@@ -121,26 +135,26 @@ hostname_valid() {
 for host in "$SECURITY_HOST" "$SIEM_HOST" "$SERVICE_HOST"; do ipv4 "$host" || die 'server addresses must be usable IPv4 literals'; done
 [[ $SECURITY_HOST != "$SIEM_HOST" && $SECURITY_HOST != "$SERVICE_HOST" && $SIEM_HOST != "$SERVICE_HOST" ]] || die 'three separate server addresses are required'
 [[ $SSH_USER =~ ^[a-z_][a-z0-9_-]*$ && ${#SSH_USER} -le 32 ]] || die 'invalid SSH user'
-for port in "$SSH_PORT" "$WEB_BACKEND_PORT" "$WAF_PORT"; do
+for port in "$SSH_PORT" "$WEB_BACKEND_PORT" "$WAF_PORT" "$LAB_HTTPS_PORT" "$LAB_GATEWAY_PORT"; do
   [[ $port =~ ^[1-9][0-9]*$ && ${#port} -le 5 && $port -le 65535 ]] || die 'invalid TCP port'
 done
-[[ -z $LOG4SHELL_HOSTNAME ]] || hostname_valid "$LOG4SHELL_HOSTNAME" || die 'LOG4SHELL_HOSTNAME must be a lowercase DNS name without scheme, port or path'
-[[ -z $LOG4SHELL_APP_JAR || ( $LOG4SHELL_APP_JAR =~ ^/opt/[A-Za-z0-9._/-]+\.jar$ && $LOG4SHELL_APP_JAR != *..* && $LOG4SHELL_APP_JAR != *//* ) ]] || die 'LOG4SHELL_APP_JAR must be empty for automatic build or a prepared absolute /opt path on the service host'
+[[ -z $LOG4SHELL_IMAGE && -z $LOG4SHELL_APP_JAR && -z $LOG4SHELL_HOSTNAME ]] || die 'legacy LOG4SHELL_* options are retired; use LAB_PUBLIC_ORIGIN and LAB_MANIFEST'
+command -v python3 >/dev/null || die 'controller requires existing python3'
+python3 -B "$HERE/deployment/validate_lab_site.py" "$LAB_PUBLIC_ORIGIN" "$LAB_HTTPS_PORT" "$LAB_ALLOWED_CIDRS" "$LAB_PROXY_SUBNET" || die 'invalid lab site settings'
+[[ $LAB_GATEWAY_PORT != "$WEB_BACKEND_PORT" && $LAB_GATEWAY_PORT != 22 && $LAB_GATEWAY_PORT != 18090 && $LAB_GATEWAY_PORT != 18081 && $LAB_GATEWAY_PORT != 18082 && $LAB_GATEWAY_PORT != 18083 ]] || die 'lab gateway port conflict'
+[[ $LAB_HTTPS_PORT != "$SSH_PORT" && $LAB_HTTPS_PORT != "$WAF_PORT" ]] || die 'lab HTTPS port conflict'
+for key in LAB_WHEEL_DIR LAB_MANIFEST LAB_SUDO_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
+  value=${!key}
+  [[ $value =~ ^/opt/[A-Za-z0-9._/-]+$ && $value != *..* && $value != *//* && $value != */ ]] || die "invalid server artifact path: $key"
+done
 [[ $MONITOR_INTERFACE == auto || $MONITOR_INTERFACE =~ ^[a-zA-Z0-9_.:-]+$ ]] || die 'invalid monitor interface'
 [[ $LLM_MODEL =~ ^[a-zA-Z0-9_./:-]+$ ]] || die 'invalid model name'
 [[ $LLM_BASE_URL =~ ^https?://[a-zA-Z0-9.-]+(:[0-9]+)?/v1/?$ ]] || die 'LLM_BASE_URL must be an HTTP(S) /v1 URL without credentials, query or fragment'
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
-say '순서: 세 서버 사전검사 → siem → 등록 CA/암호 전달 → service → security → 전체 검증'
-say 'service 구성: DVWA/MariaDB + Log4Shell 실습 앱과 요청 UI + Wazuh agent'
-if [[ -n $LOG4SHELL_APP_JAR ]]; then
-  say "Log4Shell JAR: service 서버의 준비 파일 사용 ($LOG4SHELL_APP_JAR)"
-else
-  say 'Log4Shell JAR: service 서버에서 전달한 소스로 자동 빌드 (Mac 빌드·의존성 다운로드 없음)'
-fi
-if [[ -n $LOG4SHELL_HOSTNAME ]]; then
-  say "Log4Shell HTTP 이름: $LOG4SHELL_HOSTNAME (DNS/hosts → $SECURITY_HOST 사전 준비 필요)"
-fi
-say '패키지/이미지 자동 다운로드 없음. 기존 IP·라우팅·SSH 설정은 변경하지 않습니다.'
+say '순서: 세 서버 오프라인 반입물 검사 → 패키지·이미지 설치 → 역할 사전검사 → SIEM → 공통 키·등록 자격 전달 → service → security → 전체 검증'
+say 'service 구성: 독립 DVWA/MariaDB + Lab Console + 웹 실습3개 + 별도 sudo rootless + Wazuh agent'
+say "Lab Console: $LAB_PUBLIC_ORIGIN/log4shell/ (DNS/hosts와 TLS 인증서는 사전 준비)"
+say '패키지/이미지 인터넷 다운로드 없음. 기존 IP·라우팅·SSH 설정은 변경하지 않습니다.'
 [[ $MODE != plan ]] || exit 0
 
 for tool in ssh tar mktemp python3; do command -v "$tool" >/dev/null || die "controller missing $tool; see README"; done
@@ -170,11 +184,11 @@ mkdir "$WORK/bundle"
 cat > "$WORK/bundle/site.env" <<EOF
 # Generated data; values are shell-quoted by the controller below.
 EOF
-for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL CAPSTONE_ROOT; do
+for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
-for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE LOG4SHELL_IMAGE LOG4SHELL_APP_JAR LOG4SHELL_HOSTNAME; do
+for key in SURICATA_IMAGE WAF_IMAGE ET_RULES_FILE DVWA_IMAGE MARIADB_IMAGE; do
   value=${!key}
   [[ -z $value ]] || printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
@@ -219,6 +233,19 @@ if [[ $MODE == verify ]]; then
   say '세 역할 검증 완료.'
   exit 0
 fi
+remote_prerequisites() {
+  local host=$1 role=$2 action=$3
+  ssh_run "$host" "sudo -n python3 -B $REMOTE_STAGE/source/deployment/prerequisites.py $action $role"
+}
+remote_prerequisites "$SECURITY_HOST" security check
+remote_prerequisites "$SIEM_HOST" siem check
+remote_prerequisites "$SERVICE_HOST" service check
+ssh_run "$SIEM_HOST" "sudo -n python3 -B $REMOTE_STAGE/source/deployment/lab_key.py check"
+if [[ $MODE == apply ]]; then
+  remote_prerequisites "$SECURITY_HOST" security apply
+  remote_prerequisites "$SIEM_HOST" siem apply
+  remote_prerequisites "$SERVICE_HOST" service apply
+fi
 remote_role "$SECURITY_HOST" security check
 remote_role "$SIEM_HOST" siem check
 remote_role "$SERVICE_HOST" service check
@@ -236,16 +263,16 @@ transfer_enrollment() {
 }
 transfer_enrollment "$SERVICE_HOST"
 transfer_enrollment "$SECURITY_HOST"
+# The existing SIEM admin credential is streamed through SSH directly to C.
+# No secret appears in arguments, controller files, terminal output or Git.
+ssh_run "$SIEM_HOST" "sudo -n python3 -B $REMOTE_STAGE/source/deployment/lab_key.py export" |
+  ssh_run "$SERVICE_HOST" "sudo -n python3 -B $REMOTE_STAGE/source/deployment/lab_key.py receive" || die 'common lab key transfer failed'
 remote_role "$SERVICE_HOST" service apply
 remote_role "$SERVICE_HOST" service verify
 remote_role "$SECURITY_HOST" security apply
 remote_role "$SECURITY_HOST" security verify
 remote_role "$SIEM_HOST" siem verify
 say "구축 완료. WAF: http://$SECURITY_HOST:$WAF_PORT / SIEM: https://$SIEM_HOST / Mattermost: http://$SIEM_HOST:8065"
-if [[ -n $LOG4SHELL_HOSTNAME ]]; then
-  lab_origin="http://$LOG4SHELL_HOSTNAME"; [[ $WAF_PORT == 80 ]] || lab_origin="$lab_origin:$WAF_PORT"
-  say "Log4Shell: $lab_origin/ → $lab_origin/log4shell/"
-else
-  say "Log4Shell: http://$SECURITY_HOST:$WAF_PORT/log4shell/"
-fi
+say "Lab Console: $LAB_PUBLIC_ORIGIN/log4shell/"
+say "DVWA 독립 진입점: http://$SECURITY_HOST:$WAF_PORT/dvwa/"
 say '인증 정보는 서버의 root 전용 경로에 보관합니다. 결과와 지원 범위는 README를 확인하세요.'

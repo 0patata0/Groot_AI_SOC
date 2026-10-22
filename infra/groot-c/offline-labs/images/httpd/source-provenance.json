@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-10-22",
+  "software": "Apache HTTP Server",
+  "purpose": "Isolated static-file access training; no CGI or exploit implementation",
+  "official_advisory": "https://httpd.apache.org/security/vulnerabilities_24.html",
+  "official_image": "https://hub.docker.com/_/httpd",
+  "image_maintainer": "Docker Community (Docker Official Images)",
+  "registry": "https://registry-1.docker.io/v2/library/httpd/",
+  "platform": "linux/amd64",
+  "upstream_software_license": "Apache-2.0",
+  "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+  "license_preservation": "Base image files, including LICENSE, NOTICE and distribution package notices, are retained. Base OS and dependencies carry their own licenses.",
+  "versions": [
+    {
+      "cve_id": "CVE-2021-41773",
+      "version": "2.4.49",
+      "source_tag": "docker.io/library/httpd:2.4.49",
+      "index_digest": "sha256:dcba0d12e2362fb0c50ec524ae8aa1cca4a4ba7216617a57e7bbca20767e79cc",
+      "amd64_manifest_digest": "sha256:4b5cb7697fea2aa6d398504c381b693a54ae9ad5e6317fcdbb7a2d9b8c3b1364",
+      "base_config_digest": "sha256:e91425f386186eb981e47f90780083cc2a16179f3ec45581fa7e5ba044b800fb",
+      "base_created": "2021-09-28T07:49:04.175642223Z",
+      "packaging_commit": "ba836540b5c8a91b8e72a50c660399bb01178a1f",
+      "packaging_source": "https://github.com/docker-library/httpd/blob/ba836540b5c8a91b8e72a50c660399bb01178a1f/2.4/Dockerfile",
+      "packaging_dockerfile_sha256": "6f4f56385131b5f9ef08d8ff9f7b65396537d8d6aa274d04509ebf71380c59ba",
+      "upstream_source": "https://archive.apache.org/dist/httpd/httpd-2.4.49.tar.bz2",
+      "upstream_source_sha256": "65b965d6890ea90d9706595e4b7b9365b5060bec8ea723449480b4769974133b",
+      "upstream_checksum": "https://archive.apache.org/dist/httpd/httpd-2.4.49.tar.bz2.sha256",
+      "output_tag": "groot-labs/httpd:2.4.49",
+      "output_image_id": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b"
+    },
+    {
+      "cve_id": "CVE-2021-42013",
+      "version": "2.4.50",
+      "source_tag": "docker.io/library/httpd:2.4.50",
+      "index_digest": "sha256:b73a8591d3f1f170568b501ce645dc900f8f1c4c697fbc2420cae3502ab5e02c",
+      "amd64_manifest_digest": "sha256:a0a1605656b89fe249c6306e5646d3d3c2d50606e134d411d8e8f732527cbdbb",
+      "base_config_digest": "sha256:bc9d3c5a7455df2d13d9093f31aaeda04adf4726b2f8a462f4669e9b67330c79",
+      "base_created": "2021-10-05T22:26:27.855077878Z",
+      "packaging_commit": "1f123b76be535ae2d577b93d3bf9a298ee897a8c",
+      "packaging_source": "https://github.com/docker-library/httpd/blob/1f123b76be535ae2d577b93d3bf9a298ee897a8c/2.4/Dockerfile",
+      "packaging_dockerfile_sha256": "f331912130d12bbfd1eeaeb7fe5c88d882c51d8d7e4e7ce5c92d020ab3510b24",
+      "upstream_source": "https://archive.apache.org/dist/httpd/httpd-2.4.50.tar.bz2",
+      "upstream_source_sha256": "6a2817c070c606682eb53ed963511407d3c3d7a379cdf855971467b00fb3890f",
+      "upstream_checksum": "https://archive.apache.org/dist/httpd/httpd-2.4.50.tar.bz2.sha256",
+      "output_tag": "groot-labs/httpd:2.4.50",
+      "output_image_id": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2"
+    }
+  ],
+  "verification": {
+    "registry_metadata_and_config_read": true,
+    "linux_amd64_available": true,
+    "image_volumes": null,
+    "archive_head_status": 200,
+    "published_checksum_matches_packaging_metadata": true,
+    "source_archive_downloaded": false,
+    "image_layers_downloaded_during_source_review": false,
+    "local_container_build_performed_during_source_authoring": false,
+    "native_runtime_verification": "pending separate deployment evidence",
+    "vulnerability_reproduction": "not performed by this source-authoring task"
+  },
+  "notes": [
+    "CVE-2021-42013 also affects 2.4.49; the two labs compare related path-normalization defects, not unrelated vulnerability classes.",
+    "The official checksum sidecars retain an -rc1 archive filename; the published hash value matches the historical packaging metadata.",
+    "base_config_digest identifies the registry image configuration only. It must not be assumed equal to docker image inspect .Id on every image store. The deployment operator observed Docker 29.8.1 with a containerd image store reporting a manifest digest as .Id.",
+    "Preserve the original compressed layer blobs, config and manifest when importing an OCI archive. A legacy archive with uncompressed layers may produce a different manifest on load. Verify the canonical RepoDigests reference locally before using the pinned amd64 manifest in FROM.",
+    "Bare config-digest FROM values are supported only for a verified classic image store/builder whose .Id matches that config digest. Register the newly built derived image's actual Docker-reported .Id in the lab catalog; output_image_id records the completed native inspection on 2026-10-22.",
+    "Version environment variables alone are not runtime proof; the Dockerfile compares the executable version during the build and deployment must verify it again."
+  ],
+  "deployment_evidence": "../../expansion-validation-20261022.json"
+}

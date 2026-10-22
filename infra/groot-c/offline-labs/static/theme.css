@@ -1,0 +1,211 @@
+/* Local charcoal/warm-gray palette, inspired by Huemint monochrome.
+   https://huemint.com/website-monochrome/ — no external runtime assets. */
+html[data-groot-theme] {
+  --groot-theme-bar-height:64px;
+  --groot-theme-duration:0s;
+  --bg:var(--groot-bg);
+  --paper:var(--groot-bg);
+  --sidebar:var(--groot-sidebar);
+  --surface:var(--groot-surface);
+  --panel:var(--groot-surface);
+  --surface-raised:var(--groot-raised);
+  --line:var(--groot-line);
+  --text:var(--groot-text);
+  --ink:var(--groot-text);
+  --muted:var(--groot-muted);
+  --dim:var(--groot-muted);
+  --accent:var(--groot-accent);
+  --green:var(--groot-accent);
+  --accent-dark:var(--groot-accent-surface);
+  --pale:var(--groot-accent-surface);
+  --red:var(--groot-danger);
+  --amber:var(--groot-warning);
+  background:var(--groot-bg);
+  color-scheme:dark;
+}
+
+/* No initial-load animation; motion is opt-in for a direct toggle press. */
+html[data-groot-theme][data-groot-motion="enabled"] {--groot-theme-duration:180ms}
+
+html[data-groot-theme="dark"] {
+  --groot-bg:#181817;
+  --groot-sidebar:#1e1e1c;
+  --groot-surface:#242422;
+  --groot-raised:#30302d;
+  --groot-input:#1b1b19;
+  --groot-line:#484842;
+  --groot-text:#eeede7;
+  --groot-muted:#b4b2a9;
+  --groot-accent:#d5d2c5;
+  --groot-accent-surface:#363630;
+  --groot-primary-text:#242421;
+  --groot-info:#d5d2c5;
+  --groot-info-surface:#32322e;
+  --groot-danger:#e6aaa2;
+  --groot-danger-surface:#382a27;
+  --groot-warning:#dbc493;
+  --groot-warning-surface:#343026;
+  --groot-shadow:0 3px 12px #0002;
+}
+
+html[data-groot-theme="light"] {
+  color-scheme:light;
+  --groot-bg:#f5f3ee;
+  --groot-sidebar:#eeece5;
+  --groot-surface:#fffefa;
+  --groot-raised:#eae7df;
+  --groot-input:#faf9f5;
+  --groot-line:#c5c1b6;
+  --groot-text:#292923;
+  --groot-muted:#68675f;
+  --groot-accent:#45463e;
+  --groot-accent-surface:#e8e6dd;
+  --groot-primary-text:#fffefa;
+  --groot-info:#595a50;
+  --groot-info-surface:#eceae2;
+  --groot-danger:#963e34;
+  --groot-danger-surface:#f5e7e2;
+  --groot-warning:#7a5b25;
+  --groot-warning-surface:#f3ecdc;
+  --groot-shadow:0 3px 12px #2929230a;
+}
+
+html[data-groot-theme] body {
+  background:var(--groot-bg);
+  color:var(--groot-text);
+}
+
+/* A reserved row prevents overlap with any existing header, including mobile. */
+#groot-theme-toolbar {
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  position:sticky;
+  top:0;
+  left:0;
+  z-index:10000;
+  width:100%;
+  width:100vw;
+  max-width:100%;
+  height:var(--groot-theme-bar-height);
+  min-height:var(--groot-theme-bar-height);
+  margin:0;
+  padding:9px max(16px, env(safe-area-inset-right));
+  border:0;
+  border-bottom:1px solid var(--groot-line);
+  background:var(--groot-bg);
+  color:var(--groot-text);
+  text-align:right;
+}
+
+#groot-theme-toggle {
+  box-sizing:border-box;
+  display:inline-grid;
+  grid-template-columns:16px 1fr;
+  align-items:center;
+  justify-content:start;
+  gap:8px;
+  flex:none;
+  width:96px;
+  min-width:96px;
+  min-height:44px;
+  margin:0;
+  padding:8px 14px;
+  border:1px solid var(--groot-line);
+  border-radius:24px;
+  background:var(--groot-surface);
+  color:var(--groot-text);
+  box-shadow:none;
+  font:600 13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  letter-spacing:0;
+  text-decoration:none;
+  white-space:nowrap;
+  cursor:pointer;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+
+#groot-theme-toggle:hover {border-color:var(--groot-accent);background:var(--groot-raised)}
+#groot-theme-toggle:focus-visible {outline:3px solid var(--groot-accent);outline-offset:3px}
+#groot-theme-toggle>span {min-width:0;text-align:center}
+#groot-theme-toggle .groot-theme-icon {display:block;width:16px;height:16px;flex:0 0 16px;color:currentColor}
+#groot-theme-toggle .groot-theme-icon g {transform-origin:12px 12px;transition:opacity var(--groot-theme-duration) ease,transform var(--groot-theme-duration) ease}
+html[data-groot-theme="dark"] #groot-theme-toggle .groot-theme-moon,
+html[data-groot-theme="light"] #groot-theme-toggle .groot-theme-sun {opacity:1;transform:rotate(0deg) scale(1)}
+html[data-groot-theme="dark"] #groot-theme-toggle .groot-theme-sun {opacity:0;transform:rotate(-25deg) scale(.85)}
+html[data-groot-theme="light"] #groot-theme-toggle .groot-theme-moon {opacity:0;transform:rotate(25deg) scale(.85)}
+html[data-groot-page="console"] .skip-link {z-index:10001}
+
+/* Console: the outlined workspace uses the same warm neutral theme tokens. */
+html[data-groot-page="console"][data-groot-theme] :is(.brand-light,.breadcrumb strong,.metric-label,.field-label,.lab-detail>p,.access-intro strong,.image-tag,.runtime-row code,.text-button,.copy-button) {color:var(--groot-muted)}
+html[data-groot-page="console"][data-groot-theme] :is(.small-tag,.lab-facts) {border-color:var(--groot-line)}
+html[data-groot-page="console"][data-groot-theme] :is(.connection-badge.connected,.icon-box,.section-number,.button-secondary,.button-open) {background:var(--groot-accent-surface);border-color:var(--groot-line);color:var(--groot-accent)}
+html[data-groot-page="console"][data-groot-theme] :is(.environment-label,.code-heading,.step-dot) {background:var(--groot-raised);color:var(--groot-muted)}
+html[data-groot-page="console"][data-groot-theme] .auth-panel {background:var(--groot-surface);border-color:var(--groot-line)}
+html[data-groot-page="console"][data-groot-theme] :is(.auth-form input,.select-wrap select) {background:var(--groot-input);border-color:var(--groot-line);color:var(--groot-text)}
+html[data-groot-page="console"][data-groot-theme] .auth-form input::placeholder {color:var(--groot-muted)}
+html[data-groot-page="console"][data-groot-theme] .lab-detail {background:var(--groot-raised);border-color:var(--groot-line)}
+html[data-groot-page="console"][data-groot-theme] :is(.cve-tag,.small-icon) {color:var(--groot-info);background:var(--groot-info-surface);border-color:var(--groot-line)}
+html[data-groot-page="console"][data-groot-theme] .code-block {background:var(--groot-input)}
+html[data-groot-page="console"][data-groot-theme] pre {color:var(--groot-text)}
+html[data-groot-page="console"][data-groot-theme] .button-primary {background:var(--groot-accent);border-color:var(--groot-accent);color:var(--groot-primary-text)}
+html[data-groot-page="console"][data-groot-theme] .button-primary:hover:not(:disabled) {filter:brightness(.94)}
+html[data-groot-page="console"][data-groot-theme] .notice {background:var(--groot-accent-surface);border-color:var(--groot-line);color:var(--groot-accent)}
+html[data-groot-page="console"][data-groot-theme] :is(.notice.error,.button-stop) {background:var(--groot-danger-surface);border-color:var(--groot-danger);color:var(--groot-danger)}
+html[data-groot-page="console"][data-groot-theme] :is(.notice.warning,.secure-access) {background:var(--groot-warning-surface);border-color:var(--groot-warning);color:var(--groot-warning)}
+html[data-groot-page="console"][data-groot-theme] .secure-access a {color:var(--groot-accent)}
+html[data-groot-page="console"][data-groot-theme] :is(.button-secondary,.button-open,.button-stop):hover:not(:disabled) {filter:brightness(.94)}
+
+/* Java: retain the workbench's panel layout and response formatting. */
+html[data-groot-page="java"][data-groot-theme] .brand-mark {color:var(--groot-primary-text)}
+html[data-groot-page="java"][data-groot-theme] :is(button,a,input,textarea,pre):focus-visible {outline-color:var(--groot-accent)}
+html[data-groot-page="java"][data-groot-theme] .status-dot {background:var(--groot-muted)}
+html[data-groot-page="java"][data-groot-theme] .status-dot.error {background:var(--groot-danger)}
+html[data-groot-page="java"][data-groot-theme] .panel {box-shadow:var(--groot-shadow)}
+html[data-groot-page="java"][data-groot-theme] :is(.topbar,.panel,.secondary-button) {background:var(--groot-surface)}
+html[data-groot-page="java"][data-groot-theme] .panel-heading {border-color:var(--groot-line)}
+html[data-groot-page="java"][data-groot-theme] :is(.lab-label,.step,.source-options input:checked+span) {background:var(--groot-accent-surface);color:var(--groot-accent)}
+html[data-groot-page="java"][data-groot-theme] textarea {background:var(--groot-input);border-color:var(--groot-line);color:var(--groot-text)}
+html[data-groot-page="java"][data-groot-theme] :is(.request-path,.empty-icon) {background:var(--groot-raised);color:var(--groot-muted)}
+html[data-groot-page="java"][data-groot-theme] .primary-button {background:var(--groot-accent);border-color:var(--groot-accent);color:var(--groot-primary-text)}
+html[data-groot-page="java"][data-groot-theme] .primary-button:hover {filter:brightness(.94)}
+html[data-groot-page="java"][data-groot-theme] pre {background:var(--groot-input);color:var(--groot-text);border:1px solid var(--groot-line)}
+html[data-groot-page="java"][data-groot-theme] :is(.result-badge.error,.notice.error) {color:var(--groot-danger);background:var(--groot-danger-surface)}
+html[data-groot-page="java"][data-groot-theme] .result-badge.error {border-color:var(--groot-danger-surface)}
+html[data-groot-page="java"][data-groot-theme] :is(.flow,.flow b,.flow i,footer) {color:var(--groot-muted)}
+html[data-groot-page="java"][data-groot-theme] .separator {background:var(--groot-line)}
+html[data-groot-page="java"][data-groot-theme] .status-dot.ready {background:var(--groot-accent);box-shadow:0 0 0 4px var(--groot-accent-surface)}
+
+/* Both Apache versions share the same page; fixtures remain unmodified text. */
+html[data-groot-page="httpd"][data-groot-theme] .version-card {background:var(--groot-raised);border-color:var(--groot-accent)}
+html[data-groot-page="httpd"][data-groot-theme] .version-card>p:last-child {color:var(--groot-muted)}
+html[data-groot-page="httpd"][data-groot-theme] :is(.path,.note) {background:var(--groot-input)}
+html[data-groot-page="httpd"][data-groot-theme] .button {background:var(--groot-accent-surface);color:var(--groot-accent);border-color:var(--groot-accent)}
+html[data-groot-page="httpd"][data-groot-theme] .button:hover {filter:brightness(.94)}
+
+html[data-groot-page="generic"][data-groot-theme] a {color:var(--groot-accent)}
+
+/* Only theme surfaces and this control animate; existing controls keep theirs. */
+html[data-groot-theme],
+html[data-groot-theme] body,
+#groot-theme-toolbar,
+#groot-theme-toggle,
+html[data-groot-page="console"][data-groot-theme] :is(.site-header,.hero,.panel,.metric,.lab-detail,.auth-panel,.code-block,.code-heading,.button,.art-surface,.art-side,.art-top,.art-node),
+html[data-groot-page="java"][data-groot-theme] :is(.topbar,.panel,textarea,pre,.request-path),
+html[data-groot-page="httpd"][data-groot-theme] :is(.card,.version-card,.note,.path) {
+  transition:background-color var(--groot-theme-duration) ease,color var(--groot-theme-duration) ease,border-color var(--groot-theme-duration) ease;
+}
+
+@media(prefers-reduced-motion:reduce) {
+  html[data-groot-theme][data-groot-motion] {--groot-theme-duration:0s}
+  #groot-theme-toggle,#groot-theme-toggle .groot-theme-icon g {transition:none}
+}
+@media print {
+  #groot-theme-toolbar {display:none}
+}
+
+/* Keep neutral surfaces coherent; semantic warning/error colors stay distinct. */
+html[data-groot-page="console"][data-groot-theme] :is(.tiny-dot,.status-dot) {background:var(--groot-accent);color:var(--groot-primary-text)}
+html[data-groot-page="console"][data-groot-theme] .skip-link {color:var(--groot-primary-text)}
+html[data-groot-page="console"][data-groot-theme] .brand-mark {background:none;color:var(--groot-accent)}

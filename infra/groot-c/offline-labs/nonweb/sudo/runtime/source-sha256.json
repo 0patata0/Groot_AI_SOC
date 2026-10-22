@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "recorded_date": "2026-10-23",
+  "scope": "historical source and final C configuration templates; live results are separate",
+  "files": [
+    {
+      "path": "cleanup-20261023.json",
+      "sha256": "2a8d730f8f62f476b17422054cc566c1511d19ffd7fe69a0a503d49930cbad23"
+    },
+    {
+      "path": "history/README.md",
+      "sha256": "8ff4e8736de1d1851935bf6ab9d65f3515f790dbe2f6ffe213de343cf235aed1"
+    },
+    {
+      "path": "history/rootless-acceptance.py",
+      "sha256": "be67f2c2c0749b1cbc1a4620339a83388619b09d82f7143fe3a9ed2c45cd7545",
+      "source_name": "rootless-acceptance.py",
+      "preserved_bytes": true
+    },
+    {
+      "path": "history/rootless-acquire.py",
+      "sha256": "22ce8fb5c949a421e3ec512bd72f860dde53c63429e887bc0ead2dd07b432759",
+      "source_name": "rootless-acquire.py",
+      "preserved_bytes": true
+    },
+    {
+      "path": "history/rootless-cleanup.py",
+      "sha256": "2fd30518b72f1ee86a33e5c36d83059422f71404757b84eabcc080d552cc9a5a"
+    },
+    {
+      "path": "history/rootless-final-evidence.py",
+      "sha256": "fcd2410404d2bee121e92171db6bd5b4e67876661cf2ceb9ae94e32355379c5f"
+    },
+    {
+      "path": "history/rootless-install-publisher.py",
+      "sha256": "917aa1a44cc78fd363996594dd5c9bc9962cf7a3338cf676f38c629a858d604e"
+    },
+    {
+      "path": "history/rootless-install.py",
+      "sha256": "c10146344af3d3e207bf4d8a22502c16e9c484a4badcc23bf0576160ee83ad1d",
+      "source_name": "rootless-install.py",
+      "preserved_bytes": true
+    },
+    {
+      "path": "history/rootless-publisher-final-check.py",
+      "sha256": "bcc5e191852c003650aa586e920f347968cf0c545d0512b1074c58781a63f352"
+    },
+    {
+      "path": "history/rootless-restrict-securityfs.py",
+      "sha256": "6613f9a9a9a920fe4bd4cfb9313e302b32cbe1ad11b28813bc0c5c2a553b04d5"
+    },
+    {
+      "path": "history/rootless-retry.py",
+      "sha256": "6a7d6ddb00b3529446f5c75a68298620c7c5d6f0be71e1ec77483c533801fcff"
+    },
+    {
+      "path": "history/rootless-verify-artifacts.py",
+      "sha256": "344666d082df78fcd35432c80150277596593ce582333acec5ea68518763929b",
+      "source_name": "rootless-verify-artifacts.py",
+      "preserved_bytes": true
+    },
+    {
+      "path": "live-verification-20261023.json",
+      "sha256": "2878f0d9bcff154a56bc23a7bf0af6c32b066533c8c956a4e4d3f6b317c379df"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "bb3f657309712f79bd0b19c910862522500f61ad425ee505ef9b44a5722aa3d7",
+      "source_name": "rootless-artifacts/acquisition.json",
+      "preserved_bytes": true
+    },
+    {
+      "path": "templates/capstone-sudo-docker.service",
+      "sha256": "dfd16d9e009ae6ac9770aa2ceeb50025bea5600bdf65c0f8d1d81a844e369e17",
+      "extracted_from": "history/rootless-install.py",
+      "source_line": 188,
+      "target_path": "/var/lib/capstone-sudo-runtime/.config/systemd/user/capstone-sudo-docker.service"
+    },
+    {
+      "path": "templates/capstone-sudo-status.service",
+      "sha256": "26ff0f9804ebe7f6da78d85437a8e369466cb5e81834daab03621709196be5ec"
+    },
+    {
+      "path": "templates/capstone-sudo-status.timer",
+      "sha256": "ab08306df7fb004f18465e4511b8a15ed0b0718c1066a4100db9c58c3e7370d4"
+    },
+    {
+      "path": "templates/daemon.json",
+      "sha256": "b883dc3f3a4ff1136d2e0439057d22f1472c6516ab24c2838d4c4c1ed45bb96f",
+      "extracted_from": "history/rootless-install.py",
+      "source_line": 182,
+      "target_path": "/etc/capstone-sudo-lab/daemon.json"
+    },
+    {
+      "path": "templates/opt.capstone-sudo-rootless.29.8.1.bin.rootlesskit",
+      "sha256": "08e5ea44aacce5bee78094a31789c2dc9cb11063f36bdea856bb8dc388371255",
+      "extracted_from": "history/rootless-install.py",
+      "source_line": 175,
+      "target_path": "/etc/apparmor.d/opt.capstone-sudo-rootless.29.8.1.bin.rootlesskit"
+    },
+    {
+      "path": "templates/user@1991.service.d/capstone-sudo.conf",
+      "sha256": "e91f5e56e7bd44bfc9049df6f9c0b929966f5776cc969cbc7b4740ecbd5c8ab8",
+      "target_path": "/etc/systemd/system/user@1991.service.d/capstone-sudo.conf",
+      "final_change": "history/rootless-restrict-securityfs.py"
+    }
+  ]
+}

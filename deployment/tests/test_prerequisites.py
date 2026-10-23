@@ -55,7 +55,7 @@ class Artifacts(unittest.TestCase):
         def run(args, **kwargs):
             calls.append(args)
             return subprocess.CompletedProcess(args,1,b'') if args[0]=='dpkg-query' else subprocess.CompletedProcess(args,0,b'Inst unapproved (2.0 repository)\n')
-        with patch.object(m,'run',side_effect=run), self.assertRaises(m.Refused):m.install(self.path,doc)
+        with patch.object(m,'run',side_effect=run), patch.object(m,'safe',side_effect=Path), self.assertRaises(m.Refused):m.install(self.path,doc)
         self.assertEqual(sum(c[0]=='apt-get' for c in calls),1)
         self.assertIn('--simulate',calls[-1]);self.assertIn('--no-download',calls[-1])
     def test_downgrade_stops_before_apt(self):
@@ -65,6 +65,37 @@ class Artifacts(unittest.TestCase):
             return subprocess.CompletedProcess(args,0,b'install ok installed\t2.0' if args[0]=='dpkg-query' else b'')
         with patch.object(m,'run',side_effect=run),self.assertRaises(m.Refused):m.install(self.path,doc)
         self.assertFalse(any(c[0]=='apt-get' for c in calls))
+    def test_offline_cache_uses_canonical_epoch_name_and_is_removed(self):
+        item = self.package(); item['version'] = '1:1.0'
+        doc = dict(self.doc, packages=[item]); calls = []; cache_paths = []
+        def run(args, **kwargs):
+            calls.append(args)
+            if args[0] == 'dpkg-query':
+                installed = any(c[0] == 'apt-get' and '--simulate' not in c for c in calls)
+                return subprocess.CompletedProcess(args, 0 if installed else 1,
+                    b'install ok installed\t1:1.0' if installed else b'')
+            if args[0] == 'apt-get':
+                self.assertIn('--no-download', args)
+                cache = Path(next(x.split('=',1)[1] for x in args if x.startswith('Dir::Cache::archives=')))
+                target = cache / 'example_1%3a1.0_amd64.deb'
+                self.assertEqual(target.read_bytes(), b'deb-fixture')
+                self.assertEqual(target.stat().st_mode & 0o777, 0o600)
+                cache_paths.append(cache)
+                return subprocess.CompletedProcess(args, 0, b'Inst example (1:1.0 local)\n')
+            raise AssertionError(args)
+        with patch.object(m, 'run', side_effect=run), patch.object(m, 'safe', side_effect=Path): m.install(self.path, doc)
+        self.assertEqual(len(cache_paths), 2)
+        self.assertFalse(cache_paths[0].exists())
+
+    def test_failed_offline_simulation_removes_its_private_cache(self):
+        item = self.package(); caches = []
+        def run(args, **kwargs):
+            if args[0] == 'dpkg-query': return subprocess.CompletedProcess(args, 1, b'')
+            caches.append(Path(next(x.split('=',1)[1] for x in args if x.startswith('Dir::Cache::archives='))))
+            raise m.Refused('simulation failed')
+        with patch.object(m, 'run', side_effect=run), patch.object(m, 'safe', side_effect=Path), self.assertRaises(m.Refused):
+            m.install(self.path, dict(self.doc, packages=[item]))
+        self.assertFalse(caches[0].exists())
     def test_duplicate_json_keys_rejected(self):
         with self.assertRaises(m.Refused):json.loads('{"schema":1,"schema":2}',object_pairs_hook=m.pairs)
 

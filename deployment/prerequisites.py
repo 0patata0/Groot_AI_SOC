@@ -14,6 +14,8 @@ import re
 import stat
 import subprocess
 import sys
+import shutil
+import tempfile
 
 class Refused(Exception): pass
 
@@ -57,7 +59,10 @@ def sha(path):
 
 def security_baseline(doc, *, installed=False):
     prepared = {item['package']: item['version'] for item in doc['packages']}
-    for name, minimum in HOST_SECURITY_MINIMUM.items():
+    minimums = dict(HOST_SECURITY_MINIMUM)
+    if doc.get('role') == 'siem':
+        minimums['nginx'] = '1.24.0-2ubuntu7.18'
+    for name, minimum in minimums.items():
         version = None if installed else prepared.get(name)
         if version is None:
             result = run(['dpkg-query', '-W', '-f=${Status}\t${Version}', name], check=False)
@@ -81,7 +86,7 @@ def read_manifest(path, role):
             fields = {'file', 'sha256', 'package', 'version', 'architecture'} if kind == 'packages' else {'file', 'sha256', 'tag', 'image_id'}
             need(isinstance(item, dict) and set(item) == fields, 'invalid artifact fields')
             need(all(isinstance(v, str) for v in item.values()), 'artifact values must be strings')
-            need(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.+-]*\.(deb|tar)', item['file']) is not None, 'artifact must be a flat filename')
+            need(re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9_.+-]|%3a)*\.(deb|tar)', item['file']) is not None, 'artifact must be a flat filename')
             need(item['file'] not in seen, 'duplicate artifact')
             seen.add(item['file'])
             need(re.fullmatch(r'[a-f0-9]{64}', item['sha256']) is not None, 'invalid SHA256')
@@ -112,18 +117,41 @@ def install(path, doc):
             if current[1] == item['version']: continue
             need(run(['dpkg', '--compare-versions', current[1], 'gt', item['version']], check=False).returncode != 0, 'refuse package downgrade')
         pending.append(str(path.parent / item['file']))
-    # An empty source list + --no-download avoids contacting package repositories.
-    # No --fix-broken, --allow-downgrades or auto removal is used.
-    command = ['apt-get', '-o', 'Dir::Etc::sourcelist=/dev/null', '-o', 'Dir::Etc::sourceparts=-',
-               '--no-download', '--no-remove', '--no-install-recommends', '-y', 'install', *pending]
+    # APT --no-download also skips copying file: URIs into its cache. Stage
+    # approved bytes under APT's canonical names, including escaped epochs.
+    # The cache and empty source files disappear even when simulation fails.
     if pending:
-        simulation = run(command[:1] + ['--simulate'] + command[1:], timeout=300).stdout.decode()
-        approved = {item['package'] for item in doc['packages']}
-        additions = set(re.findall(r'^Inst ([a-z0-9+.-]+)(?::amd64)? ', simulation, re.M))
-        need(additions <= approved and not re.search(r'^Remv ', simulation, re.M), 'APT selected an unlisted package/removal')
-        for item in doc['packages']:
-            need(sha(safe(path.parent / item['file'])) == item['sha256'], 'package changed before installation')
-        run(command, timeout=1800)
+        with tempfile.TemporaryDirectory(prefix='capstone-apt-offline-') as scratch:
+            cache = Path(scratch)
+            source_list = cache / 'empty.list'; source_list.touch(mode=0o600)
+            source_parts = cache / 'sources.d'; source_parts.mkdir(mode=0o700)
+            staged = []
+            for item in doc['packages']:
+                original = path.parent / item['file']
+                if str(original) not in pending: continue
+                original = safe(original)
+                need(sha(original) == item['sha256'], 'package changed before staging')
+                version = item['version'].replace(':', '%3a')
+                target = cache / (item['package'] + '_' + version + '_' + item['architecture'] + '.deb')
+                shutil.copyfile(original, target); target.chmod(0o600)
+                need(sha(target) == item['sha256'], 'staged package checksum mismatch')
+                staged.append(str(target))
+            command = ['apt-get', '-o', 'Dir::Cache::archives=' + str(cache),
+                       '-o', 'Dir::Etc::sourcelist=' + str(source_list),
+                       '-o', 'Dir::Etc::sourceparts=' + str(source_parts),
+                       '--no-download', '--no-remove', '--no-install-recommends', '-y', 'install', *staged]
+            simulation = run(command[:1] + ['--simulate'] + command[1:], timeout=300).stdout.decode()
+            approved = {item['package'] for item in doc['packages']}
+            additions = set(re.findall(r'^Inst ([a-z0-9+.-]+)(?::amd64)? ', simulation, re.M))
+            need(additions <= approved and not re.search(r'^Remv ', simulation, re.M), 'APT selected an unlisted package/removal')
+            for filename in staged:
+                item = next(x for x in doc['packages'] if x['package'] == Path(filename).name.split('_')[0])
+                need(sha(Path(filename)) == item['sha256'], 'staged package changed before installation')
+            if doc.get('role') == 'siem' and any(x['package'] == 'nginx' for x in doc['packages']):
+                # The binary is for a separate unprivileged TLS unit. Prevent
+                # the distro postinst from exposing its unrelated port-80 site.
+                run(['systemctl', 'mask', 'nginx.service'])
+            run(command, timeout=1800)
     for item in doc['packages']:
         r = run(['dpkg-query', '-W', '-f=${Status}\t${Version}', item['package']])
         need(r.stdout.decode() == 'install ok installed\t' + item['version'], 'installed package version mismatch')

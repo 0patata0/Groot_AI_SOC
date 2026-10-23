@@ -1,0 +1,349 @@
+{
+  "UID1000_verified": true,
+  "after": {
+    "container_session_workers": {
+      "redis": 0,
+      "samba": 0
+    },
+    "container_start_stop_or_restart": 0,
+    "container_worker_processes": [],
+    "control_socket_inode": 54287,
+    "daemon_PTY_processes": [],
+    "daemon_active_PTY_clients_by_lab": {
+      "redis": 0,
+      "samba": 0,
+      "sudo": 0
+    },
+    "daemon_lifecycle_mutations_in_progress": 0,
+    "lab_states": {
+      "redis": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "samba": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "sudo": {
+        "container_id": "58c9d9a6906ad43366828024a16af2be919dcad58af0461f4d16a920c46d804a",
+        "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+        "pid": 0,
+        "started_at": "2026-10-23T15:12:34.545208012Z",
+        "status": "stopped"
+      }
+    },
+    "limitations": [
+      "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+      "rootless sudo state inspected without start/stop/verify execution",
+      "no session capability or process tag returned"
+    ],
+    "observed_at": 1792768441,
+    "other_daemon_PTY_clients": 0,
+    "schema": 1,
+    "source_matches_reviewed": true,
+    "source_or_config_writes": 0,
+    "status": "readonly_preflight",
+    "status_publishers": {
+      "nonweb": {
+        "age_seconds": 8,
+        "fresh": true,
+        "labs": {
+          "CVE-2017-7494": {
+            "status": "needs_setup"
+          },
+          "CVE-2022-0543": {
+            "status": "needs_setup"
+          }
+        }
+      },
+      "sudo": {
+        "age_seconds": 55,
+        "fresh": true,
+        "labs": {
+          "CVE-2021-3156": {
+            "status": "ready"
+          }
+        }
+      }
+    },
+    "terminal_daemon_main_pid": 901165,
+    "terminal_open_or_input_or_close": 0
+  },
+  "before": {
+    "container_session_workers": {
+      "redis": 0,
+      "samba": 0
+    },
+    "container_start_stop_or_restart": 0,
+    "container_worker_processes": [],
+    "control_socket_inode": 49406,
+    "daemon_PTY_processes": [],
+    "daemon_active_PTY_clients_by_lab": {
+      "redis": 0,
+      "samba": 0,
+      "sudo": 0
+    },
+    "daemon_lifecycle_mutations_in_progress": 0,
+    "lab_states": {
+      "redis": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "samba": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "sudo": {
+        "container_id": "4e8f82fac52611ae9cd29ebad4a8a4711dcfd972acd3206462e71daa732a7f70",
+        "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+        "pid": 0,
+        "started_at": "2026-10-23T10:51:38.683543292Z",
+        "status": "stopped"
+      }
+    },
+    "limitations": [
+      "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+      "rootless sudo state inspected without start/stop/verify execution",
+      "no session capability or process tag returned"
+    ],
+    "observed_at": 1792768353,
+    "other_daemon_PTY_clients": 0,
+    "schema": 1,
+    "source_matches_reviewed": true,
+    "source_or_config_writes": 0,
+    "status": "readonly_preflight",
+    "status_publishers": {
+      "nonweb": {
+        "age_seconds": 42,
+        "fresh": true,
+        "labs": {
+          "CVE-2017-7494": {
+            "status": "needs_setup"
+          },
+          "CVE-2022-0543": {
+            "status": "needs_setup"
+          }
+        }
+      },
+      "sudo": {
+        "age_seconds": 28,
+        "fresh": true,
+        "labs": {
+          "CVE-2021-3156": {
+            "status": "needs_setup"
+          }
+        }
+      }
+    },
+    "terminal_daemon_main_pid": 702152,
+    "terminal_open_or_input_or_close": 0
+  },
+  "benign_input_count": 1,
+  "capabilities_or_raw_PTY_retained": false,
+  "deployed": {
+    "container_session_workers": {
+      "redis": 0,
+      "samba": 0
+    },
+    "container_start_stop_or_restart": 0,
+    "container_worker_processes": [],
+    "control_socket_inode": 49406,
+    "daemon_PTY_processes": [],
+    "daemon_active_PTY_clients_by_lab": {
+      "redis": 0,
+      "samba": 0,
+      "sudo": 0
+    },
+    "daemon_lifecycle_mutations_in_progress": 0,
+    "lab_states": {
+      "redis": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "samba": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "sudo": {
+        "container_id": "58c9d9a6906ad43366828024a16af2be919dcad58af0461f4d16a920c46d804a",
+        "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+        "pid": 898437,
+        "started_at": "2026-10-23T15:12:34.545208012Z",
+        "status": "running"
+      }
+    },
+    "limitations": [
+      "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+      "rootless sudo state inspected without start/stop/verify execution",
+      "no session capability or process tag returned"
+    ],
+    "observed_at": 1792768356,
+    "other_daemon_PTY_clients": 0,
+    "schema": 1,
+    "source_matches_reviewed": true,
+    "source_or_config_writes": 0,
+    "status": "readonly_preflight",
+    "status_publishers": {
+      "nonweb": {
+        "age_seconds": 45,
+        "fresh": true,
+        "labs": {
+          "CVE-2017-7494": {
+            "status": "needs_setup"
+          },
+          "CVE-2022-0543": {
+            "status": "needs_setup"
+          }
+        }
+      },
+      "sudo": {
+        "age_seconds": 31,
+        "fresh": true,
+        "labs": {
+          "CVE-2021-3156": {
+            "status": "needs_setup"
+          }
+        }
+      }
+    },
+    "terminal_daemon_main_pid": 702152,
+    "terminal_open_or_input_or_close": 0
+  },
+  "exact_owned_CID_stopped_PID0": true,
+  "finished_at": 1792768441,
+  "guard_verified": true,
+  "no_CVE_wide_stop_fallback": true,
+  "old_capability_rejected": true,
+  "original_stopped_CID_retired_under_product_contract": true,
+  "other_labs_unchanged": true,
+  "own_close_after_observation": true,
+  "owned_container_id": "58c9d9a6906ad43366828024a16af2be919dcad58af0461f4d16a920c46d804a",
+  "product_source_clock_or_configuration_changes": 0,
+  "ready": {
+    "container_session_workers": {
+      "redis": 0,
+      "samba": 0
+    },
+    "container_start_stop_or_restart": 0,
+    "container_worker_processes": [],
+    "control_socket_inode": 49406,
+    "daemon_PTY_processes": [
+      {
+        "lab": "sudo",
+        "pid": 899126,
+        "start_ticks": 219186613
+      }
+    ],
+    "daemon_active_PTY_clients_by_lab": {
+      "redis": 0,
+      "samba": 0,
+      "sudo": 1
+    },
+    "daemon_lifecycle_mutations_in_progress": 0,
+    "lab_states": {
+      "redis": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "samba": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "sudo": {
+        "container_id": "58c9d9a6906ad43366828024a16af2be919dcad58af0461f4d16a920c46d804a",
+        "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+        "pid": 898437,
+        "started_at": "2026-10-23T15:12:34.545208012Z",
+        "status": "running"
+      }
+    },
+    "limitations": [
+      "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+      "rootless sudo state inspected without start/stop/verify execution",
+      "no session capability or process tag returned"
+    ],
+    "observed_at": 1792768359,
+    "other_daemon_PTY_clients": 0,
+    "schema": 1,
+    "source_matches_reviewed": true,
+    "source_or_config_writes": 0,
+    "status": "readonly_preflight",
+    "status_publishers": {
+      "nonweb": {
+        "age_seconds": 48,
+        "fresh": true,
+        "labs": {
+          "CVE-2017-7494": {
+            "status": "needs_setup"
+          },
+          "CVE-2022-0543": {
+            "status": "needs_setup"
+          }
+        }
+      },
+      "sudo": {
+        "age_seconds": 34,
+        "fresh": true,
+        "labs": {
+          "CVE-2021-3156": {
+            "status": "needs_setup"
+          }
+        }
+      }
+    },
+    "terminal_daemon_main_pid": 702152,
+    "terminal_open_or_input_or_close": 0
+  },
+  "root_restart_evidence": {
+    "authority": "root task separately performed one fixed systemctl restart",
+    "new_daemon_PID": 901165,
+    "old_daemon_PID": 702152,
+    "safe_result_file": "p2-03-root-restart-result.json",
+    "sha256": "036a29a2b742da79d58a178b7fa3ccd3d18878f764548b548454fa35897a8a87",
+    "unit": "capstone-nonweb-terminal.service"
+  },
+  "schema": 1,
+  "scope": "P2-03 own sudo terminal across root-controlled daemon restart",
+  "service_or_host_restart_by_this_worker": 0,
+  "started_at": 1792768351,
+  "status": "pass",
+  "test_sources_sha256": {
+    "sudo_reopen_check.py": "a6a6346e881e6f630f8834ac81d99047b75ba58ceafd2d6123a6bb1df599869c",
+    "sudo_restart_check.py": "4f1f8ae80620f89ee1b7240f8a77584da06a0534f5369287925eda88f2bfa830",
+    "terminal_duration.py": "796deec34597be7e7d8847eb6bdef578275a4a254faad4eafb1a16286088e38c",
+    "terminal_duration_probe.py": "8300bd1547861a3d93e61be59c2c963d178758ee02c3f440840fc691ca9cc9fb"
+  },
+  "transient_unavailable_responses": 1
+}

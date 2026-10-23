@@ -345,6 +345,7 @@ class ControllerTests(unittest.TestCase):
     def test_new_evidence_reopens_completed_batch_in_manage_mode(self):
         self.alerts(self.alert("one"))
         trace = self.trace()
+        self.tool(trace, "mcp__wazuh_ro__get_wazuh_alert_summary", {"alerts": []})
         self.result(trace)
         trace.finish(0)
         self.assertIsNone(self.store.next_case())
@@ -403,6 +404,62 @@ class ControllerTests(unittest.TestCase):
             result = trace.finish(0)
             self.assertEqual(result["state"], "monitor" if count < 3 else "needs_review")
             self.now += 301
+
+    def test_manage_zero_read_cannot_resolve(self):
+        self.events(self.incident())
+        trace = self.trace()
+        self.result(trace)
+        result = trace.finish(0)
+        self.assertEqual(result["state"], "needs_review")
+        self.assertEqual(self.store.db.execute("SELECT detail FROM cases").fetchone()[0], "live_investigation_missing")
+
+    def test_manage_zero_read_cannot_monitor(self):
+        self.events(self.incident())
+        trace = self.trace()
+        self.result(trace, "근거 없는 정상 관찰입니다.\nMANAGEMENT_STATUS: monitor")
+        result = trace.finish(0)
+        self.assertEqual(result["state"], "needs_review")
+        self.assertEqual(self.store.db.execute("SELECT monitor_count FROM cases").fetchone()[0], 0)
+
+    def test_manage_zero_read_cannot_silently_resolve(self):
+        self.events(self.incident())
+        trace = self.trace()
+        self.result(trace, "[SILENT]\nMANAGEMENT_STATUS: resolved")
+        self.assertEqual(trace.finish(0)["state"], "needs_review")
+
+    def test_manage_incomplete_read_is_not_completed_evidence(self):
+        self.events(self.incident())
+        trace = self.trace()
+        trace.accept({"type": "tool_use", "name": "mcp__system_diagnostics__get_system_diagnostics",
+                      "input": {"target": "c:terminal-status", "lookback_minutes": 240}})
+        self.result(trace)
+        self.assertEqual(trace.finish(0)["state"], "outcome_unknown")
+
+    def test_manage_failed_read_keeps_existing_tool_failure_review(self):
+        self.events(self.incident())
+        trace = self.trace()
+        self.tool(trace, "mcp__system_diagnostics__get_system_diagnostics", {"status": "unavailable"}, error=True)
+        self.result(trace)
+        self.assertEqual(trace.finish(0)["state"], "needs_review")
+        self.assertEqual(self.store.db.execute("SELECT detail FROM cases").fetchone()[0], "model_tool_failure_requires_review")
+
+    def test_manage_successful_diagnostic_read_can_resolve(self):
+        self.events(self.incident())
+        trace = self.trace()
+        self.tool(trace, "mcp__system_diagnostics__get_system_diagnostics",
+                  {"target": "c:terminal-status", "status": "observed", "raw_messages_returned": False,
+                   "mutation_performed": False}, args={"target": "c:terminal-status", "lookback_minutes": 240})
+        self.result(trace)
+        self.assertEqual(trace.finish(0)["state"], "completed")
+
+    def test_manage_write_only_pending_proposal_stays_waiting_on_resolved_claim(self):
+        self.events(self.incident())
+        trace = self.trace()
+        proposal = "d" * 32
+        self.tool(trace, "mcp__rule_a__propose_rule_edit", {"proposal_id": proposal, "status": "pending"})
+        self.result(trace)
+        self.assertEqual(trace.finish(0)["state"], "waiting_approval")
+        self.assertEqual(self.store.db.execute("SELECT status FROM proposals WHERE id=?", (proposal,)).fetchone()[0], "pending")
 
     def test_coverage_loss_is_visible_not_normalized_to_zero(self):
         response = {"alerts": [], "total": 0, "total_relation": "eq", "truncated": False}

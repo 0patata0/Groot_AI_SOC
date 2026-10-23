@@ -1,0 +1,504 @@
+{
+  "schema": 1,
+  "draft": false,
+  "recorded_at_kst": "2026-10-24T01:01:02.667535+09:00",
+  "scope": "Existing-host normal reboot persistence and recovery completed for C, B and the second A attempt, with the first A automatic-start failure and two supported operator container starts preserved as exceptions",
+  "status": "completed_with_initial_A_failure_and_operator_recovery_preserved",
+  "planned_order": [
+    "c",
+    "b",
+    "a"
+  ],
+  "execution_authority": "Explicit operator authorization; fixed administrator transport. General reboot/sudo/Docker authority was not delegated to the LLM.",
+  "hosts": {
+    "c": {
+      "boot_id_changed": true,
+      "post_boot_uptime_seconds": 198,
+      "failed_units_after_recovery": 0,
+      "root_filesystem_read_write": true,
+      "fixed_loaded_units_compared": 26,
+      "enabled_timers_compared": 5,
+      "all_fixed_unit_and_timer_checks_passed": true,
+      "rootful_containers": {
+        "count": 4,
+        "running_before": 1,
+        "running_after": 1,
+        "full_CID_image_restart_policy_running_state_preserved": true
+      },
+      "diagnostic_snapshot": {
+        "targets": 11,
+        "fresh": true,
+        "age_seconds": 47,
+        "unavailable_unit_observations": 0,
+        "journal_unavailable_units": 0,
+        "recollected_after_boot": true
+      },
+      "status": "verified",
+      "reboot": {
+        "operator_requested": true,
+        "normal_guest_reboot_requests": 1,
+        "systemctl_returncode": 0,
+        "issued_at_epoch": 1792768711,
+        "SSH_transport_returncode": 0,
+        "forced_reboot": false
+      },
+      "user_stopped_labs_not_started": true,
+      "rootless_sudo": {
+        "socket_recovered": true,
+        "linger_enabled": true,
+        "user_Docker_active": true,
+        "user_Docker_enabled": true,
+        "container_ID_image_running_state_preserved": true
+      },
+      "no_remaining_observed_terminal_work": {
+        "PTY_and_lifecycle_zero": true,
+        "container_workers_zero": true,
+        "in_memory_closed_session_map_not_observed": true
+      },
+      "public_https": {
+        "/log4shell/": {
+          "http": 200,
+          "bytes": 14487,
+          "TLS_verified": true
+        },
+        "/log4shell/api/list": {
+          "http": 200,
+          "bytes": 3043,
+          "TLS_verified": true,
+          "catalog_count": 6
+        },
+        "/log4shell/api/status": {
+          "http": 200,
+          "bytes": 1367,
+          "TLS_verified": true,
+          "lab_count": 6,
+          "image_present_count": 6,
+          "deployment_allowed": true,
+          "safety_error": null
+        }
+      },
+      "startup_observations": {
+        "first_snapshot_uptime_seconds": 41,
+        "enabled_units_inactive_at_first_snapshot": 5,
+        "same_five_units_automatic_active_monotonic_seconds_after_boot": {
+          "minimum": 44.714085,
+          "maximum": 44.747769
+        },
+        "followup_uptime_seconds": 142,
+        "systemd_jobs_remaining_at_followup": 0,
+        "condition_and_assert_checks_passed": true,
+        "initial_journal_unavailable_units": 11,
+        "later_journal_unavailable_units": 0,
+        "interpretation": "The first snapshot preceded normal boot completion. Unit activation timestamps demonstrate automatic startup; no persistence defect was established. Journal unavailability also cleared on a later timer sample; its precise cause was not isolated."
+      },
+      "manual_service_starts_or_restarts_or_configuration_fixes": 0
+    },
+    "b": {
+      "boot_id_changed": true,
+      "post_boot_uptime_seconds": 842,
+      "failed_units_after_recovery": 0,
+      "root_filesystem_read_write": true,
+      "fixed_loaded_units_compared": 26,
+      "enabled_timers_compared": 8,
+      "all_fixed_unit_and_timer_checks_passed": true,
+      "rootful_containers": {
+        "count": 7,
+        "running_before": 6,
+        "running_after": 6,
+        "full_CID_image_restart_policy_running_state_preserved": true
+      },
+      "diagnostic_snapshot": {
+        "targets": 6,
+        "fresh": true,
+        "age_seconds": 52,
+        "unavailable_unit_observations": 0,
+        "journal_unavailable_units": 0,
+        "recollected_after_boot": true
+      },
+      "status": "verified",
+      "reboot": {
+        "operator_requested": true,
+        "normal_guest_reboot_requests": 1,
+        "systemctl_returncode": 0,
+        "issued_at_epoch": 1792769102,
+        "SSH_transport_returncode": 255,
+        "forced_reboot": false
+      },
+      "SSH_disconnect_interpretation": "Transport255 alone was not treated as success; the accepted reboot event, changed boot ID and post-boot recovery establish completion.",
+      "Hermes_recovery_backup_remained_stopped": true,
+      "gateway_recovered_and_idle": true,
+      "signed_approval_authority_ready_and_all_active_zero": true,
+      "approved_Controller_source_sha256": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f",
+      "approved_Controller_source_preserved": true,
+      "Wazuh_fixed_A_C_agents_active": true,
+      "existing_not_found_units": [
+        "capstone-vector.service",
+        "wazuh-agent.service"
+      ],
+      "existing_not_found_units_are_not_new_reboot_failures": true,
+      "startup_observations": {
+        "first_successful_snapshot_uptime_seconds": 94,
+        "initial_management_Result": "exit-code",
+        "initial_management_exit_status": 1,
+        "classified_error_code": "broker_unavailable",
+        "normal_timer_recovered_to_success": true,
+        "initial_journal_unavailable_units": 6,
+        "later_all_six_journal_statuses_observed": true,
+        "first_confirmed_observed_snapshot_epoch": 1792769849,
+        "journal_unavailability_root_cause": "unconfirmed",
+        "no_manual_start_restart_reset_failed_or_configuration_fix": true
+      },
+      "independent_readonly_journal_probe": {
+        "matched_collector_sandbox": true,
+        "probe_returncode": 0,
+        "fixed_query_summaries": [
+          {
+            "query": "err",
+            "returncode": 0,
+            "byte_count": 4809,
+            "line_count": 9
+          },
+          {
+            "query": "warning_info_error_classifier",
+            "returncode": 0,
+            "byte_count": 11203,
+            "line_count": 22
+          }
+        ],
+        "parser_status": "observed",
+        "raw_journal_or_stderr_returned": false,
+        "ephemeral_unit_final_LoadState": "not-found",
+        "ephemeral_unit_Result": "success",
+        "ephemeral_unit_ActiveState": "inactive",
+        "operational_collector_manually_started_or_source_changed": 0,
+        "distinction": "A temporary read-only probe ran separately. It did not manually start the operational collector, publish a snapshot, reload a unit or change source/configuration. Its ephemeral unit was collected to not-found."
+      },
+      "diagnostic_core_source_sha256": "228a1d98c7985a7e4986edff3fcd3de9c25d34cc02698f1d771502710144d6fc"
+    },
+    "a": {
+      "status": "completed_after_first_auto_start_failure_operator_recovery_and_successful_second_attempt",
+      "normal_guest_reboots": 2,
+      "first_attempt": {
+        "reboot": {
+          "normal_guest_reboot_requests": 1,
+          "systemctl_returncode": 0,
+          "issued_at_epoch": 1792770047,
+          "SSH_transport_returncode": 0,
+          "forced_reboot": false
+        },
+        "boot_id_changed": true,
+        "post_boot_snapshot_uptime_seconds": 69,
+        "failed_systemd_units": 0,
+        "automatic_security_container_recovery": "failed",
+        "previously_running_containers_not_started": [
+          "waf",
+          "suricata"
+        ],
+        "rootful_container_count": 4,
+        "running_before": 3,
+        "running_after": 1,
+        "full_CID_image_restart_policy_preserved": true,
+        "persisted_manual_stop_marker_observed_true_on_two_containers": true,
+        "marker_origin_and_complete_failure_root_cause": "unconfirmed",
+        "not_overwritten_by_later_success": true
+      },
+      "operator_recovery_after_first_attempt": {
+        "supported_container_start_operations": 2,
+        "exact_previously_running_full_CIDs_only": true,
+        "same_CID_image_restart_policy_preserved": true,
+        "mount_configuration_unchanged_as_reported_by_coordinating_operator": true,
+        "new_containers_images_restart_policy_or_configuration_changes": 0,
+        "unrelated_container_actions": 0,
+        "persisted_manual_stop_marker_false_after_supported_start": true,
+        "observed_at_epoch": 1792770361,
+        "public_https_after_recovery": {
+          "http": 200,
+          "image_count": 6,
+          "deployment_allowed": true,
+          "TLS_verified": true
+        },
+        "distinction": "The first automatic recovery test failed and required operator action. This recovery is not counted as automatic startup."
+      },
+      "second_attempt": {
+        "reboot": {
+          "normal_guest_reboot_requests": 1,
+          "systemctl_returncode": 0,
+          "issued_at_epoch": 1792770620,
+          "SSH_transport_returncode": 0,
+          "forced_reboot": false
+        },
+        "pre_reboot_running_containers": 3,
+        "pre_reboot_manual_stop_markers_all_false": true,
+        "boot_id_changed": true,
+        "post_boot_snapshot_uptime_seconds": 84,
+        "failed_systemd_units": 0,
+        "core_automatic_container_recovery": "passed",
+        "automatic_running_containers": [
+          "waf",
+          "suricata",
+          "chatproxy"
+        ],
+        "WAF_healthy": true,
+        "recovery_backup_remained_stopped": true,
+        "full_CID_image_restart_policy_running_state_preserved": true,
+        "new_started_at_observations": {
+          "waf": "2026-10-23T15:50:48.4448237Z",
+          "suricata": "2026-10-23T15:50:48.402200687Z",
+          "chatproxy": "2026-10-23T15:50:48.380235767Z"
+        },
+        "manual_container_starts_after_this_reboot": 0,
+        "configuration_or_policy_changes": 0,
+        "diagnostic_snapshot": {
+          "status": "observed_after_normal_timer_recovery",
+          "targets": 8,
+          "fresh": true,
+          "age_seconds": 32,
+          "journal_unavailable_units": 0,
+          "unavailable_unit_observations": 0,
+          "latest_followup_uptime_seconds": 488
+        },
+        "intermediate_followup_252_seconds": {
+          "uptime_seconds": 252,
+          "three_security_containers_still_running": true,
+          "WAF_healthy": true,
+          "recovery_backup_remained_stopped": true,
+          "failed_systemd_unit_count": 1,
+          "failed_unit_names": [
+            "capstone-vector-history-auto.service"
+          ],
+          "history_auto": {
+            "status": "pending_normal_timer_retry",
+            "classified_reason": "boot_list_unavailable",
+            "Result": "exit-code",
+            "exit_status": 65,
+            "next_retry_expected_around_kst": "2026-10-24T00:57:30+09:00",
+            "manual_service_start_restart_or_reset_failed": 0,
+            "data_loss_not_asserted": true
+          }
+        },
+        "status": "passed_automatic_core_and_background_recovery_after_successful_repeat",
+        "fixed_loaded_units_compared": 35,
+        "enabled_timers_compared": 11,
+        "all_fixed_unit_and_timer_checks_passed": true,
+        "final_followup": {
+          "uptime_seconds": 488,
+          "failed_systemd_unit_count": 0,
+          "root_filesystem_read_write": true,
+          "full_CID_image_restart_policy_running_state_preserved": true,
+          "WAF_healthy_and_Suricata_chatproxy_automatically_running": true,
+          "recovery_backup_remained_stopped": true,
+          "manual_container_starts_after_second_reboot": 0,
+          "history_auto": {
+            "status": "recovered_on_normal_timer",
+            "Result": "success",
+            "exit_status": 0,
+            "ActiveState": "inactive",
+            "SubState": "dead",
+            "inactive_successful_oneshot_is_not_failure": true,
+            "timer_active": true,
+            "timer_enabled": true,
+            "manual_service_start_restart_or_reset_failed": 0,
+            "data_loss_not_asserted": true
+          },
+          "public_https": {
+            "/log4shell/": {
+              "http": 200,
+              "TLS_verified": true
+            },
+            "/log4shell/api/list": {
+              "http": 200,
+              "TLS_verified": true,
+              "catalog_count": 6
+            },
+            "/log4shell/api/status": {
+              "http": 200,
+              "TLS_verified": true,
+              "image_count": 6,
+              "deployment_allowed": true
+            }
+          }
+        },
+        "startup_diagnostic_observations": [
+          {
+            "uptime_seconds": 84,
+            "fresh": true,
+            "journal_unavailable_units": 8
+          },
+          {
+            "uptime_seconds": 252,
+            "fresh": true,
+            "journal_unavailable_units": 0
+          },
+          {
+            "uptime_seconds": 488,
+            "fresh": true,
+            "journal_unavailable_units": 0
+          }
+        ]
+      },
+      "final_recovery_status": "verified_second_attempt_full_fixed_units_timers_and_services",
+      "first_attempt_history_auto_startup_observation": {
+        "initial_outcome": "deferred",
+        "classified_reason": "boot_list_unavailable",
+        "later_normal_timer_outcome": "batch_preserved",
+        "blocked_jobs_observed": 0,
+        "raw_event_loss_not_asserted": true
+      },
+      "first_failure_and_operator_recovery_remain_recorded": true,
+      "manual_stop_marker_origin": "unconfirmed"
+    }
+  },
+  "final_UID995_Hermes_SDK": {
+    "status": "passed",
+    "evidence": "infra/mcp/system-diagnostics-reboot-validation-20261024.json",
+    "evidence_sha256": "c329fc3586db4c1e7da6917ba7cdbcf72c55749d985df28688825b0840a2af32",
+    "uid": 995,
+    "gid": 986,
+    "initialize": 1,
+    "tools_list": 1,
+    "tools_call": 3,
+    "protocol_version": "2025-06-18",
+    "selected_targets": {
+      "a:vector": {
+        "read_succeeded": true,
+        "snapshot_age_seconds": 45,
+        "observation_available": true,
+        "ActiveState": "active",
+        "SubState": "running",
+        "Result": "success",
+        "journal_status": "observed"
+      },
+      "b:soc-bot": {
+        "read_succeeded": true,
+        "snapshot_age_seconds": 27,
+        "observation_available": true,
+        "ActiveState": "active",
+        "SubState": "running",
+        "Result": "success",
+        "journal_status": "observed"
+      },
+      "c:lab-terminal": {
+        "read_succeeded": true,
+        "snapshot_age_seconds": 4,
+        "observation_available": true,
+        "ActiveState": "active",
+        "SubState": "running",
+        "Result": "success",
+        "journal_status": "observed"
+      }
+    },
+    "approved_Controller_sha256": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f",
+    "Controller_unchanged": true,
+    "operating_configs_unchanged": true,
+    "management_session_and_message_counts_unchanged": true,
+    "management_session_counts_before": {
+      "messages": 228,
+      "sessions": 26
+    },
+    "management_session_counts_after": {
+      "messages": 228,
+      "sessions": 26
+    },
+    "model_requests": 0,
+    "Mattermost_posts": 0,
+    "new_sessions": 0,
+    "manual_collector_starts": 0,
+    "config_writes": 0,
+    "restarts": 0,
+    "deployments": 0,
+    "all25_targets_or_all_applications_health_verdict": false,
+    "earlier_natural_language_model_failure_unchanged": true
+  },
+  "reboot_phase_mutations": {
+    "normal_guest_reboots_verified": 4,
+    "package_updates_or_installations": 0,
+    "source_or_configuration_fixes_for_boot_recovery": 0,
+    "manual_supported_container_starts_after_A_first_failure": 2,
+    "manual_systemd_service_start_restart_or_reset_failed_for_recovery": 0
+  },
+  "privacy": {
+    "private_IPs_account_names_or_credential_paths_included": false,
+    "keys_tokens_or_auth_headers_included": false,
+    "raw_command_arguments_or_journal_messages_included": false,
+    "raw_packets_or_attack_payloads_included": false,
+    "local_temporary_paths_included": false
+  },
+  "evidence_digests": {
+    "C_before_snapshot": "96106070411bfef165544d35270e72e647bc7989afaaa09a0b641ad77f76fbaa",
+    "C_after_snapshot": "95423769cb15c2466bb12d8227e5b5948dd02142cb7e0941ee4705cce350673c",
+    "C_action": "ea08db7f6d7840b46c866c826705a373d3bd3647e2ecc9171b5668b4583ca91a",
+    "C_recovery": "a00ce2eb285f06e61fdac565a701166fc29aae48252f67372fe5164db957affb",
+    "C_startup_metadata": "fb988bd109088dde77a73b7d021e2a19c5b7d937ebe079a6076d0dbc0924b3d7",
+    "B_before_snapshot": "91ec2cecebb42d808d4887672684f377d76557b6f1c44000565a51563b7cb9a2",
+    "B_after_snapshot": "5e56573ff742e658b38eccb1ad8dc9be2fc6638817dceeaffdbc3ac82a8f597e",
+    "B_action": "f3021682a702b7934de2d37377ec5a17b4bea2a558bbe869d91099c141161f4a",
+    "B_recovery": "5573c04d9886f7093f16fc92c8e567496201d51a8bcf9ff1f3527ebf38d35afe",
+    "B_readonly_sandbox_probe": "ddf5c2d11437d78e5afcfd744824c577a61e363cba422a6d8b732a113a1e36e9",
+    "B_recovery_extras": "f3a5ccccc7ba4d06c6fc78bbbee0235dafe309e268d541bef444ce8f5aa8b482",
+    "A_first_before_snapshot": "148a06d8f90ba5e2b85e548439e2f9ca179e62554dd1e78f6a1b8c5261aa7bee",
+    "A_first_action": "454870289b4cc98822c48690e585adf1264796346f8b426ab2d7d3d4a99c02f4",
+    "A_first_after_snapshot": "da3067cb787f0dddb5362c464bac64476926b2ebc53ae2d720c6b96657837271",
+    "A_persisted_restart_flags_after_first_attempt": "b84ad5a18ba4507b4009759fadc4da81ef084df8fd56ee698606761519762086",
+    "A_supported_operator_recovery": "3e39660c1d3d6724478ec84d193500d40879b1b6255df17f71e542f901dad113",
+    "A_pre_second_restart_flags": "bcd3a835fa757c70ad203f1f717447c55aa8724b4ac5f8d027519cc641f4115d",
+    "A_second_before_snapshot": "00ca02086291f6ccf47e4362de8926ed5bc0352a569851b144b703e5b0162ae6",
+    "A_second_action": "c5972eca5071514a206cd4448903266102b55d78504fb021d09f067079b27b52",
+    "A_second_initial_after_snapshot": "2167914e26914e9e634adb2efb04f643968708bb3ade28d0e6c93ba1b5fd93fe",
+    "A_history_timer_metadata": "b4c0d20658ae176088dad768cf7ce67753f5e4d3533e1f564d0f74eca7be1358",
+    "A_second_252_second_snapshot": "529d34686296c3dcb19189bd562953fb5af5e537a9bf6f1fbcfd78d3aa2063c4",
+    "final_UID995_registered_SDK": "c329fc3586db4c1e7da6917ba7cdbcf72c55749d985df28688825b0840a2af32",
+    "A_second_final_snapshot": "cd72d10c1d9caa663c0d73c8c9fbe9ccf8b6a4c6a89cc349711a01fdadf48b71",
+    "A_second_final_recovery": "1b0f7212c200f567d78e5ba46ddfe3df9b3d4157260eb178ce6c637d5568d929",
+    "cross_host_final_health": "729980cc8357f36147b99b12892a23ebd5ec53b4df2e1bfb6dd05b35c894d6c4"
+  },
+  "cleanup": {
+    "ephemeral_readonly_probe_unit_not_found_after_exit": true,
+    "operating_sources_and_recovery_backups_preserved": true,
+    "shared_working_evidence_cleanup": "pending coordinating operator closeout"
+  },
+  "limits": [
+    "Completion applies to the recorded recovery and persistence checks. It does not make the failed first A automatic recovery attempt successful or erase the two supported operator container starts.",
+    "A brief SSH/HTTPS interruption is expected during a normal reboot; an initial unavailable or inactive sample alone is not a persistence failure.",
+    "Inactive/dead successful oneshots and the two pre-existing missing B units are distinguished from failed services.",
+    "Observed recovery does not establish the precise root cause of the initial B journal-unavailable sample.",
+    "The failed natural-language model tool-selection test remains a separate failure; reboot recovery does not convert it into a pass.",
+    "No fresh three-VM installation or actual attack/detection/containment E2E is included.",
+    "The persisted manual-stop marker was observed, but its origin and the complete cause of the first A automatic-start failure were not established.",
+    "The real natural-language LLM tool-selection trial remains FAIL with zero MCP calls. The passing registered SDK transport checks used no model and do not establish autonomous tool selection.",
+    "Fresh three-VM installation, real CVE exploitation and attack/detection/blocking/approval E2E remain outside this reboot validation."
+  ],
+  "cross_host_final_health": {
+    "observed_at_epoch": 1792771139,
+    "after_final_A_reboot": true,
+    "signed_authority_ready_and_active_zero": true,
+    "fixed_health_route_signatures_verified": true,
+    "active_rule_changes": 0,
+    "active_legacy_approvals": 0,
+    "active_operations": 0,
+    "Wazuh_fixed_A_C_agents_active": {
+      "a": true,
+      "c": true
+    },
+    "approved_B_Controller_sha256": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f",
+    "raw_journal_or_authentication_material_returned": false,
+    "model_requests": 0
+  },
+  "completed_verification_scope": {
+    "existing_hosts": 3,
+    "normal_guest_reboots": 4,
+    "final_fixed_loaded_unit_comparisons": {
+      "a": 35,
+      "b": 26,
+      "c": 26
+    },
+    "final_enabled_timer_comparisons": {
+      "a": 11,
+      "b": 8,
+      "c": 5
+    },
+    "selected_UID995_SDK_reads": 3,
+    "C_B_first_attempts_and_A_second_attempt_recovered": true,
+    "all_initial_automatic_recovery_attempts_passed": false,
+    "A_first_attempt_required_operator_recovery": true
+  }
+}

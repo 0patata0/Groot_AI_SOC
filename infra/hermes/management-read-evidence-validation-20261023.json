@@ -1,0 +1,292 @@
+{
+  "change": {
+    "LLM_decision_role_or_write_authority_changed": false,
+    "SILENT_resolved_also_requires_evidence": true,
+    "existing_verify_zero_read_or_missing_bound_read_unchanged": true,
+    "forced_tool_selection_or_prompt_change": false,
+    "limit": "At least one successful read is a minimum evidence boundary. It does not establish that the model reasoned correctly, selected relevant evidence, or resolved every symptom.",
+    "pending_proposal_waiting_approval_precedence_preserved": true,
+    "result": "needs_review/live_investigation_missing",
+    "trigger": "manage mode, no pending proposal, model disposition resolved or monitor, zero completed error-free readonly tool traces"
+  },
+  "cleanup": {
+    "own_temporary_directory_absence_verified": true,
+    "own_working_scripts": "removed and absence verified",
+    "own_working_scripts_removed": 16,
+    "root_private_operating_backup": "preserved",
+    "shared_helper_use_by_this_agent_finished": true,
+    "shared_root_helpers_and_results": "preserved for coordinating root and reboot gates",
+    "shared_root_helpers_and_results_preserved": true
+  },
+  "installation_scope": {
+    "changed_operating_files": [
+      "/opt/capstone-management/soc_management_controller.py"
+    ],
+    "diagnostic_v4_source_pins": "Unchanged: the four-source diagnostic bundle does not include the Controller.",
+    "fresh_install": "Existing soc_management.SOURCES includes the Controller; source_bundle dynamically hashes current bytes. Rendered Controller fixture verifies the new guard without relaxing profile checks.",
+    "historical_v3_evidence_and_backups": "Preserved. The new Controller SHA intentionally supersedes the old Controller value for future integrity comparisons.",
+    "legacy_B_portable_SOC_profile_receipts": "siem.json/siem-intent.json/siem-prepared.json were absent; no such pins were edited.",
+    "new_configuration_knobs_or_offline_artifacts": false,
+    "new_packages_images_ports_services_or_credentials": false,
+    "single_entrypoint": "deploy.sh"
+  },
+  "native_migration": {
+    "DB_after": {
+      "/opt/hermes-data/management/state.db": {
+        "messages": {
+          "count": 224,
+          "sha256": "6dcfc6babf1d8decacc598d79ef0ac7642d5bc95b5a5a59b38568060c35bf46a"
+        },
+        "sessions": {
+          "count": 24,
+          "sha256": "181e04695622bbf872ff2603e840eb5a24e87584cf922caf0c102ed0c4d2bcf5"
+        }
+      },
+      "/opt/hermes-data/state.db": {
+        "messages": {
+          "count": 1332,
+          "sha256": "fafc8428cef019c423c9e8d37ac07218fdfa9f4171b91073a1763f53ef42dcb5"
+        },
+        "sessions": {
+          "count": 128,
+          "sha256": "07f959fb44e57d1cdd24c8b44bd1310b583d1b6db8371e8568398f34501b8c58"
+        }
+      },
+      "/var/lib/capstone-management/state.sqlite3": {
+        "cases": {
+          "count": 21,
+          "sha256": "dba7494a4a78e26905b7634aeb22e7afde24778a5a5b3a3729e37f358920f71d"
+        },
+        "proposals": {
+          "count": 4,
+          "sha256": "ae6f1006fa645678e0a9c84446f4e9b75d553b748e1c24f048d5a54d58b42c40"
+        },
+        "runs": {
+          "count": 50,
+          "sha256": "6db90d23770b9635080abab6dd647bad34b4447a1dea49eeb13a004e365033ef"
+        },
+        "tool_calls": {
+          "count": 70,
+          "sha256": "581496408efc8af2fa375bd544af1fa8048128cf259a5b93f6c798c4bb8f71d0"
+        }
+      }
+    },
+    "DB_before": {
+      "/opt/hermes-data/management/state.db": {
+        "messages": {
+          "count": 224,
+          "sha256": "6dcfc6babf1d8decacc598d79ef0ac7642d5bc95b5a5a59b38568060c35bf46a"
+        },
+        "sessions": {
+          "count": 24,
+          "sha256": "181e04695622bbf872ff2603e840eb5a24e87584cf922caf0c102ed0c4d2bcf5"
+        }
+      },
+      "/opt/hermes-data/state.db": {
+        "messages": {
+          "count": 1332,
+          "sha256": "fafc8428cef019c423c9e8d37ac07218fdfa9f4171b91073a1763f53ef42dcb5"
+        },
+        "sessions": {
+          "count": 128,
+          "sha256": "07f959fb44e57d1cdd24c8b44bd1310b583d1b6db8371e8568398f34501b8c58"
+        }
+      },
+      "/var/lib/capstone-management/state.sqlite3": {
+        "cases": {
+          "count": 21,
+          "sha256": "dba7494a4a78e26905b7634aeb22e7afde24778a5a5b3a3729e37f358920f71d"
+        },
+        "proposals": {
+          "count": 4,
+          "sha256": "ae6f1006fa645678e0a9c84446f4e9b75d553b748e1c24f048d5a54d58b42c40"
+        },
+        "runs": {
+          "count": 50,
+          "sha256": "6db90d23770b9635080abab6dd647bad34b4447a1dea49eeb13a004e365033ef"
+        },
+        "tool_calls": {
+          "count": 70,
+          "sha256": "581496408efc8af2fa375bd544af1fa8048128cf259a5b93f6c798c4bb8f71d0"
+        }
+      }
+    },
+    "MCP_calls": 0,
+    "after_metadata": {
+      "bytes": 44612,
+      "gid": 0,
+      "mode": 420,
+      "sha256": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f",
+      "uid": 0
+    },
+    "backup": "/var/backups/capstone-controller-read-evidence/20261023-manage-guard",
+    "before_metadata": {
+      "bytes": 44417,
+      "gid": 0,
+      "mode": 420,
+      "sha256": "6549a4ffaf426e9e63e6eea3c528e5848d069e78dd8036c22d123f46484ee616",
+      "uid": 0
+    },
+    "candidate_isolated_fixtures": {
+      "MCP_calls": 0,
+      "all_passed": true,
+      "fixtures": {
+        "manage_monitor_zero_read": {
+          "detail": "live_investigation_missing",
+          "state": "needs_review"
+        },
+        "manage_pending_zero_read_resolved": {
+          "detail": "awaiting_broker_event",
+          "state": "waiting_approval"
+        },
+        "manage_read_resolved": {
+          "detail": "model_completed_investigation",
+          "state": "completed"
+        },
+        "manage_resolved_zero_read": {
+          "detail": "live_investigation_missing",
+          "state": "needs_review"
+        },
+        "manage_silent_zero_read": {
+          "detail": "live_investigation_missing",
+          "state": "needs_review"
+        },
+        "verify_zero_read": {
+          "detail": "live_verification_missing",
+          "state": "needs_review"
+        }
+      },
+      "isolated_SQLite_only": true,
+      "model_requests": 0,
+      "network_calls": 0,
+      "production_case_execution": false
+    },
+    "container_restarts": 0,
+    "finished_at": 1792767767,
+    "idle_gate": {
+      "active_agents": 0,
+      "active_approvals": 0,
+      "active_cases": 0,
+      "active_work": false,
+      "gateway_leases": 0,
+      "gateway_running": true,
+      "heartbeat_age_seconds": 1.882,
+      "management_leases": 0,
+      "running_runs": 0
+    },
+    "installed_isolated_fixtures": {
+      "MCP_calls": 0,
+      "all_passed": true,
+      "fixtures": {
+        "manage_monitor_zero_read": {
+          "detail": "live_investigation_missing",
+          "state": "needs_review"
+        },
+        "manage_pending_zero_read_resolved": {
+          "detail": "awaiting_broker_event",
+          "state": "waiting_approval"
+        },
+        "manage_read_resolved": {
+          "detail": "model_completed_investigation",
+          "state": "completed"
+        },
+        "manage_resolved_zero_read": {
+          "detail": "live_investigation_missing",
+          "state": "needs_review"
+        },
+        "manage_silent_zero_read": {
+          "detail": "live_investigation_missing",
+          "state": "needs_review"
+        },
+        "verify_zero_read": {
+          "detail": "live_verification_missing",
+          "state": "needs_review"
+        }
+      },
+      "isolated_SQLite_only": true,
+      "model_requests": 0,
+      "network_calls": 0,
+      "production_case_execution": false
+    },
+    "model_requests": 0,
+    "production_DB_writes": 0,
+    "production_DBs_unchanged": true,
+    "schema": 1,
+    "scope": "minimum_B_controller_manage_read_evidence_guard",
+    "service_restarts": 0,
+    "signed_approval_authority_gate": {
+      "all_active_zero": true,
+      "health": {
+        "/operations/health": {
+          "active_legacy_approvals": 0,
+          "active_operations": 0,
+          "active_rule_changes": 0,
+          "approval_configured": true,
+          "signature_verified": true
+        },
+        "/rule-changes/health": {
+          "active_legacy_approvals": 0,
+          "active_rule_changes": 0,
+          "approval_configured": true,
+          "signature_verified": true
+        }
+      },
+      "key_values_returned": false,
+      "model_requests": 0,
+      "mutations_requested": 0,
+      "observed_at": 1792767767,
+      "schema": 1,
+      "scope": "fixed_readonly_signed_broker_authority_gate"
+    },
+    "started_at": 1792767761,
+    "state": "complete"
+  },
+  "notification_limit": {
+    "SILENT_needs_review_delivery_suppression_unchanged": true,
+    "additional_fixed_failure_notice_implemented": false,
+    "meaning": "The case is retained as needs_review, but existing deliver() may suppress a SILENT report and mark it delivered. Administrator notification of that failure is not guaranteed by this change."
+  },
+  "recorded_at_kst": "2026-10-24T00:05:28+09:00",
+  "schema": 1,
+  "scope": "manage_mode_zero_read_completion_guard",
+  "source_sha256": {
+    "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+    "deployment/tests/test_soc_management.py": "aa3912d47228351c45ad02ea795c9c0e16432b8f47b9dcf94979361b0294f5c1",
+    "infra/hermes/soc_management_controller.py": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f",
+    "infra/hermes/test_soc_management_controller.py": "46b5aea3a1b70652d5440c86733ad1c7092d72a4e79885aca0af72765354534d"
+  },
+  "source_validation": {
+    "combined_passed": 69,
+    "combined_related_tests": 69,
+    "controller_tests": {
+      "existing_positive_reopen_fixture_now_includes_a_read": true,
+      "new_tests": 7,
+      "passed": 41,
+      "run": 41
+    },
+    "model_MCP_or_server_calls_in_local_fixtures": 0,
+    "rendered_installer_tests": {
+      "failure_headers": [],
+      "live_model_or_MCP_or_service_calls": 0,
+      "new_rendered_fixture_methods": 2,
+      "own_fixture_temp_removed": true,
+      "returncode": 0,
+      "run": 28,
+      "schema": 1,
+      "scope": "rendered management Controller zero-read boundary isolated fixtures",
+      "source_sha256": {
+        "deployment/tests/test_soc_management.py": "aa3912d47228351c45ad02ea795c9c0e16432b8f47b9dcf94979361b0294f5c1",
+        "infra/hermes/soc_management_controller.py": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f"
+      }
+    }
+  },
+  "status": "source_and_minimum_B_migration_complete",
+  "validation_boundaries": {
+    "actual_chat_delivery_test": false,
+    "actual_model_retested_after_guard": false,
+    "actual_model_test_result": "The separate natural-language test remains failed_no_MCP_tool_call; this guard does not convert it to success.",
+    "installed_code_fixtures": "Six isolated SQLite fixtures ran against candidate bytes and the installed actual file. They never created or modified a production Controller case.",
+    "production_DB_content_unchanged": true,
+    "production_approval_or_containment_E2E": false
+  }
+}

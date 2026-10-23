@@ -532,6 +532,8 @@ class Trace:
                 state, detail, due = "needs_review", "pending_verification_limit", now
             elif pending:
                 state, detail, due = "waiting_approval", "awaiting_broker_event", now + 120
+            elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):
+                state, detail, due = "needs_review", "live_investigation_missing", now
             elif disposition == "monitor" and self.case["monitor_count"] < 3:
                 state, detail, due = "monitor", "model_requested_followup", now + 300
             elif disposition == "resolved":

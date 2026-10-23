@@ -1,0 +1,172 @@
+{
+  "actual_result": {
+    "Mattermost_posts": 0,
+    "all_passed": true,
+    "config_sha256_after": {
+      "/opt/hermes-data/config.yaml": "626b69f728e595186ca332b0628b89c8deb44026363518b02b796f5be7a6b61a",
+      "/opt/hermes-data/management/config.yaml": "86cff3be7edf215f96fa20842e5ce510d548565bd7700b146405ecd9014c379e"
+    },
+    "config_writes": 0,
+    "controller_sha256": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f",
+    "controller_unchanged": true,
+    "deployments": 0,
+    "finished_at": 1792770949,
+    "management_session_counts_after": {
+      "messages": 228,
+      "sessions": 26
+    },
+    "management_session_counts_before": {
+      "messages": 228,
+      "sessions": 26
+    },
+    "management_session_counts_unchanged": true,
+    "manual_collector_starts": 0,
+    "model_requests": 0,
+    "new_sessions_by_probe": 0,
+    "operating_configs_unchanged": true,
+    "restarts": 0,
+    "schema": 1,
+    "scope": "post_all_hosts_reboot_fixed_SDK_readonly_probe",
+    "sdk": {
+      "all_observations_available": true,
+      "all_reads_succeeded": true,
+      "chat_posts": 0,
+      "gid": 986,
+      "initialize": 1,
+      "management_config_unchanged": true,
+      "model_requests": 0,
+      "mutations_requested": 0,
+      "new_sessions": 0,
+      "protocol_version": "2025-06-18",
+      "scope": "one_fixed_read_per_rebooted_host_via_registered_system_diagnostics",
+      "targets": {
+        "a:vector": {
+          "coverage_status": "covered_sample",
+          "expires_at": 1792771083,
+          "host": "a",
+          "journal_status": "observed",
+          "mutation_performed": false,
+          "observation_available": true,
+          "observed_at": 1792770903,
+          "properties": {
+            "ActiveState": "active",
+            "ExecMainCode": 0,
+            "ExecMainStatus": 0,
+            "LoadState": "loaded",
+            "NRestarts": 0,
+            "Result": "success",
+            "SubState": "running",
+            "Type": "simple"
+          },
+          "raw_messages_returned": false,
+          "read_succeeded": true,
+          "snapshot_age_seconds": 45,
+          "status": "observed",
+          "target": "a:vector",
+          "unit": "capstone-vector.service"
+        },
+        "b:soc-bot": {
+          "coverage_status": "covered_sample",
+          "expires_at": 1792771101,
+          "host": "b",
+          "journal_status": "observed",
+          "mutation_performed": false,
+          "observation_available": true,
+          "observed_at": 1792770921,
+          "properties": {
+            "ActiveState": "active",
+            "ExecMainCode": 0,
+            "ExecMainStatus": 0,
+            "LoadState": "loaded",
+            "NRestarts": 0,
+            "Result": "success",
+            "SubState": "running",
+            "Type": "simple"
+          },
+          "raw_messages_returned": false,
+          "read_succeeded": true,
+          "snapshot_age_seconds": 27,
+          "status": "observed",
+          "target": "b:soc-bot",
+          "unit": "soc-bot.service"
+        },
+        "c:lab-terminal": {
+          "coverage_status": "covered_sample",
+          "expires_at": 1792771124,
+          "host": "c",
+          "journal_status": "observed",
+          "mutation_performed": false,
+          "observation_available": true,
+          "observed_at": 1792770944,
+          "properties": {
+            "ActiveState": "active",
+            "ExecMainCode": 0,
+            "ExecMainStatus": 0,
+            "LoadState": "loaded",
+            "NRestarts": 0,
+            "Result": "success",
+            "SubState": "running",
+            "Type": "simple"
+          },
+          "raw_messages_returned": false,
+          "read_succeeded": true,
+          "snapshot_age_seconds": 4,
+          "status": "observed",
+          "target": "c:lab-terminal",
+          "unit": "capstone-nonweb-terminal.service"
+        }
+      },
+      "tool_names": [
+        "get_system_diagnostics"
+      ],
+      "tools_call": 3,
+      "tools_list": 1,
+      "uid": 995
+    },
+    "started_at": 1792770946,
+    "state": "complete"
+  },
+  "cleanup": {
+    "further_remote_calls_by_this_agent_needed": false,
+    "own_new_temporary_directory_created": false,
+    "private_downloads_or_packages_created": false,
+    "shared_probe_and_results_retained_for_coordinating_root": true
+  },
+  "coordinator_reported_context": {
+    "A_history_background_task": "separate; not queried or adjudicated by this probe",
+    "actual_reboots": {
+      "A": 2,
+      "B": 1,
+      "C": 1
+    },
+    "full_boot_validation": "separate; coordinating root had not declared full PASS at SDK GO"
+  },
+  "fixed_probe": {
+    "controller_expected_sha256": "128e508a567d35a94385737e4d8d23bf7e546ee1692a6d57925ee0e99d07583f",
+    "executions_after_explicit_GO": 1,
+    "limit": 1,
+    "lookback_minutes": 15,
+    "provider_model_Agent_or_CLI_conversation_used": false,
+    "registration": "existing management profile system-diagnostics MCP",
+    "source_sha256": "a179cd8f6ba6f1a7dce42d82c311fa68ce4a217bfeb3615001fd1651d4e983e9",
+    "targets": [
+      "a:vector",
+      "b:soc-bot",
+      "c:lab-terminal"
+    ],
+    "tool": "get_system_diagnostics"
+  },
+  "limits": [
+    "This verifies the registered SDK/MCP transport and selected observations for three fixed services; it is not a comprehensive health verdict for all25 diagnostics or every application.",
+    "Observed active/running service states are snapshot observations with the recorded ages, not future availability guarantees.",
+    "The earlier natural-language model test remains a separately recorded failure and was not repeated.",
+    "No raw journal/error messages, request bodies, model prompt/response, credentials, private addresses or session identifiers were collected in this public artifact.",
+    "Complete reboot acceptance and unrelated history-task recovery remain the coordinating root responsibility."
+  ],
+  "observed_finish_kst": "2026-10-24T00:55:49+09:00",
+  "observed_start_kst": "2026-10-24T00:55:46+09:00",
+  "recorded_at_kst": "2026-10-24T00:56:58+09:00",
+  "schema": 1,
+  "scope": "fixed_registered_system_diagnostics_SDK_reads_after_coordinated_reboots",
+  "status": "passed"
+}

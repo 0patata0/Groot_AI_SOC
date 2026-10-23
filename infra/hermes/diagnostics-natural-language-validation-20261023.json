@@ -1,0 +1,106 @@
+{
+  "actual_model_test": {
+    "CLI_exit_code": 0,
+    "MCP_tool_result_events": 0,
+    "MCP_tool_use_events": 0,
+    "elapsed_seconds": 28.161,
+    "finished_at_kst": "2026-10-23T23:40:17+09:00",
+    "max_turns": 4,
+    "model_response_was_Korean": true,
+    "native_final_duration_ms": 19188,
+    "native_session_api_calls": 1,
+    "natural_language_input_without_tool_name_or_forced_choice": true,
+    "operating_model_or_prompt_override": false,
+    "outer_timeout_seconds": 150,
+    "raw_prompt_response_session_identifiers_headers_or_diagnostic_bodies_in_public_evidence": false,
+    "run_budget_seconds": 120,
+    "started_at_kst": "2026-10-23T23:39:49+09:00",
+    "termination_grace_seconds": 5,
+    "token_usage": {
+      "cache_read": 0,
+      "cache_write": 0,
+      "input": 12614,
+      "output": 259,
+      "total": 12873
+    }
+  },
+  "cleanup": {
+    "normal_test_session_and_history": "retained and marked",
+    "own_temporary_directory_absence_verified": true,
+    "own_temporary_work_files": "removed and absence verified",
+    "own_working_scripts_removed": 16,
+    "shared_helper_use_by_this_agent_finished": true,
+    "shared_results": "kept for coordinating root",
+    "shared_root_helpers_and_results_preserved": true
+  },
+  "controller_guard_followup": "management-read-evidence-validation-20261023.json",
+  "controller_source_review_separate_from_actual_CLI_test": {
+    "actual_CLI_test_did_not_create_or_transition_a_Controller_case": true,
+    "existing_verify_zero_read_path": "needs_review/live_verification_missing",
+    "manage_zero_read_resolved_monitor_gap": "Minimum manage completion guard was deployed separately; see management-read-evidence-validation-20261023.json. The original native model test remains failed and did not execute a Controller case.",
+    "source": "infra/hermes/soc_management_controller.py",
+    "tested_installed_sha256": "6549a4ffaf426e9e63e6eea3c528e5848d069e78dd8036c22d123f46484ee616"
+  },
+  "factory_readonly_followup": {
+    "MCP_shutdown_completed": true,
+    "actual_model_request_schema_directly_observed": false,
+    "exact_diagnostic_name": "mcp__system_diagnostics__get_system_diagnostics",
+    "exact_name_present_before_and_after_filter": true,
+    "factory_function_count": 34,
+    "filter_output_all_readonly": true,
+    "limit": "This reconstructs the installed factory and verify filter. The successful API request payload was not retained; stored session tool_names was null and does not prove zero model-facing tools.",
+    "model_requests": 0,
+    "namespace_mismatch_not_supported": true,
+    "operating_files_unchanged": true,
+    "session_message_counts_unchanged": true,
+    "verify_filter_count": 26,
+    "wire_read_allowed": true
+  },
+  "failure_assessment": {
+    "explanation": "The model returned a completed-sounding report without a tool call or observation. A zero CLI exit code is not successful live verification. Its service/history statements are not treated as facts.",
+    "live_read_occurred": false,
+    "no_retry_or_forced_tool_call_to_convert_failure_to_success": true,
+    "tool_selection_succeeded": false,
+    "unsupported_completed_read_claim": true,
+    "unsupported_four_hour_error_count_claim": true,
+    "unsupported_service_status_claim": true
+  },
+  "housekeeping_preconditions": {
+    "auto_archive": false,
+    "checkpoint_auto_prune": true,
+    "checkpoint_store_absent_so_startup_prune_noop": true,
+    "fresh_idle_case_approval_agent_lease_counts_zero": true,
+    "heartbeat_age_seconds": 8.076,
+    "housekeeping_meta_unchanged": true,
+    "one_time_repair_latches_already_complete": true,
+    "session_prune_within_existing_24_hour_throttle": true
+  },
+  "limits": [
+    "One actual model conversation is not a broad reliability evaluation.",
+    "Current four-hour error windows can expire; old103/4 counts were not asserted.",
+    "Actual model request tool-schema metadata was not retained.",
+    "New management guard fixtures/deployment are separate from this failed native model test."
+  ],
+  "preservation": {
+    "Mattermost_posts": 0,
+    "active_management_leases_after": 0,
+    "all_existing_messages_unchanged": true,
+    "all_existing_sessions_unchanged": true,
+    "approvals_or_containment_actions": 0,
+    "automatic_cache_metadata_changed": false,
+    "case_and_proposal_unchanged": true,
+    "controller_case_executions": 0,
+    "model_MCP_security_agent_platform_meaning_unchanged": true,
+    "new_marked_test_sessions": 1,
+    "new_session_retained_for_audit": true,
+    "new_test_messages": 2,
+    "operating_files_byte_unchanged": true,
+    "remaining_test_CLI_processes": 0,
+    "service_restarts": 0,
+    "test_session_directly_deleted": false
+  },
+  "recorded_at_kst": "2026-10-23T23:55:58+09:00",
+  "schema": 1,
+  "scope": "one_actual_native_Hermes_verify_mode_natural_language_tool_selection",
+  "status": "failed_no_MCP_tool_call"
+}

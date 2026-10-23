@@ -1,0 +1,57 @@
+{
+  "P2_03_passed": true,
+  "Samba_original_not_deployed_restored": true,
+  "capabilities_cookies_PTY_bodies_credentials_retained": false,
+  "cleanup": {
+    "Mac_packages_installed": 0,
+    "operational_rootless_receipts_retired_history_and_stopped_sudo_container_preserved": true,
+    "own_task_temp_removed": true,
+    "removed_generated_files": 8,
+    "server_temp_packages_created": 0,
+    "shared_root_temp_preserved": true,
+    "verified_at": 1792768950
+  },
+  "code_and_evidence_sources": "checks/README.md and four check sources; observed checker reconstructed by archived reverse patch",
+  "completed_at": 1792768880,
+  "container_or_host_reboots_by_this_agent": 0,
+  "duration_last_input_age_seconds": 56.689,
+  "duration_posthoc_conservative_intervals_seconds": {
+    "idle": [
+      302.704,
+      305.082
+    ],
+    "lifetime": [
+      1801.56,
+      1803.948
+    ]
+  },
+  "final_session_workers_and_lifecycle_zero": true,
+  "new_three_VM_installation_tested": false,
+  "normal_reopen_UID1000_then_own_close_passed": true,
+  "permanent_report_sha256": {
+    "sudo-daemon-restart-validation-20261024.json": "530c7e433888552981343010172b9175f751d2cb541e324b35301905a6d8858e",
+    "sudo-post-restart-reopen-validation-20261024.json": "8711756e275df86f740d82563171a5b18b84d5542cd986c58a7938e497989571",
+    "terminal-duration-observed-20261023.json": "36830ff71a392f1211c758e83e9b77a2438df9fc63a78dc06ab9736848d35514",
+    "terminal-duration-setup-validation-20261023.json": "5ed520a7549a5ddf3209e23142db320dc663e46ec63a2981b27d814b1deb4b17",
+    "terminal-duration-validation-20261023.json": "29be20a6622bc6c3bc786d0e2854031a145685575b9f3409f02b31dd4fd05bdb"
+  },
+  "product_source_clock_or_config_changes": 0,
+  "reports": [
+    "terminal-duration-validation-20261023.json",
+    "terminal-duration-observed-20261023.json",
+    "terminal-duration-setup-validation-20261023.json",
+    "sudo-daemon-restart-validation-20261024.json",
+    "sudo-post-restart-reopen-validation-20261024.json"
+  ],
+  "root_guest_reboot_validation": "separate root task; not claimed by these checks",
+  "schema": 1,
+  "scope": "P2-01 idle, P2-02 hard duration, P2-03 own sudo session across root-controlled daemon restart, one normal reopen",
+  "service_restart_authority": "root performed only the fixed P2-03 terminal daemon restart; no restart by test workers",
+  "status": "pass",
+  "test_sources_sha256": {
+    "sudo_reopen_check.py": "a6a6346e881e6f630f8834ac81d99047b75ba58ceafd2d6123a6bb1df599869c",
+    "sudo_restart_check.py": "4f1f8ae80620f89ee1b7240f8a77584da06a0534f5369287925eda88f2bfa830",
+    "terminal_duration.py": "796deec34597be7e7d8847eb6bdef578275a4a254faad4eafb1a16286088e38c",
+    "terminal_duration_probe.py": "8300bd1547861a3d93e61be59c2c963d178758ee02c3f440840fc691ca9cc9fb"
+  }
+}

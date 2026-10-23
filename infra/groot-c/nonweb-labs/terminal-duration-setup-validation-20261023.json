@@ -1,0 +1,201 @@
+{
+  "cleanup": {
+    "baseline_restored": true,
+    "container_stop_attempted": true,
+    "foreign_samba_seen": false,
+    "other_labs_unchanged": true,
+    "owned_session_close_requests": [],
+    "post_cleanup": {
+      "container_session_workers": {
+        "redis": 0,
+        "samba": 0
+      },
+      "container_start_stop_or_restart": 0,
+      "container_worker_processes": [],
+      "daemon_PTY_processes": [],
+      "daemon_active_PTY_clients_by_lab": {
+        "redis": 0,
+        "samba": 0,
+        "sudo": 0
+      },
+      "daemon_lifecycle_mutations_in_progress": 0,
+      "lab_states": {
+        "redis": {
+          "container_id": null,
+          "deployment_allowed": true,
+          "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+          "image_present": true,
+          "started_at": null,
+          "status": "not_deployed"
+        },
+        "samba": {
+          "container_id": null,
+          "deployment_allowed": true,
+          "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+          "image_present": true,
+          "started_at": null,
+          "status": "not_deployed"
+        },
+        "sudo": {
+          "container_id": "4e8f82fac52611ae9cd29ebad4a8a4711dcfd972acd3206462e71daa732a7f70",
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "started_at": "2026-10-23T10:51:38.683543292Z",
+          "status": "stopped"
+        }
+      },
+      "limitations": [
+        "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+        "rootless sudo state inspected without start/stop/verify execution",
+        "no session capability or process tag returned"
+      ],
+      "observed_at": 1792766183,
+      "other_daemon_PTY_clients": 0,
+      "schema": 1,
+      "source_matches_reviewed": true,
+      "source_or_config_writes": 0,
+      "status": "readonly_preflight",
+      "status_publishers": {
+        "nonweb": {
+          "age_seconds": 4,
+          "fresh": true,
+          "labs": {
+            "CVE-2017-7494": {
+              "status": "ready"
+            },
+            "CVE-2022-0543": {
+              "status": "needs_setup"
+            }
+          }
+        },
+        "sudo": {
+          "age_seconds": 53,
+          "fresh": true,
+          "labs": {
+            "CVE-2021-3156": {
+              "status": "needs_setup"
+            }
+          }
+        }
+      },
+      "terminal_open_or_input_or_close": 0
+    }
+  },
+  "initial_attempt": {
+    "baseline": {
+      "container_session_workers": {
+        "redis": 0,
+        "samba": 0
+      },
+      "container_start_stop_or_restart": 0,
+      "container_worker_processes": [],
+      "daemon_PTY_processes": [],
+      "daemon_active_PTY_clients_by_lab": {
+        "redis": 0,
+        "samba": 0,
+        "sudo": 0
+      },
+      "daemon_lifecycle_mutations_in_progress": 0,
+      "lab_states": {
+        "redis": {
+          "container_id": null,
+          "deployment_allowed": true,
+          "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+          "image_present": true,
+          "started_at": null,
+          "status": "not_deployed"
+        },
+        "samba": {
+          "container_id": null,
+          "deployment_allowed": true,
+          "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+          "image_present": true,
+          "started_at": null,
+          "status": "not_deployed"
+        },
+        "sudo": {
+          "container_id": "4e8f82fac52611ae9cd29ebad4a8a4711dcfd972acd3206462e71daa732a7f70",
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "started_at": "2026-10-23T10:51:38.683543292Z",
+          "status": "stopped"
+        }
+      },
+      "limitations": [
+        "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+        "rootless sudo state inspected without start/stop/verify execution",
+        "no session capability or process tag returned"
+      ],
+      "observed_at": 1792766066,
+      "other_daemon_PTY_clients": 0,
+      "schema": 1,
+      "source_matches_reviewed": true,
+      "source_or_config_writes": 0,
+      "status": "readonly_preflight",
+      "status_publishers": {
+        "nonweb": {
+          "age_seconds": 10,
+          "fresh": true,
+          "labs": {
+            "CVE-2017-7494": {
+              "status": "needs_setup"
+            },
+            "CVE-2022-0543": {
+              "status": "needs_setup"
+            }
+          }
+        },
+        "sudo": {
+          "age_seconds": 57,
+          "fresh": true,
+          "labs": {
+            "CVE-2021-3156": {
+              "status": "needs_setup"
+            }
+          }
+        }
+      },
+      "terminal_open_or_input_or_close": 0
+    },
+    "bypass_or_admin_key_used": false,
+    "capabilities_cookies_or_PTY_output_retained": false,
+    "cleanup": {
+      "baseline_restored": false,
+      "cleanup_deferred": "foreign_session_or_identity_not_proven",
+      "container_stop_attempted": false,
+      "foreign_samba_seen": false,
+      "other_labs_unchanged": true,
+      "owned_session_close_requests": []
+    },
+    "duration_passed": false,
+    "elapsed_seconds": 4.957,
+    "events": [
+      {
+        "elapsed_seconds": 1.994,
+        "phase": "preflight_ready"
+      }
+    ],
+    "failure_class": "Failed",
+    "failure_code": "Samba_deployment_identity_unavailable",
+    "finished_at": 1792766069,
+    "idle_seconds": 300,
+    "lifetime_seconds": 1800,
+    "owned_container_id": null,
+    "schema": 1,
+    "scope": "real-time HTTPS Samba terminal idle and hard lifetime",
+    "sessions": [],
+    "source_or_clock_or_limit_changes": 0,
+    "started_at": 1792766064,
+    "status": "needs_review"
+  },
+  "ownership_recovery": {
+    "all_PTY_and_session_workers_zero": true,
+    "creation_in_own_deploy_request_window": true,
+    "full_CID": "dd8dc5a095215957072e332772c12dab338e095129506a5caee937c05dcc7049",
+    "original_baseline_not_deployed": true,
+    "public_short_CID_matches_full_receipted_CID": true
+  },
+  "schema": 1,
+  "scope": "integration harness public short-CID projection correction before duration sessions",
+  "source_product_changed": false,
+  "status": "own_setup_container_removed_baseline_restored",
+  "terminal_sessions_started": 0
+}

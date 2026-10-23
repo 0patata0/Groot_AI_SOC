@@ -1,0 +1,244 @@
+{
+  "schema": 1,
+  "scope": "isolated management approval and containment safety fixtures; no live end-to-end test",
+  "observed_at_utc": "2026-10-23T14:22:49.618495+00:00",
+  "source_commit": "b41b7c49e8d58ca321d528288e87e60690ddaeae",
+  "source_sha256": {
+    "deployment/protected_hosts.py": "9f2ab56a63d8e68cc64a3afdde4e061ac631f908e90633e990ba12540d7f8a50",
+    "deployment/soc_agent_block.py": "64f5b147aa3acf372c1b078ff8363ce12ef3e5cbaf98562ee2baac2b30d00c54",
+    "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+    "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+    "deployment/tests/test_protected_hosts.py": "8d53cab22c744248b606a67810bb6c115c22c6f28d78237ec6d2581b9ff26b16",
+    "deployment/tests/test_soc_management.py": "dfa4c25050f0748331795f247676c970eb5077f98531da860042d77540399f98",
+    "infra/mcp/incident_containment.py": "ab51cfeb5416a278f20c3cd569ed582c5a6f239e91b480a2ed89e1c06cba980c",
+    "infra/mcp/operations_approval.py": "d202e951e3c238f5e1144f1d18b712e0e657b4087660bbc4c08a49fb3e463b3f",
+    "infra/mcp/response-mcp.py": "8d664ef33ff8c6be866c8e0876a2981540e2fc5056b1fd7d63019c4ee2812e22",
+    "infra/mcp/rule_change_executor.py": "156b88d0ac60c85df96ce05961b911cd5bc28ddb65b0df3656134e8a17015c6c",
+    "infra/mcp/rule_change_mcp.py": "2926ee95218fb889dd7f77bcccd36bdec4ed15f58aa7ae0b3e82426fc0209682",
+    "infra/mcp/soc_bot.py": "a00e332e23953c82e735c186c2fd6ea583a8fe01c493ee2d5d8d479a06b3394a",
+    "infra/mcp/soc_management_events.py": "54a09faa461f240d5e81d75a6de8fe5d6a9c7b164edb5c9bcfb3c78944b3dc38",
+    "infra/mcp/test_incident_containment.py": "d6c45840dce0c67a76b6f6331d61f0a39bf34f7eb5986a21ebd78e52de5f378b",
+    "infra/mcp/test_incident_registration.py": "2d7981687e9ec4f017faaae036fdd3fc50a6af9d6e91eeb5b5444d6e6b596124",
+    "infra/mcp/test_operations_approval.py": "b6a0577ac15a54bbe4e4440b20cc6771cc4adcd6dc0a7479c3e7b4d17022e5b4",
+    "infra/mcp/test_response_approval.py": "d35928ca8ea8fd8d13d8bb99e54e992a2cf5e86f4435b2c0a8cdc141e4246f0a",
+    "infra/mcp/test_rule_approval_broker.py": "184df01b46f5cd2a15c5189e0507936c5abcb170dbeb9cf7baaad4b0c6007a0b",
+    "infra/mcp/test_rule_change_executor.py": "43f17a1d94575ad3ab72cbc3a00dfbc584799a1d1d59af352493363e991ec6e2",
+    "infra/mcp/wazuh_containment_ar.py": "79a24f3d78f3476b4bf507ed7fbab701704bb832f36cd45fc02268a14d4ab529"
+  },
+  "source_hashes_unchanged_during_tests": true,
+  "results": [
+    {
+      "suite": "operations_approval",
+      "working_directory": "infra/mcp",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_operations_approval"
+      ],
+      "expected": 12,
+      "run": 12,
+      "passed": 12,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    },
+    {
+      "suite": "incident_containment",
+      "working_directory": "infra/mcp",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_incident_containment"
+      ],
+      "expected": 36,
+      "run": 36,
+      "passed": 36,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    },
+    {
+      "suite": "incident_registration",
+      "working_directory": "infra/mcp",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_incident_registration"
+      ],
+      "expected": 10,
+      "run": 10,
+      "passed": 10,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    },
+    {
+      "suite": "rule_change_executor",
+      "working_directory": "infra/mcp",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_rule_change_executor"
+      ],
+      "expected": 53,
+      "run": 53,
+      "passed": 53,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    },
+    {
+      "suite": "rule_approval_broker",
+      "working_directory": "infra/mcp",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_rule_approval_broker"
+      ],
+      "expected": 25,
+      "run": 25,
+      "passed": 25,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    },
+    {
+      "suite": "response_approval",
+      "working_directory": "infra/mcp",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_response_approval"
+      ],
+      "expected": 7,
+      "run": 7,
+      "passed": 7,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    },
+    {
+      "suite": "protected_hosts",
+      "working_directory": "deployment/tests",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_protected_hosts"
+      ],
+      "expected": 12,
+      "run": 12,
+      "passed": 12,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    },
+    {
+      "suite": "installed_profile_containment",
+      "working_directory": "deployment/tests",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "-v",
+        "test_soc_management.ContainmentTests"
+      ],
+      "expected": 7,
+      "run": 7,
+      "passed": 7,
+      "skipped": 0,
+      "returncode": 0,
+      "count_matches": true
+    }
+  ],
+  "total": {
+    "run": 162,
+    "passed": 162,
+    "failed": 0,
+    "skipped": 0
+  },
+  "current_coverage": {
+    "approval_binding": [
+      "full exact candidate/base/diff/plan SHA",
+      "explicit named approver and callback peer/nonce",
+      "deny/expiry/posting failure means no execution",
+      "one-time consumption and authenticated replay rejection",
+      "approved candidate/base drift before consume",
+      "runtime readback and exact rollback",
+      "report retry does not reapply"
+    ],
+    "temporary_containment": [
+      "registration never creates rule engine or nft action",
+      "three recent independent bidirectional TCP severity1 flow evidence",
+      "public canonical source checks; simulated live-protection state; rendered never_block policy",
+      "fixed600s temporary TTL and fixed3600s keep",
+      "no duplicate extension; cooldown; foreign/manual ownership preserved",
+      "broker unavailable/response loss/restart recovery fail closed",
+      "expiry remains bounded without broker",
+      "no general operation, cross-host action or refresh syntax"
+    ],
+    "administrator_cidrs": [
+      "blank optional; canonical IPv4/CIDR normalization and bounds",
+      "existing protections and operator ranges are union",
+      "never_block elements, priority and accept/drop order verified",
+      "new deployment agent/interface/source profile binding"
+    ]
+  },
+  "clock_boundary": "TTL/expiry/retention tests use controlled fixture clocks; no real elapsed kernel TTL wait",
+  "live_actions": {
+    "model_calls": 0,
+    "MCP_or_SSH_calls": 0,
+    "approval_or_chat_posts": 0,
+    "firewall_mutations": 0,
+    "real_kernel_TTL_waits": 0,
+    "package_installations_on_Mac": 0,
+    "credential_files_read": false
+  },
+  "live_containment_eligibility": {
+    "dedicated_public_nonprotected_source_verified": false,
+    "private_Kali_source_does_not_satisfy_containment_policy": true,
+    "required_server_evidence": "three recent independent inbound bidirectional TCP severity1 attack flows from the authorized public source",
+    "policy_not_weakened_for_test": true,
+    "shared_NAT_or_management_source_must_not_be_used": true
+  },
+  "not_tested": [
+    "actual model investigation or tool choice",
+    "live incident/case or approval card creation",
+    "actual administrator approve/deny callbacks",
+    "live firewall write, traffic blocking or elapsed kernel TTL",
+    "WAF exception versus an actual layer4 block",
+    "actual attack-to-detection-to-containment E2E",
+    "host reboot recovery"
+  ],
+  "cleanup": {
+    "own_fixture_temporary_directory_removed": true,
+    "raw_test_output_saved": false,
+    "operating_files_modified": false
+  },
+  "limits": [
+    "Fixture outcomes do not prove actual model tool selection, administrator identity callbacks, kernel traffic blocking or real elapsed600/3600-second expiry.",
+    "Source hashes identify the tested snapshot; later source changes require their own validation record.",
+    "No raw packets, attack payloads, credentials, local temporary paths or personal identifiers are included."
+  ]
+}

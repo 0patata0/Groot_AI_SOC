@@ -137,6 +137,55 @@ class BindingTests(unittest.TestCase):
         self.assertIn("no legacy fallback", rendered("incident_containment.py").decode())
 
 
+class RenderedInvestigationBoundaryTests(unittest.TestCase):
+    def finish(self, disposition, tool_kind=None):
+        controller = module("soc_management_controller.py", "b")
+        with tempfile.TemporaryDirectory(prefix="rendered-investigation-") as directory:
+            store = controller.Store(directory, clock=lambda: 1000.0)
+            try:
+                case_id = store.new_case("synthetic-investigation")
+                case = store.next_case()
+                trace = controller.Trace(store, case, store.start(case))
+                trace.accept({"type": "system", "subtype": "init", "session_id": "rendered-fixture"})
+                if tool_kind:
+                    if tool_kind == "read":
+                        name = "mcp__system_diagnostics__get_system_diagnostics"
+                        arguments = {"target": "c:apache"}
+                        payload = {"status": "observed", "target": "c:apache"}
+                    else:
+                        name = "mcp__rule_a__propose_rule_edit"
+                        arguments = {"target": "a:modsecurity-custom"}
+                        payload = {"proposal_id": "e" * 32, "status": "pending", **arguments}
+                    trace.accept({"type": "tool_use", "name": name, "input": arguments})
+                    trace.accept({"type": "tool_result", "name": name, "is_error": False,
+                                  "output": json.dumps({"content": [{"type": "text", "text": json.dumps(payload)}],
+                                                        "isError": False})})
+                trace.accept({"type": "result", "session_id": trace.session_id, "exit_code": 0,
+                              "text": "합성 조사 결과\nMANAGEMENT_STATUS: " + disposition})
+                result = trace.finish(0)
+                row = store.db.execute("SELECT state,detail FROM cases WHERE id=?", (case_id,)).fetchone()
+                return result, tuple(row), store.db.execute("SELECT count(*) FROM tool_calls").fetchone()[0]
+            finally:
+                store.close()
+
+    def test_rendered_manage_cannot_resolve_or_monitor_without_a_read(self):
+        for disposition in ("resolved", "monitor"):
+            with self.subTest(disposition=disposition):
+                result, saved, calls = self.finish(disposition)
+                self.assertTrue(result["completed"])
+                self.assertEqual(result["state"], "needs_review")
+                self.assertEqual(saved, ("needs_review", "live_investigation_missing"))
+                self.assertEqual(calls, 0)
+
+    def test_rendered_successful_read_and_pending_approval_paths_are_preserved(self):
+        for tool_kind, expected in (("read", "completed"), ("pending", "waiting_approval")):
+            with self.subTest(tool_kind=tool_kind):
+                result, saved, calls = self.finish("resolved", tool_kind)
+                self.assertEqual(result["state"], expected)
+                self.assertEqual(saved[0], expected)
+                self.assertEqual(calls, 1)
+
+
 class ContainmentTests(unittest.TestCase):
     def nft_fixture(self):
         p = profile()

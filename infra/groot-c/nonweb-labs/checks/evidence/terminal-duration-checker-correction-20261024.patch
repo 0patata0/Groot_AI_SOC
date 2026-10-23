@@ -1,0 +1,29 @@
+--- observed-terminal_duration.py
++++ corrected-terminal_duration.py
+@@ -270,7 +270,9 @@
+         now = time.monotonic()
+         return {'name': self.name, 'state': 'error' if self.error else 'closed' if self.closed else 'running',
+                 'age_seconds': None if self.open_ack is None else round((self.closed_at or now) - self.open_ack, 3),
++                'open_request_RTT_seconds': None if self.open_ack is None else round(self.open_ack - self.open_sent, 6),
+                 'input_count': self.input_count, 'last_input_age_seconds': None if self.last_input_ack is None else round((self.closed_at or now) - self.last_input_ack, 3),
++                'last_input_request_RTT_seconds': None if self.last_input_ack is None else round(self.last_input_ack - self.last_input_sent, 6),
+                 'UID10001_verified': self.uid_verified, 'passed': self.passed,
+                 'error_class': self.error, 'output_byte_count_only': self.output_bytes}
+ 
+@@ -334,12 +336,12 @@
+                 if closed:
+                     self.closed, self.closed_at = True, time.monotonic()
+                     if self.name == 'idle':
+-                        lower = self.closed_at - self.last_input_sent
+-                        upper = self.closed_at - self.last_input_ack
++                        lower = self.closed_at - self.last_input_ack
++                        upper = self.closed_at - self.last_input_sent
+                         self.passed = lower >= IDLE - 1 and upper <= IDLE + 25 and self.input_count == 1
+                     else:
+-                        lower = self.closed_at - self.open_sent
+-                        upper = self.closed_at - self.open_ack
++                        lower = self.closed_at - self.open_ack
++                        upper = self.closed_at - self.open_sent
+                         self.passed = lower >= LIFETIME - 1 and upper <= LIFETIME + 25 and final_input and self.closed_at - self.last_input_ack < IDLE
+                     return
+         except Exception as exc:

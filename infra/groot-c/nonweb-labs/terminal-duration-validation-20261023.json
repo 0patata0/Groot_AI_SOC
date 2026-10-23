@@ -1,0 +1,1502 @@
+{
+  "baseline": {
+    "container_session_workers": {
+      "redis": 0,
+      "samba": 0
+    },
+    "container_start_stop_or_restart": 0,
+    "container_worker_processes": [],
+    "daemon_PTY_processes": [],
+    "daemon_active_PTY_clients_by_lab": {
+      "redis": 0,
+      "samba": 0,
+      "sudo": 0
+    },
+    "daemon_lifecycle_mutations_in_progress": 0,
+    "lab_states": {
+      "redis": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "samba": {
+        "container_id": null,
+        "deployment_allowed": true,
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "image_present": true,
+        "started_at": null,
+        "status": "not_deployed"
+      },
+      "sudo": {
+        "container_id": "4e8f82fac52611ae9cd29ebad4a8a4711dcfd972acd3206462e71daa732a7f70",
+        "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+        "started_at": "2026-10-23T10:51:38.683543292Z",
+        "status": "stopped"
+      }
+    },
+    "limitations": [
+      "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+      "rootless sudo state inspected without start/stop/verify execution",
+      "no session capability or process tag returned"
+    ],
+    "observed_at": 1792766213,
+    "other_daemon_PTY_clients": 0,
+    "schema": 1,
+    "source_matches_reviewed": true,
+    "source_or_config_writes": 0,
+    "status": "readonly_preflight",
+    "status_publishers": {
+      "nonweb": {
+        "age_seconds": 34,
+        "fresh": true,
+        "labs": {
+          "CVE-2017-7494": {
+            "status": "ready"
+          },
+          "CVE-2022-0543": {
+            "status": "needs_setup"
+          }
+        }
+      },
+      "sudo": {
+        "age_seconds": 22,
+        "fresh": true,
+        "labs": {
+          "CVE-2021-3156": {
+            "status": "needs_setup"
+          }
+        }
+      }
+    },
+    "terminal_open_or_input_or_close": 0
+  },
+  "bypass_or_admin_key_used": false,
+  "capabilities_cookies_or_PTY_output_retained": false,
+  "cleanup": {
+    "atomic_compare_and_stop_guaranteed": false,
+    "baseline_restored": true,
+    "container_stop_attempted": true,
+    "foreign_samba_seen": false,
+    "other_labs_unchanged": true,
+    "owned_session_close_requests": [
+      true,
+      true
+    ],
+    "ownership_basis": "exclusive planned test window, original not_deployed, full CID bound to public short CID, continuously sampled process identities, no observed foreign Samba session",
+    "post_cleanup": {
+      "container_session_workers": {
+        "redis": 0,
+        "samba": 0
+      },
+      "container_start_stop_or_restart": 0,
+      "container_worker_processes": [],
+      "daemon_PTY_processes": [],
+      "daemon_active_PTY_clients_by_lab": {
+        "redis": 0,
+        "samba": 0,
+        "sudo": 0
+      },
+      "daemon_lifecycle_mutations_in_progress": 0,
+      "lab_states": {
+        "redis": {
+          "container_id": null,
+          "deployment_allowed": true,
+          "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+          "image_present": true,
+          "started_at": null,
+          "status": "not_deployed"
+        },
+        "samba": {
+          "container_id": null,
+          "deployment_allowed": true,
+          "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+          "image_present": true,
+          "started_at": null,
+          "status": "not_deployed"
+        },
+        "sudo": {
+          "container_id": "4e8f82fac52611ae9cd29ebad4a8a4711dcfd972acd3206462e71daa732a7f70",
+          "image_id": "sha256:90fd1384894d26e34c2364b0ff8fb8bdb92a3e9ebc3df5dee29a61b68bfcab2a",
+          "started_at": "2026-10-23T10:51:38.683543292Z",
+          "status": "stopped"
+        }
+      },
+      "limitations": [
+        "active PTY/worker process counts observed; in-memory closed/stale session map is not exposed by current API",
+        "rootless sudo state inspected without start/stop/verify execution",
+        "no session capability or process tag returned"
+      ],
+      "observed_at": 1792768026,
+      "other_daemon_PTY_clients": 0,
+      "schema": 1,
+      "source_matches_reviewed": true,
+      "source_or_config_writes": 0,
+      "status": "readonly_preflight",
+      "status_publishers": {
+        "nonweb": {
+          "age_seconds": 19,
+          "fresh": true,
+          "labs": {
+            "CVE-2017-7494": {
+              "status": "ready"
+            },
+            "CVE-2022-0543": {
+              "status": "needs_setup"
+            }
+          }
+        },
+        "sudo": {
+          "age_seconds": 7,
+          "fresh": true,
+          "labs": {
+            "CVE-2021-3156": {
+              "status": "needs_setup"
+            }
+          }
+        }
+      },
+      "terminal_open_or_input_or_close": 0
+    },
+    "sampling_limitation": "45-second process observations cannot prove absence of an unobserved short-lived concurrent session; no public compare-and-stop primitive exists"
+  },
+  "date_note": "started on 2026-10-23 KST and completed on 2026-10-24 KST; monotonic durations used",
+  "duration_passed": true,
+  "elapsed_seconds": 1814.888,
+  "events": [
+    {
+      "elapsed_seconds": 2.12,
+      "phase": "preflight_ready"
+    },
+    {
+      "elapsed_seconds": 4.963,
+      "phase": "owned_Samba_deployed"
+    },
+    {
+      "UID10001_verified": true,
+      "elapsed_seconds": 7.333,
+      "name": "idle",
+      "phase": "session_opened"
+    },
+    {
+      "UID10001_verified": true,
+      "elapsed_seconds": 9.713,
+      "name": "lifetime",
+      "phase": "session_opened"
+    },
+    {
+      "elapsed_seconds": 49.892,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 44.012,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 43.942,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 41.632,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 41.555,
+          "name": "lifetime",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 91.326,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 85.446,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 85.377,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 83.067,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 82.989,
+          "name": "lifetime",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 133.181,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 127.302,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 127.232,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 124.922,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 124.844,
+          "name": "lifetime",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 174.564,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 168.685,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 168.615,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 166.305,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 166.227,
+          "name": "lifetime",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 214.716,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 208.836,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 208.767,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 206.456,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 206.379,
+          "name": "lifetime",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 256.068,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 250.188,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 250.119,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 247.809,
+          "error_class": null,
+          "input_count": 2,
+          "last_input_age_seconds": 3.213,
+          "name": "lifetime",
+          "output_byte_count_only": 113,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 298.168,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 292.288,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 292.218,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": false,
+          "state": "running"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 289.908,
+          "error_class": null,
+          "input_count": 2,
+          "last_input_age_seconds": 45.312,
+          "name": "lifetime",
+          "output_byte_count_only": 113,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 338.28,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 330.021,
+          "error_class": null,
+          "input_count": 2,
+          "last_input_age_seconds": 85.425,
+          "name": "lifetime",
+          "output_byte_count_only": 113,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 379.639,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 371.38,
+          "error_class": null,
+          "input_count": 2,
+          "last_input_age_seconds": 126.784,
+          "name": "lifetime",
+          "output_byte_count_only": 113,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 419.744,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 411.484,
+          "error_class": null,
+          "input_count": 2,
+          "last_input_age_seconds": 166.889,
+          "name": "lifetime",
+          "output_byte_count_only": 113,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 461.098,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 452.838,
+          "error_class": null,
+          "input_count": 2,
+          "last_input_age_seconds": 208.242,
+          "name": "lifetime",
+          "output_byte_count_only": 113,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 502.855,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 494.595,
+          "error_class": null,
+          "input_count": 3,
+          "last_input_age_seconds": 7.04,
+          "name": "lifetime",
+          "output_byte_count_only": 142,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 544.627,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 536.368,
+          "error_class": null,
+          "input_count": 3,
+          "last_input_age_seconds": 48.813,
+          "name": "lifetime",
+          "output_byte_count_only": 142,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 586.378,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 578.119,
+          "error_class": null,
+          "input_count": 3,
+          "last_input_age_seconds": 90.564,
+          "name": "lifetime",
+          "output_byte_count_only": 142,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 626.549,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 618.29,
+          "error_class": null,
+          "input_count": 3,
+          "last_input_age_seconds": 130.735,
+          "name": "lifetime",
+          "output_byte_count_only": 142,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 668.327,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 660.068,
+          "error_class": null,
+          "input_count": 3,
+          "last_input_age_seconds": 172.513,
+          "name": "lifetime",
+          "output_byte_count_only": 142,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 710.218,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 701.958,
+          "error_class": null,
+          "input_count": 3,
+          "last_input_age_seconds": 214.404,
+          "name": "lifetime",
+          "output_byte_count_only": 142,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 751.961,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 743.702,
+          "error_class": null,
+          "input_count": 4,
+          "last_input_age_seconds": 12.404,
+          "name": "lifetime",
+          "output_byte_count_only": 171,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 793.775,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 785.516,
+          "error_class": null,
+          "input_count": 4,
+          "last_input_age_seconds": 54.218,
+          "name": "lifetime",
+          "output_byte_count_only": 171,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 835.641,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 827.381,
+          "error_class": null,
+          "input_count": 4,
+          "last_input_age_seconds": 96.083,
+          "name": "lifetime",
+          "output_byte_count_only": 171,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 877.399,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 869.139,
+          "error_class": null,
+          "input_count": 4,
+          "last_input_age_seconds": 137.841,
+          "name": "lifetime",
+          "output_byte_count_only": 171,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 919.218,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 910.959,
+          "error_class": null,
+          "input_count": 4,
+          "last_input_age_seconds": 179.661,
+          "name": "lifetime",
+          "output_byte_count_only": 171,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 959.38,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 951.12,
+          "error_class": null,
+          "input_count": 4,
+          "last_input_age_seconds": 219.822,
+          "name": "lifetime",
+          "output_byte_count_only": 171,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1001.188,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 992.928,
+          "error_class": null,
+          "input_count": 5,
+          "last_input_age_seconds": 18.263,
+          "name": "lifetime",
+          "output_byte_count_only": 200,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1042.934,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1034.675,
+          "error_class": null,
+          "input_count": 5,
+          "last_input_age_seconds": 60.01,
+          "name": "lifetime",
+          "output_byte_count_only": 200,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1083.155,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1074.895,
+          "error_class": null,
+          "input_count": 5,
+          "last_input_age_seconds": 100.23,
+          "name": "lifetime",
+          "output_byte_count_only": 200,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1125.039,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1116.78,
+          "error_class": null,
+          "input_count": 5,
+          "last_input_age_seconds": 142.114,
+          "name": "lifetime",
+          "output_byte_count_only": 200,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1166.835,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1158.576,
+          "error_class": null,
+          "input_count": 5,
+          "last_input_age_seconds": 183.911,
+          "name": "lifetime",
+          "output_byte_count_only": 200,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1208.64,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1200.38,
+          "error_class": null,
+          "input_count": 5,
+          "last_input_age_seconds": 225.715,
+          "name": "lifetime",
+          "output_byte_count_only": 200,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1248.801,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1240.542,
+          "error_class": null,
+          "input_count": 6,
+          "last_input_age_seconds": 22.875,
+          "name": "lifetime",
+          "output_byte_count_only": 229,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1290.616,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1282.357,
+          "error_class": null,
+          "input_count": 6,
+          "last_input_age_seconds": 64.69,
+          "name": "lifetime",
+          "output_byte_count_only": 229,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1332.369,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1324.11,
+          "error_class": null,
+          "input_count": 6,
+          "last_input_age_seconds": 106.443,
+          "name": "lifetime",
+          "output_byte_count_only": 229,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1374.129,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1365.87,
+          "error_class": null,
+          "input_count": 6,
+          "last_input_age_seconds": 148.203,
+          "name": "lifetime",
+          "output_byte_count_only": 229,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1416.021,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1407.762,
+          "error_class": null,
+          "input_count": 6,
+          "last_input_age_seconds": 190.095,
+          "name": "lifetime",
+          "output_byte_count_only": 229,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1457.816,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1449.556,
+          "error_class": null,
+          "input_count": 6,
+          "last_input_age_seconds": 231.889,
+          "name": "lifetime",
+          "output_byte_count_only": 229,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1499.493,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1491.233,
+          "error_class": null,
+          "input_count": 7,
+          "last_input_age_seconds": 30.228,
+          "name": "lifetime",
+          "output_byte_count_only": 258,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1541.68,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1533.42,
+          "error_class": null,
+          "input_count": 7,
+          "last_input_age_seconds": 72.415,
+          "name": "lifetime",
+          "output_byte_count_only": 258,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1581.845,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1573.585,
+          "error_class": null,
+          "input_count": 7,
+          "last_input_age_seconds": 112.58,
+          "name": "lifetime",
+          "output_byte_count_only": 258,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1623.353,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1615.094,
+          "error_class": null,
+          "input_count": 7,
+          "last_input_age_seconds": 154.089,
+          "name": "lifetime",
+          "output_byte_count_only": 258,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1663.551,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1655.291,
+          "error_class": null,
+          "input_count": 7,
+          "last_input_age_seconds": 194.286,
+          "name": "lifetime",
+          "output_byte_count_only": 258,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1704.952,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1696.693,
+          "error_class": null,
+          "input_count": 7,
+          "last_input_age_seconds": 235.688,
+          "name": "lifetime",
+          "output_byte_count_only": 258,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1745.169,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1736.909,
+          "error_class": null,
+          "input_count": 8,
+          "last_input_age_seconds": 32.845,
+          "name": "lifetime",
+          "output_byte_count_only": 287,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    },
+    {
+      "elapsed_seconds": 1786.545,
+      "phase": "running",
+      "sessions": [
+        {
+          "UID10001_verified": true,
+          "age_seconds": 302.777,
+          "error_class": null,
+          "input_count": 1,
+          "last_input_age_seconds": 302.708,
+          "name": "idle",
+          "output_byte_count_only": 84,
+          "passed": true,
+          "state": "closed"
+        },
+        {
+          "UID10001_verified": true,
+          "age_seconds": 1778.286,
+          "error_class": null,
+          "input_count": 9,
+          "last_input_age_seconds": 33.41,
+          "name": "lifetime",
+          "output_byte_count_only": 316,
+          "passed": false,
+          "state": "running"
+        }
+      ]
+    }
+  ],
+  "final_test_sources_sha256": {
+    "sudo_reopen_check.py": "a6a6346e881e6f630f8834ac81d99047b75ba58ceafd2d6123a6bb1df599869c",
+    "sudo_restart_check.py": "4f1f8ae80620f89ee1b7240f8a77584da06a0534f5369287925eda88f2bfa830",
+    "terminal_duration.py": "796deec34597be7e7d8847eb6bdef578275a4a254faad4eafb1a16286088e38c",
+    "terminal_duration_probe.py": "8300bd1547861a3d93e61be59c2c963d178758ee02c3f440840fc691ca9cc9fb"
+  },
+  "finished_at": 1792768026,
+  "future_checker_correction": {
+    "applied_after_execution": true,
+    "applied_at": 1792768180,
+    "change": "lower=closed-ack; upper=closed-sent; future safe records retain request RTT",
+    "duration_test_rerun": false,
+    "source_sha256": "796deec34597be7e7d8847eb6bdef578275a4a254faad4eafb1a16286088e38c"
+  },
+  "idle_cleanup_checkpoint": {
+    "interpretation": "idle session retired while the same-container lifetime session remained live",
+    "observed_at": 1792766635,
+    "other_lab_PTY_clients": 0,
+    "remaining_Samba_PTY_clients": 1,
+    "remaining_Samba_session_workers": 1,
+    "same_owned_Samba_CID": true
+  },
+  "idle_seconds": 300,
+  "lifetime_seconds": 1800,
+  "observed_execution_record": {
+    "checker_source_sha256": "3684c476025572c2cdcdfb88476425d74f39324e0e8701f30e9ff76f9d4d7647",
+    "old_checker_result_preserved": true,
+    "path": "terminal-duration-observed-20261023.json",
+    "reverse_patch_from_corrected_source": {
+      "observed_source_reconstruction_verified": true,
+      "path": "checks/evidence/terminal-duration-checker-correction-20261024.patch",
+      "sha256": "11ff301f13fa4892cfacaf11ea15ec3e3e3b48ef7f5a981fce5823c2172c1bbe"
+    },
+    "sha256": "36830ff71a392f1211c758e83e9b77a2438df9fc63a78dc06ab9736848d35514"
+  },
+  "owned_container_id": "dec68f8f01d20f0d6433ad81b71e8c13ee8961a801de1606fab219ff5321a783",
+  "posthoc_conservative_assessment": {
+    "assessed_at": 1792768180,
+    "checks": {
+      "idle": {
+        "acceptance_interval_seconds": [
+          299,
+          325
+        ],
+        "ack_based_age_lower_seconds": 302.708,
+        "conservative_closed_age_upper_seconds": 305.078,
+        "conservative_interval_seconds": [
+          302.704,
+          305.082
+        ],
+        "conservative_phase_duration_upper_seconds": 2.37,
+        "passed": true,
+        "rounding_margin_seconds": 0.004
+      },
+      "lifetime": {
+        "acceptance_interval_seconds": [
+          1799,
+          1825
+        ],
+        "ack_based_age_lower_seconds": 1801.564,
+        "conservative_closed_age_upper_seconds": 1803.944,
+        "conservative_interval_seconds": [
+          1801.56,
+          1803.948
+        ],
+        "conservative_phase_duration_upper_seconds": 2.38,
+        "passed": true,
+        "rounding_margin_seconds": 0.004
+      }
+    },
+    "lifetime_idle_expiry_excluded": true,
+    "lifetime_last_input_age_seconds": 56.689,
+    "limitation": "exact RTT was not retained; phase duration conservatively bounds it; event/age values rounded to milliseconds",
+    "passed": true,
+    "source_of_lower_bounds": "safe ack-based age fields from the observed running checker",
+    "source_of_request_duration_upper_bounds": "consecutive saved monotonic phase events bounding open/id/capture, not an invented RTT"
+  },
+  "probe_version_note": "read-only daemon/rootless PID fields and Docker executable-only counting added after the completed Samba duration observation for P2-03; product sources unchanged",
+  "product_source_clock_limits_changed": false,
+  "schema": 1,
+  "scope": "real-time HTTPS Samba terminal idle and hard lifetime",
+  "sessions": [
+    {
+      "UID10001_verified": true,
+      "age_seconds": 302.777,
+      "error_class": null,
+      "input_count": 1,
+      "last_input_age_seconds": 302.708,
+      "name": "idle",
+      "output_byte_count_only": 84,
+      "passed": true,
+      "state": "closed"
+    },
+    {
+      "UID10001_verified": true,
+      "age_seconds": 1801.564,
+      "error_class": null,
+      "input_count": 9,
+      "last_input_age_seconds": 56.689,
+      "name": "lifetime",
+      "output_byte_count_only": 316,
+      "passed": true,
+      "state": "closed"
+    }
+  ],
+  "source_or_clock_or_limit_changes": 0,
+  "started_at": 1792766211,
+  "status": "pass"
+}

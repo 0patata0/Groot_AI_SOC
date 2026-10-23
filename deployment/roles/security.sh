@@ -359,10 +359,10 @@ assert not re.search(rb'\bsid\s*:\s*10000[0-9]{2}\s*;',active_et), 'ET prerequis
 home='['+','.join(os.environ[k]+'/32' for k in ('SECURITY_HOST','SIEM_HOST','SERVICE_HOST'))+']'
 labels={'io.capstone.portable.role':'security','io.capstone.portable.profile':os.environ['PROFILE']}
 compose={'services':{
- 'waf':{'image':os.environ['WAF_ID'],'container_name':'capstone-security-waf','restart':'unless-stopped','labels':labels,
+ 'waf':{'image':os.environ['WAF_ID'],'container_name':'capstone-security-waf','restart':'always','labels':labels,
  'environment':{'TZ':'Asia/Seoul','BACKEND':'http://'+os.environ['SERVICE_HOST']+':'+os.environ['WEB_BACKEND_PORT'],'SERVER_NAME':'capstone-service','PORT':'8080','SSL_PORT':'8443','NGINX_X_FORWARDED_PORT':os.environ['WAF_PORT'],'BLOCKING_PARANOIA':'1','MODSEC_RULE_ENGINE':'DetectionOnly','MODSEC_AUDIT_ENGINE':'RelevantOnly','MODSEC_AUDIT_LOG_FORMAT':'JSON','MODSEC_AUDIT_LOG_TYPE':'Serial','MODSEC_AUDIT_LOG':'/var/log/modsecurity/audit.log'},
  'ports':[os.environ['SECURITY_HOST']+':'+os.environ['WAF_PORT']+':8080'],'volumes':[str(r/'logs/modsecurity')+':/var/log/modsecurity',str(r/'config/GROOT_A_WAF.conf')+':/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf:ro'],'networks':['waf'],'logging':{'driver':'json-file','options':{'max-size':'10m','max-file':'3'}}},
- 'suricata':{'image':os.environ['SURI_ID'],'container_name':'capstone-security-suricata','restart':'unless-stopped','labels':labels,'network_mode':'host','cap_add':['NET_ADMIN','NET_RAW','SYS_NICE'],
+ 'suricata':{'image':os.environ['SURI_ID'],'container_name':'capstone-security-suricata','restart':'always','labels':labels,'network_mode':'host','cap_add':['NET_ADMIN','NET_RAW','SYS_NICE'],
  'command':['-i',os.environ['MONITOR_INTERFACE'],'-S','/rules/all.rules','--set','vars.address-groups.HOME_NET='+home,'--set','stats.interval=60','--set','unix-command.enabled=yes'],
  'environment':{'TZ':'Asia/Seoul'},'volumes':[str(r/'rules')+':/rules:ro',str(r/'logs/suricata')+':/var/log/suricata','suricata-lib:/var/lib/suricata'],'logging':{'driver':'json-file','options':{'max-size':'10m','max-file':'3'}}}},
  'networks':{'waf':{'driver':'bridge'}},'volumes':{'suricata-lib':{}}}

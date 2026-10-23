@@ -1071,7 +1071,7 @@ class ExecutorTests(unittest.TestCase):
 
     def test_hmac_broker_authenticates_both_directions_without_bearer_header(self):
         key = "k" * 40
-        broker = MOD.Broker("http://10.200.10.10:8090", key)
+        broker = MOD.Broker("https://10.200.10.10:8445", key)
         class Response:
             status = 200
             def __init__(self, nonce, valid):
@@ -1178,6 +1178,14 @@ class ExecutorTests(unittest.TestCase):
             "detail": "live base changed; rule was not applied"})
         self.assertEqual(aborted["status"], "aborted")
         self.assertTrue(aborted["result_posted"])
+
+
+class BrokerTransportBoundary(unittest.TestCase):
+    def test_cross_host_plaintext_is_refused(self):
+        with self.assertRaises(MOD.RuleChangeError): MOD.Broker('http://10.200.10.10:8090','x'*48)
+
+    def test_redirects_are_refused_without_forwarding_headers(self):
+        with self.assertRaises(MOD.RuleChangeError): MOD.NoBrokerRedirect().redirect_request(None,None,None,None,None,None)
 
 
 if __name__ == "__main__":

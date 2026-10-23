@@ -123,8 +123,7 @@ class BindingTests(unittest.TestCase):
         m = module("response-mcp.py")
         with mock.patch.object(m.sys, "stdin", io.StringIO("x" * (1048576 + 2))), mock.patch.object(m, "handle") as handle, \
              mock.patch.object(m, "log"):
-            with self.assertRaises(SystemExit):
-                m.main()
+            m.main()
         handle.assert_not_called()
 
     def test_managed_reader_keeps_native_provenance_contract(self):

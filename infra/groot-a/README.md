@@ -1,5 +1,7 @@
 # Groot_A (groot-sec) — 보안 게이트웨이 구성 요약
 
+> 2026-10-24 보완: 오프라인 host 패치, 기존 Java/관리망 격리, root 승인 진입점과 검증 TLS8444/8445를 적용했다. A 필수 컨테이너는 always로 재부팅 복구하며 실습/백업의 중지 상태는 보존한다. 상세 포트·권한·새 설치/기존 이관과 검증 범위는 [설치 안내](../../deployment/bootstrap-guide.md) 및 [STATUS](../../STATUS.md)를 따른다. LLM 추가 검증은 진행 중이다.
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
 > A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.

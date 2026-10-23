@@ -79,8 +79,7 @@ def substitutions(p):
         "/var/lib/docker/volumes/single-node_wazuh_etc/_data/ossec.conf": p["manager_etc"] + "/ossec.conf",
         "/var/lib/docker/volumes/single-node_wazuh_etc/_data": p["manager_etc"],
         "/home/groot_b/capstone/wazuh/single-node/config/wazuh_cluster/wazuh_manager.conf": root + "/siem/wazuh/config/wazuh_cluster/wazuh_manager.conf",
-        "http://10.200.10.10:8090": "http://" + p["siem_host"] + ":8090",
-        "http://127.0.0.1:8090": "http://" + p["siem_host"] + ":8090",
+        "https://10.200.10.10:8445": "https://" + p["siem_host"] + ":8445",
         "/usr/local/bin/docker": "/usr/local/libexec/capstone-soc-docker",
         "001": p["agent_id"], "ens192": p["interface"],
         "096e90b6243e438aa8a7b392be754732": p["machine_id"],
@@ -196,11 +195,17 @@ def render(name, raw, profile, run_source=None):
         # New installs have a private CA, so preserve real chain/IP validation.
         assigned(tree, "CTX").value = ast.parse("ssl.create_default_context(cafile='/etc/socbot/root-ca.pem')", mode="eval").body
     if name == "response-mcp.py":
-        loops = [n for n in ast.walk(tree) if isinstance(n, ast.For) and isinstance(n.iter, ast.Attribute) and
-                 isinstance(n.iter.value, ast.Name) and n.iter.value.id == "sys" and n.iter.attr == "stdin"]
-        need(len(loops) == 1, "response_stdio_source")
-        loops[0].iter = ast.parse("iter(lambda: sys.stdin.readline(1048577), '')", mode="eval").body
-        loops[0].body[:0] = ast.parse("if len(line) > 1048576:\n raise SystemExit(65)\n").body
+        # The shared source now bounds legacy and fresh installations equally.
+        # Refuse a source shape that could silently restore unbounded stdin.
+        need(ast.literal_eval(assigned(tree, "MAX_RPC_CHARS").value) == 65536, "response_stdio_limit")
+        main = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
+        reads = [n for n in ast.walk(main) if isinstance(n, ast.Call) and
+                 ast.unparse(n.func) == "sys.stdin.readline"]
+        guards = [n for n in ast.walk(main) if isinstance(n, ast.If) and
+                  ast.unparse(n.test) == "len(line) > MAX_RPC_CHARS"]
+        need(len(reads) == 1 and len(reads[0].args) == 1 and
+             ast.unparse(reads[0].args[0]) == "MAX_RPC_CHARS + 1" and
+             len(guards) == 1 and any(isinstance(n, ast.Return) for n in guards[0].body), "response_stdio_source")
     tree = Bindings(mapping, containers).visit(tree)
     if name == "rule_change_executor.py" and p["role"] == "b":
         # The official manager copies its config-mount inputs on restart. Bind

@@ -133,9 +133,12 @@ class ControllerContract(unittest.TestCase):
                                ('security soc-apply','security log-activate'), ('security log-activate','siem log-monitor'),
                                ('siem log-monitor','siem dashboard-apply'), ('siem dashboard-apply','siem soc-activate')]:
             self.assertLess(phases.index(earlier), phases.index(later))
-        self.assertEqual(phases[-9:], ['security soc-verify','security log-verify','siem verify',
+        self.assertEqual(phases[-10:], ['security soc-verify','security log-verify','siem verify',
                                       'siem soc-verify','siem log-verify','siem dashboard-verify',
-                                      'security diag-verify','service diag-verify','siem diag-verify'])
+                                      'security diag-verify','service diag-verify','siem diag-verify','siem tls-verify'])
+        self.assertLess(phases.index('siem tls-install'),phases.index('siem soc-prepare'))
+        self.assertLess(phases.index('security tls-trust'),phases.index('security soc-apply'))
+        self.assertLess(phases.index('service host-verify'),phases.index('security soc-verify'))
         for earlier, later in [('siem soc-activate','siem diag-prepare'),
                                ('siem diag-prepare','security diag-apply'),
                                ('security diag-apply','service diag-apply'),
@@ -185,8 +188,16 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
                                         'security soc-check', 'siem soc-check', 'siem dashboard-check',
                                         'security diag-check','siem diag-check','service diag-check',
+                                        'service host-check','siem host-check',
                                         'siem apply', 'siem verify', 'service apply'])
         self.assertNotIn('구축 완료.', result.stdout)
+        self.assert_clean()
+
+    def test_internal_tls_failure_prevents_approval_transport_activation(self):
+        result = self.run_controller(FAIL_PHASE='siem tls-install')
+        self.assertNotEqual(result.returncode,0)
+        self.assertNotIn('siem soc-prepare',self.phases())
+        self.assertNotIn('security soc-apply',self.phases())
         self.assert_clean()
 
     def test_check_does_not_apply(self):
@@ -194,7 +205,8 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
                                         'security soc-check', 'siem soc-check', 'siem dashboard-check',
-                                        'security diag-check','siem diag-check','service diag-check'])
+                                        'security diag-check','siem diag-check','service diag-check',
+                                        'service host-check','siem host-check'])
         self.assert_clean()
 
     def test_legacy_build_override_is_rejected_before_ssh(self):
@@ -246,7 +258,8 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(self.phases(), ['siem verify', 'service verify', 'security verify',
                                         'security soc-verify', 'security log-verify',
                                         'siem soc-verify', 'siem log-verify', 'siem dashboard-verify',
-                                        'security diag-verify','service diag-verify','siem diag-verify'])
+                                        'security diag-verify','service diag-verify','siem diag-verify',
+                                        'siem tls-verify','service host-verify','siem host-verify'])
         self.assert_clean()
 
     def test_soc_streams_never_appear_in_outputs_or_arguments(self):

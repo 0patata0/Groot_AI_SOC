@@ -14,7 +14,7 @@ services:
   waf:
     image: owasp/modsecurity-crs:nginx
     container_name: waf
-    restart: unless-stopped
+    restart: always
     environment:
       - BACKEND=http://groot-web:80          # Groot_C DVWA (extra_hosts로 해석, 기동 시 정적 resolve)
       - SERVER_NAME=groot-web                # 표시용(listen default_server라 어떤 Host도 수신)
@@ -39,7 +39,7 @@ services:
   suricata:
     image: jasonish/suricata:latest          # 8.0.6
     container_name: suricata
-    restart: unless-stopped
+    restart: always
     network_mode: host                       # ens192 직접 관측
     cap_add:
       - NET_ADMIN

@@ -14,6 +14,20 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 
 `deployment/config.example.conf`를 로컬 전용 `site.local.conf`에 복사하고 실제 주소·HTTPS 이름·허용 내부망을 입력한다. 비밀번호를 이 파일에 넣지 않는다. 전체 저장소가 필요하며 `deploy.sh`만 따로 복사해서 실행하는 방식은 아니다. 내부 Python/Bash helper는 진입점이 자동으로 호출한다. Mac에는 패키지를 설치하지 않는다.
 
+## 2026-10-24 보안 경계와 오프라인 준비
+
+패키지 다운로드는 외부 준비 환경에서만 수행한다. 대상 서버에는 서명/해시를 검증한 deb와 의존성을 반입하고, 설치기는 전용 임시 캐시·빈 저장소 목록·`--no-download --no-remove`로 설치한다. Mac에는 패키지를 설치하지 않으며 반입/해시 확인 후 작업용 deb를 삭제한다. [반입 목록과 버전 기준](setup-packages-artifacts.md)을 함께 준비한다. host sudo 최소 `.4`, SIEM nginx 최소 `1.24.0-2ubuntu7.18`을 검사한다.
+
+SIEM 기본 구성 뒤 전용 비권한 nginx가 **8444→같은 호스트 Mattermost8065**, **8445→loopback 승인8090** TLS를 제공한다. 기존 SIEM CA로 전용 DNS/IP 인증서를 만들며 CA 개인키는 SIEM에만 남긴다. 공개 CA만 SSH 파이프로 security의 운영체제 신뢰 저장소에 전달한 후 SOC 연결을 시작한다. SIEM의 일반 nginx 기본80 서비스는 masked로 유지한다. 최종 `--verify`에는 TLS와 호스트 격리가 포함된다. 기존 운영 A의 채팅/대시보드 프록시도 CA·이름 검증을 사용한다.
+
+`MANAGEMENT_ALLOWED_CIDRS`는 SSH 원천, `DASHBOARD_ALLOWED_CIDRS`는443, `CHAT_ALLOWED_CIDRS`는8444 클라이언트를 지정한다. 대시보드의 `DASHBOARD_DENIED_CIDRS`(기본 VPN192.168.15.0/24)는 허용 목록보다 먼저 적용한다. 웹 허용 값이 비면 직접 클라이언트 접근을 열지 않고 security 프록시/필수 내부 통신만 허용한다. 인증된 설치 SSH 원천은 자동으로 보존한다. `ADMIN_PROTECTED_CIDRS`는 IP 차단 예외이며 SSH/웹 권한으로 확대하지 않는다. 새 공개 CA를 사용자 단말에 신뢰시키는 절차는 서버 간 CA 전달과 별개다.
+
+SIEM은 서비스 C에서 agent1514/1515만 받고, Indexer9200/API55000/기존HTTP관리포트는 물리 서비스망에 개방하지 않는다. C의 기존 Docker 기본 bridge는 스스로 관리 영역 연결을 시작할 수 없으며 security에서 들어온 허용 서비스 응답만 허용한다. dedicated 실습 guard와 Docker 체인은 유지하고 별도 inet 테이블만 관리한다. 기존 Java의 임의 외부/JNDI 연결을 다시 여는 시나리오는 별도 승인·격리 설계가 필요하며 현재 CVE 재현 보류를 해제한 것이 아니다.
+
+`resp`는 인자 없는 root MCP 진입점만 sudo 실행한다. root 전용 설정과 승인 검증을 거친 private helper만 실행하며 하위 차단 helper의 직접 sudo는 허용하지 않는다. 승인 일회성 소비·보호 주소·소유권·TTL을 유지하고 LLM에 일반 sudo/Docker·패키지 권한을 주지 않는다.
+
+A의 필수 WAF·Suricata와 TLS 프록시는 재부팅 때 복구되도록 `restart: always`를 사용한다. 운영 중 `docker stop`은 멈추지만 daemon/호스트 재시작 시 돌아온다. 장기 중지는 관리자가 해당 정확한 CID의 재시작 정책을 `no`로 지정한 뒤 중지한다. 실습/백업의 기존 중지 정책은 유지한다. [Docker 공식 정책](https://docs.docker.com/engine/containers/start-containers-automatically/)을 따른다. 현재 기존 서버의147 부팅·최초 실패/복구·후속 통과와 새3VM 전체 설치 미실행은 [STATUS](../STATUS.md)에서 구분한다.
+
 ## 실행 순서와 범위
 
 1. 입력과 검증된 SSH host key를 확인하고 서버 3대의 machine-id가 서로 다른지 확인한다.
@@ -23,11 +37,11 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 5. SIEM을 설치·검증하고 등록 CA·암호를 두 agent 서버로 전달한다. Wazuh Dashboard의 `admin` 암호(`siem.json`의 `indexer_password`)는 SSH 파이프로 service의 root0600 파일에 직접 전달한다. Mac 파일·명령 인수·로그에는 저장하지 않는다.
 6. service에 독립 DVWA/MariaDB, FastAPI 콘솔·제한된 Docker broker·nft guard, 전용 Nginx gateway, 별도 sudo rootless 환경과 Redis·Samba·sudo 웹 터미널 서비스, Wazuh agent를 구성한다. 콘솔 계정 생성과 sudo 준비 다음에 별도 nonweb bundle을 검증·반입한다.
 7. security에 Suricata·기존 DVWA WAF와 별도 Log4Shell TLS 진입점을 구성한다. 관리·예외 키 인증은 콘솔에 직접 연결하고, 고정된3개 실습 경로만 WAF를 지난다. 일반 요청은 규칙에 걸릴 때 차단하며 유효한 예외 세션은 감사 로그를 유지한다.
-8. SIEM이 생성한 Mattermost 관리자 ID를 승인자로 고정하고 승인 브로커·정확 후보 worker·규칙 MCP·제한된 응답 MCP·Native AR 사건 전달을 구성한다. 전용 토큰은 B→A SSH 파이프로 전달하며, 승인자 암호를 MCP에 배포하지 않는다. 관리용 SSH는 고정 명령과 검증된 host key만 사용한다.
+8. SIEM의 비권한 내부 TLS8444/8445를 설치하고 공개 CA만 security에 전달·신뢰시킨 뒤 SOC를 구성한다. SIEM이 생성한 Mattermost 관리자 ID를 승인자로 고정하고 승인 브로커·정확 후보 worker·규칙 MCP·제한된 응답 MCP·Native AR 사건 전달을 구성한다. 전용 토큰은 B→A SSH 파이프로 전달하며, 승인자 암호를 MCP에 배포하지 않는다. 관리용 SSH는 고정 명령과 검증된 host key만 사용한다.
 9. Vector0.59.0 정제·원본 세대 회전·출력 유지관리·이전 부트 로컬 보관을 구성하고, 실제 등록 agent ID에 결속한 Indexer 상관관측 모니터를 추가한다. 관측 모니터의 `actions`는 비어 있으며 자체 차단을 실행하지 않는다.
 10. 통합 SOC 대시보드의 14개 패널을 구성한다. 기존 saved object와 내용이 충돌하면 덮어쓰지 않고 중단한다. 없는 객체만 생성하고 전체 내용을 재조회한다. 그 뒤 Hermes 관리 경로를 활성화한다.
 11. 세 호스트에 고정 읽기 진단 수집기를 설치한다. root 수집기가60초마다 systemd 상태와 분류한 오류 메타데이터만 게시하고, B의 비권한 MCP는 로컬 snapshot 또는 A/C의 강제 snapshot reader를 읽는다. 새 전용 키의 공개키만 A/C로 전달하고, 기존 관리자·대응용 키는 재사용하지 않는다. SSH host key는 기존에 검증한 배포 SSH 경로로 받아 별도 known_hosts에 고정한다.
-12. 기본 역할과 SOC 확장의 파일·이미지·컨테이너·서비스·승인 경계 및 세 호스트 진단 snapshot·MCP 호출을 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제를 하지 않는다. 대시보드의 아직 완료되지 않은 동일 내용 생성만 제한적으로 재개할 수 있고, 다른 확장 부분 설치는 검토 없이 재시도하지 않는다.
+12. service/siem의 별도 host guard를 적용하고 인증된 SSH 원천을 보존한다. 기본 역할과 SOC 확장의 파일·이미지·컨테이너·서비스·승인 경계, 세 호스트 진단 snapshot·MCP 호출, 내부 TLS와 host guard를 최종 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제를 하지 않는다. 대시보드의 아직 완료되지 않은 동일 내용 생성만 제한적으로 재개할 수 있고, 다른 확장 부분 설치는 검토 없이 재시도하지 않는다.
 
 카탈로그는 웹 실습3개와 Redis·Samba·sudo 터미널3개로 총6개다. 준비된 로컬 이미지만 사용하며 사용자가 콘솔에서 시작한 뒤 웹 화면 또는 같은 사이트의 터미널을 연다. 웹3개와 Redis/Samba는 초기 설치 중 시작하지 않는다. sudo 초기 bootstrap은 패키지·격리 검증을 위해 한 번 기동하며, 이후 중지 상태도 정상 설치로 검증한다. 터미널은 고정된 해당 실습 컨테이너에만 연결하며 호스트 셸·임의 Docker API·LLM 권한을 추가하지 않는다. sudo는 별도 UID1991 rootless 런타임을 유지하고 중앙 터미널의 고정 어댑터로만 연결한다. sudo 터미널은 전체 사용자 중 한 연결만 허용하며 연결 종료·입력 유휴/수명 만료 때 해당 sudo 컨테이너 전체를 중지한다. Redis/Samba 세션과 다른 실습은 중지하지 않는다. DVWA는 `http://SECURITY_HOST:WAF_PORT/dvwa/`, 콘솔·실습 페이지는 `LAB_PUBLIC_ORIGIN/log4shell/` 아래다. DVWA를 Log4Shell 메뉴에 다시 추가하지 않는다.
 

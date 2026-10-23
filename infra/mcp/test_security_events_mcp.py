@@ -57,9 +57,9 @@ class SecurityEventsMcpTests(unittest.TestCase):
         args = module.validate_args("suricata", {
             "lookback_minutes": 30, "limit": 5, "source_ip": "203.0.113.7", "signature_id": "1000010",
         })
-        query = module.build_query("suricata", args)
+        query = module.build_query("suricata", args, at=module.datetime(2026,10,24,0,0,tzinfo=module.timezone.utc))
         self.assertEqual(query["size"], 5)
-        self.assertEqual(query["query"]["bool"]["filter"][0], {"range": {"timestamp": {"gte": "now-30m"}}})
+        self.assertEqual(query["query"]["bool"]["filter"][0], {"range": {"timestamp": {"gte": "2026-10-23T23:30:00+00:00", "lte":"2026-10-24T00:00:00+00:00"}}})
         serialized = json.dumps(query)
         self.assertIn('"data.alert.signature_id": "1000010"', serialized)
         self.assertIn('"data.src_ip": "203.0.113.7"', serialized)
@@ -73,8 +73,8 @@ class SecurityEventsMcpTests(unittest.TestCase):
         self.assertEqual(module._kst_timestamp("2026-10-06T12:30:00+03:00"), "2026-10-06T18:30:00+09:00")
         self.assertEqual(module._kst_timestamp("2026-10-06T00:30:00"), "2026-10-06T09:30:00+09:00")
         self.assertEqual(module._kst_timestamp("not-a-time"), "")
-        query = module.build_query("modsecurity", module.validate_args("modsecurity", {"lookback_minutes": 15}))
-        self.assertEqual(query["query"]["bool"]["filter"][0], {"range": {"timestamp": {"gte": "now-15m"}}})
+        query = module.build_query("modsecurity", module.validate_args("modsecurity", {"lookback_minutes": 15}), at=module.datetime(2026,10,24,0,0,tzinfo=module.timezone.utc))
+        self.assertEqual(query["query"]["bool"]["filter"][0], {"range": {"timestamp": {"gte": "2026-10-23T23:45:00+00:00", "lte":"2026-10-24T00:00:00+00:00"}}})
 
     def test_untrusted_arguments_cannot_choose_index_or_unbounded_search(self):
         invalid = [
@@ -100,6 +100,13 @@ class SecurityEventsMcpTests(unittest.TestCase):
         }
         with patch.object(module, "indexer_search", return_value={"hits": {"hits": [{"_source": source}]}}):
             result = module.search("suricata", {"limit": 1})
+        self.assertEqual(result['returned_count'],1)
+        self.assertIsNone(result['indexed_window_total_count'])
+        self.assertEqual(result['source_scope'],'wazuh_indexed_alerts')
+        start=module.datetime.fromisoformat(result['requested_since_kst'])
+        end=module.datetime.fromisoformat(result['requested_until_kst'])
+        self.assertEqual(end-start,module.timedelta(minutes=60))
+        self.assertIn('전체 공격/경보 부재',result['evidence_scope_ko'])
         self.assertEqual(result["alerts"][0]["signature_id"], "1000010")
         self.assertEqual(result["alerts"][0]["timestamp"], "2026-10-06T09:00:00+09:00")
         output = json.dumps(result)

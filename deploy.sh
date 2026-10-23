@@ -22,6 +22,10 @@ LLM_MODEL=qwen3.6:35b
 LOG_PROTECTED_IPS=
 ADMIN_PROTECTED_CIDRS=
 ADMIN_INPUT_SET=0
+MANAGEMENT_ALLOWED_CIDRS=
+DASHBOARD_ALLOWED_CIDRS=
+DASHBOARD_DENIED_CIDRS=192.168.15.0/24
+CHAT_ALLOWED_CIDRS=
 CAPSTONE_ROOT=/opt/capstone
 SURICATA_IMAGE=
 WAF_IMAGE=
@@ -85,7 +89,7 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|LOG_PROTECTED_IPS|ADMIN_PROTECTED_CIDRS|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_NONWEB_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|LOG_PROTECTED_IPS|ADMIN_PROTECTED_CIDRS|MANAGEMENT_ALLOWED_CIDRS|DASHBOARD_ALLOWED_CIDRS|DASHBOARD_DENIED_CIDRS|CHAT_ALLOWED_CIDRS|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_NONWEB_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         if [[ $key == ADMIN_PROTECTED_CIDRS ]]; then ADMIN_INPUT_SET=1; fi
@@ -161,6 +165,11 @@ done
 [[ $LLM_BASE_URL =~ ^https?://[a-zA-Z0-9.-]+(:[0-9]+)?/v1/?$ ]] || die 'LLM_BASE_URL must be an HTTP(S) /v1 URL without credentials, query or fragment'
 LOG_PROTECTED_IPS=$(python3 -B "$HERE/deployment/protected_hosts.py" "$SECURITY_HOST" "$SIEM_HOST" "$SERVICE_HOST" "$LLM_BASE_URL" "$LOG_PROTECTED_IPS") || die 'invalid protected addresses'
 ADMIN_PROTECTED_CIDRS=$(python3 -B "$HERE/deployment/protected_hosts.py" --admin-cidrs "$ADMIN_PROTECTED_CIDRS") || die 'invalid administrator IP/network exemptions'
+for key in MANAGEMENT_ALLOWED_CIDRS DASHBOARD_ALLOWED_CIDRS DASHBOARD_DENIED_CIDRS CHAT_ALLOWED_CIDRS; do
+  value=${!key}
+  value=$(python3 -B "$HERE/deployment/protected_hosts.py" --admin-cidrs "$value") || die "invalid access CIDRs: $key"
+  printf -v "$key" '%s' "$value"
+done
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
 say '순서: 반입물·패키지 → 역할 사전검사 → SIEM → 공통 키·등록 자격 → service → security → 승인·대응 → 로그 처리·상관분석 → SOC 대시보드 → 고정 읽기 진단 → 전체 검증'
 say 'SOC 구성: 정확 후보 승인 MCP·제한된 대응·Vector 정제/회전/보존·관측 모니터·통합 대시보드'
@@ -201,7 +210,7 @@ mkdir "$WORK/bundle"
 cat > "$WORK/bundle/site.env" <<EOF
 # Generated data; values are shell-quoted by the controller below.
 EOF
-for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL LOG_PROTECTED_IPS ADMIN_PROTECTED_CIDRS CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
+for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL LOG_PROTECTED_IPS ADMIN_PROTECTED_CIDRS MANAGEMENT_ALLOWED_CIDRS DASHBOARD_ALLOWED_CIDRS DASHBOARD_DENIED_CIDRS CHAT_ALLOWED_CIDRS CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
@@ -255,6 +264,9 @@ if [[ $MODE == verify ]]; then
   remote_role "$SECURITY_HOST" security diag-verify
   remote_role "$SERVICE_HOST" service diag-verify
   remote_role "$SIEM_HOST" siem diag-verify
+  remote_role "$SIEM_HOST" siem tls-verify
+  remote_role "$SERVICE_HOST" service host-verify
+  remote_role "$SIEM_HOST" siem host-verify
   say '세 역할과 SOC 확장 검증 완료.'
   exit 0
 fi
@@ -280,6 +292,8 @@ remote_role "$SIEM_HOST" siem dashboard-check
 remote_role "$SECURITY_HOST" security diag-check
 remote_role "$SIEM_HOST" siem diag-check
 remote_role "$SERVICE_HOST" service diag-check
+remote_role "$SERVICE_HOST" service host-check
+remote_role "$SIEM_HOST" siem host-check
 say '세 서버 사전검사 통과.'
 [[ $MODE != check ]] || exit 0
 
@@ -302,6 +316,10 @@ remote_role "$SERVICE_HOST" service apply
 remote_role "$SERVICE_HOST" service verify
 remote_role "$SECURITY_HOST" security apply
 remote_role "$SECURITY_HOST" security verify
+# Only the public SIEM CA crosses SSH. No CA private key leaves the SIEM.
+remote_role "$SIEM_HOST" siem tls-install
+remote_role "$SIEM_HOST" siem tls-export |
+  remote_role "$SECURITY_HOST" security tls-trust || die 'internal TLS CA transfer failed'
 remote_role "$SIEM_HOST" siem soc-prepare
 # Dedicated response credentials pass directly between root-owned endpoints.
 # stdout for these phases is exclusively the bounded transfer protocol.
@@ -332,6 +350,12 @@ for name in sys.argv[1:]:
 print(json.dumps(values,sort_keys=True,separators=(',',':')))
 PY
   remote_role "$SIEM_HOST" siem diag-activate || die 'diagnostic transport activation failed'
+# Host management and the old default Docker bridge must not bypass the
+# dedicated lab guards. Preserve the authenticated controller's SSH source.
+remote_role "$SERVICE_HOST" service host-apply
+remote_role "$SIEM_HOST" siem host-apply
+remote_role "$SERVICE_HOST" service host-verify
+remote_role "$SIEM_HOST" siem host-verify
 remote_role "$SECURITY_HOST" security verify
 remote_role "$SECURITY_HOST" security soc-verify
 remote_role "$SECURITY_HOST" security log-verify
@@ -342,7 +366,8 @@ remote_role "$SIEM_HOST" siem dashboard-verify
 remote_role "$SECURITY_HOST" security diag-verify
 remote_role "$SERVICE_HOST" service diag-verify
 remote_role "$SIEM_HOST" siem diag-verify
-say "구축 완료. WAF: http://$SECURITY_HOST:$WAF_PORT / SIEM: https://$SIEM_HOST / Mattermost: http://$SIEM_HOST:8065"
+remote_role "$SIEM_HOST" siem tls-verify
+say "구축 완료. WAF: http://$SECURITY_HOST:$WAF_PORT / SIEM: https://$SIEM_HOST / Mattermost: https://$SIEM_HOST:8444"
 say "Lab Console: $LAB_PUBLIC_ORIGIN/log4shell/"
 say "DVWA 독립 진입점: http://$SECURITY_HOST:$WAF_PORT/dvwa/"
 say '인증 정보는 서버의 root 전용 경로에 보관합니다. 결과와 지원 범위는 README를 확인하세요.'

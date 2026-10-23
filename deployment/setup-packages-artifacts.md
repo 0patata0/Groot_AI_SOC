@@ -31,9 +31,9 @@ Log4Shell은 schema7부터 현재 콘솔과 검증된3개 웹이미지를 사용
 
 이 문서 작성 시 공식 설치 문서·공개 릴리스 메타데이터와 저장소 스크립트를 대조했다. 실제 패키지 설치, 바이너리 다운로드, 이미지 빌드 및 새 VM 구축은 수행하지 않았다. 아래에 명시한 SHA는 확인한 공개 배포 자료의 값이며 운영 비밀 값이 아니다.
 
-## 1. 세 서버 공통 패키지
+## 1. 세 서버 공통 패키지 준비
 
-각 서버의 Bash에서 OS와 아키텍처를 먼저 확인한다. Ubuntu 24.04의 코드명은 `noble`, Debian 패키지 아키텍처는 `amd64`여야 한다.
+OS·아키텍처 조회는 각 대상 서버에서 수행한다. 아래 `apt-get update/install`은 같은 Ubuntu24.04 amd64의 **외부 Linux 준비 환경에서만** 실행하는 준비 예시다. 운영 서버에서는 실행하지 않고 검증한 deb/의존성을 `artifacts.json`과 함께 반입해 `deploy.sh`의 오프라인 경로로 설치한다. Ubuntu 24.04의 코드명은 `noble`, Debian 패키지 아키텍처는 `amd64`여야 한다.
 
 ```bash
 set -euo pipefail
@@ -55,7 +55,7 @@ timedatectl status
 
 `getent`·`useradd`·`runuser`·`flock` 등의 Ubuntu 기본 관리 명령도 필요하다. 설치기는 누락된 명령을 감지하면 중단한다. 시간대 변경과 시간 동기화는 별개다. `timedatectl`의 동기화 상태가 정상인지 확인하고, 폐쇄망이면 허용된 내부 NTP를 사용한다. 이 명령은 기존 방화벽 정책을 초기화하거나 SSH 접근을 일괄 개방하지 않는다.
 
-SIEM에서 Wazuh 원본을 직접 받을 경우에만 `git`도 수동 설치한다. 별도 준비 서버에서 반입한다면 SIEM에 Git은 필수 조건이 아니다.
+Wazuh 원본을 가져오는 외부 Linux 준비 환경에만 `git`이 필요하다. 원본을 반입하는 SIEM에 Git은 필수 조건이 아니다. 아래 설치도 준비 환경용이다.
 
 ```bash
 sudo apt-get install -y git
@@ -63,7 +63,7 @@ sudo apt-get install -y git
 
 ## 2. Docker 공식 apt 저장소와 Engine·Compose
 
-세 서버에서 수행한다. 기존 Docker·containerd가 운영 중이면 이 신규 구축 절차를 중지한다. 아래 조회 결과에 기존 컨테이너용 패키지가 나오면 무조건 제거하지 말고 새 VM인지 확인한다.
+대상 서버에서는 기존 Docker·containerd 상태만 조회한다. 저장소 등록·curl·APT 다운로드/설치 명령은 외부 Linux 준비 환경용이며, 대상에는 검증한 Docker deb/전이 의존성을 반입한다. 기존 Docker·containerd가 운영 중이면 이 신규 구축 절차를 중지한다. 아래 조회 결과에 기존 컨테이너용 패키지가 나오면 무조건 제거하지 말고 새 VM인지 확인한다.
 
 ```bash
 dpkg-query -W -f='${Package} ${Version}\n' \
@@ -71,7 +71,7 @@ dpkg-query -W -f='${Package} ${Version}\n' \
   podman-docker containerd runc 2>/dev/null || true
 ```
 
-새 VM에 한해 공식 apt 서명 키와 저장소를 등록한다. `/etc/apt/keyrings/docker.asc` 또는 `docker.sources`가 이미 있으면 내용을 비교하고 기존 파일을 덮어쓰지 않는다. 아래 `test`는 중복 준비를 의도적으로 거절한다. [Docker의 Ubuntu 설치 문서](https://docs.docker.com/engine/install/ubuntu/)를 기준으로 작성했다.
+외부 Linux 준비 환경에 공식 apt 서명 키와 저장소를 등록한다. 설치된 운영 서버에 이 다운로드 경로를 추가하지 않는다. `/etc/apt/keyrings/docker.asc` 또는 `docker.sources`가 이미 있으면 내용을 비교하고 기존 파일을 덮어쓰지 않는다. 아래 `test`는 중복 준비를 의도적으로 거절한다. [Docker의 Ubuntu 설치 문서](https://docs.docker.com/engine/install/ubuntu/)를 기준으로 작성했다.
 
 ```bash
 set -euo pipefail
@@ -183,7 +183,7 @@ sudo install -d -o root -g root -m 0700 /opt/capstone-prereqs/evidence
 sudo stat -c '%U:%G %a %n' /opt/capstone-prereqs
 ```
 
-아래 명령은 해당 역할 서버에서만 실행한다. 태그를 받은 뒤 **같은 작업 도중 다시 pull하지 않는다.** `latest`·`nginx`·`10` 같은 태그는 시간이 지나면 바뀐다. 최초 준비의 image ID와 RepoDigest를 기록하고, 이후 동일 바이트를 복원하려면 검증한 digest 또는 저장한 image archive를 사용한다. 역할 스크립트는 최초 로컬 ID를 기록하고 변경 시 재검증을 거절한다.
+아래 다운로드 명령은 해당 역할의 반입물을 만드는 외부 Linux 준비 환경에서 실행하고, 대상 서버에는 `docker save` 산출물을 반입한다. Mac에 Docker·준비 도구를 설치하지 않는다. 태그를 받은 뒤 **같은 작업 도중 다시 pull하지 않는다.** `latest`·`nginx`·`10` 같은 태그는 시간이 지나면 바뀐다. 최초 준비의 image ID와 RepoDigest를 기록하고, 이후 동일 바이트를 복원하려면 검증한 digest 또는 저장한 image archive를 사용한다. 역할 스크립트는 최초 로컬 ID를 기록하고 변경 시 재검증을 거절한다.
 
 ```bash
 # security에서만

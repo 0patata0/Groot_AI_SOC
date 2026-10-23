@@ -2,7 +2,8 @@
 """capstone 응답(차단) MCP 서버 — Groot_A에서 실행. stdio JSON-RPC(표준 라이브러리만, 오프라인).
 
 에이전트(Claude Code / Hermes 등)는 `ssh -T groot-resp` 로 이 서버를 stdio MCP 로 띄운다(A의 sshd forced command).
-자격증명(= 차단 능력)은 A에만: 이 서버가 `sudo -n /usr/local/sbin/agent_block ...` 를 호출한다(resp 계정 sudoers 로 add/del/list 만 허용).
+자격증명은 A의 root 전용 설정에만 있다. resp는 인자 없는 root MCP 진입점만 sudo 실행하며
+하위 helper를 직접 실행할 수 없다. 이 서버가 승인을 확인한 뒤 고정 private helper를 호출한다.
 읽기 서버(B의 mcp-server-wazuh)와 분리 = 최소권한. 정책 엔진(TTL 상한·reason 필수·flush 미노출)은 여기.
 
 툴:
@@ -40,6 +41,7 @@ def _envint(name, default):
 
 MAX_MINUTES = max(1, _envint("RESP_MAX_MINUTES", 120))   # 자동 대응 상한(분). A의 agent_block 은 24h 까지 허용하지만 정책은 더 보수적.
 DEF_MINUTES = min(max(1, _envint("RESP_DEFAULT_MINUTES", 10)), MAX_MINUTES)
+MAX_RPC_CHARS = 65536
 REASON_RE = re.compile(r"[^A-Za-z0-9._:/-]+")
 IPRE = re.compile(r"^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$")
 
@@ -274,7 +276,13 @@ def handle(msg):
 
 def main():
     log("started (agent_block=%s, max=%dm)" % (AGENT_BLOCK, MAX_MINUTES))
-    for line in sys.stdin:
+    while True:
+        line = sys.stdin.readline(MAX_RPC_CHARS + 1)
+        if not line:
+            break
+        if len(line) > MAX_RPC_CHARS:
+            log("request exceeds bounded protocol input; closing")
+            return
         line = line.strip()
         if not line:
             continue

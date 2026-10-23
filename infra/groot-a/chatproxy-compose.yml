@@ -1,11 +1,11 @@
-# Groot_A — 채팅 리버스 프록시(nginx). A:443(호스트) → 컨테이너 8443 → B:8065(Mattermost).
+# Groot_A — 채팅 리버스 프록시(nginx). A:443(호스트) → 컨테이너 8443 → B:8444(Mattermost, 검증 TLS).
 # Docker published 포트라 A 호스트 방화벽(input drop)을 우회(WAF 80/8443 과 동일 방식). Wazuh/보안스택과 분리.
 # 배치: /home/groot_a/capstone/chatproxy/ (nginx.conf, tls/{chat.crt,chat.key}). 이미지: 오프라인 반입 nginx:1.27-alpine.
 services:
   chatproxy:
     image: nginx:1.27-alpine
     container_name: chatproxy
-    restart: unless-stopped
+    restart: always
     ports:
       - "443:8443"                 # 호스트 443(VPN·캠퍼스 도달) → 컨테이너 8443(TLS)
     volumes:

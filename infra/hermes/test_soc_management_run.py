@@ -59,15 +59,16 @@ class Harness:
         self.registry = types.SimpleNamespace(dispatch=dispatch)
 
         class ClientSession:
-            def __init__(self, content=None, failure=None):
+            def __init__(self, content=None, failure=None, is_error=False):
                 self.content = content or []
                 self.failure = failure
+                self.is_error = is_error
 
             async def call_tool(self, name, arguments=None, *args, **kwargs):
                 harness.wire_calls.append((name, arguments, args, kwargs))
                 if self.failure:
                     raise self.failure
-                return types.SimpleNamespace(content=self.content)
+                return types.SimpleNamespace(content=self.content, is_error=self.is_error)
 
         class AIAgent:
             def __init__(self, model="synthetic", **kwargs):
@@ -140,6 +141,9 @@ class Harness:
             stack.enter_context(mock.patch.object(sys, "path", list(sys.path)))
             stack.enter_context(mock.patch.object(sys, "stdout", self.stdout))
             stack.enter_context(mock.patch.object(sys, "stderr", self.stderr))
+            # Boundary tests use a fake native CLI; the source-pinned native
+            # completion adapter has separate dependency-injected tests.
+            stack.enter_context(mock.patch.object(wrapper, "install_grounding_retry"))
             wrapper.main()
 
 
@@ -329,7 +333,8 @@ class ManagementWrapper(unittest.TestCase):
         h = Harness(); h.run(check)
         self.assertEqual(h.guard_evidence, [[{"role": "user", "content": "한국어 SOC 보고"}, {"role": "tool", "content": "real MCP result"}]])
         self.assertNotIn("fabricated", str(h.guard_evidence))
-        self.assertEqual(h.emissions[0][0]["final_response"], "다음 단계 확인")
+        self.assertTrue(h.emissions[0][0]["final_response"].startswith("다음 단계 확인"))
+        self.assertTrue(h.emissions[0][0]["final_response"].endswith("MANAGEMENT_STATUS: needs_review"))
         self.assertEqual(h.emissions[0][1:], ("session-1", 0))
         self.assertEqual(result["final_response"], "以下步骤 확인")
 
@@ -387,6 +392,15 @@ class ManagementWrapper(unittest.TestCase):
             h.Emitter().emit_result({'final_response': '관측 결과를 확인했습니다.\nMANAGEMENT_STATUS: resolved'})
         h.run(check, 'verify')
         self.assertEqual(h.emissions[0][0]['final_response'], '관측 결과를 확인했습니다.\nMANAGEMENT_STATUS: resolved')
+
+    def test_failed_read_or_write_only_call_is_not_a_successful_observation(self):
+        for name,mode,error in [('get_system_diagnostics','verify',True),('propose_rule_change','manage',False)]:
+            h = Harness()
+            def check(h):
+                asyncio.run(h.ClientSession(is_error=error).call_tool(name,{}))
+                h.Emitter().emit_result({'final_response':'현재 정상입니다.\nMANAGEMENT_STATUS: resolved'})
+            h.run(check,mode)
+            self.assertEqual(h.emissions[0][0]['final_response'],wrapper.NO_OBSERVATION_REPORT)
 
     def test_wrong_uid_gid_mode_or_home_stops_before_native_cli(self):
         samples = [{"uid": 0}, {"uid": 1000}, {"gid": 0}, {"euid": 0}, {"egid": 0}, {"mode": "admin"}, {"mode": ""},

@@ -254,7 +254,7 @@ def preflight():
          'LLM_BASE_URL_must_be_http_or_https_v1')
     need(re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}', MODEL), 'invalid_LLM_MODEL')
     need(os.environ.get('TZ', 'Asia/Seoul') == 'Asia/Seoul', 'TZ_must_be_Asia_Seoul')
-    for exe in ('docker', 'openssl', 'ssh-keygen', 'sshd', 'systemctl', 'useradd', 'getent', 'runuser', 'ip', 'ss'):
+    for exe in ('docker', 'openssl', 'ssh-keygen', 'sshd', 'systemctl', 'useradd', 'getent', 'runuser', 'ip', 'ss', 'nginx'):
         need(shutil.which(exe) is not None, 'manual_package_missing_' + exe)
     run(['docker', 'compose', 'version'])
     need(int(pathlib.Path('/proc/sys/vm/max_map_count').read_text()) >= 262144, 'manual_vm_max_map_count_262144_required')
@@ -383,7 +383,7 @@ def create_certificates():
              '-set_serial',str(secrets.randbits(127)+1),'-out',str(cert),'-days','825','-sha256','-extfile',str(ext)],30)
         # The root0700 directory protects keys on the host. Native services read
         # only their individual RO bind mount; the CA signing key is never mounted.
-        os.chmod(key,0o444); os.chmod(cert,0o444)
+        os.chown(key,0,1000); os.chmod(key,0o440); os.chmod(cert,0o444)
         cert_check(cert,key,ca)
     publish(target/'root-ca-manager.pem',read(ca),0o444)
     for path in target.iterdir():
@@ -477,7 +477,7 @@ def write_compose(c, images):
         'networks':['chat'],'healthcheck':{'test':['CMD-SHELL','pg_isready -U mattermost -d mattermost'],'interval':'5s','timeout':'3s','retries':40}}
     mm = {'MM_SQLSETTINGS_DRIVERNAME':'postgres','MM_SQLSETTINGS_DATASOURCE':
           'postgres://mattermost:'+urllib.parse.quote(cfg['postgres_password'],safe='')+'@postgres:5432/mattermost?sslmode=disable&connect_timeout=10',
-          'MM_SERVICESETTINGS_SITEURL':'http://'+IP+':8065','MM_SERVICESETTINGS_ENABLEBOTACCOUNTCREATION':'true',
+          'MM_SERVICESETTINGS_SITEURL':'https://'+IP+':8444','MM_SERVICESETTINGS_ENABLEBOTACCOUNTCREATION':'true',
           'MM_SERVICESETTINGS_ENABLEUSERACCESSTOKENS':'true','MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION':'false',
           'MM_LOGSETTINGS_CONSOLELEVEL':'WARN','TZ':'Asia/Seoul'}
     mmvol = []

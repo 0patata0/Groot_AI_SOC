@@ -43,7 +43,7 @@ SOURCES = tuple("infra/mcp/" + name for name in (
     "response-mcp.py", "wazuh_containment_ar.py", "managed_suricata_evidence.py")) + tuple("infra/hermes/" + name for name in (
     "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md",
     "capstone-management.service.example", "capstone-management.timer.example")) + (
-    "deployment/soc_management.py", "deployment/soc_runtime.py", "deployment/soc_agent_block.py")
+    "deployment/soc_management.py", "deployment/soc_runtime.py", "deployment/soc_agent_block.py", "deployment/response_entrypoint.py")
 PRIVATE = (ipaddress.ip_network("10.0.0.0/8"), ipaddress.ip_network("172.16.0.0/12"), ipaddress.ip_network("192.168.0.0/16"))
 
 
@@ -276,7 +276,7 @@ def check(s, role):
     units = ["rule-change-worker.service", "rule-change-worker.timer"]
     directories = ["/opt/socbot", "/etc/socbot", "/var/lib/socbot", "/opt/capstone-management", "/etc/capstone-management", "/var/lib/capstone-management"] if role == "siem" else ["/opt/resp", "/var/lib/capstone"]
     units += ["soc-bot.service", "capstone-management.service", "capstone-management.timer"] if role == "siem" else ["capstone-soc-firewall.service"]
-    for path in directories + ["/etc/systemd/system/" + unit for unit in units] + ["/usr/local/libexec/capstone-soc-docker"]:
+    for path in directories + ["/etc/systemd/system/" + unit for unit in units] + ["/usr/local/libexec/capstone-soc-docker", "/usr/local/libexec/capstone-response-apply", "/usr/local/sbin/capstone-response-mcp"]:
         need(not os.path.lexists(path), "unmanaged_SOC_file_or_unit_exists")
     for name in ("rulechg", "socbot") if role == "siem" else ("rulechg", "resp"):
         account_free(name)
@@ -350,7 +350,7 @@ def install_rules(bundle, p, token, key):
     write("/usr/local/sbin/rule-change-executor", render("rule_change_executor.py", bundle["rule_change_executor.py"], p), 0o750)
     write("/opt/rule-change/run-rule-change.sh", b"#!/bin/sh\nexec /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin /usr/bin/python3 -I -B /opt/rule-change/rule_change_mcp.py\n", 0o750, 0, user.pw_gid)
     write("/etc/rule-change/broker.token", (token + "\n").encode())
-    url = "http://" + p["siem_host"] + ":8090"
+    url = "https://" + p["siem_host"] + ":8445" if p["role"] == "a" else "http://127.0.0.1:8090"
     write("/etc/rule-change/config.json", canonical({"host": p["role"], "broker_url": url, "broker_token_file": "/etc/rule-change/broker.token"}))
     unit = "[Unit]\nDescription=Capstone exact approved SOC worker\nAfter=docker.service network-online.target\n[Service]\nType=oneshot\nUser=root\nGroup=root\nExecStart=/usr/local/sbin/rule-change-executor --once\nTimeoutStartSec=600\nNoNewPrivileges=yes\nPrivateTmp=yes\nUMask=0077\n"
     write("/etc/systemd/system/rule-change-worker.service", unit.encode(), 0o644)
@@ -536,14 +536,13 @@ def install_response(bundle, p, share):
     user = forced_account("resp", "/opt/resp", share["public_key"], "/opt/resp/run-response", "/usr/local/sbin/capstone-response-mcp")
     write("/opt/resp/run-response", b"#!/bin/sh\nexec /usr/bin/sudo -n /usr/local/sbin/capstone-response-mcp\n", 0o750, 0, user.pw_gid)
     write(CODE / "response-mcp.py", render("response-mcp.py", bundle["response-mcp.py"], p), 0o600)
-    write(CODE / "response.json", canonical({"RESP_BROKER_URL": "http://" + p["siem_host"] + ":8090",
-          "RESP_BROKER_TOKEN": share["response_token"], "RESP_AGENT_BLOCK": "/usr/local/sbin/agent_block",
+    write(CODE / "response.json", canonical({"RESP_BROKER_URL": "https://" + p["siem_host"] + ":8445",
+          "RESP_BROKER_TOKEN": share["response_token"],
           "RESP_MAX_MINUTES": "120", "RESP_DEFAULT_MINUTES": "10"}))
     # The root-owned wrapper, not resp's environment, supplies all credentials.
     # No agent_block sudo rule exists for either unprivileged MCP account.
-    wrapper = "#!/usr/bin/python3 -IB\nimport json,os,runpy,urllib.request\nfrom pathlib import Path\nif os.geteuid()!=0: raise SystemExit(77)\nos.environ.clear()\nos.environ.update(PATH='/usr/sbin:/usr/bin:/sbin:/bin',PYTHONDONTWRITEBYTECODE='1')\nos.environ.update(json.loads(Path('/opt/capstone-soc/response.json').read_bytes()))\nclass NoRedirect(urllib.request.HTTPRedirectHandler):\n def redirect_request(self,*args,**kwargs): raise ValueError('redirect_refused')\nurllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect()))\nrunpy.run_path('/opt/capstone-soc/response-mcp.py',run_name='__main__')\n"
-    write("/usr/local/sbin/capstone-response-mcp", wrapper.encode(), 0o750)
-    write("/usr/local/sbin/agent_block", bundle["soc_agent_block.py"], 0o750)
+    write("/usr/local/sbin/capstone-response-mcp", render("response_entrypoint.py", bundle["response_entrypoint.py"], p), 0o750)
+    write("/usr/local/libexec/capstone-response-apply", bundle["soc_agent_block.py"], 0o750)
 
 
 def apply_security(s):
@@ -713,7 +712,7 @@ def installed_hashes(role):
         units += ["soc-bot.service", "capstone-management.service", "capstone-management.timer"]
     else:
         roots += [Path("/opt/resp"), CODE]
-        paths += [Path("/usr/local/sbin/capstone-response-mcp"), Path("/usr/local/sbin/agent_block"), Path("/var/ossec/active-response/bin/capstone-containment")]
+        paths += [Path("/usr/local/sbin/capstone-response-mcp"), Path("/usr/local/libexec/capstone-response-apply"), Path("/var/ossec/active-response/bin/capstone-containment")]
         units += ["capstone-soc-firewall.service"]
     for root in roots:
         paths += sorted(p for p in root.rglob("*") if not p.is_dir())

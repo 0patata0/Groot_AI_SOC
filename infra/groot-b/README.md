@@ -1,5 +1,7 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
+> 2026-10-24 보완: 오프라인 host 패치, 기존 Java/관리망 격리, root 승인 진입점과 검증 TLS8444/8445를 적용했다. A 필수 컨테이너는 always로 재부팅 복구하며 실습/백업의 중지 상태는 보존한다. 상세 포트·권한·새 설치/기존 이관과 검증 범위는 [설치 안내](../../deployment/bootstrap-guide.md) 및 [STATUS](../../STATUS.md)를 따른다. LLM 추가 검증은 진행 중이다.
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
 > 현재 B는 Wazuh4.14.8·Mattermost/PostgreSQL·Hermes·승인 브로커와 MCP6서버를 운영한다. 이번 읽기 점검에서 운영6컨테이너와 Wazuh000/001/002 Active를 확인했다. 고정 도구 목록과 실제 LLM 선택·대응 성공은 별개다.

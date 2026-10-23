@@ -43,7 +43,7 @@ WAF_FIELDS = COMMON_FIELDS + [
 TOOLS = [
     {
         "name": "search_suricata_alerts",
-        "description": "Search recent Suricata IDS alerts already indexed by Wazuh (not live raw EVE). Returns bounded summaries with KST timestamps.",
+        "description": "Search Suricata alerts already indexed by Wazuh, not live raw EVE. limit must be 1..50 (default 10). Returns a bounded sample, exact requested KST window, and unknown full-window total.",
         "inputSchema": {
             "type": "object", "additionalProperties": False,
             "properties": {
@@ -57,7 +57,7 @@ TOOLS = [
     },
     {
         "name": "search_modsecurity_alerts",
-        "description": "Search recent ModSecurity WAF alerts already indexed by Wazuh (not live raw audit logs). Returns safe metadata, numeric WAF rule IDs, and KST timestamps.",
+        "description": "Search ModSecurity alerts already indexed by Wazuh, not raw audit logs. limit must be 1..50 (default 10). Returns a bounded sample, exact requested KST window, and unknown full-window total.",
         "inputSchema": {
             "type": "object", "additionalProperties": False,
             "properties": {
@@ -132,7 +132,7 @@ def validate_args(kind, args):
     return out
 
 
-def build_query(kind, args):
+def build_query(kind, args, at=None):
     """Construct a fixed, bounded DSL; callers never supply an index or query."""
     label = "suricata" if kind == "suricata" else "modsecurity"
     identity = [
@@ -140,8 +140,12 @@ def build_query(kind, args):
         {"term": {"data.capstone.source": label}},
         {"exists": {"field": "data.alert.signature_id" if kind == "suricata" else "data.transaction.producer.modsecurity"}},
     ]
+    at = at or datetime.now(timezone.utc)
+    if at.tzinfo is None:
+        raise ValueError("timezone required for query window")
     filters = [
-        {"range": {"timestamp": {"gte": "now-%dm" % args["lookback_minutes"]}}},
+        {"range": {"timestamp": {"gte": (at - timedelta(minutes=args["lookback_minutes"])).isoformat(),
+                                  "lte": at.isoformat()}}},
         {"bool": {"should": identity, "minimum_should_match": 1}},
     ]
     if "source_ip" in args:
@@ -281,6 +285,12 @@ def search(kind, args):
             break
     return {
         "source": kind, "lookback_minutes": params["lookback_minutes"],
+        "requested_since_kst": _kst_timestamp(query["query"]["bool"]["filter"][0]["range"]["timestamp"]["gte"]),
+        "requested_until_kst": _kst_timestamp(query["query"]["bool"]["filter"][0]["range"]["timestamp"]["lte"]),
+        "returned_count": len(rows), "indexed_window_total_count": None,
+        "source_scope": "wazuh_indexed_alerts", "untrusted_evidence": True,
+        "evidence_scope_ko": "색인된 경보의 제한된 반환 표본입니다. 원시 센서 로그 직접 조회가 아니며 수집·색인 지연/누락이 가능합니다. "
+            "반환0건은 이 검색 표본0건을 뜻하고 전체 공격/경보 부재나 정상 판정을 입증하지 않습니다. 요청 구간 전체 건수는 미확인입니다.",
         "limit": params["limit"], "scanned": len(hits),
         "scan_capped": len(hits) >= query["size"],
         "alerts": rows,

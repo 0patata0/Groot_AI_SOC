@@ -587,7 +587,9 @@ def rule_inventory(kind, data):
     result = {"schema_version": 1, "kind": kind, "scope": "target_file_definitions",
               "source_sha256": sha256(data), "status": "unavailable", "declared_count": None,
               "unique_id_count": None, "ids": [], "duplicate_ids": [], "contiguous_id_groups": [],
-              "runtime_load_verified": False, "details": {}}
+              "runtime_load_verified": False,
+              "evidence_scope_ko": "대상 파일에 선언된 룰 정의만 집계했습니다. 엔진의 실제 적재 여부와 전체 활성 룰 수는 미확인입니다.",
+              "details": {}}
     try:
         if len(data) > MAX_CANDIDATE or b"\x00" in data or b"\r" in data:
             raise ValueError("unsupported inventory input")
@@ -620,12 +622,17 @@ def rule_inventory(kind, data):
     return result
 
 
+class NoBrokerRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        raise RuleChangeError("approval broker redirect refused")
+
+
 class Broker:
     def __init__(self, url, token):
-        if url not in ("http://10.200.10.10:8090", "http://127.0.0.1:8090") or not isinstance(token, str) or len(token) < 32:
+        if url not in ("https://10.200.10.10:8445", "http://127.0.0.1:8090") or not isinstance(token, str) or len(token) < 32:
             raise RuleChangeError("dedicated approval broker is not configured")
         self.url, self.key = url, token.encode("ascii")
-        self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoBrokerRedirect())
 
     def request(self, method, path, body=None):
         data = b"" if body is None else json.dumps(body, ensure_ascii=False).encode("utf-8")

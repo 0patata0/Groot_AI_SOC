@@ -221,7 +221,7 @@ def enhance_compose(compose, data, profile):
     compose['services']['waf']['pull_policy'] = 'never'
     compose['networks']['waf'] = {'driver': 'bridge', 'ipam': {'config': [{'subnet': data['subnet']}]}}
     compose['services']['lab-edge'] = {
-        'image': data['image'], 'pull_policy': 'never', 'container_name': EDGE, 'restart': 'unless-stopped',
+        'image': data['image'], 'pull_policy': 'never', 'container_name': EDGE, 'restart': 'always',
         'user': '101:101', 'read_only': True, 'cap_drop': ['ALL'], 'security_opt': ['no-new-privileges:true'],
         'entrypoint': ['nginx'], 'command': ['-c', '/etc/capstone/nginx.conf', '-g', 'daemon off;'],
         'working_dir': '/tmp', 'healthcheck': {'disable': True}, 'tmpfs': ['/tmp:' + TMPFS['/tmp']],

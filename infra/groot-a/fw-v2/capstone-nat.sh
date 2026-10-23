@@ -6,7 +6,7 @@
 # v1 대비 변경(보안룰_취합.md 0-B):
 #  P1  FORWARD 정책 DROP(Docker 본래 상태 복원) — 비허용 라우팅 forward(예: Kali→10.200.10.x) 차단
 #  P2  내부→외부 egress 는 EGRESS_ALLOW 허용목록만(B→DGX, DNS). B/C 가 임시 NIC 로 직접 나가는 동안은 효력 없음, NIC 제거 후 강제됨
-#  P8  컨테이너 east-west: WAF→C:80, chatproxy→B:8065/443 만. 컨테이너→외부/내부 그 외 drop
+#  P8  컨테이너 east-west: WAF→C:80, chatproxy→B:8444/443 만. 컨테이너→외부/내부 그 외 drop
 #  P9  forward drop 은 "FW_DROP_FWD " 로그(제한) → Wazuh 측면이동 신호
 #  P11 관리 DNAT(10443→B:443) 출발지를 VM 세그먼트로 제한
 #  구조: DOCKER-USER 에 허용 룰을 흩뿌리지 않고 전용 체인 CAPSTONE-FWD 를 만들어 매 적용마다 flush+재구성(결정적). DOCKER-USER 는 jump 1줄만.
@@ -39,7 +39,7 @@ EGRESS_ALLOW=(
 # P8: 컨테이너 east-west 허용 "<dst>:<proto>:<ports>" (브리지 br-* / docker0 → 내부망)
 EASTWEST_ALLOW=(
   "${C_IP}:tcp:80:WAF -> DVWA"
-  "${B_IP}:tcp:8065,443:chatproxy -> Mattermost / Wazuh dashboard backend"
+  "${B_IP}:tcp:8444,443:chatproxy -> Mattermost / Wazuh dashboard backend"
 )
 
 # BEGIN LOG4SHELL_TLS_WAF_HELPERS

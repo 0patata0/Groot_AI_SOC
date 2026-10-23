@@ -1,5 +1,7 @@
 # Groot_AI_SOC
 
+> 최신 완료·검증·남은 작업·Git 반영 상태는 [STATUS.md](STATUS.md)를 기준으로 확인한다. 2026-10-23 일시정지 구간 재검증은 운영267/267 통과, 회귀240개 통과·환경상1개 생략이며 실제 SDK 재조회도 통과했다.
+
 ## 읽기 전용 시스템 진단 운영 연결 완료 (2026-10-23)
 
 A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snapshot reader·단일 `get_system_diagnostics` MCP를 연결했다. 일반 sudo·Docker·임의 shell/journal 권한은 추가하지 않는다. 기존 B는 원본 해시·유휴/승인/lease 검사와 복구 백업을 거쳐 최소 이관했으며, 단일 `deploy.sh`의 새 서버 설치 경로도 같은 소스 계약을 사용한다. 운영 서버에는 초기 설치기 전체를 실행하지 않았다.

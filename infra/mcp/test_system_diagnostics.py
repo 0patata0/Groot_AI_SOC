@@ -324,6 +324,30 @@ class RouterTests(unittest.TestCase):
             for _ in range(30): m.query({'target': 'b:soc-bot'})
             with self.assertRaisesRegex(d.DiagnosticError, 'rate_limit'): m.query({'target': 'b:soc-bot'})
 
+    def test_kst_rendering_uses_observed_epoch_and_preserves_original_fields(self):
+        checked = 1792774726
+        value, _ = snapshot('siem', [])
+        offset = checked - NOW
+        value['checked_at'] += offset
+        value['expires_at'] += offset
+        with patch.object(d, 'read_snapshot', return_value=value), patch.object(m.time, 'time', return_value=checked + 30), patch.object(m, 'audit'):
+            result = m.query({'target': 'b:soc-bot', 'lookback_minutes': 15})
+        self.assertEqual(result['observed_at'], checked)
+        self.assertEqual(result['observed_at_kst'], '2026-10-24T01:58:46+09:00')
+        self.assertEqual(result['requested_since_kst'], '2026-10-24T01:44:16+09:00')
+        self.assertEqual(result['age_seconds'], 30)
+
+    def test_returned_sample_count_is_never_reported_as_window_total(self):
+        unit = d.PROFILES['siem']['b:soc-bot']
+        for unavailable in (False, True):
+            value, _ = snapshot('siem', [record(unit, ago=10), record(unit, ago=60), record(unit, ago=7200)],
+                                fail='journal' if unavailable else None)
+            with patch.object(d, 'read_snapshot', return_value=value), patch.object(m.time, 'time', return_value=NOW), patch.object(m, 'audit'):
+                result = m.query({'target': 'b:soc-bot', 'lookback_minutes': 1, 'limit': 1})
+            self.assertEqual(result['returned_error_count'], None if unavailable else 1)
+            self.assertIsNone(result['requested_window_total_count'])
+            self.assertEqual(result['error_observations']['count'], None if unavailable else 3)
+
     def test_recent_request_outside_snapshot_coverage_is_not_available(self):
         value, _ = snapshot('siem', [])
         with patch.object(d, 'read_snapshot', return_value=value), patch.object(m.time, 'time', return_value=NOW + 120), patch.object(m, 'audit'):

@@ -1,5 +1,11 @@
 # CVE-2021-3156 sudo 패키지·격리 환경 준비
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../../STATUS.md) · [실행 계획](../../../../../PLAN.md).
+> 현재 콘솔은 HTTP3개(Log4Shell/Apache2종)와 터미널3개(Redis/Samba/sudo), 총6항목이다. sudo는 별도 rootless의 UID1000·전역 단일 세션이며 종료 시 전체 중지한다. DVWA는 독립 유지한다. 환경 준비와 CVE 악용 성공을 구분하고 공격 재현은 보류한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 이 디렉터리는 C 호스트의 sudo를 변경하지 않고 **별도 rootless Docker**에서 Ubuntu 20.04의 sudo `1.8.31-1ubuntu1` 패키지를 준비하고 확인한다. 공격 페이로드·exploit·웹 shell·임의 명령 실행 API는 포함하지 않는다. CLI의 유일한 컨테이너 내부 검사는 고정된 `/lab/check.sh`이며 `sudo --version`, `dpkg-query`, 파일 소유권/권한을 확인한다. 운영 `/var/run/docker.sock`, 기존 웹 broker, `nonweb-labs/lab.sh`, 전역 Docker 설정은 사용하거나 변경하지 않는다.
 
 **현재 확인 범위(2026-10-22~23 KST, C 실측):** Ubuntu 24.04.5의 별도 계정 `capstone-sudo`(UID/GID 1991)에 Docker 29.8.1·RootlessKit 3.1.0 환경을 설치했다. Ubuntu/Docker 저장소 서명과 패키지 해시 검증, 오프라인 이미지 빌드·반입, Linux 네이티브 회귀 26개와 `check → up → verify → 실행 중 up → stop → 새 CID up → verify`가 통과했다. 매 `verify`에서 고정 `docker exec /lab/check.sh`를 새로 실행했다. rootless 컨테이너는 실행 상태로 유지한다. **권한 상승 공격과 원래 호스트 auditd→Wazuh 시나리오는 실행하지 않았다.** 웹의 `ready`도 패키지와 격리 환경 확인만 뜻한다.

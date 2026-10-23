@@ -1,5 +1,11 @@
 # 50 EPS · 600초 사적 analysisd 부하 관측
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../../../STATUS.md) · [실행 계획](../../../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 2026-10-15 10:47:43 KST 기준 **B 실제 시험 PASS, 전체642.808초**. 검토와 B 계약16개 통과 후 `EXECUTION_REVIEWED=True`로 활성화한 source `3ca9499f6e4635995843be8db28fd9afdd58c8e370aa065495771d4a5dac72f8`를 실행했다. [실제 결과](validation-2026-10-15.json)는 600초 부하·30,000개 exact archive·4,000개 leaf·drop0·최종 queue0·사적 자식 정리와 운영 전후 불변을 기록한다. 사적 agent000의 한 회차이며 전체 수집 파이프라인/Indexer/agent001/장기 재시작 검증은 아니다.
 
 운영 소스/서비스/원천/체크포인트를 바꾸지 않고 B의 설치 binary·규칙·decoder를 복사한 사적 analysisd 하나에 합성 30,000행을 보냈다. 기존 60초 시험과 구분하여 `analysisd.event_threads=1`, `analysisd.rule_matching_threads=1`, `analysisd.decoder_order_size=1024`를 확인했다. 준비 전/복사 후/종료 후 이 값과 운영 PID·시작시각·queue inode·고정 보호 파일 SHA를 대조했다.

@@ -1,5 +1,11 @@
 # Suricata Wazuh checkpoint 불일치 조사
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../../STATUS.md) · [실행 계획](../../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **2026-10-15 운영 반영 완료:** stats-ignore 제거와 제한 AR 활성화, agent stop/start각1회 및 timer/guard복원을마쳤다. 이후 native통계필드한도 문제는 B1024설정으로보완했다. 자연stats2행·CP27표본 불일치0, Boverflow0/agent001Active 확인. 원문/CP수동수정0. 재현62파일은 `/var/backups/capstone-suricata-stats-ignore-20261015/native-checkpoint-comparison.tgz`로보존·검증후전용임시경로제거했다. 아래사전분석과구분한다.
 
 2026-10-15 KST 조사 기록이다. 이 폴더는 원인 조사·종료형 격리 시험과 검토 중인 고정 A 일회성 수정 후보를 포함한다. 현재 운영 적용은 하지 않았다. 운영 checkpoint와 guard를 수정하는 경로는 없으며 새 패키지·상주 Python·운영 원문 반출도 없다.

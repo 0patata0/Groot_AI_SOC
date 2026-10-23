@@ -1,5 +1,11 @@
 # 저장공간 상태의 Wazuh 연결 후보
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 기존 서버의 운영 자동화와 새 서버 초기 설치는 구분한다. 지정 범위의 C1/B1/A2 재부팅 복구는10/24 검증 이력이 있으며 최초 실패·수동 복구도 보존한다. 현재6실습·MCP6서버를 기준으로 읽고 과거 후보/PID/시험 결과를 새 실측으로 해석하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 2026-10-15 KST 검증 결과: 부모가 B에서 실행한 Linux relay 17개와 실제 Wazuh logtest 56개가 모두 통과했다. [상위 monitor](../README.md)의 canonical 18키 JSON을 전용 decoder `capstone_storage_json`으로 분류한다. 로컬 정적 fixture 56개·relay jq 7개·Bash 구문도 통과했다. 실제 localfile·relay 설치와 재시작 이후 수신 결과는 부모의 배포 기록에서 별도로 확인해야 한다.
 
 후속 운영 관측(2026-10-15 09:02 KST): 부모가 A/B 자연 timer 실행의 exit0·상태 `ok`를 확인했다. B relay 파일은 1,014B/2행이고 Wazuh checkpoint가 EOF이며 prefix SHA와 일치했다. 이는 해당 로그의 native 읽기 위치와 자연 주기 동작 근거다. 정상 level0 상태의 Indexer 경보 생성이나 미래 전달 무손실을 의미하지 않는다. 상세 운영 원본·영수증은 부모의 server evidence에 보존한다.

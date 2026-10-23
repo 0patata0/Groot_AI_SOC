@@ -1,5 +1,11 @@
 # 시나리오 ↔ ATT&CK 기법 정답표 (평가 ground truth)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 6개 CVE 재현·탐지 연결(작업3번)은 사용자 지시로 보류한다. 현재 실습은 HTTP3개와 Redis/Samba/sudo 터미널3개이며 DVWA는 독립 경로다. 아래 정답·룰 ID·공격 경로는 기대값/과거 계획으로 보존하며 실행 완료를 뜻하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > 용도: 평가(3단계)에서 에이전트 판단을 채점하는 **정답 기준**. 각 시나리오 단계가 어떤 ATT&CK 기법에 해당하고(탐지 대상), 우리 인프라에서 어떤 탐지(rule id)가 떠야 하며, 에이전트가 내놓아야 할 **올바른 판단(verdict / attack_chain / 적절 대응)**을 정의한다.
 > 성격: **블루팀 탐지·대응 검증 자료**(공격 수행 절차 아님 — 절차는 `scenarios/*.md` + `references.md`의 공개 표준 인용). 기법 ID 는 ATT&CK v19.2 에 실재·비폐기 확인(2026-10-02).
 > 기계판: `scenarios/ground-truth.json`. 룰 id 상세는 `alerts.md`·`README.md`, 기법 설명은 `datasets/processed/knowledge/attack_techniques.jsonl`.

@@ -1,5 +1,11 @@
 # GROOT layer A (WAF) integration contract
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 이 문서의 제출/검사/적용 기록은 해당 날짜의 범위다. 공식 규칙 후보27개는 조사 자료이며 자동 설치·운영 반영 완료가 아니다. Suricata passive 탐지, DVWA WAF와 실습 WAF의 서로 다른 모드, 정확 후보 승인 경계를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **2026-10-08 follow-up:** SSH checks reconfirmed 10 active custom WAF IDs in `DetectionOnly`, 11 local Suricata SIDs in passive mode, and the missing new FW/WAF classifications on B. The later 2026-10-06 security-events MCP and Hermes queries did establish one local IPS mapping: SID `1000010` → Wazuh `100110`; other local SIDs and scenario-triggered alerts remain unverified. The separate approval-gated rule-change MCP is now deployed on A/B with Hermes `rule-a`/`rule-b`; authenticated read checks passed and runtime rule hashes were unchanged. Actual approval→rule application/rollback remains untested. The earlier check and original contract below are retained as dated evidence. See [current status](../STATUS.md) and [deployment record](../대화기록/2026-10-08.md).
 
 > **Status from the 2026-10-06 SSH recheck, with rule-count correction.** The WAF service is healthy, its custom GROOT conf is mounted, `nginx -t` passes, and it remains `DetectionOnly`. The live custom conf has **10 unique active rule IDs**; chained rules make `SecRule` appear on 12 directive lines. The earlier count of 11 was incorrect; `id:10010` is commented out and is not active. FW v2 has `FORWARD=DROP`; Suricata is passive with `/rules/all.rules`, 11 local SIDs, and Phase-A options. B manager's `local_decoder.xml` and `local_rules.xml` lack the new WAF 100200+ and FW-prefix classifications; local IPS SID classification was not established by this check. Verify each before claiming end-to-end alerts. WAF `On` and IPS inline/drop remain pending. The original contract below predates deployment; the intended blocking integration uses `agent_block` and the approval broker. Broker URL and token environment variables are set on A. A generic Tier 2 approval-to-block path was verified on 2026-09-28, but this SSH recheck did not repeat it and the new WAF-alert-triggered path is unverified.

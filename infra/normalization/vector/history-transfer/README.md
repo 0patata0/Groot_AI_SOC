@@ -1,5 +1,11 @@
 # 닫힌 history 배치의 B 파일 보관 수신기
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **11:02 KST 마감:** 소스는 A/B `/opt/capstone-automation/project/infra/normalization/vector/history-transfer/`에 보관했고, 실제 두 배치의 재검증을 해당 보관본으로 통과했다. 증거는 `project/evidence/history-20261014/`, 변경 전 소스는 `/var/backups/capstone-history-source-20261014/`다. 작업용 source staging·합성자료·사용자 upload·Mac 임시97파일은 제거했다. 운영 A/B 원본·수신증과 B root incoming은 보존한다. [정리 집계](cleanup-2026-10-14.json).
 
 **실측:** 후속 회수까지 포함한 native 합성144개가 통과했다(export25/continuation24/receiver41/promotion33/ACK21). 실제 A→B 합성3건/666bytes에서 첫 B 응답을 버린 후 같은 수신증·유일 배치1개를 확인하고 A의 반복 저장도 검증했다. 실제1,000건+481건도 두 SHA/fsync/원자 저장 후 첫 수신증을 유지했다. A/B에서 합계1,481개 cursor가 유일하고 원본manifest는 계속 remote_receipt=false인 최초 기록을 보존한다. 이후 수신 사실은 별도 receipt가 증명한다. [실측 JSON](deployment-2026-10-14.json).

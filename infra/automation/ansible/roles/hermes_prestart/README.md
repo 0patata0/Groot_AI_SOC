@@ -1,5 +1,11 @@
 # 고정 B Hermes 첫 시작 전 설치와 실제 복귀
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../../STATUS.md) · [실행 계획](../../../../../PLAN.md).
+> 기존 서버의 운영 자동화와 새 서버 초기 설치는 구분한다. 지정 범위의 C1/B1/A2 재부팅 복구는10/24 검증 이력이 있으며 최초 실패·수동 복구도 보존한다. 현재6실습·MCP6서버를 기준으로 읽고 과거 후보/PID/시험 결과를 새 실측으로 해석하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 ## 2026-10-23 진단 MCP 호환 계약 — 소스 검증
 
 기존 정확한5개 MCP 또는 그 집합에 `system-diagnostics` 하나만 추가한 정확한6개를 읽기 사전 점검에서 허용한다. 새 서버는 `get_system_diagnostics` 도구1개와 이름 목록 SHA까지 고정한다. 임의 서버·추가 도구·다른 SSH 명령은 거절하며 `initialize`/`tools/list`만 호출한다. 현재 일반 `hermes-prestart-b.yml`의 source/probe SHA를 동기화했고, 아래10/15의 postcreate/postinstall 전용 playbook·증거는 당시 고정 컨테이너 이력으로 보존한다. 이 소스 검증은 새 lifecycle 실행이나 운영 전환 완료를 뜻하지 않는다.

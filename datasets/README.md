@@ -1,5 +1,11 @@
 # 에이전트 파인튜닝 데이터셋 카탈로그 (2026-10-01)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 기존30B LoRA 준비 데이터는 train18,872/validation980/test932개이며10/24 로컬 행 수·SHA 대조가 일치했다. 운영35B와 다른 후보이고 GPU 학습/실모델 비교는 아직 없다. 공개 corpus·지식·독립 평가·우리 SOC 검수 trajectory의 역할을 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > 2026-10-02 별도 검증 폴더에서 작성된 고유 메모는 [검증 차이 기록](검증_차이_2026-10-02.md)에 보존했다. 그 폴더의 raw/processed 데이터는 이 디렉터리의 파일과 바이트 단위로 일치해 중복본을 정리했다. 검증 스크립트는 [validate_and_clean.py](validate_and_clean.py)로 옮겼다.
 
 > 대상 에이전트: Hermes Agent(B) + `qwen3.6:35b`(DGX Ollama)로 **경보 이후 조사·상관분석·침해판단·대응(승인)** 을 한국어로 수행. 10/08 배포 기준 MCP는 읽기 `wazuh-ro`·`security-events`, IP 대응 `resp`, 승인형 로컬 룰 변경 `rule-a`·`rule-b`의 5서버다. 초기 17툴 목록은 전체 현행 목록이 아니므로 학습 데이터는 실제 도구 이름·스키마를 다시 조회해 맞춘다. [현재 MCP 구성](../infra/mcp/README.md).

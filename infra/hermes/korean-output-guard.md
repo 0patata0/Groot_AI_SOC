@@ -1,5 +1,11 @@
 # Hermes 한국어 출력 검사
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> 현재 구성은 MCP6서버와 고정 진단25대상이다. 자연어 도구 선택·무근거 완료/SILENT 알림 보완의 실제 검증 상태는 STATUS 최상단을 따른다. 정확 후보 승인과 일반 sudo/Docker/임의 shell 금지는 유지한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 ## 2026-10-15 최신 후속 — 첫 시작 전 설치와 실제 복귀 검증
 
 [고정 B 운영자 prestart 경로](../automation/ansible/roles/hermes_prestart/README.md)에서 새 후보가 처음 실행되기 전에 가드 3파일·격리 regex를 설치하고 17개 파일을 다시 읽어 확인했다. 실제 후보 첫 시작·readiness를 통과한 뒤 고정 시험 실패를 주어 원래 컨테이너로 복귀했으며, 최종 `rolled-back/revision22`다. 원래 CID `6c2ed13aea89…`는 PID2248019로 운영 중이고 후보 `47aa31c88f9d…`는 정지 보존한다. 두 번째 전환이나 컨테이너 삭제는 하지 않았다.

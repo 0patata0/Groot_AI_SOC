@@ -1,5 +1,11 @@
 # Suricata IPS 룰셋 (ET Open) — 반입 기록
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **2026-10-13 19:54 최신 확인:** SID 1000000의 고정 Ollama 흐름 목적지를 `[211.170.162.110,211.170.162.111]:11434/TCP`·rev 2로 갱신해 기존 선택 6종 예외를 `.111`에도 적용했다. 원본 출발지 `192.168.16.230`·기존 guard·ET 원본을 유지했고 전체 검사와 기존/후보 각각 27개 PCAP 사례를 통과했다. 부분 편집의 실제 카드 승인 후 같은 컨테이너가 재시작했고 19:50:41 실제 로드 52,497·실패/skip 0, local SHA `82f41d65…`·all `8669bab4…`를 확인했다. 아래 `.110` 단독·이전 해시 설명은 당시 기록이다. [현재 룰](../../new_rule/GROOT_A_local.rules) · [회귀 검사 생성기](../mcp/validate_dgx_endpoint_transition.py).
 
 > **현재 로딩 경로(2026-10-08 SSH·배포 기록):** A의 `/home/groot_a/capstone/suricata/ruleset/`을 컨테이너 `/rules`로 마운트하고, `suricata.rules`(ET)+`GROOT_A_local.rules`(로컬 SID 11개)를 합친 `all.rules`를 `-S /rules/all.rules`로 로드한다. 아래 스테이징·반입 절차는 9/26 기록이며 현재 로딩 경로와 다르다. ET 갱신 때에는 운영 합본 재작성·구문 검사·리로드까지 검증해야 한다. 배포된 승인형 `rule-a`는 로컬 룰 변경용이며 ET 자동 갱신 기능은 아니다. 실제 승인→적용 E2E는 미검증이다. [현재 운영 문서](README.md) · [승인형 변경 대상](../mcp/rule-change-deploy.md).

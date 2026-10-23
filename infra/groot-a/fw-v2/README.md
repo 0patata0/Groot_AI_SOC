@@ -1,5 +1,11 @@
 # FW v2 — Groot_A "빡빡한 룰" (2026-10-01 설계, 2026-10-06 상태 갱신)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 ## 2026-10-13 19:30 KST — DGX 자동 차단 보호 반영
 
 A의 라이브 `never_block`과 영구 설정 `/etc/nftables.d/capstone-fw.nft`에 **`211.170.162.110/32`·`211.170.162.111/32` 두 주소를 추가했다.** 영구 파일 SHA-256은 `6c73c480…`, 백업은 `/var/backups/dgx-never-block-20261013.74xh6tzc`다. 저장소 사본에도 같은 두 보호 주소를 반영했다.

@@ -1,5 +1,11 @@
 # Suricata 원본 회전의 native 격리 시험
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **2026-10-14 20:44 KST 관련 단계 갱신:** 아래 Suricata 시험과 별도로 [WAF 전용 격리 시험](../waf-rotation/README.md)도 통과했다. 새 audit/access 경로·새 배포 ID를 쓰는 4세대 6요청(2/1/1/2)에서 늦은 이전 worker 기록, reader 정지 중 연속 두 회전, 세 번의 인접 공개, 동일 checkpoint 정상 재시작을 확인했다. Vector audit/access 각각 6건·Wazuh audit 6건, 중복 0건이다. Vector의 원문 행 SHA와 Wazuh의 native cJSON 재직렬화 SHA를 구분했고, Wazuh SIGTERM 종료 코드 1·최종 offset/SHA 및 Vector 종료 코드 0으로 정상 종료를 확인했다. [WAF 검증 결과](../waf-rotation/validation-2026-10-14.json).
 
 별도 보관본 결합은 6쌍의 ID·KST 시각·SHA 일치, 잘못된 배포 ID 4건 격리, audit 격리를 관측한 뒤 실행 시작 약2.51초에 짝을 추가한 사례의 ready 0·quarantine 1·access 단독 제외 1을 확인했다. 이는 신뢰 manifest로 source 메타데이터를 복원한 오프라인 시험이며 실시간 join 검증이 아니다. 운영 copytruncate는 유지하고 UID 101 writer 재현·원격 ACK·crash/재부팅 복구는 미완료다. 이번 WAF 회차는 20:44:38 운영 보호59파일·서비스·PID/CID 불변을 확인했고 20:45:57 원본205파일을 A 영구 경로에 SHA 대조 보관했다. 소스 보관/작업경로 정리는 후속 마감으로 기록한다. 아래 Suricata 시험 이력과 소스는 변경하지 않았다.

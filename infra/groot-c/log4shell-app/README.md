@@ -1,5 +1,11 @@
 # Log4Shell Java 실습 웹
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> 현재 콘솔은 HTTP3개(Log4Shell/Apache2종)와 터미널3개(Redis/Samba/sudo), 총6항목이다. sudo는 별도 rootless의 UID1000·전역 단일 세션이며 종료 시 전체 중지한다. DVWA는 독립 유지한다. 환경 준비와 CVE 악용 성공을 구분하고 공격 재현은 보류한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **2026-10-22 변경:** 공개 `/log4shell/` 주소는 [오프라인 실습 관리 웹](../offline-labs/README.md)으로 전환했다. 이 Java 앱과 검증된 기존 JAR는 첫 CVE 항목에 포함하며 새 실습은 C의 `127.0.0.1:18081`에 실행하며 같은 HTTPS 사이트의 `/log4shell/labs/CVE-2021-44228/`에서 WAF를 거쳐 접속한다. 키 없이 실습할 수 있고 선택적인 WAF 차단 예외 키·일회용 서명은 관리 웹에서 처리한다. 기존 `log4shell-lab` 컨테이너는 복구용으로 보존했다. 아래 10/19 공개 라우팅·설치 기록과 현재 관리 웹을 구분한다.
 
 Spring Boot가 입력 화면과 API를 직접 제공한다. 브라우저에서 `message` 요청 파라미터 또는 `X-Api-Version` 헤더를 선택해 원문을 `logger.info(raw)`에 전달한다. 기존 PHP 중계 웹을 교체하는 소스이며 공격 페이로드·콜백 서버·명령 실행 기능은 포함하지 않는다.

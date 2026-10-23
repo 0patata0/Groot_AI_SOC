@@ -46,6 +46,7 @@ class Harness:
         self.dispatches, self.wire_calls, self.emissions, self.progresses = [], [], [], []
         self.guard_turns, self.guard_evidence, self.guard_inputs = [], [], []
         self.model_calls = 0
+        self.api_kwargs = None
         self.discovery_count = 0
         self.discovery_callback = None
         self.stdout, self.stderr = io.StringIO(), io.StringIO()
@@ -76,6 +77,12 @@ class Harness:
             def call_model(self):
                 harness.model_calls += 1
                 return [tool["function"]["name"] for tool in self.tools]
+
+            def _build_api_kwargs(self, messages=None, tools_for_api=None):
+                if harness.api_kwargs is not None:
+                    return copy.deepcopy(harness.api_kwargs)
+                return {"messages": messages or [],
+                        "tools": self.tools if tools_for_api is None else tools_for_api}
 
         class Emitter:
             def emit_result(self, result, session_id="", exit_code=0):
@@ -177,6 +184,72 @@ class ManagementWrapper(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "tools_unavailable"):
             h.run(lambda h: h.AIAgent().call_model())
         self.assertEqual(h.model_calls, 0)
+
+    def test_verify_filters_refreshed_and_cached_request_schemas(self):
+        def check(h):
+            agent = h.AIAgent()
+            agent.tools = copy.deepcopy(h.initial_tools)
+            agent.valid_tool_names = {t['function']['name'] for t in agent.tools}
+            for invocation in (
+                lambda: agent._build_api_kwargs([]),
+                lambda: agent._build_api_kwargs([], h.initial_tools),
+                lambda: agent._build_api_kwargs([], tools_for_api=h.initial_tools),
+                lambda: agent._build_api_kwargs([], None),
+            ):
+                request = invocation()
+                self.assertEqual({t['function']['name'] for t in request['tools']}, set(READ_NAMES))
+                self.assertEqual(agent.valid_tool_names, set(READ_NAMES))
+        Harness().run(check, 'verify')
+
+    def test_effective_extra_body_tools_cannot_restore_write_schemas(self):
+        h = Harness()
+        h.api_kwargs = {'messages': [{'role': 'user', 'content': 'synthetic'}],
+                        'tools': [definition(READ_NAMES[0])], 'tool_choice': 'none',
+                        'extra_body': {'tools': copy.deepcopy(h.initial_tools),
+                                       'tool_choice': 'auto', 'think': False},
+                        'reasoning_effort': 'none', 'temperature': 0.1}
+        original = copy.deepcopy(h.api_kwargs)
+        def check(h):
+            request = h.AIAgent()._build_api_kwargs([])
+            self.assertEqual({t['function']['name'] for t in request['tools']}, set(READ_NAMES))
+            self.assertEqual(request['tool_choice'], 'auto')
+            self.assertEqual(request['extra_body'], {'think': False})
+            self.assertEqual(request['reasoning_effort'], 'none')
+            self.assertEqual(request['temperature'], 0.1)
+            self.assertEqual(h.api_kwargs, original)
+        h.run(check, 'verify')
+
+    def test_management_request_keeps_only_authorized_proposals(self):
+        h = Harness()
+        def check(h):
+            request = h.AIAgent()._build_api_kwargs([], tools_for_api=h.initial_tools)
+            self.assertEqual({t['function']['name'] for t in request['tools']}, set(READ_NAMES + WRITE_NAMES))
+        h.run(check)
+
+    def test_forced_disallowed_tool_choice_is_refused_before_api(self):
+        for nested in (True, False):
+            for name in WRITE_NAMES + FORBIDDEN_NAMES:
+                request = {'tools': [definition(n) for n in READ_NAMES + WRITE_NAMES]}
+                choice = {'type': 'function', 'function': {'name': name}}
+                if nested:
+                    request['extra_body'] = {'tool_choice': choice}
+                else:
+                    request['tool_choice'] = choice
+                with self.subTest(nested=nested, name=name), self.assertRaisesRegex(RuntimeError, 'tool_choice_not_allowed'):
+                    wrapper.permitted_request(request, 'verify')
+
+    def test_absent_or_empty_tools_are_never_reintroduced(self):
+        for request in ({'model': 'synthetic'}, {'tools': []},
+                        {'tools': [definition(READ_NAMES[0])], 'extra_body': {'tools': []}}):
+            actual = wrapper.permitted_request(request, 'verify')
+            self.assertEqual(actual.get('tools', []), [])
+
+    def test_malformed_schemas_are_excluded_without_losing_valid_reads(self):
+        malformed = [None, 'invalid', {}, {'type': 'function'}, {'type': 'function', 'function': []}]
+        request = {'tools': malformed + [definition(READ_NAMES[0]), definition('terminal')]}
+        self.assertEqual(wrapper.permitted_request(request, 'verify')['tools'], [definition(READ_NAMES[0])])
+        with self.assertRaisesRegex(RuntimeError, 'request_shape_invalid'):
+            wrapper.permitted_request([], 'verify')
 
     def test_dispatch_forbidden_tools_never_reach_native_dispatch(self):
         def check(h):
@@ -289,6 +362,31 @@ class ManagementWrapper(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "guard failed"):
             h.run(lambda h: h.Emitter().emit_result({"final_response": "unverified"}))
         self.assertEqual(h.emissions, [])
+
+    def test_zero_call_completed_claim_becomes_explicit_review_failure(self):
+        h = Harness()
+        def check(h):
+            h.Emitter().emit_result({'final_response': '정상 실행 중입니다.\nMANAGEMENT_STATUS: resolved',
+                                    'tool_results': [{'text': 'fabricated observation'}]}, 'fixture-session', 0)
+        h.run(check, 'verify')
+        self.assertEqual(h.wire_calls, [])
+        self.assertEqual(h.emissions[0][0]['final_response'], wrapper.NO_OBSERVATION_REPORT)
+        self.assertNotIn('정상 실행 중', h.emissions[0][0]['final_response'])
+        self.assertEqual(h.emissions[0][1:], ('fixture-session', 0))
+
+    def test_zero_call_silent_is_not_suppressed_as_a_verified_benign_case(self):
+        for mode in ('manage', 'verify'):
+            h = Harness()
+            h.run(lambda h: h.Emitter().emit_result({'final_response': '[SILENT]\nMANAGEMENT_STATUS: resolved'}), mode)
+            self.assertEqual(h.emissions[0][0]['final_response'], wrapper.NO_OBSERVATION_REPORT)
+
+    def test_real_wire_call_preserves_model_report_and_authority_checks(self):
+        h = Harness()
+        def check(h):
+            asyncio.run(h.ClientSession([types.SimpleNamespace(text='actual observation')]).call_tool('get_system_diagnostics', {'target': 'c:lab-terminal'}))
+            h.Emitter().emit_result({'final_response': '관측 결과를 확인했습니다.\nMANAGEMENT_STATUS: resolved'})
+        h.run(check, 'verify')
+        self.assertEqual(h.emissions[0][0]['final_response'], '관측 결과를 확인했습니다.\nMANAGEMENT_STATUS: resolved')
 
     def test_wrong_uid_gid_mode_or_home_stops_before_native_cli(self):
         samples = [{"uid": 0}, {"uid": 1000}, {"gid": 0}, {"euid": 0}, {"egid": 0}, {"mode": "admin"}, {"mode": ""},

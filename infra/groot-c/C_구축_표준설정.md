@@ -1,5 +1,11 @@
 # Groot_C 구축 표준설정 (A·B와 맞추기 위한 핸드오프)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> 현재 콘솔은 HTTP3개(Log4Shell/Apache2종)와 터미널3개(Redis/Samba/sudo), 총6항목이다. sudo는 별도 rootless의 UID1000·전역 단일 세션이며 종료 시 전체 중지한다. DVWA는 독립 유지한다. 환경 준비와 CVE 악용 성공을 구분하고 공격 재현은 보류한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **2026-10-19 20:30 KST 후속:** 현재 Java 웹은 `/opt/capstone-log4shell`의 영속 Compose로 관리한다. C에서 `sudo bash /opt/capstone-log4shell/manage.sh recreate`를 실행하면 보존된 JAR·환경으로 재생성한다. 실제 재생성과 컨테이너 부재 후 `up`·외부 HTTP/HTTPS·DVWA 확인을 완료했다. 원래 이미지와 내부 주소·Apache 경로를 유지하고 비root·읽기 전용 실행을 적용했다. [관리 안내](log4shell-app/README.md) · [검증](log4shell-app/compose-validation-20261019.json). 아래19:57 및 이전 기록은 당시 상태다.
 
 > **2026-10-19 정정·Java 웹 교체 완료:** 기존 `log4shell-lab`의 JAR·실행 환경 직접 확인 기록에서 Spring Boot **2.6.1**, Log4j API/Core 각각 **2.14.1**, Java **8u181**을 확인했다. 새 [Spring Boot 웹](log4shell-app/README.md)은 `/log4shell/` 화면과 API를 직접 제공하며, 상태 API에서 받은 CSRF 토큰·쿠키를 사용하는 `POST /log4shell/api/log`에서 실제 요청 헤더 또는 `message`를 변경 없이 로깅한다. 기존 PHP 중계와 이전 앱의 `GET /` 계약을 교체했고19:57 KST 적용·무해한 요청 검증을 완료했다. 상세 범위는 [STATUS](../../STATUS.md)의 후속 기록을 따른다. 무해한 요청의 응답·로그 확인은 실제 공격·콜백·보안 탐지 E2E가 아니다. 아래 10/15 PHP 화면·정상200/헤더누락400 및 더 이전 구축 설명은 당시 기록으로 보존하며, 이전 공격 절차를 새 앱에 그대로 적용할 수 없다.

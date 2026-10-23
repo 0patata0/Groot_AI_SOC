@@ -1,5 +1,21 @@
 # 고정 읽기 전용 시스템 진단
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> 현재 구성은 MCP6서버와 고정 진단25대상이다. 자연어 도구 선택·무근거 완료/SILENT 알림 보완의 실제 검증 상태는 STATUS 최상단을 따른다. 정확 후보 승인과 일반 sudo/Docker/임의 shell 금지는 유지한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
+## 2026-10-24 후속: 도구 선택·시각·표본 의미
+
+B의 진단 router는 원래 `observed_at` epoch를 유지하면서 `observed_at_kst`와 `requested_since_kst`를 `+09:00` ISO 시각으로 제공한다. 모델은 시각을 다시 암산하지 않고 이 값을 직접 인용한다. `returned_error_count`는 반환한 오류 표본 수이며 journal 이용 불가이면 `null`이다. `requested_window_total_count`는 항상 `null`로, 요청한15분 등의 전체 오류 건수를 확보했다는 주장을 하지 않는다. 기존 `error_observations.count`는 제한된4시간 수집 표본이라는 의미를 유지한다. 수집기·25대상·snapshot schema·TTL·권한은 바꾸지 않았다.
+
+사건 관리 runner는 초기 생성뿐 아니라 매 API 요청에서 native 재구성·캐시·`extra_body`의 유효 도구 목록을 다시 제한한다. verify는 읽기26개만 제공하고, manage의 기존 정확 승인 제안은 유지한다. 실제 MCP 호출 완료가0이면 모델의 완료/SILENT 주장을 상태 미확인·추가 검토 안내로 바꾼다. 관리자 알림과 모델 판단을 구분하며, 부족한 증거를 고정 정상 판정이나 자동 차단으로 대체하지 않는다.
+
+기존 B에는 root 소유 controller 안에 `-I -B -c` gate를 넣는 최소 이관을 적용했다. 새 설치기도 같은 원본 runner와 기존 렌더 경로를 사용한다. 원본과 배포된 controller의 SHA는 inline 변환 때문에 서로 다르다. 과거 v3/v4 검증 파일은 보존하고 최신 실제 자연어·전달 검증은 [STATUS](../../STATUS.md) 최상단을 따른다.
+
+## 기존 구축·조회 계약과 검증 이력
+
 2026-10-23 A/B/C 운영 반영과 실제 Hermes UID995 SDK 검증을 완료했다. 기존5개 MCP의 도구를 보존하고 여섯 번째 서버의 읽기 도구1개를 등록했으며, 관리/검증 모드의 읽기 허용과 임의 인자·쓰기 도구 거부를 확인했다. [원본 v3 성공과 v4 후속 증거](system-diagnostics-validation-20261023.json)를 구분해 남겼다. 모델의 자연어 사용과 새 서버 전체 설치는 수행하지 않았다. 기존 승인형 서비스 작업이나 LLM의 일반 sudo/Docker/SSH 금지 정책은 바꾸지 않는다.
 
 `system-diagnostics` MCP의 유일한 도구는 `get_system_diagnostics(target, lookback_minutes=15, limit=20)`다. `target`은 아래25개 중 하나, 기간은1~240분, 반환 오류는1~50개다. shell·임의 unit/host/path/command·journal 옵션·환경 변수 입력을 받지 않는다. `manage`와 `verify` 양쪽에서 읽기는 가능하지만 이 결과가 승인된 룰/서비스 대상의 별도 재조회·효과 검증을 대신하지 않는다.

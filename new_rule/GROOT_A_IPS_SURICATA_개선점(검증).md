@@ -1,5 +1,11 @@
 # Groot_A IPS(Suricata) 개선점 — **검증 반영판** (FW·WAF·IPS 합본 대비)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 이 문서의 제출/검사/적용 기록은 해당 날짜의 범위다. 공식 규칙 후보27개는 조사 자료이며 자동 설치·운영 반영 완료가 아니다. Suricata passive 탐지, DVWA WAF와 실습 WAF의 서로 다른 모드, 정확 후보 승인 경계를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **2026-10-08 후속 정정:** 이날 SSH로 ET+local 합본·Phase-A·로컬 SID 11개·passive 설정을 재확인했다. 10/06 후반 보안 이벤트 MCP와 Hermes 조회에서 로컬 SID `1000010`→Wazuh `100110` 인덱싱을 확인했다. 따라서 아래의 “local SID 분류 미확정”은 이전 점검 시점의 한계이며, 나머지 SID·시나리오 실발화는 여전히 미검증이다. 승인형 `rule-a` 배포로 Suricata 로컬 룰 변경 경로는 마련됐지만 실제 승인→적용 E2E와 ET Open 자동 갱신은 이번 배포의 완료 항목이 아니다. 9/29 감사 원문은 당시 기록으로 보존한다. [최신 상태](../STATUS.md) · [배포 기록](../대화기록/2026-10-08.md).
 
 > **후속 상태(2026-10-06 이번 세션 SSH 재점검):** 이 문서의 “현재 상태”와 §2 수치는 2026-09-29 읽기 전용 감사 스냅샷이다. A에서 ET+local 합본 `/rules/all.rules`(47,694,450B, local SID 11개) 단일 `-S` 로딩과 Phase-A 옵션·threshold 파일, passive `-i ens192`를 재확인했다. 앞선 [세션 1 기록](../대화기록/2026-10-06.md)에는 eve `community_id` 생성도 확인돼 있다. 따라서 아래 “로컬 SID 0개”와 “community-id 없음”, `-S /rules/suricata.rules`는 **현재 상태가 아니다**. B manager의 local SID 분류 여부는 이번 점검에서 확정하지 못했으며 공격 실발화 검증도 필요하다. NFQUEUE 인라인/drop은 미완료다.

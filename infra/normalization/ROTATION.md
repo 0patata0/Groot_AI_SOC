@@ -1,5 +1,11 @@
 # 파일 회전과 종료 증거 계약
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **2026-10-14 20:44 KST 최신 정정 — WAF의 실제 두 reader 격리 시험 완료.** 새 audit/access 경로와 세대별 배포 ID를 사용하는 별도 nginx/ModSecurity writer에서 4세대·6요청(2/1/1/2)을 시험했다. 이전 worker의 늦은 기록, reader 정지 중 연속 두 회전, 세 번의 인접 세대 공개, 같은 checkpoint를 사용하는 정상 reader 재시작을 통과했다. Vector의 audit/access 입력은 각각 6건, Wazuh의 audit 입력은 6건을 정확히 수신했고 중복은 0건이었다. 이 결과는 아래 10/13 writer 시험과 12:22 Suricata 시험에 추가되는 별도의 검증이다. [WAF 상세 범위](vector/waf-rotation/README.md), [검증 결과](vector/waf-rotation/validation-2026-10-14.json).
 
 Vector는 줄바꿈을 제외한 원문 행 SHA를 대조하고, Wazuh는 설치된 cJSON의 재직렬화 결과 SHA를 대조했다. Wazuh queue의 JSON 바이트를 원래 파일 바이트와 같다고 가정하지 않았다. 정상 재시작에서는 실제 SIGTERM 전달·강제 종료 없음과 함께 Wazuh의 종료 코드 1 및 최종 논리 offset/SHA, Vector의 종료 코드 0을 확인했다. 별도 보관본 결합 시험은 6건의 ID·KST 시각·SHA를 정확히 대조했고, 다른 배포 ID 4건은 격리했다. audit 격리를 관측하고 실행 시작 약2.51초 뒤 짝을 준 TTL 시험은 ready 0·quarantine 1·access 단독 제외 1이었다.

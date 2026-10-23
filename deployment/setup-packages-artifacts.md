@@ -1,5 +1,11 @@
 # 패키지·이미지·배포 자료 준비
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP6서버/고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 현재 기본 설치 경로는 [단일 Bash 초기 설치](bootstrap-guide.md)다. `deploy.sh --apply`가 각 서버의 승인된 `artifacts.json`에 따라 로컬 deb와 Docker archive를 설치한다. 아래 온라인 명령은 **외부 Linux 준비 환경에서 반입 자료를 만들거나 관리자가 사전에 설치할 때의 참고 절차**이며 폐쇄망 설치기가 실행하는 다운로드 명령이 아니다. Mac에는 패키지·JDK·Docker Desktop·가상환경을 설치하지 않는다.
 
 Log4Shell은 schema7부터 현재 콘솔과 검증된3개 웹이미지를 사용하며, schema8에서 Redis·Samba 터미널2종을 추가했고, 현재 schema9는 sudo까지 웹 터미널로 연결한6항목(웹3·터미널3) 카탈로그다. 아래 구형 Java 직접Compose/JAR 자동 빌드 설명은 과거 schema6 준비 절차이며 신규 기본 경로가 아니다. 기존 빌드 도구는 Java 이미지 준비에 사용할 수 있다. sudo 고정 rootless bundle·별도 Redis/Samba nonweb bundle·wheel·TLS 자료도 새 가이드에 따라 반입한다. sudo 웹 터미널 연결에는 기존 sudo 이미지·서명 bundle을 그대로 사용하고 중앙 nonweb 소스의 고정 어댑터를 함께 반입한다. 추가 패키지·이미지나 새 설정 키는 없다.

@@ -1,5 +1,11 @@
 # 초기 설치용 sudo rootless bootstrap
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../../../STATUS.md) · [실행 계획](../../../../../../PLAN.md).
+> 현재 콘솔은 HTTP3개(Log4Shell/Apache2종)와 터미널3개(Redis/Samba/sudo), 총6항목이다. sudo는 별도 rootless의 UID1000·전역 단일 세션이며 종료 시 전체 중지한다. DVWA는 독립 유지한다. 환경 준비와 CVE 악용 성공을 구분하고 공격 재현은 보류한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 `bootstrap.py`는 Ubuntu 24.04 amd64의 **새 전용 환경**에 고정 sudo 실습 프로파일을 설치한다. 기존 `history/` 스크립트를 실행하지 않는다. 현재 C의 수동 설치는 별도 완료 환경이며 이 helper의 관리 manifest가 없으므로 재적용을 거부한다. 코드·모의 회귀를 준비했으며 **이 helper로 새 VM 전체 설치를 실제 검증한 상태는 아니다.** 기존 C의 성공 증거를 새 설치기의 성공 증거로 바꾸어 해석하지 않는다.
 
 ```sh

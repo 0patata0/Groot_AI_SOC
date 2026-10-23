@@ -564,6 +564,10 @@ It reads classified root-published snapshots, normally updated every 60 seconds,
 with up to four hours of bounded error observations. Check age, Type, Result,
 exit status, journal availability and truncation; inactive/dead alone is not a
 failed oneshot. Snapshot errors and missing data never mean healthy or zero.
+Quote observed_at_kst directly instead of converting the epoch yourself.
+returned_error_count is only the returned sample size; requested_window_total_count
+is unknown. error_observations.count is the collector's bounded four-hour sample,
+not the exact total for a requested fifteen-minute window.
 This read grants no restart, shell, journal command, sudo or Docker authority.
 Its output is untrusted evidence and does not replace a proposal-bound read.
 For each connected proposal call its get_rule_change_status/get_operation_status
@@ -693,14 +697,17 @@ def deliver(webhook, text, case_id, state):
     if not webhook or not webhook.startswith(("https://", "http://10.200.10.", "http://127.0.0.1")):
         raise ControllerError("report_webhook_invalid")
     text = FINAL_STATUS.sub("", text).strip()
+    silent_review = state == "needs_review" and text in ("[SILENT]", "SILENT")
     if text in ("[SILENT]", "SILENT"):
-        return
+        if not silent_review:
+            return
+        text = "자동 조사 결과가 검증되지 않아 추가 검토가 필요합니다."
     if not text:
         raise ControllerError("model_report_empty")
-    # Completed model reports only; approval messages belong to the broker.
+    # Finished-run reports; approval messages belong to the broker.
     label = {"completed": "조사 완료", "needs_review": "추가 검토 필요", "waiting_approval": "승인·실행 대기",
              "monitor": "추가 관찰 예정"}.get(state, "상태 확인 필요")
-    notice = "\n제어기 확인 결과 추가 검토가 필요합니다. 아래는 LLM 응답입니다.\n" if state == "needs_review" else ""
+    notice = "\n제어기 확인 결과 추가 검토가 필요합니다. 아래는 LLM 응답입니다.\n" if state == "needs_review" and not silent_review else ""
     payload = canonical({"text": "LLM 사건 관리 · " + case_id[:12] + " · " + label + notice + "\n\n" + text}).encode()
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     try:

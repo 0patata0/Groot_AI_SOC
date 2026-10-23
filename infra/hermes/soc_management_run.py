@@ -19,6 +19,9 @@ WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
 EVENT_READ = frozenset({'search_suricata_alerts', 'search_modsecurity_alerts'})
 DIAGNOSTIC_READ = frozenset({'get_system_diagnostics'})
+NO_OBSERVATION_REPORT = ('실제 MCP 조회 결과를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
+                         '정상 또는 조사 완료로 판단하지 않았으며 추가 검토가 필요합니다.\n'
+                         'MANAGEMENT_STATUS: needs_review')
 
 
 def allowed(name, mode):
@@ -44,6 +47,38 @@ def allowed(name, mode):
 def wire_allowed(name, mode):
     return mode in {'manage', 'verify'} and isinstance(name, str) and (name.startswith(('get_wazuh_', 'search_wazuh_')) or
         name in READ | EVENT_READ | DIAGNOSTIC_READ | {'list_blocks'} or (mode == 'manage' and name in WRITE))
+
+
+def permitted_tools(tools, mode):
+    if not isinstance(tools, list):
+        return []
+    return [tool for tool in tools if isinstance(tool, dict) and tool.get('type') == 'function'
+            and isinstance(tool.get('function'), dict)
+            and allowed(tool['function'].get('name'), mode)]
+
+
+def permitted_request(request, mode):
+    """Recheck the effective payload after native tool refresh and body overrides."""
+    if not isinstance(request, dict):
+        raise RuntimeError('management_request_shape_invalid')
+    result = dict(request)
+    extra = result.get('extra_body')
+    extra = dict(extra) if isinstance(extra, dict) else {}
+    if 'tools' in result or 'tools' in extra:
+        tools = permitted_tools(extra.pop('tools', result.get('tools')), mode)
+        result['tools'] = tools
+        names = {tool['function']['name'] for tool in tools}
+        choice = extra.pop('tool_choice', result.get('tool_choice'))
+        if isinstance(choice, dict):
+            function = choice.get('function')
+            name = function.get('name') if isinstance(function, dict) else None
+            if name not in names:
+                raise RuntimeError('management_tool_choice_not_allowed')
+        if choice is not None:
+            result['tool_choice'] = choice
+    if extra or isinstance(result.get('extra_body'), dict):
+        result['extra_body'] = extra
+    return result
 
 
 def compact_target_receipt(value):
@@ -79,9 +114,11 @@ def main():
     from hermes_cli.stream_json import StreamJsonEmitter
     import capstone_korean_output_guard as guard
     dispatch, wire, init = registry.dispatch, ClientSession.call_tool, AIAgent.__init__
+    builder = AIAgent._build_api_kwargs
     original_result = StreamJsonEmitter.emit_result
     original_progress = StreamJsonEmitter.on_tool_progress
     evidence = []
+    completed_wire_calls = []
     output_lock = threading.Lock()
 
     def structured_emit(self, value):
@@ -100,6 +137,7 @@ def main():
         if not wire_allowed(name, mode):
             raise PermissionError('management_wire_tool_not_allowed')
         result = await wire(self, name, arguments, *args, **kwargs)
+        completed_wire_calls.append(name)
         # Keep only real MCP text, bounded in memory, for literal-evidence checks.
         for item in getattr(result, 'content', [])[:20]:
             value = getattr(item, 'text', None)
@@ -111,17 +149,29 @@ def main():
     @functools.wraps(init)
     def restricted_init(self, *args, **kwargs):
         init(self, *args, **kwargs)
-        self.tools = [tool for tool in self.tools
-                      if allowed(tool.get('function', {}).get('name'), mode)]
+        self.tools = permitted_tools(self.tools, mode)
         self.valid_tool_names = {t['function']['name'] for t in self.tools}
         if not self.valid_tool_names:
             raise RuntimeError('management_tools_unavailable')
+
+    @functools.wraps(builder)
+    def restricted_builder(self, *args, **kwargs):
+        # The native loop can refresh tools after __init__ or session resume.
+        self.tools = permitted_tools(self.tools, mode)
+        self.valid_tool_names = {tool['function']['name'] for tool in self.tools}
+        if len(args) > 1 and args[1] is not None:
+            args = (args[0], permitted_tools(args[1], mode), *args[2:])
+        if 'tools_for_api' in kwargs and kwargs['tools_for_api'] is not None:
+            kwargs['tools_for_api'] = permitted_tools(kwargs['tools_for_api'], mode)
+        return permitted_request(builder(self, *args, **kwargs), mode)
 
     def guarded_result(self, result, session_id='', exit_code=0):
         data = dict(result) if isinstance(result, dict) else {'final_response': str(result or '')}
         guard.begin_turn('SOC 사건 판단과 검증 결과를 한국어로 보고한다.')
         guard.set_turn_evidence([{'role': 'user', 'content': '한국어 SOC 보고'}] + evidence)
         text = data.get('final_response') or ''
+        if not completed_wire_calls:
+            text = NO_OBSERVATION_REPORT
         data['final_response'] = str(asyncio.run(guard.guard_text(text)))
         return original_result(self, data, session_id, exit_code)
 
@@ -132,6 +182,7 @@ def main():
 
     registry.dispatch, ClientSession.call_tool = gated_dispatch, gated_wire
     AIAgent.__init__, StreamJsonEmitter.emit_result = restricted_init, guarded_result
+    AIAgent._build_api_kwargs = restricted_builder
     StreamJsonEmitter.on_tool_progress = receipt_progress
     StreamJsonEmitter._emit = structured_emit
     # Register the configured MCP toolsets before native CLI validates -t.

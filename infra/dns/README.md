@@ -1,5 +1,11 @@
 # 접속 이름과 채팅 인증서 — DuckDNS 대표 이름·hosts 예비 별칭
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > 2026-10-15 14:33:38 KST 공용 인증서 적용: Mac에서 발급한 SAN `*.grootlab.duckdns.org` 한 이름의 Let's Encrypt 인증서를 A의 `chatduck.crt/key`에 설치했다. 채팅·Log4Shell DuckDNS HTTPS를 시스템 CA 검증을 켜고 확인했으며 만료는 **2027-01-13 13:25:12 KST**다. 기본 실습 주소는 계속 **`http://log4shell.grootlab.duckdns.org/`**이고 HTTPS는 선택 접근이다. 아래 10/08의 단일 채팅 인증서 발급·만료 기록은 당시 이력이다. 채팅 인증서 감시는 공유 파일을 읽되 채팅 SNI만 매일 검사하며 Log4Shell SNI는 배포·갱신 때 별도 검사한다. 자동 갱신은 없고 2026년 12월 중순에 새 인증서 재발급을 준비한다.
 
 > 2026-10-15: 채팅 인증서 만료 감시를 A(매일09:00KST)에, 전용 XML 디코더·규칙100300~100305를 B에 적용·검증했다. 만료일2027-01-06 15:02:33KST, 갱신은 수동이다. [현재 구성·갱신 절차](../groot-a/certificate-monitor/README.md). 아래 기록은 해당 시점의 이력이다.

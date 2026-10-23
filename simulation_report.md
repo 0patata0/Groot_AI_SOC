@@ -1,5 +1,11 @@
 # Agentic SOC 시뮬레이션 보고서 — 실제 CVE 기반 다단계 공격 대응
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](STATUS.md) · [실행 계획](PLAN.md).
+> 현재 구성은 A/B/C 역할 분리·MCP6서버·HTTP3/터미널3·단일 deploy.sh(service schema9)다.6CVE 공격·탐지 시험은 사용자 지시로 보류하고 LLM 진단/알림 실패 보완과 문서 정리를 우선한다. 실제 검증 범위와 새 서버 설치 제외를 함께 확인한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 작성일: 2026-09-18
 대상 모델: `qwen3.6:35b` (tool calling + thinking) — DGX Spark의 Ollama에서 서빙 (6·9·10장의 성능·품질 추정치는 후보였던 Qwen3-30B-A3B(MoE, 활성 3B) 기준값이며 배포 모델로 재측정 필요)
 실행 환경: ESXi 온프레미스(Groot_A/B/C VM) + Kali(VM 세그먼트). Agent 런타임은 Groot_B의 Hermes 컨테이너, 추론만 DGX Spark의 Ollama(OpenAI 호환 `/v1`, `211.170.162.110`/`211.170.162.111`)에서 수행

@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 import soc_management_controller as m
 
@@ -494,6 +495,45 @@ class ControllerTests(unittest.TestCase):
 
     def test_state_database_is_private(self):
         self.assertEqual(os.stat(Path(self.temp.name) / "state.sqlite3").st_mode & 0o777, 0o600)
+
+
+class DeliveryTests(unittest.TestCase):
+    webhook = "https://mattermost.invalid/hooks/review-fixture"
+
+    def test_needs_review_silent_sends_fixed_review_notice(self):
+        for text in ("[SILENT]", "SILENT", " [SILENT]\nMANAGEMENT_STATUS: resolved",
+                     "SILENT\nMANAGEMENT_STATUS: needs_review\n"):
+            with self.subTest(text=text):
+                opener = mock.Mock()
+                opener.open.return_value = Response(b"", "")
+                with mock.patch.object(m.urllib.request, "build_opener", return_value=opener):
+                    m.deliver(self.webhook, text, "a" * 32, "needs_review")
+                opener.open.assert_called_once()
+                args, kwargs = opener.open.call_args
+                self.assertEqual(kwargs, {"timeout": 15})
+                self.assertEqual(args[0].full_url, self.webhook)
+                payload = json.loads(args[0].data)
+                self.assertEqual(payload, {"text": "LLM 사건 관리 · " + "a" * 12
+                    + " · 추가 검토 필요\n\n자동 조사 결과가 검증되지 않아 추가 검토가 필요합니다."})
+                self.assertNotIn("SILENT", payload["text"])
+                self.assertNotIn("MANAGEMENT_STATUS", payload["text"])
+                self.assertNotIn("아래는 LLM 응답", payload["text"])
+
+    def test_completed_silent_keeps_existing_no_delivery(self):
+        for text in ("[SILENT]", "SILENT", "[SILENT]\nMANAGEMENT_STATUS: resolved"):
+            with self.subTest(text=text), mock.patch.object(m.urllib.request, "build_opener") as build:
+                m.deliver(self.webhook, text, "a" * 32, "completed")
+                build.assert_not_called()
+
+    def test_needs_review_existing_model_text_keeps_notice(self):
+        opener = mock.Mock()
+        opener.open.return_value = Response(b"", "")
+        with mock.patch.object(m.urllib.request, "build_opener", return_value=opener):
+            m.deliver(self.webhook, "관측을 확인해 주세요.\nMANAGEMENT_STATUS: needs_review", "a" * 32, "needs_review")
+        payload = json.loads(opener.open.call_args.args[0].data)
+        self.assertIn("제어기 확인 결과 추가 검토가 필요합니다. 아래는 LLM 응답입니다.", payload["text"])
+        self.assertTrue(payload["text"].endswith("관측을 확인해 주세요."))
+        self.assertNotIn("자동 조사 결과가 검증되지 않아", payload["text"])
 
 
 if __name__ == "__main__":

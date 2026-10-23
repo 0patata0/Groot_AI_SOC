@@ -1,5 +1,11 @@
 # 시나리오 3 — 권한상승 (CVE-2021-3156 Baron Samedit, C 호스트)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 6개 CVE 재현·탐지 연결(작업3번)은 사용자 지시로 보류한다. 현재 실습은 HTTP3개와 Redis/Samba/sudo 터미널3개이며 DVWA는 독립 경로다. 아래 정답·룰 ID·공격 경로는 기대값/과거 계획으로 보존하며 실행 완료를 뜻하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 목표: 침투 후 로컬 권한상승 시도가 C 엔드포인트(Wazuh agent 002)에 탐지되는지 확인한다. 이 시나리오는 **네트워크가 아니라 엔드포인트 텔레메트리**(auditd/rootcheck/SCA/취약점) 검증이다. exploit 코드는 저장소에 두지 않는다 — `references.md`의 Qualys 권고문/CVE만 인용한다.
 
 - CVE-2021-3156 (Baron Samedit): sudo heap 오버플로우 → 로컬 root. CISA KEV.

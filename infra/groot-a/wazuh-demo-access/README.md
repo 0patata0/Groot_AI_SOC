@@ -1,5 +1,11 @@
 # Wazuh 시연용 VPN 접속 — 2026-10-20 23:59 KST 종료
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 이 소스는 A의 기존 `wazuh.grootlab.duckdns.org:443` 서버 블록 한 곳에만 `192.168.15.0/24` VPN을 한시 허용하는 후보를 만들고, `apply.py`로 검토된 고정 구성을 한 번 적용한다. 기존 Wazuh 로그인은 유지하며 manager API·indexer·10443 포트, B 설정, legacy `wazuh.groot.lab`, 채팅·Log4Shell 서버 블록을 변경하지 않는다. 실제 적용·접속·종료 검증 결과는 바로 아래 기록을 따른다.
 
 ## 2026-10-19 22:52 적용·22:55 KST 최종 검증

@@ -1,5 +1,11 @@
 # Suricata 통계의 Wazuh 전송 제외
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **2026-10-15 대체 완료:** 이 ignore 방식은 Wazuh의 offset/hash 불일치를 유발해 제거했다. B의 decoder_order_size=1024 적용과 실제504/505필드·통계2주기 오류0/CP27표본 일치로 대체했다. 재배포 시 이 구형 ignore를 다시 적용하지 않는다. [원인·CP 수정](../../vector/raw-operations/checkpoint-diagnosis/README.md), [대체 디코더 설정](../stats-decoder-capacity/README.md). 아래는 과거 적용 기록이다.
 
 2026-10-14 04:23:57 KST에 A agent에 적용했다. Suricata가 쓰는 원본 `eve.json`과 보안 경보·flow·DNS·HTTP 입력은 유지하고, 고정 형식의 정기 `event_type=stats`만 Wazuh 전송 전에 제외한다. Vector도 원본을 계속 읽는다. 새 서비스나 패키지, Python 상시 처리기는 추가하지 않았다.

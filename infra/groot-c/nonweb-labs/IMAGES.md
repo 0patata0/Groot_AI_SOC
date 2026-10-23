@@ -1,5 +1,11 @@
 # Redis / Samba 오프라인 이미지 준비
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> 현재 콘솔은 HTTP3개(Log4Shell/Apache2종)와 터미널3개(Redis/Samba/sudo), 총6항목이다. sudo는 별도 rootless의 UID1000·전역 단일 세션이며 종료 시 전체 중지한다. DVWA는 독립 유지한다. 환경 준비와 CVE 악용 성공을 구분하고 공격 재현은 보류한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 이 문서는 이미지의 출처 검증과 빌드·export를 다룬다. 컨테이너 격리, 최초 import, 웹 터미널은 [README.md](README.md)와 `bootstrap.py`의 별도 계약이다. Mac에 Docker·GPG·패키지를 설치하지 않는다. 네트워크가 가능한 준비 장비에서 입력만 내려받고, 승인된 Linux amd64 빌드 서버의 기존 Docker와 `gpgv`로 검증·빌드한다. 호스트 Redis/Samba/sudo 패키지는 변경하지 않는다.
 
 ## 버전과 CVE의 의미

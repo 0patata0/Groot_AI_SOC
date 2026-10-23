@@ -1,5 +1,11 @@
 # Suricata Update: 현재 규칙의 오프라인 후보 생성
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> 기존 서버의 운영 자동화와 새 서버 초기 설치는 구분한다. 지정 범위의 C1/B1/A2 재부팅 복구는10/24 검증 이력이 있으며 최초 실패·수동 복구도 보존한다. 현재6실습·MCP6서버를 기준으로 읽고 과거 후보/PID/시험 결과를 새 실측으로 해석하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **2026-10-16 실행기 갱신 후 구분:** 룰 조회에 파일 정의 집계를 추가한 A 실행기 SHA는 `156b88d0ac60c85df96ce05961b911cd5bc28ddb65b0df3656134e8a17015c6c`다. 저장소의 `compare_rules.py`는 이 SHA를 고정한다. A에 설치한 **10/15 비교 도구·문서·결과 스냅샷과 기존 `d937c7…` pin은 그대로 보존**했다. 최신 실행기로 새 후보 시험을 진행하려면 검토된 최신 소스와 일치하는 실행기 사본·새로 확인한 manifest를 별도의 root 전용 source 디렉터리에 준비해야 한다. 과거 고정 시험을 새 실행기에서 통과한 결과로 재해석하거나 설치 스냅샷의 pin만 덮어쓰지 않는다. 이번에는 updater 재실행·룰 변경·자동 활성화·새 패키지 설치가 없다. 파일 정의 집계는 실제 적재 개수와 별개다. [이번 조회 근거 배포](../../mcp/README.md#2026-10-16-룰-파일-정의-집계--조회-근거-배포) · [검증 기록](../../hermes/rule-inventory-validation-20261016.json).
 
 2026-10-15 후행 마감 기록: 검토된 소스·문서10파일을 `/opt/capstone-automation/project/infra/automation/suricata-update`에 설치하고, 증거를 `/var/backups/capstone-suricata-update-20261015`에 보존했다. archive 영수증 SHA는 `a4b053b79460b503fd1d0cd01db254215f9e8699bbbb0bf50a2fec8573cb6392`다. 최종 후보와 원본1벌의 gzip·해제 SHA, 실패 시도 metadata 및 자동 활성화됐던292개 규칙 metadata를 보존한 뒤 고정 staging17개를 정리했다. 운영 보호 파일 불변·규칙 변경0·서비스 신호0이다. [영구 반입 결과](deployment-validation-2026-10-15.json)를 참고한다.

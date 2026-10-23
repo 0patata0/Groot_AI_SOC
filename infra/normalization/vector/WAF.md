@@ -1,5 +1,11 @@
 # WAF 패키지 정제와 시간 근거
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **2026-10-14 20:44 KST 추가 검증 — writer 회전과 보관본 결합을 분리해 통과했다.** 운영 설정을 바꾸지 않은 별도 nginx/ModSecurity writer에서 4세대·6요청(2/1/1/2)을 생성했다. 이전 worker의 늦은 완료, reader 정지 중 연속 두 회전, 세 번의 인접 세대 공개, 동일 checkpoint 정상 재시작 후 요청까지 Vector audit/access 각각 6건·Wazuh audit 6건을 확인했고 중복은 0건이었다. Vector는 원문 행 SHA(줄바꿈 제외), Wazuh는 설치된 cJSON 재직렬화 SHA를 사용했다. Wazuh SIGTERM 종료 코드 1·최종 offset/SHA 저장과 Vector 종료 코드 0을 확인했으며 강제 종료를 정상 재시작으로 인정하지 않았다. [시험 상세](waf-rotation/README.md), [검증 JSON](waf-rotation/validation-2026-10-14.json).
 
 원문 수집 뒤 별도 native Vector 시험으로 각 세대의 보관본 6쌍을 결합해 ID·KST 시각·SHA 일치를 확인했다. 다른 배포 ID를 준 4건은 격리했고, audit 격리를 관측한 뒤 실행 시작 기준 약2.51초에 access를 추가한 시험은 ready 0·quarantine 1·access 단독 제외 1이었다. 이 결합 시험은 root가 검증한 manifest에 따라 보관 파일의 source 경로 메타데이터를 원래 값으로 복원한 **오프라인 검증**이다. 새 운영 배포 ID 발행이나 회전 중 실시간 join 성공으로 해석하지 않는다.

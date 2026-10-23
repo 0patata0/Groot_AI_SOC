@@ -1,5 +1,11 @@
 # WAF v2 producer의 분리 native 검증
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 ## 2026-10-15 02:15 KST 최신 상태 — 3단계 운영 검증·자동 실행 확인 완료
 
 **02:15:39 KST 원본 회전 운영 전환과 세 타이머 활성화를 완료했다.** Suricata와 WAF raw 타이머는 첫 실행 `completed/local_rotation_or_not_due`를 확인했고, 해당 원천은 크기·기간 임계치 미만이라 새 회전 없이 기존 state를 유지했다. 출력 maintenance의 정상 daily 실행은 ready·evidence·telemetry 세 파일을 회전하고 빈 quarantine은 유지했다. 이어 maintenance만 재활성화한 첫 실행은 `not_due`로 끝나 추가 회전 0회였다. 세 타이머는 enabled/waiting이다.

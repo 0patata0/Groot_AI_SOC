@@ -1,5 +1,11 @@
 # CISA KEV 데이터 — 반입 기록
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> 현재 B는 Wazuh4.14.8·Mattermost/PostgreSQL·Hermes·승인 브로커와 MCP6서버를 운영한다. 이번 읽기 점검에서 운영6컨테이너와 Wazuh000/001/002 Active를 확인했다. 고정 도구 목록과 실제 LLM 선택·대응 성공은 별개다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 CVE 우선순위(실제 익스플로잇된 취약점) 판단용 **CISA Known Exploited Vulnerabilities** 카탈로그. MCP CVE 툴/취약점 판단의 오프라인 기준 데이터.
 
 ## 출처 / 버전 / 라이선스

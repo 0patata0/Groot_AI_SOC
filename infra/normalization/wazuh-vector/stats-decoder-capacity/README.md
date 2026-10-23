@@ -1,5 +1,11 @@
 # Suricata 실제 stats와 manager JSON 필드 한도
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 2026-10-15 실제 적용 완료: B의 `analysisd.decoder_order_size=1024`를 반영했다. daemon control 재시작 과정에서 컨테이너 감독 정책에 의해 같은 CID가09:10:50 KST에 재시작됐고, init PID2315523/RestartCount1을 확인했다. 별도 수동 추가 재시작은 없었다. 필수5프로세스와 agent001 Active, 실제 표본 native504필드·86600/level0을 확인했다. 이는 아래 격리 시험과 구분되는 운영 적용 결과다.
 
 09:11:54~09:14:04 KST 약130초의 실제 관측에서 A의 자연 stats2건·안정 CP 표본27개·offset/hash 불일치0·CP 수동 수정0, B의 새 JSON 필드 한도 오류0·agent001 Active를 확인했다. 다섯 프로세스 PID와 컨테이너 identity는 관측 중 동일했고 analysisd RSS는146,432→147,072KiB(+640KiB)였다. [배포·관측 JSON](deployment-validation-2026-10-15.json)은 직접 읽은 두 메타데이터 파일의 SHA를 포함한다. 이 짧은 관측에는 CPU/queue/drop 수치가 없으며 장기 무손실이나1024 설정의500EPS 성능을 증명하지 않는다. 격리 runner `e77dd4d9…`는 변경하지 않았다.

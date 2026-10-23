@@ -1,0 +1,867 @@
+{
+  "schema": 1,
+  "recorded_at_kst": "2026-10-24T02:44:30.772573+09:00",
+  "status": "bounded_management_diagnostic_and_review_delivery_fix_verified",
+  "scope": "User-selected step1 plus documentation upkeep. Six-CVE reproduction/detection step3 paused by user.",
+  "original_failure_preserved": "diagnostics-natural-language-validation-20261023.json",
+  "reproduction": {
+    "started_at": "2026-10-24T01:54:11.376176+09:00",
+    "elapsed_seconds": 29.981,
+    "MCP_calls": 0,
+    "exit_code": 0,
+    "first_actual_HTTP_tool_count": 34,
+    "disallowed_verify_write_schema_count": 8,
+    "unsupported_completed_read_claim": true,
+    "preexisting_sessions_messages_preserved": true
+  },
+  "filter_only_comparison": {
+    "elapsed_seconds": 23.139,
+    "actual_reads": [
+      "c:lab-terminal",
+      "a:raw-waf"
+    ],
+    "primary_schema_count": 26,
+    "thinking_setting_changed": false,
+    "known_report_time_conversion_failed": true,
+    "causal_or_success_rate_guarantee": false
+  },
+  "implementation": {
+    "request_boundary": "Reapply mode allowlist to canonical, explicit/cache and effective extra_body schemas; refuse disallowed named choice. Both dispatch/wire gates retained.",
+    "zero_call_report": "No completed MCP call => explicit Korean unverified/needs_review report; no model-chosen tool/argument synthesized.",
+    "silent_review": "needs_review+SILENT emits a fixed review notice; verified completed SILENT retains existing suppression.",
+    "diagnostic_output": "Original epoch plus deterministic +09:00 observed_at_kst/requested_since_kst. Returned sample size and unknown requested-window total are separate.",
+    "authority": "LLM investigates/judges/proposes; administrator approves exact protected candidate. No shell/sudo/Docker/package authority added."
+  },
+  "deployment": {
+    "status": "installed",
+    "backup": "/var/backups/capstone-management-diagnostics/20261024T021707+0900",
+    "receipt": "/var/lib/capstone-diagnostics/installation/live-management-v5-20261024T021707+0900.json",
+    "source_hashes": {
+      "source_controller_sha256": "436e5dc30c45d916a75265aa3727ae2c6664601f824e0268bccc5d7977a6eb8c",
+      "source_runner_sha256": "b37919cb2e893b353f0118de79f0b3ae1d038c7d0027057ce73e8a991390fe82",
+      "source_router_sha256": "abb63d587ece9caa7e3af28cb17fc587f861b5b7721cadf95320170c8f3d2a44",
+      "bound_controller_sha256": "cf102b64479183c019bd74e88c2ac89b5218717757290934484e77f4b75ff291"
+    },
+    "installed_files": {
+      "/opt/capstone-management/soc_management_controller.py": {
+        "sha256": "cf102b64479183c019bd74e88c2ac89b5218717757290934484e77f4b75ff291",
+        "bytes": 53792,
+        "mode": "0o644",
+        "uid": 0,
+        "gid": 0
+      },
+      "/opt/mcp/system-diagnostics-mcp.py": {
+        "sha256": "abb63d587ece9caa7e3af28cb17fc587f861b5b7721cadf95320170c8f3d2a44",
+        "bytes": 11333,
+        "mode": "0o550",
+        "uid": 0,
+        "gid": 988
+      },
+      "/opt/capstone-diagnostics-bootstrap/20261023/infra/mcp/system-diagnostics-mcp.py": {
+        "sha256": "abb63d587ece9caa7e3af28cb17fc587f861b5b7721cadf95320170c8f3d2a44",
+        "bytes": 11333,
+        "mode": "0o600",
+        "uid": 0,
+        "gid": 0
+      },
+      "/opt/capstone-management/soc_management_run.py": {
+        "sha256": "b37919cb2e893b353f0118de79f0b3ae1d038c7d0027057ce73e8a991390fe82",
+        "bytes": 9558,
+        "mode": "0o644",
+        "uid": 0,
+        "gid": 0
+      },
+      "/opt/capstone-diagnostics-bootstrap/20261023/source-sha256.json": {
+        "sha256": "827ed10b9cc8d8842892191521d950158f82f3cb23b8e18e7451aa1958ee59fc",
+        "bytes": 711,
+        "mode": "0o600",
+        "uid": 0,
+        "gid": 0
+      },
+      "/var/lib/capstone-diagnostics/installation/prepared.json": {
+        "sha256": "b7ac954ee5a088b687e27eb1f6d79b645dec15346297eabc217b819d22a4d9e7",
+        "bytes": 1724,
+        "mode": "0o600",
+        "uid": 0,
+        "gid": 0
+      },
+      "/var/lib/capstone-diagnostics/installation/intent.json": {
+        "sha256": "d64ec3a944193f2c86ad011393875ccdae2bb8a30f67f79bece19b691043ab32",
+        "bytes": 680,
+        "mode": "0o600",
+        "uid": 0,
+        "gid": 0
+      }
+    },
+    "root_owned_inline_gate": true,
+    "previous_user_data_gate_retained_but_no_longer_executed_by_controller": true,
+    "configuration_hashes_unchanged_during_apply": true,
+    "case_proposal_run_tool_call_and_session_message_tables_unchanged_during_apply": true,
+    "source_copy_and_operational_pin_sync": true,
+    "historical_verification_JSON_overwritten": false,
+    "new_VM_installer_executed": false,
+    "new_installer_uses_same_source_and_existing_dynamic_render": true,
+    "new_packages_images_ports_or_keys": 0
+  },
+  "actual_model_cases": [
+    {
+      "case": "C",
+      "started_at": "2026-10-24T02:18:53.559257+09:00",
+      "finished_at": "2026-10-24T02:19:26.890743+09:00",
+      "elapsed_seconds": 33.199,
+      "exit_code": 0,
+      "natural_language_without_tool_name_or_forced_choice": true,
+      "tool_use_count": 3,
+      "actual_reads": [
+        {
+          "target": "c:lab-terminal",
+          "host": "c",
+          "unit": "capstone-nonweb-terminal.service",
+          "is_error": false,
+          "observed_at_kst": "2026-10-24T02:19:06+09:00",
+          "age_seconds": 10,
+          "status": "observed",
+          "returned_error_count": 0,
+          "requested_window_total_count": null
+        },
+        {
+          "target": "c:terminal-guard",
+          "host": "c",
+          "unit": "capstone-nonweb-guard.service",
+          "is_error": false,
+          "observed_at_kst": "2026-10-24T02:19:06+09:00",
+          "age_seconds": 11,
+          "status": "observed",
+          "returned_error_count": 0,
+          "requested_window_total_count": null
+        },
+        {
+          "target": "c:terminal-status",
+          "host": "c",
+          "unit": "capstone-nonweb-status.service",
+          "is_error": false,
+          "observed_at_kst": "2026-10-24T02:19:06+09:00",
+          "age_seconds": 12,
+          "status": "observed",
+          "returned_error_count": 0,
+          "requested_window_total_count": null
+        }
+      ],
+      "primary_request_tool_counts": [
+        26,
+        26
+      ],
+      "all_primary_requests_readonly_26": true,
+      "reasoning_setting_unchanged": true,
+      "preexisting_sessions_messages_preserved": true,
+      "installed_controller_sha256": "cf102b64479183c019bd74e88c2ac89b5218717757290934484e77f4b75ff291",
+      "installed_gate_sha256": "b37919cb2e893b353f0118de79f0b3ae1d038c7d0027057ce73e8a991390fe82"
+    },
+    {
+      "case": "A",
+      "started_at": "2026-10-24T02:20:32.600016+09:00",
+      "finished_at": "2026-10-24T02:20:54.100992+09:00",
+      "elapsed_seconds": 21.377,
+      "exit_code": 0,
+      "natural_language_without_tool_name_or_forced_choice": true,
+      "tool_use_count": 2,
+      "actual_reads": [
+        {
+          "target": "a:vector",
+          "host": "a",
+          "unit": "capstone-vector.service",
+          "is_error": false,
+          "observed_at_kst": "2026-10-24T02:20:03+09:00",
+          "age_seconds": 40,
+          "status": "observed",
+          "returned_error_count": 0,
+          "requested_window_total_count": null
+        },
+        {
+          "target": "a:wazuh-agent",
+          "host": "a",
+          "unit": "wazuh-agent.service",
+          "is_error": false,
+          "observed_at_kst": "2026-10-24T02:20:03+09:00",
+          "age_seconds": 41,
+          "status": "observed",
+          "returned_error_count": 0,
+          "requested_window_total_count": null
+        }
+      ],
+      "primary_request_tool_counts": [
+        26,
+        26
+      ],
+      "all_primary_requests_readonly_26": true,
+      "reasoning_setting_unchanged": true,
+      "preexisting_sessions_messages_preserved": true,
+      "installed_controller_sha256": "cf102b64479183c019bd74e88c2ac89b5218717757290934484e77f4b75ff291",
+      "installed_gate_sha256": "b37919cb2e893b353f0118de79f0b3ae1d038c7d0027057ce73e8a991390fe82"
+    },
+    {
+      "case": "B",
+      "started_at": "2026-10-24T02:23:49.929464+09:00",
+      "finished_at": "2026-10-24T02:24:10.830906+09:00",
+      "elapsed_seconds": 20.781,
+      "exit_code": 0,
+      "natural_language_without_tool_name_or_forced_choice": true,
+      "tool_use_count": 2,
+      "actual_reads": [
+        {
+          "target": "b:management",
+          "host": "b",
+          "unit": "capstone-management.service",
+          "is_error": false,
+          "observed_at_kst": "2026-10-24T02:22:58+09:00",
+          "age_seconds": 62,
+          "status": "observed",
+          "returned_error_count": 0,
+          "requested_window_total_count": null
+        },
+        {
+          "target": "b:soc-bot",
+          "host": "b",
+          "unit": "soc-bot.service",
+          "is_error": false,
+          "observed_at_kst": "2026-10-24T02:22:58+09:00",
+          "age_seconds": 62,
+          "status": "observed",
+          "returned_error_count": 0,
+          "requested_window_total_count": null
+        }
+      ],
+      "primary_request_tool_counts": [
+        26,
+        26
+      ],
+      "all_primary_requests_readonly_26": true,
+      "reasoning_setting_unchanged": true,
+      "preexisting_sessions_messages_preserved": true,
+      "installed_controller_sha256": "cf102b64479183c019bd74e88c2ac89b5218717757290934484e77f4b75ff291",
+      "installed_gate_sha256": "b37919cb2e893b353f0118de79f0b3ae1d038c7d0027057ce73e8a991390fe82"
+    }
+  ],
+  "actual_model_totals": {
+    "positive_cases": 3,
+    "successful_diagnostic_reads": 7,
+    "write_calls": 0,
+    "forced_tool_choice": false,
+    "model_or_global_reasoning_configuration_changed": false,
+    "all_final_reports_use_correct_observed_KST_timestamp": true,
+    "broad_semantic_accuracy_certified": false
+  },
+  "observed_answer_limits": [
+    "B report overstated an activating/start oneshot as completed and misdescribed Result=success; the snapshot alone does not prove those transitions.",
+    "C report included an unnecessary uniqueness claim. Successful read execution is not a full factual-accuracy evaluation.",
+    "Three positive cases and one failed/successful comparison do not establish general reliability or response-time SLA."
+  ],
+  "actual_review_delivery": {
+    "status": "passed",
+    "clearly_labelled_validation_notice": true,
+    "test_label": "검증-f9bd4138",
+    "actual_http_delivery": true,
+    "database_readback_matches_exact_expected_message": true,
+    "new_matching_posts": 1,
+    "post_id_sha256": "9943ccb476b3e3eb18e04ff18d1bb6ef61401320cf11738c55dfa951c9845487",
+    "message_sha256": "4686adc390af228d42b23c24d7f36e0d8c913d697a5b22217df3d4c59d2a3050",
+    "controller_sha256": "cf102b64479183c019bd74e88c2ac89b5218717757290934484e77f4b75ff291",
+    "approval_or_case_created": false,
+    "post_retained_for_audit": true
+  },
+  "gateway_refresh": {
+    "at": "2026-10-24T02:39:54.812805+09:00",
+    "status": "running_after_refresh",
+    "configuration_changed": false,
+    "images_or_container_configuration_changed": false,
+    "management_timer_was_active": true,
+    "restart_seconds": 9.376,
+    "preexisting_sessions_messages_preserved": true,
+    "started_at_before": "2026-10-23T15:26:07.615906238Z",
+    "started_at_after": "2026-10-23T17:39:58.102221031Z",
+    "same_container_image_mounts_policy": true,
+    "code_apply_phase_container_restarts": 0,
+    "gateway_refresh_container_restarts": 1,
+    "diagnostic_old_pid_gone": true,
+    "management_timer_active_after": true,
+    "initial_fixed_log_phrase_match": false,
+    "initial_phrase_no_match_is_not_a_connection_failure": true
+  },
+  "gateway_after_refresh": {
+    "mattermost_authenticated_api_status": 200,
+    "configured_account_is_bot": true,
+    "established_mattermost_connections": 1
+  },
+  "sdk_after_code_apply": {
+    "uid": 995,
+    "server_tools": {
+      "wazuh-ro": {
+        "tool_count": 14,
+        "tool_names": [
+          "get_wazuh_agent_ports",
+          "get_wazuh_agent_processes",
+          "get_wazuh_agents",
+          "get_wazuh_alert_summary",
+          "get_wazuh_cluster_health",
+          "get_wazuh_cluster_nodes",
+          "get_wazuh_critical_vulnerabilities",
+          "get_wazuh_log_collector_stats",
+          "get_wazuh_manager_error_logs",
+          "get_wazuh_remoted_stats",
+          "get_wazuh_rules_summary",
+          "get_wazuh_vulnerability_summary",
+          "get_wazuh_weekly_stats",
+          "search_wazuh_manager_logs"
+        ],
+        "tool_names_sha256": "5ce2d57bfefef02877f4707c166477205260cb9bc37523f51e60c9febb93b881"
+      },
+      "security-events": {
+        "tool_count": 2,
+        "tool_names": [
+          "search_modsecurity_alerts",
+          "search_suricata_alerts"
+        ],
+        "tool_names_sha256": "2b40c37fa3dd8b793b33675d1c79fe8463a44c0bd5747b910a6e6dd61fd54054"
+      },
+      "resp": {
+        "tool_count": 3,
+        "tool_names": [
+          "block_ip",
+          "list_blocks",
+          "unblock_ip"
+        ],
+        "tool_names_sha256": "02badf12572ec44c13a7ec6dcbdef126c90a500426140b468e453295ae817665"
+      },
+      "rule-a": {
+        "tool_count": 8,
+        "tool_names": [
+          "get_operation_status",
+          "get_rule_change_status",
+          "get_rule_change_target",
+          "get_service_action_target",
+          "propose_rule_change",
+          "propose_rule_edit",
+          "propose_service_action",
+          "temporarily_contain_ip"
+        ],
+        "tool_names_sha256": "a19dd655f3e51f5f8fa6d3722b31278db9154458cb42d0aa37921cb44529dc87"
+      },
+      "rule-b": {
+        "tool_count": 8,
+        "tool_names": [
+          "get_operation_status",
+          "get_rule_change_status",
+          "get_rule_change_target",
+          "get_service_action_target",
+          "propose_rule_change",
+          "propose_rule_edit",
+          "propose_service_action",
+          "temporarily_contain_ip"
+        ],
+        "tool_names_sha256": "a19dd655f3e51f5f8fa6d3722b31278db9154458cb42d0aa37921cb44529dc87"
+      },
+      "system-diagnostics": {
+        "tool_count": 1,
+        "tool_names": [
+          "get_system_diagnostics"
+        ],
+        "tool_names_sha256": "cbeccb032628e48245a222e1abcafd9272aa405875784aa6e1b359f321040401"
+      }
+    },
+    "rule_targets": [
+      {
+        "target": "a:modsecurity-custom",
+        "is_error": false,
+        "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+        "rule_inventory": {
+          "contiguous_id_groups": [
+            {
+              "end": 10101,
+              "start": 10100
+            },
+            {
+              "end": 10200,
+              "start": 10200
+            },
+            {
+              "end": 10300,
+              "start": 10300
+            },
+            {
+              "end": 10400,
+              "start": 10400
+            },
+            {
+              "end": 10501,
+              "start": 10500
+            },
+            {
+              "end": 10602,
+              "start": 10600
+            }
+          ],
+          "declared_count": 10,
+          "details": {
+            "chain_continuations": 2,
+            "secaction_directives": 0,
+            "secrule_directives": 12
+          },
+          "duplicate_ids": [],
+          "ids": [
+            10100,
+            10101,
+            10200,
+            10300,
+            10400,
+            10500,
+            10501,
+            10600,
+            10601,
+            10602
+          ],
+          "kind": "waf",
+          "runtime_load_verified": false,
+          "schema_version": 1,
+          "scope": "target_file_definitions",
+          "source_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "status": "complete",
+          "unique_id_count": 10
+        }
+      },
+      {
+        "target": "a:suricata-local",
+        "is_error": false,
+        "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+        "rule_inventory": {
+          "contiguous_id_groups": [
+            {
+              "end": 1000002,
+              "start": 1000000
+            },
+            {
+              "end": 1000010,
+              "start": 1000010
+            },
+            {
+              "end": 1000033,
+              "start": 1000030
+            },
+            {
+              "end": 1000051,
+              "start": 1000050
+            },
+            {
+              "end": 1000071,
+              "start": 1000070
+            },
+            {
+              "end": 2034802,
+              "start": 2034802
+            },
+            {
+              "end": 2034806,
+              "start": 2034806
+            }
+          ],
+          "declared_count": 14,
+          "details": {
+            "et_override_count": 2,
+            "local_sid_count": 12,
+            "noalert_count": 1,
+            "other_sid_count": 0
+          },
+          "duplicate_ids": [],
+          "ids": [
+            1000000,
+            1000001,
+            1000002,
+            1000010,
+            1000030,
+            1000031,
+            1000032,
+            1000033,
+            1000050,
+            1000051,
+            1000070,
+            1000071,
+            2034802,
+            2034806
+          ],
+          "kind": "suricata",
+          "runtime_load_verified": false,
+          "schema_version": 1,
+          "scope": "target_file_definitions",
+          "source_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "status": "complete",
+          "unique_id_count": 14
+        }
+      },
+      {
+        "target": "b:wazuh-local-rules",
+        "is_error": false,
+        "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+        "rule_inventory": {
+          "contiguous_id_groups": [
+            {
+              "end": 100103,
+              "start": 100100
+            },
+            {
+              "end": 100112,
+              "start": 100110
+            },
+            {
+              "end": 100131,
+              "start": 100120
+            }
+          ],
+          "declared_count": 19,
+          "details": {
+            "level0_count": 1,
+            "level_counts": {
+              "0": 1,
+              "1": 2,
+              "10": 2,
+              "12": 3,
+              "3": 1,
+              "4": 2,
+              "5": 2,
+              "6": 3,
+              "7": 1,
+              "8": 1,
+              "9": 1
+            }
+          },
+          "duplicate_ids": [],
+          "ids": [
+            100100,
+            100101,
+            100102,
+            100103,
+            100110,
+            100111,
+            100112,
+            100120,
+            100121,
+            100122,
+            100123,
+            100124,
+            100125,
+            100126,
+            100127,
+            100128,
+            100129,
+            100130,
+            100131
+          ],
+          "kind": "wazuh",
+          "runtime_load_verified": false,
+          "schema_version": 1,
+          "scope": "target_file_definitions",
+          "source_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "status": "complete",
+          "unique_id_count": 19
+        }
+      }
+    ],
+    "diagnostic_targets": [
+      {
+        "target": "a:vector",
+        "is_error": false,
+        "status": "observed",
+        "host": "a",
+        "unit": "capstone-vector.service",
+        "age_seconds": 60,
+        "observed_at_kst": "2026-10-24T02:26:16+09:00",
+        "returned_error_count": 0,
+        "requested_window_total_count": null,
+        "properties": {
+          "ActiveEnterTimestampMonotonic": 896308171,
+          "ActiveState": "active",
+          "ExecMainCode": 0,
+          "ExecMainExitTimestampMonotonic": 0,
+          "ExecMainStartTimestampMonotonic": 896308091,
+          "ExecMainStatus": 0,
+          "InactiveEnterTimestampMonotonic": 878605832,
+          "LoadState": "loaded",
+          "NRestarts": 0,
+          "Result": "success",
+          "SubState": "running",
+          "Type": "simple",
+          "UnitFileState": "enabled"
+        },
+        "coverage": {
+          "live_query": false,
+          "maximum_accepted_age_seconds": 180,
+          "normal_interval_seconds": 60,
+          "requested_since": 1792775536,
+          "since": 1792775536,
+          "status": "covered_sample",
+          "unobserved_latest_seconds": 60,
+          "until": 1792776376
+        },
+        "error_observations": {
+          "count": 20,
+          "first_at": 1792770085,
+          "last_at": 1792770362,
+          "scope": "bounded_journal_sample"
+        }
+      },
+      {
+        "target": "b:management",
+        "is_error": false,
+        "status": "observed",
+        "host": "b",
+        "unit": "capstone-management.service",
+        "age_seconds": 13,
+        "observed_at_kst": "2026-10-24T02:27:04+09:00",
+        "returned_error_count": 0,
+        "requested_window_total_count": null,
+        "properties": {
+          "ActiveEnterTimestampMonotonic": 0,
+          "ActiveState": "inactive",
+          "ExecMainCode": 1,
+          "ExecMainExitTimestampMonotonic": 7297391636,
+          "ExecMainStartTimestampMonotonic": 7297236077,
+          "ExecMainStatus": 0,
+          "InactiveEnterTimestampMonotonic": 7297391903,
+          "LoadState": "loaded",
+          "NRestarts": 0,
+          "Result": "success",
+          "SubState": "dead",
+          "Type": "oneshot",
+          "UnitFileState": "static"
+        },
+        "coverage": {
+          "live_query": false,
+          "maximum_accepted_age_seconds": 180,
+          "normal_interval_seconds": 60,
+          "requested_since": 1792775537,
+          "since": 1792775537,
+          "status": "covered_sample",
+          "unobserved_latest_seconds": 13,
+          "until": 1792776424
+        },
+        "error_observations": {
+          "count": 27,
+          "first_at": 1792767767,
+          "last_at": 1792769284,
+          "scope": "bounded_journal_sample"
+        }
+      },
+      {
+        "target": "c:lab-terminal",
+        "is_error": false,
+        "status": "observed",
+        "host": "c",
+        "unit": "capstone-nonweb-terminal.service",
+        "age_seconds": 4,
+        "observed_at_kst": "2026-10-24T02:27:13+09:00",
+        "returned_error_count": 0,
+        "requested_window_total_count": null,
+        "properties": {
+          "ActiveEnterTimestampMonotonic": 44747769,
+          "ActiveState": "active",
+          "ExecMainCode": 0,
+          "ExecMainExitTimestampMonotonic": 0,
+          "ExecMainStartTimestampMonotonic": 44747638,
+          "ExecMainStatus": 0,
+          "InactiveEnterTimestampMonotonic": 0,
+          "LoadState": "loaded",
+          "NRestarts": 0,
+          "Result": "success",
+          "SubState": "running",
+          "Type": "simple",
+          "UnitFileState": "enabled"
+        },
+        "coverage": {
+          "live_query": false,
+          "maximum_accepted_age_seconds": 180,
+          "normal_interval_seconds": 60,
+          "requested_since": 1792775537,
+          "since": 1792775537,
+          "status": "covered_sample",
+          "unobserved_latest_seconds": 4,
+          "until": 1792776433
+        },
+        "error_observations": {
+          "count": 0,
+          "first_at": null,
+          "last_at": null,
+          "scope": "bounded_journal_sample"
+        }
+      }
+    ],
+    "model_requests": 0,
+    "mutation_calls": 0
+  },
+  "verification": {
+    "controller_tests": 44,
+    "runner_tests": 34,
+    "diagnostic_tests": 35,
+    "SOC_installer_tests": 28,
+    "diagnostic_installer_tests": 18,
+    "total_passed": 159,
+    "failed": 0,
+    "new_VM_install": false,
+    "CVE_attack_or_detection_reproduction": false,
+    "actual_containment_or_kernel_TTL_E2E": false,
+    "python_AST_files_excluding_dataset_helpers": 221,
+    "python_AST_parse_errors": 0
+  },
+  "preservation": {
+    "runtime_configuration_hashes_match_initial": true,
+    "existing_sessions_messages_preserved_each_model_case": true,
+    "gateway_refresh_preserved_history": true,
+    "marked_test_sessions_retained": 5,
+    "test_post_retained_and_labelled": true,
+    "keys_or_tokens_or_raw_journal_in_evidence": false
+  },
+  "server_cleanup": {
+    "incomplete_preparation_backup_trees_removed": [
+      {
+        "preparation_backup": "20261024T021401+0900",
+        "files": 3,
+        "bytes": 66080,
+        "absent": true
+      },
+      {
+        "preparation_backup": "20261024T021517+0900",
+        "files": 3,
+        "bytes": 66080,
+        "absent": true
+      }
+    ],
+    "complete_operational_backup_preserved": true,
+    "temporary_update_files_remaining": []
+  },
+  "documentation": {
+    "initial_markdown_files_reviewed": 563,
+    "project": 165,
+    "vendor_original": 373,
+    "history": 21,
+    "archive": 4,
+    "initial_current_context_updates": 149,
+    "pinned_runtime_contracts_unchanged": true,
+    "binary_PDF_and_raster_history_preserved": true,
+    "full_coverage_report": "local-only conversation verification directory",
+    "internal_links_checked": 1853,
+    "missing_internal_links": 0,
+    "archived_relative_links_corrected": 25,
+    "archived_original_files_preserved": 3,
+    "runtime_SOUL_unchanged": true,
+    "AGENTS_updated_by_subsequent_user_instruction": "automatic commit and push after each completed task"
+  },
+  "remaining": [
+    "Known model interpretation overstatements and broader factual accuracy/reliability evaluation.",
+    "Step3 six-CVE reproduction/detection remains paused; actual incident approval/containment/kernel TTL E2E not run.",
+    "Kali demonstration route/sudo visual check, individual long-running resource/concurrency, Harness2 evaluation.",
+    "New three-VM full install remains excluded; project VPN/push remains deferred.",
+    "Working tree changes are not committed or pushed."
+  ],
+  "cleanup": {
+    "Mac_task_temporary_directory": "removed_and_absence_verified",
+    "directory_name": "capstone-management-fix-20261024-6noi04mj",
+    "files_removed": 50,
+    "bytes_removed": 1134599,
+    "packages_installed_on_Mac": 0,
+    "packages_downloaded": 0,
+    "existing_user_files_or_caches_removed": false,
+    "complete_server_operational_backup_preserved": true,
+    "verified_at_kst": "2026-10-24T02:56:48+09:00"
+  },
+  "secret_scan": {
+    "tracked_path_count": 1158,
+    "total": 4,
+    "findings": [
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "deployment/roles/siem.sh",
+        "line": 520,
+        "changed_file": false,
+        "unchanged_from_HEAD": true
+      },
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "infra/groot-c/log4shell-app/src/main/java/fr/christophetd/log4shell/vulnerableapp/LabCsrf.java",
+        "line": 35,
+        "changed_file": false,
+        "unchanged_from_HEAD": true
+      },
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "infra/groot-c/offline-labs/test_practice_mode.py",
+        "line": 61,
+        "changed_file": false,
+        "unchanged_from_HEAD": true
+      },
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "infra/hermes/test_hermes_prestart_transaction.py",
+        "line": 17,
+        "changed_file": false,
+        "unchanged_from_HEAD": true
+      }
+    ],
+    "new_changed_file_findings": 0,
+    "coverage": "tracked working tree only; not staged blobs, history, ignored/local credentials or untracked files",
+    "redact": 0,
+    "secret_values_and_snippets_saved": false
+  },
+  "publication": {
+    "state": "prepared_for_commit_and_push",
+    "authorization": "user requires automatic commit and push at each completed task",
+    "private_artifacts_excluded": true,
+    "pre_commit_secret_scan": {
+      "tracked_path_count": 1160,
+      "total": 4,
+      "findings": [
+        {
+          "rule": "generic-api-key",
+          "provider": "Generic API key (keyword-anchored)",
+          "severity": "Medium",
+          "path": "deployment/roles/siem.sh",
+          "line": 520,
+          "changed_file": false
+        },
+        {
+          "rule": "generic-api-key",
+          "provider": "Generic API key (keyword-anchored)",
+          "severity": "Medium",
+          "path": "infra/groot-c/log4shell-app/src/main/java/fr/christophetd/log4shell/vulnerableapp/LabCsrf.java",
+          "line": 35,
+          "changed_file": false
+        },
+        {
+          "rule": "generic-api-key",
+          "provider": "Generic API key (keyword-anchored)",
+          "severity": "Medium",
+          "path": "infra/groot-c/offline-labs/test_practice_mode.py",
+          "line": 61,
+          "changed_file": false
+        },
+        {
+          "rule": "generic-api-key",
+          "provider": "Generic API key (keyword-anchored)",
+          "severity": "Medium",
+          "path": "infra/hermes/test_hermes_prestart_transaction.py",
+          "line": 17,
+          "changed_file": false
+        }
+      ],
+      "new_changed_file_findings": 0,
+      "coverage": "tracked working tree only; not Git history or ignored/private files",
+      "redact": 0,
+      "secret_values_and_snippets_saved": false
+    },
+    "staged_public_files": 141
+  }
+}

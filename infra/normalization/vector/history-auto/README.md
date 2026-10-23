@@ -1,5 +1,11 @@
 # 이전 boot kernel journal의 유한 자동 보존
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **2026-10-14: native 합성 33개와 Ansible syntax/check를 통과한 최종판을 A에 설치했고, 22:06:55 KST부터 타이머를 활성화했다.** 최종 9파일/51,061B의 library SHA `2604d5c6f9a7044f58d2c8c66995bf696d5bbdee69f49c9e48984556d1636ddf`, test SHA `b5b6c10c40f534e27451c789202d6c456f3b03c6be01a5bf6028e4f8e1cb7cba`에 대응하는 합성 실행은 exit0/33 PASS/0 FAIL이다. 실제 journal·운영 wrapper·서비스는 합성 시험에서 호출하지 않았으며, 이후 별도 운영 설치와 실제 회수를 수행했다. [검증 이력](validation-2026-10-14.json), [운영 적용](deployment-2026-10-14.json), [최종 실행 소스](native-payload-manifest.json).
 
 22:34:59 KST 후속 조회에서 이전 boot 9개 중 고정 cutoff 범위 완료3·대기6·보류0·진행중0, 누적5,876건/2,495,151bytes였다. 타이머의 마지막 자연 실행은22:32:21 KST, service 결과 success/0이었다. 이는 그 시점의 job 요약이며 원래 발생했던 모든 journal이나 원격 분석·색인 완료를 뜻하지 않는다.

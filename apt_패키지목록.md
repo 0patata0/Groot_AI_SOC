@@ -1,5 +1,11 @@
 # 로컬 apt 레포 패키지 목록 — Agentic SOC (noble/amd64)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](STATUS.md) · [실행 계획](PLAN.md).
+> 현재 구성은 A/B/C 역할 분리·MCP6서버·HTTP3/터미널3·단일 deploy.sh(service schema9)다.6CVE 공격·탐지 시험은 사용자 지시로 보류하고 LLM 진단/알림 실패 보완과 문서 정리를 우선한다. 실제 검증 범위와 새 서버 설치 제외를 함께 확인한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > 대상: Ubuntu **24.04(noble) / amd64**. 내부망 임시 apt 레포에 미리 담을 후보를 역할별로 정리.
 > 용도: 인터넷 되는 곳에서 `apt-get install --download-only <목록>`(또는 `debmirror`/`apt-mirror` 필터)로 받아 `dpkg-scanpackages` 색인 → 내부망 HTTP 서빙 → B/C(및 A) `ubuntu.sources` 지정.
 > **의존성은 apt 가 자동으로 끌어옴** → 아래는 최상위 패키지만.

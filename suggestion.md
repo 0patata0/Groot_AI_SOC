@@ -1,5 +1,11 @@
 NVIDIA DGX Spark GB10 기반 Qwen AI Agent를 활용한 Agentic SOC 구축
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](STATUS.md) · [실행 계획](PLAN.md).
+> 현재 구성은 A/B/C 역할 분리·MCP6서버·HTTP3/터미널3·단일 deploy.sh(service schema9)다.6CVE 공격·탐지 시험은 사용자 지시로 보류하고 LLM 진단/알림 실패 보완과 문서 정리를 우선한다. 실제 검증 범위와 새 서버 설치 제외를 함께 확인한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > 이 문서는 목표 아키텍처와 평가 설계다. **2026-10-06 라이브 상태**는 [STATUS.md](STATUS.md), 진행 과제는 [PLAN.md](PLAN.md)를 따른다. 현재 A의 FW v2는 적용됐고, WAF는 `DetectionOnly`, Suricata는 passive 탐지 중이다. B의 신규 FW·WAF 디코더·룰과 시나리오 경보 실발화는 미완료이며, 아래 NFQUEUE 인라인 차단·WAF 차단 서술은 후속 목표다. A의 실측 외부 직결망은 `192.168.16.128/25`다. Kali 소스 대역·라우팅은 미확인이다.
 
 1. 프로젝트 개요

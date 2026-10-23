@@ -1,5 +1,11 @@
 # 봉인 raw 보관·복원 검증과 수명주기 정책
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 기존 서버의 운영 자동화와 새 서버 초기 설치는 구분한다. 지정 범위의 C1/B1/A2 재부팅 복구는10/24 검증 이력이 있으며 최초 실패·수동 복구도 보존한다. 현재6실습·MCP6서버를 기준으로 읽고 과거 후보/PID/시험 결과를 새 실측으로 해석하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **2026-10-15 봉인본 5개의 A 압축·private 복원과 B 보관·private 복원 검증을 완료했다.** 순수 정책 합성 51개와 Linux native A/B 각 16개도 통과했다. 원본 21,157,373B를 gzip 1,556,116B로 보관했고, 운영자 SSH 연결 사이 메모리 중계로 B에 manifest/gzip 10파일을 전달했다. B 고정 machine ID에서 5개 모두 manifest·gzip SHA/크기 및 복원 원문 SHA/크기를 대조했다. 근거는 [실측 metadata](live-archive-2026-10-15.json), [검증 기록](validation-2026-10-15.json)이다.
 
 A에서는 공유 vector lock, 정확한 container writer의 writable FD0, state SHA 및 원본 identity를 전후 확인했다는 부모 실행 결과를 반영했다. 이 문서 담당자는 로컬 catalog·B receipt 5쌍의 고유 manifest SHA, 원문/압축 합계, 각 원문 SHA/크기와 수신 시각을 독립 대조했다. 마지막 B 복원 확인 시각은 10:19:17 KST다. 원본 삭제0, 기존 kernel history sender 변경0, Mac raw 파일 저장0이다. A에 B 영수증을 보존하는 후속 확인은 부모가 진행 중이며 이 시점에 완료를 주장하지 않는다.

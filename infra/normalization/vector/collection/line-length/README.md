@@ -1,5 +1,11 @@
 # EOF 과대행의 제한된 바이트 검사
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../../STATUS.md) · [실행 계획](../../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **21:20 KST 운영 확인 완료:** A에 검사 파일4개와 기존 maintenance 연결을 반영했고 재적용 changed0·Vector PID/InvocationID 불변을 확인했다. 21:19:26 기존 systemd oneshot의 정상 실행에서 root0600 상태 파일 저장·세 원천 안정·과대행0·5분 timer active를 확인했다. 이 실행은 수동 시작이며 자연 timer 주기 실측은 별도다. B에는100252/100253 두level3 상태 규칙만 추가했고 baseline104·후보116·동일manager1회재시작후116개를 통과했다. A의 기존 보호59파일과 reader/엔진은 같고 B의1/1·44threads·나머지5컨테이너·승인 경계도 유지됐다. drop0/queue0은 한 시점 표본이다. 소스·증거 보관/정리는 후속 마감으로 기록한다. [운영 적용과 상태](deployment-2026-10-14.json), [합성34·통합12 검증](validation-2026-10-14.json).
 
 이 후보는 Vector의 EOF 과대행 숫자 counter 누락을 보완하는 주기적 관측이다. GNU coreutils의 `dd`, `tr`, `wc`, `stat`, `timeout`과 기존 jq를 사용한다. 새 Python 수집기·패키지·서비스·Vector 설정 변경은 없다. 원시 로그를 수정·재주입하거나 기존 checkpoint를 갱신하지 않는다.

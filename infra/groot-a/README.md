@@ -1,5 +1,11 @@
 # Groot_A (groot-sec) — 보안 게이트웨이 구성 요약
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 ## Wazuh 시연용 VPN 한시 허용 — 2026-10-19 22:55 KST 검증
 
 `https://wazuh.grootlab.duckdns.org/`의 VPN192.168.15/24 접근을 **2026-10-20 23:59 KST**까지 허용했다. 기존 공인 `chatduck.crt/key` 참조·요청별 UTC 종료 guard·자동 close timer를 적용했고 실제 VPN 로그인/green·조기 종료403·재개·다른웹 정상까지 확인했다. chatproxy 컨테이너와 기존 파일 inode를 유지한 reload이며 B·C 설정 변경은 없다. 저장소의 [chatproxy.nginx.conf](chatproxy.nginx.conf)는 원본 SHA2790ab83… 기준 파일이고 현재 라이브는 [한시 생성기·종료 도구](wazuh-demo-access/README.md)를 반영한 SHAfbee3603…다. [실측 증거](wazuh-demo-access/deployment-validation-20261019.json). 아래VPN거부 설명은 기존 정책 이력이며 예정 종료 후 다시 적용된다.

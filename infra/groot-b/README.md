@@ -1,5 +1,11 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> 현재 B는 Wazuh4.14.8·Mattermost/PostgreSQL·Hermes·승인 브로커와 MCP6서버를 운영한다. 이번 읽기 점검에서 운영6컨테이너와 Wazuh000/001/002 Active를 확인했다. 고정 도구 목록과 실제 LLM 선택·대응 성공은 별개다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 ## 통합 SOC 대시보드 생성 — 2026-10-19
 
 [Groot SOC | 통합 탐지 현황](https://wazuh.grootlab.duckdns.org/app/dashboards#/view/groot-soc-20261019-dashboard): WAF·Suricata·Wazuh 기타 알림의 14패널, 최근 7일·30초 자동 갱신. 새 객체 15개와 기존 인덱스 패턴 참조를 API·브라우저로 검증했다. [소스·복원·적용 검증](soc-dashboard/README.md). 이번 확인에서 전역 시간대는 Browser 기본값이며 Mac 브라우저에서 KST로 표시된다. 아래 10/13 KST 고정 기록은 당시 이력으로 보존한다.

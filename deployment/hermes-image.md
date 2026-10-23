@@ -1,5 +1,11 @@
 # SIEM용 Hermes 이미지 수동 준비
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP6서버/고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 이 문서는 **Linux amd64 SIEM 서버 또는 별도의 Linux amd64 준비 서버에서 운영자가 직접 수행하는 사전 준비**다. `deploy.sh`와 역할 스크립트는 이 Dockerfile, `pip`, `uv`, `docker build/pull`을 호출하지 않는다. Mac에 패키지를 설치하거나 운영 Hermes의 데이터·환경·개인키를 빌드 입력으로 복사하지 않는다.
 
 현재 Dockerfile은 정적 검토 및 포함 Python/셸 구문 검사만 마쳤다. 새 이미지의 실제 빌드·gateway 시작·Mattermost 연결 성공을 이번 문서 작성의 검증 결과로 표시하지 않는다. 다음 명령이 실제 대상에서 성공해야 준비된 이미지로 사용할 수 있다.

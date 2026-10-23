@@ -1,5 +1,11 @@
 # 고정 A/B 저장공간 감시와 보존 검토 목록
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> 기존 서버의 운영 자동화와 새 서버 초기 설치는 구분한다. 지정 범위의 C1/B1/A2 재부팅 복구는10/24 검증 이력이 있으며 최초 실패·수동 복구도 보존한다. 현재6실습·MCP6서버를 기준으로 읽고 과거 후보/PID/시험 결과를 새 실측으로 해석하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > **09:32 KST 후속:** A/B timer 실제09:02 자연실행exit0와 B전용로그2행1014B/nativeCP EOF·SHA일치를확인했다. B service·SOC수신은더이상대기항목이아니다. A09:32는18%/여유47,604,580,352B·raw28,891,127B·backup27,084,621B/ok다. 보존기한검토목록과자동삭제미구성은유지한다. 아래08:50~08:52는당시표본이다.
 
 2026-10-15 A/B 설치·고정 경로 `check`와 양쪽 Linux private fixture 각30개 PASS를 확인했다. 추가 패키지 없이 Bash, jq, GNU find/du/df/stat/timeout, flock, logger, systemd를 사용한다. 로컬 임계값·형식 시험16개와 systemd unit/calendar 해석도 통과했다. A는 08:52:22 KST 실제 oneshot이 exit0으로 완료됐고, 저장 상태와 journal JSON이 동일했다. timer enabled/active 및 다음 예정 시각09:02 KST도 확인했다. B의 실제 service/timer와 SOC 수신, 예정된 자연 tick은 후속 확인 대상이다. 원문·체크포인트·보관본을 삭제하거나 서비스를 중지하지 않는다.

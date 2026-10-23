@@ -1,5 +1,11 @@
 # 2026-10-14 — actions 없는 native monitor 구현·운영 관찰
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> 현재 운영 경로는 Vector v2와 세대별 원본 회전·출력 유지관리·이전 부트 로컬 보존이다. Python 수집기·WAF v1 결합/초기 회전 시험은 과거 단계다. A→B 이전 로그의 일부 자동 이관과 전체 과거 로그 무손실 회수 완료를 구분한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 ## 현재 운영본 — 시간창 v2 (2026-10-14 19:38 KST)
 
 기존 monitor `-HYdN6EBERDGWPLCrWpE`를 같은 ID/권한/enabled/주기/actions0으로 v2 갱신했다. 현재 관리는 [window-v2/OPERATIONS.md](window-v2/OPERATIONS.md)의 v1/v2 고정 registry helper를 사용한다. 아래 v1 원본·명령·60초 고정 검색창은 이전 시점의 이력이며 v1 helper는 v2 state를 거절한다.

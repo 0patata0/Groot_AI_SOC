@@ -1,5 +1,11 @@
 # 공격 시나리오 · 탐지 검증 패키지 (Groot 캡스톤 SOC)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
+> 6개 CVE 재현·탐지 연결(작업3번)은 사용자 지시로 보류한다. 현재 실습은 HTTP3개와 Redis/Samba/sudo 터미널3개이며 DVWA는 독립 경로다. 아래 정답·룰 ID·공격 경로는 기대값/과거 계획으로 보존하며 실행 완료를 뜻하지 않는다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 이 폴더는 **블루팀 탐지 검증(detection validation)** 문서다. 각 시나리오는 "공격 단계 → 우리 인프라에서 떠야 하는 탐지(Suricata sid / ModSecurity·CRS 룰 / Wazuh 룰 id) → 대응(agent_block)"을 짝지어, 팀이 Kali에서 실행하고 Wazuh에서 실제로 보이는지 체크리스트로 확인하도록 만든다.
 
 > **현황(2026-10-06 라이브 점검):** A의 FW v2는 `FORWARD=DROP`으로 적용·확정됐다. WAF GROOT 룰은 `DetectionOnly`, Suricata ET+로컬 룰과 Phase-A는 passive로 로드됐다. B/C의 외부 `ens192`는 제거됐다. B의 Wazuh 인덱스에는 Suricata 로컬 SID `1000010`→`100110` 및 ModSecurity CRS `920350`→`100101` 경보가 관측됐지만, 이번 점검에서 시나리오 공격 트래픽은 새로 실행하지 않았다. GROOT WAF 커스텀 ID `10100`대 및 다른 신규 룰의 발화는 미검증이다. A의 Log4Shell 경로 토글은 OFF이며 설치된 스크립트에는 저장소의 `OBS_SEG` 코드가 없다. [작업 기록](../대화기록/2026-10-06.md)

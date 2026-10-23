@@ -1,5 +1,11 @@
 # 채팅 인증서 만료 감시·수동 갱신
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 **2026-10-15 14:33:38 KST 공용 인증서 적용:** Mac의 일회성 private 환경에서 발급한 Let's Encrypt `*.grootlab.duckdns.org` 와일드카드 인증서 한 장을 A의 `chatduck.crt/key`에 설치하고 Nginx를 한 번 재로드했다. SAN은 채팅과 Log4Shell DuckDNS 이름을 모두 포함하며 만료는 **2027-01-13 13:25:12 KST**다. Mac 시스템 CA 검증을 켠 `curl`로 채팅 ping 200과 Log4Shell HTTPS의 `/dvwa/login.php`→`/log4shell/` 최종 200을 확인했다. A 감시기의 수동 실행도 `Result=success`·exit0으로 새 파일과 채팅 SNI를 검증했다. 배포 전 인증서는 A `/var/backups/capstone-log4shell-tls/20261015T143336+0900`에 보존했다. 아래 10:49 라이브 확인의 만료일은 **교체 전 채팅 단일 이름 인증서**의 이력이다. 감시기는 공유 파일 `chatduck.crt`의 만료일·지문을 매번 읽지만 `log4shell.grootlab.duckdns.org`의 SNI·경로는 주기 검사하지 않으므로 배포·갱신 때 별도로 검증한다. 자동 갱신은 없고 **2026년 12월 중순 재발급 준비**가 현재 일정이다.
 
 **2026-10-15 10:49 KST 후속 확인:** 오늘 **09:00:00 KST 예약 실행·exit0**와 09:00:01의 `ok/verified` journal 1건, 같은 상태파일을 대조했다. 다음 예약은 10월 16일 09:00 KST다. 10:48:58 실제 TLS도 CA·hostname·제공 인증서 fingerprint 검증을 통과했고, 만료는 **2027-01-06 15:02:33 KST**로 동일하다. [A 실측](followup-a-2026-10-15.json).

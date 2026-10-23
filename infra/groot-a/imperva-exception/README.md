@@ -1,5 +1,11 @@
 # Imperva 점검 요청의 좁은 CRS 예외
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 > 04:48 WAF 단계 마감: 서버 증거 319파일/2660278B를 /var/backups/capstone-waf-recreation-validation-20261015에 보존·해시대조·fsync한 뒤 stage5를 제거했다. Mac 임시 363파일/2879578B도 제거·경로부재 확인했다. 패키지 설치0. 마지막 인증서 단계에 착수한다.
 
 ## WAF 재생성 검증 완료 (2026-10-15 04:45 KST)

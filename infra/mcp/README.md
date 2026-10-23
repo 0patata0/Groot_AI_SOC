@@ -1,5 +1,17 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
+> 현재 구성은 MCP6서버와 고정 진단25대상이다. 자연어 도구 선택·무근거 완료/SILENT 알림 보완의 실제 검증 상태는 STATUS 최상단을 따른다. 정확 후보 승인과 일반 sudo/Docker/임의 shell 금지는 유지한다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
+## 2026-10-24 실제 조회·관리 경로 보완
+
+Hermes UID995의 SDK로6서버 initialize/list를 다시 확인했다. 서버가 제공한 도구는 Wazuh14·security-events2·resp3·rule-a8·rule-b8·system-diagnostics1이며, 관리 CLI에 실제 제공하는 도구와 구분한다. verify는 읽기26개, manage는 기존 승인 제안 등 허용 목록만 제공하고 legacy resp 쓰기를 직접 노출하지 않는다. constructor 이후 재구성된 도구도 매 요청에서 다시 제한한다.
+
+세 고정 룰 대상의 현재 파일 정의는 WAF10·Suricata14(로컬12/ET override2)·Wazuh19(level0 포함)개였다. 이 값은 해당 파일 바이트/SHA의 정의 수이며 전체 CRS/ET/Wazuh·엔진 적재 수나 실제 발화 수가 아니다. 고정 진단은KST 시각·반환 표본 수·요청 구간 전체 건수 미확인을 구분한다. 실제 자연어3건/진단7조회·SILENT 검증 안내1건의 근거와 남은 해석 한계는 [STATUS](../../STATUS.md)를 따른다.
+
 ## 2026-10-23 고정 시스템 진단 — A/B/C 배포·실제 SDK 검증 완료
 
 `system-diagnostics`의 읽기 도구1개 `get_system_diagnostics`를 추가했다. A/B/C의 허용된 systemd 대상25개에서 상태·`Type`·종료 코드·재시작 횟수와 최대4시간의 분류된 오류 표본을 읽는다. root collector의60초 주기·TTL180초 snapshot을 읽고 원문 journal·환경·명령·HTTP 본문은 반환하지 않는다. 미설치·중지·실패한 unit도 조회하며, 조회 실패/잘림/범위 한계를 정상이나 오류0으로 바꾸지 않는다. 기존 승인형 변경·LLM 관리 주체와 일반 sudo/Docker 금지 정책을 유지한다. [범위·전송·검증 계약](system-diagnostics.md).

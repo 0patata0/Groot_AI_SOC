@@ -1,5 +1,11 @@
 # 2026-10-15 Imperva 예외 격리 재검증
 
+<!-- current-project-context:2026-10-24 -->
+> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../../STATUS.md) · [실행 계획](../../../../PLAN.md).
+> A는 외부/내부 관문이며 Suricata는 passive IDS다. DVWA의 DetectionOnly와 실습 HTTP 경로의 WAF 차단/요청별 예외를 구분한다. 이번 TLS 조회의 세 HTTPS 이름 만료는2027-01-13 13:25:12 KST이며 과거 인증서 값은 이력이다.
+> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
+<!-- /current-project-context -->
+
 현재 **로컬 순수 14개와 A의 run-02 native 21쌍/42요청이 통과**했다. [실측 메타데이터](validation-2026-10-15.json)의 시험 소스 SHA는 `9cc774e18ea79a82e5e83e2d183fdc0e578bae6403772220e87a034f0870c98e`이며 현재 `run-native.py`와 일치한다. 양성2개에서 해당 CRS 경보가 제외되고, 조건 이탈17개는 baseline/candidate의 전체 룰 ID 집합이 같으며, XSS2개는 커스텀 `10300`·CRS XSS·`949110`을 유지했다. 이는 설치된 예외 원본의 격리 검증이며 운영 자연 요청의 예외 적중은 아직 입증하지 못했다.
 
 native 결과에서 UID/GID101 writer 두 개는 강제 종료 없이 exit0으로 종료했다. private netns는 전후 동일한 lo만 유지했고 외부 인터페이스/default route0, 운영 요청·신호0, 운영 서비스·소스 불변이었다. cleanup 오류0·남은 private writer0·private 경로 제거를 확인했다. 합성 원문과 실행 증거는 A `/var/backups/capstone-imperva-revalidate-20261015`에 보존했으며 임시 stage는 제거됐다. 이 문서의 독립 확인은 보존된 메타데이터 전수 대조이며 원문 재조회는 수행하지 않았다.

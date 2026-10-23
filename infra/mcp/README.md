@@ -8,6 +8,8 @@
 
 ## 2026-10-24 실제 조회·관리 경로 보완
 
+후속 보안·LLM 점검에서는 UID995의6서버 initialize/list와 이벤트2종 직접 조회가 성공했으나, 같은 읽기26도구를 제공한 자연어 이벤트 요청2건은 호출0회였다. 진단/룰/agent·차단목록 요청3건에서는 실제7회 조회했다. 룰의 `runtime_load_verified=false`를 확인 완료로 뒤집는 답변 등 해석 오류도 있어 SDK 연결·모델 선택·답변 정확도를 각각 구분한다. A의 기존 응답 계정과 신규 설치기의 root 승인 wrapper 차이 역시 별도 최소 이관 과제이며 이번 점검에서 sudoers나 운영 권한을 변경하지 않았다. 상세 결과는 [STATUS](../../STATUS.md) 최상단을 따른다.
+
 Hermes UID995의 SDK로6서버 initialize/list를 다시 확인했다. 서버가 제공한 도구는 Wazuh14·security-events2·resp3·rule-a8·rule-b8·system-diagnostics1이며, 관리 CLI에 실제 제공하는 도구와 구분한다. verify는 읽기26개, manage는 기존 승인 제안 등 허용 목록만 제공하고 legacy resp 쓰기를 직접 노출하지 않는다. constructor 이후 재구성된 도구도 매 요청에서 다시 제한한다.
 
 세 고정 룰 대상의 현재 파일 정의는 WAF10·Suricata14(로컬12/ET override2)·Wazuh19(level0 포함)개였다. 이 값은 해당 파일 바이트/SHA의 정의 수이며 전체 CRS/ET/Wazuh·엔진 적재 수나 실제 발화 수가 아니다. 고정 진단은KST 시각·반환 표본 수·요청 구간 전체 건수 미확인을 구분한다. 실제 자연어3건/진단7조회·SILENT 검증 안내1건의 근거와 남은 해석 한계는 [STATUS](../../STATUS.md)를 따른다.

@@ -8,6 +8,8 @@
 
 ## 2026-10-24 관리 gate 보완
 
+후속 읽기 보안 점검에서 기존 A의 응답 계정은 하위 차단 helper를 직접 sudo 실행할 수 있는 이전 구조임을 확인했다. 아래 새 설치기의 root 승인 wrapper/직접 helper sudo 금지 계약과 구분하며, 초기 설치기를 기존 서버에 실행하지 않고 원본·의존성·복구를 확인한 별도 최소 이관이 필요하다. 이번에는 점검만 했고 실제 우회·차단·sudoers 변경은 하지 않았다. [판정과 후속](../STATUS.md).
+
 초기 설치기는 같은 `soc_management_run.py` 원본을 root 소유 controller의 `-I -B -c` 인수로 결속한다. 요청 builder는 native 도구 재구성과 `extra_body`가 있어도 mode별 도구 목록·강제 선택을 다시 검사한다. 실제 MCP 호출 완료가0이면 완료/SILENT를 미확인·needs_review로 표시한다. Controller는 needs_review의 SILENT도 고정 검토 안내로 전달한다. 진단 시각은 `observed_at_kst`, 오류 수는 반환 표본과 전체 건수 미확인을 구분한다.
 
 이 소스 계약을 기존 B에 별도 최소 이관한 결과는 [STATUS](../STATUS.md)를 따른다. 아래 신규 설치 모듈 전체를 기존 운영 서버에서 실행한 것은 아니며 새3VM 전체 설치 시험도 하지 않았다. 추가 패키지·이미지·포트·일반 실행 권한은 없다.

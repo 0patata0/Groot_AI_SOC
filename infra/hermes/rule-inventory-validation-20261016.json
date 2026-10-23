@@ -1,0 +1,1623 @@
+{
+  "schema_version": 1,
+  "date_kst": "2026-10-16",
+  "status": "deployed_exact_file_inventory_and_native_delivery_verified",
+  "purpose": "Exact target-file rule counts and IDs without model recounting or reserved-gap expansion",
+  "execution_recovery_evidence": "rule-query-execution-validation-20261016.json",
+  "scope": {
+    "targets": [
+      "a:modsecurity-custom",
+      "a:suricata-local",
+      "b:wazuh-local-rules"
+    ],
+    "counts_are": "target_file_definitions",
+    "engine_load_verified": false,
+    "other_rule_files_included": false,
+    "llm_selects_tools": true,
+    "protected_change_approval_unchanged": true,
+    "live_chat_posts": 0
+  },
+  "producer_deployments": [
+    {
+      "host": "a",
+      "at_kst": "2026-10-16T20:50:55.307039+09:00",
+      "old_sha256": "77ca7bc1dd19b0f6906711b96d1853fdbe8b2b5724d5c5362ae7d12ff64b3f87",
+      "new_sha256": "156b88d0ac60c85df96ce05961b911cd5bc28ddb65b0df3656134e8a17015c6c",
+      "backup": "/var/backups/capstone-rule-inventory/20261016/205053",
+      "existing_methods_preserved": true,
+      "rule_files_unchanged": true,
+      "security_services_restarted": 0,
+      "new_packages": 0,
+      "inventories": {
+        "a:modsecurity-custom": {
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "inventory": {
+            "schema_version": 1,
+            "kind": "waf",
+            "scope": "target_file_definitions",
+            "source_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+            "status": "complete",
+            "declared_count": 10,
+            "unique_id_count": 10,
+            "ids": [
+              10100,
+              10101,
+              10200,
+              10300,
+              10400,
+              10500,
+              10501,
+              10600,
+              10601,
+              10602
+            ],
+            "duplicate_ids": [],
+            "contiguous_id_groups": [
+              {
+                "start": 10100,
+                "end": 10101
+              },
+              {
+                "start": 10200,
+                "end": 10200
+              },
+              {
+                "start": 10300,
+                "end": 10300
+              },
+              {
+                "start": 10400,
+                "end": 10400
+              },
+              {
+                "start": 10500,
+                "end": 10501
+              },
+              {
+                "start": 10600,
+                "end": 10602
+              }
+            ],
+            "runtime_load_verified": false,
+            "details": {
+              "secrule_directives": 12,
+              "secaction_directives": 0,
+              "chain_continuations": 2
+            }
+          },
+          "runtime": {
+            "running": true,
+            "health": "healthy"
+          }
+        },
+        "a:suricata-local": {
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "inventory": {
+            "schema_version": 1,
+            "kind": "suricata",
+            "scope": "target_file_definitions",
+            "source_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+            "status": "complete",
+            "declared_count": 14,
+            "unique_id_count": 14,
+            "ids": [
+              1000000,
+              1000001,
+              1000002,
+              1000010,
+              1000030,
+              1000031,
+              1000032,
+              1000033,
+              1000050,
+              1000051,
+              1000070,
+              1000071,
+              2034802,
+              2034806
+            ],
+            "duplicate_ids": [],
+            "contiguous_id_groups": [
+              {
+                "start": 1000000,
+                "end": 1000002
+              },
+              {
+                "start": 1000010,
+                "end": 1000010
+              },
+              {
+                "start": 1000030,
+                "end": 1000033
+              },
+              {
+                "start": 1000050,
+                "end": 1000051
+              },
+              {
+                "start": 1000070,
+                "end": 1000071
+              },
+              {
+                "start": 2034802,
+                "end": 2034802
+              },
+              {
+                "start": 2034806,
+                "end": 2034806
+              }
+            ],
+            "runtime_load_verified": false,
+            "details": {
+              "local_sid_count": 12,
+              "et_override_count": 2,
+              "other_sid_count": 0,
+              "noalert_count": 1
+            }
+          },
+          "runtime": {
+            "running": true,
+            "health": "not_reported"
+          }
+        }
+      },
+      "prior_states": {
+        "applied": 5,
+        "denied": 1,
+        "expired": 2
+      }
+    },
+    {
+      "host": "b",
+      "at_kst": "2026-10-16T20:53:09.059249+09:00",
+      "old_sha256": "d937c7def4d2938d7655e445cb5cf9cd7858837aebebaf4278feae5fb69965a2",
+      "new_sha256": "22d91b33a7196d869cb3bb3425c05809775d55ab937d6c0c01876f53e401fba1",
+      "backup": "/var/backups/capstone-rule-inventory/20261016/205308",
+      "existing_methods_preserved": true,
+      "rule_files_unchanged": true,
+      "security_services_restarted": 0,
+      "new_packages": 0,
+      "inventories": {
+        "b:wazuh-local-rules": {
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "inventory": {
+            "schema_version": 1,
+            "kind": "wazuh",
+            "scope": "target_file_definitions",
+            "source_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+            "status": "complete",
+            "declared_count": 19,
+            "unique_id_count": 19,
+            "ids": [
+              100100,
+              100101,
+              100102,
+              100103,
+              100110,
+              100111,
+              100112,
+              100120,
+              100121,
+              100122,
+              100123,
+              100124,
+              100125,
+              100126,
+              100127,
+              100128,
+              100129,
+              100130,
+              100131
+            ],
+            "duplicate_ids": [],
+            "contiguous_id_groups": [
+              {
+                "start": 100100,
+                "end": 100103
+              },
+              {
+                "start": 100110,
+                "end": 100112
+              },
+              {
+                "start": 100120,
+                "end": 100131
+              }
+            ],
+            "runtime_load_verified": false,
+            "details": {
+              "level_counts": {
+                "9": 1,
+                "6": 3,
+                "12": 3,
+                "0": 1,
+                "7": 1,
+                "10": 2,
+                "3": 1,
+                "5": 2,
+                "4": 2,
+                "8": 1,
+                "1": 2
+              },
+              "level0_count": 1
+            }
+          },
+          "runtime": {
+            "running": true,
+            "health": "not_reported"
+          }
+        }
+      },
+      "prior_states": {}
+    }
+  ],
+  "producer_preflight_failure": {
+    "code": "worker_not_idle",
+    "host": "a",
+    "operating_code_changes": 0,
+    "staging_removed": true,
+    "timer_active": true,
+    "resolution": "Pause periodic timer, allow running worker to finish naturally, verify lock and terminal proposal states, then atomic replacement."
+  },
+  "source_variants": {
+    "a_matches_current_repository": true,
+    "b_preserves_older_incident_and_write_behavior": true,
+    "b_existing_module_ast_unchanged_after_removing_inventory_delta": true,
+    "new_imports": 0,
+    "b_candidate_regressions_passed": 81,
+    "historical_suricata_update_snapshot_preserved": true,
+    "repository_compare_pin_updated_for_future_verified_run": true
+  },
+  "native_transport": {
+    "path": "/opt/hermes/agent/tool_dispatch_helpers.py",
+    "sha256": "21a067da35986a1a0fe8f71d553c66d9a344f25b7fcac7f0a016a7ccbceff7a0",
+    "rule": "Exact inspected untrusted_tool_result envelope and source name only; one unwrap; normal content/SHA validation remains required; mismatches unavailable.",
+    "vendor_file_modified": false,
+    "new_runtime_hook": false
+  },
+  "evaluations": [
+    {
+      "mode": "native_natural_replay",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.317,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 10101,
+                "start": 10100
+              },
+              {
+                "end": 10200,
+                "start": 10200
+              },
+              {
+                "end": 10300,
+                "start": 10300
+              },
+              {
+                "end": 10400,
+                "start": 10400
+              },
+              {
+                "end": 10501,
+                "start": 10500
+              },
+              {
+                "end": 10602,
+                "start": 10600
+              }
+            ],
+            "declared_count": 10,
+            "details": {
+              "chain_continuations": 2,
+              "secaction_directives": 0,
+              "secrule_directives": 12
+            },
+            "duplicate_ids": [],
+            "ids": [
+              10100,
+              10101,
+              10200,
+              10300,
+              10400,
+              10500,
+              10501,
+              10600,
+              10601,
+              10602
+            ],
+            "kind": "waf",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+            "status": "complete",
+            "unique_id_count": 10
+          },
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.337,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 1000002,
+                "start": 1000000
+              },
+              {
+                "end": 1000010,
+                "start": 1000010
+              },
+              {
+                "end": 1000033,
+                "start": 1000030
+              },
+              {
+                "end": 1000051,
+                "start": 1000050
+              },
+              {
+                "end": 1000071,
+                "start": 1000070
+              },
+              {
+                "end": 2034802,
+                "start": 2034802
+              },
+              {
+                "end": 2034806,
+                "start": 2034806
+              }
+            ],
+            "declared_count": 14,
+            "details": {
+              "et_override_count": 2,
+              "local_sid_count": 12,
+              "noalert_count": 1,
+              "other_sid_count": 0
+            },
+            "duplicate_ids": [],
+            "ids": [
+              1000000,
+              1000001,
+              1000002,
+              1000010,
+              1000030,
+              1000031,
+              1000032,
+              1000033,
+              1000050,
+              1000051,
+              1000070,
+              1000071,
+              2034802,
+              2034806
+            ],
+            "kind": "suricata",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+            "status": "complete",
+            "unique_id_count": 14
+          },
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.223,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 100103,
+                "start": 100100
+              },
+              {
+                "end": 100112,
+                "start": 100110
+              },
+              {
+                "end": 100131,
+                "start": 100120
+              }
+            ],
+            "declared_count": 19,
+            "details": {
+              "level0_count": 1,
+              "level_counts": {
+                "0": 1,
+                "1": 2,
+                "10": 2,
+                "12": 3,
+                "3": 1,
+                "4": 2,
+                "5": 2,
+                "6": 3,
+                "7": 1,
+                "8": 1,
+                "9": 1
+              }
+            },
+            "duplicate_ids": [],
+            "ids": [
+              100100,
+              100101,
+              100102,
+              100103,
+              100110,
+              100111,
+              100112,
+              100120,
+              100121,
+              100122,
+              100123,
+              100124,
+              100125,
+              100126,
+              100127,
+              100128,
+              100129,
+              100130,
+              100131
+            ],
+            "kind": "wazuh",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+            "status": "complete",
+            "unique_id_count": 19
+          },
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "running": true
+        }
+      ],
+      "denied_dispatches": 0,
+      "wire_calls": 3,
+      "wrapper_active": true,
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": null,
+          "reasoning_effort": null,
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        }
+      ],
+      "api_calls": 3,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 432,
+      "final_sha256": "e54e4760a52c419418dd78f868733ec3937d1ce1eb47a8d6ce2d26864ff1fa9c",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "delivered_ids_inexact",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 85,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 50.334,
+      "actual_model_requests": 3
+    },
+    {
+      "mode": "native_inventory_contract",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.308,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 10101,
+                "start": 10100
+              },
+              {
+                "end": 10200,
+                "start": 10200
+              },
+              {
+                "end": 10300,
+                "start": 10300
+              },
+              {
+                "end": 10400,
+                "start": 10400
+              },
+              {
+                "end": 10501,
+                "start": 10500
+              },
+              {
+                "end": 10602,
+                "start": 10600
+              }
+            ],
+            "declared_count": 10,
+            "details": {
+              "chain_continuations": 2,
+              "secaction_directives": 0,
+              "secrule_directives": 12
+            },
+            "duplicate_ids": [],
+            "ids": [
+              10100,
+              10101,
+              10200,
+              10300,
+              10400,
+              10500,
+              10501,
+              10600,
+              10601,
+              10602
+            ],
+            "kind": "waf",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+            "status": "complete",
+            "unique_id_count": 10
+          },
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.302,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 1000002,
+                "start": 1000000
+              },
+              {
+                "end": 1000010,
+                "start": 1000010
+              },
+              {
+                "end": 1000033,
+                "start": 1000030
+              },
+              {
+                "end": 1000051,
+                "start": 1000050
+              },
+              {
+                "end": 1000071,
+                "start": 1000070
+              },
+              {
+                "end": 2034802,
+                "start": 2034802
+              },
+              {
+                "end": 2034806,
+                "start": 2034806
+              }
+            ],
+            "declared_count": 14,
+            "details": {
+              "et_override_count": 2,
+              "local_sid_count": 12,
+              "noalert_count": 1,
+              "other_sid_count": 0
+            },
+            "duplicate_ids": [],
+            "ids": [
+              1000000,
+              1000001,
+              1000002,
+              1000010,
+              1000030,
+              1000031,
+              1000032,
+              1000033,
+              1000050,
+              1000051,
+              1000070,
+              1000071,
+              2034802,
+              2034806
+            ],
+            "kind": "suricata",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+            "status": "complete",
+            "unique_id_count": 14
+          },
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.223,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 100103,
+                "start": 100100
+              },
+              {
+                "end": 100112,
+                "start": 100110
+              },
+              {
+                "end": 100131,
+                "start": 100120
+              }
+            ],
+            "declared_count": 19,
+            "details": {
+              "level0_count": 1,
+              "level_counts": {
+                "0": 1,
+                "1": 2,
+                "10": 2,
+                "12": 3,
+                "3": 1,
+                "4": 2,
+                "5": 2,
+                "6": 3,
+                "7": 1,
+                "8": 1,
+                "9": 1
+              }
+            },
+            "duplicate_ids": [],
+            "ids": [
+              100100,
+              100101,
+              100102,
+              100103,
+              100110,
+              100111,
+              100112,
+              100120,
+              100121,
+              100122,
+              100123,
+              100124,
+              100125,
+              100126,
+              100127,
+              100128,
+              100129,
+              100130,
+              100131
+            ],
+            "kind": "wazuh",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+            "status": "complete",
+            "unique_id_count": 19
+          },
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "running": true
+        }
+      ],
+      "denied_dispatches": 0,
+      "wire_calls": 3,
+      "wrapper_active": true,
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": null,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        }
+      ],
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 432,
+      "final_sha256": "e54e4760a52c419418dd78f868733ec3937d1ce1eb47a8d6ce2d26864ff1fa9c",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "delivered_ids_inexact",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 104,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 12.026,
+      "actual_model_requests": 0
+    },
+    {
+      "mode": "native_inventory_contract",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.305,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 10101,
+                "start": 10100
+              },
+              {
+                "end": 10200,
+                "start": 10200
+              },
+              {
+                "end": 10300,
+                "start": 10300
+              },
+              {
+                "end": 10400,
+                "start": 10400
+              },
+              {
+                "end": 10501,
+                "start": 10500
+              },
+              {
+                "end": 10602,
+                "start": 10600
+              }
+            ],
+            "declared_count": 10,
+            "details": {
+              "chain_continuations": 2,
+              "secaction_directives": 0,
+              "secrule_directives": 12
+            },
+            "duplicate_ids": [],
+            "ids": [
+              10100,
+              10101,
+              10200,
+              10300,
+              10400,
+              10500,
+              10501,
+              10600,
+              10601,
+              10602
+            ],
+            "kind": "waf",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+            "status": "complete",
+            "unique_id_count": 10
+          },
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.287,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 1000002,
+                "start": 1000000
+              },
+              {
+                "end": 1000010,
+                "start": 1000010
+              },
+              {
+                "end": 1000033,
+                "start": 1000030
+              },
+              {
+                "end": 1000051,
+                "start": 1000050
+              },
+              {
+                "end": 1000071,
+                "start": 1000070
+              },
+              {
+                "end": 2034802,
+                "start": 2034802
+              },
+              {
+                "end": 2034806,
+                "start": 2034806
+              }
+            ],
+            "declared_count": 14,
+            "details": {
+              "et_override_count": 2,
+              "local_sid_count": 12,
+              "noalert_count": 1,
+              "other_sid_count": 0
+            },
+            "duplicate_ids": [],
+            "ids": [
+              1000000,
+              1000001,
+              1000002,
+              1000010,
+              1000030,
+              1000031,
+              1000032,
+              1000033,
+              1000050,
+              1000051,
+              1000070,
+              1000071,
+              2034802,
+              2034806
+            ],
+            "kind": "suricata",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+            "status": "complete",
+            "unique_id_count": 14
+          },
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.221,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 100103,
+                "start": 100100
+              },
+              {
+                "end": 100112,
+                "start": 100110
+              },
+              {
+                "end": 100131,
+                "start": 100120
+              }
+            ],
+            "declared_count": 19,
+            "details": {
+              "level0_count": 1,
+              "level_counts": {
+                "0": 1,
+                "1": 2,
+                "10": 2,
+                "12": 3,
+                "3": 1,
+                "4": 2,
+                "5": 2,
+                "6": 3,
+                "7": 1,
+                "8": 1,
+                "9": 1
+              }
+            },
+            "duplicate_ids": [],
+            "ids": [
+              100100,
+              100101,
+              100102,
+              100103,
+              100110,
+              100111,
+              100112,
+              100120,
+              100121,
+              100122,
+              100123,
+              100124,
+              100125,
+              100126,
+              100127,
+              100128,
+              100129,
+              100130,
+              100131
+            ],
+            "kind": "wazuh",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+            "status": "complete",
+            "unique_id_count": 19
+          },
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "running": true
+        }
+      ],
+      "denied_dispatches": 0,
+      "wire_calls": 3,
+      "wrapper_active": true,
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": null,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        }
+      ],
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 990,
+      "final_sha256": "3ac1ffe8b5a32e5e44b70a16fd0a0a9b63838f66006a8f36584cd9be70571fe2",
+      "final_message_matches_delivery": true,
+      "exact_inventory_and_delivery_verified": true,
+      "passed": true,
+      "total_seconds": 12.046,
+      "actual_model_requests": 0
+    },
+    {
+      "mode": "native_natural_replay",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.306,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 10101,
+                "start": 10100
+              },
+              {
+                "end": 10200,
+                "start": 10200
+              },
+              {
+                "end": 10300,
+                "start": 10300
+              },
+              {
+                "end": 10400,
+                "start": 10400
+              },
+              {
+                "end": 10501,
+                "start": 10500
+              },
+              {
+                "end": 10602,
+                "start": 10600
+              }
+            ],
+            "declared_count": 10,
+            "details": {
+              "chain_continuations": 2,
+              "secaction_directives": 0,
+              "secrule_directives": 12
+            },
+            "duplicate_ids": [],
+            "ids": [
+              10100,
+              10101,
+              10200,
+              10300,
+              10400,
+              10500,
+              10501,
+              10600,
+              10601,
+              10602
+            ],
+            "kind": "waf",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+            "status": "complete",
+            "unique_id_count": 10
+          },
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.271,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 1000002,
+                "start": 1000000
+              },
+              {
+                "end": 1000010,
+                "start": 1000010
+              },
+              {
+                "end": 1000033,
+                "start": 1000030
+              },
+              {
+                "end": 1000051,
+                "start": 1000050
+              },
+              {
+                "end": 1000071,
+                "start": 1000070
+              },
+              {
+                "end": 2034802,
+                "start": 2034802
+              },
+              {
+                "end": 2034806,
+                "start": 2034806
+              }
+            ],
+            "declared_count": 14,
+            "details": {
+              "et_override_count": 2,
+              "local_sid_count": 12,
+              "noalert_count": 1,
+              "other_sid_count": 0
+            },
+            "duplicate_ids": [],
+            "ids": [
+              1000000,
+              1000001,
+              1000002,
+              1000010,
+              1000030,
+              1000031,
+              1000032,
+              1000033,
+              1000050,
+              1000051,
+              1000070,
+              1000071,
+              2034802,
+              2034806
+            ],
+            "kind": "suricata",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+            "status": "complete",
+            "unique_id_count": 14
+          },
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.227,
+          "inventory": {
+            "contiguous_id_groups": [
+              {
+                "end": 100103,
+                "start": 100100
+              },
+              {
+                "end": 100112,
+                "start": 100110
+              },
+              {
+                "end": 100131,
+                "start": 100120
+              }
+            ],
+            "declared_count": 19,
+            "details": {
+              "level0_count": 1,
+              "level_counts": {
+                "0": 1,
+                "1": 2,
+                "10": 2,
+                "12": 3,
+                "3": 1,
+                "4": 2,
+                "5": 2,
+                "6": 3,
+                "7": 1,
+                "8": 1,
+                "9": 1
+              }
+            },
+            "duplicate_ids": [],
+            "ids": [
+              100100,
+              100101,
+              100102,
+              100103,
+              100110,
+              100111,
+              100112,
+              100120,
+              100121,
+              100122,
+              100123,
+              100124,
+              100125,
+              100126,
+              100127,
+              100128,
+              100129,
+              100130,
+              100131
+            ],
+            "kind": "wazuh",
+            "runtime_load_verified": false,
+            "schema_version": 1,
+            "scope": "target_file_definitions",
+            "source_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+            "status": "complete",
+            "unique_id_count": 19
+          },
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "running": true
+        }
+      ],
+      "denied_dispatches": 0,
+      "wire_calls": 3,
+      "wrapper_active": true,
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": null,
+          "reasoning_effort": null,
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        }
+      ],
+      "api_calls": 3,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 990,
+      "final_sha256": "3ac1ffe8b5a32e5e44b70a16fd0a0a9b63838f66006a8f36584cd9be70571fe2",
+      "final_message_matches_delivery": true,
+      "exact_inventory_and_delivery_verified": true,
+      "passed": true,
+      "total_seconds": 57.38,
+      "actual_model_requests": 3
+    }
+  ],
+  "evaluation_notes": [
+    "First natural and synthetic native tests completed three real reads but safely rendered unavailable because the native data envelope was unsupported. They failed exact delivery validation and were not counted as successes.",
+    "Contract mode uses synthetic model completions but real native dispatch and three live MCP reads. Its api_calls count refers to native iterations, not real provider requests.",
+    "No rule writes or Mattermost posts were sent; private test homes were removed."
+  ],
+  "local_tests": {
+    "completion": 85,
+    "inventory_renderer": 65,
+    "rule_inventory": 28,
+    "existing_executor": 53,
+    "mcp_front": 10,
+    "offline_comparison": 20,
+    "siem_installer": 36
+  },
+  "renderer_deployment": {
+    "at_kst": "2026-10-16T21:00:20.271508+09:00",
+    "policy_sha256": "6245248b62e370a8a59ac3ec26c30bf99994e563937958985c387fa3e8639c66",
+    "previous_policy_sha256": "8d25a6ce0f24151fae35a89aa064cfe4febdfa3b92256c3972bfe3a674ea4f37",
+    "current_sessions_updated": 53,
+    "backup": "/var/backups/capstone-query-completion/20261016/210015",
+    "policy_backup": "/var/backups/capstone-query-completion/20261016/210015/rule-edit-policy-wjzi9ze1",
+    "database_integrity": "ok",
+    "unrelated_tables_unchanged": true,
+    "config_change": "none; existing plugin upgraded to 1.1.0",
+    "env_cron_preserved": true,
+    "plugin_sha256": {
+      "__init__.py": "b940dff1d5de3bac57b9f324c3abe3106199fde23d4c4f4acda9fbe4fbe8e3ad",
+      "plugin.yaml": "06bc1d4cfe8f4b6568be0991e38feef2dc950c667459fe1e9da10885e6cae6c1"
+    },
+    "native_files_modified": 0,
+    "same_hermes_container": true,
+    "security_services_restarted": 0,
+    "new_packages": 0
+  },
+  "remaining": [
+    "Observe a new user-initiated Mattermost request and client layout; no test chat was posted.",
+    "Broader analytical or explicitly formatted model answers retain the native response path; exact factual rendering is limited to simple current custom/local rule inventory requests.",
+    "Counts describe the three target files, not all engine-loaded or other rule files."
+  ],
+  "renderer_deployment_recovery": {
+    "hermes_restart_attempted": true,
+    "timers_restore_attempted": [
+      "capstone-management.timer",
+      "capstone-hermes-guard-reapply.timer"
+    ],
+    "staging_removed": true,
+    "policy_committed": true,
+    "errors": []
+  },
+  "post_deployment_verification": {
+    "at_kst": "2026-10-16T21:02:22.836512+09:00",
+    "policy": {
+      "SOUL.md": "6245248b62e370a8a59ac3ec26c30bf99994e563937958985c387fa3e8639c66",
+      "management/SOUL.md": "6245248b62e370a8a59ac3ec26c30bf99994e563937958985c387fa3e8639c66"
+    },
+    "plugin": {
+      "__init__.py": "b940dff1d5de3bac57b9f324c3abe3106199fde23d4c4f4acda9fbe4fbe8e3ad",
+      "plugin.yaml": "06bc1d4cfe8f4b6568be0991e38feef2dc950c667459fe1e9da10885e6cae6c1"
+    },
+    "gateway": {
+      "gateway_state": "running",
+      "active_agents": 0,
+      "updated_at": "2026-10-16T12:01:34.672755+00:00"
+    },
+    "platforms": {
+      "mattermost": {
+        "state": "connected",
+        "needs_attention": false
+      },
+      "api_server": {
+        "state": "connected",
+        "needs_attention": false
+      }
+    },
+    "units": {
+      "capstone-management.timer": "active",
+      "capstone-hermes-guard-reapply.timer": "active",
+      "soc-bot.service": "active"
+    },
+    "container": {
+      "running": true,
+      "restarting": false,
+      "started_at": "2026-10-16T12:00:20.320910677Z",
+      "same_guard_container": true
+    },
+    "database_quick_check": "ok",
+    "current_session_count": 53,
+    "current_prompts_matched": 53,
+    "native_sha256": {
+      "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
+      "agent/conversation_loop.py": "c93ee86e1da583abc7cc57417380cd71241ae028c04a4cb8456580b52ffbf3d8",
+      "agent/turn_context.py": "85f857dc3c317366d918516bc8b37a022f1020b34da0c3966a31bd289b2942e1",
+      "agent/message_metadata.py": "77fbe25c86f2ab524fcac61a83548768cffc82c476bb8a6ff83ebdf492a5479d",
+      "agent/turn_api_request.py": "e31386cb83cf551026e4df9b589173b54bc913b36fc1a09942a520e68033b59e",
+      "agent/chat_completion_helpers.py": "5231a0e674806db6ad7be60e2d40a19a4157f7d2baa238aaa9af66f61e0eea4c",
+      "plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+      "gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a"
+    },
+    "configuration": {
+      "plugins": [
+        "groot-mattermost-context",
+        "groot-query-completion"
+      ],
+      "model": "qwen3.6:35b",
+      "provider": "custom",
+      "base_url": "http://211.170.162.111:11434/v1",
+      "reasoning_override": "none"
+    },
+    "registration_log_source": "post-start agent file log; UTC timestamp compared with container start",
+    "registration_log_seen": true,
+    "registration_record_count": 1,
+    "server_staging_remaining": 0,
+    "container_probe_dirs_remaining": 0,
+    "fresh_post_restart_heartbeat": true,
+    "passed": true
+  },
+  "verification_correction": {
+    "initial_check_at_kst": "2026-10-16T21:01:19.070348+09:00",
+    "initial_passed": false,
+    "cause": "Verifier searched Docker output only; plugin INFO registration is in agent.log. Service, policy and database checks already passed.",
+    "resolution": "Read exact 1.1.0 registration from agent.log; compare UTC record timestamp with current container start; recheck all conditions.",
+    "registration_at_utc": "2026-10-16T12:00:25.711+00:00",
+    "deployment_repeated": false
+  },
+  "repository_source_sha256": {
+    "infra/mcp/rule_change_executor.py": "156b88d0ac60c85df96ce05961b911cd5bc28ddb65b0df3656134e8a17015c6c",
+    "infra/hermes/query-completion/__init__.py": "b940dff1d5de3bac57b9f324c3abe3106199fde23d4c4f4acda9fbe4fbe8e3ad",
+    "infra/hermes/query-completion/plugin.yaml": "06bc1d4cfe8f4b6568be0991e38feef2dc950c667459fe1e9da10885e6cae6c1",
+    "infra/hermes/SOUL.groot.md": "a56ce3eb4a240d2e24955547360c1a2b16b92ef184d99ec7f4105c7a5e68e1ee",
+    "infra/automation/suricata-update/compare_rules.py": "a54d40b1d60b1622d956347ceb307e2846a91bf6161ab4fa96287bd7a4fc577a"
+  },
+  "cleanup": {
+    "server_rule_producer_staging_removed": true,
+    "server_hermes_staging_remaining": 0,
+    "container_probe_dirs_remaining": 0,
+    "new_packages": 0,
+    "mac_task_temp_removed": true,
+    "removed_file_count": 94,
+    "removed_bytes": 2762242,
+    "cleanup_at_kst": "2026-10-16T21:05:27.090954+09:00"
+  }
+}

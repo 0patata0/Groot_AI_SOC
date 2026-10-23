@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "deployed_at_kst": "2026-10-16T19:13:42.660769+09:00",
+  "deployment": {
+    "deployed_at_kst": "2026-10-16T19:13:42.660769+09:00",
+    "policy_sha256": "0a383c81099c31f1714f8a1859182a31b8a1114a2637697ebbc7563ad6d8bcf8",
+    "previous_policy_sha256": "a0d4fa01972f942b7d4a0c0c48ae86ab9c6812cc851fae3371effc4960fdb1d5",
+    "current_session_prompts_updated": 52,
+    "management_policy_updated": true,
+    "database_integrity": "ok",
+    "unrelated_tables_unchanged": true,
+    "config_env_cron_preserved": true,
+    "approval_and_management_policy_outside_format_preserved": true,
+    "backup": "/var/backups/capstone-chat-format/20261016/rule-edit-policy-tsmn1g2c",
+    "management_backup": "/var/backups/capstone-chat-format/20261016/management-SOUL-191338.md",
+    "same_hermes_container_restart": true,
+    "security_services_restarted": 0,
+    "new_packages_installed": 0,
+    "cron_update_mode": "preserve_cron",
+    "updater_source_sha256": "1d4e6352e03ee013707966b0b751fb0ce8316c8cccd52fa0e51c860b1a2595f7"
+  },
+  "initial_attempt": {
+    "status": "stopped_before_policy_or_database_changes",
+    "reason": "cron policy anchor ambiguous",
+    "existing_hermes_restarted_and_timers_restored": true,
+    "previous_policy_preserved": true,
+    "followup_connected_at_kst": "2026-10-16T19:12:36.292403+09:00"
+  },
+  "format": {
+    "chat": "bold section names and vertical bullet lists; no default Markdown tables",
+    "sections": [
+      "요약",
+      "확인 내역",
+      "조치 및 다음 단계"
+    ],
+    "approval_fields": [
+      "대상",
+      "변경 전",
+      "변경 후",
+      "예상 영향",
+      "검증",
+      "승인 상태"
+    ],
+    "table_exception": "Markdown document/file bodies or explicit user table request",
+    "existing_posts_reformatted": false,
+    "code_and_log_quotes_preserved": true
+  },
+  "evaluation": {
+    "at_kst": "2026-10-16T19:10:50.762537+09:00",
+    "model": "qwen3.6:35b",
+    "endpoint_host": "211.170.162.111",
+    "cases": [
+      {
+        "case": "status",
+        "elapsed_seconds": 27.995,
+        "checks": {
+          "nonempty": true,
+          "sections": true,
+          "no_pipe_table": true,
+          "no_whole_message_code_fence": true,
+          "bullet_list": true,
+          "no_cjk_explanation": true
+        },
+        "finish_reason": "stop",
+        "characters": 424,
+        "answer_sha256": "43ddbfe1cf449c3cad9cca420c293b81b463a59717b220155e0c08401900ea55",
+        "passed": true
+      },
+      {
+        "case": "approval",
+        "elapsed_seconds": 26.646,
+        "checks": {
+          "nonempty": true,
+          "sections": true,
+          "no_pipe_table": true,
+          "no_whole_message_code_fence": true,
+          "bullet_list": true,
+          "no_cjk_explanation": true,
+          "approval_six_labels": true
+        },
+        "finish_reason": "stop",
+        "characters": 505,
+        "answer_sha256": "eb50a50bc4ea9af441a3324746f56c2734346f268ade8db3f21731de8592f6f3",
+        "passed": true
+      }
+    ],
+    "tools_called": 0,
+    "mattermost_posts_sent": 0,
+    "passed": true
+  },
+  "local_tests": {
+    "siem_bootstrap": 31,
+    "policy_updater": 11,
+    "total": 42,
+    "new_vm_installation_performed": false
+  },
+  "followup_validation": {
+    "at_kst": "2026-10-16T19:14:56.546837+09:00",
+    "policy": {
+      "SOUL.md": {
+        "sha256": "0a383c81099c31f1714f8a1859182a31b8a1114a2637697ebbc7563ad6d8bcf8",
+        "format_section_count": 1,
+        "chat_table_directive_present": false,
+        "owner": [
+          995,
+          986
+        ]
+      },
+      "management/SOUL.md": {
+        "sha256": "0a383c81099c31f1714f8a1859182a31b8a1114a2637697ebbc7563ad6d8bcf8",
+        "format_section_count": 1,
+        "chat_table_directive_present": false,
+        "owner": [
+          995,
+          986
+        ]
+      }
+    },
+    "files": {
+      "config.yaml": "f8052b8d7cb4bc59f97680625eeb1dea3072f9300d1cdf1ed456d32b612a6a4b",
+      ".env": "5012fc84e88397ee66afb1d8c32c79188f04bdfd95e7c62b70bdf56dd27fd4a3",
+      "cron/jobs.json": "2169e473bb6b752de2338ed9e4143f860dc0dfd4db07efdee66d91ea9032ecb5"
+    },
+    "active_chat_leases": 0,
+    "routing_entries": 52,
+    "database_quick_check": "ok",
+    "management_cases": {
+      "completed": 5
+    },
+    "gateway": {
+      "state": "running",
+      "active_agents": 0,
+      "updated_at": "2026-10-16T10:13:56.995107+00:00",
+      "platforms": {
+        "mattermost": {
+          "state": "connected",
+          "needs_attention": false
+        },
+        "api_server": {
+          "state": "connected",
+          "needs_attention": false
+        }
+      }
+    },
+    "timers": {
+      "capstone-management.timer": "active",
+      "capstone-hermes-guard-reapply.timer": "active"
+    },
+    "recent_bot_message_shapes": [
+      {
+        "at_kst": "2026-10-16T19:13:38.349000+09:00",
+        "length": 151,
+        "lines": 1,
+        "pipe_table_lines": 0,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": false
+      },
+      {
+        "at_kst": "2026-10-16T19:11:50.186000+09:00",
+        "length": 151,
+        "lines": 1,
+        "pipe_table_lines": 0,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": false
+      },
+      {
+        "at_kst": "2026-10-16T19:03:32.202000+09:00",
+        "length": 679,
+        "lines": 17,
+        "pipe_table_lines": 8,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": true
+      },
+      {
+        "at_kst": "2026-10-15T19:01:51.283000+09:00",
+        "length": 28,
+        "lines": 1,
+        "pipe_table_lines": 0,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": false
+      },
+      {
+        "at_kst": "2026-10-15T19:01:51.270000+09:00",
+        "length": 32,
+        "lines": 1,
+        "pipe_table_lines": 0,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": false
+      },
+      {
+        "at_kst": "2026-10-15T19:01:51.247000+09:00",
+        "length": 9,
+        "lines": 1,
+        "pipe_table_lines": 0,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": false
+      },
+      {
+        "at_kst": "2026-10-15T19:01:29.858000+09:00",
+        "length": 151,
+        "lines": 1,
+        "pipe_table_lines": 0,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": false
+      },
+      {
+        "at_kst": "2026-10-15T18:54:16.718000+09:00",
+        "length": 28,
+        "lines": 1,
+        "pipe_table_lines": 0,
+        "literal_backslash_n": 0,
+        "whole_message_fenced": false,
+        "has_common_sections": false
+      }
+    ],
+    "current_session_prompts_matched": 52,
+    "adapter_hashes": {
+      "/opt/hermes/plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+      "/opt/hermes/gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a"
+    },
+    "soc_bot_active": true,
+    "server_staging_remaining": 0,
+    "passed": true
+  },
+  "observations": {
+    "recent_bot_table_message_at_kst": "2026-10-16T19:03:32.202000+09:00",
+    "recent_bot_table_characters": 679,
+    "recent_bot_table_lines": 8,
+    "recent_bot_table_whole_message_fenced": false,
+    "mattermost_adapter_post_limit": 4000,
+    "native_split_preserves_code_fences_but_does_not_repeat_table_header": true,
+    "specific_client_rendering_cause_confirmed": false,
+    "mattermost_supports_markdown_tables": true
+  },
+  "source_references": [
+    "https://docs.mattermost.com/messaging/formatting-text#tables",
+    "https://docs.mattermost.com/end-user-guide/access/client-availability"
+  ],
+  "limits": [
+    "Actual .111 model evaluated on two synthetic cases, without tools or Mattermost test posts; not a universal formatting or factual-accuracy guarantee.",
+    "Web and mobile client visual rendering of a new real conversation was not tested.",
+    "Cron content, uid/gid/mode preserved; atomic rewrite may change inode and mtime.",
+    "Two existing-Hermes stop/start cycles: first preflight failure and subsequent successful update; no security service restart."
+  ],
+  "source_sha256": {
+    "infra/hermes/SOUL.groot.md": "30c0bc8dffe8d00c3e86b57ed59c36a737b51c74104347d276fb92103a1741be",
+    "infra/hermes/update_rule_edit_policy_B.py": "1d4e6352e03ee013707966b0b751fb0ce8316c8cccd52fa0e51c860b1a2595f7",
+    "infra/hermes/test_update_rule_edit_policy_B.py": "560e255849f3390ffa019e07ac5201e012ee2dc2a0fe6cbe5185870da9b8620f",
+    "deployment/roles/siem-test.sh": "1c80f6f322a540b21c8f07bd06c01e2686ec82be2b46aba6d7650e16f2dbbb1f"
+  },
+  "temporary_cleanup": {
+    "at_kst": "2026-10-16T19:17:10+09:00",
+    "mac_task_directory_removed": true,
+    "mac_files_removed": 13,
+    "mac_bytes_removed": 145314,
+    "server_staging_remaining": 0,
+    "new_mac_packages": 0,
+    "new_server_packages": 0,
+    "operational_files_and_backups_preserved": true
+  }
+}

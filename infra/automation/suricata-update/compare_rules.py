@@ -10,7 +10,7 @@ import hashlib
 import re
 import types
 
-WORKER_SHA256 = "d937c7def4d2938d7655e445cb5cf9cd7858837aebebaf4278feae5fb69965a2"
+WORKER_SHA256 = "156b88d0ac60c85df96ce05961b911cd5bc28ddb65b0df3656134e8a17015c6c"
 FUNCTIONS = {"_suricata_lines", "_suricata_rule", "_suricata_number",
              "_validate_suricata_overrides"}
 NATIVE_RULE_SHA256 = "c64bea79d98130fbbf489cd2d64ae7d80a38b98b7a8cdcd930381fe18b824046"

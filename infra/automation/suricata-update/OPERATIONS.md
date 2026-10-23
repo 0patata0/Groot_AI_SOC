@@ -2,6 +2,8 @@
 
 이 절차는 기존 이미지에 포함된 Suricata Update 1.3.8을 **현재 활성 규칙의 후보 생성·검증 도구**로 사용한다. 기존 승인 worker와 `all.rules == ET 원본 + local`의 바이트 합본 계약은 유지한다. 새 ET 다운로드, 주기 업데이트, flowbit 의존 규칙의 자동 활성화, 전체 후보의 운영 게시, reload/restart는 연결하지 않는다. MCP·LLM 실행 권한도 추가하지 않는다.
 
+**2026-10-16 후속:** 조회용 파일 정의 집계를 추가한 현재 A 실행기와 저장소 `compare_rules.py`의 pin은 `156b88d0ac60c85df96ce05961b911cd5bc28ddb65b0df3656134e8a17015c6c`다. 아래 10/15 설치 소스·검증 증거 및 `d937c7…` pin은 당시 스냅샷으로 보존한다. 새 시험은 검토된 최신 비교 소스와 정확히 일치하는 실행기 사본·재확인한 입력을 **새 root 전용 source 디렉터리**에 준비한 뒤 수행한다. 설치 스냅샷의 pin만 바꾸거나 과거 통과 결과를 재사용하지 않는다. 이번 갱신에서는 updater·native 시험을 재실행하지 않았다. [갱신 근거와 범위](../../hermes/rule-inventory-validation-20261016.json).
+
 2026-10-15 v6에서는 원본/후보 활성 규칙52,495개가 같고 추가·제거·변경0, 예외SID2034802/2034806 검증이 통과했다. 이어 격리 native `-T`에서52,495 loaded/failed0/skipped0을 확인했다. [후보 결과](native-candidate-validation-2026-10-15.json)와 [구문 결과](native-syntax-validation-2026-10-15.json)를 함께 읽는다. 후보 생성 결과의 `native_syntax_verified:false`는 생성 당시 상태이며 나중 결과를 덮어쓰지 않는다. PCAP replay와 운영 규칙 변경은 이번에 수행하지 않았다.
 
 ## 영구 보관 위치

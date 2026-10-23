@@ -1,5 +1,13 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+## 2026-10-16 룰 파일 정의 집계 — 조회 근거 배포
+
+`get_rule_change_target`에 현재 원문과 **같은 바이트·SHA-256**에서 계산한 `rule_inventory`를 추가했다. A는 **20:50:55 KST**, B는 **20:53:09 KST**에 배포했다. 라이브 대상 파일에서 WAF **10개**(SecRule 조건문 12개·체인 후속 조건 2개), Suricata **14개**(로컬 SID 12개·ET override 2개, noalert 마커 포함), Wazuh **19개**(level 0 기반 룰 1개 포함)를 확인했다. [배포·검증 근거](../hermes/rule-inventory-validation-20261016.json).
+
+`schema_version:1`, `scope:target_file_definitions`이며 `declared_count`는 중복 포함 선언 수, `unique_id_count`는 고유 ID 수다. `ids`·`duplicate_ids`와 실제 인접 ID만 묶은 `contiguous_id_groups`, 종류별 `details`를 제공한다. 주석의 예약 ID·인용 문자열·체인 후속 조건을 별도 룰로 세지 않는다. 미지원 구문이면 `status:unavailable`·개수 `null`로 부분 집계를 폐기하고 원문 조회는 유지한다. 이 정보는 **대상 파일의 정의 집계**이며, CRS/ET 전체 개수나 실제 엔진 적재·경보 발생 여부를 뜻하지 않는다(`runtime_load_verified:false`).
+
+실행기 SHA는 A `156b88d0ac60c85df96ce05961b911cd5bc28ddb65b0df3656134e8a17015c6c`, B `22d91b33a7196d869cb3bb3425c05809775d55ab937d6c0c01876f53e401fba1`이다. B는 기존 버전에 집계 함수와 조회 필드만 이식하여 나머지 전체 모듈 AST를 보존했으므로 A와 해시가 다르다. 저장소 회귀 91개와 B 후보 회귀 81개가 통과했다. 보안 엔진 재시작·새 패키지 설치·룰 변경은 없으며 읽기 대상과 승인·쓰기 권한은 유지한다. 백업은 A `/var/backups/capstone-rule-inventory/20261016/205053`, B `/var/backups/capstone-rule-inventory/20261016/205308`이다.
+
 **만료 승인 카드 정리 배포(2026-10-15 19:02 KST 검증):** 새로 추적한 미응답 만료 요청만 본문·버튼을 정리하고 `만료된 승인 요청` 표시를 남긴다. 원글 DELETE 없이 댓글·승인/거부·소비/결과·감사기록과 기존 webhook 카드는 보존한다. 첫 실제 응답의 빈 첨부 `null` 정규화 문제를 수정한 뒤90개 회귀와 실제5초 worker의 만료 후2.368초1회 정리·보호 카드 불변을 확인했다. 이번 정리 시험은 실제 관리자 승인·룰 API 호출0이며 별도 승인→적용 E2E가 아니다. 고정 완료 시간도 보장하지 않는다. [운영·배포·복구·검증 범위](approval-card-cleanup.md).
 
 **Wazuh 상태 판정(2026-10-15):** 프로세스 `running`과 API 준비 상태를 별도로 확인한다. 잔존 `.restart` 때문에 프로세스가 정상이어도 API1017·인증500이 발생할 수 있다. 복구 후에는 인증·manager 상태의 필수 데몬 값·agents·실제 MCP 조회를 확인하며 상태 파일을 자동으로 무조건 삭제하지 않는다. 단일 manager의 cluster disabled는 조회 권한 부족이 아니다. [실제 원인·복구·잔여 과제](wazuh-api-health-20261015.md).

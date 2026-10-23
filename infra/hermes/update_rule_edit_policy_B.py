@@ -155,8 +155,10 @@ def stopped_identity():
 
 
 def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stopped_identity,
-           management_prompt=None):
+           management_prompt=None, preserve_cron=False):
     """Core is injectable only for isolated tests; production CLI uses fixed data."""
+    require(not (preserve_cron and management_prompt is not None),
+            'preserve_cron conflicts with management_prompt')
     identity = stopped_check()
 
     def still_stopped():
@@ -175,7 +177,9 @@ def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stoppe
     metadata = {name: regular(path) for name, path in files.items()}
     original = {name: path.read_bytes() for name, path in files.items()}
     new_soul = transform(original['SOUL.md'].decode('utf-8')).encode('utf-8')
-    if management_prompt is None:
+    if preserve_cron:
+        new_jobs = original['jobs.json']
+    elif management_prompt is None:
         new_jobs = cron_patch(original['jobs.json'])
     else:
         prompt = management_prompt.read_text(encoding='utf-8')
@@ -306,6 +310,8 @@ def main():
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--management-prompt', type=Path,
                         help='also replace bounded policy and disable the superseded alert-watch cron')
+    parser.add_argument('--preserve-cron', action='store_true',
+                        help='update only the rule policy; preserve every cron byte and setting')
     args = parser.parse_args()
     require(os.geteuid() == 0, 'run as root')
     os.umask(0o077)
@@ -317,7 +323,7 @@ def main():
         require(pstat.st_uid == 0 and not stat.S_IMODE(pstat.st_mode) & 0o022,
                 'management prompt must be root-controlled')
     result = update(DATA, args.policy_file, args.backup_dir, args.dry_run,
-                    management_prompt=args.management_prompt)
+                    management_prompt=args.management_prompt, preserve_cron=args.preserve_cron)
     print(json.dumps(result, sort_keys=True))
 
 

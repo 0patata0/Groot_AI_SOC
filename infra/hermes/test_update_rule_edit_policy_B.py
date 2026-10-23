@@ -89,6 +89,57 @@ class PolicyPatchTest(unittest.TestCase):
         self.assertEqual((self.data / 'SOUL.md').read_bytes(), soul)
         self.assertEqual(list(self.backup.iterdir()), [])
 
+    def disabled_management_cron(self):
+        jobs = {'jobs': [{'name': 'soc-alert-watch', 'id': 'preserved', 'enabled': False,
+                         'prompt': 'LLM management policy; investigate events and verify outcomes.'}],
+                'updated_at': 'unchanged', 'metadata': {'format': 'retain exact bytes'}}
+        raw = (json.dumps(jobs, indent=4) + '\n\n').encode()
+        (self.data / 'cron/jobs.json').write_bytes(raw)
+        return raw
+
+    def test_preserve_cron_updates_policy_without_rewriting_disabled_management_job(self):
+        original = self.disabled_management_cron()
+        result = self.update(preserve_cron=True)
+        self.assertEqual(result['sessions'], 1)
+        self.assertTrue(result['unrelated_tables_unchanged'])
+        self.assertEqual((self.data / 'cron/jobs.json').read_bytes(), original)
+        self.assertEqual((self.data / 'SOUL.md').read_text(), 'persona\n' + self.new + '\nother policy')
+        with sqlite3.connect(self.data / 'state.db') as db:
+            current = db.execute('SELECT p.prompt FROM sessions s JOIN system_prompts p ON p.hash=s.system_prompt_hash').fetchone()[0]
+            self.assertIn(self.new, current)
+            self.assertNotIn(self.old, current)
+            self.assertEqual(db.execute('SELECT prompt FROM system_prompts WHERE hash=?', (self.old_hash,)).fetchone()[0],
+                             'history prompt prefix\n' + self.old + '\nhistory prompt suffix')
+        self.assertEqual((Path(result['backup_dir']) / 'jobs.json').read_bytes(), original)
+
+    def test_missing_cron_anchor_still_refuses_by_default_before_mutation(self):
+        original = self.disabled_management_cron()
+        before_db = self.logical_db()
+        before_soul = (self.data / 'SOUL.md').read_bytes()
+        before_mirror = (self.data / 'sessions/sessions.json').read_bytes()
+        with self.assertRaisesRegex(RuntimeError, 'cron policy anchor ambiguous'):
+            self.update()
+        self.assertEqual(self.logical_db(), before_db)
+        self.assertEqual((self.data / 'SOUL.md').read_bytes(), before_soul)
+        self.assertEqual((self.data / 'sessions/sessions.json').read_bytes(), before_mirror)
+        self.assertEqual((self.data / 'cron/jobs.json').read_bytes(), original)
+        self.assertEqual(list(self.backup.iterdir()), [])
+
+    def test_preserve_cron_and_management_prompt_are_rejected_before_any_change(self):
+        original = self.disabled_management_cron()
+        before_db = self.logical_db()
+        before_soul = (self.data / 'SOUL.md').read_bytes()
+        before_mirror = (self.data / 'sessions/sessions.json').read_bytes()
+        prompt_file = self.root / 'prompt'
+        prompt_file.write_text('LLM management policy. ' * 10)
+        with self.assertRaisesRegex(RuntimeError, 'preserve[_-]cron'):
+            self.update(preserve_cron=True, management_prompt=prompt_file)
+        self.assertEqual(self.logical_db(), before_db)
+        self.assertEqual((self.data / 'SOUL.md').read_bytes(), before_soul)
+        self.assertEqual((self.data / 'sessions/sessions.json').read_bytes(), before_mirror)
+        self.assertEqual((self.data / 'cron/jobs.json').read_bytes(), original)
+        self.assertEqual(list(self.backup.iterdir()), [])
+
     def test_live_lease_refuses_every_change(self):
         with sqlite3.connect(self.data / 'state.db') as db:
             db.execute('INSERT INTO session_turn_leases VALUES(?,?,?,?)', ('s1', 'agent', 1, 1e20))
@@ -155,6 +206,52 @@ class PolicyPatchTest(unittest.TestCase):
             current = db.execute('SELECT p.prompt FROM sessions s JOIN system_prompts p ON p.hash=s.system_prompt_hash').fetchone()[0]
             self.assertIn(new, current)
             self.assertNotIn(old, current)
+
+    def test_chat_format_replaces_current_policy_and_preserves_history_and_permissions(self):
+        source = Path(__file__).with_name('SOUL.groot.md').read_text()
+        policy = m.block(source)
+        heading, end = '### SOC 응답 서식\n', '\n## 보안 룰 변경 요청\n'
+        current_format = policy.split(heading, 1)[1].split(end, 1)[0]
+        self.assertIn('`- **대상명**: 상태 — 근거`', current_format)
+        self.assertIn('`- **항목명**: 내용`', current_format)
+        self.assertNotIn('`대상 | 상태 | 근거`', current_format)
+        self.assertNotIn('`항목 | 내용`', current_format)
+        previous_format = (
+            '- 확인 내역은 `대상 | 상태 | 근거`의 3열 Markdown 표로 작성한다.\n'
+            '- 승인 요청은 `항목 | 내용`의 2열 표로 작성한다.\n'
+            '- 표는 2~3열, 기본 6행 이내로 유지한다.\n'
+            '- 조회 실패와 승인 상태를 사실대로 보고한다.\n')
+        previous_policy = policy.replace(current_format, previous_format, 1)
+        self.assertNotEqual(previous_policy, policy)
+        # The migration changes presentation only; all write/approval rules are
+        # already identical to the new source in the old-session fixture.
+        self.assertEqual(previous_policy.split(end, 1)[1], policy.split(end, 1)[1])
+        bounded = m.block(source, '<!-- bounded-operations-policy:start -->',
+                           '<!-- bounded-operations-policy:end -->')
+        self.source.write_text(source)
+        soul = self.data / 'SOUL.md'
+        soul.write_text('persona\n' + previous_policy + '\n' + bounded + '\nother policy')
+        old_prompt = 'history prompt prefix\n' + previous_policy + '\n' + bounded + '\nhistory prompt suffix'
+        old_hash = m.sha(old_prompt.encode())
+        with sqlite3.connect(self.data / 'state.db') as db:
+            db.execute('INSERT INTO system_prompts VALUES(?,?)', (old_hash, old_prompt))
+            db.execute('UPDATE sessions SET system_prompt_hash=?', (old_hash,))
+        jobs = self.data / 'cron/jobs.json'
+        jobs.write_bytes(jobs.read_bytes().replace(m.OLD_CRON.encode(), m.NEW_CRON.encode()))
+        before_jobs = jobs.read_bytes()
+        before_mirror = (self.data / 'sessions/sessions.json').read_bytes()
+        result = self.update()
+        self.assertEqual(result['sessions'], 1)
+        self.assertTrue(result['unrelated_tables_unchanged'])
+        self.assertEqual(soul.read_text(), 'persona\n' + policy + '\n' + bounded + '\nother policy')
+        self.assertEqual(jobs.read_bytes(), before_jobs)
+        self.assertEqual((self.data / 'sessions/sessions.json').read_bytes(), before_mirror)
+        with sqlite3.connect(self.data / 'state.db') as db:
+            current = db.execute('SELECT p.prompt FROM sessions s JOIN system_prompts p ON p.hash=s.system_prompt_hash').fetchone()[0]
+            self.assertEqual(current, old_prompt.replace(previous_policy, policy, 1))
+            self.assertEqual(db.execute('SELECT prompt FROM system_prompts WHERE hash=?', (old_hash,)).fetchone()[0], old_prompt)
+            self.assertEqual(db.execute('SELECT history FROM sessions').fetchone()[0], 'unchanged')
+            self.assertEqual(db.execute('SELECT message FROM messages').fetchone()[0], 'tool history and conversation')
 
 
 if __name__ == '__main__':

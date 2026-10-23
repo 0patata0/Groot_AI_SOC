@@ -401,6 +401,225 @@ def _validate_candidate(kind, content):
     return encoded
 
 
+def _waf_inventory_statements(content):
+    """Only explicit continuations and whole-line comments in this fixed file."""
+    pending = ""
+    for line in content.split("\n"):
+        if not line.strip() or line.lstrip().startswith("#"):
+            if pending:
+                raise ValueError("comment or blank inside a continued statement")
+            continue
+        if line.endswith("\\"):
+            pending += line[:-1]
+            continue
+        yield pending + line
+        pending = ""
+    if pending:
+        raise ValueError("unfinished WAF continuation")
+
+
+def _waf_inventory_arguments(statement):
+    """Keep escapes and inner action quotes; never scan operators for IDs."""
+    arguments, index = [], 0
+    while index < len(statement):
+        if statement[index].isspace():
+            index += 1
+            continue
+        quote = statement[index] if statement[index] in "\"'" else None
+        if quote:
+            index += 1
+        start = index
+        while index < len(statement):
+            char = statement[index]
+            if char == "\\":
+                index += 2
+                if index > len(statement):
+                    raise ValueError("unfinished WAF escape")
+                continue
+            if quote and char == quote:
+                break
+            if not quote and char.isspace():
+                break
+            if not quote and char in "\"'":
+                raise ValueError("unsupported WAF argument quoting")
+            index += 1
+        if quote and (index == len(statement) or statement[index] != quote):
+            raise ValueError("unfinished WAF quote")
+        arguments.append(statement[start:index])
+        if quote:
+            index += 1
+            if index < len(statement) and not statement[index].isspace():
+                raise ValueError("unsupported WAF argument boundary")
+    return arguments
+
+
+def _waf_inventory_actions(actions):
+    fields, start, quote, escaped = [], 0, None, False
+    for index, char in enumerate(actions):
+        if escaped:
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif quote:
+            if char == quote:
+                quote = None
+        elif char in "\"'":
+            quote = char
+        elif char == ",":
+            fields.append(actions[start:index].strip())
+            start = index + 1
+    if quote or escaped:
+        raise ValueError("unfinished WAF action")
+    fields.append(actions[start:].strip())
+    ids, chained = [], False
+    for field in fields:
+        key, colon, value = field.partition(":")
+        key, value = key.strip().lower(), value.strip()
+        if not re.fullmatch(r"[a-z][a-z0-9_]*", key) or (colon and not value):
+            raise ValueError("unsupported WAF action boundary")
+        if key == "id":
+            if len(value) >= 2 and value[0] in "\"'" and value[-1] == value[0]:
+                value = value[1:-1]
+            if not colon or not re.fullmatch(r"[0-9]{1,10}", value) or not 0 < int(value) < 2**31:
+                raise ValueError("unsupported WAF ID")
+            ids.append(int(value))
+        elif key == "chain":
+            if colon or chained:
+                raise ValueError("unsupported WAF chain")
+            chained = True
+    if len(ids) > 1:
+        raise ValueError("multiple IDs on one WAF declaration")
+    return ids, chained
+
+
+def _waf_inventory(content):
+    ids, pending_chain = [], False
+    details = {"secrule_directives": 0, "secaction_directives": 0, "chain_continuations": 0}
+    # These directives do not define new IDs. Includes, conditional sections,
+    # defaults and unknown grammar are deliberately not guessed or followed.
+    neutral = {"secruleengine", "seccomponentsignature", "secmarker",
+               "secruleremovebyid", "secruleremovebytag", "secruleremovebymsg",
+               "secruleupdatetargetbyid", "secruleupdatetargetbytag", "secruleupdatetargetbymsg"}
+    for statement in _waf_inventory_statements(content):
+        args = _waf_inventory_arguments(statement)
+        directive = args[0].lower()
+        if directive in neutral and len(args) >= 2 and not pending_chain:
+            continue
+        if directive == "secrule" and len(args) in (3, 4) and args[1] and args[2]:
+            details["secrule_directives"] += 1
+            rule_ids, chained = _waf_inventory_actions(args[3]) if len(args) == 4 else ([], False)
+            if pending_chain:
+                if rule_ids:
+                    raise ValueError("ID on WAF chain continuation")
+                details["chain_continuations"] += 1
+            elif len(rule_ids) != 1:
+                raise ValueError("WAF starter without ID")
+            ids.extend(rule_ids)
+            pending_chain = chained
+        elif directive == "secaction" and len(args) == 2 and not pending_chain:
+            rule_ids, chained = _waf_inventory_actions(args[1])
+            if len(rule_ids) != 1 or chained:
+                raise ValueError("unsupported SecAction ID/chain")
+            details["secaction_directives"] += 1
+            ids.extend(rule_ids)
+        else:
+            raise ValueError("unsupported WAF statement")
+    if pending_chain:
+        raise ValueError("unfinished WAF chain")
+    return ids, details
+
+
+def _suricata_inventory(data):
+    ids = []
+    details = {"local_sid_count": 0, "et_override_count": 0, "other_sid_count": 0, "noalert_count": 0}
+    for line, single_line in _suricata_lines(data):
+        rule = _suricata_rule(line, single_line)
+        # This target's established grammar is alert-only with the default GID.
+        # SID uniqueness across unrelated generator IDs would be misleading.
+        if len(rule["header"]) != 7 or rule["header"][0] != b"alert" or rule["header"][4] not in (b"->", b"<>"):
+            raise ValueError("unsupported Suricata rule header")
+        if any(key == b"gid" for key, *_ in rule["options"]) and _suricata_number(rule, b"gid")[0] != 1:
+            raise ValueError("unsupported Suricata generator")
+        sid = _suricata_number(rule, b"sid")[0]
+        if not 0 < sid < 2**32:
+            raise ValueError("unsupported Suricata SID")
+        ids.append(sid)
+        category = ("local_sid_count" if 1000000 <= sid <= 1000099 else
+                    "et_override_count" if sid in SURICATA_ET_OVERRIDES else "other_sid_count")
+        details[category] += 1
+        if any((key == b"flowbits" and value == b"noalert") or (key == b"noalert" and not value)
+               for key, value, *_ in rule["options"]):
+            details["noalert_count"] += 1
+    return ids, details
+
+
+def _wazuh_inventory(content):
+    if re.search(r"<!\s*(?:DOCTYPE|ENTITY)", content, re.IGNORECASE):
+        raise ValueError("unsupported XML declaration")
+    root = ET.fromstring("<root>" + content + "</root>")
+    if root.text and root.text.strip():
+        raise ValueError("text outside Wazuh groups")
+    ids, levels = [], {}
+    for group in root:
+        if group.tag != "group" or (group.text and group.text.strip()) or (group.tail and group.tail.strip()):
+            raise ValueError("unsupported Wazuh group structure")
+        for rule in group:
+            if rule.tag != "rule" or (rule.tail and rule.tail.strip()):
+                raise ValueError("unsupported Wazuh rule structure")
+            rid, level = rule.get("id", ""), rule.get("level", "")
+            if not re.fullmatch(r"[0-9]{6}", rid) or not re.fullmatch(r"[0-9]{1,2}", level) or not 0 <= int(level) <= 16:
+                raise ValueError("unsupported Wazuh ID/level")
+            if any(not isinstance(elem.tag, str) or "{" in elem.tag or
+                   elem.tag in ("rule", "command", "active-response") for elem in rule.iter() if elem is not rule):
+                raise ValueError("unsupported Wazuh nested declaration")
+            ids.append(int(rid))
+            label = str(int(level))
+            levels[label] = levels.get(label, 0) + 1
+    return ids, {"level_counts": levels, "level0_count": levels.get("0", 0)}
+
+
+def rule_inventory(kind, data):
+    """Exact bounded file definitions, not validation or active-engine totals.
+
+    Parse failure discards all partial counts. Raw target reads remain available;
+    inventory adds no permission, command, write, or external-file access.
+    """
+    result = {"schema_version": 1, "kind": kind, "scope": "target_file_definitions",
+              "source_sha256": sha256(data), "status": "unavailable", "declared_count": None,
+              "unique_id_count": None, "ids": [], "duplicate_ids": [], "contiguous_id_groups": [],
+              "runtime_load_verified": False, "details": {}}
+    try:
+        if len(data) > MAX_CANDIDATE or b"\x00" in data or b"\r" in data:
+            raise ValueError("unsupported inventory input")
+        content = data.decode("utf-8")
+        if any(unicodedata.category(char) == "Cf" for char in content):
+            raise ValueError("unsupported invisible format control")
+        if kind == "waf":
+            ids, details = _waf_inventory(content)
+        elif kind == "suricata":
+            ids, details = _suricata_inventory(data)
+        elif kind == "wazuh":
+            ids, details = _wazuh_inventory(content)
+        else:
+            raise ValueError("unsupported inventory kind")
+    except (ValueError, RuleChangeError, ET.ParseError):
+        result["error"] = "syntax_or_scope_unsupported"
+        return result
+    counts = {}
+    for rid in ids:
+        counts[rid] = counts.get(rid, 0) + 1
+    unique, groups = sorted(counts), []
+    for rid in unique:
+        if groups and rid == groups[-1]["end"] + 1:
+            groups[-1]["end"] = rid
+        else:
+            groups.append({"start": rid, "end": rid})
+    result.update(status="complete", declared_count=len(ids), unique_id_count=len(unique), ids=unique,
+                  duplicate_ids=sorted(rid for rid, count in counts.items() if count > 1),
+                  contiguous_id_groups=groups, details=details)
+    return result
+
+
 class Broker:
     def __init__(self, url, token):
         if url not in ("http://10.200.10.10:8090", "http://127.0.0.1:8090") or not isinstance(token, str) or len(token) < 32:
@@ -611,7 +830,8 @@ class Engine:
                 content = current.decode("utf-8")
             except UnicodeDecodeError:
                 raise RuleChangeError("current local rule file is not UTF-8") from None
-            return {"target": target, "content": content, "sha256": sha256(current),
+            return {"target": target, "rule_inventory": rule_inventory(spec["kind"], current),
+                    "content": content, "sha256": sha256(current),
                     "runtime": runtime, "impact": spec["impact"], "related_hashes": aux,
                     "limits": proposal_limits()}
 

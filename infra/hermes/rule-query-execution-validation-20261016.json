@@ -1,0 +1,1460 @@
+{
+  "schema_version": 1,
+  "status": "deployed_execution_recovery_verified_inventory_followup_completed",
+  "diagnosis": {
+    "observed_turns": 4,
+    "tools_called": 0,
+    "finish_reason": "stop",
+    "background_query_running": false,
+    "delivery_failure_observed": false
+  },
+  "model": "qwen3.6:35b",
+  "endpoint_host": "211.170.162.111",
+  "policy_only_evaluations": [
+    {
+      "mode": "replay_affected_history_with_candidate_policy",
+      "at_kst": "2026-10-16T19:39:48.406076+09:00",
+      "advertised_tools": 16,
+      "tool_choice": "auto",
+      "steps": [
+        {
+          "step": 1,
+          "seconds": 16.991,
+          "finish_reason": "tool_calls",
+          "tool_calls": 3,
+          "content_characters": 0
+        },
+        {
+          "step": 2,
+          "seconds": 19.667,
+          "finish_reason": "stop",
+          "tool_calls": 0,
+          "content_characters": 1224
+        }
+      ],
+      "calls": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.927,
+          "content_bytes": 22652,
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "runtime_running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.588,
+          "content_bytes": 13546,
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "runtime_running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.85,
+          "content_bytes": 6122,
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "runtime_running": true
+        }
+      ],
+      "total_seconds": 41.025,
+      "final_characters": 1224,
+      "final_sha256": "f1a340ba53084079d6f65a7e9a506c6cd4983f3398c6ad276270acaa8c3892c4",
+      "readonly_execution_enforced": true,
+      "write_calls_executed": 0,
+      "mattermost_posts_sent": 0,
+      "execution_completed": true,
+      "answer_accuracy_passed": false,
+      "assessment": "Actual reads and final answer succeeded, but WAF/Wazuh counts and loaded-state claim were incorrect."
+    },
+    {
+      "mode": "replay_affected_history_with_candidate_policy",
+      "at_kst": "2026-10-16T19:42:48.557398+09:00",
+      "advertised_tools": 16,
+      "tool_choice": "auto",
+      "steps": [
+        {
+          "step": 1,
+          "seconds": 8.764,
+          "finish_reason": "stop",
+          "tool_calls": 0,
+          "content_characters": 272
+        }
+      ],
+      "calls": [],
+      "total_seconds": 8.765,
+      "final_characters": 272,
+      "final_sha256": "831fed00a03796945d1977857f5d6956c99b094cc43060e13c160ec6cab9ee17",
+      "readonly_execution_enforced": true,
+      "write_calls_executed": 0,
+      "mattermost_posts_sent": 0,
+      "execution_completed": false,
+      "answer_accuracy_passed": false,
+      "assessment": "Policy-only refinement regressed to zero tool calls and a final progress promise; not deployed."
+    }
+  ],
+  "new_packages_installed": 0,
+  "mattermost_test_posts_sent": 0,
+  "native_evaluations": [
+    {
+      "mode": "native_forced_stall_fallback",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "synthetic_first_response": true,
+      "api_calls": 4,
+      "completed": false,
+      "failed": true,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "error_near_max_iterations(Error during API call #4: property 'reasoning_content' of 'NormalizedResponse' o)",
+      "final_characters": 319,
+      "final_sha256": "5161bb066006e8ff494a77f53d80acc6713abe14c746f5a0220e22ff01dfefe5",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "bounded_honest_fallback_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 69,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 9.146,
+      "at_kst": "2026-10-16T19:59:40.652359+09:00",
+      "assessment": "Initial real-native fallback failed: NormalizedResponse reasoning_content is read-only; candidate not deployed."
+    },
+    {
+      "mode": "native_forced_stall_fallback",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "synthetic_first_response": true,
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 130,
+      "final_sha256": "29e72ecc1c4683f878569cb0dd8b948cb48c4bacb58a710236bdf9a114ac591f",
+      "final_message_matches_delivery": true,
+      "passed": true,
+      "total_seconds": 9.17,
+      "assessment": "Real native loop with synthetic repeat: one retry then honest fallback, persisted message equals delivery; no live model request for synthetic responses."
+    },
+    {
+      "mode": "native_forced_stall_then_live_recovery",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "synthetic_first_response": true,
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 1026,
+      "final_sha256": "ede79f67b3944c8f84aac088e4ca291522bd4035bd0e5af40dd2047062c89263",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "three_actual_reads_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 71,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 29.864,
+      "assessment": "First stall injected; real model follow-up fabricated results with zero tools. Candidate not deployed; guard must also reject zero-tool fabricated completion after retry."
+    },
+    {
+      "mode": "native_forced_stall_fallback",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": []
+        },
+        {
+          "tool_choice": "required",
+          "tools": []
+        }
+      ],
+      "synthetic_first_response": true,
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 130,
+      "final_sha256": "29e72ecc1c4683f878569cb0dd8b948cb48c4bacb58a710236bdf9a114ac591f",
+      "final_message_matches_delivery": true,
+      "passed": true,
+      "total_seconds": 9.838,
+      "assessment": "One-shot fallback succeeded; this older instrumentation did not inspect SDK extra_body so tools lists were incomplete."
+    },
+    {
+      "mode": "native_forced_stall_then_live_recovery",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ]
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ]
+        }
+      ],
+      "synthetic_first_response": true,
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 130,
+      "final_sha256": "29e72ecc1c4683f878569cb0dd8b948cb48c4bacb58a710236bdf9a114ac591f",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "three_actual_reads_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 76,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 25.624,
+      "assessment": "SDK extra_body confirmed 8 read schemas and required sent, but actual model returned zero calls. Guard replaced false progress with honest fallback."
+    },
+    {
+      "mode": "native_natural_replay",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "temperature": null,
+          "think": false,
+          "messages": [
+            {
+              "role": "system",
+              "chars": 30884,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1006,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 466,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1249,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 82,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1667,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 443,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 2472,
+              "nudge": false
+            }
+          ]
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "temperature": null,
+          "think": false,
+          "messages": [
+            {
+              "role": "system",
+              "chars": 30884,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1006,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 466,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1249,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 82,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1667,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 443,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 2472,
+              "nudge": false
+            }
+          ]
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "temperature": null,
+          "think": false,
+          "messages": [
+            {
+              "role": "system",
+              "chars": 30884,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1006,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 466,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1249,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 82,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 1667,
+              "nudge": false
+            },
+            {
+              "role": "assistant",
+              "chars": 443,
+              "nudge": false
+            },
+            {
+              "role": "user",
+              "chars": 2472,
+              "nudge": false
+            }
+          ]
+        }
+      ],
+      "api_calls": 1,
+      "completed": false,
+      "failed": true,
+      "partial": null,
+      "interrupted": null,
+      "turn_exit_reason": null,
+      "final_characters": 268,
+      "final_sha256": "9c2b1459210a3262f32584e1c127139985d3176004991fc7a1d67460d09ab3d4",
+      "final_message_matches_delivery": false,
+      "passed": false,
+      "failure_code": "three_actual_reads_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 76,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 23.431,
+      "assessment": "Evaluation instrumentation assumed ChatCompletion on a streaming response and raised; not a production/provider failure."
+    },
+    {
+      "mode": "native_natural_replay",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false
+        }
+      ],
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 130,
+      "final_sha256": "29e72ecc1c4683f878569cb0dd8b948cb48c4bacb58a710236bdf9a114ac591f",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "three_actual_reads_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 74,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 36.653,
+      "assessment": "Natural native replay with reasoning disabled: two real requests, no calls, honest fallback; lookup recovery failed.",
+      "answer_accuracy_passed": false
+    },
+    {
+      "mode": "native_forced_stall_then_live_recovery",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": null,
+          "temperature": null,
+          "think": false
+        }
+      ],
+      "synthetic_first_response": true,
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 130,
+      "final_sha256": "29e72ecc1c4683f878569cb0dd8b948cb48c4bacb58a710236bdf9a114ac591f",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "three_actual_reads_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 74,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 29.57,
+      "assessment": "Injected first stop then real disabled-thinking retry: read schemas and nudge sent but zero tools; honest fallback passed, lookup recovery failed.",
+      "answer_accuracy_passed": false
+    },
+    {
+      "mode": "native_thinking_replay",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.324,
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.317,
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.223,
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "running": true
+        }
+      ],
+      "denied_dispatches": 0,
+      "wire_calls": 3,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": null
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": null
+        }
+      ],
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 2368,
+      "final_sha256": "02038641252e6fffb5e05d554476615ba6f7ef2c5554df96a471029cb6273a84",
+      "final_message_matches_delivery": true,
+      "passed": true,
+      "total_seconds": 49.444,
+      "assessment": "Same model/history with reasoning enabled: three actual reads and final answer completed. Summary still used tables and overstated DetectionOnly blocking/ID range; execution success is separate from answer accuracy.",
+      "answer_accuracy_passed": false
+    },
+    {
+      "mode": "native_natural_replay",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false
+        }
+      ],
+      "api_calls": 1,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 679,
+      "final_sha256": "9ba870d3f27bb2d1a213b42c3f80020e8c8b123eeaa680be60d9b7a6334008eb",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "three_actual_reads_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 74,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 33.021,
+      "assessment": "Zero-tool fabricated completion on first response bypassed promise-only detection; scope must also cover clear current custom-rule lookup completion claims.",
+      "answer_accuracy_passed": false
+    },
+    {
+      "mode": "native_forced_stall_then_live_recovery",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": null,
+          "temperature": null,
+          "think": true
+        }
+      ],
+      "synthetic_first_response": true,
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 130,
+      "final_sha256": "29e72ecc1c4683f878569cb0dd8b948cb48c4bacb58a710236bdf9a114ac591f",
+      "final_message_matches_delivery": true,
+      "passed": false,
+      "failure_code": "three_actual_reads_required",
+      "failure_frames": [
+        {
+          "file": "verify.py",
+          "line": 74,
+          "function": "<module>"
+        },
+        {
+          "file": "verify.py",
+          "line": 10,
+          "function": "require"
+        }
+      ],
+      "total_seconds": 22.787,
+      "assessment": "Extra think:true alone did not enable reasoning through this OpenAI-compatible route. Retry still returned zero tools and honest fallback; not deployed.",
+      "answer_accuracy_passed": false
+    },
+    {
+      "mode": "native_natural_replay",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.313,
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.349,
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.292,
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "running": true
+        }
+      ],
+      "denied_dispatches": 0,
+      "wire_calls": 3,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": null,
+          "reasoning_effort": null,
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        }
+      ],
+      "api_calls": 3,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 2087,
+      "final_sha256": "af626a19345694bbe5020f89ac89b35052dd330e4c46cd38311b7471ec2fd204",
+      "final_message_matches_delivery": true,
+      "passed": true,
+      "total_seconds": 93.015,
+      "assessment": "Natural failed-history replay: zero-tool first answer recovered through one compatible reasoning request, three real reads, final answer. Original reasoning-off configuration restored for final synthesis; rule counts/IDs still inaccurate.",
+      "answer_accuracy_passed": false,
+      "plugin_sha256": "19c3c1b4cb339b2f9e7c0b3f7c85860d5f52771b4982b5e52d6c432bf1df331f"
+    },
+    {
+      "mode": "native_forced_stall_then_live_recovery",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:modsecurity-custom",
+          "seconds": 0.309,
+          "sha256": "62c855cf8e927ff57beb11d92daaa7936bbbdc2b035c029535d0da59cce2eebf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "target": "a:suricata-local",
+          "seconds": 2.334,
+          "sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+          "running": true
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "target": "b:wazuh-local-rules",
+          "seconds": 0.228,
+          "sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+          "running": true
+        }
+      ],
+      "denied_dispatches": 0,
+      "wire_calls": 3,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": null,
+          "temperature": null,
+          "think": null,
+          "reasoning_effort": null,
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        },
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": null,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        }
+      ],
+      "synthetic_first_response": true,
+      "api_calls": 3,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 1991,
+      "final_sha256": "b3cd35006ba37d180fe64e3e3ccc3e54de5e355507c861dafd7fc96084c28822",
+      "final_message_matches_delivery": true,
+      "passed": true,
+      "total_seconds": 69.436,
+      "assessment": "Injected initial promise then live model: one compatible reasoning request recovered three actual reads and final answer. Answer overstates reserved ID ranges and loaded-state proof.",
+      "answer_accuracy_passed": false,
+      "plugin_sha256": "19c3c1b4cb339b2f9e7c0b3f7c85860d5f52771b4982b5e52d6c432bf1df331f"
+    },
+    {
+      "mode": "native_forced_stall_fallback",
+      "chat_posts": 0,
+      "write_calls": 0,
+      "dispatches": [],
+      "denied_dispatches": 0,
+      "wire_calls": 0,
+      "wrapper_active": true,
+      "wrapper_attributes": [
+        "_capstone_query_completion_version"
+      ],
+      "advertised_tools": 16,
+      "request_shapes": [
+        {
+          "tool_choice": null,
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_a__propose_rule_change",
+            "mcp__rule_a__propose_rule_edit",
+            "mcp__rule_a__propose_service_action",
+            "mcp__rule_a__temporarily_contain_ip",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target",
+            "mcp__rule_b__propose_rule_change",
+            "mcp__rule_b__propose_rule_edit",
+            "mcp__rule_b__propose_service_action",
+            "mcp__rule_b__temporarily_contain_ip"
+          ],
+          "stream": true,
+          "temperature": null,
+          "think": false,
+          "reasoning_effort": "none",
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": false
+        },
+        {
+          "tool_choice": "required",
+          "tools": [
+            "mcp__rule_a__get_operation_status",
+            "mcp__rule_a__get_rule_change_status",
+            "mcp__rule_a__get_rule_change_target",
+            "mcp__rule_a__get_service_action_target",
+            "mcp__rule_b__get_operation_status",
+            "mcp__rule_b__get_rule_change_status",
+            "mcp__rule_b__get_rule_change_target",
+            "mcp__rule_b__get_service_action_target"
+          ],
+          "stream": null,
+          "temperature": null,
+          "think": null,
+          "reasoning_effort": null,
+          "reasoning": null,
+          "thinking": null,
+          "chat_template_kwargs": null,
+          "nudge_present": true
+        }
+      ],
+      "synthetic_first_response": true,
+      "api_calls": 2,
+      "completed": true,
+      "failed": false,
+      "partial": false,
+      "interrupted": false,
+      "turn_exit_reason": "text_response(finish_reason=stop)",
+      "final_characters": 130,
+      "final_sha256": "29e72ecc1c4683f878569cb0dd8b948cb48c4bacb58a710236bdf9a114ac591f",
+      "final_message_matches_delivery": true,
+      "passed": true,
+      "total_seconds": 9.529,
+      "assessment": "Synthetic repeat in actual native loop: two requests then honest unexecuted answer, no external model requests, same persisted and delivered text.",
+      "answer_accuracy_passed": true,
+      "plugin_sha256": "19c3c1b4cb339b2f9e7c0b3f7c85860d5f52771b4982b5e52d6c432bf1df331f"
+    }
+  ],
+  "history_validation": {
+    "user_rows": 4,
+    "assistant_rows": 3,
+    "tool_rows": 0,
+    "tool_calls_omitted_by_role_filter": false,
+    "read_only_database_check": true
+  },
+  "ollama_metadata": {
+    "observed_version": "0.40.4",
+    "tag": "qwen3.6:35b",
+    "parent_model": "qwen3.6-source:35b-a3b-mtp-q4_K_M-20260824",
+    "parameter_size": "35.5B",
+    "quantization": "Q4_K_M",
+    "capabilities": [
+      "completion",
+      "vision",
+      "tools",
+      "thinking"
+    ]
+  },
+  "request_configuration_diagnosis": {
+    "live_compatible_api_version": "0.40.4",
+    "reasoning_disabled_request": {
+      "reasoning_effort": "none",
+      "think": false
+    },
+    "provider_call_sent_in_capture": false,
+    "reasoning_field_precedence": "reasoning.effort then reasoning_effort",
+    "reference": "https://github.com/ollama/ollama/blob/v0.40.4/openai/openai.go",
+    "standalone_extra_think_true_does_not_override_reasoning_effort_none": true
+  },
+  "tests": {
+    "query_completion": 85,
+    "siem_installer": 36,
+    "deployment_controller": 15,
+    "policy_updater": 11
+  },
+  "limitations": [
+    "Rule summary counts/ID ranges and loaded-state claims remain inaccurate in model samples.",
+    "Actual Mattermost message posting/display E2E not performed.",
+    "Required tool_choice is not enforced by this Ollama API.",
+    "Recovery time is not bounded by the observed sample durations.",
+    "Trigger heuristics do not cover all expressions or unrelated failure modes."
+  ],
+  "deployment": {
+    "at_kst": "2026-10-16T20:34:01.484714+09:00",
+    "policy_sha256": "8d25a6ce0f24151fae35a89aa064cfe4febdfa3b92256c3972bfe3a674ea4f37",
+    "previous_policy_sha256": "0a383c81099c31f1714f8a1859182a31b8a1114a2637697ebbc7563ad6d8bcf8",
+    "current_sessions_updated": 53,
+    "backup": "/var/backups/capstone-query-completion/20261016/203357",
+    "policy_backup": "/var/backups/capstone-query-completion/20261016/203357/rule-edit-policy-9j0bm__0",
+    "database_integrity": "ok",
+    "unrelated_tables_unchanged": true,
+    "config_change": "plugins.enabled adds groot-query-completion only",
+    "env_cron_preserved": true,
+    "plugin_sha256": {
+      "__init__.py": "19c3c1b4cb339b2f9e7c0b3f7c85860d5f52771b4982b5e52d6c432bf1df331f",
+      "plugin.yaml": "bb2a553ad00dc295b12319e950751d483367106062b393da85744f875e455826"
+    },
+    "native_files_modified": 0,
+    "same_hermes_container": true,
+    "security_services_restarted": 0,
+    "new_packages": 0
+  },
+  "recovery": {
+    "hermes_restart_attempted": true,
+    "timers_restore_attempted": [
+      "capstone-management.timer",
+      "capstone-hermes-guard-reapply.timer"
+    ],
+    "staging_removed": true,
+    "policy_committed": true,
+    "errors": []
+  },
+  "post_deployment": {
+    "at_kst": "2026-10-16T20:34:41.130934+09:00",
+    "policy": {
+      "SOUL.md": "8d25a6ce0f24151fae35a89aa064cfe4febdfa3b92256c3972bfe3a674ea4f37",
+      "management/SOUL.md": "8d25a6ce0f24151fae35a89aa064cfe4febdfa3b92256c3972bfe3a674ea4f37"
+    },
+    "plugin": {
+      "__init__.py": "19c3c1b4cb339b2f9e7c0b3f7c85860d5f52771b4982b5e52d6c432bf1df331f",
+      "plugin.yaml": "bb2a553ad00dc295b12319e950751d483367106062b393da85744f875e455826"
+    },
+    "gateway": {
+      "gateway_state": "running",
+      "active_agents": 0,
+      "updated_at": "2026-10-16T11:34:16.547016+00:00"
+    },
+    "platforms": {
+      "mattermost": {
+        "state": "connected",
+        "needs_attention": false
+      },
+      "api_server": {
+        "state": "connected",
+        "needs_attention": false
+      }
+    },
+    "units": {
+      "capstone-management.timer": "active",
+      "capstone-hermes-guard-reapply.timer": "active",
+      "soc-bot.service": "active"
+    },
+    "container": {
+      "running": true,
+      "restarting": false,
+      "started_at": "2026-10-16T11:34:01.537439041Z",
+      "same_guard_container": true
+    },
+    "database_quick_check": "ok",
+    "current_session_count": 53,
+    "current_prompts_matched": 53,
+    "native_sha256": {
+      "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
+      "agent/conversation_loop.py": "c93ee86e1da583abc7cc57417380cd71241ae028c04a4cb8456580b52ffbf3d8",
+      "agent/turn_context.py": "85f857dc3c317366d918516bc8b37a022f1020b34da0c3966a31bd289b2942e1",
+      "agent/message_metadata.py": "77fbe25c86f2ab524fcac61a83548768cffc82c476bb8a6ff83ebdf492a5479d",
+      "agent/turn_api_request.py": "e31386cb83cf551026e4df9b589173b54bc913b36fc1a09942a520e68033b59e",
+      "agent/chat_completion_helpers.py": "5231a0e674806db6ad7be60e2d40a19a4157f7d2baa238aaa9af66f61e0eea4c",
+      "plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+      "gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a"
+    },
+    "configuration": {
+      "plugins": [
+        "groot-mattermost-context",
+        "groot-query-completion"
+      ],
+      "model": "qwen3.6:35b",
+      "provider": "custom",
+      "base_url": "http://211.170.162.111:11434/v1",
+      "reasoning_override": "none"
+    },
+    "registration_log_seen": true,
+    "registration_record_count": 1,
+    "server_staging_remaining": 0,
+    "container_probe_dirs_remaining": 0,
+    "fresh_post_restart_heartbeat": true,
+    "passed": true
+  },
+  "deployment_preflight_failures": [
+    {
+      "reason": "plugins_yaml_anchor",
+      "changes": 0,
+      "restarted": false,
+      "staging_removed": true
+    }
+  ],
+  "inventory_followup": {
+    "status": "completed",
+    "evidence": "rule-inventory-validation-20261016.json",
+    "note": "Earlier execution-only tests and their inaccurate summaries remain historical failures; the followup verifies exact file counts and IDs separately."
+  },
+  "final_task_cleanup": {
+    "mac_task_temp_removed": true,
+    "removed_file_count": 94,
+    "removed_bytes": 2762242,
+    "cleanup_at_kst": "2026-10-16T21:05:27.090954+09:00"
+  }
+}

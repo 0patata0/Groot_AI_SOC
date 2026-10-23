@@ -1,0 +1,761 @@
+{
+  "SDK_compatibility": {
+    "accepted_meta": "empty/null or bounded progressToken only; ignored before query/audit/result",
+    "default_meta_keys": [],
+    "evidence": "Actual UID 995 SDK used a shape-only stdio server. Installed dispatcher source independently confirmed unconditional empty _meta insertion and omission of None extension fields.",
+    "installed_version": "2.0.0",
+    "negotiated_server_protocol": "2025-06-18",
+    "normal_and_forced_fresh_SSH_queries_passed": true,
+    "unknown_call_fields_and_query_arguments_rejected": true,
+    "wire_call_keys": [
+      "name",
+      "arguments",
+      "_meta"
+    ]
+  },
+  "backup_retention": {
+    "private_configs_or_keys_in_this_evidence": false,
+    "private_operating_backups_preserved": [
+      "/var/backups/capstone-system-diagnostics/20261023-hermes-mcp",
+      "/var/backups/capstone-system-diagnostics/20261023-hermes-mcp-v2",
+      "/var/backups/capstone-system-diagnostics/20261023-hermes-mcp-v3"
+    ]
+  },
+  "cleanup": {
+    "own_Mac_temporary_directory": "removed and absence verified; earlier audit temporary directory also absent",
+    "own_temporary_files_removed": 15,
+    "remote_temporary_script_files_created_by_Hermes_migration": false,
+    "root_private_operating_backups": "preserved",
+    "shared_root_helper_use": "finished; coordinating root handles the shared task directory cleanup",
+    "temporary_pointer_removed": true
+  },
+  "collector_v4": {
+    "additional_Hermes_container_restarts": 0,
+    "controlled_three_host_source_pin_and_runtime_migration": "deployment/diagnostics-journal-fix-validation-20261023.json",
+    "native_followup_at_kst": "2026-10-23T21:30:57+09:00",
+    "new_source_tests": [
+      "fixed no-match versus generic rc1",
+      "stderr/partial output/other rc/timeout remain failures",
+      "collector empty sample count0 versus error countnull"
+    ],
+    "normalization": "Only the exact fixed journal grep query with rc1 and both output streams empty becomes rc0/empty. Stderr is consumed with a4KiB bound and discarded. Partial stdout, other exit codes, any stderr, output bounds and timeouts remain failures.",
+    "operating_backup": "/var/backups/capstone-diagnostics/20261023-journal-empty-v4",
+    "reason": "Fixed journal grep returned rc1 with stdout0/stderr0 for no matches on A/B. Treating every rc1 as failure caused unavailable/null despite a valid empty sample.",
+    "same_snapshot_schema_and_tool_authority": true,
+    "source_sha256": "228a1d98c7985a7e4986edff3fcd3de9c25d34cc02698f1d771502710144d6fc"
+  },
+  "deployment_distinctions": {
+    "container_reconfiguration_performed": false,
+    "existing_B": "Preserved existing mcp UID999/GID988 and Hermes UID995/GID986, SSH config, keys, all previous toolsets/caches and private settings. Added one exact MCP to both config files and the existing general platform lists; management config keeps absent toolsets/platform_toolsets absent. Main SOUL preserved and one marked diagnostic paragraph appended; HEAD-matched management SOUL/code replaced narrowly.",
+    "general_LLM_sudo_Docker_SSH_authority_added": false,
+    "new_servers": "deploy.sh diagnostics extension prepares role-specific root collectors, fixed snapshots and dedicated A/C forced readers, then registers the sixth MCP. Full new-server installation was not performed.",
+    "operating_system_packages_installed_by_this_migration": false,
+    "source_pins": {
+      "SDK_metadata_v3": "deployment/diagnostics-sdk-compat-validation-20261023.json",
+      "journal_empty_v4": "deployment/diagnostics-journal-fix-validation-20261023.json",
+      "transport": "deployment/diagnostics-live-validation-20261023.json"
+    }
+  },
+  "earlier_attempts": {
+    "preflight_candidate_alias_error": "No operating file or timer changes; fixed candidate list copying for YAML aliases.",
+    "stale_gate": "A preflight was rejected without changes. Subsequent read showed all active case/approval/lease/agent counters zero, no active work, heartbeat age41.299 seconds. The 45-second freshness requirement was not relaxed; a fresh heartbeat permitted the final attempt.",
+    "two_SDK_attempts": "Exact original eight files restored automatically, same CID restarted for recovery, management timer restored. Root-private backups retained."
+  },
+  "limits": {
+    "A_B_journal": "V3 historical native sample was unavailable/null. After the controlled v4 fix, actual UID995 SDK observed selected A/B targets with count0 in the bounded four-hour sample. This is not proof of zero errors in all journals or of full service health.",
+    "C_lab_terminal": "103 bounded error observations; retained_errors_truncated=true and returned limit=5. The returned newest five records do not establish the full earlier PAM failure sequence.",
+    "C_terminal_status": "Four classified records at 2026-10-23 18:58:53 KST include publication_failed/exit1/exit-code and remain visible after v4. Both native samples caught Type=oneshot activating/start with Result=success/Exit0. The exact successful recovery timestamp is not present in the error-only MCP output; this snapshot state alone does not establish a failure.",
+    "failed_and_inactive_units": "Observable by contract; inactive/dead alone is not failure. Native terminal-status sample was activating, while inactive successful oneshots are covered by source regression.",
+    "fresh_bootstrap": "Full installation on three clean servers remains untested.",
+    "model_or_chat_E2E": "No model/API request or chat post was made by validation; actual SDK invocation, tool discovery, read requests and runtime gates were verified. Natural-language model use remains untested.",
+    "protected_changes": "Existing candidate approval, TTL containment and proposal-bound verification remain unchanged.",
+    "snapshots": "60-second normal collector interval, 180-second TTL, bounded four-hour error samples. Counts are neither complete journal totals nor exact requested-subwindow totals."
+  },
+  "native_migration": {
+    "after_file_sha256": {
+      "/opt/capstone-management/soc_alert_watch.prompt": "047d2dc7ff186e4e341f749ac9646b25e7a8bb4e6a06593b385ef45a98802311",
+      "/opt/capstone-management/soc_management_controller.py": "6549a4ffaf426e9e63e6eea3c528e5848d069e78dd8036c22d123f46484ee616",
+      "/opt/hermes-data/SOUL.md": "6e620a863f29204499af4675f1ec032cccddfa1b34bd32b6463ad5498a07d4f6",
+      "/opt/hermes-data/config.yaml": "626b69f728e595186ca332b0628b89c8deb44026363518b02b796f5be7a6b61a",
+      "/opt/hermes-data/management-code/run.py": "554af36a572f3380422b1dbeeee56a1af67022a64a12b5608e069bd33b89328f",
+      "/opt/hermes-data/management/SOUL.md": "85bc46e0be76e37104a04cf8730f7c0389761980bc7a467377f6b01ef5b78c64",
+      "/opt/hermes-data/management/config.yaml": "86cff3be7edf215f96fa20842e5ce510d548565bd7700b146405ecd9014c379e",
+      "/opt/mcp/run-wazuh-ro.sh": "5702374983e3cd02029ffc39ff3e153f1d068d16aa9f45add26cecc4f9d4ab0c"
+    },
+    "backup": "/var/backups/capstone-system-diagnostics/20261023-hermes-mcp-v3",
+    "chat_posts": 0,
+    "container": {
+      "after_started_at": "2026-10-23T12:21:01.26054026Z",
+      "before_started_at": "2026-10-23T12:08:16.853529208Z",
+      "id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+      "image": "sha256:2fd023efbb8d3d2b0ce1a73d028b07370cff34f567cfe0e999553e8c327ea283",
+      "same_container_configuration": true
+    },
+    "database_writes_by_migration": false,
+    "finished_at": 1792758065,
+    "general_privileges_added": false,
+    "idle_gate_after": {
+      "active_agents": 0,
+      "active_approvals": 0,
+      "active_cases": 0,
+      "active_work": false,
+      "cases_by_state": {
+        "completed": 7,
+        "needs_review": 14
+      },
+      "gateway_leases": 0,
+      "gateway_running": true,
+      "heartbeat_age_seconds": 3.191,
+      "management_leases": 0,
+      "running_runs": 0
+    },
+    "idle_gate_at_apply": {
+      "active_agents": 0,
+      "active_approvals": 0,
+      "active_cases": 0,
+      "active_work": false,
+      "cases_by_state": {
+        "completed": 7,
+        "needs_review": 14
+      },
+      "gateway_leases": 0,
+      "gateway_running": true,
+      "heartbeat_age_seconds": 24.468,
+      "management_leases": 0,
+      "running_runs": 0
+    },
+    "idle_gate_before": {
+      "active_agents": 0,
+      "active_approvals": 0,
+      "active_cases": 0,
+      "active_work": false,
+      "cases_by_state": {
+        "completed": 7,
+        "needs_review": 14
+      },
+      "gateway_leases": 0,
+      "gateway_running": true,
+      "heartbeat_age_seconds": 24.383,
+      "management_leases": 0,
+      "running_runs": 0
+    },
+    "management_timer_restored": true,
+    "model_requests": 0,
+    "restart_requested_at": 1792758058,
+    "schema": 1,
+    "scope": "existing_B_bounded_diagnostics_MCP_migration",
+    "sdk": {
+      "all_passed": true,
+      "chat_posts": 0,
+      "gid": 986,
+      "guards_unchanged": true,
+      "initialize": 6,
+      "model_requests": 0,
+      "runtime_gate": {
+        "general_and_new_write_tools_denied": true,
+        "manage_read_allowed": true,
+        "verify_read_allowed": true
+      },
+      "servers": {
+        "resp": {
+          "names_sha256": "02badf12572ec44c13a7ec6dcbdef126c90a500426140b468e453295ae817665",
+          "tools": 3
+        },
+        "rule-a": {
+          "names_sha256": "a19dd655f3e51f5f8fa6d3722b31278db9154458cb42d0aa37921cb44529dc87",
+          "tools": 8
+        },
+        "rule-b": {
+          "names_sha256": "a19dd655f3e51f5f8fa6d3722b31278db9154458cb42d0aa37921cb44529dc87",
+          "tools": 8
+        },
+        "security-events": {
+          "names_sha256": "2b40c37fa3dd8b793b33675d1c79fe8463a44c0bd5747b910a6e6dd61fd54054",
+          "tools": 2
+        },
+        "system-diagnostics": {
+          "names_sha256": "cbeccb032628e48245a222e1abcafd9272aa405875784aa6e1b359f321040401",
+          "targets": {
+            "a:vector": {
+              "age_seconds": 43,
+              "coverage": {
+                "live_query": false,
+                "maximum_accepted_age_seconds": 180,
+                "normal_interval_seconds": 60,
+                "requested_since": 1792743663,
+                "since": 1792743663,
+                "status": "covered_sample",
+                "unobserved_latest_seconds": 43,
+                "until": 1792758020
+              },
+              "error_classes": [],
+              "error_observations": {
+                "count": null,
+                "first_at": null,
+                "last_at": null,
+                "scope": "bounded_journal_sample"
+              },
+              "journal_status": "unavailable",
+              "journal_truncated": false,
+              "mutation_performed": false,
+              "observed_at": 1792758020,
+              "properties": {
+                "ActiveEnterTimestampMonotonic": 2113244497154,
+                "ActiveState": "active",
+                "ExecMainCode": 0,
+                "ExecMainExitTimestampMonotonic": 0,
+                "ExecMainStartTimestampMonotonic": 2113244497081,
+                "ExecMainStatus": 0,
+                "InactiveEnterTimestampMonotonic": 2113230931705,
+                "LoadState": "loaded",
+                "NRestarts": 0,
+                "Result": "success",
+                "SubState": "running",
+                "Type": "simple",
+                "UnitFileState": "enabled"
+              },
+              "raw_messages_returned": false,
+              "recent_errors": [],
+              "retained_errors_truncated": false,
+              "status": "observed"
+            },
+            "b:soc-bot": {
+              "age_seconds": 9,
+              "coverage": {
+                "live_query": false,
+                "maximum_accepted_age_seconds": 180,
+                "normal_interval_seconds": 60,
+                "requested_since": 1792743664,
+                "since": 1792743664,
+                "status": "covered_sample",
+                "unobserved_latest_seconds": 9,
+                "until": 1792758055
+              },
+              "error_classes": [],
+              "error_observations": {
+                "count": null,
+                "first_at": null,
+                "last_at": null,
+                "scope": "bounded_journal_sample"
+              },
+              "journal_status": "unavailable",
+              "journal_truncated": false,
+              "mutation_performed": false,
+              "observed_at": 1792758055,
+              "properties": {
+                "ActiveEnterTimestampMonotonic": 1482126327296,
+                "ActiveState": "active",
+                "ExecMainCode": 0,
+                "ExecMainExitTimestampMonotonic": 0,
+                "ExecMainStartTimestampMonotonic": 1482126327093,
+                "ExecMainStatus": 0,
+                "InactiveEnterTimestampMonotonic": 1482126149873,
+                "LoadState": "loaded",
+                "NRestarts": 0,
+                "Result": "success",
+                "SubState": "running",
+                "Type": "simple",
+                "UnitFileState": "enabled"
+              },
+              "raw_messages_returned": false,
+              "recent_errors": [],
+              "retained_errors_truncated": false,
+              "status": "observed"
+            },
+            "c:lab-terminal": {
+              "age_seconds": 58,
+              "coverage": {
+                "live_query": false,
+                "maximum_accepted_age_seconds": 180,
+                "normal_interval_seconds": 60,
+                "requested_since": 1792743664,
+                "since": 1792743664,
+                "status": "covered_sample",
+                "unobserved_latest_seconds": 58,
+                "until": 1792758006
+              },
+              "error_classes": [
+                "journal_error",
+                "unit_result"
+              ],
+              "error_observations": {
+                "count": 103,
+                "first_at": 1792751944,
+                "last_at": 1792751969,
+                "scope": "bounded_journal_sample"
+              },
+              "journal_status": "observed",
+              "journal_truncated": false,
+              "mutation_performed": false,
+              "observed_at": 1792758006,
+              "properties": {
+                "ActiveEnterTimestampMonotonic": 2176172336328,
+                "ActiveState": "active",
+                "ExecMainCode": 0,
+                "ExecMainExitTimestampMonotonic": 0,
+                "ExecMainStartTimestampMonotonic": 2176172336144,
+                "ExecMainStatus": 0,
+                "InactiveEnterTimestampMonotonic": 2176171764469,
+                "LoadState": "loaded",
+                "NRestarts": 0,
+                "Result": "success",
+                "SubState": "running",
+                "Type": "simple",
+                "UnitFileState": "enabled"
+              },
+              "raw_messages_returned": false,
+              "recent_errors": [
+                {
+                  "at": 1792751969,
+                  "kind": "journal_error",
+                  "priority": 3
+                },
+                {
+                  "at": 1792751969,
+                  "kind": "unit_result",
+                  "priority": 4,
+                  "result": "exit-code"
+                },
+                {
+                  "at": 1792751968,
+                  "kind": "journal_error",
+                  "priority": 3
+                },
+                {
+                  "at": 1792751968,
+                  "kind": "journal_error",
+                  "priority": 3
+                },
+                {
+                  "at": 1792751968,
+                  "kind": "journal_error",
+                  "priority": 3
+                }
+              ],
+              "retained_errors_truncated": true,
+              "status": "observed"
+            },
+            "c:terminal-status": {
+              "age_seconds": 58,
+              "coverage": {
+                "live_query": false,
+                "maximum_accepted_age_seconds": 180,
+                "normal_interval_seconds": 60,
+                "requested_since": 1792743664,
+                "since": 1792743664,
+                "status": "covered_sample",
+                "unobserved_latest_seconds": 58,
+                "until": 1792758006
+              },
+              "error_classes": [
+                "journal_error",
+                "known_error_code",
+                "process_exit",
+                "unit_result"
+              ],
+              "error_observations": {
+                "count": 4,
+                "first_at": 1792749533,
+                "last_at": 1792749533,
+                "scope": "bounded_journal_sample"
+              },
+              "journal_status": "observed",
+              "journal_truncated": false,
+              "mutation_performed": false,
+              "observed_at": 1792758006,
+              "properties": {
+                "ActiveEnterTimestampMonotonic": 0,
+                "ActiveState": "activating",
+                "ExecMainCode": 0,
+                "ExecMainExitTimestampMonotonic": 0,
+                "ExecMainStartTimestampMonotonic": 2181514815097,
+                "ExecMainStatus": 0,
+                "InactiveEnterTimestampMonotonic": 2181454384545,
+                "LoadState": "loaded",
+                "NRestarts": 0,
+                "Result": "success",
+                "SubState": "start",
+                "Type": "oneshot",
+                "UnitFileState": "static"
+              },
+              "raw_messages_returned": false,
+              "recent_errors": [
+                {
+                  "at": 1792749533,
+                  "kind": "journal_error",
+                  "priority": 3
+                },
+                {
+                  "at": 1792749533,
+                  "kind": "unit_result",
+                  "priority": 4,
+                  "result": "exit-code"
+                },
+                {
+                  "at": 1792749533,
+                  "exit_code": 1,
+                  "exit_kind": "exited",
+                  "kind": "process_exit",
+                  "priority": 5
+                },
+                {
+                  "at": 1792749533,
+                  "code": "publication_failed",
+                  "kind": "known_error_code",
+                  "priority": 6
+                }
+              ],
+              "retained_errors_truncated": false,
+              "status": "observed"
+            }
+          },
+          "tools": 1,
+          "unknown_arguments_rejected": true,
+          "unknown_write_tool_rejected": true
+        },
+        "wazuh-ro": {
+          "names_sha256": "5ce2d57bfefef02877f4707c166477205260cb9bc37523f51e60c9febb93b881",
+          "tools": 14
+        }
+      },
+      "tools_call": 8,
+      "tools_list": 6,
+      "uid": 995
+    },
+    "started_at": 1792758056,
+    "state": "complete",
+    "transport_preflight": {
+      "all_passed": true,
+      "chat_posts": 0,
+      "model_requests": 0,
+      "targets": {
+        "b:soc-bot": {
+          "age_seconds": 1,
+          "journal_status": "unavailable",
+          "observed_at": 1792758055,
+          "status": "observed"
+        },
+        "c:lab-terminal": {
+          "age_seconds": 50,
+          "journal_status": "observed",
+          "observed_at": 1792758006,
+          "status": "observed"
+        },
+        "c:terminal-status": {
+          "age_seconds": 51,
+          "journal_status": "observed",
+          "observed_at": 1792758006,
+          "status": "observed"
+        }
+      }
+    }
+  },
+  "native_post_collector_v4": {
+    "chat_posts": 0,
+    "core_sha256": "228a1d98c7985a7e4986edff3fcd3de9c25d34cc02698f1d771502710144d6fc",
+    "existing_migration_files_unchanged": true,
+    "model_requests": 0,
+    "observed_at": 1792758657,
+    "same_container_without_restart": true,
+    "schema": 1,
+    "scope": "actual_Hermes_UID995_readonly_SDK_post_collector_v4",
+    "sdk": {
+      "all_passed": true,
+      "chat_posts": 0,
+      "gid": 986,
+      "initialize": 1,
+      "model_requests": 0,
+      "targets": {
+        "a:vector": {
+          "age_seconds": 3,
+          "coverage": {
+            "live_query": false,
+            "maximum_accepted_age_seconds": 180,
+            "normal_interval_seconds": 60,
+            "requested_since": 1792744255,
+            "since": 1792744255,
+            "status": "covered_sample",
+            "unobserved_latest_seconds": 3,
+            "until": 1792758652
+          },
+          "error_observations": {
+            "count": 0,
+            "first_at": null,
+            "last_at": null,
+            "scope": "bounded_journal_sample"
+          },
+          "journal_status": "observed",
+          "journal_truncated": false,
+          "mutation_performed": false,
+          "observed_at": 1792758652,
+          "properties": {
+            "ActiveEnterTimestampMonotonic": 2113244497154,
+            "ActiveState": "active",
+            "ExecMainCode": 0,
+            "ExecMainExitTimestampMonotonic": 0,
+            "ExecMainStartTimestampMonotonic": 2113244497081,
+            "ExecMainStatus": 0,
+            "InactiveEnterTimestampMonotonic": 2113230931705,
+            "LoadState": "loaded",
+            "NRestarts": 0,
+            "Result": "success",
+            "SubState": "running",
+            "Type": "simple",
+            "UnitFileState": "enabled"
+          },
+          "raw_messages_returned": false,
+          "recent_errors": [],
+          "retained_errors_truncated": false,
+          "status": "observed",
+          "target": "a:vector"
+        },
+        "b:soc-bot": {
+          "age_seconds": 21,
+          "coverage": {
+            "live_query": false,
+            "maximum_accepted_age_seconds": 180,
+            "normal_interval_seconds": 60,
+            "requested_since": 1792744256,
+            "since": 1792744256,
+            "status": "covered_sample",
+            "unobserved_latest_seconds": 21,
+            "until": 1792758635
+          },
+          "error_observations": {
+            "count": 0,
+            "first_at": null,
+            "last_at": null,
+            "scope": "bounded_journal_sample"
+          },
+          "journal_status": "observed",
+          "journal_truncated": false,
+          "mutation_performed": false,
+          "observed_at": 1792758635,
+          "properties": {
+            "ActiveEnterTimestampMonotonic": 1482126327296,
+            "ActiveState": "active",
+            "ExecMainCode": 0,
+            "ExecMainExitTimestampMonotonic": 0,
+            "ExecMainStartTimestampMonotonic": 1482126327093,
+            "ExecMainStatus": 0,
+            "InactiveEnterTimestampMonotonic": 1482126149873,
+            "LoadState": "loaded",
+            "NRestarts": 0,
+            "Result": "success",
+            "SubState": "running",
+            "Type": "simple",
+            "UnitFileState": "enabled"
+          },
+          "raw_messages_returned": false,
+          "recent_errors": [],
+          "retained_errors_truncated": false,
+          "status": "observed",
+          "target": "b:soc-bot"
+        },
+        "c:lab-terminal": {
+          "age_seconds": 42,
+          "coverage": {
+            "live_query": false,
+            "maximum_accepted_age_seconds": 180,
+            "normal_interval_seconds": 60,
+            "requested_since": 1792744256,
+            "since": 1792744256,
+            "status": "covered_sample",
+            "unobserved_latest_seconds": 42,
+            "until": 1792758614
+          },
+          "error_observations": {
+            "count": 103,
+            "first_at": 1792751944,
+            "last_at": 1792751969,
+            "scope": "bounded_journal_sample"
+          },
+          "journal_status": "observed",
+          "journal_truncated": false,
+          "mutation_performed": false,
+          "observed_at": 1792758614,
+          "properties": {
+            "ActiveEnterTimestampMonotonic": 2176172336328,
+            "ActiveState": "active",
+            "ExecMainCode": 0,
+            "ExecMainExitTimestampMonotonic": 0,
+            "ExecMainStartTimestampMonotonic": 2176172336144,
+            "ExecMainStatus": 0,
+            "InactiveEnterTimestampMonotonic": 2176171764469,
+            "LoadState": "loaded",
+            "NRestarts": 0,
+            "Result": "success",
+            "SubState": "running",
+            "Type": "simple",
+            "UnitFileState": "enabled"
+          },
+          "raw_messages_returned": false,
+          "recent_errors": [
+            {
+              "at": 1792751969,
+              "kind": "journal_error",
+              "priority": 3
+            },
+            {
+              "at": 1792751969,
+              "kind": "unit_result",
+              "priority": 4,
+              "result": "exit-code"
+            },
+            {
+              "at": 1792751968,
+              "kind": "journal_error",
+              "priority": 3
+            },
+            {
+              "at": 1792751968,
+              "kind": "journal_error",
+              "priority": 3
+            },
+            {
+              "at": 1792751968,
+              "kind": "journal_error",
+              "priority": 3
+            }
+          ],
+          "retained_errors_truncated": true,
+          "status": "observed",
+          "target": "c:lab-terminal"
+        },
+        "c:terminal-status": {
+          "age_seconds": 43,
+          "coverage": {
+            "live_query": false,
+            "maximum_accepted_age_seconds": 180,
+            "normal_interval_seconds": 60,
+            "requested_since": 1792744257,
+            "since": 1792744257,
+            "status": "covered_sample",
+            "unobserved_latest_seconds": 43,
+            "until": 1792758614
+          },
+          "error_observations": {
+            "count": 4,
+            "first_at": 1792749533,
+            "last_at": 1792749533,
+            "scope": "bounded_journal_sample"
+          },
+          "journal_status": "observed",
+          "journal_truncated": false,
+          "mutation_performed": false,
+          "observed_at": 1792758614,
+          "properties": {
+            "ActiveEnterTimestampMonotonic": 0,
+            "ActiveState": "activating",
+            "ExecMainCode": 0,
+            "ExecMainExitTimestampMonotonic": 0,
+            "ExecMainStartTimestampMonotonic": 2182122645176,
+            "ExecMainStatus": 0,
+            "InactiveEnterTimestampMonotonic": 2182063254562,
+            "LoadState": "loaded",
+            "NRestarts": 0,
+            "Result": "success",
+            "SubState": "start",
+            "Type": "oneshot",
+            "UnitFileState": "static"
+          },
+          "raw_messages_returned": false,
+          "recent_errors": [
+            {
+              "at": 1792749533,
+              "kind": "journal_error",
+              "priority": 3
+            },
+            {
+              "at": 1792749533,
+              "kind": "unit_result",
+              "priority": 4,
+              "result": "exit-code"
+            },
+            {
+              "at": 1792749533,
+              "exit_code": 1,
+              "exit_kind": "exited",
+              "kind": "process_exit",
+              "priority": 5
+            },
+            {
+              "at": 1792749533,
+              "code": "publication_failed",
+              "kind": "known_error_code",
+              "priority": 6
+            }
+          ],
+          "retained_errors_truncated": false,
+          "status": "observed",
+          "target": "c:terminal-status"
+        }
+      },
+      "tools_call": 4,
+      "tools_list": 1,
+      "uid": 995
+    }
+  },
+  "recorded_at_kst": "2026-10-23T22:28:13+09:00",
+  "schema": 1,
+  "scope": "fixed_readonly_system_diagnostics_MCP_A_B_C_with_legacy_B_Hermes_migration",
+  "source_sha256": {
+    "infra/automation/ansible/roles/hermes_prestart/files/mcp-readonly.py": "7b723e305583f04b5fe5691b71bcabaaa7624d8246640bbce975dd806235a8e6",
+    "infra/hermes/SOUL.groot.md": "85bc46e0be76e37104a04cf8730f7c0389761980bc7a467377f6b01ef5b78c64",
+    "infra/hermes/hermes_prestart_transaction.py": "b89e121fe63858843e56a5a596e6d1c581b500cfcba33095c7d164f2a53b6310",
+    "infra/hermes/soc_alert_watch.prompt": "047d2dc7ff186e4e341f749ac9646b25e7a8bb4e6a06593b385ef45a98802311",
+    "infra/hermes/soc_management_controller.py": "6549a4ffaf426e9e63e6eea3c528e5848d069e78dd8036c22d123f46484ee616",
+    "infra/hermes/soc_management_run.py": "554af36a572f3380422b1dbeeee56a1af67022a64a12b5608e069bd33b89328f",
+    "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+    "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+    "infra/mcp/run-wazuh-ro.sh": "5702374983e3cd02029ffc39ff3e153f1d068d16aa9f45add26cecc4f9d4ab0c",
+    "infra/mcp/system-diagnostics-mcp.py": "296b023831e4211dffc1046f914999e9b3e95ca6917cd3a49ba9027ebe8223c0",
+    "infra/mcp/system_diagnostics.py": "228a1d98c7985a7e4986edff3fcd3de9c25d34cc02698f1d771502710144d6fc",
+    "infra/mcp/test_system_diagnostics.py": "78ff390b7d0843ea41756894865f890524ae1ad9d9dd2c0c03e64425561d624e"
+  },
+  "source_sha256_at_Hermes_v3_integration": {
+    "infra/automation/ansible/roles/hermes_prestart/files/mcp-readonly.py": "7b723e305583f04b5fe5691b71bcabaaa7624d8246640bbce975dd806235a8e6",
+    "infra/hermes/SOUL.groot.md": "85bc46e0be76e37104a04cf8730f7c0389761980bc7a467377f6b01ef5b78c64",
+    "infra/hermes/hermes_prestart_transaction.py": "b89e121fe63858843e56a5a596e6d1c581b500cfcba33095c7d164f2a53b6310",
+    "infra/hermes/soc_alert_watch.prompt": "047d2dc7ff186e4e341f749ac9646b25e7a8bb4e6a06593b385ef45a98802311",
+    "infra/hermes/soc_management_controller.py": "6549a4ffaf426e9e63e6eea3c528e5848d069e78dd8036c22d123f46484ee616",
+    "infra/hermes/soc_management_run.py": "554af36a572f3380422b1dbeeee56a1af67022a64a12b5608e069bd33b89328f",
+    "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+    "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+    "infra/mcp/run-wazuh-ro.sh": "5702374983e3cd02029ffc39ff3e153f1d068d16aa9f45add26cecc4f9d4ab0c",
+    "infra/mcp/system-diagnostics-mcp.py": "296b023831e4211dffc1046f914999e9b3e95ca6917cd3a49ba9027ebe8223c0",
+    "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef",
+    "infra/mcp/test_system_diagnostics.py": "1aa56cc1c4d8fd2475350f45474ea214d45c3324543e3de78e135e40b91037bc"
+  },
+  "source_validation": {
+    "controller_tests": {
+      "passed": 34,
+      "run": 34
+    },
+    "diagnostics_tests": {
+      "passed": 33,
+      "run": 33
+    },
+    "management_wrapper_tests": {
+      "passed": 25,
+      "run": 25
+    },
+    "prestart_tests": {
+      "passed": 53,
+      "run": 54,
+      "skip_reason": "Mac root boundary not a live Linux root check",
+      "skipped": 1
+    },
+    "pure_tests_do_not_query_live_systemd_journal_or_SSH": true,
+    "shell_syntax": [
+      "run-system-diagnostics.sh",
+      "run-wazuh-ro.sh"
+    ],
+    "total": {
+      "passed": 145,
+      "run": 146,
+      "skipped": 1
+    }
+  },
+  "state": "complete_readonly_SDK_validated"
+}

@@ -35,7 +35,7 @@ PROMPT = Path("/opt/capstone-management/soc_alert_watch.prompt")
 MAX_RESPONSE = 2 * 1024 * 1024
 MAX_TRACE = 4 * 1024 * 1024
 MAX_LINE = 1024 * 1024
-TOOLSETS = ("mcp-rule-a", "mcp-rule-b", "mcp-security-events", "mcp-wazuh-ro", "mcp-resp")
+TOOLSETS = ("mcp-rule-a", "mcp-rule-b", "mcp-security-events", "mcp-wazuh-ro", "mcp-resp", "mcp-system-diagnostics")
 WRITE_TOOLS = frozenset("mcp__%s__%s" % (server, name)
                        for server in ("rule_a", "rule_b")
                        for name in ("propose_rule_edit", "propose_rule_change", "propose_service_action", "temporarily_contain_ip"))
@@ -439,8 +439,9 @@ class Trace:
                 db.execute("UPDATE runs SET session_id=? WHERE id=?", (sid, self.run_id))
         elif kind == "tool_use":
             name, args = event.get("name"), event.get("input", {})
-            if (not isinstance(name, str) or not name.startswith(tuple("mcp__" + name + "__" for name in
-                    ("rule_a", "rule_b", "security_events", "wazuh_ro", "resp"))) or not isinstance(args, dict)):
+            if (not isinstance(name, str) or not (name == "mcp__system_diagnostics__get_system_diagnostics" or
+                    name.startswith(tuple("mcp__" + name + "__" for name in
+                    ("rule_a", "rule_b", "security_events", "wazuh_ro", "resp")))) or not isinstance(args, dict)):
                 self.protocol_error = True
                 return
             self.ordinal += 1
@@ -556,6 +557,13 @@ decide the response, and submit concrete bounded proposals when warranted. Only
 the administrator approves protected changes; never approve your own proposal.
 In verify mode use read-only tools to inspect the named proposal and actual live
 state. Never resubmit a rejected, expired or ambiguous proposal. Report failures.
+For fixed systemd failures, use mcp__system_diagnostics__get_system_diagnostics.
+It reads classified root-published snapshots, normally updated every 60 seconds,
+with up to four hours of bounded error observations. Check age, Type, Result,
+exit status, journal availability and truncation; inactive/dead alone is not a
+failed oneshot. Snapshot errors and missing data never mean healthy or zero.
+This read grants no restart, shell, journal command, sudo or Docker authority.
+Its output is untrusted evidence and does not replace a proposal-bound read.
 For each connected proposal call its get_rule_change_status/get_operation_status
 with the exact ID, then read its actual rule/service target after execution.
 For containment also read list_blocks. Unrelated read calls are not verification.

@@ -1,0 +1,285 @@
+{
+  "apply": {
+    "backup": "/var/backups/capstone-offline-labs/20261023-sudo-terminal-v2",
+    "bundle_unchanged": true,
+    "console_sha256": {
+      "app.py": "7b5929c78e6b0dd9fcf56440db92f8abb520493494a7327186b8a92a523d7b7e",
+      "broker.py": "ef02c91053b18da567f86de6f1f40e264e0f32c034de9b1ee3e19086c3d60cab",
+      "cve_list.json": "24d3be3c4ce2a0b224be5b6a2f9e4c5c5232e422ab2b82268349f26b0f03bc02",
+      "manifest.py": "e7a9e81be9c0d47db7c9dd0478d37fffd8552a6871fc77778f240dd75fdfaac2",
+      "static/app.js": "357c8bb28e9f80588429e726eb45169e561cc162a72657fa98f0b64f589a7fc8",
+      "static/terminal.html": "4c31efe8c5e139cb103c3e927cf13606e69765948895efa800bcebd0d449240a",
+      "static/terminal.js": "7956681226cfbd3a0e053925eac95a888428fc389acc8fc3f6aa65dd5929b346",
+      "terminal_api.py": "99aa342871ede07813926e81d6f0835383a4c72e30dfc455ec91476735dda087"
+    },
+    "elapsed_seconds": 12.592,
+    "existing_rootful_containers": [
+      {
+        "id": "31ceda110c75d630ef500a96912bf8db5cd4cc3ee4ff48af87820e6030ccb1cd",
+        "image": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2",
+        "running": false,
+        "started_at": "2026-10-22T15:02:05.585800389Z"
+      },
+      {
+        "id": "457fe8c6383e731ecc8da7bcf3b24db0d19570fc4752962ecd0d6fd1bddb972f",
+        "image": "sha256:5f25b56ad55e388a0e20afd98627c91d4dc8d94b464d918fcfb2c1652d2ef14d",
+        "running": true,
+        "started_at": "2026-10-19T11:29:31.655644978Z"
+      },
+      {
+        "id": "83bb9fe8bf07b441ca6fc104759f86ce7d1951d9317db7e5f5af0902e919ac15",
+        "image": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "running": true,
+        "started_at": "2026-10-23T10:03:10.955975808Z"
+      },
+      {
+        "id": "cb972561a7802be8fd6a2897109870f80c4cb6662c1de3b55a2cdf888d16af9c",
+        "image": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b",
+        "running": false,
+        "started_at": "2026-10-23T09:59:31.285753732Z"
+      },
+      {
+        "id": "eb55ca320453778dca2985d5cdaa200396a0a8fe5d74be01f9fa0197a98d2665",
+        "image": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36",
+        "running": false,
+        "started_at": "2026-10-22T15:02:04.308278072Z"
+      }
+    ],
+    "existing_rootful_containers_unchanged": true,
+    "installed": {
+      "attack_tested": false,
+      "environment_only": true,
+      "images": {
+        "redis": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "samba": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d"
+      },
+      "profile": "capstone-nonweb-v1",
+      "schema": 1,
+      "state": "complete"
+    },
+    "observed_at": 1792752676,
+    "source_sha256": {
+      "README.md": "93f0dd5144766130113e94a2d65225196d718716a66e29aad9ef53e4fdf0bcbe",
+      "bootstrap.py": "18d10a0e9d742c1e09996ec68bd5f57c53b904d67b00dcf4e18fcc4b3b2b4926",
+      "compose.yaml": "e9129a91f47824ad5ddf5ca84814a7c3142ab491ea7627b3eee7fdc39a5732dd",
+      "lab.sh": "8659bb7e1d52994f3b9a660042e736323432564e89e634ea6e251d6a8676cdfb",
+      "publish.py": "15e573288ff41d9c324b0ef57223d826b21d8f1ba4ac2b47501f5ecfdf159c6c",
+      "runtime.py": "6e104959cc3a03c8d400d8438a2051246f6db7e66f1c43563c658eafd010a4b0",
+      "sudo_terminal.py": "35825535c02539f9815df3c556e7676158281f2d15cd058f577efc2bd2edcf51",
+      "terminal.service": "3862bf3019345822e5a182104e3554997225c4f5d464f8386949273b148435ac",
+      "terminal_server.py": "61a1fc0cfee3748e1e73c7cbbc805e206d823a4225481387a02de7877eba1fb1"
+    },
+    "state": "complete",
+    "sudo_status": {
+      "container_id": "f90aacb7046450fc93aa4e468b847153acb4b1b91a74a2a0daf8b7ebe0c23766",
+      "cve_id": "CVE-2021-3156",
+      "image_present": true,
+      "lab": "sudo",
+      "ok": true,
+      "schema": 1,
+      "status": "stopped",
+      "verification": "environment_only"
+    }
+  },
+  "attack_tested": false,
+  "browser": {
+    "catalog_count": 6,
+    "images_ready": 6,
+    "limit": "Concurrent user browser actions interrupted terminal UI interaction; actual HTTPS terminal I/O and JS client regressions passed.",
+    "main_refreshed": true,
+    "sudo_catalog_entry_seen": true,
+    "sudo_start_button_enabled_seen": true,
+    "sudo_terminal_commands_observed": false
+  },
+  "cleanup": {
+    "mac_task_cleanup_complete": true,
+    "publisher_note": "Separate one-use Git publisher remains active for final publication; its cleanup is checked in the local session log after push.",
+    "server_candidate_cleanup_complete": true,
+    "server_candidate_cleanup_evidence": {
+      "backup": "/var/backups/capstone-offline-labs/20261023-sudo-terminal-validation",
+      "bytes": 1331322,
+      "files": 103,
+      "observed_at": 1792753541,
+      "operational_files_and_images_preserved": true,
+      "removed_stages": [
+        "/var/lib/capstone-sudo-console-candidate-20261023",
+        "/var/lib/capstone-sudo-runtime-candidate-20261023",
+        "/var/lib/capstone-sudo-update-stage-20261023",
+        "/var/lib/capstone-sudo-update-stage-v2-20261023"
+      ],
+      "sha256_verified": true,
+      "stages_absent": true
+    },
+    "shared_terminal_task_bytes_removed": 690734,
+    "shared_terminal_task_directory_removed": true,
+    "shared_terminal_task_files_removed": 70
+  },
+  "failure_history": {
+    "first_operational_attempt": "Rolled back after UID transition failed; validated fixed AmbientCapabilities=CAP_SETUID under actual Group and NoNewPrivileges settings before successful v2 apply.",
+    "image_or_bundle_changed": false,
+    "original_sudo_runtime_changed": false,
+    "preflight_stale_unused_opt_catalog": "Matched HEAD four-item catalog; live /etc six-item catalog remained correct. Both synchronized with backup and exact old hash."
+  },
+  "https": {
+    "attack_tested": false,
+    "controlling_tty_warning_absent": true,
+    "ctrl_c_keeps_shell": true,
+    "disconnect_stops_container": true,
+    "final_sudo_status": "stopped",
+    "images_ready": 6,
+    "interrupt_elapsed_seconds": 0.251,
+    "observed_at": 1792752683,
+    "open_while_stopped_denied": true,
+    "other_labs_unchanged": true,
+    "package_version": "1.8.31-1ubuntu1",
+    "resize": true,
+    "restart_recreates_container": true,
+    "single_terminal_enforced": true,
+    "start_idempotent": true,
+    "stop_closes_active_session": true,
+    "stop_idempotent": true,
+    "tls_verified": true,
+    "uid": 1000
+  },
+  "limitations": {
+    "full_idle_5_minute_wait_tested": false,
+    "full_lifetime_30_minute_wait_tested": false,
+    "host_scenario_verified": false,
+    "reboot_tested": false,
+    "same_lab_shared_filesystem": true,
+    "sudo_close_boundary": "entire exactly-owned rootless container",
+    "sudo_single_global_terminal": true
+  },
+  "native_console": {
+    "observed_at": 1792750924,
+    "output": "Executing <Task finished name='Task-1' coro=<AppTests.asyncSetUp() done, defined at /var/lib/capstone-sudo-console-candidate-20261023/test_app.py:16> result=None created at /usr/lib/python3.12/asyncio/runners.py:100> took 0.855 seconds\n.................................................................................................\n----------------------------------------------------------------------\nRan 97 tests in 2.235s\n\nOK\n",
+    "returncode": 0
+  },
+  "native_nonweb": {
+    "observed_at": 1792753131,
+    "output": ".........................................................................................................................\n----------------------------------------------------------------------\nRan 121 tests in 0.170s\n\nOK\n",
+    "returncode": 0
+  },
+  "new_three_vm_installation_tested": false,
+  "observed_at": 1792753448,
+  "prior_systemd_error": {
+    "exact_cause_known": false,
+    "failed_at_kst": "2026-10-23T18:58:53+09:00",
+    "recovered_at_kst": "2026-10-23T18:59:55+09:00",
+    "reported_code": "publication_failed",
+    "unit": "capstone-nonweb-status.service"
+  },
+  "sandbox_diagnosis": {
+    "cause": {
+      "host_mode": "0755",
+      "owner_gid": 0,
+      "owner_uid": 0,
+      "path": "/run/user",
+      "sandbox_mode_with_protect_home_tmpfs": "01777",
+      "socket_parent_1991_mode": "0700"
+    },
+    "direct": {
+      "adapter_status": "running",
+      "context": "approved_legacy",
+      "status_seconds": 0.698
+    },
+    "fixed_sandbox": {
+      "adapter_status": "running",
+      "adapter_status_seconds": 0.645,
+      "added_property": "TemporaryFileSystem=/run/user:ro,mode=0755",
+      "cli_status_returncode": 0,
+      "cli_verify_returncode": 0,
+      "context_passed": true,
+      "narrow_bind_kept": "BindReadOnlyPaths=/run/user/1991",
+      "original_lab_directory_checks_unchanged": true,
+      "transient_unit_returncode": 0
+    },
+    "group_capability_diagnostic": {
+      "adapter_source_modified": false,
+      "bounding_capabilities": "000001ffffffffff",
+      "fixed_added_property": "AmbientCapabilities=CAP_SETUID",
+      "fixed_effective_and_permitted_capabilities": "000001ffffffffff",
+      "fixed_main_adapter_status_returncode": 0,
+      "fixed_main_seconds": 0.604,
+      "fixed_thread_adapter_status_returncode": 0,
+      "fixed_thread_seconds": 0.601,
+      "full_unit_matched": true,
+      "group_gid": 988,
+      "journal_label": "pam_keyinit Unable to change UID to 1991 temporarily",
+      "missing_effective_bit": "CAP_SETUID",
+      "no_new_privileges": 1,
+      "observed_at": 1792752384,
+      "operational_unit_modified": false,
+      "original_effective_capabilities": "000001ffffffff7f",
+      "original_main_result": "invalid_sudo_probe",
+      "original_thread_result": "invalid_sudo_probe",
+      "seccomp": 2,
+      "sudo_start_or_stop_called": false,
+      "user_uid": 0
+    },
+    "host": "C",
+    "observed_at": 1792751485,
+    "operator_child_capabilities": {
+      "CapAmb": "0000000000000000",
+      "CapEff": "0000000000000000",
+      "CapInh": "0000000000200180",
+      "CapPrm": "0000000000000000",
+      "NoNewPrivs": 1,
+      "active_permitted_ambient_capabilities_absent": true,
+      "ambient_capability_in_parent": "CAP_SETUID",
+      "egid": 1991,
+      "euid": 1991,
+      "full_sandbox_group": "capstone-labs",
+      "gid": 1991,
+      "main_and_thread_identical": true,
+      "observed_at": 1792752549,
+      "source_modified": false,
+      "sudo_start_or_stop_called": false,
+      "uid": 1991
+    },
+    "original_sandbox": {
+      "adapter_error": "sudo_operation_failed",
+      "cli_error": "unsafe_parent_directory",
+      "cli_status_returncode": 1,
+      "cli_verify_returncode": 1,
+      "context_passed": true
+    },
+    "schema": 1,
+    "scope": "read-only transient service sandbox diagnostics",
+    "sources_modified": false,
+    "sudo_start_or_stop_called": false,
+    "task_scripts": [
+      "diag-adapter-direct.py",
+      "diag-adapter-sandbox.py",
+      "diag-adapter-metadata.py",
+      "diag-adapter-fixed-sandbox.py",
+      "diag-adapter-full-unit.py",
+      "diag-adapter-capsetuid-unit.py",
+      "diag-adapter-capsetuid-full.py",
+      "diag-adapter-childcaps.py"
+    ]
+  },
+  "schema": 1,
+  "scope": "existing_C_rootless_sudo_web_terminal_extension",
+  "source_sha256": {
+    "infra/groot-c/nonweb-labs/test_runtime.py": "d76f8e5425b99032c0d0dc15f22beca8fca13a12fa9b23665e432ae4aebce95b",
+    "infra/groot-c/nonweb-labs/test_sudo_terminal.py": "3fae7621d7d22e792e472d451e0021e776bfbca6af88e77687cb05150723347b",
+    "infra/groot-c/nonweb-labs/test_terminal_server.py": "2f008fd05fe1d399a981a197132d24fc786689108ad79732b60e56c88eed71ee",
+    "infra/groot-c/offline-labs/test_app.py": "bd5c9ed3f45acd69bee82b577c5975296a6339d76c4884f92dab9e385a47f829",
+    "infra/groot-c/offline-labs/test_lab_types.py": "169b11f3f399727264167d5cb78493357b1bc5d29c1cd10c594c7589cb93cd65",
+    "infra/groot-c/offline-labs/test_terminal_api.py": "850e32c1450830e0b0317cf4640ce290f5d9691667ce1928bb6c80378242d645",
+    "infra/groot-c/offline-labs/test_terminal_broker.py": "01f40001d45f6fd5d7f37d3cd9f179c021fbf8879ca0f99b8a3fbc31df5748c2",
+    "infra/groot-c/offline-labs/test_terminal_client.js": "034c2e72edc07f90b2a553ced7063ca38cf37458dd59910fcf2630b5a1714729",
+    "infra/groot-c/offline-labs/test_terminal_ui.js": "3a31d054bd77f733796277be30ec347e47c741195824a95ce3b12c80d30dd6a5"
+  },
+  "tests": {
+    "installer_controller": 35,
+    "installer_service": 50,
+    "native_console": 97,
+    "native_image_preparation": 22,
+    "native_runtime": 40,
+    "native_sudo_adapter": 25,
+    "native_terminal_daemon": 34,
+    "node_suites": 2
+  }
+}

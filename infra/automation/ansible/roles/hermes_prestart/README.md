@@ -1,5 +1,9 @@
 # 고정 B Hermes 첫 시작 전 설치와 실제 복귀
 
+## 2026-10-23 진단 MCP 호환 계약 — 소스 검증
+
+기존 정확한5개 MCP 또는 그 집합에 `system-diagnostics` 하나만 추가한 정확한6개를 읽기 사전 점검에서 허용한다. 새 서버는 `get_system_diagnostics` 도구1개와 이름 목록 SHA까지 고정한다. 임의 서버·추가 도구·다른 SSH 명령은 거절하며 `initialize`/`tools/list`만 호출한다. 현재 일반 `hermes-prestart-b.yml`의 source/probe SHA를 동기화했고, 아래10/15의 postcreate/postinstall 전용 playbook·증거는 당시 고정 컨테이너 이력으로 보존한다. 이 소스 검증은 새 lifecycle 실행이나 운영 전환 완료를 뜻하지 않는다.
+
 ## 2026-10-15 최신 결과 — 4단계 실제 시험 완료
 
 고정 B 운영자 경로에서 **시작 전 가드 설치 → 후보의 실제 첫 시작·readiness → 고정 시험 실패 → 원래 컨테이너의 실제 복귀**를 완료했다. 최종 ledger는 `rolled-back`, revision 22이며 원래 plan SHA `116e24939a67657e83ebc3900740182ed491db41d42fcb9fc68e9a52f83ee37d`는 유지됐다. 기존 CID `6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b`가 PID `2248019`로 운영 중이고, 시험 후보 CID `47aa31c88f9d93adb0aa28a00b40b125df6ebd1b235605ee5274661509e21342`는 `exited` 상태로 보존한다. 두 번째 cutover나 후보 삭제는 하지 않았다.

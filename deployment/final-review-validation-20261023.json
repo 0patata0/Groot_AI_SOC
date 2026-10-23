@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "observed_at": 1792762174,
+  "scope": "terminal/favicons/fixed_readonly_diagnostics final source and evidence review",
+  "evidence_sha256": {
+    "infra/groot-c/nonweb-labs/sudo-web-validation-20261023.json": "e52ac3ff2a017d8b7c5fef46c0bcc1348a9c9d7c808da8d8c6348b5bf720d4ca",
+    "infra/groot-c/offline-labs/favicon-validation-20261023.json": "fcbedebfe4bf945e6a8b86b82b8a4664a30c439a43255f6dd444d17b670655e0",
+    "infra/mcp/system-diagnostics-validation-20261023.json": "a76d92446b8e1b5a0ca4b19c81c51b42d25bd233d5bee96caaa380ac274d1e56",
+    "deployment/diagnostics-bootstrap-validation-20261023.json": "00b44c3196e3eed474b12d6863b24656441c5bf3e42ead01134c6adae1710b60",
+    "deployment/diagnostics-journal-fix-validation-20261023.json": "1c492faaea24d4932534a93cd883eb67ba1332e9e1f94439604bf1dd4fbbb1a8"
+  },
+  "operational_completion": {
+    "terminal_catalog": 6,
+    "terminal_images_ready_verified": 6,
+    "managed_terminal_types": 3,
+    "sudo_web_HTTPS_verified": true,
+    "favicon_Safari_and_user_confirmed": true,
+    "diagnostics_actual_Hermes_SDK_verified": true,
+    "diagnostics_initial_deploy_entrypoint": "deploy.sh"
+  },
+  "reviewed_tests": {
+    "native_console": 97,
+    "native_nonweb_runtime_daemon_images_adapter": 121,
+    "service_installer": 50,
+    "diagnostics_core": 33,
+    "diagnostics_installer": 18,
+    "controller": 37,
+    "siem": 40,
+    "other_management_prestart_regressions_passed": true,
+    "Mac_root_boundary_skip": 1,
+    "node_suites": 2
+  },
+  "cleanup": {
+    "terminal_shared_task_directory_removed": true,
+    "removed_files": 70,
+    "removed_bytes": 690734,
+    "subagent_task_directories_removed": true,
+    "one_use_publisher_active_until_push": true,
+    "operating_bundles_sources_and_recovery_backups_preserved": true,
+    "user_authorized_Safari_icon_cache_backup_preserved": true
+  },
+  "not_tested": [
+    "new three-VM full installation",
+    "actual exploit/detection/response E2E",
+    "reboot persistence",
+    "full five-minute idle and thirty-minute lifetime wait",
+    "sudo commands visually observed in browser",
+    "natural-language model choice of new diagnostic tool"
+  ]
+}

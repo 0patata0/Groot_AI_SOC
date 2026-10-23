@@ -1,6 +1,6 @@
 # 환경 값 입력과 단일 셸 실행
 
-새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema7**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 인수하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**
+새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema9**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 인수하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**
 
 [네트워크·SSH 준비](setup-network-ssh.md), [오프라인 반입·설치 흐름](bootstrap-guide.md), [Hermes 이미지 준비](hermes-image.md)를 먼저 확인한다. 예시 `192.0.2.0/24`는 문서용이며 실제 할당 주소로 바꾼다. 설치기는 IP·라우팅·DNS·SSH를 자동 변경하지 않는다.
 
@@ -9,7 +9,7 @@
 | `deployment/site.local.conf` | 관리 컴퓨터 저장소 | 주소·SSH·LLM·`LAB_*` 설정. 로컬 전용0600 권장, 비밀번호 금지 |
 | `/opt/capstone-prereqs/artifacts.json` 및 명시된 파일 | 서버마다 | 역할별 승인된 `.deb`·Docker save archive의 버전·SHA·ID. root 소유, group/world 쓰기 금지 |
 | `/opt/capstone-prereqs/siem.json` | SIEM | 초기 계정·암호·Hermes image ID. root:root0600 |
-| wheel 디렉터리·카탈로그·sudo bundle | service | 아래 `LAB_WHEEL_DIR`, `LAB_MANIFEST`, `LAB_SUDO_BUNDLE` |
+| wheel 디렉터리·카탈로그·sudo/nonweb bundle | service | 아래 `LAB_WHEEL_DIR`, `LAB_MANIFEST`, `LAB_SUDO_BUNDLE`, `LAB_NONWEB_BUNDLE` |
 | TLS 인증서·개인키 | security | `LAB_PUBLIC_ORIGIN` 이름과 맞는 인증서. 개인키 root:root0600 |
 
 반입 manifest의 해시는 관리자가 승인한 파일의 동일성을 확인한다. 공급자 서명 검증은 별도 준비 단계의 책임이며, sudo bundle은 자체 고정 pin·서명 체인을 추가 검사한다. Mac에 패키지를 설치하지 않으며 controller는 반입 바이너리를 자동 다운로드하지 않는다.
@@ -78,6 +78,7 @@ LAB_GATEWAY_PORT=18091
 LAB_WHEEL_DIR=/opt/capstone-prereqs/wheels
 LAB_MANIFEST=/opt/capstone-prereqs/cve_list.json
 LAB_SUDO_BUNDLE=/opt/capstone-prereqs/sudo
+LAB_NONWEB_BUNDLE=/opt/capstone-prereqs/nonweb
 LAB_TLS_CERT=/opt/capstone-prereqs/lab-tls.crt
 LAB_TLS_KEY=/opt/capstone-prereqs/lab-tls.key
 LLM_BASE_URL=http://192.0.2.40:11434/v1
@@ -96,14 +97,17 @@ LLM_MODEL=qwen3.6:35b
 | `LAB_PROXY_SUBNET` | security 전용 프록시의 사설 /29. 호스트 route·기존 Docker·클라이언트 CIDR과 충돌 금지 |
 | `LAB_GATEWAY_PORT` | service 내부 gateway 포트, 기본18091. security와 service loopback만 허용하며 사용자 공개 주소가 아님 |
 | `LAB_WHEEL_DIR` | service의 Python3.12 amd64용 전체 고정 wheel 목록. 설치기는 인터넷 대신 이 입력으로 콘솔 환경 준비 |
-| `LAB_MANIFEST` | service의 고정 4항목 카탈로그. Java/Apache2개는 정확한 로컬 image ID, sudo는 local-cli 상태 항목 |
+| `LAB_MANIFEST` | service의 고정 6항목 카탈로그. Java/Apache2개는 정확한 로컬 image ID, Redis/Samba/sudo는 고정 managed-terminal3개; sudo는 별도 rootless 런타임 |
 | `LAB_SUDO_BUNDLE` | service의 [고정 sudo bundle](../infra/groot-c/offline-labs/nonweb/sudo/runtime/BOOTSTRAP.md). 10파일+manifest와 서명 증빙 필수 |
+| `LAB_NONWEB_BUNDLE` | service의 [Redis/Samba bundle](../infra/groot-c/nonweb-labs/README.md). manifest·provenance 및 이미지 archive2개, 기본 `/opt/capstone-prereqs/nonweb`. 콘솔 계정 생성 이후 별도 helper가 설치하며 두 실습은 미시작 상태로 둠 |
 | `LAB_TLS_CERT`, `LAB_TLS_KEY` | security의 준비된 인증서/개인키. `/opt/…` 절대 경로. 실제 hostname·키 일치·유효기간 검증 |
 | `LLM_BASE_URL`, `LLM_MODEL` | 내부 `/v1` API와 실제 모델 ID. URL 안의 자격·query 금지 |
 | `SURICATA_IMAGE`, `WAF_IMAGE`, `DVWA_IMAGE`, `MARIADB_IMAGE` | 선택 로컬 이미지 참조. 반입된 ID·플랫폼·역할 계약을 검사하며 pull하지 않음 |
 | `ET_RULES_FILE` | 선택 security 룰 경로. 기본 `/opt/capstone-prereqs/suricata.rules` |
 
-`LAB_ADMIN_KEY_FILE`은 controller의 고정 전달 경로이며 설정 파일의 입력 키가 아니다. `LAB_ADMIN_KEY`나 비밀번호 값도 넣지 않는다. 구형 `LOG4SHELL_IMAGE`, `LOG4SHELL_APP_JAR`, `LOG4SHELL_HOSTNAME`은 더 이상 쓰지 않으며 값이 있으면 거절한다. schema7은 준비된 관리형 이미지로 실행하고 초기 설치 중 Java JAR를 빌드·마운트하지 않는다.
+읽기 전용 시스템 진단에는 별도 비밀번호 입력이 없다. 설치기가 `SECURITY_HOST`·`SIEM_HOST`·`SERVICE_HOST`와 `SSH_PORT`를 새 진단 전용 SSH 경로에도 결속한다. B에서 생성한 새 키는 A/C의 고정 snapshot reader만 호출하며 관리자 SSH 키·WAF 예외 키·Wazuh 자격증명을 공유하지 않는다. collector는 root로 고정 상태와 오류 분류 메타데이터만 수집하고, MCP 계정에는 root·sudo·Docker·원본 journal 읽기 권한을 주지 않는다. 기존 서버는 새 진단 namespace가 없는지 확인한 뒤 확장 부분만 별도 배포한다.
+
+`LAB_ADMIN_KEY_FILE`은 controller의 고정 전달 경로이며 설정 파일의 입력 키가 아니다. `LAB_ADMIN_KEY`나 비밀번호 값도 넣지 않는다. 구형 `LOG4SHELL_IMAGE`, `LOG4SHELL_APP_JAR`, `LOG4SHELL_HOSTNAME`은 더 이상 쓰지 않으며 값이 있으면 거절한다. schema9은 준비된 관리형 이미지로 실행하고 초기 설치 중 Java JAR를 빌드·마운트하지 않는다. 기존 schema6·7·8 서비스는 자동으로 인수하지 않는다.
 
 설정은 LF의 `KEY=value` 데이터다. `export`, 따옴표, 줄 끝 주석, 변수 확장, `~`, 명령 치환을 넣지 않는다. 맨 앞 `#`만 주석이며 알 수 없는 키는 거절한다. 파일을 shell `source`로 실행하지 않는다. 설정 파일에 정의한 경로를 controller가 서버로 업로드하는 것은 아니다.
 
@@ -200,7 +204,7 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 - 정상 무키 요청과 웹 실습 실행·중지는 허용된다. WAF 규칙에 걸린 요청을 차단하며, 키가 없다는 이유만으로 모든 요청을 차단하지 않는다.
 - 선택 예외 키는 Dashboard `admin` 암호와 같다. 브라우저가 30초·1회용 challenge를 HMAC 서명해 보내며 원문·고정 키 해시를 보내지 않는다. 성공 시 별도 HttpOnly 세션 쿠키가600초 유지된다. 같은 브라우저 탭 사이에 공유되며 키 자체가 쿠키에 들어가는 것은 아니다.
 - 관리·인증 API는 Lab WAF를 우회하고 고정된 실제 실습 경로만 WAF를 지난다. 예외는 해당 WAF 차단에만 적용되며 Suricata·기존 IP 차단·보호 주소·LLM 승인/TTL 정책을 해제하지 않는다.
-- sudo는 관리자 전용 CLI 환경의 상태만 표시한다. `ready`도 환경/패키지 검증이며 실제 권한상승·host auditd 시나리오 성공을 뜻하지 않는다.
+- sudo도 콘솔에서 시작한 뒤 같은 사이트의 웹 터미널로 연다. 별도 UID1991 rootless 런타임·컨테이너 UID1000을 유지하며 웹/LLM에 일반 Docker나 호스트 sudo 권한을 주지 않는다. sudo는 전체 사용자 중 한 터미널만 허용하고 연결 종료·유휴/수명 만료 때 해당 컨테이너 전체를 중지한다. 환경/패키지 검증은 실제 권한상승·host auditd 시나리오 성공을 뜻하지 않는다.
 
 기본 설치는 웹 실습3개 이미지만 준비하며 자동 기동하지 않는다. 콘솔에서 선택해 실행한 뒤 같은 HTTPS 링크로 접속한다. SSH 포트포워딩은 일반 접속의 필수 절차가 아니다. 추가 CVE는 이미지·카탈로그뿐 아니라 제한된 same-origin 라우트 계약도 별도로 준비해야 한다.
 

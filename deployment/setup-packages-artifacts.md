@@ -2,7 +2,7 @@
 
 현재 기본 설치 경로는 [단일 Bash 초기 설치](bootstrap-guide.md)다. `deploy.sh --apply`가 각 서버의 승인된 `artifacts.json`에 따라 로컬 deb와 Docker archive를 설치한다. 아래 온라인 명령은 **외부 Linux 준비 환경에서 반입 자료를 만들거나 관리자가 사전에 설치할 때의 참고 절차**이며 폐쇄망 설치기가 실행하는 다운로드 명령이 아니다. Mac에는 패키지·JDK·Docker Desktop·가상환경을 설치하지 않는다.
 
-Log4Shell은 schema7부터 현재 콘솔과 검증된3개 웹이미지를 사용한다. 아래 구형 Java 직접Compose/JAR 자동 빌드 설명은 과거 schema6 준비 절차이며 신규 기본 경로가 아니다. 기존 빌드 도구는 Java 이미지 준비에 사용할 수 있다. sudo 고정 rootless bundle·wheel·TLS 자료도 새 가이드에 따라 반입한다.
+Log4Shell은 schema7부터 현재 콘솔과 검증된3개 웹이미지를 사용하며, schema8에서 Redis·Samba 터미널2종을 추가했고, 현재 schema9는 sudo까지 웹 터미널로 연결한6항목(웹3·터미널3) 카탈로그다. 아래 구형 Java 직접Compose/JAR 자동 빌드 설명은 과거 schema6 준비 절차이며 신규 기본 경로가 아니다. 기존 빌드 도구는 Java 이미지 준비에 사용할 수 있다. sudo 고정 rootless bundle·별도 Redis/Samba nonweb bundle·wheel·TLS 자료도 새 가이드에 따라 반입한다. sudo 웹 터미널 연결에는 기존 sudo 이미지·서명 bundle을 그대로 사용하고 중앙 nonweb 소스의 고정 어댑터를 함께 반입한다. 추가 패키지·이미지나 새 설정 키는 없다.
 
 2026-10-23 SOC 확장에는 security 서버의 **Vector0.59.0과 Suricata8.0.6**이 필요하다. Vector 공식 Linux amd64 deb 및 전이 의존성의 출처·서명을 외부 Linux 준비 환경에서 검토하고, 해당 파일의 실제 Package/Version/Architecture/SHA를 security `artifacts.json`의 `packages`에 넣는다. 배포 revision을 추정해 기록하지 않는다. 기존 공통 준비 목록의 jq·logrotate·coreutils·util-linux·nftables·OpenSSH·systemd도 필요하다. 새 SOC helper와 대시보드 import는 Python 표준 라이브러리이며 별도 wheel을 요구하지 않는다. 준비 파일이 없으면 사전검사에서 중단하고 온라인 설치로 대체하지 않는다. 이 확장의 새 VM 설치 시험은 제외했다.
 
@@ -585,6 +585,8 @@ PY
 | Wazuh 입력 | SIEM의 공식 v4.14.8 single-node 원본, root 소유, symlink 없음 |
 | MCP | SIEM의 검증된 ELF와 hash-only `.sha256`, 출처·SHA·아키텍처 확인 |
 | Hermes·JSON | 준비 이미지의 pin, root:root 0600 `siem.json` |
+
+고정 읽기 진단 확장은 저장소의 `infra/mcp/system_diagnostics.py`, `system-diagnostics-mcp.py`, `read-system-diagnostics.py`, `run-system-diagnostics.sh`와 `deployment/soc_diagnostics.py`를 같은 오프라인 소스로 반입한다. Python 표준 라이브러리와 기존 systemd/journalctl·OpenSSH·util-linux 도구를 사용하며 새 pip/CDN/컨테이너 이미지 반입은 없다. 배포 시 새 진단 전용 Ed25519 키를 B에서 생성하고 공개키만 전달한다. 개인키와 서버의 실제 snapshot은 Git이나 관리자 컴퓨터의 반입 묶음에 넣지 않는다.
 
 운영 입력(`/opt/capstone-prereqs`), 증거, 실행에 필요한 이미지와 패키지는 보존한다. 검증이 끝난 **이번 작업의** download archive·source clone·Rustup/Cargo cache·일회용 build context만 제거한다. 예를 들어 ET 준비 폴더는 다음처럼 삭제 대상을 제한한다. 각 작업의 변수에 실제 경로가 남아 있을 때만 실행한다.
 

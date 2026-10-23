@@ -6,6 +6,8 @@
   <meta name="color-scheme" content="dark">
   <meta name="referrer" content="no-referrer">
   <title>GROOT LAB · Lab Console</title>
+  <link rel="icon" type="image/x-icon" href="/log4shell/static/lab-console-icon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/log4shell/static/apple-touch-icon.png?v=20261023-2">
   <link rel="stylesheet" href="static/style.css">
   <script src="static/app.js" defer></script>
 </head>
@@ -80,11 +82,11 @@
           </section>
 
           <section class="panel access-panel" aria-labelledby="access-title">
-            <div class="panel-heading"><div><span class="section-number">02</span><h2 id="access-title">실습 접속</h2></div><span class="muted-label">WEB ACCESS</span></div>
-            <div class="panel-body"><div class="access-intro"><span class="icon-box small-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></svg></span><p>실습 실행 후 아래 주소로 바로 접속합니다.<br>일반 실습은 정상 요청을 허용하고 WAF 탐지 시 차단합니다.</p></div>
-              <div class="code-block"><div class="code-heading"><span><span class="step-dot">1</span>현재 검사 정책</span><button id="copy-policy" class="copy-button" type="button" disabled aria-label="현재 검사 정책 복사">복사</button></div><pre><code id="policy-summary">현재 WAF 검사 정책을 확인하고 있습니다.</code></pre></div>
-              <div class="code-block"><div class="code-heading"><span><span class="step-dot">2</span>브라우저에서 실습 열기</span><button id="copy-url" class="copy-button" type="button" disabled aria-label="실습 주소 복사">복사</button></div><pre><code id="local-url">실습을 선택하면 접속 주소가 표시됩니다.</code></pre></div>
-              <a id="open-lab" class="button button-open" target="_blank" rel="noopener noreferrer" aria-disabled="true" tabindex="-1"><span>실습 열기</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M11 4h5v5m0-5-8 8M8 4H4v12h12v-4"/></svg></a><p id="access-help" class="field-help">실습이 실행 중일 때 접속 링크가 활성화됩니다.</p>
+            <div class="panel-heading"><div><span class="section-number">02</span><h2 id="access-title">실습 접속</h2></div><span id="access-kind" class="muted-label">WEB ACCESS</span></div>
+            <div class="panel-body"><div class="access-intro"><span class="icon-box small-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></svg></span><p id="access-intro">실습 실행 후 아래 주소로 바로 접속합니다.<br>일반 실습은 정상 요청을 허용하고 WAF 탐지 시 차단합니다.</p></div>
+              <div id="policy-block" class="code-block"><div class="code-heading"><span><span class="step-dot">1</span>현재 검사 정책</span><button id="copy-policy" class="copy-button" type="button" disabled aria-label="현재 검사 정책 복사">복사</button></div><pre><code id="policy-summary">현재 WAF 검사 정책을 확인하고 있습니다.</code></pre></div>
+              <div class="code-block"><div class="code-heading"><span><span class="step-dot">2</span><span id="access-step">브라우저에서 실습 열기</span></span><button id="copy-url" class="copy-button" type="button" disabled aria-label="실습 주소 복사">복사</button></div><pre><code id="local-url">실습을 선택하면 접속 주소가 표시됩니다.</code></pre></div>
+              <a id="open-lab" class="button button-open" target="_blank" rel="noopener noreferrer" aria-disabled="true" tabindex="-1"><span id="open-label">실습 열기</span><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M11 4h5v5m0-5-8 8M8 4H4v12h12v-4"/></svg></a><p id="access-help" class="field-help">실습이 실행 중일 때 접속 링크가 활성화됩니다.</p>
               <div class="runtime-details"><div class="runtime-heading"><span class="field-label">로컬 이미지</span><span class="small-tag">NO PULL</span></div><code id="image-tag" class="image-tag">확인 중</code><div class="runtime-row"><span>서버 수신 주소</span><code id="server-address">127.0.0.1:—</code></div><div class="runtime-row"><span>이미지 ID</span><code id="image-id">—</code></div></div>
             </div>
           </section>

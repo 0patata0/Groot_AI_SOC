@@ -28,6 +28,9 @@ MESSAGES = {
     'broker_unavailable': '실행 서비스에 연결할 수 없습니다. 관리자 확인이 필요합니다.',
     'external_lab_managed_separately': '기존 서비스는 별도로 관리합니다. 이 화면에서는 실행하거나 중지하지 않습니다.',
     'local_cli_managed_separately': '로컬 CLI 실습은 별도 격리 환경에서 관리합니다. 웹에서 실행하거나 중지하지 않습니다.',
+    'terminal_unavailable': '터미널 실습 서비스에 연결할 수 없습니다.',
+    'invalid_terminal_response': '터미널 실습 상태를 확인하지 못했습니다.',
+    'terminal_operation_failed': '터미널 실습 환경을 준비하지 못했습니다. 관리자 확인이 필요합니다.',
 }
 
 
@@ -37,7 +40,7 @@ def rpc(action, cve_id=None):
         payload['cve_id'] = cve_id
     try:
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as conn:
-            conn.settimeout(65)
+            conn.settimeout(240 if action == 'deploy' else 130)
             conn.connect(os.environ.get('OFFLINE_LABS_SOCKET', '/run/capstone-offline-labs/control.sock'))
             conn.sendall(json.dumps(payload).encode() + b'\n')
             data = bytearray()
@@ -103,6 +106,7 @@ def create_app():
         validated = load_manifest(path)
         app.state.catalog = json.loads(path.read_text())
         app.state.lab_ids = frozenset(item['cve_id'] for item in validated)
+        app.state.terminal_ids = frozenset(item['cve_id'] for item in validated if item['type'] == 'managed-terminal')
         token_path = Path(os.environ.get('OFFLINE_LABS_TOKEN_FILE', '/etc/capstone-offline-labs/admin-token'))
         # A root-provisioned existing administrator password can be UTF-8.
         # Preserve meaningful whitespace; only a file's terminal LF is removed.
@@ -129,7 +133,8 @@ def create_app():
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'DENY'
         response.headers['Referrer-Policy'] = 'no-referrer'
-        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+        style = "'self' 'unsafe-inline'" if request.url.path.startswith('/terminal/') else "'self'"
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src " + style + "; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
         return response
 
     def boundary(request: Request):
@@ -234,6 +239,8 @@ def create_app():
     def index():
         return FileResponse(BASE / 'static' / 'index.html')
 
+    from terminal_api import install_routes
+    install_routes(app, boundary, BASE)
     app.mount('/static', StaticFiles(directory=BASE / 'static'), name='static')
     return app
 

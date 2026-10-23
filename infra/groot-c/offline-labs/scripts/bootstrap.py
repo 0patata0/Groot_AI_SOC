@@ -113,8 +113,12 @@ def source_files(source):
         total += info.st_size
         require(total <= 64 * 1024 * 1024 and len(result) < 5000, 'source_size_limit')
         result[str(relative)] = path.read_bytes()
-    needed = {'app.py', 'broker.py', 'guard.py', 'manifest.py', 'practice_mode.py', 'challenge.py', 'cve_list.json',
-              'static/index.html', 'static/app.js', 'static/app.css', 'static/theme.js', 'static/theme.css',
+    needed = {'app.py', 'broker.py', 'guard.py', 'manifest.py', 'practice_mode.py', 'challenge.py', 'terminal_api.py', 'cve_list.json',
+              'static/index.html', 'static/app.js', 'static/app.css', 'static/style.css', 'static/theme.js', 'static/theme.css',
+              'static/favicon.svg', 'static/favicon.png', 'static/favicon.ico', 'static/lab-console-icon.ico', 'static/apple-touch-icon.png', 'static/terminal.html', 'static/terminal.js', 'static/terminal.css',
+              'static/terminal-vendor/xterm.js', 'static/terminal-vendor/xterm.css', 'static/terminal-vendor/addon-fit.js',
+              'static/terminal-vendor/xterm.LICENSE', 'static/terminal-vendor/addon-fit.LICENSE',
+              'static/terminal-vendor/provenance.json',
               'wheel-inventory.json'} | {'scripts/bootstrap-units/' + name for name in UNITS}
     require(needed <= result.keys(), 'required_source_missing')
     return result

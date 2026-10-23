@@ -187,12 +187,18 @@ def validate_runtime(result):
 
 def validate_mcp(value):
     need(type(value) is dict and set(value) == {'uid','gid','servers','initialize','tools_list','tools_call','model_calls','chat_posts','parents_write_protected'}, 'mcp_shape')
-    need(value['uid'] == 995 and value['gid'] == 986 and value['initialize'] == value['tools_list'] == 5 and
+    baseline = {'wazuh-ro','security-events','resp','rule-a','rule-b'}
+    need(type(value['servers']) is dict and set(value['servers']) in (baseline, baseline | {'system-diagnostics'}), 'mcp_servers')
+    count = len(value['servers'])
+    need(value['uid'] == 995 and value['gid'] == 986 and value['initialize'] == value['tools_list'] == count and
          value['tools_call'] == value['model_calls'] == value['chat_posts'] == 0 and value['parents_write_protected'] is True, 'mcp_unverified')
-    need(set(value['servers']) == {'wazuh-ro','security-events','resp','rule-a','rule-b'}, 'mcp_servers')
     for row in value['servers'].values():
-        need(set(row) == {'tools','names_sha256'} and type(row['tools']) is int and 1 <= row['tools'] <= 100 and
+        need(type(row) is dict and set(row) == {'tools','names_sha256'} and type(row['tools']) is int and 1 <= row['tools'] <= 100 and
+             isinstance(row['names_sha256'], str) and
              re.fullmatch('[0-9a-f]{64}',row['names_sha256']), 'mcp_toolset')
+    if 'system-diagnostics' in value['servers']:
+        need(value['servers']['system-diagnostics'] == {'tools': 1,
+             'names_sha256': sha(canonical(['get_system_diagnostics']))}, 'diagnostic_toolset')
     return value
 
 def init_plan(token, original, snapshot, boot, mcp=None):

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fresh Ubuntu 24.04 amd64 service role. No package/image download or image build.
-# Schema 7: preloaded fixed lab images; schema 6 installations require explicit migration.
+# Schema 9: fixed web images, Redis/Samba bundle and the rootless sudo terminal; older schemas require explicit migration.
 # Official contracts: github.com/digininja/DVWA/{compose.yml,config/config.inc.php.dist,setup.php}
 # httpd.apache.org/docs/2.4/expr.html (CONN_REMOTE_ADDR)
 # documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html
@@ -94,6 +94,16 @@ offline_installer(){
 sudo_runtime(){
   python3 -B "$CAPSTONE_SOURCE/infra/groot-c/offline-labs/nonweb/sudo/runtime/bootstrap.py"     "--$1" --bundle "$LAB_SUDO_BUNDLE"
 }
+sudo_terminal_check(){
+  /usr/bin/python3 -IB /opt/capstone-nonweb-labs/sudo_terminal.py check
+}
+nonweb_runtime(){
+  local budget=600s
+  # Two image loads may each use 300s before publisher and final checks.
+  [[ $1 != apply ]] || budget=1200s
+  timeout --kill-after=10s "$budget" python3 -B "$CAPSTONE_SOURCE/infra/groot-c/nonweb-labs/bootstrap.py" \
+    "--$1" --bundle "$LAB_NONWEB_BUNDLE" --source-root "$CAPSTONE_SOURCE/infra/groot-c/nonweb-labs"
+}
 
 probe_owned(){
   local cid=$1 expected=$2 kind=$3
@@ -177,7 +187,8 @@ settings(){
   : "${LAB_MANIFEST:=/opt/capstone-prereqs/cve_list.json}" "${LAB_WHEEL_DIR:=/opt/capstone-prereqs/wheels}"
   : "${LAB_PUBLIC_ORIGIN:?https_public_origin_required}" "${LAB_GATEWAY_PORT:=18091}"
   : "${LAB_ADMIN_KEY_FILE:=/opt/capstone-prereqs/lab-admin.key}" "${LAB_SUDO_BUNDLE:=/opt/capstone-prereqs/sudo}"
-  [[ -z ${LOG4SHELL_APP_JAR:-} && -z ${LOG4SHELL_IMAGE:-} ]] || die schema7_requires_prebuilt_manifest_images_not_legacy_jar_options
+  : "${LAB_NONWEB_BUNDLE:=/opt/capstone-prereqs/nonweb}"
+  [[ -z ${LOG4SHELL_APP_JAR:-} && -z ${LOG4SHELL_IMAGE:-} ]] || die schema9_requires_prebuilt_manifest_images_not_legacy_jar_options
   : "${WAZUH_CA_FILE:=/opt/capstone-prereqs/wazuh-root-ca.pem}"
   : "${WAZUH_ENROLLMENT_PASS_FILE:=/opt/capstone-prereqs/wazuh-enrollment.pass}"
   for value in "$SECURITY_HOST" "$SIEM_HOST" "$SERVICE_HOST"; do ipv4 "$value" || die literal_ipv4_required; done
@@ -204,12 +215,13 @@ settings(){
   APP_ID=${APP_ID%% *}; DB_ID=${DB_ID%% *}; GATEWAY_ID=${GATEWAY_ID%% *}
   regular "$CAPSTONE_SOURCE/deployment/offline_service.py"
   regular "$CAPSTONE_SOURCE/infra/groot-c/offline-labs/nonweb/sudo/runtime/bootstrap.py"
-  export CAPSTONE_SOURCE SECURITY_HOST SERVICE_HOST LAB_MANIFEST LAB_PUBLIC_ORIGIN LAB_GATEWAY_PORT LAB_ADMIN_KEY_FILE GATEWAY_ID ROLE DOCKER WEB_BACKEND_PORT
+  regular "$CAPSTONE_SOURCE/infra/groot-c/nonweb-labs/bootstrap.py"
+  export CAPSTONE_SOURCE SECURITY_HOST SERVICE_HOST LAB_MANIFEST LAB_PUBLIC_ORIGIN LAB_GATEWAY_PORT LAB_ADMIN_KEY_FILE LAB_NONWEB_BUNDLE GATEWAY_ID ROLE DOCKER WEB_BACKEND_PORT
   LAB_PROFILE=$(offline_command profile) || die offline_lab_prerequisites_invalid
   INPUT=$(jq -cnS --arg root "$CAPSTONE_ROOT" --arg a "$SECURITY_HOST" --arg b "$SIEM_HOST" --arg c "$SERVICE_HOST" \
     --argjson port "$WEB_BACKEND_PORT" --arg app "$APP_ID" --arg db "$DB_ID" --argjson lab "$LAB_PROFILE" \
-    --arg sudo "$LAB_SUDO_BUNDLE" --arg wheels "$LAB_WHEEL_DIR" --arg key "$LAB_ADMIN_KEY_FILE" \
-    '{schema:7,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,offline_labs:$lab,sudo_bundle:$sudo,wheel_directory:$wheels,admin_key_file:$key}')
+    --arg sudo "$LAB_SUDO_BUNDLE" --arg nonweb "$LAB_NONWEB_BUNDLE" --arg wheels "$LAB_WHEEL_DIR" --arg key "$LAB_ADMIN_KEY_FILE" \
+    '{schema:9,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,offline_labs:$lab,sudo_bundle:$sudo,nonweb_bundle:$nonweb,wheel_directory:$wheels,admin_key_file:$key}')
 
 }
 
@@ -250,6 +262,7 @@ fresh_namespace(){
   [[ -z $names ]] || die gateway_port_in_use
   offline_installer check || die offline_lab_preflight_failed
   sudo_runtime check || die sudo_runtime_preflight_failed
+  nonweb_runtime check || die nonweb_runtime_preflight_failed
   fresh_agent
 }
 assert_managed(){
@@ -259,7 +272,7 @@ assert_managed(){
   [[ $(cat "$ROLE/input.json") == "$INPUT" ]] || die changed_inputs_require_manual_migration
   [[ $(stat -c '%u:%g:%a' "$ROLE/manifest.json") == 0:0:600 ]] || die manifest_permissions_changed
   jq -e 'keys==["agent_config_sha256","container_ids","enrollment_ca_sha256","enrollment_pass_sha256","files","role","schema","script_sha256","state"] and
-    .schema==7 and .role=="service" and .state=="complete" and
+    .schema==9 and .role=="service" and .state=="complete" and
     (.container_ids|keys)==["db","dvwa","gateway"] and
     (.container_ids|all(type=="string" and test("^[a-f0-9]{64}$"))) and
     ([.agent_config_sha256,.enrollment_ca_sha256,.enrollment_pass_sha256,.script_sha256]|all(type=="string" and test("^[a-f0-9]{64}$"))) and
@@ -464,17 +477,19 @@ verify(){
     '.Internal==false and ([.Containers[].Name]|sort)==["capstone-service-dvwa"]' >/dev/null || die front_network_changed
   docker_cmd exec capstone-service-dvwa php /opt/capstone-bootstrap.php verify >/dev/null 2>&1 || die dvwa_verification_failed
   verify_offline_apps
-  sudo_runtime verify >/dev/null || die sudo_runtime_verification_failed
+  # A deliberately stopped sudo lab is valid; do not restart it to verify installation.
+  sudo_terminal_check >/dev/null || die sudo_terminal_verification_failed
+  nonweb_runtime verify >/dev/null || die nonweb_runtime_verification_failed
   systemctl is-active --quiet wazuh-agent || die agent_not_active
   grep -Eq "^status='connected'" /var/ossec/var/run/wazuh-agentd.state || die agent_not_connected
-  note 'verified: DVWA initialized, DB private, four-item offline catalog, three pinned lab images and independent rootless sudo status, peer ACL configured, Wazuh connected; no attack test executed'
+  note 'verified: DVWA initialized, DB private, six-item catalog, three pinned web images, three terminal labs including independent rootless sudo, peer ACL configured, Wazuh connected; no attack test executed'
 }
 
 main(){
   settings "$@"
   if [[ $MODE == check ]]; then
     if [[ -e $ROLE || -L $ROLE ]]; then assert_managed; else fresh_namespace; fi
-    note 'check passed: schema7 fixed preloaded images/wheels/sudo bundle; common admin key and enrollment transferred before apply'
+    note 'check passed: schema9 fixed web images/wheels/sudo and nonweb bundles; common admin key and enrollment transferred before apply'
     return
   fi
   if [[ $MODE == verify ]]; then verify; return; fi
@@ -509,6 +524,14 @@ main(){
       --apply --bundle "$LAB_SUDO_BUNDLE" >"$ROLE/evidence/sudo-install.json" 2>"$ROLE/evidence/sudo-install.log"; then
     die sudo_runtime_install_failed_private_evidence_preserved
   fi
+  mark nonweb-runtime-install-armed
+  # The console account now exists. The separate helper loads its approved
+  # Redis/Samba image bundle and starts the terminal service. The sudo adapter
+  # keeps its independent rootless runtime and accepts a stopped lab.
+  if ! nonweb_runtime apply >"$ROLE/evidence/nonweb-install.json" 2>"$ROLE/evidence/nonweb-install.log"; then
+    die nonweb_runtime_install_failed_private_evidence_preserved
+  fi
+  mark nonweb-runtime-installed
   logrun compose-config "${COMPOSE[@]}" config --quiet
   mark compose-start-armed
   logrun compose-start "${COMPOSE[@]}" up --detach --pull never --no-build --wait --wait-timeout 120
@@ -522,7 +545,9 @@ main(){
   mark database-initialized
   mark lab-verification-armed
   verify_offline_apps
-  sudo_runtime verify >/dev/null || die sudo_runtime_verification_failed
+  # A deliberately stopped sudo lab is valid; do not restart it to verify installation.
+  sudo_terminal_check >/dev/null || die sudo_terminal_verification_failed
+  nonweb_runtime verify >/dev/null || die nonweb_runtime_verification_failed
   mark lab-ready
   configure_agent
   local files='{}' file container_ids='{}' name id
@@ -539,7 +564,7 @@ main(){
     --argjson containers "$container_ids" \
     --arg script "$(sha "${BASH_SOURCE[0]}")" --arg ca "$(sha /var/ossec/etc/capstone-manager-ca.pem)" \
     --arg pass "$(sha /var/ossec/etc/capstone-enrollment.pass)" \
-    '{schema:7,role:"service",state:"complete",container_ids:$containers,files:$files,agent_config_sha256:$agent,script_sha256:$script,enrollment_ca_sha256:$ca,enrollment_pass_sha256:$pass}' >"$ROLE/manifest.json"
+    '{schema:9,role:"service",state:"complete",container_ids:$containers,files:$files,agent_config_sha256:$agent,script_sha256:$script,enrollment_ca_sha256:$ca,enrollment_pass_sha256:$pass}' >"$ROLE/manifest.json"
   sync "$ROLE/manifest.json" "$ROLE"
   mark complete
   verify

@@ -20,6 +20,8 @@ EXTERNAL = {"type": "existing-http", "cve_id": "LAB-DVWA", "software": "DVWA",
             "vulnerable_version": "training application", "path": "/dvwa/"}
 CLI = {"type": "local-cli", "cve_id": "CVE-2021-3156", "software": "sudo",
        "vulnerable_version": "isolated lab"}
+TERMINALS = [{"type": "managed-terminal", "cve_id": identifier, "software": lab,
+              "vulnerable_version": "isolated lab"} for identifier, lab in M.TERMINAL_LABS.items()]
 
 
 class CatalogTypes(unittest.TestCase):
@@ -61,11 +63,36 @@ class CatalogTypes(unittest.TestCase):
         with self.assertRaises(M.ManifestError):
             M.validate_manifest([LEGACY, dict(CLI, cve_id=LEGACY["cve_id"])])
 
+    def test_terminal_targets_are_fixed_without_catalog_execution_options(self):
+        rows = M.validate_manifest(TERMINALS)
+        self.assertEqual([row["cve_id"] for row in rows], list(M.TERMINAL_LABS))
+        for row in rows:
+            self.assertNotIn("image_id", row)
+            self.assertNotIn("path", row)
+            for key, value in (("image_id", LEGACY["image_id"]), ("command", "sh"),
+                               ("socket", "/tmp/control.sock"), ("lab", "sudo"),
+                               ("path", "/terminal/"), ("host_port", 18084), ("container_port", 6379),
+                               ("user", "0:0"), ("container_id", "a" * 64)):
+                with self.subTest(cve=row['cve_id'], key=key), self.assertRaises(M.ManifestError):
+                    M.validate_manifest([dict(row, **{key: value})])
+        with self.assertRaises(M.ManifestError):
+            M.validate_manifest([dict(TERMINALS[0], cve_id="CVE-2022-9999")])
 
-class ReadOnlyTypes(unittest.TestCase):
+    def test_catalog_has_three_http_three_terminal_including_rootless_sudo(self):
+        rows = M.load_manifest(Path(__file__).with_name("cve_list.json"))
+        self.assertEqual(len(rows), 6)
+        self.assertEqual([row["cve_id"] for row in rows if row["type"] == "managed-terminal"],
+                         list(M.TERMINAL_LABS))
+        self.assertEqual([row["cve_id"] for row in rows if row["type"] == "local-cli"], [])
+        self.assertEqual(next(row for row in rows if row["cve_id"] == "CVE-2021-3156")["type"], "managed-terminal")
+        self.assertEqual(len([row for row in rows if row["type"] == "managed-http"]), 3)
+
+
+class LegacyReadOnlyTypes(unittest.TestCase):
     def setUp(self):
         self.docker = mock.Mock()
         self.receipts = mock.Mock()
+        # Explicit legacy fixture; production sudo is now managed-terminal.
         # Any receipt access by external/CLI paths would fail this test.
         type(self.receipts).records = mock.PropertyMock(side_effect=AssertionError("receipt access"))
         self.reader = mock.Mock(return_value={"status": "ready", "verification": "environment_only",

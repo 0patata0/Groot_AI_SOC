@@ -1,0 +1,29 @@
+[Unit]
+Description=Isolated Redis Samba and rootless sudo web terminals
+After=docker.service user@1991.service
+Requires=docker.service
+[Service]
+Type=simple
+User=root
+Group=capstone-labs
+AmbientCapabilities=CAP_SETUID
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -IB /opt/capstone-nonweb-labs/terminal_server.py
+ExecStopPost=/usr/bin/python3 -IB /opt/capstone-nonweb-labs/sudo_terminal.py stop
+Restart=on-failure
+RestartSec=3
+RuntimeDirectory=capstone-nonweb-labs
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=yes
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=tmpfs
+TemporaryFileSystem=/run/user:ro,mode=0755
+BindReadOnlyPaths=/run/user/1991
+PrivateTmp=yes
+ReadWritePaths=/var/lib/capstone-nonweb-labs /run/capstone-nonweb-labs /var/lib/capstone-sudo-runtime/.local/state/capstone-sudo-lab
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+TimeoutStopSec=100
+[Install]
+WantedBy=multi-user.target

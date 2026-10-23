@@ -11,7 +11,7 @@
     "vars": {
       "capstone_prestart_sources": {
         "hermes_prestart_contract.py": "b9cb0dfdbbfb600cb9e1d9c7b24f9e138190e2aef0c1e3d41862c4676d737554",
-        "hermes_prestart_transaction.py": "e51a66f6209b9d25565d1dea8ef0d5e31bc6850d7d03a0d2859c4c60d81446e9",
+        "hermes_prestart_transaction.py": "b89e121fe63858843e56a5a596e6d1c581b500cfcba33095c7d164f2a53b6310",
         "hermes_guard_checks.py": "74843987843dd5ef447d09896ba894ea580da2e5dc56b9bf0d48749f091e0cb5",
         "patch_korean_output_guard.py": "d6e1ea2e594ae958a33005127a618d52907e93408b786a437e163214dfaec17b",
         "korean_output_guard.py": "a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c",
@@ -91,7 +91,7 @@
           "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b"
         ]
       },
-      "capstone_prestart_mcp_sha256": "f8fcee9975c9e29feef6722dbeadcb7d910fe6d75d8b4d7d95909604c808ca56"
+      "capstone_prestart_mcp_sha256": "7b723e305583f04b5fe5691b71bcabaaa7624d8246640bbce975dd806235a8e6"
     },
     "roles": [
       "hermes_prestart"

@@ -1,0 +1,179 @@
+{
+  "Mac_package_installations": 0,
+  "accounts_or_groups_changed": false,
+  "cleanup": {
+    "operational_server_sources_and_recovery_backup_preserved": true,
+    "own_Mac_task_directory_removed": true,
+    "removed_generated_files": 14,
+    "shared_parent_directory_modified_or_removed": false,
+    "verified_at": 1792757966
+  },
+  "collector_configuration_changed": false,
+  "full_MCP_activation_tested_by_this_agent": false,
+  "global_or_diagnostic_SSH_policy_changed": false,
+  "host_results": {
+    "a": {
+      "SSH_or_account_or_collector_configuration_changed": false,
+      "backup": "/var/backups/capstone-diagnostics/20261023-sdk-params-v3",
+      "existing_core_services_restarted": false,
+      "host": "a",
+      "observed_at": 1792757849,
+      "old_evidence_overwritten": false,
+      "operational_receipt": "/var/lib/capstone-diagnostics/installation/active.json",
+      "operational_receipt_sha256": "8cb26ab2f61fd99a4e6b41bf53979b3dfc10e48aa882272366d4d874190acabe",
+      "portable_activation_called": false,
+      "previous_source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "1779816c4eab9c7e06380be1c5c00cba3929bce09af20611aa4f9cf58ae35af0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "private_key_copied_or_changed": false,
+      "role": "security",
+      "runtime_server_updated": false,
+      "schema": 1,
+      "snapshot_written_by_migration": false,
+      "source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "296b023831e4211dffc1046f914999e9b3e95ca6917cd3a49ba9027ebe8223c0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "status": "sdk-source-pins-verified",
+      "verification": {
+        "arbitrary_commands": false,
+        "host": "a",
+        "raw_journal_returned": false,
+        "role": "security",
+        "schema": 1,
+        "snapshot_units": 8,
+        "status": "verified",
+        "sudo_granted": false
+      }
+    },
+    "b": {
+      "SSH_or_account_or_collector_configuration_changed": false,
+      "backup": "/var/backups/capstone-diagnostics/20261023-sdk-params-v3",
+      "existing_core_services_restarted": false,
+      "host": "b",
+      "observed_at": 1792757885,
+      "old_evidence_overwritten": false,
+      "operational_receipt": "/var/lib/capstone-diagnostics/installation/prepared.json",
+      "operational_receipt_sha256": "4de2810aa0f0a866109e4d96ef4727e379665e9705141c913e7ece928329b06a",
+      "portable_activation_called": false,
+      "previous_source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "1779816c4eab9c7e06380be1c5c00cba3929bce09af20611aa4f9cf58ae35af0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "private_key_copied_or_changed": false,
+      "role": "siem",
+      "runtime_server_updated": true,
+      "schema": 1,
+      "snapshot_written_by_migration": false,
+      "source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "296b023831e4211dffc1046f914999e9b3e95ca6917cd3a49ba9027ebe8223c0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "status": "sdk-source-pins-verified",
+      "verification": {
+        "SDK_validation_owner": "separate_legacy_migration",
+        "runtime_server_sha256": "296b023831e4211dffc1046f914999e9b3e95ca6917cd3a49ba9027ebe8223c0",
+        "status": "prepared_transport_verified"
+      }
+    },
+    "c": {
+      "SSH_or_account_or_collector_configuration_changed": false,
+      "backup": "/var/backups/capstone-diagnostics/20261023-sdk-params-v3",
+      "existing_core_services_restarted": false,
+      "host": "c",
+      "observed_at": 1792757868,
+      "old_evidence_overwritten": false,
+      "operational_receipt": "/var/lib/capstone-diagnostics/installation/active.json",
+      "operational_receipt_sha256": "41f271ef662e8232adc3331c073810c2bb5975ffefd7ac6983e80d0e608b3984",
+      "portable_activation_called": false,
+      "previous_source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "1779816c4eab9c7e06380be1c5c00cba3929bce09af20611aa4f9cf58ae35af0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "private_key_copied_or_changed": false,
+      "role": "service",
+      "runtime_server_updated": false,
+      "schema": 1,
+      "snapshot_written_by_migration": false,
+      "source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "296b023831e4211dffc1046f914999e9b3e95ca6917cd3a49ba9027ebe8223c0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "status": "sdk-source-pins-verified",
+      "verification": {
+        "arbitrary_commands": false,
+        "host": "c",
+        "raw_journal_returned": false,
+        "role": "service",
+        "schema": 1,
+        "snapshot_units": 11,
+        "status": "verified",
+        "sudo_granted": false
+      }
+    }
+  },
+  "issue": {
+    "new_behavior": "empty/null metadata and bounded standard progressToken accepted; metadata ignored by query/audit/result; arbitrary call/query fields remain refused",
+    "previous_behavior": "strict exact call fields returned unknown_tool",
+    "trigger": "installed MCP SDK serializes tools/call with standard empty _meta"
+  },
+  "keys_copied_or_changed": false,
+  "new_core_service_restarts": 0,
+  "new_three_VM_installation_tested": false,
+  "observed_at": 1792757885,
+  "operational_runtime_updated_only": "B /opt/mcp/system-diagnostics-mcp.py",
+  "preserved_recovery_backup": "/var/backups/capstone-diagnostics/20261023-sdk-params-v3",
+  "preserved_server_sources": "/opt/capstone-diagnostics-bootstrap/20261023",
+  "previous_live_evidence_preserved": "deployment/diagnostics-live-validation-20261023.json",
+  "schema": 1,
+  "scope": "controlled diagnostics SDK metadata compatibility follow-up; operational sources and profile pins synchronized",
+  "server_temporary_staging_created": false,
+  "snapshots_written_by_migration": false,
+  "source_sha256": {
+    "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+    "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+    "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+    "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+    "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+    "infra/mcp/system-diagnostics-mcp.py": "296b023831e4211dffc1046f914999e9b3e95ca6917cd3a49ba9027ebe8223c0",
+    "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+  },
+  "tests": {
+    "actual_Hermes_SDK_activation_owner": "sudo_web_ui; separate validation receipt",
+    "diagnostic_core": 30,
+    "diagnostic_installer": 18,
+    "git_diff_check": true,
+    "native_SDK_empty_meta_reproducer_owner": "sudo_web_ui"
+  }
+}

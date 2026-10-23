@@ -30,6 +30,13 @@ elif '/deployment/remote.sh ' in command:
     elif phase=='security soc-apply': sys.stdout.buffer.write(b'public-host-identity')
     elif phase=='siem soc-activate':
         if sys.stdin.buffer.read()!=b'public-host-identity': sys.exit(49)
+    elif phase=='siem diag-export': sys.stdout.buffer.write(b'diagnostic-public-key-stream')
+    elif phase in ('security diag-apply','service diag-apply'):
+        if sys.stdin.buffer.read()!=b'diagnostic-public-key-stream': sys.exit(50)
+        print(json.dumps({'role':phase.split()[0],'host_key':'public-diagnostic-host-key'}))
+    elif phase=='siem diag-activate':
+        evidence=json.loads(sys.stdin.buffer.read())
+        if [x['role'] for x in evidence]!=['security','service']: sys.exit(51)
 elif '/deployment/prerequisites.py ' in command:
     if os.environ.get('FAIL_BUNDLE') == ' '.join(command.split()[-2:]): sys.exit(45)
 elif '/deployment/lab_key.py check' in command:
@@ -126,12 +133,38 @@ class ControllerContract(unittest.TestCase):
                                ('security soc-apply','security log-activate'), ('security log-activate','siem log-monitor'),
                                ('siem log-monitor','siem dashboard-apply'), ('siem dashboard-apply','siem soc-activate')]:
             self.assertLess(phases.index(earlier), phases.index(later))
-        self.assertEqual(phases[-6:], ['security soc-verify','security log-verify','siem verify',
-                                      'siem soc-verify','siem log-verify','siem dashboard-verify'])
+        self.assertEqual(phases[-9:], ['security soc-verify','security log-verify','siem verify',
+                                      'siem soc-verify','siem log-verify','siem dashboard-verify',
+                                      'security diag-verify','service diag-verify','siem diag-verify'])
+        for earlier, later in [('siem soc-activate','siem diag-prepare'),
+                               ('siem diag-prepare','security diag-apply'),
+                               ('security diag-apply','service diag-apply'),
+                               ('service diag-apply','siem diag-activate'),
+                               ('siem diag-activate','siem diag-verify')]:
+            self.assertLess(phases.index(earlier), phases.index(later))
         for event in self.events():
             self.assertIn('StrictHostKeyChecking=yes', event['args'])
             self.assertIn('BatchMode=yes', event['args'])
         self.assert_clean()
+
+    def test_nonweb_bundle_path_is_data_and_exported_to_roles(self):
+        with self.config.open('a') as stream:
+            stream.write('LAB_NONWEB_BUNDLE=/opt/reviewed/nonweb\n')
+        result = self.run_controller('--check')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for payload in self.payloads():
+            self.assertIn('export LAB_NONWEB_BUNDLE=/opt/reviewed/nonweb', payload['site_env'].splitlines())
+        self.assert_clean()
+
+    def test_nonweb_bundle_relative_traversal_and_shell_text_rejected_before_ssh(self):
+        original = self.config.read_text()
+        for value in ('relative/nonweb', '/opt/../etc', '/opt/nonweb;id', '/opt/nonweb$(id)'):
+            with self.subTest(value=value):
+                self.config.write_text(original + 'LAB_NONWEB_BUNDLE=' + value + '\n')
+                result = self.run_controller('--check')
+                self.assertNotEqual(result.returncode, 0)
+                self.assertEqual(self.events(), [])
+                self.assert_clean()
 
     def test_failed_prerequisite_prevents_every_apply(self):
         result = self.run_controller(FAIL_PHASE='service check')
@@ -151,6 +184,7 @@ class ControllerContract(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
                                         'security soc-check', 'siem soc-check', 'siem dashboard-check',
+                                        'security diag-check','siem diag-check','service diag-check',
                                         'siem apply', 'siem verify', 'service apply'])
         self.assertNotIn('구축 완료.', result.stdout)
         self.assert_clean()
@@ -159,7 +193,8 @@ class ControllerContract(unittest.TestCase):
         result = self.run_controller('--check')
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
-                                        'security soc-check', 'siem soc-check', 'siem dashboard-check'])
+                                        'security soc-check', 'siem soc-check', 'siem dashboard-check',
+                                        'security diag-check','siem diag-check','service diag-check'])
         self.assert_clean()
 
     def test_legacy_build_override_is_rejected_before_ssh(self):
@@ -210,13 +245,14 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.phases(), ['siem verify', 'service verify', 'security verify',
                                         'security soc-verify', 'security log-verify',
-                                        'siem soc-verify', 'siem log-verify', 'siem dashboard-verify'])
+                                        'siem soc-verify', 'siem log-verify', 'siem dashboard-verify',
+                                        'security diag-verify','service diag-verify','siem diag-verify'])
         self.assert_clean()
 
     def test_soc_streams_never_appear_in_outputs_or_arguments(self):
         result = self.run_controller()
         self.assertEqual(result.returncode, 0, result.stderr)
-        for marker in ('private-soc-test-stream', 'public-host-identity'):
+        for marker in ('private-soc-test-stream', 'public-host-identity', 'diagnostic-public-key-stream', 'public-diagnostic-host-key'):
             self.assertNotIn(marker, result.stdout + result.stderr + str(self.events()))
         self.assert_clean()
 
@@ -224,6 +260,21 @@ class ControllerContract(unittest.TestCase):
         result = self.run_controller(FAIL_PHASE='security soc-check')
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn('siem apply', self.phases())
+        self.assert_clean()
+
+    def test_diagnostic_preflight_failure_prevents_every_role_install(self):
+        result = self.run_controller(FAIL_PHASE='service diag-check')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('siem apply', self.phases())
+        self.assertNotIn('siem diag-prepare', self.phases())
+        self.assert_clean()
+
+    def test_failed_diagnostic_reader_prevents_transport_activation_and_complete(self):
+        result = self.run_controller(FAIL_PHASE='service diag-apply')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('security diag-apply', self.phases())
+        self.assertNotIn('siem diag-activate', self.phases())
+        self.assertNotIn('구축 완료.', result.stdout)
         self.assert_clean()
 
     def test_failed_extension_never_reports_complete(self):

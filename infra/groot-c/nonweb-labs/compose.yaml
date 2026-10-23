@@ -1,0 +1,73 @@
+name: capstone-nonweb-labs
+services:
+  redis:
+    image: ${REDIS_IMAGE:?installed image ID required}
+    container_name: capstone-nonweb-redis
+    profiles: [redis]
+    pull_policy: never
+    restart: "no"
+    user: "65534:65534"
+    working_dir: /lab
+    entrypoint: [/lab/start.sh]
+    command: []
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=32m,mode=1777
+      - /run:rw,nosuid,nodev,noexec,size=16m,mode=1777
+      - /var/lib/redis:rw,nosuid,nodev,noexec,size=64m,mode=1777
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    labels: {io.capstone.managed: nonweb-v1, io.capstone.lab: redis}
+    networks: [redis]
+  samba:
+    image: ${SAMBA_IMAGE:?installed image ID required}
+    container_name: capstone-nonweb-samba
+    profiles: [samba]
+    pull_policy: never
+    restart: "no"
+    user: "0:0"
+    working_dir: /lab
+    entrypoint: [/lab/start.sh]
+    command: []
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, SETUID, SETGID]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=32m,mode=1777
+      - /run:rw,nosuid,nodev,noexec,size=16m,mode=1777
+      - /var/lib/samba:rw,nosuid,nodev,noexec,size=32m,mode=1777
+      - /var/cache/samba:rw,nosuid,nodev,noexec,size=32m,mode=1777
+      - /var/log/samba:rw,nosuid,nodev,noexec,size=16m,mode=1777
+      - /share:rw,nosuid,nodev,size=64m,mode=1777
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 128
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    labels: {io.capstone.managed: nonweb-v1, io.capstone.lab: samba}
+    networks: [samba]
+networks:
+  redis:
+    name: capstone-nonweb-labs_redis
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.name: br-cap-redis
+      com.docker.network.bridge.enable_icc: "false"
+    labels: {io.capstone.managed: nonweb-v1}
+  samba:
+    name: capstone-nonweb-labs_samba
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.name: br-cap-samba
+      com.docker.network.bridge.enable_icc: "false"
+    labels: {io.capstone.managed: nonweb-v1}

@@ -1,5 +1,11 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+## 2026-10-23 고정 시스템 진단 — A/B/C 배포·실제 SDK 검증 완료
+
+`system-diagnostics`의 읽기 도구1개 `get_system_diagnostics`를 추가했다. A/B/C의 허용된 systemd 대상25개에서 상태·`Type`·종료 코드·재시작 횟수와 최대4시간의 분류된 오류 표본을 읽는다. root collector의60초 주기·TTL180초 snapshot을 읽고 원문 journal·환경·명령·HTTP 본문은 반환하지 않는다. 미설치·중지·실패한 unit도 조회하며, 조회 실패/잘림/범위 한계를 정상이나 오류0으로 바꾸지 않는다. 기존 승인형 변경·LLM 관리 주체와 일반 sudo/Docker 금지 정책을 유지한다. [범위·전송·검증 계약](system-diagnostics.md).
+
+기존 B는21:21:05 KST에 동일 Hermes CID·컨테이너 설정을 보존한 채 여섯 번째 MCP 등록을 마쳤다. 실제 UID995 SDK에서 기존5개 MCP의 도구 이름 해시 보존, 새 도구의 A/B/C 읽기, 잘못된 인자와 쓰기 도구 거부, 관리/검증 모드의 읽기 허용을 확인했다. SDK의 빈 `_meta` 호환성과 journal grep의 정상 무매치 종료코드1을 고친 후 추가 컨테이너 재시작 없이 A/B의 관측0건과 C의 과거 분류 오류 보존을 다시 확인했다. 이0건은 제한된 수집 표본이며 전체 journal이나 서비스 정상의 보증이 아니다. 모델 요청·채팅 게시와 새 서버 전체 설치는 수행하지 않았다. [v3 역사·v4 후속·검증 한계](system-diagnostics-validation-20261023.json).
+
 ## 2026-10-16 룰 파일 정의 집계 — 조회 근거 배포
 
 `get_rule_change_target`에 현재 원문과 **같은 바이트·SHA-256**에서 계산한 `rule_inventory`를 추가했다. A는 **20:50:55 KST**, B는 **20:53:09 KST**에 배포했다. 라이브 대상 파일에서 WAF **10개**(SecRule 조건문 12개·체인 후속 조건 2개), Suricata **14개**(로컬 SID 12개·ET override 2개, noalert 마커 포함), Wazuh **19개**(level 0 기반 룰 1개 포함)를 확인했다. [배포·검증 근거](../hermes/rule-inventory-validation-20261016.json).

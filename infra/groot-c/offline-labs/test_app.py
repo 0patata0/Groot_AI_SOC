@@ -116,11 +116,12 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
                 self.assertNotIn('log4shell.grootlab.duckdns.org', app.state.hosts)
 
     async def test_current_catalog_and_gateway_exclude_dvwa(self):
-        expected = {'CVE-2021-44228', 'CVE-2021-41773', 'CVE-2021-42013', 'CVE-2021-3156'}
+        expected = {'CVE-2021-44228', 'CVE-2021-41773', 'CVE-2021-42013', 'CVE-2021-3156',
+                    'CVE-2022-0543', 'CVE-2017-7494'}
         code, body, _ = await self.request('/api/list')
         self.assertEqual(code, 200)
         self.assertEqual({row['cve_id'] for row in json.loads(body)}, expected)
-        self.assertEqual(len(json.loads(body)), 4)
+        self.assertEqual(len(json.loads(body)), 6)
         self.assertEqual((await self.request('/api/gateway-session', extra=[
             (b'x-lab-gateway', b'1'), (b'x-lab-id', b'LAB-DVWA')]))[0], 404)
 
@@ -162,8 +163,10 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         code,body,_=await self.request('/api/session',token=False)
         self.assertEqual(code,200);self.assertEqual(json.loads(body),{'mode':'enforce','expires_at':None})
         with patch.object(self.module,'rpc',return_value={'ok':True}) as mock:
-            self.assertEqual((await self.request('/api/deploy','POST',b'{"cve_id":"CVE-2021-44228"}',token=False))[0],200)
-            mock.assert_called_once_with('deploy','CVE-2021-44228')
+            for identifier in ('CVE-2021-44228', 'CVE-2021-3156'):
+                mock.reset_mock()
+                self.assertEqual((await self.request('/api/deploy','POST',json.dumps({'cve_id':identifier}).encode(),token=False))[0],200)
+                mock.assert_called_once_with('deploy',identifier)
 
     async def test_proof_is_only_for_short_lived_observation_session(self):
         self.assertEqual((await self.request('/api/session','POST',b'{}',token=False))[0],401)
@@ -261,6 +264,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual((await self.request('/api/gateway-session',extra=[(b'x-lab-gateway',b'1'),*ids]))[0],404)
 
     async def test_mixed_catalog_is_exact_and_gateway_filters_by_registered_lab(self):
+        # Explicit legacy local-cli fixture, distinct from production sudo terminal.
         catalog = json.loads(Path(__file__).with_name('cve_list.json').read_text())
         catalog = [row for row in catalog if row['cve_id'] not in {'LAB-DVWA','CVE-2021-3156','CVE-2021-41773'}]
         java = next(row for row in catalog if row['cve_id']=='CVE-2021-44228')
@@ -276,6 +280,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
                 original,self.app=self.app,replacement
                 try:
                     self.assertEqual(json.loads((await self.request('/api/list'))[1]),catalog)
+                    self.assertEqual((await self.request('/terminal/CVE-2021-3156/'))[0],404)
                     raw=b'groot_lab_mode=forged; PHPSESSID=0123456789abcdef0123456789; security=low; groot_log4shell_java_http=abc.123'
                     for identifier,expected in ((b'LAB-DVWA',b'PHPSESSID=0123456789abcdef0123456789; security=low'),
                                                  (b'CVE-2021-41773',b''),(b'CVE-2021-3156',b'')):
@@ -302,6 +307,10 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         code,body,headers=await self.request('/api/list')
         self.assertEqual(code,200)
         self.assertEqual(json.loads(body),json.loads(Path(__file__).with_name('cve_list.json').read_text()))
+        rows=json.loads(body)
+        self.assertEqual({row['cve_id'] for row in rows if row.get('type')=='managed-terminal'},
+                         {'CVE-2022-0543','CVE-2017-7494','CVE-2021-3156'})
+        self.assertFalse(any(row.get('type')=='local-cli' for row in rows))
         self.assertIn(b"script-src 'self'",headers[b'content-security-policy'])
         self.assertEqual((await self.request('/static/app.js',token=False))[0],200)
         self.assertEqual((await self.request('/docs'))[0],404)
@@ -313,7 +322,10 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_no_arbitrary_docker_parameters(self):
         with patch.object(self.module,'rpc') as mock:
-            for payload in [{'cve_id':'CVE-2021-44228','image':'untrusted:latest'}, {'cve_id':';id'}, {'cve_id':5}]:
+            for payload in [{'cve_id':'CVE-2021-44228','image':'untrusted:latest'}, {'cve_id':';id'}, {'cve_id':5},
+                            {'cve_id':'CVE-2021-3156','container_id':'a'*64},
+                            {'cve_id':'CVE-2021-3156','user':'0:0'},
+                            {'cve_id':'CVE-2021-3156','socket':'/var/run/docker.sock'}]:
                 self.assertEqual((await self.request('/api/deploy','POST',json.dumps(payload).encode()))[0],422)
             mock.assert_not_called()
 

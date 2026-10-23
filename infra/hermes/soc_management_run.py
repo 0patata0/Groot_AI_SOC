@@ -18,6 +18,7 @@ READ = frozenset({'get_rule_change_target', 'get_rule_change_status',
 WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
 EVENT_READ = frozenset({'search_suricata_alerts', 'search_modsecurity_alerts'})
+DIAGNOSTIC_READ = frozenset({'get_system_diagnostics'})
 
 
 def allowed(name, mode):
@@ -27,6 +28,8 @@ def allowed(name, mode):
         return name.removeprefix('mcp__wazuh_ro__').startswith(('get_wazuh_', 'search_wazuh_'))
     if name.startswith('mcp__security_events__'):
         return name.removeprefix('mcp__security_events__') in EVENT_READ
+    if name.startswith('mcp__system_diagnostics__'):
+        return name.removeprefix('mcp__system_diagnostics__') in DIAGNOSTIC_READ
     if name == 'mcp__resp__list_blocks':
         return True
     for server in ('rule_a', 'rule_b'):
@@ -40,7 +43,7 @@ def allowed(name, mode):
 
 def wire_allowed(name, mode):
     return mode in {'manage', 'verify'} and isinstance(name, str) and (name.startswith(('get_wazuh_', 'search_wazuh_')) or
-        name in READ | EVENT_READ | {'list_blocks'} or (mode == 'manage' and name in WRITE))
+        name in READ | EVENT_READ | DIAGNOSTIC_READ | {'list_blocks'} or (mode == 'manage' and name in WRITE))
 
 
 def compact_target_receipt(value):

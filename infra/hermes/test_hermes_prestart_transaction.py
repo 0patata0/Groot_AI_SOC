@@ -404,6 +404,35 @@ class NativeOrchestrationContractTests(unittest.TestCase):
         self.assertIn('capstone_prestart_probe_fallback=true',source)
 
 class MCPProbeCompatibilityTests(unittest.TestCase):
+    def test_exact_legacy_or_diagnostics_profiles_only(self):
+        legacy=copy.deepcopy(MCP)
+        self.assertEqual(tx.validate_mcp(legacy),legacy)
+        expanded=copy.deepcopy(legacy)
+        expanded['servers']['system-diagnostics']={'tools':1,'names_sha256':tx.sha(tx.canonical(['get_system_diagnostics']))}
+        expanded['initialize']=expanded['tools_list']=6
+        self.assertEqual(tx.validate_mcp(expanded),expanded)
+        for change in ('unknown','extra_tool','wrong_hash','wrong_count'):
+            value=copy.deepcopy(expanded)
+            if change=='unknown':value['servers']['other']={'tools':1,'names_sha256':'f'*64}
+            if change=='extra_tool':value['servers']['system-diagnostics']['tools']=2
+            if change=='wrong_hash':value['servers']['system-diagnostics']['names_sha256']='f'*64
+            if change=='wrong_count':value['initialize']=5
+            with self.subTest(change=change),self.assertRaises(tx.Refused):tx.validate_mcp(value)
+
+    def test_configured_probe_accepts_only_the_fixed_diagnostic_transport(self):
+        source=Path(__file__).parents[1]/'automation/ansible/roles/hermes_prestart/files/mcp-readonly.py'
+        probe={'__name__':'mcp_probe_test'};exec(compile(source.read_text(),str(source),'exec'),probe)
+        def config(endpoints):return {name:{'command':'ssh','args':['-T','-F','/opt/data/home/.ssh/config']+tail,
+            'env':{'HOME':'/opt/data/home'}} for name,tail in endpoints.items()}
+        legacy=config(probe['ENDPOINTS'])
+        self.assertEqual(len(probe['configured_endpoints'](legacy)),5)
+        six=dict(probe['ENDPOINTS'],**{'system-diagnostics':probe['DIAGNOSTIC_ENDPOINT']})
+        current=config(six);self.assertEqual(len(probe['configured_endpoints'](current)),6)
+        bad=copy.deepcopy(current);bad['system-diagnostics']['args'][-1]='sh'
+        with self.assertRaises(ValueError):probe['configured_endpoints'](bad)
+        bad=copy.deepcopy(current);bad['other']=bad['system-diagnostics']
+        with self.assertRaises(ValueError):probe['configured_endpoints'](bad)
+
     def test_v2_model_fields_and_paginated_result_refusal_close_contexts(self):
         # SDK 2.0 uses snake_case attributes; camelCase is only a wire alias.
         # No SDK install, SSH process, or endpoint access in this regression.

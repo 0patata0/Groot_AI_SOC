@@ -19,9 +19,9 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 | `--plan` | 로컬 입력값, 주소·형식 검사 | SSH, 서버 패키지, 서비스 상태 |
 | `--check` | 세 서버 artifacts manifest·해시와 역할별 도구·이미지·TLS·wheel·sudo bundle 조건. 일회성 격리 이미지 검사 가능 | 패키지 설치·이미지 load·신규 서비스 구성·전체 연결 |
 | `--apply`의 최종 성공 | 세 서버 반입물 검사→오프라인 패키지/이미지 설치→역할 사전검사→SIEM→공통 키/등록 자격 전달→service→security 및 아래 검증 | 외부 브라우저 접근, 공격 시나리오, LLM 답변의 정확성·지연 |
-| `--verify` | SIEM API/TLS·Indexer·Mattermost·읽기 MCP·Hermes, service schema7의 DB/콘솔/broker/gateway/sudo·agent, security schema2의 TLS/WAF/IDS·agent·nft 상태 | 신규 모델 요청, 채팅 메시지 전송, 실제 공격 탐지·운영 보존 정책 |
+| `--verify` | SIEM API/TLS·Indexer·Mattermost·읽기 MCP·Hermes, service schema9의 DB/콘솔/broker/gateway/sudo·Redis/Samba 터미널 서비스·agent, security schema2의 TLS/WAF/IDS·agent·nft 상태 | 신규 모델 요청, 채팅 메시지 전송, 실제 공격 탐지·운영 보존 정책 |
 
-SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출, Mattermost 봇 인증, 60초 이내 Hermes heartbeat를 확인합니다. `model_requests_sent: 0`, `chat_messages_sent: 0`, `write_approval_configured: false`는 초기 설치 범위에 맞는 결과입니다. service는 독립 DVWA/DB, 4항목 카탈로그·고정 웹이미지3개, rootless sudo와 agent를 검사합니다. security는 `waf_mode: DetectionOnly`(DVWA), `lab_waf_mode: enforce_or_signed_session_exempt`(실습), `suricata_mode: IDS`를 구분합니다. 자동 IP 차단·Vector 설치는 포함하지 않습니다.
+SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출, Mattermost 봇 인증, 60초 이내 Hermes heartbeat를 확인합니다. `model_requests_sent: 0`, `chat_messages_sent: 0`, `write_approval_configured: false`는 초기 설치 범위에 맞는 결과입니다. service는 독립 DVWA/DB, 6항목 카탈로그·고정 웹이미지3개·터미널3개, 별도 rootless sudo와 agent를 검사합니다. security는 `waf_mode: DetectionOnly`(DVWA), `lab_waf_mode: enforce_or_signed_session_exempt`(실습), `suricata_mode: IDS`를 구분합니다. 자동 IP 차단·Vector 설치는 포함하지 않습니다.
 
 `--check`는 패키지를 설치하지 않으므로 빈 서버에서 도구 누락으로 실패할 수 있습니다. `--apply`는 먼저 승인된 로컬 deb·이미지를 설치한 뒤 역할 검사를 합니다. 이때 역할 사전검사가 실패해도 앞서 설치한 OS 패키지는 자동 롤백되지 않습니다.
 
@@ -113,7 +113,7 @@ WAF 주소로 로그인하고 기본 보안 수준이 `impossible`인지 확인�
 
 **허용된 내부망/VPN 클라이언트 브라우저**에서 `LAB_PUBLIC_ORIGIN/log4shell/`를 엽니다. 예시는 `https://lab.example.org/log4shell/`입니다. DNS/hosts는 security를 가리키고 인증서가 해당 이름과 일치해야 합니다. 옛 `LOG4SHELL_HOSTNAME`·HTTP 직접 Java 경로는 신규 설정이 아닙니다.
 
-1. 키 없이 카탈로그4개와 상태가 보이는지 확인합니다. 웹 실습3개는 `not_deployed` 또는 `stopped`여도 설치 상태로 정상일 수 있습니다. 이미지 존재와 `deployment_allowed=true`를 확인합니다. sudo는 별도 CLI 상태이며 웹 실행 버튼을 제공하지 않습니다.
+1. 키 없이 카탈로그6개와 상태가 보이는지 확인합니다. 웹3개·터미널3개는 `not_deployed` 또는 `stopped`여도 설치 상태로 정상일 수 있습니다. 이미지 존재와 `deployment_allowed=true`를 확인합니다. sudo도 실습 환경 시작 → 환경 열기로 연결하며, 기존 UID1991 rootless 환경과 고정 컨테이너 UID1000을 사용합니다. sudo 터미널은 전체 사용자 중 한 연결만 허용하고 연결 종료·유휴/수명 만료 때 해당 sudo 컨테이너 전체를 중지합니다.
 2. Java 항목을 선택해 실행합니다. 이는 관리자 또는 사용자가 요청한 **실제 컨테이너 기동**입니다. `running`을 확인하고 화면의 같은 HTTPS 링크를 엽니다. 로컬 포트18081을 클라이언트 컴퓨터의 localhost로 오해하지 않으며 SSH 터널이 필수는 아닙니다.
 3. Java·Log4j API/core2.14.1 표시를 확인하고 `capstone-spring-verification` 같은 무해한 메시지 한 건을 기록합니다. HTTP200·요청 ID·시각을 확인하되 CSRF 값·쿠키를 작업 기록에 복사하지 않습니다. Apache 두 버전은 각각 CVE-2021-41773/42013의 같은 origin 링크와 버전·정상 공개 파일만 확인합니다.
 4. 필요한 경우 `차단 예외 키 (선택)`에 Wazuh Dashboard `admin` 암호를 직접 입력합니다. 브라우저 WebCrypto가 30초·1회용 challenge에 HMAC 서명하며, 키 원문이나 고정 키 해시를 서버에 보내지 않습니다. 검증 후 입력/참조를 비우지만 완전한 메모리 삭제를 보장하는 기능은 아닙니다.
@@ -183,21 +183,19 @@ sudo sed -n "/^status=/p" /var/ossec/var/run/wazuh-agentd.state
 sudo docker exec capstone-service-dvwa apachectl -t
 ```
 
-`capstone-service-dvwa`와 `capstone-service-db`는 healthy, `capstone-service-gateway`는 running이어야 합니다. manifest는 `schema:7`, state와 phase는 complete입니다. DB 호스트 포트는 `{}` 또는 null, private 네트워크는 true, agent는 active/connected가 기준입니다. gateway는 service/loopback의 지정18091에 바인딩하며 security 출발지만 허용합니다. 웹 실습 컨테이너는 Compose에 직접 포함되지 않고 제한된 broker가 고정 image ID로 관리합니다.
+`capstone-service-dvwa`와 `capstone-service-db`는 healthy, `capstone-service-gateway`는 running이어야 합니다. manifest는 `schema:9`, state와 phase는 complete입니다. DB 호스트 포트는 `{}` 또는 null, private 네트워크는 true, agent는 active/connected가 기준입니다. gateway는 service/loopback의 지정18091에 바인딩하며 security 출발지만 허용합니다. 웹 실습 컨테이너는 Compose에 직접 포함되지 않고 제한된 broker가 고정 image ID로 관리합니다.
 
-같은 서버에서 익명 상태 조회와 sudo의 **무해한 버전·격리 검사**를 확인할 수 있습니다. 실제 설정이 다른 gateway 포트이면 바꿉니다.
+같은 서버에서 익명 상태 조회와 sudo의 **중지 상태도 허용하는 설치·격리 검사**를 확인할 수 있습니다. 실제 설정이 다른 gateway 포트이면 바꿉니다.
 
 ```bash
 curl --noproxy '*' --connect-timeout 5 --max-time 10 -fsS \
   http://127.0.0.1:18091/_offline-labs/api/status | jq '{deployment_allowed,safety_error,labs}'
 sudo systemctl is-active user@1991.service capstone-sudo-status.timer
 sudo jq '{schema,checked_at,expires_at,labs}' /var/lib/capstone-offline-labs/nonweb-status.json
-sudo runuser -u capstone-sudo -- env XDG_RUNTIME_DIR=/run/user/1991 \
-  PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 -B \
-  /opt/capstone-offline-labs/nonweb/sudo/lab.py verify
+sudo /usr/bin/python3 -IB /opt/capstone-nonweb-labs/sudo_terminal.py check
 ```
 
-위 CLI는 기동/중지하지 않습니다. sudo는 별도 UID1991 rootless daemon·network none·hostroot와 다른 UID/GID mapping·builtin seccomp2·최소 capability·자원 제한을 확인합니다. `ready`는 `environment_only`, `attack_tested=false`, `host_scenario_verified=false`이며 실제 권한상승이나 원래 host auditd 시나리오 성공이 아닙니다. 전용 컨테이너는 AppArmor 컨테이너 프로필 격리가 없고, 호스트 전역 AppArmor는 유지합니다. publisher는 root가 읽기 재검증한300초 receipt를60초마다 갱신하며 정지/오류/만료를 ready로 표시하지 않습니다.
+위 `check`는 기동/중지하지 않고 정상 중지 상태를 허용합니다. 실행 중 패키지의 고정 버전을 다시 확인하려면 기존 관리자 CLI `lab.py verify`를 사용하며, 이 명령은 중지 상태에서 실패하는 것이 정상입니다. sudo는 별도 UID1991 rootless daemon·network none·hostroot와 다른 UID/GID mapping·builtin seccomp2·최소 capability·자원 제한을 확인합니다. 환경 검증은 `environment_only`, `attack_tested=false`, `host_scenario_verified=false`이며 실제 권한상승이나 원래 host auditd 시나리오 성공이 아닙니다. 전용 컨테이너는 AppArmor 컨테이너 프로필 격리가 없고, 호스트 전역 AppArmor는 유지합니다. 기존 publisher는 root가 읽기 재검증한300초 receipt를60초마다 갱신하며 정지/오류/만료를 ready로 표시하지 않습니다. 콘솔의 sudo 실행·중지 상태는 중앙 터미널 어댑터에서 별도로 검증합니다.
 
 전체 역할의 최종 검증은 controller `--verify`로 수행합니다. 정지된 웹 실습을 강제로 기동하거나 JAR 해시를 조회하는 구형 schema6 시험은 사용하지 않습니다. Java 이미지/카탈로그를 바꾸거나 관리 컨테이너를 수동 재생성하면 고정 계약/receipt 검사에 걸릴 수 있으므로 웹 broker와 명시된 운영 절차를 따릅니다. sudo의 `stop→up`은 승인된 고정 CLI 계약상 새 CID가 되며, 이 동작도 검증 명령과 구분합니다.
 
@@ -246,7 +244,7 @@ curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS \
   "$LAB_PUBLIC_ORIGIN/log4shell/api/session" | jq '{mode,expires_at}'
 ```
 
-카탈로그4개와 새 클라이언트의 `mode:enforce`, `expires_at:null`이 정상 기준입니다. 유효한 예외 쿠키가 있는 브라우저는 exempt일 수 있으며 위 curl은 브라우저 쿠키를 공유하지 않습니다. security 자체의 `--verify` TLS probe는 Docker SNAT/클라이언트 ACL로200 또는403을 허용하고 `allowed_client_e2e_verified:false`를 출력합니다. 따라서 서버 검사 성공과 허용 클라이언트200을 별도 확인합니다.403을 없애려고 전체 CIDR 허용·프록시 신뢰 범위를 확대하지 않습니다.
+카탈로그6개와 새 클라이언트의 `mode:enforce`, `expires_at:null`이 정상 기준입니다. 유효한 예외 쿠키가 있는 브라우저는 exempt일 수 있으며 위 curl은 브라우저 쿠키를 공유하지 않습니다. security 자체의 `--verify` TLS probe는 Docker SNAT/클라이언트 ACL로200 또는403을 허용하고 `allowed_client_e2e_verified:false`를 출력합니다. 따라서 서버 검사 성공과 허용 클라이언트200을 별도 확인합니다.403을 없애려고 전체 CIDR 허용·프록시 신뢰 범위를 확대하지 않습니다.
 
 ## 4. 파일·로그·완료 기록 위치
 
@@ -294,8 +292,10 @@ curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS \
 | `Docker daemon unavailable` / `compose_plugin_required` | `systemctl is-active docker`, `docker compose version` | Docker 서비스·plugin 수동 준비 수정. 기존 daemon 데이터 삭제 금지 |
 | `preloaded_*_image_required` / `image_architecture_not_linux_amd64` | 로컬 이미지 존재·참조·OS/Architecture | 검토된 amd64 save archive·ID·SHA를 artifacts.json에 준비. --apply는 로컬 load만 하며 pull하지 않음 |
 | `artifact checksum mismatch` / `APT selected an unlisted package/removal` | 역할별 artifacts.json·원본 SHA·누락 전이 의존성 | 서명 검토한 준비 서버의 bundle을 수정. 대상 인터넷 다운로드·강제 의존성 무시 금지 |
-| `schema7_requires_prebuilt_manifest_images_not_legacy_jar_options` | 구형 LOG4SHELL_* 값 잔존 | 새 LAB_* 설정·고정 카탈로그/이미지 사용. 기존 schema6 환경은 별도 이관 |
-| `offline_lab_preflight_failed` / `offline_lab_prerequisites_invalid` | wheel 전체 목록·해시, 4항목 카탈로그, 고정3이미지, nft/systemd 조건 | 오류 원인을 확인하고 정확한 반입물을 복구. latest 대체·guard 생략 금지 |
+| `schema9_requires_prebuilt_manifest_images_not_legacy_jar_options` | 구형 LOG4SHELL_* 값 잔존 | 새 LAB_* 설정·고정 카탈로그/이미지 사용. 기존 schema6·7·8 환경은 별도 이관 |
+| `nonweb_runtime_preflight_failed` | Redis/Samba bundle·관리 소스·고정 런타임 조건 미충족 | `LAB_NONWEB_BUNDLE`의 정확4파일·SHA와 helper의 정제된 오류 코드 확인. check는 계정 생성 전에도 가능 |
+| `nonweb_runtime_install_failed_private_evidence_preserved` | 별도 nonweb 설치 중 실패 | service/evidence/nonweb-install.json과 별도 root receipt를 확인하고 부분 설치를 수동 검토. 재실행으로 덮어쓰지 않음 |
+| `offline_lab_preflight_failed` / `offline_lab_prerequisites_invalid` | wheel 전체 목록·해시, 6항목 카탈로그, 고정 웹3이미지·터미널3개, nft/systemd 조건 | 오류 원인을 확인하고 정확한 반입물을 복구. latest 대체·guard 생략 금지 |
 | `lab_common_key_precondition_failed` / 공통 키 전달 실패 | SIEM admin 암호 입력 계약·SSH pipe·service 키 root0600·기존 다른 키 | 원문을 로그에 출력하지 않고 연결 정책/권한을 점검. 기존 키를 덮어써 암호 회전하지 않음 |
 | TLS/private-network preflight 실패 | origin/port·SAN·키 일치·유효기간·허용 CIDR·/29 충돌 | DNS·인증서·네트워크 계획 수정. `-k`·전체 허용 CIDR로 우회 금지 |
 | 콘솔404/502 또는 실습503 | HTTPS→edge→gateway→콘솔, 실습 실행 상태·고정 경로 | 관리 API와 실제 WAF 실습 경로를 분리 확인. Java를 DVWA Apache의 직접 JAR 프록시로 복원하지 않음 |
@@ -358,6 +358,7 @@ python3 -B deployment/tests/test_controller.py
 python3 -B deployment/tests/test_prerequisites.py
 python3 -B deployment/tests/test_lab_key.py
 python3 -B deployment/tests/test_offline_security.py
+python3 -B deployment/tests/test_soc_diagnostics.py
 python3 -B deployment/test_offline_service.py
 bash deployment/roles/siem-test.sh
 bash deployment/roles/service-test.sh
@@ -365,3 +366,9 @@ python3 -B -m unittest discover -s infra/groot-c/offline-labs/nonweb/sudo/runtim
 ```
 
 이 검사는 controller의 가짜 SSH 순서, 반입물·키 프로토콜, SIEM/service/security 설정 생성, sudo bootstrap의 실패·권한 계약을 확인합니다. 통과 결과는 새 VM의 설치 성공, 실제 인증/DB 동작, 패킷 탐지, 모바일 알림 성공을 대신하지 않습니다. 신규 환경의 최종 인수 기록에는 사용 소스 commit, 대상 역할, 수동 준비 버전/이미지 ID, `--verify` 결과, 브라우저 로그인, 정상 웹 요청, 관리자의 봇 질의 결과와 미검증 항목을 나누어 남깁니다. 비밀값은 기록하지 않습니다.
+
+읽기 진단은 `deploy.sh --verify`에서 각 호스트의 collector timer·소스 SHA·snapshot 소유권/크기/TTL을 확인하고, B의 비권한 읽기 계정으로 A/C 고정 reader의 SSH 연결과 host key를 대조합니다. 이어 Hermes의 실제 SSH MCP 경로에서 도구 목록과 bounded read 한 건을 검사합니다. 새 모델 추론이나 채팅 메시지는 보내지 않습니다. stale/unavailable은 관측 실패이며 서비스 정상 판정으로 대체하지 않습니다. 정상 수집 간격60초·허용 나이180초·최대4시간 오류 표본과 truncation 플래그를 함께 읽어야 합니다. 오류0건은 전체 원본 로그에 오류가 없었다는 증거가 아닙니다.
+
+고정 journal grep 조회에 일치 항목이 없으면 종료 코드1과 빈 stdout·stderr를 정상적인 빈 관측으로 처리합니다. 이 경우에만 오류 수가0입니다. stderr·권한 오류·다른 조회 실패·시간 또는 출력 상한 초과는 `unavailable`과 `count=null`을 유지하며, 일반 명령의 종료 코드1을 성공으로 바꾸지 않습니다.
+
+`diagnostic_ssh_effective_policy_mismatch`이면 A/C에서 고정 진단 계정의 effective `sshd -T -C` 정책을 관리자가 확인합니다. 전역 `PermitUserEnvironment no`·`UsePAM yes`, 공개키 전용 인증, forwarding/TTY 금지와 고정 `read-snapshot` ForceCommand가 필요합니다. 초기 설치기는 이 조건을 만족시키기 위해 기존 전역 SSH 파일을 덮어쓰지 않습니다. `sshd -t`가 실패한 부분 설치도 원본 SHA와 신규 namespace·복구 백업을 검토한 별도 이관 없이 재실행하지 않습니다.

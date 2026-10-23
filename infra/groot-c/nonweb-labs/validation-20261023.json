@@ -1,0 +1,480 @@
+{
+  "attack_tested": false,
+  "backups": [
+    "/var/backups/capstone-offline-labs/20261023-nonweb-favicon",
+    "/var/backups/capstone-offline-labs/20261023-nonweb-edge",
+    "/var/backups/capstone-offline-labs/20261023-terminal-console",
+    "/var/backups/capstone-nonweb-labs/20261023-native-contract",
+    "/var/backups/capstone-nonweb-labs/20261023-terminal-tty",
+    "/var/backups/capstone-offline-labs/20261023-terminal-browser",
+    "/var/backups/capstone-offline-labs/20261023-validation",
+    "/var/backups/capstone-nonweb-images-20261023",
+    "/var/backups/capstone-terminal-tty-20261023"
+  ],
+  "browser": {
+    "application": "Safari",
+    "browser_ctrl_c_result_observed": false,
+    "favicon_server_icon": true,
+    "final_console_running_count": 0,
+    "note": "Native app automation focus/IME delayed input; only observed commands/results claimed. Ctrl+C was verified through actual HTTPS and native PTYs for both final images.",
+    "redis_browser_image_scope": "before final helper-only TTY revision",
+    "redis_uid_10001_and_ping_pong": true,
+    "refreshed_before_inspection": true,
+    "samba_clean_prompt_without_job_control_warning": true,
+    "samba_console_stop_confirmed": true,
+    "samba_dark_and_light_visual_check": true,
+    "samba_disconnect_confirmed": true,
+    "samba_final_image": true,
+    "samba_smb3_share_listing": true,
+    "samba_uid": 10001,
+    "samba_version": "4.6.3"
+  },
+  "cleanup": {
+    "backups_preserved": true,
+    "final_tty_cleanup_evidence": "terminal-tty-validation-20261023.json",
+    "image_cleanup_evidence": "image-cleanup-validation-20261023.json",
+    "mac_checked_at": 1792743227,
+    "mac_packages_installed": false,
+    "mac_removed_bytes": 1597028,
+    "mac_removed_regular_files": 48,
+    "mac_task_directory": "/private/tmp/capstone-nonweb-20261023-ll1251f5",
+    "mac_task_directory_removed": true,
+    "operational_bundle_preserved": true,
+    "validation_stages": {
+      "backup": "/var/backups/capstone-offline-labs/20261023-validation",
+      "observed_at": 1792742884,
+      "operational_bundle_preserved": true,
+      "removed_stages": [
+        "/var/lib/capstone-console-validation-20261023",
+        "/var/lib/capstone-nonweb-runtime-candidate-20261023"
+      ],
+      "services_changed": false,
+      "sha256_verified": true,
+      "source_bytes": {
+        "/var/lib/capstone-console-validation-20261023": 1141747,
+        "/var/lib/capstone-nonweb-runtime-candidate-20261023": 128151
+      },
+      "source_counts": {
+        "/var/lib/capstone-console-validation-20261023": 98,
+        "/var/lib/capstone-nonweb-runtime-candidate-20261023": 13
+      },
+      "stages_absent": true
+    }
+  },
+  "console": {
+    "apache_configtest": true,
+    "apache_final_sha256": "2b210159147625e9101b1df0659b4fa4ec9869956c28c703d962c39a8afa463b",
+    "applied_files": 17,
+    "catalog_count": 6,
+    "existing_web_labs_unchanged": true
+  },
+  "constraints": {
+    "attack_tested": false,
+    "dvwa_independent": true,
+    "full_1800_second_expiry_tested": false,
+    "git_commit_created": false,
+    "git_pushed": false,
+    "host_scenario_verified": false,
+    "new_three_vm_installation_tested": false,
+    "reboot_tested": false,
+    "same_lab_shared_uid_and_filesystem": true,
+    "separate_sid_children_full_cleanup_boundary": "lab stop/reset",
+    "sudo_remains_separate_rootless_cli": true
+  },
+  "edge": {
+    "container_unchanged": true,
+    "final_whole_config_sha256": "04e9111bd645f1ee111a44a53d018acf8afc96d75af42c4ac2f3a9118013612a",
+    "nginx_configtest": true,
+    "reload": true
+  },
+  "execution_hosts": [
+    "Mac existing tools",
+    "C runtime and builds",
+    "A edge config"
+  ],
+  "favicon": {
+    "https_200": true,
+    "safari_refreshed_visual_check": true,
+    "sha256": "8f8a19f4dac6b48377b5955e693e244184142a8aecdc368821aa58fc2ba8a411",
+    "theme_js_sha256": "4e7f45c0102439a4941b0af1ecf7e4523a123a28e20351638d1d79752a211b10"
+  },
+  "final_installed": {
+    "attack_tested": false,
+    "bundle_manifest": {
+      "images": {
+        "redis": {
+          "archive": "redis-image.tar",
+          "archive_sha256": "96cf33d0cd9161e4bf162eb1ea5fdfa28c01ea99fe1d68da22f83357fdeafbe3",
+          "archive_size": 50641408,
+          "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+          "software": "Redis",
+          "start_sha256": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+          "verifier_sha256": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+          "version": "5.0.7"
+        },
+        "samba": {
+          "archive": "samba-image.tar",
+          "archive_sha256": "06428e8ef5a869edf8f40db9c2d30b7ae6dbff8f41b4391671c5f0507ccdf4da",
+          "archive_size": 186617856,
+          "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+          "software": "Samba",
+          "start_sha256": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1",
+          "verifier_sha256": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+          "version": "4.6.3"
+        }
+      },
+      "profile": "capstone-nonweb-v1",
+      "provenance_sha256": "fb30daff3808bb58a1b6ef524ebb3fee39a9094f8b523f3d6f4cb5f91879fb00",
+      "schema": 1
+    },
+    "bundle_manifest_sha256": "0c19ad32fa69088b91a35d1e96a0a205f2c3fcd4ce38a546c56ece30c2124c37",
+    "environment_only": true,
+    "images": {
+      "redis": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+      "samba": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d"
+    },
+    "labs": {
+      "redis": {
+        "attack_tested": false,
+        "container_id": null,
+        "cve_id": "CVE-2022-0543",
+        "deployment_allowed": true,
+        "exec_user": "10001:10001",
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "image_present": true,
+        "lab": "redis",
+        "safety_error": null,
+        "schema": 1,
+        "status": "not_deployed",
+        "verification": "environment_only",
+        "verified_at": 0
+      },
+      "samba": {
+        "attack_tested": false,
+        "container_id": null,
+        "cve_id": "CVE-2017-7494",
+        "deployment_allowed": true,
+        "exec_user": "10001:10001",
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "image_present": true,
+        "lab": "samba",
+        "safety_error": null,
+        "schema": 1,
+        "status": "not_deployed",
+        "verification": "environment_only",
+        "verified_at": 0
+      }
+    },
+    "observed_at": 1792743069,
+    "old_web_labs": [
+      {
+        "id": "31ceda110c75d630ef500a96912bf8db5cd4cc3ee4ff48af87820e6030ccb1cd",
+        "image": "sha256:4509b413ae1b14f867ffdd02c11b0d2b9e42a44fcfae91006d3166c76e50cca2",
+        "running": false,
+        "started_at": "2026-10-22T15:02:05.585800389Z"
+      },
+      {
+        "id": "cb972561a7802be8fd6a2897109870f80c4cb6662c1de3b55a2cdf888d16af9c",
+        "image": "sha256:d62f9dbf56d98d33c74dfe2ed21cd1e99c9111d5b7456a33a89bc1ba1c9a192b",
+        "running": false,
+        "started_at": "2026-10-23T03:44:42.731075237Z"
+      },
+      {
+        "id": "eb55ca320453778dca2985d5cdaa200396a0a8fe5d74be01f9fa0197a98d2665",
+        "image": "sha256:6534536682a48754c4ffd98f8d7fadec20180b15dae361c14e0a672f57e73d36",
+        "running": false,
+        "started_at": "2026-10-22T15:02:04.308278072Z"
+      }
+    ],
+    "profile": "capstone-nonweb-v1",
+    "publication": {
+      "checked_at": 1792743069,
+      "expires_at": 1792743369,
+      "labs": {
+        "CVE-2017-7494": {
+          "status": "needs_setup"
+        },
+        "CVE-2022-0543": {
+          "status": "needs_setup"
+        }
+      },
+      "schema": 1
+    },
+    "schema": 1,
+    "source_sha256": {
+      "README.md": "8b4154c6e2629dcacae200c0f7ed5019ae106bb61decabf6aa92287d45dfef7f",
+      "bootstrap.py": "18d10a0e9d742c1e09996ec68bd5f57c53b904d67b00dcf4e18fcc4b3b2b4926",
+      "compose.yaml": "e9129a91f47824ad5ddf5ca84814a7c3142ab491ea7627b3eee7fdc39a5732dd",
+      "lab.sh": "8659bb7e1d52994f3b9a660042e736323432564e89e634ea6e251d6a8676cdfb",
+      "publish.py": "15e573288ff41d9c324b0ef57223d826b21d8f1ba4ac2b47501f5ecfdf159c6c",
+      "runtime.py": "b4bd7dee64a4f968626db647f1a963a98120198471b2722e52986c824a012388",
+      "terminal.service": "f2435dd927179aa78cdb311fc0759b96d11b704da2738ee3dd1876b809c1a1e3",
+      "terminal_server.py": "393dd028a9c4a07a0c9e1d1e1fc1b5d35f4defe3ff0b54a5bc99d6537b44e54b"
+    },
+    "state": "complete",
+    "units": {
+      "capstone-nonweb-guard.service": {
+        "active": "active",
+        "enabled": "enabled"
+      },
+      "capstone-nonweb-status.timer": {
+        "active": "active",
+        "enabled": "enabled"
+      },
+      "capstone-nonweb-terminal.service": {
+        "active": "active",
+        "enabled": "enabled"
+      }
+    }
+  },
+  "https_final_isolation": {
+    "guard_verified": true,
+    "labs": {
+      "redis": {
+        "attack_tested": false,
+        "container_id": "ed6f0beeafc441ebbc9adc96edad0e147f776421dbc85eb516bfad1749c7e997",
+        "docker_socket_absent": true,
+        "host_listener_denied": true,
+        "host_ports": {},
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "internal_network": true,
+        "memory_bytes": 268435456,
+        "pids_limit": 64,
+        "read_only_root": true,
+        "service_ready": true
+      },
+      "samba": {
+        "attack_tested": false,
+        "container_id": "cf5f5f51729748d3a7993b55b24541a53216e84cdf48acf39276a601a39f83f2",
+        "docker_socket_absent": true,
+        "host_listener_denied": true,
+        "host_ports": {},
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "internal_network": true,
+        "memory_bytes": 536870912,
+        "pids_limit": 128,
+        "read_only_root": true,
+        "service_ready": true
+      }
+    }
+  },
+  "https_final_stop": {
+    "CVE-2017-7494": {
+      "active_session_removed": true,
+      "open_while_stopped_denied": true,
+      "status": {
+        "lab": {
+          "attack_tested": false,
+          "container_id": null,
+          "deployment_allowed": true,
+          "host_scenario_verified": false,
+          "image_present": true,
+          "managed": true,
+          "status": "not_deployed",
+          "type": "managed-terminal",
+          "url": "/log4shell/terminal/CVE-2017-7494/",
+          "verification": "environment_only"
+        },
+        "ok": true
+      },
+      "stop_idempotent": true
+    },
+    "CVE-2022-0543": {
+      "active_session_removed": true,
+      "open_while_stopped_denied": true,
+      "status": {
+        "lab": {
+          "attack_tested": false,
+          "container_id": null,
+          "deployment_allowed": true,
+          "host_scenario_verified": false,
+          "image_present": true,
+          "managed": true,
+          "status": "not_deployed",
+          "type": "managed-terminal",
+          "url": "/log4shell/terminal/CVE-2022-0543/",
+          "verification": "environment_only"
+        },
+        "ok": true
+      },
+      "stop_idempotent": true
+    }
+  },
+  "https_final_tty": {
+    "CVE-2017-7494": {
+      "controlling_tty_warning_absent": true,
+      "ctrl_c_keeps_shell": true,
+      "interrupt_elapsed_seconds": 0.221,
+      "other_session_survives_close": true
+    },
+    "CVE-2022-0543": {
+      "controlling_tty_warning_absent": true,
+      "ctrl_c_keeps_shell": true,
+      "interrupt_elapsed_seconds": 0.227,
+      "other_session_survives_close": true
+    }
+  },
+  "https_public_assets": {
+    "CVE-2017-7494": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+      "status": 200
+    },
+    "CVE-2022-0543": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+      "status": 200
+    },
+    "favicon.svg": {
+      "sha256": "8f8a19f4dac6b48377b5955e693e244184142a8aecdc368821aa58fc2ba8a411",
+      "status": 200
+    },
+    "terminal-vendor/addon-fit.js": {
+      "sha256": "bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089",
+      "status": 200
+    },
+    "terminal-vendor/xterm.css": {
+      "sha256": "ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6",
+      "status": 200
+    },
+    "terminal-vendor/xterm.js": {
+      "sha256": "1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495",
+      "status": 200
+    },
+    "terminal.css": {
+      "sha256": "c340eb81a3ef05330c687b1ce83a0c5ea019868e78c4359132c51169b2012676",
+      "status": 200
+    },
+    "terminal.js": {
+      "sha256": "7bafc0e48d4f3a5a8e0bdafe2cbf829070584a7dd412cd4e144f3527675b3b3d",
+      "status": 200
+    },
+    "theme.js": {
+      "sha256": "4e7f45c0102439a4941b0af1ecf7e4523a123a28e20351638d1d79752a211b10",
+      "status": 200
+    }
+  },
+  "https_terminal_api": {
+    "catalog": 6,
+    "image_scope": "service and boundary proof before helper-only TTY image revision; final helper tested separately",
+    "labs": {
+      "CVE-2017-7494": {
+        "closed_session_denied": true,
+        "extra_command_denied": true,
+        "fixed_uid_10001": true,
+        "missing_origin_denied": true,
+        "output_bytes": 354,
+        "resize": true,
+        "service_output_verified": true,
+        "start_idempotent": true
+      },
+      "CVE-2022-0543": {
+        "closed_session_denied": true,
+        "extra_command_denied": true,
+        "fixed_uid_10001": true,
+        "missing_origin_denied": true,
+        "output_bytes": 164,
+        "resize": true,
+        "service_output_verified": true,
+        "start_idempotent": true
+      }
+    }
+  },
+  "new_vm_installation_tested": false,
+  "observed_at": 1792743137,
+  "referenced_evidence_sha256": {
+    "image-build-validation-20261023.json": "89a4968fac8f9789660de1e121ff9ecc80282790f8966619c99db6bc257af998",
+    "image-cleanup-validation-20261023.json": "8a625d87e5257cb916adfb4bd1c4d546d1f741fae4c128283f5a40135b6a210e",
+    "terminal-tty-validation-20261023.json": "ad544b2ed0544beadbe8d3882c261355fa4f75c9ae85db514d9e7bb88b0c7dad"
+  },
+  "runtime_updated_after_native_findings": true,
+  "schema": 1,
+  "scope": "existing_C_extension",
+  "source_sha256": {
+    "PLAN.md": "868260b5b09785d48050792dcf46385d42d9dce58ad072b4d37243d5d499ccce",
+    "README.md": "3f1bdb902035e235cdfb10ac19b379d4043c8de2c7f0763f5b2c027c3c16c881",
+    "STATUS.md": "7ff6b5d7678bb897bf8a289e9a0d594211e271c8c35fc4ee66bf7e965521a0d4",
+    "deploy.sh": "56b81fd24fc8262beff81c87907be6ed33b14aba1bb066a20468fe1f421c02ba",
+    "deployment/bootstrap-guide.md": "7ec4c91a8ec76728e8b98cc1584efa7808a38a3e477c4bf0c0ef97b6274b6eea",
+    "deployment/config.example.conf": "d72a067ad76c8d175495c6783f7bb453b7ff7bc96ff6da877766f538cd7f6a2c",
+    "deployment/configuration-guide.md": "2d31e30e577b9ed3d508d3576c004b3c8bfdddd9111a9689558b833855610f97",
+    "deployment/offline_service.py": "f3f895ac9787959d8e75de047eb663b238e302c92f6f86fdbf6e20d913bd2dd1",
+    "deployment/roles/service-test.sh": "1017d904b8d7e9409e5e8b7fd510b5f0bfdd7071d3c14d20c7f4a40a1e4e374d",
+    "deployment/roles/service.sh": "9be8ff1b59ab6e5789bc4ad8a1973605418abcd33d430e786ced8edabce22446",
+    "deployment/setup-packages-artifacts.md": "0f70d359db5c4704aca0ae2d91bc448828eeb3f2ac27f306554d810b0f2dd83f",
+    "deployment/test_offline_service.py": "3475f7e190285c339ff0fdaf1c65ea5a4352adf4546b6fe14f114788b413b230",
+    "deployment/tests/test_controller.py": "1077218baa3ecf984fbd7d96748ff125cacefdb057c75d61ff5c62369a1c0c9b",
+    "deployment/verify-troubleshoot.md": "8ed14146beae5a79efeff737bdc7824902f55259cbb15d13d159a3613e17b1fd",
+    "infra/groot-c/nonweb-labs/IMAGES.md": "ea711eb738fbf8b01dedd229f08d1bc542fcfed51a4a831341ed2e71ad6a2d96",
+    "infra/groot-c/nonweb-labs/README.md": "8b4154c6e2629dcacae200c0f7ed5019ae106bb61decabf6aa92287d45dfef7f",
+    "infra/groot-c/nonweb-labs/bootstrap.py": "18d10a0e9d742c1e09996ec68bd5f57c53b904d67b00dcf4e18fcc4b3b2b4926",
+    "infra/groot-c/nonweb-labs/compose.yaml": "e9129a91f47824ad5ddf5ca84814a7c3142ab491ea7627b3eee7fdc39a5732dd",
+    "infra/groot-c/nonweb-labs/image-build-validation-20261023.json": "89a4968fac8f9789660de1e121ff9ecc80282790f8966619c99db6bc257af998",
+    "infra/groot-c/nonweb-labs/image-cleanup-validation-20261023.json": "8a625d87e5257cb916adfb4bd1c4d546d1f741fae4c128283f5a40135b6a210e",
+    "infra/groot-c/nonweb-labs/images.py": "d6bcb3e339a22209a1c30b8d4fbe785b02e8817773587168d82dcbdbf984866b",
+    "infra/groot-c/nonweb-labs/lab.sh": "8659bb7e1d52994f3b9a660042e736323432564e89e634ea6e251d6a8676cdfb",
+    "infra/groot-c/nonweb-labs/prepare.py": "59a8ad65a9e5490f628a06e357945806270c21a7a51df39357505119578ce26c",
+    "infra/groot-c/nonweb-labs/publish.py": "15e573288ff41d9c324b0ef57223d826b21d8f1ba4ac2b47501f5ecfdf159c6c",
+    "infra/groot-c/nonweb-labs/redis/Dockerfile": "380a241c5316a99b9f5b2a1ec804d64bd45e5394ad0d193217166c52a78d9754",
+    "infra/groot-c/nonweb-labs/redis/redis.conf": "1cceb7b8621e8f2d530bce10a407b2092000e5655ad6fcf84f6e2b21a403ec48",
+    "infra/groot-c/nonweb-labs/redis/start.sh": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+    "infra/groot-c/nonweb-labs/redis/verify.sh": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+    "infra/groot-c/nonweb-labs/runtime.py": "b4bd7dee64a4f968626db647f1a963a98120198471b2722e52986c824a012388",
+    "infra/groot-c/nonweb-labs/samba/Dockerfile": "c43988924917f2b8390dd3fb3b67523386e1dff28d7a1b79bcb83c55e470a286",
+    "infra/groot-c/nonweb-labs/samba/smb.conf": "8d65e4f2122f1e9cf076111a601818f60d7c8fa5015f2be6e6265aac2ec4edb7",
+    "infra/groot-c/nonweb-labs/samba/start.sh": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1",
+    "infra/groot-c/nonweb-labs/samba/verify.sh": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+    "infra/groot-c/nonweb-labs/sources.json": "c32cc5e181f618f5c7bc6bc627796fbbd995d51aa14cdf046682146d424efca0",
+    "infra/groot-c/nonweb-labs/terminal-close.sh": "d94ab0eeb844afc4743ef36e19caed82052379f0e2ffb02b78f61b01c01c8469",
+    "infra/groot-c/nonweb-labs/terminal-lib.sh": "c1f9c60524dd16f94c0e4b84c5f87b74bb74dc34ad6667bd660e307f9e10945e",
+    "infra/groot-c/nonweb-labs/terminal-session.sh": "a9ee356938b38099cbbd84a32c420ba5b1d7c1ed908ce17f9ed37f22e65b6188",
+    "infra/groot-c/nonweb-labs/terminal-tty-validation-20261023.json": "ad544b2ed0544beadbe8d3882c261355fa4f75c9ae85db514d9e7bb88b0c7dad",
+    "infra/groot-c/nonweb-labs/terminal.service": "f2435dd927179aa78cdb311fc0759b96d11b704da2738ee3dd1876b809c1a1e3",
+    "infra/groot-c/nonweb-labs/terminal_server.py": "393dd028a9c4a07a0c9e1d1e1fc1b5d35f4defe3ff0b54a5bc99d6537b44e54b",
+    "infra/groot-c/nonweb-labs/test_images.py": "4e567397cdcc2aa3a2c5ad8709faa930a566f2f509439ebd615ab483197f3759",
+    "infra/groot-c/nonweb-labs/test_runtime.py": "1bb91bf2fa4f790bf3000f634da07a27758444ad6441fa7cdb718a4a33310da2",
+    "infra/groot-c/nonweb-labs/test_terminal_server.py": "6511337c052c1bae8ad9090b370dbb9f404ded6a35dab4760af28e7bb48d78c5",
+    "infra/groot-c/offline-labs/README.md": "9d313ce26f9ee4fafb1efc921b1f6429ac075107a4b29fc130d0f34f654380a9",
+    "infra/groot-c/offline-labs/apache-proxy.conf": "2b210159147625e9101b1df0659b4fa4ec9869956c28c703d962c39a8afa463b",
+    "infra/groot-c/offline-labs/app.py": "74cb08342cf354f4dc18c86181533bba695332cc1e6c46b9437739a7e2589d81",
+    "infra/groot-c/offline-labs/broker.py": "9f053cf84203f31423bb7110f490143b70bd3c62a3731d96067530d8ee964a33",
+    "infra/groot-c/offline-labs/cve_list.json": "bd3f6d00ca4b1321f0007b3565f8e69d5fadb39e2b8325e9a1e8204f4de24680",
+    "infra/groot-c/offline-labs/manifest.py": "a779b463e6280a211b8cd55b30a79da7f9a6aa6ef834b00a8298868111255deb",
+    "infra/groot-c/offline-labs/nginx-log4shell-server.conf": "64389f2a095d4f8585d114f5a763f02b9c48290fdeffae7dc0fda6b4491bd4ce",
+    "infra/groot-c/offline-labs/scripts/bootstrap.py": "9c48cb20f429439da882ede8aa6f94f554879c4d87821edc9f39f08ce053be6a",
+    "infra/groot-c/offline-labs/scripts/test_bootstrap.py": "40d8ee40ba56c2ed2e08b20fdd0a89b93adb8324f79c98bbf18be70c2a9887da",
+    "infra/groot-c/offline-labs/static/app.js": "86f5a295fb4f9b86e1f4289cfde6926b387fb23a5e0f2978bb73267677bfd44a",
+    "infra/groot-c/offline-labs/static/favicon.svg": "8f8a19f4dac6b48377b5955e693e244184142a8aecdc368821aa58fc2ba8a411",
+    "infra/groot-c/offline-labs/static/index.html": "221514e7333f8e989237b0511b961435b1ad15a3f90e945ab5f80a68b7ac7bb7",
+    "infra/groot-c/offline-labs/static/terminal-vendor/addon-fit.LICENSE": "e256f01188af527e4d06d21d06fbf785ae9c50d4b328bf03cbe0ba7f0aa4228f",
+    "infra/groot-c/offline-labs/static/terminal-vendor/addon-fit.js": "bdaefa370b1bfc42ee88d46fe6072400902a4d4b2d45cd93438dda9b23c97089",
+    "infra/groot-c/offline-labs/static/terminal-vendor/provenance.json": "6bbb02ff72179d8d064c4ee3036b67cbe9ecd31c7e42204f6e3776cf192597ca",
+    "infra/groot-c/offline-labs/static/terminal-vendor/xterm.LICENSE": "b569f629d00f2626a8100df2a1798210535621e42164dfd426a6fe5aac7b0ccd",
+    "infra/groot-c/offline-labs/static/terminal-vendor/xterm.css": "ba8e6985669488981ccf40c0cefe3aba80722cb6c92de7ad628b0bd717faf2b6",
+    "infra/groot-c/offline-labs/static/terminal-vendor/xterm.js": "1f991ac3b4b283ebf96e60ae23a00a52765dd3a2e46fa6fdda9f1aab032f7495",
+    "infra/groot-c/offline-labs/static/terminal.css": "c340eb81a3ef05330c687b1ce83a0c5ea019868e78c4359132c51169b2012676",
+    "infra/groot-c/offline-labs/static/terminal.html": "3b6ffa69be6730dd1cae93c1641bf5c4e6a76a30ae02a7c1ba8347fd4f16be3c",
+    "infra/groot-c/offline-labs/static/terminal.js": "7bafc0e48d4f3a5a8e0bdafe2cbf829070584a7dd412cd4e144f3527675b3b3d",
+    "infra/groot-c/offline-labs/static/theme.js": "4e7f45c0102439a4941b0af1ecf7e4523a123a28e20351638d1d79752a211b10",
+    "infra/groot-c/offline-labs/terminal_api.py": "0170ac9776962d259a9c20928e11857d92360ace973125614dba0e2dc4f02eeb",
+    "infra/groot-c/offline-labs/test_app.py": "f731c37cb220704f5a5a7f5ba136b2c5258d3183493e0eb8eb7c46ff15079b5b",
+    "infra/groot-c/offline-labs/test_lab_types.py": "c8e9cfce4c83b1b4d3286cd8f5a7d974858f7e12ca9cdc2cd9d187a89c8496fb",
+    "infra/groot-c/offline-labs/test_terminal_api.py": "c855f6f220c214826c7f058576c28479cce330049e521baf776ef9c19799d13a",
+    "infra/groot-c/offline-labs/test_terminal_broker.py": "9be98d8e6c237a4ada359385f55948fcdad54cb77624803695c887af22288c76",
+    "infra/groot-c/offline-labs/test_terminal_client.js": "97e6878fb55354fc3b37e24bc3e0a8bf50611f0d8b367681042e47c85eb02f69",
+    "infra/groot-c/offline-labs/test_terminal_ui.js": "abace4a98fb186803394a6e062f44c5a92ad9ab0e5c8d560963e4c23f95a5c8f"
+  },
+  "tests": {
+    "edge_security": 15,
+    "image_preparation": 22,
+    "installer_controller": 35,
+    "installer_offline_bootstrap": 14,
+    "installer_service": 45,
+    "native_console": 94,
+    "native_runtime": 40,
+    "native_terminal_daemon": 27,
+    "node_client_referrer_regression": {
+      "passed": true,
+      "policy_removal_negative_control": true
+    },
+    "node_ui_suites": 2
+  }
+}

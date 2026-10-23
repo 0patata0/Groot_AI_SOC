@@ -93,6 +93,16 @@
   function start() {
     if (!document.body || document.getElementById('groot-theme-toolbar')) return;
     var kind = pageKind();
+    // This shared asset is injected only into the console and its lab pages.
+    // Keep one local icon instead of an inherited application/server favicon.
+    if (kind !== 'generic' && !document.querySelector('link[rel="icon"][href="/log4shell/static/lab-console-icon.ico"]')) {
+      document.querySelectorAll('link[rel~="icon"]').forEach(function (icon) { icon.remove(); });
+      var favicon = document.createElement('link');
+      favicon.rel = 'icon';
+      favicon.type = 'image/x-icon';
+      favicon.href = '/log4shell/static/lab-console-icon.ico';
+      document.head.appendChild(favicon);
+    }
     root.setAttribute('data-groot-page', kind);
     labNavigation(kind);
 

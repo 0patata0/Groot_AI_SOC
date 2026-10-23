@@ -1,0 +1,75 @@
+{
+  "bounded_command_behavior": "returns nonzero status to collector; no timeout or output-bound failure observed",
+  "cleanup": {
+    "Mac_packages_installed": 0,
+    "own_task_directory_removed": true,
+    "removed_generated_files": 4,
+    "shared_parent_directory_modified_or_removed": false
+  },
+  "collector_source_sha256": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef",
+  "finding": "fixed grep query no matches returns rc1 with empty stdout; collect requires rc0 for both queries and marks all journal observations unavailable",
+  "observations": {
+    "a": {
+      "fixed_query_stats": [
+        {
+          "classification": "success",
+          "elapsed_ms": 24,
+          "query": "error",
+          "return_code": 0,
+          "stdout_bytes": 0,
+          "stdout_lines": 0
+        },
+        {
+          "classification": "empty_nonzero",
+          "elapsed_ms": 822,
+          "query": "classified_warning_info",
+          "return_code": 1,
+          "stdout_bytes": 0,
+          "stdout_lines": 0
+        }
+      ],
+      "host": "a",
+      "raw_journal_returned": false,
+      "snapshot_checked_at": 1792758211,
+      "snapshot_journal_statuses": [
+        "unavailable"
+      ]
+    },
+    "b": {
+      "fixed_query_stats": [
+        {
+          "classification": "success",
+          "elapsed_ms": 12,
+          "query": "error",
+          "return_code": 0,
+          "stdout_bytes": 0,
+          "stdout_lines": 0
+        },
+        {
+          "classification": "empty_nonzero",
+          "elapsed_ms": 1183,
+          "query": "classified_warning_info",
+          "return_code": 1,
+          "stdout_bytes": 0,
+          "stdout_lines": 0
+        }
+      ],
+      "host": "b",
+      "raw_journal_returned": false,
+      "snapshot_checked_at": 1792758185,
+      "snapshot_journal_statuses": [
+        "unavailable"
+      ]
+    }
+  },
+  "observed_at": 1792758266,
+  "queries_per_host": {
+    "classified_warning_info": 1,
+    "priority_err": 1
+  },
+  "raw_journal_or_stderr_returned": false,
+  "schema": 1,
+  "scope": "read-only fixed-query diagnosis of A/B journal_status unavailable; no source/runtime changes",
+  "services_stopped_or_restarted": false,
+  "source_or_configuration_changed": false
+}

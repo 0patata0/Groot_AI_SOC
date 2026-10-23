@@ -1,0 +1,326 @@
+{
+  "attack_tested": false,
+  "base_image": "ubuntu@sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a",
+  "build_evidence_directory": "/var/backups/capstone-nonweb-images-20261023",
+  "build_logs": {
+    "redis-build.log": {
+      "sha256": "efb0483f2872d7e804bff5da0382dc100a28edb31d1e3d689e28c2b665e4f03e",
+      "size": 9437
+    },
+    "redis-build.log.apt-epoch-failure": {
+      "sha256": "5a7f2c7bd0bcc9c296ac41f848ff6cfa60dd8319879f14452475fd387d15fe97",
+      "size": 6882
+    },
+    "redis-build.log.apt-path-failure": {
+      "sha256": "46d88641bc24f93e1f0d46f6518d20359fae11876ee85ed55f5c678a3133194b",
+      "size": 5922
+    },
+    "redis-build.log.buildx-unavailable": {
+      "sha256": "90bd9f73d5cf9c8b8e23d90cfc91e206f07d802c22f4e74919da012f92931d64",
+      "size": 183
+    },
+    "samba-build.log": {
+      "sha256": "dcb6cd33a7514382648fef86771bcb7263ee0d55be34bc8cb4e241a5a03d6a67",
+      "size": 853659
+    },
+    "samba-client-config-correction.log": {
+      "sha256": "c4ccb69ff67dad97b5776edbdff297e7f0f441f36b8f58e25e1a76479aa8c8ce",
+      "size": 985
+    },
+    "samba-guest-share-correction.log": {
+      "sha256": "065c11544c5b414c7f20c856d6f92749b2fc5f83e3d84b2df9069d3bfe946a24",
+      "size": 1034
+    },
+    "samba-ncalrpc-correction.log": {
+      "sha256": "daacd8b4e9d24ef116afa87424233c7e193cda1373fe93e9083a1ca47fb154d2",
+      "size": 1087
+    },
+    "samba-start-order-correction.log": {
+      "sha256": "807131d360af728ad2ade054d986fff00758d05599a164aa46ff8ea939400ed9",
+      "size": 837
+    }
+  },
+  "bundle_manifest": {
+    "images": {
+      "redis": {
+        "archive": "redis-image.tar",
+        "archive_sha256": "ef20e53905450a4d5b09de751ad268980c7d355d91f1968ea6a0b099713a943b",
+        "archive_size": 50634752,
+        "image_id": "sha256:093e0a974e3df485f4be288254a5cad2f4d3364662b85e0d4364de476b11e57e",
+        "software": "Redis",
+        "start_sha256": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+        "verifier_sha256": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+        "version": "5.0.7"
+      },
+      "samba": {
+        "archive": "samba-image.tar",
+        "archive_sha256": "8fede9ee782f86cb7023cf0b35d1c546bfe802e30a80566a79e3b2225bd1f3d7",
+        "archive_size": 186611200,
+        "image_id": "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+        "software": "Samba",
+        "start_sha256": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1",
+        "verifier_sha256": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+        "version": "4.6.3"
+      }
+    },
+    "profile": "capstone-nonweb-v1",
+    "provenance_sha256": "f375979119833fb5941112af8e3adf9a537bf2a0d76c04213e97dd0e43e3179a",
+    "schema": 1
+  },
+  "docker_server_version": "29.8.1",
+  "execution_host": "C",
+  "export": {
+    "finished_at": 1792734461,
+    "result": {
+      "attack_tested": false,
+      "bundle": "/opt/capstone-prereqs/nonweb",
+      "manifest_sha256": "933b52263bc9c7ae2d751357822bdb1c93f586801f2ea91d3898c87b5d85413f",
+      "runtime_started": false,
+      "status": "offline_bundle_verified"
+    },
+    "returncode": 0,
+    "started_at": 1792734451
+  },
+  "final_build": {
+    "attack_tested": false,
+    "corrections": [
+      {
+        "base_image_id": "sha256:b14671bf22f8b77b9738a1d284501a254c95ccb5036928a029ddd941dcc15f19",
+        "dockerfile": "FROM sha256:b14671bf22f8b77b9738a1d284501a254c95ccb5036928a029ddd941dcc15f19\nUSER 0:0\nCOPY start.sh /lab/start.sh\nRUN chmod 0555 /lab/start.sh && test \"$(sha256sum /lab/start.sh | cut -d ' ' -f1)\" = \"fbb83bd781f4b84314d1e125ff5ea6c606f2bc557c21d8bd948c1d65f3436203\"\n",
+        "image_id": "sha256:e0f9a4fcb4f53361d76599c6b2643fa34e2f16813a9dd506ffa7a66365017865",
+        "performed_at": 1792733227,
+        "reason": "chmod before relinquishing share ownership; no FOWNER capability added",
+        "start_sha256": "fbb83bd781f4b84314d1e125ff5ea6c606f2bc557c21d8bd948c1d65f3436203"
+      },
+      {
+        "base_image_id": "sha256:e0f9a4fcb4f53361d76599c6b2643fa34e2f16813a9dd506ffa7a66365017865",
+        "dockerfile": "FROM sha256:e0f9a4fcb4f53361d76599c6b2643fa34e2f16813a9dd506ffa7a66365017865\nUSER 0:0\nCOPY smb.conf /etc/samba/smb.conf\nRUN chmod 0444 /etc/samba/smb.conf && test \"$(sha256sum /etc/samba/smb.conf | cut -d ' ' -f1)\" = \"52427e4804ebe4a73dc3d8b75c2f19defedceb8f7eab6dccd0b6092e281a9414\" && /usr/local/samba/bin/testparm -s /etc/samba/smb.conf >/dev/null\n",
+        "documentation": "https://www.samba.org/samba/docs/4.7/man-html/smb.conf.5.html#NCALRPCDIR",
+        "image_id": "sha256:0e0ca7a78794481409e2e4d60289be4a4314cc52c2228552564fc8243c635192",
+        "performed_at": 1792733913,
+        "reason": "move Samba ncalrpc runtime pipes into existing /run tmpfs; preserve readonly root and exact capabilities",
+        "smb_conf_sha256": "52427e4804ebe4a73dc3d8b75c2f19defedceb8f7eab6dccd0b6092e281a9414"
+      },
+      {
+        "base_image_id": "sha256:0e0ca7a78794481409e2e4d60289be4a4314cc52c2228552564fc8243c635192",
+        "dockerfile": "FROM sha256:0e0ca7a78794481409e2e4d60289be4a4314cc52c2228552564fc8243c635192\nUSER 0:0\nRUN mkdir -p /usr/local/samba/etc && test ! -e /usr/local/samba/etc/smb.conf && ln -s /etc/samba/smb.conf /usr/local/samba/etc/smb.conf && /usr/local/samba/bin/testparm -s >/dev/null\n",
+        "image_id": "sha256:48113083812425e9021289ac43de93bd21400c969c8893f4b0d6b992e7e39f31",
+        "performed_at": 1792734012,
+        "reason": "point compiled client configuration path to the fixed /etc/samba/smb.conf",
+        "source_dockerfile_sha256": "c43988924917f2b8390dd3fb3b67523386e1dff28d7a1b79bcb83c55e470a286"
+      },
+      {
+        "base_image_id": "sha256:48113083812425e9021289ac43de93bd21400c969c8893f4b0d6b992e7e39f31",
+        "dockerfile": "FROM sha256:48113083812425e9021289ac43de93bd21400c969c8893f4b0d6b992e7e39f31\nUSER 0:0\nCOPY start.sh /lab/start.sh\nCOPY smb.conf /etc/samba/smb.conf\nRUN chmod 0555 /lab/start.sh && chmod 0444 /etc/samba/smb.conf && /usr/local/samba/bin/testparm -s >/dev/null\n",
+        "image_id": "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+        "performed_at": 1792734360,
+        "reason": "make anonymous lab share and created-file NT ACLs writable/readable for guest; effective Unix uid/gid65534 and successful chdir confirmed before SMB access denial; no host privilege added",
+        "source_sha256": {
+          "smb.conf": "8d65e4f2122f1e9cf076111a601818f60d7c8fa5015f2be6e6265aac2ec4edb7",
+          "start.sh": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1"
+        }
+      }
+    ],
+    "images": {
+      "redis": {
+        "image_id": "sha256:093e0a974e3df485f4be288254a5cad2f4d3364662b85e0d4364de476b11e57e",
+        "start_sha256": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+        "verifier_sha256": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+        "version": "5.0.7"
+      },
+      "samba": {
+        "image_id": "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+        "start_sha256": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1",
+        "verifier_sha256": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+        "version": "4.6.3"
+      }
+    },
+    "native_samba_diagnostic": {
+      "actual_share_file_directory_modes": [
+        "1777 65534 65534",
+        "666 65534 65534",
+        "777 65534 65534"
+      ],
+      "attack_tested": false,
+      "image_id": "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+      "remove_returncode": 0,
+      "service_verified": true,
+      "stop_returncode": 0,
+      "terminal_uid_probe_returncode": 0,
+      "verify_returncode": 0
+    },
+    "provenance_sha256": "c14f59bbff6b44bb88103cccb34053d0594e105195d3b0167af84ff35fd69134",
+    "schema": 1,
+    "service_verified": false
+  },
+  "image_build_complete": true,
+  "native_samba_probe": {
+    "actual_share_file_directory_modes": [
+      "1777 65534 65534",
+      "666 65534 65534",
+      "777 65534 65534"
+    ],
+    "attack_tested": false,
+    "cid": "678676f07f9c209bc230a610af9337203329e03706c954d5434460061990770c",
+    "image_id": "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+    "remove_returncode": 0,
+    "service_verified": true,
+    "state": {
+      "Dead": false,
+      "Error": "",
+      "ExitCode": 0,
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "OOMKilled": false,
+      "Paused": false,
+      "Pid": 471140,
+      "Restarting": false,
+      "Running": true,
+      "StartedAt": "2026-10-23T05:46:28.94112136Z",
+      "Status": "running"
+    },
+    "stop_returncode": 0,
+    "terminal_uid_probe_output": "  .                                   D        0  Fri Oct 23 05:46:29 2026\n  ..                                  D        0  Fri Oct 23 05:46:28 2026\n\n\t\t65536 blocks of size 1024. 65536 blocks available\n",
+    "terminal_uid_probe_returncode": 0,
+    "verify_returncode": 0,
+    "verify_stderr": "",
+    "verify_stdout": "{\"schema\":1,\"lab\":\"samba\",\"software_version\":\"4.6.3\",\"package_version\":\"source-4.6.3\",\"service_ready\":true,\"attack_tested\":false}\n"
+  },
+  "new_vm_installation_tested": false,
+  "observed_at": 1792734524,
+  "operational_bundle": "/opt/capstone-prereqs/nonweb",
+  "prior_bundle_manifest": {
+    "images": {
+      "redis": {
+        "archive": "redis-image.tar",
+        "archive_sha256": "ef20e53905450a4d5b09de751ad268980c7d355d91f1968ea6a0b099713a943b",
+        "archive_size": 50634752,
+        "image_id": "sha256:093e0a974e3df485f4be288254a5cad2f4d3364662b85e0d4364de476b11e57e",
+        "software": "Redis",
+        "start_sha256": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+        "verifier_sha256": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+        "version": "5.0.7"
+      },
+      "samba": {
+        "archive": "samba-image.tar",
+        "archive_sha256": "dd7140cb672d9723b55d64e6309976a01bbaf0a9844a58940dcf81ec757bc9b5",
+        "archive_size": 186599424,
+        "image_id": "sha256:e0f9a4fcb4f53361d76599c6b2643fa34e2f16813a9dd506ffa7a66365017865",
+        "software": "Samba",
+        "start_sha256": "fbb83bd781f4b84314d1e125ff5ea6c606f2bc557c21d8bd948c1d65f3436203",
+        "verifier_sha256": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+        "version": "4.6.3"
+      }
+    },
+    "profile": "capstone-nonweb-v1",
+    "provenance_sha256": "e28b48d1a4f945bb8cd10e270a8c9d492f9aa69c808e5cf63d0fb718c15bbee2",
+    "schema": 1
+  },
+  "probe_scope": "temporary network-none Samba containers; production runtime acceptance is recorded separately",
+  "python_version": "3.12.3",
+  "redis_package_inputs": [
+    {
+      "Filename": "pool/universe/r/redis/redis-server_5.0.7-2_amd64.deb",
+      "OriginURL": "https://archive.ubuntu.com/ubuntu/",
+      "Package": "redis-server",
+      "SHA256": "db8107cc849524acd1498c28803bf1957ad2fec45c35b3b4a8c621b386fcdb4c",
+      "Size": "37328",
+      "Version": "5:5.0.7-2"
+    },
+    {
+      "Filename": "pool/universe/r/redis/redis-tools_5.0.7-2_amd64.deb",
+      "OriginURL": "https://archive.ubuntu.com/ubuntu/",
+      "Package": "redis-tools",
+      "SHA256": "c83b22a711ebc3a3c3b78204bacce6462939d74b1724fd95c4844583ad59013e",
+      "Size": "488904",
+      "Version": "5:5.0.7-2"
+    }
+  ],
+  "runtime_started_by_image_task": true,
+  "schema": 1,
+  "signature_verification": {
+    "samba_artifacts": {
+      "samba-4.6.3.tar.asc": {
+        "sha256": "9d945de61d92fc4f4868e9ae6489807171197e5d9e85cd48c7aafca0e1f17e77",
+        "size": 173,
+        "url": "https://download.samba.org/pub/samba/stable/samba-4.6.3.tar.asc"
+      },
+      "samba-4.6.3.tar.gz": {
+        "sha256": "2a38ef3da77809cba0583fc188e2a4b5420437aecaad0dffe9a06f732e4b1561",
+        "size": 21107898,
+        "url": "https://download.samba.org/pub/samba/stable/samba-4.6.3.tar.gz"
+      },
+      "samba-pubkey_6F33915B6568B7EA.asc": {
+        "sha256": "5aacab07f71b519ec718a8ed85a802975bef3a2e8b593779613ca94254eac50d",
+        "size": 5296,
+        "url": "https://download.samba.org/pub/samba/expired-gpg-keys/samba-pubkey_6F33915B6568B7EA.asc"
+      }
+    },
+    "samba_signature_verified": true,
+    "samba_signer": "52FBC0B86D954B0843324CDC6F33915B6568B7EA",
+    "signed_indexes": [
+      {
+        "component": "main",
+        "packages_sha256": "7757921ff8feed9c3934a0c9936d441ba4a238bee3ea6c8c1df5cbcd43fc9861",
+        "release_date": "Thu, 23 Apr 2020 17:33:17 UTC",
+        "suite": "focal"
+      },
+      {
+        "component": "universe",
+        "packages_sha256": "46a746dac789bd9537aca54db1680b9dff51c248153111350382199d7d96b9d1",
+        "release_date": "Thu, 23 Apr 2020 17:33:17 UTC",
+        "suite": "focal"
+      },
+      {
+        "component": "main",
+        "packages_sha256": "25b9929bdf280bd3c55732d3b351499518de3aa5dd00cfc9fbee1e765bb59a12",
+        "release_date": "Thu, 22 Oct 2026  6:50:46 UTC",
+        "suite": "focal-updates"
+      },
+      {
+        "component": "universe",
+        "packages_sha256": "744bdb6b7675fe1d54fb7a96ab4fb59007c4bb000f0689b6adcd1acab0e3bfc4",
+        "release_date": "Thu, 22 Oct 2026  6:50:46 UTC",
+        "suite": "focal-updates"
+      },
+      {
+        "component": "main",
+        "packages_sha256": "17dbd024a91a1bb99a8c7997d6b830823c67b1b43cb282643a097f1533d90a1c",
+        "release_date": "Thu, 22 Oct 2026  5:29:15 UTC",
+        "suite": "focal-security"
+      },
+      {
+        "component": "universe",
+        "packages_sha256": "6a79b355aea271354222b26a9d6761ae93caccd8da189921ad2e4e33a9c60e3c",
+        "release_date": "Thu, 22 Oct 2026  5:29:15 UTC",
+        "suite": "focal-security"
+      }
+    ],
+    "ubuntu_keyring_sha256": "80a36b0a6de2f69f49d2df75ef473ccde121e9e190b9ea01d20a4f63778d5c31",
+    "ubuntu_signatures_verified": true
+  },
+  "source_snapshot_after_build": {
+    "IMAGES.md": "ab50dd81ab1eed0dd7dcdfe2ff5f3681c00d332c4922b40d02d4cf37f6b72cc4",
+    "images.py": "d6bcb3e339a22209a1c30b8d4fbe785b02e8817773587168d82dcbdbf984866b",
+    "prepare.py": "59a8ad65a9e5490f628a06e357945806270c21a7a51df39357505119578ce26c",
+    "redis/Dockerfile": "380a241c5316a99b9f5b2a1ec804d64bd45e5394ad0d193217166c52a78d9754",
+    "redis/redis.conf": "1cceb7b8621e8f2d530bce10a407b2092000e5655ad6fcf84f6e2b21a403ec48",
+    "redis/start.sh": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+    "redis/verify.sh": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+    "samba/Dockerfile": "c43988924917f2b8390dd3fb3b67523386e1dff28d7a1b79bcb83c55e470a286",
+    "samba/smb.conf": "8d65e4f2122f1e9cf076111a601818f60d7c8fa5015f2be6e6265aac2ec4edb7",
+    "samba/start.sh": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1",
+    "samba/verify.sh": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+    "sources.json": "c32cc5e181f618f5c7bc6bc627796fbbd995d51aa14cdf046682146d424efca0",
+    "terminal-close.sh": "1ef1854fccc45aab93f7813f4b7b59a27a38bcfef8972e26d17a1d157b40ea70",
+    "terminal-lib.sh": "49d0571d9dc8984536eeeea6de5ec71589552b732aa0efb58e2a44dc1be5b415",
+    "terminal-session.sh": "3ee303047db7c98077e46519279bc04e9c1be514fef537121945fd08ecab3581",
+    "test_images.py": "7425c32fd48560d3356309dff5db501dc24dce68042f683ff2fe859fa6dec980"
+  },
+  "temporary_inputs_cleanup": "complete; see image-cleanup-validation-20261023.json",
+  "unique_deb_count": 155,
+  "unit_tests": {
+    "mac": 21,
+    "native_c": 21,
+    "passed": true
+  }
+}

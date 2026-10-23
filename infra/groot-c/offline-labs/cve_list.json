@@ -35,10 +35,24 @@
     "description": "Apache 공식 구버전 이미지의 경로 정규화 동작을 관찰합니다. CGI 없이 공개용 실습 파일만 제공하며, 외부 송신을 차단합니다. 버전·구성 확인과 실제 취약점 재현은 별도입니다."
   },
   {
-    "type": "local-cli",
+    "type": "managed-terminal",
+    "cve_id": "CVE-2022-0543",
+    "software": "Redis · 격리 터미널 실습",
+    "vulnerable_version": "Ubuntu focal Redis 5:5.0.7-2",
+    "description": "Redis 패키지의 Lua 실행 환경을 학습하는 독립 컨테이너입니다. 실습 환경을 시작한 뒤 웹 터미널로 접속합니다. 외부 송신과 호스트 포트 공개를 차단하며, 환경 준비와 실제 취약점 재현은 별도로 검증합니다."
+  },
+  {
+    "type": "managed-terminal",
+    "cve_id": "CVE-2017-7494",
+    "software": "Samba · 격리 터미널 실습",
+    "vulnerable_version": "Samba 4.6.3",
+    "description": "Samba의 파일 공유와 모듈 처리 구성을 학습하는 독립 컨테이너입니다. 실습 환경을 시작한 뒤 웹 터미널로 접속합니다. 외부 송신과 호스트 포트 공개를 차단하며, 환경 준비와 실제 취약점 재현은 별도로 검증합니다."
+  },
+  {
+    "type": "managed-terminal",
     "cve_id": "CVE-2021-3156",
-    "software": "sudo Baron Samedit · 격리 CLI 실습",
+    "software": "sudo Baron Samedit · 격리 터미널 실습",
     "vulnerable_version": "Ubuntu focal sudo 1.8.31-1ubuntu1",
-    "description": "서명된 Ubuntu 패키지를 사용하는 별도 rootless CLI 환경입니다. 웹 명령 실행·호스트 sudo 변경은 제공하지 않습니다. 환경 준비, 실제 권한 상승, 호스트 탐지는 각각 별도 검증합니다."
+    "description": "서명된 Ubuntu 패키지를 사용하는 별도 rootless 실습 환경입니다. 시작 후 웹 터미널로 접속하며 호스트 sudo는 변경하지 않습니다. 터미널은 한 번에 하나만 연결되고 연결 종료·입력 유휴·세션 만료 시 이 실습도 중지됩니다. 환경 준비와 실제 취약점 재현은 별도로 검증합니다."
   }
 ]

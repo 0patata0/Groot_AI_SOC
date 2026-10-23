@@ -1,8 +1,39 @@
-# GROOT Offline Lab Console
+# GROOT Lab Console
 
-최신 UI는 수평 메뉴·큰 제목·서버 선화의 Lab Console이며 연결된 Java·Apache 두 버전과 공통 차콜/웜화이트 색상을 사용한다. DVWA는 독립 화면을 유지한다. 전체3서버 초기 설정은 루트 [deploy.sh 단일 진입점](../../../deployment/bootstrap-guide.md)이 로컬 반입·역할 설치·내부 helper를 연결한다. 최신 HTTPS35개·C native66개를 통과했으며 아래64개 검증은 변경 전 단계다. 새 VM3대 전체 apply는 아직 미실행이다.
+## 파비콘 재발 후속 완료 (2026-10-23)
 
-기존 Log4Shell 웹 주소에서 사용하는 오프라인 CVE 실습 관리 화면이다. [관리 화면](https://log4shell.grootlab.duckdns.org/log4shell/)의 목록 조회·실행·중지는 **키 없이** 사용할 수 있다. 선택적인 차단 예외 키는 해당 브라우저의 WAF 검사 모드를 10분 동안 바꾸는 용도다. 현재 카탈로그는 **4항목**이다. Log4Shell과 Apache httpd 2.4.49·2.4.50은 로컬 이미지로 관리한다. DVWA는 목록과 같은 HTTPS 실습 경로에서 제외하고 원래 독립 주소로 유지한다. sudo는 별도 rootless CLI 환경이며 웹에서 실행하지 않는다. sudo rootless 런타임의 무해한 환경 검증과 정식 상태 발행 검증을 완료했다. 실제 권한 상승·호스트 탐지 성공을 뜻하지 않는다.
+메인과 터미널은 로컬 `lab-console-icon.ico`를 정적으로 선언하고 공통 테마는 올바른 아이콘을 그대로 유지한다. 루트 favicon·Apple 아이콘 경로도 이미지로 연결한다. 실제 HTTPS MIME·SHA 및 Safari 아이콘 캐시 백업·재생성 후 같은 주소의 서버 선화 표시와 사용자 확인을 완료했다. 설치기 반입·검증 목록을 함께 갱신했다. [최종 아이콘 증거](favicon-validation-20261023.json).
+
+## sudo 웹 터미널 연결 — 운영 반영·HTTPS 검증 완료 (2026-10-23)
+
+sudo CVE-2021-3156은 기존에 `local-cli`의 준비 상태만 표시해 웹 시작·열기가 비활성화돼 있었다. 새 소스는 이를 `managed-terminal`로 연결하며 **HTTP3개 + 웹 터미널3개, 총6항목**을 사용한다. sudo도 **실습 환경 시작 → 환경 열기**로 `/log4shell/terminal/CVE-2021-3156/`에 접속한다. 별도 rootless 저장소의 준비 이미지도 확인해 모든 입력이 준비됐으면 이미지 수는6개다. C 운영 적용과 실제 HTTPS 접속·입출력·종료 검증을 완료했다.
+
+기존 sudo 이미지·반입 bundle·고정 런타임은 그대로 유지하고 중앙 `sudo_terminal.py` adapter를 통해 연결한다. 호스트 UID1991의 전용 rootless 계정과 컨테이너 UID1000을 사용하며 호스트 sudo·일반 Docker 옵션·임의 host shell을 받지 않는다. 기존 user namespace 안의 setuid 실습 조건을 유지하므로 HTTP/Redis/Samba의 no-new-privileges 계약을 그대로 복사하지 않는다. [중앙 관리 계약](../nonweb-labs/README.md)이 현재 웹 연결 정책이며 `nonweb/sudo/README.md`의 웹 미제공 설명은 원래 CLI 런타임 구축 당시 이력이다. 그 CLI 소스와 pin은 이번에 바꾸지 않는다.
+
+sudo 터미널은 서버 전체1개만 연결한다. **연결 종료·입력 유휴5분·전체30분·터미널 서비스 종료는 sudo 컨테이너 전체 중지**로 처리하고, 재연결은 환경을 자동 시작하지 않는다. 브라우저 탭 종료의 keepalive 전달은 보장되지 않으므로 서버의 시간 제한 정리를 함께 사용한다. 종료 결과를 확인하지 못하면 UI는 중지 완료라고 표시하지 않는다. Redis/Samba의 세션 종료는 환경을 유지하며, 전체 정리는 콘솔 중지로 수행하는 기존 정책을 유지한다.
+
+단일 `deploy.sh`는 service schema9로 이 경로를 반입·검증하도록 연결했다. 아래 schema8·터미널2종의 운영 완료와 [기존 통합 JSON](../nonweb-labs/validation-20261023.json)은 당시 이력이며 sudo 웹터미널 검증을 대신하지 않는다. 실제 취약점 악용/방어 E2E와 새 VM3대 전체 설치 시험은 별도다.
+
+
+검증은 native 콘솔97개·nonweb121개, 설치기 service50개·controller35개와 Node2종이다. 실제 HTTPS에서 sudo UID1000·패키지1.8.31-1ubuntu1·터미널 크기 변경·Ctrl+C·단일 연결·연결 종료 시 전체 중지·활성 세션 중지·새 CID 재시작을 확인했다. 기존 rootful 컨테이너는 적용 전후 동일했다. 새로고침한 Safari에서 이미지6개·sudo 항목과 시작 버튼은 확인했고, 사용자 브라우저 조작과 겹쳐 sudo 터미널 명령의 시각 검수는 별도로 완료 처리하지 않았다. [sudo 운영 증거](../nonweb-labs/sudo-web-validation-20261023.json).
+
+## Redis·Samba 웹 터미널 확장 — sudo 웹 연결 전 완료 이력 (2026-10-23)
+
+현재 운영 `cve_list.json`은 **6항목**이다. 기존 HTTP3개와 sudo CLI에 Redis **CVE-2022-0543**(Ubuntu `5:5.0.7-2`), Samba **CVE-2017-7494**(4.6.3)의 `managed-terminal` 유형을 추가했다. 두 항목은 같은 HTTPS 콘솔에서 **실습환경 시작 → 환경 열기**를 선택해 `/log4shell/terminal/<CVE ID>/`의 가상 터미널에 접속하도록 구현했다. sudo의 웹 실행·셸은 제공하지 않으며 DVWA는 원래 독립 주소를 유지한다.
+
+FastAPI는 peer credential을 확인하는 전용 Unix daemon을 거쳐, root 런타임이 검증한 full 컨테이너 ID의 고정 UID/GID10001:10001 세션을 연다. 임의 호스트 명령·이미지·mount·Docker 옵션은 받지 않는다. Redis/Samba 서비스는 컨테이너 loopback에서만 제공하고 host port를 게시하지 않는다. 따라서 HTTP 실습3개의 WAF 검사·예외 모드와 터미널 안의 Redis/SMB 프로토콜은 같은 검사 경로가 아니며, WAF 키를 터미널 권한으로 사용하지 않는다.
+
+터미널의 입력 유휴 한도는5분, 전체 수명은30분, 출력 버퍼는256KiB다. 같은 lab의 세션은 컨테이너·UID10001·파일시스템을 공유하므로 **사용자별 OS 격리가 아니다**. 탭을 닫으면 해당 OS 세션(SID)의 검증된 UID10001 프로세스 정리를 시도하며, 새 OS 세션으로 분리한 자식까지 포함한 실습 전체 정리는 해당 lab의 **중지**로 컨테이너를 제거한다. 이는 기존 HTTP3개의 정지·재시작 계약과 구분한다.
+
+C의 이미지 빌드·런타임·콘솔 반영을 완료했다. native 콘솔94개(HTTP API14개 포함), 런타임40개·터미널 daemon27개, 이미지 준비22개 회귀를 통과했다. 초기 런타임33개·daemon25개는 보완 전 결과다. 실제 HTTPS에서 서비스 응답·비권한 셸·시작을 확인하고, 터미널 helper만 보완한 최종 이미지로 Ctrl+C·다른 세션 보존·중지·중지 후 접속 거부를 재확인했다. 또한 호스트에서 도달 가능한 listener가 컨테이너에서 차단되는 것을 실측했다. host port 없음·internal network·Docker socket 없음·읽기 전용 rootfs·리소스 제한도 확인했다. 새로고침한 Safari에서 서버 파비콘, Redis의 UID10001·PONG, 최종 Samba의 UID10001·Version4.6.3·SMB3 공유 목록과 다크/화이트 테마·연결 종료·콘솔 중지를 확인했다.
+
+[통합 운영 검증](../nonweb-labs/validation-20261023.json)과 [최종 TTY·이미지 증거](../nonweb-labs/terminal-tty-validation-20261023.json)에 실제 ID·SHA·검증 범위를 기록한다. 설치와 격리 조건은 [비웹 런타임 관리 계약](../nonweb-labs/README.md)을 따른다. 단일 `deploy.sh`의 service schema8은6항목·로컬 터미널 자산·`LAB_NONWEB_BUNDLE`을 반입하고 두 컨테이너를 자동 시작하지 않는다. **아래4항목·HTTP35개·native66개는 Redis/Samba 확장 전 검증 기록**이다. 새 VM3대 전체 설치 시험은 사용자 요청으로 보류하며 실제 취약점 악용/방어 E2E·재부팅·30분 전체 세션 수명 실측은 미검증이다.
+
+## Redis·Samba 확장 전 운영 검증 기록
+
+확장 전 UI는 수평 메뉴·큰 제목·서버 선화의 Lab Console이며 연결된 Java·Apache 두 버전과 공통 차콜/웜화이트 색상을 사용한다. DVWA는 독립 화면을 유지한다. 전체3서버 초기 설정은 루트 [deploy.sh 단일 진입점](../../../deployment/bootstrap-guide.md)이 로컬 반입·역할 설치·내부 helper를 연결한다. 당시 HTTPS35개·C native66개를 통과했으며 아래64개 검증은 변경 전 단계다. 새 VM3대 전체 apply는 아직 미실행이다.
+
+기존 Log4Shell 웹 주소에서 사용하는 오프라인 CVE 실습 관리 화면이다. [관리 화면](https://log4shell.grootlab.duckdns.org/log4shell/)의 목록 조회·실행·중지는 **키 없이** 사용할 수 있다. 선택적인 차단 예외 키는 해당 브라우저의 WAF 검사 모드를 10분 동안 바꾸는 용도다. 확장 전 검증한 카탈로그는 **4항목**이다. Log4Shell과 Apache httpd 2.4.49·2.4.50은 로컬 이미지로 관리한다. DVWA는 목록과 같은 HTTPS 실습 경로에서 제외하고 원래 독립 주소로 유지한다. sudo는 별도 rootless CLI 환경이며 웹에서 실행하지 않는다. sudo rootless 런타임의 무해한 환경 검증과 정식 상태 발행 검증을 완료했다. 실제 권한 상승·호스트 탐지 성공을 뜻하지 않는다.
 
 ## 현재 범위 정정·공통 테마 — 적용 완료 (2026-10-23)
 
@@ -14,15 +45,15 @@
 
 Java와 Apache 두 버전은 메인과 같은 최대1344px 외곽 프레임, 직선 테두리, 타이포그래피와 버튼을 사용한다. 헤더의 `Lab Console` 링크로 메인에 돌아갈 수 있고, Java의 요청·응답 패널과 Apache의 버전·안내 패널은 각 실습 기능에 맞춰 유지한다. 작은 화면에서는 탐색과 패널을 세로로 배치한다. 이 모양은 공통 `theme.js/css`에서 적용하므로 Java JAR·실습 이미지를 다시 만들 필요가 없다. 단일 초기 설치기도 두 파일을 필수 소스로 반입·복사하고 실제 제공 파일을 대조하므로 동일한 디자인을 설치한다. JSON·일반 텍스트 실습 자료의 응답 형식은 바꾸지 않는다.
 
-## 현재 서버에서 사용
+## 사용 방법
 
-관리 화면은 학과 내부망·기존 VPN에서 HTTPS로 접근한다. HTTP 주소는 HTTPS로 이동한다.
+관리 화면은 학과 내부망·기존 VPN에서 HTTPS로 접근한다. HTTP 주소는 HTTPS로 이동한다. 아래는 현재6항목 기준 사용법이며 Redis/Samba의 운영 검증 범위는 맨 위 절을 따른다.
 
-1. 관리 화면에서 항목을 선택한다. Docker 관리형3개는 **실습 실행**을 누른다. sudo는 별도 CLI 안내를 따른다. 목록·상태 조회에는 키가 필요하지 않다.
-2. 관리형 앱이 실행 중이면 **실습 열기**를 누른다. 웹3항목은 같은 HTTPS 사이트의 `/log4shell/labs/<항목 ID>/`에서 열린다. 일반 웹 실습에 SSH 터널은 필요하지 않다.
-3. 일반 실습은 정상 요청을 허용하고 WAF 보안 규칙에 탐지된 요청을 차단한다. 키가 없다는 이유만으로 모든 요청을 차단하지 않는다.
-4. WAF 즉시 차단 대신 탐지를 기록하려면 **차단 예외 키 (선택)**에 **Wazuh Dashboard `admin` 계정의 비밀번호와 같은 키**를 입력하고 **예외 적용**을 누른다. 키를 Git, URL, 명령행 인수, 채팅, 브라우저 저장소에 넣지 않는다.
-5. 예외 상태에서는 `관리자 실습 · 탐지만 기록`, 일반 상태에서는 `일반 실습 · 차단 적용`을 표시한다. 예외 해제 또는 600초 만료 후 일반 정책으로 돌아간다. 사용을 마치면 직접 실행한 관리형 실습도 중지한다. sudo의 실행·중지는 웹에서 제공하지 않는다. DVWA는 이 관리 화면의 대상이 아니다.
+1. 관리 화면에서 항목을 선택한다. 목록·상태 조회와 HTTP/터미널 실습의 시작·중지에는 키가 필요하지 않다. sudo는 별도 CLI 안내를 따른다.
+2. Java·Apache 두 버전은 **실습 실행 → 실습 열기**를 선택한다. 같은 HTTPS 사이트의 `/log4shell/labs/<항목 ID>/`에서 열리며 SSH 터널은 필요하지 않다.
+3. Redis·Samba는 **실습 환경 시작 → 환경 열기**를 선택한다. 실행 중이고 격리가 확인되면 `/log4shell/terminal/<항목 ID>/`의 터미널이 열린다. 터미널의 **재연결**은 실행 중인 환경에 새 세션을 연결하고, **연결 종료**는 해당 세션만 종료한다. 환경 전체 중지는 콘솔의 **중지**를 사용한다.
+4. HTTP3개 실습은 정상 요청을 허용하고 WAF 보안 규칙에 탐지된 요청을 차단한다. 탐지만 기록하려면 **차단 예외 키 (선택)**에 **Wazuh Dashboard `admin` 계정의 비밀번호와 같은 키**를 입력하고 **예외 적용**을 누른다. Redis/SMB 프로토콜과 터미널 권한에는 이 예외가 적용되지 않는다. 키를 Git, URL, 명령행 인수, 채팅, 브라우저 저장소에 넣지 않는다.
+5. HTTP 실습의 예외 상태는 `관리자 실습 · 탐지만 기록`, 일반 상태는 `일반 실습 · 차단 적용`으로 표시한다. 예외 해제 또는 600초 만료 후 일반 정책으로 돌아간다. 사용을 마치면 직접 시작한 실습도 중지한다. sudo의 실행·중지는 웹에서 제공하지 않으며 DVWA는 이 관리 화면의 대상이 아니다.
 
 공통 키는 C의 root 관리 파일에 별도로 동기화한 값으로 검증한다. 이 화면이 Wazuh 계정으로 로그인하거나 Wazuh API에 비밀번호를 전달하는 것은 아니며 SSO도 아니다. 키 적용 여부는 실습 실행·중지 권한이나 Docker 실행 범위를 늘리지 않는다.
 
@@ -35,7 +66,15 @@ Java와 Apache 두 버전은 메인과 같은 최대1344px 외곽 프레임, 직
 
 성공하면 키 자체가 아닌 서명된 `groot_lab_mode` 세션 쿠키를 발급한다. 공개 HTTPS에서는 `Secure`, `HttpOnly`, `SameSite=Strict`를 적용하며 클라이언트 IP와 **600초** 만료에 묶인다. 페이지 새로고침으로 해제되지 않고 **같은 브라우저의 다른 탭에도 공유**된다. UI는 서버의 만료 시각·남은 시간을 표시하고 10초마다 상태·정책을 재확인한다. GET 조회는 만료 시간을 연장하지 않는다. **예외 해제**는 쿠키를 지우며, IP가 바뀌면 기존 세션은 유효하지 않다. 보안 연결이나 WebCrypto가 없는 브라우저에서도 무키 실습은 가능하지만 예외 키 입력은 비활성화된다.
 
-관리형 항목의 실행 버튼은 같은 CVE를 중복 생성하지 않는다. 중지는 컨테이너를 삭제하지 않으며 다시 실행하면 동일 컨테이너를 시작한다. Docker의 `running`은 프로세스 상태이고 모든 CVE 앱의 준비 완료·취약점 재현 성공을 의미하지 않는다. 실습은 호스트 재부팅 후 자동 시작하지 않고 화면에서 다시 실행한다.
+실행 중인 같은 CVE를 다시 시작해도 중복 컨테이너를 만들지 않는다. 중지 후 동작은 유형별로 다르다.
+
+| 유형 | 콘솔의 중지 | 다시 시작 |
+|---|---|---|
+| HTTP3개(Java·Apache 두 버전) | 컨테이너를 정지하고 보존한다. | 동일한 관리 컨테이너를 다시 시작한다. |
+| Redis·Samba 터미널2개 | 해당 실습의 모든 터미널 연결을 정리하고 컨테이너를 정지·제거한다. tmpfs의 실습 데이터도 사라진다. | 고정 이미지로 새 컨테이너를 만든다. |
+| sudo CLI | 웹에서 제공하지 않는다. | 별도 rootless CLI 절차를 따른다. |
+
+터미널의 **연결 종료**나 탭 닫기는 실습 환경 전체 중지가 아니다. 같은 실습을 공유하는 다른 세션까지 정리하려면 콘솔에서 해당 실습을 중지한다. Docker의 `running`과 무해한 서비스 준비 검사는 실제 취약점 재현·방어 탐지 성공을 의미하지 않는다. 실습은 호스트 재부팅 후 자동 시작하지 않고 필요할 때 다시 시작한다.
 
 ## 구성과 경계
 
@@ -52,22 +91,28 @@ Java와 Apache 두 버전은 메인과 같은 최대1344px 외곽 프레임, 직
   → 내부 세션 검사 → WAF 전용 Host·고정 경로
   → C Apache 내부 경로 (A·loopback만 허용)
   → 관리형: 127.0.0.1:18081(Java) / :18082(httpd 2.4.49) / :18083(httpd 2.4.50)
+
+Redis·Samba 터미널 (WAF 미경유, 고정2개 항목)
+  브라우저 /log4shell/terminal/<등록된 터미널 항목 ID>/
+  → 같은 출처 /log4shell/api/terminal/{open,poll,input,resize,close}
+  → C FastAPI → 전용 Unix daemon → 검증한 컨테이너의 UID/GID10001:10001
+  → 컨테이너 loopback의 Redis/SMB 서비스 (호스트 게시 포트 없음)
 ```
 
-**관리 API는 WAF를 경유하지 않고 실제 실습 요청은 WAF를 경유한다.** 키 검증의 challenge·proof 및 예외 세션 쿠키는 관리 경로에서 처리한다. A는 내부 세션 검사 결과로 검사 모드를 정하고 클라이언트가 보낸 제어 헤더를 덮어쓴다. 실습 요청과 함께 검사 모드·요청 식별자·클라이언트 주소를 전달하며, 쿠키는 해당 경로의 허용 목록만 남긴다. Java는 기존 CSRF 쿠키만 허용하고 httpd에는 쿠키를 전달하지 않는다. 키·proof·예외 세션 쿠키는 WAF에 전달하지 않는다. 세션 검사 서비스에 연결할 수 없으면 임의로 예외를 허용하지 않는다.
+**관리·터미널 API는 WAF를 경유하지 않고 HTTP3개 실습 요청은 WAF를 경유한다.** 키 검증의 challenge·proof 및 예외 세션 쿠키는 관리 경로에서 처리한다. A는 내부 세션 검사 결과로 검사 모드를 정하고 클라이언트가 보낸 제어 헤더를 덮어쓴다. HTTP 실습 요청과 함께 검사 모드·요청 식별자·클라이언트 주소를 전달하며, 쿠키는 해당 경로의 허용 목록만 남긴다. Java는 기존 CSRF 쿠키만 허용하고 httpd에는 쿠키를 전달하지 않는다. 키·proof·예외 세션 쿠키는 WAF에 전달하지 않는다. 세션 검사 서비스에 연결할 수 없으면 임의로 예외를 허용하지 않는다.
 
 WAF의 기존 전역 `DetectionOnly`·CRS·감사 설정은 유지하고, 전용 Host의 허용된3개 실습 경로에만 일반 모드 `On` 또는 예외 모드 `DetectionOnly`를 적용한다. 새 규칙·vhost 파일의 배포와 재생성 제약은 아래 운영 절을 따른다. DVWA의 원래 독립 경로와 이전 `log4shell-lab` 컨테이너는 보존한다. 이전 Java 컨테이너는 별도 관리기가 계속 소유하며 새 웹의 중지 버튼 대상이 아니다.
 
 이 예외는 **해당 웹 요청의 WAF 즉시 차단**에만 적용된다. Suricata는 트래픽을 관측하는 기존 passive 탐지 경로를 유지하며, 탐지 이후 기존 IP 차단·보호 주소 검사·LLM 조사와 판단·관리자 승인·TTL 계약을 바꾸지 않는다. **이미 적용된 L4/IP 차단은 이 키로 해제할 수 없다.** 예외 세션이 모든 네트워크 보호 정책을 우회하거나 공격 성공을 보장하지 않는다.
 
-- FastAPI에는 Docker socket·docker 그룹·sudo 권한이 없다. broker는 `status`, `deploy`, `stop`과 등록된 항목 ID만 받는다. 실행·중지는 `managed-http`만 허용한다. 아래 Docker 실행·격리 계약은 이 관리형 3항목에 적용하며 별도 sudo rootless 실행기는 해당 문서의 계약을 따른다. SOC/Hermes LLM에 Docker 권한을 위임하지 않는다.
+- FastAPI에는 Docker socket·docker 그룹·sudo 권한이 없다. broker는 `status`, `deploy`, `stop`과 등록된 항목 ID만 받는다. HTTP3개는 기존 broker가 관리하고 `managed-terminal`2개는 고정 ID를 전용 nonweb daemon으로 전달한다. 아래 HTTP Docker 실행·격리 계약과 Redis/Samba의 [별도 런타임 계약](../nonweb-labs/README.md)을 구분한다. sudo는 계속 웹 실행을 거부하며 SOC/Hermes LLM에 Docker 권한을 위임하지 않는다.
 - 서버 시작 때 로컬 JSON을 읽고 검증한다. 등록되지 않은 ID, 추가 실행 옵션, 잘못된 JSON, 중복 CVE·호스트 포트를 거부한다. 매니페스트 변경은 두 서비스 재시작 후 반영한다.
 - Docker 태그가 가리키는 로컬 이미지 ID를 고정 SHA와 대조한다. `--pull=never`, 명령 인수 배열, 로컬 Unix Docker 소켓만 사용한다. 이미지 누락 시 오류를 반환하며 다운로드로 대체하지 않는다.
-- 실행은 UID/GID 65532, 읽기 전용 rootfs, `/tmp` tmpfs, capability 전체 제거, no-new-privileges, CPU 1개·메모리 512MiB·PID 128·로그 회전으로 제한한다. 이미지에 선언된 `VOLUME`도 거부한다. 임의 mount·환경변수·command·exec API는 없다.
-- 전용 bridge `br-offline-labs`의 nftables 입력·전달 규칙과 ICC 차단, 컨테이너 DNS loopback 설정을 검사한다. 새 컨테이너의 호스트/다른 네트워크 방향 연결을 막는다. 단순 loopback 포트 게시만으로 외부 송신이 막힌다고 가정하지 않는다.
-- Docker 29에서 `--internal` 네트워크만 연결한 컨테이너의 게시 포트 동작 제한을 피하기 위해 일반 전용 bridge와 별도 nft 격리를 사용한다. 호스트와 실습 앱 사이의 응답은 허용한다.
+- HTTP3개 실행은 UID/GID 65532, 읽기 전용 rootfs, `/tmp` tmpfs, capability 전체 제거, no-new-privileges, CPU 1개·메모리 512MiB·PID 128·로그 회전으로 제한한다. 이미지에 선언된 `VOLUME`도 거부한다. 임의 mount·환경변수·command·Docker exec API는 없다. Redis/Samba의 서비스 사용자·리소스·격리망은 별도 고정 계약을 따르며 브라우저 터미널은 두 컨테이너 안의 UID/GID10001:10001에만 연결한다.
+- HTTP3개는 전용 bridge `br-offline-labs`의 nftables 입력·전달 규칙과 ICC 차단, 컨테이너 DNS loopback 설정을 검사한다. 새 컨테이너의 호스트/다른 네트워크 방향 연결을 막는다. 단순 loopback 포트 게시만으로 외부 송신이 막힌다고 가정하지 않는다.
+- HTTP3개는 Docker 29의 `--internal` 게시 포트 제한을 피하기 위해 일반 전용 bridge와 별도 nft 격리를 사용한다. 호스트와 실습 앱 사이의 응답은 허용한다. Redis/Samba는 포트를 게시하지 않고 각각의 internal bridge와 별도 nft 격리를 사용한다.
 - root 전용 receipt의 전체 컨테이너 ID·이미지·명령·환경·리소스·포트·네트워크·라벨을 검증한다. 이름이 같은 미관리 컨테이너를 가져오거나 삭제하지 않는다. 생성 후 receipt 저장이 실패하면 자동 인수하지 않고 관리자 검토 대상으로 남긴다.
-- guard 오류 때 새 배포는 막되, 검증된 관리 컨테이너의 상태 조회·중지는 유지한다. 실행 중인 컨테이너의 격리 장치를 root가 별도로 제거하는 행위까지 자동 복구하는 감시기는 아니다.
+- HTTP guard 오류 때 해당 HTTP 실습의 새 배포는 막되, 검증된 관리 컨테이너의 상태 조회·중지는 유지한다. terminal2개는 별도 런타임의 격리 검사로 시작·접속을 결정한다. 실행 중인 컨테이너의 격리 장치를 root가 별도로 제거하는 행위까지 자동 복구하는 감시기는 아니다.
 - API는 허용된 Host·Origin/Fetch Metadata·JSON 타입·4KiB 본문 제한을 사용하며 CORS를 열지 않는다. 모든 브라우저 요청은 같은 출처 쿠키를 사용하고 `Authorization` 헤더는 보내지 않는다. 예외 검증 API는 이 헤더가 있는 요청을 거부한다. UI·CSS·JS·폰트는 외부 CDN을 사용하지 않고 Swagger/ReDoc 외부 자산도 비활성화했다.
 
 ## 파일
@@ -76,12 +121,16 @@ WAF의 기존 전역 `DetectionOnly`·CRS·감사 설정은 유지하고, 전용
 |---|---|
 | `app.py`, `static/` | 무키 실습 API와 순수 CSS/JS UI·WebCrypto 서명 |
 | `static/theme.js`, `static/theme.css` | 콘솔·Java·Apache HTML의 공통 다크/화이트 버튼·로컬 테마 자산 |
+| `static/favicon.svg` | 같은 사이트에서 제공하는 모노크롬 서버 선화 파비콘 |
+| `terminal_api.py`, `static/terminal.html`, `static/terminal.js`, `static/terminal.css` | 같은 출처 터미널 API·화면·세션 연결 |
+| `static/terminal-vendor/` | 고정 xterm.js·fit addon, 라이선스·출처·SHA |
 | `challenge.py`, `practice_mode.py` | 30초 일회용 HMAC challenge·600초 IP 바인딩 세션 |
 | `cve_list.json`, `manifest.py` | 정적 카탈로그·엄격한 검증 |
 | `broker.py`, `guard.py` | 고정 Docker 실행·소유권 검사·전용망 차단 |
 | `Log4Shell.Dockerfile` | 기존 로컬 이미지와 검증된 Java JAR를 새 로컬 이미지로 구성 |
 | `images/httpd/` | 공식 httpd 2.4.49·2.4.50 기반의 오프라인 빌드·정적 fixture |
 | `nonweb/sudo/` | 별도 rootless sudo 환경 준비·무해한 버전/격리 확인 |
+| `../nonweb-labs/` | Redis/Samba 고정 런타임·별도 이미지 번들·터미널 daemon |
 | `rule-source-candidates.json` | 공식 규칙 후보 27개, 조사 자료이며 자동 설치 입력이 아님 |
 | `requirements.lock`, `wheel-inventory.json` | Linux amd64·Python 3.12 의존성 버전·PyPI URL·SHA |
 | `scripts/prepare-python.sh` | 연결된 준비 PC에서 wheel 다운로드·해시 확인만 수행 |
@@ -102,9 +151,13 @@ WAF의 기존 전역 `DetectionOnly`·CRS·감사 설정은 유지하고, 전용
 | CVE-2021-44228 | `managed-http` | Log4j 2.14.1, loopback 18081, 웹 실행·중지 |
 | CVE-2021-41773 | `managed-http` | Apache httpd 2.4.49, loopback 18082, 웹 실행·중지 |
 | CVE-2021-42013 | `managed-http` | Apache httpd 2.4.50, loopback 18083, 웹 실행·중지 |
+| CVE-2022-0543 | `managed-terminal` | Redis Ubuntu 5:5.0.7-2, 고정 내부 서비스·웹 터미널 소스 구현, 운영 검증 별도 |
+| CVE-2017-7494 | `managed-terminal` | Samba 4.6.3, 고정 내부 서비스·웹 터미널 소스 구현, 운영 검증 별도 |
 | CVE-2021-3156 | `local-cli` | 별도 rootless sudo 환경, 웹 셸·실행·중지 없음 |
 
-다음은 기존 관리형 항목의 형식이다. `image_id`는 필수 고정 검증 필드다.
+`managed-terminal`은 HTTP 앱용 image/port/path 값을 받아 임의 실행하지 않는다. 고정2개 ID를 별도 검증 런타임에 연결하고 이미지는 root 관리 번들·설치 config에서만 읽는다. 기존 이미지 export 스크립트의 HTTP3개와 Redis/Samba의 전용2개 archive 번들은 분리한다. 소스 필드가 존재하거나 이미지가 준비됐다는 이유만으로 실행 중·공격 재현 완료로 표시하지 않는다.
+
+다음은 `managed-http` 항목의 형식이다. 이 유형의 `image_id`는 필수 고정 검증 필드다.
 
 ```json
 {
@@ -120,17 +173,17 @@ WAF의 기존 전역 `DetectionOnly`·CRS·감사 설정은 유지하고, 전용
 }
 ```
 
-최대 32개 항목을 지원하며 관리형 항목은 CVE당 TCP 포트 1개를 사용한다. `host_port`는 1024–65535, `container_port`는 1–65535이며 호스트 포트는 서로 달라야 한다. `path`는 컨테이너 앱의 경로이며 실행 명령으로 해석하지 않는다. 같은 출처 링크는 위 웹3항목의 고정 경로만 지원한다. CLI 항목에는 Docker 실행 필드를 받지 않는다. 유효한 입력이어도 18090 등 이미 사용 중인 호스트 포트는 Docker 시작 시 충돌 오류로 남는다.
+최대 32개 항목을 지원하며 `managed-http`는 CVE당 TCP 포트 1개를 사용한다. `host_port`는 1024–65535, `container_port`는 1–65535이며 호스트 포트는 서로 달라야 한다. `path`는 컨테이너 앱의 경로이며 실행 명령으로 해석하지 않는다. 같은 출처 링크는 HTTP3항목의 고정 실습 경로와 terminal2항목의 고정 터미널 경로를 지원한다. `local-cli`·`managed-terminal` 항목에는 HTTP용 Docker 이미지·포트·경로 필드를 받지 않는다. 유효한 입력이어도 18090 등 이미 사용 중인 호스트 포트는 Docker 시작 시 충돌 오류로 남는다.
 
 `local-cli`는 root 소유 `0600` 파일 `/var/lib/capstone-offline-labs/nonweb-status.json`의 고정 schema·소유권·유효기간(최대 600초)을 읽기만 한다. 파일이 없거나 잘못됐거나 만료되면 `needs_setup`으로 표시한다. `ready`도 `verification: environment_only`이며 `attack_tested`·`host_scenario_verified`는 항상 false다. 비권한 CLI는 이 root 파일을 작성하지 않는다.
 
 httpd 두 이미지는 정적 공개 fixture만 제공하고 CGI/CGID·ScriptAlias·ExecCGI를 사용하지 않는다. CGI 명령 실행 재현을 제공하거나 검증했다는 의미가 아니다. 관리 API의 `Origin: null` 거부·CORS 차단을 유지한다.
 
-추가할 이미지는 이 실행 계약(비root·읽기 전용·tmpfs만 쓰기)에 맞게 준비하고 정상 기동을 먼저 검증한다. DB·다중 포트·추가 볼륨·root 기동이 필요한 임의 공개 이미지를 JSON에만 넣으면 모두 실행되는 구조는 아니다. 계약을 확장할 때는 broker·회귀·격리를 함께 검토한다. CVE 번호와 실제 취약 버전/구성의 대응도 관리자가 확인해야 한다.
+추가할 HTTP 이미지는 해당 실행 계약(비root·읽기 전용·tmpfs만 쓰기)에 맞게 준비하고 정상 기동을 먼저 검증한다. DB·다중 포트·추가 볼륨·root 기동이 필요한 임의 공개 이미지를 JSON에만 넣으면 모두 실행되는 구조는 아니다. terminal 유형도 Redis/Samba의 고정2개만 연결한다. 계약을 확장할 때는 broker·회귀·격리를 함께 검토한다. CVE 번호와 실제 취약 버전/구성의 대응도 관리자가 확인해야 한다.
 
 새 CVE를 목록에 추가하는 것만으로 같은 HTTPS 주소의 웹 경로가 생기지는 않는다. A TLS 프록시·WAF·C Apache의 고정 경로, 쿠키/리다이렉트 처리, UI의 지원 링크를 별도로 준비하고 검증해야 한다. 준비되지 않은 CVE의 웹 접속 링크는 비활성화한다.
 
-기존 실행 중 항목의 이미지·포트를 임의 변경하면 receipt 대조에서 충돌로 거절된다. 해당 컨테이너를 멈추고 서버 백업·데이터 보존·명시적 교체를 검토한 후 새 계약으로 갱신한다. 웹에서는 삭제·초기화·업로드를 제공하지 않는다.
+기존 실행 중 HTTP 항목의 이미지·포트를 임의 변경하면 receipt 대조에서 충돌로 거절된다. 해당 컨테이너를 멈추고 서버 백업·데이터 보존·명시적 교체를 검토한 후 새 계약으로 갱신한다. 웹에서는 임의 컨테이너 삭제·초기화·이미지 업로드를 제공하지 않는다. Redis/Samba의 고정 **중지** 동작에 포함된 자기 컨테이너 제거는 앞의 유형별 계약을 따른다.
 
 ## 오프라인 준비와 최초 설치
 
@@ -146,7 +199,7 @@ bash scripts/export-images.sh cve_list.json /new/offline-images
 bash scripts/prepare-python.sh /new/offline-wheels
 ```
 
-현재 export는 `managed-http` **3개 이미지만** 저장하고 전체4항목 카탈로그를 함께 복사한다. sudo rootless 이미지·도구는 이 묶음에 포함되지 않으며 독립 DVWA도 이 설치 범위 밖이다. sudo는 [별도 준비 절차](nonweb/sudo/README.md)를 따른다.
+현재 export는 `managed-http` **3개 이미지만** 저장하고 전체6항목 카탈로그를 함께 복사한다. Redis/Samba의2개 이미지는 `LAB_NONWEB_BUNDLE`로 지정하는 [별도 번들](../nonweb-labs/README.md)에 담는다. sudo rootless 이미지·도구도 HTTP 묶음에 포함되지 않으며 [별도 준비 절차](nonweb/sudo/README.md)를 따른다. 독립 DVWA는 이 실습 이미지 export/import의 대상이 아니다.
 
 2. 승인된 매체로 소스·카탈로그·이미지 묶음·wheel을 옮긴다. `SHA256SUMS`도 별도로 신뢰할 수 있는 이관 기록과 대조한다. 파일 해시만으로 공급자의 신원을 증명하지 않는다.
 
@@ -157,7 +210,7 @@ sudo bash scripts/import-images.sh /approved/offline-images
 
 import는 이미지만 적재한다. 동봉 카탈로그를 운영 경로에 자동 설치하거나 앱을 시작하지 않는다. 신규 설치는 검토한 카탈로그를 아래 설치 소스에 두고, 기존 서버의 카탈로그 갱신은 `/etc/capstone-offline-labs/cve_list.json`을 root 통제로 교체한 뒤 두 서비스를 재시작하는 별도 절차다.
 
-3. 사용자 진입점은 루트 `deploy.sh` 하나다. 전체 초기 설정기는 준비·역할 검사를 거쳐 아래 내부 설치기를 호출한다. 별도 사전 점검이나 격리 검증이 필요하면 동일한 CLI를 사용할 수 있다. 이미 설치된 `/opt`·`/etc`·계정·unit·broker 상태·전용 네트워크가 있으면 거절하며, 운영 서버 갱신이나 자동 삭제용으로 사용하지 않는다.
+3. 사용자 진입점은 루트 `deploy.sh` 하나다. service schema8은6항목 카탈로그를 검증하고, 콘솔 설치·sudo 준비 다음에 `LAB_NONWEB_BUNDLE`의 고정 nonweb bootstrap을 호출한다. 터미널 자산과 관리 소스도 설치 지문에 포함한다. 아래 CLI는 그중 콘솔 내부 설치기만 실행하며 Redis/Samba 런타임 전체 설치를 대신하지 않는다. 별도 사전 점검이나 격리 검증이 필요하면 사용할 수 있다. 이미 설치된 `/opt`·`/etc`·계정·unit·broker 상태·전용 네트워크가 있으면 거절하며, 운영 서버 갱신이나 자동 삭제용으로 사용하지 않는다.
 
 ```sh
 # 첫 설치 사전 검사: 파일/계정/네트워크/컨테이너 생성, 다운로드 없음
@@ -174,11 +227,11 @@ sudo bash scripts/install.sh --apply \
 
 `--origin`을 생략하면 `http://127.0.0.1:18090`와 `http://localhost:18090`만 허용한다. 기존 운영 도메인을 기본값으로 복제하지 않는다. 공개 HTTPS origin은 경로·인증정보 없이 명시해야 하며, root가 설정한 HTTPS 호스트에만 Secure 모드 쿠키를 발급한다. 외부 입력의 `X-Forwarded-Proto`는 이 판단에 사용하지 않는다. 예전 `install.sh WHEEL_DIRECTORY` 호출은 loopback 전용 `--apply`로 호환한다.
 
-검사는 Ubuntu24.04/amd64·Python3.12·rootful Docker28 이상과 필요한 기존 도구, 소스 전체의 symlink, strict catalog, 모든 managed 이미지의 정확한 로컬 ID/플랫폼, 이미 점유된 포트와 Docker publish, 계정·unit·nft·전용 bridge 충돌을 확인한다. wheel은 고정 inventory의 크기/SHA와 ZIP 내부 경로·중복·파일 유형·CRC까지 쓰기 전에 검사한다. `--check`는 로컬 Unix Docker 소켓과 읽기 명령 및 nft 구문 dry run만 사용하며 이미지 적재, 앱 실행, OS 패키지 설치를 하지 않는다.
+검사는 Ubuntu24.04/amd64·Python3.12·rootful Docker28 이상과 필요한 기존 도구, 소스 전체의 symlink, strict catalog, HTTP3개 이미지의 정확한 로컬 ID/플랫폼, 이미 점유된 포트와 Docker publish, 계정·unit·nft·전용 bridge 충돌을 확인한다. wheel은 고정 inventory의 크기/SHA와 ZIP 내부 경로·중복·파일 유형·CRC까지 쓰기 전에 검사한다. `--check`는 로컬 Unix Docker 소켓과 읽기 명령 및 nft 구문 dry run만 사용하며 이미지 적재, 앱 실행, OS 패키지 설치를 하지 않는다.
 
 키는 **선택적인 WAF 차단 예외용이며 콘솔 로그인 조건이 아니다.** `--check`는 키 파일 없이도 가능하다. standalone `--apply`에서 키 파일을 생략하면 무작위 파일을 생성하고 경로만 안내한다. 공통 Wazuh 키를 사용할 경우 전체 초기 설정기가 root 비공개 파일로 전달하며, standalone 설치기는 Wazuh 비밀번호를 조회하거나 변경하지 않는다. 키 원문을 명령행·출력·로그에 넣지 않는다. 입력 파일은 root 소유의 쓰기 제한 경로 아래 `root:root 0600`, 설치 파일은 `root:capstone-labs 0640`이다.
 
-설치기는 `static/theme.js`·`theme.css`와 검증한 wheel 내용을 복사하고 전용 guard·broker·loopback FastAPI 서비스를 구성한다. 컨테이너 실습을 자동 실행하지 않는다. `/api/list`, broker `/api/status`, 격리 규칙과 서비스 활성 상태를 확인한 뒤 완료로 기록한다. `/var/lib/capstone-offline-labs/install-state.json`은 root0600이며 단계·완료 여부·설치 파일의 SHA/권한을 보존한다. 실패 시 `failed_partial`과 마지막 단계를 남기고 후속 변경을 중단한다. 생성된 계정·파일·네트워크를 임의 삭제하지 않으므로, 원인을 검토하고 해당 부분 설치를 처리한 뒤 다시 진행한다. 기존 설치의 반복 검증은 전체 초기 설정기의 관리 receipt·runtime 검사 경로를 사용한다.
+콘솔 설치기는 테마·파비콘·터미널 화면·로컬 vendor를 포함한 `static/` 전체와 검증한 wheel 내용을 복사하고 전용 guard·broker·loopback FastAPI 서비스를 구성한다. 컨테이너 실습을 자동 실행하지 않는다. `/api/list`, broker `/api/status`, 격리 규칙과 서비스 활성 상태를 확인한 뒤 완료로 기록한다. `/var/lib/capstone-offline-labs/install-state.json`은 root0600이며 단계·완료 여부·설치 파일의 SHA/권한을 보존한다. 실패 시 `failed_partial`과 마지막 단계를 남기고 후속 변경을 중단한다. 생성된 계정·파일·네트워크를 임의 삭제하지 않으므로, 원인을 검토하고 해당 부분 설치를 처리한 뒤 다시 진행한다. 기존 설치의 반복 검증은 전체 초기 설정기의 관리 receipt·runtime 검사 경로를 사용한다.
 
 ```sh
 # loopback 관리 UI/API만 점검하는 기존 SSH 터널 예시
@@ -186,7 +239,7 @@ ssh -N -L 18090:127.0.0.1:18090 groot-c-int
 # 로컬 브라우저: http://127.0.0.1:18090/
 ```
 
-이 내부 설치기는 A/C 공개 프록시·TLS/WAF 구성과 이미지 반입을 대신하지 않는다. 전체 초기 설정기가 해당 역할을 별도로 담당한다. 신규 환경의 주소·인증서·SSH 별칭은 설정 파일에서 검토하며, 제공 standalone 프록시 예시는 현재 A/C 주소에 대한 자료다. 기존 C에는 이미 콘솔이 설치되어 있으므로 이 최초 설치기를 다시 실행하지 않는다.
+이 콘솔 내부 설치기는 A/C 공개 프록시·TLS/WAF 구성, Redis/Samba 런타임·전용 daemon·이미지 반입을 대신하지 않는다. 전체 초기 설정기가 해당 역할을 별도로 담당한다. 신규 환경의 주소·인증서·SSH 별칭은 설정 파일에서 검토하며, 제공 standalone 프록시 예시는 현재 A/C 주소에 대한 자료다. 기존 C에는 이미 콘솔이 설치되어 있으므로 이 최초 설치기를 다시 실행하지 않는다.
 
 sudo `local-cli`는 기본적으로 `needs_setup`이다. rootless 도구·이미지·계정·상태 발행기는 [독립 설치 경로](nonweb/sudo/README.md)에서 준비하며, 이 설치기는 `nonweb/`를 복사하거나 과거 설치 기록 스크립트를 실행하지 않는다. DVWA는 원래 독립 서비스로 유지하며 이 콘솔 범위에 포함하지 않는다. 전체 초기 설정의 구현·fixture 검증과 실제 새3VM 전체 설치 검증은 구분한다.
 
@@ -198,12 +251,19 @@ sudo `local-cli`는 기본적으로 `needs_setup`이다. rootless 도구·이미
 |---|---|
 | `GET /api/list` | 매니페스트 JSON 배열 그대로, 무키 |
 | `GET /api/status` | `labs` 배열, `deployment_allowed`, `safety_error`, 확인 시각, 무키 |
-| `POST /api/deploy` | `{"cve_id":"CVE-2021-44228"}` → 고정 이미지 실행 또는 이미 실행 중인 동일 컨테이너, 무키 |
-| `POST /api/stop` | 같은 입력 → 해당 관리 컨테이너 중지, 삭제 없음, 무키 |
+| `POST /api/deploy` | 등록된 HTTP/terminal 항목의 `cve_id` → 고정 환경 시작 또는 이미 실행 중인 동일 컨테이너, 무키 |
+| `POST /api/stop` | 같은 입력 → HTTP3개는 정지·보존, terminal2개는 해당 실습의 세션 정리·컨테이너 제거, 무키 |
 | `GET /api/challenge` | `challenge_id`(32hex), ASCII `message`, `expires_at`, `algorithm: HMAC-SHA-256`, `key_derivation: SHA-256`; 30초·1회용 |
 | `POST /api/session` | `{"challenge_id":"…","proof":"…"}`만 허용 → `mode: exempt`, `expires_at` 및 600초 HttpOnly 세션 쿠키 |
 | `GET /api/session` | 쿠키 상태 `{mode: enforce 또는 exempt, expires_at: epoch 또는 null}`, 무키 |
 | `DELETE /api/session` | 빈 JSON 객체 `{}` → 쿠키 해제, `{mode: enforce, expires_at: null}` |
+| `POST /api/terminal/open` | 고정 terminal 항목의 `cve_id`·`rows`·`cols` → 메모리에만 보관하는 세션 ID |
+| `POST /api/terminal/poll` | 세션 ID·`cursor` → 최대10초 대기 후 base64 출력·다음 cursor·종료 상태 |
+| `POST /api/terminal/input` | 세션 ID·base64 입력, 요청당 원본 최대2048바이트 |
+| `POST /api/terminal/resize` | 세션 ID·`rows`(2–100)·`cols`(20–300) |
+| `POST /api/terminal/close` | 세션 ID → 해당 연결 종료, 실습 컨테이너는 유지 |
+
+터미널 API는 등록된 같은 출처 `Origin`을 요구하고 세션을 Host·클라이언트 IP에 결속한다. 세션 ID는 JSON 본문으로만 전달하며 URL·브라우저 저장소에 남기지 않는다. 출력은 HTML로 삽입하지 않고 터미널 바이트로 처리한다. 출력으로 인한 클립보드 변경과 자동 링크 기능은 비활성화한다. 별도의 호스트 셸·임의 이미지·Docker 옵션을 받는 API는 없다.
 
 내부 `/api/gateway-session`은 A 프록시의 세션 확인용이며 공개 경로에서는 404로 막는다. `X-Lab-Gateway: 1`과 프록시가 고정한 정확한 등록 항목 `X-Lab-ID`를 요구한다. 공개 프록시는 웹3항목만 연결한다. Java 앱의 CSRF 토큰·쿠키 검증은 그대로 유지한다.
 
@@ -237,7 +297,7 @@ WAF 추가 파일은 기존 컨테이너의 **writable layer**에 설치한다. 
 
 ## 검증 범위
 
-**2026-10-23 범위 정정:** 현재 소스의 카탈로그는4항목·웹3경로이며 DVWA는 원래 독립 서비스로 유지한다. 정정 후 C native 회귀64개·최종 HTTP35개를 통과했다. 카탈로그4개·기존 DVWA 독립 주소200/테마 미주입, 제거한 DVWA3경로404·실행/중지unknown_cve409, 기본 HMAC 정상·DVWA 전용 쿠키 미발급, Apache 두 버전의 무해 canary403→200→403·sudo ready를 확인했다. 최신 자산의 서버 SHA와 새로고침한 Safari에서의 표시·양방향 전환도 대조했다. 아래5항목·DVWA 통합 검증과 기존 JSON은 당시 이력으로 보존하며, 현재 구성의 검증 완료 주장으로 사용하지 않는다.
+**2026-10-23 확장 전 범위 정정 기록:** 당시 카탈로그는4항목·웹3경로였으며 DVWA는 원래 독립 서비스로 유지한다. 정정 후 C native 회귀64개·최종 HTTP35개를 통과했다. 카탈로그4개·기존 DVWA 독립 주소200/테마 미주입, 제거한 DVWA3경로404·실행/중지unknown_cve409, 기본 HMAC 정상·DVWA 전용 쿠키 미발급, Apache 두 버전의 무해 canary403→200→403·sudo ready를 확인했다. 최신 자산의 서버 SHA와 새로고침한 Safari에서의 표시·양방향 전환도 대조했다. 아래5항목·DVWA 통합 검증과 기존 JSON은 당시 이력으로 보존하며, 현재 구성의 검증 완료 주장으로 사용하지 않는다.
 
 **다중 실습 후속 당시 이력 (2026-10-22):** 5항목 카탈로그·유형 경계의 backend 회귀 **64개**, 공개 HTTPS **31개**와 DVWA 예외 경계 **15개** 검사를 통과했다. 이는 API·고정 라우팅·무해한 정상/정책 요청 검증이며 실제 취약점 공격·탐지·차단 E2E 결과가 아니다. DVWA는 HTTP 세션과 Safari에서 기본 실습 계정 로그인·Welcome·Security 페이지를 확인했고 보안 수준 `impossible`을 변경하지 않았다. DVWA sandbox의 전용 예외 cookie만으로 WAF 통과, 다른 실습·관리 API에서 무효, 양 cookie 해제 후 차단 복원을 HTTPS로 검증했다. 새 실습의 합성 검사9건은 WAF→Wazuh alerts→Indexer까지 같은 transaction으로 대조했다. sudo의 10/23 후속 환경 검증은 native26회귀·7단계 무해 실행으로 완료했다. 정식 publisher의 ready→중지 시 needs_setup→새 컨테이너 실행 시 ready도 실제3단계 확인했고, enabled/active인 60초 timer가 root:root0600·TTL300초 상태 파일을 갱신한다. 실제 권한 상승·호스트 탐지 E2E는 미실행이다.
 

@@ -15,16 +15,21 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 3. 승인된 로컬 `.deb`를 `apt-get --no-download --no-remove`로 설치하고 Docker save archive를 `docker load`한다. 지정하지 않은 추가 패키지, 다운그레이드, 기존 이미지 태그 충돌을 거절한다. SIEM의 `vm.max_map_count`가 부족한 경우 전용 설정 파일로 최소262144를 적용한다.
 4. 준비된 상태에서 security·siem·service 역할을 모두 사전검사한다. 역할 충돌, 포트 충돌, 자료 누락이 있으면 서비스 설치 전에 중단한다. 이 단계의 실패 시 앞 단계에서 설치한 패키지는 유지한다.
 5. SIEM을 설치·검증하고 등록 CA·암호를 두 agent 서버로 전달한다. Wazuh Dashboard의 `admin` 암호(`siem.json`의 `indexer_password`)는 SSH 파이프로 service의 root0600 파일에 직접 전달한다. Mac 파일·명령 인수·로그에는 저장하지 않는다.
-6. service에 독립 DVWA/MariaDB, FastAPI 콘솔·제한된 Docker broker·nft guard, 전용 Nginx gateway, 별도 sudo rootless 환경, Wazuh agent를 구성한다.
+6. service에 독립 DVWA/MariaDB, FastAPI 콘솔·제한된 Docker broker·nft guard, 전용 Nginx gateway, 별도 sudo rootless 환경과 Redis·Samba·sudo 웹 터미널 서비스, Wazuh agent를 구성한다. 콘솔 계정 생성과 sudo 준비 다음에 별도 nonweb bundle을 검증·반입한다.
 7. security에 Suricata·기존 DVWA WAF와 별도 Log4Shell TLS 진입점을 구성한다. 관리·예외 키 인증은 콘솔에 직접 연결하고, 고정된3개 실습 경로만 WAF를 지난다. 일반 요청은 규칙에 걸릴 때 차단하며 유효한 예외 세션은 감사 로그를 유지한다.
 8. SIEM이 생성한 Mattermost 관리자 ID를 승인자로 고정하고 승인 브로커·정확 후보 worker·규칙 MCP·제한된 응답 MCP·Native AR 사건 전달을 구성한다. 전용 토큰은 B→A SSH 파이프로 전달하며, 승인자 암호를 MCP에 배포하지 않는다. 관리용 SSH는 고정 명령과 검증된 host key만 사용한다.
 9. Vector0.59.0 정제·원본 세대 회전·출력 유지관리·이전 부트 로컬 보관을 구성하고, 실제 등록 agent ID에 결속한 Indexer 상관관측 모니터를 추가한다. 관측 모니터의 `actions`는 비어 있으며 자체 차단을 실행하지 않는다.
 10. 통합 SOC 대시보드의 14개 패널을 구성한다. 기존 saved object와 내용이 충돌하면 덮어쓰지 않고 중단한다. 없는 객체만 생성하고 전체 내용을 재조회한다. 그 뒤 Hermes 관리 경로를 활성화한다.
-11. 기본 역할과 SOC 확장의 파일·이미지·컨테이너·서비스·승인 경계를 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제를 하지 않는다. 대시보드의 아직 완료되지 않은 동일 내용 생성만 제한적으로 재개할 수 있고, 다른 확장 부분 설치는 검토 없이 재시도하지 않는다.
+11. 세 호스트에 고정 읽기 진단 수집기를 설치한다. root 수집기가60초마다 systemd 상태와 분류한 오류 메타데이터만 게시하고, B의 비권한 MCP는 로컬 snapshot 또는 A/C의 강제 snapshot reader를 읽는다. 새 전용 키의 공개키만 A/C로 전달하고, 기존 관리자·대응용 키는 재사용하지 않는다. SSH host key는 기존에 검증한 배포 SSH 경로로 받아 별도 known_hosts에 고정한다.
+12. 기본 역할과 SOC 확장의 파일·이미지·컨테이너·서비스·승인 경계 및 세 호스트 진단 snapshot·MCP 호출을 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제를 하지 않는다. 대시보드의 아직 완료되지 않은 동일 내용 생성만 제한적으로 재개할 수 있고, 다른 확장 부분 설치는 검토 없이 재시도하지 않는다.
 
-웹 실습3개는 로컬 이미지가 준비된 상태로 등록하고 사용자가 콘솔에서 실행한다. sudo는 웹에서 실행할 수 없으며 관리자 전용 CLI와 상태 발행기를 사용한다. DVWA는 `http://SECURITY_HOST:WAF_PORT/dvwa/`, 콘솔·Java·Apache 두 버전은 `LAB_PUBLIC_ORIGIN/log4shell/` 아래다. DVWA를 Log4Shell 메뉴에 다시 추가하지 않는다.
+카탈로그는 웹 실습3개와 Redis·Samba·sudo 터미널3개로 총6개다. 준비된 로컬 이미지만 사용하며 사용자가 콘솔에서 시작한 뒤 웹 화면 또는 같은 사이트의 터미널을 연다. 웹3개와 Redis/Samba는 초기 설치 중 시작하지 않는다. sudo 초기 bootstrap은 패키지·격리 검증을 위해 한 번 기동하며, 이후 중지 상태도 정상 설치로 검증한다. 터미널은 고정된 해당 실습 컨테이너에만 연결하며 호스트 셸·임의 Docker API·LLM 권한을 추가하지 않는다. sudo는 별도 UID1991 rootless 런타임을 유지하고 중앙 터미널의 고정 어댑터로만 연결한다. sudo 터미널은 전체 사용자 중 한 연결만 허용하며 연결 종료·입력 유휴/수명 만료 때 해당 sudo 컨테이너 전체를 중지한다. Redis/Samba 세션과 다른 실습은 중지하지 않는다. DVWA는 `http://SECURITY_HOST:WAF_PORT/dvwa/`, 콘솔·실습 페이지는 `LAB_PUBLIC_ORIGIN/log4shell/` 아래다. DVWA를 Log4Shell 메뉴에 다시 추가하지 않는다.
 
 `--plan`은 로컬 입력만 확인한다. `--check`는 반입물과 역할 조건을 검사하되 패키지·이미지·서비스를 설치하지 않으므로, 아직 패키지가 없는 빈 서버에서는 누락을 보고할 수 있다. `--verify`는 이미 관리 중인 동일 구성의 검증만 수행한다. 기존 운영 GROOT 서버를 신규 설치 대상으로 인수하지 않는다.
+
+읽기 진단은 `get_system_diagnostics` 하나만 추가한다. 대상은 소스에 고정한 A/B/C 서비스 ID이며 경로·호스트·unit명·명령을 호출자가 지정할 수 없다. 수집한 snapshot은 `/var/lib/capstone-diagnostics/snapshot.json`의 root 소유0640 파일이고 TTL은180초다. 오류 조회의 최대4시간은 상한이 있는 수집 표본이며, 원본 journal 본문·환경변수·명령행·비밀값은 MCP 응답에 넣지 않는다. 누락되거나 중지된 unit도 관찰 결과로 표시하고, 자료 만료나 검증 실패를 정상으로 간주하지 않는다. 신규 설치는 전용 계정·unit·키·receipt를 자동 구성한다. 기존 운영 서버의 이 진단 확장만 추가하는 작업은 별도 원본 SHA 확인·복구 백업·변경 검증 경로를 사용하며 전체 초기 설치기를 다시 실행하지 않는다.
+
+A/C의 진단 SSH 계정은 공개키 인증과 고정 `read-snapshot` 실행만 허용한다. wrapper는 원격 명령·추가 인수를 거절하고 빈 환경으로 reader를 실행한다. 설치기는 `sshd -t`와 계정별 effective 정책을 확인하며, 전역 `PermitUserEnvironment no`·`UsePAM yes`가 충족되지 않으면 SSH를 reload하지 않고 중단한다. 전역 전용 지시문을 `Match` 안에 넣거나 기존 전역 인증 정책을 자동 변경하지 않는다.
 
 ## 폐쇄망 반입물
 
@@ -67,12 +72,14 @@ sha256sum java-lab.tar
 |---|---|
 | 공통 | Ubuntu24.04 amd64·systemd·Python3.12·SSH/sudo 및 검증된 host keys. Docker Engine/CLI/Compose·관리 명령은 로컬 deb로 설치 가능 |
 | SIEM | 기존 [SIEM 준비 목록](setup-packages-artifacts.md)의 Wazuh 원본 tree, `siem.json`, Python bcrypt, Wazuh/Mattermost/PostgreSQL/Hermes 이미지와 관련 소스 |
-| service | Wazuh agent4.14.8, Docker29.8.1/CLI, uidmap·libsubid4·dbus-user-session·AppArmor·nftables·gpgv; DVWA/MariaDB/WAF 이미지; 아래4항목 카탈로그와3개 관리형 이미지; 전체 lock wheel 디렉터리; 고정 sudo bundle |
+| service | Wazuh agent4.14.8, Docker29.8.1/CLI, uidmap·libsubid4·dbus-user-session·AppArmor·nftables·gpgv; DVWA/MariaDB/WAF 이미지; 아래6항목 카탈로그와3개 관리형 웹이미지; 전체 lock wheel 디렉터리; 고정 sudo bundle 및 Redis·Samba nonweb bundle |
 | security | Wazuh agent4.14.8, Vector0.59.0 로컬 deb와 전이 의존성, Suricata8.0.6/WAF 이미지, jq·logrotate·util-linux·nftables, 검증한 ET Open 룰, 지정 DNS 이름의 TLS 인증서·개인키, 접속 허용 내부망/VPN CIDR |
 
 콘솔 wheel은 [prepare-python.sh](../infra/groot-c/offline-labs/scripts/prepare-python.sh)의 Ubuntu/Python3.12 amd64용 전체 목록과 해시를 사용한다. 카탈로그는 [cve_list.json](../infra/groot-c/offline-labs/cve_list.json), 웹이미지 반출입은 [offline-labs README](../infra/groot-c/offline-labs/README.md)를 따른다. sudo는 [고정 rootless bootstrap](../infra/groot-c/offline-labs/nonweb/sudo/runtime/BOOTSTRAP.md)의 별도 서명 증빙까지 필요하다. sudo의 준비 JSON만 보고 서명 검증을 생략하지 않는다.
 
-`LOG4SHELL_IMAGE`, `LOG4SHELL_APP_JAR`, `LOG4SHELL_HOSTNAME`의 구형 직접 Java Compose 옵션은 schema7에서 거절한다. 현재 콘솔은 검증·반입된 이미지 ID로 실행한다. 기존 JAR 빌드 도구는 이미지 준비 용도로 보존한다. 구형 schema6을 새로운 구성으로 조용히 덮어쓰지 않는다.
+Redis·Samba 자료는 `LAB_NONWEB_BUNDLE`(기본 `/opt/capstone-prereqs/nonweb`)에 둔다. [nonweb 준비 안내](../infra/groot-c/nonweb-labs/README.md)의 `manifest.json`, `provenance.json`, `redis-image.tar`, `samba-image.tar` 정확4개와 이미지·archive 해시를 검증한다. 이 자료는 웹이미지 반출입 목록과 분리하며, 신규 `--check`는 계정·컨테이너·서비스를 생성하지 않는다. `--apply`는 `/opt/capstone-nonweb-labs` 관리 소스와 고정 root Unix socket 서비스를 구성하고 두 실습 컨테이너는 시작하지 않는다. 완료된 동일 구성의 재실행은 검증만 하고, 부분 설치·출처 충돌은 임의 인수하지 않는다.
+
+service schema는 **9**다. `LOG4SHELL_IMAGE`, `LOG4SHELL_APP_JAR`, `LOG4SHELL_HOSTNAME`의 구형 직접 Java Compose 옵션을 거절한다. 현재 콘솔은 검증·반입된 이미지 ID로 실행한다. 기존 JAR 빌드 도구는 이미지 준비 용도로 보존한다. 구형 schema6·7·8 설치는 명시적인 별도 이관이 필요하며 새 설치기로 덮어쓰지 않는다. source profile과 완료 receipt는 `terminal_api.py`, 재귀적인 static 파일·로컬 xterm 자산·favicon, sudo 및 nonweb 관리 코드를 함께 검증한다.
 
 ## 검증과 운영 변경 원칙
 

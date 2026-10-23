@@ -102,7 +102,7 @@
     }
     select.value = state.selected;
     text("catalog-help", state.catalogLoaded && state.labs.length
-      ? "서버에 등록된 " + state.labs.length + "개 실습 중 하나를 선택하세요. 웹·기존 서비스·CLI 실습을 구분합니다."
+      ? "서버에 등록된 " + state.labs.length + "개 실습 중 하나를 선택하세요. 웹·터미널·CLI 실습을 구분합니다."
       : state.catalogLoaded ? "현재 등록된 실습이 없습니다. 나중에 새로고침해 주세요." : "등록된 실습 목록을 불러오고 있습니다.");
   }
 
@@ -114,12 +114,15 @@
     const running = status === "running";
     const imagePresent = known && live.image_present === true;
     const type = lab?.type || "managed-http";
-    const managed = type === "managed-http";
+    const terminal = type === "managed-terminal";
+    const sudoTerminal = terminal && lab.cve_id === "CVE-2021-3156";
+    const managed = type === "managed-http" || terminal;
     const external = type === "existing-http";
     const cli = type === "local-cli";
     const available = known && !!lab && !state.busy && !state.sessionBusy && !state.refreshing;
     const manageable = available && managed;
-    const deployable = manageable && imagePresent && state.deploymentAllowed && !state.safetyError;
+    const deploymentAllowed = terminal ? live?.deployment_allowed === true : state.deploymentAllowed && !state.safetyError;
+    const deployable = manageable && imagePresent && deploymentAllowed;
     const color = running ? "running" : ["error", "dead", "conflict"].includes(status) ? "error" : runnableStates.has(status) ? "stopped" : "unknown";
     text("lab-cve", lab ? lab.cve_id : state.catalogLoaded ? "LAB CATALOG" : "CVE-2021-44228");
     text("lab-name", lab ? display(lab.software, lab.cve_id) : state.catalogLoaded ? "등록된 실습 없음" : "Log4Shell");
@@ -129,23 +132,23 @@
     text("lab-state-label", statusLabels[status] || "상태 확인 필요");
     $("lab-state").className = "state-badge state-" + color;
     text("lab-image-state", external ? "기존 Apache/PHP 서비스" : cli ? "독립 CLI 환경에서 관리" : known ? imagePresent ? "로컬 이미지 준비됨" : "로컬 이미지 없음" : "확인 전");
-    text("lab-container-port", lab && validPort(lab.container_port) ? lab.container_port + "/TCP" : "—");
+    text("lab-container-port", terminal ? "호스트 포트 공개 없음" : lab && validPort(lab.container_port) ? lab.container_port + "/TCP" : "—");
     text("lab-container-id", known ? shortId(live.container_id) : "—");
     $("lab-container-id").title = known ? display(live.container_id, "") : "";
     text("image-tag", lab ? display(lab.image_tag) : "확인 중");
     text("image-id", lab ? shortId(lab.image_id) : "—");
     $("image-id").title = lab ? display(lab.image_id, "") : "";
-    text("server-address", lab && validPort(lab.host_port) ? "127.0.0.1:" + Number(lab.host_port) : "127.0.0.1:—");
+    text("server-address", terminal ? "전용 터미널 연결" : lab && validPort(lab.host_port) ? "127.0.0.1:" + Number(lab.host_port) : "127.0.0.1:—");
     $("deploy-button").disabled = !deployable || !runnableStates.has(status);
     $("stop-button").disabled = !manageable || !running;
-    $("safety-notice").hidden = !state.statusFresh || state.deploymentAllowed && !state.safetyError;
-    text("deploy-label", state.action === "deploy" ? "실행 요청 중…" : "실습 실행");
+    $("safety-notice").hidden = !state.statusFresh || !managed || deploymentAllowed;
+    text("deploy-label", state.action === "deploy" ? "실행 요청 중…" : terminal ? "실습 환경 시작" : "실습 실행");
     text("stop-label", state.action === "stop" ? "중지 중…" : "중지");
 
     let help = "최신 상태를 확인한 뒤 키 없이 실습을 실행할 수 있습니다.";
     if (state.action) help = "요청을 처리하고 있습니다. 완료 후 서버 상태를 다시 확인합니다.";
     else if (known) {
-      if (!state.deploymentAllowed || state.safetyError) help = running ? "격리 설정 확인이 필요합니다. 실행 중인 이 실습은 중지할 수 있습니다." : "격리 설정 확인 전에는 실습을 실행할 수 없습니다. 운영자가 설정을 확인해야 합니다.";
+      if (!deploymentAllowed) help = running ? "격리 설정 확인이 필요합니다. 실행 중인 이 실습은 중지할 수 있습니다." : "격리 설정 확인 전에는 실습을 실행할 수 없습니다. 운영자가 설정을 확인해야 합니다.";
       else if (!imagePresent) help = running ? "로컬 이미지가 확인되지 않습니다. 실행 중인 이 실습은 중지할 수 있습니다." : "서버에 로컬 이미지가 없습니다. 운영자가 이미지를 준비한 뒤 새로고침하세요.";
       else if (running) help = "실습이 실행 중입니다. 사용을 마치면 중지해 주세요.";
       else if (runnableStates.has(status)) help = "키 없이 준비된 로컬 이미지로 이 실습 환경을 실행할 수 있습니다.";
@@ -154,22 +157,37 @@
     text("action-help", help);
     if (external) text("action-help", "기존 DVWA에 연결합니다. 이 콘솔에서는 기존 서비스를 실행·중지하지 않습니다. 로그인 후 Security에서 실습 수준을 선택하세요.");
     if (cli) text("action-help", "sudo 권한 상승은 별도 격리 CLI 환경에서 실습합니다. 웹에서 명령을 실행하거나 호스트 sudo를 변경하지 않습니다.");
+    if (terminal && running && deploymentAllowed) text("action-help", "환경 열기로 이 실습의 격리 터미널에 접속하세요. 사용을 마치면 환경을 중지해 주세요.");
+    if (sudoTerminal && running && deploymentAllowed) text("action-help", "sudo 터미널은 한 번에 하나만 연결할 수 있습니다. 연결 종료나 시간 만료 시 실습 환경도 중지됩니다.");
 
     const webIds = new Set(["CVE-2021-44228", "CVE-2021-41773", "CVE-2021-42013", "LAB-DVWA"]);
-    const supported = !!lab && webIds.has(lab.cve_id) && !cli;
-    state.url = supported ? new URL("/log4shell/labs/" + lab.cve_id + "/", window.location.href).href : "";
+    const terminalIds = new Set(["CVE-2022-0543", "CVE-2017-7494", "CVE-2021-3156"]);
+    const supported = !!lab && (terminal ? terminalIds.has(lab.cve_id) : webIds.has(lab.cve_id) && !cli);
+    state.url = supported ? new URL("/log4shell/" + (terminal ? "terminal/" : "labs/") + lab.cve_id + "/", window.location.href).href : "";
     text("local-url", state.url || (cli ? "CLI 전용 · 공개 웹 포트 없음" : lab ? "이 실습의 웹 접속 경로는 아직 준비되지 않았습니다." : "실습을 선택하면 접속 주소가 표시됩니다."));
     $("copy-url").disabled = !state.url;
     const link = $("open-lab");
-    const openable = available && (running || external) && supported;
+    const openable = available && (running || external) && supported && (!terminal || deploymentAllowed);
     link.setAttribute("aria-disabled", String(!openable));
     link.tabIndex = openable ? 0 : -1;
     if (openable) link.href = state.url;
     else link.removeAttribute("href");
-    text("access-help", cli ? (status === "ready" ? "격리 환경 준비만 확인됐습니다. 권한 상승과 호스트 탐지의 실제 검증은 별도입니다." : "독립 실행 환경 준비가 필요합니다. 카탈로그 등록은 취약점 재현 완료를 뜻하지 않습니다.")
+    text("open-label", terminal ? "환경 열기" : "실습 열기");
+    text("access-kind", terminal ? "WEB TERMINAL" : cli ? "LOCAL CLI" : "WEB ACCESS");
+    text("access-intro", terminal ? "실습 환경을 시작한 뒤 같은 사이트에서 터미널을 엽니다. 선택한 컨테이너에만 연결되며 호스트 명령은 실행하지 않습니다."
+      : cli ? "별도 격리 CLI 환경의 준비 상태를 확인합니다. 이 화면에서는 명령을 실행하지 않습니다."
+        : "실습 실행 후 아래 주소로 바로 접속합니다. 일반 실습은 정상 요청을 허용하고 WAF 탐지 시 차단합니다.");
+    $("policy-block").hidden = terminal || cli;
+    text("access-step", terminal ? "격리 터미널 열기" : cli ? "CLI 실습 안내" : "브라우저에서 실습 열기");
+    text("access-help", terminal ? (openable ? "터미널은 실습용 비root 사용자로 연결됩니다. 환경 준비 확인은 취약점 재현이나 방어 탐지 검증 완료를 뜻하지 않습니다."
+        : "환경이 실행 중이고 격리 설정이 확인되면 터미널 연결이 활성화됩니다.")
+      : cli ? (status === "ready" ? "격리 환경 준비만 확인됐습니다. 권한 상승과 호스트 탐지의 실제 검증은 별도입니다." : "독립 실행 환경 준비가 필요합니다. 카탈로그 등록은 취약점 재현 완료를 뜻하지 않습니다.")
       : lab && !supported ? "이 실습의 브라우저 접속 경로는 준비되지 않았습니다."
       : openable ? "같은 사이트의 실습 화면을 새 탭에서 엽니다. 검사 정책은 같은 브라우저에서 공유됩니다."
         : "실습을 실행하면 이 사이트의 접속 링크가 활성화됩니다.");
+    if (sudoTerminal) text("access-help", openable
+      ? "비root 사용자로 연결합니다. 입력 없이 5분이 지나거나 연결 후 30분이 되면 연결과 환경이 종료됩니다. 다시 사용하려면 콘솔에서 환경을 시작하세요."
+      : "sudo는 연결 종료 시 환경도 중지됩니다. 콘솔에서 환경을 시작한 뒤 터미널 하나를 열어주세요.");
   }
 
   function render() { renderPolicy(); renderMetrics(); renderDetail(); }
@@ -188,7 +206,8 @@
       const controller = new AbortController();
       state.controllers.add(controller);
       let timedOut = false;
-      const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, method === "GET" ? 10000 : 75000);
+      const deadline = path === "deploy" ? 250000 : path === "status" || path === "stop" ? 140000 : method === "GET" ? 10000 : 75000;
+      const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, deadline);
       try {
         const headers = { Accept: "application/json", ...(body !== undefined ? { "Content-Type": "application/json" } : {}) };
         let requestBody = body === undefined ? undefined : JSON.stringify(body);
@@ -234,7 +253,8 @@
 
   function acceptCatalog(labs) {
     if (!Array.isArray(labs) || labs.length > 32 || labs.some((lab) => !lab || typeof lab.cve_id !== "string" || !/^(?:CVE-\d{4}-\d{4,19}|LAB-DVWA)$/.test(lab.cve_id)
-      || !["managed-http", "existing-http", "local-cli"].includes(lab.type || "managed-http")
+      || !["managed-http", "managed-terminal", "existing-http", "local-cli"].includes(lab.type || "managed-http")
+      || (lab.type === "managed-terminal" && !["CVE-2022-0543", "CVE-2017-7494", "CVE-2021-3156"].includes(lab.cve_id))
       || (lab.cve_id === "LAB-DVWA") !== (lab.type === "existing-http")) || new Set(labs.map((lab) => lab.cve_id)).size !== labs.length) {
       throw new ApiError("실습 목록 응답 형식이 올바르지 않습니다.");
     }

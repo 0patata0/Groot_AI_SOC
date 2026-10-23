@@ -1,0 +1,192 @@
+{
+  "attack_tested": false,
+  "build": {
+    "attack_tested": false,
+    "finished_at": 1792741050,
+    "image_build_complete": true,
+    "images": {
+      "redis": {
+        "base_image_id": "sha256:093e0a974e3df485f4be288254a5cad2f4d3364662b85e0d4364de476b11e57e",
+        "dockerfile": "FROM sha256:093e0a974e3df485f4be288254a5cad2f4d3364662b85e0d4364de476b11e57e\nCOPY terminal-lib.sh terminal-session.sh terminal-close.sh /lab/\nUSER 0:0\nRUN chmod 0555 /lab/terminal-lib.sh /lab/terminal-session.sh /lab/terminal-close.sh\nUSER 65534:65534\n",
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7"
+      },
+      "samba": {
+        "base_image_id": "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+        "dockerfile": "FROM sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5\nCOPY terminal-lib.sh terminal-session.sh terminal-close.sh /lab/\nUSER 0:0\nRUN chmod 0555 /lab/terminal-lib.sh /lab/terminal-session.sh /lab/terminal-close.sh\nUSER 0:0\n",
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d"
+      }
+    },
+    "prior_bundle_manifest_sha256": "933b52263bc9c7ae2d751357822bdb1c93f586801f2ea91d3898c87b5d85413f",
+    "schema": 1,
+    "source_sha256": {
+      "terminal-close.sh": "d94ab0eeb844afc4743ef36e19caed82052379f0e2ffb02b78f61b01c01c8469",
+      "terminal-lib.sh": "c1f9c60524dd16f94c0e4b84c5f87b74bb74dc34ad6667bd660e307f9e10945e",
+      "terminal-session.sh": "a9ee356938b38099cbbd84a32c420ba5b1d7c1ed908ce17f9ed37f22e65b6188"
+    },
+    "started_at": 1792741046
+  },
+  "bundle_manifest": {
+    "images": {
+      "redis": {
+        "archive": "redis-image.tar",
+        "archive_sha256": "96cf33d0cd9161e4bf162eb1ea5fdfa28c01ea99fe1d68da22f83357fdeafbe3",
+        "archive_size": 50641408,
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "software": "Redis",
+        "start_sha256": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+        "verifier_sha256": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+        "version": "5.0.7"
+      },
+      "samba": {
+        "archive": "samba-image.tar",
+        "archive_sha256": "06428e8ef5a869edf8f40db9c2d30b7ae6dbff8f41b4391671c5f0507ccdf4da",
+        "archive_size": 186617856,
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "software": "Samba",
+        "start_sha256": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1",
+        "verifier_sha256": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+        "version": "4.6.3"
+      }
+    },
+    "profile": "capstone-nonweb-v1",
+    "provenance_sha256": "fb30daff3808bb58a1b6ef524ebb3fee39a9094f8b523f3d6f4cb5f91879fb00",
+    "schema": 1
+  },
+  "cleanup": {
+    "backup_directory": "/var/backups/capstone-terminal-tty-20261023",
+    "bulk_prune_used": false,
+    "checked_at": 1792741613,
+    "force_removal_used": false,
+    "mac_cleanup": {
+      "packages_installed": false,
+      "path": "/private/tmp/capstone-terminal-tty-fix-20261023-kgQPZuK9",
+      "removed": true
+    },
+    "manifest_sha256": "0c19ad32fa69088b91a35d1e96a0a205f2c3fcd4ce38a546c56ece30c2124c37",
+    "native_test_containers_remaining": 0,
+    "operational_bundle": "/opt/capstone-prereqs/nonweb",
+    "packages_installed": false,
+    "preserved_image_ids": [
+      "sha256:093e0a974e3df485f4be288254a5cad2f4d3364662b85e0d4364de476b11e57e",
+      "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+      "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+      "sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a",
+      "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7"
+    ],
+    "removed_intermediate_images": [
+      "sha256:0aafe5a4d6d4606fb3199695c6a1184e0afee021505d028b46553f512921fa27",
+      "sha256:ce3fbbea35c17b2b5c8c736247bbd90d8d251d8e5e32c2158ee59f316959406b",
+      "sha256:048592e2374f65a61453658802d49ba0b414b03c6c5c34ab4271660bf1e1b7b3",
+      "sha256:bfbf3d5e0f65f58466ba15b58841545a61bf66e9f36775e6f524a4221b7960d1",
+      "sha256:074ea9d8563cd25ecaf64f6994bdf12ff2fdbd72356007ef771e7c54dc50e36e",
+      "sha256:166fa193984e77f7f39d9879c0f1e73bb65e52ea38da9190638bb472716fcf11"
+    ],
+    "removed_work_directory": "/var/lib/capstone-terminal-tty-build-20261023",
+    "retained_intermediate_images": [],
+    "rollback_bundle": "/var/backups/capstone-terminal-tty-20261023/prior-bundle",
+    "schema": 1,
+    "work_directory_absent": true
+  },
+  "execution_host": "C",
+  "export": {
+    "finished_at": 1792741380,
+    "result": {
+      "attack_tested": false,
+      "bundle": "/opt/capstone-prereqs/nonweb",
+      "manifest_sha256": "0c19ad32fa69088b91a35d1e96a0a205f2c3fcd4ce38a546c56ece30c2124c37",
+      "runtime_started": false,
+      "status": "offline_bundle_verified"
+    },
+    "returncode": 0,
+    "started_at": 1792741369
+  },
+  "first_native_fixture_correction": "The first output assertion used an actual newline inside the shell printf argument and observed the secondary prompt. The fixture was corrected; images were unchanged. Final full native checks pass.",
+  "full_1800_second_expiry_tested": false,
+  "helper_before_sha256": {
+    "terminal-close.sh": "1ef1854fccc45aab93f7813f4b7b59a27a38bcfef8972e26d17a1d157b40ea70",
+    "terminal-lib.sh": "49d0571d9dc8984536eeeea6de5ec71589552b732aa0efb58e2a44dc1be5b415",
+    "terminal-session.sh": "3ee303047db7c98077e46519279bc04e9c1be514fef537121945fd08ecab3581"
+  },
+  "native": {
+    "all_passed": true,
+    "attack_tested": false,
+    "finished_at": 1792741265,
+    "host_mounts": false,
+    "labs": {
+      "redis": {
+        "attack_tested": false,
+        "both_terminals_closed": true,
+        "changed_start_time_denied": true,
+        "container_id": "d4a84ed2cae12b6952362dbb88111e6bce569ed096a8252c23956fe1ed35e78f",
+        "controlling_tty_and_ctrl_c": true,
+        "different_session_preserved": true,
+        "distinct_job_groups_before": 4,
+        "image_id": "sha256:f493af8512566d7523a069bc167f4d1747f0b67819fb726f66c4b07feb1575d7",
+        "job_control_warning": false,
+        "protocol_verification": true,
+        "remove_returncode": 0,
+        "same_session_live_after": 0,
+        "same_session_processes_before": 5,
+        "same_session_zombies_after": 0,
+        "stop_returncode": 0
+      },
+      "samba": {
+        "attack_tested": false,
+        "both_terminals_closed": true,
+        "changed_start_time_denied": true,
+        "container_id": "12309e7b9971b02cb010b4d58386761f83765ea1f415c6f273e518459d16a6ed",
+        "controlling_tty_and_ctrl_c": true,
+        "different_session_preserved": true,
+        "distinct_job_groups_before": 4,
+        "image_id": "sha256:37e5d2c4dac0e08f296c197f038d2d9b59df86fb1da7d3fbbaaf6bc32ae99b9d",
+        "job_control_warning": false,
+        "protocol_verification": true,
+        "remove_returncode": 0,
+        "same_session_live_after": 0,
+        "same_session_processes_before": 5,
+        "same_session_zombies_after": 0,
+        "stop_returncode": 0
+      }
+    },
+    "network": "none",
+    "schema": 1,
+    "started_at": 1792741253
+  },
+  "new_vm_installation_tested": false,
+  "observed_at": 1792741478,
+  "prior_bundle": {
+    "manifest_sha256": "933b52263bc9c7ae2d751357822bdb1c93f586801f2ea91d3898c87b5d85413f",
+    "original_four_files_preserved": true,
+    "path": "/var/backups/capstone-terminal-tty-20261023/prior-bundle"
+  },
+  "python_version": "3.12.3",
+  "same_lab_shared_uid_and_filesystem": true,
+  "schema": 1,
+  "scope": "controlling TTY preservation and fixed UID/session/start-time cleanup; prior service binaries unchanged",
+  "separate_sid_children_full_cleanup_boundary": "lab stop/reset",
+  "source_sha256": {
+    "IMAGES.md": "ea711eb738fbf8b01dedd229f08d1bc542fcfed51a4a831341ed2e71ad6a2d96",
+    "bootstrap.py": "18d10a0e9d742c1e09996ec68bd5f57c53b904d67b00dcf4e18fcc4b3b2b4926",
+    "images.py": "d6bcb3e339a22209a1c30b8d4fbe785b02e8817773587168d82dcbdbf984866b",
+    "prepare.py": "59a8ad65a9e5490f628a06e357945806270c21a7a51df39357505119578ce26c",
+    "redis/Dockerfile": "380a241c5316a99b9f5b2a1ec804d64bd45e5394ad0d193217166c52a78d9754",
+    "redis/redis.conf": "1cceb7b8621e8f2d530bce10a407b2092000e5655ad6fcf84f6e2b21a403ec48",
+    "redis/start.sh": "8504567fa942284dd5673b000113b5e8b89aa319a8df5f51055354d31155544b",
+    "redis/verify.sh": "f61b470c6354019520285650df49c0c4c4a23787b6f0e947e5310814ab5937bc",
+    "runtime.py": "b4bd7dee64a4f968626db647f1a963a98120198471b2722e52986c824a012388",
+    "samba/Dockerfile": "c43988924917f2b8390dd3fb3b67523386e1dff28d7a1b79bcb83c55e470a286",
+    "samba/smb.conf": "8d65e4f2122f1e9cf076111a601818f60d7c8fa5015f2be6e6265aac2ec4edb7",
+    "samba/start.sh": "eb9757abb0f669e5a9cfbb0fad1da4003ed70b126144a0dba774ae422e1648e1",
+    "samba/verify.sh": "ce554103a2c5387e39494565d96388d84b8ac51fd4d63f8ba06f20e14d96f9ce",
+    "sources.json": "c32cc5e181f618f5c7bc6bc627796fbbd995d51aa14cdf046682146d424efca0",
+    "terminal-close.sh": "d94ab0eeb844afc4743ef36e19caed82052379f0e2ffb02b78f61b01c01c8469",
+    "terminal-lib.sh": "c1f9c60524dd16f94c0e4b84c5f87b74bb74dc34ad6667bd660e307f9e10945e",
+    "terminal-session.sh": "a9ee356938b38099cbbd84a32c420ba5b1d7c1ed908ce17f9ed37f22e65b6188",
+    "test_images.py": "4e567397cdcc2aa3a2c5ad8709faa930a566f2f509439ebd615ab483197f3759"
+  },
+  "unit_tests": {
+    "mac": 22,
+    "native_c": 22,
+    "passed": true
+  }
+}

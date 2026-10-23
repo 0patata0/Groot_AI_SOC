@@ -1,5 +1,35 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+## 읽기 전용 시스템 진단 운영 연결 완료 (2026-10-23)
+
+A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snapshot reader·단일 `get_system_diagnostics` MCP를 연결했다. 일반 sudo·Docker·임의 shell/journal 권한은 추가하지 않는다. 기존 B는 원본 해시·유휴/승인/lease 검사와 복구 백업을 거쳐 최소 이관했으며, 단일 `deploy.sh`의 새 서버 설치 경로도 같은 소스 계약을 사용한다. 운영 서버에는 초기 설치기 전체를 실행하지 않았다.
+
+설치된 MCP SDK2.0.0의 표준 `_meta` 호환성과 journal grep의 정상적인 일치 없음 처리를 보완했다. core33·진단 설치기18·controller37·SIEM40 회귀와 실제 UID995 SDK의6개 MCP initialize/list, 잘못된 인자·쓰기 도구 거절을 확인했다. 최종 A/B/C4개 대상 조회에서 A/B 오류 표본0과 C의 과거 `publication_failed` 분류를 확인했다. C terminal 오류103개 중 보존50개로 잘림이 있으므로 전체 로그 건수나 정확한 원인 분석으로 해석하지 않는다. 원문 MESSAGE·환경·명령·HTTP 본문은 반환하지 않는다.
+
+[실제 SDK·운영 증거](infra/mcp/system-diagnostics-validation-20261023.json) · [설치·후속 핀 증거](deployment/diagnostics-journal-fix-validation-20261023.json) · [추가 검증 계획](infra/추가검증_계획_2026-10-23.md). 새3VM 전체 설치·실제 취약점 공격/탐지/대응 E2E·재부팅·장시간 터미널 만료는 이번 완료 범위와 구분한다.
+
+## 파비콘 재발 후속 완료 (2026-10-23)
+
+기본 `/favicon.ico`·Apple 아이콘 요청이 이미지로 연결되도록 프록시를 보완하고, 메인/터미널은 새 이름의 로컬 ICO를 정적으로 선언한다. 공통 테마 스크립트는 이미 맞는 아이콘을 제거하지 않는다. 실제 HTTPS의 상태·MIME·자산 SHA가 일치했고 설치기 반입/검증 목록도 갱신했다. Safari에 남은 오리 아이콘은 사용자 승인 후 아이콘 캐시만 백업·재생성하여 같은 주소의 서버 선화 표시를 확인했으며 사용자도 확인했다. 방문 기록·쿠키·암호는 변경하지 않았다. [검증 증거](infra/groot-c/offline-labs/favicon-validation-20261023.json).
+
+## sudo 웹 터미널·schema9 운영 반영 완료 (2026-10-23)
+
+- 마지막 sudo 항목의 웹 시작·열기 비활성 문제를 보완했다. 현재 카탈로그는 **HTTP3개 + 터미널3개, 총6항목**이며 같은 HTTPS 콘솔에서 시작·열기를 제공한다. 준비 이미지도 sudo의 별도 rootless 저장소까지 확인해 집계한다.
+- 기존 sudo 이미지·bundle·UID1991 rootless 런타임과 컨테이너 UID1000·setuid 조건은 유지하고 중앙 고정 adapter로 연결한다. 일반 host shell·Docker 권한이나 호스트 sudo 변경을 허용하지 않는다.
+- sudo는 터미널 전체1개만 허용한다. 연결 종료·입력 유휴5분·전체30분·서비스 종료 시 해당 컨테이너 전체를 중지하며 다시 사용하려면 콘솔에서 시작한다. Redis/Samba는 기존 세션 정리 정책을 유지한다.
+- 단일 `deploy.sh` service schema9와 같은 소스를 연결했다. 소스 구현·회귀, 기존 C 반영, 실제 HTTPS·브라우저·격리 검증을 구분해 완료한다. C native 콘솔97개·런타임/daemon/이미지/adapter121개와 실제 HTTPS 검증을 통과했다. 아래 schema8·터미널2종의 기존 증거는 당시 이력이다. 새3VM 설치 시험 제외와 실제 공격 E2E 미검증 범위는 유지한다.
+
+
+검증은 native 콘솔97개·nonweb121개, 설치기 service50개·controller35개와 Node2종이다. 실제 HTTPS에서 sudo UID1000·패키지1.8.31-1ubuntu1·터미널 크기 변경·Ctrl+C·단일 연결·연결 종료 시 전체 중지·활성 세션 중지·새 CID 재시작을 확인했다. 기존 rootful 컨테이너는 적용 전후 동일했다. 새로고침한 Safari에서 이미지6개·sudo 항목과 시작 버튼은 확인했고, 사용자 브라우저 조작과 겹쳐 sudo 터미널 명령의 시각 검수는 별도로 완료 처리하지 않았다. [sudo 운영 증거](infra/groot-c/nonweb-labs/sudo-web-validation-20261023.json).
+
+## Redis·Samba 웹 터미널·schema8 완료 이력 (2026-10-23)
+
+- 운영 카탈로그를 **HTTP3개 + sudo CLI1개 + Redis/Samba 터미널2개, 총6항목**으로 확장했다. Redis CVE-2022-0543·Samba CVE-2017-7494는 같은 콘솔에서 **실습환경 시작 → 환경 열기**로 고정 컨테이너의 브라우저 터미널에 연결한다. sudo는 별도 rootless CLI, DVWA는 원래 독립 주소를 유지한다.
+- 기존 차콜/웜화이트 테마와 맞춘 터미널 화면·서버 선화 파비콘·로컬 터미널 자산을 추가했다. 터미널 세션은 같은 실습의 컨테이너와 계정을 공유하며 사용자별 OS 격리가 아니다. HTTP 실습의 WAF 예외 키를 터미널 권한으로 확대하지 않는다.
+- 단일 `deploy.sh`의 service schema8에6항목 검사·재귀 정적 자산 반입·`LAB_NONWEB_BUNDLE`·고정 nonweb bootstrap을 연결했다. 콘솔 계정과 sudo 준비 다음에 nonweb 환경을 설치하며 Redis/Samba 실습 컨테이너는 자동 시작하지 않는다. 구형 schema6/7 환경을 임의로 인수하지 않는다.
+- **C의 이미지·런타임·콘솔 반영과 실제 HTTPS·네트워크 격리 검증을 완료**했다. native 콘솔94개·런타임/daemon67개·이미지 준비22개 회귀와 실제 서비스 응답·Ctrl+C·다른 세션 보존·시작/중지·호스트 방향 연결 차단을 확인했다. 새로고침한 Safari에서 서버 파비콘, Redis의 UID10001·PONG, 최종 Samba의 UID10001·Version4.6.3·SMB3 공유 목록과 다크/화이트 테마·연결 종료·콘솔 중지를 확인했다. [통합 검증 기록](infra/groot-c/nonweb-labs/validation-20261023.json)과 [TTY·이미지 기록](infra/groot-c/nonweb-labs/terminal-tty-validation-20261023.json)을 따른다.
+- 새 VM3대 전체 설치 시험은 사용자 요청으로 계속 보류한다. 실제 취약점 악용·탐지/LLM 대응 E2E·재부팅·30분 전체 세션 수명 실측은 이번 환경 준비 검증에 포함하지 않았다.
+
 ## 초기 설치기 SOC 연결과 선택 관리자 대역 (2026-10-23 후속)
 
 - 승인형 MCP·브로커/worker·제한된 대응·LLM 관리, Vector 정제/회전/로컬 보관·Indexer 관측과 SOC 대시보드 import를 `deploy.sh`에 통합했다. 초기 SIEM→A 등록→승인 구성→로그/대시보드→관리 타이머→전체 검증 순서이며 기존 운영 호스트 업그레이드와 구분한다.
@@ -9,11 +39,15 @@
 
 ## 콘솔 개편·단일 설치기 후속 (2026-10-23)
 
+> 이 절의4항목·service schema7은 Redis/Samba 확장 전 결과다. 이후 schema8을 거쳐 현재 소스는 최상단6항목·schema9를 따른다.
+
 - 메인 레이아웃과 Java·Apache 두 버전의 공통 모노크롬 팔레트를 배포했다. 공개35개·C native66개 검증 완료. 메인·Java·Apache 두 버전을 각각 새로고침한 다크/화이트 화면 검수를 완료했다.
 - deploy.sh 단일 진입점의 로컬 패키지/이미지 준비, service schema7, security schema2, 공통 키 전달·sudo bootstrap을 구현했다. 역할·설치 실패·입력 위변조 회귀를 통과했지만 새 VM3대 전체 apply는 미실행이다. 승인된 신규 VM에서 실제 apply/verify·허용 클라이언트 HTTPS·재부팅 후 영속성을 확인한다.
 - 운영 변경 시 같은 작업에서 초기 설치기와 반입 목록·설정 예제·검증을 함께 갱신한다. 기존 운영 서버에 초기 설치기를 다시 실행하지 않는다. 실제 공격 E2E와 공식 규칙 후보 운영 반영은 이번 완료 범위와 구분한다.
 
 ## 공통 테마·DVWA 범위 정정 완료·정리 마감 (2026-10-23)
+
+> 아래4항목은 DVWA 연결을 제거한 당시 구성이다. 이후 Redis/Samba2종을 추가했으며 DVWA 독립 유지 지시는 그대로다.
 
 - 사용자 정정에 따라 현재 카탈로그는 **Java·Apache 두 버전·sudo 총4항목**, 고정 웹 경로는 관리형3개로 한정한다. DVWA는 원래 독립 주소·앱·DB를 유지하며 추가했던 Log4Shell 프록시·목록·전용 예외 쿠키·테마 처리만 제거했다. C native64·최종 HTTP35개 검사를 통과했으며 독립 DVWA200/테마 미주입·제거 경로404·실행/중지409를 확인했다. 이전5항목 검증 JSON과 기록은 당시 이력으로 보존한다.
 - 콘솔·Java·Apache 두 버전의 상단 버튼은 현재 모드 한 단어와16px 해·달 아이콘을 표시한다. 고정96px 버튼·16px 아이콘 열·가운데 정렬한 글자 슬롯과180ms 색상 전환·reduced-motion 대응을 유지한다. 서버 SHA 일치·새로고침한 Safari의 양방향 전환과 콘솔4항목 표시를 확인했고 Java·Apache 두 버전의 테마도 확인했다. 임시자료 최종 정리 결과를 이어 기록한다.
@@ -22,7 +56,7 @@
 
 ## 다중 실습 확장 후 남은 작업 (2026-10-22 당시 계획)
 
-> 아래5항목·DVWA 연결 계획은10/23 사용자 범위 정정으로 대체됐다. 과거 진행·검증 이력으로만 보존하며 현재 실행 범위는 위4항목을 따른다.
+> 아래5항목·DVWA 연결 계획은10/23 사용자 범위 정정으로 대체됐다. 과거 진행·검증 이력으로만 보존하며 이후4항목 정정과 최상단6항목 확장을 구분한다.
 
 - 카탈로그5항목과 고정 웹4경로를 반영했다. 관리형은 Log4Shell·httpd2.4.49·httpd2.4.50이고 기존 native DVWA는 별도 관리 연결이다. sudo3156은 웹 실행 없는 별도 rootless CLI다. backend64·공개HTTPS31·DVWA예외경계15 검사를 통과했으며 실제 취약점 공격/E2E와 구분한다.
 - DVWA Safari 로그인·Security 페이지 및 opaque sandbox 전용 예외 세션의 HTTPS 경계를 확인했다. 새 실습 canary9건의 WAF→Wazuh 수신/색인도 확인했다. 실제 공격과 브라우저별 호환성 검증은 별도다.

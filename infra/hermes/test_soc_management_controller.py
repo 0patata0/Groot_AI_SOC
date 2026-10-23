@@ -232,6 +232,17 @@ class ControllerTests(unittest.TestCase):
         self.result(trace)
         self.assertEqual(trace.finish(0)["state"], "needs_review")
 
+    def test_system_diagnostics_read_is_allowed_but_not_proposal_verification(self):
+        pid = "e" * 32
+        self.events({"seq": 1, "event_key": "external", "kind": "rule_change", "at": 990,
+                     "payload": {"proposal_id": pid, "status": "applied", "target": "a:suricata-local"}})
+        trace = self.trace()
+        self.tool(trace, "mcp__system_diagnostics__get_system_diagnostics",
+                  {"target": "a:vector", "properties": {"Result": "success"}}, {"target": "a:vector"})
+        self.assertFalse(trace.protocol_error)
+        self.result(trace)
+        self.assertEqual(trace.finish(0)["state"], "needs_review")
+
     def test_status_read_alone_does_not_verify_executed_target(self):
         pid = "e" * 32
         self.events({"seq": 1, "event_key": "external", "kind": "rule_change", "at": 990,

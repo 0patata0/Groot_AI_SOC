@@ -1,0 +1,66 @@
+{
+  "backup_directory": "/var/backups/capstone-nonweb-images-20261023",
+  "bulk_prune_used": false,
+  "checked_at": 1792734625,
+  "force_removal_used": false,
+  "mac_cleanup": {
+    "packages_installed": false,
+    "path": "/private/tmp/capstone-nonweb-images-20261023-lfpzjidn",
+    "removed": true
+  },
+  "manifest_sha256": "933b52263bc9c7ae2d751357822bdb1c93f586801f2ea91d3898c87b5d85413f",
+  "operational_bundle": "/opt/capstone-prereqs/nonweb",
+  "preserved_image_ids": [
+    "sha256:093e0a974e3df485f4be288254a5cad2f4d3364662b85e0d4364de476b11e57e",
+    "sha256:742d0c282baab9f293bef42270691997a7a88810b4d749a9c5b0a310596287e5",
+    "sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a"
+  ],
+  "removed_build_containers": [
+    "d21446ca7cb9f86db3c5f05942eaaeb00c9d452f6ed96450ba35de046fd8b427",
+    "b4b5578b0413e542ddb22f5d426afc143092c0ae0f0fba274a91a817023b3a62",
+    "ffea7baf9b8675304e13da5b139d91f15dd2d45c346310ea3d9ba238140a099e"
+  ],
+  "removed_intermediate_images": [
+    "sha256:53ea7d88d60556cfdca2a48eed7a87f90dbf7136572fb7445cb93ef3b6b89ed5",
+    "sha256:60e8c3433451eddd3e1ecf93d3d7eb1532cb0b9ab34d5a9b86201dc317fd9bea",
+    "sha256:9906f1e15ed0bde8b02762c51645bc6182984d4e09d9a98096683fdb522060e5",
+    "sha256:48113083812425e9021289ac43de93bd21400c969c8893f4b0d6b992e7e39f31",
+    "sha256:15c15cb1587a33e01af36eae0fbb4cfae23da61b2157f329db8df79ad7742bcf",
+    "sha256:0e0ca7a78794481409e2e4d60289be4a4314cc52c2228552564fc8243c635192",
+    "sha256:f950236cb8f82b571935729f6359d8a8def665df7ff5a2dc246048299ba6d868",
+    "sha256:3688be7f63c040d0ceeb10f1775e32681cc8c455bc8049f8a37556bfa2b6a6ea",
+    "sha256:e0f9a4fcb4f53361d76599c6b2643fa34e2f16813a9dd506ffa7a66365017865",
+    "sha256:cc09b2f6771a07282254a39b1e22bdcde2e41fbdf5ab5c0c77220261b793c7fe",
+    "sha256:1cb46765e778c1017240a94ce37f04715af9e253c62e4387c00503df7396cd84",
+    "sha256:b14671bf22f8b77b9738a1d284501a254c95ccb5036928a029ddd941dcc15f19",
+    "sha256:8110cfe33d5bd88826de70b01b1db26a5c456512608cf288233b2812657996dc",
+    "sha256:7cba33c2af6eb6ff18bb611b4adbf0d2d26e97a0d2c1749401dc180e63af7c0b",
+    "sha256:15e1beff5e67b28e61c1672165fa3c52348efc192e0c93fc8c1601bcaf79b010",
+    "sha256:2ef5786b37a5c0df3a8d0fb973674c98cf8474f0f991c01158f52f4a65b6f88a",
+    "sha256:d7fde47a6d0cc7e1ab1680aa768f7a12e2f290a4e1f8c7a9ce4ed0345e2f3954",
+    "sha256:73ae0b72a93e6ebcb8ffc071da1e1db03abdc93ab23cfe033a8c0df67cb3df0d",
+    "sha256:29e364e05ed07f7b2a2bfb291e66d1ffc9d0797ac4cb2c2bf9b7dc5ecad55377",
+    "sha256:2ba79b7ee848f78c0c22fa14a6747f9b9da58d2c28b04d231c78d466d4e63061",
+    "sha256:3d3b0b6c433960edaefa292c3fbf57fca0edde550651969d5e375fd9333cd244",
+    "sha256:8e52ced14e4a9bcdf2a018c150739c23c8d06cbf80c3a2d803d0ec0ebc76bfb1",
+    "sha256:92834fe67fa0f31ef9f76ef83e3dfeca0603d19a56a548ebd3ec1a1820b51f9c",
+    "sha256:0bdf7eac6730695eb92861be26a24b6482ec043df033ae9a18f3319922a21900",
+    "sha256:3e7d274b60a586e1f7d982341c43ea841e4d487f78e475a6a9fabb5aedce1081",
+    "sha256:c446224c7c913ff82d9c6342b0cd5cceccda091b8050fb8a5dc2db56ec34a0e0",
+    "sha256:fc80bdc6225e9b98583054e823b29c215ed2375983a94a93654097f014634c50",
+    "sha256:cf0fc2c350d72fb7312f6b9e9bfdafecc005279aba8c4832aa02799d0c147274",
+    "sha256:07432957d697dfc2962a3d4453e7510ab485727bdcc5427733310a456ac96bd7",
+    "sha256:675d85047c4de6ac828791f77c3e309b1714fae7f26ebac42341ef43ff45b267",
+    "sha256:91afa58403551aec136aa0fd89c135440fa1017184b44f13450ec440f78f8617",
+    "sha256:3b8fa3d7af47f9b1d2cee61b149a4750307af0146b4a1fec67dd5dd14e79e2fb"
+  ],
+  "removed_prior_bundle": "/opt/capstone-prereqs/nonweb-pre-native-20261023",
+  "removed_uploads": [
+    "/tmp/capstone-nonweb-build-inputs-20261023-lfpzjidn.tar",
+    "/tmp/capstone-nonweb-key-correction-20261023-lfpzjidn.tar.gz"
+  ],
+  "removed_work_directory": "/var/lib/capstone-nonweb-build-20261023",
+  "retained_intermediate_images": [],
+  "schema": 1,
+  "work_directory_absent": true
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pure schema7 regressions: no Docker, HTTP, package or server mutations."""
+"""Pure schema9 regressions: no Docker, HTTP, package or server mutations."""
 import copy
 import hashlib
 import io
@@ -45,6 +45,8 @@ class ConfigTests(unittest.TestCase):
    'location / { return 404; }','proxy_pass http://127.0.0.1:18081/log4shell/;','proxy_pass http://127.0.0.1:18090/;'):
    self.assertIn(expected,text)
   self.assertEqual(text.count('proxy_pass'),4);self.assertNotIn('dvwa',text.lower());self.assertNotIn('include ',text)
+  self.assertIn('location ^~ /_offline-labs/ { proxy_read_timeout 275s;',text)
+  self.assertEqual(text.count('proxy_read_timeout 275s;'),1)
  def test_host_authority_preserves_port(self):
   data=m.settings({**ENV,'LAB_PUBLIC_ORIGIN':'https://labs.example.org:8443'})
   self.assertIn('proxy_set_header Host labs.example.org:8443;',m.render(data))
@@ -59,10 +61,13 @@ class ConfigTests(unittest.TestCase):
   import sys
   sys.path.insert(0,str(ROOT/'infra/groot-c/offline-labs'));import manifest
   labs=manifest.validate_manifest(json.loads((ROOT/'infra/groot-c/offline-labs/cve_list.json').read_text()))
-  with patch.object(manifest,'load_manifest',return_value=labs):self.assertEqual(len(m.catalog(ROOT,'unused')),4)
+  with patch.object(manifest,'load_manifest',return_value=labs):self.assertEqual(len(m.catalog(ROOT,'unused')),6)
   variants=[labs[:-1],labs+[{'cve_id':'LAB-DVWA'}]]
   for key,value in [('host_port',18888),('path','/other/'),('vulnerable_version','2.17.1')]:
    bad=copy.deepcopy(labs);bad[0][key]=value;variants.append(bad)
+  for cve in m.TERMINAL:
+   for field,value in [('type','local-cli'),('vulnerable_version','latest')]:
+    bad=copy.deepcopy(labs);next(item for item in bad if item['cve_id']==cve)[field]=value;variants.append(bad)
   for bad in variants:
    with patch.object(manifest,'load_manifest',return_value=bad),self.assertRaises(m.Refused):m.catalog(ROOT,'unused')
  def test_image_id_arch_volumes(self):
@@ -92,6 +97,70 @@ class RuntimeTests(unittest.TestCase):
   with self.assertRaises(m.Refused):self.verify(data)
   data=gateway();data['Config']['Labels']['com.docker.compose.project']='foreign'
   with self.assertRaises(m.Refused):self.verify(data)
+class SourceBindingTests(unittest.TestCase):
+ def setUp(self):
+  self.temp=tempfile.TemporaryDirectory(prefix='capstone-source-contract-');self.addCleanup(self.temp.cleanup)
+  self.root=Path(self.temp.name)
+  files={'infra/groot-c/offline-labs/'+name for name in m.RUNTIME_REQUIRED}
+  files|={'infra/groot-c/nonweb-labs/'+name for name in m.NONWEB_REQUIRED}
+  files|={'infra/groot-c/offline-labs/nonweb/sudo/'+name for name in ('lab.py','publish.py','runtime/bootstrap.py')}
+  files|={'infra/groot-c/offline-labs/wheel-inventory.json','infra/groot-c/offline-labs/requirements.lock',
+          'infra/groot-c/offline-labs/scripts/bootstrap.py','deployment/offline_service.py'}
+  for name in files:
+   path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture')
+ def test_nested_vendor_and_nonweb_sources_change_profile(self):
+  baseline=m.source_hash(self.root)
+  for name in ('infra/groot-c/offline-labs/static/terminal-vendor/xterm.js',
+               'infra/groot-c/nonweb-labs/runtime.py','infra/groot-c/nonweb-labs/terminal.service',
+               'infra/groot-c/nonweb-labs/sudo_terminal.py',
+               'infra/groot-c/offline-labs/terminal_api.py'):
+   path=self.root/name;path.write_text('changed')
+   self.assertNotEqual(m.source_hash(self.root),baseline)
+   path.write_text('fixture')
+   self.assertEqual(m.source_hash(self.root),baseline)
+ def test_missing_terminal_vendor_and_managed_runtime_source_refused(self):
+  for name in ('infra/groot-c/offline-labs/static/terminal-vendor/xterm.js','infra/groot-c/nonweb-labs/bootstrap.py',
+               'infra/groot-c/nonweb-labs/sudo_terminal.py'):
+   path=self.root/name;path.unlink()
+   with self.assertRaises(m.Refused):m.source_hash(self.root)
+   path.write_text('fixture')
+ def test_nested_file_and_directory_symlinks_refused(self):
+  base=self.root/'infra/groot-c/offline-labs/static'
+  link=base/'extra.js';link.symlink_to(base/'terminal.js')
+  with self.assertRaises(m.Refused):m.source_hash(self.root)
+  link.unlink();link=base/'linked';link.symlink_to(self.root/'deployment',target_is_directory=True)
+  with self.assertRaises(m.Refused):m.source_hash(self.root)
+class ManagedTerminalVerificationTests(unittest.TestCase):
+ def verify(self,changed=None):
+  raw=json.loads((ROOT/'infra/groot-c/offline-labs/cve_list.json').read_text())
+  for item in raw:
+   if item['cve_id'] in m.TERMINAL:item['type']='managed-terminal'
+  rows=[{'cve_id':item['cve_id'],'type':item.get('type','managed-http'),
+         'image_present':True,'status':'stopped','deployment_allowed':True,
+         'verification':'environment_only','attack_tested':False} for item in raw]
+  if changed:next(item for item in rows if item['cve_id']=='CVE-2021-3156').update(changed)
+  requests=[]
+  def http(path,data):
+   requests.append(path)
+   if path=='/_offline-labs/api/list':return json.dumps(raw).encode()
+   if path=='/_offline-labs/api/status':return json.dumps({'deployment_allowed':True,'labs':rows}).encode()
+   return (ROOT/'infra/groot-c/offline-labs/static'/path.removeprefix('/_offline-labs/static/')).read_bytes()
+  with tempfile.TemporaryDirectory(prefix='capstone-terminal-status-') as directory:
+   manifest=Path(directory)/'catalog.json';manifest.write_text(json.dumps(raw))
+   data={**DATA,'LAB_MANIFEST':str(manifest)}
+   with patch.object(m,'verify_installation'),patch.object(m,'run',return_value=b''),\
+        patch.object(m,'catalog',return_value=raw),patch.object(m,'http',side_effect=http):
+    result=m.verify(data,raw,['unused'])
+  self.assertTrue(all('/api/deploy' not in path and '/api/stop' not in path for path in requests))
+  return result
+ def test_three_stopped_terminals_are_valid_without_starting_labs(self):
+  result=self.verify()
+  self.assertEqual((result['schema'],result['catalog_items'],result['managed_terminal_labs'],result['labs_started']),(9,6,3,0))
+ def test_missing_sudo_image_is_not_a_ready_installation(self):
+  with self.assertRaises(m.Refused):self.verify({'image_present':False})
+ def test_sudo_errors_or_unverified_isolation_are_rejected(self):
+  for changed in ({'status':'error'},{'deployment_allowed':False},{'verification':'inventory_only'},{'attack_tested':True}):
+   with self.subTest(changed=changed),self.assertRaises(m.Refused):self.verify(changed)
 class ShellTests(unittest.TestCase):
  def test_compose(self):
   result=shell('compose_document');self.assertEqual(result.returncode,0,result.stderr);doc=json.loads(result.stdout)
@@ -105,15 +174,15 @@ class ShellTests(unittest.TestCase):
   result=shell('apache_document');self.assertEqual(result.returncode,0,result.stderr)
   self.assertIn('Alias /dvwa /var/www/html',result.stdout);self.assertNotIn('ProxyPass',result.stdout)
   self.assertNotIn('log4shell',result.stdout.lower());self.assertEqual(result.stdout.count('<VirtualHost'),1)
- def test_schema6_missing_gateway_rejected(self):
+ def test_older_schema_and_missing_gateway_rejected(self):
   query=re.search(r"jq -e '(keys==.*?)' \"\$ROLE/manifest.json\"",SCRIPT.read_text(),re.S)[1]
   names=['compose.json','config/apache.conf','config/bootstrap.php','config/gateway.conf','config/ossec.conf.candidate',
    'credentials/admin-password','credentials/app.env','credentials/db-password','credentials/db-root-password','credentials/db.env','input.json']
-  valid={'schema':7,'role':'service','state':'complete','container_ids':{x:'c'*64 for x in ('db','dvwa','gateway')},'files':{x:'a'*64 for x in names},
+  valid={'schema':9,'role':'service','state':'complete','container_ids':{x:'c'*64 for x in ('db','dvwa','gateway')},'files':{x:'a'*64 for x in names},
    **{x:'b'*64 for x in ('agent_config_sha256','enrollment_ca_sha256','enrollment_pass_sha256','script_sha256')}}
   def accepted(data):return subprocess.run(['jq','-e',query],input=json.dumps(data),text=True,capture_output=True).returncode==0
   self.assertTrue(accepted(valid))
-  for old in range(1,7):self.assertFalse(accepted({**valid,'schema':old}))
+  for old in range(1,9):self.assertFalse(accepted({**valid,'schema':old}))
   bad=copy.deepcopy(valid);del bad['files']['config/gateway.conf'];self.assertFalse(accepted(bad))
  def lifecycle(self,mode,existing=False,fail=False):
   with tempfile.TemporaryDirectory(prefix='capstone-service-test-') as directory:
@@ -158,6 +227,86 @@ main apply
    self.assertNotEqual(result.returncode,0);self.assertIn('run:offline-install',result.stdout)
    self.assertNotIn('compose',result.stdout);self.assertNotIn('database-initialization',result.stdout)
    self.assertTrue((root/'service').exists())
+ def test_nonweb_cli_arguments_are_fixed(self):
+  for action,budget in (('check','600s'),('apply','1200s'),('verify','600s')):
+   with self.subTest(action=action):
+    result=shell('LAB_NONWEB_BUNDLE=/opt/custom/nonweb; timeout(){ printf "%s\\n" "$@"; }; nonweb_runtime '+action)
+    self.assertEqual(result.returncode,0,result.stderr)
+    self.assertEqual(result.stdout.splitlines(),['--kill-after=10s',budget,'python3','-B',
+     str(ROOT/'infra/groot-c/nonweb-labs/bootstrap.py'),'--'+action,'--bundle','/opt/custom/nonweb',
+     '--source-root',str(ROOT/'infra/groot-c/nonweb-labs')])
+ def test_sudo_terminal_check_uses_fixed_readonly_adapter(self):
+  result=shell('function /usr/bin/python3(){ printf "%s\\n" "$@"; }; sudo_terminal_check')
+  self.assertEqual(result.returncode,0,result.stderr)
+  self.assertEqual(result.stdout.splitlines(),['-IB','/opt/capstone-nonweb-labs/sudo_terminal.py','check'])
+ def test_role_verification_accepts_stopped_sudo_and_rejects_adapter_failure(self):
+  for fail in (False,True):
+   code=r'''
+assert_managed(){ :; }
+docker_cmd(){ [[ $1 != ps ]] || printf '%064d\n' 0; }
+jq(){ if [[ $1 == -r ]]; then printf '%064d\n' 0; fi; }
+runtime_contract(){ :; }
+verify_offline_apps(){ printf 'http-readonly\n'; }
+sudo_runtime(){ printf 'legacy-running-verifier\n' >&2; return 1; }
+sudo_terminal_check(){ printf 'adapter-check\n' >&2; return ADAPTER_RC; }
+nonweb_runtime(){ printf 'nonweb-%s\n' "$1" >&2; }
+systemctl(){ :; }; grep(){ :; }
+verify
+'''.replace('ADAPTER_RC','1' if fail else '0')
+   with self.subTest(adapter_failure=fail):
+    result=shell(code)
+    self.assertNotIn('legacy-running-verifier',result.stderr)
+    if fail:
+     self.assertNotEqual(result.returncode,0)
+     self.assertIn('sudo_terminal_verification_failed',result.stderr)
+     self.assertNotIn('nonweb-verify',result.stderr)
+    else:
+     self.assertEqual(result.returncode,0,result.stderr)
+     self.assertEqual(result.stdout.splitlines()[0],'http-readonly')
+     self.assertEqual(result.stderr.splitlines(),['adapter-check','nonweb-verify'])
+ def test_nonweb_preflight_failure_stops_before_agent(self):
+  with tempfile.TemporaryDirectory(prefix='capstone-nonweb-preflight-') as directory:
+   code=r'''
+ROLE="$2/absent"; WEB_BACKEND_PORT=8088; LAB_GATEWAY_PORT=18091
+docker_cmd(){ :; }; ss(){ :; }
+offline_installer(){ printf 'offline-check\n'; }
+sudo_runtime(){ printf 'sudo-check\n'; }
+nonweb_runtime(){ printf 'nonweb:%s\n' "$1"; return 1; }
+fresh_agent(){ printf 'unexpected-agent\n'; }
+fresh_namespace
+'''
+   result=subprocess.run(['bash','-c','source "$1"; '+code,'preflight',str(SCRIPT),directory],text=True,capture_output=True)
+   self.assertNotEqual(result.returncode,0);self.assertIn('nonweb_runtime_preflight_failed',result.stderr)
+   self.assertEqual(result.stdout.splitlines(),['offline-check','sudo-check','nonweb:check'])
+ def test_nonweb_apply_order_and_failure_preserve_partial_role(self):
+  for fail in (False,True):
+   with self.subTest(fail=fail),tempfile.TemporaryDirectory(prefix='capstone-nonweb-order-') as directory:
+    root=Path(directory)
+    for name in ('ca','pass','key'):(root/name).write_text('synthetic-only')
+    code=r'''
+source "$1"
+CAPSTONE_ROOT="$2"; ROLE="$2/service"; CAPSTONE_SOURCE="$2/source"; EVENTS="$2/events"
+WAZUH_CA_FILE="$2/ca"; WAZUH_ENROLLMENT_PASS_FILE="$2/pass"; LAB_ADMIN_KEY_FILE="$2/key"
+LAB_MANIFEST="$2/manifest"; LAB_PUBLIC_ORIGIN=https://labs.example.org; LAB_WHEEL_DIR="$2/wheels"; SIEM_HOST=192.0.2.20
+LAB_SUDO_BUNDLE="$2/sudo"; LAB_NONWEB_BUNDLE="$2/nonweb"; COMPOSE=(fixture)
+settings(){ MODE=apply; }
+safe_path(){ :; }; regular(){ :; }; stat(){ printf '0:0:600\n'; }; flock(){ :; }
+fresh_namespace(){ :; }; enrollment_inputs(){ :; }; apache_image_probe(){ :; }; gateway_image_probe(){ :; }
+offline_command(){ :; }; write_files(){ mkdir -p "$ROLE/evidence"; }; mark(){ :; }
+timeout(){ if [[ "$*" == *sudo/runtime/bootstrap.py* ]]; then printf 'sudo-apply\n' >>"$EVENTS"; fi; }
+nonweb_runtime(){ printf 'nonweb-%s\n' "$1" >>"$EVENTS"; return FAIL_NONWEB; }
+logrun(){ printf '%s\n' "$1" >>"$EVENTS"; if [[ $1 == compose-config ]]; then exit 0; fi; }
+main apply
+'''.replace('FAIL_NONWEB','1' if fail else '0')
+    result=subprocess.run(['bash','-c',code,'order',str(SCRIPT),directory],text=True,capture_output=True)
+    events=(root/'events').read_text().splitlines()
+    self.assertEqual(events[:3],['offline-install','sudo-apply','nonweb-apply'])
+    self.assertTrue((root/'service').exists())
+    if fail:
+     self.assertNotEqual(result.returncode,0);self.assertNotIn('compose-config',events)
+     self.assertIn('nonweb_runtime_install_failed',result.stderr)
+    else:
+     self.assertEqual(result.returncode,0,result.stderr);self.assertEqual(events[-1],'compose-config')
 class ProbeTests(unittest.TestCase):
  def invoke(self,kind='gateway',start_code=0,changed=None,after_start=False):
   with tempfile.TemporaryDirectory(prefix='capstone-service-probe-') as directory:
@@ -253,7 +402,8 @@ class InstallationReceiptTests(unittest.TestCase):
   self.temp=tempfile.TemporaryDirectory(prefix='capstone-install-receipt-');self.addCleanup(self.temp.cleanup)
   self.root=Path(self.temp.name);base=self.root/'infra/groot-c/offline-labs';(base/'static').mkdir(parents=True)
   self.content={};self.meta={}
-  for name in ('app.py','broker.py','guard.py','manifest.py','static/theme.js','static/theme.css'):
+  for name in m.RUNTIME_REQUIRED:
+   (base/name).parent.mkdir(parents=True,exist_ok=True)
    (base/name).write_bytes(b'synthetic source')
    self.content['/opt/capstone-offline-labs/'+name]=b'synthetic source'
   self.content.update({x:b'synthetic settings' for x in ('/etc/capstone-offline-labs/cve_list.json','/etc/capstone-offline-labs/settings.env')})

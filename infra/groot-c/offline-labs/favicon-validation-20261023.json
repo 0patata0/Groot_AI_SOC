@@ -1,0 +1,57 @@
+{
+  "observed_at": 1792755459,
+  "tls_verified": true,
+  "paths": {
+    "/favicon.ico": {
+      "status": 200,
+      "content_type": "image/vnd.microsoft.icon",
+      "cache_control": "no-store",
+      "sha256": "d8b5766824e5123e078d9f827da0487fcdefef3e75e1c5328e718245b1b8c90a",
+      "bytes": 15086,
+      "redirected": false
+    },
+    "/log4shell/static/lab-console-icon.ico": {
+      "status": 200,
+      "content_type": "image/vnd.microsoft.icon",
+      "cache_control": "no-store",
+      "sha256": "d8b5766824e5123e078d9f827da0487fcdefef3e75e1c5328e718245b1b8c90a",
+      "bytes": 15086,
+      "redirected": false
+    },
+    "/log4shell/static/theme.js": {
+      "status": 200,
+      "content_type": "text/javascript; charset=utf-8",
+      "cache_control": "no-store",
+      "sha256": "b9bcd062af9d0dd3ea8ae59f9052aa9af3d905731f7868ca44062ce47f670dcb",
+      "bytes": 6008,
+      "redirected": false
+    },
+    "/apple-touch-icon.png": {
+      "status": 200,
+      "content_type": "image/png",
+      "cache_control": "no-store",
+      "sha256": "a45a99fcceaa80ec5e0dc55971697705bb7abd6aa0bad1ab72696236e0a45a4a",
+      "bytes": 1236,
+      "redirected": false
+    }
+  },
+  "head_icon_links": [
+    "<link rel=\"icon\" type=\"image/x-icon\" href=\"/log4shell/static/lab-console-icon.ico\">",
+    "<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"/log4shell/static/apple-touch-icon.png?v=20261023-2\">"
+  ],
+  "browser_observation": {
+    "before_ico_compat": "Safari normal reload, cache bypass and separate private window still showed cached duck icon; live DOM selected local PNG v2.",
+    "after_ico_compat": "User confirmed Safari still shows the duck after selecting the tab and reloading. Server and live DOM select the new local icon. Persistent Safari icon-cache behavior is a hypothesis; cache regeneration requires user approval.",
+    "after_cache_regeneration": {
+      "observed_at": 1792756498,
+      "browser": "Safari",
+      "method": "Quit Safari; rename only Favicon Cache to a dated backup through Finder after explicit authorization; relaunch and visit the same HTTPS console.",
+      "server_icon_seen": true,
+      "user_confirmed": true,
+      "history_cookies_passwords_changed": false,
+      "backup_preserved": true
+    }
+  },
+  "backup_on_c": "/var/backups/capstone-offline-labs/20261023-favicon-ico-compat",
+  "browser_icon_fixed": true
+}

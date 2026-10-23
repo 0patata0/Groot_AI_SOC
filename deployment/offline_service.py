@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Schema 7 service preflight, fixed gateway render and read-only verification.
+"""Schema 9 service preflight, fixed gateway render and read-only verification.
 
 No image build/download, lab start/stop, package installation or shell evaluation.
 """
@@ -15,12 +15,25 @@ import sys
 import urllib.parse
 import urllib.request
 
-IDS = {'CVE-2021-44228', 'CVE-2021-41773', 'CVE-2021-42013', 'CVE-2021-3156'}
+IDS = {'CVE-2021-44228', 'CVE-2021-41773', 'CVE-2021-42013', 'CVE-2021-3156',
+       'CVE-2022-0543', 'CVE-2017-7494'}
+TERMINAL = {'CVE-2022-0543': 'Ubuntu focal Redis 5:5.0.7-2', 'CVE-2017-7494': 'Samba 4.6.3',
+            'CVE-2021-3156': 'Ubuntu focal sudo 1.8.31-1ubuntu1'}
 WEB = {'CVE-2021-44228': (18081, 8080, '/log4shell/', '2.14.1'),
        'CVE-2021-41773': (18082, 8080, '/', '2.4.49'),
        'CVE-2021-42013': (18083, 8080, '/', '2.4.50')}
 IMAGE = re.compile(r'sha256:[0-9a-f]{64}\Z')
 TMPFS = {'/tmp': 'rw,nosuid,nodev,noexec,size=32m,mode=1777'}
+RUNTIME_REQUIRED = {'app.py', 'broker.py', 'guard.py', 'manifest.py', 'practice_mode.py', 'challenge.py',
+                    'terminal_api.py', 'static/index.html', 'static/app.js', 'static/style.css',
+                    'static/theme.js', 'static/theme.css', 'static/favicon.svg', 'static/favicon.png',
+                    'static/favicon.ico', 'static/lab-console-icon.ico', 'static/apple-touch-icon.png', 'static/terminal.html',
+                    'static/terminal.js', 'static/terminal.css', 'static/terminal-vendor/xterm.js',
+                    'static/terminal-vendor/xterm.css', 'static/terminal-vendor/addon-fit.js',
+                    'static/terminal-vendor/xterm.LICENSE', 'static/terminal-vendor/addon-fit.LICENSE',
+                    'static/terminal-vendor/provenance.json'}
+NONWEB_REQUIRED = {'lab.sh', 'compose.yaml', 'runtime.py', 'bootstrap.py', 'publish.py', 'README.md',
+                   'terminal_server.py', 'terminal.service', 'sudo_terminal.py'}
 
 
 class Refused(RuntimeError):
@@ -84,15 +97,18 @@ def catalog(source, path):
     sys.path.insert(0, str(Path(source) / 'infra/groot-c/offline-labs'))
     from manifest import load_manifest
     labs = load_manifest(path, require_root=True)
-    need(len(labs) == 4 and {x['cve_id'] for x in labs} == IDS, 'exact_four_lab_catalog_required')
+    need(len(labs) == 6 and {x['cve_id'] for x in labs} == IDS, 'exact_six_lab_catalog_required')
     for item in labs:
         if item['cve_id'] in WEB:
             expected = WEB[item['cve_id']]
             need(item['type'] == 'managed-http' and
                  tuple(item[x] for x in ('host_port', 'container_port', 'path', 'vulnerable_version')) == expected,
                  'fixed_web_lab_contract_required')
+        elif item['cve_id'] in TERMINAL:
+            need(item['type'] == 'managed-terminal' and item['vulnerable_version'] == TERMINAL[item['cve_id']],
+                 'fixed_terminal_lab_contract_required')
         else:
-            need(item['type'] == 'local-cli', 'sudo_cli_only')
+            raise Refused('unsupported_lab_contract')
     return labs
 
 
@@ -120,14 +136,42 @@ def image_check(docker, ref, expected):
     return value
 
 
+def source_file(path, root):
+    need(path.is_file() and not path.is_symlink() and not root.is_symlink(), 'runtime_source_missing')
+    parent = path.parent
+    while parent != root:
+        need(root in parent.parents and not parent.is_symlink(), 'runtime_source_invalid')
+        parent = parent.parent
+
+
+def console_source_files(source):
+    root = Path(source)
+    base = root / 'infra/groot-c/offline-labs'
+    paths = list(base.glob('*.py'))
+    for path in (base / 'static').rglob('*'):
+        need(not path.is_symlink() and (path.is_file() or path.is_dir()), 'runtime_source_invalid')
+        if path.is_file():
+            paths.append(path)
+    need(RUNTIME_REQUIRED <= {str(path.relative_to(base)) for path in paths}, 'runtime_source_missing')
+    for path in paths:
+        source_file(path, root)
+    return paths
+
+
 def source_hash(source):
     root = Path(source)
     base = root / 'infra/groot-c/offline-labs'
-    files = list(base.glob('*.py')) + list((base / 'static').glob('*')) + [p for p in (base / 'scripts').rglob('*') if p.is_file()] + [
-        base / 'wheel-inventory.json', base / 'requirements.lock', root / 'deployment/offline_service.py']
+    files = console_source_files(source)
+    for path in (base / 'scripts').rglob('*'):
+        need(not path.is_symlink() and (path.is_file() or path.is_dir()), 'runtime_source_invalid')
+        if path.is_file():
+            files.append(path)
+    files += [base / 'wheel-inventory.json', base / 'requirements.lock', root / 'deployment/offline_service.py']
+    files += [root / 'infra/groot-c/nonweb-labs' / name for name in NONWEB_REQUIRED]
+    files += [base / 'nonweb/sudo' / name for name in ('lab.py', 'publish.py', 'runtime/bootstrap.py')]
     result = hashlib.sha256()
     for path in sorted(files):
-        need(path.is_file() and not path.is_symlink(), 'runtime_source_missing')
+        source_file(path, root)
         result.update(str(path.relative_to(root)).encode() + b'\0' + hashlib.sha256(path.read_bytes()).digest())
     return result.hexdigest()
 
@@ -137,7 +181,7 @@ def profile(data, labs, docker):
         if item['type'] == 'managed-http':
             image_check(docker, item['image_tag'], item['image_id'])
     image_check(docker, data['GATEWAY_ID'], data['GATEWAY_ID'])
-    return {'schema': 7, 'manifest_sha256': hashlib.sha256(Path(data['LAB_MANIFEST']).read_bytes()).hexdigest(),
+    return {'schema': 9, 'manifest_sha256': hashlib.sha256(Path(data['LAB_MANIFEST']).read_bytes()).hexdigest(),
             'runtime_source_sha256': source_hash(data['CAPSTONE_SOURCE']),
             'gateway_image_id': data['GATEWAY_ID'], 'gateway_port': int(data['LAB_GATEWAY_PORT']),
             'origin': data['LAB_PUBLIC_ORIGIN'], 'lab_ids': sorted(IDS)}
@@ -172,7 +216,8 @@ http {{
 '''
     for path, backend in (('_offline-labs', '18090/'), ('_offline-lab-java', '18081/log4shell/'),
                           ('_offline-lab-httpd49', '18082/'), ('_offline-lab-httpd50', '18083/')):
-        result += f'    location ^~ /{path}/ {{ proxy_pass http://127.0.0.1:{backend}; }}\n'
+        timeout = 'proxy_read_timeout 275s; ' if path == '_offline-labs' else ''
+        result += f'    location ^~ /{path}/ {{ {timeout}proxy_pass http://127.0.0.1:{backend}; }}\n'
     return result + '  }\n}\n'
 
 
@@ -210,10 +255,11 @@ def http(path, data):
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, *args):
             return None
-    with urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect()).open(request, timeout=8) as response:
+    timeout = 150 if path == '/_offline-labs/api/status' else 8
+    with urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect()).open(request, timeout=timeout) as response:
         need(response.status == 200, 'gateway_http_failed')
-        raw = response.read(262145)
-        need(len(raw) <= 262144, 'gateway_response_too_large')
+        raw = response.read(1048577)
+        need(len(raw) <= 1048576, 'gateway_response_too_large')
         return raw
 
 
@@ -240,8 +286,7 @@ def verify_installation(data):
     required = {'/etc/capstone-offline-labs/cve_list.json', '/etc/capstone-offline-labs/settings.env'}
     units = ('capstone-offline-labs', 'capstone-offline-labs-broker', 'capstone-offline-labs-guard')
     required |= {'/etc/systemd/system/' + unit + '.service' for unit in units}
-    required |= {'/opt/capstone-offline-labs/' + name for name in ('app.py', 'broker.py', 'guard.py', 'manifest.py',
-                                                                 'static/theme.js', 'static/theme.css')}
+    required |= {'/opt/capstone-offline-labs/' + name for name in RUNTIME_REQUIRED}
     need(required <= files.keys(), 'install_receipt_missing_file')
     for name, info in files.items():
         need(name.startswith('/opt/capstone-offline-labs/') or name in required, 'install_receipt_path_outside_scope')
@@ -253,7 +298,7 @@ def verify_installation(data):
              format(stat.S_IMODE(current.st_mode), '04o') == info['mode'] and
              hashlib.sha256(path.read_bytes()).hexdigest() == info['sha256'], 'installed_file_changed')
     source = Path(data['CAPSTONE_SOURCE']) / 'infra/groot-c/offline-labs'
-    for path in list(source.glob('*.py')) + list((source / 'static').glob('*')):
+    for path in console_source_files(data['CAPSTONE_SOURCE']):
         name = str(Path('/opt/capstone-offline-labs') / path.relative_to(source))
         need(name in files and hashlib.sha256(path.read_bytes()).hexdigest() == files[name]['sha256'],
              'installed_source_different')
@@ -281,15 +326,23 @@ def verify(data, labs, docker):
     actual = json.loads(http('/_offline-labs/api/list', data))
     need(actual == json.loads(Path(data['LAB_MANIFEST']).read_bytes()), 'served_catalog_changed')
     status = json.loads(http('/_offline-labs/api/status', data))
-    need(status.get('deployment_allowed') is True and len(status.get('labs', [])) == 4 and
+    need(status.get('deployment_allowed') is True and len(status.get('labs', [])) == 6 and
          {x.get('cve_id') for x in status['labs']} == IDS, 'broker_status_unverified')
     for item in status['labs']:
         if item['cve_id'] in WEB:
             need(item.get('image_present') is True and item.get('status') in ('running', 'stopped', 'not_deployed'), 'web_lab_unverified')
+        elif item['cve_id'] in TERMINAL:
+            need(item.get('type') == 'managed-terminal' and item.get('image_present') is True
+                 and item.get('deployment_allowed') is True
+                 and item.get('status') in ('running', 'stopped', 'not_deployed')
+                 and item.get('verification') == 'environment_only'
+                 and item.get('attack_tested') is False, 'terminal_lab_unverified')
     base = Path(data['CAPSTONE_SOURCE']) / 'infra/groot-c/offline-labs/static'
-    for name in ('theme.js', 'theme.css'):
+    for name in ('theme.js', 'theme.css', 'favicon.svg', 'favicon.png', 'favicon.ico', 'lab-console-icon.ico', 'apple-touch-icon.png', 'terminal.html', 'terminal.js', 'terminal.css',
+                 'terminal-vendor/xterm.js', 'terminal-vendor/xterm.css', 'terminal-vendor/addon-fit.js'):
         need(http('/_offline-labs/static/' + name, data) == (base / name).read_bytes(), 'theme_asset_changed')
-    return {'schema': 7, 'status': 'verified', 'catalog_items': 4, 'managed_web_labs': 3, 'labs_started': 0}
+    return {'schema': 9, 'status': 'verified', 'catalog_items': 6, 'managed_web_labs': 3,
+            'managed_terminal_labs': 3, 'labs_started': 0}
 
 
 def main():

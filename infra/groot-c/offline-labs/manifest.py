@@ -12,7 +12,10 @@ MAX_MANIFEST_BYTES = 65536
 COMMON = {"cve_id", "software", "vulnerable_version"}
 REQUIRED = COMMON | {"image_tag", "image_id", "host_port", "container_port"}
 ALLOWED = REQUIRED | {"description", "path", "type"}
-LAB_TYPES = frozenset(("managed-http", "existing-http", "local-cli"))
+LAB_TYPES = frozenset(("managed-http", "managed-terminal", "existing-http", "local-cli"))
+# Runtime targets are code-owned. A catalog entry cannot choose a socket,
+# image, host path, executable or arbitrary terminal destination.
+TERMINAL_LABS = {"CVE-2022-0543": "redis", "CVE-2017-7494": "samba", "CVE-2021-3156": "sudo"}
 
 
 class ManifestError(ValueError):
@@ -59,6 +62,8 @@ def validate_manifest(value):
         valid_id = item["cve_id"] == "LAB-DVWA" if kind == "existing-http" else CVE_RE.fullmatch(item["cve_id"])
         if not valid_id or item["cve_id"] in ids:
             raise ManifestError("invalid_or_duplicate_cve")
+        if kind == "managed-terminal" and item["cve_id"] not in TERMINAL_LABS:
+            raise ManifestError("unsupported_terminal_lab")
         if kind == "managed-http":
             text(item["image_tag"], 255)
             text(item["image_id"], 71)
@@ -72,7 +77,7 @@ def validate_manifest(value):
                 raise ManifestError("duplicate_host_port")
             ports.add(item["host_port"])
         item["description"] = text(item.get("description", ""), 600, empty=True)
-        if kind != "local-cli":
+        if kind in {"managed-http", "existing-http"}:
             item["path"] = text(item.get("path", "/"), 256)
             if not re.fullmatch(r"/[A-Za-z0-9/_.~-]*", item["path"]) or "//" in item["path"] or ".." in item["path"].split("/"):
                 raise ManifestError("invalid_lab_path")

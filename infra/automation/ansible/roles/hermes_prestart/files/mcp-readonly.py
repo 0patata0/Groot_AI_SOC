@@ -12,6 +12,7 @@ import sys
 
 ENDPOINTS={'wazuh-ro':['mcp-b'],'security-events':['mcp-b','security-events'],
            'resp':['resp-a'],'rule-a':['rule-a'],'rule-b':['rule-b']}
+DIAGNOSTIC_ENDPOINT=['mcp-b','system-diagnostics']
 
 
 def require(value):
@@ -37,12 +38,26 @@ async def request(args):
                 require(0<len(tools)<=100)
                 names=sorted(tool.name for tool in tools)
                 require(len(names)==len(set(names)))
+                if args == DIAGNOSTIC_ENDPOINT:
+                    require(names == ['get_system_diagnostics'])
                 return {'tools':len(names),'names_sha256':hashlib.sha256(json.dumps(names,separators=(',',':')).encode()).hexdigest()}
 
 
-async def connections():
-    values=await asyncio.wait_for(asyncio.gather(*(request(args) for args in ENDPOINTS.values())),timeout=60)
-    return dict(zip(ENDPOINTS,values))
+async def connections(endpoints=ENDPOINTS):
+    values=await asyncio.wait_for(asyncio.gather(*(request(args) for args in endpoints.values())),timeout=60)
+    return dict(zip(endpoints,values))
+
+
+def configured_endpoints(config):
+    require(type(config) is dict and set(config) in (set(ENDPOINTS), set(ENDPOINTS) | {'system-diagnostics'}))
+    endpoints=dict(ENDPOINTS)
+    if 'system-diagnostics' in config:endpoints['system-diagnostics']=DIAGNOSTIC_ENDPOINT
+    for name,tail in endpoints.items():
+        server=config[name]
+        require(type(server) is dict and server.get('enabled',True) is True and server.get('command')=='ssh' and
+                server.get('args')==['-T','-F','/opt/data/home/.ssh/config']+tail and
+                server.get('env')=={'HOME':'/opt/data/home'})
+    return endpoints
 
 
 def main():
@@ -56,14 +71,9 @@ def main():
     # Validate actual configured names/argv without printing environment or keys.
     import yaml
     config=yaml.safe_load(Path('/opt/data/config.yaml').read_text())['mcp_servers']
-    require(set(config)==set(ENDPOINTS))
-    for name,tail in ENDPOINTS.items():
-        server=config[name]
-        require(server.get('enabled',True) is True and server.get('command')=='ssh' and
-                server.get('args')==['-T','-F','/opt/data/home/.ssh/config']+tail and
-                server.get('env')=={'HOME':'/opt/data/home'})
-    result=asyncio.run(connections())
-    print(json.dumps({'uid':995,'gid':986,'servers':result,'initialize':5,'tools_list':5,
+    endpoints=configured_endpoints(config)
+    result=asyncio.run(connections(endpoints))
+    print(json.dumps({'uid':995,'gid':986,'servers':result,'initialize':len(endpoints),'tools_list':len(endpoints),
                       'tools_call':0,'model_calls':0,'chat_posts':0,'parents_write_protected':True},sort_keys=True))
 
 if __name__=='__main__':

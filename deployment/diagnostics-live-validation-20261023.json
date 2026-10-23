@@ -1,0 +1,202 @@
+{
+  "cleanup": {
+    "own_Mac_task_directory_removed": true,
+    "own_source_archive_and_generated_scripts_removed": true,
+    "removed_task_files": 37,
+    "shared_parent_work_directory_modified_or_removed": false,
+    "verified_at": 1792756851
+  },
+  "full_MCP_activation_tested_by_this_agent": false,
+  "initial_failure": {
+    "cause": "PermitUserEnvironment is global-only and rejected inside Match",
+    "original_global_SSH_files_changed": false,
+    "original_user_authorized_keys_changed": false,
+    "phase": "new A/C diagnostic SSH stanza validation",
+    "resolution": "exact old source/intent/file pins checked; root-only backup; supported Match + fixed clean-environment wrapper; sshd syntax/effective policy passed before reload",
+    "running_SSH_reloaded_on_failed_validation": false
+  },
+  "installer_revision": "reviewed v2 after Match directive compatibility correction",
+  "new_three_VM_installation_tested": false,
+  "observed_at": 1792756700,
+  "preservation_reason": "installed verification sources, root-only recovery evidence, runtime receipts and operational private key; not temporary transfers",
+  "preserved_server_paths": [
+    "/opt/capstone-diagnostics-bootstrap/20261023",
+    "/var/backups/capstone-diagnostics/20261023-sshd-match-v2",
+    "/var/lib/capstone-diagnostics/installation",
+    "/etc/mcp/system-diagnostics/id_ed25519"
+  ],
+  "roles": {
+    "a": {
+      "changed_existing_containers": [],
+      "existing_container_count": 4,
+      "existing_container_ids_images_state_start_unchanged": true,
+      "host": "a",
+      "new_sudo_or_Docker_grants": false,
+      "observed_at": 1792756700,
+      "raw_journal_returned": false,
+      "reader_account_uid": 994,
+      "reader_groups": [
+        "capstone-diagnostics"
+      ],
+      "role": "security",
+      "schema": 1,
+      "snapshot_bodies_returned": false,
+      "snapshot_check": {
+        "checked_at": 1792756693,
+        "expires_at": 1792756873,
+        "host": "a",
+        "schema": 1,
+        "status": "ready",
+        "units": 8
+      },
+      "source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "1779816c4eab9c7e06380be1c5c00cba3929bce09af20611aa4f9cf58ae35af0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "verification": {
+        "arbitrary_commands": false,
+        "host": "a",
+        "raw_journal_returned": false,
+        "role": "security",
+        "schema": 1,
+        "snapshot_units": 8,
+        "status": "verified",
+        "sudo_granted": false
+      }
+    },
+    "b": {
+      "changed_existing_containers": [],
+      "existing_container_count": 7,
+      "existing_container_ids_images_state_start_unchanged": true,
+      "host": "b",
+      "new_sudo_or_Docker_grants": false,
+      "observed_at": 1792756700,
+      "raw_journal_returned": false,
+      "reader_account_uid": 999,
+      "reader_groups": [
+        "mcp",
+        "capstone-diagnostics"
+      ],
+      "role": "siem",
+      "schema": 1,
+      "snapshot_bodies_returned": false,
+      "snapshot_check": {
+        "checked_at": 1792756673,
+        "expires_at": 1792756853,
+        "host": "b",
+        "schema": 1,
+        "status": "ready",
+        "units": 6
+      },
+      "source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "1779816c4eab9c7e06380be1c5c00cba3929bce09af20611aa4f9cf58ae35af0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "verification": {
+        "MCP_activation_owner": "separate_legacy_migration",
+        "portable_activate_called": false,
+        "status": "prepared_transport_verified"
+      }
+    },
+    "c": {
+      "changed_existing_containers": [],
+      "existing_container_count": 4,
+      "existing_container_ids_images_state_start_unchanged": true,
+      "host": "c",
+      "new_sudo_or_Docker_grants": false,
+      "observed_at": 1792756700,
+      "raw_journal_returned": false,
+      "reader_account_uid": 996,
+      "reader_groups": [
+        "capstone-diagnostics"
+      ],
+      "role": "service",
+      "schema": 1,
+      "snapshot_bodies_returned": false,
+      "snapshot_check": {
+        "checked_at": 1792756668,
+        "expires_at": 1792756848,
+        "host": "c",
+        "schema": 1,
+        "status": "ready",
+        "units": 11
+      },
+      "source_sha256": {
+        "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+        "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+        "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+        "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+        "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+        "infra/mcp/system-diagnostics-mcp.py": "1779816c4eab9c7e06380be1c5c00cba3929bce09af20611aa4f9cf58ae35af0",
+        "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+      },
+      "verification": {
+        "arbitrary_commands": false,
+        "host": "c",
+        "raw_journal_returned": false,
+        "role": "service",
+        "schema": 1,
+        "snapshot_units": 11,
+        "status": "verified",
+        "sudo_granted": false
+      }
+    }
+  },
+  "schema": 1,
+  "scope": "new diagnostic namespace collectors/readers/transport; before separate B legacy MCP activation",
+  "server_execution_method": "existing verified SSH path; public source/script passed to in-memory Python; bytecode disabled",
+  "server_temporary_staging_created": false,
+  "source_root_on_each_host": "/opt/capstone-diagnostics-bootstrap/20261023",
+  "source_sha256": {
+    "deployment/soc_diagnostics.py": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+    "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+    "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+    "infra/mcp/read-system-diagnostics.py": "7cfb92f9feabbda306f8d6635be0b4570c31a0829b3d2212acbdc8d795b3b94d",
+    "infra/mcp/run-system-diagnostics.sh": "06a7e933f0585f1e0172f391efb47684243ade5a1d032ee5aa81420ba78c396e",
+    "infra/mcp/system-diagnostics-mcp.py": "1779816c4eab9c7e06380be1c5c00cba3929bce09af20611aa4f9cf58ae35af0",
+    "infra/mcp/system_diagnostics.py": "6c21cd5946daf7d4a157945cf241043d29ceddcf38865f7eaeee8704ba4fc5ef"
+  },
+  "source_transmission": {
+    "Mac_package_installations": 0,
+    "corrected_installer_sha256": "e559c0c50c52cf56490b64f7397221fd9b1eb38c31be559a57e921fbb96d4780",
+    "initial_public_source_archive_bytes": 36794,
+    "initial_public_source_archive_sha256": "0557a5fe9bc0f1c00fb63b4c65cd320a239f5e53071b4a7aed3aa08a5c46d56b",
+    "package_downloads": 0,
+    "private_key_exported": false
+  },
+  "transport": {
+    "MCP_activated": false,
+    "existing_B_wrapper_Hermes_bytes_unchanged": true,
+    "files": {
+      "/etc/mcp/system-diagnostics.json": {
+        "gid": 988,
+        "mode": 416,
+        "sha256": "8835a8cd56e0a2b05b8402c241362a3d3a0fb4e347154708fa616ee30228ff7d"
+      },
+      "/etc/mcp/system-diagnostics/known_hosts": {
+        "gid": 988,
+        "mode": 416,
+        "sha256": "e288cbe0db805e9e1cd826c059e52bc3e0934ad655af61f1e90ab4c551b05505"
+      }
+    },
+    "observed_at": 1792756577,
+    "portable_activation_called": false,
+    "private_key_exported": false,
+    "reader_hosts": [
+      "a",
+      "c"
+    ],
+    "status": "transport_ready",
+    "validated_as_uid": 999
+  }
+}

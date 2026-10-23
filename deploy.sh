@@ -40,6 +40,7 @@ LAB_WHEEL_DIR=/opt/capstone-prereqs/wheels
 LAB_MANIFEST=/opt/capstone-prereqs/cve_list.json
 LAB_ADMIN_KEY_FILE=/opt/capstone-prereqs/lab-admin.key
 LAB_SUDO_BUNDLE=/opt/capstone-prereqs/sudo
+LAB_NONWEB_BUNDLE=/opt/capstone-prereqs/nonweb
 LAB_TLS_CERT=/opt/capstone-prereqs/lab-tls.crt
 LAB_TLS_KEY=/opt/capstone-prereqs/lab-tls.key
 WORK=
@@ -62,7 +63,7 @@ Without a config, asks for security, siem, service IPv4 addresses, in that order
 
 SSH host keys, sudo access and reviewed offline bundles must be prepared first.
 Packages and docker-save images in each server's artifacts.json are installed
-without downloads. Lab wheels, catalog, sudo bundle and TLS files stay on servers.
+without downloads. Lab wheels, catalog, sudo/nonweb bundles and TLS files stay on servers.
 See deployment/bootstrap-guide.md and deployment/config.example.conf.
 EOF
 }
@@ -84,7 +85,7 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|LOG_PROTECTED_IPS|ADMIN_PROTECTED_CIDRS|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|LOG_PROTECTED_IPS|ADMIN_PROTECTED_CIDRS|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_NONWEB_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         if [[ $key == ADMIN_PROTECTED_CIDRS ]]; then ADMIN_INPUT_SET=1; fi
@@ -151,7 +152,7 @@ command -v python3 >/dev/null || die 'controller requires existing python3'
 python3 -B "$HERE/deployment/validate_lab_site.py" "$LAB_PUBLIC_ORIGIN" "$LAB_HTTPS_PORT" "$LAB_ALLOWED_CIDRS" "$LAB_PROXY_SUBNET" || die 'invalid lab site settings'
 [[ $LAB_GATEWAY_PORT != "$WEB_BACKEND_PORT" && $LAB_GATEWAY_PORT != 22 && $LAB_GATEWAY_PORT != 18090 && $LAB_GATEWAY_PORT != 18081 && $LAB_GATEWAY_PORT != 18082 && $LAB_GATEWAY_PORT != 18083 ]] || die 'lab gateway port conflict'
 [[ $LAB_HTTPS_PORT != "$SSH_PORT" && $LAB_HTTPS_PORT != "$WAF_PORT" ]] || die 'lab HTTPS port conflict'
-for key in LAB_WHEEL_DIR LAB_MANIFEST LAB_SUDO_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
+for key in LAB_WHEEL_DIR LAB_MANIFEST LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
   value=${!key}
   [[ $value =~ ^/opt/[A-Za-z0-9._/-]+$ && $value != *..* && $value != *//* && $value != */ ]] || die "invalid server artifact path: $key"
 done
@@ -161,14 +162,14 @@ done
 LOG_PROTECTED_IPS=$(python3 -B "$HERE/deployment/protected_hosts.py" "$SECURITY_HOST" "$SIEM_HOST" "$SERVICE_HOST" "$LLM_BASE_URL" "$LOG_PROTECTED_IPS") || die 'invalid protected addresses'
 ADMIN_PROTECTED_CIDRS=$(python3 -B "$HERE/deployment/protected_hosts.py" --admin-cidrs "$ADMIN_PROTECTED_CIDRS") || die 'invalid administrator IP/network exemptions'
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
-say '순서: 반입물·패키지 → 역할 사전검사 → SIEM → 공통 키·등록 자격 → service → security → 승인·대응 → 로그 처리·상관분석 → SOC 대시보드 → 전체 검증'
+say '순서: 반입물·패키지 → 역할 사전검사 → SIEM → 공통 키·등록 자격 → service → security → 승인·대응 → 로그 처리·상관분석 → SOC 대시보드 → 고정 읽기 진단 → 전체 검증'
 say 'SOC 구성: 정확 후보 승인 MCP·제한된 대응·Vector 정제/회전/보존·관측 모니터·통합 대시보드'
 if [[ -n $ADMIN_PROTECTED_CIDRS ]]; then
   say "관리자 IP 차단 예외: $ADMIN_PROTECTED_CIDRS"
 else
   say '관리자 IP 차단 예외: 추가 지정 없음'
 fi
-say 'service 구성: 독립 DVWA/MariaDB + Lab Console + 웹 실습3개 + 별도 sudo rootless + Wazuh agent'
+say 'service 구성: 독립 DVWA/MariaDB + Lab Console + 웹 실습3개 + Redis/Samba/sudo 터미널3개 (sudo는 별도 rootless) + Wazuh agent'
 say "Lab Console: $LAB_PUBLIC_ORIGIN/log4shell/ (DNS/hosts와 TLS 인증서는 사전 준비)"
 say '패키지/이미지 인터넷 다운로드 없음. 기존 IP·라우팅·SSH 설정은 변경하지 않습니다.'
 [[ $MODE != plan ]] || exit 0
@@ -200,7 +201,7 @@ mkdir "$WORK/bundle"
 cat > "$WORK/bundle/site.env" <<EOF
 # Generated data; values are shell-quoted by the controller below.
 EOF
-for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL LOG_PROTECTED_IPS ADMIN_PROTECTED_CIDRS CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
+for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL LOG_PROTECTED_IPS ADMIN_PROTECTED_CIDRS CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
@@ -251,6 +252,9 @@ if [[ $MODE == verify ]]; then
   remote_role "$SIEM_HOST" siem soc-verify
   remote_role "$SIEM_HOST" siem log-verify
   remote_role "$SIEM_HOST" siem dashboard-verify
+  remote_role "$SECURITY_HOST" security diag-verify
+  remote_role "$SERVICE_HOST" service diag-verify
+  remote_role "$SIEM_HOST" siem diag-verify
   say '세 역할과 SOC 확장 검증 완료.'
   exit 0
 fi
@@ -273,6 +277,9 @@ remote_role "$SERVICE_HOST" service check
 remote_role "$SECURITY_HOST" security soc-check
 remote_role "$SIEM_HOST" siem soc-check
 remote_role "$SIEM_HOST" siem dashboard-check
+remote_role "$SECURITY_HOST" security diag-check
+remote_role "$SIEM_HOST" siem diag-check
+remote_role "$SERVICE_HOST" service diag-check
 say '세 서버 사전검사 통과.'
 [[ $MODE != check ]] || exit 0
 
@@ -308,6 +315,23 @@ remote_role "$SIEM_HOST" siem log-monitor
 remote_role "$SIEM_HOST" siem dashboard-apply
 # The LLM management timer starts after its evidence sources are configured.
 remote_role "$SIEM_HOST" siem soc-activate < "$WORK/security-soc.json"
+# A separate read-only key can fetch only each host's root-published snapshot.
+# It is never authorized for a shell, sudo, Docker or a caller-selected journal.
+remote_role "$SIEM_HOST" siem diag-prepare
+remote_role "$SIEM_HOST" siem diag-export |
+  remote_role "$SECURITY_HOST" security diag-apply > "$WORK/security-diagnostics.json" || die 'security diagnostic reader setup failed'
+remote_role "$SIEM_HOST" siem diag-export |
+  remote_role "$SERVICE_HOST" service diag-apply > "$WORK/service-diagnostics.json" || die 'service diagnostic reader setup failed'
+python3 - "$WORK/security-diagnostics.json" "$WORK/service-diagnostics.json" <<'PY' |
+import json, pathlib, sys
+values=[]
+for name in sys.argv[1:]:
+    raw=pathlib.Path(name).read_bytes()
+    if len(raw)>16384: raise SystemExit('diagnostic host identity too large')
+    values.append(json.loads(raw))
+print(json.dumps(values,sort_keys=True,separators=(',',':')))
+PY
+  remote_role "$SIEM_HOST" siem diag-activate || die 'diagnostic transport activation failed'
 remote_role "$SECURITY_HOST" security verify
 remote_role "$SECURITY_HOST" security soc-verify
 remote_role "$SECURITY_HOST" security log-verify
@@ -315,6 +339,9 @@ remote_role "$SIEM_HOST" siem verify
 remote_role "$SIEM_HOST" siem soc-verify
 remote_role "$SIEM_HOST" siem log-verify
 remote_role "$SIEM_HOST" siem dashboard-verify
+remote_role "$SECURITY_HOST" security diag-verify
+remote_role "$SERVICE_HOST" service diag-verify
+remote_role "$SIEM_HOST" siem diag-verify
 say "구축 완료. WAF: http://$SECURITY_HOST:$WAF_PORT / SIEM: https://$SIEM_HOST / Mattermost: http://$SIEM_HOST:8065"
 say "Lab Console: $LAB_PUBLIC_ORIGIN/log4shell/"
 say "DVWA 독립 진입점: http://$SECURITY_HOST:$WAF_PORT/dvwa/"

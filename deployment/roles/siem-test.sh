@@ -37,6 +37,19 @@ def fixture(root):
     compose={'services':services,'volumes':{'old':{}},'networks':{'default':{}}}
     return ns,compose,images
 class Tests(unittest.TestCase):
+    def test_diagnostic_dispatch_precedes_all_wazuh_credential_reads(self):
+        setup=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='setup_mcp_and_hermes')
+        assignment=next(n for n in ast.walk(setup) if isinstance(n,ast.Assign) and
+                        any(isinstance(t,ast.Name) and t.id=='launcher' for t in n.targets))
+        launcher=ast.literal_eval(assignment.value)
+        self.assertLess(launcher.index("if command=='system-diagnostics':"),launcher.index("credentials.json"))
+        with mock.patch.dict(os.environ,{'SSH_ORIGINAL_COMMAND':'system-diagnostics'},clear=True), \
+             mock.patch.object(pathlib.Path,'read_bytes',side_effect=AssertionError('credential read')), \
+             mock.patch.object(os,'execve',side_effect=RuntimeError('fixed dispatch')) as execute:
+            with self.assertRaisesRegex(RuntimeError,'fixed dispatch'):
+                exec(compile(launcher,'diagnostic-dispatch','exec'),{'__file__':'/opt/capstone/siem/capstone-mcp/run-mcp'})
+        self.assertEqual(execute.call_args.args[0],'/opt/mcp/run-system-diagnostics.sh')
+        self.assertEqual(set(execute.call_args.args[2]),{'PATH','LANG','PYTHONDONTWRITEBYTECODE'})
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory(prefix='capstone-siem-pure-');self.root=pathlib.Path(self.tmp.name)
         self.n,self.c,self.images=fixture(self.root)

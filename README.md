@@ -1,6 +1,41 @@
 # Groot_AI_SOC
 
-## 콘솔 개편·단일 초기 설치기 — 2026-10-23
+## 읽기 전용 시스템 진단 운영 연결 완료 (2026-10-23)
+
+A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snapshot reader·단일 `get_system_diagnostics` MCP를 연결했다. 일반 sudo·Docker·임의 shell/journal 권한은 추가하지 않는다. 기존 B는 원본 해시·유휴/승인/lease 검사와 복구 백업을 거쳐 최소 이관했으며, 단일 `deploy.sh`의 새 서버 설치 경로도 같은 소스 계약을 사용한다. 운영 서버에는 초기 설치기 전체를 실행하지 않았다.
+
+설치된 MCP SDK2.0.0의 표준 `_meta` 호환성과 journal grep의 정상적인 일치 없음 처리를 보완했다. core33·진단 설치기18·controller37·SIEM40 회귀와 실제 UID995 SDK의6개 MCP initialize/list, 잘못된 인자·쓰기 도구 거절을 확인했다. 최종 A/B/C4개 대상 조회에서 A/B 오류 표본0과 C의 과거 `publication_failed` 분류를 확인했다. C terminal 오류103개 중 보존50개로 잘림이 있으므로 전체 로그 건수나 정확한 원인 분석으로 해석하지 않는다. 원문 MESSAGE·환경·명령·HTTP 본문은 반환하지 않는다.
+
+[실제 SDK·운영 증거](infra/mcp/system-diagnostics-validation-20261023.json) · [설치·후속 핀 증거](deployment/diagnostics-journal-fix-validation-20261023.json) · [추가 검증 계획](infra/추가검증_계획_2026-10-23.md). 새3VM 전체 설치·실제 취약점 공격/탐지/대응 E2E·재부팅·장시간 터미널 만료는 이번 완료 범위와 구분한다.
+
+## 파비콘 재발 후속 완료 (2026-10-23)
+
+기본 `/favicon.ico`·Apple 아이콘 요청이 이미지로 연결되도록 프록시를 보완하고, 메인/터미널은 새 이름의 로컬 ICO를 정적으로 선언한다. 공통 테마 스크립트는 이미 맞는 아이콘을 제거하지 않는다. 실제 HTTPS의 상태·MIME·자산 SHA가 일치했고 설치기 반입/검증 목록도 갱신했다. Safari에 남은 오리 아이콘은 사용자 승인 후 아이콘 캐시만 백업·재생성하여 같은 주소의 서버 선화 표시를 확인했으며 사용자도 확인했다. 방문 기록·쿠키·암호는 변경하지 않았다. [검증 증거](infra/groot-c/offline-labs/favicon-validation-20261023.json).
+
+## sudo 웹 터미널 운영 반영 완료 — 2026-10-23
+
+마지막 sudo 항목은 기존에 `ready` 상태만 표시하고 웹 실행·접속은 제공하지 않았다. **HTTP3개 + 웹 터미널3개, 총6항목**의 소스를 C에 반영하고 실제 HTTPS 터미널을 검증했다. sudo도 같은 [Lab Console](https://log4shell.grootlab.duckdns.org/log4shell/)에서 **실습 환경 시작 → 환경 열기**를 사용하고, 이미지 준비 완료6개를 확인했다.
+
+sudo는 기존 별도 rootless 런타임과 이미지·반입 bundle을 유지한다. 호스트 전용 계정 UID1991, 컨테이너 시작 UID1000, user namespace 안의 setuid 실습 조건을 유지하며 호스트 sudo나 일반 Docker 권한을 제공하지 않는다. sudo 터미널은 전체1개만 허용하고 **연결 종료·입력 유휴5분·전체30분·터미널 서비스 종료 시 해당 sudo 컨테이너 전체를 중지**한다. 다시 연결하려면 콘솔에서 환경을 시작해야 한다. Redis/Samba의 세션 종료와 실습 중지 구분은 그대로다.
+
+단일 `deploy.sh`의 service **schema9**에 이 연결을 반영했다. 아래 schema8·터미널2종의 완료 기록과 [기존 검증 JSON](infra/groot-c/nonweb-labs/validation-20261023.json)은 sudo 웹 연결 전 이력으로 보존하며 새3종의 운영 완료 증거로 사용하지 않는다. DVWA는 독립 주소를 유지하고 새 VM3대 전체 설치·실제 취약점 악용/방어 E2E는 별도 검증이다.
+
+
+검증은 native 콘솔97개·nonweb121개, 설치기 service50개·controller35개와 Node2종이다. 실제 HTTPS에서 sudo UID1000·패키지1.8.31-1ubuntu1·터미널 크기 변경·Ctrl+C·단일 연결·연결 종료 시 전체 중지·활성 세션 중지·새 CID 재시작을 확인했다. 기존 rootful 컨테이너는 적용 전후 동일했다. 새로고침한 Safari에서 이미지6개·sudo 항목과 시작 버튼은 확인했고, 사용자 브라우저 조작과 겹쳐 sudo 터미널 명령의 시각 검수는 별도로 완료 처리하지 않았다. [sudo 운영 증거](infra/groot-c/nonweb-labs/sudo-web-validation-20261023.json).
+
+## Redis·Samba 확장 완료 당시 구성·schema8 — 2026-10-23
+
+[Lab Console](https://log4shell.grootlab.duckdns.org/log4shell/)의 운영 카탈로그는 **HTTP 실습3개 + sudo CLI1개 + Redis/Samba 웹 터미널2개**다. Redis **CVE-2022-0543**(Ubuntu `5:5.0.7-2`)와 Samba **CVE-2017-7494**(4.6.3)는 같은 콘솔에서 **실습환경 시작 → 환경 열기**를 선택해 브라우저 터미널을 여는 흐름을 추가했다. sudo는 기존 별도 rootless CLI를 유지하고, DVWA는 원래 독립 주소에 그대로 둔다.
+
+터미널은 선택한 격리 컨테이너의 고정 비권한 계정에만 연결한다. 같은 실습의 세션은 컨테이너·계정을 공유하며 사용자별 OS 격리는 아니다. 실습 중지는 해당 Redis/Samba 컨테이너와 휘발성 데이터를 정리한다. WAF 차단 예외 키는 기존 HTTP3개 실습용이며 터미널 권한을 부여하지 않는다. 콘솔과 실습 페이지에는 공통 차콜/웜화이트 테마와 서버 선화 파비콘을 사용하고 외부 CDN 없이 로컬 터미널 자산을 제공한다.
+
+C에 두 이미지와 전용 런타임·터미널 API를 반영했다. native 콘솔94개·런타임/daemon67개·이미지 준비22개 회귀를 통과했고, 실제 HTTPS에서 비권한 셸·서비스 응답·Ctrl+C·다른 세션 보존·시작/중지와 호스트 방향 연결 차단을 확인했다. 새로고침한 Safari에서는 서버 파비콘과 Redis 터미널의 UID10001·PONG을 확인했다. [운영 검증 근거](infra/groot-c/nonweb-labs/validation-20261023.json).
+
+단일 `deploy.sh`의 service **schema8**에6항목 카탈로그·터미널 자산·고정 nonweb bootstrap을 연결했다. `LAB_NONWEB_BUNDLE`의 검증된 Redis/Samba 이미지 묶음을 반입하며 초기 설치 완료만으로 두 실습을 자동 시작하지 않는다. **새 VM3대 전체 설치 시험은 사용자 요청으로 계속 보류**하며 실제 취약점 악용·탐지/LLM 대응 E2E·재부팅은 검증하지 않았다. [설치 순서](deployment/bootstrap-guide.md) · [터미널과 격리 범위](infra/groot-c/offline-labs/README.md).
+
+## 콘솔 개편·단일 초기 설치기 — 2026-10-23 확장 전 기록
+
+> 아래4항목·schema7·HTTP35개·native66개 결과는 Redis/Samba 확장 전 검증 이력이다. 현재 운영 구성과 검증 범위는 위 항목을 따른다.
 
 메인에 수평 메뉴·큰 제목·서버 선화·실습 현황 띠를 적용했다. 메인과 Java·Apache 두 하위 실습 화면은 같은 차콜·웜그레이/웜화이트 팔레트를 공유한다. 외부 CDN 없이 동작하며 DVWA는 기존 독립 화면을 유지한다. 최신 서버 자산 SHA 일치와 공개 HTTP35개 검사를 통과했다. 선택한 HTTPS origin의 Secure 쿠키 회귀를 포함한 C native66개도 통과했다.
 
@@ -10,7 +45,7 @@
 
 Log4Shell HTTPS 주소의 **콘솔·Java·Apache 두 버전** HTML에 상단 단일 테마 버튼을 제공한다. 현재 모드인 `다크` 또는 `화이트`와 같은 16px 크기의 달·해 아이콘을 표시하고, 고정된 아이콘 자리·가운데 정렬한 글자 슬롯과 약180ms 색상 전환을 사용한다. `prefers-reduced-motion`을 존중하며 외부 CDN 없이 같은 사이트의 `localStorage`에 선택을 보존한다. 최신 자산의 서버 SHA 일치와 새로고침한 Safari에서 고정 아이콘·글자 가운데 정렬·양방향 전환을 확인했다. Java·Apache 두 버전의 테마 동작도 확인했다.
 
-사용자는 **DVWA를 원래 독립 주소에서 그대로 유지**하도록 범위를 정정했다. 앞서 같은 Log4Shell 사이트에 연결한 것은 요청 범위를 잘못 확대한 작업이었다. 현재 카탈로그는 **Java·Apache 두 버전·sudo 총4항목**, 웹 실습은 관리형3개다. 추가했던 DVWA 프록시·카탈로그 연결·전용 예외 쿠키·테마 처리만 제거했으며, 원래 DVWA 앱·DB·독립 접속 경로는 유지했다. 10/22의 5항목 배포·검증 자료는 당시 이력으로 보존한다.
+사용자는 **DVWA를 원래 독립 주소에서 그대로 유지**하도록 범위를 정정했다. 앞서 같은 Log4Shell 사이트에 연결한 것은 요청 범위를 잘못 확대한 작업이었다. 정정 당시 카탈로그는 **Java·Apache 두 버전·sudo 총4항목**, 웹 실습은 관리형3개였다. 추가했던 DVWA 프록시·카탈로그 연결·전용 예외 쿠키·테마 처리만 제거했으며, 원래 DVWA 앱·DB·독립 접속 경로는 유지했다. 10/22의 5항목 배포·검증 자료는 당시 이력으로 보존한다.
 
 ## 오프라인 실습 관리 웹 — 2026-10-22 배포·10/23 범위 정정 완료
 
@@ -18,9 +53,9 @@ Log4Shell HTTPS 주소의 **콘솔·Java·Apache 두 버전** HTML에 상단 단
 
 FastAPI·고정 기능 broker·격리망을 C에 설치하고 기존 A/C 프록시를 전환했다. 기존 Java 컨테이너는 복구용으로 유지했다. 아래 10/19의 공개 Java 화면과 초기 구축 설명은 당시 이력이며, 새 관리 웹은 아래 단일 `deploy.sh`에서 내부 설치기를 자동 호출한다.
 
-정정 후 C native 회귀 **64개**와 최종 HTTP **35개** 검사를 통과했다. 현재4항목·기존 DVWA 독립 주소200/테마 미주입·제거한 DVWA 경로404·실행/중지409, 기본 HMAC 세션·Apache 두 버전의 합성 차단/예외/복원·sudo 준비 상태를 확인했다.
+정정 후 C native 회귀 **64개**와 최종 HTTP **35개** 검사를 통과했다. 당시4항목·기존 DVWA 독립 주소200/테마 미주입·제거한 DVWA 경로404·실행/중지409, 기본 HMAC 세션·Apache 두 버전의 합성 차단/예외/복원·sudo 준비 상태를 확인했다.
 
-10/22 당시 다중 실습 backend **64개**·공개 HTTPS **31개**·DVWA 예외 경계 **15개**, 합성 검사9건의 WAF→Wazuh alerts→Indexer 전달을 확인했다. 이 결과는 정정 전 구성의 이력이며 현재4항목의 최종 검증 결과로 대신하지 않는다. 실제 취약점 공격·탐지·차단 E2E는 수행하지 않았다. [공식 규칙 후보27개](infra/groot-c/offline-labs/rule-source-candidates.json)는 조사 자료이며 운영에 반영하지 않았다. 현재 단일 초기 설치 경로는 service schema7로4항목 콘솔·웹이미지3개·별도sudo 환경까지 구성한다. 새 VM3대 실제 적용 검증은 아직 미실행이다.
+10/22 당시 다중 실습 backend **64개**·공개 HTTPS **31개**·DVWA 예외 경계 **15개**, 합성 검사9건의 WAF→Wazuh alerts→Indexer 전달을 확인했다. 이 결과는 정정 전 구성의 이력이며 정정 후4항목의 최종 검증 결과로 대신하지 않는다. 실제 취약점 공격·탐지·차단 E2E는 수행하지 않았다. [공식 규칙 후보27개](infra/groot-c/offline-labs/rule-source-candidates.json)는 조사 자료이며 운영에 반영하지 않았다. 이 단계의 단일 초기 설치 경로는 service schema7로4항목 콘솔·웹이미지3개·별도sudo 환경까지 구성했다. 현재 schema8 확장은 위 항목을 따른다. 새 VM3대 실제 적용 검증은 아직 미실행이다.
 
 ## 통합 SOC 대시보드 — 2026-10-19 생성 완료
 
@@ -40,7 +75,7 @@ FastAPI·고정 기능 broker·격리망을 C에 설치하고 기존 A/C 프록�
 
 기존 C 앱의 JAR·실행 환경을 직접 확인한 기록에서 Spring Boot **2.6.1**, Log4j API/Core 각각 **2.14.1**, Java **8u181**을 확인했습니다. 새 [Spring Boot 실습 웹](infra/groot-c/log4shell-app/README.md)은 화면과 로깅 API를 직접 제공하며, `/log4shell/`에서 입력한 요청 파라미터 또는 헤더를 변경 없이 기록합니다. API는 상태 조회로 받은 CSRF 토큰·쿠키를 사용하는 `POST /log4shell/api/log`이며 이전 앱의 `GET /` 계약과 다릅니다.
 
-당시 초기 설치기는 service **schema6**로 Java JAR을 자동 빌드하거나 준비 JAR을 사용했습니다. 현재 schema7은 검증된 이미지와 통합 콘솔을 구성하며 이 항목은10/19 이력입니다. 기존 운영 C의 Java 웹 교체·정상 요청 검증은19:57 KST 완료했고, 컨테이너 재생성 자동화의 후속 결과는 [STATUS](STATUS.md)에 별도로 기록합니다. 무해한 요청의 응답·로그 확인, 새 VM 구축, 실제 공격·콜백·탐지 E2E는 서로 다른 검증 범위입니다. [이전 PHP 웹의 검증 이력](infra/groot-c/log4shell-ui/README.md)은 당시 결과로 보존합니다.
+당시 초기 설치기는 service **schema6**로 Java JAR을 자동 빌드하거나 준비 JAR을 사용했습니다. 후속 schema7에서 검증된 이미지와 통합 콘솔로 전환했고, 현재 소스는 Redis/Samba까지 연결한 schema8입니다. 이 항목은10/19 이력입니다. 기존 운영 C의 Java 웹 교체·정상 요청 검증은19:57 KST 완료했고, 컨테이너 재생성 자동화의 후속 결과는 [STATUS](STATUS.md)에 별도로 기록합니다. 무해한 요청의 응답·로그 확인, 새 VM 구축, 실제 공격·콜백·탐지 E2E는 서로 다른 검증 범위입니다. [이전 PHP 웹의 검증 이력](infra/groot-c/log4shell-ui/README.md)은 당시 결과로 보존합니다.
 
 ## 룰 개수·ID 조회 근거 반영 — 2026-10-16 21:00 KST
 
@@ -81,10 +116,10 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 | 역할 | 초기 구성 |
 |---|---|
 | SIEM | Wazuh·Indexer·Dashboard, Mattermost/PostgreSQL, Hermes 읽기·승인 MCP, 승인 브로커·관리 경로, 상관관측·통합 SOC 대시보드 |
-| service | 독립 DVWA/MariaDB, Lab Console·제한된 broker·nft guard, 웹 실습3개, 별도 sudo rootless·상태 발행, agent |
+| service | 독립 DVWA/MariaDB, schema8 Lab Console·제한된 broker·nft guard, HTTP 실습3개·sudo CLI1개·Redis/Samba 터미널2개, 상태 발행·agent |
 | security | Suricata·DVWA WAF, Log4Shell TLS·실습 WAF, agent, Vector 정제·회전·보존, 승인 worker·제한된 nft 대응 |
 
-`--plan`은 네트워크 접근 없이 입력만 검증합니다. `--check`는 읽기 검사이며 빈 서버의 미설치 패키지를 보고할 수 있습니다. 기본 `--apply`가 로컬 deb와 이미지 archive까지 설치합니다. `--verify`는 기존 동일 구성만 검사합니다. 기존 운영 서버나 구형 schema6을 자동 덮어쓰지 않습니다.
+`--plan`은 네트워크 접근 없이 입력만 검증합니다. `--check`는 읽기 검사이며 빈 서버의 미설치 패키지를 보고할 수 있습니다. 기본 `--apply`가 로컬 deb와 이미지 archive까지 설치합니다. `--verify`는 기존 동일 구성만 검사합니다. 기존 운영 서버나 구형 service schema6/7을 자동 덮어쓰지 않습니다.
 
 | 준비·실행 문서 | 내용 |
 |---|---|
@@ -93,14 +128,15 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 | [VM·네트워크·SSH 준비](deployment/setup-network-ssh.md) | 고정 주소·라우팅·키 검증·sudo |
 | [패키지·이미지 반입 자료](deployment/setup-packages-artifacts.md) | 외부 Linux 준비 환경에서 공식 패키지·이미지 확보 |
 | [Hermes 이미지 준비](deployment/hermes-image.md) | 기반 이미지·가드·의존성·빌드 |
-| [실습 소스·이미지](infra/groot-c/offline-labs/README.md) |4항목 카탈로그·3개 웹이미지·차단 예외·테마·독립 DVWA |
+| [실습 소스·이미지](infra/groot-c/offline-labs/README.md) |6항목 카탈로그·3개 웹이미지·Redis/Samba 터미널·차단 예외·테마·독립 DVWA |
 | [sudo 초기 준비](infra/groot-c/offline-labs/nonweb/sudo/runtime/BOOTSTRAP.md) | 고정 rootless bundle·서명 검증·초기 구성 |
+| [Redis/Samba 준비](infra/groot-c/nonweb-labs/README.md) | 별도 이미지 bundle·고정 런타임·웹 터미널·격리 계약 |
 
 초기 성공 주소는 `LAB_PUBLIC_ORIGIN/log4shell/`, 독립 DVWA는 `http://SECURITY_HOST:WAF_PORT/dvwa/`, Wazuh는 `https://SIEM_HOST`, Mattermost는 `http://SIEM_HOST:8065`입니다. SIEM `admin` 암호를 Lab Console 차단 예외 키로 직접 연결하며, 원문은 SSH 파이프로 service에 전달합니다. 인증자료는 서버 root 전용 경로에 두며 Git·Mac 임시파일·로그에 기록하지 않습니다.
 
 ## 검증 범위와 운영 이식
 
-셸 구문·가짜 SSH 전송 순서·오프라인 반입 검증·service schema7·TLS/WAF 설정·installer 실패 경로·sudo 고정 권한 계약을 회귀 검사합니다. 운영 서버에서 확인한 웹/HMAC/WAF canary/sudo 환경 결과와 새 초기 설치 시험은 구분합니다. **새 Ubuntu VM3대 전체 설치는 아직 미실행**입니다. 구현·격리 회귀를 실제 새 서버 설치 성공으로 표시하지 않습니다.
+셸 구문·가짜 SSH 전송 순서·오프라인 반입 검증·service schema8·6항목/터미널 자산 결속·TLS/WAF 설정·installer 실패 경로·sudo와 nonweb 고정 권한 계약을 회귀 검사합니다. 운영 서버에서 확인한 웹/HMAC/WAF canary/sudo 환경 결과와 새 초기 설치 시험은 구분합니다. **새 Ubuntu VM3대 전체 설치는 아직 미실행**입니다. 구현·격리 회귀를 실제 새 서버 설치 성공으로 표시하지 않습니다.
 
 2026-10-23 설치기 소스에 승인형 쓰기 MCP·브로커·worker·제한된 nft 대응/Native AR, Vector 정제·원본 세대 회전·출력 유지관리·이전 부트 로컬 보관, Indexer 상관관측과 통합 SOC 대시보드를 연결합니다. **실제 새 VM 설치 시험은 사용자 요청으로 제외**했습니다. 위의10/16 읽기 MCP2개 설명은 기본 SIEM 단계의 이력이며, 이번 확장 단계가 승인·대응 경로를 추가합니다. 상세 계약과 검증 한계는 [초기 설치 가이드](deployment/bootstrap-guide.md)를 따릅니다.
 

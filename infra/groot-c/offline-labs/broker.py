@@ -16,11 +16,13 @@ import threading
 import time
 import uuid
 
-from manifest import CVE_RE, IMAGE_ID_RE, ManifestError, load_manifest, trusted_path, unique_object
+from manifest import CVE_RE, IMAGE_ID_RE, TERMINAL_LABS, ManifestError, load_manifest, trusted_path, unique_object
 
 SOCKET = Path("/run/capstone-offline-labs/control.sock")
 RECEIPT = Path("/var/lib/capstone-offline-labs/runtime.json")
 NONWEB_STATUS = Path("/var/lib/capstone-offline-labs/nonweb-status.json")
+TERMINAL_SOCKET = Path("/run/capstone-nonweb-labs/control.sock")
+TERMINAL_MAX_BYTES = 16384
 NONWEB_MAX_TTL = 600
 NONWEB_MAX_BYTES = 16384
 NETWORK = "offline-labs"
@@ -106,6 +108,70 @@ def read_nonweb_status(cve_id, path=NONWEB_STATUS, now=None):
         return dict(fallback, verification="missing")
     except (OSError, ValueError, TypeError, RecursionError):
         return fallback
+
+
+def terminal_result(response, cve_id):
+    """Project a fixed runtime response into public status, never terminal data."""
+    if cve_id not in TERMINAL_LABS or not isinstance(response, dict):
+        raise BrokerError("invalid_terminal_response")
+    if response.get("ok") is False:
+        # Do not reflect paths, command output, protocol output or credentials.
+        code = "operation_in_progress" if response.get("error") == "operation_in_progress" else "terminal_operation_failed"
+        raise BrokerError(code)
+    fields = {"ok", "schema", "lab", "cve_id", "status", "verification", "image_present", "container_id"}
+    if (set(response) != fields or response["ok"] is not True
+            or type(response["schema"]) is not int or response["schema"] != 1
+            or response["lab"] != TERMINAL_LABS[cve_id] or response["cve_id"] != cve_id
+            or not isinstance(response["status"], str)
+            or response["status"] not in {"running", "not_deployed", "stopped", "error"}
+            or response["verification"] != "environment_only"
+            or type(response["image_present"]) is not bool):
+        raise BrokerError("invalid_terminal_response")
+    cid = response["container_id"]
+    if ((cid is not None and (not isinstance(cid, str) or not ID_RE.fullmatch(cid)))
+            or (response["status"] in {"running", "stopped"} and cid is None)
+            or (response["status"] == "not_deployed" and cid is not None)):
+        raise BrokerError("invalid_terminal_response")
+    return {"type": "managed-terminal", "managed": True,
+            "status": response["status"], "image_present": response["image_present"],
+            "container_id": cid[:12] if cid else None,
+            "url": "/log4shell/terminal/" + cve_id + "/",
+            "deployment_allowed": response["image_present"] and response["status"] != "error",
+            "verification": "environment_only", "attack_tested": False, "host_scenario_verified": False}
+
+
+def terminal_request(action, cve_id):
+    """Use only a root-owned local service and compiled-in lab targets."""
+    if action not in {"status", "deploy", "stop"} or cve_id not in TERMINAL_LABS:
+        raise BrokerError("invalid_terminal_request")
+    try:
+        trusted_path(TERMINAL_SOCKET.parent, directory=True)
+        info = TERMINAL_SOCKET.lstat()
+        if (not stat.S_ISSOCK(info.st_mode) or info.st_uid != 0
+                or stat.S_IMODE(info.st_mode) not in {0o600, 0o660}):
+            raise BrokerError("terminal_unavailable")
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
+            connection.settimeout(225 if action == "deploy" else 65)
+            connection.connect(str(TERMINAL_SOCKET))
+            _, uid, _ = struct.unpack("3i", connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
+            if uid != 0:
+                raise BrokerError("terminal_unavailable")
+            payload = {"action": action, "lab": TERMINAL_LABS[cve_id]}
+            connection.sendall(canonical(payload).encode("ascii") + b"\n")
+            data = bytearray()
+            while b"\n" not in data:
+                chunk = connection.recv(4096)
+                if not chunk or len(data) + len(chunk) > TERMINAL_MAX_BYTES:
+                    raise BrokerError("invalid_terminal_response")
+                data.extend(chunk)
+        if not data.endswith(b"\n") or b"\n" in data[:-1]:
+            raise BrokerError("invalid_terminal_response")
+        response = json.loads(data[:-1].decode("utf-8"), object_pairs_hook=unique_object)
+    except BrokerError:
+        raise
+    except (OSError, ValueError, TypeError, RecursionError):
+        raise BrokerError("terminal_unavailable") from None
+    return terminal_result(response, cve_id)
 
 
 class Docker:
@@ -254,10 +320,12 @@ def create_args(lab):
 
 
 class Broker:
-    def __init__(self, labs, docker, receipts, verify_guard=guard_check, nonweb_reader=read_nonweb_status):
+    def __init__(self, labs, docker, receipts, verify_guard=guard_check, nonweb_reader=read_nonweb_status,
+                 terminal_rpc=terminal_request):
         self.labs = {lab["cve_id"]: lab for lab in labs}
         self.docker, self.receipts, self.verify_guard = docker, receipts, verify_guard
         self.nonweb_reader = nonweb_reader
+        self.terminal_rpc = terminal_rpc
         self.lock = threading.Lock()
 
     def safety(self):
@@ -315,6 +383,15 @@ class Broker:
                     **self.nonweb_reader(lab["cve_id"]),
                     "attack_tested": False, "host_scenario_verified": False}
                 continue
+            if kind == "managed-terminal":
+                try:
+                    result[lab["cve_id"]] = self.terminal_rpc("status", lab["cve_id"])
+                except BrokerError as error:
+                    result[lab["cve_id"]] = {"type": kind, "managed": True,
+                        "image_present": False, "status": "error", "container_id": None,
+                        "url": None, "deployment_allowed": False, "verification": "unverified",
+                        "attack_tested": False, "host_scenario_verified": False, "error": error.code}
+                continue
             try:
                 present, _, container = self.inventory(lab)
                 result[lab["cve_id"]] = self.result(lab, present, container)
@@ -348,6 +425,11 @@ class Broker:
                     return response
                 lab = self.labs[cve]
                 kind = lab.get("type", "managed-http")
+                if kind == "managed-terminal":
+                    # Its dedicated runtime validates a separate isolated
+                    # network and ownership contract. Do not use HTTP images,
+                    # ports, receipts or the sudo CLI publisher for this path.
+                    return {"ok": True, "lab": self.terminal_rpc(action, cve)}
                 if kind != "managed-http":
                     raise BrokerError("external_lab_managed_separately" if kind == "existing-http"
                                       else "local_cli_managed_separately")

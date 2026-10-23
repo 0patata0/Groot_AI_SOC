@@ -612,7 +612,10 @@ import json,os,sys
 from pathlib import Path
 root=Path(__file__).resolve().parent
 command=os.environ.get('SSH_ORIGINAL_COMMAND','')
-if command not in ('','security-events'): sys.exit(65)
+if command not in ('','security-events','system-diagnostics'): sys.exit(65)
+if command=='system-diagnostics':
+    os.execve('/opt/mcp/run-system-diagnostics.sh',['/opt/mcp/run-system-diagnostics.sh'],
+              {'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','PYTHONDONTWRITEBYTECODE':'1'})
 env=json.loads((root/'credentials.json').read_bytes())
 env.update(PATH='/usr/bin:/bin',LANG='C.UTF-8',PYTHONDONTWRITEBYTECODE='1')
 args=['/usr/bin/python3','-B',str(root/'security-events-mcp.py')] if command else [str(root/'mcp-server-wazuh')]

@@ -82,9 +82,13 @@ class BootstrapTests(unittest.TestCase):
                          'host_port': 18081, 'container_port': 8080},
                         {'cve_id': 'CVE-2021-3156', 'type': 'local-cli', 'software': 'sudo', 'vulnerable_version': '1'}]
         (self.source / 'cve_list.json').write_text(json.dumps(self.catalog))
-        for name in ('app.py', 'broker.py', 'guard.py', 'manifest.py', 'practice_mode.py', 'challenge.py',
-                     'static/index.html', 'static/app.js', 'static/app.css', 'static/theme.js', 'static/theme.css'):
-            target = self.source / name; target.parent.mkdir(exist_ok=True); target.write_text('fixture')
+        for name in ('app.py', 'broker.py', 'guard.py', 'manifest.py', 'practice_mode.py', 'challenge.py', 'terminal_api.py',
+                     'static/index.html', 'static/app.js', 'static/app.css', 'static/style.css', 'static/theme.js', 'static/theme.css',
+                     'static/favicon.svg', 'static/terminal.html', 'static/terminal.js', 'static/terminal.css',
+                     'static/terminal-vendor/xterm.js', 'static/terminal-vendor/xterm.css', 'static/terminal-vendor/addon-fit.js',
+                     'static/terminal-vendor/xterm.LICENSE', 'static/terminal-vendor/addon-fit.LICENSE',
+                     'static/terminal-vendor/provenance.json'):
+            target = self.source / name; target.parent.mkdir(parents=True, exist_ok=True); target.write_text('fixture')
         for name in b.UNITS:
             target = self.source / 'scripts/bootstrap-units' / name
             target.parent.mkdir(parents=True, exist_ok=True); target.write_text('[Service]\n')
@@ -283,7 +287,8 @@ class BootstrapTests(unittest.TestCase):
             path = Path(name)
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), expected['sha256'])
             self.assertEqual(format(path.stat().st_mode & 0o777, '04o'), expected['mode'])
-        for name in ('static/theme.js', 'static/theme.css', 'vendor/module.py'):
+        for name in ('static/theme.js', 'static/theme.css', 'static/terminal.js', 'static/terminal-vendor/xterm.js',
+                     'static/favicon.svg', 'terminal_api.py', 'vendor/module.py'):
             self.assertIn(str(target / name), receipt['files'])
         for name in b.UNITS:
             self.assertIn(str(units / name), receipt['files'])

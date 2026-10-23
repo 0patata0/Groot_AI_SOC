@@ -1,0 +1,107 @@
+{
+  "architecture": "amd64",
+  "base_image": "ubuntu@sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a",
+  "redis": {
+    "advisories": [
+      "https://ubuntu.com/security/CVE-2022-0543",
+      "https://ubuntu.com/security/notices/USN-5316-1"
+    ],
+    "cve_id": "CVE-2022-0543",
+    "fixed_ubuntu_version": "5:5.0.7-2ubuntu0.1",
+    "package_version": "5:5.0.7-2",
+    "packages": [
+      "redis-server",
+      "redis-tools",
+      "coreutils",
+      "util-linux",
+      "passwd",
+      "mawk",
+      "procps",
+      "sed",
+      "grep",
+      "diffutils"
+    ],
+    "version": "5.0.7"
+  },
+  "samba": {
+    "advisories": [
+      "https://www.samba.org/samba/security/CVE-2017-7494.html",
+      "https://www.samba.org/samba/history/samba-4.6.4.html",
+      "https://www.samba.org/samba/download/"
+    ],
+    "artifacts": {
+      "samba-4.6.3.tar.asc": {
+        "sha256": "9d945de61d92fc4f4868e9ae6489807171197e5d9e85cd48c7aafca0e1f17e77",
+        "size": 173,
+        "url": "https://download.samba.org/pub/samba/stable/samba-4.6.3.tar.asc"
+      },
+      "samba-4.6.3.tar.gz": {
+        "sha256": "2a38ef3da77809cba0583fc188e2a4b5420437aecaad0dffe9a06f732e4b1561",
+        "size": 21107898,
+        "url": "https://download.samba.org/pub/samba/stable/samba-4.6.3.tar.gz"
+      },
+      "samba-pubkey_6F33915B6568B7EA.asc": {
+        "sha256": "5aacab07f71b519ec718a8ed85a802975bef3a2e8b593779613ca94254eac50d",
+        "size": 5296,
+        "url": "https://download.samba.org/pub/samba/expired-gpg-keys/samba-pubkey_6F33915B6568B7EA.asc"
+      }
+    },
+    "build_packages": [
+      "build-essential",
+      "python2",
+      "python2-dev",
+      "pkg-config",
+      "libacl1-dev",
+      "libattr1-dev",
+      "libgnutls28-dev",
+      "libreadline-dev",
+      "libpopt-dev",
+      "zlib1g-dev",
+      "perl",
+      "coreutils",
+      "util-linux",
+      "passwd",
+      "mawk",
+      "procps",
+      "sed",
+      "grep",
+      "diffutils"
+    ],
+    "cve_id": "CVE-2017-7494",
+    "distribution_primary_fingerprints": [
+      "52FBC0B86D954B0843324CDC6F33915B6568B7EA"
+    ],
+    "fixed_version": "4.6.4",
+    "package_version": "source-4.6.3",
+    "runtime_packages": [
+      "python2",
+      "libacl1",
+      "libattr1",
+      "libgnutls30",
+      "libreadline8",
+      "libpopt0",
+      "zlib1g",
+      "libbsd0",
+      "coreutils",
+      "util-linux",
+      "passwd",
+      "mawk",
+      "procps",
+      "sed",
+      "grep",
+      "diffutils"
+    ],
+    "uncompressed_tar_sha256": "1f0455d2c42ef98d8b4c58d04dda0ee94bcdde7a2d55aa90ee051bb64dd90894",
+    "version": "4.6.3"
+  },
+  "schema": 1,
+  "ubuntu_components": [
+    "main",
+    "universe"
+  ],
+  "ubuntu_suites": [
+    "focal",
+    "focal-updates",
+    "focal-security"
+  ]
+}

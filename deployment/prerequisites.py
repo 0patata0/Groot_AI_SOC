@@ -17,6 +17,10 @@ import sys
 
 class Refused(Exception): pass
 
+# Host OS packages only. The isolated vulnerable sudo lab has its own signed
+# bundle and is deliberately outside the host artifact manifest.
+HOST_SECURITY_MINIMUM = {'sudo': '1.9.15p5-3ubuntu5.24.04.4'}
+
 def need(ok, reason):
     if not ok: raise Refused(reason)
 
@@ -50,6 +54,19 @@ def sha(path):
     with path.open('rb') as f:
         for block in iter(lambda: f.read(1024 * 1024), b''): h.update(block)
     return h.hexdigest()
+
+def security_baseline(doc, *, installed=False):
+    prepared = {item['package']: item['version'] for item in doc['packages']}
+    for name, minimum in HOST_SECURITY_MINIMUM.items():
+        version = None if installed else prepared.get(name)
+        if version is None:
+            result = run(['dpkg-query', '-W', '-f=${Status}\t${Version}', name], check=False)
+            fields = result.stdout.decode().split('\t')
+            need(result.returncode == 0 and len(fields) == 2 and fields[0] == 'install ok installed',
+                 'host security package missing: ' + name)
+            version = fields[1]
+        need(run(['dpkg', '--compare-versions', version, 'ge', minimum], check=False).returncode == 0,
+             'host security baseline requires ' + name + '>=' + minimum)
 
 def read_manifest(path, role):
     path = safe(path)
@@ -167,10 +184,12 @@ def main():
     need(os.geteuid() == 0, 'root required')
     managed = fresh_host_guard(args.role)
     doc = read_manifest(args.manifest, args.role)
+    security_baseline(doc)
     if managed:
         verify_existing(doc)
     if args.action == 'apply' and not managed:
         install(args.manifest, doc)
+        security_baseline(doc, installed=True)
         if args.role == 'siem':
             # The indexer's documented minimum, scoped to this explicit admin bootstrap.
             current = int(Path('/proc/sys/vm/max_map_count').read_text())

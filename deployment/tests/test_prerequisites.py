@@ -79,4 +79,30 @@ class Site(unittest.TestCase):
                 args=base[:];args[index]=value
                 with self.assertRaises(ValueError):site.validate(*args)
 
+class HostSecurityBaseline(unittest.TestCase):
+    def result(self, args, **kwargs):
+        if args[0] == 'dpkg-query':
+            return subprocess.CompletedProcess(args, 0, b'install ok installed\t1.8.31-1ubuntu1')
+        version = args[2]
+        return subprocess.CompletedProcess(args, 0 if version in (
+            '1.9.15p5-3ubuntu5.24.04.4', '1.9.15p5-3ubuntu5.24.04.5') else 1, b'')
+
+    def test_preinstalled_vulnerable_host_is_rejected(self):
+        with patch.object(m, 'run', side_effect=self.result), self.assertRaises(m.Refused):
+            m.security_baseline({'packages': []})
+
+    def test_approved_fixed_host_artifact_can_replace_old_package(self):
+        for version in ('1.9.15p5-3ubuntu5.24.04.4', '1.9.15p5-3ubuntu5.24.04.5'):
+            with self.subTest(version=version), patch.object(m, 'run', side_effect=self.result):
+                m.security_baseline({'packages': [{'package': 'sudo', 'version': version}]})
+
+    def test_old_noble_and_focal_host_artifacts_are_rejected(self):
+        for version in ('1.8.31-1ubuntu1', '1.9.15p5-3ubuntu5.24.04.2'):
+            with self.subTest(version=version), patch.object(m, 'run', side_effect=self.result), self.assertRaises(m.Refused):
+                m.security_baseline({'packages': [{'package': 'sudo', 'version': version}]})
+
+    def test_post_install_checks_actual_host_not_only_manifest(self):
+        with patch.object(m, 'run', side_effect=self.result), self.assertRaises(m.Refused):
+            m.security_baseline({'packages': [{'package': 'sudo', 'version': '1.9.15p5-3ubuntu5.24.04.4'}]}, installed=True)
+
 if __name__=='__main__':unittest.main()

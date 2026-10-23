@@ -41,6 +41,33 @@
     return 'generic';
   }
 
+  function labNavigation(kind) {
+    if (kind !== 'java' && kind !== 'httpd') return;
+    var header = document.querySelector('.topbar');
+    if (!header || header.querySelector('.groot-lab-nav')) return;
+    var navigation = document.createElement('nav');
+    navigation.className = 'groot-lab-nav';
+    navigation.setAttribute('aria-label', '실습 탐색');
+    var home = document.createElement('a');
+    home.href = '/log4shell/';
+    home.textContent = 'Lab Console';
+    var arrow = document.createElement('span');
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = '↗';
+    home.appendChild(arrow);
+    var separator = document.createElement('span');
+    separator.className = 'groot-lab-nav-separator';
+    separator.setAttribute('aria-hidden', 'true');
+    separator.textContent = '/';
+    var current = document.createElement('span');
+    current.setAttribute('aria-current', 'page');
+    current.textContent = kind === 'java' ? 'Log4Shell' : 'Apache 실습';
+    navigation.appendChild(home);
+    navigation.appendChild(separator);
+    navigation.appendChild(current);
+    header.insertBefore(navigation, header.lastElementChild);
+  }
+
   function storedTheme() {
     try {
       var value = window.localStorage.getItem(storageKey);
@@ -67,6 +94,7 @@
     if (!document.body || document.getElementById('groot-theme-toolbar')) return;
     var kind = pageKind();
     root.setAttribute('data-groot-page', kind);
+    labNavigation(kind);
 
     var toolbar = document.createElement('div');
     toolbar.id = 'groot-theme-toolbar';
@@ -85,8 +113,8 @@
     var skip = document.querySelector('body > .skip-link');
     document.body.insertBefore(toolbar, skip ? skip.nextSibling : document.body.firstChild);
 
-    // Respect each existing design until the user chooses a shared preference.
-    apply(storedTheme() || (kind === 'console' || kind === 'httpd' ? 'dark' : 'light'));
+    // Every lab starts with the console's default; a saved choice always wins.
+    apply(storedTheme() || (kind === 'generic' ? 'light' : 'dark'));
     button.addEventListener('click', function () {
       apply(theme === 'dark' ? 'light' : 'dark', true);
       try {

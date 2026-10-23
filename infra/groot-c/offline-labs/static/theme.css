@@ -184,6 +184,197 @@ html[data-groot-page="httpd"][data-groot-theme] :is(.path,.note) {background:var
 html[data-groot-page="httpd"][data-groot-theme] .button {background:var(--groot-accent-surface);color:var(--groot-accent);border-color:var(--groot-accent)}
 html[data-groot-page="httpd"][data-groot-theme] .button:hover {filter:brightness(.94)}
 
+/* Lab pages share the console's outlined frame without changing their forms. */
+html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] {
+  --groot-lab-width:1344px;
+  --groot-lab-gutter:28px;
+  --groot-lab-inset:38px;
+}
+html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] body {
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  font-synthesis:none;
+}
+html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .topbar {
+  min-height:86px;
+  height:auto;
+  padding:20px var(--groot-lab-inset);
+  gap:28px;
+  background:var(--groot-bg);
+  border-bottom:1px solid var(--groot-line);
+}
+html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .brand {
+  font-size:19px;
+  font-weight:750;
+  letter-spacing:1.2px;
+  line-height:1.2;
+  flex-shrink:0;
+}
+html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .eyebrow {
+  font:600 9px/1.6 "SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  letter-spacing:1.8px;
+  color:var(--groot-muted);
+}
+.groot-lab-nav {display:flex;align-items:center;gap:16px;margin:0 auto;font-size:11px;white-space:nowrap}
+.groot-lab-nav a {display:inline-flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid transparent;color:var(--groot-text);font-weight:550;text-decoration:none}
+.groot-lab-nav a:hover {border-color:var(--groot-text)}
+.groot-lab-nav a>span {font-size:15px}
+.groot-lab-nav-separator,.groot-lab-nav [aria-current] {color:var(--groot-muted)}
+.groot-lab-nav a:focus-visible {outline:2px solid var(--groot-accent);outline-offset:4px}
+
+/* Java: one frame from header through status strip, workbench and footer. */
+html[data-groot-page="java"][data-groot-theme] :is(body>.topbar,body>main) {
+  width:calc(100% - 2 * var(--groot-lab-gutter));
+  max-width:var(--groot-lab-width);
+  border:1px solid var(--groot-line);
+}
+html[data-groot-page="java"][data-groot-theme] body>.topbar {margin:28px auto 0}
+html[data-groot-page="java"][data-groot-theme] body>main {margin:0 auto 48px;padding:0;border-top:0}
+html[data-groot-page="java"][data-groot-theme] .topbar .brand-mark {width:35px;height:35px;background:none;color:var(--groot-accent);border:1px solid var(--groot-accent);border-radius:2px;font-size:18px;font-weight:650}
+html[data-groot-page="java"][data-groot-theme] .lab-label {padding:8px 12px;border:1px solid var(--groot-line);border-radius:2px;background:var(--groot-bg);color:var(--groot-muted);font-size:11px;white-space:nowrap}
+html[data-groot-page="java"][data-groot-theme] .intro {padding:44px 48px 0}
+html[data-groot-page="java"][data-groot-theme] h1 {margin:18px 0;font-size:clamp(48px,6.2vw,84px);font-weight:580;letter-spacing:-3px;line-height:1.04}
+html[data-groot-page="java"][data-groot-theme] .intro>p {font-size:14px;line-height:1.9;word-break:keep-all}
+html[data-groot-page="java"][data-groot-theme] .runtime {min-height:70px;margin:32px -48px 0;padding:19px 48px;gap:18px;background:var(--groot-surface);border-top:1px solid var(--groot-line);border-bottom:1px solid var(--groot-line);font-size:11px}
+html[data-groot-page="java"][data-groot-theme] .runtime b {font-size:11px}
+html[data-groot-page="java"][data-groot-theme] .runtime .text-button {margin-left:auto;font-size:11px}
+html[data-groot-page="java"][data-groot-theme] .workspace {grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;padding:32px var(--groot-lab-inset) 0}
+html[data-groot-page="java"][data-groot-theme] .panel {min-width:0;border-radius:2px;box-shadow:none}
+html[data-groot-page="java"][data-groot-theme] .panel-heading {min-height:67px;padding:15px 23px;gap:12px}
+html[data-groot-page="java"][data-groot-theme] .panel-heading h2 {font-size:14px;font-weight:600}
+html[data-groot-page="java"][data-groot-theme] .step {display:inline-block;min-width:25px;padding:0;border:1px solid var(--groot-line);border-radius:2px;font:10px/24px "SFMono-Regular",Consolas,monospace;text-align:center}
+html[data-groot-page="java"][data-groot-theme] :is(.method,.result-badge) {font-size:10px}
+html[data-groot-page="java"][data-groot-theme] .result-badge {border-radius:2px;padding:3px 8px}
+html[data-groot-page="java"][data-groot-theme] .input-panel form {padding:24px}
+html[data-groot-page="java"][data-groot-theme] :is(legend,.field-heading>label) {font-size:11px;font-weight:600}
+html[data-groot-page="java"][data-groot-theme] :is(.source-options span,textarea,.request-path,.primary-button,.secondary-button,.empty-icon,pre) {border-radius:2px}
+html[data-groot-page="java"][data-groot-theme] .source-options input:checked+span {box-shadow:none;border-color:var(--groot-accent)}
+html[data-groot-page="java"][data-groot-theme] textarea {min-height:154px;font-size:12px}
+html[data-groot-page="java"][data-groot-theme] .request-path {border:1px solid var(--groot-line);font-size:10px}
+html[data-groot-page="java"][data-groot-theme] .actions {gap:10px;flex-wrap:wrap}
+html[data-groot-page="java"][data-groot-theme] :is(.primary-button,.secondary-button) {min-height:44px;padding:11px 16px;font-size:12px;font-weight:650;line-height:1.4}
+html[data-groot-page="java"][data-groot-theme] .primary-button {flex:1;align-items:center;gap:15px}
+html[data-groot-page="java"][data-groot-theme] .secondary-button {border:1px solid var(--groot-line);color:var(--groot-accent);background:var(--groot-accent-surface)}
+html[data-groot-page="java"][data-groot-theme] .empty-icon {background:none;font-size:25px}
+html[data-groot-page="java"][data-groot-theme] .empty-state {min-height:360px}
+html[data-groot-page="java"][data-groot-theme] #result {padding:24px 24px 5px}
+html[data-groot-page="java"][data-groot-theme] .flow {margin:24px var(--groot-lab-inset) 0;padding:20px 23px;border-radius:2px;background:var(--groot-surface);font-size:11px}
+html[data-groot-page="java"][data-groot-theme] .flow b {display:inline-flex;align-items:center;justify-content:center;min-width:25px;height:25px;border:1px solid var(--groot-line);color:var(--groot-accent)}
+html[data-groot-page="java"][data-groot-theme] footer {margin:30px var(--groot-lab-inset) 0;padding:21px 0;border-top:1px solid var(--groot-line);font-size:10px}
+
+/* Apache 2.4.49 and 2.4.50 keep their comparison content in the same frame. */
+html[data-groot-page="httpd"][data-groot-theme] .shell {width:calc(100% - 2 * var(--groot-lab-gutter));max-width:var(--groot-lab-width);margin:28px auto 48px;padding:0;border:1px solid var(--groot-line)}
+html[data-groot-page="httpd"][data-groot-theme] .brand span {display:block;margin:6px 0 0;font-size:8px;line-height:1.2;font-weight:500;letter-spacing:1.6px}
+html[data-groot-page="httpd"][data-groot-theme] :is(.tag,.chips span) {border-radius:2px;font-size:10px;padding:6px 9px;white-space:nowrap}
+html[data-groot-page="httpd"][data-groot-theme] .tag {padding:8px 12px;font-size:11px}
+html[data-groot-page="httpd"][data-groot-theme] .hero {grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:46px;padding:44px 48px;border-bottom:1px solid var(--groot-line)}
+html[data-groot-page="httpd"][data-groot-theme] h1 {margin:18px 0;font-size:clamp(32px,3.6vw,49px);font-weight:580;letter-spacing:-1.8px;line-height:1.3;word-break:keep-all}
+html[data-groot-page="httpd"][data-groot-theme] .intro {font-size:14px;line-height:1.9;word-break:keep-all}
+html[data-groot-page="httpd"][data-groot-theme] .chips {gap:7px;margin-top:23px}
+html[data-groot-page="httpd"][data-groot-theme] .version-card {border-radius:2px;padding:27px 28px;border-color:var(--groot-line);background:var(--groot-surface)}
+html[data-groot-page="httpd"][data-groot-theme] .version {font-size:56px;font-weight:500;letter-spacing:-2px}
+html[data-groot-page="httpd"][data-groot-theme] .cve {font:11px/1.7 "SFMono-Regular",Consolas,monospace;letter-spacing:.5px;margin:12px 0 17px;padding:10px 0;border-top:1px solid var(--groot-line);border-bottom:1px solid var(--groot-line)}
+html[data-groot-page="httpd"][data-groot-theme] .version-card>p:last-child {font-size:11px;line-height:1.9}
+html[data-groot-page="httpd"][data-groot-theme] .cards {gap:22px;padding:32px var(--groot-lab-inset) 0}
+html[data-groot-page="httpd"][data-groot-theme] .card {min-width:0;padding:23px;border-radius:2px;display:flex;flex-direction:column}
+html[data-groot-page="httpd"][data-groot-theme] .step {align-self:flex-start;padding:5px 8px;border:1px solid var(--groot-line);border-radius:2px;background:var(--groot-accent-surface);font:10px/1.6 "SFMono-Regular",Consolas,monospace;letter-spacing:.5px}
+html[data-groot-page="httpd"][data-groot-theme] .card h2 {font-size:20px;font-weight:550;letter-spacing:-.5px;margin:18px 0 10px}
+html[data-groot-page="httpd"][data-groot-theme] .card p {font-size:12px;line-height:1.9;margin:9px 0}
+html[data-groot-page="httpd"][data-groot-theme] .card dl {font-size:11px;margin:15px 0 23px}
+html[data-groot-page="httpd"][data-groot-theme] .card .muted {font-size:10px!important}
+html[data-groot-page="httpd"][data-groot-theme] .path {border-radius:2px;padding:12px;margin:17px 0;font-size:12px}
+html[data-groot-page="httpd"][data-groot-theme] .button {margin-top:auto;min-height:44px;padding:11px 14px;border-radius:2px;border-color:var(--groot-accent);background:var(--groot-accent);color:var(--groot-primary-text);font-size:12px;font-weight:650}
+html[data-groot-page="httpd"][data-groot-theme] .text-links {margin-top:auto;padding-top:17px}
+html[data-groot-page="httpd"][data-groot-theme] .text-links a {font-size:11px}
+html[data-groot-page="httpd"][data-groot-theme] .note {margin:24px var(--groot-lab-inset) 0;padding:20px 23px;border:1px solid var(--groot-line);border-radius:2px;background:var(--groot-surface)}
+html[data-groot-page="httpd"][data-groot-theme] .note h2 {font-size:12px;font-weight:600;margin-bottom:8px}
+html[data-groot-page="httpd"][data-groot-theme] .note p {font-size:11px;line-height:1.9}
+html[data-groot-page="httpd"][data-groot-theme] footer {margin:30px var(--groot-lab-inset) 0;padding:21px 0;font-size:10px}
+
+@media(max-width:1100px) {
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] {--groot-lab-inset:28px}
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .topbar {gap:20px}
+  html[data-groot-page="java"][data-groot-theme] .intro {padding:36px 32px 0}
+  html[data-groot-page="java"][data-groot-theme] .runtime {margin-right:-32px;margin-left:-32px;padding-right:32px;padding-left:32px}
+  html[data-groot-page="java"][data-groot-theme] .workspace {gap:20px}
+  html[data-groot-page="java"][data-groot-theme] .flow {flex-wrap:wrap;justify-content:flex-start;gap:14px}
+  html[data-groot-page="httpd"][data-groot-theme] .hero {gap:28px;padding:36px 32px}
+  html[data-groot-page="httpd"][data-groot-theme] .cards {gap:18px}
+  html[data-groot-page="httpd"][data-groot-theme] .card {padding:20px}
+}
+@media(max-width:900px) {
+  html[data-groot-page="httpd"][data-groot-theme] .cards {grid-template-columns:minmax(0,1fr)}
+  html[data-groot-page="httpd"][data-groot-theme] .card dl {display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;margin:17px 0}
+  html[data-groot-page="httpd"][data-groot-theme] .card dt {margin:0}
+  html[data-groot-page="httpd"][data-groot-theme] .card dd {margin:0}
+  html[data-groot-page="httpd"][data-groot-theme] .card .button {margin-top:10px}
+}
+@media(max-width:780px) {
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] {--groot-lab-gutter:18px;--groot-lab-inset:22px}
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .topbar {flex-wrap:wrap;gap:17px;padding:20px var(--groot-lab-inset)}
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .brand {font-size:17px}
+  .groot-lab-nav {order:3;flex-basis:100%;margin:0;padding-top:12px;border-top:1px solid var(--groot-line);gap:12px;font-size:10px}
+  .groot-lab-nav a {padding:2px 0}
+  html[data-groot-page="java"][data-groot-theme] body>.topbar {margin-top:18px}
+  html[data-groot-page="java"][data-groot-theme] .intro {padding:32px 25px 0}
+  html[data-groot-page="java"][data-groot-theme] h1 {font-size:60px;letter-spacing:-2.4px}
+  html[data-groot-page="java"][data-groot-theme] .runtime {margin:26px -25px 0;padding:18px 25px;gap:13px}
+  html[data-groot-page="java"][data-groot-theme] .workspace {grid-template-columns:minmax(0,1fr);padding-top:24px;gap:22px}
+  html[data-groot-page="java"][data-groot-theme] .response-panel {min-height:340px}
+  html[data-groot-page="java"][data-groot-theme] .empty-state {min-height:240px}
+  html[data-groot-page="httpd"][data-groot-theme] .shell {margin-top:18px}
+  html[data-groot-page="httpd"][data-groot-theme] .hero {grid-template-columns:minmax(0,1fr);padding:32px 25px;gap:26px}
+  html[data-groot-page="httpd"][data-groot-theme] h1 {font-size:38px}
+  html[data-groot-page="httpd"][data-groot-theme] .version-card {padding:23px}
+  html[data-groot-page="httpd"][data-groot-theme] .version {font-size:46px}
+  html[data-groot-page="httpd"][data-groot-theme] .cards {padding-top:24px}
+}
+@media(max-width:520px) {
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] {--groot-lab-gutter:12px;--groot-lab-inset:16px}
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .topbar {padding:18px 17px;gap:17px 10px}
+  html:is([data-groot-page="java"],[data-groot-page="httpd"])[data-groot-theme] .brand {font-size:15px;letter-spacing:.8px}
+  html[data-groot-page="java"][data-groot-theme] body>.topbar,html[data-groot-page="httpd"][data-groot-theme] .shell {margin-top:12px}
+  html[data-groot-page="java"][data-groot-theme] body>main,html[data-groot-page="httpd"][data-groot-theme] .shell {margin-bottom:22px}
+  html[data-groot-page="java"][data-groot-theme] .topbar .brand-mark {width:29px;height:29px;font-size:15px}
+  html[data-groot-page="java"][data-groot-theme] .lab-label,html[data-groot-page="httpd"][data-groot-theme] .tag {padding:6px 8px;font-size:9px}
+  html[data-groot-page="java"][data-groot-theme] .intro {padding:31px 24px 0}
+  html[data-groot-page="java"][data-groot-theme] h1 {font-size:clamp(42px,11.5vw,58px);letter-spacing:-1.8px}
+  html[data-groot-page="java"][data-groot-theme] .intro>p {font-size:12px}
+  html[data-groot-page="java"][data-groot-theme] .runtime {margin:25px -24px 0;padding:17px 24px;gap:11px;font-size:10px}
+  html[data-groot-page="java"][data-groot-theme] .runtime b {font-size:10px}
+  html[data-groot-page="java"][data-groot-theme] .runtime .text-button {font-size:10px}
+  html[data-groot-page="java"][data-groot-theme] .panel-heading {padding:14px 16px;gap:9px;min-height:61px}
+  html[data-groot-page="java"][data-groot-theme] .panel-heading h2 {font-size:12px}
+  html[data-groot-page="java"][data-groot-theme] .input-panel form {padding:20px 16px}
+  html[data-groot-page="java"][data-groot-theme] #result {padding:20px 16px 5px}
+  html[data-groot-page="java"][data-groot-theme] .source-options {grid-template-columns:minmax(0,1fr)}
+  html[data-groot-page="java"][data-groot-theme] .source-options strong {font-size:11px}
+  html[data-groot-page="java"][data-groot-theme] .source-options small {font-size:10px}
+  html[data-groot-page="java"][data-groot-theme] .source-options span {padding:12px 8px 12px 31px}
+  html[data-groot-page="java"][data-groot-theme] .field-heading {flex-wrap:wrap;gap:2px 8px;margin-bottom:5px}
+  html[data-groot-page="java"][data-groot-theme] textarea {font-size:16px}
+  html[data-groot-page="java"][data-groot-theme] .actions {align-items:stretch;flex-direction:column}
+  html[data-groot-page="java"][data-groot-theme] .primary-button {flex:none}
+  html[data-groot-page="java"][data-groot-theme] .flow {padding:17px 15px;gap:12px}
+  html[data-groot-page="java"][data-groot-theme] .flow span {width:100%;font-size:10px}
+  html[data-groot-page="java"][data-groot-theme] .flow i {display:none}
+  html[data-groot-page="java"][data-groot-theme] footer {font-size:9px;line-height:1.9}
+  html[data-groot-page="httpd"][data-groot-theme] .brand span {font-size:6px;letter-spacing:1.2px}
+  html[data-groot-page="httpd"][data-groot-theme] .hero {padding:31px 24px 25px}
+  html[data-groot-page="httpd"][data-groot-theme] h1 {font-size:clamp(26px,7.4vw,36px);letter-spacing:-1px}
+  html[data-groot-page="httpd"][data-groot-theme] .intro {font-size:12px}
+  html[data-groot-page="httpd"][data-groot-theme] .chips span {font-size:9px;padding:5px 7px}
+  html[data-groot-page="httpd"][data-groot-theme] .version-card {padding:20px}
+  html[data-groot-page="httpd"][data-groot-theme] .version {font-size:42px}
+  html[data-groot-page="httpd"][data-groot-theme] .card {padding:20px 17px}
+  html[data-groot-page="httpd"][data-groot-theme] .card h2 {font-size:19px}
+  html[data-groot-page="httpd"][data-groot-theme] .card dl {grid-template-columns:minmax(0,1fr);gap:3px}
+  html[data-groot-page="httpd"][data-groot-theme] .card dt:not(:first-child) {margin-top:8px}
+  html[data-groot-page="httpd"][data-groot-theme] .note {padding:18px 17px}
+  html[data-groot-page="httpd"][data-groot-theme] footer {font-size:9px;gap:10px;align-items:flex-start;flex-direction:column}
+}
+
 html[data-groot-page="generic"][data-groot-theme] a {color:var(--groot-accent)}
 
 /* Only theme surfaces and this control animate; existing controls keep theirs. */

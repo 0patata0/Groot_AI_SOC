@@ -17,7 +17,10 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 5. SIEM을 설치·검증하고 등록 CA·암호를 두 agent 서버로 전달한다. Wazuh Dashboard의 `admin` 암호(`siem.json`의 `indexer_password`)는 SSH 파이프로 service의 root0600 파일에 직접 전달한다. Mac 파일·명령 인수·로그에는 저장하지 않는다.
 6. service에 독립 DVWA/MariaDB, FastAPI 콘솔·제한된 Docker broker·nft guard, 전용 Nginx gateway, 별도 sudo rootless 환경, Wazuh agent를 구성한다.
 7. security에 Suricata·기존 DVWA WAF와 별도 Log4Shell TLS 진입점을 구성한다. 관리·예외 키 인증은 콘솔에 직접 연결하고, 고정된3개 실습 경로만 WAF를 지난다. 일반 요청은 규칙에 걸릴 때 차단하며 유효한 예외 세션은 감사 로그를 유지한다.
-8. 설치 결과와 파일·이미지·컨테이너·서비스 상태를 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제·자동 재시도를 하지 않는다.
+8. SIEM이 생성한 Mattermost 관리자 ID를 승인자로 고정하고 승인 브로커·정확 후보 worker·규칙 MCP·제한된 응답 MCP·Native AR 사건 전달을 구성한다. 전용 토큰은 B→A SSH 파이프로 전달하며, 승인자 암호를 MCP에 배포하지 않는다. 관리용 SSH는 고정 명령과 검증된 host key만 사용한다.
+9. Vector0.59.0 정제·원본 세대 회전·출력 유지관리·이전 부트 로컬 보관을 구성하고, 실제 등록 agent ID에 결속한 Indexer 상관관측 모니터를 추가한다. 관측 모니터의 `actions`는 비어 있으며 자체 차단을 실행하지 않는다.
+10. 통합 SOC 대시보드의 14개 패널을 구성한다. 기존 saved object와 내용이 충돌하면 덮어쓰지 않고 중단한다. 없는 객체만 생성하고 전체 내용을 재조회한다. 그 뒤 Hermes 관리 경로를 활성화한다.
+11. 기본 역할과 SOC 확장의 파일·이미지·컨테이너·서비스·승인 경계를 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제를 하지 않는다. 대시보드의 아직 완료되지 않은 동일 내용 생성만 제한적으로 재개할 수 있고, 다른 확장 부분 설치는 검토 없이 재시도하지 않는다.
 
 웹 실습3개는 로컬 이미지가 준비된 상태로 등록하고 사용자가 콘솔에서 실행한다. sudo는 웹에서 실행할 수 없으며 관리자 전용 CLI와 상태 발행기를 사용한다. DVWA는 `http://SECURITY_HOST:WAF_PORT/dvwa/`, 콘솔·Java·Apache 두 버전은 `LAB_PUBLIC_ORIGIN/log4shell/` 아래다. DVWA를 Log4Shell 메뉴에 다시 추가하지 않는다.
 
@@ -65,7 +68,7 @@ sha256sum java-lab.tar
 | 공통 | Ubuntu24.04 amd64·systemd·Python3.12·SSH/sudo 및 검증된 host keys. Docker Engine/CLI/Compose·관리 명령은 로컬 deb로 설치 가능 |
 | SIEM | 기존 [SIEM 준비 목록](setup-packages-artifacts.md)의 Wazuh 원본 tree, `siem.json`, Python bcrypt, Wazuh/Mattermost/PostgreSQL/Hermes 이미지와 관련 소스 |
 | service | Wazuh agent4.14.8, Docker29.8.1/CLI, uidmap·libsubid4·dbus-user-session·AppArmor·nftables·gpgv; DVWA/MariaDB/WAF 이미지; 아래4항목 카탈로그와3개 관리형 이미지; 전체 lock wheel 디렉터리; 고정 sudo bundle |
-| security | Wazuh agent4.14.8, Suricata/WAF 이미지, 검증한 ET Open 룰, 지정 DNS 이름의 TLS 인증서·개인키, 접속 허용 내부망/VPN CIDR |
+| security | Wazuh agent4.14.8, Vector0.59.0 로컬 deb와 전이 의존성, Suricata8.0.6/WAF 이미지, jq·logrotate·util-linux·nftables, 검증한 ET Open 룰, 지정 DNS 이름의 TLS 인증서·개인키, 접속 허용 내부망/VPN CIDR |
 
 콘솔 wheel은 [prepare-python.sh](../infra/groot-c/offline-labs/scripts/prepare-python.sh)의 Ubuntu/Python3.12 amd64용 전체 목록과 해시를 사용한다. 카탈로그는 [cve_list.json](../infra/groot-c/offline-labs/cve_list.json), 웹이미지 반출입은 [offline-labs README](../infra/groot-c/offline-labs/README.md)를 따른다. sudo는 [고정 rootless bootstrap](../infra/groot-c/offline-labs/nonweb/sudo/runtime/BOOTSTRAP.md)의 별도 서명 증빙까지 필요하다. sudo의 준비 JSON만 보고 서명 검증을 생략하지 않는다.
 
@@ -75,6 +78,21 @@ sha256sum java-lab.tar
 
 셸 구문·컨트롤러 가상 SSH 순서·입력/반입물 위변조·역할 생성물·초기 설치 실패/재실행·고정 권한 계약을 자동 시험한다. 기존 운영 서버의 웹·HMAC·WAF canary·sudo 환경 검증과 **새 VM3대 전체 설치 검증**은 별개다. 새 설치 경로의 실제 VM 전체 적용은 아직 실행하지 않았다. 신규 VM에서 `--apply`와 허용 클라이언트 HTTPS 접속까지 통과한 이후에만 실제 설치 검증 완료로 기록한다.
 
-이 초기 설치기는 현재 저장소의 역할별 지원 범위를 따른다. 운영망 NAT/VPN/DNS 자체를 구축하거나, 기존 SOC의 모든 수동 이력을 자동 이관하거나, LLM에 일반 sudo/Docker·패키지 설치 권한을 부여하지 않는다. Suricata 수집은 기존 역할의 수동 탐지 모드이며 관리자의 승인 브로커·자동 차단 체계는 해당 구성의 별도 지원 범위를 확인한다.
+SOC 연결의 설치 코드는 포함하되, 이 변경의 새 VM 설치 시험은 사용자 요청으로 제외했다. 구문·격리 회귀 통과와 실제 서비스 기동·공격 E2E 성공을 구분한다. 최초 빈 인덱스에는 최소 필드 메타데이터를 사용하므로 대시보드 생성 성공만으로 실제 탐지 데이터나 화면 렌더링까지 검증했다고 표시하지 않는다.
+
+내부 단계·권한·부분 실패와 재실행 계약은 [SOC 관리 확장](SOC_MANAGEMENT.md)과 [로그 처리 모듈](log-pipeline.md)에 기록했다. 이번 소스와 로컬 검증 결과는 [SOC 설치기 검증 기록](soc-bootstrap-validation-20261023.json)으로 구분해 보존한다.
+
+`LOG_PROTECTED_IPS`는 추가 보호 IPv4의 쉼표 목록이다. 세 서버와 IP로 지정한 LLM은 자동 합집합으로 포함한다. LLM을 호스트명으로 지정하면 그 서버의 승인된 실제 IP를 명시해야 하며 설치 중 DNS로 추정하지 않는다. 관리·VPN 인프라 주소도 이 목록에 포함한다. 기존 대응 정책의 비공개/예약 주소 보호를 유지하므로 내부 실습 출발지의 실제 IP 차단 허용 범위를 이 설치기가 임의로 넓히지 않는다.
+
+관리자 차단 예외는 별도 선택 항목 `ADMIN_PROTECTED_CIDRS`다. 대화형 초기 설정에서 다음처럼 묻고, 값이 없으면 Enter로 넘어간다. 설정 파일에 빈 `ADMIN_PROTECTED_CIDRS=`를 적거나 batch 모드에서 생략해도 추가 예외 없이 진행한다.
+
+```text
+차단 예외 관리자 IPv4 또는 CIDR 대역 (쉼표 구분, 없으면 Enter): 192.168.10.25,192.168.15.0/24
+관리자 IP 차단 예외: 192.168.10.25/32,192.168.15.0/24
+```
+
+단일 IP는 `/32`로, 호스트 비트가 있는 대역은 실제 네트워크 주소로 정리하고 중복·포함 범위를 합친다. 값은 서버 프로필과 nft `never_block`에 저장하고, LLM 임시 차단·관리자 승인형 IP 차단의 실행 전에도 검사한다. 관리자 대역의 탐지·원본 로그 수집은 계속 수행한다. 이 항목은 HTTPS 접속 허용망 `LAB_ALLOWED_CIDRS`나 WAF 요청 검사 예외 세션과 별개다.
+
+운영망 FORWARD/NAT/VPN/DNS 자체, 공개 인증서 발급·채팅 HTTPS, 기존 SOC의 수동 이력·기존 승인 DB, A→B 이전 로그 전송, 긴 장애 구간의 무손실 회수·일반 백업·실제 공격 E2E는 별도 범위다. Suricata는 수동 탐지 모드를 유지하고 제한된 별도 nft 대응 경로를 사용한다. LLM에 일반 sudo/Docker·패키지 설치 권한을 부여하지 않는다.
 
 앞으로 서버 변경을 수행하면 같은 작업에서 `deploy.sh`의 역할/helper·반입 목록·설정 예제·검증을 갱신한다. 운영 서버 재설정과 신규 설치는 구분한다. 상시 서버 감시나 소스 자동 작성 데몬은 추가하지 않는다.

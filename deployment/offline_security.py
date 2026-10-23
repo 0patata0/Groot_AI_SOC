@@ -47,7 +47,11 @@ def trusted(path, *, private=False, limit=2 * 1024 * 1024):
     for parent in path.parents:
         info = parent.lstat()
         anchor = staged and str(parent) == '/var/tmp' and stat.S_IMODE(info.st_mode) == 0o1777
-        need(stat.S_ISDIR(info.st_mode) and info.st_uid == 0 and (anchor or not info.st_mode & 0o022), 'untrusted_parent')
+        audit_parent = (not private and path == Path('/opt/capstone/security/logs/modsecurity/capstone-managed/audit-path.conf')
+                        and parent == Path('/opt/capstone/security/logs/modsecurity')
+                        and info.st_uid == 101 and info.st_gid == 101 and stat.S_IMODE(info.st_mode) == 0o755)
+        need(stat.S_ISDIR(info.st_mode) and (info.st_uid == 0 or audit_parent)
+             and (anchor or not info.st_mode & 0o022), 'untrusted_parent')
         if staged and parent == source.parent:
             need(stat.S_IMODE(info.st_mode) == 0o700, 'untrusted_stage')
     info = path.lstat()
@@ -273,6 +277,14 @@ def native(data, command):
             args += ['--read-only', '--user', '101:101', '--workdir', '/tmp', '--entrypoint', 'nginx']
         else:
             args += ['--tmpfs', '/var/log/modsecurity:rw,nosuid,nodev,noexec,size=32m,mode=1777']
+            if (role / 'log-pipeline/receipt.json').exists():
+                # The producer override includes this immutable pointer. Its
+                # target is created solely inside the probe's private tmpfs;
+                # never mount an operational audit stream into a syntax test.
+                pointer = trusted(role / 'logs/modsecurity/capstone-managed/audit-path.conf')
+                args += ['--tmpfs', '/var/log/modsecurity/capstone-managed:rw,nosuid,nodev,noexec,size=8m,mode=1777',
+                         '--mount', 'type=bind,source=' + str(pointer) +
+                         ',target=/var/log/modsecurity/capstone-managed/audit-path.conf,readonly']
         for key, value in spec.get('environment', {}).items():
             args += ['--env', key + '=' + str(value)]
         for mount in spec['volumes']:

@@ -45,6 +45,17 @@ class Tests(unittest.TestCase):
         with self.assertRaises(self.n['Refused']):fn()
     def test_duplicate_secret_key_refused(self):
         self.reject(lambda:self.n['parse'](b'{"password":"one","password":"two"}'))
+    def test_dashboard_disables_multitenancy_without_changing_other_lines(self):
+        original=b'server.host: 0.0.0.0\nopensearch_security.multitenancy.enabled: true # old\nserver.port: 5601\n'
+        expected=b'server.host: 0.0.0.0\nopensearch_security.multitenancy.enabled: false\nserver.port: 5601\n'
+        self.assertEqual(self.n['dashboard_single_tenant'](original),expected)
+        self.assertEqual(self.n['dashboard_single_tenant'](expected),expected)
+        self.assertEqual(self.n['dashboard_single_tenant'](b'server.port: 5601\n'),
+                         b'server.port: 5601\nopensearch_security.multitenancy.enabled: false\n')
+    def test_dashboard_ambiguous_multitenancy_refused(self):
+        key=b'opensearch_security.multitenancy.enabled'
+        for value in (key+b': true\n'+key+b': false\n',key+b': "false"\n',b'  '+key+b': true\n',b'"'+key+b'": true\n'):
+            with self.subTest(value=value):self.reject(lambda:self.n['dashboard_single_tenant'](value))
     def test_identity_allows_atime_only(self):
         s=types.SimpleNamespace(st_dev=1,st_ino=2,st_mode=0o100600,st_uid=0,st_gid=0,st_nlink=1,
                                 st_size=4,st_mtime_ns=5,st_ctime_ns=6,st_atime_ns=7)
@@ -76,6 +87,15 @@ class Tests(unittest.TestCase):
         self.reject(lambda:self.n['manager_auth_configuration'](b'<ossec_config><auth/><auth/></ossec_config>'))
     def test_duplicate_auth_option_refused(self):
         self.reject(lambda:self.n['manager_auth_configuration'](b'<ossec_config><auth><port>1</port><port>2</port></auth></ossec_config>'))
+    def test_log_activation_budget_covers_all_native_groups(self):
+        calls=[]
+        self.n['run']=lambda argv,timeout: calls.append((argv,timeout))
+        self.n['log_pipeline']('activate')
+        self.assertGreater(calls[-1][1],4*180+120)
+        self.assertEqual(calls[-1][0][-2:],['activate','siem'])
+        for action in ('check','prepare'):
+            self.n['log_pipeline'](action)
+            self.assertEqual(calls[-1][1],120)
     def test_extra_service_refused(self):
         self.c['services']['unknown']={};self.reject(lambda:self.n['validate_wazuh'](self.c))
     def test_privileged_refused(self):
@@ -173,14 +193,16 @@ class Tests(unittest.TestCase):
         config={'mcp_servers':{'only-readonly':{}},'toolsets':['mcp-wazuh-ro']}
         baseline=copy.deepcopy(config)
         env=self.n['install_hermes_extensions'](self.n['DEST']/'bot',user,creds,config)
-        self.assertEqual(len(written),5)
-        self.assertEqual(len(reads),5)
+        self.assertEqual(len(written),7)
+        self.assertEqual(len(reads),7)
         self.assertEqual({pathlib.Path(p).name for p in written},{'__init__.py','plugin.yaml','channel_sync.py','HOOK.yaml','handler.py'})
         self.assertTrue(any('/plugins/groot-mattermost-context/' in p for p in written))
         self.assertTrue(any('/hooks/groot-mattermost-channel-sync/' in p for p in written))
+        self.assertEqual({pathlib.Path(p).name for p in written if '/plugins/groot-query-completion/' in p},
+                         {'__init__.py','plugin.yaml'})
         self.assertTrue(all(value[1:]==(0o600,995,986) for value in written.values()))
         self.assertTrue(all(value[1:]==(0o700,995,986) for value in created))
-        self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context']})
+        self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context','groot-query-completion']})
         self.assertEqual({k:v for k,v in config.items() if k!='plugins'},baseline)
         self.assertEqual(env['MATTERMOST_ALLOWED_USERS'],creds['mattermost_admin_id'])
         self.assertEqual(env['MATTERMOST_ALLOWED_CHANNELS'],'')
@@ -199,15 +221,92 @@ class Tests(unittest.TestCase):
             self.reject(lambda:self.n['install_hermes_extensions'](self.n['DEST'],user,creds,{}))
         self.assertEqual(calls,[])
     def test_extension_sources_participate_in_immutable_profile(self):
-        values={'extension':b'first'}
-        def read(path,*args,**kwargs):
-            return values['extension'] if 'mattermost-context' in str(path) else b'unchanged'
+        for source in self.n['hermes_extension_files']():
+            with self.subTest(source=source):
+                values={'extension':b'first'}
+                def read(path,*args,**kwargs):
+                    return values['extension'] if path==self.n['SOURCE']/source else b'unchanged'
+                self.n['read']=read
+                first=self.n['profile']({},self.images)
+                values['extension']=b'second'
+                second=self.n['profile']({},self.images)
+                changed={key for key,value in first['source_sha256'].items() if value!=second['source_sha256'][key]}
+                self.assertEqual(changed,{source})
+    def query_plugin(self):
+        return (pathlib.Path(sys.argv[1]).resolve().parents[2]/'infra/hermes/query-completion/__init__.py').read_bytes()
+    def test_query_source_pins_use_bounded_plugin_source_without_import(self):
+        calls=[];raw=self.query_plugin()
+        def read(path,cap):calls.append((path,cap));return raw
         self.n['read']=read
-        first=self.n['profile']({},self.images)
-        values['extension']=b'second'
-        second=self.n['profile']({},self.images)
-        changed={key for key,value in first['source_sha256'].items() if value!=second['source_sha256'][key]}
-        self.assertEqual(changed,set(self.n['hermes_extension_files']()))
+        pins=self.n['query_completion_source_pins']()
+        self.assertEqual(calls,[(self.n['SOURCE']/'infra/hermes/query-completion/__init__.py',512*1024)])
+        self.assertEqual(set(pins),{'agent/turn_final_response.py','agent/conversation_loop.py',
+                                   'agent/turn_context.py','agent/message_metadata.py',
+                                   'agent/turn_api_request.py','agent/chat_completion_helpers.py'})
+        self.assertTrue(all(len(value)==64 for value in pins.values()))
+        # Parsing pins must not execute other top-level plugin code.
+        self.assertEqual(self.n['query_completion_source_pins'](raw+b'\nraise RuntimeError("must_not_execute")\n'),pins)
+    def test_query_source_pins_reject_missing_duplicate_executable_or_invalid_hash(self):
+        pins=self.n['query_completion_source_pins'](self.query_plugin())
+        valid='SOURCE_SHA256 = '+repr(pins)+'\n'
+        variants=[b'\xff',b'SOURCE_SHA256 = {',b'SOURCE_SHA256 = dict()',b'OTHER = {}',
+                  (valid+valid).encode(),b'SOURCE_SHA256 = __import__("os").environ']
+        for path in pins:
+            missing=dict(pins);missing.pop(path);variants.append(('SOURCE_SHA256 = '+repr(missing)).encode())
+            wrong=dict(pins);wrong[path]='not-a-source-hash';variants.append(('SOURCE_SHA256 = '+repr(wrong)).encode())
+        escaped=dict(pins);escaped['../../outside.py']=escaped.pop(next(iter(pins)))
+        variants.append(('SOURCE_SHA256 = '+repr(escaped)).encode())
+        duplicate='SOURCE_SHA256 = {'+','.join(repr(k)+':'+repr(v) for k,v in pins.items())+','+repr(next(iter(pins)))+':'+repr(next(iter(pins.values())))+'}'
+        variants.append(duplicate.encode())
+        for raw in variants:
+            with self.subTest(raw=raw[:40]):self.reject(lambda:self.n['query_completion_source_pins'](raw))
+    def image_probe_code(self):
+        return next(n.value.value for n in ast.walk(tree) if isinstance(n,ast.Assign)
+                    and any(isinstance(t,ast.Name) and t.id=='code' for t in n.targets)
+                    and isinstance(n.value,ast.Constant) and isinstance(n.value.value,str)
+                    and 'VALID_HOOKS' in n.value.value)
+    def test_image_probe_rejects_drift_or_missing_native_source_for_each_pin(self):
+        whole=self.image_probe_code()
+        code=whole[whole.index('source_pins=json.loads'):whole.index('from hermes_cli.plugins import')]
+        paths=self.n['query_completion_source_pins'](self.query_plugin())
+        files={path:('synthetic-native:'+path).encode() for path in paths}
+        pins={path:hashlib.sha256(data).hexdigest() for path,data in files.items()}
+        def path(root,relative):
+            self.assertEqual(root,'/opt/hermes')
+            return types.SimpleNamespace(read_bytes=lambda:files[relative])
+        scope={'sys':types.SimpleNamespace(argv=['probe','guard-sha',json.dumps(pins)]),
+               'hashlib':hashlib,'json':json,'pathlib':types.SimpleNamespace(Path=path)}
+        exec(code,scope)
+        for relative in paths:
+            with self.subTest(relative=relative):
+                original=files[relative];files[relative]=b'changed-native-source'
+                with self.assertRaises(AssertionError):exec(code,scope)
+                del files[relative]
+                with self.assertRaises(KeyError):exec(code,scope)
+                files[relative]=original
+    def test_image_probe_passes_plugin_pins_without_network_mounts_or_installs(self):
+        commands=[];raw=self.query_plugin()
+        self.n['read']=lambda path,*args,**kwargs:raw if 'query-completion' in str(path) else b'guard-fixture'
+        self.n['run']=lambda argv,*args,**kwargs:commands.append(argv) or b''
+        self.n['image_probe']('sha256:'+'a'*64)
+        run=commands[0]
+        self.assertEqual(json.loads(run[-1]),self.n['query_completion_source_pins'](raw))
+        self.assertEqual(run[run.index('--network')+1],'none')
+        self.assertEqual(run[run.index('--pull')+1],'never')
+        self.assertIn('--read-only',run)
+        self.assertNotIn('--volume',run);self.assertNotIn('--mount',run)
+        self.assertEqual(commands[1][:3],['docker','ps','-a'])
+    def test_query_source_and_image_compatibility_fail_before_fresh_installation(self):
+        preflight=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='preflight')
+        calls=[n for n in ast.walk(preflight) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name)]
+        pin_calls=[n for n in calls if n.func.id=='query_completion_source_pins']
+        self.assertEqual(len(pin_calls),1)
+        self.assertLess(pin_calls[0].lineno,min(n.lineno for n in calls if n.func.id=='image_id'))
+        main=next(n for n in tree.body if isinstance(n,ast.Try))
+        direct=[node.value for node in main.body if isinstance(node,ast.Expr) and isinstance(node.value,ast.Call)]
+        image=next(n for n in direct if isinstance(n.func,ast.Name) and n.func.id=='image_probe')
+        prepare=next(n for n in ast.walk(main) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='prepare_files')
+        self.assertLess(image.lineno,prepare.lineno)
     def response_policy(self):
         return (pathlib.Path(sys.argv[1]).resolve().parents[2]/'infra/hermes/SOUL.groot.md').read_bytes()
     def test_response_format_extracts_only_exact_shared_four_bullets(self):
@@ -220,6 +319,29 @@ class Tests(unittest.TestCase):
         self.assertNotIn('get_rule_change_target',block)
         self.assertNotIn('propose_rule_edit',block)
         self.assertNotIn('LLM이 SOC 운영의 관리 주체다',block)
+    def test_response_format_uses_chat_lists_and_limits_table_exception(self):
+        block=self.n['hermes_response_format'](self.response_policy())
+        bullets=[line for line in block.splitlines() if line.startswith('- ')]
+        self.assertIn('`- **대상명**: 상태 — 근거`',bullets[0])
+        self.assertNotIn('`대상 | 상태 | 근거`',block)
+        self.assertNotIn('`항목 | 내용`',block)
+        for form in ('파이프(`|`)로 열을 나눈 표','공백으로 정렬한 표','HTML 표','표를 감싼 코드 블록'):
+            self.assertIn(form,bullets[2])
+        self.assertIn('기본 서식으로 쓰지 않는다',bullets[2])
+        self.assertIn('Markdown 문서·파일 생성 요청의 문서 본문이나 사용자가 명시적으로 표를 요청한 경우에만 표를 사용한다',bullets[2])
+        self.assertIn('파일을 제공하는 채팅 안내 자체는 목록으로 쓴다',bullets[2])
+        self.assertIn('전체 답변을 코드 블록으로 감싸지 않는다',bullets[2])
+    def test_response_format_approval_lists_keep_six_fields_and_card_authority(self):
+        block=self.n['hermes_response_format'](self.response_policy())
+        approval=[line for line in block.splitlines() if line.startswith('- ')][1]
+        self.assertIn('`- **항목명**: 내용`',approval)
+        fields=('대상','변경 전','변경 후','예상 영향','검증','승인 상태')
+        positions=[approval.index('`'+field+'`') for field in fields]
+        self.assertEqual(positions,sorted(positions))
+        self.assertIn('여섯 항목을 각각 별도 줄에 쓴다',approval)
+        self.assertIn('실제 도구가 제공한 승인 링크',approval)
+        self.assertIn('아직 제출하지 않은 후보를 승인 요청 완료로 표시하지 않는다',approval)
+        self.assertIn('일반 채팅의 동의는 카드 승인이 아니다',approval)
     def test_response_format_fails_closed_for_missing_duplicate_or_changed_structure(self):
         raw=self.response_policy()
         start='<!-- rule-change-policy:start -->\n### SOC 응답 서식\n'.encode()
@@ -263,7 +385,7 @@ class Tests(unittest.TestCase):
         whole=next(value for value in codes if 'VALID_HOOKS' in value)
         code=whole[whole.index('from hermes_cli.plugins import'):whole.index('from hermes_cli.tools_config import')]
         plugins=types.ModuleType('hermes_cli.plugins')
-        plugins.PluginContext=types.SimpleNamespace(register_hook=lambda:None)
+        plugins.PluginContext=types.SimpleNamespace(register_hook=lambda:None,on_unload=lambda:None)
         plugins.VALID_HOOKS={'pre_gateway_dispatch'}
         hooks=types.ModuleType('gateway.hooks')
         hooks.HookRegistry=types.SimpleNamespace(discover_and_load=lambda:None,emit=lambda:None,emit_collect=lambda:None)
@@ -288,6 +410,9 @@ class Tests(unittest.TestCase):
             plugins.VALID_HOOKS=set()
             with self.assertRaises(AssertionError):exec(code,scope)
             plugins.VALID_HOOKS={'pre_gateway_dispatch'}
+            plugins.PluginContext.on_unload=None
+            with self.assertRaises(AssertionError):exec(code,scope)
+            plugins.PluginContext.on_unload=lambda:None
             sources[prepare]='_prepend_inbound_reply_context before _expand_inbound_context_references'
             with self.assertRaises(AssertionError):exec(code,scope)
     def test_embedded_programs_compile(self):

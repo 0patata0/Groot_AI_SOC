@@ -2,8 +2,10 @@
 """Exercise the real controller against a fake SSH transport; no host mutations."""
 import json
 import os
+import pty
 from pathlib import Path
 import shutil
+import shlex
 import subprocess
 import tempfile
 import unittest
@@ -22,6 +24,12 @@ if command=='cat /etc/machine-id':
 elif '/deployment/remote.sh ' in command:
     phase=' '.join(command.split()[-2:])
     if os.environ.get('FAIL_PHASE')==phase: sys.exit(42)
+    if phase=='siem soc-export': sys.stdout.buffer.write(b'private-soc-test-stream')
+    elif phase=='security soc-receive':
+        if sys.stdin.buffer.read()!=b'private-soc-test-stream': sys.exit(48)
+    elif phase=='security soc-apply': sys.stdout.buffer.write(b'public-host-identity')
+    elif phase=='siem soc-activate':
+        if sys.stdin.buffer.read()!=b'public-host-identity': sys.exit(49)
 elif '/deployment/prerequisites.py ' in command:
     if os.environ.get('FAIL_BUNDLE') == ' '.join(command.split()[-2:]): sys.exit(45)
 elif '/deployment/lab_key.py check' in command:
@@ -56,6 +64,7 @@ class ControllerContract(unittest.TestCase):
         for name in ('deployment', 'infra', 'new_rule', 'bin', 'tmp'):
             (self.root / name).mkdir()
         shutil.copy2(ROOT / 'deployment/validate_lab_site.py', self.root / 'deployment/validate_lab_site.py')
+        shutil.copy2(ROOT / 'deployment/protected_hosts.py', self.root / 'deployment/protected_hosts.py')
         (self.root / 'infra' / 'CREDENTIALS.local.md').write_text('must-not-transfer')
         (self.root / 'infra' / '.env').write_text('must-not-transfer')
         (self.root / 'infra' / 'prepared.jar').write_text('must-not-transfer')
@@ -109,9 +118,16 @@ class ControllerContract(unittest.TestCase):
     def test_dependency_order_and_strict_ssh(self):
         result = self.run_controller()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
-                                        'siem apply', 'siem verify', 'service apply', 'service verify',
-                                        'security apply', 'security verify', 'siem verify'])
+        phases = self.phases()
+        self.assertEqual(phases[:6], ['security check', 'siem check', 'service check',
+                                     'security soc-check', 'siem soc-check', 'siem dashboard-check'])
+        for earlier, later in [('siem apply','service apply'), ('service verify','security apply'),
+                               ('security verify','siem soc-prepare'), ('siem soc-prepare','security soc-apply'),
+                               ('security soc-apply','security log-activate'), ('security log-activate','siem log-monitor'),
+                               ('siem log-monitor','siem dashboard-apply'), ('siem dashboard-apply','siem soc-activate')]:
+            self.assertLess(phases.index(earlier), phases.index(later))
+        self.assertEqual(phases[-6:], ['security soc-verify','security log-verify','siem verify',
+                                      'siem soc-verify','siem log-verify','siem dashboard-verify'])
         for event in self.events():
             self.assertIn('StrictHostKeyChecking=yes', event['args'])
             self.assertIn('BatchMode=yes', event['args'])
@@ -134,6 +150,7 @@ class ControllerContract(unittest.TestCase):
         result = self.run_controller(FAIL_PHASE='service apply')
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
+                                        'security soc-check', 'siem soc-check', 'siem dashboard-check',
                                         'siem apply', 'siem verify', 'service apply'])
         self.assertNotIn('구축 완료.', result.stdout)
         self.assert_clean()
@@ -141,7 +158,8 @@ class ControllerContract(unittest.TestCase):
     def test_check_does_not_apply(self):
         result = self.run_controller('--check')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.phases(), ['security check', 'siem check', 'service check'])
+        self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
+                                        'security soc-check', 'siem soc-check', 'siem dashboard-check'])
         self.assert_clean()
 
     def test_legacy_build_override_is_rejected_before_ssh(self):
@@ -190,8 +208,83 @@ class ControllerContract(unittest.TestCase):
     def test_verify_does_not_apply(self):
         result = self.run_controller('--verify')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.phases(), ['siem verify', 'service verify', 'security verify'])
+        self.assertEqual(self.phases(), ['siem verify', 'service verify', 'security verify',
+                                        'security soc-verify', 'security log-verify',
+                                        'siem soc-verify', 'siem log-verify', 'siem dashboard-verify'])
         self.assert_clean()
+
+    def test_soc_streams_never_appear_in_outputs_or_arguments(self):
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for marker in ('private-soc-test-stream', 'public-host-identity'):
+            self.assertNotIn(marker, result.stdout + result.stderr + str(self.events()))
+        self.assert_clean()
+
+    def test_extension_preflight_failure_prevents_role_install(self):
+        result = self.run_controller(FAIL_PHASE='security soc-check')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('siem apply', self.phases())
+        self.assert_clean()
+
+    def test_failed_extension_never_reports_complete(self):
+        result = self.run_controller(FAIL_PHASE='security log-activate')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('siem dashboard-apply', self.phases())
+        self.assertNotIn('구축 완료.', result.stdout)
+        self.assert_clean()
+
+    def test_protected_addresses_transferred_as_canonical_data(self):
+        with self.config.open('a') as f:
+            f.write('LOG_PROTECTED_IPS=192.0.2.70,192.0.2.10\n')
+        result = self.run_controller('--check')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for payload in self.payloads():
+            line=next(line for line in payload['site_env'].splitlines() if line.startswith('export LOG_PROTECTED_IPS='))
+            self.assertEqual(shlex.split(line)[1], 'LOG_PROTECTED_IPS=192.0.2.10,192.0.2.20,192.0.2.30,192.0.2.40,192.0.2.70')
+
+    def test_hostname_llm_requires_explicit_protection_before_network(self):
+        with self.config.open('a') as f:
+            f.write('LLM_BASE_URL=http://llm.example.org:11434/v1\n')
+        result = self.run_controller('--plan')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.events(), [])
+
+    def test_admin_blank_is_optional_and_reported(self):
+        result=self.run_controller('--plan')
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('관리자 IP 차단 예외: 추가 지정 없음',result.stdout)
+        with self.config.open('a') as f:f.write('ADMIN_PROTECTED_CIDRS=\n')
+        result=self.run_controller('--check')
+        self.assertEqual(result.returncode,0,result.stderr)
+        for payload in self.payloads():
+            line=next(x for x in payload['site_env'].splitlines() if x.startswith('export ADMIN_PROTECTED_CIDRS='))
+            self.assertEqual(shlex.split(line)[1],'ADMIN_PROTECTED_CIDRS=')
+
+    def test_admin_ip_and_network_are_canonicalized_for_every_host(self):
+        with self.config.open('a') as f:f.write('ADMIN_PROTECTED_CIDRS=198.51.100.25,192.168.15.42/24\n')
+        result=self.run_controller('--check')
+        self.assertEqual(result.returncode,0,result.stderr)
+        for payload in self.payloads():
+            line=next(x for x in payload['site_env'].splitlines() if x.startswith('export ADMIN_PROTECTED_CIDRS='))
+            self.assertEqual(shlex.split(line)[1],'ADMIN_PROTECTED_CIDRS=192.168.15.0/24,198.51.100.25/32')
+
+    def test_invalid_admin_network_stops_before_ssh(self):
+        with self.config.open('a') as f:f.write('ADMIN_PROTECTED_CIDRS=0.0.0.0/0\n')
+        result=self.run_controller('--check')
+        self.assertNotEqual(result.returncode,0)
+        self.assertEqual(self.events(),[])
+
+    def test_interactive_admin_prompt_accepts_empty_enter(self):
+        master,slave=pty.openpty()
+        try:
+            os.write(master,b'\n')
+            result=subprocess.run(['bash',str(self.root/'deploy.sh'),'--plan','--config',str(self.config)],
+                                  stdin=slave,capture_output=True,text=True,env=self.env,timeout=10)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('없으면 Enter',result.stderr)
+            self.assertIn('관리자 IP 차단 예외: 추가 지정 없음',result.stdout)
+        finally:
+            os.close(master);os.close(slave)
 
     def test_duplicate_host_identity_is_rejected_before_role_checks(self):
         result = self.run_controller(SAME_HOST='1')

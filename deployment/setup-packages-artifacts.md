@@ -4,6 +4,8 @@
 
 Log4Shell은 schema7부터 현재 콘솔과 검증된3개 웹이미지를 사용한다. 아래 구형 Java 직접Compose/JAR 자동 빌드 설명은 과거 schema6 준비 절차이며 신규 기본 경로가 아니다. 기존 빌드 도구는 Java 이미지 준비에 사용할 수 있다. sudo 고정 rootless bundle·wheel·TLS 자료도 새 가이드에 따라 반입한다.
 
+2026-10-23 SOC 확장에는 security 서버의 **Vector0.59.0과 Suricata8.0.6**이 필요하다. Vector 공식 Linux amd64 deb 및 전이 의존성의 출처·서명을 외부 Linux 준비 환경에서 검토하고, 해당 파일의 실제 Package/Version/Architecture/SHA를 security `artifacts.json`의 `packages`에 넣는다. 배포 revision을 추정해 기록하지 않는다. 기존 공통 준비 목록의 jq·logrotate·coreutils·util-linux·nftables·OpenSSH·systemd도 필요하다. 새 SOC helper와 대시보드 import는 Python 표준 라이브러리이며 별도 wheel을 요구하지 않는다. 준비 파일이 없으면 사전검사에서 중단하고 온라인 설치로 대체하지 않는다. 이 확장의 새 VM 설치 시험은 제외했다.
+
 다음 순서로 진행한다. SSH·고정 주소·라우팅을 먼저 준비하고, 이 문서의 자료 준비를 마친 뒤 `deploy.sh --check`를 실행한다. 예시의 `192.0.2.x`는 실제 배포 주소로 변경한다. 각 코드 블록의 실행 위치를 확인하고 **명령이 실패하면 다음 단계로 넘어가지 않는다.** 운영 중인 서버의 패키지나 agent 등록 정보를 삭제해서 신규 조건에 맞추지 않는다.
 
 | 실행 위치 | 준비할 내용 |

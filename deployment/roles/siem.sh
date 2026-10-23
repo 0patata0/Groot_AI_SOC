@@ -4,7 +4,7 @@
 set -euo pipefail
 [[ $# == 1 && $1 =~ ^(check|apply|verify)$ ]] || { echo 'usage: siem.sh check|apply|verify' >&2; exit 64; }
 exec python3 -B - "$1" <<'PY'
-import base64, copy, datetime, grp, hashlib, http.client, ipaddress, json, os, pathlib, pwd
+import ast, base64, copy, datetime, grp, hashlib, http.client, ipaddress, json, os, pathlib, pwd
 import re, secrets, shutil, socket, ssl, stat, subprocess, sys, time, urllib.error
 import urllib.parse, urllib.request, xml.etree.ElementTree as ET
 
@@ -100,6 +100,14 @@ def run(argv, timeout=30, data=None):
     return r.stdout
 def compose_args(file):
     return ['docker', 'compose', '--project-name', PROJECT, '--project-directory', str(file.parent), '-f', str(file)]
+def log_pipeline(action):
+    values=dict(HOSTS, CAPSTONE_SOURCE=str(SOURCE), CAPSTONE_ROOT=str(ROOT), LLM_BASE_URL=LLM,
+                LOG_PROTECTED_IPS=os.environ.get('LOG_PROTECTED_IPS',''))
+    # Activation includes four sequential native logtest groups (180 s each)
+    # plus bounded Docker/source checks. Do not kill a valid child at 120 s.
+    timeout = 900 if action == 'activate' else 120
+    return run(['env',*[k+'='+v for k,v in values.items()],
+                'python3','-B',str(SOURCE/'deployment/log_pipeline.py'),action,'siem'],timeout)
 def docker_inspect(name): return parse(run(['docker', 'inspect', name]))[0]
 def image_id(ref):
     d = parse(run(['docker', 'image', 'inspect', ref]))[0]
@@ -131,7 +139,31 @@ def hermes_extension_files():
     return {base + name: 'plugins/groot-mattermost-context/' + name
             for name in ('__init__.py', 'plugin.yaml', 'channel_sync.py')} | {
         base + 'startup/' + name: 'hooks/groot-mattermost-channel-sync/' + name
-        for name in ('HOOK.yaml', 'handler.py')}
+        for name in ('HOOK.yaml', 'handler.py')} | {
+        'infra/hermes/query-completion/' + name: 'plugins/groot-query-completion/' + name
+        for name in ('__init__.py', 'plugin.yaml')}
+def query_completion_source_pins(raw=None):
+    # Read literal pins from the shipped plugin without importing/executing it.
+    if raw is None:
+        raw = read(SOURCE/'infra/hermes/query-completion/__init__.py',512*1024)
+    try:
+        module = ast.parse(raw.decode('utf-8'))
+        bindings = [node for node in module.body if isinstance(node,ast.Assign)
+                    and any(isinstance(target,ast.Name) and target.id=='SOURCE_SHA256'
+                            for target in node.targets)]
+        need(len(bindings)==1 and isinstance(bindings[0].value,ast.Dict),
+             'query_completion_source_pins_invalid')
+        node = bindings[0].value
+        pins = ast.literal_eval(node)
+    except (AttributeError,UnicodeError,SyntaxError,ValueError,TypeError,RecursionError):
+        raise Refused('query_completion_source_pins_invalid') from None
+    expected = {'agent/turn_final_response.py','agent/conversation_loop.py',
+                'agent/turn_context.py','agent/message_metadata.py',
+                'agent/turn_api_request.py','agent/chat_completion_helpers.py'}
+    need(len(node.keys)==len(expected) and set(pins)==expected and
+         all(isinstance(value,str) and re.fullmatch(r'[0-9a-f]{64}',value) for value in pins.values()),
+         'query_completion_source_pins_invalid')
+    return pins
 def hermes_response_format(raw=None):
     if raw is None:
         raw = read(SOURCE/'infra/hermes/SOUL.groot.md',512*1024)
@@ -167,7 +199,7 @@ def install_hermes_extensions(data, hu, creds, hc):
         mkdir(data / relative,0o700,hu.pw_uid,hu.pw_gid)
     for source, relative in files.items():
         publish(data / relative,read(SOURCE/source,512*1024),0o600,hu.pw_uid,hu.pw_gid)
-    hc['plugins'] = {'enabled':['groot-mattermost-context']}
+    hc['plugins'] = {'enabled':['groot-mattermost-context','groot-query-completion']}
     return {'MATTERMOST_URL':'http://'+IP+':8065','MATTERMOST_TOKEN':creds['mattermost_bot_token'],
             'MATTERMOST_ALLOWED_USERS':creds['mattermost_admin_id'],'MATTERMOST_ALLOWED_CHANNELS':'',
             'MATTERMOST_HOME_CHANNEL':creds['mattermost_channel_id'],'MATTERMOST_REQUIRE_MENTION':'true',
@@ -252,9 +284,12 @@ def preflight():
               'infra/groot-b/local_rules.xml','infra/groot-b/local_decoder.xml', *hermes_extension_files()):
         read(SOURCE/p, 512*1024)
     hermes_response_format()
+    query_completion_source_pins()
     images = {k: image_id(v) for k, v in IMAGES.items()}; images['hermes'] = image_id(cfg['hermes_image'])
     compose = parse(run(compose_args(TREE/'docker-compose.yml') + ['config', '--format', 'json'], 45))
     validate_wazuh(compose)
+    dashboard_single_tenant(read(dashboard_configuration_mount(compose)))
+    log_pipeline('check')
     need(tree_snapshot(TREE) == snap, 'prerequisite_tree_changed')
     sshcfg = run(['sshd', '-T', '-C', 'user='+MCP_USER+',host=localhost,addr='+IP+',laddr='+IP+',lport='+SSH_PORT]).decode()
     need('pubkeyauthentication yes\n' in sshcfg and 'usepam yes\n' in sshcfg, 'manual_sshd_pubkey_and_UsePAM_required')
@@ -358,6 +393,21 @@ def create_certificates():
     fd=os.open(target,os.O_RDONLY|os.O_DIRECTORY)
     try: os.fsync(fd)
     finally: os.close(fd)
+def dashboard_configuration_mount(c):
+    paths=[v for v in c['services']['wazuh.dashboard'].get('volumes',[])
+           if v.get('type')=='bind' and v.get('target')=='/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml']
+    need(len(paths)==1,'official_dashboard_configuration_mount_required')
+    return pathlib.Path(paths[0]['source'])
+def dashboard_single_tenant(raw):
+    # Change one reviewed YAML scalar; never silently override ambiguous keys.
+    key=rb'opensearch_security\.multitenancy\.enabled'
+    lines=list(re.finditer(rb'^[ \t]*[\'"]?'+key+rb'[\'"]?\s*:.*$',raw,re.M))
+    need(len(lines)<=1,'duplicate_dashboard_multitenancy_key')
+    wanted=b'opensearch_security.multitenancy.enabled: false'
+    if not lines: return raw.rstrip()+b'\n'+wanted+b'\n'
+    item=lines[0]
+    need(re.fullmatch(key+rb'\s*:\s*(true|false)\s*(?:#[^\r\n]*)?',item.group()),'unsupported_dashboard_multitenancy_value')
+    return raw[:item.start()]+wanted+raw[item.end():]
 def manager_auth_configuration(raw):
     # The official single-node file contains TWO ossec_config roots. Modify only
     # the unique auth element; retain all unrelated original bytes/comments.
@@ -461,6 +511,9 @@ def prepare_files(c, snap, images):
     internal=DEST/'wazuh/config/wazuh_indexer/internal_users.yml'
     need(internal.is_file() and not internal.is_symlink(),'official_internal_users_configuration_missing')
     internal.write_bytes(canonical(users)); os.chmod(internal,0o444)
+    dashboard_config=DEST/'wazuh'/dashboard_configuration_mount(c).relative_to(TREE)
+    dashboard_config.write_bytes(dashboard_single_tenant(read(dashboard_config)))
+    os.chmod(dashboard_config,0o444)
     for name in ('secrets','exports'):
         if not (ROOT/name).exists(): mkdir(ROOT/name)
         directory(ROOT/name)
@@ -607,13 +660,18 @@ os.execve(args[0],args,env)
     return hu
 def image_probe(image):
     expected=digest(read(SOURCE/'infra/hermes/korean_output_guard.py'))
-    code="""import sys,hashlib,pathlib,inspect
+    pins=query_completion_source_pins()
+    code="""import sys,hashlib,pathlib,inspect,json
 sys.path.insert(0,'/opt/capstone-guard-runtime/regex-2026.9.29/lib/python3.13/site-packages')
 import regex,mcp
 assert regex.__version__=='2026.9.29'
 p=pathlib.Path('/opt/hermes/capstone_korean_output_guard.py')
 assert hashlib.sha256(p.read_bytes()).hexdigest()==sys.argv[1]
 assert all('capstone_korean_output_guard' in pathlib.Path('/opt/hermes',q).read_text() for q in ['plugins/platforms/mattermost/adapter.py','gateway/run_turn.py'])
+# The plugin enforces this same parsed pin set again at gateway startup.
+source_pins=json.loads(sys.argv[2])
+assert isinstance(source_pins,dict) and source_pins
+assert all(hashlib.sha256(pathlib.Path('/opt/hermes',path).read_bytes()).hexdigest()==digest for path,digest in source_pins.items())
 from hermes_cli.plugins import PluginContext, VALID_HOOKS
 from gateway.hooks import HookRegistry
 from gateway.platforms.event import MessageEvent
@@ -622,6 +680,7 @@ from gateway.authz_mixin import GatewayAuthorizationMixin
 assert callable(GatewayAuthorizationMixin._intake_adapter_for)
 assert 'pre_gateway_dispatch' in VALID_HOOKS
 assert callable(PluginContext.register_hook)
+assert callable(PluginContext.on_unload)
 assert all(callable(getattr(HookRegistry,name,None)) for name in ('discover_and_load','emit','emit_collect'))
 assert {'internal','reply_to_text','reply_to_message_id','channel_context'} <= set(MessageEvent.__dataclass_fields__)
 assert callable(MessageEvent.is_command)
@@ -642,7 +701,7 @@ assert set(_get_platform_tools(config,'mattermost'))==set(names)
         run(['docker','run','--rm','--name',name,'--label','capstone.bootstrap.probe='+nonce,
              '--pull','never','--network','none','--read-only','--tmpfs','/tmp:rw,noexec,nosuid,size=16m',
              '--entrypoint','/opt/hermes/.venv/bin/python','-e','PYTHONDONTWRITEBYTECODE=1',
-             '-e','HERMES_HOME=/tmp/hermes',image,'-B','-c',code,expected],45)
+             '-e','HERMES_HOME=/tmp/hermes',image,'-B','-c',code,expected,canonical(pins).decode()],45)
     finally:
         remaining=run(['docker','ps','-a','--no-trunc','--filter','name=^/'+name+'$','--format','{{.ID}}']).decode().splitlines()
         need(len(remaining)<=1,'private_probe_identity_ambiguous')
@@ -701,8 +760,8 @@ def verify():
     readonly_credentials(creds)
     bot,_=api('http://'+IP+':8065/api/v4/users/me',headers={'Authorization':'Bearer '+creds['mattermost_bot_token']})
     need(bot.get('id')==creds['mattermost_bot_id'] and bot.get('is_bot') is True,'Mattermost_bot_authentication_failed')
-    return {'schema_version':1,'role':'siem','status':'verified','containers':6,'readonly_mcp_servers':2,
-            'chat_messages_sent':0,'model_requests_sent':0,'write_approval_configured':False,'enrollment_password_configured':True}
+    return {'schema_version':1,'role':'siem','status':'verified','scope':'base_role','containers':6,'readonly_mcp_servers':2,
+            'chat_messages_sent':0,'model_requests_sent':0,'extensions_verified_separately':True,'enrollment_password_configured':True}
 try:
     c,snap,images=preflight()
     if STATE.exists():
@@ -714,6 +773,9 @@ try:
     phase='prepared_image_validation'; image_probe(images['hermes'])
     # No root state is published until all static prerequisites and offline image imports pass.
     fresh(); phase='files_and_enrollment'; c=prepare_files(c,snap,images)
+    phase='log_pipeline_prepare'
+    log_pipeline('prepare')
+    c=parse(read(DEST/'compose.core.json'))
     run(compose_args(DEST/'compose.core.json')+['config','--quiet'],45)
     phase='core_start'; pending('compose-core-up')
     run(compose_args(DEST/'compose.core.json')+['up','-d','--pull','never'],180)
@@ -721,6 +783,7 @@ try:
     manager_id=current_containers(False)['wazuh.manager']['id']
     run(['docker','exec',manager_id,'/var/ossec/bin/wazuh-analysisd','-t'],30)
     run(['docker','exec',manager_id,'/var/ossec/bin/wazuh-authd','-t'],30)
+    log_pipeline('activate')
     phase='application_accounts'; creds=app_bootstrap()
     phase='readonly_MCP_and_Hermes'; setup_mcp_and_hermes(c,images,creds)
     run(compose_args(DEST/'compose.json')+['config','--quiet'],45)

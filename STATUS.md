@@ -1,8 +1,22 @@
 # 인프라 현황 — 2026-10-23 현재 작업 상태
 
+## 초기 설치기 SOC 확장·관리자 차단 예외 (2026-10-23)
+
+사용자 요청에 따라 새 VM 설치 시험을 제외하고 `deploy.sh`의 SOC 구성 누락을 소스에 연결했다. 승인 브로커·정확 후보 worker·규칙/응답 MCP·LLM 관리 경로·Native AR 사건 등록, Vector0.59.0 정제·원본 회전·출력 유지관리·이전 부트 로컬 보관, Indexer 관측 모니터와14개 패널 SOC 대시보드가 대상이다. 설치용 고정 주소 대신 현재 역할의 주소·등록 agent ID·서비스 계정·컨테이너 full ID를 결속한다. 기존 운영 서버에는 이 설치기를 실행하지 않았다.
+
+초기 설정에 선택 항목 `ADMIN_PROTECTED_CIDRS`를 추가했다. 단일IPv4 또는 쉼표로 구분한CIDR을 받고 빈칸/Enter는 추가 지정 없음으로 처리한다. IP는/32로, 대역은 네트워크 주소로 정리해 프로필과 nft never_block 및 임시·승인형 IP 차단의 실행 전 검증에 반영한다. 이 대역을 탐지/원본 로그 제외 조건으로 사용하지 않으며 WAF 요청 예외 세션과 HTTPS 접속 허용망은 별도 설정이다.
+
+검증은 로컬 구문·가상 SSH·합성 파일/엔진/승인 상태 회귀다. 새 VM 기동, 실제 모델·채팅·공격 E2E, 재부팅은 이 작업에서 검증하지 않았다. A→B 이전 로그 자동 전송, 긴 장애 구간의 무손실 회수와 일반 백업은 이번 통합 범위 밖이다. [설치 순서와 제한](deployment/bootstrap-guide.md)을 따른다. 직접 실행한 격리 회귀252개와 병렬 담당의 기존 승인·대응·관리 회귀245개가 통과했으며 [소스·검증 기록](deployment/soc-bootstrap-validation-20261023.json)에 구분해 보존했다. 앞선 기본 설치기·MCP2개 범위 설명은 당시 상태로 보존한다.
+
+## Log4Shell 하위 레이아웃 통일 후속 (2026-10-23)
+
+Java·Apache 두 버전에 메인과 같은 외곽 프레임·공통 탐색·타이포그래피·패널을 적용하고 저장된 선택이 없으면 다크로 시작하도록 맞췄다. 앞선 02:07 KST 배포 기록에서 C의 세 소스와 공개 자산 SHA, HTML 4개 HTTP200·본문 보존을 확인했다. 새로고침한 Safari에서 Apache2.4.49 양방향 모드, Java 화이트·390px 다크, Apache2.4.50 다크를 확인했으며 모든 화면/크기의 전체 조합 검증은 아니다. 이번 커밋 준비에서는 라이브 서버를 다시 조회하지 않았다.
+
+현재 theme.css SHA는 `26c7fb2033b25b796795bb7b2358355ee9fc721b18d0cabb4be580f7db54076f`, theme.js SHA는 `33b52da6fe011806ac261e3e7458614424e2e5b5869dba267e252d4b31093892`다. 아래 팔레트 단계의 SHA와 검증은 당시 이력으로 보존한다. 초기 설치기는 같은 공통 자산을 반입한다.
+
 ## 메인 개편·하위 팔레트·단일 설치기 구현 (2026-10-23 후속)
 
-메인의 큰 제목·수평 탐색·서버 선화·현황 띠를 배포했다. Java의 남은 초록 포커스·그림자·상태 점도 공통 theme 변수로 연결해 Apache 두 버전과 같은 차콜/웜화이트 색상으로 맞췄다. 최신 theme.css SHA는 `d785eabdf42911b869bc7c35ddb791ae72c2f5b51fe7f7478604496db14bc05e`다. 공개 HTTP35개와 origin/Secure쿠키 보완을 포함한 C native66개를 통과했다. 아래64개 결과는 변경 전 단계의 이력이다. 브라우저 창 연결을 복구한 뒤 메인·Java·Apache 두 버전 모두 새로고침하여 다크/화이트 화면을 확인했다. 초기 로딩은 즉시 색상을 적용하고 직접 버튼 전환만180ms로 보완했다.
+메인의 큰 제목·수평 탐색·서버 선화·현황 띠를 배포했다. Java의 남은 초록 포커스·그림자·상태 점도 공통 theme 변수로 연결해 Apache 두 버전과 같은 차콜/웜화이트 색상으로 맞췄다. 이 단계의 theme.css SHA는 `d785eabdf42911b869bc7c35ddb791ae72c2f5b51fe7f7478604496db14bc05e`였으며, 아래 후속 적용에서 갱신됐다. 공개 HTTP35개와 origin/Secure쿠키 보완을 포함한 C native66개를 통과했다. 아래64개 결과는 변경 전 단계의 이력이다. 브라우저 창 연결을 복구한 뒤 메인·Java·Apache 두 버전 모두 새로고침하여 다크/화이트 화면을 확인했다. 초기 로딩은 즉시 색상을 적용하고 직접 버튼 전환만180ms로 보완했다.
 
 초기 설치는 루트 deploy.sh 하나에서 로컬 패키지/이미지 준비, SIEM, 공통 admin 키의 SSH 직접 전달, service schema7(독립 DVWA·4항목 콘솔·웹3종·별도sudo), security schema2(TLS edge·WAF)를 자동 연결한다. 실패·충돌은 임의 덮어쓰기 없이 거절하고 설치 receipt를 검증한다. 이후 서버 변경 때 설치 소스·반입 목록·예제·검증도 함께 수정하도록 AGENTS에 기록했다. 이는 상시 서버 감시 데몬이 아니다. [현재 설치 계약](deployment/bootstrap-guide.md).
 
@@ -90,6 +104,34 @@ C Apache의 기존 proxy/proxy_http 모듈을 활성화하고 `/log4shell/`를 �
 
 초기 설치기는 사전 준비한 `LOG4SHELL_APP_JAR` 검증·읽기 전용 마운트와 Apache 프록시를 사용하는 **service schema4**로 맞췄다. 서비스38·컨트롤러17 회귀가 통과했다. **Gradle 의존성 해석 빌드, 신규3VM 실제 설치, 실제 공격·콜백·탐지·차단 E2E는 미실행**이다. 별도 A:8080 시나리오 토글은 OFF이며 기존 OBS_SEG 설치본 차이는 이번 웹 교체에서 다루지 않았다. 아래10/15 PHP 화면과 이전 GET /계약은 당시 기록이다. [소스·운영 안내](infra/groot-c/log4shell-app/README.md) · [검증 근거](infra/groot-c/log4shell-app/deployment-validation-20261019.json).
 
+## 룰 개수·ID 집계 2단계 배포·검증 완료 (2026-10-16 21:02 KST)
+
+순수 커스텀 룰 목록·개수 조회는 **같은 턴에 LLM이 실제 호출한 MCP 결과의 원문·SHA-256과 `rule_inventory`가 일치할 때만** 확정 목록으로 표시하도록 보완했다. 모델이 조사 도구를 선택·실행하는 역할은 유지하고, 조회 근거가 없거나 불일치하면 미조회·집계 불가로 표시한다. 대상 파일 정의는 **WAF 10개, Suricata 14개(로컬 12+ET override 2), Wazuh 19개(level 0 포함)**이며 주석의 예약 ID·체인 후속 조건을 별도 룰로 세거나 비연속 ID를 넓은 연속 범위로 만들지 않는다. CRS/ET 전체 또는 실제 엔진 적재·발화 개수를 뜻하지 않는다. 복합 분석·사용자 지정 형식은 이 제한된 목록 렌더러의 범위 밖이다.
+
+A/B 조회 실행기는 각각 **20:50:55/20:53:09 KST**에 반영했다. A SHA는 `156b88d0…`, B는 기존 버전에 집계만 이식한 `22d91b33…`이며 기존 서버별 다른 동작을 보존했다. **21:00:20.271508 KST** Hermes 플러그인1.1·일반/관리용 정책·현재 정책 참조53개를 반영하고 같은 컨테이너만1회 재시작했다. 플러그인 SHA는 `b940dff1d5de3bac57b9f324c3abe3106199fde23d4c4f4acda9fbe4fbe8e3ad`, 정책은 `6245248b62e370a8a59ac3ec26c30bf99994e563937958985c387fa3e8639c66`, 백업은 `/var/backups/capstone-query-completion/20261016/210015`다. config·env·cron·DB의 다른 내용과 승인·쓰기 권한을 유지했으며 새 패키지 설치·보안 엔진 재시작은0이다.
+
+**21:02:22.836512 KST 최종 검증 통과:** 재기동 뒤21:00:25의 새 프로세스 등록 로그에서 플러그인1.1을 확인했고,53/53 정책 참조·DB quick check·새 heartbeat·Mattermost/API 연결·`needs_attention:false`·관리/guard timer와 soc-bot active를 확인했다. native8개 SHA는 불변이고 배포 staging·probe는 제거했다. 최초 검증기가 Docker 로그만 보아 등록을 놓친 문제는 실제 `agent.log`의 재기동 이후 시각을 대조하도록 검증기를 보완해 해소했으며 배포 장애는 아니었다.
+
+실제 모델의 native 시험은 **57.38초·API3회·읽기3회**로 정확한 개수·ID와 저장된 최종 답변 일치를 확인했다. 잘못된999개 답변을 넣은 별도 합성 시험은 **12.046초·native 반복2회·실제 읽기3회·모델 호출0회**로 근거 값에 맞게 정리됐다. 플러그인150개(기존85+집계65), producer28·기존 executor53·MCP10·비교20·SIEM36 회귀가 통과했다. **실제 Mattermost 새 게시·클라이언트 화면 E2E는0**이며 응답 시간·모든 분석 답변의 정확도를 보장하지 않는다. [구현·운영 범위](infra/hermes/query-completion/README.md) · [배포·검증 근거](infra/hermes/rule-inventory-validation-20261016.json).
+
+## 조회 실행 보완 1단계 배포 완료·답변 정확도 2단계 진행 중 (2026-10-16 20:34 KST)
+
+> 아래는 20:34 당시 기록이다. 이후 파일 정의 개수·ID 집계의 완료 범위와 남은 검증은 위21:00 항목을 따른다.
+
+“확인 중”이라고만 답한 문제 세션은 실제 도구 호출 없이 일반 텍스트로 종료됐으며, 당시 읽기 MCP 세 대상은 정상 응답했다. 현재 턴의 진행 약속과 명시적인 커스텀·로컬 룰 조회의 근거 없는 완료 주장을 제한적으로 검사하는 `groot-query-completion`을 적용했다. 한 차례 보완 요청에서 읽기 도구 선택은 LLM이 맡고, 그래도 호출이 없으면 조회 미실행으로 끝낸다. 지정된 `.111` 모델 경로의 그 요청 한 번만 상충하는 추론 옵션을 제거해 검증된 모델 기본값을 사용하며, 전역 설정·쓰기 권한·승인 절차는 유지한다.
+
+최초 YAML 구획 사전 검사 실패는 **운영 파일 변경 0건**으로 중단했다. 수정 후 **20:34:01 KST** 같은 Hermes 컨테이너를 stop/start 1회 했고, 현재 세션 정책 참조 53개와 일반·자동 관리용 SOUL에 정책을 반영했다. 정책 SHA-256은 `8d25a6ce0f24151fae35a89aa064cfe4febdfa3b92256c3972bfe3a674ea4f37`, 백업은 `/var/backups/capstone-query-completion/20261016/203357`이다. **20:34:41 검증 통과:** gateway의 Mattermost/API 연결, 관리·guard timer active, 실제 프로세스 등록 로그를 확인했다. native 소스 6개와 기존 adapter·run_turn 2개 해시는 유지했고 config 변경은 플러그인 추가뿐이다. `.env`·cron과 DB의 다른 내용은 보존했으며 이번 배포 임시 파일은 정리했다.
+
+최종 native 평가에서 문제 이력의 자연 응답 시험 93.015초와 첫 정지 응답을 주입한 시험 69.436초는 각각 실제 읽기 3건과 최종 답변까지 진행했다. 별도 9.529초 실패 경로는 모델 호출 2회·도구 호출 0회 뒤 정직한 조회 미실행 안내로 끝났다. 이는 조회 실행·실패 고지 경로의 검증이며 응답 시간 보장이 아니다. **규칙 개수·예비 규칙의 활성 여부·서술 정확도 오류는 남아 있어 사용자 요청에 따른 2단계 개선을 진행 중이다.** 1단계 배포 완료를 답변 정확도 해결이나 실제 사용자 채팅 화면 검증 완료로 확대하지 않는다. [운영 범위·복구](infra/hermes/query-completion/README.md) · [검증 근거](infra/hermes/rule-query-execution-validation-20261016.json).
+
+## 채팅 표 대신 항목별 목록 적용 (2026-10-16 19:13 KST)
+
+사용자의 채팅 표 깨짐 보고에 따라 **요약 → 확인 내역 → 조치 및 다음 단계** 구획은 유지하고, 채팅 확인 내역을 `- **대상명**: 상태 — 근거` 목록으로 바꿨다. 승인 안내는 대상·변경 전·변경 후·예상 영향·검증·승인 상태의 여섯 항목을 각각 별도 줄에 쓴다. 파이프·공백 정렬·HTML·코드 블록 표는 기본 채팅 서식으로 사용하지 않는다. Markdown 문서·파일 본문 또는 명시적 표 요청만 예외이며, 승인 카드와 원문 로그·diff는 변경하지 않았다.
+
+최초 배포 사전 검사는 관리 경로 전환 후 cron에 과거 문자열이 없어 `cron policy anchor ambiguous`로 중단됐으며 **정책·DB 변경은0**이었다. Hermes와 timer를 복원한 뒤, cron을 바이트 그대로 유지하는 명시적 `--preserve-cron` 옵션을 추가했다. 기본 동작의 기존 오류 검사와 `--management-prompt` 동시 사용 거부는 유지하고 회귀11개를 통과했다. **19:13:42.660769 KST** 현재 세션52개의 정책 참조와 자동 관리용 SOUL 갱신에 성공했으며 운영 config·env·cron 내용과 DB의 다른 테이블은 보존했다. cron 파일의 inode·mtime 불변을 뜻하지는 않는다. 정책 SHA-256은 `0a383c81099c31f1714f8a1859182a31b8a1114a2637697ebbc7563ad6d8bcf8`, 백업은 `/var/backups/capstone-chat-format/20261016/rule-edit-policy-tsmn1g2c`다.
+
+SIEM 설치기 회귀31개는 공유 서식4개 항목 복사와 기존 읽기 전용 역할·MCP2개 권한 보존을 확인했다. `.111`의 `qwen3.6:35b` 합성 상태·승인 사례2개는 각각27.995초·26.646초에 표 없는 목록과 승인6항목 검사를 통과했다. **실제 채팅 게시0·클라이언트 화면 렌더링 미검증**이며, 이 표본을 모든 답변의 서식·정확도나 응답시간 보장으로 확대하지 않는다. 아래10/15 표 정책은 당시 상태로 보존한다. [서식 운영 안내](infra/hermes/mattermost-context/README.md) · [검증 근거](infra/hermes/chat-format-validation-20261016.json).
+
 ## 만료 승인 카드 정리 배포·실제 API 검증 완료 (2026-10-15 19:02 KST)
 
 사용자가 본문·버튼 정리 방식을 승인한 뒤 **18:52 KST** B 브로커에 배포했다. 원글 DELETE 없이 `PUT /posts/{id}/patch`로 새로 추적한 미응답 만료 요청의 본문을 `만료된 승인 요청`으로 바꾸고 버튼을 제거한다. 댓글·게시물 ID·다른 속성·감사기록을 유지하며, 승인·거부·소비·결과가 기록된 보호 카드와 기존 webhook 카드는 정리 대상에서 제외한다.
@@ -136,7 +178,7 @@ LLM의 `restarting` 답변은 **실제 Wazuh API HTTP500·오류1017**에 근거
 
 사용자가 HTTP 주소에서 화면은 열리지만 정상 요청을 보내면 `연결 재확인 필요`가 표시된다고 보고했다. Safari에서 HTTPS 사용 뒤 HTTP로 전환할 때 같은 이름의 Secure 세션 쿠키와 HTTP 쿠키가 충돌하여 CSRF403이 나는 현상을 직접 재현했다. 앞선 프로토콜별 API 검증만으로 이 브라우저 전환 상태까지 확인한 것은 아니었다. WAF 주석 추가 시험은 탐지 정책을 바꾸지 않았으며 이번 오류는 세션 쿠키 처리에서 확인했다.
 
-C에 **15:46:43 KST** HTTP용 `groot_log4shell_ui_http`와 HTTPS용 `__Secure-groot_log4shell_ui_https`를 분리한 API를 적용했다. API SHA-256은 `797788d26ab3dd3c135b247c2cc64b9b5f52893c06943e6948346aa9ca97aa75`다. A에는 **15:46:57 KST** Log4Shell HTTPS 프록시의 고정 TLS hint와 새 Secure 쿠키 이름을 적용하고 Nginx를 한 번 reload했다. 이 hint는 더 엄격한 Secure 세션을 선택하는 용도이며 인증·권한·신뢰된 출발지의 증명이 아니다. CSRF, HttpOnly, SameSite와 기존 HTTP 기본 주소·선택 HTTPS를 유지한다. [API](infra/groot-c/log4shell-ui/public/api.php) · [프록시 설정](infra/groot-a/chatproxy.nginx.conf).
+C에 **15:46:43 KST** HTTP용 `groot_log4shell_ui_http`와 HTTPS용 `__Secure-groot_log4shell_ui_https`를 분리한 API를 적용했다. API SHA-256은 `797788d26ab3dd3c135b247c2cc64b9b5f52893c06943e6948346aa9ca97aa75`다. A에는 **15:46:57 KST** Log4Shell HTTPS 프록시의 고정 TLS hint와 새 Secure 쿠키 이름을 적용하고 Nginx를 한 번 reload했다. 이 hint는 더 엄격한 Secure 세션을 선택하는 용도이며 인증·권한·신뢰된 출발지의 증명이 아니다. CSRF, HttpOnly, SameSite와 기존 HTTP 기본 주소·선택 HTTPS를 유지한다. [이전 API 이력](infra/groot-c/log4shell-ui/README.md) · [프록시 설정](infra/groot-a/chatproxy.nginx.conf).
 
 수정 후 실제 Safari에서 **HTTP 정상200·헤더 누락400, HTTPS 정상200**을 확인했다. 같은 Safari에서 HTTPS 사용 후 기존 HTTP 탭으로 돌아온 **15:50:02 KST에도 정상200**을 확인했다. 별도 urllib의 주소 교차4회에서도 정상200·누락400·잘못된 CSRF403을 확인했고, C 직접 API검사9PASS와 초기 설치기 검사30PASS를 통과했다. 기존 WAF가 JSON403의 Content-Type을 `text/html`로 바꾸는 한계는 유지한다. 이번 쿠키 수정은 그 MIME 문제를 해결하거나 실제 Log4Shell 공격·탐지 전체 시험을 완료한 것이 아니다.
 

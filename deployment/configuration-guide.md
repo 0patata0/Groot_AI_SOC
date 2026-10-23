@@ -22,6 +22,8 @@
 | 공통 SSH 사용자·포트 | `capdeploy`, `22` | host key 대조, 키 인증과 `sudo -n true` |
 | security 감시 NIC | `ens192` 또는 `auto` | 미러링/경유 경로. auto는 SIEM 방향 NIC 선택 |
 | LLM API·모델 | `http://192.0.2.40:11434/v1`, `qwen3.6:35b` | SIEM에서 실제 모델 목록 조회 |
+| 추가 보호 IP | `LOG_PROTECTED_IPS=192.0.2.50,192.0.2.60` | 관리·VPN 등 차단에서 제외할 IPv4. 세 서버·literal LLM은 자동 포함, hostname LLM은 IP 명시 필수 |
+| 관리자 IP/대역 차단 예외(선택) | `ADMIN_PROTECTED_CIDRS=192.168.10.25,192.168.15.0/24` | 초기 prompt에서 Enter 또는 빈 설정이면 추가 예외 없음. IP는 /32, 대역은 네트워크 주소로 정규화 |
 | DVWA backend / WAF 포트 | `80` / `8080` | 해당 서버에서 포트가 비어 있는지 |
 | Lab HTTPS origin | `https://lab.example.org` | DNS/hosts→security, 인증서 SAN·유효기간·클라이언트 신뢰 |
 | Lab 허용 CIDR | `192.168.10.0/24` | 실제 실습 클라이언트 내부망/VPN 출발지 |

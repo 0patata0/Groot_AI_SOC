@@ -19,6 +19,9 @@ WEB_BACKEND_PORT=80
 WAF_PORT=8080
 LLM_BASE_URL=
 LLM_MODEL=qwen3.6:35b
+LOG_PROTECTED_IPS=
+ADMIN_PROTECTED_CIDRS=
+ADMIN_INPUT_SET=0
 CAPSTONE_ROOT=/opt/capstone
 SURICATA_IMAGE=
 WAF_IMAGE=
@@ -81,9 +84,10 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|LOG_PROTECTED_IPS|ADMIN_PROTECTED_CIDRS|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
+        if [[ $key == ADMIN_PROTECTED_CIDRS ]]; then ADMIN_INPUT_SET=1; fi
         ;;
       *) die "unsupported configuration key: $key" ;;
     esac
@@ -113,6 +117,10 @@ fi
 prompt LAB_PUBLIC_ORIGIN 'Log4Shell HTTPS 주소 (예: https://lab.example.org)'
 prompt LAB_ALLOWED_CIDRS '실습 허용 내부망/VPN CIDR (쉼표로 구분)'
 prompt LLM_BASE_URL 'Ollama/OpenAI 호환 API 주소 (예: http://192.0.2.40:11434/v1)'
+if [[ $ADMIN_INPUT_SET == 0 && $BATCH == 0 && -t 0 ]]; then
+  printf '차단 예외 관리자 IPv4 또는 CIDR 대역 (쉼표 구분, 없으면 Enter): ' >&2
+  IFS= read -r ADMIN_PROTECTED_CIDRS || die 'input cancelled'
+fi
 ipv4() {
   local ip=$1 part
   [[ $ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || return 1
@@ -150,8 +158,16 @@ done
 [[ $MONITOR_INTERFACE == auto || $MONITOR_INTERFACE =~ ^[a-zA-Z0-9_.:-]+$ ]] || die 'invalid monitor interface'
 [[ $LLM_MODEL =~ ^[a-zA-Z0-9_./:-]+$ ]] || die 'invalid model name'
 [[ $LLM_BASE_URL =~ ^https?://[a-zA-Z0-9.-]+(:[0-9]+)?/v1/?$ ]] || die 'LLM_BASE_URL must be an HTTP(S) /v1 URL without credentials, query or fragment'
+LOG_PROTECTED_IPS=$(python3 -B "$HERE/deployment/protected_hosts.py" "$SECURITY_HOST" "$SIEM_HOST" "$SERVICE_HOST" "$LLM_BASE_URL" "$LOG_PROTECTED_IPS") || die 'invalid protected addresses'
+ADMIN_PROTECTED_CIDRS=$(python3 -B "$HERE/deployment/protected_hosts.py" --admin-cidrs "$ADMIN_PROTECTED_CIDRS") || die 'invalid administrator IP/network exemptions'
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
-say '순서: 세 서버 오프라인 반입물 검사 → 패키지·이미지 설치 → 역할 사전검사 → SIEM → 공통 키·등록 자격 전달 → service → security → 전체 검증'
+say '순서: 반입물·패키지 → 역할 사전검사 → SIEM → 공통 키·등록 자격 → service → security → 승인·대응 → 로그 처리·상관분석 → SOC 대시보드 → 전체 검증'
+say 'SOC 구성: 정확 후보 승인 MCP·제한된 대응·Vector 정제/회전/보존·관측 모니터·통합 대시보드'
+if [[ -n $ADMIN_PROTECTED_CIDRS ]]; then
+  say "관리자 IP 차단 예외: $ADMIN_PROTECTED_CIDRS"
+else
+  say '관리자 IP 차단 예외: 추가 지정 없음'
+fi
 say 'service 구성: 독립 DVWA/MariaDB + Lab Console + 웹 실습3개 + 별도 sudo rootless + Wazuh agent'
 say "Lab Console: $LAB_PUBLIC_ORIGIN/log4shell/ (DNS/hosts와 TLS 인증서는 사전 준비)"
 say '패키지/이미지 인터넷 다운로드 없음. 기존 IP·라우팅·SSH 설정은 변경하지 않습니다.'
@@ -184,7 +200,7 @@ mkdir "$WORK/bundle"
 cat > "$WORK/bundle/site.env" <<EOF
 # Generated data; values are shell-quoted by the controller below.
 EOF
-for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
+for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL LOG_PROTECTED_IPS ADMIN_PROTECTED_CIDRS CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
@@ -230,7 +246,12 @@ if [[ $MODE == verify ]]; then
   remote_role "$SIEM_HOST" siem verify
   remote_role "$SERVICE_HOST" service verify
   remote_role "$SECURITY_HOST" security verify
-  say '세 역할 검증 완료.'
+  remote_role "$SECURITY_HOST" security soc-verify
+  remote_role "$SECURITY_HOST" security log-verify
+  remote_role "$SIEM_HOST" siem soc-verify
+  remote_role "$SIEM_HOST" siem log-verify
+  remote_role "$SIEM_HOST" siem dashboard-verify
+  say '세 역할과 SOC 확장 검증 완료.'
   exit 0
 fi
 remote_prerequisites() {
@@ -249,6 +270,9 @@ fi
 remote_role "$SECURITY_HOST" security check
 remote_role "$SIEM_HOST" siem check
 remote_role "$SERVICE_HOST" service check
+remote_role "$SECURITY_HOST" security soc-check
+remote_role "$SIEM_HOST" siem soc-check
+remote_role "$SIEM_HOST" siem dashboard-check
 say '세 서버 사전검사 통과.'
 [[ $MODE != check ]] || exit 0
 
@@ -271,7 +295,26 @@ remote_role "$SERVICE_HOST" service apply
 remote_role "$SERVICE_HOST" service verify
 remote_role "$SECURITY_HOST" security apply
 remote_role "$SECURITY_HOST" security verify
+remote_role "$SIEM_HOST" siem soc-prepare
+# Dedicated response credentials pass directly between root-owned endpoints.
+# stdout for these phases is exclusively the bounded transfer protocol.
+remote_role "$SIEM_HOST" siem soc-export |
+  remote_role "$SECURITY_HOST" security soc-receive || die 'SOC credential transfer failed'
+# This result is public host-key/agent/container identity only. Retain it in
+# this invocation's private scratch directory while finishing the log gates.
+remote_role "$SECURITY_HOST" security soc-apply > "$WORK/security-soc.json"
+remote_role "$SECURITY_HOST" security log-activate
+remote_role "$SIEM_HOST" siem log-monitor
+remote_role "$SIEM_HOST" siem dashboard-apply
+# The LLM management timer starts after its evidence sources are configured.
+remote_role "$SIEM_HOST" siem soc-activate < "$WORK/security-soc.json"
+remote_role "$SECURITY_HOST" security verify
+remote_role "$SECURITY_HOST" security soc-verify
+remote_role "$SECURITY_HOST" security log-verify
 remote_role "$SIEM_HOST" siem verify
+remote_role "$SIEM_HOST" siem soc-verify
+remote_role "$SIEM_HOST" siem log-verify
+remote_role "$SIEM_HOST" siem dashboard-verify
 say "구축 완료. WAF: http://$SECURITY_HOST:$WAF_PORT / SIEM: https://$SIEM_HOST / Mattermost: http://$SIEM_HOST:8065"
 say "Lab Console: $LAB_PUBLIC_ORIGIN/log4shell/"
 say "DVWA 독립 진입점: http://$SECURITY_HOST:$WAF_PORT/dvwa/"

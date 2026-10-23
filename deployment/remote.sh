@@ -4,7 +4,10 @@ umask 077
 stage=${1:?stage}; role=${2:?role}; action=${3:?action}
 [[ $# == 3 && $stage =~ ^/var/tmp/capstone-bootstrap-[0-9a-f]{24}$ ]] || exit 64
 [[ $role == security || $role == siem || $role == service ]] || exit 64
-[[ $action == check || $action == apply || $action == verify ]] || exit 64
+case "$role:$action" in
+  *:check|*:apply|*:verify|security:soc-check|siem:soc-check|siem:soc-prepare|siem:soc-export|security:soc-receive|security:soc-apply|siem:soc-activate|security:soc-verify|siem:soc-verify|security:log-activate|siem:log-monitor|security:log-verify|siem:log-verify|siem:dashboard-check|siem:dashboard-apply|siem:dashboard-verify) ;;
+  *) exit 64 ;;
+esac
 [[ $(id -u) == 0 && -d $stage && ! -L $stage ]] || exit 77
 for path in "$stage" "$stage/site.env" "$stage/source.tar" "$stage/source"; do
   [[ ! -L $path && $(stat -c %u "$path") == 0 ]] || { echo 'unsafe staging ownership' >&2; exit 77; }
@@ -24,6 +27,32 @@ systemctl is-system-running >/dev/null 2>&1 || [[ $(systemctl is-system-running)
 docker info >/dev/null 2>&1 || { echo 'Docker daemon unavailable' >&2; exit 69; }
 docker compose version >/dev/null || exit 69
 export CAPSTONE_SOURCE=$stage/source
+case "$action" in
+  soc-*|log-*|dashboard-*)
+    # Extensions have their own bounded, idempotent receipts. They may not
+    # convert an unrelated deployment or run concurrently with another apply.
+    case "$action" in
+      *-check|*-verify|soc-export) ;;
+      *) exec 9>/run/lock/capstone-bootstrap.lock
+         flock -n 9 || { echo 'another deployment holds the host lock' >&2; exit 75; } ;;
+    esac
+    if [[ $action != *-check ]]; then
+      [[ -f $CAPSTONE_ROOT/role && ! -L $CAPSTONE_ROOT/role && $(cat "$CAPSTONE_ROOT/role") == "$role" ]] || exit 78
+    fi
+    case "$action" in
+      soc-check) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" check --role "$role" ;;
+      soc-prepare) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" prepare-siem ;;
+      soc-export) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" export-siem ;;
+      soc-receive) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" receive-security ;;
+      soc-apply) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" apply-security ;;
+      soc-activate) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" activate-siem ;;
+      soc-verify) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" verify --role "$role" ;;
+      log-*) exec python3 -B "$CAPSTONE_SOURCE/deployment/log_pipeline.py" "${action#log-}" "$role" ;;
+      dashboard-check) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_dashboard.py" check --source-root "$CAPSTONE_SOURCE" ;;
+      dashboard-*) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_dashboard.py" "${action#dashboard-}" --source-root "$CAPSTONE_SOURCE" --url "https://$SIEM_HOST" --ca-file "$CAPSTONE_ROOT/siem/tls/root-ca.pem" --credentials-file /opt/capstone-prereqs/siem.json --receipt "$CAPSTONE_ROOT/siem/soc-dashboard.json" ;;
+    esac
+    exit 64 ;;
+esac
 if [[ $action == apply ]]; then
   exec 9>/run/lock/capstone-bootstrap.lock
   flock -n 9 || { echo 'another deployment holds the host lock' >&2; exit 75; }

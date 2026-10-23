@@ -19,6 +19,24 @@ import offline_security as s
 
 
 class SecurityFixtures(unittest.TestCase):
+    def test_native_audit_pointer_accepts_only_exact_writer_parent(self):
+        pointer=Path('/opt/capstone/security/logs/modsecurity/capstone-managed/audit-path.conf')
+        writer=pointer.parent.parent
+        def info(path):
+            if path==pointer:
+                return SimpleNamespace(st_mode=stat.S_IFREG|0o444,st_uid=0,st_gid=0,st_nlink=1,st_size=70)
+            return SimpleNamespace(st_mode=stat.S_IFDIR|0o755,st_uid=101 if path==writer else 0,
+                                   st_gid=101 if path==writer else 0)
+        with patch.object(Path,'lstat',info):
+            self.assertEqual(s.trusted(pointer),pointer)
+            with self.assertRaises(s.Refused):s.trusted(pointer,private=True)
+            with self.assertRaises(s.Refused):s.trusted(pointer.with_name('arbitrary.conf'))
+        def changed(path):
+            result=info(path)
+            if path==writer:result.st_uid=102
+            return result
+        with patch.object(Path,'lstat',changed),self.assertRaises(s.Refused):s.trusted(pointer)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
         self.role = Path(self.tmp.name).resolve()

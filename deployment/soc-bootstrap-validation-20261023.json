@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-10-22T18:06:35.784117+00:00",
+  "scope": "Single-entry fresh-host SOC bootstrap integration and optional administrator IPv4/CIDR blocking exemptions",
+  "verification_kind": "local_source_and_isolated_regression_only",
+  "new_three_vm_apply_tested": false,
+  "live_servers_changed": false,
+  "ssh_used": false,
+  "packages_downloaded_or_installed_on_mac": false,
+  "credentials_read": false,
+  "actual_attack_model_chat_approval_e2e_tested": false,
+  "reboot_tested": false,
+  "checks": [
+    {
+      "command": "python3 -B -m unittest discover -s deployment/tests",
+      "tests": 109,
+      "status": "passed"
+    },
+    {
+      "command": "python3 -B deployment/test_log_pipeline.py",
+      "tests": 39,
+      "status": "passed"
+    },
+    {
+      "command": "python3 -B deployment/test_soc_dashboard.py",
+      "tests": 26,
+      "status": "passed"
+    },
+    {
+      "command": "bash deployment/roles/siem-test.sh",
+      "tests": 39,
+      "status": "passed"
+    },
+    {
+      "command": "bash deployment/roles/service-test.sh",
+      "tests": 39,
+      "status": "passed"
+    }
+  ],
+  "direct_isolated_tests": 252,
+  "syntax": {
+    "deployment_python_ast_files": 22,
+    "embedded_siem_python_ast": "passed",
+    "bash": "passed",
+    "changed_scope_diff_check": "passed"
+  },
+  "dashboard_source_check": {
+    "status": "passed",
+    "network_requests": 0,
+    "saved_objects": 15,
+    "panels": 14,
+    "application_health_checked": false,
+    "source_objects_sha256": "ea2976daeb84c0028f7006e261d63ebf2841f9aba185fd518abfdf48206e1bbc"
+  },
+  "plan_check": {
+    "command": "bash deploy.sh --plan --batch --config deployment/config.example.conf",
+    "status": "passed",
+    "administrator_exemptions": "empty"
+  },
+  "administrator_exemption_contract": {
+    "setting": "ADMIN_PROTECTED_CIDRS",
+    "optional": true,
+    "blank_means_no_additional_exemptions": true,
+    "accepted_input": "comma-separated IPv4 addresses and IPv4 CIDRs",
+    "normalization": "host /32, normalized network prefixes, collapsed duplicate and overlapping networks",
+    "applied_to": [
+      "installed identity profile",
+      "nft never_block",
+      "LLM temporary containment protected-address check",
+      "approved response protected-address check"
+    ],
+    "detections_and_logging_retained": true,
+    "waf_request_exception_unchanged": true,
+    "https_access_ranges_unchanged": true,
+    "existing_infrastructure_and_private_reserved_protections_retained": true
+  },
+  "review": "Independent read-only integration review completed; sequential SIEM native-test timeout corrected to bounded 900 seconds for activate only.",
+  "not_included": [
+    "automatic A-to-B previous-boot history transfer",
+    "general backup and restore",
+    "remote durable acknowledgement or long-outage losslessness guarantees",
+    "existing-host migration"
+  ],
+  "source_sha256": {
+    "deploy.sh": "2a30df53da62ea588e0f4e34ab7b8212174952cfc65d684c4b4ae5a160eeebd7",
+    "deployment/README.md": "71716c43b0458517a4c121a4b0a503d4cb35c9a5ac1a9875a78e7066f7140d3d",
+    "deployment/SOC_MANAGEMENT.md": "f5daa56b626e8aecc97374b683f475ca25dd37856fe9324b3810d4e453f55c42",
+    "deployment/bootstrap-guide.md": "5c275f4daae54ff85d48eaa05b98034a424917ed40d477e5240026a1ff294747",
+    "deployment/config.example.conf": "5b72c672b2c96a81936ec85ffd9c693776eb038208bae3b418857920a0d4f526",
+    "deployment/configuration-guide.md": "99edaf94b2f1c906fffab738c2e983e965c0b2b0dd3f788d30c172a118607b85",
+    "deployment/hermes-image.md": "91c31074d2a0e201e175164e4fb0533b4d8c7f6699651bd395e62bb102a61e72",
+    "deployment/lab_key.py": "27497948227462468e569ff7b621e2392dcf0d4ab81cedf3ff7cdd9aac0f37de",
+    "deployment/log-pipeline.md": "3ed25da53767be56c989a2dd27457d51b9c10a49c4eaae78ad25b0b660349fe7",
+    "deployment/log_pipeline.py": "24325299119827e19c82cea4d27a398ac57a229b3413a266297965037cc8ca9a",
+    "deployment/offline_security.py": "8d8455176f4bd61d87f96fcb9f3bf36e7a9708938768943aaefa0b862fb84366",
+    "deployment/offline_service.py": "60746b831df161a5ec6eb3915fcb11cbf99e72e714e0b97d39719d6dec8137ea",
+    "deployment/prerequisites.py": "ac3db8638b7e5f0e48d0d6b17d97204374e3cfacf15a408c4ca948177abf97b8",
+    "deployment/protected_hosts.py": "9f2ab56a63d8e68cc64a3afdde4e061ac631f908e90633e990ba12540d7f8a50",
+    "deployment/receive-enrollment.sh": "2fd34e589533caf803ad5898ab8766735376fe02a3ce65aaeb71ece95fe4ee35",
+    "deployment/remote.sh": "906c62490f1cb6bc14d86e35a1d9fabf0dd449328787d1f03f938bd298af09bc",
+    "deployment/roles/security.sh": "04b47e9c0bffb11ab3fa4e6610f57e0a6454bf2a55c0e811910d707458f4b890",
+    "deployment/roles/service-test.sh": "3e1a2d9d52cd001016edbebb5bf8dc29ea862564f3211bb6dfc13dcbb1c6ee7a",
+    "deployment/roles/service.sh": "b7a45ae3fd5c2730779efd3728975ecf53b6efa84f43eb1a7ff952834dbc026e",
+    "deployment/roles/siem-test.sh": "3425634b69b61401e86b6a5b89694b8a4cc02c2f705d40bbac6216dd44de104f",
+    "deployment/roles/siem.sh": "1751b47f3fe2c19ac30ff08be97178b7f0eb58362ec3940c0ae0b28fb2cfccbe",
+    "deployment/setup-network-ssh.md": "75aad148ecaa5966a2c6b5d86d5511a14620fe1d08035d6bdbe44943c714b4a4",
+    "deployment/setup-packages-artifacts.md": "f0ba76c2bdad698edebcba8853107f6323d92d75d69b14b3b55d45f4e28c5033",
+    "deployment/soc_agent_block.py": "64f5b147aa3acf372c1b078ff8363ce12ef3e5cbaf98562ee2baac2b30d00c54",
+    "deployment/soc_dashboard.py": "645c220fc688828798c76cb70cdf4f0c34075bfeed121076f28619467643a244",
+    "deployment/soc_management.py": "6f9bd6ba5b5815175fa97f2827b0c50d6d2fdbfe2e8594e3174db2c91da05262",
+    "deployment/soc_runtime.py": "fdc52c3fff00cba14a31d8f9770db20b7471b4b7f9321b43bb02f0417aacc6cd",
+    "deployment/test_log_pipeline.py": "7768c13a1f60d93c6818ed5b8fc196cb13c898bdf4c0106e40a14590625ccc16",
+    "deployment/test_offline_service.py": "67e0fa4571a449cd5fb4b4cffbdcb03be779f567021898f5a71886412aa11890",
+    "deployment/test_soc_dashboard.py": "7ce03ff2b4009b8161d8ed533270ade024c345f23351fa3cd7ff125cc3d605d0",
+    "deployment/tests/test_controller.py": "00460308cd4d73421d2b4f6c444271dc92b669a053e5e89fbca275ebdfed21bd",
+    "deployment/tests/test_lab_key.py": "d6cf36b3ec6f08479b3d5fe2afdb5977343f10958a203f5cbc93d52d6b656de1",
+    "deployment/tests/test_offline_security.py": "b36bba2c7efa52794bed5b6d866f7b23a0ffdf00e442a95007f49604d72888e5",
+    "deployment/tests/test_prerequisites.py": "15bfaf96b48aad8fdaa2a37385178548444a1661dd891de8b7bf73cc756a3ba4",
+    "deployment/tests/test_protected_hosts.py": "8d53cab22c744248b606a67810bb6c115c22c6f28d78237ec6d2581b9ff26b16",
+    "deployment/tests/test_soc_management.py": "dfa4c25050f0748331795f247676c970eb5077f98531da860042d77540399f98",
+    "deployment/validate_lab_site.py": "8df3e37587f27f72fd70001fb6334c01343b64483497e41498aa364ffb347872",
+    "deployment/validate_log4shell_jar.py": "b69df872d08dfffb099a20023b1b58854f68889eb96d6f9efd68c39b96c1d022",
+    "deployment/verify-troubleshoot.md": "d0de79665180181619592b922c9ef36c0338a33f2a66ee0a244fa126deb38fd7",
+    "deployment/verify_log4shell_app.py": "583b78376970e671e98a995dac591fbb1628e543763b079d7150407564ac3bbf"
+  },
+  "collaborator_executed_existing_regressions": [
+    {
+      "working_directory": "infra/mcp",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest test_rule_change_executor test_rule_change_mcp test_incident_containment test_operations_approval test_response_approval test_incident_registration test_soc_management_events test_managed_suricata_evidence",
+      "tests": 187,
+      "status": "passed"
+    },
+    {
+      "working_directory": "infra/hermes",
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest test_soc_management_controller test_soc_management_run",
+      "tests": 58,
+      "status": "passed"
+    }
+  ]
+}

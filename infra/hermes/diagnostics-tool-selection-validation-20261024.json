@@ -745,12 +745,13 @@
     "pinned_runtime_contracts_unchanged": true,
     "binary_PDF_and_raster_history_preserved": true,
     "full_coverage_report": "local-only conversation verification directory",
-    "internal_links_checked": 1853,
+    "internal_links_checked": 1854,
     "missing_internal_links": 0,
     "archived_relative_links_corrected": 25,
     "archived_original_files_preserved": 3,
     "runtime_SOUL_unchanged": true,
-    "AGENTS_updated_by_subsequent_user_instruction": "automatic commit and push after each completed task"
+    "AGENTS_updated_by_subsequent_user_instruction": "automatic commit and push after each completed task",
+    "additional_automatic_publication_policy_link": 1
   },
   "remaining": [
     "Known model interpretation overstatements and broader factual accuracy/reliability evaluation.",
@@ -817,7 +818,7 @@
     "secret_values_and_snippets_saved": false
   },
   "publication": {
-    "state": "prepared_for_commit_and_push",
+    "state": "implementation_and_current_docs_pushed_and_remote_verified",
     "authorization": "user requires automatic commit and push at each completed task",
     "private_artifacts_excluded": true,
     "pre_commit_secret_scan": {
@@ -862,6 +863,11 @@
       "redact": 0,
       "secret_values_and_snippets_saved": false
     },
-    "staged_public_files": 141
+    "staged_public_files": 141,
+    "implementation_commit": "2c898779e58e04976721b69ca491647921d2eabf",
+    "branch": "main",
+    "remote_commit_verified": "2c898779e58e04976721b69ca491647921d2eabf",
+    "remote_matches_local_at_verification": true,
+    "publication_receipt_in_followup_document_commit": true
   }
 }

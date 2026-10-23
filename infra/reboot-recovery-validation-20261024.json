@@ -454,7 +454,12 @@
   "cleanup": {
     "ephemeral_readonly_probe_unit_not_found_after_exit": true,
     "operating_sources_and_recovery_backups_preserved": true,
-    "shared_working_evidence_cleanup": "pending coordinating operator closeout"
+    "shared_working_evidence_cleanup": "complete: fixed metadata preserved locally outside Git, operational working probes/results removed",
+    "removed_shared_operational_task_files": 88,
+    "removed_shared_operational_task_bytes": 821080,
+    "Mac_packages_installed": 0,
+    "publishing_helper_closeout": "Final one-shot Git helper removal and absence verification are recorded in the local dated conversation log after remote equality verification",
+    "updated_at": 1792771692
   },
   "limits": [
     "Completion applies to the recorded recovery and persistence checks. It does not make the failed first A automatic recovery attempt successful or erase the two supported operator container starts.",

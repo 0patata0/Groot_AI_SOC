@@ -1,5 +1,35 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+## 2026-10-25 Ollama 실제 왕복·기존 코드 재사용 후보
+
+DGX Ollama native `/api/chat`→모델의 도구 선택→SSH MCP 실행→결과를 받은 최종 답변까지 읽기2건을 확인했다. 기존8서버/36도구 스키마는 불변이고 고유 alias36개를 검증했다. 실제 모델에 제시한 도구는 Suricata 서비스 조회와 시간 계산2종뿐이다. 앞선 표준 SDK 연결 시험에서 진전한 범위이며, 전체36도구 선택·보호 변경·Mattermost·세션/관리 작업을 새 실행부로 대체한 결과는 아니다. 이번 코드는 임시 검증용으로 정리했고 운영에 설치하지 않았다. 실측·의존성·미검증 항목은 [STATUS](../../STATUS.md)를 기준으로 한다.
+
+### 어디까지 기존 제품으로 줄일 수 있는가
+
+다음은 **문서/공개 소스 검토에 따른 후보**다. 라이브에서 해당 프레임워크를 설치·실행하거나 속도를 비교한 것은 아니다. MCP 서버는 기능을 제공하고, MCP 클라이언트/에이전트 프레임워크는 연결·선택·실행 루프를 맡는다. 양쪽을 구분해 선택한다.
+
+| 후보 | 대체할 수 있는 코드 | 현재 환경의 적용 조건·판단 |
+| --- | --- | --- |
+| mcp-use Python + ChatOllama | MCP 연결/발견·도구 변환·모델 호출과 도구 실행 반복 | 우선 비교 후보. stdio command/args로 기존 SSH 연결을 구성할 수 있다는 문서상 근거가 있다. ChatOllama는 Ollama SDK로 native 채팅을 호출한다. Python1.7.1 선언은 MCP>=1.24,<2이므로 현재 운영 MCP2와 별도 환경 필요; 통신 호환은 별도 시험 |
+| mcp-use TypeScript v2 | native Ollama `/api/chat`·MCP 실행 루프 | Python 의존성 충돌을 피할 대안. 확인한 소스의 Ollama provider가 native API를 호출한다. Node 런타임/패키지 고정과 기존 Python 관리·출력 검사 연결은 추가 필요 |
+| 공식 Knowledge Graph Memory MCP | 사실·관계·관측의 영속 저장/검색/삭제 | 선택 도입 후보. 로컬 JSONL 기억이며 대화 스레드/재시작 복원·출처/유효기간 판정·현재 상태 재조회는 별도. 추가 도구/왕복이 생기므로 속도 개선 목적으로 무조건 추가하지 않음 |
+| fast-agent | 다중 MCP 연결·에이전트 실행 | stdio 지원. 문서의 Ollama 연결은 generic OpenAI-compatible `/v1`이므로 native API 비교 후보와 구분. 현재 SOC 승인/관리·채팅 이관은 별도 |
+| MCPHost (mark3labs) | 도구 발견/필터·실행 루프·비대화형 실행, Go 바이너리 반입 | 저장소 archived=true를 확인해 새 운영 도입 우선 제외. main632cc196의 Ollama 생성 경로는 `/v1`이며 사전 적재/fallback 로직도 있음. 이름에 Ollama 지원이 있어도 native 생성 경로라는 뜻은 아님 |
+| Mattermost 공식 MCP / Agents | 메시지 조회·검색·게시 API 도구 | 현재 Team11.11.1에 즉시 호환이라고 확정하지 않음. 최신 Agents 일반 요구 v12+, MCP endpoint 절 v11.2+를 구분하고 실제 플러그인 버전을 고정해야 함. 문서상 외부 MCP/상태 변경 도구의 Enterprise 이상 조건과 Streamable HTTP/OAuth 또는 PAT 검토 필요 |
+| 커뮤니티 mattermost-mcp-host | Mattermost WebSocket 수신·스레드 문맥·MCP 연결의 참고 구현 | 확인한 main64731f2의 주 실행부가 AzureChatOpenAI를 직접 생성함. 별도 ollama-mcp-server 디렉터리가 있어도 주 에이전트의 DGX Ollama 호환을 뜻하지 않음. 수정 없는 대체품으로 채택하지 않음 |
+
+공식 근거: [mcp-use Python LLM](https://docs.mcp-use.com/python/agent/llm-integration) · [stdio 설정](https://docs.mcp-use.com/python/client/client-configuration) · [Python 의존성 선언](https://github.com/mcp-use/mcp-use/blob/f877f789e7b4979e62e5cbe221bfb29ebb86d1bd/libraries/python/pyproject.toml) · [ChatOllama 구현](https://github.com/langchain-ai/langchain/blob/master/libs/partners/ollama/langchain_ollama/chat_models.py) · [TypeScript provider](https://github.com/mcp-use/mcp-use/blob/f877f789e7b4979e62e5cbe221bfb29ebb86d1bd/libraries/typescript/packages/agent/src/llm/providers/ollama/index.ts) · [Memory MCP](https://github.com/modelcontextprotocol/servers/blob/main/src/memory/README.md) · [fast-agent provider](https://fast-agent.ai/models/providers/additional/) · [fast-agent stdio](https://fast-agent.ai/mcp/client-servers/) · [MCPHost 상태](https://github.com/mark3labs/mcphost) / [provider 소스](https://github.com/mark3labs/mcphost/blob/632cc196002275d42dbf93ad3f1241ff853deb80/internal/models/providers.go) · [Mattermost 공식 조건](https://docs.mattermost.com/administration-guide/configure/agents-admin-guide) · [커뮤니티 host 실제 LLM](https://github.com/jagan-shanmugam/mattermost-mcp-host/blob/64731f22558b9ccfd7f965b2e0269f2e0e60b97f/src/mattermost_mcp_host/agent/llm_agent.py).
+
+### 추가로 필요한 환경과 유지할 프로젝트 코드
+
+- 기존 SOC 조회/제안36도구를 위해 새로운 범용 MCP 서버를 추가할 필요는 없다. 현재의 `calculate_time`도 재사용한다. 서버/계정별 키·known_hosts·ForceCommand·도구 이름/target enum·타임아웃·관리 allowlist를 새 클라이언트에 정확히 연결해야 한다.
+- 기존 컨테이너의 MCP/httpx/aiohttp/PyYAML/jsonschema 및 전이41패키지 조건 충족을 확인했다. regex2026.9.29는 별도 CPython3.13 경로에 있다. 독립 Python3.12 환경을 택하면 venv 및 그 ABI의 wheel을 따로 준비한다. 이 목록은 완성된 오프라인 lock이 아니다. REST 직결에는 Ollama CLI/SDK/로컬 추론 daemon이 필수는 아니지만 ChatOllama를 택하면 langchain-ollama와 Ollama SDK 등의 전이 의존성이 추가된다.
+- Memory MCP를 택하면 Node/npm 패키지와 지정 데이터 경로를 준비한다. 컨테이너에는 Node/npm이 있지만 호스트 PATH에는 없었다. 기존 Hermes Memory를 자동 공유하거나 대체하지 않는다. 공식 예시의 온라인 npx/pip/go install을 폐쇄망 서버에서 그대로 실행하지 않고 버전·출처·해시·전체 의존성을 고정해 오프라인 반입한다. 기존 운영 가상환경을 다운그레이드하지 않는다.
+- `soc_management_controller.py`는 Hermes CLI/stream-json/세션 복원을 호출하고 `soc_management_run.py`는 AIAgent·도구·출력 hook을 사용한다. 프레임워크를 도입해도 관리 사건→새 실행부→구조화 결과/영속 보고 연결이 필요하다. Mattermost MCP의 조회/게시 도구만으로 채팅 이벤트 수신·스레드 격리·재시도까지 자동 구현되는 것은 아니다. 공식 Mattermost standalone stdio 실행은 문서상 개발용이며 운영 권장 경로는 plugin embedded/HTTP다.
+- LLM의 조사/변경안 준비를 유지하고 정확 후보 승인·보호 주소·TTL·worker·KST/근거/한국어 검사를 이어야 한다. 일반 MCP 승인 확인창을 기존 승인 브로커의 동등 구현으로 보지 않는다. 범용 shell/파일/Docker 도구·프레임워크 code execution·외부 텔레메트리/추적·무제한 반복을 기본으로 추가하지 않고, 필요한 기존 도구만 제한하고 요청 예산을 고정한다.
+
+추후 별도 실행부를 도입한다면 먼저 읽기 전용으로 이름 충돌7종/36스키마·프로토콜·오류/제한을 시험하고, 같은 모델·문맥·도구 노출·추론 정책·캐시 조건에서 정확도/질문→게시 시간을 반복 비교한다. 별도 Memory와 관리 사건 소비 경로를 사용해 이중 게시/이중 적용을 막는다. 실제 설치 시 루트 deploy.sh·설정 예제·오프라인 목록·검증/복구를 함께 갱신한다. 이번에는 설치·새 서비스/포트·승인 생성·채팅 게시·운영 교체가 없다.
+
 > **원격 연결안 정정:** B Ollama 클라이언트→DGX Ollama는 가능하며 B의 모델용 자원 부족으로 배제하지 않는다. 기존 MCP 서버와 승인 계층을 재사용할 수 있지만 MCP 도구 실행/결과 전달·채팅/기억·관리 흐름을 맡는 실행부가 필요하다. 현 Hermes보다 빠른지는 동등 기능 비교 전에는 확정하지 않는다. [STATUS](../../STATUS.md).
 
 > **2026-10-25 서버 적합성 후속:** B의 4 vCPU/15.62GiB·계산 GPU 미노출과 현재35B 파일21.07GiB를 확인해 **B Hermes + DGX Ollama 유지**를 권고한다. 기존 MCP는 호환 클라이언트로 재사용 가능하지만 Ollama 설치만으로 Mattermost·기억·정확 승인·LLM 관리 실행이 자동 이관되지는 않는다. 이 프로젝트의 승인/TTL 통제는 외부 MCP·브로커·worker와 함께 보존해야 한다. 별도 실행부의 동등 기능/속도 비교는 미실행이다. [비교 결과](../../STATUS.md).

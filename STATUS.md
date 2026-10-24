@@ -1,5 +1,26 @@
 # 인프라 현황 — 2026-10-25 현재 작업 상태
 
+## Ollama↔MCP 실제 왕복과 기존 코드 대체 후보 — 2026-10-25 05:22~05:31 KST
+
+**결론:** 기존 MCP 서버는 재사용 가능하며, 이번에는 DGX Ollama native API가 도구를 선택하고 실제 MCP 결과를 받아 최종 답변을 만드는 읽기 2건까지 확인했다. 연결·실행 루프를 모두 새로 작성할 필요는 없다. 기존 프레임워크 중 `mcp-use + ChatOllama`를 별도 환경에서 비교할 우선 후보로 판단한다. 후보 프레임워크 자체의 설치·운영 검증이나 Hermes 교체 결정은 아니다. 근거·추가 의존성과 후보별 대체 범위는 [MCP 안내](infra/mcp/README.md)를 따른다.
+
+| 확인 항목 | 이번 직접 검증과 한계 |
+| --- | --- |
+| 기존 MCP | SSH stdio 8연결 initialize/list_tools 성공, 36도구 스키마 불변·구조 검증. 읽기27/보호9, A/B 중복 bare 이름7종을 서버별 고유 이름36개로 구분 |
+| 실제 모델 왕복 | 기존 컨테이너 UID995·표준 MCP SDK/httpx로 Hermes 에이전트 import 없이 DGX `/api/chat`·qwen3.6:35b 호출. 모델에는 읽기2도구만 노출, 생성4회·실제 읽기2회·보호 호출0 |
+| IDS 질문 | `rule-a.get_service_action_target(target=a:suricata)` 정확 선택. running=true·KST 시각·개별 SID 적재 미확인이라는 최종 설명까지 독립 확인 |
+| 시간 질문 | `system-diagnostics.calculate_time` 정확 선택. 입력 UTC를 KST 04:50으로 변환하고 기준05:00까지10분이라는 답변 확인 |
+| 측정 | IDS19.673초(첫 모델 적재7.681초 포함), 시간2.604초. MCP 발견/초기화는 제외하고 각 질문의 모델2회+도구1회 구간을 측정. 짧은 별도 문맥이며 Hermes와의 성능 A/B가 아님 |
+| 운영 보존 | 운영8파일 SHA·Hermes CID/PID 불변, failed units0. 설정/권한/서비스 재시작·승인 생성·채팅 게시·패키지 설치0. 모델 생성에 따른 DGX 적재 상태는 바뀔 수 있음 |
+
+**의존성 실측:** 기존 Hermes 컨테이너에는 Python3.13.5·MCP2.0.0·httpx0.28.1·aiohttp3.14.3·PyYAML6.0.3·jsonschema4.26.0·pydantic2.13.4·anyio4.12.1·SSH·Node/npm이 있다. MCP/httpx/aiohttp/PyYAML/jsonschema의 전이 의존41패키지는 설치 버전 조건 누락0이며 MCP2의 httpx2/mcp-types도 포함한다. 이는 새 실행부의 완성된 lock/오프라인 반입 묶음을 뜻하지 않는다. `regex==2026.9.29`는 별도 CPython3.13 경로에서 사용 중이다. B 호스트의 기본 Python3.12.3 환경에는 MCP/HTTP 클라이언트 등이 없고 python3-venv도 미설치 상태다. 전체 호스트의 모든 가상환경을 조사한 것은 아니다. Ollama CLI/SDK는 기존 컨테이너에서 발견되지 않았으나 REST 직접 연결에는 필수가 아니다.
+
+**후보 조사 결과:** mcp-use Python1.7.1의 선언은 `mcp>=1.24.0,<2.0.0`이므로 운영 MCP2.0 환경에 혼합 설치하지 않는다. 별도 환경과 `langchain-ollama` 등 전체 의존성 준비가 필요하며, SDK 패키지 버전 차이와 MCP 통신 프로토콜 호환 여부는 별개다. mcp-use TypeScript v2의 native `/api/chat` 구현도 대안이지만 Node 배포·프로젝트 Python 연동 검증이 추가된다. 공식 Memory MCP는 사실 기억 저장/검색 코드를 줄일 수 있으나 대화 세션·오래된 사실 판정·KST/근거 검사를 대신하지 않는다. fast-agent는 문서상 Ollama `/v1` 연결 후보다. MCPHost는 저장소가 archived이고 확인한 main 구현도 `/v1`을 사용해 신규 운영 도입 우선순위에서 제외한다. Mattermost 공식 MCP는 현재 Team11.11.1에 그대로 적용한다고 확정할 수 없으며 플러그인 버전·라이선스·전송 방식 검토가 필요하다. 커뮤니티 Mattermost MCP Host는 확인한 주 에이전트가 AzureChatOpenAI를 직접 사용해 DGX용 완성 대체품으로 분류하지 않는다. 모든 후보는 공식 문서/소스 조사만 했으며 이번 라이브 성공을 해당 제품의 성공으로 표시하지 않는다.
+
+**남은 구현·검증:** 기존36 SOC 도구는 유지한다. `soc_management_controller.py`의 Hermes CLI 실행과 `soc_management_run.py`의 AIAgent/stream-json hook에 대응하는 실행부 연결, Mattermost 이벤트/스레드·영속 기록·실패 보고, KST/한국어/증거 검사, 정확 후보 승인·보호 주소·TTL·worker 검증을 이관해야 한다. 범용 shell/파일/Docker MCP를 추가해 이 경계를 우회하지 않는다. 후보 도입 시 별도 읽기 환경→36도구/대상·오류 계약→동일 모델/문맥/정책의 반복 지연·정확도 비교→채팅/관리/승인 동등성 순으로 확인한다. 새 환경에서 기존 관리 사건·DB를 이중 소비하지 않는다. 이번 전체36개 모델 선택·보호 승인/적용·실제 채팅·공격 E2E·새 서버 설치는 미실행,3번CVE 보류 유지.
+
+**파일·Git·정리:** 공개 STATUS/PLAN/README/MCP/B 안내와 로컬 업무분담·세션·검증 보고서를 갱신한다. 운영/설치기 동작 변경이 없어 deploy.sh·설정 예제·반입 목록의 실행 내용은 유지한다. 실제 후보 도입 시에는 단일 설치기와 ABI별 오프라인 반입·해시 검증·복구 경로도 함께 반영해야 한다. Mac 시험 실행기5파일/14,150바이트·임시 디렉터리 제거 확인, 패키지 다운로드/설치·서버 임시 파일0이다. 이 절 작성 시 문서는 로컬 변경 상태이며 검증 후 명시적 파일 추가·자동 커밋/푸시·실제 원격 비교를 수행한다.
+
 ## B에 원격 Ollama 실행부를 추가할 자원 여유 — 2026-10-25 05:14 KST
 
 **판단: 여유 있음.** 모델 추론은 DGX에 유지하고 B에는 Ollama 원격 클라이언트와 SOC 실행부를 추가하는 조건이다. 현재 Hermes를 유지한 채 별도 비교 환경을 두는 것도 자원상 가능하다고 판단한다. 설치 전의 용량 판단이며 신규 실행부의 실제 사용량·최대 동시 부하·성능 개선을 검증한 결과는 아니다.

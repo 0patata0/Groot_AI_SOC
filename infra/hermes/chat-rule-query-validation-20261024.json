@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "date_kst": "2026-10-24",
-  "current_version": "1.3.0",
+  "current_version": "1.3.1",
   "scope": "normal-profile native Mattermost-platform SDK, isolated database; installed gateway startup/link checks; no new chat posts",
   "suricata_live_audit": {
     "running": true,
@@ -303,7 +303,61 @@
       },
       "direct_chat_posts": 0,
       "protected_changes": 0,
-      "latency_sla_verified": false
+      "latency_sla_verified": false,
+      "source_commit": "5ab0c6ef6834ea4343ec449b2852121517b1b0c7",
+      "source_commit_remote_verified": true
+    },
+    {
+      "version": "1.3.1",
+      "source_sha256": "e6864fa465fa22fd900f44a6513facbb79c726274b8d6d27d611d6cdf764adfc",
+      "purpose": "Keep pure inventories read-only; after investigation tool results preserve existing native proposal capability and medium reasoning. No additional operator request to prepare a change. Backend approval remains unchanged.",
+      "local_tests": {
+        "query": 177,
+        "siem_installer": 40,
+        "total": 217
+      },
+      "native_schema_probe": {
+        "version": "groot-query-completion:1.3.1",
+        "first_read_schema_count": 19,
+        "after_result_schema_count": 36,
+        "proposal_capability_preserved": true,
+        "native_valid_names_unchanged": true,
+        "reasoning_effort": "medium",
+        "model": "qwen3.6:35b",
+        "provider_calls": 0,
+        "tool_execution_calls": 0,
+        "messages_posted": 0,
+        "temporary_directory_removed": true
+      },
+      "deployment": {
+        "backup": "/var/backups/capstone-query-completion/20261024T174546+0900",
+        "management_timer_was_active": true,
+        "status": "applied",
+        "source_sha256": {
+          "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "e6864fa465fa22fd900f44a6513facbb79c726274b8d6d27d611d6cdf764adfc",
+          "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "4685a9fea0fba8924980b36799c1eea020a1b2da2fd1990d0bb1e871317a50b5"
+        },
+        "same_container": true,
+        "native_nine_unchanged": true,
+        "configurations_unchanged": true,
+        "existing_messages_preserved": 1353,
+        "new_message_rows": 0,
+        "gateway": "running",
+        "mattermost_adapter_state": "connected",
+        "registration_pids": [
+          "158"
+        ],
+        "hermes_restarts": 1,
+        "security_device_restarts": 0,
+        "messages_posted": 0,
+        "new_packages": 0,
+        "management_timer_active_after": true,
+        "failed_unit_count": 0,
+        "receipt": "/var/lib/capstone-management/live-query-role-20261024T174546+0900.json"
+      },
+      "provider_calls_or_proposals_executed_in_this_probe": 0,
+      "new_full_model_latency_trial": false,
+      "latency_evidence": "Prior stage 1.3.0 timings; its pure inventory/local format path is retained and unit-checked."
     }
   ],
   "not_verified": [
@@ -312,5 +366,34 @@
     "repeated latency/SLA",
     "real attacks/protected response E2E",
     "new three-VM installation"
-  ]
+  ],
+  "cleanup": {
+    "removed_files": 69,
+    "removed_bytes": 1319613,
+    "both_task_directories_removed": true,
+    "mac_package_installs": 0,
+    "package_downloads": 0,
+    "existing_user_cache_deleted": false,
+    "server_replay_directories_remaining": 0,
+    "operational_three_backups_retained": true
+  },
+  "cleanup_first_stage": {
+    "removed_files": 63,
+    "removed_bytes": 1250504,
+    "task_directory_removed": true,
+    "known_failed_pure_fixture_directories_absent": true,
+    "mac_package_installs": 0,
+    "package_downloads": 0,
+    "existing_user_cache_deleted": false,
+    "server_replay_directories_remaining": 0,
+    "operational_source_and_backups_retained": true
+  },
+  "cleanup_role_stage": {
+    "removed_files": 6,
+    "removed_bytes": 69109,
+    "role_task_directory_removed": true,
+    "mac_package_installs": 0,
+    "package_downloads": 0,
+    "existing_user_cache_deleted": false
+  }
 }

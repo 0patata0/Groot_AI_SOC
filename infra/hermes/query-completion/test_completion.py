@@ -1076,6 +1076,16 @@ class FirstRequestGroundingTests(unittest.TestCase):
                 h, result, seen, original = self.build(request, native_exchanges())
                 self.assertFalse(hasattr(h.agent, '_capstone_query_completion_local_format'))
 
+    def test_investigation_reads_first_then_keeps_existing_proposal_capability(self):
+        question = 'IDS는 왜 활성화 안됐지?'
+        h, first, _, _ = self.build(question)
+        self.assertTrue(all(t['function']['name'] in PLUGIN._READ_TOOL_NAMES for t in first['tools']))
+        h, after, _, _ = self.build(question, [{'role':'tool','tool_call_id':'observed','content':'actual read result'}])
+        self.assertIn('mcp__rule_a__propose_rule_edit', {t['function']['name'] for t in after['tools']})
+        self.assertEqual(after['reasoning_effort'], 'medium')
+        self.assertEqual(h.agent.valid_tool_names, {t['function']['name'] for t in h.agent.tools})
+        self.assertFalse(hasattr(h.agent, '_capstone_query_completion_local_format'))
+
     def test_fully_verified_prior_table_is_a_no_tool_non_thinking_format_request(self):
         from test_inventory_render import native_exchanges
         before = [{'role': 'user', 'content': '현재 적용된 룰 보여줘'}, *native_exchanges(),

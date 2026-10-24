@@ -18,7 +18,7 @@ from pathlib import Path
 import re
 import time
 
-VERSION = "groot-query-completion:1.3.0"
+VERSION = "groot-query-completion:1.3.1"
 SOURCE_ROOT = Path("/opt/hermes")
 SOURCE_SHA256 = {
     "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
@@ -209,7 +209,7 @@ def _read_tools(tools, names):
     return scoped
 
 
-def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, format_only=False):
+def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, format_only=False, read_only=True):
     """Narrow the next native chat request only; never add a tool or synthesize a call."""
     original = getattr(agent, "_build_api_kwargs", None)
     offered = _read_tools(getattr(agent, "tools", None), getattr(agent, "valid_tool_names", ()) or ())
@@ -246,24 +246,24 @@ def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, f
         extra = dict(extra) if isinstance(extra, dict) else {}
         # OpenAI's extra_body wins at the wire. Filter that effective list too,
         # then remove duplicate controls so it cannot restore write schemas.
-        reads = _read_tools(extra.pop("tools", result.get("tools")), allowed)
-        if format_only:
-            reads = []  # A verified prior-table reformat performs no new operation.
-        extra.pop("tool_choice", None)
-        # A native builder may omit tools. Do not resurrect even a known readable schema.
-        narrowed = {**result, "tools": reads,
-                    "tool_choice": ("required" if require_read else "auto") if reads else "none"}
-        # The model may emit a name absent from the advertised schema. Native
-        # dispatch must use the same allowlist until this response is consumed.
-        previous_names = getattr(agent, "valid_tool_names", None)
-        leased_names = {t["function"]["name"] for t in reads}
-        def restore_names():
-            if getattr(agent, "valid_tool_names", None) is leased_names:
-                agent.valid_tool_names = previous_names
-            if getattr(agent, "_capstone_query_completion_names_restore", None) is restore_names:
-                delattr(agent, "_capstone_query_completion_names_restore")
-        agent.valid_tool_names = leased_names
-        agent._capstone_query_completion_names_restore = restore_names
+        narrowed = dict(result)
+        if read_only:
+            reads = _read_tools(extra.pop("tools", result.get("tools")), allowed)
+            if format_only:
+                reads = []  # A verified prior-table reformat performs no new operation.
+            extra.pop("tool_choice", None)
+            # A native builder may omit tools. Do not resurrect even a known readable schema.
+            narrowed.update(tools=reads, tool_choice=("required" if require_read else "auto") if reads else "none")
+            # Match validation/dispatch to this request's advertised reads.
+            previous_names = getattr(agent, "valid_tool_names", None)
+            leased_names = {t["function"]["name"] for t in reads}
+            def restore_names():
+                if getattr(agent, "valid_tool_names", None) is leased_names:
+                    agent.valid_tool_names = previous_names
+                if getattr(agent, "_capstone_query_completion_names_restore", None) is restore_names:
+                    delattr(agent, "_capstone_query_completion_names_restore")
+            agent.valid_tool_names = leased_names
+            agent._capstone_query_completion_names_restore = restore_names
         base_url = getattr(agent, "base_url", None)
         if (getattr(agent, "provider", None) == "custom"
                 and getattr(agent, "model", None) == "qwen3.6:35b"
@@ -384,7 +384,8 @@ def make_request_wrapper(original, reanchor):
             if has_calls and not render_rule_inventory(inventory_request, messages[idx + 1:], missing_targets=True):
                 local_text = render_rule_inventory(inventory_request, messages[idx + 1:])
         if not callable(pending) and not _arm_read_request(agent, turn, require_read=not has_calls and not prior_table,
-                                                          inventory_only=inventory_only, format_only=bool(local_text)):
+                inventory_only=inventory_only, format_only=bool(local_text),
+                read_only=inventory_only or not has_calls):
             return original(agent, **kw)
         if local_text:
             agent._capstone_query_completion_local_format = (turn, local_text)

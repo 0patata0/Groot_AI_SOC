@@ -1,0 +1,826 @@
+{
+  "schema_version": 1,
+  "checked_at_kst": "2026-10-24T23:41:23.719241+09:00",
+  "scope": "read-only inference inspection and sequential API-only diagnostic replays; no production tuning",
+  "access_constraint": "User confirmed only Ollama API is exposed; no DGX SSH access.",
+  "model_server": {
+    "api_version": "0.40.4",
+    "model": "qwen3.6:35b",
+    "family": "qwen35moe",
+    "parameter_size": "35.5B",
+    "quantization": "Q4_K_M",
+    "digest": "096fdbd02fe620fc10cbeb6537e080f8041aece851e5d696aed024d4f70f2e47",
+    "context_length": 262144,
+    "reported_resident_bytes": 23941863177,
+    "reported_vram_bytes": 23941863177,
+    "sampling_defaults": "top_k                          20\ntop_p                          0.95\ndraft_num_predict              2\nmin_p                          0\npresence_penalty               1.5\nrepeat_penalty                 1\ntemperature                    1"
+  },
+  "network": {
+    "source": "Groot_B",
+    "destination": "configured Ollama API",
+    "version_get_seconds": [
+      0.002533,
+      0.002501,
+      0.002431,
+      0.002381,
+      0.001998
+    ],
+    "median_seconds": 0.002431
+  },
+  "b_resources": {
+    "loadavg": [
+      "0.09",
+      "0.08",
+      "0.14"
+    ],
+    "meminfo": [
+      "MemTotal:       16377104 kB",
+      "MemAvailable:   12357272 kB",
+      "SwapTotal:       4194300 kB",
+      "SwapFree:        4194300 kB"
+    ]
+  },
+  "native_wire_fixture": {
+    "historical_user_row": 1429,
+    "historical_read_result_rows": [
+      1430,
+      1431,
+      1432
+    ],
+    "history_from_same_authorized_test_thread": true,
+    "initial_tools": 19,
+    "post_read_tools": 35,
+    "tool_schemas_differ": true,
+    "schema_permissions_preserved": true,
+    "model_requests_max_output_tokens": 1536,
+    "actual_mcp_tool_execution": 0,
+    "mcp_schema_discovery_performed": true,
+    "stored_state_opened_read_only": true,
+    "provider_streamed_privately_for_timing": true,
+    "user_channel_streaming_setting_unchanged": true,
+    "native_endpoint_mapping": "same messages/tools; think=false and equivalent sampling options; native API has no tool_choice field.",
+    "request_metadata": {
+      "selection": {
+        "tools": 19,
+        "tool_names": [
+          "mcp__resp__list_blocks",
+          "mcp__rule_a__get_operation_status",
+          "mcp__rule_a__get_rule_change_status",
+          "mcp__rule_a__get_rule_change_target",
+          "mcp__rule_a__get_service_action_target",
+          "mcp__rule_b__get_operation_status",
+          "mcp__rule_b__get_rule_change_status",
+          "mcp__rule_b__get_rule_change_target",
+          "mcp__rule_b__get_service_action_target",
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__system_diagnostics__get_system_diagnostics",
+          "mcp__wazuh_ro__get_wazuh_agent_ports",
+          "mcp__wazuh_ro__get_wazuh_agent_processes",
+          "mcp__wazuh_ro__get_wazuh_agents",
+          "mcp__wazuh_ro__get_wazuh_alert_summary",
+          "mcp__wazuh_ro__get_wazuh_cluster_health",
+          "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities",
+          "mcp__wazuh_ro__search_wazuh_manager_logs"
+        ],
+        "messages": 77,
+        "chars_by_role": {
+          "system": 10468,
+          "user": 14843,
+          "assistant": 12185,
+          "tool": 2924
+        },
+        "reasoning_effort": "none",
+        "tool_choice": "required",
+        "schema_sha256": "c2b22a7bc3f8baaeb06e3ca04aa7b8e024272cb4009e71fb8bdb77235e700144"
+      },
+      "answer": {
+        "tools": 35,
+        "tool_names": [
+          "mcp__resp__block_ip",
+          "mcp__resp__list_blocks",
+          "mcp__resp__unblock_ip",
+          "mcp__rule_a__get_operation_status",
+          "mcp__rule_a__get_rule_change_status",
+          "mcp__rule_a__get_rule_change_target",
+          "mcp__rule_a__get_service_action_target",
+          "mcp__rule_b__get_operation_status",
+          "mcp__rule_b__get_rule_change_status",
+          "mcp__rule_b__get_rule_change_target",
+          "mcp__rule_b__get_service_action_target",
+          "mcp__rule_write_a__propose_rule_change",
+          "mcp__rule_write_a__propose_rule_edit",
+          "mcp__rule_write_a__propose_service_action",
+          "mcp__rule_write_a__temporarily_contain_ip",
+          "mcp__rule_write_b__propose_rule_change",
+          "mcp__rule_write_b__propose_rule_edit",
+          "mcp__rule_write_b__propose_service_action",
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__system_diagnostics__get_system_diagnostics",
+          "mcp__wazuh_ro__get_wazuh_agent_ports",
+          "mcp__wazuh_ro__get_wazuh_agent_processes",
+          "mcp__wazuh_ro__get_wazuh_agents",
+          "mcp__wazuh_ro__get_wazuh_alert_summary",
+          "mcp__wazuh_ro__get_wazuh_cluster_health",
+          "mcp__wazuh_ro__get_wazuh_cluster_nodes",
+          "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities",
+          "mcp__wazuh_ro__get_wazuh_log_collector_stats",
+          "mcp__wazuh_ro__get_wazuh_manager_error_logs",
+          "mcp__wazuh_ro__get_wazuh_remoted_stats",
+          "mcp__wazuh_ro__get_wazuh_rules_summary",
+          "mcp__wazuh_ro__get_wazuh_vulnerability_summary",
+          "mcp__wazuh_ro__get_wazuh_weekly_stats",
+          "mcp__wazuh_ro__search_wazuh_manager_logs"
+        ],
+        "messages": 80,
+        "chars_by_role": {
+          "system": 10468,
+          "user": 15178,
+          "assistant": 12185,
+          "tool": 7396
+        },
+        "reasoning_effort": "none",
+        "tool_choice": null,
+        "schema_sha256": "95be1c6d8809615bc497a62a9c77fe09f5b1d50ef6820fbdaac03a94b3fc9ab7"
+      }
+    }
+  },
+  "trials": [
+    {
+      "api": "v1",
+      "phase": "selection",
+      "first_chunk_seconds": 8.914833,
+      "first_answer_seconds": 8.914835,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 8.914768,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 22808,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens": 87,
+        "total_tokens": 22895
+      },
+      "seconds": 9.43477,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "group": "same_request_repeat"
+    },
+    {
+      "api": "v1",
+      "phase": "answer",
+      "first_chunk_seconds": 10.711281,
+      "first_answer_seconds": 10.711283,
+      "reasoning_chars": 0,
+      "answer_chars": 572,
+      "tool_chunks": 0,
+      "headers_seconds": 10.711231,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 27886,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens": 300,
+        "total_tokens": 28186
+      },
+      "seconds": 14.351235,
+      "tool_names": [],
+      "group": "same_request_repeat"
+    },
+    {
+      "api": "v1",
+      "phase": "selection",
+      "first_chunk_seconds": 0.90013,
+      "first_answer_seconds": 0.900132,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 0.900062,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 22808,
+        "prompt_tokens_details": {
+          "cached_tokens": 22804
+        },
+        "completion_tokens": 73,
+        "total_tokens": 22881
+      },
+      "seconds": 1.272565,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__rule_b__get_service_action_target"
+      ],
+      "group": "same_request_repeat"
+    },
+    {
+      "api": "v1",
+      "phase": "answer",
+      "first_chunk_seconds": 0.578888,
+      "first_answer_seconds": 0.578889,
+      "reasoning_chars": 0,
+      "answer_chars": 408,
+      "tool_chunks": 0,
+      "headers_seconds": 0.578838,
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 27886,
+        "prompt_tokens_details": {
+          "cached_tokens": 27882
+        },
+        "completion_tokens": 216,
+        "total_tokens": 28102
+      },
+      "seconds": 3.209287,
+      "tool_names": [],
+      "group": "same_request_repeat"
+    },
+    {
+      "api": "native",
+      "phase": "selection",
+      "first_chunk_seconds": 0.863941,
+      "first_answer_seconds": 0.863943,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 0.863886,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 1375269687,
+        "load_duration": 12881823,
+        "prompt_eval_count": 22808,
+        "prompt_eval_cached_count": 22804,
+        "prompt_eval_duration": 71050000,
+        "eval_count": 87,
+        "eval_duration": 881389000
+      },
+      "seconds": 1.379819,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "group": "same_request_repeat",
+      "server_seconds": {
+        "total": 1.37527,
+        "load": 0.012882,
+        "prompt_eval": 0.07105,
+        "eval": 0.881389
+      },
+      "decode_tokens_per_second": 98.708,
+      "uncached_prefill_tokens_per_second": 56.298
+    },
+    {
+      "api": "native",
+      "phase": "answer",
+      "first_chunk_seconds": 0.491396,
+      "first_answer_seconds": 0.491399,
+      "reasoning_chars": 0,
+      "answer_chars": 537,
+      "tool_chunks": 0,
+      "headers_seconds": 0.491337,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 4000334438,
+        "load_duration": 15803704,
+        "prompt_eval_count": 27886,
+        "prompt_eval_cached_count": 27882,
+        "prompt_eval_duration": 67726000,
+        "eval_count": 287,
+        "eval_duration": 3512806000
+      },
+      "seconds": 4.004656,
+      "tool_names": [],
+      "group": "same_request_repeat",
+      "server_seconds": {
+        "total": 4.000334,
+        "load": 0.015804,
+        "prompt_eval": 0.067726,
+        "eval": 3.512806
+      },
+      "decode_tokens_per_second": 81.701,
+      "uncached_prefill_tokens_per_second": 59.062
+    },
+    {
+      "api": "native",
+      "phase": "selection",
+      "variant": "fresh_prefix",
+      "first_chunk_seconds": 32.227677,
+      "first_answer_seconds": 32.227679,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 32.227616,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 33930409114,
+        "load_duration": 13141592774,
+        "prompt_eval_count": 22840,
+        "prompt_eval_cached_count": 0,
+        "prompt_eval_duration": 17818810000,
+        "eval_count": 87,
+        "eval_duration": 2897793000
+      },
+      "seconds": 33.934155,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\": \"a:suricata\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\": 10, \"lookback_minutes\": 60}"
+        }
+      ],
+      "group": "fresh_prefix_sampling",
+      "server_seconds": {
+        "total": 33.930409,
+        "load": 13.141593,
+        "prompt_eval": 17.81881,
+        "eval": 2.897793
+      },
+      "decode_tokens_per_second": 30.023,
+      "uncached_prefill_tokens_per_second": 1281.792
+    },
+    {
+      "api": "native",
+      "phase": "selection",
+      "variant": "same_fresh_prefix",
+      "first_chunk_seconds": 1.489874,
+      "first_answer_seconds": 1.489876,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 1.489822,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 3675730722,
+        "load_duration": 15131843,
+        "prompt_eval_count": 22840,
+        "prompt_eval_cached_count": 22836,
+        "prompt_eval_duration": 251614000,
+        "eval_count": 102,
+        "eval_duration": 3323292000
+      },
+      "seconds": 3.680014,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__system_diagnostics__get_system_diagnostics"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\": \"a:suricata\"}"
+        },
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": "{\"limit\": 10, \"lookback_minutes\": 60, \"target\": \"a:raw-suricata\"}"
+        }
+      ],
+      "group": "fresh_prefix_sampling",
+      "server_seconds": {
+        "total": 3.675731,
+        "load": 0.015132,
+        "prompt_eval": 0.251614,
+        "eval": 3.323292
+      },
+      "decode_tokens_per_second": 30.692,
+      "uncached_prefill_tokens_per_second": 15.897
+    },
+    {
+      "api": "native",
+      "phase": "selection",
+      "variant": "tail_changed",
+      "first_chunk_seconds": 18.069807,
+      "first_answer_seconds": 18.069809,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 18.069759,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 19889895094,
+        "load_duration": 10533366,
+        "prompt_eval_count": 22818,
+        "prompt_eval_cached_count": 0,
+        "prompt_eval_duration": 16104653000,
+        "eval_count": 88,
+        "eval_duration": 2984579000
+      },
+      "seconds": 19.896703,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\": \"a:suricata\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\": 10, \"lookback_minutes\": 360}"
+        }
+      ],
+      "group": "fresh_prefix_sampling",
+      "server_seconds": {
+        "total": 19.889895,
+        "load": 0.010533,
+        "prompt_eval": 16.104653,
+        "eval": 2.984579
+      },
+      "decode_tokens_per_second": 29.485,
+      "uncached_prefill_tokens_per_second": 1416.858
+    },
+    {
+      "api": "v1",
+      "phase": "selection",
+      "variant": "temperature_zero",
+      "first_chunk_seconds": 3.086651,
+      "first_answer_seconds": 3.086654,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 3.086569,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 22808,
+        "prompt_tokens_details": {
+          "cached_tokens": 20770
+        },
+        "completion_tokens": 87,
+        "total_tokens": 22895
+      },
+      "seconds": 4.790505,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\":\"a:suricata\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\":10,\"lookback_minutes\":60}"
+        }
+      ],
+      "group": "fresh_prefix_sampling"
+    },
+    {
+      "api": "v1",
+      "phase": "selection",
+      "variant": "temperature_zero",
+      "first_chunk_seconds": 1.523807,
+      "first_answer_seconds": 1.52381,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 1.523734,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "prompt_tokens": 22808,
+        "prompt_tokens_details": {
+          "cached_tokens": 22804
+        },
+        "completion_tokens": 87,
+        "total_tokens": 22895
+      },
+      "seconds": 3.228076,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\":\"a:suricata\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\":10,\"lookback_minutes\":60}"
+        }
+      ],
+      "group": "fresh_prefix_sampling"
+    },
+    {
+      "api": "native",
+      "phase": "answer",
+      "variant": "fresh_prefix",
+      "first_chunk_seconds": 20.461494,
+      "first_answer_seconds": 20.461495,
+      "reasoning_chars": 0,
+      "answer_chars": 566,
+      "tool_chunks": 0,
+      "headers_seconds": 20.461446,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 31355623324,
+        "load_duration": 16602780,
+        "prompt_eval_count": 27918,
+        "prompt_eval_cached_count": 0,
+        "prompt_eval_duration": 19650701000,
+        "eval_count": 297,
+        "eval_duration": 10896873000
+      },
+      "seconds": 31.359679,
+      "tool_names": [],
+      "tool_calls": [],
+      "group": "fresh_prefix_sampling",
+      "server_seconds": {
+        "total": 31.355623,
+        "load": 0.016603,
+        "prompt_eval": 19.650701,
+        "eval": 10.896873
+      },
+      "decode_tokens_per_second": 27.256,
+      "uncached_prefill_tokens_per_second": 1420.713
+    },
+    {
+      "api": "native",
+      "phase": "answer",
+      "variant": "same_fresh_prefix",
+      "first_chunk_seconds": 0.301705,
+      "first_answer_seconds": 0.301706,
+      "reasoning_chars": 0,
+      "answer_chars": 848,
+      "tool_chunks": 0,
+      "headers_seconds": 0.301664,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 18140368299,
+        "load_duration": 16863851,
+        "prompt_eval_count": 27918,
+        "prompt_eval_cached_count": 27914,
+        "prompt_eval_duration": 194444000,
+        "eval_count": 398,
+        "eval_duration": 17841197000
+      },
+      "seconds": 18.144395,
+      "tool_names": [],
+      "tool_calls": [],
+      "group": "fresh_prefix_sampling",
+      "server_seconds": {
+        "total": 18.140368,
+        "load": 0.016864,
+        "prompt_eval": 0.194444,
+        "eval": 17.841197
+      },
+      "decode_tokens_per_second": 22.308,
+      "uncached_prefill_tokens_per_second": 20.571
+    },
+    {
+      "api": "native",
+      "phase": "selection",
+      "variant": "baseline",
+      "first_chunk_seconds": 0.893127,
+      "first_answer_seconds": 0.893129,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 0.893071,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 1420026656,
+        "load_duration": 12330791,
+        "prompt_eval_count": 22808,
+        "prompt_eval_cached_count": 22804,
+        "prompt_eval_duration": 67476000,
+        "eval_count": 87,
+        "eval_duration": 897365000
+      },
+      "seconds": 1.424401,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\": \"a:suricata\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\": 10, \"lookback_minutes\": 30}"
+        }
+      ],
+      "group": "tail_only_control",
+      "server_seconds": {
+        "total": 1.420027,
+        "load": 0.012331,
+        "prompt_eval": 0.067476,
+        "eval": 0.897365
+      },
+      "decode_tokens_per_second": 96.951,
+      "uncached_prefill_tokens_per_second": 59.28
+    },
+    {
+      "api": "native",
+      "phase": "selection",
+      "variant": "tail_changed",
+      "first_chunk_seconds": 1.344272,
+      "first_answer_seconds": 1.344273,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 2,
+      "headers_seconds": 1.344223,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 1867054348,
+        "load_duration": 13135931,
+        "prompt_eval_count": 22818,
+        "prompt_eval_cached_count": 20770,
+        "prompt_eval_duration": 898943000,
+        "eval_count": 87,
+        "eval_duration": 892185000
+      },
+      "seconds": 1.870772,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\": \"a:suricata\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\": 10, \"lookback_minutes\": 30}"
+        }
+      ],
+      "group": "tail_only_control",
+      "server_seconds": {
+        "total": 1.867054,
+        "load": 0.013136,
+        "prompt_eval": 0.898943,
+        "eval": 0.892185
+      },
+      "decode_tokens_per_second": 97.513,
+      "uncached_prefill_tokens_per_second": 2278.231
+    },
+    {
+      "api": "native",
+      "phase": "selection",
+      "variant": "tail_changed",
+      "first_chunk_seconds": 0.528801,
+      "first_answer_seconds": 0.528803,
+      "reasoning_chars": 0,
+      "answer_chars": 0,
+      "tool_chunks": 3,
+      "headers_seconds": 0.528753,
+      "server_metrics": {
+        "done_reason": "stop",
+        "total_duration": 1375376149,
+        "load_duration": 18496458,
+        "prompt_eval_count": 22818,
+        "prompt_eval_cached_count": 22814,
+        "prompt_eval_duration": 87302000,
+        "eval_count": 124,
+        "eval_duration": 1217280000
+      },
+      "seconds": 1.380721,
+      "tool_names": [
+        "mcp__rule_a__get_service_action_target",
+        "mcp__rule_a__get_rule_change_target",
+        "mcp__security_events__search_suricata_alerts"
+      ],
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\": \"a:suricata\"}"
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "arguments": "{\"target\": \"a:suricata-local\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\": 20, \"lookback_minutes\": 60}"
+        }
+      ],
+      "group": "tail_only_control",
+      "server_seconds": {
+        "total": 1.375376,
+        "load": 0.018496,
+        "prompt_eval": 0.087302,
+        "eval": 1.21728
+      },
+      "decode_tokens_per_second": 101.866,
+      "uncached_prefill_tokens_per_second": 45.818
+    }
+  ],
+  "findings": {
+    "uncached_v1_selection_answer_seconds": [
+      9.43477,
+      14.351235
+    ],
+    "exact_repeat_v1_selection_answer_seconds": [
+      1.272565,
+      3.209287
+    ],
+    "uncached_native_input_seconds": [
+      17.81881,
+      19.650701
+    ],
+    "cached_same_input_seconds": [
+      0.251614,
+      0.194444
+    ],
+    "observed_model_load_seconds_max": 13.141592774,
+    "observed_native_decode_tokens_per_second_min_max": [
+      22.308,
+      101.866
+    ],
+    "tail_only_control": {
+      "baseline_cached_tokens": 22804,
+      "changed_tail_cached_tokens": 20770,
+      "changed_tail_total_tokens": 22818,
+      "changed_tail_input_seconds": 0.898943,
+      "identical_tail_repeat_cached_tokens": 22814,
+      "conclusion": "prefix reuse works; a small suffix change did not force full reprocessing in this controlled pair"
+    },
+    "temperature_zero": {
+      "requests": 2,
+      "selected_calls_each": 2,
+      "same_selected_names_and_arguments": true,
+      "production_applied": false,
+      "reason": "no demonstrated call-count or end-to-end latency benefit; too few cases for accuracy conclusion"
+    },
+    "other_resident_model_observed": "qwen3.8:27b",
+    "other_model_causality_confirmed": false,
+    "caveat_for_first_tail_changed_trial": "The earlier fresh_prefix_sampling group changed the system prefix between calls; its cache miss cannot be attributed to a suffix-only edit."
+  },
+  "unchanged": {
+    "production_plugin": "1.5.1",
+    "production_files_hashes": {
+      "/opt/hermes-data/config.yaml": "d308c6254301bd3dcfa021a93f0203100f7323112295d31e1dde93829815cf83",
+      "/opt/hermes-data/management/config.yaml": "f27f928e9b9ff550a57b03f78afef4f7cd648fe4fbdcab0469a10eba36e4a729",
+      "/opt/hermes-data/memories/MEMORY.md": "c413cf3c190260caf3ab2ed678844c04ffb681c65076dfb14a25da70f95d1b8c",
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "ec4775bdbd31dc1e57d7691b12e3cbd0f6d13c8450414229cc777ee435287018",
+      "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "70210dc610b6637df39c35b2c5d440b0de1261688c5f2c07fb6bbf60ad855e49",
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+      "/opt/capstone-management/soc_management_controller.py": "82c062fa93323fdde7f2be0737ffe6eedcede435991eb6506ded9c4102c5f070"
+    },
+    "runtime_restart_count": 0,
+    "model_install_or_switch": false,
+    "keep_alive_num_ctx_server_cache_settings_changed": false,
+    "force_unload_or_cache_flush": false,
+    "new_chat_posts": 0,
+    "message_count": 1453,
+    "protection_actions": 0,
+    "model_parameters_verified_unchanged": true,
+    "diagnostic_state_messages_added": 0,
+    "message_count_before_previous_task": 1450,
+    "message_count_after": 1453,
+    "concurrent_live_activity_rows": 3,
+    "concurrent_activity_note": "A different Mattermost thread received a user post, bot response and session metadata at 23:23 KST; these were not posted by this diagnostic. Only row metadata was inspected."
+  },
+  "health": {
+    "gateway": {
+      "active_agents": 0,
+      "platforms": {
+        "mattermost": "connected",
+        "api_server": "connected"
+      }
+    },
+    "services": {
+      "capstone-management.timer": "active",
+      "rule-change-worker.timer": "active",
+      "soc-bot.service": "active"
+    },
+    "failed_units": "",
+    "server_trial_dirs": []
+  },
+  "limitations": [
+    "GPU utilization, thermal/power limits, server queue, parallel inference and exact server options cannot be established through exposed APIs.",
+    "Other model residency and decode slowdowns are correlated observations, not proof of resource contention.",
+    "16 sequential requests, historical fixture and limited synthetic changes; not a load test, general accuracy test or fresh chat E2E.",
+    "No new speed improvement was deployed; earlier 43-second chat measurements remain the latest actual channel samples.",
+    "Do not expose unvalidated streaming tokens to users to bypass the existing KST/evidence checks."
+  ],
+  "sources": [
+    "https://docs.ollama.com/api/chat",
+    "https://docs.ollama.com/api/ps",
+    "https://docs.ollama.com/api/openai-compatibility"
+  ],
+  "git": {
+    "state": "inspection documents prepared; commit/push pending"
+  },
+  "cleanup": {
+    "package_downloads": 0,
+    "mac_installs": 0,
+    "server_trial_dirs_removed": true,
+    "mac_task_temp_removed": false
+  }
+}

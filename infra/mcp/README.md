@@ -1,5 +1,19 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+## 2026-10-25 에이전트 교체 시 호환 경계
+
+운영의일반/관리8MCP는모두SSH stdio다. 기존컨테이너의Python환경에서Hermes에이전트없이표준MCP SDK로36도구발견과Suricata상태·KST계산2읽기를확인했다. 서버를재사용할근거이며Ollama자체나신규에이전트의전체운영호환시험은아니다.
+
+| 항목 | 교체 시 요구 |
+| --- | --- |
+| 연결 | MCP initialize/list_tools/call_tool,SSH subprocess/stdin/stdout,기존UID·키·known_hosts·ForceCommand·시간제한 |
+| 도구 매핑 | A/B에같은bare이름7종존재.서버별이름/target enum을보존하고자동으로한쪽에합치지않음 |
+| 권한 | ruleview조회/rulechg제안·resp권한분리,관리gate의직접차단제외,승인/보호주소/TTL·worker검증유지 |
+| 결과 | 호출ID/오류/타임아웃·KST파생값·원본해시/관측범위·최종저장/알림의동일성 |
+| SOC 실행 | LLM조사·판단·변경안작성주도,정확승인후적용확인·영속사건큐/실패보고보존 |
+
+Ollama의function calling은도구선택을출력하지만현재MCP접속/실행과Mattermost·관리/승인흐름은클라이언트측이이어받아야한다. [Ollama 도구 호출](https://docs.ollama.com/capabilities/tool-calling) · [MCP 클라이언트](https://modelcontextprotocol.io/docs/2026-07-28/develop/build-client). 현재서버에Ollama를설치하는배치안이라도이실행부의설계·검증이추가로필요하다. 최신실측/미실행범위는 [STATUS](../../STATUS.md).
+
 > **2026-10-25 KST 조회 표현:** A/B의 공통 룰 MCP 읽기 응답에 `time_display`(KST·경과값)를 추가했다. 해시 대상 `observation`·원본 내용·승인 SHA는 그대로다. 기존 진단 MCP의 순수 `calculate_time`은 서버 조회/정상 판정 증거와 분리한다. [시간 계산 계약](system-diagnostics.md) · [운영 검증](../../STATUS.md).
 
 > **2026-10-24 KST/진단 후속:** 승인 카드의 시작/만료 시각은 KST로 표시하며 원본 계획·해시는 그대로 유지한다. 진단 범위 오류는 허용 수치를 반환하고 실제mcp계정의 거절/정정 조회를 확인했다. 최신 배포·검증은 [STATUS](../../STATUS.md).
@@ -76,7 +90,7 @@ Hermes UID995의 SDK로6서버 initialize/list를 다시 확인했다. 서버가
 
 **영속 사건 큐 배포 요건(2026-10-15 후속):** `soc-bot.service`의 `ProtectSystem=strict`를 유지하면서 `/var/lib/socbot`만 쓰기 가능해야 한다. 전체 흐름 시험에서 파일 소유권이 맞아도 서비스의 파일시스템 제한으로 사건 등록이503으로 실패하는 문제를 확인했다. 해당 디렉터리의 `socbot:socbot`·0700과 SQLite 파일0600을 유지하고 [전용 drop-in 예시](soc-bot-management-state.conf.example)를 `/etc/systemd/system/soc-bot.service.d/management-state.conf`에 적용했다. 진행 중 승인0건 확인 후 daemon-reload·브로커 재시작을 수행했으며 실제 합성 사건의 등록과 큐 수신을 확인했다. 다른 경로의 쓰기 권한, LLM 도구 권한, 승인 조건은 확대하지 않는다.
 
-원칙: **MCP 서버는 클라이언트 불가지론(client-agnostic)**. 어떤 AI(에이전트 런타임·LLM API)가 붙는지는 서버가 모른다. "무엇을 붙일지"는 **클라이언트 설정 한 블록**에만 존재한다. 따라서 에이전트/LLM을 바꿔도 서버(툴·자격증명·권한·정책)는 그대로다.
+원칙: **MCP 서버는 표준 클라이언트와 에이전트 구현을 분리한다.** 호환 MCP 클라이언트와 도구 이름·스키마·결과 어댑터가 있으면 서버의 도구·자격·권한·정책을 보존해 재사용할 수 있다. 에이전트의 채팅·Memory·검사·승인/관리 실행부까지 설정 한 블록으로 자동 이관된다는 뜻은 아니다. Ollama의 모델 API에도 별도 MCP 클라이언트/실행 루프가 필요하다.
 
 **2026-10-13 19:54 후속 완료:** `.111` Suricata 예외를 새 `propose_rule_edit`로 제출해 실제 전체 diff 게시·관리자 카드 승인·worker 적용·엔진 검증·결과 게시까지 확인했다. Hermes는 `.111`의 `qwen3.6:35b`로 전환했고 기존 MCP 권한·대화 이력을 유지했다. 아래 19:14의 부분 편집 적용 미검증 표시는 당시 상태다. 이번 작은 단일 카드 검증을 큰 diff 분할 카드·별도 서비스 작업·임시 선차단의 실제 실행 검증으로 확대하지 않는다. [최종 상태·증거](../../STATUS.md).
 

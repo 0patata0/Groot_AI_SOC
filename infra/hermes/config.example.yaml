@@ -37,7 +37,7 @@ mcp_servers:
       resources: false
       prompts: false
     trust: full
-  system-diagnostics:                         # 고정 A/B/C root snapshot 조회 1툴, shell/원문 journal 권한 없음
+  system-diagnostics:                         # 고정 A/B/C root snapshot 조회 + 순수 calculate_time 2툴, shell/원문 journal 권한 없음
     command: ssh
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b", "system-diagnostics"]
     env: {HOME: /opt/data/home}
@@ -97,7 +97,7 @@ security:
   allow_lazy_installs: false                  # 오프라인: 런타임 pip 설치 시도 금지
 
 # 2026-10-15: 일반 terminal/file/code/delegation 도구를 관리 작업에 노출하지 않는다.
-# 기존 라이브의5개 MCP에 새 읽기전용 system-diagnostics를 추가하는 배포 계약이다.
+# 2026-10-23 초기 계약: 당시5개 MCP에 읽기전용 system-diagnostics를 추가했다. 현행8연결/36도구는 위 설정을 따른다.
 # 배포 전후 _get_platform_tools 결과가 아래6개와 정확히 같음을
 # 당시 확인하고 known_builtin_toolsets/known_plugin_toolsets도 해당 설치본 기준으로 저장했다.
 # 버전 변경 시 기본 도구 자동 추가 여부를 다시 검사한다.

@@ -22,6 +22,8 @@ DGX Ollama native `/api/chat`→모델의 도구 선택→SSH MCP 실행→결�
 
 ### 추가로 필요한 환경과 유지할 프로젝트 코드
 
+**별도 환경의 위치:** 같은 B 서버 안의 별도 컨테이너 또는 Python 가상환경을 의미한다. 다른 물리 서버/VM을 마련할 필요는 없다. 기존 Hermes의 패키지와 시험 실행부의 패키지·설정·기억 경로를 분리하고, 모델 추론은 두 환경 모두 DGX Ollama를 이용한다. 기존 MCP 서버도 재사용한다. venv는 패키지 분리이며 OS 권한 격리를 대신하지 않으므로 SSH 키·도구/승인 제한은 별도로 적용한다. 아직 어느 방식도 새로 설치하지 않았다.
+
 - 기존 SOC 조회/제안36도구를 위해 새로운 범용 MCP 서버를 추가할 필요는 없다. 현재의 `calculate_time`도 재사용한다. 서버/계정별 키·known_hosts·ForceCommand·도구 이름/target enum·타임아웃·관리 allowlist를 새 클라이언트에 정확히 연결해야 한다.
 - 기존 컨테이너의 MCP/httpx/aiohttp/PyYAML/jsonschema 및 전이41패키지 조건 충족을 확인했다. regex2026.9.29는 별도 CPython3.13 경로에 있다. 독립 Python3.12 환경을 택하면 venv 및 그 ABI의 wheel을 따로 준비한다. 이 목록은 완성된 오프라인 lock이 아니다. REST 직결에는 Ollama CLI/SDK/로컬 추론 daemon이 필수는 아니지만 ChatOllama를 택하면 langchain-ollama와 Ollama SDK 등의 전이 의존성이 추가된다.
 - Memory MCP를 택하면 Node/npm 패키지와 지정 데이터 경로를 준비한다. 컨테이너에는 Node/npm이 있지만 호스트 PATH에는 없었다. 기존 Hermes Memory를 자동 공유하거나 대체하지 않는다. 공식 예시의 온라인 npx/pip/go install을 폐쇄망 서버에서 그대로 실행하지 않고 버전·출처·해시·전체 의존성을 고정해 오프라인 반입한다. 기존 운영 가상환경을 다운그레이드하지 않는다.

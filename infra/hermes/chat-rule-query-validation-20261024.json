@@ -357,7 +357,9 @@
       },
       "provider_calls_or_proposals_executed_in_this_probe": 0,
       "new_full_model_latency_trial": false,
-      "latency_evidence": "Prior stage 1.3.0 timings; its pure inventory/local format path is retained and unit-checked."
+      "latency_evidence": "Prior stage 1.3.0 timings; its pure inventory/local format path is retained and unit-checked.",
+      "source_commit": "f4d5fb4d21dd1f19f748ccbffcbae3ad5eaf7fb9",
+      "source_commit_remote_verified": true
     }
   ],
   "not_verified": [

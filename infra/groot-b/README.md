@@ -1,5 +1,7 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
+> **2026-10-25 05:00 KST 역할·자원 확인:** B는 4 vCPU/RAM15.62GiB(가용11.77GiB)·swap사용0이며 계산용 GPU는 노출되지 않았다(VMware vmwgfx). Wazuh3종·Mattermost·PostgreSQL·Hermes 6컨테이너 실행, Hermes 유휴1표본314.2MiB/CPU0.16%. 현행35B 파일21.07GiB와 공존 서비스 때문에 B에서 동일 모델 추론을 맡기는 전환은 권장하지 않는다. B Hermes가 SOC/MCP·채팅을 관리하고 DGX Ollama가 추론하는 구성을 유지한다. 초기 프로세스 root와 실제 Hermes UID995를 구분하며 운영권한 변경은 없다. 전체 비교·근거·미검증 범위는 [STATUS](../../STATUS.md).
+
 > 2026-10-24 보완: 오프라인 host 패치, 기존 Java/관리망 격리, root 승인 진입점과 검증 TLS8444/8445를 적용했다. A 필수 컨테이너는 always로 재부팅 복구하며 실습/백업의 중지 상태는 보존한다. 상세 포트·권한·새 설치/기존 이관과 검증 범위는 [설치 안내](../../deployment/bootstrap-guide.md) 및 [STATUS](../../STATUS.md)를 따른다. LLM 추가 검증은 진행 중이다.
 
 <!-- current-project-context:2026-10-24 -->

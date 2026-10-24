@@ -14,7 +14,7 @@
 
 확인한 DGX/Qwen 사건 관리 경로는 추론 지원 metadata를 대조한 뒤 `reasoning_effort=medium`을 사용한다. 일반 채팅 설정·추론 표시·권한은 유지한다. 해당 Ollama0.40.4의 OpenAI 호환 경로에는 native `think` 필드가 없으므로 지원되는 호환 옵션을 사용한다([해당 버전 adapter](https://raw.githubusercontent.com/ollama/ollama/v0.40.4/openai/openai.go), [공식 호환 제어 설명](https://docs.ollama.com/api/openai-compatibility)).
 
-제어기는 조사 완료·불완료·중단 보고를 run별 영속 전달 큐에 저장하고, 전송 실패 시 다음 timer 실행에서 보고만 다시 보낸다. 호출당 전송 시도1회, 최초60초부터 최대1시간 간격이며 모델·승인·조치를 재실행하지 않는다. `--no-deliver`는 전송과 새 보고 적재를 모두 막는다. 과거 미전달 보고는 자동 역송하지 않는다. 고정 보고ID로 재전송을 식별하지만 webhook이 수신 후 응답을 잃으면 중복될 수 있다. 실제 적용·모델/전달 검증 범위는 [STATUS](../../STATUS.md)를 따른다.
+제어기는 조사 완료·불완료·중단 보고를 run별 영속 전달 큐에 저장하고, 전송 실패 시 다음 timer 실행에서 보고만 다시 보낸다. 호출당 전송 시도1회, 최초60초부터 최대1시간 간격이며 모델·승인·조치를 재실행하지 않는다. `--no-deliver`는 전송과 새 보고 적재를 모두 막는다. 과거 미전달 보고는 자동 역송하지 않는다. 고정 보고ID로 재전송을 식별하지만 webhook이 수신 후 응답을 잃으면 중복될 수 있다. 표시된 일반/가상 중단 fixture2건은 실제 SOC Alerts에 게시하고 저장 본문·API 재조회·WebSocket 수신을 확인했다. 이 시험은 새 LLM 조사나 실제 모델 중단을 만들지 않았다. 실제 적용·모델/전달 검증 범위는 [STATUS](../../STATUS.md)를 따른다.
 
 ## 2026-10-24 후속: 도구 선택·시각·표본 의미
 

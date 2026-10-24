@@ -285,11 +285,23 @@ class ServiceActionService:
         profile = self._profile(target)
         with self.engine.locked():
             observation = self.backend.observe(target)
-            return {"target": target, "allowed_actions": profile["actions"], "observation": observation,
+            result = {"target": target, "allowed_actions": profile["actions"], "observation": observation,
                     "base_state_sha256": digest(observation), "policy_sha256": digest(_policy(target)),
                     "impact": profile["impact"], "automatic_recovery": "none",
                     "restart_grace_seconds": profile["stop_seconds"],
                     "restart_timeout_effect": "Docker may SIGKILL after the fixed graceful-stop interval"}
+        if profile["kind"] == "suricata":
+            # Reuse the canonical reader after releasing the workflow lock.
+            # Approval still binds only the original observation, unchanged.
+            try:
+                evidence = self.engine.get_target("a:suricata-local")["runtime"]
+                if evidence.get("container_id") != observation["container_id"]:
+                    raise self.error("container changed between read observations")
+                result["rule_source_evidence"] = evidence
+            except (OSError, self.error):
+                result["rule_source_evidence"] = {"status": "unavailable",
+                    "evidence_scope": "rule source not verified; do not infer its path or loading failure"}
+        return result
 
     def _post(self, record):
         answer = self.engine.broker.request("POST", "/operations", record["proposal"])

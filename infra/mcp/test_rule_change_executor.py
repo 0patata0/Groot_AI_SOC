@@ -808,6 +808,35 @@ class ExecutorTests(unittest.TestCase):
             engine.propose(target, "0" * 64, self.candidate("waf"), "requested")
         self.assertEqual(self.broker.rows, {})
 
+    def test_suricata_read_exposes_current_source_without_changing_approval_runtime(self):
+        engine, runner, target, current = self.engine("suricata")
+        spec = engine.targets[target]
+        bound_before = engine._inspect(spec)
+        result = engine.get_target(target)
+        self.assertEqual(result['runtime']['rule_source_path'], '/rules/all.rules')
+        self.assertTrue(result['runtime']['combined_is_exact_et_plus_local'])
+        self.assertEqual(result['runtime']['combined_sha256'], result['related_hashes']['all_sha256'])
+        self.assertEqual(result['runtime']['observed_at'], 1000)
+        self.assertFalse(result['rule_inventory']['runtime_load_verified'])
+        self.assertEqual(engine._inspect(spec), bound_before)
+        self.assertNotIn('rule_source_path', bound_before)
+        self.assertFalse(any(c[1] == 'restart' for c in runner.commands))
+
+    def test_suricata_rejects_wrong_or_duplicate_rule_source_argument(self):
+        engine, runner, target, current = self.engine("suricata")
+        original = runner.call
+        for command in (['-S', '/rules/suricata.rules', '/rules/all.rules'],
+                        ['-S', '/rules/all.rules', '-S', '/rules/all.rules'], ['-S']):
+            def changed(argv, timeout=30):
+                data = original(argv, timeout)
+                if argv[1] == 'inspect':
+                    rows = json.loads(data)
+                    rows[0]['Config']['Cmd'] = command
+                    return json.dumps(rows).encode()
+                return data
+            with mock.patch.object(runner, 'call', side_effect=changed), self.assertRaises(MOD.RuleChangeError):
+                engine.get_target(target)
+
     def test_read_only_check_creates_no_state_directory(self):
         engine, runner, target, _ = self.engine("waf")
         other_state = self.base / "not-created"

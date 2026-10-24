@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "date_kst": "2026-10-24",
+  "scope": "authorized actual Mattermost test thread, real model/MCP/native persistence/API/WebSocket; memory cleanup and current rule-source read evidence",
+  "live_chat_before_refresh": [
+    {
+      "question": "[응답 재시험] 현재 적용된 룰 보여줘",
+      "final_seconds": 22.206,
+      "new_mcp_calls": 3,
+      "native_saved_final_matches_post": true,
+      "websocket_received": true,
+      "final_post_id": "6arxgpmq4bfh7fzp6rt4ozxs3y"
+    },
+    {
+      "question": "장비별로 표로 보여줘",
+      "final_seconds": 0.14,
+      "new_mcp_calls": 0,
+      "native_saved_final_matches_post": true,
+      "websocket_received": true,
+      "final_post_id": "hjxtx4kxhfy9unanp49ku17tkc"
+    },
+    {
+      "question": "IDS는 왜 활성화 안 됐지? 실제 조회 근거로 확인해줘",
+      "final_seconds": 64.393,
+      "new_mcp_calls": 2,
+      "native_saved_final_matches_post": true,
+      "websocket_received": true,
+      "final_post_id": "o5kxhz57ofgj78crckfbs8bpoe"
+    }
+  ],
+  "before_content_verdicts": [
+    "pass",
+    "pass",
+    "fail"
+  ],
+  "live_chat_after_refresh": [
+    {
+      "question": "IDS는 왜 활성화 안 됐지? 실제 조회 근거로 확인해줘",
+      "final_seconds": 126.243,
+      "new_mcp_calls": 3,
+      "native_saved_final_matches_post": true,
+      "websocket_received": true,
+      "final_post_id": "zs6rzew5htfofefsxc7uuxfj1c"
+    }
+  ],
+  "after_content_verdict": "partial: wrong runtime path/loading-defect claim corrected; additional factual-scope/time/argument errors remain",
+  "thread_url": "https://chat.grootlab.duckdns.org/soc/pl/wfcubja98pfcbxnzptfdhpas4e",
+  "memory": {
+    "files_updated": 1,
+    "obsolete_items_removed": 3,
+    "reviewed_characters": 904,
+    "sha256": "c413cf3c190260caf3ab2ed678844c04ffb681c65076dfb14a25da70f95d1b8c",
+    "active_normal_policy_refs": 64,
+    "cached_memory_frames_replaced": 42,
+    "management_policy_refs": 24,
+    "stale_active_prompt_claims": 0,
+    "user_preferences_removed": false,
+    "historical_messages_and_old_prompt_blobs_preserved": true,
+    "backup": "/var/backups/capstone-memory-refresh/20261024T203845+0900"
+  },
+  "direct_live_evidence": {
+    "checked_at_kst": "2026-10-24T20:27:17+09:00",
+    "suricata_rule_source": "-S /rules/all.rules",
+    "exact_et_plus_local": true,
+    "container_file_sha256_matches": true,
+    "rules_loaded": 52497,
+    "rules_failed": 0,
+    "rules_skipped": 0,
+    "per_sid_attack_e2e_verified": false
+  },
+  "isolated_replays": [
+    {
+      "stage": "memory only",
+      "seconds": 62.779,
+      "verdict": "fail: stale previous assistant explanation repeated despite corrected memory; invalid operation-status request ID",
+      "chat_posts": 0
+    },
+    {
+      "stage": "memory plus read evidence",
+      "seconds": 44.516,
+      "verdict": "core runtime source corrected; still approximate uptime error and out-of-range diagnostics lookback; not full pass",
+      "chat_posts": 0
+    }
+  ],
+  "remaining_observed_errors": [
+    "Actual follow-up converted 2026-10-24T15:45:30.294+09:00 indexed event to 15:45:30Z and added unverified TLS",
+    "Historical indexed SID hit was overextended to current loading proof; old 24-hour query count reused without its observation time",
+    "Diagnostics returned error sample 0 was described as no errors",
+    "Diagnostics called unknown target a:waf; backend safely refused and final reply noted unavailability",
+    "Causal question final latency remains high: 126.243 seconds in the follow-up sample"
+  ],
+  "read_evidence_changes": {
+    "existing_rule_query_exposes_validated_source_and_combination": true,
+    "service_query_reuses_canonical_rule_reader": true,
+    "extra_read_evidence_outside_approval_state_hash": true,
+    "source_option_and_following_path_strictly_validated": true,
+    "per_file_runtime_load_verified_flag": "still false; current command/file verification is separate"
+  },
+  "test_counts": {
+    "mcp": 360,
+    "management": 117,
+    "query": 177,
+    "deployment_all": 157,
+    "policy_memory": 14,
+    "siem": 40,
+    "total_excluding_overlap": 865
+  },
+  "preservation": {
+    "normal_messages_before_first_chat": 1353,
+    "after_first_three": 1367,
+    "after_follow_up": 1375,
+    "existing_message_rows_preserved": true,
+    "same_hermes_container_stop_start_count": 1,
+    "rule_services_restarted": 0,
+    "protected_actions": 0,
+    "new_packages_images_ports": 0,
+    "final_failed_units": 0
+  },
+  "limits": [
+    "Four actual questions are limited samples, not general accuracy or latency SLA",
+    "Browser visual rendering, user read status and mobile push not tested",
+    "Attack/approval/containment E2E not executed; CVE scenario hold and fresh three-VM install exclusion retained"
+  ],
+  "git": "pending automatic publication",
+  "mac_cleanup": "pending task temporary-file removal",
+  "source_sha256": {
+    "infra/hermes/SOUL.groot.md": "a616fbeee4bd876d07326bf24e9207cebcbdc9c0e21b023b13cb4b43adb7d406",
+    "infra/hermes/update_rule_edit_policy_B.py": "5fd71a814896ca7eca8e852f5e694c52f27de595fdfa563a65f4f1badf438413",
+    "infra/mcp/rule_change_executor.py": "08809f03a41f98d0537ddc32967845250805c586fd3e3a88f4b6cd90826f8358",
+    "infra/mcp/service_action_executor.py": "95fd32455319245a4094de7fb38cf22339d3ef6f1588f02bef122ae1c8500cd8"
+  }
+}

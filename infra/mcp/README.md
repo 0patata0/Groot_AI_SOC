@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **2026-10-24 현재 구동 근거 보완:** `get_rule_change_target(a:suricata-local)`의 runtime은 기존 검증을 통과한 rule_source_path(`/rules/all.rules`), 정확 ET+local 결합 여부/SHA·관측 epoch를 반환한다. `get_service_action_target(a:suricata)`도 동일 canonical reader의 rule_source_evidence를 사용하며 승인용 observation/base_state_sha256은 유지한다. 컨테이너 ID 불일치/읽기 실패는 미확인으로 남긴다. per-SID 적재 미검증 플래그는 계속 false다. 새 도구/권한/포트는 없다. [실제 재시험과 남은 오류](../../STATUS.md) · [검증](../hermes/natural-chat-memory-validation-20261024.json).
+
 ## 현행 조회·변경 기능 소유 — 2026-10-24
 
 같은 조회는 읽기 전용 경로에서만 제공한다. 실제 파일 읽기/집계 구현은 공통 root helper를 재사용하지만 SSH 계정·개인키·sudo 인자·MCP 목록·실행 허용은 분리한다.

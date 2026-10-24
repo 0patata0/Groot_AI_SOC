@@ -4,6 +4,7 @@ from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
 SPEC = importlib.util.spec_from_file_location('policy_patch', Path(__file__).with_name('update_rule_edit_policy_B.py'))
@@ -252,6 +253,60 @@ class PolicyPatchTest(unittest.TestCase):
             self.assertEqual(db.execute('SELECT prompt FROM system_prompts WHERE hash=?', (old_hash,)).fetchone()[0], old_prompt)
             self.assertEqual(db.execute('SELECT history FROM sessions').fetchone()[0], 'unchanged')
             self.assertEqual(db.execute('SELECT message FROM messages').fetchone()[0], 'tool history and conversation')
+
+    def memory_fixture(self):
+        old = 'old live-state claim'
+        (self.data / 'memories').mkdir()
+        (self.data / 'memories/MEMORY.md').write_text(old + '\n')
+        snapshot = self.root / 'memory-new.md'
+        snapshot.write_text('checked snapshot\n')
+        frame = 'MEMORY (your personal notes) [1% — 20/2,200 chars]\n' + '═' * 8 + '\n' + old + '\n\nConversation started: retained\n'
+        with sqlite3.connect(self.data / 'state.db') as db:
+            prompt = self.old + '\n' + frame
+            h = m.sha(prompt.encode())
+            db.execute('INSERT INTO system_prompts VALUES(?,?)', (h, prompt))
+            db.execute('UPDATE sessions SET system_prompt_hash=? WHERE id=?', (h, 's1'))
+        return snapshot, prompt, h
+
+    def test_memory_refresh_preserves_messages_user_frame_and_old_blob(self):
+        snapshot, prompt, h = self.memory_fixture()
+        result = self.update(memory_file=snapshot, preserve_cron=True)
+        self.assertTrue(result['memory_file_updated'])
+        self.assertEqual(result['cached_memory_frames_refreshed'], 1)
+        self.assertEqual((self.data / 'memories/MEMORY.md').read_text(), 'checked snapshot\n')
+        with sqlite3.connect(self.data / 'state.db') as db:
+            updated = db.execute('SELECT p.prompt FROM sessions s JOIN system_prompts p ON p.hash=s.system_prompt_hash').fetchone()[0]
+            self.assertNotIn('old live-state claim', updated)
+            self.assertIn('checked snapshot', updated)
+            self.assertIn('Conversation started: retained', updated)
+            self.assertEqual(db.execute('SELECT prompt FROM system_prompts WHERE hash=?', (h,)).fetchone()[0], prompt)
+            self.assertEqual(db.execute('SELECT message FROM messages').fetchone()[0], 'tool history and conversation')
+
+    def test_memory_write_failure_rolls_back_refs_policy_and_memory(self):
+        snapshot, prompt, h = self.memory_fixture()
+        before = self.logical_db()
+        old_soul = (self.data / 'SOUL.md').read_bytes()
+        original_atomic = m.atomic
+        def failing(path, data, meta):
+            if path.name == 'MEMORY.md' and data == snapshot.read_bytes():
+                raise OSError('injected memory write failure')
+            return original_atomic(path, data, meta)
+        with mock.patch.object(m, 'atomic', side_effect=failing), self.assertRaises(OSError):
+            self.update(memory_file=snapshot, preserve_cron=True)
+        self.assertEqual(self.logical_db(), before)
+        self.assertEqual((self.data / 'SOUL.md').read_bytes(), old_soul)
+        self.assertEqual((self.data / 'memories/MEMORY.md').read_text(), 'old live-state claim\n')
+
+    def test_memory_mismatch_ambiguity_and_budget_refuse_changes(self):
+        frame = 'MEMORY (your personal notes) [1% — 3/10 chars]\n' + '═' * 8 + '\nold\n\nConversation started: retained\n'
+        for text, old, new in ((frame, 'other', 'new'), (frame + frame, 'old', 'new'), (frame, 'old', 'x' * 11)):
+            with self.assertRaises(RuntimeError):
+                m.replace_cached_memory(text, old, new)
+        self.assertEqual(m.replace_cached_memory('no memory frame', 'old', 'new'), 'no memory frame')
+        user = '\nUSER (user profile)\nuser preference: old'
+        text = frame.replace('\nConversation started: retained\n', user)
+        updated = m.replace_cached_memory(text, 'old', 'new')
+        self.assertTrue(updated.endswith(user))
 
 
 if __name__ == '__main__':

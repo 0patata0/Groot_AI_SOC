@@ -9,6 +9,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import sqlite3
 import stat
@@ -154,8 +155,28 @@ def stopped_identity():
     return info['Id'], state.get('StartedAt'), state.get('FinishedAt')
 
 
+def replace_cached_memory(text, old, new):
+    """Refresh only the known native memory frame, preserving user/history text."""
+    pattern = r'(?ms)^MEMORY \(your personal notes\) \[[^\n]+\]\n[═]+\n(.*?)(?=\nConversation started:|\nUSER \(user profile\)|\Z)'
+    frames = list(re.finditer(pattern, text))
+    require(len(frames) <= 1, 'ambiguous native memory frames')
+    if not frames:
+        return text
+    frame = frames[0]
+    require(frame.group(1).strip() == old.strip(), 'cached memory differs from reviewed source')
+    budget = re.search(r'/([0-9,]+) chars\]', frame.group())
+    require(budget is not None, 'native memory budget missing')
+    maximum = int(budget[1].replace(',', ''))
+    count = len(new.strip())
+    require(0 < count <= maximum <= 65536, 'updated memory exceeds native budget')
+    header = frame.group()[:frame.start(1) - frame.start()]
+    header = re.sub(r'\[\d+% — [0-9,]+/[0-9,]+ chars\]',
+                    '[' + str(count * 100 // maximum) + '% — ' + format(count, ',') + '/' + format(maximum, ',') + ' chars]', header)
+    return text[:frame.start()] + header + new.strip() + '\n' + text[frame.end():]
+
+
 def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stopped_identity,
-           management_prompt=None, preserve_cron=False):
+           management_prompt=None, preserve_cron=False, memory_file=None):
     """Core is injectable only for isolated tests; production CLI uses fixed data."""
     require(not (preserve_cron and management_prompt is not None),
             'preserve_cron conflicts with management_prompt')
@@ -166,16 +187,25 @@ def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stoppe
 
     source = policy_file.read_text(encoding='utf-8')
     policy = block(source)
+    new_memory = memory_file.read_text(encoding='utf-8') if memory_file is not None else None
+    old_memory = None
     def transform(text):
         updated = replace_block(text, policy)
         if management_prompt is not None:
             start, end = '<!-- bounded-operations-policy:start -->', '<!-- bounded-operations-policy:end -->'
             updated = updated.replace(block(updated, start, end), block(source, start, end), 1)
+        if new_memory is not None:
+            updated = replace_cached_memory(updated, old_memory, new_memory)
         return updated
     files = {'SOUL.md': data / 'SOUL.md', 'jobs.json': data / 'cron/jobs.json',
              'sessions.json': data / 'sessions/sessions.json'}
+    if memory_file is not None:
+        files['MEMORY.md'] = data / 'memories/MEMORY.md'
     metadata = {name: regular(path) for name, path in files.items()}
     original = {name: path.read_bytes() for name, path in files.items()}
+    if new_memory is not None:
+        old_memory = original['MEMORY.md'].decode('utf-8')
+        require(0 < len(new_memory.strip()) <= 2200, 'reviewed memory snapshot bounds')
     new_soul = transform(original['SOUL.md'].decode('utf-8')).encode('utf-8')
     if preserve_cron:
         new_jobs = original['jobs.json']
@@ -268,18 +298,26 @@ def update(data, policy_file, backup_parent, dry_run=False, stopped_check=stoppe
         require(set(after_blobs) == set(old_blobs) | {item[1] for item in updates}, 'unexpected prompt blob added')
         require(db.execute('PRAGMA integrity_check').fetchall() == [('ok',)], 'updated DB integrity failed')
         still_stopped()
-        for name, updated in (('SOUL.md', new_soul), ('jobs.json', new_jobs)):
+        file_updates = [('SOUL.md', new_soul), ('jobs.json', new_jobs)]
+        if new_memory is not None:
+            file_updates.append(('MEMORY.md', new_memory.encode('utf-8')))
+        for name, updated in file_updates:
             require(files[name].read_bytes() == original[name], 'file changed during update: ' + name)
             changed_files.append(name)
             atomic(files[name], updated, metadata[name])
         require(files['sessions.json'].read_bytes() == original['sessions.json'], 'session mirror changed')
         require(files['SOUL.md'].read_bytes() == new_soul and files['jobs.json'].read_bytes() == new_jobs,
                 'policy file verification failed')
+        if new_memory is not None:
+            require(files['MEMORY.md'].read_bytes() == new_memory.encode('utf-8'), 'memory file verification failed')
         still_stopped()
         db.commit()
         committed = True
         return {'sessions': len(ids), 'policy_sha256': sha(policy.encode()), 'backup_dir': str(backup),
-                'database_integrity': 'ok', 'unrelated_tables_unchanged': True}
+                'database_integrity': 'ok', 'unrelated_tables_unchanged': True,
+                'memory_file_updated': new_memory is not None,
+                'cached_memory_frames_refreshed': sum(1 for ref in refs if new_memory is not None
+                    and 'MEMORY (your personal notes)' in old_blobs[ref['system_prompt_hash']])}
     except BaseException:
         if not committed:
             db.rollback()
@@ -312,6 +350,8 @@ def main():
                         help='also replace bounded policy and disable the superseded alert-watch cron')
     parser.add_argument('--preserve-cron', action='store_true',
                         help='update only the rule policy; preserve every cron byte and setting')
+    parser.add_argument('--memory-file', type=Path,
+                        help='root-reviewed replacement for the existing MEMORY.md and matching current prompt frames')
     args = parser.parse_args()
     require(os.geteuid() == 0, 'run as root')
     os.umask(0o077)
@@ -322,8 +362,13 @@ def main():
         pstat = regular(args.management_prompt)
         require(pstat.st_uid == 0 and not stat.S_IMODE(pstat.st_mode) & 0o022,
                 'management prompt must be root-controlled')
+    if args.memory_file is not None:
+        mstat = regular(args.memory_file)
+        require(mstat.st_uid == 0 and not stat.S_IMODE(mstat.st_mode) & 0o022,
+                'memory snapshot must be root-controlled')
     result = update(DATA, args.policy_file, args.backup_dir, args.dry_run,
-                    management_prompt=args.management_prompt, preserve_cron=args.preserve_cron)
+                    management_prompt=args.management_prompt, preserve_cron=args.preserve_cron,
+                    memory_file=args.memory_file)
     print(json.dumps(result, sort_keys=True))
 
 

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Root-owned, fixed-target executor for human-approved rule changes.
 
-The stdio MCP user may invoke this file *without arguments* via one sudoers
-entry. It accepts fixed JSON operations, including full-file ``propose`` and
+The write MCP invokes this file without arguments; the independent read MCP
+may invoke only ``--read-only``. Both use exact sudoers entries. Fixed JSON
+operations include full-file ``propose`` and
 literal ``propose-edit``, on stdin. A root-only
 systemd timer invokes ``--once`` to complete approved proposals. No MCP field
 is a filesystem path, container name, command, URL, or approval identity.
@@ -775,7 +776,8 @@ class Engine:
                 raise RuleChangeError("WAF is not in DetectionOnly mode")
         if spec["kind"] == "suricata":
             cmd = info.get("Config", {}).get("Cmd") or []
-            if "-S" not in cmd or "/rules/all.rules" not in cmd or "-q" in cmd:
+            if (cmd.count("-S") != 1 or cmd.index("-S") + 1 >= len(cmd)
+                    or cmd[cmd.index("-S") + 1] != "/rules/all.rules" or "-q" in cmd):
                 raise RuleChangeError("Suricata runtime no longer matches passive all.rules contract")
             if not recovering and (info["State"].get("OOMKilled") or info["State"].get("Restarting")):
                 raise RuleChangeError("Suricata container is OOM-killed or restarting")
@@ -839,6 +841,14 @@ class Engine:
         with self.locked():
             runtime = self._inspect(spec)
             current, _, aux = self._snapshot(spec)
+            if spec["kind"] == "suricata":
+                # These facts already passed _inspect and the exact host/live
+                # snapshot checks. Expose them only in the read receipt; do not
+                # alter the runtime snapshot bound to approval payloads.
+                runtime = {**runtime, "rule_source_option": "-S", "rule_source_path": "/rules/all.rules",
+                           "combined_is_exact_et_plus_local": True,
+                           "combined_sha256": aux["all_sha256"], "observed_at": int(self.clock()),
+                           "evidence_scope": "current container command and matching ET+local file bytes; per-SID engine load not verified"}
             try:
                 content = current.decode("utf-8")
             except UnicodeDecodeError:

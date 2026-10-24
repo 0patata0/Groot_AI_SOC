@@ -126,6 +126,18 @@ class ServiceTests(unittest.TestCase):
         self.backend = FakeBackend(self.now)
         self.svc = service.ServiceActionService(self.engine, self.backend)
         self.backend.service = self.svc
+        self.reader = mock.patch.object(self.engine, "get_target", return_value={"runtime": {"container_id": "a" * 64, "rule_source_path": "/rules/all.rules"}})
+        self.reader.start()
+        self.addCleanup(self.reader.stop)
+
+    def test_read_source_evidence_never_changes_approval_state_hash(self):
+        result = self.svc.get_target('a:suricata')
+        self.assertEqual(result['rule_source_evidence']['rule_source_path'], '/rules/all.rules')
+        self.assertEqual(result['base_state_sha256'], service.digest(result['observation']))
+        with mock.patch.object(self.engine, 'get_target', side_effect=helper.RuleChangeError('read unavailable')):
+            unavailable = self.svc.get_target('a:suricata')
+        self.assertEqual(unavailable['rule_source_evidence']['status'], 'unavailable')
+        self.assertEqual(unavailable['base_state_sha256'], result['base_state_sha256'])
 
     def tearDown(self):
         self.tmp.cleanup()

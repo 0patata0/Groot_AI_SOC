@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-10-24 Memory 갱신:** 추가 오프라인 바이너리는 없다. 변경된 SOUL·rule_change_executor.py·service_action_executor.py는 기존 SOC 소스 번들이 함께 반입/검증한다. 운영 Memory snapshot은 root가 현재 서버 사실을 확인해 작성하고 원본·DB 백업 후 적용하는 유지보수 자료다. 신규 VM의 이미 확인된 상태로 배포하지 않는다. [현황](../STATUS.md).
+
 > **2026-10-24 조회 통합 반입:** 추가 deb/wheel/이미지/포트는 없다. 소스 반입에는 `infra/mcp/rule_readonly_install.py`와 변경된 공통 MCP/실행기·관리 정책/설정이 포함된다. 루트 deploy.sh의 SOC 소스 번들이 함께 해시를 검증하고, 서버에서 독립 읽기 키를 생성해 공개키만 기존 비공개 설치 스트림으로 A에 전달한다. 개인키를 Mac으로 반입하지 않는다. 기존 운영에 초기 설치기 전체를 다시 실행하지 않는다. [권한 경계](../infra/mcp/README.md).
 
 

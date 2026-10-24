@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+> **2026-10-24 Memory/읽기 근거 보완:** 초기 deploy.sh가 사용하는 SOUL에 메모보다 현재 관측을 우선하는 원칙을 추가했고 동일 rule/service getter가 현재 명령·결합 파일의 검증 근거를 제공한다. 운영은 root 검토 Memory와 활성 참조만 최소 갱신했으며 신규 서버에 날짜가 고정된 운영 Memory를 심지 않는다. 추가 deb/이미지/포트0,865회귀 통과·새3VM 설치 미실행. 실제 자연어 재질문의 남은 오류/지연은 [STATUS](../STATUS.md)에 구분한다.
+
 > **2026-10-24 현행:** root deploy.sh는 독립 읽기 키·ruleview 계정과 rule-write-a/b를 자동 연결한다. 룰 조회/변경은 서로 다른 경로이며 기존 읽기 도구 이름을 유지한다. 전체 설치 후 논리 MCP8개/35도구다. 새로운 deb/이미지/포트는 없다.47 SOC 렌더/정책 검사와40 SIEM 검사를 통과했으며 새3VM 전체 설치 검증은 제외한다. [현황](../STATUS.md) · [권한 경계](../infra/mcp/README.md).
 
 <!-- current-project-context:2026-10-24 -->

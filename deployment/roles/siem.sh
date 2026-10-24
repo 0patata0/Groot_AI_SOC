@@ -214,6 +214,8 @@ def profile(snap, images):
             'source_sha256':{p:digest(read(SOURCE/p)) for p in (
                 'infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
                 'infra/hermes/SOUL.groot.md',
+                'deployment/bot_profiles.py','deployment/bot-icons/sources.json',
+                'deployment/bot-icons/hermes.png','deployment/bot-icons/ollama.png',
                 'infra/groot-b/local_rules.xml','infra/groot-b/local_decoder.xml', *hermes_extension_files())}}
 def fresh():
     forbidden = [DEST, ROOT/'exports/wazuh-enrollment-ca.pem', ROOT/'secrets/enrollment.pass',
@@ -283,6 +285,8 @@ def preflight():
     need(re.fullmatch(r'[0-9a-f]{64}', pin) and digest(binary) == pin and binary.startswith(b'\x7fELF'), 'reviewed_mcp_binary_SHA_required')
     for p in ('infra/mcp/security-events-mcp.py', 'infra/hermes/korean_output_guard.py',
               'infra/hermes/SOUL.groot.md',
+              'deployment/bot_profiles.py','deployment/bot-icons/sources.json',
+              'deployment/bot-icons/hermes.png','deployment/bot-icons/ollama.png',
               'infra/groot-b/local_rules.xml','infra/groot-b/local_decoder.xml', *hermes_extension_files()):
         read(SOURCE/p, 512*1024)
     hermes_response_format()
@@ -532,6 +536,15 @@ def prepare_files(c, snap, images):
     publish(DEST/'wazuh/capstone-local-decoder.xml',read(SOURCE/'infra/groot-b/local_decoder.xml'),0o444)
     publish(DEST/'wazuh/capstone-internal-options.conf',b'analysisd.decoder_order_size=1024\n',0o444)
     return write_compose(c,images)
+def set_bot_profile(base, token, user_id):
+    import importlib.util
+    path = SOURCE/'deployment/bot_profiles.py'
+    read(path, 512*1024)
+    spec = importlib.util.spec_from_file_location('capstone_bot_profiles', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.set_profile_image(base, token, user_id, 'hermes', SOURCE/'deployment/bot-icons')
+
 def app_bootstrap():
     mm='http://'+IP+':8065/api/v4'; admin={'username':cfg['mattermost_admin_username'],
          'email':cfg['mattermost_admin_email'],'password':cfg['mattermost_admin_password']}
@@ -545,6 +558,8 @@ def app_bootstrap():
     pending('mattermost-create-channel'); channel,_=api(mm+'/channels','POST',{'team_id':team['id'],'name':'soc','display_name':'SOC','type':'O'},hdr,statuses=(201,))
     pending('mattermost-create-bot'); bot,_=api(mm+'/bots','POST',{'username':'capstone-assistant','display_name':'Capstone Assistant','description':'Read-only SOC assistant'},hdr,statuses=(201,))
     bid=bot['user_id']
+    pending('mattermost-bot-profile')
+    publish(DEST/'bot-profile.json',canonical(set_bot_profile('http://'+IP+':8065',token,bid)))
     pending('mattermost-add-bot-team'); api(mm+'/teams/'+team['id']+'/members','POST',{'team_id':team['id'],'user_id':bid},hdr,statuses=(201,))
     pending('mattermost-add-bot-channel'); api(mm+'/channels/'+channel['id']+'/members','POST',{'user_id':bid},hdr,statuses=(201,))
     pending('mattermost-create-bot-token'); bt,_=api(mm+'/users/'+bid+'/tokens','POST',{'description':'capstone-hermes'},hdr,statuses=(201,))

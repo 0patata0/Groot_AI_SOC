@@ -1,5 +1,8 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+> **2026-10-25 봇 식별:** `ollama`에는 공식 라마 아이콘, 기존 `hermes`에는 공식 앱 아이콘을 적용했다. 초기 채팅 설치도 동봉 자산을 사용한다. 모델/권한/실행부 설정과 별개이며 [현재 검증 상태](../../STATUS.md)를 따른다.
+
+
 모델 추론은 기존 DGX Ollama에 두고, B에 `mcp-use 1.7.1` + `langchain-ollama 1.1.0` + 공식 Ollama Python SDK `0.6.3`을 별도 Python 3.12 venv로 설치한다. 이 구성은 **Ollama 클라이언트를 사용하는 에이전트 실행부**다. B에 Ollama 추론 daemon/CLI·모델 가중치를 설치하는 구성은 아니다. 실제 비교 결과와 현재 Git/검증 상태는 [STATUS](../../STATUS.md)를 따른다.
 
 `B soc-ollama → DGX /api/chat → B의 MCP 호출 → DGX 최종 답변` 순서로 실행한다. host 프로세스여서 추가 Docker NIC가 없고 기존 Hermes와 직렬로 연결하지 않는다. 기존 자동 사건 관리 controller는 Hermes가 계속 맡는다. 별도 `ollama` 봇은 전용 채널/DM에서 조사와 승인형 변경안 준비를 수행할 수 있으며, 두 실행부가 같은 보호 MCP·승인 broker를 사용한다. 자동 사건 소비자를 추가해 같은 사건을 중복 처리하지 않는다. 두 라이브러리 환경의 MCP 버전(시험1.30/운영2.0)은 서로 섞지 않는다.

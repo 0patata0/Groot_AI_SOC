@@ -15,6 +15,7 @@ from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ollama_trial import ROOT, ETC, STATE, USER, safe, write, run, need, digest
+from bot_profiles import asset as profile_asset, set_profile_image
 
 UNIT = Path('/etc/systemd/system/capstone-ollama-chat.service')
 CHAT_SOURCES = ('chat.py', 'chat_policy.py')
@@ -120,6 +121,7 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
     need(all(re.fullmatch(r'[a-z0-9]{26}', x) for x in (team_id, admin_id, hermes_channel_id)), 'chat_ids')
     for name in CHAT_SOURCES:
         safe(source / 'infra/ollama-trial' / name)
+    profile_asset('ollama', source / 'deployment/bot-icons')
     api = API(base_url)
     try:
         me, headers = api.call('POST', '/users/login', admin)
@@ -138,6 +140,9 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
         bot, _ = api.call('POST', '/bots', {'username': 'ollama', 'display_name': 'ollama',
             'description': 'DGX Ollama 기반 SOC 읽기 전용 시험 봇. soc-ollama 또는 DM에서 질문하세요.'})
         bid = bot['user_id']; pending['bot_id'] = bid
+        write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
+        pending['bot_profile'] = set_profile_image(base_url, api.token, bid, 'ollama',
+                                                   source / 'deployment/bot-icons')
         write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
         api.call('POST', '/teams/' + team_id + '/members', {'team_id': team_id, 'user_id': bid})
         channel, _ = api.call('POST', '/channels', {'team_id': team_id, 'name': 'soc-ollama',
@@ -169,6 +174,7 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
         need(renamed['id'] == hermes_channel_id and renamed['name'] == 'soc-hermes', 'hermes_rename_verify')
         write(UNIT, service_text().encode(), mode=0o644)
         receipt = {'schema': 1, 'bot_id': bid, 'channel_id': cid, 'team_name': team['name'],
+                   'bot_profile': pending['bot_profile'],
                    'token_id': token['id'], 'hermes_channel_id': hermes_channel_id,
                    'hermes_previous_name': previous['name'], 'new_listener': False,
                    'sources': {name: digest(ROOT / name) for name in CHAT_SOURCES},

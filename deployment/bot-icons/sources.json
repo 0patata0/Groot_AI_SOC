@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "note": "Unmodified official project/organization images for bot identification; no endorsement implied. Bundled for offline initial installation.",
+  "assets": {
+    "hermes": {
+      "filename": "hermes.png",
+      "sha256": "4b75d873f29e3f330c7f9032051555b66218cf11e5a470876f3e0754cb32bc8e",
+      "source": "https://raw.githubusercontent.com/NousResearch/hermes-agent/931cf3365739da38fe32d30e12d94e7df8056973/apps/desktop/assets/appx/Square44x44Logo.targetsize-256.png",
+      "width": 256,
+      "height": 256,
+      "license_file": "LICENSE.hermes",
+      "license_source": "https://raw.githubusercontent.com/NousResearch/hermes-agent/931cf3365739da38fe32d30e12d94e7df8056973/LICENSE"
+    },
+    "ollama": {
+      "filename": "ollama.png",
+      "sha256": "9935054bc02030f6b1bf7b3218872acdb1fe13336b9b68d7bb44a6f86cec887b",
+      "source": "https://avatars.githubusercontent.com/u/151674099?v=4&s=256",
+      "width": 256,
+      "height": 256,
+      "license_file": "LICENSE.ollama",
+      "license_source": "https://raw.githubusercontent.com/ollama/ollama/d44c2581904a98430e348d89cc2af1529b1808a0/LICENSE"
+    }
+  }
+}

@@ -179,6 +179,7 @@ class Tests(unittest.TestCase):
         self.n['pending']=intents.append;self.n['publish']=lambda p,d,*a,**k:published.update({p.name:json.loads(d)})
         self.n['tls']=lambda:None;self.n['auth_api']=lambda:{'Authorization':'fixture'}
         self.n['readonly_credentials']=lambda c:None
+        self.n['set_bot_profile']=lambda *args:{'brand':'hermes','fixture':True}
         def api(url,method='GET',body=None,headers=None,context=None,raw=False,statuses=(200,)):
             calls.append((url,method,body))
             if '/api/v4/users/login' in url:return {},{'Token':'synthetic-admin-token'}

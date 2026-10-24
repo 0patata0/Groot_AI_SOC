@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Mention-free private trial channel + authorized one-to-one DMs.
 
-WebSocket events feed a durable, single-worker read-only agent queue. The bot
-token never enters the LLM. No arbitrary channel posting or protected MCP calls.
+WebSocket events feed a durable, single-worker SOC agent queue. The bot token
+never enters the LLM. Protected MCP calls retain the existing server approval gates.
 """
 import argparse
 import asyncio
@@ -52,6 +52,14 @@ class Gateway:
             self.db.row_factory = sqlite3.Row
             self.db.execute('pragma journal_mode=WAL')
             self.db.execute('create table if not exists jobs (id text primary key, post text not null, status text not null, reply text, answer text, attempts integer not null default 0)')
+            if 'evidence' not in {row[1] for row in self.db.execute('pragma table_info(jobs)')}:
+                self.db.execute('alter table jobs add column evidence text')
+            if 'report' not in {row[1] for row in self.db.execute('pragma table_info(jobs)')}:
+                self.db.execute('alter table jobs add column report text')
+            if 'protected_started' not in {row[1] for row in self.db.execute('pragma table_info(jobs)')}:
+                self.db.execute('alter table jobs add column protected_started integer not null default 0')
+            self.db.execute("update jobs set status='delivery',answer=? where status='running' and protected_started=1",
+                ('보호 도구 요청 후 실행부가 재시작되어 최종 결과를 확인하지 못했습니다. 중복 실행을 피하기 위해 재요청하지 않았습니다. 승인 카드와 작업 ID의 현재 상태를 확인해야 합니다.',))
             self.db.execute("update jobs set status='queued' where status='running' and attempts<2")
             self.db.execute("update jobs set status='abandoned' where status='running'")
             self.db.commit()
@@ -116,6 +124,19 @@ class Gateway:
             return [p for p in recent['posts'].values() if p['channel_id'] == post['channel_id']]
         return await self.thread(post)
 
+    def prior_evidence(self, post):
+        # Reformat evidence only in the exact thread and for the same human.
+        # An independent root intentionally starts with no cached facts.
+        root = post.get('root_id')
+        if not root:
+            return None
+        for row in self.db.execute("select post,evidence from jobs where status='done' and evidence is not null order by rowid desc limit 200"):
+            previous = json.loads(row['post'])
+            if (previous['channel_id'] == post['channel_id'] and previous['user_id'] == post['user_id'] and
+                    (previous.get('root_id') or previous['id']) == root and previous['create_at'] < post['create_at']):
+                return json.loads(row['evidence'])
+        return None
+
     async def reply_id(self, job, post):
         if job['reply']:
             return job['reply']
@@ -156,18 +177,34 @@ class Gateway:
             with self.db:
                 self.db.execute("update jobs set status='running',attempts=attempts+1 where id=?", (post['id'],))
             started = time.perf_counter()
+            evidence = None
+            audit = None
+            def protected_start():
+                with self.db:
+                    self.db.execute('update jobs set protected_started=1 where id=?', (post['id'],))
             try:
                 question = question_with_history(post, await self.history_for(post), self.c['bot_id'])
                 with contextlib.redirect_stdout(sys.stderr):
-                    report = await asyncio.wait_for(agent_run(self.runtime, {'question': question}), 210)
+                    report = await asyncio.wait_for(agent_run(self.runtime, {'question': question,
+                        'current_question': post['message'], 'prior_evidence': self.prior_evidence(post)},
+                        on_protected_start=protected_start), 1110)
                 answer = final_text(report, time.perf_counter() - started)
+                evidence = json.dumps(report['evidence'], ensure_ascii=False) if report.get('evidence') else None
+                audit = json.dumps({k: v for k, v in report.items() if k not in ('evidence', 'catalog')}, ensure_ascii=False)
+                if len(audit.encode()) > 4194304:
+                    audit = json.dumps({'status': report['status'], 'audit_truncated': True,
+                                        'calls': [{k: v for k, v in c.items() if k != 'result'} for c in report.get('calls', [])]})
+                if evidence and len(evidence.encode()) > 1048576:
+                    evidence = None
                 log('generation_complete', post_id=post['id'], status=report['status'],
-                    seconds=round(time.perf_counter() - started, 3), tool_calls=len(report.get('calls', [])))
+                    seconds=round(time.perf_counter() - started, 3), tool_calls=len(report.get('calls', [])),
+                    model_calls=len(report.get('model_calls', [])), protected_calls=report.get('protected_calls', 0),
+                    evidence_reused=report.get('evidence_reused', False), issues=report.get('remaining_issues', []))
             except Exception as exc:
                 answer = final_text({'status': 'failed'}, time.perf_counter() - started)
                 log('generation_failed', post_id=post['id'], error_type=type(exc).__name__)
             with self.db:
-                self.db.execute("update jobs set answer=?,status='delivery' where id=?", (answer, post['id']))
+                self.db.execute("update jobs set answer=?,evidence=?,report=?,status='delivery' where id=?", (answer, evidence, audit, post['id']))
         existing = await self.api('GET', '/posts/' + reply)
         require(existing['user_id'] == self.c['bot_id'] and existing['channel_id'] == post['channel_id'] and
                 existing.get('props', {}).get('capstone_ollama_source') == post['id'], 'reply_binding')

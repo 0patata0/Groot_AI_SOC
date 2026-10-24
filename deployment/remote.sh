@@ -41,7 +41,7 @@ case "$action" in
     fi
     case "$action" in
       trial-chat-*) exec python3 -B "$CAPSTONE_SOURCE/deployment/ollama_trial_chat.py" "${action#trial-chat-}" --source-root "$CAPSTONE_SOURCE" --mattermost-url "http://$SIEM_HOST:8065" ;;
-      trial-*) exec python3 -B "$CAPSTONE_SOURCE/deployment/ollama_trial.py" "${action#trial-}" --source-root "$CAPSTONE_SOURCE" --bundle "$OLLAMA_TRIAL_BUNDLE" ;;
+      trial-*) exec python3 -B "$CAPSTONE_SOURCE/deployment/ollama_trial.py" "${action#trial-}" --source-root "$CAPSTONE_SOURCE" --bundle "$OLLAMA_TRIAL_BUNDLE" --access-mode "${OLLAMA_TRIAL_ACCESS_MODE:-read-only}" ;;
       soc-check) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" check --role "$role" ;;
       soc-prepare) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" prepare-siem ;;
       soc-export) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" export-siem ;;

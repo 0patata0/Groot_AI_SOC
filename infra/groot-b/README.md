@@ -1,6 +1,6 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
-> **2026-10-25 06:23 KST Ollama 병행 시험 적용:** 같은 B host venv에 Ollama SDK+mcp-use 실행부를 설치했다. 모델은 Hermes와 같은 DGX qwen3.6:35b. `ollama` 봇의 `soc-ollama` 채널/DM을 활성화하고 기존 soc-agent는 이력/ID를 유지해 `soc-hermes`로 이름을 바꿨다. 읽기26도구·별도 비특권 gateway만 추가하며 기존 관리/승인은 Hermes가 담당한다. 18회 SDK 비교에서 후보가 빠른 표본을 얻었으나 실제 채팅 게시시간/전체 기능 동등성·완전한 정확도는 미검증이다. [사용·설치·복구](../ollama-trial/README.md) · [결과/한계/Git 상태](../../STATUS.md).
+> **2026-10-25 Ollama 하네스·동등 권한 재시험 완료:** 같은 DGX qwen3.6:35b와 8서버·36도구(읽기27·보호9)로 실제 채팅을 비교했다. 새 스레드 룰/표 약10초·IDS14.9초·로그14.9초·25대상 진단50.1초, 검증된 같은 스레드 표 재정리0.063초였다. 조회 근거·KST·대상/범위 오류를 보완했으며 전체 진단 지연과 Hermes의 일부 조회 누락은 후속이다. 기존 정확 승인/TTL 경계와 Hermes 자동 관리 controller는 유지한다. 전체 자연어 정확도·보호 실행 E2E·새3VM 설치 완료를 뜻하지 않는다. [결과·한계·Git 상태](../../STATUS.md).
 
 
 > **2026-10-25 05:22~05:25 KST 실행 의존성·왕복 확인:** 기존 Hermes 컨테이너(Python3.13.5/MCP2.0.0/httpx0.28.1)의 라이브러리만으로 native Ollama→MCP 읽기→최종 답변2건을 통과했다. B 기본 Python3.12.3 환경에는 같은 라이브러리가 없어 별도 배포가 필요하다. 선택 루트5의 전이 의존41개 조건 충족·격리 regex2026.9.29 확인은 새 실행부 전체 lock/배포 검증과 다르다. mcp-use Python1.7.1은 MCP<2를 요구하므로 운영 환경을 낮추지 않고 격리해야 한다. 운영8SHA/CID/PID 불변·설치/재시작0. [STATUS](../../STATUS.md) · [대체 후보와 필요 연결](../mcp/README.md).

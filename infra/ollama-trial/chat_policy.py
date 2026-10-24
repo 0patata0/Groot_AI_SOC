@@ -2,6 +2,7 @@
 import json
 import re
 from datetime import datetime, timezone, timedelta
+from harness import footer_free
 
 ID = re.compile(r'[a-z0-9]{26}\Z')
 KST = timezone(timedelta(hours=9))
@@ -30,7 +31,7 @@ def question_with_history(post, prior, bot_id):
     rows.sort(key=lambda p: (p.get('create_at', 0), p['id']))
     context = []
     for p in rows[-10:]:
-        text = str(p.get('message', ''))[:1800]
+        text = footer_free(str(p.get('message', '')))[:1800]
         if p.get('user_id') == bot_id and text.startswith('확인하고 있습니다.'):
             continue
         context.append({'role': 'assistant' if p['user_id'] == bot_id else 'user', 'text': text})
@@ -55,13 +56,13 @@ def kst_text(text):
 
 
 def final_text(report, elapsed):
-    if report.get('status') != 'completed' or not isinstance(report.get('final_response'), str):
+    if report.get('status') not in ('completed', 'partial') or not isinstance(report.get('final_response'), str):
         answer = '이번 요청을 끝까지 확인하지 못했습니다. 잠시 후 다시 질문해 주세요. 서버 상태가 정상이라는 뜻은 아닙니다.'
     else:
-        answer = kst_text(report['final_response']).strip()
+        answer = kst_text(footer_free(report['final_response'])).strip()
     if not answer:
         answer = '확인한 답변을 생성하지 못했습니다. 다시 질문해 주세요.'
     # Bound the Mattermost post; do not silently claim a truncated answer is complete.
     if len(answer) > 12000:
         answer = answer[:12000] + '\n\n(답변이 길어 일부를 생략했습니다. 범위를 좁혀 질문해 주세요.)'
-    return answer + '\n\n---\n읽기 전용 시험 · ' + datetime.now(KST).strftime('%Y-%m-%d %H:%M:%S KST') + f' · 처리 {elapsed:.1f}초'
+    return answer + '\n\n---\nSOC 비교 시험 · ' + datetime.now(KST).strftime('%Y-%m-%d %H:%M:%S KST') + f' · 처리 {elapsed:.1f}초'

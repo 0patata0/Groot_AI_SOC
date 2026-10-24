@@ -1,6 +1,6 @@
 # Groot_AI_SOC
 
-> **2026-10-25 06:23 KST Ollama 병행 시험 적용:** 같은 B host venv에 Ollama SDK+mcp-use 실행부를 설치했다. 모델은 Hermes와 같은 DGX qwen3.6:35b. `ollama` 봇의 `soc-ollama` 채널/DM을 활성화하고 기존 soc-agent는 이력/ID를 유지해 `soc-hermes`로 이름을 바꿨다. 읽기26도구·별도 비특권 gateway만 추가하며 기존 관리/승인은 Hermes가 담당한다. 18회 SDK 비교에서 후보가 빠른 표본을 얻었으나 실제 채팅 게시시간/전체 기능 동등성·완전한 정확도는 미검증이다. [사용·설치·복구](infra/ollama-trial/README.md) · [결과/한계/Git 상태](STATUS.md).
+> **2026-10-25 Ollama 하네스·동등 권한 재시험 완료:** 같은 DGX qwen3.6:35b와 8서버·36도구(읽기27·보호9)로 실제 채팅을 비교했다. 새 스레드 룰/표 약10초·IDS14.9초·로그14.9초·25대상 진단50.1초, 검증된 같은 스레드 표 재정리0.063초였다. 조회 근거·KST·대상/범위 오류를 보완했으며 전체 진단 지연과 Hermes의 일부 조회 누락은 후속이다. 기존 정확 승인/TTL 경계와 Hermes 자동 관리 controller는 유지한다. 전체 자연어 정확도·보호 실행 E2E·새3VM 설치 완료를 뜻하지 않는다. [결과·한계·Git 상태](STATUS.md).
 
 
 > **2026-10-25 Ollama/MCP 후속 검증:** 기존 MCP8연결/36스키마 확인에 이어 DGX native API의 도구 선택→실제 조회→최종 응답2건(IDS·KST 계산)을 통과했다. 전체 SOC 에이전트 호환이나 속도 개선을 검증한 것은 아니다. mcp-use 등으로 실행 코드를 줄일 후보와 의존성 충돌·기억/채팅/승인 이관 범위를 조사했으며 설치·운영 교체는 하지 않았다. [검증·남은 일·Git 상태](STATUS.md) · [재사용 후보](infra/mcp/README.md).

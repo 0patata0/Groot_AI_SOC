@@ -24,7 +24,9 @@ USER = 'soc-ollama'
 PROFILES = {'rule-a': ('rule-a',), 'rule-b': ('rule-b',),
             'security-events': ('mcp-b', 'security-events'),
             'system-diagnostics': ('mcp-b', 'system-diagnostics'), 'wazuh-ro': ('mcp-b',)}
-SOURCES = ('runtime.py', 'policy.py', 'requirements.lock', 'offline-manifest.json')
+SOURCES = ('runtime.py', 'policy.py', 'harness.py', 'requirements.lock', 'offline-manifest.json')
+PARITY_PROFILES = {**PROFILES, 'resp': ('resp-a',),
+                   'rule-write-a': ('rule-write-a',), 'rule-write-b': ('rule-write-b',)}
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LC_ALL': 'C', 'TZ': 'Asia/Seoul',
        'PYTHONDONTWRITEBYTECODE': '1', 'PIP_NO_CACHE_DIR': '1',
        'PIP_DISABLE_PIP_VERSION_CHECK': '1', 'DEBIAN_FRONTEND': 'noninteractive'}
@@ -103,13 +105,13 @@ def hostpath(path, home):
     return out
 
 
-def connection_plan(home):
+def connection_plan(home, parity=False):
     # Read operator-controlled config only; do not import an agent or environment.
     import yaml
     need(home.is_absolute() and not home.is_symlink(), 'hermes_home')
     config = yaml.safe_load((home / 'config.yaml').read_text())
     output = {}
-    for key in ('rule-a', 'rule-b', 'wazuh-ro'):
+    for key in ('rule-a', 'rule-b', 'wazuh-ro') + (('resp', 'rule-write-a', 'rule-write-b') if parity else ()):
         p = config['mcp_servers'][key]; args = p['args']
         need(p['command'] in ('ssh', '/usr/bin/ssh') and len(args) == 4 and
              args[:2] == ['-T', '-F'], 'ssh_profile_shape')
@@ -122,11 +124,13 @@ def connection_plan(home):
             k, _, v = line.partition(' ')
             values.setdefault(k, []).append(v)
         one = lambda k: values[k][0]
-        need(one('user') == 'ruleview' if key.startswith('rule-') else
-             one('user') in ('mcp', 'capstone-mcp'), 'ssh_account_scope')
+        expected_users = ({'rulechg'} if key.startswith('rule-write-') else
+                          {'ruleview'} if key in ('rule-a', 'rule-b') else
+                          {'resp'} if key == 'resp' else {'mcp', 'capstone-mcp'})
+        need(one('user') in expected_users, 'ssh_account_scope')
         need(re.fullmatch(r'[0-9.]+', one('hostname')) and one('port').isdigit(), 'ssh_host_shape')
         need(len(values['identityfile']) == 1, 'single_identity_required')
-        if key.startswith('rule-'):
+        if key in ('rule-a', 'rule-b'):
             need(Path(one('identityfile')).name in ('rule_readonly_ed25519', 'soc_readonly_ed25519'),
                  'readonly_key_required')
         output[key] = {'host': one('hostname'), 'port': one('port'), 'user': one('user'),
@@ -143,6 +147,42 @@ def connection_plan(home):
     return config, output, authorized, commands.pop()
 
 
+def source_files(source):
+    files = {name: safe(source / name) for name in SOURCES}
+    files['query_grounding.py'] = safe(source.parent / 'hermes/query-completion/__init__.py')
+    files['grounding.py'] = safe(source.parent / 'hermes/soc_management_run.py')
+    return files
+
+
+def parity_configuration(home, user):
+    hermes, connections, _, _ = connection_plan(home, parity=True)
+    ssh = (ETC / 'ssh/config').read_text()
+    # Replace only this installer's optional block. Base read identities persist.
+    ssh = re.sub(r'\n# parity:start\n.*?# parity:end\n', '\n', ssh, flags=re.S)
+    block = '\n# parity:start\n'
+    for name in ('resp', 'rule-write-a', 'rule-write-b'):
+        con = connections[name]
+        key, known = ETC / ('ssh/' + name + '_ed25519'), ETC / ('ssh/' + name + '_known_hosts')
+        write(key, con['key'].read_bytes(), mode=0o640, gid=user.pw_gid)
+        write(known, con['known'].read_bytes(), gid=user.pw_gid)
+        alias = 'resp-a' if name == 'resp' else name
+        block += (f'Host {alias}\n HostName {con["host"]}\n Port {con["port"]}\n User {con["user"]}\n'
+                  f' IdentityFile {key}\n UserKnownHostsFile {known}\n IdentitiesOnly yes\n'
+                  ' BatchMode yes\n StrictHostKeyChecking yes\n ConnectTimeout 10\n'
+                  ' ForwardAgent no\n ClearAllForwardings yes\n ServerAliveInterval 15\n ServerAliveCountMax 2\n')
+    write(ETC / 'ssh/config', (ssh + block + '# parity:end\n').encode(), gid=user.pw_gid)
+    cfg = json.loads((ETC / 'config.json').read_text())
+    need(cfg['model'] == hermes['model']['default'] and
+         cfg['base_url'].rstrip('/') + '/v1' == hermes['model']['base_url'].rstrip('/'), 'model_parity')
+    cfg['access_mode'] = 'hermes-parity'
+    cfg['mcpServers'] = {name: {'command': '/usr/bin/ssh',
+        'args': ['-T', '-F', str(ETC / 'ssh/config'), *args],
+        'env': {'PATH': '/usr/bin:/bin', 'LC_ALL': 'C'},
+        'timeout': 720 if name == 'resp' else 420 if name.startswith('rule-write-') else 180}
+        for name, args in PARITY_PROFILES.items()}
+    write(ETC / 'config.json', json.dumps(cfg, indent=2).encode(), gid=user.pw_gid)
+
+
 def verify():
     receipt = json.loads(safe(ETC / 'receipt.json').read_text())
     for name, expected in receipt['sources'].items():
@@ -156,17 +196,22 @@ def verify():
     result = run([ROOT / 'venv/bin/python', '-I', '-B', '-m', 'pip', 'check'])
     probe = run(['/usr/local/sbin/capstone-ollama-trial'], input=b'{"discover_only":true}\n', timeout=120)
     data = json.loads(probe.stdout)
-    need(data['status'] == 'discovered' and len(data['catalog']) == 26 and
+    parity = json.loads((ETC / 'config.json').read_text()).get('access_mode') == 'hermes-parity'
+    need(data['status'] == 'discovered' and len(data['catalog']) == (36 if parity else 26) and
          data['model_calls'] == [] and data['protected_calls'] == 0, 'trial_discovery')
-    return {'status': 'verified', 'readonly_tools': 26, 'servers': 5,
+    return {'status': 'verified', 'readonly_tools': 27 if parity else 26,
+            'protected_tools': 9 if parity else 0, 'servers': 8 if parity else 5,
             'model_requests': 0, 'pip_check': result.returncode == 0, 'uid': user.pw_uid,
             'network_mode': 'host_process', 'daemon': False}
 
 
-def install(source, bundle, home):
+def install(source, bundle, home, access_mode='read-only'):
     if (ETC / 'receipt.json').exists():
+        need(json.loads((ETC / 'config.json').read_text()).get('access_mode', 'read-only') == access_mode,
+             'use_incremental_upgrade_for_access_change')
         return verify()
     need(not ROOT.exists() and not ETC.exists() and not STATE.exists(), 'partial_install_requires_review')
+    files = source_files(source)
     config, connections, authorized, force = connection_plan(home)
     doc = bundle_check(source, bundle)
     packages = []
@@ -191,8 +236,8 @@ def install(source, bundle, home):
     for path in (ROOT, ETC, ETC / 'ssh', STATE):
         path.mkdir(mode=0o750)
         os.chown(path, user.pw_uid if path == STATE else 0, user.pw_gid)
-    for name in SOURCES:
-        write(ROOT / name, safe(source / name).read_bytes(), gid=user.pw_gid)
+    for name, path in files.items():
+        write(ROOT / name, path.read_bytes(), gid=user.pw_gid)
     run(['python3', '-I', '-B', '-m', 'venv', ROOT / 'venv'])
     run([ROOT / 'venv/bin/python', '-I', '-B', '-m', 'pip', 'install', '--no-index',
          '--no-cache-dir', '--disable-pip-version-check', '--no-compile', '--require-hashes',
@@ -230,6 +275,8 @@ def install(source, bundle, home):
     need(base.endswith('/v1'), 'hermes_endpoint_shape')
     cfg = {'schema': 1, 'base_url': base[:-3], 'model': config['model']['default'], 'mcpServers': profiles}
     write(ETC / 'config.json', json.dumps(cfg, indent=2).encode(), gid=user.pw_gid)
+    if access_mode == 'hermes-parity':
+        parity_configuration(home, user)
     wrapper = ('#!/bin/sh\nset -eu\numask 077\n'
                'exec /usr/sbin/runuser -u soc-ollama -- /usr/bin/env -i '
                'HOME=/var/lib/capstone-ollama-trial PATH=/usr/bin:/bin TZ=Asia/Seoul '
@@ -237,17 +284,84 @@ def install(source, bundle, home):
                '/opt/capstone-ollama-trial/runtime.py "$@"\n')
     write('/usr/local/sbin/capstone-ollama-trial', wrapper.encode(), mode=0o755)
     receipt = {'schema': 1, 'at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
-               'sources': {name: digest(ROOT / name) for name in SOURCES},
+               'sources': {name: digest(ROOT / name) for name in files},
                'offline_bundle': str(bundle), 'authorized_keys': str(authorized),
-               'registered_public_key': pub, 'readonly_only': True, 'uid': user.pw_uid,
+               'registered_public_key': pub, 'readonly_only': access_mode == 'read-only', 'uid': user.pw_uid,
                'model_downloaded': False, 'new_listener': False}
     write(ETC / 'receipt.json', json.dumps(receipt, indent=2).encode(), mode=0o600)
     return verify()
 
 
+def upgrade(source, home, access_mode):
+    """Incremental operator update, with old sources/config retained for rollback."""
+    import sqlite3
+    files = source_files(source)
+    for name in ('chat.py', 'chat_policy.py'):
+        files[name] = safe(source / name)
+    need((ETC / 'receipt.json').exists(), 'install_required')
+    user = pwd.getpwnam(USER)
+    if access_mode == 'hermes-parity':
+        connection_plan(home, parity=True)  # Validate before stopping the bot.
+    dbpath = STATE / 'chat/queue.sqlite'
+    if dbpath.exists():
+        with sqlite3.connect('file:' + str(dbpath) + '?mode=ro', uri=True) as db:
+            need(db.execute("select count(*) from jobs where status in ('queued','running','delivery','uncertain')").fetchone()[0] == 0,
+                 'chat_requests_in_flight')
+    stamp = datetime.now(timezone(timedelta(hours=9))).strftime('%Y%m%d-%H%M%S-%f')
+    backup = Path('/var/backups') / ('capstone-ollama-' + stamp)
+    backup.mkdir(mode=0o700)
+    metadata = {str(p): (stat.S_IMODE(p.stat().st_mode), p.stat().st_uid, p.stat().st_gid)
+                for p in [*ETC.rglob('*'), *ROOT.iterdir()] if p.is_file() and not p.is_symlink()}
+    write(backup / 'metadata.json', json.dumps(metadata).encode(), mode=0o600)
+    shutil.copytree(ETC, backup / 'etc', copy_function=shutil.copy2)
+    (backup / 'sources').mkdir(mode=0o700)
+    for path in ROOT.iterdir():
+        if path.is_file() and not path.is_symlink():
+            shutil.copy2(path, backup / 'sources' / path.name)
+    active = run(['systemctl', 'is-active', 'capstone-ollama-chat.service'], check=False).returncode == 0
+    if active:
+        run(['systemctl', 'stop', 'capstone-ollama-chat.service'])
+    try:
+        for name, path in files.items():
+            write(ROOT / name, path.read_bytes(), gid=user.pw_gid)
+        if access_mode == 'hermes-parity':
+            parity_configuration(home, user)
+        else:
+            need(json.loads((ETC / 'config.json').read_text()).get('access_mode', 'read-only') == 'read-only',
+                 'explicit_parity_revocation_required')
+        receipt = json.loads((ETC / 'receipt.json').read_text())
+        receipt.update(sources={name: digest(ROOT / name) for name in files if name not in ('chat.py', 'chat_policy.py')},
+                       readonly_only=access_mode == 'read-only', access_mode=access_mode, backup=str(backup),
+                       at_kst=datetime.now(timezone(timedelta(hours=9))).isoformat())
+        write(ETC / 'receipt.json', json.dumps(receipt, indent=2).encode(), mode=0o600)
+        if (ETC / 'chat-receipt.json').exists():
+            receipt = json.loads((ETC / 'chat-receipt.json').read_text())
+            receipt['sources'] = {name: digest(ROOT / name) for name in ('chat.py', 'chat_policy.py')}
+            write(ETC / 'chat-receipt.json', json.dumps(receipt, indent=2).encode(), mode=0o600)
+        result = verify()
+    except Exception:
+        for path in (backup / 'sources').iterdir():
+            mode, uid, gid = metadata[str(ROOT / path.name)]
+            write(ROOT / path.name, path.read_bytes(), mode=mode, uid=uid, gid=gid)
+        for path in (backup / 'etc').rglob('*'):
+            if path.is_file():
+                dest = ETC / path.relative_to(backup / 'etc')
+                mode, uid, gid = metadata[str(dest)]
+                write(dest, path.read_bytes(), mode=mode, uid=uid, gid=gid)
+        for path in [*ETC.rglob('*'), *(ROOT / name for name in files)]:
+            if path.is_file() and not path.is_symlink() and str(path) not in metadata:
+                path.unlink()  # Only files created by this failed bounded upgrade.
+        raise
+    finally:
+        if active:
+            run(['systemctl', 'start', 'capstone-ollama-chat.service'])
+    return {**result, 'backup': str(backup)}
+
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('action', choices=('check', 'install', 'verify'))
+    p.add_argument('action', choices=('check', 'install', 'verify', 'upgrade'))
+    p.add_argument('--access-mode', choices=('read-only', 'hermes-parity'), default='read-only')
     p.add_argument('--source-root', type=Path, default=Path(__file__).resolve().parents[1])
     p.add_argument('--bundle', type=Path, default=Path('/opt/capstone-prereqs/ollama-trial'))
     p.add_argument('--hermes-home', type=Path, default=Path('/opt/capstone/siem/capstone-hermes'))
@@ -258,7 +372,9 @@ def main():
         doc = bundle_check(source, args.bundle)
         result = {'status': 'checked', 'debs': len(doc['debs']), 'wheels': len(doc['wheels']), 'mutations': 0}
     elif args.action == 'install':
-        result = install(source, args.bundle, args.hermes_home)
+        result = install(source, args.bundle, args.hermes_home, args.access_mode)
+    elif args.action == 'upgrade':
+        result = upgrade(source, args.hermes_home, args.access_mode)
     else:
         result = verify()
     print(json.dumps(result))

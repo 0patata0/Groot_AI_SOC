@@ -9,6 +9,7 @@ shell commands.
 """
 
 import json
+import copy
 import subprocess
 import sys
 
@@ -17,6 +18,8 @@ SUPPORTED = {"2024-11-05", "2025-03-26", PROTOCOL}
 HELPER = "/usr/local/sbin/rule-change-executor"
 MAX_INPUT = 1024 * 1024
 MAX_OUTPUT = 4 * 1024 * 1024
+READ_TOOLS = frozenset({"get_rule_change_target", "get_rule_change_status",
+                        "get_service_action_target", "get_operation_status"})
 
 TOOLS = [
     {
@@ -125,13 +128,31 @@ def _result(data, error=False):
     return {"content": [{"type": "text", "text": json.dumps(data, ensure_ascii=False, sort_keys=True)}], "isError": error}
 
 
-def _call_helper(payload):
+def tool_list(access, host):
+    """One owner per operation; fixed host scopes are also enforced by root."""
+    if access not in {"read", "write"} or host not in {"a", "b"}:
+        raise ValueError("invalid fixed MCP role")
+    result = []
+    for original in TOOLS:
+        if (original["name"] in READ_TOOLS) != (access == "read"):
+            continue
+        if original["name"] == "temporarily_contain_ip" and host != "a":
+            continue
+        tool = copy.deepcopy(original)
+        target = tool["inputSchema"]["properties"].get("target")
+        if target:
+            target["enum"] = [x for x in target["enum"] if x.startswith(host + ":")]
+        result.append(tool)
+    return result
+
+
+def _call_helper(payload, readonly=False):
     request = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     if len(request) > MAX_INPUT:
         return _result({"error": "request too large"}, True)
     try:
         proc = subprocess.run(
-            ["/usr/bin/sudo", "-n", HELPER], input=request, capture_output=True,
+            ["/usr/bin/sudo", "-n", HELPER] + (["--read-only"] if readonly else []), input=request, capture_output=True,
             timeout=360 if payload.get("operation") in {"propose", "propose-edit", "service-propose", "contain-ip", "service-get"} else 45, check=False,
         )
     except (OSError, subprocess.TimeoutExpired):
@@ -149,7 +170,7 @@ def _call_helper(payload):
     return _result(data, bool(data.get("error")))
 
 
-def handle(message):
+def handle(message, access="write", host="a"):
     if not isinstance(message, dict):
         return None
     mid, method = message.get("id"), message.get("method")
@@ -158,39 +179,46 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if requested in SUPPORTED else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-rule-change-mcp", "version": "0.3.0"},
+            "serverInfo": {"name": "capstone-rule-" + access + "-mcp", "version": "0.4.0"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None
     if method == "ping":
         return {"jsonrpc": "2.0", "id": mid, "result": {}}
     if method == "tools/list":
-        return {"jsonrpc": "2.0", "id": mid, "result": {"tools": TOOLS}}
+        return {"jsonrpc": "2.0", "id": mid, "result": {"tools": tool_list(access, host)}}
     if method == "tools/call":
         params = message.get("params") or {}
         name, args = params.get("name"), params.get("arguments")
+        advertised = {tool["name"]: tool for tool in tool_list(access, host)}
+        if name not in advertised:
+            return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "unknown tool for this role"}}
         if not isinstance(args, dict):
             return {"jsonrpc": "2.0", "id": mid, "result": _result({"error": "arguments must be an object"}, True)}
+        target = advertised[name]["inputSchema"]["properties"].get("target")
+        if target and args.get("target") not in target["enum"]:
+            return {"jsonrpc": "2.0", "id": mid, "result": _result({"error": "target is not allowlisted on this host"}, True)}
+        call_helper = lambda payload: _call_helper(payload, readonly=(access == "read"))
         if name == "get_rule_change_target":
             if set(args) != {"target"}:
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:
-                result = _call_helper({"operation": "get", **args})
+                result = call_helper({"operation": "get", **args})
         elif name == "propose_rule_edit":
             if set(args) != {"target", "base_sha256", "edits", "reason"}:
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:
-                result = _call_helper({"operation": "propose-edit", **args})
+                result = call_helper({"operation": "propose-edit", **args})
         elif name == "propose_rule_change":
             if set(args) != {"target", "base_sha256", "candidate_content", "reason"}:
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:
-                result = _call_helper({"operation": "propose", **args})
+                result = call_helper({"operation": "propose", **args})
         elif name == "get_rule_change_status":
             if set(args) != {"proposal_id"}:
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:
-                result = _call_helper({"operation": "status", **args})
+                result = call_helper({"operation": "status", **args})
         elif name in {"get_service_action_target", "propose_service_action", "temporarily_contain_ip", "get_operation_status"}:
             operation, required = {
                 "get_service_action_target": ("service-get", {"target"}),
@@ -198,7 +226,7 @@ def handle(message):
                 "temporarily_contain_ip": ("contain-ip", {"ip", "reason"}),
                 "get_operation_status": ("operation-status", {"request_id"}),
             }[name]
-            result = _call_helper({"operation": operation, **args}) if set(args) == required else _result({"error": "required/unsupported arguments"}, True)
+            result = call_helper({"operation": operation, **args}) if set(args) == required else _result({"error": "required/unsupported arguments"}, True)
         else:
             return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32602, "message": "unknown tool"}}
         return {"jsonrpc": "2.0", "id": mid, "result": result}
@@ -208,11 +236,18 @@ def handle(message):
 
 
 def main():
+    from pathlib import Path
+    # Wrappers are root-owned forced commands. SSH_ORIGINAL_COMMAND is ignored.
+    if sys.argv[1:] not in ([], ["--read-only"]):
+        raise SystemExit(2)
+    access = "read" if sys.argv[1:] == ["--read-only"] else "write"
+    host = Path("/opt/rule-change/mcp-host").read_text().strip()
+    tool_list(access, host)
     for line in sys.stdin.buffer:
         if len(line) > MAX_INPUT:
             continue
         try:
-            reply = handle(json.loads(line))
+            reply = handle(json.loads(line), access, host)
         except (UnicodeDecodeError, ValueError, TypeError):
             reply = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "parse error"}}
         if reply is not None:

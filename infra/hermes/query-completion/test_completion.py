@@ -129,7 +129,7 @@ class Harness:
         self.build_calls = []
         initial_tools = [definition(name) for name in (
             'mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target',
-            'mcp__rule_a__propose_rule_edit', 'mcp__rule_a__temporarily_contain_ip')]
+            'mcp__rule_write_a__propose_rule_edit', 'mcp__rule_write_a__temporarily_contain_ip')]
         self.agent = SimpleNamespace(
             platform='mattermost', source=SimpleNamespace(platform='mattermost'),
             _current_turn_id='turn-a', _interrupt_requested=False,
@@ -697,7 +697,7 @@ class ReadonlyRecoveryTests(unittest.TestCase):
         self.assertEqual(h.api_kwargs['tool_choice'], 'auto')
 
     def test_write_only_or_unknown_tools_do_not_get_required_mode(self):
-        for names in (['mcp__rule_a__propose_rule_edit', 'mcp__rule_a__temporarily_contain_ip'],
+        for names in (['mcp__rule_write_a__propose_rule_edit', 'mcp__rule_write_a__temporarily_contain_ip'],
                       ['terminal', 'mcp__unknown__get_rule_change_target'], []):
             with self.subTest(names=names):
                 h = Harness()
@@ -726,7 +726,7 @@ class ReadonlyRecoveryTests(unittest.TestCase):
     def test_recovery_never_reintroduces_tools_omitted_by_native_builder(self):
         h = Harness()
         self.assertEqual(h.call().action, 'continue')
-        h.api_kwargs['tools'] = [definition('mcp__rule_a__propose_rule_edit')]
+        h.api_kwargs['tools'] = [definition('mcp__rule_write_a__propose_rule_edit')]
         candidate = h.agent._build_api_kwargs()
         self.assertNotEqual(candidate.get('tool_choice'), 'required')
         self.assertFalse(any(item['function']['name'].startswith('mcp__rule_b__')
@@ -736,9 +736,9 @@ class ReadonlyRecoveryTests(unittest.TestCase):
     def test_nested_sdk_tools_and_choice_cannot_force_write_tool(self):
         h = Harness()
         h.api_kwargs['extra_body'] = {
-            'tools': [definition('mcp__rule_a__propose_rule_edit'),
+            'tools': [definition('mcp__rule_write_a__propose_rule_edit'),
                       definition('mcp__rule_a__get_rule_change_target')],
-            'tool_choice': {'type': 'function', 'function': {'name': 'mcp__rule_a__propose_rule_edit'}},
+            'tool_choice': {'type': 'function', 'function': {'name': 'mcp__rule_write_a__propose_rule_edit'}},
             'think': False, 'options': {'num_ctx': 32768},
         }
         before = copy.deepcopy(h.api_kwargs)
@@ -755,7 +755,7 @@ class ReadonlyRecoveryTests(unittest.TestCase):
         self.assertIsNot(retry['extra_body'], h.api_kwargs['extra_body'])
 
     def test_nested_write_only_or_empty_tools_never_resurrect_top_level_reads(self):
-        for effective_tools in ([definition('mcp__rule_a__propose_rule_edit')], [], None):
+        for effective_tools in ([definition('mcp__rule_write_a__propose_rule_edit')], [], None):
             with self.subTest(effective_tools=effective_tools):
                 h = Harness()
                 h.api_kwargs['extra_body'] = {'tools': effective_tools, 'tool_choice': 'auto', 'think': False}
@@ -987,7 +987,7 @@ class FirstRequestGroundingTests(unittest.TestCase):
         self.assertTrue(PLUGIN._arm_read_request(h.agent, 'turn-a', inventory_only=True))
         result = h.agent._build_api_kwargs()
         self.assertEqual(h.agent.valid_tool_names, {t['function']['name'] for t in result['tools']})
-        self.assertNotIn('mcp__rule_a__propose_rule_edit', h.agent.valid_tool_names)
+        self.assertNotIn('mcp__rule_write_a__propose_rule_edit', h.agent.valid_tool_names)
         h.agent._capstone_query_completion_names_restore()
         self.assertIs(h.agent.valid_tool_names, original)
         self.assertTrue(PLUGIN._arm_read_request(h.agent, 'turn-a', inventory_only=True))
@@ -1081,7 +1081,7 @@ class FirstRequestGroundingTests(unittest.TestCase):
         h, first, _, _ = self.build(question)
         self.assertTrue(all(t['function']['name'] in PLUGIN._READ_TOOL_NAMES for t in first['tools']))
         h, after, _, _ = self.build(question, [{'role':'tool','tool_call_id':'observed','content':'actual read result'}])
-        self.assertIn('mcp__rule_a__propose_rule_edit', {t['function']['name'] for t in after['tools']})
+        self.assertIn('mcp__rule_write_a__propose_rule_edit', {t['function']['name'] for t in after['tools']})
         self.assertEqual(after['reasoning_effort'], 'medium')
         self.assertEqual(h.agent.valid_tool_names, {t['function']['name'] for t in h.agent.tools})
         self.assertFalse(hasattr(h.agent, '_capstone_query_completion_local_format'))

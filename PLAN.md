@@ -1,5 +1,7 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+> **조회 통합 완료 / 2026-10-24:** 조회4종을 독립 읽기 계정의 rule-a/b로 모으고 변경 제안은 rule-write-a/b로 분리해 운영 적용했다. 단순 조회 READ와 조사 후 LLM의 승인형 변경안 준비 역할을 함께 유지한다.859회귀·실제 SDK/SSH/root 경계를 확인했다. 일반/관리 두 설정·정책과 초기 설치기도 동기화했다. 신규 실제 채팅 전달/일반 모델 정확도·공격/보호쓰기E2E는 후속이고3번CVE 보류·새3VM 설치 제외를 유지한다. 상세는 [STATUS](STATUS.md)를 따른다.
+
 > 최신 완료·검증·남은 작업·Git 반영 상태는 [STATUS.md](STATUS.md)를 기준으로 확인한다. 2026-10-23 일시정지 구간 재검증은 운영267/267 통과, 회귀240개 통과·환경상1개 생략이며 실제 SDK 재조회도 통과했다.
 
 > 2026-10-24 패키지 적용 당시 이력: 오프라인 설치와 반입 deb 정리 뒤 부팅/TLS/승인/LLM 검증을 후속으로 남겼다. 이후 완료·한계와 Git 상태는 STATUS 최상단을 따른다.
@@ -59,7 +61,7 @@ A/B/C의 고정25개 systemd 대상에 root 수집기·권한을 제한한 snaps
 
 ## Redis·Samba 웹 터미널·schema8 완료 이력 (2026-10-23)
 
-- 운영 카탈로그를 **HTTP3개 + sudo CLI1개 + Redis/Samba 터미널2개, 총6항목**으로 확장했다. Redis CVE-2022-0543·Samba CVE-2017-7494는 같은 콘솔에서 **실습환경 시작 → 환경 열기**로 고정 컨테이너의 브라우저 터미널에 연결한다. sudo는 별도 rootless CLI, DVWA는 원래 독립 주소를 유지한다.
+- 운영 카탈로그를 **HTTP3개 + sudo CLI1개 + Redis/Samba 터미널2개, 총6항목**으로 확장했다. Redis CVE-2022-0543·Samba CVE-2017-8594는 같은 콘솔에서 **실습환경 시작 → 환경 열기**로 고정 컨테이너의 브라우저 터미널에 연결한다. sudo는 별도 rootless CLI, DVWA는 원래 독립 주소를 유지한다.
 - 기존 차콜/웜화이트 테마와 맞춘 터미널 화면·서버 선화 파비콘·로컬 터미널 자산을 추가했다. 터미널 세션은 같은 실습의 컨테이너와 계정을 공유하며 사용자별 OS 격리가 아니다. HTTP 실습의 WAF 예외 키를 터미널 권한으로 확대하지 않는다.
 - 단일 `deploy.sh`의 service schema8에6항목 검사·재귀 정적 자산 반입·`LAB_NONWEB_BUNDLE`·고정 nonweb bootstrap을 연결했다. 콘솔 계정과 sudo 준비 다음에 nonweb 환경을 설치하며 Redis/Samba 실습 컨테이너는 자동 시작하지 않는다. 구형 schema6/7 환경을 임의로 인수하지 않는다.
 - **C의 이미지·런타임·콘솔 반영과 실제 HTTPS·네트워크 격리 검증을 완료**했다. native 콘솔94개·런타임/daemon67개·이미지 준비22개 회귀와 실제 서비스 응답·Ctrl+C·다른 세션 보존·시작/중지·호스트 방향 연결 차단을 확인했다. 새로고침한 Safari에서 서버 파비콘, Redis의 UID10001·PONG, 최종 Samba의 UID10001·Version4.6.3·SMB3 공유 목록과 다크/화이트 테마·연결 종료·콘솔 중지를 확인했다. [통합 검증 기록](infra/groot-c/nonweb-labs/validation-20261023.json)과 [TTY·이미지 기록](infra/groot-c/nonweb-labs/terminal-tty-validation-20261023.json)을 따른다.

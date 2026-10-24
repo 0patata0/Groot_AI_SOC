@@ -1,8 +1,10 @@
 # Groot_AI_SOC
 
+> **2026-10-24 조회 경로 통합:** 룰/서비스/승인 상태 조회4종은 읽기 전용 `rule-a/b`, 변경 제안은 `rule-write-a/b`로 제공한다. 독립 계정·키와 root 경계로 중복 제공을 없앴고 기존 조회 이름을 보존했다. 논리 MCP8개/도구35개이며 추가 VM은 없다. 실제 조회·권한 거절·859회귀를 확인했다. 상세 적용/한계는 [STATUS](STATUS.md), 사용 경계는 [MCP 안내](infra/mcp/README.md)를 따른다.
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](STATUS.md) · [실행 계획](PLAN.md).
-> 현재 구성은 A/B/C 역할 분리·MCP6서버·HTTP3/터미널3·단일 deploy.sh(service schema9)다.6CVE 공격·탐지 시험은 사용자 지시로 보류하고 LLM 진단/알림 실패 보완과 문서 정리를 우선한다. 실제 검증 범위와 새 서버 설치 제외를 함께 확인한다.
+> 현재 구성은 A/B/C 역할 분리·MCP8논리 서버·HTTP3/터미널3·단일 deploy.sh(service schema9)다.6CVE 공격·탐지 시험은 사용자 지시로 보류하고 LLM 진단/알림 실패 보완과 문서 정리를 우선한다. 실제 검증 범위와 새 서버 설치 제외를 함께 확인한다.
 > 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
 <!-- /current-project-context -->
 
@@ -56,7 +58,7 @@ sudo는 기존 별도 rootless 런타임과 이미지·반입 bundle을 유지�
 
 ## Redis·Samba 확장 완료 당시 구성·schema8 — 2026-10-23
 
-[Lab Console](https://log4shell.grootlab.duckdns.org/log4shell/)의 운영 카탈로그는 **HTTP 실습3개 + sudo CLI1개 + Redis/Samba 웹 터미널2개**다. Redis **CVE-2022-0543**(Ubuntu `5:5.0.7-2`)와 Samba **CVE-2017-7494**(4.6.3)는 같은 콘솔에서 **실습환경 시작 → 환경 열기**를 선택해 브라우저 터미널을 여는 흐름을 추가했다. sudo는 기존 별도 rootless CLI를 유지하고, DVWA는 원래 독립 주소에 그대로 둔다.
+[Lab Console](https://log4shell.grootlab.duckdns.org/log4shell/)의 운영 카탈로그는 **HTTP 실습3개 + sudo CLI1개 + Redis/Samba 웹 터미널2개**다. Redis **CVE-2022-0543**(Ubuntu `5:5.0.7-2`)와 Samba **CVE-2017-8594**(4.6.3)는 같은 콘솔에서 **실습환경 시작 → 환경 열기**를 선택해 브라우저 터미널을 여는 흐름을 추가했다. sudo는 기존 별도 rootless CLI를 유지하고, DVWA는 원래 독립 주소에 그대로 둔다.
 
 터미널은 선택한 격리 컨테이너의 고정 비권한 계정에만 연결한다. 같은 실습의 세션은 컨테이너·계정을 공유하며 사용자별 OS 격리는 아니다. 실습 중지는 해당 Redis/Samba 컨테이너와 휘발성 데이터를 정리한다. WAF 차단 예외 키는 기존 HTTP3개 실습용이며 터미널 권한을 부여하지 않는다. 콘솔과 실습 페이지에는 공통 차콜/웜화이트 테마와 서버 선화 파비콘을 사용하고 외부 CDN 없이 로컬 터미널 자산을 제공한다.
 

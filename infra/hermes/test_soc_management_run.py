@@ -30,10 +30,10 @@ READ_NAMES = ["mcp__wazuh_ro__get_wazuh_agents", "mcp__wazuh_ro__search_wazuh_ma
               "mcp__rule_a__get_rule_change_target", "mcp__rule_b__get_rule_change_status",
               "mcp__rule_b__get_service_action_target", "mcp__rule_a__get_operation_status",
               "mcp__resp__list_blocks", "mcp__system_diagnostics__get_system_diagnostics"]
-WRITE_NAMES = ["mcp__rule_a__propose_rule_edit", "mcp__rule_b__propose_rule_change",
-               "mcp__rule_a__propose_service_action", "mcp__rule_a__temporarily_contain_ip"]
+WRITE_NAMES = ["mcp__rule_write_a__propose_rule_edit", "mcp__rule_write_b__propose_rule_change",
+               "mcp__rule_write_a__propose_service_action", "mcp__rule_write_a__temporarily_contain_ip"]
 FORBIDDEN_NAMES = ["terminal", "execute_code", "run_command", "ssh", "sudo", "docker",
-                   "mcp__resp__block_ip", "mcp__resp__unblock_ip", "mcp__rule_b__temporarily_contain_ip",
+                   "mcp__resp__block_ip", "mcp__resp__unblock_ip", "mcp__rule_write_b__temporarily_contain_ip",
                    "mcp__rule_a__submit-incident", "mcp__wazuh_ro__run_command",
                    "mcp__security_events__block_ip", "mcp__unknown__get_rule_change_target",
                    "mcp__system_diagnostics__restart_service", "mcp__system_diagnostics__journalctl",
@@ -477,7 +477,7 @@ class ManagementWrapper(unittest.TestCase):
         def check(h):
             for kind, name in (("tool.started", "mcp__rule_a__get_rule_change_target"),
                                ("tool.completed", "mcp__rule_b__get_service_action_target"),
-                               ("tool.completed", "mcp__rule_a__propose_rule_edit")):
+                               ("tool.completed", "mcp__rule_write_a__propose_rule_edit")):
                 h.Emitter().on_tool_progress(kind, name, result=outer)
         h = Harness(); h.run(check)
         self.assertTrue(all(progress[4]["result"] == outer for progress in h.progresses))

@@ -38,7 +38,7 @@ CODE = Path("/opt/capstone-soc")
 FIXED_ENV = {"PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
              "LC_ALL": "C.UTF-8", "TZ": "Asia/Seoul", "PYTHONDONTWRITEBYTECODE": "1"}
 SOURCES = tuple("infra/mcp/" + name for name in (
-    "rule_change_executor.py", "rule_change_mcp.py", "service_action_executor.py", "incident_containment.py",
+    "rule_change_executor.py", "rule_change_mcp.py", "rule_readonly_install.py", "service_action_executor.py", "incident_containment.py",
     "soc_bot.py", "soc_management_events.py", "operations_approval.py", "approval_card_cleanup.py",
     "response-mcp.py", "wazuh_containment_ar.py", "managed_suricata_evidence.py")) + tuple("infra/hermes/" + name for name in (
     "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md",
@@ -271,16 +271,16 @@ def check(s, role):
         trusted_directory(STATE)
         need((STATE / (role + ".json")).exists(), "partial_or_unowned_SOC_state_requires_review")
         return {"status": "existing_requires_verify", "role": role}
-    for path in (CODE, "/opt/rule-change", "/etc/rule-change", "/var/lib/rule-change", "/usr/local/sbin/rule-change-executor"):
+    for path in (CODE, "/opt/rule-change", "/opt/rule-view", "/etc/sudoers.d/capstone-rule-readonly", "/etc/ssh/sshd_config.d/63-capstone-rule-readonly.conf", "/etc/rule-change", "/var/lib/rule-change", "/usr/local/sbin/rule-change-executor"):
         need(not os.path.lexists(path), "existing_SOC_namespace_refused")
     units = ["rule-change-worker.service", "rule-change-worker.timer"]
     directories = ["/opt/socbot", "/etc/socbot", "/var/lib/socbot", "/opt/capstone-management", "/etc/capstone-management", "/var/lib/capstone-management"] if role == "siem" else ["/opt/resp", "/var/lib/capstone"]
     units += ["soc-bot.service", "capstone-management.service", "capstone-management.timer"] if role == "siem" else ["capstone-soc-firewall.service"]
     for path in directories + ["/etc/systemd/system/" + unit for unit in units] + ["/usr/local/libexec/capstone-soc-docker", "/usr/local/libexec/capstone-response-apply", "/usr/local/sbin/capstone-response-mcp"]:
         need(not os.path.lexists(path), "unmanaged_SOC_file_or_unit_exists")
-    for name in ("rulechg", "socbot") if role == "siem" else ("rulechg", "resp"):
+    for name in ("rulechg", "ruleview", "socbot") if role == "siem" else ("rulechg", "ruleview", "resp"):
         account_free(name)
-    for name in ("rulechg",) if role == "siem" else ("rulechg", "resp"):
+    for name in ("rulechg", "ruleview") if role == "siem" else ("rulechg", "ruleview", "resp"):
         for path in ("/etc/sudoers.d/capstone-soc-" + name, "/etc/ssh/sshd_config.d/64-capstone-soc-" + name + ".conf"):
             need(not os.path.lexists(path), "unmanaged_privilege_grant_exists")
     if role == "security":
@@ -329,7 +329,7 @@ def forced_account(name, home, public, program, sudo_program):
     run(["visudo", "-cf", str(sudo)])
     ssh = ("Match User " + name + "\n    ForceCommand " + program + "\n    AuthenticationMethods publickey\n"
            "    PasswordAuthentication no\n    KbdInteractiveAuthentication no\n    DisableForwarding yes\n"
-           "    PermitTTY no\n    X11Forwarding no\n    PermitUserRC no\n    PermitUserEnvironment no\nMatch all\n")
+           "    PermitTTY no\n    X11Forwarding no\n    PermitUserRC no\nMatch all\n")
     write("/etc/ssh/sshd_config.d/64-capstone-soc-" + name + ".conf", ssh.encode(), 0o644)
     return user
 
@@ -342,13 +342,16 @@ def install_docker(profile):
           profile["docker"] + " --host unix:///var/run/docker.sock \"$@\"\n").encode(), 0o750)
 
 
-def install_rules(bundle, p, token, key):
+def install_rules(bundle, p, token, key, readonly_key):
     user = forced_account("rulechg", "/opt/rule-change", key, "/opt/rule-change/run-rule-change.sh", "/usr/local/sbin/rule-change-executor")
     mkdir("/etc/rule-change"); mkdir("/var/lib/rule-change")
     for name in ("rule_change_mcp.py", "service_action_executor.py", "incident_containment.py", "managed_suricata_evidence.py"):
         write(Path("/opt/rule-change") / name, render(name, bundle[name], p), 0o640, 0, user.pw_gid)
     write("/usr/local/sbin/rule-change-executor", render("rule_change_executor.py", bundle["rule_change_executor.py"], p), 0o750)
     write("/opt/rule-change/run-rule-change.sh", b"#!/bin/sh\nexec /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin /usr/bin/python3 -I -B /opt/rule-change/rule_change_mcp.py\n", 0o750, 0, user.pw_gid)
+    namespace = {"__name__": "capstone_rule_readonly_install"}
+    exec(compile(bundle["rule_readonly_install.py"], "rule_readonly_install.py", "exec"), namespace)
+    namespace["install"](p["role"], readonly_key)
     write("/etc/rule-change/broker.token", (token + "\n").encode())
     url = "https://" + p["siem_host"] + ":8445" if p["role"] == "a" else "http://127.0.0.1:8090"
     write("/etc/rule-change/config.json", canonical({"host": p["role"], "broker_url": url, "broker_token_file": "/etc/rule-change/broker.token"}))
@@ -359,15 +362,16 @@ def install_rules(bundle, p, token, key):
 
 
 def validate_stream(obj, s):
-    fields = {"schema", "hosts", "protected_ips", "admin_protected_cidrs", "interface", "ssh_port", "agent_id", "rule_token", "response_token", "public_key", "siem_host_key", "hermes_uid", "hermes_gid"}
+    fields = {"schema", "hosts", "protected_ips", "admin_protected_cidrs", "interface", "ssh_port", "agent_id", "rule_token", "response_token", "public_key", "readonly_public_key", "siem_host_key", "hermes_uid", "hermes_gid"}
     need(type(obj) is dict and set(obj) == fields and obj["schema"] == 1 and obj["hosts"] == s["hosts"] and
          obj["protected_ips"] == s["protected_ips"] and obj["admin_protected_cidrs"] == s["admin_protected_cidrs"] and
          obj["interface"] == s["interface"] and obj["ssh_port"] == s["ssh_port"], "secret_stream_profile_mismatch")
     for name in ("rule_token", "response_token"):
         need(isinstance(obj[name], str) and re.fullmatch(r"[0-9a-f]{64}", obj[name]), "secret_stream_token_format")
     need(obj["rule_token"] != obj["response_token"], "independent_tokens_required")
-    for name in ("public_key", "siem_host_key"):
+    for name in ("public_key", "readonly_public_key", "siem_host_key"):
         need(public_key(obj[name].encode()) == obj[name], "stream_public_key")
+    need(obj["public_key"].split()[:2] != obj["readonly_public_key"].split()[:2], "independent_readonly_key_required")
     need(re.fullmatch(r"[0-9]{3,8}", obj["agent_id"]) and obj["agent_id"] != "000", "stream_agent_id")
     need(all(type(obj[k]) is int and 1 <= obj[k] < 65534 for k in ("hermes_uid", "hermes_gid")), "stream_Hermes_identity")
     return obj
@@ -431,9 +435,13 @@ def prepare_siem(s):
     private = STATE / "management_ed25519"
     run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "capstone-soc-management", "-f", str(private)])
     key = public_key(read(str(private) + ".pub"))
+    readonly_private = STATE / "readonly_ed25519"
+    run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "capstone-soc-readonly", "-f", str(readonly_private)])
+    readonly_key = public_key(read(str(readonly_private) + ".pub"))
+    need(readonly_key != key, "separate_readonly_key_required")
     share = {"schema": 1, "hosts": s["hosts"], "protected_ips": s["protected_ips"], "interface": s["interface"], "ssh_port": s["ssh_port"],
              "admin_protected_cidrs": s["admin_protected_cidrs"],
-             "agent_id": p["agent_id"], "rule_token": secrets.token_hex(32), "response_token": secrets.token_hex(32), "public_key": key,
+             "agent_id": p["agent_id"], "rule_token": secrets.token_hex(32), "response_token": secrets.token_hex(32), "public_key": key, "readonly_public_key": readonly_key,
              "siem_host_key": public_key(read("/etc/ssh/ssh_host_ed25519_key.pub")), "hermes_uid": hu.pw_uid, "hermes_gid": hu.pw_gid}
     write(STATE / "export.json", canonical(share))
     mm = "http://" + s["hosts"]["SIEM_HOST"] + ":8065"
@@ -465,7 +473,7 @@ def prepare_siem(s):
     write("/opt/socbot/serve", launcher.encode(), 0o750, 0, sb.pw_gid)
     unit = "[Unit]\nDescription=Capstone authenticated approval broker\nAfter=docker.service network-online.target\n[Service]\nUser=socbot\nGroup=socbot\nExecStart=/opt/socbot/serve\nRestart=on-failure\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nReadWritePaths=/var/lib/socbot\nUMask=0077\n[Install]\nWantedBy=multi-user.target\n"
     write("/etc/systemd/system/soc-bot.service", unit.encode(), 0o644)
-    install_rules(bundle, p, share["rule_token"], key)
+    install_rules(bundle, p, share["rule_token"], key, share["readonly_public_key"])
     mkdir("/opt/capstone-management", 0o755); mkdir("/etc/capstone-management"); mkdir("/var/lib/capstone-management")
     write("/opt/capstone-management/soc_management_controller.py", controller, 0o750)
     write("/opt/capstone-management/soc_alert_watch.prompt", bundle["soc_alert_watch.prompt"], 0o644)
@@ -516,7 +524,7 @@ def mcp_probe(profile):
 from mcp import ClientSession,StdioServerParameters
 from mcp.client.stdio import stdio_client
 async def main():
- for alias in ('soc-rule-a','soc-rule-b','soc-resp'):
+ for alias in ('soc-rule-a','soc-rule-b','soc-rule-write-a','soc-rule-write-b','soc-resp'):
   params=StdioServerParameters(command='/usr/bin/ssh',args=['-T','-F','/opt/data/home/.ssh/soc_config',alias],env={'PATH':'/usr/bin:/bin','LC_ALL':'C'})
   with open(os.devnull,'w') as sink:
    async with stdio_client(params,errlog=sink) as (reader,writer):
@@ -524,7 +532,7 @@ async def main():
      await session.initialize()
      result=await session.list_tools()
      names={x.name for x in result.tools}
-     expected={'block_ip','unblock_ip','list_blocks'} if alias=='soc-resp' else {'get_rule_change_target','propose_rule_edit','propose_rule_change','get_rule_change_status','get_service_action_target','propose_service_action','temporarily_contain_ip','get_operation_status'}
+     expected={'block_ip','unblock_ip','list_blocks'} if alias=='soc-resp' else ({'propose_rule_edit','propose_rule_change','propose_service_action'} | ({'temporarily_contain_ip'} if alias.endswith('-a') else set()) if '-write-' in alias else {'get_rule_change_target','get_rule_change_status','get_service_action_target','get_operation_status'})
      assert not result.next_cursor and names==expected and len(names)==len(result.tools)
 asyncio.run(asyncio.wait_for(main(),timeout=90))
 '''
@@ -574,7 +582,7 @@ def apply_security(s):
     mkdir(CODE, 0o755)
     write(STATE / "security-intent.json", canonical({"profile": p, "source_sha256": {k: digest(v) for k, v in bundle.items()}, "automatic_retry": False}))
     write(STATE / "agent-ossec-before.xml", old)
-    install_docker(p); install_rules(bundle, p, share["rule_token"], share["public_key"])
+    install_docker(p); install_rules(bundle, p, share["rule_token"], share["public_key"], share["readonly_public_key"])
     install_response(bundle, p, share)
     mkdir("/var/lib/capstone")
     write(CODE / "containment.nft", firewall(p["protected_ips"], p["admin_protected_cidrs"]), 0o600)
@@ -642,23 +650,24 @@ def activate_siem(s):
     write(STATE / "activation-intent.json", canonical({"security_receipt": evidence, "automatic_retry": False}))
     ssh = data / "home/.ssh"
     hermes_file(ssh / "soc_ed25519", read(STATE / "management_ed25519", secret=True), hu.pw_uid, hu.pw_gid)
+    hermes_file(ssh / "soc_readonly_ed25519", read(STATE / "readonly_ed25519", secret=True), hu.pw_uid, hu.pw_gid)
     token = lambda ip: ip if s["ssh_port"] == 22 else "[" + ip + "]:" + str(s["ssh_port"])
     known = token(p["security_host"]) + " " + hostkey + "\n" + token(p["siem_host"]) + " " + share["siem_host_key"] + "\n"
     hermes_file(ssh / "soc_known_hosts", known.encode(), hu.pw_uid, hu.pw_gid)
     config = ""
-    for alias, host, user in (("soc-rule-a", p["security_host"], "rulechg"), ("soc-rule-b", p["siem_host"], "rulechg"), ("soc-resp", p["security_host"], "resp")):
+    for alias, host, user in (("soc-rule-a", p["security_host"], "ruleview"), ("soc-rule-b", p["siem_host"], "ruleview"), ("soc-rule-write-a", p["security_host"], "rulechg"), ("soc-rule-write-b", p["siem_host"], "rulechg"), ("soc-resp", p["security_host"], "resp")):
         config += ("Host " + alias + "\n HostName " + host + "\n Port " + str(s["ssh_port"]) + "\n User " + user +
-                   "\n IdentityFile /opt/data/home/.ssh/soc_ed25519\n IdentitiesOnly yes\n BatchMode yes\n StrictHostKeyChecking yes\n"
+                   "\n IdentityFile /opt/data/home/.ssh/" + ("soc_readonly_ed25519" if user == "ruleview" else "soc_ed25519") + "\n IdentitiesOnly yes\n BatchMode yes\n StrictHostKeyChecking yes\n"
                    " UserKnownHostsFile /opt/data/home/.ssh/soc_known_hosts\n ConnectTimeout 10\n")
     hermes_file(ssh / "soc_config", config.encode(), hu.pw_uid, hu.pw_gid)
     # Parse data as JSON only; the initial role writes JSON-compatible YAML.
     hc = parse((data / "config.yaml").read_bytes())
     need(set(hc["mcp_servers"]) == {"wazuh-ro", "security-events"}, "unexpected_existing_MCP_servers")
-    for name, alias in (("rule-a", "soc-rule-a"), ("rule-b", "soc-rule-b"), ("resp", "soc-resp")):
+    for name, alias in (("rule-a", "soc-rule-a"), ("rule-b", "soc-rule-b"), ("rule-write-a", "soc-rule-write-a"), ("rule-write-b", "soc-rule-write-b"), ("resp", "soc-resp")):
         hc["mcp_servers"][name] = {"command": "ssh", "args": ["-T", "-F", "/opt/data/home/.ssh/soc_config", alias],
             "connect_timeout": 30, "timeout": 660 if name == "resp" else 180, "supports_parallel_tool_calls": False,
             "tools": {"resources": False, "prompts": False}, "trust": "full"}
-    tools = ["mcp-wazuh-ro", "mcp-security-events", "mcp-rule-a", "mcp-rule-b", "mcp-resp"]
+    tools = ["mcp-wazuh-ro", "mcp-security-events", "mcp-rule-a", "mcp-rule-b", "mcp-rule-write-a", "mcp-rule-write-b", "mcp-resp"]
     hc["toolsets"] = tools; hc["platform_toolsets"] = {"mattermost": tools, "cli": tools}
     hermes_file(data / "config.yaml", canonical(hc), hu.pw_uid, hu.pw_gid, True)
     soul = source_bundle(s)["SOUL.groot.md"]
@@ -667,7 +676,7 @@ def activate_siem(s):
              ". 도구 대상 ID a:modsecurity-custom, a:suricata-local, b:wazuh-local-rules를 사용한다. "
              "물리 경로·컨테이너·승인자는 root 설치 프로필에 결속돼 있으며 호출자가 바꿀 수 없다. "
              "a:chatproxy는 이 설치에 없으며 호출하지 않는다. Native AR는 사건 등록만 수행한다. "
-             "임시 선차단은 LLM의 조사와 rule-a MCP 호출 뒤 증거·보호주소·600초 TTL 검사로 실행된다. "
+             "임시 선차단은 LLM의 조사와 rule-write-a MCP 호출 뒤 증거·보호주소·600초 TTL 검사로 실행된다. "
              "관리자 CIDR은 IP 차단에서만 보호되며 탐지 로그나 WAF 요청 검사를 면제하지 않는다.\n").encode()
     hermes_file(data / "SOUL.md", soul, hu.pw_uid, hu.pw_gid, True)
     management = data / "management"; need(not management.exists(), "management_home_exists")
@@ -699,13 +708,13 @@ def activate_siem(s):
         "native_AR_registration_only": True, "model_failure_fallback_blocking": False, "attack_tested": False,
         "security_receipt": evidence, "source_sha256": {k: digest(v) for k, v in source_bundle(s).items()}}
     write(STATE / "siem.json", canonical(receipt))
-    return {"status": "active", "role": "siem", "MCP_servers": 5, "native_AR_registration_only": True,
+    return {"status": "active", "role": "siem", "MCP_servers": 7, "native_AR_registration_only": True,
             "management_timer_enabled": True, "attack_tested": False}
 
 
 def installed_hashes(role):
     paths = [Path("/usr/local/sbin/rule-change-executor"), Path("/usr/local/libexec/capstone-soc-docker")]
-    roots = [Path("/opt/rule-change"), Path("/etc/rule-change")]
+    roots = [Path("/opt/rule-change"), Path("/opt/rule-view"), Path("/etc/rule-change")]
     units = ["rule-change-worker.service", "rule-change-worker.timer"]
     if role == "siem":
         roots += [Path("/opt/socbot"), Path("/etc/socbot"), Path("/opt/capstone-management"), Path("/etc/capstone-management")]
@@ -719,6 +728,7 @@ def installed_hashes(role):
     paths += [Path("/etc/systemd/system") / name for name in units]
     for account in ("rulechg",) if role == "siem" else ("rulechg", "resp"):
         paths += [Path("/etc/sudoers.d/capstone-soc-" + account), Path("/etc/ssh/sshd_config.d/64-capstone-soc-" + account + ".conf")]
+    paths += [Path("/etc/sudoers.d/capstone-rule-readonly"), Path("/etc/ssh/sshd_config.d/63-capstone-rule-readonly.conf")]
     return {str(path): digest(read(path)) for path in paths}
 
 

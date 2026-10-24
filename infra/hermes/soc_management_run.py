@@ -394,8 +394,12 @@ def allowed(name, mode):
         prefix = 'mcp__' + server + '__'
         if name.startswith(prefix):
             bare = name.removeprefix(prefix)
-            return bare in READ or (mode == 'manage' and bare in WRITE and
-                                   (bare != 'temporarily_contain_ip' or server == 'rule_a'))
+            return bare in READ
+    for server in ('rule_write_a', 'rule_write_b'):
+        prefix = 'mcp__' + server + '__'
+        if name.startswith(prefix):
+            bare = name.removeprefix(prefix)
+            return mode == 'manage' and bare in WRITE and (bare != 'temporarily_contain_ip' or server == 'rule_write_a')
     return False
 
 

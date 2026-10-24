@@ -124,6 +124,9 @@ def render(name, raw, profile, run_source=None):
     containers = {"waf": "capstone-security-waf", "suricata": "capstone-security-suricata",
                   "single-node-wazuh.manager-1": "capstone-wazuh-manager",
                   "single-node-wazuh.dashboard-1": "capstone-wazuh-dashboard"}
+    if name == "rule_change_mcp.py":
+        node = assigned(tree, "SERVICE_TARGETS")
+        node.value = literal([target for target in ast.literal_eval(node.value) if target != "a:chatproxy"])
     if name == "rule_change_executor.py":
         node = assigned(tree, "TARGETS")
         node.value = literal(replace_profile_paths(ast.literal_eval(node.value), mapping, containers))

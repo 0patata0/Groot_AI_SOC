@@ -73,13 +73,14 @@ class RuleChangeTransportTests(unittest.TestCase):
             ('get_operation_status', 'operation-status', {'request_id':'a'*32}),
         ]
         for name, op, args in cases:
+            access = 'read' if name in mcp.READ_TOOLS else 'write'
             msg = {'id':1,'method':'tools/call','params':{'name':name,'arguments':args}}
             with patch.object(mcp, '_call_helper', return_value=mcp._result({'ok':True})) as call:
-                self.assertFalse(mcp.handle(msg)['result']['isError'])
-                call.assert_called_once_with({'operation':op, **args})
+                self.assertFalse(mcp.handle(msg, access)['result']['isError'])
+                call.assert_called_once_with({'operation':op, **args}, readonly=(access == 'read'))
             msg['params']['arguments'] = {**args, 'command':'arbitrary command'}
             with patch.object(mcp, '_call_helper') as call:
-                self.assertTrue(mcp.handle(msg)['result']['isError'])
+                self.assertTrue(mcp.handle(msg, access)['result']['isError'])
                 call.assert_not_called()
 
     def test_operation_schemas_expose_no_arbitrary_install_or_container_tool(self):

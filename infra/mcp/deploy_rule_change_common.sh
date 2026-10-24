@@ -36,10 +36,10 @@ MANAGED=("$MCP_DST" "$EXEC_DST" "$WRAP_DST" "$CONFIG" "$TOKEN_DST" "$AK" "$SUDOE
 die(){ echo "rule-change deploy: $*" >&2; exit 1; }
 
 for bin in python3 docker sshd ssh-keygen visudo systemctl stat runuser; do command -v "$bin" >/dev/null || die "missing command: $bin"; done
-for src in "$MCP_SRC" "$EXEC_SRC" "$WRAP_SRC"; do
+for src in "$MCP_SRC" "$EXEC_SRC" "$WRAP_SRC" "$SRC/rule_readonly_install.py"; do
   [[ -f $src && ! -L $src ]] || die "staged source is absent or a symlink: $src"
 done
-python3 - "$SRC" "$MCP_SRC" "$EXEC_SRC" "$WRAP_SRC" <<'PY' || die 'staged code directory/files must be root-owned and not group/world-writable'
+python3 - "$SRC" "$MCP_SRC" "$EXEC_SRC" "$WRAP_SRC" "$SRC/rule_readonly_install.py" <<'PY' || die 'staged code directory/files must be root-owned and not group/world-writable'
 import os, stat, sys
 directory,*files=sys.argv[1:]
 for path in (directory,*files):
@@ -48,7 +48,7 @@ for path in (directory,*files):
 assert stat.S_ISDIR(os.lstat(directory).st_mode)
 for path in files: assert stat.S_ISREG(os.lstat(path).st_mode)
 PY
-python3 - "$MCP_SRC" "$EXEC_SRC" <<'PY' || die 'Python syntax failed'
+python3 - "$MCP_SRC" "$EXEC_SRC" "$SRC/rule_readonly_install.py" <<'PY' || die 'Python syntax failed'
 import ast, pathlib, sys
 for path in sys.argv[1:]:
     ast.parse(pathlib.Path(path).read_text(encoding='utf-8'), filename=path)
@@ -202,7 +202,8 @@ fi
 usermod -p '*' rulechg
 install -d -o root -g rulechg -m 0750 /opt/rule-change /opt/rule-change/.ssh
 install -d -o root -g root -m 0700 /etc/rule-change "$STATE"
-install -o root -g rulechg -m 0750 "$MCP_SRC" "$MCP_DST"
+[[ -n ${RULE_READONLY_PUBKEY:-} && $RULE_READONLY_PUBKEY != "$RULE_PUBKEY" ]] || die 'independent RULE_READONLY_PUBKEY required'
+install -o root -g rulechg -m 0644 "$MCP_SRC" "$MCP_DST"
 install -o root -g rulechg -m 0750 "$WRAP_SRC" "$WRAP_DST"
 install -o root -g root -m 0750 "$EXEC_SRC" "$EXEC_DST"
 if [[ ! -e $TOKEN_DST || ! $RULE_BROKER_TOKEN_FILE -ef $TOKEN_DST ]]; then
@@ -276,12 +277,19 @@ Unit=rule-change-worker.service
 WantedBy=timers.target
 EOF
 chmod 0644 "$SERVICE" "$TIMER"
+python3 - "$SRC/rule_readonly_install.py" "$ROLE" "$RULE_READONLY_PUBKEY" <<'PYREAD' || die 'read-only account provisioning failed'
+import pathlib, sys
+namespace={"__name__":"capstone_rule_readonly_install"}
+exec(compile(pathlib.Path(sys.argv[1]).read_bytes(),sys.argv[1],"exec"),namespace)
+namespace["install"](sys.argv[2],sys.argv[3])
+PYREAD
+systemctl reload ssh || die 'sshd readonly reload failed'
 systemctl daemon-reload
 "$EXEC_DST" --check >/dev/null || die 'root executor --check failed'
 "$EXEC_DST" --broker-check >/dev/null || die 'root executor HMAC broker check failed'
 
 # Protocol smoke test is read-only: initialize and tools/list only.
-python3 - "$WRAP_DST" <<'PY' || die 'unprivileged MCP protocol smoke test failed'
+python3 - "$WRAP_DST" "$ROLE" <<'PY' || die 'unprivileged MCP protocol smoke test failed'
 import json, subprocess, sys
 msgs=[{'jsonrpc':'2.0','id':1,'method':'initialize','params':{'protocolVersion':'2025-06-18','capabilities':{},'clientInfo':{'name':'installer','version':'1'}}},
       {'jsonrpc':'2.0','method':'notifications/initialized'},
@@ -290,7 +298,7 @@ p=subprocess.run(['runuser','-u','rulechg','--',sys.argv[1]],input='\n'.join(map
 assert p.returncode==0 and not p.stderr, 'MCP wrapper failed'
 rows=[json.loads(line) for line in p.stdout.splitlines()]
 tools=next(row['result']['tools'] for row in rows if row.get('id')==2)
-assert {t['name'] for t in tools}=={'get_rule_change_target','propose_rule_change','get_rule_change_status'}
+assert {t['name'] for t in tools}==({'propose_rule_edit','propose_rule_change','propose_service_action'} | ({'temporarily_contain_ip'} if sys.argv[2]=='a' else set()))
 PY
 systemctl enable --now rule-change-worker.timer >/dev/null || die 'worker timer failed'
 systemctl is-active --quiet rule-change-worker.timer || die 'worker timer not active'

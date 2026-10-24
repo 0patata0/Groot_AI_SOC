@@ -1,5 +1,25 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+## 현행 조회·변경 기능 소유 — 2026-10-24
+
+같은 조회는 읽기 전용 경로에서만 제공한다. 실제 파일 읽기/집계 구현은 공통 root helper를 재사용하지만 SSH 계정·개인키·sudo 인자·MCP 목록·실행 허용은 분리한다.
+
+| 경로 | 계정 / 기능 |
+| --- | --- |
+| rule-a / rule-b | 독립 키의 ruleview. get_rule_change_target, get_rule_change_status, get_service_action_target, get_operation_status만 제공 |
+| rule-write-a / rule-write-b | 기존 rulechg. propose_rule_edit, propose_rule_change, propose_service_action. A만 temporarily_contain_ip 추가 |
+| wazuh-ro | 기존14개 Wazuh API 조회. 전체 룰 요약은 로컬 파일 목록과 다른 범위 |
+| security-events / system-diagnostics | 정제 이벤트2종 / 고정 systemd 진단1종. 승인 상태 SHA를 얻는 실시간 서비스 조회와 구별 |
+| resp | 기존 list_blocks 및 승인형 block_ip/unblock_ip. 관리 gate는 직접 block/unblock 제외 |
+
+총8논리 MCP/35도구이며 서버 VM을 추가하지 않는다. 기존6개 중 혼합 rule-a/b를 조회/제안 경로로 나눴다. 같은 호스트의 조회/제안 목록은 서로 겹치지 않고 target enum도 자기 장비만 포함한다. B에 미지원 임시 차단을 안내하지 않는다. 조회 요청을 변경 서버로 보내거나 읽기 경로에 제안을 위조하면 거부한다. ruleview sudo는 `rule-change-executor --read-only`만 허용하고 해당 모드는 모든 변경/worker/사건 등록을 거부한다. 파일/SHA 조회·모든 판단 없는 집계는 이전 명칭을 유지하므로 실제 도구 근거 검증과 이전 조회의 표 재정리 연결을 보존한다.
+
+LLM은 먼저 읽기 도구로 증거·정확 SHA/현재 상태를 얻고 필요하면 같은 장비의 rule-write 경로로 구체 승인안을 준비한다. 조사 후 별도 재지시를 기다리지 않는다. 정확 후보 승인·지정 worker, 긴급 차단의 LLM 조사·증거/보호 주소·TTL을 유지하며 일반 sudo/Docker/패키지 설치 권한은 제공하지 않는다. 원인 분석 이후 기존 변경안 준비 도구 보존과 단순 조회 제한은 query1.3.1을 그대로 사용한다.
+
+신규 설치는 루트 deploy.sh가 독립 키 생성/전달과 양쪽 읽기 계정·공통 helper·정책·normal/management 설정을 연결한다. 내부 rule_readonly_install.py는 사용자 진입점이 아니다. 새 오프라인 패키지·이미지·포트가 없으며 기존 서버에는 초기 설치기를 재실행하지 않는다. 운영 이관은 root 백업·유휴 확인·현재 정책 참조 동기화 뒤 같은 Hermes CID를 재기동했다. 영수증은 작업 JSON 폴더 밖 `/var/lib/capstone-mcp-unify`에 보관한다.
+
+859회귀·실제8서버 SDK/35스키마·파일3/서비스2 읽기·교차 경계7거절·root경계6거절과 worker 후속 성공을 확인했다. 파일 정의10/14/19는 전체 엔진 활성 룰 수를 뜻하지 않는다. 이번 모델 새 응답·실제 채팅/공격/승인/차단E2E·새 VM 전체 설치 시험은 별도다. [검증](role-consolidation-validation-20261024.json) · [최신 현황](../../STATUS.md). 아래 배포 이력은 당시의 범위다.
+
 > LLM 진단·알림 추가 보완: 종료 종류/실제 종료값 구분, 상태 표지의 모델 정정, 룰 표 제목 오탐 수정과 run별 영속 보고 재전송을 적용했다. 확인한 DGX/Qwen 사건 관리 요청은 지원되는 reasoning_effort=medium을 사용한다. 일반 채팅 설정과 승인/도구 권한은 유지한다. 실제 SOC Alerts의 표시된 fixture2건은 설치된 전달 큐/함수와 기존 webhook을 거쳐 저장·API 재조회·WebSocket 수신을 확인했다. 실제 검증·한계는 [STATUS](../../STATUS.md) 최상단을 따른다.
 
 > 이전 보완 이력(2026-10-24 08:13 기준): 오프라인 host 패치, 기존 Java/관리망 격리, root 승인 진입점과 검증 TLS8444/8445를 적용했다. A 필수 컨테이너는 always로 재부팅 복구하며 실습/백업의 중지 상태는 보존한다. LLM 최종5질문은 맞는 도구12읽기를 완료했고 해석 불일치/상태 표지 누락2건은 검토 필요로 남겼다. 상세 포트·권한·새 설치/기존 이관과 검증 범위는 [설치 안내](../../deployment/bootstrap-guide.md) 및 [STATUS](../../STATUS.md)를 따른다.

@@ -127,7 +127,7 @@ class ControllerTests(unittest.TestCase):
         self.events(self.incident())
         trace = self.trace()
         pid = "b" * 32
-        self.tool(trace, "mcp__rule_a__propose_rule_edit", {"proposal_id": pid, "status": "pending"})
+        self.tool(trace, "mcp__rule_write_a__propose_rule_edit", {"proposal_id": pid, "status": "pending"})
         self.result(trace, "승인을 요청했습니다.\nMANAGEMENT_STATUS: awaiting_approval")
         result = trace.finish(0)
         self.assertEqual(result["state"], "waiting_approval")
@@ -150,8 +150,8 @@ class ControllerTests(unittest.TestCase):
         self.events(self.incident())
         trace = self.trace()
         pid = "c" * 32
-        self.tool(trace, "mcp__rule_a__propose_rule_edit", {"proposal_id": pid, "status": "pending"})
-        trace.accept({"type": "tool_use", "name": "mcp__rule_a__temporarily_contain_ip", "input": {"ip": "8.8.4.4"}})
+        self.tool(trace, "mcp__rule_write_a__propose_rule_edit", {"proposal_id": pid, "status": "pending"})
+        trace.accept({"type": "tool_use", "name": "mcp__rule_write_a__temporarily_contain_ip", "input": {"ip": "8.8.4.4"}})
         self.result(trace)
         self.assertEqual(trace.finish(0)["state"], "outcome_unknown")
         self.events({"seq": 2, "event_key": "approved", "kind": "rule_change", "at": 1001,
@@ -168,14 +168,14 @@ class ControllerTests(unittest.TestCase):
     def test_unknown_write_output_does_not_claim_success(self):
         self.events(self.incident())
         trace = self.trace()
-        self.tool(trace, "mcp__rule_a__propose_service_action", {"message": "posted"})
+        self.tool(trace, "mcp__rule_write_a__propose_service_action", {"message": "posted"})
         self.result(trace)
         self.assertEqual(trace.finish(0)["state"], "outcome_unknown")
 
     def test_native_registry_result_envelope_binds_proposal(self):
         self.events(self.incident())
         trace = self.trace()
-        pid, name = "f" * 32, "mcp__rule_a__propose_rule_edit"
+        pid, name = "f" * 32, "mcp__rule_write_a__propose_rule_edit"
         trace.accept({"type": "tool_use", "name": name, "input": {}})
         trace.accept({"type": "tool_result", "name": name, "output": json.dumps({"result": json.dumps({"proposal_id": pid, "status": "pending"})})})
         self.result(trace)
@@ -185,7 +185,7 @@ class ControllerTests(unittest.TestCase):
     def test_registry_error_without_is_error_requires_review(self):
         self.events(self.incident())
         trace = self.trace()
-        name = "mcp__rule_a__propose_rule_edit"
+        name = "mcp__rule_write_a__propose_rule_edit"
         trace.accept({"type": "tool_use", "name": name, "input": {}})
         trace.accept({"type": "tool_result", "name": name, "output": json.dumps({"result": json.dumps({"error": "refused"})})})
         self.result(trace)
@@ -204,7 +204,7 @@ class ControllerTests(unittest.TestCase):
         self.events(self.incident())
         trace = self.trace()
         pid = "d" * 32
-        self.tool(trace, "mcp__rule_a__propose_rule_edit", {"proposal_id": pid, "status": "pending"})
+        self.tool(trace, "mcp__rule_write_a__propose_rule_edit", {"proposal_id": pid, "status": "pending"})
         self.result(trace)
         trace.finish(0)
         self.assertIsNone(self.store.next_case())
@@ -359,7 +359,7 @@ class ControllerTests(unittest.TestCase):
     def test_pending_case_joins_next_minute_without_duplicate_write_until_five_minutes(self):
         self.alerts(self.alert("one"))
         trace = self.trace()
-        self.tool(trace, "mcp__rule_a__propose_rule_edit", {"proposal_id": "a" * 32, "status": "pending"})
+        self.tool(trace, "mcp__rule_write_a__propose_rule_edit", {"proposal_id": "a" * 32, "status": "pending"})
         self.result(trace)
         trace.finish(0)
         self.alerts(self.alert("two", "2026-10-15T00:01:01Z"))
@@ -457,7 +457,7 @@ class ControllerTests(unittest.TestCase):
         self.events(self.incident())
         trace = self.trace()
         proposal = "d" * 32
-        self.tool(trace, "mcp__rule_a__propose_rule_edit", {"proposal_id": proposal, "status": "pending"})
+        self.tool(trace, "mcp__rule_write_a__propose_rule_edit", {"proposal_id": proposal, "status": "pending"})
         self.result(trace)
         self.assertEqual(trace.finish(0)["state"], "waiting_approval")
         self.assertEqual(self.store.db.execute("SELECT status FROM proposals WHERE id=?", (proposal,)).fetchone()[0], "pending")

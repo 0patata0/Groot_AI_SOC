@@ -709,9 +709,15 @@ class Engine:
 
     @contextlib.contextmanager
     def locked(self):
-        fd = os.open(self.state_dir / ".lock", os.O_CREAT | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0), 0o600)
         try:
-            fcntl.flock(fd, fcntl.LOCK_EX)
+            fd = os.open(self.state_dir / ".lock", (os.O_RDONLY if self.read_only else os.O_CREAT | os.O_RDWR) | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        except FileNotFoundError:
+            if not self.read_only:
+                raise
+            yield
+            return
+        try:
+            fcntl.flock(fd, fcntl.LOCK_SH if self.read_only else fcntl.LOCK_EX)
             yield
         finally:
             fcntl.flock(fd, fcntl.LOCK_UN)
@@ -1473,21 +1479,31 @@ def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if os.geteuid() != 0:
         raise RuleChangeError("root helper must run as root")
-    host, broker = _secure_config()
-    if not argv:
+    readonly = argv == ["--read-only"]
+    caller = os.environ.get("SUDO_USER")
+    if caller == "ruleview" and not readonly:
+        raise RuleChangeError("read-only caller requires --read-only")
+    if readonly or not argv:
         raw = sys.stdin.buffer.read(MAX_REQUEST + 1)
         if len(raw) > MAX_REQUEST:
             raise RuleChangeError("request too large")
         request = json.loads(raw, object_pairs_hook=_unique_request)
         if not isinstance(request, dict):
             raise RuleChangeError("request must be a JSON object")
+        read_operations = {"get", "status", "service-get", "operation-status"}
+        if readonly and request.get("operation") not in read_operations:
+            raise RuleChangeError("operation is not read-only")
+        if caller == "rulechg" and request.get("operation") in read_operations:
+            raise RuleChangeError("queries belong to the read-only MCP")
+    host, broker = _secure_config()
+    if readonly or not argv:
         if request.get("operation") == "submit-incident":
             if set(request) != {"operation", "incident"}:
                 raise RuleChangeError("invalid incident request fields")
             result = _submit_incident(host, broker, request["incident"])
             print(json.dumps(result, ensure_ascii=False, sort_keys=True))
             return
-    engine = Engine(host, broker, read_only=argv in (["--check"], ["--broker-check"]))
+    engine = Engine(host, broker, read_only=readonly or argv in (["--check"], ["--broker-check"]))
     if argv == ["--broker-check"]:
         broker.health()
         result = {"broker": "authenticated_response_verified", "host": host}
@@ -1502,7 +1518,7 @@ def main(argv=None):
             result["operations"].extend(services[1].worker_once())
         result["processed"] = engine.worker_once()
         result["operations"].extend(services[0].worker_once())
-    elif not argv:
+    elif readonly or not argv:
         if request.get("operation") == "get" and set(request) == {"operation", "target"}:
             result = engine.get_target(request["target"])
         elif request.get("operation") == "propose" and set(request) == {"operation", "target", "base_sha256", "candidate_content", "reason"}:

@@ -51,6 +51,17 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_fresh_mcp_schemas_have_exclusive_roles_and_no_legacy_chatproxy(self):
+        for host in ('a', 'b'):
+            m = module('rule_change_mcp.py', host)
+            reads, writes = m.tool_list('read', host), m.tool_list('write', host)
+            self.assertEqual(len(reads), 4)
+            self.assertEqual(len(writes), 4 if host == 'a' else 3)
+            self.assertFalse({t['name'] for t in reads} & {t['name'] for t in writes})
+            for tool in reads + writes:
+                targets = tool['inputSchema']['properties'].get('target', {}).get('enum', [])
+                self.assertTrue(all(t.startswith(host + ':') and t != 'a:chatproxy' for t in targets))
+
     def test_rule_targets_are_host_specific_and_full_ids(self):
         for role, count in (("a", 2), ("b", 1)):
             m = module("rule_change_executor.py", role)
@@ -115,9 +126,9 @@ class BindingTests(unittest.TestCase):
         for mode in ("manage", "verify"):
             for name in ("terminal", "docker", "mcp__resp__block_ip", "mcp__resp__unblock_ip", "write_file"):
                 self.assertFalse(m.allowed(name, mode))
-        self.assertTrue(m.allowed("mcp__rule_a__temporarily_contain_ip", "manage"))
-        self.assertFalse(m.allowed("mcp__rule_a__temporarily_contain_ip", "verify"))
-        self.assertFalse(m.allowed("mcp__rule_b__temporarily_contain_ip", "manage"))
+        self.assertTrue(m.allowed("mcp__rule_write_a__temporarily_contain_ip", "manage"))
+        self.assertFalse(m.allowed("mcp__rule_write_a__temporarily_contain_ip", "verify"))
+        self.assertFalse(m.allowed("mcp__rule_write_b__temporarily_contain_ip", "manage"))
 
     def test_root_response_rejects_oversized_stdio_before_dispatch(self):
         m = module("response-mcp.py")
@@ -152,7 +163,7 @@ class RenderedInvestigationBoundaryTests(unittest.TestCase):
                         arguments = {"target": "c:apache"}
                         payload = {"status": "observed", "target": "c:apache"}
                     else:
-                        name = "mcp__rule_a__propose_rule_edit"
+                        name = "mcp__rule_write_a__propose_rule_edit"
                         arguments = {"target": "a:modsecurity-custom"}
                         payload = {"proposal_id": "e" * 32, "status": "pending", **arguments}
                     trace.accept({"type": "tool_use", "name": name, "input": arguments})
@@ -316,9 +327,9 @@ class BootstrapTests(unittest.TestCase):
              "protected_ips": profile()["protected_ips"], "admin_protected_cidrs": [], "interface": "auto", "ssh_port": 22}
         key = "ssh-ed25519 " + base64.b64encode(b"\0\0\0\x0bssh-ed25519\0\0\0\x20" + b"x" * 32).decode()
         obj = dict(s, schema=1, agent_id="007", rule_token="a" * 64, response_token="b" * 64,
-                   public_key=key, siem_host_key=key, hermes_uid=991, hermes_gid=992)
+                   public_key=key, readonly_public_key="ssh-ed25519 " + base64.b64encode(b"\0\0\0\x0bssh-ed25519\0\0\0\x20" + b"y" * 32).decode(), siem_host_key=key, hermes_uid=991, hermes_gid=992)
         self.assertEqual(install.validate_stream(obj, s), obj)
-        for fields in ({"response_token": "a" * 64}, {"admin_protected_cidrs": ["1.0.0.0/8"]}, {"agent_id": "000"}):
+        for fields in ({"readonly_public_key": key}, {"response_token": "a" * 64}, {"admin_protected_cidrs": ["1.0.0.0/8"]}, {"agent_id": "000"}):
             with self.assertRaises(runtime.Refused):
                 install.validate_stream(dict(obj, **fields), s)
 

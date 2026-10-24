@@ -1,3 +1,4 @@
+# 2026-10-24 현행: 조회는 rule-a/b(ruleview), 변경 제안은 rule-write-a/b(rulechg) 단일 경로. 총8논리 MCP/35도구이며 추가 VM은 없다. 아래 과거 배포 이력은 당시 범위다.
 # Hermes Agent 설정 템플릿 — Groot SOC. 실배치 경로: Groot_B /opt/hermes-data/config.yaml (컨테이너 /opt/data/config.yaml)
 # 실행: 공식 Docker 이미지 nousresearch/hermes-agent(오프라인 반입), 데이터 볼륨 /opt/hermes-data:/opt/data, HERMES_UID/GID=호스트 hermes 사용자.
 # 핵심(A안): Wazuh API·인덱서·FW 자격증명은 여기 없다. MCP 서버는 sshd ForceCommand 경계(mcp@B, resp@A, rulechg@A/B)로만 붙고,
@@ -57,7 +58,7 @@ mcp_servers:
       prompts: false
     trust: full                               # 라이브는 서버측 승인 브로커가 block_ip 승인 강제(2026-09-28 실측)
   # rule-change-mcp:start
-  rule-a:                                     # A의 WAF·Suricata 로컬 룰 전용, 별도 rulechg 계정/키
+  rule-a:                                     # A 고정 파일/작업 조회4종, ruleview 읽기 전용 계정/별도 키
     command: ssh
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-a"]
     env: {HOME: /opt/data/home}
@@ -65,9 +66,25 @@ mcp_servers:
     timeout: 420                            # 2026-10-13 라이브: 후보 검사·분할 검토 게시 허용 시간
     supports_parallel_tool_calls: false
     trust: full                               # 승인 강제는 서버측 브로커·root 실행기
-  rule-b:                                     # B의 Wazuh 로컬 룰 전용, 같은 전용 클라이언트 키
+  rule-b:                                     # B 고정 파일/작업 조회4종, ruleview 읽기 전용 계정/별도 키
     command: ssh
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-b"]
+    env: {HOME: /opt/data/home}
+    connect_timeout: 60
+    timeout: 420
+    supports_parallel_tool_calls: false
+    trust: full
+  rule-write-a:                              # rulechg 변경 제안 전용; 조회 도구 없음
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-write-a"]
+    env: {HOME: /opt/data/home}
+    connect_timeout: 60
+    timeout: 420
+    supports_parallel_tool_calls: false
+    trust: full
+  rule-write-b:                              # rulechg 변경 제안 전용; 조회 도구 없음
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-write-b"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
     timeout: 420
@@ -81,12 +98,12 @@ security:
 # 2026-10-15: 일반 terminal/file/code/delegation 도구를 관리 작업에 노출하지 않는다.
 # 기존 라이브의5개 MCP에 새 읽기전용 system-diagnostics를 추가하는 배포 계약이다.
 # 배포 전후 _get_platform_tools 결과가 아래6개와 정확히 같음을
-# 확인하고 known_builtin_toolsets/known_plugin_toolsets도 해당 설치본 기준으로 저장했다.
+# 당시 확인하고 known_builtin_toolsets/known_plugin_toolsets도 해당 설치본 기준으로 저장했다.
 # 버전 변경 시 기본 도구 자동 추가 여부를 다시 검사한다.
 platform_toolsets:
-  mattermost: [wazuh-ro, security-events, resp, rule-a, rule-b, system-diagnostics]
-  cron: [wazuh-ro, security-events, resp, rule-a, rule-b, system-diagnostics]
-  cli: [wazuh-ro, security-events, resp, rule-a, rule-b, system-diagnostics]
+  mattermost: [wazuh-ro, security-events, resp, rule-a, rule-b, rule-write-a, rule-write-b, system-diagnostics]
+  cron: [wazuh-ro, security-events, resp, rule-a, rule-b, rule-write-a, rule-write-b, system-diagnostics]
+  cli: [wazuh-ro, security-events, resp, rule-a, rule-b, rule-write-a, rule-write-b, system-diagnostics]
 
 # ── 모델(LLM) — DGX Spark Ollama (2026-09-28 최초 연결, 2026-10-13 19:51 .111 전환) ──
 # 두 노드 211.170.162.110 / .111 :11434 (OpenAI 호환 /v1, 인증 없음). 아래는 10/13 19:51:45 KST resolver로 확인한 실배치 값이다.

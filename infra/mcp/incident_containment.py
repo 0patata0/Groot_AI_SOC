@@ -247,12 +247,19 @@ class NftBackend:
     def locked(self):
         # Shared with existing manual agent_block and its expiry reaper. Never
         # invoke agent_block while holding this lock (it would lock recursively).
-        fd = os.open(BLOCK_LOCK, os.O_CREAT | os.O_RDWR | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        readonly = getattr(self.engine, "read_only", False)
+        try:
+            fd = os.open(BLOCK_LOCK, (os.O_RDONLY if readonly else os.O_CREAT | os.O_RDWR) | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        except FileNotFoundError:
+            if not readonly:
+                raise
+            yield
+            return
         try:
             st = os.fstat(fd)
             if not stat.S_ISREG(st.st_mode) or st.st_uid != os.geteuid() or st.st_nlink != 1:
                 raise ContainmentError("unsafe firewall mutation lock")
-            fcntl.flock(fd, fcntl.LOCK_EX)
+            fcntl.flock(fd, fcntl.LOCK_SH if readonly else fcntl.LOCK_EX)
             yield
         finally:
             fcntl.flock(fd, fcntl.LOCK_UN)
@@ -374,7 +381,8 @@ class ContainmentService:
         self.backend = backend or NftBackend(engine)
         self.evidence = evidence or read_evidence
         if engine.host == "a":
-            self.directory.mkdir(mode=0o700, parents=False, exist_ok=True)
+            if not getattr(engine, "read_only", False):
+                self.directory.mkdir(mode=0o700, parents=False, exist_ok=True)
             st = os.lstat(self.directory)
             if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.geteuid() or stat.S_IMODE(st.st_mode) != 0o700:
                 raise ContainmentError("containment state directory must be owned by executor, mode 0700")

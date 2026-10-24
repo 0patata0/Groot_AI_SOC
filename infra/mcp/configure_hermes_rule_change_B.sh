@@ -1,7 +1,7 @@
 #!/bin/bash
 # Run on Groot_B only AFTER both A/B rule-change servers and broker pass tests.
 # --prepare-key creates only the dedicated client key and prints its public key.
-# --check is read-only. Default apply registers two MCP entries and the managed
+# --check is read-only. Default apply registers four role-specific MCP entries and the managed
 # SOUL policy, with rollback of Hermes files on any failed contract/parse check.
 set -euo pipefail
 umask 077
@@ -11,6 +11,7 @@ MODE=${1:---apply}
 DATA=/opt/hermes-data
 SSH_DIR=$DATA/home/.ssh
 KEY=$SSH_DIR/rule_change_ed25519
+READKEY=$SSH_DIR/rule_readonly_ed25519
 SSH_CFG=$SSH_DIR/config
 YAML=$DATA/config.yaml
 SOUL=$DATA/SOUL.md
@@ -40,9 +41,15 @@ assert s.index('<!-- rule-change-policy:start -->')<s.index('<!-- rule-change-po
 PY
 
 if [[ $MODE == --prepare-key ]]; then
+  [[ ! -e $READKEY && ! -e $READKEY.pub ]] || die 'read-only key already exists; do not rotate implicitly'
   [[ ! -e $KEY && ! -e $KEY.pub ]] || die 'key already exists; do not rotate implicitly'
   ssh-keygen -q -t ed25519 -N '' -C 'hermes-rule-change@groot-siem' -f "$KEY"
   chown hermes:hermes "$KEY" "$KEY.pub"; chmod 0600 "$KEY"; chmod 0644 "$KEY.pub"
+  [[ ! -e $READKEY && ! -e $READKEY.pub ]] || die 'read-only key already exists'
+  ssh-keygen -q -t ed25519 -N '' -C 'hermes-rule-readonly@groot-siem' -f "$READKEY"
+  chown hermes:hermes "$READKEY" "$READKEY.pub"; chmod 0600 "$READKEY"; chmod 0644 "$READKEY.pub"
+  echo 'Dedicated read-only public key (register as RULE_READONLY_PUBKEY):'
+  cat "$READKEY.pub"
   echo 'Dedicated rule-change public key (register on both A and B with deploy scripts):'
   cat "$KEY.pub"
   exit 0
@@ -50,7 +57,10 @@ fi
 [[ -f $KEY && ! -L $KEY && -f $KEY.pub && ! -L $KEY.pub ]] || die 'dedicated key absent; run --prepare-key first'
 [[ $(stat -c %a "$KEY") == 600 ]] || die 'private key mode must be 0600'
 [[ $(stat -c %u "$KEY") == $(id -u hermes) ]] || die 'private key owner mismatch'
+[[ -f $READKEY && ! -L $READKEY && $(stat -c %a "$READKEY") == 600 && $(stat -c %u "$READKEY") == $(id -u hermes) ]] || die 'separate read-only key missing/unsafe'
 ACTUAL=$(ssh-keygen -y -f "$KEY") || die 'private key invalid'
+READ_ACTUAL=$(ssh-keygen -y -f "$READKEY") || die 'read-only private key invalid'
+[[ $(awk '{print $1,$2}' <<<"$READ_ACTUAL") != $(awk '{print $1,$2}' <<<"$ACTUAL") ]] || die 'read and write keys must differ'
 [[ $(awk '{print $1,$2}' <<<"$ACTUAL") == $(awk '{print $1,$2}' "$KEY.pub") ]] || die 'public/private key mismatch'
 [[ $(id -nG hermes) != *mcp* && $(id -nG hermes) != *rulechg* && $(id -nG hermes) != *docker* ]] || die 'hermes OS user has a privileged server group'
 docker inspect hermes --format '{{.State.Running}}' | grep -qx true || die 'Hermes container not running'
@@ -67,11 +77,12 @@ assert yaml.count('  # rule-change-mcp:start')==yaml.count('  # rule-change-mcp:
 assert soul.count('<!-- rule-change-policy:start -->')==soul.count('<!-- rule-change-policy:end -->')==1
 ssh_block=ssh[ssh.index('# rule-change-hosts:start'):ssh.index('# rule-change-hosts:end')]
 yaml_block=yaml[yaml.index('  # rule-change-mcp:start'):yaml.index('  # rule-change-mcp:end')]
-assert 'Host rule-a\n    HostName 10.200.10.1\n    User rulechg' in ssh_block
-assert 'Host rule-b\n    HostName 10.200.10.10\n    User rulechg' in ssh_block
+assert 'Host rule-a\n    HostName 10.200.10.1\n    User ruleview' in ssh_block
+assert 'Host rule-b\n    HostName 10.200.10.10\n    User ruleview' in ssh_block
 assert ssh_block.count('IdentityFile /opt/data/home/.ssh/rule_change_ed25519')==2
+assert ssh_block.count('IdentityFile /opt/data/home/.ssh/rule_readonly_ed25519')==2
 assert '  rule-a:\n    command: ssh' in yaml_block and '  rule-b:\n    command: ssh' in yaml_block
-assert yaml_block.count('    trust: full')==2
+assert yaml_block.count('    trust: full')==4
 start='<!-- rule-change-policy:start -->'; end='<!-- rule-change-policy:end -->'
 extract=lambda s:s[s.index(start):s.index(end)+len(end)]
 assert extract(soul)==extract(source)
@@ -130,6 +141,15 @@ ssh=ssh_path.read_text()
 ssh,block=managed(ssh,'# rule-change-hosts:start','# rule-change-hosts:end', '''# rule-change-hosts:start
 Host rule-a
     HostName 10.200.10.1
+    User ruleview
+    IdentityFile /opt/data/home/.ssh/rule_readonly_ed25519
+    IdentitiesOnly yes
+    BatchMode yes
+    UserKnownHostsFile /opt/data/home/.ssh/known_hosts
+    StrictHostKeyChecking yes
+    ServerAliveInterval 30
+Host rule-write-a
+    HostName 10.200.10.1
     User rulechg
     IdentityFile /opt/data/home/.ssh/rule_change_ed25519
     IdentitiesOnly yes
@@ -139,6 +159,15 @@ Host rule-a
     ServerAliveInterval 30
 Host rule-b
     HostName 10.200.10.10
+    User ruleview
+    IdentityFile /opt/data/home/.ssh/rule_readonly_ed25519
+    IdentitiesOnly yes
+    BatchMode yes
+    UserKnownHostsFile /opt/data/home/.ssh/known_hosts
+    StrictHostKeyChecking yes
+    ServerAliveInterval 30
+Host rule-write-b
+    HostName 10.200.10.10
     User rulechg
     IdentityFile /opt/data/home/.ssh/rule_change_ed25519
     IdentitiesOnly yes
@@ -147,7 +176,7 @@ Host rule-b
     StrictHostKeyChecking yes
     ServerAliveInterval 30
 # rule-change-hosts:end''')
-if re.search(r'(?m)^Host\s+rule-[ab]\s*$',ssh): raise ValueError('unmanaged rule SSH host alias exists')
+if re.search(r'(?m)^Host\s+rule-(?:write-)?[ab]\s*$',ssh): raise ValueError('unmanaged rule SSH host alias exists')
 replace(ssh_path,ssh.rstrip()+'\n\n'+block+'\n')
 yaml=yaml_path.read_text()
 yaml,block=managed(yaml,'  # rule-change-mcp:start','  # rule-change-mcp:end', '''  # rule-change-mcp:start
@@ -156,7 +185,7 @@ yaml,block=managed(yaml,'  # rule-change-mcp:start','  # rule-change-mcp:end', '
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-a"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 240
+    timeout: 420
     supports_parallel_tool_calls: false
     trust: full
   rule-b:
@@ -164,11 +193,27 @@ yaml,block=managed(yaml,'  # rule-change-mcp:start','  # rule-change-mcp:end', '
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-b"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 240
+    timeout: 420
+    supports_parallel_tool_calls: false
+    trust: full
+  rule-write-a:
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-write-a"]
+    env: {HOME: /opt/data/home}
+    connect_timeout: 60
+    timeout: 420
+    supports_parallel_tool_calls: false
+    trust: full
+  rule-write-b:
+    command: ssh
+    args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-write-b"]
+    env: {HOME: /opt/data/home}
+    connect_timeout: 60
+    timeout: 420
     supports_parallel_tool_calls: false
     trust: full
   # rule-change-mcp:end''')
-if re.search(r'(?m)^  rule-[ab]:\s*$',yaml): raise ValueError('unmanaged rule MCP entry exists')
+if re.search(r'(?m)^  rule-(?:write-)?[ab]:\s*$',yaml): raise ValueError('unmanaged rule MCP entry exists')
 matches=list(re.finditer(r'(?m)^mcp_servers:\s*$',yaml))
 if len(matches)!=1: raise ValueError('expected exactly one mcp_servers mapping')
 at=matches[0].end()
@@ -196,9 +241,9 @@ messages=[
 proc=subprocess.run(['ssh','-T','-F','/opt/data/home/.ssh/config',alias],input='\n'.join(map(json.dumps,messages))+'\n',text=True,capture_output=True,timeout=90)
 assert proc.returncode==0
 responses={row['id']:row for row in (json.loads(line) for line in proc.stdout.splitlines()) if 'id' in row}
-assert responses[1]['result']['serverInfo']['name']=='capstone-rule-change-mcp'
+assert responses[1]['result']['serverInfo']['name']=='capstone-rule-read-mcp'
 names={tool['name'] for tool in responses[2]['result']['tools']}
-assert names=={'get_rule_change_target','propose_rule_change','get_rule_change_status'}
+assert names=={'get_rule_change_target','get_rule_change_status','get_service_action_target','get_operation_status'}
 assert not responses[3]['result'].get('isError')
 PY
 done

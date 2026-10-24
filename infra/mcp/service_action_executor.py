@@ -246,7 +246,8 @@ class ServiceActionService:
         self.error = self.helper.RuleChangeError
         self.backend = backend or ServiceBackend(engine)
         self.state_dir = engine.state_dir / "services"
-        self.state_dir.mkdir(mode=0o700, exist_ok=True)
+        if not getattr(engine, "read_only", False):
+            self.state_dir.mkdir(mode=0o700, exist_ok=True)
         st = self.state_dir.lstat()
         if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.geteuid() or stat.S_IMODE(st.st_mode) != 0o700:
             raise self.error("service state directory must be owned by executor and mode 0700")

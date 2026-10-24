@@ -450,8 +450,8 @@ class CallEvidenceTests(unittest.TestCase):
                 self.assertIsNone(render([{"role": "assistant", "tool_calls": calls}]))
 
     def test_unknown_or_protected_write_tool_keeps_original_model_path(self):
-        for name in ("mcp__unknown__get_status", "mcp__rule_a__propose_rule_edit",
-                     "mcp__rule_a__temporarily_contain_ip", "get_rule_change_target"):
+        for name in ("mcp__unknown__get_status", "mcp__rule_write_a__propose_rule_edit",
+                     "mcp__rule_write_a__temporarily_contain_ip", "get_rule_change_target"):
             with self.subTest(name=name):
                 rows = all_exchanges()
                 rows.append({"role": "assistant", "tool_calls": [call(name=name, call_id="other")]})
@@ -696,7 +696,7 @@ class NativePersistenceBoundaryTests(unittest.TestCase):
         self.assertEqual(h.flushes[-1]["content"], result.final_response)
 
     def test_unknown_or_protected_write_mixed_turn_stays_native(self):
-        for name in ("mcp__unknown__get_status", "mcp__rule_a__propose_rule_edit"):
+        for name in ("mcp__unknown__get_status", "mcp__rule_write_a__propose_rule_edit"):
             with self.subTest(name=name):
                 rows = all_exchanges() + [{"role": "assistant", "tool_calls": [call(name=name, call_id="other")]}]
                 self.harness(rows=rows).assert_passthrough(self)

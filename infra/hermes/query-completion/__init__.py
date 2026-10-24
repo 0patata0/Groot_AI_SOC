@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.5.1"
+VERSION = "groot-query-completion:1.6.0"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0"
+EVIDENCE_SOURCE_SHA256 = "c3611896791c85ebebcdef4570b057ca1907bb1ed9d8fd7e35471759aa615c0f"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -97,6 +97,7 @@ _READ_TOOL_NAMES = frozenset(
     "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts",
     "mcp__resp__list_blocks",
     "mcp__system_diagnostics__get_system_diagnostics",
+    "mcp__system_diagnostics__calculate_time",
     *(f"mcp__wazuh_ro__{name}" for name in (
         "get_wazuh_agent_ports", "get_wazuh_agent_processes", "get_wazuh_agents",
         "get_wazuh_alert_summary", "get_wazuh_cluster_health",
@@ -198,7 +199,7 @@ def _remaining(kw, agent):
     return remaining is None or (type(remaining) in (int, float) and remaining >= 2)
 
 
-def _read_tools(tools, names):
+def _read_tools(tools, names, target_scope=None):
     if not isinstance(tools, list):
         return []
     reads = [tool for tool in tools if isinstance(tool, dict) and tool.get("type") == "function"
@@ -209,6 +210,8 @@ def _read_tools(tools, names):
     scoped = []
     for tool in reads:
         name = tool["function"]["name"]
+        if target_scope is not None and name not in target_scope:
+            continue
         if name in {f"mcp__rule_{host}__{op}" for host in "ab"
                     for op in ("get_rule_change_target", "get_service_action_target")}:
             parameters = tool["function"].get("parameters")
@@ -223,14 +226,23 @@ def _read_tools(tools, names):
                     continue
                 tool = copy.deepcopy(tool)
                 tool["function"]["parameters"]["properties"]["target"]["enum"] = enum
+        if target_scope is not None and target_scope[name] is not None:
+            enum = tool['function'].get('parameters', {}).get('properties', {}).get('target', {}).get('enum')
+            if not isinstance(enum, list):
+                continue
+            enum = [x for x in enum if x in target_scope[name]]
+            if not enum:
+                continue
+            tool = copy.deepcopy(tool)
+            tool['function']['parameters']['properties']['target']['enum'] = enum
         scoped.append(tool)
     return scoped
 
 
-def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, format_only=False, read_only=True, selection_only=False, grounded_lookup=False):
+def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, format_only=False, read_only=True, selection_only=False, grounded_lookup=False, target_scope=None):
     """Narrow the next native chat request only; never add a tool or synthesize a call."""
     original = getattr(agent, "_build_api_kwargs", None)
-    offered = _read_tools(getattr(agent, "tools", None), getattr(agent, "valid_tool_names", ()) or ())
+    offered = _read_tools(getattr(agent, "tools", None), getattr(agent, "valid_tool_names", ()) or (), target_scope)
     if inventory_only:
         offered = [t for t in offered if t["function"]["name"] in {
             "mcp__rule_a__get_rule_change_target", "mcp__rule_b__get_rule_change_target"}]
@@ -266,7 +278,7 @@ def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, f
         # then remove duplicate controls so it cannot restore write schemas.
         narrowed = dict(result)
         if read_only:
-            reads = _read_tools(extra.pop("tools", result.get("tools")), allowed)
+            reads = _read_tools(extra.pop("tools", result.get("tools")), allowed, target_scope)
             if format_only:
                 reads = []  # A verified prior-table reformat performs no new operation.
             extra.pop("tool_choice", None)
@@ -328,7 +340,9 @@ def status_lookup_guidance(request):
             or re.search(r'위험|공격|차단|대응|조치|취약|사고|분석|비교|상세|전문|원문', request)):
         return ''
     return (
-        '이번 질문은 장비의 현재 활성 여부 확인입니다. 우선 서비스 상태 조회로 실제 가동과 '
+        '이번 질문은 장비의 현재 활성 여부 확인입니다. 이 구성에서 IDS/Suricata는 A의 a:suricata이고 '
+        'B의 b:wazuh-manager는 Wazuh 매니저입니다. 서로의 조회로 상태를 대신 확인하지 마세요. '
+        '우선 서비스 상태 조회로 실제 가동과 '
         '현재 룰 경로의 근거를 확인하세요. 룰 내용이나 SID 목록을 요청하지 않았다면 '
         '큰 룰 파일 전문·관련 없는 장비의 전체 목록 조회부터 시작하지 마세요. '
         '추가 조회는 필요한 미확인 항목을 해결할 때 선택하세요. 최종 답변은 결론, '
@@ -336,6 +350,41 @@ def status_lookup_guidance(request):
         '관측하지 않은 TLS 등 일반 원인을 덧붙이지 마세요. 문제를 확인하면 기존 '
         '조사·변경안 준비·정확 승인 절차를 계속하세요.'
     )
+
+
+_TIME_TOOL = 'mcp__system_diagnostics__calculate_time'
+_IDS_SERVICE = 'mcp__rule_a__get_service_action_target'
+TIME_GUIDANCE = (
+    '시각 변환·시간순 정렬·경과시간은 calculate_time 읽기 계산 도구를 사용하세요. '
+    '현재 요청이나 실제 조회의 원본 날짜·시각·offset을 그대로 인자로 옮기고, 비교 기준 시각도 명시하세요. '
+    'kst/chronological_order/differences/minutes_until_reference 계산값을 사용해 한국시간으로 답하세요. '
+    '수집 입력 순서 대신 chronological_order를 복사하세요. differences는 to-from이므로 역방향 질문이면 부호를 반대로 하고, '
+    'since_latest는 마지막 chronological_order 사건의 minutes_until_reference 값을 그대로 사용하세요. '
+    '요청한 계산 결과를 모두 답하고, 사용자가 JSON 형식을 지정한 계산 질문에는 그 형식을 지키세요. '
+    '시각 계산은 서버 상태 조회나 사건 판단의 근거를 새로 만들지 않습니다. 시간대가 없는 원문은 추정하지 마세요.'
+)
+
+
+def time_calculation_request(request):
+    return (isinstance(request, str) and len(request) <= 20000
+            and not live_rule_request(request)
+            and not re.search(r'도구\s*(?:없이|쓰지|사용하지)|도구.{0,8}말', request)
+            and len(EVIDENCE._AWARE_TIME.findall(request)) >= 1
+            and bool(re.search(r'시간|시각|순서|정렬|계산|최신\s*관측|KST|UTC|elapsed|timeline', request, re.I))
+            and not _WRITE.search(re.sub(r'(?:실제\s*)?(?:변경|수정|차단|적용|배포)\s*(?:없이|하지\s*말고|금지)', '', _unquoted_text(request))))
+
+
+def ids_status_scope(request):
+    """An explicit single-device read scope, not a tool call or diagnosis."""
+    if not isinstance(request, str):
+        return None
+    request = _unquoted_text(request)
+    if (not live_rule_request(request) or not status_lookup_guidance(request)
+            or not re.search(r'(?<![A-Za-z])(?:IDS|IPS|Suricata)(?![A-Za-z])|수리카타', request, re.I)
+            or re.search(r'WAF|ModSecurity|Wazuh|와주|HIDS|NIDS|장비별|모든|전체|말고|제외|아닌|B서버|Groot[_ ]?B', request, re.I)
+            or re.search(r'룰|규칙|SID|비교', request, re.I)):
+        return None
+    return {_IDS_SERVICE: {'a:suricata'}}
 
 
 def inventory_request_for_turn(request, messages, idx):
@@ -400,8 +449,9 @@ def make_request_wrapper(original, reanchor):
         user, messages, turn = kw.get("original_user_message"), kw.get("messages"), kw.get("turn_id")
         platform = getattr(agent, "platform", "")
         request = current_request_text(user)
+        time_request = time_calculation_request(request)
         if (str(getattr(platform, "value", platform)).lower() != "mattermost"
-                or not live_rule_request(request) or not isinstance(turn, str) or not turn
+                or not (live_rule_request(request) or time_request) or not isinstance(turn, str) or not turn
                 or turn != getattr(agent, "_current_turn_id", None)
                 or getattr(agent, "_interrupt_requested", False) or not isinstance(messages, list)):
             return original(agent, **kw)
@@ -422,25 +472,36 @@ def make_request_wrapper(original, reanchor):
             if has_calls and not render_rule_inventory(inventory_request, messages[idx + 1:], missing_targets=True):
                 local_text = render_rule_inventory(inventory_request, messages[idx + 1:])
         facts, errors, linked = current_evidence(messages[idx + 1:])
-        grounded_lookup = bool(linked and facts and not errors and
+        scope = ids_status_scope(request)
+        if scope and linked and not any(f.get('kind') in ('service','runtime') and f.get('target') == 'a:suricata' for f in facts):
+            has_calls = False
+        if time_request:
+            has_calls = any(f.get('kind') == 'time_calculation' for f in facts)
+            scope = {_TIME_TOOL: None} if not has_calls else None
+        # A missing deployed schema is never fabricated. The final evidence check
+        # reports the missing scope instead of treating another service as IDS.
+        if scope and not _read_tools(getattr(agent, 'tools', None), getattr(agent, 'valid_tool_names', ()), scope):
+            scope = None
+        grounded_lookup = bool(time_request and has_calls or linked and facts and not errors and
             any(f.get('kind') == 'runtime' for f in facts) and
             not re.search(r'위험|공격|차단|대응|조치|취약|사고|분석', request))
         if not callable(pending) and not _arm_read_request(agent, turn, require_read=not has_calls and not prior_table,
                 inventory_only=inventory_only, format_only=bool(local_text),
-                read_only=inventory_only or not has_calls, selection_only=not has_calls, grounded_lookup=grounded_lookup):
+                read_only=inventory_only or not has_calls, selection_only=not has_calls, grounded_lookup=grounded_lookup,
+                target_scope=scope if not has_calls else None):
             return original(agent, **kw)
         if isinstance(kw.get("api_messages"), list):
             kw = {**kw, "api_messages": compact_read_history(kw["api_messages"], user)}
         facts, errors, linked = current_evidence(messages[idx + 1:])
         if not inventory_only and linked and (facts or errors) and isinstance(kw.get("api_messages"), list):
             kw = {**kw, "api_messages": [*kw["api_messages"], {"role": "user", "content":
-                evidence_guidance(facts, errors) + status_lookup_guidance(request)}]}
+                evidence_guidance(facts, errors) + (TIME_GUIDANCE if time_request else status_lookup_guidance(request))}]}
         if local_text:
             agent._capstone_query_completion_local_format = (turn, local_text)
         if not has_calls and isinstance(kw.get("api_messages"), list):
             guidance = ('이번 요청은 직전의 실제 조회 결과를 표로 재정리하는 형식 요청입니다. '
                         '새 조회·변경 없이 앞선 조회 기준임을 밝히고 간결하게 답하세요.'
-                        if prior_table else LIVE_QUERY_GUIDANCE + status_lookup_guidance(request))
+                        if prior_table else TIME_GUIDANCE if time_request else LIVE_QUERY_GUIDANCE + status_lookup_guidance(request))
             kw = {**kw, "api_messages": [*kw["api_messages"], {"role": "user", "content": guidance}]}
         try:
             return original(agent, **kw)
@@ -898,7 +959,8 @@ def make_wrapper(original, native, append_message, reanchor):
                 or getattr(agent, "_stall_guards", True) is False
                 or kw.get("_pending_verification_response") is not None
                 or not isinstance(turn, str) or not turn
-                or not request or not (_READ.search(request) or live_rule_request(request)) or _WRITE.search(request)
+                or not request or not (_READ.search(request) or live_rule_request(request) or time_calculation_request(request))
+                or _WRITE.search(request) and not time_calculation_request(request)
                 or not isinstance(messages, list) or getattr(message, "tool_calls", None)):
             return finish(agent, **kw)
         idx = reanchor(messages, user)
@@ -909,7 +971,18 @@ def make_wrapper(original, native, append_message, reanchor):
         facts, errors, linked = current_evidence(messages[idx + 1:])
         text = getattr(message, 'content', None)
         issues = EVIDENCE.evidence_claim_violations(text, facts) if linked else []
-        if linked and (issues or errors):
+        if time_calculation_request(request):
+            issues.extend(EVIDENCE.calculated_json_violations(text, facts))
+        missing_ids = bool(ids_status_scope(request) and linked and not any(
+            f.get('kind') in ('service','runtime') and f.get('target') == 'a:suricata' for f in facts))
+        if missing_ids:
+            issues.append('requested_target_unobserved:a:suricata')
+        missing_time = time_calculation_request(request) and not any(f.get('kind') == 'time_calculation' for f in facts)
+        if missing_time:
+            issues.append('time_calculation_not_performed')
+        elif time_calculation_request(request) and (not isinstance(text,str) or not re.search(r'\d',text)):
+            issues.append('calculation_result_omitted')
+        if issues or errors:
             retried_evidence = getattr(agent, '_capstone_evidence_turn', None) == turn
             counter = kw.get('codex_ack_continuations')
             known = int(getattr(agent, '_capstone_query_completion_turn', None) == turn)
@@ -921,7 +994,8 @@ def make_wrapper(original, native, append_message, reanchor):
                 agent._clear_status_buffer()
                 append_message(messages, agent._build_assistant_message(message, 'incomplete'))
                 append_message(messages, {'role': 'user', 'content':
-                    '최종 답변 근거 검사: ' + ', '.join(issues) + '\n' + evidence_guidance(facts, errors)})
+                    '최종 답변 근거 검사: ' + ', '.join(issues) + '\n' + evidence_guidance(facts, errors) +
+                    (TIME_GUIDANCE if time_calculation_request(request) else status_lookup_guidance(request))})
                 agent._session_messages = messages
                 names = ('active_system_prompt', '_turn_exit_reason', '_preflight_compression_blocked',
                          'truncated_response_parts', 'length_continue_retries',
@@ -932,6 +1006,11 @@ def make_wrapper(original, native, append_message, reanchor):
                         '현재 SID별 적재와 사건 원인은 미확인입니다.\n' + EVIDENCE.literal_evidence_summary(facts))
             if errors:
                 fallback += '\n일부 진단 인자가 거절되어 해당 범위는 확인하지 못했습니다.'
+            if missing_ids:
+                fallback = '요청한 IDS(a:suricata)의 실제 조회 근거가 없어 활성 여부는 미확인입니다. 다른 장비의 상태로 대신 판단하지 않았습니다.\n' + fallback
+            if time_calculation_request(request):
+                fallback = ('시간 계산 근거와 최종 설명을 확인하지 못해 모델의 계산값은 확정하지 않았습니다.\n'
+                            + EVIDENCE.literal_evidence_summary(facts))
             return finish(agent, **_with_final_text(kw, fallback))
         inventory_request = inventory_request_for_turn(request, messages, idx)
         prior_table = render_prior_inventory(request, messages, idx)

@@ -24,6 +24,87 @@ _library = None
 _queries = deque()
 _audits = deque()
 
+TIME_TOOL = {
+    'name': 'calculate_time',
+    'description': 'Calculate KST conversion, chronological order and signed elapsed seconds/minutes from explicit timestamps. '
+        'Use this for time arithmetic instead of mental conversion. Copy source timestamps exactly, including their offset; '
+        'never relabel UTC as KST. Labels identify supplied events, not their health/state. '
+        'reference is an explicit timestamp or "now" for this server clock. Missing offsets are refused. '
+        'This is pure calculation, not a live SOC observation, incident judgement, permission or approval.',
+    'inputSchema': {'type': 'object', 'additionalProperties': False, 'required': ['timestamps'],
+        'properties': {'timestamps': {'type': 'array', 'minItems': 1, 'maxItems': 8,
+            'items': {'type': 'object', 'additionalProperties': False, 'required': ['id', 'value'],
+                'properties': {'id': {'type': 'string', 'pattern': '^[A-Za-z0-9_.:-]{1,32}$'},
+                               'value': {'type': 'string', 'maxLength': 48,
+                                         'description': 'Full ISO date and time with seconds and Z or UTC offset; up to 9 fractional digits.'}}}},
+            'reference': {'type': 'string', 'maxLength': 48}}},
+    'annotations': {'title': 'Calculate KST times and durations', 'readOnlyHint': True,
+        'destructiveHint': False, 'idempotentHint': False},
+}
+
+
+def time_instant(value):
+    """Exact nanosecond arithmetic, including pre-epoch and offset date boundaries."""
+    d = library()
+    match = re.fullmatch(r'(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2})(?:\.(\d{1,9}))?(Z|[+-]\d{2}:\d{2}| UTC| KST)', value) if isinstance(value, str) else None
+    d.need(match is not None and len(value) <= 48, 'invalid_timestamp_offset_required')
+    if match[3].startswith(('+','-')):
+        d.need(match[3] != '-00:00' and int(match[3][1:3]) <= 23 and int(match[3][4:6]) <= 59, 'invalid_timestamp_offset')
+    fraction = (match[2] or '').ljust(9, '0')
+    offset = {'Z': '+00:00', ' UTC': '+00:00', ' KST': '+09:00'}.get(match[3], match[3])
+    try:
+        base = datetime.fromisoformat(match[1] + offset)
+        delta = base.astimezone(timezone.utc) - datetime(1970, 1, 1, tzinfo=timezone.utc)
+        kst = base.astimezone(timezone(timedelta(hours=9))).isoformat(timespec='seconds')
+    except (ValueError, OverflowError):
+        raise d.DiagnosticError('invalid_timestamp') from None
+    ns = (delta.days * 86400 + delta.seconds) * 1000000000 + int(fraction)
+    suffix = fraction.rstrip('0')
+    return ns, kst[:-6] + ('.' + suffix if suffix else '') + '+09:00'
+
+
+def calculate_time(value):
+    d = library()
+    d.need(isinstance(value, dict) and {'timestamps'} <= set(value) <= {'timestamps', 'reference'}, 'invalid_arguments')
+    supplied = value['timestamps']
+    d.need(isinstance(supplied, list) and 1 <= len(supplied) <= 8, 'invalid_timestamp_count')
+    rows, instants = [], {}
+    for entry in supplied:
+        d.need(isinstance(entry, dict) and set(entry) == {'id', 'value'}, 'invalid_arguments')
+        label = entry['id']
+        d.need(isinstance(label, str) and re.fullmatch(r'[A-Za-z0-9_.:-]{1,32}', label) and label not in instants, 'invalid_timestamp_id')
+        ns, kst = time_instant(entry['value'])
+        instants[label] = ns
+        rows.append({'id': label, 'source_timestamp': entry['value'], 'kst': kst})
+    reference = value.get('reference')
+    ref_ns, ref_kst = None, None
+    if 'reference' in value:
+        if reference == 'now':
+            reference = datetime.now(timezone(timedelta(hours=9))).isoformat()
+        ref_ns, ref_kst = time_instant(reference)
+    differences = []
+    for i, row in enumerate(rows):
+        if ref_ns is not None:
+            delta = ref_ns - instants[row['id']]
+            row.update(seconds_until_reference=delta / 1000000000, minutes_until_reference=delta / 60000000000)
+        for other in rows[i + 1:]:
+            delta = instants[other['id']] - instants[row['id']]
+            differences.append({'from': row['id'], 'to': other['id'], 'nanoseconds': delta,
+                                'seconds': delta / 1000000000, 'minutes': delta / 60000000000})
+    ordered = sorted(instants, key=instants.get)  # Equal instants keep input order; explicitly group ties.
+    groups = []
+    for label in ordered:
+        if groups and instants[groups[-1][0]] == instants[label]:
+            groups[-1].append(label)
+        else:
+            groups.append([label])
+    answer = {'schema': 1, 'kind': 'time_calculation', 'timezone': 'Asia/Seoul', 'timestamps': rows,
+              'chronological_order': ordered, 'simultaneous_groups': groups, 'differences': differences,
+              'reference_kst': ref_kst, 'source_scope': 'supplied_timestamps_only',
+              'live_observation': False, 'mutation_performed': False}
+    d.need(len(d.encode(answer)) <= MAX_RESULT, 'result_bound')
+    return answer
+
 
 def library():
     global _library
@@ -60,7 +141,7 @@ def tools():
                           'description': 'Returned error sample cap: integer 1..50; values above 50 are refused. Not minutes.'}}},
         'annotations': {'title': 'Read fixed system diagnostics', 'readOnlyHint': True,
             'destructiveHint': False, 'idempotentHint': True},
-    }]
+    }, TIME_TOOL]
 
 
 def arguments(value):
@@ -187,7 +268,7 @@ def result(value, error=False):
 def call_arguments(params):
     d = library()
     d.need(isinstance(params, dict) and {'name', 'arguments'} <= set(params)
-           <= {'name', 'arguments', '_meta'} and params['name'] == 'get_system_diagnostics',
+           <= {'name', 'arguments', '_meta'} and params['name'] in {'get_system_diagnostics', 'calculate_time'},
            'unknown_tool')
     # The installed SDK emits an empty standard _meta object even without a
     # progress callback. Metadata never reaches the query or its audit/result.
@@ -214,7 +295,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.0.0'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.1.0'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':
@@ -222,7 +303,8 @@ def handle(message):
     elif method == 'tools/call':
         params = message.get('params')
         try:
-            value = result(query(call_arguments(params)))
+            args = call_arguments(params)
+            value = result(calculate_time(args) if params['name'] == 'calculate_time' else query(args))
         except (ValueError, OSError, KeyError, TypeError) as exc:
             audit('unavailable')
             reason = str(exc) if isinstance(exc, library().DiagnosticError) and (re.fullmatch(r'[a-z_]{1,64}', str(exc)) or

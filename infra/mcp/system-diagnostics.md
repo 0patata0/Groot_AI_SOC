@@ -1,11 +1,19 @@
 # 고정 읽기 전용 시스템 진단
 
+## 2026-10-25 현재 도구: 진단 + 순수 시간 계산
+
+기존 `get_system_diagnostics`와 새 `calculate_time` 두 도구를 같은 읽기 MCP에서 제공한다. 별도 서버·계정·포트·패키지가 없고 전체 구성은8논리 MCP/36도구다.
+
+`calculate_time({"timestamps":[{"id":"A","value":"2026-10-24T15:55:11Z"}],"reference":"2026-10-25T01:05:11+09:00"})`는 A의 `kst=2026-10-25T00:55:11+09:00`, `minutes_until_reference=10`을 반환한다. 최대8개, ID는 ASCII 영숫자/`_.:-` 1~32자, 날짜·초·명시적 offset이 필요하다. UTC/KST 접미도 지원하고 날짜 경계·최대9자리 소수초를 계산한다. 시간대 누락·알 수 없는 `-00:00`·잘못된 offset은 거절한다. `reference="now"`는 서버 현재 시각을 쓴다.
+
+결과는 `chronological_order`, 동일 시각 그룹, 각 시각의 KST/기준까지 경과값, 입력 쌍의 `differences`를 포함한다. 차이는 **to − from**이며 역방향이면 부호가 바뀐다. 원본 입력 순서는 시간순과 다를 수 있다. `live_observation=false`, `mutation_performed=false`이고 호스트 명령·스냅샷 조회·네트워크를 실행하지 않는다. 계산은 상태 정상/사건 원인/승인 판단을 대신하지 않는다. 초기 설치 검증도 실제 SDK에서 두 도구와 KST 날짜 경계·10분 계산을 확인한다.
+
 
 > 2026-10-24 보완: `lookback_minutes`(1..240)·`limit`(1..50) 범위 거절은 일반 `diagnostics_unavailable`로 감추지 않고 고정된 범위 설명을 반환한다. 임의 내부 예외는 계속 감춘다. 조회 창·관측 시각은 KST를 사용하고, 모델은 실패한 호출을 관측으로 취급하지 않은 채 실제 스키마로 정정한다. 최신 적용/검증은 [STATUS](../../STATUS.md)를 따른다.
 
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
-> 현재 구성은 MCP6서버와 고정 진단25대상이다. 자연어 도구 선택·무근거 완료/SILENT 알림 보완의 실제 검증 상태는 STATUS 최상단을 따른다. 정확 후보 승인과 일반 sudo/Docker/임의 shell 금지는 유지한다.
+> 현재 구성은8논리 MCP/36도구와 고정 진단25대상이다. 자연어 도구 선택·무근거 완료/SILENT 알림 보완의 실제 검증 상태는 STATUS 최상단을 따른다. 정확 후보 승인과 일반 sudo/Docker/임의 shell 금지는 유지한다.
 > 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
 <!-- /current-project-context -->
 
@@ -31,7 +39,7 @@ B의 진단 router는 원래 `observed_at` epoch를 유지하면서 `observed_at
 
 2026-10-23 A/B/C 운영 반영과 실제 Hermes UID995 SDK 검증을 완료했다. 기존5개 MCP의 도구를 보존하고 여섯 번째 서버의 읽기 도구1개를 등록했으며, 관리/검증 모드의 읽기 허용과 임의 인자·쓰기 도구 거부를 확인했다. [원본 v3 성공과 v4 후속 증거](system-diagnostics-validation-20261023.json)를 구분해 남겼다. 모델의 자연어 사용과 새 서버 전체 설치는 수행하지 않았다. 기존 승인형 서비스 작업이나 LLM의 일반 sudo/Docker/SSH 금지 정책은 바꾸지 않는다.
 
-`system-diagnostics` MCP의 유일한 도구는 `get_system_diagnostics(target, lookback_minutes=15, limit=20)`다. `target`은 아래25개 중 하나, 기간은1~240분, 반환 오류는1~50개다. shell·임의 unit/host/path/command·journal 옵션·환경 변수 입력을 받지 않는다. `manage`와 `verify` 양쪽에서 읽기는 가능하지만 이 결과가 승인된 룰/서비스 대상의 별도 재조회·효과 검증을 대신하지 않는다.
+2026-10-23 최초 구축 당시 `system-diagnostics` MCP의 유일한 도구는 `get_system_diagnostics(target, lookback_minutes=15, limit=20)`다. `target`은 아래25개 중 하나, 기간은1~240분, 반환 오류는1~50개다. shell·임의 unit/host/path/command·journal 옵션·환경 변수 입력을 받지 않는다. `manage`와 `verify` 양쪽에서 읽기는 가능하지만 이 결과가 승인된 룰/서비스 대상의 별도 재조회·효과 검증을 대신하지 않는다.
 
 MCP SDK 2.0.0이 기본 전송하는 빈 `_meta`와 제한된 표준 `progressToken`은 허용하되 조회·감사·결과에 전달하지 않는다. 다른 호출 필드나 메타데이터, 조회 인자의 추가 키는 거절한다. SDK wire 재현과 실제 SSH 도구 호출은 순수 함수 회귀와 구분해 검증한다.
 

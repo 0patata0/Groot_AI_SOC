@@ -385,11 +385,15 @@ async def main():
    async with ClientSession(read,write) as session:
     await session.initialize()
     response=await session.list_tools()
-    assert response.next_cursor is None and {x.name for x in response.tools}=={'get_system_diagnostics'}
+    assert response.next_cursor is None and {x.name for x in response.tools}=={'get_system_diagnostics','calculate_time'}
     result=await session.call_tool('get_system_diagnostics',{'target':'b:soc-bot','lookback_minutes':15,'limit':1})
-    assert not result.isError and len(result.model_dump_json())<=262144
+    assert not getattr(result,'is_error',getattr(result,'isError',True)) and len(result.model_dump_json())<=262144
+    result=await session.call_tool('calculate_time',{'timestamps':[{'id':'A','value':'2026-10-24T15:55:11Z'}],'reference':'2026-10-25T01:05:11+09:00'})
+    value=json.loads(result.content[0].text)
+    assert not getattr(result,'is_error',getattr(result,'isError',True)) and value['timestamps'][0]['kst']=='2026-10-25T00:55:11+09:00'
+    assert value['timestamps'][0]['minutes_until_reference']==10 and value['live_observation'] is False
 asyncio.run(asyncio.wait_for(main(),timeout=45))
-print(json.dumps({'tools':1,'bounded_read':True,'model_requests':0,'chat_messages':0}))
+print(json.dumps({'tools':2,'bounded_read':True,'time_calculation':True,'model_requests':0,'chat_messages':0}))
 """
     common.docker('exec', '--user', str(hermes_uid) + ':' + str(hermes_gid), container['Id'],
                   '/opt/hermes/.venv/bin/python', '-B', '-c', code, timeout=60)

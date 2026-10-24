@@ -12,6 +12,7 @@ import json
 import copy
 import subprocess
 import sys
+from datetime import datetime, timedelta, timezone
 
 PROTOCOL = "2025-06-18"
 SUPPORTED = {"2024-11-05", "2025-03-26", PROTOCOL}
@@ -90,7 +91,7 @@ SERVICE_TARGETS = ["a:waf", "a:suricata", "a:chatproxy", "b:wazuh-manager", "b:w
 TOOLS.extend([
     {
         "name": "get_service_action_target",
-        "description": "Read the current state and allowed restart/reload actions of one fixed service. Package installation and container creation/configuration are unsupported.",
+        "description": "Read the current state and allowed restart/reload actions of one fixed service. IDS/Suricata is a:suricata on A; b:wazuh-manager is Wazuh on B, not the IDS engine. Use time_display KST and elapsed values directly; original observation stays unchanged for its approval hash. Package installation and container creation/configuration are unsupported.",
         "inputSchema": {"type": "object", "additionalProperties": False,
                         "properties": {"target": {"type": "string", "enum": SERVICE_TARGETS}}, "required": ["target"]},
         "annotations": {"title": "Read allowed service", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
@@ -167,7 +168,44 @@ def _call_helper(payload, readonly=False):
         return _result({"error": "invalid helper response"}, True)
     if proc.returncode and not (isinstance(data, dict) and isinstance(data.get("error"), str)):
         return _result({"error": "rule-change helper rejected the request"}, True)
+    if readonly and payload.get('operation') in {'get','service-get'} and not data.get('error'):
+        data = with_time_display(data)
     return _result(data, bool(data.get("error")))
+
+
+def with_time_display(data, now=None):
+    """Add a stored KST view; never edit the hashed observation or source file."""
+    kst = timezone(timedelta(hours=9))
+    now = now or datetime.now(kst)
+    if now.tzinfo is None:
+        raise ValueError('aware reference required')
+    display = {'timezone':'Asia/Seoul', 'rendered_at_kst':now.astimezone(kst).isoformat(), 'values':[]}
+    for parent in ('observation','runtime','rule_source_evidence'):
+        source = data.get(parent)
+        if not isinstance(source, dict):
+            continue
+        for field in ('started_at','observed_at','last_reload'):
+            value = source.get(field)
+            try:
+                if type(value) in (int,float):
+                    instant = datetime.fromtimestamp(value, timezone.utc)
+                elif isinstance(value,str):
+                    instant = datetime.fromisoformat(value.replace('Z','+00:00'))
+                else:
+                    continue
+                if instant.tzinfo is None:
+                    continue
+                elapsed = round((now-instant).total_seconds(),6)
+                days, rest = divmod(abs(elapsed),86400)
+                hours, rest = divmod(rest,3600)
+                minutes, seconds = divmod(rest,60)
+                display['values'].append({'source_field':parent+'.'+field,
+                    'kst':instant.astimezone(kst).isoformat(),
+                    'seconds_until_rendered_at':elapsed,
+                    'elapsed_display':('-' if elapsed<0 else '') + f'{int(days)}일 {int(hours)}시간 {int(minutes)}분 {seconds:g}초'})
+            except (ValueError, OverflowError, OSError):
+                continue
+    return {**data, 'time_display':display}
 
 
 def handle(message, access="write", host="a"):
@@ -179,7 +217,7 @@ def handle(message, access="write", host="a"):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if requested in SUPPORTED else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-rule-" + access + "-mcp", "version": "0.4.0"},
+            "serverInfo": {"name": "capstone-rule-" + access + "-mcp", "version": "0.5.0"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None

@@ -1,6 +1,8 @@
 # 초기 설치기의 Hermes 확장
 
-> **2026-10-24 설치 계약:** deploy.sh는 Hermes `timezone: Asia/Seoul`, query-completion 1.5.1의3파일(공용 grounding 포함), 동일 관리 gate·KST 정책·승인 카드·정확한 진단 범위 오류를 반입한다. 현재 조회의 API 문맥 축소와 첫 읽기/간결한 상태 설명 안내를 포함하며 소스 변경은 기존 배포 해시 계약에 반영된다. 추가 패키지 없음. 운영 최소 변경과 새 서버 전체 설치 시험은 구분하며 [STATUS](../STATUS.md)를 따른다.
+> **2026-10-25 설치 동기화:** 루트 `deploy.sh`의 기존 source bundle에 IDS 대상 제한·KST 저장용 플러그인/공용 gate/SOUL과 A/B 룰 MCP의 `time_display`, B 진단 MCP의 `calculate_time`을 포함한다. 진단 설치 probe는 SDK의 `is_error`/`isError` 차이를 처리하고 실제 두 도구·KST 날짜 경계·10분 계산을 검증한다. 추가 deb/wheel/이미지나 오프라인 반입 항목은 없으며 기존 목록을 유지한다. 운영은 별도 최소 교체로 반영했고 새 서버 전체 설치 시험은 미실행이다.
+
+> **2026-10-25 설치 계약:** deploy.sh는 Hermes `timezone: Asia/Seoul`, query-completion 1.6.0의3파일(공용 grounding 포함), 동일 관리 gate·KST 정책·승인 카드·정확한 진단 범위 오류를 반입한다. 현재 조회의 API 문맥 축소와 첫 읽기/간결한 상태 설명 안내를 포함하며 소스 변경은 기존 배포 해시 계약에 반영된다. 추가 패키지 없음. 운영 최소 변경과 새 서버 전체 설치 시험은 구분하며 [STATUS](../STATUS.md)를 따른다.
 
 > **2026-10-24 Memory/읽기 근거 보완:** 초기 deploy.sh가 사용하는 SOUL에 메모보다 현재 관측을 우선하는 원칙을 추가했고 동일 rule/service getter가 현재 명령·결합 파일의 검증 근거를 제공한다. 운영은 root 검토 Memory와 활성 참조만 최소 갱신했으며 신규 서버에 날짜가 고정된 운영 Memory를 심지 않는다. 추가 deb/이미지/포트0,865회귀 통과·새3VM 설치 미실행. 실제 자연어 재질문의 남은 오류/지연은 [STATUS](../STATUS.md)에 구분한다.
 

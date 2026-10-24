@@ -1,10 +1,12 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **2026-10-25 KST 조회 표현:** A/B의 공통 룰 MCP 읽기 응답에 `time_display`(KST·경과값)를 추가했다. 해시 대상 `observation`·원본 내용·승인 SHA는 그대로다. 기존 진단 MCP의 순수 `calculate_time`은 서버 조회/정상 판정 증거와 분리한다. [시간 계산 계약](system-diagnostics.md) · [운영 검증](../../STATUS.md).
+
 > **2026-10-24 KST/진단 후속:** 승인 카드의 시작/만료 시각은 KST로 표시하며 원본 계획·해시는 그대로 유지한다. 진단 범위 오류는 허용 수치를 반환하고 실제mcp계정의 거절/정정 조회를 확인했다. 최신 배포·검증은 [STATUS](../../STATUS.md).
 
 > **2026-10-24 현재 구동 근거 보완:** `get_rule_change_target(a:suricata-local)`의 runtime은 기존 검증을 통과한 rule_source_path(`/rules/all.rules`), 정확 ET+local 결합 여부/SHA·관측 epoch를 반환한다. `get_service_action_target(a:suricata)`도 동일 canonical reader의 rule_source_evidence를 사용하며 승인용 observation/base_state_sha256은 유지한다. 컨테이너 ID 불일치/읽기 실패는 미확인으로 남긴다. per-SID 적재 미검증 플래그는 계속 false다. 새 도구/권한/포트는 없다. [실제 재시험과 남은 오류](../../STATUS.md) · [검증](../hermes/natural-chat-memory-validation-20261024.json).
 
-## 현행 조회·변경 기능 소유 — 2026-10-24
+## 현행 조회·변경 기능 소유 — 2026-10-25
 
 같은 조회는 읽기 전용 경로에서만 제공한다. 실제 파일 읽기/집계 구현은 공통 root helper를 재사용하지만 SSH 계정·개인키·sudo 인자·MCP 목록·실행 허용은 분리한다.
 
@@ -13,10 +15,10 @@
 | rule-a / rule-b | 독립 키의 ruleview. get_rule_change_target, get_rule_change_status, get_service_action_target, get_operation_status만 제공 |
 | rule-write-a / rule-write-b | 기존 rulechg. propose_rule_edit, propose_rule_change, propose_service_action. A만 temporarily_contain_ip 추가 |
 | wazuh-ro | 기존14개 Wazuh API 조회. 전체 룰 요약은 로컬 파일 목록과 다른 범위 |
-| security-events / system-diagnostics | 정제 이벤트2종 / 고정 systemd 진단1종. 승인 상태 SHA를 얻는 실시간 서비스 조회와 구별 |
+| security-events / system-diagnostics | 정제 이벤트2종 / 고정 systemd 진단과 순수 시간 계산2종. 승인 상태 SHA를 얻는 실시간 서비스 조회와 구별 |
 | resp | 기존 list_blocks 및 승인형 block_ip/unblock_ip. 관리 gate는 직접 block/unblock 제외 |
 
-총8논리 MCP/35도구이며 서버 VM을 추가하지 않는다. 기존6개 중 혼합 rule-a/b를 조회/제안 경로로 나눴다. 같은 호스트의 조회/제안 목록은 서로 겹치지 않고 target enum도 자기 장비만 포함한다. B에 미지원 임시 차단을 안내하지 않는다. 조회 요청을 변경 서버로 보내거나 읽기 경로에 제안을 위조하면 거부한다. ruleview sudo는 `rule-change-executor --read-only`만 허용하고 해당 모드는 모든 변경/worker/사건 등록을 거부한다. 파일/SHA 조회·모든 판단 없는 집계는 이전 명칭을 유지하므로 실제 도구 근거 검증과 이전 조회의 표 재정리 연결을 보존한다.
+총8논리 MCP/36도구이며 서버 VM을 추가하지 않는다. 기존6개 중 혼합 rule-a/b를 조회/제안 경로로 나눴다. 같은 호스트의 조회/제안 목록은 서로 겹치지 않고 target enum도 자기 장비만 포함한다. B에 미지원 임시 차단을 안내하지 않는다. 조회 요청을 변경 서버로 보내거나 읽기 경로에 제안을 위조하면 거부한다. ruleview sudo는 `rule-change-executor --read-only`만 허용하고 해당 모드는 모든 변경/worker/사건 등록을 거부한다. 파일/SHA 조회·모든 판단 없는 집계는 이전 명칭을 유지하므로 실제 도구 근거 검증과 이전 조회의 표 재정리 연결을 보존한다.
 
 LLM은 먼저 읽기 도구로 증거·정확 SHA/현재 상태를 얻고 필요하면 같은 장비의 rule-write 경로로 구체 승인안을 준비한다. 조사 후 별도 재지시를 기다리지 않는다. 정확 후보 승인·지정 worker, 긴급 차단의 LLM 조사·증거/보호 주소·TTL을 유지하며 일반 sudo/Docker/패키지 설치 권한은 제공하지 않는다. 원인 분석 이후 기존 변경안 준비 도구 보존과 단순 조회 제한은 query1.3.1을 그대로 사용한다.
 

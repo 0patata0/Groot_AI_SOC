@@ -1,4 +1,5 @@
-# 2026-10-24 현행: 조회는 rule-a/b(ruleview), 변경 제안은 rule-write-a/b(rulechg) 단일 경로. 총8논리 MCP/35도구이며 추가 VM은 없다. 아래 과거 배포 이력은 당시 범위다.
+# query-completion1.6.0: IDS=a:suricata, 조회 time_display 및 calculate_time의 KST/경과값 사용. 원본 로그/승인 해시는 보존.
+# 2026-10-25 현행: 조회는 rule-a/b(ruleview), 변경 제안은 rule-write-a/b(rulechg) 단일 경로. 총8논리 MCP/36도구이며 추가 VM은 없다. 아래 과거 배포 이력은 당시 범위다.
 # Hermes Agent 설정 템플릿 — Groot SOC. 실배치 경로: Groot_B /opt/hermes-data/config.yaml (컨테이너 /opt/data/config.yaml)
 # 실행: 공식 Docker 이미지 nousresearch/hermes-agent(오프라인 반입), 데이터 볼륨 /opt/hermes-data:/opt/data, HERMES_UID/GID=호스트 hermes 사용자.
 # 핵심(A안): Wazuh API·인덱서·FW 자격증명은 여기 없다. MCP 서버는 sshd ForceCommand 경계(mcp@B, resp@A, rulechg@A/B)로만 붙고,

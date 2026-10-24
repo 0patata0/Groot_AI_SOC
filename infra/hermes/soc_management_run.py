@@ -23,7 +23,7 @@ READ = frozenset({'get_rule_change_target', 'get_rule_change_status',
 WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
 EVENT_READ = frozenset({'search_suricata_alerts', 'search_modsecurity_alerts'})
-DIAGNOSTIC_READ = frozenset({'get_system_diagnostics'})
+DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
 NO_OBSERVATION_REPORT = ('성공한 MCP 조회 근거를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
                          '정상 또는 조사 완료로 판단하지 않았으며 추가 검토가 필요합니다.\n'
                          'MANAGEMENT_STATUS: needs_review')
@@ -56,13 +56,57 @@ def parse_instant(value):
         value = re.sub(r' KST$', '+09:00', re.sub(r' UTC$', '+00:00', value))
         parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
         return parsed if parsed.tzinfo is not None else None
-    except ValueError:
+    except (ValueError, OverflowError):
         return None
 
 
 def kst_time(value):
     parsed = parse_instant(value)
     return parsed.astimezone(KST).isoformat() + ' (KST)' if parsed else '시간대 확인 필요'
+
+
+def _kst_table(text):
+    """Convert explicit UTC date/time columns only when every dated cell is understood."""
+    lines = text.splitlines(keepends=True)
+    for i in range(len(lines)-1):
+        header = lines[i].split('|')
+        if '|' not in lines[i] or not re.fullmatch(r'[\s|:\-]+', lines[i+1].strip()):
+            continue
+        columns = [j for j,c in enumerate(header) if re.search(r'UTC',c) and 'KST' not in c and re.search(r'시각|시간|time|date|시작|종료',c,re.I)]
+        for column in columns:
+            updates = []
+            for n in range(i+2,len(lines)):
+                if '|' not in lines[n]:
+                    break
+                cells = lines[n].split('|')
+                if column >= len(cells):
+                    updates = []; break
+                raw = cells[column].strip().strip('`*')
+                if raw in ('','-','미확인','N/A'):
+                    continue
+                if re.fullmatch(r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?',raw):
+                    raw += '+00:00'
+                parsed = parse_instant(raw)
+                if parsed is None:
+                    updates = []; break
+                updates.append((n,parsed))
+            if updates:
+                header[column] = header[column].replace('UTC','KST')
+                lines[i] = '|'.join(header)
+                for n,parsed in updates:
+                    cells = lines[n].split('|')
+                    cells[column] = ' '+parsed.astimezone(KST).isoformat()+' '
+                    lines[n] = '|'.join(cells)
+    return ''.join(lines)
+
+
+def _kst_prose(text):
+    # Common model formats previously escaped the suffix-only ISO matcher.
+    date = r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?'
+    text = _kst_table(text)
+    text = re.sub(r'\bUTC\s*[:：]?\s*('+date+r')(?![0-9:+.Z-])',lambda m:kst_time(m[1]+' UTC'),text)
+    text = re.sub(r'('+date+r')\s*\(UTC\)',lambda m:kst_time(m[1]+' UTC'),text)
+    return _AWARE_TIME.sub(lambda m:m[0] if m[0].endswith(('KST','+09:00','+0900')) else kst_time(m[0]),text)
 
 
 def kst_display(text):
@@ -76,12 +120,13 @@ def kst_display(text):
     parts = re.split(r'(^```[^\n]*\n.*?^```[^\n]*$)', text, flags=re.M | re.S)
     for i, part in enumerate(parts):
         if i % 2:
-            stamps = list(dict.fromkeys(_AWARE_TIME.findall(part)))[:16]
+            stamps = [x for x in dict.fromkeys(_AWARE_TIME.findall(part))
+                      if not x.endswith(('KST', '+09:00', '+0900'))][:16]
             if stamps and (i + 1 >= len(parts) or not parts[i + 1].startswith('\n원문 시각의 KST 환산: ')):
                 parts[i] += '\n원문 시각의 KST 환산: ' + ', '.join(kst_time(x) for x in stamps)
         else:
             # Avoid duplicate labels on repeated finalization.
-            parts[i] = _AWARE_TIME.sub(lambda m: m[0] if m[0].endswith(('KST', '+09:00', '+0900')) else kst_time(m[0]), part)
+            parts[i] = _kst_prose(part)
     return ''.join(parts)
 
 
@@ -99,7 +144,7 @@ def _times(data, depth=0):
         return []
     if isinstance(data, dict):
         found = [v for k, v in data.items() if isinstance(v, str) and
-                 re.fullmatch(r'(?:timestamp|timestamp_kst|ts_kst|started_at|observed_at_kst|requested_since_kst|requested_until_kst|last_reload)', k) and parse_instant(v)]
+                 re.fullmatch(r'(?:timestamp|timestamp_kst|ts_kst|started_at|started_at_kst|observed_at_kst|requested_since_kst|requested_until_kst|last_reload|kst|reference_kst)', k) and parse_instant(v)]
         return (found + [v for x in list(data.values())[:60] for v in _times(x, depth + 1)])[:120]
     if isinstance(data, list):
         return [v for x in data[:50] for v in _times(x, depth + 1)][:120]
@@ -140,6 +185,9 @@ def observation_facts(name, result):
             if not isinstance(data, dict) or data.get('error') or data.get('isError'):
                 continue
             stamps = list(dict.fromkeys(_times(data)))
+            if name == 'calculate_time' and data.get('kind') == 'time_calculation' and data.get('live_observation') is False:
+                rows.append({'kind': 'time_calculation', **{k:data[k] for k in
+                    ('timestamps','chronological_order','differences','reference_kst') if k in data}})
             if name in EVENT_READ and data.get('source') in ('suricata', 'modsecurity'):
                 keep = ('source', 'requested_since_kst', 'requested_until_kst', 'returned_count',
                         'indexed_window_total_count', 'scan_capped')
@@ -162,8 +210,11 @@ def observation_facts(name, result):
                     **{k: inv[k] for k in ('declared_count', 'source_sha256', 'runtime_load_verified') if k in inv}})
             if name == 'get_service_action_target' and isinstance(data.get('observation'), dict):
                 observed = data['observation']
+                rows.append({'kind': 'service', 'target': data.get('target'),
+                             'running': observed.get('running'),
+                             'started_at': observed.get('started_at') if parse_instant(observed.get('started_at')) else None})
                 if parse_instant(observed.get('started_at')):
-                    rows.append({'kind': 'service', 'target': data.get('target'), 'started_at': observed['started_at']})
+                    stamps.append(observed['started_at'])
             if name in ('get_rule_change_target', 'get_service_action_target'):
                 runtime = data.get('rule_source_evidence', data.get('runtime'))
                 if isinstance(runtime, dict) and runtime.get('rule_source_option') == '-S' and runtime.get('rule_source_path') == '/rules/all.rules':
@@ -261,6 +312,8 @@ def evidence_claim_violations(text, facts):
     for stamp in _AWARE_TIME.findall(text):
         parsed = parse_instant(stamp)
         if parsed and instants and not any(abs((parsed - v).total_seconds()) < 1 for v in instants):
+            if any(f.get('kind') == 'time_calculation' for f in facts):
+                issues.add('calculated_timestamp_mismatch')
             # Same wall clock relabelled with a different offset is the observed defect.
             if any(abs((parsed.replace(tzinfo=None) - v.replace(tzinfo=None)).total_seconds()) < 1 for v in instants):
                 issues.add('timestamp_offset_relabelled')
@@ -296,6 +349,60 @@ def evidence_claim_violations(text, facts):
     return sorted(issues)
 
 
+def calculated_json_violations(text, facts):
+    """Check common explicit calculation fields against actual tool results.
+
+    This is deliberately not a general prose/incident-state truth checker. Field
+    names with ambiguous event labels are left alone; no model arguments change.
+    """
+    calculations = [f for f in facts if f.get('kind') == 'time_calculation']
+    if not calculations or not isinstance(text, str):
+        return []
+    raw = text.strip()
+    fenced = re.findall(r'^```(?:json)?[ \t]*\n(.*?)\n```[ \t]*$', raw, re.M | re.S)
+    if fenced:
+        return sorted({issue for block in fenced for issue in calculated_json_violations(block, facts)})
+    try:
+        answer = json.loads(raw)
+    except (ValueError, TypeError):
+        return []
+    if not isinstance(answer, dict):
+        return []
+    fact = calculations[-1]
+    rows = {r['id']: r for r in fact.get('timestamps', []) if isinstance(r, dict) and isinstance(r.get('id'), str)}
+    labels = {}
+    for label in rows:
+        labels.setdefault(label.lower(), []).append(label)
+    expected = {}
+    order = fact.get('chronological_order')
+    if isinstance(order, list) and order and all(x in rows for x in order):
+        expected.update(event_order=order, chronological_order=order)
+        for unit in ('seconds', 'minutes'):
+            value = rows[order[-1]].get(unit + '_until_reference')
+            if type(value) in (int, float):
+                expected['since_latest_' + unit] = value
+    for key in answer:
+        for label, ids in labels.items():
+            if len(ids) != 1:
+                continue
+            if key.lower() == label + '_kst':
+                expected[key] = rows[ids[0]].get('kst')
+        for pair in fact.get('differences', []):
+            a, b = pair.get('from'), pair.get('to')
+            if not all(isinstance(x, str) and len(labels.get(x.lower(), [])) == 1 for x in (a, b)):
+                continue
+            for unit in ('seconds', 'minutes'):
+                value = pair.get(unit)
+                if type(value) not in (int, float):
+                    continue
+                if key.lower() == a.lower() + '_to_' + b.lower() + '_' + unit:
+                    expected[key] = value
+                elif key.lower() == b.lower() + '_to_' + a.lower() + '_' + unit:
+                    expected[key] = -value
+    return ['calculated_json_field_mismatch:' + key for key, value in expected.items()
+            if key in answer and (type(answer[key]) is bool or answer[key] != value)]
+
+
 def literal_evidence_summary(facts):
     """Render exact observed quantities/limits, leaving every response decision to the model."""
     iso = kst_time
@@ -304,7 +411,26 @@ def literal_evidence_summary(facts):
     rows = []
     for row in facts[-16:]:
         kind = row.get('kind')
-        if kind == 'events':
+        if kind == 'time_calculation':
+            order = row.get('chronological_order', [])
+            if order and all(isinstance(x, str) and re.fullmatch(r'[A-Za-z0-9_.:-]{1,32}', x) for x in order):
+                rows.append('- 계산된 시간순(과거 → 최근): ' + ' → '.join(order))
+            reference = row.get('reference_kst')
+            if parse_instant(reference):
+                rows.append('- 시간 계산 기준: ' + iso(reference))
+            for value in row.get('timestamps', [])[:8]:
+                if not isinstance(value,dict) or not re.fullmatch(r'[A-Za-z0-9_.:-]{1,32}',str(value.get('id',''))):
+                    continue
+                rendered = '- 시각 ' + value['id'] + ': ' + iso(value.get('kst'))
+                minutes = value.get('minutes_until_reference')
+                if type(minutes) in (int,float):
+                    rendered += '; 기준 시각까지 ' + str(minutes) + '분'
+                rows.append(rendered)
+            for value in row.get('differences', [])[:28]:
+                if (isinstance(value,dict) and all(re.fullmatch(r'[A-Za-z0-9_.:-]{1,32}',str(value.get(k,''))) for k in ('from','to'))
+                        and type(value.get('seconds')) in (int,float)):
+                    rows.append('- 시간차 ' + value['from'] + ' → ' + value['to'] + ': ' + str(value['seconds']) + '초')
+        elif kind == 'events':
             name = 'Suricata' if row.get('source') == 'suricata' else 'WAF'
             rows.append(f"- {name}: 요청 {iso(row.get('requested_since_kst'))} ~ {iso(row.get('requested_until_kst'))}; "
                         f"색인 반환 표본 {count(row.get('returned_count'))}건. 요청 구간 전체 건수 미확인. 이 표본만으로 행위자·공격 여부 확정 불가.")
@@ -633,7 +759,8 @@ def main():
         if argument_refusal(name, result):
             argument_errors.append(name)
         if wire_allowed(name, 'verify') and getattr(result, 'is_error', getattr(result, 'isError', False)) is False:
-            completed_wire_calls.append(name)
+            if name != 'calculate_time':
+                completed_wire_calls.append(name)  # Arithmetic alone is never a successful SOC observation.
             read_facts.extend(observation_facts(name, result))
             del read_facts[:-32]
         # Keep only real MCP text, bounded in memory, for literal-evidence checks.

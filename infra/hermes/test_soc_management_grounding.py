@@ -35,7 +35,7 @@ class Grounding(unittest.TestCase):
         request=self.agent._build_api_kwargs()
         self.assertEqual(request['tool_choice'],'required')
         self.assertEqual({t['function']['name'] for t in request['tools']},set(READ_NAMES))
-        self.assertNotIn('arguments',request);self.assertNotIn('reasoning_effort',request)
+        self.assertNotIn('arguments',request);self.assertEqual(request['reasoning_effort'],'medium')
         self.assertNotIn('think',request['extra_body'])
         self.assertIs(self.agent._build_api_kwargs,self.builder)
         next_request=self.agent._build_api_kwargs()
@@ -44,6 +44,7 @@ class Grounding(unittest.TestCase):
 
     def test_actual_read_or_native_pending_tool_does_not_force_more_calls(self):
         self.completed.append('search_suricata_alerts')
+        self.kw['assistant_message'].content='반환 표본을 확인했습니다.\nMANAGEMENT_STATUS: monitor'
         self.assertEqual(self.call(self.agent,**self.kw),'original')
         self.completed.clear();self.kw['assistant_message'].tool_calls=[{'name':'native-selected'}]
         self.assertEqual(self.call(self.agent,**self.kw),'original')
@@ -82,6 +83,13 @@ class Grounding(unittest.TestCase):
         self.call(self.agent,**self.kw)
         request=self.agent._build_api_kwargs()
         self.assertEqual(request['reasoning_effort'],'none');self.assertFalse(request['extra_body']['think'])
+
+    def test_management_thinking_is_scoped_to_verified_route_and_model(self):
+        request=wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)
+        self.assertNotIn('think',request['extra_body']);self.assertEqual(request['reasoning_effort'],'medium')
+        self.assertFalse(self.request['extra_body']['think'])
+        self.agent.model='another-model'
+        self.assertEqual(wrapper.management_reasoning(self.request,self.agent),self.request)
 
     def test_unrecognized_native_source_refuses_before_installing_hook(self):
         with patch.object(wrapper.Path,'read_bytes',side_effect=OSError),self.assertRaisesRegex(RuntimeError,'source_changed'):

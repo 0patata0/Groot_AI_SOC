@@ -70,7 +70,11 @@ def observation_facts(name, result):
             elif name == 'get_system_diagnostics' and isinstance(data.get('target'), str):
                 keep = ('target', 'requested_since_kst', 'requested_until_kst', 'observed_at_kst',
                         'returned_error_count', 'requested_window_total_count')
-                rows.append({'kind': 'diagnostics', **{k: data[k] for k in keep if k in data}})
+                row = {'kind': 'diagnostics', **{k: data[k] for k in keep if k in data}}
+                if isinstance(data.get('process_termination'), dict):
+                    row['process_termination'] = {k: v for k, v in data['process_termination'].items()
+                        if k in ('kind', 'exit_status', 'signal_number') and (v is None or type(v) is int or v in ('exited', 'killed', 'dumped', 'not_recorded'))}
+                rows.append(row)
             elif name == 'get_rule_change_target' and isinstance(data.get('rule_inventory'), dict):
                 inv = data['rule_inventory']
                 rows.append({'kind': 'rules', 'target': data.get('target'),
@@ -122,15 +126,26 @@ def evidence_claim_violations(text, facts):
             negated = re.match(r'\s*(?:인지|인지는|으로|이라고|라고)?\s*(?:단정.{0,8}(?:않|없)|미확인|확인.{0,5}못)', after)
             if not re.search(r'표본|반환|검색\s*결과', before) and not negated:
                 issues.add('unknown_window_total_claimed')
-        for line in text.splitlines():
-            if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:0\s*건|없었|없습|전혀\s*없)', line) and
-                    not re.search(r'표본|반환|검색\s*결과|미확인|단정.{0,5}않|확인.{0,5}못', line)):
+        for line in re.split(r'[\n.!?;]|[。！？]', text):
+            if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:0\s*건|없(?:었|습|음|다|는)|전혀\s*없)', line) and
+                    not re.search(r'표본|반환|검색\s*결과|미확인|단정.{0,8}(?:않|없)|확인.{0,5}못|아니|아닙|아님', line)):
                 issues.add('sample_zero_presented_as_absence')
     if any(x.get('kind') == 'rules' and x.get('runtime_load_verified') is False for x in facts):
-        for match in re.finditer(r'(?:적재|로딩|로드)(?:\s*(?:여부|상태|가|는|를|도|까지))*\s*(?:정상\s*)?(?:확인|검증|완료)', text):
-            nearby = text[max(0, match.start() - 15):match.end() + 35]
-            if not re.search(r'미확인|미검증|미완료|불가|불명|(?:확인|검증).{0,10}(?:못|없)|아니|아닙|아님|않|안\s*(?:됨|되|했)', nearby):
+        # A column heading such as "실제 적재 검증 여부" is not a claim that
+        # verification succeeded. Require an affirmative statement or cell.
+        loading_columns = []
+        for line in text.splitlines():
+            cells = [c.strip().strip('*` ') for c in line.strip().strip('|').split('|')]
+            if '|' in line and any(re.search(r'(?:적재|로딩|로드).{0,12}(?:여부|검증|상태)', c) for c in cells):
+                loading_columns = [i for i, c in enumerate(cells) if re.search(r'(?:적재|로딩|로드)', c)]
+            elif '|' in line and any(i < len(cells) and re.fullmatch(
+                    r'(?:확인(?:됨|완료)?|검증(?:됨|완료)?|완료|정상|true)', cells[i], re.I) for i in loading_columns):
                 issues.add('unverified_engine_loading_claimed')
+            for clause in re.split(r'[\n.!?;]|[。！？]', line):
+                positive = re.search(r'(?:적재|로딩|로드)(?:\s*(?:여부|상태|가|는|를|도|까지))*\s*(?:정상\s*)?'
+                    r'(?:(?:확인|검증)(?:했|합|되었|됐|됨|완료)|완료(?:했|되었|됐|됨|입니다|\s*$))', clause)
+                if positive and not re.search(r'미확인|미검증|미완료|불가|불명|(?:확인|검증).{0,10}(?:못|없)|아니|아닙|아님|않|안\s*(?:됨|되|했)', clause):
+                    issues.add('unverified_engine_loading_claimed')
     event_facts = [x for x in facts if x.get('kind') == 'events']
     if event_facts:
         if re.search(r'(?:내망|내부망|사설\s*(?:IP|주소)|내부\s*IP).{0,100}(?:이므로|이라서|따라서|때문에).{0,60}(?:외부\s*공격.{0,20}(?:아니|아닙|아님|없)|무해|정상|안전)', text):
@@ -138,6 +153,14 @@ def evidence_claim_violations(text, facts):
         if (not any(x.get('forwarding_evidence') for x in event_facts) and
                 re.search(r'포트\s*포워딩\s*(?:시도|탐지|행위)', text)):
             issues.add('scan_misreported_as_port_forwarding')
+    diagnostics = [x for x in facts if x.get('kind') == 'diagnostics' and x.get('process_termination')]
+    for line in text.splitlines():
+        candidates = [x for x in diagnostics if x.get('target', '\0') in line] or diagnostics
+        statuses = {x['process_termination'].get('exit_status') for x in candidates}
+        clean_line = re.sub(r'[*`]', '', line)
+        for match in re.finditer(r'(?i)(?:exit[ _]*(?:code|status)|종료\s*(?:코드|값))\s*[:=]?\s*([0-9]+)', clean_line):
+            if not re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)', clean_line[match.end():]) and len(statuses) == 1 and None not in statuses and int(match[1]) not in statuses:
+                issues.add('diagnostic_exit_status_mismatch')
     return sorted(issues)
 
 
@@ -165,6 +188,9 @@ def literal_evidence_summary(facts):
                 continue
             rows.append(f"- {target}: 요청 {iso(row.get('requested_since_kst'))} ~ {iso(row.get('requested_until_kst'))}; "
                         f"수집 관측 {iso(row.get('observed_at_kst'))}; 오류 반환 표본 {count(row.get('returned_error_count'))}건. 구간 전체 오류 건수 미확인.")
+            exit_info = row.get('process_termination', {})
+            if exit_info.get('kind') == 'exited':
+                rows.append(f"  마지막 메인 프로세스 종료 종류 exited; 종료값 {count(exit_info.get('exit_status'))}. 현재 정상 여부 판단과 별개입니다.")
         elif kind == 'rules':
             target, digest = row.get('target', ''), row.get('source_sha256', '')
             if (not isinstance(target, str) or not re.fullmatch(r'[abc]:[A-Za-z0-9_.-]+', target) or
@@ -181,14 +207,23 @@ def factual_review_report(facts):
             literal_evidence_summary(facts) + '\nMANAGEMENT_STATUS: needs_review')
 
 
+def management_status(text):
+    """Read one terminal model conclusion; never infer it from prose."""
+    if not isinstance(text, str):
+        return None
+    matches = list(re.finditer(r'^MANAGEMENT_STATUS:[^\r\n]*$', text, re.M))
+    if len(matches) != 1 or text[matches[0].end():].strip():
+        return None
+    value = re.fullmatch(r'MANAGEMENT_STATUS: (resolved|monitor|needs_review|awaiting_approval)[ \t]*', matches[0].group())
+    return value.group(1) if value else None
+
+
 def bind_management_status(native_text, guarded_text):
     """Formatting cannot change the model's control label; missing labels fail review."""
-    pattern = r'^MANAGEMENT_STATUS: (resolved|monitor|needs_review|awaiting_approval)\s*$'
-    matches = list(re.finditer(pattern, native_text, re.M))
-    valid = len(matches) == 1 and not native_text[matches[0].end():].strip()
-    label = matches[0].group(1) if valid else 'needs_review'
+    status = management_status(native_text)
+    label = status or 'needs_review'
     body = re.sub(r'(?m)^MANAGEMENT_STATUS:[^\n]*\n?', '', guarded_text).strip()
-    if not valid:
+    if status is None:
         body += '\n관리 상태 표지의 누락·형식 오류로 추가 검토가 필요합니다.'
     return body + '\nMANAGEMENT_STATUS: ' + label
 
@@ -203,6 +238,23 @@ def current_management_request(user):
         except (ValueError, TypeError):
             pass
     return user if len(user) <= 16384 else '원본 현재 사용자 요청을 다시 확인하세요. 권한과 증거의 구분은 유지합니다.'
+
+
+def management_reasoning(request, agent):
+    """Use the verified Ollama compatibility control in this process only."""
+    extra = dict(request.get('extra_body') or {})
+    if (getattr(agent, 'provider', None) != 'custom' or getattr(agent, 'model', None) != 'qwen3.6:35b'
+            or str(getattr(agent, 'base_url', '')).rstrip('/') != 'http://211.170.162.111:11434/v1'
+            or extra.get('model', request.get('model')) != 'qwen3.6:35b'):
+        return request
+    result = dict(request)
+    for key in ('think', 'reasoning_effort', 'reasoning'):
+        result.pop(key, None)
+        extra.pop(key, None)
+    # This route's /api/show confirms boolean thinking. Its OpenAI adapter
+    # accepts reasoning_effort, not the native /api/chat "think" field.
+    # A recognized non-none effort maps to true for a boolean-only model.
+    return {**result, 'reasoning_effort': 'medium', 'extra_body': extra}
 
 
 def arm_grounding_read(agent, turn):
@@ -233,18 +285,7 @@ def arm_grounding_read(agent, turn):
         result = permitted_request(result, 'verify')
         reads = [x for x in result.get('tools', []) if x['function']['name'] in names]
         result = {**result, 'tools': reads, 'tool_choice': 'required' if reads else 'none'}
-        extra = dict(result.get('extra_body') or {})
-        # This inspected Ollama route can prematurely stop with effort=none.
-        # Use its default thinking policy on this single bounded retry only.
-        if (getattr(agent, 'provider', None) == 'custom' and getattr(agent, 'model', None) == 'qwen3.6:35b'
-                and str(getattr(agent, 'base_url', '')).rstrip('/') == 'http://211.170.162.111:11434/v1'
-                and extra.get('model', result.get('model')) == 'qwen3.6:35b'):
-            for key in ('think', 'reasoning_effort', 'reasoning'):
-                result.pop(key, None)
-                extra.pop(key, None)
-        if extra or isinstance(result.get('extra_body'), dict):
-            result['extra_body'] = extra
-        return result
+        return management_reasoning(result, agent)
 
     agent._build_api_kwargs = once
     agent._capstone_grounding_restore = restore
@@ -261,7 +302,10 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         message, messages, user = kw.get('assistant_message'), kw.get('messages'), kw.get('user_message')
         count, maximum, counter = kw.get('api_call_count'), getattr(agent, 'max_iterations', None), kw.get('codex_ack_continuations')
         remaining = getattr(getattr(agent, 'iteration_budget', None), 'remaining', None)
-        issues = evidence_claim_violations(getattr(message, 'content', None), facts or [])
+        content = getattr(message, 'content', None)
+        issues = evidence_claim_violations(content, facts or [])
+        if completed_calls and management_status(content) is None:
+            issues.append('missing_or_invalid_management_status')
         factual = bool(completed_calls and issues)
         argument_retry = bool(not completed_calls and argument_errors)
         missing_evidence = any(x.startswith('unobserved_') for x in issues)
@@ -289,7 +333,9 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                 '. 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. '
                 '표본을 전체 건수로, 정의 파일을 실제 적재로, 사설 주소를 무해성/행위자 증명으로 바꾸지 마세요. '
                 '보고 항목에 실제 조회 근거가 없으면 필요한 읽기 도구와 인자를 직접 선택해 확보해야 합니다. '
-                '불확실성은 미확인으로 남기세요.\n' + literal_evidence_summary(facts or []))
+                '불확실성은 미확인으로 남기세요. 마지막 줄에는 모델이 판단한 상태를 '
+                'MANAGEMENT_STATUS: resolved 또는 monitor 또는 needs_review 또는 awaiting_approval 중 '
+                '정확히 하나로 쓰세요. 상태를 본문의 표현에서 추측하거나 새 승인을 만들지 마세요.\n' + literal_evidence_summary(facts or []))
         elif argument_retry:
             agent._capstone_argument_turn = turn
             nudge = ('읽기 도구가 인자 검증에서 거절되어 성공한 조회 근거가 없습니다. 원래 사용자 요청은 유지합니다. '
@@ -479,7 +525,7 @@ def main():
             args = (args[0], permitted_tools(args[1], mode), *args[2:])
         if 'tools_for_api' in kwargs and kwargs['tools_for_api'] is not None:
             kwargs['tools_for_api'] = permitted_tools(kwargs['tools_for_api'], mode)
-        return permitted_request(builder(self, *args, **kwargs), mode)
+        return management_reasoning(permitted_request(builder(self, *args, **kwargs), mode), self)
 
     def guarded_result(self, result, session_id='', exit_code=0):
         data = dict(result) if isinstance(result, dict) else {'final_response': str(result or '')}

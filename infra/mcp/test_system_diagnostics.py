@@ -318,6 +318,15 @@ class RouterTests(unittest.TestCase):
         self.assertTrue(result['untrusted_evidence'])
         self.assertEqual(result['properties']['ActiveState'], 'failed')
 
+    def test_termination_kind_is_distinct_from_exit_status_and_signal(self):
+        for code,status,kind,exit_status,signal in ((1,0,'exited',0,None),(1,1,'exited',1,None),
+                (2,15,'killed',None,15),(3,11,'dumped',None,11),(None,None,'not_recorded',None,None),
+                (0,0,'not_recorded',None,None)):
+            with self.subTest(code=code,status=status):
+                result=m.process_termination({'ExecMainCode':code,'ExecMainStatus':status})
+                self.assertEqual((result['kind'],result['exit_status'],result['signal_number']),
+                                 (kind,exit_status,signal))
+
     def test_query_rate_limit_is_per_process_and_bounded(self):
         value, _ = snapshot('siem', [])
         with patch.object(d, 'read_snapshot', return_value=value), patch.object(m.time, 'time', return_value=NOW), patch.object(m, 'audit'):

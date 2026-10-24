@@ -30,6 +30,8 @@ A의 필수 WAF·Suricata와 TLS 프록시는 재부팅 때 복구되도록 `res
 
 ## 실행 순서와 범위
 
+관리 controller와 gate, 진단 MCP는 같은 원본 소스에서 렌더한다. 초기 사건 DB는 run별 `report_outbox`를 함께 만들며, 기존 운영 서버의 최소 이관은 원본 SHA·유휴 상태·root 복구/DB 백업을 먼저 확인하고 빈 전달 테이블만 추가한다. 과거 사건·대화나 미전달 보고를 초기화·자동 재전송하지 않는다. 전송 실패·모델 불완료 알림과 `--no-deliver` 의미는 [진단·보고 계약](../infra/mcp/system-diagnostics.md)을 따른다. 추가 패키지·포트·자격은 필요하지 않다.
+
 1. 입력과 검증된 SSH host key를 확인하고 서버 3대의 machine-id가 서로 다른지 확인한다.
 2. 각 서버의 `/opt/capstone-prereqs/artifacts.json`과 모든 파일 해시를 검사한다. 하나라도 다르면 패키지 설치 전에 중단한다.
 3. 승인된 로컬 `.deb`를 `apt-get --no-download --no-remove`로 설치하고 Docker save archive를 `docker load`한다. 지정하지 않은 추가 패키지, 다운그레이드, 기존 이미지 태그 충돌을 거절한다. SIEM의 `vm.max_map_count`가 부족한 경우 전용 설정 파일로 최소262144를 적용한다.

@@ -6,6 +6,16 @@
 > 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
 <!-- /current-project-context -->
 
+## 2026-10-24 추가 보완: 종료 정보와 보고 전달
+
+`process_termination`은 `kind_code`/`kind`와 실제 `exit_status` 또는 `signal_number`를 분리한다. 예를 들어 `ExecMainCode=1, ExecMainStatus=0`은 종료 종류가 `exited`이고 종료값은0이다. 종료 종류1을 오류 종료값1로 읽지 않는다. `not_recorded`는 메인 프로세스 종료 기록이 없다는 뜻이다. 마지막 종료 기록이나 `Result=success`만으로 현재 기동 완료·서비스 정상 여부를 확정하지 않는다. `activating/start`는 기동 중이며, 한 스냅샷만으로 고착·지속 장애라고 판단할 수 없다. [systemd API의 프로세스 필드](https://www.freedesktop.org/software/systemd/man/latest/org.freedesktop.systemd1.html)와 [Linux6.8의 SIGCHLD 종류](https://raw.githubusercontent.com/torvalds/linux/v6.8/include/uapi/asm-generic/siginfo.h)를 따른다.
+
+관리 보고의 상태 표지가 없거나 중복되면 기존 보고 정정1회 예산 안에서 모델이 직접 수정한다. 표 제목의 “실제 적재 검증 여부”를 적재 성공 주장으로 오인하던 검사를 고쳤다. 표본0건은 “반환된 오류 표본0건, 전체 건수 미확인”으로 보고하며 다른 문장의 한계 설명이 무조건적인 “오류 없음”을 허용하지 않는다. 한계를 지키지 못한 결과는 검토 필요로 남긴다. 모든 자연어 판단의 정확성을 보장하는 검사는 아니다.
+
+확인한 DGX/Qwen 사건 관리 경로는 추론 지원 metadata를 대조한 뒤 `reasoning_effort=medium`을 사용한다. 일반 채팅 설정·추론 표시·권한은 유지한다. 해당 Ollama0.40.4의 OpenAI 호환 경로에는 native `think` 필드가 없으므로 지원되는 호환 옵션을 사용한다([해당 버전 adapter](https://raw.githubusercontent.com/ollama/ollama/v0.40.4/openai/openai.go), [공식 호환 제어 설명](https://docs.ollama.com/api/openai-compatibility)).
+
+제어기는 조사 완료·불완료·중단 보고를 run별 영속 전달 큐에 저장하고, 전송 실패 시 다음 timer 실행에서 보고만 다시 보낸다. 호출당 전송 시도1회, 최초60초부터 최대1시간 간격이며 모델·승인·조치를 재실행하지 않는다. `--no-deliver`는 전송과 새 보고 적재를 모두 막는다. 과거 미전달 보고는 자동 역송하지 않는다. 고정 보고ID로 재전송을 식별하지만 webhook이 수신 후 응답을 잃으면 중복될 수 있다. 실제 적용·모델/전달 검증 범위는 [STATUS](../../STATUS.md)를 따른다.
+
 ## 2026-10-24 후속: 도구 선택·시각·표본 의미
 
 B의 진단 router는 원래 `observed_at` epoch를 유지하면서 `observed_at_kst`와 `requested_since_kst`를 `+09:00` ISO 시각으로 제공한다. 모델은 시각을 다시 암산하지 않고 이 값을 직접 인용한다. `returned_error_count`는 반환한 오류 표본 수이며 journal 이용 불가이면 `null`이다. `requested_window_total_count`는 항상 `null`로, 요청한15분 등의 전체 오류 건수를 확보했다는 주장을 하지 않는다. 기존 `error_observations.count`는 제한된4시간 수집 표본이라는 의미를 유지한다. 수집기·25대상·snapshot schema·TTL·권한은 바꾸지 않았다.

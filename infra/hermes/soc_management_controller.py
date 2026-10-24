@@ -111,6 +111,7 @@ class Broker:
 class Store:
     def __init__(self, directory=STATE, clock=time.time):
         self.root, self.clock = Path(directory), clock
+        self.report_notifications = True
         self.root.mkdir(mode=0o700, parents=True, exist_ok=True)
         if self.root.is_symlink() or (self.root.stat().st_mode & 0o077):
             raise ControllerError("state_directory_must_be_private")
@@ -150,6 +151,13 @@ class Store:
                 completed INTEGER NOT NULL DEFAULT 0, is_error INTEGER NOT NULL DEFAULT 0,
                 PRIMARY KEY(run_id,ordinal));
             CREATE INDEX IF NOT EXISTS case_queue ON cases(state,due,priority);
+            CREATE TABLE IF NOT EXISTS report_outbox (
+                run_id TEXT PRIMARY KEY REFERENCES runs(id),
+                case_id TEXT NOT NULL REFERENCES cases(id), state TEXT NOT NULL,
+                text TEXT NOT NULL, created REAL NOT NULL, due REAL NOT NULL,
+                attempts INTEGER NOT NULL DEFAULT 0, delivered REAL,
+                delivery_state TEXT NOT NULL DEFAULT 'pending', last_error TEXT NOT NULL DEFAULT '');
+            CREATE INDEX IF NOT EXISTS report_queue ON report_outbox(delivery_state,due,created);
         """)
         if "target" not in {row[1] for row in self.db.execute("PRAGMA table_info(proposals)")}:
             self.db.execute("ALTER TABLE proposals ADD COLUMN target TEXT NOT NULL DEFAULT ''")
@@ -157,6 +165,48 @@ class Store:
 
     def close(self):
         self.db.close()
+
+    @contextlib.contextmanager
+    def reporting(self, enabled):
+        previous, self.report_notifications = self.report_notifications, enabled
+        try:
+            yield
+        finally:
+            self.report_notifications = previous
+
+    def queue_report(self, run_id, case_id, state, text):
+        """Caller commits this immutable report with the corresponding run result."""
+        if not self.report_notifications:
+            return
+        self.db.execute("""INSERT OR IGNORE INTO report_outbox(run_id,case_id,state,text,created,due)
+            VALUES(?,?,?,?,?,?)""", (run_id, case_id, state, text, self.clock(), self.clock()))
+
+    def flush_report(self, sender=None):
+        """At most one notification attempt, never another model/tool invocation."""
+        if not self.report_notifications:
+            return {"attempted": 0}
+        row = self.db.execute("""SELECT * FROM report_outbox WHERE delivery_state='pending' AND due<=?
+            ORDER BY created,rowid LIMIT 1""", (self.clock(),)).fetchone()
+        if row is None:
+            return {"attempted": 0}
+        sender = deliver if sender is None else sender
+        try:
+            sent = sender(os.environ.get("MM_WEBHOOK", ""), row["text"], row["case_id"], row["state"], report_id=row["run_id"])
+        except ControllerError:
+            attempts = row["attempts"] + 1
+            delay = min(3600, 60 * 2 ** min(attempts - 1, 6))
+            with self.db:
+                self.db.execute("""UPDATE report_outbox SET attempts=?,due=?,last_error='report_delivery_failed'
+                    WHERE run_id=?""", (attempts, self.clock() + delay, row["run_id"]))
+                self.set_meta("report_delivery_failure_at", self.clock())
+            return {"attempted": 1, "delivered": False}
+        with self.db:
+            self.db.execute("""UPDATE report_outbox SET attempts=attempts+1,delivered=?,delivery_state=?,last_error=''
+                WHERE run_id=?""", (self.clock(), "sent" if sent is not False else "suppressed", row["run_id"]))
+            latest = self.db.execute("SELECT id FROM runs WHERE case_id=? ORDER BY started DESC,rowid DESC LIMIT 1", (row["case_id"],)).fetchone()
+            if latest and latest[0] == row["run_id"]:
+                self.db.execute("UPDATE cases SET delivered=1 WHERE id=?", (row["case_id"],))
+        return {"attempted": 1, "delivered": True}
 
     @contextlib.contextmanager
     def locked(self):
@@ -298,8 +348,11 @@ class Store:
 
     def recover(self):
         with self.db:
+            interrupted = self.db.execute("SELECT id,case_id FROM runs WHERE state='running'").fetchall()
             self.db.execute("UPDATE cases SET state='outcome_unknown',detail='interrupted_run_requires_review',updated=? WHERE state='running'", (self.clock(),))
             self.db.execute("UPDATE runs SET state='outcome_unknown',detail='interrupted_run_requires_review',finished=? WHERE state='running'", (self.clock(),))
+            for row in interrupted:
+                self.queue_report(row["id"], row["case_id"], "outcome_unknown", incomplete_report("interrupted_run_requires_review"))
 
     def next_case(self):
         return self.db.execute("SELECT * FROM cases WHERE state IN ('ready','monitor','waiting_approval') AND due<=? ORDER BY priority,created LIMIT 1", (self.clock(),)).fetchone()
@@ -321,6 +374,7 @@ class Store:
     def summary(self):
         states = {row[0]: row[1] for row in self.db.execute("SELECT state,count(*) FROM cases GROUP BY state")}
         return {"cases": states, "event_cursor": int(self.meta("event_cursor")),
+                "pending_reports": self.db.execute("SELECT count(*) FROM report_outbox WHERE delivery_state='pending'").fetchone()[0],
                 "alert_coverage_gap": self.meta("alert_coverage_gap_since") != "0",
                 "alert_truncated": self.meta("alert_truncation_at") != "0"}
 
@@ -523,8 +577,10 @@ class Trace:
         else:
             proposals = list(db.execute("SELECT id,status,result_status,target FROM proposals WHERE case_id=?", (self.case["id"],)))
             pending = any((p[2] or p[1]) not in TERMINAL for p in proposals)
-            marker = FINAL_STATUS.search(text)
-            disposition = marker.group(1) if marker else "unclassified"
+            markers = list(FINAL_STATUS.finditer(text))
+            marker_lines = re.findall(r'^MANAGEMENT_STATUS:[^\r\n]*$', text, re.M)
+            disposition = (markers[0].group(1) if len(markers) == len(marker_lines) == 1
+                and not text[markers[0].end():].strip() else "unclassified")
             verified = db.execute("SELECT count(*) FROM tool_calls WHERE run_id=? AND completed=1 AND is_write=0 AND is_error=0", (self.run_id,)).fetchone()[0]
             missing_bound_read = any(not verified_proposal(p, self.read_receipts) for p in proposals)
             if self.case["mode"] == "verify" and (not verified or missing_bound_read):
@@ -545,6 +601,7 @@ class Trace:
             db.execute("UPDATE runs SET state=?,finished=?,detail=? WHERE id=?", ("completed" if success else "outcome_unknown", now, detail, self.run_id))
             db.execute("UPDATE cases SET state=?,updated=?,due=?,detail=?,final_text=?,delivered=0,monitor_count=monitor_count+?,mode=CASE WHEN ? IN ('monitor','waiting_approval') THEN 'verify' ELSE mode END WHERE id=?",
                        (state, now, due, detail, text if success else "", int(state == "monitor"), state, self.case["id"]))
+            self.store.queue_report(self.run_id, self.case["id"], state, text if success else incomplete_report(detail))
         return {"run_id": self.run_id, "case_id": self.case["id"], "state": state, "completed": success, "text": text if success else ""}
 
 
@@ -566,7 +623,22 @@ It reads classified root-published snapshots, normally updated every 60 seconds,
 with up to four hours of bounded error observations. Check age, Type, Result,
 exit status, journal availability and truncation; inactive/dead alone is not a
 failed oneshot. Snapshot errors and missing data never mean healthy or zero.
+ExecMainCode is the waitid termination kind, NOT the process exit status.
+Use process_termination.exit_status for an exited process (ExecMainCode=1).
+For killed/dumped processes report signal_number, not an invented exit status.
+The last main-process termination record alone is not current service health.
+activating/start is still starting, not active/running or completed. Result=success
+can be the previous operation's result; it does not turn starting into complete.
+One snapshot cannot show that a starting unit is stuck or has a persistent
+failure. not_recorded means no main-process termination record, not a fault.
+Do not call active/running or successful exited oneshots abnormal merely because
+other units are starting. Every registered target is a real operational unit.
+For every zero-count diagnostic say "반환된 오류 표본 0건, 전체 오류 건수 미확인".
+Do not shorten that to "오류 없음", even with a separate uncertainty footnote.
 Quote observed_at_kst directly instead of converting the epoch yourself.
+requested_at_kst in controller metadata is the request time, not a tool's query
+or observation time. Do not invent a query timestamp. If a rule/agent result
+does not supply a time, omit that time rather than estimating it.
 Diagnostic limit is at most 50 (default 20); lookback_minutes is at most 240.
 Read argument bounds before calling. A refused query is not an observation;
 correct invalid arguments using the schema and actual error, then read again.
@@ -611,6 +683,9 @@ MANAGEMENT_STATUS: resolved
 MANAGEMENT_STATUS: monitor
 MANAGEMENT_STATUS: needs_review
 MANAGEMENT_STATUS: awaiting_approval
+The status line is mandatory even for a simple read-only status request. Select
+the conclusion yourself; do not omit it or replace it with prose. A table header
+about verification is not verification evidence.
 These labels describe your conclusion, never authorize an action. Include real
 evidence and remaining uncertainty. Do not invent tool calls or proposal IDs.
 """
@@ -714,34 +789,45 @@ def run_hermes(store, case, prompt):
     return trace.finish(returncode, error)
 
 
-def deliver(webhook, text, case_id, state):
+def incomplete_report(detail):
+    safe = detail if detail in {"model_outer_timeout", "model_process_failure", "model_trace_limit",
+        "model_prompt_too_large", "interrupted_run_requires_review", "incomplete_model_run_requires_review"} else "diagnostic_run_incomplete"
+    return ("자동 조사를 완료하지 못했습니다. 원인 코드: `" + safe + "`.\n"
+            "실행·승인·차단 결과를 확인하지 못했으므로 추가 검토가 필요합니다. 알림 재전송은 조사나 조치를 재실행하지 않습니다.")
+
+
+def deliver(webhook, text, case_id, state, report_id=None):
     if not webhook or not webhook.startswith(("https://", "http://10.200.10.", "http://127.0.0.1")):
         raise ControllerError("report_webhook_invalid")
-    text = FINAL_STATUS.sub("", text).strip()
+    text = re.sub(r'(?m)^MANAGEMENT_STATUS:[^\r\n]*$', "", text).strip()
     silent_review = state == "needs_review" and text in ("[SILENT]", "SILENT")
     if text in ("[SILENT]", "SILENT"):
         if not silent_review:
-            return
+            return False
         text = "자동 조사 결과가 검증되지 않아 추가 검토가 필요합니다."
     if not text:
         raise ControllerError("model_report_empty")
     # Finished-run reports; approval messages belong to the broker.
-    label = {"completed": "조사 완료", "needs_review": "추가 검토 필요", "waiting_approval": "승인·실행 대기",
+    label = {"completed": "조사 완료", "needs_review": "추가 검토 필요", "waiting_approval": "승인·실행 대기", "outcome_unknown": "자동 조사 실패·확인 필요",
              "monitor": "추가 관찰 예정"}.get(state, "상태 확인 필요")
     notice = "\n제어기 확인 결과 추가 검토가 필요합니다. 아래는 LLM 응답입니다.\n" if state == "needs_review" and not silent_review else ""
-    payload = canonical({"text": "LLM 사건 관리 · " + case_id[:12] + " · " + label + notice + "\n\n" + text}).encode()
+    reference = " · 보고 " + report_id[:12] if report_id else ""
+    payload = canonical({"text": "LLM 사건 관리 · " + case_id[:12] + " · " + label + reference + notice + "\n\n" + text}).encode()
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     try:
         with opener.open(urllib.request.Request(webhook, data=payload, headers={"Content-Type": "application/json"}), timeout=15) as response:
             if response.status not in (200, 201, 204):
                 raise ControllerError("report_delivery_failed")
+            return True
     except (OSError, urllib.error.HTTPError):
         raise ControllerError("report_delivery_failed") from None
 
 
 def once(store, broker, base, no_deliver=False, runner=run_hermes):
-    with store.locked():
+    with store.locked(), store.reporting(not no_deliver):
         store.recover()
+        # Retry a durable report even when the broker/model is unavailable.
+        delivery = store.flush_report()
         # A broker outage never becomes an empty/normal security finding.
         count, backlog = 0, False
         for _ in range(10):
@@ -758,17 +844,11 @@ def once(store, broker, base, no_deliver=False, runner=run_hermes):
         result = None
         if case:
             result = runner(store, case, prompt_for(base, case, store.context(case["id"])))
-            if result["completed"] and result["text"] and not no_deliver:
-                try:
-                    deliver(os.environ.get("MM_WEBHOOK", ""), result["text"], case["id"], result["state"])
-                    with store.db:
-                        store.db.execute("UPDATE cases SET delivered=1 WHERE id=?", (case["id"],))
-                except ControllerError:
-                    # Never rerun the LLM or its writes because delivery failed.
-                    with store.db:
-                        store.set_meta("report_delivery_failure_at", store.clock())
+        if not delivery["attempted"]:
+            delivery = store.flush_report()
         summary = store.summary()
         return {**summary, "events_received": count, "event_backlog": backlog,
+                "report_delivery": delivery,
                 "run": {key: result[key] for key in ("run_id", "case_id", "state", "completed")} if result else None}
 
 

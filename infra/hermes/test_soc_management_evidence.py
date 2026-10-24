@@ -22,12 +22,57 @@ class LiteralEvidence(unittest.TestCase):
     def test_sample_zero_is_not_total_absence(self):
         self.assertIn('sample_zero_presented_as_absence',m.evidence_claim_violations('WAF 경보는 0건입니다.',[sample()]))
         self.assertEqual(m.evidence_claim_violations('WAF 검색 결과 반환 표본은 0건입니다. 전체 건수 미확인.',[sample()]),[])
+        for text in ('최근15분 오류 없음. 반환 표본의 한계가 있습니다.',
+                     '최근15분 오류가 없습니다. 다른 문장의 반환 표본은 별개입니다.'):
+            self.assertIn('sample_zero_presented_as_absence',m.evidence_claim_violations(text,[sample()]))
+        self.assertEqual(m.evidence_claim_violations('오류 없음이라고 단정할 수 없습니다.',[sample()]),[])
 
     def test_rule_file_is_not_runtime_loading(self):
         facts=[{'kind':'rules','runtime_load_verified':False}]
         self.assertIn('unverified_engine_loading_claimed',m.evidence_claim_violations('실제 적재를 확인했습니다.',facts))
         self.assertEqual(m.evidence_claim_violations('파일 정의 확인, 실제 적재는 미확인입니다.',facts),[])
         self.assertEqual(m.evidence_claim_violations('이 결과만으로 실제 적재 확인은 불가합니다.',facts),[])
+
+    def test_verification_table_header_is_not_a_successful_loading_claim(self):
+        facts=[{'kind':'rules','runtime_load_verified':False}]
+        text=('실제 엔진 적재 여부는 미확인입니다.\n'
+              '| 대상 | 파일 정의 수 | SHA-256 실제 적재 검증 여부 |\n'
+              '| --- | --- | --- |\n| WAF | 10개 | **미확인** (`false`) |\n'
+              '실제 적재 상태는 확인되지 않았습니다.\nMANAGEMENT_STATUS: needs_review')
+        self.assertEqual(m.evidence_claim_violations(text,facts),[])
+        self.assertIn('unverified_engine_loading_claimed',m.evidence_claim_violations(
+            '| 대상 | 실제 적재 검증 여부 |\n| --- | --- |\n| WAF | 확인됨 |',facts))
+        self.assertIn('unverified_engine_loading_claimed',m.evidence_claim_violations(
+            '실제 적재를 확인했습니다. 일부 검사는 미확인입니다.',facts))
+
+    def test_model_can_repair_missing_status_once_without_another_forced_read(self):
+        h=grounding_fixtures.Grounding();h.setUp();h.completed.append('list_blocks')
+        h.kw['assistant_message'].content='현재 차단 목록은 비어 있습니다.'
+        call=m.grounding_wrapper(lambda agent,**kw:'original',
+            types.SimpleNamespace(FinalResponseVerdict=types.SimpleNamespace),lambda rows,row:rows.append(row),
+            lambda rows,user:0,h.completed,[{'kind':'blocks','count':0}])
+        result=call(h.agent,**h.kw)
+        self.assertEqual(result.action,'continue')
+        self.assertIs(h.agent._build_api_kwargs,h.builder)
+        self.assertIn('missing_or_invalid_management_status',h.kw['messages'][-1]['content'])
+        h.kw['codex_ack_continuations']=1
+        self.assertEqual(call(h.agent,**h.kw),'original')
+        h.kw['assistant_message'].content+='\nMANAGEMENT_STATUS: monitor'
+        self.assertEqual(m.management_status(h.kw['assistant_message'].content),'monitor')
+
+    def test_terminal_status_rejects_unknown_duplicates_and_following_prose(self):
+        for text in ('MANAGEMENT_STATUS: bogus\nMANAGEMENT_STATUS: monitor',
+                     'MANAGEMENT_STATUS: resolved\n추가 본문',
+                     '**MANAGEMENT_STATUS: monitor**'):
+            self.assertIsNone(m.management_status(text))
+
+    def test_waitid_kind_one_cannot_be_reported_as_exit_status_one(self):
+        facts=[{'kind':'diagnostics','target':'c:terminal-guard',
+                'process_termination':{'kind':'exited','exit_status':0,'signal_number':None}}]
+        self.assertIn('diagnostic_exit_status_mismatch',m.evidence_claim_violations(
+            'c:terminal-guard: Exit Code 1, Result=success',facts))
+        self.assertEqual(m.evidence_claim_violations('ExecMainCode=1, 종료값 0입니다.',facts),[])
+        self.assertEqual(m.evidence_claim_violations('종료값 1이 아니라 0입니다.',facts),[])
 
     def test_private_address_or_scan_signature_is_not_attribution_or_forwarding(self):
         bad='내망 IP에서 유래한 것이므로 외부 공격 증거는 아닙니다. 포트 포워딩 시도가 탐지됐습니다.'

@@ -66,9 +66,21 @@
     "fresh three-VM installation"
   ],
   "git": {
-    "source": "pending automatic commit/push after review"
+    "source_commit": "899035bf68d99e48901776e0fa064aa8595b7b65",
+    "actual_remote_verified_equal": true,
+    "post_publish_documentation": "separate automatic follow-up commit; final HEAD/remote/clean kept in local session record"
   },
-  "mac_cleanup": "pending final cleanup",
+  "mac_cleanup": {
+    "removed_files": 50,
+    "removed_bytes": 1388753,
+    "task_temp_path": "/private/tmp/capstone-mcp-unify-20261024-i4aokdl_",
+    "new_mac_packages": 0,
+    "package_downloads": 0,
+    "existing_user_caches_deleted": 0,
+    "server_operational_keys_and_backups_retained": true,
+    "directory_absent": true,
+    "checked_at_kst": "2026-10-24T19:17:30+09:00"
+  },
   "source_sha256": {
     "infra/mcp/rule_change_mcp.py": "8005281fbcfe840eb3b9d95d9dfe50cb748292706a0d46b183fade07c5bfd879",
     "infra/mcp/rule_change_executor.py": "a83830ffe2fdd5f21deb6bd99e53edc8966d1fbbe0f9d9eca5813f78493d9831",
@@ -92,5 +104,19 @@
     "b_result": "success",
     "b_exit_status": 0,
     "failed_units": 0
+  },
+  "static_checks": {
+    "python_ast_files": 234,
+    "installation_heredoc_ast_blocks": 14,
+    "internal_links": 409,
+    "missing": 0,
+    "staged_source_files": 29,
+    "stage_bytes_match": true
+  },
+  "secret_scan": {
+    "tracked_files": 1173,
+    "unchanged_generic_false_positives": 4,
+    "new_findings": 0,
+    "coverage": "current tracked working tree; no history or ignored credential files"
   }
 }

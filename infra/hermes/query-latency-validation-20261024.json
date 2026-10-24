@@ -304,7 +304,13 @@
       "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
       "/opt/hermes-data/management-code/run.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
       "/opt/capstone-management/soc_management_controller.py": "82c062fa93323fdde7f2be0737ffe6eedcede435991eb6506ded9c4102c5f070"
-    }
+    },
+    "tracked_secret_scan_files": 1178,
+    "known_generic_false_positives": 4,
+    "new_secret_findings": 0,
+    "changed_markdown_relative_links": 406,
+    "missing_relative_links": 0,
+    "staged_source_files_byte_matched": 12
   },
   "deployment": {
     "same_container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
@@ -331,12 +337,19 @@
     "Actual attack/detection/approval/block E2E and fresh three-VM install were not performed; CVE scenario 3 remains paused."
   ],
   "git": {
-    "state": "source and documentation prepared; commit/push not yet complete"
+    "source_commit": "1eab21710cfd4522576bdbc4de20e8b57faae289",
+    "source_push_verified": true,
+    "actual_remote_matched_source": true,
+    "publication_cleanup_receipt": "follow-up documentation commit; final HEAD recorded in local session log"
   },
   "cleanup": {
     "server_trial_temp_dirs": [],
-    "mac_temporary_directory_removed": false,
+    "mac_temporary_directory_removed": true,
     "mac_packages_installed": 0,
-    "package_downloads": 0
+    "package_downloads": 0,
+    "mac_removed_files": 32,
+    "mac_removed_bytes": 380139,
+    "retained_private_evidence_files": 14,
+    "existing_user_files_caches_untouched": true
   }
 }

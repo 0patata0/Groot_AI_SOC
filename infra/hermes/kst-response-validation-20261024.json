@@ -163,9 +163,30 @@
     "Final model/chat case preceded native timezone configuration; both native profiles were separately verified after setting Asia/Seoul, without another model post."
   ],
   "git": {
-    "source_publication": "pending"
+    "source_publication": "pushed_and_authenticated_remote_matched",
+    "source_commit": "2bbef9102162917936884e25fbe0a90cb3954e2b",
+    "publication_note": "This receipt and STATUS closure are a subsequent documentation commit; its final HEAD is recorded locally."
   },
-  "temporary_cleanup": "pending",
+  "temporary_cleanup": {
+    "mac": {
+      "files": 138,
+      "bytes": 1795233,
+      "directory": "/private/tmp/capstone-natural-chat-20261024-lf7kenlv",
+      "retained_evidence_files": 35,
+      "packages_downloaded": 0,
+      "mac_packages_installed": 0,
+      "directory_absent": true
+    },
+    "server": {
+      "removed_trial_dirs": [],
+      "remaining_trial_dirs": [],
+      "native_guard_pins": {
+        "plugins/platforms/mattermost/adapter.py": true,
+        "gateway/run_turn.py": true
+      }
+    },
+    "existing_user_files_and_caches_preserved": true
+  },
   "native_timezone": {
     "/opt/data": {
       "timezone": "Asia/Seoul",
@@ -208,16 +229,16 @@
       "messages": 470
     },
     "gateway": {
-      "updated_at": "2026-10-24T22:14:41.335486+09:00",
+      "updated_at": "2026-10-24T22:22:21.481876+09:00",
       "active_agents": 0,
       "platforms": {
         "mattermost": {
           "state": "connected",
           "error_code": null,
           "error_message": null,
-          "updated_at": "2026-10-24T22:08:37.349440+09:00",
+          "updated_at": "2026-10-24T22:19:18.180901+09:00",
           "writer_pid": 158,
-          "writer_start_time": 5530544,
+          "writer_start_time": 5594618,
           "needs_attention": false,
           "retrying_since": null
         },
@@ -225,9 +246,9 @@
           "state": "connected",
           "error_code": null,
           "error_message": null,
-          "updated_at": "2026-10-24T22:08:37.352030+09:00",
+          "updated_at": "2026-10-24T22:19:18.183587+09:00",
           "writer_pid": 158,
-          "writer_start_time": 5530544,
+          "writer_start_time": 5594618,
           "needs_attention": false,
           "retrying_since": null,
           "listener_base": "http://127.0.0.1:8642"
@@ -259,5 +280,44 @@
       "/opt/socbot/operations_approval.py": "305d59a4e8f68041b630149c6906981df7be6f5f651046a67d65fe80aa412d60",
       "/opt/mcp/system-diagnostics-mcp.py": "d7890b56579ce69fb83a090cf4f6efdf3f7d7995b5940cba88d262ca9c9901ba"
     }
+  },
+  "static_checks": {
+    "python_ast": 235,
+    "changed_markdown_links": 441,
+    "missing_links": []
+  },
+  "secret_scan": {
+    "tracked": 1176,
+    "findings": [
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "deployment/roles/siem.sh",
+        "line": 522
+      },
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "infra/groot-c/log4shell-app/src/main/java/fr/christophetd/log4shell/vulnerableapp/LabCsrf.java",
+        "line": 35
+      },
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "infra/groot-c/offline-labs/test_practice_mode.py",
+        "line": 61
+      },
+      {
+        "rule": "generic-api-key",
+        "provider": "Generic API key (keyword-anchored)",
+        "severity": "Medium",
+        "path": "infra/hermes/test_hermes_prestart_transaction.py",
+        "line": 17
+      }
+    ],
+    "count": 4
   }
 }

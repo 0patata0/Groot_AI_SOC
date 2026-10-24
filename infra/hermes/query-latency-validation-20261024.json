@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "checked_at_kst": "2026-10-24T23:00:01.573567+09:00",
+  "plugin_version": "1.5.1",
+  "status": "latency improved; model-dependent delays and tool-selection errors remain",
+  "historical_baseline": {
+    "post_to_final_seconds": 116.092,
+    "final_post_url": "https://chat.grootlab.duckdns.org/soc/pl/bwogtfbnspy5py3wenod95mtka",
+    "stages_seconds": {
+      "first_no_tool_answer": 41.216,
+      "retry_tool_selection": 32.198,
+      "reads": 5.989,
+      "final_generation": 36.542,
+      "posting": 0.123
+    }
+  },
+  "native_wire_probe": {
+    "same_persisted_question_and_history": true,
+    "provider_calls": 0,
+    "original_message_chars": 139489,
+    "final_message_chars": 35190,
+    "sdk_initial_read_tools": 18,
+    "reasoning_effort": "none",
+    "tool_choice": "required",
+    "native_registered_version": "groot-query-completion:1.5.1",
+    "stored_history_unchanged": true
+  },
+  "selection_only_model_trials": [
+    {
+      "kind": "original",
+      "seconds": 37.341,
+      "input_chars": 139489,
+      "finish_reason": "stop",
+      "calls": [],
+      "answer_chars": 666,
+      "reasoning_chars": 0,
+      "usage": {
+        "prompt_tokens": 58391,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens": 331,
+        "total_tokens": 58722
+      }
+    },
+    {
+      "kind": "old_read_payloads_elided",
+      "seconds": 9.087,
+      "input_chars": 34084,
+      "finish_reason": "tool_calls",
+      "calls": [
+        {
+          "name": "mcp__wazuh_ro__get_wazuh_alert_summary",
+          "arguments": "{\"limit\":50}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"lookback_minutes\":240,\"limit\":10}"
+        },
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\":\"a:suricata\"}"
+        }
+      ],
+      "answer_chars": 0,
+      "reasoning_chars": 0,
+      "usage": {
+        "prompt_tokens": 19568,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens": 127,
+        "total_tokens": 19695
+      }
+    },
+    {
+      "kind": "old_read_payloads_elided",
+      "seconds": 1.113,
+      "input_chars": 34084,
+      "finish_reason": "tool_calls",
+      "calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\":\"a:suricata\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\":50,\"lookback_minutes\":1440}"
+        }
+      ],
+      "answer_chars": 0,
+      "reasoning_chars": 0,
+      "usage": {
+        "prompt_tokens": 19568,
+        "prompt_tokens_details": {
+          "cached_tokens": 19564
+        },
+        "completion_tokens": 89,
+        "total_tokens": 19657
+      }
+    },
+    {
+      "kind": "original",
+      "seconds": 6.959,
+      "input_chars": 139489,
+      "finish_reason": "stop",
+      "calls": [],
+      "answer_chars": 800,
+      "reasoning_chars": 0,
+      "usage": {
+        "prompt_tokens": 58391,
+        "prompt_tokens_details": {
+          "cached_tokens": 58387
+        },
+        "completion_tokens": 382,
+        "total_tokens": 58773
+      }
+    }
+  ],
+  "live_cases": [
+    {
+      "case": "1.5.0 IDS intermediate",
+      "started_at_kst": "2026-10-24T22:49:10.341231+09:00",
+      "question_id": "eprgubxtztbx7eyjjzcr171xqe",
+      "final_post_url": "https://chat.grootlab.duckdns.org/soc/pl/og7tzas1sir83gdhwom34965so",
+      "post_to_final_seconds": 48.485,
+      "first_post_seconds": 14.059,
+      "tool_call_attempts": 2,
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "arguments": "{\"target\":\"a:suricata-local\"}"
+        },
+        {
+          "name": "mcp__security_events__search_suricata_alerts",
+          "arguments": "{\"limit\":50,\"lookback_minutes\":60,\"signature_id\":\"1000051\"}"
+        }
+      ],
+      "correction_passes": 1,
+      "api_native_exact_match": true,
+      "original_message_rows_preserved": true,
+      "message_rows_before_after": [
+        1421,
+        1428
+      ],
+      "content_review": "partial: correct runtime/time; SID range shorthand and extraneous TLS/load phrasing remain"
+    },
+    {
+      "case": "1.5.1 IDS",
+      "started_at_kst": "2026-10-24T22:53:25.588755+09:00",
+      "question_id": "9sn7oghgnpg99c8m59mr4abmxa",
+      "final_post_url": "https://chat.grootlab.duckdns.org/soc/pl/i5iip9bmt3gej8cmk3nki5si7r",
+      "post_to_final_seconds": 43.291,
+      "first_post_seconds": 16.574,
+      "tool_call_attempts": 2,
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\":\"a:suricata\"}"
+        },
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": "{\"limit\":10,\"lookback_minutes\":60,\"target\":\"a:raw-suricata\"}"
+        }
+      ],
+      "correction_passes": 0,
+      "api_native_exact_match": true,
+      "original_message_rows_preserved": true,
+      "message_rows_before_after": [
+        1428,
+        1433
+      ],
+      "content_review": "core requested facts checked against current results; not universal correctness"
+    },
+    {
+      "case": "1.5.1 IDS repeat",
+      "started_at_kst": "2026-10-24T22:56:18.163809+09:00",
+      "question_id": "1rahtnsbgffd9chhn7gbd8oopc",
+      "final_post_url": "https://chat.grootlab.duckdns.org/soc/pl/uyyfguzsmb8nmdz6hkn9oq1zno",
+      "post_to_final_seconds": 43.063,
+      "first_post_seconds": 13.055,
+      "tool_call_attempts": 2,
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_service_action_target",
+          "arguments": "{\"target\":\"a:suricata\"}"
+        },
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": "{\"limit\":10,\"lookback_minutes\":60,\"target\":\"a:raw-suricata\"}"
+        }
+      ],
+      "correction_passes": 1,
+      "api_native_exact_match": true,
+      "original_message_rows_preserved": true,
+      "message_rows_before_after": [
+        1433,
+        1440
+      ],
+      "content_review": "core requested facts checked against current results; not universal correctness",
+      "corrected_issue": "unobserved_event_source:suricata"
+    },
+    {
+      "case": "1.5.1 rules",
+      "started_at_kst": "2026-10-24T22:58:00.350748+09:00",
+      "question_id": "w3xpjpe86fyujjwh5stdg9w3ce",
+      "final_post_url": "https://chat.grootlab.duckdns.org/soc/pl/ah38wu6qztnzzyitgcur6pj11r",
+      "post_to_final_seconds": 16.478,
+      "first_post_seconds": 13.623,
+      "tool_call_attempts": 5,
+      "tool_calls": [
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "arguments": "{\"target\":\"a:modsecurity-custom\"}"
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "arguments": "{\"target\":\"a:suricata-local\"}"
+        },
+        {
+          "name": "mcp__rule_b__get_rule_change_target",
+          "arguments": "{\"target\":\"b:wazuh-local-rules\"}"
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "arguments": "{\"target\":\"a:suricata\"}"
+        },
+        {
+          "name": "mcp__rule_a__get_rule_change_target",
+          "arguments": "{\"target\":\"a:waf\"}"
+        }
+      ],
+      "correction_passes": 0,
+      "api_native_exact_match": true,
+      "original_message_rows_preserved": true,
+      "message_rows_before_after": [
+        1440,
+        1448
+      ],
+      "content_review": "core requested facts checked against current results; not universal correctness",
+      "valid_file_reads": 3,
+      "rejected_wrong_target_calls": 2,
+      "verified_file_counts": {
+        "waf": 10,
+        "suricata": 14,
+        "wazuh": 19
+      }
+    },
+    {
+      "case": "1.5.1 prior table",
+      "started_at_kst": "2026-10-24T22:59:27.329809+09:00",
+      "question_id": "zffjh817wbdd3repunp9mcgu4w",
+      "final_post_url": "https://chat.grootlab.duckdns.org/soc/pl/8ugk7hwgopfgffbazqxft6rs1e",
+      "post_to_final_seconds": 0.233,
+      "first_post_seconds": 0.233,
+      "tool_call_attempts": 0,
+      "tool_calls": [],
+      "correction_passes": 0,
+      "api_native_exact_match": true,
+      "original_message_rows_preserved": true,
+      "message_rows_before_after": [
+        1448,
+        1450
+      ],
+      "content_review": "core requested facts checked against current results; not universal correctness",
+      "new_provider_calls": 0,
+      "new_tool_calls": 0,
+      "scope": "explicitly labelled reuse of previous hash-verified file results"
+    }
+  ],
+  "validation": {
+    "query_tests": 199,
+    "deployment_tests": 157,
+    "siem_tests": 40,
+    "total_distinct": 396,
+    "native_source_pins": 7,
+    "native_aliases": true,
+    "message_count": 1450,
+    "gateway_connected": true,
+    "active_agents": 0,
+    "failed_units": "",
+    "timer_broker_states": {
+      "capstone-management.timer": "active",
+      "rule-change-worker.timer": "active",
+      "soc-bot.service": "active"
+    },
+    "native_hashes": {
+      "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
+      "agent/conversation_loop.py": "c93ee86e1da583abc7cc57417380cd71241ae028c04a4cb8456580b52ffbf3d8",
+      "agent/turn_context.py": "85f857dc3c317366d918516bc8b37a022f1020b34da0c3966a31bd289b2942e1",
+      "agent/message_metadata.py": "77fbe25c86f2ab524fcac61a83548768cffc82c476bb8a6ff83ebdf492a5479d",
+      "agent/turn_api_request.py": "e31386cb83cf551026e4df9b589173b54bc913b36fc1a09942a520e68033b59e",
+      "agent/chat_completion_helpers.py": "5231a0e674806db6ad7be60e2d40a19a4157f7d2baa238aaa9af66f61e0eea4c",
+      "agent/turn_api_call.py": "a2b2c0232b1d37d5ebfefff2d06ce1bd3b69cfe93ab3a8c9f382d62f2a6deb8b",
+      "plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+      "gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a"
+    },
+    "deployed_hashes": {
+      "/opt/hermes-data/config.yaml": "d308c6254301bd3dcfa021a93f0203100f7323112295d31e1dde93829815cf83",
+      "/opt/hermes-data/management/config.yaml": "f27f928e9b9ff550a57b03f78afef4f7cd648fe4fbdcab0469a10eba36e4a729",
+      "/opt/hermes-data/memories/MEMORY.md": "c413cf3c190260caf3ab2ed678844c04ffb681c65076dfb14a25da70f95d1b8c",
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "ec4775bdbd31dc1e57d7691b12e3cbd0f6d13c8450414229cc777ee435287018",
+      "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "70210dc610b6637df39c35b2c5d440b0de1261688c5f2c07fb6bbf60ad855e49",
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+      "/opt/hermes-data/management-code/run.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+      "/opt/capstone-management/soc_management_controller.py": "82c062fa93323fdde7f2be0737ffe6eedcede435991eb6506ded9c4102c5f070"
+    }
+  },
+  "deployment": {
+    "same_container_id": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "hermes_stop_start_count": 2,
+    "changed_live_files": [
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+      "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml"
+    ],
+    "backups": [
+      "/var/backups/capstone-query-latency/20261024T224808+0900",
+      "/var/backups/capstone-query-latency/20261024T225309+0900"
+    ],
+    "model_config_memory_shared_gate_unchanged": true,
+    "new_packages_images_ports": 0,
+    "protected_actions": 0,
+    "entrypoint": "deploy.sh",
+    "existing_source_hash_contract_covers_changes": true
+  },
+  "limits": [
+    "Same authorized test thread; few samples, not an SLA or all-question accuracy result.",
+    "Historical baseline and sequential samples; model cache/load and different selected reads prevent attributing the full gain to one variable.",
+    "No user UI rendering/mobile push or new WebSocket observer; final delivery verified by authenticated API and native saved text.",
+    "One repeat needed evidence correction; inventory included two wrong-target reads that were rejected.",
+    "Actual attack/detection/approval/block E2E and fresh three-VM install were not performed; CVE scenario 3 remains paused."
+  ],
+  "git": {
+    "state": "source and documentation prepared; commit/push not yet complete"
+  },
+  "cleanup": {
+    "server_trial_temp_dirs": [],
+    "mac_temporary_directory_removed": false,
+    "mac_packages_installed": 0,
+    "package_downloads": 0
+  }
+}

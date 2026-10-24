@@ -1048,7 +1048,8 @@ class FirstRequestGroundingTests(unittest.TestCase):
                 self.assertEqual(result['reasoning_effort'], 'none')  # Only first read selection; analysis retains medium.
                 self.assertTrue(result['tools'])
                 self.assertTrue(all(t['function']['name'] in PLUGIN._READ_TOOL_NAMES for t in result['tools']))
-                self.assertEqual(seen[0][-1]['content'], PLUGIN.LIVE_QUERY_GUIDANCE)
+                self.assertEqual(seen[0][-1]['content'], PLUGIN.LIVE_QUERY_GUIDANCE +
+                                 PLUGIN.status_lookup_guidance(PLUGIN.current_request_text(h.kw['user_message'])))
                 self.assertNotEqual(seen[0], original)
                 self.assertIs(h.agent._build_api_kwargs, h.original_builder)
                 self.assertEqual(h.api_kwargs['reasoning_effort'], 'none')

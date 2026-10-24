@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.4.0"
+VERSION = "groot-query-completion:1.5.1"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0"
@@ -306,6 +306,9 @@ def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, f
 
 
 LIVE_QUERY_GUIDANCE = (
+    "현재 턴은 아직 실제 조회하지 않았습니다. 첫 응답은 필요한 읽기 도구 호출만 하세요. "
+    "설명·과거 결과 재요약·최종 답변을 먼저 작성하지 마세요. "
+    "도구 선택과 인자는 제공된 스키마로 직접 결정하세요. "
     "이번 요청은 현재 운영 상태의 읽기 조회입니다. 이전 봇 답변은 현재 상태의 증거가 아닙니다. "
     "필요한 기존 읽기 도구와 인자를 직접 선택하고 실제 반환값으로 답하세요. "
     "룰 파일의 정의 수와 전체 CRS/ET 개수, 엔진 적재와 실제 탐지 성공을 구분하세요. "
@@ -316,6 +319,23 @@ LIVE_QUERY_GUIDANCE = (
     "TLS 등 일반적 한계를 이번 장애의 확인된 원인으로 바꾸지 마세요. "
     "요청한 표/상세 형식은 따르되 같은 요약·목록을 반복하지 마세요. 이 안내는 변경이나 승인이 아닙니다."
 )
+
+
+def status_lookup_guidance(request):
+    """Keep a simple activation check scoped; tool/argument choice stays with the model."""
+    if (not isinstance(request, str) or not _DEVICE.search(request)
+            or not re.search(r'활성|가동|로드|적재', request)
+            or re.search(r'위험|공격|차단|대응|조치|취약|사고|분석|비교|상세|전문|원문', request)):
+        return ''
+    return (
+        '이번 질문은 장비의 현재 활성 여부 확인입니다. 우선 서비스 상태 조회로 실제 가동과 '
+        '현재 룰 경로의 근거를 확인하세요. 룰 내용이나 SID 목록을 요청하지 않았다면 '
+        '큰 룰 파일 전문·관련 없는 장비의 전체 목록 조회부터 시작하지 마세요. '
+        '추가 조회는 필요한 미확인 항목을 해결할 때 선택하세요. 최종 답변은 결론, '
+        '이번 조회의 핵심 근거, 미확인 범위를 간결하게 쓰세요. 요청하지 않은 SID 범위나 '
+        '관측하지 않은 TLS 등 일반 원인을 덧붙이지 마세요. 문제를 확인하면 기존 '
+        '조사·변경안 준비·정확 승인 절차를 계속하세요.'
+    )
 
 
 def inventory_request_for_turn(request, messages, idx):
@@ -410,16 +430,17 @@ def make_request_wrapper(original, reanchor):
                 read_only=inventory_only or not has_calls, selection_only=not has_calls, grounded_lookup=grounded_lookup):
             return original(agent, **kw)
         if isinstance(kw.get("api_messages"), list):
-            kw = {**kw, "api_messages": compact_old_context(kw["api_messages"], user)}
+            kw = {**kw, "api_messages": compact_read_history(kw["api_messages"], user)}
         facts, errors, linked = current_evidence(messages[idx + 1:])
         if not inventory_only and linked and (facts or errors) and isinstance(kw.get("api_messages"), list):
-            kw = {**kw, "api_messages": [*kw["api_messages"], {"role": "user", "content": evidence_guidance(facts, errors)}]}
+            kw = {**kw, "api_messages": [*kw["api_messages"], {"role": "user", "content":
+                evidence_guidance(facts, errors) + status_lookup_guidance(request)}]}
         if local_text:
             agent._capstone_query_completion_local_format = (turn, local_text)
         if not has_calls and isinstance(kw.get("api_messages"), list):
             guidance = ('이번 요청은 직전의 실제 조회 결과를 표로 재정리하는 형식 요청입니다. '
                         '새 조회·변경 없이 앞선 조회 기준임을 밝히고 간결하게 답하세요.'
-                        if prior_table else LIVE_QUERY_GUIDANCE)
+                        if prior_table else LIVE_QUERY_GUIDANCE + status_lookup_guidance(request))
             kw = {**kw, "api_messages": [*kw["api_messages"], {"role": "user", "content": guidance}]}
         try:
             return original(agent, **kw)
@@ -778,6 +799,71 @@ def compact_old_context(api_messages, user):
                 row = {**row, 'content': parsed}
         out.append(row)
     return out
+
+
+_OLD_READ_NOTICE = (
+    "이전 턴의 읽기 결과는 이번 현재 조회에서 생략했습니다. 현재 근거가 아니며, "
+    "원문은 저장 이력에 보존되어 있습니다. 필요한 현재 상태는 새로 조회하세요."
+)
+_HISTORY_REFERENCE = re.compile(
+    r"이전|과거|아까|앞선|방금|어제|지난|당시|비교|차이|다시\s*(?:설명|정리)|"
+    r"(?:위|그|해당|같은)\s*(?:결과|내용|로그|룰|규칙|설정|장비|서버)|장비별.*(?:표|테이블)"
+)
+
+
+def compact_read_history(api_messages, user):
+    """Elide only linked, old read payloads for a fresh, explicit lookup.
+
+    All policy, user constraints, assistant text/calls and current-turn results
+    stay intact. History-dependent requests and unknown/protected calls keep
+    their payloads. This projection never changes persisted messages or facts
+    used by the evidence gate/local inventory renderer.
+    """
+    out = compact_old_context(api_messages, user)
+    request = current_request_text(user)
+    if (not isinstance(out, list) or not live_rule_request(request)
+            or _HISTORY_REFERENCE.search(request)):
+        return out
+    anchors = [i for i, row in enumerate(out) if isinstance(row, dict)
+               and row.get('role') == 'user' and row.get('content') == user]
+    if len(anchors) != 1:
+        return out  # No exact wire anchor: preserve native context.
+    boundary = anchors[0]
+    calls, duplicate_ids, result_counts = {}, set(), {}
+    for row in out[:boundary]:
+        if not isinstance(row, dict):
+            continue
+        if row.get('role') == 'assistant':
+            tool_calls = row.get('tool_calls') or []
+            if not isinstance(tool_calls, list):
+                return out
+            for call in tool_calls:
+                if not isinstance(call, dict):
+                    continue
+                call_id, fn = call.get('id'), call.get('function')
+                if not isinstance(call_id, str) or not isinstance(fn, dict):
+                    continue
+                if call_id in calls:
+                    duplicate_ids.add(call_id)
+                calls[call_id] = fn.get('name')
+        elif row.get('role') == 'tool' and isinstance(row.get('tool_call_id'), str):
+            call_id = row['tool_call_id']
+            if call_id not in calls:
+                duplicate_ids.add(call_id)  # A result preceding its call is not linked.
+            result_counts[call_id] = result_counts.get(call_id, 0) + 1
+    projected = list(out)
+    for i, row in enumerate(out[:boundary]):
+        if not isinstance(row, dict) or row.get('role') != 'tool':
+            continue
+        call_id = row.get('tool_call_id')
+        name = calls.get(call_id) if isinstance(call_id, str) else None
+        if (isinstance(name, str) and EVIDENCE.allowed(name, 'verify')
+                and call_id not in duplicate_ids and result_counts.get(call_id) == 1
+                and row.get('name', name) == name
+                and row.get('tool_name', name) == name
+                and isinstance(row.get('content'), str)):
+            projected[i] = {**row, 'content': _OLD_READ_NOTICE}
+    return projected
 
 
 def make_wrapper(original, native, append_message, reanchor):

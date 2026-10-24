@@ -161,7 +161,7 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(self.svc.worker_once()[0]["status"], "pending")
         self.assertFalse(self.backend.actions)
         card = self.broker.cards[0]["attachments"][0]["text"]
-        self.assertIn(self.backend.observation["started_at"], card)
+        self.assertIn(operations.display_summary_kst(self.backend.observation["started_at"]), card)
         self.assertIn("예상 변경 후 상태", card)
         self.assertIn("a:waf", card)
         self.assertEqual(self.broker.consumes, 0)

@@ -141,7 +141,8 @@ def hermes_extension_files():
         base + 'startup/' + name: 'hooks/groot-mattermost-channel-sync/' + name
         for name in ('HOOK.yaml', 'handler.py')} | {
         'infra/hermes/query-completion/' + name: 'plugins/groot-query-completion/' + name
-        for name in ('__init__.py', 'plugin.yaml')}
+        for name in ('__init__.py', 'plugin.yaml')} | {
+        'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py'}
 def query_completion_source_pins(raw=None):
     # Read literal pins from the shipped plugin without importing/executing it.
     if raw is None:
@@ -199,6 +200,7 @@ def install_hermes_extensions(data, hu, creds, hc):
         mkdir(data / relative,0o700,hu.pw_uid,hu.pw_gid)
     for source, relative in files.items():
         publish(data / relative,read(SOURCE/source,512*1024),0o600,hu.pw_uid,hu.pw_gid)
+    hc['timezone'] = 'Asia/Seoul'
     hc['plugins'] = {'enabled':['groot-mattermost-context','groot-query-completion']}
     return {'MATTERMOST_URL':'http://'+IP+':8065','MATTERMOST_TOKEN':creds['mattermost_bot_token'],
             'MATTERMOST_ALLOWED_USERS':creds['mattermost_admin_id'],'MATTERMOST_ALLOWED_CHANNELS':'',

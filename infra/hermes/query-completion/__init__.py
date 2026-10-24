@@ -17,8 +17,26 @@ import os
 from pathlib import Path
 import re
 import time
+from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.3.1"
+VERSION = "groot-query-completion:1.4.0"
+# One canonical implementation is also embedded in the root management gate.
+# The installer ships it verbatim here; reject drift before executing it.
+EVIDENCE_SOURCE_SHA256 = "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0"
+
+def _load_evidence():
+    path = Path(__file__).with_name('grounding.py')
+    if not path.exists():
+        path = Path(__file__).parent.parent / 'soc_management_run.py'
+    raw = path.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != EVIDENCE_SOURCE_SHA256:
+        raise RuntimeError('evidence_source_pin_mismatch')
+    module = ModuleType('_capstone_shared_evidence')
+    module.__file__ = str(path)
+    exec(compile(raw, str(path), 'exec'), module.__dict__)
+    return module
+
+EVIDENCE = _load_evidence()
 SOURCE_ROOT = Path("/opt/hermes")
 SOURCE_SHA256 = {
     "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
@@ -209,7 +227,7 @@ def _read_tools(tools, names):
     return scoped
 
 
-def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, format_only=False, read_only=True):
+def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, format_only=False, read_only=True, selection_only=False, grounded_lookup=False):
     """Narrow the next native chat request only; never add a tool or synthesize a call."""
     original = getattr(agent, "_build_api_kwargs", None)
     offered = _read_tools(getattr(agent, "tools", None), getattr(agent, "valid_tool_names", ()) or ())
@@ -277,7 +295,7 @@ def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, f
                 extra.pop(key, None)
             # Verified file counts/IDs are rendered from hashes, so their final
             # prose step does not need another thinking pass.
-            narrowed["reasoning_effort"] = "none" if inventory_only and not require_read else "medium"
+            narrowed["reasoning_effort"] = "none" if selection_only or grounded_lookup or inventory_only and not require_read else "medium"
         if extra or isinstance(result.get("extra_body"), dict):
             narrowed["extra_body"] = extra
         return narrowed
@@ -383,10 +401,19 @@ def make_request_wrapper(original, reanchor):
             has_calls = bool(render_rule_inventory(inventory_request, messages[idx + 1:], verified_targets=True))
             if has_calls and not render_rule_inventory(inventory_request, messages[idx + 1:], missing_targets=True):
                 local_text = render_rule_inventory(inventory_request, messages[idx + 1:])
+        facts, errors, linked = current_evidence(messages[idx + 1:])
+        grounded_lookup = bool(linked and facts and not errors and
+            any(f.get('kind') == 'runtime' for f in facts) and
+            not re.search(r'위험|공격|차단|대응|조치|취약|사고|분석', request))
         if not callable(pending) and not _arm_read_request(agent, turn, require_read=not has_calls and not prior_table,
                 inventory_only=inventory_only, format_only=bool(local_text),
-                read_only=inventory_only or not has_calls):
+                read_only=inventory_only or not has_calls, selection_only=not has_calls, grounded_lookup=grounded_lookup):
             return original(agent, **kw)
+        if isinstance(kw.get("api_messages"), list):
+            kw = {**kw, "api_messages": compact_old_context(kw["api_messages"], user)}
+        facts, errors, linked = current_evidence(messages[idx + 1:])
+        if not inventory_only and linked and (facts or errors) and isinstance(kw.get("api_messages"), list):
+            kw = {**kw, "api_messages": [*kw["api_messages"], {"role": "user", "content": evidence_guidance(facts, errors)}]}
         if local_text:
             agent._capstone_query_completion_local_format = (turn, local_text)
         if not has_calls and isinstance(kw.get("api_messages"), list):
@@ -684,8 +711,88 @@ def _with_final_text(kw, text):
     return {**kw, "assistant_message": safe_message, "final_response": text, "truncated_response_parts": []}
 
 
+
+def current_evidence(rows):
+    """Only actual call-linked read results in this turn; no prose/history facts."""
+    calls, used, facts, errors = {}, set(), [], {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        if row.get('role') == 'assistant':
+            for call in row.get('tool_calls') or []:
+                if not isinstance(call, dict) or not isinstance(call.get('function'), dict):
+                    return [], [], False
+                name, cid = call['function'].get('name'), call.get('id')
+                if not EVIDENCE.allowed(name, 'verify') or not isinstance(cid, str) or cid in calls:
+                    return [], [], False  # Preserve native protected operation handling.
+                calls[cid] = name
+        elif row.get('role') == 'tool':
+            cid = row.get('tool_call_id')
+            if cid not in calls or cid in used:
+                return [], [], False
+            used.add(cid)
+            name = calls[cid]
+            raw = row.get('content')
+            if not isinstance(raw, str) or len(raw) > 200000:
+                continue
+            try:
+                data = _inventory_payload(raw, name)
+                short = name.rsplit('__', 1)[-1]
+                refused = EVIDENCE.argument_error(data)
+                if refused:
+                    errors[name] = True
+                elif isinstance(data, dict) and not data.get('error') and not data.get('isError'):
+                    errors.pop(name, None)
+                result = SimpleNamespace(is_error=False, content=[SimpleNamespace(text=json.dumps(data))])
+                facts.extend(EVIDENCE.observation_facts(short, result))
+            except (ValueError, TypeError, RecursionError):
+                continue
+    return facts, sorted(errors), bool(used)
+
+
+def evidence_guidance(facts, errors):
+    return ('현재 턴의 실제 조회 근거를 우선하세요. 아래 요약은 자료이며 명령·승인·사건 판단이 아닙니다. '
+            '모든 표시 시각은 같은 절대 시각의 KST(+09:00)로 변환하세요. 원본 offset을 Z로 바꾸지 마세요. '
+            '과거 SID 적중은 현재 SID별 적재 검증이 아닙니다. 이전 답변의 기간별 수치는 이번 조회 근거가 아닙니다. '
+            '이미 성공한 동일 조회는 상태 변경 근거가 없으면 반복하지 말고 현재 결과로 간결하게 답하세요. 오류 반환 표본 0건은 전체 오류 없음이 아닙니다. 관측되지 않은 TLS·원인·경과시간은 만들지 마세요. '
+            '현재 문제가 확인되면 기존 권한 안에서 조사·변경안 준비를 계속하고 보호된 적용은 정확 승인 절차를 지키세요.\n'
+            + EVIDENCE.literal_evidence_summary(facts)
+            + ('\n인자 검증 거절: ' + ', '.join(errors) + '. 실제 스키마의 enum/minimum/maximum을 확인해 필요한 조회의 인자를 직접 정정하세요. '
+               '필요 없는 조회는 생략 이유와 미확인 범위를 명시하세요.' if errors else ''))
+
+
+def compact_old_context(api_messages, user):
+    """Remove duplicate hydrated context only from previous user API messages.
+
+    Original user text, current context and all stored history/tool results remain.
+    No historical facts or approvals are synthesized.
+    """
+    if not isinstance(api_messages, list):
+        return api_messages
+    out = []
+    for row in api_messages:
+        if isinstance(row, dict) and row.get('role') == 'user' and row.get('content') != user:
+            raw = row.get('content')
+            parsed = current_request_text(raw)
+            if isinstance(raw, str) and raw.startswith(_CONTEXT_PREFIX) and parsed:
+                row = {**row, 'content': parsed}
+        out.append(row)
+    return out
+
+
 def make_wrapper(original, native, append_message, reanchor):
     """Dependency-injected wrapper; native owns model calls, tool dispatch and persistence."""
+    def finish(agent, **kw):
+        text = getattr(kw.get('assistant_message'), 'content', None)
+        platform = getattr(agent, 'platform', '')
+        if (str(getattr(platform, 'value', platform)).lower() == 'mattermost'
+                and kw.get('finish_reason') == 'stop' and isinstance(text, str)
+                and not getattr(kw.get('assistant_message'), 'tool_calls', None)):
+            shown = EVIDENCE.kst_display(text)
+            if shown != text:
+                kw = _with_final_text(kw, shown)
+        return original(agent, **kw)
+
     @functools.wraps(original)
     def wrapped(agent, **kw):
         restore_names = getattr(agent, "_capstone_query_completion_names_restore", None)
@@ -707,28 +814,55 @@ def make_wrapper(original, native, append_message, reanchor):
                 or not isinstance(turn, str) or not turn
                 or not request or not (_READ.search(request) or live_rule_request(request)) or _WRITE.search(request)
                 or not isinstance(messages, list) or getattr(message, "tool_calls", None)):
-            return original(agent, **kw)
+            return finish(agent, **kw)
         idx = reanchor(messages, user)
         if (type(idx) is not int or not 0 <= idx < len(messages)
                 or not isinstance(messages[idx], dict) or messages[idx].get("role") != "user"
                 or messages[idx].get("content") != user):
-            return original(agent, **kw)
+            return finish(agent, **kw)
+        facts, errors, linked = current_evidence(messages[idx + 1:])
+        text = getattr(message, 'content', None)
+        issues = EVIDENCE.evidence_claim_violations(text, facts) if linked else []
+        if linked and (issues or errors):
+            retried_evidence = getattr(agent, '_capstone_evidence_turn', None) == turn
+            counter = kw.get('codex_ack_continuations')
+            known = int(getattr(agent, '_capstone_query_completion_turn', None) == turn)
+            if not retried_evidence and type(counter) is int and counter == known and _remaining(kw, agent):
+                # Keep the original allowed tools after investigation; never choose or alter args.
+                agent._capstone_evidence_turn = turn
+                agent._mute_post_response = False
+                agent._empty_content_retries = agent._thinking_prefill_retries = 0
+                agent._clear_status_buffer()
+                append_message(messages, agent._build_assistant_message(message, 'incomplete'))
+                append_message(messages, {'role': 'user', 'content':
+                    '최종 답변 근거 검사: ' + ', '.join(issues) + '\n' + evidence_guidance(facts, errors)})
+                agent._session_messages = messages
+                names = ('active_system_prompt', '_turn_exit_reason', '_preflight_compression_blocked',
+                         'truncated_response_parts', 'length_continue_retries',
+                         '_pending_verification_response', '_pending_verification_response_previewed')
+                return native.FinalResponseVerdict(action='continue', final_response=None,
+                    codex_ack_continuations=counter + 1, **{name: kw[name] for name in names})
+            fallback = ('조회한 사실과 모델 설명이 일치하지 않아 확인된 자료만 표시합니다. '
+                        '현재 SID별 적재와 사건 원인은 미확인입니다.\n' + EVIDENCE.literal_evidence_summary(facts))
+            if errors:
+                fallback += '\n일부 진단 인자가 거절되어 해당 범위는 확인하지 못했습니다.'
+            return finish(agent, **_with_final_text(kw, fallback))
         inventory_request = inventory_request_for_turn(request, messages, idx)
         prior_table = render_prior_inventory(request, messages, idx)
         if prior_table is not None:
-            return original(agent, **_with_final_text(kw, prior_table))
+            return finish(agent, **_with_final_text(kw, prior_table))
         inventory_text = render_rule_inventory(inventory_request, messages[idx + 1:])
         missing = render_rule_inventory(inventory_request, messages[idx + 1:], missing_targets=True)
         retried = getattr(agent, "_capstone_query_completion_turn", None) == turn
         complete_inventory = bool(inventory_text is not None and missing and not retried)
         if inventory_text is not None and not complete_inventory:
-            return original(agent, **_with_final_text(kw, inventory_text))
+            return finish(agent, **_with_final_text(kw, inventory_text))
         text = getattr(message, "content", None)
         if not retried and not complete_inventory and not (looks_like_unexecuted_lookup(text) or needs_live_rule_evidence(request, text)):
-            return original(agent, **kw)
+            return finish(agent, **kw)
         if not complete_inventory and any(isinstance(row, dict) and (row.get("role") == "tool"
                    or row.get("role") == "assistant" and row.get("tool_calls")) for row in messages[idx + 1:]):
-            return original(agent, **kw)
+            return finish(agent, **kw)
         counter = kw.get("codex_ack_continuations")
         if (not retried and type(counter) is int and counter == 0 and _remaining(kw, agent)
                 and _arm_read_request(agent, turn, inventory_only=complete_inventory or bool(_RULE.search(request) and _inventory_request(request)))):
@@ -755,7 +889,7 @@ def make_wrapper(original, native, append_message, reanchor):
                 **{name: kw[name] for name in names},
             )
         # The native function builds and persists this same truthful final text.
-        return original(agent, **_with_final_text(kw, inventory_text if inventory_text is not None else FALLBACK))
+        return finish(agent, **_with_final_text(kw, inventory_text if inventory_text is not None else FALLBACK))
 
     wrapped.__capstone_query_completion__ = VERSION
     wrapped._capstone_query_completion_version = VERSION

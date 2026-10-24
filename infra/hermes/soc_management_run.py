@@ -7,6 +7,7 @@ approval and evidence checks remain authoritative for every physical action.
 """
 import asyncio
 import functools
+from datetime import datetime, timedelta, timezone
 import hashlib
 import importlib
 import json
@@ -43,6 +44,87 @@ GROUNDING_NUDGE = (
 )
 
 
+
+KST = timezone(timedelta(hours=9), 'KST')
+_AWARE_TIME = re.compile(r'(?<![0-9])\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:?\d{2}|[ ](?:UTC|KST))(?![0-9])')
+
+
+def parse_instant(value):
+    if not isinstance(value, str):
+        return None
+    try:
+        value = re.sub(r' KST$', '+09:00', re.sub(r' UTC$', '+00:00', value))
+        parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+        return parsed if parsed.tzinfo is not None else None
+    except ValueError:
+        return None
+
+
+def kst_time(value):
+    parsed = parse_instant(value)
+    return parsed.astimezone(KST).isoformat() + ' (KST)' if parsed else '시간대 확인 필요'
+
+
+def kst_display(text):
+    """Presentation only: never change fenced source/diffs, IDs or tool arguments.
+
+    Original fenced data stays byte exact; its time conversion is attached outside.
+    Storage/approval hashes and source timestamps are not rewritten.
+    """
+    if not isinstance(text, str):
+        return text
+    parts = re.split(r'(^```[^\n]*\n.*?^```[^\n]*$)', text, flags=re.M | re.S)
+    for i, part in enumerate(parts):
+        if i % 2:
+            stamps = list(dict.fromkeys(_AWARE_TIME.findall(part)))[:16]
+            if stamps and (i + 1 >= len(parts) or not parts[i + 1].startswith('\n원문 시각의 KST 환산: ')):
+                parts[i] += '\n원문 시각의 KST 환산: ' + ', '.join(kst_time(x) for x in stamps)
+        else:
+            # Avoid duplicate labels on repeated finalization.
+            parts[i] = _AWARE_TIME.sub(lambda m: m[0] if m[0].endswith(('KST', '+09:00', '+0900')) else kst_time(m[0]), part)
+    return ''.join(parts)
+
+
+def _unpack(data):
+    for _ in range(4):
+        if isinstance(data, dict) and isinstance(data.get('result'), str):
+            data = json.loads(data['result'])
+        else:
+            break
+    return data
+
+
+def _times(data, depth=0):
+    if depth > 6:
+        return []
+    if isinstance(data, dict):
+        found = [v for k, v in data.items() if isinstance(v, str) and
+                 re.fullmatch(r'(?:timestamp|timestamp_kst|ts_kst|started_at|observed_at_kst|requested_since_kst|requested_until_kst|last_reload)', k) and parse_instant(v)]
+        return (found + [v for x in list(data.values())[:60] for v in _times(x, depth + 1)])[:120]
+    if isinstance(data, list):
+        return [v for x in data[:50] for v in _times(x, depth + 1)][:120]
+    return []
+
+
+def argument_error(data):
+    """Recognize actual schema refusals, including the native nested JSON error."""
+    if not isinstance(data, dict):
+        return False
+    error = data.get('error', data.get('reason'))
+    if isinstance(error, str):
+        if re.fullmatch(r'unsupported argument: [A-Za-z_][A-Za-z0-9_]{0,63}', error):
+            return True
+        if error in ('invalid_arguments', 'unknown_target', 'invalid_range') or re.fullmatch(
+                r'(?:limit|lookback_minutes) must be an integer (?:from|between) [0-9]+ (?:to|and) [0-9]+', error):
+            return True
+        if len(error) < 4096:
+            try:
+                return argument_error(json.loads(error))
+            except (ValueError, RecursionError):
+                pass
+    return False
+
+
 def observation_facts(name, result):
     """Keep bounded literal scope facts, never event instructions or decisions."""
     if getattr(result, 'is_error', getattr(result, 'isError', False)) is not False:
@@ -54,11 +136,10 @@ def observation_facts(name, result):
             continue
         try:
             data = json.loads(raw)
-            for _ in range(3):
-                if isinstance(data, dict) and isinstance(data.get('result'), str):
-                    data = json.loads(data['result'])
+            data = _unpack(data)
             if not isinstance(data, dict) or data.get('error') or data.get('isError'):
                 continue
+            stamps = list(dict.fromkeys(_times(data)))
             if name in EVENT_READ and data.get('source') in ('suricata', 'modsecurity'):
                 keep = ('source', 'requested_since_kst', 'requested_until_kst', 'returned_count',
                         'indexed_window_total_count', 'scan_capped')
@@ -79,27 +160,36 @@ def observation_facts(name, result):
                 inv = data['rule_inventory']
                 rows.append({'kind': 'rules', 'target': data.get('target'),
                     **{k: inv[k] for k in ('declared_count', 'source_sha256', 'runtime_load_verified') if k in inv}})
-            elif name == 'list_blocks' and isinstance(data.get('blocks'), list):
+            if name == 'get_service_action_target' and isinstance(data.get('observation'), dict):
+                observed = data['observation']
+                if parse_instant(observed.get('started_at')):
+                    rows.append({'kind': 'service', 'target': data.get('target'), 'started_at': observed['started_at']})
+            if name in ('get_rule_change_target', 'get_service_action_target'):
+                runtime = data.get('rule_source_evidence', data.get('runtime'))
+                if isinstance(runtime, dict) and runtime.get('rule_source_option') == '-S' and runtime.get('rule_source_path') == '/rules/all.rules':
+                    rows.append({'kind': 'runtime', 'target': data.get('target'), **{k: runtime[k] for k in
+                        ('rule_source_path', 'combined_is_exact_et_plus_local', 'observed_at', 'started_at', 'running') if k in runtime},
+                        'runtime_load_verified': False})
+            if name == 'list_blocks' and isinstance(data.get('blocks'), list):
                 rows.append({'kind': 'blocks', 'count': len(data['blocks'])})
+            if stamps:
+                rows.append({'kind': 'times', 'instants': stamps})
         except (ValueError, TypeError, RecursionError):
             continue
     return rows
 
 
 def argument_refusal(name, result):
-    if not wire_allowed(name, 'verify') or getattr(result, 'is_error', getattr(result, 'isError', False)) is not True:
+    if not wire_allowed(name, 'verify'):
         return False
     for block in getattr(result, 'content', [])[:20]:
         raw = getattr(block, 'text', None)
-        if not isinstance(raw, str) or len(raw) > 4096:
-            continue
-        try:
-            error = json.loads(raw).get('error', '')
-            if error in ('invalid_arguments', 'unknown_target', 'invalid_range') or (
-                    isinstance(error, str) and re.fullmatch(r'(?:limit|lookback_minutes) must be an integer (?:from|between) [0-9]+ (?:to|and) [0-9]+', error)):
-                return True
-        except (ValueError, TypeError, AttributeError):
-            continue
+        if isinstance(raw, str) and len(raw) <= 131072:
+            try:
+                if argument_error(_unpack(json.loads(raw))):
+                    return True
+            except (ValueError, TypeError, RecursionError):
+                pass
     return False
 
 
@@ -130,7 +220,12 @@ def evidence_claim_violations(text, facts):
             if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:0\s*건|없(?:었|습|음|다|는)|전혀\s*없)', line) and
                     not re.search(r'표본|반환|검색\s*결과|미확인|단정.{0,8}(?:않|없)|확인.{0,5}못|아니|아닙|아님', line)):
                 issues.add('sample_zero_presented_as_absence')
-    if any(x.get('kind') == 'rules' and x.get('runtime_load_verified') is False for x in facts):
+    if unknown:
+        for line in text.splitlines():
+            if (re.search(r'(?:경보|이벤트).{0,25}[0-9]+\s*건.{0,6}(?:발생|있음|있습니다)', line) and
+                    not re.search(r'반환|표본|검색 결과|미확인|단정.{0,8}(?:않|없)', line)):
+                issues.add('sample_count_presented_as_window_total')
+    if any(x.get('kind') in ('rules', 'runtime') and x.get('runtime_load_verified') is False for x in facts):
         # A column heading such as "실제 적재 검증 여부" is not a claim that
         # verification succeeded. Require an affirmative statement or cell.
         loading_columns = []
@@ -161,18 +256,49 @@ def evidence_claim_violations(text, facts):
         for match in re.finditer(r'(?i)(?:exit[ _]*(?:code|status)|종료\s*(?:코드|값))\s*[:=]?\s*([0-9]+)', clean_line):
             if not re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)', clean_line[match.end():]) and len(statuses) == 1 and None not in statuses and int(match[1]) not in statuses:
                 issues.add('diagnostic_exit_status_mismatch')
+    instants = [parse_instant(v) for f in facts if f.get('kind') == 'times' for v in f.get('instants', [])]
+    instants = [v for v in instants if v is not None]
+    for stamp in _AWARE_TIME.findall(text):
+        parsed = parse_instant(stamp)
+        if parsed and instants and not any(abs((parsed - v).total_seconds()) < 1 for v in instants):
+            # Same wall clock relabelled with a different offset is the observed defect.
+            if any(abs((parsed.replace(tzinfo=None) - v.replace(tzinfo=None)).total_seconds()) < 1 for v in instants):
+                issues.add('timestamp_offset_relabelled')
+            if any(any(abs(abs((parsed - v).total_seconds()) - shift) < 1 for shift in (32400, 64800)) for v in instants):
+                issues.add('timestamp_zone_shift')
+    runtime = [f for f in facts if f.get('kind') == 'runtime']
+    for line in text.splitlines():
+        negated = re.search(r'과거|이전|오답|잘못|아니|아님|아닙|미확인|불가|못|않', line)
+        if runtime and re.search(r'시작|started_at', line, re.I) and not negated:
+            services = [f for f in facts if f.get('kind') in ('service', 'runtime')]
+            specific = [f for f in services if isinstance(f.get('target'), str) and f['target'] in line]
+            starts = [parse_instant(f.get('started_at')) for f in (specific or services)]
+            starts = [v for v in starts if v is not None]
+            for value in _AWARE_TIME.findall(line):
+                parsed = parse_instant(value)
+                if parsed and starts and not any(abs((parsed-v).total_seconds()) < 1 for v in starts):
+                    issues.add('service_start_instant_mismatch')
+        if runtime and re.search(r'결합.{0,25}로드됨|결합.{0,25}적재됨', line) and not negated:
+            issues.add('combined_bytes_are_not_engine_load_proof')
+        if runtime and re.search(r'-S\s+/rules/suricata\.rules', line) and not negated:
+            issues.add('current_rule_source_mismatch')
+        if runtime and re.search(r'(?:SID|로컬).{0,60}(?:로딩|적재|로드).{0,15}(?:확인|증명|입증)', line, re.I) and not negated:
+            issues.add('historical_hit_is_not_current_engine_proof')
+        if runtime and re.search(r'경보|이벤트|SID|통신|탐지', line) and re.search(r'\bTLS\b', line) and not re.search(r'가능|일반|가정|미확인|확인.{0,5}못|추가', line):
+            issues.add('tls_not_in_current_evidence')
+        for row in runtime:
+            started = parse_instant(row.get('started_at'))
+            observed = row.get('observed_at')
+            if started and type(observed) in (int, float) and re.search(r'시작|가동|경과|uptime', line, re.I):
+                for hours in re.findall(r'(?:약\s*)?([0-9]+)\s*시간\s*(?:전|경과|가동)', line):
+                    if abs(float(hours) - (observed - started.timestamp()) / 3600) > 1:
+                        issues.add('uptime_mismatch')
     return sorted(issues)
 
 
 def literal_evidence_summary(facts):
     """Render exact observed quantities/limits, leaving every response decision to the model."""
-    from datetime import datetime
-    def iso(value):
-        try:
-            parsed = datetime.fromisoformat(value)
-            return parsed.isoformat() if parsed.tzinfo else '미확인'
-        except (ValueError, TypeError):
-            return '미확인'
+    iso = kst_time
     def count(value):
         return str(value) if type(value) is int and value >= 0 else '미확인'
     rows = []
@@ -197,6 +323,12 @@ def literal_evidence_summary(facts):
                     not isinstance(digest, str) or not re.fullmatch(r'[0-9a-f]{64}', digest)):
                 continue
             rows.append(f"- {target}: 파일 정의 {count(row.get('declared_count'))}개; SHA256 {digest}; 실제 엔진 적재 미확인.")
+        elif kind == 'runtime':
+            observed = row.get('observed_at')
+            stamp = datetime.fromtimestamp(observed, KST).isoformat() if type(observed) in (int, float) else None
+            rows.append(f"- Suricata 구동 근거 관측 {iso(stamp)}: -S /rules/all.rules; ET+local 정확 결합={row.get('combined_is_exact_et_plus_local') is True}; 시작 {iso(row.get('started_at'))}. 현재 SID별 엔진 적재는 미확인.")
+        elif kind == 'times':
+            rows.append('- 현재 조회에 포함된 시각(KST): ' + ', '.join(iso(v) for v in row.get('instants', [])[:12]))
         elif kind == 'blocks':
             rows.append(f"- 차단 목록: 현재 항목 {count(row.get('count'))}개. 이 조회는 경보·서비스 상태 조회가 아닙니다.")
     return '\n'.join(rows)
@@ -539,7 +671,7 @@ def main():
         if not completed_wire_calls:
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
-        data['final_response'] = factual_review_report(read_facts) if evidence_claim_violations(text, read_facts) else text
+        data['final_response'] = factual_review_report(read_facts) if evidence_claim_violations(text, read_facts) else kst_display(text)
         return original_result(self, data, session_id, exit_code)
 
     def receipt_progress(self, event_type, tool_name=None, preview=None, args=None, **kwargs):
@@ -554,7 +686,7 @@ def main():
     StreamJsonEmitter._emit = structured_emit
     # Register the configured MCP toolsets before native CLI validates -t.
     # Imports performed for the gates precede the CLI's background discovery.
-    from tools.mcp_tool import discover_mcp_tools
+    from tools.mcp_tool_discovery import discover_mcp_tools
     discover_mcp_tools()
     install_grounding_retry(completed_wire_calls, read_facts, argument_errors)
     from hermes_cli.main import main as native_main

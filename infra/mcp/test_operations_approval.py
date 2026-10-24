@@ -67,6 +67,19 @@ class OperationsTest(unittest.TestCase):
         req.update(changes)
         return self.broker.result(created["operation_id"], req)
 
+    def test_card_kst_preserves_exact_plan_binding_across_date_boundary(self):
+        req = operation()
+        req['plan']['before_summary'] = 'container=abc; started=2026-10-23T22:03:11.971632878Z; running=True'
+        req['plan_sha256'] = ops.digest(req['plan'])
+        before = copy.deepcopy(req)
+        created = self.create(req)
+        text = self.cards[-1]['attachments'][0]['text']
+        self.assertIn('2026-10-24T07:03:11.971632+09:00 (KST)', text)
+        self.assertNotIn('2026-10-23T22:03', text)
+        self.assertEqual(req, before)
+        self.assertEqual(created['plan_sha256'], before['plan_sha256'])
+        self.assertEqual(self.broker.records[created['request_id']]['plan'], before['plan'])
+
     def test_service_plan_is_complete_and_observations_are_distinct_from_plan_hash(self):
         req = operation()
         created = self.create(req)
@@ -76,7 +89,7 @@ class OperationsTest(unittest.TestCase):
         for item in (req["target"], req["plan_sha256"], req["plan"]["before_observation_sha256"],
                      req["plan"]["policy_sha256"], req["plan"]["reason"], "reload"):
             self.assertIn(item, text)
-        self.assertIn(req["plan"]["before_summary"], text)
+        self.assertIn(ops.display_summary_kst(req["plan"]["before_summary"]), text)
         self.assertIn("예상 변경 후 상태", text)
         self.assertLess(len(text.encode()), 8000)
         self.assertNotIn("nonce", created)

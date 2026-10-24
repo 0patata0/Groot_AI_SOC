@@ -49,6 +49,17 @@ CONTAINMENT_FIELDS = frozenset(("ip", "action", "temporary_expires_at", "keep_se
 KST = timezone(timedelta(hours=9), "KST")
 
 
+def display_summary_kst(summary):
+    """Card-only conversion; the exact approved plan and digests stay unchanged."""
+    def convert(match):
+        try:
+            stamp = datetime.fromisoformat(match[0].replace('Z', '+00:00'))
+            return stamp.astimezone(KST).isoformat() + ' (KST)' if stamp.tzinfo else match[0] + ' (시간대 확인 필요)'
+        except ValueError:
+            return match[0] + ' (시각 확인 필요)'
+    return re.sub(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:?\d{2})?', convert, summary)
+
+
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
 
@@ -173,7 +184,7 @@ class OperationsBroker:
                     "예상 변경 후 상태: %s\n영향: %s\n"
                     "사유:\n\n    %s\n\n지정된 서비스의 이 작업 한 건만 승인합니다. "
                     "적용 전 상태가 달라지면 중단하며, 실행 결과는 별도 실측 SHA-256으로 보고합니다." %
-                    (plan["action"], plan["policy_sha256"], plan["before_summary"], expected,
+                    (plan["action"], plan["policy_sha256"], display_summary_kst(plan["before_summary"]), expected,
                      SERVICE_IMPACT[rec["target"]], plan["reason"]))
         return (header + "\n\n외부 IP `%s`는 이미 임시 차단했습니다.\n"
                 "증거 SHA-256: `%s`\n무응답 시 최초 임시 차단 후 10분 이내 자동 해제됩니다.\n"

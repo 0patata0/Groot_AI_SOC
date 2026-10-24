@@ -569,6 +569,8 @@ stdlib/dependency 최소 Rust 버전 문제나 빌드 실패가 나면 Cargo 파
 
 ## 9. Hermes와 SIEM 초기 입력
 
+일반 채팅 1.4는 query-completion의 `__init__.py`·`plugin.yaml`과 공용 `infra/hermes/soc_management_run.py`를 `grounding.py`로 함께 반입한다. 세 파일은 단일 deploy.sh가 설치하며 공용 코드 SHA와 native 핀을 검사한다. 별도 패키지 다운로드는 없다. 일반/관리 프로필의 `timezone: Asia/Seoul`, KST 정책과 승인 카드 표시도 같은 소스 묶음을 사용한다.
+
 [Hermes 이미지 수동 준비](hermes-image.md)를 완료하고 결과 image ID를 `siem.json`의 `hermes_image`에 기록한다. 기존 운영 Hermes의 `.env`, 대화 데이터, SSH 키, Docker volume은 이식하지 않는다. 준비된 이미지에는 Python 3.13, MCP SDK, 검토된 한국어 출력 가드·regex가 있어야 하며, 첫 기동 전 검사를 통과해야 한다.
 
 `/opt/capstone-prereqs/siem.json`의 필드와 암호 조건은 [루트 README의 siem 사전 자료](../README.md#siem)를 따른다. 파일은 **root:root 0600**, 정확한 JSON 스키마여야 한다. shell history에 암호를 쓰는 `echo '암호'` 방식 대신 SIEM에서 `sudoedit`으로 입력한다. 전체 JSON을 로그에 출력하지 않고 문법만 확인한다.

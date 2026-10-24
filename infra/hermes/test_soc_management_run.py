@@ -123,7 +123,7 @@ class Harness:
 
         modules = {"tools": module("tools", __path__=[]),
                    "tools.registry": module("tools.registry", registry=self.registry),
-                   "tools.mcp_tool": module("tools.mcp_tool", discover_mcp_tools=self.discover),
+                   "tools.mcp_tool_discovery": module("tools.mcp_tool", discover_mcp_tools=self.discover),
                    "mcp": module("mcp", ClientSession=self.ClientSession),
                    "run_agent": module("run_agent", AIAgent=self.AIAgent),
                    "hermes_cli": module("hermes_cli", __path__=[]),

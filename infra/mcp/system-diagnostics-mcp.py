@@ -225,7 +225,8 @@ def handle(message):
             value = result(query(call_arguments(params)))
         except (ValueError, OSError, KeyError, TypeError) as exc:
             audit('unavailable')
-            reason = str(exc) if isinstance(exc, library().DiagnosticError) and re.fullmatch(r'[a-z_]{1,64}', str(exc)) else 'diagnostics_unavailable'
+            reason = str(exc) if isinstance(exc, library().DiagnosticError) and (re.fullmatch(r'[a-z_]{1,64}', str(exc)) or
+                re.fullmatch(r'(?:lookback_minutes|limit) must be an integer from [0-9]+ to [0-9]+', str(exc))) else 'diagnostics_unavailable'
             value = result({'status': 'unavailable', 'reason': reason,
                             'mutation_performed': False}, True)
     else:

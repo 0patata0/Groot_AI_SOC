@@ -1,0 +1,263 @@
+{
+  "observed_at_kst": "2026-10-24T22:15:55.212915+09:00",
+  "version": "groot-query-completion:1.4.0",
+  "scope": "KST presentation and bounded read-evidence correction; no protected actions",
+  "tests": {
+    "mcp": 362,
+    "query": 192,
+    "management": 117,
+    "deployment": 157,
+    "policy": 14,
+    "siem": 40,
+    "total_unique": 882
+  },
+  "cases": [
+    {
+      "case": "first_registered",
+      "result": "partial_scope_and_latency",
+      "seconds_to_final_post": 139.919,
+      "mcp_calls": 11,
+      "old_rows_preserved": true,
+      "message_rows_after": 1393,
+      "api_native_equal": true,
+      "final_websocket_observed": true
+    },
+    {
+      "case": "faster_attempt",
+      "result": "failed_time_double_conversion",
+      "seconds_to_final_post": 87.675,
+      "mcp_calls": 2,
+      "old_rows_preserved": true,
+      "message_rows_after": 1400,
+      "api_native_equal": true,
+      "final_websocket_observed": true
+    },
+    {
+      "case": "time_fixed",
+      "result": "kst_pass_argument_errors",
+      "seconds_to_final_post": 112.915,
+      "mcp_calls": 8,
+      "old_rows_preserved": true,
+      "message_rows_after": 1413,
+      "api_native_equal": true,
+      "final_websocket_observed": true
+    },
+    {
+      "case": "final_transport",
+      "result": "pass_final_content_api_native",
+      "seconds_to_final_post": 116.092,
+      "mcp_calls": 3,
+      "old_rows_preserved": true,
+      "message_rows_after": 1421,
+      "api_native_equal": true,
+      "final_websocket_observed": null,
+      "final_post_url": "https://chat.grootlab.duckdns.org/soc/pl/bwogtfbnspy5py3wenod95mtka",
+      "measurement_note": "Observer ended before final post; later authenticated API read matched native final exactly. Prior time-fixed case observed final over WebSocket."
+    }
+  ],
+  "isolated_failures": [
+    {
+      "seconds": 122.297,
+      "reason": "plugin disabled by deprecated import; excluded from post-fix validation"
+    },
+    {
+      "timeout_seconds": 195,
+      "reason": "SDK completion not obtained; excluded from success results"
+    }
+  ],
+  "native_pre_provider_probe": {
+    "captures": [
+      {
+        "keys": [
+          "api_kwargs",
+          "_original_api_kwargs",
+          "_llm_middleware_trace",
+          "_moa_prepared_request",
+          "_retry",
+          "thinking_spinner",
+          "retry_count",
+          "api_call_count",
+          "api_request_id",
+          "effective_task_id",
+          "turn_id",
+          "interrupted"
+        ],
+        "platform": "mattermost",
+        "model": "qwen3.6:35b",
+        "provider": "custom",
+        "base_url": "http://211.170.162.111:11434/v1",
+        "reasoning_effort": "none",
+        "tool_choice": "required",
+        "tool_count": 18,
+        "extra_keys": [],
+        "guidance_present": true
+      }
+    ]
+  },
+  "diagnostic_wire": {
+    "invalid": {
+      "mutation_performed": false,
+      "reason": "lookback_minutes must be an integer from 1 to 240",
+      "status": "unavailable"
+    },
+    "corrected": {
+      "target": "a:raw-suricata",
+      "requested_minutes": 60,
+      "observed_at_kst": "2026-10-24T22:10:58+09:00",
+      "requested_since_kst": "2026-10-24T21:11:56+09:00",
+      "requested_until_kst": "2026-10-24T22:11:56+09:00",
+      "returned_error_count": 0,
+      "requested_window_total_count": null
+    },
+    "mutations": 0
+  },
+  "runtime": {
+    "sessions": 64,
+    "policy_sha256": "0482f0e164efd174534eb3b3c5e84ea268dd1e03d2cac03a5a5d894d29fee04f",
+    "backup_dir": "/var/backups/capstone-kst-evidence/20261024T220820+0900/rule-edit-policy-kxz8b53j",
+    "database_integrity": "ok",
+    "unrelated_tables_unchanged": true,
+    "memory_file_updated": false,
+    "cached_memory_frames_refreshed": 0,
+    "management_refs": 24,
+    "backup": "/var/backups/capstone-kst-evidence/20261024T220820+0900",
+    "same_cid": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "files": {
+      "/opt/capstone-management/soc_management_controller.py": "82c062fa93323fdde7f2be0737ffe6eedcede435991eb6506ded9c4102c5f070",
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "4ca3f8e68fb051c2ba2de9e6fe3c0fa261bb59eed53061363547f370fe101a8a",
+      "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "8e4536c5b36e0f9bf34cdb67eab0d12562c91fd013a3e2af558a052fd6ba5d46",
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+      "/opt/hermes-data/management-code/run.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+      "/opt/mcp/system-diagnostics-mcp.py": "d7890b56579ce69fb83a090cf4f6efdf3f7d7995b5940cba88d262ca9c9901ba"
+    },
+    "management_other_tables_unchanged": true
+  },
+  "approval_card": {
+    "backup": "/var/backups/capstone-kst-card/20261024T213856+0900",
+    "sha256": "305d59a4e8f68041b630149c6906981df7be6f5f651046a67d65fe80aa412d60",
+    "before_health": {
+      "status": "ready",
+      "approval_configured": true,
+      "active_operations": 0,
+      "operation_status_counts": {},
+      "active_rule_changes": 0,
+      "rule_status_counts": {},
+      "legacy_approval_status_counts": {},
+      "active_legacy_approvals": 0
+    },
+    "service_restarted": "soc-bot.service",
+    "protected_operations": 0
+  },
+  "hermes_same_container_restarts_this_unit": 7,
+  "source_sha256": {
+    "infra/hermes/query-completion/__init__.py": "4ca3f8e68fb051c2ba2de9e6fe3c0fa261bb59eed53061363547f370fe101a8a",
+    "infra/hermes/soc_management_run.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+    "infra/mcp/operations_approval.py": "305d59a4e8f68041b630149c6906981df7be6f5f651046a67d65fe80aa412d60",
+    "infra/mcp/system-diagnostics-mcp.py": "d7890b56579ce69fb83a090cf4f6efdf3f7d7995b5940cba88d262ca9c9901ba"
+  },
+  "limitations": [
+    "Latency remains 116.092 seconds in the final sample; no SLA or general NLP accuracy guarantee.",
+    "Final-case WebSocket observer closed early; final API/native equality verified separately.",
+    "No new-server full installation or actual attack/approval/block E2E.",
+    "CVE scenario 3 remains paused.",
+    "Final model/chat case preceded native timezone configuration; both native profiles were separately verified after setting Asia/Seoul, without another model post."
+  ],
+  "git": {
+    "source_publication": "pending"
+  },
+  "temporary_cleanup": "pending",
+  "native_timezone": {
+    "/opt/data": {
+      "timezone": "Asia/Seoul",
+      "now_kst": "2026-10-24T22:19:43.852157+09:00",
+      "native_example": "[Sat 2026-10-24 07:03:11 KST]"
+    },
+    "/opt/data/management": {
+      "timezone": "Asia/Seoul",
+      "now_kst": "2026-10-24T22:19:45.111249+09:00",
+      "native_example": "[Sat 2026-10-24 07:03:11 KST]"
+    }
+  },
+  "native_timezone_apply": {
+    "backup": "/var/backups/capstone-kst-native-timezone/20261024T221902+0900",
+    "timezone": "Asia/Seoul",
+    "other_config_fields_unchanged": true,
+    "same_cid": "6c2ed13aea89404463061ea2032084bdd159ae784aff4e7bd9eea7406ba9b30b",
+    "files": {
+      "/opt/hermes-data/config.yaml": "d308c6254301bd3dcfa021a93f0203100f7323112295d31e1dde93829815cf83",
+      "/opt/hermes-data/management/config.yaml": "f27f928e9b9ff550a57b03f78afef4f7cd648fe4fbdcab0469a10eba36e4a729"
+    }
+  },
+  "runtime_verification": {
+    "memory": {
+      "sha256": "c413cf3c190260caf3ab2ed678844c04ffb681c65076dfb14a25da70f95d1b8c",
+      "characters": 904,
+      "stale_literal_absent": true,
+      "user_file_exists": false
+    },
+    "/opt/hermes-data": {
+      "active_refs": 64,
+      "stale_current_claims": 0,
+      "new_policy_refs": 64,
+      "messages": 1421
+    },
+    "/opt/hermes-data/management": {
+      "active_refs": 24,
+      "stale_current_claims": 0,
+      "new_policy_refs": 24,
+      "messages": 470
+    },
+    "gateway": {
+      "updated_at": "2026-10-24T22:14:41.335486+09:00",
+      "active_agents": 0,
+      "platforms": {
+        "mattermost": {
+          "state": "connected",
+          "error_code": null,
+          "error_message": null,
+          "updated_at": "2026-10-24T22:08:37.349440+09:00",
+          "writer_pid": 158,
+          "writer_start_time": 5530544,
+          "needs_attention": false,
+          "retrying_since": null
+        },
+        "api_server": {
+          "state": "connected",
+          "error_code": null,
+          "error_message": null,
+          "updated_at": "2026-10-24T22:08:37.352030+09:00",
+          "writer_pid": 158,
+          "writer_start_time": 5530544,
+          "needs_attention": false,
+          "retrying_since": null,
+          "listener_base": "http://127.0.0.1:8642"
+        }
+      }
+    },
+    "failed_units": [],
+    "timers": {
+      "capstone-management.timer": "active",
+      "soc-bot.service": "active",
+      "rule-change-worker.timer": "active"
+    },
+    "native_pins": {
+      "agent/turn_final_response.py": true,
+      "agent/conversation_loop.py": true,
+      "agent/turn_context.py": true,
+      "agent/message_metadata.py": true,
+      "agent/turn_api_request.py": true,
+      "agent/chat_completion_helpers.py": true,
+      "agent/turn_api_call.py": true
+    },
+    "shared_source_sha256": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+    "embedded_gate_exact": true,
+    "runtime_files": {
+      "/opt/capstone-management/soc_management_controller.py": "82c062fa93323fdde7f2be0737ffe6eedcede435991eb6506ded9c4102c5f070",
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "31b2fd3adcae4665f49289c4fe0aff3f66eb23928c7519ae0c986f065dd189f0",
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "4ca3f8e68fb051c2ba2de9e6fe3c0fa261bb59eed53061363547f370fe101a8a",
+      "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "8e4536c5b36e0f9bf34cdb67eab0d12562c91fd013a3e2af558a052fd6ba5d46",
+      "/opt/socbot/operations_approval.py": "305d59a4e8f68041b630149c6906981df7be6f5f651046a67d65fe80aa412d60",
+      "/opt/mcp/system-diagnostics-mcp.py": "d7890b56579ce69fb83a090cf4f6efdf3f7d7995b5940cba88d262ca9c9901ba"
+    }
+  }
+}

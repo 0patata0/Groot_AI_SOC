@@ -373,6 +373,17 @@ class RouterTests(unittest.TestCase):
             self.assertLess(len(call.args[1]), 256)
             self.assertEqual(set(json.loads(call.args[1])), {'event', 'outcome', 'at', 'target'})
 
+    def test_wire_range_refusal_preserves_schema_bounds_without_internal_errors(self):
+        for args,expected in (({'target':'a:raw-suricata','lookback_minutes':1440}, 'lookback_minutes must be an integer from 1 to 240'),
+                              ({'target':'a:raw-suricata','limit':51}, 'limit must be an integer from 1 to 50')):
+            with patch.object(m,'audit'):
+                wire=m.handle({'jsonrpc':'2.0','id':1,'method':'tools/call','params':{'name':'get_system_diagnostics','arguments':args}})
+            self.assertTrue(wire['result']['isError'])
+            self.assertEqual(json.loads(wire['result']['content'][0]['text'])['reason'],expected)
+        with patch.object(m,'query',side_effect=ValueError('private diagnostic detail')),patch.object(m,'audit'):
+            wire=m.handle({'jsonrpc':'2.0','id':1,'method':'tools/call','params':{'name':'get_system_diagnostics','arguments':{'target':'a:raw-suricata'}}})
+        self.assertNotIn('private diagnostic detail',json.dumps(wire))
+
     def test_protocol_tools_and_unknown_requests_never_dispatch(self):
         tool = m.handle({'jsonrpc': '2.0', 'id': 1, 'method': 'tools/list'})['result']['tools'][0]
         self.assertEqual(tool['name'], 'get_system_diagnostics')

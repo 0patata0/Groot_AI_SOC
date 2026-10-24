@@ -1045,7 +1045,7 @@ class FirstRequestGroundingTests(unittest.TestCase):
             with self.subTest(request=request):
                 h, result, seen, original = self.build(request)
                 self.assertEqual(result['tool_choice'], 'required')
-                self.assertEqual(result['reasoning_effort'], 'medium')
+                self.assertEqual(result['reasoning_effort'], 'none')  # Only first read selection; analysis retains medium.
                 self.assertTrue(result['tools'])
                 self.assertTrue(all(t['function']['name'] in PLUGIN._READ_TOOL_NAMES for t in result['tools']))
                 self.assertEqual(seen[0][-1]['content'], PLUGIN.LIVE_QUERY_GUIDANCE)

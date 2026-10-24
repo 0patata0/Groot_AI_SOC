@@ -159,7 +159,7 @@ def query_completion_source_pins(raw=None):
         raise Refused('query_completion_source_pins_invalid') from None
     expected = {'agent/turn_final_response.py','agent/conversation_loop.py',
                 'agent/turn_context.py','agent/message_metadata.py',
-                'agent/turn_api_request.py','agent/chat_completion_helpers.py'}
+                'agent/turn_api_request.py','agent/chat_completion_helpers.py','agent/turn_api_call.py'}
     need(len(node.keys)==len(expected) and set(pins)==expected and
          all(isinstance(value,str) and re.fullmatch(r'[0-9a-f]{64}',value) for value in pins.values()),
          'query_completion_source_pins_invalid')

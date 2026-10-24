@@ -1057,8 +1057,24 @@ class FirstRequestGroundingTests(unittest.TestCase):
         from test_inventory_render import native_exchanges
         h, result, seen, original = self.build('현재 적용된 룰 보여줘',
                                               native_exchanges())
-        self.assertEqual(result['tool_choice'], 'auto')
+        self.assertEqual(result['tool_choice'], 'none')
+        self.assertEqual(result['tools'], [])
+        self.assertIn('14개', h.agent._capstone_query_completion_local_format[1])
         self.assertEqual(seen[0], original)
+
+    def test_partial_current_inventory_cannot_skip_provider_execution(self):
+        from test_inventory_render import exchange, WAF
+        h, result, seen, original = self.build('현재 적용된 룰 보여줘', exchange(WAF))
+        self.assertFalse(hasattr(h.agent, '_capstone_query_completion_local_format'))
+        self.assertNotEqual(result['tools'], [])
+
+    def test_detailed_names_levels_or_analysis_are_not_replaced_by_count_formatter(self):
+        from test_inventory_render import native_exchanges
+        for request in ('현재 룰 ID와 이름을 표로 보여줘', '현재 룰 레벨과 심각도 보여줘',
+                        '현재 룰의 탐지 조건을 보여줘', '현재 룰 원인을 분석해줘'):
+            with self.subTest(request=request):
+                h, result, seen, original = self.build(request, native_exchanges())
+                self.assertFalse(hasattr(h.agent, '_capstone_query_completion_local_format'))
 
     def test_fully_verified_prior_table_is_a_no_tool_non_thinking_format_request(self):
         from test_inventory_render import native_exchanges
@@ -1122,16 +1138,74 @@ class FirstRequestGroundingTests(unittest.TestCase):
                 self.assertIn('조회 미실행', h.original_calls[-1].content)
 
 
+class LocalFormatCompletionTests(unittest.TestCase):
+    def harness(self, **changes):
+        agent = SimpleNamespace(platform='mattermost', api_mode='chat_completions',
+            _current_turn_id='turn-a', _stall_guards=True, _interrupt_requested=False,
+            _has_pending_redirect=lambda: False,
+            _capstone_query_completion_local_format=('turn-a', 'verified file table'))
+        for key, value in changes.items():setattr(agent, key, value)
+        original = mock.Mock(return_value='provider path')
+        factory = mock.Mock(side_effect=lambda text, turn: {'local_text': text, 'turn': turn})
+        native = SimpleNamespace(ApiCallVerdict=lambda **kw: SimpleNamespace(**kw),
+                                 stop_thinking_spinner=lambda agent, spinner: None)
+        wrapped = PLUGIN.make_call_wrapper(original, native, factory)
+        return agent, original, factory, wrapped
+
+    def test_complete_verified_display_uses_no_provider_and_keeps_native_verdict(self):
+        agent, original, factory, wrapped = self.harness()
+        verdict = wrapped(agent, turn_id='turn-a', thinking_spinner='spinner', interrupted=False)
+        self.assertEqual(verdict.action, 'fallthrough')
+        self.assertEqual(verdict.response['local_text'], 'verified file table')
+        self.assertIsNone(verdict.thinking_spinner)
+        self.assertFalse(verdict.interrupted)
+        original.assert_not_called()
+        factory.assert_called_once_with('verified file table', 'turn-a')
+        self.assertEqual(agent._capstone_local_format_count, 1)
+        self.assertFalse(hasattr(agent, '_capstone_query_completion_local_format'))
+        self.assertEqual(wrapped(agent, turn_id='turn-a'), 'provider path')
+        original.assert_called_once()
+
+    def test_stale_cancelled_redirected_non_chat_and_non_mattermost_use_native_path(self):
+        for changes in ({'_current_turn_id':'new-turn'}, {'_interrupt_requested':True},
+                        {'_has_pending_redirect':lambda: True}, {'platform':'cli'},
+                        {'api_mode':'responses'}, {'_stall_guards':False},
+                        {'_capstone_query_completion_local_format':None}):
+            with self.subTest(changes=changes):
+                agent, original, factory, wrapped = self.harness(**changes)
+                self.assertEqual(wrapped(agent, turn_id='turn-a'), 'provider path')
+                original.assert_called_once();factory.assert_not_called()
+
+    def test_locked_pending_redirect_uses_native_path(self):
+        import threading
+        agent, original, factory, wrapped = self.harness(
+            _pending_redirect_lock=threading.Lock(), _pending_redirect='a correction')
+        self.assertEqual(wrapped(agent, turn_id='turn-a'), 'provider path')
+        original.assert_called_once();factory.assert_not_called()
+
+    def test_factory_failure_falls_back_without_logging_exception_payload(self):
+        agent, original, factory, wrapped = self.harness()
+        factory.side_effect = ValueError('private exception details')
+        with self.assertLogs('capstone.query_completion', level='WARNING') as logs:
+            self.assertEqual(wrapped(agent, turn_id='turn-a'), 'provider path')
+        self.assertIn('ValueError', logs.output[0])
+        self.assertNotIn('private exception details', logs.output[0])
+        original.assert_called_once()
+
+
 class RegistrationTests(unittest.TestCase):
     def setUp(self):
         self.h = Harness()
         self.native = SimpleNamespace(finish_text_response=self.h.original,
                                       FinalResponseVerdict=Verdict)
         self.build = lambda agent, **kw: kw
-        self.loop = SimpleNamespace(finish_text_response=self.h.original, build_api_request=self.build)
+        self.call = lambda agent, **kw: kw
+        self.loop = SimpleNamespace(finish_text_response=self.h.original, build_api_request=self.build,
+                                    perform_api_call=self.call)
         self.modules = {
             'agent.turn_final_response': self.native,
             'agent.turn_api_request': SimpleNamespace(build_api_request=self.build),
+            'agent.turn_api_call': SimpleNamespace(perform_api_call=self.call),
             'agent.conversation_loop': self.loop,
             'agent.turn_context': SimpleNamespace(reanchor_current_turn_user_idx=self.h.reanchor),
             'agent.message_metadata': SimpleNamespace(append_message=self.h.append),
@@ -1155,7 +1229,12 @@ class RegistrationTests(unittest.TestCase):
         PLUGIN.register(self.ctx)
         installed = self.native.finish_text_response
         build_installed = self.loop.build_api_request
+        call_installed = self.loop.perform_api_call
         api = self.modules['agent.turn_api_request']
+        call = self.modules['agent.turn_api_call']
+        self.assertIs(call.perform_api_call, call_installed)
+        self.assertIsNot(call_installed, self.call)
+        self.assertEqual(inspect.signature(call_installed), inspect.signature(self.call))
         self.assertIs(api.build_api_request, build_installed)
         self.assertIsNot(build_installed, self.build)
         self.assertEqual(inspect.signature(build_installed), inspect.signature(self.build))
@@ -1172,6 +1251,8 @@ class RegistrationTests(unittest.TestCase):
         self.assertIs(self.loop.finish_text_response, self.h.original)
         self.assertIs(api.build_api_request, self.build)
         self.assertIs(self.loop.build_api_request, self.build)
+        self.assertIs(self.loop.perform_api_call, self.call)
+        self.assertIs(call.perform_api_call, self.call)
 
     def test_request_alias_drift_rejects_registration_before_any_mutation(self):
         foreign = lambda *args, **kw: None

@@ -1,3 +1,3 @@
 name: groot-query-completion
-version: 1.2.0
-description: Source-pinned first-request grounding and bounded completion of live Mattermost rule queries
+version: 1.3.0
+description: Model-selected live reads and provider-free formatting of verified file inventories

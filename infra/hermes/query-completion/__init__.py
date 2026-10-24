@@ -6,6 +6,7 @@ tool, grants no permission, and leaves the existing execution/approval loop inta
 from __future__ import annotations
 
 import copy
+from contextlib import nullcontext
 from dataclasses import fields, is_dataclass, replace
 import functools
 import hashlib
@@ -15,8 +16,9 @@ import logging
 import os
 from pathlib import Path
 import re
+import time
 
-VERSION = "groot-query-completion:1.2.0"
+VERSION = "groot-query-completion:1.3.0"
 SOURCE_ROOT = Path("/opt/hermes")
 SOURCE_SHA256 = {
     "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
@@ -25,6 +27,7 @@ SOURCE_SHA256 = {
     "agent/message_metadata.py": "77fbe25c86f2ab524fcac61a83548768cffc82c476bb8a6ff83ebdf492a5479d",
     "agent/turn_api_request.py": "e31386cb83cf551026e4df9b589173b54bc913b36fc1a09942a520e68033b59e",
     "agent/chat_completion_helpers.py": "5231a0e674806db6ad7be60e2d40a19a4157f7d2baa238aaa9af66f61e0eea4c",
+    "agent/turn_api_call.py": "a2b2c0232b1d37d5ebfefff2d06ce1bd3b69cfe93ab3a8c9f382d62f2a6deb8b",
 }
 NUDGE = (
     "현재 사용자 턴에서 실제 도구 호출은 0회입니다. 방금 답변의 진행 약속이나 완료 주장은 실제 조회 근거가 아닙니다. "
@@ -351,6 +354,8 @@ def make_request_wrapper(original, reanchor):
     """
     @functools.wraps(original)
     def wrapped(agent, **kw):
+        if hasattr(agent, "_capstone_query_completion_local_format"):
+            delattr(agent, "_capstone_query_completion_local_format")
         restore_names = getattr(agent, "_capstone_query_completion_names_restore", None)
         if callable(restore_names):
             restore_names()
@@ -373,11 +378,16 @@ def make_request_wrapper(original, reanchor):
         inventory_request = inventory_request_for_turn(request, messages, idx)
         inventory_only = bool(_RULE.search(inventory_request) and _inventory_request(inventory_request))
         prior_table = render_prior_inventory(request, messages, idx)
+        local_text = prior_table
         if inventory_only:
             has_calls = bool(render_rule_inventory(inventory_request, messages[idx + 1:], verified_targets=True))
+            if has_calls and not render_rule_inventory(inventory_request, messages[idx + 1:], missing_targets=True):
+                local_text = render_rule_inventory(inventory_request, messages[idx + 1:])
         if not callable(pending) and not _arm_read_request(agent, turn, require_read=not has_calls and not prior_table,
-                                                          inventory_only=inventory_only, format_only=bool(prior_table)):
+                                                          inventory_only=inventory_only, format_only=bool(local_text)):
             return original(agent, **kw)
+        if local_text:
+            agent._capstone_query_completion_local_format = (turn, local_text)
         if not has_calls and isinstance(kw.get("api_messages"), list):
             guidance = ('이번 요청은 직전의 실제 조회 결과를 표로 재정리하는 형식 요청입니다. '
                         '새 조회·변경 없이 앞선 조회 기준임을 밝히고 간결하게 답하세요.'
@@ -389,11 +399,69 @@ def make_request_wrapper(original, reanchor):
             restore_names = getattr(agent, "_capstone_query_completion_names_restore", None)
             if callable(restore_names):
                 restore_names()
+            if hasattr(agent, "_capstone_query_completion_local_format"):
+                delattr(agent, "_capstone_query_completion_local_format")
             raise
         finally:
             restore = getattr(agent, "_capstone_query_completion_builder_restore", None)
             if callable(restore):
                 restore()
+    wrapped.__capstone_query_completion__ = VERSION
+    return wrapped
+
+
+def local_completion(text, turn):
+    """A labelled local formatting result, never an invented provider response/usage."""
+    from openai.types.chat import ChatCompletion  # Existing native dependency; no extra package.
+    return ChatCompletion(
+        id="capstone-local-format-" + hashlib.sha256(turn.encode()).hexdigest()[:16],
+        model="capstone-verified-file-format", created=int(time.time()), object="chat.completion",
+        choices=[{"index": 0, "finish_reason": "stop", "message": {
+            "role": "assistant", "content": text, "tool_calls": None}}],
+        usage={"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+    )
+
+
+def make_call_wrapper(original, native, response_factory=local_completion):
+    """Skip provider execution only for an already hash-verified file display.
+
+    No observation, tool/argument selection, incident judgement or approval is
+    synthesized. Native normalization/finalization/persistence remain in use.
+    """
+    @functools.wraps(original)
+    def wrapped(agent, **kw):
+        memo = getattr(agent, "_capstone_query_completion_local_format", None)
+        if memo is not None:
+            delattr(agent, "_capstone_query_completion_local_format")
+        platform = getattr(agent, "platform", "")
+        if (str(getattr(platform, "value", platform)).lower() != "mattermost"
+                or getattr(agent, "api_mode", "chat_completions") != "chat_completions"
+                or getattr(agent, "_stall_guards", True) is False
+                or not isinstance(memo, tuple) or len(memo) != 2
+                or memo[0] != kw.get("turn_id") or memo[0] != getattr(agent, "_current_turn_id", None)
+                or not isinstance(memo[1], str) or not memo[1]):
+            return original(agent, **kw)
+        lock = getattr(agent, "_pending_redirect_lock", None)
+        response = None
+        with nullcontext() if lock is None else lock:
+            redirected = (bool(getattr(agent, "_pending_redirect", None)) if lock is not None
+                          else bool(getattr(agent, "_has_pending_redirect", lambda: False)()))
+            if not redirected and not getattr(agent, "_interrupt_requested", False):
+                try:
+                    response = response_factory(memo[1], memo[0])
+                except Exception as exc:
+                    logging.getLogger("capstone.query_completion").warning(
+                        "local_format_fallback error_class=%s", type(exc).__name__)
+        if response is None:
+            return original(agent, **kw)
+        agent._capstone_local_format_count = getattr(agent, "_capstone_local_format_count", 0) + 1
+        logging.getLogger("capstone.query_completion").info(
+            "event=verified_local_format provider_calls=0 pid=%d", os.getpid())
+        return native.ApiCallVerdict(
+            action="fallthrough", response=response,
+            thinking_spinner=native.stop_thinking_spinner(agent, kw.get("thinking_spinner")),
+            interrupted=kw.get("interrupted"),
+        )
     wrapped.__capstone_query_completion__ = VERSION
     return wrapped
 
@@ -414,7 +482,7 @@ def _inventory_request(request):
                 _RULE.search(request) and live_rule_request(request) or _DEVICE_TABLE.search(request))
             and bool(re.search(r"확인|조회|보여|목록|리스트|개수|몇\s*개|\b(?:ID|SID)\b", request, re.I))
             and not _WRITE.search(request) and not _NON_LIVE_REQUEST.search(request)
-            and not re.search(r"왜|원인|위험|분석|설명|동작|전문|원문|다운로드|비교|차이|방법|역할|목적|서비스|상태|로그|경보|전체\s*(?:파일|내용)|(?:파일|내용)\s*전체|(?<![A-Za-z])(?:JSON|CSV)(?![A-Za-z])", request, re.I))
+            and not re.search(r"왜|원인|위험|분석|설명|동작|이름|명칭|심각도|레벨|메시지|탐지\s*조건|\b(?:severity|level|name)\b|전문|원문|다운로드|비교|차이|방법|역할|목적|서비스|상태|로그|경보|전체\s*(?:파일|내용)|(?:파일|내용)\s*전체|(?<![A-Za-z])(?:JSON|CSV)(?![A-Za-z])", request, re.I))
 
 
 def _verified_inventory(payload, target):
@@ -704,22 +772,30 @@ def register(ctx):
         context = importlib.import_module("agent.turn_context")
         metadata = importlib.import_module("agent.message_metadata")
         api = importlib.import_module("agent.turn_api_request")
+        call = importlib.import_module("agent.turn_api_call")
         original = native.finish_text_response
         original_build = api.build_api_request
+        original_call = call.perform_api_call
         if loop.finish_text_response is not original:
             raise ValueError("native_alias_mismatch")
         if loop.build_api_request is not original_build:
             raise ValueError("native_request_alias_mismatch")
+        if loop.perform_api_call is not original_call:
+            raise ValueError("native_call_alias_mismatch")
         if getattr(original, "__capstone_query_completion__", None) == VERSION:
-            if getattr(original_build, "__capstone_query_completion__", None) != VERSION:
+            if (getattr(original_build, "__capstone_query_completion__", None) != VERSION
+                    or getattr(original_call, "__capstone_query_completion__", None) != VERSION):
                 raise ValueError("request_wrapper_version_mismatch")
             return
         if getattr(original, "__capstone_query_completion__", None) or hasattr(original, "__wrapped__"):
             raise ValueError("wrapper_version_mismatch")
         if getattr(original_build, "__capstone_query_completion__", None) or hasattr(original_build, "__wrapped__"):
             raise ValueError("request_wrapper_version_mismatch")
+        if getattr(original_call, "__capstone_query_completion__", None) or hasattr(original_call, "__wrapped__"):
+            raise ValueError("call_wrapper_version_mismatch")
         wrapped = make_wrapper(original, native, metadata.append_message, context.reanchor_current_turn_user_idx)
         build_wrapped = make_request_wrapper(original_build, context.reanchor_current_turn_user_idx)
+        call_wrapped = make_call_wrapper(original_call, call)
 
         def restore():
             for module in (native, loop):
@@ -728,15 +804,20 @@ def register(ctx):
             for module in (api, loop):
                 if module.build_api_request is build_wrapped:
                     module.build_api_request = original_build
+            for module in (call, loop):
+                if module.perform_api_call is call_wrapped:
+                    module.perform_api_call = original_call
 
         ctx.on_unload(restore)
         native.finish_text_response = loop.finish_text_response = wrapped
         api.build_api_request = loop.build_api_request = build_wrapped
+        call.perform_api_call = loop.perform_api_call = call_wrapped
         try:
             logging.getLogger("capstone.query_completion").info(
                 "version=%s aliases_installed=%s pid=%d", VERSION,
                 native.finish_text_response is wrapped and loop.finish_text_response is wrapped
-                and api.build_api_request is build_wrapped and loop.build_api_request is build_wrapped, os.getpid(),
+                and api.build_api_request is build_wrapped and loop.build_api_request is build_wrapped
+                and call.perform_api_call is call_wrapped and loop.perform_api_call is call_wrapped, os.getpid(),
             )
         except Exception:
             pass  # Logging cannot invalidate an installed wrapper/unload lease.

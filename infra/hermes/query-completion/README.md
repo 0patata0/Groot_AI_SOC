@@ -10,6 +10,14 @@
 
 구현·회귀 시험·모델 평가·라이브 배포는 서로 다른 확인 단계다. 확정한 배포 시각과 시험 결과는 [검증 근거 JSON](../rule-query-execution-validation-20261016.json)을 기준으로 읽는다. 소스와 이 문서가 존재한다는 사실만으로 운영 프로세스의 활성화를 의미하지 않는다.
 
+## 2026-10-24 일반 채팅 1.3 속도 보완
+
+완전한 현재 파일 집계 또는 완전히 검증된 직전 조회의 순수 표 재정리에서는 추가 provider 생성을 생략한다. 사실은 기존 MCP 호출 ID·본문/집계SHA에서만 얻으며 새 관측·도구/인자·사건 판단·승인을 만들지 않는다. `turn_api_call.perform_api_call`의 검토한 native 경로에서 로컬 표시를 정상 정규화·완료·저장 단계로 전달한다. 반환/저장 본문과 한국어 가드·기존 전송 경로는 유지한다.
+
+로컬 결과는 `capstone-local-format-` ID와 `capstone-verified-file-format` 표시·사용량0으로 구분한다. native `api_calls`는 로컬 표시 단계도 세므로 실제 provider 요청 수로 읽지 않는다. 현재 조회는 모델이 실제 읽기와 필요 시 누락 보완을 수행한 뒤에만 이 경로를 쓴다. 이름/레벨/원인·분석/원문/변경 요청, 부족·실패 자료·취소·redirect·형식 생성 실패는 기존 모델 경로를 유지한다. 직전 조회 재정리는 앞선 조회 기준/새 조회 없음을 명시하며 현재/최신 요청은 다시 읽는다.
+
+최종 native SDK는 현재조회28.229초·실제 provider진입3/MCP3, 후속 표0.072초·실제 provider/MCP0이고 모두 저장 본문과 일치했다. 첫 조회의 모델 지연은 남으며 실제 새 채팅 입력→화면·일반 정확성/SLA는 별도다. B 실제1.3 최소 반영·접속/프로세스 확인과 Git 상태는 [STATUS](../../../STATUS.md)를 따른다. 기존6pin에 `agent/turn_api_call.py`를 추가한7pin과6함수 alias를 검사하며 초기 설치도 같은 계약을 검사한다. 기존 native 의존성만 사용하고 Mac/서버 패키지 추가는 없다. 아래1.2 내용은 앞선 단계 이력이다.
+
 ## 2026-10-24 일반 채팅 1.2 보완
 
 운영 반영 상태와 최종 표본은 [STATUS](../../../STATUS.md) 최상단을 따른다. 아래 1.0/1.1의 범위·제외·실측은 당시 기록이다.
@@ -89,7 +97,7 @@ Mattermost 스레드 문맥이 붙은 요청은 [문맥 플러그인](../matterm
 
 ## 소스 고정과 시작 확인
 
-공개 완료 훅 API 대신 검토한 native 실행 경로의 런타임 참조를 감싸는 구현이다. [플러그인 소스](./__init__.py)의 `SOURCE_SHA256`에 다음 여섯 파일을 고정하며, 다른 바이트면 등록을 거절한다.
+공개 완료 훅 API 대신 검토한 native 실행 경로의 런타임 참조를 감싸는 구현이다. [플러그인 소스](./__init__.py)의 `SOURCE_SHA256`에 다음 일곱 파일을 고정하며, 다른 바이트면 등록을 거절한다.
 
 - `agent/turn_final_response.py`
 - `agent/conversation_loop.py`
@@ -97,6 +105,7 @@ Mattermost 스레드 문맥이 붙은 요청은 [문맥 플러그인](../matterm
 - `agent/message_metadata.py`
 - `agent/turn_api_request.py`
 - `agent/chat_completion_helpers.py`
+- `agent/turn_api_call.py`
 
 Hermes 원본 파일을 덮어쓰지 않는다. 등록 과정은 원래 함수 참조의 일치와 기존 wrapper 충돌을 검사하고 `on_unload`에 모듈 함수 참조를 원복하는 처리를 등록한다. 다만 hot unload 시 이미 agent 인스턴스에 예약된 1회 API 요청 builder는 다음 호출까지 남을 수 있다. 모듈 참조 원복과 모든 실행 중 인스턴스의 즉시 해제는 다르므로, 운영 해제에는 아래의 동일 컨테이너 재시작 절차를 사용한다. 별도 한국어 출력 가드가 관리하는 `plugins/platforms/mattermost/adapter.py`, `gateway/run_turn.py`의 두 파일 핀은 다른 계약이며 유지한다.
 

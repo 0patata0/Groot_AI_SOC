@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "date_kst": "2026-10-24",
-  "current_version": "1.2.0",
+  "current_version": "1.3.0",
   "scope": "normal-profile native Mattermost-platform SDK, isolated database; installed gateway startup/link checks; no new chat posts",
   "suricata_live_audit": {
     "running": true,
@@ -144,7 +144,166 @@
         "receipt": "/var/lib/capstone-management/live-query-completion-20261024T161637+0900.json"
       },
       "latency_sla_verified": false,
-      "remaining": "Model generation still takes roughly 34 seconds even for a verified table reformat; local format completion under review."
+      "remaining": "Model generation still takes roughly 34 seconds even for a verified table reformat; local format completion under review.",
+      "source_commit": "51c58c954b5d11399a16b0328a8eb7b315942bc5",
+      "source_commit_remote_verified": true
+    },
+    {
+      "version": "1.3.0",
+      "source_sha256": "34d9e102907dbc22466acc022fdedda35304b673f2d55b9079cdba78e28c15ef",
+      "local_tests": {
+        "query": 176,
+        "siem_installer": 40,
+        "total": 216
+      },
+      "native_sdk_cases": [
+        {
+          "saved_final_matches": true,
+          "provider_method_entries": [
+            "_interruptible_streaming_api_call",
+            "_interruptible_streaming_api_call",
+            "_interruptible_streaming_api_call"
+          ],
+          "local_format_phases": 1,
+          "configured_model_after": "qwen3.6:35b",
+          "question": "현재 적용된 룰 보여줘",
+          "seconds": 28.229,
+          "api_calls": 4,
+          "calls": [
+            {
+              "name": "get_rule_change_target",
+              "target": "a:modsecurity-custom",
+              "seconds": 0.371,
+              "is_error": false
+            },
+            {
+              "name": "get_rule_change_target",
+              "target": "b:wazuh-local-rules",
+              "seconds": 0.234,
+              "is_error": false
+            },
+            {
+              "name": "get_rule_change_target",
+              "target": "a:suricata-local",
+              "seconds": 2.363,
+              "is_error": false
+            }
+          ],
+          "error": false,
+          "has_runtime_disabled_claim": false
+        },
+        {
+          "saved_final_matches": true,
+          "provider_method_entries": [],
+          "local_format_phases": 1,
+          "configured_model_after": "qwen3.6:35b",
+          "question": "좀 더 자세라게 보고싶은데 장비별로 표로 보여줄래",
+          "seconds": 0.072,
+          "api_calls": 1,
+          "calls": [],
+          "error": false,
+          "has_runtime_disabled_claim": false
+        }
+      ],
+      "native_api_phases_each": [
+        4,
+        1
+      ],
+      "main_loop_provider_execution_entries_each": [
+        3,
+        0
+      ],
+      "local_format_phases_each": [
+        1,
+        1
+      ],
+      "counts_and_ids": [
+        10,
+        14,
+        19
+      ],
+      "returned_equals_saved_both": true,
+      "native_api_phases_are_not_provider_request_count": true,
+      "local_response_provenance": {
+        "id_prefix": "capstone-local-format-",
+        "model_label": "capstone-verified-file-format",
+        "provider_usage_tokens": 0
+      },
+      "eligibility": "complete current hash-verified file inventory, or complete prior verified inventory for a pure table reformat explicitly labelled no new query; no analysis/names/levels/source/changes",
+      "new_query_seconds": 28.229,
+      "prior_table_reformat_seconds": 0.072,
+      "main_loop_provider_calls_for_prior_table": 0,
+      "new_mcp_calls_for_prior_table": 0,
+      "deployment": {
+        "backup": "/var/backups/capstone-query-completion/20261024T164936+0900",
+        "management_timer_was_active": true,
+        "status": "applied",
+        "same_container": true,
+        "native_nine_hashes_unchanged": true,
+        "native_hashes": {
+          "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
+          "agent/conversation_loop.py": "c93ee86e1da583abc7cc57417380cd71241ae028c04a4cb8456580b52ffbf3d8",
+          "agent/turn_context.py": "85f857dc3c317366d918516bc8b37a022f1020b34da0c3966a31bd289b2942e1",
+          "agent/message_metadata.py": "77fbe25c86f2ab524fcac61a83548768cffc82c476bb8a6ff83ebdf492a5479d",
+          "agent/turn_api_request.py": "e31386cb83cf551026e4df9b589173b54bc913b36fc1a09942a520e68033b59e",
+          "agent/chat_completion_helpers.py": "5231a0e674806db6ad7be60e2d40a19a4157f7d2baa238aaa9af66f61e0eea4c",
+          "agent/turn_api_call.py": "a2b2c0232b1d37d5ebfefff2d06ce1bd3b69cfe93ab3a8c9f382d62f2a6deb8b",
+          "plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+          "gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a"
+        },
+        "source_sha256": {
+          "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "34d9e102907dbc22466acc022fdedda35304b673f2d55b9079cdba78e28c15ef",
+          "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "0f57b7b7211a3227ee9d5a68c174034e1dd9b932ed712fb3a5ae6532c3ac6f94"
+        },
+        "configurations_unchanged": true,
+        "existing_message_rows_preserved": 1353,
+        "new_message_rows": 0,
+        "connection": {
+          "api_status": 200,
+          "is_bot": true,
+          "websocket_status": 101,
+          "hello_received": true
+        },
+        "registration_pids": [
+          "158"
+        ],
+        "security_device_restarts": 0,
+        "hermes_restarts": 1,
+        "messages_posted": 0,
+        "new_packages": 0,
+        "management_timer_active_after": true,
+        "receipt": "/var/lib/capstone-management/live-query-completion-20261024T164936+0900.json"
+      },
+      "post_deploy": {
+        "gateway": {
+          "gateway_state": "running",
+          "active_agents": 0,
+          "updated_at": "2026-10-24T07:56:55.476339+00:00"
+        },
+        "management_timer_active": true,
+        "config_sha256": "626b69f728e595186ca332b0628b89c8deb44026363518b02b796f5be7a6b61a",
+        "plugin_sha256": "34d9e102907dbc22466acc022fdedda35304b673f2d55b9079cdba78e28c15ef",
+        "mattermost_adapter_state": {
+          "state": "connected"
+        },
+        "unit_states": {
+          "soc-bot.service": {
+            "Result": "success",
+            "ActiveState": "active",
+            "SubState": "running"
+          },
+          "capstone-management.timer": {
+            "Result": "success",
+            "ActiveState": "active",
+            "SubState": "waiting"
+          }
+        },
+        "failed_unit_count": 0,
+        "remaining_replay_directories": []
+      },
+      "direct_chat_posts": 0,
+      "protected_changes": 0,
+      "latency_sla_verified": false
     }
   ],
   "not_verified": [

@@ -261,7 +261,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(calls,[(self.n['SOURCE']/'infra/hermes/query-completion/__init__.py',512*1024)])
         self.assertEqual(set(pins),{'agent/turn_final_response.py','agent/conversation_loop.py',
                                    'agent/turn_context.py','agent/message_metadata.py',
-                                   'agent/turn_api_request.py','agent/chat_completion_helpers.py'})
+                                   'agent/turn_api_request.py','agent/chat_completion_helpers.py','agent/turn_api_call.py'})
         self.assertTrue(all(len(value)==64 for value in pins.values()))
         # Parsing pins must not execute other top-level plugin code.
         self.assertEqual(self.n['query_completion_source_pins'](raw+b'\nraise RuntimeError("must_not_execute")\n'),pins)

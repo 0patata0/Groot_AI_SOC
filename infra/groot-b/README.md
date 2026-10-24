@@ -1,5 +1,7 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
+> **2026-10-25 05:14 KST 추가 자원 확인:** DGX 추론을 유지하는 별도 Ollama 클라이언트/실행부 시험 공간은 충분하다고 판단한다. 가용RAM11.74GiB·가용디스크100.05GiB·swap0,4vCPU의3초표본busy0.25~2.76%. /·/opt·Docker는 같은 파일시스템이므로 디스크 여유를 중복 합산하지 않는다. Hermes314.3MiB·운영8SHA/CID/PID불변. 설치/다운로드/신규 동시 부하 시험은 하지 않았다. [STATUS](../../STATUS.md).
+
 > **후속 정정:** 사용자 검토안은 B의 Ollama 클라이언트를 DGX Ollama에 연결하고 추론은 DGX에 두는 구성이다. 아래 RAM/GPU 실측은 사실이지만 이 원격 연결안의 제약으로 적용하지 않는다. 현행 유지 권고는 채팅·MCP 실행·기억·승인/관리 기능 이관이 미검증이라는 범위이며 속도 우열은 별도 비교 대상이다. [STATUS](../../STATUS.md).
 
 > **2026-10-25 05:00 KST 역할·자원 확인:** B는 4 vCPU/RAM15.62GiB(가용11.77GiB)·swap사용0이며 계산용 GPU는 노출되지 않았다(VMware vmwgfx). Wazuh3종·Mattermost·PostgreSQL·Hermes 6컨테이너 실행, Hermes 유휴1표본314.2MiB/CPU0.16%. 현행35B 파일21.07GiB와 공존 서비스 때문에 B에서 동일 모델 추론을 맡기는 전환은 권장하지 않는다. B Hermes가 SOC/MCP·채팅을 관리하고 DGX Ollama가 추론하는 구성을 유지한다. 초기 프로세스 root와 실제 Hermes UID995를 구분하며 운영권한 변경은 없다. 전체 비교·근거·미검증 범위는 [STATUS](../../STATUS.md).

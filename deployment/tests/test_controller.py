@@ -105,6 +105,47 @@ class ControllerContract(unittest.TestCase):
                         PAYLOAD_LOG=str(self.payload_log),
                         PYTHONDONTWRITEBYTECODE='1')
 
+    def test_optional_ollama_trial_is_siem_only_after_diagnostics(self):
+        with self.config.open('a') as f:
+            f.write('OLLAMA_TRIAL_ENABLE=1\n')
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        phases = self.phases()
+        self.assertLess(phases.index('siem trial-check'), phases.index('siem apply'))
+        self.assertLess(phases.index('siem diag-activate'), phases.index('siem trial-install'))
+        self.assertLess(phases.index('siem trial-install'), phases.index('siem trial-verify'))
+        self.assertFalse(any(x.startswith(('security trial-', 'service trial-')) for x in phases))
+
+    def test_trial_check_failure_stops_install(self):
+        with self.config.open('a') as f:
+            f.write('OLLAMA_TRIAL_ENABLE=1\n')
+        result = self.run_controller(FAIL_PHASE='siem trial-check')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('siem trial-install', self.phases())
+
+    def test_trial_flag_rejects_shell_text_before_ssh(self):
+        with self.config.open('a') as f:
+            f.write('OLLAMA_TRIAL_ENABLE=1;touch /tmp/no\n')
+        result = self.run_controller('--plan')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.events(), [])
+
+    def test_optional_chat_follows_verified_runtime(self):
+        with self.config.open('a') as f:
+            f.write('OLLAMA_TRIAL_ENABLE=1\nOLLAMA_TRIAL_CHAT_ENABLE=1\n')
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        phases = self.phases()
+        self.assertLess(phases.index('siem trial-verify'), phases.index('siem trial-chat-install'))
+        self.assertLess(phases.index('siem trial-chat-install'), phases.index('siem trial-chat-verify'))
+
+    def test_chat_without_runtime_rejected_before_ssh(self):
+        with self.config.open('a') as f:
+            f.write('OLLAMA_TRIAL_CHAT_ENABLE=1\n')
+        result = self.run_controller('--plan')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.events(), [])
+
     def run_controller(self, mode='--apply', **env):
         return subprocess.run(['bash', str(self.root / 'deploy.sh'), mode, '--batch', '--config', str(self.config)],
                               env=dict(self.env, **env), capture_output=True, text=True, timeout=30)

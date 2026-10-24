@@ -1,5 +1,8 @@
 # HITL 채팅 채널 설계 — 온프레미스 Mattermost (오프라인, 양방향 웹훅)
 
+> **2026-10-25 채널/봇 최신화:** 기존 soc-agent는 동일 ID와 대화 이력을 유지해 **soc-hermes**로 이름을 변경했다. soc-alerts는 유지한다. 새 **ollama** 봇은 별도 비공개 **soc-ollama** 채널과 허용 관리자 DM에서 읽기26도구로 응답한다. 기존 승인·관리 역할은 Hermes가 담당하며 새 봇에는 쓰기 권한이 없다. [사용/권한/연결](../ollama-trial/README.md) · [검증 현황](../../STATUS.md). 아래 soc-agent 표기는 각 과거 이력의 명칭이다.
+
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
 > 현재 구성은 MCP6서버와 고정 진단25대상이다. 자연어 도구 선택·무근거 완료/SILENT 알림 보완의 실제 검증 상태는 STATUS 최상단을 따른다. 정확 후보 승인과 일반 sudo/Docker/임의 shell 금지는 유지한다.

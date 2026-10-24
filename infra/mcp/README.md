@@ -1,5 +1,8 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **2026-10-25 06:23 KST Ollama 병행 시험 적용:** 같은 B host venv에 Ollama SDK+mcp-use 실행부를 설치했다. 모델은 Hermes와 같은 DGX qwen3.6:35b. `ollama` 봇의 `soc-ollama` 채널/DM을 활성화하고 기존 soc-agent는 이력/ID를 유지해 `soc-hermes`로 이름을 바꿨다. 읽기26도구·별도 비특권 gateway만 추가하며 기존 관리/승인은 Hermes가 담당한다. 18회 SDK 비교에서 후보가 빠른 표본을 얻었으나 실제 채팅 게시시간/전체 기능 동등성·완전한 정확도는 미검증이다. [사용·설치·복구](../ollama-trial/README.md) · [결과/한계/Git 상태](../../STATUS.md).
+
+
 ## 2026-10-25 Ollama 실제 왕복·기존 코드 재사용 후보
 
 DGX Ollama native `/api/chat`→모델의 도구 선택→SSH MCP 실행→결과를 받은 최종 답변까지 읽기2건을 확인했다. 기존8서버/36도구 스키마는 불변이고 고유 alias36개를 검증했다. 실제 모델에 제시한 도구는 Suricata 서비스 조회와 시간 계산2종뿐이다. 앞선 표준 SDK 연결 시험에서 진전한 범위이며, 전체36도구 선택·보호 변경·Mattermost·세션/관리 작업을 새 실행부로 대체한 결과는 아니다. 이번 코드는 임시 검증용으로 정리했고 운영에 설치하지 않았다. 실측·의존성·미검증 항목은 [STATUS](../../STATUS.md)를 기준으로 한다.

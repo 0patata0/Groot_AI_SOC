@@ -1,5 +1,8 @@
 # 단일 Bash 초기 설치
 
+> **2026-10-25 선택적 시험 분기:** `OLLAMA_TRIAL_ENABLE=1`과 `OLLAMA_TRIAL_BUNDLE`을 지정하면 B의 반입물을 사전검사하고 SOC/진단 구성 뒤 host venv의 Ollama 기반 읽기 실행부를 설치·검증한다. 모델은 DGX에 유지한다. `OLLAMA_TRIAL_CHAT_ENABLE=1`을 함께 지정하면 ollama 봇과 비공개 soc-ollama 채널·host gateway 서비스도 추가하며 기존 Hermes 채널 ID를 유지해 soc-hermes로 이름 변경한다. 두 옵션 기본값0이며 기존 운영 서버에는 전체 bootstrap을 재실행하지 않는다. [추가 반입·권한·복구](../infra/ollama-trial/README.md), [실제 검증 범위](../STATUS.md).
+
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
 > 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP6서버/고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.

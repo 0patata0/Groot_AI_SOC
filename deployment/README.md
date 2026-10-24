@@ -1,5 +1,8 @@
 # 초기 설치기의 Hermes 확장
 
+> **2026-10-25 선택적 Ollama 시험 환경:** `OLLAMA_TRIAL_ENABLE=1`이면 같은 B 호스트의 비특권 venv에 Ollama SDK+mcp-use 실행부를 추가한다. DGX 추론과 기존 Hermes 운영을 유지하며 새 Docker NIC/수신 포트는 없다. `OLLAMA_TRIAL_CHAT_ENABLE=1`은 별도 ollama 봇·soc-ollama 채널·비특권 gateway 서비스를 추가하고 기존 채널을 soc-hermes로 이름 변경한다. 두 옵션 기본값0. deb3+wheel70 고정 반입·해시·읽기5서버26도구 검증을 루트 deploy.sh 분기에 연결했다. [설치/실행/복구](../infra/ollama-trial/README.md) · [실제 적용·비교·한계](../STATUS.md).
+
+
 > **2026-10-25 설치 동기화:** 루트 `deploy.sh`의 기존 source bundle에 IDS 대상 제한·KST 저장용 플러그인/공용 gate/SOUL과 A/B 룰 MCP의 `time_display`, B 진단 MCP의 `calculate_time`을 포함한다. 진단 설치 probe는 SDK의 `is_error`/`isError` 차이를 처리하고 실제 두 도구·KST 날짜 경계·10분 계산을 검증한다. 추가 deb/wheel/이미지나 오프라인 반입 항목은 없으며 기존 목록을 유지한다. 운영은 별도 최소 교체로 반영했고 새 서버 전체 설치 시험은 미실행이다.
 
 > **2026-10-25 설치 계약:** deploy.sh는 Hermes `timezone: Asia/Seoul`, query-completion 1.6.0의3파일(공용 grounding 포함), 동일 관리 gate·KST 정책·승인 카드·정확한 진단 범위 오류를 반입한다. 현재 조회의 API 문맥 축소와 첫 읽기/간결한 상태 설명 안내를 포함하며 소스 변경은 기존 배포 해시 계약에 반영된다. 추가 패키지 없음. 운영 최소 변경과 새 서버 전체 설치 시험은 구분하며 [STATUS](../STATUS.md)를 따른다.

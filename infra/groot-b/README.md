@@ -1,5 +1,8 @@
 # 2026_capstone_Groot_B — SIEM(Wazuh) + MCP Server
 
+> **2026-10-25 06:23 KST Ollama 병행 시험 적용:** 같은 B host venv에 Ollama SDK+mcp-use 실행부를 설치했다. 모델은 Hermes와 같은 DGX qwen3.6:35b. `ollama` 봇의 `soc-ollama` 채널/DM을 활성화하고 기존 soc-agent는 이력/ID를 유지해 `soc-hermes`로 이름을 바꿨다. 읽기26도구·별도 비특권 gateway만 추가하며 기존 관리/승인은 Hermes가 담당한다. 18회 SDK 비교에서 후보가 빠른 표본을 얻었으나 실제 채팅 게시시간/전체 기능 동등성·완전한 정확도는 미검증이다. [사용·설치·복구](../ollama-trial/README.md) · [결과/한계/Git 상태](../../STATUS.md).
+
+
 > **2026-10-25 05:22~05:25 KST 실행 의존성·왕복 확인:** 기존 Hermes 컨테이너(Python3.13.5/MCP2.0.0/httpx0.28.1)의 라이브러리만으로 native Ollama→MCP 읽기→최종 답변2건을 통과했다. B 기본 Python3.12.3 환경에는 같은 라이브러리가 없어 별도 배포가 필요하다. 선택 루트5의 전이 의존41개 조건 충족·격리 regex2026.9.29 확인은 새 실행부 전체 lock/배포 검증과 다르다. mcp-use Python1.7.1은 MCP<2를 요구하므로 운영 환경을 낮추지 않고 격리해야 한다. 운영8SHA/CID/PID 불변·설치/재시작0. [STATUS](../../STATUS.md) · [대체 후보와 필요 연결](../mcp/README.md).
 
 > **2026-10-25 05:14 KST 추가 자원 확인:** DGX 추론을 유지하는 별도 Ollama 클라이언트/실행부 시험 공간은 충분하다고 판단한다. 가용RAM11.74GiB·가용디스크100.05GiB·swap0,4vCPU의3초표본busy0.25~2.76%. /·/opt·Docker는 같은 파일시스템이므로 디스크 여유를 중복 합산하지 않는다. Hermes314.3MiB·운영8SHA/CID/PID불변. 설치/다운로드/신규 동시 부하 시험은 하지 않았다. [STATUS](../../STATUS.md).

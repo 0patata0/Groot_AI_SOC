@@ -5,7 +5,7 @@ stage=${1:?stage}; role=${2:?role}; action=${3:?action}
 [[ $# == 3 && $stage =~ ^/var/tmp/capstone-bootstrap-[0-9a-f]{24}$ ]] || exit 64
 [[ $role == security || $role == siem || $role == service ]] || exit 64
 case "$role:$action" in
-  *:check|*:apply|*:verify|security:soc-check|siem:soc-check|siem:soc-prepare|siem:soc-export|security:soc-receive|security:soc-apply|siem:soc-activate|security:soc-verify|siem:soc-verify|security:log-activate|siem:log-monitor|security:log-verify|siem:log-verify|siem:dashboard-check|siem:dashboard-apply|siem:dashboard-verify|*:diag-check|*:diag-verify|siem:diag-prepare|siem:diag-export|security:diag-apply|service:diag-apply|siem:diag-activate|siem:tls-install|siem:tls-export|siem:tls-verify|security:tls-trust|siem:host-check|service:host-check|siem:host-apply|service:host-apply|siem:host-verify|service:host-verify) ;;
+  siem:trial-chat-install|siem:trial-chat-verify|siem:trial-check|siem:trial-install|siem:trial-verify|*:check|*:apply|*:verify|security:soc-check|siem:soc-check|siem:soc-prepare|siem:soc-export|security:soc-receive|security:soc-apply|siem:soc-activate|security:soc-verify|siem:soc-verify|security:log-activate|siem:log-monitor|security:log-verify|siem:log-verify|siem:dashboard-check|siem:dashboard-apply|siem:dashboard-verify|*:diag-check|*:diag-verify|siem:diag-prepare|siem:diag-export|security:diag-apply|service:diag-apply|siem:diag-activate|siem:tls-install|siem:tls-export|siem:tls-verify|security:tls-trust|siem:host-check|service:host-check|siem:host-apply|service:host-apply|siem:host-verify|service:host-verify) ;;
   *) exit 64 ;;
 esac
 [[ $(id -u) == 0 && -d $stage && ! -L $stage ]] || exit 77
@@ -28,7 +28,7 @@ docker info >/dev/null 2>&1 || { echo 'Docker daemon unavailable' >&2; exit 69; 
 docker compose version >/dev/null || exit 69
 export CAPSTONE_SOURCE=$stage/source
 case "$action" in
-  soc-*|log-*|dashboard-*|diag-*|host-*|tls-*)
+  soc-*|log-*|dashboard-*|diag-*|host-*|tls-*|trial-*)
     # Extensions have their own bounded, idempotent receipts. They may not
     # convert an unrelated deployment or run concurrently with another apply.
     case "$action" in
@@ -40,6 +40,8 @@ case "$action" in
       [[ -f $CAPSTONE_ROOT/role && ! -L $CAPSTONE_ROOT/role && $(cat "$CAPSTONE_ROOT/role") == "$role" ]] || exit 78
     fi
     case "$action" in
+      trial-chat-*) exec python3 -B "$CAPSTONE_SOURCE/deployment/ollama_trial_chat.py" "${action#trial-chat-}" --source-root "$CAPSTONE_SOURCE" --mattermost-url "http://$SIEM_HOST:8065" ;;
+      trial-*) exec python3 -B "$CAPSTONE_SOURCE/deployment/ollama_trial.py" "${action#trial-}" --source-root "$CAPSTONE_SOURCE" --bundle "$OLLAMA_TRIAL_BUNDLE" ;;
       soc-check) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" check --role "$role" ;;
       soc-prepare) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" prepare-siem ;;
       soc-export) exec python3 -B "$CAPSTONE_SOURCE/deployment/soc_management.py" export-siem ;;

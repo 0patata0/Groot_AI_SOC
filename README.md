@@ -1,5 +1,8 @@
 # Groot_AI_SOC
 
+> **2026-10-25 06:23 KST Ollama 병행 시험 적용:** 같은 B host venv에 Ollama SDK+mcp-use 실행부를 설치했다. 모델은 Hermes와 같은 DGX qwen3.6:35b. `ollama` 봇의 `soc-ollama` 채널/DM을 활성화하고 기존 soc-agent는 이력/ID를 유지해 `soc-hermes`로 이름을 바꿨다. 읽기26도구·별도 비특권 gateway만 추가하며 기존 관리/승인은 Hermes가 담당한다. 18회 SDK 비교에서 후보가 빠른 표본을 얻었으나 실제 채팅 게시시간/전체 기능 동등성·완전한 정확도는 미검증이다. [사용·설치·복구](infra/ollama-trial/README.md) · [결과/한계/Git 상태](STATUS.md).
+
+
 > **2026-10-25 Ollama/MCP 후속 검증:** 기존 MCP8연결/36스키마 확인에 이어 DGX native API의 도구 선택→실제 조회→최종 응답2건(IDS·KST 계산)을 통과했다. 전체 SOC 에이전트 호환이나 속도 개선을 검증한 것은 아니다. mcp-use 등으로 실행 코드를 줄일 후보와 의존성 충돌·기억/채팅/승인 이관 범위를 조사했으며 설치·운영 교체는 하지 않았다. [검증·남은 일·Git 상태](STATUS.md) · [재사용 후보](infra/mcp/README.md).
 
 > **2026-10-25 05:14 KST 추가 용량 확인:** DGX 추론을 유지하는 Ollama 클라이언트/실행부는 B에 추가할 자원 여유가 있다. 4vCPU·가용RAM11.74GiB·디스크100.05GiB·swap사용0이며 Hermes를 유지한 별도 비교 환경도 용량상 가능하다고 판단한다. 신규 실행부의 동시부하/속도는 미검증, 설치·다운로드·운영변경0이다. [실측·범위](STATUS.md).

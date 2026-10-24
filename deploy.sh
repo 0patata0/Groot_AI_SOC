@@ -19,6 +19,9 @@ WEB_BACKEND_PORT=80
 WAF_PORT=8080
 LLM_BASE_URL=
 LLM_MODEL=qwen3.6:35b
+OLLAMA_TRIAL_ENABLE=0
+OLLAMA_TRIAL_CHAT_ENABLE=0
+OLLAMA_TRIAL_BUNDLE=/opt/capstone-prereqs/ollama-trial
 LOG_PROTECTED_IPS=
 ADMIN_PROTECTED_CIDRS=
 ADMIN_INPUT_SET=0
@@ -89,7 +92,7 @@ if [[ -n $CONFIG ]]; then
     [[ $line != *$'\r'* && $line == *=* ]] || die 'configuration requires KEY=value lines (LF)'
     key=${line%%=*}; value=${line#*=}
     case "$key" in
-      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|LOG_PROTECTED_IPS|ADMIN_PROTECTED_CIDRS|MANAGEMENT_ALLOWED_CIDRS|DASHBOARD_ALLOWED_CIDRS|DASHBOARD_DENIED_CIDRS|CHAT_ALLOWED_CIDRS|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_NONWEB_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
+      SECURITY_HOST|SIEM_HOST|SERVICE_HOST|SSH_USER|SSH_PORT|SSH_IDENTITY|SSH_KNOWN_HOSTS|MONITOR_INTERFACE|WEB_BACKEND_PORT|WAF_PORT|LLM_BASE_URL|LLM_MODEL|OLLAMA_TRIAL_CHAT_ENABLE|OLLAMA_TRIAL_ENABLE|OLLAMA_TRIAL_BUNDLE|LOG_PROTECTED_IPS|ADMIN_PROTECTED_CIDRS|MANAGEMENT_ALLOWED_CIDRS|DASHBOARD_ALLOWED_CIDRS|DASHBOARD_DENIED_CIDRS|CHAT_ALLOWED_CIDRS|SURICATA_IMAGE|WAF_IMAGE|ET_RULES_FILE|DVWA_IMAGE|MARIADB_IMAGE|LOG4SHELL_IMAGE|LOG4SHELL_APP_JAR|LOG4SHELL_HOSTNAME|LAB_PUBLIC_ORIGIN|LAB_HTTPS_PORT|LAB_ALLOWED_CIDRS|LAB_PROXY_SUBNET|LAB_GATEWAY_PORT|LAB_WHEEL_DIR|LAB_MANIFEST|LAB_SUDO_BUNDLE|LAB_NONWEB_BUNDLE|LAB_TLS_CERT|LAB_TLS_KEY)
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         if [[ $key == ADMIN_PROTECTED_CIDRS ]]; then ADMIN_INPUT_SET=1; fi
@@ -156,7 +159,10 @@ command -v python3 >/dev/null || die 'controller requires existing python3'
 python3 -B "$HERE/deployment/validate_lab_site.py" "$LAB_PUBLIC_ORIGIN" "$LAB_HTTPS_PORT" "$LAB_ALLOWED_CIDRS" "$LAB_PROXY_SUBNET" || die 'invalid lab site settings'
 [[ $LAB_GATEWAY_PORT != "$WEB_BACKEND_PORT" && $LAB_GATEWAY_PORT != 22 && $LAB_GATEWAY_PORT != 18090 && $LAB_GATEWAY_PORT != 18081 && $LAB_GATEWAY_PORT != 18082 && $LAB_GATEWAY_PORT != 18083 ]] || die 'lab gateway port conflict'
 [[ $LAB_HTTPS_PORT != "$SSH_PORT" && $LAB_HTTPS_PORT != "$WAF_PORT" ]] || die 'lab HTTPS port conflict'
-for key in LAB_WHEEL_DIR LAB_MANIFEST LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
+[[ $OLLAMA_TRIAL_ENABLE == 0 || $OLLAMA_TRIAL_ENABLE == 1 ]] || die 'OLLAMA_TRIAL_ENABLE must be 0 or 1'
+[[ $OLLAMA_TRIAL_CHAT_ENABLE == 0 || $OLLAMA_TRIAL_CHAT_ENABLE == 1 ]] || die 'OLLAMA_TRIAL_CHAT_ENABLE must be 0 or 1'
+[[ $OLLAMA_TRIAL_CHAT_ENABLE == 0 || $OLLAMA_TRIAL_ENABLE == 1 ]] || die 'OLLAMA_TRIAL_CHAT_ENABLE requires OLLAMA_TRIAL_ENABLE'
+for key in OLLAMA_TRIAL_BUNDLE LAB_WHEEL_DIR LAB_MANIFEST LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
   value=${!key}
   [[ $value =~ ^/opt/[A-Za-z0-9._/-]+$ && $value != *..* && $value != *//* && $value != */ ]] || die "invalid server artifact path: $key"
 done
@@ -210,7 +216,7 @@ mkdir "$WORK/bundle"
 cat > "$WORK/bundle/site.env" <<EOF
 # Generated data; values are shell-quoted by the controller below.
 EOF
-for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL LOG_PROTECTED_IPS ADMIN_PROTECTED_CIDRS MANAGEMENT_ALLOWED_CIDRS DASHBOARD_ALLOWED_CIDRS DASHBOARD_DENIED_CIDRS CHAT_ALLOWED_CIDRS CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
+for key in SECURITY_HOST SIEM_HOST SERVICE_HOST SSH_PORT MONITOR_INTERFACE WEB_BACKEND_PORT WAF_PORT LLM_BASE_URL LLM_MODEL OLLAMA_TRIAL_CHAT_ENABLE OLLAMA_TRIAL_ENABLE OLLAMA_TRIAL_BUNDLE LOG_PROTECTED_IPS ADMIN_PROTECTED_CIDRS MANAGEMENT_ALLOWED_CIDRS DASHBOARD_ALLOWED_CIDRS DASHBOARD_DENIED_CIDRS CHAT_ALLOWED_CIDRS CAPSTONE_ROOT LAB_PUBLIC_ORIGIN LAB_HTTPS_PORT LAB_ALLOWED_CIDRS LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_WHEEL_DIR LAB_MANIFEST LAB_ADMIN_KEY_FILE LAB_SUDO_BUNDLE LAB_NONWEB_BUNDLE LAB_TLS_CERT LAB_TLS_KEY; do
   value=${!key}
   printf 'export %s=%q\n' "$key" "$value" >> "$WORK/bundle/site.env"
 done
@@ -267,6 +273,8 @@ if [[ $MODE == verify ]]; then
   remote_role "$SIEM_HOST" siem tls-verify
   remote_role "$SERVICE_HOST" service host-verify
   remote_role "$SIEM_HOST" siem host-verify
+  if [[ $OLLAMA_TRIAL_ENABLE == 1 ]]; then remote_role "$SIEM_HOST" siem trial-verify; fi
+  if [[ $OLLAMA_TRIAL_CHAT_ENABLE == 1 ]]; then remote_role "$SIEM_HOST" siem trial-chat-verify; fi
   say '세 역할과 SOC 확장 검증 완료.'
   exit 0
 fi
@@ -294,6 +302,7 @@ remote_role "$SIEM_HOST" siem diag-check
 remote_role "$SERVICE_HOST" service diag-check
 remote_role "$SERVICE_HOST" service host-check
 remote_role "$SIEM_HOST" siem host-check
+if [[ $OLLAMA_TRIAL_ENABLE == 1 ]]; then remote_role "$SIEM_HOST" siem trial-check; fi
 say '세 서버 사전검사 통과.'
 [[ $MODE != check ]] || exit 0
 
@@ -350,6 +359,14 @@ for name in sys.argv[1:]:
 print(json.dumps(values,sort_keys=True,separators=(',',':')))
 PY
   remote_role "$SIEM_HOST" siem diag-activate || die 'diagnostic transport activation failed'
+if [[ $OLLAMA_TRIAL_ENABLE == 1 ]]; then
+  remote_role "$SIEM_HOST" siem trial-install
+  remote_role "$SIEM_HOST" siem trial-verify
+  if [[ $OLLAMA_TRIAL_CHAT_ENABLE == 1 ]]; then
+    remote_role "$SIEM_HOST" siem trial-chat-install
+    remote_role "$SIEM_HOST" siem trial-chat-verify
+  fi
+fi
 # Host management and the old default Docker bridge must not bypass the
 # dedicated lab guards. Preserve the authenticated controller's SSH source.
 remote_role "$SERVICE_HOST" service host-apply

@@ -1,5 +1,8 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-10-25 선택 반입물 추가:** Ollama 시험 옵션을 켤 때만 `/opt/capstone-prereqs/ollama-trial`에 deb3개·Linux CPython3.12 wheel70개와 정확한 [별도 manifest](../infra/ollama-trial/offline-manifest.json)를 준비한다. python3.12-venv3.12.3-1ubuntu0.17 / pip-whl24.0+dfsg-1ubuntu1.3 / setuptools-whl68.1.2-2ubuntu1.2 및 [전체 Python lock](../infra/ollama-trial/requirements.lock)을 사용한다. 이 묶음은 기존 평면 artifacts.json 목록과 구분하며 자체 설치기가 해시/추가 파일을 검증한다. [준비·적용·정리](../infra/ollama-trial/README.md). 채팅 옵션은 이 wheel 묶음에 포함된 httpx/websockets를 사용하므로 별도 바이너리가 더 필요하지 않다. 기본 설치에는 추가하지 않는다.
+
+
 > **2026-10-24 응답 지연 보완:** query-completion 1.5.1의 `__init__.py`·`plugin.yaml`과 기존 공용 `grounding.py`를 소스 번들로 반입한다. 기존 deploy.sh의 확장 소스 해시 검증을 사용하며 deb/wheel/이미지 추가와 Mac 설치는 없다. 운영은 플러그인2파일 최소 교체로 반영하고 기존 공용 코드·모델·설정·승인 경계를 유지했다. [현황](../STATUS.md).
 
 > **2026-10-24 Memory 갱신:** 추가 오프라인 바이너리는 없다. 변경된 SOUL·rule_change_executor.py·service_action_executor.py는 기존 SOC 소스 번들이 함께 반입/검증한다. 운영 Memory snapshot은 root가 현재 서버 사실을 확인해 작성하고 원본·DB 백업 후 적용하는 유지보수 자료다. 신규 VM의 이미 확인된 상태로 배포하지 않는다. [현황](../STATUS.md).

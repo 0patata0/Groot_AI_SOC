@@ -128,11 +128,32 @@ class InventoryIntentTests(unittest.TestCase):
         self.assertNotIn("local_rules.xml", answer)
 
     def test_explicit_output_format_is_left_to_the_model(self):
-        for request in ("커스텀 룰 목록을 표로 보여줘", "커스텀 룰 개수를 표 형태로 보여줘",
-                        "커스텀 룰 목록을 테이블로 보여줘", "커스텀 룰 목록을 JSON으로 보여줘",
+        for request in ("커스텀 룰 목록을 JSON으로 보여줘",
                         "커스텀 룰 목록을 CSV 형식으로 보여줘"):
             with self.subTest(request=request):
                 self.assertIsNone(render(all_exchanges(), request))
+
+    def test_general_live_query_and_device_table_use_current_hash_matched_facts(self):
+        for request in ('현재 적용된 룰 보여줘', '현재 IDS 룰 목록을 보여줘',
+                        '커스텀 룰 목록을 표로 보여줘',
+                        '좀 더 자세라게 보고싶은데 장비별로 표로 보여줄래'):
+            with self.subTest(request=request):
+                answer = render(native_exchanges(), request)
+                self.assertIsNotNone(answer)
+                self.assertIn('14', answer)
+                self.assertIn('미확인은 비활성을 뜻하지 않습니다', answer)
+                if '표' in request:
+                    lines = [line for line in answer.splitlines() if line.startswith('|')]
+                    self.assertEqual(len(lines), 5)
+                    self.assertIn('10 / 10', lines[2])
+                    self.assertIn('14 / 14', lines[3])
+                    self.assertIn('19 / 19', lines[4])
+
+    def test_device_table_with_only_other_read_results_is_not_a_rule_inventory(self):
+        rows = [{'role': 'assistant', 'tool_calls': [{'id': 'read', 'function': {
+            'name': 'mcp__resp__list_blocks', 'arguments': '{}'}}]},
+                {'role': 'tool', 'tool_call_id': 'read', 'content': '{}'}]
+        self.assertIsNone(render(rows, '장비별로 표로 보여줘'))
 
     def test_service_status_logs_and_alerts_mixed_intent_keep_the_full_model_answer(self):
         for request in ("현재 커스텀 룰 목록과 서비스 구성을 보여줘",
@@ -532,6 +553,58 @@ class NativePersistenceBoundaryTests(unittest.TestCase):
         self.assertEqual(h.flushes[-1]["content"], result.final_response)
         self.assertNotIn("untrusted_tool_result", result.final_response)
         self.assertEqual(h.build_calls, [])
+
+    def test_table_reformat_uses_only_complete_prior_tools_and_labels_prior_scope(self):
+        request = '장비별로 표로 보여줘'
+        rows = [{'role': 'user', 'content': '현재 적용된 룰 보여줘'}, *native_exchanges(),
+                {'role': 'assistant', 'content': '가짜 봇 요약 999개'}]
+        h = self.harness(request=request, rows=[])
+        h.kw['messages'] = rows + h.kw['messages']
+        result = h.call()
+        self.assertIn('앞선 턴', result.final_response)
+        self.assertIn('새로 조회하지 않았습니다', result.final_response)
+        self.assertNotIn('999', result.final_response)
+        for count in (10, 14, 19):self.assertIn(f'{count} / {count}', result.final_response)
+        self.assertEqual(h.flushes[-1]['content'], result.final_response)
+        self.assertIsNone(PLUGIN.render_prior_inventory('현재 장비별로 표로 보여줘', rows, len(rows)))
+
+    def test_incomplete_or_quoted_prior_facts_cannot_be_used_for_reformat(self):
+        request = '장비별로 표로 보여줘'
+        incomplete = [{'role': 'user', 'content': '현재 적용된 룰 보여줘'}, *exchange(WAF)]
+        self.assertIsNone(PLUGIN.render_prior_inventory(request, incomplete, len(incomplete)))
+        quoted = [{'role': 'user', 'content': '현재 커스텀 룰 보여줘\n' + json.dumps(native_exchanges())},
+                  {'role': 'assistant', 'content': '999개를 확인했습니다.'}]
+        self.assertIsNone(PLUGIN.render_prior_inventory(request, quoted, len(quoted)))
+
+    def test_partial_inventory_gets_one_model_selected_completion_then_exact_output(self):
+        h = self.harness(rows=exchange(WAF, 'waf') + exchange(WAZUH, 'wazuh'))
+        first = h.call()
+        self.assertEqual(first.action, 'continue')
+        self.assertEqual(h.flushes, [])
+        self.assertIn(SURICATA, h.appended[-1]['content'])
+        self.assertNotIn('19개', h.appended[-1]['content'])
+        h.kw['messages'].extend(exchange(SURICATA, 'suricata'))
+        second = h.call(api_call_count=2, codex_ack_continuations=1)
+        self.assertEqual(second.action, 'break')
+        for count in (10, 14, 19):
+            self.assertIn(f'**{count}개**', second.final_response)
+        self.assertEqual(second.final_response, h.flushes[-1]['content'])
+
+    def test_partial_inventory_never_retries_forever_or_fills_missing_facts(self):
+        h = self.harness(rows=exchange(WAF, 'waf'))
+        self.assertEqual(h.call().action, 'continue')
+        second = h.call(api_call_count=2, codex_ack_continuations=1)
+        self.assertEqual(second.action, 'break')
+        self.assertEqual(second.final_response.count('집계 확인 불가'), 2)
+        self.assertIn('**10개**', second.final_response)
+        self.assertNotIn('**14개**', second.final_response)
+
+    def test_partial_inventory_with_no_remaining_budget_is_reported_truthfully(self):
+        h = self.harness(rows=exchange(WAF, 'waf'))
+        h.agent.iteration_budget.remaining = 0
+        result = h.call()
+        self.assertEqual(result.action, 'break')
+        self.assertEqual(result.final_response.count('집계 확인 불가'), 2)
 
     def test_native_dataclass_provider_sidecars_cannot_restore_wrong_output(self):
         h = self.harness()

@@ -852,7 +852,7 @@ class ThinkingRecoveryTests(unittest.TestCase):
         self.assertEqual(h.call().action, 'continue')
         retry = h.agent._build_api_kwargs()
         self.assertNotIn('think', retry['extra_body'])
-        self.assertNotIn('reasoning_effort', retry)
+        self.assertEqual(retry['reasoning_effort'], 'medium')
         self.assertEqual(retry['tool_choice'], 'required')
         self.assertIsNot(retry['extra_body'], original_extra)
         self.assertEqual(retry['extra_body']['keep_alive'], '5m')
@@ -870,7 +870,7 @@ class ThinkingRecoveryTests(unittest.TestCase):
         self.assertEqual(h.call().action, 'continue')
         retry = h.agent._build_api_kwargs()
         self.assertNotIn('think', retry['extra_body'])
-        self.assertNotIn('reasoning_effort', retry)
+        self.assertEqual(retry['reasoning_effort'], 'medium')
         self.assertIs(h.agent._build_api_kwargs()['extra_body']['think'], False)
 
     def test_known_route_does_not_invent_unsupported_think_field(self):
@@ -879,7 +879,7 @@ class ThinkingRecoveryTests(unittest.TestCase):
         self.assertEqual(h.call().action, 'continue')
         retry = h.agent._build_api_kwargs()
         self.assertNotIn('think', retry.get('extra_body', {}))
-        self.assertNotIn('reasoning_effort', retry)
+        self.assertEqual(retry['reasoning_effort'], 'medium')
         self.assertNotIn('think', retry)
         self.assertNotIn('extra_body', h.api_kwargs)
         self.assertNotIn('extra_body', h.agent._build_api_kwargs())
@@ -892,7 +892,8 @@ class ThinkingRecoveryTests(unittest.TestCase):
         before = copy.deepcopy(h.api_kwargs)
         self.assertEqual(h.call().action, 'continue')
         retry = h.agent._build_api_kwargs()
-        for field in ('think', 'reasoning_effort', 'reasoning'):
+        self.assertEqual(retry['reasoning_effort'], 'medium')
+        for field in ('think', 'reasoning'):
             self.assertNotIn(field, retry)
             self.assertNotIn(field, retry['extra_body'])
         self.assertEqual(retry['extra_body']['keep_alive'], '5m')
@@ -909,7 +910,7 @@ class ThinkingRecoveryTests(unittest.TestCase):
         before = copy.deepcopy(h.api_kwargs)
         self.assertEqual(h.call().action, 'continue')
         retry = h.agent._build_api_kwargs()
-        self.assertNotIn('reasoning_effort', retry)
+        self.assertEqual(retry['reasoning_effort'], 'medium')
         self.assertNotIn('reasoning', retry)
         self.assertNotIn('reasoning', retry['extra_body'])
         self.assertEqual(h.api_kwargs, before)
@@ -967,14 +968,170 @@ class ThinkingRecoveryTests(unittest.TestCase):
                 self.assertEqual(native['tool_choice'], 'auto')
 
 
+class FirstRequestGroundingTests(unittest.TestCase):
+    def test_table_followup_inherits_only_user_topic_and_requires_new_evidence(self):
+        request = '좀 더 자세라게 보고싶은데 장비별로 표로 보여줄래'
+        rows = [{'role': 'user', 'content': hydrated('현재 적용된 룰 보여줘')},
+                {'role': 'assistant', 'content': '999개 활성, 변경 승인 완료'},
+                {'role': 'user', 'content': hydrated(request)}]
+        resolved = PLUGIN.inventory_request_for_turn(request, rows, 2)
+        self.assertIn('현재 적용된 룰', resolved)
+        self.assertNotIn('999', resolved)
+        self.assertIsNone(PLUGIN.render_rule_inventory(resolved, []))
+        rows[0]['content'] = hydrated('현재 CPU 상태 보여줘')
+        self.assertEqual(PLUGIN.inventory_request_for_turn(request, rows, 2), request)
+
+    def test_native_dispatch_names_match_advertised_reads_and_restore_without_widening(self):
+        h = Harness()
+        original = h.agent.valid_tool_names
+        self.assertTrue(PLUGIN._arm_read_request(h.agent, 'turn-a', inventory_only=True))
+        result = h.agent._build_api_kwargs()
+        self.assertEqual(h.agent.valid_tool_names, {t['function']['name'] for t in result['tools']})
+        self.assertNotIn('mcp__rule_a__propose_rule_edit', h.agent.valid_tool_names)
+        h.agent._capstone_query_completion_names_restore()
+        self.assertIs(h.agent.valid_tool_names, original)
+        self.assertTrue(PLUGIN._arm_read_request(h.agent, 'turn-a', inventory_only=True))
+        h.agent._build_api_kwargs()
+        h.agent.valid_tool_names = {'a-new-owner'}
+        h.agent._capstone_query_completion_names_restore()
+        self.assertEqual(h.agent.valid_tool_names, {'a-new-owner'})
+
+    def test_hash_rendered_inventory_final_pass_uses_none_only_on_the_known_route(self):
+        h = Harness()
+        h.agent.provider, h.agent.model = 'custom', 'qwen3.6:35b'
+        h.agent.base_url = 'http://211.170.162.111:11434/v1'
+        h.api_kwargs['model'] = 'qwen3.6:35b'
+        self.assertTrue(PLUGIN._arm_read_request(h.agent, 'turn-a', inventory_only=True, require_read=False))
+        result = h.agent._build_api_kwargs()
+        self.assertEqual(result['reasoning_effort'], 'none')
+        self.assertEqual(result['tool_choice'], 'auto')
+
+    def test_final_phase_does_not_restore_names_before_native_tool_validation(self):
+        h = Harness()
+        original = h.agent.valid_tool_names
+        self.assertTrue(PLUGIN._arm_read_request(h.agent, 'turn-a', inventory_only=True))
+        api = h.agent._build_api_kwargs()
+        allowed = {t['function']['name'] for t in api['tools']}
+        h.call(finish_reason='tool_calls', assistant_message=message('', calls=[{'id': 'read'}]))
+        self.assertEqual(h.agent.valid_tool_names, allowed)
+        self.assertIsNot(h.agent.valid_tool_names, original)
+        h.call(assistant_message=message('조회 미실행: 확인할 수 없습니다.'))
+        self.assertIs(h.agent.valid_tool_names, original)
+
+    def build(self, request, rows=None, before=None, **agent_changes):
+        h = Harness(request=hydrated(request))
+        h.agent.provider, h.agent.model = 'custom', 'qwen3.6:35b'
+        h.agent.base_url = 'http://211.170.162.111:11434/v1'
+        h.api_kwargs.update(model='qwen3.6:35b', reasoning_effort='none')
+        for k, v in agent_changes.items():
+            setattr(h.agent, k, v)
+        seen = []
+
+        def native(agent, *, original_user_message, messages, api_messages, turn_id):
+            seen.append(api_messages)
+            return agent._build_api_kwargs(api_messages)
+
+        wrapper = PLUGIN.make_request_wrapper(native, h.reanchor)
+        messages = (before or []) + h.kw['messages'] + (rows or [])
+        api_messages = copy.deepcopy(messages)
+        result = wrapper(h.agent, original_user_message=h.kw['user_message'],
+                         messages=messages, api_messages=api_messages, turn_id='turn-a')
+        return h, result, seen, api_messages
+
+    def test_exact_actual_questions_start_with_model_selected_read_schemas(self):
+        for request in ('현재 적용된 룰 보여줘',
+                        '좀 더 자세라게 보고싶은데 장비별로 표로 보여줄래',
+                        'IDS는 왜 활성화 안됐지?'):
+            with self.subTest(request=request):
+                h, result, seen, original = self.build(request)
+                self.assertEqual(result['tool_choice'], 'required')
+                self.assertEqual(result['reasoning_effort'], 'medium')
+                self.assertTrue(result['tools'])
+                self.assertTrue(all(t['function']['name'] in PLUGIN._READ_TOOL_NAMES for t in result['tools']))
+                self.assertEqual(seen[0][-1]['content'], PLUGIN.LIVE_QUERY_GUIDANCE)
+                self.assertNotEqual(seen[0], original)
+                self.assertIs(h.agent._build_api_kwargs, h.original_builder)
+                self.assertEqual(h.api_kwargs['reasoning_effort'], 'none')
+
+    def test_tool_followup_allows_final_answer_instead_of_forcing_another_call(self):
+        from test_inventory_render import native_exchanges
+        h, result, seen, original = self.build('현재 적용된 룰 보여줘',
+                                              native_exchanges())
+        self.assertEqual(result['tool_choice'], 'auto')
+        self.assertEqual(seen[0], original)
+
+    def test_fully_verified_prior_table_is_a_no_tool_non_thinking_format_request(self):
+        from test_inventory_render import native_exchanges
+        before = [{'role': 'user', 'content': '현재 적용된 룰 보여줘'}, *native_exchanges(),
+                  {'role': 'assistant', 'content': '모델이 쓴 잘못된 999개'}]
+        h, result, seen, original = self.build('장비별로 표로 보여줘', before=before)
+        self.assertEqual(result['tools'], [])
+        self.assertEqual(result['tool_choice'], 'none')
+        self.assertEqual(result['reasoning_effort'], 'none')
+        self.assertEqual(h.agent.valid_tool_names, set())
+        self.assertIn('재정리', seen[0][-1]['content'])
+
+    def test_long_zero_call_answer_cannot_bypass_evidence_guard(self):
+        h = Harness(request='현재 적용된 룰 보여줘', text='룰 조회 완료. ' * 800)
+        self.assertEqual(h.call().action, 'continue')
+        self.assertEqual(h.call().action, 'break')
+        self.assertIn('조회 미실행', h.original_calls[-1].content)
+
+    def test_history_and_protected_or_supplied_text_requests_do_not_expand_scope(self):
+        for request in ('안녕', 'Suricata는 왜 필요한가?', 'IDS 모드 변경해줘', '커스텀 룰 승인해줘',
+                        '현재 룰 보여주고 잘못된 건 고쳐줘', '현재 룰 조회 후 조정해줘',
+                        '아래 커스텀 룰 내용을 확인해줘',
+                        '도구 없이 현재 적용된 룰 보여줘',
+                        '어제 커스텀 룰 조회 결과를 다시 보여줘'):
+            with self.subTest(request=request):
+                h, result, seen, original = self.build(request)
+                self.assertIs(result, h.api_kwargs)
+                self.assertEqual(seen[0], original)
+
+    def test_other_platform_or_cancelled_turn_is_not_modified(self):
+        for changes in ({'platform': 'cli'}, {'_interrupt_requested': True},
+                        {'_current_turn_id': 'replacement-turn'}):
+            h, result, seen, original = self.build('현재 적용된 룰 보여줘', **changes)
+            self.assertIs(result, h.api_kwargs)
+            self.assertEqual(seen[0], original)
+
+    def test_shared_transport_target_enum_is_narrowed_to_each_actual_server(self):
+        tools = []
+        for host in 'ab':
+            tool = definition(f'mcp__rule_{host}__get_rule_change_target')
+            tool['function']['parameters']['properties']['target'] = {'type': 'string',
+                'enum': ['a:modsecurity-custom', 'a:suricata-local', 'b:wazuh-local-rules']}
+            tools.append(tool)
+        before = copy.deepcopy(tools)
+        narrowed = PLUGIN._read_tools(tools, {t['function']['name'] for t in tools})
+        self.assertEqual(narrowed[0]['function']['parameters']['properties']['target']['enum'],
+                         ['a:modsecurity-custom', 'a:suricata-local'])
+        self.assertEqual(narrowed[1]['function']['parameters']['properties']['target']['enum'],
+                         ['b:wazuh-local-rules'])
+        self.assertEqual(tools, before)
+
+    def test_actual_unqueried_claims_cannot_escape_through_a_permission_question(self):
+        claims = ('현재 적용된 규칙 48개를 조회했습니다.',
+                  'IDS는 -S 옵션으로 비활성 상태입니다. 변경할까요?')
+        for request, claim in zip(('현재 적용된 룰 보여줘', 'IDS는 왜 활성화 안됐지?'), claims):
+            with self.subTest(request=request):
+                h = Harness(request=hydrated(request), text=claim)
+                self.assertEqual(h.call().action, 'continue')
+                # The one model retry may still ignore tools: fail honestly.
+                self.assertEqual(h.call().action, 'break')
+                self.assertIn('조회 미실행', h.original_calls[-1].content)
+
+
 class RegistrationTests(unittest.TestCase):
     def setUp(self):
         self.h = Harness()
         self.native = SimpleNamespace(finish_text_response=self.h.original,
                                       FinalResponseVerdict=Verdict)
-        self.loop = SimpleNamespace(finish_text_response=self.h.original)
+        self.build = lambda agent, **kw: kw
+        self.loop = SimpleNamespace(finish_text_response=self.h.original, build_api_request=self.build)
         self.modules = {
             'agent.turn_final_response': self.native,
+            'agent.turn_api_request': SimpleNamespace(build_api_request=self.build),
             'agent.conversation_loop': self.loop,
             'agent.turn_context': SimpleNamespace(reanchor_current_turn_user_idx=self.h.reanchor),
             'agent.message_metadata': SimpleNamespace(append_message=self.h.append),
@@ -997,6 +1154,11 @@ class RegistrationTests(unittest.TestCase):
     def test_registration_updates_both_aliases_idempotently_and_unloads(self):
         PLUGIN.register(self.ctx)
         installed = self.native.finish_text_response
+        build_installed = self.loop.build_api_request
+        api = self.modules['agent.turn_api_request']
+        self.assertIs(api.build_api_request, build_installed)
+        self.assertIsNot(build_installed, self.build)
+        self.assertEqual(inspect.signature(build_installed), inspect.signature(self.build))
         self.assertIs(self.loop.finish_text_response, installed)
         self.assertIsNot(installed, self.h.original)
         self.assertEqual(inspect.signature(installed), inspect.signature(self.h.original))
@@ -1008,6 +1170,17 @@ class RegistrationTests(unittest.TestCase):
         self.callbacks[0]()
         self.assertIs(self.native.finish_text_response, self.h.original)
         self.assertIs(self.loop.finish_text_response, self.h.original)
+        self.assertIs(api.build_api_request, self.build)
+        self.assertIs(self.loop.build_api_request, self.build)
+
+    def test_request_alias_drift_rejects_registration_before_any_mutation(self):
+        foreign = lambda *args, **kw: None
+        self.loop.build_api_request = foreign
+        with self.assertRaisesRegex(RuntimeError, 'query_completion_registration_rejected'):
+            PLUGIN.register(self.ctx)
+        self.assertIs(self.native.finish_text_response, self.h.original)
+        self.assertIs(self.loop.build_api_request, foreign)
+        self.assertEqual(self.callbacks, [])
 
     def test_source_pin_mismatch_changes_no_alias(self):
         with mock.patch.object(Path, 'read_bytes', return_value=b'unreviewed drift'):

@@ -157,7 +157,13 @@ class Tests(unittest.TestCase):
             for opt in ('-keyout','-out'):
                 if opt in argv:pathlib.Path(argv[argv.index(opt)+1]).write_bytes(b'fixture-certificate')
             return b''
-        self.n['run']=run;self.n['create_certificates']()
+        self.n['run']=run
+        # A pure fixture verifies the requested ownership without requiring root
+        # or changing ownership of the developer's temporary files.
+        with mock.patch.object(os,'chown') as chown:
+            self.n['create_certificates']()
+        self.assertEqual(chown.call_args_list,[mock.call(target/(n+'-key.pem'),0,1000)
+            for n in ('wazuh.manager','wazuh.indexer','wazuh.dashboard','api-server','admin')])
         self.assertEqual(len(checks),5)
         subjects=[a[a.index('-subj')+1] for a in commands if '-subj' in a]
         self.assertIn('/C=US/L=California/O=Wazuh/OU=Wazuh/CN=admin',subjects)

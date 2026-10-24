@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "date_kst": "2026-10-24",
+  "current_version": "1.2.0",
+  "scope": "normal-profile native Mattermost-platform SDK, isolated database; installed gateway startup/link checks; no new chat posts",
+  "suricata_live_audit": {
+    "running": true,
+    "command_flags": [
+      "-i",
+      "ens192",
+      "-S",
+      "/rules/all.rules"
+    ],
+    "combined_exact_ET_plus_local": true,
+    "container_combined_sha256_matches": true,
+    "local_file_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+    "combined_file_sha256": "8669bab4923070dac1ed474f4c96c6a90ad92a794518a19fc628bc8354619da6",
+    "ruleset_statistics": {
+      "id": 0,
+      "rules_loaded": 52497,
+      "rules_failed": 0,
+      "rules_skipped": 0
+    },
+    "ruleset_load": {
+      "id": 0,
+      "last_reload": "2026-10-23T22:03:32.826677+0000"
+    },
+    "mutations": 0
+  },
+  "local_file_definition_count": 14,
+  "per_rule_firing_e2e_verified": false,
+  "actual_earlier_chat": {
+    "questions": 3,
+    "actual_tools_each": [
+      0,
+      0,
+      0
+    ],
+    "native_reply_seconds": [
+      19.796,
+      4.785,
+      3.437
+    ],
+    "claimed_counts_unreliable": true
+  },
+  "stages": [
+    {
+      "version": "1.2.0",
+      "source_sha256": "9730f5cbcc66ff59f8170dcbd2fbf84d44ab310b3bd4d18830069158a0562fd6",
+      "local_tests": {
+        "query": 170,
+        "siem_installer": 40,
+        "total": 210
+      },
+      "native_sdk_cases": [
+        {
+          "saved_final_matches": true,
+          "question": "현재 적용된 룰 보여줘",
+          "seconds": 34.6,
+          "api_calls": 2,
+          "calls": [
+            {
+              "name": "get_rule_change_target",
+              "target": "a:modsecurity-custom",
+              "seconds": 0.313,
+              "is_error": false
+            },
+            {
+              "name": "get_rule_change_target",
+              "target": "a:suricata-local",
+              "seconds": 2.27,
+              "is_error": false
+            },
+            {
+              "name": "get_rule_change_target",
+              "target": "b:wazuh-local-rules",
+              "seconds": 0.218,
+              "is_error": false
+            }
+          ],
+          "error": false,
+          "has_runtime_disabled_claim": false
+        },
+        {
+          "saved_final_matches": true,
+          "question": "좀 더 자세라게 보고싶은데 장비별로 표로 보여줄래",
+          "seconds": 34.524,
+          "api_calls": 1,
+          "calls": [],
+          "error": false,
+          "has_runtime_disabled_claim": false
+        }
+      ],
+      "actual_provider_calls_each": [
+        2,
+        1
+      ],
+      "counts_and_ids": [
+        10,
+        14,
+        19
+      ],
+      "second_case_evidence": "complete prior native tool results plus matching file hashes; explicitly no new query",
+      "returned_equals_saved_both": true,
+      "direct_chat_posts": 0,
+      "protected_changes": 0,
+      "deployment": {
+        "backup": "/var/backups/capstone-query-completion/20261024T161637+0900",
+        "management_timer_was_active": true,
+        "status": "applied",
+        "same_container": true,
+        "native_eight_hashes_unchanged": true,
+        "native_hashes": {
+          "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
+          "agent/conversation_loop.py": "c93ee86e1da583abc7cc57417380cd71241ae028c04a4cb8456580b52ffbf3d8",
+          "agent/turn_context.py": "85f857dc3c317366d918516bc8b37a022f1020b34da0c3966a31bd289b2942e1",
+          "agent/message_metadata.py": "77fbe25c86f2ab524fcac61a83548768cffc82c476bb8a6ff83ebdf492a5479d",
+          "agent/turn_api_request.py": "e31386cb83cf551026e4df9b589173b54bc913b36fc1a09942a520e68033b59e",
+          "agent/chat_completion_helpers.py": "5231a0e674806db6ad7be60e2d40a19a4157f7d2baa238aaa9af66f61e0eea4c",
+          "plugins/platforms/mattermost/adapter.py": "1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b",
+          "gateway/run_turn.py": "d4dae0f3194f7b7d435aac2eb37d4697822612cd6955911d86bb61400ad2871a"
+        },
+        "source_sha256": {
+          "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "9730f5cbcc66ff59f8170dcbd2fbf84d44ab310b3bd4d18830069158a0562fd6",
+          "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "5bc8e843a507724d847f95d06593cfe1a1b8727d05b122f943a725b985f7cd97"
+        },
+        "configurations_unchanged": true,
+        "existing_message_rows_preserved": 1353,
+        "new_message_rows": 0,
+        "connection": {
+          "api_status": 200,
+          "is_bot": true,
+          "websocket_status": 101,
+          "hello_received": true
+        },
+        "registration_pids": [
+          "158"
+        ],
+        "security_device_restarts": 0,
+        "hermes_restarts": 1,
+        "messages_posted": 0,
+        "new_packages": 0,
+        "management_timer_active_after": true,
+        "receipt": "/var/lib/capstone-management/live-query-completion-20261024T161637+0900.json"
+      },
+      "latency_sla_verified": false,
+      "remaining": "Model generation still takes roughly 34 seconds even for a verified table reformat; local format completion under review."
+    }
+  ],
+  "not_verified": [
+    "new actual chat input -> current gateway -> reply integration",
+    "general mixed/root-cause/event factual accuracy",
+    "repeated latency/SLA",
+    "real attacks/protected response E2E",
+    "new three-VM installation"
+  ]
+}

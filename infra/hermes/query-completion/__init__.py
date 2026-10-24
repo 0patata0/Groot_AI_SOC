@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 import re
 
-VERSION = "groot-query-completion:1.1.0"
+VERSION = "groot-query-completion:1.2.0"
 SOURCE_ROOT = Path("/opt/hermes")
 SOURCE_SHA256 = {
     "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
@@ -39,7 +39,7 @@ FALLBACK = (
     "현재 상태와 적용 내용은 확인되지 않았으며 변경도 수행하지 않았습니다."
 )
 _READ = re.compile(r"확인|조회|보여|알려|목록|리스트|상태|로그|결과|답변|보고|개수|몇\s*개|\b(?:ID|SID)\b", re.I)
-_WRITE = re.compile(r"수정|추가|삭제|변경|차단|적용해|설치|재시작|승인|거부|원복|배포|만료")
+_WRITE = re.compile(r"수정|추가|삭제|변경|차단|적용해|설치|재시작|승인|거부|원복|배포|만료|고쳐|고치|바꿔|조정|반영|켜줘|꺼줘|복구|재구성|중지|시작해|해제|활성화해")
 _EXCLUDE = re.compile(
     r"예시|예를\s*들|인용|번역|문구|가정|시나리오|원하면|원하시면|필요하면|필요하시면|요청하시면|"
     r"(?:조회|확인|점검|조사)\s*(?:미실행|실패|불가|완료)|"
@@ -57,6 +57,9 @@ _PROMISE_END = re.compile(
 _HEADINGS = {"요약", "확인 내역", "조치 및 다음 단계"}
 _ACK = re.compile(r"^(?:네|알겠습니다|확인하겠습니다|잠시만\s*기다려\s*주세요|잠시\s*기다려\s*주세요)[.!…]*$")
 _LOCAL_RULE = re.compile(r"(?:커스텀|로컬|custom|local).{0,24}(?:룰|규칙|rules?)|(?:룰|규칙|rules?).{0,24}(?:커스텀|로컬|custom|local)", re.I)
+_RULE = re.compile(r"룰|규칙|\brules?\b", re.I)
+_DEVICE = re.compile(r"(?<![A-Za-z])(?:IDS|IPS|Suricata|WAF|ModSecurity|Wazuh)(?![A-Za-z])|수리카타|와주", re.I)
+_DEVICE_TABLE = re.compile(r"장비별.{0,30}(?:표|테이블)")
 _NON_LIVE_REQUEST = re.compile(
     r"개념|정의|예시|예제|번역|가능|작성법|도구\s*없이|설명만|(?:실제\s*)?조회(?:는|하지)\s*말|"
     r"(?:이전|과거|아까|어제|앞선|위의|기존).{0,30}(?:결과|답변).{0,20}(?:요약|정리|보여|다시)|"
@@ -72,6 +75,7 @@ _READ_TOOL_NAMES = frozenset(
 ) | frozenset({
     "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts",
     "mcp__resp__list_blocks",
+    "mcp__system_diagnostics__get_system_diagnostics",
     *(f"mcp__wazuh_ro__{name}" for name in (
         "get_wazuh_agent_ports", "get_wazuh_agent_processes", "get_wazuh_agents",
         "get_wazuh_alert_summary", "get_wazuh_cluster_health",
@@ -110,17 +114,37 @@ def _unquoted_text(text):
     return re.sub(r'''"[^"\n]*"|'[^'\n]*'|“[^”]*”|‘[^’]*’|「[^」]*」|『[^』]*』''', "", text)
 
 
+def live_rule_request(request):
+    """Current rule queries and explicit device-state follow-ups need fresh reads.
+
+    Background history cannot authorize an action. This predicate reads only the
+    current request and only narrows an already available read-tool list.
+    """
+    if not isinstance(request, str) or not 1 <= len(request) <= 20000:
+        return False
+    request = _unquoted_text(request)
+    if _WRITE.search(request) or _NON_LIVE_REQUEST.search(request):
+        return False
+    return bool((_RULE.search(request) and _READ.search(request)
+                 and (_LOCAL_RULE.search(request) or re.search(r"현재|적용된|활성|운영|지금", request)))
+                or (_DEVICE.search(request) and re.search(r"활성|로드|적재", request)
+                    and re.search(r"왜|현재|지금|확인|조회", request))
+                or (_DEVICE_TABLE.search(request) and _READ.search(request)))
+
+
 def needs_live_rule_evidence(request, text):
     """Current custom-rule status claims require a real call, unlike supplied-text analysis."""
-    if (not isinstance(request, str) or not _LOCAL_RULE.search(request)
-            or not re.search(r"확인|조회|보여|목록|리스트|개수|몇\s*개|\b(?:ID|SID)\b", request, re.I)
+    if (not live_rule_request(request)
             or _NON_LIVE_REQUEST.search(request) or not isinstance(text, str)
-            or not 1 <= len(text.strip()) <= 6000):
+            or not text.strip()):
         return False
+    if len(text) > 6000:
+        return True  # Long output cannot bypass evidence checks; do not regex-scan it.
     text = _unquoted_text(text)
-    if "?" in text or "？" in text:
-        return False
-    return bool(_RESULT_CLAIM.search(text) or (_inventory_request(request)
+    text = re.sub(r"[^.!?\n]*[?？]", "", text)  # Questions are not affirmative evidence claims.
+    runtime_claim = (re.search(r"(?:IDS|IPS|Suricata|룰|규칙|-S)[^\n.!?]{0,120}(?:비활성|활성|적재|로드|읽지\s*않|안\s*읽)", text, re.I)
+                     and not _HONEST_FAILURE.search(text))
+    return bool(_RESULT_CLAIM.search(text) or runtime_claim or (_inventory_request(request)
         and re.search(r"\d+\s*개|\b(?:ID|SID)\s*[:：]", text, re.I)
         and not _HONEST_FAILURE.search(text)) or (
         re.search(r"SHA[\s-]?256", text, re.I) and not _HONEST_FAILURE.search(text)))
@@ -156,17 +180,39 @@ def _remaining(kw, agent):
 def _read_tools(tools, names):
     if not isinstance(tools, list):
         return []
-    return [tool for tool in tools if isinstance(tool, dict) and tool.get("type") == "function"
+    reads = [tool for tool in tools if isinstance(tool, dict) and tool.get("type") == "function"
             and isinstance(tool.get("function"), dict)
             and isinstance(tool["function"].get("name"), str)
             and tool["function"]["name"] in _READ_TOOL_NAMES
             and tool["function"]["name"] in names]
+    scoped = []
+    for tool in reads:
+        name = tool["function"]["name"]
+        if name in {f"mcp__rule_{host}__{op}" for host in "ab"
+                    for op in ("get_rule_change_target", "get_service_action_target")}:
+            parameters = tool["function"].get("parameters")
+            parameters = parameters if isinstance(parameters, dict) else {}
+            properties = parameters.get("properties")
+            properties = properties if isinstance(properties, dict) else {}
+            target = properties.get("target") or {}
+            enum = target.get("enum") if isinstance(target, dict) else None
+            if isinstance(enum, list) and all(isinstance(value, str) for value in enum):
+                enum = [value for value in enum if value.startswith(name[len("mcp__rule_")] + ":")]
+                if not enum:
+                    continue
+                tool = copy.deepcopy(tool)
+                tool["function"]["parameters"]["properties"]["target"]["enum"] = enum
+        scoped.append(tool)
+    return scoped
 
 
-def _arm_read_request(agent, turn):
+def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, format_only=False):
     """Narrow the next native chat request only; never add a tool or synthesize a call."""
     original = getattr(agent, "_build_api_kwargs", None)
     offered = _read_tools(getattr(agent, "tools", None), getattr(agent, "valid_tool_names", ()) or ())
+    if inventory_only:
+        offered = [t for t in offered if t["function"]["name"] in {
+            "mcp__rule_a__get_rule_change_target", "mcp__rule_b__get_rule_change_target"}]
     if (not callable(original) or not offered
             or getattr(agent, "api_mode", "chat_completions") != "chat_completions"):
         return False
@@ -198,20 +244,37 @@ def _arm_read_request(agent, turn):
         # OpenAI's extra_body wins at the wire. Filter that effective list too,
         # then remove duplicate controls so it cannot restore write schemas.
         reads = _read_tools(extra.pop("tools", result.get("tools")), allowed)
+        if format_only:
+            reads = []  # A verified prior-table reformat performs no new operation.
         extra.pop("tool_choice", None)
         # A native builder may omit tools. Do not resurrect even a known readable schema.
-        narrowed = {**result, "tools": reads, "tool_choice": "required" if reads else "none"}
+        narrowed = {**result, "tools": reads,
+                    "tool_choice": ("required" if require_read else "auto") if reads else "none"}
+        # The model may emit a name absent from the advertised schema. Native
+        # dispatch must use the same allowlist until this response is consumed.
+        previous_names = getattr(agent, "valid_tool_names", None)
+        leased_names = {t["function"]["name"] for t in reads}
+        def restore_names():
+            if getattr(agent, "valid_tool_names", None) is leased_names:
+                agent.valid_tool_names = previous_names
+            if getattr(agent, "_capstone_query_completion_names_restore", None) is restore_names:
+                delattr(agent, "_capstone_query_completion_names_restore")
+        agent.valid_tool_names = leased_names
+        agent._capstone_query_completion_names_restore = restore_names
         base_url = getattr(agent, "base_url", None)
         if (getattr(agent, "provider", None) == "custom"
                 and getattr(agent, "model", None) == "qwen3.6:35b"
                 and extra.get("model", result.get("model")) == "qwen3.6:35b"
                 and isinstance(base_url, str)
                 and base_url.rstrip("/") == "http://211.170.162.111:11434/v1"):
-            # Ollama's OpenAI endpoint ignores `think`; the reasoning effort
-            # can still disable thinking. Use this verified route's default once.
+            # This verified boolean-thinking route accepts the compatibility
+            # effort field. Do not depend on a model's changeable default.
             for key in ("think", "reasoning_effort", "reasoning"):
                 narrowed.pop(key, None)
                 extra.pop(key, None)
+            # Verified file counts/IDs are rendered from hashes, so their final
+            # prose step does not need another thinking pass.
+            narrowed["reasoning_effort"] = "none" if inventory_only and not require_read else "medium"
         if extra or isinstance(result.get("extra_body"), dict):
             narrowed["extra_body"] = extra
         return narrowed
@@ -219,6 +282,120 @@ def _arm_read_request(agent, turn):
     agent._build_api_kwargs = once
     agent._capstone_query_completion_builder_restore = restore
     return True
+
+
+LIVE_QUERY_GUIDANCE = (
+    "이번 요청은 현재 운영 상태의 읽기 조회입니다. 이전 봇 답변은 현재 상태의 증거가 아닙니다. "
+    "필요한 기존 읽기 도구와 인자를 직접 선택하고 실제 반환값으로 답하세요. "
+    "룰 파일의 정의 수와 전체 CRS/ET 개수, 엔진 적재와 실제 탐지 성공을 구분하세요. "
+    "runtime_load_verified=false는 적재 미확인이며 비활성이라는 뜻이 아닙니다. "
+    "Suricata -S는 지정 파일만 읽는 옵션입니다. 그 파일에 로컬 룰이 합쳐졌는지 조회하지 않고 "
+    "로컬 룰 비활성이나 모드 변경 필요를 단정하지 마세요. 도구가 확인하지 않은 범위는 미확인으로 남기세요. "
+    "비활성 전제가 사실인지 먼저 검증하세요. 사용자가 탐지 누락을 관측했다는 증거가 없으면 "
+    "TLS 등 일반적 한계를 이번 장애의 확인된 원인으로 바꾸지 마세요. "
+    "요청한 표/상세 형식은 따르되 같은 요약·목록을 반복하지 마세요. 이 안내는 변경이나 승인이 아닙니다."
+)
+
+
+def inventory_request_for_turn(request, messages, idx):
+    """Resolve an explicit table follow-up's subject from the previous user.
+
+    Only the subject is inherited. Facts still require this turn's real calls;
+    bot prose, quoted context, and previous approvals never supply evidence.
+    """
+    if not _inventory_request(request) or _RULE.search(request) or not _DEVICE_TABLE.search(request):
+        return request
+    for row in reversed(messages[max(0, idx - 64):idx]):
+        if not isinstance(row, dict) or row.get('role') != 'user':
+            continue
+        text = row.get('content')
+        if text == NUDGE or isinstance(text, str) and text.startswith('현재 사용자 요청의 파일 집계에서 아직 완전한 조회 근거가 없는 대상: '):
+            continue
+        prior = current_request_text(text)
+        if prior and _RULE.search(prior) and _inventory_request(prior):
+            return prior + '\n' + request
+        break
+    return request
+
+
+def render_prior_inventory(request, messages, idx):
+    """Pure table reformat: only complete prior tool evidence, explicitly dated as prior."""
+    if (_RULE.search(request) or not _DEVICE_TABLE.search(request) or not _inventory_request(request)
+            or re.search(r"현재|지금|최신|다시\s*조회|새로\s*조회", request)):
+        return None
+    resolved = inventory_request_for_turn(request, messages, idx)
+    if resolved == request:
+        return None
+    for previous in range(idx - 1, max(-1, idx - 65), -1):
+        row = messages[previous]
+        if not isinstance(row, dict) or row.get('role') != 'user':
+            continue
+        text = row.get('content')
+        if text == NUDGE or isinstance(text, str) and text.startswith('현재 사용자 요청의 파일 집계에서 아직 완전한 조회 근거가 없는 대상: '):
+            continue
+        rows = messages[previous + 1:idx]
+        verified = render_rule_inventory(resolved, rows, verified_targets=True)
+        if not verified or render_rule_inventory(resolved, rows, missing_targets=True):
+            return None
+        result = render_rule_inventory(resolved, rows)
+        return ('**요약**\n앞선 턴의 실제 도구 조회와 파일 해시로 검증한 정의를 표로 다시 정리했습니다. '
+                '이번 요청에서는 새로 조회하지 않았습니다.\n' + result.split('\n', 2)[2])
+    return None
+
+
+def make_request_wrapper(original, reanchor):
+    """Ground live rule queries on the first request, before a wasted final/retry.
+
+    The pinned native builder still owns sanitizing, middleware and API calls.
+    Neither this wrapper nor its guidance invokes a tool or picks arguments.
+    """
+    @functools.wraps(original)
+    def wrapped(agent, **kw):
+        restore_names = getattr(agent, "_capstone_query_completion_names_restore", None)
+        if callable(restore_names):
+            restore_names()
+        user, messages, turn = kw.get("original_user_message"), kw.get("messages"), kw.get("turn_id")
+        platform = getattr(agent, "platform", "")
+        request = current_request_text(user)
+        if (str(getattr(platform, "value", platform)).lower() != "mattermost"
+                or not live_rule_request(request) or not isinstance(turn, str) or not turn
+                or turn != getattr(agent, "_current_turn_id", None)
+                or getattr(agent, "_interrupt_requested", False) or not isinstance(messages, list)):
+            return original(agent, **kw)
+        idx = reanchor(messages, user)
+        if (type(idx) is not int or not 0 <= idx < len(messages)
+                or not isinstance(messages[idx], dict)
+                or messages[idx].get("role") != "user" or messages[idx].get("content") != user):
+            return original(agent, **kw)
+        has_calls = any(isinstance(row, dict) and (row.get("role") == "tool"
+            or row.get("role") == "assistant" and row.get("tool_calls")) for row in messages[idx + 1:])
+        pending = getattr(agent, "_capstone_query_completion_builder_restore", None)
+        inventory_request = inventory_request_for_turn(request, messages, idx)
+        inventory_only = bool(_RULE.search(inventory_request) and _inventory_request(inventory_request))
+        prior_table = render_prior_inventory(request, messages, idx)
+        if inventory_only:
+            has_calls = bool(render_rule_inventory(inventory_request, messages[idx + 1:], verified_targets=True))
+        if not callable(pending) and not _arm_read_request(agent, turn, require_read=not has_calls and not prior_table,
+                                                          inventory_only=inventory_only, format_only=bool(prior_table)):
+            return original(agent, **kw)
+        if not has_calls and isinstance(kw.get("api_messages"), list):
+            guidance = ('이번 요청은 직전의 실제 조회 결과를 표로 재정리하는 형식 요청입니다. '
+                        '새 조회·변경 없이 앞선 조회 기준임을 밝히고 간결하게 답하세요.'
+                        if prior_table else LIVE_QUERY_GUIDANCE)
+            kw = {**kw, "api_messages": [*kw["api_messages"], {"role": "user", "content": guidance}]}
+        try:
+            return original(agent, **kw)
+        except BaseException:
+            restore_names = getattr(agent, "_capstone_query_completion_names_restore", None)
+            if callable(restore_names):
+                restore_names()
+            raise
+        finally:
+            restore = getattr(agent, "_capstone_query_completion_builder_restore", None)
+            if callable(restore):
+                restore()
+    wrapped.__capstone_query_completion__ = VERSION
+    return wrapped
 
 
 _INVENTORY_TARGETS = {
@@ -233,10 +410,11 @@ def _inventory_request(request):
     if not isinstance(request, str):
         return False
     request = _unquoted_text(request)
-    return (isinstance(request, str) and bool(_LOCAL_RULE.search(request))
+    return (isinstance(request, str) and bool(_LOCAL_RULE.search(request) or
+                _RULE.search(request) and live_rule_request(request) or _DEVICE_TABLE.search(request))
             and bool(re.search(r"확인|조회|보여|목록|리스트|개수|몇\s*개|\b(?:ID|SID)\b", request, re.I))
             and not _WRITE.search(request) and not _NON_LIVE_REQUEST.search(request)
-            and not re.search(r"왜|원인|위험|분석|설명|동작|전문|원문|다운로드|비교|차이|방법|역할|목적|서비스|상태|로그|경보|전체\s*(?:파일|내용)|(?:파일|내용)\s*전체|표\s*(?:로|형식|형태)|테이블|(?<![A-Za-z])(?:JSON|CSV)(?![A-Za-z])", request, re.I))
+            and not re.search(r"왜|원인|위험|분석|설명|동작|전문|원문|다운로드|비교|차이|방법|역할|목적|서비스|상태|로그|경보|전체\s*(?:파일|내용)|(?:파일|내용)\s*전체|(?<![A-Za-z])(?:JSON|CSV)(?![A-Za-z])", request, re.I))
 
 
 def _verified_inventory(payload, target):
@@ -303,7 +481,7 @@ def _inventory_payload(raw, name):
     return payload
 
 
-def render_rule_inventory(request, rows):
+def render_rule_inventory(request, rows, *, missing_targets=False, verified_targets=False):
     """Use only current tool-call-linked, hash-matched file facts; never parse chat as evidence."""
     if not _inventory_request(request):
         return None
@@ -372,22 +550,37 @@ def render_rule_inventory(request, rows):
                 continue
     if not attempted:
         return None
+    if not _RULE.search(request) and not calls:
+        return None  # An equipment table can be about service state, not rules.
     if ambiguous:
         results.clear()
     patterns = {"a:modsecurity-custom": r"modsecurity|모드시큐리티|\bwaf\b",
-                "a:suricata-local": r"suricata|수리카타|\bips\b",
+                "a:suricata-local": r"suricata|수리카타|(?<![A-Za-z])(?:ips|ids)(?![A-Za-z])",
                 "b:wazuh-local-rules": r"wazuh|와주|\bsiem\b"}
     requested = [target for target, pattern in patterns.items() if re.search(pattern, request, re.I)]
     requested = requested or list(_INVENTORY_TARGETS)
+    if verified_targets:
+        return [target for target in requested if results.get(target) is not None]
+    if missing_targets:
+        # Retry a partial, unambiguous inventory once. Malformed/unlinked data
+        # stays unknown rather than turning a broken transport into new work.
+        return ([target for target in requested if results.get(target) is None]
+                if any(results.get(target) is not None for target in requested) else [])
     summary = ("현재 조회 결과와 파일 해시가 일치하는 대상 파일의 규칙 정의를 집계했습니다. 주석의 예약 구간은 포함하지 않습니다."
                if any(results.get(target) is not None for target in requested)
                else "이번 조회에서 완전한 집계 근거를 확보하지 못했습니다.")
-    lines = ["**요약**", summary, "", "**확인 내역**"]
+    table = bool(re.search(r"표|테이블", request))
+    lines = ["**요약**", summary, "", "**확인 내역**", ""]
+    notes = []
+    if table:
+        lines.extend(["| 장비 | 대상 파일 | 정의 수 / 고유 ID 수 | ID / SID | 엔진 개별 적재 |",
+                      "| --- | --- | --- | --- | --- |"])
     for target in requested:
         label, filename, kind = _INVENTORY_TARGETS[target]
         inv = results.get(target)
         if inv is None:
-            lines.append(f"- **{label}**: 집계 확인 불가 — `{target}`의 이번 조회에서 완전한 집계 근거를 확인하지 못했습니다. 0개라는 뜻이 아닙니다.")
+            lines.append(f"| {label} | `{filename}` | 집계 확인 불가(0개 아님) | 미확인 | 미확인 |" if table else
+                f"- **{label}**: 집계 확인 불가 — `{target}`의 이번 조회에서 완전한 집계 근거를 확인하지 못했습니다. 0개라는 뜻이 아닙니다.")
             continue
         details = inv["details"]
         detail = ""
@@ -397,8 +590,12 @@ def render_rule_inventory(request, rows):
             detail = f" (level 0 규칙 {details['level0_count']}개 포함)"
         duplicate = (f" 중복 ID: {', '.join(str(n) for n in inv['duplicate_ids'])}." if inv["duplicate_ids"] else "")
         ids = ", ".join(str(n) for n in inv["ids"]) or "없음"
+        if table:
+            lines.append(f"| {label} | `{filename}` | {inv['declared_count']} / {inv['unique_id_count']} | {ids} | 미확인 |")
+            notes.append(f"{label} 근거: `{target}`, SHA-256 `{inv['source_sha256'][:16]}…`.{detail}{duplicate}")
+            continue
         lines.append(f"- **{label}**: `{filename}` 규칙 정의 **{inv['declared_count']}개**, 고유 ID **{inv['unique_id_count']}개**{detail}.{duplicate}\n  {'SID' if kind == 'suricata' else 'ID'}: `{ids}`\n  근거: `{target}`, SHA-256 `{inv['source_sha256'][:16]}…`.")
-    lines.extend(["", "**조치 및 다음 단계**", "위 수치는 지정한 파일의 정의 수입니다. 다른 룰 파일, 엔진의 개별 규칙 적재 여부, 실제 탐지 성공 여부는 이번 집계에 포함하지 않았습니다."])
+    lines.extend(["", *notes, "", "**조치 및 다음 단계**", "위 수치는 지정한 파일의 정의 수입니다. 전체 CRS/ET 개수가 아니며, 엔진의 개별 규칙 적재 여부와 실제 탐지 성공 여부는 이번 집계에 포함하지 않았습니다. 미확인은 비활성을 뜻하지 않습니다."])
     return "\n".join(lines)
 
 
@@ -422,6 +619,11 @@ def make_wrapper(original, native, append_message, reanchor):
     """Dependency-injected wrapper; native owns model calls, tool dispatch and persistence."""
     @functools.wraps(original)
     def wrapped(agent, **kw):
+        restore_names = getattr(agent, "_capstone_query_completion_names_restore", None)
+        # Native runs this phase before tool validation, even for tool_calls.
+        # Keep the lease through validation/dispatch; final text may restore it.
+        if callable(restore_names) and not getattr(kw.get("assistant_message"), "tool_calls", None):
+            restore_names()
         restore = getattr(agent, "_capstone_query_completion_builder_restore", None)
         if callable(restore):
             restore()
@@ -434,7 +636,7 @@ def make_wrapper(original, native, append_message, reanchor):
                 or getattr(agent, "_stall_guards", True) is False
                 or kw.get("_pending_verification_response") is not None
                 or not isinstance(turn, str) or not turn
-                or not request or not _READ.search(request) or _WRITE.search(request)
+                or not request or not (_READ.search(request) or live_rule_request(request)) or _WRITE.search(request)
                 or not isinstance(messages, list) or getattr(message, "tool_calls", None)):
             return original(agent, **kw)
         idx = reanchor(messages, user)
@@ -442,19 +644,25 @@ def make_wrapper(original, native, append_message, reanchor):
                 or not isinstance(messages[idx], dict) or messages[idx].get("role") != "user"
                 or messages[idx].get("content") != user):
             return original(agent, **kw)
-        inventory_text = render_rule_inventory(request, messages[idx + 1:])
-        if inventory_text is not None:
-            return original(agent, **_with_final_text(kw, inventory_text))
+        inventory_request = inventory_request_for_turn(request, messages, idx)
+        prior_table = render_prior_inventory(request, messages, idx)
+        if prior_table is not None:
+            return original(agent, **_with_final_text(kw, prior_table))
+        inventory_text = render_rule_inventory(inventory_request, messages[idx + 1:])
+        missing = render_rule_inventory(inventory_request, messages[idx + 1:], missing_targets=True)
         retried = getattr(agent, "_capstone_query_completion_turn", None) == turn
+        complete_inventory = bool(inventory_text is not None and missing and not retried)
+        if inventory_text is not None and not complete_inventory:
+            return original(agent, **_with_final_text(kw, inventory_text))
         text = getattr(message, "content", None)
-        if not retried and not (looks_like_unexecuted_lookup(text) or needs_live_rule_evidence(request, text)):
+        if not retried and not complete_inventory and not (looks_like_unexecuted_lookup(text) or needs_live_rule_evidence(request, text)):
             return original(agent, **kw)
-        if any(isinstance(row, dict) and (row.get("role") == "tool"
+        if not complete_inventory and any(isinstance(row, dict) and (row.get("role") == "tool"
                    or row.get("role") == "assistant" and row.get("tool_calls")) for row in messages[idx + 1:]):
             return original(agent, **kw)
         counter = kw.get("codex_ack_continuations")
         if (not retried and type(counter) is int and counter == 0 and _remaining(kw, agent)
-                and _arm_read_request(agent, turn)):
+                and _arm_read_request(agent, turn, inventory_only=complete_inventory or bool(_RULE.search(request) and _inventory_request(request)))):
             agent._capstone_query_completion_turn = turn
             agent._mute_post_response = False
             agent._empty_content_retries = agent._thinking_prefill_retries = 0
@@ -462,7 +670,12 @@ def make_wrapper(original, native, append_message, reanchor):
             agent._clear_status_buffer()
             interim = agent._build_assistant_message(message, "incomplete")
             append_message(messages, interim)
-            append_message(messages, {"role": "user", "content": NUDGE})
+            nudge = ("현재 사용자 요청의 파일 집계에서 아직 완전한 조회 근거가 없는 대상: "
+                     + ", ".join(missing) + ". 이미 조회된 대상을 반복하지 말고 누락 대상의 기존 읽기 도구와 "
+                     "올바른 서버·인자를 직접 선택해 조회하세요. 실패한 대상은 미확인으로 남기고 "
+                     "전체 파일 목록을 확인했다고 주장하지 마세요. 이 안내는 변경·승인이 아닙니다."
+                     if complete_inventory else NUDGE)
+            append_message(messages, {"role": "user", "content": nudge})
             agent._session_messages = messages
             names = ("active_system_prompt", "_turn_exit_reason", "_preflight_compression_blocked",
                      "truncated_response_parts", "length_continue_retries")
@@ -473,7 +686,7 @@ def make_wrapper(original, native, append_message, reanchor):
                 **{name: kw[name] for name in names},
             )
         # The native function builds and persists this same truthful final text.
-        return original(agent, **_with_final_text(kw, FALLBACK))
+        return original(agent, **_with_final_text(kw, inventory_text if inventory_text is not None else FALLBACK))
 
     wrapped.__capstone_query_completion__ = VERSION
     wrapped._capstone_query_completion_version = VERSION
@@ -490,26 +703,40 @@ def register(ctx):
         loop = importlib.import_module("agent.conversation_loop")
         context = importlib.import_module("agent.turn_context")
         metadata = importlib.import_module("agent.message_metadata")
+        api = importlib.import_module("agent.turn_api_request")
         original = native.finish_text_response
+        original_build = api.build_api_request
         if loop.finish_text_response is not original:
             raise ValueError("native_alias_mismatch")
+        if loop.build_api_request is not original_build:
+            raise ValueError("native_request_alias_mismatch")
         if getattr(original, "__capstone_query_completion__", None) == VERSION:
+            if getattr(original_build, "__capstone_query_completion__", None) != VERSION:
+                raise ValueError("request_wrapper_version_mismatch")
             return
         if getattr(original, "__capstone_query_completion__", None) or hasattr(original, "__wrapped__"):
             raise ValueError("wrapper_version_mismatch")
+        if getattr(original_build, "__capstone_query_completion__", None) or hasattr(original_build, "__wrapped__"):
+            raise ValueError("request_wrapper_version_mismatch")
         wrapped = make_wrapper(original, native, metadata.append_message, context.reanchor_current_turn_user_idx)
+        build_wrapped = make_request_wrapper(original_build, context.reanchor_current_turn_user_idx)
 
         def restore():
             for module in (native, loop):
                 if module.finish_text_response is wrapped:
                     module.finish_text_response = original
+            for module in (api, loop):
+                if module.build_api_request is build_wrapped:
+                    module.build_api_request = original_build
 
         ctx.on_unload(restore)
         native.finish_text_response = loop.finish_text_response = wrapped
+        api.build_api_request = loop.build_api_request = build_wrapped
         try:
             logging.getLogger("capstone.query_completion").info(
                 "version=%s aliases_installed=%s pid=%d", VERSION,
-                native.finish_text_response is wrapped and loop.finish_text_response is wrapped, os.getpid(),
+                native.finish_text_response is wrapped and loop.finish_text_response is wrapped
+                and api.build_api_request is build_wrapped and loop.build_api_request is build_wrapped, os.getpid(),
             )
         except Exception:
             pass  # Logging cannot invalidate an installed wrapper/unload lease.

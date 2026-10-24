@@ -2,6 +2,8 @@
 # IPS(Suricata 8.0.6, 1단계 IDS/passive on ens192) + WAF(ModSecurity v3 + OWASP CRS, nginx 리버스 프록시 → groot-web:80). FW는 호스트 nftables.
 # 배치 경로(A): /home/groot_a/capstone/secstack/  (logs/ 상대경로; Wazuh 에이전트가 수집)
 # 이미지: 오프라인 반입본(jasonish/suricata:latest=8.0.6, owasp/modsecurity-crs:nginx). egress 차단 → 태그 변경 금지.
+# 2026-10-24 주의: 이 파일은 9/26 초기 템플릿이다. 현재 운영·단일 deploy.sh는
+# ET+로컬 합본을 -S /rules/all.rules로 읽는다. 아래 옛 ET-only 경로로 운영 서버를 재배포하지 않는다.
 #
 # ⚠️ 이미지 특성(실물 확인) — 어기면 기동 실패/무증상:
 #  - suricata 엔트리포인트는 set -e 로 /etc/suricata,/var/lib/suricata,/var/log/suricata 를 chown -R 한다 → 그 안에 :ro 마운트 금지.

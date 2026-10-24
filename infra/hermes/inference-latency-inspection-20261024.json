@@ -815,12 +815,30 @@
     "https://docs.ollama.com/api/openai-compatibility"
   ],
   "git": {
-    "state": "inspection documents prepared; commit/push pending"
+    "inspection_commit": "f33ad4f0ec9e4a46f3648e35fcedf9263586efef",
+    "pushed": true,
+    "actual_remote_matched": true,
+    "receipt": "cleanup and publication confirmation in a follow-up documentation commit; final HEAD recorded in local session log"
   },
   "cleanup": {
     "package_downloads": 0,
     "mac_installs": 0,
     "server_trial_dirs_removed": true,
-    "mac_task_temp_removed": false
+    "mac_task_temp_removed": true,
+    "removed_files": 14,
+    "removed_bytes": 519955,
+    "private_evidence_retained": true,
+    "existing_files_caches_untouched": true
+  },
+  "document_validation": {
+    "changed_files": 8,
+    "staged_bytes_matched": true,
+    "relative_links_checked": 399,
+    "missing_relative_links": 0,
+    "tracked_secret_scan_files": 1180,
+    "known_generic_false_positives": 4,
+    "new_secret_findings": 0,
+    "runtime_code_changes": 0,
+    "runtime_regression_tests_rerun": false
   }
 }

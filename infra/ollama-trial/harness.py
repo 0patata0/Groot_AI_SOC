@@ -67,17 +67,18 @@ def read_report(question, calls):
 
 
 def ids_runtime_question(question):
-    text = normalized(question)
+    text = READ.scope_text(normalized(question))
     return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
         and re.search(r'활성|가동|적재|사용(?:\s*중|하는|하고)|구동|불러오|로드', text)
         and not re.search(r'WAF|Wazuh', text, re.I) and not READ.wants_write(text))
 
 
 def _inventory_question(question):
-    text = normalized(question)
+    text = READ.scope_text(normalized(question))
     if ids_runtime_question(question): return None
-    if re.search(r'왜|원인|비교|차이|변경|수정|차단|삭제|추가|적용해|재시작|원문|전문|분석', text):
+    if re.search(r'왜|원인|차이|변경|수정|차단|삭제|추가|적용해|재시작|원문|전문|분석', text):
         return None
+    if '비교' in text and not re.search(r'(?:개수|정의\s*수).{0,12}비교|비교.{0,12}(?:개수|정의\s*수)', text): return None
     if not (re.search(r'룰|규칙|rules?', text, re.I) and re.search(r'조회|보여|개수|목록|장비별|몇', text)):
         return None
     devices = [label for pattern, label in [('WAF|ModSecurity', 'WAF'),
@@ -86,7 +87,7 @@ def _inventory_question(question):
 
 
 def combined_rule_request(question):
-    text = normalized(question)
+    text = READ.scope_text(normalized(question))
     if READ.wants_write(text): return None
     runtime = re.search(r'(?:IDS|Suricata|수리카타)(?:가|는|의)?[^.!?。]{0,90}(?:local\.rules|all\.rules|구동\s*경로|실행\s*경로|룰\s*경로|실제\s*사용|사용하는지|가동\s*상태)', text, re.I)
     if runtime and re.search(r'(?:규칙|룰|파일\s*정의).{0,35}(?:개수|목록|정의\s*수)|(?:개수|목록|정의\s*수).{0,20}(?:규칙|룰|파일\s*정의)', text):
@@ -233,8 +234,36 @@ def guidance(question):
     return result
 
 
+def diagnostic_request(question):
+    text = READ.scope_text(normalized(question))
+    if (not READ.wants_write(text) and re.search(r'A\s*/\s*B\s*/\s*C', text, re.I)
+            and re.search(r'서비스|서버', text) and re.search(r'실패|오류|진단', text)):
+        return {'all': True, 'requested': []}
+    if READ.wants_write(text) or not re.search(r'진단', text) or not re.search(r'서비스|서버|대상', text): return None
+    if re.search(r'A\s*/\s*B\s*/\s*C', text, re.I) and re.search(r'모두|전체|빠짐', text):
+        return {'all': True, 'requested': []}
+    # Select a literal service name only; soc-bot is not the Hermes container.
+    hosts = re.findall(r'(?<![A-Za-z0-9])([ABC])\s*서버', text, re.I)
+    host = hosts[0].lower() if hosts else None
+    wanted = re.findall(r'(?<![A-Za-z0-9_])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_-])', text)
+    for pattern, name in [(r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스', 'hermes'), (r'Wazuh\s*(?:manager|매니저)', 'wazuh-manager'),
+                          (r'\bsoc-bot\b', 'soc-bot'), (r'\bDocker\b|도커', 'docker'), (r'\bVector\b|벡터', 'vector')]:
+        if host and re.search(pattern, text, re.I): wanted.append(host + ':' + name)
+    return {'all': False, 'requested': list(dict.fromkeys(wanted)), 'unresolved': not wanted}
+
+
+def diagnostic_scope(question, targets):
+    request = diagnostic_request(question)
+    if not request: return [], []
+    if request['all']: return list(targets), []
+    return ([t for t in request['requested'] if t in targets],
+            [t for t in request['requested'] if t not in targets] + (['요청 서비스 이름/범위 해석 미확인'] if request.get('unresolved') else []))
+
+
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    if diagnostic_request(question):
+        return {'mcp__system_diagnostics__get_system_diagnostics'}
     combined = combined_rule_request(question)
     if combined:
         scope = {'mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target', 'mcp__rule_a__get_service_action_target'}
@@ -296,7 +325,8 @@ def missing_reads(question, calls, diagnostic_targets=()):
     if scope == {'mcp__system_diagnostics__get_system_diagnostics'}:
         done = {c['arguments'].get('target') for c in successful if c['name'] == 'get_system_diagnostics'
                 and payload(c) and payload(c).get('schema') == 1 and payload(c).get('target') == c['arguments'].get('target')}
-        return [t for t in diagnostic_targets if t not in done]
+        selected, unsupported = diagnostic_scope(question, diagnostic_targets)
+        return [t for t in selected if t not in done] + ['진단 대상 미지원/미확인: ' + t for t in unsupported]
     if scope and any('search_' in n or 'alert_summary' in n for n in scope):
         return sorted(scope - names)
     return []
@@ -338,10 +368,8 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
                 needed = []
                 for part in relevant:
                     agent = READ.target_id(part, calls)
-                    args = {} if name == 'get_wazuh_remoted_stats' else {'agent_id': agent}
+                    args = READ.feature_args(part, name, agent)
                     if args and not agent: continue
-                    if name == 'get_wazuh_agent_ports':
-                        args.update(READ.port_filters(part))
                     c = READ.matching(part, calls, name, **args)
                     if READ.valid_wazuh(c, name) or READ.failed_attempt(part, calls, name, args): continue
                     needed.append(part)
@@ -357,16 +385,34 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
                             props.pop(key)
                     result[alias]['additionalProperties'] = False
                 if 'limit' in props and name in ('get_wazuh_agent_processes', 'get_wazuh_agent_ports', 'get_wazuh_critical_vulnerabilities'):
-                    props['limit'] = {**props['limit'], 'minimum': 1, 'maximum': min(part.get('limit', 5) for part in needed)}
+                    props['limit'] = {**props['limit'], 'minimum': 1, 'maximum': max(part.get('limit', 5) for part in needed)}
                     result[alias]['required'] = list(dict.fromkeys(result[alias].get('required', []) + ['limit']))
                 if name == 'get_wazuh_agent_processes' and 'search' not in result[alias].get('required', []):
                     # This bounded plan requests an inventory, not an inferred
                     # process-name filter. Even search="" is rejected upstream.
-                    props.pop('search', None)
+                    searches = {part.get('search') for part in needed}
+                    if searches == {None}: props.pop('search', None)
+                    else:
+                        props['search'] = {**props.get('search', {'type':'string'}), 'enum': sorted(s for s in searches if s)}
+                        if None not in searches: result[alias]['required'] = list(dict.fromkeys(result[alias].get('required', []) + ['search']))
                     result[alias]['additionalProperties'] = False
                 if name == 'get_wazuh_agent_ports':
-                    for key, value in {'protocol': '', 'state': '', **READ.port_filters(needed[0])}.items():
-                        if key in props: props[key] = {**props[key], 'enum': [value]}
+                    filters = [{'protocol': '', 'state': '', **READ.port_filters(part)} for part in needed]
+                    for key in ('protocol', 'state'):
+                        if key in props: props[key] = {**props[key], 'enum': sorted({f[key] for f in filters})}
+                # Bind each device to its own predicate, filter and count.
+                # Independent enums would allow another cross-product error.
+                variants = []
+                for part in needed:
+                    exact = READ.feature_args(part, name, READ.target_id(part, calls))
+                    if name == 'get_wazuh_agent_ports': exact = {'protocol':'', 'state':'', **exact}
+                    if 'limit' in props and name in ('get_wazuh_agent_processes', 'get_wazuh_agent_ports', 'get_wazuh_critical_vulnerabilities'):
+                        exact['limit'] = part.get('limit', 5)
+                    variant = {'properties': {k: {'enum':[v]} for k,v in exact.items() if k in props}, 'required':[k for k in exact if k in props]}
+                    if name == 'get_wazuh_agent_processes' and not part.get('search') and 'search' in props:
+                        variant['not'] = {'required':['search']}
+                    if variant not in variants: variants.append(variant)
+                if variants: result[alias]['anyOf'] = variants
     pending = missing_reads(question, calls, diagnostic_targets)
     for alias in list(result):
         name = alias.split('__')[-1];props = result[alias].get('properties', {})
@@ -489,18 +535,30 @@ def cell(value):
 def diagnostic_report(question, calls, targets):
     if tool_scope(question) != {'mcp__system_diagnostics__get_system_diagnostics'}:
         return None
+    selected, unsupported = diagnostic_scope(question, targets)
+    catalog = list(targets)
+    targets = selected
     latest = {}
     for call in calls:
         if call['name'] == 'get_system_diagnostics':
             target = call['arguments'].get('target')
             data = payload(call)
             latest[target] = data if data and data.get('target') == target and data.get('schema') == 1 else None
-    if not latest:
+    if not latest and not unsupported:
         return None
     verified = [t for t in targets if latest.get(t)]
     rows = ['**요약**', f'전체 대상 {len(targets)}개 / 유효 조회 {len(verified)}개 / 미확인 {len(targets)-len(verified)}개. 미확인 목록: ' + (', '.join(t for t in targets if t not in verified) or '없음') + '\n고정 진단 대상별 수집 스냅샷입니다. 원인과 전체 오류 발생 여부는 이 표본만으로 확정하지 않습니다.',
             '', '**확인 내역**', '', '| 대상 | Type | ActiveState / SubState | Result | 오류 반환 표본 | 수집 시각 KST |',
             '| --- | --- | --- | --- | --- | --- |']
+    if unsupported:
+        rows[1] = ('요청 범위 중 등록 진단 대상 ' + str(len(selected)) + '개 / 실제 유효 조회 ' + str(len(verified)) + '개 / 미지원·대상 미확인 ' + str(len(unsupported)) + '개입니다. 서비스 상태를 확인했다는 뜻이 아닙니다.\n'
+                   '현재 연결된 MCP의 실제 도구 스키마에서 요청 대상에 해당하는 등록 이름을 확인하지 못했습니다. 다른 서비스로 대신 조회하지 않았습니다.\n'
+                   '미지원·미확인: ' + ', '.join(unsupported) + '\n등록된 진단 대상: ' + ', '.join(catalog))
+        if not selected:
+            return '\n'.join(['**요약**', rows[1], '', '**확인 내역**', '',
+                *READ.table(['요청 대상', '진단 지원', '실제 서비스 상태'], [(t, '등록 대상 미지원/미확인', '조회 미실행·미확인') for t in unsupported]),
+                '', '**조치 및 다음 단계**', '도구 목록의 지원 범위만 확인했습니다. 서비스 상태·로그 조회는 수행하지 않았고 정상·장애·오류 0건으로 판정하지 않았습니다.'])
+        rows += ['| ' + ' | '.join(cell(v) for v in (t,'등록 대상 미지원','조회 미실행','미확인','미확인','미확인')) + ' |' for t in unsupported]
     windows, errors = [], []
     for target in targets:
         data = latest.get(target)

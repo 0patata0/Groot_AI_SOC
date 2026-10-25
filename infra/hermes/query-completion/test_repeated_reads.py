@@ -42,6 +42,77 @@ def schemas():
 
 
 class RepeatedReads(unittest.TestCase):
+    def test_subject_predicates_and_distinct_limits_are_bound_without_cross_product(self):
+        q='보안 서버에서는 프로세스를 최대 4개, 서비스 서버에서는 TCP ESTABLISHED 포트를 최대 7개 조회해줘.'
+        p=H.read_plan(q);a,c=p['plans']
+        self.assertEqual((a['agent_name'],a['features'],a['limit']),('groot-sec',['get_wazuh_agent_processes'],4))
+        self.assertEqual((c['agent_name'],c['features'],c['limit']),('groot-web',['get_wazuh_agent_ports'],7))
+        self.assertEqual(H.READ.port_filters(c),{'protocol':'tcp','state':'ESTABLISHED'})
+        selected=H.refine_read_schemas(q,schemas(),[identity()])
+        self.assertEqual(selected[H.READ.WAZUH+'get_wazuh_agent_processes']['properties']['agent_id']['enum'],['019'])
+        self.assertEqual(selected[H.READ.WAZUH+'get_wazuh_agent_ports']['properties']['agent_id']['enum'],['017'])
+        self.assertTrue(H.missing_reads(q,[identity(),process('017',4)]))
+
+    def test_multiple_literal_ids_are_each_required_and_visible(self):
+        q='에이전트 ID 041과 ID 087의 프로세스를 각각 최대 3개 조회해줘'
+        p=H.read_plan(q);self.assertEqual([x['agent_id'] for x in p['plans']],['041','087'])
+        calls=[process('041')]
+        self.assertTrue(any('087' in s for s in H.missing_reads(q,calls)))
+        self.assertIn('전체 확인 완료가 아닙니다',H.read_report(q,calls))
+        self.assertEqual(H.missing_reads(q,calls+[process('087')]),[])
+
+    def test_exclusions_do_not_add_work_or_erase_write_intent(self):
+        q='보안 서버 TCP 포트 최대 7개 조회해줘. 서비스 서버는 이번 대상에서 제외해줘.'
+        p=H.read_plan(q);self.assertEqual(p['agent_name'],'groot-sec');self.assertNotEqual(p['kind'],'multi')
+        q='WAF 규칙 정의 개수와 IDS 규칙 정의 개수를 비교해줘. Wazuh는 이번 조회에서 빼고 표로 보여줘.'
+        self.assertEqual(set(H.missing_reads(q,[])),{'a:modsecurity-custom','a:suricata-local'})
+        q='WAF 규칙을 삭제하고 IDS는 제외해줘'
+        self.assertTrue(H.READ.wants_write(H.normalized(q)));self.assertIsNone(H.read_plan(q))
+        self.assertIn('서비스 서버',H.READ.scope_text('서비스 서버를 제외하지 마.'))
+
+    def test_distribution_tail_does_not_create_second_host_vulnerability_work(self):
+        q='서비스 서버 취약점 분포와 보안 서버 로그수집기 Global/Interval 통계를 조회해줘. 취약점 분포는 개수를 제한하지 마.'
+        p=H.read_plan(q)
+        self.assertEqual([x['features'] for x in p['plans']],[['get_wazuh_vulnerability_summary'],['get_wazuh_log_collector_stats']])
+
+    def test_exact_search_keeps_identity_and_missing_command_visible(self):
+        q='보안 서버 프로세스에서 이름에 chronyd가 포함된 항목을 검색해서 최대 3개 PID와 명령줄을 보여줘.'
+        p=H.read_plan(q);self.assertEqual(p['search'],'chronyd')
+        sc=schemas();sc[H.READ.WAZUH+'get_wazuh_agent_processes']['properties']['search']={'type':'string'}
+        selected=H.refine_read_schemas(q,sc,[identity()])[H.READ.WAZUH+'get_wazuh_agent_processes']
+        self.assertEqual(selected['properties']['search']['enum'],['chronyd'])
+        c=process('019');self.assertTrue(H.missing_reads(q,[identity(),c]))
+        c['arguments']['search']='chronyd'
+        text=H.read_report(q,[identity(),c]);self.assertIn('명령줄(미제공이면 미확인)',text)
+
+    def test_unknown_name_is_retained_and_can_resolve_from_actual_inventory(self):
+        q='이름이 sensor-east인 장비의 UDP 포트를 조회해줘'
+        p=H.read_plan(q);self.assertEqual(p['agent_name'],'sensor-east')
+        self.assertIsNone(H.READ.target_id(p,[identity()]))
+        c=call('get_wazuh_agents','Agent ID: 042\nName: sensor-east\nStatus: ACTIVE\nIP: 192.0.2.42',{'status':'active'})
+        self.assertEqual(H.READ.target_id(p,[c]),'042')
+
+    def test_diagnostic_subset_uses_real_catalog_and_never_equates_soc_bot_with_hermes(self):
+        q='B 서버의 서비스 진단에서 Hermes와 Wazuh manager 두 대상만 조회해줘'
+        targets=['b:soc-bot','b:docker','b:vector']
+        wanted,unsupported=H.diagnostic_scope(q,targets)
+        self.assertEqual(wanted,[]);self.assertEqual(unsupported,['b:hermes','b:wazuh-manager'])
+        self.assertEqual(H.refine_read_schemas(q,{'mcp__system_diagnostics__get_system_diagnostics':{'properties':{'target':{'enum':targets}}}},[],targets),{})
+        text=H.diagnostic_report(q,[],targets);self.assertIn('실제 유효 조회 0개',text);self.assertIn('서비스 상태를 확인했다는 뜻이 아닙니다',text)
+        wanted,unsupported=H.diagnostic_scope('B 서버의 서비스 진단 중 b:docker만 조회해줘',targets)
+        self.assertEqual(wanted,['b:docker']);self.assertEqual(unsupported,[])
+
+    def test_device_specific_filter_and_limit_variants_cannot_be_crossed(self):
+        q='보안 서버 TCP LISTENING 포트를 최대 4개, 서비스 서버 UDP 포트를 최대 7개 조회해줘'
+        s=H.refine_read_schemas(q,schemas(),[identity()])[H.READ.WAZUH+'get_wazuh_agent_ports']
+        self.assertEqual(len(s['anyOf']),2)
+        if Draft202012Validator:
+            v=Draft202012Validator(s)
+            v.validate({'agent_id':'019','protocol':'tcp','state':'LISTENING','limit':4})
+            v.validate({'agent_id':'017','protocol':'udp','state':'','limit':7})
+            for invalid in [{'agent_id':'019','protocol':'udp','state':'','limit':7},{'agent_id':'017','protocol':'udp','state':'','limit':4}]:
+                with self.assertRaises(Exception):v.validate(invalid)
+
     def test_critical_example_limit_never_truncates_distribution_query(self):
         q='Groot_C 취약점 심각도 분포와 Critical 항목을 최대 3개 조회해줘'
         base={'type':'object','properties':{'agent_id':{'type':'string'},'limit':{'type':'integer'},'severity':{'type':'string'}},'required':['agent_id']}

@@ -427,6 +427,8 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
                 text += "\n미확인 대상: " + ", ".join(missing)
             agent._capstone_alignment_partial = bool(missing)
         else:
+            if not harness.READ.wants_write(request) and harness.violations(request, text, calls):
+                return original(agent, **query._with_final_text(kw, harness.fallback(request, calls)))
             return legacy(agent, **kw)
         for name in ("_capstone_query_completion_builder_restore", "_capstone_query_completion_names_restore"):
             restore = getattr(agent, name, None)

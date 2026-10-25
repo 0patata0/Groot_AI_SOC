@@ -54,6 +54,14 @@ def read_plan(question):
 
 
 def read_report(question, calls):
+    combined = combined_rule_request(question)
+    if combined:
+        missing = missing_reads(question, calls)
+        inventory_text = SHARED.render_rule_inventory(combined, linked_rows(calls))
+        service_text = service_report('IDS 실제 가동 상태 조회', calls)
+        return '\n\n'.join(['**전체 요청 범위**\n' + ('규칙 파일과 IDS 구동 근거를 모두 확인했습니다.' if not missing else '일부 요청 항목이 미완료입니다. 전체 확인 완료가 아닙니다.'),
+            inventory_text or '규칙 파일 조회 미완료/실패입니다.', service_text or 'IDS 구동 경로 조회 미완료/실패입니다.'] +
+            (['미확인 항목: ' + ', '.join(missing)] if missing else []))
     plan = read_plan(question)
     return READ.report(plan, calls, EVIDENCE) if plan else None
 
@@ -61,11 +69,11 @@ def read_report(question, calls):
 def ids_runtime_question(question):
     text = normalized(question)
     return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
-        and re.search(r'활성|가동|적재|사용\s*중|구동|불러오|로드', text)
+        and re.search(r'활성|가동|적재|사용(?:\s*중|하는|하고)|구동|불러오|로드', text)
         and not re.search(r'WAF|Wazuh', text, re.I) and not READ.wants_write(text))
 
 
-def inventory_question(question):
+def _inventory_question(question):
     text = normalized(question)
     if ids_runtime_question(question): return None
     if re.search(r'왜|원인|비교|차이|변경|수정|차단|삭제|추가|적용해|재시작|원문|전문|분석', text):
@@ -75,6 +83,25 @@ def inventory_question(question):
     devices = [label for pattern, label in [('WAF|ModSecurity', 'WAF'),
                (r'(?<![A-Za-z])IDS(?![A-Za-z])|Suricata', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]
     return '현재 적용된 규칙 목록 보여줘 ' + ' '.join(devices) + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
+
+
+def combined_rule_request(question):
+    text = normalized(question)
+    if READ.wants_write(text): return None
+    runtime = re.search(r'(?:IDS|Suricata|수리카타)(?:가|는|의)?[^.!?。]{0,90}(?:local\.rules|all\.rules|구동\s*경로|실행\s*경로|룰\s*경로|실제\s*사용|사용하는지|가동\s*상태)', text, re.I)
+    if runtime and re.search(r'(?:규칙|룰|파일\s*정의).{0,35}(?:개수|목록|정의\s*수)|(?:개수|목록|정의\s*수).{0,20}(?:규칙|룰|파일\s*정의)', text):
+        labels = [label for pattern, label in [('WAF|ModSecurity', 'WAF'), ('IDS|Suricata|수리카타', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]
+        return '현재 규칙 목록 보여줘 ' + ' '.join(labels) + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
+    return None
+
+
+def inventory_question(question):
+    return None if combined_rule_request(question) else _inventory_question(question)
+
+
+def structured_read(question):
+    return bool(read_plan(question) or combined_rule_request(question) or inventory_question(question) or
+                tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
 
 
 def linked_rows(calls):
@@ -197,6 +224,8 @@ def guidance(question):
     plan = read_plan(question)
     if plan:
         result += '\n' + READ.guidance(plan)
+    if combined_rule_request(question):
+        result += '\n이 요청에는 규칙 파일 목록과 IDS 구동 경로라는 두 조회가 있습니다. get_rule_change_target의 모든 요청 파일과 rule-a.get_service_action_target(a:suricata)를 각각 선택하세요. 한쪽만 완료한 것을 전체 완료로 보고하지 마세요.'
     if inventory_question(question):
         result += '\n이번 규칙 목록은 요청한 장비의 파일을 빠짐없이 조회하세요. 장비 미지정이면 WAF/IDS/Wazuh 세 파일 모두입니다.'
     if tool_scope(question):
@@ -206,6 +235,10 @@ def guidance(question):
 
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    combined = combined_rule_request(question)
+    if combined:
+        scope = {'mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target', 'mcp__rule_a__get_service_action_target'}
+        return scope
     plan = read_plan(question)
     if plan:
         scope = READ.scope(plan, calls)
@@ -238,6 +271,9 @@ def tool_scope(question, calls=None):
 
 
 def missing_reads(question, calls, diagnostic_targets=()):
+    combined = combined_rule_request(question)
+    if combined:
+        return missing_reads(combined, calls, diagnostic_targets) + missing_reads('IDS 실제 가동 상태 조회', calls, diagnostic_targets)
     plan = read_plan(question)
     if plan:
         return READ.missing(plan, calls, EVIDENCE)
@@ -258,18 +294,145 @@ def missing_reads(question, calls, diagnostic_targets=()):
                          and c.get('arguments', {}).get('target') == 'a:suricata'
                          and payload(c) for c in successful) else ['a:suricata']
     if scope == {'mcp__system_diagnostics__get_system_diagnostics'}:
-        done = {c['arguments'].get('target') for c in successful if c['name'] == 'get_system_diagnostics'}
+        done = {c['arguments'].get('target') for c in successful if c['name'] == 'get_system_diagnostics'
+                and payload(c) and payload(c).get('schema') == 1 and payload(c).get('target') == c['arguments'].get('target')}
         return [t for t in diagnostic_targets if t not in done]
     if scope and any('search_' in n or 'alert_summary' in n for n in scope):
         return sorted(scope - names)
     return []
 
 
+def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
+    """Narrow actual read schemas to unmet requirements; never dispatch calls."""
+    result = json.loads(json.dumps(schemas))
+    p = read_plan(question)
+    if p and p['kind'] == 'time' and READ.TIME in result:
+        schema = result[READ.TIME]
+        props = schema.get('properties', {})
+        values = props.get('timestamps', {}).get('items', {}).get('properties', {}).get('value')
+        if isinstance(values, dict):
+            values['enum'] = list(dict.fromkeys(p['stamps']))
+        reference = READ.explicit_reference(p)
+        if 'reference' in props:
+            props['reference'] = {**props['reference'], 'enum': [reference] if reference else list(dict.fromkeys(p['stamps'])) + ['now']}
+            if reference:
+                schema['required'] = list(dict.fromkeys(schema.get('required', []) + ['reference']))
+    if p and p['kind'] in ('wazuh', 'multi'):
+        plans = READ.parts(p)
+        for alias in list(result):
+            name = alias.split('__')[-1]
+            props = result[alias].get('properties', {})
+            if name == 'get_wazuh_agents':
+                states = {state for part in plans for state in part['states'] if not READ.valid_wazuh(READ.state_call(part, calls, state), name)}
+                if any(part['needs_agent'] and not READ.target_id(part, calls) and not READ.valid_wazuh(READ.state_call(part, calls, 'active'), 'get_wazuh_agents') for part in plans): states.add('active')
+                if not states:
+                    result.pop(alias); continue
+                if 'status' in props: props['status'] = {**props['status'], 'enum': sorted(states)}
+                # Full status lists resolve physical names and cannot silently
+                # satisfy a request for all agents with a guessed name filter.
+                for key in list(props):
+                    if key != 'status' and key not in result[alias].get('required', []): props.pop(key)
+                result[alias]['additionalProperties'] = False
+            elif name.startswith('get_wazuh_'):
+                relevant = [part for part in plans if name in part['features']]
+                needed = []
+                for part in relevant:
+                    agent = READ.target_id(part, calls)
+                    args = {} if name == 'get_wazuh_remoted_stats' else {'agent_id': agent}
+                    if args and not agent: continue
+                    if name == 'get_wazuh_agent_ports':
+                        args.update(READ.port_filters(part))
+                    c = READ.matching(part, calls, name, **args)
+                    if READ.valid_wazuh(c, name) or READ.failed_attempt(part, calls, name, args): continue
+                    needed.append(part)
+                if not needed:
+                    result.pop(alias); continue
+                if 'agent_id' in props:
+                    props['agent_id'] = {**props['agent_id'], 'enum': sorted({READ.target_id(part, calls) for part in needed})}
+                if name == 'get_wazuh_vulnerability_summary':
+                    # The maximum for displayed Critical examples must never
+                    # truncate the separate severity-distribution source.
+                    for key in list(props):
+                        if key != 'agent_id' and key not in result[alias].get('required', []):
+                            props.pop(key)
+                    result[alias]['additionalProperties'] = False
+                if 'limit' in props and name in ('get_wazuh_agent_processes', 'get_wazuh_agent_ports', 'get_wazuh_critical_vulnerabilities'):
+                    props['limit'] = {**props['limit'], 'minimum': 1, 'maximum': min(part.get('limit', 5) for part in needed)}
+                    result[alias]['required'] = list(dict.fromkeys(result[alias].get('required', []) + ['limit']))
+                if name == 'get_wazuh_agent_processes' and 'search' not in result[alias].get('required', []):
+                    # This bounded plan requests an inventory, not an inferred
+                    # process-name filter. Even search="" is rejected upstream.
+                    props.pop('search', None)
+                    result[alias]['additionalProperties'] = False
+                if name == 'get_wazuh_agent_ports':
+                    for key, value in {'protocol': '', 'state': '', **READ.port_filters(needed[0])}.items():
+                        if key in props: props[key] = {**props[key], 'enum': [value]}
+    pending = missing_reads(question, calls, diagnostic_targets)
+    for alias in list(result):
+        name = alias.split('__')[-1];props = result[alias].get('properties', {})
+        if 'target' not in props or name not in ('get_rule_change_target', 'get_service_action_target', 'get_system_diagnostics'): continue
+        targets = [x for x in pending if x.startswith(('a:', 'b:', 'c:'))]
+        if name == 'get_rule_change_target': targets = [x for x in targets if x in ('a:modsecurity-custom', 'a:suricata-local', 'b:wazuh-local-rules')]
+        if name == 'get_service_action_target': targets = [x for x in targets if x == 'a:suricata']
+        actual = props['target'].get('enum')
+        if actual: targets = [x for x in targets if x in actual]
+        if name != 'get_system_diagnostics':
+            host = 'a:' if '__rule_a__' in alias else 'b:'
+            targets = [x for x in targets if x.startswith(host)]
+        if not targets: result.pop(alias); continue
+        props['target'] = {**props['target'], 'enum': targets}
+    return result
+
+
+def policy_explanation(question, tools):
+    """Quote verified tool-policy facts for a narrow explanation-only request.
+
+    This is policy documentation, not an incident decision or a tool action.
+    Unknown descriptions and mixed investigative/action requests decline it.
+    """
+    text = normalized(question)
+    if (READ.wants_write(text) or not re.search(r'DGX', text, re.I) or not re.search(r'보호', text)
+            or not re.search(r'차단', text) or not re.search(r'거절|거부|불가', text)
+            or not re.search(r'정책.{0,15}(?:만|설명)|설명만', text)
+            or re.search(r'조회해|확인해|최근|경보|로그.{0,12}(?:분석|확인)|사건.{0,12}(?:분석|판단)', text)):
+        return None
+    descriptions = {t.get('function', {}).get('name'): t.get('function', {}).get('description', '') for t in tools}
+    regular = descriptions.get('mcp__resp__block_ip', '')
+    temporary = descriptions.get('mcp__rule_write_a__temporarily_contain_ip', '')
+    if ('refuses protected/management addresses' not in regular or
+            'Protected/private/management/DGX and active SSH addresses are refused' not in temporary):
+        return None
+    return ('**요약**\n보호된 DGX 주소는 일반 차단과 긴급 임시 차단 모두의 거절 대상입니다.\n\n'
+            '**확인 내역**\n'
+            '| 도구 정의 | 확인한 보호 경계 |\n| --- | --- |\n'
+            '| block_ip | protected/management 주소와 활성 SSH 주소를 거절 |\n'
+            '| temporarily_contain_ip | protected/private/management/DGX 및 활성 SSH 주소를 거절 |\n\n'
+            '운영자 승인은 보호 주소 거절을 우회하는 허가가 아닙니다. 일반 block_ip나 다른 차단 경로로 우회하라고 안내하지 않습니다. '
+            '이 정책 정의는 실제 공격·장애 발생 여부나 DGX의 다른 역할에 대한 근거가 아닙니다.\n\n'
+            '**조치 및 다음 단계**\n도구 정의에 근거한 정책 설명입니다. 실제 조회·차단 도구 호출은 수행하지 않았습니다. '
+            '실제 사건은 증거 조사와 기존 승인·보호 절차에 따라 별도로 판단해야 합니다.')
+
+
+def validated_selection(value, schema):
+    """Validate every model-selected read; collapse only exact duplicates."""
+    from jsonschema import Draft202012Validator
+    strict = json.loads(json.dumps(schema))
+    strict['properties']['calls'].pop('uniqueItems', None)
+    Draft202012Validator(strict).validate(value)
+    result = json.loads(json.dumps(value));seen = set();calls = []
+    for item in result['calls']:
+        key = json.dumps(item, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+        if key not in seen: calls.append(item);seen.add(key)
+    removed = len(result['calls']) - len(calls);result['calls'] = calls
+    Draft202012Validator(schema).validate(result)
+    return result, removed
+
+
 def selection_schema(schemas, limit):
     if not schemas or not 1 <= limit <= 40 or any(not EVIDENCE.allowed(n, 'verify') for n in schemas):
         raise ValueError('read_selection_scope')
     return {'title': 'ReadToolSelection', 'type': 'object', 'additionalProperties': False,
-        'properties': {'calls': {'type': 'array', 'minItems': 1, 'maxItems': limit, 'items': {'anyOf': [
+        'properties': {'calls': {'type': 'array', 'minItems': 1, 'maxItems': limit, 'uniqueItems': True, 'items': {'anyOf': [
             {'type': 'object', 'additionalProperties': False, 'required': ['tool', 'arguments'],
              'properties': {'tool': {'type': 'string', 'const': name}, 'arguments': schema}}
             for name, schema in schemas.items()]}}}, 'required': ['calls']}
@@ -334,7 +497,8 @@ def diagnostic_report(question, calls, targets):
             latest[target] = data if data and data.get('target') == target and data.get('schema') == 1 else None
     if not latest:
         return None
-    rows = ['**요약**', '고정 진단 대상별 수집 스냅샷입니다. 원인과 전체 오류 발생 여부는 이 표본만으로 확정하지 않습니다.',
+    verified = [t for t in targets if latest.get(t)]
+    rows = ['**요약**', f'전체 대상 {len(targets)}개 / 유효 조회 {len(verified)}개 / 미확인 {len(targets)-len(verified)}개. 미확인 목록: ' + (', '.join(t for t in targets if t not in verified) or '없음') + '\n고정 진단 대상별 수집 스냅샷입니다. 원인과 전체 오류 발생 여부는 이 표본만으로 확정하지 않습니다.',
             '', '**확인 내역**', '', '| 대상 | Type | ActiveState / SubState | Result | 오류 반환 표본 | 수집 시각 KST |',
             '| --- | --- | --- | --- | --- | --- |']
     windows, errors = [], []

@@ -35,7 +35,7 @@ def wants_write(text):
         r'|(?:추가|삭제|수정|변경|원복|복구|재시작|설치|배포|차단|해제|승인|거부|적용)(?:해|하(?:고|라|세요|는|여|자)|해줘|해주|해줄)', text))
 
 
-def plan(question, aware_time):
+def _single_plan(question, aware_time):
     text = without_prohibitions(question)
     if wants_write(text) or re.search(r'도구\s*없이|조회(?:는|하지)\s*말|설명만|번역|라는\s*문장', text):
         return None
@@ -62,16 +62,57 @@ def plan(question, aware_time):
     states = [s for s in STATES if re.search(r'(?<![a-z_])' + s + r'(?![a-z_])', text, re.I)]
     if not features and not (re.search(r'Wazuh|와주|에이전트|agent', text, re.I) and states):
         return None
+    if 'get_wazuh_agent_processes' in features and re.search(r'검색|필터|search\s*[:=]', text, re.I):
+        return None  # A filtered process search stays with the general agent.
     if not re.search(r'조회|보여|확인|정리|상태|목록|통계|요약', text):
         return None
-    explicit = re.search(r'(?:agent[_ ]?id|에이전트\s*(?:ID)?|ID)\s*[:=]?\s*[\x60\'\"]?(\d{3})\b', text, re.I)
-    alias = next((name for pattern, name in [(r'Groot[_ ]?C|groot-web|capstone-service|서비스\s*서버', 'groot-web'),
-        (r'Groot[_ ]?A|groot-sec|capstone-security', 'groot-sec'), (r'Groot[_ ]?B|wazuh\.manager|capstone-wazuh-manager', 'wazuh.manager')]
+    explicit = re.search(r'(?:agent[_ ]?id|에이전트\s*(?:ID)?|ID)\s*[:=]?\s*[\x60\'\"]?(\d{3})(?![0-9])', text, re.I)
+    alias = next((name for pattern, name in [(r'Groot[_ ]?C|groot-web|capstone-service|서비스\s*(?:서버|호스트)|(?<![A-Za-z0-9])C\s*서버', 'groot-web'),
+        (r'Groot[_ ]?A|groot-sec|capstone-security|보안\s*(?:서버|호스트)|(?<![A-Za-z0-9])A\s*서버', 'groot-sec'), (r'Groot[_ ]?B|wazuh[._ ]manager|(?:Wazuh|와주)\s*매니저|capstone-wazuh-manager|(?<![A-Za-z0-9])B\s*서버', 'wazuh.manager')]
         if re.search(pattern, text, re.I)), None)
     dependent = any(n not in ('get_wazuh_remoted_stats',) for n in features)
     return {'kind': 'wazuh', 'features': features, 'states': states or ([] if features else ['active']),
             'agent_id': explicit[1] if explicit else None, 'agent_name': alias,
-            'needs_agent': dependent, 'question': question}
+            'needs_agent': dependent, 'limit': requested_limit(text), 'question': question}
+
+
+def requested_limit(question):
+    found = re.search(r'(?:최대|상위|각각|각)\s*(\d{1,3})\s*(?:개|건)|(?<!\d)(\d{1,3})\s*(?:개|건)\s*이하', question)
+    return min(100, max(1, int(next(x for x in found.groups() if x)))) if found else 5
+
+
+def plan(question, aware_time):
+    p = _single_plan(question, aware_time)
+    if not p or p['kind'] != 'wazuh' or not p['needs_agent'] or p.get('agent_id'):
+        return p
+    names = [name for pattern, name in [
+        (r'Groot[_ ]?A|groot-sec|capstone-security|보안\s*(?:서버|호스트)|(?<![A-Za-z0-9])A\s*서버', 'groot-sec'),
+        (r'Groot[_ ]?B|wazuh[._ ]manager|(?:Wazuh|와주)\s*매니저|capstone-wazuh-manager|(?<![A-Za-z0-9])B\s*서버', 'wazuh.manager'),
+        (r'Groot[_ ]?C|groot-web|capstone-service|서비스\s*(?:서버|호스트)|(?<![A-Za-z0-9])C\s*서버', 'groot-web')]
+        if re.search(pattern, question, re.I)]
+    if len(names) < 2:
+        return p
+    parts = [{**p, 'agent_name': name, 'states': p['states'] if i == 0 else [],
+              'features': [n for n in p['features'] if i == 0 or n != 'get_wazuh_remoted_stats']}
+             for i, name in enumerate(names)]
+    return {'kind': 'multi', 'plans': parts, 'question': question}
+
+
+def parts(p):
+    return p['plans'] if p and p['kind'] == 'multi' else [p] if p else []
+
+
+def explicit_reference(p):
+    if not p or p['kind'] != 'time':
+        return None
+    return next((stamp for stamp in p['stamps'] if re.search(
+        r'(?:기준(?:\s*시각)?|reference)(?:은|는)?\s*[:=]?\s*' + re.escape(stamp),
+        p['question'], re.I)), None)
+
+
+def verified_ids(p, calls):
+    return sorted({target_id(part, calls) for part in parts(p)
+                   if part['kind'] == 'wazuh' and target_id(part, calls)})
 
 
 def successful(call):
@@ -123,18 +164,20 @@ def agents(text):
 
 
 def target_id(p, calls):
-    if p.get('agent_id'):
+    if p.get('agent_id') and not p.get('agent_name'):
         return p['agent_id']
     matches = set()
     for c in calls:
         if c.get('server') == 'wazuh-ro' and c.get('name') == 'get_wazuh_agents':
             for a in agents(text_result(c) or ''):
-                if a['name'] in ASSET_NAMES.get(p.get('agent_name'), ()):
+                if a['name'] in ASSET_NAMES.get(p.get('agent_name'), ()) and (not p.get('agent_id') or a['id'] == p['agent_id']):
                     matches.add(a['id'])
     return next(iter(matches)) if len(matches) == 1 else None
 
 
 def scope(p, calls=None):
+    if p['kind'] == 'multi':
+        return set().union(*(scope(part, calls) for part in p['plans']))
     if p['kind'] == 'time': return {TIME}
     if p['kind'] == 'status':
         prefix = 'mcp__rule_' + p['target'][0] + '__'
@@ -155,15 +198,46 @@ def matching(p, calls, name, **args):
         return str(a).lower() == str(b).lower() if k in ('state', 'protocol') else a == b
     found = [c for c in calls if c.get('server') == server and c.get('name') == name
              and successful(c) and all(equal(k, c.get('arguments', {}).get(k), v) for k, v in args.items())]
+    if name == 'get_wazuh_vulnerability_summary':
+        found = [c for c in found if not any(v not in (None, '') for k, v in c.get('arguments', {}).items() if k != 'agent_id')]
     return found[-1] if found else None
+
+
+def port_filters(p):
+    text = p['question']
+    values = {}
+    if re.search(r'\bTCP\b', text, re.I): values['protocol'] = 'tcp'
+    elif re.search(r'\bUDP\b', text, re.I): values['protocol'] = 'udp'
+    if re.search(r'LISTENING|수신\s*대기|리스닝', text, re.I): values['state'] = 'LISTENING'
+    else:
+        state = re.search(r'(?<![A-Za-z_])(ESTABLISHED|TIME_WAIT|CLOSE_WAIT|SYN_SENT|SYN_RECV|FIN_WAIT1|FIN_WAIT2|LAST_ACK|CLOSING|CLOSE)(?![A-Za-z_])', text, re.I)
+        if state: values['state'] = state[1].upper()
+    return values
+
+
+def failed_attempt(p, calls, name, args):
+    for c in reversed(calls):
+        if c.get('server') != 'wazuh-ro' or c.get('name') != name or not all(c.get('arguments', {}).get(k) == v for k, v in args.items()): continue
+        raw = c.get('result')
+        if not isinstance(raw, str) or hashlib.sha256(raw.encode()).hexdigest() != c.get('result_sha256'): continue
+        data = unpack(raw)
+        if c.get('is_error') or isinstance(data, dict) and data.get('error') or isinstance(data, str) and re.match(r'\s*(?:Error\b|Failed\b|Traceback|Exception\b)', data, re.I):
+            return c
+    return None
+
+
+def state_call(p, calls, state):
+    rows = [c for c in calls if c.get('name') == 'get_wazuh_agents' and
+            not any(v is not None and v != '' for k, v in c.get('arguments', {}).items() if k not in ('status', 'limit', 'offset'))]
+    return matching(p, rows, 'get_wazuh_agents', status=state)
 
 
 def valid_wazuh(call, name):
     raw = text_result(call) if call else None
     if raw is None: return False
     markers = {'get_wazuh_agents': r'Agent ID:|No Wazuh agents matching',
-        'get_wazuh_agent_processes': r'PID:|No processes found',
-        'get_wazuh_agent_ports': r'Protocol:|No ports found',
+        'get_wazuh_agent_processes': r'PID:|No processes (?:found|for agent)',
+        'get_wazuh_agent_ports': r'Protocol:|No (?:network )?ports (?:found|for agent)',
         'get_wazuh_vulnerability_summary': r'CVE:|No vulnerabilit|^SOC_VULNERABILITY_AGGREGATE_V1',
         'get_wazuh_critical_vulnerabilities': r'CRITICAL VULNERABILITY|No critical vulnerabilit',
         'get_wazuh_remoted_stats': r'Wazuh Remoted Statistics:',
@@ -171,7 +245,16 @@ def valid_wazuh(call, name):
     return bool(re.search(markers[name], raw, re.I))
 
 
+def ambiguous_empty(p, calls, name, c):
+    raw = text_result(c) if c else None
+    if name not in ('get_wazuh_agent_processes', 'get_wazuh_agent_ports') or not raw or not re.match(r'No (?:processes|(?:network )?ports) for agent', raw): return False
+    # The MCP collapses missing syscollector data and empty matches, even for a registered ID.
+    return True
+
+
 def missing(p, calls, evidence):
+    if p['kind'] == 'multi':
+        return [part['agent_name'] + ' / ' + item for part in p['plans'] for item in missing(part, calls, evidence)]
     if p['kind'] == 'time':
         for c in reversed(calls):
             if c.get('name') != 'calculate_time' or c.get('server') != 'system-diagnostics' or not successful(c): continue
@@ -179,7 +262,8 @@ def missing(p, calls, evidence):
             supplied = [x.get('value') for x in args.get('timestamps', []) if isinstance(x, dict)] + [args.get('reference')]
             expected = {evidence.parse_instant(s) for s in p['stamps']}
             actual = {evidence.parse_instant(s) for s in supplied}
-            if (None not in expected and expected <= actual and isinstance(data, dict)
+            reference = explicit_reference(p)
+            if (None not in expected and expected <= actual and (not reference or args.get('reference') == reference) and isinstance(data, dict)
                     and data.get('kind') == 'time_calculation' and data.get('source_scope') == 'supplied_timestamps_only'):
                 return []
         return ['calculate_time: 사용자 제공 시각/기준 시각']
@@ -199,27 +283,30 @@ def missing(p, calls, evidence):
         return pending
     pending = []
     for state in p['states']:
-        if not valid_wazuh(matching(p, calls, 'get_wazuh_agents', status=state), 'get_wazuh_agents'):
+        if not valid_wazuh(state_call(p, calls, state), 'get_wazuh_agents'):
             pending.append('get_wazuh_agents:' + state)
     agent = target_id(p, calls)
     if p['needs_agent'] and not agent:
         pending.append('get_wazuh_agents: 대상 이름/ID 실제 식별')
     for name in p['features']:
         args = {} if name == 'get_wazuh_remoted_stats' else {'agent_id': agent}
-        if name == 'get_wazuh_agent_ports' and re.search(r'TCP|LISTENING', p['question'], re.I):
-            args.update(protocol='tcp', state='LISTENING')
+        if name == 'get_wazuh_agent_ports': args.update(port_filters(p))
         c = matching(p, calls, name, **args) if agent or not args else None
-        if not valid_wazuh(c, name) or name == 'get_wazuh_vulnerability_summary' and vulnerability_view(text_result(c) or '').get('transport_truncated'):
+        if not valid_wazuh(c, name) or ambiguous_empty(p, calls, name, c) or name == 'get_wazuh_vulnerability_summary' and vulnerability_view(text_result(c) or '').get('transport_truncated'):
             pending.append(name + (':' + (agent or '대상 미확인') if args else ''))
     return pending
 
 
 def guidance(p, calls=()):
+    if p['kind'] == 'multi':
+        return ('요청한 각 장비를 빠짐없이 식별하고 장비별 모든 조회를 수행하세요. 동일 상태의 에이전트 목록을 반복하지 말고 name 필터 없이 받은 실제 이름→ID 매핑을 재사용하세요. ' + '\n'.join(guidance(part, calls) for part in p['plans']))
     text = ('요청은 읽기 전용입니다. 변경안 제출/재시작 금지는 변경 목표가 아닙니다. '
             '제공된 도구를 실제로 선택해 모든 요청 항목을 확인하세요. 성공한 같은 조회를 반복하지 마세요. ')
     if p['kind'] == 'wazuh':
-        text += ('장비 이름과 에이전트 번호는 다릅니다. Groot_C는 서비스 호스트 groot-web이라는 이름으로 '
-                 '(새 설치는 capstone-service) get_wazuh_agents(status=active) 결과에서 ID를 확인하세요. c/003 같은 추측 ID를 쓰지 마세요. '
+        text += ('장비 이름과 에이전트 번호는 다릅니다. Groot_A/보안 서버는 groot-sec(새 설치 capstone-security), '
+                 'Groot_C/서비스 서버는 groot-web(새 설치 capstone-service), Groot_B는 wazuh.manager입니다. '
+                 '이 이름은 ID가 아닙니다. get_wazuh_agents(status=active)의 실제 반환 이름/ID를 사용하세요. '
+                 'name 필터를 추측하거나 빈 필터 결과를 같은 인자로 반복하지 말고 name 없이 조회해 식별하세요. '
                  '프로세스/포트는 수집 인벤토리이며 시작 시각은 수집 시각이 아닙니다. '
                  'remoted/로그수집기 통계는 alert_summary로 대신하지 않습니다. '
                  '취약점 요약은 반환 목록의 심각도를 집계하고 전체 범위/페이지 한계를 밝힙니다. '
@@ -227,7 +314,8 @@ def guidance(p, calls=()):
                  '시각 표시는 이미 KST로 변환됩니다. 현재시간만 얻으려고 calculate_time을 반복하지 마세요. ')
         if target_id(p, calls): text += '이번 조회로 식별된 대상 agent_id=' + target_id(p, calls) + '. '
     elif p['kind'] == 'time':
-        text += 'calculate_time에 사용자 원본 시각과 비교 기준을 옮기고 반환값을 요청한 표로 보여주세요. '
+        text += ('calculate_time에 사용자 원본 시각과 비교 기준을 옮기고 반환값을 요청한 표로 보여주세요. '
+                 'reference에는 사건 ID나 base/ref라는 이름이 아니라 offset이 포함된 실제 시각 문자열을 넣으세요. ')
     else:
         text += '과거 제안 상태와 현재 파일/컨테이너를 따로 조회하세요. 과거 recovery_failed만으로 현재 장애라고 단정하지 마세요. '
     return text
@@ -274,6 +362,14 @@ def table(headers, rows):
 
 
 def report(p, calls, evidence):
+    if p['kind'] == 'multi':
+        pending = missing(p, calls, evidence)
+        title = '요청한 모든 장비의 조회 항목을 확인했습니다.' if not pending else '일부 장비/항목이 미완료입니다. 전체 확인 완료가 아닙니다.'
+        sections = ['**전체 요청 범위**', title]
+        for part in p['plans']:
+            sections += ['', '**장비: ' + cell(part['agent_name']) + '**', report(part, calls, evidence)]
+        if pending: sections += ['', '전체 미확인 목록: ' + ', '.join(pending)]
+        return '\n'.join(sections)
     pending = missing(p, calls, evidence)
     rows = ['**요약**', '요청한 조회 항목을 확인했습니다.' if not pending else '일부 조회가 미완료입니다. 정상이나 0건으로 판단하지 않았습니다.', '', '**확인 내역**']
     if p['kind'] == 'time':
@@ -300,7 +396,7 @@ def report(p, calls, evidence):
         agent = target_id(p, calls)
         if p['needs_agent']: rows += ['대상: ' + cell(p.get('agent_name')) + ' / agent_id=' + cell(agent)]
         for state in p['states']:
-            c = matching(p, calls, 'get_wazuh_agents', status=state)
+            c = state_call(p, calls, state)
             raw = text_result(c) if c else None
             if raw is None: continue
             parsed = agents(raw)
@@ -312,15 +408,26 @@ def report(p, calls, evidence):
         if p['states']: rows += ['상태 범위: ' + ', '.join(p['states']) + '. 다른 상태는 별도 확인하지 않았습니다. 목록 limit/페이지 범위 밖은 미확인입니다.']
         for name in p['features']:
             args = {} if name == 'get_wazuh_remoted_stats' else {'agent_id': agent}
+            if name == 'get_wazuh_agent_ports': args.update(port_filters(p))
             c = matching(p, calls, name, **args) if agent or not args else None
             raw = text_result(c) if c else None
-            if not raw or not valid_wazuh(c, name): continue
+            if not raw or not valid_wazuh(c, name):
+                failed = failed_attempt(p, calls, name, args)
+                if failed:
+                    reason = unpack(failed['result'])
+                    rows += ['', '`' + name + '` 조회 실패/미확인: ' + cell(str(reason)[:400]), '이 오류를 0건이나 정상 상태로 해석하지 않았습니다. 같은 실패 호출을 자동 반복하지 않았습니다.']
+                continue
             rows += ['', '`' + name + '` (실제 인자: ' + cell(json.dumps(c['arguments'], ensure_ascii=False)) + ')']
+            if ambiguous_empty(p, calls, name, c):
+                rows += ['도구는 조건에 맞는 반환 자료가 없다고 응답했습니다: ' + cell(raw), '이 응답만으로 요청 ID의 등록 여부, 자료 미수집, 조회 실패와 실제 0건을 구분할 수 없습니다. 현재 정상이나 장비 부재로 확정하지 않았습니다. 같은 호출을 반복하지 않고 미확인으로 남깁니다.']
+                continue
             if name == 'get_wazuh_agent_processes':
-                rows += table(['PID', '프로세스', '상태', '실행 시작 KST'], [(field(x, 'PID'), field(x, 'Name'), field(x, 'State'), evidence.kst_time(field(x, 'Start Time'))) for x in records(raw, r'PID:')[:5]])
+                rows += table(['PID', '프로세스', '상태', '실행 시작 KST'], [(field(x, 'PID'), field(x, 'Name'), field(x, 'State'), evidence.kst_time(field(x, 'Start Time'))) for x in records(raw, r'PID:')[:p.get('limit', 5)]])
+                if not records(raw, r'PID:'): rows += ['해당 조건의 반환 자료 0건입니다. 조회 실패·현재 전체 프로세스 부재와 구분합니다.']
                 rows += ['마지막 수집 인벤토리입니다. 수집 시각은 응답에서 미제공/미확인이고 실행 시작 시각과 다릅니다. 실시간 전체 프로세스 목록이 아닙니다.']
             elif name == 'get_wazuh_agent_ports':
-                rows += table(['프로토콜', '로컬', '상태', '프로세스', 'PID'], [(field(x, 'Protocol'), field(x, 'Local'), field(x, 'State'), field(x, 'Process Name'), field(x, 'PID')) for x in records(raw, r'Protocol:')[:5]])
+                rows += table(['프로토콜', '로컬', '상태', '프로세스', 'PID'], [(field(x, 'Protocol'), field(x, 'Local'), field(x, 'State'), field(x, 'Process Name'), field(x, 'PID')) for x in records(raw, r'Protocol:')[:p.get('limit', 5)]])
+                if not records(raw, r'Protocol:'): rows += ['해당 조건의 반환 자료 0건입니다. 조회 실패·현재 전체 포트 부재와 구분합니다.']
                 rows += ['마지막 수집 인벤토리이며 수집 시각은 미확인입니다. 필터/limit 밖의 포트와 실시간 노출 여부는 미확인입니다.']
             elif name == 'get_wazuh_vulnerability_summary':
                 d = vulnerability_view(raw)
@@ -330,7 +437,7 @@ def report(p, calls, evidence):
             elif name == 'get_wazuh_critical_vulnerabilities':
                 chunks = records(raw, r'(?:🔴 )?CRITICAL VULNERABILITY')
                 rows += table(['CVE 필드', '참조 URL에 포함된 ID(미검증)', '패키지', '버전'], [(field(x, 'CVE'),
-                    ', '.join(dict.fromkeys(re.findall(r'CVE-\d{4}-\d+', field(x, 'Reference') or ''))) or '미제공', field(x, 'Package'), field(x, 'Version')) for x in chunks[:5]])
+                    ', '.join(dict.fromkeys(re.findall(r'CVE-\d{4}-\d+', field(x, 'Reference') or ''))) or '미제공', field(x, 'Package'), field(x, 'Version')) for x in chunks[:p.get('limit', 5)]])
                 rows += ['CVE Unknown은 참조 URL만으로 확정하지 않았습니다. 패키지/버전 미제공은 미확인입니다. 취약점 자료는 실제 침해 발생의 증거가 아닙니다.']
             else:
                 # Keep every returned counter, including both collector periods.

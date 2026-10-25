@@ -170,5 +170,32 @@ class DurableDelivery(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.gateway.api.call_args.args[1], '/channels/' + CHANNEL + '/posts?per_page=60')
 
 
+
+class AuditRetention(unittest.TestCase):
+    def test_large_vulnerability_keeps_bounded_evidence_timing_and_other_reads(self):
+        import hashlib
+        raw='CVE: Unknown\nSeverity: HIGH\nDescription: '+('x'*1100000)
+        sha=hashlib.sha256(raw.encode()).hexdigest()
+        report={'status':'completed','model_calls':[{'seconds':2.3}], 'total_seconds':4.5,
+                'calls':[{'server':'wazuh-ro','name':'get_wazuh_vulnerability_summary','arguments':{'agent_id':'002'},'result':raw,'result_sha256':sha,'result_bytes':len(raw),'is_error':False},
+                         {'server':'wazuh-ro','name':'get_wazuh_agents','result':'kept'}]}
+        audit=json.loads(chat.audit_json(report));c=audit['calls'][0]
+        self.assertEqual(c['source_result_sha256'],sha)
+        self.assertEqual(c['result_sha256'],hashlib.sha256(c['result'].encode()).hexdigest())
+        self.assertEqual(chat.harness.READ.vulnerability_view(c['result'])['severity_counts'],{'HIGH':1})
+        self.assertEqual(audit['model_calls'],report['model_calls']);self.assertEqual(audit['total_seconds'],4.5)
+        self.assertEqual(audit['calls'][1]['result'],'kept');self.assertEqual(report['calls'][0]['result'],raw)
+        self.assertLess(len(chat.audit_json(report)),10000)
+
+    def test_large_unknown_body_and_metadata_remain_bounded_and_explicit(self):
+        report={'status':'partial','model_calls':[{'seconds':1}], 'protected_calls':0,
+                'calls':[{'name':'get_wazuh_agents','result':'x'*4200000,'result_sha256':'saved'}]}
+        audit=json.loads(chat.audit_json(report));self.assertTrue(audit['audit_truncated'])
+        self.assertNotIn('result',audit['calls'][0]);self.assertEqual(audit['model_calls'],report['model_calls'])
+        report['calls'][0]['arguments']={'oversized':'x'*4200000}
+        audit=json.loads(chat.audit_json(report));self.assertTrue(audit['metadata_omitted'])
+        self.assertIn('arguments_sha256',audit['calls'][0]);self.assertLess(len(json.dumps(audit)),10000)
+
+
 if __name__ == '__main__':
     unittest.main()

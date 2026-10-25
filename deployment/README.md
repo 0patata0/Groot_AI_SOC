@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+> **2026-10-25 반복 개선 소스1.9.2:** 루트 deploy.sh의 기존 SIEM/Ollama 설치 경로가 공통 read_contract·harness·계약1.2.2 및 Ollama chat 감사 저장 보완을 함께 배치한다. 기존 오프라인 manifest 바이너리를 유지하고 갱신 소스 전체를 반입한다. 추가 deb/wheel/이미지/포트0이며 설정 예제·키/권한 계약 변경도 없다. 운영은 백업 후 증분 upgrade로 반영했고 실제 새3VM 전체 설치는 미실행이다. [구현·검증 구분](../STATUS.md).
+
 > **2026-10-25 공통 채팅 소스:** 초기 SIEM 설치에 query 플러그인8파일(문맥/훅과 합계13)을 배치한다. Ollama도 같은 정책/근거 소스를 사용하며 읽기90초·보호720초 설정을 연계한다. 추가 패키지·이미지·포트는 없다. 기존 운영은 증분 반영만 수행했고 새3VM 전체 설치는 미검증이다. [전체 파일과 native 차이](../infra/hermes/chat-harness.md) · [현황](../STATUS.md).
 
 > **2026-10-25 봇 프로필:** 초기 Hermes 봇과 선택적 Ollama 봇 생성 시 [동봉 아이콘](bot-icons/sources.json)을 지정한다. `deploy.sh` 소스 archive에 PNG·출처/SHA·라이선스와 `bot_profiles.py`를 포함하므로 서버 외부 다운로드와 추가 패키지는 없다. 운영 기존 계정은 별도 최소 API 갱신으로 적용했으며 새3VM 전체 설치 시험과 구분한다.

@@ -124,12 +124,14 @@ async def run(config, request, *, on_protected_start=None):
         async def create_all(self, current_client):
             self.tools, self.resources, self.prompts = [], [], []
             catalog = []
+            report['_policy_tools'] = []
             for server, session in current_client.get_all_active_sessions().items():
                 connector = session.connector
                 tools = await connector.list_tools()
                 require({t.name for t in tools} == available[server], 'server_tool_contract_changed')
                 for tool in tools:
                     name = alias(server, tool.name)
+                    report['_policy_tools'].append({'function': {'name': name, 'description': tool.description or ''}})
                     schema = json.loads(json.dumps(tool.inputSchema))
                     Draft202012Validator.check_schema(schema)
                     catalog.append({'server': server, 'name': tool.name, 'alias': name,
@@ -148,9 +150,9 @@ async def run(config, request, *, on_protected_start=None):
                                 validate_call(backend, bare_name, arguments, mode)
                                 Draft202012Validator(input_schema).validate(arguments)
                                 budget.take()
-                                if read_plan and read_plan['kind'] == 'wazuh' and 'agent_id' in arguments:
-                                    expected = harness.READ.target_id(read_plan, report['calls'])
-                                    if not expected or arguments['agent_id'] != expected:
+                                if read_plan and read_plan['kind'] in ('wazuh', 'multi') and 'agent_id' in arguments:
+                                    expected = harness.READ.verified_ids(read_plan, report['calls'])
+                                    if arguments['agent_id'] not in expected:
                                         report.setdefault('rejected_calls', []).append({'server': backend,
                                             'name': bare_name, 'arguments': arguments, 'reason': 'agent_identity_not_verified',
                                             'mcp_executed': False})
@@ -218,7 +220,15 @@ async def run(config, request, *, on_protected_start=None):
         else:
             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
             tick = time.perf_counter()
-            final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
+            structured = harness.structured_read(current)
+            policy_answer = harness.policy_explanation(current, report['_policy_tools'])
+            if policy_answer:
+                report['policy_definition_rendered'] = True
+                final = policy_answer
+            elif structured:
+                final = ''  # The same model selects actual reads below.
+            else:
+                final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
             if not report['protected_calls']:
                 missing = (harness.inventory(current, report['calls'], missing_targets=True) or
                            harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ())))
@@ -228,7 +238,7 @@ async def run(config, request, *, on_protected_start=None):
                            harness.event_report(current, report['calls']))
                 issues = [] if literal else harness.violations(current, str(final), report['calls'])
                 repair_passes = 0
-                while (missing or issues) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES:
+                while (missing or issues) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
                     repair_passes += 1
                     report['repair'] = {'missing_targets': missing, 'issues': issues}
                     instruction = ('현재 질문: ' + current + '\n조회 근거 점검 결과: ' + json.dumps(report['repair'], ensure_ascii=False) +
@@ -241,24 +251,26 @@ async def run(config, request, *, on_protected_start=None):
                         # protected tools, inferred approvals or incident decisions.
                         selected_tools = {t.name: t for t in agent.adapter.tools if t.name in read_scope}
                         schemas = {name: json.loads(json.dumps(tool.args_schema)) for name, tool in selected_tools.items()}
-                        expected = harness.READ.target_id(read_plan, report['calls']) if read_plan and read_plan['kind'] == 'wazuh' else None
-                        if expected:
-                            for input_schema in schemas.values():
-                                if 'agent_id' in input_schema.get('properties', {}):
-                                    input_schema['properties']['agent_id']['enum'] = [expected]
+                        schemas = harness.refine_read_schemas(current, schemas, report['calls'], report.get('diagnostic_targets', ()))
+                        if not schemas:
+                            break  # Report a verified terminal failure; no blind repeat.
                         schema = harness.selection_schema(schemas, budget.limit - budget.used)
                         report['repair']['method'] = 'structured_read_selection'
                         selector = llm.with_structured_output(schema, method='json_schema')
                         plan = await asyncio.wait_for(selector.ainvoke([
                             ('system', SYSTEM_PROMPT + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
                              '절대 구간이 미지원이어도 사용자 요청에 따라 지원되는 최근 상대 구간의 표본을 조회하세요. '
-                             '요청한 장비/대상을 빠짐없이 포함하고 이미 성공한 조회를 반복하지 마세요. 요청구간을 지원한다고 꾸미지 마세요.'),
+                             '요청한 장비/대상을 빠짐없이 포함하고 이미 성공한 조회를 반복하지 마세요. 요청구간을 지원한다고 꾸미지 마세요.' + harness.guidance(current)),
                             ('human', instruction + '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
-                        Draft202012Validator(schema).validate(plan)
+                        report.setdefault('read_selections', []).append(plan)
+                        plan, removed = harness.validated_selection(plan, schema)
+                        report['deduplicated_read_selections'] = report.get('deduplicated_read_selections', 0) + removed
                         selection_active = True
-                        for choice in plan['calls']:
-                            await selected_tools[choice['tool']].ainvoke(choice['arguments'])
-                        selection_active = False
+                        try:
+                            for choice in plan['calls']:
+                                await selected_tools[choice['tool']].ainvoke(choice['arguments'])
+                        finally:
+                            selection_active = False
                         final = ''  # Only observed facts can render this bounded read path.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
@@ -299,6 +311,7 @@ async def run(config, request, *, on_protected_start=None):
         elif report['calls'] and not report['protected_calls']:
             report.update(status='partial', final_response=harness.fallback(current, report['calls']))
     finally:
+        report.pop('_policy_tools', None)
         await client.close_all_sessions()
         report['total_seconds'] = time.perf_counter() - started
     return report

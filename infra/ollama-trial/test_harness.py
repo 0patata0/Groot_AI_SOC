@@ -50,6 +50,9 @@ class Grounding(unittest.TestCase):
         q = 'A/B/C 서버의 실패한 서비스 오류 조회'
         calls = [{'name': 'get_system_diagnostics', 'server': 'system-diagnostics',
                   'arguments': {'target': 'a:vector'}, 'result': '{}', 'is_error': False}]
+        self.assertEqual(harness.missing_reads(q, calls, ['a:vector', 'b:vector']), ['a:vector', 'b:vector'])
+        raw = json.dumps({'schema': 1, 'target': 'a:vector'})
+        calls[0].update(result=raw, result_sha256=hashlib.sha256(raw.encode()).hexdigest())
         self.assertEqual(harness.missing_reads(q, calls, ['a:vector', 'b:vector']), ['b:vector'])
         calls[0]['is_error'] = True
         self.assertEqual(harness.missing_reads(q, calls, ['a:vector']), ['a:vector'])

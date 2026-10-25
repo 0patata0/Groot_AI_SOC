@@ -7,6 +7,7 @@ never enters the LLM. Protected MCP calls retain the existing server approval ga
 import argparse
 import asyncio
 import contextlib
+import hashlib
 import json
 import ipaddress
 import os
@@ -19,12 +20,50 @@ from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from runtime import run as agent_run, load_config as agent_config
+import harness
 from policy import require
 from chat_policy import ID, KST, eligible, question_with_history, final_text
 
 
 def log(event, **fields):
     print(json.dumps({'at_kst': datetime.now(KST).isoformat(), 'event': event, **fields}), flush=True)
+
+
+def audit_json(report):
+    """Keep bounded evidence and metadata when a vulnerability body is large."""
+    audit = json.loads(json.dumps({k: v for k, v in report.items() if k not in ('evidence', 'catalog')}))
+    for call in audit.get('calls', []):
+        raw = call.get('result')
+        if (call.get('server') == 'wazuh-ro' and call.get('name') == 'get_wazuh_vulnerability_summary'
+                and isinstance(raw, str) and len(raw.encode()) > 1048576
+                and harness.READ.successful(call)):
+            compact = harness.READ.compact_vulnerability(raw)
+            if isinstance(compact, str):
+                call.update(source_result_sha256=call['result_sha256'], result=compact,
+                            result_sha256=hashlib.sha256(compact.encode()).hexdigest(),
+                            audit_result_bytes=len(compact.encode()), audit_compacted=True)
+    encoded = json.dumps(audit, ensure_ascii=False)
+    if len(encoded.encode()) > 4194304:
+        audit['audit_truncated'] = True
+        for call in sorted(audit.get('calls', []), key=lambda c: len(str(c.get('result', ''))), reverse=True):
+            if 'result' not in call:
+                continue
+            call.pop('result')
+            call['result_omitted_reason'] = 'chat_audit_size_limit; original hash/bytes retained'
+            encoded = json.dumps(audit, ensure_ascii=False)
+            if len(encoded.encode()) <= 4194304:
+                break
+    if len(encoded.encode()) > 4194304:
+        # Exceptional oversized arguments/metadata must not bypass the DB cap.
+        audit = {'status': report.get('status'), 'audit_truncated': True,
+                 'metadata_omitted': True, 'original_audit_sha256': hashlib.sha256(encoded.encode()).hexdigest(),
+                 'protected_calls': report.get('protected_calls'), 'calls': [
+                     {'server': c.get('server'), 'name': c.get('name'), 'is_error': c.get('is_error'),
+                      'arguments_sha256': hashlib.sha256(json.dumps(c.get('arguments'), sort_keys=True).encode()).hexdigest(),
+                      'result_sha256': c.get('source_result_sha256', c.get('result_sha256')),
+                      'result_bytes': c.get('result_bytes')} for c in audit.get('calls', [])]}
+        encoded = json.dumps(audit, ensure_ascii=False)
+    return encoded
 
 
 def config_read(path):
@@ -190,10 +229,7 @@ class Gateway:
                         on_protected_start=protected_start), 1110)
                 answer = final_text(report, time.perf_counter() - started)
                 evidence = json.dumps(report['evidence'], ensure_ascii=False) if report.get('evidence') else None
-                audit = json.dumps({k: v for k, v in report.items() if k not in ('evidence', 'catalog')}, ensure_ascii=False)
-                if len(audit.encode()) > 4194304:
-                    audit = json.dumps({'status': report['status'], 'audit_truncated': True,
-                                        'calls': [{k: v for k, v in c.items() if k != 'result'} for c in report.get('calls', [])]})
+                audit = audit_json(report)
                 if evidence and len(evidence.encode()) > 1048576:
                     evidence = None
                 log('generation_complete', post_id=post['id'], status=report['status'],

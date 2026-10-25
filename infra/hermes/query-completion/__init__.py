@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.8.3"
+VERSION = "groot-query-completion:1.9.2"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "832876a2eda1f95999d7e51a7d2171200d12a91f92d8796ebedd593e14583119"
@@ -593,7 +593,7 @@ def _inventory_request(request):
                 _RULE.search(request) and live_rule_request(request) or _DEVICE_TABLE.search(request))
             and bool(re.search(r"확인|조회|보여|목록|리스트|개수|몇\s*개|\b(?:ID|SID)\b", request, re.I))
             and not _WRITE.search(request) and not _NON_LIVE_REQUEST.search(request)
-            and not re.search(r"사용\s*중인지|불러오|로드|적재", request)
+            and not re.search(r"사용(?:\s*중인지|하는지|하고)|구동\s*경로|실행\s*경로|불러오|로드|적재", request)
             and not re.search(r"왜|원인|위험|분석|설명|동작|이름|명칭|심각도|레벨|메시지|탐지\s*조건|\b(?:severity|level|name)\b|전문|원문|다운로드|비교|차이|방법|역할|목적|서비스|상태|로그|경보|전체\s*(?:파일|내용)|(?:파일|내용)\s*전체|(?<![A-Za-z])(?:JSON|CSV)(?![A-Za-z])", request, re.I))
 
 

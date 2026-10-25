@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.7.0"
+VERSION = "groot-query-completion:1.8.3"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "c3611896791c85ebebcdef4570b057ca1907bb1ed9d8fd7e35471759aa615c0f"
+EVIDENCE_SOURCE_SHA256 = "832876a2eda1f95999d7e51a7d2171200d12a91f92d8796ebedd593e14583119"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -39,6 +39,7 @@ def _load_evidence():
 EVIDENCE = _load_evidence()
 SOURCE_ROOT = Path("/opt/hermes")
 SOURCE_SHA256 = {
+    "tools/mcp_tool_handlers.py": "d1b4463309a2de351aaf6c7cd8f7a2a1e83f5e26dbe058371c9eeb9d0c567903",
     "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
     "agent/conversation_loop.py": "c93ee86e1da583abc7cc57417380cd71241ae028c04a4cb8456580b52ffbf3d8",
     "agent/turn_context.py": "85f857dc3c317366d918516bc8b37a022f1020b34da0c3966a31bd289b2942e1",
@@ -592,6 +593,7 @@ def _inventory_request(request):
                 _RULE.search(request) and live_rule_request(request) or _DEVICE_TABLE.search(request))
             and bool(re.search(r"확인|조회|보여|목록|리스트|개수|몇\s*개|\b(?:ID|SID)\b", request, re.I))
             and not _WRITE.search(request) and not _NON_LIVE_REQUEST.search(request)
+            and not re.search(r"사용\s*중인지|불러오|로드|적재", request)
             and not re.search(r"왜|원인|위험|분석|설명|동작|이름|명칭|심각도|레벨|메시지|탐지\s*조건|\b(?:severity|level|name)\b|전문|원문|다운로드|비교|차이|방법|역할|목적|서비스|상태|로그|경보|전체\s*(?:파일|내용)|(?:파일|내용)\s*전체|(?<![A-Za-z])(?:JSON|CSV)(?![A-Za-z])", request, re.I))
 
 
@@ -1073,6 +1075,8 @@ def register(ctx):
         metadata = importlib.import_module("agent.message_metadata")
         api = importlib.import_module("agent.turn_api_request")
         call = importlib.import_module("agent.turn_api_call")
+        mcp_handlers = importlib.import_module("tools.mcp_tool_handlers")
+        original_result = mcp_handlers._call_tool_racing_stdio_death
         original = native.finish_text_response
         original_build = api.build_api_request
         original_call = call.perform_api_call
@@ -1084,7 +1088,8 @@ def register(ctx):
             raise ValueError("native_call_alias_mismatch")
         if getattr(original, "__capstone_query_completion__", None) == VERSION:
             if (getattr(original_build, "__capstone_query_completion__", None) != VERSION
-                    or getattr(original_call, "__capstone_query_completion__", None) != VERSION):
+                    or getattr(original_call, "__capstone_query_completion__", None) != VERSION
+                    or getattr(original_result, "__capstone_query_completion__", None) != VERSION):
                 raise ValueError("request_wrapper_version_mismatch")
             return
         if getattr(original, "__capstone_query_completion__", None) or hasattr(original, "__wrapped__"):
@@ -1093,6 +1098,8 @@ def register(ctx):
             raise ValueError("request_wrapper_version_mismatch")
         if getattr(original_call, "__capstone_query_completion__", None) or hasattr(original_call, "__wrapped__"):
             raise ValueError("call_wrapper_version_mismatch")
+        if getattr(original_result, "__capstone_query_completion__", None) or hasattr(original_result, "__wrapped__"):
+            raise ValueError("result_wrapper_version_mismatch")
         wrapped = make_wrapper(original, native, metadata.append_message, context.reanchor_current_turn_user_idx)
         build_wrapped = make_request_wrapper(original_build, context.reanchor_current_turn_user_idx)
         call_wrapped = make_call_wrapper(original_call, call)
@@ -1106,8 +1113,12 @@ def register(ctx):
         wrapped = alignment.final_wrapper(wrapped, original, native, metadata.append_message,
             context.reanchor_current_turn_user_idx, query_adapter, shared_chat)
         build_wrapped = alignment.request_wrapper(build_wrapped, query_adapter, shared_chat)
+        call_wrapped = alignment.selection_call_wrapper(call_wrapped, query_adapter)
+        result_wrapped = alignment.vulnerability_result_wrapper(original_result, shared_chat.READ, VERSION)
 
         def restore():
+            if mcp_handlers._call_tool_racing_stdio_death is result_wrapped:
+                mcp_handlers._call_tool_racing_stdio_death = original_result
             for module in (native, loop):
                 if module.finish_text_response is wrapped:
                     module.finish_text_response = original
@@ -1122,6 +1133,7 @@ def register(ctx):
         native.finish_text_response = loop.finish_text_response = wrapped
         api.build_api_request = loop.build_api_request = build_wrapped
         call.perform_api_call = loop.perform_api_call = call_wrapped
+        mcp_handlers._call_tool_racing_stdio_death = result_wrapped
         try:
             logging.getLogger("capstone.query_completion").info(
                 "version=%s aliases_installed=%s pid=%d", VERSION,

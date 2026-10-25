@@ -62,7 +62,14 @@ def parse_instant(value):
 
 def kst_time(value):
     parsed = parse_instant(value)
-    return parsed.astimezone(KST).isoformat() + ' (KST)' if parsed else '시간대 확인 필요'
+    if not parsed:
+        return '시간대 확인 필요'
+    try:
+        return parsed.astimezone(KST).isoformat() + ' (KST)'
+    except (ValueError, OverflowError):
+        # Wazuh manager keepalive can contain a year-9999 sentinel. It is
+        # not a future contact and must not crash the whole chat turn.
+        return '시각 특수값/변환 범위 초과 (실제 시각 미확인)'
 
 
 def _kst_table(text):
@@ -89,13 +96,17 @@ def _kst_table(text):
                 parsed = parse_instant(raw)
                 if parsed is None:
                     updates = []; break
-                updates.append((n,parsed))
+                try:
+                    shown = parsed.astimezone(KST).isoformat()
+                except (ValueError, OverflowError):
+                    shown = '시각 특수값/변환 범위 초과 (실제 시각 미확인)'
+                updates.append((n,shown))
             if updates:
                 header[column] = header[column].replace('UTC','KST')
                 lines[i] = '|'.join(header)
-                for n,parsed in updates:
+                for n,shown in updates:
                     cells = lines[n].split('|')
-                    cells[column] = ' '+parsed.astimezone(KST).isoformat()+' '
+                    cells[column] = ' '+shown+' '
                     lines[n] = '|'.join(cells)
     return ''.join(lines)
 

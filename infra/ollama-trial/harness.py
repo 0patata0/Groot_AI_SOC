@@ -18,6 +18,12 @@ if not contract_path.exists():
 contract_spec = importlib.util.spec_from_file_location('_soc_chat_contract', contract_path)
 CONTRACT = importlib.util.module_from_spec(contract_spec)
 contract_spec.loader.exec_module(CONTRACT)
+read_path = HERE / 'read_contract.py'
+if not read_path.exists():
+    read_path = HERE.parent / 'hermes/read_contract.py'
+read_spec = importlib.util.spec_from_file_location('_soc_read_contract', read_path)
+READ = importlib.util.module_from_spec(read_spec)
+read_spec.loader.exec_module(READ)
 path = HERE / 'query_grounding.py'
 if not path.exists():
     path = HERE / '__init__.py' if (HERE / '__init__.py').exists() else HERE.parent / 'hermes/query-completion/__init__.py'
@@ -34,11 +40,34 @@ SYSTEM_PROMPT = CONTRACT.system_prompt()
 def normalized(question):
     # Only classification: original user instructions still go to the model.
     text = re.sub(r'^\[비교시험 Q\d+\]\s*', '', question)
-    return re.sub(r'(?:변경이나\s*재시작|변경|수정|재시작)\s*(?:은\s*)?(?:하지\s*말고|없이)', '', text)
+    return READ.without_prohibitions(SHARED._unquoted_text(text))
+
+
+def read_plan(question):
+    text = normalized(question)
+    # Recover literal data only, never instructions inside quotations.
+    literals = EVIDENCE._AWARE_TIME.findall(question) + re.findall(r'(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])', question)
+    for value in literals:
+        if value not in text:
+            text += '\n' + value
+    return READ.plan(text, EVIDENCE._AWARE_TIME)
+
+
+def read_report(question, calls):
+    plan = read_plan(question)
+    return READ.report(plan, calls, EVIDENCE) if plan else None
+
+
+def ids_runtime_question(question):
+    text = normalized(question)
+    return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
+        and re.search(r'활성|가동|적재|사용\s*중|구동|불러오|로드', text)
+        and not re.search(r'WAF|Wazuh', text, re.I) and not READ.wants_write(text))
 
 
 def inventory_question(question):
     text = normalized(question)
+    if ids_runtime_question(question): return None
     if re.search(r'왜|원인|비교|차이|변경|수정|차단|삭제|추가|적용해|재시작|원문|전문|분석', text):
         return None
     if not (re.search(r'룰|규칙|rules?', text, re.I) and re.search(r'조회|보여|개수|목록|장비별|몇', text)):
@@ -97,6 +126,10 @@ def model_view(server, name, raw):
     if server != 'wazuh-ro':
         return raw
     text = wazuh_text(raw)
+    if name == 'get_wazuh_log_collector_stats' and isinstance(text, str):
+        text = re.sub(r'(?m)^(\s*(?:Start|End): ).*$', r'\1원본 시간대 검증 필요; 절대시각 미확인', text)
+    if name == 'get_wazuh_vulnerability_summary' and isinstance(text, str) and 'CVE:' in text:
+        return json.dumps(READ.vulnerability_view(text), ensure_ascii=False)
     return json.dumps({'result': EVIDENCE.kst_display(text), 'display_timezone': 'Asia/Seoul',
         'time_scope': '반환 표본만 표시합니다. 지정 절대 구간 전체 건수는 미확인입니다.'}, ensure_ascii=False) if text is not None else raw
 
@@ -114,7 +147,9 @@ def wazuh_text(raw):
 def violations(question, answer, calls):
     facts = facts_for(calls)
     issues = EVIDENCE.evidence_claim_violations(answer, facts) + EVIDENCE.calculated_json_violations(answer, facts)
-    if not calls and re.search(r'현재|조회|확인|보여|로그|오류|실패한|적용된', normalized(question)):
+    text = normalized(question)
+    if (not calls and not READ.wants_write(text)
+            and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
         issues.append('current_state_requires_actual_read')
     return sorted(set(issues))
 
@@ -123,10 +158,15 @@ def footer_free(text):
     return re.sub(r'\n*(?:---\s*\n)?(?:읽기 전용 시험|SOC 비교 시험)\s*·[^\n]*', '', text).strip()
 
 
+def reuse_only(question):
+    text = SHARED._unquoted_text(question)
+    return bool(re.search(r'표|테이블|정리', text) and re.search(r'(?:추가|새로|다시)?\s*조회(?:는|를|도)?\s*하지\s*말', text))
+
+
 def prior_inventory(question, evidence):
     # Pure reformat only. Fresh roots never receive evidence from the gateway.
     if (not isinstance(evidence, dict) or not re.search(r'표|테이블|정리', question)
-            or re.search(r'현재|지금|다시\s*조회|최신|갱신|변경|수정|삭제|추가', question)):
+            or re.search(r'현재|지금|다시\s*조회|최신|갱신|변경|수정|삭제|추가', normalized(question))):
         return None
     previous = evidence.get('question', '')
     if not inventory_question(previous):
@@ -140,13 +180,23 @@ def prior_inventory(question, evidence):
         return None
     rendered = inventory(combined, calls)
     if rendered:
-        return '이전 실제 조회 시각: ' + str(evidence.get('at_kst', '미확인')) + '\n새 조회 없이 검증된 동일 스레드 결과를 재구성했습니다.\n\n' + rendered.replace('현재 조회 결과', '이전 조회 결과')
+        stamps = []
+        for call in calls:
+            if call.get('name') == 'get_rule_change_target' and READ.successful(call):
+                data = READ.unpack(call['result'])
+                stamp = data.get('time_display', {}).get('rendered_at_kst') if isinstance(data, dict) else None
+                if EVIDENCE.parse_instant(stamp): stamps.append(EVIDENCE.kst_time(stamp))
+        when = ' / '.join(dict.fromkeys(stamps)) if stamps else str(evidence.get('at_kst', '미확인'))
+        return '이전 실제 조회 시각: ' + when + '\n새 조회 없이 검증된 동일 스레드 결과를 재구성했습니다.\n\n' + rendered.replace('현재 조회 결과', '이전 조회 결과')
     return None
 
 
 def guidance(question):
     text = normalized(question)
     result = SHARED.status_lookup_guidance(text)
+    plan = read_plan(question)
+    if plan:
+        result += '\n' + READ.guidance(plan)
     if inventory_question(question):
         result += '\n이번 규칙 목록은 요청한 장비의 파일을 빠짐없이 조회하세요. 장비 미지정이면 WAF/IDS/Wazuh 세 파일 모두입니다.'
     if tool_scope(question):
@@ -154,8 +204,17 @@ def guidance(question):
     return result
 
 
-def tool_scope(question):
+def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    plan = read_plan(question)
+    if plan:
+        scope = READ.scope(plan, calls)
+        if calls is not None and plan['kind'] == 'wazuh' and (not plan['needs_agent'] or READ.target_id(plan, calls)):
+            missing = READ.missing(plan, calls, EVIDENCE)
+            scope = {n for n in scope if any(m.startswith(n.split('__')[-1] + ':') or m == n.split('__')[-1] for m in missing)}
+        return scope
+    if ids_runtime_question(question):
+        return {'mcp__rule_a__get_service_action_target'}
     if inventory_question(question):
         return {'mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target'}
     text = normalized(question)
@@ -179,6 +238,9 @@ def tool_scope(question):
 
 
 def missing_reads(question, calls, diagnostic_targets=()):
+    plan = read_plan(question)
+    if plan:
+        return READ.missing(plan, calls, EVIDENCE)
     scope = tool_scope(question)
     inventory_request = inventory_question(question)
     if inventory_request:
@@ -342,7 +404,7 @@ def event_report(question, calls):
 
 
 def fallback(question, calls):
-    rendered = inventory(question, calls)
+    rendered = read_report(question, calls) or inventory(question, calls)
     if rendered:
         return rendered
     summary = EVIDENCE.literal_evidence_summary(facts_for(calls))
@@ -358,13 +420,8 @@ def write_progress(question, calls):
     These are submission observations, not a replacement for fresh apply-status
     verification. Preserve every real receipt even if a later attempt fails.
     """
-    text = SHARED._unquoted_text(question)
-    # Remove the negated verb, not the rest of a compound request: "기존 룰은
-    # 수정하지 말고 WAF/IDS/Wazuh 주석 변경안을 작성" still has three goals.
-    text = re.sub(r'(?:변경|수정|추가|삭제|원복|작성|준비|제출)(?:은|는|을|를)?\s*'
-                  r'(?:하지\s*(?:말고|마세요|마|말아(?:줘|주세요)?|않고|않는)|없이)', '', text)
-    text = re.sub(r'만들지\s*(?:말고|마세요|마|말아(?:줘|주세요)?)', '', text)
-    writing = bool(re.search(r'(?:변경안|원복안|제안).{0,80}(?:만들|작성|준비|요청|제출)|(?:추가|삭제|수정|변경|원복|복구)(?:해|하|하는|를|할|해줘)', text))
+    text = normalized(question)
+    writing = READ.wants_write(text)
     observed = {}
     for c in calls:
         if c.get('name') not in ('propose_rule_edit', 'propose_rule_change') or c.get('server') not in ('rule-write-a', 'rule-write-b'):
@@ -372,22 +429,32 @@ def write_progress(question, calls):
         target = c.get('arguments', {}).get('target')
         if target not in ('a:modsecurity-custom', 'a:suricata-local', 'b:wazuh-local-rules') or not target.startswith(c['server'][-1] + ':'):
             continue
-        entry = observed.setdefault(target, {'receipts': {}, 'failures': []})
+        entry = observed.setdefault(target, {'receipts': {}, 'failures': [], 'unresolved': False, 'rejected_edits': []})
         raw = c.get('result', '')
         valid = isinstance(raw, str) and hashlib.sha256(raw.encode()).hexdigest() == c.get('result_sha256')
         try: data = json.loads(raw) if valid else None
         except (ValueError, TypeError): data = None
         if not isinstance(data, dict):
             entry['failures'].append('호출 결과 미확인; 상태 조회 필요')
+            entry['unresolved'] = True
         elif c.get('is_error') or data.get('error'):
             # Transport errors may occur after a server has accepted the call.
-            entry['failures'].append('오류 반환/처리 상태 확인 필요: ' + str(data.get('error', '도구 오류'))[:160])
+            error = str(data.get('error', '도구 오류'))[:160]
+            if re.fullmatch(r'edit [1-9][0-9]* old_text must match exactly once in the original file', error):
+                entry['rejected_edits'].append(error)
+            else:
+                entry['failures'].append('오류 반환/처리 상태 확인 필요: ' + error)
+                entry['unresolved'] = True
         elif (data.get('target') == target and data.get('status') == 'pending' and data.get('review_posted') is True
               and re.fullmatch(r'[0-9a-f]{32}', str(data.get('proposal_id', '')))
               and all(re.fullmatch(r'[0-9a-f]{64}', str(data.get(k, ''))) for k in ('before_sha256', 'after_sha256'))):
             entry['receipts'][data['proposal_id']] = data
+            for error in entry['rejected_edits']:
+                entry['failures'].append('이전 편집 검증 거절; 이후 별도 후보 제출됨: ' + error)
+            entry['rejected_edits'] = []
         else:
             entry['failures'].append('제출 완료 근거 불충분; 상태 조회 필요')
+            entry['unresolved'] = True
     if not observed and (not writing or not re.search(r'룰|규칙|파일|주석|원복|modsecurity|suricata|wazuh', text, re.I)):
         return None
     expected = []
@@ -398,14 +465,17 @@ def write_progress(question, calls):
     rows = ['**요청 항목별 변경안 제출 근거**', '| 대상 | 상태 | 제안 ID 또는 확인 필요 사항 |', '| --- | --- | --- |']
     missing, hashes = [], []
     for target in expected:
-        entry = observed.get(target, {'receipts': {}, 'failures': []})
+        entry = observed.get(target, {'receipts': {}, 'failures': [], 'unresolved': False, 'rejected_edits': []})
         receipts, failures = entry['receipts'], entry['failures']
         for pid, data in receipts.items():
             rows.append('| ' + target + ' | 제출 당시 승인 대기 (적용 여부는 별도 확인) | ' + pid + ' |')
             hashes.append('- ' + target + ' / ' + pid + ' 변경 전 SHA: `' + data['before_sha256'] + '`; 후보 SHA: `' + data['after_sha256'] + '`.')
         for failure in failures:
-            rows.append('| ' + target + ' | 추가 확인 필요 | ' + re.sub(r'[\r\n|]', ' ', failure) + ' |')
-        if not receipts or failures:
+            status = '이전 거절 이력' if failure.startswith('이전 편집 검증 거절;') else '추가 확인 필요'
+            rows.append('| ' + target + ' | ' + status + ' | ' + re.sub(r'[\r\n|]', ' ', failure) + ' |')
+        for failure in entry['rejected_edits']:
+            rows.append('| ' + target + ' | 편집 검증 거절/미완료 | ' + failure + ' |')
+        if not receipts or entry['unresolved'] or entry['rejected_edits']:
             missing.append(target)
         if not receipts and not failures:
             rows.append('| ' + target + ' | 미처리/확인 필요 | 이번 요청의 변경안 제출 근거 없음 |')

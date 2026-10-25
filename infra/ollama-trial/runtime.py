@@ -69,10 +69,14 @@ async def run(config, request, *, on_protected_start=None):
     current = request.get('current_question', question)
     require(isinstance(current, str) and len(current) <= 16000, 'current_question')
     report['access_mode'] = mode
+    read_plan = harness.read_plan(current)
     cached = harness.prior_inventory(current, request.get('prior_evidence'))
     if cached and not request.get('discover_only'):
         report.update(status='completed', final_response=cached, evidence_reused=True,
                       evidence=request['prior_evidence'], total_seconds=time.perf_counter() - started)
+        return report
+    if harness.reuse_only(current) and not request.get('discover_only'):
+        report.update(status='partial', final_response='같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.', total_seconds=time.perf_counter() - started)
         return report
     chosen = request.get('tools')
     if chosen is None and not request.get('discover_only'):
@@ -144,6 +148,15 @@ async def run(config, request, *, on_protected_start=None):
                                 validate_call(backend, bare_name, arguments, mode)
                                 Draft202012Validator(input_schema).validate(arguments)
                                 budget.take()
+                                if read_plan and read_plan['kind'] == 'wazuh' and 'agent_id' in arguments:
+                                    expected = harness.READ.target_id(read_plan, report['calls'])
+                                    if not expected or arguments['agent_id'] != expected:
+                                        report.setdefault('rejected_calls', []).append({'server': backend,
+                                            'name': bare_name, 'arguments': arguments, 'reason': 'agent_identity_not_verified',
+                                            'mcp_executed': False})
+                                        return json.dumps({'error': 'agent_identity_not_verified',
+                                            'required': 'get_wazuh_agents로 대상 이름과 ID를 먼저 확인',
+                                            'observed_agent_id': expected}, ensure_ascii=False)
                                 tick = time.perf_counter()
                                 event = {'server': backend, 'name': bare_name, 'arguments': arguments,
                                          'via': 'structured_read_selection' if selection_active else 'native_tool_call'}
@@ -161,7 +174,9 @@ async def run(config, request, *, on_protected_start=None):
                                     result = await asyncio.wait_for(connection.call_tool(bare_name, arguments,
                                         read_timeout_seconds=timedelta(seconds=timeout)), timeout + 5)
                                     text = '\n'.join(c.text for c in result.content if getattr(c, 'type', None) == 'text')
-                                    require(len(text.encode()) <= 2097152, 'mcp_result_too_large')
+                                    event['result_bytes'] = len(text.encode())
+                                    limit = harness.READ.MAX_VULNERABILITY_BYTES if bare_name == 'get_wazuh_vulnerability_summary' else 2097152
+                                    require(event['result_bytes'] <= limit, 'mcp_result_too_large')
                                     event.update(is_error=bool(result.isError), result_sha256=hashlib.sha256(text.encode()).hexdigest(),
                                                  result=text)
                                     if is_protected:
@@ -178,7 +193,7 @@ async def run(config, request, *, on_protected_start=None):
                     call = make_call(server, tool.name, connector, schema)
                     self.tools.append(StructuredTool(name=name, description=tool.description or name,
                         args_schema=schema, coroutine=call,
-                        return_direct=bool(harness.inventory_question(current) and tool.name == 'get_rule_change_target')))
+                        return_direct=bool(read_plan or harness.inventory_question(current) and tool.name == 'get_rule_change_target')))
             require(len(catalog) == sum(len(available[s]) for s in active_servers), 'catalog_count')
             report['catalog'] = sorted(catalog, key=lambda x: x['alias'])
             report['exposed_tools'] = [t.name for t in self.tools]
@@ -207,23 +222,30 @@ async def run(config, request, *, on_protected_start=None):
             if not report['protected_calls']:
                 missing = (harness.inventory(current, report['calls'], missing_targets=True) or
                            harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ())))
-                literal = (harness.inventory(current, report['calls']) or
+                literal = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
                            harness.service_report(current, report['calls']) or
                            harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
                            harness.event_report(current, report['calls']))
                 issues = [] if literal else harness.violations(current, str(final), report['calls'])
-                if (missing or issues) and meter.used < steps:
+                repair_passes = 0
+                while (missing or issues) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES:
+                    repair_passes += 1
                     report['repair'] = {'missing_targets': missing, 'issues': issues}
                     instruction = ('현재 질문: ' + current + '\n조회 근거 점검 결과: ' + json.dumps(report['repair'], ensure_ascii=False) +
                         '\n누락된 실제 조회를 마치고 근거에 맞춰 최종 답변을 정정하세요. 이미 성공한 조회는 반복하지 마세요. '
                         '이 안내는 변경이나 승인이 아닙니다.\n' + harness.EVIDENCE.literal_evidence_summary(harness.facts_for(report['calls'])))
-                    read_scope = harness.tool_scope(current)
+                    read_scope = harness.tool_scope(current, report['calls'])
                     if read_scope and budget.used < budget.limit:
                         # The same LLM selects real read calls in constrained JSON
                         # when native tool calling stalls. No fixed fallback reads,
                         # protected tools, inferred approvals or incident decisions.
                         selected_tools = {t.name: t for t in agent.adapter.tools if t.name in read_scope}
-                        schemas = {name: tool.args_schema for name, tool in selected_tools.items()}
+                        schemas = {name: json.loads(json.dumps(tool.args_schema)) for name, tool in selected_tools.items()}
+                        expected = harness.READ.target_id(read_plan, report['calls']) if read_plan and read_plan['kind'] == 'wazuh' else None
+                        if expected:
+                            for input_schema in schemas.values():
+                                if 'agent_id' in input_schema.get('properties', {}):
+                                    input_schema['properties']['agent_id']['enum'] = [expected]
                         schema = harness.selection_schema(schemas, budget.limit - budget.used)
                         report['repair']['method'] = 'structured_read_selection'
                         selector = llm.with_structured_output(schema, method='json_schema')
@@ -240,7 +262,9 @@ async def run(config, request, *, on_protected_start=None):
                         final = ''  # Only observed facts can render this bounded read path.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
-                rendered = (harness.inventory(current, report['calls']) or
+                    missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
+                    issues = [] if harness.read_report(current, report['calls']) else harness.violations(current, str(final), report['calls'])
+                rendered = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
                             harness.service_report(current, report['calls']) or
                             harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
                             harness.event_report(current, report['calls']))

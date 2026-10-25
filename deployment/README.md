@@ -1,6 +1,6 @@
 # 초기 설치기의 Hermes 확장
 
-> **2026-10-25 공통 채팅 소스:** 초기 SIEM 설치에 query 플러그인7파일(문맥/훅과 합계12)을 배치한다. Ollama도 같은 정책/근거 소스를 사용하며 읽기90초·보호720초 설정을 연계한다. 추가 패키지·이미지·포트는 없다. 기존 운영은 증분 반영만 수행했고 새3VM 전체 설치는 미검증이다. [전체 파일과 native 차이](../infra/hermes/chat-harness.md) · [현황](../STATUS.md).
+> **2026-10-25 공통 채팅 소스:** 초기 SIEM 설치에 query 플러그인8파일(문맥/훅과 합계13)을 배치한다. Ollama도 같은 정책/근거 소스를 사용하며 읽기90초·보호720초 설정을 연계한다. 추가 패키지·이미지·포트는 없다. 기존 운영은 증분 반영만 수행했고 새3VM 전체 설치는 미검증이다. [전체 파일과 native 차이](../infra/hermes/chat-harness.md) · [현황](../STATUS.md).
 
 > **2026-10-25 봇 프로필:** 초기 Hermes 봇과 선택적 Ollama 봇 생성 시 [동봉 아이콘](bot-icons/sources.json)을 지정한다. `deploy.sh` 소스 archive에 PNG·출처/SHA·라이선스와 `bot_profiles.py`를 포함하므로 서버 외부 다운로드와 추가 패키지는 없다. 운영 기존 계정은 별도 최소 API 갱신으로 적용했으며 새3VM 전체 설치 시험과 구분한다.
 
@@ -38,7 +38,7 @@ SIEM 설치기의 조회 플러그인2파일 매핑과 소스 SHA 프로필이 �
 
 ## 포함 파일과 권한
 
-SIEM 설치기는 기존 Mattermost 문맥 플러그인·공개 채널 동기화 훅 5개 파일에 [조회 응답 보완 플러그인](../infra/hermes/query-completion/__init__.py)의 `__init__.py`, `plugin.yaml`, `alignment.py`, `grounding.py`, `chat_harness.py`, `chat_contract.py`, `soc_policy.md`를 더해 총12개 파일을 배치한다. `plugins.enabled`에는 `groot-mattermost-context`, `groot-query-completion`을 지정한다. 모든 파일은 신규 Hermes 서비스 계정 소유, 파일 `0600`·디렉터리 `0700`이며, 소스 SHA는 배포 프로필에 포함된다. 설치 후 소스가 달라지면 같은 설치의 재검증에서 프로필 불일치로 거절한다.
+SIEM 설치기는 기존 Mattermost 문맥 플러그인·공개 채널 동기화 훅 5개 파일에 [조회 응답 보완 플러그인](../infra/hermes/query-completion/__init__.py)의 `__init__.py`, `plugin.yaml`, `alignment.py`, `grounding.py`, `chat_harness.py`, `chat_contract.py`, `soc_policy.md`, `read_contract.py`를 더해 총13개 파일을 배치한다. `plugins.enabled`에는 `groot-mattermost-context`, `groot-query-completion`을 지정한다. 모든 파일은 신규 Hermes 서비스 계정 소유, 파일 `0600`·디렉터리 `0700`이며, 소스 SHA는 배포 프로필에 포함된다. 설치 후 소스가 달라지면 같은 설치의 재검증에서 프로필 불일치로 거절한다.
 
 기본 SIEM 단계의 도구는 Wazuh·security-events 읽기 MCP2개다. 이후 별도 SOC 확장 단계가 정확 후보 승인 도구와 운영 SOUL을 설치한다. 조회 플러그인 자체가 쓰기 권한이나 승인 우회 경로를 추가하지는 않는다.
 

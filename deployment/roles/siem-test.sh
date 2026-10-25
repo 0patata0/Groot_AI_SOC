@@ -213,14 +213,14 @@ class Tests(unittest.TestCase):
         config={'mcp_servers':{'only-readonly':{}},'toolsets':['mcp-wazuh-ro']}
         baseline=copy.deepcopy(config)
         env=self.n['install_hermes_extensions'](self.n['DEST']/'bot',user,creds,config)
-        self.assertEqual(len(written),12)
-        self.assertEqual(len(reads),12)
+        self.assertEqual(len(written),13)
+        self.assertEqual(len(reads),13)
         self.assertEqual({pathlib.Path(p).name for p in written},{'__init__.py','plugin.yaml','channel_sync.py','HOOK.yaml','handler.py','grounding.py',
-            'alignment.py','chat_contract.py','soc_policy.md','chat_harness.py'})
+            'alignment.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py'})
         self.assertTrue(any('/plugins/groot-mattermost-context/' in p for p in written))
         self.assertTrue(any('/hooks/groot-mattermost-channel-sync/' in p for p in written))
         self.assertEqual({pathlib.Path(p).name for p in written if '/plugins/groot-query-completion/' in p},
-                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','chat_contract.py','soc_policy.md','chat_harness.py'})
+                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py'})
         self.assertTrue(all(value[1:]==(0o600,995,986) for value in written.values()))
         self.assertTrue(all(value[1:]==(0o700,995,986) for value in created))
         self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context','groot-query-completion']})
@@ -264,7 +264,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(calls,[(self.n['SOURCE']/'infra/hermes/query-completion/__init__.py',512*1024)])
         self.assertEqual(set(pins),{'agent/turn_final_response.py','agent/conversation_loop.py',
                                    'agent/turn_context.py','agent/message_metadata.py',
-                                   'agent/turn_api_request.py','agent/chat_completion_helpers.py','agent/turn_api_call.py'})
+                                   'agent/turn_api_request.py','agent/chat_completion_helpers.py','agent/turn_api_call.py',
+                'tools/mcp_tool_handlers.py'})
         self.assertTrue(all(len(value)==64 for value in pins.values()))
         # Parsing pins must not execute other top-level plugin code.
         self.assertEqual(self.n['query_completion_source_pins'](raw+b'\nraise RuntimeError("must_not_execute")\n'),pins)

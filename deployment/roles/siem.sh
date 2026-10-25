@@ -144,6 +144,7 @@ def hermes_extension_files():
         for name in ('__init__.py', 'plugin.yaml', 'alignment.py')} | {
         'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py',
         'infra/hermes/chat_contract.py': 'plugins/groot-query-completion/chat_contract.py',
+        'infra/hermes/read_contract.py': 'plugins/groot-query-completion/read_contract.py',
         'infra/hermes/SOUL.groot.md': 'plugins/groot-query-completion/soc_policy.md',
         'infra/ollama-trial/harness.py': 'plugins/groot-query-completion/chat_harness.py'}
 def query_completion_source_pins(raw=None):
@@ -163,7 +164,8 @@ def query_completion_source_pins(raw=None):
         raise Refused('query_completion_source_pins_invalid') from None
     expected = {'agent/turn_final_response.py','agent/conversation_loop.py',
                 'agent/turn_context.py','agent/message_metadata.py',
-                'agent/turn_api_request.py','agent/chat_completion_helpers.py','agent/turn_api_call.py'}
+                'agent/turn_api_request.py','agent/chat_completion_helpers.py','agent/turn_api_call.py',
+                'tools/mcp_tool_handlers.py'}
     need(len(node.keys)==len(expected) and set(pins)==expected and
          all(isinstance(value,str) and re.fullmatch(r'[0-9a-f]{64}',value) for value in pins.values()),
          'query_completion_source_pins_invalid')

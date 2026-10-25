@@ -71,6 +71,20 @@ class BindingTests(unittest.TestCase):
                 self.assertIn(value["container"], profile(role)["container_ids"].values())
             self.assertEqual(m.DOCKER, "/usr/local/libexec/capstone-soc-docker")
 
+    def test_installed_wazuh_status_accepts_disabled_optional_daemons_only(self):
+        m = module("rule_change_executor.py", "b")
+        target = m.TARGETS["b:wazuh-local-rules"]
+        command = [m.DOCKER, "exec", target["container"], "/var/ossec/bin/wazuh-control", "status"]
+        output = (b"wazuh-clusterd not running...\nwazuh-analysisd is running...\n"
+                  b"wazuh-remoted is running...\nwazuh-db is running...\n")
+        with mock.patch.object(m.subprocess, "run", return_value=mock.Mock(returncode=1, stdout=output)):
+            self.assertEqual(m.Runner().call(command), output)
+            with self.assertRaises(m.RuleChangeError):
+                m.Runner().call(command[:-1] + ["restart"])
+        with mock.patch.object(m.subprocess, "run", return_value=mock.Mock(returncode=1, stdout=output.replace(b"wazuh-db is running...", b"wazuh-db not running..."))):
+            with self.assertRaises(m.RuleChangeError):
+                m.Runner().call(command)
+
     def test_container_position_changes_without_changing_engine_kind(self):
         tree = ast.parse(rendered("rule_change_executor.py"))
         calls = [n for n in ast.walk(tree) if isinstance(n, ast.List) and len(n.elts) > 3 and

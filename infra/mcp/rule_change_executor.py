@@ -678,16 +678,31 @@ class Broker:
         return True
 
 
+def _wazuh_core_ready(status):
+    """Optional disabled daemons make wazuh-control status exit 1 on a healthy manager."""
+    lines = [line.strip() for line in status.splitlines()]
+    for process in ("wazuh-analysisd", "wazuh-remoted", "wazuh-db"):
+        observed = [line for line in lines if line.startswith(process + " ")]
+        if observed not in ([process + " is running"], [process + " is running..."]):
+            return False
+    return True
+
+
 class Runner:
     def call(self, argv, timeout=30):
         try:
             result = subprocess.run(argv, capture_output=True, timeout=timeout, check=False)
         except (OSError, subprocess.TimeoutExpired) as exc:
             raise RuleChangeError("service command unavailable or timed out") from exc
-        if result.returncode:
-            raise RuleChangeError("service command failed: %s" % " ".join(argv[:4]))
         if len(result.stdout) > 1024 * 1024:
             raise RuleChangeError("service command output too large")
+        if result.returncode:
+            # This is a status-only exception, never a general success-code override.
+            wazuh_status = (len(argv) == 5 and list(argv[:2]) == [DOCKER, "exec"] and
+                            list(argv[3:]) == ["/var/ossec/bin/wazuh-control", "status"])
+            if (result.returncode != 1 or not wazuh_status or
+                    not _wazuh_core_ready(result.stdout.decode("utf-8", "replace"))):
+                raise RuleChangeError("service command failed: %s" % " ".join(argv[:4]))
         return result.stdout
 
 
@@ -1128,7 +1143,7 @@ class Engine:
                 self._inspect(spec)
                 status = self.runner.call([DOCKER, "exec", spec["container"],
                                            "/var/ossec/bin/wazuh-control", "status"], timeout=15).decode("utf-8", "replace")
-                if all("%s is running" % process in status for process in ("wazuh-analysisd", "wazuh-remoted", "wazuh-db")):
+                if _wazuh_core_ready(status):
                     return
             except RuleChangeError:
                 pass

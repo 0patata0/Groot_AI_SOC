@@ -1042,6 +1042,56 @@ class ExecutorTests(unittest.TestCase):
         self.assertTrue(any(any(part.endswith("wazuh-control") for part in cmd) for cmd in runner.commands))
         self.assertTrue(any(cmd[1] == "restart" for cmd in runner.commands))
 
+    def test_wazuh_status_exit_one_with_disabled_optional_daemons(self):
+        output = (b"wazuh-clusterd not running...\nwazuh-maild not running...\n"
+                  b"wazuh-analysisd is running...\nwazuh-remoted is running...\nwazuh-db is running...\n")
+        command = [MOD.DOCKER, "exec", "manager", "/var/ossec/bin/wazuh-control", "status"]
+        runner = MOD.Runner()
+        with mock.patch.object(MOD.subprocess, "run", return_value=mock.Mock(returncode=1, stdout=output)):
+            self.assertEqual(runner.call(command), output)
+            for changed in (command[:-1] + ["restart"],
+                            [MOD.DOCKER, "exec", "manager", "/bin/sh", "status"],
+                            [MOD.DOCKER, "restart", "manager"], command + ["extra"]):
+                with self.subTest(command=changed), self.assertRaises(MOD.RuleChangeError):
+                    runner.call(changed)
+        for code in (2, 125, -9):
+            with self.subTest(code=code), mock.patch.object(MOD.subprocess, "run", return_value=mock.Mock(returncode=code, stdout=output)):
+                with self.assertRaises(MOD.RuleChangeError):
+                    runner.call(command)
+
+    def test_approved_wazuh_edit_does_not_roll_back_for_disabled_optional_daemons(self):
+        engine, runner, target, current = self.engine("wazuh")
+        original = runner.call
+        output = (b"wazuh-clusterd not running...\nwazuh-analysisd is running...\n"
+                  b"wazuh-remoted is running...\nwazuh-db is running...\n")
+        def live_status(argv, timeout=30):
+            if "/var/ossec/bin/wazuh-control" in argv:
+                with mock.patch.object(MOD.subprocess, "run", return_value=mock.Mock(returncode=1, stdout=output)):
+                    return MOD.Runner().call(argv, timeout)
+            return original(argv, timeout)
+        runner.call = live_status
+        proposal = self.propose(engine, target, current, "wazuh")
+        self.broker.rows[proposal["proposal_id"]]["status"] = "approved"
+        self.assertEqual(engine.worker_once()[0]["status"], "applied")
+        self.assertEqual(self.broker.consumes, 1)
+        self.assertEqual(runner.restart_count, 1)
+        self.assertEqual(Path(engine.targets[target]["path"]).read_text(), self.candidate("wazuh"))
+
+    def test_wazuh_required_process_status_is_exact_and_unambiguous(self):
+        healthy = "wazuh-analysisd is running...\nwazuh-remoted is running...\nwazuh-db is running...\n"
+        self.assertTrue(MOD._wazuh_core_ready(healthy))
+        self.assertTrue(MOD._wazuh_core_ready(healthy.replace("...", "")))
+        for process in ("wazuh-analysisd", "wazuh-remoted", "wazuh-db"):
+            line = process + " is running...\n"
+            for bad in (healthy.replace(line, ""), healthy.replace(line, process + " not running...\n"),
+                        healthy.replace(line, "stale: " + line), healthy + line,
+                        healthy + process + " not running...\n", healthy.replace(line, process + " is running... stale\n")):
+                with self.subTest(process=process, status=bad):
+                    self.assertFalse(MOD._wazuh_core_ready(bad))
+                    with mock.patch.object(MOD.subprocess, "run", return_value=mock.Mock(returncode=1, stdout=bad.encode())):
+                        with self.assertRaises(MOD.RuleChangeError):
+                            MOD.Runner().call([MOD.DOCKER, "exec", "manager", "/var/ossec/bin/wazuh-control", "status"])
+
     def test_base_drift_after_approval_rejected_before_consume(self):
         engine, _, target, current = self.engine("waf")
         proposal = self.propose(engine, target, current, "waf")

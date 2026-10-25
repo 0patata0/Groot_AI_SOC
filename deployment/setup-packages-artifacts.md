@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-10-25 Wazuh 승인 적용 상태 검사 보완:** 선택 기능이 꺼져 `wazuh-control status`가 종료1이어도 정확한 Docker status 명령과 analysisd/remoted/db의 유일한 정상 행이 확인되면 준비 완료로 처리한다. 다른 명령·오류 코드·필수 프로세스 누락/정지/모순은 거절한다. 변경 소스는 `rule_change_executor.py`이며 루트 deploy.sh의 기존 canonical 소스/호스트 바인딩 경로에 포함된다. 추가 패키지·설정 키·권한·포트가 없어 예제와 deb/wheel 반입 목록의 실행 내용은 그대로다. 기존 B는 root 백업 후 helper만 증분 반영했으며 새3VM 전체 설치는 별도 미검증이다. [검증·적용 범위](../STATUS.md).
+
 > **2026-10-25 프로필 자산:** `deployment/bot-icons/`의 두 PNG·출처/SHA·라이선스 및 `deployment/bot_profiles.py`는 기존 `deploy.sh` 소스 archive에 포함한다. 별도 deb/wheel/이미지 반입은 추가하지 않는다. 설치 중 인터넷 다운로드가 필요하지 않다.
 
 

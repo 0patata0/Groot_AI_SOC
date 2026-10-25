@@ -1,5 +1,7 @@
 # Mattermost 조회 응답 보완
 
+> **2026-10-25 현행1.7.0:** 일반 Mattermost35B 채팅의 SOC 정책/추론off·temp0·top_p0.95·출력2048/범위 선택/읽기 근거/쓰기 누락 보고를 Ollama와 공유한다. 새 루트의 다른 채널 첨부 글은 API 복사에서 제외하며 저장 이력은 보존한다. native 반복한도12는 Ollama 모델 카운터12와 다른 단위다. 자동관리 CLI는 이 옵션 변경에서 제외한다. 아래1.6.0/선택적medium 기록은 과거 상태다. [설계·설치·남는 차이](../chat-harness.md) · [현재 검증](../../../STATUS.md).
+
 ## 2026-10-25 실제 채팅과 새 스레드
 
 기존/새스레드에동일3질문을순차게시해최종native저장/API/WebSocket수신6건을확인했다. 룰25.466→6.722초,표0.182→0.143초,IDS39.547→25.750초이며각1회·캐시/부하비통제다. 기존룰은미조회답변후정정1회,새룰은바로3대상을조회했다. 새IDS는미확인을명시한문장에근거검사가정정1회를요구해오탐검토대상이다. 이번코드수정은없다.
@@ -173,7 +175,7 @@ Hermes 원본 파일을 덮어쓰지 않는다. 등록 과정은 원래 함수 �
 
 ## 배치와 초기 설치
 
-`plugin.yaml`, `__init__.py`를 `$HERMES_HOME/plugins/groot-query-completion/`에 두고 `config.yaml`의 `plugins.enabled`에 `groot-query-completion`을 추가한다. 이 환경의 컨테이너 안 `HERMES_HOME`은 `/opt/data`이며, SSH용 HOME인 `/opt/data/home`과 구분한다.
+`plugin.yaml`, `__init__.py`, `alignment.py`와 [공유 소스4개](../chat-harness.md)를 `$HERMES_HOME/plugins/groot-query-completion/`에 두고 `config.yaml`의 `plugins.enabled`에 `groot-query-completion`을 추가한다. 이 환경의 컨테이너 안 `HERMES_HOME`은 `/opt/data`이며, SSH용 HOME인 `/opt/data/home`과 구분한다.
 
 플러그인과 설정은 영속 데이터에 있으므로 동일 데이터를 마운트한 기존 컨테이너의 재시작에도 유지된다. 컨테이너를 재생성할 때도 해당 데이터와 호환되는 검토 이미지를 함께 보존해야 한다. 데이터가 없는 새 컨테이너나 새 이미지 자체에 자동 포함되는 구성은 아니다.
 

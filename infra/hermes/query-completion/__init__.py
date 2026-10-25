@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.6.0"
+VERSION = "groot-query-completion:1.7.0"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "c3611896791c85ebebcdef4570b057ca1907bb1ed9d8fd7e35471759aa615c0f"
@@ -1096,6 +1096,16 @@ def register(ctx):
         wrapped = make_wrapper(original, native, metadata.append_message, context.reanchor_current_turn_user_idx)
         build_wrapped = make_request_wrapper(original_build, context.reanchor_current_turn_user_idx)
         call_wrapped = make_call_wrapper(original_call, call)
+        alignment_path = Path(__file__).with_name("alignment.py")
+        alignment_spec = importlib.util.spec_from_file_location("_capstone_chat_alignment", alignment_path)
+        alignment = importlib.util.module_from_spec(alignment_spec)
+        alignment_spec.loader.exec_module(alignment)
+        shared_chat = alignment.load_harness()
+        query_adapter = SimpleNamespace(VERSION=VERSION, current_request_text=current_request_text,
+            _inventory_payload=_inventory_payload, _remaining=_remaining, _with_final_text=_with_final_text)
+        wrapped = alignment.final_wrapper(wrapped, original, native, metadata.append_message,
+            context.reanchor_current_turn_user_idx, query_adapter, shared_chat)
+        build_wrapped = alignment.request_wrapper(build_wrapped, query_adapter, shared_chat)
 
         def restore():
             for module in (native, loop):

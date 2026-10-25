@@ -1,0 +1,38 @@
+# Hermes·Ollama 공통 채팅 기준
+
+2026-10-25 운영 채팅에 `soc-chat-contract:1.0.0` / Hermes `query-completion:1.7.0`을 적용했다. 실행·재시도·종료의 내부 구현을 유지하면서 공통으로 제어할 수 있는 정책·입력 조건·근거 검사를 맞춘다. 최종 실측·배포·Git 상태는 [STATUS](../../STATUS.md)를 따른다.
+
+| 항목 | 공통 기준 |
+| --- | --- |
+| 모델 | 기존 DGX `qwen3.6:35b` |
+| 일반 채팅 생성 옵션 | 추론 off, temperature 0, top_p 0.95, 출력 한도 2,048토큰 |
+| SOC 지침 | [chat_contract.py](chat_contract.py)가 [SOUL.groot.md](SOUL.groot.md)와 조회·변경 완료 지침을 결합한 동일 문자열/해시 |
+| 도구 권한 | 기존 8 MCP/36도구, 읽기27·보호9. 일반 shell/sudo/Docker 위임 없음 |
+| 도구 노출 | 같은 단순 룰·IDS·이벤트·전체 진단 범위 선택 함수. A/B 실제 호스트의 target enum만 노출 |
+| 새 스레드 | 다른 채널 루트 글을 모델 입력에 섞지 않음. Hermes는 정확한 native 첨부 문맥의 API 복사본만 투영하며 저장 이력은 보존 |
+| 읽기 완료 근거 | 파일 SHA/정의 ID, IDS 실제 대상·경로, 진단 대상 전체 목록, 실제 조회 구간·표본을 같은 코드로 검증·표시 |
+| 변경안 진행 보고 | 실제 제출 영수증의 대상·제안 ID·전후 SHA·승인 카드 게시를 검증. 일부 실패해도 이미 생성된 모든 제안 ID와 실패/미처리 대상을 표시 |
+| 시간 | 설명/표는 KST. 원문 로그·룰·승인 해시는 보존 |
+| 실행 상한 | Hermes native `max_iterations=12`, Ollama 모델 호출 기본12회. 누락 조회 정정은 최대1회이며 총 예산 안에서 수행 |
+| MCP 타임아웃 | Hermes 읽기 전용5서버90초, 보호3서버720초. Ollama는 읽기 호출90초/보호 호출720초 |
+
+Hermes는 `/v1/chat/completions`의 `reasoning_effort=none`, Ollama는 `/api/chat`의 `think=false`를 사용한다. 실제 설치 SDK의 직렬화 값과 운영 요청 메타데이터를 확인한다. `extra_body`에 남은 추론·샘플링 값이 공통 옵션을 덮지 않게 제거한다.
+
+전체 프롬프트·메모리까지 동일하다는 뜻은 아니다. Hermes의 native persona, 전역 Memory, 세션 저장/압축과 Ollama의 스레드 이력 구성은 남는다. 새 루트의 다른 채널 문맥 제외는 저장된 Memory·대화 삭제가 아니며, 같은 스레드의 후속 문맥도 유지한다. 공통 SOC 지침의 SHA와 전체 프롬프트 SHA를 구별해야 한다.
+
+## 실행부에 남는 차이
+
+- Hermes의 native iteration은 API 재시도·로컬 표시 단계·grace 처리와 관계가 있다. Ollama의 실제 모델 호출 카운터12회와 엄밀히 같은 단위가 아니다. Ollama의 별도 도구32회 한도를 Hermes에도 동일하게 강제했다고 주장하지 않는다.
+- 누락 조회를 보완할 때 Hermes는 native 대화 continuation을, Ollama는 같은 LLM의 JSON Schema 기반 읽기 호출 선택을 사용한다. 둘 다 모델이 도구·인자를 선택하며 고정 분기로 대신 조회하거나 보호 작업을 자동 재실행하지 않는다.
+- Hermes의 취소·연결 재시도·종료·저장은 native 경로를 따른다. Ollama는 SQLite 작업 큐와 동일 보호 인자 중복 실행 방지를 별도로 유지한다. 승인·증거·TTL·보호 주소 검사는 같은 서버가 강제한다. 일반 대화나 두 봇의 합의로 승인하지 않는다.
+- Hermes의 `resp`는 읽기 `list_blocks`와 보호 작업이 같은 서버에 있으므로 서버 단위720초다. Ollama는 해당 읽기 호출에는90초를 적용한다. 접속/모델 HTTP/전체 턴 취소 한도도 native 차이가 남는다. Ollama 첫 실행900초·정정180초·gateway1110초는 응답 목표 시간이 아닌 실패 상한이다.
+- 변경안 표는 **이번 요청에서 확인한 제출 근거**다. 제출 당시 pending을 현재 적용 완료로 바꾸지 않는다. 오류·통신 두절을 미적용으로 단정하지 않으며 상태 재조회가 필요하다. 적용/원복 성공은 기존 상태 조회와 실제 SHA·런타임 확인을 별도로 요구한다. 임의 자연어의 모든 목적·영향·원복 설명을 완전히 검증하는 의미 분석기는 아니다.
+- 자동 사건 관리 controller는 Hermes만 담당하며 이번 일반 Mattermost 채팅 옵션 정렬에서 제외한다. 자동관리 이관·동시 사건 소비·모델 교체는 하지 않았다.
+
+## 배치와 검증
+
+초기 설치 진입점은 루트 `deploy.sh`다. SIEM 내부 설치기는 기존 문맥/훅5파일과 query 플러그인7파일을 배치한다. 후자는 `__init__.py`, `plugin.yaml`, `alignment.py`, `grounding.py`, `chat_harness.py`, `chat_contract.py`, `soc_policy.md`이며 마지막 네 파일은 각각 canonical 소스를 복사한다. Ollama 내부 설치기도 같은 정책·grounding 소스를 복사하고 receipt SHA를 검사한다. 새 wheel/deb/이미지/포트는 없다. 오프라인 반입 시 기존 manifest 바이너리와 **갱신된 프로젝트 소스 전체**를 함께 반입해야 한다.
+
+기존 운영 서버는 전체 초기 설치기로 덮지 않는다. 유휴 확인→root 복구 백업→해당 플러그인/설정과 Ollama 증분 upgrade→gateway 재시작→공통 소스 SHA·SDK 옵션·실제 채팅 확인 순서로 반영했다. Memory·SOUL 원본·자동관리 설정·기존 룰을 보존하고 timer 상태를 복원했다.
+
+검사는 중복/역순/미연결 호출 ID, 잘못된 영수증·해시, 성공 후 실패의 제안 ID 보존, 누락 대상, 관리 CLI 제외, native 등록/해제와 설치 경로를 포함한다. 과거 Ollama W4 실패 기록 재생에서는 두 성공 제안과 Wazuh 실패를 모두 표시한다. 이는 새로운 실제 쓰기 성공이나 점수 상승을 증명하지 않는다. 실제 쓰기6유형 반복 채점·공격/대응 E2E·새3VM 전체 설치는 별도 후속이다.

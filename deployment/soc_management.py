@@ -665,7 +665,7 @@ def activate_siem(s):
     need(set(hc["mcp_servers"]) == {"wazuh-ro", "security-events"}, "unexpected_existing_MCP_servers")
     for name, alias in (("rule-a", "soc-rule-a"), ("rule-b", "soc-rule-b"), ("rule-write-a", "soc-rule-write-a"), ("rule-write-b", "soc-rule-write-b"), ("resp", "soc-resp")):
         hc["mcp_servers"][name] = {"command": "ssh", "args": ["-T", "-F", "/opt/data/home/.ssh/soc_config", alias],
-            "connect_timeout": 30, "timeout": 660 if name == "resp" else 180, "supports_parallel_tool_calls": False,
+            "connect_timeout": 30, "timeout": 720 if name in ("resp", "rule-write-a", "rule-write-b") else 90, "supports_parallel_tool_calls": False,
             "tools": {"resources": False, "prompts": False}, "trust": "full"}
     tools = ["mcp-wazuh-ro", "mcp-security-events", "mcp-rule-a", "mcp-rule-b", "mcp-rule-write-a", "mcp-rule-write-b", "mcp-resp"]
     hc["toolsets"] = tools; hc["platform_toolsets"] = {"mattermost": tools, "cli": tools}

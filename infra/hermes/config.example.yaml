@@ -1,3 +1,4 @@
+# 2026-10-25 chat-contract1.0/query-completion1.7: 일반 Mattermost 추론off/temp0/top_p0.95/output2048, native iteration<=12. MCP 읽기90초/보호720초. 자동관리CLI 추론설정 별도.
 # query-completion1.6.0: IDS=a:suricata, 조회 time_display 및 calculate_time의 KST/경과값 사용. 원본 로그/승인 해시는 보존.
 # 2026-10-25 현행: 조회는 rule-a/b(ruleview), 변경 제안은 rule-write-a/b(rulechg) 단일 경로. 총8논리 MCP/36도구이며 추가 VM은 없다. 아래 과거 배포 이력은 당시 범위다.
 # Hermes Agent 설정 템플릿 — Groot SOC. 실배치 경로: Groot_B /opt/hermes-data/config.yaml (컨테이너 /opt/data/config.yaml)
@@ -19,7 +20,7 @@ mcp_servers:
     env:
       HOME: /opt/data/home                    # Hermes 는 셸 env 를 전부 넘기지 않으므로 HOME 명시
     connect_timeout: 60
-    timeout: 180
+    timeout: 90
     supports_parallel_tool_calls: false
     tools:
       resources: false
@@ -31,7 +32,7 @@ mcp_servers:
     env:
       HOME: /opt/data/home
     connect_timeout: 60
-    timeout: 180
+    timeout: 90
     supports_parallel_tool_calls: false
     tools:
       resources: false
@@ -42,7 +43,7 @@ mcp_servers:
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "mcp-b", "system-diagnostics"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 30
+    timeout: 90
     supports_parallel_tool_calls: false
     tools: {resources: false, prompts: false}
     trust: full                               # 반환 오류는 비신뢰 증거, 승인/운영 명령 아님
@@ -52,7 +53,7 @@ mcp_servers:
     env:
       HOME: /opt/data/home
     connect_timeout: 60
-    timeout: 180
+    timeout: 720
     supports_parallel_tool_calls: false
     tools:
       resources: false
@@ -64,7 +65,7 @@ mcp_servers:
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-a"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 420                            # 2026-10-13 라이브: 후보 검사·분할 검토 게시 허용 시간
+    timeout: 90
     supports_parallel_tool_calls: false
     trust: full                               # 승인 강제는 서버측 브로커·root 실행기
   rule-b:                                     # B 고정 파일/작업 조회4종, ruleview 읽기 전용 계정/별도 키
@@ -72,7 +73,7 @@ mcp_servers:
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-b"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 420
+    timeout: 90
     supports_parallel_tool_calls: false
     trust: full
   rule-write-a:                              # rulechg 변경 제안 전용; 조회 도구 없음
@@ -80,7 +81,7 @@ mcp_servers:
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-write-a"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 420
+    timeout: 720
     supports_parallel_tool_calls: false
     trust: full
   rule-write-b:                              # rulechg 변경 제안 전용; 조회 도구 없음
@@ -88,7 +89,7 @@ mcp_servers:
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "rule-write-b"]
     env: {HOME: /opt/data/home}
     connect_timeout: 60
-    timeout: 420
+    timeout: 720
     supports_parallel_tool_calls: false
     trust: full
   # rule-change-mcp:end

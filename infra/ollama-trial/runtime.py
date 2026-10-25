@@ -83,11 +83,11 @@ async def run(config, request, *, on_protected_start=None):
         require(isinstance(chosen, list) and len(chosen) == len(set(chosen)) and
                 set(chosen) <= {alias(s, t) for s, names in available.items() for t in names},
                 'invalid_tool_subset')
-    budget = Budget(request.get('max_tool_calls', 32))
+    budget = Budget(request.get('max_tool_calls', harness.CONTRACT.TOOL_CALLS))
     lock = asyncio.Lock()
     protected_attempts = {}
     selection_active = False
-    steps = request.get('max_steps', 12)
+    steps = request.get('max_steps', harness.CONTRACT.MODEL_STEPS)
     require(type(steps) is int and 1 <= steps <= 16, 'model_step_budget')
 
     class Meter(AsyncCallbackHandler):
@@ -134,6 +134,7 @@ async def run(config, request, *, on_protected_start=None):
                         report['diagnostic_targets'] = schema['properties']['target']['enum']
                     if chosen is not None and name not in chosen:
                         continue
+                    schema = harness.CONTRACT.normalized_schema(name, schema)
                     if harness.tool_scope(current) == {'mcp__rule_a__get_service_action_target'}:
                         schema['properties']['target']['enum'] = ['a:suricata']
 
@@ -156,7 +157,7 @@ async def run(config, request, *, on_protected_start=None):
                                         on_protected_start()
                                     report['protected_calls'] += 1
                                 try:
-                                    timeout = 720 if is_protected else 90
+                                    timeout = harness.CONTRACT.PROTECTED_TIMEOUT if is_protected else harness.CONTRACT.READ_TIMEOUT
                                     result = await asyncio.wait_for(connection.call_tool(bare_name, arguments,
                                         read_timeout_seconds=timedelta(seconds=timeout)), timeout + 5)
                                     text = '\n'.join(c.text for c in result.content if getattr(c, 'type', None) == 'text')
@@ -183,8 +184,8 @@ async def run(config, request, *, on_protected_start=None):
             report['exposed_tools'] = [t.name for t in self.tools]
 
     meter = Meter()
-    llm = ChatOllama(model=config['model'], base_url=config['base_url'], reasoning=False,
-                     temperature=0, top_p=0.95, num_predict=2048, client_kwargs={'timeout': 90},
+    llm = ChatOllama(model=config['model'], base_url=config['base_url'], reasoning=harness.CONTRACT.REASONING,
+                     temperature=harness.CONTRACT.TEMPERATURE, top_p=harness.CONTRACT.TOP_P, num_predict=harness.CONTRACT.OUTPUT_TOKENS, client_kwargs={'timeout': 90},
                      callbacks=[meter])
     agent = MCPAgent(llm=llm, client=client, max_steps=steps, memory_enabled=True,
                      system_prompt=SYSTEM_PROMPT + harness.guidance(current), use_server_manager=False, verbose=False,
@@ -202,7 +203,7 @@ async def run(config, request, *, on_protected_start=None):
         else:
             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
             tick = time.perf_counter()
-            final = await asyncio.wait_for(agent.run(question), 900 if mode == 'hermes-parity' else 180)
+            final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
             if not report['protected_calls']:
                 missing = (harness.inventory(current, report['calls'], missing_targets=True) or
                            harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ())))
@@ -255,14 +256,23 @@ async def run(config, request, *, on_protected_start=None):
                     final = harness.fallback(current, report['calls'])
                     if still_missing:
                         final += '\n미확인 대상: ' + ', '.join(still_missing)
+            progress = harness.write_progress(current, report['calls'])
+            if progress:
+                report['write_progress'] = progress
+                final = ((str(final) + '\n\n') if progress['complete'] else '요청한 변경안 준비가 일부 미완료입니다. 승인 대기는 실제 적용 완료가 아닙니다.\n\n') + progress['text']
             final = harness.EVIDENCE.kst_display(harness.footer_free(str(final)))
-            report.update(status='completed', final_response=final,
+            report['chat_contract'] = {'version': harness.CONTRACT.VERSION, 'system_sha256': harness.CONTRACT.fingerprint(), 'model_steps': steps, 'tool_calls': budget.limit}
+            report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') else 'completed', final_response=final,
                           conversation_seconds=time.perf_counter() - tick)
             if not report['protected_calls'] and harness.inventory(current, report['calls'], verified_targets=True):
                 report['evidence'] = {'question': current, 'at_kst': report['at_kst'], 'calls': report['calls']}
     except Exception as exc:
         report.update(status='failed', error_type=type(exc).__name__)
-        if report['calls'] and not report['protected_calls']:
+        progress = harness.write_progress(current, report['calls'])
+        if progress:
+            report.update(status='partial', write_progress=progress,
+                          final_response='실행이 중단되었습니다. 아래는 중단 전 확인된 제출 근거이며 요청 전체 완료가 아닙니다.\n\n' + progress['text'])
+        elif report['calls'] and not report['protected_calls']:
             report.update(status='partial', final_response=harness.fallback(current, report['calls']))
     finally:
         await client.close_all_sessions()

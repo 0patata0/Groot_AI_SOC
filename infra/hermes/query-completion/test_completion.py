@@ -1226,7 +1226,10 @@ class RegistrationTests(unittest.TestCase):
         content = b'offline known source fixture'
         self.pin_patch = mock.patch.object(PLUGIN, 'SOURCE_SHA256', {
             'agent/turn_final_response.py': hashlib.sha256(content).hexdigest()})
-        self.read_patch = mock.patch.object(Path, 'read_bytes', return_value=content)
+        real_read = Path.read_bytes
+        self.read_patch = mock.patch.object(Path, 'read_bytes', autospec=True,
+            side_effect=lambda path: content if path == PLUGIN.SOURCE_ROOT / 'agent/turn_final_response.py'
+            else real_read(path))
         self.import_patch = mock.patch.object(PLUGIN.importlib, 'import_module',
                                               side_effect=lambda name: self.modules[name])
         self.pin_patch.start()

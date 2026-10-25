@@ -302,7 +302,7 @@ def hermes_configuration(value):
     result = json.loads(json.dumps(value))
     result['mcp_servers']['system-diagnostics'] = {'command': 'ssh',
         'args': ['-T', '-F', '/opt/data/home/.ssh/config', 'siem-readonly', 'system-diagnostics'],
-        'connect_timeout': 30, 'timeout': 60, 'supports_parallel_tool_calls': False,
+        'connect_timeout': 30, 'timeout': 90, 'supports_parallel_tool_calls': False,
         'tools': {'resources': False, 'prompts': False}, 'trust': 'full'}
     for tools in [result.get('toolsets'), *result.get('platform_toolsets', {}).values()]:
         need(isinstance(tools, list) and all(isinstance(name, str) for name in tools), 'diagnostic_toolsets_invalid')

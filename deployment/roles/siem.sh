@@ -141,8 +141,11 @@ def hermes_extension_files():
         base + 'startup/' + name: 'hooks/groot-mattermost-channel-sync/' + name
         for name in ('HOOK.yaml', 'handler.py')} | {
         'infra/hermes/query-completion/' + name: 'plugins/groot-query-completion/' + name
-        for name in ('__init__.py', 'plugin.yaml')} | {
-        'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py'}
+        for name in ('__init__.py', 'plugin.yaml', 'alignment.py')} | {
+        'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py',
+        'infra/hermes/chat_contract.py': 'plugins/groot-query-completion/chat_contract.py',
+        'infra/hermes/SOUL.groot.md': 'plugins/groot-query-completion/soc_policy.md',
+        'infra/ollama-trial/harness.py': 'plugins/groot-query-completion/chat_harness.py'}
 def query_completion_source_pins(raw=None):
     # Read literal pins from the shipped plugin without importing/executing it.
     if raw is None:
@@ -657,7 +660,7 @@ os.execve(args[0],args,env)
     servers={}
     for name,extra in [('wazuh-ro',[]),('security-events',['security-events'])]:
         servers[name]={'command':'ssh','args':['-T','-F','/opt/data/home/.ssh/config','siem-readonly']+extra,
-                      'connect_timeout':30,'timeout':120,'supports_parallel_tool_calls':False,
+                      'connect_timeout':30,'timeout':90,'supports_parallel_tool_calls':False,
                       'tools':{'resources':False,'prompts':False},'trust':'full'}
     tools=['mcp-wazuh-ro','mcp-security-events']
     hc={'mcp_servers':servers,'security':{'allow_lazy_installs':False},'model':{'provider':'custom','base_url':LLM,'default':MODEL},

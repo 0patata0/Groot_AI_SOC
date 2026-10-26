@@ -1,4 +1,14 @@
-# 인프라 현황 — 2026-10-26 현재 작업 상태
+# 인프라 현황 — 2026-10-27 현재 작업 상태
+
+## A SSH MAC 4종 제외 적용 — 2026-10-27 00:24 KST
+
+사용자가 설명받은 후보의 실제 적용을 승인했다. A `/etc/ssh/sshd_config.d/01-capstone-macs.conf`에 `hmac-sha1`, `hmac-sha1-etm@openssh.com`, `umac-64@openssh.com`, `umac-64-etm@openssh.com` 제외 정책을 배치하고 구문/유효값 검사 후 SSH reload를 완료했다. 후보 SHA `a9231625009b1bc78d477bdd85db0800b22ff2d3bcc3b6d2aa817ce92cfc9e90`, 적용 모듈 SHA `02e4f139574ebf4e956ef05d1b2c01776ed6808d887df03f4cf83cc79f1342f8`. 원본 설정·모듈 백업은 A `/var/backups/capstone-ssh-macs-20261027-002422`, 정책 전후 영수증은 `/var/backups/capstone-ssh-macs-t3q_fjn3`에 보존한다.
+
+- **운영 검증:** 기존 관리 세션 유지, 새 관리 SSH 기본/강제 SHA256-ETM/강제 SHA512-ETM 3회 성공. 비AEAD `aes256-ctr`를 강제한 제외4종은 모두 `no matching MAC found`로 거절됐다. SSH MainPID1720 유지·서비스 active/running. 기존6설정 파일 SHA와 관리자/resp/ruleview/rulechg/진단계정의 MAC 외 유효 옵션은 동일하다. 계정·키·허용 IP·방화벽·B/C SSH 정책 변경 없음.
+- **봇·관제 연결:** Hermes UID995:986과 Ollama soc-ollama의 기존 키/설정으로 각각 resp·rule-a·rule-write-a·system-diagnostics 총8경로 초기화/도구 목록 조회 성공. 차단 목록·실제 IDS 룰·A agent 진단 읽기6호출 성공, 쓰기 호출0. Wazuh agent 진단은 active/running·표본 신선도59/4초였다. 00:30 최종 감사에서 관리 timer active/직전 oneshot 성공, 실제 공동채널·Ollama·Hermes 실행 및 A/B failed unit0을 확인했다. 재적용 changed=false로 추가 reload가 없었다.
+- **중요한 잔여·정정:** 00:26 조회된 저장 SCA35654는 변경 전 10/26 19:03:38 KST 스캔의 failed다. 더구나 설치된 정책의 금지식에는 이번 후보에서 유지한 `umac-128-etm@openssh.com`도 포함되어 있어, 단순히 다음 스캔을 기다리면 통과한다고 안내할 수 없다. 요청한4종 제거 완료와 SCA 정책 적합성/사건 종결을 구분한다. 해당 사건은 needs_review 유지, DB 강제 종결·정책 예외·SCA 재시작/스캔 강제 실행0. 정책은12h·scan_on_start이며 추가 제외 또는 정책 검토가 별도 남는다.
+- **소스·설치·검사:** 신규 내부 `deployment/ssh_macs.py`를 기존 security 역할 check/apply/verify와 소스 SHA 프로필에 연결했다. 기존의 더 엄격한 MAC 정책·타인 파일·Include 우선순위 충돌을 거절하고, 검증/reload 실패 시 추가 파일을 원복한다. 새 모듈10·A 설치16·초기 설치 controller44=70검사 통과. 설정 예제·네트워크 안내·오프라인 반입 목록/README·PLAN도 반영했다. 새3VM 전체 설치·호스트 재부팅·공격E2E·이번 변경 후 실제 쓰기는 미실행이다. 추가 deb/wheel/이미지·패키지 다운로드/Mac 설치0.
+- **Git·정리:** 공개10파일 커밋·푸시와 서버 재현 소스 동기화 전이다. 로컬 증거·대화기록·업무분담은 Git 제외, 운영 복구 백업은 보존한다. 이번 임시 helper는 게시·검증 후 제거하고 최종 원격 일치/정리 결과를 로컬 마감에 남긴다.
 
 ## 잔여6건 추가 점검 결과 — 2026-10-26 23:56 KST
 

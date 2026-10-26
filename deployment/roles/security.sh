@@ -53,6 +53,7 @@ export WEB_BACKEND_PORT WAF_PORT ET_RULES_FILE WAZUH_CA_FILE WAZUH_ENROLLMENT_PA
 export LAB_PUBLIC_ORIGIN LAB_ALLOWED_CIDRS LAB_HTTPS_PORT LAB_PROXY_SUBNET LAB_GATEWAY_PORT LAB_TLS_CERT LAB_TLS_KEY
 lab_security() { python3 -B "$CAPSTONE_SOURCE/deployment/offline_security.py" "$1"; }
 log_pipeline() { python3 -B "$CAPSTONE_SOURCE/deployment/log_pipeline.py" "$1" security; }
+ssh_macs() { python3 -B "$CAPSTONE_SOURCE/deployment/ssh_macs.py" "$1"; }
 
 bounded() { timeout --signal=TERM --kill-after=5s "$@"; }
 hash() { local x; x=$(sha256sum -- "$1") || return 1; printf '%s' "${x%% *}"; }
@@ -147,6 +148,8 @@ PY
         fi
     done
     safe_file "$CAPSTONE_SOURCE/deployment/offline_security.py" 2097152
+    safe_file "$CAPSTONE_SOURCE/deployment/ssh_macs.py" 1048576
+    ssh_macs check >/dev/null || die 'SSH MAC policy conflicts with existing host settings'
     safe_file "$CAPSTONE_SOURCE/deployment/validate_lab_site.py" 1048576
     for name in nginx-log4shell-server.conf waf-log4shell-server.conf REQUEST-900-CAPSTONE-LABS.conf; do
         safe_file "$CAPSTONE_SOURCE/infra/groot-c/offline-labs/$name" 2097152
@@ -184,13 +187,15 @@ PY
     SECURITY_SCRIPT_SHA=$(hash "${BASH_SOURCE[0]}")
     LOG_SOURCE_SHA=$(log_pipeline fingerprint | jq -er '.source_sha256') || die 'log source fingerprint failed'
     LOG_INSTALLER_SHA=$(hash "$CAPSTONE_SOURCE/deployment/log_pipeline.py")
+    SSH_MACS_SHA=$(hash "$CAPSTONE_SOURCE/deployment/ssh_macs.py")
+    export SSH_MACS_SHA
     export LAB_PROFILE SECURITY_SCRIPT_SHA LOG_SOURCE_SHA LOG_INSTALLER_SHA
     ET_SHA=$(hash "$ET_RULES_FILE"); LOCAL_SHA=$(hash "$CAPSTONE_SOURCE/new_rule/GROOT_A_local.rules")
     WAF_SHA=$(hash "$CAPSTONE_SOURCE/new_rule/GROOT_A_WAF.conf")
     export ET_SHA LOCAL_SHA WAF_SHA CA_SHA
     PROFILE=$(python3 - <<'PY'
 import hashlib,json,os
-keys=('CAPSTONE_ROOT','SECURITY_HOST','SIEM_HOST','SERVICE_HOST','MONITOR_INTERFACE','WEB_BACKEND_PORT','WAF_PORT','SURI_ID','WAF_ID','ET_SHA','LOCAL_SHA','WAF_SHA','CA_SHA','LAB_PROFILE','SECURITY_SCRIPT_SHA','LOG_SOURCE_SHA','LOG_INSTALLER_SHA','LOG_PROTECTED_IPS','ADMIN_PROTECTED_CIDRS','TZ')
+keys=('CAPSTONE_ROOT','SECURITY_HOST','SIEM_HOST','SERVICE_HOST','MONITOR_INTERFACE','WEB_BACKEND_PORT','WAF_PORT','SURI_ID','WAF_ID','ET_SHA','LOCAL_SHA','WAF_SHA','CA_SHA','LAB_PROFILE','SECURITY_SCRIPT_SHA','LOG_SOURCE_SHA','LOG_INSTALLER_SHA','SSH_MACS_SHA','LOG_PROTECTED_IPS','ADMIN_PROTECTED_CIDRS','TZ')
 print(hashlib.sha256(json.dumps({k:os.environ[k] for k in keys},sort_keys=True,separators=(',',':')).encode()).hexdigest())
 PY
 )
@@ -221,6 +226,7 @@ PY
 }
 
 verify_role() {
+    ssh_macs verify >/dev/null || die 'SSH MAC policy verification failed'
     [[ -f $COMPOSE && -f $ROLE_DIR/manifest.json ]] || die 'role files missing'
     python3 - "$ROLE_DIR" <<'PY'
 import hashlib,json,os,pathlib,stat,sys
@@ -318,6 +324,7 @@ apply_role() {
     sync -f "$STATE"; sync -f "$ROLE_DIR"
     trap 'printf "security: apply incomplete; inspect %s; no automatic retry or cleanup\n" "$ROLE_DIR" >&2' ERR
     trap 'cleanup_native_test || printf "security: private native test cleanup incomplete; inspect recorded CID\n" >&2' EXIT
+    ssh_macs install || die 'SSH MAC policy installation failed; inspect backup and retained session'
     install -d -o root -g root -m 0755 "$ROLE_DIR/config" "$ROLE_DIR/rules" "$ROLE_DIR/logs" "$ROLE_DIR/logs/suricata"
     install -d -o 101 -g 101 -m 0755 "$ROLE_DIR/logs/modsecurity"
     install -d -o root -g root -m 0700 "$ROLE_DIR/backup"

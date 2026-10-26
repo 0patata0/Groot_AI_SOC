@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+> **2026-10-27 SSH MAC 초기 설치 경로:** 기존 `deploy.sh` → security 역할에서 `ssh_macs.py`의 check/install/verify를 호출한다. 고정4종 제외·설정 충돌 거절·원복·소스 SHA 검증을 포함하며 추가 패키지는 없다. 운영 A에는 해당 설정만 증분 반영했고 B/C SSH는 변경하지 않았다. 전체 신규 설치·전체 CIS 통과 검증과 구분한다. [설정·복구](setup-network-ssh.md#security-역할의-ssh-mac-정책--2026-10-27) · [운영 결과](../STATUS.md).
+
 > **10/26 조사 필드 반입:** security-events canonical 소스의 제한된 DNS/HTTP 조사 문맥을 기존 root deploy.sh SIEM 경로가 반입한다. 기존 서버는 해당1파일만 백업 후 증분 적용하며 재시작·새키·포트·deb/wheel/이미지 추가0이다. 기존 내부 MCP 배포기의 도구 목록 검사도 현행3개로 맞췄다. 새3VM 전체설치 검증과 [운영 증분/검증](../STATUS.md)은 구분한다.
 
 > **10/26 22:53 감사 전송 보완:** 기존 소스 반입의 관리 controller/run과 H/O 공통 grounding·핀을 함께 갱신한다. security-events 감사128KiB/사건 식별500건 상한 및 초과 거절, 운영자 사유 전달이 deploy.sh 기존 렌더링에 반영된다. 추가 패키지/이미지/포트0이며 운영 증분과 새3VM전체설치를 구분한다. [검증·Git](../STATUS.md).

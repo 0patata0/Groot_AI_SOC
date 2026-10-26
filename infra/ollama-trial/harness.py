@@ -55,7 +55,79 @@ def read_plan(question):
     return READ.plan(text, EVIDENCE._AWARE_TIME)
 
 
+def rule_detail_request(question):
+    text = READ.scope_text(normalized(question))
+    if READ.wants_write(text) or re.search(r'설명만|조회하지|도구\s*없이', text):
+        return None
+    if not re.search(r'조회|확인|보여', text):
+        return None
+    ids = re.findall(r'\b(?:ID|SID)\s*[:=]?\s*([0-9]{1,10})(?![0-9])', text, re.I)
+    unique = list(dict.fromkeys(map(int, ids)))
+    if len(unique) != 1 or not 0 < unique[0] < 2**32:
+        return None
+    targets = [target for pattern,target in [('WAF|ModSecurity','a:modsecurity-custom'),
+        ('IDS|Suricata','a:suricata-local'),('Wazuh|와주','b:wazuh-local-rules')] if re.search(pattern,text,re.I)]
+    if not targets or (len(targets)>1 and len(ids)<len(targets) and not re.search(r'같은\s*(?:ID|SID|숫자)',text,re.I)):
+        return None
+    fields = re.search(r'레벨|(?<![A-Za-z_])(?:level|description)(?![A-Za-z_])',text,re.I)
+    presence = re.search(r'존재|있는지|있나|없으면|존재\s*여부',text)
+    if (not fields and not presence) or (fields and 'b:wazuh-local-rules' not in targets) or (len(targets)>1 and not presence):
+        return None
+    # Other rule semantics stay with the model, never substitute a presence table.
+    if re.search(r'왜|원인|분석|영향|탐지\s*조건|\bmsg(?![A-Za-z_])', text, re.I):
+        return None
+    return {'id':unique[0], 'targets':targets}
+
+
+def rule_detail_values(request, calls):
+    import xml.etree.ElementTree as ET
+    result = {}
+    for target in request['targets']:
+        for call in reversed(calls):
+            if (call.get('server') != 'rule-'+target[0] or call.get('name') != 'get_rule_change_target'
+                    or call.get('arguments',{}).get('target') != target):
+                continue
+            data = payload(call)
+            inv = SHARED._verified_inventory(data, target)
+            if inv is None: break
+            present = request['id'] in inv['ids']
+            value = {'present':present, 'sha256':data['sha256'], 'level':None, 'description':None}
+            if target=='b:wazuh-local-rules' and present:
+                content = data['content']
+                if re.search(r'<!\s*(?:DOCTYPE|ENTITY)',content,re.I): break
+                try:
+                    root = ET.fromstring('<verified_rules>'+content+'</verified_rules>')
+                    rules = [r for r in root.iter('rule') if r.get('id')==str(request['id'])]
+                    if len(rules)!=1 or not re.fullmatch(r'[0-9]+',rules[0].get('level','')): break
+                    desc = rules[0].find('description')
+                    if desc is None: break
+                    value.update(level=int(rules[0].get('level')),description=''.join(desc.itertext()))
+                    if len(value['description'])>4096: break
+                except (ET.ParseError,ValueError): break
+            result[target] = value
+            break
+    return result
+
+
+def rule_detail_report(request, calls):
+    values = rule_detail_values(request,calls)
+    rows = ['**요약**', '요청한 ID를 장비별 현재 파일에서 확인했습니다.' if len(values)==len(request['targets']) else
+        '일부 대상이 미조회·검증 실패입니다. 미확인은 규칙이 없다는 뜻이 아닙니다.', '', '**확인 내역**', '',
+        '| 대상 파일 | ID / SID | 파일 정의 | level | description |', '| --- | --- | --- | --- | --- |']
+    for target in request['targets']:
+        v=values.get(target)
+        present='미조회·미확인' if v is None else '정의됨' if v['present'] else '없음 (파일에 미정의)'
+        level='미확인' if v is None else str(v['level']) if v['level'] is not None else '해당 없음'
+        desc='미확인' if v is None else json.dumps(v['description'],ensure_ascii=False).replace('|',r'\|') if v['description'] is not None else '해당 없음'
+        rows.append('| '+target+' | '+str(request['id'])+' | '+present+' | '+level+' | '+desc+' |')
+    rows += ['', *['- '+target+' SHA-256: `'+v['sha256']+'`.' for target,v in values.items()], '',
+        '파일의 정의·필드를 확인한 결과이며 장비 간 같은 숫자는 별개의 규칙입니다. 엔진별 적재·탐지 성공은 미확인입니다.']
+    return '\n'.join(rows)
+
+
 def read_report(question, calls):
+    detail = rule_detail_request(question)
+    if detail: return rule_detail_report(detail, calls)
     combined = combined_rule_request(question)
     if combined:
         missing = missing_reads(question, calls)
@@ -78,6 +150,8 @@ def ids_runtime_question(question):
 def _inventory_question(question):
     text = READ.scope_text(normalized(question))
     if ids_runtime_question(question): return None
+    if re.search(r'설명|레벨|심각도|메시지|탐지\s*조건|(?<![A-Za-z_])(?:level|description|severity|msg)(?![A-Za-z_])|\b(?:ID|SID)\s*[:=]?\s*[0-9]+', text, re.I):
+        return None  # Specific fields/IDs must not become a whole-file count table.
     if re.search(r'왜|원인|차이|변경|수정|차단|삭제|추가|적용해|재시작|원문|전문|분석', text):
         return None
     if '비교' in text and not re.search(r'(?:개수|정의\s*수).{0,12}비교|비교.{0,12}(?:개수|정의\s*수)', text): return None
@@ -103,7 +177,7 @@ def inventory_question(question):
 
 
 def structured_read(question):
-    return bool(read_plan(question) or combined_rule_request(question) or inventory_question(question) or
+    return bool(rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
                 tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
 
 
@@ -150,7 +224,43 @@ def facts_for(calls):
     return facts
 
 
+
+def rule_edit_anchors(data):
+    """Bounded unique edge excerpts from a hash-verified file, never a candidate."""
+    content = data.get('content')
+    if not isinstance(content, str) or not content or len(content.encode('utf-8')) > 128 * 1024:
+        return None
+    if hashlib.sha256(content.encode('utf-8')).hexdigest() != data.get('sha256'):
+        return None
+    lines = content.splitlines(keepends=True)
+    found = {'source_sha256': data['sha256']}
+    for position, parts in (('file_start', lines), ('file_end', reversed(lines))):
+        excerpt = ''
+        for count, line in enumerate(parts):
+            if count >= 128:
+                break
+            excerpt = excerpt + line if position == 'file_start' else line + excerpt
+            if len(excerpt.encode('utf-8')) > 4096:
+                break
+            start = content.find(excerpt)
+            if content.find(excerpt, start + 1) == -1:
+                found[position] = {'old_text': excerpt}
+                break
+    return found if len(found) > 1 else None
+
+
 def model_view(server, name, raw):
+    if server in ('rule-a', 'rule-b') and name == 'get_rule_change_target':
+        try:
+            data = json.loads(raw)
+            if isinstance(data, dict) and not data.get('error') and str(data.get('target', '')).startswith(server[-1] + ':'):
+                anchors = rule_edit_anchors(data)
+                if anchors:
+                    data['edit_anchors'] = anchors
+                    return json.dumps(data, ensure_ascii=False)
+        except (ValueError, TypeError):
+            pass
+        return raw
     if server in ('rule-write-a', 'rule-write-b') and name in ('propose_rule_edit', 'propose_rule_change'):
         try:
             data = json.loads(raw)
@@ -158,10 +268,12 @@ def model_view(server, name, raw):
                 stamp = approval_expiry_kst(data.get('approval_expires_at'))
                 if stamp:
                     data['approval_expires_at_kst'] = stamp
+                    data.pop('approval_expires_at', None)  # Epoch stays in the untouched audit/approval receipt.
                     return json.dumps(data, ensure_ascii=False)
         except (ValueError, TypeError):
             pass
         return raw
+
     # Normalize only the legacy read-only Wazuh presentation. Keep the original
     # result/hash in the audit record; never rewrite hashed rules or write data.
     if server != 'wazuh-ro':
@@ -384,6 +496,8 @@ def diagnostic_scope(question, targets):
 
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    detail = rule_detail_request(question)
+    if detail: return {'mcp__rule_'+t[0]+'__get_rule_change_target' for t in detail['targets']}
     if diagnostic_request(question):
         return {'mcp__system_diagnostics__get_system_diagnostics'}
     combined = combined_rule_request(question)
@@ -422,6 +536,10 @@ def tool_scope(question, calls=None):
 
 
 def missing_reads(question, calls, diagnostic_targets=()):
+    detail = rule_detail_request(question)
+    if detail:
+        verified = rule_detail_values(detail,calls)
+        return [t for t in detail['targets'] if t not in verified]
     combined = combined_rule_request(question)
     if combined:
         return missing_reads(combined, calls, diagnostic_targets) + missing_reads('IDS 실제 가동 상태 조회', calls, diagnostic_targets)
@@ -660,6 +778,15 @@ def cell(value):
     return text if len(text) <= 240 else text[:237] + '…'
 
 
+def operational_text(value):
+    """Keep the whole operational warning; table-cell shortening is inappropriate."""
+    if not isinstance(value, str) or not value:
+        return '미확인'
+    if len(value) > 4096:
+        return '상세 설명이 표시 한도를 초과했습니다. 영향 전체가 미확인이므로 원문 확인이 필요합니다.'
+    return value.replace('\r', ' ').replace('\n', ' ')
+
+
 def diagnostic_report(question, calls, targets):
     if tool_scope(question) != {'mcp__system_diagnostics__get_system_diagnostics'}:
         return None
@@ -860,7 +987,7 @@ def write_metadata_prose(answer, metadata):
     if not metadata:
         return answer
     def field_values(key):
-        return '; '.join(v['target'] + ': ' + cell(v.get(key) or '미확인') for v in metadata)
+        return '; '.join(v['target'] + ': ' + operational_text(v.get(key)) for v in metadata)
     parts = re.split(r'(^```[^\n]*\n.*?^```[^\n]*$)', answer, flags=re.M | re.S)
     for i in range(0, len(parts), 2):
         lines = parts[i].splitlines(keepends=True)
@@ -871,7 +998,9 @@ def write_metadata_prose(answer, metadata):
             if (re.search(r'^\s*(?:[-0-9.]+\s*)?검증\s*(?:범위|결과)?\s*:', clean) or
                     re.search(r'엔진.{0,30}구문.{0,50}(?:검증됨|검증됐|완료|통과했)', clean)):
                 lines[j] = '- 제출 검증 범위 (서버 영수증): ' + field_values('validation') + ending
-            elif re.search(r'^\s*(?:[-0-9.]+\s*)?(?:적용|예상)\s*영향\s*:', clean):
+            elif (re.search(r'^\s*(?:[-0-9.]+\s*)?(?:적용|예상)\s*영향\s*:', clean) or
+                  re.search(r'(?:승인|적용).{0,35}(?:재시작|재로딩|리로드|재적재|reload|restart)', clean, re.I) or
+                  re.search(r'(?:동작|중단|서비스|WAF|Suricata|Wazuh).{0,25}영향.{0,10}없|중단.{0,10}없|무중단',clean,re.I)):
                 lines[j] = '- 승인된 후보 적용에 포함된 영향 (서버 조회): ' + field_values('impact') + ending
             elif total:
                 values = {v['target']: v.get('declared_count') for v in metadata}
@@ -908,8 +1037,10 @@ def preparation_gap(question, calls):
 
 def preparation_instruction(targets):
     return ('요청한 변경안 준비가 아직 끝나지 않았습니다: ' + ', '.join(targets) +
-            '. 이번 요청에서 보호 도구 호출은 아직 없습니다. 실제 읽기와 허용된 변경안 준비 도구를 직접 선택하여 '
-            '사용자 요청을 이어가세요. 도구로 준비할 수 없는 이유가 있다면 대상별로 설명하세요. '
+            '. 이번 요청에서 보호 도구 호출은 아직 없습니다. 사용자는 초안 작성과 승인 카드 제출을 이미 요청했습니다. '
+            'get_rule_change_target의 현재 SHA와 원문을 확인하고 propose_rule_edit로 검토용 후보를 준비할 수 있습니다. '
+            '파일 맨 앞/뒤 삽입에는 반환된 edit_anchors의 해당 old_text를 그대로 보존하고 새 텍스트를 앞/뒤에 붙이세요. '
+            '실제 도구와 인자는 직접 선택하세요. 제출하지 못했다면 대상별 이유를 밝히고 제출 완료라고 쓰지 마세요. '
             '이 안내는 적용 승인이나 일반 shell/sudo/Docker 권한이 아닙니다.')
 
 
@@ -918,6 +1049,7 @@ def rejected_before_proposal(error):
     # submitted a card. Transport/timeouts/unknown errors remain unresolved.
     return bool(re.fullmatch(
         r'edit [1-9][0-9]* old_text (?:must match exactly once in|is absent from) the original file'
+        r'|candidate must end with a newline'
         r'|base_sha256 must be a SHA-256 from get_rule_change_target'
         r'|target changed since it was read; fetch current content and retry'
         r'|Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden', error))
@@ -980,7 +1112,7 @@ def write_progress(question, calls):
             rows.append('| ' + target + ' | 제출 당시 승인 대기 (적용 여부는 별도 확인) | ' + pid + ' |')
             hashes.append('- ' + target + ' / ' + pid + ' 변경 전 SHA: `' + data['before_sha256'] + '`; 후보 SHA: `' + data['after_sha256'] + '`.')
             if isinstance(data.get('validation'), str):
-                hashes.append('  - 제출 검증 범위: ' + cell(data['validation']))
+                hashes.append('  - 제출 검증 범위: ' + operational_text(data['validation']))
             reads = [payload(c) for c in calls if c.get('name') == 'get_rule_change_target'
                      and c.get('server') == 'rule-' + target[0] and c.get('arguments', {}).get('target') == target]
             source = next((v for v in reversed(reads) if v and v.get('target') == target
@@ -994,7 +1126,7 @@ def write_progress(question, calls):
             if inv:
                 hashes.append('  - 제출 전 파일 정의 수: ' + str(inv['declared_count']) + '개; 실제 엔진 적재 검증과 별개입니다.')
             if source and isinstance(source.get('impact'), str):
-                hashes.append('  - 승인된 후보 적용에 포함된 영향: ' + cell(source['impact']))
+                hashes.append('  - 승인된 후보 적용에 포함된 영향: ' + operational_text(source['impact']))
             expiry = data.get('approval_expires_at')
             if type(expiry) is int:
                 stamp = approval_expiry_kst(expiry)

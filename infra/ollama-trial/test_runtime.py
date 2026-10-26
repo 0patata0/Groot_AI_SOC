@@ -1,0 +1,130 @@
+"""Exercise the real runtime repair loop with SDK boundaries replaced, no network."""
+import asyncio
+import hashlib
+import json
+from pathlib import Path
+import sys
+import types
+import unittest
+from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import runtime
+
+
+class PreparationLoop(unittest.TestCase):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None):
+        calls, prompts = [], []
+        content = '# heading\nbody\n'
+        sha = hashlib.sha256(content.encode()).hexdigest()
+        available = {'rule-a':['get_rule_change_target'], 'rule-write-a':['propose_rule_edit']}
+        class Connector:
+            def __init__(self, server): self.server = server
+            async def list_tools(self):
+                return [types.SimpleNamespace(name=name,description='fixture',inputSchema={
+                    'type':'object','properties':{'target':{'type':'string'}}}) for name in available[self.server]]
+            async def call_tool(self, name, arguments, **kw):
+                calls.append(name)
+                data = ({'target':'a:modsecurity-custom','content':content,'sha256':sha}
+                        if name=='get_rule_change_target' else
+                        {'target':'a:modsecurity-custom','proposal_id':'1'*32,'before_sha256':sha,
+                         'after_sha256':'2'*64,'status':'pending','review_posted':True})
+                return types.SimpleNamespace(isError=False,content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
+        class Client:
+            def __init__(self, **kw): pass
+            def get_all_active_sessions(self):
+                return {server:types.SimpleNamespace(connector=Connector(server)) for server in available}
+            async def close_all_sessions(self): pass
+        class Tool:
+            def __init__(self, **kw): self.__dict__.update(kw)
+            async def ainvoke(self, args): return await self.coroutine(**args)
+        class LLM:
+            def __init__(self, **kw): pass
+            def with_structured_output(self, *a, **kw):
+                raise AssertionError('write preparation was narrowed to read-only selection')
+        class Agent:
+            def __init__(self, client, **kw): self.client=client
+            async def initialize(self): await self.adapter.create_all(self.client)
+            async def run(self, prompt):
+                prompts.append(prompt);tools={t.name:t for t in self.adapter.tools}
+                if len(prompts)==1:
+                    if bad_input:
+                        refused = json.loads(await tools['mcp__rule_a__get_rule_change_target'].ainvoke({}))
+                        assert refused['executed'] is False
+                        assert refused['error']=='tool_input_schema_validation_failed'
+                    await tools['mcp__rule_a__get_rule_change_target'].ainvoke({'target':'a:modsecurity-custom'})
+                if len(prompts)==submit_on:
+                    await tools['mcp__rule_write_a__propose_rule_edit'].ainvoke({
+                        'target':'a:modsecurity-custom','base_sha256':sha,
+                        'edits':[{'old_text':'# heading\n','new_text':'# new\n# heading\n'}],'reason':'requested comment'})
+                return 'ModSecurity 파일을 확인했습니다. 변경안은 준비하지 못했습니다.'
+        class ValidationError(Exception):
+            validator='required'
+        class Validator:
+            def __init__(self,*a):pass
+            @staticmethod
+            def check_schema(*a):pass
+            def validate(self,args):
+                if 'target' not in args:raise ValidationError('missing target')
+        definitions={
+            'mcp_use':{'MCPClient':Client,'MCPAgent':Agent},
+            'mcp_use.agents.adapters.langchain_adapter':{'LangChainAdapter':object},
+            'langchain_ollama':{'ChatOllama':LLM},
+            'langchain_core.tools':{'StructuredTool':Tool},
+            'langchain_core.callbacks':{'AsyncCallbackHandler':object},
+            'jsonschema':{'Draft202012Validator':Validator,'ValidationError':ValidationError}}
+        modules={}
+        for name,attrs in definitions.items():
+            module=types.ModuleType(name);module.__dict__.update(attrs);modules[name]=module
+        original_scope=runtime.harness.tool_scope
+        def scope(question, observed=None):
+            return {'mcp__rule_a__get_rule_change_target'} if narrow_repair and observed else original_scope(question,observed)
+        with patch.dict(sys.modules,modules), patch.object(runtime,'capabilities',return_value=available), \
+             patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools), \
+             patch.object(runtime.harness,'tool_scope',side_effect=scope):
+            report=asyncio.run(runtime.run({'model':'qwen3.6:35b','base_url':'http://fixture.invalid',
+                'access_mode':'hermes-parity','mcpServers':{s:{} for s in available}},
+                {'question':question or 'WAF 파일 선두에 주석 변경안을 만들어줘. 실제 적용하지 말고 승인 카드까지만 준비해줘.'}))
+        self.assertNotEqual(report['status'],'failed',report)
+        return report,prompts,calls
+
+    def test_stalled_model_receives_exactly_one_preparation_continuation(self):
+        report,prompts,calls=self.execute()
+        self.assertEqual(len(prompts),2)
+        self.assertEqual(report['write_preparation_attempts'],1)
+        self.assertEqual(calls,['get_rule_change_target'])
+        self.assertFalse(report['write_progress']['complete'])
+
+    def test_preparation_retains_model_selected_write_tools(self):
+        report,prompts,calls=self.execute(submit_on=2,narrow_repair=True)
+        self.assertEqual(len(prompts),2)
+        self.assertEqual(calls,['get_rule_change_target','propose_rule_edit'])
+        self.assertTrue(report['write_progress']['complete'])
+
+    def test_requested_candidate_is_write_preparation_not_completed_read_only(self):
+        q='WAF 파일 끝에 주석 한 줄을 덧붙이는 검토용 후보와 승인 카드를 준비해줘. 실제 적용은 하지마.'
+        report,prompts,calls=self.execute(question=q)
+        self.assertEqual(report['status'],'partial')
+        self.assertEqual(report['write_preparation_attempts'],1)
+        self.assertFalse(report['write_progress']['complete'])
+        self.assertFalse(runtime.harness.READ.wants_write('기존 승인 카드와 후보를 보여줘'))
+        report,prompts,calls=self.execute(question=q,submit_on=2)
+        self.assertTrue(report['write_progress']['complete'])
+        self.assertEqual(calls,['get_rule_change_target','propose_rule_edit'])
+
+    def test_a_protected_attempt_is_not_repeated_by_preparation(self):
+        report,prompts,calls=self.execute(submit_on=1)
+        self.assertEqual(len(prompts),1)
+        self.assertNotIn('write_preparation_attempts',report)
+        self.assertEqual(calls.count('propose_rule_edit'),1)
+
+    def test_schema_refusal_does_not_call_mcp_and_model_can_correct_it(self):
+        report,prompts,calls=self.execute(submit_on=1,bad_input=True)
+        self.assertEqual(calls,['get_rule_change_target','propose_rule_edit'])
+        self.assertEqual(report['protected_calls'],1)
+        self.assertEqual(len(report['input_rejections']),1)
+        self.assertFalse(report['input_rejections'][0]['executed'])
+        self.assertTrue(report['write_progress']['complete'])
+
+
+if __name__=='__main__':unittest.main()

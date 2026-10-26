@@ -28,6 +28,41 @@ def fixture(target='a:modsecurity-custom'):
 
 
 class Grounding(unittest.TestCase):
+    def detail_fixture(self, content='<group name="test"><rule id="42" level="0"><description>base &amp; test | detail</description></rule></group>'):
+        call=fixture('b:wazuh-local-rules');data=json.loads(call['result']);data['content']=content
+        data['sha256']=hashlib.sha256(content.encode()).hexdigest();data['rule_inventory'].update(ids=[42],source_sha256=data['sha256'])
+        call['result']=json.dumps(data);call['result_sha256']=hashlib.sha256(call['result'].encode()).hexdigest();return call
+
+    def test_rule_detail_keeps_level_zero_description_and_cross_device_absence(self):
+        q='Wazuh ID 42 level과 description을 조회하고 WAF 같은 ID 존재 여부도 보여줘'
+        calls=[self.detail_fixture(),fixture()]
+        self.assertTrue(harness.structured_read(q))
+        self.assertEqual(harness.tool_scope(q),{'mcp__rule_a__get_rule_change_target','mcp__rule_b__get_rule_change_target'})
+        self.assertEqual(harness.missing_reads(q,calls),[])
+        answer=harness.read_report(q,calls)
+        self.assertIn('b:wazuh-local-rules | 42 | 정의됨 | 0',answer)
+        self.assertIn('base & test',answer)
+        self.assertIn('a:modsecurity-custom | 42 | 없음 (파일에 미정의)',answer)
+
+    def test_rule_detail_failed_or_hash_changed_source_is_not_absence(self):
+        q='Wazuh ID 42의 level과 description을 조회해줘'
+        call=self.detail_fixture();call['result_sha256']='0'*64
+        self.assertEqual(harness.missing_reads(q,[call]),['b:wazuh-local-rules'])
+        self.assertIn('미조회·미확인',harness.read_report(q,[call]))
+        self.assertNotIn('없음 (파일에 미정의)',harness.read_report(q,[call]))
+
+    def test_rule_detail_does_not_assign_different_ids_or_replace_change_analysis(self):
+        for q in ('Wazuh ID 42와 WAF ID 43을 조회해줘','Wazuh ID 42 설명을 변경해줘',
+                  'Wazuh ID 42가 위험한 원인을 분석해서 보여줘'):
+            self.assertIsNone(harness.rule_detail_request(q))
+
+    def test_rule_detail_rejects_doctype_and_missing_xml_fields(self):
+        q='Wazuh ID 42 level과 description을 조회해줘'
+        for content in ('<!DOCTYPE x><group><rule id="42" level="0"><description>x</description></rule></group>',
+                        '<group><rule id="42" level="0"/></group>',
+                        '<group><rule id="42" level="0"><description>x</description></rule><rule id="42" level="1"><description>y</description></rule></group>'):
+            self.assertEqual(harness.missing_reads(q,[self.detail_fixture(content)]),['b:wazuh-local-rules'])
+
     def test_korean_running_and_active_requests_use_observed_read_renderers(self):
         q = '현재 IDS 서비스 실행 상태를 각자 조회하고 서로 검증해줘'
         self.assertTrue(harness.structured_read(q))

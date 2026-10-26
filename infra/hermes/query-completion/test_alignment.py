@@ -26,9 +26,31 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_edit_anchors_are_unique_original_edges_not_candidate_text(self):
+        for content in ('# ===\n# title\n# ===\nbody\n# ===\n',
+                        '# ===\r\n# 제목\r\n# ===\r\n본문\r\n# ===\r\n',
+                        '<group>\n</group>'):
+            raw = json.dumps({'target':'a:modsecurity-custom','content':content,
+                              'sha256':hashlib.sha256(content.encode()).hexdigest()})
+            shown = json.loads(H.model_view('rule-a', 'get_rule_change_target', raw))
+            self.assertEqual(shown['content'], content)
+            anchors = shown['edit_anchors']
+            first, last = anchors['file_start']['old_text'], anchors['file_end']['old_text']
+            self.assertTrue(content.startswith(first)); self.assertTrue(content.endswith(last))
+            for anchor in (first,last):
+                self.assertEqual(content.find(anchor, content.find(anchor)+1), -1)
+            self.assertEqual(content.replace(first, '# new\n'+first, 1), '# new\n'+content)
+            self.assertEqual(content.replace(last, last+'\n# new', 1), content+'\n# new')
+            bad = json.loads(raw);bad['sha256']='0'*64
+            self.assertEqual(H.model_view('rule-a','get_rule_change_target',json.dumps(bad)),json.dumps(bad))
+            self.assertEqual(H.model_view('rule-b','get_rule_change_target',raw),raw)
+        for content in ('', 'x'*5000, ('# repeated\n'*1000)):
+            data={'content':content,'sha256':hashlib.sha256(content.encode()).hexdigest()}
+            self.assertIsNone(H.rule_edit_anchors(data))
+
     def test_submitted_scope_impact_and_denial_prose_follow_actual_receipts(self):
         from test_inventory_render import payload as inventory_payload
-        data = inventory_payload(); data['impact'] = 'configuration test and reload; inode-preserving write'
+        data = inventory_payload(); data['impact'] = ('verified file update; '*20 + 'container restarts; detection pauses briefly; no inline transition')
         raw = json.dumps(data)
         read = dict(server='rule-a', name='get_rule_change_target', arguments={'target': data['target']},
                     result=raw, result_sha256=hashlib.sha256(raw.encode()).hexdigest())
@@ -43,6 +65,7 @@ class SharedContract(unittest.TestCase):
         prose = report.split('```')[0]
         self.assertNotIn('검증됨', prose); self.assertNotIn('완전히 영향 없음', prose)
         self.assertIn(validation, prose); self.assertIn(data['impact'], prose)
+        self.assertIn(data['impact'], progress['text'])
         self.assertIn('파일을 복원할 필요가 없습니다', prose); self.assertIn(fence, report)
         forged = dict(read, result_sha256='0' * 64)
         progress = H.write_progress('WAF 주석 변경안 만들어줘', [forged, submitted])
@@ -97,7 +120,8 @@ class SharedContract(unittest.TestCase):
         original = copy.deepcopy(call)
         shown = json.loads(H.model_view(call['server'], call['name'], call['result']))
         self.assertEqual(shown['approval_expires_at_kst'], '2026-10-27T02:59:25+09:00 (KST)')
-        self.assertEqual(shown['approval_expires_at'], 1793037565)
+        self.assertNotIn('approval_expires_at',shown)
+        self.assertEqual(json.loads(call['result'])['approval_expires_at'], 1793037565)
         self.assertEqual(call, original)
         progress = H.write_progress('WAF 룰 변경안 작성해줘', [call])
         wrong = '승인 만료: 2026-10-27 11:59:25 KST, 약 9시간 후 만료.'
@@ -128,8 +152,48 @@ class SharedContract(unittest.TestCase):
         self.assertIn('approval_expires_at_kst', out.api_kwargs['messages'][-1]['content'])
         self.assertNotIn('approval_expires_at_kst', rows[-1]['content'])
 
+    def test_native_rule_anchors_exist_only_in_model_copy(self):
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        q='WAF 파일 마지막에 주석 변경안을 만들어줘'
+        data={'target':'a:modsecurity-custom','content':'# edge\nbody\n# edge\n'}
+        data['sha256']=hashlib.sha256(data['content'].encode()).hexdigest()
+        raw=json.dumps(data)
+        call={'server':'rule-a','name':'get_rule_change_target','arguments':{'target':data['target']},
+              'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        rows=[{'role':'user','content':q}]+H.linked_rows([call]);before=copy.deepcopy(rows)
+        agent=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,_current_turn_id='t')
+        request=Request({'messages':rows})
+        projected=alignment.request_wrapper(lambda *a,**k:request,PLUGIN,H)(agent,original_user_message=q,turn_id='t',messages=rows)
+        self.assertEqual(rows,before)
+        self.assertIn('edit_anchors',projected.api_kwargs['messages'][-1]['content'])
+        self.assertNotIn('edit_anchors',rows[-1]['content'])
+
+    def test_specific_rule_fields_and_presence_are_not_replaced_by_inventory_counts(self):
+        for question in ('Wazuh ID 100100 level과 description, WAF ID 100100 존재 여부를 보여줘',
+                         'IDS SID 1000030 msg를 실제 조회해줘',
+                         'Wazuh 규칙 description을 보여줘'):
+            with self.subTest(question=question):
+                self.assertIsNone(H.inventory_question(question))
+                self.assertIsNone(H.inventory(question, []))
+                self.assertFalse(PLUGIN._inventory_request(question))
+        self.assertIsNotNone(H.inventory_question('WAF와 Wazuh의 규칙 개수와 ID 목록 보여줘'))
+
+    def test_operational_restart_and_no_impact_claims_use_observed_impact(self):
+        impact='WAF nginx configuration test and reload; DetectionOnly remains enabled.'
+        fence='```text\n승인 시 WAF 재시작\n```'
+        text='승인 시 WAF nginx 재시작/재로딩이 필요합니다.\nWAF 동작에는 영향 없음.\n'+fence
+        out=H.write_metadata_prose(text,[{'target':'a:modsecurity-custom','impact':impact,'after_sha256':'a'*64}])
+        self.assertNotIn('재시작/재로딩',out)
+        self.assertNotIn('영향 없음',out)
+        self.assertEqual(out.count(impact),2)
+        self.assertIn(fence,out)
+
     def test_known_presubmit_rejection_recovers_only_after_verified_receipt(self):
-        messages = ['edit 2 old_text must match exactly once in the original file',
+        messages = ['candidate must end with a newline', 'edit 2 old_text must match exactly once in the original file',
                     'edit 1 old_text is absent from the original file',
                     'base_sha256 must be a SHA-256 from get_rule_change_target',
                     'target changed since it was read; fetch current content and retry',
@@ -151,7 +215,7 @@ class SharedContract(unittest.TestCase):
                     self.assertFalse(H.write_progress('WAF 룰 수정해줘', [proposal('a:modsecurity-custom'), failed])['complete'])
 
     def test_unknown_transport_outcome_not_cleared_by_later_receipt(self):
-        for error in ('TimeoutError', 'HTTP 502', 'unknown', 'edit 1 old_text is absent from the original file; applied'):
+        for error in ('TimeoutError', 'HTTP 502', 'unknown', 'candidate must end with a newline; applied', 'edit 1 old_text is absent from the original file; applied'):
             failed = proposal('a:modsecurity-custom', error=json.dumps({'error': error}))
             self.assertFalse(H.write_progress('WAF 룰 수정해줘', [failed, proposal('a:modsecurity-custom', '2'*32)])['complete'])
 

@@ -787,7 +787,13 @@ class Trace:
         if not isinstance(text, str) or len(text.encode("utf-8")) > 128 * 1024:
             success, text = False, ""
         if not success:
-            state, detail, due = "outcome_unknown", error or "incomplete_model_run_requires_review", now
+            detail = error or "incomplete_model_run_requires_review"
+            if not error and returncode == 124:
+                detail = "model_subprocess_timeout_requires_review"
+            elif (not error and not self.protocol_error and not missing and self.result
+                  and self.result.get("exit_code") == 130):
+                detail = "model_interrupted_requires_review"
+            state, due = "outcome_unknown", now
         elif self.tool_error or self.pending_sca_argument_errors:
             state, detail, due = "needs_review", "model_tool_failure_requires_review", now
         else:
@@ -1137,7 +1143,8 @@ def run_hermes(store, case, prompt):
 
 def incomplete_report(detail):
     safe = detail if detail in {"model_outer_timeout", "model_process_failure", "model_trace_limit",
-        "model_prompt_too_large", "interrupted_run_requires_review", "incomplete_model_run_requires_review"} else "diagnostic_run_incomplete"
+        "model_prompt_too_large", "interrupted_run_requires_review", "incomplete_model_run_requires_review",
+        "model_subprocess_timeout_requires_review", "model_interrupted_requires_review"} else "diagnostic_run_incomplete"
     return ("자동 조사를 완료하지 못했습니다. 원인 코드: `" + safe + "`.\n"
             "실행·승인·차단 결과를 확인하지 못했으므로 추가 검토가 필요합니다. 알림 재전송은 조사나 조치를 재실행하지 않습니다.")
 

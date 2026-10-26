@@ -45,6 +45,24 @@ class Opener:
 
 
 class ControllerTests(unittest.TestCase):
+    def test_interrupted_and_timeout_results_remain_unresolved_with_precise_diagnostics(self):
+        for index,(returncode,native,outer,expected) in enumerate((
+            (124,130,None,'model_subprocess_timeout_requires_review'),
+            (130,130,None,'model_interrupted_requires_review'),
+            (0,130,None,'model_interrupted_requires_review'),
+            (130,130,'model_outer_timeout','model_outer_timeout'),
+        )):
+            event=self.incident('interrupt-'+str(index),index+1)
+            event['payload']['src_ip']='198.51.100.'+str(index+10)
+            self.events(event);trace=self.trace()
+            trace.accept({'type':'result','session_id':trace.session_id,'exit_code':native,
+                          'text':'조사 완료\nMANAGEMENT_STATUS: resolved'})
+            result=trace.finish(returncode,outer)
+            self.assertEqual(result['state'],'outcome_unknown')
+            row=self.store.db.execute('select detail from runs where id=?',(trace.run_id,)).fetchone()
+            self.assertEqual(row[0],expected)
+            self.assertIn(expected,m.incomplete_report(expected))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.now = 1000.0

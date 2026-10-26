@@ -56,7 +56,7 @@ async def run(config, request, *, on_protected_start=None):
     from langchain_ollama import ChatOllama
     from langchain_core.tools import StructuredTool
     from langchain_core.callbacks import AsyncCallbackHandler
-    from jsonschema import Draft202012Validator
+    from jsonschema import Draft202012Validator, ValidationError
 
     started = time.perf_counter()
     report = {'at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
@@ -148,8 +148,18 @@ async def run(config, request, *, on_protected_start=None):
                         async def call(**arguments):
                             async with lock:
                                 validate_call(backend, bare_name, arguments, mode)
-                                Draft202012Validator(input_schema).validate(arguments)
                                 budget.take()
+                                try:
+                                    Draft202012Validator(input_schema).validate(arguments)
+                                except ValidationError as exc:
+                                    # This is before any MCP call or protected-start
+                                    # callback. Let the model correct schema input;
+                                    # never replay a call whose outcome is unknown.
+                                    rejection = {'server': backend, 'name': bare_name,
+                                        'error': 'tool_input_schema_validation_failed',
+                                        'validator': str(exc.validator), 'executed': False}
+                                    report.setdefault('input_rejections', []).append(rejection)
+                                    return canonical({**rejection, 'expected_schema': input_schema})
                                 if read_plan and read_plan['kind'] in ('wazuh', 'multi') and 'agent_id' in arguments:
                                     expected = harness.READ.verified_ids(read_plan, report['calls'])
                                     if arguments['agent_id'] not in expected:
@@ -248,10 +258,11 @@ async def run(config, request, *, on_protected_start=None):
                         '이 안내는 변경이나 승인이 아닙니다.\n' + harness.EVIDENCE.literal_evidence_summary(harness.facts_for(report['calls'])))
                     if gap:
                         preparation_used = True
+                        report['write_preparation_attempts'] = 1
                         report['repair']['missing_write_targets'] = gap
                         instruction = '현재 질문: ' + current + '\n' + harness.preparation_instruction(gap)
                     read_scope = harness.tool_scope(current, report['calls'])
-                    if read_scope and budget.used < budget.limit:
+                    if read_scope and not gap and budget.used < budget.limit:
                         # The same LLM selects real read calls in constrained JSON
                         # when native tool calling stalls. No fixed fallback reads,
                         # protected tools, inferred approvals or incident decisions.
@@ -280,7 +291,7 @@ async def run(config, request, *, on_protected_start=None):
                         final = ''  # Only observed facts can render this bounded read path.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
-                    if report['protected_calls']:
+                    if report['protected_calls'] or preparation_used:
                         break
                     gap = harness.preparation_gap(current, report['calls'])
                     missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))

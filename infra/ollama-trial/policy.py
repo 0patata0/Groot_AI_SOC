@@ -8,6 +8,7 @@ READ_TOOLS = {
     'rule-a': RULE_READS, 'rule-b': RULE_READS,
     'security-events': {'search_suricata_alerts', 'search_modsecurity_alerts'},
     'system-diagnostics': {'get_system_diagnostics', 'calculate_time'},
+    'resp': {'list_blocks'},
     'wazuh-ro': {'get_wazuh_agents', 'get_wazuh_cluster_nodes',
                 'get_wazuh_critical_vulnerabilities', 'get_wazuh_manager_error_logs',
                 'get_wazuh_vulnerability_summary', 'get_wazuh_agent_processes',
@@ -36,6 +37,12 @@ def capabilities(mode='read-only'):
 
 def protected(server, name):
     return name in PROTECTED_TOOLS.get(server, ())
+
+
+def filter_catalog(server, tools, mode):
+    require(server in capabilities(mode), 'server_not_authorized')
+    require({t.name for t in tools} == PARITY_TOOLS[server], 'server_tool_contract_changed')
+    return [t for t in tools if t.name in capabilities(mode)[server]]
 
 
 def require(value, code):

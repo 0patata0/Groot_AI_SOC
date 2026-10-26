@@ -69,7 +69,7 @@ def read_report(question, calls):
 def ids_runtime_question(question):
     text = READ.scope_text(normalized(question))
     return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
-        and re.search(r'활성|가동|적재|사용(?:\s*중|하는|하고)|구동|불러오|로드', text)
+        and re.search(r'활성|가동|적재|사용(?:\s*중|하는|하고)|구동|불러오|로드|실행\s*(?:상태|여부|중)', text)
         and not re.search(r'WAF|Wazuh', text, re.I) and not READ.wants_write(text))
 
 

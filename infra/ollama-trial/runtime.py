@@ -21,7 +21,7 @@ os.environ.update(MCP_USE_ANONYMIZED_TELEMETRY='false', DO_NOT_TRACK='1',
                   LANGCHAIN_TRACING_V2='false', MCP_USE_DEBUG='0',
                   PYTHONDONTWRITEBYTECODE='1', TZ='Asia/Seoul')
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from policy import PROFILES, Budget, alias, capabilities, protected, require, validate_call, validate_endpoint, validate_model
+from policy import PROFILES, Budget, alias, capabilities, filter_catalog, protected, require, validate_call, validate_endpoint, validate_model
 import harness
 SYSTEM_PROMPT = harness.SYSTEM_PROMPT
 
@@ -128,8 +128,8 @@ async def run(config, request, *, on_protected_start=None):
             for server, session in current_client.get_all_active_sessions().items():
                 connector = session.connector
                 tools = await connector.list_tools()
-                require({t.name for t in tools} == available[server], 'server_tool_contract_changed')
-                for tool in tools:
+                # Mixed catalogs are validated before their write tools are hidden.
+                for tool in filter_catalog(server, tools, mode):
                     name = alias(server, tool.name)
                     report['_policy_tools'].append({'function': {'name': name, 'description': tool.description or ''}})
                     schema = json.loads(json.dumps(tool.inputSchema))

@@ -28,6 +28,13 @@ def fixture(target='a:modsecurity-custom'):
 
 
 class Grounding(unittest.TestCase):
+    def test_korean_running_and_active_requests_use_observed_read_renderers(self):
+        q = '현재 IDS 서비스 실행 상태를 각자 조회하고 서로 검증해줘'
+        self.assertTrue(harness.structured_read(q))
+        self.assertEqual(harness.missing_reads(q, []), ['a:suricata'])
+        p = harness.read_plan('현재 활성 Wazuh 에이전트 목록을 보여줘')
+        self.assertEqual(p['states'], ['active'])
+        self.assertEqual(harness.read_plan('현재 비활성 Wazuh 에이전트 목록을 보여줘'), None)
     def test_structured_read_selection_never_offers_protected_tools(self):
         with self.assertRaises(ValueError):
             harness.selection_schema({'mcp__rule_write_a__propose_rule_edit': {'type': 'object'}}, 3)

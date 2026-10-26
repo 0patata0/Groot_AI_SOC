@@ -37,6 +37,15 @@ elif '/deployment/remote.sh ' in command:
     elif phase=='siem diag-activate':
         evidence=json.loads(sys.stdin.buffer.read())
         if [x['role'] for x in evidence]!=['security','service']: sys.exit(51)
+    elif phase=='security monitor-prepare': sys.stdout.buffer.write(b'monitor-public-key-stream')
+    elif phase in ('siem monitor-authorize','service monitor-authorize'):
+        if sys.stdin.buffer.read()!=b'monitor-public-key-stream': sys.exit(52)
+        print(json.dumps({'host':phase.split()[0],'host_key':'public-monitor-host-key'}))
+    elif phase=='security monitor-hosts':
+        if len(json.loads(sys.stdin.buffer.read()))!=2: sys.exit(53)
+    elif phase=='siem monitor-export': sys.stdout.buffer.write(b'private-monitor-webhook-stream')
+    elif phase=='security monitor-activate':
+        if sys.stdin.buffer.read()!=b'private-monitor-webhook-stream': sys.exit(54)
 elif '/deployment/prerequisites.py ' in command:
     if os.environ.get('FAIL_BUNDLE') == ' '.join(command.split()[-2:]): sys.exit(45)
 elif '/deployment/lab_key.py check' in command:
@@ -145,6 +154,19 @@ class ControllerContract(unittest.TestCase):
         result = self.run_controller('--plan')
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(self.events(), [])
+
+    def test_review_channel_requires_chat_and_follows_verified_gateway(self):
+        with self.config.open('a') as f:
+            f.write('SOC_REVIEW_CHAT_ENABLE=1\n')
+        result=self.run_controller('--plan')
+        self.assertNotEqual(result.returncode,0);self.assertEqual(self.events(),[])
+        with self.config.open('a') as f:
+            f.write('OLLAMA_TRIAL_ENABLE=1\nOLLAMA_TRIAL_CHAT_ENABLE=1\n')
+        result=self.run_controller()
+        self.assertEqual(result.returncode,0,result.stderr)
+        phases=self.phases()
+        self.assertLess(phases.index('siem trial-chat-verify'),phases.index('siem review-chat-install'))
+        self.assertLess(phases.index('siem review-chat-install'),phases.index('siem review-chat-verify'))
 
     def run_controller(self, mode='--apply', **env):
         return subprocess.run(['bash', str(self.root / 'deploy.sh'), mode, '--batch', '--config', str(self.config)],

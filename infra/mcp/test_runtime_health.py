@@ -18,6 +18,18 @@ NOW=1900000000
 
 
 class RuntimeTests(unittest.TestCase):
+    def test_review_channel_health_binds_running_process_and_pending_age(self):
+        value={'pid':44,'process_start_ticks':55,'at':NOW,'last_poll':NOW,'pending':1,'oldest_pending_at':NOW-10}
+        with patch.object(h,'read_file',return_value=(json.dumps(value).encode(),NOW)), \
+             patch.object(h,'command',return_value='44'),patch.object(h,'process_start',return_value=55):
+            metrics,codes=h.review_chat(NOW,None)
+            self.assertEqual(codes,[]);self.assertEqual(metrics['review_chat_pending_jobs'],1)
+            self.assertIn('chat_heartbeat_stale',h.review_chat(NOW+31,None)[1])
+            self.assertIn('job_stalled',h.review_chat(NOW+1800,None)[1])
+        with patch.object(h,'read_file',return_value=(json.dumps(value).encode(),NOW)), \
+             patch.object(h,'command',return_value='45'),patch.object(h,'process_start',return_value=55),self.assertRaises(ValueError):
+            h.review_chat(NOW,None)
+
     def test_catalog_has_no_arbitrary_paths_and_matches_validator(self):
         self.assertEqual(d.RUNTIME_TARGETS,h.ROLE_TARGETS)
         self.assertEqual(len(d.TARGETS),38)

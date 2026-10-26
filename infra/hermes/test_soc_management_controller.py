@@ -396,7 +396,7 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(self.store.db.execute("SELECT count(*) FROM inbox").fetchone()[0], 41)
         self.assertIn('"evidence_truncated":true', m.prompt_for("policy", case, evidence))
 
-    def test_monitor_is_bounded_and_readonly(self):
+    def test_monitor_without_proposals_keeps_investigation_mode_and_is_bounded(self):
         self.events(self.incident())
         for count in range(4):
             trace = self.trace()
@@ -404,7 +404,79 @@ class ControllerTests(unittest.TestCase):
             self.result(trace, "추가 관찰이 필요합니다.\nMANAGEMENT_STATUS: monitor")
             result = trace.finish(0)
             self.assertEqual(result["state"], "monitor" if count < 3 else "needs_review")
+            self.assertEqual(self.store.db.execute("SELECT mode FROM cases").fetchone()[0], "manage")
             self.now += 301
+
+    def test_operator_review_preserves_prior_failure_and_forces_fresh_readonly_run(self):
+        self.events(self.incident())
+        trace = self.trace()
+        trace.finish(1)
+        prior = dict(self.store.db.execute("SELECT * FROM cases").fetchone())
+        queued = self.store.review(prior["id"], "operator requested review")
+        self.assertFalse(queued["completed"])
+        self.assertEqual(self.store.db.execute("SELECT count(*) FROM runs").fetchone()[0], 1)
+        case = self.store.next_case()
+        self.assertEqual(case["mode"], "verify")
+        self.assertIsNone(case["session_id"])
+        self.assertNotIn("--resume", m.command_for(case))
+        self.assertIn('"operator_readonly_review":true', m.prompt_for("policy", case, self.store.context(case["id"])))
+        rid = self.store.start(case)
+        t = m.Trace(self.store, case, rid)
+        t.accept({"type": "system", "subtype": "init", "session_id": "fresh-review"})
+        self.tool(t, "mcp__resp__list_blocks", {"blocks": []})
+        self.result(t)
+        result = t.finish(0)
+        self.assertEqual(result["state"], "completed")
+        audit = self.store.db.execute("SELECT * FROM reviews").fetchone()
+        self.assertEqual(json.loads(audit["previous"]), prior)
+        self.assertEqual(audit["run_id"], result["run_id"])
+        self.assertEqual(self.store.db.execute("SELECT state FROM runs WHERE id=?", (trace.run_id,)).fetchone()[0], "outcome_unknown")
+        with self.assertRaisesRegex(m.ControllerError, "not_eligible"):
+            self.store.review(prior["id"], "second review")
+
+    def test_review_refuses_running_case_and_empty_reason(self):
+        self.events(self.incident())
+        trace = self.trace()
+        with self.assertRaisesRegex(m.ControllerError, "not_eligible"):
+            self.store.review(trace.case["id"], "operator review")
+        with self.assertRaisesRegex(m.ControllerError, "request_invalid"):
+            self.store.review(trace.case["id"], " ")
+
+    def test_supersession_needs_later_broker_reference_and_fresh_matching_reads(self):
+        p1, p2, target = "a" * 32, "b" * 32, "a:suricata-local"
+        for seq, pid in ((1, p1), (2, p2)):
+            self.events({"seq": seq, "event_key": pid, "kind": "rule_change", "at": 990,
+                         "payload": {"event": "result", "proposal_id": pid, "status": "applied", "target": target}})
+        cid = self.store.db.execute("SELECT case_id FROM proposals WHERE id=?", (p1,)).fetchone()[0]
+        later = self.store.later_proposals(cid)
+        self.assertEqual(later[0]["follows"], [p1])
+        row = (p1, "applied", "", target)
+        receipts = {("status", p1): {"target": target, "status": "applied", "after_sha256": "1" * 64},
+                    ("target", target): {"target": target, "sha256": "2" * 64, "runtime": {"running": True, "health": "healthy"}}}
+        self.assertFalse(m.verified_proposal(row, receipts, later))
+        receipts[("status", p2)] = {"target": target, "status": "applied", "before_sha256": "1" * 64, "after_sha256": "2" * 64}
+        self.assertTrue(m.verified_proposal(row, receipts, later))
+        self.assertFalse(m.verified_proposal(row, receipts))
+        for key, value in (("target", "b:wazuh-local-rules"), ("status", "failed"), ("before_sha256", "3" * 64)):
+            changed = dict(receipts)
+            changed[("status", p2)] = dict(receipts[("status", p2)], **{key: value})
+            self.assertFalse(m.verified_proposal(row, changed, later))
+        cid2 = self.store.db.execute("SELECT case_id FROM proposals WHERE id=?", (p2,)).fetchone()[0]
+        self.assertEqual(self.store.later_proposals(cid2), [])
+
+    def test_recovery_failure_needs_later_successful_chain_not_just_live_base_hash(self):
+        pid, target = "a" * 32, "b:wazuh-local-rules"
+        row = (pid, "recovery_failed", "", target)
+        receipts = {("status", pid): {"target": target, "status": "recovery_failed", "before_sha256": "1" * 64},
+                    ("target", target): {"target": target, "sha256": "1" * 64, "runtime": {"running": True, "health": "healthy"}}}
+        self.assertFalse(m.verified_proposal(row, receipts))
+        later = []
+        for seq, before, after in ((2, "1", "2"), (3, "2", "1")):
+            sid = str(seq) * 32
+            later.append({"id": sid, "target": target, "follows": [pid], "result_seq": seq})
+            receipts[("status", sid)] = {"target": target, "status": "applied", "before_sha256": before * 64, "after_sha256": after * 64}
+        self.assertTrue(m.verified_proposal(row, receipts, later))
+        self.assertFalse(m.verified_proposal(row, receipts, later[1:]))
 
     def test_manage_zero_read_cannot_resolve(self):
         self.events(self.incident())
@@ -492,6 +564,10 @@ class ControllerTests(unittest.TestCase):
         self.assertIn("never authorize an action", prompt)
         self.assertNotIn("--yolo", m.command_for(case))
         self.assertNotIn("-z", m.command_for(case))
+        case = dict(case, chat_request='현재 IDS 실행 상태를 조회해줘')
+        prompt = m.prompt_for('old Wazuh history', case, self.store.context(case['id']))
+        current = json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n',1)[1])
+        self.assertEqual(current['request'], '현재 IDS 실행 상태를 조회해줘')
 
     def test_state_database_is_private(self):
         self.assertEqual(os.stat(Path(self.temp.name) / "state.sqlite3").st_mode & 0o777, 0o600)

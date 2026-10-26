@@ -134,3 +134,12 @@ SOC 연결의 설치 코드는 포함하되, 이 변경의 새 VM 설치 시험�
 ## 채널 참여와 자동 보고 발신자 (2026-10-26)
 
 초기 Hermes 채널은 soc-hermes, 보고 채널은 soc-alerts-agent다. SOC 설치는 non-admin soc-report 봇과 그 봇 소유의 채널 고정 웹훅을 생성하며, 관리자 계정과 발행자를 분리한다. Ollama 채팅 선택 시 공개 soc-ollama와 공용 보고채널 멘션을 연결한다. 두 봇의 자동 참여는 채널 표시 이름 끝의 -agent/-hermes/-ollama 기준이다. 공통 동기화 소스와 deployment/report_publisher.py는 기존 소스 묶음에 포함된다. 추가 deb/wheel/이미지/포트는 없다. 실제 새 VM 전체 설치 검증은 이번 라이브 증분 검증과 별개다. [사용·현재 완료 범위](../infra/hermes/chat-channels.md).
+
+
+## 선택적 공동 채널
+
+두 봇의 직접 요청·상호 검증 채널을 함께 설치하려면 기존 `OLLAMA_TRIAL_ENABLE=1`, `OLLAMA_TRIAL_CHAT_ENABLE=1`과 `SOC_REVIEW_CHAT_ENABLE=1`을 설정한다. 단일 진입점 `deploy.sh`가 Ollama 채팅 확인 뒤 `deployment/review_chat.py`를 호출한다. 새 서버 설치 옵션이며 운영 서버에는 초기 설치를 다시 실행하지 않는다.
+
+반입 소스에 `infra/hermes/review_channel.py`, `review_channel_policy.py`, `review_channel_worker.py`와 `deployment/review_chat.py`를 포함한다. 기존 공통 `read_contract.py`·query 근거 모듈·Ollama SDK를 재사용하며 추가 deb/wheel/이미지/수신 포트는 없다. 전용 systemd 서비스·root 대기열을 만들고, Ollama 모델 작업은 기존 비특권 계정으로 실행한다. Hermes는 고정 UID의 기존 관리 gate를 사용한다. 봇 토큰은 분배기만 읽고 모델에 전달하지 않는다. 기존 보안 룰·관리자 승인 경계는 유지한다.
+
+서비스/파일 SHA와 현재 PID의 heartbeat 검사는 새 서버 전체 설치 시험을 대신하지 않는다. 실제 완료 범위는 [STATUS](../STATUS.md), 채널 사용은 [채널 안내](../infra/hermes/chat-channels.md)를 따른다.

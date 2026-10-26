@@ -523,7 +523,20 @@ def management_reasoning(request, agent):
     # This route's /api/show confirms boolean thinking. Its OpenAI adapter
     # accepts reasoning_effort, not the native /api/chat "think" field.
     # A recognized non-none effort maps to true for a boolean-only model.
-    return {**result, 'reasoning_effort': 'medium', 'extra_body': extra}
+    review = os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') == '1' and os.environ.get('CAPSTONE_MANAGEMENT_MODE') == 'verify'
+    if review:
+        result.pop('max_completion_tokens', None)
+        result['max_tokens'] = 2048
+    return {**result, 'reasoning_effort': 'none' if review else 'medium', 'extra_body': extra}
+
+
+def initial_review_read(request, completed_calls):
+    if (os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') != '1'
+            or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify' or completed_calls):
+        return request
+    value = permitted_request(request, 'verify')
+    reads = value.get('tools', [])
+    return {**value, 'tool_choice': 'required'} if reads else value
 
 
 def arm_grounding_read(agent, turn):
@@ -799,7 +812,7 @@ def main():
             args = (args[0], permitted_tools(args[1], mode), *args[2:])
         if 'tools_for_api' in kwargs and kwargs['tools_for_api'] is not None:
             kwargs['tools_for_api'] = permitted_tools(kwargs['tools_for_api'], mode)
-        return management_reasoning(permitted_request(builder(self, *args, **kwargs), mode), self)
+        return initial_review_read(management_reasoning(permitted_request(builder(self, *args, **kwargs), mode), self), completed_wire_calls)
 
     def guarded_result(self, result, session_id='', exit_code=0):
         data = dict(result) if isinstance(result, dict) else {'final_response': str(result or '')}

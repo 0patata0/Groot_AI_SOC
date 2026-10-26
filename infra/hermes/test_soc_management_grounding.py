@@ -7,6 +7,15 @@ from test_soc_management_run import wrapper, definition, READ_NAMES, WRITE_NAMES
 
 
 class Grounding(unittest.TestCase):
+    def test_readonly_review_requires_model_selected_read_before_answer(self):
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            request = wrapper.initial_review_read(self.request, [])
+            self.assertEqual(request['tool_choice'], 'required')
+            self.assertEqual({t['function']['name'] for t in request['tools']}, set(READ_NAMES))
+            self.assertIs(wrapper.initial_review_read(self.request, ['actual_read']), self.request)
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertIs(wrapper.initial_review_read(self.request, []), self.request)
+
     def setUp(self):
         self.completed=[];self.original_calls=[]
         self.tools=[definition(n) for n in READ_NAMES+WRITE_NAMES+['terminal']]
@@ -94,6 +103,14 @@ class Grounding(unittest.TestCase):
     def test_unrecognized_native_source_refuses_before_installing_hook(self):
         with patch.object(wrapper.Path,'read_bytes',side_effect=OSError),self.assertRaisesRegex(RuntimeError,'source_changed'):
             wrapper.install_grounding_retry([])
+
+    def test_explicit_readonly_review_uses_bounded_nonreasoning_profile(self):
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW': '1', 'CAPSTONE_MANAGEMENT_MODE': 'verify'}):
+            request=wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)
+            self.assertEqual(request['reasoning_effort'],'none')
+            self.assertEqual(request['max_tokens'],2048)
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW': '1', 'CAPSTONE_MANAGEMENT_MODE': 'manage'}):
+            self.assertEqual(wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)['reasoning_effort'],'medium')
 
 
 if __name__=='__main__':unittest.main()

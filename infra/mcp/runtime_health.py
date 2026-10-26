@@ -315,15 +315,36 @@ def bot(target, cfg, runner, now):
     return row
 
 
-def management(now):
+def process_start(pid):
+    require(type(pid) is int and pid > 0)
+    return int(Path('/proc',str(pid),'stat').read_text().rsplit(')',1)[1].split()[19])
+
+
+def review_chat(now, runner):
+    value = json.loads(read_file('/var/lib/capstone-review-chat/health.json')[0])
+    pid = int(command(runner, ['/usr/bin/systemctl','show','capstone-review-chat.service','--property=MainPID','--value']).strip())
+    require(value['pid'] == pid and value['process_start_ticks'] == process_start(pid)
+            and type(value['pending']) is int and value['pending'] >= 0
+            and all(type(value[k]) in (int,float) and 0 < value[k] <= now+5 for k in ('at','last_poll')))
+    oldest = value.get('oldest_pending_at')
+    require(oldest is None or type(oldest) in (int,float) and 0 < oldest <= now+5)
+    metrics = {'review_chat_installed': True, 'review_chat_poll_age_seconds': max(0, now-value['last_poll']),
+               'review_chat_pending_jobs': value['pending'], 'review_chat_oldest_job_seconds': max(0,now-oldest) if oldest else 0}
+    codes = []
+    if now-value['at']>30 or metrics['review_chat_poll_age_seconds']>30: codes.append('chat_heartbeat_stale')
+    if metrics['review_chat_oldest_job_seconds']>1800: codes.append('job_stalled')
+    return metrics, codes
+
+
+def management(now, runner=None):
     # SQLite may need its WAL/SHM sidecars even for a read-only connection.
     # The collector unit permits that one directory; SQL stays query-only.
     with sqlite3.connect('file:/var/lib/capstone-management/state.sqlite3?mode=ro', uri=True, timeout=2) as db:
         db.execute('pragma query_only=ON')
         pending = db.execute("select count(*),min(created) from report_outbox where delivery_state='pending'").fetchone()
         runs = db.execute("select count(*),min(started) from runs where state='running'").fetchone()
-        due = db.execute("select count(*),min(due) from cases where state in ('ready','monitor','waiting_approval') and due<?",(now,)).fetchone()
-        review = db.execute("select count(*) from cases where state in ('needs_review','outcome_unknown')").fetchone()[0]
+        due = db.execute("select count(*),min(due) from cases where state in ('ready','monitor','waiting_approval','review_ready') and due<?",(now,)).fetchone()
+        review = db.execute("select count(*) from cases where state in ('needs_review','outcome_unknown','review_ready')").fetchone()[0]
     metrics = {'pending_reports': pending[0], 'oldest_report_seconds': max(0, now - pending[1]) if pending[1] else 0,
                'running_cases': runs[0], 'oldest_case_seconds': max(0, now - runs[1]) if runs[1] else 0,
                'overdue_cases':due[0], 'oldest_overdue_seconds':max(0,now-due[1]) if due[1] else 0, 'review_required_cases':review}
@@ -331,6 +352,12 @@ def management(now):
     if review: codes.append('case_review_required')
     if metrics['oldest_report_seconds'] > 180: codes.append('report_delivery_pending')
     if metrics['oldest_case_seconds'] > 900 or metrics['oldest_overdue_seconds'] > 900: codes.append('case_stalled')
+    metrics['review_chat_installed'] = Path('/etc/capstone-review-chat/config.json').exists()
+    if metrics['review_chat_installed']:
+        try:
+            extra, more = review_chat(now, runner);metrics.update(extra);codes.extend(more)
+        except (OSError, ValueError, KeyError, TypeError):
+            codes.append('chat_heartbeat_stale')
     return observation('management_pipeline', now, metrics, codes, limits=('no_pending_case_is_not_security_clearance',))
 
 
@@ -357,7 +384,7 @@ def collect_one(target, cfg, runner, now):
     if target == 'b:wazuh-manager': return wazuh(cfg, runner, now)
     if target in ('a:collection', 'c:collection'): return agent_collection(cfg['role'], runner, now)
     if target in ('b:hermes', 'b:ollama'): return bot(target, cfg, runner, now)
-    if target == 'b:management-pipeline': return management(now)
+    if target == 'b:management-pipeline': return management(now, runner)
     if target == 'b:ingestion': return probe_receipt('ingestion', now)
     if target == 'b:llm':
         models = request_json(cfg['llm_url'], '/api/ps').get('models', [])

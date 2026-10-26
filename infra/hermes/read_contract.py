@@ -71,7 +71,7 @@ def without_prohibitions(text):
 def wants_write(text):
     text = without_prohibitions(text)
     return bool(re.search(
-        r'(?:변경안|원복안|제안).{0,60}(?:만들|작성|준비|제출)(?:해|하|해줘|해주|해줄|하세요|을|한다|$)'
+        r'(?:변경안|수정안|원복안|제안).{0,60}(?:만들|작성|준비|제출)(?:해|하|해줘|해주|해줄|하세요|을|한다|$)'
         r'|(?:추가|삭제|수정|변경|원복|복구|재시작|설치|배포|차단|해제|승인|거부|적용)(?:해|하(?:고|라|세요|는|여|자)|해줘|해주|해줄)', text))
 
 
@@ -95,6 +95,9 @@ def _single_plan(question, aware_time):
         if re.search(pattern, text, re.I):
             features.append(name)
     states = [s for s in STATES if re.search(r'(?<![a-z_])' + s + r'(?![a-z_])', text, re.I)]
+    if re.search(r'(?<![가-힣])활성(?:화)?(?:된|인)?\s*(?:Wazuh\s*)?(?:에이전트|agent)|(?:에이전트|agent).{0,20}활성\s*(?:상태|목록)', text, re.I):
+        if 'active' not in states:
+            states.append('active')
     if not features and not (re.search(r'Wazuh|와주|에이전트|agent', text, re.I) and states):
         return None
     search = process_search(text)

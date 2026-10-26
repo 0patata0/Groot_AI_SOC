@@ -148,6 +148,38 @@ class ControllerTests(unittest.TestCase):
         self.assertFalse(m.verified_sca_checks(req,[],1000.))
         self.assertFalse(m.verified_sca_checks(req,[receipt],100000.))
 
+    def sca_retry_trace(self, error_message=None):
+        self.now=m.datetime.fromisoformat('2026-10-26T18:00:00+09:00').timestamp()
+        event=self.alert('sca-retry','2026-10-23T12:00:00Z',rule='19011')
+        event.update(location='sca',description='CIS.: Ensure sshd HostbasedAuthentication is disabled.: Status changed from passed to failed')
+        self.alerts(event);trace=self.trace()
+        message=error_message or 'title_contains requires policy_id and 3..120 plain-text characters; no check_ids'
+        name='mcp__security_events__get_wazuh_sca_checks'
+        trace.accept({'type':'tool_use','name':name,'input':{'agent_id':'001','title_contains':'HostbasedAuthentication'}})
+        trace.accept({'type':'tool_result','name':name,'is_error':True,'output':json.dumps({'error':json.dumps({'error':message})})})
+        payload={'source_scope':'last_stored_sca_scan','agent_id':'001','policy_id':'cis',
+                 'policies':[{'policy_id':'cis','scan_end_kst':'2026-10-26T07:00:00+09:00'}],
+                 'checks':[{'check_id':35649,'title':'Ensure sshd HostbasedAuthentication is disabled.','result':'passed'}]}
+        return trace,name,payload
+
+    def test_corrected_missing_sca_policy_recovers_only_with_matching_actual_check(self):
+        trace,name,payload=self.sca_retry_trace()
+        self.tool(trace,name,payload,{'agent_id':'001','policy_id':'cis','title_contains':'HostbasedAuthentication'})
+        self.result(trace);self.assertEqual(trace.finish(0)['state'],'completed')
+        self.assertEqual(self.store.db.execute('select count(*) from tool_calls where is_error=1').fetchone()[0],1)
+
+    def test_sca_argument_error_not_cleared_by_other_check_or_policy_summary(self):
+        trace,name,payload=self.sca_retry_trace();payload['checks'][0]['title']='Ensure sshd UsePAM is enabled.'
+        self.tool(trace,name,payload,{'agent_id':'001','policy_id':'cis','title_contains':'UsePAM'})
+        self.tool(trace,name,{'agent_id':'001','policies':[]},{'agent_id':'001'})
+        self.result(trace);self.assertEqual(trace.finish(0)['state'],'needs_review')
+        self.assertTrue(trace.pending_sca_argument_errors)
+
+    def test_sca_transport_failure_remains_failure_after_successful_lookup(self):
+        trace,name,payload=self.sca_retry_trace('Read-only query failed; check server logs')
+        self.tool(trace,name,payload,{'agent_id':'001','policy_id':'cis','title_contains':'HostbasedAuthentication'})
+        self.result(trace);self.assertEqual(trace.finish(0)['state'],'needs_review')
+
     def test_broker_signature_is_bound_to_nonce_status_body_and_query(self):
         good = m.Broker("x" * 32, opener=Opener(), clock=lambda: 1000)
         self.assertEqual(good.get("/management/events?after=0&limit=100")["events"], [])

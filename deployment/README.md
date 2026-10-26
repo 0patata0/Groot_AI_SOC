@@ -1,6 +1,6 @@
 # 초기 설치기의 Hermes 확장
 
-> **10/26 사건 종결 검증:** 기존 deploy.sh→SOC 관리 controller 렌더링 경로가 후속 변경 참조·SCA 개별 점검 제목과 센서 사건의 출처/출발지/시각/상관 규칙 ID 근거 검증을 함께 반영한다. 관리134/설치30 검사를 통과했고 운영은 root controller만 증분 교체했다. 추가 패키지·이미지·포트·키0이며 새3VM 전체 설치는 미실행이다. [STATUS](../STATUS.md).
+> **10/26 사건 종결 검증:** 기존 deploy.sh→SOC 관리 controller 렌더링 경로가 후속 변경 참조·SCA 개별 점검 제목과 센서 사건의 출처/출발지/시각/상관 규칙 ID 근거 검증을 함께 반영한다. SCA 특정 인자 오류의 실제 재조회 확인을 포함한 관리137/설치30 검사를 통과했고 운영은 root controller만 증분 교체했다. 추가 패키지·이미지·포트·키0이며 새3VM 전체 설치는 미실행이다. [STATUS](../STATUS.md).
 
 > **10/26 저장소 계측 소스:** 기존 소스 묶음의 `infra/automation/storage-retention/{monitor.sh,monitor-lib.sh,test-native.sh,README.md}`를 함께 갱신한다. lib SHA pin·256개 상한/실패 분류를 기존 고정 A/B 운영 설치에 증분 반영했다. 새 deb/wheel/이미지·포트·키 변경0이며 기존 오프라인 목록을 유지한다. 이 고정 호스트 모듈의 새 서버 bootstrap/전체 설치 검증은 미완료다. [설치 계약](../infra/automation/storage-retention/README.md) · [실측/잔여](../STATUS.md).
 

@@ -480,6 +480,38 @@ def effective_status(payload):
     return status
 
 
+def missing_sca_policy_query(name, arguments, output):
+    """Only a missing-policy title lookup can recover through that exact check."""
+    if name != "mcp__security_events__get_wazuh_sca_checks" or arguments.get("policy_id") is not None:
+        return None
+    agent, title = arguments.get("agent_id"), arguments.get("title_contains")
+    if (not isinstance(agent, str) or not re.fullmatch(r"[0-9]{3,8}", agent)
+            or not isinstance(title, str) or not 3 <= len(title) <= 120
+            or any(ord(c) < 32 for c in title) or "check_ids" in arguments):
+        return None
+    for _ in range(8):
+        if isinstance(output, str):
+            try:
+                output = json.loads(output)
+                continue
+            except ValueError:
+                break
+        if not isinstance(output, dict):
+            return None
+        if isinstance(output.get("error"), str):
+            output = output["error"]
+        elif set(output) == {"result"}:
+            output = output["result"]
+        elif (isinstance(output.get("content"), list) and len(output["content"]) == 1
+              and isinstance(output["content"][0], dict) and output["content"][0].get("type") == "text"):
+            output = output["content"][0].get("text")
+        else:
+            return None
+    if output == "title_contains requires policy_id and 3..120 plain-text characters; no check_ids":
+        return (agent, title.casefold())
+    return None
+
+
 def healthy_observation(value):
     return (isinstance(value, dict) and value.get("running") is True
             and value.get("health") in ("healthy", "none", "not_reported")
@@ -612,6 +644,7 @@ class Trace:
         self.arguments, self.read_receipts = {}, {}
         self.sca_requirements = sca_review_requirements(store.context(case["id"]))
         self.sca_receipts = []
+        self.pending_sca_argument_errors = set()
         self.sensor_requirements = sensor_review_requirements(store.context(case["id"]))
         self.sensor_receipts = set()
 
@@ -653,7 +686,11 @@ class Trace:
                 return
             payload = tool_payload(event.get("output"))
             error = bool(event.get("is_error")) or tool_failed(event.get("output"))
-            self.tool_error |= error
+            recoverable = missing_sca_policy_query(name, self.arguments[pending[0]["ordinal"]], event.get("output")) if error else None
+            if recoverable:
+                self.pending_sca_argument_errors.add(recoverable)
+            else:
+                self.tool_error |= error
             with db:
                 db.execute("UPDATE tool_calls SET completed=1,is_error=? WHERE run_id=? AND ordinal=?", (int(error), self.run_id, pending[0]["ordinal"]))
                 if name in WRITE_TOOLS and not error:
@@ -708,6 +745,8 @@ class Trace:
                                 if isinstance(check,dict) and isinstance(check.get("title"),str) and type(check.get("check_id")) is int:
                                     self.sca_receipts.append({"agent_id":args["agent_id"],"title":check["title"].rstrip(" .").casefold(),
                                         "scan_at":stamp.timestamp(),"result":check.get("result")})
+                                    self.pending_sca_argument_errors = {key for key in self.pending_sca_argument_errors
+                                        if key[0] != args["agent_id"] or key[1] not in check["title"].casefold()}
                 elif not error and payload and name in (
                         "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts"):
                     source = "suricata" if name.endswith("search_suricata_alerts") else "modsecurity"
@@ -734,7 +773,7 @@ class Trace:
             success, text = False, ""
         if not success:
             state, detail, due = "outcome_unknown", error or "incomplete_model_run_requires_review", now
-        elif self.tool_error:
+        elif self.tool_error or self.pending_sca_argument_errors:
             state, detail, due = "needs_review", "model_tool_failure_requires_review", now
         else:
             proposals = list(db.execute("SELECT id,status,result_status,target FROM proposals WHERE case_id=?", (self.case["id"],)))

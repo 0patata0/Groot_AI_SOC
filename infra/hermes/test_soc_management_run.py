@@ -470,6 +470,53 @@ class ManagementWrapper(unittest.TestCase):
         self.assertNotIn("content", receipt)
         self.assertEqual(json.loads(outer)["result"], inner)
 
+    def test_large_event_and_sca_audit_preserves_last_row_and_original_mcp_response(self):
+        for bare in wrapper.EVENT_READ:
+            with self.subTest(tool=bare):
+                payload = {'source_scope': 'last_stored_sca_scan' if bare == 'get_wazuh_sca_checks' else 'wazuh_indexed_alerts',
+                           'alerts': [{'timestamp': '2026-10-22T04:09:02.%03d+09:00' % i,
+                                       'source_ip': '192.0.2.8', 'wazuh_rule_id': '100110',
+                                       'signature': '실제 경보 표본 ' * 16} for i in range(50)]}
+                inner = json.dumps(payload, ensure_ascii=False)
+                outer = json.dumps({'result': inner}, ensure_ascii=False)
+                self.assertGreater(len(outer), 5000)
+                content = [types.SimpleNamespace(text=inner)]
+                def check(h):
+                    actual = asyncio.run(h.ClientSession(content).call_tool(bare, {}))
+                    h.Emitter().on_tool_progress('tool.completed', 'mcp__security_events__' + bare,
+                                                result=outer, tool_call_id='actual-call', duration=0.25)
+                    self.assertEqual(actual.content[0].text, inner)
+                h = Harness(); h.run(check, 'verify')
+                events = [json.loads(line) for line in h.stdout.getvalue().splitlines()]
+                self.assertEqual(len(events), 1)
+                self.assertEqual(events[0]['tool_call_id'], 'actual-call')
+                self.assertEqual(events[0]['duration_ms'], 250)
+                self.assertFalse(events[0]['is_error'])
+                self.assertEqual(controller.tool_payload(events[0]['output']), payload)
+
+    def test_event_audit_utf8_limit_and_native_errors_fail_closed(self):
+        for result, error in (('가' * (wrapper.MAX_EVENT_AUDIT_BYTES // 3 + 1), False),
+                              (json.dumps({'error': 'denied'}), True)):
+            with self.subTest(error=error):
+                def check(h):
+                    h.Emitter().on_tool_progress('tool.completed', 'mcp__security_events__search_suricata_alerts',
+                                                result=result, is_error=error)
+                h = Harness(); h.run(check, 'verify')
+                event = json.loads(h.stdout.getvalue())
+                self.assertTrue(event['is_error'])
+                self.assertTrue(controller.tool_failed(event['output']))
+                self.assertIsNone(controller.tool_payload(event['output']))
+
+    def test_event_audit_does_not_emit_completion_for_start_or_other_tool(self):
+        def check(h):
+            h.Emitter().on_tool_progress('tool.started', 'mcp__security_events__search_suricata_alerts', result='x'*6000)
+            h.Emitter().on_tool_progress('tool.completed', 'mcp__wazuh_ro__get_wazuh_agents', result='x'*6000)
+        h = Harness(); h.run(check, 'verify')
+        events = [json.loads(line) for line in h.stdout.getvalue().splitlines()]
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0]['name'], 'mcp__wazuh_ro__get_wazuh_agents')
+        self.assertEqual(len(events[0]['output']), 5000)
+
     def test_compaction_only_for_completed_rule_target_reads(self):
         payload = {"target": "a:suricata-local", "sha256": "a"*64,
                    "runtime": {"running": True}, "content": "x"*6000}

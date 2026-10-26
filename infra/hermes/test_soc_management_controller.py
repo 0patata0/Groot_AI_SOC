@@ -526,6 +526,44 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(self.store.db.execute("SELECT count(*) FROM inbox").fetchone()[0], 41)
         self.assertIn('"evidence_truncated":true', m.prompt_for("policy", case, evidence))
 
+    def test_full_sensor_references_cover_older_events_beyond_description_limit(self):
+        alerts = []
+        for i in range(53):
+            alert = self.alert(str(i), '2026-10-22T04:09:02.%03d+09:00' % i)
+            alert['location'] = '/logs/suricata/eve.json';alerts.append(alert)
+        self.alerts(*alerts);case = self.store.next_case();context = self.store.context(case['id'])
+        refs = m.sensor_review_requirements(context)
+        self.assertEqual(context['evidence_included'], 40)
+        self.assertTrue(context['evidence_truncated'])
+        self.assertTrue(context['sensor_references_complete'])
+        self.assertEqual(len(refs), 53)
+        self.assertTrue(m.verified_sensor_events(refs, refs))
+        self.assertFalse(m.verified_sensor_events(refs, refs - {m.sensor_event_reference(alerts[0])}))
+        prompt = m.prompt_for('policy', dict(case, operator_review=True), context)
+        self.assertIn('2026-10-22T04:09:59.999999+09:00', prompt)
+
+    def test_sensor_reference_cap_does_not_turn_omitted_events_into_completion(self):
+        alerts = []
+        for i in range(501):
+            alert = self.alert(str(i), '2026-10-22T04:09:02.%03d+09:00' % i)
+            alert['location'] = '/logs/suricata/eve.json';alerts.append(alert)
+        self.alerts(*alerts[:500]);case = self.store.next_case()
+        self.assertTrue(self.store.context(case['id'])['sensor_references_complete'])
+        self.alerts(alerts[-1]);context = self.store.context(case['id'])
+        self.assertFalse(context['sensor_references_complete'])
+        self.assertFalse(m.verified_sensor_events(m.sensor_review_requirements(context),
+                                                 {m.sensor_event_reference(a) for a in alerts}))
+
+    def test_operator_confirmation_comes_from_review_record_and_never_closes_without_read(self):
+        self.events(self.incident());trace = self.trace();trace.finish(1)
+        self.store.review(trace.case['id'], 'Operator confirms this specific event was an authorized test')
+        case = self.store.next_case();prompt = m.prompt_for('policy', case, self.store.context(case['id']))
+        self.assertEqual(case['operator_review_reason'], 'Operator confirms this specific event was an authorized test')
+        current = json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n', 1)[1])['request']
+        self.assertIn(case['operator_review_reason'], current)
+        trace = self.trace();self.result(trace)
+        self.assertEqual(trace.finish(0)['state'], 'needs_review')
+
     def test_monitor_without_proposals_keeps_investigation_mode_and_is_bounded(self):
         self.events(self.incident())
         for count in range(4):

@@ -24,6 +24,7 @@ WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
 EVENT_READ = frozenset({'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks'})
 DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
+MAX_EVENT_AUDIT_BYTES = 128 * 1024
 NO_OBSERVATION_REPORT = ('성공한 MCP 조회 근거를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
                          '정상 또는 조사 완료로 판단하지 않았으며 추가 검토가 필요합니다.\n'
                          'MANAGEMENT_STATUS: needs_review')
@@ -869,6 +870,26 @@ def main():
         return original_result(self, data, session_id, exit_code)
 
     def receipt_progress(self, event_type, tool_name=None, preview=None, args=None, **kwargs):
+        if event_type == 'tool.completed' and tool_name in {
+                'mcp__security_events__' + name for name in EVENT_READ}:
+            # Native CLI previews stop at 5,000 characters, in the middle of JSON.
+            # Keep the bounded real result for host verification, without changing
+            # the model's MCP response or trusting assistant-generated evidence.
+            output = str(kwargs.get('result') or '')
+            error = bool(kwargs.get('is_error', False))
+            size = len(output.encode('utf-8'))
+            if size > MAX_EVENT_AUDIT_BYTES:
+                output = json.dumps({'error': 'audit_output_limit_exceeded', 'original_utf8_bytes': size})
+                error = True
+            key = kwargs.get('tool_call_id') or tool_name
+            started = getattr(self, '_tool_started', {})
+            elapsed = time.time() - started.pop(key, time.time())
+            duration = kwargs.get('duration') or elapsed
+            payload = {'type': 'tool_result', 'name': tool_name, 'output': output,
+                       'duration_ms': int(float(duration) * 1000), 'is_error': error}
+            if kwargs.get('tool_call_id'):
+                payload['tool_call_id'] = kwargs['tool_call_id']
+            return self._emit(payload)
         if event_type == 'tool.completed' and isinstance(tool_name, str) and tool_name.endswith('__get_rule_change_target'):
             kwargs['result'] = compact_target_receipt(kwargs.get('result', ''))
         return original_progress(self, event_type, tool_name, preview, args, **kwargs)

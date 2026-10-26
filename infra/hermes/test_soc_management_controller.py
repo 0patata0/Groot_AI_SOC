@@ -698,6 +698,27 @@ class ControllerTests(unittest.TestCase):
         current = json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n',1)[1])
         self.assertEqual(current['request'], '현재 IDS 실행 상태를 조회해줘')
 
+    def test_operator_proposal_prompt_routes_original_and_successors_to_same_host(self):
+        self.events(self.incident())
+        case = dict(self.store.next_case(), operator_review=True)
+        for host in ('a', 'b'):
+            with self.subTest(host=host):
+                evidence = self.store.context(case['id'])
+                evidence['proposals'] = [{'id': 'a' * 32, 'target': host + ':rules'}]
+                evidence['later_proposals'] = [{'id': 'b' * 32, 'target': host + ':rules', 'follows': ['a' * 32]}]
+                prompt = m.prompt_for('policy', case, evidence)
+                current = json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n', 1)[1])['request']
+                for name in ('get_rule_change_status', 'get_rule_change_target'):
+                    self.assertEqual(current.count('mcp__rule_write_' + host + '__' + name), 2)
+                    other = 'b' if host == 'a' else 'a'
+                    self.assertNotIn('mcp__rule_write_' + other + '__' + name, current)
+
+    def test_unknown_proposal_target_does_not_invent_a_registered_tool(self):
+        for target in ('', 'c:rules', 'b', 'b__;sudo', None):
+            with self.subTest(target=target):
+                self.assertEqual(m.proposal_read_reference({'id': 'a' * 32, 'target': target}),
+                                 {'proposal_id': 'a' * 32, 'target': target})
+
     def test_state_database_is_private(self):
         self.assertEqual(os.stat(Path(self.temp.name) / "state.sqlite3").st_mode & 0o777, 0o600)
 

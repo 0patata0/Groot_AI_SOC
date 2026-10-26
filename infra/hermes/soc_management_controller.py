@@ -811,6 +811,17 @@ class Trace:
         return {"run_id": self.run_id, "case_id": self.case["id"], "state": state, "completed": success, "text": text if success else ""}
 
 
+def proposal_read_reference(proposal):
+    """Name the registered read endpoints from authenticated target metadata."""
+    target = proposal["target"]
+    reference = {"proposal_id": proposal["id"], "target": target}
+    if isinstance(target, str) and target.startswith(("a:", "b:")):
+        prefix = "mcp__rule_write_" + target[0] + "__"
+        reference.update(status_tool=prefix + "get_rule_change_status",
+                         target_tool=prefix + "get_rule_change_target")
+    return reference
+
+
 def prompt_for(base, case, evidence):
     current_request = dict(case).get("chat_request", base)
     if dict(case).get("operator_review"):
@@ -826,15 +837,19 @@ def prompt_for(base, case, evidence):
             "근거·남은 한계와 결론을 12줄 이내로 보고하고 마지막 MANAGEMENT_STATUS 표지를 반드시 붙인다.")
         if evidence["proposals"]:
             current_request += ("\n이번 실행에서 먼저 조회할 연결 제안(과거 상태 설명은 실제 조회를 대신하지 않음): " +
-                canonical([{"proposal_id": p["id"], "target": p["target"]} for p in evidence["proposals"]]))
+                canonical([proposal_read_reference(p) for p in evidence["proposals"]]))
             successors = evidence.get("later_proposals", [])
             if successors:
                 current_request += ("\n현재 해시가 원래 적용 후 해시와 다르거나 과거 복구 실패가 있으면, "
                     "아래 같은 대상의 후속 제안 상태를 직접 조회해 before_sha256→after_sha256 연결을 확인한다. "
                     "원래 제안과 현재 파일만 반복 조회해서는 원복 여부를 알 수 없다. "
+                    "첫 후속 제안에서 멈추지 말고 현재 파일 해시까지 연결하는 데 필요한 후속 상태를 계속 조회한다. "
                     "이 목록은 조회할 참조이며 적용 성공의 증거가 아니다. 조회하지 않은 후속 제안을 확인했다고 쓰지 않는다: " +
-                    canonical([{"proposal_id": p["id"], "target": p["target"], "follows": p["follows"]}
+                    canonical([dict(proposal_read_reference(p), follows=p["follows"])
                                for p in successors]))
+            current_request += ("\n각 참조의 status_tool/target_tool은 해당 대상 서버의 등록된 읽기 도구다. "
+                "b: 대상 제안을 A 도구로 조회한 오류는 B 저장소에서 제안이 소실됐다는 증거가 아니다. "
+                "명시된 서버의 도구로 실제 조회하고 실패와 미확인을 구분한다.")
             current_request += ("\n이번 사건의 종결 범위는 해당 변경 절차와 현재 대상의 복구 상태다. "
                 "파일·실행 상태 확인과 SID별 탐지 시험을 구분하고 미시험 한계를 명시한다. "
                 "SID별 미시험만으로 정상 복구를 적용 실패라고 단정하지 않는다. "

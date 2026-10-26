@@ -1,5 +1,7 @@
 # 고정 A/B 저장공간 감시와 보존 검토 목록
 
+> **10/26 계측 보완:** 17:25 KST B의 정상 백업 디렉터리117개가 기존64개 제한에 걸린 원인을 재확인했다. 제한을256개로 조정하되 트리100,000항목·worker30초·symlink 거절은 유지한다. `inventory.json`의 `backup_scan_status`는 complete/directory_limit_exceeded/invalid_backup_entry/backup_root_unavailable/tree_or_metadata_unavailable을 구분하고, 정상 목록의 개수와 상한도 표시한다. 공개 status18키·Wazuh 규칙/차단 정책·삭제 금지는 그대로다. 17:32 KST A/B에 같은 검증 소스를 증분 반영해 두 호스트 complete/ok·실제 oneshot exit0를 확인했다. 기존 고정 호스트 모듈의 새 서버 bootstrap 검증은 별도 미완료다. 최신 운영 검증은 [STATUS](../../../STATUS.md)를 따른다.
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../../STATUS.md) · [실행 계획](../../../PLAN.md).
 > 기존 서버의 운영 자동화와 새 서버 초기 설치는 구분한다. 지정 범위의 C1/B1/A2 재부팅 복구는10/24 검증 이력이 있으며 최초 실패·수동 복구도 보존한다. 현재6실습·MCP6서버를 기준으로 읽고 과거 후보/PID/시험 결과를 새 실측으로 해석하지 않는다.
@@ -21,7 +23,7 @@ A 08:50:39 관측은 사용률20%·여유46,845,345,792B·managed raw28,107,392B
 | A raw | `logs/suricata/capstone-managed`, `logs/modsec/capstone-managed`의 합계(앞 경로 `/home/groot_a/capstone/secstack/`) |
 | A history | `/var/lib/capstone-vector-history-auto/store`, `/var/lib/capstone-vector-history` |
 | B history | `/var/lib/capstone-history-receipts` |
-| 두 호스트 backup | `/var/backups/capstone-*`의 직접 하위 디렉터리만, 최대 64개 |
+| 두 호스트 backup | `/var/backups/capstone-*`의 직접 하위 디렉터리만, 최대 256개 |
 | disk | 위 고정 경로들이 있는 filesystem의 최소 여유 bytes/최대 사용률 |
 
 A는 기존 `vector.lock`을 shared/nonblocking으로 잡아 세대 선택을 보호한다. 회전/관리자 작업과 경합하면 기다리거나 서비스를 조작하지 않고 unavailable을 낸다. 원문 파일은 stat/du로만 조사하며 내용을 읽지 않는다. raw state JSON은 current/pending 번호를 판단할 만큼만 읽는다. CP·자격증명·환경 파일·DB는 열지 않는다.
@@ -66,6 +68,6 @@ backup은 root 디렉터리 mtime가 A30일/B90일을 넘으면 검토 count에 
 - `/var/lib/capstone-storage-monitor`: root:root0700. `.lock`, `status.json`, `inventory.json`은 root0600. 다른 저장 경로의 권한은 바꾸지 않는다.
 - unit 두 개는 `/etc/systemd/system/` root0644. `systemd-analyze verify`와 calendar 해석을 native로 먼저 확인한다.
 
-`test-native.sh --policy-only`는 순수 jq 시험16개다. Linux root에서 `test-native.sh`는 새 `/var/tmp/capstone-storage-native.*`만 사용해 총30개를 시험한다. 실제 GNU du/df, symlink/없음, 세대 검토 제외, worker timeout/오염, status fsync/rename을 확인한다. publisher 시험만 world-writable `/var/tmp` 위 조상 대신 자신의 root0700 fixture까지 trust boundary를 제한하는 stub을 사용한다. 운영 상태·원문·서비스는 접근하지 않는다.
+`test-native.sh --policy-only`는 순수 jq 시험16개다. Linux root에서 `test-native.sh`는 새 `/var/tmp/capstone-storage-native.*`만 사용해 총32개를 시험한다. 실제 GNU du/df, symlink/없음, 세대 검토 제외, worker timeout/오염, status fsync/rename을 확인한다. publisher 시험만 world-writable `/var/tmp` 위 조상 대신 자신의 root0700 fixture까지 trust boundary를 제한하는 stub을 사용한다. 운영 상태·원문·서비스는 접근하지 않는다.
 
 native 시험 후 A/B에서 `monitor.sh check`의 정확 18키와 live 경로/용량을 대조하고 B 규칙을 연결한다. 첫 `systemctl start capstone-storage-monitor.service`와 journal 1건, 상태 파일 root0600, 기존 보호 SHA/CP 불변을 확인한 뒤 timer를 활성화한다. timer는 KST 매시 02/17/32/47분, Persistent=false다. 기존 raw(0/1분대)와 output(3분대) 회전 일정은 바꾸지 않는다. 이후 자연 tick은 별도로 관찰한다.

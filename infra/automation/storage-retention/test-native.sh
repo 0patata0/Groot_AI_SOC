@@ -55,6 +55,19 @@ tree_missing() { expect_fail st_tree "$WORK" "$ROOT/missing"; }
 disk_ok() { local text available used; text=$(st_disk "$ROOT"); read -r available used <<< "$text"; st_uint "$available"; [[ $used =~ ^[0-9]+$ ]] && (( used<=100 )); }
 backup_ok() { mkdir "$ROOT/backups" "$ROOT/backups/capstone-saved" "$ROOT/backups/other"; [[ $(st_backup_list "$ROOT/backups") == "$ROOT/backups/capstone-saved" ]]; }
 backup_symlink() { ln -s "$ROOT/tree" "$ROOT/backups/capstone-link"; expect_fail st_backup_list "$ROOT/backups"; rm "$ROOT/backups/capstone-link"; }
+backup_many() {
+    local i output
+    mkdir "$ROOT/backups-many"
+    for ((i=0;i<256;i++)); do mkdir "$ROOT/backups-many/capstone-$i"; done
+    output=$(st_backup_list "$ROOT/backups-many")
+    [[ $(printf '%s\n' "$output" | wc -l) == 256 ]]
+}
+backup_limit() {
+    mkdir "$ROOT/backups-many/capstone-256"
+    local rc=0
+    st_backup_list "$ROOT/backups-many" > "$WORK/over-limit" || rc=$?
+    [[ $rc == 2 && ! -s $WORK/over-limit ]]
+}
 raw_setup() {
     mkdir "$ROOT/managed"
     jq -ncS '{schema_version:1,policy:"capstone-raw-operations-v1",engine:"suricata",machine_id:"096e90b6243e438aa8a7b392be754732",phase:"switch_pending",revision:3,current:{number:2},pending:{number:3}}' > "$ROOT/state.json"
@@ -108,6 +121,8 @@ run_case missing_scan_unavailable tree_missing
 run_case native_df_parse disk_ok
 run_case backup_fixed_directory_selection backup_ok
 run_case backup_symlink_refused backup_symlink
+run_case backup_256_directories_fully_listed backup_many
+run_case backup_257_refused_without_partial_success backup_limit
 run_case aged_raw_review_not_current_pending_unsealed raw_review
 run_case linked_raw_not_review_eligible raw_hardlink
 run_case malformed_state_refused raw_bad_state

@@ -4,7 +4,7 @@ SM_ROOT=/usr/local/lib/capstone-storage-monitor
 SM_SELF=$SM_ROOT/monitor.sh
 SM_STATE=/var/lib/capstone-storage-monitor
 SM_TIMEOUT=30s
-SM_LIB_SHA=b1bbf9517e448e191017003ff53bd074d8932eb7bf20586c361822f164341b1f
+SM_LIB_SHA=f5618183136b2ab7669df440871f45931214c473d88040c26464bed84f20b33c
 SM_POLICY_SHA=0c6f43d05eca8b0355b833dbbc54a1c3ccefff6fda49995c64105308c30bd37d
 sm_dir() {
     local p=$1 mode

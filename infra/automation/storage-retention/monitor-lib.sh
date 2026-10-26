@@ -46,10 +46,10 @@ st_backup_list() {
     st_ancestors "$base" || return 1
     shopt -s nullglob
     local paths=("$base"/capstone-*)
-    (( ${#paths[@]}<=64 )) || return 1
+    (( ${#paths[@]}<=256 )) || return 2
     for p in "${paths[@]}"; do
         name=${p##*/}
-        [[ $name =~ ^capstone-[A-Za-z0-9][A-Za-z0-9._-]{0,95}$ && -d $p && ! -L $p && $(stat -c %u "$p") == 0 ]] || return 1
+        [[ $name =~ ^capstone-[A-Za-z0-9][A-Za-z0-9._-]{0,95}$ && -d $p && ! -L $p && $(stat -c %u "$p") == 0 ]] || return 3
         printf '%s\n' "$p"
     done
 }
@@ -99,6 +99,7 @@ st_raw_review() {
 }
 st_worker() {
     local host=$1 work=$2 machine observed now cutoff errors=0 raw=0 backups=0 history=0 due=0 review=0 disk available=null used=null value path lists rawreview=null
+    local backup_status=complete backup_count=null backup_error=0
     local -a raws=() histories=() disks=(/var/backups) backup_paths=()
     case "$host" in
       a) machine=096e90b6243e438aa8a7b392be754732
@@ -127,14 +128,22 @@ st_worker() {
     done
     if lists=$(st_backup_list /var/backups); then
         while IFS= read -r path; do [[ -n $path ]] && backup_paths+=("$path"); done <<< "$lists"
+        backup_count=${#backup_paths[@]}
         for path in "${backup_paths[@]}"; do
             disks+=("$path")
-            if value=$(st_tree "$work" "$path"); then if (( backups>=0 )); then backups=$((backups+value)); fi; else backups=-1; errors=$((errors+1)); fi
+            if value=$(st_tree "$work" "$path"); then if (( backups>=0 )); then backups=$((backups+value)); fi; else backups=-1; backup_status=tree_or_metadata_unavailable; errors=$((errors+1)); fi
             if value=$(stat -c %Y -- "$path") && st_uint "$value"; then
                 if (( due>=0 && value<=cutoff )); then due=$((due+1)); fi
-            else due=-1; errors=$((errors+1)); fi
+            else due=-1; backup_status=tree_or_metadata_unavailable; errors=$((errors+1)); fi
         done
-    else backups=-1; due=-1; errors=$((errors+1)); fi
+    else
+        backup_error=$?; backups=-1; due=-1; errors=$((errors+1))
+        case "$backup_error" in
+          2) backup_status=directory_limit_exceeded ;;
+          3) backup_status=invalid_backup_entry ;;
+          *) backup_status=backup_root_unavailable ;;
+        esac
+    fi
     if disk=$(st_disk "${disks[@]}"); then read -r available used <<< "$disk"; else errors=$((errors+1)); fi
     : > "$work/raw-review.jsonl"
     if [[ $host == a ]]; then
@@ -156,7 +165,8 @@ st_worker() {
        backup_review_due_count:$due,scan_status:$scan}' > "$work/measurements.json" || return 1
     # Keep the inventory small even after many years; counts remain complete.
     head -n 32 "$work/raw-review.jsonl" | jq -sc --arg host "$host" --argjson total "${rawreview:-null}" \
-      '{schema_version:1,host:$host,raw_review_rows:.,raw_review_total:$total,
+      --arg backup_status "$backup_status" --argjson backup_count "$backup_count" \
+      '{backup_scan_status:$backup_status,backup_directory_count:$backup_count,backup_directory_limit:256,schema_version:1,host:$host,raw_review_rows:.,raw_review_total:$total,
         all_capstone_backups_protected:true,referenced_backups_always_protected:true,
         archive_authorized:false,automatic_deletion:false,checkpoint_changed:false}' > "$work/inventory.json"
 }

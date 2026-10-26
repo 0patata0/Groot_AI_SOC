@@ -22,7 +22,7 @@ from types import ModuleType, SimpleNamespace
 VERSION = "groot-query-completion:1.11.0"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "a05984c2e7f87b55488fdc96e04cd7a990a8e7c3c15b58bacceca3995ad20ed9"
+EVIDENCE_SOURCE_SHA256 = "04fa2420ee2567174392811e770b32e587a107816361ecba248497e88b3af170"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -96,6 +96,7 @@ _READ_TOOL_NAMES = frozenset(
                  "get_service_action_target", "get_operation_status")
 ) | frozenset({
     "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts",
+    "mcp__security_events__get_wazuh_sca_checks",
     "mcp__resp__list_blocks",
     "mcp__system_diagnostics__get_system_diagnostics",
     "mcp__system_diagnostics__calculate_time",

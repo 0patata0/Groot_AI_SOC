@@ -534,6 +534,38 @@ def verified_proposal(row, receipts, later=()):
     return False
 
 
+def sca_review_requirements(context):
+    """A stored SCA alert needs its own newer check, not aggregate policy health."""
+    requirements=[]
+    for event in context["events"]:
+        value=event["evidence"]
+        if event["kind"] != "alert" or value.get("location") != "sca":
+            continue
+        match=re.fullmatch(r".+: (Ensure .+?): Status changed from .+",str(value.get("description","")))
+        agent=value.get("agent",{}).get("id")
+        try:
+            stamp=datetime.fromisoformat(value["timestamp"].replace("Z","+00:00"))
+            if stamp.tzinfo is None: raise ValueError()
+            timestamp=stamp.timestamp()
+        except (ValueError,KeyError,TypeError): timestamp=None
+        title=match[1].rstrip(" .").casefold() if match else None
+        requirements.append({"agent_id":agent,"title":title,"at":timestamp})
+    if requirements and context.get("evidence_truncated"):
+        requirements.append({"agent_id":None,"title":None,"at":None})
+    return requirements
+
+
+def verified_sca_checks(requirements, receipts, now):
+    for needed in requirements:
+        if not needed["title"] or needed["at"] is None:
+            return False
+        matches=[r for r in receipts if r["agent_id"]==needed["agent_id"] and r["title"]==needed["title"]
+                 and needed["at"] < r["scan_at"] <= now+60 and now-r["scan_at"] <= 86400]
+        if not matches or max(matches,key=lambda r:r["scan_at"])["result"]!="passed":
+            return False
+    return True
+
+
 class Trace:
     def __init__(self, store, case, run_id):
         self.store, self.case, self.run_id = store, case, run_id
@@ -542,6 +574,8 @@ class Trace:
         self.protocol_error, self.tool_error = False, False
         self.references = {}
         self.arguments, self.read_receipts = {}, {}
+        self.sca_requirements = sca_review_requirements(store.context(case["id"]))
+        self.sca_receipts = []
 
     def accept(self, event):
         if not isinstance(event, dict):
@@ -621,6 +655,21 @@ class Trace:
                     if target and payload.get("target") == target:
                         self.read_receipts[("target", target)] = {key: payload[key] for key in
                             ("target", "sha256", "runtime", "observation") if key in payload}
+                elif not error and payload and name == "mcp__security_events__get_wazuh_sca_checks":
+                    args=self.arguments[pending[0]["ordinal"]]
+                    pid=payload.get("policy_id")
+                    policies=[p for p in payload.get("policies",[]) if isinstance(p,dict) and p.get("policy_id")==pid]
+                    if (payload.get("source_scope")=="last_stored_sca_scan" and pid==args.get("policy_id")
+                            and payload.get("agent_id")==args.get("agent_id") and len(policies)==1):
+                        try:
+                            stamp=datetime.fromisoformat(policies[0]["scan_end_kst"])
+                            if stamp.tzinfo is None: raise ValueError()
+                        except (KeyError,TypeError,ValueError): stamp=None
+                        if stamp:
+                            for check in payload.get("checks",[])[:50]:
+                                if isinstance(check,dict) and isinstance(check.get("title"),str) and type(check.get("check_id")) is int:
+                                    self.sca_receipts.append({"agent_id":args["agent_id"],"title":check["title"].rstrip(" .").casefold(),
+                                        "scan_at":stamp.timestamp(),"result":check.get("result")})
                 elif not error and name == "mcp__resp__list_blocks":
                     self.read_receipts[("target", "a:incident-ip")] = {"observed": True}
         elif kind == "result":
@@ -654,6 +703,8 @@ class Trace:
                 state, detail, due = "needs_review", "live_verification_missing", now
             elif pending and self.case["run_count"] >= 8:
                 state, detail, due = "needs_review", "pending_verification_limit", now
+            elif disposition == "resolved" and not verified_sca_checks(self.sca_requirements,self.sca_receipts,now):
+                state, detail, due = "needs_review", "sca_check_verification_missing", now
             elif pending:
                 state, detail, due = "waiting_approval", "awaiting_broker_event", now + 120
             elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):
@@ -679,8 +730,15 @@ def prompt_for(base, case, evidence):
             "연결 제안이 있으면 해당 ID의 결정/실행 상태와 필요한 현재 대상·후속 변경의 근거를 직접 조회한다. "
             "만료·거부는 적용 성공이 아닌 승인 절차의 종료다. 후속 원복이 있으면 필요한 상태 조회를 이번 실행에서 끝낸다. "
             "연결 제안이 없으면 사건 자체의 현재 근거를 조사한다. 관련 없는 경보·클러스터 조회로 대체하지 않는다. "
+            "get_rule_change_target의 target은 필수다. 빈 {}는 권한 부족이 아니라 필수 인자 누락이다. "
+            "A/B 도구와 실제 target 접두사를 맞춘다. get_rule_change_status에는 proposal_id를 지정한다. "
+            "만료·거부의 실제 상태가 확인됐다면 승인 절차의 종결 여부를 판단하되, 미적용을 미완료 사고와 혼동하지 않는다. "
             "전체 보안 정상이나 공격 부재 증명이 아닌 이 사건의 미완료 항목을 판단한다. "
+            "현재 경보를 해당 과거 사건과 연결할 근거가 없으면 관련 사건이라고 서술하지 않는다. "
             "근거·남은 한계와 결론을 12줄 이내로 보고하고 마지막 MANAGEMENT_STATUS 표지를 반드시 붙인다.")
+        if evidence["proposals"]:
+            current_request += ("\n이번 실행에서 먼저 조회할 연결 제안(과거 상태 설명은 실제 조회를 대신하지 않음): " +
+                canonical([{"proposal_id": p["id"], "target": p["target"]} for p in evidence["proposals"]]))
     control = {"case_id": case["id"], "mode": case["mode"], "session_id": case["session_id"],
                "requested_at_kst": datetime.now(timezone(timedelta(hours=9))).isoformat(),
                "run_number": case["run_count"] + 1, "proposals": evidence["proposals"],
@@ -711,6 +769,18 @@ at the current hash; references alone are not proof. A mismatch alone does not
 prove the old change failed. Preserve any historical recovery_failed/failed
 outcome even if a later approved change restored service. Do not reapply it.
 Distinguish file/service recovery from attack-free status or per-rule detection.
+For historical WAF/Suricata incidents, use the existing search tool with until_kst
+(+09:00 end timestamp, last 90 days) and lookback_minutes <= 1440, matching the
+event time and source. A Wazuh correlation rule.id (for example 100110/100102)
+is NOT the sensor Suricata SID or ModSecurity rule ID; discover the returned
+sensor IDs before filtering them. Recent unrelated alerts cannot verify
+a past incident. A zero bounded sample does not prove the old attack was harmless.
+For SCA configuration alerts use mcp__security_events__get_wazuh_sca_checks with
+the exact agent_id, then the returned policy_id and relevant check_ids, or
+title_contains using the check title from the event (e.g. GSSAPIAuthentication).
+A policy summary alone does not verify the individual failed check. It reads
+the last stored scan, not live host settings. Quote scan_end_kst and its age;
+missing/failed checks cannot be replaced by cluster health or recent alert counts.
 For fixed systemd failures, use mcp__system_diagnostics__get_system_diagnostics.
 It reads classified root-published snapshots, normally updated every 60 seconds,
 with up to four hours of bounded error observations. Check age, Type, Result,
@@ -803,6 +873,13 @@ def command_for(case):
                "--source", "capstone-management", "-t", ",".join(TOOLSETS)]
     if dict(case).get("operator_review") or dict(case).get("fast_readonly"):
         command[2:2] = ["-e", "CAPSTONE_MANAGEMENT_REVIEW=1"]
+    if dict(case).get("operator_review"):
+        command[2:2] = ["-e", "CAPSTONE_OPERATOR_REVIEW=1"]
+    required = dict(case).get("required_status_reads", [])
+    if required:
+        if not dict(case).get("operator_review") or case["mode"] != "verify" or len(required) > 32:
+            raise ControllerError("status_read_requirements_invalid")
+        command[2:2] = ["-e", "CAPSTONE_REQUIRED_STATUS_JSON=" + canonical(required)]
     if case["session_id"]:
         if not SESSION.fullmatch(case["session_id"]):
             raise ControllerError("session_id_invalid")
@@ -811,6 +888,11 @@ def command_for(case):
 
 
 def run_hermes(store, case, prompt):
+    if dict(case).get("operator_review") and case["mode"] == "verify":
+        # Authenticated controller metadata reaches the wrapper out of band.
+        # The model still selects the required read's tool/arguments and disposition.
+        case = dict(case, required_status_reads=[{"proposal_id": p["id"], "target": p["target"]}
+            for p in store.context(case["id"])["proposals"]])
     rid = store.start(case)
     trace, error, returncode = Trace(store, case, rid), None, 1
     path = store.root / (rid + ".jsonl")

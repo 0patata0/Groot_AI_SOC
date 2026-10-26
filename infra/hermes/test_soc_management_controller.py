@@ -83,6 +83,33 @@ class ControllerTests(unittest.TestCase):
         trace.accept({"type": "tool_result", "name": name, "is_error": error,
                       "output": json.dumps({"content": [{"type": "text", "text": json.dumps(payload)}], "isError": error})})
 
+    def test_sca_resolution_requires_exact_newer_pass_not_policy_summary(self):
+        self.now=m.datetime.fromisoformat('2026-10-26T15:00:00+09:00').timestamp()
+        event=self.alert('sca-1','2026-10-23T12:00:00Z',rule='19011')
+        event.update(location='sca',description='CIS Benchmark.: Ensure sshd GSSAPIAuthentication is disabled.: Status changed from passed to failed')
+        self.alerts(event);trace=self.trace()
+        self.tool(trace,'mcp__security_events__get_wazuh_sca_checks',
+                  {'agent_id':'001','policies':[{'policy_id':'cis','score':99}]},{'agent_id':'001'})
+        self.result(trace)
+        self.assertEqual(trace.finish(0)['state'],'needs_review')
+        cid=trace.case['id'];self.store.review(cid,'Exact stored check revalidation')
+        trace=self.trace()
+        payload={'source_scope':'last_stored_sca_scan','agent_id':'001','policy_id':'cis',
+                 'policies':[{'policy_id':'cis','scan_end_kst':'2026-10-26T07:00:00+09:00'}],
+                 'checks':[{'check_id':35648,'title':'Ensure sshd GSSAPIAuthentication is disabled.','result':'passed'}]}
+        self.tool(trace,'mcp__security_events__get_wazuh_sca_checks',payload,{'agent_id':'001','policy_id':'cis','check_ids':[35648]})
+        self.result(trace);self.assertEqual(trace.finish(0)['state'],'completed')
+
+    def test_sca_old_future_failed_wrong_agent_or_missing_check_cannot_resolve(self):
+        req=[{'agent_id':'001','title':'ensure x','at':100.}]
+        receipt={'agent_id':'001','title':'ensure x','scan_at':900.,'result':'passed'}
+        self.assertTrue(m.verified_sca_checks(req,[receipt],1000.))
+        for changes in ({'agent_id':'002'},{'title':'ensure y'},{'result':'failed'},
+                        {'result':'not applicable'},{'scan_at':99.},{'scan_at':1061.}):
+            with self.subTest(changes=changes):self.assertFalse(m.verified_sca_checks(req,[dict(receipt,**changes)],1000.))
+        self.assertFalse(m.verified_sca_checks(req,[],1000.))
+        self.assertFalse(m.verified_sca_checks(req,[receipt],100000.))
+
     def test_broker_signature_is_bound_to_nonce_status_body_and_query(self):
         good = m.Broker("x" * 32, opener=Opener(), clock=lambda: 1000)
         self.assertEqual(good.get("/management/events?after=0&limit=100")["events"], [])

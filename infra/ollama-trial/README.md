@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+> **10/26 카탈로그:** 읽기 전용은6서버28도구, Hermes 동등 권한은8서버37도구(보호9). SCA 조회를 두 봇에 공통 제공하며 새 listener·패키지는 없다. 초기 설치의 resp 연결은 읽기 모드에서 `list_blocks`만 노출하며 보호 동작은 계속 거절한다. [배포/검증](../../STATUS.md).
+
 > **공동 채널:** `soc-review-agent`에서 @ollama 직접 요청과 양방향 검증을 지원한다. 직접 요청은 기존 동등 권한, 자동 조회/검증은 읽기 전용이다. 검증용 resp 혼합 카탈로그에서는 list_blocks만 노출한다. [사용법](../hermes/chat-channels.md) · [운영 검증](../../STATUS.md).
 
 > **2026-10-26 채널/발신자 구분:** 공개 soc-ollama와 -ollama 채널, -agent 채널의 @ollama 멘션 및 기존 허용 DM을 지원한다. 두 봇 공통 접미사 동기화60초, 보고 발신자 soc-report 분리를 적용했다. [채널 규칙](../hermes/chat-channels.md) · [검증·미완료](../../STATUS.md).

@@ -23,7 +23,8 @@ STATE = Path('/var/lib/capstone-ollama-trial')
 USER = 'soc-ollama'
 PROFILES = {'rule-a': ('rule-a',), 'rule-b': ('rule-b',),
             'security-events': ('mcp-b', 'security-events'),
-            'system-diagnostics': ('mcp-b', 'system-diagnostics'), 'wazuh-ro': ('mcp-b',)}
+            'system-diagnostics': ('mcp-b', 'system-diagnostics'), 'wazuh-ro': ('mcp-b',),
+            'resp': ('resp-a',)}
 SOURCES = ('runtime.py', 'policy.py', 'harness.py', 'requirements.lock', 'offline-manifest.json')
 PARITY_PROFILES = {**PROFILES, 'resp': ('resp-a',),
                    'rule-write-a': ('rule-write-a',), 'rule-write-b': ('rule-write-b',)}
@@ -111,7 +112,7 @@ def connection_plan(home, parity=False):
     need(home.is_absolute() and not home.is_symlink(), 'hermes_home')
     config = yaml.safe_load((home / 'config.yaml').read_text())
     output = {}
-    for key in ('rule-a', 'rule-b', 'wazuh-ro') + (('resp', 'rule-write-a', 'rule-write-b') if parity else ()):
+    for key in ('rule-a', 'rule-b', 'wazuh-ro', 'resp') + (('rule-write-a', 'rule-write-b') if parity else ()):
         p = config['mcp_servers'][key]; args = p['args']
         need(p['command'] in ('ssh', '/usr/bin/ssh') and len(args) == 4 and
              args[:2] == ['-T', '-F'], 'ssh_profile_shape')
@@ -201,10 +202,10 @@ def verify():
     probe = run(['/usr/local/sbin/capstone-ollama-trial'], input=b'{"discover_only":true}\n', timeout=120)
     data = json.loads(probe.stdout)
     parity = json.loads((ETC / 'config.json').read_text()).get('access_mode') == 'hermes-parity'
-    need(data['status'] == 'discovered' and len(data['catalog']) == (36 if parity else 26) and
+    need(data['status'] == 'discovered' and len(data['catalog']) == (37 if parity else 28) and
          data['model_calls'] == [] and data['protected_calls'] == 0, 'trial_discovery')
-    return {'status': 'verified', 'readonly_tools': 27 if parity else 26,
-            'protected_tools': 9 if parity else 0, 'servers': 8 if parity else 5,
+    return {'status': 'verified', 'readonly_tools': 28,
+            'protected_tools': 9 if parity else 0, 'servers': 8 if parity else 6,
             'model_requests': 0, 'pip_check': result.returncode == 0, 'uid': user.pw_uid,
             'network_mode': 'host_process', 'daemon': False}
 
@@ -261,7 +262,7 @@ def install(source, bundle, home, access_mode='read-only'):
           mode=stat.S_IMODE(st.st_mode), uid=st.st_uid, gid=st.st_gid)
     configtext = ''
     for name, con in connections.items():
-        name = 'mcp-b' if name == 'wazuh-ro' else name
+        name = 'mcp-b' if name == 'wazuh-ro' else 'resp-a' if name == 'resp' else name
         targetkey = key if name == 'mcp-b' else ETC / ('ssh/' + name + '_ed25519')
         if name != 'mcp-b':
             write(targetkey, con['key'].read_bytes(), mode=0o600, uid=user.pw_uid, gid=user.pw_gid)

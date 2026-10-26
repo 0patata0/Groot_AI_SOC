@@ -1,5 +1,6 @@
 """Bounded native-loop retry: model selects a read; no action/argument synthesis."""
 import copy
+import json
 import types
 import unittest
 from unittest.mock import patch
@@ -7,6 +8,32 @@ from test_soc_management_run import wrapper, definition, READ_NAMES, WRITE_NAMES
 
 
 class Grounding(unittest.TestCase):
+    def test_proposal_review_requires_exact_fresh_status_before_other_queries(self):
+        requirements=[{'proposal_id':'a'*32,'target':'b:wazuh-local-rules'}]
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            request=wrapper.initial_review_read(self.request,['unrelated_health'],requirements,[])
+            self.assertEqual([t['function']['name'] for t in request['tools']],['mcp__rule_b__get_rule_change_status'])
+            self.assertEqual(request['tool_choice'],'required')
+            self.assertNotIn('arguments',request)
+            receipt={'kind':'proposal_status','proposal_id':'b'*32,'target':'b:wazuh-local-rules'}
+            self.assertEqual(wrapper.initial_review_read(self.request,['read'],requirements,[receipt])['tool_choice'],'required')
+            receipt['proposal_id']='a'*32
+            self.assertIs(wrapper.initial_review_read(self.request,['read'],requirements,[receipt]),self.request)
+            receipt['target']='a:suricata-local'
+            self.assertEqual(wrapper.initial_review_read(self.request,['read'],requirements,[receipt])['tool_choice'],'required')
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertIs(wrapper.initial_review_read(self.request,[],requirements,[]),self.request)
+
+    def test_status_requirements_are_out_of_band_validated_and_missing_tools_fail(self):
+        req=[{'proposal_id':'a'*32,'target':'a:chatproxy'}]
+        self.assertEqual(wrapper.status_read_requirements(json.dumps(req)),req)
+        for invalid in ('{}','[]',json.dumps([{'proposal_id':'a'*32,'target':'arbitrary:root'}]),
+                        json.dumps([{'proposal_id':'a'*32,'target':'a:waf','command':'sudo'}])):
+            with self.subTest(invalid=invalid),self.assertRaises(RuntimeError):wrapper.status_read_requirements(invalid)
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            request={**self.request,'tools':[]}
+            with self.assertRaisesRegex(RuntimeError,'tools_unavailable'):wrapper.initial_review_read(request,[],req,[])
+
     def test_readonly_review_requires_model_selected_read_before_answer(self):
         with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify'}):
             request = wrapper.initial_review_read(self.request, [])
@@ -99,6 +126,13 @@ class Grounding(unittest.TestCase):
         self.assertFalse(self.request['extra_body']['think'])
         self.agent.model='another-model'
         self.assertEqual(wrapper.management_reasoning(self.request,self.agent),self.request)
+
+    def test_operator_case_review_keeps_reasoning_budget_separate_from_chat(self):
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_OPERATOR_REVIEW':'1'}):
+            request=wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)
+            self.assertEqual(request['reasoning_effort'],'medium')
+            self.assertEqual(request['max_tokens'],6144)
+            self.assertNotIn('think',request['extra_body'])
 
     def test_unrecognized_native_source_refuses_before_installing_hook(self):
         with patch.object(wrapper.Path,'read_bytes',side_effect=OSError),self.assertRaisesRegex(RuntimeError,'source_changed'):

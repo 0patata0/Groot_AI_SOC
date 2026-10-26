@@ -18,6 +18,108 @@ spec.loader.exec_module(module)
 
 
 class SecurityEventsMcpTests(unittest.TestCase):
+    def test_historical_window_is_bounded_kst_and_exact(self):
+        at=module.datetime(2026,10,26,15,tzinfo=module.KST)
+        params=module.validate_args('suricata',{'until_kst':'2026-10-17T16:00:00+09:00','lookback_minutes':60,'source_ip':'192.0.2.1','signature_id':'100110'})
+        query=module.build_query('suricata',params,at)
+        self.assertEqual(query['query']['bool']['filter'][0]['range']['timestamp'],{'gte':'2026-10-17T15:00:00+09:00','lte':'2026-10-17T16:00:00+09:00'})
+        self.assertEqual(query['size'],10)
+        for value in ('2026-10-17T16:00:00','2026-10-17T07:00:00Z','2026-99-17T16:00:00+09:00','now-1d'):
+            with self.subTest(value=value),self.assertRaises(ValueError):module.validate_args('suricata',{'until_kst':value})
+        for value in ('2026-10-27T16:00:00+09:00','2026-01-01T16:00:00+09:00'):
+            with self.subTest(value=value),self.assertRaises(ValueError):module.build_query('suricata',module.validate_args('suricata',{'until_kst':value}),at)
+        with self.assertRaises(ValueError):module.validate_args('suricata',{'until_kst':'2026-10-17T16:00:00+09:00','lookback_minutes':1441})
+
+    def test_sca_arguments_cannot_select_paths_actions_or_credentials(self):
+        bad = [{}, {'agent_id':'../001'}, {'agent_id':'001','policy_id':'../x'},
+               {'agent_id':'001','policy_id':'a?x=1'}, {'agent_id':'001','check_ids':[1]},
+               {'agent_id':'001','policy_id':'cis','check_ids':[True]},
+               {'agent_id':'001','policy_id':'cis','check_ids':[1,1]},
+               {'agent_id':'001','policy_id':'cis','check_ids':list(range(1,22))},
+               {'agent_id':'001','command':'restart'}, {'agent_id':'001','url':'https://other/'}]
+        with patch.object(module,'sca_api_reader') as read:
+            for args in bad:
+                with self.subTest(args=args):self.assertTrue(module.call_tool('get_wazuh_sca_checks',args)['isError'])
+            read.assert_not_called()
+
+    def sca_fixture(self, *, changed=False, total=2):
+        policy={'policy_id':'cis_ubuntu24-04','name':'CIS','end_scan':'2026-10-25T22:03:39+00:00',
+                'start_scan':'2026-10-25T22:00:00+00:00','hash_file':'hash','pass':1,'fail':1,'invalid':0,'total_checks':total}
+        checks=[{'id':35648,'result':'passed','title':'SSH check','full_log':'secret','remediation':'do not execute me'},
+                {'id':35654,'result':'failed','title':'MAC check','reason':'noncompliant'}]
+        calls=[]
+        def read(agent, selected=None, limit=50):
+            calls.append((agent,selected,limit))
+            return (checks,total) if selected else ([{**policy,**({'end_scan':'2026-10-26T00:00:00Z'} if changed and len(calls)>2 else {})}],1)
+        return read,calls
+
+    def test_sca_exact_ids_scan_time_projection_and_scope(self):
+        read,calls=self.sca_fixture()
+        with patch.object(module,'sca_api_reader',return_value=read):
+            data=module.sca_checks({'agent_id':'001','policy_id':'cis_ubuntu24-04','check_ids':[35648,99999]})
+        self.assertEqual(data['policies'][0]['scan_end_kst'],'2026-10-26T07:03:39+09:00')
+        self.assertEqual(data['checks'][0]['result'],'passed')
+        self.assertEqual(data['returned_count'],1)
+        self.assertEqual(data['missing_requested_check_ids'],[99999])
+        self.assertEqual(data['source_scope'],'last_stored_sca_scan')
+        self.assertFalse(data['scan_capped'])
+        self.assertEqual(calls,[('001',None,50),('001','cis_ubuntu24-04',500),('001',None,50)])
+        self.assertNotIn('secret',json.dumps(data));self.assertNotIn('do not execute',json.dumps(data))
+        self.assertEqual(module.sca_scan_time('2026-10-26T07:00:00'),'')
+
+    def test_sca_title_lookup_uses_existing_scan_and_preserves_missing(self):
+        read,calls=self.sca_fixture()
+        with patch.object(module,'sca_api_reader',return_value=read):
+            data=module.sca_checks({'agent_id':'001','policy_id':'cis_ubuntu24-04','title_contains':'nonexistent'})
+        self.assertEqual(data['returned_count'],0)
+        self.assertEqual(data['matched_within_scan'],0)
+        self.assertEqual(calls[1],('001','cis_ubuntu24-04',500))
+        with patch.object(module,'sca_api_reader',return_value=self.sca_fixture()[0]):
+            found=module.sca_checks({'agent_id':'001','policy_id':'cis_ubuntu24-04','title_contains':'sSh'})
+        self.assertEqual([(c['check_id'],c['result']) for c in found['checks']],[(35648,'passed')])
+        for args in ({'agent_id':'001','title_contains':'ssh'},{'agent_id':'001','policy_id':'cis','title_contains':'ssh','check_ids':[1]},{'agent_id':'001','policy_id':'cis','title_contains':'a\nb'}):
+            with self.assertRaises(ValueError):module.validate_sca_args(args)
+
+    def test_sca_discovery_does_not_assume_a_policy_or_start_scan(self):
+        read,calls=self.sca_fixture()
+        with patch.object(module,'sca_api_reader',return_value=read):data=module.sca_checks({'agent_id':'001'})
+        self.assertEqual(len(calls),1);self.assertNotIn('checks',data)
+        self.assertEqual(data['policy_total'],1)
+
+    def test_sca_scan_changes_errors_and_truncation_stay_visible(self):
+        for changed,total in ((True,2),(False,501)):
+            read,_=self.sca_fixture(changed=changed,total=total)
+            with patch.object(module,'sca_api_reader',return_value=read):
+                result=module.call_tool('get_wazuh_sca_checks',{'agent_id':'001','policy_id':'cis_ubuntu24-04'})
+            if changed:self.assertTrue(result['isError'])
+            else:self.assertTrue(json.loads(result['content'][0]['text'])['scan_capped'])
+        with patch.object(module,'sca_api_reader',side_effect=RuntimeError('secret credential')):
+            result=module.call_tool('get_wazuh_sca_checks',{'agent_id':'001'})
+        self.assertTrue(result['isError']);self.assertNotIn('secret credential',json.dumps(result))
+
+    def test_sca_api_has_fixed_get_resources_and_no_redirect_or_proxy(self):
+        seen=[];handlers=[]
+        class Response:
+            def __init__(self,data):self.data=data
+            def __enter__(self):return self
+            def __exit__(self,*_):return False
+            def read(self,limit):return json.dumps({'error':0,'data':self.data}).encode()
+        class Opener:
+            def open(self,req,timeout):
+                seen.append(req)
+                return Response({'token':'sample.token.signature'} if len(seen)==1 else
+                    {'affected_items':[],'total_affected_items':0,'total_failed_items':0})
+        def build(*args):handlers.extend(args);return Opener()
+        env={'WAZUH_API_HOST':'127.0.0.1','WAZUH_API_PORT':'55000','WAZUH_API_USERNAME':'mcp-ro',
+             'WAZUH_API_PASSWORD':'test-only','HTTPS_PROXY':'https://untrusted.invalid'}
+        with patch.dict(os.environ,env,clear=True),patch.object(module.urllib.request,'build_opener',side_effect=build):
+            read=module.sca_api_reader();self.assertEqual(read('001','cis_test',500),([],0))
+            with self.assertRaises(ValueError):read('001','../other')
+        self.assertEqual([r.get_method() for r in seen],['POST','GET'])
+        self.assertEqual(seen[1].full_url,'https://127.0.0.1:55000/sca/001/checks/cis_test?limit=500')
+        self.assertEqual(handlers[0].proxies,{})
+        self.assertTrue(any(isinstance(x,module.NoRedirect) for x in handlers))
+
     def test_indexer_request_uses_fixed_alert_index_and_no_proxy(self):
         captured = {}
 
@@ -157,7 +259,7 @@ class SecurityEventsMcpTests(unittest.TestCase):
         lines = [json.loads(line) for line in proc.stdout.splitlines()]
         self.assertEqual([row["id"] for row in lines], [1, 2, 3])
         self.assertEqual({tool["name"] for tool in lines[1]["result"]["tools"]},
-                         {"search_suricata_alerts", "search_modsecurity_alerts"})
+                         {"search_suricata_alerts", "search_modsecurity_alerts", "get_wazuh_sca_checks"})
         self.assertTrue(lines[2]["result"]["isError"])
 
 

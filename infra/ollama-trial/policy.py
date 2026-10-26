@@ -6,7 +6,7 @@ RULE_READS = {'get_rule_change_target', 'get_rule_change_status',
               'get_service_action_target', 'get_operation_status'}
 READ_TOOLS = {
     'rule-a': RULE_READS, 'rule-b': RULE_READS,
-    'security-events': {'search_suricata_alerts', 'search_modsecurity_alerts'},
+    'security-events': {'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks'},
     'system-diagnostics': {'get_system_diagnostics', 'calculate_time'},
     'resp': {'list_blocks'},
     'wazuh-ro': {'get_wazuh_agents', 'get_wazuh_cluster_nodes',

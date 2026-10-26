@@ -22,7 +22,7 @@ READ = frozenset({'get_rule_change_target', 'get_rule_change_status',
                   'get_service_action_target', 'get_operation_status'})
 WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
-EVENT_READ = frozenset({'search_suricata_alerts', 'search_modsecurity_alerts'})
+EVENT_READ = frozenset({'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks'})
 DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
 NO_OBSERVATION_REPORT = ('성공한 MCP 조회 근거를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
                          '정상 또는 조사 완료로 판단하지 않았으며 추가 검토가 필요합니다.\n'
@@ -196,6 +196,10 @@ def observation_facts(name, result):
             if not isinstance(data, dict) or data.get('error') or data.get('isError'):
                 continue
             stamps = list(dict.fromkeys(_times(data)))
+            if name in ('get_rule_change_status', 'get_operation_status'):
+                pid = data.get('proposal_id', data.get('request_id'))
+                if isinstance(pid, str) and re.fullmatch(r'[0-9a-f]{32}', pid) and isinstance(data.get('target'), str):
+                    rows.append({'kind':'proposal_status', 'tool':name, 'proposal_id':pid, 'target':data['target']})
             if name == 'calculate_time' and data.get('kind') == 'time_calculation' and data.get('live_observation') is False:
                 rows.append({'kind': 'time_calculation', **{k:data[k] for k in
                     ('timestamps','chronological_order','differences','reference_kst') if k in data}})
@@ -524,15 +528,46 @@ def management_reasoning(request, agent):
     # accepts reasoning_effort, not the native /api/chat "think" field.
     # A recognized non-none effort maps to true for a boolean-only model.
     review = os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') == '1' and os.environ.get('CAPSTONE_MANAGEMENT_MODE') == 'verify'
+    operator_review = review and os.environ.get('CAPSTONE_OPERATOR_REVIEW') == '1'
     if review:
         result.pop('max_completion_tokens', None)
-        result['max_tokens'] = 2048
-    return {**result, 'reasoning_effort': 'none' if review else 'medium', 'extra_body': extra}
+        result['max_tokens'] = 6144 if operator_review else 2048
+    return {**result, 'reasoning_effort': 'none' if review and not operator_review else 'medium', 'extra_body': extra}
 
 
-def initial_review_read(request, completed_calls):
+def status_read_requirements(raw):
+    if raw is None:
+        return []
+    try:
+        value = json.loads(raw)
+        if not isinstance(value, list) or not 1 <= len(value) <= 32:
+            raise ValueError()
+        for row in value:
+            if (not isinstance(row, dict) or set(row) != {'proposal_id','target'} or
+                    not isinstance(row['proposal_id'], str) or not re.fullmatch(r'[0-9a-f]{32}', row['proposal_id']) or
+                    row['target'] not in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules',
+                        'a:waf','a:suricata','a:chatproxy','b:wazuh-manager','b:wazuh-dashboard','a:incident-ip')):
+                raise ValueError()
+        return value
+    except (ValueError, TypeError):
+        raise RuntimeError('status_read_requirements_invalid') from None
+
+
+def initial_review_read(request, completed_calls, requirements=(), facts=()):
     if (os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') != '1'
-            or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify' or completed_calls):
+            or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'):
+        return request
+    missing = [r for r in requirements if not any(f.get('kind') == 'proposal_status' and
+        f.get('proposal_id') == r['proposal_id'] and f.get('target') == r['target'] for f in facts)]
+    if missing:
+        names = {'mcp__rule_'+r['target'][0]+'__'+('get_rule_change_status' if
+            r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status') for r in missing}
+        value = permitted_request(request, 'verify')
+        reads = [t for t in value.get('tools', []) if t['function']['name'] in names]
+        if {t['function']['name'] for t in reads} != names:
+            raise RuntimeError('required_status_read_tools_unavailable')
+        return {**value, 'tools':reads, 'tool_choice':'required'}
+    if completed_calls:
         return request
     value = permitted_request(request, 'verify')
     reads = value.get('tools', [])
@@ -761,6 +796,8 @@ def main():
     evidence = []
     completed_wire_calls = []
     read_facts = []
+    status_receipts = []
+    requirements = status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))
     argument_errors = []
     output_lock = threading.Lock()
 
@@ -785,7 +822,12 @@ def main():
         if wire_allowed(name, 'verify') and getattr(result, 'is_error', getattr(result, 'isError', False)) is False:
             if name != 'calculate_time':
                 completed_wire_calls.append(name)  # Arithmetic alone is never a successful SOC observation.
-            read_facts.extend(observation_facts(name, result))
+            observed = observation_facts(name, result)
+            read_facts.extend(observed)
+            for fact in observed:
+                if fact.get('kind') == 'proposal_status' and fact not in status_receipts:
+                    status_receipts.append(fact)
+            del status_receipts[:-64]
             del read_facts[:-32]
         # Keep only real MCP text, bounded in memory, for literal-evidence checks.
         for item in getattr(result, 'content', [])[:20]:
@@ -812,7 +854,8 @@ def main():
             args = (args[0], permitted_tools(args[1], mode), *args[2:])
         if 'tools_for_api' in kwargs and kwargs['tools_for_api'] is not None:
             kwargs['tools_for_api'] = permitted_tools(kwargs['tools_for_api'], mode)
-        return initial_review_read(management_reasoning(permitted_request(builder(self, *args, **kwargs), mode), self), completed_wire_calls)
+        return initial_review_read(management_reasoning(permitted_request(builder(self, *args, **kwargs), mode), self),
+                                   completed_wire_calls, requirements, status_receipts)
 
     def guarded_result(self, result, session_id='', exit_code=0):
         data = dict(result) if isinstance(result, dict) else {'final_response': str(result or '')}

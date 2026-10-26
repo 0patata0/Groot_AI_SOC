@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+> **10/26 사건 조회 소스:** 기존 반입 소스의 `infra/mcp/security-events-mcp.py`, 관리 controller/gate, query-completion 근거핀, Ollama 정책/설치기를 함께 반영한다. SCA는 기존 API 계정의 읽기 권한을 재사용하며 추가 deb/wheel/이미지는0이다. 기본 read-only 설치에도 resp 조회 연결을 포함해 실행부 계약(6서버/28읽기)에 맞춘다. 운영 증분과 새 서버 전체 설치 검증은 [STATUS](../STATUS.md)에서 구분한다.
+
 > **2026-10-26 독립 감시:** 루트 deploy.sh의 진단 연결 이후 A/B/C runtime 수집·A outbox/B 모델·수집 검사와 키 연결을 자동 구성한다. 별도 설치 진입점·패키지·이미지·포트는 추가하지 않는다. [구성·키·제한](../infra/mcp/monitoring.md) · [운영 검증](../STATUS.md).
 
 > **2026-10-25 새 질문 보완 소스1.10.0 / 계약1.3.0:** 장비별 요청 결합·복수 ID·제외/검색 조건·진단 지원 범위 검사는 루트 deploy.sh의 기존 SIEM/Ollama 소스 매핑으로 함께 배치한다. 운영 서버는 root 백업 후 증분 교체하고 실제 Mattermost WebSocket 인증 복귀를 확인했다. 새 deb/wheel/이미지/포트·설정 예제·키/권한 계약 변경은 없어 기존 오프라인 바이너리 목록을 유지하고 갱신 소스를 반입한다. 실제 새3VM 전체 설치는 미실행이다. [검사·운영 검증·한계](../STATUS.md).

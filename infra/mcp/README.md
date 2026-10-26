@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **10/26 추가 조회:** security-events에 `get_wazuh_sca_checks`를 추가했다. `agent_id`로 정책을 찾은 뒤 `policy_id`와 `check_ids`(최대20개) 또는 `title_contains`(제목 일부,최대50결과)를 지정한다. 기존 mcp-ro SCA 읽기 권한만 사용한다. `scan_end_kst`/나이/누락을 함께 읽으며 저장 스캔을 현재 설정 검사로 해석하지 않는다. 과거 경보에는 `until_kst`(+09:00,90일 이내)와 `lookback_minutes`(최대1440)를 사용한다. 미래·시간대 없는 값은 거절한다. [배포 상태](../../STATUS.md).
+
 > **2026-10-26 진단 확장:** 고정 systemd25+runtime12와 `soc:coverage` 전체37대상 집계, 두 봇 공통 heartbeat/진단, A 독립 장애 outbox를 추가했다. [설계·권한·주기·한계](monitoring.md)와 [실제 운영 검증·게시 상태](../../STATUS.md)를 따른다.
 
 > **2026-10-25 Wazuh 승인 적용 상태 검사 보완:** 선택 기능이 꺼져 `wazuh-control status`가 종료1이어도 정확한 Docker status 명령과 analysisd/remoted/db의 유일한 정상 행이 확인되면 준비 완료로 처리한다. 다른 명령·오류 코드·필수 프로세스 누락/정지/모순은 거절한다. 변경 소스는 `rule_change_executor.py`이며 루트 deploy.sh의 기존 canonical 소스/호스트 바인딩 경로에 포함된다. 추가 패키지·설정 키·권한·포트가 없어 예제와 deb/wheel 반입 목록의 실행 내용은 그대로다. 기존 B는 root 백업 후 helper만 증분 반영했으며 새3VM 전체 설치는 별도 미검증이다. [검증·적용 범위](../../STATUS.md).

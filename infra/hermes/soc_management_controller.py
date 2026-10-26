@@ -809,6 +809,16 @@ def prompt_for(base, case, evidence):
                 "최근24시간이나 서비스 정상 조회는 과거 사건의 경보 조회를 대신하지 않는다. "
                 "반환 경보의 정확한 출처·출발지·시각·Wazuh 상관 규칙 ID를 대조하고 공격/허용 판단은 별도 근거로 내린다. "
                 "사건 당시 표본을 찾지 못하거나 원본 근거가 잘렸다면 해결 완료로 종결하지 않는다.")
+        sca_checks = sca_review_requirements(evidence)
+        if sca_checks:
+            current_request += ("\n이 SCA 사건에서 확인해야 하는 개별 항목: " + canonical([
+                {"agent_id": r["agent_id"], "title_contains": r["title"]} for r in sca_checks
+                if r["agent_id"] and r["title"]]) +
+                "\nget_wazuh_sca_checks로 해당 agent_id의 정책 목록을 먼저 읽어 실제 policy_id를 확인한다. "
+                "다음 조회에는 그 policy_id와 위 title_contains를 함께 넣어 정확한 항목을 선택한다. "
+                "policy_id만 넣은 최초50개 표본이나 정책 전체 점수는 이 항목의 검증이 아니다. "
+                "check_id를 추측하지 말고 반환된 점검 제목/결과와 스캔 시각을 대조한다. "
+                "정확한 항목이 failed 또는 누락이면 해결 완료로 종결하지 않는다.")
     control = {"case_id": case["id"], "mode": case["mode"], "session_id": case["session_id"],
                "requested_at_kst": datetime.now(timezone(timedelta(hours=9))).isoformat(),
                "run_number": case["run_count"] + 1, "proposals": evidence["proposals"],

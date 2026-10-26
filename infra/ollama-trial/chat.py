@@ -178,11 +178,15 @@ class Gateway:
         return [p for p in result['posts'].values() if p['channel_id'] == post['channel_id']]
 
     async def history_for(self, post):
+        if post.get('root_id'):
+            return await self.thread(post)
         channel = await self.api('GET', '/channels/' + post['channel_id'])
-        if channel.get('type') == 'D' and not post.get('root_id'):
+        if channel.get('type') == 'D':
             recent = await self.api('GET', '/channels/' + post['channel_id'] + '/posts?per_page=60')
             return [p for p in recent['posts'].values() if p['channel_id'] == post['channel_id']]
-        return await self.thread(post)
+        # A new non-DM root has no earlier thread messages. The separate
+        # reply_id lookup still reconciles uncertain sends before any POST.
+        return []
 
     def prior_evidence(self, post):
         # Reformat evidence only in the exact thread and for the same human.

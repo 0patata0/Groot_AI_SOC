@@ -19,6 +19,7 @@ class Harness:
     combined_rule_request = staticmethod(lambda s: False)
     inventory_question = staticmethod(lambda s: False)
     ids_runtime_question = staticmethod(lambda s: False)
+    rule_detail_request = staticmethod(lambda s: None)
 
 
 class API:
@@ -83,6 +84,14 @@ class Tests(unittest.TestCase):
         self.assertEqual(p.route('수정하지 말고 룰 보여줘', Harness)['engine'], 'ollama')
         self.assertEqual(p.route('규칙 수정안을 작성해줘', Harness), {'engine': 'hermes', 'cross_review': True})
         self.assertEqual(p.route('침해 의심 사건을 조사해줘', Harness)['engine'], 'hermes')
+
+    def test_rule_detail_is_single_reader_but_explicit_review_still_runs(self):
+        with mock.patch.object(Harness, 'rule_detail_request', return_value={'id':42}):
+            self.assertEqual(p.route('Wazuh ID 42 level 조회', Harness),
+                             {'engine':'ollama','cross_review':False})
+            self.assertTrue(p.route('Wazuh ID 42 level 조회 후 서로 검증해줘', Harness)['cross_review'])
+            self.assertEqual(p.route('Wazuh ID 42 변경 위험 분석해줘', Harness),
+                             {'engine':'hermes','cross_review':True})
 
     def test_source_dedup_and_top_level_reply(self):
         self.d.add(self.post); self.d.add(self.post)

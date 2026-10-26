@@ -2,7 +2,7 @@
 import json
 import re
 from datetime import datetime, timezone, timedelta
-from harness import footer_free
+from harness import footer_free, EVIDENCE
 try:
     import channel_sync
 except ModuleNotFoundError as exc:
@@ -83,14 +83,9 @@ def question_with_history(post, prior, bot_id, report_bot_ids=()):
 
 
 def kst_text(text):
-    # Convert explicit timezone-bearing ISO timestamps only; never guess naive dates.
-    pattern = r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})'
-    def convert(m):
-        try:
-            return datetime.fromisoformat(m[0].replace('Z', '+00:00')).astimezone(KST).isoformat(timespec='seconds')
-        except ValueError:
-            return m[0]
-    return re.sub(pattern, convert, text)
+    # Use the shared idempotent display guard: already-KST text and fenced
+    # source/diffs remain byte exact, including fractional seconds.
+    return EVIDENCE.kst_display(text)
 
 
 def final_text(report, elapsed):

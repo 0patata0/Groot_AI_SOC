@@ -289,6 +289,33 @@ class RepeatedReads(unittest.TestCase):
         text=H.read_report(COMBINED,calls);self.assertIn('/rules/all.rules',text);self.assertIn('정의 수',text)
         self.assertIsNone(H.combined_rule_request('WAF IDS Wazuh 규칙을 수정해줘'))
 
+    def test_inventory_caveat_does_not_replace_file_read_with_service_read(self):
+        queries = ['Suricata 규칙 목록과 해시 보여줘. 엔진 활성 여부는 파일 정의와 구분해줘.',
+                   'IDS 룰 목록 확인해줘. 파일 정의와 엔진 적재를 혼동하지 말아줘.']
+        for q in queries:
+            self.assertIsNotNone(H.inventory_question(q))
+            self.assertFalse(H.ids_runtime_question(q))
+            self.assertNotIn('mcp__rule_a__get_service_action_target', H.tool_scope(q))
+        q = 'IDS 룰 목록과 현재 엔진 적재 상태도 조회해줘'
+        self.assertIsNotNone(H.combined_rule_request(q))
+        self.assertIn('a:suricata', H.missing_reads(q, []))
+        self.assertIn('a:suricata-local', H.missing_reads(q, []))
+        q = 'Suricata 규칙 목록과 해시 보여줘. 엔진 활성 여부는 파일 정의와 구분해줘.'
+        target='a:suricata-local'; data=payload(target)
+        calls=[call('get_rule_change_target',data,{'target':target},server='rule-a')]
+        self.assertIn(data['sha256'], H.inventory(q,calls))
+        for spelling in ('SHA를', 'SHA256을', 'SHA-256도'):
+            self.assertIn(data['sha256'], H.inventory('Suricata 규칙 목록과 '+spelling+' 보여줘',calls))
+
+    def test_inventory_discovery_uses_only_requested_hosts(self):
+        a='mcp__rule_a__get_rule_change_target'; b='mcp__rule_b__get_rule_change_target'
+        self.assertEqual(H.tool_scope('IDS 규칙 목록 보여줘'), {a})
+        self.assertEqual(H.tool_scope('Wazuh 규칙 목록 보여줘'), {b})
+        self.assertEqual(H.tool_scope('WAF와 IDS 규칙 목록 보여줘'), {a})
+        self.assertEqual(H.tool_scope('WAF Wazuh 규칙 목록 보여줘'), {a,b})
+        self.assertEqual(H.tool_scope('전체 규칙 목록 보여줘'), {a,b})
+        self.assertEqual(H.tool_scope('IDS 규칙 목록과 구동 경로 보여줘'), {a,'mcp__rule_a__get_service_action_target'})
+
     def test_policy_facts_require_exact_available_definitions_and_exclude_incidents(self):
         tools=[{'function':{'name':'mcp__resp__block_ip','description':'Requires operator approval and refuses protected/management addresses and IPs with an active SSH session.'}},
                {'function':{'name':'mcp__rule_write_a__temporarily_contain_ip','description':'Protected/private/management/DGX and active SSH addresses are refused.'}}]

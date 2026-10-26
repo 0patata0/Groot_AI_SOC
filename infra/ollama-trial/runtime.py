@@ -275,11 +275,12 @@ async def run(config, request, *, on_protected_start=None):
                         report['repair']['method'] = 'structured_read_selection'
                         selector = llm.with_structured_output(schema, method='json_schema')
                         plan = await asyncio.wait_for(selector.ainvoke([
-                            ('system', SYSTEM_PROMPT + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
+                            ('system', harness.CONTRACT.system_prompt(read_only=True) + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
                              '절대 구간이 미지원이어도 사용자 요청에 따라 지원되는 최근 상대 구간의 표본을 조회하세요. '
                              '요청한 장비/대상을 빠짐없이 포함하고 이미 성공한 조회를 반복하지 마세요. 요청구간을 지원한다고 꾸미지 마세요.' + harness.guidance(current)),
                             ('human', instruction + '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
                         report.setdefault('read_selections', []).append(plan)
+                        report['read_selection_prompt_sha256'] = harness.CONTRACT.fingerprint(read_only=True)
                         plan, removed = harness.validated_selection(plan, schema)
                         report['deduplicated_read_selections'] = report.get('deduplicated_read_selections', 0) + removed
                         selection_active = True

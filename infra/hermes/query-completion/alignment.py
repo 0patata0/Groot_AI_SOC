@@ -249,7 +249,9 @@ def request_wrapper(original, query, harness):
         agent._capstone_read_selection = None
         # Respect the native investigative read-first lease; ordinary explicit
         # read requests use the same scope as the other chat adapter.
-        data = harness.CONTRACT.normalize_openai(result.api_kwargs, scope)
+        read_selection = bool(scope and harness.structured_read(request)
+                              and all(harness.EVIDENCE.allowed(name, 'verify') for name in scope))
+        data = harness.CONTRACT.normalize_openai(result.api_kwargs, scope, read_only=read_selection)
         if isinstance(data.get('messages'), list):
             data['messages'], projected = project_new_thread(data['messages'],
                 kw.get('original_user_message'), request, harness.SHARED._CONTEXT_PREFIX)
@@ -313,7 +315,7 @@ def request_wrapper(original, query, harness):
             fn = tool.get("function", {})
             if fn.get("name") == "mcp__system_diagnostics__get_system_diagnostics":
                 agent._capstone_alignment_diagnostic_targets = fn.get("parameters", {}).get("properties", {}).get("target", {}).get("enum", [])
-        agent._capstone_alignment_contract = harness.CONTRACT.fingerprint()
+        agent._capstone_alignment_contract = harness.CONTRACT.fingerprint(read_only=read_selection)
         logging.getLogger("capstone.query_completion").info(
             "event=chat_contract version=%s prompt_sha256=%s reasoning=none output_tokens=%d native_iterations=%s tools=%d new_root_context_projected=%s",
             harness.CONTRACT.VERSION, agent._capstone_alignment_contract,
@@ -324,7 +326,7 @@ def request_wrapper(original, query, harness):
     return wrapped
 
 
-def selection_response(response, schema):
+def selection_response(response, schema, harness=None):
     """Translate the model's validated selection, retaining its content/usage.
 
     This is a wire-format adapter, not a fabricated observation or fixed dispatch.
@@ -338,7 +340,7 @@ def selection_response(response, schema):
     if not isinstance(raw, str) or len(raw) > 65536:
         raise ValueError('read_selection_response_size')
     value = json.loads(raw)
-    harness = load_harness()
+    harness = harness if harness is not None else load_harness()
     value, removed = harness.validated_selection(value, schema)
     if removed: logging.getLogger('capstone.query_completion').info('event=deduplicated_read_selection removed=%d', removed)
     result = copy.deepcopy(response)
@@ -349,7 +351,7 @@ def selection_response(response, schema):
     return result, len(value['calls'])
 
 
-def selection_call_wrapper(original, query):
+def selection_call_wrapper(original, query, harness=None):
     @functools.wraps(original)
     def wrapped(agent, **kw):
         selection = getattr(agent, '_capstone_read_selection', None)
@@ -361,7 +363,7 @@ def selection_call_wrapper(original, query):
             return verdict
         agent._capstone_read_selection = None
         try:
-            response, count = selection_response(verdict.response, selection[1])
+            response, count = selection_response(verdict.response, selection[1], harness)
         except Exception as exc:
             logging.getLogger('capstone.query_completion').warning('read_selection_rejected error_class=%s', type(exc).__name__)
             return verdict

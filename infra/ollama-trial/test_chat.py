@@ -81,7 +81,7 @@ class Routing(unittest.TestCase):
 
     def test_kst_date_boundary_and_naive_date_preserved(self):
         text = policy.kst_text('2026-10-24T19:50:00Z / 2026-10-24 19:50:00')
-        self.assertEqual(text, '2026-10-25T04:50:00+09:00 / 2026-10-24 19:50:00')
+        self.assertEqual(text, '2026-10-25T04:50:00+09:00 (KST) / 2026-10-24 19:50:00')
 
     def test_failure_does_not_claim_healthy(self):
         answer = policy.final_text({'status': 'failed'}, 2)
@@ -190,6 +190,27 @@ class DurableDelivery(unittest.IsolatedAsyncioTestCase):
         self.gateway.api = AsyncMock(side_effect=[{'type': 'D'}, {'posts': self.posts}])
         self.assertEqual(await self.gateway.history_for(SOURCE), [SOURCE])
         self.assertEqual(self.gateway.api.call_args.args[1], '/channels/' + CHANNEL + '/posts?per_page=60')
+
+    async def test_new_public_root_does_not_fetch_empty_thread_history(self):
+        self.gateway.api = AsyncMock(return_value={'type':'O'})
+        self.assertEqual(await self.gateway.history_for(SOURCE), [])
+        self.gateway.api.assert_awaited_once_with('GET', '/channels/' + CHANNEL)
+
+    async def test_thread_reply_fetches_history_without_redundant_channel_lookup(self):
+        self.gateway.api = AsyncMock(return_value={'posts': self.posts})
+        post = {**SOURCE, 'root_id': 'r'*26}
+        self.assertEqual(await self.gateway.history_for(post), [SOURCE])
+        self.gateway.api.assert_awaited_once_with('GET', '/posts/' + 'r'*26 + '/thread?per_page=200')
+
+    def test_final_kst_guard_preserves_source_and_existing_precision(self):
+        stamp='2026-10-27T06:12:34.123456+09:00'
+        source='```diff\n+ timestamp: 2026-10-26T21:12:34.123456Z\n```'
+        text=stamp+'\n'+source
+        rendered=policy.kst_text(text)
+        self.assertIn(stamp, rendered)
+        self.assertIn(source, rendered)
+        self.assertIn('원문 시각의 KST 환산', rendered)
+        self.assertEqual(policy.kst_text(rendered), rendered)
 
 
 

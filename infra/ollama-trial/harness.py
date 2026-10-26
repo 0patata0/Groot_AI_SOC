@@ -140,15 +140,26 @@ def read_report(question, calls):
     return READ.report(plan, calls, EVIDENCE) if plan else None
 
 
-def ids_runtime_question(question):
+def rule_scope_text(question):
+    """Separate an inventory request's interpretation caveat from a live query."""
     text = READ.scope_text(normalized(question))
+    if re.search(r'(?:규칙|룰|파일\s*정의|\bID\b|\bSID\b).{0,35}(?:목록|개수|정의\s*수)', text, re.I):
+        text = re.sub(r'(?:엔진\s*)?(?:적재|로드|활성)(?:\s*(?:여부|상태))?(?:는|를)?\s*'
+                      r'(?:파일\s*)?정의(?:와|과)\s*(?:구분(?:해|하)|혼동하지)', '', text)
+        text = re.sub(r'(?:파일\s*)?정의(?:와|과)\s*(?:엔진\s*)?(?:적재|로드|활성)'
+                      r'(?:\s*(?:여부|상태))?(?:를|는)?\s*(?:구분(?:해|하)|혼동하지)', '', text)
+    return text
+
+
+def ids_runtime_question(question):
+    text = rule_scope_text(question)
     return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
         and re.search(r'활성|가동|적재|사용(?:\s*중|하는|하고)|구동|불러오|로드|실행\s*(?:상태|여부|중)', text)
         and not re.search(r'WAF|Wazuh', text, re.I) and not READ.wants_write(text))
 
 
 def _inventory_question(question):
-    text = READ.scope_text(normalized(question))
+    text = rule_scope_text(question)
     if ids_runtime_question(question): return None
     if re.search(r'설명|레벨|심각도|메시지|탐지\s*조건|(?<![A-Za-z_])(?:level|description|severity|msg)(?![A-Za-z_])|\b(?:ID|SID)\s*[:=]?\s*[0-9]+', text, re.I):
         return None  # Specific fields/IDs must not become a whole-file count table.
@@ -159,13 +170,15 @@ def _inventory_question(question):
         return None
     devices = [label for pattern, label in [('WAF|ModSecurity', 'WAF'),
                (r'(?<![A-Za-z])IDS(?![A-Za-z])|Suricata', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]
-    return '현재 적용된 규칙 목록 보여줘 ' + ' '.join(devices) + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
+    return ('현재 적용된 규칙 목록 보여줘 ' + ' '.join(devices)
+            + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
+            + (' SHA-256' if re.search(r'(?<![A-Za-z])SHA(?:-?256)?(?![A-Za-z0-9])|해시', text, re.I) else ''))
 
 
 def combined_rule_request(question):
-    text = READ.scope_text(normalized(question))
+    text = rule_scope_text(question)
     if READ.wants_write(text): return None
-    runtime = re.search(r'(?:IDS|Suricata|수리카타)(?:가|는|의)?[^.!?。]{0,90}(?:local\.rules|all\.rules|구동\s*경로|실행\s*경로|룰\s*경로|실제\s*사용|사용하는지|가동\s*상태)', text, re.I)
+    runtime = re.search(r'(?:IDS|Suricata|수리카타)(?:가|는|의)?[^.!?。]{0,90}(?:local\.rules|all\.rules|구동\s*경로|실행\s*경로|룰\s*경로|실제\s*사용|사용하는지|가동\s*상태|(?:활성|적재|로드)\s*(?:상태|여부))', text, re.I)
     if runtime and re.search(r'(?:규칙|룰|파일\s*정의).{0,35}(?:개수|목록|정의\s*수)|(?:개수|목록|정의\s*수).{0,20}(?:규칙|룰|파일\s*정의)', text):
         labels = [label for pattern, label in [('WAF|ModSecurity', 'WAF'), ('IDS|Suricata|수리카타', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]
         return '현재 규칙 목록 보여줘 ' + ' '.join(labels) + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
@@ -502,8 +515,7 @@ def tool_scope(question, calls=None):
         return {'mcp__system_diagnostics__get_system_diagnostics'}
     combined = combined_rule_request(question)
     if combined:
-        scope = {'mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target', 'mcp__rule_a__get_service_action_target'}
-        return scope
+        return inventory_tool_scope(combined) | {'mcp__rule_a__get_service_action_target'}
     plan = read_plan(question)
     if plan:
         scope = READ.scope(plan, calls)
@@ -513,8 +525,9 @@ def tool_scope(question, calls=None):
         return scope
     if ids_runtime_question(question):
         return {'mcp__rule_a__get_service_action_target'}
-    if inventory_question(question):
-        return {'mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target'}
+    inventory_request = inventory_question(question)
+    if inventory_request:
+        return inventory_tool_scope(inventory_request)
     text = normalized(question)
     if re.search(r'변경|수정|차단해|재시작|추가해|삭제|적용해|설치|배포', text):
         return None
@@ -533,6 +546,14 @@ def tool_scope(question, calls=None):
     if re.search(r'A\s*/\s*B\s*/\s*C', text, re.I) and re.search(r'서비스|서버', text) and re.search(r'실패|오류|진단', text):
         return {'mcp__system_diagnostics__get_system_diagnostics'}
     return None
+
+
+def inventory_tool_scope(request):
+    """Limit catalog discovery to the hosts named by the normalized inventory."""
+    a = bool(re.search(r'WAF|Suricata', request, re.I))
+    b = bool(re.search(r'Wazuh', request, re.I))
+    return {name for name, selected in [('mcp__rule_a__get_rule_change_target', a or not b),
+                                       ('mcp__rule_b__get_rule_change_target', b or not a)] if selected}
 
 
 def missing_reads(question, calls, diagnostic_targets=()):

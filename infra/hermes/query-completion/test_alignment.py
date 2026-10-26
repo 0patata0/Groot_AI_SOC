@@ -26,6 +26,23 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_read_selection_omits_only_write_completion_guidance(self):
+        full, read = C.system_prompt(), C.system_prompt(read_only=True)
+        self.assertLess(len(read), len(full))
+        self.assertIn(C.QUERY_GUIDANCE, read)
+        self.assertIn(C.READ_COMPLETION_GUIDANCE, read)
+        self.assertNotIn(C.COMPLETION_GUIDANCE, read)
+        policy = full.split(C.QUERY_GUIDANCE)[0]
+        self.assertTrue(read.startswith(policy))  # Full SOUL security policy retained.
+        original = {'messages':[{'role':'system','content':'native policy'},
+                                {'role':'user','content':'Wazuh 규칙 조회'}]}
+        snapshot = copy.deepcopy(original)
+        selected = C.normalize_openai(original, read_only=True)
+        self.assertIn(C.READ_COMPLETION_GUIDANCE, selected['messages'][0]['content'])
+        self.assertEqual(original, snapshot)
+        # A subsequent write request must not inherit the smaller read prompt.
+        self.assertIn(C.COMPLETION_GUIDANCE, C.normalize_openai(original)['messages'][0]['content'])
+
     def test_edit_anchors_are_unique_original_edges_not_candidate_text(self):
         for content in ('# ===\n# title\n# ===\nbody\n# ===\n',
                         '# ===\r\n# 제목\r\n# ===\r\n본문\r\n# ===\r\n',

@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.11.9"
+VERSION = "groot-query-completion:1.11.12"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "b18ff96a76995bcccc3adda5897844f506d53325f4effd5b409fb73bc8f51faf"
@@ -773,11 +773,12 @@ def render_rule_inventory(request, rows, *, missing_targets=False, verified_targ
             detail = f" (level 0 규칙 {details['level0_count']}개 포함)"
         duplicate = (f" 중복 ID: {', '.join(str(n) for n in inv['duplicate_ids'])}." if inv["duplicate_ids"] else "")
         ids = ", ".join(str(n) for n in inv["ids"]) or "없음"
+        shown_sha = inv['source_sha256'] if re.search(r'(?<![A-Za-z])SHA(?:-?256)?(?![A-Za-z0-9])|해시', request, re.I) else inv['source_sha256'][:16] + '…'
         if table:
             lines.append(f"| {label} | `{filename}` | {inv['declared_count']} / {inv['unique_id_count']} | {ids} | 미확인 |")
-            notes.append(f"{label} 근거: `{target}`, SHA-256 `{inv['source_sha256'][:16]}…`.{detail}{duplicate}")
+            notes.append(f"{label} 근거: `{target}`, SHA-256 `{shown_sha}`.{detail}{duplicate}")
             continue
-        lines.append(f"- **{label}**: `{filename}` 규칙 정의 **{inv['declared_count']}개**, 고유 ID **{inv['unique_id_count']}개**{detail}.{duplicate}\n  {'SID' if kind == 'suricata' else 'ID'}: `{ids}`\n  근거: `{target}`, SHA-256 `{inv['source_sha256'][:16]}…`.")
+        lines.append(f"- **{label}**: `{filename}` 규칙 정의 **{inv['declared_count']}개**, 고유 ID **{inv['unique_id_count']}개**{detail}.{duplicate}\n  {'SID' if kind == 'suricata' else 'ID'}: `{ids}`\n  근거: `{target}`, SHA-256 `{shown_sha}`.")
     lines.extend(["", *notes, "", "**조치 및 다음 단계**", "위 수치는 지정한 파일의 정의 수입니다. 전체 CRS/ET 개수가 아니며, 엔진의 개별 규칙 적재 여부와 실제 탐지 성공 여부는 이번 집계에 포함하지 않았습니다. 미확인은 비활성을 뜻하지 않습니다."])
     return "\n".join(lines)
 
@@ -1125,7 +1126,7 @@ def register(ctx):
         wrapped = alignment.final_wrapper(wrapped, original, native, metadata.append_message,
             context.reanchor_current_turn_user_idx, query_adapter, shared_chat)
         build_wrapped = alignment.request_wrapper(build_wrapped, query_adapter, shared_chat)
-        call_wrapped = alignment.selection_call_wrapper(call_wrapped, query_adapter)
+        call_wrapped = alignment.selection_call_wrapper(call_wrapped, query_adapter, shared_chat)
         result_wrapped = alignment.vulnerability_result_wrapper(original_result, shared_chat.READ, VERSION)
 
         def restore():

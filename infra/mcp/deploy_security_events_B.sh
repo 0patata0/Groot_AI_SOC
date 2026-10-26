@@ -56,7 +56,7 @@ grep -Fq 'exec "$BIN"' "$STAGE/run-wazuh-ro.sh" || die "래퍼에 기존 바이�
 
 # 자격증명이나 Indexer 호출 없이 구문·MCP initialize/tools/list를 확인한다.
 check_tools() {
-python3 - "$1" "$2" <<'PY'
+python3 -B - "$1" "$2" <<'PY'
 import ast, json, subprocess, sys
 path, mode = sys.argv[1:]
 if mode == "direct":
@@ -67,7 +67,7 @@ messages = [
     {"jsonrpc": "2.0", "method": "notifications/initialized"},
     {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
 ]
-cmd = ["/usr/bin/python3", path] if mode == "direct" else ["runuser", "-u", "mcp", "--", "env", "-i", "PATH=/usr/bin:/bin", "SSH_CONNECTION=local", "SSH_ORIGINAL_COMMAND=security-events", path]
+cmd = ["/usr/bin/python3", "-B", path] if mode == "direct" else ["runuser", "-u", "mcp", "--", "env", "-i", "PATH=/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE=1", "SSH_CONNECTION=local", "SSH_ORIGINAL_COMMAND=security-events", path]
 p = subprocess.run(cmd, input="\n".join(map(json.dumps, messages)) + "\n", text=True, capture_output=True, timeout=10)
 if p.returncode:
     raise SystemExit("MCP %s check exited with status %d" % (mode, p.returncode))
@@ -77,9 +77,9 @@ try:
     names = {tool["name"] for tool in tools}
 except (ValueError, KeyError, StopIteration, TypeError) as exc:
     raise SystemExit("MCP %s protocol failed: %s" % (mode, type(exc).__name__))
-if names != {"search_suricata_alerts", "search_modsecurity_alerts"}:
+if names != {"search_suricata_alerts", "search_modsecurity_alerts", "get_wazuh_sca_checks"}:
     raise SystemExit("MCP %s exposed unexpected tools" % mode)
-print("MCP %s check: 2 read-only tools" % mode)
+print("MCP %s check: 3 read-only tools" % mode)
 PY
 }
 check_tools "$STAGE/security-events-mcp.py" direct

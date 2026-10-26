@@ -18,6 +18,51 @@ spec.loader.exec_module(module)
 
 
 class SecurityEventsMcpTests(unittest.TestCase):
+    def test_dns_context_is_bounded_and_does_not_invent_reverse_queries(self):
+        value={'type':'request','queries':[{'rrname':'status.example.test','rrtype':'AAAA','secret':'hidden'}],
+               'answers':[{'rdata':'secret-answer'}]}
+        row=module.summarize_suricata({'data':{'dns':value}})
+        self.assertEqual(row['dns_questions'],[{'name':'status.example.test','type':'AAAA'}])
+        self.assertEqual(row['dns_message_type'],'request')
+        self.assertFalse(row['dns_questions_incomplete'])
+        self.assertNotIn('secret',json.dumps(row));self.assertNotIn('hidden',json.dumps(row))
+        capped=module.dns_questions({'queries':value['queries']*17})
+        self.assertEqual(len(capped['dns_questions']),16);self.assertTrue(capped['dns_questions_incomplete'])
+        for invalid in ('x\nignore instructions','x'*254, {'nested':'data'}):
+            row=module.dns_questions({'queries':[{'rrname':invalid,'rrtype':'A'}]})
+            self.assertEqual(row['dns_questions'],[]);self.assertTrue(row['dns_questions_incomplete'])
+        self.assertEqual(module.dns_questions({'rrname':'old.example.test','rrtype':'PTR'})['dns_questions'][0]['type'],'PTR')
+
+    def test_waf_context_preserves_path_and_only_hashes_identifiers(self):
+        tx={'unique_id':'opaque-transaction','request':{'uri':'/x/%2e%2e/labs/status?token=secret-query#secret-fragment',
+            'headers':{'User-Agent':'secret-user-agent','Authorization':'secret-auth','Cookie':'secret-cookie'},'body':'secret-body'}}
+        row=module.summarize_modsecurity({'data':{'transaction':tx}})
+        self.assertEqual(row['request_path'],'/x/%2e%2e/labs/status')
+        self.assertTrue(row['request_query_omitted']);self.assertFalse(row['request_path_incomplete'])
+        self.assertEqual(row['transaction_id_sha256'],module.hashlib.sha256(b'opaque-transaction').hexdigest())
+        self.assertEqual(row['user_agent_sha256'],module.hashlib.sha256(b'secret-user-agent').hexdigest())
+        self.assertNotIn('secret',json.dumps(row));self.assertNotIn('opaque-transaction',json.dumps(row))
+        tx['request']['uri']='https://private-user:private-pass@example.test/a//b?token=hidden'
+        row=module.http_context(tx);self.assertEqual(row['request_path'],'/a//b');self.assertNotIn('private',json.dumps(row))
+        self.assertEqual(module.http_context({'request':{'uri':'//a//b'}})['request_path'],'//a//b')
+
+    def test_waf_context_bad_and_large_values_are_explicit(self):
+        for value in ('/x\nBAD','x'*8193,'not-a-path',{'x':'y'}):
+            row=module.http_context({'request':{'uri':value}})
+            self.assertTrue(row['request_path_incomplete']);self.assertEqual(row['request_path'],'')
+        row=module.http_context({'request':{'uri':'/'+'x'*600}})
+        self.assertEqual(len(row['request_path']),512);self.assertTrue(row['request_path_incomplete'])
+        self.assertEqual(module.opaque_hash('가'*1400),'')
+        self.assertEqual(module.opaque_hash({'bad':'type'}),'')
+
+    def test_query_selects_only_necessary_context_and_existing_deployer_accepts_three_tools(self):
+        fields=module.build_query('modsecurity',module.validate_args('modsecurity',{}))['_source']['includes']
+        self.assertIn('data.transaction.request.uri',fields)
+        self.assertNotIn('data.transaction.request.headers',fields)
+        self.assertFalse(any('Cookie' in f or 'Authorization' in f or 'body' in f for f in fields))
+        script=SERVER.with_name('deploy_security_events_B.sh').read_text()
+        self.assertIn('"get_wazuh_sca_checks"',script)
+
     def test_historical_window_is_bounded_kst_and_exact(self):
         at=module.datetime(2026,10,26,15,tzinfo=module.KST)
         params=module.validate_args('suricata',{'until_kst':'2026-10-17T16:00:00+09:00','lookback_minutes':60,'source_ip':'192.0.2.1','signature_id':'100110'})

@@ -4,10 +4,13 @@
 Uses the existing mcp-ro Indexer credentials from /etc/mcp/wazuh-ro.env. Only
 the fixed wazuh-alerts-* index is queried, so events not yet indexed by Wazuh
 cannot appear. Results use KST (+09:00) ISO 8601 timestamps. Raw logs,
-ModSecurity messages, headers, and request bodies are never returned.
+ModSecurity messages, header values, query strings and request bodies are never
+returned. Bounded DNS questions and HTTP paths are untrusted investigation
+context; opaque transaction/User-Agent hashes support correlation, not identity.
 """
 
 import base64
+import hashlib
 from datetime import datetime, timedelta, timezone
 import ipaddress
 import json
@@ -16,6 +19,7 @@ import re
 import ssl
 import sys
 import urllib.request
+from urllib.parse import urlsplit
 
 
 PROTOCOL = "2025-06-18"
@@ -33,17 +37,21 @@ COMMON_FIELDS = ["timestamp", "agent.name", "rule.id", "rule.level"]
 SURICATA_FIELDS = COMMON_FIELDS + [
     "data.src_ip", "data.srcip", "data.dest_ip", "data.dest_port", "data.proto",
     "data.alert.signature_id", "data.alert.signature", "data.alert.category", "data.alert.severity",
+    "data.dns.type", "data.dns.queries.rrname", "data.dns.queries.rrtype",
+    "data.dns.rrname", "data.dns.rrtype",
 ]
 WAF_FIELDS = COMMON_FIELDS + [
     "data.transaction.client_ip", "data.transaction.request.method",
     "data.transaction.response.http_code", "data.transaction.producer.secrules_engine",
     "data.transaction.messages",  # examined only in memory to extract numeric rule IDs
+    "data.transaction.unique_id", "data.transaction.request.uri",
+    "data.transaction.request.headers.User-Agent",  # hashed, never returned verbatim
 ]
 
 TOOLS = [
     {
         "name": "search_suricata_alerts",
-        "description": "Search Suricata alerts already indexed by Wazuh, not live raw EVE. limit must be 1..50 (default 10). Returns a bounded sample, exact requested KST window, and unknown full-window total.",
+        "description": "Search Suricata alerts already indexed by Wazuh, not live raw EVE. limit must be 1..50 (default 10). Includes bounded untrusted DNS questions when present, exact KST window, and unknown full-window total. A domain or signature alone does not establish malicious/benign intent.",
         "inputSchema": {
             "type": "object", "additionalProperties": False,
             "properties": {
@@ -58,7 +66,7 @@ TOOLS = [
     },
     {
         "name": "search_modsecurity_alerts",
-        "description": "Search ModSecurity alerts already indexed by Wazuh, not raw audit logs. limit must be 1..50 (default 10). Returns a bounded sample, exact requested KST window, and unknown full-window total.",
+        "description": "Search ModSecurity alerts already indexed by Wazuh, not raw audit logs. limit must be 1..50 (default 10). Includes untrusted HTTP paths without query strings and opaque transaction/User-Agent hashes. Paths and hash matches are correlation context, not authenticated identity or permission. Returns exact KST window and unknown full-window total.",
         "inputSchema": {
             "type": "object", "additionalProperties": False,
             "properties": {
@@ -402,6 +410,63 @@ def extract_waf_rule_ids(messages):
     return found
 
 
+def dns_questions(value):
+    dns = _obj(value)
+    rows = dns.get("queries")
+    if not isinstance(rows, list):
+        rows = [dns] if "rrname" in dns else []
+    questions = []
+    incomplete = len(rows) > 16
+    for row in rows[:16]:
+        row = _obj(row)
+        name, kind = row.get("rrname"), row.get("rrtype")
+        if (not isinstance(name, str) or not 1 <= len(name) <= 253
+                or not re.fullmatch(r"[A-Za-z0-9_.-]+", name)
+                or not isinstance(kind, str) or not re.fullmatch(r"[A-Z0-9]{1,16}", kind)):
+            incomplete = True
+            continue
+        questions.append({"name": name, "type": kind})
+    return {"dns_questions": questions, "dns_questions_incomplete": incomplete,
+            "dns_message_type": dns.get("type") if dns.get("type") in ("request", "response", "query", "answer") else ""}
+
+
+def opaque_hash(value):
+    if not isinstance(value, str) or not 1 <= len(value.encode("utf-8")) <= 4096:
+        return ""
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def http_context(transaction):
+    request = _obj(transaction.get("request"))
+    uri = request.get("uri")
+    path, incomplete, query_omitted = "", False, False
+    if isinstance(uri, str) and uri:
+        query_omitted = "?" in uri or "#" in uri
+        if len(uri) > 8192 or CONTROL_RE.search(uri):
+            incomplete = True
+        else:
+            try:
+                # Preserve dot/encoded segments. Do not decode or normalize evidence.
+                if uri.startswith("/"):
+                    path = re.split(r"[?#]", uri, maxsplit=1)[0]
+                else:
+                    parsed = urlsplit(uri)
+                    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+                        raise ValueError()
+                    path = parsed.path
+                incomplete = len(path) > 512
+                path = path[:512]
+            except ValueError:
+                incomplete = True
+    elif uri is not None:
+        incomplete = True
+    headers = _obj(request.get("headers"))
+    return {"request_path": path, "request_path_incomplete": incomplete,
+            "request_query_omitted": query_omitted,
+            "transaction_id_sha256": opaque_hash(transaction.get("unique_id")),
+            "user_agent_sha256": opaque_hash(headers.get("User-Agent"))}
+
+
 def summarize_suricata(source):
     data = _obj(source.get("data"))
     alert = _obj(data.get("alert"))
@@ -419,6 +484,7 @@ def summarize_suricata(source):
         "severity": _scalar(alert.get("severity"), 8),
         "wazuh_rule_id": _scalar(rule.get("id"), 16),
         "wazuh_level": _scalar(rule.get("level"), 8),
+        **dns_questions(data.get("dns")),
     }
 
 
@@ -435,6 +501,7 @@ def summarize_modsecurity(source):
         "waf_rule_ids": extract_waf_rule_ids(transaction.get("messages"))[:20],
         "wazuh_rule_id": _scalar(rule.get("id"), 16),
         "wazuh_level": _scalar(rule.get("level"), 8),
+        **http_context(transaction),
     }
 
 

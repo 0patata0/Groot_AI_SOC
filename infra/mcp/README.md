@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **10/26 23:42 KST 조사 필드:** 기존3도구를 유지하며 DNS 질문 최대16개와 HTTP 경로512자, 거래ID/User-Agent SHA256을 추가했다. 경로의 query/fragment·헤더값·쿠키·인증정보·본문은 반환하지 않는다. 경로/질의명은 비신뢰 증거이며 해시는 행위자 인증이 아니다. 잘림/형식 오류를 명시하고 반환 표본/전체 수 미확인 경계를 유지한다. 실제 H/O 같은 결과와194검사, 사건 검토/설정 변경 범위는 [STATUS](../../STATUS.md)를 따른다.
+
 > **10/26 추가 조회:** security-events에 `get_wazuh_sca_checks`를 추가했다. `agent_id`로 정책을 찾은 뒤 `policy_id`와 `check_ids`(최대20개) 또는 `title_contains`(제목 일부,최대50결과)를 지정한다. 기존 mcp-ro SCA 읽기 권한만 사용한다. `scan_end_kst`/나이/누락을 함께 읽으며 저장 스캔을 현재 설정 검사로 해석하지 않는다. 과거 경보에는 `until_kst`(+09:00,90일 이내)와 `lookback_minutes`(최대1440)를 사용한다. 미래·시간대 없는 값은 거절한다. [배포 상태](../../STATUS.md).
 
 > **2026-10-26 진단 확장:** 고정 systemd25+runtime12와 `soc:coverage` 전체37대상 집계, 두 봇 공통 heartbeat/진단, A 독립 장애 outbox를 추가했다. [설계·권한·주기·한계](monitoring.md)와 [실제 운영 검증·게시 상태](../../STATUS.md)를 따른다.

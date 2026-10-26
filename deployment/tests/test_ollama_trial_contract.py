@@ -12,6 +12,8 @@ def load(name,path):
 class InstallContract(unittest.TestCase):
     def test_profiles_cover_runtime_scope_and_keep_protected_calls_separate(self):
         installer=load('trial_install','deployment/ollama_trial.py')
+        self.assertIn('read_pool.py', installer.SOURCES)
+        self.assertTrue((ROOT/'infra/ollama-trial/read_pool.py').is_file())
         policy=load('trial_policy','infra/ollama-trial/policy.py')
         self.assertEqual(set(installer.PROFILES),set(policy.capabilities('read-only')))
         self.assertEqual(set(installer.PARITY_PROFILES),set(policy.capabilities('hermes-parity')))

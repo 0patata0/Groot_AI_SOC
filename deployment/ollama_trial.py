@@ -25,7 +25,7 @@ PROFILES = {'rule-a': ('rule-a',), 'rule-b': ('rule-b',),
             'security-events': ('mcp-b', 'security-events'),
             'system-diagnostics': ('mcp-b', 'system-diagnostics'), 'wazuh-ro': ('mcp-b',),
             'resp': ('resp-a',)}
-SOURCES = ('runtime.py', 'policy.py', 'harness.py', 'requirements.lock', 'offline-manifest.json')
+SOURCES = ('runtime.py', 'read_pool.py', 'policy.py', 'harness.py', 'requirements.lock', 'offline-manifest.json')
 PARITY_PROFILES = {**PROFILES, 'resp': ('resp-a',),
                    'rule-write-a': ('rule-write-a',), 'rule-write-b': ('rule-write-b',)}
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LC_ALL': 'C', 'TZ': 'Asia/Seoul',

@@ -21,6 +21,7 @@ from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from runtime import run as agent_run, load_config as agent_config
+from read_pool import ReadConnectionPool
 import harness
 try:
     import gateway_health
@@ -96,6 +97,7 @@ class Gateway:
     def __init__(self, config, http, state=None):
         self.c, self.http = config, http
         self.runtime = agent_config('/etc/capstone-ollama-trial/config.json')
+        self.read_pool = ReadConnectionPool()
         self.state = Path(state) if state else None
         self.wake = asyncio.Event()
         self.worker_task = None
@@ -250,13 +252,14 @@ class Gateway:
                 with self.db:
                     self.db.execute('update jobs set protected_started=1 where id=?', (post['id'],))
             try:
+                self.runtime = agent_config('/etc/capstone-ollama-trial/config.json')
                 current = request_text(post['message'])
                 question = question_with_history({**post, 'message': current}, await self.history_for(post), self.c['bot_id'],
                                                  self.c.get('report_bot_ids', []))
                 with contextlib.redirect_stdout(sys.stderr):
                     report = await asyncio.wait_for(agent_run(self.runtime, {'question': question,
                         'current_question': current, 'prior_evidence': self.prior_evidence(post)},
-                        on_protected_start=protected_start), 1110)
+                        on_protected_start=protected_start, connection_pool=self.read_pool), 1110)
                 answer = final_text(report, time.perf_counter() - started)
                 evidence = json.dumps(report['evidence'], ensure_ascii=False) if report.get('evidence') else None
                 audit = audit_json(report)
@@ -357,10 +360,13 @@ async def main_async(args):
             await gateway.listen(once=True)
             log('check_passed', posts_sent=0, model_requests=0)
         else:
-            async with asyncio.TaskGroup() as group:
-                group.create_task(gateway.sync_channels())
-                gateway.worker_task = group.create_task(gateway.worker())
-                group.create_task(gateway.listen())
+            try:
+                async with asyncio.TaskGroup() as group:
+                    group.create_task(gateway.sync_channels())
+                    gateway.worker_task = group.create_task(gateway.worker())
+                    group.create_task(gateway.listen())
+            finally:
+                await gateway.read_pool.close()
 
 
 if __name__ == '__main__':

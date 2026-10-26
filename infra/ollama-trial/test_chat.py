@@ -112,6 +112,10 @@ class DurableDelivery(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(self.temp.cleanup)
         with patch.object(chat, 'agent_config', return_value={}):
             self.gateway = chat.Gateway(CONFIG, None, self.temp.name)
+        config_patch = patch.object(chat, 'agent_config', return_value={})
+        config_patch.start()
+        self.addCleanup(config_patch.stop)
+        self.addAsyncCleanup(self.gateway.read_pool.close)
         self.addCleanup(self.gateway.db.close)
         self.posts = {POST: dict(SOURCE)}
         self.sent = 0

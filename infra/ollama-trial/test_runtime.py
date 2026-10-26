@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import types
 import unittest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import runtime
@@ -82,9 +82,12 @@ class PreparationLoop(unittest.TestCase):
         with patch.dict(sys.modules,modules), patch.object(runtime,'capabilities',return_value=available), \
              patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools), \
              patch.object(runtime.harness,'tool_scope',side_effect=scope):
+            pool = types.SimpleNamespace(borrow=AsyncMock(side_effect=AssertionError('write request entered read pool')))
             report=asyncio.run(runtime.run({'model':'qwen3.6:35b','base_url':'http://fixture.invalid',
                 'access_mode':'hermes-parity','mcpServers':{s:{} for s in available}},
-                {'question':question or 'WAF 파일 선두에 주석 변경안을 만들어줘. 실제 적용하지 말고 승인 카드까지만 준비해줘.'}))
+                {'question':question or 'WAF 파일 선두에 주석 변경안을 만들어줘. 실제 적용하지 말고 승인 카드까지만 준비해줘.'},
+                connection_pool=pool))
+            pool.borrow.assert_not_awaited()
         self.assertNotEqual(report['status'],'failed',report)
         return report,prompts,calls
 

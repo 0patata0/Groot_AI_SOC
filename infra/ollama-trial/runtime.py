@@ -50,7 +50,7 @@ def load_config(path):
     return c
 
 
-async def run(config, request, *, on_protected_start=None):
+async def run(config, request, *, on_protected_start=None, connection_pool=None):
     from mcp_use import MCPClient, MCPAgent
     from mcp_use.agents.adapters.langchain_adapter import LangChainAdapter
     from langchain_ollama import ChatOllama
@@ -117,8 +117,13 @@ async def run(config, request, *, on_protected_start=None):
 
     active_servers = {s: p for s, p in config['mcpServers'].items()
                       if chosen is None or any(alias(s, n) in chosen for n in available[s])}
-    client = MCPClient(config={'mcpServers': active_servers}, code_mode=False,
-                       sandbox=False, sampling_callback=None, elicitation_callback=None)
+    from read_pool import eligible as pool_eligible
+    pooled = connection_pool is not None and pool_eligible(active_servers, chosen)
+    if pooled:
+        client = await connection_pool.borrow(config, active_servers, chosen)
+    else:
+        client = MCPClient(config={'mcpServers': active_servers}, code_mode=False,
+                           sandbox=False, sampling_callback=None, elicitation_callback=None)
 
     class ReadAdapter(LangChainAdapter):
         async def create_all(self, current_client):
@@ -210,19 +215,19 @@ async def run(config, request, *, on_protected_start=None):
             report['catalog'] = sorted(catalog, key=lambda x: x['alias'])
             report['exposed_tools'] = [t.name for t in self.tools]
 
-    meter = Meter()
-    llm = ChatOllama(model=config['model'], base_url=config['base_url'], reasoning=harness.CONTRACT.REASONING,
-                     temperature=harness.CONTRACT.TEMPERATURE, top_p=harness.CONTRACT.TOP_P, num_predict=harness.CONTRACT.OUTPUT_TOKENS, client_kwargs={'timeout': 90},
-                     callbacks=[meter])
-    agent = MCPAgent(llm=llm, client=client, max_steps=steps, memory_enabled=True,
-                     system_prompt=SYSTEM_PROMPT + harness.guidance(current), use_server_manager=False, verbose=False,
-                     callbacks=[], retry_on_error=False)
-    # Graph middleware nodes are not model turns. Keep the model and tool caps
-    # independent, including across the one grounding repair below.
-    agent.recursion_limit = steps * 8 + 16
-    agent.adapter = ReadAdapter()
-    agent.adapter._record_telemetry = False
     try:
+        meter = Meter()
+        llm = ChatOllama(model=config['model'], base_url=config['base_url'], reasoning=harness.CONTRACT.REASONING,
+                         temperature=harness.CONTRACT.TEMPERATURE, top_p=harness.CONTRACT.TOP_P, num_predict=harness.CONTRACT.OUTPUT_TOKENS, client_kwargs={'timeout': 90},
+                         callbacks=[meter])
+        agent = MCPAgent(llm=llm, client=client, max_steps=steps, memory_enabled=True,
+                         system_prompt=SYSTEM_PROMPT + harness.guidance(current), use_server_manager=False, verbose=False,
+                         callbacks=[], retry_on_error=False)
+        # Graph middleware nodes are not model turns. Model/tool caps are fresh
+        # for every request, including when only the transport is reused.
+        agent.recursion_limit = steps * 8 + 16
+        agent.adapter = ReadAdapter()
+        agent.adapter._record_telemetry = False
         await agent.initialize()
         report['initialization_seconds'] = time.perf_counter() - started
         if request.get('discover_only'):
@@ -339,7 +344,13 @@ async def run(config, request, *, on_protected_start=None):
             report.update(status='partial', final_response=harness.fallback(current, report['calls']))
     finally:
         report.pop('_policy_tools', None)
-        await client.close_all_sessions()
+        try:
+            if pooled:
+                report['connection_reuse'] = client.metrics()
+                if 'initialization_seconds' not in report:
+                    await client.invalidate()
+        finally:
+            await client.close_all_sessions()
         report['total_seconds'] = time.perf_counter() - started
     return report
 

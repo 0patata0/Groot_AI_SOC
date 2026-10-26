@@ -420,6 +420,25 @@ class ExecutorTests(unittest.TestCase):
                 self.assertEqual(Path(engine.targets[target]["path"]).read_bytes(), current)
                 self.assertFalse(self.broker.rows)
 
+    def test_wazuh_bare_comment_is_rejected_before_card_or_engine_actions(self):
+        engine, runner, target, current = self.engine('wazuh')
+        for candidate in ('# audit\n' + current.decode(),
+                          current.decode().replace('</group>', '</group># audit'),
+                          current.decode().replace('<rule ', '# audit\n<rule ')):
+            with self.subTest(candidate=candidate), mock.patch.object(engine, '_candidate_preflight') as preflight:
+                with self.assertRaisesRegex(MOD.RuleChangeError, 'Wazuh comments must use XML syntax'):
+                    engine.propose(target, digest(current), candidate, 'comment validation')
+                preflight.assert_not_called()
+                self.assertFalse(self.broker.rows)
+                self.assertFalse(list(engine.state_dir.glob('*.json')))
+                self.assertEqual(Path(engine.targets[target]['path']).read_bytes(), current)
+        valid = '<!-- audit -->\n' + current.decode().replace('old', '# literal description')
+        self.assertEqual(MOD._validate_candidate('wazuh', valid), valid.encode())
+        with self.assertRaisesRegex(MOD.RuleChangeError, 'Wazuh comments must use XML syntax'):
+            engine.propose_edit(target, digest(current), [{'old_text': current.decode(),
+                'new_text': '# audit\n' + current.decode()}], 'comment validation')
+        self.assertEqual(runner.restart_count, 0)
+
     def test_literal_edit_keeps_fixed_et_flowbit_guard(self):
         engine, runner, target, _, candidate, et = self.et_engine()
         spec = engine.targets[target]

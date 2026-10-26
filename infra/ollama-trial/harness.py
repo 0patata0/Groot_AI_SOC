@@ -4,6 +4,8 @@ The installer copies the two canonical Hermes sources verbatim. Development
 imports those same sources, rather than maintaining a second rules parser.
 """
 import hashlib
+from datetime import datetime
+import ipaddress
 import importlib.util
 import json
 from pathlib import Path
@@ -149,6 +151,17 @@ def facts_for(calls):
 
 
 def model_view(server, name, raw):
+    if server in ('rule-write-a', 'rule-write-b') and name in ('propose_rule_edit', 'propose_rule_change'):
+        try:
+            data = json.loads(raw)
+            if isinstance(data, dict) and not data.get('error') and data.get('status') == 'pending':
+                stamp = approval_expiry_kst(data.get('approval_expires_at'))
+                if stamp:
+                    data['approval_expires_at_kst'] = stamp
+                    return json.dumps(data, ensure_ascii=False)
+        except (ValueError, TypeError):
+            pass
+        return raw
     # Normalize only the legacy read-only Wazuh presentation. Keep the original
     # result/hash in the audit record; never rewrite hashed rules or write data.
     if server != 'wazuh-ro':
@@ -179,7 +192,104 @@ def violations(question, answer, calls):
     if (not calls and not READ.wants_write(text)
             and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
         issues.append('current_state_requires_actual_read')
+    issues.extend(action_claim_violations(question, answer, calls))
     return sorted(set(issues))
+
+
+def action_claim_violations(question, answer, calls):
+    """Check claimed observations/execution, including on the write path.
+
+    This does not decide whether an incident warrants a change or run a tool.
+    Policy-only refusal is valid; invented current state or server outcomes are not.
+    """
+    if not isinstance(answer, str):
+        return []
+    verified = []
+    for call in calls:
+        raw = call.get('result')
+        if isinstance(raw, str) and hashlib.sha256(raw.encode()).hexdigest() == call.get('result_sha256'):
+            verified.append(call)
+    block_reads = any(c.get('server') == 'resp' and c.get('name') == 'list_blocks'
+                      and payload(c) for c in verified)
+    event_reads = any(c.get('name') in ('search_suricata_alerts', 'search_modsecurity_alerts',
+                      'get_wazuh_alert_summary') and payload(c) for c in verified)
+    actual_actions = [c for c in verified if (c.get('server'), c.get('name')) in (
+        ('resp', 'block_ip'), ('resp', 'unblock_ip'),
+        ('rule-write-a', 'temporarily_contain_ip'))]
+    issues = set()
+    for line in answer.splitlines():
+        clean = re.sub(r'[*`]', '', line)
+        unobserved = re.search(r'미조회|미확인|조회하지|조회\s*(?:못|안)|확인하지|확인\s*불가|알\s*수\s*없|단정.{0,8}(?:않|없)', clean)
+        if not block_reads and not unobserved and re.search(r'차단\s*(?:목록|리스트)', clean) and re.search(r'없|비어|포함|등록|있습니다|있음', clean):
+            issues.add('unobserved_block_list_claim')
+        event = r'(?:공격(?!자)|경보|[Ss]everity\s*[0-9]+)'
+        absence = (event + r'[^.!?;\n]{0,60}?(?:확인되지|발견되지|관측되지)\s*않|'
+                   + event + r'(?:\s*(?:증거|징후|기록|발생|로그))?\s*(?:은|는|이|가)?\s*(?:없(?:습|음|다|었)|0\s*건)')
+        if not event_reads and not unobserved and re.search(absence, clean):
+            issues.add('unobserved_attack_absence_claim')
+        if (not actual_actions and not re.search(r'호출\s*전|호출하지|호출\s*시|호출한다면|정책\s*(?:설명|상)|미호출', clean)
+                and (re.search(r'(?:실행|처리)\s*(?:결과|상태).{0,70}(?:서버\s*거부|요청\s*실패|차단\s*완료)', clean)
+                     or re.search(r'차단\s*시도.{0,70}(?:실패|거부)', clean)
+                     or re.search(r'(?:서버|도구).{0,40}(?:거부했|거절했|거부되었|거절되었|거부됐|거절됐|거부됨|거절됨)', clean))):
+            issues.add('unobserved_protected_execution_claim')
+        if not re.search(r'호출하지|조회하지|미조회|미호출|조회할|확인할|확인해야|조회해야|호출해야|호출할', clean):
+            claimed = re.findall(r'\b((?:get_|list_|search_|calculate_)[a-z_]+)\s*(?:\([^)]*\))?\s*(?:조회\s*결과|반환\s*결과|결과)', clean)
+            for name in claimed:
+                if not any(c.get('name') == name and payload(c) for c in verified):
+                    issues.add('unobserved_tool_result_claim')
+    # The model itself identifies a protected subject; it must not then propose
+    # a different API as a way around that boundary. Conditional denials stay valid.
+    addresses = set(re.findall(r'(?<![0-9.])(?:[0-9]{1,3}\.){3}[0-9]{1,3}(?![0-9.])', question))
+    try:
+        nonpublic_subject = len(addresses) == 1 and not ipaddress.ip_address(next(iter(addresses))).is_global
+    except ValueError:
+        nonpublic_subject = False
+    protected_subject = nonpublic_subject or re.search(
+        r'(?:해당|요청|대상|이\s*주소)[^\n]{0,60}(?:보호|사설|관리)|(?:보호된|보호\s*대상인)\s*(?:DGX\s*)?주소', answer)
+    if protected_subject:
+        for line in re.split(r'\n|(?<=[.!?;])\s+|\s*\(단[, ]', answer):
+            public_alternative = re.search(r'공인|외부', line) and not re.search(r'사설|내부|관리|해당\s*(?:IP|주소)', line, re.I)
+            if (re.search(r'block_ip|일반\s*차단', line, re.I) and not public_alternative
+                    and re.search(r'대안|대신|사용|진행|차단|승인|가능', line)
+                    and not re.search(r'거부|거절|불가|허용되지|지원하지|수\s*없|가능하지|사용하지|우회.{0,12}(?:않|안|못|없)|사용.{0,8}(?:않|안|못|없)', line)):
+                issues.add('protected_address_bypass_advice')
+            if (re.search(r'방화벽|nftables|(?:WAF|Suricata).{0,25}(?:IP|주소)\s*목록', line, re.I)
+                    and not public_alternative
+                    and re.search(r'해당\s*(?:IP|주소)|관리\s*주소|보호\s*주소|대신|우회', line, re.I)
+                    and re.search(r'차단|수정해야|관리해야|관리할\s*수|변경해야', line)
+                    and not re.search(r'거부|거절|불가|허용되지|지원하지|수\s*없|해서는\s*안|하지\s*않|우회.{0,12}(?:않|안|못|없)', line)):
+                issues.add('protected_address_bypass_advice')
+            if (re.search(r'propose_rule_change|propose_rule_edit', line) and
+                    re.search(r'방화벽|nftables', line, re.I) and
+                    re.search(r'변경|진행|승인', line) and
+                    not re.search(r'불가|미지원|범위.{0,8}밖|지원하지|수\s*없', line)):
+                issues.add('unsupported_firewall_proposal_advice')
+    return sorted(issues)
+
+
+def action_fallback(question, calls):
+    """Report observable limits; never replace a missing model decision with a change."""
+    attempts = [c for c in calls if (c.get('server'), c.get('name')) in (
+        ('resp', 'block_ip'), ('resp', 'unblock_ip'), ('rule-write-a', 'temporarily_contain_ip'))]
+    lines = ['답변의 상태·실행 설명에 확인되지 않은 근거가 있어 확인 범위만 표시합니다.',
+             '이 답변은 변경 적용이나 현재 보안 상태가 정상이라는 판정이 아닙니다.']
+    reads = sorted({c.get('name', '') for c in calls if payload(c) and
+                    c.get('name', '').startswith(('get_', 'list_', 'search_', 'calculate_'))})
+    lines.append('- 이번 요청에서 성공한 조회·계산: ' + (', '.join(reads) if reads else '없음/미조회'))
+    if not re.search(r'차단|해제|block|contain', question, re.I) and not attempts:
+        lines.append('- 실제 조회하지 않은 도구의 반환 결과나 현재 상태를 대신 보고할 수 없습니다. 허용된 조사와 변경안 준비를 이어가야 합니다.')
+        return '\n'.join(lines)
+    if attempts:
+        lines.append('- 차단/해제 도구 호출 기록: ' + str(len(attempts)) + '건. 실제 적용 여부는 반환 결과와 후속 상태로 확인해야 합니다.')
+    else:
+        lines.append('- 이번 요청에서 차단/해제 도구를 호출하지 않았습니다. 서버가 요청을 거절했다고 보고하지 않습니다.')
+    if not any(c.get('server') == 'resp' and c.get('name') == 'list_blocks' and payload(c) for c in calls):
+        lines.append('- 현재 차단 목록: 성공한 조회 근거 없음/미확인.')
+    if not any(c.get('name') in ('search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_alert_summary')
+               and payload(c) for c in calls):
+        lines.append('- 최근 공격 여부: 성공한 경보 조회 근거 없음/미확인. 공격이 없다는 뜻이 아닙니다.')
+    lines.append('- 보호 주소의 거절은 운영자 승인이나 일반 block_ip 호출로 우회할 수 없습니다. 실제 사건 판단과 허용된 조사는 별도로 이어가야 합니다.')
+    return '\n'.join(lines)
 
 
 def footer_free(text):
@@ -504,7 +614,7 @@ def selection_schema(schemas, limit):
 
 def payload(call):
     raw = call.get('result', '')
-    if call.get('is_error') or hashlib.sha256(raw.encode()).hexdigest() != call.get('result_sha256'):
+    if not isinstance(raw, str) or call.get('is_error') or hashlib.sha256(raw.encode()).hexdigest() != call.get('result_sha256'):
         return None
     try:
         data = json.loads(raw)
@@ -687,6 +797,132 @@ def fallback(question, calls):
             ('\n조회 실패: ' + ', '.join(failures) if failures else ''))
 
 
+def proposal_error(value):
+    """Unwrap bounded MCP error envelopes without turning unknown errors into success."""
+    for _ in range(4):
+        if isinstance(value, dict) and set(value) == {'error'}:
+            value = value['error']
+        elif isinstance(value, str):
+            try:
+                nested = json.loads(value)
+            except (ValueError, TypeError):
+                return value
+            if not isinstance(nested, dict) or set(nested) != {'error'}:
+                return value
+            value = nested
+        else:
+            break
+    return value if isinstance(value, str) else str(value)
+
+
+def approval_expiry_kst(value):
+    if type(value) is not int:
+        return None
+    try:
+        return datetime.fromtimestamp(value, EVIDENCE.KST).isoformat() + ' (KST)'
+    except (OverflowError, ValueError, OSError):
+        return None
+
+
+def expiry_prose(answer, expiries):
+    """Replace only expiry-time prose with verified receipts; fenced data is immutable."""
+    if not expiries:
+        return answer
+    parts = re.split(r'(^```[^\n]*\n.*?^```[^\n]*$)', answer, flags=re.M | re.S)
+    for i in range(0, len(parts), 2):
+        lines = parts[i].splitlines(keepends=True)
+        for j, line in enumerate(lines):
+            if (re.search(r'만료|approval_expires_at', line) and
+                    re.search(r'\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}|\b[0-9]{9,12}\b|\d+\s*(?:시간|분|초)', line)):
+                selected = [v for v in expiries if v['proposal_id'] in line or str(v['epoch']) in line]
+                selected = selected or expiries
+                lines[j] = '- 승인 만료 (서버 기준): ' + '; '.join(v['target'] + ' / ' + v['proposal_id'] + ': ' + v['kst'] for v in selected) + ('\n' if line.endswith('\n') else '')
+        parts[i] = ''.join(lines)
+    return ''.join(parts)
+
+
+def write_report(answer, progress):
+    """Keep a grounded refusal explanation without presenting missing work as done."""
+    answer = expiry_prose(str(answer or ''), progress.get('expiries', []))
+    answer = write_metadata_prose(answer, progress.get('file_metadata', []))
+    if progress['complete']:
+        return answer + '\n\n' + progress['text']
+    header = '요청한 변경안 준비가 일부 미완료입니다. 승인 대기는 실제 적용 완료가 아닙니다.'
+    refusal = re.search(r'지원하지|지원되지|제공하지|제공되지|수행할 수 없|실행할 수 없|변경할 수 없|권한이 없|도구가 없|기능이 없|범위.{0,6}벗어|불가능|실행\s*불가|허용되지', answer)
+    completed = re.search(r'(?:적용|변경|제출|처리|실행)\s*(?:을|이|를)?\s*완료|모두\s*(?:반영|성공)|(?:적용|변경|실행|제출|처리|작성|준비)했', answer)
+    if refusal and not completed:
+        return header + '\n\n' + answer + '\n\n' + progress['text']
+    return header + '\n\n' + progress['text']
+
+
+def write_metadata_prose(answer, metadata):
+    """Ground incidental total counts and rollback bases; keep code/diffs intact."""
+    if not metadata:
+        return answer
+    def field_values(key):
+        return '; '.join(v['target'] + ': ' + cell(v.get(key) or '미확인') for v in metadata)
+    parts = re.split(r'(^```[^\n]*\n.*?^```[^\n]*$)', answer, flags=re.M | re.S)
+    for i in range(0, len(parts), 2):
+        lines = parts[i].splitlines(keepends=True)
+        for j, line in enumerate(lines):
+            clean = re.sub(r'[*`]', '', line)
+            total = re.search(r'(?:총|전체|기존|나머지)\s*(?:규칙|룰)?[^.!?\n]{0,15}?[0-9]+\s*개(?:의)?\s*(?:규칙|룰)|(?:전체|총)\s*(?:규칙|룰)[^.!?\n]{0,15}?[0-9]+\s*개', clean)
+            ending = '\n' if line.endswith('\n') else ''
+            if (re.search(r'^\s*(?:[-0-9.]+\s*)?검증\s*(?:범위|결과)?\s*:', clean) or
+                    re.search(r'엔진.{0,30}구문.{0,50}(?:검증됨|검증됐|완료|통과했)', clean)):
+                lines[j] = '- 제출 검증 범위 (서버 영수증): ' + field_values('validation') + ending
+            elif re.search(r'^\s*(?:[-0-9.]+\s*)?(?:적용|예상)\s*영향\s*:', clean):
+                lines[j] = '- 승인된 후보 적용에 포함된 영향 (서버 조회): ' + field_values('impact') + ending
+            elif total:
+                values = {v['target']: v.get('declared_count') for v in metadata}
+                lines[j] = '- 제출 전 파일 정의 수 (실제 엔진 적재와 별개): ' + '; '.join(
+                    target + ': ' + (str(count) + '개' if type(count) is int else '미확인')
+                    for target, count in values.items()) + '.' + ending
+            elif ((re.search(r'원복|되돌리', clean) and re.search(r'SHA|해시|방법|복원|원본|거부|만료', clean, re.I)) or
+                  (re.search(r'거부|만료', clean) and re.search(r'원본|복원|되돌리', clean)) or
+                  (re.search(r'현재.{0,20}(?:SHA|해시)', clean, re.I) and
+                   any(re.search(r'(?<![0-9a-f])' + v['after_sha256'][:8] + r'(?:[0-9a-f]{56}|\.\.\.|…)', clean) for v in metadata))):
+                lines[j] = '- 취소·원복 방법: 미적용 후보는 카드 거부/만료 시 파일을 복원할 필요가 없습니다. 적용 후 원복 시 실제 파일을 재조회한 SHA로 이전 내용을 복원하는 새 후보를 만들고 승인을 받습니다.' + ending
+        parts[i] = ''.join(lines)
+    return ''.join(parts)
+
+
+def preparation_gap(question, calls):
+    """One model continuation may prepare requested edits before any protected call.
+
+    Never dispatch here or retry an attempted change, including unknown outcomes.
+    Infrastructure reconfiguration and unsupported mode changes are not file edits.
+    """
+    text = normalized(question)
+    if (not READ.wants_write(text) or re.search(r'모드|컨테이너|재구성|\binline\b|\bDetectionOnly\b', text, re.I)
+            or not re.search(r'변경안|수정안|주석|description|\bmsg\b', text, re.I)):
+        return []
+    if any('write' in c.get('server', '') or
+           (c.get('server') == 'resp' and c.get('name') != 'list_blocks') or
+           re.match(r'propose_|submit_|apply_|temporarily_|restart_|block_|unblock_', c.get('name', ''))
+           for c in calls):
+        return []
+    progress = write_progress(question, calls)
+    return progress['missing'] if progress else []
+
+
+def preparation_instruction(targets):
+    return ('요청한 변경안 준비가 아직 끝나지 않았습니다: ' + ', '.join(targets) +
+            '. 이번 요청에서 보호 도구 호출은 아직 없습니다. 실제 읽기와 허용된 변경안 준비 도구를 직접 선택하여 '
+            '사용자 요청을 이어가세요. 도구로 준비할 수 없는 이유가 있다면 대상별로 설명하세요. '
+            '이 안내는 적용 승인이나 일반 shell/sudo/Docker 권한이 아닙니다.')
+
+
+def rejected_before_proposal(error):
+    # These exact executor validations precede _propose_candidate and cannot have
+    # submitted a card. Transport/timeouts/unknown errors remain unresolved.
+    return bool(re.fullmatch(
+        r'edit [1-9][0-9]* old_text (?:must match exactly once in|is absent from) the original file'
+        r'|base_sha256 must be a SHA-256 from get_rule_change_target'
+        r'|target changed since it was read; fetch current content and retry'
+        r'|Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden', error))
+
+
 def write_progress(question, calls):
     """Report proposal receipts, including partial failure, without dispatch/retry.
 
@@ -712,11 +948,11 @@ def write_progress(question, calls):
             entry['unresolved'] = True
         elif c.get('is_error') or data.get('error'):
             # Transport errors may occur after a server has accepted the call.
-            error = str(data.get('error', '도구 오류'))[:160]
-            if re.fullmatch(r'edit [1-9][0-9]* old_text must match exactly once in the original file', error):
+            error = proposal_error(data.get('error', '도구 오류'))
+            if rejected_before_proposal(error):
                 entry['rejected_edits'].append(error)
             else:
-                entry['failures'].append('오류 반환/처리 상태 확인 필요: ' + error)
+                entry['failures'].append('오류 반환/처리 상태 확인 필요: ' + error[:160])
                 entry['unresolved'] = True
         elif (data.get('target') == target and data.get('status') == 'pending' and data.get('review_posted') is True
               and re.fullmatch(r'[0-9a-f]{32}', str(data.get('proposal_id', '')))
@@ -736,13 +972,37 @@ def write_progress(question, calls):
     expected += [target for target in observed if target not in expected]
     if not expected: return None
     rows = ['**요청 항목별 변경안 제출 근거**', '| 대상 | 상태 | 제안 ID 또는 확인 필요 사항 |', '| --- | --- | --- |']
-    missing, hashes = [], []
+    missing, hashes, expiries, metadata = [], [], [], []
     for target in expected:
         entry = observed.get(target, {'receipts': {}, 'failures': [], 'unresolved': False, 'rejected_edits': []})
         receipts, failures = entry['receipts'], entry['failures']
         for pid, data in receipts.items():
             rows.append('| ' + target + ' | 제출 당시 승인 대기 (적용 여부는 별도 확인) | ' + pid + ' |')
             hashes.append('- ' + target + ' / ' + pid + ' 변경 전 SHA: `' + data['before_sha256'] + '`; 후보 SHA: `' + data['after_sha256'] + '`.')
+            if isinstance(data.get('validation'), str):
+                hashes.append('  - 제출 검증 범위: ' + cell(data['validation']))
+            reads = [payload(c) for c in calls if c.get('name') == 'get_rule_change_target'
+                     and c.get('server') == 'rule-' + target[0] and c.get('arguments', {}).get('target') == target]
+            source = next((v for v in reversed(reads) if v and v.get('target') == target
+                           and v.get('sha256') == data['before_sha256']), None)
+            inv = SHARED._verified_inventory(source, target)
+            metadata.append({'target': target, 'before_sha256': data['before_sha256'],
+                             'after_sha256': data['after_sha256'],
+                             'validation': data.get('validation') if isinstance(data.get('validation'), str) else None,
+                             'impact': source.get('impact') if source and isinstance(source.get('impact'), str) else None,
+                             'declared_count': inv['declared_count'] if inv else None})
+            if inv:
+                hashes.append('  - 제출 전 파일 정의 수: ' + str(inv['declared_count']) + '개; 실제 엔진 적재 검증과 별개입니다.')
+            if source and isinstance(source.get('impact'), str):
+                hashes.append('  - 승인된 후보 적용에 포함된 영향: ' + cell(source['impact']))
+            expiry = data.get('approval_expires_at')
+            if type(expiry) is int:
+                stamp = approval_expiry_kst(expiry)
+                if stamp:
+                    hashes.append('  - 승인 만료: ' + stamp)
+                    expiries.append({'target': target, 'proposal_id': pid, 'epoch': expiry, 'kst': stamp})
+                else:
+                    hashes.append('  - 승인 만료 시각: 변환 범위 초과/미확인')
         for failure in failures:
             status = '이전 거절 이력' if failure.startswith('이전 편집 검증 거절;') else '추가 확인 필요'
             rows.append('| ' + target + ' | ' + status + ' | ' + re.sub(r'[\r\n|]', ' ', failure) + ' |')
@@ -752,4 +1012,7 @@ def write_progress(question, calls):
             missing.append(target)
         if not receipts and not failures:
             rows.append('| ' + target + ' | 미처리/확인 필요 | 이번 요청의 변경안 제출 근거 없음 |')
-    return {'text': '\n'.join(rows + [''] + hashes), 'missing': missing, 'complete': not missing}
+    if metadata:
+        hashes.append('- 취소·원복: 미적용 후보는 승인 카드에서 거부합니다. 적용 후 원복은 실제 파일을 다시 조회한 SHA를 기준으로 이전 내용을 복원하는 새 후보를 만들고 승인을 받습니다.')
+    return {'text': '\n'.join(rows + [''] + hashes), 'missing': missing, 'complete': not missing,
+            'expiries': expiries, 'file_metadata': metadata}

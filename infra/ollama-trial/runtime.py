@@ -238,12 +238,18 @@ async def run(config, request, *, on_protected_start=None):
                            harness.event_report(current, report['calls']))
                 issues = [] if literal else harness.violations(current, str(final), report['calls'])
                 repair_passes = 0
-                while (missing or issues) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
+                gap = harness.preparation_gap(current, report['calls'])
+                preparation_used = False
+                while (missing or issues or (gap and not preparation_used)) and not harness.action_claim_violations(current, str(final), report['calls']) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
                     repair_passes += 1
                     report['repair'] = {'missing_targets': missing, 'issues': issues}
                     instruction = ('현재 질문: ' + current + '\n조회 근거 점검 결과: ' + json.dumps(report['repair'], ensure_ascii=False) +
                         '\n누락된 실제 조회를 마치고 근거에 맞춰 최종 답변을 정정하세요. 이미 성공한 조회는 반복하지 마세요. '
                         '이 안내는 변경이나 승인이 아닙니다.\n' + harness.EVIDENCE.literal_evidence_summary(harness.facts_for(report['calls'])))
+                    if gap:
+                        preparation_used = True
+                        report['repair']['missing_write_targets'] = gap
+                        instruction = '현재 질문: ' + current + '\n' + harness.preparation_instruction(gap)
                     read_scope = harness.tool_scope(current, report['calls'])
                     if read_scope and budget.used < budget.limit:
                         # The same LLM selects real read calls in constrained JSON
@@ -274,6 +280,9 @@ async def run(config, request, *, on_protected_start=None):
                         final = ''  # Only observed facts can render this bounded read path.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
+                    if report['protected_calls']:
+                        break
+                    gap = harness.preparation_gap(current, report['calls'])
                     missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
                     issues = [] if harness.read_report(current, report['calls']) else harness.violations(current, str(final), report['calls'])
                 rendered = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
@@ -289,13 +298,19 @@ async def run(config, request, *, on_protected_start=None):
                     final = rendered
                 elif issues:
                     report['remaining_issues'] = issues
-                    final = harness.fallback(current, report['calls'])
+                    final = (harness.action_fallback(current, report['calls']) if
+                             harness.action_claim_violations(current, str(final), report['calls']) else
+                             harness.fallback(current, report['calls']))
                     if still_missing:
                         final += '\n미확인 대상: ' + ', '.join(still_missing)
+            action_issues = harness.action_claim_violations(current, str(final), report['calls'])
+            if action_issues:
+                report['remaining_issues'] = sorted(set(report.get('remaining_issues', []) + action_issues))
+                final = harness.action_fallback(current, report['calls'])
             progress = harness.write_progress(current, report['calls'])
             if progress:
                 report['write_progress'] = progress
-                final = ((str(final) + '\n\n') if progress['complete'] else '요청한 변경안 준비가 일부 미완료입니다. 승인 대기는 실제 적용 완료가 아닙니다.\n\n') + progress['text']
+                final = harness.write_report(final, progress)
             final = harness.EVIDENCE.kst_display(harness.footer_free(str(final)))
             report['chat_contract'] = {'version': harness.CONTRACT.VERSION, 'system_sha256': harness.CONTRACT.fingerprint(), 'model_steps': steps, 'tool_calls': budget.limit}
             report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') else 'completed', final_response=final,

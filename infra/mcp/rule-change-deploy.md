@@ -1,5 +1,7 @@
 # 승인형 로컬 보안 룰 변경 MCP 배포 절차
 
+> **2026-10-27 Wazuh 주석 검증:** `_validate_candidate`는 XML root/group/rule 컨테이너의 비공백 바깥 텍스트를 거절한다. `#`는 Wazuh XML 주석이 아니며 `<!-- ... -->`를 사용한다. 제안 전 거절이므로 카드·적용·재시작이 발생하지 않는다. 전체 엔진 검사는 기존 승인 후 경로에서 수행한다. 기존 설치기가 같은 원본을 반영하며 새 패키지·포트·권한은 없다. [운영 검증](../../STATUS.md).
+
 > **2026-10-25 Wazuh 승인 적용 상태 검사 보완:** 선택 기능이 꺼져 `wazuh-control status`가 종료1이어도 정확한 Docker status 명령과 analysisd/remoted/db의 유일한 정상 행이 확인되면 준비 완료로 처리한다. 다른 명령·오류 코드·필수 프로세스 누락/정지/모순은 거절한다. 변경 소스는 `rule_change_executor.py`이며 루트 deploy.sh의 기존 canonical 소스/호스트 바인딩 경로에 포함된다. 추가 패키지·설정 키·권한·포트가 없어 예제와 deb/wheel 반입 목록의 실행 내용은 그대로다. 기존 B는 root 백업 후 helper만 증분 반영했으며 새3VM 전체 설치는 별도 미검증이다. [검증·적용 범위](../../STATUS.md).
 
 > **2026-10-25 14:34 KST 후속:** 콜백 /32 정정 뒤 정상 지정승인자 카드의 거부→denied 및 두 봇의 정확 WAF 주석 적용/원복4단계를 확인했다. 서명 결정/소비/applied·호스트/컨테이너 해시·동일inode/CID/master·worker교체·nginx구문0·healthy/DetectionOnly, 최종active승인0 확인. 모델의 후보 작성/누락 오류와 실제 실행 경로 성공은 별도로 평가한다. [전체 결과](../../STATUS.md).

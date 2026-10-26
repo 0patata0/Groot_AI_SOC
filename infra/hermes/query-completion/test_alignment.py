@@ -26,6 +26,180 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_submitted_scope_impact_and_denial_prose_follow_actual_receipts(self):
+        from test_inventory_render import payload as inventory_payload
+        data = inventory_payload(); data['impact'] = 'configuration test and reload; inode-preserving write'
+        raw = json.dumps(data)
+        read = dict(server='rule-a', name='get_rule_change_target', arguments={'target': data['target']},
+                    result=raw, result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+        validation = 'offline guard checks passed; full engine syntax test after approval and before reload'
+        submitted = proposal(data['target'], before_sha256=data['sha256'], validation=validation)
+        progress = H.write_progress('WAF 주석 변경안 만들어줘', [read, submitted])
+        text = ('- **검증 범위**: 엔진 구문 검사(approval 후 reload 전)로 검증됨.\n'
+                '- **적용 영향**: 완전히 영향 없음.\n'
+                '- **되돌리는 방법**: 승인이 거부되거나 만료되면 원본 파일로 복원 가능.')
+        fence = '```text\n' + text + '\n```'
+        report = H.write_report(text + '\n' + fence, progress)
+        prose = report.split('```')[0]
+        self.assertNotIn('검증됨', prose); self.assertNotIn('완전히 영향 없음', prose)
+        self.assertIn(validation, prose); self.assertIn(data['impact'], prose)
+        self.assertIn('파일을 복원할 필요가 없습니다', prose); self.assertIn(fence, report)
+        forged = dict(read, result_sha256='0' * 64)
+        progress = H.write_progress('WAF 주석 변경안 만들어줘', [forged, submitted])
+        self.assertIn('a:modsecurity-custom: 미확인', H.write_report(text, progress))
+
+    def test_write_counts_and_rollback_base_use_verified_file_metadata(self):
+        from test_inventory_render import payload as inventory_payload
+        data = inventory_payload()
+        raw = json.dumps(data)
+        read = dict(server='rule-a', name='get_rule_change_target', arguments={'target': data['target']},
+                    result=raw, result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+        submitted = proposal(data['target'], before_sha256=data['sha256'])
+        progress = H.write_progress('WAF 주석 변경안 만들어줘', [read, submitted])
+        text = '나머지 12개 규칙은 불변입니다.\n현재 파일 SHA: ' + 'b'*64 + '\n수정 대상 2개 규칙은 별도 검토합니다.'
+        fence = '```text\n나머지 12개 규칙\n```'
+        report = H.write_report(text + '\n' + fence, progress)
+        self.assertNotIn('나머지 12개 규칙은 불변', report)
+        self.assertIn('a:modsecurity-custom: 10개', report)
+        self.assertIn('원복 시 실제 파일을 재조회', report)
+        self.assertIn('수정 대상 2개 규칙', report)
+        self.assertIn(fence, report)
+        for rollback_text in ('되돌리는 방법: 기존 SHA 62c855cf...를 기준으로 복원하는 편집안 제출',
+                     '원복 방법: 현재 파일 SHA를 기준으로 삭제 제안'):
+            self.assertIn('원복 시 실제 파일을 재조회', H.write_report(rollback_text, progress))
+            self.assertNotIn('기존 SHA 62c855cf', H.write_report(rollback_text, progress))
+        self.assertIn('미적용 후보는 승인 카드에서 거부', report)
+        read['result_sha256'] = '0' * 64
+        progress = H.write_progress('WAF 주석 변경안 만들어줘', [read, submitted])
+        self.assertIsNone(progress['file_metadata'][0]['declared_count'])
+        self.assertIn('a:modsecurity-custom: 미확인', H.write_report(text, progress))
+
+    def test_unstarted_edit_gets_one_continuation_but_never_retries_attempted_changes(self):
+        q = 'Wazuh 규칙 description 주석 변경안을 만들어줘'
+        self.assertEqual(H.preparation_gap(q, []), ['b:wazuh-local-rules'])
+        for call in (proposal('b:wazuh-local-rules', error='unknown'),
+                     {'server':'rule-write-b','name':'propose_rule_edit','error_type':'TimeoutError'},
+                     {'server':'resp','name':'block_ip','result':''}):
+            self.assertEqual(H.preparation_gap(q, [call]), [])
+        self.assertEqual(H.preparation_gap('WAF 규칙 모드를 바꾸고 IDS 컨테이너 재구성해줘', []), [])
+        h = Harness(text='변경안을 준비하겠습니다.', request=q)
+        h.agent.model = 'qwen3.6:35b'; h.agent.provider = 'custom'
+        h.wrapper = alignment.final_wrapper(h.wrapper, h.original, h.native, h.append, h.reanchor, PLUGIN, H)
+        first = h.call()
+        self.assertEqual(first.action, 'continue')
+        self.assertIn('b:wazuh-local-rules', h.kw['messages'][-1]['content'])
+        second = h.call()
+        self.assertNotEqual(second.action, 'continue')
+        self.assertIn('미처리/확인 필요', second.final_response)
+
+    def test_expiry_presentation_uses_receipt_and_preserves_raw_and_fenced_data(self):
+        call = proposal('a:modsecurity-custom', approval_expires_at=1793037565)
+        original = copy.deepcopy(call)
+        shown = json.loads(H.model_view(call['server'], call['name'], call['result']))
+        self.assertEqual(shown['approval_expires_at_kst'], '2026-10-27T02:59:25+09:00 (KST)')
+        self.assertEqual(shown['approval_expires_at'], 1793037565)
+        self.assertEqual(call, original)
+        progress = H.write_progress('WAF 룰 변경안 작성해줘', [call])
+        wrong = '승인 만료: 2026-10-27 11:59:25 KST, 약 9시간 후 만료.'
+        fence = '```json\n{"approval_expires_at": 1793037565}\n```'
+        answer = H.write_report(wrong + '\n' + fence, progress)
+        self.assertNotIn('11:59:25', answer); self.assertNotIn('9시간', answer)
+        self.assertIn(fence, answer); self.assertIn(shown['approval_expires_at_kst'], answer)
+        forged = {**call, 'result_sha256': '0' * 64}
+        self.assertEqual(H.write_progress('WAF 룰 변경안 작성해줘', [forged])['expiries'], [])
+        for value in (True, '1793037565', 10**100):
+            self.assertIsNone(H.approval_expiry_kst(value))
+
+    def test_native_proposal_time_is_projected_only_to_api_copy(self):
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        q = 'WAF 룰 변경안 작성해줘'
+        agent = SimpleNamespace(platform='mattermost', model='qwen3.6:35b', provider='custom',
+                                max_iterations=12, _current_turn_id='t')
+        rows = [{'role': 'user', 'content': q}] + H.linked_rows([proposal('a:modsecurity-custom', approval_expires_at=1793037565)])
+        original = copy.deepcopy(rows)
+        request = Request({'messages': rows})
+        out = alignment.request_wrapper(lambda *a, **k: request, PLUGIN, H)(agent,
+            original_user_message=q, turn_id='t', messages=rows)
+        self.assertEqual(rows, original)
+        self.assertIn('approval_expires_at_kst', out.api_kwargs['messages'][-1]['content'])
+        self.assertNotIn('approval_expires_at_kst', rows[-1]['content'])
+
+    def test_known_presubmit_rejection_recovers_only_after_verified_receipt(self):
+        messages = ['edit 2 old_text must match exactly once in the original file',
+                    'edit 1 old_text is absent from the original file',
+                    'base_sha256 must be a SHA-256 from get_rule_change_target',
+                    'target changed since it was read; fetch current content and retry',
+                    'Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden']
+        for error in messages:
+            for depth in range(3):
+                wrapped = error
+                for _ in range(depth): wrapped = json.dumps({'error': wrapped})
+                failed = proposal('a:modsecurity-custom', error=wrapped)
+                failed['is_error'] = True
+                # Real error responses have no proposal receipt, unlike the helper default.
+                failed['result'] = json.dumps({'error': wrapped})
+                failed['result_sha256'] = hashlib.sha256(failed['result'].encode()).hexdigest()
+                with self.subTest(error=error, depth=depth):
+                    self.assertFalse(H.write_progress('WAF 룰 수정해줘', [failed])['complete'])
+                    fixed = H.write_progress('WAF 룰 수정해줘', [failed, proposal('a:modsecurity-custom')])
+                    self.assertTrue(fixed['complete'])
+                    self.assertIn('이전 거절 이력', fixed['text'])
+                    self.assertFalse(H.write_progress('WAF 룰 수정해줘', [proposal('a:modsecurity-custom'), failed])['complete'])
+
+    def test_unknown_transport_outcome_not_cleared_by_later_receipt(self):
+        for error in ('TimeoutError', 'HTTP 502', 'unknown', 'edit 1 old_text is absent from the original file; applied'):
+            failed = proposal('a:modsecurity-custom', error=json.dumps({'error': error}))
+            self.assertFalse(H.write_progress('WAF 룰 수정해줘', [failed, proposal('a:modsecurity-custom', '2'*32)])['complete'])
+
+    def test_recovered_write_keeps_model_report_and_appends_verified_metadata(self):
+        q = 'WAF 룰 주석 변경안을 작성해줘'
+        bad = proposal('a:modsecurity-custom', error=json.dumps({'error': 'edit 1 old_text is absent from the original file'}))
+        good = proposal('a:modsecurity-custom', validation='offline guards only; engine test after approval',
+                        approval_expires_at=1793031551)
+        h = Harness(text='승인 대기입니다. 원복 방법은 새 후보를 제출하는 것입니다.', request=q)
+        h.agent.model = 'qwen3.6:35b'; h.agent.provider = 'custom'
+        h.kw['messages'] += H.linked_rows([bad, good])
+        h.wrapper = alignment.final_wrapper(h.wrapper, h.original, h.native, h.append, h.reanchor, PLUGIN, H)
+        result = h.call().final_response
+        self.assertIn('원복 방법', result)
+        self.assertIn('제출 검증 범위', result)
+        self.assertIn('2026-10-27T01:19:11+09:00', result)
+        self.assertNotIn('일부 미완료', result)
+
+    def test_write_request_cannot_skip_execution_claim_checks(self):
+        h = Harness(text='실행 결과: 차단 요청 실패 (서버 거부). 현재 차단 목록에 없습니다.',
+                    request='관리 서버의 차단 요청을 처리해줘')
+        h.agent.model = 'qwen3.6:35b'; h.agent.provider = 'custom'
+        h.wrapper = alignment.final_wrapper(h.wrapper, h.original, h.native, h.append, h.reanchor, PLUGIN, H)
+        result = h.call().final_response
+        self.assertNotIn('현재 차단 목록에 없습니다', result)
+        self.assertIn('호출하지 않았습니다', result)
+
+    def test_write_intent_includes_mode_change_without_forcing_a_fake_read(self):
+        q = '보호 모드를 바꾸고 IDS 컨테이너를 inline으로 재구성해줘'
+        self.assertTrue(H.READ.wants_write(q))
+        self.assertNotIn('current_state_requires_actual_read', H.violations(q,
+            '허용된 기능으로는 두 작업을 수행할 수 없습니다. 조회와 변경을 실행하지 않았습니다.', []))
+        for text in ('시각을 KST로 바꾸고 시간 차를 계산해줘', 'Wazuh 규칙 조회 결과를 표로 바꿔줘'):
+            self.assertFalse(H.READ.wants_write(text))
+        self.assertTrue(H.READ.wants_write('WAF 모드를 On으로 바꾸고 시각은 KST로 바꿔줘'))
+
+    def test_unsupported_changes_keep_explanation_but_not_false_completion(self):
+        q = 'WAF 규칙 처리 모드를 바꾸고 IDS 컨테이너를 inline으로 재구성해줘'
+        reason = '현재 도구는 모드 변경과 컨테이너 재구성을 지원하지 않습니다. 두 작업을 실행하지 않았습니다.'
+        progress = H.write_progress(q, [])
+        self.assertFalse(progress['complete'])
+        self.assertIn(reason, H.write_report(reason, progress))
+        self.assertNotIn('모두 성공', H.write_report(reason + ' 모두 성공했습니다.', progress))
+        h = Harness(text=reason, request=q)
+        h.agent.model = 'qwen3.6:35b'; h.agent.provider = 'custom'
+        h.wrapper = alignment.final_wrapper(h.wrapper, h.original, h.native, h.append, h.reanchor, PLUGIN, H)
+        self.assertIn(reason, h.call().final_response)
+
     def test_new_root_context_matches_thread_only_gateway_without_erasing_history(self):
         root = hydrated(scope='same_channel_top_level')
         rows = [{'role': 'user', 'content': root}]

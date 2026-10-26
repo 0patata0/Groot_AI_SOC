@@ -392,6 +392,10 @@ def _validate_candidate(kind, content):
             raise RuleChangeError("Wazuh XML fragment is invalid: %s" % exc) from None
         if any(child.tag != "group" for child in root):
             raise RuleChangeError("Wazuh local file may contain only top-level group elements")
+        containers = [root] + [elem for elem in root.iter() if elem.tag in ("group", "rule")]
+        if any((elem.text and elem.text.strip()) or
+               any(child.tail and child.tail.strip() for child in elem) for elem in containers):
+            raise RuleChangeError("Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden")
         if any(elem.tag in ("command", "active-response") for elem in root.iter()):
             raise RuleChangeError("Wazuh active response/command elements are forbidden")
         ids = [elem.attrib.get("id", "") for elem in root.iter("rule")]

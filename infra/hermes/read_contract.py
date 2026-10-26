@@ -70,8 +70,12 @@ def without_prohibitions(text):
 
 def wants_write(text):
     text = without_prohibitions(text)
+    # Presentation conversion alone does not authorize an operational change.
+    text = re.sub(r'(?:KST|UTC|한국\s*시간|표|테이블|목록)(?:으)?로\s*(?:바꿔(?:줘|주세요)?|바꾸(?:어|고))', '', text, flags=re.I)
     return bool(re.search(
         r'(?:변경안|수정안|원복안|제안).{0,60}(?:만들|작성|준비|제출)(?:해|하|해줘|해주|해줄|하세요|을|한다|$)'
+        r'|(?:변경안|수정안|원복안|제안).{0,60}만들어(?:줘|주|줄|주세요|라|요|$)'
+        r'|(?:바꿔|바꾸어|바꾸고|바꿔줘|재구성해|재구성하(?:고|라|세요|자))'
         r'|(?:추가|삭제|수정|변경|원복|복구|재시작|설치|배포|차단|해제|승인|거부|적용)(?:해|하(?:고|라|세요|는|여|자)|해줘|해주|해줄)', text))
 
 

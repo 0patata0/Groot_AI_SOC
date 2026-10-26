@@ -391,13 +391,14 @@ class Store:
                 for r in results if r["id"] not in own and r["status"] == "applied"
                 and any(r["result_seq"] > seq and r["target"] == own[pid] for pid, seq in origin.items())]
 
-    def review(self, cid, reason):
+    def review(self, cid, reason, *, reopen_completed=False):
         """Queue explicit operator review; the normal controller owns execution."""
-        if not isinstance(cid, str) or not ID.fullmatch(cid) or not isinstance(reason, str) or not 1 <= len(reason.strip()) <= 500:
+        if not isinstance(cid, str) or not ID.fullmatch(cid) or not isinstance(reason, str) or not 1 <= len(reason.strip()) <= 500 or type(reopen_completed) is not bool:
             raise ControllerError("review_request_invalid")
         with self.locked():
             row = self.db.execute("SELECT * FROM cases WHERE id=?", (cid,)).fetchone()
-            if row is None or row["state"] not in ("needs_review", "outcome_unknown"):
+            eligible = ("needs_review", "outcome_unknown", "completed") if reopen_completed else ("needs_review", "outcome_unknown")
+            if row is None or row["state"] not in eligible:
                 raise ControllerError("review_case_not_eligible")
             review_id = secrets.token_hex(16)
             with self.db:
@@ -566,6 +567,37 @@ def verified_sca_checks(requirements, receipts, now):
     return True
 
 
+def sensor_event_reference(value, source=None):
+    """Identify evidence; a signature alone never decides incident disposition."""
+    if source is None:
+        location = str(value.get("location", ""))
+        source = ("suricata" if "/suricata/" in location else
+                  "modsecurity" if "/modsec/" in location else None)
+    if source not in ("suricata", "modsecurity"):
+        return None
+    ip = value.get("src_ip") or value.get("source_ip")
+    try:
+        stamp = datetime.fromisoformat(value["timestamp"].replace("Z", "+00:00"))
+        if stamp.tzinfo is None or not isinstance(ip, str) or not ip:
+            raise ValueError()
+        return (source, ip, stamp.timestamp())
+    except (ValueError, TypeError, KeyError, AttributeError):
+        return (source, None, None)
+
+
+def sensor_review_requirements(context):
+    references = {r for event in context["events"] if event["kind"] == "alert"
+                  if (r := sensor_event_reference(event["evidence"])) is not None}
+    if references and context.get("evidence_truncated"):
+        references.add(("coverage_truncated", None, None))
+    return references
+
+
+def verified_sensor_events(requirements, receipts):
+    return all(ip is not None and stamp is not None and (source, ip, stamp) in receipts
+               for source, ip, stamp in requirements)
+
+
 class Trace:
     def __init__(self, store, case, run_id):
         self.store, self.case, self.run_id = store, case, run_id
@@ -576,6 +608,8 @@ class Trace:
         self.arguments, self.read_receipts = {}, {}
         self.sca_requirements = sca_review_requirements(store.context(case["id"]))
         self.sca_receipts = []
+        self.sensor_requirements = sensor_review_requirements(store.context(case["id"]))
+        self.sensor_receipts = set()
 
     def accept(self, event):
         if not isinstance(event, dict):
@@ -670,6 +704,15 @@ class Trace:
                                 if isinstance(check,dict) and isinstance(check.get("title"),str) and type(check.get("check_id")) is int:
                                     self.sca_receipts.append({"agent_id":args["agent_id"],"title":check["title"].rstrip(" .").casefold(),
                                         "scan_at":stamp.timestamp(),"result":check.get("result")})
+                elif not error and payload and name in (
+                        "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts"):
+                    source = "suricata" if name.endswith("search_suricata_alerts") else "modsecurity"
+                    if payload.get("source_scope") == "wazuh_indexed_alerts" and payload.get("source") == source:
+                        for alert in payload.get("alerts", [])[:50]:
+                            if isinstance(alert, dict):
+                                reference = sensor_event_reference(alert, source)
+                                if reference and reference[1] is not None:
+                                    self.sensor_receipts.add(reference)
                 elif not error and name == "mcp__resp__list_blocks":
                     self.read_receipts[("target", "a:incident-ip")] = {"observed": True}
         elif kind == "result":
@@ -705,6 +748,8 @@ class Trace:
                 state, detail, due = "needs_review", "pending_verification_limit", now
             elif disposition == "resolved" and not verified_sca_checks(self.sca_requirements,self.sca_receipts,now):
                 state, detail, due = "needs_review", "sca_check_verification_missing", now
+            elif disposition == "resolved" and not verified_sensor_events(self.sensor_requirements, self.sensor_receipts):
+                state, detail, due = "needs_review", "incident_event_verification_missing", now
             elif pending:
                 state, detail, due = "waiting_approval", "awaiting_broker_event", now + 120
             elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):
@@ -739,6 +784,27 @@ def prompt_for(base, case, evidence):
         if evidence["proposals"]:
             current_request += ("\n이번 실행에서 먼저 조회할 연결 제안(과거 상태 설명은 실제 조회를 대신하지 않음): " +
                 canonical([{"proposal_id": p["id"], "target": p["target"]} for p in evidence["proposals"]]))
+            successors = evidence.get("later_proposals", [])
+            if successors:
+                current_request += ("\n현재 해시가 원래 적용 후 해시와 다르거나 과거 복구 실패가 있으면, "
+                    "아래 같은 대상의 후속 제안 상태를 직접 조회해 before_sha256→after_sha256 연결을 확인한다. "
+                    "원래 제안과 현재 파일만 반복 조회해서는 원복 여부를 알 수 없다. "
+                    "이 목록은 조회할 참조이며 적용 성공의 증거가 아니다. 조회하지 않은 후속 제안을 확인했다고 쓰지 않는다: " +
+                    canonical([{"proposal_id": p["id"], "target": p["target"], "follows": p["follows"]}
+                               for p in successors]))
+            current_request += ("\n이번 사건의 종결 범위는 해당 변경 절차와 현재 대상의 복구 상태다. "
+                "파일·실행 상태 확인과 SID별 탐지 시험을 구분하고 미시험 한계를 명시한다. "
+                "SID별 미시험만으로 정상 복구를 적용 실패라고 단정하지 않는다. "
+                "현재 대상이나 후속 변경 근거가 불충분하면 종결하지 않는다.")
+        references = sensor_review_requirements(evidence)
+        if references:
+            current_request += ("\n이 사건의 실제 경보 조회에서 대조할 출처·출발지·사건 시각: " + canonical([
+                {"source": source, "source_ip": ip, "event_at_kst": datetime.fromtimestamp(stamp, timezone(timedelta(hours=9))).isoformat()}
+                for source, ip, stamp in sorted(references, key=str) if ip is not None and stamp is not None]) +
+                "\n사건 시각을 포함하는 until_kst/ lookback_minutes와 source_ip로 조회한다. "
+                "최근24시간이나 서비스 정상 조회는 과거 사건의 경보 조회를 대신하지 않는다. "
+                "반환 경보의 정확한 출처·출발지·시각을 대조하고 공격/허용 판단은 별도 근거로 내린다. "
+                "사건 당시 표본을 찾지 못하거나 원본 근거가 잘렸다면 해결 완료로 종결하지 않는다.")
     control = {"case_id": case["id"], "mode": case["mode"], "session_id": case["session_id"],
                "requested_at_kst": datetime.now(timezone(timedelta(hours=9))).isoformat(),
                "run_number": case["run_count"] + 1, "proposals": evidence["proposals"],

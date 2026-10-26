@@ -100,6 +100,44 @@ class ControllerTests(unittest.TestCase):
         self.tool(trace,'mcp__security_events__get_wazuh_sca_checks',payload,{'agent_id':'001','policy_id':'cis','check_ids':[35648]})
         self.result(trace);self.assertEqual(trace.finish(0)['state'],'completed')
 
+    def test_historical_sensor_event_needs_matching_returned_source_ip_and_time(self):
+        event=self.alert('waf-old','2026-10-22T11:46:50.158+0000',rule='100102')
+        event['location']='/home/a/logs/modsec/audit.log'
+        self.alerts(event);trace=self.trace()
+        payload={'source':'modsecurity','source_scope':'wazuh_indexed_alerts','alerts':[
+            {'timestamp':'2026-10-26T11:46:50.158+00:00','source_ip':event['src_ip']}]}
+        name='mcp__security_events__search_modsecurity_alerts'
+        self.tool(trace,name,payload,{'lookback_minutes':1440});self.result(trace)
+        self.assertEqual(trace.finish(0)['state'],'needs_review')
+        self.assertEqual(self.store.db.execute('select detail from cases').fetchone()[0],'incident_event_verification_missing')
+        self.store.review(trace.case['id'],'Exact historical evidence required');trace=self.trace()
+        payload['alerts'][0]['timestamp']='2026-10-22T20:46:50.158+09:00'
+        self.tool(trace,name,payload,{'until_kst':'2026-10-22T21:00:00+09:00','source_ip':event['src_ip']})
+        self.result(trace);self.assertEqual(trace.finish(0)['state'],'completed')
+
+    def test_sensor_empty_wrong_source_or_ip_and_truncation_cannot_resolve(self):
+        event={'location':'/logs/suricata/eve.json','timestamp':'2026-10-22T01:00:00Z','src_ip':'192.0.2.8'}
+        context={'events':[{'kind':'alert','evidence':event}],'evidence_truncated':False}
+        req=m.sensor_review_requirements(context);reference=next(iter(req))
+        self.assertTrue(m.verified_sensor_events(req,{reference}))
+        for rows in (set(),{('modsecurity',reference[1],reference[2])},{('suricata','192.0.2.9',reference[2])}):
+            self.assertFalse(m.verified_sensor_events(req,rows))
+        self.assertFalse(m.verified_sensor_events(m.sensor_review_requirements(dict(context,evidence_truncated=True)),{reference}))
+        invalid=dict(event,timestamp='invalid');self.assertFalse(m.verified_sensor_events(
+            m.sensor_review_requirements({'events':[{'kind':'alert','evidence':invalid}]}),{reference}))
+
+    def test_explicit_operator_review_reopens_completed_with_history_preserved(self):
+        self.events(self.incident());trace=self.trace()
+        self.tool(trace,'mcp__wazuh_ro__get_wazuh_agents',{'agents':[]});self.result(trace)
+        self.assertEqual(trace.finish(0)['state'],'completed')
+        with self.assertRaisesRegex(m.ControllerError,'not_eligible'):
+            self.store.review(trace.case['id'],'No implicit reopening')
+        result=self.store.review(trace.case['id'],'Recheck missing historical evidence',reopen_completed=True)
+        self.assertEqual(result['state'],'review_ready')
+        row=self.store.db.execute('select previous,run_id from reviews').fetchone()
+        self.assertEqual(json.loads(row['previous'])['state'],'completed');self.assertIsNone(row['run_id'])
+        self.assertEqual(self.store.db.execute('select state from runs where id=?',(trace.run_id,)).fetchone()[0],'completed')
+
     def test_sca_old_future_failed_wrong_agent_or_missing_check_cannot_resolve(self):
         req=[{'agent_id':'001','title':'ensure x','at':100.}]
         receipt={'agent_id':'001','title':'ensure x','scan_at':900.,'result':'passed'}

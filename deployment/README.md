@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+> **10/26 사건 종결 검증:** 기존 deploy.sh→SOC 관리 controller 렌더링 경로가 후속 변경 참조와 센서 사건 근거 검증을 함께 반영한다. 관리134/설치30 검사를 통과했고 운영은 root controller만 증분 교체했다. 추가 패키지·이미지·포트·키0이며 새3VM 전체 설치는 미실행이다. [STATUS](../STATUS.md).
+
 > **10/26 저장소 계측 소스:** 기존 소스 묶음의 `infra/automation/storage-retention/{monitor.sh,monitor-lib.sh,test-native.sh,README.md}`를 함께 갱신한다. lib SHA pin·256개 상한/실패 분류를 기존 고정 A/B 운영 설치에 증분 반영했다. 새 deb/wheel/이미지·포트·키 변경0이며 기존 오프라인 목록을 유지한다. 이 고정 호스트 모듈의 새 서버 bootstrap/전체 설치 검증은 미완료다. [설치 계약](../infra/automation/storage-retention/README.md) · [실측/잔여](../STATUS.md).
 
 > **10/26 사건 조회 소스:** 기존 반입 소스의 `infra/mcp/security-events-mcp.py`, 관리 controller/gate, query-completion 근거핀, Ollama 정책/설치기를 함께 반영한다. SCA는 기존 API 계정의 읽기 권한을 재사용하며 추가 deb/wheel/이미지는0이다. 기본 read-only 설치에도 resp 조회 연결을 포함해 실행부 계약(6서버/28읽기)에 맞춘다. 운영 증분과 새 서버 전체 설치 검증은 [STATUS](../STATUS.md)에서 구분한다.

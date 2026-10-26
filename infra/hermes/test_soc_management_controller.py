@@ -105,7 +105,7 @@ class ControllerTests(unittest.TestCase):
         event['location']='/home/a/logs/modsec/audit.log'
         self.alerts(event);trace=self.trace()
         payload={'source':'modsecurity','source_scope':'wazuh_indexed_alerts','alerts':[
-            {'timestamp':'2026-10-26T11:46:50.158+00:00','source_ip':event['src_ip']}]}
+            {'timestamp':'2026-10-26T11:46:50.158+00:00','source_ip':event['src_ip'],'wazuh_rule_id':'100102'}]}
         name='mcp__security_events__search_modsecurity_alerts'
         self.tool(trace,name,payload,{'lookback_minutes':1440});self.result(trace)
         self.assertEqual(trace.finish(0)['state'],'needs_review')
@@ -116,11 +116,11 @@ class ControllerTests(unittest.TestCase):
         self.result(trace);self.assertEqual(trace.finish(0)['state'],'completed')
 
     def test_sensor_empty_wrong_source_or_ip_and_truncation_cannot_resolve(self):
-        event={'location':'/logs/suricata/eve.json','timestamp':'2026-10-22T01:00:00Z','src_ip':'192.0.2.8'}
+        event={'location':'/logs/suricata/eve.json','timestamp':'2026-10-22T01:00:00Z','src_ip':'192.0.2.8','rule':{'id':'100110'}}
         context={'events':[{'kind':'alert','evidence':event}],'evidence_truncated':False}
         req=m.sensor_review_requirements(context);reference=next(iter(req))
         self.assertTrue(m.verified_sensor_events(req,{reference}))
-        for rows in (set(),{('modsecurity',reference[1],reference[2])},{('suricata','192.0.2.9',reference[2])}):
+        for rows in (set(),{('modsecurity',reference[1],reference[2],reference[3])},{('suricata','192.0.2.9',reference[2],reference[3])},{(*reference[:3],'100102')},{(*reference[:3],None)}):
             self.assertFalse(m.verified_sensor_events(req,rows))
         self.assertFalse(m.verified_sensor_events(m.sensor_review_requirements(dict(context,evidence_truncated=True)),{reference}))
         invalid=dict(event,timestamp='invalid');self.assertFalse(m.verified_sensor_events(

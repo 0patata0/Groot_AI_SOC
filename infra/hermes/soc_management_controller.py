@@ -576,26 +576,30 @@ def sensor_event_reference(value, source=None):
     if source not in ("suricata", "modsecurity"):
         return None
     ip = value.get("src_ip") or value.get("source_ip")
+    original_rule = value.get("rule")
+    rule = value.get("wazuh_rule_id") or (original_rule.get("id") if isinstance(original_rule, dict) else None)
+    if not isinstance(rule, str) or not re.fullmatch(r"[0-9]{1,8}", rule):
+        rule = None
     try:
         stamp = datetime.fromisoformat(value["timestamp"].replace("Z", "+00:00"))
         if stamp.tzinfo is None or not isinstance(ip, str) or not ip:
             raise ValueError()
-        return (source, ip, stamp.timestamp())
+        return (source, ip, stamp.timestamp(), rule)
     except (ValueError, TypeError, KeyError, AttributeError):
-        return (source, None, None)
+        return (source, None, None, rule)
 
 
 def sensor_review_requirements(context):
     references = {r for event in context["events"] if event["kind"] == "alert"
                   if (r := sensor_event_reference(event["evidence"])) is not None}
     if references and context.get("evidence_truncated"):
-        references.add(("coverage_truncated", None, None))
+        references.add(("coverage_truncated", None, None, None))
     return references
 
 
 def verified_sensor_events(requirements, receipts):
-    return all(ip is not None and stamp is not None and (source, ip, stamp) in receipts
-               for source, ip, stamp in requirements)
+    return all(ip is not None and stamp is not None and rule is not None and (source, ip, stamp, rule) in receipts
+               for source, ip, stamp, rule in requirements)
 
 
 class Trace:
@@ -799,11 +803,11 @@ def prompt_for(base, case, evidence):
         references = sensor_review_requirements(evidence)
         if references:
             current_request += ("\n이 사건의 실제 경보 조회에서 대조할 출처·출발지·사건 시각: " + canonical([
-                {"source": source, "source_ip": ip, "event_at_kst": datetime.fromtimestamp(stamp, timezone(timedelta(hours=9))).isoformat()}
-                for source, ip, stamp in sorted(references, key=str) if ip is not None and stamp is not None]) +
+                {"source": source, "source_ip": ip, "event_at_kst": datetime.fromtimestamp(stamp, timezone(timedelta(hours=9))).isoformat(), "wazuh_rule_id": rule}
+                for source, ip, stamp, rule in sorted(references, key=str) if ip is not None and stamp is not None]) +
                 "\n사건 시각을 포함하는 until_kst/ lookback_minutes와 source_ip로 조회한다. "
                 "최근24시간이나 서비스 정상 조회는 과거 사건의 경보 조회를 대신하지 않는다. "
-                "반환 경보의 정확한 출처·출발지·시각을 대조하고 공격/허용 판단은 별도 근거로 내린다. "
+                "반환 경보의 정확한 출처·출발지·시각·Wazuh 상관 규칙 ID를 대조하고 공격/허용 판단은 별도 근거로 내린다. "
                 "사건 당시 표본을 찾지 못하거나 원본 근거가 잘렸다면 해결 완료로 종결하지 않는다.")
     control = {"case_id": case["id"], "mode": case["mode"], "session_id": case["session_id"],
                "requested_at_kst": datetime.now(timezone(timedelta(hours=9))).isoformat(),

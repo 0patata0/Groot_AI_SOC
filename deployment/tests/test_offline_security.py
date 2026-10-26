@@ -114,6 +114,23 @@ class SecurityFixtures(unittest.TestCase):
         data = s.settings({**self.env, 'LAB_PUBLIC_ORIGIN': 'https://log4shell.grootlab.duckdns.org', 'LAB_HTTPS_PORT': '443'})
         self.assertIn(b'server_name log4shell.grootlab.duckdns.org;', s.render(data, self.sources)['config/lab-edge.conf'])
 
+    def test_explicit_public_web_access_preserves_gateway_and_waf_checks(self):
+        data = s.settings({**self.env, 'LAB_ALLOWED_CIDRS': 'all'})
+        self.assertEqual(data['allowed'], ['all'])
+        output = s.render(data, self.sources)
+        edge = output['config/lab-edge.conf'].decode()
+        self.assertEqual(edge.count('allow all;'), 1)
+        self.assertIn('allow all;\n        deny all;', edge)
+        self.assertEqual(edge.count('auth_request /_capstone_lab_session;'), 3)
+        self.assertIn('location = /log4shell/api/gateway-session { return 404; }', edge)
+        private = s.render(self.data, self.sources)
+        self.assertEqual(output['config/lab-waf.conf'], private['config/lab-waf.conf'])
+        self.assertEqual(output['config/lab-policy.conf'], private['config/lab-policy.conf'])
+        self.assertNotIn('allow all;', private['config/lab-edge.conf'].decode())
+        for bad in ('all,192.168.10.0/24', 'ALL', 'all;', 'all\n', '::/0', '0.0.0.0/0'):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                s.settings({**self.env, 'LAB_ALLOWED_CIDRS': bad})
+
     def test_edge_compose_is_pinned_nonroot_private_and_no_implicit_bind_creation(self):
         value = s.enhance_compose(self.compose(), self.data, self.env['PROFILE'])
         edge = value['services']['lab-edge']; waf = value['services']['waf']

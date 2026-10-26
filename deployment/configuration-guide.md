@@ -99,7 +99,7 @@ LLM_MODEL=qwen3.6:35b
 | `MONITOR_INTERFACE` | security 감시 NIC 또는 auto |
 | `WEB_BACKEND_PORT`, `WAF_PORT` | 독립 DVWA의 service/backend와 security/WAF 포트. Lab HTTPS와 별개 |
 | `LAB_PUBLIC_ORIGIN`, `LAB_HTTPS_PORT` | 필수 HTTPS DNS origin과 같은 포트. path·사용자정보·query 금지. 기본443은 origin에 생략 |
-| `LAB_ALLOWED_CIDRS` | 쉼표로 구분한 1~32개 고유 RFC1918 IPv4 CIDR. `0.0.0.0/0` 불가 |
+| `LAB_ALLOWED_CIDRS` | 쉼표로 구분한 1~32개 고유 RFC1918 IPv4 CIDR, 또는 모든 출발지의 실습 웹 접근을 명시하는 단독 값 `all`. `all`과 CIDR 혼합·`0.0.0.0/0`은 거절. SSH·Wazuh·MCP 접근 정책과 별개 |
 | `LAB_PROXY_SUBNET` | security 전용 프록시의 사설 /29. 호스트 route·기존 Docker·클라이언트 CIDR과 충돌 금지 |
 | `LAB_GATEWAY_PORT` | service 내부 gateway 포트, 기본18091. security와 service loopback만 허용하며 사용자 공개 주소가 아님 |
 | `LAB_WHEEL_DIR` | service의 Python3.12 amd64용 전체 고정 wheel 목록. 설치기는 인터넷 대신 이 입력으로 콘솔 환경 준비 |

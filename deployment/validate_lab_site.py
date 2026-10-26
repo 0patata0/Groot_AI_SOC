@@ -19,8 +19,9 @@ def validate(origin, port, allowed, subnet):
     authority = hostname if actual_port == 443 else hostname + ':' + str(actual_port)
     if origin != 'https://' + authority: raise ValueError('canonical HTTPS origin required')
     rfc1918 = [ipaddress.ip_network(x) for x in ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16')]
-    nets = [ipaddress.ip_network(x, strict=True) for x in allowed.split(',')]
-    if not 1 <= len(nets) <= 32 or len(nets) != len(set(nets)):
+    public = allowed == 'all'
+    nets = [] if public else [ipaddress.ip_network(x, strict=True) for x in allowed.split(',')]
+    if not public and (not 1 <= len(nets) <= 32 or len(nets) != len(set(nets))):
         raise ValueError('one to 32 unique internal/VPN networks required')
     for n in nets:
         if n.version != 4 or not any(n.subnet_of(p) for p in rfc1918):
@@ -30,7 +31,7 @@ def validate(origin, port, allowed, subnet):
         raise ValueError('private /29 proxy subnet required')
     if any(proxy.overlaps(n) for n in nets): raise ValueError('proxy/client network overlap')
     return {'origin': origin, 'hostname': hostname, 'authority': authority, 'port': actual_port,
-            'allowed': [str(n) for n in nets], 'subnet': str(proxy),
+            'allowed': ['all'] if public else [str(n) for n in nets], 'subnet': str(proxy),
             'waf_ip': str(proxy.network_address + 2), 'edge_ip': str(proxy.network_address + 3)}
 
 if __name__ == '__main__':

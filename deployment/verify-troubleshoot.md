@@ -303,7 +303,7 @@ curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS \
 | `nonweb_runtime_install_failed_private_evidence_preserved` | 별도 nonweb 설치 중 실패 | service/evidence/nonweb-install.json과 별도 root receipt를 확인하고 부분 설치를 수동 검토. 재실행으로 덮어쓰지 않음 |
 | `offline_lab_preflight_failed` / `offline_lab_prerequisites_invalid` | wheel 전체 목록·해시, 6항목 카탈로그, 고정 웹3이미지·터미널3개, nft/systemd 조건 | 오류 원인을 확인하고 정확한 반입물을 복구. latest 대체·guard 생략 금지 |
 | `lab_common_key_precondition_failed` / 공통 키 전달 실패 | SIEM admin 암호 입력 계약·SSH pipe·service 키 root0600·기존 다른 키 | 원문을 로그에 출력하지 않고 연결 정책/권한을 점검. 기존 키를 덮어써 암호 회전하지 않음 |
-| TLS/private-network preflight 실패 | origin/port·SAN·키 일치·유효기간·허용 CIDR·/29 충돌 | DNS·인증서·네트워크 계획 수정. `-k`·전체 허용 CIDR로 우회 금지 |
+| TLS/site preflight 실패 | origin/port·SAN·키 일치·유효기간·허용 CIDR·/29 충돌 | DNS·인증서·네트워크 계획 수정. 웹 공개를 의도한 경우에만 `LAB_ALLOWED_CIDRS=all` 지정. `-k`로 TLS 검사를 우회하지 않음 |
 | 콘솔404/502 또는 실습503 | HTTPS→edge→gateway→콘솔, 실습 실행 상태·고정 경로 | 관리 API와 실제 WAF 실습 경로를 분리 확인. Java를 DVWA Apache의 직접 JAR 프록시로 복원하지 않음 |
 | 예외 인증401/429 | 입력 키·30초 challenge 만료/재사용·발급 제한·HTTPS/WebCrypto·시각 | 새 challenge로 재입력 또는 제한 시간 후 재시도. raw키/Bearer/고정해시 프로토콜은 거절되는 것이 정상 |
 | `deployment_allowed:false` | `safety_error`, nft guard·network 계약 | 배포가 차단된 원인을 복구. 상태 조회·관리 중지는 별도 가능하며 LLM에 일반 Docker 권한 추가 금지 |

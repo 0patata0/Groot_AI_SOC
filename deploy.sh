@@ -125,7 +125,7 @@ if [[ $BATCH == 0 && -t 0 && -z $CONFIG ]]; then
 
 fi
 prompt LAB_PUBLIC_ORIGIN 'Log4Shell HTTPS 주소 (예: https://lab.example.org)'
-prompt LAB_ALLOWED_CIDRS '실습 허용 내부망/VPN CIDR (쉼표로 구분)'
+prompt LAB_ALLOWED_CIDRS '실습 웹 허용 내부망/VPN CIDR (쉼표 구분, 모든 출발지는 all)'
 prompt LLM_BASE_URL 'Ollama/OpenAI 호환 API 주소 (예: http://192.0.2.40:11434/v1)'
 if [[ $ADMIN_INPUT_SET == 0 && $BATCH == 0 && -t 0 ]]; then
   printf '차단 예외 관리자 IPv4 또는 CIDR 대역 (쉼표 구분, 없으면 Enter): ' >&2

@@ -32,7 +32,7 @@ WAZUH_ENROLLMENT_PASS_FILE=${WAZUH_ENROLLMENT_PASS_FILE:-/opt/capstone-prereqs/w
 SURICATA_IMAGE=${SURICATA_IMAGE:-jasonish/suricata:8.0.6}
 WAF_IMAGE=${WAF_IMAGE:-owasp/modsecurity-crs:nginx}
 : "${LAB_PUBLIC_ORIGIN:?explicit HTTPS lab origin is required}"
-: "${LAB_ALLOWED_CIDRS:?explicit private client/VPN CIDRs are required}"
+: "${LAB_ALLOWED_CIDRS:?explicit client/VPN CIDRs or all for public lab web access are required}"
 LAB_HTTPS_PORT=${LAB_HTTPS_PORT:-443}
 LAB_PROXY_SUBNET=${LAB_PROXY_SUBNET:-172.30.247.0/29}
 LAB_GATEWAY_PORT=${LAB_GATEWAY_PORT:-18091}

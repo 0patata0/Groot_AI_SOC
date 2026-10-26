@@ -91,6 +91,38 @@ class ControllerTests(unittest.TestCase):
         with self.assertRaisesRegex(m.ControllerError, "path_refused"):
             good.get("/rule-changes/deadbeef/consume")
 
+    def test_registered_time_calculation_does_not_break_valid_read_trace(self):
+        self.events(self.incident())
+        trace = self.trace()
+        self.tool(trace, "mcp__wazuh_ro__get_wazuh_agents", {"agents": [{"id": "001"}]})
+        self.tool(trace, "mcp__system_diagnostics__calculate_time",
+                  {"kind": "time_calculation", "live_observation": False})
+        self.result(trace)
+        result = trace.finish(0)
+        self.assertTrue(result['completed'])
+        self.assertEqual(result['state'], 'completed')
+        self.assertEqual(self.store.db.execute('SELECT count(*) FROM tool_calls WHERE run_id=? AND completed=1',
+                                              (trace.run_id,)).fetchone()[0], 2)
+
+    def test_calculation_alone_is_not_live_investigation_or_verification(self):
+        for mode in ('manage', 'verify'):
+            with self.subTest(mode=mode):
+                cid = self.store.new_case('calculation-only-' + mode, mode)
+                case = dict(self.store.db.execute('SELECT * FROM cases WHERE id=?', (cid,)).fetchone())
+                trace = m.Trace(self.store, case, self.store.start(case))
+                trace.accept({'type':'system','subtype':'init','session_id':'calculation-session-' + mode})
+                self.tool(trace, 'mcp__system_diagnostics__calculate_time',
+                          {'kind':'time_calculation','live_observation':False})
+                self.result(trace)
+                self.assertEqual(trace.finish(0)['state'], 'needs_review')
+
+    def test_unknown_diagnostic_tool_is_still_a_protocol_failure(self):
+        self.events(self.incident())
+        trace = self.trace()
+        self.tool(trace, 'mcp__system_diagnostics__execute_shell', {'ok': True})
+        self.result(trace)
+        self.assertEqual(trace.finish(0)['state'], 'outcome_unknown')
+
     def test_pagination_cursor_acks_only_durable_returned_records(self):
         self.store.ingest_events({"events": [self.incident()], "latest_seq": 900})
         self.assertEqual(self.store.meta("event_cursor"), "1")

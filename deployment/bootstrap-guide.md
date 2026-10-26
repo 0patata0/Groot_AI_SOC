@@ -143,3 +143,5 @@ SOC 연결의 설치 코드는 포함하되, 이 변경의 새 VM 설치 시험�
 반입 소스에 `infra/hermes/review_channel.py`, `review_channel_policy.py`, `review_channel_worker.py`와 `deployment/review_chat.py`를 포함한다. 기존 공통 `read_contract.py`·query 근거 모듈·Ollama SDK를 재사용하며 추가 deb/wheel/이미지/수신 포트는 없다. 전용 systemd 서비스·root 대기열을 만들고, Ollama 모델 작업은 기존 비특권 계정으로 실행한다. Hermes는 고정 UID의 기존 관리 gate를 사용한다. 봇 토큰은 분배기만 읽고 모델에 전달하지 않는다. 기존 보안 룰·관리자 승인 경계는 유지한다.
 
 서비스/파일 SHA와 현재 PID의 heartbeat 검사는 새 서버 전체 설치 시험을 대신하지 않는다. 실제 완료 범위는 [STATUS](../STATUS.md), 채널 사용은 [채널 안내](../infra/hermes/chat-channels.md)를 따른다.
+
+2026-10-26 관리 제어기 보완은 기존 `deployment/soc_runtime.py`의 canonical 제어기/gate 렌더링과 `deployment/review_chat.py`의 실행부 반입 경로를 사용한다. 새 패키지·이미지·포트는 추가하지 않는다. 관리 제어기와 공동채널 worker를 함께 맞추며, 시간 계산 도구를 감사 대상으로 허용하되 실제 서버 관측으로 인정하지 않는다.

@@ -145,7 +145,11 @@ def main():
             # new_case hashes the external key; bind that identity separately.
             store.db.commit()
             case = dict(store.db.execute('SELECT * FROM cases WHERE id=?', (cid,)).fetchone())
-            case['chat_request'] = request.get('current_question', request['question'])
+            case['chat_task'] = request['phase']
+            # A factual retry must retain the peer's comparison task and the
+            # explicitly untrusted original answer, not become an inventory.
+            case['chat_request'] = (request['question'] if request['phase'] == 'peer'
+                                    else request.get('current_question', request['question']))
             # Cross-review needs the normal investigation reasoning profile.
             # The low-reasoning historical-case shortcut skipped real reads in
             # shared-chat trials; keep the read-only gate without that shortcut.

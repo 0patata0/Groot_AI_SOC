@@ -1,5 +1,24 @@
 # 인프라 현황 — 2026-10-27 현재 작업 상태
 
+## 과거 사건·호스트 정책 추가 검토 — 2026-10-27 KST
+
+**실제 A/B/C 설정과 원본 근거를 추가 점검했으며, 보안 설정을 일괄 변경하거나 SCA 실패를 통과로 치환하지 않았다.** 이번 대상은 기존 WAF 묶음1건과 SSH MAC/AppArmor/IP forwarding3건이다. 별도로 B 호스트 SCA 수집 공백을 확인했다.
+
+| 항목 | 새 확인과 판단 | 후속 |
+|---|---|---|
+| 과거 WAF5거래 | 실제 접근로그5/5·이전 line SHA 일치, 과거 색인3구간 재조회. 오늘 정상 HTTPS200·무서명 변형2경로403. 첫 두 모델 보고의 건수/프록시/응답 원인·종결 근거 오류를 보존하고 재개 | 최종 needs_review 유지. 실제 공격 부재나 완전 해결로 확대하지 않음 |
+| A SSH MAC | 기존4종 제외 유지. 최신07:03:35 SCA35654 failed와 설치 정책의 UMAC128-ETM 금지 조건 확인 | 추가 제외 후보 검증 완료·미적용. B/C도 기존 약한4종이 남아 같은 정책 정렬 필요 |
+| C AppArmor | 최신06:43:13 SCA35538/35539 failed. rootless 전용UID의 실행 프로세스4개가 unconfined, sudo 실습은 중지·network none. 운영 rootful Log4Shell은 docker-default | 일괄 모드 전환 금지. rootless 지원 한계를 고려한 실습 범위의 명시적 위험 수용 또는 별도 격리/제한 프로필 검증 필요. 예외 미승인 |
+| C IP forwarding | IPv4=1/IPv6=0, 운영 Docker bridge에 사용. guard15규칙·관련5파일 SHA가10/26과 동일. 컨테이너 netns 관리 경로5개 timeout/웹200/PID불변 | 역할상 전달 유지 권장, 보완 통제와 별도 승인 예외 검토. 전체 포트/프로토콜 격리 증명은 아님 |
+| B 호스트 SCA | agent000은 Amazon Linux wazuh.manager 컨테이너. B Ubuntu 호스트 agent unit 미설치, 등록000/001/002만 확인 | B 호스트 전용 수집 보완 필요. 기존 B 서비스·스토리지 진단과 구분 |
+
+- **SSH 후보 검증:** SHA1/UMAC64 계열4종과 설치 SCA가 금지하는 UMAC128-ETM을 제외하는 옵션을 A/B/C에서 `sshd -t/-T`로 검사했다. 다른 유효 옵션은 동일하며 `aes256-ctr`+SHA256-ETM/SHA512-ETM 신규 인증 총6회 성공. 실제 drop-in 배치/reload0, 전후 SSH파일16SHA 동일. 모든 자동화 클라이언트 호환/후속 SCA 통과는 아직 검증하지 않았다. 기존 A 전용 설치 모듈의 승인된 파일 이행과 B/C 역할 연계는 실제 적용 시 별도 구현·검증해야 하며 후보를 기본 정책으로 바꾸지 않았다.
+- **C 격리 범위:** 컨테이너 netns에서 A22/B1514·55000·9200/C22가 timeout이다. 호스트에서는 A22/B1514/C22 성공, B API/Indexer2개는 호스트도 timeout이므로 그2개를 컨테이너 전용 차단 증거로 보지 않는다. sudo 실습 전용UID·read-only rootfs·cap 제한·자원 제한·호스트bind0·securityfs 제한은 AppArmor 제한 자체를 대체하지 않는다. [Docker rootless 지원 한계](https://docs.docker.com/engine/security/rootless/troubleshoot/)와 [bridge의 IP forwarding 요구](https://docs.docker.com/engine/network/firewall-iptables/)를 실제 구성과 대조했다.
+- **재검토 범위·한계:** 정상 Store.review와 복구 DB 백업을 사용했고 보호 쓰기0이다. 실행 중 재개1회는 controller lock으로 거절되어 기존 조사를 자연 종료시킨 뒤 다음 timer만 잠시 대기/복구했다. 모델의 SSH `propose_rule_edit` 권고는 해당 도구의 등록 대상 밖이므로 채택하지 않았다. IP forwarding 보고의 불필요한 시간 계산 오류 등 자동 조사 의미/도구 선택 오류도 잔여다. 읽기 조회·근거 점검 완료와 실제 설정 해결/사건 종결을 구분한다.
+- **배포·검증 생략:** 운영 소스/보안 설정/초기 설치 기본값/패키지/포트 변경0. 관련 문서와 후속 계획만 갱신한다. 새 서버 전체 설치·실제 공격/탐지/대응 E2E·새 실습 기동·예외 승인·장기/재부팅 시험은 미실행이다. A/B/C failed unit0 표본, 관리 timer 복구 확인. 08:38 KST 이번4건 모두 needs_review/실행·대기0, 원래45건41completed/4needs_review 유지. 모델6회·읽기24호출(오류1)/보호쓰기0, WAF3회 각각원참조5/5대조. 보고 outbox6건sent·미전달0이며 이번에는 Mattermost 게시 본문을 API로 별도 재대조하지 않았다. 최종 WAF 보고의 과거 표본으로 현재 경보 지속 부재를 말한 문구·조회 시각 오표기도 검증된 결론으로 채택하지 않았다.
+- **Git·정리:** 추가 검토 결과·관제 범위·후속 계획의 공개4문서를 검증하고 자동 커밋·지정 인증 푸시를 진행한다. 운영 코드 배포는 없다. 로컬 상세 근거·SSH 후보·업무분담·대화기록은 Git 제외. 서버에 실행 스크립트/패키지를 저장하지 않았고 복구 DB 백업은 운영 근거로 보존한다. Mac 작업 전용 임시 스크립트는 최종 게시 뒤 제거한다.
+
+
 ## Ollama 읽기 연결 재사용 — 2026-10-27 07:00 KST 운영 검증
 
 **Ollama 일반 채팅에만 연결 재사용을 반영했고 Hermes는 유지했다.** 설치된 Hermes `/opt/hermes/tools/mcp_tool.py`는 이미 서버별 장기 Task·전용 event loop·재접속/종료 관리를 사용한다. 동일한 풀을 추가할 이유가 없어 코드·컨테이너 재시작0이다. 공동채널은 별도 작업 프로세스의 수명/격리를 유지하며 이번 변경의 속도 효과에 포함하지 않는다.

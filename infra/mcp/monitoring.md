@@ -18,6 +18,12 @@ root collector가 약60초마다 schema2 스냅샷을 발행한다. 기존 schem
 
 현재 B의 `b:vector`와 `b:wazuh-agent`는 의도된 미설치다. 컨테이너의 manager를 host agent로 대신 세지 않는다. Indexer 단일 노드의 yellow, oneshot의 성공 후 inactive, 누적 Suricata 검사 깊이 제한을 현재 서비스 중단으로 단정하지 않는다. `needs_review/outcome_unknown` 사건은 정상이나 완료로 바꾸지 않는다.
 
+## 호스트 보안 정책 점검 범위
+
+2026-10-27 운영 대조에서 Wazuh agent001은 A(groot-sec), agent002는 C(groot-web)로 확인했다. agent000은 Amazon Linux 기반 `wazuh.manager` 컨테이너이며 Ubuntu B 호스트가 아니다. B 호스트의 `wazuh-agent.service`는 미설치이고 등록 목록도000/001/002뿐이다. **000의 SCA 결과로 B 호스트의 SSH·커널·AppArmor 준수를 판단하지 않는다.** 기존 B 서비스/스토리지/runtime 진단과 호스트 SCA 공백을 구분한다. B 호스트 전용 agent 또는 동등한 정책 수집은 후속이며 이번에 설치하지 않았다.
+
+SCA는 마지막 저장 스캔이다. 개별 항목의 결과·스캔 종료 시각과 실제 호스트 설정을 대조한다. A의 기존 SSH4종 제외와 설치된 SCA35654의 UMAC128-ETM 금지 조건은 다르며, 정책 변경이나 다음 스캔 없이 통과를 주장하지 않는다. C의 rootless sudo 실습 AppArmor 제한 부재와 rootful Log4Shell의 `docker-default`를 구분한다. Docker bridge용 IPv4 forwarding도 역할·통신 제한을 함께 평가한다. 예외는 명시적 범위·승인·재검토 조건이 필요한 별도 결정이며 원래 `failed` 결과를 지우지 않는다. [최신 검토·남은 조치](../../STATUS.md).
+
 ## A의 독립 감시와 재전송
 
 A의 `capstone-soc-observe.timer`는 A 로컬 및 B/C의 고정 읽기 전용 스냅샷을 확인한다. 전용 키는 source IP 제한·강제 reader·host key pin을 사용하며 셸, sudo, Docker, 터널 권한이 없다. A의 키는 기존 B→A/C 진단 키와 분리한다. B의 root 전달 검증은 기존 B→A/C snapshot 전용 identity의 root600 사본을 사용한다. 원래 MCP 그룹640키·원격 허용 범위는 유지하며 NoNewPrivileges를 끄거나 실행 중 계정을 전환하지 않는다. B가 중단돼도 A의 로컬 감시 기록은 계속 가능하다.

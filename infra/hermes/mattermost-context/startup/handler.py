@@ -24,7 +24,7 @@ _ID = re.compile(r"[a-z0-9]{26}\Z")
 
 def _settings():
     keys = ("CAPSTONE_MM_TEAM_ID", "CAPSTONE_MM_BOT_ID", "MATTERMOST_HOME_CHANNEL",
-            "MATTERMOST_URL", "MATTERMOST_TOKEN", "HERMES_HOME")
+            "MATTERMOST_URL", "MATTERMOST_TOKEN", "HERMES_HOME", "CAPSTONE_MM_MANAGED_CHANNELS")
     values = {key: os.environ.get(key, "") for key in keys}
     if not values["CAPSTONE_MM_TEAM_ID"]:
         return None
@@ -68,6 +68,8 @@ async def _run(settings, core):
             _session=session, _base_url=settings["MATTERMOST_URL"].rstrip("/"),
             _token=settings["MATTERMOST_TOKEN"], _bot_user_id=settings["CAPSTONE_MM_BOT_ID"],
             _auth_header=lambda: {"Authorization": "Bearer " + settings["MATTERMOST_TOKEN"]},
+            _capstone_home=settings['HERMES_HOME'],
+            _capstone_managed_channels=settings.get('CAPSTONE_MM_MANAGED_CHANNELS', '').split(','),
         )
         while True:
             result = await core.sync_once(adapter, settings)
@@ -103,6 +105,7 @@ async def handle(event_type, context):
         if settings is None:
             return
         core = _load_core(settings["HERMES_HOME"])
+        core.install_gate(settings['HERMES_HOME'])
     except Exception:
         LOGGER.warning("Mattermost public channel sync disabled: configuration_or_core_unavailable")
         return

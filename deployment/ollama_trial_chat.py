@@ -18,7 +18,12 @@ from ollama_trial import ROOT, ETC, STATE, USER, safe, write, run, need, digest
 from bot_profiles import asset as profile_asset, set_profile_image
 
 UNIT = Path('/etc/systemd/system/capstone-ollama-chat.service')
-CHAT_SOURCES = ('chat.py', 'chat_policy.py')
+CHAT_SOURCES = ('chat.py', 'chat_policy.py', 'channel_sync.py')
+
+
+def chat_source(source, name):
+    directory = 'infra/hermes/mattermost-context' if name == 'channel_sync.py' else 'infra/ollama-trial'
+    return source / directory / name
 def local_base(value):
     p = urlsplit(value)
     need(p.scheme == 'http' and p.port == 8065 and not p.username and not p.password and
@@ -120,7 +125,7 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
          'partial_chat_install_requires_review')
     need(all(re.fullmatch(r'[a-z0-9]{26}', x) for x in (team_id, admin_id, hermes_channel_id)), 'chat_ids')
     for name in CHAT_SOURCES:
-        safe(source / 'infra/ollama-trial' / name)
+        safe(chat_source(source, name))
     profile_asset('ollama', source / 'deployment/bot-icons')
     api = API(base_url)
     try:
@@ -146,12 +151,16 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
         write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
         api.call('POST', '/teams/' + team_id + '/members', {'team_id': team_id, 'user_id': bid})
         channel, _ = api.call('POST', '/channels', {'team_id': team_id, 'name': 'soc-ollama',
-            'display_name': 'soc-ollama', 'type': 'P',
+            'display_name': 'soc-ollama', 'type': 'O',
             'header': 'ollama 읽기 전용 시험 · 멘션 없이 질문 · 후속 질문은 같은 스레드 · 변경/승인은 기존 Hermes',
             'purpose': '기존 Hermes와 분리한 Ollama 기반 실행부 직접 비교'})
         cid = channel['id']; pending['channel_id'] = cid
         write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
         api.call('POST', '/channels/' + cid + '/members', {'user_id': bid})
+        alerts, _ = api.call('GET', '/teams/' + team_id + '/channels/name/soc-alerts-agent')
+        reporter, _ = api.call('GET', '/users/username/soc-report')
+        need(reporter.get('is_bot') and 'system_admin' not in reporter.get('roles', '').split(), 'report_bot_identity')
+        api.call('POST', '/channels/' + alerts['id'] + '/members', {'user_id': bid})
         members, _ = api.call('GET', '/channels/' + cid + '/members')
         if admin_id not in {m['user_id'] for m in members}:
             api.call('POST', '/channels/' + cid + '/members', {'user_id': admin_id})
@@ -159,12 +168,14 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
         user = pwd.getpwnam(USER)
         config = {'schema': 1, 'base_url': base_url, 'username': 'ollama',
                   'bot_id': bid, 'channel_id': cid, 'team_id': team_id, 'allowed_users': [admin_id],
-                  'token': token['token'], 'enabled_at_ms': int(time.time() * 1000)}
+                  'token': token['token'], 'enabled_at_ms': int(time.time() * 1000),
+                  'mention_channel_ids': [alerts['id']], 'report_bot_ids': [reporter['id'], admin_id],
+                  'mention_enabled_at_ms': int(time.time() * 1000)}
         write(ETC / 'chat.json', json.dumps(config).encode(), gid=user.pw_gid)
         pending['token_id'] = token['id']
         write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
         for name in CHAT_SOURCES:
-            write(ROOT / name, (source / 'infra/ollama-trial' / name).read_bytes(), gid=user.pw_gid)
+            write(ROOT / name, chat_source(source, name).read_bytes(), gid=user.pw_gid)
         state = STATE / 'chat'; state.mkdir(mode=0o700); os.chown(state, user.pw_uid, user.pw_gid)
         # Name update only: preserve channel ID, posts, members and routing IDs.
         if previous['name'] != 'soc-hermes' or previous['display_name'] != 'soc-hermes':

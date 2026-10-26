@@ -561,7 +561,7 @@ def app_bootstrap():
     token=next((v for k,v in headers.items() if k.lower()=='token'),None); need(token,'Mattermost_login_token_missing')
     hdr={'Authorization':'Bearer '+token}
     pending('mattermost-create-team'); team,_=api(mm+'/teams','POST',{'name':'capstone','display_name':'Capstone SOC','type':'I'},hdr,statuses=(201,))
-    pending('mattermost-create-channel'); channel,_=api(mm+'/channels','POST',{'team_id':team['id'],'name':'soc','display_name':'SOC','type':'O'},hdr,statuses=(201,))
+    pending('mattermost-create-channel'); channel,_=api(mm+'/channels','POST',{'team_id':team['id'],'name':'soc-hermes','display_name':'soc-hermes','type':'O'},hdr,statuses=(201,))
     pending('mattermost-create-bot'); bot,_=api(mm+'/bots','POST',{'username':'capstone-assistant','display_name':'Capstone Assistant','description':'Read-only SOC assistant'},hdr,statuses=(201,))
     bid=bot['user_id']
     pending('mattermost-bot-profile')

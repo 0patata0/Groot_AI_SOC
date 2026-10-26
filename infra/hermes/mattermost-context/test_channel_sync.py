@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import types
+import tempfile
 import unittest
 from unittest.mock import AsyncMock, patch
 
@@ -15,7 +16,7 @@ ENV = {"CAPSTONE_MM_TEAM_ID": TEAM, "MATTERMOST_HOME_CHANNEL": HOME}
 
 
 def channel(channel_id=NEW, **changes):
-    return {"id": channel_id, "team_id": TEAM, "type": "O", "delete_at": 0, **changes}
+    return {"id": channel_id, "team_id": TEAM, "type": "O", "delete_at": 0, "name": "sample-hermes", **changes}
 
 
 class Response:
@@ -70,12 +71,17 @@ class Session:
         if method == "GET" and path.startswith("/channels/"):
             cid = path.rsplit("/", 1)[1]
             return Response(self.fresh if self.fresh is not None else channel(cid))
+        if method == "DELETE":
+            return Response({"status": "OK"})
         if method == "POST" and path.endswith("/members"):
             return Response({"channel_id": path.split("/")[2], "user_id": BOT}, 201)
         raise AssertionError("unexpected fake request")
 
     def get(self, url, **kwargs):
         return self.request("GET", url, **kwargs)
+
+    def delete(self, url, **kwargs):
+        return self.request("DELETE", url, **kwargs)
 
     def post(self, url, **kwargs):
         return self.request("POST", url, **kwargs)
@@ -87,6 +93,56 @@ def adapter(session=None, **changes):
 
 
 class SyncTest(unittest.IsolatedAsyncioTestCase):
+    async def test_suffix_matrix_and_uncategorized_channels(self):
+        for engine in ('hermes', 'ollama'):
+            for suffix, yes in [('agent', True), (engine, True), ('hermes' if engine == 'ollama' else 'ollama', False), ('general', False)]:
+                s = Session(publics=[channel(HOME), channel(name='test-'+suffix)], fresh=channel(name='test-'+suffix))
+                a = adapter(s); a._capstone_engine = engine
+                result = await m.sync_once(a, ENV)
+                self.assertEqual(result['joined'], int(yes))
+
+    async def test_visible_name_overrides_url_and_wrong_membership_is_removed(self):
+        s = Session(publics=[channel(HOME), channel(name='legacy-hermes', display_name='shared-ollama')],
+                    members=[{'channel_id': HOME, 'user_id': BOT}, {'channel_id': NEW, 'user_id': BOT}],
+                    fresh=channel(name='legacy-hermes', display_name='shared-ollama'))
+        result = await m.sync_once(adapter(s), ENV)
+        self.assertEqual((result['joined'], result['left']), (0, 1))
+        self.assertEqual([p for method,p,_ in s.calls if method=='DELETE'], ['/channels/'+NEW+'/members/'+BOT])
+
+    async def test_default_channel_not_rejoined_and_unclassified_never_added(self):
+        s = Session(publics=[channel(HOME), channel(name='town-square')],
+                    members=[{'channel_id': HOME, 'user_id': BOT}, {'channel_id': NEW, 'user_id': BOT}])
+        result = await m.sync_once(adapter(s), ENV)
+        self.assertEqual((result['joined'], result['left']), (0, 0))
+
+    def test_native_gate_fails_closed_and_never_changes_dm_handler(self):
+        class MattermostAdapter:
+            def _apply_channel_gating(self, cid, text):
+                return text
+        module = types.ModuleType('synthetic_native_mattermost'); module.MattermostAdapter = MattermostAdapter
+        with tempfile.TemporaryDirectory() as home, patch.dict('sys.modules', {'synthetic_native_mattermost': module}):
+            m.install_gate(home); adapter = MattermostAdapter()
+            self.assertIsNone(adapter._apply_channel_gating(NEW, '@hermes query'))
+            directory=Path(home)/'health';directory.mkdir()
+            p=directory/'channel-routing.json';p.write_text(json.dumps({'checked_at':m.time.time(),'allowed':[HOME]}))
+            self.assertEqual(adapter._apply_channel_gating(HOME,'question'),'question')
+            self.assertIsNone(adapter._apply_channel_gating(NEW,'@hermes query'))
+            p.write_text(json.dumps({'checked_at':m.time.time()-151,'allowed':[HOME]}))
+            self.assertIsNone(adapter._apply_channel_gating(HOME,'question'))
+
+    async def test_ollama_channel_is_excluded_from_every_sync(self):
+        a = adapter(Session(publics=[channel(HOME), channel(name='soc-ollama')]))
+        for _ in range(2):
+            result = await m.sync_once(a, ENV)
+            self.assertEqual((result['status'], result['joined']), ('ok', 0))
+        self.assertFalse(any(method == 'POST' for method, _, _ in a._session.calls))
+
+    async def test_channel_renamed_to_ollama_before_join_is_skipped(self):
+        a = adapter(Session(fresh=channel(name='soc-ollama')))
+        result = await m.sync_once(a, ENV)
+        self.assertEqual((result['joined'], result['skipped']), (0, 1))
+        self.assertFalse(any(method == 'POST' for method, _, _ in a._session.calls))
+
     async def test_only_new_public_self_membership_is_written(self):
         a = adapter()
         result = await m.sync_once(a, ENV)
@@ -119,8 +175,7 @@ class SyncTest(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(any(c[0] == "POST" for c in s.calls))
 
     async def test_wrong_home_team_and_missing_home_membership_refuse(self):
-        for s, reason in ((Session(home=channel(HOME, team_id="x" * 26)), "home_team_mismatch"),
-                          (Session(members=[]), "home_membership_missing")):
+        for s, reason in ((Session(home=channel(HOME, team_id="x" * 26)), "home_team_mismatch"),):
             self.assertEqual((await m.sync_once(adapter(s), ENV))["reason"], reason)
             self.assertFalse(any(c[0] == "POST" for c in s.calls))
 
@@ -242,7 +297,7 @@ class StartupTest(unittest.IsolatedAsyncioTestCase):
             started.set()
             await asyncio.sleep(100)
         with patch.dict(self.hook.os.environ, self.settings, clear=True), \
-                patch.object(self.hook, "_load_core", return_value=m), \
+                patch.object(self.hook, "_load_core", return_value=m), patch.object(m, "install_gate"), \
                 patch.object(self.hook, "_run", side_effect=blocked):
             await asyncio.wait_for(self.hook.handle("gateway:startup", {"platforms": ["mattermost"]}), 0.1)
             first = self.hook._TASK

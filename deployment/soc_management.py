@@ -32,6 +32,7 @@ import urllib.request
 
 sys.dont_write_bytecode = True  # check also stays read-only without an external -B flag.
 from soc_runtime import Refused, agent_ar, firewall, manager_ar, need, render, validate_profile, verify_agent_ar, verify_firewall
+from report_publisher import provision as provision_report_publisher
 
 STATE = Path("/var/lib/capstone-soc")
 CODE = Path("/opt/capstone-soc")
@@ -43,7 +44,8 @@ SOURCES = tuple("infra/mcp/" + name for name in (
     "response-mcp.py", "wazuh_containment_ar.py", "managed_suricata_evidence.py")) + tuple("infra/hermes/" + name for name in (
     "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md",
     "capstone-management.service.example", "capstone-management.timer.example")) + (
-    "deployment/soc_management.py", "deployment/soc_runtime.py", "deployment/soc_agent_block.py", "deployment/response_entrypoint.py")
+    "deployment/soc_management.py", "deployment/soc_runtime.py", "deployment/soc_agent_block.py", "deployment/response_entrypoint.py",
+    "deployment/report_publisher.py")
 PRIVATE = (ipaddress.ip_network("10.0.0.0/8"), ipaddress.ip_network("172.16.0.0/12"), ipaddress.ip_network("192.168.0.0/16"))
 
 
@@ -452,8 +454,33 @@ def prepare_siem(s):
     actual, _ = request(mm + "/api/v4/config", headers=auth)
     service_settings = parse(actual)["ServiceSettings"]
     need(service_settings["EnableIncomingWebhooks"] is True and service_settings["AllowedUntrustedInternalConnections"] == s["hosts"]["SIEM_HOST"], "Mattermost_callback_configuration_not_effective")
-    hook, _ = request(mm + "/api/v4/hooks/incoming", "POST", {"channel_id": creds["mattermost_channel_id"], "display_name": "SOC approvals", "description": "Exact proposal and management results"}, auth)
-    hook_id = parse(hook)["id"]; need(re.fullmatch(r"[a-z0-9]{26}", hook_id), "webhook_identity")
+    def report_api(method, path, body=None, absent=False):
+        # request() sanitizes HTTP failures; only the explicit lookup may be absent.
+        if absent:
+            users, hdr = request(mm + "/api/v4/users/usernames", "POST", ["soc-report"], auth)
+            found = parse(users)
+            need(len(found) <= 1, "publisher_duplicate_username")
+            return (found[0] if found else None), hdr
+        data, hdr = request(mm + "/api/v4" + path, method, body, auth)
+        return parse(data), hdr
+    try:
+        # The interactive Hermes channel and automated report channel are distinct.
+        channels, _ = report_api('GET', '/teams/' + creds['mattermost_team_id'] + '/channels?page=0&per_page=200')
+        need(len(channels) < 200, 'bootstrap_channel_inventory_limit')
+        alerts = [c for c in channels if c.get('name') == 'soc-alerts-agent' and not c.get('delete_at')]
+        need(len(alerts) <= 1, 'duplicate_report_channels')
+        if alerts:
+            report_channel = alerts[0]
+        else:
+            report_channel, _ = report_api('POST', '/channels', {
+                'team_id': creds['mattermost_team_id'], 'name': 'soc-alerts-agent', 'display_name': 'soc-alerts-agent', 'type': 'O',
+                'header': 'SOC 자동 보고 · 봇을 멘션해 후속 조회 · -agent: 두 봇 참여'})
+        for uid in (aid, creds['mattermost_bot_id']):
+            report_api('POST', '/channels/' + report_channel['id'] + '/members', {'user_id': uid})
+        publisher = provision_report_publisher(report_api, creds["mattermost_team_id"], report_channel['id'])
+    finally:
+        request(mm + "/api/v4/users/logout", "POST", headers=auth)
+    hook_id = publisher["hook"]["id"]
     webhook = mm + "/hooks/" + hook_id
     sb = create_account("socbot", "/opt/socbot")
     mkdir("/opt/socbot", 0o750, 0, sb.pw_gid); mkdir("/etc/socbot", 0o750, 0, sb.pw_gid); mkdir("/var/lib/socbot", 0o700, sb.pw_uid, sb.pw_gid)

@@ -196,7 +196,7 @@ def build_summary(hours=12):
         fields.append({"short": True, "title": "출처 IP", "value": "\n".join("%s(%d)" % (k, v) for k, v in agg["src"][:5]) or "-"})
     fields.append({"short": True, "title": "취약점(groot-web)", "value": str(vc) if vc is not None else "조회 실패"})
     text = "정기 수집 현황 — %s. 최근 %dh의 조회 결과입니다. 위험도·오탐·대응 필요성은 LLM 관리 에이전트가 근거를 조회해 판단합니다. 경보 0건은 정상 판정이 아닙니다." % (status, hours)
-    return {"username": "SOC-Agent", "attachments": [{"color": color, "title": "%s · SOC 정기 상태 요약" % status,
+    return {"username": "soc-report", "attachments": [{"color": color, "title": "%s · SOC 정기 상태 요약" % status,
             "text": text, "fields": fields, "footer": "capstone SOC telemetry (정기)", "ts": int(time.time())}]}
 
 
@@ -260,7 +260,7 @@ def build_report(minutes):
     sample = "\n".join("`%s` id=%s lv%s %s [%s]" % (r["ts"], r["id"], r["level"], r["desc"][:50], r["srcip"]) for r in rows[:5])
     text = ("**경보 조회 자료** (최근 %d분, level>=5 경보 %d건)\n%s\n\n"
             "이 자료는 집계·표본입니다. 위험도·오탐·대응 필요성은 LLM 관리 에이전트가 추가 근거와 현재 상태를 조회해 판단합니다." % (minutes, agg["total"], sample))
-    return {"username": "SOC-Agent",
+    return {"username": "soc-report",
             "attachments": [{"color": "#439fe0", "title": "SOC 경보 조회 자료", "text": text, "fields": fields,
                              "footer": "capstone SOC telemetry", "ts": int(time.time())}]}
 
@@ -320,7 +320,7 @@ def approval_create(req):
     text = ("에이전트 `%s`가 `%s`에 %s 작업을 요청했습니다.\n작업: `%s`\n사유:\n\n    %s\n\n"
             "요청 id `%s` · %d분 내 응답 없으면 미실행. 이 IP의 해당 작업 한 번만 승인합니다." %
             (by, ip, operation, action, reason, rid, APPROVAL_TTL // 60))
-    payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800", "title": "⚠️ %s 승인 요청 (HITL Tier 2)" % operation, "text": text,
+    payload = {"username": "soc-report", "attachments": [{"color": "#e0a800", "title": "⚠️ %s 승인 요청 (HITL Tier 2)" % operation, "text": text,
                "actions": [act("승인", "approve", "primary"), act("거부", "deny", "danger")], "footer": "capstone SOC HITL", "ts": int(time.time())}]}
     posted, _ = _post_approval_card("legacy", rid, rec, payload, rec["ts"] + APPROVAL_TTL)
     with _LOCK:
@@ -585,7 +585,7 @@ def rule_change_create(req):
                 "integration": {"url": MM_ACTION_URL + "/rule-actions",
                                 "context": {"proposal_id": rid, "nonce": nonce, "decision": decision,
                                             "proposal_digest": digest}}}
-    payload = {"username": "SOC-Agent", "attachments": [{
+    payload = {"username": "soc-report", "attachments": [{
         "color": "#e0a800", "title": "⚠️ 보안 룰 변경 승인 요청", "text": card_text,
         "actions": [action("승인", "approve", "primary"), action("거부", "deny", "danger")],
         "footer": "capstone SOC rule change HITL", "ts": int(time.time())}]}
@@ -626,7 +626,7 @@ def rule_change_create(req):
                         _rule_diff_display(part)))
         if not _rule_card_fits(review_text) or not ready_to_post():
             return failed_post()
-        review_payload = {"username": "SOC-Agent", "attachments": [{
+        review_payload = {"username": "soc-report", "attachments": [{
             "color": "#e0a800", "title": "보안 룰 변경 검토 · %d/%d" % (index, len(parts)),
             "text": review_text, "footer": "capstone SOC rule change HITL", "ts": int(time.time())}]}
         posted, _ = post_mm(review_payload)
@@ -767,7 +767,7 @@ def rule_change_abort(rid, req):
         rec["decided_ts"] = time.time()
     body = (rec["card_text"] + "\n\n승인자 ID: `%s`\n적용 결과: `미적용`\n실제 읽기 SHA-256: `%s`\n"
             "미적용 사유:\n    %s" % (rec["by"], req["readback_sha256"], detail))
-    payload = {"username": "SOC-Agent", "attachments": [{
+    payload = {"username": "soc-report", "attachments": [{
         "color": "#d24b4b", "title": "보안 룰 변경 미적용 · %s" % rec["target"],
         "text": body, "footer": "capstone SOC rule change HITL", "ts": int(time.time())}]}
     posted, _ = post_mm(payload)
@@ -833,7 +833,7 @@ def rule_change_result(rid, req):
         rec["decided_ts"] = time.time()
     result_text = (rec["card_text"] + "\n\n승인자 ID: `%s`\n적용 결과: `%s`\n실제 읽기 SHA-256: `%s`\n"
                    "검증·재로드 결과:\n    %s" % (rec["by"], req["status"], req["readback_sha256"], detail))
-    payload = {"username": "SOC-Agent", "attachments": [{
+    payload = {"username": "soc-report", "attachments": [{
         "color": "#28a745" if req["status"] == "applied" else "#d24b4b",
         "title": "보안 룰 변경 결과 · %s" % rec["target"], "text": result_text,
         "footer": "capstone SOC rule change HITL", "ts": int(time.time())}]}

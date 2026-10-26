@@ -130,3 +130,7 @@ SOC 연결의 설치 코드는 포함하되, 이 변경의 새 VM 설치 시험�
 운영망 FORWARD/NAT/VPN/DNS 자체, 공개 인증서 발급·채팅 HTTPS, 기존 SOC의 수동 이력·기존 승인 DB, A→B 이전 로그 전송, 긴 장애 구간의 무손실 회수·일반 백업·실제 공격 E2E는 별도 범위다. Suricata는 수동 탐지 모드를 유지하고 제한된 별도 nft 대응 경로를 사용한다. LLM에 일반 sudo/Docker·패키지 설치 권한을 부여하지 않는다.
 
 앞으로 서버 변경을 수행하면 같은 작업에서 `deploy.sh`의 역할/helper·반입 목록·설정 예제·검증을 갱신한다. 운영 서버 재설정과 신규 설치는 구분한다. 상시 서버 감시나 소스 자동 작성 데몬은 추가하지 않는다.
+
+## 채널 참여와 자동 보고 발신자 (2026-10-26)
+
+초기 Hermes 채널은 soc-hermes, 보고 채널은 soc-alerts-agent다. SOC 설치는 non-admin soc-report 봇과 그 봇 소유의 채널 고정 웹훅을 생성하며, 관리자 계정과 발행자를 분리한다. Ollama 채팅 선택 시 공개 soc-ollama와 공용 보고채널 멘션을 연결한다. 두 봇의 자동 참여는 채널 표시 이름 끝의 -agent/-hermes/-ollama 기준이다. 공통 동기화 소스와 deployment/report_publisher.py는 기존 소스 묶음에 포함된다. 추가 deb/wheel/이미지/포트는 없다. 실제 새 VM 전체 설치 검증은 이번 라이브 증분 검증과 별개다. [사용·현재 완료 범위](../infra/hermes/chat-channels.md).

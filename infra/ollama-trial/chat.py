@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mention-free private trial channel + authorized one-to-one DMs.
+"""Dedicated public channel, mentions on SOC reports, and authorized DMs.
 
 WebSocket events feed a durable, single-worker SOC agent queue. The bot token
 never enters the LLM. Protected MCP calls retain the existing server approval gates.
@@ -15,6 +15,7 @@ from pathlib import Path
 import sqlite3
 import sys
 import time
+from types import SimpleNamespace
 from datetime import datetime
 from urllib.parse import urlsplit
 
@@ -30,7 +31,7 @@ except ModuleNotFoundError as exc:
     gateway_health = importlib.util.module_from_spec(_health_spec)
     _health_spec.loader.exec_module(gateway_health)
 from policy import require
-from chat_policy import ID, KST, eligible, question_with_history, final_text
+from chat_policy import ID, KST, eligible, question_with_history, final_text, channel_sync, request_text
 
 
 def log(event, **fields):
@@ -80,6 +81,10 @@ def config_read(path):
     c = json.loads(p.read_text())
     require(c['schema'] == 1 and c['username'] == 'ollama' and c['allowed_users'], 'chat_config_shape')
     require(all(ID.fullmatch(x) for x in [c['bot_id'], c['channel_id'], c['team_id'], *c['allowed_users']]), 'chat_ids')
+    for key in ('mention_channel_ids', 'report_bot_ids', 'managed_channel_ids'):
+        require(isinstance(c.get(key, []), list) and len(c.get(key, [])) <= 4 and
+                all(isinstance(x, str) and ID.fullmatch(x) for x in c.get(key, [])), 'chat_report_ids')
+    require(type(c.get('mention_enabled_at_ms', c['enabled_at_ms'])) is int, 'chat_mention_start')
     u = urlsplit(c['base_url'])
     require(u.scheme == 'http' and ipaddress.ip_address(u.hostname).is_private and u.port == 8065 and
             not u.username and not u.password and not u.query and not u.fragment and not u.path, 'local_mattermost_only')
@@ -99,6 +104,7 @@ class Gateway:
             self.db = sqlite3.connect(self.state / 'queue.sqlite')
             self.db.row_factory = sqlite3.Row
             self.db.execute('pragma journal_mode=WAL')
+            self.db.execute('create table if not exists routes (id text primary key, enabled_at integer not null, active integer not null)')
             self.db.execute('create table if not exists jobs (id text primary key, post text not null, status text not null, reply text, answer text, attempts integer not null default 0)')
             if 'evidence' not in {row[1] for row in self.db.execute('pragma table_info(jobs)')}:
                 self.db.execute('alter table jobs add column evidence text')
@@ -126,8 +132,10 @@ class Gateway:
                 me.get('is_bot') and not me.get('delete_at') and
                 'system_admin' not in me.get('roles', '').split(), 'bot_identity')
         channel = await self.api('GET', '/channels/' + self.c['channel_id'])
-        require(channel['name'] == 'soc-ollama' and channel['team_id'] == self.c['team_id'], 'bot_channel')
-        await self.api('GET', '/channels/' + channel['id'] + '/members/' + me['id'])
+        require(channel['team_id'] == self.c['team_id'] and not channel.get('delete_at'), 'bot_channel')
+        for cid in self.c.get('mention_channel_ids', []):
+            alerts = await self.api('GET', '/channels/' + cid)
+            require(alerts['team_id'] == self.c['team_id'], 'report_channel')
         return channel
 
     async def accept(self, post_id):
@@ -142,6 +150,10 @@ class Gateway:
             members = [x['user_id'] for x in await self.api('GET', '/channels/' + channel['id'] + '/members')]
         if not eligible(p, self.c, channel, members):
             return
+        if channel.get('type') != 'D':
+            route = self.db.execute('select enabled_at,active from routes where id=?', (channel['id'],)).fetchone()
+            if route and (not route['active'] or p['create_at'] < route['enabled_at']):
+                return
         # Only authorized human posts are persisted; bot messages cannot feed loops.
         with self.db:
             self.db.execute('insert or ignore into jobs(id,post,status) values(?,?,?)', (p['id'], json.dumps(p), 'queued'))
@@ -151,7 +163,7 @@ class Gateway:
     async def catchup(self):
         channels = await self.api('GET', '/users/me/teams/' + self.c['team_id'] + '/channels')
         for channel in channels:
-            if channel['id'] != self.c['channel_id'] and channel.get('type') != 'D':
+            if channel.get('type') != 'D' and not channel_sync.wanted(channel, 'ollama'):
                 continue
             posts = await self.api('GET', '/channels/' + channel['id'] + '/posts?per_page=60')
             rows = sorted(posts['posts'].values(), key=lambda p: (p['create_at'], p['id']))
@@ -213,7 +225,10 @@ class Gateway:
         post = json.loads(job['post'])
         # Revalidate current source/authorization immediately before any response.
         fresh = await self.api('GET', '/posts/' + post['id'])
-        if fresh.get('delete_at') or fresh.get('message') != post['message']:
+        channel = await self.api('GET', '/channels/' + post['channel_id'])
+        members = ([m['user_id'] for m in await self.api('GET', '/channels/' + channel['id'] + '/members')]
+                   if channel.get('type') == 'D' else [])
+        if (fresh.get('message') != post['message'] or not eligible(fresh, self.c, channel, members)):
             with self.db:
                 self.db.execute("update jobs set status='cancelled' where id=?", (post['id'],))
             return
@@ -231,10 +246,12 @@ class Gateway:
                 with self.db:
                     self.db.execute('update jobs set protected_started=1 where id=?', (post['id'],))
             try:
-                question = question_with_history(post, await self.history_for(post), self.c['bot_id'])
+                current = request_text(post['message'])
+                question = question_with_history({**post, 'message': current}, await self.history_for(post), self.c['bot_id'],
+                                                 self.c.get('report_bot_ids', []))
                 with contextlib.redirect_stdout(sys.stderr):
                     report = await asyncio.wait_for(agent_run(self.runtime, {'question': question,
-                        'current_question': post['message'], 'prior_evidence': self.prior_evidence(post)},
+                        'current_question': current, 'prior_evidence': self.prior_evidence(post)},
                         on_protected_start=protected_start), 1110)
                 answer = final_text(report, time.perf_counter() - started)
                 evidence = json.dumps(report['evidence'], ensure_ascii=False) if report.get('evidence') else None
@@ -273,6 +290,25 @@ class Gateway:
                 await asyncio.wait_for(self.wake.wait(), 5)
             except asyncio.TimeoutError:
                 pass
+
+    def record_routes(self, ids):
+        now = int(time.time()*1000)
+        with self.db:
+            for row in self.db.execute('select id from routes').fetchall():
+                if row['id'] not in ids:
+                    self.db.execute('update routes set active=0 where id=?', (row['id'],))
+            for cid in ids:
+                since = self.c['enabled_at_ms'] if cid == self.c['channel_id'] else now
+                self.db.execute('insert into routes values(?,?,1) on conflict(id) do update set enabled_at=case when active=0 then excluded.enabled_at else enabled_at end,active=1', (cid, since))
+
+    async def sync_channels(self):
+        adapter = SimpleNamespace(_bot_user_id=self.c['bot_id'], _capstone_engine='ollama',
+                                  _capstone_api=self.api, _capstone_routes=self.record_routes)
+        env = {'CAPSTONE_MM_TEAM_ID': self.c['team_id'], 'MATTERMOST_HOME_CHANNEL': self.c['channel_id']}
+        while True:
+            result = await channel_sync.sync_once(adapter, env)
+            log('channel_sync', **result)
+            await asyncio.sleep(channel_sync.POLL_SECONDS)
 
     async def listen(self, once=False):
         from websockets.asyncio.client import connect
@@ -318,6 +354,7 @@ async def main_async(args):
             log('check_passed', posts_sent=0, model_requests=0)
         else:
             async with asyncio.TaskGroup() as group:
+                group.create_task(gateway.sync_channels())
                 gateway.worker_task = group.create_task(gateway.worker())
                 group.create_task(gateway.listen())
 

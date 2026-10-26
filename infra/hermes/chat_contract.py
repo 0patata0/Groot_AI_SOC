@@ -4,7 +4,7 @@ import hashlib
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.3.0'
+VERSION = 'soc-chat-contract:1.4.0'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90

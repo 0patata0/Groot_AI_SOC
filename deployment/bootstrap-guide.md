@@ -1,5 +1,7 @@
 # 단일 Bash 초기 설치
 
+> **2026-10-26 감시 단계:** 기존 진단 및 선택 Ollama 구성 뒤 `monitor-configure/prepare/authorize/trust/activate/verify` 내부 단계를 루트 deploy.sh가 호출한다. A→B/C 전용 snapshot 키·기존 HTTPS SiteURL/CA·웹훅 스트림을 연결한다. 새3VM 전체 설치 성공 여부는 운영 증분 검증과 구분해 [STATUS](../STATUS.md)에 기록한다. [감시 상세](../infra/mcp/monitoring.md).
+
 > **2026-10-25 선택적 시험 분기:** `OLLAMA_TRIAL_ENABLE=1`과 `OLLAMA_TRIAL_BUNDLE`을 지정하면 B의 반입물을 사전검사하고 SOC/진단 구성 뒤 host venv의 Ollama 기반 읽기 실행부를 설치·검증한다. 모델은 DGX에 유지한다. `OLLAMA_TRIAL_CHAT_ENABLE=1`을 함께 지정하면 ollama 봇과 비공개 soc-ollama 채널·host gateway 서비스도 추가하며 기존 Hermes 채널 ID를 유지해 soc-hermes로 이름 변경한다. 두 옵션 기본값0이며 기존 운영 서버에는 전체 bootstrap을 재실행하지 않는다. [추가 반입·권한·복구](../infra/ollama-trial/README.md), [실제 검증 범위](../STATUS.md).
 
 

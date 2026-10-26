@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.10.0"
+VERSION = "groot-query-completion:1.11.0"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "832876a2eda1f95999d7e51a7d2171200d12a91f92d8796ebedd593e14583119"
@@ -1108,6 +1108,15 @@ def register(ctx):
         alignment = importlib.util.module_from_spec(alignment_spec)
         alignment_spec.loader.exec_module(alignment)
         shared_chat = alignment.load_harness()
+        try:
+            health_path = Path(__file__).with_name('gateway_health.py')
+            if not health_path.exists(): health_path = Path(__file__).parent.parent / 'gateway_health.py'
+            health_spec = importlib.util.spec_from_file_location('_capstone_gateway_health', health_path)
+            health = importlib.util.module_from_spec(health_spec)
+            health_spec.loader.exec_module(health)
+            health.install_hermes(ctx)
+        except Exception:
+            logging.getLogger('capstone.gateway_health').error('gateway_health_unavailable')
         query_adapter = SimpleNamespace(VERSION=VERSION, current_request_text=current_request_text,
             _inventory_payload=_inventory_payload, _remaining=_remaining, _with_final_text=_with_final_text)
         wrapped = alignment.final_wrapper(wrapped, original, native, metadata.append_message,

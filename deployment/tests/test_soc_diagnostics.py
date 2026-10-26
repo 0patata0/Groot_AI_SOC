@@ -77,7 +77,7 @@ class Profiles(unittest.TestCase):
             self.assertIn('ReadWritePaths=/var/lib/capstone-diagnostics\n', service)
             self.assertIn('NoNewPrivileges=yes', service)
             self.assertIn('ProtectSystem=strict', service)
-            self.assertIn('TimeoutStartSec=55', service)
+            self.assertIn('TimeoutStartSec=85', service)
             self.assertIn('TimeoutStopSec=5', service)
             self.assertIn('OnUnitActiveSec=60s', timer)
             for forbidden in ('sudo ', 'docker ', 'journalctl ', 'SSH', '/etc/sudoers'):

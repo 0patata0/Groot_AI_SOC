@@ -33,7 +33,7 @@ READER_HOME = STATE / 'reader'
 MCP_USER = 'capstone-mcp'
 ROLE_HOST = {'security': 'a', 'siem': 'b', 'service': 'c'}
 HOST_ENV = {'security': 'SECURITY_HOST', 'siem': 'SIEM_HOST', 'service': 'SERVICE_HOST'}
-SOURCES = ('system_diagnostics.py', 'system-diagnostics-mcp.py',
+SOURCES = ('system_diagnostics.py', 'runtime_health.py', 'system-diagnostics-mcp.py',
            'read-system-diagnostics.py', 'run-system-diagnostics.sh')
 SERVICE = 'capstone-system-diagnostics.service'
 TIMER = 'capstone-system-diagnostics.timer'
@@ -80,8 +80,9 @@ def unit_documents(role):
         '[Service]\nType=oneshot\nUser=root\nGroup=capstone-diagnostics\n'
         'ExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --collect --role ' + role + '\n'
         'UMask=0027\nNoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\n'
-        'ReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX\n'
-        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nTimeoutStartSec=55\nTimeoutStopSec=5\n')
+        'ReadWritePaths=/var/lib/capstone-diagnostics\nRestrictAddressFamilies=AF_UNIX AF_INET AF_INET6\n'
+        + ('ReadWritePaths=-/var/lib/capstone-management\n' if role == 'siem' else '') +
+        'ProtectKernelTunables=yes\nProtectControlGroups=yes\nKillMode=control-group\nTimeoutStartSec=85\nTimeoutStopSec=5\n')
     timer = ('[Unit]\nDescription=Refresh bounded Capstone diagnostic snapshots\n'
         '[Timer]\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=5s\nUnit=' + SERVICE + '\n'
         '[Install]\nWantedBy=timers.target\n')
@@ -148,11 +149,12 @@ def install_common(s, role):
     common.mkdir(STATE, 0o750, 0, gid); common.mkdir(PRIVATE)
     common.write(PRIVATE / 'intent.json', common.canonical(profile(s, role)))
     common.mkdir(CODE, 0o755)
-    common.write(CODE / 'system_diagnostics.py', source_bundle(s)['system_diagnostics.py'], 0o644)
+    for name in ('system_diagnostics.py','runtime_health.py'):
+        common.write(CODE / name, source_bundle(s)[name], 0o644)
     for name, raw in unit_documents(role).items():
         common.write(Path('/etc/systemd/system') / name, raw, 0o644)
     common.run(['/usr/bin/systemctl', 'daemon-reload'])
-    common.run(['/usr/bin/systemctl', 'start', SERVICE], timeout=70)
+    common.run(['/usr/bin/systemctl', 'start', SERVICE], timeout=100)
     common.run(['/usr/bin/systemctl', 'enable', '--now', TIMER])
     return gid
 
@@ -184,7 +186,7 @@ def prepare_siem(s):
     bundle = source_bundle(s)
     for name in ('system-diagnostics-mcp.py', 'run-system-diagnostics.sh'):
         common.write(MCP / name, bundle[name], 0o550, 0, mc.pw_gid)
-    files = [CODE / 'system_diagnostics.py', KEYDIR / 'id_ed25519', KEYDIR / 'id_ed25519.pub',
+    files = [CODE / 'system_diagnostics.py', CODE / 'runtime_health.py', KEYDIR / 'id_ed25519', KEYDIR / 'id_ed25519.pub',
              MCP / 'system-diagnostics-mcp.py', MCP / 'run-system-diagnostics.sh']
     files += [Path('/etc/systemd/system') / n for n in unit_documents('siem')]
     saved = {'schema': 1, 'profile': profile(s, 'siem'), 'files': {str(p): installed_record(p) for p in files}}
@@ -257,7 +259,7 @@ def apply_reader(s, role, raw):
     common.write(sshd, reader_ssh_configuration(), 0o644)
     common.run(['/usr/sbin/sshd', '-t']); verify_ssh_policy(s, role)
     common.run(['/usr/bin/systemctl', 'reload', 'ssh'])
-    files = [CODE / 'system_diagnostics.py', reader, launcher, keys, sshd]
+    files = [CODE / 'system_diagnostics.py', CODE / 'runtime_health.py', reader, launcher, keys, sshd]
     files += [Path('/etc/systemd/system') / n for n in unit_documents(role)]
     common.write(PRIVATE / 'active.json', common.canonical({'schema': 1, 'profile': profile(s, role),
         'reader_public_key': public, 'files': {str(p): installed_record(p) for p in files}}))

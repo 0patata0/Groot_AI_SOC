@@ -31,6 +31,24 @@ def agents():
 
 
 class ExpandedReads(unittest.TestCase):
+    def test_coverage_target_survives_read_selection_narrowing(self):
+        alias='mcp__system_diagnostics__get_system_diagnostics'
+        targets=['a:waf','b:hermes','soc:coverage']
+        schema={'type':'object','properties':{'target':{'type':'string','enum':targets}},'required':['target']}
+        selected=H.refine_read_schemas('전체 관제 상태를 진단해줘',{alias:schema},[],targets)
+        self.assertEqual(selected[alias]['properties']['target']['enum'],['soc:coverage'])
+        self.assertEqual(H.diagnostic_scope('A 서버 수집기와 C 서버 수집기 상태를 진단해줘',['a:collection','c:collection']),(['a:collection','c:collection'],[]))
+
+    def test_coverage_selection_deduplicates_ignored_history_arguments(self):
+        import importlib.util
+        if importlib.util.find_spec('jsonschema') is None:self.skipTest('server SDK dependency required')
+        alias='mcp__system_diagnostics__get_system_diagnostics'
+        schema={'type':'object','properties':{'target':{'enum':['soc:coverage']},'limit':{'type':'integer'}},'required':['target']}
+        value={'calls':[{'tool':alias,'arguments':{'target':'soc:coverage'}},
+                        {'tool':alias,'arguments':{'target':'soc:coverage','limit':50}}]}
+        plan,removed=H.validated_selection(value,H.selection_schema({alias:schema},32))
+        self.assertEqual(len(plan['calls']),1);self.assertEqual(removed,1)
+
     def test_native_selection_uses_only_actual_read_catalog_and_keeps_inputs(self):
         @dataclass
         class Request:

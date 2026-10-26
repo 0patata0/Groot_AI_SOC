@@ -236,28 +236,40 @@ def guidance(question):
 
 def diagnostic_request(question):
     text = READ.scope_text(normalized(question))
-    if (not READ.wants_write(text) and re.search(r'A\s*/\s*B\s*/\s*C', text, re.I)
-            and re.search(r'서비스|서버', text) and re.search(r'실패|오류|진단', text)):
-        return {'all': True, 'requested': []}
-    if READ.wants_write(text) or not re.search(r'진단', text) or not re.search(r'서비스|서버|대상', text): return None
-    if re.search(r'A\s*/\s*B\s*/\s*C', text, re.I) and re.search(r'모두|전체|빠짐', text):
-        return {'all': True, 'requested': []}
-    # Select a literal service name only; soc-bot is not the Hermes container.
-    hosts = re.findall(r'(?<![A-Za-z0-9])([ABC])\s*서버', text, re.I)
-    host = hosts[0].lower() if hosts else None
-    wanted = re.findall(r'(?<![A-Za-z0-9_])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_-])', text)
-    for pattern, name in [(r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스', 'hermes'), (r'Wazuh\s*(?:manager|매니저)', 'wazuh-manager'),
-                          (r'\bsoc-bot\b', 'soc-bot'), (r'\bDocker\b|도커', 'docker'), (r'\bVector\b|벡터', 'vector')]:
-        if host and re.search(pattern, text, re.I): wanted.append(host + ':' + name)
-    return {'all': False, 'requested': list(dict.fromkeys(wanted)), 'unresolved': not wanted}
+    if READ.wants_write(text): return None
+    health = re.search(r'진단|관제.*(?:공백|상태|건강)|상태.*(?:점검|확인)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text)
+    if not re.search(r'진단|관제|Hermes|헤르메스|Ollama|올라마|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
+    if not health and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
+    if re.search(r'(?:전체|모든).*관제|관제.*(?:전체|공백)|A\s*/\s*B\s*/\s*C|soc:coverage',text,re.I):
+        return {'all':True,'requested':[]}
+    host_matches=list(re.finditer(r'(?<![A-Za-z0-9])([ABC])\s*서버',text,re.I))
+    hosts=[m[1].lower() for m in host_matches]
+    host=hosts[0] if len(hosts)==1 else None
+    wanted=re.findall(r'(?<![A-Za-z0-9_])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_-])',text)
+    for pattern,name,default in [
+        (r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스','hermes','b'),
+        (r'Suricata|IDS|수리카타','suricata','a'),(r'WAF|ModSecurity','waf','a'),
+        (r'에이전트|수집기|\bcollection\b','collection',None),
+        (r'Ollama|올라마','ollama','b'),(r'Wazuh\s*(?:manager|매니저)','wazuh-manager','b'),
+        (r'Indexer|인덱서','wazuh-indexer','b'),(r'Mattermost|매터모스트','mattermost','b'),
+        (r'LLM|모델','llm','b'),(r'사건.*(?:처리|전달)|관리.*파이프라인','management-pipeline','b'),
+        (r'수집.*(?:경로|전달|파이프라인)|ingestion','ingestion','b'),
+        (r'\bsoc-bot\b','soc-bot',None),(r'\bDocker\b|도커','docker',None),
+        (r'\bVector\b|벡터','vector',None)]:
+        for match in re.finditer(pattern,text,re.I):
+            if re.search(r'[abc]:$',text[max(0,match.start()-2):match.start()]): continue
+            preceding=[m[1].lower() for m in host_matches if m.end()<=match.start()]
+            selected=(preceding[-1] if preceding else host) or default
+            if selected: wanted.append(selected+':'+name)
+    return {'all':False,'requested':list(dict.fromkeys(wanted)),'unresolved':not wanted}
 
 
 def diagnostic_scope(question, targets):
-    request = diagnostic_request(question)
-    if not request: return [], []
-    if request['all']: return list(targets), []
+    request=diagnostic_request(question)
+    if not request: return [],[]
+    if request['all']: return (['soc:coverage'] if 'soc:coverage' in targets else list(targets)),[]
     return ([t for t in request['requested'] if t in targets],
-            [t for t in request['requested'] if t not in targets] + (['요청 서비스 이름/범위 해석 미확인'] if request.get('unresolved') else []))
+            [t for t in request['requested'] if t not in targets]+(['요청 서비스 이름/범위 해석 미확인'] if request.get('unresolved') else []))
 
 
 def tool_scope(question, calls=None):
@@ -417,7 +429,8 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
     for alias in list(result):
         name = alias.split('__')[-1];props = result[alias].get('properties', {})
         if 'target' not in props or name not in ('get_rule_change_target', 'get_service_action_target', 'get_system_diagnostics'): continue
-        targets = [x for x in pending if x.startswith(('a:', 'b:', 'c:'))]
+        targets = [x for x in pending if x.startswith(('a:', 'b:', 'c:')) or
+                   (name == 'get_system_diagnostics' and x == 'soc:coverage')]
         if name == 'get_rule_change_target': targets = [x for x in targets if x in ('a:modsecurity-custom', 'a:suricata-local', 'b:wazuh-local-rules')]
         if name == 'get_service_action_target': targets = [x for x in targets if x == 'a:suricata']
         actual = props['target'].get('enum')
@@ -467,7 +480,12 @@ def validated_selection(value, schema):
     Draft202012Validator(strict).validate(value)
     result = json.loads(json.dumps(value));seen = set();calls = []
     for item in result['calls']:
-        key = json.dumps(item, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+        identity=item
+        if item['tool']=='mcp__system_diagnostics__get_system_diagnostics' and item['arguments'].get('target')=='soc:coverage':
+            # This endpoint always returns the same latest full snapshot;
+            # history/row-limit arguments do not change aggregate scope.
+            identity={'tool':item['tool'],'arguments':{'target':'soc:coverage'}}
+        key = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
         if key not in seen: calls.append(item);seen.add(key)
     removed = len(result['calls']) - len(calls);result['calls'] = calls
     Draft202012Validator(schema).validate(result)
@@ -546,6 +564,8 @@ def diagnostic_report(question, calls, targets):
             latest[target] = data if data and data.get('target') == target and data.get('schema') == 1 else None
     if not latest and not unsupported:
         return None
+    if any(v and v.get('kind') in ('runtime','coverage') for v in latest.values()):
+        return runtime_diagnostic_report(targets, latest, unsupported)
     verified = [t for t in targets if latest.get(t)]
     rows = ['**요약**', f'전체 대상 {len(targets)}개 / 유효 조회 {len(verified)}개 / 미확인 {len(targets)-len(verified)}개. 미확인 목록: ' + (', '.join(t for t in targets if t not in verified) or '없음') + '\n고정 진단 대상별 수집 스냅샷입니다. 원인과 전체 오류 발생 여부는 이 표본만으로 확정하지 않습니다.',
             '', '**확인 내역**', '', '| 대상 | Type | ActiveState / SubState | Result | 오류 반환 표본 | 수집 시각 KST |',
@@ -577,6 +597,37 @@ def diagnostic_report(question, calls, targets):
         '', '**조치 및 다음 단계**',
         '- inactive/dead인 oneshot과 failed를 구분해야 합니다. 위 표의 상태값을 임의로 정상/장애로 바꾸지 않았습니다.',
         '- 약60초 주기 수집 자료이며 실시간 journal 전체 조회가 아닙니다. 현재 장애 원인·미수집 구간은 미확인입니다.'])
+    return '\n'.join(rows)
+
+
+def runtime_diagnostic_report(targets, latest, unsupported):
+    records={}
+    for t in targets:
+        data=latest.get(t)
+        if data and data.get('kind')=='coverage': records.update(data.get('targets',{}))
+        else: records[t]=data or {'status':'unavailable','codes':['조회 미완료']}
+    counts={k:sum(r.get('status')==k for r in records.values()) for k in ('ok','degraded','unavailable','not_installed')}
+    rows=['**요약**',f"진단 대상 {len(records)}개: 점검 통과 {counts['ok']}, 이상 징후 {counts['degraded']}, 미확인 {counts['unavailable']}, 미설치 {counts['not_installed']}. 전체 공격 탐지·대응 성공을 뜻하지 않습니다.",'','**확인 내역**','',
+          '| 대상 | 판정 | 근거 | 수집 시각 KST |','| --- | --- | --- | --- |']
+    labels={'ok':'점검 통과','degraded':'이상 징후','unavailable':'미확인','not_installed':'미설치'}
+    details=[]
+    for target,data in records.items():
+        p=data.get('properties',{});codes=data.get('codes',[])
+        evidence=(', '.join(codes) if codes else (' / '.join(str(p.get(k,'미확인')) for k in ('Type','ActiveState','SubState','Result')) if p else '고정 점검 항목 통과'))
+        rows.append('| '+' | '.join(cell(v) for v in (target,labels.get(data.get('status'),'미확인'),evidence,data.get('observed_at_kst')))+' |')
+        if len(records)<=4 and data.get('metrics'):
+            details += ['', '**'+cell(target)+' 근거 수치**'] + ['- `'+cell(k)+'`: '+cell(__import__('datetime').datetime.fromtimestamp(v,EVIDENCE.KST).isoformat() if k.endswith('_at') and type(v) in (int,float) else v) for k,v in data['metrics'].items()]
+    rows += details
+    if 'inspection_limit_reached' in records.get('a:suricata',{}).get('codes',[]):
+        rows += ['', 'IDS 검사 깊이/재조립 한도 수치는 엔진 시작 이후 누적입니다. 커널 드롭과 다른 항목이며 현재 공격 발생을 뜻하지 않습니다.']
+    if 'case_review_required' in records.get('b:management-pipeline',{}).get('codes',[]):
+        rows += ['', '관리 파이프라인에 needs_review/outcome_unknown 사건이 남아 있습니다. 조회 성공과 사건 처리 완료는 다르며 임의 종결하지 않았습니다.']
+    if unsupported: rows += ['','미지원·미확인 요청: '+', '.join(unsupported)]
+    rows += ['','**조치 및 다음 단계**',
+        '- 약60초 주기 자료입니다. 모델·수집 경로 합성 점검은 별도 주기이며, 미확인은 정상이나 0건이 아닙니다.',
+        '- 미설치는 역할별 기대 구성을 확인해야 합니다. 표본 오류·누적 드롭은 현재 장애 원인으로 단정하지 않습니다.',
+        '- B/Mattermost 장애는 A에 보존하고 복구 후 알립니다. 장애 중 외부 즉시 알림 경로는 없습니다.',
+        '- 실제 공격·탐지·LLM 판단·승인·대응의 전체 E2E 성공 여부는 별도 검증 대상입니다.']
     return '\n'.join(rows)
 
 

@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import types
 
 SNAPSHOT = Path('/var/lib/capstone-diagnostics/snapshot.json')
 MAX_SNAPSHOT = 131072
@@ -53,6 +54,28 @@ PROFILES = {
     },
 }
 TARGETS = {target: unit for profile in PROFILES.values() for target, unit in profile.items()}
+RUNTIME_TARGETS = {
+    'security': ('a:waf', 'a:suricata', 'a:collection'),
+    'siem': ('b:hermes', 'b:ollama', 'b:wazuh-manager', 'b:wazuh-indexer',
+             'b:mattermost', 'b:llm', 'b:management-pipeline', 'b:ingestion'),
+    'service': ('c:collection',),
+}
+TARGETS.update({t: None for values in RUNTIME_TARGETS.values() for t in values})
+TARGETS['soc:coverage'] = None
+_runtime = None
+
+
+def runtime_library():
+    global _runtime
+    if _runtime is None:
+        path = Path(__file__).with_name('runtime_health.py')
+        source = root_file(path, 131072)
+        module = types.ModuleType('fixed_runtime_health')
+        module.__file__ = str(path)
+        exec(compile(source, str(path), 'exec'), module.__dict__)
+        need(module.ROLE_TARGETS == RUNTIME_TARGETS, 'runtime_catalog_mismatch')
+        _runtime = module
+    return _runtime
 TEXT_PROPERTIES = ('LoadState', 'ActiveState', 'SubState', 'Result', 'UnitFileState', 'Type')
 NUMBER_PROPERTIES = ('ExecMainCode', 'ExecMainStatus', 'NRestarts',
                      'ActiveEnterTimestampMonotonic', 'InactiveEnterTimestampMonotonic',
@@ -326,8 +349,9 @@ def validate_error(value, since, until):
 
 def validate_snapshot(value, expected_host=None, now=None, require_fresh=True):
     now = int(time.time()) if now is None else now
-    need(isinstance(value, dict) and set(value) == {'schema', 'host', 'checked_at', 'expires_at',
-         'lookback_minutes', 'units'} and type(value['schema']) is int and value['schema'] == 1,
+    need(isinstance(value, dict) and type(value.get('schema')) is int and value['schema'] in (1, 2)
+         and set(value) == {'schema', 'host', 'checked_at', 'expires_at',
+         'lookback_minutes', 'units'} | ({'runtime'} if value['schema'] == 2 else set()),
          'snapshot_schema')
     host = value['host']
     need(host in ROLE_HOST.values() and (expected_host is None or host == expected_host), 'snapshot_host')
@@ -371,6 +395,9 @@ def validate_snapshot(value, expected_host=None, now=None, require_fresh=True):
                      'error_counts')
         for error in row['recent_errors']:
             validate_error(error, value['checked_at'] - LOOKBACK * 60, value['checked_at'])
+    if value['schema'] == 2:
+        role = next(r for r, h in ROLE_HOST.items() if h == host)
+        runtime_library().validate(value['runtime'], role, value['checked_at'])
     need(len(encode(value)) <= MAX_SNAPSHOT, 'snapshot_byte_bound')
     return value
 
@@ -380,7 +407,7 @@ def read_snapshot(expected_host=None, now=None):
     return validate_snapshot(parsed(root_file(SNAPSHOT, MAX_SNAPSHOT, 0o640, gid)), expected_host, now)
 
 
-def collect(role, runner=bounded_command, now=None):
+def collect(role, runner=bounded_command, now=None, include_runtime=None):
     need(role in PROFILES, 'invalid_role')
     now = int(time.time()) if now is None else now
     profile = PROFILES[role]
@@ -422,6 +449,9 @@ def collect(role, runner=bounded_command, now=None):
             row.update(**errors[row['unit']], journal_status='observed', journal_truncated=truncated)
     except (DiagnosticError, OSError):
         pass
+    if include_runtime is True or (include_runtime is None and runner is bounded_command and Path('/etc/capstone-diagnostics/runtime.json').exists()):
+        value['schema'] = 2
+        value['runtime'] = runtime_library().collect(role, runner, now)
     return validate_snapshot(value, ROLE_HOST[role], now)
 
 

@@ -143,6 +143,7 @@ def hermes_extension_files():
         'infra/hermes/query-completion/' + name: 'plugins/groot-query-completion/' + name
         for name in ('__init__.py', 'plugin.yaml', 'alignment.py')} | {
         'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py',
+        'infra/hermes/gateway_health.py': 'plugins/groot-query-completion/gateway_health.py',
         'infra/hermes/chat_contract.py': 'plugins/groot-query-completion/chat_contract.py',
         'infra/hermes/read_contract.py': 'plugins/groot-query-completion/read_contract.py',
         'infra/hermes/SOUL.groot.md': 'plugins/groot-query-completion/soc_policy.md',

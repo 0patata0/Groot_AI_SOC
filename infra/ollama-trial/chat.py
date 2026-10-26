@@ -21,6 +21,14 @@ from urllib.parse import urlsplit
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from runtime import run as agent_run, load_config as agent_config
 import harness
+try:
+    import gateway_health
+except ModuleNotFoundError as exc:
+    if exc.name != 'gateway_health': raise
+    import importlib.util
+    _health_spec = importlib.util.spec_from_file_location('gateway_health', Path(__file__).resolve().parents[1] / 'hermes/gateway_health.py')
+    gateway_health = importlib.util.module_from_spec(_health_spec)
+    _health_spec.loader.exec_module(gateway_health)
 from policy import require
 from chat_policy import ID, KST, eligible, question_with_history, final_text
 
@@ -85,6 +93,7 @@ class Gateway:
         self.runtime = agent_config('/etc/capstone-ollama-trial/config.json')
         self.state = Path(state) if state else None
         self.wake = asyncio.Event()
+        self.worker_task = None
         self.db = None
         if self.state:
             self.db = sqlite3.connect(self.state / 'queue.sqlite')
@@ -278,12 +287,17 @@ class Gateway:
                     log('websocket_connected', bot='ollama', channel='soc-ollama')
                     if once:
                         return
-                    await self.catchup()
-                    async for raw in ws:
-                        event = json.loads(raw)
-                        if event.get('event') == 'posted':
-                            post = json.loads(event['data']['post'])
-                            await self.accept(post.get('id'))
+                    watcher = asyncio.create_task(gateway_health.ollama_watch(ws, self.state / 'health.json', self.worker_task))
+                    try:
+                        await self.catchup()
+                        async for raw in ws:
+                            event = json.loads(raw)
+                            if event.get('event') == 'posted':
+                                post = json.loads(event['data']['post'])
+                                await self.accept(post.get('id'))
+                    finally:
+                        watcher.cancel()
+                        with contextlib.suppress(asyncio.CancelledError): await watcher
             except Exception as exc:
                 if once:
                     raise
@@ -304,7 +318,7 @@ async def main_async(args):
             log('check_passed', posts_sent=0, model_requests=0)
         else:
             async with asyncio.TaskGroup() as group:
-                group.create_task(gateway.worker())
+                gateway.worker_task = group.create_task(gateway.worker())
                 group.create_task(gateway.listen())
 
 

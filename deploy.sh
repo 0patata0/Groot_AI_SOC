@@ -369,6 +369,25 @@ if [[ $OLLAMA_TRIAL_ENABLE == 1 ]]; then
     remote_role "$SIEM_HOST" siem trial-chat-verify
   fi
 fi
+# Independent A observer with fixed snapshot-only identities. Secret webhook
+# material travels directly between root endpoints, never into controller files.
+remote_role "$SECURITY_HOST" security monitor-configure
+remote_role "$SIEM_HOST" siem monitor-configure
+remote_role "$SERVICE_HOST" service monitor-configure
+remote_role "$SECURITY_HOST" security monitor-prepare |
+  remote_role "$SIEM_HOST" siem monitor-authorize > "$WORK/observer-b.json"
+remote_role "$SECURITY_HOST" security monitor-prepare |
+  remote_role "$SERVICE_HOST" service monitor-authorize > "$WORK/observer-c.json"
+python3 - "$WORK/observer-b.json" "$WORK/observer-c.json" <<'PYMON' |
+import json,pathlib,sys
+print(json.dumps([json.loads(pathlib.Path(p).read_bytes()) for p in sys.argv[1:]]))
+PYMON
+  remote_role "$SECURITY_HOST" security monitor-trust
+remote_role "$SIEM_HOST" siem monitor-export |
+  remote_role "$SECURITY_HOST" security monitor-activate
+remote_role "$SECURITY_HOST" security monitor-verify
+remote_role "$SIEM_HOST" siem monitor-verify
+remote_role "$SERVICE_HOST" service monitor-verify
 # Host management and the old default Docker bridge must not bypass the
 # dedicated lab guards. Preserve the authenticated controller's SSH source.
 remote_role "$SERVICE_HOST" service host-apply

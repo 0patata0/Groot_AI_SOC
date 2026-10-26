@@ -19,7 +19,7 @@ IDENTITY = Path('/etc/mcp/system-diagnostics/id_ed25519')
 KNOWN_HOSTS = Path('/etc/mcp/system-diagnostics/known_hosts')
 PROTOCOLS = ('2024-11-05', '2025-03-26', '2025-06-18')
 MAX_INPUT = 8192
-MAX_RESULT = 16384
+MAX_RESULT = 65536
 _library = None
 _queries = deque()
 _audits = deque()
@@ -126,7 +126,7 @@ def library():
 def tools():
     return [{
         'name': 'get_system_diagnostics',
-        'description': 'Read a fixed A/B/C systemd service snapshot: selected status/exit/restart fields and classified recent errors. '
+        'description': 'Read fixed A/B/C systemd and SOC runtime health snapshots. soc:coverage returns every target in one call, including missing evidence. Hermes, Ollama, Wazuh manager/indexer, Mattermost, model and collection have dedicated targets. '
             'Root collectors update every 60 seconds; this is not a live shell or raw journal reader. '
             'Quote observed_at_kst directly for KST time; do not mentally convert the epoch. '
             'returned_error_count counts only returned samples; requested_window_total_count is unknown. '
@@ -215,10 +215,16 @@ def query(value):
         _queries.popleft()
     d.need(len(_queries) < 30, 'query_rate_limit')
     _queries.append(now)
+    if target == 'soc:coverage':
+        return coverage(now)
     host = target[0]
     snapshot = d.read_snapshot('b', now) if host == 'b' else remote_snapshot(host, route_config())
     d.validate_snapshot(snapshot, host, now)
     checked = snapshot['checked_at']
+    if target not in snapshot['units']:
+        result = runtime_result(snapshot, target, now)
+        audit('observed', target)
+        return result
     row = snapshot['units'][target]
     since = now - minutes * 60
     errors = [item for item in row['recent_errors'] if item['at'] >= since][:limit]
@@ -248,6 +254,56 @@ def query(value):
         'mutation_performed': False}
     d.need(len(d.encode(result)) <= MAX_RESULT, 'result_bound')
     audit('observed', target)
+    return result
+
+
+def runtime_result(snapshot, target, now):
+    checked = snapshot['checked_at']
+    row = snapshot.get('runtime', {}).get(target)
+    return {'schema': 1, 'kind': 'runtime', 'target': target, 'host': snapshot['host'],
+        'observed_at_kst': datetime.fromtimestamp(checked, timezone(timedelta(hours=9))).isoformat(),
+        'age_seconds': max(0, now-checked), 'expires_at': snapshot['expires_at'],
+        **(row or {'status': 'unavailable', 'codes': ['runtime_not_configured'], 'metrics': {}, 'limits': []}),
+        'kind': 'runtime', 'mutation_performed': False, 'untrusted_evidence': True,
+        'lookback_scope': 'latest_snapshot_only_not_requested_history'}
+
+
+def coverage(now):
+    d = library();rows = {};hosts = {};config = None
+    try: config = route_config()
+    except (ValueError, OSError, KeyError): pass
+    def fetch(host):
+        try:
+            snapshot = d.read_snapshot('b', now) if host == 'b' else remote_snapshot(host, config)
+            return host, d.validate_snapshot(snapshot, host, now)
+        except (ValueError, OSError, KeyError, TypeError): return host, None
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=3) as pool: snapshots = dict(pool.map(fetch, ('a','b','c')))
+    for host, snapshot in snapshots.items():
+        hosts[host] = 'observed' if snapshot else 'unavailable'
+        for target in sorted(t for t in d.TARGETS if t.startswith(host + ':')):
+            if not snapshot:
+                rows[target] = {'kind': 'unknown', 'status': 'unavailable', 'codes': ['snapshot_unavailable']}
+            elif target in snapshot['units']:
+                item = snapshot['units'][target];p = item['properties']
+                # Inactive successful oneshots are not failed services. Missing
+                # optional legacy units remain explicitly absent, not healthy.
+                status = ('unavailable' if item['status'] != 'observed' else
+                    'not_installed' if p['LoadState'] == 'not-found' else
+                    'degraded' if p['ActiveState'] == 'failed' or p['Result'] not in (None,'success') else
+                    'ok' if p['ActiveState'] == 'active' or p['Type'] == 'oneshot' and p['Result'] == 'success' else 'degraded')
+                rows[target] = {'kind':'systemd', 'status':status, 'properties':p,
+                    'observed_at_kst': datetime.fromtimestamp(snapshot['checked_at'], timezone(timedelta(hours=9))).isoformat(),
+                    'journal_status':item['journal_status'], 'sample_error_count':item['error_observations']['count'],
+                    'error_count_scope':'bounded_four_hour_sample_not_current_fault'}
+            else: rows[target] = runtime_result(snapshot, target, now)
+    counts = {s:sum(r['status'] == s for r in rows.values()) for s in ('ok','degraded','unavailable','not_installed')}
+    result = {'schema':1, 'kind':'coverage', 'target':'soc:coverage', 'targets':rows, 'hosts':hosts,
+        'total_targets':len(rows), 'counts':counts, 'mutation_performed':False, 'untrusted_evidence':True,
+        'limits':['sampled_health_not_security_clearance','no_out_of_band_notification',
+                  'not_full_attack_detection_response_e2e','not_installed_requires_role_review']}
+    d.need(len(d.encode(result)) <= MAX_RESULT, 'result_bound')
+    audit('observed','soc:coverage')
     return result
 
 

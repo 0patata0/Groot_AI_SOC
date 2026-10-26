@@ -816,7 +816,7 @@ def proposal_read_reference(proposal):
     target = proposal["target"]
     reference = {"proposal_id": proposal["id"], "target": target}
     if isinstance(target, str) and target.startswith(("a:", "b:")):
-        prefix = "mcp__rule_write_" + target[0] + "__"
+        prefix = "mcp__rule_" + target[0] + "__"
         reference.update(status_tool=prefix + "get_rule_change_status",
                          target_tool=prefix + "get_rule_change_target")
     return reference

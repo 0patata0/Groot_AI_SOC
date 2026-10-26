@@ -10,6 +10,7 @@ import unittest
 from unittest import mock
 
 import soc_management_controller as m
+import soc_management_run as runner
 
 
 class Response:
@@ -709,9 +710,12 @@ class ControllerTests(unittest.TestCase):
                 prompt = m.prompt_for('policy', case, evidence)
                 current = json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n', 1)[1])['request']
                 for name in ('get_rule_change_status', 'get_rule_change_target'):
-                    self.assertEqual(current.count('mcp__rule_write_' + host + '__' + name), 2)
+                    tool = 'mcp__rule_' + host + '__' + name
+                    self.assertEqual(current.count(tool), 2)
+                    self.assertTrue(runner.allowed(tool, 'verify'))
                     other = 'b' if host == 'a' else 'a'
-                    self.assertNotIn('mcp__rule_write_' + other + '__' + name, current)
+                    self.assertNotIn('mcp__rule_' + other + '__' + name, current)
+                self.assertNotIn('mcp__rule_write_', current)
 
     def test_unknown_proposal_target_does_not_invent_a_registered_tool(self):
         for target in ('', 'c:rules', 'b', 'b__;sudo', None):

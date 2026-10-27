@@ -4,7 +4,8 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from soc_assessment import assess_event,tool_equivalent,ait_fields
+from datetime import datetime
+from soc_assessment import assess_event,tool_equivalent,ait_fields,kst_present
 
 
 class RequestedScopeTests(unittest.TestCase):
@@ -53,6 +54,33 @@ class RequestedScopeTests(unittest.TestCase):
         args=('failed-block-state-query','현재 차단 목록','조회 실패, 현재 미확인')
         self.assertEqual(self.event(*args,'저장소 오류로 조회가 실패했습니다. 현재 확인할 수 없습니다.')['issues'],[])
         self.assertIn('false_empty_block_state_after_query_failure',self.event(*args,'차단된 IP는 0개입니다.')['issues'])
+
+    def test_korean_date_is_equivalent_but_wrong_or_unlabelled_time_is_not(self):
+        when=datetime.fromisoformat('2022-02-06T10:47:31+00:00')
+        self.assertTrue(kst_present('KST 시각: 2022년 2월 6일 19:47:31 (UTC+9 기준)',when))
+        self.assertTrue(kst_present('2022년 2월 6일 19:47:31 (UTC+9 기준)',when))
+        self.assertFalse(kst_present('KST: 2022년 2월 6일 10:47:31',when))
+        self.assertFalse(kst_present('2022년 2월 6일 19:47:31',when))
+        self.assertFalse(kst_present('KST: 2022년 2월 30일 19:47:31',when))
+
+    def test_unknown_block_state_is_not_an_empty_list(self):
+        args=('failed-block-state-query','현재 차단 목록','조회 실패, 현재 미확인')
+        good='조회는 실패했습니다. 저장소 오류로 장비의 차단 상태 정보를 확인할 수 없습니다.'
+        self.assertEqual(self.event(*args,good)['issues'],[])
+        for bad in ('조회 실패했습니다. 차단 목록은 없습니다.', '차단 항목 없음', '차단된 IP는 0개입니다.'):
+            self.assertIn('false_empty_block_state_after_query_failure',self.event(*args,bad)['issues'])
+
+    def test_repeating_policy_is_not_evidence_of_a_failed_query(self):
+        value=self.event('failed-block-state-query','현재 차단 목록','조회 실패, 미확인',
+                         '미확인은 명시합니다. 도구 오류를 정상으로 판단하지 마세요.')
+        self.assertIn('actual_query_failure_requires_review',value['manual_review'])
+
+    def test_markdown_field_headings_preserve_values(self):
+        payload={'timestamp':'2022-02-06T10:47:31Z','rule':{'id':'20100','level':8},'phase_window':'network_scans'}
+        case={'messages':[{'role':'user','content':json.dumps(payload)}]}
+        text='### **rule.id**\n- `20100`\n### **level**\n- `8`\nKST: 2022-02-06 19:47:31\nnetwork_scans\n악성 확정 불가'
+        self.assertEqual(ait_fields(case,text),([],[]))
+        self.assertIn('level_missing_or_wrong',ait_fields(case,text.replace('`8`','`7`'))[0])
 
 
 if __name__=='__main__':unittest.main()

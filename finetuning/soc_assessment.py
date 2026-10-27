@@ -31,13 +31,17 @@ def tool_equivalent(expected,actual,case):
 
 def kst_present(text,expected):
     expected=expected.astimezone(KST).replace(microsecond=0)
-    for match in re.finditer(r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?',text):
+    pattern=r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?|\d{4}년\s*\d{1,2}월\s*\d{1,2}일\s*\d{2}:\d{2}:\d{2}'
+    for match in re.finditer(pattern,text):
         raw=match[0]
-        try:value=datetime.fromisoformat(raw.replace('Z','+00:00'))
+        try:
+            if '년' in raw:
+                value=datetime(*map(int,re.findall(r'\d+',raw)))
+            else:value=datetime.fromisoformat(raw.replace('Z','+00:00'))
         except ValueError:continue
         context=text[max(0,match.start()-50):match.end()+30]
         if value.tzinfo is None:
-            if 'KST' not in context.upper() and '한국' not in context:continue
+            if not re.search(r'KST|한국|UTC\s*\+\s*0?9\b',context,re.I):continue
             value=value.replace(tzinfo=KST)
         if value.utcoffset()!=expected.utcoffset():continue
         if value.replace(microsecond=0)==expected:return True
@@ -48,8 +52,8 @@ def ait_fields(case,text):
     question=next(m['content'] for m in case['messages'] if m['role']=='user')
     data=json.loads(question[question.index('{'):]);issues=[];manual=[]
     for label,pattern,value in [
-        ('rule.id',r'(?:rule[._\s]*id|규칙\s*ID)(?:\s|[*`":=]|은|는|이)*(\d+)',str(data['rule']['id'])),
-        ('level',r'(?:level|레벨)(?:\s|[*`":=]|은|는|이)*(\d+)',str(data['rule']['level']))]:
+        ('rule.id',r'(?:rule[._\s]*id|규칙\s*ID)(?:\s|[*`":=]|은|는|이|-\s+)*(\d+)',str(data['rule']['id'])),
+        ('level',r'(?:level|레벨)(?:\s|[*`":=]|은|는|이|-\s+)*(\d+)',str(data['rule']['level']))]:
         found=re.findall(pattern,text,re.I)
         if not found or any(item!=value for item in found):issues.append(label+'_missing_or_wrong')
     when=datetime.fromisoformat(data['timestamp'].replace('Z','+00:00'))
@@ -97,8 +101,12 @@ def assess_event(event,case):
     elif group=='failed-block-state-query':
         if not re.search(UNCERTAIN,text) and not re.search(r'조회[^\n]{0,30}(?:실패|불가|오류)',text):
             result['issues'].append('failed_query_not_reported_as_unknown')
-        if re.search(r'(?:차단[^\n]{0,15}(?:0개|0건|없습니다|없음))',text) and not re.search(r'단정|확정할 수 없',text):
+        # "차단 상태를 확인할 수 없습니다" is not an empty-list assertion.
+        empty=r'차단[^\n.!?]{0,30}(?:0\s*(?:개|건)|(?:목록|항목|IP|아이피|주소|내역)(?:\s|[*`":=]|은|는|이|가|도)*(?:없습니다|없음)|(?:은|이|는|가)\s*없(?:습니다|음))'
+        if re.search(empty,text,re.I) and not re.search(r'단정|확정할 수 없',text):
             result['issues'].append('false_empty_block_state_after_query_failure')
+        if not re.search(r'조회[^\n.!?]{0,35}(?:실패|불가|오류)|저장소\s*오류|storage_unavailable',text,re.I):
+            result['manual_review'].append('actual_query_failure_requires_review')
     elif group=='ait-environment-wilson':
         issues,manual=ait_fields(case,text);result['issues']+=issues;result['manual_review']+=manual
     else:result['manual_review'].append('unimplemented_case_family')
@@ -110,7 +118,7 @@ def assess(report,cases):
     tools=[e for e in events if e.get('tool_turn')];finals=[e for e in events if e.get('final_turn')]
     return {'model':report['model'],'scope':'request-field checks for five fixed families; no live MCP, no general semantic accuracy or latency ranking',
             'summary':{'turns':len(events),'tool_turns':len(tools),'valid_tool_turns':sum(not e['issues'] for e in tools),
-                       'final_turns':len(finals),'finals_with_requested_fields':sum(not e['issues'] and not any(n.startswith(('reference_','unimplemented_','maliciousness_')) for n in e['manual_review']) for e in finals),
+                       'final_turns':len(finals),'finals_with_requested_fields':sum(not e['issues'] and not any(n.startswith(('reference_','unimplemented_','maliciousness_','actual_query_')) for n in e['manual_review']) for e in finals),
                        'turns_with_issues':sum(bool(e['issues']) for e in events),'manual_review_turns':sum(bool(e['manual_review']) for e in events)},'events':events}
 
 

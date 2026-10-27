@@ -94,10 +94,32 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(cmd.count('--mount'),1)
 
     def test_tokenizer_and_download_have_no_gpu_access(self):
-        for stage in ('download','tokenize'):
+        for stage in ('download','tokenize','soc-tokenize'):
             cmd=thor_container.command('/tmp/training',stage,1000,1000)
             self.assertNotIn('--gpus',cmd)
         with self.assertRaises(ValueError):thor_container.command('/tmp/training','shell',1000,1000)
+
+    def test_soc_full_training_keeps_the_same_offline_boundary(self):
+        cmd=thor_container.command('/tmp/training','soc-train',1000,1000)
+        self.assertEqual(cmd[cmd.index('--network')+1],'none')
+        self.assertEqual(cmd[cmd.index('--memory')+1],'112g')
+        self.assertIn('HF_DEACTIVATE_ASYNC_LOAD=1',cmd)
+        self.assertNotIn('--privileged',cmd)
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);(root/'finetuning').mkdir()
+            config={'model_name_or_path':'fixture','revision':'a'*40}
+            (root/'finetuning/config.qwen36-thor.json').write_text(json.dumps(config))
+            for stage in ('prepare','download','tokenize','soc-tokenize'):
+                (root/f'{stage}-status.json').write_text('{"status":"completed"}')
+            (root/'soc-pilot-status.json').write_text('{"status":"failed"}')
+            (root/'base-manifest.json').write_text(json.dumps({'model':'fixture','revision':'a'*40,'verified':True}))
+            with patch.object(sys,'argv',['thor_container','soc-train','--root',str(root)]), \
+                 patch('thor_container.platform.system',return_value='Linux'), \
+                 patch('thor_container.platform.machine',return_value='aarch64'), \
+                 patch('thor_container.subprocess.run',return_value=SimpleNamespace(returncode=1,stdout='')), \
+                 patch('thor_container.subprocess.check_output') as docker:
+                with self.assertRaisesRegex(SystemExit,'SOC pilot'):thor_container.main()
+                docker.assert_not_called()
 
     def test_main_training_requires_completed_smoke_before_docker_launch(self):
         with tempfile.TemporaryDirectory() as directory:

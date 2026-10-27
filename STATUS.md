@@ -1,5 +1,15 @@
 # 인프라 현황 — 2026-10-27 현재 작업 상태
 
+## SOC 시험 완료·전체 1회 학습 시작 — 2026-10-27 19:43 KST
+
+**SOC 2-step+8-step 시험·어댑터 검증과 기존35B 추론 복구를 완료했다. 사용자가 본 학습·최대2시간 추론 중단/자동복구를 명시 승인해19:43:32 KST 별도 전체1회 학습을 시작했다.** 현재 전체 학습/모델 내보내기/운영 전환은 미완료다. Thor 저장 루트는 `~/Capstone_Groot_training/qwen36-20261027`이며 아래19:31의 실행 중 표기는 당시 이력이다.
+
+- **시험 실측:** smoke2step·validation8, pilot8step/16microbatch·validation44 모두 exit0/OOMKilled=false다. pilot train loss1.276117/eval0.934229·epoch0.0714286이며 서로 다른 평가 범위의 smoke loss와 직접 비교하지 않는다. 두 어댑터 각각380tensor finite/190 B행렬 nonzero·65,061,752B, pilot SHA `7df320788edc65718e79c65702686566cc0e4bb2c88eb2bd8e7d83474d96f6bf`. CUDA allocated peak69.20/reserved71.80GiB, 최저 host 가용41.87GiB. 19:40:30.697 기존35B 재적재·timer inactive 확인, 중단593.75초(9분53.75초)다. 이번 적재 중 NVRM 메모리 경고3건은 남았으며 global OOM kill0/정상 완료와 구분한다. 장기 안정성은 아직 검증하지 않았다.
+- **본 학습 범위:** `config.qwen36-soc-main.json`으로 같은 고정35B BF16/eager/r16, 길이1536·lr2e-5·batch1/accumulation2·train224prefix1epoch=112optimizerstep·validation44개를 사용한다. test52개는 학습하지 않는다. 별도 `outputs/soc-main/`에 저장하고 원본·pilot을 보존한다. 첫 step은 정상이며 초기 실측 예상은60~90분이다. 105분 작업 제한·110분 독립 호스트 복구 timer를 먼저 활성화했고12GiB host 가용 보호·성공/실패 즉시 원래35B 복구를 적용한다. 승인 범위를 넘어 자동 재시도하거나 봇 모델을 교체하지 않는다.
+- **Cisco 비교 결론:** Q4_K_M GGUF4,921,465,824B를 검증하고19:41:43 별도 `soc-foundation-sec:8b-instruct-q4km-20261027`로 등록했다. 현재 Ollama0.40.2의 show capability는completion뿐이며 실제 `/api/chat`이 `does not support tools`/HTTP400을 반환했다. 같은 gold-context8턴 중 도구 카탈로그 포함7턴은 거절됐고1턴은 응답했지만 UTC10:47을 KST10:47로 잘못 표시했다(정답19:47). 현 native MCP 봇의 대체 후보에서 제외하며 원래35B 설정을 유지한다. 다른 하네스의 일반 보안 지식 능력 전체를 평가한 것은 아니다. 원래35B의 자동53.75점에는 올바른 동의어/날짜 형식을 누락으로 본 예가 있어 정확도 우위의 정량 근거로 쓰지 않는다.
+- **검증/소스/Git:** 전체 단계도 network none·동일 제한을 유지하며 실패한pilot이면 본 학습을 거절한다. 로컬/Thor87검사 통과, 본 학습 준비5파일 SHA 일치·서버 전송tar 제거. 반입 묶음50member/14,472,066B 전체 원문 일치·자격/가중치/결과 제외를 확인하고 Mac 검사용tar를 제거했다. 앞선19공개파일은 `fd2302e5173833b071947ff93655c4600477272e`로 자동 게시·19:34:00 KST remote main 일치/clean 확인. 이번 본 학습 설정/문서 후속은 아직 미커밋이며 검증 뒤 자동 게시한다. SOC 서비스/권한/초기 설치 진입점은 유지하고 새 서버 전체 설치·실제 MCP/채팅/공격 E2E는 수행하지 않았다.
+- **다음:** 전체 학습 완료·새 경고/최종 어댑터·추론 복구 확인→정확 원본 병합/보조 가중치 보존·GGUF 변환→별도 모델 등록→동일 조건 평가. 현재 pilot만으로 SOC 정확도 향상을 주장하지 않는다. 학습 데이터/가중치/자격·대화/검증·업무분담은 Git 제외이고, Mac 이번 작업용 tar/helper는 해당 작업 마감 후 정리한다.
+
 ## SOC 학습 준비·Thor 저장 경로 변경 — 2026-10-27 19:31 KST
 
 사용자 지시로 Thor의 `~/capstone-training`을 **`~/Capstone_Groot_training`**으로 변경했다. 현재 작업 루트는 **`~/Capstone_Groot_training/qwen36-20261027`**이다. 기존 원본·venv·데이터·어댑터·실패 이력은 이동 보존했고 이전 경로 부재를 라이브 확인했다. 경로 변경 때문에 운영 Ollama를 중지하지 않았다. 아래 이전 경로는 당시 이력이다.

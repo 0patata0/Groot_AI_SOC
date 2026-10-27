@@ -1,6 +1,6 @@
 # thor-05용 Qwen3.6-35B 학습
 
-> **10/27 19:31 SOC 학습 후속:** Thor 저장 루트를 `~/Capstone_Groot_training/qwen36-20261027`로 변경하고 원본·기존 결과를 보존했다. 현37도구에 맞춘212대화(144/32/36)·전체 prefix224/44/52 토큰 검사를 완료했으며, 자동복구를 갖춘2-step+8-step 제한 시험과 Cisco8B GGUF 비교 준비를 진행 중이다. 본 전체 학습·학습 모델 등록/운영 교체·정확도 우위는 미완료다. [실측·현재 상태](../STATUS.md).
+> **10/27 19:43 SOC 본 학습 시작:** 저장 루트 `~/Capstone_Groot_training/qwen36-20261027` 변경·212대화 준비·SOC2-step/8-step 시험과 추론 복구를 완료했다. 사용자 최대2시간 중단/자동복구 승인으로224prefix 전체1회/112-step 학습을 시작했다. 로컬/Thor87검사 통과. Cisco8B는 등록됐으나 현재native 도구 호출 미지원·시각 오류로 대체 후보에서 제외했다. 전체 학습 완료·학습본 변환/등록·운영 교체는 미완료이며 [상세 현황](../STATUS.md)을 따른다.
 
 
 > **10/27 18:00 학습 재개 결과:** CPU 파일 참조 누적으로 발생한35B 적재 메모리 문제를 보완해 실제2-step·평가·어댑터 저장까지 완료했다. 380텐서 finite/190 B행렬 갱신,78검사 통과. 추론은약2분56초만에 원래35B로 복구했다. 본 학습·변환/등록·운영 교체·SOC 정확도 비교는 미실행이며,현SOC 자료 보완과 장기 학습 시간대 결정이 남는다. 아래 정지/0step은 당시 이력이다. [실측·잔여·Git](../STATUS.md).
@@ -148,3 +148,15 @@ python3 -B "$training_root/finetuning/thor_container.py" soc-pilot --root "$trai
 `soc_evaluate.py`는 native `/api/chat`에서 heldout 시나리오의 처음/마지막 assistant를 정답 도구 결과 이력과 함께 재생한다. 실제 MCP 실행·연속 자율 조사·승인/적용·채팅 전송은 하지 않는다. 누락70/필수 사실60, 미등록/보호 오호출100점 감점과 HTTP 실패0점을 기록하지만 문자열 판정에는 수동 의미 검토가 필요하다. 중간 턴 누락을 숨길 수 있는 gold-context 평가이므로 실제 에이전트 E2E를 대체하지 않는다.
 
 Cisco 비교본은 Qwen adapter가 아닌 별도 Llama계열8B다. 고정 원본/NOTICE·기반 Llama3.1 조건을 보존하고 기존 NGC 이미지에서 공식 llama.cpp `276378515ceebee5d14bcc8536603dd5c87491a2`를 CPU 전용으로 빌드한다. `convert_reference.py`가 BF16 GGUF→Q4_K_M 및 SHA를 기록하고 `reference_model.py`는 검증된 GGUF만 새 이름으로 등록한다. Thor Ollama0.40.2의 직접 safetensors import는 Q4_K_M 미지원/MLX 부재로 실패했으며 서비스를 교체하거나 MLX를 설치하지 않는다. 변환 의존성 sentencepiece0.2.1은 별도 작업 target에만 둔다. 기존 모델/봇 설정은 보존하고 등록·실제 추론·MCP/한국어 점수는 각각 검증한다.
+
+### 전체 SOC 1회 학습
+
+`config.qwen36-soc-main.json`은224train prefix/accumulation2의 전체1epoch(112step),44validation을 사용한다. pilot8step의 가중치에서 재개하지 않고 같은 고정 원본에 새 LoRA를 초기화한다. test는 사용하지 않는다. `soc-train`은 성공한pilot/전체토큰검사·원본 검증이 필요하고 별도 `outputs/soc-main/`에 기록한다. launcher는 추론을 중지하지 않으므로 공유 서버에서 자원/시간대와 독립 복구를 먼저 확보한다. 이번 운영자의 승인은 최대2시간이며105분 작업 제한·110분 독립 복구 timer·12GiB 보호를 적용했다. 일반 SOC LLM에 이 운영 권한을 위임하지 않는다.
+
+```bash
+# 승인된 시간대·복구/자원 준비가 끝난 Thor에서만:
+python3 -B "$training_root/finetuning/thor_container.py" soc-train --root "$training_root"
+python3 -B pack.py --config config.qwen36-soc-main.json --output <새 반입묶음 경로>
+```
+
+위 실행 예시를 현재 실행 중인 작업에 중복 적용하지 않는다. 전체 실행/드라이버/어댑터·복구·정확도 결과는 STATUS의 실제 완료 여부를 따른다.

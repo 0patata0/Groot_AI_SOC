@@ -27,3 +27,45 @@ AttackLM의 `permissive`는 기존 전처리 파일명이다. 위 라이선스�
 ## 2026-10-27 현행 도구 대조
 
 기존 공개 train18,872행의 구조화 호출19,230개는 현행 MCP 전체 이름과 일치0개였다. 모델별 새 학습 설정과 자료의 업무 적합성은 별개다. 현재 스키마 스냅샷·읽기 감사기는 [THOR_35B.md](THOR_35B.md)를 따르며 공개 원출처·라이선스/분할은 유지한다. 이름의 일괄 치환·현재상태 정답화·검수 없는 운영대화 편입은 수행하지 않았다.
+
+## 추가 학습자료·가중치 후보 조사 — 2026-10-27 KST
+
+사용자의 추가 자료 탐색 요청에 따라 원 제공자 카드·공개 미리보기를 확인했다. 아래 규모/라이선스/성능은 제공자 표기이며 전체 데이터 정답성·원본 파일 SHA·우리 tokenizer/37MCP 스냅샷·Thor/Ollama 호환 검증을 통과한 수치가 아니다. 후보 본문·가중치 다운로드, 계정 약관 동의, 패키지 설치, 학습·운영 모델 변경은 수행하지 않았다. 기존 corpus/분할·평가 제외 정책은 유지한다.
+
+### 새로 확인한 학습·평가 후보
+
+| 후보 | 제공자 규모/라이선스 | 이 프로젝트에서의 판단 |
+|---|---|---|
+| [Ko-Agent-Trajectories-1.0](https://huggingface.co/datasets/taejoon89/Ko-Agent-Trajectories-1.0) | SFT518,232 / robustness DPO33,323 / behavior DPO14,238 / eval9,936. 데이터CC-BY-4.0, 파이프라인Apache-2.0 | 한국어 다단계 호출·오류 복구 보조 후보. 제작자의Qwen3-8B 비사고모드 시험에서 과잉 확인 질문과 첫 호출 저하가 관측돼 전체 혼합은 권장하지 않는다. 행동 예시 검수·별도 평가 필요. 현재 학습기는 SFT이며 DPO쌍을 그대로 투입할 수 없다. |
+| [ko-agentic-sft](https://huggingface.co/datasets/waylake/ko-agentic-sft) | 2,369대화: action1,583/no-action786. Apache-2.0 | 불필요한 도구 호출 억제·빈 결과 처리의 소규모 보조 후보. 가상 도구 응답/자리표시 URL은 사실 근거로 쓰지 않는다. 문자열action·user역할의도구결과를 현재messages/tools 계약으로 변환·검수한다. |
+| [Primus-Instruct](https://huggingface.co/datasets/trendmicro-ailab/Primus-Instruct) | 보안496+일반339=835. ODC-BY | 경보 설명·의심 명령·보안 조회 쿼리에 가까운 우선 도메인 후보. HF계정 동의/접근권한이 필요한 gate가 현재도 존재한다. 이번에 동의·접근을 대신하지 않았다. |
+| [xLAM-60k](https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k) | 60,000예시/3,673API. CC-BY-4.0 | 기존 미반입 후보의 gate·출처를 재확인했다. 일반 호출 보조용이며 실제SOC판단/승인을 대체하지 않는다. query/tools/answers 구조 변환 및 기존자료 중복 확인 후 사용한다. |
+| [qwen3.5-functioncalling-v2](https://huggingface.co/datasets/Mustafaege/qwen3.5-functioncalling-v2) | 카드약225K·영/한. Apache-2.0표기 | Glaive+Saxo 재포장이다. 기존Glaive와 원천 중복이 있어 수량만 더하지 않는다. 문자열 호출/도구 결과 역할 변환·원천별 조건 재확인이 필요해 후순위다. |
+| [SOC-AgentBench](https://huggingface.co/datasets/alirezaaminzadeh/soc-agent-bench) | 120에피소드/12시나리오. Apache-2.0 | 이 프로젝트에서는 전체를 평가 전용으로 보류한다. Wazuh/Suricata 등 합성 로그와 별도7도구를 사용한다. 숨은 정답/금지행동을 모델 입력에 노출하지 않고 근거 누락·허위 관측·불필요 호출·무승인 행동을 채점한다. |
+| [FunctionChat-Bench](https://github.com/kakao/functionchat-bench) | 한국어 도구 사용 평가 자료 | 즉시 호출/추가 질문/불가능한 도구 요청 거절의 회귀 확인용. 학습 원천으로 편입하지 않는다. |
+
+[한국어ToolLLaMA 변환본](https://huggingface.co/datasets/gyung/toolllama-korean-function-calling)은1,524행(한국어762+영어762)이지만 원천이 `toolllama_G123_dfs_eval.json`으로 명시돼 학습 후보에서 제외한다. [ko-agentic-toolcall](https://huggingface.co/datasets/jungsanghyun/ko-agentic-toolcall)은 검색 카드에 규모가 나오지만 원본raw접근401/완전한라이선스를 확인하지 못해 미확인 후보로만 남긴다.
+
+### 이미 학습된 가중치·LoRA
+
+| 후보 | 확인한 제공자 정보 | 판단 |
+|---|---|---|
+| [Foundation-Sec-8B-Instruct](https://huggingface.co/fdtn-ai/Foundation-Sec-8B-Instruct) | Cisco공식보안특화Instruct,Llama3.1기반8B,영어지원·카드other/NOTICE는Cisco변경분Apache-2.0+기반Llama3.1조건 | 경보해석의별도비교1순위. 현Qwen의LoRA가아니며독립모델로평가한다. 한국어·MCP호출·Ollama실적재/속도와전체라이선스조건검토는후속이다. |
+| [Foundation-Sec-8B-Reasoning](https://huggingface.co/fdtn-ai/Foundation-Sec-8B-Reasoning) | Cisco공식보안추론8B,영어지원·카드other/NOTICE는Cisco변경분Apache-2.0+기반Llama3.1조건 | 복합사건판단비교후보. 추론토큰이응답지연에미치는영향을측정해야하며8B라는이유만으로35B보다빠르거나정확하다고판정하지않는다. |
+| [Llama-Primus-Merged](https://huggingface.co/trendmicro-ailab/Llama-Primus-Merged) | TrendMicro공식보안코퍼스학습+Llama3.1-8B계열병합,카드MIT | 보안지식/트리아지의별도비교후보. 기반Llama조건과모델파일고지확인후반입한다. 한국어·현MCP·정확도우위는자체미검증이다. |
+| [CyberStrike-OffSec-35B](https://huggingface.co/oyildirim/CyberStrike-OffSec-35B) | 같은Qwen3.6-35B-A3B계열의merged+adapter revision. 공격용 하네스300예시 학습,라이선스표기other | 우리MCP와 다른 실행 체계다. 모델 이름이 같아도 base commit·adapter 대상/shape·tokenizer·보호승인·Ollama 변환을 확인해야 한다. 제작자24상황평가에서도 구조화 호출은base22→후보18로 일부퇴보했다. 검증 없는 대체/병합 후보로 추천하지 않는다. |
+| [Qwen3.6-35B-A3B-RFT](https://huggingface.co/shaneMattner/Qwen3.6-35B-A3B-RFT) | 같은모델계열의BF16 merged,코딩train1,616/val180. Apache-2.0 | SOC전용학습이 아니다. 제작자비교의base4bit/후보6bit조건이달라학습효과를분리하지못했다. 비교연구후순위,현재SOC우위근거없음. |
+
+Cisco 두 후보의 [Instruct NOTICE](https://huggingface.co/fdtn-ai/Foundation-Sec-8B-Instruct/blob/main/NOTICE.md) · [Reasoning NOTICE](https://huggingface.co/fdtn-ai/Foundation-Sec-8B-Reasoning/blob/main/NOTICE.md)도 직접 확인했다. Cisco 변경분의 Apache-2.0만으로 기반 Llama3.1 조건을 생략하지 않는다.
+
+공식Cisco의1.1-Instruct발표는찾았으나해당HF경로는열리지않아이번다운로드가능후보로확정하지않았다.
+
+이는제공자카드조사이며새모델적재/어댑터shape대조/자체A/B를실행한것이아니다. 다른base의LoRA를현재35B에곧바로합칠수있다고판정하지않는다.
+
+### 보유 자료와 권장 선별 순서
+
+기존 `preparation_summary.json`은원입력120,917행중구조검사/중복제외후적격106,511행,소스별5,000상한을거쳐최종20,784행을기록한다. 이숫자는이번에전체본문을재검사한결과가아니다. `datasets/processed/`의기존5개대화입력과AIT분할/SALAD train/ATT&CK방어자료,raw ToolACE경로의존재를직접확인했다. 현재학습에는AIT경보·SALAD CSV·지식자료가자동포함되지않았다.
+
+권장순서: (1) 보유AIT/Wazuh·Suricata경보+실제성공/실패SOC요청을현행도구스키마에맞춰검수한trajectory, (2) Primus방어과제또는보유ATT&CK/CAR/RE&CT근거로작성·검수한경보설명, (3) 한국어보조자료의소량선별이다. 공개가상응답이나과거운영상태를현재사실로외우게하지않는다. 짧은질문의FW/IDS/WAF대상선택,모든요청항목조회,증거불충분/도구장애,승인전변경금지,적용/원복/사후검증,UTC/KST중복변환금지를필수축으로둔다.
+
+원천·같은사건·번역쌍·질문변형단위로분할하고기존test및외부벤치를학습에서제외한다. 현MCP는보관스냅샷37도구(읽기28/보호9)기준이며반입전실제계약을다시대조한다. 소스별상한만해제하거나수십만행을추가하는것보다스키마/근거/누락검수와새사건평가를먼저수행한다. 선별·전처리·반입·GPU학습·정확도평가는모두다음단계이며이번조사완료와구분한다.

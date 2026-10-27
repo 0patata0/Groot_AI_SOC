@@ -69,3 +69,9 @@ Cisco 두 후보의 [Instruct NOTICE](https://huggingface.co/fdtn-ai/Foundation-
 권장순서: (1) 보유AIT/Wazuh·Suricata경보+실제성공/실패SOC요청을현행도구스키마에맞춰검수한trajectory, (2) Primus방어과제또는보유ATT&CK/CAR/RE&CT근거로작성·검수한경보설명, (3) 한국어보조자료의소량선별이다. 공개가상응답이나과거운영상태를현재사실로외우게하지않는다. 짧은질문의FW/IDS/WAF대상선택,모든요청항목조회,증거불충분/도구장애,승인전변경금지,적용/원복/사후검증,UTC/KST중복변환금지를필수축으로둔다.
 
 원천·같은사건·번역쌍·질문변형단위로분할하고기존test및외부벤치를학습에서제외한다. 현MCP는보관스냅샷37도구(읽기28/보호9)기준이며반입전실제계약을다시대조한다. 소스별상한만해제하거나수십만행을추가하는것보다스키마/근거/누락검수와새사건평가를먼저수행한다. 선별·전처리·반입·GPU학습·정확도평가는모두다음단계이며이번조사완료와구분한다.
+
+## SOC 선별 실행 — 2026-10-27 KST
+
+후보 조사 뒤 현37MCP 계약을19:05:50 KST 재조회하고 검수 합성100대화와 기존 AIT 공개 실습 경보의 사실 추출112대화를 별도 준비했다. AIT 출처는 [AIT Alert Data Set](https://zenodo.org/records/8263181), CC-BY-4.0이며 각 원본파일/선택행 SHA를 로컬 manifest에 보존한다. rule.id·level·KST 시각·phase_window만 근거로 삼고 공격 시간대를 개별 경보의 악성 정답으로 확장하지 않는다. 여섯 환경 train72, wheeler validation20, wilson test20으로 분리했다. 합성100건은72/12/16으로 시나리오별 분리하며 injection·조회실패·KST 등의 미사용 평가를 둔다. 실제 운영 사건/사람 전수 검수 자료가 아니며 외부 한국어 대규모 corpus는 이번에 추가 반입하지 않았다.
+
+최종 train144/validation32/test36대화(assistant prefix224/44/52), 길이1536에서 초과·정렬 오류0. `soc_dataset.py`가 실제 도구 인자/연결·명시 검수 출처·필수 사실·시나리오 및 첫 질문 중복을 검사한다. test 기반 재설계 시 새 독립 평가셋이 필요하다. 소스 cases·데이터·manifest는 로컬과 Thor `~/Capstone_Groot_training/qwen36-20261027/finetuning/`에 보존하고 Git에 추가하지 않는다. Cisco8B 고정 가중치는 Thor에만 내려받았으며 Qwen에 혼합하거나 LoRA로 적용하지 않는다. 최신 학습/비교 완료 여부는 [STATUS](../STATUS.md)를 따른다.

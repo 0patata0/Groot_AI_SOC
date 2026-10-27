@@ -8,20 +8,20 @@ import subprocess
 from download_model import verify_artifact
 
 IMAGE = 'nvcr.io/nvidia/pytorch@sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb'
-STAGES = ('prepare','download','tokenize','smoke','train')
+STAGES = ('prepare','download','tokenize','smoke','train','soc-tokenize','soc-smoke','soc-pilot')
 
 
 def command(root, stage, uid, gid):
     if stage not in STAGES: raise ValueError('Unknown stage')
     root = Path(root).resolve()
-    training = stage in ('smoke','train')
+    training = stage in ('smoke','train','soc-smoke','soc-pilot')
     env = {'PYTHONDONTWRITEBYTECODE':'1','PIP_NO_CACHE_DIR':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1',
            'HF_HUB_DISABLE_TELEMETRY':'1','HF_HUB_DISABLE_PROGRESS_BARS':'1','HF_HOME':'/workspace/hf-cache',
            'HF_HUB_DISABLE_IMPLICIT_TOKEN':'1',
            'XDG_CACHE_HOME':'/workspace/runtime-cache','TRITON_CACHE_DIR':'/workspace/runtime-cache/triton',
            'TOKENIZERS_PARALLELISM':'false','CUDA_VISIBLE_DEVICES':'0','TZ':'Asia/Seoul',
            'PIP_CONSTRAINT':'/workspace/vendor-constraints.txt'}
-    if stage in ('tokenize','smoke','train'): env.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
+    if stage not in ('prepare','download'): env.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     if training: env['HF_DEACTIVATE_ASYNC_LOAD']='1'
     args = ['docker','run','-d','--pull=never','--name','capstone-qwen36-'+stage,
             '--user',f'{uid}:{gid}','--cap-drop','ALL','--security-opt','no-new-privileges',
@@ -52,7 +52,7 @@ def main():
     if args.stage != 'prepare':
         for stage in ['prepare'] + ([] if args.stage in ('download','tokenize') else ['download','tokenize']):
             if json.loads((root/f'{stage}-status.json').read_text())['status']!='completed':raise SystemExit('Prerequisite stage incomplete')
-    if args.stage in ('tokenize','smoke','train'):
+    if args.stage not in ('prepare','download'):
         manifest=json.loads((root/'base-manifest.json').read_text())
         config=json.loads((root/'finetuning/config.qwen36-thor.json').read_text())
         if manifest.get('revision')!=config['revision'] or manifest.get('model')!=config['model_name_or_path']:
@@ -64,6 +64,10 @@ def main():
             raise SystemExit('Pinned base artifacts are not verified')
     if args.stage == 'train' and json.loads((root/'smoke-status.json').read_text())['status']!='completed':
         raise SystemExit('Successful smoke stage required')
+    if args.stage == 'soc-pilot' and json.loads((root/'soc-smoke-status.json').read_text())['status']!='completed':
+        raise SystemExit('Successful SOC smoke stage required')
+    if args.stage in ('soc-smoke','soc-pilot') and json.loads((root/'soc-tokenize-status.json').read_text())['status']!='completed':
+        raise SystemExit('Successful SOC tokenization required')
     print(subprocess.check_output(command(root,args.stage,os.getuid(),os.getgid()),text=True).strip())
 
 

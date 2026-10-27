@@ -1,0 +1,10 @@
+{
+  "model_name_or_path": "fdtn-ai/Foundation-Sec-8B-Instruct",
+  "revision": "aa13cb996e7fc700e7efd6b7367992f14cf349c0",
+  "purpose": "independent evaluation only; not an adapter for Qwen",
+  "ollama_model": "soc-foundation-sec:8b-instruct-q4km-20261027",
+  "quantization": "Q4_K_M",
+  "gguf_file": "foundation-sec-8b-q4_k_m.gguf",
+  "num_ctx": 8192,
+  "license_notice": "Cisco modifications Apache-2.0; underlying Llama 3.1 Community License"
+}

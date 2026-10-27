@@ -1,5 +1,8 @@
 # thor-05용 Qwen3.6-35B 학습
 
+> **10/27 19:31 SOC 학습 후속:** Thor 저장 루트를 `~/Capstone_Groot_training/qwen36-20261027`로 변경하고 원본·기존 결과를 보존했다. 현37도구에 맞춘212대화(144/32/36)·전체 prefix224/44/52 토큰 검사를 완료했으며, 자동복구를 갖춘2-step+8-step 제한 시험과 Cisco8B GGUF 비교 준비를 진행 중이다. 본 전체 학습·학습 모델 등록/운영 교체·정확도 우위는 미완료다. [실측·현재 상태](../STATUS.md).
+
+
 > **10/27 18:00 학습 재개 결과:** CPU 파일 참조 누적으로 발생한35B 적재 메모리 문제를 보완해 실제2-step·평가·어댑터 저장까지 완료했다. 380텐서 finite/190 B행렬 갱신,78검사 통과. 추론은약2분56초만에 원래35B로 복구했다. 본 학습·변환/등록·운영 교체·SOC 정확도 비교는 미실행이며,현SOC 자료 보완과 장기 학습 시간대 결정이 남는다. 아래 정지/0step은 당시 이력이다. [실측·잔여·Git](../STATUS.md).
 
 > **2026-10-27 16:23 일시정지:** 원본39파일·71.93GB의 checksum과 실토큰 검사는 완료했다. 실제35B 시험은 가중치 적재 중 global OOM으로 실패해 optimizer0/2step이며, 기존 Ollama/35B는약81.4초만에 복구했다. 학습 대기 작업과 복구 timer는 종료됐고 사용자 요청으로 추가 수정/재시험을 중지했다. 아래 실행 준비 이력과 구분하며 [STATUS](../STATUS.md)의 재개 지점을 따른다.
@@ -66,10 +69,10 @@ Thor의 `capacity_check`는 `MemAvailable`과 컨테이너 cgroup 잔여 한도�
 
 이 PyTorch의 `grouped_mm`는 SM90만 지원해 Thor SM110에서 실제 실패했다.35B 설정/학습·병합 로더에 `experts_implementation="eager"`를 명시한다. 축소 랜덤40층 구조에서 full attention40/DeltaNet150·LoRA gradient380개·finite loss/gradient·optimizer 갱신을 확인했다. 이는 전체35B의 정확도/성능 검증이 아니다. DeltaNet은 추가 커널 없는 PyTorch 경로를 사용한다.
 
-학습 작업 폴더는 `~/capstone-training/qwen36-20261027`이며 소스/데이터·venv·base·manifest·stage log/status·outputs를 보존한다. 아래 명령은 Thor에서만 실행한다. 이미 완료/실행 중인 단계를 중복 실행하면 거절한다.
+학습 작업 폴더는 `~/Capstone_Groot_training/qwen36-20261027`이며 소스/데이터·venv·base·manifest·stage log/status·outputs를 보존한다. 아래 명령은 Thor에서만 실행한다. 이미 완료/실행 중인 단계를 중복 실행하면 거절한다.
 
 ```bash
-training_root="$HOME/capstone-training/qwen36-20261027"
+training_root="$HOME/Capstone_Groot_training/qwen36-20261027"
 python3 -B "$training_root/finetuning/thor_container.py" prepare --root "$training_root"
 python3 -B "$training_root/finetuning/thor_container.py" download --root "$training_root"
 python3 -B "$training_root/finetuning/thor_container.py" tokenize --root "$training_root"
@@ -126,3 +129,22 @@ python3 -B pack.py --config config.qwen36-thor.json \
 이전 준비 단계61개 표준 라이브러리 검사 통과, 두 설정의 데이터/행 수·SHA 검사, shell 구문·Mac 설치 거절 검사, 실서버 Jinja로 공식35B 서식의3가지 대화 prefix/문자 마스킹 경계 확인. Jinja 검사는 실제 토크나이저 ID/모델 적재/학습 검사가 아니다. 후속 실행 단계에서 GPU 환경/패키지 검사·축소 구조 LoRA 역전파를 확인했고 전체 원본 다운로드/실토큰 검사를 진행 중이다. 전체35B 적재·2-step/본 학습·병합/실모델 비교·운영 반영은 미실행이다. [최신 현황](../STATUS.md).
 
 2026-10-27 15:13:56 실토큰 전분할 검사: train44,774 prefix 중35,253개, validation2,793중1,583개, test2,264중1,546개 허용. 길이초과 제외는 각각9,521/1,210/718개이며 prefix 정렬 오류0이다. 로컬/Thor71검사 통과. 추가 축소 랜덤 모델의 실제 Trainer2step·평가·어댑터 저장 통합 검증까지 성공했고 임시 랜덤 가중치는 제거했다. 전체35B 결과는 [STATUS](../STATUS.md)를 따른다.
+
+## 현 SOC 전용 제한 시험 — 2026-10-27 KST
+
+`config.qwen36-soc.json`은 같은 고정35B/BF16/eager/r16을 사용하며 길이1536·학습률2e-5·pilot8step/accumulation2다. 기존20,784행과30B 설정을 덮어쓰지 않는다. `soc_dataset.py`로 검수 source case의 도구/인자·출처·필수 사실·시나리오 분할을 검사해 별도212대화를 준비했다. 자료는 Git 제외이므로 clone만으로 재생성되지 않는다. 에이전트 검수 합성100건과 AIT 추출112건이며 실제 승인된 운영 동작의 기록이라고 주장하지 않는다.
+
+```bash
+training_root="$HOME/Capstone_Groot_training/qwen36-20261027"
+# 같은 단계/출력의 재실행은 거절한다. 먼저 기록과 실행 중 작업을 확인한다.
+python3 -B "$training_root/finetuning/thor_container.py" soc-tokenize --root "$training_root"
+# 공유 추론 중단/독립 복구 timer·시간대·자원 확보는 운영자가 별도로 관리한다.
+python3 -B "$training_root/finetuning/thor_container.py" soc-smoke --root "$training_root"
+python3 -B "$training_root/finetuning/thor_container.py" soc-pilot --root "$training_root"
+```
+
+`pilot`은224개 train prefix 전체 epoch가 아니다. 평가에는44개 validation prefix를 모두 사용하며 test52개를 학습/validation에 합치지 않는다. 단기 결과의 loss 감소를 SOC 누락 해결이나 운영 적합성으로 해석하지 않는다. `pack.py --config config.qwen36-soc.json --output <새 파일>`은 공개 실행 소스와 로컬 SOC 원본/분할을 명시 목록으로 묶고 가중치/자격/결과는 제외한다.
+
+`soc_evaluate.py`는 native `/api/chat`에서 heldout 시나리오의 처음/마지막 assistant를 정답 도구 결과 이력과 함께 재생한다. 실제 MCP 실행·연속 자율 조사·승인/적용·채팅 전송은 하지 않는다. 누락70/필수 사실60, 미등록/보호 오호출100점 감점과 HTTP 실패0점을 기록하지만 문자열 판정에는 수동 의미 검토가 필요하다. 중간 턴 누락을 숨길 수 있는 gold-context 평가이므로 실제 에이전트 E2E를 대체하지 않는다.
+
+Cisco 비교본은 Qwen adapter가 아닌 별도 Llama계열8B다. 고정 원본/NOTICE·기반 Llama3.1 조건을 보존하고 기존 NGC 이미지에서 공식 llama.cpp `276378515ceebee5d14bcc8536603dd5c87491a2`를 CPU 전용으로 빌드한다. `convert_reference.py`가 BF16 GGUF→Q4_K_M 및 SHA를 기록하고 `reference_model.py`는 검증된 GGUF만 새 이름으로 등록한다. Thor Ollama0.40.2의 직접 safetensors import는 Q4_K_M 미지원/MLX 부재로 실패했으며 서비스를 교체하거나 MLX를 설치하지 않는다. 변환 의존성 sentencepiece0.2.1은 별도 작업 target에만 둔다. 기존 모델/봇 설정은 보존하고 등록·실제 추론·MCP/한국어 점수는 각각 검증한다.

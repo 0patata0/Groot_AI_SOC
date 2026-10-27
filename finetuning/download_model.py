@@ -34,7 +34,7 @@ def download(config, destination):
         revision=config['revision'], files_metadata=True)
     if info.sha != config['revision']:
         raise ValueError('Resolved base revision does not match the pinned commit')
-    patterns = ('*.json', '*.jinja', '*.safetensors', '*.txt', '*.model', 'LICENSE*', 'README.md')
+    patterns = ('*.json', '*.jinja', '*.safetensors', '*.txt', '*.model', 'LICENSE*', 'NOTICE*', 'README.md')
     files = []
     for item in info.siblings:
         if not any(fnmatch.fnmatch(item.rfilename, p) for p in patterns):

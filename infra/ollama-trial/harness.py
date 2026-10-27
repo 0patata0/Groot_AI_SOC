@@ -42,7 +42,36 @@ SYSTEM_PROMPT = CONTRACT.system_prompt()
 def normalized(question):
     # Only classification: original user instructions still go to the model.
     text = re.sub(r'^\[비교시험 Q\d+\]\s*', '', question)
-    return READ.without_prohibitions(SHARED._unquoted_text(text))
+    return CONTRACT.normalize_query_text(READ.without_prohibitions(SHARED._unquoted_text(text)))
+
+
+def rule_scope_request(question):
+    if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):
+        return None
+    text = READ.scope_text(normalized(question))
+    if READ.wants_write(text):
+        return None
+    return CONTRACT.rule_scope_request(text)
+
+
+def scope_notice(question):
+    """Scope/capability explanation only; never an observation or tool result."""
+    request = rule_scope_request(question)
+    if not request:
+        return None
+    if request['ambiguous']:
+        return ('어느 장비의 규칙을 볼까요? FW(네트워크 방화벽), WAF, IDS(Suricata), Wazuh 중 '
+                '대상을 알려주세요. 아직 조회하지 않았습니다.')
+    if request['basic_only'] and 'FW' not in request['devices']:
+        return ('요청하신 기본·내장 규칙 전체는 현재 커스텀 파일 조회 도구로 확인할 수 없습니다. '
+                '커스텀 규칙을 기본 규칙 대신 표시하지 않았습니다. 기본 룰 목록은 미조회·미확인입니다.')
+    if request['devices'] == ['FW']:
+        return ('FW(네트워크 방화벽) 규칙 조회 요청으로 이해했습니다.\n'
+                '현재 이 조회 경로에는 전체 nftables/iptables 규칙을 읽는 도구가 구현되어 있지 않아 '
+                '기본 정책·허용/차단 규칙·NAT를 확인하지 못했습니다. '
+                'list_blocks는 봇의 임시 차단 목록만 제공하며 전체 FW 규칙을 대신하지 못합니다.\n'
+                '조회 미완료이며 규칙이 없다는 뜻은 아닙니다.')
+    return None
 
 
 def read_plan(question):
@@ -126,6 +155,11 @@ def rule_detail_report(request, calls):
 
 
 def read_report(question, calls):
+    notice = scope_notice(question)
+    if notice: return notice
+    scope = rule_scope_request(question)
+    if scope and 'FW' in scope['devices']:
+        return scope_notice('FW 룰') + '\n\n' + (inventory(question, calls) or '나머지 요청 대상도 아직 미조회입니다.')
     detail = rule_detail_request(question)
     if detail: return rule_detail_report(detail, calls)
     combined = combined_rule_request(question)
@@ -160,16 +194,25 @@ def ids_runtime_question(question):
 
 def _inventory_question(question):
     text = rule_scope_text(question)
+    request = rule_scope_request(question)
+    if scope_notice(question): return None
+    if request and 'FW' in request['devices']:
+        selected = [d for d in request['devices'] if d != 'FW']
+        return ('현재 적용된 규칙 목록 보여줘 ' + ' '.join(selected)
+                + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
+                + (' SHA-256' if re.search(r'SHA|해시', text, re.I) else '')) if selected else None
     if ids_runtime_question(question): return None
     if re.search(r'설명|레벨|심각도|메시지|탐지\s*조건|(?<![A-Za-z_])(?:level|description|severity|msg)(?![A-Za-z_])|\b(?:ID|SID)\s*[:=]?\s*[0-9]+', text, re.I):
         return None  # Specific fields/IDs must not become a whole-file count table.
     if re.search(r'왜|원인|차이|변경|수정|차단|삭제|추가|적용해|재시작|원문|전문|분석', text):
         return None
     if '비교' in text and not re.search(r'(?:개수|정의\s*수).{0,12}비교|비교.{0,12}(?:개수|정의\s*수)', text): return None
-    if not (re.search(r'룰|규칙|rules?', text, re.I) and re.search(r'조회|보여|개수|목록|장비별|몇', text)):
+    if not (re.search(r'룰|규칙|rules?', text, re.I) and re.search(r'조회|보여|출력|개수|목록|장비별|몇', text)):
         return None
     devices = [label for pattern, label in [('WAF|ModSecurity', 'WAF'),
                (r'(?<![A-Za-z])IDS(?![A-Za-z])|Suricata', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]
+    if request and request['devices']:
+        devices = request['devices']
     return ('현재 적용된 규칙 목록 보여줘 ' + ' '.join(devices)
             + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
             + (' SHA-256' if re.search(r'(?<![A-Za-z])SHA(?:-?256)?(?![A-Za-z0-9])|해시', text, re.I) else ''))
@@ -211,7 +254,14 @@ def linked_rows(calls):
 
 def inventory(question, calls, **kwargs):
     request = inventory_question(question)
-    return SHARED.render_rule_inventory(request, linked_rows(calls), **kwargs) if request else None
+    rendered = SHARED.render_rule_inventory(request, linked_rows(calls), **kwargs) if request else None
+    scope = rule_scope_request(question)
+    if isinstance(rendered, str) and scope and not scope['custom_only']:
+        rendered = ('**조회 범위: 커스텀 파일만 확인**\n기본·내장 규칙과 엔진 전체 적재 목록은 '
+                    '이 조회에 포함되지 않아 전체 룰 확인은 미완료입니다.\n\n' + rendered)
+        if not scope['devices']:
+            rendered = 'FW(네트워크 방화벽) 전체 규칙도 현재 조회 도구 범위 밖이라 미확인입니다.\n\n' + rendered
+    return rendered
 
 
 def facts_for(calls):
@@ -463,7 +513,7 @@ def guidance(question):
     if combined_rule_request(question):
         result += '\n이 요청에는 규칙 파일 목록과 IDS 구동 경로라는 두 조회가 있습니다. get_rule_change_target의 모든 요청 파일과 rule-a.get_service_action_target(a:suricata)를 각각 선택하세요. 한쪽만 완료한 것을 전체 완료로 보고하지 마세요.'
     if inventory_question(question):
-        result += '\n이번 규칙 목록은 요청한 장비의 파일을 빠짐없이 조회하세요. 장비 미지정이면 WAF/IDS/Wazuh 세 파일 모두입니다.'
+        result += '\n명시한 장비만 조회하세요. 이 도구는 커스텀 파일 조회이며 기본 룰·전체 적재 확인이 아닙니다. 전체 요청이면 미조회 범위를 먼저 밝히세요.'
     if tool_scope(question):
         result += '\n현재 상태를 답할 근거가 아직 없습니다. 첫 응답에서 제공된 읽기 도구를 실제로 호출하세요. 도구 설명이나 예시 숫자를 조회 결과로 제시하지 마세요.'
     return result
@@ -509,6 +559,7 @@ def diagnostic_scope(question, targets):
 
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    if scope_notice(question): return set()
     detail = rule_detail_request(question)
     if detail: return {'mcp__rule_'+t[0]+'__get_rule_change_target' for t in detail['targets']}
     if diagnostic_request(question):
@@ -557,6 +608,13 @@ def inventory_tool_scope(request):
 
 
 def missing_reads(question, calls, diagnostic_targets=()):
+    request = rule_scope_request(question)
+    if request and 'FW' in request['devices']:
+        other = [d for d in request['devices'] if d != 'FW']
+        return ['FW 전체 규칙(기본 정책·NAT 포함): 조회 도구 미구현'] + (
+            missing_reads('현재 커스텀 규칙 목록 보여줘 ' + ' '.join(other), calls, diagnostic_targets) if other else [])
+    if request and request['basic_only']:
+        return ['기본·내장 규칙 전체: 현재 커스텀 조회 도구 범위 밖']
     detail = rule_detail_request(question)
     if detail:
         verified = rule_detail_values(detail,calls)

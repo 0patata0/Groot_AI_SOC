@@ -208,7 +208,7 @@ class Dispatcher:
             if future.done():
                 report = future.result()
                 # Retain bounded audit facts, without exposing raw tool bodies in chat.
-                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'structured_scope_complete') if k in report}
+                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'structured_scope_complete', 'scope_resolution', 'unqueried') if k in report}
                 summary['calls'] = [{k: c[k] for k in ('server', 'name', 'is_error', 'is_write', 'result_sha256') if k in c} for c in report.get('calls', [])]
                 with self.db:
                     self.db.execute("UPDATE jobs SET result=?,status='delivery' WHERE id=?", (json.dumps(summary, ensure_ascii=False), jid))

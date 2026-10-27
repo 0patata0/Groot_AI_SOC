@@ -233,6 +233,12 @@ def request_wrapper(original, query, harness):
         idx = next((i for i in range(len(rows) - 1, -1, -1) if isinstance(rows[i], dict)
                     and rows[i].get('role') == 'user' and rows[i].get('content') == kw.get('original_user_message')), -1)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload) if idx >= 0 else []
+        notice = harness.scope_notice(request)
+        if notice and not calls:
+            agent._capstone_read_selection = None
+            agent._capstone_query_completion_local_format = (turn, notice)
+            agent._capstone_alignment_partial = True
+            return result
         prior = prior_read_report(request, rows, idx, query, harness) if idx >= 0 else None
         if not calls and (prior or harness.reuse_only(request)):
             agent._capstone_read_selection = None
@@ -387,6 +393,10 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         if type(idx) is not int or idx < 0 or idx >= len(rows) or rows[idx].get("content") != user:
             return legacy(agent, **kw)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload)
+        notice = harness.scope_notice(request)
+        if notice and not calls:
+            agent._capstone_alignment_partial = True
+            return original(agent, **query._with_final_text(kw, notice))
         targets = getattr(agent, "_capstone_alignment_diagnostic_targets", ())
         policy = getattr(agent, '_capstone_policy_definition', None)
         if policy and policy[0] == getattr(agent, '_current_turn_id', None) and not calls:

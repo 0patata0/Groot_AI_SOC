@@ -20,6 +20,7 @@ class Harness:
     inventory_question = staticmethod(lambda s: False)
     ids_runtime_question = staticmethod(lambda s: False)
     rule_detail_request = staticmethod(lambda s: None)
+    scope_notice = staticmethod(lambda s: None)
 
 
 class API:
@@ -213,6 +214,26 @@ class Tests(unittest.TestCase):
         self.assertFalse(p.uncertain({'status':'completed','structured_scope_complete':True,
                                      'final_response':'실행 중입니다. SID별 적재는 미확인입니다.'}))
         self.assertTrue(p.uncertain({'status':'partial','structured_scope_complete':True,'final_response':'미확인'}))
+        for reason in ('clarification_required', 'unsupported_scope'):
+            self.assertFalse(p.uncertain({'status':'partial', 'scope_resolution':reason, 'protected_calls':0, 'calls':[], 'final_response':'미확인'}))
+            self.assertTrue(p.uncertain({'status':'partial', 'scope_resolution':reason, 'protected_calls':1, 'final_response':'미확인'}))
+
+    def test_scope_notice_survives_persistence_without_spawning_redundant_peer(self):
+        self.post['message'] = 'FW 룰 보여줘'
+        self.d.add(self.post)
+        job = self.job();self.d.placeholder(job)
+        future = concurrent.futures.Future()
+        future.set_result({'status':'partial', 'scope_resolution':'unsupported_scope',
+                           'final_response':'FW 전체 규칙 미조회', 'protected_calls':0, 'calls':[],
+                           'unqueried':['FW 전체 규칙']})
+        self.d.active[job['engine']] = (future, job['id'])
+        pool = mock.Mock()
+        self.d.tick(pool)
+        saved = json.loads(self.job()['result'])
+        self.assertEqual(saved['scope_resolution'], 'unsupported_scope')
+        self.assertEqual(saved['unqueried'], ['FW 전체 규칙'])
+        self.assertEqual(self.d.db.execute('select count(*) from jobs').fetchone()[0], 1)
+        pool.submit.assert_not_called()
 
     def test_uncertain_read_gets_one_readonly_peer_and_never_loops(self):
         self.d.add(self.post); self.finish('partial', '일부 대상은 미확인입니다.')

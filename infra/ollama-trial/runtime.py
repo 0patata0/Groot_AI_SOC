@@ -51,13 +51,6 @@ def load_config(path):
 
 
 async def run(config, request, *, on_protected_start=None, connection_pool=None):
-    from mcp_use import MCPClient, MCPAgent
-    from mcp_use.agents.adapters.langchain_adapter import LangChainAdapter
-    from langchain_ollama import ChatOllama
-    from langchain_core.tools import StructuredTool
-    from langchain_core.callbacks import AsyncCallbackHandler
-    from jsonschema import Draft202012Validator, ValidationError
-
     started = time.perf_counter()
     report = {'at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
               'engine': 'mcp-use/ChatOllama', 'model': config['model'],
@@ -69,6 +62,14 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
     current = request.get('current_question', question)
     require(isinstance(current, str) and len(current) <= 16000, 'current_question')
     report['access_mode'] = mode
+    notice = harness.scope_notice(current)
+    if notice and not request.get('discover_only'):
+        scope = harness.rule_scope_request(current)
+        report.update(status='partial', final_response=notice,
+                      scope_resolution='clarification_required' if scope['ambiguous'] else 'unsupported_scope',
+                      unqueried=harness.missing_reads(current, []),
+                      conversation_seconds=time.perf_counter() - started)
+        return report
     read_plan = harness.read_plan(current)
     cached = harness.prior_inventory(current, request.get('prior_evidence'))
     if cached and not request.get('discover_only'):
@@ -78,6 +79,13 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
     if harness.reuse_only(current) and not request.get('discover_only'):
         report.update(status='partial', final_response='같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.', total_seconds=time.perf_counter() - started)
         return report
+    from mcp_use import MCPClient, MCPAgent
+    from mcp_use.agents.adapters.langchain_adapter import LangChainAdapter
+    from langchain_ollama import ChatOllama
+    from langchain_core.tools import StructuredTool
+    from langchain_core.callbacks import AsyncCallbackHandler
+    from jsonschema import Draft202012Validator, ValidationError
+
     chosen = request.get('tools')
     if chosen is None and not request.get('discover_only'):
         scope = harness.tool_scope(current)

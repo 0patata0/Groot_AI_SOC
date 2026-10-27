@@ -201,3 +201,16 @@ python3 -B "$training_root/finetuning/soc_evaluate.py" \
 ### 20:54 KST 실행 결과·서식 검증 보완
 
 본 학습112step/1epoch·44validation·어댑터 저장/finite검사와기존추론복구·HF전체내보내기를완료했다.학습본GGUF변환은진행중이며최신별도등록/평가는STATUS를따른다. `register_soc.py`는모든FROM blob SHA를text/projector와대조하고,selected native template은고정HF서식과비교한다. 원registry의Go placeholder와표시가다르다는이유로검증에실패한첫시도는보존했다. 원래runtime옵션/다른모델digest는유지하며두HF파생모델의서식은동일하게맞춘다. 설치버전의 [selectedModelTemplate](https://github.com/ollama/ollama/blob/v0.40.2/server/routes.go) 동작과실제HF파일SHA를대조했다. 원등록본과새HF파생의서식차이를학습효과로해석하지않는다.
+
+### 요청 필드 평가 보완
+
+기존 `soc_evaluate.py`의자동점수는참고문장/인자완전일치도다. 요청밖의미확인해설이나이미KST인값의변환설명까지강제해정확한답을오감점한것을확인했다. 이값을정확도로사용하지않는다. `soc_assessment.py`를추가해고정5시험군의실제요청필드·관측값을별도검사한다. 호스트namefilter추가·날짜의KST표기형식차이를인정하고포트값은실제tool관측에서읽는다. AIT의phase_window누락도검사한다. 알수없는군/자연어판단은수동검토이며자동통과가아니다.
+
+```bash
+python3 -B "$training_root/finetuning/soc_assessment.py" \
+  --report "$training_root/soc-evaluation/matched-base-full.json" \
+  --cases "$training_root/finetuning/data-soc-source-v1/cases.jsonl" \
+  --output "$training_root/soc-evaluation/matched-base-request-assessment.json"
+```
+
+21:12 KST 미학습본은도구16/16·요청필드36/36이며근거없는정보성서술1건은수동검토다. “기존6건누락”은요청밖설명을강제한평가오류로정정했으며원기록을보존한다. 학습참고답변/분할/가중치는바꾸지않고같은판정기로학습본을비교한다. 숫자/형식일치가전체관제품질·승인/적용/채팅E2E를보장하지않고,단일소규모시험의일반화/부하통제없는속도우위를주장하지않는다.

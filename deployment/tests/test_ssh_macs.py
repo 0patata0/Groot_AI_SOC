@@ -23,6 +23,40 @@ class MacPolicy(unittest.TestCase):
             p.start(); self.addCleanup(p.stop)
         p = patch.object(m, 'trusted')
         self.trust = p.start(); self.addCleanup(p.stop)
+        p = patch.object(m.os, 'fchown')
+        p.start(); self.addCleanup(p.stop)
+
+    def test_exact_previous_policy_migrates_and_can_restore_original(self):
+        self.target.write_bytes(m.LEGACY_CONTENT)
+        self.target.chmod(0o640)
+        with patch.object(m, 'check', return_value=(GOOD + [m.EXCLUDED[-1]], GOOD, OTHER)), \
+                patch.object(m, 'policy', return_value=(GOOD, OTHER)), patch.object(m, 'run'):
+            result = m.install()
+            self.assertEqual(self.target.read_bytes(), m.CONTENT)
+            self.assertTrue((Path(result['backup']) / 'before.conf').is_file())
+            m.rollback(result['backup'])
+        self.assertEqual(self.target.read_bytes(), m.LEGACY_CONTENT)
+        self.assertEqual(self.target.stat().st_mode & 0o777, 0o640)
+
+    def test_failed_legacy_upgrade_restores_original_bytes(self):
+        self.target.write_bytes(m.LEGACY_CONTENT)
+        with patch.object(m, 'check', return_value=(GOOD, GOOD, OTHER)), \
+                patch.object(m, 'policy', return_value=(GOOD, ['usepam no'])), patch.object(m, 'run'):
+            with self.assertRaisesRegex(ValueError, 'include_order'):
+                m.install()
+        self.assertEqual(self.target.read_bytes(), m.LEGACY_CONTENT)
+
+    def test_legacy_edit_between_snapshot_and_publication_is_preserved(self):
+        self.target.write_bytes(m.LEGACY_CONTENT)
+        replace = m.replace_exact
+        def competing_replace(data, expected, **kwargs):
+            self.target.write_text('operator change\n')
+            return replace(data, expected, **kwargs)
+        with patch.object(m, 'check', return_value=(GOOD, GOOD, OTHER)), \
+                patch.object(m, 'replace_exact', side_effect=competing_replace):
+            with self.assertRaisesRegex(RuntimeError, 'concurrent_edit'):
+                m.install()
+        self.assertEqual(self.target.read_text(), 'operator change\n')
 
     def test_refuses_unowned_file_without_touching_it(self):
         self.target.write_text('MACs hmac-sha2-256\n')
@@ -108,11 +142,16 @@ class MacPolicy(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'untrusted_path'):
             clean.trusted(p)
 
-    def test_fresh_install_entrypoint_calls_policy_checks_and_pins_source(self):
-        shell = (Path(__file__).parents[1] / 'roles/security.sh').read_text()
-        for text in ('ssh_macs check', 'ssh_macs install', 'ssh_macs verify', "'SSH_MACS_SHA'"):
-            self.assertIn(text, shell)
-        subprocess.run(['bash', '-n', str(Path(__file__).parents[1] / 'roles/security.sh')], check=True)
+    def test_all_fresh_roles_use_common_policy_and_pin_source(self):
+        root = Path(__file__).parents[1]
+        for role in ('security', 'siem', 'service'):
+            shell = (root / ('roles/' + role + '.sh')).read_text()
+            self.assertIn('deployment/ssh_macs.py', shell)
+            for action in ('check', 'install', 'verify'):
+                self.assertTrue(('ssh_macs ' + action) in shell or
+                                ("ssh_macs.py'),'" + action + "'") in shell or
+                                ('ssh_macs.py" ' + action) in shell)
+            subprocess.run(['bash', '-n', str(root / ('roles/' + role + '.sh'))], check=True)
 
 
 if __name__ == '__main__':

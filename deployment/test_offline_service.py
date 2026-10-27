@@ -215,6 +215,7 @@ CAPSTONE_ROOT="$2"; ROLE="$2/service"; CAPSTONE_SOURCE="$2/source"
 WAZUH_CA_FILE="$2/ca"; WAZUH_ENROLLMENT_PASS_FILE="$2/pass"; LAB_ADMIN_KEY_FILE="$2/key"
 LAB_MANIFEST="$2/manifest"; LAB_PUBLIC_ORIGIN=https://labs.example.org; LAB_WHEEL_DIR="$2/wheels"; SIEM_HOST=192.0.2.20
 settings(){ MODE=apply; }
+ssh_macs(){ :; }
 safe_path(){ :; }; regular(){ :; }; stat(){ printf '0:0:600\n'; }; flock(){ :; }
 fresh_namespace(){ :; }; enrollment_inputs(){ :; }; timeout(){ :; }; apache_image_probe(){ :; }; gateway_image_probe(){ :; }
 offline_command(){ :; }
@@ -243,6 +244,7 @@ main apply
   for fail in (False,True):
    code=r'''
 assert_managed(){ :; }
+ssh_macs(){ :; }
 docker_cmd(){ [[ $1 != ps ]] || printf '%064d\n' 0; }
 jq(){ if [[ $1 == -r ]]; then printf '%064d\n' 0; fi; }
 runtime_contract(){ :; }
@@ -290,6 +292,7 @@ WAZUH_CA_FILE="$2/ca"; WAZUH_ENROLLMENT_PASS_FILE="$2/pass"; LAB_ADMIN_KEY_FILE=
 LAB_MANIFEST="$2/manifest"; LAB_PUBLIC_ORIGIN=https://labs.example.org; LAB_WHEEL_DIR="$2/wheels"; SIEM_HOST=192.0.2.20
 LAB_SUDO_BUNDLE="$2/sudo"; LAB_NONWEB_BUNDLE="$2/nonweb"; COMPOSE=(fixture)
 settings(){ MODE=apply; }
+ssh_macs(){ :; }
 safe_path(){ :; }; regular(){ :; }; stat(){ printf '0:0:600\n'; }; flock(){ :; }
 fresh_namespace(){ :; }; enrollment_inputs(){ :; }; apache_image_probe(){ :; }; gateway_image_probe(){ :; }
 offline_command(){ :; }; write_files(){ mkdir -p "$ROLE/evidence"; }; mark(){ :; }
@@ -384,6 +387,7 @@ docker_cmd(){
 source "$1"
 CAPSTONE_ROOT="$2"; ROLE="$2/service"; WAZUH_CA_FILE="$2/ca"; WAZUH_ENROLLMENT_PASS_FILE="$2/pass"; SIEM_HOST=192.0.2.20
 settings(){ MODE=apply; }
+ssh_macs(){ :; }
 safe_path(){ :; }; regular(){ :; }; stat(){ printf '0:0:600\n'; }; flock(){ :; }
 fresh_namespace(){ :; }; enrollment_inputs(){ :; }; timeout(){ :; }; apache_image_probe(){ :; }
 offline_command(){ :; }; write_files(){ mkdir -p "$ROLE/evidence"; }

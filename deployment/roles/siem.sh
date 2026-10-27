@@ -183,8 +183,8 @@ def hermes_response_format(raw=None):
     need(begin < finish, 'SOC_response_format_order_invalid')
     body = text[begin:finish].strip()
     lines = body.splitlines()
-    need(len(lines)==4 and all(line.startswith('- ') and len(line)>2 for line in lines)
-         and len(body)<=16384, 'SOC_response_format_four_bullets_required')
+    need(len(lines)==5 and all(line.startswith('- ') and len(line)>2 for line in lines)
+         and len(body)<=16384, 'SOC_response_format_five_bullets_required')
     return '### SOC 응답 서식\n'+body+'\n'
 def readonly_soul():
     # Copy only the shared presentation section, never live write-tool policies.
@@ -218,7 +218,7 @@ def profile(snap, images):
             'prerequisite_tree_sha256':digest(canonical(snap)),
             'prerequisite_credentials_sha256':digest(read(PRE/'siem.json',16384,True)),
             'source_sha256':{p:digest(read(SOURCE/p)) for p in (
-                'infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
+                'deployment/ssh_macs.py','infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
                 'infra/hermes/SOUL.groot.md',
                 'deployment/bot_profiles.py','deployment/bot-icons/sources.json',
                 'deployment/bot-icons/hermes.png','deployment/bot-icons/ollama.png',
@@ -250,6 +250,8 @@ def preflight():
     need(ROOT == pathlib.Path('/opt/capstone'), 'CAPSTONE_ROOT_must_be_opt_capstone')
     need(SOURCE.is_absolute() and SOURCE != pathlib.Path('/'), 'CAPSTONE_SOURCE_required')
     directory(SOURCE); directory(PRE)
+    read(SOURCE/'deployment/ssh_macs.py')
+    run(['python3','-B',str(SOURCE/'deployment/ssh_macs.py'),'check'])
     release = pathlib.Path('/etc/os-release').read_text()
     need('ID=ubuntu' in release and 'VERSION_ID="24.04"' in release, 'Ubuntu_24_04_required')
     need(os.uname().machine == 'x86_64', 'amd64_required')
@@ -762,6 +764,7 @@ asyncio.run(main())
     run(['docker','exec','-i','--user',str(hu.pw_uid)+':'+str(hu.pw_gid),NAMES['hermes'],
          '/opt/hermes/.venv/bin/python','-B','-'],100,code.encode())
 def verify():
+    run(['python3','-B',str(SOURCE/'deployment/ssh_macs.py'),'verify'])
     saved=parse(read(STATE)); need(saved.get('status')=='applied','successful_apply_receipt_required')
     need(saved.get('profile')==profile(snap,images),'completed_deployment_profile_changed')
     now=current_containers(); need({k:v['id'] for k,v in now.items()}==saved['container_ids'],'container_replacement_requires_review')
@@ -798,7 +801,9 @@ try:
               'package_installs':0,'application_health_checked':False,'Hermes_image_runtime_check_pending':True},sort_keys=True)); sys.exit(0)
     phase='prepared_image_validation'; image_probe(images['hermes'])
     # No root state is published until all static prerequisites and offline image imports pass.
-    fresh(); phase='files_and_enrollment'; c=prepare_files(c,snap,images)
+    fresh(); phase='ssh_macs'
+    run(['python3','-B',str(SOURCE/'deployment/ssh_macs.py'),'install'])
+    phase='files_and_enrollment'; c=prepare_files(c,snap,images)
     phase='log_pipeline_prepare'
     log_pipeline('prepare')
     c=parse(read(DEST/'compose.core.json'))

@@ -1,16 +1,18 @@
 # 새 환경의 네트워크·SSH 준비
 
-## security 역할의 SSH MAC 정책 — 2026-10-27
+## 세 호스트 공통 SSH MAC 정책 — 2026-10-27
 
-루트 `deploy.sh`의 기존 security 역할 설치 과정은 `deployment/ssh_macs.py`를 내부 호출한다. `check`에서는 호스트 구문과 후보 유효값을 읽고, 최초 `apply`에서는 `/etc/ssh/sshd_config.d/01-capstone-macs.conf`에 아래 정책을 배치한다. 기존 파일이 다른 내용이거나 더 엄격한 기존 정책을 완화하게 되면 중단한다. 새 설치 소스 프로필에 모듈 SHA를 포함하고 `verify`에서도 파일과 실제 유효값을 대조한다. B/C의 SSH MAC은 변경하지 않는다.
+루트 `deploy.sh`의 security·siem·service 역할은 `deployment/ssh_macs.py`의 check/install/verify를 호출한다. `/etc/ssh/sshd_config.d/01-capstone-macs.conf`에 아래 정책을 배치하고 소스 SHA와 실제 유효 설정을 검증한다. 정확히 일치하는 종전 A의4종 제외 파일만 백업 후5종 제외로 이행한다. 다른 기존 파일·더 엄격한 정책·MAC 외 옵션 변경은 거절한다.
 
 ```text
-MACs -hmac-sha1,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-64-etm@openssh.com
+MACs -hmac-sha1,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-64-etm@openssh.com,umac-128-etm@openssh.com
 ```
 
-후보 배치 후 전체 구문·유효 옵션을 검증해 MAC 외 설정이 바뀌면 원복한다. 성공 시 `ssh.service`를 reload하며 기존 접속을 유지한다. 관리자는 별도 새 SSH 연결과 MCP 연결을 확인해야 한다. 적용 후 새 연결 실패 시 보존한 세션에서 원본 부재 기록과 추가 파일의 후보 SHA를 대조한 뒤 이 파일만 제거하고 `sshd -t` 및 reload로 복귀한다. 기존 인증 설정·키·허용 IP를 바꾸거나 보안 서비스를 재시작하는 절차가 아니다. 운영 서버는 초기 설치기로 덮어쓰지 않고 승인된 후보만 증분 반영한다.
+SHA1/UMAC64 계열4종과 설치된 Ubuntu SCA35654가 금지하는 UMAC128-ETM을 제외한다. 이 범위는 모든 SSH/CIS 항목의 통과를 뜻하지 않는다. 기존 계정·키·비밀번호 인증·허용 IP는 별도 정책이다.
 
-운영 A의 설치된 Wazuh SCA35654 규칙은 `umac-128-etm@openssh.com`도 금지 목록에 포함한다. 위 정책은 요청한 4종 제거 범위이며 이 항목을 유지하므로 SCA 통과를 보장하지 않는다. 저장된 과거 스캔, 현재 유효 설정, 정책 적합성 판단을 구분한다. 실제 적용·검증과 잔여는 [STATUS](../STATUS.md)를 따른다.
+후보 배치 후 전체 구문·유효 옵션을 확인하고 `ssh.service`를 reload한다. 실패하면 이번 추가 파일을 제거하거나 정확한 종전 파일의 내용·권한을 복원한다. 원본과 메타데이터는 `/var/backups/capstone-ssh-macs-*`에 root 전용으로 보존한다. 기존 세션을 유지하면서 별도 신규 관리 연결과 실제 봇/MCP 클라이언트를 검증한다. 배포 helper의 reload 성공만으로 신규 접속까지 검증했다고 표시하지 않는다. 운영 서버에는 초기 설치기를 재실행하지 않고 승인된 설정만 증분 적용한다.
+
+저장된 SCA 스캔과 현재 유효 설정은 다르다. 적용 후 스캔 시각과 개별 체크를 다시 조회해야 하며 과거 실패 기록을 지우지 않는다. 실제 운영 결과는 [STATUS](../STATUS.md)를 따른다.
 
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).

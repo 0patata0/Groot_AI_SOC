@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed SSH MAC policy for the security role; no account or firewall changes."""
+"""Common SSH MAC policy; migrate only the exact former security-role policy."""
 import argparse
 from datetime import datetime
 import fcntl
@@ -16,9 +16,12 @@ TARGET = Path('/etc/ssh/sshd_config.d/01-capstone-macs.conf')
 BACKUPS = Path('/var/backups')
 LOCK = Path('/etc/ssh/.capstone-macs.lock')
 EXCLUDED = ('hmac-sha1', 'hmac-sha1-etm@openssh.com',
-            'umac-64@openssh.com', 'umac-64-etm@openssh.com')
+            'umac-64@openssh.com', 'umac-64-etm@openssh.com',
+            'umac-128-etm@openssh.com')
 OPTION = 'MACs=-' + ','.join(EXCLUDED)
-CONTENT = ('# Capstone security role: exclude legacy SSH MAC algorithms.\n'
+LEGACY_CONTENT = ('# Capstone security role: exclude legacy SSH MAC algorithms.\n'
+                  'MACs -' + ','.join(EXCLUDED[:4]) + '\n').encode()
+CONTENT = ('# Capstone hosts: exclude legacy and installed SCA-denied SSH MACs.\n'
            'MACs -' + ','.join(EXCLUDED) + '\n').encode()
 
 
@@ -56,7 +59,7 @@ def check():
     trusted(TARGET.parent, directory=True)
     if TARGET.exists() or TARGET.is_symlink():
         trusted(TARGET)
-        if TARGET.read_bytes() != CONTENT:
+        if TARGET.read_bytes() not in (CONTENT, LEGACY_CONTENT):
             raise ValueError('ssh_macs_unowned_existing_file')
     run(['/usr/sbin/sshd', '-t'])
     before, other = policy()
@@ -91,36 +94,89 @@ def sync_directory(path):
         os.close(fd)
 
 
+def identity(path):
+    s = path.lstat()
+    return (s.st_dev, s.st_ino, s.st_mode, s.st_uid, s.st_gid,
+            s.st_nlink, s.st_size, s.st_mtime_ns, s.st_ctime_ns)
+
+
+def replace_exact(data, expected, mode=0o644, uid=0, gid=0):
+    """Publish without clobbering a destination changed since its snapshot."""
+    fd, name = tempfile.mkstemp(prefix='.capstone-macs-', dir=TARGET.parent)
+    try:
+        with os.fdopen(fd, 'wb') as f:
+            os.fchmod(f.fileno(), mode)
+            os.fchown(f.fileno(), uid, gid)
+            f.write(data); f.flush(); os.fsync(f.fileno())
+        if expected is None:
+            os.link(name, TARGET)
+        else:
+            trusted(TARGET)
+            if identity(TARGET) != expected:
+                raise RuntimeError('ssh_macs_concurrent_edit')
+            os.replace(name, TARGET)
+    finally:
+        if os.path.exists(name):
+            os.unlink(name)
+
+
+def rollback(backup):
+    backup = Path(backup)
+    if backup.parent != BACKUPS or not backup.name.startswith('capstone-ssh-macs-'):
+        raise ValueError('ssh_macs_invalid_backup')
+    trusted(backup, directory=True)
+    trusted(backup / 'before.json')
+    metadata = json.loads((backup / 'before.json').read_text())
+    trusted(TARGET)
+    if metadata['target'] != str(TARGET) or TARGET.read_bytes() != CONTENT:
+        raise RuntimeError('ssh_macs_rollback_refused_concurrent_edit')
+    if metadata['target_existed']:
+        trusted(backup / 'before.conf')
+        previous = (backup / 'before.conf').read_bytes()
+        if (previous != LEGACY_CONTENT or
+                hashlib.sha256(previous).hexdigest() != metadata['before_sha256']):
+            raise ValueError('ssh_macs_invalid_previous_content')
+        replace_exact(previous, identity(TARGET), **metadata['file_metadata'])
+        sync_directory(TARGET.parent)
+    else:
+        TARGET.unlink(); sync_directory(TARGET.parent)
+    run(['/usr/sbin/sshd', '-t'])
+    run(['systemctl', 'reload', 'ssh.service'])
+    return {'status': 'rolled_back', 'backup': str(backup)}
+
+
 def install():
     before, after, other = check()
-    if TARGET.exists():
+    previous = TARGET.read_bytes() if TARGET.exists() else None
+    if previous == CONTENT:
         return {**verify(), 'changed': False}
+    if previous not in (None, LEGACY_CONTENT):
+        raise ValueError('ssh_macs_unowned_existing_file')
+    expected = identity(TARGET) if previous is not None else None
+    old_stat = TARGET.stat() if previous is not None else None
     trusted(BACKUPS, directory=True)
     backup = Path(tempfile.mkdtemp(prefix='capstone-ssh-macs-', dir=BACKUPS))
     metadata = {'time_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),
-                'target': str(TARGET), 'target_existed': False,
+                'target': str(TARGET), 'target_existed': previous is not None,
+                'before_sha256': hashlib.sha256(previous).hexdigest() if previous else None,
+                'file_metadata': {'mode': stat.S_IMODE(old_stat.st_mode),
+                                  'uid': old_stat.st_uid, 'gid': old_stat.st_gid} if old_stat else None,
                 'before_macs': before, 'candidate_macs': after,
                 'other_effective_options': other}
     (backup / 'before.json').write_text(json.dumps(metadata, indent=2) + '\n')
     (backup / 'candidate.conf').write_bytes(CONTENT)
+    if previous is not None:
+        (backup / 'before.conf').write_bytes(previous)
     for p in backup.iterdir():
         p.chmod(0o600)
         with p.open('rb') as f:
             os.fsync(f.fileno())
     sync_directory(backup)
     sync_directory(BACKUPS)
-    fd, name = tempfile.mkstemp(prefix='.capstone-macs-', dir=TARGET.parent)
     published = False
     try:
-        with os.fdopen(fd, 'wb') as f:
-            os.fchmod(f.fileno(), 0o644)
-            f.write(CONTENT)
-            f.flush()
-            os.fsync(f.fileno())
-        # Exclusive publication never overwrites a file created after preflight.
-        os.link(name, TARGET)
+        replace_exact(CONTENT, expected)
         published = True
-        os.unlink(name)
         sync_directory(TARGET.parent)
         actual, rest = policy()
         if actual != after or rest != other:
@@ -132,17 +188,8 @@ def install():
                 'fresh_connection_required': True}
     except Exception:
         if published:
-            trusted(TARGET)
-            if TARGET.read_bytes() != CONTENT:
-                raise RuntimeError('ssh_macs_rollback_refused_concurrent_edit')
-            TARGET.unlink()
-            sync_directory(TARGET.parent)
-            run(['/usr/sbin/sshd', '-t'])
-            run(['systemctl', 'reload', 'ssh.service'])
+            rollback(backup)
         raise
-    finally:
-        if os.path.exists(name):
-            os.unlink(name)
 
 
 def main():

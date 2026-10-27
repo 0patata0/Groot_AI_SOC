@@ -175,6 +175,7 @@ compose_document(){
       networks:{front:{},private:{internal:true}},volumes:{database:{}}}'
 }
 
+ssh_macs() { python3 -B "$CAPSTONE_SOURCE/deployment/ssh_macs.py" "$1"; }
 settings(){
   [[ $# == 1 && $1 =~ ^(check|apply|verify)$ ]] || die 'usage: bash service.sh check|apply|verify'
   MODE=$1
@@ -213,6 +214,8 @@ settings(){
   GATEWAY_ID=$(docker_cmd image inspect --format '{{.Id}} {{.Os}} {{.Architecture}}' "$WAF_IMAGE") || die preloaded_gateway_image_required
   [[ $APP_ID =~ ^sha256:[a-f0-9]{64}\ linux\ amd64$ && $DB_ID =~ ^sha256:[a-f0-9]{64}\ linux\ amd64$ && $GATEWAY_ID =~ ^sha256:[a-f0-9]{64}\ linux\ amd64$ ]] || die amd64_images_required
   APP_ID=${APP_ID%% *}; DB_ID=${DB_ID%% *}; GATEWAY_ID=${GATEWAY_ID%% *}
+  regular "$CAPSTONE_SOURCE/deployment/ssh_macs.py"
+  ssh_macs check >/dev/null || die ssh_macs_check_failed
   regular "$CAPSTONE_SOURCE/deployment/offline_service.py"
   regular "$CAPSTONE_SOURCE/infra/groot-c/offline-labs/nonweb/sudo/runtime/bootstrap.py"
   regular "$CAPSTONE_SOURCE/infra/groot-c/nonweb-labs/bootstrap.py"
@@ -220,8 +223,9 @@ settings(){
   LAB_PROFILE=$(offline_command profile) || die offline_lab_prerequisites_invalid
   INPUT=$(jq -cnS --arg root "$CAPSTONE_ROOT" --arg a "$SECURITY_HOST" --arg b "$SIEM_HOST" --arg c "$SERVICE_HOST" \
     --argjson port "$WEB_BACKEND_PORT" --arg app "$APP_ID" --arg db "$DB_ID" --argjson lab "$LAB_PROFILE" \
+    --arg sshmacs "$(sha "$CAPSTONE_SOURCE/deployment/ssh_macs.py")" \
     --arg sudo "$LAB_SUDO_BUNDLE" --arg nonweb "$LAB_NONWEB_BUNDLE" --arg wheels "$LAB_WHEEL_DIR" --arg key "$LAB_ADMIN_KEY_FILE" \
-    '{schema:9,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,offline_labs:$lab,sudo_bundle:$sudo,nonweb_bundle:$nonweb,wheel_directory:$wheels,admin_key_file:$key}')
+    '{ssh_macs_sha256:$sshmacs,schema:9,role:"service",root:$root,security_host:$a,siem_host:$b,service_host:$c,port:$port,app_image_id:$app,db_image_id:$db,offline_labs:$lab,sudo_bundle:$sudo,nonweb_bundle:$nonweb,wheel_directory:$wheels,admin_key_file:$key}')
 
 }
 
@@ -463,6 +467,7 @@ verify_offline_apps(){
 }
 
 verify(){
+  ssh_macs verify >/dev/null || die ssh_macs_verify_failed
   assert_managed
   local name id expected
   for name in dvwa db gateway; do
@@ -510,6 +515,7 @@ main(){
   timeout --kill-after=2s 12s openssl s_client -connect "$SIEM_HOST:1515" -CAfile "$WAZUH_CA_FILE" \
     -verify_ip "$SIEM_HOST" -verify_return_error -no_ign_eof </dev/null >/dev/null 2>&1 || die enrollment_tls_identity_failed
   apache_image_probe
+  ssh_macs install || die ssh_macs_install_failed
   write_files
   mark gateway-syntax-test-armed
   gateway_image_probe

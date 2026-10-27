@@ -213,14 +213,14 @@ class Tests(unittest.TestCase):
         config={'mcp_servers':{'only-readonly':{}},'toolsets':['mcp-wazuh-ro']}
         baseline=copy.deepcopy(config)
         env=self.n['install_hermes_extensions'](self.n['DEST']/'bot',user,creds,config)
-        self.assertEqual(len(written),13)
-        self.assertEqual(len(reads),13)
+        self.assertEqual(len(written),14)
+        self.assertEqual(len(reads),14)
         self.assertEqual({pathlib.Path(p).name for p in written},{'__init__.py','plugin.yaml','channel_sync.py','HOOK.yaml','handler.py','grounding.py',
-            'alignment.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py'})
+            'alignment.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
         self.assertTrue(any('/plugins/groot-mattermost-context/' in p for p in written))
         self.assertTrue(any('/hooks/groot-mattermost-channel-sync/' in p for p in written))
         self.assertEqual({pathlib.Path(p).name for p in written if '/plugins/groot-query-completion/' in p},
-                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py'})
+                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
         self.assertTrue(all(value[1:]==(0o600,995,986) for value in written.values()))
         self.assertTrue(all(value[1:]==(0o700,995,986) for value in created))
         self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context','groot-query-completion']})
@@ -332,11 +332,11 @@ class Tests(unittest.TestCase):
         self.assertLess(image.lineno,prepare.lineno)
     def response_policy(self):
         return (pathlib.Path(sys.argv[1]).resolve().parents[2]/'infra/hermes/SOUL.groot.md').read_bytes()
-    def test_response_format_extracts_only_exact_shared_four_bullets(self):
+    def test_response_format_extracts_only_exact_shared_five_bullets(self):
         raw=self.response_policy();block=self.n['hermes_response_format'](raw)
         expected='### SOC 응답 서식\n'+raw.decode().split('### SOC 응답 서식\n',1)[1].split('\n## 보안 룰 변경 요청\n',1)[0].strip()+'\n'
         self.assertEqual(block,expected)
-        self.assertEqual(sum(line.startswith('- ') for line in block.splitlines()),4)
+        self.assertEqual(sum(line.startswith('- ') for line in block.splitlines()),5)
         for text in ('`**요약**`','`**확인 내역**`','`**조치 및 다음 단계**`'):
             self.assertIn(text,block)
         self.assertNotIn('get_rule_change_target',block)

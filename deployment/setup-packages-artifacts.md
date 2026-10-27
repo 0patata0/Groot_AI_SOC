@@ -1,6 +1,6 @@
 # 패키지·이미지·배포 자료 준비
 
-> **2026-10-27 SSH MAC 소스:** 기존 `deploy.sh` 소스 archive에 `deployment/ssh_macs.py`와 수정된 `deployment/roles/security.sh`를 포함한다. 기존 OpenSSH server·Python3·systemd만 사용하므로 추가 deb/wheel/이미지 반입은 없다. security 역할의 고정 MAC 4종 제외·검증을 초기 설치에 연결하며 기존 운영 A에는 해당 설정만 증분 적용한다. [정책·복구 범위](setup-network-ssh.md#security-역할의-ssh-mac-정책--2026-10-27).
+> **2026-10-27 공통 SSH MAC:** root `deploy.sh`의 security·siem·service 역할에5종 제외·정확한 구4종 정책 이행·충돌 거절·백업/원복·검증을 연결한다. 기존 OpenSSH/Python3/systemd를 사용하며 추가 패키지는 없다. 소스 archive에 `deployment/ssh_macs.py`와 세 역할을 함께 포함한다. 운영 적용은 별도 증분 경로이며 새3VM 전체 설치 검증과 구분한다. [정책·복구](setup-network-ssh.md#세-호스트-공통-ssh-mac-정책--2026-10-27) · [현재 검증 상태](../STATUS.md).
 
 > **2026-10-26 소스 반입 추가:** `deployment/soc_monitoring.py`, `infra/mcp/{runtime_health,soc_monitor,pipeline_probe}.py`, `infra/hermes/gateway_health.py`와 기존 canary fixture4개·검증 jq를 source bundle에 포함한다. 추가 deb/wheel/컨테이너 이미지는0이며 기존 SSH/Python표준라이브러리/SQLite/jq/curl을 사용한다. 신규 감시 timer3개·전용 읽기 키·HTTPS 연결은 [설계](../infra/mcp/monitoring.md), 실제 검증·Mac 임시 정리는 [STATUS](../STATUS.md)를 따른다.
 

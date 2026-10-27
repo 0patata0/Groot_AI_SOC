@@ -2,7 +2,7 @@
 
 > **2026-10-27 Ollama 연결 수명:** `deploy.sh`의 기존 Ollama 설치/upgrade 소스 목록에 `infra/ollama-trial/read_pool.py`를 포함한다. 오프라인 반입은 기존 source archive만 갱신하며 deb/wheel/이미지 추가는 없다. `OLLAMA_TRIAL_CHAT_ENABLE=1`의 일반 채팅은 순수 읽기 연결을 최대300초 유휴 유지한다. SSH 설정·키 교체 시 gateway 재시작이 필요하다. 설치 계약/운영 증분 배포와 새3VM 전체설치 미실행 범위는 [STATUS](../STATUS.md)를 따른다.
 
-> **2026-10-27 SSH MAC 초기 설치 경로:** 기존 `deploy.sh` → security 역할에서 `ssh_macs.py`의 check/install/verify를 호출한다. 고정4종 제외·설정 충돌 거절·원복·소스 SHA 검증을 포함하며 추가 패키지는 없다. 운영 A에는 해당 설정만 증분 반영했고 B/C SSH는 변경하지 않았다. 전체 신규 설치·전체 CIS 통과 검증과 구분한다. [설정·복구](setup-network-ssh.md#security-역할의-ssh-mac-정책--2026-10-27) · [운영 결과](../STATUS.md).
+> **2026-10-27 공통 SSH MAC:** root `deploy.sh`의 security·siem·service 역할에5종 제외·정확한 구4종 정책 이행·충돌 거절·백업/원복·검증을 연결한다. 기존 OpenSSH/Python3/systemd를 사용하며 추가 패키지는 없다. 소스 archive에 `deployment/ssh_macs.py`와 세 역할을 함께 포함한다. 운영 적용은 별도 증분 경로이며 새3VM 전체 설치 검증과 구분한다. [정책·복구](setup-network-ssh.md#세-호스트-공통-ssh-mac-정책--2026-10-27) · [현재 검증 상태](../STATUS.md).
 
 > **10/26 조사 필드 반입:** security-events canonical 소스의 제한된 DNS/HTTP 조사 문맥을 기존 root deploy.sh SIEM 경로가 반입한다. 기존 서버는 해당1파일만 백업 후 증분 적용하며 재시작·새키·포트·deb/wheel/이미지 추가0이다. 기존 내부 MCP 배포기의 도구 목록 검사도 현행3개로 맞췄다. 새3VM 전체설치 검증과 [운영 증분/검증](../STATUS.md)은 구분한다.
 

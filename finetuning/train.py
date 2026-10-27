@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Single NVIDIA GPU QLoRA. --check is stdlib-only; --train is explicit.
+"""Single NVIDIA GPU LoRA/NF4 recipes. --check is stdlib-only; --train is explicit.
 
 Expand each dialogue into assistant-turn prefixes, supervising only the last
 assistant in each prefix (including tool calls). Never truncate a completion.
@@ -18,6 +18,8 @@ import platform
 import sys
 
 ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
+import model_profile
 
 
 def read_config(path):
@@ -33,6 +35,7 @@ def read_config(path):
         raise ValueError("Specify a base model and explicit LoRA target_modules")
     if config.get("enable_thinking") is not False:
         raise ValueError("This prepared corpus uses non-thinking targets; enable_thinking must be false")
+    model_profile.validate_profile(config)
     return config
 
 
@@ -147,7 +150,9 @@ def collate_lists(features, pad_token_id):
     return batch
 
 
-def preflight():
+def preflight(config=None):
+    config = config or {}
+    quantized = config.get("quantization", "nf4") == "nf4"
     if platform.system() != "Linux":
         raise RuntimeError("Training requires the target Linux NVIDIA GPU environment; macOS is excluded.")
     import torch
@@ -157,18 +162,38 @@ def preflight():
         raise RuntimeError("Expose exactly one GPU with CUDA_VISIBLE_DEVICES=<index> for this single-GPU recipe.")
     if int(os.environ.get("WORLD_SIZE", "1")) != 1:
         raise RuntimeError("This recipe targets one sufficiently large GPU. Multi-GPU/FSDP requires a separate configuration.")
-    packages = {name: importlib.metadata.version(name) for name in ("torch", "transformers", "peft", "accelerate", "bitsandbytes")}
+    names = ["torch", "transformers", "peft", "accelerate"] + (["bitsandbytes"] if quantized else [])
+    packages = {name: importlib.metadata.version(name) for name in names}
+    model_profile.model_class(config)  # Fail before downloading weights when the installed loader is unsupported.
     props = torch.cuda.get_device_properties(0)
-    # Test the CUDA quantization kernel without loading a model or allocating optimizer states.
-    from bitsandbytes.functional import quantize_4bit, dequantize_4bit
-    sample = torch.randn(128, 128, device="cuda", dtype=torch.float16)
-    quantized, state = quantize_4bit(sample, quant_type="nf4")
-    restored = dequantize_4bit(quantized, state)
-    if not torch.isfinite(restored).all():
-        raise RuntimeError("bitsandbytes NF4 kernel test failed")
-    return {"packages": packages, "gpu": props.name, "gpu_memory_gib": round(props.total_memory / 2**30, 2),
+    # Exercise forward and backward, not just device discovery or an SM list.
+    sample = torch.randn(32, 32, device="cuda", dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16, requires_grad=True)
+    (sample @ sample.T).float().square().mean().backward()
+    torch.cuda.synchronize()
+    if not torch.isfinite(sample.grad).all():
+        raise RuntimeError("CUDA forward/backward kernel test failed")
+    if quantized:
+        from bitsandbytes.functional import quantize_4bit, dequantize_4bit
+        quant, state = quantize_4bit(sample.detach(), quant_type="nf4")
+        if not torch.isfinite(dequantize_4bit(quant, state)).all():
+            raise RuntimeError("bitsandbytes NF4 kernel test failed")
+    mem = {}
+    for line in Path('/proc/meminfo').read_text().splitlines():
+        key, value = line.split(':', 1)
+        if key in ('MemAvailable', 'MemTotal'): mem[key] = int(value.split()[0]) * 1024 / 2**30
+    cuda_free, cuda_total = torch.cuda.mem_get_info()
+    hardware = {"packages": packages, "gpu": props.name, "gpu_memory_gib": round(props.total_memory / 2**30, 2),
             "cuda": torch.version.cuda, "bf16_supported": torch.cuda.is_bf16_supported(),
-            "nf4_kernel": "passed", "platform": platform.machine()}
+            "nf4_kernel": "passed" if quantized else "not_used", "cuda_forward_backward": "passed",
+            "platform": platform.machine(), "compute_capability": list(torch.cuda.get_device_capability()),
+            "available_memory_gib": round(min(mem['MemAvailable'], cuda_free / 2**30), 2),
+            "system_memory_gib": round(mem['MemTotal'], 2), "cuda_free_gib": round(cuda_free / 2**30, 2)}
+    try:
+        model_profile.check_training_capacity(config, hardware)
+        hardware['capacity_check'] = 'passed_planning_floor_not_peak_memory_guarantee'
+    except RuntimeError as exc:
+        hardware['capacity_check'] = str(exc)
+    return hardware
 
 
 def run_training(config, checks, hardware):
@@ -176,7 +201,8 @@ def run_training(config, checks, hardware):
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, Trainer, TrainingArguments, set_seed
+    from transformers import AutoConfig, AutoTokenizer, BitsAndBytesConfig, Trainer, TrainingArguments, set_seed
+    model_profile.check_training_capacity(config, hardware)
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
     output = Path(config["output_dir"])
     if output.exists() and any(output.iterdir()):
@@ -184,6 +210,8 @@ def run_training(config, checks, hardware):
     output.mkdir(parents=True, exist_ok=True)
     set_seed(config["seed"])
     load_args = {"revision": config["revision"], "trust_remote_code": False, "local_files_only": config["offline"]}
+    base_config = AutoConfig.from_pretrained(config["model_name_or_path"], **load_args)
+    model_profile.validate_model_config(config, base_config)
     tokenizer = AutoTokenizer.from_pretrained(config["model_name_or_path"], **load_args)
     if not tokenizer.chat_template:
         raise ValueError("Base tokenizer must provide a chat template")
@@ -197,20 +225,31 @@ def run_training(config, checks, hardware):
     (output / "tokenization_report.json").write_text(json.dumps(token_stats, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps(token_stats, ensure_ascii=False, indent=2))
     dtype = torch.bfloat16 if hardware["bf16_supported"] else torch.float16
-    quant = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
-    model = AutoModelForCausalLM.from_pretrained(config["model_name_or_path"], **load_args, torch_dtype=dtype,
-        quantization_config=quant, device_map={"": 0}, attn_implementation="sdpa")
+    quantized = config.get("quantization", "nf4") == "nf4"
+    model_args = {}
+    if quantized:
+        model_args['quantization_config'] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
+    model = model_profile.model_class(config).from_pretrained(config["model_name_or_path"], **load_args, torch_dtype=dtype,
+        **model_args, device_map={"": 0}, attn_implementation="sdpa")
     model.config.use_cache = False
-    model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True,
-        gradient_checkpointing_kwargs={"use_reentrant": False})
+    if hasattr(model.config, 'text_config'): model.config.text_config.use_cache = False
+    coverage = model_profile.check_lora_targets(config, model.named_modules())
+    if quantized:
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True,
+            gradient_checkpointing_kwargs={"use_reentrant": False})
+    else:
+        # Preserve frozen BF16 MoE weights: k-bit preparation can upcast them to FP32.
+        model.requires_grad_(False)
+        model.enable_input_require_grads()
     lora = LoraConfig(task_type="CAUSAL_LM", r=config["lora_r"], lora_alpha=config["lora_alpha"],
         lora_dropout=config["lora_dropout"], target_modules=config["target_modules"], bias="none")
     model = get_peft_model(model, lora)
+    model_profile.check_trainable_scope(config, model.named_parameters())
     model.print_trainable_parameters()
     args = TrainingArguments(output_dir=str(output), num_train_epochs=config["num_train_epochs"], max_steps=config["max_steps"],
         per_device_train_batch_size=config["per_device_train_batch_size"], per_device_eval_batch_size=1,
         gradient_accumulation_steps=config["gradient_accumulation_steps"], learning_rate=config["learning_rate"],
-        lr_scheduler_type="cosine", warmup_ratio=config["warmup_ratio"], optim="paged_adamw_8bit",
+        lr_scheduler_type="cosine", warmup_ratio=config["warmup_ratio"], optim="paged_adamw_8bit" if quantized else "adamw_torch",
         logging_steps=config["logging_steps"], eval_strategy="steps", eval_steps=config["eval_steps"],
         save_strategy="steps", save_steps=config["save_steps"], save_total_limit=config["save_total_limit"],
         bf16=hardware["bf16_supported"], fp16=not hardware["bf16_supported"], gradient_checkpointing=True,
@@ -222,7 +261,7 @@ def run_training(config, checks, hardware):
         return {key: torch.tensor(value, dtype=torch.long) for key, value in collate_lists(features, tokenizer.pad_token_id).items()}
 
     metadata = {"config": config, "data": checks, "hardware": hardware, "base_revision_resolved": getattr(model.config, "_commit_hash", None),
-                "tokenizer_class": type(tokenizer).__name__, "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)}
+                "tokenizer_class": type(tokenizer).__name__, "lora_coverage": coverage, "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)}
     (output / "run_manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     trainer = Trainer(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator, processing_class=tokenizer)
     result = trainer.train()
@@ -258,14 +297,14 @@ def main():
             raise ValueError("Invalid length or sample limits")
         config["offline"] = config["offline"] or opts.offline
         if opts.preflight:
-            print(json.dumps(preflight(), indent=2))
+            print(json.dumps(preflight(config), indent=2))
         else:
             checks = check_data(config)
             if opts.check:
                 print(json.dumps(checks, indent=2))
                 print("Data/configuration check passed. No model was loaded or trained.")
             else:
-                run_training(config, checks, preflight())
+                run_training(config, checks, preflight(config))
     except (ValueError, RuntimeError, ImportError, OSError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1

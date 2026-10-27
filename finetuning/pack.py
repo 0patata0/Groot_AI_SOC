@@ -12,11 +12,15 @@ from train import ROOT, check_data, read_config
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "bundles" / "soc-finetuning.tar.gz")
+    parser.add_argument("--config", type=Path, default=ROOT / "config.json")
     opts = parser.parse_args()
-    raw = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
+    config_path = opts.config.resolve()
+    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json'):
+        parser.error("Choose one of the bundled model profiles")
+    raw = json.loads(config_path.read_text(encoding="utf-8"))
     if any(Path(raw[key]).is_absolute() for key in ("data_dir", "output_dir")):
         parser.error("Use relative data_dir/output_dir paths for a portable bundle")
-    config = read_config(ROOT / "config.json")
+    config = read_config(config_path)
     if Path(config["data_dir"]).resolve() != ROOT / "data":
         parser.error("Portable bundle requires data_dir=data in config.json")
     if not Path(config["output_dir"]).resolve().is_relative_to(ROOT):
@@ -24,7 +28,9 @@ def main():
     check_data(config)
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "evaluate.py",
-             "pack.py", "preparation_summary.json", "data/manifest.json",
+             "pack.py", "model_profile.py", "config.qwen36-thor.json", "requirements.qwen36-thor.txt",
+             "setup_thor.sh", "THOR_35B.md", "audit_tools.py", "mcp_contract.json",
+             "preparation_summary.json", "data/manifest.json",
              "data/train.jsonl", "data/validation.jsonl", "data/test.jsonl"]
     paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))
     for path in paths:

@@ -23,3 +23,7 @@ AttackLM의 `permissive`는 기존 전처리 파일명이다. 위 라이선스�
 `processed/eval/`의 CyberMetric·CTI-Bench·SecQA·AttackLM bench와 `raw/sevenllm/test.jsonl`은 **동일 질문 차단용으로만 읽고 학습에 합치지 않았다.** AIT 원본 경보, SALAD CSV, knowledge/reference, 기타 미지정 파일도 자동으로 학습에 넣지 않았다. 대화형 정답으로 가공하는 별도 단계가 필요한 데이터다.
 
 입력 파일·평가 제외 파일의 SHA256, 출처별 선택/탈락 수, 출력 SHA256은 `data/manifest.json` 및 Git 추적용 `preparation_summary.json`에서 확인한다. 라이선스·출처 메타데이터는 학습 텍스트에 넣지 않는다.
+
+## 2026-10-27 현행 도구 대조
+
+기존 공개 train18,872행의 구조화 호출19,230개는 현행 MCP 전체 이름과 일치0개였다. 모델별 새 학습 설정과 자료의 업무 적합성은 별개다. 현재 스키마 스냅샷·읽기 감사기는 [THOR_35B.md](THOR_35B.md)를 따르며 공개 원출처·라이선스/분할은 유지한다. 이름의 일괄 치환·현재상태 정답화·검수 없는 운영대화 편입은 수행하지 않았다.

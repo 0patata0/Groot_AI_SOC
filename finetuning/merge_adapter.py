@@ -13,6 +13,8 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
+import model_profile
 
 
 def inspect_adapter(adapter):
@@ -31,7 +33,7 @@ def inspect_adapter(adapter):
     revision = manifest.get("base_revision_resolved")
     if not revision and not Path(base).is_dir():
         raise ValueError("Exact base revision unavailable. Recover the original local base folder first.")
-    return {"adapter": str(adapter), "base_model_name_or_path": base, "revision": revision}
+    return {"adapter": str(adapter), "base_model_name_or_path": base, "revision": revision, "training_config": manifest["config"]}
 
 
 def main():
@@ -58,9 +60,9 @@ def main():
         os.environ.setdefault("HF_HOME", str(ROOT / ".cache" / "huggingface"))
         os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
         import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from transformers import AutoTokenizer
         from peft import PeftModel
-        base = AutoModelForCausalLM.from_pretrained(
+        base = model_profile.model_class(info["training_config"]).from_pretrained(
             info["base_model_name_or_path"], revision=info["revision"],
             local_files_only=opts.offline, trust_remote_code=False,
             torch_dtype=getattr(torch, opts.dtype), device_map={"": opts.device},
@@ -70,6 +72,7 @@ def main():
         model = PeftModel.from_pretrained(base, str(opts.adapter), is_trainable=False)
         model = model.merge_and_unload(safe_merge=True)
         model.config.use_cache = True
+        if hasattr(model.config, "text_config"): model.config.text_config.use_cache = True
         model.save_pretrained(str(output), safe_serialization=True, max_shard_size="4GB")
         tokenizer = AutoTokenizer.from_pretrained(str(opts.adapter), local_files_only=True, trust_remote_code=False)
         tokenizer.save_pretrained(str(output))

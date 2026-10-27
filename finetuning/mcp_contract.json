@@ -1,0 +1,1114 @@
+{
+  "observed_at_kst": "2026-10-27T14:27:38.698978+09:00",
+  "scope": "MCP list_tools only; no model request or tool execution",
+  "tools": [
+    {
+      "server": "resp",
+      "name": "mcp__resp__block_ip",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "attacker IPv4, e.g. 203.0.113.7"
+          },
+          "minutes": {
+            "type": "integer",
+            "description": "block duration in minutes (1..120, default 10)"
+          },
+          "reason": {
+            "type": "string",
+            "description": "why (e.g. Wazuh alert id / rule id). Required for audit."
+          }
+        },
+        "required": [
+          "ip",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "resp",
+      "name": "mcp__resp__list_blocks",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "server": "resp",
+      "name": "mcp__resp__unblock_ip",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "ip": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ip"
+        ]
+      }
+    },
+    {
+      "server": "rule-a",
+      "name": "mcp__rule_a__get_operation_status",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          }
+        },
+        "required": [
+          "request_id"
+        ]
+      }
+    },
+    {
+      "server": "rule-a",
+      "name": "mcp__rule_a__get_rule_change_status",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proposal_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{16,64}$"
+          }
+        },
+        "required": [
+          "proposal_id"
+        ]
+      }
+    },
+    {
+      "server": "rule-a",
+      "name": "mcp__rule_a__get_rule_change_target",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "a:modsecurity-custom",
+              "a:suricata-local"
+            ]
+          }
+        },
+        "required": [
+          "target"
+        ]
+      }
+    },
+    {
+      "server": "rule-a",
+      "name": "mcp__rule_a__get_service_action_target",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "a:waf",
+              "a:suricata",
+              "a:chatproxy"
+            ]
+          }
+        },
+        "required": [
+          "target"
+        ]
+      }
+    },
+    {
+      "server": "rule-b",
+      "name": "mcp__rule_b__get_operation_status",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$"
+          }
+        },
+        "required": [
+          "request_id"
+        ]
+      }
+    },
+    {
+      "server": "rule-b",
+      "name": "mcp__rule_b__get_rule_change_status",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "proposal_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{16,64}$"
+          }
+        },
+        "required": [
+          "proposal_id"
+        ]
+      }
+    },
+    {
+      "server": "rule-b",
+      "name": "mcp__rule_b__get_rule_change_target",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "b:wazuh-local-rules"
+            ]
+          }
+        },
+        "required": [
+          "target"
+        ]
+      }
+    },
+    {
+      "server": "rule-b",
+      "name": "mcp__rule_b__get_service_action_target",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "b:wazuh-manager",
+              "b:wazuh-dashboard"
+            ]
+          }
+        },
+        "required": [
+          "target"
+        ]
+      }
+    },
+    {
+      "server": "rule-write-a",
+      "name": "mcp__rule_write_a__propose_rule_change",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "a:modsecurity-custom",
+              "a:suricata-local"
+            ]
+          },
+          "base_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "SHA-256 returned by get_rule_change_target"
+          },
+          "candidate_content": {
+            "type": "string",
+            "description": "Complete replacement content of the selected local rule file"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "target",
+          "base_sha256",
+          "candidate_content",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "rule-write-a",
+      "name": "mcp__rule_write_a__propose_rule_edit",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "a:modsecurity-custom",
+              "a:suricata-local"
+            ]
+          },
+          "base_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Copy the exact SHA-256 returned by get_rule_change_target"
+          },
+          "edits": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "description": "Exact original-text replacements; combined old_text and new_text must fit 64 KiB UTF-8. Final reconstructed file must fit 128 KiB.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "old_text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "A nonempty unique literal excerpt from the original file, preserving all whitespace and newlines"
+                },
+                "new_text": {
+                  "type": "string",
+                  "description": "Exact replacement; keep the anchor when inserting, or empty to delete"
+                }
+              },
+              "required": [
+                "old_text",
+                "new_text"
+              ]
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "target",
+          "base_sha256",
+          "edits",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "rule-write-a",
+      "name": "mcp__rule_write_a__propose_service_action",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "a:waf",
+              "a:suricata",
+              "a:chatproxy"
+            ]
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "restart",
+              "reload"
+            ]
+          },
+          "base_state_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "target",
+          "action",
+          "base_state_sha256",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "rule-write-a",
+      "name": "mcp__rule_write_a__temporarily_contain_ip",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "ip": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "ip",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "rule-write-b",
+      "name": "mcp__rule_write_b__propose_rule_change",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "b:wazuh-local-rules"
+            ]
+          },
+          "base_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "SHA-256 returned by get_rule_change_target"
+          },
+          "candidate_content": {
+            "type": "string",
+            "description": "Complete replacement content of the selected local rule file"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "target",
+          "base_sha256",
+          "candidate_content",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "rule-write-b",
+      "name": "mcp__rule_write_b__propose_rule_edit",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "b:wazuh-local-rules"
+            ]
+          },
+          "base_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Copy the exact SHA-256 returned by get_rule_change_target"
+          },
+          "edits": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "description": "Exact original-text replacements; combined old_text and new_text must fit 64 KiB UTF-8. Final reconstructed file must fit 128 KiB.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "old_text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "A nonempty unique literal excerpt from the original file, preserving all whitespace and newlines"
+                },
+                "new_text": {
+                  "type": "string",
+                  "description": "Exact replacement; keep the anchor when inserting, or empty to delete"
+                }
+              },
+              "required": [
+                "old_text",
+                "new_text"
+              ]
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "target",
+          "base_sha256",
+          "edits",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "rule-write-b",
+      "name": "mcp__rule_write_b__propose_service_action",
+      "protected": true,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "target": {
+            "type": "string",
+            "enum": [
+              "b:wazuh-manager",
+              "b:wazuh-dashboard"
+            ]
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "restart",
+              "reload"
+            ]
+          },
+          "base_state_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "target",
+          "action",
+          "base_state_sha256",
+          "reason"
+        ]
+      }
+    },
+    {
+      "server": "security-events",
+      "name": "mcp__security_events__get_wazuh_sca_checks",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "pattern": "^[0-9]{3,8}$"
+          },
+          "policy_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+          },
+          "title_contains": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120,
+            "description": "Case-insensitive title substring, e.g. GSSAPIAuthentication. Requires policy_id; cannot combine with check_ids."
+          },
+          "check_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "uniqueItems": true,
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          }
+        },
+        "required": [
+          "agent_id"
+        ]
+      }
+    },
+    {
+      "server": "security-events",
+      "name": "mcp__security_events__search_modsecurity_alerts",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "until_kst": {
+            "type": "string",
+            "description": "Optional historical window end, ISO8601 with +09:00. At most 90 days old, never future; lookback_minutes still limits the window to 24 hours."
+          },
+          "lookback_minutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1440,
+            "default": 60
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 10
+          },
+          "source_ip": {
+            "type": "string",
+            "description": "Exact source IPv4 or IPv6 address"
+          },
+          "rule_id": {
+            "type": "string",
+            "pattern": "^[0-9]{1,10}$",
+            "description": "Exact sensor ModSecurity/CRS rule ID, NOT a Wazuh correlation rule ID"
+          }
+        }
+      }
+    },
+    {
+      "server": "security-events",
+      "name": "mcp__security_events__search_suricata_alerts",
+      "protected": false,
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "until_kst": {
+            "type": "string",
+            "description": "Optional historical window end, ISO8601 with +09:00. At most 90 days old, never future; lookback_minutes still limits the window to 24 hours."
+          },
+          "lookback_minutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1440,
+            "default": 60
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 10
+          },
+          "source_ip": {
+            "type": "string",
+            "description": "Exact source IPv4 or IPv6 address"
+          },
+          "signature_id": {
+            "type": "string",
+            "pattern": "^[0-9]{1,10}$",
+            "description": "Exact sensor Suricata SID, NOT a Wazuh correlation rule ID"
+          }
+        }
+      }
+    },
+    {
+      "server": "system-diagnostics",
+      "name": "mcp__system_diagnostics__calculate_time",
+      "protected": false,
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "reference": {
+            "maxLength": 48,
+            "type": "string"
+          },
+          "timestamps": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "pattern": "^[A-Za-z0-9_.:-]{1,32}$",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Full ISO date and time with seconds and Z or UTC offset; up to 9 fractional digits.",
+                  "maxLength": 48,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "value"
+              ],
+              "type": "object"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "timestamps"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "server": "system-diagnostics",
+      "name": "mcp__system_diagnostics__get_system_diagnostics",
+      "protected": false,
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 20,
+            "description": "Returned error sample cap: integer 1..50; values above 50 are refused. Not minutes.",
+            "maximum": 50,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "lookback_minutes": {
+            "default": 15,
+            "maximum": 240,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "target": {
+            "enum": [
+              "a:certificate-monitor",
+              "a:collection",
+              "a:docker",
+              "a:raw-suricata",
+              "a:raw-waf",
+              "a:rule-worker",
+              "a:storage-monitor",
+              "a:suricata",
+              "a:vector",
+              "a:waf",
+              "a:wazuh-agent",
+              "b:collection",
+              "b:docker",
+              "b:hermes",
+              "b:ingestion",
+              "b:llm",
+              "b:management",
+              "b:management-pipeline",
+              "b:mattermost",
+              "b:ollama",
+              "b:rule-worker",
+              "b:soc-bot",
+              "b:vector",
+              "b:wazuh-agent",
+              "b:wazuh-indexer",
+              "b:wazuh-manager",
+              "c:apache",
+              "c:collection",
+              "c:docker",
+              "c:lab-api",
+              "c:lab-broker",
+              "c:lab-guard",
+              "c:lab-terminal",
+              "c:sudo-status",
+              "c:sudo-user-manager",
+              "c:terminal-guard",
+              "c:terminal-status",
+              "c:wazuh-agent",
+              "soc:coverage"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "target"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_agent_ports",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "agent_id": {
+            "description": "Agent ID to get network ports for (required, e.g., \"001\", \"002\", \"003\")",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of ports to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "protocol": {
+            "description": "Protocol to filter by (e.g., \"tcp\", \"udp\")",
+            "type": "string"
+          },
+          "state": {
+            "description": "State to filter by (e.g., \"LISTENING\", \"ESTABLISHED\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id",
+          "protocol",
+          "state"
+        ],
+        "title": "GetAgentPortsParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_agent_processes",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "agent_id": {
+            "description": "Agent ID to get processes for (required, e.g., \"0\", \"1\", \"001\")",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of processes to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "search": {
+            "description": "Search string to filter processes by name or command (optional)",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id"
+        ],
+        "title": "GetAgentProcessesParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_agents",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "group": {
+            "description": "Agent group to filter by (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "ip": {
+            "description": "Agent IP address to filter by (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of agents to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Agent name to search for (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "os_platform": {
+            "description": "Operating system platform to filter by (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "description": "Agent status filter (active, disconnected, pending, never_connected)",
+            "type": "string"
+          },
+          "version": {
+            "description": "Agent version to filter by (optional)",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "GetAgentsParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_alert_summary",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "description": "Parameters for getting alert summary",
+        "properties": {
+          "limit": {
+            "description": "Maximum number of alerts to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "title": "GetAlertSummaryParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_cluster_health",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "GetClusterHealthParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_cluster_nodes",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "limit": {
+            "description": "Maximum number of nodes to retrieve (optional, Wazuh API default is 500)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "node_type": {
+            "description": "Filter by node type (e.g., 'master', 'worker') (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "offset": {
+            "description": "Number of nodes to skip (offset) (optional, default: 0)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "title": "GetClusterNodesParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "agent_id": {
+            "description": "Agent ID to get critical vulnerabilities for (required, e.g., \"0\", \"1\", \"001\")",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of vulnerabilities to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "agent_id"
+        ],
+        "title": "GetCriticalVulnerabilitiesParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_log_collector_stats",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "agent_id": {
+            "description": "Agent ID to get log collector stats for (required, e.g., \"0\", \"1\", \"001\")",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id"
+        ],
+        "title": "GetLogCollectorStatsParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_manager_error_logs",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "limit": {
+            "description": "Maximum number of error log entries to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "title": "GetManagerErrorLogsParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_remoted_stats",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "GetRemotedStatsParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_rules_summary",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "filename": {
+            "description": "Filename to filter by (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "group": {
+            "description": "Rule group to filter by (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "level": {
+            "description": "Rule level to filter by (optional)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "limit": {
+            "description": "Maximum number of rules to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "title": "GetRulesSummaryParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_vulnerability_summary",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "agent_id": {
+            "description": "Agent ID to filter vulnerabilities by (required, e.g., \"0\", \"1\", \"001\")",
+            "type": "string"
+          },
+          "cve": {
+            "description": "CVE ID to search for (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of vulnerabilities to retrieve (default: 10000)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "severity": {
+            "description": "Severity level to filter by (Low, Medium, High, Critical) (optional)",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id"
+        ],
+        "title": "GetVulnerabilitiesSummaryParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__get_wazuh_weekly_stats",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "GetWeeklyStatsParams",
+        "type": "object"
+      }
+    },
+    {
+      "server": "wazuh-ro",
+      "name": "mcp__wazuh_ro__search_wazuh_manager_logs",
+      "protected": false,
+      "parameters": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "level": {
+            "description": "Log level to filter by (e.g., \"error\", \"warning\", \"info\")",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum number of log entries to retrieve (default: 300)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Number of log entries to skip (default: 0)",
+            "format": "uint32",
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "search_term": {
+            "description": "Search term to filter log descriptions (optional)",
+            "nullable": true,
+            "type": "string"
+          },
+          "tag": {
+            "description": "Log tag to filter by (e.g., \"wazuh-modulesd\") (optional)",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "level"
+        ],
+        "title": "SearchManagerLogsParams",
+        "type": "object"
+      }
+    }
+  ]
+}

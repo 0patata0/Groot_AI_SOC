@@ -1,6 +1,6 @@
 # thor-05용 Qwen3.6-35B 학습
 
-2026-10-27: 사용자 지시로 학습 실행 준비에 착수했다. **격리 환경 설치·실제 GPU 축소 구조 검증 완료, 전체35B 원본 다운로드/데이터 토큰화 진행 중. 전체 모델 학습·운영 배포는 아직 없다.** 기존 `config.json`의30B 실험과 정제 데이터·이전 압축파일은 보존했다.35B는 명시적으로 `--config config.qwen36-thor.json`을 선택한다.
+2026-10-27: 사용자 지시로 학습 실행 준비에 착수했다. **격리 환경 설치·실제 GPU 축소 구조 검증 완료, 전체35B 원본 다운로드 중·데이터 토큰화 완료. 전체 모델 학습·운영 배포는 아직 없다.** 기존 `config.json`의30B 실험과 정제 데이터·이전 압축파일은 보존했다.35B는 명시적으로 `--config config.qwen36-thor.json`을 선택한다.
 
 ## 현재 확인한 환경
 
@@ -66,7 +66,7 @@ python3 -B "$training_root/finetuning/thor_container.py" train --root "$training
 - `download_model.py`는 공개 HF 고정 commit의 메타데이터부터 받고 총71,926,864,255B 대상 파일의 크기와 LFS SHA256/Git blob hash를 검증한다. 각 단계는 durable container로 실행되어 SSH가 끊겨도 계속되며 KST status/log를 남긴다.
 - `tokenize`는 검증된 메타데이터만으로 train/validation/test 전체 prefix·마스킹 경계·초과 길이 제외 수를 확인한다. 다운로드와 CPU 검사만 병행할 수 있다. 실제 가중치 학습에는 완료된 다운로드/검증/토큰화가 필요하며 본 학습에는 성공한 smoke가 추가로 필요하다.
 - `smoke`는 accumulation1·2 optimizer step, train32/eval8 prefix 상한이다. 본 학습의 accumulation16과 다르므로 이 속도를 본 학습 전체 시간으로 그대로 환산하지 않는다. `train`은 원설정1epoch·전체 허용 prefix를 사용하고 별도 output에 어댑터를 저장한다. `progress.json`에 KST·step·예상 잔여시간·CUDA peak를 남기며 평가/저장까지 성공해야 completed다. 실패한 output·status를 자동 삭제하거나 학습을 자동 재실행하지 않는다.
-- 현재 Ollama와 자원이 겹쳐96GiB 하한에 못 미친다. 운영 추론 중지/재개는 이 도구에 포함하지 않는다. 학습 시간대·자원 확보 후 재검사하며 운영 모델/GGUF를 자동 교체하지 않는다.
+- 현재 Ollama와 자원이 겹쳐96GiB 하한에 못 미친다. 단계 launcher는 추론 중지/재개를 하지 않는다. 이번에는 사용자가30분 이내2-step 시험/복구를 별도로 승인해, 다운로드·검증/소스SHA/다른GPU작업 부재를 확인하는 일회성 supervisor를 등록했다. 실제 중지 전에25분 호스트 복구 timer를 설정하고 시험 완료/실패 시 즉시복구한다. 본 학습 중 장시간 중단은 별도 시간대 결정이 필요하다. 학습 시간대·자원 확보 후 재검사하며 운영 모델/GGUF를 자동 교체하지 않는다.
 
 오프라인 별도 학습 장비에는 같은 arm64 NGC 이미지와 digest 확인, 해당 이미지/플랫폼용 의존성 wheel과 `install-report.json`의 버전·SHA, 고정 HF snapshot/`base-manifest.json`, 명시적 `pack.py` 소스/데이터 묶음이 필요하다. 이번에는 기존 이미지와 Thor 직접 다운로드를 사용했으며 폐쇄망 신규 학습 환경 전체 반입/설치는 미검증이다. SOC 초기 설치 진입점은 계속 루트 `deploy.sh` 하나다. 학습 실행은 기존 외부 추론 장비의 별도 실험이며 SOC 초기 설치가 모델 학습을 자동 실행하지 않는다.
 
@@ -106,3 +106,5 @@ python3 -B pack.py --config config.qwen36-thor.json \
 ## 이번 검증 범위
 
 이전 준비 단계61개 표준 라이브러리 검사 통과, 두 설정의 데이터/행 수·SHA 검사, shell 구문·Mac 설치 거절 검사, 실서버 Jinja로 공식35B 서식의3가지 대화 prefix/문자 마스킹 경계 확인. Jinja 검사는 실제 토크나이저 ID/모델 적재/학습 검사가 아니다. 후속 실행 단계에서 GPU 환경/패키지 검사·축소 구조 LoRA 역전파를 확인했고 전체 원본 다운로드/실토큰 검사를 진행 중이다. 전체35B 적재·2-step/본 학습·병합/실모델 비교·운영 반영은 미실행이다. [최신 현황](../STATUS.md).
+
+2026-10-27 15:13:56 실토큰 전분할 검사: train44,774 prefix 중35,253개, validation2,793중1,583개, test2,264중1,546개 허용. 길이초과 제외는 각각9,521/1,210/718개이며 prefix 정렬 오류0이다. 로컬/Thor71검사 통과. 추가 축소 랜덤 모델의 실제 Trainer2step·평가·어댑터 저장 통합 검증까지 성공했고 임시 랜덤 가중치는 제거했다. 전체35B 결과는 [STATUS](../STATUS.md)를 따른다.

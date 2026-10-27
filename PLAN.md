@@ -1,6 +1,6 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
-> **10/27 학습 실행 착수:** 격리 CUDA/패키지와 축소 구조 LoRA 검증 완료, 원본35B 다운로드/전체 token 검사 진행. 다음은 checksum·실토큰 결과 확인→공유 추론과 학습 시간대/96GiB 자원 확보→2step peak/손실/속도 확인→별도 본 학습이다. 운영 교체/현SOC 검수 trajectory·미사용 평가셋은 별도이며 [STATUS](STATUS.md)와 [학습 절차](finetuning/THOR_35B.md)를 따른다.
+> **10/27 학습 실행 착수:** 격리 CUDA/패키지와 축소 구조 LoRA 검증 완료, 원본35B 다운로드 중/전체 token 검사 완료. 다음은 checksum·실토큰 결과 확인→공유 추론과 학습 시간대/96GiB 자원 확보→2step peak/손실/속도 확인→별도 본 학습이다. 운영 교체/현SOC 검수 trajectory·미사용 평가셋은 별도이며 [STATUS](STATUS.md)와 [학습 절차](finetuning/THOR_35B.md)를 따른다.
 
 > **10/27 학습 준비 후속:** 현재35B/thor용 별도 프로필·모델/병합 로더·자원 검사·37도구 계약 감사기를 준비했다. 기존30B/20,784행 보존. 다음은 Thor CUDA 환경 준비와 학습 시간대/메모리 확보, 현SOC trajectory 검수·독립 평가셋,2-step GPU 검증이다. 설치/학습/운영 전환은 이번에 하지 않았고 [THOR_35B](finetuning/THOR_35B.md)·[STATUS](STATUS.md)를 따른다.
 

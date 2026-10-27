@@ -160,3 +160,21 @@ python3 -B pack.py --config config.qwen36-soc-main.json --output <새 반입묶�
 ```
 
 위 실행 예시를 현재 실행 중인 작업에 중복 적용하지 않는다. 전체 실행/드라이버/어댑터·복구·정확도 결과는 STATUS의 실제 완료 여부를 따른다.
+
+### MTP·비전 보존 내보내기
+
+`merge_streaming.py`는CPU에서 원본26shard를 순차 읽어 LoRA190대상만 바꾸고 나머지855tensor/MTP19개와 모든 검증된 원본 메타데이터를 복사한다. PEFT0.18.1 CPU safe_merge의 delta BF16 반올림 순서를 고정한다. 저장 뒤1,045개 전체 tensor의 이름·dtype·값을 다시 대조하고 파일 SHA를 남긴다. 첫 작은 불일치 fixture를 수정한 뒤 PEFT와 정확 일치했고 실제pilot35B 출력도 전체 검증/190모듈 변경·MTP19보존으로 완료했다. 기존 `merge_adapter.py`의 전체 모델 재구성과 구분하며 이 프로필의 내보내기에는 이 경로를 사용한다.
+
+```bash
+# 기존 고정 컨테이너 내부 CPU 전용·충분한 RAM/디스크·host reserve 보호 아래:
+/workspace/venv/bin/python -B /workspace/finetuning/merge_streaming.py \
+  --adapter /workspace/outputs/soc-main/adapter \
+  --output /workspace/exports/qwen36-soc-main-hf \
+  --base-manifest /workspace/base-manifest.json --threads 2
+/workspace/venv/bin/python -B /workspace/finetuning/convert_soc.py --variant base
+/workspace/venv/bin/python -B /workspace/finetuning/convert_soc.py --variant main
+```
+
+`main` 명령은 실제 본 학습 완료 후에만 실행한다. 출력이 있으면 덮어쓰지 않고 실패 근거도 보존한다. `convert_soc.py`는 같은 고정 공식 llama.cpp source/CPU binary를 확인하고 원본/병합 파일 SHA를 재검사한 뒤 BF16 GGUF→Q4_K_M을 변환한다. base는 비전 projector도 별도 변환하고 main은 보존 검증된 동일 projector를 재사용한다. MTP1층 포함 metadata를 검사한다. 현재 base 변환 진행 중이며 전체 변환/등록·실제 추론 검증은 미완료다. 원 registry GGUF와 HF commit의 원본 이력이 미확정이므로 같은 HF에서 같은 변환으로 만든 미학습본을 비교 기준으로 추가한다. 일반 기존 운영 모델과의 속도는 별도로 표시한다.
+
+등록 준비에는 [Ollama create API](https://docs.ollama.com/api/create)와 [설치 버전0.40.2 GGUF projector 분류](https://github.com/ollama/ollama/blob/v0.40.2/server/create.go)를 대조했다. 실제 도구·시각·한국어 평가와 비전 입력 시험, 운영 모델 전환은 각각 구분한다. 새 패키지/GPU 권한을 SOC LLM에 위임하지 않는다.

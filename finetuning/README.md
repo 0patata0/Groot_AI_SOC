@@ -166,3 +166,7 @@ python3 -B finetuning/train.py --check
 같은 첫 사용자 질문은 소스가 달라도 같은 split에 묶는다. 평가 전용 파일과 SEVENLLM 원본 test의 동일 질문은 제외한다. 이는 공백 정규화한 질문의 일치 검사이며, 의미가 유사한 질문이나 실제 공격 시나리오 단위 누출까지 제거했다는 보장은 아니다. 공개 자료의 일반 도구명을 현재 MCP 이름으로 무조건 치환하지 않았다. 우리 SOC 전용 데이터로 만들려면 실제 스키마와 검수한 trajectory가 추가로 필요하다. 자세한 출처·제외 범위는 [DATA_SOURCES.md](DATA_SOURCES.md), 수량은 [preparation_summary.json](preparation_summary.json)을 따른다.
 
 참고: [Qwen 공식 모델 카드](https://huggingface.co/Qwen/Qwen3-30B-A3B), [PEFT 양자화 학습](https://huggingface.co/docs/peft/developer_guides/quantization), [PEFT 체크포인트](https://huggingface.co/docs/peft/developer_guides/checkpoint), [QLoRA 논문](https://arxiv.org/abs/2305.14314).
+
+## 현재35B SOC 후속 경로
+
+현재 저장 루트는 Thor `~/Capstone_Groot_training/qwen36-20261027`이다. 새 자료는212대화·train/validation/test144/32/36이며 Git 제외다. `soc_dataset.py`는 계약/출처/분할을 검사하고 `config.qwen36-soc-main.json`·`soc-train`은 전체224prefix1epoch를 별도 결과에 저장한다. `merge_streaming.py`는 MTP/비전이 빠지지 않게 원본 전체를 보존하며190개 LoRA만 병합하고, `convert_soc.py`는 같은 HF 미학습/학습본을 같은 GGUF/Q4_K_M으로 비교할 준비를 한다. 실제pilot HF 내보내기는 검증 완료, 본 학습과 base 변환은 진행 중이다. 단계별 명령/자원·검증 범위는 [THOR_35B](THOR_35B.md), 최신 완료 여부/Git은 [STATUS](../STATUS.md)를 따른다.

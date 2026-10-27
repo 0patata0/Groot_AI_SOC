@@ -6,7 +6,7 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import memory_budget
@@ -63,6 +63,19 @@ class ArtifactTests(unittest.TestCase):
 
 
 class LaunchTests(unittest.TestCase):
+    def test_final_evaluation_reuses_only_the_current_step(self):
+        trainer=SimpleNamespace(state=SimpleNamespace(global_step=2,log_history=[
+            {'step':2,'eval_loss':0.25,'eval_runtime':5,'epoch':1}, {'step':2,'train_loss':0.1}]),evaluate=Mock(return_value={'eval_loss':0.3}))
+        self.assertEqual(train.final_eval_metrics(trainer)['eval_loss'],0.25)
+        trainer.evaluate.assert_not_called()
+        trainer.state.global_step=3
+        self.assertEqual(train.final_eval_metrics(trainer)['eval_loss'],0.3)
+        trainer.evaluate.assert_called_once()
+
+    def test_nonfinite_final_evaluation_cannot_be_reused(self):
+        trainer=SimpleNamespace(state=SimpleNamespace(global_step=2,log_history=[{'step':2,'eval_loss':float('nan')}]))
+        with self.assertRaisesRegex(RuntimeError,'Nonfinite'):train.final_eval_metrics(trainer)
+
     def test_thor_loader_avoids_vendor_sm90_only_grouped_mm(self):
         config=json.loads((train.ROOT/'config.qwen36-thor.json').read_text())
         self.assertEqual(model_profile.loading_kwargs(config),{'experts_implementation':'eager'})

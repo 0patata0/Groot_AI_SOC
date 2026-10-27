@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 import model_profile
 import memory_budget
+from bounded_loading import checkpoint_loading
 
 
 def write_json(path, value):
@@ -36,6 +37,19 @@ def write_json(path, value):
 
 def kst_now():
     return datetime.now(ZoneInfo('Asia/Seoul')).isoformat()
+
+
+def final_eval_metrics(trainer):
+    """Reuse an evaluation only when it describes the final optimizer step."""
+    for entry in reversed(trainer.state.log_history):
+        if 'eval_loss' in entry:
+            if entry.get('step') == trainer.state.global_step:
+                metrics = {key:value for key,value in entry.items() if key.startswith('eval_') or key == 'epoch'}
+                if not all(math.isfinite(v) for v in metrics.values() if isinstance(v,(float,int))):
+                    raise RuntimeError('Nonfinite final evaluation metric')
+                return metrics
+            break
+    return trainer.evaluate()
 
 
 def read_config(path):
@@ -253,6 +267,9 @@ def run_training(config, checks, hardware):
     os.environ.setdefault("HF_HOME", str(ROOT / ".cache" / "huggingface"))
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    if config.get('model_kind') == 'qwen3_5_moe':
+        # Transformers 5.4 supports bounded synchronous tensor materialization.
+        os.environ['HF_DEACTIVATE_ASYNC_LOAD'] = '1'
     import torch
     from transformers import BitsAndBytesConfig, Trainer, TrainerCallback, TrainingArguments, set_seed
     model_profile.check_training_capacity(config, hardware)
@@ -276,8 +293,14 @@ def run_training(config, checks, hardware):
     model_args = model_profile.loading_kwargs(config)
     if quantized:
         model_args['quantization_config'] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
-    model = model_profile.model_class(config).from_pretrained(config["model_name_or_path"], **load_args, torch_dtype=dtype,
-        **model_args, device_map={"": 0}, attn_implementation="sdpa")
+    with checkpoint_loading(config):
+        model = model_profile.model_class(config).from_pretrained(config["model_name_or_path"], **load_args, dtype=dtype,
+            **model_args, device_map={"": 0}, attn_implementation="sdpa")
+    write_json(output / 'loading_memory.json', {'at_kst':kst_now(),
+        'cuda_allocated_bytes':torch.cuda.memory_allocated(), 'cuda_reserved_bytes':torch.cuda.memory_reserved(),
+        'peak_cuda_allocated_bytes':torch.cuda.max_memory_allocated(),
+        'dtype_parameters':dict(Counter(str(p.dtype) for p in model.parameters())),
+        'async_loading':os.environ.get('HF_DEACTIVATE_ASYNC_LOAD') != '1'})
     model.config.use_cache = False
     if hasattr(model.config, 'text_config'): model.config.text_config.use_cache = False
     coverage = model_profile.check_lora_targets(config, model.named_modules())
@@ -308,7 +331,12 @@ def run_training(config, checks, hardware):
     def collator(features):
         return {key: torch.tensor(value, dtype=torch.long) for key, value in collate_lists(features, tokenizer.pad_token_id).items()}
 
-    metadata = {"config": config, "data": checks, "hardware": hardware, "base_revision_resolved": getattr(model.config, "_commit_hash", None),
+    base_artifact = config.get('base_artifact_manifest', {})
+    if base_artifact and base_artifact.get('revision') != config['revision']:
+        raise ValueError('Verified base artifact revision differs from training configuration')
+    metadata = {"config": config, "data": checks, "hardware": hardware,
+                "base_revision_resolved": getattr(model.config, "_commit_hash", None) or base_artifact.get('revision'),
+                "base_artifact_manifest": base_artifact,
                 "tokenizer_class": type(tokenizer).__name__, "lora_coverage": coverage, "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)}
     (output / "run_manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
     class Progress(TrainerCallback):
@@ -327,6 +355,7 @@ def run_training(config, checks, hardware):
                 'metrics':self.metrics})
 
         def on_step_end(self, args, state, control, **kwargs): self.record(state, 'training')
+        def on_train_begin(self, args, state, control, **kwargs): self.record(state, 'training')
 
         def on_log(self, args, state, control, logs=None, **kwargs):
             self.metrics.update(logs or {})
@@ -342,7 +371,7 @@ def run_training(config, checks, hardware):
     trainer.save_model(str(output / "adapter"))
     tokenizer.save_pretrained(str(output / "adapter"))
     trainer.save_metrics("train", result.metrics)
-    trainer.save_metrics("eval", trainer.evaluate())
+    trainer.save_metrics("eval", final_eval_metrics(trainer))
     trainer.save_state()
     progress.record(trainer.state, 'completed')
     print(f"Saved adapter and tokenizer to {output / 'adapter'}. Requires the original base model. No upload performed.")

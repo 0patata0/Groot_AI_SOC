@@ -1,13 +1,16 @@
 """Fixed stages inside the pinned Thor training container; never controls Ollama."""
 import argparse
 import importlib.metadata as md
+import hashlib
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
+import signal
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import guarded_process
 
 ROOT = Path('/workspace')
 SOURCE = ROOT / 'finetuning'
@@ -20,6 +23,10 @@ def run(args, log, env=None):
 
 
 def main():
+    def interrupted(signum, frame):
+        raise InterruptedError(f'Training stage interrupted by signal {signum}')
+    signal.signal(signal.SIGTERM, interrupted)
+    signal.signal(signal.SIGINT, interrupted)
     parser = argparse.ArgumentParser()
     parser.add_argument('stage', choices=['prepare','download','tokenize','smoke','train'])
     stage = parser.parse_args().stage
@@ -46,6 +53,12 @@ def main():
                 run([PYTHON,'-B',SOURCE/'download_model.py'],log)
             else:
                 config=json.loads((SOURCE/'config.qwen36-thor.json').read_text())
+                if stage in ('smoke','train'):
+                    raw=(ROOT/'base-manifest.json').read_bytes();manifest=json.loads(raw)
+                    if not manifest.get('verified') or manifest['revision']!=config['revision'] or manifest['model']!=config['model_name_or_path']:
+                        raise ValueError('Verified base manifest does not match the training profile')
+                    config['base_artifact_manifest']={'model':manifest['model'],'revision':manifest['revision'],
+                        'manifest_sha256':hashlib.sha256(raw).hexdigest()}
                 config.update(model_name_or_path='/workspace/base',offline=True)
                 if stage == 'smoke': config['gradient_accumulation_steps']=1
                 local_config=SOURCE/'config.run.local.json'
@@ -55,7 +68,10 @@ def main():
                 elif stage == 'smoke': args += ['--train','--max-steps','2','--max-train-samples','32',
                     '--max-eval-samples','8','--output-dir','/workspace/outputs/smoke']
                 else: args += ['--train','--output-dir','/workspace/outputs/train']
-                run(args,log)
+                if stage in ('smoke','train'):
+                    guarded_process.run([str(x) for x in args],log=log,cwd=SOURCE,env=os.environ.copy(),
+                                        report=ROOT/f'{stage}-memory-guard.json')
+                else: run(args,log)
         status['status']='completed'
     except Exception as exc:
         status.update(status='failed',error_type=type(exc).__name__,error=str(exc))

@@ -1,5 +1,7 @@
 # thor-05용 Qwen3.6-35B 학습
 
+> **10/27 18:00 학습 재개 결과:** CPU 파일 참조 누적으로 발생한35B 적재 메모리 문제를 보완해 실제2-step·평가·어댑터 저장까지 완료했다. 380텐서 finite/190 B행렬 갱신,78검사 통과. 추론은약2분56초만에 원래35B로 복구했다. 본 학습·변환/등록·운영 교체·SOC 정확도 비교는 미실행이며,현SOC 자료 보완과 장기 학습 시간대 결정이 남는다. 아래 정지/0step은 당시 이력이다. [실측·잔여·Git](../STATUS.md).
+
 > **2026-10-27 16:23 일시정지:** 원본39파일·71.93GB의 checksum과 실토큰 검사는 완료했다. 실제35B 시험은 가중치 적재 중 global OOM으로 실패해 optimizer0/2step이며, 기존 Ollama/35B는약81.4초만에 복구했다. 학습 대기 작업과 복구 timer는 종료됐고 사용자 요청으로 추가 수정/재시험을 중지했다. 아래 실행 준비 이력과 구분하며 [STATUS](../STATUS.md)의 재개 지점을 따른다.
 
 시작 시96GiB 가용 계획 하한과 컨테이너112GiB 제한이 실제 통합 메모리 peak를 보장하지 못했다. 메모리 표본/커널 OOM 근거를 보존했으며 CPU/GPU 동시 적재·일시 버퍼·dtype 등 상세 원인은 재개 후 분석한다. 실패한 `smoke-status.json`·`outputs/smoke`·컨테이너를 자동 삭제/재실행하지 않는다. 전체 모델 학습·학습 어댑터·본 학습 시간 추정·병합/신규 Ollama 등록은 아직 없다.
@@ -7,6 +9,16 @@
 실제 meta 구조 대조에서 필요한1,026텐서는 checkpoint에 모두 있었고, 추가19개 `mtp.*`는 [공식 로더](https://github.com/huggingface/transformers/blob/v5.4.0/src/transformers/models/qwen3_5_moe/modeling_qwen3_5_moe.py)가 제외한다. 이 로더의 모델 파라미터는35,107,181,936개이며 MTP 포함 원본 전체와 구분한다. 향후 내보내기/변환 시 보조 헤드와 비전/서식 보존 범위도 검증해야 한다.
 
 2026-10-27: 사용자 지시로 학습 실행 준비에 착수했다. **격리 환경 설치·실제 GPU 축소 구조 검증 완료, 전체35B 원본 다운로드 중·데이터 토큰화 완료. 전체 모델 학습·운영 배포는 아직 없다.** 기존 `config.json`의30B 실험과 정제 데이터·이전 압축파일은 보존했다.35B는 명시적으로 `--config config.qwen36-thor.json`을 선택한다.
+
+## 메모리 적재 보완 — 2026-10-27 재개
+
+`bounded_loading.py`는 이 프로필의 Transformers5.4.0 적재 구간에만 적용한다. 기본 로더는 전체 safetensors slice/파일 참조를 적재 완료까지 유지한다. Thor의 GPU 복사 후 CPU 익명 메모리가 누적되는 현상을 실측해, 메타데이터만 보유하고 각 텐서를 읽을 때 파일을 다시 열어 복사 후 참조를 해제하도록 바꿨다. `HF_DEACTIVATE_ASYNC_LOAD=1`로 미리 적재하는 작업도 막는다. 체크포인트 바이트·dtype·모델 구조와 설치된 라이브러리 파일은 바꾸지 않으며, 로더 context 종료 시 원래 함수를 복구한다. 독립 학습/병합 프로세스용이며 멀티스레드 운영 추론에 적용하지 않는다. 라이브러리 버전을 바꾸면 재검증 전 실행을 거절한다.
+
+동일한 실가중치2.102GB 제한 시험에서 CUDA 할당은 같았고 최종 CPU RssAnon은2,533,840KiB→481,272KiB로 감소했다. 작은4shard/21tensor의 적재 전후 완전 일치와 누락0도 확인했다. 순차 적재만으로는 실패했으므로 이 두 변경을 분리해 기록한다. 공식 [Transformers 로더](https://github.com/huggingface/transformers/blob/v5.4.0/src/transformers/core_model_loading.py)와 [safetensors0.6.2 파일 참조](https://github.com/huggingface/safetensors/blob/v0.6.2/bindings/python/src/lib.rs)를 대조했다. CUDA 내부의 private page 전환 세부 원리까지 검증한 것은 아니다.
+
+`guarded_process.py`는0.25초마다 host MemAvailable을 확인하고12GiB 미만이거나 관측이 실패하면 이번 학습 자식 프로세스 그룹만 종료한다. 컨테이너 SIGTERM도 자식 정리/실패 상태 기록으로 연결한다. 이는 메모리 예약이나 global OOM의 수학적 방지 보장이 아니며,96GiB 시작 기준·112GiB 컨테이너 상한과 별도로 동작한다. 실제 추론 중단 시험은 독립25분 호스트 복구 timer를 먼저 확인하고, 시험 완료/실패/24분 제한 시 즉시 기존 Ollama/35B를 복구한다. 장기 본 학습은30분 시험 승인에 포함되지 않는다. 실패 시도와 중단 컨테이너는 별도 보존하고 자동 재시도하지 않는다.
+
+마지막 optimizer step의 평가가 이미 수행됐다면 해당 지표를 저장하고 중복 평가를 생략한다. 이전 step의 평가나 비정상 수치는 재사용하지 않는다. 실제 CPU Trainer2step에서 평가 호출1회 유지,78개 검사를 통과했다. 전체35B 재시험은 이 소규모 후속 이후 다시 하지 않았다. 새 container 실행은 검증된 원본 manifest의 revision/SHA를 run manifest에 포함하며, 기존 smoke 산출물은 덮어쓰지 않고 별도 provenance로 출처를 보완했다.
 
 ## 현재 확인한 환경
 

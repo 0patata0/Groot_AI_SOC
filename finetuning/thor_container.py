@@ -22,6 +22,7 @@ def command(root, stage, uid, gid):
            'TOKENIZERS_PARALLELISM':'false','CUDA_VISIBLE_DEVICES':'0','TZ':'Asia/Seoul',
            'PIP_CONSTRAINT':'/workspace/vendor-constraints.txt'}
     if stage in ('tokenize','smoke','train'): env.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
+    if training: env['HF_DEACTIVATE_ASYNC_LOAD']='1'
     args = ['docker','run','-d','--pull=never','--name','capstone-qwen36-'+stage,
             '--user',f'{uid}:{gid}','--cap-drop','ALL','--security-opt','no-new-privileges',
             '--pids-limit','512','--cpus','10' if training else '4','--memory','112g' if training else '12g',

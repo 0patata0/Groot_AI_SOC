@@ -15,6 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 import model_profile
+from bounded_loading import checkpoint_loading
 
 
 def inspect_adapter(adapter):
@@ -62,12 +63,13 @@ def main():
         import torch
         from transformers import AutoTokenizer
         from peft import PeftModel
-        base = model_profile.model_class(info["training_config"]).from_pretrained(
-            info["base_model_name_or_path"], revision=info["revision"],
-            local_files_only=opts.offline, trust_remote_code=False,
-            torch_dtype=getattr(torch, opts.dtype), device_map={"": opts.device},
-            low_cpu_mem_usage=True, **model_profile.loading_kwargs(info["training_config"]),
-        )
+        with checkpoint_loading(info["training_config"]):
+            base = model_profile.model_class(info["training_config"]).from_pretrained(
+                info["base_model_name_or_path"], revision=info["revision"],
+                local_files_only=opts.offline, trust_remote_code=False,
+                dtype=getattr(torch, opts.dtype), device_map={"": opts.device},
+                **model_profile.loading_kwargs(info["training_config"]),
+            )
         # Reload the unquantized base: avoid merging into a lossy 4-bit checkpoint.
         model = PeftModel.from_pretrained(base, str(opts.adapter), is_trainable=False)
         model = model.merge_and_unload(safe_merge=True)

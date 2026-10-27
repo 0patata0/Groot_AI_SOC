@@ -1,5 +1,15 @@
 # 인프라 현황 — 2026-10-27 현재 작업 상태
 
+## 동일 조건 미학습 GGUF 준비 완료 — 2026-10-27 20:35 KST
+
+**전체 SOC 본 학습은103/112step 진행 중이며, 동일 HF 원본의 미학습 GGUF/Q4_K_M 비교본은20:33:14 KST CPU 변환·검증을 완료했다.** 본 학습 완료/추론 복구와 새 모델 등록·실제 추론은 아직 미완료다.
+
+- 고정 llama.cpp의 text BF16 GGUF71,066,994,528B→Q4_K_M21,713,462,784B, 별도 F16 projector899,283,200B를 생성했다. Q4 SHA `810199c2ce42d7db26e6fdd77ffbc1347df1e8ac7cb927377940879c26f34f63`, projector SHA `daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1`. 결과는 Thor `~/Capstone_Groot_training/qwen36-20261027/exports/qwen36-soc-base-gguf/`다. CPU2/RAM16GiB·network none·GPU0·host reserve12GiB, 최저 host 가용30.51GiB, exit0이다. 양자화는약22분29초이며 전체 검증/텍스트·비전 변환 포함약31분32초다.
+- HF1,045tensor(vision333/MTP19)가 GGUF text753/projector334로 표현된다. 공식 변환기의41layer fused expert gate/up 분리(+41)와 비전 Conv3D의 temporal2개 분리(+1)를 확인했다. 단순 수량 동일 검사는 부적절하며 누락이라고 판정하지 않는다. block41·MTP1층·MTP20GGUF tensor와 projector334개의 finite 값을 확인했다. 실제 비전 입력 E2E를 대신하지 않는다.
+- `register_soc.py`는 원본의 template/system/parameters·renderer/parser·capabilities·runner를 대조해 새 base/main 이름으로만 등록하도록 준비했다. 로컬/Thor92검사 통과(최종 metadata 보존 검사는 실제 API 등록 뒤 확인). 스트리밍 업로드는 Thor loopback API에서만 이루어지고 Mac에 가중치를 복사하지 않는다. 기존 모든 모델 digest 불변과 변환 manifest SHA를 결과에 기록한다. 아직 등록 명령은 실행하지 않았다.
+- `soc_evaluate.py --all-cases --all-turns`로test36대화/52assistant턴 전체의 gold-context 개별 턴 평가를 준비했다. 실패 HTTP body도 보존하고0점으로 계산한다. 노출 도구는 사례별 실제 카탈로그 부분집합이며 전체37도구 중 자율 선택·실제 MCP 실행·연속 조사/승인/채팅 E2E와 구분한다. 엄격한 호출/문자열 자동 점수는 유효한 이름 필터·동의어/날짜 표기를 잘못 감점할 수 있어 의미 검토 없이 우위로 해석하지 않는다. 학습 데이터/정답은 바꾸지 않았다.
+- 앞선 HF 보존 내보내기 소스는 `fb5e907670ad968d15f01704f07749fc9fb96044`로 자동 게시하고20:03:20 KST 실제remote main 일치/clean을 확인했다. 이번 등록/평가 준비와 완료 현황은 후속 자동 커밋·푸시 대상이다. 현재 원본 모델 선택·SOC 권한/서비스/설치 진입점은 유지하며, 본 학습 이후 변환·등록·정확도 평가·실제 봇 전환/보호 E2E는 미완료다.
+
 ## 원본 전체 보존 내보내기 검증 — 2026-10-27 20:02 KST
 
 **전체 SOC 본 학습은35/112step(31.25%) 진행 중이다. 별도로 완료된pilot의 실제35B HF 내보내기를 CPU에서 완료해1,045개 전체 텐서와MTP19개 보존을 확인했다.** 본 학습 완료·새 모델 추론/우위·운영 전환은 아직 아니다.

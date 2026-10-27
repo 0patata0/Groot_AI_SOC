@@ -11,7 +11,7 @@ from pathlib import Path
 import re
 import statistics
 import time
-from urllib import request
+from urllib import request,error
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -36,20 +36,27 @@ def score(reference,prediction,case,final,catalog):
         'automatic_scope':'exact structured calls and requested fact strings only; semantic review still required'}
 
 
-def evaluate(model,endpoint,cases,catalog,output,max_groups=8):
-    output=Path(output)
-    if output.exists():raise ValueError('Use a new report path')
+def select_cases(cases,max_groups,all_cases=False):
     selected=[];seen=set()
     for case in cases:
-        if case['split']!='test' or case['scenario_group'] in seen:continue
+        if case['split']!='test':continue
+        if all_cases:selected.append(case);continue
+        if case['scenario_group'] in seen:continue
         seen.add(case['scenario_group']);selected.append(case)
         if len(selected)>=max_groups:break
+    return selected
+
+
+def evaluate(model,endpoint,cases,catalog,output,max_groups=8,all_cases=False,all_turns=False):
+    output=Path(output)
+    if output.exists():raise ValueError('Use a new report path')
+    selected=select_cases(cases,max_groups,all_cases)
     if not selected:raise ValueError('No held-out cases selected')
     report={'at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),'model':model,
-        'mode':'offline gold-context single-turn; no tool execution','results':[]}
+        'mode':'offline gold-context single-turn; no tool execution','all_cases':all_cases,'all_assistant_turns':all_turns,'results':[]}
     for case in selected:
         row=validate_case(case,catalog);positions=[i for i,m in enumerate(row['messages']) if m['role']=='assistant']
-        for index in sorted(set([positions[0],positions[-1]])):
+        for index in positions if all_turns else sorted(set([positions[0],positions[-1]])):
             payload={'model':model,'messages':row['messages'][:index],'stream':False,'think':False,
                 'options':{'temperature':0,'num_predict':512,'num_ctx':8192},'keep_alive':'10m'}
             if row['tools']:payload['tools']=row['tools']
@@ -60,11 +67,12 @@ def evaluate(model,endpoint,cases,catalog,output,max_groups=8):
                 with request.urlopen(req,timeout=180) as response:result=json.load(response)
                 event.update(status='ok',response=result['message'],usage={k:result.get(k) for k in ['load_duration','prompt_eval_count','prompt_eval_duration','eval_count','eval_duration']},
                     scores=score(row['messages'][index],result['message'],case,index==positions[-1],catalog))
+            except error.HTTPError as exc:event.update(status='failed',error=repr(exc),http_body=exc.read().decode(errors='replace')[:2000])
             except Exception as exc:event.update(status='failed',error=repr(exc))
             event['wall_seconds']=round(time.monotonic()-started,3);report['results'].append(event)
             output.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     ok=[e for e in report['results'] if e['status']=='ok']
-    report['summary']={'selected_groups':len(selected),'turns':len(report['results']),'successful_turns':len(ok),
+    report['summary']={'selected_groups':len({c['scenario_group'] for c in selected}),'selected_cases':len(selected),'turns':len(report['results']),'successful_turns':len(ok),
         'mean_score':statistics.mean(e['scores']['score'] if e['status']=='ok' else 0 for e in report['results']),
         'failed_turns':len(report['results'])-len(ok),
         'missing_calls':sum(e['scores']['missing_expected_calls'] for e in ok),
@@ -78,8 +86,9 @@ def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--model',required=True)
     p.add_argument('--endpoint',default='http://127.0.0.1:11434');p.add_argument('--cases',required=True,type=Path)
     p.add_argument('--catalog',type=Path,default=Path(__file__).with_name('mcp_contract.json'))
-    p.add_argument('--output',required=True,type=Path);p.add_argument('--max-groups',type=int,default=8);a=p.parse_args()
-    print(json.dumps(evaluate(a.model,a.endpoint,[json.loads(l) for l in a.cases.read_text().splitlines()],json.loads(a.catalog.read_text()),a.output,a.max_groups),ensure_ascii=False))
+    p.add_argument('--output',required=True,type=Path);p.add_argument('--max-groups',type=int,default=8)
+    p.add_argument('--all-cases',action='store_true');p.add_argument('--all-turns',action='store_true');a=p.parse_args()
+    print(json.dumps(evaluate(a.model,a.endpoint,[json.loads(l) for l in a.cases.read_text().splitlines()],json.loads(a.catalog.read_text()),a.output,a.max_groups,a.all_cases,a.all_turns),ensure_ascii=False))
 
 
 if __name__=='__main__':main()

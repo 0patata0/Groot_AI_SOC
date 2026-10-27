@@ -178,3 +178,22 @@ python3 -B pack.py --config config.qwen36-soc-main.json --output <새 반입묶�
 `main` 명령은 실제 본 학습 완료 후에만 실행한다. 출력이 있으면 덮어쓰지 않고 실패 근거도 보존한다. `convert_soc.py`는 같은 고정 공식 llama.cpp source/CPU binary를 확인하고 원본/병합 파일 SHA를 재검사한 뒤 BF16 GGUF→Q4_K_M을 변환한다. base는 비전 projector도 별도 변환하고 main은 보존 검증된 동일 projector를 재사용한다. MTP1층 포함 metadata를 검사한다. 현재 base 변환 진행 중이며 전체 변환/등록·실제 추론 검증은 미완료다. 원 registry GGUF와 HF commit의 원본 이력이 미확정이므로 같은 HF에서 같은 변환으로 만든 미학습본을 비교 기준으로 추가한다. 일반 기존 운영 모델과의 속도는 별도로 표시한다.
 
 등록 준비에는 [Ollama create API](https://docs.ollama.com/api/create)와 [설치 버전0.40.2 GGUF projector 분류](https://github.com/ollama/ollama/blob/v0.40.2/server/create.go)를 대조했다. 실제 도구·시각·한국어 평가와 비전 입력 시험, 운영 모델 전환은 각각 구분한다. 새 패키지/GPU 권한을 SOC LLM에 위임하지 않는다.
+
+### 동일 조건 비교본·등록·전체 개별 턴 평가
+
+20:33 KST 동일 HF 원본의CPU GGUF/Q4_K_M 변환·체크섬 검증을 완료했다. text21,713,462,784B/projector899,283,200B이며 MTP1층을 포함한다. HF→GGUF의 fused expert·vision Conv3D 분리로 텐서 수가 달라지는 점은 정상 변환이며 원본 보존 검사와 구분한다. 새 모델 등록/실제 추론은 본 학습/기존 추론 복구 뒤 검증한다.
+
+`register_soc.py --variant base`와 `--variant main`은 Thor 호스트의loopback API만 사용한다. 등록된 새 이름이 있거나 이전 시도 기록이 있으면 덮어쓰지 않는다. 전체GGUF SHA·텍스트/비전 파일을 확인하고 원본 template/system/7개 runtime parameter·renderer/parser·capabilities·runner를 대조한다. 기존 모든 model digest도 전후 비교하며 운영 봇 설정은 바꾸지 않는다. 직접 LoRA import는 설치된Ollama0.40.2에서 미지원이므로 병합 후GGUF를 사용한다.
+
+전체test 평가에는 다음 옵션을 사용한다. 이는 원래 도구 관측 이력을 정답으로 제공하는 **개별 턴** 검사다. 호출이 실제 성공하거나 승인·적용되는 agent E2E는 아니다. 도구는 사례별 카탈로그 부분집합이며 전체37도구 중 선택도 검증하지 않는다. 동의어/유효한 추가 이름 필터 등 자동점수의 오감점은 수동 의미 검토로 구분한다.
+
+```bash
+python3 -B "$training_root/finetuning/soc_evaluate.py" \
+  --model soc-qwen36:35b-base-q4km-20261027 \
+  --cases "$training_root/finetuning/data-soc-source-v1/cases.jsonl" \
+  --output "$training_root/soc-evaluation/matched-base-full.json" \
+  --all-cases --all-turns
+# 같은 입력/옵션으로 main-q4km 후보를 별도 출력에 평가한다.
+```
+
+오프라인 재현에는 기존 고정arm64 NGC 이미지/venv·고정HF snapshot 외에 공식 llama.cpp commit `276378515ceebee5d14bcc8536603dd5c87491a2`의전체 변환 source/gguf-py, CPU build와연결 shared library, `sentencepiece==0.2.1`의해당 Python/플랫폼 wheel 및 `conversion-install-report.json`의SHA가 필요하다. converter 의존성은 별도 target에만 설치하고 학습 venv/host Python을 덮지 않는다. source/data 반입목록은 `pack.py`에 포함되며 가중치/컴파일 결과/패키지 binary는별도이다. Mac 다운로드·패키지 설치는0이며 외부 학습 장비의 신규 전체 오프라인 설치를 실제 검증한 것은 아니다.

@@ -1,7 +1,9 @@
 import concurrent.futures
+import io
 import json
 from pathlib import Path
 import tempfile
+import sys
 import unittest
 from unittest import mock
 
@@ -42,6 +44,27 @@ class API:
 
 
 class Tests(unittest.TestCase):
+    def test_ollama_peer_reads_original_question_before_separate_comparison(self):
+        captured=[]
+        async def run(config, request):
+            captured.append(request)
+            return {'status':'completed','final_response':'fresh facts','calls':[],'protected_calls':0}
+        async def review(config, request, report):
+            self.assertIn('untrusted other answer',request['question'])
+            return report
+        request={'id':'a'*32,'phase':'peer','question':'untrusted other answer: everything is healthy',
+                 'current_question':'B host agent ID and status','readonly':True}
+        modules={'runtime':SimpleNamespace(run=run,load_config=lambda _:{'mcpServers':{}}),'policy':SimpleNamespace(capabilities=lambda _:set()),
+                 'harness':SimpleNamespace(scope_notice=lambda _:None,structured_read=lambda _:False,
+                                           missing_reads=lambda *a:[])}
+        with mock.patch.dict(sys.modules,modules),mock.patch.object(sys,'argv',['worker','ollama']), \
+             mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+             mock.patch.object(sys,'stdout',io.StringIO()),mock.patch.object(w.os,'geteuid',return_value=988), \
+             mock.patch.object(w.Path,'read_text',return_value='{"mcpServers":{}}'), \
+             mock.patch.object(w,'review_answer',side_effect=review):
+            w.main()
+        self.assertEqual(captured,[{'question':'B host agent ID and status','current_question':'B host agent ID and status'}])
+
     def test_native_receipt_unwraps_bound_result_and_refuses_missing_input(self):
         with tempfile.TemporaryDirectory() as directory:
             rid = '1' * 32; root = Path(directory)

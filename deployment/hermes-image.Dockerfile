@@ -17,10 +17,10 @@ assert shutil.which('uv') and shutil.which('ssh'), 'base_image_tools_missing'
 root = pathlib.Path('/opt/hermes')
 inputs = pathlib.Path('/tmp/capstone-image-input')
 pins = {
-    'korean_output_guard.py': 'a6b977d2c670ded98f61639a480702ed06d4a866b705e7d10705a056b974895c',
+    'korean_output_guard.py': '860c0c15f5f328e7e70e0f8332663d7a0867a87f5d10012e22777b7d18761a35',
     'patch_korean_output_guard.py': 'd6e1ea2e594ae958a33005127a618d52907e93408b786a437e163214dfaec17b',
     'korean-output-guard-requirements.txt': '2a7835754a18465d6b7d9b891b239e48254c29fe8d703ff4bdafb99cf39115e2',
-    'test_korean_output_guard.py': '82bc0fcbf2cf658ce7161b34faffcb7204020b9cd0a253fac090162566f6816a',
+    'test_korean_output_guard.py': 'ca88119663ea306e9d5a93ce4911d554ccd07389665b6c03c55d16d7386cd2ed',
     'test_korean_output_guard_engine.py': 'a847a34c05b094552c38d8d56bc9f15d3ab76c98dd6af92de199fe4c0d2b3ddc',
     'verify_korean_output_guard_runtime.py': '7af8e0bb63cd9a4545d1d906c328a6ba43a1a71788efb652d42a8717d512fac9',
     'regex-2026.9.29-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl': 'd49c18f1ea294cf4adde2e5ac256e98c82ea9d708462ce4bf799dffa7cfe8a2c',

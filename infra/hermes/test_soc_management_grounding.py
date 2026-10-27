@@ -127,6 +127,17 @@ class Grounding(unittest.TestCase):
         self.agent.model='another-model'
         self.assertEqual(wrapper.management_reasoning(self.request,self.agent),self.request)
 
+    def test_thor_transport_preserves_management_and_readonly_profiles(self):
+        self.agent.base_url='http://10.200.10.10:11435/v1'
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'manage','CAPSTONE_OPERATOR_REVIEW':'0'}):
+            request=wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)
+            self.assertEqual(request['reasoning_effort'],'medium')
+            self.assertNotIn('think',request['extra_body'])
+        with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_OPERATOR_REVIEW':'0'}):
+            request=wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)
+            self.assertEqual(request['reasoning_effort'],'none')
+            self.assertEqual(request['max_tokens'],2048)
+
     def test_operator_case_review_keeps_reasoning_budget_separate_from_chat(self):
         with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_OPERATOR_REVIEW':'1'}):
             request=wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)

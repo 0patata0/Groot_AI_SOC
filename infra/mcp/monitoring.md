@@ -37,7 +37,7 @@ A의 `capstone-soc-observe.timer`는 A 로컬 및 B/C의 고정 읽기 전용 �
 
 ## 모델·로그 전달 점검
 
-B의 `capstone-soc-model.timer`는 5분마다 현재 DGX 모델에 최대4토큰의 짧은 요청을 보낸다. GPU 상태나 보안 판단 정확도, 모든 MCP 사용 성공을 대신하지 않는다.
+B의 `capstone-soc-model.timer`는 3분마다 현재 설정된 모델에 최대4토큰의 짧은 요청을 보낸다. 2026-10-27 thor 첫 적재 약58초를 확인해 요청별 `keep_alive=10m`를 지정하고 기본5분 해제보다 앞서 검사하도록 맞췄다. Ollama 서버의 전역 설정이나 다른 모델의 설정은 바꾸지 않는다. 캐시는180초 미만이고 URL/모델의 SHA가 일치할 때만 사용한다. 장애·서비스 재시작 후의 첫 적재 지연이나 장기 성능을 보장하는 기능은 아니다. GPU 상태나 보안 판단 정확도, 모든 MCP 사용 성공을 대신하지 않는다.
 
 A는 기존 별도 canary 파일에 15분마다13행을 추가한다. B의 `capstone-soc-ingestion.timer`가 약60초마다 고유 run ID의 manager2경보·Indexer2문서와 정확한 사건 tuple을 대조한다. 기존 level3 canary 규칙 SHA와 활성 대응/integration 범위가 안전한 경우만 입력을 허용한다. 규칙 불일치·증거 누락·오래된 결과를 정상으로 처리하지 않는다.
 

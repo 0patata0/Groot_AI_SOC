@@ -831,6 +831,13 @@ class ReadonlyRecoveryTests(unittest.TestCase):
 
 
 class ThinkingRecoveryTests(unittest.TestCase):
+    def test_thor_tunnel_keeps_the_same_bounded_reasoning_control(self):
+        h=self.harness(base_url='http://10.200.10.10:11435/v1')
+        self.assertEqual(h.call().action,'continue')
+        retry=h.agent._build_api_kwargs()
+        self.assertEqual(retry['reasoning_effort'],'medium')
+        self.assertNotIn('think',retry['extra_body'])
+        self.assertEqual(h.agent._build_api_kwargs()['reasoning_effort'],'none')
     def harness(self, **route):
         h = Harness()
         settings = {'provider': 'custom', 'model': 'qwen3.6:35b',

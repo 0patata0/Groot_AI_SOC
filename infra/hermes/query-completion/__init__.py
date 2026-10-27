@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.11.13"
+VERSION = "groot-query-completion:1.11.15"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "b18ff96a76995bcccc3adda5897844f506d53325f4effd5b409fb73bc8f51faf"
+EVIDENCE_SOURCE_SHA256 = "350ff14292f62305b5d27c22721cbbac38ab0f78d61e18e79538f03e3a6b566e"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -301,7 +301,8 @@ def _arm_read_request(agent, turn, *, require_read=True, inventory_only=False, f
                 and getattr(agent, "model", None) == "qwen3.6:35b"
                 and extra.get("model", result.get("model")) == "qwen3.6:35b"
                 and isinstance(base_url, str)
-                and base_url.rstrip("/") == "http://211.170.162.111:11434/v1"):
+                and base_url.rstrip("/") in {"http://211.170.162.111:11434/v1",
+                                              "http://10.200.10.10:11435/v1"}):
             # This verified boolean-thinking route accepts the compatibility
             # effort field. Do not depend on a model's changeable default.
             for key in ("think", "reasoning_effort", "reasoning"):

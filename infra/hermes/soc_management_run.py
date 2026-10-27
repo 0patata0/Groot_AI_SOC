@@ -118,7 +118,16 @@ def _kst_prose(text):
     text = _kst_table(text)
     text = re.sub(r'\bUTC\s*[:：]?\s*('+date+r')(?![0-9:+.Z-])',lambda m:kst_time(m[1]+' UTC'),text)
     text = re.sub(r'('+date+r')\s*\(UTC\)',lambda m:kst_time(m[1]+' UTC'),text)
-    return _AWARE_TIME.sub(lambda m:m[0] if m[0].endswith(('KST','+09:00','+0900')) else kst_time(m[0]),text)
+    text = _AWARE_TIME.sub(lambda m:m[0] if m[0].endswith(('KST','+09:00','+0900')) else kst_time(m[0]),text)
+    def label(match):
+        stamps = _AWARE_TIME.findall(match[2])
+        parsed = [parse_instant(value) for value in stamps]
+        if parsed and all(value is not None and value.utcoffset() == timedelta(hours=9) for value in parsed):
+            return match[1] + 'KST' + match[2]
+        return match[0]
+    # A labelled field can retain '(UTC)' beside an already-KST value.
+    # Fix that label only; do not convert the instant again or rewrite prose.
+    return re.sub(r'(?m)^([ \t]*(?:[-*]\s*)?(?:\*\*)?[^:\n`]{1,100}\()UTC(\)(?:\*\*)?\s*[:：][^\n]*)$', label, text)
 
 
 def kst_display(text):
@@ -518,7 +527,8 @@ def management_reasoning(request, agent):
     """Use the verified Ollama compatibility control in this process only."""
     extra = dict(request.get('extra_body') or {})
     if (getattr(agent, 'provider', None) != 'custom' or getattr(agent, 'model', None) != 'qwen3.6:35b'
-            or str(getattr(agent, 'base_url', '')).rstrip('/') != 'http://211.170.162.111:11434/v1'
+            or str(getattr(agent, 'base_url', '')).rstrip('/') not in {
+                'http://211.170.162.111:11434/v1', 'http://10.200.10.10:11435/v1'}
             or extra.get('model', request.get('model')) != 'qwen3.6:35b'):
         return request
     result = dict(request)

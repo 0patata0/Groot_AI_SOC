@@ -411,7 +411,7 @@ class NativeRewriteTransportTests(unittest.IsolatedAsyncioTestCase):
         return json.dumps(value, ensure_ascii=False).encode("utf-8")
 
     @contextmanager
-    def fake_transport(self, response_body, status=200):
+    def fake_transport(self, response_body, status=200, endpoint="http://211.170.162.111:11434/v1"):
         """Provide existing-dependency interfaces without imports or any network."""
         captured = {"requests": [], "session_options": [], "timeouts": []}
 
@@ -451,13 +451,20 @@ class NativeRewriteTransportTests(unittest.IsolatedAsyncioTestCase):
         fake_aiohttp.ClientTimeout = timeout
         fake_yaml = ModuleType("yaml")
         fake_yaml.safe_load = lambda _text: {"model": {
-            "base_url": "http://211.170.162.111:11434/v1", "default": "qwen3.6:35b",
+            "base_url": endpoint, "default": "qwen3.6:35b",
         }}
         config_path = SimpleNamespace(stat=lambda: SimpleNamespace(st_size=100),
                                       read_text=lambda **_kwargs: "synthetic test config")
         with mock.patch.dict(sys.modules, {"aiohttp": fake_aiohttp, "yaml": fake_yaml}):
             with mock.patch.object(MOD, "CONFIG_PATH", config_path):
                 yield captured
+
+    async def test_thor_transport_keeps_native_rewrite_fragment_only(self):
+        with self.fake_transport(self.response(), endpoint="http://10.200.10.10:11435/v1") as captured:
+            result = await MOD._default_rewrite(self.MASKED)
+        self.assertEqual(result, self.MASKED.replace("规则", "규칙").replace("確認", "확인"))
+        self.assertEqual(captured['requests'][0]['url'], 'http://10.200.10.10:11435/api/chat')
+        self.assertNotIn('__KOG_', json.dumps(captured['requests'][0]['json']))
 
     async def test_native_transport_sends_only_foreign_fragments_and_restores_tokens_locally(self):
         with self.fake_transport(self.response()) as captured:

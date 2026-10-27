@@ -125,6 +125,22 @@ class ControllerContract(unittest.TestCase):
         self.assertLess(phases.index('siem trial-install'), phases.index('siem trial-verify'))
         self.assertFalse(any(x.startswith(('security trial-', 'service trial-')) for x in phases))
 
+    def test_inference_config_path_is_transferred_without_secret_material(self):
+        with self.config.open('a') as f:
+            f.write('LLM_TUNNEL_CONFIG=/etc/capstone-inference/tunnel.json\n')
+        result = self.run_controller()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for payload in self.payloads():
+            self.assertIn('export LLM_TUNNEL_CONFIG=/etc/capstone-inference/tunnel.json', payload['site_env'].splitlines())
+            self.assertFalse(any('id_ed25519' in n or 'tunnel.json' in n for n in payload['source_names']))
+
+    def test_inference_config_rejects_traversal_before_ssh(self):
+        with self.config.open('a') as f:
+            f.write('LLM_TUNNEL_CONFIG=/etc/../tmp/tunnel.json\n')
+        result = self.run_controller('--plan')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.events(), [])
+
     def test_trial_check_failure_stops_install(self):
         with self.config.open('a') as f:
             f.write('OLLAMA_TRIAL_ENABLE=1\n')

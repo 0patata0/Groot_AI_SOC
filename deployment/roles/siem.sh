@@ -21,6 +21,7 @@ HOSTS = {k: os.environ.get(k, '') for k in ('SECURITY_HOST', 'SIEM_HOST', 'SERVI
 IP = HOSTS['SIEM_HOST']
 LLM = os.environ.get('LLM_BASE_URL', '')
 MODEL = os.environ.get('LLM_MODEL', '')
+TUNNEL_CONFIG = os.environ.get('LLM_TUNNEL_CONFIG', '')
 SSH_PORT = os.environ.get('SSH_PORT', '22')
 MCP_USER, HERMES_USER = 'capstone-mcp', 'capstone-hermes'
 NAMES = {'wazuh.manager': 'capstone-wazuh-manager', 'wazuh.indexer': 'capstone-wazuh-indexer',
@@ -219,10 +220,11 @@ def install_hermes_extensions(data, hu, creds, hc):
             'CAPSTONE_MM_TEAM_ID':creds['mattermost_team_id'],'CAPSTONE_MM_BOT_ID':creds['mattermost_bot_id']}
 def profile(snap, images):
     return {'hosts':HOSTS,'ssh_port':int(SSH_PORT),'llm_base_url':LLM,'llm_model':MODEL,'images':images,
+            'inference_tunnel_config_sha256':digest(read(TUNNEL_CONFIG,65536,True)) if TUNNEL_CONFIG else None,
             'prerequisite_tree_sha256':digest(canonical(snap)),
             'prerequisite_credentials_sha256':digest(read(PRE/'siem.json',16384,True)),
             'source_sha256':{p:digest(read(SOURCE/p)) for p in (
-                'deployment/ssh_macs.py','deployment/siem_host_agent.py',
+                'deployment/ssh_macs.py','deployment/siem_host_agent.py','deployment/inference_tunnel.py',
                 'infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
                 'infra/hermes/SOUL.groot.md',
                 'deployment/bot_profiles.py','deployment/bot-icons/sources.json',
@@ -249,7 +251,16 @@ def fresh():
     for port in (1514,1515,55000,9200,443,8065):
         need(not run(['ss','-H','-ltn','sport = :'+str(port)]).strip(),'required_TCP_port_already_used_'+str(port))
     need(not run(['ss','-H','-lun','sport = :514']).strip(),'required_UDP_port_already_used_514')
+def inference_transport(action):
+    if not TUNNEL_CONFIG: return
+    c=parse(read(TUNNEL_CONFIG,65536,True))
+    need(LLM.rstrip('/')=='http://%s:%s/v1' % (c.get('listen_host'),c.get('listen_port')),
+         'inference_tunnel_endpoint_mismatch')
+    need(c.get('listen_host')==IP, 'inference_tunnel_must_bind_siem_address')
+    read(SOURCE/'deployment/inference_tunnel.py')
+    run(['python3','-B',str(SOURCE/'deployment/inference_tunnel.py'),action,'--config',TUNNEL_CONFIG],45)
 def preflight():
+    inference_transport('check')
     global cfg
     need(os.geteuid() == 0, 'root_required')
     need(ROOT == pathlib.Path('/opt/capstone'), 'CAPSTONE_ROOT_must_be_opt_capstone')
@@ -771,6 +782,7 @@ asyncio.run(main())
     run(['docker','exec','-i','--user',str(hu.pw_uid)+':'+str(hu.pw_gid),NAMES['hermes'],
          '/opt/hermes/.venv/bin/python','-B','-'],100,code.encode())
 def verify():
+    inference_transport('verify')
     run(['python3','-B',str(SOURCE/'deployment/ssh_macs.py'),'verify'])
     run(['python3','-B',str(SOURCE/'deployment/siem_host_agent.py'),'verify'])
     saved=parse(read(STATE)); need(saved.get('status')=='applied','successful_apply_receipt_required')
@@ -811,6 +823,7 @@ try:
     # No root state is published until all static prerequisites and offline image imports pass.
     fresh(); phase='ssh_macs'
     run(['python3','-B',str(SOURCE/'deployment/ssh_macs.py'),'install'])
+    phase='inference_transport'; inference_transport('install')
     phase='files_and_enrollment'; c=prepare_files(c,snap,images)
     phase='log_pipeline_prepare'
     log_pipeline('prepare')

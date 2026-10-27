@@ -386,8 +386,9 @@ async def _default_rewrite(text: str) -> str:
     if not isinstance(endpoint, str) or not isinstance(name, str) or not re.fullmatch(r"qwen[A-Za-z0-9_.:/+\-]{1,100}", name):
         raise ValueError("guard_config_model")
     parsed = urlsplit(endpoint)
-    if (parsed.scheme != "http" or parsed.hostname not in {"211.170.162.110", "211.170.162.111"}
-            or parsed.port != 11434 or parsed.path not in ("/v1", "/v1/")
+    if (parsed.scheme != "http" or (parsed.hostname, parsed.port) not in {
+            ("211.170.162.110", 11434), ("211.170.162.111", 11434), ("10.200.10.10", 11435)}
+            or parsed.path not in ("/v1", "/v1/")
             or parsed.username or parsed.password or parsed.query or parsed.fragment):
         raise ValueError("guard_config_endpoint")
     prompt = (

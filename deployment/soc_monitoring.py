@@ -73,7 +73,7 @@ def units(role):
             'TimeoutStartSec=50\nTimeoutStopSec=5\nKillMode=control-group\n').encode()
         docs[name+'.timer']=(
             '[Unit]\nDescription=Periodic SOC '+action+'\n[Timer]\nOnBootSec=45s\n'
-            'OnUnitInactiveSec='+('300' if action=='model' else '60')+'s\nAccuracySec=5s\n'
+            'OnUnitInactiveSec='+('180' if action=='model' else '60')+'s\nAccuracySec=5s\n'
             '[Install]\nWantedBy=timers.target\n').encode()
     return docs
 

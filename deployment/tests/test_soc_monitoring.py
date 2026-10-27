@@ -1,12 +1,47 @@
 import importlib.util
+import hashlib
+import json
 from pathlib import Path
 import sys
+import tempfile
+from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 DEP=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(DEP))
 import soc_monitoring as m
+spec=importlib.util.spec_from_file_location('probe',DEP.parent/'infra/mcp/soc_monitor.py')
+probe=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe)
+
+
+class ModelProbeTests(unittest.TestCase):
+    def test_fresh_receipt_from_another_backend_does_not_skip_inference(self):
+        with tempfile.TemporaryDirectory() as root:
+            cfg={'llm_url':'http://10.200.10.10:11435','model':'qwen3.6:35b'}
+            h=SimpleNamespace(load_config=lambda _:cfg,request_json=Mock(return_value={'done':True,'model':cfg['model'],'response':'OK'}))
+            d=SimpleNamespace(runtime_library=lambda:h,root_file=lambda p,*a:p.read_bytes(),parsed=json.loads)
+            p=Path(root)/'model-probe.json';p.write_text(json.dumps({'checked_at':999,'backend_sha256':'previous'}))
+            with patch.object(probe,'STATE',Path(root)),patch.object(probe.time,'time',return_value=1000),patch.object(probe,'atomic') as save:
+                probe.model_probe(d)
+            body=h.request_json.call_args.kwargs['body']
+            self.assertEqual(body['keep_alive'],'10m');self.assertEqual(body['options']['num_predict'],4)
+            self.assertTrue(save.call_args.args[1]['success'])
+            self.assertEqual(save.call_args.args[1]['backend_sha256'],hashlib.sha256(json.dumps([cfg['llm_url'],cfg['model']]).encode()).hexdigest())
+
+    def test_same_backend_cache_expires_at_three_minutes(self):
+        with tempfile.TemporaryDirectory() as root:
+            cfg={'llm_url':'http://10.200.10.10:11435','model':'qwen3.6:35b'}
+            h=SimpleNamespace(load_config=lambda _:cfg,request_json=Mock(return_value={'done':True,'model':cfg['model'],'response':'OK'}))
+            d=SimpleNamespace(runtime_library=lambda:h,root_file=lambda p,*a:p.read_bytes(),parsed=json.loads)
+            key=hashlib.sha256(json.dumps([cfg['llm_url'],cfg['model']]).encode()).hexdigest()
+            (Path(root)/'model-probe.json').write_text(json.dumps({'checked_at':1000,'backend_sha256':key}))
+            with patch.object(probe,'STATE',Path(root)),patch.object(probe.time,'time',return_value=1179),patch.object(probe,'atomic'):
+                probe.model_probe(d)
+            h.request_json.assert_not_called()
+            with patch.object(probe,'STATE',Path(root)),patch.object(probe.time,'time',return_value=1180),patch.object(probe,'atomic'):
+                probe.model_probe(d)
+            h.request_json.assert_called_once()
 
 
 class MonitoringInstallerTests(unittest.TestCase):
@@ -29,7 +64,7 @@ class MonitoringInstallerTests(unittest.TestCase):
         docs=m.units('siem')
         self.assertEqual(set(docs),{'capstone-soc-model.service','capstone-soc-model.timer',
                                   'capstone-soc-ingestion.service','capstone-soc-ingestion.timer'})
-        self.assertIn(b'OnUnitInactiveSec=300s',docs['capstone-soc-model.timer'])
+        self.assertIn(b'OnUnitInactiveSec=180s',docs['capstone-soc-model.timer'])
         self.assertIn(b'OnUnitInactiveSec=60s',docs['capstone-soc-ingestion.timer'])
 
     def test_source_bundle_carries_every_probe_dependency(self):

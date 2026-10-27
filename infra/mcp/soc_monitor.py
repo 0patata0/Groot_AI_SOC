@@ -186,18 +186,19 @@ def observer(d,cfg):
 
 def model_probe(d):
     h=d.runtime_library();cfg=h.load_config('siem');now=int(time.time())
+    backend=hashlib.sha256(json.dumps([cfg['llm_url'],cfg['model']]).encode()).hexdigest()
     previous=STATE/'model-probe.json'
     if previous.exists():
         old=d.parsed(d.root_file(previous,4096))
-        if 0<=now-old['checked_at']<300: return
+        if old.get('backend_sha256')==backend and 0<=now-old['checked_at']<180: return
     start=time.monotonic();ok=False
     try:
         response=h.request_json(cfg['llm_url'],'/api/generate',timeout=35,body={
-            'model':cfg['model'],'prompt':'Reply OK.','stream':False,'think':False,
+            'model':cfg['model'],'prompt':'Reply OK.','stream':False,'think':False,'keep_alive':'10m',
             'options':{'num_predict':4,'temperature':0}})
         ok=response.get('done') is True and response.get('model')==cfg['model'] and isinstance(response.get('response'),str) and bool(response['response'].strip())
     except (ValueError,OSError,http.client.HTTPException): pass
-    atomic(previous,{'schema':1,'checked_at':now,'success':ok,'elapsed_ms':round((time.monotonic()-start)*1000),
+    atomic(previous,{'schema':1,'checked_at':now,'success':ok,'backend_sha256':backend,'elapsed_ms':round((time.monotonic()-start)*1000),
         'scope':'bounded_inference_only_no_tool_or_security_judgement'})
 
 

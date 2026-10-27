@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+> **2026-10-27 선택 추론 터널:** root `deploy.sh`에 `LLM_TUNNEL_CONFIG`를 추가했다. 기존 OpenSSH/Python/systemd로 B 전용 주소에서 외부 추론 서버의 loopback API에 연결하며 별도 모델·패키지 다운로드나 키 위임을 하지 않는다. [준비·권한·검증·복구](inference-transport.md)와 [실제 운영 상태](../STATUS.md)를 구분한다.
+
 > **2026-10-27 B 호스트 agent:** `deploy.sh`의 SIEM 역할도 검증된 미등록 Wazuh4.14.8-1 deb를 요구한다. manager 준비 후 `siem_host_agent.py`로 별도 host agent 등록·연결을 검증하고 초기 소스 프로필에 포함한다. 응답 서식은 정책 블록 안의 정확한5항목만 추출해 앞쪽 조회 범위 지침이 추가돼도 초기 설치가 실패하지 않는다. 기존 서버에는 초기 설치기를 재실행하지 않는다. 두 봇의 host/manager 구분과 공통38대상 진단을 함께 배포한다. [반입](setup-packages-artifacts.md#오프라인-b-호스트-패키지와-검증) · [검증](verify-troubleshoot.md#b-호스트-수집과-manager-컨테이너-구분).
 
 > **2026-10-27 Ollama 연결 수명:** `deploy.sh`의 기존 Ollama 설치/upgrade 소스 목록에 `infra/ollama-trial/read_pool.py`를 포함한다. 오프라인 반입은 기존 source archive만 갱신하며 deb/wheel/이미지 추가는 없다. `OLLAMA_TRIAL_CHAT_ENABLE=1`의 일반 채팅은 순수 읽기 연결을 최대300초 유휴 유지한다. SSH 설정·키 교체 시 gateway 재시작이 필요하다. 설치 계약/운영 증분 배포와 새3VM 전체설치 미실행 범위는 [STATUS](../STATUS.md)를 따른다.

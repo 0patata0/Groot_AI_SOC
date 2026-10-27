@@ -22,6 +22,18 @@ def runtime():
 
 
 class EvidenceKST(unittest.TestCase):
+    def test_utc_field_label_with_kst_value_changes_label_only(self):
+        text='- **최종 Keep Alive (UTC)**: 2026-10-27T13:14:20+09:00 (KST)'
+        expected=text.replace('(UTC)','(KST)')
+        self.assertEqual(E.kst_display(text),expected)
+        self.assertEqual(E.kst_display(expected),expected)
+
+    def test_field_label_without_aware_time_and_fenced_original_are_preserved(self):
+        text='- 최종 시각 (UTC): 미확인\n```text\n- 원문 (UTC): 2026-10-27T13:14:20+09:00\n```\nUTC 원문은 KST 표시와 구분한다.'
+        self.assertEqual(E.kst_display(text),text)
+        invalid='- 시각 (UTC): 2026-99-99T13:14:20+09:00'
+        self.assertEqual(E.kst_display(invalid),invalid)
+
     def test_day_boundary_and_precision_are_converted_not_relabelled(self):
         self.assertEqual(E.kst_display('시작 2026-10-23T22:03:11.971Z'),
                          '시작 2026-10-24T07:03:11.971000+09:00 (KST)')

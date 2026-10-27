@@ -139,6 +139,8 @@ if iptables -L DOCKER-USER -n >/dev/null 2>&1; then
   F -i "$EXT_IF" -o 'br-+' -m conntrack --ctstate NEW -j ACCEPT
   F -i "$EXT_IF" -o docker0 -m conntrack --ctstate NEW -j ACCEPT
   # int -> ext : P2 허용목록 (+ ICMP 진단)
+  # SIEM inference tunnel only; the Ollama API stays on Thor loopback.
+  F -s "$B_IP" -i "$INT_IF" -o "$EXT_IF" -d 211.170.162.124 -p tcp --dport 8022 -m conntrack --ctstate NEW -m comment --comment capstone-thor-inference -j ACCEPT
   for e in "${EGRESS_ALLOW[@]}"; do IFS=: read -r dst proto port desc <<<"$e"
     F -s "$INT_NET" -i "$INT_IF" -o "$EXT_IF" -d "$dst" -p "$proto" --dport "$port" -m conntrack --ctstate NEW -j ACCEPT
   done

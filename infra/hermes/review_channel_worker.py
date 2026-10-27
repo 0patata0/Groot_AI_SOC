@@ -131,7 +131,10 @@ def main():
             config['access_mode'] = 'read-only'
             config['mcpServers'] = {k: v for k, v in config['mcpServers'].items() if k in capabilities('read-only')}
         with contextlib.redirect_stdout(sys.stderr):
-            report = asyncio.run(runtime.run(config, {'question': request['question'],
+            # Obtain fresh facts from the original request before comparing
+            # the other bot's prose in the separate review_answer stage.
+            read_question = request.get('current_question', request['question']) if request['phase'] == 'peer' else request['question']
+            report = asyncio.run(runtime.run(config, {'question': read_question,
                 'current_question': request.get('current_question', request['question'])}))
             import harness
             current = request.get('current_question', request['question'])

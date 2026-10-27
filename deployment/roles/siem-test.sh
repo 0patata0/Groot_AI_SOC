@@ -26,7 +26,7 @@ def fixture(root):
          'hermes_image':'sha256:'+'1'*64}
     ns.update(ROOT=root,DEST=dest,PRE=pre,TREE=wt,SOURCE=root/'source',IP='192.0.2.20',PROJECT='capstone-siem',
               HOSTS={'SECURITY_HOST':'192.0.2.10','SIEM_HOST':'192.0.2.20','SERVICE_HOST':'192.0.2.30'},
-              LLM='http://192.0.2.40:11434/v1',MODEL='fixture-model',SSH_PORT='22',cfg=cfg,
+              LLM='http://192.0.2.40:11434/v1',MODEL='fixture-model',SSH_PORT='22',cfg=cfg,TUNNEL_CONFIG='',
               IMAGES={n:'wazuh/'+n+':4.14.8' for n in ('wazuh.manager','wazuh.indexer','wazuh.dashboard')},
               NAMES=names,dashboard_password='synthetic-dashboard-password')
     services={n:{'image':ns['IMAGES'][n],'volumes':[],'ports':[]} for n in ns['IMAGES']}
@@ -37,6 +37,20 @@ def fixture(root):
     compose={'services':services,'volumes':{'old':{}},'networks':{'default':{}}}
     return ns,compose,images
 class Tests(unittest.TestCase):
+    def test_optional_inference_transport_is_disabled_without_config(self):
+        self.n['run']=mock.Mock(side_effect=AssertionError('must not start transport'))
+        self.n['inference_transport']('install')
+        self.n['run'].assert_not_called()
+    def test_inference_transport_requires_matching_siem_listener(self):
+        self.n['TUNNEL_CONFIG']='/etc/capstone-inference/tunnel.json'
+        cfg={'listen_host':'192.0.2.20','listen_port':11435}
+        self.n['read']=lambda *a: json.dumps(cfg).encode()
+        self.n['run']=mock.Mock()
+        self.reject(lambda:self.n['inference_transport']('check'))
+        self.n['run'].assert_not_called()
+        self.n['LLM']='http://192.0.2.20:11435/v1'
+        self.n['inference_transport']('check')
+        self.assertEqual(self.n['run'].call_args.args[0][-3:],['check','--config',self.n['TUNNEL_CONFIG']])
     def test_diagnostic_dispatch_precedes_all_wazuh_credential_reads(self):
         setup=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='setup_mcp_and_hermes')
         assignment=next(n for n in ast.walk(setup) if isinstance(n,ast.Assign) and

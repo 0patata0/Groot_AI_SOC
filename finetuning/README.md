@@ -1,5 +1,7 @@
 # 30B 파인튜닝 준비 폴더
 
+> **2026-10-27 로컬 재확인:** `data/`의 train18,872/validation980/test932행과 manifest SHA가 모두 일치한다. 학습·병합·평가 코드와 기존 `bundles/soc-finetuning.tar.gz`가 남아 있다. 설정은 여전히 `Qwen/Qwen3-30B-A3B`이며 현재 thor-05 운영 `qwen3.6:35b`와 다른 후보다. 이 폴더에 학습된 어댑터/가중치는 없다. 현재 MCP37도구/8서버에 맞춘 SOC trajectory 검수·대상 GPU 학습 호환 검사는 별도이며, SSH 연결·추론 성공을 학습 완료로 해석하지 않는다. 이번 확인에서 설치·다운로드·업로드·학습은 하지 않았다. [현재 상태](../STATUS.md).
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
 > 기존30B LoRA 준비 데이터는 train18,872/validation980/test932개이며10/24 로컬 행 수·SHA 대조가 일치했다. 운영35B와 다른 후보이고 GPU 학습/실모델 비교는 아직 없다. 공개 corpus·지식·독립 평가·우리 SOC 검수 trajectory의 역할을 구분한다.

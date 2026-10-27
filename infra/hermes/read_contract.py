@@ -20,10 +20,10 @@ ASSET_NAMES = {'groot-web': ('groot-web', 'capstone-service'),
                'groot-siem-host': ('groot-siem-host', 'capstone-siem-host'),
                'wazuh.manager': ('wazuh.manager', 'capstone-wazuh-manager')}
 ASSET_PATTERNS = (
-    (r'Groot[_ ]?A|groot-sec|capstone-security|보안\s*(?:서버|호스트)|(?<![A-Za-z0-9])A\s*서버', 'groot-sec'),
+    (r'Groot[_ ]?A|groot-sec|capstone-security|보안\s*(?:서버|호스트)|(?<![A-Za-z0-9])A\s*(?:서버|호스트)', 'groot-sec'),
     (r'Groot[_ ]?B|groot-siem(?:-host)?|capstone-siem-host|SIEM\s*(?:서버|호스트)|(?<![A-Za-z0-9])B\s*(?:서버|호스트)', 'groot-siem-host'),
     (r'wazuh[._ ]manager|(?:Wazuh|와주)\s*(?:매니저|manager)|capstone-wazuh-manager', 'wazuh.manager'),
-    (r'Groot[_ ]?C|groot-web|capstone-service|서비스\s*(?:서버|호스트)|(?<![A-Za-z0-9])C\s*서버', 'groot-web'))
+    (r'Groot[_ ]?C|groot-web|capstone-service|서비스\s*(?:서버|호스트)|(?<![A-Za-z0-9])C\s*(?:서버|호스트)', 'groot-web'))
 AGENT_ID_PATTERN = r'(?:agent[_ ]?id|에이전트\s*(?:ID)?|ID)\s*[:=]?\s*[\x60\'\"]?(\d{3})(?![0-9])'
 FEATURES = ((r'프로세스|process', 'get_wazuh_agent_processes'),
             (r'포트|ports?|LISTENING', 'get_wazuh_agent_ports'),
@@ -122,6 +122,10 @@ def _single_plan(question, aware_time):
     if re.search(r'(?<![가-힣])활성(?:화)?(?:된|인)?\s*(?:Wazuh\s*)?(?:에이전트|agent)|(?:에이전트|agent).{0,20}활성\s*(?:상태|목록)', text, re.I):
         if 'active' not in states:
             states.append('active')
+    if not features:
+        identity = identity_plan(text, states)
+        if identity:
+            return identity
     if not features and not (re.search(r'Wazuh|와주|에이전트|agent', text, re.I) and states):
         return None
     search = process_search(text)
@@ -140,6 +144,176 @@ def _single_plan(question, aware_time):
     return {'kind': 'wazuh', 'features': features, 'states': states or ([] if features else ['active']),
             'agent_id': explicit[1] if explicit else None, 'agent_name': alias,
             'needs_agent': dependent, 'limit': requested_limit(text), 'search': search, 'question': text}
+
+
+def identity_plan(text, states):
+    """Current identity/state only; never reinterpret a diagnosis or a change."""
+    if re.search(r'비활성|원인|분석|위험|침해|왜|설명|정책|설정|룰|규칙|로그|경보|보안', text, re.I):
+        # A server alias itself may contain 보안; remove that alias for this test.
+        residual = text
+        for pattern, _ in ASSET_PATTERNS:
+            residual = re.sub(pattern, '', residual, flags=re.I)
+        if re.search(r'비활성|원인|분석|위험|침해|왜|설명|정책|설정|룰|규칙|로그|경보|보안', residual, re.I):
+            return None
+    if re.search(r'그룹|필터|검색|os_platform|version\s*[:=]|group\s*[:=]|IP\s*(?:[:=]|\d)', text, re.I):
+        return None
+    mentions = asset_mentions(text)
+    mentions += [(m.start(), m.end(), None, m[1]) for m in re.finditer(AGENT_ID_PATTERN, text, re.I)]
+    literal = re.search(r'이름(?:이|은|으로)?\s*[`\'\"]?([A-Za-z][A-Za-z0-9_.-]*)', text)
+    if not mentions and literal and re.search(r'장비|에이전트|서버', text[literal.end():literal.end()+20]):
+        mentions.append((literal.start(), literal.end(), literal[1], None))
+    if not mentions and (states or not re.search(r'Wazuh|에이전트|\bagents?\b', text, re.I)):
+        return None
+    if not re.search(r'(?<![a-z])ID(?![a-z])|식별|연결|상태|등록|목록|리스트|status|identity', text, re.I):
+        return None
+    subjects = []
+    previous_end = 0
+    for start, end, name, agent_id in sorted(mentions):
+        if (agent_id and subjects and subjects[-1]['agent_name'] and not subjects[-1]['agent_id']
+                and re.fullmatch(r'\s*(?:의|에이전트)?\s*', text[previous_end:start])):
+            subjects[-1]['agent_id'] = agent_id
+        else:
+            subject = {'agent_name': name, 'agent_id': agent_id}
+            if subject not in subjects: subjects.append(subject)
+        previous_end = end
+    return {'kind': 'agent_identity', 'subjects': subjects, 'states': states, 'question': text}
+
+
+def identity_calls(p, calls, state):
+    names = {name for subject in p['subjects'] if subject['agent_name']
+             for name in ASSET_NAMES.get(subject['agent_name'], (subject['agent_name'],))}
+    selected = {}
+    for c in calls:
+        if c.get('server') != 'wazuh-ro' or c.get('name') != 'get_wazuh_agents': continue
+        args = c.get('arguments', {})
+        if args.get('status') != state: continue
+        if any(v not in (None, '') for k,v in args.items() if k not in ('status','name','limit','offset')): continue
+        name = args.get('name')
+        if name not in (None, '') and name not in names: continue
+        if not valid_wazuh(c, 'get_wazuh_agents'): continue
+        raw = text_result(c); rows = agents(raw)
+        if rows:
+            if (len(rows) != len(records(raw, r'Agent ID:'))
+                    or any(not re.fullmatch(r'[\W_]*' + re.escape(state) + r'[\W_]*', a['status'], re.I) for a in rows)):
+                continue
+        elif not re.match(r'No Wazuh agents matching', raw.strip()): continue
+        selected[name or ''] = c
+    return list(selected.values())
+
+
+def identity_call(p, calls, state):
+    found = identity_calls(p, calls, state)
+    return found[-1] if found else None
+
+
+def identity_rows(p, calls):
+    rows = {}
+    for state in p['states'] or STATES:
+        for c in identity_calls(p, calls, state):
+            for a in agents(text_result(c)):
+                rows[(a['id'], a['name'], state)] = a
+    return list(rows.values())
+
+
+def subject_rows(subject, rows):
+    names = ASSET_NAMES.get(subject['agent_name'], (subject['agent_name'],))
+    return [a for a in rows if (not subject['agent_name'] or a['name'] in names)
+            and (not subject['agent_id'] or a['id'] == subject['agent_id'])]
+
+
+def identity_states(p, calls):
+    """Expose unmet read choices, not a fixed tool invocation."""
+    if p['states'] or not p['subjects']:
+        return [state for state in p['states'] or STATES if not identity_call(p, calls, state)]
+    rows = identity_rows(p, calls)
+    if all(len(subject_rows(subject, rows)) == 1 for subject in p['subjects']): return []
+    if not identity_call(p, calls, 'active'): return ['active']
+    return [state for state in STATES if not identity_call(p, calls, state)]
+
+
+def identity_missing(p, calls):
+    pending = ['get_wazuh_agents:' + state for state in identity_states(p, calls)]
+    rows = identity_rows(p, calls)
+    for subject in p['subjects']:
+        if len(subject_rows(subject, rows)) != 1:
+            pending.append('get_wazuh_agents: 대상 식별 미확인/중복 ' + part_label(subject))
+    return pending
+
+
+def identity_report(p, calls, evidence):
+    pending = identity_missing(p, calls); all_rows = identity_rows(p, calls)
+    rows = ['**요약**', '요청한 에이전트 ID·연결 상태를 실제 조회로 확인했습니다.' if not pending else
+            '대상 식별 또는 상태 조회가 미완료입니다. 미등록이나 정상으로 단정하지 않았습니다.', '', '**확인 내역**']
+    displayed = []
+    if p['subjects']:
+        for subject in p['subjects']:
+            matched = subject_rows(subject, all_rows)
+            rows += ['요청 대상: ' + cell(part_label(subject))]
+            if len(matched) == 1: displayed.extend(matched)
+            else: rows += ['실제 반환에서 일치하는 대상을 유일하게 식별하지 못했습니다. 후보 ' + str(len(matched)) + '개; 상태 미확인.']
+    else: displayed = all_rows
+    rows += table(['ID', '이름', '주소', '상태', '마지막 연결 KST'], [(a['id'], a['name'], a['ip'], a['status'],
+        '특수값: 실제 연결 시각 미확인' if (a['last_keepalive'] or '').startswith('9999-') else evidence.kst_time(a['last_keepalive'])) for a in displayed])
+    rows += ['표시한 반환 레코드: ' + str(len(displayed)) + '개. 이름/ID로 대조했으며 IP만으로 호스트를 추정하지 않았습니다.']
+    queried = [state for state in p['states'] or STATES if identity_call(p, calls, state)]
+    rows += ['확인한 상태 범위: ' + (', '.join(queried) or '없음') + '. 반환 목록/페이지 밖과 모든 보안 기능의 정상 여부는 미확인입니다.']
+    if pending: rows += ['미확인: ' + '; '.join(pending)]
+    rows += ['', '**조치 및 다음 단계**', '조회만 수행했습니다. 보호된 변경은 실행하지 않았습니다.']
+    return '\n'.join(rows)
+
+
+def identity_comparison(p, review_question, calls, evidence):
+    """Compare only displayed identity/state claims with this model's own reads.
+
+    This is evidence presentation, not an incident verdict or model dispatch.
+    Free prose, missing/truncated tables and changed observation times are not
+    promoted into verified facts or security decisions.
+    """
+    if not p or p['kind'] != 'agent_identity': return None
+    literal = identity_report(p, calls, evidence)
+    def incomplete(reason):
+        return {'complete': False, 'verdict': 'unverified', 'text':
+                'ID·연결 상태의 교차 대조가 미완료입니다. ' + reason + '\n\n**독립 조회 근거**\n' + literal}
+    if identity_missing(p, calls): return incomplete('요청 대상의 독립 조회가 부족합니다.')
+    try:
+        envelope = json.loads(review_question.split('\nUNTRUSTED_REVIEW_DATA\n', 1)[1])
+        other = envelope['other_agent_answer']
+        if not isinstance(other, str) or envelope.get('other_answer_truncated') is not False:
+            return incomplete('상대 답변의 전체 자료를 확인하지 못했습니다.')
+    except (ValueError, KeyError, IndexError, TypeError):
+        return incomplete('상대 답변의 자료 경계를 확인하지 못했습니다.')
+    header = '| ID | 이름 | 주소 | 상태 | 마지막 연결 KST |'
+    if other.count(header) != 1: return incomplete('상대 답변에서 동일한 범위의 ID·상태 표를 식별하지 못했습니다.')
+    body = other.split(header, 1)[1].splitlines()[1:]
+    claims = []
+    for line in body:
+        if not line.startswith('|'): break
+        if re.fullmatch(r'[| :\-]+', line): continue
+        m = re.fullmatch(r'\| (\d{3}) \| ([A-Za-z0-9_.-]+) \| [^|]+ \| ([^|]+) \| [^|]+ \|', line)
+        if not m: return incomplete('상대 표의 형식을 검증하지 못했습니다.')
+        status = re.fullmatch(r'[\W_]*(active|disconnected|pending|never_connected)[\W_]*', m[3], re.I)
+        if not status: return incomplete('상대 표의 상태 토큰을 확인하지 못했습니다.')
+        claims.append((m[1], m[2], status[1].lower()))
+    if len(set((i,n) for i,n,_ in claims)) != len(claims): return incomplete('상대 표에 중복된 대상이 있습니다.')
+    fresh = identity_rows(p, calls)
+    if p['subjects']: fresh = [a for subject in p['subjects'] for a in subject_rows(subject, fresh)]
+    actual = [(a['id'], a['name'], re.fullmatch(r'[\W_]*(active|disconnected|pending|never_connected)[\W_]*', a['status'], re.I)[1].lower()) for a in fresh]
+    match = set(claims) == set(actual)
+    rows = ['**ID·연결 상태 교차 대조**',
+            '상대 표의 ID·이름·연결 상태가 이번 독립 조회와 일치합니다.' if match else
+            '상대 표와 이번 독립 조회에 차이가 있습니다. 관측 시점 차이인지 오기인지는 이 비교만으로 확정하지 않았습니다.']
+    shown = []
+    for i,n,status in actual:
+        prior = [c for c in claims if c[:2] == (i,n)]
+        shown.append((i,n,prior[0][2] if prior else '상대 표에 없음',status,
+                      '일치' if prior and prior[0][2] == status else '현재 조회와 차이'))
+    for i,n,status in claims:
+        if not any(a[:2] == (i,n) for a in actual): shown.append((i,n,status,'요청 대상의 독립 반환에서 미확인','범위/관측 차이'))
+    rows += table(['ID','이름','상대 상태','독립 조회 상태','대조 결과'], shown)
+    rows += ['이름/ID는 요청 대상의 실제 반환과 대조했습니다. 같은 IP라는 이유로 호스트와 관리 컨테이너를 합치지 않았습니다.',
+             '대조 범위는 위 표의 ID·이름·연결 상태입니다. 상대의 다른 서술·원인·보안 정상 여부는 검증 완료로 확대하지 않습니다.',
+             '', '**독립 조회 근거**', literal]
+    return {'complete':True,'verdict':'matching_observed_fields' if match else 'observed_difference','text':'\n'.join(rows)}
 
 
 def requested_limit(question):
@@ -275,6 +449,7 @@ def target_id(p, calls):
 
 
 def scope(p, calls=None):
+    if p['kind'] == 'agent_identity': return {AGENTS}
     if p['kind'] == 'multi':
         return set().union(*(scope(part, calls) for part in p['plans']))
     if p['kind'] == 'time': return {TIME}
@@ -352,6 +527,7 @@ def ambiguous_empty(p, calls, name, c):
 
 
 def missing(p, calls, evidence):
+    if p['kind'] == 'agent_identity': return identity_missing(p, calls)
     if p['kind'] == 'multi':
         return [part_label(part) + ' / ' + item for part in p['plans'] for item in missing(part, calls, evidence)]
     if p['kind'] == 'time':
@@ -396,6 +572,16 @@ def missing(p, calls, evidence):
 
 
 def guidance(p, calls=()):
+    if p['kind'] == 'agent_identity':
+        return ('이 요청은 에이전트 식별/연결 상태의 읽기 전용 조회입니다. 모델이 get_wazuh_agents를 실제 선택하세요. '
+                'B 호스트/SIEM은 groot-siem-host(새 설치 capstone-siem-host), A는 groot-sec(capstone-security), '
+                'C는 groot-web(capstone-service)입니다. Wazuh Manager는 별도 wazuh.manager(capstone-wazuh-manager)입니다. '
+                '고정 ID나 IP로 추정하지 말고 실제 반환 이름과 ID를 대조하세요. 127.0.0.1도 그 이름의 관측 주소일 뿐입니다. '
+                '대상 이름 필터를 추측하지 말고 name/ip/group 필터 없이 상태별 목록을 조회하세요. '
+                '지정 상태가 없으면 active에서 시작해 대상이 없을 때 disconnected/pending/never_connected도 확인하세요. '
+                '전체 목록은 네 상태 모두 필요합니다. 중복 대상·오류·목록 밖은 미확인으로 남기세요. '
+                '목록 개수는 실제 반환 행으로 계산하세요. 요청 대상=' +
+                ', '.join(part_label(x) for x in p['subjects']) + '; 지정 상태=' + ', '.join(p['states']) + '.')
     if p['kind'] == 'multi':
         return ('요청한 각 장비를 빠짐없이 식별하고 장비별 모든 조회를 수행하세요. 동일 상태의 에이전트 목록을 반복하지 말고 name 필터 없이 받은 실제 이름→ID 매핑을 재사용하세요. ' + '\n'.join(guidance(part, calls) for part in p['plans']))
     text = ('요청은 읽기 전용입니다. 변경안 제출/재시작 금지는 변경 목표가 아닙니다. '
@@ -462,6 +648,7 @@ def table(headers, rows):
 
 
 def report(p, calls, evidence):
+    if p['kind'] == 'agent_identity': return identity_report(p, calls, evidence)
     if p['kind'] == 'multi':
         pending = missing(p, calls, evidence)
         title = '요청한 모든 장비의 조회 항목을 확인했습니다.' if not pending else '일부 장비/항목이 미완료입니다. 전체 확인 완료가 아닙니다.'

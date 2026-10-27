@@ -655,6 +655,17 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     result = json.loads(json.dumps(schemas))
     p = read_plan(question)
+    if p and p['kind'] == 'agent_identity':
+        if READ.AGENTS not in result: return {}
+        states = [state for state in READ.identity_states(p, calls) if not READ.failed_attempt(
+            p, calls, 'get_wazuh_agents', {'status': state})]
+        if not states: return {}
+        schema = result[READ.AGENTS]
+        props = schema['properties']
+        schema['properties'] = {'status': {**props['status'], 'enum': states}}
+        schema['required'] = ['status']
+        schema['additionalProperties'] = False
+        return {READ.AGENTS: schema}
     if p and p['kind'] == 'time' and READ.TIME in result:
         schema = result[READ.TIME]
         props = schema.get('properties', {})

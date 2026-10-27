@@ -1,6 +1,6 @@
 # thor-05용 Qwen3.6-35B 학습
 
-> **10/27 19:43 SOC 본 학습 시작:** 저장 루트 `~/Capstone_Groot_training/qwen36-20261027` 변경·212대화 준비·SOC2-step/8-step 시험과 추론 복구를 완료했다. 사용자 최대2시간 중단/자동복구 승인으로224prefix 전체1회/112-step 학습을 시작했다. 로컬/Thor87검사 통과. Cisco8B는 등록됐으나 현재native 도구 호출 미지원·시각 오류로 대체 후보에서 제외했다. 전체 학습 완료·학습본 변환/등록·운영 교체는 미완료이며 [상세 현황](../STATUS.md)을 따른다.
+> **10/27 20:54 SOC 본 학습 완료:** Thor `~/Capstone_Groot_training/qwen36-20261027`에서224prefix1epoch/112-step·검증·어댑터저장·전체HF내보내기를완료하고기존35B추론을57분37초만에복구했다.380tensorfinite·MTP19보존/93검사통과.동일HF 미학습GGUF는별도등록/52턴응답확인,학습본GGUF/등록·비교는진행중이다.운영봇교체와MCP/채팅/보호E2E는미실행이며 [상세현황](../STATUS.md)을따른다.
 
 
 > **10/27 18:00 학습 재개 결과:** CPU 파일 참조 누적으로 발생한35B 적재 메모리 문제를 보완해 실제2-step·평가·어댑터 저장까지 완료했다. 380텐서 finite/190 B행렬 갱신,78검사 통과. 추론은약2분56초만에 원래35B로 복구했다. 본 학습·변환/등록·운영 교체·SOC 정확도 비교는 미실행이며,현SOC 자료 보완과 장기 학습 시간대 결정이 남는다. 아래 정지/0step은 당시 이력이다. [실측·잔여·Git](../STATUS.md).
@@ -183,7 +183,7 @@ python3 -B pack.py --config config.qwen36-soc-main.json --output <새 반입묶�
 
 20:33 KST 동일 HF 원본의CPU GGUF/Q4_K_M 변환·체크섬 검증을 완료했다. text21,713,462,784B/projector899,283,200B이며 MTP1층을 포함한다. HF→GGUF의 fused expert·vision Conv3D 분리로 텐서 수가 달라지는 점은 정상 변환이며 원본 보존 검사와 구분한다. 새 모델 등록/실제 추론은 본 학습/기존 추론 복구 뒤 검증한다.
 
-`register_soc.py --variant base`와 `--variant main`은 Thor 호스트의loopback API만 사용한다. 등록된 새 이름이 있거나 이전 시도 기록이 있으면 덮어쓰지 않는다. 전체GGUF SHA·텍스트/비전 파일을 확인하고 원본 template/system/7개 runtime parameter·renderer/parser·capabilities·runner를 대조한다. 기존 모든 model digest도 전후 비교하며 운영 봇 설정은 바꾸지 않는다. 직접 LoRA import는 설치된Ollama0.40.2에서 미지원이므로 병합 후GGUF를 사용한다.
+`register_soc.py --variant base`와 `--variant main`은 Thor 호스트의loopback API만 사용한다. 등록된 새 이름이 있거나 이전 시도 기록이 있으면 덮어쓰지 않는다. 전체GGUF SHA·텍스트/비전 파일을 확인하고 원본 system/7개 runtime parameter·renderer/parser·capabilities·runner를 대조한다. 유효 native 채팅 서식은 같은 고정 HF의 `chat_template.jinja`와 대조하며 원 registry의 Go placeholder와 동일하다고 표시하지 않는다. 기존 모든 model digest도 전후 비교하며 운영 봇 설정은 바꾸지 않는다. 직접 LoRA import는 설치된Ollama0.40.2에서 미지원이므로 병합 후GGUF를 사용한다.
 
 전체test 평가에는 다음 옵션을 사용한다. 이는 원래 도구 관측 이력을 정답으로 제공하는 **개별 턴** 검사다. 호출이 실제 성공하거나 승인·적용되는 agent E2E는 아니다. 도구는 사례별 카탈로그 부분집합이며 전체37도구 중 선택도 검증하지 않는다. 동의어/유효한 추가 이름 필터 등 자동점수의 오감점은 수동 의미 검토로 구분한다.
 
@@ -197,3 +197,7 @@ python3 -B "$training_root/finetuning/soc_evaluate.py" \
 ```
 
 오프라인 재현에는 기존 고정arm64 NGC 이미지/venv·고정HF snapshot 외에 공식 llama.cpp commit `276378515ceebee5d14bcc8536603dd5c87491a2`의전체 변환 source/gguf-py, CPU build와연결 shared library, `sentencepiece==0.2.1`의해당 Python/플랫폼 wheel 및 `conversion-install-report.json`의SHA가 필요하다. converter 의존성은 별도 target에만 설치하고 학습 venv/host Python을 덮지 않는다. source/data 반입목록은 `pack.py`에 포함되며 가중치/컴파일 결과/패키지 binary는별도이다. Mac 다운로드·패키지 설치는0이며 외부 학습 장비의 신규 전체 오프라인 설치를 실제 검증한 것은 아니다.
+
+### 20:54 KST 실행 결과·서식 검증 보완
+
+본 학습112step/1epoch·44validation·어댑터 저장/finite검사와기존추론복구·HF전체내보내기를완료했다.학습본GGUF변환은진행중이며최신별도등록/평가는STATUS를따른다. `register_soc.py`는모든FROM blob SHA를text/projector와대조하고,selected native template은고정HF서식과비교한다. 원registry의Go placeholder와표시가다르다는이유로검증에실패한첫시도는보존했다. 원래runtime옵션/다른모델digest는유지하며두HF파생모델의서식은동일하게맞춘다. 설치버전의 [selectedModelTemplate](https://github.com/ollama/ollama/blob/v0.40.2/server/routes.go) 동작과실제HF파일SHA를대조했다. 원등록본과새HF파생의서식차이를학습효과로해석하지않는다.

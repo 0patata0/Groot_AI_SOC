@@ -5,14 +5,17 @@ Uploads stream directly on Thor; no weights pass through the Mac.
 """
 import argparse
 import http.client
+import hashlib
 import json
 from pathlib import Path
 import platform
+import re
 from urllib import request,error
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from convert_reference import digest
+from download_model import verify_artifact
 
 
 def api(path,payload=None,timeout=30):
@@ -53,6 +56,32 @@ def upload(path,sha):
     finally:connection.close()
 
 
+def hf_template(root):
+    root=Path(root);manifest=json.loads((root/'base-manifest.json').read_text())
+    if not manifest.get('verified') or manifest['revision']!='995ad96eacd98c81ed38be0c5b274b04031597b0':
+        raise ValueError('Pinned HF template provenance required')
+    artifact=next(a for a in manifest['files'] if a['path']=='chat_template.jinja')
+    verify_artifact(root/'base',artifact)
+    return (root/'base/chat_template.jinja').read_text()
+
+
+def verify_runtime(original,show,expected_template,files):
+    # Native llama.cpp show selects the embedded GGUF Jinja template, even when
+    # the manifest also contains the original legacy Go {{ .Prompt }} layer.
+    if show.get('template')!=expected_template:raise ValueError('Effective template differs from pinned HF')
+    for key in ('system','renderer','parser','requires','license','messages'):
+        if show.get(key)!=original.get(key):raise ValueError('Runtime metadata differs: '+key)
+    if parameters(show.get('parameters',''))!=parameters(original.get('parameters','')):raise ValueError('Effective runtime options differ')
+    if show['details']['quantization_level']!='Q4_K_M' or not show.get('projector_info'):raise ValueError('Text/projector import incomplete')
+    if set(show.get('capabilities',[]))!=set(original.get('capabilities',[])):raise ValueError('Candidate capabilities differ from original')
+    if show['details'].get('runner')!=original['details'].get('runner'):raise ValueError('Candidate runner differs from original')
+    actual=set(re.findall(r'(?m)^FROM\s+\S*sha256-([0-9a-f]{64})\s*$',show.get('modelfile','')))
+    if actual!={value.removeprefix('sha256:') for value in files.values()}:raise ValueError('Registered text/projector blob mismatch')
+    return {'runtime_options_match_original':True,'chat_template_matches_hf':True,
+            'chat_template_matches_original':show.get('template')==original.get('template'),
+            'hf_template_sha256':hashlib.sha256(expected_template.encode()).hexdigest()}
+
+
 def register(root,variant):
     if variant not in ('base','main'):raise ValueError('Unknown candidate')
     folder=Path(root)/f'exports/qwen36-soc-{variant}-gguf';record=folder/'registration-status.json'
@@ -69,6 +98,7 @@ def register(root,variant):
         before={m['name']:m['digest'] for m in api('/api/tags')['models']}
         if model in before:raise ValueError('Candidate already exists; refusing replacement')
         original=api('/api/show',{'model':'qwen3.6:35b'})
+        expected_template=hf_template(root)
         if original['details']['quantization_level']!='Q4_K_M':raise ValueError('Original quantization changed')
         chosen={a['path']:a for a in conversion['artifacts'] if a['path'] in ['qwen36-soc-q4_k_m.gguf','mmproj-qwen36-soc-f16.gguf']}
         if len(chosen)!=2:raise ValueError('Text and vision projector required')
@@ -81,22 +111,17 @@ def register(root,variant):
         payload={'model':model,'files':files,'stream':False,'parameters':parameters(original.get('parameters',''))}
         for key in ('template','system','renderer','parser','requires','license','messages'):
             if original.get(key):payload[key]=original[key]
-        state['status']='registering';save()
+        state.update(status='registering',files=files,original_digest=before['qwen3.6:35b']);save()
         result=api('/api/create',payload,timeout=1200)
         if result.get('status')!='success':raise ValueError('Model registration incomplete: '+repr(result))
         show=api('/api/show',{'model':model})
-        for key in ('template','system','renderer','parser','requires','license','messages'):
-            if show.get(key)!=original.get(key):raise ValueError('Runtime metadata differs: '+key)
-        if parameters(show.get('parameters',''))!=payload['parameters']:raise ValueError('Effective runtime options differ')
-        if show['details']['quantization_level']!='Q4_K_M' or not show.get('projector_info'):raise ValueError('Text/projector import incomplete')
-        if set(show.get('capabilities',[]))!=set(original.get('capabilities',[])):raise ValueError('Candidate capabilities differ from original')
-        if show['details'].get('runner')!=original['details'].get('runner'):raise ValueError('Candidate runner differs from original')
+        verified=verify_runtime(original,show,expected_template,files)
         (folder/'ollama-show.json').write_text(json.dumps(show,ensure_ascii=False,indent=2)+'\n')
         tags=api('/api/tags')['models'];after={m['name']:m['digest'] for m in tags}
         if any(after.get(name)!=sha for name,sha in before.items()):raise ValueError('An existing model changed during registration')
         tag=next(m for m in tags if m['name']==model)
         state.update(status='completed',completed_at_kst=datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),
-                     digest=tag['digest'],files=files,capabilities=show['capabilities'],runtime_matches_original=True,
+                     digest=tag['digest'],files=files,capabilities=show['capabilities'],**verified,
                      conversion_manifest_sha256=digest(folder/'conversion-status.json'),
                      original_digest=before['qwen3.6:35b'],existing_models_unchanged=True)
     except BaseException as exc:state.update(status='failed',error=repr(exc));save();raise

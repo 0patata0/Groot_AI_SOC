@@ -1,5 +1,16 @@
 # 인프라 현황 — 2026-10-27 현재 작업 상태
 
+## SOC 본 학습·추론 복구·HF 내보내기 완료 — 2026-10-27 20:54 KST
+
+**전체224train prefix/112optimizerstep·1epoch와44validation 평가·어댑터 저장을 완료했고,20:41:08.978 KST 기존35B 추론을 복구했다. 전체1,045tensor를 보존한 학습본HF 내보내기도 완료했다.** 학습본 GGUF 변환은 진행 중이며 학습본 Ollama 등록/정확도 비교·운영 봇 교체는 아직 미완료다.
+
+- **학습 실측:** train loss0.728650/eval0.333340,112step/epoch1.0,실제train runtime3358.16초(평가121.64초 포함). CUDA allocated peak69.71/reserved79.55GiB. 어댑터380tensor 모두finite/190 B행렬nonzero·65,061,752B, SHA `fd057a0526ee98583c8c99e7529fb06bcccf559b5766b5d66c6124646a066d58`. 본 학습19:43:32 이후 커널 NVRM/OOM/Xid 기록0이다. 앞선pilot의3경고 이력은 보존하며 원인까지 해결했다고 확대하지 않는다. 학습 중 parent sampler 최저 가용30.54GiB(동시baseline converter guard는30.51GiB)다. loss는 해당44validation의값이며 운영SOC 정답률이 아니다.
+- **복구:** 추론 중단3456.53초(57분36.53초),최대2시간 승인 범위 안에서 원래 `qwen3.6:35b` 재적재/기존digest `a7eb95c5…fbd87c`·독립복구timer inactive 확인. B→Thor SSH추론터널의 실제tags/ps와기존5모델digest 보존,두 채팅 서비스/공동채널 서비스active도 읽기 확인했다. 실제 새 채팅 게시·응답/공격 E2E는 이번에 하지 않았다.
+- **학습 결과 위치:** Thor `~/Capstone_Groot_training/qwen36-20261027/outputs/soc-main/adapter/`와 체크포인트, `exports/qwen36-soc-main-hf/`.20:48:19 CPU export exit0/OOMKilled=false·1,045tensor 전수대조/190모듈변경/855보존/MTP19보존을 확인했다. export 자체최저host 가용81.06GiB다. Mac에는 가중치를 내려받지 않았으며 원본·pilot·이전 실패 로그도 유지한다.
+- **서식 검증 정정:** 첫base 등록은 실제생성 뒤 `show.template`의원본일치 검사에서실패했다. 원 registry 모델은13자Go placeholder `{{ .Prompt }}`, 새GGUF는HF Jinja7764자다. 설치된0.40.2 `selectedModelTemplate`가nativeGGUF의내장서식을반환하는것을공식source와실제HF파일SHA로확인했다. 두HF파생base/main끼리는고정HF서식SHA `e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259`를맞추고,원모델의7parameter·system/renderer/parser/requires/license·capabilities/runner를따로검증하도록수정했다. 원등록본과서식동일이라고표시하지않는다. 최초실패기록을보존하고이미생성된base는재생성/덮어쓰기없이검증만완료했다.
+- **base 실제등록/평가:** `soc-qwen36:35b-base-q4km-20261027`,digest `f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad`,원본5모델digest불변·정확한text/projector blob2개·HF서식/나머지옵션일치를확인했다. tools/thinking/completion/vision·llamacpp이며 native52turn은52응답/HTTP실패0·미등록/보호오호출0. 엄격자동37.69점/누락75/호출불일치4는동의어·날짜형식·유효한추가namefilter의오감점을포함해정확도점수로쓰지않는다. 수동 확인에서IDS엔진미확인누락2/4,포트외부접근미확인누락4/4는실제보완대상이다. test52gold-turn/사례별toolsubset 검증이며 전체37도구 선택·실제MCP/채팅 E2E를대신하지않는다. background CPU부하를통제하지않아1.62초평균을속도우위로판정하지않는다.
+- **코드/Git/후속:** 로컬/Thor93검사통과,HF서식/가중치blob불일치거절회귀포함. 등록/평가준비는 `67d517aa9414ea9e20e3ca20c83efaa27c74c5e8`로자동게시·20:35:59KST remote main일치/clean 확인. 이번실제학습/HF export/서식보완결과는후속자동게시대상이다. 남은순서는학습본GGUF완료→별도main등록→동일입력52턴평가/핵심누락검토→문서/Git/작업임시정리다. 운영봇선택은원래35B를유지하며새모델승격·실제보호적용/원복·비전입력/새서버설치·장기부하/재부팅E2E는미실행이다.
+
 ## 동일 조건 미학습 GGUF 준비 완료 — 2026-10-27 20:35 KST
 
 **전체 SOC 본 학습은103/112step 진행 중이며, 동일 HF 원본의 미학습 GGUF/Q4_K_M 비교본은20:33:14 KST CPU 변환·검증을 완료했다.** 본 학습 완료/추론 복구와 새 모델 등록·실제 추론은 아직 미완료다.

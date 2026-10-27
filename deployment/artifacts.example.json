@@ -1,6 +1,14 @@
 {
   "schema": 1,
   "role": "service",
-  "packages": [],
+  "packages": [
+    {
+      "file": "wazuh-agent_4.14.8-1_amd64.deb",
+      "sha256": "6ed202e211fd8c544d1906c9b94dcd4b503d1829eef7d0a82ce4bcf4a1688967",
+      "package": "wazuh-agent",
+      "version": "4.14.8-1",
+      "architecture": "amd64"
+    }
+  ],
   "images": []
 }

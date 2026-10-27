@@ -154,6 +154,36 @@ class RepeatedReads(unittest.TestCase):
         c=call('get_wazuh_agents','Agent ID: 007\nName: wazuh.manager\nStatus: ACTIVE\nIP: 127.0.0.1',{'status':'active'})
         self.assertEqual(H.READ.verified_ids(p,[c]),['007'])
 
+    def test_b_host_cannot_be_satisfied_by_manager_container(self):
+        manager=call('get_wazuh_agents','Agent ID: 000\nName: wazuh.manager\nStatus: ACTIVE\nIP: 127.0.0.1',{'status':'active'})
+        host=call('get_wazuh_agents','Agent ID: 019\nName: groot-siem-host\nStatus: ACTIVE\nIP: 192.0.2.20',{'status':'active'})
+        for question in ('B 서버 프로세스를 최대 2개 보여줘', 'Groot_B 취약점 요약을 조회해줘',
+                         'B 호스트의 패키지 취약점을 확인해줘', 'SIEM 호스트 포트 목록 보여줘'):
+            with self.subTest(question=question):
+                p=H.read_plan(question)
+                self.assertEqual(p['agent_name'],'groot-siem-host')
+                self.assertEqual(H.READ.verified_ids(p,[manager]),[])
+                self.assertEqual(H.READ.verified_ids(p,[manager,host]),['019'])
+
+    def test_host_and_manager_remain_separate_compound_targets(self):
+        p=H.read_plan('B 호스트와 Wazuh Manager의 프로세스를 각각 2개 조회해줘')
+        self.assertEqual(p['kind'],'multi')
+        self.assertEqual([x['agent_name'] for x in p['plans']],['groot-siem-host','wazuh.manager'])
+
+    def test_container_location_is_not_a_second_host_request(self):
+        for prefix in ('B 서버의', 'Groot_B에서', 'SIEM 호스트에 설치된'):
+            with self.subTest(prefix=prefix):
+                p=H.read_plan(prefix+' Wazuh Manager 프로세스를 최대 2개 보여줘')
+                self.assertEqual(p['kind'],'wazuh')
+                self.assertEqual(p['agent_name'],'wazuh.manager')
+        p=H.read_plan('B 서버 프로세스와 Wazuh Manager 프로세스를 각각 2개 보여줘')
+        self.assertEqual([x['agent_name'] for x in p['plans']],['groot-siem-host','wazuh.manager'])
+
+    def test_fresh_b_name_uses_live_id_and_no_zero_fallback(self):
+        p=H.read_plan('capstone-siem-host 프로세스를 보여줘')
+        c=call('get_wazuh_agents','Agent ID: 023\nName: capstone-siem-host\nStatus: ACTIVE\nIP: 192.0.2.20',{'status':'active'})
+        self.assertEqual(H.READ.verified_ids(p,[c]),['023'])
+
     def test_file_definition_paraphrase_preserves_both_runtime_and_table(self):
         q='IDS 구동 경로와 WAF Wazuh IDS 파일 정의 개수를 함께 표로 보여줘'
         combined=H.combined_rule_request(q);self.assertIsNotNone(combined)

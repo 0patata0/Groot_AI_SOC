@@ -17,10 +17,12 @@ TIME = 'mcp__system_diagnostics__calculate_time'
 STATES = ('active', 'disconnected', 'pending', 'never_connected')
 ASSET_NAMES = {'groot-web': ('groot-web', 'capstone-service'),
                'groot-sec': ('groot-sec', 'capstone-security'),
+               'groot-siem-host': ('groot-siem-host', 'capstone-siem-host'),
                'wazuh.manager': ('wazuh.manager', 'capstone-wazuh-manager')}
 ASSET_PATTERNS = (
     (r'Groot[_ ]?A|groot-sec|capstone-security|보안\s*(?:서버|호스트)|(?<![A-Za-z0-9])A\s*서버', 'groot-sec'),
-    (r'Groot[_ ]?B|wazuh[._ ]manager|(?:Wazuh|와주)\s*(?:매니저|manager)|capstone-wazuh-manager|(?<![A-Za-z0-9])B\s*서버', 'wazuh.manager'),
+    (r'Groot[_ ]?B|groot-siem(?:-host)?|capstone-siem-host|SIEM\s*(?:서버|호스트)|(?<![A-Za-z0-9])B\s*(?:서버|호스트)', 'groot-siem-host'),
+    (r'wazuh[._ ]manager|(?:Wazuh|와주)\s*(?:매니저|manager)|capstone-wazuh-manager', 'wazuh.manager'),
     (r'Groot[_ ]?C|groot-web|capstone-service|서비스\s*(?:서버|호스트)|(?<![A-Za-z0-9])C\s*서버', 'groot-web'))
 AGENT_ID_PATTERN = r'(?:agent[_ ]?id|에이전트\s*(?:ID)?|ID)\s*[:=]?\s*[\x60\'\"]?(\d{3})(?![0-9])'
 FEATURES = ((r'프로세스|process', 'get_wazuh_agent_processes'),
@@ -29,6 +31,24 @@ FEATURES = ((r'프로세스|process', 'get_wazuh_agent_processes'),
             (r'Critical|치명적|심각한', 'get_wazuh_critical_vulnerabilities'),
             (r'remoted|수신\s*통계', 'get_wazuh_remoted_stats'),
             (r'로그\s*수집기?[^.!?\n]{0,35}통계|log.?collector', 'get_wazuh_log_collector_stats'))
+
+
+def asset_mentions(text):
+    mentions = sorted((m.start(), m.end(), name, None)
+                      for pattern, name in ASSET_PATTERNS
+                      for m in re.finditer(pattern, text, re.I))
+    result = []
+    for i, mention in enumerate(mentions):
+        # "B 서버의 Wazuh Manager" names a container's location, whereas
+        # "B 호스트와 Wazuh Manager" requests two independent assets.
+        if i + 1 < len(mentions) and mention[2] == 'groot-siem-host':
+            following = mentions[i + 1]
+            if following[2] == 'wazuh.manager' and re.fullmatch(
+                    r'\s*(?:의|에서|에\s*(?:있는|설치된|실행\s*중인))\s*',
+                    text[mention[1]:following[0]]):
+                continue
+        result.append(mention)
+    return result
 
 
 def exclusion_spans(text):
@@ -110,8 +130,7 @@ def _single_plan(question, aware_time):
     if not re.search(r'조회|보여|확인|정리|상태|목록|통계|요약', text):
         return None
     explicit = re.search(AGENT_ID_PATTERN, text, re.I)
-    alias = next((name for pattern, name in ASSET_PATTERNS
-        if re.search(pattern, text, re.I)), None)
+    alias = next((name for _, _, name, _ in asset_mentions(text)), None)
     literal_name = re.search(r'이름(?:이|은|으로)?\s*[`\'\"]?([A-Za-z][A-Za-z0-9_.-]*)', text)
     if not alias and literal_name:
         # Only a named device clause may supply an unknown asset name.
@@ -134,7 +153,7 @@ def plan(question, aware_time):
     if not p or p['kind'] != 'wazuh' or not p['needs_agent']:
         return p
     mentions = [(m.start(), m.end(), None, m[1]) for m in re.finditer(AGENT_ID_PATTERN, text, re.I)]
-    mentions += [(m.start(), m.end(), name, None) for pattern, name in ASSET_PATTERNS for m in re.finditer(pattern, text, re.I)]
+    mentions += asset_mentions(text)
     mentions.sort()
     if len(mentions) < 2:
         return p
@@ -383,7 +402,7 @@ def guidance(p, calls=()):
             '제공된 도구를 실제로 선택해 모든 요청 항목을 확인하세요. 성공한 같은 조회를 반복하지 마세요. ')
     if p['kind'] == 'wazuh':
         text += ('장비 이름과 에이전트 번호는 다릅니다. Groot_A/보안 서버는 groot-sec(새 설치 capstone-security), '
-                 'Groot_C/서비스 서버는 groot-web(새 설치 capstone-service), Groot_B는 wazuh.manager입니다. '
+                 'Groot_C/서비스 서버는 groot-web(새 설치 capstone-service), Groot_B/B 호스트는 groot-siem-host(새 설치 capstone-siem-host)입니다. Wazuh Manager/wazuh.manager는 별도 관리 컨테이너입니다. 000의 SCA·프로세스·패키지를 B Ubuntu 호스트 결과로 대신하지 마세요. '
                  '이 이름은 ID가 아닙니다. get_wazuh_agents(status=active)의 실제 반환 이름/ID를 사용하세요. '
                  'name 필터를 추측하거나 빈 필터 결과를 같은 인자로 반복하지 말고 name 없이 조회해 식별하세요. '
                  '프로세스/포트는 수집 인벤토리이며 시작 시각은 수집 시각이 아닙니다. '

@@ -119,6 +119,7 @@ resolvectl status
                                          ├─ DVWA
                                          └─ Apache /log4shell/ proxy ── private lab ── Spring Boot:8080/log4shell/
 security / service ── Wazuh:1514,1515@siem
+siem host agent ── local published Wazuh:1514@siem
 관리자 ── Dashboard:443 / Mattermost:8065@siem
 Hermes@siem ── LLM:11434 또는 지정 포트
 Hermes 컨테이너@siem ── siem 자신의 SSH 포트 ── 읽기 MCP
@@ -134,6 +135,7 @@ Log4Shell에 별도 HTTP 이름을 쓰려면 `LOG4SHELL_HOSTNAME`을 설정하�
 |---|---|---|
 | 관리 컴퓨터 → 세 서버 | 공통 `SSH_PORT` | 키 기반 배포·조회 |
 | security/service → siem | `1514`, `1515` | agent 로그·TLS 등록 |
+| siem host → local manager | 기존 published `1514/tcp` | 별도 host agent 로그·정책 수집, 신규 포트/원격 등록 허용 확대 없음 |
 | security → service | `WEB_BACKEND_PORT` 기본 `80` | DVWA·Log4Shell UI의 WAF backend; 일반 클라이언트 직접 접근은 허용하지 않음 |
 | 승인된 실습 클라이언트 → security | `WAF_PORT` 기본 `8080` | WAF를 통한 실습 HTTP |
 | 관리자 → siem | `443`, `8065` | Dashboard·Mattermost |

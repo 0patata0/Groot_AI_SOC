@@ -57,7 +57,7 @@ TARGETS = {target: unit for profile in PROFILES.values() for target, unit in pro
 RUNTIME_TARGETS = {
     'security': ('a:waf', 'a:suricata', 'a:collection'),
     'siem': ('b:hermes', 'b:ollama', 'b:wazuh-manager', 'b:wazuh-indexer',
-             'b:mattermost', 'b:llm', 'b:management-pipeline', 'b:ingestion'),
+             'b:mattermost', 'b:llm', 'b:management-pipeline', 'b:ingestion', 'b:collection'),
     'service': ('c:collection',),
 }
 TARGETS.update({t: None for values in RUNTIME_TARGETS.values() for t in values})

@@ -4,7 +4,7 @@
 
 ## 두 봇의 공통 진단
 
-Hermes와 Ollama는 같은 `system-diagnostics.get_system_diagnostics`를 사용한다. 기존 systemd25대상에 아래 runtime12대상을 추가했다. `soc:coverage`는 전체37대상을 한 번에 집계하는 선택값으로, 별도 장비가 아니다. MCP 이름·보호 도구 권한은 늘리지 않는다.
+Hermes와 Ollama는 같은 `system-diagnostics.get_system_diagnostics`를 사용한다. 기존 systemd25대상에 아래 runtime13대상을 추가했다. `soc:coverage`는 전체38대상을 한 번에 집계하는 선택값으로, 별도 장비가 아니다. MCP 이름·보호 도구 권한은 늘리지 않는다.
 
 | 서버 | 고정 runtime 대상 | 확인하는 근거 |
 | --- | --- | --- |
@@ -12,17 +12,18 @@ Hermes와 Ollama는 같은 `system-diagnostics.get_system_diagnostics`를 사용
 | B | `b:hermes`, `b:ollama` | 현재 프로세스 ID·시작 시각에 연결된 인증 WebSocket/worker heartbeat, 대기 작업 |
 | B | `b:wazuh-manager`, `b:wazuh-indexer`, `b:mattermost` | manager 필수6프로세스·큐/드롭, Indexer cluster health, Mattermost API |
 | B | `b:llm`, `b:management-pipeline`, `b:ingestion` | DGX 소량 추론, 사건/보고 대기 및 검토 필요 상태, 합성 로그 전달 대조 |
+| B | `b:collection` | 호스트 agent 연결·상태 최신성·실제 호스트 바이너리의 필수 프로세스 |
 | C | `c:collection` | 에이전트 연결·필수 프로세스·상태 최신성 |
 
-root collector가 약60초마다 schema2 스냅샷을 발행한다. 기존 schema1은 이관용으로 읽을 수 있지만 runtime 근거가 없으면 미확인이다. 최대 유효기간180초, 한 호스트 누락도 전체37대상 중 미확인으로 남긴다. `lookback_minutes`가 있어도 runtime은 최신 스냅샷이며 해당 기간 전체 이력을 조회한 것이 아니다. systemd 오류 수는 반환 표본 수이며 전체 발생 건수가 아니다. KST 표시 시각은 서버에서 계산한다.
+root collector가 약60초마다 schema2 스냅샷을 발행한다. 기존 schema1은 이관용으로 읽을 수 있지만 runtime 근거가 없으면 미확인이다. 최대 유효기간180초, 한 호스트 누락도 전체38대상 중 미확인으로 남긴다. `lookback_minutes`가 있어도 runtime은 최신 스냅샷이며 해당 기간 전체 이력을 조회한 것이 아니다. systemd 오류 수는 반환 표본 수이며 전체 발생 건수가 아니다. KST 표시 시각은 서버에서 계산한다.
 
-현재 B의 `b:vector`와 `b:wazuh-agent`는 의도된 미설치다. 컨테이너의 manager를 host agent로 대신 세지 않는다. Indexer 단일 노드의 yellow, oneshot의 성공 후 inactive, 누적 Suricata 검사 깊이 제한을 현재 서비스 중단으로 단정하지 않는다. `needs_review/outcome_unknown` 사건은 정상이나 완료로 바꾸지 않는다.
+현재 B의 `b:vector`는 의도된 미설치다. `b:wazuh-agent`는 설치된 호스트 unit이며 `b:collection`에서 연결 단절·오래된 상태·프로세스 부재를 별도로 검사한다. manager 컨테이너와 같은 이름의 프로세스는 실제 실행파일 inode를 비교해 호스트 프로세스로 잘못 세지 않는다. 컨테이너의 manager를 host agent로 대신 세지 않는다. Indexer 단일 노드의 yellow, oneshot의 성공 후 inactive, 누적 Suricata 검사 깊이 제한을 현재 서비스 중단으로 단정하지 않는다. `needs_review/outcome_unknown` 사건은 정상이나 완료로 바꾸지 않는다.
 
 ## 호스트 보안 정책 점검 범위
 
-2026-10-27 운영 대조에서 Wazuh agent001은 A(groot-sec), agent002는 C(groot-web)로 확인했다. agent000은 Amazon Linux 기반 `wazuh.manager` 컨테이너이며 Ubuntu B 호스트가 아니다. B 호스트의 `wazuh-agent.service`는 미설치이고 등록 목록도000/001/002뿐이다. **000의 SCA 결과로 B 호스트의 SSH·커널·AppArmor 준수를 판단하지 않는다.** 기존 B 서비스/스토리지/runtime 진단과 호스트 SCA 공백을 구분한다. B 호스트 전용 agent 또는 동등한 정책 수집은 후속이며 이번에 설치하지 않았다.
+2026-10-27 운영 대조에서 Wazuh agent001은 A(groot-sec), agent002는 C(groot-web)로 확인했다. agent000은 Amazon Linux 기반 `wazuh.manager` 컨테이너이며 Ubuntu B 호스트가 아니다. 이후 승인된 오프라인 반입으로 B에 `groot-siem-host`를 별도 등록했다(운영 등록 결과003, 새 설치 이름 capstone-siem-host; ID를 코드에 고정하지 않음). **000의 SCA 결과로 B 호스트의 SSH·커널·AppArmor 준수를 판단하지 않는다.** 기존 B 서비스/스토리지/runtime 진단과 호스트 SCA 공백을 구분한다. B agent는 SCA/syscollector/FIM/journald를 수집하고 기존 로컬 manager로 전송한다. 자체 active response와 원격 자동 enrollment는 비활성화했다. 두 봇의 실제 이름→ID 조회, SCA 정책/SSH 체크·프로세스 조회를 확인했다. 첫 SCA279항목의120통과·117실패·42invalid는 당시 스캔 결과이며 전체 보안 해결을 의미하지 않는다.
 
-SCA는 마지막 저장 스캔이다. 개별 항목의 결과·스캔 종료 시각과 실제 호스트 설정을 대조한다. A의 기존 SSH4종 제외와 설치된 SCA35654의 UMAC128-ETM 금지 조건은 다르며, 정책 변경이나 다음 스캔 없이 통과를 주장하지 않는다. C의 rootless sudo 실습 AppArmor 제한 부재와 rootful Log4Shell의 `docker-default`를 구분한다. Docker bridge용 IPv4 forwarding도 역할·통신 제한을 함께 평가한다. 예외는 명시적 범위·승인·재검토 조건이 필요한 별도 결정이며 원래 `failed` 결과를 지우지 않는다. [최신 검토·남은 조치](../../STATUS.md).
+SCA는 마지막 저장 스캔이다. 개별 항목의 결과·스캔 종료 시각과 실제 호스트 설정을 대조한다. A/B/C SSH는 설치 SCA35654의 UMAC128-ETM을 포함한5종 제외로 정렬했다. 현재 설정과 별개로 저장된 스캔의 시각을 확인하며 갱신되지 않은 과거 실패를 임의로 통과로 바꾸지 않는다. C의 rootless sudo 실습 AppArmor 제한 부재와 rootful Log4Shell의 `docker-default`를 구분한다. Docker bridge용 IPv4 forwarding도 역할·통신 제한을 함께 평가한다. 예외는 명시적 범위·승인·재검토 조건이 필요한 별도 결정이며 원래 `failed` 결과를 지우지 않는다. [최신 검토·남은 조치](../../STATUS.md).
 
 ## A의 독립 감시와 재전송
 

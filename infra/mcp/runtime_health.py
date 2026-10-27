@@ -24,7 +24,7 @@ CONFIG = Path('/etc/capstone-diagnostics/runtime.json')
 ROLE_TARGETS = {
     'security': ('a:waf', 'a:suricata', 'a:collection'),
     'siem': ('b:hermes', 'b:ollama', 'b:wazuh-manager', 'b:wazuh-indexer',
-             'b:mattermost', 'b:llm', 'b:management-pipeline', 'b:ingestion'),
+             'b:mattermost', 'b:llm', 'b:management-pipeline', 'b:ingestion', 'b:collection'),
     'service': ('c:collection',),
 }
 TARGETS = frozenset(t for values in ROLE_TARGETS.values() for t in values)
@@ -199,15 +199,23 @@ def wazuh(cfg, runner, now):
     return row
 
 
+def host_executable(pid, name):
+    """Same executable inode, not a same-named process inside a container."""
+    try:
+        expected = Path('/var/ossec/bin', name).stat()
+        actual = Path('/proc', str(pid), 'exe').stat()
+        return (expected.st_dev, expected.st_ino) == (actual.st_dev, actual.st_ino)
+    except OSError:
+        return False
+
+
 def agent_collection(role, runner, now):
     metrics = {};codes = []
     for proc in ('wazuh-agentd', 'wazuh-logcollector'):
         text=command(runner,['/usr/bin/pgrep','-x',proc[:15]],allowed=(0,1))
         pids=[int(p) for p in text.split() if p.isdecimal()]
-        present=False
-        if len(pids)==1:
-            try: present=str(Path('/proc',str(pids[0]),'exe').readlink())=='/var/ossec/bin/'+proc
-            except OSError: pass
+        present = sum(host_executable(pid, proc) for pid in pids[:128]) == 1
+        if len(pids) > 128: codes.append('inspection_limit_reached')
         metrics[proc.replace('-', '_') + '_running']=present
         if not present: codes.append('process_missing')
     raw, mtime = read_file('/var/ossec/var/run/wazuh-agentd.state', uid=pwd.getpwnam('wazuh').pw_uid)
@@ -382,7 +390,7 @@ def probe_receipt(kind, now):
 
 def collect_one(target, cfg, runner, now):
     if target == 'b:wazuh-manager': return wazuh(cfg, runner, now)
-    if target in ('a:collection', 'c:collection'): return agent_collection(cfg['role'], runner, now)
+    if target in ('a:collection', 'b:collection', 'c:collection'): return agent_collection(cfg['role'], runner, now)
     if target in ('b:hermes', 'b:ollama'): return bot(target, cfg, runner, now)
     if target == 'b:management-pipeline': return management(now, runner)
     if target == 'b:ingestion': return probe_receipt('ingestion', now)

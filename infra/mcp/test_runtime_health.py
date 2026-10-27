@@ -32,7 +32,7 @@ class RuntimeTests(unittest.TestCase):
 
     def test_catalog_has_no_arbitrary_paths_and_matches_validator(self):
         self.assertEqual(d.RUNTIME_TARGETS,h.ROLE_TARGETS)
-        self.assertEqual(len(d.TARGETS),38)
+        self.assertEqual(len(d.TARGETS),39)
         self.assertIn('soc:coverage',d.TARGETS)
 
     def test_missing_configuration_is_not_healthy(self):
@@ -97,14 +97,30 @@ class RuntimeTests(unittest.TestCase):
         def runner(argv,maximum,seconds):
             commands.append(argv)
             return 0,b'11\n' if argv[-1]=='wazuh-agentd' else b'12\n'
-        def executable(path):
-            return Path('/var/ossec/bin/wazuh-agentd' if '/11/' in str(path) else '/var/ossec/bin/wazuh-logcollector')
         with patch.object(h,'read_file',return_value=(b"status='connected'\nmsg_buffer='0'\n",NOW)), \
-             patch.object(h.pwd,'getpwnam') as user,patch.object(Path,'readlink',autospec=True,side_effect=executable):
+             patch.object(h.pwd,'getpwnam') as user,patch.object(h,'host_executable',return_value=True):
             user.return_value.pw_uid=110
             self.assertEqual(h.agent_collection('service',runner,NOW)['status'],'ok')
         self.assertEqual(len(commands),2)
         self.assertTrue(all(c[:2]==['/usr/bin/pgrep','-x'] for c in commands))
+
+    def test_b_host_and_container_process_names_do_not_collide(self):
+        def runner(*args): return 0,b'11\n12\n'
+        with patch.object(h,'read_file',return_value=(b"status='connected'\n",NOW)), \
+             patch.object(h.pwd,'getpwnam') as user, \
+             patch.object(h,'host_executable',side_effect=lambda pid,name:pid==12):
+            user.return_value.pw_uid=110
+            self.assertEqual(h.collect_one('b:collection',{'role':'siem'},runner,NOW)['status'],'ok')
+        with patch.object(h,'read_file',return_value=(b"status='disconnected'\n",NOW-181)), \
+             patch.object(h.pwd,'getpwnam') as user,patch.object(h,'host_executable',return_value=False):
+            user.return_value.pw_uid=110
+            result=h.agent_collection('siem',runner,NOW)
+            for code in ('process_missing','agent_disconnected','stats_stale'):self.assertIn(code,result['codes'])
+
+    def test_same_path_in_container_is_not_host_executable(self):
+        from types import SimpleNamespace
+        with patch.object(Path,'stat',side_effect=[SimpleNamespace(st_dev=1,st_ino=2),SimpleNamespace(st_dev=3,st_ino=2)]):
+            self.assertFalse(h.host_executable(11,'wazuh-logcollector'))
 
 
 class ObserverTests(unittest.TestCase):

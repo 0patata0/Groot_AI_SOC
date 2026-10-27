@@ -1,5 +1,16 @@
 # 설치 후 접속·검증·장애 진단
 
+## B 호스트 수집과 manager 컨테이너 구분
+
+새 설치 `deploy.sh`는 `capstone-siem-host`를 별도 등록한다. 운영 이름은 `groot-siem-host`이며 ID는 등록/조회 결과에서 확인하고 고정000/003으로 가정하지 않는다. Wazuh agent000의 Amazon Linux 결과는 manager 컨테이너이고 B Ubuntu24.04 호스트 결과가 아니다.
+
+- 호스트에서 `systemctl is-active wazuh-agent`와 `/var/ossec/var/run/wazuh-agentd.state`의 connected·최근 갱신을 확인한다. `/var/lib/capstone-siem-host-agent/receipt.json`에는 비밀 없는 ID·설정 SHA·등록 KST가 있다. client.keys는 출력하지 않는다.
+- 두 봇의 `get_wazuh_agents`에서 이름·ID·OS를 확인하고 `get_wazuh_sca_checks`로 정책 목록→정확 policy/check·스캔 시각을 조회한다. `b:wazuh-agent`는 호스트 unit, `b:wazuh-manager`는 컨테이너다.
+- syscollector 패키지/OS/프로세스, journald/FIM/SCA 수집이 각각 도착했는지 확인한다. 단순 active나 전체 SCA 점수만으로 모든 탐지·대응 E2E를 통과했다고 표시하지 않는다.
+- 운영 검증에서는 B 점검용 SSH 접속4건의 journald 메시지/PID와 agent003의 경보 ID/원문, 인덱서 저장 내용을 대조했다. A/C는 수집기 순차 재시작 후 새 SCA의 SSH MAC35654 통과를 확인했다. 전체 raw 로그 보관은 비활성화 상태이며 이 검증은 모든 로그 무누락·FIM 이벤트·공격 대응 시험을 대신하지 않는다. [시점별 결과](../STATUS.md).
+- 부분 설치 실패의 pending/원본 config는 보존한다. 다른 agent 키를 삭제하거나 등록 파일을 비워 재시도하지 않는다. 실패 시 새 host agent만 중지되며 manager/다른 agent는 재시작하지 않는다.
+
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
 > 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP6서버/고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.

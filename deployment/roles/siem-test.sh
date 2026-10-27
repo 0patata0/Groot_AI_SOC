@@ -367,15 +367,23 @@ class Tests(unittest.TestCase):
         self.assertIn('일반 채팅의 동의는 카드 승인이 아니다',approval)
     def test_response_format_fails_closed_for_missing_duplicate_or_changed_structure(self):
         raw=self.response_policy()
-        start='<!-- rule-change-policy:start -->\n### SOC 응답 서식\n'.encode()
+        start='\n### SOC 응답 서식\n'.encode()
         end='\n## 보안 룰 변경 요청\n'.encode()
         variants=(raw.replace(start,b'',1),raw+start,raw.replace(end,b'',1),raw+end,
                   raw.replace(end,b'\n- extra policy\n'+end,1),
                   raw.replace(end,b'\n## unexpected capability\n'+end,1),b'\xff',
-                  end+raw.replace(end,b'',1))
+                  end+raw.replace(end,b'',1),
+                  raw.replace(b'<!-- rule-change-policy:start -->',b'',1),
+                  raw.replace(b'<!-- rule-change-policy:end -->',b'',1))
         for invalid in variants:
             with self.subTest(case=variants.index(invalid)):
                 self.reject(lambda:self.n['hermes_response_format'](invalid))
+    def test_response_format_allows_separate_scope_guidance_without_copying_it(self):
+        raw=self.response_policy()
+        marker=b'<!-- rule-change-policy:start -->'
+        extra='\n### 조회 범위\n- 다른 장비로 대체하지 않는다.\n'.encode()
+        self.assertEqual(self.n['hermes_response_format'](raw.replace(marker,marker+extra,1)),
+                         self.n['hermes_response_format'](raw))
     def test_response_format_read_is_bounded_and_readonly_soul_retains_capabilities(self):
         calls=[]
         def read(path,cap):

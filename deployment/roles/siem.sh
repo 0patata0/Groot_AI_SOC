@@ -176,11 +176,15 @@ def hermes_response_format(raw=None):
         raw = read(SOURCE/'infra/hermes/SOUL.groot.md',512*1024)
     try: text = raw.decode('utf-8')
     except (AttributeError,UnicodeError): raise Refused('SOC_response_format_encoding_invalid')
-    start = '<!-- rule-change-policy:start -->\n### SOC 응답 서식\n'
+    policy_start = '<!-- rule-change-policy:start -->'
+    policy_end = '<!-- rule-change-policy:end -->'
+    start = '\n### SOC 응답 서식\n'
     end = '\n## 보안 룰 변경 요청\n'
-    need(text.count(start)==1 and text.count(end)==1, 'SOC_response_format_anchor_invalid')
+    need(all(text.count(anchor)==1 for anchor in (policy_start,policy_end,start,end)),
+         'SOC_response_format_anchor_invalid')
     begin = text.index(start)+len(start); finish = text.index(end)
-    need(begin < finish, 'SOC_response_format_order_invalid')
+    need(text.index(policy_start) < begin < finish < text.index(policy_end),
+         'SOC_response_format_order_invalid')
     body = text[begin:finish].strip()
     lines = body.splitlines()
     need(len(lines)==5 and all(line.startswith('- ') and len(line)>2 for line in lines)
@@ -218,7 +222,8 @@ def profile(snap, images):
             'prerequisite_tree_sha256':digest(canonical(snap)),
             'prerequisite_credentials_sha256':digest(read(PRE/'siem.json',16384,True)),
             'source_sha256':{p:digest(read(SOURCE/p)) for p in (
-                'deployment/ssh_macs.py','infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
+                'deployment/ssh_macs.py','deployment/siem_host_agent.py',
+                'infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
                 'infra/hermes/SOUL.groot.md',
                 'deployment/bot_profiles.py','deployment/bot-icons/sources.json',
                 'deployment/bot-icons/hermes.png','deployment/bot-icons/ollama.png',
@@ -252,6 +257,8 @@ def preflight():
     directory(SOURCE); directory(PRE)
     read(SOURCE/'deployment/ssh_macs.py')
     run(['python3','-B',str(SOURCE/'deployment/ssh_macs.py'),'check'])
+    read(SOURCE/'deployment/siem_host_agent.py')
+    run(['python3','-B',str(SOURCE/'deployment/siem_host_agent.py'),'check'])
     release = pathlib.Path('/etc/os-release').read_text()
     need('ID=ubuntu' in release and 'VERSION_ID="24.04"' in release, 'Ubuntu_24_04_required')
     need(os.uname().machine == 'x86_64', 'amd64_required')
@@ -765,6 +772,7 @@ asyncio.run(main())
          '/opt/hermes/.venv/bin/python','-B','-'],100,code.encode())
 def verify():
     run(['python3','-B',str(SOURCE/'deployment/ssh_macs.py'),'verify'])
+    run(['python3','-B',str(SOURCE/'deployment/siem_host_agent.py'),'verify'])
     saved=parse(read(STATE)); need(saved.get('status')=='applied','successful_apply_receipt_required')
     need(saved.get('profile')==profile(snap,images),'completed_deployment_profile_changed')
     now=current_containers(); need({k:v['id'] for k,v in now.items()}==saved['container_ids'],'container_replacement_requires_review')
@@ -814,6 +822,8 @@ try:
     manager_id=current_containers(False)['wazuh.manager']['id']
     run(['docker','exec',manager_id,'/var/ossec/bin/wazuh-analysisd','-t'],30)
     run(['docker','exec',manager_id,'/var/ossec/bin/wazuh-authd','-t'],30)
+    phase='siem_host_agent'
+    run(['python3','-B',str(SOURCE/'deployment/siem_host_agent.py'),'install'],150)
     log_pipeline('activate')
     phase='application_accounts'; creds=app_bootstrap()
     phase='readonly_MCP_and_Hermes'; setup_mcp_and_hermes(c,images,creds)

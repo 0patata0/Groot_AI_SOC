@@ -135,9 +135,9 @@ unset docker_version
 
 Docker 게시 포트는 일반 host INPUT/UFW 규칙과 경로가 다를 수 있다. 접근 제한은 [네트워크 준비 절차](setup-network-ssh.md)와 실제 패킷 경로를 대조한다. 이 프로젝트의 기본 nft 테이블은 접근 차단 정책 전체를 제공하지 않는다.
 
-## 3. security·service의 Wazuh agent 4.14.8
+## 3. security·siem·service의 Wazuh agent 4.14.8
 
-SIEM에는 이 agent를 설치하지 않는다. security와 service에서 기존 등록 여부를 먼저 확인한다. 다음 조건이 실패하면 기존 agent를 삭제하거나 `client.keys`를 비워서 진행하지 않는다.
+security·siem·service 세 Ubuntu 호스트 모두 미등록 `wazuh-agent 4.14.8-1 amd64`가 필요하다. SIEM의 manager 컨테이너(agent000)는 Ubuntu 호스트 수집을 대신하지 않는다. 세 역할에서 기존 등록 여부를 먼저 확인한다. 다음 조건이 실패하면 기존 agent를 삭제하거나 `client.keys`를 비워서 진행하지 않는다.
 
 ```bash
 set -euo pipefail
@@ -155,7 +155,7 @@ printf '%s\n' \
 sudo apt-get update
 apt-cache madison wazuh-agent
 
-wazuh_version=$(apt-cache madison wazuh-agent | awk '$3 ~ /^4\.14\.8-/ {print $3; exit}')
+wazuh_version=$(apt-cache madison wazuh-agent | awk '$3 == "4.14.8-1" {print $3; exit}')
 test -n "$wazuh_version"
 printf '선택한 Wazuh agent 버전: %s\n' "$wazuh_version"
 sudo env -u WAZUH_MANAGER -u WAZUH_REGISTRATION_SERVER \
@@ -169,9 +169,17 @@ sudo /var/ossec/bin/wazuh-control info
 unset wazuh_version
 ```
 
-공식 문서는 등록 변수 없이 설치하면 미등록 agent를 준비할 수 있다고 설명한다. 여기서는 manager 주소와 등록 암호를 아직 지정하지 않는다. 실제 `deploy.sh`가 SIEM 구성 후 새 CA·등록 암호·agent 이름을 넣고 등록한다. agent는 **중지하되 mask하지 않는다.** mask 상태이면 배포 시 시작할 수 없다. 패키지 hold는 manager 4.14.8과의 버전 불일치를 방지하기 위한 것이며, 이후 보안 업데이트는 검토 후 manager와 함께 계획한다. [Wazuh Linux agent 설치·업데이트 관리](https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-linux.html)
+공식 문서는 등록 변수 없이 설치하면 미등록 agent를 준비할 수 있다고 설명한다. 여기서는 manager 주소와 등록 암호를 아직 지정하지 않는다. 실제 `deploy.sh`는 A/C를 새 CA·등록 암호로 등록하고, B는 manager 준비 후 로컬 Docker 관리 명령으로 별도 `capstone-siem-host` 키를 발급한다. 키는 서버 내부에서만 처리하며 원격 enrollment 설정을 완화하지 않는다. 운영 B의 이름은 `groot-siem-host`다. agent는 **중지하되 mask하지 않는다.** mask 상태이면 배포 시 시작할 수 없다. 패키지 hold는 manager 4.14.8과의 버전 불일치를 방지하기 위한 것이며, 이후 보안 업데이트는 검토 후 manager와 함께 계획한다. [Wazuh Linux agent 설치·업데이트 관리](https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-linux.html)
 
-`4.14.8-*`가 저장소에 없으면 다른 최신 버전을 대신 설치하지 않는다. 공식 패키지 목록에서 4.14.8 amd64와 배포자의 checksum을 확보하거나 검증한 내부 패키지 저장소를 사용한다. `apt-cache`의 revision을 확인하므로 문서에서 확인하지 않은 `-1` 등의 revision을 가정하지 않는다.
+`4.14.8-1`이 저장소에 없으면 다른 최신 버전을 대신 설치하지 않는다. 공식 패키지 목록에서 4.14.8 amd64와 배포자의 checksum을 확보하거나 검증한 내부 패키지 저장소를 사용한다. 현재 B 설치 모듈은 실제 검증한 revision `4.14.8-1`을 요구한다. revision 변경은 모듈·검증·manager 호환성을 함께 검토한다.
+
+### 오프라인 B 호스트 패키지와 검증
+
+외부 접속이 없는 서버에는 온라인 apt 명령을 실행하지 않는다. 승인된 인터넷 환경의 작업 전용 임시경로로 공식 Wazuh `GPG-KEY-WAZUH`, `4.x/apt/dists/stable/InRelease`, `main/binary-amd64/Packages.gz`, `pool/main/w/wazuh-agent/wazuh-agent_4.14.8-1_amd64.deb`를 TLS 검증하여 받는다. 서버의 기존 gpgv로 InRelease 서명을 확인한 뒤 Packages.gz의 SHA256/크기, 정확한 Package/Version/Architecture 항목의 deb SHA256/크기를 순서대로 대조한다. 서명 키는 공식 HTTPS 출처와 함께 기록한다.
+
+2026-10-27 반입본은 amd6413,227,800바이트, SHA256 `6ed202e211fd8c544d1906c9b94dcd4b503d1829eef7d0a82ce4bcf4a1688967`, 서명 키 fingerprint `0DCFCA5547B19D2A6099506096B3EE5F29111145`다. `libc6`, `lsb-release`, `debconf`, `adduser`, `procps` 의존성은 대상 서버에서 먼저 확인한다. 새 서버는 같은 deb와 누락 의존성을 역할별 `artifacts.json`에 명시해 root deploy.sh의 오프라인 준비 경로로 설치한다. 기존 운영 B는 초기 설치기를 재실행하지 않고 검증된 deb만 증분 설치했다. Mac 패키지 설치·캐시 생성을 피하고, 반입/검증 후 다운로드·임시 환경을 정리한다.
+
+B 설치 모듈은 agent 기존 등록/실행·manager 버전·로컬1514 바인딩을 확인하고 SCA/syscollector/FIM/journald 기본 수집을 유지한다. agent의 자동 enrollment와 자체 active response는 꺼서 기존 승인형 SOC 대응과 충돌하지 않게 한다. 부분 실패는 agent를 정지하고 `/var/lib/capstone-siem-host-agent`에 복구 근거를 남기며, 다른 agent 키 삭제나 자동 재등록으로 진행하지 않는다. 설치 완료는 agent 연결 검증이며 SCA 결과와 실제 사건 수집 검증은 [검증 안내](verify-troubleshoot.md)를 따른다.
 
 ## 4. SIEM의 bcrypt와 커널 설정
 

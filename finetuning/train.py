@@ -16,10 +16,26 @@ import os
 from pathlib import Path
 import platform
 import sys
+import time
+import math
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 import model_profile
+import memory_budget
+
+
+def write_json(path, value):
+    path = Path(path)
+    temporary = path.with_suffix('.tmp')
+    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n')
+    temporary.replace(path)
+
+
+def kst_now():
+    return datetime.now(ZoneInfo('Asia/Seoul')).isoformat()
 
 
 def read_config(path):
@@ -186,8 +202,9 @@ def preflight(config=None):
             "cuda": torch.version.cuda, "bf16_supported": torch.cuda.is_bf16_supported(),
             "nf4_kernel": "passed" if quantized else "not_used", "cuda_forward_backward": "passed",
             "platform": platform.machine(), "compute_capability": list(torch.cuda.get_device_capability()),
-            "available_memory_gib": round(min(mem['MemAvailable'], cuda_free / 2**30), 2),
-            "system_memory_gib": round(mem['MemTotal'], 2), "cuda_free_gib": round(cuda_free / 2**30, 2)}
+            "system_memory_gib": round(mem['MemTotal'], 2)}
+    hardware.update(memory_budget.budget(mem['MemAvailable'], cuda_free / 2**30, cuda_total / 2**30,
+        platform.machine(), torch.cuda.get_device_capability(), memory_budget.cgroup_headroom()))
     try:
         model_profile.check_training_capacity(config, hardware)
         hardware['capacity_check'] = 'passed_planning_floor_not_peak_memory_guarantee'
@@ -196,19 +213,9 @@ def preflight(config=None):
     return hardware
 
 
-def run_training(config, checks, hardware):
-    os.environ.setdefault("HF_HOME", str(ROOT / ".cache" / "huggingface"))
-    os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    import torch
-    from transformers import AutoConfig, AutoTokenizer, BitsAndBytesConfig, Trainer, TrainingArguments, set_seed
-    model_profile.check_training_capacity(config, hardware)
-    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-    output = Path(config["output_dir"])
-    if output.exists() and any(output.iterdir()):
-        raise ValueError("Output directory is not empty. Select a new --output-dir for this run.")
-    output.mkdir(parents=True, exist_ok=True)
-    set_seed(config["seed"])
+def prepare_tokens(config, output, include_test=False):
+    """Use the actual pinned tokenizer without allocating model weights or CUDA."""
+    from transformers import AutoConfig, AutoTokenizer
     load_args = {"revision": config["revision"], "trust_remote_code": False, "local_files_only": config["offline"]}
     base_config = AutoConfig.from_pretrained(config["model_name_or_path"], **load_args)
     model_profile.validate_model_config(config, base_config)
@@ -218,15 +225,55 @@ def run_training(config, checks, hardware):
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
-    data_root = Path(config["data_dir"])
-    train, train_stats = tokenize_split(data_root / "train.jsonl", tokenizer, config["max_length"], config["max_train_samples"])
-    val, val_stats = tokenize_split(data_root / "validation.jsonl", tokenizer, config["max_length"], config["max_eval_samples"])
-    token_stats = {"train": train_stats, "validation": val_stats, "loss": "each_assistant_turn_as_completion", "truncation": "disabled; overlength prefixes rejected"}
-    (output / "tokenization_report.json").write_text(json.dumps(token_stats, ensure_ascii=False, indent=2) + "\n")
-    print(json.dumps(token_stats, ensure_ascii=False, indent=2))
+    datasets, stats = {}, {}
+    splits = ('train', 'validation', 'test') if include_test else ('train', 'validation')
+    for split in splits:
+        limit = config['max_train_samples'] if split == 'train' else config['max_eval_samples']
+        datasets[split], stats[split] = tokenize_split(Path(config['data_dir']) / f'{split}.jsonl',
+            tokenizer, config['max_length'], limit)
+        # A standalone audit must not retain a complete unused test dataset.
+        if include_test: datasets[split] = None
+    stats.update(loss='each_assistant_turn_as_completion',
+                 truncation='disabled; overlength prefixes rejected', checked_at_kst=kst_now())
+    write_json(Path(output) / 'tokenization_report.json', stats)
+    print(json.dumps(stats, ensure_ascii=False, indent=2), flush=True)
+    return tokenizer, datasets
+
+
+def tokenize_only(config, checks):
+    output = Path(config['output_dir'])
+    if output.exists() and any(output.iterdir()):
+        raise ValueError('Output directory is not empty')
+    output.mkdir(parents=True, exist_ok=True)
+    prepare_tokens(config, output, include_test=True)
+    write_json(output / 'data_check.json', checks)
+
+
+def run_training(config, checks, hardware):
+    os.environ.setdefault("HF_HOME", str(ROOT / ".cache" / "huggingface"))
+    os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    import torch
+    from transformers import BitsAndBytesConfig, Trainer, TrainerCallback, TrainingArguments, set_seed
+    model_profile.check_training_capacity(config, hardware)
+    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+    output = Path(config["output_dir"])
+    if output.exists() and any(output.iterdir()):
+        raise ValueError("Output directory is not empty. Select a new --output-dir for this run.")
+    output.mkdir(parents=True, exist_ok=True)
+    set_seed(config["seed"])
+    load_args = {"revision": config["revision"], "trust_remote_code": False, "local_files_only": config["offline"]}
+    write_json(output / 'progress.json', {'status':'tokenizing', 'at_kst':kst_now()})
+    tokenizer, datasets = prepare_tokens(config, output)
+    train, val = datasets['train'], datasets['validation']
+    # Tokenization takes time; recheck competing allocations immediately before loading.
+    hardware = preflight(config)
+    model_profile.check_training_capacity(config, hardware)
+    write_json(output / 'progress.json', {'status':'loading_model', 'at_kst':kst_now()})
+    torch.cuda.reset_peak_memory_stats()
     dtype = torch.bfloat16 if hardware["bf16_supported"] else torch.float16
     quantized = config.get("quantization", "nf4") == "nf4"
-    model_args = {}
+    model_args = model_profile.loading_kwargs(config)
     if quantized:
         model_args['quantization_config'] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
     model = model_profile.model_class(config).from_pretrained(config["model_name_or_path"], **load_args, torch_dtype=dtype,
@@ -255,7 +302,8 @@ def run_training(config, checks, hardware):
         bf16=hardware["bf16_supported"], fp16=not hardware["bf16_supported"], gradient_checkpointing=True,
         gradient_checkpointing_kwargs={"use_reentrant": False}, max_grad_norm=1.0, seed=config["seed"], data_seed=config["seed"],
         report_to=[], push_to_hub=False, remove_unused_columns=False, label_names=["labels"],
-        prediction_loss_only=True, dataloader_num_workers=0)
+        prediction_loss_only=True, dataloader_num_workers=0, disable_tqdm=True,
+        logging_first_step=True, logging_nan_inf_filter=False)
 
     def collator(features):
         return {key: torch.tensor(value, dtype=torch.long) for key, value in collate_lists(features, tokenizer.pad_token_id).items()}
@@ -263,13 +311,40 @@ def run_training(config, checks, hardware):
     metadata = {"config": config, "data": checks, "hardware": hardware, "base_revision_resolved": getattr(model.config, "_commit_hash", None),
                 "tokenizer_class": type(tokenizer).__name__, "lora_coverage": coverage, "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)}
     (output / "run_manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
-    trainer = Trainer(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator, processing_class=tokenizer)
+    class Progress(TrainerCallback):
+        def __init__(self):
+            self.started = time.monotonic()
+            self.metrics = {}
+
+        def record(self, state, status):
+            elapsed = time.monotonic() - self.started
+            write_json(output / 'progress.json', {'status':status, 'at_kst':kst_now(),
+                'step':state.global_step, 'max_steps':state.max_steps, 'epoch':state.epoch,
+                'elapsed_seconds':round(elapsed, 2),
+                'estimated_remaining_seconds':round(elapsed / state.global_step * (state.max_steps-state.global_step), 1) if state.global_step else None,
+                'peak_cuda_allocated_gib':round(torch.cuda.max_memory_allocated()/2**30, 2),
+                'peak_cuda_reserved_gib':round(torch.cuda.max_memory_reserved()/2**30, 2),
+                'metrics':self.metrics})
+
+        def on_step_end(self, args, state, control, **kwargs): self.record(state, 'training')
+
+        def on_log(self, args, state, control, logs=None, **kwargs):
+            self.metrics.update(logs or {})
+            for key, value in (logs or {}).items():
+                if isinstance(value, (float, int)) and not math.isfinite(value):
+                    raise RuntimeError('Nonfinite training metric: '+key)
+            self.record(state, 'training')
+
+    progress = Progress()
+    trainer = Trainer(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator,
+                      processing_class=tokenizer, callbacks=[progress])
     result = trainer.train()
     trainer.save_model(str(output / "adapter"))
     tokenizer.save_pretrained(str(output / "adapter"))
     trainer.save_metrics("train", result.metrics)
     trainer.save_metrics("eval", trainer.evaluate())
     trainer.save_state()
+    progress.record(trainer.state, 'completed')
     print(f"Saved adapter and tokenizer to {output / 'adapter'}. Requires the original base model. No upload performed.")
 
 
@@ -279,6 +354,7 @@ def main():
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument("--check", action="store_true", help="Verify prepared data using stdlib only; no downloads")
     action.add_argument("--preflight", action="store_true", help="Check target GPU/packages/NF4 kernel; no model downloads")
+    action.add_argument("--tokenize-only", action="store_true", help="Audit all splits with the real tokenizer; no model/GPU allocation")
     action.add_argument("--train", action="store_true", help="Explicitly start GPU training (only on the training machine)")
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--max-steps", type=int)
@@ -303,6 +379,8 @@ def main():
             if opts.check:
                 print(json.dumps(checks, indent=2))
                 print("Data/configuration check passed. No model was loaded or trained.")
+            elif opts.tokenize_only:
+                tokenize_only(config, checks)
             else:
                 run_training(config, checks, preflight(config))
     except (ValueError, RuntimeError, ImportError, OSError) as exc:

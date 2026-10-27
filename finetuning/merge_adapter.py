@@ -66,7 +66,7 @@ def main():
             info["base_model_name_or_path"], revision=info["revision"],
             local_files_only=opts.offline, trust_remote_code=False,
             torch_dtype=getattr(torch, opts.dtype), device_map={"": opts.device},
-            low_cpu_mem_usage=True,
+            low_cpu_mem_usage=True, **model_profile.loading_kwargs(info["training_config"]),
         )
         # Reload the unquantized base: avoid merging into a lossy 4-bit checkpoint.
         model = PeftModel.from_pretrained(base, str(opts.adapter), is_trainable=False)

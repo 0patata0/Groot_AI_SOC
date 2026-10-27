@@ -1,4 +1,5 @@
-# Candidate profile; package metadata checked 2026-10-27, GPU execution pending.
+# Validated 2026-10-27 with NGC 25.08: pip check + tiny architecture CUDA backward.
+# Full 35B training remains a separate validation gate.
 # Use a separately validated Thor SM110 CUDA PyTorch build. No bitsandbytes in BF16 recipe.
 transformers==5.4.0
 peft==0.18.1

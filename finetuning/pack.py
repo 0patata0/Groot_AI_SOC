@@ -30,6 +30,7 @@ def main():
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "evaluate.py",
              "pack.py", "model_profile.py", "config.qwen36-thor.json", "requirements.qwen36-thor.txt",
              "setup_thor.sh", "THOR_35B.md", "audit_tools.py", "mcp_contract.json",
+             "container_task.py", "thor_container.py", "memory_budget.py", "download_model.py",
              "preparation_summary.json", "data/manifest.json",
              "data/train.jsonl", "data/validation.jsonl", "data/test.jsonl"]
     paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))

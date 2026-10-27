@@ -12,3 +12,4 @@ __pycache__/
 *.bin
 *.gguf
 *.tar.gz
+config.*.local.json

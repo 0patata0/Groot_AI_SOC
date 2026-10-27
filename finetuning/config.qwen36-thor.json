@@ -25,6 +25,7 @@
   "offline": false,
   "model_kind": "qwen3_5_moe",
   "quantization": "none",
+  "experts_implementation": "eager",
   "expected_lora_modules": {
     "self_attn": 40,
     "linear_attn": 150

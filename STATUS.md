@@ -1,5 +1,17 @@
 # 인프라 현황 — 2026-10-27 현재 작업 상태
 
+## Thor 학습 실행 준비 — 2026-10-27 KST
+
+**사용자 지시로 학습 실행에 착수해 격리 환경을 구성했다. 전체35B 가중치 다운로드·실제 토큰화는 진행 중이며, 전체 모델의2-step/본 학습은 아직 시작하지 않았다.** [실행 경로·반입·한계](finetuning/THOR_35B.md). 아래14:35의 “설치/다운로드0”은 그 시점 이력이다.
+
+- **실제 환경:** 기존 arm64 NVIDIA PyTorch25.08 이미지 digest `ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb`를 재사용했다. 별도 작업 폴더/venv에 transformers5.4.0·peft0.18.1·accelerate1.12.0 설치, vendor torch2.8.0a0+34c6371d24.nv25.8/CUDA13.0 유지, pip check·SM110 BF16 행렬 역전파 통과. 기본 Python/운영 이미지·추론 서비스 변경0이다.
+- **발견/수정:** 축소 랜덤40층 모델에서 기본 grouped_mm가 SM90만 지원해 실패했다.35B 학습·병합의 experts backend를 eager로 고정한 재시험에서 LoRA190모듈/gradient380개·finite loss/gradient·optimizer 갱신 통과(9.713초, CUDA allocated peak0.047GiB). 축소 구조의 통합 호환 시험이며 전체35B 학습/성능/정확도 검증은 아니다. DeltaNet 전용 가속 커널 미설치에 따른 실제 속도는 후속이다.
+- **자원 검사:**15:08 실측 MemAvailable75.2GiB/CUDA raw free6.08GiB·cgroup headroom111.1GiB. Thor UMA의 회수 가능 캐시와 cgroup 잔여를 반영하되96GiB 계획 하한을 유지하고 모델 적재 직전 재검사한다. 이 수치는 peak 성공 보장이 아니다. Ollama 약30GiB GPU 프로세스가 실행 중이며 자동 종료/unload0. 학습 중 추론 중단 여부/자원 시간대는 별도 확인이 필요하다.
+- **실행/자료:** 서버 `~/capstone-training/qwen36-20261027`에 소스/기존20,784행을 SHA 대조 반입했다.14:48:36 고정 HF 원본71,926,864,255B 다운로드,15:04:22 실제35B tokenizer의3분할 검사를 시작했다. 완전 다운로드·각 artifact hash 검증 후에만 smoke가 가능하며 본 학습은 성공한 smoke를 요구한다. 현재 공개 보조 corpus이며 현SOC37도구 전용 검수 자료가 아니다.
+- **격리/관측:** 단계별 durable 컨테이너/KST status·로그, 비특권 UID/cap-drop/no-new-privileges·작업1mount·포트0. 다운로드/토큰화는 GPU 미노출, 학습은 network none·CPU10/RAM112GiB/swap추가0. 자원 한도는 예약이나 GPU 메모리 완전 격리를 뜻하지 않는다. smoke는 accumulation1·2step·train32/eval8 상한, 본 학습은 기존 accumulation16·1epoch다. 학습 진행/peak/유한 metric 검사·별도 어댑터 출력, 중복 실행·실패 자동 재시작 거절을 추가했다.
+- **검증/설치 범위:** 로컬71검사 및35B 데이터 행수/SHA 통과.32member 이관 묶음은 원본 바이트 전부 일치·로컬 전용 자격/가중치/venv 제외 확인 후 제거했다. 현재 소스를 Thor에 동기화해 검사한다. SOC 초기 설치는 계속 root `deploy.sh`이며 외부 장비의 별도 실험으로 구분하고 학습 사용법/오프라인 반입 목록을 갱신했다. 전체35B 적재·GPU2step/본 학습·병합·GGUF/Ollama 등록·정확도/속도 비교·운영 전환·새 서버 전체 설치는 미실행이다.
+- **Git/정리:** 관련 공개 소스/문서 자동 커밋·푸시 준비 중. 직전완료 `b5e475f24969c3d80a92baa18118ba863d3c4af0`과 이번 변경을 구분한다. Mac에 패키지/모델 설치·다운로드0; 이번 반입/검사 tar2개28,773,393B를 SHA 대조 후 제거했고 서버 전송 tar도 제거했다. 서버 학습 원본/환경/로그·데이터는 작업 산출물로 보존, 다운로드 완료 후 불필요 캐시는 별도 정리한다. 자격/학습data/기존tar/대화기록/검증/업무분담은 Git 제외다.
+
 ## 현재35B/thor 학습 준비 수정 — 2026-10-27 KST
 
 **기존30B 설정/20,784행을 보존하고 현재35B용 준비 코드를 추가했다. 실제 GPU 학습·설치·운영 모델 교체는 하지 않았다.** [설정·사용법·한계](finetuning/THOR_35B.md). 아래 “35B용 전환 미실행”은 이 작업 전 시점이며 실제 학습 미실행은 계속 유효하다.

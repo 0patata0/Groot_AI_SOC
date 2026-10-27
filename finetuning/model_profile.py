@@ -18,7 +18,13 @@ def validate_profile(config):
             raise ValueError('35B LoRA must be scoped to language-model layers')
         if config.get('min_available_memory_gib', 0) < 96:
             raise ValueError('35B recipe requires the documented 96 GiB free-memory planning floor')
+        if config.get('experts_implementation', 'eager') != 'eager':
+            raise ValueError('Thor vendor Torch grouped_mm is not validated; use the tested eager experts backend')
     return kind
+
+
+def loading_kwargs(config):
+    return {'experts_implementation':'eager'} if validate_profile(config)=='qwen3_5_moe' else {}
 
 
 def model_class(config):

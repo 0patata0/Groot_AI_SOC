@@ -1,5 +1,45 @@
 # 데이터 출처와 사용 범위
 
+## 2026-10-29 학회·기관 근거 확인과 추가 자료 우선순위
+
+사용자는 추가 학습량보다 출처와 검증 근거를 요구했다. 아래는 **학회 정식 게재 또는 기관 공식 발행을 직접 확인한 자료**다. 논문 게재는 방법과 실험의 학술적 근거이며, 모든 데이터 행의 무오류·우리 SOC 성능·기관의 프로젝트 인증을 뜻하지 않는다. 연구용 합성 데이터도 생성·검증 과정이 명확하면 활용할 수 있으나 실제 침해 사건의 전문가 판정과 구분한다. 과거 후보 목록 전체가 이 기준을 통과했다는 뜻은 아니다.
+
+| 자료 | 직접 확인한 근거 | 제공자 생성·검증 방식 | 우리 업무에 쓸 범위 | 확보/라이선스 상태 |
+|---|---|---|---|---|
+| AIT Alert Data Set | AIT Austrian Institute of Technology 연구진의 [기관 배포·논문/DOI 목록](https://zenodo.org/records/8263181), CSET 2024 논문 | 실험 시나리오의 로그에서 Wazuh·Suricata·AMiner 경보를 생성. 정상행위의 오탐도 포함하며 labels는 공격 단계의 시간 구간 | 경보 사실 추출·상관분석·미확인 판단. 단계 라벨을 개별 경보의 악성 정답으로 바꾸지 않는다 | 기존 원본 zip/labels 보유·이번 공식 MD5 2/2 일치. Zenodo API CC-BY-4.0 확인. 우리 MCP 대화 변환은 별도 검수 대상 |
+| ToolACE | 연구진의 [ICLR 2025 정식 논문](https://proceedings.iclr.cc/paper_files/paper/2025/hash/663865ea167425c6c562cb0b6bcf76c7-Abstract-Conference.html)과 [공식 데이터](https://huggingface.co/datasets/Team-ACE/ToolACE) | 합성 도구 대화, 규칙 검사와 모델 검사 결합. 공개 부분집합 11,300개 | 도구 선택·인자·관련 없는 도구 처리 보조. 보안 사건의 악성/정상 정답을 제공하는 자료는 아니다 | 기존 원본 보유·이번 공식 LFS SHA256 일치. Apache-2.0 카드 표기. 현행 R2 학습에 추가 편입하지 않음 |
+| APIGen / xLAM-60k | Salesforce AI Research의 [NeurIPS 2024 Datasets and Benchmarks 논문](https://proceedings.neurips.cc/paper_files/paper/2024/hash/61cce86d180b1184949e58939c4f983d-Abstract-Datasets_and_Benchmarks_Track.html)과 [공식 60K 배포](https://huggingface.co/datasets/Salesforce/xlam-function-calling-60k) | 형식·실행·의미의 3단계 검증을 거친 합성 함수 호출 자료 | 도구/인자 선택 보조. 우리 승인·차단·IDS 대상 판단은 따로 검사 | CC-BY-4.0, 접근 조건 동의 필요. 이번 파일 다운로드/동의/원본 SHA 검증/학습은 미실행 |
+| PRIMUS-Instruct | Trend Micro AI Lab의 [EMNLP 2025 정식 논문](https://aclanthology.org/2025.emnlp-main.527/)과 [원 제공자 카드](https://huggingface.co/datasets/trendmicro-ailab/Primus-Instruct) | 전문가가 구성한 보안 업무 질문과 GPT-4o 응답. 카드의 보안496+일반339=835개. 전문가가 모든 답변을 승인한 실관제 정답셋이라고 해석하지 않는다 | 경보 설명·조회 쿼리·의심 명령 분석 등의 보안 문장/근거 활용 | ODC-BY, 접근 시 정보 공유/동의 조건. 이번 접근 동의/본문 수집·SHA/행별 검수는 미실행. [Trend Cybertron 명의 카드](https://huggingface.co/datasets/trend-cybertron/Primus-Instruct/blob/main/README.md)도 확인 |
+| MITRE ATT&CK | [MITRE 공식 지식베이스](https://attack.mitre.org/) | 실제 관측을 토대로 전술/기법을 정리 | 기법 정의·근거 문서. 도구 호출 대화나 개별 경보의 공격 성공 정답으로 간주하지 않는다 | 기존 보유 STIX/지식 원천 있음. 정확한 버전·원천 이용 조건을 보존하고 최신 웹 문서를 기존 로컬판과 동일하다고 표시하지 않는다 |
+| NIST SP 800-61 Rev.3 | [NIST 공식 최종 문서](https://csrc.nist.gov/pubs/sp/800/61/r3/final), 2025-04 | 사고 대응·위험 관리 권고 문서 | 조사·대응·복구 절차의 설계 근거. 학습 대화 정답셋과 구분 | 이번 공식 서지/초록 확인. 문서 전체 조항을 전수 검토하거나 현행 시스템의 NIST 준수를 검증한 것은 아니다 |
+
+### 인용 가능한 서지
+
+- Landauer, M., Skopik, F., Wurzenberger, M. (2024). *Introducing a New Alert Data Set for Multi-Step Attack Analysis*. CSET 2024. 데이터 DOI `10.5281/zenodo.8263181`, 논문 DOI `10.1145/3675741.3675748`. 기관 배포 페이지가 논문을 직접 연결한다. ACM 본문은 이번 도구 접근403으로 전수 읽지 않았으며 데이터 설명/서지만 확인했다.
+- Liu, W. et al. (2025). *ToolACE: Winning the Points of LLM Function Calling*. ICLR 2025. 공식 학회 논문 페이지와 공개 데이터 카드를 대조했다.
+- Liu, Z. et al. (2024). *APIGen: Automated PIpeline for Generating Verifiable and Diverse Function-Calling Datasets*. NeurIPS 2024, Datasets and Benchmarks Track. 학회 표기 DOI `10.52202/079017-1725`.
+- Yu, Y.-C., Chiang, T.-H., Tsai, C.-W., Huang, C.-M., Tsao, W.-K. (2025). *Primus: A Pioneering Collection of Open-Source Datasets for Cybersecurity LLM Training*. EMNLP 2025, pp.10391–10413. DOI `10.18653/v1/2025.emnlp-main.527`.
+- Nelson, A., Rekhi, S., Souppaya, M., Scarfone, K. (2025). *Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile*. NIST SP 800-61 Rev.3. 문서의 일반 권고를 우리 고정 승인/보호 정책의 구체적 의무라고 임의 인용하지 않는다.
+
+서지와 원본 링크는 위 표에 연결했다. 이번은 서지·공식 배포·검증 방식 확인으로, 모든 논문의 본문/부록 재현이나 데이터 전수 전문가 감사를 완료한 것이 아니다.
+
+### 실제로 이번에 확인한 것
+
+- 로컬 ToolACE `data.json` 37,154,735바이트의 SHA256 `ba12c083fca7e8da48c67ad5b895e495447da7c66e39a2e19742c082e6cb537e`가 공식 HF 파일 메타데이터의 LFS oid와 일치했다. AIT zip MD5 `43db6b1f0996e0024befd617706c50e9`, labels MD5 `60ff33796c77fd2136c4d1a4bc841bd9`도 공식 배포와 일치했다. 이는 파일 동일성 확인이며 내용 정답성 인증이 아니다. 공식 MD5는 현대적 보안 서명이나 진본성 증명으로 확대하지 않는다.
+- 현행 R2 train192개는 전부 `synthetic_lab_fixture` / `agent_reviewed`다. 실제 전문가 전수 검수/기관 인증 자료가 아니다. 각각1개 도구 정의132대화,2개 정의60대화이며 실제 호출은37종 중19종이다. 나머지18종의 호출 예시 부재를 다시 확인했다. 과거 공개 corpus18,872 train행이나 후보 원문 규모를 현행 R2 학습량에 더하지 않는다.
+- [직전 품질 시험](QUALITY_RESULTS.md)은 새 합성20사례·에이전트 검수이며 독립 실무 정확도가 아니다. 같은 HF control84점 대비 학습본76점이라는 불리한 결과도 보존한다. 과제 생성기·관측 제공/단일 턴·소규모 평가 한계를 명시한다. 외부 논문 점수를 우리 모델 점수로 옮기지 않는다.
+- 개인 계정의 한국어 공개 합성 자료도 후보지만 이번의 학회/기관 우선 선정과 구분한다. Ko-Agent-Trajectories 제작자 카드 자체에도 첫 호출/과잉 확인 질문 퇴행이 있어 전체 혼합을 우선하지 않는다. 우리 팀이 원문/실험/독립 검증을 끝낸 것으로 표시하지 않는다.
+
+### 추가 학습을 위한 사용 순서와 아직 남은 검증
+
+우선 보유 AIT+ToolACE를 실제 MCP 계약과 구분해 선별하고, 접근 조건을 충족한 PRIMUS/APIGen을 보조 후보로 검토한다. 보안 개념은 MITRE/NIST/장비 공식 문서에 근거하고, 현재 장비 상태·룰 내용·제안 ID는 실제 관측만 정답 근거로 사용한다. 장비 문서는 [Wazuh 공식 규칙 문법](https://documentation.wazuh.com/current/user-manual/ruleset/ruleset-xml-syntax/rules.html)처럼 버전과 원 규칙 정의를 확인하며 임의 CRS 소속/악성 판정을 만들지 않는다.
+
+다음 학습 대화는 전체/유사 도구 간 대상 선택, 필수 조회 누락 방지, 관측된 ID만 사용, 오류·빈목록 구분, 파일 선언/엔진 적재 분리, 승인·실행·사후 검증 분리를 포함한다. R2 길이2048과 직전 전체37도구 입력최대8999토큰의 차이를 확인했으므로 전체 도구 학습을 단순 추가하지 않는다. 실제 토큰·메모리 적합성 검증 또는 학습/실행에 일관된 도구 선택 구성이 필요하며, 이것을 점수 하락의 확정 원인으로 주장하지 않는다.
+
+각 편입 예제에는 출처/논문·revision·원본/변환 SHA·원문 위치·도구 계약 버전·선별/제외 이유·생성/변환 방법·검수 주체와 범위를 기록한다. 구조 검사는 객관적 계약 검사, 실제 도구 관측은 환경 확인, 전문가 검수는 의미/판단 확인으로 구분한다. 전문가 검수가 없으면 그대로 표시한다. 사건·환경·문장틀을 분리하고 기존20개 품질 문항 및 외부 벤치마크를 학습에서 제외한다. 개발셋으로 후보를 선택한 후 새 미사용 평가와 실제 MCP/승인/적용·원복 E2E를 확인해야 운영 품질 근거가 된다.
+
+이번은 조사와 기존 파일 대조 완료이며 새 corpus/가중치 다운로드·학습·서버 변경·운영 승격은 없다. 로컬 검사 근거는 `대화기록/검증/2026-10-29-data-evidence/`에 남기고 Git에는 요약·인용 링크만 반영한다. 아래는 과거 시점의 수집·후보 이력으로 보존한다.
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
 > 기존30B LoRA 준비 데이터는 train18,872/validation980/test932개이며10/24 로컬 행 수·SHA 대조가 일치했다. 운영35B와 다른 후보이고 GPU 학습/실모델 비교는 아직 없다. 공개 corpus·지식·독립 평가·우리 SOC 검수 trajectory의 역할을 구분한다.

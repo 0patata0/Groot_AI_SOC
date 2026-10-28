@@ -1,5 +1,22 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## VMM 실제 결과·잔여 연산 추적 — 2026-10-28 18:02 KST
+
+같은35B/자료/LoRA/2-step·최장2prefix·eval8의 VMM 비교를 완료했다. baseline과 manifest 차이는 output_dir뿐이며 data/학습파라미터는 같다. 기존12건 중 적재 때의 경고는 이번0건이지만 첫 연산에3건이 남았다. 한 번씩의 순차 비교이므로 캐시·단편화 상태도 달랐으며, 감소 전부를 설정 효과로 확정하지 않는다.
+
+| 확인 항목 | 기본 재현 | VMM 비교 |
+|---|---|---|
+| 같은 NVRM 경고 | 12건(적재 중8/직후4) | 3건(첫 학습 연산 도중) |
+| 2-step/평가·종료 | 완료·exit0 | 완료·exit0 |
+| PyTorch 재시도/OOM·새 강제종료 | 각0 | 각0 |
+| CUDA peak allocated/reserved | 70.37/71.88GiB | 70.35/71.60GiB |
+| host 최저 가용 | 43.80GiB | 43.64GiB |
+| 원35B 복구·실제중단 | 17:08:17KST·172.42초 | 18:01:18KST·174.50초 |
+
+VMM에서는12표본 모두 실제 expandable segment2개였다. 사전할당은17:58:35.131~36.127KST, 적재완료17:59:46.883KST이며3건은17:59:55.395~55.471KST다. 이3건을 특정 cuBLAS/cuDNN/연산 또는 실패페이지 크기에 귀속할 증거는 아직 없다. 기존R2 24/48checkpoint SHA는 불변이고 새 모델 등록·운영전환은 없다.
+
+이를 분리하려고 `soc-memory-trace`/`--mode memory-trace`를 준비했다. 같은VMM·2-step과 복구 경계를 유지하고 첫step의 CPU operator 시간만 별도 Chrome trace에 저장한다. 프로세스 내부 CPU 시간 기록이며 텐서값·shape·스택·GPU활동 프로파일을 저장하지 않는다. trace 절대기준시각을 커널 KST와 맞춰 겹치는 연산을 조사한다. 새 출력/상태와 root 복사본을 사용하고 기존재현은 보존한다. 로컬/Thor163검사·실제GPU미노출CPU profiler/시각기준·무중단check 완료, 실제추적은시작전이다. VMM의전체학습기본적용·잔여경고해결·장기안정성은미완료다.
+
 ## 경고의 의미·VMM 비교 경로 — 2026-10-28 KST
 
 공식 Jetson39.2.1 태그의 `version.mk`는595.78/r595_00이며 실제 드라이버와 맞는다. 이 태그의 `mem_desc.c:1336`은 내부 메모리 할당 실패를 오류 수준으로 기록한다. `system_mem.c`는 기본 페이지 선택과 허용 조건에 따라 더 작은 페이지로 재시도할 수 있다. 따라서 이 메시지와 학습 성공이 함께 나타날 수 있지만, 이번12건의 내부 요청/페이지 크기·최종 재시도 성공을 직접 추적한 것은 아니다. [NVIDIA 공식 소스 안내](https://docs.nvidia.com/jetson/archives/r39.2.1/DeveloperGuide/SD/WorkingWithSources.html) · [할당 오류 위치](https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver/-/blob/76b260e5967dfe9815b9054a4a4642f10672a763/src/nvidia/src/kernel/gpu/mem_mgr/mem_desc.c#L1336) · [재시도 경로](https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver/-/blob/76b260e5967dfe9815b9054a4a4642f10672a763/src/nvidia/src/kernel/mem_mgr/system_mem.c#L227).

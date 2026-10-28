@@ -59,6 +59,17 @@ class WindowTests(unittest.TestCase):
                 (root/'outputs/soc-memory-vmm').mkdir()
                 with self.assertRaisesRegex(ValueError,'automatic retry'):window.verify_ready(root)
 
+    def test_trace_trial_has_a_distinct_stage_state_and_short_timer(self):
+        with self.memory_mode():
+            window.select_mode('memory-trace')
+            self.assertEqual(window.STAGES,('soc-memory-trace',))
+            self.assertEqual(window.STATE,Path('/var/lib/capstone-memory-trace-20261028'))
+            args=window.restore_command('/inspected.py','/training')
+            self.assertIn('--unit=capstone-memory-trace-restore',args)
+            self.assertIn('--on-active=8m',args)
+            self.assertIn('--property=TimeoutStartSec=6min',args)
+            self.assertEqual(args[-1],'memory-trace')
+
     def test_unknown_operator_mode_is_rejected_and_v2_defaults_stay_reviewed(self):
         with self.memory_mode():
             with self.assertRaises(ValueError):window.select_mode('arbitrary')

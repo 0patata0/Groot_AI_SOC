@@ -6,6 +6,7 @@ An unavailable measurement is not zero, and a sample is not a capacity guarantee
 from datetime import datetime
 import json
 from pathlib import Path
+import time
 from zoneinfo import ZoneInfo
 
 HOST_KEYS={'MemTotal','MemFree','MemAvailable','Buffers','Cached','KReclaimable',
@@ -15,6 +16,31 @@ CUDA_KEYS={'allocated_bytes.all.current','allocated_bytes.all.peak',
            'reserved_bytes.all.current','reserved_bytes.all.peak',
            'inactive_split_bytes.all.current','inactive_split_bytes.all.peak',
            'num_alloc_retries','num_ooms','num_device_alloc','num_device_free'}
+
+
+class FirstStepTrace:
+    """Opt-in CPU operator timestamps; no tensor values, CUDA activity, or stacks."""
+    def __init__(self,output,torch,enabled=False):
+        self.output=Path(output);self.torch=torch;self.enabled=enabled;self.profiler=None;self.finished=False
+
+    def start(self):
+        if not self.enabled:return
+        if self.profiler is not None:raise RuntimeError('First-step trace already started')
+        if (self.output/'first-step-trace.json').exists():raise ValueError('Prior first-step trace exists')
+        self.started_at_kst=datetime.now(ZoneInfo('Asia/Seoul')).isoformat()
+        self.started_epoch_ns=time.time_ns()
+        self.profiler=self.torch.profiler.profile(activities=[self.torch.profiler.ProfilerActivity.CPU],
+            record_shapes=False,with_stack=False)
+        self.profiler.start()
+
+    def stop(self):
+        if self.profiler is None or self.finished:return
+        self.profiler.stop();self.finished=True
+        self.profiler.export_chrome_trace(str(self.output/'first-step-trace.json'))
+        metadata={'started_at_kst':self.started_at_kst,'started_epoch_ns':self.started_epoch_ns,
+                  'completed_at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),
+                  'activities':['CPU'],'record_shapes':False,'with_stack':False}
+        (self.output/'first-step-trace-clock.json').write_text(json.dumps(metadata,indent=2)+'\n')
 
 
 def _numbers(path,keys,kib=False):

@@ -29,7 +29,7 @@ def main():
     signal.signal(signal.SIGINT, interrupted)
     parser = argparse.ArgumentParser()
     parser.add_argument('stage', choices=['prepare','download','tokenize','smoke','train','soc-tokenize','soc-smoke','soc-pilot','soc-train',
-                                        'soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm'])
+                                        'soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace'])
     stage = parser.parse_args().stage
     status = {'stage':stage, 'started_at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(), 'status':'running'}
     record = ROOT / f'{stage}-status.json'
@@ -54,32 +54,33 @@ def main():
                 run([PYTHON,'-B',SOURCE/'download_model.py'],log)
             else:
                 soc=stage.startswith('soc-')
-                memory_repro=stage in ('soc-memory-smoke','soc-memory-vmm')
+                memory_repro=stage in ('soc-memory-smoke','soc-memory-vmm','soc-memory-trace')
                 v2=stage.startswith('soc-v2-') or memory_repro
                 profile='config.qwen36-soc-v2.json' if v2 else ('config.qwen36-soc-main.json' if stage=='soc-train' else ('config.qwen36-soc.json' if soc else 'config.qwen36-thor.json'))
                 config=json.loads((SOURCE/profile).read_text())
                 if stage in ('tokenize','soc-tokenize','soc-v2-tokenize'):
                     config.update(max_train_samples=0,max_eval_samples=0)
-                if stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm'):
+                if stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace'):
                     raw=(ROOT/'base-manifest.json').read_bytes();manifest=json.loads(raw)
                     if not manifest.get('verified') or manifest['revision']!=config['revision'] or manifest['model']!=config['model_name_or_path']:
                         raise ValueError('Verified base manifest does not match the training profile')
                     config['base_artifact_manifest']={'model':manifest['model'],'revision':manifest['revision'],
                         'manifest_sha256':hashlib.sha256(raw).hexdigest()}
                 config.update(model_name_or_path='/workspace/base',offline=True)
-                if stage in ('smoke','soc-smoke','soc-v2-smoke','soc-memory-smoke','soc-memory-vmm'): config['gradient_accumulation_steps']=1
-                if stage in ('soc-v2-smoke','soc-memory-smoke','soc-memory-vmm'):config['smoke_longest_prefixes']=True
-                local_config=SOURCE/('config.soc-memory-vmm.run.local.json' if stage=='soc-memory-vmm' else 'config.soc-memory.run.local.json' if memory_repro else 'config.soc-v2.run.local.json' if v2 else 'config.run.local.json')
+                if stage in ('smoke','soc-smoke','soc-v2-smoke','soc-memory-smoke','soc-memory-vmm','soc-memory-trace'): config['gradient_accumulation_steps']=1
+                if stage in ('soc-v2-smoke','soc-memory-smoke','soc-memory-vmm','soc-memory-trace'):config['smoke_longest_prefixes']=True
+                if stage=='soc-memory-trace':config['trace_first_step']=True
+                local_config=SOURCE/(f'config.{stage}.run.local.json' if stage in ('soc-memory-vmm','soc-memory-trace') else 'config.soc-memory.run.local.json' if memory_repro else 'config.soc-v2.run.local.json' if v2 else 'config.run.local.json')
                 local_config.write_text(json.dumps(config,indent=2)+'\n')
                 args=[PYTHON,'-B',SOURCE/'train.py','--config',local_config]
                 if stage in ('tokenize','soc-tokenize','soc-v2-tokenize'): args += ['--tokenize-only','--output-dir','/workspace/soc-v2-tokenization' if v2 else '/workspace/soc-tokenization' if soc else '/workspace/tokenization']
-                elif stage in ('smoke','soc-smoke','soc-v2-smoke','soc-memory-smoke','soc-memory-vmm'): args += ['--train','--max-steps','2','--max-train-samples','2' if v2 else '32',
+                elif stage in ('smoke','soc-smoke','soc-v2-smoke','soc-memory-smoke','soc-memory-vmm','soc-memory-trace'): args += ['--train','--max-steps','2','--max-train-samples','2' if v2 else '32',
                     '--max-eval-samples','8','--output-dir','/workspace/outputs/'+(stage if memory_repro else 'soc-v2-smoke' if v2 else 'soc-smoke' if soc else 'smoke')]
                 elif stage == 'soc-v2-pilot': args += ['--train','--output-dir','/workspace/outputs/soc-v2-pilot']
                 elif stage == 'soc-pilot': args += ['--train','--output-dir','/workspace/outputs/soc-pilot']
                 elif stage == 'soc-train': args += ['--train','--output-dir','/workspace/outputs/soc-main']
                 else: args += ['--train','--output-dir','/workspace/outputs/train']
-                if stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm'):
+                if stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace'):
                     guarded_process.run([str(x) for x in args],log=log,cwd=SOURCE,env=os.environ.copy(),
                                         report=ROOT/f'{stage}-memory-guard.json')
                 else: run(args,log)

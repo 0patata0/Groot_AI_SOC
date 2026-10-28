@@ -363,6 +363,7 @@ def run_training(config, checks, hardware):
                 "base_artifact_manifest": base_artifact,
                 "tokenizer_class": type(tokenizer).__name__, "lora_coverage": coverage, "trainable_parameters": sum(p.numel() for p in model.parameters() if p.requires_grad)}
     (output / "run_manifest.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n")
+    first_step_trace=memory_telemetry.FirstStepTrace(output,torch,config.get('trace_first_step',False))
     class Progress(TrainerCallback):
         def __init__(self):
             self.started = time.monotonic()
@@ -379,8 +380,12 @@ def run_training(config, checks, hardware):
                 'memory':memory_telemetry.record(output,torch.cuda,phase=status,step=state.global_step),
                 'metrics':self.metrics})
 
-        def on_step_end(self, args, state, control, **kwargs): self.record(state, 'training')
-        def on_train_begin(self, args, state, control, **kwargs): self.record(state, 'training')
+        def on_step_end(self, args, state, control, **kwargs):
+            first_step_trace.stop()
+            self.record(state, 'training')
+        def on_train_begin(self, args, state, control, **kwargs):
+            self.record(state, 'training')
+            first_step_trace.start()
 
         def on_log(self, args, state, control, logs=None, **kwargs):
             self.metrics.update(logs or {})
@@ -397,6 +402,7 @@ def run_training(config, checks, hardware):
     except Exception as exc:
         memory_telemetry.record(output,torch.cuda,phase='training_failed',step=trainer.state.global_step,error_type=type(exc).__name__)
         raise
+    finally:first_step_trace.stop()
     trainer.save_model(str(output / "adapter"))
     tokenizer.save_pretrained(str(output / "adapter"))
     trainer.save_metrics("train", result.metrics)

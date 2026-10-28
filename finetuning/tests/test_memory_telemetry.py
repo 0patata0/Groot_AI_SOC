@@ -4,9 +4,10 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from memory_telemetry import collect,record
+from memory_telemetry import collect,record,FirstStepTrace
 
 
 class Uninitialized:
@@ -22,6 +23,23 @@ class Initialized:
 
 
 class TelemetryTests(unittest.TestCase):
+    def test_first_step_trace_is_opt_in_cpu_only_and_stops_once(self):
+        calls=[]
+        class Profile:
+            def start(self):calls.append('start')
+            def stop(self):calls.append('stop')
+            def export_chrome_trace(self,path):Path(path).write_text('{}')
+        def profile(**kwargs):
+            self.assertEqual(kwargs,{'activities':['CPU'],'record_shapes':False,'with_stack':False})
+            return Profile()
+        torch=SimpleNamespace(profiler=SimpleNamespace(profile=profile,ProfilerActivity=SimpleNamespace(CPU='CPU')))
+        with tempfile.TemporaryDirectory() as d:
+            disabled=FirstStepTrace(d,object());disabled.start();disabled.stop()
+            trace=FirstStepTrace(d,torch,True);trace.start();trace.stop();trace.stop()
+            self.assertEqual(calls,['start','stop'])
+            self.assertTrue((Path(d)/'first-step-trace-clock.json').exists())
+            with self.assertRaisesRegex(ValueError,'Prior'):FirstStepTrace(d,torch,True).start()
+
     def test_segment_snapshot_distinguishes_vmm_from_missing_or_failed_data(self):
         class Snapshot(Initialized):
             def memory_snapshot(self):return [{'is_expandable':True},{'is_expandable':False}]

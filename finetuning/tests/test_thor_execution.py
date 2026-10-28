@@ -64,6 +64,11 @@ class ArtifactTests(unittest.TestCase):
 
 
 class LaunchTests(unittest.TestCase):
+    def test_trace_trial_retains_the_vmm_container_and_all_resource_limits(self):
+        vmm=thor_container.command('/tmp/training','soc-memory-vmm',1000,1000)
+        trace=thor_container.command('/tmp/training','soc-memory-trace',1000,1000)
+        self.assertEqual(trace,[v.replace('soc-memory-vmm','soc-memory-trace') for v in vmm])
+
     def test_vmm_is_opt_in_and_keeps_native_training_commands_identical(self):
         native=thor_container.command('/tmp/training','soc-memory-smoke',1000,1000)
         vmm=thor_container.command('/tmp/training','soc-memory-vmm',1000,1000)

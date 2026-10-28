@@ -67,6 +67,10 @@ def read_config(path):
     if config.get("enable_thinking") is not False:
         raise ValueError("This prepared corpus uses non-thinking targets; enable_thinking must be false")
     model_profile.validate_profile(config)
+    if config.get('model_kind')=='qwen3_5_moe':
+        config.setdefault('assistant_only_logits',True)
+    if 'assistant_only_logits' in config and not isinstance(config['assistant_only_logits'],bool):
+        raise ValueError('assistant_only_logits must be a boolean')
     return config
 
 

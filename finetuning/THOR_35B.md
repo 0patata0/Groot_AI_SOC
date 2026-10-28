@@ -1,5 +1,28 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 개선 적용 결과·현재 사용 기준 — 2026-10-28 18:43 KST
+
+**같은 고정35B/자료/LoRA와 최장2prefix·2-step/eval8에서 VMM+정답위치 projection의 경고0건을 확인했다.** 원래35B는18:36:27.146KST복구했고 중단은168.966844초다. 아래는 각각1회의짧은실행이며 캐시/단편화상태를동일하게고정한반복실험은아니다.
+
+| 실제비교 | 기본 할당·기존loss | VMM만 | VMM+정답위치loss |
+|---|---:|---:|---:|
+| 같은 커널 할당 경고 | 12 | 3 | **0** |
+| CUDA peak allocated(GiB) | 70.37 | 70.35 | **66.87** |
+| CUDA peak reserved(GiB) | 71.88 | 71.60 | **67.05** |
+| host 최저 가용(GiB) | 43.80 | 43.64 | **48.27** |
+| 2-step/eval8·정상종료 | 완료 | 완료 | 완료 |
+| 새PyTorch/host/cgroup OOM | 0 | 0 | 0 |
+
+NVIDIA595.78의`mem_desc.c:1336`은내부메모리할당실패로그다. 공식소스에는큰페이지실패뒤작은페이지로재시도할수있는경로가있다. 실제실패요청의크기·페이지종류·fallback성공을직접관측한것은아니다. CPUtrace첫20경고가log-softmax역전파와겹치는상관을찾아불필요한큰임시텐서를줄였다. profiling실행자체는훈련73건/복구후1건으로달랐으므로위정량비교에서제외한다. 경고0단기결과를드라이버결함완전해결·장기누수없음으로확대하지않는다.
+
+입력문맥1664/1582토큰은모두backbone을통과한다. LMhead와loss에서만causal정답이있는56/58개위치를선택하며학습114개·평가292개정답을전부보존했다. `supervised_positions`는전후정답개수를대조하고빈정답·충돌옵션을거부한다. 실제CPU의마스크/패딩/배치합집합·문맥을연결한모델에서손실과모든파라미터기울기동등성,실제Trainer2회누적/평가를검증했다. GPU부동소수계산의bit동일·새정확도우위를보장하는검사는아니다.
+
+후속Thor훈련컨테이너는`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`를기본사용한다. 고정`qwen3_5_moe`프로필은`assistant_only_logits`기본True이며명시False를보존한다. 직접실행하는경우에도승인된중단/복구절차안에서같은프로세스할당설정을사용해야한다. 기본재현`soc-memory-smoke`는native,기본/VMM/trace대조단계의선택loss는False로유지해과거비교의의미를보존한다. 일반30B/NF4프로필에는선택loss기본값을넣지않는다. loss-only평가·기존mean/누적정규화계약을보존하고미검증조합은거부한다.
+
+기본값동기화후로컬/Thor168검사중hostTorch3검사는생략했고동일기존이미지의GPU미노출실제3검사로확인했다. 실제개선옵션GPU2-step/eval8·완성어댑터380finite/190Bnonzero,기존R2 24/48checkpointSHA불변을검증했다. 어댑터SHA는`6d11e47463541aa6795dc2f22cab869ed911a3d1b422338485df723fe48b64e7`다. 새모델등록/봇전환은없으며원35B를유지한다. 이번완료는긴48-step본학습/모든길이·배치/장기안정성·독립정확도/MCP·채팅·보호E2E검증이아니다.
+
+증거는서버`memory-fix-20261028/`의각비교audit/기본값·가중치검증과`outputs/soc-memory-loss/completion-loss-selection.jsonl`에보존했다. 대형CPUtrace는`outputs/soc-memory-trace/first-step-trace.json.gz`로보존하고압축복원SHA일치를확인한뒤raw만정리했다. 원본SHA`462758969a8c28ffd0332e98ba06c0308eef1e3687f1b65b2b720bb42ac0ae50`,gzipSHA`7f280e61ae6ad2afa7ffcf73771706358a3aaa2ea02aa78af8a30576c21f642a`다.18:43KST원35Bactive/digest상주·복구timer3개inactive·복구후추가관련커널경고0을확인했다. 아래항목은각시점의진행이력이다.
+
 ## 경고 연산·정답 위치 projection 수정안 — 2026-10-28 KST
 
 CPU trace와 커널 절대시각을 맞춘 첫20개 경고는 `aten::_log_softmax_backward_data`/그 autograd 호출과 겹쳤다. 이것은 호출 구간의 상관 증거이며 실패 페이지 크기까지 추적한 것은 아니다. 추적 실행은 학습73건으로 비추적VMM3건보다 많았다. profiling과 실행 당시메모리 상태의 영향을 분리하지 못해 이 수치로 회귀/개선을 판단하지 않는다. 전체1,480,316,893B trace는 서버에서 스트리밍 해석했고 Mac에 받지 않았다.

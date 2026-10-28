@@ -64,6 +64,21 @@ class ArtifactTests(unittest.TestCase):
 
 
 class LaunchTests(unittest.TestCase):
+    def test_future_training_uses_vmm_but_the_native_control_stays_native(self):
+        for stage in ('smoke','train','soc-v2-smoke','soc-v2-pilot','soc-memory-loss'):
+            self.assertIn('PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True',thor_container.command('/tmp/training',stage,1000,1000))
+        self.assertNotIn('PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True',thor_container.command('/tmp/training','soc-memory-smoke',1000,1000))
+
+    def test_selected_logits_default_is_scoped_and_explicit_control_is_preserved(self):
+        profile=train.ROOT/'config.qwen36-soc-v2.json'
+        self.assertTrue(train.read_config(profile)['assistant_only_logits'])
+        self.assertFalse(train.read_config(train.ROOT/'config.json').get('assistant_only_logits',False))
+        with tempfile.TemporaryDirectory() as d:
+            p=Path(d)/'config.json';raw=json.loads(profile.read_text());raw['assistant_only_logits']=False;p.write_text(json.dumps(raw))
+            self.assertFalse(train.read_config(p)['assistant_only_logits'])
+            raw['assistant_only_logits']='false';p.write_text(json.dumps(raw))
+            with self.assertRaisesRegex(ValueError,'boolean'):train.read_config(p)
+
     def test_trace_trial_retains_the_vmm_container_and_all_resource_limits(self):
         vmm=thor_container.command('/tmp/training','soc-memory-vmm',1000,1000)
         trace=thor_container.command('/tmp/training','soc-memory-trace',1000,1000)

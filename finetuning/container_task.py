@@ -70,6 +70,8 @@ def main():
                 if stage in ('smoke','soc-smoke','soc-v2-smoke','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss'): config['gradient_accumulation_steps']=1
                 if stage in ('soc-v2-smoke','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss'):config['smoke_longest_prefixes']=True
                 if stage=='soc-memory-trace':config['trace_first_step']=True
+                if config.get('model_kind')=='qwen3_5_moe':config.setdefault('assistant_only_logits',True)
+                if stage in ('soc-memory-smoke','soc-memory-vmm','soc-memory-trace'):config['assistant_only_logits']=False
                 if stage=='soc-memory-loss':config['assistant_only_logits']=True
                 local_config=SOURCE/(f'config.{stage}.run.local.json' if stage in ('soc-memory-vmm','soc-memory-trace','soc-memory-loss') else 'config.soc-memory.run.local.json' if memory_repro else 'config.soc-v2.run.local.json' if v2 else 'config.run.local.json')
                 local_config.write_text(json.dumps(config,indent=2)+'\n')

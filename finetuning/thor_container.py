@@ -24,7 +24,7 @@ def command(root, stage, uid, gid):
            'PIP_CONSTRAINT':'/workspace/vendor-constraints.txt'}
     if stage not in ('prepare','download'): env.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     if training: env['HF_DEACTIVATE_ASYNC_LOAD']='1'
-    if stage in ('soc-memory-vmm','soc-memory-trace','soc-memory-loss'):env['PYTORCH_CUDA_ALLOC_CONF']='expandable_segments:True'
+    if training and stage!='soc-memory-smoke':env['PYTORCH_CUDA_ALLOC_CONF']='expandable_segments:True'
     args = ['docker','run','-d','--pull=never','--name','capstone-qwen36-'+stage,
             '--user',f'{uid}:{gid}','--cap-drop','ALL','--security-opt','no-new-privileges',
             '--pids-limit','512','--cpus','10' if training else '4','--memory','112g' if training else '12g',

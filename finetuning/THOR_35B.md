@@ -1,5 +1,22 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 추론 추천 검토·라이선스 — 2026-10-29T04:31:32.380166+09:00
+
+- 04:27KST 읽기 확인: Ollama0.40.2, `qwen3.6:35b`/`qwen35moe`/GGUF Q4_K_M·llamacpp, 모델파일22,621,314,381B·상주size_vram23,656,629,533B, 원digest유지. API의 상주모델context_length필드는262144이며 실제 봇 요청별 입력/설정과 구분한다. 명령검색에서vllm/sglang/trtllm-serve없음(컨테이너/모든venv 미전수조사). 추론 변경/설치/성능시험0.
+- NVIDIA [Thor 사양](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor/)의2070은 FP4 sparse 지표이며 현재 생성TPS와 동일하지 않다. MoE 활성3B와 전체가중치 상주는 구분한다. [SGLang 공식 안내](https://raw.githubusercontent.com/sgl-project/sgl-cookbook/main/docs/autoregressive/Qwen/Qwen3.6.md)는BF16약70GB/FP8약35GB 가중치를 제시하므로 FP8도20~30GB라는 설명은 부정확하다.
+- vLLM/SGLang/TRT-LLM을 한 엔진으로 취급하지 않는다. `--mem-fraction-static`은SGLang, vLLM은`--gpu-memory-utilization`; 둘 다 학습/공유UMA 여유와 문맥·동시성에 맞춰 실측해야 한다. Q4_K_M은NVFP4와 다른 형식이다. 파서만으로 올바른 대상선택·누락방지·MCP실행/승인이 보장되지 않는다.
+- [Jetson AI Lab의 Thor 전용 예시](https://raw.githubusercontent.com/NVIDIA-AI-IOT/jetson-ai-lab/main/src/content/models/qwen3-6-35b-a3b.md)는NVIDIA NVFP4/vLLM/MTP와`qwen3_xml`을 사용한다. Qwen/SGLang의`qwen3_coder` 예시와 버전·체크포인트별로 대조해야 한다. [포럼 사용자 측정](https://forums.developer.nvidia.com/t/benchmark-report-qwen3-6-35b-a3b-nvfp4-on-nvidia-dgx-spark-jetson-thor-blackwell-6000-pro/371810)의Thor 8K입력/1K출력·16요청 집중조건은합산124.23tok/s·평균TTFT63.25초다. 현재 봇의 단일채팅 속도향상 근거로 환산하지 않는다.
+- 비교 후보는 vLLM+NVFP4+MTP이며 현재 두봇/MCP·승인경계/운영Ollama를 유지한 별도검증이 필요하다. Ollama봇은 현재`ChatOllama`를 사용하므로vLLM주소만 바꾸는 호환성은 보장되지 않는다. 런타임·양자화·템플릿이 함께 바뀌면 배포조합비교로 기록한다. 새학습어댑터는기성NVFP4에자동포함되지않는다.
+- **vLLM 자체는 [Apache-2.0](https://github.com/vllm-project/vllm/blob/main/LICENSE)**로 별도유료라이선스구매 없이 자체서버에서사용가능하다. 수정·재배포는 [원문 조건](https://www.apache.org/licenses/LICENSE-2.0)의고지/변경표시등을따르며모델·컨테이너·의존성조건은별도다. NVIDIA NVFP4 모델카드는Apache-2.0을표기한다. 실제선택이미지/버전의패키지별검토는설치전에수행한다.
+
+
+**후속 정정 2026-10-29T04:16:44.348253+09:00:** 자체작성308/520(59.23%)은 기관이 검증한 정답이 아니다. CPU/토큰/호출·출처 검사는 답변 의미의 독립 검수를 대신하지 않는다. 520건은 준비본 수로만 보존하고 학습 투입 확정에서 제외한다. 사용자 지시에 따라 외부 기관·학술 원천 및 공식 실제 사고 자료를 추가 수집하고, 자체작성 비중을 줄인 새 corpus/근거 검수를 먼저 수행한다. R3/R4 신규 학습은 실행 제어기에서 보류한다. [검수 상태](V4_DATA_REVIEW.json).
+
+
+V4 전체 학습 반입 묶음은 Thor에서 `python3 -B finetuning/pack.py --config finetuning/config.qwen36-soc-v4-full.json --output /작업별/새경로.tar.gz`로 만든다. 이 묶음은 고정된 520대화·출처/직무/평가기준·학습 코드를 포함하며 동결 입력 SHA가 달라지면 거절한다. 대용량 원본 로그·가중치·자격 값은 포함하지 않는다. 원문 재취득은 DATA_SOURCES의 원격 참조 절차를 따르고, 묶음만으로 원본 ZIP 전체 무결성이나 새 서버 전체 설치를 검증했다고 하지 않는다.
+
+> **10/29 기관/직무 연계 전체 학습 준비:** 원격참조 AIT-LDS 행라벨·CISA·NIST/ENISA직무·실제 IDS 재조회를 포함해**332/94/94=520사례**. 실제tokenizer/Torch CPU검증으로 모든assistant턴766/202/202보존·학습입력중복57.9%감소(속도/품질향상 미검증). 전체1epoch/166step·독립복구 준비·GPU학습/운영전환미시작. 이후FW전체읽기MCP→복구가능한하네스정리→2x2비교로우수구성선택. [자료·한계](DATA_SOURCES.md) · [실제진행](../STATUS.md).
+
 > **10/29 SOC 업무용 R3 준비:** 8개 관제 workflow+출처 연결 AIT 아카이브로264/60/60건을 준비했다. 원경보192개 대조·CPU696/168/168prefix 전부 보존/최장2710토큰·운영MCP37도구 계약일치 확인. ToolACE는 보조 후보로만 정제하고 핵심 혼합에서 제외했다. 개발 순차 평가/중단·복구 준비를 진행하며 새 GPU학습/후보적재/운영전환은 아직 없다. [자료·출처·검증한계](DATA_SOURCES.md).
 
 > **10/29 새 품질 비교:** 동일HF 미학습84점 대비R2 24/48각76점으로 향상을 확인하지 못했다. 운영원본73점과의차이는템플릿/변환도포함한다.20합성사례/41턴/37도구·164요청성공·실MCP/채팅/경고인과별도,운영전환0. [사례별 결과·제한](QUALITY_RESULTS.md).

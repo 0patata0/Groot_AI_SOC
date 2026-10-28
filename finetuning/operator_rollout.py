@@ -61,7 +61,8 @@ def replay(case,catalog,generate,max_turns=8):
                 entry=lookup.get(call['name'])
                 valid=entry and not call.get('parse_error') and matches_schema(call['arguments'],checked_schema(entry['parameters']))
                 wanted=steps[done][0]['arguments'] if done<len(steps) else {}
-                wrong_target=any(k in wanted and k in call['arguments'] and wanted[k]!=call['arguments'][k] for k in ('target','source_ip','request_id','proposal_id'))
+                actual_args=call['arguments'] if isinstance(call.get('arguments'),dict) else {}
+                wrong_target=any(k in wanted and k in actual_args and wanted[k]!=actual_args[k] for k in ('target','source_ip','request_id','proposal_id'))
                 if wrong_target:issues.append('unexpected_or_wrong_call')
                 elif valid and not entry.get('protected'):
                     # A reasonable alternative read is not equivalent to a

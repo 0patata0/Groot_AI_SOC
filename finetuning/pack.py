@@ -15,13 +15,13 @@ def main():
     parser.add_argument("--config", type=Path, default=ROOT / "config.json")
     opts = parser.parse_args()
     config_path = opts.config.resolve()
-    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json','config.qwen36-soc-v2.json','config.qwen36-soc-v3.json'):
+    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json','config.qwen36-soc-v2.json','config.qwen36-soc-v3.json','config.qwen36-soc-v4.json','config.qwen36-soc-v4-full.json'):
         parser.error("Choose one of the bundled model profiles")
     raw = json.loads(config_path.read_text(encoding="utf-8"))
     if any(Path(raw[key]).is_absolute() for key in ("data_dir", "output_dir")):
         parser.error("Use relative data_dir/output_dir paths for a portable bundle")
     config = read_config(config_path)
-    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1", ROOT / "data-soc-v2-r2", ROOT / "data-soc-operator-v3-r1"):
+    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1", ROOT / "data-soc-v2-r2", ROOT / "data-soc-operator-v3-r1", ROOT / "data-soc-operator-v4-r1"):
         parser.error("Portable bundle requires one of the fixed prepared datasets")
     if not Path(config["output_dir"]).resolve().is_relative_to(ROOT):
         parser.error("Portable bundle requires an output_dir inside finetuning/")
@@ -43,6 +43,30 @@ def main():
     if config_path.name == 'config.qwen36-soc-v3.json':
         names += ['data-soc-operator-v3-r1/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json','operator-audit.json')]
         names += ['data-soc-source-operator-v3-r1/cases.jsonl']
+    if config_path.name in ('config.qwen36-soc-v4.json','config.qwen36-soc-v4-full.json'):
+        names += ['SOC_ROLE_MATRIX.json','V4_DATA_PREPARATION.json','V4_TRAINING_INPUTS.json',
+                  'V4_ASSESSMENT_POLICY.json','V4_DATA_REVIEW.json','SOURCE_EXPANSION.json','dialogue_encoding.py','remote_zip.py',
+                  'acquire_institutional.py','institutional_sources.py','prepare_institutional.py',
+                  'config.qwen36-soc-v4.json','config.qwen36-soc-v4-full.json']
+        names += ['data-soc-operator-v4-r1/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json','institutional-audit.json')]
+        names += ['data-soc-source-operator-v4-r1/cases.jsonl',
+                  'data-soc-operator-v3-r1/train.jsonl',
+                  'data-soc-operator-v3-r1/validation.jsonl',
+                  'data-soc-operator-v3-r1/test.jsonl',
+                  'data-soc-source-operator-v3-r1/cases.jsonl']
+        # Package exactly the frozen learning inputs. Raw remote archives/caches,
+        # credentials and weights are never discovered recursively or bundled.
+        frozen=json.loads((ROOT/'V4_TRAINING_INPUTS.json').read_text(encoding='utf-8'))
+        expected={frozen['profile']:frozen['profile_sha256'],
+                  frozen['source_cases']:frozen['source_cases_sha256'],
+                  'mcp_contract.json':frozen['catalog_sha256'],
+                  **frozen['source_sha256']}
+        expected.update({frozen['data_folder']+'/'+split+'.jsonl':sha
+                         for split,sha in frozen['data_sha256'].items()})
+        for name,sha in expected.items():
+            path=ROOT/name
+            if path.is_symlink() or not path.resolve().is_relative_to(ROOT) or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:
+                parser.error('Frozen V4 input differs: '+name)
     names += ['driver-diagnostics/'+name for name in ('README.md','NOTICE','check.py','elf_versions.py','manifest.json','gcc132-offline-manifest.json','nvidia-595.78-allocation.patch')]
     paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))
     for path in paths:

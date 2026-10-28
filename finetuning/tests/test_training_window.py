@@ -100,11 +100,45 @@ class WindowTests(unittest.TestCase):
             (evaluation/'base-development-v2-job.json').write_text(json.dumps({'status':'completed','original_warm_done':True}));(evaluation/'base-development-v2.json').write_text('{"status":"completed"}')
             window.select_mode('v3')
             with patch.object(window,'V3_DATA_HASHES',hashes),patch.object(window,'run',side_effect=AssertionError('No mutation')):
-                window.verify_ready(root)
+                window.verify_v3_ready(root)
                 (root/'soc-v3-smoke-status.json').write_text('{"status":"failed"}')
-                with self.assertRaisesRegex(ValueError,'automatic retry'):window.verify_ready(root)
+                with self.assertRaisesRegex(ValueError,'automatic retry'):window.verify_v3_ready(root)
                 (root/'soc-v3-smoke-status.json').unlink();proof['train']['kept']-=1;(tok/'tokenization_report.json').write_text(json.dumps(proof))
-                with self.assertRaisesRegex(ValueError,'prefixes excluded'):window.verify_ready(root)
+                with self.assertRaisesRegex(ValueError,'prefixes excluded'):window.verify_v3_ready(root)
+
+    def test_full_epoch_window_preserves_three_hour_bound_and_independent_recovery(self):
+        with self.memory_mode():
+            window.select_mode('v4-full');self.assertEqual(window.STAGES,('soc-v4-full-smoke','soc-v4-full-train'));self.assertEqual(window.LIMIT_SECONDS,165*60);args=window.restore_command('/inspected.py','/training');self.assertIn('--on-active=170m',args);self.assertIn('--property=TimeoutStartSec=6min',args);self.assertLess(window.RESTORE_MINUTES+6,180)
+
+    def test_full_epoch_readiness_pins_source_and_all_turn_coverage_without_service_actions(self):
+        with tempfile.TemporaryDirectory() as d,self.memory_mode():
+            root=Path(d);folder=root/'finetuning';folder.mkdir();freeze={'profile':'profile.json','source_cases':'cases.jsonl','data_folder':'data','source_sha256':{},'data_sha256':{},'records':{'train':332,'validation':94,'test':94},'assistant_turns':{'train':766,'validation':202,'test':202},'development_case_ids':['case1'],'development_evaluation_code_sha256':'fixture-code'}
+            for name,key in [('profile.json','profile_sha256'),('cases.jsonl','source_cases_sha256'),('mcp_contract.json','catalog_sha256')]:
+                data=name.encode();(folder/name).write_bytes(data);freeze[key]=hashlib.sha256(data).hexdigest()
+            (folder/'data').mkdir()
+            for split in ('train','validation','test'):
+                payload=split.encode();(folder/'data'/(split+'.jsonl')).write_bytes(payload);freeze['data_sha256'][split]=hashlib.sha256(payload).hexdigest()
+            (folder/'train.py').write_bytes(b'fixed-source');freeze['source_sha256']['train.py']=hashlib.sha256(b'fixed-source').hexdigest()
+            raw=json.dumps(freeze).encode();(folder/'V4_TRAINING_INPUTS.json').write_bytes(raw);digest=hashlib.sha256(raw).hexdigest();tok=root/'soc-v4-full-tokenization';tok.mkdir();proof={s:{'kept':n,'candidate_examples':n,'candidate_turns':freeze['assistant_turns'][s],'covered_assistant_turns':freeze['assistant_turns'][s]} for s,n in freeze['records'].items()};proof.update(max_length=4096,loss='all_assistant_turns_per_conversation',require_all_prefixes=True);(tok/'tokenization_report.json').write_text(json.dumps(proof));(tok/'data_check.json').write_text(json.dumps({'sha256':freeze['data_sha256']}));(root/'soc-v4-dialogue-probe.json').write_text('{"status":"passed","tests_returncode":0}')
+            evaluation=root/'soc-v4-evaluation';evaluation.mkdir();(evaluation/'base-development-job.json').write_text('{"status":"completed","original_warm_done":true}');report={'status':'completed','source_cases_sha256':freeze['source_cases_sha256'],'catalog_sha256':freeze['catalog_sha256'],'results':[{'case_id':'case1'}]};(evaluation/'base-development.json').write_text(json.dumps(report));(evaluation/'frozen-plan.json').write_text('{"case_ids":["case1"],"evaluation_code_sha256":"fixture-code"}')
+            window.select_mode('v4-full')
+            with patch.object(window,'V4_FULL_INPUTS_SHA256',digest),patch.object(window,'run',side_effect=AssertionError('No mutation')):
+                window.verify_v4_full_ready(root);(folder/'train.py').write_bytes(b'changed')
+                with self.assertRaisesRegex(ValueError,'source/corpus mismatch'):window.verify_v4_full_ready(root)
+                (folder/'train.py').write_bytes(b'fixed-source');proof['train']['covered_assistant_turns']-=1;(tok/'tokenization_report.json').write_text(json.dumps(proof))
+                with self.assertRaisesRegex(ValueError,'targets excluded'):window.verify_v4_full_ready(root)
+
+    def test_unreviewed_soc_plans_cannot_reach_timer_or_service_stop(self):
+        with self.memory_mode(),tempfile.TemporaryDirectory() as d:
+            for mode in ('v3','v4-full'):
+                window.select_mode(mode)
+                with patch.object(window,'run',side_effect=AssertionError('No service action')):
+                    with self.assertRaisesRegex(ValueError,'Training release withheld'):
+                        window.window(Path(d),Path('/inspected-operator.py'))
+
+    def test_measured_full_epoch_estimate_is_separate_from_actual_deadline(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);out=root/'outputs/soc-v4-full-smoke';out.mkdir(parents=True);(out/'successful_microbatch_lineage.jsonl').write_text('{"at_kst":"2026-10-29T04:00:00+09:00"}\n{"at_kst":"2026-10-29T04:00:20+09:00"}\n');(out/'eval_results.json').write_text('{"eval_runtime":16}');tok=root/'soc-v4-full-tokenization';tok.mkdir();(tok/'tokenization_report.json').write_text('{"train":{"tokens":332000,"kept":332,"max_tokens":2000}}');value=window.full_window_estimate(root);self.assertGreater(value['estimated_main_seconds'],0);self.assertEqual(value['length_ratio'],.5);self.assertIn('not completion',value['scope'])
 
     def fixture(self,root):
         (root/'finetuning/data-soc-v2-r2').mkdir(parents=True)

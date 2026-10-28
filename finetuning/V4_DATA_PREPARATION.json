@@ -1,0 +1,370 @@
+{
+  "at_kst": "2026-10-29T02:58:27.226357+09:00",
+  "source_cases_sha256": "0307e26799f0d2b9734c31604c7a1f21b03a463d05ef598cb6560c606ed1a578",
+  "outputs": {
+    "train": {
+      "records": 332,
+      "sha256": "fcbcc6331c5d004a338148baeada48211314aa227c3dbfa145867fe58481b331"
+    },
+    "validation": {
+      "records": 94,
+      "sha256": "6eec2eadbf471761771db1a0d4621ef80c1845dc8392af32c07a27d93e584591"
+    },
+    "test": {
+      "records": 94,
+      "sha256": "ec401cadcbaf119e4a389df4f3e536ad322a715f8823ef3cb332072059077ff9"
+    }
+  },
+  "source_mix": {
+    "train": {
+      "synthetic_lab_fixture": 204,
+      "public_testbed_log": 90,
+      "public_institutional_record": 36,
+      "captured_live_observation": 2
+    },
+    "validation": {
+      "synthetic_lab_fixture": 52,
+      "public_testbed_log": 30,
+      "public_institutional_record": 12
+    },
+    "test": {
+      "synthetic_lab_fixture": 52,
+      "public_testbed_log": 30,
+      "public_institutional_record": 12
+    }
+  },
+  "workflows": {
+    "correlation": 36,
+    "service_proposal": 36,
+    "coverage_gap": 36,
+    "verify_failed": 36,
+    "verify_applied": 36,
+    "containment_pending": 36,
+    "containment_expired": 36,
+    "rule_proposal": 36,
+    "archive_investigation": 96,
+    "labelled_host_investigation": 54,
+    "kev_triage": 60,
+    "forensic_capability_gap": 20,
+    "live_state_freshness": 2
+  },
+  "whole_AIT_archives_downloaded_or_checksum_verified": false,
+  "remote_reference_method": "official selected members via HTTPS ranges; CRC/memberSHA + exact provider label line binding; acquisition caches removable after validation",
+  "expert_review": false,
+  "new_gpu_training": false,
+  "current_FW_full_read_tool": false,
+  "future_order": [
+    "training/quality/Thor registration",
+    "FW full read MCP and both-bot verification",
+    "rollback-protected harness cleanup",
+    "untrained/trained x existing/cleaned harness comparison and best selection"
+  ],
+  "limits": [
+    "Same generator controlled workflow holdouts; not unseen production incident proof.",
+    "AIT-LDS adds one training environment; log rows are not independent incidents.",
+    "CISA/role references do not prove local assets vulnerable or grant new tools.",
+    "Captured live values are timestamped examples and must be re-queried for current answers.",
+    "Existing R3 validation has been used for development; final test model answers remain ungenerated."
+  ],
+  "prepared_at_kst": "2026-10-29T04:01:04.855525+09:00",
+  "phase": "technical_preparation_only_training_withheld_pending_source_and_gold_rework",
+  "total_dialogues": 520,
+  "official_sources": [
+    {
+      "name": "nice-components-v2.2.0.json",
+      "source_url": "https://csrc.nist.gov/csrc/media/Projects/cprt/documents/nice/v2-2-0_nf_components.json",
+      "final_url": "https://csrc.nist.gov/csrc/media/Projects/cprt/documents/nice/v2-2-0_nf_components.json",
+      "bytes": 2674252,
+      "sha256": "3ad1d9d7e0d6b32895cb569f86c3bc05af2937a68e96eab4d1c9b3d9fa6e575e",
+      "etag": "\"0f1a58ed3e6dc1:0\"",
+      "content_type": "application/json",
+      "status": "downloaded"
+    },
+    {
+      "name": "enisa-ecsf-role-profiles-2022.pdf",
+      "source_url": "https://www.enisa.europa.eu/sites/default/files/publications/European%20Cybersecurity%20Skills%20Framework%20Role%20Profiles.pdf",
+      "final_url": "https://www.enisa.europa.eu/sites/default/files/publications/European%20Cybersecurity%20Skills%20Framework%20Role%20Profiles.pdf",
+      "bytes": 983388,
+      "sha256": "10bd5a6e7f5d3214f04de67dbc47f3707ce185d69634738d7164f2b4cd28ffc9",
+      "etag": "\"f015c-61eb2a7f30ec0\"",
+      "content_type": "application/pdf",
+      "status": "downloaded"
+    },
+    {
+      "name": "ait-lds-v2-record.json",
+      "source_url": "https://zenodo.org/api/records/5789064",
+      "final_url": "https://zenodo.org/api/records/5789064",
+      "bytes": 17209,
+      "sha256": "038babe8a234260b2169f3f613dc95f8462afcf02388de40ef014497dd3916b9",
+      "etag": "\"24\"",
+      "content_type": "application/json",
+      "status": "downloaded"
+    }
+  ],
+  "kev": {
+    "at_kst": "2026-10-29T02:22:19.724754+09:00",
+    "source": "https://github.com/cisagov/kev-data",
+    "commit": "30a09b6f3f7e2f03618cc8c95d212966d3c14e6e",
+    "files": [
+      {
+        "name": "LICENSE",
+        "source_url": "https://raw.githubusercontent.com/cisagov/kev-data/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/LICENSE",
+        "bytes": 7469,
+        "sha256": "8dfcf2d0cba33bede386eb470daf2ac08caf6540fc2516baab10dd546f90938a"
+      },
+      {
+        "name": "README.md",
+        "source_url": "https://raw.githubusercontent.com/cisagov/kev-data/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/README.md",
+        "bytes": 3318,
+        "sha256": "7d18e1fc40185acc90128fcceb18f016e010c8d0cf4125c3311c9381cbafcfe2"
+      },
+      {
+        "name": "known_exploited_vulnerabilities.json",
+        "source_url": "https://raw.githubusercontent.com/cisagov/kev-data/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/known_exploited_vulnerabilities.json",
+        "bytes": 1814644,
+        "sha256": "2d9931c086e42d05425c2da924299c8d9b7ff836de373f981668b7ef5f6f0fd7"
+      },
+      {
+        "name": "known_exploited_vulnerabilities_schema.json",
+        "source_url": "https://raw.githubusercontent.com/cisagov/kev-data/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/known_exploited_vulnerabilities_schema.json",
+        "bytes": 3623,
+        "sha256": "0d5865c98694c5bfba2c78a26caf814f406b3fce8bfb81bef79e99c7f288b0e7"
+      }
+    ],
+    "license": "CC0-1.0",
+    "catalog_version": "2026.10.27",
+    "released_at_kst": "2026-10-28T04:00:02.230700+09:00",
+    "records": 1760,
+    "role": "vulnerability triage reference, not proof any local host is vulnerable or compromised",
+    "rows_have_unique_cve_ids": true
+  },
+  "nice_role_task_memberships": {
+    "PD-WRL-001": 43,
+    "PD-WRL-003": 29,
+    "PD-WRL-007": 15
+  },
+  "nice_distinct_tasks": 75,
+  "project_mapped_tasks": 16,
+  "project_mapped_competencies": 8,
+  "full_conversation_tokenization": {
+    "train": {
+      "read": 332,
+      "candidate_examples": 332,
+      "candidate_turns": 766,
+      "kept": 332,
+      "covered_assistant_turns": 766,
+      "tokens": 517758,
+      "supervised_tokens": 106549,
+      "max_tokens": 2710,
+      "encoding_mode": "all_assistant_turns",
+      "example_unit": "complete_conversation"
+    },
+    "validation": {
+      "read": 94,
+      "candidate_examples": 94,
+      "candidate_turns": 202,
+      "kept": 94,
+      "covered_assistant_turns": 202,
+      "tokens": 136640,
+      "supervised_tokens": 28982,
+      "max_tokens": 2710,
+      "encoding_mode": "all_assistant_turns",
+      "example_unit": "complete_conversation"
+    },
+    "test": {
+      "read": 94,
+      "candidate_examples": 94,
+      "candidate_turns": 202,
+      "kept": 94,
+      "covered_assistant_turns": 202,
+      "tokens": 137107,
+      "supervised_tokens": 29054,
+      "max_tokens": 2687,
+      "encoding_mode": "all_assistant_turns",
+      "example_unit": "complete_conversation"
+    },
+    "max_length": 4096,
+    "require_all_prefixes": true,
+    "loss": "all_assistant_turns_per_conversation",
+    "truncation": "disabled; overlength prefixes rejected",
+    "checked_at_kst": "2026-10-29T03:32:36.917300+09:00"
+  },
+  "real_CPU_torch_probe": {
+    "tests_returncode": 0,
+    "tests_summary": ".....................................................................................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 245 tests in 5.902s\n\nOK\n",
+    "splits": {
+      "train": {
+        "full_conversation_stats": {
+          "read": 332,
+          "candidate_examples": 332,
+          "candidate_turns": 766,
+          "kept": 332,
+          "covered_assistant_turns": 766,
+          "tokens": 517758,
+          "supervised_tokens": 106549,
+          "max_tokens": 2710,
+          "encoding_mode": "all_assistant_turns",
+          "example_unit": "complete_conversation"
+        },
+        "prefix_stats": {
+          "read": 332,
+          "candidate_turns": 766,
+          "kept": 766,
+          "tokens": 1229759,
+          "supervised_tokens": 106549,
+          "max_tokens": 2710
+        },
+        "supervised_token_union_identical": true,
+        "longest_two": [
+          2710,
+          2706
+        ]
+      },
+      "validation": {
+        "full_conversation_stats": {
+          "read": 94,
+          "candidate_examples": 94,
+          "candidate_turns": 202,
+          "kept": 94,
+          "covered_assistant_turns": 202,
+          "tokens": 136640,
+          "supervised_tokens": 28982,
+          "max_tokens": 2710,
+          "encoding_mode": "all_assistant_turns",
+          "example_unit": "complete_conversation"
+        },
+        "prefix_stats": {
+          "read": 94,
+          "candidate_turns": 202,
+          "kept": 202,
+          "tokens": 313813,
+          "supervised_tokens": 28982,
+          "max_tokens": 2710
+        },
+        "supervised_token_union_identical": true,
+        "longest_two": [
+          2710,
+          2688
+        ]
+      },
+      "test": {
+        "full_conversation_stats": {
+          "read": 94,
+          "candidate_examples": 94,
+          "candidate_turns": 202,
+          "kept": 94,
+          "covered_assistant_turns": 202,
+          "tokens": 137107,
+          "supervised_tokens": 29054,
+          "max_tokens": 2687,
+          "encoding_mode": "all_assistant_turns",
+          "example_unit": "complete_conversation"
+        },
+        "prefix_stats": {
+          "read": 94,
+          "candidate_turns": 202,
+          "kept": 202,
+          "tokens": 314432,
+          "supervised_tokens": 29054,
+          "max_tokens": 2687
+        },
+        "supervised_token_union_identical": true,
+        "longest_two": [
+          2687,
+          2683
+        ]
+      }
+    },
+    "status": "passed"
+  },
+  "reproduction": {
+    "train": "fcbcc6331c5d004a338148baeada48211314aa227c3dbfa145867fe58481b331",
+    "validation": "6eec2eadbf471761771db1a0d4621ef80c1845dc8392af32c07a27d93e584591",
+    "test": "ec401cadcbaf119e4a389df4f3e536ad322a715f8823ef3cb332072059077ff9",
+    "source_cases": "0307e26799f0d2b9734c31604c7a1f21b03a463d05ef598cb6560c606ed1a578"
+  },
+  "operator_readiness": {
+    "operator_sha256": "8a6727af0581168d7992429761c6ca3501e69587720bdc44f6d0e0b012b8a383",
+    "root_owned": true,
+    "check": {
+      "ready": true,
+      "no_service_action": true
+    },
+    "services_stopped": false
+  },
+  "source_reference_caches_removed": {
+    "files": 42,
+    "bytes": 16986518
+  },
+  "selected_reference_integrity_scope": "selected ZIP member CRC + SHA, exact raw/label-line binding + official metadata recheck; no entire ZIP MD5 verification",
+  "full_training_plan": {
+    "schema": 1,
+    "profile": "config.qwen36-soc-v4-full.json",
+    "profile_sha256": "d6790bd1dca59a90ddca5585aa67ad6540f6316eb1ced7f99e28a5a39cf982d9",
+    "data_folder": "data-soc-operator-v4-r1",
+    "data_sha256": {
+      "train": "fcbcc6331c5d004a338148baeada48211314aa227c3dbfa145867fe58481b331",
+      "validation": "6eec2eadbf471761771db1a0d4621ef80c1845dc8392af32c07a27d93e584591",
+      "test": "ec401cadcbaf119e4a389df4f3e536ad322a715f8823ef3cb332072059077ff9"
+    },
+    "records": {
+      "train": 332,
+      "validation": 94,
+      "test": 94
+    },
+    "assistant_turns": {
+      "train": 766,
+      "validation": 202,
+      "test": 202
+    },
+    "source_cases": "data-soc-source-operator-v4-r1/cases.jsonl",
+    "source_cases_sha256": "0307e26799f0d2b9734c31604c7a1f21b03a463d05ef598cb6560c606ed1a578",
+    "catalog_sha256": "ffcfb0bc8393e483e395a2348cb258dc7b843ee677579c8da577c7f1636390bd",
+    "source_sha256": {
+      "train.py": "a9256e9a03e700fe2caad60b2e54358914a471543908bf8adeb7d1c586e4335c",
+      "dialogue_encoding.py": "851ddd55f5ac7b31729aeaa17fe5f0d911dee00eadcbb99ae915327fd663f498",
+      "training_lineage.py": "8bea81d9aa8b84e895105b412fc0582ad66bc3d66779d665b4a1b87b362acca9",
+      "completion_loss.py": "a634fa9d5d1a5ad0a292cd1828d7975837460d6286154b1b8ecd1cd5c20078c9",
+      "model_profile.py": "52f902d46f9447b87328d2468645a64e376727a927b5f9a6068b2025798d314e",
+      "bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
+      "memory_budget.py": "662d9d5c1fe77933286582a813d048760a3fd2373798b9aba9df4f70ca6fe0c3",
+      "memory_telemetry.py": "1d85a4f2845e9a9a7e81f7b98431365f7b55950ccc87a49648c3a95d8981c5bf",
+      "guarded_process.py": "a30a3a41051cd46e9fd7398e5a2952eb4066f6619a7bc5b2ceefe77ddcc39ff8",
+      "container_task.py": "d550f0d456771f4ae8f89d9646b2014cecd15d4b20800fdec6cd9d318766eb8d",
+      "thor_container.py": "f19735ac73a7c09f3cdefbc159a7e20c8bcbee64f686c907d27956c81c25e409"
+    },
+    "loss_mode": "all_assistant_turns",
+    "max_steps": 166,
+    "num_train_epochs": 1,
+    "max_length": 4096,
+    "gradient_accumulation_steps": 2,
+    "learning_rate": 2e-06,
+    "supervision_note": "Target-token union preserved; per-conversation sampling/normalization differs from per-prefix averaging.",
+    "original_operational_model_not_replaced_by_training": true,
+    "window": {
+      "training_limit_minutes": 165,
+      "independent_restore_minutes": 170,
+      "maximum_shared_interruption_minutes": 180
+    },
+    "scope": "operator-reviewed frozen full-epoch training plan, not permission or completed execution",
+    "development_case_ids": [
+      "soc-v4-core-soc-operator-v3-correlation-validation-000",
+      "soc-v4-core-soc-operator-v3-service_proposal-validation-000",
+      "soc-v4-core-soc-operator-v3-coverage_gap-validation-000",
+      "soc-v4-core-soc-operator-v3-verify_failed-validation-000",
+      "soc-v4-core-soc-operator-v3-verify_applied-validation-000",
+      "soc-v4-core-soc-operator-v3-containment_pending-validation-000",
+      "soc-v4-core-soc-operator-v3-containment_expired-validation-000",
+      "soc-v4-core-soc-operator-v3-rule_proposal-validation-000",
+      "soc-v4-core-soc-operator-v3-ait-wheeler-000",
+      "soc-v4-ait-lds-wheeler-2705",
+      "soc-v4-kev-CVE-2020-3950",
+      "soc-v4-forensic-validation-0"
+    ],
+    "development_evaluation_code_sha256": "7e3934a79fa58f924110e9715a73b77335ec0dd0934954feda5eac44721fa582"
+  },
+  "training_permission": "new shared interruption window not yet confirmed",
+  "model_or_bot_selection_changed": false,
+  "training_release": "withheld",
+  "review_record": "V4_DATA_REVIEW.json"
+}

@@ -60,7 +60,8 @@ def validate_case(case,catalog):
     review=case.get('review',{})
     if review.get('status') not in ('agent_reviewed','mechanically_verified_extraction') or not review.get('basis'):
         raise ValueError('Reviewed evidence and basis required')
-    if review.get('evidence_kind') not in ('synthetic_lab_fixture','public_testbed_log'):
+    if review.get('evidence_kind') not in ('synthetic_lab_fixture','public_testbed_log',
+                                          'public_institutional_record','captured_live_observation'):
         raise ValueError('Explicit evidence provenance required')
     lookup={t['name']:t for t in catalog['tools']}
     tools=[]

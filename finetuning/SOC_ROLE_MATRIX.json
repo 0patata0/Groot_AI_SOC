@@ -1,0 +1,255 @@
+{
+  "schema": 1,
+  "basis": "project-authored mapping to official role/task definitions; no institution certification or full-role mastery claim",
+  "nice_document": [
+    {
+      "doc_identifier": "SP_800_181_2_2_0",
+      "name": "Workforce Framework for Cybersecurity (NICE Framework) (NIST SP 800-181 Rev 1)",
+      "version": "2.2.0",
+      "website": "https://csrc.nist.gov/pubs/sp/800/181/r1/final"
+    }
+  ],
+  "nice_source": {
+    "name": "nice-components-v2.2.0.json",
+    "source_url": "https://csrc.nist.gov/csrc/media/Projects/cprt/documents/nice/v2-2-0_nf_components.json",
+    "final_url": "https://csrc.nist.gov/csrc/media/Projects/cprt/documents/nice/v2-2-0_nf_components.json",
+    "bytes": 2674252,
+    "sha256": "3ad1d9d7e0d6b32895cb569f86c3bc05af2937a68e96eab4d1c9b3d9fa6e575e",
+    "etag": "\"0f1a58ed3e6dc1:0\"",
+    "content_type": "application/json",
+    "status": "downloaded"
+  },
+  "roles": [
+    {
+      "id": "PD-WRL-001",
+      "title": "Defensive Cybersecurity",
+      "description": "Responsible for analyzing data collected from various cybersecurity defense tools to mitigate risks.",
+      "task_memberships": 43
+    },
+    {
+      "id": "PD-WRL-003",
+      "title": "Incident Response",
+      "description": "Responsible for investigating, analyzing, and responding to network cybersecurity incidents.",
+      "task_memberships": 29
+    },
+    {
+      "id": "PD-WRL-007",
+      "title": "Vulnerability Analysis",
+      "description": "Responsible for assessing systems and networks to identify deviations from acceptable configurations, enclave policy, or local policy. Measure effectiveness of defense-in-depth architecture against known vulnerabilities.",
+      "task_memberships": 15
+    }
+  ],
+  "distinct_tasks_in_roles": 75,
+  "training_competencies": [
+    {
+      "competency": "alert_triage",
+      "nice_tasks": [
+        {
+          "id": "T1250",
+          "text": "Perform cyber defense incident triage"
+        },
+        {
+          "id": "T1252",
+          "text": "Determine the scope, urgency, and impact of cyber defense incidents"
+        }
+      ],
+      "example_families": [
+        "correlation",
+        "archive_investigation"
+      ],
+      "scope": "implemented controlled examples, not demonstrated human proficiency",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    },
+    {
+      "competency": "multisource_investigation",
+      "nice_tasks": [
+        {
+          "id": "T1489",
+          "text": "Correlate incident data"
+        },
+        {
+          "id": "T1299",
+          "text": "Determine causes of network alerts"
+        },
+        {
+          "id": "T1084",
+          "text": "Identify anomalous network activity"
+        }
+      ],
+      "example_families": [
+        "correlation",
+        "coverage_gap"
+      ],
+      "scope": "implemented controlled examples; causes outside supplied observations remain unknown",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    },
+    {
+      "competency": "evidence_and_handover",
+      "nice_tasks": [
+        {
+          "id": "T1370",
+          "text": "Collect intrusion artifacts"
+        },
+        {
+          "id": "T1316",
+          "text": "Document cyber defense incidents from initial detection through final resolution"
+        },
+        {
+          "id": "T1332",
+          "text": "Produce incident findings reports"
+        },
+        {
+          "id": "T1333",
+          "text": "Communicate incident findings to appropriate constituencies"
+        },
+        {
+          "id": "T1617",
+          "text": "Prepare cyber defense reports"
+        }
+      ],
+      "example_families": [
+        "archive_investigation",
+        "verify_applied",
+        "verify_failed"
+      ],
+      "scope": "bounded read evidence/reporting, not full forensic acquisition",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    },
+    {
+      "competency": "controlled_response",
+      "nice_tasks": [
+        {
+          "id": "T1371",
+          "text": "Mitigate potential cyber defense incidents"
+        },
+        {
+          "id": "T1110",
+          "text": "Coordinate technical support to enterprise-wide cybersecurity defense technicians"
+        }
+      ],
+      "example_families": [
+        "service_proposal",
+        "containment_pending",
+        "containment_expired"
+      ],
+      "scope": "project approval/TTL policies remain mandatory",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    },
+    {
+      "competency": "post_action_review",
+      "nice_tasks": [
+        {
+          "id": "T1485",
+          "text": "Prepare after action reviews (AARs)"
+        }
+      ],
+      "example_families": [
+        "verify_applied",
+        "verify_failed",
+        "containment_expired"
+      ],
+      "scope": "verification/closure subset, not full organizational AAR",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    },
+    {
+      "competency": "detection_content",
+      "nice_tasks": [
+        {
+          "id": "T0020",
+          "text": "Develop content for cyber defense tools"
+        }
+      ],
+      "example_families": [
+        "rule_proposal"
+      ],
+      "scope": "exact bounded edit/approval subset, not autonomous arbitrary IDS program changes",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    },
+    {
+      "competency": "vulnerability_triage",
+      "nice_tasks": [
+        {
+          "id": "T1119",
+          "text": "Recommend vulnerability remediation strategies"
+        },
+        {
+          "id": "T1252",
+          "text": "Determine the scope, urgency, and impact of cyber defense incidents"
+        }
+      ],
+      "example_families": [
+        "kev_triage"
+      ],
+      "scope": "additional CISA-grounded examples in preparation; no local vulnerability inferred from KEV alone",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    },
+    {
+      "competency": "forensic_capability_gap",
+      "nice_tasks": [
+        {
+          "id": "T1256",
+          "text": "Perform forensically sound image collection"
+        }
+      ],
+      "example_families": [
+        "forensic_capability_gap"
+      ],
+      "scope": "full forensic image collection is unsupported by current MCP; teach explicit escalation without fabricated collection",
+      "critical_failures": [
+        "invented evidence or completion",
+        "wrong target or ID",
+        "missing requested evidence/approval/post-check",
+        "unapproved or unrelated protected action"
+      ]
+    }
+  ],
+  "enisa_reference": {
+    "uri": "https://www.enisa.europa.eu/sites/default/files/publications/European%20Cybersecurity%20Skills%20Framework%20Role%20Profiles.pdf",
+    "sha256": "10bd5a6e7f5d3214f04de67dbc47f3707ce185d69634738d7164f2b4cd28ffc9",
+    "section": "2.2 Cyber Incident Responder, printed pages7-8",
+    "doi": "10.2824/859537",
+    "license": "CC-BY-4.0",
+    "project_paraphrase": "SOC analysis includes monitoring, correlation, impact/causes, evidence, controlled mitigation, restoration verification and incident reporting."
+  },
+  "limitations": [
+    "Only selected role tasks are mapped; 75 distinct tasks are not all implemented by this project.",
+    "Official source identity does not guarantee error-free records or derived Korean answers.",
+    "Institutional policy references do not grant any new MCP permissions.",
+    "Hypothetical forensic collection, scanners and arbitrary shell/package/container actions must not be invented."
+  ]
+}

@@ -66,6 +66,8 @@ def read_config(path):
         raise ValueError("Specify a base model and explicit LoRA target_modules")
     if config.get("enable_thinking") is not False:
         raise ValueError("This prepared corpus uses non-thinking targets; enable_thinking must be false")
+    if config.get("loss_mode","prefix_completions") not in ("prefix_completions","all_assistant_turns"):
+        raise ValueError("Unknown supervised loss mode")
     model_profile.validate_profile(config)
     if config.get('model_kind')=='qwen3_5_moe':
         config.setdefault('assistant_only_logits',True)
@@ -184,13 +186,15 @@ def collate_lists(features, pad_token_id):
         boundary = item["prompt_length"]
         batch["input_ids"].append(ids + [pad_token_id] * pad)
         batch["attention_mask"].append([1] * len(ids) + [0] * pad)
-        batch["labels"].append([-100] * boundary + ids[boundary:] + [-100] * pad)
+        from dialogue_encoding import label_values
+        batch["labels"].append(label_values(item,pad_token_id,width))
     return batch
 
 
 def check_token_coverage(stats, required):
     """Critical curricula cannot silently lose a tool-call completion to filtering."""
-    if required and stats.get('kept') != stats.get('candidate_turns'):
+    complete=(stats.get('covered_assistant_turns')==stats.get('candidate_turns') and stats.get('kept')==stats.get('candidate_examples')) if stats.get('encoding_mode')=='all_assistant_turns' else stats.get('kept')==stats.get('candidate_turns')
+    if required and not complete:
         raise ValueError(f"Required assistant prefixes were excluded: {stats}")
 
 
@@ -264,15 +268,19 @@ def prepare_tokens(config, output, include_test=False):
     for split in splits:
         limit = config['max_train_samples'] if split == 'train' else config['max_eval_samples']
         longest=split=='train' and config.get('smoke_longest_prefixes',False)
-        datasets[split], stats[split] = tokenize_split(Path(config['data_dir']) / f'{split}.jsonl',
-            tokenizer, config['max_length'], 0 if longest else limit)
+        if config.get('loss_mode')=='all_assistant_turns':
+            from dialogue_encoding import tokenize_dialogues
+            datasets[split],stats[split]=tokenize_dialogues(Path(config['data_dir'])/f'{split}.jsonl',tokenizer,config['max_length'],0 if longest else limit,encode_completion)
+        else:
+            datasets[split], stats[split] = tokenize_split(Path(config['data_dir']) / f'{split}.jsonl',
+                tokenizer, config['max_length'], 0 if longest else limit)
         check_token_coverage(stats[split], config.get('require_all_prefixes', False))
         if longest:
             datasets[split]=select_longest_prefixes(datasets[split],limit)
             stats[split].update(selected_prefixes=len(datasets[split]),selection='longest_after_full_coverage_check')
         # A standalone audit must not retain a complete unused test dataset.
         if include_test: datasets[split] = None
-    stats.update(max_length=config['max_length'],require_all_prefixes=config.get('require_all_prefixes',False),loss='each_assistant_turn_as_completion',
+    stats.update(max_length=config['max_length'],require_all_prefixes=config.get('require_all_prefixes',False),loss='all_assistant_turns_per_conversation' if config.get('loss_mode')=='all_assistant_turns' else 'each_assistant_turn_as_completion',
                  truncation='disabled; overlength prefixes rejected', checked_at_kst=kst_now())
     write_json(Path(output) / 'tokenization_report.json', stats)
     print(json.dumps(stats, ensure_ascii=False, indent=2), flush=True)

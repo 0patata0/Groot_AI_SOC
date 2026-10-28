@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "at_kst": "2026-10-29T04:16:44.348253+09:00",
+  "decision": "withheld",
+  "unexecuted_plans": [
+    "soc-v3",
+    "soc-v4-full"
+  ],
+  "prepared_dialogues": 520,
+  "project_authored_synthetic": 308,
+  "synthetic_percent": 59.23,
+  "official_source_derived": 210,
+  "live_observation_derived": 2,
+  "independent_expert_gold_review": false,
+  "technical_checks_do_not_validate_gold_answers": true,
+  "gpu_training_started": false,
+  "reason": "User requires authoritative, trustworthy sources and reduction of project-authored synthetic data; 520-case corpus is not released for training.",
+  "required_rework": [
+    "Prefer original institutional/peer-reviewed-source data and official incident reports.",
+    "Increase unique deduplicated externally sourced training records above prior actual training; distinguish prepared-only legacy pool.",
+    "Bind every factual target to original record/label/section and retain source version/license/hash.",
+    "Reduce project-authored examples to separately labelled optional harness/approval-interface coverage, evaluated by ablation.",
+    "Distinguish institutional synthetic testbeds, actual incident reports, knowledge bases and agent-authored narratives.",
+    "Split related records/incidents/reports as groups; keep independent evaluation out of training."
+  ],
+  "preserve": "Original V3/V4 corpus/config/input hashes and historical readiness receipts; no model/adapter deletion or service stop."
+}

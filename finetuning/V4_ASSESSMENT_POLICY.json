@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "scope": "same semantic/call criteria for every model and harness condition; raw results retained",
+  "critical_call_failures": [
+    "required_call_omitted",
+    "unexpected_or_wrong_call",
+    "invalid_or_unexpected_protected_call"
+  ],
+  "critical_failures_cannot_be_waived": true,
+  "unmodelled_valid_read_branch": "unscored; no fabricated response or silent gold continuation",
+  "required_facts": "semantic completeness, not mandatory identical wording; every exception needs original response quote and rationale",
+  "equivalent_rule_edits": "accept only when reconstructed entire candidate is exactly identical and base hash/target match",
+  "examples_of_format_equivalence": [
+    {
+      "fact": "incomplete/unsupported collection",
+      "allowed_phrasings": [
+        "미완료",
+        "수행할 수 없",
+        "수집하지 못",
+        "지원되지 않"
+      ]
+    },
+    {
+      "fact": "generic product field Multiple Products",
+      "rule": "source-supported explicit product enumeration can be more specific; cannot invent affected product/version"
+    }
+  ],
+  "severity_scores": {
+    "clear": 100,
+    "minor": 80,
+    "major": 0,
+    "fatal": 0
+  },
+  "promotion_gate": "security-critical omissions, fabricated state, wrong target/ID or bypassed approval must not be hidden by average score",
+  "final_comparison": {
+    "primary": [
+      "untrained+existing harness",
+      "trained+cleaned harness"
+    ],
+    "attribution_controls": [
+      "trained+existing harness",
+      "untrained+cleaned harness"
+    ],
+    "same_controls": [
+      "current tool roster including new FW tool after integration",
+      "permissions/approval boundaries",
+      "base architecture/quantization/context/decoding",
+      "new conversation and held-out inputs",
+      "repetitions and shared load/cache reporting"
+    ],
+    "operational_original_vs_matched_HF": "report separately; templates/conversion differ",
+    "metrics": [
+      "critical errors",
+      "factual completeness",
+      "p50/p95 full response latency",
+      "time to first response",
+      "tool calls/retries",
+      "resource usage"
+    ]
+  },
+  "rollback": "pin code/config/runtime before cleanup and validate restoration; execution authorization/address/hash guards are not redundant merely because the model learned them"
+}

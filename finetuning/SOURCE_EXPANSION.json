@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "at_kst": "2026-10-29T04:22:52.807973+09:00",
+  "scope": "Additional authoritative source acquisition/inventory; not a released SFT dataset or completed training.",
+  "user_requirement": "Reduce project-authored synthetic data; prioritize trustworthy institutional/academic/official incident sources and increase distinct externally sourced learning records beyond prior actual training.",
+  "current_520_case_training_release": "withheld",
+  "project_authored_308": "excluded from current core training release; retain as optional separately reviewed interface examples, not institutional gold",
+  "acquisition": {
+    "cisa_incidents": {
+      "files": [
+        {
+          "url": "https://www.cisa.gov/sites/default/files/2024-03/aa24-038a_csa_prc_state_sponsored_actors_compromise_us_critical_infrastructure_3.pdf",
+          "final_url": "https://www.cisa.gov/sites/default/files/2024-03/aa24-038a_csa_prc_state_sponsored_actors_compromise_us_critical_infrastructure_3.pdf",
+          "path": "cisa-incidents/AA24-038A.pdf",
+          "bytes": 1635282,
+          "sha256": "f90e5d955b131306453a7c2ced1efcf0618d3e0dfd6c6c181262319fab63339b",
+          "advisory_id": "AA24-038A",
+          "status": "acquired_official_report"
+        },
+        {
+          "url": "https://www.cisa.gov/sites/default/files/2024-09/aa23-061a-stopransomware-blacksuit-royal-ransomware_5.pdf",
+          "final_url": "https://www.cisa.gov/sites/default/files/2024-09/aa23-061a-stopransomware-blacksuit-royal-ransomware_5.pdf",
+          "path": "cisa-incidents/AA23-061A.pdf",
+          "bytes": 676705,
+          "sha256": "44c1a388f6f513af80f34a042ff7b0777ef41cc512d1ca7dbf7df6e4451d41c8",
+          "advisory_id": "AA23-061A",
+          "status": "acquired_official_report"
+        },
+        {
+          "url": "https://www.cisa.gov/sites/default/files/2024-05/aa24-131a-joint-csa-stopransomware-black-basta_1.pdf",
+          "final_url": "https://www.cisa.gov/sites/default/files/2024-05/aa24-131a-joint-csa-stopransomware-black-basta_1.pdf",
+          "path": "cisa-incidents/AA24-131A.pdf",
+          "bytes": 628210,
+          "sha256": "0a9b0d2ff1a3e47654f5ff9e0a0398d65515a8e0237e7434c15974c0514b92f7",
+          "advisory_id": "AA24-131A",
+          "status": "acquired_official_report"
+        }
+      ],
+      "role": "official incident/adversary observations; advisory is not proof local infrastructure is compromised",
+      "admission": "pending section/claim extraction and primary-evidence review; no model-generated gold"
+    },
+    "vcdb": {
+      "repo": "vz-risk/VCDB",
+      "commit": "f6f98c00f66ab35f5b49977a5852ce94a5bb31d1",
+      "files": [
+        {
+          "url": "https://api.github.com/repos/vz-risk/VCDB/commits/master",
+          "final_url": "https://api.github.com/repos/vz-risk/VCDB/commits/master",
+          "path": "vcdb/commit.json",
+          "bytes": 90028,
+          "sha256": "4668fd2662d584ea4c5e8627390bab19049fa9b4be70712ca934fbdedd32af9f"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vz-risk/VCDB/f6f98c00f66ab35f5b49977a5852ce94a5bb31d1/LICENSE.txt",
+          "final_url": "https://raw.githubusercontent.com/vz-risk/VCDB/f6f98c00f66ab35f5b49977a5852ce94a5bb31d1/LICENSE.txt",
+          "path": "vcdb/LICENSE.txt",
+          "bytes": 14107,
+          "sha256": "55c550adb50e82c87f8aeb6706b6b778e8657cf49593167c9d2bfbc270323182"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vz-risk/VCDB/f6f98c00f66ab35f5b49977a5852ce94a5bb31d1/README.md",
+          "final_url": "https://raw.githubusercontent.com/vz-risk/VCDB/f6f98c00f66ab35f5b49977a5852ce94a5bb31d1/README.md",
+          "path": "vcdb/README.md",
+          "bytes": 6681,
+          "sha256": "bc004a3ad4f248c7276a1d887e38c6289184d997374113f924217b69c5e939f9"
+        }
+      ],
+      "admission": "secondary only; community/AI-assisted encoding cannot substitute primary evidence"
+    },
+    "cmu_cert": {
+      "doi": "10.1184/R1/12841247.v1",
+      "title": "Insider Threat Test Dataset",
+      "license": {
+        "value": 1,
+        "name": "CC BY 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "published_date": "2020-09-30T15:36:53Z",
+      "files": [
+        {
+          "id": 24860765,
+          "name": "SEI_Insider_README.txt",
+          "size": 1446,
+          "download_url": "https://ndownloader.figshare.com/files/24860765",
+          "computed_md5": "3168963335887132baccc4179f46c467",
+          "supplied_md5": "3168963335887132baccc4179f46c467"
+        },
+        {
+          "id": 24857828,
+          "name": "answers.tar.bz2",
+          "size": 1254678,
+          "download_url": "https://ndownloader.figshare.com/files/24857828",
+          "computed_md5": "c0c96eaa06915e417504f932756f58d8",
+          "supplied_md5": "c0c96eaa06915e417504f932756f58d8"
+        },
+        {
+          "id": 24857831,
+          "name": "CHECKSUMS-sha256.txt",
+          "size": 868,
+          "download_url": "https://ndownloader.figshare.com/files/24857831",
+          "computed_md5": "7ac18005aac99a59bf30fbaa84808861",
+          "supplied_md5": "7ac18005aac99a59bf30fbaa84808861"
+        }
+      ],
+      "acquired": [
+        {
+          "url": "https://api.figshare.com/v2/articles/12841247/versions/1",
+          "final_url": "https://api.figshare.com/v2/articles/12841247/versions/1",
+          "path": "cmu-cert/article-v1.json",
+          "bytes": 8445,
+          "sha256": "484a01ebc65c64bdb53a4a097b9051a11c8e4ac943bc2a824956783d64e296cd"
+        },
+        {
+          "url": "https://ndownloader.figshare.com/files/24857828",
+          "final_url": "https://s3-eu-west-1.amazonaws.com/pstorage-cmu-348901238291901/24857828/answers.tar.bz2",
+          "path": "cmu-cert/answers.tar.bz2",
+          "bytes": 1254678,
+          "sha256": "ed21bf921def01e97326b314f2d1fa77651a945bd31bf513095f8ac7658c9ddd",
+          "provider_md5_verified": true
+        }
+      ],
+      "role": "institution-generated synthetic testbed with provider answer key, not actual incident logs",
+      "admission": "pending scenario parsing/log availability/licensing and role audit"
+    },
+    "mitre": {
+      "repo": "mitre-attack/attack-stix-data",
+      "commit": "c2494b29dd268c46a5d0ea0990553e4327cd2253",
+      "files": [
+        {
+          "url": "https://api.github.com/repos/mitre-attack/attack-stix-data/commits/master",
+          "final_url": "https://api.github.com/repos/mitre-attack/attack-stix-data/commits/master",
+          "path": "mitre/commit.json",
+          "bytes": 17883,
+          "sha256": "52c4d1aa6e7cda47849a7aa31d5a3b58fa593cfbc6dcab93f3cc095cda2a82a5"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/LICENSE.txt",
+          "final_url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/LICENSE.txt",
+          "path": "mitre/LICENSE.txt",
+          "bytes": 1354,
+          "sha256": "738144f7fb054722a4ef9d3367c51710341dc12fc574c6ac3a41daaaecd8bf5e"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/README.md",
+          "final_url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/README.md",
+          "path": "mitre/README.md",
+          "bytes": 5278,
+          "sha256": "dc0317fd9f727bb878861bd6122d8da4928203bbad0f950b7b70009a5a7dbd5f"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/enterprise-attack/enterprise-attack.json",
+          "final_url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/enterprise-attack/enterprise-attack.json",
+          "path": "mitre/enterprise-attack.json",
+          "bytes": 55271014,
+          "sha256": "81113ba98afa2928f3dcff62022539f7ce30c315c32e14422f11ff95ce534352"
+        }
+      ],
+      "active_types": {
+        "attack-pattern": 706,
+        "intrusion-set": 178,
+        "campaign": 57,
+        "relationship": 21819
+      },
+      "actor_or_campaign_technique_relations_with_source_text_and_references": 6027,
+      "role": "provider-coded CTI relationship records, not unique incidents or direct SOC investigations",
+      "admission": "pending label/source relevance and grouped split audit"
+    }
+  },
+  "source_inventory": {
+    "at_kst": "2026-10-29T04:22:52.807973+09:00",
+    "stage": "source_inventory_not_training_admission",
+    "mitre": {
+      "input_relationships": 6027,
+      "unique_entity_technique_description_records": 6027,
+      "duplicates_removed": 0,
+      "source_entities": 230,
+      "government_or_academic_reference_records": 704,
+      "descriptions_are_MITRE_source_text_not_project_authored": true,
+      "underlying_report_urls_individually_verified": false,
+      "not_independent_incidents": true
+    },
+    "cmu_cert": {
+      "answer_archive_members": 194,
+      "member_bytes": 7504747,
+      "scenario_description_members": [
+        "answers/scenarios.txt",
+        "answers/readme.txt"
+      ],
+      "training_examples": 0,
+      "why_not_yet_admitted": "Provider answer keys must be paired with suitable context; no claim that label rows are independent incidents. Full multi-GB log archives were not fetched.",
+      "provider_SHA256_verified": true,
+      "additional_metadata": [
+        {
+          "name": "SEI_Insider_README.txt",
+          "url": "https://ndownloader.figshare.com/files/24860765",
+          "bytes": 1446,
+          "sha256": "dc23efbbc5ea9c14f2cbcf31f927f39bcfdcdf550d0608650ad7f90d17cbaceb"
+        },
+        {
+          "name": "CHECKSUMS-sha256.txt",
+          "url": "https://ndownloader.figshare.com/files/24857831",
+          "bytes": 868,
+          "sha256": "3a03ec4e0a2cc39fa76d3c12f22323f3ac1ad1b0acc8a199a7b4a37566b245ca"
+        }
+      ]
+    },
+    "cisa_kev_reference": 1760,
+    "services_stopped": false,
+    "GPU_training_started": false
+  },
+  "previous_actual_training": {
+    "v1_train_dialogues": 144,
+    "v1_completed_epoch": 1,
+    "R2_available_train_dialogues": 192,
+    "R2_steps": 48,
+    "R2_full_epoch_completed": false,
+    "legacy_train_prepared_pool": 18872,
+    "legacy_pool_fully_trained": false
+  },
+  "not_admitted": [
+    {
+      "source": "USENIX Security 2024 SOC Measurement, UIUC/NCSA/IBM authors",
+      "paper": "https://www.usenix.org/conference/usenixsecurity24/presentation/yang-limin",
+      "dataset_access": "https://github.com/idashlab/SOC_Measurement_Usenix24_related_material",
+      "status": "researcher permission/affiliation/application required; not requested, no email sent, raw dataset not acquired"
+    },
+    {
+      "source": "VCDB",
+      "status": "secondary community/AI-assisted incident encoding; not admitted as verified primary gold"
+    },
+    {
+      "source": "SOC/incident-analysis preprints and public benchmarks",
+      "status": "candidate evaluation only; peer-review, author identity, release/license and train/test rights must be verified; no automatic training ingestion"
+    }
+  ],
+  "next_required": [
+    "Expand evidence-paired institutional logs and official incident reports; preserve scenario/incident identities.",
+    "Bind each target label or factual claim to original record/label/section; no free-form agent-authored incident verdict as gold.",
+    "Deduplicate source objects and related incidents/reports before grouped train/validation/test split.",
+    "Separate raw source record counts, unique incident counts, prepared dialogues and actually trained samples.",
+    "Run role coverage/label/rights and token checks, then freeze new corpus/profile; determine training outage from actual workload."
+  ],
+  "training_or_model_selection_changed": false,
+  "Mac_downloaded_models_or_installed_packages": false
+}

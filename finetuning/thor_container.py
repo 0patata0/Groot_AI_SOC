@@ -9,13 +9,13 @@ from download_model import verify_artifact
 
 IMAGE = 'nvcr.io/nvidia/pytorch@sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb'
 STAGES = ('prepare','download','tokenize','smoke','train','soc-tokenize','soc-smoke','soc-pilot','soc-train',
-          'soc-v3-tokenize','soc-v3-smoke','soc-v3-pilot','soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
+          'soc-v4-full-tokenize','soc-v4-full-smoke','soc-v4-full-train','soc-v4-tokenize','soc-v4-smoke','soc-v4-pilot','soc-v3-tokenize','soc-v3-smoke','soc-v3-pilot','soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
 
 
 def command(root, stage, uid, gid):
     if stage not in STAGES: raise ValueError('Unknown stage')
     root = Path(root).resolve()
-    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v3-smoke','soc-v3-pilot','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
+    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v4-full-smoke','soc-v4-full-train','soc-v4-smoke','soc-v4-pilot','soc-v3-smoke','soc-v3-pilot','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
     env = {'PYTHONDONTWRITEBYTECODE':'1','PIP_NO_CACHE_DIR':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1',
            'HF_HUB_DISABLE_TELEMETRY':'1','HF_HUB_DISABLE_PROGRESS_BARS':'1','HF_HOME':'/workspace/hf-cache',
            'HF_HUB_DISABLE_IMPLICIT_TOKEN':'1',
@@ -98,6 +98,37 @@ def main():
             raise SystemExit('v3 tokenization proof belongs to different corpus')
     if args.stage=='soc-v3-pilot' and json.loads((root/'soc-v3-smoke-status.json').read_text())['status']!='completed':
         raise SystemExit('Successful v3 smoke required')
+    if args.stage in ('soc-v4-smoke','soc-v4-pilot'):
+        if json.loads((root/'soc-v4-tokenize-status.json').read_text())['status']!='completed':
+            raise SystemExit('Successful v4 tokenization required')
+        report=json.loads((root/'soc-v4-tokenization/tokenization_report.json').read_text())
+        profile=json.loads((root/'finetuning/config.qwen36-soc-v4.json').read_text())
+        checks=json.loads((root/'soc-v4-tokenization/data_check.json').read_text())
+        manifest=json.loads((root/'finetuning/data-soc-operator-v4-r1/manifest.json').read_text())
+        if report.get('max_length')!=profile['max_length'] or report.get('require_all_prefixes') is not True:
+            raise SystemExit('Strict v4 tokenization settings required')
+        if any(report[s].get('kept')!=report[s].get('candidate_turns') for s in ('train','validation','test')):
+            raise SystemExit('Required v4 prefixes excluded')
+        if checks.get('sha256')!={s:manifest['outputs'][s]['sha256'] for s in ('train','validation','test')}:
+            raise SystemExit('v4 tokenization proof belongs to different corpus')
+    if args.stage=='soc-v4-pilot' and json.loads((root/'soc-v4-smoke-status.json').read_text())['status']!='completed':
+        raise SystemExit('Successful v4 smoke required')
+    if args.stage in ('soc-v4-full-smoke','soc-v4-full-train'):
+        if json.loads((root/'soc-v4-full-tokenize-status.json').read_text())['status']!='completed':
+            raise SystemExit('Successful full-dialogue tokenization required')
+        proof=json.loads((root/'soc-v4-full-tokenization/tokenization_report.json').read_text())
+        checks=json.loads((root/'soc-v4-full-tokenization/data_check.json').read_text())
+        manifest=json.loads((root/'finetuning/data-soc-operator-v4-r1/manifest.json').read_text())
+        if proof.get('loss')!='all_assistant_turns_per_conversation' or proof.get('max_length')!=4096 or proof.get('require_all_prefixes') is not True:
+            raise SystemExit('Strict full-dialogue tokenization proof required')
+        for split,rows,turns in [('train',332,766),('validation',94,202),('test',94,202)]:
+            row=proof[split]
+            if (row.get('kept'),row.get('candidate_examples'),row.get('covered_assistant_turns'),row.get('candidate_turns'))!=(rows,rows,turns,turns):
+                raise SystemExit('Full-dialogue examples or assistant targets excluded')
+        if checks.get('sha256')!={s:manifest['outputs'][s]['sha256'] for s in ('train','validation','test')}:
+            raise SystemExit('Full-dialogue tokenization corpus mismatch')
+    if args.stage=='soc-v4-full-train' and json.loads((root/'soc-v4-full-smoke-status.json').read_text())['status']!='completed':
+        raise SystemExit('Successful full-dialogue smoke required')
     print(subprocess.check_output(command(root,args.stage,os.getuid(),os.getgid()),text=True).strip())
 
 

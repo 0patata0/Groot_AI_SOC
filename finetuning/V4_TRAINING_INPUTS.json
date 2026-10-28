@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "profile": "config.qwen36-soc-v4-full.json",
+  "profile_sha256": "d6790bd1dca59a90ddca5585aa67ad6540f6316eb1ced7f99e28a5a39cf982d9",
+  "data_folder": "data-soc-operator-v4-r1",
+  "data_sha256": {
+    "train": "fcbcc6331c5d004a338148baeada48211314aa227c3dbfa145867fe58481b331",
+    "validation": "6eec2eadbf471761771db1a0d4621ef80c1845dc8392af32c07a27d93e584591",
+    "test": "ec401cadcbaf119e4a389df4f3e536ad322a715f8823ef3cb332072059077ff9"
+  },
+  "records": {
+    "train": 332,
+    "validation": 94,
+    "test": 94
+  },
+  "assistant_turns": {
+    "train": 766,
+    "validation": 202,
+    "test": 202
+  },
+  "source_cases": "data-soc-source-operator-v4-r1/cases.jsonl",
+  "source_cases_sha256": "0307e26799f0d2b9734c31604c7a1f21b03a463d05ef598cb6560c606ed1a578",
+  "catalog_sha256": "ffcfb0bc8393e483e395a2348cb258dc7b843ee677579c8da577c7f1636390bd",
+  "source_sha256": {
+    "train.py": "a9256e9a03e700fe2caad60b2e54358914a471543908bf8adeb7d1c586e4335c",
+    "dialogue_encoding.py": "851ddd55f5ac7b31729aeaa17fe5f0d911dee00eadcbb99ae915327fd663f498",
+    "training_lineage.py": "8bea81d9aa8b84e895105b412fc0582ad66bc3d66779d665b4a1b87b362acca9",
+    "completion_loss.py": "a634fa9d5d1a5ad0a292cd1828d7975837460d6286154b1b8ecd1cd5c20078c9",
+    "model_profile.py": "52f902d46f9447b87328d2468645a64e376727a927b5f9a6068b2025798d314e",
+    "bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
+    "memory_budget.py": "662d9d5c1fe77933286582a813d048760a3fd2373798b9aba9df4f70ca6fe0c3",
+    "memory_telemetry.py": "1d85a4f2845e9a9a7e81f7b98431365f7b55950ccc87a49648c3a95d8981c5bf",
+    "guarded_process.py": "a30a3a41051cd46e9fd7398e5a2952eb4066f6619a7bc5b2ceefe77ddcc39ff8",
+    "container_task.py": "d550f0d456771f4ae8f89d9646b2014cecd15d4b20800fdec6cd9d318766eb8d",
+    "thor_container.py": "f19735ac73a7c09f3cdefbc159a7e20c8bcbee64f686c907d27956c81c25e409"
+  },
+  "loss_mode": "all_assistant_turns",
+  "max_steps": 166,
+  "num_train_epochs": 1,
+  "max_length": 4096,
+  "gradient_accumulation_steps": 2,
+  "learning_rate": 2e-06,
+  "supervision_note": "Target-token union preserved; per-conversation sampling/normalization differs from per-prefix averaging.",
+  "original_operational_model_not_replaced_by_training": true,
+  "window": {
+    "training_limit_minutes": 165,
+    "independent_restore_minutes": 170,
+    "maximum_shared_interruption_minutes": 180
+  },
+  "scope": "operator-reviewed frozen full-epoch training plan, not permission or completed execution",
+  "development_case_ids": [
+    "soc-v4-core-soc-operator-v3-correlation-validation-000",
+    "soc-v4-core-soc-operator-v3-service_proposal-validation-000",
+    "soc-v4-core-soc-operator-v3-coverage_gap-validation-000",
+    "soc-v4-core-soc-operator-v3-verify_failed-validation-000",
+    "soc-v4-core-soc-operator-v3-verify_applied-validation-000",
+    "soc-v4-core-soc-operator-v3-containment_pending-validation-000",
+    "soc-v4-core-soc-operator-v3-containment_expired-validation-000",
+    "soc-v4-core-soc-operator-v3-rule_proposal-validation-000",
+    "soc-v4-core-soc-operator-v3-ait-wheeler-000",
+    "soc-v4-ait-lds-wheeler-2705",
+    "soc-v4-kev-CVE-2020-3950",
+    "soc-v4-forensic-validation-0"
+  ],
+  "development_evaluation_code_sha256": "7e3934a79fa58f924110e9715a73b77335ec0dd0934954feda5eac44721fa582"
+}

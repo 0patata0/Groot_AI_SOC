@@ -1,0 +1,201 @@
+% Dataset and model references. Access dates are not publication dates.
+% Training role and retained file hashes: TRAINING_PROVENANCE.json.
+% Do not cite a prepared-only source as a completed training experiment.
+@misc{nous_hermes_function_calling_v1,
+  author = {{Nous Research}},
+  title = {{Hermes Function Calling v1}},
+  url = {https://huggingface.co/datasets/NousResearch/hermes-function-calling-v1},
+  urldate = {2026-10-29},
+  note = {Dataset repository. Includes Glaive-derived subset; see per-record source attribution.}
+}
+@misc{glaive_function_calling_v2,
+  author = {{Glaive AI}},
+  title = {{Glaive Function Calling v2}},
+  url = {https://huggingface.co/datasets/glaiveai/glaive-function-calling-v2},
+  urldate = {2026-10-29},
+  note = {Prepared corpus source; no completed full-corpus training claim.}
+}
+@misc{djlougen_hermes_filtered,
+  author = {{DJLougen}},
+  title = {{Hermes Agent Reasoning Traces -- Quality Filtered}},
+  year = {2026},
+  url = {https://huggingface.co/datasets/DJLougen/hermes-agent-traces-filtered},
+  urldate = {2026-10-29},
+  note = {Cite both this filtered version and the original Lambda dataset. Prepared-only in retained experiments.}
+}
+@misc{lambda_hermes_traces,
+  author = {{Lambda}},
+  title = {{Hermes Agent Reasoning Traces}},
+  url = {https://huggingface.co/datasets/lambda/hermes-agent-reasoning-traces},
+  urldate = {2026-10-29},
+  note = {Upstream of the DJLougen filtered release; current card is not a recovered historical acquisition revision.}
+}
+@misc{sevenllm_dataset,
+  author = {{Multilingual-Multimodal-NLP}},
+  title = {{SEVENLLM-Dataset}},
+  url = {https://huggingface.co/datasets/Multilingual-Multimodal-NLP/SEVENLLM-Dataset},
+  urldate = {2026-10-29},
+  note = {Train source prepared separately from the excluded test split.}
+}
+@article{ji2024sevenllm,
+  author = {Ji, Hangyuan and Yang, Jian and Chai, Linzheng and Wei, Chaoren and Yang, Liqun and Duan, Yunlong and Wang, Yunli and Sun, Tianzhen and Guo, Hongcheng and Li, Tongliang and Ren, Changyu and Li, Zhoujun},
+  title = {{SEvenLLM}: Benchmarking, Eliciting, and Enhancing Abilities of Large Language Models in Cyber Threat Intelligence},
+  journal = {arXiv preprint arXiv:2405.03446},
+  year = {2024},
+  doi = {10.48550/arXiv.2405.03446},
+  url = {https://arxiv.org/abs/2405.03446v2},
+  note = {Preprint citation verified here; do not infer a conference venue from this record.}
+}
+@misc{attacklm_dataset,
+  author = {{Veedubin}},
+  title = {{attacklm-dataset}},
+  url = {https://github.com/Veedubin/attacklm-dataset},
+  urldate = {2026-10-29},
+  note = {Aggregation repository. Preserve per-record upstream attribution and license; see TRAINING_PROVENANCE.json. Prepared-only in retained completed runs.}
+}
+@misc{ait_ads_2023,
+  author = {Landauer, Max and Skopik, Florian and Wurzenberger, Markus},
+  title = {{AIT Alert Data Set}},
+  year = {2023},
+  publisher = {Zenodo},
+  version = {1},
+  doi = {10.5281/zenodo.8263181},
+  url = {https://zenodo.org/records/8263181},
+  urldate = {2026-10-29},
+  note = {Experimental testbed alerts, including false positives. Phase-window labels are not per-alert maliciousness labels.}
+}
+@inproceedings{landauer2024ait_ads,
+  author = {Landauer, Max and Skopik, Florian and Wurzenberger, Markus},
+  title = {Introducing a New Alert Data Set for Multi-Step Attack Analysis},
+  booktitle = {Proceedings of the 17th Cyber Security Experimentation and Test Workshop},
+  year = {2024},
+  doi = {10.1145/3675741.3675748},
+  url = {https://doi.org/10.1145/3675741.3675748},
+  note = {Citation linked by the institutional Zenodo record. Publisher full text was not accessible during this audit.}
+}
+@misc{qwen36_35b_base,
+  author = {{Qwen Team}},
+  title = {{Qwen3.6-35B-A3B}},
+  url = {https://huggingface.co/Qwen/Qwen3.6-35B-A3B/tree/995ad96eacd98c81ed38be0c5b274b04031597b0},
+  urldate = {2026-10-29},
+  note = {Pinned fine-tuning base revision 995ad96eacd98c81ed38be0c5b274b04031597b0. Upstream pretraining corpus is outside the project fine-tuning dataset.}
+}
+
+@misc{attacklm_upstream_openassistant,
+  title = {{OpenAssistant}},
+  url = {https://huggingface.co/datasets/OpenAssistant/oasst1},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_slimpajama,
+  title = {{SlimPajama}},
+  url = {https://huggingface.co/datasets/cerebras/SlimPajama-627B},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_atomic_red_team,
+  title = {{atomic-red-team}},
+  url = {https://github.com/redcanaryco/atomic-red-team},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_attacklm_synthetic,
+  title = {{attacklm-synthetic}},
+  url = {https://github.com/Veedubin/AttackLM},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_metasploit_framework,
+  title = {{metasploit-framework}},
+  url = {https://github.com/rapid7/metasploit-framework},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_mitre_atlas,
+  title = {{mitre-atlas}},
+  url = {https://github.com/mitre-atlas/atlas-data},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_mitre_atlas_arsenal,
+  title = {{mitre-atlas-arsenal}},
+  url = {https://github.com/mitre-atlas/arsenal},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_mitre_stockpile,
+  title = {{mitre-stockpile}},
+  url = {https://github.com/mitre/stockpile},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_mordor,
+  title = {{mordor}},
+  url = {https://github.com/OTRF/Security-Datasets},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_nist_sp800_61r3,
+  title = {{nist-sp800-61r3}},
+  url = {https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r3.pdf},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_nvidia_garak,
+  title = {{nvidia-garak}},
+  url = {https://github.com/NVIDIA/garak},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_promptfoo,
+  title = {{promptfoo}},
+  url = {https://github.com/promptfoo/promptfoo},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_promptmap,
+  title = {{promptmap}},
+  url = {https://github.com/utkusen/promptmap},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_sigma_hq,
+  title = {{sigma-hq}},
+  url = {https://github.com/SigmaHQ/sigma},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_splunk_content,
+  title = {{splunk-content}},
+  url = {https://github.com/splunk/security_content},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_the_stack_v2_permissive,
+  title = {{the-stack-v2-permissive}},
+  url = {https://huggingface.co/datasets/bigcode/the-stack-v2-0.3},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}
+
+@misc{attacklm_upstream_threathunter_playbook,
+  title = {{threathunter-playbook}},
+  url = {https://github.com/OTRF/ThreatHunter-Playbook},
+  urldate = {2026-10-29},
+  note = {Upstream named by retained AttackLM record metadata; prepared-only here. Exact historical revision and full upstream rights were not independently re-established.}
+}

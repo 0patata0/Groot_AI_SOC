@@ -1,5 +1,7 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+> **10/29 과거 학습 출처 정리:** 12실행·3corpus/9분할SHA·AIT112원본행을대조하고BibTeX/기계판독이력표를연결했다. 초기혼합자료는일부2-step시험만,v1은AIT+합성,R2는합성이며준비량/실제학습량을분리한다. 과거batch ID/일부취득revision미기록도공개한다. [논문용출처·정정·검증한계](finetuning/DATA_SOURCES.md). 추가반입분정제/새학습은이후단계다.
+
 > **10/29 추가 자료의 학술·기관 근거 확인:** AIT/CSET·ToolACE/ICLR2025·APIGen/NeurIPS2024·PRIMUS/EMNLP2025와 MITRE/NIST 공식 자료를 확인했다. 기존ToolACE SHA/AIT MD5 3검사일치. 현재R2 192개는내부에이전트검수합성자료로기관인증/전문가정답이아니다. 새반입/학습/운영전환없음. [원출처·인용·검증/한계](finetuning/DATA_SOURCES.md).
 
 > **10/29 품질 비교 완료:** 새20사례·41턴/모델·37도구 동일조건에서 HF 미학습control84점, R2 24/48각76점, 운영 원본73점. 학습효과는같은HF대비각8점하락으로운영원본유지. 전체164요청성공·누락/장비추측·가짜ID잔여·실MCP/채팅/경고인과별도. [점수·사례·한계](finetuning/QUALITY_RESULTS.md).

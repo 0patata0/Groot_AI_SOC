@@ -1,5 +1,17 @@
 # 인프라 현황 — 2026-10-29 현재 작업 상태
 
+## 과거 학습자료 출처·투입 이력 감사 완료 — 2026-10-29T00:49:31.904875+09:00
+
+[논문용 출처/가공·검수/정정](finetuning/DATA_SOURCES.md) · [3corpus/12실행 원장](finetuning/TRAINING_PROVENANCE.json) · [BibTeX](finetuning/references.bib) · [재검증기](finetuning/audit_training_provenance.py).
+
+- Thor읽기전용으로12완료run manifest·토큰통계·Trainer상태/어댑터SHA·24/48체크포인트를확인,3corpus×3split=9해시가로컬manifest/서버/각run과일치했다. v1 AIT train72/validation20/test20총112는가공파일/개행포함행SHA·공식zip내원경보객체까지일치. R2생성기재생성소스바이트일치. 파일/출처연결확인이지정답/기관인증이아니다.
+- **과거표현정정:** 초기공개혼합train18,872는‘전혀학습안함’이아니라최초13행에서허용한32prefix의2step시험에일부쓰였다(모두Nous처리원천,내부Glaive5k부분집합포함). 다른4원천전체학습으로확대하지않는다. v1 144=합성72+AIT72/224prefix·본112step/기록epoch1. R2 192/390은준비풀이며실제48step/accum2/epoch0.24615;메모리재현은그중최장2prefix재사용이다.
+- 5공개준비원천·AttackLM17상위출처URI/선언라이선스·직접/재포장인용·고정HFbase revision·합성작성/검수주체·평가제외를기록했다. 과거batch별sampler ID/일부취득commit 미기록·초기base_revision_resolved null은복원했다고주장하지않는다. v1 메타데이터의operator/independent문구를사용자작성/전문가검수로해석하지않도록정정했다.
+- 출처검사4회귀·로컬191검사중188pass/기존hostTorch3환경생략. 실제출처9해시/12run/112원본행/R2재생성은별도실측이다. 서버서비스는읽기조회시active·이번서비스중단/학습/가중치변경0. 추가데이터정제/새학습지시는다음단계로수신했고아직새학습셋고정/토큰검증/공유추론중단은없다. 새학습승인요청은정제후구체설정/시간/복구계획을갖춘경우에만한다.
+- 반입목록에출처JSON/BibTeX/재검증기·검사를포함했다. 새서비스/키/포트/운영설정변경없음·초기설치기불변. 서버소스동기화/검증·Mac임시정리/Git는마감영수증으로구분한다. 과거소스원문/개인로컬기록은Git미포함을유지한다.
+
+- **마감 검증 2026-10-29T00:57:04.636081+09:00**: 공개출처/BibTeX/재검증기를포함한86파일 반입SHA/압축바이트일치(SHA`8041a30dc7f08f479bab1c30a7cfb1e443a296396795e1c48344a9fa480d2b14`),Thor동기화/191검사(기존Torch3환경생략)·active확인. 서버전송압축제거·기존원문/학습기록/가중치보존. 이번Mac작업원문·임시스크립트/압축은Git마감후정리하고출처원장은보존한다. Git는후속영수증으로남긴다. 추가자료정제/새학습은후속작업이며서비스중단이나새가중치생성은없다.
+
 ## 추가 학습자료의 학회·기관 출처 확인 — 2026-10-29T00:25:43.539884+09:00
 
 사용자의 추가자료·공신력·프로젝트근거 요청에 따라 AIT기관/CSET2024,ToolACE/ICLR2025,Salesforce APIGen/NeurIPS2024,Trend Micro PRIMUS/EMNLP2025의 공식 서지·배포·검증 방식을 확인했다. MITRE/NIST는 지식·절차 근거로 구분한다. [서지/원문·용도·라이선스·실제검사/잔여](finetuning/DATA_SOURCES.md).

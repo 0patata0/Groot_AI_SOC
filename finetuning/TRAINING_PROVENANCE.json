@@ -1,0 +1,931 @@
+{
+  "schema": 1,
+  "created_at_kst": "2026-10-29T00:45:52.980914+09:00",
+  "scope": "Retrospective provenance of retained fine-tuning runs. File and run binding, not institution certification or exact historical sampler replay.",
+  "base_model": {
+    "repository": "Qwen/Qwen3.6-35B-A3B",
+    "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/tree/995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "pretraining_corpus_scope": "Upstream model pretraining data is outside this project fine-tuning provenance; not reconstructed."
+  },
+  "corpora": [
+    {
+      "id": "data",
+      "manifest_sha256": "170faae72eeda7a893d67de5513f9dd6b2830f058a3abd5b8e6287579b748553",
+      "splits": {
+        "test": {
+          "path": "test.jsonl",
+          "records": 932,
+          "rows": 932,
+          "sha256": "15b9f79720b78dce1f7c60f4388c683512c01e9c124d65ee82a052a0bd1b23cf"
+        },
+        "train": {
+          "path": "train.jsonl",
+          "records": 18872,
+          "rows": 18872,
+          "sha256": "76bd506368e9a88a3d3c362a215de346d2b1236eef17890fc5ebda6b84b84dda"
+        },
+        "validation": {
+          "path": "validation.jsonl",
+          "records": 980,
+          "rows": 980,
+          "sha256": "81f3819e415b3bd0fc752efe831218d188ba605215338cbdea969e7cd8e39a47"
+        }
+      },
+      "train_source_counts": {
+        "hermes_fc_v1.dedup.jsonl": 4612,
+        "glaive_fc_v2.hermes.jsonl": 4597,
+        "hermes_agent_traces.jsonl": 639,
+        "sevenllm_en.jsonl": 4528,
+        "attacklm.permissive.jsonl": 4496
+      },
+      "evidence_kind_by_split": {
+        "train": {
+          "public_corpus_prepared": 18872
+        },
+        "validation": {
+          "public_corpus_prepared": 980
+        },
+        "test": {
+          "public_corpus_prepared": 932
+        }
+      },
+      "exact_per_batch_historical_sample_trace_available": false,
+      "source": "five public processed inputs; only early Hermes subset admitted to initial smoke",
+      "prepared_source_pool_not_full_training": true
+    },
+    {
+      "id": "data-soc-v1",
+      "manifest_sha256": "ac5947d24d1045e361b3cc613b9efe4f114b1a70903017591f00e70806dd8d83",
+      "splits": {
+        "train": {
+          "records": 144,
+          "sha256": "bd5c1272966dc75b7504997bccbfc6c74c55335c2592267f16271d0544116830"
+        },
+        "validation": {
+          "records": 32,
+          "sha256": "c65380b6c3812ad42564682494c3bbcb903d5e4effab5c9b87b3a7bae7ae71e8"
+        },
+        "test": {
+          "records": 36,
+          "sha256": "7717cc575ca111e70fa176a8da37d30450cf1cc15baaa27c3969171d136cf2db"
+        }
+      },
+      "train_source_counts": {
+        "soc-reviewed-v1": 144
+      },
+      "evidence_kind_by_split": {
+        "train": {
+          "synthetic_lab_fixture": 72,
+          "public_testbed_log": 72
+        },
+        "validation": {
+          "synthetic_lab_fixture": 12,
+          "public_testbed_log": 20
+        },
+        "test": {
+          "synthetic_lab_fixture": 16,
+          "public_testbed_log": 20
+        }
+      },
+      "exact_per_batch_historical_sample_trace_available": false,
+      "catalog_sha256": "e79cfeb58701c757e6410bdde79574d7dd68f6c18989b3f83ec16d48fcbf0e77",
+      "source_cases_sha256": "badd21dce8355a8022a90a749342ce2812134975609945c4e7110c5443654c82",
+      "authorship": "AI work agent; no independent human expert review",
+      "source": "AIT extraction plus internal synthetic scenarios"
+    },
+    {
+      "id": "data-soc-v2-r2",
+      "manifest_sha256": "ce431fd3d0dcf6987fac2500f41c9168396c5b5101a0c24ddfda275cfb4aae4f",
+      "splits": {
+        "train": {
+          "records": 192,
+          "sha256": "73e6345fd0e7fdd35c31272bcdd271528ffee52d86d9fd15af363d23bef25ac7"
+        },
+        "validation": {
+          "records": 32,
+          "sha256": "ac515b0ed1ad2e7c613512d5e32c9aa707ed68c03356e55dcb59cfcfa6320850"
+        },
+        "test": {
+          "records": 32,
+          "sha256": "4e7bf5e8f988895fcd9efb437c1c231295befdf7e0bc1d59614481974edb755d"
+        }
+      },
+      "train_source_counts": {
+        "soc-reviewed-v2": 192
+      },
+      "evidence_kind_by_split": {
+        "train": {
+          "synthetic_lab_fixture": 192
+        },
+        "validation": {
+          "synthetic_lab_fixture": 32
+        },
+        "test": {
+          "synthetic_lab_fixture": 32
+        }
+      },
+      "exact_per_batch_historical_sample_trace_available": false,
+      "catalog_sha256": "e79cfeb58701c757e6410bdde79574d7dd68f6c18989b3f83ec16d48fcbf0e77",
+      "source_cases_sha256": "b89ddbc86a40dd55743513a255f7d35e05adad701fca4468f347f3a5980fdeae",
+      "authorship": "AI work agent; no independent human expert review",
+      "source": "internal synthetic curriculum only"
+    }
+  ],
+  "runs": [
+    {
+      "path": "driver-allocation-20261028/native-01/output/run_manifest.json",
+      "manifest_sha256": "ab85a2c671b6d2b1e9eb1f548c77a09bd8a8f492f684f225dc774248b3031e17",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 1,
+      "recorded_epoch": 0.5,
+      "gradient_accumulation_steps": 1,
+      "max_length": 2048,
+      "max_train_prefixes": 2,
+      "smoke_longest_prefixes": true,
+      "tokenization": {
+        "sha256": "61e64aeaf0068c1a86607e7d15e85540fe6743b829479662decd9f81abeb9f4b",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231,
+            "selected_prefixes": 2,
+            "selection": "longest_after_full_coverage_check"
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4117,
+            "supervised_tokens": 292
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T20:33:05.526511+09:00"
+        }
+      },
+      "artifacts": {
+        "driver-allocation-20261028/native-01/output/adapter/adapter_model.safetensors": {
+          "sha256": "3e3156df05f9ad444d6eda6fc44c5ab797024a35d22e29aa65bb39632c7c2d92",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "driver-original-repro-20261028/output/run_manifest.json",
+      "manifest_sha256": "5d0082dbf49094466096fb0866aef814ae39b6710bbcd8f3ae2439e9a365e787",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 2,
+      "recorded_epoch": 1.0,
+      "gradient_accumulation_steps": 1,
+      "max_length": 2048,
+      "max_train_prefixes": 2,
+      "smoke_longest_prefixes": true,
+      "tokenization": {
+        "sha256": "4d6430eeb96aec591a9f3fc30f287c7d377021cfbae593e2b6fd9d6cc6ed955c",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231,
+            "selected_prefixes": 2,
+            "selection": "longest_after_full_coverage_check"
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4117,
+            "supervised_tokens": 292
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T22:47:10.791329+09:00"
+        }
+      },
+      "artifacts": {
+        "driver-original-repro-20261028/output/adapter/adapter_model.safetensors": {
+          "sha256": "9f051b53f1de1d7950acf836a62effe15b25a1d1a83fd5454e15256870ac900e",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/smoke/run_manifest.json",
+      "manifest_sha256": "000e0f81ee9940fb72813c7d8420a649ac48b58cbb3fcc0886e59121be9285a4",
+      "corpus": "data",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": null,
+      "recorded_global_step": 2,
+      "recorded_epoch": 0.0625,
+      "gradient_accumulation_steps": 1,
+      "max_length": 1024,
+      "max_train_prefixes": 32,
+      "smoke_longest_prefixes": false,
+      "tokenization": {
+        "sha256": "0c942b839dfd12b571a7c62beac207e4c53a742099059f1b95b1c284b36b97c0",
+        "content": {
+          "train": {
+            "read": 13,
+            "candidate_turns": 33,
+            "kept": 32,
+            "tokens": 18930,
+            "supervised_tokens": 2010,
+            "over_max_length": 1
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4480,
+            "supervised_tokens": 425
+          },
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-27T17:57:43.709595+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/smoke/adapter/adapter_model.safetensors": {
+          "sha256": "39930f9b077ce5f0e70e4665c07daebbd792490fdc89eb100a4a0ba3617305c5",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false,
+      "admitted_source_scope": "tokenization read first 13 legacy train rows, all from hermes_fc_v1.dedup.jsonl;32 prefixes accepted/2 optimizer steps. Embedded Glaive-5k subsets present in pool. Exact two consumed prefix IDs were not logged."
+    },
+    {
+      "path": "outputs/soc-main/run_manifest.json",
+      "manifest_sha256": "c59b699d70582293d4f229a2986d088032e7a69d0f49249842725d4c56e6bf98",
+      "corpus": "data-soc-v1",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 112,
+      "recorded_epoch": 1.0,
+      "gradient_accumulation_steps": 2,
+      "max_length": 1536,
+      "max_train_prefixes": 0,
+      "smoke_longest_prefixes": false,
+      "tokenization": {
+        "sha256": "0c34d6914a43766f7927704560536d8fe406c1c3d660fb94a1cbe7d233ee8af7",
+        "content": {
+          "train": {
+            "read": 144,
+            "candidate_turns": 224,
+            "kept": 224,
+            "tokens": 158865,
+            "supervised_tokens": 17061
+          },
+          "validation": {
+            "read": 32,
+            "candidate_turns": 44,
+            "kept": 44,
+            "tokens": 22581,
+            "supervised_tokens": 3660
+          },
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-27T19:43:42.703213+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-main/adapter/adapter_model.safetensors": {
+          "sha256": "fd057a0526ee98583c8c99e7529fb06bcccf559b5766b5d66c6124646a066d58",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-memory-loss/run_manifest.json",
+      "manifest_sha256": "96435eeb236a500080b7038896c1f113dcfdde13e051076c0457aa96903e2e7c",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 2,
+      "recorded_epoch": 1.0,
+      "gradient_accumulation_steps": 1,
+      "max_length": 2048,
+      "max_train_prefixes": 2,
+      "smoke_longest_prefixes": true,
+      "tokenization": {
+        "sha256": "2b6af4451e53c679c92ad3ffb66f2d6ce8fa876b5927ea7a75737fa4a9bc8c6c",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231,
+            "selected_prefixes": 2,
+            "selection": "longest_after_full_coverage_check"
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4117,
+            "supervised_tokens": 292
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T18:33:49.542405+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-memory-loss/adapter/adapter_model.safetensors": {
+          "sha256": "6d11e47463541aa6795dc2f22cab869ed911a3d1b422338485df723fe48b64e7",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-memory-smoke/run_manifest.json",
+      "manifest_sha256": "cfab79b272dce1acfb7685c013713e4f225f133c37f66e8d92147aab712d43e5",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 2,
+      "recorded_epoch": 1.0,
+      "gradient_accumulation_steps": 1,
+      "max_length": 2048,
+      "max_train_prefixes": 2,
+      "smoke_longest_prefixes": true,
+      "tokenization": {
+        "sha256": "cbd60b8e722eca306ef89896a1ee93c736d9a7187b213768352b08ba7c220bd8",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231,
+            "selected_prefixes": 2,
+            "selection": "longest_after_full_coverage_check"
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4117,
+            "supervised_tokens": 292
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T17:05:36.507307+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-memory-smoke/adapter/adapter_model.safetensors": {
+          "sha256": "3459f82235bbbe87473860c8a824c3a717b8854a561a516dd0660eefc8eaf99d",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-memory-trace/run_manifest.json",
+      "manifest_sha256": "7288eadcf82449d7ee4b84ceee8506251cc465d9e5362bee01f1388e6ca6e039",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 2,
+      "recorded_epoch": 1.0,
+      "gradient_accumulation_steps": 1,
+      "max_length": 2048,
+      "max_train_prefixes": 2,
+      "smoke_longest_prefixes": true,
+      "tokenization": {
+        "sha256": "531c4d2967420980e677a841cbddbe539f2d275293dea6ba57904c8fa8ed5884",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231,
+            "selected_prefixes": 2,
+            "selection": "longest_after_full_coverage_check"
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4117,
+            "supervised_tokens": 292
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T18:11:21.245266+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-memory-trace/adapter/adapter_model.safetensors": {
+          "sha256": "7389b28498d4bc20025032c47aed53626e6c7535c21e7cf53224f6deb3d35068",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-memory-vmm/run_manifest.json",
+      "manifest_sha256": "cf0e1fd65acb410bc918985c21a321d6f0a0f43f188f9e093e4af81d2cdc8908",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 2,
+      "recorded_epoch": 1.0,
+      "gradient_accumulation_steps": 1,
+      "max_length": 2048,
+      "max_train_prefixes": 2,
+      "smoke_longest_prefixes": true,
+      "tokenization": {
+        "sha256": "dbf8cd679be5948db477e27b23e8b57c1c0c3d86818c17d7414341a3fe529b39",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231,
+            "selected_prefixes": 2,
+            "selection": "longest_after_full_coverage_check"
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4117,
+            "supervised_tokens": 292
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T17:58:35.049017+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-memory-vmm/adapter/adapter_model.safetensors": {
+          "sha256": "9efdb7dae70c6ab7c8f0849a399d78972e2a898668194e34e3ab533dbc7d1cc5",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-pilot/run_manifest.json",
+      "manifest_sha256": "4123dae50843ad3a33ea7d2ae38bbe6f57542bed68d8b2efbce48544144a05c5",
+      "corpus": "data-soc-v1",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 8,
+      "recorded_epoch": 0.07142857142857142,
+      "gradient_accumulation_steps": 2,
+      "max_length": 1536,
+      "max_train_prefixes": 0,
+      "smoke_longest_prefixes": false,
+      "tokenization": {
+        "sha256": "35657e73895a54f221c7c0884ea8713f1858c8e56580d96f33ebfbdac75cff3f",
+        "content": {
+          "train": {
+            "read": 144,
+            "candidate_turns": 224,
+            "kept": 224,
+            "tokens": 158865,
+            "supervised_tokens": 17061
+          },
+          "validation": {
+            "read": 32,
+            "candidate_turns": 44,
+            "kept": 44,
+            "tokens": 22581,
+            "supervised_tokens": 3660
+          },
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-27T19:33:19.074436+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-pilot/adapter/adapter_model.safetensors": {
+          "sha256": "7df320788edc65718e79c65702686566cc0e4bb2c88eb2bd8e7d83474d96f6bf",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-smoke/run_manifest.json",
+      "manifest_sha256": "681fc061cb43a1673cac5bf00817dc125c76bfdd938112cc33dafc0104678ac6",
+      "corpus": "data-soc-v1",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 2,
+      "recorded_epoch": 0.0625,
+      "gradient_accumulation_steps": 1,
+      "max_length": 1536,
+      "max_train_prefixes": 32,
+      "smoke_longest_prefixes": false,
+      "tokenization": {
+        "sha256": "d7cc840f8d7e881ecb1fb90dacbaa3284e0366bb611b81d7856e65e78d242d6b",
+        "content": {
+          "train": {
+            "read": 14,
+            "candidate_turns": 32,
+            "kept": 32,
+            "tokens": 30068,
+            "supervised_tokens": 2033
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 5126,
+            "supervised_tokens": 458
+          },
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-27T19:30:46.526729+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-smoke/adapter/adapter_model.safetensors": {
+          "sha256": "71fac90130ba33c38f638f07233f5b7408f4f035c37eb9ea212992e50a168ea4",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-v2-pilot/run_manifest.json",
+      "manifest_sha256": "e941048084b8a309c74e37d495803e7523c4fbb1f59a8785c34a41105981b40a",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 48,
+      "recorded_epoch": 0.24615384615384617,
+      "gradient_accumulation_steps": 2,
+      "max_length": 2048,
+      "max_train_prefixes": 0,
+      "smoke_longest_prefixes": false,
+      "tokenization": {
+        "sha256": "1247f4bb3406aaff3433fc145659d451eb1f6999ed320ef0bb0177ab653f4e25",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231
+          },
+          "validation": {
+            "read": 32,
+            "candidate_turns": 65,
+            "kept": 65,
+            "tokens": 53020,
+            "supervised_tokens": 4077
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T11:05:17.083470+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-v2-pilot/adapter/adapter_model.safetensors": {
+          "sha256": "2b748f1796fe59399338bdd2faeb5bb0bca0f68071ff25e307862ab2124f90d4",
+          "bytes": 65061752
+        },
+        "outputs/soc-v2-pilot/checkpoint-24/adapter_model.safetensors": {
+          "sha256": "d687ff56950ce4a0299fa9f718f0346e56e772791ef61fb6a4ea687f7f6ac7d6",
+          "bytes": 65061752
+        },
+        "outputs/soc-v2-pilot/checkpoint-48/adapter_model.safetensors": {
+          "sha256": "2b748f1796fe59399338bdd2faeb5bb0bca0f68071ff25e307862ab2124f90d4",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {
+        "outputs/soc-v2-pilot/checkpoint-24/trainer_state.json": {
+          "global_step": 24,
+          "epoch": 0.12307692307692308,
+          "max_steps": 48
+        },
+        "outputs/soc-v2-pilot/checkpoint-48/trainer_state.json": {
+          "global_step": 48,
+          "epoch": 0.24615384615384617,
+          "max_steps": 48
+        }
+      },
+      "historical_batch_indices_saved": false
+    },
+    {
+      "path": "outputs/soc-v2-smoke/run_manifest.json",
+      "manifest_sha256": "7978eec4e7297c985164c56348954d92bf66e32e7ffa6b82b35900e1c2b718bb",
+      "corpus": "data-soc-v2-r2",
+      "base_config_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "base_revision_resolved_recorded": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+      "recorded_global_step": 2,
+      "recorded_epoch": 1.0,
+      "gradient_accumulation_steps": 1,
+      "max_length": 2048,
+      "max_train_prefixes": 2,
+      "smoke_longest_prefixes": true,
+      "tokenization": {
+        "sha256": "00fa1de0ee746cd5a3f2ead073bbf693f2d4404ac9dafbe3813d71c785c023fd",
+        "content": {
+          "train": {
+            "read": 192,
+            "candidate_turns": 390,
+            "kept": 390,
+            "tokens": 314119,
+            "supervised_tokens": 24231,
+            "selected_prefixes": 2,
+            "selection": "longest_after_full_coverage_check"
+          },
+          "validation": {
+            "read": 4,
+            "candidate_turns": 8,
+            "kept": 8,
+            "tokens": 4117,
+            "supervised_tokens": 292
+          },
+          "max_length": 2048,
+          "require_all_prefixes": true,
+          "loss": "each_assistant_turn_as_completion",
+          "truncation": "disabled; overlength prefixes rejected",
+          "checked_at_kst": "2026-10-28T11:01:54.726802+09:00"
+        }
+      },
+      "artifacts": {
+        "outputs/soc-v2-smoke/adapter/adapter_model.safetensors": {
+          "sha256": "59c34728458e9c0de02fb5406a3b0a3f86033eecb5bb4fbcc08e55639ea6bb20",
+          "bytes": 65061752
+        }
+      },
+      "checkpoint_states": {},
+      "historical_batch_indices_saved": false
+    }
+  ],
+  "legacy_prepared_inputs": [
+    {
+      "processed_file": "processed/attacklm.permissive.jsonl",
+      "source_url": "https://github.com/Veedubin/attacklm-dataset",
+      "processed_sha256": "0b24ea4924c2cf2b14b2f30714a008ab02ca46d6d63dea00428eb57fcd422e2d",
+      "prepared_split_rows": {
+        "test": 236,
+        "train": 4496,
+        "validation": 268
+      },
+      "upstream_revision_at_original_acquisition": "not recorded; current web revision must not be substituted",
+      "rights_status": "record-specific declarations; upstream terms must be retained"
+    },
+    {
+      "processed_file": "processed/glaive_fc_v2.hermes.jsonl",
+      "source_url": "https://huggingface.co/datasets/glaiveai/glaive-function-calling-v2",
+      "processed_sha256": "7230d0f1c4ea2b3336cad8622e8b917bc0575ac5a811f1a1e0f212fdcd8b3fc0",
+      "prepared_split_rows": {
+        "test": 184,
+        "train": 4597,
+        "validation": 219
+      },
+      "upstream_revision_at_original_acquisition": "not recorded; current web revision must not be substituted",
+      "rights_status": "dataset card Apache-2.0; redistribution/source conditions retained"
+    },
+    {
+      "processed_file": "processed/hermes_agent_traces.jsonl",
+      "source_url": "https://huggingface.co/datasets/DJLougen/hermes-agent-traces-filtered",
+      "processed_sha256": "e604ad86c316261a96736de22d8b546e908219163f5767dad82301562943bde2",
+      "prepared_split_rows": {
+        "test": 56,
+        "train": 639,
+        "validation": 89
+      },
+      "upstream_revision_at_original_acquisition": "not recorded; current web revision must not be substituted",
+      "rights_status": "dataset card Apache-2.0; redistribution/source conditions retained"
+    },
+    {
+      "processed_file": "processed/hermes_fc_v1.dedup.jsonl",
+      "source_url": "https://huggingface.co/datasets/NousResearch/hermes-function-calling-v1",
+      "processed_sha256": "85ff6b92b3ca6bd4af6e41411f6a9838f16638fb851eadf7b05d74da5873f1ce",
+      "prepared_split_rows": {
+        "test": 210,
+        "train": 4612,
+        "validation": 178
+      },
+      "upstream_revision_at_original_acquisition": "not recorded; current web revision must not be substituted",
+      "rights_status": "dataset card Apache-2.0; redistribution/source conditions retained"
+    },
+    {
+      "processed_file": "processed/sevenllm_en.jsonl",
+      "source_url": "https://huggingface.co/datasets/Multilingual-Multimodal-NLP/SEVENLLM-Dataset",
+      "processed_sha256": "210eab56a3f42e554e75c2e6b5724f271a19fe121c6a6845867b50ba1666a343",
+      "prepared_split_rows": {
+        "test": 246,
+        "train": 4528,
+        "validation": 226
+      },
+      "upstream_revision_at_original_acquisition": "not recorded; current web revision must not be substituted",
+      "rights_status": "dataset card Apache-2.0; redistribution/source conditions retained"
+    }
+  ],
+  "attacklm_prepared_upstream_attribution": [
+    {
+      "source": "OpenAssistant",
+      "source_uri": "https://huggingface.co/datasets/OpenAssistant/oasst1",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://www.apache.org/licenses/LICENSE-2.0",
+      "prepared_all_splits_rows": 2,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "SlimPajama",
+      "source_uri": "https://huggingface.co/datasets/cerebras/SlimPajama-627B",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://www.apache.org/licenses/LICENSE-2.0",
+      "prepared_all_splits_rows": 1,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "atomic-red-team",
+      "source_uri": "https://github.com/redcanaryco/atomic-red-team",
+      "declared_license": "MIT",
+      "license_uri": "https://opensource.org/licenses/MIT",
+      "prepared_all_splits_rows": 229,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "attacklm-synthetic",
+      "source_uri": "https://github.com/Veedubin/AttackLM",
+      "declared_license": "MIT",
+      "license_uri": "https://opensource.org/licenses/MIT",
+      "prepared_all_splits_rows": 94,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "metasploit-framework",
+      "source_uri": "https://github.com/rapid7/metasploit-framework",
+      "declared_license": "BSD-3-Clause",
+      "license_uri": "https://opensource.org/licenses/BSD-3-Clause",
+      "prepared_all_splits_rows": 3005,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "mitre-atlas",
+      "source_uri": "https://github.com/mitre-atlas/atlas-data",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://www.apache.org/licenses/LICENSE-2.0",
+      "prepared_all_splits_rows": 371,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "mitre-atlas-arsenal",
+      "source_uri": "https://github.com/mitre-atlas/arsenal",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://www.apache.org/licenses/LICENSE-2.0",
+      "prepared_all_splits_rows": 5,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "mitre-stockpile",
+      "source_uri": "https://github.com/mitre/stockpile",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://www.apache.org/licenses/LICENSE-2.0",
+      "prepared_all_splits_rows": 85,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "mordor",
+      "source_uri": "https://github.com/OTRF/Security-Datasets",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://github.com/OTRF/Security-Datasets/blob/master/LICENSE",
+      "prepared_all_splits_rows": 21,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "nist-sp800-61r3",
+      "source_uri": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-61r3.pdf",
+      "declared_license": "Public-Domain",
+      "license_uri": "https://www.nist.gov/open/copyright-fair-use-and-licensing-statements-srd-data-software-and-technical-series-publications",
+      "prepared_all_splits_rows": 36,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "nvidia-garak",
+      "source_uri": "https://github.com/NVIDIA/garak",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://www.apache.org/licenses/LICENSE-2.0",
+      "prepared_all_splits_rows": 12,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "promptfoo",
+      "source_uri": "https://github.com/promptfoo/promptfoo",
+      "declared_license": "MIT",
+      "license_uri": "https://opensource.org/licenses/MIT",
+      "prepared_all_splits_rows": 7,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "promptmap",
+      "source_uri": "https://github.com/utkusen/promptmap",
+      "declared_license": "MIT",
+      "license_uri": "https://opensource.org/licenses/MIT",
+      "prepared_all_splits_rows": 3,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "sigma-hq",
+      "source_uri": "https://github.com/SigmaHQ/sigma",
+      "declared_license": "DRL-1.1",
+      "license_uri": "https://github.com/SigmaHQ/sigma/blob/master/LICENSE",
+      "prepared_all_splits_rows": 673,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "splunk-content",
+      "source_uri": "https://github.com/splunk/security_content",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://github.com/splunk/security_content/blob/main/LICENSE",
+      "prepared_all_splits_rows": 450,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "the-stack-v2-permissive",
+      "source_uri": "https://huggingface.co/datasets/bigcode/the-stack-v2-0.3",
+      "declared_license": "Apache-2.0 AND MIT AND BSD-3-Clause",
+      "license_uri": "https://huggingface.co/datasets/bigcode/the-stack-v2-0.3",
+      "prepared_all_splits_rows": 1,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    },
+    {
+      "source": "threathunter-playbook",
+      "source_uri": "https://github.com/OTRF/ThreatHunter-Playbook",
+      "declared_license": "Apache-2.0",
+      "license_uri": "https://github.com/OTRF/ThreatHunter-Playbook/blob/master/LICENSE",
+      "prepared_all_splits_rows": 5,
+      "observed_training_use": "not admitted to retained initial smoke; not present in v1/R2 training corpus"
+    }
+  ],
+  "verification": {
+    "split_hash_matches_local_manifest_and_server": 9,
+    "bound_run_manifests": 12,
+    "ait_extracted_rows_verified_against_processed_and_raw_zip": 112,
+    "ait_train_rows": 72,
+    "ait_validation_rows": 20,
+    "ait_test_rows": 20,
+    "r2_source_exact_replay": true,
+    "r2_source_generator_sha256": "6d1663a8e58977ffd1c6902fe9223c057d23160757d084684a720cdd8ecff179",
+    "generator_last_commit": "574470e832d17c57035a97b99f4afbe02c3b7a2e"
+  },
+  "not_trained_or_separate_use": {
+    "qwen3_30b": "configuration/preparation only; no retained completed 30B training run",
+    "ToolACE_APIGen_PRIMUS": "not in the retained past train corpora; candidates for next experiment",
+    "AIT_wheeler_wilson": "validation/test only in v1; not train",
+    "v2_drafts": "no corresponding hash in retained completed manifests; do not attribute to R2",
+    "Foundation_Sec": "separate pretrained comparison model; not mixed into Qwen weights",
+    "evaluations": "legacy exclusions and previously used quality test remain outside training"
+  },
+  "limitations": [
+    "Historical sampler batch indices were not saved; do not claim exact per-step record IDs.",
+    "Upstream acquisition revisions absent for several old public sources; content SHA is retained but retrieval-time commits must not be invented.",
+    "V1 synthetic metadata says operator-authored/independently checked; records were AI-agent-authored/reviewed, not user-authored or independently human-expert reviewed.",
+    "Prepared conversation counts, admitted token prefixes, and optimizer updates are distinct. R2 192 conversations/390 prefixes is the pool;48-step accum2 records epoch0.246153846, not one full epoch.",
+    "First smoke base_revision_resolved is null; config pins the revision but that field is not retroactively populated.",
+    "No past run used every newly surveyed dataset; citation of a candidate does not establish training use."
+  ]
+}

@@ -1,5 +1,41 @@
 # 데이터 출처와 사용 범위
 
+## 2026-10-29 과거 학습의 출처·실제 투입 이력
+
+논문용 출처는 [기계 판독 이력표](TRAINING_PROVENANCE.json), [BibTeX](references.bib), [재검증기](audit_training_provenance.py)에 연결한다. 2026-10-29 Thor에서 읽은12개 완료 실행의 manifest/토큰 통계/Trainer 상태·어댑터 해시와 로컬 원본을 대조했다. 공개/기관 원천을 가공한 자료와 자체 합성 대화, 준비만 한 후보, 평가 자료를 구분한다. **아래 정정은 과거의 “공개 혼합 자료는 준비만 했다”는 포괄적 표현보다 우선한다.**
+
+| 실제 실행 | 학습 원천과 인용 | 준비 풀/선택 범위 | 확인된 학습 |
+|---|---|---|---|
+| 10/27 초기35B smoke | [Nous Hermes FC v1](https://huggingface.co/datasets/NousResearch/hermes-function-calling-v1). 해당 준비 풀에 `glaive-function-calling-5k.json` 재포함 원천도 있음 | 일반 혼합 train18,872행 중 앞13행을 읽어32 prefix 허용. 앞13행은 전부 Nous 처리 파일에서 유래 | 2 optimizer steps, accumulation1.18,872행 전체나5개 원천 전부를 학습한 것이 아니다. 실제2개 prefix의 개별 ID/순서는 당시 미기록 |
+| 10/27 v1 smoke/pilot/main | 자체 합성 대화 + [AIT 기관 원본](https://zenodo.org/records/8263181), `ait_ads_2023`와`landauer2024ait_ads` 함께 인용 | train144대화=자체합성72+AIT 추출72,224prefix. validation32=합성12+AIT20,test36=합성16+AIT20 | smoke32prefix풀/2step,pilot8step,본학습112step/기록epoch1. 서로 독립 실행이며 본학습을smoke어댑터의 연속학습으로 표시하지 않는다 |
+| 10/28 R2 smoke/pilot | 자체 생성한 합성 SOC curriculum, 생성기·MCP 계약/소스SHA를 인용. 외부 기관 정답이라고 표기하지 않는다 | train192대화/390prefix,validation32/65,test32/65.전부합성 | 최장2prefix smoke2step, 별도pilot48step/accum2/기록epoch0.246153846.24/48체크포인트는 같은pilot의 중간/최종이며 서로 다른 전체학습으로 합산하지 않는다 |
+| 10/28 메모리·드라이버 진단 | R2와 **동일한 데이터 해시**. 새 외부 학습자료가 아니다 | R2 train의 최장2prefix,eval8prefix | native/VMM/trace/선택loss/원본재현2step·native 별도1step. 품질 학습 완료/신규 사례 수로 중복 계상하지 않는다 |
+
+첫 학습 적재 실패·작은 무작위 모델 호환성 fixture는 완료한35B 학습 자료로 합산하지 않는다. 실패 기록은 로컬에 보존하며 폐기된fixture를 실제SOC학습 원천으로 인용하지 않는다. 30B 설정은 준비된 후보였고 실제 위 실행의 기반은 고정35B다. 기반 모델은 `qwen36_35b_base`, revision `995ad96eacd98c81ed38be0c5b274b04031597b0`를 사용한다. 초기smoke의`base_revision_resolved`필드는null였으므로 당시확인필드를사후에채웠다고표시하지않는다. 기반모델의 전체사전학습데이터는우리가확인/복원한후속학습자료와다르다.
+
+### 일반 혼합 준비 자료의 전체 원천
+
+| 처리 입력 | 준비 train/validation/test | 1차 배포처·인용키 | 과거 실제 학습 관련성 |
+|---|---:|---|---|
+| Hermes FC v1 | 4612/178/210 | [Nous Research](https://huggingface.co/datasets/NousResearch/hermes-function-calling-v1), `nous_hermes_function_calling_v1` | 위 초기smoke의허용32prefix 원천. 포함된Glaive5k는레코드의`_source_file`로구분 |
+| Glaive v2 | 4597/219/184 | [Glaive AI](https://huggingface.co/datasets/glaiveai/glaive-function-calling-v2), `glaive_function_calling_v2` | 준비됨. 초기smoke가읽은앞13행에는없고v1/R2에도미포함. Glaive5k재포함본과동일자료로표시하지않는다 |
+| 필터된 Hermes traces | 639/89/56 | [DJLougen](https://huggingface.co/datasets/DJLougen/hermes-agent-traces-filtered)와 그 [Lambda 상위 원천](https://huggingface.co/datasets/lambda/hermes-agent-reasoning-traces), `djlougen_hermes_filtered`+`lambda_hermes_traces` | 준비됨. 양쪽 출처를 인용하며 실제실행결과라는제작자설명을우리실관제기록으로표현하지않음 |
+| SEvenLLM 영어 | 4528/226/246 | [공식 데이터](https://huggingface.co/datasets/Multilingual-Multimodal-NLP/SEVENLLM-Dataset), [논문](https://arxiv.org/abs/2405.03446v2), `sevenllm_dataset`+`ji2024sevenllm` | 준비됨. `train.jsonl` 원천과학습제외한`test.jsonl`을분리. 이번인용은arXiv v2이며확인안한학회명을만들지않는다 |
+| AttackLM 선별 | 4496/268/236 | [집계 저장소](https://github.com/Veedubin/attacklm-dataset), `attacklm_dataset` 및개별upstream키 | 준비됨. 집계자만인용하지않고원천17종URI/선언라이선스/수량을JSON에보존. DRL-1.1등을동일한permissive조건으로표현하지않음 |
+
+이표의분할수는manifest의고정기록이며아래기계판독이력표와재검사한다. 공개카드Apache-2.0은기록하되원천별권리/고지/재배포조건을생략하지않는다. 과거취득당시commit/revision을남기지않은공개원천은미기록으로표시하고,현재웹main을당시버전으로대체하지않는다. 내용SHA와가공후파일SHA는보존되어있다. 실제학습에없는원천을‘학습에사용’이라고논문본문에쓰지않는다.
+
+### 가공·정답·검수의 근거
+
+- 일반 혼합: `datasets/prep.py` → `datasets/processed/` → `finetuning/prepare_data.py` → 고정`data/manifest.json`. ShareGPT/텍스트호출을구조화하고형식·스키마·호출순서·중복·길이·소스상한을검사한다. 명시think/SEvenLLM thought는제외했다. 이것은보안정답의전문가전수검증과다르다.
+- v1 AIT: 공식zip → 환경별가공파일SHA → 원천행번호/개행포함행SHA → fact추출대화 → 분할SHA → run manifest → 어댑터SHA. 이번에train72/validation20/test20총112개 모두가공파일과공식zip내경보객체까지일치했다. 추가필드`ait_env`/`phase_window`를제거하고동일객체를대조했다. 시각변환·rule.id/level/phase 추출이목표이며단계창을개별악성정답으로바꾸지않는다. six train/wheeler validation/wilson test 환경분리를유지한다.
+- v1 합성·R2: AI작업에이전트가작성/검수했다. v1과거메타데이터의`Operator-authored`/`independently checked`는사용자작성또는독립사람검수를뜻하는것이아니다. 원문은보존하고이해석정정을적용한다. 실제서버관측·기관인증·전문가정답이라고부르지않는다. R2는현재추적생성기로원천256대화를재생성해소스SHA `b89ddbc86a40dd55743513a255f7d35e05adad701fca4468f347f3a5980fdeae`와바이트일치했다.
+- 3개corpus×3split=9개로컬manifest/서버파일SHA와12개실행의데이터해시가모두연결됐다. 과거batch별sampler인덱스를기록하지않아개별step의행ID는완전복원했다고주장하지않는다. 새로운실험은원천ID/행SHA/정규화ID/분할·prefix매핑과샘플사용기록을보강해야한다.
+- 평가 자료와후보는분리한다. ToolACE/APIGen/PRIMUS는위과거학습에없다. 외부benchmark·AIT holdout·기존test·직전20개품질문항을다음train으로편입하지않는다. Cisco Foundation-Sec은별도사전학습모델비교이며Qwen LoRA 원천이아니다.
+
+재검사: `python3 -B finetuning/audit_training_provenance.py --run-inventory LOCAL_THOR_INVENTORY.json --output NEW_AUDIT.json`. 무결성/출처연결검사이며정확도인증이아니다. 원문·실행원장·행별증거는로컬/Thor에보존하고공개Git에는요약JSON/인용/검사코드를넣는다. BibTeX는논문서식에맞춰사용하되확인안한저자/발행연도/학회명을채우지않는다.
+
+
 ## 2026-10-29 학회·기관 근거 확인과 추가 자료 우선순위
 
 사용자는 추가 학습량보다 출처와 검증 근거를 요구했다. 아래는 **학회 정식 게재 또는 기관 공식 발행을 직접 확인한 자료**다. 논문 게재는 방법과 실험의 학술적 근거이며, 모든 데이터 행의 무오류·우리 SOC 성능·기관의 프로젝트 인증을 뜻하지 않는다. 연구용 합성 데이터도 생성·검증 과정이 명확하면 활용할 수 있으나 실제 침해 사건의 전문가 판정과 구분한다. 과거 후보 목록 전체가 이 기준을 통과했다는 뜻은 아니다.

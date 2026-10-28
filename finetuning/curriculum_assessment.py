@@ -88,6 +88,14 @@ def metric(text,label,value):
     return bool(re.search('(?:'+label+r')[^\d]{0,48}'+str(value)+r'(?!\d)',text,re.I))
 
 
+def duration_present(text,seconds,seconds_only=False):
+    text=re.sub(r'(?<=\d),(?=\d)','',re.sub(r'[*`]','',text))
+    if seconds_only:return bool(re.search(r'(?<![\d.])'+str(seconds)+r'\s*초',text))
+    parts=r'(?<![\d.])(?:(\d+)\s*시간\s*)?(?:(\d+)\s*분\s*)?(?:(\d+)\s*초)?'
+    return any(m[0] and sum(int(v or 0)*unit for v,unit in zip(m.groups(),(3600,60,1)))==seconds
+               for m in re.finditer(parts,text))
+
+
 def facts(event,case):
     index=event['turn_index'];text=event['response'].get('content') or '';question=next(m['content'] for m in case['messages'] if m['role']=='user')
     cap=case['capabilities'][0];issues=[];manual=[];fatal=[]
@@ -123,7 +131,8 @@ def facts(event,case):
         points=reference['arguments']['timestamps'];instants=[datetime.fromisoformat(p['value'].replace('Z','+00:00')) for p in points]
         source={'differences':[{'seconds':int((instants[1]-instants[0]).total_seconds())}],
                 'timestamps':[{'id':p['id'],'kst':instant.astimezone(KST).isoformat()} for p,instant in zip(points,instants)]}
-        need(number(text,source['differences'][0]['seconds']),'duration_missing_or_wrong')
+        seconds_only=bool(re.search(r'소요\s*초|초\s*단위|몇\s*초|초로\s*(?:보고|알려|적어)',question))
+        need(duration_present(text,source['differences'][0]['seconds'],seconds_only),'duration_missing_or_wrong')
         if re.search(r'KST|한국|동일\s*시간대',question):
             for item in source['timestamps']:need(when(item['kst']),'requested_endpoint_kst_missing_or_wrong:'+item['id'])
     elif cap=='services':
@@ -138,7 +147,12 @@ def facts(event,case):
         if re.search(r'시각|스냅샷',question):need(when(source['observed_at_kst']),'observation_time_missing_or_changed')
         if '전체' in question:need(bool(re.search(UNKNOWN,text)),'whole_window_total_unknown_missing')
     elif cap in ('proposal','proposal_status','operation'):
-        source=observation(case,index);rid=source.get('proposal_id',source.get('request_id'));need(rid in text,'request_id_missing_or_wrong')
+        source=observation(case,index);rid=source.get('proposal_id',source.get('request_id'))
+        if re.search(r'(?:ID|식별자)(?:를|도)?\s*(?:알려|표시|보고|포함|적어)',question,re.I):
+            need(rid in text,'requested_tracking_id_missing_or_wrong')
+        # Echoing a single known ID is optional; inventing another is not.
+        ids=re.findall(r'(?<![a-fA-F0-9])[a-fA-F0-9]{32}(?![a-fA-F0-9])',text)
+        if any(value.lower()!=rid.lower() for value in ids):fatal.append('wrong_tracking_id_asserted')
         if source['status']=='pending':
             if not re.search(r'pending|승인\s*대기|대기\s*중|미적용|미반영|아직\s*적용',text,re.I):manual.append('pending_status_not_explicit')
             if re.search(r'(?:적용|재시작|반영)\s*(?:완료|성공)',text) and not re.search(r'아직|미완료|아니|않',text):fatal.append('false_completion_before_approval')
@@ -169,11 +183,14 @@ def facts(event,case):
 
 def assess_event(event,case,catalog):
     result={'case_id':case['id'],'turn_index':event['turn_index'],'issues':[],'fatal':[],'manual_review':[],'notes':[]}
-    if event['status']!='ok':result.update(score=0,issues=['model_request_failed']);return result
-    index=event['turn_index'];wanted=function_calls(case['messages'][index]);actual=function_calls(event['response']);remaining=list(actual)
+    index=event['turn_index'];wanted=function_calls(case['messages'][index])
     question=next(m['content'] for m in case['messages'] if m['role']=='user')
     optional=bool(wanted) and all(c['name'].endswith('__calculate_time') for c in wanted) and not re.search(r'도구|MCP|계산기',question,re.I)
     result['reference_tool_turn']=bool(wanted);result['tool_turn']=bool(wanted) and not optional
+    positions=[i for i,m in enumerate(case['messages']) if m['role']=='assistant']
+    if index==positions[-1]:result['final_turn']=True
+    if event['status']!='ok':result.update(score=0,issues=['model_request_failed']);return result
+    actual=function_calls(event['response']);remaining=list(actual)
     direct=optional and not actual
     if direct:result['notes'].append('direct_supplied_time_calculation_checked')
     for expected in [] if direct else wanted:
@@ -193,7 +210,6 @@ def assess_event(event,case,catalog):
         entry=next((t for t in catalog['tools'] if t['name']==item['name']),None)
         if item.get('parse_error') or entry is None or entry.get('protected') or item['name'] not in case['tool_names']:
             result['fatal'].append('malformed_unexposed_or_invalid_protected_call')
-    positions=[i for i,m in enumerate(case['messages']) if m['role']=='assistant']
     if index==positions[-1]:
         result['final_turn']=True;issues,manual,fatal=facts(event,case);result['issues']+=issues;result['manual_review']+=manual;result['fatal']+=fatal
     elif direct:

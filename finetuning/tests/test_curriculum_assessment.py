@@ -5,7 +5,7 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from curriculum_assessment import assess_event
+from curriculum_assessment import assess_event,assess,duration_present
 from soc_curriculum import make_case
 
 CATALOG=json.loads((Path(__file__).resolve().parents[1]/'mcp_contract.json').read_text())
@@ -74,6 +74,38 @@ class AssessmentTests(unittest.TestCase):
     def test_swapped_sca_counts_do_not_pass_by_having_both_numbers(self):
         case=make_case('sca','validation',1);answer={'role':'assistant','content':'통과 2건, 실패 14건입니다.'}
         self.assertIn('sca_counts_missing_or_wrong',assess_event(event(case,4,answer),case,CATALOG)['issues'])
+
+    def test_equivalent_duration_units_follow_requested_precision(self):
+        case=make_case('elapsed','validation',1)
+        good=event(case,4,{'role':'assistant','content':'실제로 흐른 시간은 **19분 19초**입니다.'})
+        self.assertEqual(assess_event(good,case,CATALOG)['issues'],[])
+        good['response']['content']='19분 18초'
+        self.assertIn('duration_missing_or_wrong',assess_event(good,case,CATALOG)['issues'])
+        self.assertTrue(duration_present('소요: 1시간 2분 3초',3723))
+        self.assertFalse(duration_present('소요: 19분 19초',1159,seconds_only=True))
+        self.assertFalse(duration_present('시각 11:59, 요청번호 1159',1159))
+
+    def test_optional_tracking_id_echo_is_not_a_missing_fact(self):
+        case=make_case('proposal','validation',0)
+        good=event(case,6,{'role':'assistant','content':'주석 삽입안을 준비했으며 관리자 승인 대기 중입니다.'})
+        self.assertEqual(assess_event(good,case,CATALOG)['issues'],[])
+        good['response']['content']+=' 파일 SHA-256: '+('a'*64)
+        self.assertEqual(assess_event(good,case,CATALOG)['fatal'],[])
+        good['response']['content']+=' 제안 ID: '+('b'*32)
+        self.assertIn('wrong_tracking_id_asserted',assess_event(good,case,CATALOG)['fatal'])
+
+    def test_explicitly_requested_tracking_id_is_still_required(self):
+        case=make_case('proposal','validation',0);case['messages'][1]['content']+=' 제안 ID도 알려줘'
+        answer=event(case,6,{'role':'assistant','content':'승인 대기 중입니다.'})
+        self.assertIn('requested_tracking_id_missing_or_wrong',assess_event(answer,case,CATALOG)['issues'])
+
+    def test_http_failures_stay_in_required_component_denominators(self):
+        case=make_case('processes','validation',0)
+        events=[{'status':'failed','case_id':case['id'],'turn_index':ix} for ix in (2,4,6)]
+        summary=assess({'model':'test','results':events},[case],CATALOG)['summary']
+        self.assertEqual(summary['turns'],3);self.assertEqual(summary['required_tool_turns'],2)
+        self.assertEqual(summary['final_turns'],1);self.assertEqual(summary['valid_required_tool_turns'],0)
+        self.assertEqual(summary['bounded_turn_score'],0)
 
 
 if __name__=='__main__':unittest.main()

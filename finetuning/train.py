@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 import model_profile
 import memory_budget
+import memory_telemetry
 from bounded_loading import checkpoint_loading
 
 
@@ -305,14 +306,20 @@ def run_training(config, checks, hardware):
     model_profile.check_training_capacity(config, hardware)
     write_json(output / 'progress.json', {'status':'loading_model', 'at_kst':kst_now()})
     torch.cuda.reset_peak_memory_stats()
+    memory_telemetry.record(output,torch.cuda,phase='loading_model')
     dtype = torch.bfloat16 if hardware["bf16_supported"] else torch.float16
     quantized = config.get("quantization", "nf4") == "nf4"
     model_args = model_profile.loading_kwargs(config)
     if quantized:
         model_args['quantization_config'] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
-    with checkpoint_loading(config):
-        model = model_profile.model_class(config).from_pretrained(config["model_name_or_path"], **load_args, dtype=dtype,
-            **model_args, device_map={"": 0}, attn_implementation="sdpa")
+    try:
+        with checkpoint_loading(config):
+            model = model_profile.model_class(config).from_pretrained(config["model_name_or_path"], **load_args, dtype=dtype,
+                **model_args, device_map={"": 0}, attn_implementation="sdpa")
+    except Exception as exc:
+        memory_telemetry.record(output,torch.cuda,phase='loading_failed',error_type=type(exc).__name__)
+        raise
+    memory_telemetry.record(output,torch.cuda,phase='model_loaded')
     write_json(output / 'loading_memory.json', {'at_kst':kst_now(),
         'cuda_allocated_bytes':torch.cuda.memory_allocated(), 'cuda_reserved_bytes':torch.cuda.memory_reserved(),
         'peak_cuda_allocated_bytes':torch.cuda.max_memory_allocated(),
@@ -369,6 +376,7 @@ def run_training(config, checks, hardware):
                 'estimated_remaining_seconds':round(elapsed / state.global_step * (state.max_steps-state.global_step), 1) if state.global_step else None,
                 'peak_cuda_allocated_gib':round(torch.cuda.max_memory_allocated()/2**30, 2),
                 'peak_cuda_reserved_gib':round(torch.cuda.max_memory_reserved()/2**30, 2),
+                'memory':memory_telemetry.record(output,torch.cuda,phase=status,step=state.global_step),
                 'metrics':self.metrics})
 
         def on_step_end(self, args, state, control, **kwargs): self.record(state, 'training')
@@ -384,7 +392,11 @@ def run_training(config, checks, hardware):
     progress = Progress()
     trainer = Trainer(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator,
                       processing_class=tokenizer, callbacks=[progress])
-    result = trainer.train()
+    try:
+        result = trainer.train()
+    except Exception as exc:
+        memory_telemetry.record(output,torch.cuda,phase='training_failed',step=trainer.state.global_step,error_type=type(exc).__name__)
+        raise
     trainer.save_model(str(output / "adapter"))
     tokenizer.save_pretrained(str(output / "adapter"))
     trainer.save_metrics("train", result.metrics)

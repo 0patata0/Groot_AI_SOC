@@ -1,5 +1,38 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 메모리 점검 후속 — 2026-10-28 KST
+
+**현재 추론은 가동 중이며, 경고의 정확한 할당 원인은 아직 확정하지 않았다.** Jetson Linux39.2.1/kernel6.8.12-1021-tegra/driver595.78에서 운영35B를 유지한 채 로그·자원만 점검했다. 새 GPU 학습이나 부하 재현은 하지 않았다.
+
+| 실제 확인 범위 | 결과 |
+|---|---|
+| 15:38 KST 전체/가용 RAM | 약122.8/85.7GiB |
+| 기존 Ollama GPU 프로세스 | 1개, 약29.6GiB로 보고됨; OS 수치와 합산하지 않음 |
+| 15:51:24~15:51:56 KST, 5회 읽기 전용 관찰 | 가용85.66~85.69GiB; oom_kill/allocstall/compaction 카운터 증가0 |
+| 오늘 NVRM 할당 경고 | 학습50건 + 비교 모델 적재2건 =52건 |
+| 실제 OOM 종료 | 10/27 16:20:43 KST 실패한 첫 학습1건; 오늘 새 종료0 |
+| 15:01:53~15:53:34 KST 커널 재조회 | 추가 NV_ERR_NO_MEMORY/Xid/OOM kill/page allocation failure0 |
+
+학습50건은 긴2prefix smoke에49건,48-step pilot에1건이다. smoke2건은 가중치 적재 중,47건은 적재 완료11:03:23 직후11:03:24~31에 발생했다. pilot1건은 적재 완료11:06:27 뒤11:06:52에 발생했다. 당시 LoRA 설정·학습 초기화·첫 연산의 세부 경계를 남기지 않아 어느 내부 라이브러리 요청인지 분리할 수 없다. 두 단계는 exit0/가중치finite이며 host 가용 최저는 각각43.87/32.52GiB였다. 추론 적재2건은14:26:38/15:01:52이고 해당 모델은42/42층 GPU 적재 후 응답했다. 이를 메모리 부족이 무해하다는 판정으로 확대하지 않는다.
+
+CMA는512MiB 중 약6.2MiB가 남아 있고 큰 연속 블록도 제한적이지만, 과거 실패 요청의 크기·주소 공간·요구 정렬·당시CMA를 기록하지 않아 CMA 부족/단편화를 원인으로 확정할 수 없다. 현재 NvMap clients가0K여도 GPU 사용0이 아니며, nvidia-smi 전체 메모리N/A도0으로 해석하지 않는다. PSI는 커널 CONFIG_PSI 비활성으로 미제공이다. VM 카운터는 부팅 이후 누적값이므로 어제 OOM1건을 오늘 장애로 합산하지 않는다.
+
+Thor의 CPU/GPU는 같은 물리 DRAM을 사용하며, OS·CUDA·NVML의 계측 범위가 다르다. [CUDA for Tegra13.0](https://docs.nvidia.com/cuda/archive/13.0.0/cuda-for-tegra-appnote/index.html#estimating-total-allocatable-device-memory-on-an-integrated-gpu-device). KReclaimable은 회수 가능한 커널 할당 추정값이며 실제 즉시 할당 성공을 보장하지 않는다. [Linux proc 문서](https://www.kernel.org/doc/html/latest/filesystems/proc.html). 설치된R39.2.1의 공식 문서에도 CUDA 서버 종료 후 캐시가 남는 알려진 이슈5661165가 있지만, 이것이 이번 경고의 확정 원인이라는 증거는 없다. [NVIDIA 릴리스 노트](https://docs.nvidia.com/jetson/archives/r39.2.1/ReleaseNotes/Jetson_Linux_Release_Notes_r39.2.1.pdf).
+
+### 다음 실행에 적용할 진단 기록
+
+`train.py`는 `memory_telemetry.py`를 통해 새 출력 폴더의 `memory_telemetry.jsonl`과 `progress.json.memory`에 다음을 기록한다.
+
+- 적재 전/후, 학습 시작·step/log·완료, Python 적재/학습 예외 시각(KST)과 단계.
+- 현재/peak CUDA 할당·예약·미사용 분할 블록, `num_alloc_retries`와 `num_ooms`, CUDA free/total 및 allocator backend.
+- host MemFree/MemAvailable/Cached/KReclaimable/CMA, 누적 VM 카운터, 관측 cgroup의 current/peak/max/events.
+- 미제공·조회 실패·기록 실패를 상태로 남긴다. 오류 전문·환경 변수·사용자 데이터는 기록하지 않는다. CUDA를 초기화하거나 캐시/누적 카운터를 비우지 않는다.
+
+PyTorch의 재시도 카운터는 실패 후 캐시 반환·재시도를, OOM 카운터는 던져진 OOM을 구분한다. 이 카운터는 해당 PyTorch allocator 범위이므로 드라이버나 다른 라이브러리 내부 오류 전체를 대표하지 않는다. [PyTorch2.8 문서](https://docs.pytorch.org/docs/2.8/generated/torch.cuda.memory.memory_stats.html).
+
+로컬/Thor **150검사 통과**, 기존 학습 이미지의 GPU 미노출 CPU 컨테이너에서도 Torch2.8 import·CUDA 미초기화·실측 host/cgroup 기록을 확인했다. 호스트에는 Torch가 없어 최초 호스트 import 검사는 실패했고, 설치를 추가하지 않고 원래 컨테이너 환경에서 정정 검증했다. 컨테이너는 종료 후 자동 제거했다. 실제 GPU 실행에서 새 기록과 경고의 상관을 검증하는 단계, 장기 누수/최대 부하/메모리 소자 검사는 미완료다. 추론 설정·driver·96GiB 시작 기준·12GiB guard·가중치·학습 설정은 유지했다. 다음 승인된 실험에서 먼저 이 기록으로 실패 요청 유형을 구분하며 이번 점검으로 새 학습을 예약하지 않는다.
+
+
 > **10/28 R2 비교 마감:** 기존 회귀의 호출13/16→16/16·필드29/36→36/36 회복. 새 질문은 원본 우위가 입증되지 않았고 누락·잘못된 대상이 남아 운영35B를 유지한다. 최종/회귀 완료·실제MCP/E2E 미실행·후속과 [세부 근거](R2_RESULTS.md)를 구분한다.
 
 > **10/28 개발 비교 완료:** 두 후보 등록·원본/control/24/48 개발 비교를 끝냈다. 필수 도구27/30이 남아 운영 모델을 유지하며,24-step 사전 선택 후 미사용 최종·기존 회귀 시험 중이다. [실제 결과·제한](R2_RESULTS.md).

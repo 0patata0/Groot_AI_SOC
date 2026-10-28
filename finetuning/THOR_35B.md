@@ -1,5 +1,36 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 드라이버 내부 실패 조건 점검 — 2026-10-28 20:53 KST
+
+**원래 `NV_ERR_NO_MEMORY`(0x51)를 반환한 정확한 분기는 아직 특정하지 못했다.** 같은 595.78 공식 소스와 실제 커널 할당 스택을 대조했다. 이번에는 복구 가능한 하위 할당 실패를 관측했지만, 원래 경고는 재현되지 않았다. 기존 메모리 최적화는 유지하며 드라이버 원인 해결 완료로 표시하지 않는다.
+
+- `mem_desc.c:1336`은 `_memdescAllocInternal`의 실패를 기록하는 공통 지점이다. 시스템 메모리 경로의 `nv_alloc_pages`에서는 할당 정보/페이지 표 생성 실패, `nv_alloc_system_pages`에서는 실제 페이지 블록 요청이 끝내 실패할 때 0x51을 반환할 수 있다. 다른 주소 공간·후속 단계도 있어 이 로그 한 줄로 어느 분기인지 정할 수 없다. `page_count`는 OS의 4KiB 페이지 수이며 요청 바이트는 `page_count*4096`이다. 큰 페이지 정책 값과 곱하면 오산이다.
+- 이번 스택의 NVIDIA 할당 경로에서 `kvmalloc_node`의 2~32MiB 연속 블록 선호 요청 실패를 관측했다. 후속 CUDA 작업은 모두 성공했다. 소스의 vmalloc 대체 경로와 부합하지만 실제 대체 함수의 반환값까지 직접 추적한 것은 아니다. 이 실패를 원래의 최종 0x51 반환으로 간주하지 않는다.
+- 실제 native 모델 1-step에서는 2MiB CPU THP 요청 실패144건과 NVIDIA/kvmalloc 경로 실패4건(2MiB1·4MiB1·8MiB2)을 관측했다. THP 스택은 `do_huge_pmd_anonymous_page`로 GPU 데이터 할당 실패와 구분한다. 실패 스택에 `nv_alloc_system_pages`가 직접 포함된 사례는 없었다. 관측 범위는 지정 PID/알려진 TID이며 서버 전체 모든 할당을 뜻하지 않는다.
+
+| 실행한 진단 | 하위 페이지 요청 실패 | 관련 커널 경고 | 결과 |
+|---|---:|---:|---|
+| CUDA64MiB/2GiB·서비스 유지 | 0 | 별도 구간 집계 없음 | 할당/해제 성공 |
+| 큰 할당+임시 작업 공간 | 8MiB2·16MiB1 | 0 | 모든 CUDA 요청 성공 |
+| 8GiB 추가 요청 보호조건 확인 | 0 | 0 | 여유2GiB 조건으로 해당 요청 생략 |
+| 허용 범위5.75GiB 작업 공간+첫 커널 실행 | 32MiB1 | 0 | 성공, 최대 동시 약74.16GiB |
+| 실제 Torch dense log-softmax 역전파 모사 | 0 | 0 | 성공, 최대72.81GiB |
+| 기존 native35B·전체loss·1-step/eval8 | THP144+기타4 | 0 | 정상 완료, 최대70.37GiB |
+
+**앞선 12→3→0은 각 단기 실행에서 관측한 수치다. 이번에는 최적화를 끈 native 경로도 첫 step까지 경고0이므로, 개선 코드가 경고를 없앤 유일한 원인이라고 단정할 수 없다.** 이번 대조는 1-step으로 이전2-step보다 짧다. 메모리 peak70.37→66.87GiB 감소와 정답/기울기 보존 검증은 유효하지만 경고의 인과 검증과 분리한다. 풀·캐시·단편화 상태의 영향은 가능성으로 남긴다.
+
+현재 커널6.8.12-1021-tegra에는 `CONFIG_KPROBES`, `CONFIG_FUNCTION_TRACER`, kernel/module BTF가 없다. 기존 tracefs의 정적 `mm_page_alloc`/CMA 이벤트·전용 인스턴스·PID/TID 제한 스택만 사용했다. 수집기의 overrun/commit-overrun/drop 및 읽기 오류0, native 원문 잘림0을 확인했고 전역 tracer/clock/동적 이벤트는 변경하지 않았다. 드라이버·커널 재빌드/교체, 전역 VM/THP/cache 변경, 임의 fault injection은 수행하지 않았다.
+
+**이전 분류 정정:** 아래 18:43 결과의 “훈련73건/복구후1건”은 잘못된 분류다. 원문74건은 모두 훈련 구간이며, 0x51 73건과 별도 상태 전환 오류0x56 1건(18:12:34.003106 KST)이다. 복구 시작은18:14:34.859 KST로 복구 후 오류가 아니다. 0x56의 원인은 미확정이며 이전 기록은 당시 이력으로 보존한다.
+
+다섯 중단 구간 합계216.20초, 가장 긴 native 구간146.53초 후20:35:23.989 KST 원래35B를 복구했다. 20:52:55 KST 서비스active·원digest 상주·관련 추가 커널 오류0·전용 타이머/작업 비활성·전용 trace 인스턴스/컨테이너 잔여0·복구 스크립트SHA불변을 재확인했다. 서버에는 root 전용 `/var/lib/capstone-driver-allocation-20261028/` 보고서와 학습 루트 `driver-allocation-20261028/native-01/`의 진단 결과를 보존한다. 새 운영 모델 등록/봇 전환·본학습·SOC 정확도/MCP/채팅·공격탐지대응E2E·새 서버 설치는 수행하지 않았다. 이번 변경은 문서이며 이전168검사/실제CPU3검사를 새 시험 결과로 중복 계산하지 않는다.
+
+원래 경고가 다시 발생하는 조건에서 실패 요청 인자와 최종 반환 분기를 함께 수집해야 원인을 확정할 수 있다. 현재 커널 기능만으로 직접 함수 인자/반환 추적이 제한되어, 추가 계측은 별도 커널/드라이버 준비와 중단 범위 검토가 필요하다. 자동 재실험은 예약하지 않았다.
+
+공식 근거: [NVIDIA Jetson39.2.1/595.78 고정 소스](https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver/-/blob/76b260e5967dfe9815b9054a4a4642f10672a763/src/nvidia/src/kernel/gpu/mem_mgr/mem_desc.c#L1336), [nv_alloc_pages/메타데이터](https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver/-/blob/76b260e5967dfe9815b9054a4a4642f10672a763/kernel-open/nvidia/nv.c#L391), [페이지 블록 실패 반환](https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver/-/blob/76b260e5967dfe9815b9054a4a4642f10672a763/kernel-open/nvidia/nv-vm.c#L990), [Linux kvmalloc fallback](https://raw.githubusercontent.com/torvalds/linux/v6.8/mm/util.c), [kprobe 구성 요건](https://docs.kernel.org/trace/kprobetrace.html).
+
+아래는 앞선 각 시점의 기록이다.
+
 ## 개선 적용 결과·현재 사용 기준 — 2026-10-28 18:43 KST
 
 **같은 고정35B/자료/LoRA와 최장2prefix·2-step/eval8에서 VMM+정답위치 projection의 경고0건을 확인했다.** 원래35B는18:36:27.146KST복구했고 중단은168.966844초다. 아래는 각각1회의짧은실행이며 캐시/단편화상태를동일하게고정한반복실험은아니다.

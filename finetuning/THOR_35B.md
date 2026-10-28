@@ -1,5 +1,16 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 두 전제 확인: GCC13.2 정합·서명 정책/정적 ABI 통과 — 2026-10-28 22:02 KST
+
+**컴파일러 불일치를 해소했고 서명 정책과 정적 심볼 호환성에서도 차단 조건을 찾지 못했다. 실제 로딩·원래0x51 재현/해결은 별도다.** [반입 검증·판정 방법](driver-diagnostics/README.md#빌드서명-정책정적-abi-확인--2026-10-28-2202-kst).
+
+- Ubuntu 공식 noble의 GCC13.2.0-23ubuntu4 arm64 6deb/46,994,004B를 작업별 Mac 임시 경로에 받고 반입했다. 기존 서버 gpgv/keyring으로 InRelease 서명(서명키 fingerprint `F6ECB3762474EDA9D21B7022871920D1991BC93C`)과 Packages.xz/각deb SHA를 검증했다. dpkg-deb로 별도 폴더에만 추출·시스템 GCC13.3 불변/apt·패키지 설치0이다. 실제 gcc/g++·cc1/cc1plus와 C/C++ 오브젝트의13.2.0을 대조했다.
+- 같은 고정소스/진단패치 전체를 CPU2·8GiB·15분·GPU/네트워크/모듈 로딩 금지·시스템 읽기 전용 조건에서 재빌드했다.22:01:06KST 종료/152.05초, compiler mismatch0·기존 소스 주소/선언 경고8건이다. 모듈22,286,208B/SHA`3f6f881f2313766ebc74eb309183a43004462188c05b9efbe0fb986c68697c0d`·595.78/vermagic일치. 이전13.3 후보도 비교 근거로 보존한다.
+- SecureBoot0/SetupMode1·sig_enforceN·CONFIG_MODULE_SIG_FORCE/LOCKDOWN_LSM 미설정이다. 현재 정책에서 unsigned 자체는 차단 요인이 아니며 정책/키/신뢰 목록을 바꾸거나 서명 검증을 해제한 결과가 아니다. 서명을 새로 부여한 것도 아니다.
+- 새 후보 입력444개 CRC 전부 일치·출력96개 이름/CRC가 원본과 동일하다. modeset1/UVM79 인터페이스 모두 일치, DRM 원본NVIDIA 직접의존0. 추가 tsecriscv의 입력79개도 모두 일치했다. 누락/불일치0·새 Module.symvers96개와 파서 결과 일치다. CRC로 표현되지 않는 실행 동작까지 보장하지 않는다.
+- Thor의 CONFIG_ASM_MODVERSIONS 가변 길이 next/crc/name/영종료 레코드와 절대 u32 CRC·PREL32 이름 참조를 실제 ELF에서 확인했다. 현재 kmod31의 import 조회 실패와 원본 export CRC0 표시는 도구의 형식 처리 한계다. 전용 읽기 전용 파서를 추가하고 원문/모든 모듈/빌드 결과에 대조했다. 개발 중 형식의 종료 표식/중복 debug 섹션·GCC libexec 경로를 수정했으며 운영 변경/ABI 결함으로 집계하지 않는다.
+- 파서5검사·전체177검사(기존host Torch3생략) 통과. 모듈 미로딩/추론·화면 중단0이며 기본35B를 유지했다. 긴학습/정확도/실제MCP·채팅/공격탐지대응E2E/새서버 전체 설치는 이번 범위가 아니다. 실제 적용은 유지보수·복구 콘솔/원복 경로 준비 후 판단한다.
+
 ## 원인 추적 공백 보완·진단 모듈 격리 빌드 — 2026-10-28 21:18 KST
 
 **커널 전체 교체 없이 실패 정보를 추가할 진단 패치를 작성하고 Thor에서 실제 `nvidia.ko` 빌드를 완료했다. 원래 0x51을 해결한 패치는 아니며 운영 적용 준비 완료로 표시하지 않는다.** [패치·검증기·운영 적용 경계](driver-diagnostics/README.md).

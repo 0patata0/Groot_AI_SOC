@@ -26,9 +26,24 @@ git -C /absolute/path/to/isolated-source apply /absolute/path/to/nvidia-595.78-a
 python3 -B check.py --source /absolute/path/to/isolated-source --expect-patched
 ```
 
-Thor에서는 기존 `gcc-13`/make/정확한 실행 커널 헤더를 사용해 `kernel-open/nvidia/nv-kernel.o_binary` 목표를 먼저 빌드하고, `kernel-open`에서 `NV_KERNEL_MODULES=nvidia`로 모듈을 만든다. `CC=gcc-13`, `SYSSRC`와 `SYSOUT`에는 헤더의 실제 경로를 지정한다. CPU2/메모리8GiB/15분 제한, 일반 사용자, 읽기 전용 시스템·작업 폴더만 쓰기, GPU 장치/네트워크/모듈 로딩 금지로 격리한다. 빌드 중 운영 Ollama를 중지하지 않는다. 실패 로그와 성공 로그는 구분해 보존한다.
+Thor에서는 [GCC13.2 반입 목록](gcc132-offline-manifest.json)의 공식 Ubuntu `13.2.0-23ubuntu4` arm64 패키지6개를 Mac의 작업 임시 폴더에 받아 반입한다. 서버에서 기존 Ubuntu archive keyring으로 `InRelease` 서명→Packages.xz SHA→각 deb SHA를 검증한 뒤 `dpkg-deb -x`로 작업 폴더에만 추출한다. 패키지 설치/다운그레이드 없이 시스템 GCC13.3을 유지한다. 도구체인의 gcc/g++·실제 cc1/cc1plus와 오브젝트 `.comment`의13.2.0을 확인한다. 검증된 컴파일러의 절대 경로를 `CC`/`CXX`에 지정한다.
+
+기존 make/실행 커널의 정확한 헤더로 `kernel-open/nvidia/nv-kernel.o_binary` 목표를 먼저 빌드하고, `kernel-open`에서 `NV_KERNEL_MODULES=nvidia`로 모듈을 만든다. `SYSSRC`/`SYSOUT`은 격리 시작 전에 확인한 헤더의 실제 경로로 고정한다. CPU2/메모리8GiB/15분 제한·일반 사용자·시스템 읽기 전용/작업 폴더만 쓰기·GPU 장치/네트워크/모듈 로딩 금지를 유지한다. 빌드 중 운영 Ollama를 중지하지 않는다. 실패 로그와 성공 로그는 구분해 보존한다.
 
 패치 역적용 검증과 체크섬·테스트는 컴파일/모듈 로딩 시험을 대신하지 않는다. 컴파일 성공·595.78/vermagic 일치도 실행 호환성이나 원래 경고 해결의 증거는 아니다.
+
+## 빌드·서명 정책·정적 ABI 확인 — 2026-10-28 22:02 KST
+
+- 실행 커널과 정확히 같은 GCC13.2 배포 버전으로 전체 재빌드했고 compiler mismatch 경고0을 확인했다. 기존 소스의 주소 비교/선언 경고8건은 남겨 별도로 기록했다. 새 모듈22,286,208B/SHA `3f6f881f2313766ebc74eb309183a43004462188c05b9efbe0fb986c68697c0d`이며 version595.78/vermagic이 일치한다.
+- `SecureBoot=0`, `SetupMode=1`, `sig_enforce=N`, CONFIG_MODULE_SIG_FORCE/LOCKDOWN_LSM 미설정이다. 현재 정책에서는 미서명 자체가 로딩 차단 조건이 아니다. 후보는 unsigned 상태이며 서명 키/신뢰 목록/검증 정책은 변경하지 않았다. 정책 허용과 실제 안전한 운영 적용은 구분한다.
+- 후보 입력444개가 설치된 커널/모듈의 CRC와 모두 일치한다. 출력96개 이름/CRC는 운영 원본과 전부 같다. modeset1/UVM79개의 원본 NVIDIA 의존 인터페이스가 그대로 맞고, DRM의 원본 NVIDIA 직접 의존은0개다. 추가 `tsecriscv` 모듈 자체 입력79개도 모두 해석/CRC 일치했다. 누락/불일치0이며 새 출력표는 빌드의 Module.symvers96개와 교차 검증했다.
+- 현재 kmod31의 버전 조회는 이 Thor 커널의 가변 길이 `next/crc/name` 레코드를 지원하지 않아 실패하고, 원본 export CRC를0으로 잘못 표시한다. [elf_versions.py](elf_versions.py)는 실제 헤더/종료 레코드와 ELF PREL32 이름 참조·u32 CRC 표를 읽는다. 다른 레이아웃/잘린 레코드/중복 ABI 메타데이터/잘못된 참조는 거부한다. 실행/설치 없이 메타데이터를 읽는 도구다.
+
+```sh
+python3 -B elf_versions.py --module /absolute/path/to/nvidia.ko
+```
+
+파서의5검사·전체177검사 중 기존host Torch3건 생략과 실제 모듈/Module.symvers 대조를 구분한다. 이번에는 실제 모듈 로딩/재부팅/원래0x51 재현을 수행하지 않았다. ABI CRC 일치는 정적 조건이며 동작 호환성·원래 오류 해결의 보증이 아니다. 유지보수 범위/복구 경로를 갖춘 실제 적용 시험이 남는다.
 
 ## 운영 적용 경계
 

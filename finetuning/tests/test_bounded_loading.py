@@ -10,6 +10,25 @@ from bounded_loading import ReopeningFile, checkpoint_loading
 
 
 class MappingTests(unittest.TestCase):
+    def test_warmup_diagnostics_preserve_call_result_and_restore_on_error(self):
+        for fail in (False,True):
+            phases=[];original=object()
+            def warmup(value):
+                self.assertEqual(value,'fixture')
+                if fail:raise ValueError('allocation failed')
+                return 7
+            modeling=SimpleNamespace(safe_open=original,caching_allocator_warmup=warmup)
+            package=SimpleNamespace(__version__='5.4.0',modeling_utils=modeling)
+            with patch.dict(sys.modules,{'transformers':package,'transformers.modeling_utils':modeling}):
+                try:
+                    with checkpoint_loading({'model_kind':'qwen3_5_moe'},diagnostics=phases.append):
+                        self.assertEqual(modeling.caching_allocator_warmup('fixture'),7)
+                except ValueError:
+                    self.assertTrue(fail)
+            self.assertIs(modeling.safe_open,original)
+            self.assertIs(modeling.caching_allocator_warmup,warmup)
+            self.assertEqual(phases,['allocator_warmup_start','allocator_warmup_failed' if fail else 'allocator_warmup_completed'])
+
     def test_metadata_retains_no_mapping_and_reads_reopen(self):
         state={'active':0,'opens':0}
         class Slice:

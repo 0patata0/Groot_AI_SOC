@@ -22,6 +22,22 @@ class Initialized:
 
 
 class TelemetryTests(unittest.TestCase):
+    def test_segment_snapshot_distinguishes_vmm_from_missing_or_failed_data(self):
+        class Snapshot(Initialized):
+            def memory_snapshot(self):return [{'is_expandable':True},{'is_expandable':False}]
+        class MissingFlag(Snapshot):
+            def memory_snapshot(self):return [{}]
+        class Failed(Snapshot):
+            def memory_snapshot(self):raise RuntimeError('private path')
+        for cuda,expected in ((Snapshot(),1),(MissingFlag(),None)):
+            value=collect(cuda,phase='fixture')
+            self.assertEqual(value['cuda']['status'],'available')
+            self.assertEqual(value['cuda']['segments']['expandable'],expected)
+        value=collect(Failed(),phase='fixture')
+        self.assertEqual(value['cuda']['status'],'available')
+        self.assertEqual(value['cuda']['segments']['status'],'unavailable')
+        self.assertNotIn('private path',json.dumps(value))
+
     def test_uninitialized_cuda_is_never_initialized_or_reported_as_zero_use(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);(root/'meminfo').write_text('MemAvailable: 100 kB\nCmaFree: 6 kB\n');(root/'vmstat').write_text('oom_kill 1\n')

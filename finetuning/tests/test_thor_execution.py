@@ -64,6 +64,35 @@ class ArtifactTests(unittest.TestCase):
 
 
 class LaunchTests(unittest.TestCase):
+    def test_vmm_is_opt_in_and_keeps_native_training_commands_identical(self):
+        native=thor_container.command('/tmp/training','soc-memory-smoke',1000,1000)
+        vmm=thor_container.command('/tmp/training','soc-memory-vmm',1000,1000)
+        self.assertIn('PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True',vmm)
+        self.assertNotIn('PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True',native)
+        expected=[a.replace('soc-memory-smoke','soc-memory-vmm') for a in native]
+        index=vmm.index('PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True')
+        del vmm[index-1:index+1]
+        self.assertEqual(vmm,expected)
+
+    def test_vmm_worker_keeps_native_config_and_two_step_limits(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);source=root/'finetuning';source.mkdir()
+            config=json.loads((train.ROOT/'config.qwen36-soc-v2.json').read_text())
+            (source/'config.qwen36-soc-v2.json').write_text(json.dumps(config))
+            (source/'config.soc-memory.run.local.json').write_text('native evidence')
+            (root/'base-manifest.json').write_text(json.dumps({'verified':True,'revision':config['revision'],'model':config['model_name_or_path']}))
+            with patch.object(container_task,'ROOT',root),patch.object(container_task,'SOURCE',source), \
+                 patch('container_task.sys.argv',['container_task.py','soc-memory-vmm']), \
+                 patch('container_task.signal.signal'),patch('container_task.guarded_process.run') as launch:
+                container_task.main()
+            args=launch.call_args.args[0]
+            for flag,value in (('--max-steps','2'),('--max-train-samples','2'),('--max-eval-samples','8'),('--output-dir','/workspace/outputs/soc-memory-vmm')):
+                self.assertEqual(args[args.index(flag)+1],value)
+            actual=json.loads((source/'config.soc-memory-vmm.run.local.json').read_text())
+            self.assertTrue(actual['smoke_longest_prefixes'])
+            self.assertEqual(actual['gradient_accumulation_steps'],1)
+            self.assertEqual((source/'config.soc-memory.run.local.json').read_text(),'native evidence')
+
     def test_memory_worker_is_two_long_prefix_steps_and_preserves_v2_files(self):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);source=root/'finetuning';source.mkdir()

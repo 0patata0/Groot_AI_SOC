@@ -313,7 +313,7 @@ def run_training(config, checks, hardware):
     if quantized:
         model_args['quantization_config'] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
     try:
-        with checkpoint_loading(config):
+        with checkpoint_loading(config,diagnostics=lambda phase:memory_telemetry.record(output,torch.cuda,phase=phase)):
             model = model_profile.model_class(config).from_pretrained(config["model_name_or_path"], **load_args, dtype=dtype,
                 **model_args, device_map={"": 0}, attn_implementation="sdpa")
     except Exception as exc:

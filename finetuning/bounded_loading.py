@@ -41,7 +41,7 @@ class ReopeningFile:
 
 
 @contextmanager
-def checkpoint_loading(config):
+def checkpoint_loading(config, diagnostics=None):
     if config.get('model_kind') != 'qwen3_5_moe':
         yield
         return
@@ -50,6 +50,18 @@ def checkpoint_loading(config):
     if transformers.__version__ != '5.4.0':
         raise RuntimeError('Revalidate bounded loading before changing Transformers 5.4.0')
     original = modeling.safe_open
+    original_warmup = modeling.caching_allocator_warmup if diagnostics is not None else None
+    if diagnostics is not None:
+        def measured_warmup(*args, **kwargs):
+            diagnostics('allocator_warmup_start')
+            try:
+                result = original_warmup(*args, **kwargs)
+            except Exception:
+                diagnostics('allocator_warmup_failed')
+                raise
+            diagnostics('allocator_warmup_completed')
+            return result
+        modeling.caching_allocator_warmup = measured_warmup
     previous = os.environ.get('HF_DEACTIVATE_ASYNC_LOAD')
     os.environ['HF_DEACTIVATE_ASYNC_LOAD'] = '1'
     modeling.safe_open = lambda filename, framework, device='cpu': ReopeningFile(original, filename, framework, device)
@@ -57,5 +69,6 @@ def checkpoint_loading(config):
         yield
     finally:
         modeling.safe_open = original
+        if original_warmup is not None:modeling.caching_allocator_warmup = original_warmup
         if previous is None: os.environ.pop('HF_DEACTIVATE_ASYNC_LOAD', None)
         else: os.environ['HF_DEACTIVATE_ASYNC_LOAD'] = previous

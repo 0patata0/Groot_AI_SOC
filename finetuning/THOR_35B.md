@@ -1,5 +1,17 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 경고의 의미·VMM 비교 경로 — 2026-10-28 KST
+
+공식 Jetson39.2.1 태그의 `version.mk`는595.78/r595_00이며 실제 드라이버와 맞는다. 이 태그의 `mem_desc.c:1336`은 내부 메모리 할당 실패를 오류 수준으로 기록한다. `system_mem.c`는 기본 페이지 선택과 허용 조건에 따라 더 작은 페이지로 재시도할 수 있다. 따라서 이 메시지와 학습 성공이 함께 나타날 수 있지만, 이번12건의 내부 요청/페이지 크기·최종 재시도 성공을 직접 추적한 것은 아니다. [NVIDIA 공식 소스 안내](https://docs.nvidia.com/jetson/archives/r39.2.1/DeveloperGuide/SD/WorkingWithSources.html) · [할당 오류 위치](https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver/-/blob/76b260e5967dfe9815b9054a4a4642f10672a763/src/nvidia/src/kernel/gpu/mem_mgr/mem_desc.c#L1336) · [재시도 경로](https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver/-/blob/76b260e5967dfe9815b9054a4a4642f10672a763/src/nvidia/src/kernel/mem_mgr/system_mem.c#L227).
+
+설치된 Transformers5.4.0 소스 SHA는 고정 공식 버전과 일치한다. 이 로더는 모델 전체 크기의 큰 텐서를 먼저 할당/반환해 캐시를 준비한다. 앞선 재현의 inactive split peak 약64.45GiB와 연결해 확인할 후보이며, 이 단계가12건 모두의 원인이라는 증거는 아직 없다. 새 hook은 실제 원래 함수를 그대로 호출하면서 사전 할당 시작/완료/실패 시각을 기록하고 종료·예외 후 함수를 복원한다.
+
+작은 CUDA 단일 할당64MiB~2GiB는 모두 성공했다. 기존 오프라인 Torch 이미지에서도 기본 방식과 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`를 각각 최대2GiB 할당·일부 쓰기·해제로 확인했다. VMM 방식의 실제 expandable segment2개, 양쪽 OOM/재시도0·커널 경고0이며 Ollama는 계속 active였다. 작은 시험이35B 전체 모델의 경고 해결을 입증하지는 않는다. 이 설정은 PyTorch의 실험적 기능이며 모델/길이가 달라질 때도 별도 검증해야 한다. [PyTorch2.8 메모리 설정](https://docs.pytorch.org/docs/2.8/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf).
+
+전용 `soc-memory-vmm` 컨테이너에만 해당 환경변수를 적용하고 `training_window.py --mode memory-vmm`로 비교한다. 기존 기본 방식/출력은 보존한다. 최장2prefix·2-step/accum1·eval8·6분 학습 제한·8분 독립 복구/복구실행6분·최대15분 한도와 원래35B digest 복구 조건을 유지한다. 새 출력은 `outputs/soc-memory-vmm`, config는 `config.soc-memory-vmm.run.local.json`, 상태는 `/var/lib/capstone-memory-vmm-20261028`, root 복사본은 `/usr/local/libexec/capstone-memory-vmm-window.py`다. 기존 결과와 같은 새 결과의 자동 덮어쓰기/재시도는 거부한다.
+
+로컬/Thor160검사와 실제 GPU 미노출 Torch/Transformers hook·함수 복원·CUDA 초기화0 검증, 서비스 조작 없는 준비 check까지 완료했다. 새35B 비교 결과는 후속에 기록한다. GPU 할당 보호가 완전한 cgroup 제한으로 대체된 것은 아니므로 host12GiB guard를 유지한다. 운영 모델/드라이버/VM전역 설정은 바꾸지 않는다.
+
 ## 실제 메모리 재현 결과 — 2026-10-28 17:05~17:08 KST
 
 **같은 NVRM `NV_ERR_NO_MEMORY` 경고 12건을 재현했으며, 학습은 2-step 모두 완료했다.** 최대15분 중단 승인 아래 6분 학습 제한·8분 독립 복구 타이머를 적용했다. 기존 `qwen3.6:35b`는 원래 digest로 복구됐고 실제 중단은172.42139초(2분52.42초)다. 경고의 정확한 내부 할당 원인은 미확정이다.

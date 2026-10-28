@@ -40,6 +40,25 @@ class WindowTests(unittest.TestCase):
                 (root/'soc-memory-smoke-status.json').write_text('{"status":"failed"}')
                 with self.assertRaisesRegex(ValueError,'automatic retry'):window.verify_ready(root)
 
+    def test_vmm_trial_preserves_native_evidence_and_has_its_own_recovery(self):
+        with tempfile.TemporaryDirectory() as d,self.memory_mode():
+            root=Path(d);digests=self.fixture(root)
+            (root/'outputs/soc-memory-smoke').mkdir(parents=True)
+            (root/'soc-memory-smoke-status.json').write_text('{"status":"completed"}')
+            window.select_mode('memory-vmm')
+            self.assertEqual(window.STAGES,('soc-memory-vmm',))
+            self.assertEqual(window.STATE,Path('/var/lib/capstone-memory-vmm-20261028'))
+            self.assertEqual(window.LIMIT_SECONDS,360)
+            args=window.restore_command('/inspected.py',root)
+            self.assertIn('--unit=capstone-memory-vmm-restore',args)
+            self.assertIn('--on-active=8m',args)
+            self.assertIn('--property=TimeoutStartSec=6min',args)
+            self.assertEqual(args[-1],'memory-vmm')
+            with patch.object(window,'DATA_HASHES',digests):
+                window.verify_ready(root)
+                (root/'outputs/soc-memory-vmm').mkdir()
+                with self.assertRaisesRegex(ValueError,'automatic retry'):window.verify_ready(root)
+
     def test_unknown_operator_mode_is_rejected_and_v2_defaults_stay_reviewed(self):
         with self.memory_mode():
             with self.assertRaises(ValueError):window.select_mode('arbitrary')

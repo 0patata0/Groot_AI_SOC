@@ -54,6 +54,16 @@ def collect(cuda=None,*,phase,step=None,proc=Path('/proc'),cgroup=Path('/sys/fs/
         data['allocator_counters']={k:v for k,v in cuda.memory_stats().items() if k in CUDA_KEYS and isinstance(v,int) and not isinstance(v,bool) and v>=0}
         data['counter_caveat']='Backend-specific; zero retries does not exclude driver/library failures.'
         free,total=cuda.mem_get_info();data.update(free_bytes=free,total_bytes=total)
+        snapshot=getattr(cuda,'memory_snapshot',None)
+        if snapshot is not None:
+            try:
+                segments=snapshot()
+                flags=[s.get('is_expandable') for s in segments]
+                data['segments']={'status':'available','count':len(segments),
+                    'expandable':sum(flags) if all(isinstance(v,bool) for v in flags) else None}
+            except Exception as exc:
+                data['segments']={'status':'unavailable','error_type':type(exc).__name__}
+        else:data['segments']={'status':'unavailable'}
     except Exception as exc:result['cuda'].update(status='unavailable',error_type=type(exc).__name__)
     return result
 

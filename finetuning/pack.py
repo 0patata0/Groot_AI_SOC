@@ -40,6 +40,7 @@ def main():
     if config_path.name == 'config.qwen36-soc-v2.json':
         names += ['data-soc-v2-r2/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json','curriculum-audit.json')]
         names += ['data-soc-source-v2-r2/cases.jsonl']
+    names += ['driver-diagnostics/'+name for name in ('README.md','NOTICE','check.py','manifest.json','nvidia-595.78-allocation.patch')]
     paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))
     for path in paths:
         if not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(ROOT):

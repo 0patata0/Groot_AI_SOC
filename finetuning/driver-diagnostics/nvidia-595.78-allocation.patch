@@ -1,0 +1,118 @@
+--- a/kernel-open/nvidia/nv.c
++++ b/kernel-open/nvidia/nv.c
+@@ -21,8 +21,10 @@
+  * DEALINGS IN THE SOFTWARE.
+  */
+ 
+ #include <linux/module.h>  // for MODULE_FIRMWARE
++#include <linux/ratelimit.h>
++#include <linux/sched.h>
+ 
+ // must precede "nv.h" and "nv-firmware.h" includes
+ #define NV_FIRMWARE_FOR_NAME(name)  "nvidia/" NV_VERSION_STRING "/" name ".bin"
+ #define NV_FIRMWARE_DECLARE_GSP(name) \
+@@ -407,8 +409,12 @@
+     NV_KZALLOC(at, sizeof(nv_alloc_t));
+     if (at == NULL)
+     {
+         nv_printf(NV_DBG_ERRORS, "NVRM: failed to allocate alloc info\n");
++        pr_err_ratelimited("NVRM: GROOT_ALLOC stage=metadata_info bytes=%llu metadata_bytes=%llu pid=%d tgid=%d\n",
++                           (unsigned long long)num_pages * PAGE_SIZE,
++                           (unsigned long long)pt_size,
++                           task_pid_nr(current), task_tgid_nr(current));
+         return NULL;
+     }
+ 
+     // at->num_pages is an unsigned int, check that the requested page count fits
+@@ -424,8 +430,12 @@
+     at->page_table = kvzalloc(pt_size, NV_GFP_KERNEL);
+     if (at->page_table == NULL)
+     {
+         nv_printf(NV_DBG_ERRORS, "NVRM: failed to allocate page table\n");
++        pr_err_ratelimited("NVRM: GROOT_ALLOC stage=metadata_table bytes=%llu metadata_bytes=%llu pid=%d tgid=%d\n",
++                           (unsigned long long)num_pages * PAGE_SIZE,
++                           (unsigned long long)pt_size,
++                           task_pid_nr(current), task_tgid_nr(current));
+         NV_KFREE(at, sizeof(nv_alloc_t));
+         return NULL;
+     }
+ 
+@@ -3939,9 +3949,17 @@
+         return NV_ERR_NOT_SUPPORTED;
+ 
+     at = nvos_create_alloc(dev, page_count);
+     if (at == NULL)
++    {
++        pr_err_ratelimited("NVRM: GROOT_ALLOC stage=nv_alloc_pages_metadata status=0x%x bytes=%llu page_size=%llu contiguous=%u node=%d pid=%d tgid=%d\n",
++                           (unsigned int)NV_ERR_NO_MEMORY,
++                           (unsigned long long)page_count * PAGE_SIZE,
++                           (unsigned long long)page_size,
++                           (unsigned int)contiguous, node_id,
++                           task_pid_nr(current), task_tgid_nr(current));
+         return NV_ERR_NO_MEMORY;
++    }
+ 
+     at->cache_type = cache_type;
+ 
+     if (contiguous)
+@@ -4006,8 +4024,14 @@
+ 
+     return NV_OK;
+ 
+ failed:
++    pr_err_ratelimited("NVRM: GROOT_ALLOC stage=nv_alloc_pages_return status=0x%x bytes=%llu page_size=%llu contiguous=%u node=%d pid=%d tgid=%d\n",
++                       (unsigned int)status,
++                       (unsigned long long)page_count * PAGE_SIZE,
++                       (unsigned long long)page_size,
++                       (unsigned int)contiguous, node_id,
++                       task_pid_nr(current), task_tgid_nr(current));
+     nvos_free_alloc(at);
+ 
+     return status;
+ }
+--- a/kernel-open/nvidia/nv-vm.c
++++ b/kernel-open/nvidia/nv-vm.c
+@@ -20,8 +20,10 @@
+  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+  * DEALINGS IN THE SOFTWARE.
+  */
+ 
++#include <linux/ratelimit.h>
++#include <linux/sched.h>
+ #include "os-interface.h"
+ #include "nv.h"
+ #include "nv-linux.h"
+ #include "nv-reg.h"
+@@ -1062,8 +1064,14 @@
+ 
+     return NV_OK;
+ 
+ failed:
++    pr_err_ratelimited("NVRM: GROOT_ALLOC stage=system_pages status=0x%x bytes=%llu order=%u failed_block=%u pool_blocks=%u gfp=0x%x node=%d pid=%d tgid=%d\n",
++                       (unsigned int)NV_ERR_NO_MEMORY,
++                       (unsigned long long)at->num_pages * PAGE_SIZE,
++                       at->order, i, num_pool_allocated_pages,
++                       gfp_mask, preferred_node_id,
++                       task_pid_nr(current), task_tgid_nr(current));
+     nv_printf(NV_DBG_MEMINFO,
+         "NVRM: VM: %s: failed to allocate memory\n", __FUNCTION__);
+     nv_free_system_pages(at);
+     return NV_ERR_NO_MEMORY;
+--- a/src/nvidia/src/kernel/gpu/mem_mgr/mem_desc.c
++++ b/src/nvidia/src/kernel/gpu/mem_mgr/mem_desc.c
+@@ -1336,8 +1336,15 @@
+     NV_CHECK_OK(status, LEVEL_ERROR, _memdescAllocInternal(pMemDesc));
+ 
+     if (status != NV_OK)
+     {
++        NV_PRINTF(LEVEL_ERROR,
++                  "GROOT_ALLOC stage=memdesc_return status=0x%x bytes=%llu alignment=%llu address_space=%u page_size_policy=%u\n",
++                  (unsigned int)status,
++                  (unsigned long long)pMemDesc->Size,
++                  (unsigned long long)pMemDesc->Alignment,
++                  (unsigned int)pMemDesc->_addressSpace,
++                  (unsigned int)pMemDesc->_pageSize);
+         pMemDesc->pHeap = NULL;
+     }
+ 
+     return status;

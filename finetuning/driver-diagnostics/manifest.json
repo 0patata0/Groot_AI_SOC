@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "purpose": "failure-only diagnostics, not an allocation fix",
+  "repository": "https://gitlab.com/nvidia/nv-tegra/tegra/kernel-src/nv-unified-gpu-display-driver",
+  "commit": "76b260e5967dfe9815b9054a4a4642f10672a763",
+  "tag": "jetson_39.2.1",
+  "driver": "595.78",
+  "patch_sha256": "80d500699b0c2e0544fe093e1b4cedda9dfe09579317cb9e596bad7e5879a98a",
+  "files": [
+    {
+      "path": "kernel-open/nvidia/nv.c",
+      "before_sha256": "4c766098070e3c999717d23f4d6aa11b724ea6925a0c34592cbf5d932c66b8ac",
+      "after_sha256": "f306a1b6d74e88cb520528b023318db544c63175c7862e8a48c15e1d3dca789d"
+    },
+    {
+      "path": "kernel-open/nvidia/nv-vm.c",
+      "before_sha256": "c69fa725fb484ae94fe625f1c3de1ad32aee1343307d5b27488c825a803d0078",
+      "after_sha256": "95efd6ef541a73d5f64b4444379bb68bb6409d81ff3771a03ed71b37d8e0210d"
+    },
+    {
+      "path": "src/nvidia/src/kernel/gpu/mem_mgr/mem_desc.c",
+      "before_sha256": "cbc0aee4b79ca0aabd7fb696a89a68ab5fbc7ca53d7b7403971dac1a2c8d16d9",
+      "after_sha256": "7bdf4002dbef007786b70baceb3da9743f5834d23343918b88208ec714d68ead"
+    }
+  ]
+}

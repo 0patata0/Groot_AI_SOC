@@ -67,11 +67,12 @@ def main():
                         'manifest_sha256':hashlib.sha256(raw).hexdigest()}
                 config.update(model_name_or_path='/workspace/base',offline=True)
                 if stage in ('smoke','soc-smoke','soc-v2-smoke'): config['gradient_accumulation_steps']=1
+                if stage=='soc-v2-smoke':config['smoke_longest_prefixes']=True
                 local_config=SOURCE/('config.soc-v2.run.local.json' if v2 else 'config.run.local.json')
                 local_config.write_text(json.dumps(config,indent=2)+'\n')
                 args=[PYTHON,'-B',SOURCE/'train.py','--config',local_config]
                 if stage in ('tokenize','soc-tokenize','soc-v2-tokenize'): args += ['--tokenize-only','--output-dir','/workspace/soc-v2-tokenization' if v2 else '/workspace/soc-tokenization' if soc else '/workspace/tokenization']
-                elif stage in ('smoke','soc-smoke','soc-v2-smoke'): args += ['--train','--max-steps','2','--max-train-samples','32',
+                elif stage in ('smoke','soc-smoke','soc-v2-smoke'): args += ['--train','--max-steps','2','--max-train-samples','2' if v2 else '32',
                     '--max-eval-samples','8','--output-dir','/workspace/outputs/'+('soc-v2-smoke' if v2 else 'soc-smoke' if soc else 'smoke')]
                 elif stage == 'soc-v2-pilot': args += ['--train','--output-dir','/workspace/outputs/soc-v2-pilot']
                 elif stage == 'soc-pilot': args += ['--train','--output-dir','/workspace/outputs/soc-pilot']

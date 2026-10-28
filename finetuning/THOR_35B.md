@@ -283,3 +283,8 @@ v2만max_length2048/require_all_prefixes:true로 설정했다. 첫1536검사의4
 실행은 독립 `capstone-soc-v2-restore.timer`를50분으로 먼저 설정/active확인→Ollama중단→원base2-step→성공시별도원base48-step→즉시복구/기존35B재적재다. 학습deadline45분·공유중단상한계획60분이며 실패/SIGTERM에도복구한다. 다른GPU프로세스는이름만허용하지않고Ollama MainPID의자손인지확인한다. 실패이력을자동지우거나재시도하지않고,모델등록/봇전환은하지않는다. 실제실행전새중단승인을받고새제어기의실중단/복구결과를따로기록한다. 기존본학습복구성공을새제어기E2E로대신하지않는다.
 
 root-owned사본의 `run --root ...`은 승인된operator만durable systemd service로 실행한다. 제어기자체독립timer와별개로service RuntimeMaxSec48분을둘수있다. 필요operator명령은실제경로/해시를검토한후사용하며공통초기설치기나운영에이전트권한을바꾸지않는다. 검수자료/원본가중치는이전과같이로컬전용반입이고Git clone만으로전달되지않는다.
+
+
+### 10/28 승인된 smoke 입력 보완
+
+공유중단최대60분/자동복구를별도로승인받았다. v2 smoke는 `smoke_longest_prefixes:true`, `--max-train-samples 2`로전체train390prefix를토큰검사한뒤최장2개만선택한다. CPU실측1664/1582토큰·eval8prefix이며2optimizerstep/accum1로둘다통과하도록한다. 학습길이상한2048을초기짧은예시만으로검증하지않기위한보완이다. strict coverage의390kept는전체검사수이고실제smoke학습은2개라는점을구분한다. 48-step pilot은별도base에서전체자료를사용가능한상태로시작하며최대96prefix를업데이트한다. 자료/분할/프로필SHA·개발/최종평가설정은불변이다. 로컬/Thor123검사통과와실GPU/복구결과는별도로기록한다.

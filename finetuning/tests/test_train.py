@@ -43,6 +43,12 @@ def conversation(final="Final fixture conclusion"):
 
 
 class EncodingTests(unittest.TestCase):
+    def test_smoke_selection_includes_longest_examples_after_initial_source_window(self):
+        features=[{'input_ids':array('i',[1]*n),'prompt_length':1} for n in range(2,42)]
+        chosen=train.select_longest_prefixes(features,2)
+        self.assertEqual([len(item['input_ids']) for item in chosen],[41,40])
+        self.assertEqual(len(features),40)
+        with self.assertRaises(ValueError):train.select_longest_prefixes(features,0)
     def test_required_curriculum_cannot_silently_drop_overlength_tool_turns(self):
         train.check_token_coverage({'kept':4,'candidate_turns':4},True)
         with self.assertRaisesRegex(ValueError,'excluded'):

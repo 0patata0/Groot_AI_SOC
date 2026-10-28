@@ -186,6 +186,12 @@ def check_token_coverage(stats, required):
         raise ValueError(f"Required assistant prefixes were excluded: {stats}")
 
 
+def select_longest_prefixes(features,limit):
+    """Smoke tests must exercise the longest completions, beyond early source rows."""
+    if type(limit) is not int or limit<=0:raise ValueError('Longest-prefix smoke selection requires a positive limit')
+    return sorted(features,key=lambda item:len(item['input_ids']),reverse=True)[:limit]
+
+
 def preflight(config=None):
     config = config or {}
     quantized = config.get("quantization", "nf4") == "nf4"
@@ -249,9 +255,13 @@ def prepare_tokens(config, output, include_test=False):
     splits = ('train', 'validation', 'test') if include_test else ('train', 'validation')
     for split in splits:
         limit = config['max_train_samples'] if split == 'train' else config['max_eval_samples']
+        longest=split=='train' and config.get('smoke_longest_prefixes',False)
         datasets[split], stats[split] = tokenize_split(Path(config['data_dir']) / f'{split}.jsonl',
-            tokenizer, config['max_length'], limit)
+            tokenizer, config['max_length'], 0 if longest else limit)
         check_token_coverage(stats[split], config.get('require_all_prefixes', False))
+        if longest:
+            datasets[split]=select_longest_prefixes(datasets[split],limit)
+            stats[split].update(selected_prefixes=len(datasets[split]),selection='longest_after_full_coverage_check')
         # A standalone audit must not retain a complete unused test dataset.
         if include_test: datasets[split] = None
     stats.update(max_length=config['max_length'],require_all_prefixes=config.get('require_all_prefixes',False),loss='each_assistant_turn_as_completion',

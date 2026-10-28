@@ -1,5 +1,41 @@
 # 데이터 출처와 사용 범위
 
+## SOC 관제원 업무용 R3 자료 준비 — 2026-10-29
+
+사용자의 목표는 관제 관리자가 수행하는 **조사 → 증거 대조 → 위험·불확실성 판단 → 변경안/승인 → 적용 후 확인 → 인계**다. 일반 API 호출 corpus 전체를 SOC 전문 정답으로 투입하지 않는다. 현재 [준비 원장](R3_DATA_PREPARATION.json)은 학습 전 상태다.
+
+| 자료 | train | validation | test | 역할·근거 |
+|---|---:|---:|---:|---|
+| 자체 통제 관제 workflow | 192 | 48 | 48 | 8업무 유형·실제 MCP 계약/응답 원본 함수·로컬 승인/TTL 정책, 에이전트 작성/검수 |
+| AIT 과거 로그 조사 | 72 | 12 | 12 | 2경보/사례·원ZIP 192개 객체 일치·가공파일/개행 포함 행 SHA·환경 단위 분리, CC-BY-4.0 |
+| 합계 | **264** | **60** | **60** | assistant prefix **696/168/168**, 4K 안에서 제외/절단 0 |
+
+8업무는 WAF/IDS 상관분석·IDS 재시작 승인안·수집 공백·실패 후 검증·복구 검증·임시 차단의 유지 승인·만료 확인·룰 설명 변경안이다. 원인 미확정, 누적 카운터, 관측 표본, 승인/실제 적용, 실제 엔진 적재를 구분한다. 임시 차단 `pending`은 이미 생성된 최초10분 차단의 **60분 유지 승인 대기**다. 룰/서비스 `pending`과 같다고 가르치지 않는다. 실패/확인 불가를 정상·완료로 바꾸지 않는다.
+
+AIT 자료는 **2022년 시험장 아카이브**다. 현재 MCP의 최근 기간 조회로 위장하거나 현재 차단을 요청하지 않는다. `phase_window`는 구간 컨텍스트이며 `normal`도 정상 정답이 아니다. 기존 v1에 쓴 행은 제외했고 train의6환경·validation wheeler·test wilson을 유지한다. 증거 필드/시각은 기계 대조, 한국어 판단·우선순위·인계문은 에이전트 작성이며 독립 전문가 판정이 아니다. `ait_ads_2023`+`landauer2024ait_ads`를 함께 인용하고 가공 방법·선택 수·분할·한계를 논문에 기술한다.
+
+[NIST SP800-61r3](https://csrc.nist.gov/pubs/sp/800/61/r3/final)의 RS.AN-03/06/07/08, RS.MI-01, RC.RP-02/05/06을 절차 참고로 연결했다. BibTeX 키는 `nist_sp800_61r3`이며 ToolACE 보조 후보는 `liu2025toolace`와 `team_ace_toolace`로 논문/배포처를 구분한다. 이 문서가 우리 데이터의 정답을 인증하거나 우리 MCP·승인/TTL 구현을 요구한다는 뜻은 아니다. 원본문의 사건 분석/증거 보존/범위 판단/억제/복구 확인에 맞춰 자체 업무 예제를 작성했다.
+
+ToolACE는 고정 원본11,300행에서 엄격한 AST literal-only/스키마·응답 연결·중복/평가 제외 검사 후10,019행(8,031/1,008/980)을 보조 후보로 정제했다. 대체 호출 형식518행 등은 지원하지 않아 제외했다. 이 후보의 전체 의미 검수/실토큰 검사는 미완료이며 **R3 핵심 train에는0건**이다. 임의 API를 운영 MCP 이름으로 바꾸지 않고 reversible alias를 보존한다. APIGen/PRIMUS 게이트 동의·본문 반입은 여전히 미실행이다.
+
+실제 운영 재조회: A 공개 주소→B 내부10.200.10.10 경유,8서버/37도구 전부응답·고정 catalog와 이름/인자/설명 차이0. `a:suricata`는 `kind:runtime`, `metrics/codes/limits`다. 기존 일부 R2/20사례의 systemd `ActiveState` 가정은 실제 이 target과 다르므로 원점수/자료를 보존하고 [한계를 정정](QUALITY_RESULTS.md)했다. 새 센서/진단/룰 인벤토리는 실제 소스의 순수 투영 함수를 사용한다. 그 밖의 결과는 최소 필드 통제 fixture이며 전체 라이브 응답 채록이 아니다.
+
+소스 재생성으로 source SHA와3분할 출력이 모두 일치했다. 학습 시 최장 입력2710/2706토큰, 전체37도구 개발 요청 최대9840+출력768은16K 요청예산 안이다. 학습에는 사례별 소수 도구를 제공하므로 실제 전체37도구 선택 능력으로 일반화했는지는 별도 평가해야 한다. 같은 생성기의 문구/ID holdout이며 독립 실사건/전문가 검증으로 확대하지 않는다.
+
+순차 평가기 `operator_rollout.py`는 모델이 맞는 다음 호출을 생성한 경우에만 fixture를 제공한다. ID·scope·정확한 후보를 검사하되 사유 문장 암기는 요구하지 않는다. 다른 앵커로 같은 전체 파일을 만들면 동등한 수정안으로 허용한다. 준비하지 않은 유효한 조회 경로는 **미평가**이며 거짓 관측/자동 정답 주입/무조건 오답으로 대체하지 않는다. 자동 필수 문자열 판정 뒤 실제 원문 의미 검수가 필요하다. 테스트60건은 토큰 검사만 했고 모델 답변 생성/체크포인트 선택에 쓰지 않았다.
+
+수정 기준의 학습 전 개발9건을 완료했다. 5건은 조회 생략/무관한 임시차단·가짜ID/근거 없는 적재방식/아카이브 원본·해시오해석 등의 중대오류를 원문으로 확인했고,4건은 지원하지 않는 대체 조회 경로로 미평가다. 전체 정확도 백분율로 제시하지 않는다. 초기 엄격 평가의 전체0은 평가기 한계가 섞인 수치다. 원본35B warm을 확인했다.
+
+새48-step/2e-6는 제한 pilot 설정이며 전체696prefix 1epoch 학습 완료가 아니다. 새 successful_microbatch_lineage는 실제 성공 forward/backward의 record/prefix/행 SHA와 직전 optimizer step을 남긴다. 성공 microbatch가 이후 optimizer update/전체 실행 성공을 의미하지 않는다. GPU 학습/변환/후보등록/봇 전환은 아직 없다.
+
+재생성에는 전체 repo의 `infra/mcp` 원본, 기존 AIT 원본·processed·v1 제외 목록이 필요하다. 이들은 자동 인터넷 취득/미확인 동의로 대체하지 않는다. 휴대용 pack은 정제 자료·명세·소스·테스트와 검사용 `contract_sources` 3개를 명시적으로 포함한다. 실제 MCP 서비스로 설치하는 파일이 아니며 새 서비스/포트/키/초기 deploy 변경은 없다.
+
+```bash
+python3 -B finetuning/prepare_soc_operator.py --output NEW_DATA --source-output NEW_SOURCE/cases.jsonl
+python3 -B finetuning/train.py --config finetuning/config.qwen36-soc-v3.json --check
+python3 -B finetuning/pack.py --config finetuning/config.qwen36-soc-v3.json --output TASK_TMP/r3.tar.gz
+```
+
 ## 2026-10-29 과거 학습의 출처·실제 투입 이력
 
 논문용 출처는 [기계 판독 이력표](TRAINING_PROVENANCE.json), [BibTeX](references.bib), [재검증기](audit_training_provenance.py)에 연결한다. 2026-10-29 Thor에서 읽은12개 완료 실행의 manifest/토큰 통계/Trainer 상태·어댑터 해시와 로컬 원본을 대조했다. 공개/기관 원천을 가공한 자료와 자체 합성 대화, 준비만 한 후보, 평가 자료를 구분한다. **아래 정정은 과거의 “공개 혼합 자료는 준비만 했다”는 포괄적 표현보다 우선한다.**

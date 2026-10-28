@@ -1,0 +1,360 @@
+{
+  "created_at_kst": "2026-10-29T01:36:25.172781+09:00",
+  "source_cases_sha256": "814bda2602a6f0daba47a9ca6a2d7617384ef5efeb6e5e4c257c58de62e3f38d",
+  "outputs": {
+    "train": {
+      "records": 264,
+      "sha256": "b2110b772aa0e3d8c7f40da4fd2e4d41a5f9a50ff99fc649e30c13c95b43e484"
+    },
+    "validation": {
+      "records": 60,
+      "sha256": "919ffd74b36aaa0d9c6ebd16e7735b7cef15db539c9ac7b7cf195108f4cc4812"
+    },
+    "test": {
+      "records": 60,
+      "sha256": "0873bc148ca2ccab683df1c53a4460cd6a1861736b54afeb9bd0379093a2e8c5"
+    }
+  },
+  "source_mix": {
+    "train": {
+      "synthetic_lab_fixture": 192,
+      "public_testbed_log": 72
+    },
+    "validation": {
+      "synthetic_lab_fixture": 48,
+      "public_testbed_log": 12
+    },
+    "test": {
+      "synthetic_lab_fixture": 48,
+      "public_testbed_log": 12
+    }
+  },
+  "workflow_checks": {
+    "numeric_only_cross_split_overlap": 0,
+    "previous_test_question_overlap": 0,
+    "records": {
+      "train": 192,
+      "validation": 48,
+      "test": 48
+    },
+    "review_scope": "mechanical contract/projection/explicit-fact checks and agent-authored answers; no independent expert certification"
+  },
+  "ait_original_alerts_verified": 192,
+  "ait_environment_disjoint": true,
+  "legacy_v1_ait_rows_excluded": true,
+  "toolace_included": false,
+  "toolace_role": "auxiliary candidate only; no SOC semantic approval",
+  "source_projections": {
+    "infra/mcp/security-events-mcp.py": "49b25780a5f807ec5faa3e97525391f118affbd9703af429335e58d4866c8df6",
+    "infra/mcp/system-diagnostics-mcp.py": "19fad0143e4198b9a52695607226de3c1950f993c0b833c3394eb043f2a8fdf6",
+    "infra/mcp/rule_change_executor.py": "741a4eead24b54e5bd7dd00261dcc90decd6961af34a05bff5988d226e2d7c73"
+  },
+  "sources": [
+    {
+      "uri": "https://doi.org/10.5281/zenodo.8263181",
+      "license": "CC-BY-4.0"
+    },
+    {
+      "uri": "https://doi.org/10.1145/3675741.3675748",
+      "scope": "dataset paper"
+    },
+    {
+      "uri": "https://doi.org/10.6028/NIST.SP.800-61r3",
+      "scope": "procedure reference, no certification of synthetic labels"
+    }
+  ],
+  "limitations": [
+    "agent-authored procedure/reasoning, not independent expert-labelled SOC trajectories",
+    "synthetic workflow holdouts share generator/families; not unseen real incident proof",
+    "partial controlled responses beyond source projections, not full captured live responses",
+    "GPU training/export/registration/bot operation/actual attack E2E not completed"
+  ],
+  "prepared_at_kst": "2026-10-29T01:52:25.257257+09:00",
+  "phase": "r1_prepared_frozen_additional_role_aligned_sources_in_progress",
+  "tokenization": {
+    "train": {
+      "stats": {
+        "read": 264,
+        "candidate_turns": 696,
+        "kept": 696,
+        "tokens": 1177092,
+        "supervised_tokens": 91792,
+        "max_tokens": 2710
+      },
+      "longest_two": [
+        2710,
+        2706
+      ]
+    },
+    "validation": {
+      "stats": {
+        "read": 60,
+        "candidate_turns": 168,
+        "kept": 168,
+        "tokens": 288755,
+        "supervised_tokens": 21114,
+        "max_tokens": 2710
+      },
+      "longest_two": [
+        2710,
+        2688
+      ]
+    },
+    "test": {
+      "stats": {
+        "read": 60,
+        "candidate_turns": 168,
+        "kept": 168,
+        "tokens": 288997,
+        "supervised_tokens": 21169,
+        "max_tokens": 2687
+      },
+      "longest_two": [
+        2687,
+        2683
+      ]
+    },
+    "all37_development_requests": {
+      "maximum_input_tokens": 9840,
+      "num_predict": 768,
+      "requested_num_ctx": 16384,
+      "requests": [
+        {
+          "case_id": "soc-operator-v3-correlation-validation-000",
+          "turn_index": 2,
+          "tokens": 8559
+        },
+        {
+          "case_id": "soc-operator-v3-correlation-validation-000",
+          "turn_index": 4,
+          "tokens": 8966
+        },
+        {
+          "case_id": "soc-operator-v3-correlation-validation-000",
+          "turn_index": 6,
+          "tokens": 9320
+        },
+        {
+          "case_id": "soc-operator-v3-service_proposal-validation-000",
+          "turn_index": 2,
+          "tokens": 8559
+        },
+        {
+          "case_id": "soc-operator-v3-service_proposal-validation-000",
+          "turn_index": 4,
+          "tokens": 8792
+        },
+        {
+          "case_id": "soc-operator-v3-service_proposal-validation-000",
+          "turn_index": 6,
+          "tokens": 9265
+        },
+        {
+          "case_id": "soc-operator-v3-service_proposal-validation-000",
+          "turn_index": 8,
+          "tokens": 9507
+        },
+        {
+          "case_id": "soc-operator-v3-coverage_gap-validation-000",
+          "turn_index": 2,
+          "tokens": 8557
+        },
+        {
+          "case_id": "soc-operator-v3-coverage_gap-validation-000",
+          "turn_index": 4,
+          "tokens": 8660
+        },
+        {
+          "case_id": "soc-operator-v3-coverage_gap-validation-000",
+          "turn_index": 6,
+          "tokens": 8836
+        },
+        {
+          "case_id": "soc-operator-v3-verify_failed-validation-000",
+          "turn_index": 2,
+          "tokens": 8575
+        },
+        {
+          "case_id": "soc-operator-v3-verify_failed-validation-000",
+          "turn_index": 4,
+          "tokens": 8727
+        },
+        {
+          "case_id": "soc-operator-v3-verify_failed-validation-000",
+          "turn_index": 6,
+          "tokens": 8957
+        },
+        {
+          "case_id": "soc-operator-v3-verify_applied-validation-000",
+          "turn_index": 2,
+          "tokens": 8584
+        },
+        {
+          "case_id": "soc-operator-v3-verify_applied-validation-000",
+          "turn_index": 4,
+          "tokens": 8738
+        },
+        {
+          "case_id": "soc-operator-v3-verify_applied-validation-000",
+          "turn_index": 6,
+          "tokens": 8962
+        },
+        {
+          "case_id": "soc-operator-v3-containment_pending-validation-000",
+          "turn_index": 2,
+          "tokens": 8561
+        },
+        {
+          "case_id": "soc-operator-v3-containment_pending-validation-000",
+          "turn_index": 4,
+          "tokens": 9212
+        },
+        {
+          "case_id": "soc-operator-v3-containment_pending-validation-000",
+          "turn_index": 6,
+          "tokens": 9540
+        },
+        {
+          "case_id": "soc-operator-v3-containment_pending-validation-000",
+          "turn_index": 8,
+          "tokens": 9840
+        },
+        {
+          "case_id": "soc-operator-v3-containment_expired-validation-000",
+          "turn_index": 2,
+          "tokens": 8579
+        },
+        {
+          "case_id": "soc-operator-v3-containment_expired-validation-000",
+          "turn_index": 4,
+          "tokens": 8752
+        },
+        {
+          "case_id": "soc-operator-v3-containment_expired-validation-000",
+          "turn_index": 6,
+          "tokens": 8975
+        },
+        {
+          "case_id": "soc-operator-v3-rule_proposal-validation-000",
+          "turn_index": 2,
+          "tokens": 8573
+        },
+        {
+          "case_id": "soc-operator-v3-rule_proposal-validation-000",
+          "turn_index": 4,
+          "tokens": 9010
+        },
+        {
+          "case_id": "soc-operator-v3-rule_proposal-validation-000",
+          "turn_index": 6,
+          "tokens": 9274
+        },
+        {
+          "case_id": "soc-operator-v3-ait-wheeler-000",
+          "turn_index": 2,
+          "tokens": 8807
+        }
+      ]
+    }
+  },
+  "live_contract": {
+    "at_kst": "2026-10-29T01:24:04.834952+09:00",
+    "servers": 8,
+    "tools": 37,
+    "name_schema_description_differences": 0
+  },
+  "profile": {
+    "path": "config.qwen36-soc-v3.json",
+    "sha256": "a36f7158b035baa9156f6350af0c79535152e499a9f425f11669e89f653466a4",
+    "max_steps": 48,
+    "learning_rate": 2e-06,
+    "max_length": 4096,
+    "record_successful_microbatch_prefix_ids": true
+  },
+  "validation_rollout": {
+    "at_kst": "2026-10-29T01:54:44.386459+09:00",
+    "baseline_model": "soc-qwen36:35b-base-q4km-20261027",
+    "cases": 9,
+    "scored_cases": 5,
+    "unscored_cases": 4,
+    "overall_accuracy": "not estimated due to partial branch support",
+    "major_in_scored_cases": 5,
+    "semantic_review_scope": "all 9 traces read; downstream accuracy of four alternative paths unknown",
+    "original_warm_done": true,
+    "no_live_MCP_execution": true,
+    "issues": [
+      {
+        "workflow": "correlation",
+        "severity": "major",
+        "reason": "조회 없이 양센서 경보 부재·가짜 에이전트 ID/비활성 상태를 생성하고 block/unblock 승인 절차도 잘못 설명."
+      },
+      {
+        "workflow": "service_proposal",
+        "severity": "major",
+        "reason": "IDS 유지보수 요청에 무관한 임시차단을 생성하고 사건 문자열을 request_id로 사용. 실제 실행 없음."
+      },
+      {
+        "workflow": "coverage_gap",
+        "severity": "unscored",
+        "reason": "Valid alternative read branch has no fixture; no gold observation/accuracy score supplied"
+      },
+      {
+        "workflow": "verify_failed",
+        "severity": "unscored",
+        "reason": "Valid alternative read branch has no fixture; no gold observation/accuracy score supplied"
+      },
+      {
+        "workflow": "verify_applied",
+        "severity": "unscored",
+        "reason": "Valid alternative read branch has no fixture; no gold observation/accuracy score supplied"
+      },
+      {
+        "workflow": "containment_pending",
+        "severity": "major",
+        "reason": "조회 없이10분 차단/50분 잔여·센서증거를 지어냄. 출력768절단."
+      },
+      {
+        "workflow": "containment_expired",
+        "severity": "unscored",
+        "reason": "Valid alternative read branch has no fixture; no gold observation/accuracy score supplied"
+      },
+      {
+        "workflow": "rule_proposal",
+        "severity": "major",
+        "reason": "동등 후보/정확한pending ID는 맞지만 근거 없는 적재방식을 추가하고 파일/엔진미확인을 누락."
+      },
+      {
+        "workflow": "archive_investigation",
+        "severity": "major",
+        "reason": "원본 부재 단정·로그ID를해시로표기·구간라벨을공격원인/차단근거로확대. 출력768절단."
+      }
+    ]
+  },
+  "limits": {
+    "gpu_training": false,
+    "model_export_or_registration": false,
+    "bot_model_selection_changed": false,
+    "expert_review_completed": false,
+    "actual_attack_detection_response_E2E": false,
+    "new_server_full_install": false
+  },
+  "local_tests": {
+    "total": 223,
+    "passed": 220,
+    "skipped": 3,
+    "skip_reason": "existing host Torch unavailable"
+  },
+  "reproduction": {
+    "source_sha256_match": true,
+    "three_output_sha256_match": true
+  },
+  "thor_checks": {
+    "at_kst": "2026-10-29T02:05:28.520778+09:00",
+    "files_verified": 101,
+    "tests_total": 223,
+    "passed": 220,
+    "skipped": 3,
+    "operator_ready_without_service_action": true,
+    "ollama_original_only": true
+  }
+}

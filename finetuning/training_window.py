@@ -40,6 +40,9 @@ def select_mode(mode):
     if mode=='v2':
         STAGES=('soc-v2-smoke','soc-v2-pilot');STATE=Path('/var/lib/capstone-training-v2-window')
         LIMIT_SECONDS=45*60;RESTORE_MINUTES=50;RESTORE_UNIT='capstone-soc-v2-restore'
+    elif mode=='v3':
+        STAGES=('soc-v3-smoke','soc-v3-pilot');STATE=Path('/var/lib/capstone-training-v3-window')
+        LIMIT_SECONDS=75*60;RESTORE_MINUTES=80;RESTORE_UNIT='capstone-soc-v3-restore'
     elif mode=='memory-repro':
         STAGES=('soc-memory-smoke',);STATE=Path('/var/lib/capstone-memory-repro-20261028')
         LIMIT_SECONDS=6*60;RESTORE_MINUTES=8;RESTORE_UNIT='capstone-memory-repro-restore'
@@ -78,6 +81,7 @@ def save(name,value):
 
 
 def verify_ready(root):
+    if MODE=='v3':return verify_v3_ready(root)
     raw=(root/'finetuning/config.qwen36-soc-v2.json').read_bytes()
     if hashlib.sha256(raw).hexdigest()!=PROFILE_SHA256:raise ValueError('Frozen pilot profile checksum mismatch')
     profile=json.loads(raw)
@@ -103,10 +107,42 @@ def verify_ready(root):
     if job.get('source_sha256')!=BASELINE_INPUTS:raise ValueError('Development baseline used different inputs')
 
 
+V3_DATA_HASHES={'train':'b2110b772aa0e3d8c7f40da4fd2e4d41a5f9a50ff99fc649e30c13c95b43e484',
+    'validation':'919ffd74b36aaa0d9c6ebd16e7735b7cef15db539c9ac7b7cf195108f4cc4812',
+    'test':'0873bc148ca2ccab683df1c53a4460cd6a1861736b54afeb9bd0379093a2e8c5'}
+
+def verify_v3_ready(root):
+    hashes=V3_DATA_HASHES
+    expected_profile='a36f7158b035baa9156f6350af0c79535152e499a9f425f11669e89f653466a4'
+    if hashlib.sha256((root/'finetuning/config.qwen36-soc-v3.json').read_bytes()).hexdigest()!=expected_profile:
+        raise ValueError('Frozen v3 profile checksum mismatch')
+    for split,digest in hashes.items():
+        if hashlib.sha256((root/'finetuning/data-soc-operator-v3-r1'/(split+'.jsonl')).read_bytes()).hexdigest()!=digest:
+            raise ValueError('Frozen v3 corpus mismatch')
+    proof=json.loads((root/'soc-v3-tokenization/tokenization_report.json').read_text())
+    checks=json.loads((root/'soc-v3-tokenization/data_check.json').read_text())
+    if proof.get('max_length')!=4096 or proof.get('require_all_prefixes') is not True or checks.get('sha256')!=hashes:
+        raise ValueError('Strict v3 tokenization proof required')
+    for split,count in [('train',696),('validation',168),('test',168)]:
+        if proof[split].get('candidate_turns')!=count or proof[split].get('kept')!=count:
+            raise ValueError('Required v3 prefixes excluded')
+    sources={'cases':root/'finetuning/data-soc-source-operator-v3-r1/cases.jsonl','catalog':root/'finetuning/mcp_contract.json'}
+    frozen=json.loads((root/'soc-v3-evaluation/frozen-plan.json').read_text())
+    for key,path in sources.items():
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=frozen[key+'_sha256']:raise ValueError('v3 baseline source mismatch')
+    job=json.loads((root/'soc-v3-evaluation/base-development-v2-job.json').read_text())
+    report=json.loads((root/'soc-v3-evaluation/base-development-v2.json').read_text())
+    if job.get('status')!='completed' or not job.get('original_warm_done') or report.get('status')!='completed':
+        raise ValueError('Completed v3 development baseline and original warm-up required')
+    for stage in STAGES:
+        if (root/(stage+'-status.json')).exists() or (root/'outputs'/stage).exists():
+            raise ValueError('Prior v3 training evidence exists; automatic retry forbidden')
+
+
 def restore_command(script,root):
     args=['systemd-run','--unit='+RESTORE_UNIT,'--on-active='+str(RESTORE_MINUTES)+'m',
           '--timer-property=AccuracySec=1s']
-    if MODE in ('memory-repro','memory-vmm','memory-trace','memory-loss'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
+    if MODE in ('v3','memory-repro','memory-vmm','memory-trace','memory-loss'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
     args+=['/usr/bin/python3','-B',str(script),'restore','--root',str(root)]
     if MODE!='v2':args+=['--mode',MODE]
     return args
@@ -209,7 +245,7 @@ def window(root,script):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['check','run','restore']);parser.add_argument('--root',type=Path,required=True)
-    parser.add_argument('--mode',choices=['v2','memory-repro','memory-vmm','memory-trace','memory-loss'],default='v2');args=parser.parse_args();select_mode(args.mode)
+    parser.add_argument('--mode',choices=['v2','v3','memory-repro','memory-vmm','memory-trace','memory-loss'],default='v2');args=parser.parse_args();select_mode(args.mode)
     if args.action=='check':
         verify_ready(args.root.resolve());print(json.dumps({'ready':True,'no_service_action':True}));return
     script=Path(__file__).resolve()

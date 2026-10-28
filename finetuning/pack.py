@@ -15,13 +15,13 @@ def main():
     parser.add_argument("--config", type=Path, default=ROOT / "config.json")
     opts = parser.parse_args()
     config_path = opts.config.resolve()
-    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json','config.qwen36-soc-v2.json'):
+    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json','config.qwen36-soc-v2.json','config.qwen36-soc-v3.json'):
         parser.error("Choose one of the bundled model profiles")
     raw = json.loads(config_path.read_text(encoding="utf-8"))
     if any(Path(raw[key]).is_absolute() for key in ("data_dir", "output_dir")):
         parser.error("Use relative data_dir/output_dir paths for a portable bundle")
     config = read_config(config_path)
-    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1", ROOT / "data-soc-v2-r2"):
+    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1", ROOT / "data-soc-v2-r2", ROOT / "data-soc-operator-v3-r1"):
         parser.error("Portable bundle requires one of the fixed prepared datasets")
     if not Path(config["output_dir"]).resolve().is_relative_to(ROOT):
         parser.error("Portable bundle requires an output_dir inside finetuning/")
@@ -29,9 +29,9 @@ def main():
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "merge_streaming.py", "evaluate.py",
              "pack.py", "model_profile.py", "config.qwen36-thor.json", "requirements.qwen36-thor.txt",
-             "setup_thor.sh", "THOR_35B.md", "R2_RESULTS.md", "QUALITY_RESULTS.md", "TRAINING_PROVENANCE.json", "references.bib", "audit_training_provenance.py", "audit_tools.py", "mcp_contract.json",
+             "setup_thor.sh", "THOR_35B.md", "R2_RESULTS.md", "QUALITY_RESULTS.md", "TRAINING_PROVENANCE.json", "R3_DATA_PREPARATION.json", "references.bib", "audit_training_provenance.py", "audit_tools.py", "mcp_contract.json",
              "container_task.py", "thor_container.py", "memory_budget.py", "memory_telemetry.py", "completion_loss.py", "download_model.py", "guarded_process.py", "bounded_loading.py",
-             "soc_dataset.py", "soc_curriculum.py", "soc_evaluate.py", "soc_assessment.py", "curriculum_assessment.py", "quality_assessment.py", "training_window.py", "reference_model.py", "register_soc.py", "convert_reference.py", "convert_soc.py", "config.qwen36-soc.json", "config.qwen36-soc-main.json", "config.qwen36-soc-v2.json", "config.foundation-sec-8b.json",
+             "prepare_toolace.py", "prepare_soc_operator.py", "soc_operator_curriculum.py", "operator_rollout.py", "config.qwen36-soc-v3.json", "soc_dataset.py", "soc_curriculum.py", "soc_evaluate.py", "soc_assessment.py", "curriculum_assessment.py", "quality_assessment.py", "training_window.py", "training_lineage.py", "reference_model.py", "register_soc.py", "convert_reference.py", "convert_soc.py", "config.qwen36-soc.json", "config.qwen36-soc-main.json", "config.qwen36-soc-v2.json", "config.foundation-sec-8b.json",
              "preparation_summary.json", "data/manifest.json",
              "data/train.jsonl", "data/validation.jsonl", "data/test.jsonl"]
     if config_path.name in ('config.qwen36-soc.json','config.qwen36-soc-main.json'):
@@ -40,6 +40,9 @@ def main():
     if config_path.name == 'config.qwen36-soc-v2.json':
         names += ['data-soc-v2-r2/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json','curriculum-audit.json')]
         names += ['data-soc-source-v2-r2/cases.jsonl']
+    if config_path.name == 'config.qwen36-soc-v3.json':
+        names += ['data-soc-operator-v3-r1/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json','operator-audit.json')]
+        names += ['data-soc-source-operator-v3-r1/cases.jsonl']
     names += ['driver-diagnostics/'+name for name in ('README.md','NOTICE','check.py','elf_versions.py','manifest.json','gcc132-offline-manifest.json','nvidia-595.78-allocation.patch')]
     paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))
     for path in paths:
@@ -51,6 +54,13 @@ def main():
     with output.open("xb") as handle, tarfile.open(fileobj=handle, mode="w:gz") as archive:
         for path in paths:
             archive.add(path, arcname=str(Path("finetuning") / path.relative_to(ROOT)), recursive=False)
+        # Pure source projections are required by workflow regression tests.
+        # These copies are evidence code, never installed as MCP services.
+        for name in ('security-events-mcp.py','system-diagnostics-mcp.py','rule_change_executor.py'):
+            path=ROOT.parent/'infra/mcp'/name
+            if not path.is_file():path=ROOT/'contract_sources'/name
+            if not path.is_file() or path.is_symlink():raise ValueError('Missing contract projection source')
+            archive.add(path,arcname='finetuning/contract_sources/'+name,recursive=False)
     digest = hashlib.sha256()
     with output.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):

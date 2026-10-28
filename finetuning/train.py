@@ -163,6 +163,9 @@ def tokenize_split(path, tokenizer, max_length, limit):
                 stats["kept"] += 1
                 stats["tokens"] += len(encoded["input_ids"])
                 stats["supervised_tokens"] += len(encoded["input_ids"]) - encoded["prompt_length"]
+                from training_lineage import prefix_identity
+                encoded["prefix_identity"]=prefix_identity(source,index)
+                stats["max_tokens"]=max(stats["max_tokens"],len(encoded["input_ids"]))
                 rows.append(encoded)
     if not rows:
         raise ValueError(f"No usable examples in {Path(path).name}: {dict(stats)}")
@@ -357,7 +360,11 @@ def run_training(config, checks, hardware):
         logging_first_step=True, logging_nan_inf_filter=False)
 
     def collator(features):
-        return {key: torch.tensor(value, dtype=torch.long) for key, value in collate_lists(features, tokenizer.pad_token_id).items()}
+        batch={key: torch.tensor(value, dtype=torch.long) for key, value in collate_lists(features, tokenizer.pad_token_id).items()}
+        if config.get("record_prefix_usage",False):
+            from training_lineage import META
+            batch[META]=[f["prefix_identity"] for f in features]
+        return batch
 
     base_artifact = config.get('base_artifact_manifest', {})
     if base_artifact and base_artifact.get('revision') != config['revision']:
@@ -404,6 +411,9 @@ def run_training(config, checks, hardware):
         if config.get('model_kind')!='qwen3_5_moe':raise ValueError('Selected logits are validated for the pinned Qwen MoE profile only')
         from completion_loss import trainer_class
         trainer_type=trainer_class(Trainer)
+    if config.get("record_prefix_usage",False):
+        from training_lineage import recorded_trainer
+        trainer_type=recorded_trainer(trainer_type,output/"successful_microbatch_lineage.jsonl")
     trainer = trainer_type(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator,
                       processing_class=tokenizer, callbacks=[progress])
     try:

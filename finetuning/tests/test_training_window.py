@@ -77,6 +77,35 @@ class WindowTests(unittest.TestCase):
             self.assertEqual(window.STAGES,('soc-v2-smoke','soc-v2-pilot'))
             self.assertEqual(window.LIMIT_SECONDS,45*60);self.assertEqual(window.RESTORE_MINUTES,50)
 
+    def test_v3_uses_its_own_bounded_window_and_root_restore_timeout(self):
+        with self.memory_mode():
+            window.select_mode('v3')
+            self.assertEqual(window.STAGES,('soc-v3-smoke','soc-v3-pilot'))
+            self.assertEqual(window.LIMIT_SECONDS,75*60)
+            args=window.restore_command('/inspected.py','/training')
+            self.assertIn('--on-active=80m',args);self.assertIn('--property=TimeoutStartSec=6min',args)
+            self.assertLess(window.RESTORE_MINUTES+6,90)
+
+    def test_v3_check_is_read_only_rejects_stale_tokens_and_never_reuses_outputs(self):
+        with tempfile.TemporaryDirectory() as d,self.memory_mode():
+            root=Path(d);folder=root/'finetuning';data=folder/'data-soc-operator-v3-r1';data.mkdir(parents=True)
+            (folder/'config.qwen36-soc-v3.json').write_bytes((Path(__file__).resolve().parents[1]/'config.qwen36-soc-v3.json').read_bytes())
+            hashes={}
+            for split in ('train','validation','test'):
+                payload=split.encode();(data/(split+'.jsonl')).write_bytes(payload);hashes[split]=hashlib.sha256(payload).hexdigest()
+            tok=root/'soc-v3-tokenization';tok.mkdir();proof={s:{'kept':n,'candidate_turns':n} for s,n in [('train',696),('validation',168),('test',168)]};proof.update(max_length=4096,require_all_prefixes=True)
+            (tok/'tokenization_report.json').write_text(json.dumps(proof));(tok/'data_check.json').write_text(json.dumps({'sha256':hashes}))
+            cases=folder/'data-soc-source-operator-v3-r1';cases.mkdir();(cases/'cases.jsonl').write_text('fixture');(folder/'mcp_contract.json').write_text('fixture')
+            evaluation=root/'soc-v3-evaluation';evaluation.mkdir();digest=hashlib.sha256(b'fixture').hexdigest();(evaluation/'frozen-plan.json').write_text(json.dumps({'cases_sha256':digest,'catalog_sha256':digest}))
+            (evaluation/'base-development-v2-job.json').write_text(json.dumps({'status':'completed','original_warm_done':True}));(evaluation/'base-development-v2.json').write_text('{"status":"completed"}')
+            window.select_mode('v3')
+            with patch.object(window,'V3_DATA_HASHES',hashes),patch.object(window,'run',side_effect=AssertionError('No mutation')):
+                window.verify_ready(root)
+                (root/'soc-v3-smoke-status.json').write_text('{"status":"failed"}')
+                with self.assertRaisesRegex(ValueError,'automatic retry'):window.verify_ready(root)
+                (root/'soc-v3-smoke-status.json').unlink();proof['train']['kept']-=1;(tok/'tokenization_report.json').write_text(json.dumps(proof))
+                with self.assertRaisesRegex(ValueError,'prefixes excluded'):window.verify_ready(root)
+
     def fixture(self,root):
         (root/'finetuning/data-soc-v2-r2').mkdir(parents=True)
         config=Path(__file__).resolve().parents[1]/'config.qwen36-soc-v2.json'

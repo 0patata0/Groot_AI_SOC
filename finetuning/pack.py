@@ -29,9 +29,9 @@ def main():
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "merge_streaming.py", "evaluate.py",
              "pack.py", "model_profile.py", "config.qwen36-thor.json", "requirements.qwen36-thor.txt",
-             "setup_thor.sh", "THOR_35B.md", "R2_RESULTS.md", "audit_tools.py", "mcp_contract.json",
+             "setup_thor.sh", "THOR_35B.md", "R2_RESULTS.md", "QUALITY_RESULTS.md", "audit_tools.py", "mcp_contract.json",
              "container_task.py", "thor_container.py", "memory_budget.py", "memory_telemetry.py", "completion_loss.py", "download_model.py", "guarded_process.py", "bounded_loading.py",
-             "soc_dataset.py", "soc_curriculum.py", "soc_evaluate.py", "soc_assessment.py", "curriculum_assessment.py", "training_window.py", "reference_model.py", "register_soc.py", "convert_reference.py", "convert_soc.py", "config.qwen36-soc.json", "config.qwen36-soc-main.json", "config.qwen36-soc-v2.json", "config.foundation-sec-8b.json",
+             "soc_dataset.py", "soc_curriculum.py", "soc_evaluate.py", "soc_assessment.py", "curriculum_assessment.py", "quality_assessment.py", "training_window.py", "reference_model.py", "register_soc.py", "convert_reference.py", "convert_soc.py", "config.qwen36-soc.json", "config.qwen36-soc-main.json", "config.qwen36-soc-v2.json", "config.foundation-sec-8b.json",
              "preparation_summary.json", "data/manifest.json",
              "data/train.jsonl", "data/validation.jsonl", "data/test.jsonl"]
     if config_path.name in ('config.qwen36-soc.json','config.qwen36-soc-main.json'):

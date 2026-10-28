@@ -5,6 +5,7 @@ live agent investigation or proof of full semantic correctness. Missing calls an
 requested facts receive large penalties; raw outputs remain available for review.
 """
 import argparse
+import copy
 from collections import Counter
 import json
 from pathlib import Path
@@ -36,6 +37,24 @@ def score(reference,prediction,case,final,catalog):
         'automatic_scope':'exact structured calls and requested fact strings only; semantic review still required'}
 
 
+def transport_tools(tools):
+    """Supply explicit object properties for Ollama grammar compatibility.
+
+    Missing properties and an empty properties object impose the same JSON
+    Schema constraints. Preserve every existing constraint and the pinned input.
+    """
+    result=copy.deepcopy(tools)
+    def visit(schema):
+        if not isinstance(schema,dict):return
+        if schema.get('type')=='object':schema.setdefault('properties',{})
+        for child in schema.get('properties',{}).values():visit(child)
+        for key in ('items','additionalProperties'):visit(schema.get(key))
+        for key in ('allOf','anyOf','oneOf'):
+            for child in schema.get(key,[]):visit(child)
+    for tool in result:visit(tool['function']['parameters'])
+    return result
+
+
 def select_cases(cases,max_groups,all_cases=False,split='test'):
     if split not in ('validation','test'):raise ValueError('Only development or final test may be evaluated')
     selected=[];seen=set()
@@ -48,25 +67,28 @@ def select_cases(cases,max_groups,all_cases=False,split='test'):
     return selected
 
 
-def evaluate(model,endpoint,cases,catalog,output,max_groups=8,all_cases=False,all_turns=False,split='test'):
+def evaluate(model,endpoint,cases,catalog,output,max_groups=8,all_cases=False,all_turns=False,split='test',num_ctx=8192,num_predict=512,before_request=None):
+    if not isinstance(num_ctx,int) or isinstance(num_ctx,bool) or not 512<=num_ctx<=32768:raise ValueError('Context must be 512..32768')
+    if not isinstance(num_predict,int) or isinstance(num_predict,bool) or not 1<=num_predict<=2048:raise ValueError('Prediction budget must be 1..2048')
     output=Path(output)
     if output.exists():raise ValueError('Use a new report path')
     selected=select_cases(cases,max_groups,all_cases,split)
     if not selected:raise ValueError('No held-out cases selected')
     report={'at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),'model':model,
-        'mode':'offline gold-context single-turn; no tool execution','evaluation_split':split,'all_cases':all_cases,'all_assistant_turns':all_turns,'results':[]}
+        'mode':'offline gold-context single-turn; no tool execution','evaluation_split':split,'all_cases':all_cases,'all_assistant_turns':all_turns,'num_ctx':num_ctx,'num_predict':num_predict,'results':[]}
     for case in selected:
         row=validate_case(case,catalog);positions=[i for i,m in enumerate(row['messages']) if m['role']=='assistant']
         for index in positions if all_turns else sorted(set([positions[0],positions[-1]])):
             payload={'model':model,'messages':row['messages'][:index],'stream':False,'think':False,
-                'options':{'temperature':0,'num_predict':512,'num_ctx':8192},'keep_alive':'10m'}
-            if row['tools']:payload['tools']=row['tools']
+                'options':{'temperature':0,'num_predict':num_predict,'num_ctx':num_ctx},'keep_alive':'10m'}
+            if row['tools']:payload['tools']=transport_tools(row['tools'])
             event={'case_id':case['id'],'scenario_group':case['scenario_group'],'turn_index':index}
+            if before_request is not None:before_request()
             started=time.monotonic()
             try:
                 req=request.Request(endpoint.rstrip('/')+'/api/chat',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
                 with request.urlopen(req,timeout=180) as response:result=json.load(response)
-                event.update(status='ok',response=result['message'],usage={k:result.get(k) for k in ['load_duration','prompt_eval_count','prompt_eval_duration','eval_count','eval_duration']},
+                event.update(status='ok',response=result['message'],usage={k:result.get(k) for k in ['load_duration','prompt_eval_count','prompt_eval_duration','eval_count','eval_duration','done_reason']},
                     scores=score(row['messages'][index],result['message'],case,index==positions[-1],catalog))
             except error.HTTPError as exc:event.update(status='failed',error=repr(exc),http_body=exc.read().decode(errors='replace')[:2000])
             except Exception as exc:event.update(status='failed',error=repr(exc))
@@ -89,8 +111,8 @@ def main():
     p.add_argument('--catalog',type=Path,default=Path(__file__).with_name('mcp_contract.json'))
     p.add_argument('--output',required=True,type=Path);p.add_argument('--max-groups',type=int,default=8)
     p.add_argument('--all-cases',action='store_true');p.add_argument('--all-turns',action='store_true')
-    p.add_argument('--split',choices=['validation','test'],default='test');a=p.parse_args()
-    print(json.dumps(evaluate(a.model,a.endpoint,[json.loads(l) for l in a.cases.read_text().splitlines()],json.loads(a.catalog.read_text()),a.output,a.max_groups,a.all_cases,a.all_turns,a.split),ensure_ascii=False))
+    p.add_argument('--split',choices=['validation','test'],default='test');p.add_argument('--num-ctx',type=int,default=8192);p.add_argument('--num-predict',type=int,default=512);a=p.parse_args()
+    print(json.dumps(evaluate(a.model,a.endpoint,[json.loads(l) for l in a.cases.read_text().splitlines()],json.loads(a.catalog.read_text()),a.output,a.max_groups,a.all_cases,a.all_turns,a.split,a.num_ctx,a.num_predict),ensure_ascii=False))
 
 
 if __name__=='__main__':main()

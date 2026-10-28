@@ -1,5 +1,18 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## V5 준비·실행 절차 (2026-10-29 KST)
+
+현재 corpus는 `data-soc-evidence-v5-r3`(1024/128/128)이다. `V5_TRAINING_INPUTS.json` SHA를 고정한 root소유 `capstone-training-v5-window.py`로만 신규 공유중단 실행을 제어한다. V3/V4는 출처/정답검수 사유로 보류를 유지한다. `soc-v5-tokenize`는 기존 고정이미지·CPU12GiB·GPU/네트워크 없음, `soc-v5-smoke`는 최장2입력/2-step, `soc-v5-train`은 원base부터512step/accum2/1epoch/lr5e-7이다. 토큰화만으로 학습하지 않는 회귀검사를 포함한다.
+
+실행 전 새 공유중단 범위를 확인한다. 독립170분복구타이머를 먼저 만든 뒤 Ollama중지·메모리96GiB와다른GPU작업없음을확인한다. 최장2-step 실제간격/평가시간/길이비율/여유로 남은165분안에맞는지판단하며 맞지않으면 본학습전복구한다. 완료/실패·시간제한시원35B복구,복구작업6분제한/최대3시간계획이며 커널정지까지복구를보증하지않는다. SSH만가능한기존제약/0x51미해결인과는유지한다. **새GPU학습은아직미시작**이다.
+
+portable반입은 `python3 -B finetuning/pack.py --config finetuning/config.qwen36-soc-v5.json --output <새파일>`을 **Thor에서** 수행한다. Mac에는데이터/가중치/패키지다운로드없음. pack은명시목록/동결SHA·출처고지·검증기·설정·계약검사용소스를포함하며가중치/자격/원본대용량아카이브는제외한다. CISA정제는Thor기존`pdftotext`/`pdftoppm`/`pdfinfo`를사용했다. 새서버오프라인재현에는이도구들과고정원천을준비해야하며신규전체설치시험은하지않았다. 서비스/포트/이미지추가가아니므로초기root`deploy.sh`동작은변경없다.
+
+본학습후 `verify_evidence_training.verify(root)` (변환·등록기의 공통 검사)로1,024개실성공microbatch/512optimizerstep/1epoch·원행SHA/정답턴·중복/누락0·finite metric/adapterSHA를확인한다. 별도실tensor검사및변환의190LoRA/19MTP보존검증을대신하지않는다. `convert_soc.py`와`register_soc.py`의`--variant v5`는새태그`soc-qwen36:35b-evidence-v5-q4km-20261029`만생성하며기존봇선택은바꾸지않는다. MITRELICENSE/원출처고지를모델license에추가하고원base고지도유지한다. 원control/32dev/관제12회귀와미사용128시험·실운용확인은분리한다.
+
+가용108GiB에서HF병합+BF16GGUF+Q4중첩약154GiB가필요해기존pilot HF26shard66.97GiB한정삭제안을준비했다. 삭제는아직없으며구체승인후만진행한다. base/원pilotadapter/merge-status·tokenizer/config/index·Ollama모델은남겨재생성가능하게한다. 새Q4검증뒤이번생성BF16중간산출물은정리하여등록blob복사공간을확보한다. [준비/출처/검증](V5_DATA_PREPARATION.json) · [현재상태](../STATUS.md).
+
+
 **실행 범위 정정:** vLLM·NVFP4·MTP 추천은 사용자 지시에 따라 향후 고려사항으로만 보관한다. 아래 내용은 조사 기록이며 설치·운영 전환·성능시험의 실행 계획이 아니다. 현재 우선 작업은 외부 자료의 출처·정답 근거 검수와 정제다.
 
 ## 추론 추천 검토·라이선스 — 2026-10-29T04:31:32.380166+09:00

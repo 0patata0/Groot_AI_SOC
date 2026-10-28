@@ -46,6 +46,9 @@ def select_mode(mode):
     elif mode=='v3':
         STAGES=('soc-v3-smoke','soc-v3-pilot');STATE=Path('/var/lib/capstone-training-v3-window')
         LIMIT_SECONDS=75*60;RESTORE_MINUTES=80;RESTORE_UNIT='capstone-soc-v3-restore'
+    elif mode=='v5':
+        STAGES=('soc-v5-smoke','soc-v5-train');STATE=Path('/var/lib/capstone-training-v5-window')
+        LIMIT_SECONDS=165*60;RESTORE_MINUTES=170;RESTORE_UNIT='capstone-soc-v5-restore'
     elif mode=='v4-full':
         STAGES=('soc-v4-full-smoke','soc-v4-full-train');STATE=Path('/var/lib/capstone-training-v4-full-window')
         LIMIT_SECONDS=165*60;RESTORE_MINUTES=170;RESTORE_UNIT='capstone-soc-v4-full-restore'
@@ -89,6 +92,7 @@ def save(name,value):
 def verify_ready(root):
     if MODE in UNRELEASED_SOC_MODES:
         raise ValueError('Training release withheld: project-authored gold answers lack independent validation; rework corpus before training')
+    if MODE=='v5':return verify_v5_ready(root)
     if MODE=='v4-full':return verify_v4_full_ready(root)
     if MODE=='v3':return verify_v3_ready(root)
     raw=(root/'finetuning/config.qwen36-soc-v2.json').read_bytes()
@@ -149,6 +153,52 @@ def verify_v3_ready(root):
 
 
 V4_FULL_INPUTS_SHA256='2be7f3f32288a814944dfd8932d783500f29c1fa49e770c595819de2eff3ec83'
+V5_INPUTS_SHA256='89a5b480ca333e6bc3a192e48bd51c7412e171b3d055b053e1ad1ebe9db07e02'
+
+
+def verify_v5_ready(root):
+    """Pinned provider-labelled inputs, no calls to services during checking."""
+    folder=root/'finetuning';raw=(folder/'V5_TRAINING_INPUTS.json').read_bytes()
+    if hashlib.sha256(raw).hexdigest()!=V5_INPUTS_SHA256:raise ValueError('Frozen V5 inputs differ')
+    frozen=json.loads(raw)
+    if frozen.get('gold_derivation')!='original_provider_labels' or frozen.get('project_authored_incident_scenarios')!=0:
+        raise ValueError('V5 source-label release required')
+    checks=[(folder/frozen['profile'],frozen['profile_sha256']),
+            (folder/frozen['source_cases'],frozen['source_cases_sha256']),
+            (folder/'V5_EVIDENCE_SPEC.json',frozen['spec_file_sha256'])]
+    checks.extend((folder/name,digest) for name,digest in frozen['source_sha256'].items())
+    checks.extend((folder/frozen['data_folder']/(split+'.jsonl'),digest) for split,digest in frozen['data_sha256'].items())
+    for path,digest in checks:
+        if path.is_symlink() or not path.resolve().is_relative_to(folder.resolve()) or hashlib.sha256(path.read_bytes()).hexdigest()!=digest:
+            raise ValueError('Frozen V5 source/corpus mismatch')
+    audit_path=folder/frozen['data_folder']/'independent-source-audit.json'
+    if hashlib.sha256(audit_path.read_bytes()).hexdigest()!=frozen['source_audit_sha256']:raise ValueError('V5 source proof differs')
+    audit=json.loads(audit_path.read_text())
+    if audit.get('status')!='passed' or audit.get('records')!=frozen['records'] or audit.get('cross_split_shared_reports_or_groups_or_identical_observations')!=0:
+        raise ValueError('V5 original source proof incomplete')
+    profile=json.loads((folder/frozen['profile']).read_text())
+    if (profile['max_steps'],profile['gradient_accumulation_steps'],profile['num_train_epochs'],profile['learning_rate'])!=(512,2,1,5e-7):
+        raise ValueError('Reviewed full-epoch V5 plan changed')
+    proof=json.loads((root/'soc-v5-tokenization/tokenization_report.json').read_text());data=json.loads((root/'soc-v5-tokenization/data_check.json').read_text())
+    if proof.get('loss')!='all_assistant_turns_per_conversation' or proof.get('require_all_prefixes') is not True or proof.get('max_length')!=profile['max_length'] or data.get('sha256')!=frozen['data_sha256']:
+        raise ValueError('V5 all-assistant token proof differs')
+    for split,count in frozen['records'].items():
+        row=proof[split]
+        if (row.get('kept'),row.get('candidate_examples'),row.get('covered_assistant_turns'),row.get('candidate_turns'))!=(count,)*4:
+            raise ValueError('V5 observations or target turns excluded')
+    evaluation=root/'soc-evidence-v5-evaluation';plan=json.loads((evaluation/'frozen-plan.json').read_text())
+    if hashlib.sha256((evaluation/'frozen-plan.json').read_bytes()).hexdigest()!=frozen['development_plan_sha256']:raise ValueError('V5 development plan differs')
+    job=json.loads((evaluation/'baseline-job.json').read_text());report=json.loads((evaluation/'base-evidence-development.json').read_text());operator=json.loads((evaluation/'base-operator-development.json').read_text())
+    if job.get('status')!='completed' or job.get('original_warm_done') is not True or report.get('status')!='completed' or operator.get('status')!='completed':
+        raise ValueError('Completed V5 and operator baselines and original restoration required')
+    ids=[r['case_id'] for r in report['results']]
+    if len(ids)!=32 or len(ids)!=len(set(ids)) or ids!=plan['case_ids'] or report.get('validation_sha256')!=frozen['data_sha256']['validation']:
+        raise ValueError('V5 development baseline incomplete')
+    if report.get('model_digest')!=frozen['HF_control_digest']:raise ValueError('V5 control model changed')
+    if operator.get('source_cases_sha256')!=frozen['operator_cases_sha256'] or operator.get('catalog_sha256')!=frozen['operator_catalog_sha256'] or len(operator['results'])!=12:
+        raise ValueError('Operator regression baseline differs')
+    for stage in STAGES:
+        if (root/(stage+'-status.json')).exists() or (root/'outputs'/stage).exists():raise ValueError('Prior V5 training evidence; no automatic retry')
 
 def verify_v4_full_ready(root):
     raw=(root/'finetuning/V4_TRAINING_INPUTS.json').read_bytes()
@@ -184,25 +234,28 @@ def verify_v4_full_ready(root):
         if (root/(stage+'-status.json')).exists() or (root/'outputs'/stage).exists():raise ValueError('Prior full-training evidence; automatic retry forbidden')
 
 
-def full_window_estimate(root):
+def full_window_estimate(root,mode='v4-full'):
     """Use measured longest smoke microbatches; deadline remains authoritative."""
-    folder=root/'outputs/soc-v4-full-smoke'
+    if mode not in ('v4-full','v5'):raise ValueError('Unsupported full-epoch mode')
+    prefix='soc-v5' if mode=='v5' else 'soc-v4-full'
+    folder=root/'outputs'/(prefix+'-smoke')
     rows=list(map(json.loads,(folder/'successful_microbatch_lineage.jsonl').read_text().splitlines()))
     if len(rows)!=2:raise ValueError('Two real longest smoke backward passes required')
     seconds=(datetime.fromisoformat(rows[1]['at_kst'])-datetime.fromisoformat(rows[0]['at_kst'])).total_seconds()
     if not 0<seconds<3600:raise ValueError('Invalid measured smoke interval')
-    proof=json.loads((root/'soc-v4-full-tokenization/tokenization_report.json').read_text());train=proof['train'];evaluation=json.loads((folder/'eval_results.json').read_text())
+    proof=json.loads((root/(prefix+'-tokenization')/'tokenization_report.json').read_text());train=proof['train'];evaluation=json.loads((folder/'eval_results.json').read_text())
     ratio=min(1.0,train['tokens']/train['kept']/train['max_tokens'])
     # Smoke uses accumulation1 at longest inputs; main accumulation2 at the
     # full measured length mix. Include evaluation/loading/saving headroom.
-    estimate=seconds*train['kept']*ratio*1.25+evaluation['eval_runtime']/8*94*1.25+300
+    eval_count=128 if mode=='v5' else 94;eval_passes=2 if mode=='v5' else 1
+    estimate=seconds*train['kept']*ratio*1.25+evaluation['eval_runtime']/8*eval_count*eval_passes*1.25+300
     return {'estimated_main_seconds':round(estimate,1),'longest_microbatch_interval_seconds':round(seconds,3),'length_ratio':round(ratio,4),'scope':'planning estimate, not completion or latency guarantee'}
 
 
 def restore_command(script,root):
     args=['systemd-run','--unit='+RESTORE_UNIT,'--on-active='+str(RESTORE_MINUTES)+'m',
           '--timer-property=AccuracySec=1s']
-    if MODE in ('v3','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
+    if MODE in ('v3','v5','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
     args+=['/usr/bin/python3','-B',str(script),'restore','--root',str(root)]
     if MODE!='v2':args+=['--mode',MODE]
     return args
@@ -276,8 +329,8 @@ def window(root,script):
         run(['systemctl','stop','ollama'],timeout=45)
         deadline=time.monotonic()+LIMIT_SECONDS
         for stage in STAGES:
-            if MODE=='v4-full' and stage=='soc-v4-full-train':
-                estimate=full_window_estimate(root);job['smoke_estimate']=estimate;save('window.json',job)
+            if MODE in ('v4-full','v5') and stage==STAGES[-1]:
+                estimate=full_window_estimate(root,MODE);job['smoke_estimate']=estimate;save('window.json',job)
                 if estimate['estimated_main_seconds']>deadline-time.monotonic():raise TimeoutError('Measured full training would exceed reviewed window')
             job['stage']=stage;save('window.json',job)
             run(['runuser','-u',user,'--','/usr/bin/python3','-B',root/'finetuning/thor_container.py',stage,'--root',root],timeout=60)
@@ -308,7 +361,7 @@ def window(root,script):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['check','run','restore']);parser.add_argument('--root',type=Path,required=True)
-    parser.add_argument('--mode',choices=['v2','v3','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'],default='v2');args=parser.parse_args();select_mode(args.mode)
+    parser.add_argument('--mode',choices=['v2','v3','v5','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'],default='v2');args=parser.parse_args();select_mode(args.mode)
     if args.action=='check':
         verify_ready(args.root.resolve());print(json.dumps({'ready':True,'no_service_action':True}));return
     script=Path(__file__).resolve()

@@ -1,5 +1,27 @@
 # 데이터 출처와 사용 범위
 
+## V5: 원 제공자 관측·기법 매핑 직접 사용 (2026-10-29 KST)
+
+[V5 준비원장](V5_DATA_PREPARATION.json)과[고정 입력/소스SHA](V5_TRAINING_INPUTS.json)가 실제 준비량/검증 범위의 기준이다. 이 단계는 관제원의 **위협 인텔리전스 근거 연결/분류/인계** 일부를 다룬다. 트리아지·다중센서 상관·라이브 재조회·변경안/승인·적용 후 검증 전체를 학습했다고 하지 않는다. 이전 NIST/ENISA 역할 연결은 업무 범위 근거이며 이번 정답 인증이 아니다.
+
+| 원 제공자/고정 자료 | 이번 채택 | 근거와 한계 |
+|---|---:|---|
+| [MITRE ATT&CK STIX 고정commit](https://github.com/mitre-attack/attack-stix-data/tree/c2494b29dd268c46a5d0ea0990553e4327cd2253) | 1,208관측(3분할 합계) | actor/campaign→technique의 원문과 관계 라벨. 6,027원관계는 독립사건6,027개가 아님. 인용보고서 전부의 원본문을 개별 검증한 것은 아님. |
+| [CISA/FBI 공동 AA23-061A BlackSuit/Royal](https://www.cisa.gov/sites/default/files/2024-09/aa23-061a-stopransomware-blacksuit-royal-ransomware_5.pdf) | train15관측 | p22–24 표18–23의17행을 원문/ID 계수 대조. 1문맥모호·1역사적 부모명 표기변형을 보수적으로 보류. |
+| [CISA 공동 AA24-038A Volt Typhoon](https://www.cisa.gov/sites/default/files/2024-03/aa24-038a_csa_prc_state_sponsored_actors_compromise_us_critical_infrastructure_3.pdf) | validation49관측 | p37–45 표5–17의67행. 문맥모호6행과 p38 T1583.003 Botnet/Virtual Private Server ID·제목 충돌을 보류. 동일관측은 여러 라벨을 병합하며 중복질문으로 늘리지 않음. |
+| [CISA/FBI/HHS/MS-ISAC AA24-131A Black Basta](https://www.cisa.gov/sites/default/files/2024-05/aa24-131a-joint-csa-stopransomware-black-basta_1.pdf) | test8관측 | p4–5 표2–6의8행. 전체보고서 단위 미학습 holdout. |
+
+CISA3종 모두를 train에 넣지 않았다. CISA 합계72관측과 MITRE1,208=1,280건, 학습1,024/검증128/시험128이다. 풀6,038 중4,758은 미선택 후보로 남으며 학습량에 합산하지 않는다. 이전 실제v1 144대화/R2가용192대화보다 큰 **학습1,024대화**를 준비했지만 GPU투입량은 아직0이다. 기존18,872준비풀과 전체학습을 혼동하지 않는다.
+
+정답은 원 제공자의 기법ID/원문명칭을 기계적으로 연결하고 출처 식별자·`reported_mapping_only`/`not_assessed` 범위를 학습한다. 사건 이야기0개, 질문문구·system지침·JSON형식은 프로젝트 작성, 독립 전문가 검수0이다. 기관 출처의 신뢰성이 모든 제공자 라벨의 완전성/무오류나 이 프로젝트의 운용 정확성을 보장하지 않는다. 과거 공격 보고를 현재 서버 침해/조치 완료로 바꾸지 않는다.
+
+분할은 주체·캠페인 귀속·공유 인용 URL·CISA보고서 연결 성분을 사용한다. 같은 원문·그룹·인용보고서 교차누출0을 별도 검증기로 검사했다. CISA92행은 pdftotext layout 파서와 별도 bbox단어ID 집계가 일치했다. 시각검수는 Royalp23/Voltp38/Bastap4 대표3페이지만이며, 14표영역페이지 전체의 시각검수로 확대하지 않는다. ATT&CK14/15 원본은 같은commit의14.0/15.0JSON을 감사 참조로 고정했으나 CISA의 정확한patch버전으로 단정하지 않는다. T1484.001은 부모명 표기차이 가능성이 있고, T1583.003/Botnet은 실제ID·명칭불일치로 구분한다. 에이전트가 정답ID를 임의 정정하지 않았다.
+
+MITRE 원LICENSE와 `SOURCE_ATTRIBUTION.json`을 dataset 및 후보 등록 고지에 보존한다. CISA/제3자 원고지 유지·TLP:CLEAR를 저작권 라이선스로 해석하지 않음. 이 작업은 내부 연구용 정제/학습 준비이며 corpus/가중치 공개배포 승인을 뜻하지 않는다. 대용량 AIT 원격참조 이력은 아래에 보존하지만 이번 V5에 새로 혼합하지 않았다. CMU답안키/ToolACE/USENIX원자료도 V5핵심에 미편입이다.
+
+학습전32개 개발응답은 JSON32/32·엄격원문완전3/32·정확기법ID macroF1 0.1233이다. 원라벨누락34중7은 상위기법만 답변했고, 원정답집합밖45ID 모두를 기술적 거짓으로 판정하지 않는다. 원문라벨 비포괄성/명칭 버전/대체 해석은 별도 의미검수 대상이다. 해당 수치를 전체SOC정확도나 두운영봇 점수로 쓰지 않는다. 시험128답변은 아직 생성하지 않았다.
+
+
 ## 외부 기관·실제 사고 원천 확대 — 2026-10-29T04:31:32.380166+09:00
 
 사용자 지시에 따라 자체작성308건을 중심 학습자료로 투입하는 기존 계획은 보류했다. 다음 수는 **학습 확정 사례 수가 아니라 새로 확보한 원천의 재고**다. [원천·해시·보류사유](SOURCE_EXPANSION.json).

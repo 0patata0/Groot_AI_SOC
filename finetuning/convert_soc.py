@@ -27,11 +27,15 @@ def convert(root,variant):
         if not manifest.get('verified') or manifest['revision']!='995ad96eacd98c81ed38be0c5b274b04031597b0':
             raise ValueError('Verified pinned base required')
         files=manifest['files']
-    elif variant in ('pilot','main','v2-step24','v2-step48'):
+    elif variant in ('pilot','main','v2-step24','v2-step48','v5'):
         model=root/f'exports/qwen36-soc-{variant}-hf';manifest=json.loads((model/'merge-status.json').read_text())
         if manifest.get('status')!='completed' or manifest['base_revision']!='995ad96eacd98c81ed38be0c5b274b04031597b0' or manifest['verified_tensors']!=1045 or manifest['target_modules']!=190 or manifest['preserved_mtp_tensors']!=19:
             raise ValueError('Complete verified SOC merge required')
         files=manifest['files']
+        if variant=='v5':
+            from verify_evidence_training import verify
+            if verify(root)['adapter_sha256']!=manifest['adapter_sha256']:
+                raise ValueError('Merged V5 adapter differs from the completed full epoch')
         if variant.startswith('v2-step'):
             step=int(variant.removeprefix('v2-step'));checkpoint=root/f'outputs/soc-v2-pilot/checkpoint-{step}'
             saved=json.loads((checkpoint/'trainer_state.json').read_text())
@@ -99,7 +103,7 @@ def convert(root,variant):
 def main():
     def interrupted(signum,frame):raise InterruptedError(f'Conversion interrupted by signal {signum}')
     signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path('/workspace'));parser.add_argument('--variant',choices=['base','pilot','main','v2-step24','v2-step48'],required=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path('/workspace'));parser.add_argument('--variant',choices=['base','pilot','main','v2-step24','v2-step48','v5'],required=True)
     args=parser.parse_args();print(json.dumps(convert(args.root,args.variant)))
 
 

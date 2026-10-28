@@ -1,0 +1,234 @@
+{
+  "prepared_at_kst": "2026-10-29T05:39:00.282714+09:00",
+  "status": "prepared_not_GPU_trained",
+  "source_dataset": "data-soc-evidence-v5-r3",
+  "records": {
+    "train": 1024,
+    "validation": 128,
+    "test": 128
+  },
+  "total_records": 1280,
+  "pool_records": {
+    "train": 4835,
+    "validation": 692,
+    "test": 511
+  },
+  "unselected_records": 4758,
+  "provider_counts": {
+    "MITRE ATT&CK": 1208,
+    "CISA AA23-061A": 15,
+    "CISA AA24-038A": 49,
+    "CISA AA24-131A": 8
+  },
+  "source_group_counts": {
+    "train": 144,
+    "validation": 13,
+    "test": 18
+  },
+  "unique_technique_labels": {
+    "train": 522,
+    "validation": 140,
+    "test": 132
+  },
+  "gold_derivation": "original_provider_labels",
+  "project_authored_incident_scenarios": 0,
+  "question_and_format_project_authored": true,
+  "independent_expert_review": false,
+  "task_scope": "Source-reported historical CTI technique mapping, not full SOC operational competence or current compromise classification",
+  "CISA_report_splits": {
+    "AA23-061A": {
+      "split": "train",
+      "records": 15
+    },
+    "AA24-038A": {
+      "split": "validation",
+      "records": 49
+    },
+    "AA24-131A": {
+      "split": "test",
+      "records": 8
+    }
+  },
+  "CISA_review": {
+    "PDF_table_rows": 92,
+    "independent_bbox_ID_words": 92,
+    "selected_observations": 72,
+    "quarantined_context_rows": 7,
+    "withheld_title_variants_or_ID_conflicts": 2,
+    "other_differences": "identical observations merged with all provider labels retained",
+    "visual_pages_checked": {
+      "AA23-061A": [
+        23
+      ],
+      "AA24-038A": [
+        38
+      ],
+      "AA24-131A": [
+        4
+      ]
+    },
+    "full_visual_review": false
+  },
+  "reproduction": {
+    "source_cases_and_three_split_SHA256_equal": true,
+    "mechanical_source_rows_verified": 1324,
+    "cross_split_shared_reports_groups_or_identical_observations": 0
+  },
+  "source_audit": {
+    "status": "passed",
+    "records": {
+      "train": 1024,
+      "validation": 128,
+      "test": 128
+    },
+    "provider_label_assignments": {
+      "train": 1052,
+      "validation": 140,
+      "test": 132
+    },
+    "original_source_rows_verified": 1324,
+    "independent_PDF_ID_coverage": {
+      "AA23-061A": {
+        "layout_rows": 17,
+        "independent_PDF_ID_words": 17,
+        "matched": true
+      },
+      "AA24-038A": {
+        "layout_rows": 67,
+        "independent_PDF_ID_words": 67,
+        "matched": true
+      },
+      "AA24-131A": {
+        "layout_rows": 8,
+        "independent_PDF_ID_words": 8,
+        "matched": true
+      }
+    },
+    "cross_split_shared_reports_or_groups_or_identical_observations": 0,
+    "scope": "mechanical provider-label/attribution consistency, not independent expert validation of incident truth"
+  },
+  "tokenization": {
+    "train": {
+      "read": 1024,
+      "candidate_examples": 1024,
+      "candidate_turns": 1024,
+      "kept": 1024,
+      "covered_assistant_turns": 1024,
+      "tokens": 325717,
+      "supervised_tokens": 64442,
+      "max_tokens": 406,
+      "encoding_mode": "all_assistant_turns",
+      "example_unit": "complete_conversation"
+    },
+    "validation": {
+      "read": 128,
+      "candidate_examples": 128,
+      "candidate_turns": 128,
+      "kept": 128,
+      "covered_assistant_turns": 128,
+      "tokens": 39889,
+      "supervised_tokens": 8136,
+      "max_tokens": 347,
+      "encoding_mode": "all_assistant_turns",
+      "example_unit": "complete_conversation"
+    },
+    "test": {
+      "read": 128,
+      "candidate_examples": 128,
+      "candidate_turns": 128,
+      "kept": 128,
+      "covered_assistant_turns": 128,
+      "tokens": 40915,
+      "supervised_tokens": 8054,
+      "max_tokens": 381,
+      "encoding_mode": "all_assistant_turns",
+      "example_unit": "complete_conversation"
+    },
+    "max_length": 4096,
+    "require_all_prefixes": true,
+    "loss": "all_assistant_turns_per_conversation",
+    "truncation": "disabled; overlength prefixes rejected",
+    "checked_at_kst": "2026-10-29T05:16:33.800173+09:00"
+  },
+  "actual_CPU_tests": {
+    "count": 271,
+    "skips": 0,
+    "passed": true,
+    "log_sha256": "c38f740d01d706c1723aba10740f6d663faaefd6f4da25b71ba57a112a958d3e"
+  },
+  "development_baseline": {
+    "control_model": "soc-qwen36:35b-base-q4km-20261027",
+    "digest": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad",
+    "plan_sha256": "7fe6e595d52e0facf98553df1469e8545f18c5b17977e9e0a635d64a5e230603",
+    "requests": 32,
+    "JSON_valid": 32,
+    "strict_reference_complete": 3,
+    "exact_reference_macro_F1": 0.1232638888888889,
+    "missing_reference_IDs": 34,
+    "non_reference_predicted_IDs": 45,
+    "omitted_children_with_predicted_parent": 7,
+    "interpretation": "Reference agreement, not global SOC accuracy. Non-reference predictions are not all proven false; taxonomy versions, coarse parents and non-exhaustive provider annotations require separate semantic review. Raw answers retained unchanged.",
+    "operator_regression": "12 offline cases completed; 8 provisional string checks need semantic review and 4 valid alternative branches unscored; not 0% operational bot accuracy",
+    "final_test_128_answers_generated": false,
+    "actual_MCP_tools_executed": false
+  },
+  "training_plan": {
+    "base_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "full_selected_train_epoch": 1,
+    "train_records": 1024,
+    "steps": 512,
+    "gradient_accumulation": 2,
+    "learning_rate": 5e-07,
+    "smoke": "2 longest examples first; main starts from original base",
+    "train_deadline_minutes": 165,
+    "independent_restore_minutes": 170,
+    "restore_timeout_minutes": 6,
+    "max_shared_interruption_minutes": 180,
+    "approval": "pending_new_shared_service_interruption",
+    "promotion": "new candidate tag only; no automatic selection"
+  },
+  "candidate_tag": "soc-qwen36:35b-evidence-v5-q4km-20261029",
+  "frozen_inputs_SHA256": "89a5b480ca333e6bc3a192e48bd51c7412e171b3d055b053e1ad1ebe9db07e02",
+  "storage": {
+    "free_GiB_at_preparation": 108.15,
+    "old_pilot_HF_shards_proposed": 26,
+    "old_pilot_HF_bytes_proposed": 71903776776,
+    "old_artifact_deletion": false,
+    "deletion_approval": "pending; retain base, adapter, metadata and Ollama models"
+  },
+  "licensing": "MITRE source LICENSE copied with dataset; original CISA/third-party notices retained. TLP:CLEAR is not a copyright license. No public release of corpus/weights in this step.",
+  "not_changed": [
+    "Ollama operating model selection",
+    "services/ports/keys",
+    "driver",
+    "root deploy service settings"
+  ],
+  "remaining": [
+    "new interruption approval",
+    "smoke/time-fit/full GPU training",
+    "actual full-epoch/tensor validation",
+    "storage approval/CPU export/candidate registration",
+    "matched control evaluation/final holdout",
+    "full FW read-only MCP",
+    "rollback-protected harness cleanup and 2x2 comparison"
+  ],
+  "operator_validation": {
+    "at_kst": "2026-10-29T05:42:59.943016+09:00",
+    "path": "/usr/local/libexec/capstone-training-v5-window.py",
+    "sha256": "fa4fd3142f19c3f76cd0a94dd0127f89c26fba5ee65c86e28d8b0e975b65e1a0",
+    "root_owned": true,
+    "check": {
+      "ready": true,
+      "no_service_action": true
+    },
+    "altered_source_target_baseline_rejected": true
+  },
+  "portable_CPU_tests": {
+    "count": 271,
+    "skipped": 0,
+    "status": "passed",
+    "log_sha256": "fc1971ca06aa68fe38a81f56c6c94c7aa74bb6d116865bee4d3cbff36718113c"
+  },
+  "portable_scope": "271 tests passed without skips on a separately unpacked allowlisted bundle in the existing pinned Torch CPU image; final documentation receipt only changes metadata, not frozen learning source/data.",
+  "Git_at_preparation": "public source preparation awaiting commit/push; local datasets/evaluation reports excluded"
+}

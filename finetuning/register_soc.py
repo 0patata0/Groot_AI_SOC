@@ -85,7 +85,27 @@ def verify_runtime(original,show,expected_template,files):
 def candidate_name(variant):
     if variant in ('base','main'):return f'soc-qwen36:35b-{variant}-q4km-20261027'
     if variant in ('v2-step24','v2-step48'):return f'soc-qwen36:35b-{variant}-q4km-20261028'
+    if variant=='v5':return 'soc-qwen36:35b-evidence-v5-q4km-20261029'
     raise ValueError('Unknown candidate')
+
+
+def v5_source_notice(root):
+    root=Path(root);folder=root/'finetuning/data-soc-evidence-v5-r3'
+    manifest=json.loads((folder/'manifest.json').read_text())
+    license=(folder/'MITRE-ATTACK-LICENSE.txt').read_text()
+    attribution=(folder/'SOURCE_ATTRIBUTION.json').read_text()
+    if digest(folder/'MITRE-ATTACK-LICENSE.txt')!=manifest['MITRE_license_sha256'] or digest(folder/'SOURCE_ATTRIBUTION.json')!=manifest['attribution_sha256']:
+        raise ValueError('Training source attribution changed')
+    return ('\n\nSOC evidence V5 training-source attribution (not institutional certification):\n'
+            +license+'\nOriginal report/source provenance:\n'+attribution)
+
+
+def with_source_notice(original,notice):
+    result=dict(original);license=original.get('license')
+    if isinstance(license,str):result['license']=license+notice
+    elif isinstance(license,list) and all(isinstance(s,str) for s in license):result['license']=[*license,notice]
+    else:raise ValueError('Original model license must be preserved')
+    return result
 
 
 def register(root,variant):
@@ -103,6 +123,14 @@ def register(root,variant):
         before={m['name']:m['digest'] for m in api('/api/tags')['models']}
         if model in before:raise ValueError('Candidate already exists; refusing replacement')
         original=api('/api/show',{'model':'qwen3.6:35b'})
+        expected_runtime=original
+        if variant=='v5':
+            from verify_evidence_training import verify
+            state['training_coverage']=verify(root)
+            notice=v5_source_notice(root)
+            expected_runtime=with_source_notice(original,notice)
+            (folder/'training-source-attribution.txt').write_text(notice)
+            state['training_source_attribution_sha256']=hashlib.sha256(notice.encode()).hexdigest()
         expected_template=hf_template(root)
         if original['details']['quantization_level']!='Q4_K_M':raise ValueError('Original quantization changed')
         chosen={a['path']:a for a in conversion['artifacts'] if a['path'] in ['qwen36-soc-q4_k_m.gguf','mmproj-qwen36-soc-f16.gguf']}
@@ -115,12 +143,12 @@ def register(root,variant):
         (folder/'original-runtime-show.json').write_text(json.dumps(original,ensure_ascii=False,indent=2)+'\n')
         payload={'model':model,'files':files,'stream':False,'parameters':parameters(original.get('parameters',''))}
         for key in ('template','system','renderer','parser','requires','license','messages'):
-            if original.get(key):payload[key]=original[key]
+            if expected_runtime.get(key):payload[key]=expected_runtime[key]
         state.update(status='registering',files=files,original_digest=before['qwen3.6:35b']);save()
         result=api('/api/create',payload,timeout=1200)
         if result.get('status')!='success':raise ValueError('Model registration incomplete: '+repr(result))
         show=api('/api/show',{'model':model})
-        verified=verify_runtime(original,show,expected_template,files)
+        verified=verify_runtime(expected_runtime,show,expected_template,files)
         (folder/'ollama-show.json').write_text(json.dumps(show,ensure_ascii=False,indent=2)+'\n')
         tags=api('/api/tags')['models'];after={m['name']:m['digest'] for m in tags}
         if any(after.get(name)!=sha for name,sha in before.items()):raise ValueError('An existing model changed during registration')
@@ -134,7 +162,7 @@ def register(root,variant):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path.home()/'Capstone_Groot_training/qwen36-20261027');parser.add_argument('--variant',choices=['base','main','v2-step24','v2-step48'],required=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path.home()/'Capstone_Groot_training/qwen36-20261027');parser.add_argument('--variant',choices=['base','main','v2-step24','v2-step48','v5'],required=True)
     args=parser.parse_args()
     if platform.system()!='Linux' or platform.machine()!='aarch64':raise SystemExit('Run on Thor host')
     print(json.dumps(register(args.root,args.variant)))

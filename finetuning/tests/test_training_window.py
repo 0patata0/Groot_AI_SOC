@@ -110,6 +110,14 @@ class WindowTests(unittest.TestCase):
         with self.memory_mode():
             window.select_mode('v4-full');self.assertEqual(window.STAGES,('soc-v4-full-smoke','soc-v4-full-train'));self.assertEqual(window.LIMIT_SECONDS,165*60);args=window.restore_command('/inspected.py','/training');self.assertIn('--on-active=170m',args);self.assertIn('--property=TimeoutStartSec=6min',args);self.assertLess(window.RESTORE_MINUTES+6,180)
 
+    def test_v5_has_independent_restore_and_refuses_unfrozen_inputs_before_any_service_action(self):
+        with self.memory_mode(),tempfile.TemporaryDirectory() as d:
+            root=Path(d);(root/'finetuning').mkdir();(root/'finetuning/V5_TRAINING_INPUTS.json').write_text('{}')
+            window.select_mode('v5');self.assertEqual(window.STAGES,('soc-v5-smoke','soc-v5-train'))
+            args=window.restore_command('/inspected.py',root);self.assertIn('--on-active=170m',args);self.assertIn('--property=TimeoutStartSec=6min',args)
+            with patch.object(window,'run',side_effect=AssertionError('No service action')):
+                with self.assertRaisesRegex(ValueError,'Frozen V5 inputs differ'):window.window(root,Path('/inspected.py'))
+
     def test_full_epoch_readiness_pins_source_and_all_turn_coverage_without_service_actions(self):
         with tempfile.TemporaryDirectory() as d,self.memory_mode():
             root=Path(d);folder=root/'finetuning';folder.mkdir();freeze={'profile':'profile.json','source_cases':'cases.jsonl','data_folder':'data','source_sha256':{},'data_sha256':{},'records':{'train':332,'validation':94,'test':94},'assistant_turns':{'train':766,'validation':202,'test':202},'development_case_ids':['case1'],'development_evaluation_code_sha256':'fixture-code'}

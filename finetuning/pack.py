@@ -15,18 +15,20 @@ def main():
     parser.add_argument("--config", type=Path, default=ROOT / "config.json")
     opts = parser.parse_args()
     config_path = opts.config.resolve()
-    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json','config.qwen36-soc-v2.json','config.qwen36-soc-v3.json','config.qwen36-soc-v4.json','config.qwen36-soc-v4-full.json'):
+    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json','config.qwen36-soc-v2.json','config.qwen36-soc-v3.json','config.qwen36-soc-v4.json','config.qwen36-soc-v4-full.json','config.qwen36-soc-v5.json'):
         parser.error("Choose one of the bundled model profiles")
     raw = json.loads(config_path.read_text(encoding="utf-8"))
     if any(Path(raw[key]).is_absolute() for key in ("data_dir", "output_dir")):
         parser.error("Use relative data_dir/output_dir paths for a portable bundle")
     config = read_config(config_path)
-    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1", ROOT / "data-soc-v2-r2", ROOT / "data-soc-operator-v3-r1", ROOT / "data-soc-operator-v4-r1"):
+    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1", ROOT / "data-soc-v2-r2", ROOT / "data-soc-operator-v3-r1", ROOT / "data-soc-operator-v4-r1", ROOT / "data-soc-evidence-v5-r3"):
         parser.error("Portable bundle requires one of the fixed prepared datasets")
     if not Path(config["output_dir"]).resolve().is_relative_to(ROOT):
         parser.error("Portable bundle requires an output_dir inside finetuning/")
     check_data(config)
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
+             "evidence_groups.py", "cisa_tables.py", "prepare_evidence_v5.py", "audit_evidence_v5.py", "evaluate_evidence_v5.py", "review_evidence_results.py", "verify_evidence_training.py", "V5_EVIDENCE_SPEC.json", "config.qwen36-soc-v5.json",
+             "SOC_ROLE_MATRIX.json", "V4_DATA_PREPARATION.json", "V4_DATA_REVIEW.json", "V4_TRAINING_INPUTS.json", "V4_ASSESSMENT_POLICY.json", "config.qwen36-soc-v4.json", "config.qwen36-soc-v4-full.json", "SOURCE_EXPANSION.json", "dialogue_encoding.py", "remote_zip.py", "acquire_institutional.py", "institutional_sources.py", "prepare_institutional.py",
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "merge_streaming.py", "evaluate.py",
              "pack.py", "model_profile.py", "config.qwen36-thor.json", "requirements.qwen36-thor.txt",
              "setup_thor.sh", "THOR_35B.md", "R2_RESULTS.md", "QUALITY_RESULTS.md", "TRAINING_PROVENANCE.json", "R3_DATA_PREPARATION.json", "references.bib", "audit_training_provenance.py", "audit_tools.py", "mcp_contract.json",
@@ -67,8 +69,21 @@ def main():
             path=ROOT/name
             if path.is_symlink() or not path.resolve().is_relative_to(ROOT) or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:
                 parser.error('Frozen V4 input differs: '+name)
+    if config_path.name == 'config.qwen36-soc-v5.json':
+        names += ['V5_TRAINING_INPUTS.json','V5_DATA_PREPARATION.json','SOURCE_EXPANSION.json']
+        names += ['data-soc-evidence-v5-r3/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json',
+                  'independent-source-audit.json','evidence-audit.json','MITRE-ATTACK-LICENSE.txt','SOURCE_ATTRIBUTION.json')]
+        names += ['data-soc-source-evidence-v5-r3/cases.jsonl']
+        frozen=json.loads((ROOT/'V5_TRAINING_INPUTS.json').read_text())
+        expected={frozen['profile']:frozen['profile_sha256'],frozen['source_cases']:frozen['source_cases_sha256'],
+                  'V5_EVIDENCE_SPEC.json':frozen['spec_file_sha256'],**frozen['source_sha256']}
+        expected.update({frozen['data_folder']+'/'+s+'.jsonl':h for s,h in frozen['data_sha256'].items()})
+        for name,digest in expected.items():
+            path=ROOT/name
+            if path.is_symlink() or not path.resolve().is_relative_to(ROOT) or hashlib.sha256(path.read_bytes()).hexdigest()!=digest:
+                parser.error('Frozen V5 input differs: '+name)
     names += ['driver-diagnostics/'+name for name in ('README.md','NOTICE','check.py','elf_versions.py','manifest.json','gcc132-offline-manifest.json','nvidia-595.78-allocation.patch')]
-    paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))
+    paths = [ROOT / name for name in dict.fromkeys(names)] + sorted((ROOT / "tests").glob("test_*.py"))
     for path in paths:
         if not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(ROOT):
             parser.error(f"Missing or unsafe bundle input: {path.relative_to(ROOT)}")

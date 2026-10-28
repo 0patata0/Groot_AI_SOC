@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "limits": {
+    "train": 1024,
+    "validation": 128,
+    "test": 128
+  },
+  "scope": "Original provider CTI mappings only; no project-authored attack verdicts. One selected observation once, not independent incident counts.",
+  "historical_taxonomies": {
+    "14.0": {
+      "version": "14.0",
+      "url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/enterprise-attack/enterprise-attack-14.0.json",
+      "path": "mitre/enterprise-attack-14.0.json",
+      "bytes": 41774949,
+      "sha256": "87d503af611d2545f62224ef65e90b07e14935176b88d407a6574f38676353cd",
+      "objects": 20770
+    },
+    "15.0": {
+      "version": "15.0",
+      "url": "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/c2494b29dd268c46a5d0ea0990553e4327cd2253/enterprise-attack/enterprise-attack-15.0.json",
+      "path": "mitre/enterprise-attack-15.0.json",
+      "bytes": 43474289,
+      "sha256": "f327d6bfac80e09db35fdabb2e92ccaecffb8c370f59555dbbaadaf930323cc0",
+      "objects": 21542
+    }
+  },
+  "cisa": {
+    "AA23-061A": {
+      "entity": "BlackSuit / Royal",
+      "first_page": 22,
+      "last_page": 24,
+      "tables": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "expected_rows": 17,
+      "taxonomy_version": "15.0",
+      "split": "train",
+      "quarantine": [
+        {
+          "page": 23,
+          "id": "T1078.002",
+          "reason": "Statement about encrypted files creating administrator accounts needs source clarification; do not infer missing mechanism."
+        }
+      ]
+    },
+    "AA24-038A": {
+      "entity": "Volt Typhoon",
+      "first_page": 37,
+      "last_page": 45,
+      "tables": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "expected_rows": 67,
+      "taxonomy_version": "14.0",
+      "split": "validation",
+      "quarantine": [
+        {
+          "page": 40,
+          "id": "T1006",
+          "reason": "Creating a shadow copy alone does not establish direct-volume access; insufficient context in isolated table row."
+        },
+        {
+          "page": 40,
+          "id": "T1070.009",
+          "reason": "Cleared logs/artifacts statement does not explicitly establish persistence removal in isolated row."
+        },
+        {
+          "page": 40,
+          "id": "T1218",
+          "reason": "Generic use of native tools does not explicitly establish proxy execution in isolated row."
+        },
+        {
+          "page": 41,
+          "id": "T1555",
+          "reason": "Ambiguous statement about installed browsers/saved data needs source clarification."
+        },
+        {
+          "page": 41,
+          "id": "T1552.004",
+          "reason": "Symmetric browser AES key and Private Keys technique require clarification before isolated-row training."
+        },
+        {
+          "page": 42,
+          "id": "T1217",
+          "reason": "Same ambiguous installed-browser statement; preserve for review, not as a gold observation."
+        }
+      ]
+    },
+    "AA24-131A": {
+      "entity": "Black Basta",
+      "first_page": 4,
+      "last_page": 5,
+      "tables": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "expected_rows": 8,
+      "taxonomy_version": "15.0",
+      "split": "test",
+      "quarantine": []
+    }
+  },
+  "taxonomy_version_scope": "Reports specify major versions 14/15; original 14.0/15.0 releases are audit references, not proof of the unreported patch version.",
+  "independent_human_expert_review": false,
+  "selection_note": "Core labels are source-coded; question wording and JSON formatting are project-authored. Wider source pool remains untrained unless selected in a later explicit corpus."
+}

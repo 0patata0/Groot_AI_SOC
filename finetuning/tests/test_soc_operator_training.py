@@ -6,6 +6,15 @@ from unittest.mock import patch
 import container_task,thor_container
 from prepare_soc_operator import archived_case
 class OperatorTrainingTests(unittest.TestCase):
+ def test_v5_cpu_stage_cannot_fall_through_to_training(self):
+  self.assertNotIn('--gpus',thor_container.command('/tmp/training','soc-v5-tokenize',1000,1000))
+  for stage in ('soc-v5-smoke','soc-v5-train'):
+   self.assertIn('--gpus',thor_container.command('/tmp/training',stage,1000,1000))
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);source=root/'finetuning';source.mkdir();profile=Path(__file__).resolve().parents[1]/'config.qwen36-soc-v5.json';(source/profile.name).write_bytes(profile.read_bytes())
+   with patch.object(container_task,'ROOT',root),patch.object(container_task,'SOURCE',source),patch('container_task.sys.argv',['container_task.py','soc-v5-tokenize']),patch('container_task.signal.signal'),patch('container_task.run') as run,patch('container_task.guarded_process.run',side_effect=AssertionError('Tokenization cannot train')):
+    container_task.main()
+   args=run.call_args.args[0];self.assertIn('--tokenize-only',args);self.assertNotIn('--train',args);self.assertEqual(args[args.index('--output-dir')+1],'/workspace/soc-v5-tokenization')
  def test_cpu_tokenization_has_no_gpu_and_no_network(self):
   c=thor_container.command('/tmp/training','soc-v3-tokenize',1000,1000)
   self.assertNotIn('--gpus',c);self.assertEqual(c[c.index('--network')+1],'none');self.assertEqual(c[c.index('--memory')+1],'12g')

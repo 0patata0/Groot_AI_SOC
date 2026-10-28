@@ -9,13 +9,38 @@ from download_model import verify_artifact
 
 IMAGE = 'nvcr.io/nvidia/pytorch@sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb'
 STAGES = ('prepare','download','tokenize','smoke','train','soc-tokenize','soc-smoke','soc-pilot','soc-train',
-          'soc-v4-full-tokenize','soc-v4-full-smoke','soc-v4-full-train','soc-v4-tokenize','soc-v4-smoke','soc-v4-pilot','soc-v3-tokenize','soc-v3-smoke','soc-v3-pilot','soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
+          'soc-v5-tokenize','soc-v4-full-tokenize','soc-v5-smoke','soc-v4-full-smoke','soc-v5-train','soc-v4-full-train','soc-v4-tokenize','soc-v4-smoke','soc-v4-pilot','soc-v3-tokenize','soc-v3-smoke','soc-v3-pilot','soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
+
+
+def verify_v5_inputs(root):
+    """Require complete source-label and CPU token proofs before any GPU stage."""
+    if json.loads((root/'soc-v5-tokenize-status.json').read_text()).get('status') != 'completed':
+        raise SystemExit('Successful V5 tokenization required')
+    source = root/'finetuning'
+    profile = json.loads((source/'config.qwen36-soc-v5.json').read_text())
+    folder = source/profile['data_dir']
+    manifest = json.loads((folder/'manifest.json').read_text())
+    audit = json.loads((folder/'independent-source-audit.json').read_text())
+    proof = json.loads((root/'soc-v5-tokenization/tokenization_report.json').read_text())
+    checks = json.loads((root/'soc-v5-tokenization/data_check.json').read_text())
+    if audit.get('status') != 'passed' or audit.get('records') != manifest['selected_records']:
+        raise SystemExit('V5 original-provider audit required')
+    if manifest.get('project_authored_incident_scenarios') != 0 or manifest.get('gold_derivation') != 'original_provider_labels':
+        raise SystemExit('Only source-labelled V5 observations are released')
+    if proof.get('loss') != 'all_assistant_turns_per_conversation' or proof.get('require_all_prefixes') is not True or proof.get('max_length') != profile['max_length']:
+        raise SystemExit('Strict V5 all-assistant token proof required')
+    for split, count in manifest['selected_records'].items():
+        row = proof[split]
+        if (row.get('kept'), row.get('covered_assistant_turns'), row.get('candidate_examples'), row.get('candidate_turns')) != (count,)*4:
+            raise SystemExit('V5 observations or target turns were excluded')
+    if checks.get('sha256') != {s:r['sha256'] for s,r in manifest['outputs'].items()}:
+        raise SystemExit('V5 tokenized corpus differs')
 
 
 def command(root, stage, uid, gid):
     if stage not in STAGES: raise ValueError('Unknown stage')
     root = Path(root).resolve()
-    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v4-full-smoke','soc-v4-full-train','soc-v4-smoke','soc-v4-pilot','soc-v3-smoke','soc-v3-pilot','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
+    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v5-smoke','soc-v4-full-smoke','soc-v5-train','soc-v4-full-train','soc-v4-smoke','soc-v4-pilot','soc-v3-smoke','soc-v3-pilot','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
     env = {'PYTHONDONTWRITEBYTECODE':'1','PIP_NO_CACHE_DIR':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1',
            'HF_HUB_DISABLE_TELEMETRY':'1','HF_HUB_DISABLE_PROGRESS_BARS':'1','HF_HOME':'/workspace/hf-cache',
            'HF_HUB_DISABLE_IMPLICIT_TOKEN':'1',
@@ -129,6 +154,10 @@ def main():
             raise SystemExit('Full-dialogue tokenization corpus mismatch')
     if args.stage=='soc-v4-full-train' and json.loads((root/'soc-v4-full-smoke-status.json').read_text())['status']!='completed':
         raise SystemExit('Successful full-dialogue smoke required')
+    if args.stage in ('soc-v5-smoke','soc-v5-train'):
+        verify_v5_inputs(root)
+    if args.stage=='soc-v5-train' and json.loads((root/'soc-v5-smoke-status.json').read_text())['status']!='completed':
+        raise SystemExit('Successful V5 smoke required')
     print(subprocess.check_output(command(root,args.stage,os.getuid(),os.getgid()),text=True).strip())
 
 

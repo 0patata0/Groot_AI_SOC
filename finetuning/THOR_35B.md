@@ -1,5 +1,30 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 실제 메모리 재현 결과 — 2026-10-28 17:05~17:08 KST
+
+**같은 NVRM `NV_ERR_NO_MEMORY` 경고 12건을 재현했으며, 학습은 2-step 모두 완료했다.** 최대15분 중단 승인 아래 6분 학습 제한·8분 독립 복구 타이머를 적용했다. 기존 `qwen3.6:35b`는 원래 digest로 복구됐고 실제 중단은172.42139초(2분52.42초)다. 경고의 정확한 내부 할당 원인은 미확정이다.
+
+| 실제 GPU 실행·복구 확인 | 결과 |
+|---|---|
+| 별도 단계·출력 | `soc-memory-smoke` / `outputs/soc-memory-smoke/` |
+| 입력·연산 | 같은 고정 R2 원본·프로필, 전체390 train prefix 검증 후 최장1664/1582토큰 2개 선택, 2-step/accumulation1, validation8 |
+| 공유 추론 중단·복구 | 17:05:25.114144~17:08:17.535534 KST; 완료 즉시 복구 |
+| 모델 적재 완료 | 17:06:47.109616 KST 진단 표본 |
+| 같은 커널 경고 | 17:05:56.281989~17:06:47.820223 KST, 적재 중8건·완료 직후4건; 복구 구간0 |
+| CUDA 최대 allocated/reserved | 70.37/71.88GiB, native allocator |
+| PyTorch 할당 재시도·OOM | 10표본에서 각0; 모든 드라이버 내부 할당을 포괄하는 카운터는 아님 |
+| 종료·host guard | Docker exit0/OOMKilled=false, 최저 가용43.80GiB, 12GiB 보호 여유 유지 |
+| OOM-kill | host 누적1→1, cgroup oom/oom_kill0; 새 강제 종료0 |
+| 기존 체크포인트 보존 | R2 24/48-step 어댑터 SHA 불변; 새 등록/운영 승격0 |
+
+모델 적재 전→완료 시점에서 host MemAvailable은117.39→51.42GiB, CMA free는6.289→0.312MiB였다. 실행 마지막에는43.80GiB/1.773MiB였다. 처음→마지막 표본의 `allocstall_normal`은1921, `compact_stall`은3926, `compact_fail`은1937, `compact_success`는1989 증가했다. 이는 회수·압축 활동이 있었다는 관측이다. 실패 요청의 크기·메모리 종류·정렬을 모르므로 CMA 부족이나 단편화가 경고의 원인이라고 확정할 수 없다. Python OOM이 없었다는 사실 역시 드라이버 경고가 무해하다는 증거는 아니다.
+
+cgroup peak는 약3.18GiB였지만 같은 프로세스의 CUDA peak allocated는70.37GiB였다. 따라서 이 Thor 실행에서 Docker112GiB cgroup 제한을 전체 GPU 메모리 사용량 제한과 같게 해석하지 않는다. 기존 host 가용 메모리 보호를 유지한다. 단일 짧은 재현은 장기 누수·하드웨어 정상 여부·본 학습 안정성을 판정하지 못한다.
+
+증거는 Thor `~/Capstone_Groot_training/qwen36-20261027/memory-repro-20261028/reproduction-audit.json`, 새 출력의 `memory_telemetry.jsonl`·`progress.json`·`run_manifest.json`, 별도 window/restore 상태에 보존했다. 기존 R2 출력·실행config·원본 가중치는 보존했다. 재현용2-step 어댑터를 변환·등록하거나 봇에 적용하지 않았다. loss와2-step 성공은 정확도 개선 평가가 아니다.
+
+남은 원인 조사는 실패한 드라이버 할당 요청의 종류·크기 확인과 같은 조건의 장기 안정성 검증이다. 드라이버/캐시/CMA 설정 변경, 재부팅, 추가 GPU 실험은 이번 재현에 포함하지 않았다. 실제 채팅·MCP·보호 변경 E2E도 실행하지 않았다. 아래 준비/점검 내용은 재현 전 시점의 이력이다.
+
 > **메모리 재현 준비:** operator `training_window.py --mode memory-repro`와전용 `soc-memory-smoke`를추가했다. 최장2prefix/2step·새결과경로·6분학습제한/8분독립복구·기존35B유지,로컬/Thor155검사와무중단전제조건검증완료다. 공유추론최대15분중단확인은진행중이며아직GPU실행하지않았다. [실행상태](../STATUS.md).
 
 ## 메모리 점검 후속 — 2026-10-28 KST

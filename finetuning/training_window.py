@@ -26,12 +26,25 @@ STAGES=('soc-v2-smoke','soc-v2-pilot')
 STATE=Path('/var/lib/capstone-training-v2-window')
 LIMIT_SECONDS=45*60
 RESTORE_MINUTES=50
+MODE='v2'
 DATA_HASHES={'train':'73e6345fd0e7fdd35c31272bcdd271528ffee52d86d9fd15af363d23bef25ac7',
              'validation':'ac515b0ed1ad2e7c613512d5e32c9aa707ed68c03356e55dcb59cfcfa6320850',
              'test':'4e7bf5e8f988895fcd9efb437c1c231295befdf7e0bc1d59614481974edb755d'}
 PROFILE_SHA256='2d76cd0dd8f52ee5372a7690be8eef8d75bd7fc2499bd0b89792dc6a414da9da'
 BASELINE_INPUTS={'cases.jsonl':'b89ddbc86a40dd55743513a255f7d35e05adad701fca4468f347f3a5980fdeae',
                  'mcp_contract.json':'ffcfb0bc8393e483e395a2348cb258dc7b843ee677579c8da577c7f1636390bd'}
+
+
+def select_mode(mode):
+    global MODE,STAGES,STATE,LIMIT_SECONDS,RESTORE_MINUTES,RESTORE_UNIT
+    if mode=='v2':
+        STAGES=('soc-v2-smoke','soc-v2-pilot');STATE=Path('/var/lib/capstone-training-v2-window')
+        LIMIT_SECONDS=45*60;RESTORE_MINUTES=50;RESTORE_UNIT='capstone-soc-v2-restore'
+    elif mode=='memory-repro':
+        STAGES=('soc-memory-smoke',);STATE=Path('/var/lib/capstone-memory-repro-20261028')
+        LIMIT_SECONDS=6*60;RESTORE_MINUTES=8;RESTORE_UNIT='capstone-memory-repro-restore'
+    else:raise ValueError('Unknown fixed operator mode')
+    MODE=mode
 
 
 def now():return datetime.now(ZoneInfo('Asia/Seoul')).isoformat()
@@ -82,8 +95,12 @@ def verify_ready(root):
 
 
 def restore_command(script,root):
-    return ['systemd-run','--unit='+RESTORE_UNIT,'--on-active='+str(RESTORE_MINUTES)+'m',
-            '--timer-property=AccuracySec=1s','/usr/bin/python3','-B',str(script),'restore','--root',str(root)]
+    args=['systemd-run','--unit='+RESTORE_UNIT,'--on-active='+str(RESTORE_MINUTES)+'m',
+          '--timer-property=AccuracySec=1s']
+    if MODE=='memory-repro':args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
+    args+=['/usr/bin/python3','-B',str(script),'restore','--root',str(root)]
+    if MODE!='v2':args+=['--mode',MODE]
+    return args
 
 
 def process_belongs_to(pid,ancestor,proc=Path('/proc')):
@@ -143,7 +160,7 @@ def window(root,script):
     if any(line.startswith('capstone-qwen36-') for line in run(['docker','ps','--format','{{.Names}}']).stdout.splitlines()):
         raise ValueError('Another training stage is running')
     user=pwd.getpwuid(1000).pw_name
-    job={'status':'prepared','started_at_kst':now(),'stages':list(STAGES),'deadline_seconds':LIMIT_SECONDS,
+    job={'status':'prepared','mode':MODE,'started_at_kst':now(),'stages':list(STAGES),'deadline_seconds':LIMIT_SECONDS,
          'independent_restore_minutes':RESTORE_MINUTES,'original_digest':ORIGINAL_DIGEST};save('window.json',job)
     paused=False
     try:
@@ -182,7 +199,8 @@ def window(root,script):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['check','run','restore']);parser.add_argument('--root',type=Path,required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['check','run','restore']);parser.add_argument('--root',type=Path,required=True)
+    parser.add_argument('--mode',choices=['v2','memory-repro'],default='v2');args=parser.parse_args();select_mode(args.mode)
     if args.action=='check':
         verify_ready(args.root.resolve());print(json.dumps({'ready':True,'no_service_action':True}));return
     script=Path(__file__).resolve()

@@ -1,5 +1,7 @@
 # thor-05용 Qwen3.6-35B 학습
 
+> **메모리 재현 준비:** operator `training_window.py --mode memory-repro`와전용 `soc-memory-smoke`를추가했다. 최장2prefix/2step·새결과경로·6분학습제한/8분독립복구·기존35B유지,로컬/Thor155검사와무중단전제조건검증완료다. 공유추론최대15분중단확인은진행중이며아직GPU실행하지않았다. [실행상태](../STATUS.md).
+
 ## 메모리 점검 후속 — 2026-10-28 KST
 
 **현재 추론은 가동 중이며, 경고의 정확한 할당 원인은 아직 확정하지 않았다.** Jetson Linux39.2.1/kernel6.8.12-1021-tegra/driver595.78에서 운영35B를 유지한 채 로그·자원만 점검했다. 새 GPU 학습이나 부하 재현은 하지 않았다.

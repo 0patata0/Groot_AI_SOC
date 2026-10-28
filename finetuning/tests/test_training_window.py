@@ -13,6 +13,40 @@ import training_window as window
 
 
 class WindowTests(unittest.TestCase):
+    def memory_mode(self):
+        return patch.multiple(window,MODE=window.MODE,STAGES=window.STAGES,STATE=window.STATE,
+                              LIMIT_SECONDS=window.LIMIT_SECONDS,RESTORE_MINUTES=window.RESTORE_MINUTES,
+                              RESTORE_UNIT=window.RESTORE_UNIT)
+
+    def test_memory_repro_is_one_new_stage_with_its_own_short_recovery_timer(self):
+        with self.memory_mode():
+            window.select_mode('memory-repro')
+            self.assertEqual(window.STAGES,('soc-memory-smoke',))
+            self.assertEqual(window.LIMIT_SECONDS,360)
+            self.assertNotEqual(window.STATE,Path('/var/lib/capstone-training-v2-window'))
+            args=window.restore_command('/usr/local/libexec/inspected.py','/training')
+            self.assertIn('--on-active=8m',args);self.assertIn('memory-repro',args)
+            self.assertIn('--property=Type=oneshot',args);self.assertIn('--property=TimeoutStartSec=6min',args)
+            self.assertLess(window.RESTORE_MINUTES+6,15)
+
+    def test_memory_repro_keeps_existing_v2_results_and_rejects_its_own_retry(self):
+        with tempfile.TemporaryDirectory() as d,self.memory_mode():
+            root=Path(d);digests=self.fixture(root)
+            (root/'soc-v2-smoke-status.json').write_text('{"status":"completed"}')
+            (root/'outputs/soc-v2-pilot').mkdir(parents=True)
+            window.select_mode('memory-repro')
+            with patch.object(window,'DATA_HASHES',digests):
+                window.verify_ready(root)
+                (root/'soc-memory-smoke-status.json').write_text('{"status":"failed"}')
+                with self.assertRaisesRegex(ValueError,'automatic retry'):window.verify_ready(root)
+
+    def test_unknown_operator_mode_is_rejected_and_v2_defaults_stay_reviewed(self):
+        with self.memory_mode():
+            with self.assertRaises(ValueError):window.select_mode('arbitrary')
+            window.select_mode('memory-repro');window.select_mode('v2')
+            self.assertEqual(window.STAGES,('soc-v2-smoke','soc-v2-pilot'))
+            self.assertEqual(window.LIMIT_SECONDS,45*60);self.assertEqual(window.RESTORE_MINUTES,50)
+
     def fixture(self,root):
         (root/'finetuning/data-soc-v2-r2').mkdir(parents=True)
         config=Path(__file__).resolve().parents[1]/'config.qwen36-soc-v2.json'

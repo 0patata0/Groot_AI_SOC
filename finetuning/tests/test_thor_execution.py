@@ -10,6 +10,7 @@ from unittest.mock import patch, Mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import memory_budget
+import container_task
 import model_profile
 import thor_container
 import train
@@ -63,6 +64,34 @@ class ArtifactTests(unittest.TestCase):
 
 
 class LaunchTests(unittest.TestCase):
+    def test_memory_worker_is_two_long_prefix_steps_and_preserves_v2_files(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);source=root/'finetuning';source.mkdir()
+            config=json.loads((train.ROOT/'config.qwen36-soc-v2.json').read_text())
+            (source/'config.qwen36-soc-v2.json').write_text(json.dumps(config))
+            (source/'config.soc-v2.run.local.json').write_text('previous v2 evidence')
+            (root/'base-manifest.json').write_text(json.dumps({'verified':True,'revision':config['revision'],'model':config['model_name_or_path']}))
+            with patch.object(container_task,'ROOT',root),patch.object(container_task,'SOURCE',source), \
+                 patch('container_task.sys.argv',['container_task.py','soc-memory-smoke']), \
+                 patch('container_task.signal.signal'),patch('container_task.guarded_process.run') as launch:
+                container_task.main()
+            args=launch.call_args.args[0]
+            for flag,value in (('--max-steps','2'),('--max-train-samples','2'),('--max-eval-samples','8'),('--output-dir','/workspace/outputs/soc-memory-smoke')):
+                self.assertEqual(args[args.index(flag)+1],value)
+            local=json.loads((source/'config.soc-memory.run.local.json').read_text())
+            self.assertTrue(local['smoke_longest_prefixes']);self.assertTrue(local['offline'])
+            self.assertEqual(local['gradient_accumulation_steps'],1)
+            self.assertEqual((source/'config.soc-v2.run.local.json').read_text(),'previous v2 evidence')
+            self.assertEqual(launch.call_args.kwargs['report'],root/'soc-memory-smoke-memory-guard.json')
+
+    def test_memory_repro_uses_a_separate_offline_bounded_gpu_container(self):
+        cmd=thor_container.command('/tmp/training','soc-memory-smoke',1000,1000)
+        self.assertEqual(cmd[cmd.index('--name')+1],'capstone-qwen36-soc-memory-smoke')
+        self.assertEqual(cmd[cmd.index('--network')+1],'none')
+        self.assertEqual(cmd[cmd.index('--memory')+1],'112g')
+        self.assertIn('--gpus',cmd);self.assertIn('HF_DEACTIVATE_ASYNC_LOAD=1',cmd)
+        self.assertNotIn('--privileged',cmd)
+
     def test_final_evaluation_reuses_only_the_current_step(self):
         trainer=SimpleNamespace(state=SimpleNamespace(global_step=2,log_history=[
             {'step':2,'eval_loss':0.25,'eval_runtime':5,'epoch':1}, {'step':2,'train_loss':0.1}]),evaluate=Mock(return_value={'eval_loss':0.3}))

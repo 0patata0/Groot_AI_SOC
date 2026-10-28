@@ -1,5 +1,17 @@
 # 인프라 현황 — 2026-10-28 현재 작업 상태
 
+## 실제 메모리 재현 준비 — 2026-10-28T16:55:24.663744+09:00
+
+**재현 실행 경로는 준비됐으며, 아직 공유 추론 중단과 새 GPU 실행은 시작하지 않았다.** 같은 R2 원본/프로필/자료에서 최장1664·1582토큰2prefix·2step/accum1·validation8만 별도 `soc-memory-smoke` 단계로 실행한다.48-step 본 학습·변환·새 모델 등록/운영 교체는 포함하지 않는다.
+
+- 기존R2출력/상태/실행config는보존하고새출력 `outputs/soc-memory-smoke`,새config `config.soc-memory.run.local.json`,새상태경로 `/var/lib/capstone-memory-repro-20261028`을사용한다. 같은새경로의재시도도증거가있으면거부한다.
+- `training_window.py --mode memory-repro`는6분학습deadline/8분독립복구timer·최대6분oneshot복구실행한도를사용한다.15분이내복구를목표로계획했으며기존35Bdigest대조/warm복구·실패시복구·다른GPU프로세스거부·12GiBhostguard/96GiB시작검사는유지한다. v2기존모드45/50분과이전root복사본/기록은보존한다.
+- 로컬/Thor155검사·root소유operator복사본SHA `e6f6fe1643cd7c2dcceebffd2fb206a5adacc5cea8359828b5ac102ed08f5840`·실제무중단check통과. 원35Bactive/digest불변·현재GPU작업Ollama1개·디스크110.38GiB를확인했다. timer시작0·service_stop0·새GPU학습0이며공유추론중단승인은별도확인중이다. 이전60분승인window는이미완료됐고이번재현의새중단과구분한다.
+- 실행시새memory_telemetry의단계/할당재시도·OOM·host/CMA/cgroup을커널경고KST와대조한다. 경고가없더라도상태차이가있어원인해결로단정하지않는다. 실제승인/실행/복구·재현결과는후속에기록한다. 이준비단위공개변경은자동Git게시하며자격·자료·검증/대화기록·업무분담은제외한다.
+
+
+- **준비 검증 후속 2026-10-28T17:00:11.550231+09:00**:68파일반입묶음전체소스바이트일치/SHA`9d081a41b4d19e6ee9d4e68d10cafb9100ae09559c91bda83ae3c85b9cbf72fd`확인뒤Mactar삭제.16:56:52KST1초시험타이머는root복사본의check만실행해ready/no_service_action으로정상종료했다. 초기폴링은자동회수된transientunit의ExecMainCode를기다려timeout됐지만journal에서실행/성공종료를독립확인했다. 실제8분복구timer/GPU/공유추론중지는계속0이며승인대기다.
+
 ## Thor 메모리 점검·진단 기록 보완 — 2026-10-28T16:00:13.036668+09:00
 
 **현재 추론은 가동 중이며 가용 메모리 약85.7GiB, 오늘 실제OOM종료0이다. GPU 할당 경고는 학습50건에 비교모델 적재2건을 더해52건으로 확인했으나 정확한 실패 요청/원인은 미확정이다.** [범위·공식자료·후속](finetuning/THOR_35B.md).

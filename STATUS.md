@@ -1,5 +1,14 @@
 # 인프라 현황 — 2026-10-28 현재 작업 상태
 
+## 연산 추적·정답 위치 선택 계산 준비 — 2026-10-28T18:33:00.772743+09:00
+
+**첫20개 경고 시각이 `aten::_log_softmax_backward_data`와 겹쳤다. 모든 입력 위치의 전체 어휘 점수를 만드는 불필요한 손실 계산을 줄일 수정안을 준비했다.** 문맥은 backbone 전체에 그대로 입력하고 causal shift 후 정답이 있는 위치의 vocabulary projection만 계산한다. 학습자료/정답/LoRA 범위는 바꾸지 않는다.
+
+- CPU profiler 추적2-step도 정상 종료/원35B 복구했다(실제중단217.69초). 추적훈련 경고74건·복구후0건을 따로 기록했다. profiling·메모리 상태가 달라3건짜리 비추적 VMM과 정량 성능 비교하지 않는다. 1.48GB/7,010,762event trace는 서버에서 스트리밍 해석했으며 Mac에는 받지 않았다.
+- 새 `completion_loss.py`는 전체 causal target의 개수를 대조하고, 같은 Transformers loss를 사용한다. 고정 ConditionalGeneration은 loss kwargs를 전달하지 않으므로 전용 Trainer에서 선택 logits/shift_labels와 기존 mean·누적 정규화를 보존한다. prediction_loss_only·추가정규화/label smoothing 충돌은 거부한다.
+- 로컬/Thor166검사 중Torch3건은host에서생략했고, 기존GPU미노출이미지에서실제3검사 모두통과했다. 두배치/서로다른마스크/패딩/마지막토큰·문맥기울기·모든파라미터기울기·실제2회누적학습/평가를 확인했다. 모델패키지/원본가중치 변경0이다.
+- 별도 `soc-memory-loss`/`memory-loss`로같은VMM·최장2prefix/2-step/eval8·6분제한/8분독립복구·원35B복구 범위에서GPU확인한다. 실제35B경고해결·운영기본적용은 아직 미검증이며 성공으로 표시하지 않는다.
+
 ## VMM 비교 결과·첫 연산 추적 준비 — 2026-10-28T18:10:28.634087+09:00
 
 **동일35B/자료의2-step VMM 비교는 성공했고 경고는12→3건으로 감소했다. 적재 구간0건, 첫 학습 연산 중3건이 남아 해결 완료로 판단하지 않는다.** 기존35B는18:01:18.542KST 복구·중단174.50초(2분54.50초), exit0/OOMKilled=false·OOM/재시도0·기존R2 SHA불변이다. [상세](finetuning/THOR_35B.md).

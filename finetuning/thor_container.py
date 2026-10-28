@@ -9,13 +9,13 @@ from download_model import verify_artifact
 
 IMAGE = 'nvcr.io/nvidia/pytorch@sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb'
 STAGES = ('prepare','download','tokenize','smoke','train','soc-tokenize','soc-smoke','soc-pilot','soc-train',
-          'soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace')
+          'soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
 
 
 def command(root, stage, uid, gid):
     if stage not in STAGES: raise ValueError('Unknown stage')
     root = Path(root).resolve()
-    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace')
+    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss')
     env = {'PYTHONDONTWRITEBYTECODE':'1','PIP_NO_CACHE_DIR':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1',
            'HF_HUB_DISABLE_TELEMETRY':'1','HF_HUB_DISABLE_PROGRESS_BARS':'1','HF_HOME':'/workspace/hf-cache',
            'HF_HUB_DISABLE_IMPLICIT_TOKEN':'1',
@@ -24,7 +24,7 @@ def command(root, stage, uid, gid):
            'PIP_CONSTRAINT':'/workspace/vendor-constraints.txt'}
     if stage not in ('prepare','download'): env.update(HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1')
     if training: env['HF_DEACTIVATE_ASYNC_LOAD']='1'
-    if stage in ('soc-memory-vmm','soc-memory-trace'):env['PYTORCH_CUDA_ALLOC_CONF']='expandable_segments:True'
+    if stage in ('soc-memory-vmm','soc-memory-trace','soc-memory-loss'):env['PYTORCH_CUDA_ALLOC_CONF']='expandable_segments:True'
     args = ['docker','run','-d','--pull=never','--name','capstone-qwen36-'+stage,
             '--user',f'{uid}:{gid}','--cap-drop','ALL','--security-opt','no-new-privileges',
             '--pids-limit','512','--cpus','10' if training else '4','--memory','112g' if training else '12g',
@@ -72,9 +72,9 @@ def main():
         raise SystemExit('Successful SOC pilot stage required')
     if args.stage in ('soc-smoke','soc-pilot','soc-train') and json.loads((root/'soc-tokenize-status.json').read_text())['status']!='completed':
         raise SystemExit('Successful SOC tokenization required')
-    if args.stage in ('soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace') and json.loads((root/'soc-v2-tokenize-status.json').read_text())['status']!='completed':
+    if args.stage in ('soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss') and json.loads((root/'soc-v2-tokenize-status.json').read_text())['status']!='completed':
         raise SystemExit('Successful v2 tokenization required')
-    if args.stage in ('soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace'):
+    if args.stage in ('soc-v2-smoke','soc-v2-pilot','soc-memory-smoke','soc-memory-vmm','soc-memory-trace','soc-memory-loss'):
         report=json.loads((root/'soc-v2-tokenization/tokenization_report.json').read_text())
         profile=json.loads((root/'finetuning/config.qwen36-soc-v2.json').read_text())
         if report.get('max_length')!=profile['max_length'] or report.get('require_all_prefixes') is not True:

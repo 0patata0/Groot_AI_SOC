@@ -49,6 +49,9 @@ def select_mode(mode):
     elif mode=='memory-trace':
         STAGES=('soc-memory-trace',);STATE=Path('/var/lib/capstone-memory-trace-20261028')
         LIMIT_SECONDS=6*60;RESTORE_MINUTES=8;RESTORE_UNIT='capstone-memory-trace-restore'
+    elif mode=='memory-loss':
+        STAGES=('soc-memory-loss',);STATE=Path('/var/lib/capstone-memory-loss-20261028')
+        LIMIT_SECONDS=6*60;RESTORE_MINUTES=8;RESTORE_UNIT='capstone-memory-loss-restore'
     else:raise ValueError('Unknown fixed operator mode')
     MODE=mode
 
@@ -103,7 +106,7 @@ def verify_ready(root):
 def restore_command(script,root):
     args=['systemd-run','--unit='+RESTORE_UNIT,'--on-active='+str(RESTORE_MINUTES)+'m',
           '--timer-property=AccuracySec=1s']
-    if MODE in ('memory-repro','memory-vmm','memory-trace'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
+    if MODE in ('memory-repro','memory-vmm','memory-trace','memory-loss'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
     args+=['/usr/bin/python3','-B',str(script),'restore','--root',str(root)]
     if MODE!='v2':args+=['--mode',MODE]
     return args
@@ -206,7 +209,7 @@ def window(root,script):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['check','run','restore']);parser.add_argument('--root',type=Path,required=True)
-    parser.add_argument('--mode',choices=['v2','memory-repro','memory-vmm','memory-trace'],default='v2');args=parser.parse_args();select_mode(args.mode)
+    parser.add_argument('--mode',choices=['v2','memory-repro','memory-vmm','memory-trace','memory-loss'],default='v2');args=parser.parse_args();select_mode(args.mode)
     if args.action=='check':
         verify_ready(args.root.resolve());print(json.dumps({'ready':True,'no_service_action':True}));return
     script=Path(__file__).resolve()

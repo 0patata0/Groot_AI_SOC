@@ -1,5 +1,17 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## 경고 연산·정답 위치 projection 수정안 — 2026-10-28 KST
+
+CPU trace와 커널 절대시각을 맞춘 첫20개 경고는 `aten::_log_softmax_backward_data`/그 autograd 호출과 겹쳤다. 이것은 호출 구간의 상관 증거이며 실패 페이지 크기까지 추적한 것은 아니다. 추적 실행은 학습73건으로 비추적VMM3건보다 많았다. profiling과 실행 당시메모리 상태의 영향을 분리하지 못해 이 수치로 회귀/개선을 판단하지 않는다. 전체1,480,316,893B trace는 서버에서 스트리밍 해석했고 Mac에 받지 않았다.
+
+기존 completion-only 학습은 prompt labels를-100으로 무시하지만, 각 입력 위치의 큰 어휘 logits와 log-softmax backward tensor는 계산한다. 새 `completion_loss.py`는 입력 문맥을 전부 backbone에 넣은 뒤 causal shift 후 실제 정답이 있는 위치만 LM head로 선택한다. 배치별 위치의 합집합을 사용하며 나머지 배치의-100은 유지한다. 정답 토큰 개수를 전후 대조하고 supervision이 없거나 외부 logits 옵션이 충돌하면 거부한다.
+
+고정 Qwen conditional model의 `logits_to_keep`는 Tensor 선택을 지원하지만 자체 loss 호출은 kwargs의 shift_labels를 전달하지 않는다. 따라서 전용 Trainer가 선택된 logits와 정렬한 targets를 공식 `ForCausalLMLoss`에 명시 전달한다. 기존 mean loss·Trainer gradient accumulation 경계를 유지하며, 추가 num_items 정규화/label smoothing·임의 compute_loss_func·loss-only가 아닌평가는 거부한다. [고정 모델 구현](https://raw.githubusercontent.com/huggingface/transformers/v5.4.0/src/transformers/models/qwen3_5_moe/modeling_qwen3_5_moe.py) · [공식 loss 구현](https://raw.githubusercontent.com/huggingface/transformers/v5.4.0/src/transformers/loss/loss_utils.py).
+
+실제 CPU Torch/Transformers에서 손실과 모든 파라미터 기울기를 기존 방식과 대조했다. 다른배치의 정답 위치·마스크 구멍/패딩·마지막토큰을 포함하고 누적 문맥을 갖는 backbone으로 문맥 gradient 보존을 확인했다. 실제 Trainer2회누적1step과 loss-only평가도 통과했다. 세 검사에서CUDA초기화0이며 host전체166검사는Torch3건생략/별도실제CPU3건완료로 구분한다. 최초toy fixture의label_names/ModelOutput계약오류는 실제학습과같게 고친 뒤통과했다.
+
+새 `soc-memory-loss`/`--mode memory-loss`는 VMM과해당옵션만사용하며 profiler를끄고최장2prefix/2-step/eval8·6분학습제한/8분독립복구/기존35B유지를따른다. 새config/출력/상태로이전R2·기본/VMM/trace증거를보존한다. 아직35BGPU경고해결·기본활성화/장기시험·정확도개선평가는완료하지않았다.
+
 ## VMM 실제 결과·잔여 연산 추적 — 2026-10-28 18:02 KST
 
 같은35B/자료/LoRA/2-step·최장2prefix·eval8의 VMM 비교를 완료했다. baseline과 manifest 차이는 output_dir뿐이며 data/학습파라미터는 같다. 기존12건 중 적재 때의 경고는 이번0건이지만 첫 연산에3건이 남았다. 한 번씩의 순차 비교이므로 캐시·단편화 상태도 달랐으며, 감소 전부를 설정 효과로 확정하지 않는다.

@@ -395,7 +395,12 @@ def run_training(config, checks, hardware):
             self.record(state, 'training')
 
     progress = Progress()
-    trainer = Trainer(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator,
+    trainer_type=Trainer
+    if config.get('assistant_only_logits',False):
+        if config.get('model_kind')!='qwen3_5_moe':raise ValueError('Selected logits are validated for the pinned Qwen MoE profile only')
+        from completion_loss import trainer_class
+        trainer_type=trainer_class(Trainer)
+    trainer = trainer_type(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator,
                       processing_class=tokenizer, callbacks=[progress])
     try:
         result = trainer.train()

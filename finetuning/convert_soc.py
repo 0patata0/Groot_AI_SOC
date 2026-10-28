@@ -27,11 +27,16 @@ def convert(root,variant):
         if not manifest.get('verified') or manifest['revision']!='995ad96eacd98c81ed38be0c5b274b04031597b0':
             raise ValueError('Verified pinned base required')
         files=manifest['files']
-    elif variant in ('pilot','main'):
+    elif variant in ('pilot','main','v2-step24','v2-step48'):
         model=root/f'exports/qwen36-soc-{variant}-hf';manifest=json.loads((model/'merge-status.json').read_text())
         if manifest.get('status')!='completed' or manifest['base_revision']!='995ad96eacd98c81ed38be0c5b274b04031597b0' or manifest['verified_tensors']!=1045 or manifest['target_modules']!=190 or manifest['preserved_mtp_tensors']!=19:
             raise ValueError('Complete verified SOC merge required')
         files=manifest['files']
+        if variant.startswith('v2-step'):
+            step=int(variant.removeprefix('v2-step'));checkpoint=root/f'outputs/soc-v2-pilot/checkpoint-{step}'
+            saved=json.loads((checkpoint/'trainer_state.json').read_text())
+            if saved.get('global_step')!=step or digest(checkpoint/'adapter_model.safetensors')!=manifest['adapter_sha256']:
+                raise ValueError('Merged v2 adapter does not match the named checkpoint')
     else:raise ValueError('Unknown conversion variant')
     folder=root/f'exports/qwen36-soc-{variant}-gguf';folder.mkdir(parents=True,exist_ok=False)
     record=folder/'conversion-status.json';state={'status':'checking','variant':variant,'started_at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),'llama_cpp_revision':REVISION}
@@ -94,7 +99,7 @@ def convert(root,variant):
 def main():
     def interrupted(signum,frame):raise InterruptedError(f'Conversion interrupted by signal {signum}')
     signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path('/workspace'));parser.add_argument('--variant',choices=['base','pilot','main'],required=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path('/workspace'));parser.add_argument('--variant',choices=['base','pilot','main','v2-step24','v2-step48'],required=True)
     args=parser.parse_args();print(json.dumps(convert(args.root,args.variant)))
 
 

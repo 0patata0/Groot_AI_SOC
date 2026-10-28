@@ -1,5 +1,17 @@
 # 인프라 현황 — 2026-10-28 현재 작업 상태
 
+## R2 48-step 완료·기존 추론 자동 복구·체크포인트 비교 진행 — 2026-10-28 14:02 KST
+
+**승인된2-step→48-step 학습을 완료하고10/28 11:40:00 KST 기존35B를자동복구했다. 중단은2295.87초(38분15.87초)로승인60분이내다.** timer inactive/Ollama active·기존모델digest불변·자동봇교체없음을읽기확인했다. 아직학습본응답개선은판정하지않았다.
+
+- **학습/증거:** smoke는1664/1582토큰2prefix·2step/accum1·eval8, pilot은다시미학습base에서48step/accum2·epoch0.2461538/최대96prefix·validation65를평가했다. pilot trainloss0.9923964/eval0.8650029·runtime1994.51초,peakallocated70.29/reserved82.82GiB,host가용최저32.52GiB다. 기존v1과자료/평가범위가달라loss를직접비교하거나정확도개선으로쓰지않는다. 두stage는exit0이고OOM kill기록은없었으나커널의NV_ERR_NO_MEMORY 드라이버메모리할당경고50건이있어원인/장기안정성은미해결로남긴다. 새학습자동재시도는없다.
+- **가중치:** checkpoint24/48각380tensorfinite·190B행렬nonzero·65,061,752B다.24SHA `d687ff56950ce4a0299fa9f718f0346e56e772791ef61fb6a4ea687f7f6ac7d6`,48/최종adapterSHA `2b748f1796fe59399338bdd2faeb5bb0bca0f68071ff25e307862ab2124f90d4` 일치를확인했다. 원본base/v1결과/R2checkpoint를보존한다.
+- **변환/등록:** 두checkpoint를CPU2/RAM20GiB씩·networknone/GPU0·host12GiBreserve로전체HF병합중이다. 이후각각CPU2/RAM16GiB로순차Q4_K_M변환/새비교태그등록한다. converter는named checkpoint의global_step/adapterSHA와실병합manifest를대조한다. 기존HF서식/7옵션·capabilities/runner·텍스트/비전blob·기존모델digest일치를유지하며원봇선택은바꾸지않는다. 초기디스크326.94GiB로두후보를비교하기위해검증된Q4등록후이번후보의중간BF16GGUF만SHA영수증을남겨정리한다. 원base·adapter/checkpoint·병합HF·Q4/projector·기존자료는제거하지않는다. 디스크/메모리상한실패시실패이력을보존한다.
+- **평가보완:** `curriculum_assessment.py`는실제요청필드/관측값을검사하고추가기본인자·유효한서비스묶음읽기·동등한최종변경후보·날짜표기/문구차이를인정한다. 필수조회30턴과참고계산경로33턴을구분하고,사용자가도구를명시하지않은제공시각의정확한직접계산도필드검증한다. 호스트명을process검색어로쓰는오필터·잘못된anchor/후보·오류를빈목록으로단정·허위완료/근거없는정상단정은큰감점/치명오류다. 해석불확실은수동검토로남긴다. 학습본생성응답을얻기전에판정경로를준비했고양쪽원문에같이적용하며reference원점수60.15와별개다. 로컬134검사통과이며Thor동기화/134검사는후속이다.
+- **범위/남음/Git:** 아직두후보native개발65턴·선택후최종65턴/기존회귀·실제MCP/채팅/보호E2E·운영전환은미완료다. 합성/사례별도구부분집합·gold-context턴검사를일반관제품질로확대하지않는다. GPU학습확정소스 `8122bb99c0f4d95b6e3fbe85605311e522ea8b03`는11:01:13KSTremote일치/clean확인했으며이번학습완료/변환·판정보완·문서를후속자동게시한다. 데이터/가중치·자격·대화/검증/업무분담제외는유지한다.
+
+- **2026-10-28 14:10 KST 후속 검증:** 당시후속이던Thor134검사·새판정기/반입목록동기화를완료했다. frozen assessor SHA `b9bbce1b64b2687c3d730857341d26c61dc2c39c9e339ba21eb67461cac11847`를학습본응답생성전에고정했다. 비교driver는실제운영tag35B의개발65턴도추가한뒤24/48후보등록을기다려순차개발평가하고수동선택전최종test는실행하지않는다. HF미학습control은훈련효과를비교하고운영tag는실사용후보차이를비교하는서로다른baseline이며서식/원본provenance차이를숨기지않는다. source반입tar2개는Mac에서도SHA대조후삭제했고소스/자료/기록·필요helper는유지한다.
+
 ## R2 제한 학습 중단 승인·최장 smoke 검증 — 2026-10-28 11:01 KST
 
 사용자가 **최대60분 공유 Ollama 중단·자동복구**를 명시 승인했다. 같은 작업의 중단 허가를 다시 묻지 않고 원base2-step→성공시별도원base48-step을 진행한다. 학습deadline45분/독립복구timer50분·기존35B복구·자동모델교체없음 조건은 그대로다. 실제 새학습은 아직 시작 전이며 실행 후 상태를 구분해 추가한다.

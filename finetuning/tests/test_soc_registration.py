@@ -3,11 +3,16 @@ from pathlib import Path
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from register_soc import parameters,verify_runtime
+from register_soc import parameters,verify_runtime,candidate_name
 from soc_evaluate import select_cases
 
 
 class CandidateTests(unittest.TestCase):
+    def test_checkpoint_models_have_distinct_names_and_cannot_replace_original(self):
+        names={candidate_name(v) for v in ('base','main','v2-step24','v2-step48')}
+        self.assertEqual(len(names),4);self.assertNotIn('qwen3.6:35b',names)
+        self.assertTrue(candidate_name('v2-step24').endswith('20261028'))
+        with self.assertRaises(ValueError):candidate_name('../arbitrary')
     def test_runtime_options_preserve_numbers_and_repeated_stops(self):
         value=parameters('temperature 0.6\ndraft_num_predict 2\nstop "<|im_end|>"\nstop "a\\nb"\n')
         self.assertEqual(value,{'temperature':0.6,'draft_num_predict':2,'stop':['<|im_end|>','a\nb']})

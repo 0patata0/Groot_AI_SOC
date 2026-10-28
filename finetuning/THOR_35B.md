@@ -1,5 +1,7 @@
 # thor-05용 Qwen3.6-35B 학습
 
+> **10/28 실제실행:** R2 2-step/48-step을완료하고38분16초만에원35B복구·timerinactive를확인했다.24/48checkpoint가중치는검증했고CPU비교변환중이다. 커널드라이버메모리경고50건은미해결이며정확도개선·새모델승격은아직없다. 아래실행전기록과현황을구분한다.
+
 > **현행 v2 후보는 R2:** 자료 경로 `data-soc-source-v2-r2/cases.jsonl`·`data-soc-v2-r2/`, strict2048/390·65·65prefix/122검사다. 아래 최초v2 예제/1536 결과는 보존된 이력이며 다음 후보에는 R2를 사용한다. 새 GPU 실행은 operator 복구 제어기와 별도 중단 시간대 승인 후에만 진행한다.
 
 > **10/27 21:40 SOC 비교 마감:** 본 학습224prefix/112-step·HF/GGUF 내보내기와 별도 모델 등록을 완료했다. 동일 HF 미학습본/학습본의 필요한 도구 호출은16/16→13/16, 요청 필드 최종 답변은36/36→29/36으로 퇴행해 이번 학습본은 운영 적용에서 제외한다. 기존35B는20:41 KST 복구/21:38 재확인했고 봇 선택은 유지했다. 저장 위치는 Thor `~/Capstone_Groot_training/qwen36-20261027`이다. 실제 토크나이저320prefix 검사 통과, 원인 확정·재학습·MCP/채팅/보호 E2E는 후속이다. 아래 시점별 진행 기록과 [최신 결과·검증 범위](../STATUS.md)를 구분한다.
@@ -288,3 +290,14 @@ root-owned사본의 `run --root ...`은 승인된operator만durable systemd serv
 ### 10/28 승인된 smoke 입력 보완
 
 공유중단최대60분/자동복구를별도로승인받았다. v2 smoke는 `smoke_longest_prefixes:true`, `--max-train-samples 2`로전체train390prefix를토큰검사한뒤최장2개만선택한다. CPU실측1664/1582토큰·eval8prefix이며2optimizerstep/accum1로둘다통과하도록한다. 학습길이상한2048을초기짧은예시만으로검증하지않기위한보완이다. strict coverage의390kept는전체검사수이고실제smoke학습은2개라는점을구분한다. 48-step pilot은별도base에서전체자료를사용가능한상태로시작하며최대96prefix를업데이트한다. 자료/분할/프로필SHA·개발/최종평가설정은불변이다. 로컬/Thor123검사통과와실GPU/복구결과는별도로기록한다.
+
+
+### R2 체크포인트 비교와 판정
+
+CPU streaming merge의입력은 `outputs/soc-v2-pilot/checkpoint-24`·`checkpoint-48`이다. 각각 `exports/qwen36-soc-v2-step24-hf`·`qwen36-soc-v2-step48-hf`로원본1045tensor보존/190모듈변경·vision/MTP보존을검사한다. `convert_soc.py --variant v2-step24|v2-step48`는HF병합manifest와해당checkpoint의global_step/adapterSHA를대조한뒤동일고정converter/Q4_K_M·baseprojector로변환한다.
+
+`register_soc.py --variant v2-step24|v2-step48`는각각 `soc-qwen36:35b-v2-step24-q4km-20261028`·`soc-qwen36:35b-v2-step48-q4km-20261028`로만등록한다. 이전모델/태그/봇선택을덮어쓰지않고HF서식·원옵션/capabilities·blobSHA를확인한다. GPU학습/공유서비스중단은추가로하지않는다.
+
+디스크예산상두후보를순차변환하며Q4등록검증후해당후보의 `qwen36-soc-bf16.gguf`만삭제한다. 삭제전bytes/SHA와 `intermediate-cleanup.json`을남기고원본base·어댑터/체크포인트·병합HF·최종Q4/projector와이전결과를보존한다. BF16GGUF는보존HF에서같은converter로재생성할수있다. 기존사용자모델/파일을삭제하지않는다.
+
+개발평가는둘다동일R2 validation32대화/65gold-context턴·동일native옵션이다. `curriculum_assessment.py`는실제요청필드/관측값과동등후보를검사하고수동검토를남긴다. 필수조회와선택적인입력시간계산을구분하며올바른직접계산/기본인자/묶음읽기/표현차이를무조건누락으로세지않는다. critical오류·요청누락에큰감점을유지한다. 새학습응답을얻기전에준비한판정기로양쪽을평가하고gold문장/분할/가중치를바꾸지않는다. 평균원점수는일반의미정확도가아니며최종test는개발선택후처음실행한다.

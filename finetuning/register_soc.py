@@ -82,11 +82,16 @@ def verify_runtime(original,show,expected_template,files):
             'hf_template_sha256':hashlib.sha256(expected_template.encode()).hexdigest()}
 
 
+def candidate_name(variant):
+    if variant in ('base','main'):return f'soc-qwen36:35b-{variant}-q4km-20261027'
+    if variant in ('v2-step24','v2-step48'):return f'soc-qwen36:35b-{variant}-q4km-20261028'
+    raise ValueError('Unknown candidate')
+
+
 def register(root,variant):
-    if variant not in ('base','main'):raise ValueError('Unknown candidate')
+    model=candidate_name(variant)
     folder=Path(root)/f'exports/qwen36-soc-{variant}-gguf';record=folder/'registration-status.json'
     if record.exists():raise ValueError('Inspect previous registration before explicitly retrying')
-    model=f'soc-qwen36:35b-{variant}-q4km-20261027'
     state={'status':'checking','model':model,'variant':variant,'started_at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat()}
     def save():
         temp=record.with_suffix('.tmp');temp.write_text(json.dumps(state,indent=2)+'\n');temp.replace(record)
@@ -129,7 +134,7 @@ def register(root,variant):
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path.home()/'Capstone_Groot_training/qwen36-20261027');parser.add_argument('--variant',choices=['base','main'],required=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--root',type=Path,default=Path.home()/'Capstone_Groot_training/qwen36-20261027');parser.add_argument('--variant',choices=['base','main','v2-step24','v2-step48'],required=True)
     args=parser.parse_args()
     if platform.system()!='Linux' or platform.machine()!='aarch64':raise SystemExit('Run on Thor host')
     print(json.dumps(register(args.root,args.variant)))

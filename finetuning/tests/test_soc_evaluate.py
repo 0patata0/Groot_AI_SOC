@@ -2,10 +2,15 @@ import unittest
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from soc_evaluate import score
+from soc_evaluate import score,select_cases
 
 
 class ScoringTests(unittest.TestCase):
+    def test_development_evaluation_cannot_silently_read_final_test(self):
+        rows=[{'split':s,'scenario_group':s} for s in ('train','validation','test')]
+        self.assertEqual(select_cases(rows,8,True,'validation'),[rows[1]])
+        self.assertEqual(select_cases(rows,8,True),[rows[2]])
+        with self.assertRaises(ValueError):select_cases(rows,8,True,'train')
     def setUp(self):
         self.catalog={'tools':[{'name':'read','protected':False},{'name':'write','protected':True}]}
         self.case={'tool_names':['read','write'],'checks':{'required_facts':[['IDS'],['미확인']]}}

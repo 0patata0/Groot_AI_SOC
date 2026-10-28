@@ -15,13 +15,13 @@ def main():
     parser.add_argument("--config", type=Path, default=ROOT / "config.json")
     opts = parser.parse_args()
     config_path = opts.config.resolve()
-    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json'):
+    if config_path.parent != ROOT or config_path.name not in ('config.json', 'config.qwen36-thor.json','config.qwen36-soc.json','config.qwen36-soc-main.json','config.qwen36-soc-v2.json'):
         parser.error("Choose one of the bundled model profiles")
     raw = json.loads(config_path.read_text(encoding="utf-8"))
     if any(Path(raw[key]).is_absolute() for key in ("data_dir", "output_dir")):
         parser.error("Use relative data_dir/output_dir paths for a portable bundle")
     config = read_config(config_path)
-    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1"):
+    if Path(config["data_dir"]).resolve() not in (ROOT / "data", ROOT / "data-soc-v1", ROOT / "data-soc-v2-r2"):
         parser.error("Portable bundle requires one of the fixed prepared datasets")
     if not Path(config["output_dir"]).resolve().is_relative_to(ROOT):
         parser.error("Portable bundle requires an output_dir inside finetuning/")
@@ -31,12 +31,15 @@ def main():
              "pack.py", "model_profile.py", "config.qwen36-thor.json", "requirements.qwen36-thor.txt",
              "setup_thor.sh", "THOR_35B.md", "audit_tools.py", "mcp_contract.json",
              "container_task.py", "thor_container.py", "memory_budget.py", "download_model.py", "guarded_process.py", "bounded_loading.py",
-             "soc_dataset.py", "soc_evaluate.py", "soc_assessment.py", "reference_model.py", "register_soc.py", "convert_reference.py", "convert_soc.py", "config.qwen36-soc.json", "config.qwen36-soc-main.json", "config.foundation-sec-8b.json",
+             "soc_dataset.py", "soc_curriculum.py", "soc_evaluate.py", "soc_assessment.py", "training_window.py", "reference_model.py", "register_soc.py", "convert_reference.py", "convert_soc.py", "config.qwen36-soc.json", "config.qwen36-soc-main.json", "config.qwen36-soc-v2.json", "config.foundation-sec-8b.json",
              "preparation_summary.json", "data/manifest.json",
              "data/train.jsonl", "data/validation.jsonl", "data/test.jsonl"]
     if config_path.name in ('config.qwen36-soc.json','config.qwen36-soc-main.json'):
         names += ['data-soc-v1/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json')]
         names += ['data-soc-source-v1/cases.jsonl']
+    if config_path.name == 'config.qwen36-soc-v2.json':
+        names += ['data-soc-v2-r2/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json','curriculum-audit.json')]
+        names += ['data-soc-source-v2-r2/cases.jsonl']
     paths = [ROOT / name for name in names] + sorted((ROOT / "tests").glob("test_*.py"))
     for path in paths:
         if not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(ROOT):

@@ -43,6 +43,11 @@ def conversation(final="Final fixture conclusion"):
 
 
 class EncodingTests(unittest.TestCase):
+    def test_required_curriculum_cannot_silently_drop_overlength_tool_turns(self):
+        train.check_token_coverage({'kept':4,'candidate_turns':4},True)
+        with self.assertRaisesRegex(ValueError,'excluded'):
+            train.check_token_coverage({'kept':3,'candidate_turns':4,'over_max_length':1},True)
+        train.check_token_coverage({'kept':3,'candidate_turns':4},False)
     def test_only_final_assistant_is_supervised_and_all_input_roles_are_masked(self):
         row = conversation()
         tokenizer = FakeTokenizer()

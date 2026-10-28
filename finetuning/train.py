@@ -180,6 +180,12 @@ def collate_lists(features, pad_token_id):
     return batch
 
 
+def check_token_coverage(stats, required):
+    """Critical curricula cannot silently lose a tool-call completion to filtering."""
+    if required and stats.get('kept') != stats.get('candidate_turns'):
+        raise ValueError(f"Required assistant prefixes were excluded: {stats}")
+
+
 def preflight(config=None):
     config = config or {}
     quantized = config.get("quantization", "nf4") == "nf4"
@@ -245,9 +251,10 @@ def prepare_tokens(config, output, include_test=False):
         limit = config['max_train_samples'] if split == 'train' else config['max_eval_samples']
         datasets[split], stats[split] = tokenize_split(Path(config['data_dir']) / f'{split}.jsonl',
             tokenizer, config['max_length'], limit)
+        check_token_coverage(stats[split], config.get('require_all_prefixes', False))
         # A standalone audit must not retain a complete unused test dataset.
         if include_test: datasets[split] = None
-    stats.update(loss='each_assistant_turn_as_completion',
+    stats.update(max_length=config['max_length'],require_all_prefixes=config.get('require_all_prefixes',False),loss='each_assistant_turn_as_completion',
                  truncation='disabled; overlength prefixes rejected', checked_at_kst=kst_now())
     write_json(Path(output) / 'tokenization_report.json', stats)
     print(json.dumps(stats, ensure_ascii=False, indent=2), flush=True)

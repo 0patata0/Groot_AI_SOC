@@ -9,6 +9,7 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -51,6 +52,11 @@ def checked_schema(original):
 def validate_case(case,catalog):
     if case.get('split') not in ('train','validation','test'):raise ValueError('Explicit split required')
     if not case.get('scenario_group') or not case.get('id'):raise ValueError('Scenario identity required')
+    version=case.get('dataset_version','soc-reviewed-v1')
+    if not isinstance(version,str) or not re.fullmatch(r'soc-reviewed-v[1-9][0-9]*',version):
+        raise ValueError('Invalid reviewed dataset version')
+    if version!='soc-reviewed-v1' and not case.get('template_family'):
+        raise ValueError('Versioned curriculum requires a wording family')
     review=case.get('review',{})
     if review.get('status') not in ('agent_reviewed','mechanically_verified_extraction') or not review.get('basis'):
         raise ValueError('Reviewed evidence and basis required')
@@ -84,22 +90,27 @@ def validate_case(case,catalog):
             raise ValueError('Pending approval must not become successful application')
         if any(word in final for word in ('적용 완료','차단 완료','원복 완료')):
             raise ValueError('Invented completion before approval')
-    normalized['id']=case['id'];normalized['source']='soc-reviewed-v1'
+    normalized['id']=case['id'];normalized['source']=version
     normalized['provenance']={'scenario_group':case['scenario_group'],'review':review,
         'source_uri':case.get('source_uri','project:reviewed-soc-cases'),'license':case.get('license','project-local')}
+    if case.get('template_family'):normalized['provenance']['template_family']=case['template_family']
     return normalized
 
 
 def prepare(cases,catalog,output):
     output=Path(output)
     if output.exists():raise ValueError('Use a new output directory')
-    groups={};prompts={};ids=set();splits={k:[] for k in ('train','validation','test')};counts=Counter()
+    groups={};families={};prompts={};ids=set();splits={k:[] for k in ('train','validation','test')};counts=Counter()
     for case in cases:
         if case['id'] in ids:raise ValueError('Duplicate case ID')
         ids.add(case['id']);row=validate_case(case,catalog);split=case['split']
         group=case['scenario_group']
         if group in groups and groups[group]!=split:raise ValueError('Scenario leakage across splits')
         groups[group]=split
+        family=case.get('template_family')
+        if family:
+            if family in families and families[family]!=split:raise ValueError('Wording family leakage across splits')
+            families[family]=split
         key=prompt_hash(next(m['content'] for m in row['messages'] if m['role']=='user'))
         if key in prompts and prompts[key]!=split:raise ValueError('Prompt leakage across splits')
         prompts[key]=split;splits[split].append(row);counts.update(case.get('capabilities',[]))

@@ -1,5 +1,7 @@
 # thor-05용 Qwen3.6-35B 학습
 
+> **현행 v2 후보는 R2:** 자료 경로 `data-soc-source-v2-r2/cases.jsonl`·`data-soc-v2-r2/`, strict2048/390·65·65prefix/122검사다. 아래 최초v2 예제/1536 결과는 보존된 이력이며 다음 후보에는 R2를 사용한다. 새 GPU 실행은 operator 복구 제어기와 별도 중단 시간대 승인 후에만 진행한다.
+
 > **10/27 21:40 SOC 비교 마감:** 본 학습224prefix/112-step·HF/GGUF 내보내기와 별도 모델 등록을 완료했다. 동일 HF 미학습본/학습본의 필요한 도구 호출은16/16→13/16, 요청 필드 최종 답변은36/36→29/36으로 퇴행해 이번 학습본은 운영 적용에서 제외한다. 기존35B는20:41 KST 복구/21:38 재확인했고 봇 선택은 유지했다. 저장 위치는 Thor `~/Capstone_Groot_training/qwen36-20261027`이다. 실제 토크나이저320prefix 검사 통과, 원인 확정·재학습·MCP/채팅/보호 E2E는 후속이다. 아래 시점별 진행 기록과 [최신 결과·검증 범위](../STATUS.md)를 구분한다.
 
 > **10/27 20:54 SOC 본 학습 완료:** Thor `~/Capstone_Groot_training/qwen36-20261027`에서224prefix1epoch/112-step·검증·어댑터저장·전체HF내보내기를완료하고기존35B추론을57분37초만에복구했다.380tensorfinite·MTP19보존/93검사통과.동일HF 미학습GGUF는별도등록/52턴응답확인,학습본GGUF/등록·비교는진행중이다.운영봇교체와MCP/채팅/보호E2E는미실행이며 [상세현황](../STATUS.md)을따른다.
@@ -234,3 +236,50 @@ python3 -B "$training_root/finetuning/soc_assessment.py" \
 로컬 train144대화/224prefix/80개 정답 호출은 서로 다른7도구만 포함한다. AIT 사실 추출72대화, 합성9군 각8행이며 숫자를 가린 질문 형태는8군이1개/IDS군이3개다. `list_blocks`·이미KST값 그대로 표시·포트 조회의 train 예시는 없었다. 의도적으로 미학습 유형을 test에 둔 일반화 시험이며, 이 통계가 퇴행의 확정 원인은 아니다.
 
 후속은 기존 자료/평가/가중치를 보존하고 새 버전의 다양한 독립 시나리오·구체적 실제 답변을 검수하는 것이다. 이미 본 test를 학습하지 않고 새 개발/최종 미사용 평가를 고정한다. 미학습 base에서 낮은 학습률 후보5e-6/1e-5와 짧은 업데이트 예산/중간 체크포인트를 비교한다. 이는 미검증 실험안이며 기존2e-5 설정을 바꾸거나 GPU 학습을 실행하지 않았다. 한 변수씩 비교해 자료/업데이트 영향과 BF16→Q4 양자화 영향을 구분한다. [SFT의 목표는 정답 시퀀스 NLL 최소화](https://huggingface.co/docs/trl/en/sft_trainer#looking-deeper-into-the-sft-method)이며 우리의 호출 성공/누락/허위 완료 평가는 별도로 확인한다. [Trainer의 평가·저장 설정](https://huggingface.co/docs/transformers/en/main_classes/trainer)을 사용하더라도 loss만으로 운영 승격하지 않는다. 이번에 서버 접속/공유 추론 중단/재학습은 하지 않았다.
+
+
+### SOC v2 자료와 보수적 비교 경로
+
+`soc_curriculum.py`는 live 도구/모델 호출 없이 agent-reviewed synthetic 관측의 소스 필드 투영을 만든다. 학습192/개발32/최종test32대화,390/65/65assistant prefix이며 기존v1을 보존한다. v2는16능력·19종 실제 호출 예시와160문장틀을 분리했다. 실제 운영 사례나 새로운 능력 OOD 평가가 아니다. 초기 초안은 로컬 archive/검증 보고서에 보존했고 아래 경로만 최종 검수 자료다.
+
+```bash
+python3 -B finetuning/soc_curriculum.py \
+  --source-output finetuning/data-soc-source-v2/cases.jsonl \
+  --output finetuning/data-soc-v2 \
+  --previous-cases finetuning/data-soc-source-v1/cases.jsonl
+python3 -B finetuning/pack.py --config finetuning/config.qwen36-soc-v2.json --output /작업별/임시경로/soc-v2.tar.gz
+```
+
+기존 출력 경로를 덮어쓰지 않는다. 새 클론에는 로컬 전용 v1/v2 자료가 없으므로 승인된 자료 반입이 필요하다. 기존test는 회귀용이며 train으로 복사하지 않는다. 개발 평가는 `soc_evaluate.py --split validation --all-cases --all-turns`로32대화65턴만 사용한다. 최종test는 개발 결과로 후보를 고정한 후 사용하며 자동 exact-string 점수는 수동 의미 검토 전 정확도가 아니다.
+
+Thor에서는 `soc-v2-tokenize`가 GPU 없이 `/workspace/soc-v2-tokenization`에 검사한다. `soc-v2-smoke`는 원base의2-step/accum1·8prefix eval, 성공 후 `soc-v2-pilot`은 별도 원base에서lr5e-6/48step/accum2·eval/save24로 시작한다. 퇴행main/pilot어댑터를 이어 학습하지 않는다. 실제 업데이트는 최대96prefix로 전체390prefix epoch가 아니다. 상태/로그·출력은 `soc-v2-*`로 분리하고 소스 profile과 생성 runtime local config를 구분한다. 기존offline/112GiB/12GiB guard 및 선행/기존 흔적 차단을 유지한다.
+
+```bash
+python3 -B "$training_root/finetuning/thor_container.py" soc-v2-tokenize --root "$training_root"
+# 아래 GPU 단계는 공유 추론 중단 시간대와 독립 복구 timer를 준비한 후에만 실행한다.
+python3 -B "$training_root/finetuning/thor_container.py" soc-v2-smoke --root "$training_root"
+python3 -B "$training_root/finetuning/thor_container.py" soc-v2-pilot --root "$training_root"
+```
+
+48-step은 최적값이나 점수 향상이 확인된 설정이 아니다. 새 자료와 보수 설정을 함께 보는 후보이므로 단일 원인의 효과로 해석하지 않는다. 자동 서비스 중단/재시도/모델 전환은 없다. 고정 final test, 정확한 변경 후보/승인/적용 근거, 실제MCP/채팅/보호E2E를 각각 검증한다.
+
+
+### 현행 R2 실행과 operator 복구 경계
+
+개발1차의 질문 모호성을 수정한R2를 별도 경로에 고정했다. 개발·최종split의 범위는 같지만 경보의 `phase_window` 필드를 명확히 하고 합성 출처 문구를 중립적 탐지 설명으로 바꿨다. 같은R2의 미학습 baseline을 다시 실행한다. 원자료·개발1차·초안은 유지하며 최종test는 아직 모델에 요청하지 않았다.
+
+```bash
+python3 -B finetuning/soc_curriculum.py \
+  --source-output finetuning/data-soc-source-v2-r2/cases.jsonl \
+  --output finetuning/data-soc-v2-r2 \
+  --previous-cases finetuning/data-soc-source-v1/cases.jsonl
+python3 -B finetuning/pack.py --config finetuning/config.qwen36-soc-v2.json --output /작업별/임시경로/soc-v2-r2.tar.gz
+```
+
+v2만max_length2048/require_all_prefixes:true로 설정했다. 첫1536검사의4개 제외는 학습 전에 발견해 보존했으며 최종R2는390/65/65개 전부 보존된다. 초과/정렬 실패를 조용히 무시하지 않는다. 학습 전 current corpus SHA를 가진 strict tokenization proof를 확인한다.
+
+`training_window.py`는 검수된 root-owned operator 사본으로만 실제중단/복구를 실행한다. 일반 읽기 `check --root ...`는 현재자료/설정·토큰proof·개발 baseline·이전실행부재만검사하며 서비스작업이없다. operator는 파일 SHA/소유·부모권한을 대조한 뒤 `/usr/local/libexec/capstone-training-window-v2.py`를 root소유0755로 설치한다. MCP에 노출하거나 LLM의sudo/Docker범위를 늘리지 않는다. 상태는root소유 `/var/lib/capstone-training-v2-window`에 보존한다.
+
+실행은 독립 `capstone-soc-v2-restore.timer`를50분으로 먼저 설정/active확인→Ollama중단→원base2-step→성공시별도원base48-step→즉시복구/기존35B재적재다. 학습deadline45분·공유중단상한계획60분이며 실패/SIGTERM에도복구한다. 다른GPU프로세스는이름만허용하지않고Ollama MainPID의자손인지확인한다. 실패이력을자동지우거나재시도하지않고,모델등록/봇전환은하지않는다. 실제실행전새중단승인을받고새제어기의실중단/복구결과를따로기록한다. 기존본학습복구성공을새제어기E2E로대신하지않는다.
+
+root-owned사본의 `run --root ...`은 승인된operator만durable systemd service로 실행한다. 제어기자체독립timer와별개로service RuntimeMaxSec48분을둘수있다. 필요operator명령은실제경로/해시를검토한후사용하며공통초기설치기나운영에이전트권한을바꾸지않는다. 검수자료/원본가중치는이전과같이로컬전용반입이고Git clone만으로전달되지않는다.

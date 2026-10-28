@@ -8,13 +8,14 @@ import subprocess
 from download_model import verify_artifact
 
 IMAGE = 'nvcr.io/nvidia/pytorch@sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb'
-STAGES = ('prepare','download','tokenize','smoke','train','soc-tokenize','soc-smoke','soc-pilot','soc-train')
+STAGES = ('prepare','download','tokenize','smoke','train','soc-tokenize','soc-smoke','soc-pilot','soc-train',
+          'soc-v2-tokenize','soc-v2-smoke','soc-v2-pilot')
 
 
 def command(root, stage, uid, gid):
     if stage not in STAGES: raise ValueError('Unknown stage')
     root = Path(root).resolve()
-    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train')
+    training = stage in ('smoke','train','soc-smoke','soc-pilot','soc-train','soc-v2-smoke','soc-v2-pilot')
     env = {'PYTHONDONTWRITEBYTECODE':'1','PIP_NO_CACHE_DIR':'1','PIP_DISABLE_PIP_VERSION_CHECK':'1',
            'HF_HUB_DISABLE_TELEMETRY':'1','HF_HUB_DISABLE_PROGRESS_BARS':'1','HF_HOME':'/workspace/hf-cache',
            'HF_HUB_DISABLE_IMPLICIT_TOKEN':'1',
@@ -70,6 +71,17 @@ def main():
         raise SystemExit('Successful SOC pilot stage required')
     if args.stage in ('soc-smoke','soc-pilot','soc-train') and json.loads((root/'soc-tokenize-status.json').read_text())['status']!='completed':
         raise SystemExit('Successful SOC tokenization required')
+    if args.stage in ('soc-v2-smoke','soc-v2-pilot') and json.loads((root/'soc-v2-tokenize-status.json').read_text())['status']!='completed':
+        raise SystemExit('Successful v2 tokenization required')
+    if args.stage in ('soc-v2-smoke','soc-v2-pilot'):
+        report=json.loads((root/'soc-v2-tokenization/tokenization_report.json').read_text())
+        profile=json.loads((root/'finetuning/config.qwen36-soc-v2.json').read_text())
+        if report.get('max_length')!=profile['max_length'] or report.get('require_all_prefixes') is not True:
+            raise SystemExit('v2 tokenization settings do not match the strict profile')
+        if any(report[s].get('kept')!=report[s].get('candidate_turns') for s in ('train','validation','test')):
+            raise SystemExit('v2 required assistant prefixes were excluded')
+    if args.stage=='soc-v2-pilot' and json.loads((root/'soc-v2-smoke-status.json').read_text())['status']!='completed':
+        raise SystemExit('Successful v2 smoke required')
     print(subprocess.check_output(command(root,args.stage,os.getuid(),os.getgid()),text=True).strip())
 
 

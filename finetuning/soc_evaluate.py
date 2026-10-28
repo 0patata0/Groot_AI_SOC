@@ -36,10 +36,11 @@ def score(reference,prediction,case,final,catalog):
         'automatic_scope':'exact structured calls and requested fact strings only; semantic review still required'}
 
 
-def select_cases(cases,max_groups,all_cases=False):
+def select_cases(cases,max_groups,all_cases=False,split='test'):
+    if split not in ('validation','test'):raise ValueError('Only development or final test may be evaluated')
     selected=[];seen=set()
     for case in cases:
-        if case['split']!='test':continue
+        if case['split']!=split:continue
         if all_cases:selected.append(case);continue
         if case['scenario_group'] in seen:continue
         seen.add(case['scenario_group']);selected.append(case)
@@ -47,13 +48,13 @@ def select_cases(cases,max_groups,all_cases=False):
     return selected
 
 
-def evaluate(model,endpoint,cases,catalog,output,max_groups=8,all_cases=False,all_turns=False):
+def evaluate(model,endpoint,cases,catalog,output,max_groups=8,all_cases=False,all_turns=False,split='test'):
     output=Path(output)
     if output.exists():raise ValueError('Use a new report path')
-    selected=select_cases(cases,max_groups,all_cases)
+    selected=select_cases(cases,max_groups,all_cases,split)
     if not selected:raise ValueError('No held-out cases selected')
     report={'at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),'model':model,
-        'mode':'offline gold-context single-turn; no tool execution','all_cases':all_cases,'all_assistant_turns':all_turns,'results':[]}
+        'mode':'offline gold-context single-turn; no tool execution','evaluation_split':split,'all_cases':all_cases,'all_assistant_turns':all_turns,'results':[]}
     for case in selected:
         row=validate_case(case,catalog);positions=[i for i,m in enumerate(row['messages']) if m['role']=='assistant']
         for index in positions if all_turns else sorted(set([positions[0],positions[-1]])):
@@ -87,8 +88,9 @@ def main():
     p.add_argument('--endpoint',default='http://127.0.0.1:11434');p.add_argument('--cases',required=True,type=Path)
     p.add_argument('--catalog',type=Path,default=Path(__file__).with_name('mcp_contract.json'))
     p.add_argument('--output',required=True,type=Path);p.add_argument('--max-groups',type=int,default=8)
-    p.add_argument('--all-cases',action='store_true');p.add_argument('--all-turns',action='store_true');a=p.parse_args()
-    print(json.dumps(evaluate(a.model,a.endpoint,[json.loads(l) for l in a.cases.read_text().splitlines()],json.loads(a.catalog.read_text()),a.output,a.max_groups,a.all_cases,a.all_turns),ensure_ascii=False))
+    p.add_argument('--all-cases',action='store_true');p.add_argument('--all-turns',action='store_true')
+    p.add_argument('--split',choices=['validation','test'],default='test');a=p.parse_args()
+    print(json.dumps(evaluate(a.model,a.endpoint,[json.loads(l) for l in a.cases.read_text().splitlines()],json.loads(a.catalog.read_text()),a.output,a.max_groups,a.all_cases,a.all_turns,a.split),ensure_ascii=False))
 
 
 if __name__=='__main__':main()

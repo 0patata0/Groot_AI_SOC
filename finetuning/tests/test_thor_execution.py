@@ -94,10 +94,18 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(cmd.count('--mount'),1)
 
     def test_tokenizer_and_download_have_no_gpu_access(self):
-        for stage in ('download','tokenize','soc-tokenize'):
+        for stage in ('download','tokenize','soc-tokenize','soc-v2-tokenize'):
             cmd=thor_container.command('/tmp/training',stage,1000,1000)
             self.assertNotIn('--gpus',cmd)
         with self.assertRaises(ValueError):thor_container.command('/tmp/training','shell',1000,1000)
+
+    def test_v2_training_has_the_same_limits_and_distinct_stage(self):
+        for stage in ('soc-v2-smoke','soc-v2-pilot'):
+            cmd=thor_container.command('/tmp/training',stage,1000,1000)
+            self.assertIn('--gpus',cmd);self.assertEqual(cmd[cmd.index('--network')+1],'none')
+            self.assertEqual(cmd[cmd.index('--memory')+1],'112g')
+            self.assertIn('HF_DEACTIVATE_ASYNC_LOAD=1',cmd)
+            self.assertEqual(cmd[-1],stage)
 
     def test_soc_full_training_keeps_the_same_offline_boundary(self):
         cmd=thor_container.command('/tmp/training','soc-train',1000,1000)

@@ -14,7 +14,7 @@ from soc_assessment import kst_present,UNCERTAIN,KST
 from soc_dataset import checked_schema
 from prepare_data import matches_schema
 
-UNKNOWN=UNCERTAIN+r'|확인되지\s*않|단정하기\s*(?:어려|어렵)|판단하기\s*(?:어려|어렵)|불확정|추가\s*분석|확정할.*부족'
+UNKNOWN=UNCERTAIN+r'|확인\s*불가|알\s*수\s*없|확인되지\s*않|단정하기(?:는|가|도)?\s*(?:어려|어렵)|판단하기(?:는|가|도)?\s*(?:어려|어렵)|단정[^\n.]{0,30}(?:적절하지|어렵|한계)|불확정|추가\s*분석|확정할.*부족'
 
 
 def observation(case,index,name=None):
@@ -34,6 +34,21 @@ def candidate(content,args):
     return content
 
 
+def same_requested_candidate(source,expected,actual,question):
+    if actual==expected:return True
+    # This curriculum requests one literal comment. An unspecified placement is
+    # not an instruction to use the author's preferred first-line placement.
+    if re.search(r'첫|맨\s*앞|처음|상단|시작|마지막|끝|하단|번째',question):return False
+    if not source or not expected.endswith(source):return False
+    inserted=expected[:-len(source)]
+    if not re.fullmatch(r'(?:#[^\n]*|<!--[^\n]*-->)\n',inserted):return False
+    start=0
+    while (position:=actual.find(inserted,start))>=0:
+        if (position==0 or actual[position-1]=='\n') and actual[:position]+actual[position+len(inserted):]==source:return True
+        start=position+1
+    return False
+
+
 def equivalent(wanted,got,case,index,catalog):
     if got.get('parse_error') or wanted['name']!=got['name']:return False
     name=wanted['name'];expected=wanted['arguments'];actual=got['arguments']
@@ -43,7 +58,8 @@ def equivalent(wanted,got,case,index,catalog):
         if actual.get('target')!=expected['target'] or actual.get('base_sha256')!=expected['base_sha256']:return False
         if not actual.get('reason','').strip():return False
         source=next(json.loads(m['content']) for m in reversed(case['messages'][:index]) if m['role']=='tool' and 'get_rule_change_target' in m.get('name',''))
-        try:return candidate(source['content'],actual)==candidate(source['content'],expected)
+        question=next(m['content'] for m in case['messages'] if m['role']=='user')
+        try:return same_requested_candidate(source['content'],candidate(source['content'],expected),candidate(source['content'],actual),question)
         except (ValueError,KeyError,TypeError):return False
     if name.endswith('__calculate_time'):
         try:
@@ -57,8 +73,10 @@ def equivalent(wanted,got,case,index,catalog):
             if not d.get('name'):d.pop('name',None)
         if 'name' not in a:e.pop('name',None)  # All-active lookup is a valid broader read.
     elif name.endswith(('__get_wazuh_agent_ports','__get_wazuh_agent_processes')):
+        question=next(m['content'] for m in case['messages'] if m['role']=='user')
+        unspecified=not re.search(r'전체|모두|빠짐|\d+\s*(?:개|건)|limit|한도',question,re.I)
         for d in (a,e):
-            if d.get('limit') in (None,300):d.pop('limit',None)
+            if d.get('limit') in (None,300) or unspecified and 1<=d.get('limit',300)<=300:d.pop('limit',None)
             if d.get('search') in (None,''):d.pop('search',None)
             if 'protocol' in d:d['protocol']=d['protocol'].lower()
             if 'state' in d:d['state']=d['state'].upper()
@@ -69,6 +87,9 @@ def equivalent(wanted,got,case,index,catalog):
     elif name.endswith('__get_system_diagnostics'):
         for d in (a,e):
             d.setdefault('lookback_minutes',15);d.setdefault('limit',20)
+        question=next(m['content'] for m in case['messages'] if m['role']=='user')
+        if not re.search(r'\d+\s*(?:분|시간)|lookback',question,re.I):a.pop('lookback_minutes');e.pop('lookback_minutes')
+        if not re.search(r'\d+\s*(?:개|건)|limit|한도|최대',question,re.I):a.pop('limit');e.pop('limit')
     return canonical_json(a)==canonical_json(e)
 
 
@@ -84,8 +105,10 @@ def quantity(text,value):
 
 
 def metric(text,label,value):
-    text=re.sub(r'(?<=\d),(?=\d)','',text)
-    return bool(re.search('(?:'+label+r')[^\d]{0,48}'+str(value)+r'(?!\d)',text,re.I))
+    text=re.sub(r'(?<=\d),(?=\d)','',re.sub(r'[*`]','',text))
+    after=r'(?<!\d)'+str(value)+r'\s*(?:개|건)?\s*(?:'+label+r')'
+    before='(?:'+label+r')(?:\s|\([^\n)]{0,30}\)|[:：=|]|개수|건수|항목|수){0,48}'+str(value)+r'(?!\d)'
+    return bool(re.search(before,text,re.I) or re.search(after,text,re.I))
 
 
 def duration_present(text,seconds,seconds_only=False):
@@ -138,7 +161,7 @@ def facts(event,case):
     elif cap=='services':
         need('WAF' in text.upper() and bool(re.search(r'IDS|Suricata',text,re.I)),'requested_device_missing')
         if any('error' in json.loads(m['content']) for m in case['messages'] if m['role']=='tool'):
-            need(bool(re.search(UNKNOWN+r'|확인\s*불가|스냅샷.*오류',text)),'unavailable_device_not_reported')
+            need(bool(re.search(UNKNOWN+r'|snapshot_unavailable|스냅샷.*(?:오류|불가|실패)|조회[^\n.]{0,20}(?:실패|오류)',text)),'unavailable_device_not_reported')
     elif cap=='events':
         source=observation(case,index);need(quantity(text,source['returned_count']) or number(text,source['returned_count']),'returned_event_count_missing_or_wrong')
         if '전체' in question or '공격 부재' in question:need(bool(re.search(UNKNOWN+r'|null|알\s*수\s*없',text,re.I)),'requested_total_or_safety_uncertainty_missing')

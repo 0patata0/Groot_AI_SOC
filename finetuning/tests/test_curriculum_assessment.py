@@ -20,6 +20,8 @@ class AssessmentTests(unittest.TestCase):
         case=make_case('processes','validation',0);e=event(case,4)
         args=e['response']['tool_calls'][0]['function']['arguments'];args['limit']=300
         self.assertEqual(assess_event(e,case,CATALOG)['issues'],[])
+        args['limit']=100
+        self.assertEqual(assess_event(e,case,CATALOG)['issues'],[])
         args['search']='maple-sensor-1';self.assertIn('requested_tool_missing_or_wrong',assess_event(e,case,CATALOG)['issues'])
 
     def test_parallel_requested_services_are_valid_and_duplicates_are_extra(self):
@@ -106,6 +108,48 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(summary['turns'],3);self.assertEqual(summary['required_tool_turns'],2)
         self.assertEqual(summary['final_turns'],1);self.assertEqual(summary['valid_required_tool_turns'],0)
         self.assertEqual(summary['bounded_turn_score'],0)
+
+    def test_comment_location_is_required_only_when_user_specifies_it(self):
+        case=make_case('proposal','test',1);e=event(case,4)
+        source=json.loads(case['messages'][3]['content'])['content'];args=e['response']['tool_calls'][0]['function']['arguments']
+        marker=args['edits'][0]['new_text'].splitlines()[0]+'\n'
+        args['edits']=[{'old_text':source,'new_text':source+marker}]
+        self.assertEqual(assess_event(e,case,CATALOG)['issues'],[])
+        case['messages'][1]['content']+=' 주석 위치는 맨 앞이어야 해'
+        self.assertTrue(assess_event(e,case,CATALOG)['fatal'])
+        case['messages'][1]['content']='주석을 삽입해'
+        args['edits'][0]['new_text']=source.replace('DetectionOnly','On')+marker
+        self.assertTrue(assess_event(e,case,CATALOG)['fatal'])
+
+    def test_unspecified_diagnostic_window_and_cap_are_not_exact_targets(self):
+        case=make_case('diagnostics','test',0);e=event(case,2)
+        e['response']['tool_calls'][0]['function']['arguments'].update(lookback_minutes=60,limit=50)
+        self.assertEqual(assess_event(e,case,CATALOG)['issues'],[])
+        case['messages'][1]['content']+=' 최근15분,최대20건으로'
+        self.assertIn('requested_tool_missing_or_wrong',assess_event(e,case,CATALOG)['issues'])
+
+    def test_value_before_sca_label_is_valid_but_swapped_metrics_are_not(self):
+        case=make_case('sca','test',0)
+        good=event(case,4,{'role':'assistant','content':'정책 결과: 13개 통과 (Pass), 1개 실패 (Fail)'})
+        self.assertEqual(assess_event(good,case,CATALOG)['issues'],[])
+        good['response']['content']='1개 통과, 13개 실패, 전체 1개'
+        self.assertIn('sca_counts_missing_or_wrong',assess_event(good,case,CATALOG)['issues'])
+
+    def test_query_failure_wording_reports_unavailable_device(self):
+        case=make_case('services','test',1)
+        answer=event(case,6,{'role':'assistant','content':'WAF 조회 성공. IDS Suricata 상태를 조회하는 데 실패했습니다.'})
+        self.assertNotIn('unavailable_device_not_reported',assess_event(answer,case,CATALOG)['issues'])
+
+    def test_korean_uncertainty_particle_is_not_an_omission(self):
+        case=make_case('alert_facts','validation',0);e=event(case,4)
+        for wording in ('단정하기는 어렵습니다.','단정하기가 어렵습니다.','판단하기도 어렵습니다.'):
+            e['response']['content']='ID60201 level5 KST2026-09-03T03:27:00+09:00 phase_window:scan_window. '+wording
+            self.assertNotIn('maliciousness_uncertainty_missing',assess_event(e,case,CATALOG)['issues'])
+
+    def test_attack_absence_caution_is_not_an_uncertainty_omission(self):
+        case=make_case('events','test',0)
+        e=event(case,4,{'role':'assistant','content':'검색된 경보는 0건입니다. 이를 근거로 공격이 전혀 없었다고 단정하는 것은 적절하지 않습니다.'})
+        self.assertEqual(assess_event(e,case,CATALOG)['issues'],[])
 
 
 if __name__=='__main__':unittest.main()

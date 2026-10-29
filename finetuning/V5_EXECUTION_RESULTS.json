@@ -1,6 +1,6 @@
 {
-  "updated_at_kst": "2026-10-29T13:27:35.863058+09:00",
-  "status": "deferred_by_user_plan_only",
+  "updated_at_kst": "2026-10-29T16:49:34.077983+09:00",
+  "status": "r7_smoke_completed_reference_eval_mismatch_restored",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
     "train": 1024,
@@ -62,6 +62,21 @@
       "full_main_training_started": false,
       "reason": "User explicitly deferred training and requested planning only; not a model quality failure",
       "artifact_path": "attempts/v5-r6-user-stopped-20261029"
+    },
+    {
+      "name": "checkpointed_r7_resume",
+      "status": "two_step_completed_reference_eval_gate_rejected",
+      "started_at_kst": "2026-10-29T16:40:59.346503+09:00",
+      "restored_at_kst": "2026-10-29T16:43:23.949448+09:00",
+      "steps": 2,
+      "distinct_train_observations": 2,
+      "same_training_prefixes_as_reference": true,
+      "gradient_checkpointing": true,
+      "train_loss": 0.5438567250967026,
+      "eval_loss": 0.5853192806243896,
+      "reference_eval_loss": 0.5660265684127808,
+      "main_training_started": false,
+      "reason": "Reference evaluation loss mismatch; cause under investigation, threshold unchanged"
     }
   ],
   "artifact_inventory": [
@@ -158,10 +173,10 @@
     "scope": "agent review of existing raw-model offline development outputs; no real MCP/bot execution or independent expert review; not a global accuracy percentage"
   },
   "next_plan": {
-    "state": "plan_only_deferred_by_user",
-    "start_authorized": false,
+    "state": "diagnose_reference_eval_mismatch_before_new_trial",
+    "start_authorized": true,
     "training_compute_target": "Thor, as requested after confirming no other GPU",
-    "user_start_instruction_required": true,
+    "user_start_instruction_required": false,
     "no_scheduled_restart": true,
     "dataset_records": {
       "train": 1024,
@@ -178,8 +193,13 @@
     "prior_outage_seconds_at_user_stop": 538.811982,
     "time_and_resource_revalidation_required": true,
     "new_run_state_and_input_version_required": true,
-    "frozen_plan_inputs_sha256": "e708d9863d4e45c018a5202d26d90513f6ed50807ed9f23eaeff1ccab1e0d1d8",
-    "plan_document": "../PLAN.md"
+    "frozen_plan_inputs_sha256": "ad8a65a6cd37e674cac02dbd2fecf7442d60d68d9ef758f6687f355a4d161b9f",
+    "plan_document": "../PLAN.md",
+    "current_approval": "User explicitly approved maximum4h30 interruption and automatic restoration on2026-10-29",
+    "operator": "/usr/local/libexec/capstone-training-v5-r7-window.py",
+    "operator_sha256": "e57f99c227e2a750ded52c6251b3b3f992ce4b5b43e64ce4db075352dd86bfea",
+    "service_action_started": true,
+    "current_model_restored": true
   },
   "no_main_epoch_or_candidate_registered": true,
   "final_test_128_answers_generated": false,
@@ -187,12 +207,11 @@
   "new_full_server_install_tested": false,
   "vLLM_driver_or_operational_bot_selection_changed": false,
   "remaining": [
-    "new shared-interruption extension approval",
+    "Diagnose unchanged-training-loss but different evaluation loss in checkpointed r7; no arbitrary tolerance relaxation",
     "original-checkpointing smoke and full selected epoch",
     "full lineage/tensor validation",
     "CPU merge and GGUF export/candidate registration",
     "same-control development and final holdout comparison",
-    "full FW read-only MCP",
     "rollback-protected harness cleanup and 2x2 comparison"
   ],
   "Git_at_recording": "source/results/docs not yet committed; final publication receipt is STATUS.md and local session",

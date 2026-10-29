@@ -1,5 +1,5 @@
 {
-  "version": "v5-r6-plan-only-user-deferred",
+  "version": "soc-evidence-v5-r7",
   "prepared_at_kst": "2026-10-29T11:59:15.546222+09:00",
   "profile": "config.qwen36-soc-v5.json",
   "profile_sha256": "98be021b89748419a554bdf987978920497c268c94859865ff46cd96e7ddba47",
@@ -71,23 +71,29 @@
       "window_path": "attempts/v5-uncheckpointed-rejected-20261029/window.json",
       "window_sha256": "b4eae69f973d5af950fbf96f2693a6c20ba288deb36f03e2c507d15337448429",
       "reason": "2-step completed, optimized smoke reference loss mismatch; restored original model"
+    },
+    {
+      "window_path": "attempts/v5-r6-user-stopped-20261029/window.json",
+      "window_sha256": "a3642acd99ba57e7a887e831fe265d24cd84fe13cbe11ccab82fc98ca6e86f89",
+      "reason": "Previous user-requested stop during smoke; restored original model, full epoch not started"
     }
   ],
   "planned_gradient_checkpointing": true,
   "total_planned_outage_seconds": 16200,
-  "extended_window_approval": "approved_by_user_resume_after_confirming_no_other_GPU",
-  "resumed_at_kst": "2026-10-29T13:15:13.632482+09:00",
+  "extended_window_approval": "explicit_user_approved_270min_and_automatic_restore_20261029",
+  "resumed_at_kst": "2026-10-29T16:17:51.880302+09:00",
   "execution_placement": {
     "training_compute": "Thor",
     "deployment_and_inference": "Thor",
     "operator": "coding agent",
     "no_other_GPU_available": true
   },
-  "approval_basis": "User withdrew the inference-only restriction and directed resuming the existing Thor workflow after the reviewed total 4h30 plan was presented.",
-  "execution_status": "deferred_by_user_plan_only",
-  "start_authorized": false,
+  "approval_basis": "User explicitly approved maximum 4h30 shared inference interruption and automatic restoration; FW verification must complete before GPU execution.",
+  "execution_status": "prepared_for_authorized_resume_after_FW_validation",
+  "start_authorized": true,
   "deferred_at_kst": "2026-10-29T13:27:35.863058+09:00",
-  "latest_user_instruction": "Train later; prepare the plan only. No scheduling or automatic training restart.",
-  "current_attempt_receipt": "attempts/v5-r6-user-stopped-20261029/window.json",
-  "new_run_and_freeze_required_before_execution": true
+  "latest_user_instruction": "Resume server work and prepare training in parallel; explicitly approve maximum 4h30 interruption and automatic restore.",
+  "current_attempt_receipt": "/var/lib/capstone-training-v5-r7-window/window.json",
+  "new_run_and_freeze_required_before_execution": false,
+  "execution_run_id": "v5-r7-20261029"
 }

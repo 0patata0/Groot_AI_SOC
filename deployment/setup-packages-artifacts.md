@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-10-29 FW 읽기 반입:** 갱신된 `infra/mcp/response-mcp.py`, `deployment/soc_management.py`, 두 봇 공통 하네스/계약/grounding/정책과 공동 채널 정책을 소스 묶음에 포함한다. 기존 nftables·Python 표준 라이브러리·OpenSSH를 사용하므로 추가 deb/wheel/이미지는 0개다. 초기 설치기는 갱신된 도구 계약을 검사한다. [범위·복구](../infra/mcp/firewall-read.md).
+
 > **2026-10-27 추론 경로 소스:** `deployment/inference_tunnel.py`, SIEM 역할·root 설치기·설정 예제, 갱신한 Hermes 가드/공유 gate 및 이미지 pin을 소스 묶음에 포함한다. SSH 터널은 기존 OpenSSH client/Python3/iproute2/systemd를 사용해 추가 deb/wheel/이미지가 없다. 외부 thor의 모델 가중치는 그 서버가 직접 받으며 Mac과 폐쇄망 A/B/C의 온라인 설치는 없다. 새 Hermes 이미지를 준비하는 경우 갱신한 가드와 시험 SHA를 사용한다. [전용 키·host pin·egress 준비](inference-transport.md) · [진행/검증 범위](../STATUS.md).
 
 > **2026-10-27 공통 SSH MAC:** root `deploy.sh`의 security·siem·service 역할에5종 제외·정확한 구4종 정책 이행·충돌 거절·백업/원복·검증을 연결한다. 기존 OpenSSH/Python3/systemd를 사용하며 추가 패키지는 없다. 소스 archive에 `deployment/ssh_macs.py`와 세 역할을 함께 포함한다. 운영 적용은 별도 증분 경로이며 새3VM 전체 설치 검증과 구분한다. [정책·복구](setup-network-ssh.md#세-호스트-공통-ssh-mac-정책--2026-10-27) · [현재 검증 상태](../STATUS.md).

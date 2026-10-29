@@ -43,7 +43,7 @@ def route(question, harness):
     # This only chooses an execution lane. Neither branch decides to block or
     # approve; every security action still requires LLM judgment and MCP gates.
     significant = bool(re.search(r'변경|수정|추가|삭제|적용|차단|해제|재시작|원복|복구|사건|침해|공격|조사|의심|분석|검토', text))
-    pure_read = bool(harness.scope_notice(question) or harness.rule_detail_request(question) or harness.read_plan(question) or harness.combined_rule_request(question)
+    pure_read = bool(harness.firewall_request(question) or harness.scope_notice(question) or harness.rule_detail_request(question) or harness.read_plan(question) or harness.combined_rule_request(question)
                      or harness.inventory_question(question) or harness.ids_runtime_question(question))
     return {'engine': 'ollama' if pure_read and not significant else 'hermes',
             'cross_review': significant or not pure_read or verification_request(question)}

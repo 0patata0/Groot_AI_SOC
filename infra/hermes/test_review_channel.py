@@ -23,6 +23,7 @@ class Harness:
     ids_runtime_question = staticmethod(lambda s: False)
     rule_detail_request = staticmethod(lambda s: None)
     scope_notice = staticmethod(lambda s: None)
+    firewall_request = staticmethod(lambda s: None)
 
 
 class API:
@@ -64,6 +65,58 @@ class Tests(unittest.TestCase):
              mock.patch.object(w,'review_answer',side_effect=review):
             w.main()
         self.assertEqual(captured,[{'question':'B host agent ID and status','current_question':'B host agent ID and status'}])
+
+    def test_fw_only_hermes_lead_uses_verify_and_native_read_first_without_actions(self):
+        from contextlib import nullcontext
+        chosen = []
+        class DB:
+            def execute(self, sql, args=()):
+                if 'tool_calls' in sql: return []
+                return SimpleNamespace(fetchone=lambda: None if 'SELECT 1' in sql else
+                    {'id':'c'*32,'mode':'verify','run_count':0,'session_id':None})
+            def commit(self): pass
+        store=SimpleNamespace(db=DB(),locked=lambda:nullcontext(),reporting=lambda _:nullcontext(),
+            new_case=lambda key,mode:chosen.append(mode) or 'c'*32,context=lambda _:[],close=lambda:None)
+        def run(store,case,prompt):
+            chosen.append((case['fast_readonly'],controller.TOOLSETS))
+            return {'completed':False,'state':'needs_review','text':'미완료','run_id':'d'*32}
+        controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
+            run_hermes=run,prompt_for=lambda *a:'prompt')
+        harness=SimpleNamespace(scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},guidance=lambda _:'read only',read_plan=lambda _:None)
+        request={'id':'a'*32,'phase':'lead','question':'FW 룰'}
+        with mock.patch.dict(sys.modules,{'harness':harness,'soc_management_controller':controller}), \
+             mock.patch.object(sys,'argv',['worker','hermes']), \
+             mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+             mock.patch.object(sys,'stdout',io.StringIO()),mock.patch.object(w.os,'geteuid',return_value=0):
+            w.main()
+        self.assertEqual(chosen,['verify',(True,('mcp-resp',))])
+
+    def test_fw_scope_controls_completion_instead_of_model_disposition(self):
+        from contextlib import nullcontext
+        for verified,model_state,expected in ((False,'completed','partial'),(True,'needs_review','completed')):
+            class DB:
+                def execute(self,sql,args=()):
+                    if 'tool_calls' in sql:return []
+                    return SimpleNamespace(fetchone=lambda:None if 'SELECT 1' in sql else
+                        {'id':'c'*32,'mode':'verify','run_count':0,'session_id':None})
+                def commit(self):pass
+            store=SimpleNamespace(db=DB(),locked=lambda:nullcontext(),reporting=lambda _:nullcontext(),
+                new_case=lambda *a:'c'*32,context=lambda _:[],close=lambda:None)
+            result={'completed':True,'state':model_state,'text':'model text','run_id':'d'*32}
+            controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
+                run_hermes=lambda *a:result,prompt_for=lambda *a:'prompt')
+            harness=SimpleNamespace(scope_notice=lambda _:None,firewall_request=lambda _:{'devices':['FW']},
+                guidance=lambda _:'read only',read_plan=lambda _:None,read_report=lambda *a:'verified or incomplete facts',
+                missing_reads=lambda *a:[] if verified else ['FW incomplete'])
+            request={'id':'a'*32,'phase':'lead','question':'FW 룰'};output=io.StringIO()
+            with mock.patch.dict(sys.modules,{'harness':harness,'soc_management_controller':controller}), \
+                 mock.patch.object(sys,'argv',['worker','hermes']), \
+                 mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+                 mock.patch.object(sys,'stdout',output),mock.patch.object(w.os,'geteuid',return_value=0), \
+                 mock.patch.object(w,'read_trace_calls',return_value=[]):
+                w.main()
+            report=json.loads(output.getvalue())
+            self.assertEqual(report['status'],expected);self.assertEqual(report['structured_scope_complete'],verified)
 
     def test_native_receipt_unwraps_bound_result_and_refuses_missing_input(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -14,11 +14,18 @@
 주의: stdout 은 JSON-RPC 채널 — 진단은 전부 stderr. 성공/실패는 tool result 의 isError 로.
 """
 import json
+import hashlib
 import os
+from pathlib import Path
 import re
+import resource
+import secrets
+import stat
 import subprocess
 import sys
+import tempfile
 import time
+from datetime import datetime, timezone, timedelta
 import urllib.request
 
 try:
@@ -46,6 +53,19 @@ REASON_RE = re.compile(r"[^A-Za-z0-9._:/-]+")
 IPRE = re.compile(r"^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$")
 
 TOOLS = [
+    {
+        "name": "get_firewall_rules",
+        "description": "Read Groot_A host network namespace's COMPLETE live nftables ruleset: all families/tables, base chain default policies, chains, rules (including NAT/Docker), sets and maps. Not WAF/IDS/custom rule files or just temporary blocks. Read-only fixed command; no approval. Follow next_offset with the same snapshot until complete. Legacy iptables and other hosts/namespaces are explicitly outside coverage.",
+        "inputSchema": {
+            "type": "object", "additionalProperties": False,
+            "properties": {
+                "snapshot": {"type": "string", "pattern": "^[0-9a-f]{32}$", "description": "Snapshot from a previous page; omit for a fresh live read."},
+                "offset": {"type": "integer", "minimum": 0, "maximum": 100000},
+                "limit": {"type": "integer", "minimum": 1, "maximum": 200, "default": 200},
+            },
+        },
+        "annotations": {"title": "Read full firewall rules", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True, "openWorldHint": False},
+    },
     {
         "name": "block_ip",
         "description": "Block a source IPv4 at the Groot_A gateway firewall for a limited time (nftables agent_block set). "
@@ -109,6 +129,106 @@ def run_agent_block(args):
 
 def tool_text(text, is_error=False):
     return {"content": [{"type": "text", "text": text}], "isError": is_error}
+
+
+FW_CACHE = Path('/run/capstone-fw-read')
+FW_MAX_BYTES = 2 * 1024 * 1024
+FW_PAGE_BYTES = 48000
+FW_TTL = 300
+
+
+def _fw_cache():
+    # Shared across SSH sessions; never follow user-writable paths/symlinks.
+    for parent in FW_CACHE.parents:
+        st = parent.lstat()
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid != 0 or st.st_mode & 0o022:
+            raise ValueError('firewall cache parent is untrusted')
+    FW_CACHE.mkdir(mode=0o700, exist_ok=True)
+    st = FW_CACHE.lstat()
+    if not stat.S_ISDIR(st.st_mode) or st.st_uid != 0 or stat.S_IMODE(st.st_mode) != 0o700:
+        raise ValueError('firewall cache is untrusted')
+    return FW_CACHE
+
+
+def _fw_capture():
+    def limits():
+        resource.setrlimit(resource.RLIMIT_FSIZE, (FW_MAX_BYTES, FW_MAX_BYTES))
+    with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
+        p = subprocess.run(['/usr/sbin/nft', '-j', '-a', '-n', 'list', 'ruleset'],
+                           stdin=subprocess.DEVNULL, stdout=out, stderr=err, timeout=10,
+                           env={'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LC_ALL': 'C'}, preexec_fn=limits)
+        out.seek(0); raw = out.read(FW_MAX_BYTES + 1)
+        if p.returncode or len(raw) >= FW_MAX_BYTES:
+            raise ValueError('nft read failed or exceeded capture limit; rules are unconfirmed')
+    data = json.loads(raw)
+    objects = data.get('nftables')
+    if not isinstance(objects, list) or any(not isinstance(o, dict) or len(o) != 1 for o in objects):
+        raise ValueError('invalid nft ruleset; rules are unconfirmed')
+    objects = [o for o in objects if 'metainfo' not in o]
+    counts = {}
+    for obj in objects:
+        kind = next(iter(obj)); counts[kind] = counts.get(kind, 0) + 1
+    legacy = {}
+    for family, path in [('ipv4', '/proc/net/ip_tables_names'), ('ipv6', '/proc/net/ip6_tables_names')]:
+        p = Path(path)
+        legacy[family] = p.read_text().split() if p.exists() else []
+    return {'schema': 1, 'target': 'a:firewall', 'observed_at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
+            'source': 'nft -j -a -n list ruleset', 'scope': 'Groot_A host network namespace; all nftables families/tables',
+            'excluded_scope': ['other hosts', 'other network namespaces', 'legacy iptables'],
+            'legacy_tables': legacy, 'coverage_warnings': ['Legacy iptables tables also exist; not included'] if any(legacy.values()) else [],
+            'sha256': hashlib.sha256(raw).hexdigest(), 'counts': counts, 'objects': objects}
+
+
+def firewall_rules(args):
+    try:
+        if not isinstance(args, dict) or set(args) - {'snapshot', 'offset', 'limit'}:
+            raise ValueError('only snapshot, offset, limit are accepted')
+        offset, limit = args.get('offset', 0), args.get('limit', 200)
+        snapshot = args.get('snapshot')
+        if type(offset) is not int or not 0 <= offset <= 100000 or type(limit) is not int or not 1 <= limit <= 200:
+            raise ValueError('invalid page bounds')
+        if snapshot is not None and (not isinstance(snapshot, str) or not re.fullmatch('[0-9a-f]{32}', snapshot)):
+            raise ValueError('invalid snapshot')
+        if offset and not snapshot:
+            raise ValueError('offset requires the previous snapshot')
+        cache = _fw_cache()
+        if snapshot:
+            fd = os.open(cache / snapshot, os.O_RDONLY | os.O_NOFOLLOW)
+            with os.fdopen(fd, 'rb') as f:
+                st = os.fstat(f.fileno())
+                if st.st_uid != 0 or not stat.S_ISREG(st.st_mode) or stat.S_IMODE(st.st_mode) != 0o600 or time.time() - st.st_mtime > FW_TTL:
+                    raise ValueError('snapshot expired or untrusted; start a fresh read')
+                raw = f.read(FW_MAX_BYTES + 1)
+                if len(raw) > FW_MAX_BYTES: raise ValueError('snapshot too large')
+                data = json.loads(raw)
+        else:
+            data = _fw_capture()
+            files = sorted((p for p in cache.iterdir() if re.fullmatch('[0-9a-f]{32}', p.name)), key=lambda p: p.lstat().st_mtime)
+            for p in files:
+                if time.time() - p.lstat().st_mtime > FW_TTL or len(files) >= 8:
+                    p.unlink()
+            snapshot = secrets.token_hex(16)
+            raw = json.dumps(data, ensure_ascii=False, separators=(',', ':')).encode()
+            if len(raw) > FW_MAX_BYTES: raise ValueError('snapshot too large')
+            fd = os.open(cache / snapshot, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+            with os.fdopen(fd, 'wb') as f: f.write(raw)
+        objects = data.pop('objects')
+        if offset > len(objects): raise ValueError('offset past end of snapshot')
+        page, size = [], 0
+        for obj in objects[offset:offset + limit]:
+            n = len(json.dumps(obj, ensure_ascii=False, separators=(',', ':')).encode())
+            if size + n > FW_PAGE_BYTES:
+                if not page: raise ValueError('single nft object exceeds page limit; full read unavailable')
+                break
+            page.append(obj); size += n
+        end = offset + len(page)
+        data.update(snapshot=snapshot, offset=offset, next_offset=end if end < len(objects) else None,
+                    total_objects=len(objects), complete=end == len(objects), objects=page,
+                    snapshot_expires_seconds=FW_TTL)
+        return tool_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')))
+    except (ValueError, OSError, subprocess.SubprocessError, KeyError, TypeError) as e:
+        # Errors never become a zero-rule/healthy result. Never echo nft stderr.
+        return tool_text('get_firewall_rules failed: ' + (str(e) if isinstance(e, ValueError) else type(e).__name__) + '; 조회 미완료', True)
 
 
 EXIT_MEANING = {0: "ok", 1: "agent_block internal (not root / fw sets missing / sudo denied)", 2: "invalid argument",
@@ -187,6 +307,8 @@ def request_approval(ip, minutes, reason, action="block"):
 
 
 def call_tool(name, args):
+    if name == 'get_firewall_rules':
+        return firewall_rules(args)
     if name == "block_ip":
         ip = str(args.get("ip", "")).strip()
         reason = str(args.get("reason", "")).strip()
@@ -253,7 +375,7 @@ def handle(msg):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": ver,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-response-mcp", "version": "1.1.0"},
+            "serverInfo": {"name": "capstone-response-mcp", "version": "1.2.0"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None  # notification, no reply

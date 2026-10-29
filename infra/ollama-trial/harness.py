@@ -65,13 +65,92 @@ def scope_notice(question):
     if request['basic_only'] and 'FW' not in request['devices']:
         return ('요청하신 기본·내장 규칙 전체는 현재 커스텀 파일 조회 도구로 확인할 수 없습니다. '
                 '커스텀 규칙을 기본 규칙 대신 표시하지 않았습니다. 기본 룰 목록은 미조회·미확인입니다.')
-    if request['devices'] == ['FW']:
-        return ('FW(네트워크 방화벽) 규칙 조회 요청으로 이해했습니다.\n'
-                '현재 이 조회 경로에는 전체 nftables/iptables 규칙을 읽는 도구가 구현되어 있지 않아 '
-                '기본 정책·허용/차단 규칙·NAT를 확인하지 못했습니다. '
-                'list_blocks는 봇의 임시 차단 목록만 제공하며 전체 FW 규칙을 대신하지 못합니다.\n'
-                '조회 미완료이며 규칙이 없다는 뜻은 아닙니다.')
     return None
+
+
+def firewall_request(question):
+    request = rule_scope_request(question)
+    return request if request and 'FW' in request['devices'] else None
+
+
+def firewall_state(calls):
+    """Only contiguous, hashed pages from one actual MCP snapshot are complete."""
+    pages = []
+    for call in calls:
+        if call.get('server') != 'resp' or call.get('name') != 'get_firewall_rules': continue
+        data = payload(call)
+        if not data or data.get('offset') == 0: pages = []
+        if (not data or data.get('schema') != 1 or data.get('target') != 'a:firewall'
+                or not EVIDENCE.parse_instant(data.get('observed_at_kst'))
+                or not isinstance(data.get('objects'), list)): continue
+        if not pages:
+            if data.get('offset') != 0: continue
+        elif (data.get('snapshot') != pages[0]['snapshot'] or data.get('sha256') != pages[0]['sha256']
+              or data.get('offset') != pages[-1].get('next_offset')
+              or data.get('total_objects') != pages[0]['total_objects']): continue
+        pages.append(data)
+    if not pages: return None
+    data = dict(pages[-1]); data['objects'] = [o for p in pages for o in p['objects']]
+    counts = {}
+    for obj in data['objects']:
+        if not isinstance(obj, dict) or len(obj) != 1: return None
+        key = next(iter(obj)); counts[key] = counts.get(key, 0) + 1
+    data['verified_complete'] = (data.get('complete') is True and data.get('next_offset') is None
+        and len(data['objects']) == data.get('total_objects') and counts == data.get('counts'))
+    return data
+
+
+def firewall_report(question, calls):
+    data = firewall_state(calls)
+    if not data or not data['verified_complete']:
+        return 'FW 전체 조회 미완료입니다. 실패·미조회·페이지 누락을 규칙 0개로 해석하지 않습니다.'
+    def cell(value):
+        return str(value).replace('|', r'\|').replace('\n', ' ').replace('`', "'").replace('<', '&lt;').replace('>', '&gt;')
+    counts = data['counts']; objects = data['objects']
+    rows = ['**A 서버 FW 전체 nftables 조회**', '조회 시각: ' + data['observed_at_kst'] + ' (KST)',
+            '테이블 ' + str(counts.get('table', 0)) + '개 · 체인 ' + str(counts.get('chain', 0)) + '개 · 규칙 ' + str(counts.get('rule', 0)) + '개 · 집합 ' + str(counts.get('set', 0)) + '개.',
+            '호스트 네임스페이스의 기본 정책·NAT·Docker·커스텀을 함께 조회했습니다. 다음 표는 체인별 요약입니다.', '',
+            '| family / table | chain | hook / 우선순위 | 기본 정책 | 규칙 수 |', '| --- | --- | --- | --- | --- |']
+    rules = [o['rule'] for o in objects if 'rule' in o]
+    for obj in objects:
+        if 'chain' not in obj: continue
+        c = obj['chain']; key = tuple(c.get(k) for k in ('family', 'table', 'name'))
+        n = sum(tuple(r.get(k) for k in ('family', 'table', 'chain')) == key for r in rules)
+        rows.append('| ' + ' | '.join(map(cell, [str(c.get('family')) + ' / ' + str(c.get('table')), c.get('name'),
+            str(c.get('hook', '일반 체인')) + ' / ' + str(c.get('prio', '—')), c.get('policy', '해당 없음'), n])) + ' |')
+    if re.search(r'상세|자세|개별|전문|원문|조건|전체\s*(?:룰|규칙)', normalized(question)):
+        # Mattermost posts are bounded. All kernel objects were read, while
+        # display pages are explicitly separate from MCP capture pagination.
+        requested = re.search(r'([1-9][0-9]{0,3})\s*페이지', normalized(question))
+        number = int(requested[1]) if requested else 1
+        display_pages, page = [], []
+        for r in rules:
+            expr = [e for e in r.get('expr', []) if 'counter' not in e]
+            line = '| ' + ' | '.join(map(cell, ['/'.join(str(r.get(k)) for k in ('family','table','chain')),
+                r.get('handle'), json.dumps(expr, ensure_ascii=False, separators=(',', ':'))])) + ' |'
+            if len(line) > 5000:
+                line = line[:4900] + ' … [긴 규칙 표시 생략; 전체 조건은 MCP 원문에 보존] |'
+            if page and (len(page) >= 16 or sum(map(len, page)) + len(line) > 6000):
+                display_pages.append(page); page = []
+            page.append(line)
+        if page: display_pages.append(page)
+        selected = display_pages[number - 1] if number <= len(display_pages) else []
+        rows += ['', '**개별 규칙 표시 ' + str(number) + '/' + str(len(display_pages)) + '페이지 (전체 ' + str(len(rules)) + '개 조회, 이 페이지 ' + str(len(selected)) + '개 표시)**',
+            '채팅 표시 페이지입니다. 다른 규칙은 “FW 전체 규칙 상세 N페이지”로 확인하세요. MCP 조회 누락과 구분합니다.',
+            '| family / table / chain | handle | 조건·동작 (nft JSON, counter 제외) |', '| --- | --- | --- |', *selected]
+        if not selected: rows += ['요청한 표시 페이지에 규칙이 없습니다. 전체 규칙 0개라는 뜻은 아닙니다.']
+        sets = [o for o in objects if 'set' in o or 'map' in o or 'element' in o]
+        if sets:
+            raw = json.dumps(sets,ensure_ascii=False,separators=(',',':')).replace('```', '\\u0060\\u0060\\u0060')
+            rows += ['', '집합·맵·원소 ' + str(len(sets)) + '개 조회.']
+            if len(raw) <= 2000: rows += ['```json', raw, '```']
+            else: rows += ['집합 원문은 채팅 길이 제한으로 표시 생략했습니다. 전체 원소는 MCP 응답에 보존되어 있습니다.']
+    else:
+        rows += ['', '개별 조건·집합 원소는 위 요약표에 생략했습니다. “FW 전체 규칙 상세”로 확인할 수 있습니다.']
+    rows += ['', '범위: A 호스트 nftables만 확인했습니다. 다른 서버·컨테이너 내부 네임스페이스·legacy iptables는 포함하지 않습니다.',
+             'list_blocks는 별도의 임시 차단 목록입니다. 이번 조회로 규칙을 변경하지 않았습니다.']
+    rows += [str(w) for w in data.get('coverage_warnings', [])]
+    return '\n'.join(rows)
 
 
 def read_plan(question):
@@ -159,7 +238,8 @@ def read_report(question, calls):
     if notice: return notice
     scope = rule_scope_request(question)
     if scope and 'FW' in scope['devices']:
-        return scope_notice('FW 룰') + '\n\n' + (inventory(question, calls) or '나머지 요청 대상도 아직 미조회입니다.')
+        other = [d for d in scope['devices'] if d != 'FW']
+        return firewall_report(question, calls) + ('\n\n' + (inventory(question, calls) or '나머지 요청 대상은 미조회입니다.') if other else '')
     detail = rule_detail_request(question)
     if detail: return rule_detail_report(detail, calls)
     combined = combined_rule_request(question)
@@ -233,7 +313,7 @@ def inventory_question(question):
 
 
 def structured_read(question):
-    return bool(rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
+    return bool(firewall_request(question) or rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
                 tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
 
 
@@ -507,6 +587,8 @@ def prior_inventory(question, evidence):
 def guidance(question):
     text = normalized(question)
     result = SHARED.status_lookup_guidance(text)
+    if firewall_request(question):
+        result += '\nFW는 resp.get_firewall_rules로 기본 정책·체인·NAT 포함 전체 nftables를 조회하세요. list_blocks나 WAF/IDS 파일로 대체하지 마세요. next_offset이 있으면 같은 snapshot으로 끝까지 조회하고 complete/전체 개수를 검증하세요. 실패를 0건으로 보고하지 마세요.'
     plan = read_plan(question)
     if plan:
         result += '\n' + READ.guidance(plan)
@@ -560,6 +642,10 @@ def diagnostic_scope(question, targets):
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
     if scope_notice(question): return set()
+    request = firewall_request(question)
+    if request:
+        other = [d for d in request['devices'] if d != 'FW']
+        return {'mcp__resp__get_firewall_rules'} | (inventory_tool_scope(' '.join(other)) if other else set())
     detail = rule_detail_request(question)
     if detail: return {'mcp__rule_'+t[0]+'__get_rule_change_target' for t in detail['targets']}
     if diagnostic_request(question):
@@ -611,7 +697,8 @@ def missing_reads(question, calls, diagnostic_targets=()):
     request = rule_scope_request(question)
     if request and 'FW' in request['devices']:
         other = [d for d in request['devices'] if d != 'FW']
-        return ['FW 전체 규칙(기본 정책·NAT 포함): 조회 도구 미구현'] + (
+        data = firewall_state(calls)
+        return ([] if data and data['verified_complete'] else ['FW 전체 규칙(기본 정책·NAT 포함): 조회 미완료']) + (
             missing_reads('현재 커스텀 규칙 목록 보여줘 ' + ' '.join(other), calls, diagnostic_targets) if other else [])
     if request and request['basic_only']:
         return ['기본·내장 규칙 전체: 현재 커스텀 조회 도구 범위 밖']
@@ -654,6 +741,16 @@ def missing_reads(question, calls, diagnostic_targets=()):
 def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     result = json.loads(json.dumps(schemas))
+    fw = 'mcp__resp__get_firewall_rules'
+    if firewall_request(question) and fw in result:
+        state = firewall_state(calls)
+        if state and state['verified_complete']:
+            result.pop(fw)
+        elif state and type(state.get('next_offset')) is int:
+            props = result[fw]['properties']
+            props['snapshot']['enum'] = [state['snapshot']]
+            props['offset']['enum'] = [state['next_offset']]
+            result[fw]['required'] = ['snapshot', 'offset']
     p = read_plan(question)
     if p and p['kind'] == 'agent_identity':
         if READ.AGENTS not in result: return {}
@@ -1117,7 +1214,7 @@ def preparation_gap(question, calls):
             or not re.search(r'변경안|수정안|주석|description|\bmsg\b', text, re.I)):
         return []
     if any('write' in c.get('server', '') or
-           (c.get('server') == 'resp' and c.get('name') != 'list_blocks') or
+           (c.get('server') == 'resp' and c.get('name') not in {'list_blocks', 'get_firewall_rules'}) or
            re.match(r'propose_|submit_|apply_|temporarily_|restart_|block_|unblock_', c.get('name', ''))
            for c in calls):
         return []

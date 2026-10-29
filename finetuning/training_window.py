@@ -48,8 +48,8 @@ def select_mode(mode):
         STAGES=('soc-v3-smoke','soc-v3-pilot');STATE=Path('/var/lib/capstone-training-v3-window')
         LIMIT_SECONDS=75*60;RESTORE_MINUTES=80;RESTORE_UNIT='capstone-soc-v3-restore'
     elif mode=='v5':
-        STAGES=('soc-v5-smoke','soc-v5-train');STATE=Path('/var/lib/capstone-training-v5-r6-window')
-        LIMIT_SECONDS=245*60;RESTORE_MINUTES=250;RESTORE_UNIT='capstone-soc-v5-r6-restore'
+        STAGES=('soc-v5-smoke','soc-v5-train');STATE=Path('/var/lib/capstone-training-v5-r7-window')
+        LIMIT_SECONDS=245*60;RESTORE_MINUTES=250;RESTORE_UNIT='capstone-soc-v5-r7-restore'
     elif mode=='v4-full':
         STAGES=('soc-v4-full-smoke','soc-v4-full-train');STATE=Path('/var/lib/capstone-training-v4-full-window')
         LIMIT_SECONDS=165*60;RESTORE_MINUTES=170;RESTORE_UNIT='capstone-soc-v4-full-restore'
@@ -154,7 +154,7 @@ def verify_v3_ready(root):
 
 
 V4_FULL_INPUTS_SHA256='2be7f3f32288a814944dfd8932d783500f29c1fa49e770c595819de2eff3ec83'
-V5_INPUTS_SHA256='e708d9863d4e45c018a5202d26d90513f6ed50807ed9f23eaeff1ccab1e0d1d8'
+V5_INPUTS_SHA256='ad8a65a6cd37e674cac02dbd2fecf7442d60d68d9ef758f6687f355a4d161b9f'
 
 
 def verify_v5_ready(root):

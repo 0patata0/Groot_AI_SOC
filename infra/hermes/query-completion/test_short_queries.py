@@ -39,7 +39,7 @@ class ShortQueries(unittest.TestCase):
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'ollama-trial'))
         import runtime
-        for question in ('FW 룰', '룰 보여줘', 'WAF 기본 룰'):
+        for question in ('룰 보여줘', 'WAF 기본 룰'):
             result = asyncio.run(runtime.run({'model':'qwen3.6:35b'}, {'question':question}))
             self.assertEqual(result['status'], 'partial')
             self.assertEqual(result['calls'], [])
@@ -65,9 +65,9 @@ class ShortQueries(unittest.TestCase):
                          'F/W 룰 출력', '지금 fw 률 츌력해볼래', '방화벽 보여줘'):
             with self.subTest(question=question):
                 self.assertEqual(H.rule_scope_request(question)['devices'], ['FW'])
-                self.assertEqual(H.tool_scope(question), set())
+                self.assertEqual(H.tool_scope(question), {'mcp__resp__get_firewall_rules'})
                 self.assertIsNone(H.inventory_question(question))
-                self.assertIn('미완료', H.scope_notice(question))
+                self.assertIsNone(H.scope_notice(question))
                 self.assertTrue(H.missing_reads(question, []))
 
     def test_known_short_and_long_device_queries_have_identical_scope(self):
@@ -101,7 +101,7 @@ class ShortQueries(unittest.TestCase):
     def test_mixed_fw_and_waf_keeps_both_requested_scopes(self):
         question = 'FW와 WAF 룰 보여줘'
         self.assertIsNone(H.scope_notice(question))
-        self.assertEqual(H.tool_scope(question), {'mcp__rule_a__get_rule_change_target'})
+        self.assertEqual(H.tool_scope(question), {'mcp__rule_a__get_rule_change_target', 'mcp__resp__get_firewall_rules'})
         missing = H.missing_reads(question, [])
         self.assertEqual(len(missing), 2)
         self.assertIn('FW', missing[0])
@@ -129,7 +129,7 @@ class ShortQueries(unittest.TestCase):
             api_kwargs: dict
             api_messages: list
             _original_api_kwargs: object = None
-        for question in ('FW 룰', '룰 보여줘', 'WAF 기본 룰'):
+        for question in ('룰 보여줘', 'WAF 기본 룰'):
             agent = SimpleNamespace(platform='mattermost', model='qwen3.6:35b', provider='custom',
                                     _current_turn_id='t', max_iterations=12)
             rows = [{'role': 'user', 'content': question}]
@@ -146,7 +146,8 @@ class ShortQueries(unittest.TestCase):
         h.agent.model = 'qwen3.6:35b'; h.agent.provider = 'custom'
         h.wrapper = alignment.final_wrapper(h.wrapper, h.original, h.native, h.append, h.reanchor, PLUGIN, H)
         h.call()
-        self.assertEqual(h.original_calls[-1].content, H.scope_notice('FW 룰'))
+        self.assertFalse(h.original_calls)
+        self.assertIn('FW 전체 규칙', str(h.agent._session_messages))
 
 
 if __name__ == '__main__':

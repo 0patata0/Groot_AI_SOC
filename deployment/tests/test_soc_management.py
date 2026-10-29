@@ -144,6 +144,21 @@ class BindingTests(unittest.TestCase):
         self.assertFalse(m.allowed("mcp__rule_write_a__temporarily_contain_ip", "verify"))
         self.assertFalse(m.allowed("mcp__rule_write_b__temporarily_contain_ip", "manage"))
 
+    def test_actual_embedded_gate_exposes_fw_read_and_applies_read_first(self):
+        controller = module('soc_management_controller.py', 'b')
+        command = controller.command_for({'mode':'verify', 'session_id':None, 'fast_readonly':True})
+        self.assertIn('CAPSTONE_MANAGEMENT_REVIEW=1', command)
+        embedded = command[command.index('-c') + 1]
+        gate = {'__name__':'_embedded_gate_test'}
+        exec(compile(embedded, 'embedded-management-gate', 'exec'), gate)
+        tools = [{'type':'function','function':{'name':'mcp__resp__'+name}}
+                 for name in ('get_firewall_rules','list_blocks','block_ip','unblock_ip')]
+        with mock.patch.dict('os.environ', CAPSTONE_MANAGEMENT_MODE='verify', CAPSTONE_MANAGEMENT_REVIEW='1'):
+            request = gate['initial_review_read']({'tools':tools}, [])
+        self.assertEqual(request['tool_choice'], 'required')
+        self.assertEqual({t['function']['name'] for t in request['tools']},
+                         {'mcp__resp__get_firewall_rules'})
+
     def test_root_response_rejects_oversized_stdio_before_dispatch(self):
         m = module("response-mcp.py")
         with mock.patch.object(m.sys, "stdin", io.StringIO("x" * (1048576 + 2))), mock.patch.object(m, "handle") as handle, \

@@ -559,7 +559,7 @@ async def main():
      await session.initialize()
      result=await session.list_tools()
      names={x.name for x in result.tools}
-     expected={'block_ip','unblock_ip','list_blocks'} if alias=='soc-resp' else ({'propose_rule_edit','propose_rule_change','propose_service_action'} | ({'temporarily_contain_ip'} if alias.endswith('-a') else set()) if '-write-' in alias else {'get_rule_change_target','get_rule_change_status','get_service_action_target','get_operation_status'})
+     expected={'block_ip','unblock_ip','list_blocks','get_firewall_rules'} if alias=='soc-resp' else ({'propose_rule_edit','propose_rule_change','propose_service_action'} | ({'temporarily_contain_ip'} if alias.endswith('-a') else set()) if '-write-' in alias else {'get_rule_change_target','get_rule_change_status','get_service_action_target','get_operation_status'})
      assert not result.next_cursor and names==expected and len(names)==len(result.tools)
 asyncio.run(asyncio.wait_for(main(),timeout=90))
 '''

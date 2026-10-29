@@ -8,7 +8,7 @@ READ_TOOLS = {
     'rule-a': RULE_READS, 'rule-b': RULE_READS,
     'security-events': {'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks'},
     'system-diagnostics': {'get_system_diagnostics', 'calculate_time'},
-    'resp': {'list_blocks'},
+    'resp': {'list_blocks', 'get_firewall_rules'},
     'wazuh-ro': {'get_wazuh_agents', 'get_wazuh_cluster_nodes',
                 'get_wazuh_critical_vulnerabilities', 'get_wazuh_manager_error_logs',
                 'get_wazuh_vulnerability_summary', 'get_wazuh_agent_processes',
@@ -23,7 +23,7 @@ PROTECTED_TOOLS = {
     'rule-write-b': {'propose_rule_edit', 'propose_rule_change', 'propose_service_action'},
     'resp': {'block_ip', 'unblock_ip'},
 }
-PARITY_TOOLS = {**READ_TOOLS, **PROTECTED_TOOLS, 'resp': {'list_blocks', 'block_ip', 'unblock_ip'}}
+PARITY_TOOLS = {**READ_TOOLS, **PROTECTED_TOOLS, 'resp': {'list_blocks', 'get_firewall_rules', 'block_ip', 'unblock_ip'}}
 PROFILES = {'rule-a': ['rule-a'], 'rule-b': ['rule-b'],
             'rule-write-a': ['rule-write-a'], 'rule-write-b': ['rule-write-b'], 'resp': ['resp-a'],
             'security-events': ['mcp-b', 'security-events'],

@@ -578,9 +578,15 @@ def initial_review_read(request, completed_calls, requirements=(), facts=()):
         if {t['function']['name'] for t in reads} != names:
             raise RuntimeError('required_status_read_tools_unavailable')
         return {**value, 'tools':reads, 'tool_choice':'required'}
+    # The shared-channel FW lane offers only resp reads. Match the chat
+    # adapters' single-tool scope and do not let list_blocks satisfy FW reads.
+    value = permitted_request(request, 'verify')
+    names = {t['function']['name'] for t in value.get('tools', [])}
+    if names == {'mcp__resp__get_firewall_rules', 'mcp__resp__list_blocks'} and 'get_firewall_rules' not in completed_calls:
+        return {**value, 'tools':[t for t in value['tools']
+                if t['function']['name'] == 'mcp__resp__get_firewall_rules'], 'tool_choice':'required'}
     if completed_calls:
         return request
-    value = permitted_request(request, 'verify')
     reads = value.get('tools', [])
     return {**value, 'tool_choice': 'required'} if reads else value
 
@@ -716,7 +722,7 @@ def allowed(name, mode):
         return name.removeprefix('mcp__security_events__') in EVENT_READ
     if name.startswith('mcp__system_diagnostics__'):
         return name.removeprefix('mcp__system_diagnostics__') in DIAGNOSTIC_READ
-    if name == 'mcp__resp__list_blocks':
+    if name in {'mcp__resp__list_blocks', 'mcp__resp__get_firewall_rules'}:
         return True
     for server in ('rule_a', 'rule_b'):
         prefix = 'mcp__' + server + '__'
@@ -733,7 +739,7 @@ def allowed(name, mode):
 
 def wire_allowed(name, mode):
     return mode in {'manage', 'verify'} and isinstance(name, str) and (name.startswith(('get_wazuh_', 'search_wazuh_')) or
-        name in READ | EVENT_READ | DIAGNOSTIC_READ | {'list_blocks'} or (mode == 'manage' and name in WRITE))
+        name in READ | EVENT_READ | DIAGNOSTIC_READ | {'list_blocks', 'get_firewall_rules'} or (mode == 'manage' and name in WRITE))
 
 
 def permitted_tools(tools, mode):
@@ -880,8 +886,8 @@ def main():
         return original_result(self, data, session_id, exit_code)
 
     def receipt_progress(self, event_type, tool_name=None, preview=None, args=None, **kwargs):
-        if event_type == 'tool.completed' and tool_name in {
-                'mcp__security_events__' + name for name in EVENT_READ}:
+        if event_type == 'tool.completed' and (tool_name == 'mcp__resp__get_firewall_rules' or tool_name in {
+                'mcp__security_events__' + name for name in EVENT_READ}):
             # Native CLI previews stop at 5,000 characters, in the middle of JSON.
             # Keep the bounded real result for host verification, without changing
             # the model's MCP response or trusting assistant-generated evidence.

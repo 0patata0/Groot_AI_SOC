@@ -22,16 +22,16 @@ spec.loader.exec_module(installer)
 
 class ReadPolicy(unittest.TestCase):
     def test_mixed_catalog_only_exposes_reads_and_rejects_server_drift(self):
-        tools = [SimpleNamespace(name=n) for n in ('list_blocks', 'block_ip', 'unblock_ip')]
-        self.assertEqual([t.name for t in policy.filter_catalog('resp', tools, 'read-only')], ['list_blocks'])
-        self.assertEqual(len(policy.filter_catalog('resp', tools, 'hermes-parity')), 3)
+        tools = [SimpleNamespace(name=n) for n in ('list_blocks', 'get_firewall_rules', 'block_ip', 'unblock_ip')]
+        self.assertEqual([t.name for t in policy.filter_catalog('resp', tools, 'read-only')], ['list_blocks', 'get_firewall_rules'])
+        self.assertEqual(len(policy.filter_catalog('resp', tools, 'hermes-parity')), 4)
         for changed in (tools[:-1], tools + [SimpleNamespace(name='shell')]):
             with self.assertRaisesRegex(ValueError, 'server_tool_contract_changed'):
                 policy.filter_catalog('resp', changed, 'read-only')
     def test_unique_names_and_exact_read_count(self):
         names = [policy.alias(s, t) for s, ts in policy.READ_TOOLS.items() for t in ts]
-        self.assertEqual(len(names), 28)
-        self.assertEqual(len(set(names)), 28)
+        self.assertEqual(len(names), 29)
+        self.assertEqual(len(set(names)), 29)
         self.assertNotEqual(policy.alias('rule-a', 'get_service_action_target'),
                             policy.alias('rule-b', 'get_service_action_target'))
 

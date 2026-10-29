@@ -1,4 +1,5 @@
 #!/bin/bash
+# 역사적 legacy 경로. 신규 초기 설치 진입점은 루트 deploy.sh이며 전체 FW 읽기는 그 root 진입점에서만 지원한다.
 # Groot_A: 응답(차단) MCP 서버 배치 — 게이트형(리뷰 반영). root 로 실행(stdin 으로 비밀 주입 불필요; 자격증명 없음).
 # 전제: /tmp/resp/ 에 response-mcp.py, run-response.sh 반입. capstone_fw(agent_block) 이미 적용됨. RESP_PUBKEY=클라이언트 공개키 한 줄.
 # 원칙: 전용 사용자 resp(비번 없음) + sshd Match ForceCommand + authorized_keys restrict → 그 키로는 응답 서버만 실행.
@@ -116,7 +117,7 @@ send({"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"
 r=json.loads(p.stdout.readline()); assert r["result"]["serverInfo"]["name"]=="capstone-response-mcp", r; print("  initialize ok:", r["result"]["serverInfo"])
 send({"jsonrpc":"2.0","method":"notifications/initialized"})
 send({"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}})
-r=json.loads(p.stdout.readline()); names=[t["name"] for t in r["result"]["tools"]]; assert set(names)=={"block_ip","unblock_ip","list_blocks"}, names; print("  tools:", names)
+r=json.loads(p.stdout.readline()); names=[t["name"] for t in r["result"]["tools"]]; assert set(names)=={"block_ip","unblock_ip","list_blocks","get_firewall_rules"}, names; print("  tools:", names)
 send({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"list_blocks","arguments":{}}})
 r=json.loads(p.stdout.readline()); assert r["result"]["isError"] is False, r; print("  list_blocks:", r["result"]["content"][0]["text"][:60])
 send({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"block_ip","arguments":{"ip":"10.200.10.10","minutes":5,"reason":"deploy-selftest-protected"}}})

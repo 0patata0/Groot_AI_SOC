@@ -47,7 +47,7 @@ mcp_servers:
     supports_parallel_tool_calls: false
     tools: {resources: false, prompts: false}
     trust: full                               # 반환 오류는 비신뢰 증거, 승인/운영 명령 아님
-  resp:                                       # 응답(차단) MCP 서버(A, response-mcp.py, 계정 resp) — block_ip/unblock_ip/list_blocks
+  resp:                                       # 응답(차단) MCP 서버(A, response-mcp.py, 계정 resp) — get_firewall_rules/list_blocks 읽기 + block_ip/unblock_ip 보호쓰기
     command: ssh
     args: ["-T", "-F", "/opt/data/home/.ssh/config", "resp-a"]  # Host resp-a = resp@10.200.10.1
     env:
@@ -98,7 +98,7 @@ security:
   allow_lazy_installs: false                  # 오프라인: 런타임 pip 설치 시도 금지
 
 # 2026-10-15: 일반 terminal/file/code/delegation 도구를 관리 작업에 노출하지 않는다.
-# 2026-10-23 초기 계약: 당시5개 MCP에 읽기전용 system-diagnostics를 추가했다. 현행8연결/36도구는 위 설정을 따른다.
+# 2026-10-23 초기 계약: 당시5개 MCP에 읽기전용 system-diagnostics를 추가했다. 2026-10-29 현행8연결/38도구(읽기29/보호9)는 위 설정을 따른다. resp.get_firewall_rules는 전체 FW 읽기다.
 # 배포 전후 _get_platform_tools 결과가 아래6개와 정확히 같음을
 # 당시 확인하고 known_builtin_toolsets/known_plugin_toolsets도 해당 설치본 기준으로 저장했다.
 # 버전 변경 시 기본 도구 자동 추가 여부를 다시 검사한다.

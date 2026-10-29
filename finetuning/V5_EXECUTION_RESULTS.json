@@ -1,6 +1,6 @@
 {
-  "updated_at_kst": "2026-10-30T00:29:26.491596+09:00",
-  "status": "r8_development_comparison_completed_final_test_running",
+  "updated_at_kst": "2026-10-30T00:40:22.883444+09:00",
+  "status": "r8_full_matched_CTI_test_completed_candidate_not_promoted",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
     "train": 1024,
@@ -186,17 +186,17 @@
     ]
   },
   "no_main_epoch_or_candidate_registered": false,
-  "final_test_128_answers_generated": false,
+  "final_test_128_answers_generated": true,
   "actual_MCP_or_chat_or_attack_E2E": false,
   "new_full_server_install_tested": false,
   "vLLM_driver_or_operational_bot_selection_changed": false,
   "remaining": [
-    "Same-control candidate development and untouched final holdout quality evaluation",
-    "CPU merge/GGUF export/candidate registration after resource and quality checks",
-    "Actual attack/sensor/LLM/approval E2E; training and kernel isolation do not prove this",
-    "Rollback-protected harness cleanup and2x2 comparison"
+    "Retain existing operational model; registered R8 candidate is evaluation/archive only.",
+    "Use development evidence to plan improvements; this 128-case final split is consumed and cannot be presented as unseen again.",
+    "Verify actual operator MCP/FW/approval/write/rollback and Messenger/attack E2E separately.",
+    "Harness cleanup must preserve recovery and safety gates; trained candidate not selected from current CTI evidence."
   ],
-  "Git_at_recording": "Export/registration and lifecycle correction public updates pending automatic commit/push; prior preparation already published.",
+  "Git_at_recording": "Lifecycle fix and development results published as 15a24a753a9205fb91092219ea84006d06d372a6; final held-out results and documentation pending follow-up commit/push.",
   "next_plan_before_user_deferral": {
     "state": "pending_new_extended_shared_interruption_approval",
     "gradient_checkpointing": true,
@@ -1025,7 +1025,7 @@
     "candidate_registered_from_r8": false
   },
   "post_training_comparison": {
-    "checked_at_kst": "2026-10-30T00:29:26.491596+09:00",
+    "checked_at_kst": "2026-10-30T00:40:22.883444+09:00",
     "scope": "CTI source mapping development only; not full SOC or operational promotion",
     "export": {
       "completed_at_kst": "2026-10-30T00:06:14.647741+09:00",
@@ -1203,19 +1203,102 @@
       },
       "conclusion": "Small CTI reference-F1 change; strict completion and omitted-ID count unchanged. Not sufficient for operating-model promotion."
     },
-    "final_test_128_answers_generated": false,
+    "final_test_128_answers_generated": true,
     "operational_model_promoted": false,
     "actual_MCP_chat_attack_E2E": false,
     "final_test": {
-      "status": "running",
+      "status": "completed",
       "started_at_kst": "2026-10-30T00:26:55.161849+09:00",
+      "finished_at_kst": "2026-10-30T00:35:11.012074+09:00",
       "plan_sha256": "b59a2502aac85fe7e1770ad25f890b8cb3523e525d18407c11391a788c7e5b4f",
+      "report_sha256": "7658845b834854c44e5e6ac3aad4543f8424a98a0382968a4be406321c9b1feb",
       "cases_per_arm": 128,
-      "last_checked_at_kst": "2026-10-30T00:27:43.097383+09:00",
       "completed_responses": {
-        "control": 22
+        "control": 128,
+        "candidate": 128
       },
-      "tuning_after_final_test_started": false
+      "prior_progress_snapshot": {
+        "status": "running",
+        "started_at_kst": "2026-10-30T00:26:55.161849+09:00",
+        "plan_sha256": "b59a2502aac85fe7e1770ad25f890b8cb3523e525d18407c11391a788c7e5b4f",
+        "cases_per_arm": 128,
+        "last_checked_at_kst": "2026-10-30T00:27:43.097383+09:00",
+        "completed_responses": {
+          "control": 22
+        },
+        "tuning_after_final_test_started": false
+      },
+      "summary": {
+        "control": {
+          "requests": 128,
+          "strict_complete": 13,
+          "format_valid": 128,
+          "macro_f1": 0.15885416666666666,
+          "missing_IDs": 111,
+          "unsupported_IDs": 147
+        },
+        "candidate": {
+          "requests": 128,
+          "strict_complete": 13,
+          "format_valid": 127,
+          "macro_f1": 0.140625,
+          "missing_IDs": 114,
+          "unsupported_IDs": 147
+        }
+      },
+      "paired_F1_cases": {
+        "improved": 2,
+        "regressed": 5,
+        "tied": 121
+      },
+      "warmup_seconds": {
+        "control": 7.467376120155677,
+        "candidate": 7.965108012082055
+      },
+      "response_median_seconds": {
+        "control": 1.745047107920982,
+        "candidate": 1.6999283550539985
+      },
+      "omitted_children_with_predicted_parent": {
+        "control": 21,
+        "candidate": 21
+      },
+      "candidate_format_failure": {
+        "count": 1,
+        "case_id": "soc-evidence-v5-a5314613d04ba1c70778",
+        "done_reason": "length",
+        "output_limit_tokens": 512,
+        "interpretation": "Generated an overlong mapping list; incomplete JSON and absent scope/source fields. Same fixed output limit applied to both arms; original score preserved."
+      },
+      "restoration": {
+        "status": "verified",
+        "errors": [],
+        "context_length": 262144,
+        "registry_unchanged": true,
+        "original_generation_verified": true
+      },
+      "tuning_after_final_test_started": false,
+      "holdout_consumed": true,
+      "reuse_as_unseen_future_test_allowed": false,
+      "interpretation": "Exact agreement with provider CTI reference mappings, not full SOC accuracy or an independently certified label set."
+    },
+    "decision": "Retain current operational model; candidate is not promoted because held-out omissions and formatting regressed.",
+    "post_fix_live_verification": {
+      "at_kst": "2026-10-30T00:36:27.814300+09:00",
+      "ollama": "active",
+      "resident_models": [
+        {
+          "name": "qwen3.6:35b",
+          "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+          "context_length": 262144,
+          "size": 23656629533
+        }
+      ],
+      "evaluation_process_exited": true,
+      "kernel_warning_events_since_lifecycle_fix": [],
+      "kernel_query_returncode": 0,
+      "ollama_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+      "driver_internal_failure_root_cause_resolved": false
     }
   },
   "final_test_response_generation_started": true,

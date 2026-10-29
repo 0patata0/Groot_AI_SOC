@@ -1,0 +1,1340 @@
+{
+  "schema": 1,
+  "verified_at_kst": "2026-10-30T01:44:29.870208+09:00",
+  "status": "source_linkage_review_completed_not_training_admitted",
+  "summary": {
+    "environments": 5,
+    "raw_label_pairs": 40,
+    "raw_rows": 1942943,
+    "provider_label_rows_bound": 623514,
+    "selected_source_rows": 240,
+    "selected_provider_label_bindings": 234,
+    "zero_Wazuh_Suricata_intervals_reviewed": 9,
+    "intervals_with_provider_label_evidence": 7,
+    "intervals_without_provider_label_evidence": 2,
+    "AMiner_objects_scanned": 24199,
+    "AMiner_objects_in_intervals": 19,
+    "AMiner_training_mode_true_in_intervals": 2,
+    "new_training_dialogues": 0
+  },
+  "sources": [
+    {
+      "DOI": "10.5281/zenodo.8263181",
+      "license": "CC-BY-4.0",
+      "role": "existing ADS alerts and phase windows",
+      "citation_keys": [
+        "ait_ads_2023",
+        "landauer2024ait_ads"
+      ]
+    },
+    {
+      "DOI": "10.5281/zenodo.5789064",
+      "license": "CC-BY-NC-SA-4.0",
+      "role": "versioned raw logs and provider-generated line labels",
+      "citation_keys": [
+        "ait_lds_v2_2022",
+        "landauer2023maintainable",
+        "landauer2021haveit"
+      ]
+    }
+  ],
+  "windows": [
+    {
+      "environment": "fox",
+      "phase": "webshell",
+      "start_kst": "2022-01-18T21:38:00+09:00",
+      "end_kst": "2022-01-18T21:38:30+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 18,
+      "provider_labelled_raw_rows_in_interval": 17,
+      "AMiner_objects": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "line": 411718,
+          "line_sha256": "549a22509a4ce55eacdb1256433661f71fd3b1150432e9124dbdaf9b3a7bd1d6",
+          "timestamp_kst": "2022-01-18T21:38:00+09:00",
+          "provider_labels": [
+            "attacker_http",
+            "foothold",
+            "webshell_upload"
+          ]
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "line": 411719,
+          "line_sha256": "59479e6b711a1cba2aa46d6ad0207f522095f74febc3d0b93836f8d5147663ec",
+          "timestamp_kst": "2022-01-18T21:38:00+09:00",
+          "provider_labels": [
+            "attacker_http",
+            "foothold",
+            "webshell_upload"
+          ]
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "line": 411721,
+          "line_sha256": "c78e51ab9a1546e53072c14835a82f8a2c8c1fb728bcfcb1c8d93a95dd2302a6",
+          "timestamp_kst": "2022-01-18T21:38:04+09:00",
+          "provider_labels": [
+            "attacker_http",
+            "foothold",
+            "webshell_cmd"
+          ]
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "line": 411722,
+          "line_sha256": "19823efe7edae4762aee34574ec3fe9b2bc1c5a6a60cc0ae10d201a235764ebe",
+          "timestamp_kst": "2022-01-18T21:38:06+09:00",
+          "provider_labels": [
+            "attacker_http",
+            "foothold",
+            "webshell_cmd"
+          ]
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "line": 411736,
+          "line_sha256": "12027d1623985e9c06bbd080ceb9ba07c3ff337104652d2cd9fba894a46f018c",
+          "timestamp_kst": "2022-01-18T21:38:29+09:00",
+          "provider_labels": [
+            "webshell_cmd",
+            "escalate"
+          ]
+        },
+        {
+          "member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log",
+          "line": 1011,
+          "line_sha256": "3eb1568c1874bffb6e9ba4fe214451b748e680118d7b587e59923e4ce3d92c14",
+          "timestamp_kst": "2022-01-18T21:38:09.321000+09:00",
+          "provider_labels": []
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 10409,
+          "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "raw_line": 411736,
+          "provider_labels": [
+            "webshell_cmd",
+            "escalate"
+          ]
+        }
+      ],
+      "review_status": "source_label_evidence_available_not_full_incident_success"
+    },
+    {
+      "environment": "fox",
+      "phase": "reverse_shell",
+      "start_kst": "2022-01-18T22:13:50+09:00",
+      "end_kst": "2022-01-18T22:14:30+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 3,
+      "provider_labelled_raw_rows_in_interval": 0,
+      "AMiner_objects": 1,
+      "AMiner_training_modes": {
+        "false": 1
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "line": 411835,
+          "line_sha256": "8cdcec6b02c3129fc177d8904a8a75adf97929e32a2b3620b5a72d8a8f0d06b1",
+          "timestamp_kst": "2022-01-18T22:13:52+09:00",
+          "provider_labels": []
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "line": 411836,
+          "line_sha256": "ad02dfd3dd10791dc3cd3f13ce8daeb1c79fc7490c775dab648891f369f58ff2",
+          "timestamp_kst": "2022-01-18T22:14:18+09:00",
+          "provider_labels": []
+        },
+        {
+          "member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log",
+          "line": 1059,
+          "line_sha256": "995c0f8d3506ccc71ba35c81aa60f2c1c73593f1ade30f77eba215fce3f8de0d",
+          "timestamp_kst": "2022-01-18T22:14:09.321000+09:00",
+          "provider_labels": []
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 10415,
+          "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+          "raw_line": 411836,
+          "provider_labels": []
+        }
+      ],
+      "review_status": "reverse_shell_success_unconfirmed_need_connection_or_process_evidence"
+    },
+    {
+      "environment": "fox",
+      "phase": "service_stop",
+      "start_kst": "2022-01-17T18:04:46+09:00",
+      "end_kst": "2022-01-17T18:04:48+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 2,
+      "provider_labelled_raw_rows_in_interval": 2,
+      "AMiner_objects": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 467,
+          "line_sha256": "8c11dcefb852da86d071c3df720c71f2652e798cbb76bd4b5bb8c314e6a12ffc",
+          "timestamp_kst": "2022-01-17T18:04:47.683000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 468,
+          "line_sha256": "6ba483e96fa4f568cd7eda5e084bae1cb18f2d2f27d4fe92ef16098a0e99f5dd",
+          "timestamp_kst": "2022-01-17T18:04:47.683000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 825,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 467,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "aminer_line": 826,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 468,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "review_status": "source_label_evidence_available_not_full_incident_success"
+    },
+    {
+      "environment": "russellmitchell",
+      "phase": "reverse_shell",
+      "start_kst": "2022-01-24T13:36:56+09:00",
+      "end_kst": "2022-01-24T13:37:39+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 2,
+      "provider_labelled_raw_rows_in_interval": 0,
+      "AMiner_objects": 3,
+      "AMiner_training_modes": {
+        "false": 3
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+          "line": 8530,
+          "line_sha256": "4db8fe4e138ad5a9104ac52085597d21ea09e88259c7e6212f76346580880319",
+          "timestamp_kst": "2022-01-24T13:37:25+09:00",
+          "provider_labels": []
+        },
+        {
+          "member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+          "line": 370,
+          "line_sha256": "c9bb38245a3b9183c4a7ba923083ffc63a9f62e7b4eb261edac5b9ee6a74dc9b",
+          "timestamp_kst": "2022-01-24T13:37:07.284000+09:00",
+          "provider_labels": []
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 3881,
+          "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+          "raw_line": 8530,
+          "provider_labels": []
+        },
+        {
+          "aminer_line": 3882,
+          "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+          "raw_line": 8530,
+          "provider_labels": []
+        }
+      ],
+      "review_status": "reverse_shell_success_unconfirmed_need_connection_or_process_evidence"
+    },
+    {
+      "environment": "russellmitchell",
+      "phase": "service_stop",
+      "start_kst": "2022-01-24T22:50:38+09:00",
+      "end_kst": "2022-01-24T22:50:40+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 2,
+      "provider_labelled_raw_rows_in_interval": 2,
+      "AMiner_objects": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 667,
+          "line_sha256": "75fea7cb9f237cc4c96baabb239aa8ca1fa85540c5a3f81fad3edf3682817086",
+          "timestamp_kst": "2022-01-24T22:50:39.298000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 668,
+          "line_sha256": "1ef4ebaaad408acc93e051be72a9ffb698d62961705c95b355efcb5c5d7b61f7",
+          "timestamp_kst": "2022-01-24T22:50:39.298000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 4041,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 667,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "aminer_line": 4042,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 668,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "review_status": "source_label_evidence_available_not_full_incident_success"
+    },
+    {
+      "environment": "santos",
+      "phase": "service_stop",
+      "start_kst": "2022-01-16T16:16:17+09:00",
+      "end_kst": "2022-01-16T16:16:19+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 2,
+      "provider_labelled_raw_rows_in_interval": 2,
+      "AMiner_objects": 3,
+      "AMiner_training_modes": {
+        "false": 3
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 451,
+          "line_sha256": "c8c10b3383b0e7e87cf3e118a0e6b51fedbd0a20a993361637c34f0e8324ad1d",
+          "timestamp_kst": "2022-01-16T16:16:18.019000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 452,
+          "line_sha256": "cfce1ef250d7164e1df3eaba8542bbedc3576b3db710720a088403b3a923b4a4",
+          "timestamp_kst": "2022-01-16T16:16:18.019000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 559,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 451,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "review_status": "source_label_evidence_available_not_full_incident_success"
+    },
+    {
+      "environment": "shaw",
+      "phase": "webshell",
+      "start_kst": "2022-01-29T23:39:40+09:00",
+      "end_kst": "2022-01-29T23:40:01+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 9,
+      "provider_labelled_raw_rows_in_interval": 9,
+      "AMiner_objects": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+          "line": 5939,
+          "line_sha256": "310cfe54ce0e1295bb91663a9c53db6b7bc50b87237e345f4721bc35981ecc4f",
+          "timestamp_kst": "2022-01-29T23:39:41+09:00",
+          "provider_labels": [
+            "attacker_http",
+            "foothold",
+            "webshell_upload"
+          ]
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+          "line": 5940,
+          "line_sha256": "d66ad52c464c616b6fb3e49b3f8555b00ca0e3c4c3fabaab3b4c6eeb6203c3e1",
+          "timestamp_kst": "2022-01-29T23:39:43+09:00",
+          "provider_labels": [
+            "attacker_http",
+            "foothold",
+            "webshell_cmd"
+          ]
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+          "line": 5941,
+          "line_sha256": "43b60eccb5c9f6b67b71507e1dbb566173c504d82945cbef9715db0ba66b6960",
+          "timestamp_kst": "2022-01-29T23:39:46+09:00",
+          "provider_labels": [
+            "attacker_http",
+            "foothold",
+            "webshell_cmd"
+          ]
+        },
+        {
+          "member": "gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+          "line": 5947,
+          "line_sha256": "6d841810de3e43ada1b4cd4259cc41a29c0f01edc0d0e316a71099cd653b6044",
+          "timestamp_kst": "2022-01-29T23:40:01+09:00",
+          "provider_labels": [
+            "webshell_cmd",
+            "escalate"
+          ]
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 1550,
+          "raw_member": "gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+          "raw_line": 5947,
+          "provider_labels": [
+            "webshell_cmd",
+            "escalate"
+          ]
+        }
+      ],
+      "review_status": "source_label_evidence_available_not_full_incident_success"
+    },
+    {
+      "environment": "shaw",
+      "phase": "service_stop",
+      "start_kst": "2022-01-29T06:08:00+09:00",
+      "end_kst": "2022-01-29T06:08:02+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 2,
+      "provider_labelled_raw_rows_in_interval": 2,
+      "AMiner_objects": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 701,
+          "line_sha256": "6a40fc492c49d5e97bcf39077056692b1ac40068e3e82c928e12907428f95efe",
+          "timestamp_kst": "2022-01-29T06:08:01.491000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 702,
+          "line_sha256": "c207cf1923c00d96cd6b1bdfbcb9d744a267ba6dc33028bd9b30acc997376038",
+          "timestamp_kst": "2022-01-29T06:08:01.491000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 645,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 701,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "aminer_line": 646,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 702,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "review_status": "source_label_evidence_available_not_full_incident_success"
+    },
+    {
+      "environment": "wardbeck",
+      "phase": "service_stop",
+      "start_kst": "2022-01-21T07:12:27+09:00",
+      "end_kst": "2022-01-21T07:12:29+09:00",
+      "ADS_Wazuh_Suricata_records": 0,
+      "raw_rows_in_interval_with_explicit_time": 2,
+      "provider_labelled_raw_rows_in_interval": 2,
+      "AMiner_objects": 2,
+      "AMiner_training_modes": {
+        "true": 2
+      },
+      "sample_source_references": [
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 367,
+          "line_sha256": "e812eba6559dc65ae25cb26a79ce4315b635f7bcfe8801812d315ff75c6d2a06",
+          "timestamp_kst": "2022-01-21T07:12:28.495000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "member": "gather/internal_share/logs/audit/audit.log",
+          "line": 368,
+          "line_sha256": "eb3294cc7f4392f361290796e4b6a38592b82853cfce755883319a62e8a9ecfd",
+          "timestamp_kst": "2022-01-21T07:12:28.499000+09:00",
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "exact_AMiner_to_LDS_sample_bindings": [
+        {
+          "aminer_line": 739,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 367,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        },
+        {
+          "aminer_line": 740,
+          "raw_member": "gather/internal_share/logs/audit/audit.log",
+          "raw_line": 368,
+          "provider_labels": [
+            "dnsteal",
+            "exfiltration-service",
+            "attacker"
+          ]
+        }
+      ],
+      "review_status": "source_label_evidence_available_not_full_incident_success"
+    }
+  ],
+  "member_checks": [
+    {
+      "environment": "fox",
+      "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+      "label_member": "labels/inet-firewall/logs/dnsmasq.log",
+      "raw_member_sha256": "6068d052ebd72bdea61616bf2dd15ab403b8cea236c265e890d38906fc7a26d6",
+      "label_member_sha256": "75b4031178a00e70066f0b6363acec24a1b62378e2f11baf3b336d3f43ea4d3a",
+      "counts": {
+        "raw_lines": 240582,
+        "labelled_raw_lines": 44600
+      },
+      "provider_label_rows": 44600,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 240582
+      }
+    },
+    {
+      "environment": "fox",
+      "raw_member": "gather/internal_share/logs/audit/audit.log",
+      "label_member": "labels/internal_share/logs/audit/audit.log",
+      "raw_member_sha256": "2f3cb0dd94d0a24dc4db5bf750d1cf78fddeac051235bcd2f8be9697173f28c2",
+      "label_member_sha256": "2e60dad8a10c1e7da2c1122d554438becebb1aea6d52a459ceb9d572cfcf8d3d",
+      "counts": {
+        "raw_lines": 898,
+        "labelled_raw_lines": 2
+      },
+      "provider_label_rows": 2,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 898
+      }
+    },
+    {
+      "environment": "fox",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.price.fox.org-access.log.2",
+      "raw_member_sha256": "ccdf27896c74e9e435fce0e4abbacae47511634e4ee195e07599f70687d009de",
+      "label_member_sha256": "45c56852e1e89b5e46c9192ea49ffe7be32893302f0f3fc05f41f26050302288",
+      "counts": {
+        "raw_lines": 412922,
+        "labelled_raw_lines": 410841
+      },
+      "provider_label_rows": 410841,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "apache_offset": 412922
+      }
+    },
+    {
+      "environment": "fox",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.price.fox.org-error.log.1",
+      "raw_member_sha256": "3894781e6dadce252675d741e461109a937822850d4714204c52a50479205f2d",
+      "label_member_sha256": "fb1eac1d535e63bf72379ab2e38a7666dad7013b3ca32769ee1a79cf67aa3733",
+      "counts": {
+        "raw_lines": 1338,
+        "labelled_raw_lines": 1336
+      },
+      "provider_label_rows": 1336,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 1338
+      }
+    },
+    {
+      "environment": "fox",
+      "raw_member": "gather/intranet_server/logs/audit/audit.log",
+      "label_member": "labels/intranet_server/logs/audit/audit.log",
+      "raw_member_sha256": "a78734b020a9fa7566bdcb2921f9ec8dfc3627f3cb19b72abfef07e3dbccfb13",
+      "label_member_sha256": "cc05e448ada429148a3bf63916afb77b92c951e4737971fe9212098edce11653",
+      "counts": {
+        "raw_lines": 2887,
+        "labelled_raw_lines": 19
+      },
+      "provider_label_rows": 19,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 2887
+      }
+    },
+    {
+      "environment": "fox",
+      "raw_member": "gather/intranet_server/logs/auth.log",
+      "label_member": "labels/intranet_server/logs/auth.log",
+      "raw_member_sha256": "ded3e39860960ed9dd3be998fcf634976eb49dea3d10ac627f2bf22320d100f7",
+      "label_member_sha256": "401d07d93d75219ac7dc4e77c1373a1c1381cb13d2194007452f37e1da8383cc",
+      "counts": {
+        "raw_lines": 572,
+        "labelled_raw_lines": 12
+      },
+      "provider_label_rows": 12,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 572
+      }
+    },
+    {
+      "environment": "fox",
+      "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log",
+      "label_member": "labels/monitoring/logs/logstash/intranet-server/2022-01-18-system.cpu.log",
+      "raw_member_sha256": "084dcdfc4cb3c7d75c30f3f64f072cb77a5359de16dc545b213db010bf90523a",
+      "label_member_sha256": "ecb4b92c23c2638c88ef99ccc82612ccc640fc263f043565427b09f68b9362af",
+      "counts": {
+        "raw_lines": 1920,
+        "labelled_raw_lines": 46
+      },
+      "provider_label_rows": 46,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "json_explicit_offset": 1920
+      }
+    },
+    {
+      "environment": "fox",
+      "raw_member": "gather/vpn/logs/openvpn.log",
+      "label_member": "labels/vpn/logs/openvpn.log",
+      "raw_member_sha256": "dc8357ad1a2a4ce9e8963f1eb5eaccdfc106d32de5ae720d052956cedc618722",
+      "label_member_sha256": "fe4be45bee7b25f59d3433585fdf8bfdb5733b583a2494b5f0beaa1b27a49fe7",
+      "counts": {
+        "raw_lines": 7299,
+        "labelled_raw_lines": 28
+      },
+      "provider_label_rows": 28,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 7299
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+      "label_member": "labels/inet-firewall/logs/dnsmasq.log",
+      "raw_member_sha256": "3b26c8774eab02ea72c46e7c3eead9e7a3601c6f169ce83b3bd4cafd7674888b",
+      "label_member_sha256": "3712f7e48ee1121a23f37d7dd14a4e729b3a86ad58ba9f365f7209dfc58cb5fe",
+      "counts": {
+        "raw_lines": 275900,
+        "labelled_raw_lines": 54035
+      },
+      "provider_label_rows": 54035,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 275900
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/internal_share/logs/audit/audit.log",
+      "label_member": "labels/internal_share/logs/audit/audit.log",
+      "raw_member_sha256": "3b91178b6874141755e8461779aa9fa3f079de85867855e47a75e1fbde7bb940",
+      "label_member_sha256": "1c7bcf8b4c2c8c520eeb2e7a9bdeec95b65c60f7615b6119c23a707e3c45c7ca",
+      "counts": {
+        "raw_lines": 732,
+        "labelled_raw_lines": 2
+      },
+      "provider_label_rows": 2,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 732
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-access.log.2",
+      "raw_member_sha256": "4d3d700f50c6dde5295ebc57a00701b7c3049812c6f6709b3f809e36be362153",
+      "label_member_sha256": "ab6a834e2f9b8321cb7045cd78e0d88eea851a0f4b5231827f16e87ca7286154",
+      "counts": {
+        "raw_lines": 8530,
+        "labelled_raw_lines": 7695
+      },
+      "provider_label_rows": 7695,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "apache_offset": 8530
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.smith.russellmitchell.com-error.log.2",
+      "raw_member_sha256": "ff3d6815b660b87bc0576bbb7fee011d48a08c2a81d12ab83c052e98a58b281b",
+      "label_member_sha256": "14b014f6e3cfeb33c2ea6aa6fe9fc2938587f5c7cfdfd267cc9e00de8e66fe10",
+      "counts": {
+        "raw_lines": 36,
+        "labelled_raw_lines": 36
+      },
+      "provider_label_rows": 36,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 36
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/intranet_server/logs/audit/audit.log",
+      "label_member": "labels/intranet_server/logs/audit/audit.log",
+      "raw_member_sha256": "8dbee7a1f2d998c4bee99748b3be2cc16479f1e81fe30a71b1f9197f53f2601c",
+      "label_member_sha256": "4ae8b5dcb024f9ffd9c5249cc6af4a2fb93e20620f5c0876af9c216b05b23c23",
+      "counts": {
+        "raw_lines": 2316,
+        "labelled_raw_lines": 9
+      },
+      "provider_label_rows": 9,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 2316
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/intranet_server/logs/auth.log",
+      "label_member": "labels/intranet_server/logs/auth.log",
+      "raw_member_sha256": "091920347866802f42b869575c9b1139fa4fa783b83630a9ca1e0ce68a184e39",
+      "label_member_sha256": "a5c8c79f03471928f2e2cc2eadd6282ccf836f2ab4b5770c34ddf52e317d2bd2",
+      "counts": {
+        "raw_lines": 272,
+        "labelled_raw_lines": 8
+      },
+      "provider_label_rows": 8,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 272
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+      "label_member": "labels/monitoring/logs/logstash/intranet-server/2022-01-24-system.cpu.log",
+      "raw_member_sha256": "4bd9d49a8c78bcc5ece4f8c38c93720735e919658b5e408b3620335dc251767b",
+      "label_member_sha256": "bbbb78d92e606b0bb1ed54e4cf468a9f3374054f8dd60a70778749c976a88f09",
+      "counts": {
+        "raw_lines": 1920,
+        "labelled_raw_lines": 49
+      },
+      "provider_label_rows": 49,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "json_explicit_offset": 1920
+      }
+    },
+    {
+      "environment": "russellmitchell",
+      "raw_member": "gather/vpn/logs/openvpn.log",
+      "label_member": "labels/vpn/logs/openvpn.log",
+      "raw_member_sha256": "08042e1ad03874326960ef3eef91a50305009cb2e7afe88827750dd839701bb1",
+      "label_member_sha256": "24a46d40bf7e6ca91ee9f25f499ab1f709e881271d6944173e157f607c0d8e0d",
+      "counts": {
+        "raw_lines": 5537,
+        "labelled_raw_lines": 28
+      },
+      "provider_label_rows": 28,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 5537
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+      "label_member": "labels/inet-firewall/logs/dnsmasq.log",
+      "raw_member_sha256": "2cee0cab1e1e4cd2b2ed43b93ec2044e9f8c7343ab1fe6d832d0372d5a1654b9",
+      "label_member_sha256": "48af8fbb41bd45be90eeea44cbd632d98bce900f433ba106252bdc4f0409b9ef",
+      "counts": {
+        "raw_lines": 275667,
+        "labelled_raw_lines": 39426
+      },
+      "provider_label_rows": 39426,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 275667
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/internal_share/logs/audit/audit.log",
+      "label_member": "labels/internal_share/logs/audit/audit.log",
+      "raw_member_sha256": "33b535b96f81473c60c6df10d9f2ac3753c9b2bfe3b9d749a3af5f9d89c1f3bd",
+      "label_member_sha256": "33e817d0662687e5e636f8173e2763d7a3ef0ee4ed8b0b1a2521be42550d4449",
+      "counts": {
+        "raw_lines": 728,
+        "labelled_raw_lines": 2
+      },
+      "provider_label_rows": 2,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 728
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.smith.santos.com-access.log",
+      "raw_member_sha256": "92d8fae4669a1fc10fbb23832c18b1429e894d9033f135c7e77fc4d0d90287ba",
+      "label_member_sha256": "22a6c67df7525f3c45555c0056dc38bfb84f64b650ff585cceaae363633141c2",
+      "counts": {
+        "raw_lines": 9462,
+        "labelled_raw_lines": 7794
+      },
+      "provider_label_rows": 7794,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "apache_offset": 9462
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.smith.santos.com-error.log",
+      "raw_member_sha256": "7ee7ca5fa22ff8d83c022bbaf050ec9a827c3e85f9d233442090ddd7103701f0",
+      "label_member_sha256": "25b727363b998ff7f450c1f366f02dfcca272db9d02504248d9ab95caf7b53a0",
+      "counts": {
+        "raw_lines": 44,
+        "labelled_raw_lines": 42
+      },
+      "provider_label_rows": 42,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 44
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/intranet_server/logs/audit/audit.log",
+      "label_member": "labels/intranet_server/logs/audit/audit.log",
+      "raw_member_sha256": "c0b288f21fe2d39e888f124b77a1162aafcc7329ba18f3e47c25398d8a15f54e",
+      "label_member_sha256": "c52e271b7ae91a78269448bff45e438117f0e19d1a5d8f970861c07179a807bd",
+      "counts": {
+        "raw_lines": 2263,
+        "labelled_raw_lines": 19
+      },
+      "provider_label_rows": 19,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 2263
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/intranet_server/logs/auth.log",
+      "label_member": "labels/intranet_server/logs/auth.log",
+      "raw_member_sha256": "e58e17ce592a3cbddf0a2280276642ffd19802b3e8265ff3d3fed961aebf52c7",
+      "label_member_sha256": "8dd9c6ae0e3dce0fbbc593374229e8feb630007e8385d8c1493b22dbf152ef7c",
+      "counts": {
+        "raw_lines": 270,
+        "labelled_raw_lines": 12
+      },
+      "provider_label_rows": 12,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 270
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+      "label_member": "labels/monitoring/logs/logstash/intranet-server/2022-01-17-system.cpu.log",
+      "raw_member_sha256": "1fe7e7e06d79e8e786e5fcebb2560aa2350b42439ab9a7c090c7faa89ca6f8d7",
+      "label_member_sha256": "eeb51573e76733a7f1a16d2b1affdf15b466ae3fa30e3b447fc52cede83230f3",
+      "counts": {
+        "raw_lines": 1920,
+        "labelled_raw_lines": 44
+      },
+      "provider_label_rows": 44,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "json_explicit_offset": 1920
+      }
+    },
+    {
+      "environment": "santos",
+      "raw_member": "gather/vpn/logs/openvpn.log",
+      "label_member": "labels/vpn/logs/openvpn.log",
+      "raw_member_sha256": "f39a169c2ab4165b9848635c6e729a004bddb315f1f2f277f0341baf662e9ba7",
+      "label_member_sha256": "7b00e3ce62fa975aa5a86af11fd2a74378b0142979f1bd6c16d0091b60d40a20",
+      "counts": {
+        "raw_lines": 5622,
+        "labelled_raw_lines": 28
+      },
+      "provider_label_rows": 28,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 5622
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+      "label_member": "labels/inet-firewall/logs/dnsmasq.log",
+      "raw_member_sha256": "25cb4de4cf72f7678ee1fbbc0f767d739dc6aed5a31b2166460a9cc647562839",
+      "label_member_sha256": "3f77f7f18c90ca4538e00391039602c874dad755815f026b578acb9d29f0069f",
+      "counts": {
+        "raw_lines": 328329,
+        "labelled_raw_lines": 503
+      },
+      "provider_label_rows": 503,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 328329
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/internal_share/logs/audit/audit.log",
+      "label_member": "labels/internal_share/logs/audit/audit.log",
+      "raw_member_sha256": "af18bb6fe50e5088f5519426456fd00f5e745580fddb567005e32eca092d6897",
+      "label_member_sha256": "d20213aeceb6dc2344399965d9edce8ccc0ec4204306b3248fe222e3f40593c0",
+      "counts": {
+        "raw_lines": 1068,
+        "labelled_raw_lines": 2
+      },
+      "provider_label_rows": 2,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 1068
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-access.log.2",
+      "raw_member_sha256": "1357c0c5b8dbe090765a601bc94063ea082568eb8902eeee40711968a2020d38",
+      "label_member_sha256": "dd2a70052b8e4f90f6df1ecb073822e6e05b1b77f2defa16f3b406fd2186559f",
+      "counts": {
+        "raw_lines": 6626,
+        "labelled_raw_lines": 5226
+      },
+      "provider_label_rows": 5226,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "apache_offset": 6626
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-error.log.2",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.thomasmurray.shaw.info-error.log.2",
+      "raw_member_sha256": "e599578e03138c2080fe6290aabb87261a224cf52fb3158a81f5dccf0119956b",
+      "label_member_sha256": "488908e4adc3da0a01e0126407afd1c733991e2490439357b50cfa041189df2b",
+      "counts": {
+        "raw_lines": 33,
+        "labelled_raw_lines": 33
+      },
+      "provider_label_rows": 33,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 33
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/intranet_server/logs/audit/audit.log",
+      "label_member": "labels/intranet_server/logs/audit/audit.log",
+      "raw_member_sha256": "bef1bfe6d15ff4236f65c0e85947647405c0f5d259c853cd5bf66f7f677ca23c",
+      "label_member_sha256": "5273543a5f5509e9457f9bb47e554f9531dbba0ab92e19022d4f13aae37ea644",
+      "counts": {
+        "raw_lines": 3395,
+        "labelled_raw_lines": 19
+      },
+      "provider_label_rows": 19,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 3395
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/intranet_server/logs/auth.log.1",
+      "label_member": "labels/intranet_server/logs/auth.log.1",
+      "raw_member_sha256": "05a7457de1cadcb8ce2be0b8cd8a63b1b3424c19c8089327c1802adc17e92cf8",
+      "label_member_sha256": "2efa996cd87143e23e883d8fcb409d7e2bd4f9fd03897634e18a7614ad97ccdc",
+      "counts": {
+        "raw_lines": 807,
+        "labelled_raw_lines": 12
+      },
+      "provider_label_rows": 12,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 807
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-29-system.cpu.log",
+      "label_member": "labels/monitoring/logs/logstash/intranet-server/2022-01-29-system.cpu.log",
+      "raw_member_sha256": "8638186544eb5a8cee9658639437dd542856d54322cdc4c559a8fd21806a8019",
+      "label_member_sha256": "8c574fe5ce765fd0924880ed55080895806399fd480fac4a8da95860710a1a07",
+      "counts": {
+        "raw_lines": 1920,
+        "labelled_raw_lines": 53
+      },
+      "provider_label_rows": 53,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "json_explicit_offset": 1920
+      }
+    },
+    {
+      "environment": "shaw",
+      "raw_member": "gather/vpn/logs/openvpn.log",
+      "label_member": "labels/vpn/logs/openvpn.log",
+      "raw_member_sha256": "875913c16b879cce3cab4b22a04c9167af596874bb0250d79fdbc706315bccca",
+      "label_member_sha256": "70145be403c5f3e7f2074ee76911e9ee397dd9a73d440ddd70ddc9a356ecd0fa",
+      "counts": {
+        "raw_lines": 11361,
+        "labelled_raw_lines": 28
+      },
+      "provider_label_rows": 28,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 11361
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/inet-firewall/logs/dnsmasq.log",
+      "label_member": "labels/inet-firewall/logs/dnsmasq.log",
+      "raw_member_sha256": "b74e5ffe2452960c5291e3003d9369258acc89a9307daf1595fd23153a638465",
+      "label_member_sha256": "c3fe80b0165fd0b1a0dac73f980b516e49c92d8e684c028ccc76e44099e0a250",
+      "counts": {
+        "raw_lines": 299055,
+        "labelled_raw_lines": 46078
+      },
+      "provider_label_rows": 46078,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 299055
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/internal_share/logs/audit/audit.log",
+      "label_member": "labels/internal_share/logs/audit/audit.log",
+      "raw_member_sha256": "b1ffd7405df67474f447784f45340f266ecbaa419926f7ea93228ed1e728a57a",
+      "label_member_sha256": "ea2db5d0c3d4f77fc928b5a2d778731fa0dfc0c536c631a046de0fbaf69873f3",
+      "counts": {
+        "raw_lines": 898,
+        "labelled_raw_lines": 2
+      },
+      "provider_label_rows": 2,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 898
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-access.log.1",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-access.log.1",
+      "raw_member_sha256": "3092c1d29e74a6409d0077f4a1d606eb47e28ba342d56779b658808cfbdcb7e8",
+      "label_member_sha256": "3193c9b14d7f72991a624526823c702e61be8f0596d05e6311d438f14a662db5",
+      "counts": {
+        "raw_lines": 11262,
+        "labelled_raw_lines": 5299
+      },
+      "provider_label_rows": 5299,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "apache_offset": 11262
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-error.log.1",
+      "label_member": "labels/intranet_server/logs/apache2/intranet.hurstwong.wardbeck.info-error.log.1",
+      "raw_member_sha256": "9cc54bcfff6101601c5b44ebccb1b5b385dcddfdf54157cbcbe3c9088773a1e9",
+      "label_member_sha256": "488908e4adc3da0a01e0126407afd1c733991e2490439357b50cfa041189df2b",
+      "counts": {
+        "raw_lines": 33,
+        "labelled_raw_lines": 33
+      },
+      "provider_label_rows": 33,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 33
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/intranet_server/logs/audit/audit.log",
+      "label_member": "labels/intranet_server/logs/audit/audit.log",
+      "raw_member_sha256": "803f046a4f51db204d295a9480fa535b388076ae434104f89f63fed496d7ad0d",
+      "label_member_sha256": "275c66e97a0bfd03fc076334dbb9e0b8d4589867ddae761d691267fb43ee0a2b",
+      "counts": {
+        "raw_lines": 2919,
+        "labelled_raw_lines": 19
+      },
+      "provider_label_rows": 19,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "audit_epoch": 2919
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/intranet_server/logs/auth.log",
+      "label_member": "labels/intranet_server/logs/auth.log",
+      "raw_member_sha256": "194bbc8319ab924de8236fd9c672674fcf20db0116e760a6ab0e5d0d55c0d746",
+      "label_member_sha256": "7aee23a3d88ab724ec33233ab9658185d16a869ee42434c8340711e86dc87681",
+      "counts": {
+        "raw_lines": 124,
+        "labelled_raw_lines": 12
+      },
+      "provider_label_rows": 12,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 124
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/monitoring/logs/logstash/intranet-server/2022-01-23-system.cpu.log",
+      "label_member": "labels/monitoring/logs/logstash/intranet-server/2022-01-23-system.cpu.log",
+      "raw_member_sha256": "2ef42d28392c0c77c206011dc6e1bf3e93b04a1e375dd2d30f3885879d5778f7",
+      "label_member_sha256": "c2e9f8dfa22b2e0aa4feec82c4e6c25875337ed89d2f3127c5dcd6f5538bba48",
+      "counts": {
+        "raw_lines": 1920,
+        "labelled_raw_lines": 54
+      },
+      "provider_label_rows": 54,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "json_explicit_offset": 1920
+      }
+    },
+    {
+      "environment": "wardbeck",
+      "raw_member": "gather/vpn/logs/openvpn.log",
+      "label_member": "labels/vpn/logs/openvpn.log",
+      "raw_member_sha256": "b4821e27a80a276008a666fa3044ad810cad2632ac36e84490073ac5c02c1962",
+      "label_member_sha256": "328ac0562cb128702cd8b6b0d55f9ebc8e378cc0af368642c66feadcdfb375bd",
+      "counts": {
+        "raw_lines": 13556,
+        "labelled_raw_lines": 28
+      },
+      "provider_label_rows": 28,
+      "all_label_references_bound": true,
+      "timestamp_types": {
+        "unresolved": 13556
+      }
+    }
+  ],
+  "integrity": {
+    "selected_member_CRC_and_SHA256": true,
+    "all_provider_line_references_checked_in_selected_pairs": true,
+    "whole_LDS_archive_MD5_verified": false,
+    "official_record_metadata_rechecked": true,
+    "metadata_sha256": "e3b4f6c8b427a00ca8469689e23374f170ef5ebee4fd21c9d7572085404060cb",
+    "R1_R2_all_40_pair_results_equal": true,
+    "selected_raw_line_SHA256_verified": 240,
+    "remote_result_file_SHA256": {
+      "gap-inputs.json": "65eea49d738eab9f73b2e91690532861654c21caead6ec786c605bd0660dd976",
+      "index-state.json": "90702763ac0ce15ee8e53b90cc7d707a2ae654221616f39d4f936fffc0cd3f99",
+      "linkage-start.json": "912793cb3034753e98928db663dc3a412b742cc44ff083037ab59e148a972778",
+      "linkage-state.json": "dceeec6b8ccf90de719999dd4f6f0634eec89f5af921310a63e2b27287e88c8c",
+      "cpu-tests.json": "92ef8898f96ddcb82b691d0bbb7ed832ddecbe55ecc8d11a06ac7ed3feaccd01",
+      "fox-linkage.json": "1bf21d0cff0f4935841743e17d48dc05543ae60e49c8b365d9d6f0b4bd47a2ec",
+      "russellmitchell-linkage.json": "204fb7f5e5766f820c98a419d907738f0c6059f661852b5d628b24727113fc87",
+      "santos-linkage.json": "cfe7d5585b942a8c6b7bf610b1316b449d55bb8f6fe1e96f5a124d4bbbd1422d",
+      "shaw-linkage.json": "558382a2fe59cb1509e2bfae7c20604bedb53847182fe57ae918c533973752f7",
+      "wardbeck-linkage.json": "d4db4405ee558a7ba12f2c3ad7f300ccb0ea3962b0f0a8b78051f43cf27e58e1"
+    },
+    "AMiner_raw_member_SHA256": {
+      "fox_aminer.json": "3de2f6d87c843b99dbc5ca3d5225fcd42f60938187d6391dc33d01c216fffcb4",
+      "russellmitchell_aminer.json": "f8f7698833836d0e24624d53981474795ec6f8991a1b33d5fb2e9e411c24752f",
+      "santos_aminer.json": "45d9e531e66b047df69dfe128548e1d8f314b8c6c2df976a026cc47709b7df9f",
+      "shaw_aminer.json": "1e18cd6b3f94ec32c72741351887f975c3157c7c271adcd5e4589617c70c161c",
+      "wardbeck_aminer.json": "cc4f073ff9f7bea57b17aa263d58c7cc0b4a7a3b9499cdf3491cf1510d3a98bd"
+    },
+    "AMiner_analysis_sha256": "7b7ba0b6062d18c141f0b8354f15e8fc22c251b57318eb8bb8e3323bea5bff71"
+  },
+  "parser_fix": {
+    "problem": "A timestamp-like value in an attacker-controlled request/body could be mistaken for event time by an unanchored pattern.",
+    "fix": "Audit and Apache timestamp parsers accept actual log headers; JSON uses top-level timestamp fields with explicit offsets. Syslog without year/zone remains unresolved.",
+    "source": "link_ait_labels.py",
+    "source_sha256": "855ab3f7f879aa86a830eb8cc65780db69b34a64dfed04e75d57597713a9fae9",
+    "regression_tests_Mac": 8,
+    "regression_tests_Thor_CPU": 8,
+    "old_run_retained": true,
+    "corrected_run": {
+      "stage": "completed",
+      "started_at_kst": "2026-10-30T01:35:36.640202+09:00",
+      "pid": 675173,
+      "service_or_GPU_actions": false,
+      "completed_at_kst": "2026-10-30T01:41:29.974623+09:00",
+      "results": [
+        {
+          "environment": "fox",
+          "pairs": 8,
+          "label_rows": 456884,
+          "raw_rows": 668418,
+          "transferred_bytes": 12764239
+        },
+        {
+          "environment": "russellmitchell",
+          "pairs": 8,
+          "label_rows": 61862,
+          "raw_rows": 295243,
+          "transferred_bytes": 8120967
+        },
+        {
+          "environment": "santos",
+          "pairs": 8,
+          "label_rows": 47367,
+          "raw_rows": 295976,
+          "transferred_bytes": 8244628
+        },
+        {
+          "environment": "shaw",
+          "pairs": 8,
+          "label_rows": 5876,
+          "raw_rows": 353539,
+          "transferred_bytes": 7821279
+        },
+        {
+          "environment": "wardbeck",
+          "pairs": 8,
+          "label_rows": 51525,
+          "raw_rows": 329767,
+          "transferred_bytes": 9312460
+        }
+      ],
+      "provider_metadata_rechecked": true,
+      "metadata_recheck_sha256": "e3b4f6c8b427a00ca8469689e23374f170ef5ebee4fd21c9d7572085404060cb"
+    },
+    "worker_sha256": "7f559cf68812eeb03d8f7da87cc05f4417bbb41fb972ee2d793215809f348e94"
+  },
+  "transfer": {
+    "method": "bounded HTTPS ranges directly on Thor; compressed archives never stored or fully downloaded",
+    "index_and_both_linkage_runs_bytes": 104488803,
+    "last_run_bytes": 46263573,
+    "per_environment_per_linkage_run_bound_bytes": 33554432,
+    "full_raw_members_cached_to_disk": false,
+    "Mac_packages_models_or_raw_archives_downloaded": false
+  },
+  "runtime_scope": {
+    "server_review_directory": "~/Capstone_Groot_training/qwen36-20261027/institutional-review-20261030-r2",
+    "corrected_job_terminal": true,
+    "same_process_live_at_final_check": false,
+    "ollama_active_at_kst": "2026-10-30T01:42:17.683609+09:00",
+    "service_stops": 0,
+    "GPU_training": false,
+    "model_selection_changed": false,
+    "actual_chat_attack_E2E_executed": false
+  },
+  "limitations": [
+    "Historical training environments only; no new independent holdout or incident count claim.",
+    "Absence of alerts or provider labels is not a benign verdict. Detection mechanisms, inputs and configurations differ.",
+    "Two reverse-shell intervals have contemporaneous raw/AMiner observations but no provider-labelled raw rows; successful reverse connection is not established.",
+    "SERVICE_START/STOP res=success proves that logged event only, not full attack success, exfiltration or a production outage.",
+    "AMiner includes two TrainingMode=true objects in wardbeck/service_stop; source observation counts are not operational detection rates.",
+    "Unknown source year/timezone is not inferred; in-interval counts cover explicitly timestamped records only.",
+    "Provider labels are rule-derived, not independent expert incident adjudication. No live MCP trajectory or approved action gold was created.",
+    "Partial HTTPS range plus selected CRC/SHA and metadata checks do not prove the full archive published MD5."
+  ],
+  "next": [
+    "Review evidence-bound analyst questions/answers and uncertainty escalation against these source records.",
+    "Add another independent institutional source/campaign for final evaluation; preserve prior AIT environment split and consumed V5 final128.",
+    "Only then freeze any new training plan; no inference interruption or model promotion is approved by this review alone."
+  ]
+}

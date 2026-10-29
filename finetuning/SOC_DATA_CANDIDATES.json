@@ -157,6 +157,15 @@
         "no_observation_groups": 9,
         "new_training_dialogues": 0,
         "raw_LDS_log_linkage": false
+      },
+      "raw_log_linkage_followup": {
+        "at_kst": "2026-10-30T01:46:51.694593+09:00",
+        "report": "AIT_GAP_LINKAGE.json",
+        "pairs": 40,
+        "provider_labels_bound": 623514,
+        "reviewed_gap_intervals": 9,
+        "success_unconfirmed_intervals": 2,
+        "new_training_dialogues": 0
       }
     }
   ],

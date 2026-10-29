@@ -132,7 +132,7 @@ class OperationsTest(unittest.TestCase):
         req = operation(); req["plan"]["policy_sha256"] = ""; variants.append(req)
         req = operation(); req["expires_at"] = int(time.time()) + 1000; variants.append(req)
         req = operation(); req["status"] = "approved"; variants.append(req)
-        for address in ("127.0.0.1", "10.0.0.1", "192.0.2.1", "224.0.0.1", "::1", "0.0.0.0"):
+        for address in ("127.0.0.1", "169.254.0.1", "192.0.2.1", "224.0.0.1", "::1", "0.0.0.0"):
             req = operation("containment"); req["plan"]["ip"] = address; variants.append(req)
         req = operation("containment"); req["plan"]["keep_seconds"] = 86400; variants.append(req)
         req = operation("containment"); del req["plan"]["evidence_sha256"]; variants.append(req)
@@ -144,6 +144,19 @@ class OperationsTest(unittest.TestCase):
         req = operation(); req["plan_sha256"] = "0" * 64
         self.assertEqual(self.broker.create(req)[1], 400)
         self.assertFalse(self.cards)
+
+    def test_private_unicast_contract_keeps_exact_evidence_and_approval(self):
+        for address in ("10.1.2.3", "172.20.0.5", "192.168.16.233"):
+            req = operation("containment")
+            req["plan"]["ip"] = address
+            req["plan_sha256"] = ops.digest(req["plan"])
+            created = self.create(req)
+            self.assertEqual(created["status"], "pending")
+            self.assertEqual(created["plan_sha256"], req["plan_sha256"])
+            # Merely preparing a private-IP card must never consume approval.
+            response, code = self.broker.consume(created["operation_id"],
+                {"proposal_digest": created["proposal_digest"]})
+            self.assertEqual(code, 409)
 
     def test_every_supported_service_action_can_be_proposed(self):
         for target, actions in ops.SERVICE_ACTIONS.items():

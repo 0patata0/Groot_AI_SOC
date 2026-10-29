@@ -109,7 +109,7 @@ TOOLS.extend([
     },
     {
         "name": "temporarily_contain_ip",
-        "description": "On rule-a only, temporarily block a public external attacker IPv4 for 10 minutes if server-verified recent Suricata attack evidence meets the fixed threshold. Immediately ask the operator to keep it for 60 minutes or request release. Protected/private/management/DGX and active SSH addresses are refused. Repeated requests never extend the expiry. This is the only pre-approved emergency action; no rule or service changes occur.",
+        "description": "On rule-a only, temporarily block an attacker IPv4 (public or RFC1918) for 10 minutes if server-verified recent Suricata attack evidence meets the fixed threshold. Immediately ask the operator to keep it for 60 minutes or request release. Protected/management/infrastructure/DGX and active SSH addresses are refused. Repeated requests never extend the expiry. This is the only pre-approved emergency action; no rule or service changes occur.",
         "inputSchema": {"type": "object", "additionalProperties": False, "properties": {
             "ip": {"type": "string"}, "reason": {"type": "string", "minLength": 1, "maxLength": 200}},
             "required": ["ip", "reason"]},

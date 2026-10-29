@@ -1,5 +1,7 @@
 # Native Wazuh 사건 → LLM 판단 → 제한된 Containment
 
+> 2026-10-29 정정: 아래 과거 공인 전용·사설 전체 제외 설명은 현재 정책이 아니다. LLM 조사 후 공인/RFC1918 출발지를 동일 증거 기준으로 검증하며 live never_block·관리·필수 서버 보호는 유지한다. Native AR은 계속 사건 등록만 수행한다. [현재 정책](approved-operations.md)을 기준으로 한다.
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../../STATUS.md) · [실행 계획](../../PLAN.md).
 > 현재 구성은 MCP6서버와 고정 진단25대상이다. 자연어 도구 선택·무근거 완료/SILENT 알림 보완의 실제 검증 상태는 STATUS 최상단을 따른다. 정확 후보 승인과 일반 sudo/Docker/임의 shell 금지는 유지한다.

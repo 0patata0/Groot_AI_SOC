@@ -348,7 +348,7 @@ class RepeatedReads(unittest.TestCase):
 
     def test_policy_facts_require_exact_available_definitions_and_exclude_incidents(self):
         tools=[{'function':{'name':'mcp__resp__block_ip','description':'Requires operator approval and refuses protected/management addresses and IPs with an active SSH session.'}},
-               {'function':{'name':'mcp__rule_write_a__temporarily_contain_ip','description':'Protected/private/management/DGX and active SSH addresses are refused.'}}]
+               {'function':{'name':'mcp__rule_write_a__temporarily_contain_ip','description':'Protected/management/infrastructure/DGX and active SSH addresses are refused.'}}]
         text=H.policy_explanation(POLICY,tools)
         self.assertIn('우회하는 허가가 아닙니다',text)
         self.assertEqual(H.violations(POLICY,text,[]),[])

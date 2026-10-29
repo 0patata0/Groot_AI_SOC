@@ -240,6 +240,14 @@ class ContainmentTests(unittest.TestCase):
                      {"rule": {"family": "inet", "table": "capstone_fw", "chain": name, "expr": [match("agent_block"), {"log": {"prefix": "GROOT-FW BLOCK "}}, {"drop": None}]}}]
         return {"nftables": rows}
 
+    def test_private_address_class_is_not_a_blanket_firewall_exemption(self):
+        import ipaddress
+        nets = runtime.protected_networks(["10.42.0.20", "192.168.16.230"], ["192.168.10.0/24"])
+        for ip in ("10.42.0.21", "172.20.0.5", "192.168.16.233"):
+            self.assertFalse(any(ipaddress.ip_address(ip) in n for n in nets))
+        for ip in ("10.42.0.20", "192.168.16.230", "192.168.10.25", "211.170.162.85", "127.0.0.1"):
+            self.assertTrue(any(ipaddress.ip_address(ip) in n for n in nets))
+
     def test_live_firewall_requires_admin_elements_and_drop_order(self):
         p = profile(); value = self.nft_fixture()
         self.assertTrue(runtime.verify_firewall(value, p["protected_ips"], p["admin_protected_cidrs"]))
@@ -301,7 +309,8 @@ class ContainmentTests(unittest.TestCase):
     def test_firewall_keeps_defaults_and_collapses_networks_without_expansion(self):
         text = runtime.firewall(profile()["protected_ips"], ["93.184.216.0/24"]).decode()
         self.assertIn("93.184.216.0/24", text)
-        self.assertIn("10.0.0.0/8", text)
+        self.assertNotIn("10.0.0.0/8", text)
+        self.assertIn("10.42.0.20/32", text)
         self.assertIn("flags timeout", text)
         self.assertEqual(text.count('log prefix "GROOT-FW BLOCK " drop'), 2)
         self.assertNotIn("flush", text)

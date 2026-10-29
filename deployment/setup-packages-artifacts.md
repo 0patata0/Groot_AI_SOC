@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> 2026-10-29 사설 출발지 정책 변경은 기존 소스 bundle의 `incident_containment.py`·`operations_approval.py`·`rule_change_mcp.py`, 공통 SOC 지침/하네스와 `soc_runtime.py`에 반영한다. 추가 deb·wheel·이미지·포트·공통 키는 없다. `deploy.sh`가 기존 내부 설치 경로로 이 소스를 반입하며 예제의 명시적 관리자/인프라 보호를 적용한다.
+
 > **2026-10-29 FW 읽기 반입:** 갱신된 `infra/mcp/response-mcp.py`, `deployment/soc_management.py`, 두 봇 공통 하네스/계약/grounding/정책과 공동 채널 정책을 소스 묶음에 포함한다. 기존 nftables·Python 표준 라이브러리·OpenSSH를 사용하므로 추가 deb/wheel/이미지는 0개다. 초기 설치기는 갱신된 도구 계약을 검사한다. [범위·복구](../infra/mcp/firewall-read.md).
 
 > **2026-10-27 추론 경로 소스:** `deployment/inference_tunnel.py`, SIEM 역할·root 설치기·설정 예제, 갱신한 Hermes 가드/공유 gate 및 이미지 pin을 소스 묶음에 포함한다. SSH 터널은 기존 OpenSSH client/Python3/iproute2/systemd를 사용해 추가 deb/wheel/이미지가 없다. 외부 thor의 모델 가중치는 그 서버가 직접 받으며 Mac과 폐쇄망 A/B/C의 온라인 설치는 없다. 새 Hermes 이미지를 준비하는 경우 갱신한 가드와 시험 SHA를 사용한다. [전용 키·host pin·egress 준비](inference-transport.md) · [진행/검증 범위](../STATUS.md).

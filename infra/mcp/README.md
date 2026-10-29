@@ -176,7 +176,7 @@ Hermes UID995의 SDK로6서버 initialize/list를 다시 확인했다. 서버가
 | `get_rule_change_status` | 룰 승인·적용·복구 상태 조회 |
 | `get_service_action_target` | 허용 서비스의 현재 상태·가능 작업 조회 |
 | `propose_service_action` | 조회한 상태에 결속한 고정 restart/reload의 사전 승인 요청 |
-| `temporarily_contain_ip` | A에서 검증한 최근 공격 증거가 조건을 충족하는 외부 IPv4의 최대 10분 임시 차단 |
+| `temporarily_contain_ip` | A에서 검증한 최근 공격 증거가 조건을 충족하는 비보호 공인/RFC1918 IPv4의 최대 10분 임시 차단 |
 | `get_operation_status` | 서비스 작업·임시 차단의 승인·실행·검증·만료 상태 조회 |
 
 서비스 작업은 A `waf`·`chatproxy`의 reload/restart, A `suricata`와 B `wazuh-manager`·`wazuh-dashboard`의 restart만 허용한다. 승인 카드에서 변경 전 상태, 예상 변경 후 상태, 영향, 사유와 해시를 검토하고 지정 승인 뒤 한 번만 실행한다. 패키지 설치·컨테이너 생성/구성 변경·임의 셸 명령은 지원하지 않는다. 임시 차단은 서버 증거·보호 주소·활성 SSH 검사 뒤 선행하며, 이후 **60분 유지 / 해제 요청**을 받는다. 무응답·장애 시 원래 10분 커널 TTL이 상한이다. 해제 요청은 다음 worker에서 처리하므로 진행 중인 룰·서비스 작업에 따라 지연될 수 있다. 세부 기준·복구 절차는 [승인형 운영 작업](approved-operations.md)에 둔다.

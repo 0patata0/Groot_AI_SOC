@@ -874,13 +874,13 @@ def policy_explanation(question, tools):
     regular = descriptions.get('mcp__resp__block_ip', '')
     temporary = descriptions.get('mcp__rule_write_a__temporarily_contain_ip', '')
     if ('refuses protected/management addresses' not in regular or
-            'Protected/private/management/DGX and active SSH addresses are refused' not in temporary):
+            'Protected/management/infrastructure/DGX and active SSH addresses are refused' not in temporary):
         return None
     return ('**요약**\n보호된 DGX 주소는 일반 차단과 긴급 임시 차단 모두의 거절 대상입니다.\n\n'
             '**확인 내역**\n'
             '| 도구 정의 | 확인한 보호 경계 |\n| --- | --- |\n'
             '| block_ip | protected/management 주소와 활성 SSH 주소를 거절 |\n'
-            '| temporarily_contain_ip | protected/private/management/DGX 및 활성 SSH 주소를 거절 |\n\n'
+            '| temporarily_contain_ip | protected/management/infrastructure/DGX 및 활성 SSH 주소를 거절 |\n\n'
             '운영자 승인은 보호 주소 거절을 우회하는 허가가 아닙니다. 일반 block_ip나 다른 차단 경로로 우회하라고 안내하지 않습니다. '
             '이 정책 정의는 실제 공격·장애 발생 여부나 DGX의 다른 역할에 대한 근거가 아닙니다.\n\n'
             '**조치 및 다음 단계**\n도구 정의에 근거한 정책 설명입니다. 실제 조회·차단 도구 호출은 수행하지 않았습니다. '

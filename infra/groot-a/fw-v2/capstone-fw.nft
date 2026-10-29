@@ -19,6 +19,8 @@
 # ⚠ 잠금 주의: 적용 전에 **지금 접속한 출발지가 mgmt_src 에 포함**되는지 확인(fw_apply_v2.sh 가 자동 검사). 현장 PC(192.168.16.x)에서 관리하려면 주석 해제.
 
 table inet capstone_fw {
+    # Named administrator: 211.170.162.85/32 (2026-10-29), covered by the existing approved campus /24.
+    # These explicit role-based ranges remain protected; RFC1918 by itself is not an exemption.
     # Protect the campus /24, including DGX endpoints, from agent_block; later policies still apply.
     set never_block {
         type ipv4_addr

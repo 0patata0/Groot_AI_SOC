@@ -271,8 +271,7 @@ def protected_networks(protected, admin_networks=()):
     addresses = set(protected)
     for value in addresses:
         need(str(ipaddress.IPv4Address(value)) == value, "firewall_address")
-    networks = ["0.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8", "169.254.0.0/16",
-                "172.16.0.0/12", "192.168.0.0/16", "224.0.0.0/4", "240.0.0.0/4", "211.170.162.0/24",
+    networks = ["0.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8", "169.254.0.0/16", "224.0.0.0/4", "240.0.0.0/4", "211.170.162.0/24",
                 "168.126.63.1/32", "168.126.63.2/32", "8.8.8.8/32", "8.8.4.4/32", "1.1.1.1/32",
                 "1.0.0.1/32", "9.9.9.9/32"]
     nets = list(ipaddress.collapse_addresses([ipaddress.ip_network(n) for n in networks] +

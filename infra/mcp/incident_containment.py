@@ -35,6 +35,9 @@ PROTECTED = tuple(ipaddress.ip_network(x) for x in (
     "211.170.162.0/24",  # campus DGX endpoints .110/.111 and their infrastructure
     "168.126.63.1/32", "168.126.63.2/32", "8.8.8.8/32", "8.8.4.4/32",
     "1.1.1.1/32", "1.0.0.1/32", "9.9.9.9/32"))
+# RFC1918 is an address class, not an implicit trust boundary. Live role-based
+# never_block entries, interfaces/gateways/DNS and established sessions still win.
+RFC1918 = tuple(ipaddress.ip_network(x) for x in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))
 DESTINATIONS = tuple(ipaddress.ip_network(x) for x in ("192.168.16.230/32", "10.200.10.0/24"))
 # Recon, policy alerts and the historical DGX false-positive ET pair are excluded.
 ATTACK_CATEGORIES = frozenset(("Attempted Administrator Privilege Gain",
@@ -63,13 +66,13 @@ def operation_digest(payload):
 
 def checked_ip(value):
     if not isinstance(value, str):
-        raise ContainmentError("source must be an external public IPv4")
+        raise ContainmentError("source must be a canonical public or RFC1918 IPv4")
     try:
         addr = ipaddress.IPv4Address(value)
     except ipaddress.AddressValueError:
-        raise ContainmentError("source must be an external public IPv4") from None
-    if str(addr) != value or not addr.is_global or addr.is_multicast or addr.is_reserved or any(addr in n for n in PROTECTED):
-        raise ContainmentError("protected, non-public, or non-canonical source address")
+        raise ContainmentError("source must be a canonical public or RFC1918 IPv4") from None
+    if str(addr) != value or not (addr.is_global or any(addr in n for n in RFC1918)) or addr.is_multicast or addr.is_reserved or any(addr in n for n in PROTECTED):
+        raise ContainmentError("protected, special-use, or non-canonical source address")
     return addr
 
 

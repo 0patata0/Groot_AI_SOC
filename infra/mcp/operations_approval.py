@@ -120,8 +120,10 @@ class OperationsBroker:
                 address = ipaddress.IPv4Address(plan["ip"])
             except (ValueError, TypeError, ipaddress.AddressValueError):
                 raise ValueError("invalid containment IP")
-            if str(address) != plan["ip"] or not address.is_global or address.is_multicast or address.is_reserved:
-                raise ValueError("containment IP must be a public unicast IPv4 address")
+            private_unicast = any(address in ipaddress.IPv4Network(n) for n in
+                                  ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))
+            if str(address) != plan["ip"] or not (address.is_global or private_unicast) or address.is_multicast or address.is_reserved:
+                raise ValueError("containment IP must be a public or RFC1918 unicast IPv4 address")
             if (plan["action"] != "temporary_block" or type(plan["keep_seconds"]) is not int or
                     plan["keep_seconds"] != 3600 or type(plan["temporary_expires_at"]) is not int or
                     plan["temporary_expires_at"] != req["expires_at"] or
@@ -186,7 +188,7 @@ class OperationsBroker:
                     "적용 전 상태가 달라지면 중단하며, 실행 결과는 별도 실측 SHA-256으로 보고합니다." %
                     (plan["action"], plan["policy_sha256"], display_summary_kst(plan["before_summary"]), expected,
                      SERVICE_IMPACT[rec["target"]], plan["reason"]))
-        return (header + "\n\n외부 IP `%s`는 이미 임시 차단했습니다.\n"
+        return (header + "\n\n출발지 IP `%s`는 이미 임시 차단했습니다.\n"
                 "증거 SHA-256: `%s`\n무응답 시 최초 임시 차단 후 10분 이내 자동 해제됩니다.\n"
                 "[60분 유지]는 승인 시각부터 60분까지만 유지하고, [해제 요청]은 다음 worker 처리에서 해제합니다. "
                 "진행 중인 룰·서비스 작업 때문에 처리가 늦어질 수 있지만, 유지 승인이 적용되기 전에는 "

@@ -166,10 +166,28 @@ class ContainmentTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(c.ContainmentError):
                 c.validated_evidence([event(i, **change) for i in (1, 2, 3)], PUBLIC, NOW)
     def test_protected_and_nonpublic_rejected(self):
-        for ip in ["10.1.2.3", "192.168.16.4", "172.20.0.1", "127.0.0.1", "169.254.1.1", "224.0.0.1", "100.64.1.1", "211.170.162.110", "211.170.162.111", "8.8.8.8", "::1", "93.184.216.034", "1.2.3.4;flush ruleset"]:
+        for ip in ["0.0.0.0", "192.0.2.1", "198.51.100.1", "203.0.113.1", "240.0.0.1", "255.255.255.255", "211.170.162.85", "127.0.0.1", "169.254.1.1", "224.0.0.1", "100.64.1.1", "211.170.162.110", "211.170.162.111", "8.8.8.8", "::1", "93.184.216.034", "1.2.3.4;flush ruleset"]:
             with self.subTest(ip=ip), self.assertRaises(c.ContainmentError):
                 self.service.propose(ip, "test")
         self.assertEqual(self.backend.creates, 0)
+    def test_rfc1918_requires_evidence_and_respects_live_protection(self):
+        for ip in ("10.1.2.3", "172.20.0.5", "192.168.16.233"):
+            with self.subTest(ip=ip):
+                events = [event(i, src_ip=ip, flow={"src_ip": ip, "dest_ip": "192.168.16.230",
+                          "pkts_toserver": 3, "pkts_toclient": 2}) for i in (1, 2, 3)]
+                with self.assertRaises(c.ContainmentError):
+                    c.validated_evidence(events[:2], ip, NOW)
+                evidence = c.validated_evidence(events, ip, NOW)
+                service = c.ContainmentService(self.engine, self.backend, lambda *args: evidence)
+                self.backend.protected.add(ip)
+                before = self.backend.creates
+                with self.assertRaises(c.ContainmentError): service.propose(ip, "verified private source")
+                self.assertEqual(before, self.backend.creates)
+                self.backend.protected.remove(ip)
+                r = service.propose(ip, "verified private source")
+                self.assertEqual(r["status"], "pending")
+                self.assertEqual(r["owned_deadline"], NOW + 600)
+
     def test_actual_broker_contract_and_evidence_binding(self):
         r = self.propose()
         self.assertEqual(r["status"], "pending")

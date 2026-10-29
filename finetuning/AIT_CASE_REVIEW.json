@@ -1,0 +1,262 @@
+{
+  "schema": 1,
+  "verified_at_kst": "2026-10-30T02:07:02.993738+09:00",
+  "status": "source_bound_investigation_drafts_not_training_admitted",
+  "summary": {
+    "review_cases": 9,
+    "source_environments": 5,
+    "source_window_families": {
+      "reverse_shell": 2,
+      "service_stop": 5,
+      "webshell": 2
+    },
+    "source_rows": 25,
+    "exact_shared_raw_bindings": 14,
+    "new_independent_incidents": 0,
+    "new_training_examples_admitted": 0,
+    "independent_expert_reviews": 0
+  },
+  "lineage": {
+    "input_report": "AIT_GAP_LINKAGE.json",
+    "input_sha256": {
+      "results": "0a6c603a4b34a6641906f58851cbcb1a8269f0b53f873b0c62250cb6b7c7ddbd",
+      "report": "cfc79a50416cab06940c56d968e23b2cff97c35372ba37933557bc0241ab2818",
+      "aminer": "7b7ba0b6062d18c141f0b8354f15e8fc22c251b57318eb8bb8e3323bea5bff71"
+    },
+    "source_sha256": "ee20eb9f47843320a0d422d145d382e5f6d5e6a794c86674bae2693ad33967c2",
+    "case_output_sha256": "57d1499fe18ba8a867d9672a3d9d962b19f59402a246b561ce56aafc57e85127",
+    "local_ignored_output": "data-ait-case-review-20261030-r3/review-cases.jsonl",
+    "case_drafts_bundled_for_training": false,
+    "split": "historical_train_only",
+    "leakage_group": "AIT LDS/ADS derivatives grouped by source environment; all five environments already belong to historical train",
+    "source_notice_sha256": "cd809e61c6b73666a0090f0393e1dc535d1a91e400e1a20b51f20ab0f274c5c3"
+  },
+  "cases": [
+    {
+      "id": "ait-source-review:fox:reverse_shell",
+      "family": "reverse_shell",
+      "start_kst": "2022-01-18T22:13:50+09:00",
+      "end_kst": "2022-01-18T22:14:30+09:00",
+      "source_rows": 3,
+      "shared_raw_bindings": 1,
+      "AMiner_training_modes": {
+        "false": 1
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:fox:service_stop",
+      "family": "service_stop",
+      "start_kst": "2022-01-17T18:04:46+09:00",
+      "end_kst": "2022-01-17T18:04:48+09:00",
+      "source_rows": 2,
+      "shared_raw_bindings": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:fox:webshell",
+      "family": "webshell",
+      "start_kst": "2022-01-18T21:38:00+09:00",
+      "end_kst": "2022-01-18T21:38:30+09:00",
+      "source_rows": 6,
+      "shared_raw_bindings": 1,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:russellmitchell:reverse_shell",
+      "family": "reverse_shell",
+      "start_kst": "2022-01-24T13:36:56+09:00",
+      "end_kst": "2022-01-24T13:37:39+09:00",
+      "source_rows": 2,
+      "shared_raw_bindings": 2,
+      "AMiner_training_modes": {
+        "false": 3
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:russellmitchell:service_stop",
+      "family": "service_stop",
+      "start_kst": "2022-01-24T22:50:38+09:00",
+      "end_kst": "2022-01-24T22:50:40+09:00",
+      "source_rows": 2,
+      "shared_raw_bindings": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:santos:service_stop",
+      "family": "service_stop",
+      "start_kst": "2022-01-16T16:16:17+09:00",
+      "end_kst": "2022-01-16T16:16:19+09:00",
+      "source_rows": 2,
+      "shared_raw_bindings": 1,
+      "AMiner_training_modes": {
+        "false": 3
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:shaw:service_stop",
+      "family": "service_stop",
+      "start_kst": "2022-01-29T06:08:00+09:00",
+      "end_kst": "2022-01-29T06:08:02+09:00",
+      "source_rows": 2,
+      "shared_raw_bindings": 2,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:shaw:webshell",
+      "family": "webshell",
+      "start_kst": "2022-01-29T23:39:40+09:00",
+      "end_kst": "2022-01-29T23:40:01+09:00",
+      "source_rows": 4,
+      "shared_raw_bindings": 1,
+      "AMiner_training_modes": {
+        "false": 2
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    },
+    {
+      "id": "ait-source-review:wardbeck:service_stop",
+      "family": "service_stop",
+      "start_kst": "2022-01-21T07:12:27+09:00",
+      "end_kst": "2022-01-21T07:12:29+09:00",
+      "source_rows": 2,
+      "shared_raw_bindings": 2,
+      "AMiner_training_modes": {
+        "true": 2
+      },
+      "draft_status": "needs_review",
+      "answer_author": "project_agent_not_provider_or_independent_expert"
+    }
+  ],
+  "source_interpretation": [
+    {
+      "finding": "Two intervals contain a shell command with literal outbound TCP target in an HTTP request despite no provider row labels. This is request evidence; connection and command success remain unconfirmed.",
+      "basis": "Exact raw coordinates and strict URL/base64/JSON decoding; no command executed."
+    },
+    {
+      "finding": "All five service_stop windows contain both SERVICE_START and SERVICE_STOP records. The diary dnsteal_stop entry is outside each window. Time differences alone do not establish a dataset error.",
+      "basis": "Published phase windows, raw audit records and separate attacker diary timestamps; no timeline correction performed."
+    },
+    {
+      "finding": "The paper describes data exfiltration as separate from the later server-takeover sequence. Do not force every attack into one chronological chain.",
+      "source": "https://arxiv.org/html/2203.08580v1",
+      "sections": [
+        "3.2.3",
+        "4.1"
+      ]
+    },
+    {
+      "finding": "The selected fox exfil.service labeling rule matches process events for the configured service unit, including the observed start/stop rows. It is not an exfiltration-success or general-service-outage verdict.",
+      "source": "https://zenodo.org/records/5789064",
+      "members": [
+        "rules/audit.yaml",
+        "gather/internal_share/configs/systemd/system/consequuntur.service"
+      ],
+      "scope": "Direct rule/definition inspection for fox only; do not claim all other environments definitions were acquired."
+    }
+  ],
+  "official_sources": [
+    {
+      "url": "https://zenodo.org/records/8263181",
+      "doi": "10.5281/zenodo.8263181",
+      "license": "CC-BY-4.0"
+    },
+    {
+      "url": "https://zenodo.org/records/5789064",
+      "doi": "10.5281/zenodo.5789064",
+      "license": "CC-BY-NC-SA-4.0"
+    },
+    {
+      "url": "https://arxiv.org/html/2203.08580v1",
+      "published_paper_doi": "10.1109/TDSC.2022.3201582",
+      "role": "Original author description of scenario design; not certification of our draft answers"
+    },
+    {
+      "url": "https://github.com/ait-aecid/alert-data-set",
+      "role": "Provider distinguishes time-window labels from event-level labeling; repository not executed"
+    }
+  ],
+  "selected_context_acquisition": {
+    "archive": "fox.zip",
+    "published_MD5": "md5:b6cd133398fbed6f3e7434dafbc45756",
+    "whole_archive_checksum_verified": false,
+    "archive_index_transfer_bytes": 2556243,
+    "selected_context_pass_transfer_bytes": 2752851,
+    "selected_members": [
+      {
+        "member": "gather/internal_share/configs/systemd/system/consequuntur.service",
+        "sha256": "f0efc953b70e9d9a907e85de5d50684b00b48a1ac24ba175b29e3aee9c6a0bb3",
+        "crc32": "a840b129"
+      },
+      {
+        "member": "environment/provisioning/ansible/playbooks/deploy/attack_exfiltration/templates/exfil.service.j2",
+        "sha256": "b1b2cb937fda73fc3c5dade6be2f1fc08200cf7b76c9106519caf9e8876385fc",
+        "crc32": "6e90325a"
+      },
+      {
+        "member": "environment/provisioning/ansible/playbooks/deploy/attack_exfiltration/templates/exfil.sh.j2",
+        "sha256": "6eb73a0a27a058f19081d4ed143d9b67e20e629587142fb4bfbb8bba55f4fd9f",
+        "crc32": "c0f39746"
+      },
+      {
+        "member": "environment/provisioning/ansible/playbooks/deploy/attack_exfiltration/main.yml",
+        "sha256": "5129263a1aa4d4e0d4dfcaa6ff07f3e74b14e9e7cb3388d94cab97d5465ddeea",
+        "crc32": "df986b4a"
+      },
+      {
+        "member": "rules/audit.yaml",
+        "sha256": "ac17452cb16ea7686fdd2c248d759bd15e15d4f0c3285ee0cd7e38661359985b",
+        "crc32": "f43c42dd"
+      }
+    ],
+    "transport": "bounded HTTPS byte ranges, memory only; selected text/SHA retained as provenance, no whole ZIP/raw log download",
+    "source_code_executed": false
+  },
+  "validation": {
+    "regression_tests_Mac_CPU": 8,
+    "all_25_projected_source_rows_separately_checked": true,
+    "R1_R2_output_bytes_equal": true,
+    "AMiner_input_and_all_result_envelope_hashes_pinned": true,
+    "cross_sensor_string_bindings_checked": 14,
+    "frozen_R8_source_hashes_unchanged": 25,
+    "frozen_R8_input_manifest_unchanged": true,
+    "full_training_bundle_built": false,
+    "Thor_deployment_or_CPU_execution": false,
+    "live_MCP_or_Mattermost_or_attack_E2E": false,
+    "R2_R3_case_bytes_equal_notice_now_automatic": true
+  },
+  "limitations": [
+    "Question and draft answer wording is project-authored from attributed events, not official Q&A.",
+    "All nine windows come from five related historical training environments; do not report nine independent incidents or unused evaluation cases.",
+    "Critical omissions, attack success, containment/approval and recovery need separate real evidence and evaluation.",
+    "Raw query arguments and full commands are omitted from projections to avoid copying credentials; source coordinates/SHA retained.",
+    "Draft files are excluded from current training inputs and portable bundle. No GPU training or model selection changes occurred."
+  ],
+  "next": [
+    "Acquire and link a different institutional source (CMU CERT answer/log pairs, then LANL selection).",
+    "Design a new campaign/source-disjoint final evaluation before choosing a training mix.",
+    "Verify actual MCP/tool trajectories separately; never invent live tool outputs for public historical evidence."
+  ]
+}

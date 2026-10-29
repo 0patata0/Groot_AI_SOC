@@ -1,5 +1,18 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**AIT 관제 질문/답변 초안 — 2026-10-30 KST:** [AIT_CASE_REVIEW.json](AIT_CASE_REVIEW.json)에9구간·25원행·14교차참조와 근거/한계를 기록했습니다. 초안은 로컬 `data-ait-case-review-20261030-r3/`에 있으며 학습 데이터·반입pack에는 포함하지 않습니다. 원문 기반 사실과 프로젝트 작성 판단/후속 조사를 구분하고 기존 train 환경만 사용합니다.
+
+`prepare_ait_case_review.py`는 이전 원격 결과의 content/SHA envelope, 공개 `AIT_GAP_LINKAGE.json`, 그 원장에 해시가 고정된 AMiner 분석 JSON을 입력받습니다. 새 output 경로에만 `review-cases.jsonl`, `manifest.json`, `SOURCE_NOTICE.txt`를 씁니다. 출처·변형·권리 고지는 재생성할 때도 자동으로 보존합니다. 공개 원장에는 원시 로그/초안 전문을 포함하지 않습니다.
+
+```bash
+python3 -B finetuning/prepare_ait_case_review.py --results /path/results-r2-final.json --report finetuning/AIT_GAP_LINKAGE.json --aminer /path/aminer-comparison-r2.json --output /new/review-directory
+python3 -B -m unittest discover -s finetuning/tests -p test_ait_case_review.py
+```
+
+Mac CPU8검사·25원행 별도 대조·R1/R2초안 바이트동일 확인. Thor 실행/전체pack·모델 평가/새학습은 이번 범위 밖입니다. 원문 쿼리 인수·전체 명령은 파생 투영에 복사하지 않으며 원문 좌표/SHA를 남깁니다. [출처·이용 범위](DATA_SOURCES.md).
+
+이하 당시 이력입니다.
+
 **원시 로그/라벨 연계 — 2026-10-30T01:46:51.694593+09:00:** [AIT_GAP_LINKAGE.json](AIT_GAP_LINKAGE.json)에5환경40쌍·원문1,942,943행/라벨623,514행의 연결 근거를 기록했습니다. 9경보0구간의7개는 제공자 라벨 근거/2개는 성공 미확정입니다. AMiner 관측과 학습모드도 분리했습니다. [출처·권리·집계 한계](DATA_SOURCES.md).
 
 `link_ait_labels.link_pair`는 열린 원문/라벨 스트림을 순서대로 대조하며, 원문·라벨 SHA/행 좌표/제한된 검토 표본을 반환합니다. 실제 로그 헤더/명시 시각만 해석하고, 잘못된·중복·범위 밖 라벨은 실패시킵니다. 라벨 부재를 정상으로 바꾸지 않으며 질문·답변/도구 호출이나 학습을 생성하지 않습니다. 원격 범위 취득은 기존 `remote_zip.RemoteZip`를 사용했고 실행 코드/입력 SHA와 결과는 Thor의 별도 검토 폴더에 보존했습니다.

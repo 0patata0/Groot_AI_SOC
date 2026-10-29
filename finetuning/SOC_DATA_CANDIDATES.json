@@ -166,6 +166,15 @@
         "reviewed_gap_intervals": 9,
         "success_unconfirmed_intervals": 2,
         "new_training_dialogues": 0
+      },
+      "case_review_followup": {
+        "at_kst": "2026-10-30T02:09:19.800268+09:00",
+        "report": "AIT_CASE_REVIEW.json",
+        "drafts": 9,
+        "source_environments": 5,
+        "source_rows": 25,
+        "training_examples_admitted": 0,
+        "independent_expert_review": false
       }
     }
   ],

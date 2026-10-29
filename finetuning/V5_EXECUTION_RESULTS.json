@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-10-29T19:01:15.889680+09:00",
+  "updated_at_kst": "2026-10-29T20:51:36.511452+09:00",
   "status": "r8_deterministic_full_training_running",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
@@ -257,50 +257,50 @@
     },
     "last_progress": {
       "status": "training",
-      "at_kst": "2026-10-29T19:00:54.081208+09:00",
-      "step": 92,
+      "at_kst": "2026-10-29T20:51:13.402823+09:00",
+      "step": 277,
       "max_steps": 512,
-      "epoch": 0.1796875,
-      "elapsed_seconds": 3066.18,
-      "estimated_remaining_seconds": 13997.8,
-      "peak_cuda_allocated_gib": 65.99,
-      "peak_cuda_reserved_gib": 66.11,
+      "epoch": 0.541015625,
+      "elapsed_seconds": 9685.5,
+      "estimated_remaining_seconds": 8216.9,
+      "peak_cuda_allocated_gib": 66.04,
+      "peak_cuda_reserved_gib": 66.16,
       "memory": {
         "schema": 1,
-        "at_kst": "2026-10-29T19:00:54.081455+09:00",
+        "at_kst": "2026-10-29T20:51:13.403088+09:00",
         "phase": "training",
-        "step": 92,
+        "step": 277,
         "host_bytes": {
           "status": "available",
           "values": {
             "MemTotal": 131856924672,
-            "MemFree": 2596368384,
-            "MemAvailable": 52782444544,
-            "Buffers": 29380608,
-            "Cached": 50754908160,
+            "MemFree": 2365120512,
+            "MemAvailable": 52700422144,
+            "Buffers": 37146624,
+            "Cached": 50891284480,
             "SwapTotal": 0,
             "SwapFree": 0,
-            "KReclaimable": 641220608,
-            "Slab": 1933123584,
-            "SReclaimable": 462848000,
-            "SUnreclaim": 1470275584,
+            "KReclaimable": 646311936,
+            "Slab": 1939292160,
+            "SReclaimable": 467939328,
+            "SUnreclaim": 1471352832,
             "CmaTotal": 536870912,
-            "CmaFree": 442368
+            "CmaFree": 475136
           }
         },
         "vm_cumulative_counters": {
           "status": "available",
           "values": {
-            "allocstall_normal": 29744,
+            "allocstall_normal": 29747,
             "oom_kill": 1,
-            "compact_stall": 99187,
-            "compact_fail": 36024,
+            "compact_stall": 99198,
+            "compact_fail": 36035,
             "compact_success": 63163
           }
         },
         "cgroup": {
           "namespace": "observed cgroup root",
-          "memory.current": 4918214656,
+          "memory.current": 5140725760,
           "memory.peak": 5784735744,
           "memory.max": 120259084288,
           "memory.events": {
@@ -321,18 +321,18 @@
           "allocator_backend": "native",
           "allocator_counters": {
             "allocated_bytes.all.current": 70476589568,
-            "allocated_bytes.all.peak": 70858358272,
+            "allocated_bytes.all.peak": 70905964032,
             "inactive_split_bytes.all.current": 0,
             "inactive_split_bytes.all.peak": 0,
             "num_alloc_retries": 0,
-            "num_device_alloc": 202,
+            "num_device_alloc": 207,
             "num_device_free": 1,
             "num_ooms": 0,
-            "reserved_bytes.all.current": 70986498048,
-            "reserved_bytes.all.peak": 70986498048
+            "reserved_bytes.all.current": 71036829696,
+            "reserved_bytes.all.peak": 71036829696
           },
           "counter_caveat": "Backend-specific; zero retries does not exclude driver/library failures.",
-          "free_bytes": 2774740992,
+          "free_bytes": 2543493120,
           "total_bytes": 131856924672,
           "segments": {
             "status": "available",
@@ -342,13 +342,17 @@
         }
       },
       "metrics": {
-        "loss": 0.7513942718505859,
-        "grad_norm": 1.461529016494751,
-        "learning_rate": 4.723186969766821e-07,
-        "epoch": 0.1796875
+        "loss": 0.4586228132247925,
+        "grad_norm": 1.1119897365570068,
+        "learning_rate": 2.3101672144368846e-07,
+        "epoch": 0.541015625,
+        "eval_loss": 0.4515947699546814,
+        "eval_runtime": 546.666,
+        "eval_samples_per_second": 0.234,
+        "eval_steps_per_second": 0.234
       }
     },
-    "checked_at_kst": "2026-10-29T19:01:15.889680+09:00",
+    "checked_at_kst": "2026-10-29T20:51:36.511452+09:00",
     "estimated_finish_kst": "2026-10-29T23:36:44.704147+09:00",
     "scheduled_progress_check_kst": "2026-10-29T23:08:24.204147+09:00",
     "training_limit_kst": "2026-10-29T23:48:24.204147+09:00",
@@ -453,9 +457,202 @@
             "epoch": 0.00390625
           }
         }
+      },
+      {
+        "checked_at_kst": "2026-10-29T19:01:15.889680+09:00",
+        "progress": {
+          "status": "training",
+          "at_kst": "2026-10-29T19:00:54.081208+09:00",
+          "step": 92,
+          "max_steps": 512,
+          "epoch": 0.1796875,
+          "elapsed_seconds": 3066.18,
+          "estimated_remaining_seconds": 13997.8,
+          "peak_cuda_allocated_gib": 65.99,
+          "peak_cuda_reserved_gib": 66.11,
+          "memory": {
+            "schema": 1,
+            "at_kst": "2026-10-29T19:00:54.081455+09:00",
+            "phase": "training",
+            "step": 92,
+            "host_bytes": {
+              "status": "available",
+              "values": {
+                "MemTotal": 131856924672,
+                "MemFree": 2596368384,
+                "MemAvailable": 52782444544,
+                "Buffers": 29380608,
+                "Cached": 50754908160,
+                "SwapTotal": 0,
+                "SwapFree": 0,
+                "KReclaimable": 641220608,
+                "Slab": 1933123584,
+                "SReclaimable": 462848000,
+                "SUnreclaim": 1470275584,
+                "CmaTotal": 536870912,
+                "CmaFree": 442368
+              }
+            },
+            "vm_cumulative_counters": {
+              "status": "available",
+              "values": {
+                "allocstall_normal": 29744,
+                "oom_kill": 1,
+                "compact_stall": 99187,
+                "compact_fail": 36024,
+                "compact_success": 63163
+              }
+            },
+            "cgroup": {
+              "namespace": "observed cgroup root",
+              "memory.current": 4918214656,
+              "memory.peak": 5784735744,
+              "memory.max": 120259084288,
+              "memory.events": {
+                "status": "available",
+                "values": {
+                  "low": 0,
+                  "high": 0,
+                  "max": 0,
+                  "oom": 0,
+                  "oom_kill": 0,
+                  "oom_group_kill": 0
+                }
+              }
+            },
+            "cuda": {
+              "status": "available",
+              "scope": "current PyTorch process; not all driver allocations",
+              "allocator_backend": "native",
+              "allocator_counters": {
+                "allocated_bytes.all.current": 70476589568,
+                "allocated_bytes.all.peak": 70858358272,
+                "inactive_split_bytes.all.current": 0,
+                "inactive_split_bytes.all.peak": 0,
+                "num_alloc_retries": 0,
+                "num_device_alloc": 202,
+                "num_device_free": 1,
+                "num_ooms": 0,
+                "reserved_bytes.all.current": 70986498048,
+                "reserved_bytes.all.peak": 70986498048
+              },
+              "counter_caveat": "Backend-specific; zero retries does not exclude driver/library failures.",
+              "free_bytes": 2774740992,
+              "total_bytes": 131856924672,
+              "segments": {
+                "status": "available",
+                "count": 2,
+                "expandable": 2
+              }
+            }
+          },
+          "metrics": {
+            "loss": 0.7513942718505859,
+            "grad_norm": 1.461529016494751,
+            "learning_rate": 4.723186969766821e-07,
+            "epoch": 0.1796875
+          }
+        }
+      },
+      {
+        "checked_at_kst": "2026-10-29T20:38:58.585884+09:00",
+        "progress": {
+          "status": "training",
+          "at_kst": "2026-10-29T20:30:31.319224+09:00",
+          "step": 256,
+          "max_steps": 512,
+          "epoch": 0.5,
+          "elapsed_seconds": 8443.42,
+          "estimated_remaining_seconds": 8443.4,
+          "peak_cuda_allocated_gib": 66.04,
+          "peak_cuda_reserved_gib": 66.16,
+          "memory": {
+            "schema": 1,
+            "at_kst": "2026-10-29T20:30:31.319416+09:00",
+            "phase": "training",
+            "step": 256,
+            "host_bytes": {
+              "status": "available",
+              "values": {
+                "MemTotal": 131856924672,
+                "MemFree": 2657005568,
+                "MemAvailable": 52767416320,
+                "Buffers": 35467264,
+                "Cached": 50673561600,
+                "SwapTotal": 0,
+                "SwapFree": 0,
+                "KReclaimable": 640815104,
+                "Slab": 1933680640,
+                "SReclaimable": 462442496,
+                "SUnreclaim": 1471238144,
+                "CmaTotal": 536870912,
+                "CmaFree": 475136
+              }
+            },
+            "vm_cumulative_counters": {
+              "status": "available",
+              "values": {
+                "allocstall_normal": 29747,
+                "oom_kill": 1,
+                "compact_stall": 99198,
+                "compact_fail": 36035,
+                "compact_success": 63163
+              }
+            },
+            "cgroup": {
+              "namespace": "observed cgroup root",
+              "memory.current": 4918145024,
+              "memory.peak": 5784735744,
+              "memory.max": 120259084288,
+              "memory.events": {
+                "status": "available",
+                "values": {
+                  "low": 0,
+                  "high": 0,
+                  "max": 0,
+                  "oom": 0,
+                  "oom_kill": 0,
+                  "oom_group_kill": 0
+                }
+              }
+            },
+            "cuda": {
+              "status": "available",
+              "scope": "current PyTorch process; not all driver allocations",
+              "allocator_backend": "native",
+              "allocator_counters": {
+                "allocated_bytes.all.current": 70476588032,
+                "allocated_bytes.all.peak": 70905964032,
+                "inactive_split_bytes.all.current": 0,
+                "inactive_split_bytes.all.peak": 0,
+                "num_alloc_retries": 0,
+                "num_device_alloc": 207,
+                "num_device_free": 1,
+                "num_ooms": 0,
+                "reserved_bytes.all.current": 71036829696,
+                "reserved_bytes.all.peak": 71036829696
+              },
+              "counter_caveat": "Backend-specific; zero retries does not exclude driver/library failures.",
+              "free_bytes": 2835378176,
+              "total_bytes": 131856924672,
+              "segments": {
+                "status": "available",
+                "count": 2,
+                "expandable": 2
+              }
+            }
+          },
+          "metrics": {
+            "loss": 0.3797227740287781,
+            "grad_norm": 1.2189987897872925,
+            "learning_rate": 2.642434593197739e-07,
+            "epoch": 0.5
+          }
+        }
       }
     ],
     "observed_runtime": {
+      "unit_observed_at_kst": "2026-10-29T20:38:58.585884+09:00",
       "supervisor_active": true,
       "supervisor_pid": 540892,
       "container_running": true,
@@ -463,9 +660,25 @@
       "container_OOMKilled": false,
       "restore_timer_active": true,
       "progress_timer_active": true,
-      "evidence_sha256": "c0ca34e691689873940e079e9c488f956406ac09a3645c70c67119735353bce6",
-      "scope": "read-only SSH unit/container/progress check; no restart or model promotion"
-    }
+      "ollama_active": false,
+      "followup_observed_at_kst": "2026-10-29T20:51:36.511452+09:00",
+      "training_process_pid": 541544,
+      "successful_microbatches": 555,
+      "distinct_observations": 555,
+      "repeated_observations": 0,
+      "saved_checkpoint": "checkpoint-256",
+      "disk_available_gib": 173.45,
+      "mid_epoch_eval_runtime_seconds": 546.666,
+      "mid_epoch_eval_loss": 0.4515947699546814,
+      "scope": "read-only observed process/progress and intermediate artifacts; no final epoch, final adapter or quality certification",
+      "evidence_sha256": {
+        "live-status.json": "1b7fe9cd10768558d96daa7433eac3ce4331e5577cba3b6b2bb33a88f6ebd475",
+        "evaluation-progress.json": "edffa150feddf7316632a019a2459a48d70ba35dfc5a688c163b7ced8f7f5d73"
+      }
+    },
+    "monitoring_resumed_at_kst": "2026-10-29T20:38:58.585884+09:00",
+    "monitoring_resume_basis": "User requested work resumption and training-status check",
+    "progress_estimate_scope": "Linear estimate excludes remaining final evaluation/save/restore overhead; original23:36 estimate and safety deadlines retained, not a promised completion time"
   },
   "historical_pre_r8_fields": {
     "recorded_at_kst": "2026-10-29T18:11:20.249649+09:00",
@@ -511,7 +724,7 @@
       "rollback-protected harness cleanup and 2x2 comparison"
     ]
   },
-  "original_35B_restored_scope": "R8 pause started18:08 KST; no completion/restore receipt yet. Previous successful restore belongs to earlier attempts.",
+  "original_35B_restored_scope": "Directly observed Ollama inactive at20:38KST during approved R8 training; completion/restore receipts absent. Previous successful restoration belongs to older attempts.",
   "no_main_epoch_or_candidate_registered_scope": "Legacy combined field retired: main training has started; epoch not complete and candidate not registered. Use explicit fields below.",
   "main_training_started": true,
   "main_epoch_completed": false,

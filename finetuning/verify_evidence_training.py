@@ -22,6 +22,11 @@ def verify(root):
         raise ValueError('Complete V5 epoch required before export')
     if run['data']['sha256'] != frozen['data_sha256'] or run['config']['max_steps'] != config['max_steps']:
         raise ValueError('Run used different corpus or steps')
+    if config.get('deterministic_training') is True:
+        expected={'requested':True,'algorithms_enabled':True,'cublas_workspace':':4096:8',
+                  'cudnn_benchmark':False,'cudnn_deterministic':True,'matmul_tf32':False,'cudnn_tf32':False}
+        if run['config'].get('deterministic_training') is not True or run.get('hardware',{}).get('determinism') != expected:
+            raise ValueError('Actual deterministic training profile proof required')
     if run.get('base_revision_resolved') != '995ad96eacd98c81ed38be0c5b274b04031597b0':
         raise ValueError('Pinned original base required')
     if (run['config'].get('loss_mode'), run['config'].get('record_prefix_usage'), run['config'].get('max_train_samples')) != ('all_assistant_turns', True, 0):

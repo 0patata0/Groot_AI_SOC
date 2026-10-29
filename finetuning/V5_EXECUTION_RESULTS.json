@@ -1,6 +1,6 @@
 {
-  "updated_at_kst": "2026-10-29T17:45:29.283722+09:00",
-  "status": "two_independent_deterministic_smokes_byte_identical_original_restored_main_not_started",
+  "updated_at_kst": "2026-10-29T18:11:20.249649+09:00",
+  "status": "r8_deterministic_full_training_running",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
     "train": 1024,
@@ -254,5 +254,129 @@
     "original_restored_at_kst": "2026-10-29T17:43:34.314613+09:00",
     "estimated_main_seconds": 19700.471576551725,
     "requires_new_window_plan_and_approval": true
+  },
+  "active_run": {
+    "run_id": "v5-r8-20261029",
+    "unit": "capstone-soc-v5-r8-training",
+    "window": {
+      "status": "training",
+      "mode": "v5-r8",
+      "started_at_kst": "2026-10-29T18:08:24.172566+09:00",
+      "stages": [
+        "soc-v5-train"
+      ],
+      "deadline_seconds": 20400,
+      "independent_restore_minutes": 345,
+      "original_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+      "pause_started_at_kst": "2026-10-29T18:08:24.204147+09:00",
+      "smoke_estimate": {
+        "estimated_main_seconds": 19700.5,
+        "reference_runs": 2,
+        "scope": "same deterministic profile measured estimate; deadline remains authoritative"
+      },
+      "stage": "soc-v5-train"
+    },
+    "last_progress": {
+      "status": "training",
+      "at_kst": "2026-10-29T18:11:00.300764+09:00",
+      "step": 2,
+      "max_steps": 512,
+      "epoch": 0.00390625,
+      "elapsed_seconds": 72.4,
+      "estimated_remaining_seconds": 18462.6,
+      "peak_cuda_allocated_gib": 65.95,
+      "peak_cuda_reserved_gib": 66.04,
+      "memory": {
+        "schema": 1,
+        "at_kst": "2026-10-29T18:11:00.300969+09:00",
+        "phase": "training",
+        "step": 2,
+        "host_bytes": {
+          "status": "available",
+          "values": {
+            "MemTotal": 131856924672,
+            "MemFree": 2494058496,
+            "MemAvailable": 53106171904,
+            "Buffers": 25579520,
+            "Cached": 51184070656,
+            "SwapTotal": 0,
+            "SwapFree": 0,
+            "KReclaimable": 641896448,
+            "Slab": 1932152832,
+            "SReclaimable": 463523840,
+            "SUnreclaim": 1468628992,
+            "CmaTotal": 536870912,
+            "CmaFree": 532480
+          }
+        },
+        "vm_cumulative_counters": {
+          "status": "available",
+          "values": {
+            "allocstall_normal": 29744,
+            "oom_kill": 1,
+            "compact_stall": 99138,
+            "compact_fail": 35976,
+            "compact_success": 63162
+          }
+        },
+        "cgroup": {
+          "namespace": "observed cgroup root",
+          "memory.current": 4683632640,
+          "memory.peak": 5784735744,
+          "memory.max": 120259084288,
+          "memory.events": {
+            "status": "available",
+            "values": {
+              "low": 0,
+              "high": 0,
+              "max": 0,
+              "oom": 0,
+              "oom_kill": 0,
+              "oom_group_kill": 0
+            }
+          }
+        },
+        "cuda": {
+          "status": "available",
+          "scope": "current PyTorch process; not all driver allocations",
+          "allocator_backend": "native",
+          "allocator_counters": {
+            "allocated_bytes.all.current": 70476589568,
+            "allocated_bytes.all.peak": 70809314816,
+            "inactive_split_bytes.all.current": 0,
+            "inactive_split_bytes.all.peak": 0,
+            "num_alloc_retries": 0,
+            "num_device_alloc": 197,
+            "num_device_free": 1,
+            "num_ooms": 0,
+            "reserved_bytes.all.current": 70915194880,
+            "reserved_bytes.all.peak": 70915194880
+          },
+          "counter_caveat": "Backend-specific; zero retries does not exclude driver/library failures.",
+          "free_bytes": 2672431104,
+          "total_bytes": 131856924672,
+          "segments": {
+            "status": "available",
+            "count": 2,
+            "expandable": 2
+          }
+        }
+      },
+      "metrics": {
+        "loss": 0.537857174873352,
+        "grad_norm": 1.5338492393493652,
+        "learning_rate": 3.125e-08,
+        "epoch": 0.00390625
+      }
+    },
+    "checked_at_kst": "2026-10-29T18:11:20.249649+09:00",
+    "estimated_finish_kst": "2026-10-29T23:36:44.704147+09:00",
+    "scheduled_progress_check_kst": "2026-10-29T23:08:24.204147+09:00",
+    "training_limit_kst": "2026-10-29T23:48:24.204147+09:00",
+    "independent_restore_kst": "2026-10-29T23:53:24.204147+09:00",
+    "source_of_times": "pause start plus approved execution bounds; estimate is not guaranteed finish",
+    "ssh_disconnect_readback_verified": true,
+    "automatic_model_promotion": false,
+    "validation": "293 pinned-image CPU tests passed without skips; host293 with3 existing Torch skips"
   }
 }

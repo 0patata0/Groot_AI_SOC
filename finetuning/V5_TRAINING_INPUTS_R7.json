@@ -1,0 +1,99 @@
+{
+  "version": "soc-evidence-v5-r7",
+  "prepared_at_kst": "2026-10-29T11:59:15.546222+09:00",
+  "profile": "config.qwen36-soc-v5.json",
+  "profile_sha256": "98be021b89748419a554bdf987978920497c268c94859865ff46cd96e7ddba47",
+  "data_folder": "data-soc-evidence-v5-r3",
+  "source_cases": "data-soc-source-evidence-v5-r3/cases.jsonl",
+  "source_cases_sha256": "dad7f409e64a628bc35602651e5f2f3e06a982f58c3d05516f7701828d8673e9",
+  "data_sha256": {
+    "train": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2",
+    "validation": "ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6dd9ccbf593b7",
+    "test": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045"
+  },
+  "records": {
+    "train": 1024,
+    "validation": 128,
+    "test": 128
+  },
+  "spec_file_sha256": "5f8d54e0fc552cac4e88c77a762fff5f60a513afe05579b94afb6fa5310f30a0",
+  "source_audit_sha256": "c7ca3b2ffdaed1380906bd091abdc4278b2f37828f1b9641fe6e096766ee5828",
+  "source_sha256": {
+    "train.py": "7f43c4daf890f84d37d9695162cbe974f173c1730e9913e80942a519c741d774",
+    "prepare_data.py": "a3cf3d2e24534298d1c09ce9cdcd1bd05b7a677107a7817ded4ec5448969fc5f",
+    "model_profile.py": "52f902d46f9447b87328d2468645a64e376727a927b5f9a6068b2025798d314e",
+    "bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
+    "memory_budget.py": "662d9d5c1fe77933286582a813d048760a3fd2373798b9aba9df4f70ca6fe0c3",
+    "memory_telemetry.py": "1d85a4f2845e9a9a7e81f7b98431365f7b55950ccc87a49648c3a95d8981c5bf",
+    "guarded_process.py": "a30a3a41051cd46e9fd7398e5a2952eb4066f6619a7bc5b2ceefe77ddcc39ff8",
+    "completion_loss.py": "a634fa9d5d1a5ad0a292cd1828d7975837460d6286154b1b8ecd1cd5c20078c9",
+    "dialogue_encoding.py": "851ddd55f5ac7b31729aeaa17fe5f0d911dee00eadcbb99ae915327fd663f498",
+    "training_lineage.py": "8bea81d9aa8b84e895105b412fc0582ad66bc3d66779d665b4a1b87b362acca9",
+    "container_task.py": "21ee0c1514931400c39e3c04189f84b5c38a2e28d262fd235dc8eef9d8adc260",
+    "thor_container.py": "c922127563587588b71d019dfa0c03551069441bf7de1e61a76ca692b5661bcd",
+    "evidence_groups.py": "d07dcb79759cab548ae9439d3363a3cd78d963cb5c88c2ff9da10f6f663845ed",
+    "cisa_tables.py": "7f62451dc4da61f04e88d205a2eb1ccc34b7908c4f67f93e7d52a4b6d657cdfd",
+    "prepare_evidence_v5.py": "a1f6080bea278551a05124f3bb8cd64abb45eb3fd1029dfb1abfa882e5715d8d",
+    "audit_evidence_v5.py": "04ebfda9e75508b91067744d9500f1d840817152278210a31f2192207deaecfe",
+    "evaluate_evidence_v5.py": "439ab4da76c589c119c83d8138b9aa5beda19be39191b76fd31807b93510ca1a",
+    "review_evidence_results.py": "0edc06c8ee12a6aba9c35899fc8acb5f88fbdc5793f85863de163033d6ad4b22",
+    "verify_evidence_training.py": "e3d86e8838256c652e1ddd31c0e967db0b57e33785e9eae51d1b23db49fe4395",
+    "convert_soc.py": "a3e0265522366c5692e9a6b817a692525b385f9e4fcd8e865be24abd56be6ef1",
+    "register_soc.py": "8956871ff50f1984041cf5b9eb18d829c96be10a9e870396097e4adc4620c574",
+    "reference_model.py": "a0837b4b4210af019fc1689806b13355fa2ae66b201b9d48b73be600dc2e7905",
+    "merge_streaming.py": "6477ee8bac20c4642399f778b32b9a166428fe4b06136e36d0eaca98891444d3",
+    "operator_rollout.py": "7e3934a79fa58f924110e9715a73b77335ec0dd0934954feda5eac44721fa582",
+    "soc_assessment.py": "b47b92e093a8ab310d883ef6a840d1168171cef50e691454d5d8667ca9b07f08"
+  },
+  "development_plan_sha256": "7fe6e595d52e0facf98553df1469e8545f18c5b17977e9e0a635d64a5e230603",
+  "HF_control_digest": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad",
+  "operator_cases_sha256": "0307e26799f0d2b9734c31604c7a1f21b03a463d05ef598cb6560c606ed1a578",
+  "operator_catalog_sha256": "ffcfb0bc8393e483e395a2348cb258dc7b843ee677579c8da577c7f1636390bd",
+  "base_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+  "gold_derivation": "original_provider_labels",
+  "project_authored_incident_scenarios": 0,
+  "independent_expert_review": false,
+  "scope": "source-reported CTI mapping; no assurance of full SOC operational competence",
+  "prior_attempt": {
+    "window_path": "attempts/v5-checkpointed-20261029/window.json",
+    "window_sha256": "0717bcb76c529af72bdec85101e3b6a479fdfc9f03740f85ee95a4e0fca9384d",
+    "smoke_path": "attempts/v5-checkpointed-20261029/outputs/soc-v5-smoke"
+  },
+  "total_approved_outage_seconds": 16200,
+  "optimization": "Activation checkpointing disable rejected after loss discrepancy and slower total smoke; return to original checkpointed computation. Same corpus and 1024-row full epoch. Existing three-hour approval is not extended.",
+  "additional_prior_attempts": [
+    {
+      "window_path": "attempts/v5-r4-nameerror-20261029/window.json",
+      "window_sha256": "cf00099595ef4bb90852aa0c1d0684c433bb4ce22c777e5fa596a1316f2a588a",
+      "reason": "NameError before optimizer initialization; restored, zero successful microbatches"
+    },
+    {
+      "window_path": "attempts/v5-uncheckpointed-rejected-20261029/window.json",
+      "window_sha256": "b4eae69f973d5af950fbf96f2693a6c20ba288deb36f03e2c507d15337448429",
+      "reason": "2-step completed, optimized smoke reference loss mismatch; restored original model"
+    },
+    {
+      "window_path": "attempts/v5-r6-user-stopped-20261029/window.json",
+      "window_sha256": "a3642acd99ba57e7a887e831fe265d24cd84fe13cbe11ccab82fc98ca6e86f89",
+      "reason": "Previous user-requested stop during smoke; restored original model, full epoch not started"
+    }
+  ],
+  "planned_gradient_checkpointing": true,
+  "total_planned_outage_seconds": 16200,
+  "extended_window_approval": "explicit_user_approved_270min_and_automatic_restore_20261029",
+  "resumed_at_kst": "2026-10-29T16:17:51.880302+09:00",
+  "execution_placement": {
+    "training_compute": "Thor",
+    "deployment_and_inference": "Thor",
+    "operator": "coding agent",
+    "no_other_GPU_available": true
+  },
+  "approval_basis": "User explicitly approved maximum 4h30 shared inference interruption and automatic restoration; FW verification must complete before GPU execution.",
+  "execution_status": "prepared_for_authorized_resume_after_FW_validation",
+  "start_authorized": true,
+  "deferred_at_kst": "2026-10-29T13:27:35.863058+09:00",
+  "latest_user_instruction": "Resume server work and prepare training in parallel; explicitly approve maximum 4h30 interruption and automatic restore.",
+  "current_attempt_receipt": "/var/lib/capstone-training-v5-r7-window/window.json",
+  "new_run_and_freeze_required_before_execution": false,
+  "execution_run_id": "v5-r7-20261029"
+}

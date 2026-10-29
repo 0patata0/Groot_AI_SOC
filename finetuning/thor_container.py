@@ -156,8 +156,14 @@ def main():
         raise SystemExit('Successful full-dialogue smoke required')
     if args.stage in ('soc-v5-smoke','soc-v5-train'):
         verify_v5_inputs(root)
-    if args.stage=='soc-v5-train' and json.loads((root/'soc-v5-smoke-status.json').read_text())['status']!='completed':
-        raise SystemExit('Successful V5 smoke required')
+    if args.stage=='soc-v5-train':
+        profile=json.loads((root/'finetuning/config.qwen36-soc-v5.json').read_text())
+        if profile.get('deterministic_training') is True:
+            from training_window import verify_deterministic_reference
+            frozen=json.loads((root/'finetuning/V5_TRAINING_INPUTS.json').read_text())
+            verify_deterministic_reference(root,frozen,profile)
+        elif json.loads((root/'soc-v5-smoke-status.json').read_text())['status']!='completed':
+            raise SystemExit('Successful V5 smoke required')
     print(subprocess.check_output(command(root,args.stage,os.getuid(),os.getgid()),text=True).strip())
 
 

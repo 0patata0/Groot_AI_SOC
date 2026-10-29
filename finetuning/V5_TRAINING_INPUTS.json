@@ -1,8 +1,8 @@
 {
-  "version": "soc-evidence-v5-r7",
-  "prepared_at_kst": "2026-10-29T11:59:15.546222+09:00",
+  "version": "soc-evidence-v5-r8-deterministic",
+  "prepared_at_kst": "2026-10-29T18:05:36.477767+09:00",
   "profile": "config.qwen36-soc-v5.json",
-  "profile_sha256": "98be021b89748419a554bdf987978920497c268c94859865ff46cd96e7ddba47",
+  "profile_sha256": "80aa46f81827b1685686451a2f8c54d29de3f7fafb57c663e76c4e779cacc47f",
   "data_folder": "data-soc-evidence-v5-r3",
   "source_cases": "data-soc-source-evidence-v5-r3/cases.jsonl",
   "source_cases_sha256": "dad7f409e64a628bc35602651e5f2f3e06a982f58c3d05516f7701828d8673e9",
@@ -19,7 +19,7 @@
   "spec_file_sha256": "5f8d54e0fc552cac4e88c77a762fff5f60a513afe05579b94afb6fa5310f30a0",
   "source_audit_sha256": "c7ca3b2ffdaed1380906bd091abdc4278b2f37828f1b9641fe6e096766ee5828",
   "source_sha256": {
-    "train.py": "7f43c4daf890f84d37d9695162cbe974f173c1730e9913e80942a519c741d774",
+    "train.py": "688b6f08f845a023ea85ced6ca76282cc741c9added0702d2017f7549eebac42",
     "prepare_data.py": "a3cf3d2e24534298d1c09ce9cdcd1bd05b7a677107a7817ded4ec5448969fc5f",
     "model_profile.py": "52f902d46f9447b87328d2468645a64e376727a927b5f9a6068b2025798d314e",
     "bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
@@ -30,14 +30,14 @@
     "dialogue_encoding.py": "851ddd55f5ac7b31729aeaa17fe5f0d911dee00eadcbb99ae915327fd663f498",
     "training_lineage.py": "8bea81d9aa8b84e895105b412fc0582ad66bc3d66779d665b4a1b87b362acca9",
     "container_task.py": "21ee0c1514931400c39e3c04189f84b5c38a2e28d262fd235dc8eef9d8adc260",
-    "thor_container.py": "c922127563587588b71d019dfa0c03551069441bf7de1e61a76ca692b5661bcd",
+    "thor_container.py": "ffe672b93b2756b9c6ed6c9a4db2fc5b497a9e5d11937a7efe14db3e055a059e",
     "evidence_groups.py": "d07dcb79759cab548ae9439d3363a3cd78d963cb5c88c2ff9da10f6f663845ed",
     "cisa_tables.py": "7f62451dc4da61f04e88d205a2eb1ccc34b7908c4f67f93e7d52a4b6d657cdfd",
     "prepare_evidence_v5.py": "a1f6080bea278551a05124f3bb8cd64abb45eb3fd1029dfb1abfa882e5715d8d",
     "audit_evidence_v5.py": "04ebfda9e75508b91067744d9500f1d840817152278210a31f2192207deaecfe",
     "evaluate_evidence_v5.py": "439ab4da76c589c119c83d8138b9aa5beda19be39191b76fd31807b93510ca1a",
     "review_evidence_results.py": "0edc06c8ee12a6aba9c35899fc8acb5f88fbdc5793f85863de163033d6ad4b22",
-    "verify_evidence_training.py": "e3d86e8838256c652e1ddd31c0e967db0b57e33785e9eae51d1b23db49fe4395",
+    "verify_evidence_training.py": "4a6c0386a6503da09535b6d2a0e05b6924030a0661c56b619f2b8c69f685cfc2",
     "convert_soc.py": "a3e0265522366c5692e9a6b817a692525b385f9e4fcd8e865be24abd56be6ef1",
     "register_soc.py": "8956871ff50f1984041cf5b9eb18d829c96be10a9e870396097e4adc4620c574",
     "reference_model.py": "a0837b4b4210af019fc1689806b13355fa2ae66b201b9d48b73be600dc2e7905",
@@ -59,8 +59,8 @@
     "window_sha256": "0717bcb76c529af72bdec85101e3b6a479fdfc9f03740f85ee95a4e0fca9384d",
     "smoke_path": "attempts/v5-checkpointed-20261029/outputs/soc-v5-smoke"
   },
-  "total_approved_outage_seconds": 16200,
-  "optimization": "Activation checkpointing disable rejected after loss discrepancy and slower total smoke; return to original checkpointed computation. Same corpus and 1024-row full epoch. Existing three-hour approval is not extended.",
+  "total_approved_outage_seconds": 21060,
+  "optimization": "Use the byte-identical two-trial deterministic profile. Full1024 observations/512steps remain unchanged. Existing35B restored before completion validation; no model promotion.",
   "additional_prior_attempts": [
     {
       "window_path": "attempts/v5-r4-nameerror-20261029/window.json",
@@ -79,21 +79,63 @@
     }
   ],
   "planned_gradient_checkpointing": true,
-  "total_planned_outage_seconds": 16200,
-  "extended_window_approval": "explicit_user_approved_270min_and_automatic_restore_20261029",
-  "resumed_at_kst": "2026-10-29T16:17:51.880302+09:00",
+  "total_planned_outage_seconds": 21060,
+  "extended_window_approval": "contextual_user_go_ahead_for_new_5h28_estimated_run_20261029",
+  "resumed_at_kst": "2026-10-29T18:05:36.477767+09:00",
   "execution_placement": {
     "training_compute": "Thor",
     "deployment_and_inference": "Thor",
     "operator": "coding agent",
     "no_other_GPU_available": true
   },
-  "approval_basis": "User explicitly approved maximum 4h30 shared inference interruption and automatic restoration; FW verification must complete before GPU execution.",
-  "execution_status": "prepared_for_authorized_resume_after_FW_validation",
+  "approval_basis": "User go-ahead after repeated explanation of ~5h28 and inference downtime; operator bounds this new run to training340m, independent restore345m plus6m restoration.",
+  "execution_status": "preparing_detached_full_training",
   "start_authorized": true,
   "deferred_at_kst": "2026-10-29T13:27:35.863058+09:00",
-  "latest_user_instruction": "Resume server work and prepare training in parallel; explicitly approve maximum 4h30 interruption and automatic restore.",
-  "current_attempt_receipt": "/var/lib/capstone-training-v5-r7-window/window.json",
+  "latest_user_instruction": "Proceed with the explained remote 5h28 full training and check near completion; keep running after disconnect.",
+  "current_attempt_receipt": "/var/lib/capstone-training-v5-r8-window/window.json",
   "new_run_and_freeze_required_before_execution": false,
-  "execution_run_id": "v5-r7-20261029"
+  "execution_run_id": "v5-r8-20261029",
+  "interruption_scope": "current_run",
+  "historical_approval_seconds": 16200,
+  "previous_frozen_inputs": {
+    "path": "V5_TRAINING_INPUTS_R7.json",
+    "sha256": "ad8a65a6cd37e674cac02dbd2fecf7442d60d68d9ef758f6687f355a4d161b9f"
+  },
+  "reproducibility_reference": {
+    "report_path": "outputs/soc-v5-strict-repro-20261029/report.json",
+    "runs": [
+      "outputs/soc-v5-strict-repro-20261029/run-1",
+      "outputs/soc-v5-strict-repro-20261029/run-2"
+    ],
+    "restore_path": "attempts/v5-r8-reference-20261029/restore.json",
+    "files_sha256": {
+      "attempts/v5-r8-reference-20261029/window.json": "e35573393188f9bf57531400f8746b6e6d6b4bfa7f1d1b9435d0ae8269e6f054",
+      "attempts/v5-r8-reference-20261029/restore.json": "b45291260512c807aca988e3701e3f7f94d9a8eb449483b05216653ae27944dc",
+      "outputs/soc-v5-strict-repro-20261029/report.json": "5b6f8fb128e535b68860eb8019067272f26f06e3e7a3a6fb58e87de2ea6aa5d6",
+      "outputs/soc-v5-strict-repro-20261029/run-1/run_manifest.json": "db11db46c79a80b3f08db0bd9b0624736340068a3ae66fb145c118d363817337",
+      "outputs/soc-v5-strict-repro-20261029/run-1/trainer_state.json": "1c25dd5b588d255c30953e2fb0908195cb3d2615a8b73938eb21d80e3c9d0feb",
+      "outputs/soc-v5-strict-repro-20261029/run-1/train_results.json": "8fbf81a085fb08173cbf0ab613a2039782f2b2acbe76f727803f94dc9ad6b245",
+      "outputs/soc-v5-strict-repro-20261029/run-1/eval_results.json": "3a3bce8515a5576815984bf8761d6645e5956f64e984b1517eb9ab4e0a9f403f",
+      "outputs/soc-v5-strict-repro-20261029/run-1/successful_microbatch_lineage.jsonl": "4af77b5bf24b311c0e60dca9c1d9afcd7f99c7be5d51f1e7c669d76f68be6181",
+      "outputs/soc-v5-strict-repro-20261029/run-1/adapter/adapter_model.safetensors": "ebe2e5f1426a7066954c3ba87d92d61deb7c7204ef1ef7a5f59621e142c1831d",
+      "outputs/soc-v5-strict-repro-20261029/run-2/run_manifest.json": "8c016d267b947de013df3800eaddce4f899bd97f1baa41bc2490fdd7608922c1",
+      "outputs/soc-v5-strict-repro-20261029/run-2/trainer_state.json": "904baebc93b2b5a2e690c36fb486d99b02fa0bef32ba14e7178a4857833fc181",
+      "outputs/soc-v5-strict-repro-20261029/run-2/train_results.json": "761dd9bfaf042d64e23e7361c6992608d927182c786d964ed7ed03b3b1522d82",
+      "outputs/soc-v5-strict-repro-20261029/run-2/eval_results.json": "377fd5d66f64dc8d806635a31d634e4a6936af31d9cd8cb0f913d69e79ac0b24",
+      "outputs/soc-v5-strict-repro-20261029/run-2/successful_microbatch_lineage.jsonl": "b0188c5fc73de1d265addf7b1617d7263fd259f39f48d5f28a90b1cb4e4632cf",
+      "outputs/soc-v5-strict-repro-20261029/run-2/adapter/adapter_model.safetensors": "ebe2e5f1426a7066954c3ba87d92d61deb7c7204ef1ef7a5f59621e142c1831d"
+    },
+    "adapter_sha256": "ebe2e5f1426a7066954c3ba87d92d61deb7c7204ef1ef7a5f59621e142c1831d"
+  },
+  "window_plan": {
+    "training_limit_minutes": 340,
+    "independent_restore_minutes": 345,
+    "restore_service_limit_minutes": 6,
+    "scheduled_progress_check_minutes": 300,
+    "supervisor_runtime_limit_minutes": 347,
+    "main_estimate_seconds": 19700.5,
+    "disconnect_survival": "Thor systemd supervisor and detached Docker, not SSH session",
+    "automatic_promotion": false
+  }
 }

@@ -50,6 +50,9 @@ def select_mode(mode):
     elif mode=='v5':
         STAGES=('soc-v5-smoke','soc-v5-train');STATE=Path('/var/lib/capstone-training-v5-r7-window')
         LIMIT_SECONDS=245*60;RESTORE_MINUTES=250;RESTORE_UNIT='capstone-soc-v5-r7-restore'
+    elif mode=='v5-r8':
+        STAGES=('soc-v5-train',);STATE=Path('/var/lib/capstone-training-v5-r8-window')
+        LIMIT_SECONDS=340*60;RESTORE_MINUTES=345;RESTORE_UNIT='capstone-soc-v5-r8-restore'
     elif mode=='v4-full':
         STAGES=('soc-v4-full-smoke','soc-v4-full-train');STATE=Path('/var/lib/capstone-training-v4-full-window')
         LIMIT_SECONDS=165*60;RESTORE_MINUTES=170;RESTORE_UNIT='capstone-soc-v4-full-restore'
@@ -93,7 +96,7 @@ def save(name,value):
 def verify_ready(root):
     if MODE in UNRELEASED_SOC_MODES:
         raise ValueError('Training release withheld: project-authored gold answers lack independent validation; rework corpus before training')
-    if MODE=='v5':return verify_v5_ready(root)
+    if MODE in ('v5','v5-r8'):return verify_v5_ready(root)
     if MODE=='v4-full':return verify_v4_full_ready(root)
     if MODE=='v3':return verify_v3_ready(root)
     raw=(root/'finetuning/config.qwen36-soc-v2.json').read_bytes()
@@ -154,7 +157,7 @@ def verify_v3_ready(root):
 
 
 V4_FULL_INPUTS_SHA256='2be7f3f32288a814944dfd8932d783500f29c1fa49e770c595819de2eff3ec83'
-V5_INPUTS_SHA256='ad8a65a6cd37e674cac02dbd2fecf7442d60d68d9ef758f6687f355a4d161b9f'
+V5_INPUTS_SHA256='17cc241cd1144e2092a6f4b4b4b53be9742fca6088bf6c3e496ff72861e41eda'
 
 
 def verify_v5_ready(root):
@@ -180,7 +183,11 @@ def verify_v5_ready(root):
     profile=json.loads((folder/frozen['profile']).read_text())
     if (profile['max_steps'],profile['gradient_accumulation_steps'],profile['num_train_epochs'],profile['learning_rate'])!=(512,2,1,5e-7):
         raise ValueError('Reviewed full-epoch V5 plan changed')
-    if frozen.get('prior_attempt'):
+    if MODE=='v5-r8':
+        verify_deterministic_reference(root,frozen,profile)
+        if frozen.get('interruption_scope')!='current_run' or (RESTORE_MINUTES+6)*60>frozen['total_approved_outage_seconds']:
+            raise ValueError('New run exceeds its reviewed restoration window')
+    elif frozen.get('prior_attempt'):
         prior = frozen['prior_attempt']; prior_path = root/prior['window_path']
         if hashlib.sha256(prior_path.read_bytes()).hexdigest()!=prior['window_sha256'] or profile.get('gradient_checkpointing') is not frozen.get('planned_gradient_checkpointing'):
             raise ValueError('Reviewed V5 execution optimization differs')
@@ -219,6 +226,73 @@ def verify_v5_ready(root):
         raise ValueError('Operator regression baseline differs')
     for stage in STAGES:
         if (root/(stage+'-status.json')).exists() or (root/'outputs'/stage).exists():raise ValueError('Prior V5 training evidence; no automatic retry')
+
+def verify_deterministic_reference(root,frozen,profile):
+    if (profile.get('max_train_samples'),profile.get('max_eval_samples'),profile.get('per_device_train_batch_size'),profile.get('gradient_accumulation_steps'))!=(0,0,1,2):
+        raise ValueError('Full deterministic epoch cannot be sample-limited')
+    reference=frozen['reproducibility_reference']
+    def checked(relative,digest):
+        path=root/relative
+        if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()):
+            raise ValueError('Unsafe reproducibility reference')
+        if hashlib.sha256(path.read_bytes()).hexdigest()!=digest:
+            raise ValueError('Reproducibility reference checksum differs')
+        return path
+    for relative,digest in reference['files_sha256'].items():checked(relative,digest)
+    report=json.loads((root/reference['report_path']).read_text())
+    if report.get('status')!='completed' or report.get('tensor_count')!=380 or report.get('different_tensor_count')!=0:
+        raise ValueError('Two exact deterministic smoke results required')
+    if report.get('training_updates')!=4 or len(report.get('runs',[]))!=2:
+        raise ValueError('Both independent two-step trials required')
+    if profile.get('deterministic_training') is not True or profile.get('gradient_checkpointing') is not True:
+        raise ValueError('Verified deterministic checkpointed profile required')
+    settings={'requested':True,'algorithms_enabled':True,'cublas_workspace':':4096:8',
+              'cudnn_benchmark':False,'cudnn_deterministic':True,'matmul_tf32':False,'cudnn_tf32':False}
+    for i,relative in enumerate(reference['runs']):
+        folder=root/relative;manifest=json.loads((folder/'run_manifest.json').read_text());config=manifest['config']
+        for key in ('revision','max_length','learning_rate','lora_r','lora_alpha','lora_dropout','seed','loss_mode','target_modules','gradient_checkpointing','deterministic_training'):
+            if config.get(key)!=profile.get(key):raise ValueError('Full profile differs from proven smoke: '+key)
+        if manifest['data']['sha256']!=frozen['data_sha256'] or manifest['hardware'].get('determinism')!=settings:
+            raise ValueError('Reference data or numerical profile differs')
+        if json.loads((folder/'trainer_state.json').read_text())['global_step']!=2:
+            raise ValueError('Reference optimizer steps incomplete')
+        digest=hashlib.sha256((folder/'adapter/adapter_model.safetensors').read_bytes()).hexdigest()
+        if digest!=report['adapter_sha256'][i] or digest!=reference['adapter_sha256']:
+            raise ValueError('Reference adapters are not byte-identical')
+    restored=json.loads((root/reference['restore_path']).read_text())
+    if restored.get('status')!='restored' or restored.get('original_digest')!=ORIGINAL_DIGEST:
+        raise ValueError('Original inference restoration proof required')
+    return report
+
+
+def deterministic_full_estimate(root):
+    frozen=json.loads((root/'finetuning/V5_TRAINING_INPUTS.json').read_text())
+    profile=json.loads((root/'finetuning'/frozen['profile']).read_text())
+    verify_deterministic_reference(root,frozen,profile)
+    proof=json.loads((root/'soc-v5-tokenization/tokenization_report.json').read_text())['train']
+    ratio=min(1.0,proof['tokens']/proof['kept']/proof['max_tokens']);estimates=[]
+    for relative in frozen['reproducibility_reference']['runs']:
+        folder=root/relative
+        rows=[json.loads(line) for line in (folder/'successful_microbatch_lineage.jsonl').read_text().splitlines()]
+        if len(rows)!=2:raise ValueError('Two real smoke backward passes required')
+        seconds=(datetime.fromisoformat(rows[1]['at_kst'])-datetime.fromisoformat(rows[0]['at_kst'])).total_seconds()
+        if not 0<seconds<3600:raise ValueError('Invalid reference interval')
+        evaluation=json.loads((folder/'eval_results.json').read_text())
+        estimates.append(seconds*proof['kept']*ratio*1.25+evaluation['eval_runtime']/8*128*2*1.25+300)
+    return {'estimated_main_seconds':round(max(estimates),1),'reference_runs':2,
+            'scope':'same deterministic profile measured estimate; deadline remains authoritative'}
+
+
+def progress_snapshot(root):
+    result={'checked_at_kst':now(),'scope':'server-side status snapshot, not a chat notification'}
+    for name,path in [('window',STATE/'window.json'),('restore',STATE/'restore.json'),
+                      ('progress',root/'outputs/soc-v5-train/progress.json'),
+                      ('completion',STATE/'completion-verification.json')]:
+        if path.exists():result[name]=json.loads(path.read_text())
+    result['ollama_service']=run(['systemctl','is-active','ollama'],check=False).stdout.strip()
+    save('scheduled-progress-check.json',result)
+    return result
+
 
 def verify_v4_full_ready(root):
     raw=(root/'finetuning/V4_TRAINING_INPUTS.json').read_bytes()
@@ -309,7 +383,7 @@ def verify_v5_smoke_equivalence(root):
 def restore_command(script,root):
     args=['systemd-run','--unit='+RESTORE_UNIT,'--on-active='+str(RESTORE_MINUTES)+'m',
           '--timer-property=AccuracySec=1s']
-    if MODE in ('v3','v5','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
+    if MODE in ('v3','v5','v5-r8','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'):args+=['--property=Type=oneshot','--property=TimeoutStartSec=6min']
     args+=['/usr/bin/python3','-B',str(script),'restore','--root',str(root)]
     if MODE!='v2':args+=['--mode',MODE]
     return args
@@ -411,7 +485,7 @@ def restore(root):
 def window(root,script):
     if (STATE/'window.json').exists():raise ValueError('Prior window receipt exists; no automatic retry')
     verify_ready(root)
-    if MODE=='v5':
+    if MODE in ('v5','v5-r8'):
         frozen=json.loads((root/'finetuning/V5_TRAINING_INPUTS.json').read_text())
         if frozen.get('total_planned_outage_seconds',frozen['total_approved_outage_seconds'])>frozen['total_approved_outage_seconds']:
             raise ValueError('Extended shared interruption has not been approved; no service action')
@@ -432,13 +506,16 @@ def window(root,script):
     try:
         run(restore_command(script,root))
         if run(['systemctl','is-active',RESTORE_UNIT+'.timer']).stdout.strip()!='active':raise RuntimeError('Independent restore timer not active')
+        if MODE=='v5-r8':
+            run(['systemd-run','--unit=capstone-soc-v5-r8-progress','--on-active=300m','--timer-property=AccuracySec=1s','/usr/bin/python3','-B',str(script),'progress','--root',str(root),'--mode','v5-r8'])
+            if run(['systemctl','is-active','capstone-soc-v5-r8-progress.timer']).stdout.strip()!='active':raise RuntimeError('Progress timer not active')
         job.update(status='training',pause_started_at_kst=now());save('window.json',job)
         paused=True
         run(['systemctl','stop','ollama'],timeout=45)
         deadline=time.monotonic()+LIMIT_SECONDS
         for stage in STAGES:
-            if MODE in ('v4-full','v5') and stage==STAGES[-1]:
-                estimate=full_window_estimate(root,MODE);job['smoke_estimate']=estimate;save('window.json',job)
+            if MODE in ('v4-full','v5','v5-r8') and stage==STAGES[-1]:
+                estimate=deterministic_full_estimate(root) if MODE=='v5-r8' else full_window_estimate(root,MODE);job['smoke_estimate']=estimate;save('window.json',job)
                 if estimate['estimated_main_seconds']>deadline-time.monotonic():raise TimeoutError('Measured full training would exceed reviewed window')
             job['stage']=stage;save('window.json',job)
             run(['runuser','-u',user,'--','/usr/bin/python3','-B',root/'finetuning/thor_container.py',stage,'--root',root],timeout=60)
@@ -465,11 +542,20 @@ def window(root,script):
             except Exception as exc:job.update(recovery_error_type=type(exc).__name__)
         else:run(['systemctl','stop',RESTORE_UNIT+'.timer'],check=False)
         job['finished_at_kst']=now();save('window.json',job)
+    if MODE=='v5-r8' and job['status']=='training_completed_restored':
+        try:
+            code="import sys,json;from pathlib import Path;root=Path(sys.argv[1]);sys.path.insert(0,str(root/'finetuning'));from verify_evidence_training import verify;print(json.dumps(verify(root)))"
+            verification=json.loads(run(['runuser','-u',user,'--','/usr/bin/python3','-B','-c',code,root],timeout=60).stdout)
+            verification['verified_at_kst']=now();save('completion-verification.json',verification)
+            job['completion_verification']='passed';save('window.json',job)
+        except Exception as exc:
+            save('completion-verification.json',{'status':'failed','error_type':type(exc).__name__,'at_kst':now()})
+            job['completion_verification']='failed';save('window.json',job);raise
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['check','run','restore']);parser.add_argument('--root',type=Path,required=True)
-    parser.add_argument('--mode',choices=['v2','v3','v5','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'],default='v2');args=parser.parse_args();select_mode(args.mode)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['check','run','restore','progress']);parser.add_argument('--root',type=Path,required=True)
+    parser.add_argument('--mode',choices=['v2','v3','v5','v5-r8','v4-full','memory-repro','memory-vmm','memory-trace','memory-loss'],default='v2');args=parser.parse_args();select_mode(args.mode)
     if args.action=='check':
         verify_ready(args.root.resolve());print(json.dumps({'ready':True,'no_service_action':True}));return
     script=Path(__file__).resolve()
@@ -480,6 +566,8 @@ def main():
     STATE.mkdir(mode=0o755,parents=True,exist_ok=True)
     if STATE.is_symlink() or STATE.stat().st_uid!=0 or stat.S_IMODE(STATE.stat().st_mode)&0o022:raise SystemExit('Unsafe operator state directory')
     def interrupted(signum,frame):raise InterruptedError('Operator window interrupted')
+    if args.action=='progress':
+        print(json.dumps(progress_snapshot(args.root.resolve())));return
     if args.action=='run':
         signal.signal(signal.SIGTERM,interrupted);signal.signal(signal.SIGINT,interrupted)
         window(args.root.resolve(),script)

@@ -70,7 +70,7 @@ def main():
             if path.is_symlink() or not path.resolve().is_relative_to(ROOT) or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:
                 parser.error('Frozen V4 input differs: '+name)
     if config_path.name == 'config.qwen36-soc-v5.json':
-        names += ['V5_TRAINING_INPUTS.json','V5_DATA_PREPARATION.json','V5_EXECUTION_RESULTS.json','SOURCE_EXPANSION.json']
+        names += ['V5_TRAINING_INPUTS.json','V5_TRAINING_INPUTS_R7.json','V5_DATA_PREPARATION.json','V5_EXECUTION_RESULTS.json','SOURCE_EXPANSION.json']
         names += ['data-soc-evidence-v5-r3/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json',
                   'independent-source-audit.json','evidence-audit.json','MITRE-ATTACK-LICENSE.txt','SOURCE_ATTRIBUTION.json')]
         names += ['data-soc-source-evidence-v5-r3/cases.jsonl']

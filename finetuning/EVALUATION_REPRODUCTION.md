@@ -18,3 +18,12 @@ GPU 진단은 같은 BF16/SDPA 모델에 저장된 두 어댑터를 번갈아 �
 `train.py`의 `deterministic_training:true`는 명시적으로 선택하는 별도 수치 연산 프로필이다. CUDA 할당 전에 workspace와 결정적 알고리즘·cuDNN·TF32 설정을 적용하고 실제 값을 manifest에 기록한다. 기존 기본 프로필은 자동으로 바꾸지 않는다. `reproduce_training.py`는 원래 최장 2입력/2-step/seed/학습률/재계산 설정을 그대로 복사해 이 옵션과 새 출력 경로만 바꾸며, 독립 프로세스 2개에서 순차 실행한다. 두 결과의 step2 완료, 유한 가중치, 모든 adapter tensor와 train/eval loss 일치를 검사한다. 8분 실행 제한·10분 독립 복구를 갖는 별도 검토 창에서 시험했다. 이 프로필은 속도가 달라질 수 있으므로 본 학습 시간을 다시 산정해야 한다.
 
 V5 smoke 동등성 검사도 참조/후보의 수치 연산 프로필이 다르면 손실 비교를 거절한다. strict 프로필은 실제 설정 영수증까지 요구한다. 예전 reference loss 허용치를 넓히거나, 새 프로필의 낮은 손실을 운영 관제 정확도 향상으로 간주하지 않는다. 다음 본 학습은 검증된 동일 프로필 참조·새 입력 동결·원래 모델 복구·누적 중단 한도를 모두 충족해야 한다.
+
+
+## R8 원격 본 학습(2026-10-29 시작)
+
+사용자의 약5시간28분 예상에 대한 진행 지시로 별도 새 실행 창을 열었다. `V5_TRAINING_INPUTS_R7.json`과 서버 `attempts/v5-r8-reference-20261029/`에 이전 동결/설정·참조 복구를 보존한다. 새 `V5_TRAINING_INPUTS.json`은 결정적 프로필과 25개 학습 소스, 두 시험의 15개 참조 파일을 SHA로 고정한다. full1,024건/512-step만 실행하며 검증된2-step을 또 실행하지 않는다.
+
+검토된 root 복사본 `/usr/local/libexec/capstone-training-v5-r8-window.py`의 `v5-r8` 모드만 사용한다. systemd 감독 `capstone-soc-v5-r8-training` 아래 기존 이미지의 분리된 Docker 컨테이너를 실행한다. SSH 종료/Mac 종료와 독립이며 서버 자체 장애·재부팅 후 자동 학습 재개를 뜻하지 않는다. 학습340분 제한, 독립복구345분·최대6분, 감독347분 제한이다. 원모델 실제 생성/태그를 복구한 뒤 전체 성공 lineage와512optimizerstep·정답누락0/최종설정·지표를 확인해 `completion-verification.json`을 남긴다. 병합·후보등록·운영승격은 수행하지 않는다.
+
+진행 상태는 `systemctl status capstone-soc-v5-r8-training`, `systemctl status capstone-soc-v5-r8-restore.timer`, `systemctl status capstone-soc-v5-r8-progress.timer`와 `~/Capstone_Groot_training/qwen36-20261027/outputs/soc-v5-train/progress.json`에서 확인한다. 원격 연결을 다시 열면 된다. root 전용 `/var/lib/capstone-training-v5-r8-window/`에 감독/복구/완료 검증 영수증을 저장한다. 300분 후 조회 타이머는 같은 경로의 `scheduled-progress-check.json`에 상태를 기록하며, 외부 채팅 알림이 아니다. 현재 및 미래 시점은 KST로 기록한다.

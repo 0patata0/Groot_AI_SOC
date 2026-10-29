@@ -18,6 +18,7 @@ from register_soc import parameters
 ORIGINAL = 'qwen3.6:35b'
 ORIGINAL_DIGEST = 'a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c'
 OPTIONS = {'temperature': 0, 'seed': 42, 'num_ctx': 8192, 'num_predict': 512}
+MODEL_LIFECYCLE = 'release_completed_arm_unless_preexisting'
 
 
 def sha(raw):
@@ -94,6 +95,7 @@ def pin_plan(dataset, frozen, development, registration, split, control, candida
             'models': {'control': {'name': control, 'digest': tags[control]},
                        'candidate': {'name': candidate, 'digest': tags[candidate]}},
             'runtime': runtimes[control], 'options': OPTIONS,
+            'model_lifecycle': MODEL_LIFECYCLE,
             'candidate_registration': registration,
             'source_sha256': source_hashes(), 'arm_order': ['control', 'candidate'],
             'scope': 'source-reported CTI mapping; not full SOC competence or live MCP',
@@ -128,6 +130,8 @@ def run_pair(dataset, plan_path, output, request=api, clock=time.monotonic):
         raise ValueError('Distinct non-operational comparison models required')
     if plan['source_sha256'] != source_hashes() or plan['options'] != OPTIONS:
         raise ValueError('Frozen scorer or decoding options changed')
+    if plan.get('model_lifecycle') != MODEL_LIFECYCLE:
+        raise ValueError('Frozen model release policy changed')
     if plan['arm_order'] != ['control', 'candidate'] or not 1 <= plan['wall_limit_seconds'] <= 3600:
         raise ValueError('Unexpected comparison execution bounds')
     rows = read_rows(dataset, plan['split'], plan['dataset_sha256'])
@@ -156,17 +160,20 @@ def run_pair(dataset, plan_path, output, request=api, clock=time.monotonic):
               'latency_scope': 'sequential arm blocks on shared inference; no isolated-load claim'}
     with output.open('x') as handle:
         handle.write(json.dumps(result, ensure_ascii=False, indent=2)+'\n')
-    started = clock(); attempted = set()
+    started = clock(); attempted = set(); released = set()
     try:
         for arm in plan['arm_order']:
             model = plan['models'][arm]['name']; attempted.add(model)
             entry = result['arms'][arm] = {'model': model, 'results': []}
+            warm_started = clock()
             warm = request('generate', {'model': model, 'prompt': 'OK', 'raw': True,
                            'think': False, 'stream': False, 'keep_alive': '10m',
                            'options': {**OPTIONS, 'num_predict': 1}})
             if not warm.get('done') or warm.get('model') != model or warm.get('eval_count', 0) < 1:
                 raise RuntimeError('Evaluation warm-up failed')
             entry['warmup_completed'] = True
+            entry['warmup_seconds'] = clock()-warm_started
+            entry['warmup_load_duration_ns'] = warm.get('load_duration')
             for identifier in ids:
                 if clock()-started >= plan['wall_limit_seconds']:
                     raise TimeoutError('Comparison wall limit reached')
@@ -186,6 +193,13 @@ def run_pair(dataset, plan_path, output, request=api, clock=time.monotonic):
                     'assessment': assessment})
                 persist(output, result)
             entry['summary'] = summarize(entry['results']); persist(output, result)
+            # Release this invocation's completed arm before loading another
+            # 35B model on Thor's shared memory. Preserve preexisting residents.
+            if model not in before:
+                request('generate', {'model': model, 'keep_alive': 0})
+                released.add(model)
+                entry['released_after_arm'] = True
+                persist(output, result)
         result['status'] = 'completed'
     except BaseException as exc:
         result.update(status='failed', error_type=type(exc).__name__)
@@ -193,7 +207,7 @@ def run_pair(dataset, plan_path, output, request=api, clock=time.monotonic):
     finally:
         restore = {'status': 'checking', 'errors': []}
         # Only unload evaluation models introduced by this invocation.
-        for model in sorted(attempted - before.keys()):
+        for model in sorted(attempted - before.keys() - released):
             try:
                 request('generate', {'model': model, 'keep_alive': 0})
             except Exception as exc:

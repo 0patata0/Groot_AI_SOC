@@ -114,6 +114,29 @@ class PairTests(unittest.TestCase):
                     pair.run_pair(self.root, self.path, self.root/'result.json', request=changed)
                 self.assertFalse(any(n in ('chat', 'generate') for n, _ in api.calls))
 
+    def test_completed_arm_is_released_before_next_model_load(self):
+        r = self.run_pair()
+        calls = self.api.calls
+        released = [i for i, (n, p) in enumerate(calls)
+                    if n == 'generate' and p.get('model') == 'control' and p.get('keep_alive') == 0]
+        candidate_load = next(i for i, (n, p) in enumerate(calls)
+                              if n == 'generate' and p.get('model') == 'candidate' and p.get('keep_alive') != 0)
+        self.assertEqual(len(released), 1)
+        self.assertLess(released[0], candidate_load)
+        self.assertTrue(all(r['arms'][arm]['released_after_arm'] for arm in ('control', 'candidate')))
+
+    def test_preexisting_comparison_model_is_not_released(self):
+        def with_existing(path, payload=None):
+            response = self.api(path, payload)
+            if path == 'ps':
+                response['models'].append({'name': 'control', 'context_length': 8192})
+            return response
+        r = pair.run_pair(self.root, self.path, self.root/'result.json', request=with_existing)
+        self.assertEqual(r['status'], 'completed')
+        self.assertNotIn('released_after_arm', r['arms']['control'])
+        self.assertFalse(any(n == 'generate' and p.get('model') == 'control' and p.get('keep_alive') == 0
+                             for n, p in self.api.calls))
+
     def test_failed_candidate_preserves_partial_evidence_and_restores(self):
         self.api.fail_candidate = True
         with self.assertRaises(TimeoutError): self.run_pair()

@@ -1,6 +1,6 @@
 {
-  "updated_at_kst": "2026-10-29T23:12:20.835379+09:00",
-  "status": "r8_full_epoch_completed_artifacts_verified_original_inference_restored",
+  "updated_at_kst": "2026-10-30T00:29:26.491596+09:00",
+  "status": "r8_development_comparison_completed_final_test_running",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
     "train": 1024,
@@ -196,7 +196,7 @@
     "Actual attack/sensor/LLM/approval E2E; training and kernel isolation do not prove this",
     "Rollback-protected harness cleanup and2x2 comparison"
   ],
-  "Git_at_recording": "source/results/docs not yet committed; final publication receipt is STATUS.md and local session",
+  "Git_at_recording": "Export/registration and lifecycle correction public updates pending automatic commit/push; prior preparation already published.",
   "next_plan_before_user_deferral": {
     "state": "pending_new_extended_shared_interruption_approval",
     "gradient_checkpointing": true,
@@ -1016,7 +1016,208 @@
   "no_main_epoch_or_candidate_registered_scope": "Legacy combined field retired; main epoch completed but candidate not registered. Use explicit completion/candidate fields.",
   "main_training_started": true,
   "main_epoch_completed": true,
-  "candidate_registered_from_r8": false,
+  "candidate_registered_from_r8": true,
   "interruption_accounting_note": "R8 actual closed interruption18117.661111seconds is recorded per run. Earlier-attempt historical totals are not silently presented as an all-experiment sum.",
-  "historical_fields_scope": "attempts/artifact_inventory/weights and earlier reproduction fields retain prior experiment history; active_run.completion is the completed R8 result."
+  "historical_fields_scope": "attempts/artifact_inventory/weights and earlier reproduction fields retain prior experiment history; active_run.completion is the completed R8 result.",
+  "historical_pre_comparison_fields": {
+    "updated_at_kst": "2026-10-29T23:12:20.835379+09:00",
+    "status": "r8_full_epoch_completed_artifacts_verified_original_inference_restored",
+    "candidate_registered_from_r8": false
+  },
+  "post_training_comparison": {
+    "checked_at_kst": "2026-10-30T00:29:26.491596+09:00",
+    "scope": "CTI source mapping development only; not full SOC or operational promotion",
+    "export": {
+      "completed_at_kst": "2026-10-30T00:06:14.647741+09:00",
+      "adapter_sha256": "15d84f92e21cbe55e07f7aa065acf25b3c362bcac92b2b8d4982daaf2f51dad7",
+      "artifacts": [
+        {
+          "path": "qwen36-soc-q4_k_m.gguf",
+          "bytes": 21713462816,
+          "sha256": "7b9770710c42d30d77a7fe67bea15ebdb1fbaaecc456e413071d10015bb363de"
+        },
+        {
+          "path": "mmproj-qwen36-soc-f16.gguf",
+          "bytes": 899283200,
+          "sha256": "daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1"
+        }
+      ],
+      "merged_tensors": 1045,
+      "changed_modules": 190,
+      "preserved_tensors": 855,
+      "converter_revision": "276378515ceebee5d14bcc8536603dd5c87491a2",
+      "cpu_container_exitcode": 0,
+      "cpu_container_OOMKilled": false,
+      "removed_new_BF16_intermediate": {
+        "at_kst": "2026-10-30T00:06:13.374749+09:00",
+        "path": "qwen36-soc-bf16.gguf",
+        "bytes": 71066994528,
+        "sha256": "9fab64fe399f8c5a474da26ecdd82b99f4fbad1e493517bf514ed95ad32a9050",
+        "reason": "new reproducible intermediate only; verified merged HF and Q4/projector preserved",
+        "can_rebuild_from": "exports/qwen36-soc-v5-hf"
+      }
+    },
+    "registration": {
+      "status": "completed",
+      "model": "soc-qwen36:35b-evidence-v5-q4km-20261029",
+      "variant": "v5",
+      "started_at_kst": "2026-10-30T00:06:40.982383+09:00",
+      "training_coverage": {
+        "status": "passed",
+        "epoch": 1,
+        "steps": 512,
+        "distinct_observations": 1024,
+        "successful_microbatches": 1024,
+        "adapter_sha256": "15d84f92e21cbe55e07f7aa065acf25b3c362bcac92b2b8d4982daaf2f51dad7"
+      },
+      "training_source_attribution_sha256": "e87da8db178706ad024012ddae35937c0aa92bbe0b2b8cedaa0505c167d437e6",
+      "files": {
+        "qwen36-soc-q4_k_m.gguf": "sha256:7b9770710c42d30d77a7fe67bea15ebdb1fbaaecc456e413071d10015bb363de",
+        "mmproj-qwen36-soc-f16.gguf": "sha256:daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1"
+      },
+      "original_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+      "completed_at_kst": "2026-10-30T00:07:41.124111+09:00",
+      "digest": "caa40ec0c4d52a0ae7a8bb04b0cdeff5df555ce2fb36269adc5e5ca63d2fb522",
+      "capabilities": [
+        "tools",
+        "thinking",
+        "completion",
+        "vision"
+      ],
+      "runtime_options_match_original": true,
+      "chat_template_matches_hf": true,
+      "chat_template_matches_original": false,
+      "hf_template_sha256": "e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259",
+      "conversion_manifest_sha256": "99245aa8ba96fb89162caba032714891085c17171b7a5e424d7a235ab5b7014f",
+      "existing_models_unchanged": true
+    },
+    "first_development_attempt": {
+      "status": "failed_before_candidate_answers",
+      "finished_at_kst": "2026-10-30T00:11:27.858292+09:00",
+      "error_type": "TimeoutError",
+      "candidate_answers": 0,
+      "control_summary": {
+        "requests": 32,
+        "strict_complete": 3,
+        "format_valid": 32,
+        "macro_f1": 0.1232638888888889,
+        "missing_IDs": 34,
+        "unsupported_IDs": 45
+      },
+      "restoration": {
+        "status": "verified",
+        "errors": [],
+        "context_length": 262144,
+        "registry_unchanged": true,
+        "original_generation_verified": true
+      },
+      "driver_allocation_warning_at_kst": "2026-10-30T00:11:21.570928+09:00",
+      "driver_warning_causality": "not established; occurred with concurrent model load and cancellation",
+      "service_cgroup_OOM": 0
+    },
+    "one_token_probe": {
+      "status": "completed",
+      "started_at_kst": "2026-10-30T00:17:40.155113+09:00",
+      "pid": 669285,
+      "model": "soc-qwen36:35b-evidence-v5-q4km-20261029",
+      "operational_selection_changed": false,
+      "resident_before": [
+        "qwen3.6:35b"
+      ],
+      "mem_available_before": 91712176128,
+      "warm_timeout_seconds": 600,
+      "options": {
+        "num_ctx": 8192,
+        "num_predict": 1,
+        "temperature": 0,
+        "seed": 42
+      },
+      "seconds": 7.736982581904158,
+      "response_metrics": {
+        "eval_count": 1,
+        "total_duration": 7736008044,
+        "load_duration": 7681469183,
+        "prompt_eval_duration": 49688000,
+        "eval_duration": 1000,
+        "done_reason": "length"
+      },
+      "restoration": {
+        "status": "verified",
+        "context_length": 262144,
+        "registry_unchanged": true,
+        "errors": []
+      },
+      "finished_at_kst": "2026-10-30T00:17:48.649459+09:00"
+    },
+    "lifecycle_fix": "release own completed comparison model before next arm; preserve original and preexisting models; unchanged weights, scoring and 120s API deadline",
+    "development_retry": {
+      "status": "completed",
+      "started_at_kst": "2026-10-30T00:21:33.215040+09:00",
+      "plan_sha256": "dd5455db2639e3b0e63c6206facd88c44c39c392eb7e14cccd2191b2d0ff699b",
+      "source_sha256": "e99946594bdb3386ea5008389300d980b34b0fb6c69a519e87c38609f16ed250",
+      "test_plan": {
+        "path": "paired-test-r2-plan.json",
+        "sha256": "b59a2502aac85fe7e1770ad25f890b8cb3523e525d18407c11391a788c7e5b4f",
+        "cases": 128
+      },
+      "finished_at_kst": "2026-10-30T00:23:54.142674+09:00",
+      "report_sha256": "32213785bce8e5f0f8e6bfa5baf727b256c15bb831d5e66d5e09ca34f04dfbbc",
+      "summary": {
+        "control": {
+          "requests": 32,
+          "strict_complete": 3,
+          "format_valid": 32,
+          "macro_f1": 0.1232638888888889,
+          "missing_IDs": 34,
+          "unsupported_IDs": 45
+        },
+        "candidate": {
+          "requests": 32,
+          "strict_complete": 3,
+          "format_valid": 32,
+          "macro_f1": 0.1293402777777778,
+          "missing_IDs": 34,
+          "unsupported_IDs": 42
+        }
+      },
+      "restoration": {
+        "status": "verified",
+        "errors": [],
+        "context_length": 262144,
+        "registry_unchanged": true,
+        "original_generation_verified": true
+      },
+      "latency_scope": "sequential arm blocks on shared inference; no isolated-load claim",
+      "paired_F1_cases": {
+        "improved": 2,
+        "regressed": 1,
+        "tied": 29
+      },
+      "warmup_seconds": {
+        "control": 7.217286557191983,
+        "candidate": 8.105523385107517
+      },
+      "response_median_seconds": {
+        "control": 1.7330671719973907,
+        "candidate": 1.6994171771220863
+      },
+      "conclusion": "Small CTI reference-F1 change; strict completion and omitted-ID count unchanged. Not sufficient for operating-model promotion."
+    },
+    "final_test_128_answers_generated": false,
+    "operational_model_promoted": false,
+    "actual_MCP_chat_attack_E2E": false,
+    "final_test": {
+      "status": "running",
+      "started_at_kst": "2026-10-30T00:26:55.161849+09:00",
+      "plan_sha256": "b59a2502aac85fe7e1770ad25f890b8cb3523e525d18407c11391a788c7e5b4f",
+      "cases_per_arm": 128,
+      "last_checked_at_kst": "2026-10-30T00:27:43.097383+09:00",
+      "completed_responses": {
+        "control": 22
+      },
+      "tuning_after_final_test_started": false
+    }
+  },
+  "final_test_response_generation_started": true,
+  "final_test_128_answers_generated_scope": "True only after both matched models finish all 128 test responses; partial progress is in post_training_comparison.final_test."
 }

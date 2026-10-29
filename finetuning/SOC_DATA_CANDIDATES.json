@@ -1,0 +1,295 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T00:57:16.287495+09:00",
+  "status": "candidate_research_only_not_training_admission",
+  "purpose": "Expand evidence-based SOC triage, multi-source investigation, timeline reconstruction and uncertainty handling beyond CTI technique mapping.",
+  "new_raw_logs_downloaded": false,
+  "new_training_examples_admitted": 0,
+  "GPU_training_started": false,
+  "production_changed": false,
+  "evidence_scope": "Primary provider pages and bounded metadata checked now; previous acquisition and use taken from SOURCE_EXPANSION.json, V4_DATA_PREPARATION.json and V5_DATA_PREPARATION.json. Archive availability/content not tested now.",
+  "candidates": [
+    {
+      "id": "lanl_cyber1",
+      "novelty": "new_direct_source_candidate",
+      "provider": "Los Alamos National Laboratory",
+      "url": "https://csr.lanl.gov/data/cyber1/",
+      "doi": "10.17021/1179829",
+      "year": 2015,
+      "nature": "De-identified internal network logs with designated red-team authentication events; not a complete incident-response answer set.",
+      "provider_scale": {
+        "days": 58,
+        "events": 1648275307,
+        "compressed_size": "approximately 12 GB"
+      },
+      "ground_truth": "redteam.txt.gz lists selected known compromise authentication events; unlisted events are not certified benign.",
+      "soc_roles": [
+        "multisource_investigation",
+        "evidence_and_handover",
+        "alert_triage"
+      ],
+      "rights": "Provider page waives copyright and related rights to the extent possible under law; retain academic citation.",
+      "selection": "Start with red-team metadata; pair selected host/time windows with authentication, process, DNS and flow records. Request form and download access not exercised. Single gzip files may require server-side streaming of substantial bytes; URL references alone do not train weights.",
+      "limitations": [
+        "Anonymized relative epoch cannot be converted to factual KST dates.",
+        "Older environment and incomplete malicious-event labels.",
+        "Event count is not independent incident or dialogue count."
+      ],
+      "ready_for_training": false
+    },
+    {
+      "id": "optc",
+      "novelty": "new_direct_source_candidate",
+      "provider": "DARPA-funded OpTC; collected/enriched by Five Directions, with Boston Fusion, BAE and Provatek roles described by provider",
+      "url": "https://github.com/FiveDirections/OpTC-data",
+      "commit": "5b108604f11f767aa11ea79ff827595f3fad15fd",
+      "nature": "Isolated Windows testbed with background activity and red-team injection; not real production incidents.",
+      "provider_scale": {
+        "collected_hosts": 500,
+        "compressed_size": "approximately 1 TB",
+        "exercise": "two weeks"
+      },
+      "ground_truth": "OpTCRedTeamGroundTruth.pdf and eCAR/Bro linkage; provider errata must be applied.",
+      "soc_roles": [
+        "multisource_investigation",
+        "evidence_and_handover"
+      ],
+      "rights": "Provider README states public-domain release and Distribution A; no accuracy warranty.",
+      "selection": "Read ground-truth report and errata first; choose campaign/host/day files on provider Drive. Do not fetch the full corpus. Download availability not verified.",
+      "limitations": [
+        "Duplicate process objects, missing module-load hashes, zero acuity values and inconsistent path representations.",
+        "Do not attribute release to an unverified MITLL repository.",
+        "No complete approved-action or rollback ground truth."
+      ],
+      "ready_for_training": false
+    },
+    {
+      "id": "botsv3",
+      "novelty": "new_direct_source_candidate",
+      "provider": "Splunk",
+      "url": "https://github.com/splunk/botsv3",
+      "commit": "5f556f8b4c4ce0bd7498e642fdb52801e89bee0f",
+      "release_announcement": "https://www.splunk.com/en_us/blog/security/botsv3-dataset-released.html",
+      "nature": "Provider-created SOC/CTF scenarios including cloud and APT investigation.",
+      "provider_scale": {
+        "compressed_size": "320.1 MB",
+        "format": "pre-indexed Splunk"
+      },
+      "ground_truth": "Official release announcement offers questions, answers and hints by email request; not obtained here.",
+      "soc_roles": [
+        "alert_triage",
+        "multisource_investigation",
+        "evidence_and_handover"
+      ],
+      "rights": "Repository LICENSE is CC0-1.0; runtime/add-ons have separate licenses.",
+      "selection": "Obtain authoritative question/answer set and verify a usable log export path before admission. No email sent or Splunk installed.",
+      "limitations": [
+        "Not plain raw JSON/CSV directly usable by our MCP.",
+        "Published installation targets old versions; compatibility not validated.",
+        "Public walkthrough answers are not a substitute for provider ground truth."
+      ],
+      "ready_for_training": false
+    },
+    {
+      "id": "cmu_cert",
+      "novelty": "previously_acquired_answer_key_not_used_in_V5",
+      "provider": "Carnegie Mellon University SEI/CERT with ExactData and DARPA sponsorship",
+      "url": "https://www.sei.cmu.edu/library/insider-threat-test-dataset/",
+      "doi": "10.1184/R1/12841247.v1",
+      "metadata_url": "https://api.figshare.com/v2/articles/12841247/versions/1",
+      "nature": "Institution-generated synthetic background and insider-threat activities.",
+      "ground_truth": "Provider answer archive contains scenario descriptions and synthetic user identifiers; must pair with logs from matching release.",
+      "soc_roles": [
+        "alert_triage",
+        "multisource_investigation",
+        "evidence_and_handover"
+      ],
+      "rights": "CC BY 4.0 reconfirmed through official version-1 API.",
+      "selection": "Reuse previously verified answer archive and checksums; choose matching release/context before server-side selective extraction.",
+      "prior_acquisition": {
+        "answer_archive_bytes": 1254678,
+        "archive_members": 194,
+        "training_examples": 0,
+        "evidence": "SOURCE_EXPANSION.json"
+      },
+      "limitations": [
+        "194 archive members are not 194 independent incidents.",
+        "Full multi-GB log archives were not acquired previously or now.",
+        "Cross-release repeated scenarios must be deduplicated before splitting."
+      ],
+      "ready_for_training": false
+    },
+    {
+      "id": "ait_ads_lds",
+      "novelty": "existing_sources_for_careful_expansion_not_new_corpus",
+      "provider": "AIT Austrian Institute of Technology / TU Wien",
+      "urls": [
+        "https://zenodo.org/records/8263181",
+        "https://zenodo.org/records/5789064"
+      ],
+      "nature": "Institution-generated testbeds; ADS is derived from LDS, not independent incident evidence.",
+      "provider_scale": {
+        "ADS_alerts": 2655821,
+        "ADS_scenarios": 8,
+        "ADS_archive_size": "96.2 MB"
+      },
+      "ground_truth": "ADS labels are attack-phase intervals; LDS has log-line rules and labels. A phase interval does not prove every contained alert malicious.",
+      "soc_roles": [
+        "alert_triage",
+        "multisource_investigation",
+        "evidence_and_handover",
+        "detection_content"
+      ],
+      "rights": "ADS CC BY 4.0; pinned LDS v2.0 CC BY-NC-SA 4.0 per prior verified records. Keep them distinct and recheck chosen version on acquisition.",
+      "selection": "Prioritize evidence-linked Wazuh/Suricata episodes in existing training environments; preserve historical validation/test environments and derivative-family grouping.",
+      "limitations": [
+        "AIT already used in earlier training, but not latest V5 CTI core.",
+        "More rows in existing scenarios are not new independent incidents.",
+        "Cannot call historical AIT holdouts or V5 final128 newly unseen."
+      ],
+      "ready_for_training": false
+    }
+  ],
+  "not_prioritized": [
+    {
+      "id": "otrf_security_datasets",
+      "url": "https://github.com/OTRF/Security-Datasets",
+      "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
+      "reason": "Useful reproducible attack recordings, but root README says GPL-3.0 while LICENSE says MIT; file-level provenance/licensing scope must be resolved before admission. Community source, not government certification."
+    },
+    {
+      "id": "cyber_defense_benchmark",
+      "url": "https://arxiv.org/abs/2604.19533v3",
+      "reason": "Author preprint describing 106 OTRF procedures and Sigma-derived labels; useful evaluation design, but peer review/data license not confirmed and labels are not independent expert full-incident adjudication. Do not count it as independent of OTRF."
+    }
+  ],
+  "admission_rules": [
+    "Preserve source URL/DOI/revision/license, exact selected content hashes, event identifiers and provider ground-truth link. Keep provider labels separate from project-derived dialogue/action labels.",
+    "Group splits by incident/campaign/environment and source derivatives, not log rows. Reserve new final cases before model responses; consumed V5 final128 cannot be fresh evaluation.",
+    "Minimize authored narratives; bind answers to source evidence. MCP names, approvals, protected addresses and rollback constraints require separate local contract tests and reviewed execution traces.",
+    "Treat evidence omission, fabricated facts, wrong target, unjustified benign decisions and unauthorized actions as critical errors; report SOC workflow performance separately from CTI F1.",
+    "Use selective files or verified range retrieval where supported. Streaming a compressed archive may still transfer most bytes. Reference links alone are not training inputs.",
+    "Provider reputation and permissive terms do not guarantee annotation correctness or quality improvement. Human/expert adjudication status must be explicit."
+  ],
+  "recommended_order": [
+    "AIT evidence-linked expansion within allowed training environments",
+    "CMU CERT matching context and answers",
+    "LANL selected multi-source episodes",
+    "BOTS after official answer/export access",
+    "OpTC after small-file feasibility check"
+  ],
+  "metadata_verification": {
+    "at_kst": "2026-10-30T00:53:45.566119+09:00",
+    "scope": "metadata_only_no_log_archives",
+    "tls": "verified_with_existing_system_CA",
+    "previous_attempt": "default_Python_CA_failed_no_TLS_bypass",
+    "sources": {
+      "optc_commit": {
+        "url": "https://api.github.com/repos/FiveDirections/OpTC-data/commits/master",
+        "bytes": 7265,
+        "sha256": "e267e7cd8eb47a79ae3cfdaa79ec13807a5b2330cedd0d023ff574d854dd8490",
+        "commit": "5b108604f11f767aa11ea79ff827595f3fad15fd",
+        "html_url": "https://github.com/FiveDirections/OpTC-data/commit/5b108604f11f767aa11ea79ff827595f3fad15fd"
+      },
+      "botsv3_commit": {
+        "url": "https://api.github.com/repos/splunk/botsv3/commits/master",
+        "bytes": 5071,
+        "sha256": "bb19dfc76cf4f88fb11f4efc54a6373813837383734cf33b87fccd6d2f74cd95",
+        "commit": "5f556f8b4c4ce0bd7498e642fdb52801e89bee0f",
+        "html_url": "https://github.com/splunk/botsv3/commit/5f556f8b4c4ce0bd7498e642fdb52801e89bee0f"
+      },
+      "otrf_commit": {
+        "url": "https://api.github.com/repos/OTRF/Security-Datasets/commits/master",
+        "bytes": 26209,
+        "sha256": "1548fc82b8819b3afdb61c6ec6a2a255888a880fd132fef246f473ecb9d52ebe",
+        "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
+        "html_url": "https://github.com/OTRF/Security-Datasets/commit/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87"
+      },
+      "cert_v1": {
+        "url": "https://api.figshare.com/v2/articles/12841247/versions/1",
+        "bytes": 8445,
+        "sha256": "484a01ebc65c64bdb53a4a097b9051a11c8e4ac943bc2a824956783d64e296cd",
+        "doi": "10.1184/R1/12841247.v1",
+        "version": 1,
+        "license": {
+          "value": 1,
+          "name": "CC BY 4.0",
+          "url": "https://creativecommons.org/licenses/by/4.0/"
+        },
+        "files": [
+          {
+            "name": "SEI_Insider_README.txt",
+            "size": 1446,
+            "download_url": "https://ndownloader.figshare.com/files/24860765"
+          },
+          {
+            "name": "answers.tar.bz2",
+            "size": 1254678,
+            "download_url": "https://ndownloader.figshare.com/files/24857828"
+          },
+          {
+            "name": "r1.tar.bz2",
+            "size": 87541633,
+            "download_url": "https://ndownloader.figshare.com/files/24857825"
+          },
+          {
+            "name": "r2.tar.bz2",
+            "size": 8655227129,
+            "download_url": "https://ndownloader.figshare.com/files/24852656"
+          },
+          {
+            "name": "r3.1.tar.bz2",
+            "size": 4249740376,
+            "download_url": "https://ndownloader.figshare.com/files/24857777"
+          },
+          {
+            "name": "r3.2.tar.bz2",
+            "size": 4285343561,
+            "download_url": "https://ndownloader.figshare.com/files/24856979"
+          },
+          {
+            "name": "r4.1.tar.bz2",
+            "size": 5018970347,
+            "download_url": "https://ndownloader.figshare.com/files/24855644"
+          },
+          {
+            "name": "r4.2.tar.bz2",
+            "size": 4824287500,
+            "download_url": "https://ndownloader.figshare.com/files/24856766"
+          },
+          {
+            "name": "r5.1.tar.bz2",
+            "size": 11236061031,
+            "download_url": "https://ndownloader.figshare.com/files/24849308"
+          },
+          {
+            "name": "r5.2.tar.bz2",
+            "size": 11137370937,
+            "download_url": "https://ndownloader.figshare.com/files/24849938"
+          },
+          {
+            "name": "r6.1.tar.bz2",
+            "size": 20360461443,
+            "download_url": "https://ndownloader.figshare.com/files/24848018"
+          },
+          {
+            "name": "r6.2.tar.bz2",
+            "size": 23811144737,
+            "download_url": "https://ndownloader.figshare.com/files/24844280"
+          },
+          {
+            "name": "CHECKSUMS-sha256.txt",
+            "size": 868,
+            "download_url": "https://ndownloader.figshare.com/files/24857831"
+          },
+          {
+            "name": "CHECKSUMS-sha1.txt",
+            "size": 604,
+            "download_url": "https://ndownloader.figshare.com/files/24857837"
+          }
+        ]
+      }
+    }
+  },
+  "next_required": "Select independent episodes and ground-truth pairs, check license/file availability and contamination, then freeze a small development study and new final holdout before considering further training."
+}

@@ -27,7 +27,7 @@ def main():
         parser.error("Portable bundle requires an output_dir inside finetuning/")
     check_data(config)
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
-             "evidence_groups.py", "cisa_tables.py", "prepare_evidence_v5.py", "audit_evidence_v5.py", "evaluate_evidence_v5.py", "review_evidence_results.py", "verify_evidence_training.py", "V5_EVIDENCE_SPEC.json", "config.qwen36-soc-v5.json",
+             "evidence_groups.py", "cisa_tables.py", "prepare_evidence_v5.py", "audit_evidence_v5.py", "evaluate_evidence_v5.py", "evaluate_evidence_pair.py", "review_evidence_results.py", "verify_evidence_training.py", "V5_EVIDENCE_SPEC.json", "config.qwen36-soc-v5.json",
              "SOC_ROLE_MATRIX.json", "V4_DATA_PREPARATION.json", "V4_DATA_REVIEW.json", "V4_TRAINING_INPUTS.json", "V4_ASSESSMENT_POLICY.json", "config.qwen36-soc-v4.json", "config.qwen36-soc-v4-full.json", "SOURCE_EXPANSION.json", "dialogue_encoding.py", "remote_zip.py", "acquire_institutional.py", "institutional_sources.py", "prepare_institutional.py",
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "merge_streaming.py", "evaluate.py",
              "pack.py", "model_profile.py", "config.qwen36-thor.json", "requirements.qwen36-thor.txt",
@@ -70,7 +70,7 @@ def main():
             if path.is_symlink() or not path.resolve().is_relative_to(ROOT) or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:
                 parser.error('Frozen V4 input differs: '+name)
     if config_path.name == 'config.qwen36-soc-v5.json':
-        names += ['V5_TRAINING_INPUTS.json','V5_TRAINING_INPUTS_R7.json','V5_DATA_PREPARATION.json','V5_EXECUTION_RESULTS.json','SOURCE_EXPANSION.json']
+        names += ['V5_TRAINING_INPUTS.json','V5_TRAINING_INPUTS_R7.json','V5_DATA_PREPARATION.json','V5_EXECUTION_RESULTS.json','V5_COMPARISON.md','SOURCE_EXPANSION.json']
         names += ['data-soc-evidence-v5-r3/'+name for name in ('train.jsonl','validation.jsonl','test.jsonl','manifest.json',
                   'independent-source-audit.json','evidence-audit.json','MITRE-ATTACK-LICENSE.txt','SOURCE_ATTRIBUTION.json')]
         names += ['data-soc-source-evidence-v5-r3/cases.jsonl']

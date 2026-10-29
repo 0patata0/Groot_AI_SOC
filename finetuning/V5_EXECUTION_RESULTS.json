@@ -1,6 +1,6 @@
 {
-  "updated_at_kst": "2026-10-29T16:49:34.077983+09:00",
-  "status": "r7_smoke_completed_reference_eval_mismatch_restored",
+  "updated_at_kst": "2026-10-29T17:45:29.283722+09:00",
+  "status": "two_independent_deterministic_smokes_byte_identical_original_restored_main_not_started",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
     "train": 1024,
@@ -243,5 +243,16 @@
     "GPU_computation": "Thor",
     "extra_GPU_available": false
   },
-  "stopped_runtime_verified_at_kst": "2026-10-29T13:23:18.017244+09:00"
+  "stopped_runtime_verified_at_kst": "2026-10-29T13:23:18.017244+09:00",
+  "reproducibility_followup": {
+    "report": "V5_REPRODUCTION_RESULTS.json",
+    "two_independent_two_step_trials": 2,
+    "exact_adapter_tensor_matches": 380,
+    "adapter_sha256": "ebe2e5f1426a7066954c3ba87d92d61deb7c7204ef1ef7a5f59621e142c1831d",
+    "reference_loss_tolerance_unchanged": true,
+    "main_training_started": false,
+    "original_restored_at_kst": "2026-10-29T17:43:34.314613+09:00",
+    "estimated_main_seconds": 19700.471576551725,
+    "requires_new_window_plan_and_approval": true
+  }
 }

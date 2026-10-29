@@ -129,6 +129,11 @@ class WindowTests(unittest.TestCase):
                 (p/'adapter/adapter_model.safetensors').write_bytes(b'identical fixture')
                 (p/'train_results.json').write_text('{"train_loss":0.5}');(p/'eval_results.json').write_text('{"eval_loss":0.6}')
             self.assertTrue(window.verify_v5_smoke_equivalence(root)['adapter_bytes_identical'])
+            new_manifest=root/'outputs/soc-v5-smoke/run_manifest.json'
+            new_manifest.write_text('{"config":{"gradient_checkpointing":false,"deterministic_training":true}}')
+            with self.assertRaisesRegex(ValueError,'numerical profile'):
+                window.verify_v5_smoke_equivalence(root)
+            new_manifest.write_text('{"config":{"gradient_checkpointing":false}}')
             new=root/'outputs/soc-v5-smoke';(new/'train_results.json').write_text('{"train_loss":0.8}')
             with self.assertRaisesRegex(ValueError,'loss differs'):window.verify_v5_smoke_equivalence(root)
             (new/'train_results.json').write_text('{"train_loss":0.5}')
@@ -241,7 +246,7 @@ class WindowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);tags={'models':[{'name':window.ORIGINAL,'digest':window.ORIGINAL_DIGEST}]}
             with patch.object(window,'STATE',root),patch.object(window,'run',return_value=SimpleNamespace(returncode=1,stdout='')) as command, \
-                 patch.object(window,'api',side_effect=[tags,{'done':False}]):
+                 patch.object(window,'api',side_effect=[tags,{'models':[]},{'done':False}]):
                 with self.assertRaises(RuntimeError):window.restore(root)
             self.assertFalse(any(c.args[0]==['systemctl','stop',window.RESTORE_UNIT+'.timer'] for c in command.call_args_list))
             self.assertEqual(json.loads((root/'restore.json').read_text())['status'],'restore_failed')

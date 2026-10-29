@@ -47,6 +47,34 @@ def checkpointing_enabled(config):
     return value
 
 
+def deterministic_training_enabled(config):
+    value = config.get('deterministic_training', False)
+    if type(value) is not bool:
+        raise ValueError('deterministic_training must be a boolean')
+    return value
+
+
+def configure_determinism(config, torch):
+    """Opt-in reproducibility profile, configured before CUDA allocation."""
+    enabled = deterministic_training_enabled(config)
+    if enabled:
+        if torch.cuda.is_initialized() and os.environ.get('CUBLAS_WORKSPACE_CONFIG') != ':4096:8':
+            raise RuntimeError('Deterministic profile must be configured before CUDA initialization')
+        os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+        torch.use_deterministic_algorithms(True)
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+    return {'requested': enabled,
+            'algorithms_enabled': torch.are_deterministic_algorithms_enabled(),
+            'cublas_workspace': os.environ.get('CUBLAS_WORKSPACE_CONFIG'),
+            'cudnn_benchmark': torch.backends.cudnn.benchmark,
+            'cudnn_deterministic': torch.backends.cudnn.deterministic,
+            'matmul_tf32': torch.backends.cuda.matmul.allow_tf32,
+            'cudnn_tf32': torch.backends.cudnn.allow_tf32}
+
+
 def final_eval_metrics(trainer):
     """Reuse an evaluation only when it describes the final optimizer step."""
     for entry in reversed(trainer.state.log_history):
@@ -81,6 +109,7 @@ def read_config(path):
     if 'assistant_only_logits' in config and not isinstance(config['assistant_only_logits'],bool):
         raise ValueError('assistant_only_logits must be a boolean')
     checkpointing_enabled(config)
+    deterministic_training_enabled(config)
     return config
 
 
@@ -218,6 +247,7 @@ def preflight(config=None):
     if platform.system() != "Linux":
         raise RuntimeError("Training requires the target Linux NVIDIA GPU environment; macOS is excluded.")
     import torch
+    determinism = configure_determinism(config, torch)
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA GPU not available. Check the GPU driver and CUDA-enabled PyTorch.")
     if torch.cuda.device_count() != 1:
@@ -244,7 +274,7 @@ def preflight(config=None):
         key, value = line.split(':', 1)
         if key in ('MemAvailable', 'MemTotal'): mem[key] = int(value.split()[0]) * 1024 / 2**30
     cuda_free, cuda_total = torch.cuda.mem_get_info()
-    hardware = {"packages": packages, "gpu": props.name, "gpu_memory_gib": round(props.total_memory / 2**30, 2),
+    hardware = {"determinism": determinism, "packages": packages, "gpu": props.name, "gpu_memory_gib": round(props.total_memory / 2**30, 2),
             "cuda": torch.version.cuda, "bf16_supported": torch.cuda.is_bf16_supported(),
             "nf4_kernel": "passed" if quantized else "not_used", "cuda_forward_backward": "passed",
             "platform": platform.machine(), "compute_capability": list(torch.cuda.get_device_capability()),

@@ -1,0 +1,367 @@
+{
+  "updated_at_kst": "2026-10-29T17:45:29.283722+09:00",
+  "status": "two_independent_deterministic_smokes_byte_identical_original_restored_main_not_started",
+  "scope": "Two-step reproducibility only; not full-epoch completion, SOC quality improvement or driver root cause proof",
+  "unchanged_data": {
+    "train": 1024,
+    "validation": 128,
+    "test": 128,
+    "actual_train_prefixes_per_trial": 2,
+    "actual_eval_examples_per_trial": 8
+  },
+  "preparation_fix": {
+    "integer_array_canonicalization": true,
+    "same_training_collator": true,
+    "cpu_actual_tokenizer_passed": true,
+    "cuda_initialized_in_cpu_preparation": false
+  },
+  "failed_first_diagnostic": {
+    "pause_started_at_kst": "2026-10-29T17:06:23.062068+09:00",
+    "failure": "array.array JSON serialization before model loading",
+    "training_updates": 0,
+    "automatic_restore_receipt": "warmup_timeout_preserved",
+    "live_generation_verified_at_kst": "2026-10-29T17:23:40.399675+09:00",
+    "probe_seconds": 44.12580450112,
+    "caveat": "Conservative outage upper bound includes time before direct response verification; service was already processing requests"
+  },
+  "fixed_weight_evaluation": {
+    "passes": [
+      {
+        "adapter": "reference",
+        "mode": "current",
+        "at_kst": "2026-10-29T17:29:58.205351+09:00",
+        "seconds": 28.02917837188579,
+        "per_example_loss": [
+          0.5903089046478271,
+          0.5016384720802307,
+          0.46514570713043213,
+          0.4723818004131317,
+          0.35984599590301514,
+          0.7647000551223755,
+          0.7553645372390747,
+          0.6188275218009949
+        ],
+        "mean_loss": 0.5660266242921352
+      },
+      {
+        "adapter": "r7",
+        "mode": "current",
+        "at_kst": "2026-10-29T17:30:24.727392+09:00",
+        "seconds": 26.505369863007218,
+        "per_example_loss": [
+          0.5868896842002869,
+          0.5101454257965088,
+          0.549022376537323,
+          0.4676899015903473,
+          0.3593609929084778,
+          0.7987874746322632,
+          0.7628658413887024,
+          0.6477922201156616
+        ],
+        "mean_loss": 0.5853192396461964
+      },
+      {
+        "adapter": "reference",
+        "mode": "current",
+        "at_kst": "2026-10-29T17:30:51.383776+09:00",
+        "seconds": 26.63958929805085,
+        "per_example_loss": [
+          0.5903089046478271,
+          0.5016384720802307,
+          0.46514570713043213,
+          0.4723818004131317,
+          0.35984599590301514,
+          0.7647000551223755,
+          0.7553645372390747,
+          0.6188275218009949
+        ],
+        "mean_loss": 0.5660266242921352
+      },
+      {
+        "adapter": "r7",
+        "mode": "current",
+        "at_kst": "2026-10-29T17:31:18.008207+09:00",
+        "seconds": 26.607587775914,
+        "per_example_loss": [
+          0.5868896842002869,
+          0.5101454257965088,
+          0.549022376537323,
+          0.4676899015903473,
+          0.3593609929084778,
+          0.7987874746322632,
+          0.7628658413887024,
+          0.6477922201156616
+        ],
+        "mean_loss": 0.5853192396461964
+      },
+      {
+        "adapter": "reference",
+        "mode": "deterministic",
+        "at_kst": "2026-10-29T17:31:52.862547+09:00",
+        "seconds": 34.83748351200484,
+        "per_example_loss": [
+          0.5714633464813232,
+          0.5025723576545715,
+          0.4984108507633209,
+          0.47781136631965637,
+          0.4104585349559784,
+          0.7576872706413269,
+          0.7925936579704285,
+          0.6177034378051758
+        ],
+        "mean_loss": 0.5785876028239727
+      },
+      {
+        "adapter": "r7",
+        "mode": "deterministic",
+        "at_kst": "2026-10-29T17:32:27.766426+09:00",
+        "seconds": 34.88675571186468,
+        "per_example_loss": [
+          0.5817269682884216,
+          0.5201219320297241,
+          0.4931909441947937,
+          0.43790626525878906,
+          0.3298770785331726,
+          0.7796517014503479,
+          0.7331666350364685,
+          0.5885267853736877
+        ],
+        "mean_loss": 0.5580210387706757
+      },
+      {
+        "adapter": "reference",
+        "mode": "deterministic",
+        "at_kst": "2026-10-29T17:33:01.984621+09:00",
+        "seconds": 34.20150421792641,
+        "per_example_loss": [
+          0.5714633464813232,
+          0.5025723576545715,
+          0.4984108507633209,
+          0.47781136631965637,
+          0.4104585349559784,
+          0.7576872706413269,
+          0.7925936579704285,
+          0.6177034378051758
+        ],
+        "mean_loss": 0.5785876028239727
+      },
+      {
+        "adapter": "r7",
+        "mode": "deterministic",
+        "at_kst": "2026-10-29T17:33:36.016804+09:00",
+        "seconds": 34.01548830512911,
+        "per_example_loss": [
+          0.5817269682884216,
+          0.5201219320297241,
+          0.4931909441947937,
+          0.43790626525878906,
+          0.3298770785331726,
+          0.7796517014503479,
+          0.7331666350364685,
+          0.5885267853736877
+        ],
+        "mean_loss": 0.5580210387706757
+      }
+    ],
+    "repeat_comparison": [
+      {
+        "adapter": "reference",
+        "mode": "current",
+        "runs": 2,
+        "examples": 8,
+        "maximum_repeat_loss_difference": 0.0
+      },
+      {
+        "adapter": "r7",
+        "mode": "current",
+        "runs": 2,
+        "examples": 8,
+        "maximum_repeat_loss_difference": 0.0
+      },
+      {
+        "adapter": "reference",
+        "mode": "deterministic",
+        "runs": 2,
+        "examples": 8,
+        "maximum_repeat_loss_difference": 0.0
+      },
+      {
+        "adapter": "r7",
+        "mode": "deterministic",
+        "runs": 2,
+        "examples": 8,
+        "maximum_repeat_loss_difference": 0.0
+      }
+    ],
+    "validation_fingerprint": "e38b5edbb63673f3fe312f3a80c849fc8bc484581ed96e232f74a1dc785f543e",
+    "model_input_fingerprint": "6f3f767abb0b96c268e9def8cbc14c46eaf4d7a65873a64e4ef84dd3c20b6f3a",
+    "window": {
+      "status": "evaluation_completed_restored",
+      "started_at_kst": "2026-10-29T17:28:06.354372+09:00",
+      "training_updates": 0,
+      "limit_seconds": 360,
+      "independent_restore_minutes": 8,
+      "pause_started_at_kst": "2026-10-29T17:28:06.372753+09:00",
+      "restored_at_kst": "2026-10-29T17:33:51.939883+09:00",
+      "finished_at_kst": "2026-10-29T17:33:51.939900+09:00"
+    },
+    "restore": {
+      "started_at_kst": "2026-10-29T17:33:39.471465+09:00",
+      "status": "restored",
+      "original_model": "qwen3.6:35b",
+      "original_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+      "completed_at_kst": "2026-10-29T17:33:51.930197+09:00"
+    },
+    "warm": {
+      "at_kst": "2026-10-29T17:33:51.929832+09:00",
+      "attempts": [
+        {
+          "attempt": 1,
+          "context_length": 8192,
+          "status": "verified",
+          "elapsed_seconds": 9.079791842028499,
+          "eval_count": 1
+        }
+      ]
+    }
+  },
+  "independent_training_reproduction": {
+    "started_at_kst": "2026-10-29T17:38:04.643352+09:00",
+    "status": "completed",
+    "training_updates": 4,
+    "runs": [
+      {
+        "index": 1,
+        "metrics": {
+          "epoch": 1.0,
+          "train_loss": 0.5193924009799957,
+          "train_runtime": 74.3822,
+          "train_samples_per_second": 0.027,
+          "train_steps_per_second": 0.027,
+          "eval_loss": 0.5765107274055481,
+          "eval_runtime": 35.9026,
+          "eval_samples_per_second": 0.223,
+          "eval_steps_per_second": 0.223
+        },
+        "determinism": {
+          "requested": true,
+          "algorithms_enabled": true,
+          "cublas_workspace": ":4096:8",
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "matmul_tf32": false,
+          "cudnn_tf32": false
+        }
+      },
+      {
+        "index": 2,
+        "metrics": {
+          "epoch": 1.0,
+          "train_loss": 0.5193924009799957,
+          "train_runtime": 73.277,
+          "train_samples_per_second": 0.027,
+          "train_steps_per_second": 0.027,
+          "eval_loss": 0.5765107274055481,
+          "eval_runtime": 36.0023,
+          "eval_samples_per_second": 0.222,
+          "eval_steps_per_second": 0.222
+        },
+        "determinism": {
+          "requested": true,
+          "algorithms_enabled": true,
+          "cublas_workspace": ":4096:8",
+          "cudnn_benchmark": false,
+          "cudnn_deterministic": true,
+          "matmul_tf32": false,
+          "cudnn_tf32": false
+        }
+      }
+    ],
+    "prepare_only": false,
+    "tensor_count": 380,
+    "different_tensor_count": 0,
+    "maximum_tensor_difference": 0.0,
+    "adapter_sha256": [
+      "ebe2e5f1426a7066954c3ba87d92d61deb7c7204ef1ef7a5f59621e142c1831d",
+      "ebe2e5f1426a7066954c3ba87d92d61deb7c7204ef1ef7a5f59621e142c1831d"
+    ],
+    "finished_at_kst": "2026-10-29T17:43:19.996887+09:00"
+  },
+  "training_lineage_and_timing": [
+    {
+      "run": 1,
+      "two_prefixes_match_original": true,
+      "longest_microbatch_seconds": 17.913792,
+      "length_ratio": 0.7834556842672413,
+      "estimated_full_training_seconds": 19700.471576551725,
+      "peak_cuda_allocated_gib": 65.97,
+      "cuda_ooms": 0,
+      "cgroup_ooms": 0
+    },
+    {
+      "run": 2,
+      "two_prefixes_match_original": true,
+      "longest_microbatch_seconds": 17.876903,
+      "length_ratio": 0.7834556842672413,
+      "estimated_full_training_seconds": 19667.466428728447,
+      "peak_cuda_allocated_gib": 65.97,
+      "cuda_ooms": 0,
+      "cgroup_ooms": 0
+    }
+  ],
+  "window": {
+    "status": "reproduction_completed_restored",
+    "started_at_kst": "2026-10-29T17:38:02.585280+09:00",
+    "planned_training_updates": 4,
+    "limit_seconds": 480,
+    "independent_restore_minutes": 10,
+    "pause_started_at_kst": "2026-10-29T17:38:02.602631+09:00",
+    "restored_at_kst": "2026-10-29T17:43:34.324170+09:00",
+    "finished_at_kst": "2026-10-29T17:43:34.324185+09:00"
+  },
+  "restore": {
+    "started_at_kst": "2026-10-29T17:43:21.626975+09:00",
+    "status": "restored",
+    "original_model": "qwen3.6:35b",
+    "original_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+    "completed_at_kst": "2026-10-29T17:43:34.314613+09:00"
+  },
+  "original_model_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+  "active": "active",
+  "restore_timer": "inactive",
+  "kernel_warning_lines_during_strict_window": [],
+  "main_training_estimate_seconds": 19700.471576551725,
+  "existing_approved_outage_seconds": 16200,
+  "main_training_started": false,
+  "model_promoted": false,
+  "next_requirements": [
+    "New deterministic-profile reference and frozen full-training run inputs",
+    "Recalculate complete interruption budget including prior windows and recovery",
+    "Approval for a longer shared-inference interruption before main training",
+    "Same-condition quality evaluation before promotion"
+  ],
+  "validation": {
+    "host_tests": 289,
+    "passed": 286,
+    "existing_torch_skipped": 3,
+    "actual_saved_adapter_evaluations": 8,
+    "actual_independent_two_step_training_runs": 2,
+    "actual_new_mcp_calls": 0,
+    "mattermost_posts": 0,
+    "thor_pinned_image_cpu_tests": 289,
+    "thor_pinned_image_cpu_passed": 289,
+    "thor_cpu_skipped": 0
+  },
+  "source_sha256": {
+    "train.py": "688b6f08f845a023ea85ced6ca76282cc741c9added0702d2017f7549eebac42",
+    "reproduce_evaluation.py": "38090f2483a6f5821d7ffe45882dcd90d7bdd4be271f42ee2056c62a9ad7418c",
+    "reproduce_training.py": "01bdc90305aefe5fcb9e7f911f845870009a6bbf9e0acd9edca4b2458a13e171",
+    "training_window.py": "909af902d4f136e70386e21b513110bc5bfe2af5efcd9c82eebf54cc77ce3b2f"
+  },
+  "cleanup": {
+    "stopped_trial_containers_removed": 3,
+    "container_logs_and_inspection_preserved": true,
+    "new_packages_or_models_downloaded": 0,
+    "mac_temporary_cleanup": "pending"
+  }
+}

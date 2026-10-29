@@ -279,8 +279,17 @@ def verify_v5_smoke_equivalence(root):
     prior=frozen.get('prior_attempt')
     if not prior:return {'scope':'initial smoke, no prior comparison'}
     old=root/prior['smoke_path'];new=root/'outputs/soc-v5-smoke'
-    if json.loads((new/'run_manifest.json').read_text())['config'].get('gradient_checkpointing') is not frozen.get('planned_gradient_checkpointing',False):
+    manifests=[json.loads((folder/'run_manifest.json').read_text()) for folder in (old,new)]
+    if manifests[1]['config'].get('gradient_checkpointing') is not frozen.get('planned_gradient_checkpointing',False):
         raise ValueError('Smoke used a different checkpointing policy')
+    profiles=[item['config'].get('deterministic_training',False) for item in manifests]
+    if any(type(value) is not bool for value in profiles) or profiles[0] != profiles[1]:
+        raise ValueError('Smoke numerical profile differs; do not compare losses across modes')
+    if profiles[0]:
+        required={'requested':True,'algorithms_enabled':True,'cublas_workspace':':4096:8',
+                  'cudnn_benchmark':False,'cudnn_deterministic':True,'matmul_tf32':False,'cudnn_tf32':False}
+        if any(item.get('hardware',{}).get('determinism') != required for item in manifests):
+            raise ValueError('Actual deterministic profile proof required')
     def identities(folder):
         return [r['prefixes'] for r in map(json.loads,(folder/'successful_microbatch_lineage.jsonl').read_text().splitlines())]
     if len(identities(new))!=2 or identities(new)!=identities(old):
@@ -318,6 +327,52 @@ def process_belongs_to(pid,ancestor,proc=Path('/proc')):
     return False
 
 
+def verify_generation(api, model, digest, *, record=lambda item: None,
+                      clock=time.monotonic, budget_seconds=180):
+    if not 1 <= budget_seconds <= 180:
+        raise ValueError('Readiness probe budget must be within 180 seconds')
+    started = clock()
+    deadline = started + budget_seconds
+    attempts = []
+    for attempt in range(1, 4):
+        remaining = deadline - clock()
+        if remaining <= 0:
+            break
+        row = {'attempt': attempt}
+        try:
+            models = api('ps', timeout=min(10, remaining)).get('models', [])
+            loaded = [item for item in models if item.get('name') == model]
+            if len(loaded) > 1:
+                raise ValueError('Ambiguous resident model')
+            if loaded and loaded[0].get('digest') != digest:
+                raise ValueError('Resident model digest mismatch')
+            context = loaded[0].get('context_length', 8192) if loaded else 8192
+            if type(context) is not int or not 512 <= context <= 1048576:
+                raise ValueError('Invalid resident context')
+            remaining = deadline - clock()
+            if remaining <= 0:
+                break
+            row['context_length'] = context
+            response = api('generate', {
+                'model': model, 'prompt': 'OK', 'raw': True, 'stream': False,
+                'think': False, 'keep_alive': '10m',
+                'options': {'num_ctx': context, 'num_predict': 1, 'temperature': 0},
+            }, timeout=min(60, remaining))
+            if (response.get('done') is not True or response.get('model') != model
+                    or response.get('eval_count', 0) < 1):
+                raise RuntimeError('Original model generation not confirmed')
+            row.update(status='verified', elapsed_seconds=clock()-started,
+                       eval_count=response['eval_count'])
+            attempts.append(row); record(row)
+            return {'done': True, 'generation_verified': True,
+                    'elapsed_seconds': clock()-started, 'attempts': attempts}
+        except (TimeoutError, OSError) as exc:
+            row.update(status='timeout_or_transport_error', error_type=type(exc).__name__,
+                       elapsed_seconds=clock()-started)
+            attempts.append(row); record(row)
+    raise TimeoutError('Original model generation did not complete within the bounded readiness probe')
+
+
 def restore(root):
     with (STATE/'restore.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
@@ -338,8 +393,12 @@ def restore(root):
                 except (OSError,ValueError):
                     if time.monotonic()>deadline:raise
                     time.sleep(2)
-            warm=api('generate',{'model':ORIGINAL,'keep_alive':'10m','options':{'num_ctx':8192}},timeout=90)
-            if not warm.get('done'):raise RuntimeError('Original model warm-up incomplete')
+            attempts=[]
+            def record_attempt(item):
+                attempts.append(item)
+                save('warm-attempts.json',{'at_kst':now(),'attempts':attempts})
+            warm=verify_generation(api,ORIGINAL,ORIGINAL_DIGEST,record=record_attempt)
+            result['generation_probe']=warm
             result.update(status='restored',original_model=ORIGINAL,original_digest=tags[ORIGINAL],completed_at_kst=now())
             run(['systemctl','stop',RESTORE_UNIT+'.timer'],check=False)
         except Exception as exc:

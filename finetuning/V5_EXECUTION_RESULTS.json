@@ -1,5 +1,5 @@
 {
-  "updated_at_kst": "2026-10-29T18:11:20.249649+09:00",
+  "updated_at_kst": "2026-10-29T19:01:15.889680+09:00",
   "status": "r8_deterministic_full_training_running",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
@@ -143,8 +143,8 @@
     "training_processes_completed": true,
     "cause_or_resolution_confirmed": false
   },
-  "actual_shared_interruption_seconds_total": 538.811982,
-  "original_35B_restored": true,
+  "actual_shared_interruption_seconds_total": null,
+  "original_35B_restored": false,
   "original_35B_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
   "operating_model_selection_changed": false,
   "approved_cleanup": {
@@ -173,46 +173,25 @@
     "scope": "agent review of existing raw-model offline development outputs; no real MCP/bot execution or independent expert review; not a global accuracy percentage"
   },
   "next_plan": {
-    "state": "diagnose_reference_eval_mismatch_before_new_trial",
-    "start_authorized": true,
-    "training_compute_target": "Thor, as requested after confirming no other GPU",
-    "user_start_instruction_required": false,
-    "no_scheduled_restart": true,
-    "dataset_records": {
-      "train": 1024,
-      "validation": 128,
-      "test": 128
-    },
-    "full_selected_train_epoch": 1,
-    "optimizer_steps": 512,
-    "gradient_accumulation": 2,
-    "learning_rate": 5e-07,
-    "gradient_checkpointing": true,
-    "estimated_main_seconds_reference": 13677,
-    "proposed_window_minutes": 270,
-    "prior_outage_seconds_at_user_stop": 538.811982,
-    "time_and_resource_revalidation_required": true,
-    "new_run_state_and_input_version_required": true,
-    "frozen_plan_inputs_sha256": "ad8a65a6cd37e674cac02dbd2fecf7442d60d68d9ef758f6687f355a4d161b9f",
+    "state": "await_remote_r8_completion_and_restore",
+    "new_training_start_authorized": false,
+    "active_run_id": "v5-r8-20261029",
+    "automatic_model_promotion": false,
     "plan_document": "../PLAN.md",
-    "current_approval": "User explicitly approved maximum4h30 interruption and automatic restoration on2026-10-29",
-    "operator": "/usr/local/libexec/capstone-training-v5-r7-window.py",
-    "operator_sha256": "e57f99c227e2a750ded52c6251b3b3f992ce4b5b43e64ce4db075352dd86bfea",
-    "service_action_started": true,
-    "current_model_restored": true
+    "followup": "verify completed lineage/tensors and original inference restoration, then matched quality evaluation"
   },
-  "no_main_epoch_or_candidate_registered": true,
+  "no_main_epoch_or_candidate_registered": false,
   "final_test_128_answers_generated": false,
   "actual_MCP_or_chat_or_attack_E2E": false,
   "new_full_server_install_tested": false,
   "vLLM_driver_or_operational_bot_selection_changed": false,
   "remaining": [
-    "Diagnose unchanged-training-loss but different evaluation loss in checkpointed r7; no arbitrary tolerance relaxation",
-    "original-checkpointing smoke and full selected epoch",
-    "full lineage/tensor validation",
-    "CPU merge and GGUF export/candidate registration",
-    "same-control development and final holdout comparison",
-    "rollback-protected harness cleanup and 2x2 comparison"
+    "Current R8 full epoch completion and original 35B restoration verification",
+    "Full1,024-row/512-step lineage and finite tensor checks",
+    "Candidate export/registration after artifact/resource verification",
+    "Matched development and untouched final holdout evaluation",
+    "Actual attack/sensor/LLM/approval E2E after inference restoration",
+    "Rollback-protected harness cleanup and2x2 comparison"
   ],
   "Git_at_recording": "source/results/docs not yet committed; final publication receipt is STATUS.md and local session",
   "next_plan_before_user_deferral": {
@@ -278,35 +257,35 @@
     },
     "last_progress": {
       "status": "training",
-      "at_kst": "2026-10-29T18:11:00.300764+09:00",
-      "step": 2,
+      "at_kst": "2026-10-29T19:00:54.081208+09:00",
+      "step": 92,
       "max_steps": 512,
-      "epoch": 0.00390625,
-      "elapsed_seconds": 72.4,
-      "estimated_remaining_seconds": 18462.6,
-      "peak_cuda_allocated_gib": 65.95,
-      "peak_cuda_reserved_gib": 66.04,
+      "epoch": 0.1796875,
+      "elapsed_seconds": 3066.18,
+      "estimated_remaining_seconds": 13997.8,
+      "peak_cuda_allocated_gib": 65.99,
+      "peak_cuda_reserved_gib": 66.11,
       "memory": {
         "schema": 1,
-        "at_kst": "2026-10-29T18:11:00.300969+09:00",
+        "at_kst": "2026-10-29T19:00:54.081455+09:00",
         "phase": "training",
-        "step": 2,
+        "step": 92,
         "host_bytes": {
           "status": "available",
           "values": {
             "MemTotal": 131856924672,
-            "MemFree": 2494058496,
-            "MemAvailable": 53106171904,
-            "Buffers": 25579520,
-            "Cached": 51184070656,
+            "MemFree": 2596368384,
+            "MemAvailable": 52782444544,
+            "Buffers": 29380608,
+            "Cached": 50754908160,
             "SwapTotal": 0,
             "SwapFree": 0,
-            "KReclaimable": 641896448,
-            "Slab": 1932152832,
-            "SReclaimable": 463523840,
-            "SUnreclaim": 1468628992,
+            "KReclaimable": 641220608,
+            "Slab": 1933123584,
+            "SReclaimable": 462848000,
+            "SUnreclaim": 1470275584,
             "CmaTotal": 536870912,
-            "CmaFree": 532480
+            "CmaFree": 442368
           }
         },
         "vm_cumulative_counters": {
@@ -314,14 +293,14 @@
           "values": {
             "allocstall_normal": 29744,
             "oom_kill": 1,
-            "compact_stall": 99138,
-            "compact_fail": 35976,
-            "compact_success": 63162
+            "compact_stall": 99187,
+            "compact_fail": 36024,
+            "compact_success": 63163
           }
         },
         "cgroup": {
           "namespace": "observed cgroup root",
-          "memory.current": 4683632640,
+          "memory.current": 4918214656,
           "memory.peak": 5784735744,
           "memory.max": 120259084288,
           "memory.events": {
@@ -342,18 +321,18 @@
           "allocator_backend": "native",
           "allocator_counters": {
             "allocated_bytes.all.current": 70476589568,
-            "allocated_bytes.all.peak": 70809314816,
+            "allocated_bytes.all.peak": 70858358272,
             "inactive_split_bytes.all.current": 0,
             "inactive_split_bytes.all.peak": 0,
             "num_alloc_retries": 0,
-            "num_device_alloc": 197,
+            "num_device_alloc": 202,
             "num_device_free": 1,
             "num_ooms": 0,
-            "reserved_bytes.all.current": 70915194880,
-            "reserved_bytes.all.peak": 70915194880
+            "reserved_bytes.all.current": 70986498048,
+            "reserved_bytes.all.peak": 70986498048
           },
           "counter_caveat": "Backend-specific; zero retries does not exclude driver/library failures.",
-          "free_bytes": 2672431104,
+          "free_bytes": 2774740992,
           "total_bytes": 131856924672,
           "segments": {
             "status": "available",
@@ -363,13 +342,13 @@
         }
       },
       "metrics": {
-        "loss": 0.537857174873352,
-        "grad_norm": 1.5338492393493652,
-        "learning_rate": 3.125e-08,
-        "epoch": 0.00390625
+        "loss": 0.7513942718505859,
+        "grad_norm": 1.461529016494751,
+        "learning_rate": 4.723186969766821e-07,
+        "epoch": 0.1796875
       }
     },
-    "checked_at_kst": "2026-10-29T18:11:20.249649+09:00",
+    "checked_at_kst": "2026-10-29T19:01:15.889680+09:00",
     "estimated_finish_kst": "2026-10-29T23:36:44.704147+09:00",
     "scheduled_progress_check_kst": "2026-10-29T23:08:24.204147+09:00",
     "training_limit_kst": "2026-10-29T23:48:24.204147+09:00",
@@ -377,6 +356,165 @@
     "source_of_times": "pause start plus approved execution bounds; estimate is not guaranteed finish",
     "ssh_disconnect_readback_verified": true,
     "automatic_model_promotion": false,
-    "validation": "293 pinned-image CPU tests passed without skips; host293 with3 existing Torch skips"
-  }
+    "validation": "293 pinned-image CPU tests passed without skips; host293 with3 existing Torch skips",
+    "progress_history": [
+      {
+        "checked_at_kst": "2026-10-29T18:11:20.249649+09:00",
+        "progress": {
+          "status": "training",
+          "at_kst": "2026-10-29T18:11:00.300764+09:00",
+          "step": 2,
+          "max_steps": 512,
+          "epoch": 0.00390625,
+          "elapsed_seconds": 72.4,
+          "estimated_remaining_seconds": 18462.6,
+          "peak_cuda_allocated_gib": 65.95,
+          "peak_cuda_reserved_gib": 66.04,
+          "memory": {
+            "schema": 1,
+            "at_kst": "2026-10-29T18:11:00.300969+09:00",
+            "phase": "training",
+            "step": 2,
+            "host_bytes": {
+              "status": "available",
+              "values": {
+                "MemTotal": 131856924672,
+                "MemFree": 2494058496,
+                "MemAvailable": 53106171904,
+                "Buffers": 25579520,
+                "Cached": 51184070656,
+                "SwapTotal": 0,
+                "SwapFree": 0,
+                "KReclaimable": 641896448,
+                "Slab": 1932152832,
+                "SReclaimable": 463523840,
+                "SUnreclaim": 1468628992,
+                "CmaTotal": 536870912,
+                "CmaFree": 532480
+              }
+            },
+            "vm_cumulative_counters": {
+              "status": "available",
+              "values": {
+                "allocstall_normal": 29744,
+                "oom_kill": 1,
+                "compact_stall": 99138,
+                "compact_fail": 35976,
+                "compact_success": 63162
+              }
+            },
+            "cgroup": {
+              "namespace": "observed cgroup root",
+              "memory.current": 4683632640,
+              "memory.peak": 5784735744,
+              "memory.max": 120259084288,
+              "memory.events": {
+                "status": "available",
+                "values": {
+                  "low": 0,
+                  "high": 0,
+                  "max": 0,
+                  "oom": 0,
+                  "oom_kill": 0,
+                  "oom_group_kill": 0
+                }
+              }
+            },
+            "cuda": {
+              "status": "available",
+              "scope": "current PyTorch process; not all driver allocations",
+              "allocator_backend": "native",
+              "allocator_counters": {
+                "allocated_bytes.all.current": 70476589568,
+                "allocated_bytes.all.peak": 70809314816,
+                "inactive_split_bytes.all.current": 0,
+                "inactive_split_bytes.all.peak": 0,
+                "num_alloc_retries": 0,
+                "num_device_alloc": 197,
+                "num_device_free": 1,
+                "num_ooms": 0,
+                "reserved_bytes.all.current": 70915194880,
+                "reserved_bytes.all.peak": 70915194880
+              },
+              "counter_caveat": "Backend-specific; zero retries does not exclude driver/library failures.",
+              "free_bytes": 2672431104,
+              "total_bytes": 131856924672,
+              "segments": {
+                "status": "available",
+                "count": 2,
+                "expandable": 2
+              }
+            }
+          },
+          "metrics": {
+            "loss": 0.537857174873352,
+            "grad_norm": 1.5338492393493652,
+            "learning_rate": 3.125e-08,
+            "epoch": 0.00390625
+          }
+        }
+      }
+    ],
+    "observed_runtime": {
+      "supervisor_active": true,
+      "supervisor_pid": 540892,
+      "container_running": true,
+      "container_pid": 541482,
+      "container_OOMKilled": false,
+      "restore_timer_active": true,
+      "progress_timer_active": true,
+      "evidence_sha256": "c0ca34e691689873940e079e9c488f956406ac09a3645c70c67119735353bce6",
+      "scope": "read-only SSH unit/container/progress check; no restart or model promotion"
+    }
+  },
+  "historical_pre_r8_fields": {
+    "recorded_at_kst": "2026-10-29T18:11:20.249649+09:00",
+    "scope": "Values previously retained at top level from earlier attempts; not the active R8 state",
+    "original_35B_restored": true,
+    "no_main_epoch_or_candidate_registered": true,
+    "actual_shared_interruption_seconds_total": 538.811982,
+    "next_plan": {
+      "state": "diagnose_reference_eval_mismatch_before_new_trial",
+      "start_authorized": true,
+      "training_compute_target": "Thor, as requested after confirming no other GPU",
+      "user_start_instruction_required": false,
+      "no_scheduled_restart": true,
+      "dataset_records": {
+        "train": 1024,
+        "validation": 128,
+        "test": 128
+      },
+      "full_selected_train_epoch": 1,
+      "optimizer_steps": 512,
+      "gradient_accumulation": 2,
+      "learning_rate": 5e-07,
+      "gradient_checkpointing": true,
+      "estimated_main_seconds_reference": 13677,
+      "proposed_window_minutes": 270,
+      "prior_outage_seconds_at_user_stop": 538.811982,
+      "time_and_resource_revalidation_required": true,
+      "new_run_state_and_input_version_required": true,
+      "frozen_plan_inputs_sha256": "ad8a65a6cd37e674cac02dbd2fecf7442d60d68d9ef758f6687f355a4d161b9f",
+      "plan_document": "../PLAN.md",
+      "current_approval": "User explicitly approved maximum4h30 interruption and automatic restoration on2026-10-29",
+      "operator": "/usr/local/libexec/capstone-training-v5-r7-window.py",
+      "operator_sha256": "e57f99c227e2a750ded52c6251b3b3f992ce4b5b43e64ce4db075352dd86bfea",
+      "service_action_started": true,
+      "current_model_restored": true
+    },
+    "remaining": [
+      "Diagnose unchanged-training-loss but different evaluation loss in checkpointed r7; no arbitrary tolerance relaxation",
+      "original-checkpointing smoke and full selected epoch",
+      "full lineage/tensor validation",
+      "CPU merge and GGUF export/candidate registration",
+      "same-control development and final holdout comparison",
+      "rollback-protected harness cleanup and 2x2 comparison"
+    ]
+  },
+  "original_35B_restored_scope": "R8 pause started18:08 KST; no completion/restore receipt yet. Previous successful restore belongs to earlier attempts.",
+  "no_main_epoch_or_candidate_registered_scope": "Legacy combined field retired: main training has started; epoch not complete and candidate not registered. Use explicit fields below.",
+  "main_training_started": true,
+  "main_epoch_completed": false,
+  "candidate_registered_from_r8": false,
+  "interruption_accounting_note": "Current R8 interruption ongoing; historical closed-attempt value preserved, not a completed total for all attempts."
 }

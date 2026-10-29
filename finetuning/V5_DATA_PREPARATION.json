@@ -230,5 +230,21 @@
     "log_sha256": "fc1971ca06aa68fe38a81f56c6c94c7aa74bb6d116865bee4d3cbff36718113c"
   },
   "portable_scope": "271 tests passed without skips on a separately unpacked allowlisted bundle in the existing pinned Torch CPU image; final documentation receipt only changes metadata, not frozen learning source/data.",
-  "Git_at_preparation": "public source preparation awaiting commit/push; local datasets/evaluation reports excluded"
+  "Git_at_preparation": "public source preparation awaiting commit/push; local datasets/evaluation reports excluded",
+  "execution_followup": {
+    "at_kst": "2026-10-29T12:04:45.407795+09:00",
+    "ledger": "V5_EXECUTION_RESULTS.json",
+    "status": "smoke_experiments_completed_full_training_not_started",
+    "full_epoch_not_started": true,
+    "original_35B_restored": true,
+    "cumulative_outage_seconds": 411.891958,
+    "deleted_old_pilot_shards": 26,
+    "new_plan_frozen_inputs_sha256": "33754a20cabf032a51bfde8b4bcea29dcf0a3da5527818ba8b15cec93c4c428a",
+    "new_extended_interruption_approval": "pending",
+    "latest_actual_CPU_tests": {
+      "count": 276,
+      "skips": 0,
+      "passed": true
+    }
+  }
 }

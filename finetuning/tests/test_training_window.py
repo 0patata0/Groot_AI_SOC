@@ -114,9 +114,34 @@ class WindowTests(unittest.TestCase):
         with self.memory_mode(),tempfile.TemporaryDirectory() as d:
             root=Path(d);(root/'finetuning').mkdir();(root/'finetuning/V5_TRAINING_INPUTS.json').write_text('{}')
             window.select_mode('v5');self.assertEqual(window.STAGES,('soc-v5-smoke','soc-v5-train'))
-            args=window.restore_command('/inspected.py',root);self.assertIn('--on-active=170m',args);self.assertIn('--property=TimeoutStartSec=6min',args)
+            args=window.restore_command('/inspected.py',root);self.assertIn('--on-active=250m',args);self.assertIn('--property=TimeoutStartSec=6min',args)
             with patch.object(window,'run',side_effect=AssertionError('No service action')):
                 with self.assertRaisesRegex(ValueError,'Frozen V5 inputs differ'):window.window(root,Path('/inspected.py'))
+
+    def test_optimized_v5_smoke_requires_same_real_inputs_and_consistent_loss(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);(root/'finetuning').mkdir()
+            (root/'finetuning/V5_TRAINING_INPUTS.json').write_text(json.dumps({'prior_attempt':{'smoke_path':'old'}}))
+            for name in ('old','outputs/soc-v5-smoke'):
+                p=root/name;p.mkdir(parents=True);(p/'adapter').mkdir()
+                (p/'run_manifest.json').write_text('{"config":{"gradient_checkpointing":false}}')
+                (p/'successful_microbatch_lineage.jsonl').write_text('{"prefixes":[{"record_id":"a"}]}\n{"prefixes":[{"record_id":"b"}]}\n')
+                (p/'adapter/adapter_model.safetensors').write_bytes(b'identical fixture')
+                (p/'train_results.json').write_text('{"train_loss":0.5}');(p/'eval_results.json').write_text('{"eval_loss":0.6}')
+            self.assertTrue(window.verify_v5_smoke_equivalence(root)['adapter_bytes_identical'])
+            new=root/'outputs/soc-v5-smoke';(new/'train_results.json').write_text('{"train_loss":0.8}')
+            with self.assertRaisesRegex(ValueError,'loss differs'):window.verify_v5_smoke_equivalence(root)
+            (new/'train_results.json').write_text('{"train_loss":0.5}')
+            (new/'successful_microbatch_lineage.jsonl').write_text('{"prefixes":[{"record_id":"changed"}]}\n')
+            with self.assertRaisesRegex(ValueError,'targets'):window.verify_v5_smoke_equivalence(root)
+
+    def test_extended_v5_plan_refuses_run_before_any_service_action_without_new_approval(self):
+        with tempfile.TemporaryDirectory() as d,self.memory_mode():
+            root=Path(d);(root/'finetuning').mkdir()
+            (root/'finetuning/V5_TRAINING_INPUTS.json').write_text('{"total_planned_outage_seconds":16200,"total_approved_outage_seconds":10800}')
+            window.select_mode('v5')
+            with patch.object(window,'verify_ready'),patch.object(window,'run',side_effect=AssertionError('No service action')):
+                with self.assertRaisesRegex(ValueError,'has not been approved'):window.window(root,Path('/inspected.py'))
 
     def test_full_epoch_readiness_pins_source_and_all_turn_coverage_without_service_actions(self):
         with tempfile.TemporaryDirectory() as d,self.memory_mode():

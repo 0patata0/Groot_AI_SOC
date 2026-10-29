@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import symtable
+import builtins
 
 
 SPEC = importlib.util.spec_from_file_location("finetuning_train", Path(__file__).resolve().parents[1] / "train.py")
@@ -43,6 +45,33 @@ def conversation(final="Final fixture conclusion"):
 
 
 class EncodingTests(unittest.TestCase):
+    def test_training_entrypoint_has_no_unresolved_module_global_reads(self):
+        source = Path(train.__file__).read_text()
+        table = symtable.symtable(source, 'train.py', 'exec')
+        defined = set(dir(builtins)) | {'__file__', '__name__'} | {
+            s.get_name() for s in table.get_symbols()
+            if s.is_assigned() or s.is_imported() or s.is_namespace()}
+        issues = []
+        def visit(scope):
+            for symbol in scope.get_symbols():
+                if symbol.is_referenced() and symbol.is_global() and not symbol.is_assigned() and not symbol.is_imported() and symbol.get_name() not in defined:
+                    issues.append((scope.get_name(), symbol.get_name()))
+            for child in scope.get_children():
+                visit(child)
+        for scope in table.get_children():
+            visit(scope)
+        self.assertEqual(issues, [])
+
+    def test_checkpointing_defaults_preserve_prior_profiles_and_allow_explicit_disable(self):
+        self.assertTrue(train.checkpointing_enabled({}))
+        self.assertTrue(train.checkpointing_enabled({'gradient_checkpointing': True}))
+        self.assertFalse(train.checkpointing_enabled({'gradient_checkpointing': False}))
+
+    def test_checkpointing_rejects_string_or_numeric_false_values(self):
+        for value in ('false', 0, 1, None):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'boolean'):
+                train.checkpointing_enabled({'gradient_checkpointing': value})
+
     def test_smoke_selection_includes_longest_examples_after_initial_source_window(self):
         features=[{'input_ids':array('i',[1]*n),'prompt_length':1} for n in range(2,42)]
         chosen=train.select_longest_prefixes(features,2)

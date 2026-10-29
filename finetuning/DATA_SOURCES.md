@@ -1,5 +1,8 @@
 # 데이터 출처와 사용 범위
 
+**V5 실제 투입 후속:** [실행원장](V5_EXECUTION_RESULTS.json)에원run_manifest/Trainer/lineageSHA를연결했다. 같은학습관측2개를checkpointed/uncheckpointed각2-step에사용했으며총4개독립사건이나학습1,024개전체투입으로집계하지않는다. 중간NameError시도는성공microbatch0이다. 원문/분할SHA·출처1324행대조·원LICENSE는불변,새관제전체학습/독립전문가인증은아니다. 기존TRAINING_PROVENANCE의3corpus/12실행은보존하고이신규원장을별도연결했다. 추가GPU본학습은공유중단시간연장확인전미시작이다.
+
+
 ## V5: 원 제공자 관측·기법 매핑 직접 사용 (2026-10-29 KST)
 
 [V5 준비원장](V5_DATA_PREPARATION.json)과[고정 입력/소스SHA](V5_TRAINING_INPUTS.json)가 실제 준비량/검증 범위의 기준이다. 이 단계는 관제원의 **위협 인텔리전스 근거 연결/분류/인계** 일부를 다룬다. 트리아지·다중센서 상관·라이브 재조회·변경안/승인·적용 후 검증 전체를 학습했다고 하지 않는다. 이전 NIST/ENISA 역할 연결은 업무 범위 근거이며 이번 정답 인증이 아니다.

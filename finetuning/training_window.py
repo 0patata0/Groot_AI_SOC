@@ -8,6 +8,7 @@ from datetime import datetime
 import fcntl
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import pwd
@@ -47,8 +48,8 @@ def select_mode(mode):
         STAGES=('soc-v3-smoke','soc-v3-pilot');STATE=Path('/var/lib/capstone-training-v3-window')
         LIMIT_SECONDS=75*60;RESTORE_MINUTES=80;RESTORE_UNIT='capstone-soc-v3-restore'
     elif mode=='v5':
-        STAGES=('soc-v5-smoke','soc-v5-train');STATE=Path('/var/lib/capstone-training-v5-window')
-        LIMIT_SECONDS=165*60;RESTORE_MINUTES=170;RESTORE_UNIT='capstone-soc-v5-restore'
+        STAGES=('soc-v5-smoke','soc-v5-train');STATE=Path('/var/lib/capstone-training-v5-r6-window')
+        LIMIT_SECONDS=245*60;RESTORE_MINUTES=250;RESTORE_UNIT='capstone-soc-v5-r6-restore'
     elif mode=='v4-full':
         STAGES=('soc-v4-full-smoke','soc-v4-full-train');STATE=Path('/var/lib/capstone-training-v4-full-window')
         LIMIT_SECONDS=165*60;RESTORE_MINUTES=170;RESTORE_UNIT='capstone-soc-v4-full-restore'
@@ -153,7 +154,7 @@ def verify_v3_ready(root):
 
 
 V4_FULL_INPUTS_SHA256='2be7f3f32288a814944dfd8932d783500f29c1fa49e770c595819de2eff3ec83'
-V5_INPUTS_SHA256='89a5b480ca333e6bc3a192e48bd51c7412e171b3d055b053e1ad1ebe9db07e02'
+V5_INPUTS_SHA256='33754a20cabf032a51bfde8b4bcea29dcf0a3da5527818ba8b15cec93c4c428a'
 
 
 def verify_v5_ready(root):
@@ -179,6 +180,25 @@ def verify_v5_ready(root):
     profile=json.loads((folder/frozen['profile']).read_text())
     if (profile['max_steps'],profile['gradient_accumulation_steps'],profile['num_train_epochs'],profile['learning_rate'])!=(512,2,1,5e-7):
         raise ValueError('Reviewed full-epoch V5 plan changed')
+    if frozen.get('prior_attempt'):
+        prior = frozen['prior_attempt']; prior_path = root/prior['window_path']
+        if hashlib.sha256(prior_path.read_bytes()).hexdigest()!=prior['window_sha256'] or profile.get('gradient_checkpointing') is not frozen.get('planned_gradient_checkpointing'):
+            raise ValueError('Reviewed V5 execution optimization differs')
+        receipt = json.loads(prior_path.read_text())
+        if receipt.get('status')!='training_failed_restored' or receipt.get('stage')!='soc-v5-smoke' or receipt.get('error_type')!='TimeoutError':
+            raise ValueError('Prior bounded smoke must have restored the original model')
+        elapsed = (datetime.fromisoformat(receipt['restored_at_kst'])-datetime.fromisoformat(receipt['pause_started_at_kst'])).total_seconds()
+        for other in frozen.get('additional_prior_attempts', []):
+            path=root/other['window_path']
+            if hashlib.sha256(path.read_bytes()).hexdigest()!=other['window_sha256']:
+                raise ValueError('Prior retry receipt differs')
+            row=json.loads(path.read_text())
+            if row.get('status')!='training_failed_restored' or row.get('stage')!='soc-v5-smoke':
+                raise ValueError('Prior retry did not restore the original model')
+            elapsed+=(datetime.fromisoformat(row['restored_at_kst'])-datetime.fromisoformat(row['pause_started_at_kst'])).total_seconds()
+        budget=frozen.get('total_planned_outage_seconds',frozen['total_approved_outage_seconds'])
+        if elapsed+(RESTORE_MINUTES+6)*60>budget:
+            raise ValueError('Combined old and new restoration bounds exceed the reviewed interruption plan')
     proof=json.loads((root/'soc-v5-tokenization/tokenization_report.json').read_text());data=json.loads((root/'soc-v5-tokenization/data_check.json').read_text())
     if proof.get('loss')!='all_assistant_turns_per_conversation' or proof.get('require_all_prefixes') is not True or proof.get('max_length')!=profile['max_length'] or data.get('sha256')!=frozen['data_sha256']:
         raise ValueError('V5 all-assistant token proof differs')
@@ -249,7 +269,32 @@ def full_window_estimate(root,mode='v4-full'):
     # full measured length mix. Include evaluation/loading/saving headroom.
     eval_count=128 if mode=='v5' else 94;eval_passes=2 if mode=='v5' else 1
     estimate=seconds*train['kept']*ratio*1.25+evaluation['eval_runtime']/8*eval_count*eval_passes*1.25+300
-    return {'estimated_main_seconds':round(estimate,1),'longest_microbatch_interval_seconds':round(seconds,3),'length_ratio':round(ratio,4),'scope':'planning estimate, not completion or latency guarantee'}
+    result={'estimated_main_seconds':round(estimate,1),'longest_microbatch_interval_seconds':round(seconds,3),'length_ratio':round(ratio,4),'scope':'planning estimate, not completion or latency guarantee'}
+    if mode=='v5':result['smoke_reference_check']=verify_v5_smoke_equivalence(root)
+    return result
+
+
+def verify_v5_smoke_equivalence(root):
+    frozen=json.loads((root/'finetuning/V5_TRAINING_INPUTS.json').read_text())
+    prior=frozen.get('prior_attempt')
+    if not prior:return {'scope':'initial smoke, no prior comparison'}
+    old=root/prior['smoke_path'];new=root/'outputs/soc-v5-smoke'
+    if json.loads((new/'run_manifest.json').read_text())['config'].get('gradient_checkpointing') is not frozen.get('planned_gradient_checkpointing',False):
+        raise ValueError('Smoke used a different checkpointing policy')
+    def identities(folder):
+        return [r['prefixes'] for r in map(json.loads,(folder/'successful_microbatch_lineage.jsonl').read_text().splitlines())]
+    if len(identities(new))!=2 or identities(new)!=identities(old):
+        raise ValueError('Optimized smoke changed original input or supervised targets')
+    metrics={}
+    for name,key in [('train_results.json','train_loss'),('eval_results.json','eval_loss')]:
+        a=json.loads((old/name).read_text())[key];b=json.loads((new/name).read_text())[key]
+        if not math.isfinite(b) or not math.isclose(a,b,rel_tol=1e-3,abs_tol=1e-4):
+            raise ValueError('Optimized smoke loss differs from the original computation')
+        metrics[key]={'reference':a,'candidate':b}
+    return {'same_two_inputs_and_target_tokens':True,'loss_consistent_within_relative_1e_3_absolute_1e_4':True,
+            'adapter_bytes_identical':hashlib.sha256((old/'adapter/adapter_model.safetensors').read_bytes()).digest()==hashlib.sha256((new/'adapter/adapter_model.safetensors').read_bytes()).digest(),
+            'metrics':metrics,'planned_gradient_checkpointing':frozen.get('planned_gradient_checkpointing',False),
+            'scope':'actual smoke equivalence check; not a full training quality result'}
 
 
 def restore_command(script,root):
@@ -307,6 +352,10 @@ def restore(root):
 def window(root,script):
     if (STATE/'window.json').exists():raise ValueError('Prior window receipt exists; no automatic retry')
     verify_ready(root)
+    if MODE=='v5':
+        frozen=json.loads((root/'finetuning/V5_TRAINING_INPUTS.json').read_text())
+        if frozen.get('total_planned_outage_seconds',frozen['total_approved_outage_seconds'])>frozen['total_approved_outage_seconds']:
+            raise ValueError('Extended shared interruption has not been approved; no service action')
     if run(['systemctl','is-active','ollama']).stdout.strip()!='active':raise ValueError('Ollama was not active before the window')
     tags={m['name']:m['digest'] for m in api('tags')['models']}
     if tags.get(ORIGINAL)!=ORIGINAL_DIGEST:raise ValueError('Original model identity mismatch')

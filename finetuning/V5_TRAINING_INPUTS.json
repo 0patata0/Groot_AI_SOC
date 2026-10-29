@@ -1,8 +1,8 @@
 {
-  "version": "v5-r3",
-  "prepared_at_kst": "2026-10-29T05:39:00.219065+09:00",
+  "version": "v5-r6-original-checkpointing-extended-plan",
+  "prepared_at_kst": "2026-10-29T11:59:15.546222+09:00",
   "profile": "config.qwen36-soc-v5.json",
-  "profile_sha256": "855bdab282f20993b9d98baf69ea6283e7b9219a1cfb0781e97deb957f426d32",
+  "profile_sha256": "98be021b89748419a554bdf987978920497c268c94859865ff46cd96e7ddba47",
   "data_folder": "data-soc-evidence-v5-r3",
   "source_cases": "data-soc-source-evidence-v5-r3/cases.jsonl",
   "source_cases_sha256": "dad7f409e64a628bc35602651e5f2f3e06a982f58c3d05516f7701828d8673e9",
@@ -19,7 +19,7 @@
   "spec_file_sha256": "5f8d54e0fc552cac4e88c77a762fff5f60a513afe05579b94afb6fa5310f30a0",
   "source_audit_sha256": "c7ca3b2ffdaed1380906bd091abdc4278b2f37828f1b9641fe6e096766ee5828",
   "source_sha256": {
-    "train.py": "a9256e9a03e700fe2caad60b2e54358914a471543908bf8adeb7d1c586e4335c",
+    "train.py": "7f43c4daf890f84d37d9695162cbe974f173c1730e9913e80942a519c741d774",
     "prepare_data.py": "a3cf3d2e24534298d1c09ce9cdcd1bd05b7a677107a7817ded4ec5448969fc5f",
     "model_profile.py": "52f902d46f9447b87328d2468645a64e376727a927b5f9a6068b2025798d314e",
     "bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
@@ -53,5 +53,27 @@
   "gold_derivation": "original_provider_labels",
   "project_authored_incident_scenarios": 0,
   "independent_expert_review": false,
-  "scope": "source-reported CTI mapping; no assurance of full SOC operational competence"
+  "scope": "source-reported CTI mapping; no assurance of full SOC operational competence",
+  "prior_attempt": {
+    "window_path": "attempts/v5-checkpointed-20261029/window.json",
+    "window_sha256": "0717bcb76c529af72bdec85101e3b6a479fdfc9f03740f85ee95a4e0fca9384d",
+    "smoke_path": "attempts/v5-checkpointed-20261029/outputs/soc-v5-smoke"
+  },
+  "total_approved_outage_seconds": 10800,
+  "optimization": "Activation checkpointing disable rejected after loss discrepancy and slower total smoke; return to original checkpointed computation. Same corpus and 1024-row full epoch. Existing three-hour approval is not extended.",
+  "additional_prior_attempts": [
+    {
+      "window_path": "attempts/v5-r4-nameerror-20261029/window.json",
+      "window_sha256": "cf00099595ef4bb90852aa0c1d0684c433bb4ce22c777e5fa596a1316f2a588a",
+      "reason": "NameError before optimizer initialization; restored, zero successful microbatches"
+    },
+    {
+      "window_path": "attempts/v5-uncheckpointed-rejected-20261029/window.json",
+      "window_sha256": "b4eae69f973d5af950fbf96f2693a6c20ba288deb36f03e2c507d15337448429",
+      "reason": "2-step completed, optimized smoke reference loss mismatch; restored original model"
+    }
+  ],
+  "planned_gradient_checkpointing": true,
+  "total_planned_outage_seconds": 16200,
+  "extended_window_approval": "pending"
 }

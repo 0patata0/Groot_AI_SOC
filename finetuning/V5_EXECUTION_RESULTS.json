@@ -1,0 +1,173 @@
+{
+  "updated_at_kst": "2026-10-29T12:04:45.407795+09:00",
+  "status": "smoke_experiments_completed_full_training_not_started",
+  "corpus": "data-soc-evidence-v5-r3",
+  "records": {
+    "train": 1024,
+    "validation": 128,
+    "test": 128
+  },
+  "data_unchanged": true,
+  "project_authored_incident_scenarios": 0,
+  "independent_expert_review": false,
+  "task_scope": "source-reported CTI technique mapping, not full SOC operations",
+  "attempts": [
+    {
+      "name": "checkpointed_reference",
+      "status": "two_step_completed_main_refused_by_time_guard",
+      "started_at_kst": "2026-10-29T11:29:31.035889+09:00",
+      "restored_at_kst": "2026-10-29T11:31:57.424268+09:00",
+      "steps": 2,
+      "distinct_train_observations": 2,
+      "gradient_checkpointing": true,
+      "train_loss": 0.5438567250967026,
+      "eval_loss": 0.5660265684127808,
+      "train_runtime_metric_seconds": 47.721,
+      "GPU_peak_allocated_GiB": 65.93,
+      "main_estimate_seconds": 13677.0,
+      "reason": "Predicted full epoch exceeds prior three-hour shared interruption plan"
+    },
+    {
+      "name": "checkpointing_scope_error",
+      "status": "failed_before_optimizer_initialization",
+      "started_at_kst": "2026-10-29T11:40:50.694327+09:00",
+      "restored_at_kst": "2026-10-29T11:42:30.963431+09:00",
+      "successful_microbatches": 0,
+      "error": "Agent-introduced NameError from misplaced local checkpointing variable; fixed and undefined-global regression added"
+    },
+    {
+      "name": "uncheckpointed_candidate",
+      "status": "two_step_completed_reference_loss_gate_rejected",
+      "started_at_kst": "2026-10-29T11:47:14.779679+09:00",
+      "restored_at_kst": "2026-10-29T11:50:00.014154+09:00",
+      "steps": 2,
+      "distinct_train_observations": 2,
+      "same_two_observations_as_reference": true,
+      "gradient_checkpointing": false,
+      "train_loss": 0.5438567250967026,
+      "eval_loss": 0.5763576626777649,
+      "train_runtime_metric_seconds": 63.0541,
+      "GPU_peak_allocated_GiB": 74.35,
+      "adopted": false,
+      "reason": "Evaluation loss differs beyond predeclared tolerance; no total-runtime improvement demonstrated. Cause and general performance not established."
+    }
+  ],
+  "artifact_inventory": [
+    {
+      "name": "checkpointed",
+      "path": "attempts/v5-checkpointed-20261029/outputs/soc-v5-smoke",
+      "run_manifest.json_sha256": "06d1a086795f23a51443c7d17ad9117fea960030d988ee127be254815d4d9f2a",
+      "train_results.json_sha256": "4d833b80edf4cebfc025668eeaa2e17f24b4895d701c8bac500ddd29b5a21a30",
+      "eval_results.json_sha256": "c52c3156488f106eae68d6412e1e7aaacc54b7852fa2002d2d571ee0e8095376",
+      "trainer_state.json_sha256": "416d86d026e7977d9bc59f6687be1481ffc08f0f11e022868dfd3017b329bdcd",
+      "successful_microbatch_lineage.jsonl_sha256": "6ddc5f9de170bc9f14c78a76159c230dab77989e79b859fec8fba8e6a050af6e",
+      "successful_microbatches": 2
+    },
+    {
+      "name": "scope_error",
+      "path": "attempts/v5-r4-nameerror-20261029/outputs/soc-v5-smoke",
+      "successful_microbatches": 0
+    },
+    {
+      "name": "uncheckpointed_rejected",
+      "path": "attempts/v5-uncheckpointed-rejected-20261029/outputs/soc-v5-smoke",
+      "run_manifest.json_sha256": "fb6c4c23bdf87ed5447c0d17e697119640380acec1f6dc4bdd79ea91f7b70faa",
+      "train_results.json_sha256": "11ce915044bcf60303784306e4a7f61ca17aa58f54b478dbdd1de1257a97b22a",
+      "eval_results.json_sha256": "7b55e38a8a84306ad794f6ddcb3c6695a828f34879c20227cc6d58d803359cd0",
+      "trainer_state.json_sha256": "139a3bed07985bccd3f1f18dc8b86e5cb9857db9ad9d4a37c0396a26a823b597",
+      "successful_microbatch_lineage.jsonl_sha256": "458cab3a86a75da74cf7711ff65aa94216efe0102df28a9fd325229c3d11ac25",
+      "successful_microbatches": 2
+    }
+  ],
+  "weights": {
+    "checkpointed": {
+      "finite_tensors": 380,
+      "nonzero_B_matrices": 190
+    },
+    "uncheckpointed": {
+      "finite_tensors": 380,
+      "nonzero_B_matrices": 190
+    },
+    "different_tensors": 190,
+    "maximum_absolute_difference": 9.944574230758008e-07,
+    "relative_l2_difference": 1.246406048091691e-06
+  },
+  "kernel_observations": {
+    "status_0x51_matching_lines": 2,
+    "observed_at_kst": [
+      "2026-10-29T11:48:41.906948+09:00",
+      "2026-10-29T11:48:41.958932+09:00"
+    ],
+    "observed_during": "uncheckpointed trial",
+    "container_OOMKilled": false,
+    "training_processes_completed": true,
+    "cause_or_resolution_confirmed": false
+  },
+  "actual_shared_interruption_seconds_total": 411.891958,
+  "original_35B_restored": true,
+  "original_35B_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+  "operating_model_selection_changed": false,
+  "approved_cleanup": {
+    "status": "completed",
+    "verified_and_deleted_shards": 26,
+    "deleted_bytes": 71903776776,
+    "folder": "exports/qwen36-soc-pilot-hf",
+    "all_full_SHA256_verified_before_removal": true,
+    "base_adapter_and_metadata_preserved": true,
+    "existing_Ollama_models_preserved": true,
+    "historical_HF_shards_now_require_regeneration": true,
+    "free_GiB_at_verification": 174.53658294677734
+  },
+  "latest_actual_CPU_tests": {
+    "count": 276,
+    "skips": 0,
+    "passed": true
+  },
+  "source_scope_bug_regression": "symtable undefined-global audit of all train.py function scopes, plus strict boolean config and real checkpointing-state check",
+  "development_operator_semantic_review": {
+    "cases": 12,
+    "critical": 5,
+    "major": 2,
+    "incomplete": 1,
+    "valid_alternative_read_branches_unscored": 4,
+    "scope": "agent review of existing raw-model offline development outputs; no real MCP/bot execution or independent expert review; not a global accuracy percentage"
+  },
+  "next_plan": {
+    "state": "pending_new_extended_shared_interruption_approval",
+    "gradient_checkpointing": true,
+    "selected_train_rows": 1024,
+    "epochs": 1,
+    "optimizer_steps": 512,
+    "batch_size": 1,
+    "accumulation": 2,
+    "learning_rate": 5e-07,
+    "estimated_main_seconds_from_reference": 13677,
+    "train_deadline_minutes": 245,
+    "independent_restore_minutes": 250,
+    "restore_timeout_minutes": 6,
+    "proposed_total_shared_interruption_minutes": 270,
+    "proposed_prior_plus_new_worst_seconds": 15771.891958,
+    "currently_approved_total_seconds": 10800,
+    "execution_guard_blocks_unapproved_extension": true,
+    "root_operator": "/usr/local/libexec/capstone-training-v5-r6-window.py",
+    "root_operator_SHA256": "f7f746556054c6600a6aee6e543a12f9fbaf30ed42e6f9fc3c21cd4123c77893",
+    "frozen_inputs_SHA256": "33754a20cabf032a51bfde8b4bcea29dcf0a3da5527818ba8b15cec93c4c428a",
+    "technical_readiness": true,
+    "actual_new_run_or_timer_started": false
+  },
+  "no_main_epoch_or_candidate_registered": true,
+  "final_test_128_answers_generated": false,
+  "actual_MCP_or_chat_or_attack_E2E": false,
+  "new_full_server_install_tested": false,
+  "vLLM_driver_or_operational_bot_selection_changed": false,
+  "remaining": [
+    "new shared-interruption extension approval",
+    "original-checkpointing smoke and full selected epoch",
+    "full lineage/tensor validation",
+    "CPU merge and GGUF export/candidate registration",
+    "same-control development and final holdout comparison",
+    "full FW read-only MCP",
+    "rollback-protected harness cleanup and 2x2 comparison"
+  ],
+  "Git_at_recording": "source/results/docs not yet committed; final publication receipt is STATUS.md and local session"
+}

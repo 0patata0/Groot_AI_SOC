@@ -40,6 +40,13 @@ def kst_now():
     return datetime.now(ZoneInfo('Asia/Seoul')).isoformat()
 
 
+def checkpointing_enabled(config):
+    value = config.get('gradient_checkpointing', True)
+    if not isinstance(value, bool):
+        raise ValueError('gradient_checkpointing must be a boolean')
+    return value
+
+
 def final_eval_metrics(trainer):
     """Reuse an evaluation only when it describes the final optimizer step."""
     for entry in reversed(trainer.state.log_history):
@@ -73,6 +80,7 @@ def read_config(path):
         config.setdefault('assistant_only_logits',True)
     if 'assistant_only_logits' in config and not isinstance(config['assistant_only_logits'],bool):
         raise ValueError('assistant_only_logits must be a boolean')
+    checkpointing_enabled(config)
     return config
 
 
@@ -324,6 +332,7 @@ def run_training(config, checks, hardware):
     memory_telemetry.record(output,torch.cuda,phase='loading_model')
     dtype = torch.bfloat16 if hardware["bf16_supported"] else torch.float16
     quantized = config.get("quantization", "nf4") == "nf4"
+    checkpointing = checkpointing_enabled(config)
     model_args = model_profile.loading_kwargs(config)
     if quantized:
         model_args['quantization_config'] = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=dtype)
@@ -344,7 +353,7 @@ def run_training(config, checks, hardware):
     if hasattr(model.config, 'text_config'): model.config.text_config.use_cache = False
     coverage = model_profile.check_lora_targets(config, model.named_modules())
     if quantized:
-        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True,
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=checkpointing,
             gradient_checkpointing_kwargs={"use_reentrant": False})
     else:
         # Preserve frozen BF16 MoE weights: k-bit preparation can upcast them to FP32.
@@ -361,7 +370,7 @@ def run_training(config, checks, hardware):
         lr_scheduler_type="cosine", warmup_ratio=config["warmup_ratio"], optim="paged_adamw_8bit" if quantized else "adamw_torch",
         logging_steps=config["logging_steps"], eval_strategy="steps", eval_steps=config["eval_steps"],
         save_strategy="steps", save_steps=config["save_steps"], save_total_limit=config["save_total_limit"],
-        bf16=hardware["bf16_supported"], fp16=not hardware["bf16_supported"], gradient_checkpointing=True,
+        bf16=hardware["bf16_supported"], fp16=not hardware["bf16_supported"], gradient_checkpointing=checkpointing,
         gradient_checkpointing_kwargs={"use_reentrant": False}, max_grad_norm=1.0, seed=config["seed"], data_seed=config["seed"],
         report_to=[], push_to_hub=False, remove_unused_columns=False, label_names=["labels"],
         prediction_loss_only=True, dataloader_num_workers=0, disable_tqdm=True,
@@ -403,6 +412,8 @@ def run_training(config, checks, hardware):
             first_step_trace.stop()
             self.record(state, 'training')
         def on_train_begin(self, args, state, control, **kwargs):
+            if bool(model.is_gradient_checkpointing) != checkpointing:
+                raise RuntimeError('Actual activation checkpointing differs from the reviewed configuration')
             self.record(state, 'training')
             first_step_trace.start()
 

@@ -927,5 +927,18 @@
     "Prepared conversation counts, admitted token prefixes, and optimizer updates are distinct. R2 192 conversations/390 prefixes is the pool;48-step accum2 records epoch0.246153846, not one full epoch.",
     "First smoke base_revision_resolved is null; config pins the revision but that field is not retroactively populated.",
     "No past run used every newly surveyed dataset; citation of a candidate does not establish training use."
+  ],
+  "subsequent_run_ledgers": [
+    {
+      "path": "V5_EXECUTION_RESULTS.json",
+      "corpus": "data-soc-evidence-v5-r3",
+      "scope": "New original-provider MITRE/CISA source-labelled CTI observations; two completed 2-step trials on the same two selected training observations, one zero-step code failure; no 1024-row main epoch yet. Historical 3 corpora/12 runs below remain unchanged.",
+      "source_references": [
+        "mitre_attack_pinned_20261029",
+        "cisa_blacksuit_royal_aa23_061a",
+        "cisa_volt_typhoon_aa24_038a",
+        "cisa_black_basta_aa24_131a"
+      ]
+    }
   ]
 }

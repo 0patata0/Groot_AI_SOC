@@ -1,5 +1,18 @@
 # thor-05용 Qwen3.6-35B 학습
 
+## V5 실제 시험 결과·연장안 (2026-10-29 KST)
+
+[V5 실행원장](V5_EXECUTION_RESULTS.json)을 최신기준으로한다. 첫checkpointed2-step은정상/380tensorfinite·190LoRA B업데이트·최대65.93GiB,전체예상13677초(3h47m57s)로기존3시간계획의시간가드가본학습진입을거절했다. 이어서도입한변수선언위치실수(NameError/학습0step)는run_training지역선언으로수정하고symtable전함수미정의global검사를추가했다. checkpointing=False2-step은finite/190B업데이트이나검증loss0.576358vs0.566027/게이트불일치·기록train_runtime63.05vs47.72초로이시험에서시간이득이없어채택하지않는다. 학습loss는같았고adapter190tensor차이/최대절대약9.94e-7이다. 이는최종정확도나분포전체의열화증명이아니다.
+
+같은uncheckpointed시험시각0x51커널경고2줄관측/컨테이너OOM종료0,원인확정·해결아님. 원래checkpointing=True를명시복구했다. actual모델flag확인·입력/정답·손실일관성게이트를유지하며독립복구와모든과거source/output/status를attempts에보존했다. 원35B마지막시험후11:50KST복구·누적중단411.891958초(6분51.9초),새본학습/모델등록0.
+
+실제CPU276검사생략0·root소유`/usr/local/libexec/capstone-training-v5-r6-window.py`의기술check통과. 새계획은245분학습한계/250분독립복구/복구6분한계,이전실중단포함최악15771.89초(4h22m51.9s)로**총4h30m검토안**이다. 현재실승인은여전히총3h이므로`total_planned_outage_seconds > total_approved_outage_seconds`이면서비스/타이머호출전에run을거절한다. 이차단은실입력+mock서비스격리검사로확인했고,추가실행/복구타이머는기동하지않았다. 새시간범위승인후승인값·frozenSHA와root복사본을맞춘뒤에만실행한다.
+
+승인된옛`exports/qwen36-soc-pilot-hf/model-00001-of-00026.safetensors`~26만전SHA/크기를검증후삭제했다(71,903,776,776B). 원base/adapter/병합manifest·토크나이저/인덱스/라이선스와Ollama태그는보존·HF_SHARDS_REMOVED표식을남겨과거HF재사용에는재생성이필요함을표시했다. 가용약174.5GiB,새변환/Q4검증뒤이번BF16중간파일을정리하고등록공간을확보한다. Mac가중치/패키지다운로드설치0. 루트deploy서비스설정/driver/vLLM/봇모델선택변경0.
+
+이하 문구는 이전 준비 시점의 기록이다.
+
+
 ## V5 준비·실행 절차 (2026-10-29 KST)
 
 현재 corpus는 `data-soc-evidence-v5-r3`(1024/128/128)이다. `V5_TRAINING_INPUTS.json` SHA를 고정한 root소유 `capstone-training-v5-window.py`로만 신규 공유중단 실행을 제어한다. V3/V4는 출처/정답검수 사유로 보류를 유지한다. `soc-v5-tokenize`는 기존 고정이미지·CPU12GiB·GPU/네트워크 없음, `soc-v5-smoke`는 최장2입력/2-step, `soc-v5-train`은 원base부터512step/accum2/1epoch/lr5e-7이다. 토큰화만으로 학습하지 않는 회귀검사를 포함한다.

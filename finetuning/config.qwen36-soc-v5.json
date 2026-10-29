@@ -34,5 +34,6 @@
   "require_all_prefixes": true,
   "assistant_only_logits": true,
   "record_prefix_usage": true,
-  "loss_mode": "all_assistant_turns"
+  "loss_mode": "all_assistant_turns",
+  "gradient_checkpointing": true
 }

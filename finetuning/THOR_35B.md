@@ -1,5 +1,9 @@
 # thor-05용 Qwen3.6-35B 학습
 
+**R8 완료 — 2026-10-29 23:12 KST:** 전체1,024관측/512단계·1epoch 완료, 원자료 lineage·380개 유한 텐서/190LoRA쌍을 검증했다. 기존35B는23:10 자동복구되고 원digest/실제응답을 재확인했다. 어댑터는 Thor `~/Capstone_Groot_training/qwen36-20261027/outputs/soc-v5-train/adapter/`에 보존한다. 병합/GGUF후보·운영 전환·최종 품질 비교는 미실행이며 완료된 실행을 재시작하지 않는다. [실행·복구 결과](V5_EXECUTION_RESULTS.json) · [현황/남은 작업](../STATUS.md).
+
+아래 실행/재현 절차와 진행 문구는 해당 시점의 이력이다.
+
 **R8 원격 본 학습:** 18:08 KST시작·예상 23:36 KST. systemd감독+분리Docker/340분제한·345분독립복구·300분진행조회, 원35B복구확인후완료범위검증·자동승격없음. SSH/Mac접속종료는학습을종료하지않는다. [실행안내](EVALUATION_REPRODUCTION.md) · [현황](../STATUS.md).
 
 아래는 과거 기록이다.

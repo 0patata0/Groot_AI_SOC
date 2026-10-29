@@ -145,5 +145,13 @@
     "rights-and-format-audit.json": "975a016be05e48835e3f2dd9dad9118d3b6ae7fb30d26652d5cfb96c7904db8a",
     "source-inventory.json": "74934850c38e6cd87c634057e419bff8fb3c97238ffe39879a2408e1af4a2cc9"
   },
-  "next_priority": "OpTC bounded raw-record/ground-truth linkage; LANL after access-form decision; CMU after provider rights and missing-file clarification."
+  "next_priority": "OpTC bounded raw-record/ground-truth linkage; LANL after access-form decision; CMU after provider rights and missing-file clarification.",
+  "optc_prefix_followup": {
+    "at_kst": "2026-10-30T02:54:24.835474+09:00",
+    "report": "OPTC_EVIDENCE_REVIEW.json",
+    "complete_prefix_rows": 31797,
+    "full_incident_linkage": false,
+    "provider_quota_on_both_full_files": true,
+    "training_examples_admitted": 0
+  }
 }

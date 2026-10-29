@@ -1,5 +1,15 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**OpTC 원본 검사기 — 2026-10-30 KST:** [OPTC_EVIDENCE_REVIEW.json](OPTC_EVIDENCE_REVIEW.json)에 실제 prefix31,797행과 시각/부분입력 한계를 기록했습니다. `inspect_optc_evidence.inspect_prefix`는 gzip 시작부분 bytes와 원본 크기를 받아 완전/부분 입력을 구분합니다. `scan_records`는 JSONL iterator를 끝까지 읽고 제한된 메타데이터만 보존하며, 전체 파일 무결성은 호출 측의 별도 검증이 필요합니다. 두 함수 모두 악성 정답·학습 대화를 만들지 않습니다.
+
+```bash
+python3 -B -m unittest discover -s finetuning/tests -p test_optc_evidence.py
+```
+
+Mac/Thor 최종11검사 통과. 서버의 전체 스트림 시도는 제공자 quota로 종료됐고 목표 사건 연결/신규 편입은 미완료입니다. 원장·검사 소스를 pack 목록에 추가했으며 원문 표본/초안을 자동 학습 입력으로 넣지 않습니다. [출처와 한계](DATA_SOURCES.md).
+
+이하 이전 검토·작업 이력이다.
+
 **추가 원천 검토 — 2026-10-30 KST:** [SOC_SOURCE_ACCESS_REVIEW.json](SOC_SOURCE_ACCESS_REVIEW.json)에 CMU 이용 조건 충돌/상세파일1개 누락, LANL 양식 대기, OpTC 정답102타임라인 항목과 선택 로그 위치를 기록했습니다. 원문·대화/학습 개수를 구분하며 신규 편입0입니다. [출처/한계](DATA_SOURCES.md). 원장만 재현pack의 소스 목록에 추가했고 원문·검토 초안은 학습 데이터로 자동 포함하지 않습니다.
 
 이하 이전 검토·작업 이력이다.

@@ -353,5 +353,13 @@
     "LANL selected multi-source episodes",
     "BOTS after official answer/export access",
     "OpTC after small-file feasibility check"
-  ]
+  ],
+  "optc_prefix_followup": {
+    "at_kst": "2026-10-30T02:54:24.835474+09:00",
+    "report": "OPTC_EVIDENCE_REVIEW.json",
+    "complete_prefix_rows": 31797,
+    "full_incident_linkage": false,
+    "provider_quota_on_both_full_files": true,
+    "training_examples_admitted": 0
+  }
 }

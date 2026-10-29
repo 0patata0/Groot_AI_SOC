@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T02:54:24.835474+09:00",
+  "status": "prefix_format_verified_full_incident_linkage_incomplete_provider_quota",
+  "source_repository": "https://github.com/FiveDirections/OpTC-data",
+  "source_commit": "5b108604f11f767aa11ea79ff827595f3fad15fd",
+  "rights_and_ground_truth": "SOC_SOURCE_ACCESS_REVIEW.json",
+  "files": [
+    {
+      "name": "early",
+      "source_id": "1pJLxJsDV8sngiedbfVajMetczIgM3PQd",
+      "expected_file_bytes": 109692169,
+      "compressed_prefix_bytes": 1048576,
+      "compressed_prefix_sha256": "b52ec83bd49cc1561e2986b867c56744b597fbb69d4b5e4b4283628d7ccb7066",
+      "decompressed_prefix_bytes": 9170915,
+      "decompressed_prefix_sha256": "143e61f51b13e5cb919c3548e9d93377d5d1ffc6792c4f845e8171e2c294d31f",
+      "partial_tail_bytes": 456,
+      "counts": {
+        "complete_lines": 16510,
+        "parsed_objects": 16510,
+        "rejected_lines": 0,
+        "unknown_timestamp": 0,
+        "missing_event_id": 0,
+        "duplicate_event_id": 0,
+        "target_host_records": 0
+      },
+      "observed_time_range": {
+        "min_source": "2019-09-22T23:21:58.744000-04:00",
+        "max_source": "2019-09-23T09:14:07.278000-04:00",
+        "min_kst": "2019-09-23T12:21:58.744000+09:00",
+        "max_kst": "2019-09-23T22:14:07.278000+09:00"
+      },
+      "target_host": "Sysclient0201",
+      "target_time_range": null,
+      "timestamp_representations": {
+        "timestamp:str": 16510
+      },
+      "coverage": "prefix_only",
+      "whole_file_read": false,
+      "gzip_integrity_verified": false,
+      "adjacent_time_regressions": 6118,
+      "selected_prefix_complete": true
+    },
+    {
+      "name": "last",
+      "source_id": "1HFSyvmgH0jvdnnnTdKfWRjZYOrLWoIkv",
+      "expected_file_bytes": 2217842713,
+      "compressed_prefix_bytes": 1048576,
+      "compressed_prefix_sha256": "84ef8a992d0b11d912802151a35fb6e0245f7b997583d2778d81019437290027",
+      "decompressed_prefix_bytes": 8538376,
+      "decompressed_prefix_sha256": "0a539fda79bec8e600fa9cf0a813dd2bcdffe8e684cc844445e74fb972ed3257",
+      "partial_tail_bytes": 474,
+      "counts": {
+        "complete_lines": 15287,
+        "parsed_objects": 15287,
+        "rejected_lines": 0,
+        "unknown_timestamp": 0,
+        "missing_event_id": 0,
+        "duplicate_event_id": 0,
+        "target_host_records": 0
+      },
+      "observed_time_range": {
+        "min_source": "2019-09-22T23:56:29.760000-04:00",
+        "max_source": "2019-09-23T10:11:12.248000-04:00",
+        "min_kst": "2019-09-23T12:56:29.760000+09:00",
+        "max_kst": "2019-09-23T23:11:12.248000+09:00"
+      },
+      "target_host": "Sysclient0201",
+      "target_time_range": null,
+      "timestamp_representations": {
+        "timestamp:str": 15287
+      },
+      "coverage": "prefix_only",
+      "whole_file_read": false,
+      "gzip_integrity_verified": false,
+      "adjacent_time_regressions": 5353,
+      "selected_prefix_complete": true
+    }
+  ],
+  "combined_prefix_counts": {
+    "complete_lines": 31797,
+    "unique_event_ids_across_both_prefixes": 31797,
+    "duplicate_event_ids_across_files": 0,
+    "semantic_duplicate_process_objects_checked": false
+  },
+  "adjacent_time_regressions": 11471,
+  "schema_findings": {
+    "observed_timestamp": "ISO 8601 text in timestamp, with explicit -04:00 offset in all 31,797 complete prefix rows; not numeric timestamp_ms as a schema-only assumption.",
+    "filename_date_is_not_event_date": true,
+    "report_timezone_confirmed": false,
+    "report_clock_alignment": "Any -04:00 report-window interpretation remains a review hypothesis until event linkage confirms it.",
+    "event_order": "Top-level event times regress in 11,471 adjacent comparisons across the two prefixes. Do not stop scanning merely because a later event time has been seen.",
+    "known_duplicate_process_errata_resolved": false
+  },
+  "target_incident_linkage": {
+    "target_host": "Sysclient0201",
+    "target_host_rows_in_prefixes": 0,
+    "incident_linked": false,
+    "reason": "Prefixes do not establish the selected report incident or whole-file host absence. Full scan was blocked by provider quota."
+  },
+  "format_projection_check": {
+    "secondary_host": "Sysclient0205",
+    "metadata_samples_independently_checked": 17,
+    "purpose": "Time/UUID/line SHA projection verification only; not replacement incident evidence or benign labels.",
+    "source_queries_commands_credentials_copied": false
+  },
+  "implementation": {
+    "module": "inspect_optc_evidence.py",
+    "sha256": "b09f12cade36412442f57bb590f1301e488cbdd5237352bf3d2227e6e995b46f",
+    "tests": "tests/test_optc_evidence.py",
+    "tests_sha256": "ed50134a1ba5d41ace039b3427acfd4673889e538be4d1da435159daf1e6850c",
+    "local_tests_passed": 11,
+    "thor_final_tests_passed": 11,
+    "final_prefix_replay_identical": true,
+    "omission_checks": [
+      "Partial gzip versus complete integrity/EOF",
+      "Malformed/non-object rows, unknown/conflicting time and absent IDs",
+      "Correct single KST conversion with explicit timezone",
+      "Bounded samples retain total row counts and do not copy commands",
+      "Out-of-order events do not terminate scan",
+      "Oversized lines/output fail explicitly"
+    ],
+    "R1_source_sha256": "48eb12a1992f91673063a51108351e8b6ac1ce87d8aa5999365e617a4de1726c",
+    "final_difference": "Unused JSON serialization removed; executed R1 source preserved on Thor."
+  },
+  "remote_attempt": {
+    "path": "~/Capstone_Groot_training/qwen36-20261027/optc-review-20261030-r1",
+    "launch_kst": "2026-10-30T02:45:44.308350+09:00",
+    "deadline_seconds": 720,
+    "cpu_cores": 1,
+    "nice": 10,
+    "result": "failed_or_partial",
+    "finished_at_kst": "2026-10-30T02:45:47.575763+09:00",
+    "completed_full_files": 0,
+    "provider_followup": "Both selected full-file requests returned an HTML quota-exceeded notice. Requests stopped; no copies, alternate identities or quota bypass used.",
+    "provider_checked_at_kst": [
+      "2026-10-30T02:47:41.484865+09:00",
+      "2026-10-30T02:48:35.521593+09:00"
+    ],
+    "terminal_verified_at_kst": "2026-10-30T02:50:50.337084+09:00",
+    "supervisor_present": false,
+    "worker_present": false,
+    "ollama_active_at_terminal_check": true,
+    "full_scan_restarted_after_quota": false,
+    "raw_archives_saved_on_Thor": false
+  },
+  "scope": {
+    "new_training_examples_admitted": 0,
+    "gpu_training_started": false,
+    "production_configuration_changed": false,
+    "mcp_or_chat_e2e": false,
+    "attack_e2e": false,
+    "full_pack_or_new_server_install": false,
+    "provider_integrity_for_entire_archives_verified": false
+  },
+  "local_evidence_sha256": {
+    "prefix-inspection-r1.json": "c89d3a974c0dec3837fac8057334cf82d0c0a99e5c0e00e7e05eeb9bdd748296",
+    "independent-prefix-check.json": "26c1ce9c222df982988d2bd3d4849cd8ee4c693cbcd93fe459341d9a4f8e3315",
+    "cross-prefix-id-check.json": "bbb1186af14b0a174d33daeb06dc2aebfb3cc1c24d96d98d9219a50f15850393",
+    "remote-terminal-and-provider-check.json": "5d605cb1d382bea8a672b5a954b28067c2d36363a1588e0c8345f6f3e93a7235",
+    "launch.json": "3370b76bdbf25aad841ae432ea04d4731bd769b82a9886a2754b6cc41819caa8",
+    "final-code-check.json": "916080f031a86da7eda3c5c34df601257cd55d23d3a116d7e9aadb13edbee7fb"
+  },
+  "next_required": [
+    "Retry source acquisition only after provider availability changes; no automatic retry loop.",
+    "Link target-host events/UUID/PID/artifacts to source report and resolve timezone hypothesis.",
+    "Apply semantic duplicate-process/hash/path errata; absence in a prefix is not whole-file absence.",
+    "Review factual claims and group connected source families before selecting new development/final cases.",
+    "Actual MCP/approval/write/rollback evidence remains a separate requirement."
+  ]
+}

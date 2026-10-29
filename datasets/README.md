@@ -199,7 +199,7 @@
 | `knowledge/attack_tactics.jsonl` | 〃 `x-mitre-tactic` | **15** | 전술 설명 |
 | `knowledge/attack_revoked_map.jsonl` | 〃 `revoked-by` | **157** | 폐기 id → 대체 id (CTID 14~16 매핑 등 **구버전 id 를 19.2 로 정규화**할 때 사용) |
 | `knowledge/tram_sentences.jsonl` | CTID **TRAM** bootstrap+merged+tram2(single/multi) · Apache-2.0 | **47,805 문장** (라벨 22,286, 다중 799, 비라벨 25,519=음성) | **문장 → 기법 ID** 주석(disposition=accept 만). **미지 기법 ID 0**(활성+폐기 id 로 검증). 로그/경보 텍스트에서 `attack_chain` 을 뽑는 능력의 지도 데이터 |
-| `knowledge/attack_flows.jsonl` | CTID **Attack Flow** corpus(.afb 빌더 포맷) · Apache-2.0 | **41 사건** (액션 952, 간선 610) | 실제 사건의 **기법 순서 체인**(anchor/latch 로 간선 복원, BFS 순서). 예 Black Basta 38액션·37간선. **T1190 포함 사건 7개**(CISA Iranian APT, FIN13…). 간선 복원 실패 2건(Conti CISA Alert·Example Attack Tree: 순서 없이 액션만) |
+| `knowledge/attack_flows.jsonl` | CTID **Attack Flow** corpus(.afb 빌더 포맷) · Apache-2.0 | **41 흐름**: 원본 scope상 사건 25, 악성코드 8, 캠페인 3, 행위자 2, 훈련계획 2, 공격트리 1 | **2026-10-30 정정:** 41개 모두 실제 독립 사건이라는 기존 설명은 잘못됐다. 기존 최소 변환본의 액션 952·직접 액션 간선 610은 전체 그래프가 아니다. 원본 조건 147·AND 89·OR 29, 연결 2,113개의 분기 의미를 보존하지 않으며 BFS 나열을 시간순 정답으로 사용할 수 없다. 기존 변환본은 이력으로 보존하고 학습 정답 사용을 보류한다. [전수 대조/한계](../finetuning/SOC_ADDITIONAL_DATA_REVIEW.json) |
 | `reference/ttp_mapping.jsonl` | tumeteor/Security-TTP-Mapping | 3,519 | 절차 문장→기법. **라이선스 모호(README 배지 CC-BY-NC-SA vs 본문 CC-BY) → 학습 제외, 참고/평가용** |
 
 **남은 ATT&CK 관련 공백(스크랩으로 안 됨, 작성 필요)**: 우리 시나리오↔기법 정답표(S1 T1595/T1190/T1110, S2 T1190/T1059/T1071, S3 T1068/T1548 등)를 `scenarios/alerts.md` 룰 매트릭스와 함께 ground truth 로 작성해야 한다. 한국어 ATT&CK 번역은 공식본 없음.

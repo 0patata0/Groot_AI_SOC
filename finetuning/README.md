@@ -1,5 +1,7 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**추가 실제 데이터 원천 — 2026-10-30 KST:** Linux-APT·DEDALE·CTU-SME-11·Hornet65·AuditBench를 조사했습니다. Wazuh CSV 887행과 DEDALE 라벨 ZIP의 무결성/한 멤버 10,593행 형식을 확인했습니다. [출처·용도·제약](DATA_SOURCES.md) · [파일별 검증](SOC_ADDITIONAL_DATA_REVIEW.json). 기관 자료의 원행 수를 학습 대화 수로 세지 않으며 신규 편입은0입니다. 원시자료를 pack에 넣지 않고 검토 원장만 포함합니다. DEDALE 공식 시험 분할과 OpTC 파생 중복을 보존하고, 이용 조건 미확인 AuditBench/SecCoRA 등은 편입 보류입니다.
+
 **OpTC 원본 검사기 — 2026-10-30 KST:** [OPTC_EVIDENCE_REVIEW.json](OPTC_EVIDENCE_REVIEW.json)에 실제 prefix31,797행과 시각/부분입력 한계를 기록했습니다. `inspect_optc_evidence.inspect_prefix`는 gzip 시작부분 bytes와 원본 크기를 받아 완전/부분 입력을 구분합니다. `scan_records`는 JSONL iterator를 끝까지 읽고 제한된 메타데이터만 보존하며, 전체 파일 무결성은 호출 측의 별도 검증이 필요합니다. 두 함수 모두 악성 정답·학습 대화를 만들지 않습니다.
 
 ```bash

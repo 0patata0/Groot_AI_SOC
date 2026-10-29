@@ -361,5 +361,14 @@
     "full_incident_linkage": false,
     "provider_quota_on_both_full_files": true,
     "training_examples_admitted": 0
-  }
+  },
+  "followup_reviews": [
+    {
+      "review": "SOC_ADDITIONAL_DATA_REVIEW.json",
+      "reviewed_at_kst": "2026-10-30T08:34:45.583664+09:00",
+      "new_source_families": 5,
+      "training_admitted": 0,
+      "scope": "New real-file checks and metadata; preserve earlier candidate review history."
+    }
+  ]
 }

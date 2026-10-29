@@ -369,7 +369,7 @@
   title = {{StopRansomware: Black Basta, AA24-131A}},
   year = {2024},
   url = {https://www.cisa.gov/sites/default/files/2024-05/aa24-131a-joint-csa-stopransomware-black-basta_1.pdf},
-  note = {Pinned PDF SHA256 0a9b0d2ff1a3e47654f5ff9e0a0398d65515a8e0237e7434c15974c0514b92f7; pp. 4--5, Tables 2--6. Accessed 2026-10-29 KST. V5 final held-out report; model answers not yet generated.}
+  note = {Pinned PDF SHA256 0a9b0d2ff1a3e47654f5ff9e0a0398d65515a8e0237e7434c15974c0514b92f7; pp. 4--5, Tables 2--6. Accessed 2026-10-29 KST. At preparation this was the V5 final held-out report. Correction 2026-10-30: the 128-item final evaluation has since been consumed; not a fresh unseen test.}
 }
 
 % Additional SOC source candidates, reviewed 2026-10-30; not yet training inputs.
@@ -397,4 +397,79 @@
   year = {2020},
   url = {https://github.com/splunk/botsv3/tree/5f556f8b4c4ce0bd7498e642fdb52801e89bee0f},
   note = {CC0-1.0 repository; release announcement dated 2020-03-18. Official question/answer set offered separately by request. Accessed 2026-10-30; candidate only, not acquired or trained.}
+}
+
+% Additional raw-log sources reviewed 2026-10-30; no training admission.
+@misc{karim2024linux_apt_data,
+  author = {Karim, Sohaib},
+  title = {{Linux-APT-Dataset-2024}},
+  year = {2024},
+  publisher = {Zenodo},
+  doi = {10.5281/zenodo.10685642},
+  url = {https://zenodo.org/records/10685642},
+  note = {CC BY 4.0 metadata; actual logs from emulated attacks. Two CSV files (887 rows) and rule XML checked; not adjudicated training dialogues.}
+}
+@article{karim2024linux_apt_paper,
+  author = {Karim, Syed Sohaib and Afzal, Mehreen and Iqbal, Waseem and Al Abri, Dawood},
+  title = {Advanced Persistent Threat (APT) and intrusion detection evaluation dataset for linux systems 2024},
+  journal = {Data in Brief},
+  volume = {54},
+  pages = {110290},
+  year = {2024},
+  doi = {10.1016/j.dib.2024.110290}
+}
+@misc{lanvin2026dedale_data,
+  author = {Lanvin, Maxime and Majorczyk, Frederic},
+  title = {{DEDALE: Dataset for Evaluating Detection of APT among Logs and Events}},
+  publisher = {Recherche Data Gouv},
+  year = {2026},
+  doi = {10.57745/Y5JLDG},
+  url = {https://dedale.inria.fr/download.html},
+  note = {Repository V2.1 inspected 2026-10-30; CC BY 4.0 terms. Author-recommended temporal train/test separation retained; label archive integrity check is not full raw-log validation.}
+}
+@inproceedings{lanvin2026dedale_paper,
+  author = {Lanvin, Maxime and Majorczyk, Frederic},
+  title = {{Get Out of DEDALE with RESCOUSSE: A New Dataset and Testbed for Evaluating the Detection of APT Attacks Among Network and System Logs}},
+  booktitle = {Computer Security. ESORICS 2025 International Workshops},
+  series = {Lecture Notes in Computer Science},
+  volume = {16232},
+  pages = {3--23},
+  year = {2026},
+  doi = {10.1007/978-3-032-16092-8_1},
+  note = {Publisher first online 2026-05-01; workshops associated with ESORICS 2025, not claimed main-conference paper.}
+}
+@misc{bendl2023ctu_sme11,
+  author = {Bendl, Stepan and Valeros, Veronica and Garcia, Sebastian},
+  title = {{CTU-SME-11: a labeled dataset with real benign and malicious network traffic mimicking a small medium-size enterprise environment}},
+  publisher = {Zenodo},
+  year = {2023},
+  doi = {10.5281/zenodo.7958259},
+  url = {https://zenodo.org/records/7958259},
+  note = {University dataset associated with a masters thesis, not asserted peer-reviewed publication. CC BY 4.0 metadata; 11-device summary checked, raw archives not acquired.}
+}
+@misc{valeros2024hornet65_data,
+  author = {Valeros, Veronica and Garcia, Sebastian},
+  title = {{CTU Hornet 65 Niner: A Network Dataset of Geographically Distributed Low-Interaction Honeypots}},
+  publisher = {Mendeley Data},
+  year = {2024},
+  doi = {10.17632/nt4p9zsv5k.1},
+  url = {https://data.mendeley.com/datasets/nt4p9zsv5k/1},
+  note = {CC BY 4.0 dataset record. Real Internet observations; not independently adjudicated compromise labels. Raw file verification pending.}
+}
+@article{valeros2025hornet65_paper,
+  author = {Valeros, Veronica and Garcia, Sebastian},
+  title = {{CTU Hornet 65 Niner: A network dataset of geographically distributed low-interaction honeypots}},
+  journal = {Data in Brief},
+  volume = {58},
+  pages = {111261},
+  year = {2025},
+  doi = {10.1016/j.dib.2024.111261}
+}
+@misc{anand2026auditbench,
+  author = {Anand, Aniket and Hou, Yiwei and Fields, Daniel and Kantchelian, Alex and Tao, David and Thomas, Kurt and Ho, Grant},
+  title = {Benchmarking and Exploring the Capabilities of LLMs for Attack Investigations},
+  year = {2026},
+  doi = {10.48550/arXiv.2606.10281},
+  url = {https://arxiv.org/abs/2606.10281v2},
+  note = {Preprint v2, 2026-09-26; peer-reviewed acceptance not verified. Repository 369ad441f2876245d0db19990c77ccbcb74a0a3a metadata checked; explicit data license not found, no training admission.}
 }

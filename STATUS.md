@@ -1,5 +1,15 @@
 # 인프라 현황 — 2026-10-30 현재 작업 상태
 
+## 추가 실제 데이터5원천 검토·소형 원본 검증 — 2026-10-30 KST
+
+- **완료:** Linux-APT·DEDALE·CTU-SME-11·Hornet65·AuditBench의 기관/연구자 출처·논문·파일 목록·권리 조건을 검토했다. Linux-APT CSV2개887행/XML, DEDALE 라벨 ZIP2,669,407B/5멤버CRC·한JSONL10,593행, CTU-SME 공식11기기 집계의 제공 MD5/자체 SHA를 확인했다. [범위·한계](finetuning/DATA_SOURCES.md) · [기계판독 근거](finetuning/SOC_ADDITIONAL_DATA_REVIEW.json).
+- **정정:** CTU-SME99,993,509흐름 중 한Ubuntu 장비97.84% 편향, Linux-APT 룰 라벨/SCA 참조 한계, DEDALE 공식 시험기간/부분집합 중복을 기록했다. AttackFlow41원본은 upstream과41/41일치하나 사건 scope25개이며, 기존 변환본이 조건147/AND89/OR29 의미를 보존하지 않는 사실을 정정했다. 기존 원문/변환본은 보존하고 새 파서는 미구현이다.
+- **배포/운영:** 공개 출처·원장·README·계획과pack 소스목록만 변경했다. 서버 반입·새 학습·GPU/모델·봇·보안정책 변경0. CISA3PDF403, Hornet 직접접근 TLS검증실패, Thor SSH timeout은 기본/재시도에서 확인했다. **현재 Thor 서비스 상태는 미확인**이며 과거02:55 Ollama active와 구분한다. 서비스/포트/패키지 변경이 없어deploy.sh/오프라인목록은 불변이다.
+- **미완료:** 학습 편입0, 사건 단위 정제/독립 정답검수·source-family분할·CTU/Hornet 원로그 확인·DEDALE 원로그 연결·전체pack/Thor반입·실제MCP/채팅/공격E2E·새서버설치는 미실행이다. AuditBench/SecCoRA 명시적 이용 조건과 IoT23 문구불일치 해결 전 학습 편입을 보류한다. 기존 R8 운영 미승격 판단을 유지한다.
+- **검증/Git:** 작은 원본3,795,872B는 메모리에서 처리하고 프로젝트에는 출처/해시/집계를 기록했다. 신규 패키지/원시archive/모델 Mac설치·보존0. 원장/인용/집계·pack구문·R8고정입력 검증과 자동 커밋·푸시 결과는 마감 영수증에 구분한다. 이 현황 수정 자체는 게시 완료가 아니다.
+
+이하 이전 검토·작업 이력이다.
+
 ## OpTC 부분 원문 검증 완료·전체 사건 연결 미완료 — 2026-10-30 KST
 
 - **완료:** 선택2파일의 첫1MiB씩에서31,797완전 JSON행·파싱/시간대불명0·표본 event ID고유31,797을 독립 대조했다. 명시적-04:00 문자열 timestamp와 인접시각 역전11,471회를 확인해 숫자형/파일명시각/정렬 가정을 금지했다. 목표호스트0은 prefix 범위 사실이며 정상/전체부재 정답이 아니다. [출처·원장](finetuning/OPTC_EVIDENCE_REVIEW.json).

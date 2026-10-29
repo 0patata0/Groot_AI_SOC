@@ -1,5 +1,5 @@
 {
-  "version": "v5-r6-original-checkpointing-extended-plan",
+  "version": "v5-r6-plan-only-user-deferred",
   "prepared_at_kst": "2026-10-29T11:59:15.546222+09:00",
   "profile": "config.qwen36-soc-v5.json",
   "profile_sha256": "98be021b89748419a554bdf987978920497c268c94859865ff46cd96e7ddba47",
@@ -59,7 +59,7 @@
     "window_sha256": "0717bcb76c529af72bdec85101e3b6a479fdfc9f03740f85ee95a4e0fca9384d",
     "smoke_path": "attempts/v5-checkpointed-20261029/outputs/soc-v5-smoke"
   },
-  "total_approved_outage_seconds": 10800,
+  "total_approved_outage_seconds": 16200,
   "optimization": "Activation checkpointing disable rejected after loss discrepancy and slower total smoke; return to original checkpointed computation. Same corpus and 1024-row full epoch. Existing three-hour approval is not extended.",
   "additional_prior_attempts": [
     {
@@ -75,5 +75,19 @@
   ],
   "planned_gradient_checkpointing": true,
   "total_planned_outage_seconds": 16200,
-  "extended_window_approval": "pending"
+  "extended_window_approval": "approved_by_user_resume_after_confirming_no_other_GPU",
+  "resumed_at_kst": "2026-10-29T13:15:13.632482+09:00",
+  "execution_placement": {
+    "training_compute": "Thor",
+    "deployment_and_inference": "Thor",
+    "operator": "coding agent",
+    "no_other_GPU_available": true
+  },
+  "approval_basis": "User withdrew the inference-only restriction and directed resuming the existing Thor workflow after the reviewed total 4h30 plan was presented.",
+  "execution_status": "deferred_by_user_plan_only",
+  "start_authorized": false,
+  "deferred_at_kst": "2026-10-29T13:27:35.863058+09:00",
+  "latest_user_instruction": "Train later; prepare the plan only. No scheduling or automatic training restart.",
+  "current_attempt_receipt": "attempts/v5-r6-user-stopped-20261029/window.json",
+  "new_run_and_freeze_required_before_execution": true
 }

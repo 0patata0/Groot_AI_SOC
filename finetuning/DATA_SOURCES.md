@@ -1,5 +1,8 @@
 # 데이터 출처와 사용 범위
 
+**현재 실행 상태 정정:** 사용자가 학습을 나중으로 미루고 계획만 요청했다. 재개했던 checkpointed smoke는 성공역전파2개/진행step2 후 평가·저장중 사용자 중지로 종료했으며, 본 학습1024개 전체 투입/완성후보 등록은 없다. 이전완료2-step시험·0-step코드오류와별도실행으로[실행원장](V5_EXECUTION_RESULTS.json)에연결했다. 원천1280/분할·출처라벨·라이선스는불변이며현재학습/예약은없다. 다음사용자재개지시전에는[계획](../PLAN.md)만유지한다.
+
+
 **V5 실제 투입 후속:** [실행원장](V5_EXECUTION_RESULTS.json)에원run_manifest/Trainer/lineageSHA를연결했다. 같은학습관측2개를checkpointed/uncheckpointed각2-step에사용했으며총4개독립사건이나학습1,024개전체투입으로집계하지않는다. 중간NameError시도는성공microbatch0이다. 원문/분할SHA·출처1324행대조·원LICENSE는불변,새관제전체학습/독립전문가인증은아니다. 기존TRAINING_PROVENANCE의3corpus/12실행은보존하고이신규원장을별도연결했다. 추가GPU본학습은공유중단시간연장확인전미시작이다.
 
 

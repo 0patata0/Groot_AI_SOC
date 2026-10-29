@@ -154,7 +154,7 @@ def verify_v3_ready(root):
 
 
 V4_FULL_INPUTS_SHA256='2be7f3f32288a814944dfd8932d783500f29c1fa49e770c595819de2eff3ec83'
-V5_INPUTS_SHA256='33754a20cabf032a51bfde8b4bcea29dcf0a3da5527818ba8b15cec93c4c428a'
+V5_INPUTS_SHA256='e708d9863d4e45c018a5202d26d90513f6ed50807ed9f23eaeff1ccab1e0d1d8'
 
 
 def verify_v5_ready(root):

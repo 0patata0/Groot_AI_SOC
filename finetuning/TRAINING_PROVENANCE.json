@@ -932,7 +932,7 @@
     {
       "path": "V5_EXECUTION_RESULTS.json",
       "corpus": "data-soc-evidence-v5-r3",
-      "scope": "New original-provider MITRE/CISA source-labelled CTI observations; two completed 2-step trials on the same two selected training observations, one zero-step code failure; no 1024-row main epoch yet. Historical 3 corpora/12 runs below remain unchanged.",
+      "scope": "Original-provider MITRE/CISA CTI observations; completed checkpointed/uncheckpointed 2-step trials on the same two observations, one zero-step code failure, and one resumed smoke with two recorded backward passes interrupted by user before evaluation/save completion. No 1024-row main epoch.",
       "source_references": [
         "mitre_attack_pinned_20261029",
         "cisa_blacksuit_royal_aa23_061a",

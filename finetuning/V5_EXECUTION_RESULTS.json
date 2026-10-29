@@ -1,6 +1,6 @@
 {
-  "updated_at_kst": "2026-10-29T12:04:45.407795+09:00",
-  "status": "smoke_experiments_completed_full_training_not_started",
+  "updated_at_kst": "2026-10-29T13:27:35.863058+09:00",
+  "status": "deferred_by_user_plan_only",
   "corpus": "data-soc-evidence-v5-r3",
   "records": {
     "train": 1024,
@@ -50,6 +50,18 @@
       "GPU_peak_allocated_GiB": 74.35,
       "adopted": false,
       "reason": "Evaluation loss differs beyond predeclared tolerance; no total-runtime improvement demonstrated. Cause and general performance not established."
+    },
+    {
+      "name": "checkpointed_resume_user_stopped",
+      "status": "interrupted_by_user_during_smoke_evaluation_or_save",
+      "started_at_kst": "2026-10-29T13:19:12.198998+09:00",
+      "restored_at_kst": "2026-10-29T13:21:19.119022+09:00",
+      "recorded_successful_microbatches": 2,
+      "progress_global_step": 2,
+      "smoke_stage_completed": false,
+      "full_main_training_started": false,
+      "reason": "User explicitly deferred training and requested planning only; not a model quality failure",
+      "artifact_path": "attempts/v5-r6-user-stopped-20261029"
     }
   ],
   "artifact_inventory": [
@@ -77,6 +89,19 @@
       "trainer_state.json_sha256": "139a3bed07985bccd3f1f18dc8b86e5cb9857db9ad9d4a37c0396a26a823b597",
       "successful_microbatch_lineage.jsonl_sha256": "458cab3a86a75da74cf7711ff65aa94216efe0102df28a9fd325229c3d11ac25",
       "successful_microbatches": 2
+    },
+    {
+      "name": "checkpointed_resume_user_stopped",
+      "path": "attempts/v5-r6-user-stopped-20261029/outputs/soc-v5-smoke",
+      "artifact_sha256": {
+        "run_manifest.json": "00f4dc2fe0309e990f25a4ae3eca1b2dd53883a3546eff6a3318f0affe7a6b50",
+        "successful_microbatch_lineage.jsonl": "57b2dd879c59d36c6e23ab334ff4d3cbad457e4e80992747d4e3ee34389337ab",
+        "progress.json": "16276112322af1d858eabe18a45986764368ae6494c319172eb946ce6ad1103b",
+        "tokenization_report.json": "2bf84bf8a2eebf791743880454e91e54d08cb3904fdf0d787fe78968d1dac3db"
+      },
+      "successful_microbatches": 2,
+      "smoke_completed": false,
+      "source_frozen_inputs_sha256": "340188b18f50b9b858de86981903d9e7034d5a9a7df29407ff650481866fb317"
     }
   ],
   "weights": {
@@ -103,7 +128,7 @@
     "training_processes_completed": true,
     "cause_or_resolution_confirmed": false
   },
-  "actual_shared_interruption_seconds_total": 411.891958,
+  "actual_shared_interruption_seconds_total": 538.811982,
   "original_35B_restored": true,
   "original_35B_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
   "operating_model_selection_changed": false,
@@ -133,6 +158,45 @@
     "scope": "agent review of existing raw-model offline development outputs; no real MCP/bot execution or independent expert review; not a global accuracy percentage"
   },
   "next_plan": {
+    "state": "plan_only_deferred_by_user",
+    "start_authorized": false,
+    "training_compute_target": "Thor, as requested after confirming no other GPU",
+    "user_start_instruction_required": true,
+    "no_scheduled_restart": true,
+    "dataset_records": {
+      "train": 1024,
+      "validation": 128,
+      "test": 128
+    },
+    "full_selected_train_epoch": 1,
+    "optimizer_steps": 512,
+    "gradient_accumulation": 2,
+    "learning_rate": 5e-07,
+    "gradient_checkpointing": true,
+    "estimated_main_seconds_reference": 13677,
+    "proposed_window_minutes": 270,
+    "prior_outage_seconds_at_user_stop": 538.811982,
+    "time_and_resource_revalidation_required": true,
+    "new_run_state_and_input_version_required": true,
+    "frozen_plan_inputs_sha256": "e708d9863d4e45c018a5202d26d90513f6ed50807ed9f23eaeff1ccab1e0d1d8",
+    "plan_document": "../PLAN.md"
+  },
+  "no_main_epoch_or_candidate_registered": true,
+  "final_test_128_answers_generated": false,
+  "actual_MCP_or_chat_or_attack_E2E": false,
+  "new_full_server_install_tested": false,
+  "vLLM_driver_or_operational_bot_selection_changed": false,
+  "remaining": [
+    "new shared-interruption extension approval",
+    "original-checkpointing smoke and full selected epoch",
+    "full lineage/tensor validation",
+    "CPU merge and GGUF export/candidate registration",
+    "same-control development and final holdout comparison",
+    "full FW read-only MCP",
+    "rollback-protected harness cleanup and 2x2 comparison"
+  ],
+  "Git_at_recording": "source/results/docs not yet committed; final publication receipt is STATUS.md and local session",
+  "next_plan_before_user_deferral": {
     "state": "pending_new_extended_shared_interruption_approval",
     "gradient_checkpointing": true,
     "selected_train_rows": 1024,
@@ -155,19 +219,10 @@
     "technical_readiness": true,
     "actual_new_run_or_timer_started": false
   },
-  "no_main_epoch_or_candidate_registered": true,
-  "final_test_128_answers_generated": false,
-  "actual_MCP_or_chat_or_attack_E2E": false,
-  "new_full_server_install_tested": false,
-  "vLLM_driver_or_operational_bot_selection_changed": false,
-  "remaining": [
-    "new shared-interruption extension approval",
-    "original-checkpointing smoke and full selected epoch",
-    "full lineage/tensor validation",
-    "CPU merge and GGUF export/candidate registration",
-    "same-control development and final holdout comparison",
-    "full FW read-only MCP",
-    "rollback-protected harness cleanup and 2x2 comparison"
-  ],
-  "Git_at_recording": "source/results/docs not yet committed; final publication receipt is STATUS.md and local session"
+  "execution_operator": {
+    "curation_configuration_launch_monitoring_verification": "coding agent",
+    "GPU_computation": "Thor",
+    "extra_GPU_available": false
+  },
+  "stopped_runtime_verified_at_kst": "2026-10-29T13:23:18.017244+09:00"
 }

@@ -56,6 +56,8 @@ def runtime_fingerprint(show):
     return {'template_sha256': sha(show.get('template', '').encode()),
             'system_sha256': sha(show.get('system', '').encode()),
             'parameters': parameters(show.get('parameters', '')),
+            'renderer': show.get('renderer'), 'parser': show.get('parser'),
+            'requires': show.get('requires'), 'messages': show.get('messages'),
             'quantization': show['details']['quantization_level'],
             'runner': show['details'].get('runner'),
             'capabilities': sorted(show.get('capabilities', []))}

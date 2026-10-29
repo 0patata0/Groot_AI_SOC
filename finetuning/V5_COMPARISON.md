@@ -7,7 +7,7 @@ R8 학습 완료는 1,024개 관측의 전체 투입과 가중치 저장을 검�
 - 기준: `soc-qwen36:35b-base-q4km-20261027` — 동일 HF commit의 미학습 Q4_K_M.
 - 후보: `soc-qwen36:35b-evidence-v5-q4km-20261029` — 검증한 R8 어댑터를 같은 BF16 base에 병합하고 동일 고정 변환기로 Q4_K_M 변환한다. 이 문서 작성 시 후보 변환이 진행 중이며 등록·평가는 아직 전이다.
 - 운영 registry 원본 `qwen3.6:35b`는 보호·복구 대상이다. HF 파생 비교본과 채팅 서식이 다르므로 학습 효과의 주 비교군으로 대체하지 않는다.
-- 두 비교본은 모델 digest·서식/system 해시·파라미터·양자화·runner·capabilities를 대조한다. 후보의 전체 학습 완료/등록 영수증을 요구한다.
+- 두 비교본은 모델 digest·서식/system 해시·파라미터·renderer/parser/requires/messages·양자화·runner·capabilities를 대조한다. 후보의 전체 학습 완료/등록 영수증을 요구한다. 출처를 추가한 license는 추론 조건 비교에서 제외하며 원본 보존과 학습 출처 표기를 별도로 검증한다.
 - 입력과 평가 코드 SHA를 고정한다. temperature0/seed42/context8192/output512·thinking off·JSON 출력·동일 순서/질문을 사용한다. 원본 정답 assistant 메시지는 요청에서 제외한다.
 
 `evaluate_evidence_v5.py`와 기존32개 결과는 R8 동결 소스/이력으로 그대로 보존한다. 새 `evaluate_evidence_pair.py`는 같은 판정기를 사용하면서 실제 분할명을 기록한다. 입력·모델·서식이 달라지면 실행을 거절하고 기존 보고서/계획을 덮어쓰지 않는다.

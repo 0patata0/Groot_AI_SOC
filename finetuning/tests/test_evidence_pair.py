@@ -101,6 +101,19 @@ class PairTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.run_pair()
         self.assertFalse(any(n in ('chat', 'generate') for n, _ in self.api.calls))
 
+    def test_hidden_runtime_fields_are_checked_before_inference(self):
+        for field in ('renderer', 'parser', 'requires', 'messages'):
+            with self.subTest(field=field):
+                api = FakeAPI(self.gold)
+                def changed(path, payload=None):
+                    response = api(path, payload)
+                    if path == 'show' and payload['model'] == 'candidate':
+                        response[field] = 'different'
+                    return response
+                with self.assertRaises(ValueError):
+                    pair.run_pair(self.root, self.path, self.root/'result.json', request=changed)
+                self.assertFalse(any(n in ('chat', 'generate') for n, _ in api.calls))
+
     def test_failed_candidate_preserves_partial_evidence_and_restores(self):
         self.api.fail_candidate = True
         with self.assertRaises(TimeoutError): self.run_pair()

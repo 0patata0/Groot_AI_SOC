@@ -241,5 +241,12 @@
     "Run role coverage/label/rights and token checks, then freeze new corpus/profile; determine training outage from actual workload."
   ],
   "training_or_model_selection_changed": false,
-  "Mac_downloaded_models_or_installed_packages": false
+  "Mac_downloaded_models_or_installed_packages": false,
+  "rights_and_availability_followup_20261030": {
+    "at_kst": "2026-10-30T02:29:22.038809+09:00",
+    "report": "SOC_SOURCE_ACCESS_REVIEW.json",
+    "cmu_status": "hold: metadata/embedded terms conflict and r6.1-4.csv absent",
+    "previous_metadata_license_is_not_admission_clearance": true,
+    "training_examples_admitted": 0
+  }
 }

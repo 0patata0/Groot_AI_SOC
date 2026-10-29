@@ -35,7 +35,12 @@
         "Older environment and incomplete malicious-event labels.",
         "Event count is not independent incident or dialogue count."
       ],
-      "ready_for_training": false
+      "ready_for_training": false,
+      "access_followup": {
+        "report": "SOC_SOURCE_ACCESS_REVIEW.json",
+        "status": "email_and_purpose_form_pending_user_response",
+        "submitted": false
+      }
     },
     {
       "id": "optc",
@@ -61,7 +66,16 @@
         "Do not attribute release to an unverified MITLL repository.",
         "No complete approved-action or rollback ground truth."
       ],
-      "ready_for_training": false
+      "ready_for_training": false,
+      "access_followup": {
+        "report": "SOC_SOURCE_ACCESS_REVIEW.json",
+        "status": "ground_truth_and_target_file_metadata_checked_no_raw_logs",
+        "timestamped_report_entries": 102,
+        "target_compressed_bytes": [
+          109692169,
+          2217842713
+        ]
+      }
     },
     {
       "id": "botsv3",
@@ -104,7 +118,7 @@
         "multisource_investigation",
         "evidence_and_handover"
       ],
-      "rights": "CC BY 4.0 reconfirmed through official version-1 API.",
+      "rights": "Metadata CC BY 4.0 conflicts with embedded ExactData derivative/distribution restrictions; admission held pending provider clarification.",
       "selection": "Reuse previously verified answer archive and checksums; choose matching release/context before server-side selective extraction.",
       "prior_acquisition": {
         "answer_archive_bytes": 1254678,
@@ -117,7 +131,15 @@
         "Full multi-GB log archives were not acquired previously or now.",
         "Cross-release repeated scenarios must be deduplicated before splitting."
       ],
-      "ready_for_training": false
+      "ready_for_training": false,
+      "initial_metadata_only_rights_statement": "CC BY 4.0 reconfirmed through official version-1 API.",
+      "access_followup": {
+        "report": "SOC_SOURCE_ACCESS_REVIEW.json",
+        "status": "rights_conflict_and_one_missing_detail_file",
+        "listed_records": 191,
+        "detail_members_found": 190,
+        "missing": "r6.1-4.csv"
+      }
     },
     {
       "id": "ait_ads_lds",
@@ -200,11 +222,11 @@
     "Provider reputation and permissive terms do not guarantee annotation correctness or quality improvement. Human/expert adjudication status must be explicit."
   ],
   "recommended_order": [
-    "AIT evidence-linked expansion within allowed training environments",
-    "CMU CERT matching context and answers",
-    "LANL selected multi-source episodes",
+    "AIT reviewed drafts remain training-admission pending; preserve source-family grouping",
+    "OpTC bounded raw-record linkage with report and semantic errata",
+    "LANL selected episodes after access-form decision",
     "BOTS after official answer/export access",
-    "OpTC after small-file feasibility check"
+    "CMU CERT only after rights clarification and missing-member resolution"
   ],
   "metadata_verification": {
     "at_kst": "2026-10-30T00:53:45.566119+09:00",
@@ -319,5 +341,17 @@
       }
     }
   },
-  "next_required": "Select independent episodes and ground-truth pairs, check license/file availability and contamination, then freeze a small development study and new final holdout before considering further training."
+  "next_required": "Select independent episodes and ground-truth pairs, check license/file availability and contamination, then freeze a small development study and new final holdout before considering further training.",
+  "latest_followup": {
+    "at_kst": "2026-10-30T02:29:22.038809+09:00",
+    "report": "SOC_SOURCE_ACCESS_REVIEW.json",
+    "new_training_examples_admitted": 0
+  },
+  "recommended_order_at_initial_review": [
+    "AIT evidence-linked expansion within allowed training environments",
+    "CMU CERT matching context and answers",
+    "LANL selected multi-source episodes",
+    "BOTS after official answer/export access",
+    "OpTC after small-file feasibility check"
+  ]
 }

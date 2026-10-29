@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T02:29:22.038809+09:00",
+  "scope": "CMU rights and archive-linkage audit; LANL access review; OpTC ground-truth and selective acquisition planning. Not released training data.",
+  "new_training_examples_admitted": 0,
+  "gpu_training_started": false,
+  "production_changed": false,
+  "live_server_queried": false,
+  "cmu_cert": {
+    "doi": "10.1184/R1/12841247.v1",
+    "metadata_url": "https://api.figshare.com/v2/articles/12841247/versions/1",
+    "answer_archive_url": "https://ndownloader.figshare.com/files/24857828",
+    "answer_archive_bytes": 1254678,
+    "answer_archive_sha256": "ed21bf921def01e97326b314f2d1fa77651a945bd31bf513095f8ac7658c9ddd",
+    "provider_md5_verified": true,
+    "metadata_license": "CC BY 4.0",
+    "embedded_license_member": "answers/license.txt",
+    "embedded_license_sha256": "0a4f2481498ce8158486fcfe24103910e70405e42b407c5cbe07cf9a7ceb58b9",
+    "embedded_license_encoding": "cp1252",
+    "rights_finding": "Embedded ExactData terms restrict distribution and derivative works, while allowing minimal excerpts in research reports with attribution. This differs from the repository metadata label; no precedence or permission conclusion is made.",
+    "provider_resolution_found_in_checked_primary_sources": false,
+    "decision": "hold_training_and_derivative_dataset_publication_pending_provider_clarification",
+    "master_sha256": "394202dfd70884edb61fc9ecde9f08d6f616700e4eee0984bf06a52d1a99d726",
+    "master_records_excluding_header": 191,
+    "unique_detail_references": 191,
+    "regular_archive_members": 194,
+    "actual_detail_csv_members": 190,
+    "resolved_detail_references_by_unique_basename": 190,
+    "missing_detail_references": [
+      "r6.1-4.csv"
+    ],
+    "ambiguous_detail_references": [],
+    "release_counts": {
+      "2": 1,
+      "3.1": 2,
+      "3.2": 2,
+      "4.1": 3,
+      "4.2": 70,
+      "5.1": 4,
+      "5.2": 99,
+      "6.1": 5,
+      "6.2": 5
+    },
+    "scenario_family_counts": {
+      "1": 66,
+      "2": 66,
+      "3": 24,
+      "4": 33,
+      "5": 2
+    },
+    "format_review": {
+      "detail_files_read": 1,
+      "detail_rows_read": 19,
+      "detail_sha256": "2c1b63e64abf828aa77f288551dfac619214bea6a0f7815ef21e2e1fff2b8f5f",
+      "mixed_variable_width_event_rows": true,
+      "time_zone_confirmed": false
+    },
+    "counting_limits": "191 listed records across 9 releases and 5 scenario families are not 191 independently adjudicated incidents or prepared dialogues. Only one detail file was read; references were checked for presence, not all contents.",
+    "correction": "Earlier unique_detail_members count described references in the master, not verified archive members. The archive contains 190 matching detail CSV files; r6.1-4.csv is absent. The answers archive already includes selected incident observations, but does not replace full benign/background context.",
+    "cleanup": "The new local archive and raw master/detail copy were removed after hashing. Two subsequent bounded in-memory reads verified header and missing-member counts. Existing source copies were not deleted."
+  },
+  "lanl_cyber1": {
+    "url": "https://csr.lanl.gov/data/cyber1/",
+    "doi": "10.17021/1179829",
+    "access": "Official download form requires email and use purpose; submission pending user response.",
+    "form_submitted": false,
+    "raw_logs_downloaded": false,
+    "rights": "Provider copyright waiver recorded; retain citation.",
+    "time": "Anonymized relative epoch is not a recoverable factual calendar/KST date.",
+    "labels": "Red-team authentication list marks selected known compromise events, not all malicious activity and not benign certification of other rows."
+  },
+  "optc": {
+    "provider_repository": "https://github.com/FiveDirections/OpTC-data",
+    "pinned_commit": "5b108604f11f767aa11ea79ff827595f3fad15fd",
+    "rights": "Provider README public-domain release / Distribution A; explicitly no accuracy warranty.",
+    "nature": "Isolated exercise with background activity; simulated addresses and domains must not be treated as current block indicators.",
+    "ground_truth": {
+      "path": "OpTCRedTeamGroundTruth.pdf",
+      "github_pdf_bytes": 453244,
+      "github_pdf_sha256": "5986d23b81169221a491f7a8302fce140b12638ef4cf9b3a894ed3cb2fad9567",
+      "github_pdf_pages": 7,
+      "drive_file_id": "1lX8kfrdZGJwaqSdwTlEBGwmz069lZWh-",
+      "drive_metadata_bytes": 13727,
+      "drive_text_sha256": "82b72793e9fc237cbf4d907a1e851f7f39fc38a13a457b7afb995ba0ec8fcadc",
+      "timestamped_log_entries": 102,
+      "log_entries_by_source_date": {
+        "09/23/19": 37,
+        "09/24/19": 47,
+        "09/25/19": 18
+      },
+      "same_ordered_time_keys_in_github_and_drive_text": true,
+      "full_text_identical_ignoring_whitespace": false,
+      "equivalence_scope": "Timestamp keys agree; text and byte versions differ. Do not claim full-content or PDF-byte equivalence. Pin GitHub report as baseline and retain variant discrepancy.",
+      "time_zone_confirmed_in_report": false
+    },
+    "selection": {
+      "root_folder_id": "1n3kkS3KR31KUegn42yk3-e6JkZvf0Caa",
+      "path": "ecar/evaluation/23Sep19-red/AIA-201-225",
+      "target_host": "Sysclient0201",
+      "target_source_date": "2019-09-23",
+      "target_source_time_window": "11:20:00 to 11:45:00 (report-local, time zone unresolved)",
+      "files": [
+        {
+          "id": "1HFSyvmgH0jvdnnnTdKfWRjZYOrLWoIkv",
+          "title": "AIA-201-225.ecar-last.json.gz",
+          "size": "2217842713",
+          "url": "https://drive.google.com/file/d/1HFSyvmgH0jvdnnnTdKfWRjZYOrLWoIkv/view?usp=drivesdk"
+        },
+        {
+          "id": "1pJLxJsDV8sngiedbfVajMetczIgM3PQd",
+          "title": "AIA-201-225.ecar-2019-12-08T11-05-10.046.json.gz",
+          "size": "109692169",
+          "url": "https://drive.google.com/file/d/1pJLxJsDV8sngiedbfVajMetczIgM3PQd/view?usp=drivesdk"
+        }
+      ],
+      "raw_log_files_downloaded": 0,
+      "raw_log_records_checked": 0,
+      "note": "Folder/file metadata read only. December timestamp in a filename is not assumed to be event time. No claim either file contains the selected records until content verification."
+    },
+    "next_extraction": [
+      "Probe bounded content and actual timestamp fields/time zone before any window alignment. A gzip stream may require substantial transfer; do not promise random access or zero download.",
+      "Start with PROCESS, REGISTRY and FLOW evidence around the target host; preserve record UUID/actor/object relations, raw-line hash and provider report page/time. Resolve missing or contradictory context without inventing a verdict.",
+      "Apply duplicate-process, missing-module-hash, acuity_level and device/drive-path errata. ecar.md uses timestamp_ms in its field list but timestamp in its example: verify actual records, not an assumed schema.",
+      "The Drive errata file only documents alternate archive packaging; it does not replace the GitHub semantic errata.",
+      "Group connected hosts/days/campaigns before assigning development/final evaluation. Day 2 persists into Day 3; three report sections or 102 rows are not independent incidents.",
+      "Preserve attempted/failed/succeeded/unknown distinctions; no real MCP approval, block or rollback label may be fabricated from this exercise."
+    ],
+    "ready_for_training": false
+  },
+  "validation": {
+    "cmu_archive_sha_and_provider_md5_match": true,
+    "cmu_master_header_and_missing_member_rechecked": true,
+    "optc_report_time_keys_crosschecked": 102,
+    "source_metadata_and_counts_checked": true,
+    "all_raw_event_contents_verified": false,
+    "model_quality_test": false,
+    "mcp_or_attack_e2e": false,
+    "full_pack_or_new_server_install": false
+  },
+  "local_evidence_sha256": {
+    "mac-archive-cleanup.json": "dad18676316a64cad3ef26ea272b2d92c3c1a74055a6086d5cb394fc40ac6276",
+    "master-linkage-correction.json": "990a75a648ddb6ef6fe45056dbc4d22ac60b3e2f845fe0a57ecc67cb1879bc0e",
+    "optc-drive-discovery.json": "f0244c1b1e972cefd5af82c25432fa83b06bb772bde95937808990f50d8b37c8",
+    "optc-groundtruth-pages.json": "0ef906f5eabd74e3b7ae3990b3ee9e254bcd41b6b680e83fb82f1e60cc7dd08e",
+    "rights-and-format-audit.json": "975a016be05e48835e3f2dd9dad9118d3b6ae7fb30d26652d5cfb96c7904db8a",
+    "source-inventory.json": "74934850c38e6cd87c634057e419bff8fb3c97238ffe39879a2408e1af4a2cc9"
+  },
+  "next_priority": "OpTC bounded raw-record/ground-truth linkage; LANL after access-form decision; CMU after provider rights and missing-file clarification."
+}

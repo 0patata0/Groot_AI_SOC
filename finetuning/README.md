@@ -1,5 +1,9 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**추가 원천 검토 — 2026-10-30 KST:** [SOC_SOURCE_ACCESS_REVIEW.json](SOC_SOURCE_ACCESS_REVIEW.json)에 CMU 이용 조건 충돌/상세파일1개 누락, LANL 양식 대기, OpTC 정답102타임라인 항목과 선택 로그 위치를 기록했습니다. 원문·대화/학습 개수를 구분하며 신규 편입0입니다. [출처/한계](DATA_SOURCES.md). 원장만 재현pack의 소스 목록에 추가했고 원문·검토 초안은 학습 데이터로 자동 포함하지 않습니다.
+
+이하 이전 검토·작업 이력이다.
+
 **AIT 관제 질문/답변 초안 — 2026-10-30 KST:** [AIT_CASE_REVIEW.json](AIT_CASE_REVIEW.json)에9구간·25원행·14교차참조와 근거/한계를 기록했습니다. 초안은 로컬 `data-ait-case-review-20261030-r3/`에 있으며 학습 데이터·반입pack에는 포함하지 않습니다. 원문 기반 사실과 프로젝트 작성 판단/후속 조사를 구분하고 기존 train 환경만 사용합니다.
 
 `prepare_ait_case_review.py`는 이전 원격 결과의 content/SHA envelope, 공개 `AIT_GAP_LINKAGE.json`, 그 원장에 해시가 고정된 AMiner 분석 JSON을 입력받습니다. 새 output 경로에만 `review-cases.jsonl`, `manifest.json`, `SOURCE_NOTICE.txt`를 씁니다. 출처·변형·권리 고지는 재생성할 때도 자동으로 보존합니다. 공개 원장에는 원시 로그/초안 전문을 포함하지 않습니다.

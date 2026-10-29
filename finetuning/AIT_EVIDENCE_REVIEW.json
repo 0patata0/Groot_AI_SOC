@@ -1,0 +1,304 @@
+{
+  "at_kst": "2026-10-30T01:08:35.928766+09:00",
+  "status": "source_evidence_verified_pending_raw_log_linkage_and_answer_review",
+  "generator_sha256": "761f377f91187702286eaaebac4f3152fcdb1a281cebfc6e162affe857138ccf",
+  "manifest_sha256": "d517887ce6c6a9c14a660877fbbb2f405ec9347d2d5407fa1baaa272d557d399",
+  "manifest": {
+    "schema": 1,
+    "created_at_kst": "2026-10-30T01:06:26.999687+09:00",
+    "status": "evidence_prepared_pending_context_and_answer_review",
+    "source": {
+      "doi": "10.5281/zenodo.8263181",
+      "license": "CC-BY-4.0",
+      "digests": {
+        "archive": {
+          "md5": "43db6b1f0996e0024befd617706c50e9",
+          "sha256": "9f0595c4ebe56ac9223763881f55369dd4f249a8108064e4ae108eb3309aeeb9"
+        },
+        "labels": {
+          "md5": "60ff33796c77fd2136c4d1a4bc841bd9",
+          "sha256": "633e09b42772eabbbe5b48598220860eead60b7352efb01973fc45a5034290c0"
+        }
+      },
+      "paper_doi": "10.1145/3675741.3675748",
+      "split_sha256": "e263900c670f66d77459ffaf82ef82790cc75efad239b1d4f539e9d8e574d6d9"
+    },
+    "historical_split": {
+      "train": [
+        "fox",
+        "harrison",
+        "russellmitchell",
+        "santos",
+        "shaw",
+        "wardbeck"
+      ],
+      "val": [
+        "wheeler"
+      ],
+      "holdout": [
+        "wilson"
+      ]
+    },
+    "read_environment_members": [
+      "fox_wazuh.json",
+      "harrison_wazuh.json",
+      "russellmitchell_wazuh.json",
+      "santos_wazuh.json",
+      "shaw_wazuh.json",
+      "wardbeck_wazuh.json"
+    ],
+    "validation_test_members_read": false,
+    "sample_cap_per_group": 12,
+    "groups": 66,
+    "independent_environments": 6,
+    "nonempty_groups": 57,
+    "selected_record_occurrences": 454,
+    "selected_unique_records": 450,
+    "rejected_records": 0,
+    "groups_sha256": "65fe2a07928a9c5735d53991b3239c00a3e653f5d2a7eb838aa917b19eb2d10c",
+    "members": [
+      {
+        "member": "fox_wazuh.json",
+        "member_sha256": "e03787f1a4402b034c4c2648c0632d92c5982aecaa6146837695ca7aa3023b51",
+        "counts": {
+          "lines": 462523,
+          "parsed": 462523,
+          "multiple_phase_matches": 230
+        },
+        "origins": {
+          "wazuh": 451439,
+          "suricata_via_wazuh": 11084
+        },
+        "phase_memberships": {
+          "outside_published_phase_windows": 50283,
+          "dnsteal": 381,
+          "network_scans": 323,
+          "service_scans": 140,
+          "wpscan": 4979,
+          "dirb": 406083,
+          "cracking": 554,
+          "privilege_escalation": 10
+        },
+        "rejected_examples": [],
+        "source_lines_conserved": true,
+        "zip_crc_checked_to_eof": true
+      },
+      {
+        "member": "harrison_wazuh.json",
+        "member_sha256": "6c5571aca9b55812f7497a929008a740515c9f866f026f25ddf94cc01ac1ad10",
+        "counts": {
+          "lines": 583754,
+          "parsed": 583754
+        },
+        "origins": {
+          "suricata_via_wazuh": 67384,
+          "wazuh": 516370
+        },
+        "phase_memberships": {
+          "outside_published_phase_windows": 161774,
+          "network_scans": 296,
+          "service_scans": 769,
+          "wpscan": 4848,
+          "dirb": 411477,
+          "webshell": 31,
+          "cracking": 1251,
+          "reverse_shell": 19,
+          "privilege_escalation": 49,
+          "service_stop": 4,
+          "dnsteal": 3236
+        },
+        "rejected_examples": [],
+        "source_lines_conserved": true,
+        "zip_crc_checked_to_eof": true
+      },
+      {
+        "member": "russellmitchell_wazuh.json",
+        "member_sha256": "da4b882de7df765d4fbedd772a5bf892e7a440580d3654c585d6d124bfb94832",
+        "counts": {
+          "lines": 41488,
+          "parsed": 41488
+        },
+        "origins": {
+          "wazuh": 32302,
+          "suricata_via_wazuh": 9186
+        },
+        "phase_memberships": {
+          "outside_published_phase_windows": 32951,
+          "network_scans": 8,
+          "service_scans": 167,
+          "dirb": 4459,
+          "wpscan": 3172,
+          "webshell": 4,
+          "cracking": 10,
+          "privilege_escalation": 6,
+          "dnsteal": 711
+        },
+        "rejected_examples": [],
+        "source_lines_conserved": true,
+        "zip_crc_checked_to_eof": true
+      },
+      {
+        "member": "santos_wazuh.json",
+        "member_sha256": "df298d52ab555a75b1e6a60e80aae973e845d85ba9875d001bd2f5f4f3b5097b",
+        "counts": {
+          "lines": 126513,
+          "parsed": 126513,
+          "multiple_phase_matches": 3
+        },
+        "origins": {
+          "suricata_via_wazuh": 44112,
+          "wazuh": 82401
+        },
+        "phase_memberships": {
+          "outside_published_phase_windows": 116944,
+          "dnsteal": 831,
+          "network_scans": 104,
+          "service_scans": 90,
+          "dirb": 4459,
+          "wpscan": 3274,
+          "webshell": 13,
+          "cracking": 773,
+          "reverse_shell": 6,
+          "privilege_escalation": 22
+        },
+        "rejected_examples": [],
+        "source_lines_conserved": true,
+        "zip_crc_checked_to_eof": true
+      },
+      {
+        "member": "shaw_wazuh.json",
+        "member_sha256": "45e34b65ce08c6a49b0ba52a4f36dbe5829d26240a2acccf8b3842201b6afca8",
+        "counts": {
+          "lines": 68539,
+          "parsed": 68539,
+          "multiple_phase_matches": 198
+        },
+        "origins": {
+          "wazuh": 51847,
+          "suricata_via_wazuh": 16692
+        },
+        "phase_memberships": {
+          "outside_published_phase_windows": 62573,
+          "dnsteal": 105,
+          "network_scans": 3,
+          "service_scans": 1,
+          "wpscan": 927,
+          "dirb": 4459,
+          "cracking": 647,
+          "reverse_shell": 3,
+          "privilege_escalation": 19
+        },
+        "rejected_examples": [],
+        "source_lines_conserved": true,
+        "zip_crc_checked_to_eof": true
+      },
+      {
+        "member": "wardbeck_wazuh.json",
+        "member_sha256": "b4e483c67e4de2a20b1b559692981e912fb83f1d1831b6e1f7e5760b16fe7117",
+        "counts": {
+          "lines": 88204,
+          "parsed": 88204,
+          "multiple_phase_matches": 154
+        },
+        "origins": {
+          "wazuh": 63694,
+          "suricata_via_wazuh": 24510
+        },
+        "phase_memberships": {
+          "outside_published_phase_windows": 82135,
+          "dnsteal": 17,
+          "network_scans": 3,
+          "service_scans": 56,
+          "wpscan": 904,
+          "dirb": 4459,
+          "webshell": 13,
+          "cracking": 752,
+          "reverse_shell": 6,
+          "privilege_escalation": 13
+        },
+        "rejected_examples": [],
+        "source_lines_conserved": true,
+        "zip_crc_checked_to_eof": true
+      }
+    ],
+    "new_training_dialogues": 0,
+    "expert_review": false,
+    "training_started": false,
+    "limits": [
+      "Historical training environments may overlap earlier training records; no novelty or new holdout claim.",
+      "Selection is bounded by rule/sensor/agent diversity; excluded observations are counted, not certified benign.",
+      "Phase membership is time context only; outside a phase does not mean benign.",
+      "Shared endpoints retain all matching phases; group counts can exceed unique record counts.",
+      "Wazuh rule.id/level and Suricata signature_id/severity are separate identifiers and scales.",
+      "No raw LDS host-log label linkage, incident adjudication, MCP trajectory or response gold yet.",
+      "Provider source reputation and byte identity do not certify labels or model quality."
+    ]
+  },
+  "independent_recheck": {
+    "selected_raw_lines_and_objects": 450,
+    "complete_member_SHA256_matches": 6,
+    "KST_and_all_phase_matches": true,
+    "heldout_environment_in_samples": false
+  },
+  "review": {
+    "selected_origin_occurrences": {
+      "wazuh": 332,
+      "suricata_via_wazuh": 122
+    },
+    "mixed_sensor_groups": 37,
+    "zero_observation_groups": [
+      {
+        "environment": "fox",
+        "phase": "webshell"
+      },
+      {
+        "environment": "fox",
+        "phase": "reverse_shell"
+      },
+      {
+        "environment": "fox",
+        "phase": "service_stop"
+      },
+      {
+        "environment": "russellmitchell",
+        "phase": "reverse_shell"
+      },
+      {
+        "environment": "russellmitchell",
+        "phase": "service_stop"
+      },
+      {
+        "environment": "santos",
+        "phase": "service_stop"
+      },
+      {
+        "environment": "shaw",
+        "phase": "webshell"
+      },
+      {
+        "environment": "shaw",
+        "phase": "service_stop"
+      },
+      {
+        "environment": "wardbeck",
+        "phase": "service_stop"
+      }
+    ],
+    "zero_observation_meaning": "No Wazuh/Suricata records in the provider interval in this archive; not proof of no attack or failed attack. AMiner and raw LDS evidence not inspected by this run.",
+    "previous_pipeline_finding": "datasets/prep.py chooses first matching inclusive phase and uses normal for outside-phase context. New evidence recipe retains all matches and never labels outside-phase benign. Historical datasets/weights untouched.",
+    "training_dialogues": 0,
+    "independent_incidents_claimed": false,
+    "expert_adjudication": false
+  },
+  "scope": {
+    "server_connected": false,
+    "new_packages_or_downloads": false,
+    "GPU_training": false,
+    "operational_model_changed": false
+  },
+  "next": [
+    "Pair source groups and nine zero-observation intervals with raw LDS logs/line labels in the same training environments.",
+    "Review incident conclusions, uncertainties and actual MCP/approval trajectories before constructing supervised dialogues.",
+    "Choose a separate unused evaluation source or campaign; historical AIT holdouts and consumed V5 final128 remain excluded."
+  ]
+}

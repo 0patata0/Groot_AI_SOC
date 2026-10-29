@@ -1,5 +1,22 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**AIT 증거 준비 — 2026-10-30T01:11:08.558457+09:00:** 학습6환경의 원경보1,371,021행을 대조해 고유 원본450개/검토66묶음을 준비했습니다. 파싱 오류0·중첩585행·관측0 구간9개를 명시합니다. 원행/객체/단계/KST 독립 대조와 회귀9개 통과. [원장](AIT_EVIDENCE_REVIEW.json) · [출처/제약](DATA_SOURCES.md). 감독학습 대화·원시 LDS 연결·사건 정답 검수는 아직 전입니다.
+
+기존 자료로 재현할 때는 새 출력 경로를 지정합니다. 의존성 설치·모델 호출·네트워크 요청이 없으며 기존 train/validation/test나 이전 산출물을 덮어쓰지 않습니다.
+
+```bash
+python3 -B finetuning/prepare_ait_evidence.py \
+  --archive datasets/raw/ait-ads/ait_ads.zip \
+  --labels datasets/raw/ait-ads/labels.csv \
+  --split datasets/processed/ait/split.json \
+  --output finetuning/data-ait-evidence-review-NEW --samples 12
+python3 -B -m unittest discover -s finetuning/tests -p test_ait_evidence.py
+```
+
+추출 소스·검사·검증/후보 원장은 반입 allowlist에 포함했으며 원경보·검토 묶음은 자동 반입하거나 학습 입력에 섞지 않습니다. 이번에는 Thor 반입 및 전체 pack 생성 검증을 수행하지 않았습니다.
+
+이하 당시 이력입니다.
+
 **추가 관제 데이터 후보 — 2026-10-30T00:57:16.287495+09:00:** 신규 직접 도입3종(LANL·OpTC·BOTS)과 기존 확장2묶음(CMU CERT·AIT)을 조사했습니다. [출처·정답/권리 한계](DATA_SOURCES.md) · [후보 원장](SOC_DATA_CANDIDATES.json). 정답과 로그 문맥을 묶고 새 독립 평가를 분리한 뒤 학습안을 검토합니다. 신규 원시자료/정제/학습 편입0이며 기존 R8 입력·모델 선택은 변경하지 않았습니다.
 
 이하 당시 이력입니다.

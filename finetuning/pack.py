@@ -27,6 +27,7 @@ def main():
         parser.error("Portable bundle requires an output_dir inside finetuning/")
     check_data(config)
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
+             "prepare_ait_evidence.py", "AIT_EVIDENCE_REVIEW.json", "SOC_DATA_CANDIDATES.json",
              "evidence_groups.py", "cisa_tables.py", "prepare_evidence_v5.py", "audit_evidence_v5.py", "evaluate_evidence_v5.py", "evaluate_evidence_pair.py", "review_evidence_results.py", "verify_evidence_training.py", "V5_EVIDENCE_SPEC.json", "config.qwen36-soc-v5.json",
              "SOC_ROLE_MATRIX.json", "V4_DATA_PREPARATION.json", "V4_DATA_REVIEW.json", "V4_TRAINING_INPUTS.json", "V4_ASSESSMENT_POLICY.json", "config.qwen36-soc-v4.json", "config.qwen36-soc-v4-full.json", "SOURCE_EXPANSION.json", "dialogue_encoding.py", "remote_zip.py", "acquire_institutional.py", "institutional_sources.py", "prepare_institutional.py",
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "merge_streaming.py", "evaluate.py",

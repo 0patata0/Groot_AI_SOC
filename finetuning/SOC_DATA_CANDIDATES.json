@@ -147,7 +147,17 @@
         "More rows in existing scenarios are not new independent incidents.",
         "Cannot call historical AIT holdouts or V5 final128 newly unseen."
       ],
-      "ready_for_training": false
+      "ready_for_training": false,
+      "preparation_followup": {
+        "at_kst": "2026-10-30T01:11:08.558457+09:00",
+        "report": "AIT_EVIDENCE_REVIEW.json",
+        "source_rows_checked": 1371021,
+        "selected_unique_source_coordinates": 450,
+        "groups": 66,
+        "no_observation_groups": 9,
+        "new_training_dialogues": 0,
+        "raw_LDS_log_linkage": false
+      }
     }
   ],
   "not_prioritized": [

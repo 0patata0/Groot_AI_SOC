@@ -26,6 +26,76 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_incident_judgment_retains_failed_draft_and_uses_shared_repair_budget(self):
+        q='DVWA 요청이 공격이었나? 탐지 근거와 대응 필요성을 판단해줘.'
+        h=Harness(text='IDS 경보는 0건입니다.',request=q)
+        h.agent.model='qwen3.6:35b';h.agent.provider='custom'
+        raw=json.dumps({'source':'suricata','alerts':[],'returned_count':0,'indexed_window_total_count':None})
+        call=dict(server='security-events',name='search_suricata_alerts',arguments={},result=raw,
+                  result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+        h.kw['messages'] += H.linked_rows([call])
+        h.wrapper=alignment.final_wrapper(h.wrapper,h.original,h.native,h.append,h.reanchor,PLUGIN,H)
+        result=h.call()
+        self.assertEqual(result.action,'continue')
+        audit=h.agent._capstone_incident_judgment_audit[1][-1]
+        self.assertEqual(audit['draft'],'IDS 경보는 0건입니다.')
+        self.assertIn('sample_zero_presented_as_absence',audit['issues'])
+        self.assertIn('<untrusted_tool_observations>',h.kw['messages'][-1]['content'])
+        self.assertIn('위험과 대응 필요성을 직접 판단',h.kw['messages'][-1]['content'])
+        h.agent._capstone_incident_repairs=(h.agent._current_turn_id,H.CONTRACT.REPAIR_PASSES)
+        result=h.call()
+        self.assertEqual(result.action,'break')
+        self.assertTrue(h.agent._capstone_alignment_partial)
+        self.assertNotIn('IDS 경보는 0건입니다.',result.final_response)
+        self.assertEqual(h.kw['messages'][-2]['content'],'IDS 경보는 0건입니다.')
+        self.assertEqual(len(alignment.calls_from_rows(h.kw['messages'][1:],PLUGIN._inventory_payload)),1)
+
+    def test_incident_audit_is_bounded_and_not_for_protected_work(self):
+        q='DVWA 공격인지 조사해줘'
+        draft='가' * 20000
+        audit=H.incident_judgment_check(q,draft,[])
+        self.assertEqual(len(audit['draft']),16384)
+        self.assertTrue(audit['draft_truncated'])
+        self.assertEqual(audit['draft_sha256'],hashlib.sha256(draft.encode()).hexdigest())
+        self.assertIsNone(H.incident_judgment_check(q,draft,[proposal('a:modsecurity-custom')]))
+        self.assertIsNone(H.incident_judgment_check('WAF 변경안을 만들어줘',draft,[]))
+
+    def test_repair_wire_preserves_or_restores_current_instruction_only(self):
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        q='DVWA 공격인지 조사해줘'
+        instruction='최종 답변 근거 검사: fixture'
+        a=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,
+            _current_turn_id='turn',_capstone_incident_repair_prompt=('turn',instruction))
+        raw=json.dumps({'source':'modsecurity','alerts':[],'returned_count':0})
+        c=dict(server='security-events',name='search_modsecurity_alerts',arguments={},result=raw,
+               result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+        rows=[{'role':'user','content':q}]+H.linked_rows([c])
+        for present in (False,True):
+            wire=copy.deepcopy(rows)+([{'role':'user','content':instruction}] if present else [])
+            wrap=alignment.request_wrapper(lambda *a,**kw:Request({'messages':wire,'tools':[]}),PLUGIN,H)
+            result=wrap(a,original_user_message=q,turn_id='turn',messages=rows)
+            self.assertEqual(sum(m.get('content')==instruction for m in result.api_kwargs['messages']),1)
+            self.assertEqual(wire,rows+([{'role':'user','content':instruction}] if present else []))
+        a._capstone_incident_repair_prompt=('old',instruction)
+        result=wrap(a,original_user_message=q,turn_id='turn',messages=rows)
+        # A fresh request with no matching prompt must not import another turn's repair.
+        wire[:]=copy.deepcopy(rows)
+        result=wrap(a,original_user_message=q,turn_id='turn',messages=rows)
+        self.assertFalse(any(m.get('content')==instruction for m in result.api_kwargs['messages']))
+
+    def test_unchanged_failure_stop_requires_same_observations_and_issue(self):
+        q='DVWA 공격인지 조사해줘'
+        first=H.incident_judgment_check(q,'IDS 경보는 0건입니다.',[])
+        self.assertTrue(H.repeated_judgment([first,copy.deepcopy(first)]))
+        for key,value in [('tool_result_sha256',['a'*64]),('issues',[]),
+                          ('draft_sha256','b'*64),('earlier_tool_results_omitted',True)]:
+            other=copy.deepcopy(first);other[key]=value
+            self.assertFalse(H.repeated_judgment([first,other]),key)
+
     def test_incident_selects_real_reads_then_restores_native_judgment(self):
         @dataclass
         class Request:

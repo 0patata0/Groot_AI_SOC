@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+> **2026-10-31 사건 판단 정정:** 기존 `deploy.sh` 소스 경로로 query-completion1.15.7/chat-contract1.5.2와 두 봇 공통 하네스를 설치합니다. B 운영 파일과 오프라인 source cache를 동기화했으며 새 패키지·포트·설정 키는 없습니다. 운영 증분 반영과 새 서버 전체 설치 검증은 구분합니다. [동작·복구·검증](../infra/hermes/incident-judgment-repair.md).
+
 > **2026-10-29 FW 읽기:** root `deploy.sh`의 기존 SOC/두 봇 소스 경로에 전체 FW 조회를 포함했다. 응답 MCP 4도구 계약과 공통 38도구 허용 목록을 사용한다. 신규 설정 키·포트·패키지는 없다. [설치·오프라인·복구 범위](../infra/mcp/firewall-read.md) · [검증](../STATUS.md).
 
 > **2026-10-27 선택 추론 터널:** root `deploy.sh`에 `LLM_TUNNEL_CONFIG`를 추가했다. 기존 OpenSSH/Python/systemd로 B 전용 주소에서 외부 추론 서버의 loopback API에 연결하며 별도 모델·패키지 다운로드나 키 위임을 하지 않는다. [준비·권한·검증·복구](inference-transport.md)와 [실제 운영 상태](../STATUS.md)를 구분한다.

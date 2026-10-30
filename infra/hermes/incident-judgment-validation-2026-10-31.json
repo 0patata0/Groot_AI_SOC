@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "verified_at_kst": "2026-10-31T02:45:03.460268+09:00",
+  "query_completion": "1.15.7",
+  "chat_contract": "1.5.2",
+  "tests": {
+    "native": {
+      "run": 364,
+      "passed": 362,
+      "skipped": 2
+    },
+    "sdk": {
+      "run": 102,
+      "passed": 102
+    },
+    "install_contract": {
+      "run": 1,
+      "passed": 1
+    }
+  },
+  "passed": 465,
+  "skipped": 2,
+  "trial_posts": 5,
+  "final_replies": 5,
+  "strict_full_incident_completions": 0,
+  "trials": [
+    {
+      "name": "hermes-1",
+      "bot": "Hermes",
+      "version": "1.15.5",
+      "root_post_id": "w4poabjiffgdifd83tsugpngbh",
+      "final_post_id": "7t9x1niriinmdbmjho5f6jgjcy",
+      "posted_at_kst": "2026-10-31T02:27:53.827000+09:00",
+      "chat_seconds": 88.41,
+      "runtime_seconds": null,
+      "tool_calls": 3,
+      "model_calls": 4,
+      "protected_calls": 0,
+      "adapter_status": "partial",
+      "strict_full_incident_completion": false,
+      "event_arguments": [
+        {
+          "tool": "search_modsecurity_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 20,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        },
+        {
+          "tool": "search_suricata_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 20,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        }
+      ],
+      "draft_checks": [
+        {
+          "sha256": "190354a679e9b5eef624a5a2538102e7b92783690ff4adaadede2a38089d99b1",
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ]
+        },
+        {
+          "sha256": "190354a679e9b5eef624a5a2538102e7b92783690ff4adaadede2a38089d99b1",
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ]
+        },
+        {
+          "sha256": "190354a679e9b5eef624a5a2538102e7b92783690ff4adaadede2a38089d99b1",
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ]
+        }
+      ],
+      "final_response_sha256": "99bd358931be7a06bb7d91ce41d74326d7f86cdd7a05d05b1dc8cc75b6b50f9c",
+      "remaining": [
+        "sample zero stated as absence; same failed draft repeated three times; final facts-only fallback"
+      ]
+    },
+    {
+      "name": "ollama-1",
+      "bot": "Ollama",
+      "version": "1.15.5",
+      "root_post_id": "3wkdff4wtbg3dkxy9j4i9gjboo",
+      "final_post_id": "oautdbq8sig1mknpphyiebnxpy",
+      "posted_at_kst": "2026-10-31T02:30:47.479000+09:00",
+      "chat_seconds": 50.486,
+      "runtime_seconds": 50.40969525196124,
+      "tool_calls": 3,
+      "model_calls": 2,
+      "protected_calls": 0,
+      "adapter_status": "completed",
+      "strict_full_incident_completion": false,
+      "event_arguments": [
+        {
+          "tool": "search_suricata_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 30,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        },
+        {
+          "tool": "search_modsecurity_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 30,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        }
+      ],
+      "draft_checks": [
+        {
+          "sha256": "b43ec2e09a2d24f1a11995d47c10be6232824b80f695de838840c5c982236d17",
+          "issues": []
+        }
+      ],
+      "final_response_sha256": "b07b871e5a5344e18694432f85a441cff2901e70ecb27af462c71f4d1e0e992e",
+      "remaining": [
+        "30 minute read for 20 minute request",
+        "unsupported SQLi/rule meaning and collection-cause explanation"
+      ]
+    },
+    {
+      "name": "ollama-2",
+      "bot": "Ollama",
+      "version": "1.15.6",
+      "root_post_id": "3hqaj4ydrbgw3qkkahkaofuzio",
+      "final_post_id": "5iny91eakbr83k3ex697nudmah",
+      "posted_at_kst": "2026-10-31T02:35:27.199000+09:00",
+      "chat_seconds": 45.91,
+      "runtime_seconds": 45.809481664095074,
+      "tool_calls": 3,
+      "model_calls": 2,
+      "protected_calls": 0,
+      "adapter_status": "completed",
+      "strict_full_incident_completion": false,
+      "event_arguments": [
+        {
+          "tool": "search_suricata_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 30,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        },
+        {
+          "tool": "search_modsecurity_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 30,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        }
+      ],
+      "draft_checks": [
+        {
+          "sha256": "47f7b9396e63299b76078cc0c46abf352eac735cd4dec650a94c12534531ce95",
+          "issues": []
+        }
+      ],
+      "final_response_sha256": "46786ee01e8dfabb2fd239e6c476801fd67e08f8b20b33dacc374bc7e37aa52c",
+      "remaining": [
+        "30 minute read for 20 minute request",
+        "private address/lab inferred as authorized benign activity",
+        "unauthorized test used as basis for whitelist advice"
+      ]
+    },
+    {
+      "name": "hermes-2",
+      "bot": "Hermes",
+      "version": "1.15.7",
+      "root_post_id": "qu5b5ejs17dedq3ob4aw1kabqr",
+      "final_post_id": "3iq8bk1pqp87dgeqhnmt48tsaa",
+      "posted_at_kst": "2026-10-31T02:39:37.142000+09:00",
+      "chat_seconds": 85.007,
+      "runtime_seconds": null,
+      "tool_calls": 3,
+      "model_calls": 4,
+      "protected_calls": 0,
+      "adapter_status": "partial",
+      "strict_full_incident_completion": false,
+      "event_arguments": [
+        {
+          "tool": "search_modsecurity_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 20,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        },
+        {
+          "tool": "search_suricata_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 20,
+            "source_ip": "192.168.16.233",
+            "limit": 50
+          }
+        }
+      ],
+      "draft_checks": [
+        {
+          "sha256": "593d6226c37a9d7d8a2f10051b4155e12c7de99dd4cda71c1c38872b25aaa3d4",
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ]
+        },
+        {
+          "sha256": "df41ebbe336a456a17f508b8d311b02d8aa44fe6f624603adb909aeadc7f66fc",
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ]
+        },
+        {
+          "sha256": "df41ebbe336a456a17f508b8d311b02d8aa44fe6f624603adb909aeadc7f66fc",
+          "issues": [
+            "sample_zero_presented_as_absence"
+          ]
+        }
+      ],
+      "final_response_sha256": "d78547239c761444eb0f6c8ed29af7255d516d6d9af5beae5a63407246f372c9",
+      "remaining": [
+        "sample zero absence claim survives two real model corrections",
+        "rule meanings and IDS absence cause not established",
+        "final facts-only fallback"
+      ]
+    },
+    {
+      "name": "ollama-3",
+      "bot": "Ollama",
+      "version": "1.15.7",
+      "root_post_id": "i1c9gywxhidtmczq1cgym66mny",
+      "final_post_id": "h94g5chpm38x5rj4crp9z9b1wy",
+      "posted_at_kst": "2026-10-31T02:42:15.421000+09:00",
+      "chat_seconds": 75.971,
+      "runtime_seconds": 75.90527976199519,
+      "tool_calls": 3,
+      "model_calls": 3,
+      "protected_calls": 0,
+      "adapter_status": "completed",
+      "strict_full_incident_completion": false,
+      "event_arguments": [
+        {
+          "tool": "search_suricata_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 30,
+            "source_ip": "192.168.16.233"
+          }
+        },
+        {
+          "tool": "search_modsecurity_alerts",
+          "arguments": {
+            "until_kst": "2026-10-29T19:20:00+09:00",
+            "lookback_minutes": 30,
+            "source_ip": "192.168.16.233"
+          }
+        }
+      ],
+      "draft_checks": [
+        {
+          "sha256": "263adf3f67aea4d34349470b10b013483b49deb342e71e60b0656695f22560a6",
+          "issues": [
+            "unknown_window_total_claimed"
+          ]
+        },
+        {
+          "sha256": "3869a42390c069c857d8a487ebcd243f65d89545f2d72f9f8a14b2f97ff63417",
+          "issues": []
+        }
+      ],
+      "final_response_sha256": "47e58bc53b67f61fa37361ed227c0343c9af447badceed6f8f1caac7d1eb278f",
+      "remaining": [
+        "30 minute read for 20 minute request",
+        "HTTP200 used to suggest exploit success without execution evidence",
+        "rule interpretation and generic exception/containment advice need actual incident grounds"
+      ]
+    }
+  ],
+  "actual_replay": {
+    "native_initial_repeated_sha": true,
+    "sdk_environment_failure_previously_undetected": true,
+    "newly_detected_issues": [
+      "environment_used_as_authorization",
+      "unapproved_activity_allowlist_advice"
+    ]
+  },
+  "native_wire_verification": {
+    "current_turn_prompt_present": true,
+    "observations": 2,
+    "instruction_loss_not_proven": true
+  },
+  "deployment": [
+    {
+      "applied": true,
+      "backup": "/var/backups/capstone-judgment-20261031-022725",
+      "files": {
+        "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "980ca0737a4f28a559af7543172b415c106949aa141bbdb5dca2ec8e16b81ae9",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/__init__.py": "980ca0737a4f28a559af7543172b415c106949aa141bbdb5dca2ec8e16b81ae9",
+        "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "d77965ac977b054c55a31d83fcc7812ec5b9e84d112dcfdc7efba09ebff86ad1",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/plugin.yaml": "d77965ac977b054c55a31d83fcc7812ec5b9e84d112dcfdc7efba09ebff86ad1",
+        "/opt/hermes-data/plugins/groot-query-completion/alignment.py": "67d36c006065c6b038074c0017d1a6164383f09f742783b59b20876095041025",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/alignment.py": "67d36c006065c6b038074c0017d1a6164383f09f742783b59b20876095041025",
+        "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": "b808a4de349139aedd45d07d173d1f450f55d091862274dd0730d479d4dabb02",
+        "/opt/capstone-ollama-trial/query_grounding.py": "980ca0737a4f28a559af7543172b415c106949aa141bbdb5dca2ec8e16b81ae9",
+        "/opt/capstone-ollama-trial/harness.py": "b808a4de349139aedd45d07d173d1f450f55d091862274dd0730d479d4dabb02",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/harness.py": "b808a4de349139aedd45d07d173d1f450f55d091862274dd0730d479d4dabb02",
+        "/opt/capstone-ollama-trial/runtime.py": "9855eba19af64a5077fdf30f5133d129f349bbd537c74c5e78a77e02e2fe2dcc",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/runtime.py": "9855eba19af64a5077fdf30f5133d129f349bbd537c74c5e78a77e02e2fe2dcc"
+      },
+      "protected_files_unchanged": true,
+      "finished_epoch": 1793381248.815926
+    },
+    {
+      "applied": true,
+      "backup": "/var/backups/capstone-judgment-20261031-023402",
+      "files": {
+        "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "cddb6254ab394d140ea625d470ca85722990c3d727b0a15ecfefea353ecd13f8",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/__init__.py": "cddb6254ab394d140ea625d470ca85722990c3d727b0a15ecfefea353ecd13f8",
+        "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "8636a97c9c6e902fe6a4934132b96be37b53a7d4e7b93979ef919e287afc9afe",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/plugin.yaml": "8636a97c9c6e902fe6a4934132b96be37b53a7d4e7b93979ef919e287afc9afe",
+        "/opt/hermes-data/plugins/groot-query-completion/alignment.py": "28446e6d8d20f8da34f8bb0c1059995908fc5b0b95854bf590a8a7e6d7b24882",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/alignment.py": "28446e6d8d20f8da34f8bb0c1059995908fc5b0b95854bf590a8a7e6d7b24882",
+        "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": "78aafc46da745be24e492a55dfdcac9141b0063ebb320db9b0a6f0c41084215c",
+        "/opt/capstone-ollama-trial/query_grounding.py": "cddb6254ab394d140ea625d470ca85722990c3d727b0a15ecfefea353ecd13f8",
+        "/opt/capstone-ollama-trial/harness.py": "78aafc46da745be24e492a55dfdcac9141b0063ebb320db9b0a6f0c41084215c",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/harness.py": "78aafc46da745be24e492a55dfdcac9141b0063ebb320db9b0a6f0c41084215c",
+        "/opt/capstone-ollama-trial/runtime.py": "3cb845be7114512cb20fba3e7f95cf3923354f0051ac8ae662e4c62e0197576e",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/runtime.py": "3cb845be7114512cb20fba3e7f95cf3923354f0051ac8ae662e4c62e0197576e"
+      },
+      "protected_files_unchanged": true,
+      "finished_epoch": 1793381645.769773
+    },
+    {
+      "applied": true,
+      "backup": "/var/backups/capstone-judgment-20261031-023848",
+      "files": {
+        "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "7c309c1ee5f65f7a09640fc841b87b99e87c888d6688586fb92afd7378aa1adf",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/__init__.py": "7c309c1ee5f65f7a09640fc841b87b99e87c888d6688586fb92afd7378aa1adf",
+        "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "0c259286ef86f717bfe2733e6b8fea161a6fe170bacd636d914a6b3bd8a7f630",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/plugin.yaml": "0c259286ef86f717bfe2733e6b8fea161a6fe170bacd636d914a6b3bd8a7f630",
+        "/opt/hermes-data/plugins/groot-query-completion/alignment.py": "28446e6d8d20f8da34f8bb0c1059995908fc5b0b95854bf590a8a7e6d7b24882",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/alignment.py": "28446e6d8d20f8da34f8bb0c1059995908fc5b0b95854bf590a8a7e6d7b24882",
+        "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": "18634f8ae9aa09b7ff682e4e79accb021aeb1863407f1f0d23e485b234fef102",
+        "/opt/capstone-ollama-trial/query_grounding.py": "7c309c1ee5f65f7a09640fc841b87b99e87c888d6688586fb92afd7378aa1adf",
+        "/opt/capstone-ollama-trial/harness.py": "18634f8ae9aa09b7ff682e4e79accb021aeb1863407f1f0d23e485b234fef102",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/harness.py": "18634f8ae9aa09b7ff682e4e79accb021aeb1863407f1f0d23e485b234fef102",
+        "/opt/capstone-ollama-trial/runtime.py": "3cb845be7114512cb20fba3e7f95cf3923354f0051ac8ae662e4c62e0197576e",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/runtime.py": "3cb845be7114512cb20fba3e7f95cf3923354f0051ac8ae662e4c62e0197576e",
+        "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "519a06dcfc2170cfc9f4257f50a5144bd8cdf68d4a385060030e1712ee90c6da",
+        "/opt/capstone-ollama-trial/chat_contract.py": "519a06dcfc2170cfc9f4257f50a5144bd8cdf68d4a385060030e1712ee90c6da",
+        "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/chat_contract.py": "519a06dcfc2170cfc9f4257f50a5144bd8cdf68d4a385060030e1712ee90c6da"
+      },
+      "protected_files_unchanged": true,
+      "finished_epoch": 1793381931.650107
+    }
+  ],
+  "installed": {
+    "at": 1793382003.1511612,
+    "files": {
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": true,
+      "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/__init__.py": true,
+      "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": true,
+      "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/plugin.yaml": true,
+      "/opt/hermes-data/plugins/groot-query-completion/alignment.py": true,
+      "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/alignment.py": true,
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": true,
+      "/opt/capstone-ollama-trial/query_grounding.py": true,
+      "/opt/capstone-ollama-trial/harness.py": true,
+      "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/harness.py": true,
+      "/opt/capstone-ollama-trial/runtime.py": true,
+      "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/runtime.py": true,
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": true,
+      "/opt/capstone-ollama-trial/chat_contract.py": true,
+      "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/chat_contract.py": true
+    },
+    "native_version": "groot-query-completion:1.15.7"
+  },
+  "limitations": [
+    "Same historical development incident reused in new threads, not unused evaluation or training",
+    "Same model; shared load/cache not controlled; no general speed or agent superiority claim",
+    "Guard success/adapter completed is not incident judgment correctness",
+    "No new training, model swap, Thor inference stop, protected mutation, attack-response E2E or full new-server installation",
+    "Raw replies/rejected drafts remain private evidence; no automatic incident benign classification or blocking"
+  ]
+}

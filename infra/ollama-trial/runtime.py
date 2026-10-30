@@ -270,11 +270,14 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                            harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
                            harness.event_report(current, report['calls']))
                 issues = [] if literal else harness.violations(current, str(final), report['calls'])
+                audit = harness.incident_judgment_check(current, str(final), report['calls'])
+                if audit:
+                    report.setdefault('judgment_audit', []).append(audit)
                 repair_passes = 0
                 gap = harness.preparation_gap(current, report['calls'])
                 incident_gap = harness.incident_evidence_gap(current, report['calls'])
                 preparation_used = False
-                while (missing or issues or incident_gap or (gap and not preparation_used)) and (incident_gap or not harness.action_claim_violations(current, str(final), report['calls'])) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
+                while (missing or issues or incident_gap or (gap and not preparation_used)) and (incident_gap or audit or not harness.action_claim_violations(current, str(final), report['calls'])) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
                     repair_passes += 1
                     report['repair'] = {'missing_targets': missing, 'issues': issues}
                     instruction = ('현재 질문: ' + current + '\n조회 근거 점검 결과: ' + json.dumps(report['repair'], ensure_ascii=False) +
@@ -288,6 +291,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                     if incident_gap:
                         instruction = harness.incident_evidence_instruction(current)
                         report['repair']['incident_evidence_missing'] = True
+                    elif audit and issues:
+                        instruction = harness.incident_judgment_instruction(current, str(final), report['calls'], issues)
                     read_scope = harness.incident_selection_scope(current, report['calls']) or harness.tool_scope(current, report['calls'])
                     if read_scope and not gap and budget.used < budget.limit:
                         # The same LLM selects real read calls in constrained JSON
@@ -322,6 +327,13 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                             final = ''  # Failed/missing reads cannot become observations.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
+                    audit = harness.incident_judgment_check(current, str(final), report['calls'])
+                    if audit:
+                        report.setdefault('judgment_audit', []).append(audit)
+                        report['judgment_audit'] = report['judgment_audit'][-4:]
+                        if harness.repeated_judgment(report['judgment_audit']):
+                            report['stop_reason'] = 'repeated_unchanged_judgment'
+                            break
                     if report['protected_calls'] or preparation_used:
                         break
                     gap = harness.preparation_gap(current, report['calls'])

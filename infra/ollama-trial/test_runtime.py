@@ -13,7 +13,7 @@ import runtime
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None):
         calls, prompts = [], []
         self.protected_starts = []
         content = '# heading\nbody\n'
@@ -58,6 +58,8 @@ class PreparationLoop(unittest.TestCase):
             async def run(self, prompt):
                 prompts.append(prompt);tools={t.name:t for t in self.adapter.tools}
                 if read_incident:
+                    if incident_drafts:
+                        return incident_drafts[min(len(prompts)-1,len(incident_drafts)-1)]
                     return 'WAF 반환 표본 0건. 구간 전체와 사건 영향·위험은 미확인이며 추가 조사가 필요합니다.'
                 if len(prompts)==1:
                     if bad_input:
@@ -129,6 +131,43 @@ class PreparationLoop(unittest.TestCase):
         self.assertEqual(report.get('remaining_issues',[]),[])
         self.assertIn('추가 조사가 필요',report['final_response'])
         self.assertEqual(report['calls'][0]['via'],'structured_read_selection')
+
+    def test_incident_factual_repair_keeps_failed_draft_without_repeating_reads(self):
+        failed='WAF 경보는 0건입니다.'
+        fixed='WAF 반환 표본 0건. 실제 공격 여부와 영향은 미확인이고 추가 조사가 필요합니다.'
+        report,prompts,calls=self.execute(question='DVWA 공격인지 근거와 대응 필요성을 조사해줘.',
+            read_incident=True,incident_drafts=[failed,fixed])
+        self.assertEqual(report['status'],'completed')
+        self.assertEqual(report['final_response'],fixed)
+        self.assertEqual(calls,['search_modsecurity_alerts'])
+        self.assertEqual(len(prompts),2)
+        self.assertIn('<untrusted_tool_observations>',prompts[-1])
+        self.assertIn(failed,prompts[-1])
+        self.assertEqual(report['judgment_audit'][0]['draft'],failed)
+        self.assertIn('sample_zero_presented_as_absence',report['judgment_audit'][0]['issues'])
+        self.assertEqual(report['judgment_audit'][-1]['issues'],[])
+
+    def test_incident_exhausted_factual_repairs_remain_partial_with_audit(self):
+        failed='WAF 경보는 0건입니다.'
+        report,prompts,calls=self.execute(question='DVWA 공격인지 근거와 대응 필요성을 조사해줘.',
+            read_incident=True,incident_drafts=[failed])
+        self.assertEqual(report['status'],'partial')
+        self.assertEqual(len(prompts),2)
+        self.assertEqual(calls,['search_modsecurity_alerts'])
+        self.assertEqual(report['protected_calls'],0)
+        self.assertEqual(len(report['judgment_audit']),2)
+        self.assertEqual(report['stop_reason'],'repeated_unchanged_judgment')
+        self.assertNotIn(failed,report['final_response'])
+
+    def test_incident_environment_refusal_is_repaired_without_an_action(self):
+        failed='사설 주소이므로 대응이 불필요합니다.'
+        fixed='WAF 반환 표본 0건. 승인 여부와 실제 영향은 미확인이고 추가 조사가 필요합니다.'
+        report,prompts,calls=self.execute(question='DVWA 공격인지 근거와 대응 필요성을 조사해줘.',
+            read_incident=True,incident_drafts=[failed,fixed])
+        self.assertEqual(report['final_response'],fixed)
+        self.assertIn('environment_used_as_authorization',report['judgment_audit'][0]['issues'])
+        self.assertEqual(calls,['search_modsecurity_alerts'])
+        self.assertEqual(report['protected_calls'],0)
 
     def test_stalled_model_receives_exactly_one_preparation_continuation(self):
         report,prompts,calls=self.execute()

@@ -277,6 +277,15 @@ def request_wrapper(original, query, harness):
                 kw.get('original_user_message'), request, harness.SHARED._CONTEXT_PREFIX)
         else:
             projected = False
+        pending = getattr(agent, '_capstone_incident_repair_prompt', None)
+        if pending and pending[0] == turn and isinstance(data.get('messages'), list):
+            visible = any(row.get('role') == 'user' and row.get('content') == pending[1]
+                          for row in data['messages'])
+            if not visible:
+                data['messages'].append({'role': 'user', 'content': pending[1]})
+            logging.getLogger('capstone.query_completion').info(
+                'event=incident_repair_wire native_prompt_present=%s prompt_sha256=%s',
+                visible, hashlib.sha256(pending[1].encode()).hexdigest())
         observed = {c.get('call_id'): c for c in calls}
         for row in data.get('messages', []):
             call = observed.get(row.get('tool_call_id')) if row.get('role') == 'tool' else None
@@ -486,19 +495,42 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         counter = kw.get('codex_ack_continuations')
         repairs = getattr(agent, '_capstone_incident_repairs', (None, 0))
         used = repairs[1] if repairs[0] == turn else 0
-        if (harness.incident_evidence_gap(request, calls) and type(counter) is int
+        audit = harness.incident_judgment_check(request, text, calls)
+        incident_gap = harness.incident_evidence_gap(request, calls)
+        incident_issues = audit['issues'] if audit else []
+        repeated = False
+        if audit:
+            previous = getattr(agent, '_capstone_incident_judgment_audit', (None, []))
+            attempts = previous[1] if previous[0] == turn else []
+            agent._capstone_incident_judgment_audit = (turn, (attempts + [audit])[-3:])
+            repeated = harness.repeated_judgment(attempts + [audit])
+            logging.getLogger('capstone.query_completion').info(
+                'event=incident_judgment_check draft_sha256=%s issues=%s',
+                audit['draft_sha256'], ','.join(incident_issues))
+        if ((incident_gap or incident_issues) and not repeated and type(counter) is int
                 and used < harness.CONTRACT.REPAIR_PASSES and query._remaining(kw, agent)):
             agent._capstone_incident_repairs = (turn, used + 1)
             agent._mute_post_response = False
             agent._clear_status_buffer()
             append_message(rows, agent._build_assistant_message(message, 'incomplete'))
-            append_message(rows, {'role': 'user', 'content': harness.incident_evidence_instruction(request)})
+            instruction = (harness.incident_evidence_instruction(request) if incident_gap else
+                harness.incident_judgment_instruction(request, text, calls, incident_issues))
+            agent._capstone_incident_repair_prompt = (turn, instruction)
+            append_message(rows, {'role': 'user', 'content': instruction})
             agent._session_messages = rows
             names = ('active_system_prompt', '_turn_exit_reason', '_preflight_compression_blocked',
                      'truncated_response_parts', 'length_continue_retries',
                      '_pending_verification_response', '_pending_verification_response_previewed')
             return native.FinalResponseVerdict(action='continue', final_response=None,
                 codex_ack_continuations=counter + 1, **{name: kw[name] for name in names})
+        if incident_issues:
+            # Keep the rejected draft in the existing private session, not chat.
+            append_message(rows, agent._build_assistant_message(message, 'incomplete'))
+            agent._session_messages = rows
+            agent._capstone_alignment_partial = True
+            agent._capstone_incident_repair_prompt = None
+            return original(agent, **query._with_final_text(kw, harness.fallback(request, calls)))
+        agent._capstone_incident_repair_prompt = None
         action_issues = harness.action_claim_violations(request, text, calls)
         if action_issues:
             text = harness.action_fallback(request, calls)

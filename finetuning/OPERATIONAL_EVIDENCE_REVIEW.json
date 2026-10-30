@@ -1,0 +1,283 @@
+{
+  "schema": 1,
+  "at_kst": "2026-10-30T19:10:23.998120+09:00",
+  "decision": "live_read_evidence_reserved_and_stale_tool_description_reconciled_not_training_release",
+  "live_capture": {
+    "at_kst": "2026-10-30T18:47:33.849555+09:00",
+    "capture_sha256": "63161fd17d22dd7b6a14dead3078a678c9828cb71839149c09cc127901a645b3",
+    "via": "Mac to A by documented hostname, B via A; existing soc-ollama account for MCP client",
+    "status": "completed",
+    "catalog_servers": 8,
+    "catalog_tools": 38,
+    "read_tools": 29,
+    "protected_tools": 9,
+    "model": "qwen3.6:35b",
+    "model_calls": 0,
+    "protected_calls": 0,
+    "chat_posts": 0,
+    "runtime_policy_harness_sha256": {
+      "runtime.py": "012e49055ba3b79bebe11b069cd1a4604ae05557d6b3ca0b4acd2f6989e852de",
+      "policy.py": "7a6ac7a9c8ddb035e505cdbc63a1be2c0a314597202d86ecb45b07a79e56bc4a",
+      "harness.py": "05f6af8c472fa423a315483ee57732a2879317fb71444025aa106842ef7a15ae"
+    },
+    "source_hashes_match_workspace": true
+  },
+  "FW_observation": {
+    "actual_FW_pages": 3,
+    "FW_objects": 145,
+    "FW_counts": {
+      "table": 8,
+      "chain": 30,
+      "rule": 98,
+      "set": 9
+    },
+    "base_chains": 14
+  },
+  "FW_scope": {
+    "target": "a:firewall",
+    "all_current_nft_objects_preserved": true,
+    "legacy_tables": {
+      "ipv4": [],
+      "ipv6": []
+    },
+    "excluded": [
+      "other hosts",
+      "other network namespaces",
+      "legacy iptables"
+    ],
+    "byte_and_offset_consistency_verified": true,
+    "upstream_raw_nft_hash_recomputed": false,
+    "operational_snapshot_not_new_independent_incident": true
+  },
+  "catalog_delta": {
+    "schema_changes": 0,
+    "permissions_changed": 0,
+    "description_changed": [
+      "mcp__rule_write_a__temporarily_contain_ip"
+    ],
+    "old_meaning": "Public external only; all private addresses refused.",
+    "current_meaning": "Public or RFC1918 attacker subject to server-verified attack evidence; explicit protected/management/infrastructure/DGX/active-SSH addresses refused,10-minute TTL/no extension unchanged.",
+    "source_file": "infra/mcp/rule_change_mcp.py",
+    "source_sha256": "0b44fd53afb95ca079d9f7d8ecc244eb8316070f762deaa9ae1c16ac9e28aa13"
+  },
+  "candidate_refresh": {
+    "latest_inventory": "data-soc-mixture-candidate-20261030-r5",
+    "manifest_sha256": "9ad551a760309f569ee8cba9c1de41695a34f7d31108daba2d484e5aff153179",
+    "rows_total": 1197,
+    "only_tool_description_changed": true,
+    "rows_changed": 3,
+    "messages_arguments_permissions_unchanged": true,
+    "changes": {
+      "soc-v4-core-soc-operator-v3-containment_pending-train-000": {
+        "old_record_line_sha256": "565293f77ff30c1522a068a88f4b79a7fb54c2c2aa69e61e3f9ab1895741a696",
+        "new_record_line_sha256": "a615a431358bfaa3231bbbaacced2948a0f2e029b6e2f859c092ffc8b2491e36",
+        "messages_sha256": "6a3aef039b4c6304cbcec948bfbe10eb5d8d1fb3aec80189be45a07a7c29ede8"
+      },
+      "soc-v4-core-soc-operator-v3-containment_pending-train-001": {
+        "old_record_line_sha256": "bbdfc2d6e43a22ea59cd7dcf49d92aadbf125f3ac54f30c680ddb330162e3900",
+        "new_record_line_sha256": "c117ddd89a2041a78d5fc1d99ed6f9e28e1171f5e14aa53a86c91c51c52c65f4",
+        "messages_sha256": "66cce7d9bfcf85a56d19b18217ba811c338dbec77bf681e16536e6810899c021"
+      },
+      "soc-v4-core-soc-operator-v3-containment_pending-train-002": {
+        "old_record_line_sha256": "a591b124f2f21086bc17f70d3ea19ccd09d5348611529af99438fbfc1dc76034",
+        "new_record_line_sha256": "b5af38bc4a5fb060489389d6baf5e912d9be44f627836670c1227d30e45c8a7a",
+        "messages_sha256": "1ad0e434e1d34acc4027b63244ce8d5bf3fb16d5af9f8807b8c92b25ad08e912"
+      }
+    },
+    "pool_files": {
+      "cti-replay-candidates.jsonl": {
+        "rows": 1024,
+        "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2"
+      },
+      "observation-candidates.jsonl": {
+        "rows": 143,
+        "sha256": "2a00f9956b58e5067bda0fe962d2edd58dac9fe931e3817d6bca8d240439869f"
+      },
+      "optional-harness-candidates.jsonl": {
+        "rows": 30,
+        "sha256": "6ceafb6eae1f3c1df91bf2bfba01b3a698c5457d60eb4750194c4eb635479d82"
+      }
+    },
+    "previous_inventory_preserved": true,
+    "historical_V4_V5_splits_and_catalog_preserved": true,
+    "latest_pilot": "data-soc-pilot-candidate-20261030-r5",
+    "pilot_manifest_sha256": "8c74b9e3d7d5d120c12f5cc0b1fcfd2a90e5b4c1d7bc007de895caec10afb72e",
+    "pilot_arms": {
+      "evidence-only.jsonl": {
+        "rows": 191,
+        "sha256": "acee5ff65c57b50991620504713d0b22703516715ffa9ae7107aa9444dddaf84"
+      },
+      "evidence-plus-harness.jsonl": {
+        "rows": 221,
+        "sha256": "c33c832585e8604c16afbd2aa7eae20d050d7f5cb6fdaaefb7944b5a3caeecf2"
+      }
+    },
+    "token_required_at_creation_resolved_by_follow_up": true
+  },
+  "actual_CPU_token_check": {
+    "at_kst": "2026-10-30T18:56:31.166512+09:00",
+    "manifest_sha256": "9ad551a760309f569ee8cba9c1de41695a34f7d31108daba2d484e5aff153179",
+    "model": "Qwen/Qwen3.6-35B-A3B",
+    "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "metadata_files": 11,
+    "measurements": {
+      "cti-replay-candidates.jsonl": {
+        "rows": 1024,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 406
+      },
+      "observation-candidates.jsonl": {
+        "rows": 143,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 2876
+      },
+      "optional-harness-candidates.jsonl": {
+        "rows": 30,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 2710
+      }
+    },
+    "token_deltas": [
+      {
+        "id": "soc-v4-core-soc-operator-v3-containment_pending-train-000",
+        "old_tokens": 2656,
+        "new_tokens": 2665,
+        "supervised_tokens_unchanged": true
+      },
+      {
+        "id": "soc-v4-core-soc-operator-v3-containment_pending-train-001",
+        "old_tokens": 2653,
+        "new_tokens": 2662,
+        "supervised_tokens_unchanged": true
+      },
+      {
+        "id": "soc-v4-core-soc-operator-v3-containment_pending-train-002",
+        "old_tokens": 2631,
+        "new_tokens": 2640,
+        "supervised_tokens_unchanged": true
+      }
+    ],
+    "all_fit_4096_and_aligned": true,
+    "truncated": false,
+    "rows_dropped": 0,
+    "model_weights_loaded": false,
+    "exit_code": 0,
+    "OOMKilled": false,
+    "runtime": "Existing pinned image/venv; runc CPU4,8GiB,no network,readonly root,timeout120s",
+    "ollama_before_after": "active"
+  },
+  "reserved_operational_evidence": {
+    "folder": "data-operational-evidence-20261030-r1",
+    "manifest_sha256": "8efb3cdd5968aeba84b4710976d3f59f08d1e86b117619c1578429a624521017",
+    "files": {
+      "catalog.json": {
+        "sha256": "ce928395c5520d71f76230dfce394c981bcbe4f3f422c6cad7de39c604cc355d",
+        "bytes": 42811
+      },
+      "firewall-capture.json": {
+        "sha256": "63161fd17d22dd7b6a14dead3078a678c9828cb71839149c09cc127901a645b3",
+        "bytes": 94745
+      },
+      "firewall-facts.json": {
+        "sha256": "f1e01b5fb1a0242a6d334124ef58138a44216e398298313bac0550357a3d02e5",
+        "bytes": 3963
+      }
+    },
+    "counts": {
+      "servers": 8,
+      "tools": 38,
+      "read_tools": 29,
+      "protected_tools": 9,
+      "FW_pages": 3,
+      "FW_objects": 145,
+      "FW_base_chains": 14
+    },
+    "new_operator_answers_generated": 0,
+    "final_operational_cases_created": 0,
+    "source_type": "Project operational snapshot, not institutional/expert-certified incident data",
+    "independence": "Fresh capture is not proof of independent policy contents; the same infrastructure was used in older tests."
+  },
+  "verification": {
+    "actual_FW_pages": 3,
+    "FW_objects": 145,
+    "FW_counts": {
+      "table": 8,
+      "chain": 30,
+      "rule": 98,
+      "set": 9
+    },
+    "base_chains": 14,
+    "changed_rows_only": [
+      "soc-v4-core-soc-operator-v3-containment_pending-train-000",
+      "soc-v4-core-soc-operator-v3-containment_pending-train-001",
+      "soc-v4-core-soc-operator-v3-containment_pending-train-002"
+    ],
+    "only_tool_description_changed": true,
+    "total_rows": 1197,
+    "token_deltas": [
+      {
+        "id": "soc-v4-core-soc-operator-v3-containment_pending-train-000",
+        "old_tokens": 2656,
+        "new_tokens": 2665,
+        "supervised_tokens_unchanged": true
+      },
+      {
+        "id": "soc-v4-core-soc-operator-v3-containment_pending-train-001",
+        "old_tokens": 2653,
+        "new_tokens": 2662,
+        "supervised_tokens_unchanged": true
+      },
+      {
+        "id": "soc-v4-core-soc-operator-v3-containment_pending-train-002",
+        "old_tokens": 2631,
+        "new_tokens": 2640,
+        "supervised_tokens_unchanged": true
+      }
+    ],
+    "V5_sources25_and_six_splits_preserved": true,
+    "CLI_two_reproductions_except_time": true,
+    "new_tests": 16,
+    "existing_tests": 48,
+    "total_tests": 64,
+    "independent_method": "Direct whole-object concatenation/count/policy and per-record structural delta; no new validator imported.",
+    "existing_outputs_refused": 2
+  },
+  "execution_issues": {
+    "initial_default_key_auth": "No matching default key; documented A jump plus project one-process askpass authenticated.",
+    "sudo_n": "B requires password; explicit sudo stdin used without copying secrets.",
+    "probe_constructor": "First probe supplied unsupported telemetry_enabled to MCPClient; failed before sessions/tools. Corrected to installed code_mode/sandbox signature and disabled telemetry with existing environment settings. Runtime source was not changed."
+  },
+  "cleanup_remote": {
+    "at_kst": "2026-10-30T18:59:18.746166+09:00",
+    "removed_files": 17,
+    "removed_bytes": 3679620,
+    "container_removed": true,
+    "frozen_sources_preserved": 25,
+    "ollama_after": "active",
+    "retained": [
+      "launch.json",
+      "observation.json",
+      "out/token-check.json",
+      "cleanup.json"
+    ]
+  },
+  "cleanup_mac": {
+    "at_kst": "2026-10-30T19:10:23.998120+09:00",
+    "files": 26,
+    "bytes": 9556252,
+    "mac_packages_installed": 0,
+    "publisher_pending_final_push": true
+  },
+  "remaining": [
+    "Build unused operational tasks with source-backed gold for approval/edit/apply/verification/rollback and unavailable tools/storage; read capture is not a complete operational benchmark.",
+    "Freeze matched-compute training and full-catalog runtime/context comparison; no new training outage is authorized by this report.",
+    "Actual model response quality, chat/approval/write/rollback and attack E2E; new-server full install and complete pack remain untested."
+  ],
+  "new_training": false,
+  "model_promoted": false,
+  "runtime_policy_changed": false,
+  "presentation_created": false
+}

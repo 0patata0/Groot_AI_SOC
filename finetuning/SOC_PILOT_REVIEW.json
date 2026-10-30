@@ -779,5 +779,17 @@
     "pilot_manifest_sha256": "1a2ef51f47c8928ed86de55ec0816ead0e4cdbb07ca9c3f869f83863c659224c",
     "arm_bytes_unchanged": true,
     "new_final_operational_evaluation": 0
+  },
+  "live_contract_follow_up": {
+    "at_kst": "2026-10-30T19:10:23.998120+09:00",
+    "report": "OPERATIONAL_EVIDENCE_REVIEW.json",
+    "catalog_tools": 38,
+    "schema_changes": 0,
+    "description_changes": 1,
+    "candidate_rows_changed": 3,
+    "latest_inventory": "data-soc-mixture-candidate-20261030-r5",
+    "latest_pilot": "data-soc-pilot-candidate-20261030-r5",
+    "actual1197_token_check_passed": true,
+    "new_training": false
   }
 }

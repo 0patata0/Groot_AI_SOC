@@ -1,5 +1,27 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+## 라이브 도구 설명 보완·운영 조회 근거 — 2026-10-30T19:12:15.868392+09:00
+
+최신 전체 후보는 `data-soc-mixture-candidate-20261030-r5`, 소규모 비교 후보는 `data-soc-pilot-candidate-20261030-r5`다. 기존R4는보존한다. 라이브38도구의스키마/권한은기존과같았고임시차단설명1개만달랐다. `refresh_soc_tool_descriptions.py`는 명시적으로 검수한 이 차이만 허용하며 새 도구/스키마/권한·다른 설명 변화는 중단한다. 후보3개 도구 설명만현재RFC1918 정책에맞췄고질문·답변·인자/권한·TTL은유지했다. [원장](OPERATIONAL_EVIDENCE_REVIEW.json).
+
+```sh
+python3 -B finetuning/refresh_soc_tool_descriptions.py \
+  --inventory finetuning/data-soc-mixture-candidate-20261030-r4 \
+  --capture /local/read-only-live-capture.json \
+  --output /new/candidate-directory
+python3 -B finetuning/prepare_operational_evidence.py \
+  --capture /local/read-only-live-capture.json \
+  --output /new/evidence-directory
+```
+
+둘다기존출력을덮어쓰지않고라이브도구를직접호출하지않는다. refresh는프로젝트소스선언·실측설명을대조하고CAM분리검사를유지한다. 소스묶음은`contract_sources/rule_change_mcp.py`투영도포함한다. 실행에는원후보/로컬근거/CAM예약자료가별도로필요하며원문이나자격파일은자동pack하지않는다.
+
+새후보생성당시 `new_token_proof_required: true`는그대로보존했고후속실행으로1,197건전체를검증했다. 실제Qwen최대2,876/4,096·절단/마스크오류0,3개입력만각9토큰증가/정답불변이다. `prepare_soc_pilot.py`에는해당R5와이번실토큰증빙을지정해야하며이전R4증빙은해시불일치로사용할수없다.191행은동일,221행은3설명만변경된다.
+
+`data-operational-evidence-20261030-r1`은 실제38도구카탈로그·FW3페이지·기본정책14개/범위근거를분리한예약자료다. 공개Git에는해시/검증만남기고실제규칙본문은제외한다. 첫/중간페이지누락·snapshot/hash변경·오류응답을완료로세지않는다. 원nftstdout의해시를별도로재계산한것은아니며동일snapshot/응답바이트/전체객체를검사했다. 이자료만으로승인·쓰기·원복능력이나미사용최종운영평가가완료되지않는다.
+
+이하 이전 준비 이력을 보존한다.
+
 ## CAM 평가자료 혼입 방지 — 2026-10-30T18:38:46.434440+09:00
 
 `audit_cam_isolation.py`는 기존 학습·평가39파일, V4/V5 원천2파일, 후보3파일의 모든 역할·중첩 JSON을 검사한다. 47,627행 방문에서 사건 로그/출처 일치0, 표준 오류 제목100행은 비식별 문구로 분리했다. CAM 입력393개에는7,424로그행(고유7,061)이 있고 두 공격 단계가5줄을 공유한다. 제공기관의 전체34실험을 이용한 정상 로그 필터를 고려하여 CAM 전체를 학습에서 제외한다. [원천·실행·한계](CAM_ISOLATION_REVIEW.json).

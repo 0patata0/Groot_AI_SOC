@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **2026-10-30 변경 기록 읽기:** get_rule_change_status의 승인 소모·결과 알림·과거 읽기 해시 누락을 보완했습니다. current_file_checked=false이며 현재 파일은 별도 getter로 검증합니다. 기존 읽기 전용 계정·승인/worker 경계를 유지합니다. [필드와 복구](change-status-read.md) · [실제 검증](../../STATUS.md).
+
 > **2026-10-29 FW 전체 읽기:** 기존 `resp`에 `get_firewall_rules`를 추가했다. A 호스트의 기본 정책·모든 체인·NAT/Docker·전체 nftables를 읽으며 임시 차단 목록과 구분한다. [사용·범위·페이지·복구](firewall-read.md) · [운영 검증](../../STATUS.md).
 
 > **2026-10-27 쓰기 사전 검증 보완:** Wazuh 후보의 XML 요소 밖 `#` 텍스트를 승인 카드 생성 전에 거절한다. XML 주석과 description 내부의 정상 텍스트는 허용한다. 승인 후 실제 엔진 검사·정확 후보 승인 경계는 유지한다. [검증과 운영 상태](../../STATUS.md).

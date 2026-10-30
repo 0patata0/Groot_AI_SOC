@@ -13,7 +13,7 @@ fail closed when the broker, approver, validation, or live base has changed.
 """
 
 import contextlib
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import difflib
 import fcntl
 import hashlib
@@ -993,14 +993,42 @@ class Engine:
             record = self._load(rid)
             out = {"proposal_id": rid, "target": record["payload"]["target"], "status": record["status"],
                    "before_sha256": record["payload"]["base_sha256"], "after_sha256": record["payload"]["candidate_sha256"],
-                   "result": record.get("result", "")}
-            if record["status"] == "pending":
+                   "result": record.get("result", ""),
+                   "observed_at_kst": datetime.fromtimestamp(self.clock(), timezone(timedelta(hours=9))).isoformat(),
+                   "status_scope": "proposal_execution_record", "current_file_checked": False,
+                   "approval_consumed": record.get("approval_consumed"),
+                   "result_posted": record.get("result_posted"),
+                   "approval_status": "unknown", "approval_status_source": "not_recorded"}
+            # A terminal receipt is historical execution evidence, not a fresh
+            # check of the target. Preserve missing legacy fields as unknown.
+            if record.get("approval_consumed") is True:
+                out.update(approval_status="consumed", approval_status_source="execution_record")
+            elif record["status"] in ("denied", "expired"):
+                out.update(approval_status=record["status"], approval_status_source="execution_record")
+            if record["status"] in ("pending", "prepared"):
                 try:
                     decision = self._checked_decision(record)
                     out["approval_status"] = decision["status"]
                     out["approved_by"] = decision.get("by", "") if decision["status"] == "approved" else ""
                 except RuleChangeError:
                     out["approval_status"] = "unavailable"
+                out["approval_status_source"] = "broker_lookup"
+            final = record.get("result_payload")
+            if isinstance(final, dict):
+                out["recorded_result"] = {k: final[k] for k in ("status", "readback_sha256", "detail") if k in final}
+            out["hash_scope"] = {"before_sha256": "proposal_base", "after_sha256": "proposed_candidate",
+                                 "recorded_result.readback_sha256": "historical_result_readback_not_current"}
+            if record.get("result_posted") is True:
+                delivery = "confirmed"
+            elif record.get("approval_consumed") is True and record["status"] in ("applied", "rolled_back", "recovery_failed", "failed") and record.get("result_posted") is False:
+                delivery = "retry_pending"
+            elif record["status"] == "aborted":
+                delivery = "abort_confirmed"
+            elif record["status"] in ("abort_pending", "abort_report_error"):
+                delivery = record["status"]
+            else:
+                delivery = "not_recorded"
+            out["result_delivery"] = {"status": delivery, "retry_reexecutes_change": False}
             return out
 
     def _backup(self, record, name, path):

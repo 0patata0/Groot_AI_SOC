@@ -1160,6 +1160,77 @@ class ExecutorTests(unittest.TestCase):
         self.assertEqual(len(self.broker.results), 1)
         self.assertEqual(self.broker.consumes, 1)
 
+    def test_status_keeps_execution_pending_separate_from_broker_decision(self):
+        engine, runner, target, current = self.engine("waf")
+        proposal = self.propose(engine, target, current, "waf")
+        rid = proposal['proposal_id']
+        saved = engine._record_path(rid).read_bytes()
+        commands = list(runner.commands)
+        engine.read_only = True
+        for decision in ('pending', 'approved', 'denied', 'expired', 'consumed'):
+            self.broker.rows[rid]['status'] = decision
+            out = engine.status(rid)
+            self.assertEqual((out['status'], out['approval_status']), ('pending', decision))
+            self.assertEqual(out['approval_status_source'], 'broker_lookup')
+            self.assertIsNone(out['approval_consumed'])
+            self.assertEqual(out['observed_at_kst'], '1970-01-01T09:16:40+09:00')
+        self.broker.fail_get = True
+        self.assertEqual(engine.status(rid)['approval_status'], 'unavailable')
+        self.assertEqual(engine._record_path(rid).read_bytes(), saved)
+        self.assertEqual(runner.commands, commands)
+        self.assertEqual(self.broker.consumes, 0)
+
+    def test_status_preserves_historical_hash_and_delivery_retry_after_current_drift(self):
+        engine, runner, target, current = self.engine('waf')
+        rid = self.propose(engine, target, current, 'waf')['proposal_id']
+        self.broker.rows[rid]['status'] = 'approved'
+        self.broker.fail_result_once = True
+        engine.worker_once()
+        historical = digest(self.candidate('waf').encode())
+        Path(engine.targets[target]['path']).write_bytes(current + b'# later change\n')
+        saved = engine._record_path(rid).read_bytes()
+        out = engine.status(rid)
+        self.assertEqual(out['approval_status'], 'consumed')
+        self.assertTrue(out['approval_consumed'])
+        self.assertFalse(out['result_posted'])
+        self.assertEqual(out['result_delivery'], {'status':'retry_pending', 'retry_reexecutes_change':False})
+        self.assertEqual(out['recorded_result']['readback_sha256'], historical)
+        self.assertFalse(out['current_file_checked'])
+        self.assertEqual(engine._record_path(rid).read_bytes(), saved)
+        commands = list(runner.commands)
+        engine.worker_once()
+        self.assertEqual(engine.status(rid)['result_delivery']['status'], 'confirmed')
+        self.assertEqual(runner.commands, commands)
+        self.assertEqual(self.broker.consumes, 1)
+
+    def test_status_does_not_infer_recovery_or_missing_legacy_approval(self):
+        engine, _, target, current = self.engine('waf')
+        rid = self.propose(engine, target, current, 'waf')['proposal_id']
+        record = engine._load(rid)
+        for status in ('applied','rolled_back','recovery_failed','failed','denied','expired'):
+            record['status'] = status
+            engine._save(record)
+            out = engine.status(rid)
+            self.assertEqual(out['status'], status)
+            self.assertIsNone(out['approval_consumed'])
+            self.assertIsNone(out['result_posted'])
+            self.assertEqual(out['approval_status'], status if status in ('denied','expired') else 'unknown')
+            self.assertEqual(out['result_delivery']['status'], 'not_recorded')
+            self.assertNotIn('recorded_result', out)
+
+    def test_status_preserves_abort_delivery_and_prepared_uncertainty(self):
+        engine, _, target, current = self.engine('waf')
+        rid = self.propose(engine, target, current, 'waf')['proposal_id']
+        record = engine._load(rid)
+        for status, delivery in [('abort_pending','abort_pending'),('abort_report_error','abort_report_error'),('aborted','abort_confirmed')]:
+            record['status'] = status; engine._save(record)
+            self.assertEqual(engine.status(rid)['result_delivery']['status'], delivery)
+        record['status'] = 'prepared'; engine._save(record)
+        self.broker.rows[rid]['status'] = 'consumed'
+        out = engine.status(rid)
+        self.assertEqual((out['status'],out['approval_status']), ('prepared','consumed'))
+        self.assertIsNone(out['approval_consumed'])
+
     def test_reject_mode_escalation(self):
         for kind, candidate in (("waf", "SecRuleEngine DetectionOnly\nSecRule ARGS @rx x \"ctl:ruleEngine=On\"\n"),
                                 ("suricata", 'drop tcp any any -> any any (msg:"x"; sid:1000001; rev:1;)\n')):

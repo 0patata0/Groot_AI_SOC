@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-10-30 변경 상태 조회:** 추가 deb/wheel/이미지는 없습니다. 기존 SOC 소스 bundle의 rule_change_executor.py와 공통 read_contract.py/harness.py를 반입하며 루트 deploy.sh의 기존 설치 경로를 유지합니다. 상태 반환만 확장하며 설정 예제 키·포트·권한은 변하지 않습니다. B 복구 bundle에 빠졌던 기존 Wazuh XML 주석 검사도 canonical과 맞췄습니다. [사용·복구](../infra/mcp/change-status-read.md) · [운영/새 설치 검증 구분](../STATUS.md).
+
 > 2026-10-29 사설 출발지 정책 변경은 기존 소스 bundle의 `incident_containment.py`·`operations_approval.py`·`rule_change_mcp.py`, 공통 SOC 지침/하네스와 `soc_runtime.py`에 반영한다. 추가 deb·wheel·이미지·포트·공통 키는 없다. `deploy.sh`가 기존 내부 설치 경로로 이 소스를 반입하며 예제의 명시적 관리자/인프라 보호를 적용한다.
 
 > **2026-10-29 FW 읽기 반입:** 갱신된 `infra/mcp/response-mcp.py`, `deployment/soc_management.py`, 두 봇 공통 하네스/계약/grounding/정책과 공동 채널 정책을 소스 묶음에 포함한다. 기존 nftables·Python 표준 라이브러리·OpenSSH를 사용하므로 추가 deb/wheel/이미지는 0개다. 초기 설치기는 갱신된 도구 계약을 검사한다. [범위·복구](../infra/mcp/firewall-read.md).

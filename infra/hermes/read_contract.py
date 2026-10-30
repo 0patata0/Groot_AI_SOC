@@ -107,13 +107,14 @@ def _single_plan(question, aware_time):
     if stamps and re.search(r'시간|시각|계산|KST|UTC|timeline', text, re.I):
         return {'kind': 'time', 'stamps': stamps, 'question': question}
     ids = re.findall(r'(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])', text)
-    if ids and re.search(r'제안|proposal|변경', text, re.I) and re.search(r'상태|이력|실패|처리', text):
+    if ids and re.search(r'제안|proposal|변경', text, re.I) and re.search(r'상태|이력|실패|처리|승인|적용|원복|복구|알림|결과|해시', text):
         targets = [t for pattern, t in [('WAF|ModSecurity', 'a:modsecurity-custom'),
             ('IDS|Suricata', 'a:suricata-local'), ('Wazuh|와주', 'b:wazuh-local-rules')]
             if re.search(pattern, text, re.I)]
         if len(targets) == 1:
             return {'kind': 'status', 'ids': list(dict.fromkeys(ids)), 'target': targets[0],
                     'current': bool(re.search(r'현재|지금|최신', text)), 'question': question}
+        return None  # An ambiguous change target is not an agent-inventory read.
     features = []
     for pattern, name in FEATURES:
         if re.search(pattern, text, re.I):
@@ -547,7 +548,7 @@ def missing(p, calls, evidence):
         for pid in p['ids']:
             c = matching(p, calls, 'get_rule_change_status', proposal_id=pid)
             data = unpack(c['result']) if c else None
-            if not isinstance(data, dict) or data.get('proposal_id') != pid or not data.get('status') or data.get('error'):
+            if not isinstance(data, dict) or data.get('proposal_id') != pid or data.get('target') != p['target'] or not data.get('status') or data.get('error'):
                 pending.append('proposal:' + pid)
         if p['current']:
             c = matching(p, calls, 'get_rule_change_target', target=p['target'])
@@ -603,7 +604,12 @@ def guidance(p, calls=()):
         text += ('calculate_time에 사용자 원본 시각과 비교 기준을 옮기고 반환값을 요청한 표로 보여주세요. '
                  'reference에는 사건 ID나 base/ref라는 이름이 아니라 offset이 포함된 실제 시각 문자열을 넣으세요. ')
     else:
-        text += '과거 제안 상태와 현재 파일/컨테이너를 따로 조회하세요. 과거 recovery_failed만으로 현재 장애라고 단정하지 마세요. '
+        text += ('제안의 실행 상태와 승인 상태·승인 소모·결과 알림 전달 여부를 구분하세요. '
+                 '실행 pending만으로 미승인이라 단정하지 말고 approval_status를 확인하세요. '
+                 'approval_status=unavailable은 승인 조회 실패이며 pending과 다릅니다. '
+                 '과거 제안 상태와 현재 파일/컨테이너를 따로 조회하세요. before/after는 원본/후보 해시이며 '
+                 'recorded_result는 과거 결과입니다. 현재 해시는 get_rule_change_target에서 확인하세요. '
+                 '과거 recovery_failed만으로 현재 장애라고 단정하지 마세요. 결과 알림 재전송은 변경 재실행이 아닙니다. ')
     return text
 
 
@@ -671,14 +677,39 @@ def report(p, calls, evidence):
     elif p['kind'] == 'status':
         for pid in p['ids']:
             c = matching(p, calls, 'get_rule_change_status', proposal_id=pid)
-            if c:
+            if c and 'proposal:' + pid not in pending:
                 d = unpack(c['result'])
-                if isinstance(d, dict): rows += ['- 과거 제안 `' + pid + '`: ' + cell(d.get('status')) + '; ' + cell(d.get('result'))]
+                if isinstance(d, dict):
+                    rows += ['', '**변경 `' + pid + '`의 실행 기록**',
+                             *table(['항목', '조회 근거'], [
+                                 ('실행 상태(현재 서비스 상태와 별개)', d.get('status')),
+                                 ('승인 상태', d.get('approval_status')),
+                                 ('승인 상태 근거', d.get('approval_status_source')),
+                                 ('일회 승인 소모 여부', d.get('approval_consumed')),
+                                 ('결과 알림 전달', d.get('result_delivery', {}).get('status')),
+                                 ('원본 SHA-256', d.get('before_sha256')),
+                                 ('후보 SHA-256', d.get('after_sha256')),
+                                 ('과거 결과 읽기 SHA-256', d.get('recorded_result', {}).get('readback_sha256')),
+                                 ('조회 시각(KST)', d.get('observed_at_kst'))]),
+                             '실행 결과: ' + cell(d.get('result'))]
+                    if d.get('approval_status') == 'unavailable': rows += ['승인 조회 실패입니다. 승인 대기·거부·미승인으로 단정할 수 없습니다.']
+                    if d.get('status') in ('pending', 'prepared'): rows += ['실행기의 대기/준비 상태와 승인 결정은 별개입니다.']
+                    if d.get('result_delivery', {}).get('status') == 'retry_pending': rows += ['결과 알림 재전송 대기입니다. 변경을 재실행하지 않습니다.']
         c = matching(p, calls, 'get_rule_change_target', target=p['target']) if p['current'] else None
         if c and p['target'] not in pending:
             d = unpack(c['result']);inv = d.get('rule_inventory', {});runtime = d.get('runtime', {})
             rows += ['', *table(['현재 대상', 'SHA-256', '파일 정의 수', '컨테이너 running'], [(p['target'], d.get('sha256'), inv.get('declared_count'), runtime.get('running'))])]
+            for pid in p['ids']:
+                status_call = matching(p, calls, 'get_rule_change_status', proposal_id=pid)
+                if status_call and 'proposal:' + pid not in pending:
+                    receipt = unpack(status_call['result'])
+                    comparisons = [(label, '일치' if d['sha256'] == receipt[key] else '불일치')
+                                   for key, label in [('before_sha256', '원본'), ('after_sha256', '후보')]
+                                   if isinstance(receipt.get(key), str) and re.fullmatch(r'[0-9a-f]{64}', receipt[key])]
+                    rows += ['변경 `' + pid + '` 대비 현재 파일: ' + ', '.join(label + ' ' + value for label, value in comparisons)]
             rows += ['과거 실패 기록은 그대로 보존됩니다. 현재 파일/컨테이너 관측과 별개입니다. 개별 룰 적재·필수 내부 프로세스의 현재 정상 여부는 이 조회만으로 확정하지 않습니다.']
+        elif not p['current']:
+            rows += ['현재 파일/서비스는 별도 조회하지 않았습니다. 후보·과거 결과 해시를 현재 해시로 해석하지 않습니다.']
     else:
         agent = target_id(p, calls)
         if p['needs_agent']: rows += ['대상: ' + cell(p.get('agent_name')) + ' / agent_id=' + cell(agent)]

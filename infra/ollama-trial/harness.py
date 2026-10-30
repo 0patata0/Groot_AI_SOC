@@ -760,6 +760,20 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
                 schema['properties']['limit']['enum'] = [next(iter(limits))]
                 schema['required'] = list(dict.fromkeys([*schema.get('required', []), 'limit']))
     p = read_plan(question)
+    if p and p['kind'] == 'status':
+        pending = READ.missing(p, calls, EVIDENCE)
+        prefix = 'mcp__rule_' + p['target'][0] + '__'
+        wanted = {prefix + 'get_rule_change_status': ('proposal_id', [pid for pid in p['ids'] if 'proposal:' + pid in pending])}
+        if p['current'] and p['target'] in pending:
+            wanted[prefix + 'get_rule_change_target'] = ('target', [p['target']])
+        narrowed = {}
+        for alias, (key, values) in wanted.items():
+            if alias in result and values:
+                schema = result[alias]
+                schema['properties'][key]['enum'] = values
+                schema['required'] = list(dict.fromkeys([*schema.get('required', []), key]))
+                narrowed[alias] = schema
+        return narrowed
     if p and p['kind'] == 'agent_identity':
         if READ.AGENTS not in result: return {}
         states = [state for state in READ.identity_states(p, calls) if not READ.failed_attempt(

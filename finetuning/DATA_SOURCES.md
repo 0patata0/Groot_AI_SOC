@@ -2,6 +2,8 @@
 
 ## Linux-APT 원문 조사 초안 후속 — 2026-10-30 KST
 
+> **사건 보고서 대조 후속:** [Maastricht 출처 검토](../datasets/ATTACK_FLOW_SOURCE_REVIEW.json)는 원문 PDF SHA·쪽수/객체 SHA·22개 제어 노드의 한계를 묶는다. PDF 관련10쪽을 시각 확인했으며 이전 일부 단락 검토를 보완한다. 권리·기관 인증을 자동 확장하지 않고 프로젝트 검토임을 밝힌다. 원문/라벨은 보존하고 전체 흐름의 사실 정답 생성은 보류한다. PDF 본문은 재배포·학습에 넣지 않는다.
+
 > **Attack Flow 별도 후속:** [고정 원본/의미 정의](../datasets/ATTACK_FLOW_SOURCE_SPEC.json)와 [그래프 검증 원장](../datasets/ATTACK_FLOW_GRAPH_REVIEW.json)에 조건147·AND89·OR29와 전체2,113연결의 보존 결과를 기록했다. MITRE CTID corpus의 인용 자료를 포함하며 Apache-2.0 원문 LICENSE/변경 NOTICE를 보존한다. 기존41개를 새 원천/독립 사건으로 중복 집계하지 않는다. 조건 ordinary anchor1개는 참/거짓을 추측하지 않으며 Maastricht 표현 일부는 공식 대학 공개 Fox-IT 보고서 관련 단락만으로 뒷받침되지 않아 사실 정답 생성을 보류한다. 이 후속 작업이 아래의 ‘새 파서 미구현’ 과거 기록을 갱신한다. 학습 편입은0이다.
 
 > **후속 입력 검수:** [원장](SOC_OBSERVATION_INPUT_REVIEW.json)은 AIT9·Linux-APT8 초안을 입력 후보17개로 정리한 결과다. 근거94개의 원문 좌표·해시 연결과 관측값을 보존했다. 제공자 주석은 주석으로 남기되 phase_label·의미 있는 사건ID·검토 답변은 입력에 복사하지 않는다. 주석 없는 기법 예측 평가가 아닌 근거 검토 과제이며 질문·해석은 프로젝트 작성이다.

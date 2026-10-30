@@ -1,0 +1,564 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T10:39:49.742287+09:00",
+  "status": "source_review_hold",
+  "authorship": "Project reviewer analysis; not institutional correction, label certification, or independent expert review.",
+  "source_graph": {
+    "file": "Maastricht University Ransomware.afb",
+    "sha256": "d97349fdd47244dfe9a34362403ef6d25fcab49df0a5744eee0fb05484a755a6",
+    "upstream_commit": "6c26db9bbb34fcfd655f4fa7edfaa5a018c108ae",
+    "graph_output_sha256": "e4ef23d8313c52b33b429d8375f2e05be0259299bc7e727e6e2ba8af3f1b1a5d"
+  },
+  "report_source": {
+    "url": "https://www.maastrichtuniversity.nl/nl/file/foxitrapportreactieuniversiteitmaastrichtnl10-02pdf",
+    "bytes": 4370027,
+    "sha256": "7fd88a9d0d5860b8477b9ac1edc8f2e4e8c1ef2d9fd1bfdf4fe59af7fa32a5ab",
+    "content_type": "application/pdf",
+    "total_pages": 47,
+    "text_extraction": "Existing macOS PDFKit; all pages extracted, relevant sections inspected. Full report factual audit not claimed.",
+    "visually_reviewed_pdf_pages": [
+      21,
+      25,
+      26,
+      27,
+      28,
+      29,
+      31,
+      33,
+      34,
+      36
+    ],
+    "raw_pdf_retained": false,
+    "reuse": "Citation and review only; no report-text training or PDF redistribution license asserted."
+  },
+  "correction_of_previous_review": {
+    "prior_record": "ATTACK_FLOW_GRAPH_REVIEW.json:cited_incident_review",
+    "scope": "Previous paragraph-only review was incomplete.",
+    "finding": "SDBBot-to-Meterpreter is explicit on page 26; Unix Shell specificity remains unsupported. Web search omission was not source absence."
+  },
+  "findings_summary": {
+    "delivery": "Pages 25-26 describe links; attachment labeling conflicts.",
+    "execution": "Windows context does not establish a Unix interpreter.",
+    "exploit": "Mechanism remains uncertain; original graph contains a qualifying note.",
+    "credentials": "Earlier memory access is inferred; later Mimikatz evidence cannot prove it.",
+    "timestamps": "Tables disagree; preserve both values without invented timezone conversion."
+  },
+  "required_context": {
+    "note_id": "a53a9a5a-f97e-4f60-82fb-481924673b12",
+    "note_sha256": "0aaeba13de79cd249def44ec49e10db08b51dd03fa5a9c7a8b64e7f5e6540f6f",
+    "direct_note_action_edge": "a706557b-f671-44de-ba56-1a524713407c",
+    "action_id": "986b710d-19da-4022-86fb-27df6ee27515",
+    "note_retained_in_new_graph": true,
+    "note_not_in_legacy_steps": true
+  },
+  "timeline_disagreements": [
+    {
+      "comparison": "first infection, Table 8 versus Table 9",
+      "pdf_pages": [
+        34,
+        36
+      ],
+      "source_values": [
+        "2019-10-15 16:56:03",
+        "2019-10-15 14:56:03"
+      ],
+      "difference_seconds": 7200,
+      "timezone": "not established for reconciliation",
+      "timestamp_kst": null
+    },
+    {
+      "comparison": "domain-controller login, Table 8 versus narrative/Table 9",
+      "pdf_pages": [
+        34,
+        28,
+        36
+      ],
+      "source_values": [
+        "2019-11-21 13:19:59",
+        "2019-11-21 13:19:53"
+      ],
+      "difference_seconds": 6,
+      "timezone": "not established for reconciliation",
+      "timestamp_kst": null
+    }
+  ],
+  "definition_sources": [
+    {
+      "id": "T1566.001",
+      "url": "https://attack.mitre.org/techniques/T1566/001/",
+      "checked_at_kst": "2026-10-30T10:39:49.742287+09:00"
+    },
+    {
+      "id": "T1566.002",
+      "url": "https://attack.mitre.org/techniques/T1566/002/",
+      "checked_at_kst": "2026-10-30T10:39:49.742287+09:00"
+    },
+    {
+      "id": "T1595.002",
+      "url": "https://attack.mitre.org/techniques/T1595/002/",
+      "checked_at_kst": "2026-10-30T10:39:49.742287+09:00"
+    },
+    {
+      "id": "T1059.004",
+      "url": "https://attack.mitre.org/techniques/T1059/004/",
+      "checked_at_kst": "2026-10-30T10:39:49.742287+09:00"
+    },
+    {
+      "id": "T1003.001",
+      "url": "https://attack.mitre.org/techniques/T1003/001/",
+      "checked_at_kst": "2026-10-30T10:39:49.742287+09:00"
+    }
+  ],
+  "node_review": [
+    {
+      "node_id": "e846ce14-d8d4-4d87-aa1c-4581a52e0642",
+      "source_object_sha256": "d5d69d3d916ae07fc1243b60dcc6003ed8c776afcd31b41f9ceb02c398ccf803",
+      "node_type": "action",
+      "original_technique_id": "T1566.001",
+      "pdf_pages_1_based": [
+        25,
+        26
+      ],
+      "printed_report_pages": [
+        16,
+        17
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "delivery_mode_conflict"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "47ffc519-7b5c-419d-8b4d-d738abb1ef1f",
+      "source_object_sha256": "365257a3ec3b00c8a603d4779ff8f04106e5b5ad21a5f57028bd637189c9f173",
+      "node_type": "action",
+      "original_technique_id": "T1204.002",
+      "pdf_pages_1_based": [
+        25,
+        26
+      ],
+      "printed_report_pages": [
+        16,
+        17
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "host_scope_needs_precision"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "b2f0f8a2-7563-46ea-90fe-924b943e5374",
+      "source_object_sha256": "86f4ee7bd698a01d51d0e68152bb25440963c8bdd065c2b367df1e63ee1fe024",
+      "node_type": "action",
+      "original_technique_id": "T1547.001",
+      "pdf_pages_1_based": [
+        26
+      ],
+      "printed_report_pages": [
+        17
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "registry_subkey_unverified"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "337ea15a-8eff-4e01-91e9-13b4aa809986",
+      "source_object_sha256": "538f919bc16d407bc9f21e3e73ce9615642e2e3b9dbb900b2900659919512562",
+      "node_type": "action",
+      "original_technique_id": "T1095",
+      "pdf_pages_1_based": [
+        26
+      ],
+      "printed_report_pages": [
+        17
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "transport_protocol_unverified"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "8b19cc76-f722-4b26-8100-5f96c5437ee8",
+      "source_object_sha256": "2f979f32ed9c9c498080b906c8389702813838c0a3e1941dec6532eedff759c5",
+      "node_type": "action",
+      "original_technique_id": "T1059.004",
+      "pdf_pages_1_based": [
+        21,
+        26,
+        27
+      ],
+      "printed_report_pages": [
+        12,
+        17,
+        18
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "unix_subtype_unverified"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "986b710d-19da-4022-86fb-27df6ee27515",
+      "source_object_sha256": "d405a7c79644201989b7e504a0fde2b32d7b0db1f7ee3e084d0041fec6769178",
+      "node_type": "action",
+      "original_technique_id": "T1210",
+      "pdf_pages_1_based": [
+        27,
+        28
+      ],
+      "printed_report_pages": [
+        18,
+        19
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "source_caveat_required"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "f5e02545-48d0-48ed-8452-558605dc32be",
+      "source_object_sha256": "4990735861210746d134a4c27ac7d71fcfd0e920cfc952268c88b21bf4a6d933",
+      "node_type": "action",
+      "original_technique_id": "T1068",
+      "pdf_pages_1_based": [
+        27,
+        28
+      ],
+      "printed_report_pages": [
+        18,
+        19
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "source_caveat_required"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "0db59e5b-1282-4709-ab0f-ae39ad624351",
+      "source_object_sha256": "fd2a977729ba62bb91b44437e6d7635345b40dda28a56b59da321cf8fb28b377",
+      "node_type": "action",
+      "original_technique_id": "T1018",
+      "pdf_pages_1_based": [
+        27
+      ],
+      "printed_report_pages": [
+        18
+      ],
+      "status": "event_supported_only",
+      "finding_codes": [],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "58f2e28f-0e34-49dc-af49-ca0906474990",
+      "source_object_sha256": "6eee112fbcd2d3d245d1ede969bb2b7f02021ddf0aa9923ace8b368558c97256",
+      "node_type": "action",
+      "original_technique_id": "T1595.002",
+      "pdf_pages_1_based": [
+        27,
+        33
+      ],
+      "printed_report_pages": [
+        18,
+        24
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "attack_phase_mapping_requires_review"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "59f1a81d-5930-41d7-87fd-25297217ad6f",
+      "source_object_sha256": "ed39d5e9388aff0d02e767bb2cd209162e52ddad7dc63f34c9d3f5ff564e6859",
+      "node_type": "condition",
+      "original_technique_id": null,
+      "pdf_pages_1_based": [
+        27,
+        28
+      ],
+      "printed_report_pages": [
+        18,
+        19
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "condition_binding_unresolved"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "b2302d5c-7e98-4bf2-857b-609b68bc30a7",
+      "source_object_sha256": "b6494a07a38d22ee1c8ca49a9c4883ce2fabf486736f2ebd94fb2a3cafe79ffb",
+      "node_type": "action",
+      "original_technique_id": "T1003.001",
+      "pdf_pages_1_based": [
+        28,
+        33,
+        36
+      ],
+      "printed_report_pages": [
+        19,
+        24,
+        27
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "memory_mechanism_inferred_not_observed",
+        "later_event_not_earlier_evidence"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "e69292c5-8732-425b-98ce-1715818303c5",
+      "source_object_sha256": "dd16a1256b943958249cd24def4a2de6147b5f1f84102c333210ed4bbb714f92",
+      "node_type": "condition",
+      "original_technique_id": null,
+      "pdf_pages_1_based": [
+        28
+      ],
+      "printed_report_pages": [
+        19
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "access_observed_method_unknown"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "72b25a1c-bd74-4d2b-acce-774967a3d6d3",
+      "source_object_sha256": "dbcece67a88b0ac730aee5e6c0858fea7603e78c39a9884990b923bdfe1fde3c",
+      "node_type": "action",
+      "original_technique_id": "T1018",
+      "pdf_pages_1_based": [
+        28
+      ],
+      "printed_report_pages": [
+        19
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "completeness_not_established"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "694536a5-19cc-4b18-b8f4-17da494e9b3d",
+      "source_object_sha256": "f309f1c1830e6040e6b4d57928603559f8d42290104eca18ab944586900e6860",
+      "node_type": "action",
+      "original_technique_id": "T1059",
+      "pdf_pages_1_based": [
+        26,
+        27,
+        28
+      ],
+      "printed_report_pages": [
+        17,
+        18,
+        19
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "execution_vs_interpreter_unspecified"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "de70e8df-2907-4885-b3c2-c13dbe144030",
+      "source_object_sha256": "ecb9c846f43052c71a05b2746cdfcd1aa554af9f6c5a1059cd094abf41e1f1ee",
+      "node_type": "action",
+      "original_technique_id": "T1046",
+      "pdf_pages_1_based": [
+        28
+      ],
+      "printed_report_pages": [
+        19
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "collection_method_not_established"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "e67187bf-184c-4c98-9aff-9c53cd08506b",
+      "source_object_sha256": "3089f77a68e91c1aab3cb577cd40dc227d5f7273d377d9a9a680b3440865d7ee",
+      "node_type": "action",
+      "original_technique_id": "T1057",
+      "pdf_pages_1_based": [
+        28
+      ],
+      "printed_report_pages": [
+        19
+      ],
+      "status": "event_supported_only",
+      "finding_codes": [],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "5d119bee-b5dc-4ace-b7d9-6b69d7bd1b76",
+      "source_object_sha256": "60e6bb465e3b917d4afcc614b51d245bcd659a7ae700938ebdafe9d0e3466261",
+      "node_type": "action",
+      "original_technique_id": "T1105",
+      "pdf_pages_1_based": [
+        28,
+        29
+      ],
+      "printed_report_pages": [
+        19,
+        20
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "transfer_direction_mapping_unverified"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "aecc220e-638e-4f1d-8437-8eabab5a3c19",
+      "source_object_sha256": "0eff878d1f8d190115c33caaac91ba7f4099da86fe2668624ff6b6732637d32f",
+      "node_type": "condition",
+      "original_technique_id": null,
+      "pdf_pages_1_based": [
+        29,
+        34
+      ],
+      "printed_report_pages": [
+        20,
+        25
+      ],
+      "status": "event_supported_only",
+      "finding_codes": [],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "1ef2bbee-79c3-4b92-b0c8-acc139984154",
+      "source_object_sha256": "19a51270b98b450e81226a40ee3844cf3cad0912dfefb6c9a1168caab004c061",
+      "node_type": "action",
+      "original_technique_id": "T1562.001",
+      "pdf_pages_1_based": [
+        29,
+        31
+      ],
+      "printed_report_pages": [
+        20,
+        22
+      ],
+      "status": "event_supported_only",
+      "finding_codes": [],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "75bcb6d2-a7b0-4985-81f2-8f1335f8aa12",
+      "source_object_sha256": "f23f9c49edc868449d3b84ff8567364ca04f1b497b3c94132cc4d01e95357638",
+      "node_type": "action",
+      "original_technique_id": "T1562.001",
+      "pdf_pages_1_based": [
+        29,
+        31
+      ],
+      "printed_report_pages": [
+        20,
+        22
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "privilege_scope_needs_precision"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "24aad6b2-b3ed-4a91-912c-aecc31d43dab",
+      "source_object_sha256": "342924442086b898afc2f907216053e1ae22dc98dfa1ecbf35fa61aa5a7b934b",
+      "node_type": "action",
+      "original_technique_id": "T1486",
+      "pdf_pages_1_based": [
+        29,
+        31,
+        34
+      ],
+      "printed_report_pages": [
+        20,
+        22,
+        25
+      ],
+      "status": "event_supported_only",
+      "finding_codes": [],
+      "label_certified": false,
+      "training_admitted": false
+    },
+    {
+      "node_id": "992c80ba-7ccb-4c32-9db1-8c17e7a5f04a",
+      "source_object_sha256": "a83ac433396b1205f4cc48af7a30a9a4d755904f24213956e3f17110b201b5c8",
+      "node_type": "condition",
+      "original_technique_id": null,
+      "pdf_pages_1_based": [
+        25,
+        26
+      ],
+      "printed_report_pages": [
+        16,
+        17
+      ],
+      "status": "qualification_required",
+      "finding_codes": [
+        "host_scope_needs_precision"
+      ],
+      "label_certified": false,
+      "training_admitted": false
+    }
+  ],
+  "counts": {
+    "actions": 18,
+    "conditions": 4,
+    "reviewed_nodes": 22,
+    "status_counts": {
+      "qualification_required": 17,
+      "event_supported_only": 5
+    }
+  },
+  "interpretation_limits": [
+    "Qualification flags include missing specificity and context; not 17 proven source errors.",
+    "Supported event does not certify all phrasing, ATT&CK labels, graph edges, chronology, or causality.",
+    "All original nodes and labels remain unchanged; no automatic replacement or new training example.",
+    "Separate full source review and task design are still required."
+  ],
+  "runtime": {
+    "thor_tcp_probes": 2,
+    "tcp_result": "TimeoutError on ordinary and escalated runs",
+    "ssh_auth_attempted": false,
+    "actual_tokenizer_checked": false,
+    "current_service_state": "unverified",
+    "new_training": false,
+    "production_changed": false,
+    "new_Mac_packages": 0
+  }
+}

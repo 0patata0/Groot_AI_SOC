@@ -361,5 +361,10 @@
     "finding": "Relevant report paragraphs describe Windows SYSTEM/domain-admin privileges and Cobalt Strike/Meterpreter. They do not substantiate the connected AFB action wording Unix Shell/SDBBot; missing keyword search results alone are not treated as proof of absence.",
     "decision": "Preserve original graph, keep the ordinary anchor untyped, and hold this flow from factual-answer generation pending a complete source review. No corrected attack technique or causal branch invented.",
     "institutional_source_is_not_label_certification": true
+  },
+  "source_semantics_followup": {
+    "file": "ATTACK_FLOW_SOURCE_REVIEW.json",
+    "status": "22 control nodes reviewed; SDBBot earlier-paragraph evidence confirmed; wording/mapping/context qualifications retained.",
+    "relationship": "Extends the earlier paragraph-only review; preserves that historical observation without using it as a whole-report absence claim."
   }
 }

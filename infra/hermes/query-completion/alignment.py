@@ -237,6 +237,15 @@ def request_wrapper(original, query, harness):
         # Per-agent, per-turn evidence snapshot. Native execution/recording stay
         # native; a tool batch cannot borrow another conversation's file read.
         agent._capstone_proposal_context = (turn, request, calls, threading.Lock(), set()) if idx >= 0 else None
+        agent._capstone_proposal_user = (turn, kw.get('original_user_message')) if idx >= 0 else None
+        agent._capstone_proposal_terminal = (turn, harness.proposal_recovery(request, calls))
+        if agent._capstone_proposal_terminal[1]:
+            agent._capstone_read_selection = None
+            agent._capstone_alignment_partial = True
+            agent._capstone_query_completion_local_format = (turn,
+                '같은 후보의 제출 전 오류가 3회 반복되어 추가 모델 호출을 중단했습니다.\n\n' +
+                harness.write_report('', harness.write_progress(request, calls)))
+            return result
         notice = harness.scope_notice(request)
         if notice and not calls:
             agent._capstone_read_selection = None
@@ -368,6 +377,39 @@ def proposal_input_wrapper(original, harness, version):
     return wrapped
 
 
+def budget_fallback_wrapper(original, query, harness, reanchor):
+    """Use verified proposal receipts before native persistence, without an extra LLM summary."""
+    @functools.wraps(original)
+    def wrapped(agent, **kw):
+        turn = getattr(agent, '_current_turn_id', None)
+        context = getattr(agent, '_capstone_proposal_user', None)
+        rows = kw.get('messages')
+        count, maximum = kw.get('api_call_count'), getattr(agent, 'max_iterations', None)
+        remaining = getattr(getattr(agent, 'iteration_budget', None), 'remaining', None)
+        exhausted = (type(count) is int and type(maximum) is int and count >= maximum
+                     or type(remaining) is int and remaining <= 0)
+        if (enabled(agent) and exhausted and not kw.get('interrupted') and not kw.get('failed')
+                and not getattr(agent, '_interrupt_requested', False)
+                and kw.get('final_response') is None and kw.get('_pending_verification_response') is None
+                and str(kw.get('_turn_exit_reason')) in ('unknown','budget_exhausted')
+                and context and context[0] == turn and isinstance(rows,list)):
+            user = context[1]
+            idx = reanchor(rows, user)
+            if type(idx) is int and 0 <= idx < len(rows) and rows[idx].get('role') == 'user' and rows[idx].get('content') == user:
+                request = query.current_request_text(user)
+                calls = calls_from_rows(rows[idx + 1:], query._inventory_payload)
+                progress = harness.write_progress(request, calls)
+                if progress:
+                    agent._capstone_alignment_partial = True
+                    kw = {**kw, '_pending_verification_response':
+                        '호출 횟수 한도에 도달했습니다. 다음은 이번 요청에서 확인된 변경안 제출 근거입니다.\n\n' +
+                        harness.write_report('', progress), '_pending_verification_response_previewed':False}
+                    logging.getLogger('capstone.query_completion').info('event=proposal_budget_receipt provider_calls=0')
+        return original(agent, **kw)
+    wrapped.__capstone_query_completion__ = query.VERSION
+    return wrapped
+
+
 def selection_response(response, schema, harness=None):
     """Translate the model's validated selection, retaining its content/usage.
 
@@ -447,8 +489,9 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         if not calls and (prior or harness.reuse_only(request)):
             prior = prior or '같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.'
             return original(agent, **query._with_final_text(kw, prior))
-        gap = harness.preparation_gap(request, calls)
         turn = getattr(agent, '_current_turn_id', None)
+        terminal = getattr(agent, '_capstone_proposal_terminal', None) == (turn, True)
+        gap = [] if terminal else harness.preparation_gap(request, calls)
         counter = kw.get('codex_ack_continuations')
         if (gap and not action_issues and getattr(agent, '_capstone_write_preparation_turn', None) != turn
                 and type(counter) is int and query._remaining(kw, agent)):
@@ -465,6 +508,8 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
                 codex_ack_continuations=counter + 1, **{name: kw[name] for name in names})
         if progress:
             text = harness.write_report(text, progress)
+            if terminal:
+                text = '같은 후보의 제출 전 오류가 3회 반복되어 추가 모델 호출을 중단했습니다.\n\n' + text
             agent._capstone_alignment_partial = bool(action_issues) or not progress["complete"]
         elif harness.tool_scope(request):
             missing = (harness.inventory(request, calls, missing_targets=True)

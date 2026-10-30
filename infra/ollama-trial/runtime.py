@@ -109,6 +109,10 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
             self.used = 0
 
         async def on_chat_model_start(self, serialized, messages, *, run_id, **kwargs):
+            history = harness.proposal_history(report['calls'], report.get('proposal_input_rejections', ()))
+            if harness.proposal_recovery(current, history):
+                report['stop_reason'] = 'repeated_local_proposal_failure'
+                require(False, 'repeated_local_proposal_failure')
             require(self.used < steps, 'model_budget_exhausted')
             self.used += 1
             self.starts[run_id] = time.perf_counter()
@@ -353,7 +357,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
         progress = harness.write_progress(current, harness.proposal_history(report['calls'], report.get('proposal_input_rejections', ())))
         if progress:
             report.update(status='partial', write_progress=progress,
-                          final_response='실행이 중단되었습니다. 아래는 중단 전 확인된 제출 근거이며 요청 전체 완료가 아닙니다.\n\n' + progress['text'])
+                          final_response=('같은 후보의 제출 전 오류가 3회 반복되어 추가 모델 호출을 중단했습니다. ' if report.get('stop_reason') == 'repeated_local_proposal_failure' else '') +
+                          '실행이 중단되었습니다. 아래는 중단 전 확인된 제출 근거이며 요청 전체 완료가 아닙니다.\n\n' + progress['text'])
         elif report['calls'] and not report['protected_calls']:
             report.update(status='partial', final_response=harness.fallback(current, report['calls']))
     finally:

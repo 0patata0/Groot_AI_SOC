@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.13.0"
+VERSION = "groot-query-completion:1.14.0"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "f5bf061398f4c6066d888565efb22f50ccb4fa9645eb778fa2d22e6462d0e051"
@@ -39,6 +39,7 @@ def _load_evidence():
 EVIDENCE = _load_evidence()
 SOURCE_ROOT = Path("/opt/hermes")
 SOURCE_SHA256 = {
+    "agent/turn_finalizer.py": "77ca6c9e92cb7e887fd1d0d950da417e5540a865a6866af9ad0c23b784e7f6bf",
     "agent/tool_executor.py": "f34672aea4869e04ceec2927b01d2eabf17f5b600e58d6db79c2abac7d0c6b4c",
     "tools/mcp_tool_handlers.py": "d1b4463309a2de351aaf6c7cd8f7a2a1e83f5e26dbe058371c9eeb9d0c567903",
     "agent/turn_final_response.py": "dd7bec20542ecd5c895877002f021966ef8e2f41b69bd5e9661db78a231dc8b1",
@@ -1084,6 +1085,8 @@ def register(ctx):
         mcp_handlers = importlib.import_module("tools.mcp_tool_handlers")
         tool_executor = importlib.import_module("agent.tool_executor")
         original_pre_tool = tool_executor._pre_tool_block
+        finalizer = importlib.import_module("agent.turn_finalizer")
+        original_budget = finalizer._resolve_budget_fallback
         original_result = mcp_handlers._call_tool_racing_stdio_death
         original = native.finish_text_response
         original_build = api.build_api_request
@@ -1098,7 +1101,8 @@ def register(ctx):
             if (getattr(original_build, "__capstone_query_completion__", None) != VERSION
                     or getattr(original_call, "__capstone_query_completion__", None) != VERSION
                     or getattr(original_result, "__capstone_query_completion__", None) != VERSION
-                    or getattr(original_pre_tool, "__capstone_query_completion__", None) != VERSION):
+                    or getattr(original_pre_tool, "__capstone_query_completion__", None) != VERSION
+                    or getattr(original_budget, "__capstone_query_completion__", None) != VERSION):
                 raise ValueError("request_wrapper_version_mismatch")
             return
         if getattr(original, "__capstone_query_completion__", None) or hasattr(original, "__wrapped__"):
@@ -1111,6 +1115,8 @@ def register(ctx):
             raise ValueError("result_wrapper_version_mismatch")
         if getattr(original_pre_tool, "__capstone_query_completion__", None) or hasattr(original_pre_tool, "__wrapped__"):
             raise ValueError("pre_tool_wrapper_version_mismatch")
+        if getattr(original_budget, "__capstone_query_completion__", None) or hasattr(original_budget, "__wrapped__"):
+            raise ValueError("budget_wrapper_version_mismatch")
         wrapped = make_wrapper(original, native, metadata.append_message, context.reanchor_current_turn_user_idx)
         build_wrapped = make_request_wrapper(original_build, context.reanchor_current_turn_user_idx)
         call_wrapped = make_call_wrapper(original_call, call)
@@ -1136,8 +1142,11 @@ def register(ctx):
         call_wrapped = alignment.selection_call_wrapper(call_wrapped, query_adapter, shared_chat)
         result_wrapped = alignment.vulnerability_result_wrapper(original_result, shared_chat.READ, VERSION)
         pre_tool_wrapped = alignment.proposal_input_wrapper(original_pre_tool, shared_chat, VERSION)
+        budget_wrapped = alignment.budget_fallback_wrapper(original_budget, query_adapter, shared_chat, context.reanchor_current_turn_user_idx)
 
         def restore():
+            if finalizer._resolve_budget_fallback is budget_wrapped:
+                finalizer._resolve_budget_fallback = original_budget
             if tool_executor._pre_tool_block is pre_tool_wrapped:
                 tool_executor._pre_tool_block = original_pre_tool
             if mcp_handlers._call_tool_racing_stdio_death is result_wrapped:
@@ -1158,6 +1167,7 @@ def register(ctx):
         call.perform_api_call = loop.perform_api_call = call_wrapped
         mcp_handlers._call_tool_racing_stdio_death = result_wrapped
         tool_executor._pre_tool_block = pre_tool_wrapped
+        finalizer._resolve_budget_fallback = budget_wrapped
         try:
             logging.getLogger("capstone.query_completion").info(
                 "version=%s aliases_installed=%s pid=%d", VERSION,

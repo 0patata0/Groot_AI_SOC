@@ -13,7 +13,7 @@ import runtime
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False):
         calls, prompts = [], []
         self.protected_starts = []
         content = '# heading\nbody\n'
@@ -41,11 +41,11 @@ class PreparationLoop(unittest.TestCase):
             def __init__(self, **kw): self.__dict__.update(kw)
             async def ainvoke(self, args): return await self.coroutine(**args)
         class LLM:
-            def __init__(self, **kw): pass
+            def __init__(self, **kw): self.callbacks=kw.get('callbacks',[])
             def with_structured_output(self, *a, **kw):
                 raise AssertionError('write preparation was narrowed to read-only selection')
         class Agent:
-            def __init__(self, client, **kw): self.client=client
+            def __init__(self, client, **kw): self.client=client;self.llm=kw['llm']
             async def initialize(self): await self.adapter.create_all(self.client)
             async def run(self, prompt):
                 prompts.append(prompt);tools={t.name:t for t in self.adapter.tools}
@@ -55,7 +55,15 @@ class PreparationLoop(unittest.TestCase):
                         assert refused['executed'] is False
                         assert refused['error']=='tool_input_schema_validation_failed'
                     await tools['mcp__rule_a__get_rule_change_target'].ainvoke({'target':'a:modsecurity-custom'})
-                if correct_preflight:
+                if repeat_preflight:
+                    for i in range(4):
+                        for callback in self.llm.callbacks:
+                            await callback.on_chat_model_start({},[],run_id=str(i))
+                        await tools['mcp__rule_write_a__propose_rule_edit'].ainvoke({
+                            'target':'a:modsecurity-custom','base_sha256':sha,
+                            'edits':[{'old_text':'body\n','new_text':'body\n\n# AUDIT-NOTE\n'}],
+                            'reason':'requested comment'})
+                elif correct_preflight:
                     await tools['mcp__rule_write_a__propose_rule_edit'].ainvoke({
                         'target':'a:modsecurity-custom','base_sha256':sha,
                         'edits':[{'old_text':'body\n','new_text':'body\n'+ ('\n' if len(prompts)==1 else '')+'# AUDIT-NOTE\n'}],
@@ -150,6 +158,15 @@ class PreparationLoop(unittest.TestCase):
         self.assertEqual(len(report['proposal_input_rejections']),1)
         self.assertEqual(report['write_progress']['scope_checks'][0]['status'],'match')
         self.assertIn('이전 편집 검증 거절',report['final_response'])
+
+    def test_repeated_local_failures_stop_before_another_model_or_protected_call(self):
+        q='WAF 맨 끝에 # AUDIT-NOTE 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용은 유지해줘.'
+        report,prompts,calls=self.execute(question=q,repeat_preflight=True)
+        self.assertEqual(report['status'],'partial')
+        self.assertEqual(report['stop_reason'],'repeated_local_proposal_failure')
+        self.assertEqual(len(report['proposal_input_rejections']),3)
+        self.assertEqual(calls,['get_rule_change_target']);self.assertEqual(self.protected_starts,[])
+        self.assertIn('빈 줄 1개',report['final_response']);self.assertIn('3회',report['final_response'])
 
     def test_preserve_mode_proposal_uses_one_model_continuation(self):
         q='WAF 파일 끝에 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용과 모드는 유지하고, 원복 방법도 알려줘.'

@@ -1219,7 +1219,7 @@ def write_report(answer, progress):
     header = '요청한 변경안 준비가 일부 미완료입니다. 승인 대기는 실제 적용 완료가 아닙니다.'
     refusal = re.search(r'지원하지|지원되지|제공하지|제공되지|수행할 수 없|실행할 수 없|변경할 수 없|권한이 없|도구가 없|기능이 없|범위.{0,6}벗어|불가능|실행\s*불가|허용되지', answer)
     completed = re.search(r'(?:적용|변경|제출|처리|실행)\s*(?:을|이|를)?\s*완료|모두\s*(?:반영|성공)|(?:적용|변경|실행|제출|처리|작성|준비)했', answer)
-    if refusal and not completed:
+    if refusal and not completed and not progress.get('local_input_failures'):
         return header + '\n\n' + answer + '\n\n' + progress['text']
     return header + '\n\n' + progress['text']
 
@@ -1240,6 +1240,11 @@ def write_metadata_prose(answer, metadata):
             if (re.search(r'^\s*(?:[-0-9.]+\s*)?검증\s*(?:범위|결과)?\s*:', clean) or
                     re.search(r'엔진.{0,30}구문.{0,50}(?:검증됨|검증됐|완료|통과했)', clean)):
                 lines[j] = '- 제출 검증 범위 (서버 영수증): ' + field_values('validation') + ending
+            elif re.search(r'승인.{0,25}(?:별도|추가|다시).{0,20}(?:요청|지시|명령)', clean):
+                lines[j] = '- 승인 후 실행: 정확한 후보를 승인하면 worker가 검증 후 자동 적용합니다. 별도의 적용 요청을 기다리는 단계는 없습니다.' + ending
+            elif (re.search(r'적재|로딩|탐지|차단', clean) and 'get_rule_change_target' in clean
+                  and re.search(r'확인|검증', clean)):
+                lines[j] = '- 적용 후 확인: 재조회한 현재 파일 SHA와 반환된 실행 상태를 대조합니다. 개별 룰 적재·탐지/차단 성공은 별도 검증이 필요합니다.' + ending
             elif (re.search(r'^\s*(?:[-0-9.]+\s*)?(?:적용|예상)\s*영향\s*:', clean) or
                   re.search(r'(?:승인|적용).{0,35}(?:재시작|재로딩|리로드|재적재|reload|restart)', clean, re.I) or
                   re.search(r'(?:동작|중단|서비스|WAF|Suricata|Wazuh).{0,25}영향.{0,10}없|중단.{0,10}없|무중단',clean,re.I)):
@@ -1383,10 +1388,11 @@ def _proposal_preflight(question, calls, server, name, arguments):
     if candidate == content:
         return reject('edit_invalid', '원문과 후보가 같습니다. 변경안을 제출하지 않았습니다.')
     after = hashlib.sha256(candidate.encode()).hexdigest()
-    scope = exact_comment_scope(question, source, {'before_sha256':source['sha256'], 'after_sha256':after})
+    scope = exact_comment_scope(question, source, {'before_sha256':source['sha256'], 'after_sha256':after}, candidate_content=candidate)
     if scope and scope['status'] != 'match':
         return reject('scope_' + ('mismatch' if scope['status'] == 'mismatch' else 'unverified'),
-                      '요청한 주석 한 줄·위치와 원문 보존 조건을 만족하지 않습니다. old_text 전체와 기존 개행을 보존하고 새 문구만 지정한 앞/뒤에 붙이세요.',
+                      '편집 기준은 원문에 일치했습니다. ' + preproposal_message({'error':'proposal_preflight_scope_mismatch','scope':scope}) +
+                      ' old_text 전체와 기존 개행을 보존하고 새 주석 한 줄만 지정한 앞/뒤에 붙이세요. 빈 줄을 추가하지 마세요.',
                       candidate_sha256=after, scope=scope, edit_anchors=rule_edit_anchors(source))
     for c in calls:
         if c.get('server') != server or c.get('name') not in ('propose_rule_edit','propose_rule_change') or c.get('arguments',{}).get('target') != target:
@@ -1434,7 +1440,58 @@ def proposal_history(calls, rejections=()):
     return output
 
 
-def exact_comment_scope(question, source, receipt):
+def preproposal_message(rejection):
+    """Describe only typed local validation facts, never a transport/server cause."""
+    scope = rejection.get('scope', {})
+    diagnostic = scope.get('diagnostic', {}) if isinstance(scope, dict) else {}
+    blank = diagnostic.get('extra_blank_lines') if isinstance(diagnostic, dict) else None
+    if type(blank) is int and 0 < blank <= 65536:
+        return f'원문은 보존됐지만 요청한 주석 외에 빈 줄 {blank}개가 추가됐습니다.'
+    if isinstance(diagnostic, dict) and diagnostic.get('wrong_position') is True:
+        return '원문은 보존됐지만 주석의 삽입 위치가 요청과 다릅니다.'
+    return {
+        'proposal_preflight_edit_invalid':'편집 형식·원문 일치·크기·종료 개행 조건을 만족하지 못했습니다.',
+        'proposal_preflight_scope_mismatch':'요청한 주석 한 줄·위치·원문 보존 조건과 후보가 다릅니다.',
+        'proposal_preflight_scope_unverified':'요청 범위와 원문 보존을 확인하지 못했습니다.',
+        'proposal_preflight_read_required':'현재 턴의 실제 원문 조회가 필요합니다.',
+        'proposal_preflight_source_invalid':'조회 원문과 해시가 일치하지 않습니다.',
+        'proposal_preflight_base_mismatch':'편집의 기준 해시가 조회한 원문 해시와 다릅니다.',
+        'proposal_preflight_context_unavailable':'현재 턴의 요청·조회 근거를 확인하지 못했습니다.',
+        'proposal_preflight_duplicate':'같은 후보가 이미 제출되어 중복 제출하지 않았습니다.',
+        'proposal_preflight_outcome_unknown':'이전 보호 호출의 결과를 확인할 때까지 재제출하지 않습니다.',
+    }.get(rejection.get('error'), '제출 전 입력 검사에서 거절되었습니다.')
+
+
+def proposal_recovery(question, calls):
+    """Stop model calls only after three identical local failures for every missing target.
+
+    Different candidates reset the streak. Real/unknown protected calls and
+    multi-target unfinished work cannot become a completed or safely unsubmitted task.
+    """
+    progress = write_progress(question, calls)
+    if not progress or progress['complete']:
+        return False
+    histories = {}
+    for call in calls:
+        if call.get('name') not in ('propose_rule_edit','propose_rule_change'):
+            continue
+        args = call.get('arguments', {})
+        target = args.get('target')
+        local = local_preproposal_rejection(call)
+        fingerprint = None
+        if local:
+            # Scope diagnostics prove a reconstructed candidate. Other failures
+            # use the exact model arguments, not a guessed semantic equivalence.
+            candidate = local.get('candidate_sha256')
+            value = [args.get('base_sha256'), candidate] if re.fullmatch(r'[0-9a-f]{64}', str(candidate)) else [call.get('name'),args]
+            fingerprint = hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=True).encode()).hexdigest()
+        histories.setdefault(target, []).append(fingerprint)
+    return bool(progress['missing']) and all(
+        len(histories.get(target, ())) >= 3 and histories[target][-1] is not None
+        and len(set(histories[target][-3:])) == 1 for target in progress['missing'])
+
+
+def exact_comment_scope(question, source, receipt, *, candidate_content=None):
     """Check a narrow, explicit one-line insertion by hash; never build a proposal.
 
     General edits still require full human diff review. Only an unambiguous
@@ -1463,8 +1520,21 @@ def exact_comment_scope(question, source, receipt):
     position = next(iter(positions))
     expected = comment + newline + content if position == 'start' else content + comment + newline
     expected_sha = hashlib.sha256(expected.encode()).hexdigest()
-    return {'status': 'match' if expected_sha == receipt['after_sha256'] else 'mismatch',
-            'expected_sha256': expected_sha, 'position': position}
+    result = {'status': 'match' if expected_sha == receipt['after_sha256'] else 'mismatch',
+              'expected_sha256': expected_sha, 'position': position}
+    if (result['status'] == 'mismatch' and isinstance(candidate_content, str)
+            and hashlib.sha256(candidate_content.encode()).hexdigest() == receipt['after_sha256']):
+        added = (candidate_content[len(content):] if position == 'end' and candidate_content.startswith(content)
+                 else candidate_content[:-len(content)] if position == 'start' and candidate_content.endswith(content) else None)
+        if added is not None:
+            lines = added.splitlines()
+            blanks = sum(not line.strip() for line in lines)
+            if blanks and [line for line in lines if line.strip()] == [comment]:
+                result['diagnostic'] = {'extra_blank_lines': blanks}
+        if (candidate_content.count(comment + newline) == 1
+                and candidate_content.replace(comment + newline, '', 1) == content and added is None):
+            result['diagnostic'] = {'wrong_position': True}
+    return result
 
 
 def write_progress(question, calls):
@@ -1476,6 +1546,7 @@ def write_progress(question, calls):
     text = normalized(question)
     writing = READ.wants_write(text)
     observed = {}
+    local_input_failures = 0
     for c in calls:
         if c.get('name') not in ('propose_rule_edit', 'propose_rule_change') or c.get('server') not in ('rule-write-a', 'rule-write-b'):
             continue
@@ -1495,7 +1566,8 @@ def write_progress(question, calls):
             error = proposal_error(data.get('error', '도구 오류'))
             local_rejection = local_preproposal_rejection(c)
             if local_rejection:
-                entry['rejected_edits'].append('제출 전 검사 (MCP 미호출): ' + local_rejection['error'])
+                local_input_failures += 1
+                entry['rejected_edits'].append('제출 전 검사 (MCP 미호출): ' + preproposal_message(local_rejection))
             elif rejected_before_proposal(error):
                 entry['rejected_edits'].append(error)
             else:
@@ -1572,4 +1644,5 @@ def write_progress(question, calls):
     if metadata:
         hashes.append('- 취소·원복: 미적용 후보는 승인 카드에서 거부합니다. 적용 후 원복은 실제 파일을 다시 조회한 SHA를 기준으로 이전 내용을 복원하는 새 후보를 만들고 승인을 받습니다.')
     return {'text': '\n'.join(rows + [''] + hashes), 'missing': missing, 'complete': not missing,
-            'expiries': expiries, 'file_metadata': metadata, 'scope_checks': scope_checks}
+            'expiries': expiries, 'file_metadata': metadata, 'scope_checks': scope_checks,
+            'local_input_failures': local_input_failures}

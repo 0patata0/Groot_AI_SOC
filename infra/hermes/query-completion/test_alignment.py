@@ -26,6 +26,18 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_proposal_receipt_does_not_require_extra_apply_request_or_claim_engine_proof(self):
+        submitted=proposal('a:modsecurity-custom')
+        progress=H.write_progress('WAF 변경안을 만들어줘',[submitted])
+        text=('승인 후 별도 요청 시 적용할 수 있습니다.\n'
+              '엔진의 실제 룰 적재 여부는 get_rule_change_target 재조회로 확인할 수 있습니다.\n')
+        rendered=H.write_report(text,progress)
+        self.assertIn('worker가 검증 후 자동 적용',rendered)
+        self.assertIn('개별 룰 적재·탐지/차단 성공은 별도 검증',rendered)
+        self.assertNotIn('별도 요청 시',rendered)
+        fence='```text\n'+text+'```'
+        self.assertIn(fence,H.write_report(fence,progress))
+
     def test_detection_configuration_is_not_an_event_observation(self):
         q='WAF 변경안을 만들어줘'
         for text in ('WAF 탐지 모드는 변경 없음.', 'IDS 탐지 규칙 변경 없음.',

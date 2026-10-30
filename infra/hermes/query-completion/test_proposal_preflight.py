@@ -110,4 +110,95 @@ class NativeBoundary(unittest.TestCase):
         self.assertEqual(json.loads(wrapped(agent,ref)[0])['error'],'proposal_preflight_outcome_unknown')
         other=self.agent();self.assertIsNone(wrapped(other,ref)[0])
 
+class Recovery(unittest.TestCase):
+    def failed(self, new_text=None):
+        a=args();a['edits'][0]['new_text']=new_text or '# preserve\n# repeated\n\n# PREFLIGHT-NOTE\n'
+        r=check(a)
+        return H.proposal_history([], [dict(server='rule-write-a',name='propose_rule_edit',arguments=a,after_call_count=0,rejection=r)])[0]
+
+    def test_scope_feedback_distinguishes_blank_line_from_wrong_position(self):
+        a=args();a['edits'][0]['new_text']='# preserve\n# repeated\n\n# PREFLIGHT-NOTE\n'
+        r=check(a);self.assertEqual(r['scope']['diagnostic'],{'extra_blank_lines':1})
+        self.assertIn('빈 줄 1개',r['detail']);self.assertIn('기준은 원문에 일치',r['detail'])
+        a['edits'][0]['new_text']='# preserve\n# PREFLIGHT-NOTE\n# repeated\n'
+        r=check(a);self.assertEqual(r['scope']['diagnostic'],{'wrong_position':True})
+        self.assertIn('삽입 위치',r['detail'])
+        # Only a matching candidate hash may support a diagnostic.
+        scope=H.exact_comment_scope(Q,dict(content=CONTENT),dict(before_sha256=sha(CONTENT),after_sha256='0'*64),candidate_content=CONTENT)
+        self.assertNotIn('diagnostic',scope)
+
+    def test_three_identical_local_candidates_stop_without_hiding_other_work(self):
+        bad=self.failed()
+        self.assertFalse(H.proposal_recovery(Q,[read(),bad,bad]))
+        self.assertTrue(H.proposal_recovery(Q,[read(),bad,bad,bad]))
+        different=self.failed('# preserve\n# PREFLIGHT-NOTE\n# repeated\n')
+        self.assertFalse(H.proposal_recovery(Q,[read(),bad,bad,different]))
+        self.assertFalse(H.proposal_recovery(Q+' IDS도 변경안을 만들어줘',[read(),bad,bad,bad]))
+        success=proposal(TARGET,before_sha256=sha(CONTENT),after_sha256=sha(CONTENT+'# PREFLIGHT-NOTE\n'))
+        self.assertFalse(H.proposal_recovery(Q,[read(),bad,bad,bad,success]))
+        forged=dict(bad,result_sha256='0'*64)
+        self.assertFalse(H.proposal_recovery(Q,[read(),forged,forged,forged]))
+
+    def test_final_refusal_cannot_invent_json_or_server_failure(self):
+        progress=H.write_progress(Q,[read(),self.failed()])
+        rendered=H.write_report('JSON 인코딩 문제로 실행 불가. 서버가 거부했습니다.',progress)
+        self.assertNotIn('JSON 인코딩',rendered);self.assertNotIn('서버가 거부',rendered)
+        self.assertIn('빈 줄 1개',rendered);self.assertIn('MCP 미호출',rendered)
+
+    def test_native_request_terminal_keeps_transcript_and_skips_provider(self):
+        from dataclasses import dataclass
+        from test_alignment import PLUGIN, Harness
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        h=Harness(request=Q);h.agent.model='qwen3.6:35b';h.agent.provider='custom'
+        rows=[{'role':'user','content':Q}]+H.linked_rows([dict(c,is_error=False) for c in [read(),self.failed(),self.failed(),self.failed()]])
+        before=copy.deepcopy(rows);result=Request({'messages':rows})
+        alignment.request_wrapper(lambda *a,**kw:result,PLUGIN,H)(h.agent,
+            original_user_message=Q,turn_id=h.agent._current_turn_id,messages=rows)
+        self.assertEqual(rows,before);self.assertTrue(h.agent._capstone_proposal_terminal[1])
+        self.assertIn('3회',h.agent._capstone_query_completion_local_format[1])
+        provider=Mock(side_effect=AssertionError('unexpected provider call'))
+        native=SimpleNamespace(ApiCallVerdict=lambda **kw:SimpleNamespace(**kw),stop_thinking_spinner=lambda *a:None)
+        wrapped=PLUGIN.make_call_wrapper(provider,native,response_factory=lambda text,turn:SimpleNamespace(content=text))
+        verdict=wrapped(h.agent,turn_id=h.agent._current_turn_id)
+        self.assertIn('MCP 미호출',verdict.response.content);provider.assert_not_called()
+        h.kw['messages']=rows
+        h.wrapper=alignment.final_wrapper(h.wrapper,h.original,h.native,h.append,h.reanchor,PLUGIN,H)
+        verdict=h.call()
+        self.assertNotEqual(verdict.action,'continue');self.assertIn('3회',verdict.final_response)
+        self.assertTrue(h.agent._capstone_alignment_partial)
+
+    def budget_fixture(self):
+        from test_alignment import PLUGIN, Harness
+        h=Harness(request=Q);h.agent.model='qwen3.6:35b';h.agent.provider='custom'
+        h.agent._capstone_proposal_user=(h.agent._current_turn_id,Q)
+        rows=[{'role':'user','content':Q}]+H.linked_rows([dict(c,is_error=False) for c in [read(),self.failed()]])
+        kw=dict(final_response=None,api_call_count=h.agent.max_iterations,interrupted=False,failed=False,
+            messages=rows,_turn_exit_reason='unknown',_pending_verification_response=None,
+            _pending_verification_response_previewed=False,logger=None)
+        original=Mock(side_effect=lambda agent,**kw:kw)
+        return h,kw,original,alignment.budget_fallback_wrapper(original,PLUGIN,H,h.reanchor)
+
+    def test_budget_summary_is_grounded_before_native_finalizer_runs(self):
+        h,kw,original,wrapped=self.budget_fixture();before=copy.deepcopy(kw['messages'])
+        result=wrapped(h.agent,**kw)
+        self.assertIn('빈 줄 1개',result['_pending_verification_response'])
+        self.assertIn('MCP 미호출',result['_pending_verification_response'])
+        self.assertIsNone(result['final_response']);self.assertEqual(kw['messages'],before)
+        self.assertTrue(h.agent._capstone_alignment_partial);original.assert_called_once()
+
+    def test_budget_keeps_interrupt_failure_existing_pending_and_foreign_turn_native(self):
+        for change in ({'interrupted':True},{'failed':True},{'final_response':'existing'},
+                       {'_pending_verification_response':'existing'}, {'_turn_exit_reason':'transport_error'},
+                       {'api_call_count':1}):
+            h,kw,original,wrapped=self.budget_fixture();kw.update(change)
+            self.assertEqual(wrapped(h.agent,**kw),kw)
+        h,kw,original,wrapped=self.budget_fixture();h.agent._capstone_proposal_user=('foreign',Q)
+        self.assertEqual(wrapped(h.agent,**kw),kw)
+        h,kw,original,wrapped=self.budget_fixture();h.agent.platform='cli'
+        self.assertEqual(wrapped(h.agent,**kw),kw)
+
 if __name__=='__main__':unittest.main()

@@ -1,5 +1,21 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**학습 후보 분리 — 2026-10-30 KST:** [검수 원장](SOC_MIXTURE_REVIEW.json). 최신 로컬 후보는 `data-soc-mixture-candidate-20261030-r3`이며 R1/R2는 이전 검사 근거로 보존한다. CTI 재사용1,024행, 기관 근거 관제143행, 선택적 하네스30행은 세 파일로 분리한다. 합계1,197은 권장 배합이나 신규 사건 수가 아니다. V4 보류126개와 프로젝트 작성 관제 해석은 원문 사실 재검수가 남는다. 기존 전체520개 자료/분할을 변경하지 않았다.
+
+`prepare_soc_mixture.py`는 고정 V4/V5 해시·분할과 R2 관측 원장을 확인하고, V4 학습분할 자체 예제204개를 대표27개로 묶는다. 비교용 fingerprint만 생성 ID/절대시각을 정규화하며 선택한 원문은 바꾸지 않는다. 승인·실패·만료/TTL/근거/심각도/ID 대응을 보존한다. 기존155행의 바이트 동일성과27질문유형·9업무 흐름을 별도로 대조했다. 과거 라이브2건과 FW 호출 선택1건은 별도 출처로 구분한다.
+
+```sh
+python3 -B finetuning/prepare_soc_mixture.py \
+  --observations finetuning/data-soc-observation-candidate-20261030-r2 \
+  --fw-proof /path/to/local-20261029-fw-final-eval.json \
+  --output finetuning/data-soc-mixture-candidate-NEW
+python3 -B -m unittest discover -s finetuning/tests -p 'test_soc_mixture.py'
+```
+
+원래 `mcp_contract.json`은 고정37개로 보존한다. 출력의 `mcp-contract-candidate.json`만 현재 FW 소스/과거 실제 스키마와 맞춘38개이며 현재 라이브 목록 전체를 인증하지 않는다. FW 예제는 프로젝트 질문→호출 선택까지만 포함한다. 실제 응답39KB나 모델 최종 답변을 가짜 정답으로 붙이지 않는다. 전체38도구 입력은8,567토큰으로4K를 초과하여 R3 예제에서는 혼동 가능한 조회6도구를 제시했다. 이 예제1,608토큰과 후보1,197개 전수 최대2,876/4K·마스크 정합을 확인했다. 전체38도구 환경/페이지 연속조회 정확도는 별도 검증 대상이다.
+
+`check_soc_mixture_tokens.py`는 고정 모델/번들의 해시를 확인하고 기존 실제 Qwen tokenizer로 전체 대화·모든 assistant 구간·입력/도구/패딩 마스크를 검사한다. 초과/정합 오류는 결과에 남기고 exit2, 임의 절단/누락/학습/도구 실행은 없다. 기존 CPU 격리환경만 사용했다. MITRE/CISA/AIT/Linux 고지와 원문 좌표/원장을 보존하며 기관 원문이 프로젝트 답변의 인증을 뜻하지 않음을 표시했다. 후보/정답 본문은 Git/자동pack 제외이고 검사 소스·검수 원장만pack목록에 추가한다. 실제 배합·미사용 운영평가·품질 비교 전에는 실행 프로필/학습 편입을 만들지 않는다.
+
 **CAM 벤치마크 후보 구성 — 2026-10-30 KST:** [원장](CAM_BENCHMARK_REVIEW.json). 원본990질문을 고유393입력으로 묶고 `inputs.jsonl`, `gold.jsonl`, `lineage.jsonl`을 분리했다. 입력 원문과990개 출처좌표는 보존하며 정답·시나리오·주석층은 모델 메시지에 추가하지 않는다. 구조화ID54·기타ID294·ID없음45개이며, 이를 순수 원시로그 추론 성능으로 동일시하지 않는다. 전체393개는 학습에서 제외한 평가후보이며 아직 독립최종시험으로 확정하지 않았다. 로컬R1은 초기원장으로 보존하고R2를 최신으로 사용한다(같은393개를 두 번세지 않음).
 
 ```sh

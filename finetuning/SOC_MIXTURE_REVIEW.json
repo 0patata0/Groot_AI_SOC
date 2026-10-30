@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "at_kst": "2026-10-30T17:35:02.832213+09:00",
+  "decision": "candidate_pools_prepared_not_training_release",
+  "training_admitted": 0,
+  "candidate_manifest_sha256": "b34915f9a3d52732dadd9e5a06f2494d27527828f30502e63f5b4ca5dec6aa97",
+  "pool_files": {
+    "cti-replay-candidates.jsonl": {
+      "rows": 1024,
+      "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2"
+    },
+    "observation-candidates.jsonl": {
+      "rows": 143,
+      "sha256": "64fe20ff11982ba8df6bc81e76cc3a6b9e7eede39c410f489f2ee082a8f9f833"
+    },
+    "optional-harness-candidates.jsonl": {
+      "rows": 30,
+      "sha256": "45eeed78f37da561d708c8c331b22ff42adc58cb12b644398bccccc1218602b2"
+    }
+  },
+  "source_counts": {
+    "V5_previously_trained_replay": 1024,
+    "V4_institutional_evidence_but_project_authored_targets": 126,
+    "new_reviewed_observations": 17,
+    "V4_synthetic_before": 204,
+    "V4_synthetic_selected": 27,
+    "V4_historical_live": 2,
+    "new_FW_call_selection": 1
+  },
+  "sampling_ratio": null,
+  "counts_are_new_independent_incidents": false,
+  "synthetic_selection": {
+    "scope": "V4 train partition only; original 520-case pool and withheld decision preserved",
+    "original_train_synthetic": 204,
+    "representatives": 27,
+    "omitted_identity_time_repetitions": 177,
+    "workflows": {
+      "containment_expired": 3,
+      "containment_pending": 3,
+      "correlation": 3,
+      "coverage_gap": 3,
+      "rule_proposal": 3,
+      "service_proposal": 3,
+      "verify_applied": 3,
+      "verify_failed": 3,
+      "forensic_capability_gap": 3
+    },
+    "groups_of_eight": 24,
+    "groups_of_four": 3,
+    "normalization_scope": "Fingerprint only: controlled identity renaming and relative times; selected original rows copied byte-for-byte. Approval, state, TTL, severity, evidence, failures and ID relations retained.",
+    "all_operator_coverage_claimed": false
+  },
+  "provenance": {
+    "V5_replay": "1024 existing trained rows, byte-identical, not new source evidence",
+    "V4_observations": "126 withheld candidates: AIT testbed 90 + CISA KEV 36, project-authored Korean interpretations",
+    "new_observations": "Reviewed R2 AIT9 + Linux8, input evidence94 unchanged; not new final evaluation",
+    "optional_harness": "27 synthetic + 2 historical captured observations + 1 project-authored FW call-selection prefix",
+    "institution_certified_SOC_answers": false,
+    "notices": [
+      "MITRE-ATTACK-LICENSE.txt",
+      "V5_SOURCE_ATTRIBUTION.json",
+      "AIT_NOTICE.txt",
+      "LINUX_APT_NOTICE.txt",
+      "SOURCE_NOTICE.txt"
+    ],
+    "original_V4_V5_source_case_and_split_hashes_retained": true
+  },
+  "fw": {
+    "id": "SOC-FW-ROUTING-CANDIDATE-20261030",
+    "authorship": "project_authored_call_selection_prefix",
+    "source": "historical verified MCP call and current source schema",
+    "historical_observed_at_kst": "2026-10-29T16:38:55.046986+09:00",
+    "historical_result_sha256": "190abc72a21799f57088ce7b0b5bd259a1316800c560c1039f51578b9c0ae3c3",
+    "historical_objects": 145,
+    "schema_sha256": "7fa8b4032b741e4f7304e0e29a295729f784a7fb8bb8ad096a0a7cfce0ffd4b9",
+    "tool_schema_count": 6,
+    "source_prompt_is_project_authored": true,
+    "candidate_catalog_tools": 38,
+    "tool_context_scope": "Six read competitors only; not the full live or training catalog",
+    "tool_result_copied": false,
+    "model_answer_used_as_gold": false,
+    "scope": "Call selection only; no result interpretation, pagination or completion target",
+    "record_sha256": "f488b31cdd10193464660ab59b19b837c749382479dce245c04993a812a6f0d9",
+    "training_admitted": false,
+    "source_file_sha256": "9dd94f82e1ca516f916d06f2040b38bc4a594934b1fc395d169d7b560e1003cf",
+    "local_proof_sha256": "1dfeeb7779b4c89529c07e49b552a3bb7e8b5a64b7ec55c7abc2acc952aff1d3",
+    "entry": {
+      "server": "resp",
+      "name": "mcp__resp__get_firewall_rules",
+      "protected": false,
+      "description": "Read Groot_A host network namespace's COMPLETE live nftables ruleset: all families/tables, base chain default policies, chains, rules (including NAT/Docker), sets and maps. Not WAF/IDS/custom rule files or just temporary blocks. Read-only fixed command; no approval. Follow next_offset with the same snapshot until complete. Legacy iptables and other hosts/namespaces are explicitly outside coverage.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "snapshot": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{32}$",
+            "description": "Snapshot from a previous page; omit for a fresh live read."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "default": 200
+          }
+        }
+      }
+    }
+  },
+  "token_check": {
+    "at_kst": "2026-10-30T17:29:42.898605+09:00",
+    "result_sha256": "a473075f3ae1464edf5f5d3102254033bda29b81aeeff902c5ccc13ae27c1ef9",
+    "model": "Qwen/Qwen3.6-35B-A3B",
+    "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "manifest_sha256": "b34915f9a3d52732dadd9e5a06f2494d27527828f30502e63f5b4ca5dec6aa97",
+    "metadata_files_verified": 11,
+    "pool_results": {
+      "cti-replay-candidates.jsonl": {
+        "rows": 1024,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 406
+      },
+      "observation-candidates.jsonl": {
+        "rows": 143,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 2876
+      },
+      "optional-harness-candidates.jsonl": {
+        "rows": 30,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 2710
+      }
+    },
+    "FW_prefix_tokens": 1608,
+    "all_1197_fit_and_aligned": true,
+    "rows_dropped": 0,
+    "truncated": false,
+    "runtime": "existing pinned PyTorch image/venv, CPU4/8GiB/runc/network none, 180-second limit",
+    "exit_code": 0,
+    "oom": false,
+    "model_weights_loaded": false,
+    "tool_calls_executed": 0
+  },
+  "earlier_failed_gate": {
+    "bundle": "R2, preserved locally (R1 before source-notice addition also preserved)",
+    "records": 1197,
+    "failing_records": 1,
+    "reason": "Full 38-tool FW prefix is 8567 tokens, over 4096; gate exited 2 without truncation",
+    "change": "R3 FW training context uses six competing read tools (1608 tokens). Full candidate catalog remains 38; no live harness/catalog change. Other1196 dialogues unchanged.",
+    "full_catalog_accuracy_evaluated": false
+  },
+  "independent_checks": {
+    "candidate_rows": 1197,
+    "synthetic_rows_covered": 204,
+    "representatives": 27,
+    "wording_groups": 27,
+    "copied_V4_rows_byte_exact": 155,
+    "held_out_prompt_conflicts": [],
+    "V4_nonsynthetic_group_conflicts": {},
+    "R8_frozen_sources_unchanged": 25,
+    "cli_repro_except_time": true,
+    "existing_output_refused": true,
+    "initial_audit_correction": "Forensic examples share one template_family, but three question wordings each carry a generated case ID. Corrected two overly strict independent assertions; candidate bytes unchanged."
+  },
+  "V5_report_entity_audit": {
+    "method": "MITRE entity / CISA whole advisory",
+    "groups": 220,
+    "cross_split_groups": {},
+    "limitation": "Not a full audit of secondary incident reports, all earlier corpora or pretraining"
+  },
+  "verification": {
+    "new_regressions": 16,
+    "existing_observation_regressions": 39,
+    "total": 55,
+    "new_server_full_install": false,
+    "full_training_pack": false,
+    "model_quality": false,
+    "live_MCP_chat_write_rollback": false,
+    "attack_E2E": false,
+    "pack_initial_allowlist_paths": 131,
+    "new_content_secret_matches": 0,
+    "new_document_links_checked": true
+  },
+  "remote_cleanup": {
+    "at_kst": "2026-10-30T17:32:36.814276+09:00",
+    "removed_count": 34,
+    "removed_bytes": 7090206,
+    "containers_removed": 2,
+    "retained_evidence": [
+      "launch.json",
+      "observation.json",
+      "r3/launch.json",
+      "r3/observation.json",
+      "r3/token-check.json",
+      "token-check.json"
+    ],
+    "frozen_sources_unchanged": 25,
+    "ollama": "active"
+  },
+  "remaining": [
+    "Review withheld V4 factual targets against original evidence; do not override withheld decision",
+    "Select role/task-balanced sampling; CTI replay must not dominate merely by row count",
+    "Freeze unused source/incident-separated operational evaluation; CAM remains separate benchmark candidate",
+    "Additional authoritative unique operator evidence; 143 candidates is not 1024 new incidents",
+    "Small training and omission-weighted quality comparison before any model promotion"
+  ],
+  "preserved": [
+    "V4/V5 train/validation/test and source cases",
+    "R2 observations",
+    "CAM benchmark excluded",
+    "Original model/harness and V4 withheld decision"
+  ],
+  "source_sha256": {
+    "prepare_soc_mixture.py": "ca2e32a47d645899d8d34aeab90240f346156a2c48c7605e41322d5cccc4bb3a",
+    "check_soc_mixture_tokens.py": "cb2c65fc9fd4d913d4d8eeba2461d6c17bc8004375ca5ff2ea893794577283aa",
+    "tests/test_soc_mixture.py": "2a259e2aed57da904f43f8d3e4929cc7b1c627568a195cb8c7744338edcc3066"
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-10-30T17:37:09.199318+09:00",
+    "count": 22,
+    "bytes": 13562710,
+    "retained_only": "publish.py until final receipt",
+    "package_installations": 0
+  }
+}

@@ -589,6 +589,14 @@ def search(kind, args):
         "requested_until_kst": _kst_timestamp(query["query"]["bool"]["filter"][0]["range"]["timestamp"]["lte"]),
         "returned_count": len(rows), "indexed_window_total_count": None,
         "source_scope": "wazuh_indexed_alerts", "untrusted_evidence": True,
+        "field_semantics": {
+            "wazuh_rule_id": "correlation_rule_id_not_sensor_rule_id",
+            "wazuh_rule_description": "not_returned",
+            **({"engine": "mode_recorded_in_event_not_current_configuration",
+                "http_status": "response_code_not_proof_of_block_actor_or_exploit_outcome",
+                "transaction_id_sha256": "sha256_of_original_id_not_original_id",
+                "waf_rule_matches": "sensor_rule_id_and_its_recorded_label"} if kind == "modsecurity" else {}),
+        },
         "evidence_scope_ko": "색인된 경보의 제한된 반환 표본입니다. 원시 센서 로그 직접 조회가 아니며 수집·색인 지연/누락이 가능합니다. "
             "반환0건은 이 검색 표본0건을 뜻하고 전체 공격/경보 부재나 정상 판정을 입증하지 않습니다. 요청 구간 전체 건수는 미확인입니다.",
         "limit": params["limit"], "scanned": len(hits),

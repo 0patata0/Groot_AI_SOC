@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.16.1"
+VERSION = "groot-query-completion:1.16.4"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "962ca44822ab8bf9463fd9975bea356150d39038426609994b4e4c1f328278f3"

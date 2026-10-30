@@ -18,6 +18,17 @@ spec.loader.exec_module(module)
 
 
 class SecurityEventsMcpTests(unittest.TestCase):
+    def test_returned_field_provenance_does_not_claim_current_mode_or_outcome(self):
+        source={'rule':{'description':'private payload'},'data':{'transaction':{
+            'response':{'http_code':302},'producer':{'secrules_engine':'DetectionOnly'}}}}
+        with patch.object(module,'indexer_search',return_value={'hits':{'hits':[{'_source':source}]}}):
+            result=module.search('modsecurity',{})
+        self.assertEqual(result['alerts'][0]['engine'],'DetectionOnly')
+        self.assertEqual(result['field_semantics']['engine'],'mode_recorded_in_event_not_current_configuration')
+        self.assertEqual(result['field_semantics']['transaction_id_sha256'],'sha256_of_original_id_not_original_id')
+        self.assertEqual(result['field_semantics']['wazuh_rule_description'],'not_returned')
+        self.assertNotIn('private payload',json.dumps(result))
+
     def test_explicit_endpoints_preserve_seconds_and_cross_midnight(self):
         at=module.datetime(2026,10,31,12,tzinfo=module.KST)
         for start,end,seconds in [('2026-10-29T19:00:00+09:00','2026-10-29T19:20:00+09:00',1200),

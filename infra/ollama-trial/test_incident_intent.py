@@ -83,6 +83,22 @@ class IncidentIntent(unittest.TestCase):
         self.assertFalse(h.incident_evidence_gap(q,[dict(call,server='resp',name='block_ip')]))
         self.assertFalse(h.incident_evidence_gap('DVWA 공격자를 조사하고 차단해줘',[]))
 
+    def test_actor_and_arrow_source_do_not_expand_to_another_address(self):
+        alias='mcp__security_events__search_modsecurity_alerts'
+        schema={'type':'object','properties':{'source_ip':{'type':'string'}}}
+        for q in ('10월29일 192.168.16.233이 DVWA에서 한 행위를 조사해줘',
+                  '192.168.16.233 → DVWA 사건 조사해줘',
+                  '192.168.16.233에서 Log4Shell 공격이었나? 조사해줘'):
+            result=h.refine_read_schemas(q,{alias:schema},[])[alias]
+            self.assertEqual(result['properties']['source_ip']['enum'],['192.168.16.233'])
+            self.assertIn('source_ip',result['required'])
+        for q in ('대상 DVWA 192.168.16.233에 대한 공격을 조사해줘',
+                  '출발지 192.168.16.0/24의 DVWA 공격을 조사해줘',
+                  '192.168.16.233 → 192.168.16.234 공격을 조사해줘'):
+            result=h.refine_read_schemas(q,{alias:schema},[])[alias]
+            self.assertNotIn('enum',result['properties']['source_ip'])
+        self.assertNotIn('enum',schema['properties']['source_ip'])
+
     def test_incident_judgment_is_not_replaced_by_literal_event_table(self):
         q='WAF 경보 조사하고 공격인지 판단해줘'
         self.assertIsNone(h.tool_scope(q))

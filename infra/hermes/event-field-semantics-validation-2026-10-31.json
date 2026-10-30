@@ -1,0 +1,206 @@
+{
+  "at_kst": "2026-10-31T05:07:26.770784+09:00",
+  "versions": {
+    "query_completion": "1.16.4",
+    "chat_contract": "1.5.5"
+  },
+  "tests": [
+    {
+      "suite": "native",
+      "total": 365,
+      "skipped": 2,
+      "exit": 0
+    },
+    {
+      "suite": "sdk",
+      "total": 113,
+      "skipped": 0,
+      "exit": 0
+    },
+    {
+      "suite": "events",
+      "total": 24,
+      "skipped": 0,
+      "exit": 0
+    },
+    {
+      "suite": "install-management",
+      "total": 33,
+      "skipped": 0,
+      "exit": 0
+    },
+    {
+      "suite": "install-trial",
+      "total": 1,
+      "skipped": 0,
+      "exit": 0
+    }
+  ],
+  "passed": 534,
+  "skipped": 2,
+  "skip_reason": "Mac에 jsonschema 미설치; 기존 설치기 검사는 별도 실행",
+  "sources": {
+    "infra/hermes/chat_contract.py": "a0e26700ac5806ec45d8faf3acc11e20fb4cc5a44102265e38cf0a18fdff0ff6",
+    "infra/hermes/query-completion/__init__.py": "5410fa78c0934cc56796e38f03669f2897618e0bd384f635126db558f03ba29b",
+    "infra/hermes/query-completion/plugin.yaml": "18c014ef8a9daf1e9fc1d9e4a43f33a2b42c7318cf8e5bcee8c5212bc4f097ae",
+    "infra/mcp/security-events-mcp.py": "e11982b69e5c8aeda42493cbbd4f8c6355ec0f7ab8ee6e89ce0bf8882afc4500",
+    "infra/mcp/test_security_events_mcp.py": "0d0420acf4c40aec7163fb8726d016548276df04d171d5a0828c966c29130dfa",
+    "infra/ollama-trial/harness.py": "3670d4d62e9ef1c4c54c8bc617a1453f680715fdfbaee30889a1e84299db102d",
+    "infra/ollama-trial/test_incident_intent.py": "21d1659aa9710191959ee8ec67047f25b88c2e1b9d667bd46e6f4aa04f127bf4",
+    "infra/ollama-trial/test_incident_reasoning.py": "68f831185873d15b363a47155f89ef7744c7fc06f51d0b9f67fb51c081576c86"
+  },
+  "deployed_targets": [
+    {
+      "source": "infra/hermes/query-completion/__init__.py",
+      "target": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+      "after": "5410fa78c0934cc56796e38f03669f2897618e0bd384f635126db558f03ba29b"
+    },
+    {
+      "source": "infra/hermes/query-completion/__init__.py",
+      "target": "/opt/capstone-ollama-trial/query_grounding.py",
+      "after": "5410fa78c0934cc56796e38f03669f2897618e0bd384f635126db558f03ba29b"
+    },
+    {
+      "source": "infra/hermes/query-completion/__init__.py",
+      "target": "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/__init__.py",
+      "after": "5410fa78c0934cc56796e38f03669f2897618e0bd384f635126db558f03ba29b"
+    },
+    {
+      "source": "infra/hermes/query-completion/plugin.yaml",
+      "target": "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml",
+      "after": "18c014ef8a9daf1e9fc1d9e4a43f33a2b42c7318cf8e5bcee8c5212bc4f097ae"
+    },
+    {
+      "source": "infra/hermes/query-completion/plugin.yaml",
+      "target": "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/query-completion/plugin.yaml",
+      "after": "18c014ef8a9daf1e9fc1d9e4a43f33a2b42c7318cf8e5bcee8c5212bc4f097ae"
+    },
+    {
+      "source": "infra/hermes/chat_contract.py",
+      "target": "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+      "after": "a0e26700ac5806ec45d8faf3acc11e20fb4cc5a44102265e38cf0a18fdff0ff6"
+    },
+    {
+      "source": "infra/hermes/chat_contract.py",
+      "target": "/opt/capstone-ollama-trial/chat_contract.py",
+      "after": "a0e26700ac5806ec45d8faf3acc11e20fb4cc5a44102265e38cf0a18fdff0ff6"
+    },
+    {
+      "source": "infra/hermes/chat_contract.py",
+      "target": "/opt/capstone-prereqs/ollama-trial/source/infra/hermes/chat_contract.py",
+      "after": "a0e26700ac5806ec45d8faf3acc11e20fb4cc5a44102265e38cf0a18fdff0ff6"
+    },
+    {
+      "source": "infra/ollama-trial/harness.py",
+      "target": "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+      "after": "3670d4d62e9ef1c4c54c8bc617a1453f680715fdfbaee30889a1e84299db102d"
+    },
+    {
+      "source": "infra/ollama-trial/harness.py",
+      "target": "/opt/capstone-ollama-trial/harness.py",
+      "after": "3670d4d62e9ef1c4c54c8bc617a1453f680715fdfbaee30889a1e84299db102d"
+    },
+    {
+      "source": "infra/ollama-trial/harness.py",
+      "target": "/opt/capstone-prereqs/ollama-trial/source/infra/ollama-trial/harness.py",
+      "after": "3670d4d62e9ef1c4c54c8bc617a1453f680715fdfbaee30889a1e84299db102d"
+    },
+    {
+      "source": "infra/mcp/security-events-mcp.py",
+      "target": "/opt/mcp/security-events-mcp.py",
+      "after": "e11982b69e5c8aeda42493cbbd4f8c6355ec0f7ab8ee6e89ce0bf8882afc4500"
+    },
+    {
+      "source": "infra/mcp/security-events-mcp.py",
+      "target": "/opt/capstone-prereqs/ollama-trial/source/infra/mcp/security-events-mcp.py",
+      "after": "e11982b69e5c8aeda42493cbbd4f8c6355ec0f7ab8ee6e89ce0bf8882afc4500"
+    }
+  ],
+  "live_source_observation_kst": "2026-10-31T04:54:17.522158+09:00",
+  "native_leases": 0,
+  "sdk_pending": 0,
+  "actual_chat_trials": [
+    {
+      "label": "o1",
+      "version": "1.16.2",
+      "server_chat_seconds": 45.292,
+      "tool_calls": 4,
+      "model_calls": 2,
+      "manual_result": "추가 출발지 오조회·과거 모드의 현재화·차단 부재 단정 잔여"
+    },
+    {
+      "label": "h1",
+      "version": "1.16.2",
+      "server_chat_seconds": 72.299,
+      "tool_calls": 2,
+      "model_calls": 3,
+      "manual_result": "표본0의 부재 단정·상관 규칙 의미 오류; 자료 요약으로 종료"
+    },
+    {
+      "label": "o2",
+      "version": "1.16.3",
+      "server_chat_seconds": 41.143,
+      "tool_calls": 2,
+      "model_calls": 2,
+      "manual_result": "요청 출발지/구간·주요 필드 해석 개선; 전체 조사 완료 아님"
+    },
+    {
+      "label": "h2",
+      "version": "1.16.3",
+      "server_chat_seconds": 77.457,
+      "tool_calls": 2,
+      "model_calls": 4,
+      "manual_result": "현재 설정을 확인하겠다는 계획을 단정으로 검사하는 오탐; 자료 요약 종료"
+    },
+    {
+      "label": "h3",
+      "version": "1.16.4",
+      "server_chat_seconds": 60.055,
+      "tool_calls": 2,
+      "model_calls": 3,
+      "manual_result": "검사 오탐 해소; 최종 문장에 IDS 부재/미탐지 단정 잔여"
+    },
+    {
+      "label": "o3",
+      "version": "1.16.4",
+      "server_chat_seconds": 40.619,
+      "tool_calls": 2,
+      "model_calls": 2,
+      "manual_result": "요청 범위·필드·불확실성 구분; 추가 조사를 사용자 재지시로 미루는 표현 잔여"
+    }
+  ],
+  "protected_calls": 0,
+  "fresh_roots": 6,
+  "terminal_replies": 6,
+  "rejected_before_post": 1,
+  "actual_mcp_read": {
+    "at_kst": "2026-10-31T04:42:04+09:00",
+    "privileged": false,
+    "tool_count": 3,
+    "waf_returned": 1,
+    "ids_returned": 0,
+    "http_status": 302,
+    "field_semantics_present": true
+  },
+  "rollback_backups": [
+    "/var/backups/capstone-evidence-semantics-20261031-043436",
+    "/var/backups/capstone-evidence-semantics-20261031-044130",
+    "/var/backups/capstone-evidence-semantics-20261031-044817"
+  ],
+  "limits": [
+    "Same historical development events, not an independent holdout; repeated question for regression",
+    "Shared load and caches uncontrolled; server create/update timing excludes client display and push",
+    "Narrow claim checks are not complete semantic validation",
+    "Actual protected apply/rollback, new attack E2E, new-server full install and long-term stability not tested",
+    "Wazuh raw description addition rejected by private-payload regression and excluded",
+    "H2 checker false positive reproduced on three actual drafts and fixed; residual IDS absence claim not fully detected",
+    "Readonly tasks do not prove autonomous full investigation or containment"
+  ],
+  "private_evidence_hashes": {
+    "tests4.json": "97dd520e484c4772e995354b8dc9660cfb43497d66269f11e327c493373e239f",
+    "audit10.json": "1784c863296a22f566cafedd22e9ebbc9a9e511c5cb624115255a55432ed51e6",
+    "actual-replay.json": "29bbe0ea8f7ccbc4e155350432dd6b3c326c31031be3931293abea68e9dca3b6",
+    "actual-false-positive-replay.json": "26d4ff5c7a8b0193b7b0908188d0c3ff8be123d0266e6ca8c3087502327de08d",
+    "mcp-live.json": "1f14fdbf00ea4e4e7a36a54978c4c53e394127c84eaec8b2810d8ac0fa1d707a"
+  }
+}

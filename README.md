@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+## 사건 필드 해석 보완·학습 준비 상태 — 2026-10-31
+
+두 봇의 HTTP 응답/실제 차단, 원본 ID/해시, 센서/상관 규칙, 사건 당시/현재 설정 구분을 보완했습니다. 운영13파일 일치·534검사 통과/2생략·실제6응답을 확인했으나 IDS 부재 단정과 자율 조사 후속에는 문제가 남아 있습니다. 새 GPU 본학습은 실행 설정·복구 검증 미완료로 아직 시작하지 않았습니다. 05:15 KST 작업 일시정지 후 현황 확인은 사용자 재지시에 따릅니다. [동작·복구](infra/hermes/event-field-semantics.md) · [실측·한계](infra/hermes/event-field-semantics-validation-2026-10-31.json) · [현황](STATUS.md).
+
 ## 사건 조회 구간·현재 시각 보완 — 2026-10-31
 
 두 봇에 턴별 KST 시각·실패 조회 인자/오류 피드백을 반영하고 MCP의 정확 시작/종료 구간·WAF 센서 설명을 제공했습니다. 실제4새대화의 연도/구간은 모두 맞았지만 최종 사건 판단에는 중요한 근거 오류가 남아 있습니다. [조회 계약](infra/mcp/event-evidence-window.md) · [실측과 한계](infra/mcp/event-evidence-window-validation-2026-10-31.json) · [현재 작업/일시정지 계획](STATUS.md).

@@ -239,5 +239,18 @@
     "observation_pool_sha256": "2a00f9956b58e5067bda0fe962d2edd58dac9fe931e3817d6bca8d240439869f",
     "all_1197_tokens_rechecked": true,
     "earlier_R3_receipts_preserved": true
+  },
+  "pilot_follow_up": {
+    "at_kst": "2026-10-30T18:19:34.070334+09:00",
+    "report": "SOC_PILOT_REVIEW.json",
+    "candidate": "data-soc-pilot-candidate-20261030-r3",
+    "arm_rows": [
+      191,
+      221
+    ],
+    "unique_rows": 221,
+    "full_R4_inventory_rows_preserved": 1197,
+    "training_admitted": 0,
+    "optimal_mix_or_quality_claimed": false
   }
 }

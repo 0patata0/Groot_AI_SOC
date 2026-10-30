@@ -1,5 +1,24 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**소규모 비교후보 — 2026-10-30 KST:** [원장](SOC_PILOT_REVIEW.json). `data-soc-pilot-candidate-20261030-r3`의 `evidence-only.jsonl`191행과 `evidence-plus-harness.jsonl`221행은 같은143관제·48CTI를 공유하며 두번째에하네스30행을더한다. 고유행221·원본1,197보존이며새자료412건으로세지않는다. 기존고정train원천그룹48개에서한행씩선택하고제공자범위→기법포함→고정해시동점규칙을적용한다. 평가정답/모델점수는선정에쓰지않는다. CTI기법범위가522→67이므로추가455개가없어진것이나본학습최적비율이아니며전체자료/회귀평가를유지한다.
+
+```sh
+python3 -B finetuning/check_pilot_loss_contract.py \
+  --frozen-root /existing/finetuning --output /new/loss-check.json
+python3 -B finetuning/prepare_soc_pilot.py \
+  --inventory finetuning/data-soc-mixture-candidate-20261030-r4 \
+  --token-proof /local/R4-token-observation.json \
+  --loss-proof /local/loss-observation.json \
+  --output finetuning/data-soc-pilot-candidate-NEW
+python3 -B -m unittest discover -s finetuning/tests -p 'test_soc_pilot.py'
+```
+
+`--loss-proof`는실제CPU실행의 `state`와`loss_check`를담은수집영수증이고, `--token-proof`는같은R4의`state`와`token_check`다. 단독검사기출력만으로실행상태를만들지않는다. 준비기는해시/ID/완료상태·실패/절단0을검증하고새경로에만쓴다. 실행프로필·자동학습pack에는후보본문을추가하지않는다. 소스/원장만pack허용목록에추가한다.
+
+고정손실코드의batch1평균은샘플내정답토큰평균이다. 전체1,197행에서CTI행비중85.5%와targettoken비중47.1%는서로다른수치이며실제모델기울기비중이아니다. Thor기존torch/transformers에서작은CPU예제로호출평균과토큰평균의차이·외부분모거부를확인했다. 실제Qwen전체학습/마지막배치/기울기나모델품질시험은아니다.
+
+`evaluation-boundaries.json`은기존V5시험128=사용된개발회귀, CAM393=보류공개벤치마크, 미사용최종운영평가=없음으로구분한다. 중요누락/허위사실·실행/잘못된대상/승인우회는상쇄불가이고검토미완료는승격불가다. 두후보한번씩학습은96대111갱신(batch1/accum2·미누락가정)으로동일연산량이아니므로그조건으로하네스자료만의인과효과를주장하지않는다. 실행전동일연산량대조·추가근거/최종평가·실행프로필/메모리점검이남는다. 후보행은원문바이트가같아앞선실토큰증빙을재사용했으며이번새토큰화나학습은하지않았다.
+
 **V4 관제 후보 원문 재검수 — 2026-10-30 KST:** [결과](V4_OBSERVATION_TARGET_REVIEW.json). 최신 후보는 `data-soc-mixture-candidate-20261030-r4`다. `data-soc-observation-reviewed-v4-20261030-r1`의126개를 기존 관제풀의 같은 ID와 교체한다. 기존 CTI1,024·하네스30·R2관측17은 그대로이고 건수는 총1,197이다. 원V4/분할·이전후보/보류결정은 덮어쓰지 않는다.
 
 `refine_v4_observation_targets.py`는 기존ADS6파일/선택144원본객체/6ZIP멤버CRC, LDS감사/라벨2파일·정확한행 연결, 고정CISA문서/36레코드를 확인한다. AIT같은시각27쌍의 순서 미확정·기법태그31쌍의 센서판단 범위·감사로그18개 필드를 명시한다. KEV36개 입력에 원래 누락된 `forensicTriage`와`notes`를 추가하고 설명/조치/참조를 답변에 보존한다(Yes3/No33). 나머지90개 입력은 동일하다. 한국어 해석은 프로젝트 작성이며 기관/독립전문가 인증을 뜻하지 않는다.

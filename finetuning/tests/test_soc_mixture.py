@@ -4,11 +4,12 @@ from datetime import datetime, timedelta
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from prepare_soc_mixture import (synthetic_fingerprint, select_synthetic, fw_entry,
-                                 fw_candidate, sha, FW, FW_SCHEMA, FW_CONTEXT, v5_group_audit)
+                                 fw_candidate, sha, FW, FW_SCHEMA, FW_CONTEXT, v5_group_audit, reviewed_v4)
 
 
 class MixtureTests(unittest.TestCase):
@@ -142,6 +143,50 @@ class MixtureTests(unittest.TestCase):
                  {'id': '3', 'provider': 'MITRE ATT&CK', 'entity': 'group', 'split': 'train'},
                  {'id': '4', 'provider': 'MITRE ATT&CK', 'entity': 'group', 'split': 'validation'}]
         self.assertEqual(len(v5_group_audit(cases)['cross_split_groups']), 2)
+
+    def revision_fixture(self, directory, change=None):
+        original = {'id': 'c', 'source': 'frozen', 'tools': [], 'messages': [
+            {'role': 'system', 'content': 's'}, {'role': 'user', 'content': 'u'},
+            {'role': 'assistant', 'content': 'old'}]}
+        case = {'id': 'c', 'split': 'train'}
+        row = deepcopy(original);row['messages'][-1]['content'] = 'reviewed'
+        trace = {'id': 'c', 'original_record_sha256': sha(original), 'source_case_sha256': sha(case),
+                 'partition': 'historical_training_candidate_only', 'training_admitted': False}
+        if change: change(row, trace)
+        trace['record_sha256'] = sha(row)
+        raw = (json.dumps(row)+'\n').encode();tr = (json.dumps(trace)+'\n').encode()
+        (directory/'candidate-dialogues.jsonl').write_bytes(raw);(directory/'lineage.jsonl').write_bytes(tr)
+        names = ['KEV_SOURCE_RECORDS.jsonl', 'AIT_NOTICE.txt', 'SOURCE_NOTICE.txt']
+        for n in names:(directory/n).write_bytes(b'fixture')
+        manifest = {'status': 'source_rechecked_refined_candidates_not_training_release', 'training_admitted': 0,
+                    'records': 1, 'dialogues_sha256': sha(raw), 'lineage_sha256': sha(tr), 'findings': {},
+                    'support_files': {n: sha(b'fixture') for n in names}}
+        (directory/'manifest.json').write_text(json.dumps(manifest))
+        return [case], {'c': (json.dumps(original)+'\n').encode()}
+
+    def test_refinement_is_replacement_not_extra_rows(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d);cases, originals = self.revision_fixture(root)
+            rows, traces, support, revision = reviewed_v4(root, cases, originals)
+            self.assertEqual(set(rows), {'c'});self.assertEqual(revision['rows_added'], 0)
+
+    def test_refinement_cannot_rebind_original_hash(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d);cases, originals = self.revision_fixture(root,
+                lambda row,t: t.update(original_record_sha256='a'*64))
+            with self.assertRaises(ValueError): reviewed_v4(root, cases, originals)
+
+    def test_refinement_cannot_promote_partition(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d);cases, originals = self.revision_fixture(root,
+                lambda row,t: t.update(partition='test', training_admitted=True))
+            with self.assertRaises(ValueError): reviewed_v4(root, cases, originals)
+
+    def test_refinement_cannot_add_tool_or_role(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d);cases, originals = self.revision_fixture(root,
+                lambda row,t: row['messages'].append({'role': 'tool', 'content': 'fabricated'}))
+            with self.assertRaises(ValueError): reviewed_v4(root, cases, originals)
 
 
 if __name__ == '__main__':

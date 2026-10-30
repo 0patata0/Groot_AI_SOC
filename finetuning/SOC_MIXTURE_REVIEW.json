@@ -230,5 +230,14 @@
     "bytes": 13562710,
     "retained_only": "publish.py until final receipt",
     "package_installations": 0
+  },
+  "follow_up": {
+    "at_kst": "2026-10-30T17:55:58.264786+09:00",
+    "report": "V4_OBSERVATION_TARGET_REVIEW.json",
+    "latest_candidate": "data-soc-mixture-candidate-20261030-r4",
+    "change": "Source-rechecked126 V4 observations replace old126; no extra rows. CTI1024/harness30 and R2 observations17 unchanged.",
+    "observation_pool_sha256": "2a00f9956b58e5067bda0fe962d2edd58dac9fe931e3817d6bca8d240439869f",
+    "all_1197_tokens_rechecked": true,
+    "earlier_R3_receipts_preserved": true
   }
 }

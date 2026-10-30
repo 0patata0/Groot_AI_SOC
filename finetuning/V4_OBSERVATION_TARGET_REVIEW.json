@@ -1,0 +1,248 @@
+{
+  "schema": 1,
+  "at_kst": "2026-10-30T17:55:58.264786+09:00",
+  "decision": "126_training_candidates_source_rechecked_and_refined_not_admitted",
+  "training_admitted": 0,
+  "records": 126,
+  "findings": {
+    "equal_time_pairs": 27,
+    "sensor_MITRE_annotated_pairs": 31,
+    "forensicTriage_previously_omitted": 36,
+    "forensicTriage_Yes_previously_omitted": 3,
+    "KEV_input_fields_added": [
+      "forensicTriage",
+      "notes"
+    ],
+    "inputs_changed": 36,
+    "targets_changed": 126
+  },
+  "refined_manifest_sha256": "771fbe745badfa08c819f01fc1a82a72255cbeaa794c754381a9c51ecc09821a",
+  "dialogues_sha256": "1f3eb27836601ab297b9f1d221f33ae016a3080fc3ebb38d7421e7d14d00db79",
+  "lineage_sha256": "9f7fe2103e8e4cf1c2066cb6554e5f4692d470ca5eebef1bb1ff976346ffc739",
+  "source_verification": {
+    "ADS": {
+      "processed_files": [
+        {
+          "file": "datasets/processed/ait/fox.labeled.jsonl",
+          "sha256": "0d5b40fc39c0fb4233b0e2a680c1eec613499e6d0a9ad06e61c88718f85ca460",
+          "selected_rows": 24
+        },
+        {
+          "file": "datasets/processed/ait/harrison.labeled.jsonl",
+          "sha256": "35f550135f91e466a7dc3c5e67e9dc1d593dfd114ff6a9ce08d6d4a841d9e444",
+          "selected_rows": 24
+        },
+        {
+          "file": "datasets/processed/ait/russellmitchell.labeled.jsonl",
+          "sha256": "4bc7dc38eb1903f6abea536b785a21d317d76aebe621bf47cc5c6d63672a7e39",
+          "selected_rows": 24
+        },
+        {
+          "file": "datasets/processed/ait/santos.labeled.jsonl",
+          "sha256": "2d9c6d04d9081f153f53898ff50a0eb850b04ccb9f697a0b2f46897d16750c67",
+          "selected_rows": 24
+        },
+        {
+          "file": "datasets/processed/ait/shaw.labeled.jsonl",
+          "sha256": "39303ac09158bc483779d1e79a31022f57f901c86e6258370e12fd666f050d16",
+          "selected_rows": 24
+        },
+        {
+          "file": "datasets/processed/ait/wardbeck.labeled.jsonl",
+          "sha256": "e7e5da3c7f979e821ba0f97843f9f2e7ee25d002d247c1276d7b780d702b24d3",
+          "selected_rows": 24
+        }
+      ],
+      "original_objects_verified": 144,
+      "original_ZIP_members_CRC_verified": 6,
+      "phase_window_scope": "Existing processed contextual annotation retained; not a malicious label or a newly verified raw-log fact"
+    },
+    "LDS": {
+      "raw_sha256": "8dbee7a1f2d998c4bee99748b3be2cc16479f1e81fe30a71b1f9197f53f2601c",
+      "label_sha256": "4ae8b5dcb024f9ffd9c5249cc6af4a2fb93e20620f5c0876af9c216b05b23c23",
+      "source_rows": 2316,
+      "provider_labelled_rows": 9,
+      "candidate_rows": 18,
+      "whole_archive_checksum_verified": false
+    },
+    "KEV": {
+      "document_sha256": "2d9931c086e42d05425c2da924299c8d9b7ff836de373f981668b7ef5f6f0fd7",
+      "catalog_version": "2026.10.27",
+      "source_commit": "30a09b6f3f7e2f03618cc8c95d212966d3c14e6e",
+      "selected_records": 36,
+      "forensicTriage_counts": {
+        "Yes": 3,
+        "No": 33
+      }
+    }
+  },
+  "source_notices_retained": true,
+  "official_sources": [
+    {
+      "url": "https://raw.githubusercontent.com/cisagov/kev-data/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/known_exploited_vulnerabilities.json",
+      "bytes": 1814644,
+      "sha256": "2d9931c086e42d05425c2da924299c8d9b7ff836de373f981668b7ef5f6f0fd7",
+      "selected_records": 36
+    },
+    {
+      "url": "https://zenodo.org/records/5789064",
+      "scope": "provider line-label semantics, original selected audit and label files",
+      "range_acquisition": {
+        "url": "https://zenodo.org/api/records/5789064/files/russellmitchell.zip/content",
+        "members": [
+          {
+            "member": "gather/intranet_server/logs/audit/audit.log",
+            "sha256": "8dbee7a1f2d998c4bee99748b3be2cc16479f1e81fe30a71b1f9197f53f2601c",
+            "bytes": 420842,
+            "zip_crc_verified": true,
+            "crc32": "4ecb5130"
+          },
+          {
+            "member": "labels/intranet_server/logs/audit/audit.log",
+            "sha256": "4ae8b5dcb024f9ffd9c5249cc6af4a2fb93e20620f5c0876af9c216b05b23c23",
+            "bytes": 2397,
+            "zip_crc_verified": true,
+            "crc32": "16f94307"
+          }
+        ],
+        "transferred_bytes": 2550407,
+        "requested_bytes": 2550407,
+        "requests": 39,
+        "whole_archive_checksum_verified": false,
+        "record_metadata_rechecked": true,
+        "published_md5": "md5:78e9b7d169b438f03816019b52ab3ff7"
+      }
+    },
+    {
+      "url": "https://doi.org/10.5281/zenodo.8263181",
+      "scope": "existing local original AIT-ADS archive, six complete Wazuh members CRC /144 exact selected objects; no new ADS download"
+    }
+  ],
+  "input_change": "Only36 KEV inputs add original forensicTriage and notes;90 AIT inputs and17 existing R2 observations unchanged. No events invented.",
+  "target_change": "126 project-authored targets now retain tied-time uncertainty/sensor-tag scope/audit fields or provider-specific KEV description/action/forensic flags/references. Not institutional or independent-expert gold.",
+  "mixture": {
+    "latest": "data-soc-mixture-candidate-20261030-r4",
+    "manifest_sha256": "de6ca1a33b9214d98262e6093fe653c8ea3c35c13e3baef50c88564c5c794259",
+    "pool_files": {
+      "cti-replay-candidates.jsonl": {
+        "rows": 1024,
+        "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2"
+      },
+      "observation-candidates.jsonl": {
+        "rows": 143,
+        "sha256": "2a00f9956b58e5067bda0fe962d2edd58dac9fe931e3817d6bca8d240439869f"
+      },
+      "optional-harness-candidates.jsonl": {
+        "rows": 30,
+        "sha256": "45eeed78f37da561d708c8c331b22ff42adc58cb12b644398bccccc1218602b2"
+      }
+    },
+    "replaced_observation_rows": 126,
+    "new_rows": 0,
+    "old_R1_R2_R3_preserved": true,
+    "V4_withheld_decision_preserved": true
+  },
+  "independent_cross_check": {
+    "checked_rows": 126,
+    "literal_fields_checked": 1836,
+    "changed_inputs": 36,
+    "tied_times": 27,
+    "forensicTriage": {
+      "Yes": 3,
+      "No": 33
+    },
+    "changed_mixture_rows": 126,
+    "unchanged_R2_observations": 17,
+    "CTI_and_harness_pools_unchanged": true,
+    "frozen_splits_unchanged": 6,
+    "frozen_V5_sources_unchanged": 25,
+    "source_of_answers": "project-authored interpretations, not provider expert gold",
+    "cli_reproduction_except_time": 2,
+    "existing_output_refused": 2
+  },
+  "token_check": {
+    "at_kst": "2026-10-30T17:49:45.672274+09:00",
+    "manifest_sha256": "de6ca1a33b9214d98262e6093fe653c8ea3c35c13e3baef50c88564c5c794259",
+    "model": "Qwen/Qwen3.6-35B-A3B",
+    "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "model_metadata_files": 11,
+    "pool_results": {
+      "cti-replay-candidates.jsonl": {
+        "rows": 1024,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 406
+      },
+      "observation-candidates.jsonl": {
+        "rows": 143,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 2876
+      },
+      "optional-harness-candidates.jsonl": {
+        "rows": 30,
+        "alignment_errors": {},
+        "over_4096": 0,
+        "max_tokens": 2710
+      }
+    },
+    "all_1197_fit_and_aligned": true,
+    "truncation": false,
+    "exit_code": 0,
+    "oom": false,
+    "weights_loaded": false,
+    "CPU_only": "existing pinned image/venv, runc4CPU/8GiB/networknone/read-only root/180s limit"
+  },
+  "tests": {
+    "new_target_regressions": 14,
+    "new_replacement_guard_regressions": 4,
+    "existing_regressions": 55,
+    "total": 73,
+    "CLI_reproductions": 2,
+    "existing_output_refusals": 2,
+    "complete_training_pack": false,
+    "new_server_full_install": false,
+    "live_MCP_chat_write_rollback_E2E": false,
+    "attack_E2E": false,
+    "model_quality": false,
+    "pack_initial_allowlist_paths": 133
+  },
+  "remote_cleanup": {
+    "at_kst": "2026-10-30T17:52:32.200874+09:00",
+    "count": 17,
+    "bytes": 3675777,
+    "container_removed": true,
+    "frozen_sources_unchanged": 25,
+    "ollama": "active",
+    "retained_evidence": [
+      "launch.json",
+      "observation.json",
+      "token-check.json",
+      "cleanup.json"
+    ]
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-10-30T17:54:00.612940+09:00",
+    "count": 31,
+    "bytes": 12569651,
+    "package_installations": 0,
+    "remaining": "publisher until final Git receipt"
+  },
+  "source_sha256": {
+    "refine_v4_observation_targets.py": "37686ab5ccbc03fc46fd5cabe1d6cb04ecd57b65deb36fb8957fabe76074b5a3",
+    "prepare_soc_mixture.py": "6b853c7bd49476ecb5c22e42210e52d901a9ee5bb22c83b25dce2958003d5834",
+    "tests/test_v4_observation_targets.py": "559659275379e79ac69ef69aaa78c70af50f95b6b75c36ed32c689f6aaf56890",
+    "tests/test_soc_mixture.py": "68e9968ac6998ab14a2c19691fcfb0316fba96c74835c10cd79829afce7d2875"
+  },
+  "remaining": [
+    "Select actual role/task-balanced training mix; existing CTI1024 is replay, not new data.",
+    "Freeze an unused source/incident-separated operational evaluation and sufficient authoritative operator evidence.",
+    "Small training and omission-weighted quality comparison; no automatic model promotion.",
+    "Source-bound project interpretations still require semantic quality evaluation; mechanical checks are not independent expert review."
+  ],
+  "not_performed": [
+    "New training",
+    "Production model or harness change",
+    "Presentation material authoring"
+  ]
+}

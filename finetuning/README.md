@@ -1,5 +1,23 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**V4 관제 후보 원문 재검수 — 2026-10-30 KST:** [결과](V4_OBSERVATION_TARGET_REVIEW.json). 최신 후보는 `data-soc-mixture-candidate-20261030-r4`다. `data-soc-observation-reviewed-v4-20261030-r1`의126개를 기존 관제풀의 같은 ID와 교체한다. 기존 CTI1,024·하네스30·R2관측17은 그대로이고 건수는 총1,197이다. 원V4/분할·이전후보/보류결정은 덮어쓰지 않는다.
+
+`refine_v4_observation_targets.py`는 기존ADS6파일/선택144원본객체/6ZIP멤버CRC, LDS감사/라벨2파일·정확한행 연결, 고정CISA문서/36레코드를 확인한다. AIT같은시각27쌍의 순서 미확정·기법태그31쌍의 센서판단 범위·감사로그18개 필드를 명시한다. KEV36개 입력에 원래 누락된 `forensicTriage`와`notes`를 추가하고 설명/조치/참조를 답변에 보존한다(Yes3/No33). 나머지90개 입력은 동일하다. 한국어 해석은 프로젝트 작성이며 기관/독립전문가 인증을 뜻하지 않는다.
+
+```sh
+python3 -B finetuning/refine_v4_observation_targets.py \
+  --kev /path/pinned-known_exploited_vulnerabilities.json \
+  --lds-audit /path/original-audit.log --lds-labels /path/original-labels.log \
+  --output finetuning/data-soc-observation-reviewed-v4-NEW
+python3 -B finetuning/prepare_soc_mixture.py \
+  --observations finetuning/data-soc-observation-candidate-20261030-r2 \
+  --fw-proof /path/to/local-20261029-fw-final-eval.json \
+  --reviewed-v4-observations finetuning/data-soc-observation-reviewed-v4-NEW \
+  --output finetuning/data-soc-mixture-candidate-NEW
+```
+
+원V4 고정분할/사례·로컬ADS 아카이브/처리파일과 고정SHA에 맞는 CISA/LDS원문이 필요하다. 새출력만허용하며 검수후보도 자동학습편입하지 않는다. `--reviewed-v4-observations`는 원행/원사례 해시·ID·분할·역할·새행SHA·고지를 확인해 교체만 수행한다. 후보/정답은 Git/자동pack제외다. R4 전수실토큰 최대2,876/4K·마스크통과, 원문필드1,836개 별도대조·73회귀·두CLI재현을 완료했다. 실제모델품질·운영도구행동은 별도 검증한다.
+
 **학습 후보 분리 — 2026-10-30 KST:** [검수 원장](SOC_MIXTURE_REVIEW.json). 최신 로컬 후보는 `data-soc-mixture-candidate-20261030-r3`이며 R1/R2는 이전 검사 근거로 보존한다. CTI 재사용1,024행, 기관 근거 관제143행, 선택적 하네스30행은 세 파일로 분리한다. 합계1,197은 권장 배합이나 신규 사건 수가 아니다. V4 보류126개와 프로젝트 작성 관제 해석은 원문 사실 재검수가 남는다. 기존 전체520개 자료/분할을 변경하지 않았다.
 
 `prepare_soc_mixture.py`는 고정 V4/V5 해시·분할과 R2 관측 원장을 확인하고, V4 학습분할 자체 예제204개를 대표27개로 묶는다. 비교용 fingerprint만 생성 ID/절대시각을 정규화하며 선택한 원문은 바꾸지 않는다. 승인·실패·만료/TTL/근거/심각도/ID 대응을 보존한다. 기존155행의 바이트 동일성과27질문유형·9업무 흐름을 별도로 대조했다. 과거 라이브2건과 FW 호출 선택1건은 별도 출처로 구분한다.

@@ -574,3 +574,10 @@ Cisco 두 후보의 [Instruct NOTICE](https://huggingface.co/fdtn-ai/Foundation-
 후보 조사 뒤 현37MCP 계약을19:05:50 KST 재조회하고 검수 합성100대화와 기존 AIT 공개 실습 경보의 사실 추출112대화를 별도 준비했다. AIT 출처는 [AIT Alert Data Set](https://zenodo.org/records/8263181), CC-BY-4.0이며 각 원본파일/선택행 SHA를 로컬 manifest에 보존한다. rule.id·level·KST 시각·phase_window만 근거로 삼고 공격 시간대를 개별 경보의 악성 정답으로 확장하지 않는다. 여섯 환경 train72, wheeler validation20, wilson test20으로 분리했다. 합성100건은72/12/16으로 시나리오별 분리하며 injection·조회실패·KST 등의 미사용 평가를 둔다. 실제 운영 사건/사람 전수 검수 자료가 아니며 외부 한국어 대규모 corpus는 이번에 추가 반입하지 않았다.
 
 최종 train144/validation32/test36대화(assistant prefix224/44/52), 길이1536에서 초과·정렬 오류0. `soc_dataset.py`가 실제 도구 인자/연결·명시 검수 출처·필수 사실·시나리오 및 첫 질문 중복을 검사한다. test 기반 재설계 시 새 독립 평가셋이 필요하다. 소스 cases·데이터·manifest는 로컬과 Thor `~/Capstone_Groot_training/qwen36-20261027/finetuning/`에 보존하고 Git에 추가하지 않는다. Cisco8B 고정 가중치는 Thor에만 내려받았으며 Qwen에 혼합하거나 LoRA로 적용하지 않는다. 최신 학습/비교 완료 여부는 [STATUS](../STATUS.md)를 따른다.
+
+
+## 2026-10-30 관제 후보126개 후속 재검수
+
+[검수 원장](V4_OBSERVATION_TARGET_REVIEW.json). 공식 [CISA KEV 고정본](https://github.com/cisagov/kev-data/blob/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/known_exploited_vulnerabilities.json) 36레코드에서 기존 입력의 forensicTriage/notes 누락을 복원했다. Yes3/No33 표시는 수집본 필드이며 조직별 법적 의무나 현 자산 침해 여부로 확대하지 않는다. 문서SHA·JSON포인터/레코드SHA·전체선택원문을 후보 원장에 보존한다. CC0-1.0 고지 및 관련 원문 참조를 유지한다.
+
+[AIT LDS](https://zenodo.org/records/5789064)의 정확한 원행·제공자 규칙 라벨, [AIT ADS](https://doi.org/10.5281/zenodo.8263181)의 원본 경보를 대조했다. 연구 시험망/센서주석/시나리오구간과 실제 침해 확정을 구분하며 한국어 관제 해석은 프로젝트 작성이다. LDS CC BY-NC-SA4.0·ADS CC BY4.0 고지/저자/논문 출처를 유지한다. 동일시각27쌍과 sensor MITRE 주석31쌍을 새 독립사건으로 세지 않는다. 재검수로 신규학습 편입·독립최종평가가 이루어진 것은 아니다.

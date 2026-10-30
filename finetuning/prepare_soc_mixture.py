@@ -196,7 +196,42 @@ def v5_group_audit(cases):
             'limitation': 'Not a full audit of secondary incident reports, all earlier corpora or pretraining'}
 
 
-def build(root, observations, fw_proof, output):
+def reviewed_v4(directory, public, originals):
+    """Explicit replacement, never extra rows; retain IDs and withheld lineage."""
+    raw_manifest = (directory / 'manifest.json').read_bytes()
+    manifest = json.loads(raw_manifest)
+    require(manifest['status'] == 'source_rechecked_refined_candidates_not_training_release'
+            and manifest['training_admitted'] == 0, 'Unexpected V4 review release')
+    raw = verified(directory/'candidate-dialogues.jsonl', manifest['dialogues_sha256'])
+    trace_raw = verified(directory/'lineage.jsonl', manifest['lineage_sha256'])
+    rows = [json.loads(x) for x in raw.splitlines()]
+    traces = [json.loads(x) for x in trace_raw.splitlines()]
+    expected = {c['id']: c for c in public}
+    require(len(rows) == len(traces) == manifest['records'] == len(expected)
+            and {r['id'] for r in rows} == set(expected), 'Refined V4 IDs/count differ')
+    by_id, bindings = {}, {}
+    for row, trace in zip(rows, traces):
+        old = json.loads(originals[row['id']])
+        require(trace['id'] == row['id'] and trace['record_sha256'] == sha(row)
+                and trace['original_record_sha256'] == sha(old)
+                and trace['source_case_sha256'] == sha(expected[row['id']])
+                and trace['partition'] == 'historical_training_candidate_only'
+                and trace['training_admitted'] is False, 'Refined V4 lineage differs')
+        require(row['id'] == old['id'] and row['source'] == old['source'] and row['tools'] == old['tools'] == []
+                and len(row['messages']) == 3 and [m['role'] for m in row['messages']] == ['system','user','assistant']
+                and row['messages'][0] == old['messages'][0], 'Refined V4 scope/roles changed')
+        by_id[row['id']] = (canonical(row)+'\n').encode()
+        bindings[row['id']] = trace
+    support = {name: verified(directory/name, digest) for name,digest in manifest['support_files'].items()
+               if name in ('KEV_SOURCE_RECORDS.jsonl', 'AIT_NOTICE.txt', 'SOURCE_NOTICE.txt')}
+    require(set(support) == {'KEV_SOURCE_RECORDS.jsonl', 'AIT_NOTICE.txt', 'SOURCE_NOTICE.txt'}, 'Missing revised source notice')
+    return by_id, bindings, support, {'manifest_sha256': sha(raw_manifest),
+        'dialogues_sha256': manifest['dialogues_sha256'], 'lineage_sha256': manifest['lineage_sha256'],
+        'records': len(rows), 'findings': manifest['findings'], 'rows_added': 0,
+        'replacement_only_not_admitted': True}
+
+
+def build(root, observations, fw_proof, output, reviewed_v4_observations=None):
     require(not output.exists(), 'Output already exists')
     review = json.loads((root / 'V4_DATA_REVIEW.json').read_text())
     require(review['decision'] == 'withheld', 'Reassess changed V4 decision')
@@ -224,9 +259,13 @@ def build(root, observations, fw_proof, output):
     source_path = root.parent / 'infra/mcp/response-mcp.py'
     entry = fw_entry(source_path.read_text())
     catalog, fw_row, fw_lineage = fw_candidate(old_catalog, entry, json.loads(fw_proof.read_text()))
+    replacement, reviewed_bindings, reviewed_support, revision = {}, {}, {}, None
+    if reviewed_v4_observations:
+        replacement, reviewed_bindings, reviewed_support, revision = reviewed_v4(
+            reviewed_v4_observations, public, raw_rows['V4'])
     pools = {
         'cti-replay-candidates.jsonl': b''.join(raw_rows['V5'].values()),
-        'observation-candidates.jsonl': b''.join(raw_rows['V4'][c['id']] for c in public)
+        'observation-candidates.jsonl': b''.join(replacement.get(c['id'], raw_rows['V4'][c['id']]) for c in public)
             + (observations / 'candidate-dialogues.jsonl').read_bytes(),
         'optional-harness-candidates.jsonl': b''.join(raw_rows['V4'][c['id']] for c in [*selected, *live])
             + (canonical(fw_row) + '\n').encode(),
@@ -244,6 +283,10 @@ def build(root, observations, fw_proof, output):
                 'evidence_kind': c.get('review', {}).get('evidence_kind', 'provider_cti_mapping'),
                 'institution_certified_SOC_answer': False,
                 'withheld_V4_status_preserved': version == 'V4', 'training_admitted': False})
+            if c['id'] in replacement:
+                lineage[-1].update(record_line_sha256=sha(replacement[c['id']]),
+                    original_frozen_record_line_sha256=sha(raw_rows[version][c['id']]),
+                    refined_source_binding=reviewed_bindings[c['id']])
     lineage.extend({'id': t['record_id'], 'pool': 'observation-candidates.jsonl',
                     'origin_lineage_sha256': sha(t), 'group': t['leakage_group'],
                     'institution_certified_SOC_answer': False, 'training_admitted': False} for t in traces)
@@ -263,6 +306,7 @@ def build(root, observations, fw_proof, output):
                           'new_reviewed_observations': len(obs_rows),
                           'V4_synthetic_before': len(synthetics), 'V4_synthetic_selected': len(selected),
                           'V4_historical_live': len(live), 'new_FW_call_selection': 1},
+        'V4_observation_revision': revision,
         'synthetic_workflow_coverage': dict(Counter(c['review']['workflow'] for c in selected)),
         'synthetic_group_sizes': dict(Counter(len(g['members']) for g in dedup)),
         'observation_manifest_sha256': sha((observations / 'manifest.json').read_bytes()),
@@ -310,6 +354,15 @@ def build(root, observations, fw_proof, output):
         'it does not include a captured user question, fabricated tool result or final model answer.\n'
         'CAM/evaluation files are excluded. All remaining evidence/quality/release gates still apply.\n'
     ).encode()
+    if revision:
+        for name, content in reviewed_support.items():
+            pools['REVIEWED_V4_' + name] = content
+        pools['SOURCE_NOTICE.txt'] += (
+            'Follow-up: 126 V4 observation rows replaced by an explicitly source-rechecked version,\n'
+            'with original IDs/splits and old/new hashes retained. See REVIEWED_V4_SOURCE_NOTICE.txt.\n'
+            'The earlier byte-preservation statement applies to unrevised frozen rows only.\n').encode()
+        manifest['release_gates_remaining'][0] = ('Source recheck and target refinements completed for the chosen126; '
+            'project-authored targets remain subject to semantic/expert quality evaluation and V4 remains withheld')
     manifest['support_files'] = {name: sha(data) for name, data in pools.items() if name not in manifest['pool_files']}
     output.mkdir(parents=True, exist_ok=False)
     for name, raw in pools.items():
@@ -324,8 +377,9 @@ def main():
     parser.add_argument('--observations', type=Path, required=True)
     parser.add_argument('--fw-proof', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--reviewed-v4-observations', type=Path)
     args = parser.parse_args()
-    report = build(args.root, args.observations, args.fw_proof, args.output)
+    report = build(args.root, args.observations, args.fw_proof, args.output, args.reviewed_v4_observations)
     print(json.dumps({'status': report['status'], 'pools': report['pool_files'], 'counts': report['source_counts']}))
 
 

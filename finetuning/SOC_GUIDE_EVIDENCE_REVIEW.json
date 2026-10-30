@@ -1,0 +1,292 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-31T00:36:55.016621+09:00",
+  "scope": "Official GUIDE v2 complete-file streaming, selected incident evidence and task-specific source review. No fine-tuning admission.",
+  "training_examples_admitted": 0,
+  "gpu_training_started": false,
+  "production_model_changed": false,
+  "source_review": "SOC_GUIDE_SOURCE_REVIEW.json",
+  "provider_url": "https://www.kaggle.com/datasets/Microsoft/microsoft-security-incident-prediction",
+  "license": "CDLA-Permissive-2.0",
+  "license_text_sha256": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868",
+  "storage": {
+    "thor_root": "~/Capstone_Groot_training/guide-review-20261031",
+    "evidence": "evidence-r1/selected.jsonl",
+    "current_index": "audit-r2/review-index.json",
+    "current_review": "audit-r2/manifest.json",
+    "prior_review_preserved": "audit-r1",
+    "raw_train_and_test_saved": false,
+    "mac_raw_rows_downloaded": false,
+    "network_bytes_full_train_plus_test": 3513372918,
+    "additional_test_prefix_bytes": 1048576,
+    "ranking_fetch_bytes": 136325,
+    "selected_bytes": 37986773,
+    "mac_packages_installed": 0
+  },
+  "acquisition": {
+    "started_at_kst": "2026-10-31T00:18:51.047994+09:00",
+    "status": "collected_for_review",
+    "training_examples_generated": 0,
+    "source_url": "https://www.kaggle.com/api/v1/datasets/download/Microsoft/microsoft-security-incident-prediction/GUIDE_Train.csv?datasetVersionNumber=2",
+    "selection_seed": "groot-guide-v2-20261031",
+    "selection_modulus": 64,
+    "source_file": "GUIDE_Train.csv",
+    "source_version": 2,
+    "original_test_file_read": false,
+    "raw_full_file_saved": false,
+    "selection_uses_labels": false,
+    "ranked_organizations_excluded": true,
+    "reserved_organizations": 499,
+    "transport_headers": {
+      "ETag": "\"115c2d188e80826d9fbdb9c8784afa22\"",
+      "Last-Modified": "Sat, 18 Jul 2026 21:18:14 GMT",
+      "Content-Length": "2425409087",
+      "x-goog-hash": "crc32c=dRLhGw=="
+    },
+    "source_records": 9516837,
+    "selected_records": 34087,
+    "selected_incidents": 3882,
+    "selected_bytes": 37986773,
+    "selected_duplicate_records_preserved": 0,
+    "source_grade_row_counts": {
+      "TruePositive": 3322713,
+      "FalsePositive": 2031967,
+      "BenignPositive": 4110817,
+      "": 51340
+    },
+    "source_action_row_counts": {
+      "": 9460773,
+      "ContainAccount": 53760,
+      "IsolateDevice": 2237,
+      "Stop Virtual Machines": 67
+    },
+    "iterator_exhausted": true,
+    "transport_eof_must_be_verified_separately": true,
+    "source_sha256": "3d6c286e1353236b3457a011a20cb9a8cec26a589ab685dab31dad261d47b8c3",
+    "source_md5": "115c2d188e80826d9fbdb9c8784afa22",
+    "provider_md5_verified": false,
+    "source_bytes_read": 2425409087,
+    "source_eof_verified": true,
+    "coverage": "All released train rows for selected keys; not complete real-world incidents.",
+    "selected_sha256": "f333a2750d165ff92df6dbdc26e113d5aafa8403e1110d4583013d9376e120b9",
+    "finished_at_kst": "2026-10-31T00:22:49.171362+09:00",
+    "elapsed_seconds": 238.123
+  },
+  "original_test_audit": {
+    "started_at_kst": "2026-10-31T00:28:19.579735+09:00",
+    "status": "audited_for_review",
+    "source_url": "https://www.kaggle.com/api/v1/datasets/download/Microsoft/microsoft-security-incident-prediction/GUIDE_Test.csv?datasetVersionNumber=2",
+    "test_raw_saved": false,
+    "training_examples_generated": 0,
+    "selected_source_sha256": "f333a2750d165ff92df6dbdc26e113d5aafa8403e1110d4583013d9376e120b9",
+    "selected_records": 34087,
+    "selected_incidents": 3882,
+    "transport_headers": {
+      "ETag": "\"879da214668cae6bd1b258f527d39813\"",
+      "Last-Modified": "Sat, 18 Jul 2026 21:17:50 GMT",
+      "Content-Length": "1087963831",
+      "x-goog-hash": "crc32c=ywnu4w=="
+    },
+    "test_records": 4147992,
+    "test_organizations": 4400,
+    "usage_counts": {
+      "Private": 1232555,
+      "Public": 2915437
+    },
+    "overlap_incidents": 0,
+    "overlap_rows": 0,
+    "overlap_keys": [],
+    "selected_orgs_also_in_original_test": 1049,
+    "iterator_exhausted": true,
+    "test_eof_verified": true,
+    "test_bytes_read": 1087963831,
+    "test_sha256": "fdfd7523efd6e3c26bd0290ba6acbcb237196cf923dd56a28e96802035db35a3",
+    "test_md5": "879da214668cae6bd1b258f527d39813",
+    "source_eligible_incidents": 3531,
+    "source_eligible_records": 33401,
+    "source_eligible_action_incidents": 18,
+    "excluded_incidents": 351,
+    "exclusion_reason_counts": {
+      "missing_triage": 351
+    },
+    "source_eligible_grade_counts": {
+      "TruePositive": 806,
+      "BenignPositive": 1078,
+      "FalsePositive": 1647
+    },
+    "review_index_sha256": "be8a71b2f6d1f7b3acf44da6b90844d8861a3fa08045c920358feaf3c3224d77",
+    "pending": [
+      "Decision-time feature audit",
+      "Evidence sufficiency / task design",
+      "Organization split",
+      "Token budget without silent evidence truncation",
+      "Independent SOC/tool-use evaluation"
+    ],
+    "finished_at_kst": "2026-10-31T00:29:57.094753+09:00",
+    "elapsed_seconds": 97.515
+  },
+  "current_task_indexes": {
+    "status": "audited_by_task_for_review",
+    "reclassified_at_kst": "2026-10-31T00:33:11.312199+09:00",
+    "collection_manifest_sha256": "b80a43e1b9308f638eca94e2ed57287035cc777b54367e8b0b3526cc8dea64ee",
+    "prior_test_audit_sha256": "1dd85b5f27a73d5bfc2460f965c02d500a5bcd7f684d162eaca6770085305fcb",
+    "prior_test_audit": "audit-r1/manifest.json",
+    "original_test_stream_repeated": false,
+    "source_files": [
+      {
+        "path": "audit_guide_evidence.py",
+        "sha256": "f694556145bbe6a9f953ba31502bf88cfb512cafda2027920bfa91f8248df9e5"
+      },
+      {
+        "path": "tests/test_audit_guide_evidence.py",
+        "sha256": "a93ef266bb1ae74f6181bed8ef88ab6c24ddfe6343ed2525a536183fa22d1d38"
+      }
+    ],
+    "selected_source_sha256": "f333a2750d165ff92df6dbdc26e113d5aafa8403e1110d4583013d9376e120b9",
+    "review_index_sha256": "220dd995afafbac69b43bf1c564b4fa76f9e54b284d7597dd1d63fc382ebed4d",
+    "triage_eligible_incidents": 3531,
+    "triage_eligible_records": 33401,
+    "triage_grade_counts": {
+      "TruePositive": 806,
+      "BenignPositive": 1078,
+      "FalsePositive": 1647
+    },
+    "action_eligible_incidents": 369,
+    "action_eligible_records": 859,
+    "action_cases_without_triage": 351,
+    "eligible_for_both_tasks": 18,
+    "unique_source_eligible_incidents": 3882,
+    "triage_exclusion_reasons": {
+      "missing_triage": 351
+    },
+    "action_exclusion_reasons": {
+      "missing_action": 3513
+    },
+    "action_target_semantics": "Customer-reported action labels only; no execution success or permission inferred.",
+    "training_examples_generated": 0,
+    "pending": [
+      "Decision-time feature audit",
+      "Evidence sufficiency / task design",
+      "Organization split",
+      "Token budget without silent evidence truncation",
+      "Independent SOC/tool-use evaluation"
+    ]
+  },
+  "feature_sufficiency": {
+    "actual_counts": {
+      "rows": 34087,
+      "AlertTitle_decimal": 34087,
+      "DetectorId_decimal": 34087,
+      "IpAddress_decimal": 34087,
+      "Sha256_decimal": 34087,
+      "LastVerdict_nonempty": 7077,
+      "SuspicionLevel_nonempty": 4535,
+      "Category_nonempty": 34087,
+      "MitreTechniques_nonempty": 17757
+    },
+    "largest_normalized_case_bytes": 10250292,
+    "method": "Independently iterate every selected JSON row; count nonempty / str.isdecimal fields and sum normalized row bytes by (OrgId,IncidentId).",
+    "limitations": [
+      "Every selected AlertTitle and DetectorId is a scrubbed integer, not a readable alert description. Do not invent incident narratives from opaque IDs.",
+      "LastVerdict and SuspicionLevel have values in some rows but no verified decision-time availability. Exclude from input until temporal leakage audit.",
+      "Largest incident exceeds10MB as normalized selected evidence; no silent truncation or full-file model prompt. Evidence retrieval/chunking requires separately verified coverage.",
+      "Source-eligible indexes are not approved LLM dialogues, expert reasoning traces or executable MCP arguments.",
+      "Original-test incident overlap is0 but1049 selected organizations also occur there; organization-held-out evaluation still requires explicit partition.",
+      "Triage labels and remediation labels represent different targets. Missing triage must not erase a supplied action label or be converted to benign."
+    ]
+  },
+  "execution": {
+    "training_stopped": false,
+    "ollama_stop_commands": 0,
+    "ollama_active_since_kst": "2026-10-29T23:10:09.347230+09:00",
+    "resident_models": [
+      {
+        "name": "qwen3.6:35b",
+        "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+        "context_length": 262144
+      }
+    ],
+    "inference_request_sent": false,
+    "cpu_quota_percent": 100,
+    "memory_limit_mib": 1536,
+    "collect_limit_seconds": 900,
+    "audit_limit_seconds": 600,
+    "units_terminal_and_missing": true,
+    "unit_existence_checked_at_kst": "2026-10-31T00:30:33.274718+09:00"
+  },
+  "validation": {
+    "local_tests": 14,
+    "thor_tests": 14,
+    "selected_file_all_rows_and_summary_recomputed": true,
+    "original_test_full_stream_eof_verified": true,
+    "current_indexes_independent_counts_verified": true,
+    "local_remote_source_hashes_match": true,
+    "provider_full_md5_claim": false,
+    "checksum_note": "Computed stream MD5 equals the returned ETag string for both train and test. x-goog-hash supplied only CRC32C; it was not independently verified. SHA256/full length and pinned1MiB prefix are recorded."
+  },
+  "preserved_files": {
+    "collect_guide_evidence.py": {
+      "bytes": 12095,
+      "sha256": "dfa209b87a4213ec68bcdf80abcb4054d53b4a30129d30a6bc1157d23a04347a"
+    },
+    "audit_guide_evidence.py": {
+      "bytes": 9631,
+      "sha256": "f694556145bbe6a9f953ba31502bf88cfb512cafda2027920bfa91f8248df9e5"
+    },
+    "tests/test_collect_guide_evidence.py": {
+      "bytes": 4941,
+      "sha256": "7024822e0cc0f4a0a536278d3a701eee05d8e027d3b1a67cfd9679f0e2f0f6b1"
+    },
+    "tests/test_audit_guide_evidence.py": {
+      "bytes": 2559,
+      "sha256": "a93ef266bb1ae74f6181bed8ef88ab6c24ddfe6343ed2525a536183fa22d1d38"
+    },
+    "audit-source-r1.py": {
+      "bytes": 8321,
+      "sha256": "4a15f86808cda104b4c03179de02c638d25b253d4f0852331a49dd833112c803"
+    },
+    "tests/test_audit_guide_evidence.r1.txt": {
+      "bytes": 1302,
+      "sha256": "0c38b1bf5127fe7fe2a90baf978eda97b3980102f0eea5b4f538708ca7153eac"
+    },
+    "CDLA-Permissive-2.0.txt": {
+      "bytes": 2354,
+      "sha256": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868"
+    },
+    "evidence-r1/manifest.json": {
+      "bytes": 1080280,
+      "sha256": "b80a43e1b9308f638eca94e2ed57287035cc777b54367e8b0b3526cc8dea64ee"
+    },
+    "evidence-r1/selected.jsonl": {
+      "bytes": 37986773,
+      "sha256": "f333a2750d165ff92df6dbdc26e113d5aafa8403e1110d4583013d9376e120b9"
+    },
+    "evidence-r1/rankings.csv": {
+      "bytes": 136325,
+      "sha256": "e4ea9308f45821128a3cd446ab19e6559edfc50709e72034ce957b6f0e2e65d6"
+    },
+    "audit-r1/manifest.json": {
+      "bytes": 1870,
+      "sha256": "1dd85b5f27a73d5bfc2460f965c02d500a5bcd7f684d162eaca6770085305fcb"
+    },
+    "audit-r1/review-index.json": {
+      "bytes": 813747,
+      "sha256": "be8a71b2f6d1f7b3acf44da6b90844d8861a3fa08045c920358feaf3c3224d77"
+    },
+    "audit-r2/manifest.json": {
+      "bytes": 1758,
+      "sha256": "ad524de7c2b75c379dd4bae515cd6a477868752718fc186f16aec97775495e8b"
+    },
+    "audit-r2/review-index.json": {
+      "bytes": 1057638,
+      "sha256": "220dd995afafbac69b43bf1c564b4fa76f9e54b284d7597dd1d63fc382ebed4d"
+    }
+  },
+  "remaining": [
+    "Decision-time feature / evidence sufficiency review before SFT conversion",
+    "Task-specific entity/action annotation and exact source lineage",
+    "Organization/source-family split independent of prior test results",
+    "Token and evidence-completeness checks",
+    "Same-harness, same-compute pilot comparison before any model promotion"
+  ]
+}

@@ -31,6 +31,7 @@ def main():
              "link_ait_labels.py", "AIT_GAP_LINKAGE.json",
              "prepare_ait_case_review.py", "AIT_CASE_REVIEW.json", "SOC_SOURCE_ACCESS_REVIEW.json",
              "inspect_optc_evidence.py", "OPTC_EVIDENCE_REVIEW.json", "SOC_ADDITIONAL_DATA_REVIEW.json",
+             "collect_guide_evidence.py", "audit_guide_evidence.py", "SOC_GUIDE_SOURCE_REVIEW.json", "SOC_GUIDE_EVIDENCE_REVIEW.json",
              "link_dedale_labels.py", "DEDALE_LINKAGE_REVIEW.json",
              "inspect_dedale_network.py", "DEDALE_CORRELATION_REVIEW.json",
              "compare_dedale_clocks.py", "DEDALE_CLOCK_REVIEW.json",

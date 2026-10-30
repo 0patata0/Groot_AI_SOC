@@ -138,5 +138,88 @@
       },
       "service": "Result=success\nExecMainExitTimestamp=Sat 2026-10-31 02:02:04 KST\nExecMainStatus=0\n"
     }
+  },
+  "read_only_followup_0313_kst": {
+    "a": {
+      "checked_at_kst": "2026-10-31T03:13:57.610754+09:00",
+      "read_only": true,
+      "status.json": {
+        "host": "a",
+        "scan_status": "complete",
+        "status": "ok",
+        "reason": "healthy",
+        "used_percent": 23,
+        "available_bytes": 44970303488,
+        "observed_at_utc": "2026-10-30T18:02:02Z",
+        "observed_at_kst": "2026-10-31T03:02:02+09:00",
+        "file_sha256": "165d2299727668edba39959e41178fc132bb4641dc15cce257d7170a42bfe921"
+      },
+      "inventory.json": {
+        "backup_directory_count": 67,
+        "backup_file_count": 0,
+        "backup_entry_count": 67,
+        "backup_entry_limit": 256,
+        "backup_scan_status": "complete",
+        "file_sha256": "99d84177700b5061a13228d705679ef8bc7f59c3a6915298763add25fc2f1a8c"
+      },
+      "service": {
+        "Result": "success",
+        "ExecMainExitTimestamp": "Sat 2026-10-31 03:02:02 KST",
+        "ExecMainStatus": "0"
+      },
+      "timer": {
+        "NextElapseUSecRealtime": "Sat 2026-10-31 03:17:00 KST",
+        "ActiveState": "active",
+        "UnitFileState": "enabled"
+      }
+    },
+    "b": {
+      "checked_at_kst": "2026-10-31T03:13:58.127428+09:00",
+      "read_only": true,
+      "status.json": {
+        "host": "b",
+        "scan_status": "complete",
+        "status": "ok",
+        "reason": "healthy",
+        "used_percent": 29,
+        "available_bytes": 105606504448,
+        "observed_at_utc": "2026-10-30T18:02:03Z",
+        "observed_at_kst": "2026-10-31T03:02:03+09:00",
+        "file_sha256": "48a49addc5da2ac47c549b1ee67e0d6404bd99d7a2c0d975caf216a276b7a6ac"
+      },
+      "inventory.json": {
+        "backup_directory_count": 202,
+        "backup_file_count": 1,
+        "backup_entry_count": 203,
+        "backup_entry_limit": 256,
+        "backup_scan_status": "complete",
+        "file_sha256": "63c7e998f9ed094fc453e00541e80218ff35496ad95fd46a29185f607df64a2a"
+      },
+      "service": {
+        "Result": "success",
+        "ExecMainExitTimestamp": "Sat 2026-10-31 03:02:04 KST",
+        "ExecMainStatus": "0"
+      },
+      "timer": {
+        "NextElapseUSecRealtime": "Sat 2026-10-31 03:17:00 KST",
+        "ActiveState": "active",
+        "UnitFileState": "enabled"
+      },
+      "new_storage_unavailable_alerts": {
+        "since_kst": "2026-10-31T01:15:49+09:00",
+        "until_kst": "2026-10-31T03:13:58.127428+09:00",
+        "total": {
+          "value": 0,
+          "relation": "eq"
+        },
+        "timed_out": false,
+        "shards": {
+          "total": 105,
+          "successful": 105,
+          "skipped": 0,
+          "failed": 0
+        }
+      }
+    }
   }
 }

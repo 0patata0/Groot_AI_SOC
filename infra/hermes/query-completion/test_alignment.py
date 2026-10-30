@@ -26,6 +26,69 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_detection_configuration_is_not_an_event_observation(self):
+        q='WAF 변경안을 만들어줘'
+        for text in ('WAF 탐지 모드는 변경 없음.', 'IDS 탐지 규칙 변경 없음.',
+                     'ModSecurity 탐지 설정은 변경 없이 유지합니다.'):
+            self.assertEqual(H.violations(q,text,[]),[])
+        for text in ('WAF 탐지 모드는 유지, 경보는 0건입니다.',
+                     'WAF 탐지 없음.', 'WAF 스캔 0건 확인했습니다.'):
+            self.assertIn('unobserved_event_source:modsecurity',H.violations(q,text,[]))
+
+    def test_literal_comment_scope_checks_receipt_hash_without_dispatch(self):
+        for newline in ('\n', '\r\n'):
+            content = '# header' + newline + 'SecRuleEngine DetectionOnly' + newline
+            base = hashlib.sha256(content.encode()).hexdigest()
+            raw = json.dumps({'target':'a:modsecurity-custom','content':content,'sha256':base})
+            read = dict(server='rule-a',name='get_rule_change_target',arguments={'target':'a:modsecurity-custom'},
+                        result=raw,result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+            for edge in ('맨 앞', '맨 끝'):
+                q = f'WAF 파일 {edge}에 `# reviewed marker` 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용은 유지해줘.'
+                addition = '# reviewed marker' + newline
+                expected = addition + content if edge == '맨 앞' else content + addition
+                for candidate, status in ((expected,'match'),(newline+expected,'mismatch'),(expected.replace('DetectionOnly','On'),'mismatch')):
+                    submitted = proposal('a:modsecurity-custom',before_sha256=base,
+                                         after_sha256=hashlib.sha256(candidate.encode()).hexdigest())
+                    calls = [read, submitted]
+                    before = copy.deepcopy(calls)
+                    progress = H.write_progress(q,calls)
+                    self.assertEqual(progress['scope_checks'][0]['status'],status)
+                    self.assertEqual(progress['complete'],status=='match')
+                    self.assertEqual(calls,before)
+                    rendered = H.write_report('모두 반영했습니다.',progress)
+                    if status!='match':
+                        self.assertIn('승인 보류',rendered)
+                        self.assertNotIn('모두 반영했습니다.',rendered)
+                        self.assertIn('1'*32,rendered)
+
+    def test_comment_scope_does_not_invent_missing_original_or_ambiguous_literal(self):
+        q='WAF 맨 끝에 # UNIQUE-NOTE 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용과 모드는 유지해줘.'
+        submitted=proposal('a:modsecurity-custom')
+        progress=H.write_progress(q,[submitted])
+        self.assertFalse(progress['complete'])
+        self.assertEqual(progress['scope_checks'][0]['status'],'unverified')
+        for text in (q.replace('맨 끝','맨 앞과 맨 끝'), q.replace('# UNIQUE-NOTE','알맞은'),
+                     q.replace('기존 내용과 모드는 유지해줘.',''),
+                     'WAF 기존 승인안 조회해줘'):
+            self.assertIsNone(H.exact_comment_scope(text,None,{}))
+
+    def test_native_final_rejects_mismatched_scope_without_retrying_protected_call(self):
+        q='WAF 맨 끝에 # UNIQUE-NOTE 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용과 모드는 유지해줘.'
+        content='# header\n';base=hashlib.sha256(content.encode()).hexdigest()
+        raw=json.dumps({'target':'a:modsecurity-custom','content':content,'sha256':base})
+        read=dict(server='rule-a',name='get_rule_change_target',arguments={'target':'a:modsecurity-custom'},
+                  result=raw,result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+        submitted=proposal('a:modsecurity-custom',before_sha256=base,
+                           after_sha256=hashlib.sha256((content+'\n# UNIQUE-NOTE\n').encode()).hexdigest())
+        h=Harness(text='변경안 준비 완료',request=q)
+        h.agent.model='qwen3.6:35b';h.agent.provider='custom'
+        h.kw['messages'] += H.linked_rows([read,submitted])
+        h.wrapper=alignment.final_wrapper(h.wrapper,h.original,h.native,h.append,h.reanchor,PLUGIN,H)
+        result=h.call()
+        self.assertEqual(result.action,'break')
+        self.assertIn('승인 보류',result.final_response)
+        self.assertTrue(h.agent._capstone_alignment_partial)
+
     def test_read_selection_omits_only_write_completion_guidance(self):
         full, read = C.system_prompt(), C.system_prompt(read_only=True)
         self.assertLess(len(read), len(full))
@@ -131,6 +194,27 @@ class SharedContract(unittest.TestCase):
         second = h.call()
         self.assertNotEqual(second.action, 'continue')
         self.assertIn('미처리/확인 필요', second.final_response)
+
+    def test_preserving_mode_does_not_suppress_unstarted_file_proposal(self):
+        for suffix in ('기존 내용과 모드는 유지하고, 원복 방법도 알려줘.',
+                       'DetectionOnly는 그대로 유지해줘.', '모드를 보존한 채로 진행해줘.'):
+            q = 'WAF 끝에 시험 주석 한 줄을 추가하는 승인안을 만들어줘. ' + suffix
+            self.assertEqual(H.preparation_gap(q, []), ['a:modsecurity-custom'])
+            for call in (proposal('a:modsecurity-custom'),
+                         {'server':'rule-write-a','name':'propose_rule_edit','error_type':'TimeoutError'}):
+                self.assertEqual(H.preparation_gap(q, [call]), [])
+        for suffix in ('모드는 유지하지 말고 바꿔줘.', 'DetectionOnly를 해제해줘.',
+                       '모드는 유지하고 IDS를 inline으로 바꿔줘.', '컨테이너를 재구성해줘.',
+                       '모드 유지 여부는 미정이야.'):
+            self.assertEqual(H.preparation_gap('WAF 주석 변경안을 만들어줘. ' + suffix, []), [])
+        q = 'WAF 주석 승인안을 만들어줘. 기존 모드는 유지하고, 원복 방법도 알려줘.'
+        h = Harness(text='변경안을 준비하겠습니다.', request=q)
+        h.agent.model = 'qwen3.6:35b'; h.agent.provider = 'custom'
+        h.wrapper = alignment.final_wrapper(h.wrapper, h.original, h.native, h.append, h.reanchor, PLUGIN, H)
+        self.assertEqual(h.call().action, 'continue')
+        self.assertNotEqual(h.call().action, 'continue')
+        self.assertFalse(H.READ.wants_write('기존 WAF 승인안을 조회해줘'))
+        self.assertFalse(H.READ.wants_write('WAF 승인안을 만들지 마'))
 
     def test_expiry_presentation_uses_receipt_and_preserves_raw_and_fenced_data(self):
         call = proposal('a:modsecurity-custom', approval_expires_at=1793037565)

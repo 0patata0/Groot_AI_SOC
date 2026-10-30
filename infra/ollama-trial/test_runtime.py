@@ -121,6 +121,26 @@ class PreparationLoop(unittest.TestCase):
         self.assertNotIn('write_preparation_attempts',report)
         self.assertEqual(calls.count('propose_rule_edit'),1)
 
+    def test_mismatched_literal_comment_is_partial_without_protected_retry(self):
+        q='WAF 맨 끝에 # AUDIT-NOTE 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용은 유지해줘.'
+        report,prompts,calls=self.execute(question=q,submit_on=1)
+        self.assertEqual(report['status'],'partial')
+        self.assertEqual(report['write_progress']['scope_checks'][0]['status'],'mismatch')
+        self.assertIn('승인 보류',report['final_response'])
+        self.assertEqual(len(prompts),1)
+        self.assertEqual(calls,['get_rule_change_target','propose_rule_edit'])
+
+    def test_preserve_mode_proposal_uses_one_model_continuation(self):
+        q='WAF 파일 끝에 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용과 모드는 유지하고, 원복 방법도 알려줘.'
+        report,prompts,calls=self.execute(question=q,submit_on=2)
+        self.assertEqual(report['write_preparation_attempts'],1)
+        self.assertEqual(calls,['get_rule_change_target','propose_rule_edit'])
+        self.assertEqual(len(prompts),2)
+        self.assertTrue(report['write_progress']['complete'])
+        report,prompts,calls=self.execute(question=q,submit_on=1)
+        self.assertEqual(len(prompts),1)
+        self.assertNotIn('write_preparation_attempts',report)
+
     def test_schema_refusal_does_not_call_mcp_and_model_can_correct_it(self):
         report,prompts,calls=self.execute(submit_on=1,bad_input=True)
         self.assertEqual(calls,['get_rule_change_target','propose_rule_edit'])

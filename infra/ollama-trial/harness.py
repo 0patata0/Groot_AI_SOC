@@ -442,7 +442,10 @@ def wazuh_text(raw):
 
 def violations(question, answer, calls):
     facts = facts_for(calls)
-    issues = EVIDENCE.evidence_claim_violations(answer, facts) + EVIDENCE.calculated_json_violations(answer, facts)
+    # Configuration terminology is not an event observation. Preserve other
+    # claims on the same line, and use the untouched answer for JSON/time checks.
+    claim_text = re.sub(r'탐지\s*(?:모드|규칙|룰|설정|정책)', '설정', answer)
+    issues = EVIDENCE.evidence_claim_violations(claim_text, facts) + EVIDENCE.calculated_json_violations(answer, facts)
     text = normalized(question)
     if (not calls and not READ.wants_write(text)
             and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
@@ -1262,7 +1265,14 @@ def preparation_gap(question, calls):
     Infrastructure reconfiguration and unsupported mode changes are not file edits.
     """
     text = normalized(question)
-    if (not READ.wants_write(text) or re.search(r'모드|컨테이너|재구성|\binline\b|\bDetectionOnly\b', text, re.I)
+    # An explicit instruction to preserve the mode is not a mode change.
+    # Remove only affirmative preservation clauses; ambiguous mentions and
+    # negated preservation still keep the infrastructure exclusion below.
+    mode_token = r'(?<![A-Za-z0-9_])(?:DetectionOnly|inline)(?![A-Za-z0-9_])'
+    action_text = re.sub(r'(?:모드|' + mode_token + r')\s*(?:은|는|을|를)?\s*'
+                         r'(?:그대로\s*)?(?:유지|보존)(?:하고|하며|해(?:줘)?|한\s*채(?:로)?)'
+                         r'(?=\s|[,.!?]|$)', '', text, flags=re.I)
+    if (not READ.wants_write(text) or re.search(r'모드|컨테이너|재구성|' + mode_token, action_text, re.I)
             or not re.search(r'변경안|수정안|주석|description|\bmsg\b', text, re.I)):
         return []
     if any('write' in c.get('server', '') or
@@ -1292,6 +1302,39 @@ def rejected_before_proposal(error):
         r'|base_sha256 must be a SHA-256 from get_rule_change_target'
         r'|target changed since it was read; fetch current content and retry'
         r'|Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden', error))
+
+
+def exact_comment_scope(question, source, receipt):
+    """Check a narrow, explicit one-line insertion by hash; never build a proposal.
+
+    General edits still require full human diff review. Only an unambiguous
+    literal comment, an edge, and explicit preservation of the original qualify.
+    """
+    if (not READ.wants_write(normalized(question)) or
+            not re.search(r'주석\s*(?:한\s*줄|1\s*줄)', question) or
+            not re.search(r'기존[^\n.!?]{0,30}(?:유지|보존)', question)):
+        return None
+    edges = set(re.findall(r'맨\s*앞|맨\s*끝|선두|말미', question))
+    positions = {'start' if re.search(r'앞|선두', edge) else 'end' for edge in edges}
+    quoted = re.findall(r'[`"\'](#[^\r\n`"\']+|<!--[^\r\n`"\']+-->)[`"\']\s*주석', question)
+    plain = re.findall(r'(?<!\S)(#[ \t]+[A-Za-z0-9_.:-]+)[ \t]+주석', question)
+    comments = quoted + plain
+    if len(positions) != 1 or len(comments) != 1:
+        return None
+    comment = comments[0]
+    if '\x00' in comment or len(comment.encode()) > 1024:
+        return None
+    content = source.get('content') if isinstance(source, dict) else None
+    if (not isinstance(content, str) or len(content.encode()) > 128 * 1024 or
+            hashlib.sha256(content.encode()).hexdigest() != receipt['before_sha256'] or
+            not content.endswith('\n')):
+        return {'status': 'unverified', 'reason': '정확한 원문·종료 개행을 확인하지 못함'}
+    newline = '\r\n' if content.endswith('\r\n') else '\n'
+    position = next(iter(positions))
+    expected = comment + newline + content if position == 'start' else content + comment + newline
+    expected_sha = hashlib.sha256(expected.encode()).hexdigest()
+    return {'status': 'match' if expected_sha == receipt['after_sha256'] else 'mismatch',
+            'expected_sha256': expected_sha, 'position': position}
 
 
 def write_progress(question, calls):
@@ -1343,7 +1386,7 @@ def write_progress(question, calls):
     expected += [target for target in observed if target not in expected]
     if not expected: return None
     rows = ['**요청 항목별 변경안 제출 근거**', '| 대상 | 상태 | 제안 ID 또는 확인 필요 사항 |', '| --- | --- | --- |']
-    missing, hashes, expiries, metadata = [], [], [], []
+    missing, hashes, expiries, metadata, scope_checks = [], [], [], [], []
     for target in expected:
         entry = observed.get(target, {'receipts': {}, 'failures': [], 'unresolved': False, 'rejected_edits': []})
         receipts, failures = entry['receipts'], entry['failures']
@@ -1356,6 +1399,16 @@ def write_progress(question, calls):
                      and c.get('server') == 'rule-' + target[0] and c.get('arguments', {}).get('target') == target]
             source = next((v for v in reversed(reads) if v and v.get('target') == target
                            and v.get('sha256') == data['before_sha256']), None)
+            scope = exact_comment_scope(question, source, data)
+            if scope:
+                scope_checks.append({'target': target, 'proposal_id': pid, **scope})
+                if scope['status'] != 'match':
+                    entry['unresolved'] = True
+                    rows.append('| ' + target + ' | 승인 보류: 요청 범위 ' +
+                                ('불일치' if scope['status'] == 'mismatch' else '미확인') + ' | ' + pid + ' |')
+                    hashes.append('  - 요청한 주석 한 줄만 추가한 후보와 일치하지 않거나 검증할 수 없습니다. 전체 diff를 검토하고 이 후보를 승인하지 마세요.')
+                    if scope.get('expected_sha256'):
+                        hashes.append('  - 요청 범위 기준 후보 SHA: `' + scope['expected_sha256'] + '`.')
             inv = SHARED._verified_inventory(source, target)
             metadata.append({'target': target, 'before_sha256': data['before_sha256'],
                              'after_sha256': data['after_sha256'],
@@ -1386,4 +1439,4 @@ def write_progress(question, calls):
     if metadata:
         hashes.append('- 취소·원복: 미적용 후보는 승인 카드에서 거부합니다. 적용 후 원복은 실제 파일을 다시 조회한 SHA를 기준으로 이전 내용을 복원하는 새 후보를 만들고 승인을 받습니다.')
     return {'text': '\n'.join(rows + [''] + hashes), 'missing': missing, 'complete': not missing,
-            'expiries': expiries, 'file_metadata': metadata}
+            'expiries': expiries, 'file_metadata': metadata, 'scope_checks': scope_checks}

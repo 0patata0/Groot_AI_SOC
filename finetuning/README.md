@@ -1,5 +1,9 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**DEDALE IDS·호스트 후속:** `inspect_dedale_network.py`는 Suricata syslog 요약의 센서·통신 양끝·룰ID·경보 우선순위를 구분하고, 호스트 라벨의 명시적 연결 필드를 조사한다. 경보1,465,627행 전수/독립 재대조와12회귀를 통과했다. [검증 원장](DEDALE_CORRELATION_REVIEW.json). 사건 연계·학습 편입은0이며 작성자 저장소 MIT/GPLv3 표기 충돌을 기록했다.
+
+호출은 `inspect_alerts(bounded_lines(stream), timestamp_unit=None)`와 `inspect_host_records(bounded_lines(stream), source=member)`를 사용한다. 입력 취득·ZIP CRC/제공MD5·용량 한도는 호출자가 검증한다. 시각 단위 계약 없이 정수를 변환하지 않으며, `epoch-ms` 옵션 테스트 통과는 실제 데이터 단위 확인을 뜻하지 않는다. `host_transport_tuple`은 명시적 TCP/UDP·양끝 주소/포트만 허용한다. DNS 답변/unspecified 주소/부분 주소·시각만으로 사건을 연결하지 않는다. 이 도구는 해당 공개 자료 진단용이며 범용 로그 수집기나 운영 차단기/학습기 아니다. pack에는 자체 검사 소스·원장만 추가하고 원본/작성자 코드/다운로드물은 넣지 않는다.
+
 **DEDALE 원문 연계 후속:** `link_dedale_labels.py`는 제공 라벨과 원본의 전체 JSON을 대조하며 시간·호스트만 같은 다른 이벤트를 제외한다. 선택7구간6,188,928행·5,581라벨을 연결했고 별도 원시 JSONL MD57개도 일치했다. 12회귀/기존Range6검사 통과. 학습 편입0이며 공식 시험기간/검토 노출 경계를 유지한다. [검증 원장](DEDALE_LINKAGE_REVIEW.json).
 
 검사기는 `index_labels`로 제공 라벨의 좌표·전체 객체 해시를 만들고 `scan_raw_member(bounded_lines(stream), ...)`로 명시적 시간 구간을 대조한다. 원본 취득은 기존 `remote_zip.RemoteZip`의 지정 범위 읽기를 사용했다. 스트림 EOF와 압축/제공 체크섬 확인은 호출자 책임이며, 부분 다운로드·전체 ZIP 무결성·원문 라벨 정답성의 범위를 구분한다. 후보/원본/대화는 자동 pack에 넣지 않고 검사 소스와 원장만 묶는다.

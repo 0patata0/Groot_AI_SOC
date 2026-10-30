@@ -483,5 +483,14 @@
     "whole_training_pack_created": false,
     "new_server_installation": false,
     "runtime_logs_and_match_coordinates": "Local ignored evidence only; raw messages and commands are not copied into this report."
+  },
+  "network_correlation_followup": {
+    "at_kst": "2026-10-30T12:19:24.025235+09:00",
+    "file": "DEDALE_CORRELATION_REVIEW.json",
+    "alert_rows": 1465627,
+    "host_label_rows": 15783,
+    "confirmed_host_incident_links": 0,
+    "new_training_admitted": 0,
+    "author_code_license": "MIT root / GPLv3 subdirectory README conflict; reuse held"
   }
 }

@@ -1,0 +1,481 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T12:19:24.025235+09:00",
+  "status": "source-verified; host/network incident correlation not established; no training admission",
+  "dataset": {
+    "name": "DEDALE",
+    "doi": "10.57745/Y5JLDG",
+    "version": "2.1",
+    "record_url": "https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_sha256": "d6b12c27d80c9b10ebb7910b7bb5a084556f1ee51c68e7eef56eda1596c8ba6d",
+    "metadata_rechecked_unchanged": true,
+    "license": "CC BY 4.0; attribution required",
+    "nature": "Four-week virtualized research testbed, not production victim incident logs",
+    "attribution": "Maxime Lanvin and Frederic Majorczyk, DEDALE, Recherche Data Gouv, DOI 10.57745/Y5JLDG, V2.1; paper DOI 10.1007/978-3-032-16092-8_1"
+  },
+  "acquisition": [
+    {
+      "file": "suricata.zip",
+      "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717879",
+      "bytes": 24596811,
+      "sha256": "4a5140ca94d5f73649dc3743a9806e255ffde21bb3669e93f1953337cf539128",
+      "md5": "3e824b0967e2e397eac04c8c253db842",
+      "members": [
+        {
+          "name": "suricata_alerts.jsonl",
+          "bytes": 699465555,
+          "compressed": 24596619,
+          "crc32": "3a173c18"
+        }
+      ]
+    },
+    {
+      "file": "labels.zip",
+      "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717882",
+      "bytes": 2669407,
+      "sha256": "729ac223a89c70f771861920b6b9ee3ab1bb5569e12ec54c04f380aadf574dc7",
+      "md5": "455d0a7042531eff74285006f97822e4",
+      "members": [
+        {
+          "name": "system_labels/",
+          "bytes": 0,
+          "compressed": 0,
+          "crc32": "00000000"
+        },
+        {
+          "name": "system_labels/clients_1_and_2/",
+          "bytes": 0,
+          "compressed": 0,
+          "crc32": "00000000"
+        },
+        {
+          "name": "system_labels/clients_1_and_2/malicious_events_class_1_and_2.jsonl",
+          "bytes": 23862705,
+          "compressed": 1338239,
+          "crc32": "6ccbb251"
+        },
+        {
+          "name": "system_labels/clients_1_and_2/malicious_events_class_1.jsonl",
+          "bytes": 20773464,
+          "compressed": 1039653,
+          "crc32": "86f47528"
+        },
+        {
+          "name": "system_labels/internal_server/",
+          "bytes": 0,
+          "compressed": 0,
+          "crc32": "00000000"
+        },
+        {
+          "name": "system_labels/internal_server/malicious_events_class_1_and_2.jsonl",
+          "bytes": 7865096,
+          "compressed": 157937,
+          "crc32": "ce0f9164"
+        },
+        {
+          "name": "system_labels/internal_server/malicious_events_class_1.jsonl",
+          "bytes": 6683184,
+          "compressed": 131640,
+          "crc32": "8ccb25f8"
+        },
+        {
+          "name": "system_labels/system_labels_md5sum.sig",
+          "bytes": 344,
+          "compressed": 164,
+          "crc32": "d5bb33ba"
+        }
+      ]
+    }
+  ],
+  "alert_inspection": {
+    "counts": {
+      "records": 1465627,
+      "flow_id_present": 0,
+      "community_id_present": 0,
+      "time_regressions": 0,
+      "sensor_is_neither_endpoint": 1357346
+    },
+    "transport_counts": {
+      "tcp": 1312274,
+      "udp": 153353
+    },
+    "signature_counts": {
+      "2017515": 732828,
+      "2024897": 301950,
+      "2002087": 714,
+      "2029994": 84,
+      "2009702": 37306,
+      "2027390": 9886,
+      "2011341": 250476,
+      "2027757": 15502,
+      "2027865": 69179,
+      "2027863": 23371,
+      "2027758": 2636,
+      "2025331": 1202,
+      "2031231": 2684,
+      "2024527": 1520,
+      "2016149": 1172,
+      "2016150": 844,
+      "2027695": 28,
+      "2031492": 1139,
+      "2101334": 12363,
+      "2001219": 7,
+      "2003068": 21,
+      "2027867": 463,
+      "2001569": 18,
+      "2012092": 11,
+      "2018908": 137,
+      "2400001": 12,
+      "2029340": 42,
+      "2029753": 10,
+      "2025709": 2,
+      "2012090": 13,
+      "2000334": 1,
+      "2027117": 1,
+      "2027262": 2,
+      "2016922": 2,
+      "2025699": 1
+    },
+    "alert_priority_counts": {
+      "2": 846760,
+      "3": 313928,
+      "1": 304939
+    },
+    "bytes": 699465555,
+    "sha256": "4733ea1c72179ffd98927c201292f941d62831636b7ffa4e85e38769f30137ff",
+    "min_numeric_time": 1734912021587,
+    "max_numeric_time": 1737331188652,
+    "timestamp_unit": null,
+    "iterator_exhausted": true,
+    "confirmed_host_incident_links": 0,
+    "training_admitted": 0,
+    "limits": [
+      "No full sensor health, packet coverage, drop/block verdict or attack success inference.",
+      "Missing host tuple or shared ID cannot be replaced by time-only correlation.",
+      "Raw timestamp integers and syslog wrapper priority retain their own meaning."
+    ],
+    "zip_crc_verified": true,
+    "sensor_counts": {
+      "observer_1": 1258286,
+      "observer_2": 207341
+    }
+  },
+  "host_label_field_inventory": [
+    {
+      "source": "system_labels/clients_1_and_2/malicious_events_class_1_and_2.jsonl",
+      "counts": {
+        "records": 10593,
+        "complete_explicit_ecs_transport_tuple": 0,
+        "sysmon_event_3": 0,
+        "has_source_ip": 0,
+        "has_destination_ip": 0,
+        "unspecified_destination_ip": 0,
+        "dns_event": 12,
+        "host_ip_present": 0,
+        "flow_id_present": 0,
+        "community_id_present": 0
+      },
+      "event_code_counts": {
+        "600": 6,
+        "400": 1,
+        "7": 2922,
+        "11": 6639,
+        "800": 33,
+        "4103": 33,
+        "4104": 2,
+        "10": 141,
+        "1": 121,
+        "403": 1,
+        "5": 122,
+        "18": 123,
+        "22": 12,
+        "17": 122,
+        "2": 315
+      },
+      "bytes": 23862705,
+      "sha256": "2e74057014bf62a9b1d055d70fab03d5931b41a2600eab6fead3916c780b2a52",
+      "endpoint_evidence": [],
+      "scope": "Provided label records only; not all original host logs or sensor configuration.",
+      "zip_crc_verified": true
+    },
+    {
+      "source": "system_labels/internal_server/malicious_events_class_1_and_2.jsonl",
+      "counts": {
+        "records": 5190,
+        "complete_explicit_ecs_transport_tuple": 0,
+        "sysmon_event_3": 0,
+        "has_source_ip": 1,
+        "has_destination_ip": 2,
+        "unspecified_destination_ip": 2,
+        "dns_event": 0,
+        "host_ip_present": 0,
+        "flow_id_present": 0,
+        "community_id_present": 0
+      },
+      "event_code_counts": {
+        "None": 5190
+      },
+      "bytes": 7865096,
+      "sha256": "e0021919e9297192cd269edbaa5c07032dd261ff47a00351b54d04aa7e999e8d",
+      "endpoint_evidence": [
+        {
+          "source": "system_labels/internal_server/malicious_events_class_1_and_2.jsonl",
+          "line": 216,
+          "byte_offset": 304403,
+          "sha256": "6f9f9f0bb0ceee7b8ab4f1eb185a280ade66788f039f0dcfd110736d4414354c",
+          "timestamp_source": "2025-01-10T11:34:09.076Z",
+          "source_fields": [],
+          "destination_fields": [
+            "ip",
+            "port"
+          ],
+          "transport_explicit": false,
+          "action": "connected-to"
+        },
+        {
+          "source": "system_labels/internal_server/malicious_events_class_1_and_2.jsonl",
+          "line": 219,
+          "byte_offset": 308578,
+          "sha256": "5b2869edaf1d85d52f2cc699ac3628f024175aed998e3e4bb05c5b6acb4b5cdc",
+          "timestamp_source": "2025-01-10T11:34:09.076Z",
+          "source_fields": [],
+          "destination_fields": [
+            "ip",
+            "port"
+          ],
+          "transport_explicit": false,
+          "action": "connected-to"
+        },
+        {
+          "source": "system_labels/internal_server/malicious_events_class_1_and_2.jsonl",
+          "line": 1447,
+          "byte_offset": 2138496,
+          "sha256": "56c120743437a026a9c0f84c25a344901da46fad93ee01a406a05e68b0a922ad",
+          "timestamp_source": "2025-01-10T11:34:10.072Z",
+          "source_fields": [
+            "ip"
+          ],
+          "destination_fields": [],
+          "transport_explicit": false,
+          "action": "started-session"
+        }
+      ],
+      "scope": "Provided label records only; not all original host logs or sensor configuration.",
+      "zip_crc_verified": true
+    }
+  ],
+  "prior_exact_raw_links": {
+    "review": "DEDALE_LINKAGE_REVIEW.json",
+    "selected_raw_rows": 6188928,
+    "matched_labels": 5581,
+    "endpoint_bearing_labels_rebound": 3,
+    "scope": "Existing raw-coordinate ledger rechecked; no full host raw archive redownload this unit."
+  },
+  "author_labeling_reference": {
+    "repository": "https://gitlab.inria.fr/mlanvin/dedale_labeling",
+    "project_id": 59645,
+    "commit": "f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+    "files": [
+      {
+        "path": "LICENSE.txt",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/LICENSE.txt/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 1095,
+        "sha256": "1b34096de9e909170c6064bcee795484798e530b0c50fa10dc1a0be45a72915f",
+        "git_blob": "5bfd4de695d7425c16ef6abc5e6e3895a4aadb32"
+      },
+      {
+        "path": "README.md",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/README.md/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 634,
+        "sha256": "e0539a32005cb71ea055eae5b816c8da86c7988694362e8ab8ca311f10194e8a",
+        "git_blob": "2093b61530cf70c9b0541787d78550e364f4a805"
+      },
+      {
+        "path": "network_log_labeling/README.md",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/network_log_labeling%2FREADME.md/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 1154,
+        "sha256": "ae2c62ba6caf26470fed7661c5a1154602c65f55e68c28a8f1af80276c1e1aac",
+        "git_blob": "e6862bc7612b1c3efddfc397a2d7282b774c5486"
+      },
+      {
+        "path": "network_log_labeling/zeek_tools.py",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/network_log_labeling%2Fzeek_tools.py/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 2039,
+        "sha256": "3ff17d88a65fae51e9395149472d2277370097f5ade119be5690dc23062b6ca8",
+        "git_blob": "fdf54778d11e40bcea7dffc60c979e044d859cd0"
+      },
+      {
+        "path": "system_log_labeling/README.md",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2FREADME.md/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 3394,
+        "sha256": "3e683eae4e913f3e84f623e2b19e8b8357f07face435ca3d1e490bc33eddf338",
+        "git_blob": "edd8a270e5322ffe98487ac9cf794cd8214dde24"
+      },
+      {
+        "path": "system_log_labeling/ground_truth/gt_internalserver_class_1.csv",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Fground_truth%2Fgt_internalserver_class_1.csv/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 497,
+        "sha256": "749b45143fc4ce5bf661aec800fedea46ea4fc4140aba07c6774e5777b507e29",
+        "git_blob": "1fa05139487923b6bc2dd7a5221e03fefd55804f"
+      },
+      {
+        "path": "system_log_labeling/ground_truth/gt_internalserver_class_1_and_2.csv",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Fground_truth%2Fgt_internalserver_class_1_and_2.csv/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 1562,
+        "sha256": "0739c2b97c7e958418b6499bc77100bd21423e4254e8894e32f1159f8ae4aa74",
+        "git_blob": "648b9c593d97162c827febffc14bc136e6347b04"
+      },
+      {
+        "path": "system_log_labeling/ground_truth/gt_internalserver_presentation_pdf_class_1.csv",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Fground_truth%2Fgt_internalserver_presentation_pdf_class_1.csv/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 140,
+        "sha256": "738ea5945e04c70a08bc3eb21235e80bf4534bf109e7d6480520187f7258c8cc",
+        "git_blob": "cab9e1e667a7c8bdf4555c4044030b35ba09218c"
+      },
+      {
+        "path": "system_log_labeling/ground_truth/gt_windows_client1_class_1.csv",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Fground_truth%2Fgt_windows_client1_class_1.csv/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 3786,
+        "sha256": "623083cb79c6e9c2d21281b046d4aa6ca11b98c840fdef97451b0a9775148afa",
+        "git_blob": "2741c6b6c5f3dc674ee58948371bd08ec5ddfea0"
+      },
+      {
+        "path": "system_log_labeling/ground_truth/gt_windows_client1_class_1_and_2.csv",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Fground_truth%2Fgt_windows_client1_class_1_and_2.csv/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 5318,
+        "sha256": "5235ec130c9ae359935785200093ddfa0f63254981e1d20ff2b7486223c8a247",
+        "git_blob": "2fabc7219f7539001ea732b41772cc57712a21d7"
+      },
+      {
+        "path": "system_log_labeling/ground_truth/gt_windows_client2_class_1.csv",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Fground_truth%2Fgt_windows_client2_class_1.csv/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 5009,
+        "sha256": "5dfd66c52d9bfd13c41b2ef28dceb4b939e13bab470448965eb0f537db0004b3",
+        "git_blob": "bc6a0b59016e97f6a4af239ec48cd4f9aef407dd"
+      },
+      {
+        "path": "system_log_labeling/ground_truth/gt_windows_client2_class_1_and_2.csv",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Fground_truth%2Fgt_windows_client2_class_1_and_2.csv/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 7262,
+        "sha256": "f512b808c3f7c422d1232462695ce9fb17c073ecb4c028a6a0330808564ac1da",
+        "git_blob": "4aaacdc67dbfc4359f5c0354f0b30e6019e9df7a"
+      },
+      {
+        "path": "system_log_labeling/label_dedale_auditbeat/src/main.rs",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Flabel_dedale_auditbeat%2Fsrc%2Fmain.rs/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 4555,
+        "sha256": "2743138fe3bc3706b3682d4ec8a734e13a6d04da2e008936c466d0ecb7095134",
+        "git_blob": "da5678e371e935a29f0cebfb979f2e62701995fa"
+      },
+      {
+        "path": "system_log_labeling/label_dedale_winlogbeat/src/main.rs",
+        "url": "https://gitlab.inria.fr/api/v4/projects/59645/repository/files/system_log_labeling%2Flabel_dedale_winlogbeat%2Fsrc%2Fmain.rs/raw?ref=f148722eb5908fc17841dc3c8be1591c5c3e59a6",
+        "bytes": 7407,
+        "sha256": "71592ea7e6a48baf1c1105f755f30950894328b61164651edd23cbdb611bd0cf",
+        "git_blob": "d8e727c31b3bb7d7e29128d538ea8cb3cbbfd372"
+      }
+    ],
+    "license_status": "conflict: root LICENSE.txt is MIT; system_log_labeling and network_log_labeling README claim GPLv3",
+    "license_decision": "Do not assert an unambiguous code license. Source inspected, not copied, executed, adapted, installed or bundled. Dataset CC BY 4.0 is separately recorded.",
+    "host_label_method": "Author documentation describes malicious-process ground truth and process-tree/time-range labeling; precise process lifetime matters for PID reuse.",
+    "network_label_method": "Author documentation labels Zeek conn.log and CICFlowMeter with attack-step times and adjustable margins, not a certified Suricata-to-process gold join.",
+    "independent_adjudication": "Repository provenance does not certify every label or operational action as correct."
+  },
+  "field_semantics_references": [
+    {
+      "url": "https://docs.suricata.io/en/suricata-7.0.8/output/eve/eve-json-output.html",
+      "scope": "EVE JSON output and correlation fields; no claim that this dataset ran version 7.0.8."
+    },
+    {
+      "url": "https://docs.suricata.io/en/suricata-7.0.8/configuration/suricata-yaml.html",
+      "scope": "Separate fast/syslog/EVE output formats; an alert alone is not proof of a drop or successful attack."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon",
+      "scope": "Event 3 records network connections; absence from provided malicious labels does not prove source sensor was disabled."
+    }
+  ],
+  "correlation_decision": {
+    "confirmed_host_incident_links": 0,
+    "new_training_examples": 0,
+    "observed_gaps": [
+      "No flow_id or community_id in the full exported alert file or provided host labels.",
+      "No complete explicit ECS TCP/UDP endpoint tuple in the 15,783 combined host labels; this is not a scan of every original host event.",
+      "Windows provided labels have 12 DNS events but no Sysmon event 3. DNS answers are not evidence of a transport connection.",
+      "Two Linux destination addresses are unspecified listeners (0.0.0.0/::), and one separate session event has only source IP; none yields a complete transport tuple.",
+      "Three alert integer time fields agree, but export unit/clock contract was not established. Values remain numeric; KST is not guessed.",
+      "Sensor host is neither message endpoint in 1,357,346 alerts. Preserve observer identity separately."
+    ],
+    "not_inferred": [
+      "No time-only incident join",
+      "No alert count as unique incident count",
+      "No attack success, blocking, benign verdict or full monitoring coverage from these exports"
+    ],
+    "next_evidence": [
+      "Dataset-specific timestamp/export contract and host/IP mapping",
+      "Selected original connection/flow or packet evidence with process/incident context and clock tolerance",
+      "Source-family and official temporal split plus annotation review before evaluation or training"
+    ]
+  },
+  "validation": {
+    "unit_tests": 12,
+    "unit_tests_passed": true,
+    "independent_full_alert_scan": {
+      "at_kst": "2026-10-30T12:18:10.842705+09:00",
+      "passed": true,
+      "independent_alert_rows": 1465627,
+      "independent_alert_bytes": 699465555,
+      "sha256": "4733ea1c72179ffd98927c201292f941d62831636b7ffa4e85e38769f30137ff",
+      "parsed_fields_checked": [
+        "source/destination IPv4/IPv6 and ports",
+        "SID",
+        "embedded priority",
+        "sensor",
+        "transport"
+      ],
+      "alert_archive_and_member_crc_checked": true,
+      "metadata_sha256_unchanged": true,
+      "label_archive_provider_md5_checked": true,
+      "author_git_blob_files_verified": 14,
+      "author_license_conflict": "root LICENSE.txt MIT; both subdirectory READMEs GPLv3",
+      "new_full_host_raw_download": false,
+      "timestamp_unit_verified": false,
+      "cross_sensor_incident_links_created": 0
+    },
+    "executed_source_sha256": {
+      "inspect_dedale_network.py": "2c88596873bbe994155ed58ed73d4233cafde7974ba796509fd67b90d54f2a16",
+      "link_dedale_labels.py": "ba0b8cdc3dee98649706130f97e397a8b51ec02ba2ed90e4d228e31ac754800c"
+    },
+    "final_source_sha256": {
+      "inspect_dedale_network.py": "6a9c3af705bd552cbf65721781acff580a64f9fb951503e9b9cdfd09d71f11ac",
+      "link_dedale_labels.py": "ba0b8cdc3dee98649706130f97e397a8b51ec02ba2ed90e4d228e31ac754800c"
+    },
+    "post_run_docstring_correction_only": true,
+    "post_run_function_ast_unchanged": true,
+    "prior_inputs_and_final_eval": "Existing frozen R8/V5 inputs and already-exposed final test must remain unchanged; no new unseen claim.",
+    "not_run": [
+      "Full training bundle (V4/V5 split files absent locally)",
+      "GPU training",
+      "Remote tokenizer",
+      "Live MCP/chat/attack E2E",
+      "Fresh server install"
+    ],
+    "independent_validation_sha256": "6b5d698235dc99fb4746196ad74d9785e328c497b44d9433d8c0efd26a80b1c5"
+  },
+  "execution_scope": {
+    "new_mac_packages": 0,
+    "server_authenticated": false,
+    "thor_tcp": [
+      "2026-10-30T11:57:39.014777+09:00 TimeoutError",
+      "2026-10-30T12:04:53.680346+09:00 escalated TimeoutError"
+    ],
+    "current_service_state": "unknown; timeout is not proof the inference service is down",
+    "production_changed": false,
+    "gpu_training_started": false,
+    "raw_json_saved_to_disk": false,
+    "full_small_archives_downloaded": true,
+    "deploy_or_offline_manifest_change_required": false,
+    "temporary_cleanup": "Own archives, author source references, metadata and helpers removed after evidence recording; final receipt in local session/STATUS."
+  }
+}

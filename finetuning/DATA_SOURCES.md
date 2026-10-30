@@ -1,5 +1,15 @@
 # 데이터 출처와 사용 범위
 
+## DEDALE IDS 원자료 및 작성자 라벨링 근거 — 2026-10-30 KST
+
+[공식 V2.1](https://doi.org/10.57745/Y5JLDG)의 [Suricata ZIP](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717879)24,596,811B를 전체 취득해 제공 MD5/ZIP CRC/SHA를 대조했다. 해제된 경보1,465,627행·699,465,555B와 [호스트 라벨 ZIP](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717882)의 combined15,783행을 전수 조사했다. class1 부분집합은 더하지 않는다. [필드/독립 검증/제약](DEDALE_CORRELATION_REVIEW.json).
+
+[공식 작성자 저장소](https://gitlab.inria.fr/mlanvin/dedale_labeling/-/tree/f148722eb5908fc17841dc3c8be1591c5c3e59a6)의14파일을 고정 Gitblob/SHA로 확인했다. 문서는 프로세스 식별·생존 시간 범위에 따른 host 라벨링과 공격 단계 시간/여유 범위에 따른 Zeek·CICFlowMeter 라벨링을 설명한다. 이는 모든 이벤트의 전문가 검수나 Suricata-프로세스 연결 정답을 인증하지 않는다. **이용 조건 충돌:** 루트 LICENSE.txt는 MIT, system/network README는 GPLv3다. 앞선 GPLv3 단정은 정정하며 작성자 코드의 재사용/배포는 보류한다. 코드 내용을 공개 소스에 복사/포팅·실행·설치하지 않았고 출처/해시만 보존한다. 데이터의 CC BY4.0은 별도 조건이다.
+
+경보는 syslog 요약이고 공통 flow/community 식별자가 없으며 제공 host 라벨에도 완전한 명시적 연결 튜플이 없다. Windows 라벨의 Sysmon3 부재는 전체 원로그/센서 비활성의 증거가 아니다. [Microsoft Event3 설명](https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon#event-id-3-network-connection), [Suricata EVE 설명](https://docs.suricata.io/en/suricata-7.0.8/output/eve/eve-json-output.html)은 필드 의미 참고이며 데이터셋의 실행 버전/구성을 증명하지 않는다. 정수 시각의 export 계약 미확인으로 KST 변환·시각만의 사건 연결은 하지 않았다.
+
+공식 연구 시험망·기간 분할·검토 노출을 보존하며 독립 사고 수/실제 피해기관 로그/학습 대화 수로 확대하지 않는다. 새 사건 연결0·학습 편입0이다. 다음은 시각/호스트-IP 계약, 선택 연결/flow·패킷/프로세스 맥락과 사건 검수다. 공개 검사기는 프로젝트 작성이며 라벨 의미·모델 품질을 보증하지 않는다.
+
 ## DEDALE 원문 연계 후속 — 2026-10-30 KST
 
 [공식 V2.1](https://doi.org/10.57745/Y5JLDG)의 선택7시간 원본6,188,928행에서 제공 라벨5,581개를 정확히 연결했다. CRC/BZ2 EOF/SHA·제공 원시 JSONL MD57개와 별도 전체 객체 대조를 확인했다. class1은 class1+2에 포함되어 중복 합산하지 않는다. [출처·선정·실패·한계 원장](DEDALE_LINKAGE_REVIEW.json).

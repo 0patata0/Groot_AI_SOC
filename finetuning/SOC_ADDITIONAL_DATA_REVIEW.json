@@ -562,5 +562,14 @@
     "raw_rows": 6188928,
     "matched_labels": 5581,
     "scope": "Selected seven hourly raw members, not all archive logs or new training examples."
+  },
+  "dedale_correlation_followup": {
+    "at_kst": "2026-10-30T12:19:24.025235+09:00",
+    "file": "DEDALE_CORRELATION_REVIEW.json",
+    "alert_rows": 1465627,
+    "host_label_rows": 15783,
+    "confirmed_host_incident_links": 0,
+    "new_training_admitted": 0,
+    "author_code_license": "MIT root / GPLv3 subdirectory README conflict; reuse held"
   }
 }

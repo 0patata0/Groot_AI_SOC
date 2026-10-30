@@ -56,6 +56,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
               'engine': 'mcp-use/ChatOllama', 'model': config['model'],
               'calls': [], 'model_calls': [], 'chat_posts': 0, 'protected_calls': 0,
               'network_mode': 'host_process', 'telemetry_enabled': False}
+    report['turn_clock'] = harness.CONTRACT.turn_clock(report['at_kst'])
     mode = config.get('access_mode', 'read-only')
     available = capabilities(mode)
     question = request.get('question', '')
@@ -239,7 +240,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                          temperature=harness.CONTRACT.TEMPERATURE, top_p=harness.CONTRACT.TOP_P, num_predict=harness.CONTRACT.OUTPUT_TOKENS, client_kwargs={'timeout': 90},
                          callbacks=[meter])
         agent = MCPAgent(llm=llm, client=client, max_steps=steps, memory_enabled=True,
-                         system_prompt=SYSTEM_PROMPT + harness.guidance(current), use_server_manager=False, verbose=False,
+                         system_prompt=SYSTEM_PROMPT + '\n' + report['turn_clock'] + harness.guidance(current), use_server_manager=False, verbose=False,
                          callbacks=[], retry_on_error=False)
         # Graph middleware nodes are not model turns. Model/tool caps are fresh
         # for every request, including when only the transport is reused.
@@ -289,7 +290,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                         report['repair']['missing_write_targets'] = gap
                         instruction = '현재 질문: ' + current + '\n' + harness.preparation_instruction(gap)
                     if incident_gap:
-                        instruction = harness.incident_evidence_instruction(current)
+                        instruction = harness.incident_evidence_instruction(current, report['calls'])
                         report['repair']['incident_evidence_missing'] = True
                     elif audit and issues:
                         instruction = harness.incident_judgment_instruction(current, str(final), report['calls'], issues)
@@ -307,8 +308,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                         report['repair']['method'] = 'structured_read_selection'
                         selector = llm.with_structured_output(schema, method='json_schema')
                         plan = await asyncio.wait_for(selector.ainvoke([
-                            ('system', harness.CONTRACT.system_prompt(read_only=True) + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
-                             'security-events는 until_kst와 lookback_minutes로 과거 구간을 선택하고 실제 반환 구간을 확인하세요. '
+                            ('system', harness.CONTRACT.system_prompt(read_only=True) + '\n' + report['turn_clock'] + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
+                             'security-events는 정확한 시작·종료에 since_kst와 until_kst를 선택하세요(lookback_minutes와 혼용 금지). 종료와 조회 폭만 있으면 until_kst와 lookback_minutes를 사용하세요. 실제 반환 구간을 확인하세요. '
                              '요청한 장비/대상을 빠짐없이 포함하고 이미 성공한 조회를 반복하지 마세요. 요청구간을 지원한다고 꾸미지 마세요.' + harness.guidance(current)),
                             ('human', instruction + '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
                         report.setdefault('read_selections', []).append(plan)

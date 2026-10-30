@@ -12,6 +12,7 @@ class AuthorizationEvidence(unittest.TestCase):
             '외부 공격자가 아닌 내부 IP에서 발생했으므로 긴급 차단 대상은 아닙니다.',
             '사설 주소이므로 대응이 불필요합니다.',
             'DVWA는 테스트 환경이므로 정상으로 판정합니다.',
+            'DVWA는 실습용 취약 서비스이므로, 공격 탐지 알림은 정상적인 테스트 행위일 가능성이 높다.',
             '내부 테스트 환경(DVWA) 접근이므로 필요시 WAF 예외 처리가 적절합니다.'):
             self.assertIn('environment_used_as_authorization',h.incident_context_violations(text),text)
 
@@ -22,6 +23,7 @@ class AuthorizationEvidence(unittest.TestCase):
     def test_valid_uncertainty_authorization_and_investigation_are_preserved(self):
         for text in (
             '내부 IP이므로 정상이라고 단정할 수 없습니다.',
+            'DVWA 실습 환경이므로 정상 가능성이 높다고 단정할 수 없습니다.',
             'DVWA 테스트 환경은 정상 판정의 근거가 아닙니다.',
             '사설 주소이지만 공격 근거가 있어 추가 조사와 제한된 대응안을 검토해야 합니다.',
             '내부 IP에서 탐지되었습니다. 해당 시각·출발지의 시험 승인을 관리자가 확인했습니다. 영향은 미확인입니다.',

@@ -13,8 +13,10 @@ import runtime
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False):
         calls, prompts = [], []
+        self.selector_prompts=[];self.agent_system_prompts=[]
+        selector_prompts=self.selector_prompts;agent_system_prompts=self.agent_system_prompts
         self.protected_starts = []
         content = '# heading\nbody\n'
         sha = hashlib.sha256(content.encode()).hexdigest()
@@ -28,6 +30,8 @@ class PreparationLoop(unittest.TestCase):
                     'type':'object','properties':{'target':{'type':'string'}}}) for name in available[self.server]]
             async def call_tool(self, name, arguments, **kw):
                 calls.append(name)
+                if incident_read_error and name=='search_modsecurity_alerts' and len(calls)==1:
+                    return types.SimpleNamespace(isError=True,content=[types.SimpleNamespace(type='text',text=json.dumps({'error':'until_kst must be in the past 90 days'}))])
                 data = ({'target':'a:modsecurity-custom','content':content,'sha256':sha}
                         if name=='get_rule_change_target' else
                         {'source':'modsecurity','returned_count':0,'alerts':[],
@@ -49,11 +53,15 @@ class PreparationLoop(unittest.TestCase):
             def __init__(self, **kw): self.callbacks=kw.get('callbacks',[])
             def with_structured_output(self, *a, **kw):
                 if read_incident:
-                    return types.SimpleNamespace(ainvoke=AsyncMock(return_value={'calls':[
-                        {'tool':'mcp__security_events__search_modsecurity_alerts','arguments':{'target':'fixture'}}]}))
+                    async def select(messages):
+                        selector_prompts.append(messages)
+                        return {'calls':[{'tool':'mcp__security_events__search_modsecurity_alerts',
+                            'arguments':{'target':'bad-year' if incident_read_error and len(selector_prompts)==1 else 'fixture'}}]}
+                    return types.SimpleNamespace(ainvoke=select)
                 raise AssertionError('write preparation was narrowed to read-only selection')
         class Agent:
-            def __init__(self, client, **kw): self.client=client;self.llm=kw['llm']
+            def __init__(self, client, **kw):
+                self.client=client;self.llm=kw['llm'];agent_system_prompts.append(kw['system_prompt'])
             async def initialize(self): await self.adapter.create_all(self.client)
             async def run(self, prompt):
                 prompts.append(prompt);tools={t.name:t for t in self.adapter.tools}
@@ -131,6 +139,23 @@ class PreparationLoop(unittest.TestCase):
         self.assertEqual(report.get('remaining_issues',[]),[])
         self.assertIn('추가 조사가 필요',report['final_response'])
         self.assertEqual(report['calls'][0]['via'],'structured_read_selection')
+
+    def test_real_failed_read_feedback_and_clock_reach_next_selector(self):
+        report,prompts,calls=self.execute(question='DVWA 사건 조사하고 위험 판단해줘',read_incident=True,incident_read_error=True)
+        self.assertEqual(calls,['search_modsecurity_alerts']*2)
+        self.assertEqual(len(self.selector_prompts),2)
+        self.assertNotIn('<untrusted_failed_reads>',self.selector_prompts[0][1][1])
+        feedback=self.selector_prompts[1][1][1]
+        self.assertIn('<untrusted_failed_reads>',feedback)
+        self.assertIn('until_kst must be in the past 90 days',feedback)
+        self.assertIn('bad-year',feedback)
+        for messages in self.selector_prompts:
+            self.assertIn(report['turn_clock'],messages[0][1])
+            self.assertIn(report['at_kst'],messages[0][1])
+        self.assertIn(report['turn_clock'],self.agent_system_prompts[0])
+        self.assertEqual(len(prompts),1)
+        self.assertEqual(report['protected_calls'],0)
+        self.assertEqual(report['status'],'completed')
 
     def test_incident_factual_repair_keeps_failed_draft_without_repeating_reads(self):
         failed='WAF 경보는 0건입니다.'

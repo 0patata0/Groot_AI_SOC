@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+## 사건 조회 구간·현재 시각 보완 — 2026-10-31
+
+두 봇에 턴별 KST 시각·실패 조회 인자/오류 피드백을 반영하고 MCP의 정확 시작/종료 구간·WAF 센서 설명을 제공했습니다. 실제4새대화의 연도/구간은 모두 맞았지만 최종 사건 판단에는 중요한 근거 오류가 남아 있습니다. [조회 계약](infra/mcp/event-evidence-window.md) · [실측과 한계](infra/mcp/event-evidence-window-validation-2026-10-31.json) · [현재 작업/일시정지 계획](STATUS.md).
+
 ## Vector 서버 장애 복구 — 2026-10-31 04:01 KST
 
 A 로그 정제 중단과 Suricata/WAF 원본 회전 상호 대기를 수정했습니다. 정제 재개·세 예약 작업 종료0·reader 가드·B 새 수신을 확인했고 원본과 과거 경보는 보존합니다. 중단 기간 전체 전달 대조·봇 판단/실대응E2E는 남아 있습니다. [복구 근거와 범위](infra/normalization/vector/raw-operations/peer-recovery-2026-10-31.md) · [현황/Git](STATUS.md).

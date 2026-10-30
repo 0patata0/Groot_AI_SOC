@@ -272,6 +272,14 @@ def request_wrapper(original, query, harness):
         read_selection = bool(scope and (harness.structured_read(request) or incident_scope)
                               and all(harness.EVIDENCE.allowed(name, 'verify') for name in scope))
         data = harness.CONTRACT.normalize_openai(result.api_kwargs, scope, read_only=read_selection)
+        clock = getattr(agent, '_capstone_turn_clock', None)
+        if not clock or clock[0] != turn:
+            clock = (turn, harness.CONTRACT.turn_clock())
+            agent._capstone_turn_clock = clock
+        for row in data.get('messages', []):
+            if row.get('role') == 'system' and isinstance(row.get('content'), str):
+                row['content'] += '\n' + clock[1]
+                break
         if isinstance(data.get('messages'), list):
             data['messages'], projected = project_new_thread(data['messages'],
                 kw.get('original_user_message'), request, harness.SHARED._CONTEXT_PREFIX)
@@ -513,7 +521,7 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
             agent._mute_post_response = False
             agent._clear_status_buffer()
             append_message(rows, agent._build_assistant_message(message, 'incomplete'))
-            instruction = (harness.incident_evidence_instruction(request) if incident_gap else
+            instruction = (harness.incident_evidence_instruction(request, calls) if incident_gap else
                 harness.incident_judgment_instruction(request, text, calls, incident_issues))
             agent._capstone_incident_repair_prompt = (turn, instruction)
             append_message(rows, {'role': 'user', 'content': instruction})

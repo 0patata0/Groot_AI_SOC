@@ -26,6 +26,33 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_runtime_clock_is_stable_in_turn_and_refreshed_between_turns(self):
+        from unittest.mock import patch
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        a=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,_current_turn_id='a')
+        source={'messages':[{'role':'system','content':'native\n[SOC_RUNTIME_CLOCK]stale[/SOC_RUNTIME_CLOCK]'},
+                            {'role':'user','content':'hello'}]}
+        original=copy.deepcopy(source)
+        wrap=alignment.request_wrapper(lambda *args,**kw:Request(source),PLUGIN,H)
+        clocks=[C.turn_clock('2026-12-31T23:59:59+09:00'),C.turn_clock('2027-01-01T00:00:01+09:00')]
+        with patch.object(C,'turn_clock',side_effect=clocks) as clock:
+            for _ in range(2):
+                result=wrap(a,original_user_message='hello',turn_id='a')
+                text=result.api_kwargs['messages'][0]['content']
+                self.assertEqual(text.count('[SOC_RUNTIME_CLOCK]'),1)
+                self.assertIn(clocks[0],text)
+                self.assertNotIn('stale',text)
+            self.assertEqual(clock.call_count,1)
+            a._current_turn_id='b'
+            result=wrap(a,original_user_message='hello',turn_id='b')
+            self.assertIn(clocks[1],result.api_kwargs['messages'][0]['content'])
+            self.assertEqual(clock.call_count,2)
+        self.assertEqual(source,original)
+
     def test_incident_judgment_retains_failed_draft_and_uses_shared_repair_budget(self):
         q='DVWA 요청이 공격이었나? 탐지 근거와 대응 필요성을 판단해줘.'
         h=Harness(text='IDS 경보는 0건입니다.',request=q)

@@ -4,8 +4,8 @@
 Uses the existing mcp-ro Indexer credentials from /etc/mcp/wazuh-ro.env. Only
 the fixed wazuh-alerts-* index is queried, so events not yet indexed by Wazuh
 cannot appear. Results use KST (+09:00) ISO 8601 timestamps. Raw logs,
-ModSecurity messages, header values, query strings and request bodies are never
-returned. Bounded DNS questions and HTTP paths are untrusted investigation
+full ModSecurity message objects, matched data, headers, query strings and request
+bodies are never returned. Bounded sensor descriptions, DNS questions and HTTP paths are untrusted investigation
 context; opaque transaction/User-Agent hashes support correlation, not identity.
 """
 
@@ -43,7 +43,7 @@ SURICATA_FIELDS = COMMON_FIELDS + [
 WAF_FIELDS = COMMON_FIELDS + [
     "data.transaction.client_ip", "data.transaction.request.method",
     "data.transaction.response.http_code", "data.transaction.producer.secrules_engine",
-    "data.transaction.messages",  # examined only in memory to extract numeric rule IDs
+    "data.transaction.messages",  # project IDs and bounded top-level sensor descriptions only
     "data.transaction.unique_id", "data.transaction.request.uri",
     "data.transaction.request.headers.User-Agent",  # hashed, never returned verbatim
 ]
@@ -55,6 +55,7 @@ TOOLS = [
         "inputSchema": {
             "type": "object", "additionalProperties": False,
             "properties": {
+                "since_kst": {"type": "string", "description": "Exact interval start, ISO8601 with seconds and +09:00. Requires until_kst; do not also supply lookback_minutes. The interval must be positive and at most 24 hours."},
                 "until_kst": {"type": "string", "description": "Optional historical window end, ISO8601 with +09:00. At most 90 days old, never future; lookback_minutes still limits the window to 24 hours."},
                 "lookback_minutes": {"type": "integer", "minimum": 1, "maximum": MAX_LOOKBACK_MINUTES, "default": 60},
                 "limit": {"type": "integer", "minimum": 1, "maximum": MAX_LIMIT, "default": 10},
@@ -66,10 +67,11 @@ TOOLS = [
     },
     {
         "name": "search_modsecurity_alerts",
-        "description": "Search ModSecurity alerts already indexed by Wazuh, not raw audit logs. limit must be 1..50 (default 10). Includes untrusted HTTP paths without query strings and opaque transaction/User-Agent hashes. Paths and hash matches are correlation context, not authenticated identity or permission. Returns exact KST window and unknown full-window total.",
+        "description": "Search ModSecurity alerts already indexed by Wazuh, not raw audit logs. limit must be 1..50 (default 10). Includes bounded untrusted sensor rule descriptions, native severity, HTTP paths without query strings and opaque transaction/User-Agent hashes. A match or HTTP200 is not exploit success or authenticated permission. Use since_kst + until_kst for exact endpoints, or until_kst + lookback_minutes. Returns actual KST window and unknown full-window total.",
         "inputSchema": {
             "type": "object", "additionalProperties": False,
             "properties": {
+                "since_kst": {"type": "string", "description": "Exact interval start, ISO8601 with seconds and +09:00. Requires until_kst; do not also supply lookback_minutes. The interval must be positive and at most 24 hours."},
                 "until_kst": {"type": "string", "description": "Optional historical window end, ISO8601 with +09:00. At most 90 days old, never future; lookback_minutes still limits the window to 24 hours."},
                 "lookback_minutes": {"type": "integer", "minimum": 1, "maximum": MAX_LOOKBACK_MINUTES, "default": 60},
                 "limit": {"type": "integer", "minimum": 1, "maximum": MAX_LIMIT, "default": 10},
@@ -276,7 +278,7 @@ def _positive_int(value, name, default, maximum):
 def validate_args(kind, args):
     if not isinstance(args, dict):
         raise ValueError("arguments must be an object")
-    allowed = {"lookback_minutes", "limit", "source_ip", "until_kst"}
+    allowed = {"lookback_minutes", "limit", "source_ip", "until_kst", "since_kst"}
     id_key = "signature_id" if kind == "suricata" else "rule_id"
     allowed.add(id_key)
     unknown = set(args) - allowed
@@ -286,14 +288,23 @@ def validate_args(kind, args):
         "lookback_minutes": _positive_int(args.get("lookback_minutes"), "lookback_minutes", 60, MAX_LOOKBACK_MINUTES),
         "limit": _positive_int(args.get("limit"), "limit", 10, MAX_LIMIT),
     }
-    if "until_kst" in args:
-        value = args["until_kst"]
+    if "since_kst" in args and ("until_kst" not in args or "lookback_minutes" in args):
+        raise ValueError("since_kst requires until_kst and cannot combine with lookback_minutes")
+    for key in ("until_kst", "since_kst"):
+        if key not in args:
+            continue
+        value = args[key]
         if not isinstance(value, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,6})?\+09:00", value):
-            raise ValueError("until_kst requires an ISO8601 timestamp with +09:00")
+            raise ValueError(key + " requires an ISO8601 timestamp with +09:00")
         try:
-            out["until_kst"] = datetime.fromisoformat(value).isoformat()
+            out[key] = datetime.fromisoformat(value).isoformat()
         except ValueError:
-            raise ValueError("invalid until_kst timestamp") from None
+            raise ValueError("invalid " + key + " timestamp") from None
+    if "since_kst" in out:
+        seconds = (datetime.fromisoformat(out["until_kst"]) - datetime.fromisoformat(out["since_kst"])).total_seconds()
+        if not 0 < seconds <= MAX_LOOKBACK_MINUTES * 60:
+            raise ValueError("explicit interval must be positive and at most 24 hours")
+        out["lookback_minutes"] = seconds / 60
     if "source_ip" in args:
         try:
             if not isinstance(args["source_ip"], str):
@@ -325,8 +336,11 @@ def build_query(kind, args, at=None):
         if not at - timedelta(days=90) <= end <= at:
             raise ValueError("until_kst must be in the past 90 days")
         at = end
+    start = datetime.fromisoformat(args["since_kst"]) if "since_kst" in args else at - timedelta(minutes=args["lookback_minutes"])
+    if not 0 < (at - start).total_seconds() <= MAX_LOOKBACK_MINUTES * 60:
+        raise ValueError("query interval must be positive and at most 24 hours")
     filters = [
-        {"range": {"timestamp": {"gte": (at - timedelta(minutes=args["lookback_minutes"])).isoformat(),
+        {"range": {"timestamp": {"gte": start.isoformat(),
                                   "lte": at.isoformat()}}},
         {"bool": {"should": identity, "minimum_should_match": 1}},
     ]
@@ -408,6 +422,49 @@ def extract_waf_rule_ids(messages):
         # Only structured messages (or a valid JSON serialization of them)
         # identify an actual WAF rule.
     return found
+
+
+def waf_rule_matches(messages):
+    """Project sensor labels, never details.data/match or complete message objects."""
+    incomplete = False
+    if isinstance(messages, str):
+        if len(messages) > 131072:
+            messages = None
+        else:
+            try:
+                messages = json.loads(messages)
+            except (ValueError, RecursionError):
+                messages = None
+    if isinstance(messages, dict):
+        messages = [messages]
+    if not isinstance(messages, list):
+        messages = []
+        incomplete = True
+    if len(messages) > 64:
+        incomplete = True
+    rows = []
+    for entry in messages[:64]:
+        item = _obj(entry)
+        details = _obj(item.get('details'))
+        nested_id, direct_id = _scalar(details.get('ruleId'),16), _scalar(item.get('ruleId'),16)
+        rid = nested_id or direct_id
+        title = item.get('message')  # details.message/data/match are not labels.
+        if (not RULE_ID_RE.fullmatch(rid) or nested_id and direct_id and nested_id != direct_id
+                or not isinstance(title,str) or not title.strip() or CONTROL_RE.search(title)):
+            incomplete = True
+            continue
+        severity = _scalar(details.get('severity'),8)
+        if severity not in set('01234567'):
+            severity = ''
+        row = {'rule_id': rid, 'description': title[:240], 'native_severity': severity}
+        incomplete = incomplete or len(title) > 240
+        if row not in rows:
+            if len(rows) == 20:
+                incomplete = True
+                break
+            rows.append(row)
+    return {'waf_rule_matches': rows, 'waf_rule_matches_incomplete': incomplete,
+            'waf_rule_messages_untrusted': True}
 
 
 def dns_questions(value):
@@ -499,6 +556,7 @@ def summarize_modsecurity(source):
         "http_status": _scalar(_obj(transaction.get("response")).get("http_code"), 8),
         "engine": _scalar(_obj(transaction.get("producer")).get("secrules_engine"), 24),
         "waf_rule_ids": extract_waf_rule_ids(transaction.get("messages"))[:20],
+        **waf_rule_matches(transaction.get("messages")),
         "wazuh_rule_id": _scalar(rule.get("id"), 16),
         "wazuh_level": _scalar(rule.get("level"), 8),
         **http_context(transaction),
@@ -526,6 +584,7 @@ def search(kind, args):
             break
     return {
         "source": kind, "lookback_minutes": params["lookback_minutes"],
+        "window_mode": "explicit_bounds" if "since_kst" in params else "lookback",
         "requested_since_kst": _kst_timestamp(query["query"]["bool"]["filter"][0]["range"]["timestamp"]["gte"]),
         "requested_until_kst": _kst_timestamp(query["query"]["bool"]["filter"][0]["range"]["timestamp"]["lte"]),
         "returned_count": len(rows), "indexed_window_total_count": None,

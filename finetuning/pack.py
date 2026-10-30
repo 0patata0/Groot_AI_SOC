@@ -31,6 +31,7 @@ def main():
              "link_ait_labels.py", "AIT_GAP_LINKAGE.json",
              "prepare_ait_case_review.py", "AIT_CASE_REVIEW.json", "SOC_SOURCE_ACCESS_REVIEW.json",
              "inspect_optc_evidence.py", "OPTC_EVIDENCE_REVIEW.json", "SOC_ADDITIONAL_DATA_REVIEW.json",
+             "link_dedale_labels.py", "DEDALE_LINKAGE_REVIEW.json",
              "prepare_linux_apt.py", "LINUX_APT_SOURCE_SPEC.json", "LINUX_APT_EVIDENCE_REVIEW.json",
              "prepare_linux_apt_cases.py", "LINUX_APT_CASE_REVIEW.json",
              "prepare_soc_observation_inputs.py", "check_soc_observation_tokens.py", "SOC_OBSERVATION_INPUT_REVIEW.json",

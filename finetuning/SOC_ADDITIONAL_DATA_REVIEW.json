@@ -555,5 +555,12 @@
     "event_rows": 122563,
     "training_admitted": 0,
     "prior_887_row_review_preserved": true
+  },
+  "dedale_linkage_followup": {
+    "at_kst": "2026-10-30T11:54:09.740198+09:00",
+    "file": "DEDALE_LINKAGE_REVIEW.json",
+    "raw_rows": 6188928,
+    "matched_labels": 5581,
+    "scope": "Selected seven hourly raw members, not all archive logs or new training examples."
   }
 }

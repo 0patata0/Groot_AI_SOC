@@ -1,5 +1,7 @@
 # 에이전트 파인튜닝 데이터셋 카탈로그 (2026-10-01)
 
+**DEDALE 후속 검증 — 2026-10-30 KST:** 원본 ZIP 전체를 받지 않고 선택7시간 멤버를 읽어6,188,928행과5,581라벨을 연결했다. 제공 원시 JSONL MD57개·별도 객체 대조를 확인했으며 공식 평가기간과 검토 노출을 보존한다. [검사기/사용 경계](../finetuning/README.md) · [원장](../finetuning/DEDALE_LINKAGE_REVIEW.json). 신규 학습 편입은0이다.
+
 ## Attack Flow 분기 보존 후속 — 2026-10-30 KST
 
 **출처 검토 후속:** [ATTACK_FLOW_SOURCE_REVIEW.json](ATTACK_FLOW_SOURCE_REVIEW.json)에 Maastricht18action·4condition의 원문 쪽수/객체SHA와 검토 상태를 기록했다. 17개는 한정 필요,5개는 사건 관측 수준의 지지이며 오류17개/정답5개 판정이 아니다. 앞선 부분 검토와 달리 SDBBot 사용은 원문 앞부분에서 확인했다. 원본의 추정 주석을 보존하고 전체 흐름의 사실 정답 생성은 계속 보류한다. PDF 본문·이미지를 학습 데이터나 저장소에 넣지 않는다.

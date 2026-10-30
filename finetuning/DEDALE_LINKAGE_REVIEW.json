@@ -1,0 +1,487 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T11:54:09.740198+09:00",
+  "status": "verified_selected_record_linkage",
+  "dataset": {
+    "name": "DEDALE",
+    "doi": "10.57745/Y5JLDG",
+    "version": "2.1",
+    "record_url": "https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_sha256": "d6b12c27d80c9b10ebb7910b7bb5a084556f1ee51c68e7eef56eda1596c8ba6d",
+    "metadata_rechecked_unchanged": true,
+    "license": "CC BY 4.0; attribution required",
+    "nature": "Four-week virtualized research testbed, not production victim incident logs",
+    "attribution": "Maxime Lanvin and Frederic Majorczyk, DEDALE, Recherche Data Gouv, DOI 10.57745/Y5JLDG, V2.1; paper DOI 10.1007/978-3-032-16092-8_1"
+  },
+  "labels": {
+    "archive_url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717882",
+    "bytes": 2669407,
+    "sha256": "729ac223a89c70f771861920b6b9ee3ab1bb5569e12ec54c04f380aadf574dc7",
+    "provider_archive_md5_verified": true,
+    "members": [
+      {
+        "member": "system_labels/internal_server/malicious_events_class_1.jsonl",
+        "records": 4409,
+        "bytes": 6683184,
+        "sha256": "28d0e21ecf103e8b7fbfb06805939ec8d9e5eeb54ecf5a38adf7412340869db9",
+        "zip_crc32": "8ccb25f8",
+        "zip_crc_verified": true,
+        "md5_verified": true
+      },
+      {
+        "member": "system_labels/internal_server/malicious_events_class_1_and_2.jsonl",
+        "records": 5190,
+        "bytes": 7865096,
+        "sha256": "e0021919e9297192cd269edbaa5c07032dd261ff47a00351b54d04aa7e999e8d",
+        "zip_crc32": "ce0f9164",
+        "zip_crc_verified": true,
+        "md5_verified": true
+      },
+      {
+        "member": "system_labels/clients_1_and_2/malicious_events_class_1.jsonl",
+        "records": 9566,
+        "bytes": 20773464,
+        "sha256": "5cf5bb782f2d6304752f6b03d19e8544e1e4b21ba91372c7e15067553f1e01a6",
+        "zip_crc32": "86f47528",
+        "zip_crc_verified": true,
+        "md5_verified": true
+      },
+      {
+        "member": "system_labels/clients_1_and_2/malicious_events_class_1_and_2.jsonl",
+        "records": 10593,
+        "bytes": 23862705,
+        "sha256": "2e74057014bf62a9b1d055d70fab03d5931b41a2600eab6fead3916c780b2a52",
+        "zip_crc32": "6ccbb251",
+        "zip_crc_verified": true,
+        "md5_verified": true
+      }
+    ],
+    "sets": {
+      "audit": {
+        "class_1": 4409,
+        "class_1_and_2": 5190,
+        "class_2_only": 781
+      },
+      "win": {
+        "class_1": 9566,
+        "class_1_and_2": 10593,
+        "class_2_only": 1027
+      }
+    },
+    "unique_combined_records": 15783,
+    "class1_subsets_not_added_to_combined_count": true,
+    "label_semantics": "Provider-selected events; exact raw equality does not independently certify maliciousness or all annotation semantics."
+  },
+  "counts": {
+    "raw_members": 7,
+    "raw_rows": 6188928,
+    "decompressed_bytes_streamed": 9986690545,
+    "selected_compressed_member_bytes": 92261570,
+    "matched_label_records": 5581,
+    "missing_labels_in_selected_hours": 0,
+    "duplicate_matches": 0,
+    "same_host_time_other_content": 2462,
+    "matched_class_1": 4800,
+    "matched_class_2_only": 781
+  },
+  "archives": [
+    {
+      "file": "system_logs_auditbeat.zip",
+      "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717881",
+      "provider_bytes": 10896385060,
+      "published_whole_archive_md5": "d01b50094a93aa5ebc8a46e6150d256b",
+      "whole_archive_md5_verified": false,
+      "selected_members": [
+        {
+          "member": "daily_auditbeat/D19_H11_2025-01-10T11_auditbeat_F444.jsonl.bz2",
+          "bytes": 75129190,
+          "sha256": "38eb6b2c52ae52ea05d7c2db726adb88d0afc22ca3092974f42172a9bd0eed49",
+          "zip_crc32": "78f7a54b",
+          "zip_crc_verified": true,
+          "reused_r2_verified_member": true,
+          "provided_member_md5": null,
+          "member_md5_verified": false,
+          "provided_raw_jsonl_md5": "16ce28e70d16ba9acf3eeaf52b060814",
+          "label_selection_hour_source": "2025-01-10T11",
+          "label_selection_is_not_assumed_raw_time_range": true
+        }
+      ],
+      "checksum_member": {
+        "name": "daily_auditbeat/auditbeat_md5sum.sig",
+        "bytes": 203849,
+        "sha256": "c79aa4e91406610e84b0d9adb8481b3b21ddf4067435a7ea2d632cfbc18fcf76",
+        "zip_crc_verified": true
+      },
+      "checksum_basename_suffix_counts": {
+        ".jsonl.bz2": 0,
+        ".jsonl": 672,
+        ".log": 0,
+        ".bz2": 0
+      },
+      "transferred_bytes": 3777572,
+      "requested_bytes_upper_bound": 3777572,
+      "range_requests": 2,
+      "etag": "\"b4f406d8edfce181266f56abda1ce87e-11\"",
+      "last_modified_source_header": "Fri, 30 Jan 2026 10:11:25 GMT",
+      "range_metrics_scope": "R3 only; Linux compressed member reused after R2 full CRC/SHA verification. These metrics are not the total task network transfer."
+    },
+    {
+      "file": "system_logs_winlogbeat.zip",
+      "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717892",
+      "provider_bytes": 27123250952,
+      "published_whole_archive_md5": "7af54ba2977f7535d4c07beb6b1ec657",
+      "whole_archive_md5_verified": false,
+      "selected_members": [
+        {
+          "member": "daily_winlogbeat/D20_H18_2025-01-11T18_winlogbeat_F475.jsonl.bz2",
+          "bytes": 256501,
+          "sha256": "428e9358d989904496f0489278d375bf875dc3fc2cb6c74b8158a93ffefb850b",
+          "zip_crc32": "0d9f5a79",
+          "zip_crc_verified": true,
+          "reused_r2_verified_member": false,
+          "provided_member_md5": null,
+          "member_md5_verified": false,
+          "provided_raw_jsonl_md5": "989bf08056a320aee70479efd0c862a3",
+          "label_selection_hour_source": "2025-01-11T18",
+          "label_selection_is_not_assumed_raw_time_range": true
+        },
+        {
+          "member": "daily_winlogbeat/D21_H18_2025-01-12T18_winlogbeat_F499.jsonl.bz2",
+          "bytes": 336771,
+          "sha256": "5ef149b40a091fb4126ef6dd824e2dc360780b35268ec37b40d9c6d2b45a23c7",
+          "zip_crc32": "056c2cb1",
+          "zip_crc_verified": true,
+          "reused_r2_verified_member": false,
+          "provided_member_md5": null,
+          "member_md5_verified": false,
+          "provided_raw_jsonl_md5": "12cf6f9ddc3473438c750258b51d3a6b",
+          "label_selection_hour_source": "2025-01-12T18",
+          "label_selection_is_not_assumed_raw_time_range": true
+        },
+        {
+          "member": "daily_winlogbeat/D21_H11_2025-01-12T11_winlogbeat_F492.jsonl.bz2",
+          "bytes": 3564320,
+          "sha256": "09750e5ff95a6ef4dc6cd2a683814d0d3c9e237c75abeeb438bb946042be441a",
+          "zip_crc32": "8f293542",
+          "zip_crc_verified": true,
+          "reused_r2_verified_member": false,
+          "provided_member_md5": null,
+          "member_md5_verified": false,
+          "provided_raw_jsonl_md5": "3e257121660f22dd7af81f23d4e025d4",
+          "label_selection_hour_source": "2025-01-12T11",
+          "label_selection_is_not_assumed_raw_time_range": true
+        },
+        {
+          "member": "daily_winlogbeat/D21_H8_2025-01-12T08_winlogbeat_F489.jsonl.bz2",
+          "bytes": 3628637,
+          "sha256": "6ca400311958d007dd26f3ecc5f8513f0cdcf27cb634f05ecea107dbb8541d2d",
+          "zip_crc32": "67585381",
+          "zip_crc_verified": true,
+          "reused_r2_verified_member": false,
+          "provided_member_md5": null,
+          "member_md5_verified": false,
+          "provided_raw_jsonl_md5": "54a9d8c2b5496a68c46e8b7a0d7d3814",
+          "label_selection_hour_source": "2025-01-12T08",
+          "label_selection_is_not_assumed_raw_time_range": true
+        },
+        {
+          "member": "daily_winlogbeat/D20_H8_2025-01-11T08_winlogbeat_F465.jsonl.bz2",
+          "bytes": 3964656,
+          "sha256": "1a3c8dc3b12298fe34d71f09fa0325272d9227c9a603d23ff95f4677f550f668",
+          "zip_crc32": "5d7f29f4",
+          "zip_crc_verified": true,
+          "reused_r2_verified_member": false,
+          "provided_member_md5": null,
+          "member_md5_verified": false,
+          "provided_raw_jsonl_md5": "45fa500e20b097e84f42d248a2eac58c",
+          "label_selection_hour_source": "2025-01-11T08",
+          "label_selection_is_not_assumed_raw_time_range": true
+        },
+        {
+          "member": "daily_winlogbeat/D20_H11_2025-01-11T11_winlogbeat_F468.jsonl.bz2",
+          "bytes": 5381495,
+          "sha256": "15dda6cad2e12827ca904e77754c489c742fcd9d3418a914948d0aa5000098a9",
+          "zip_crc32": "363c91fb",
+          "zip_crc_verified": true,
+          "reused_r2_verified_member": false,
+          "provided_member_md5": null,
+          "member_md5_verified": false,
+          "provided_raw_jsonl_md5": "58fe4f468f2e1abc879dfaf47899429b",
+          "label_selection_hour_source": "2025-01-11T11",
+          "label_selection_is_not_assumed_raw_time_range": true
+        }
+      ],
+      "checksum_member": {
+        "name": "daily_winlogbeat/winlogbeat_md5sum.sig",
+        "bytes": 120514,
+        "sha256": "85fe6773b6c21ac1fdfafebd7378dae6fa899a09f3d7426d42aab4fa471a256e",
+        "zip_crc_verified": true
+      },
+      "checksum_basename_suffix_counts": {
+        ".jsonl.bz2": 0,
+        ".jsonl": 672,
+        ".log": 0,
+        ".bz2": 0
+      },
+      "transferred_bytes": 25949960,
+      "requested_bytes_upper_bound": 25949960,
+      "range_requests": 25,
+      "etag": "\"9ff54bafabcc31faff953e38e5cc2072-26\"",
+      "last_modified_source_header": "Fri, 30 Jan 2026 10:51:29 GMT",
+      "range_metrics_scope": "R3 only; Linux compressed member reused after R2 full CRC/SHA verification. These metrics are not the total task network transfer."
+    }
+  ],
+  "results": [
+    {
+      "raw_member": "daily_auditbeat/D19_H11_2025-01-10T11_auditbeat_F444.jsonl.bz2",
+      "counts": {
+        "rows": 6070169,
+        "invalid_identity_or_time": 0,
+        "out_of_window": 0,
+        "same_identity_different_content": 1700,
+        "matched_rows": 5190,
+        "time_regressions": 0
+      },
+      "bytes": 9659587674,
+      "sha256": "a29d093b9745719c6f05ff0654fd950d5d322e15a4ce7dd71e6f1b5a34cc9efb",
+      "iterator_exhausted": true,
+      "expected_label_records": 5190,
+      "matched_unique_records": 5190,
+      "duplicate_matches": 0,
+      "matched_class_1": 4409,
+      "matched_class_2_only": 781,
+      "min_observed_kst": "2025-01-10T20:00:00.692000+09:00",
+      "max_observed_kst": "2025-01-10T20:59:59.996000+09:00",
+      "unmatched_rows_are_not_benign_labels": true,
+      "training_admitted": 0,
+      "integrity_scope": "Caller must verify archive/member CRC and compression EOF separately.",
+      "bz2_eof_verified": true,
+      "matches_sha256": "e92d748bded0bebaab1a69b541df8f2e6bd9cd7c79764fc1e662b52583735531",
+      "missing_label_records": 0,
+      "provided_raw_jsonl_md5": "16ce28e70d16ba9acf3eeaf52b060814",
+      "provided_raw_jsonl_md5_verified": true
+    },
+    {
+      "raw_member": "daily_winlogbeat/D20_H18_2025-01-11T18_winlogbeat_F475.jsonl.bz2",
+      "counts": {
+        "rows": 1745,
+        "invalid_identity_or_time": 0,
+        "out_of_window": 0,
+        "same_identity_different_content": 0,
+        "matched_rows": 2,
+        "time_regressions": 0
+      },
+      "bytes": 4849853,
+      "sha256": "e2a395d64acfc358ba91c3fd3cad7dccdf37bcae9d2ad334659ebe9f31006107",
+      "iterator_exhausted": true,
+      "expected_label_records": 2,
+      "matched_unique_records": 2,
+      "duplicate_matches": 0,
+      "matched_class_1": 2,
+      "matched_class_2_only": 0,
+      "min_observed_kst": "2025-01-12T03:00:00.241000+09:00",
+      "max_observed_kst": "2025-01-12T03:11:51.839000+09:00",
+      "unmatched_rows_are_not_benign_labels": true,
+      "training_admitted": 0,
+      "integrity_scope": "Caller must verify archive/member CRC and compression EOF separately.",
+      "bz2_eof_verified": true,
+      "matches_sha256": "4fed3639749529d04996f1294880782c6908c24cba58948ec1bc4c5ecb1dc111",
+      "missing_label_records": 0,
+      "provided_raw_jsonl_md5": "989bf08056a320aee70479efd0c862a3",
+      "provided_raw_jsonl_md5_verified": true
+    },
+    {
+      "raw_member": "daily_winlogbeat/D21_H18_2025-01-12T18_winlogbeat_F499.jsonl.bz2",
+      "counts": {
+        "rows": 2509,
+        "invalid_identity_or_time": 0,
+        "out_of_window": 0,
+        "same_identity_different_content": 0,
+        "matched_rows": 2,
+        "time_regressions": 0
+      },
+      "bytes": 7590935,
+      "sha256": "343aa02ab5b644a84e3e78e38725768ca12a600f818664304dfcd82f98e989c9",
+      "iterator_exhausted": true,
+      "expected_label_records": 2,
+      "matched_unique_records": 2,
+      "duplicate_matches": 0,
+      "matched_class_1": 2,
+      "matched_class_2_only": 0,
+      "min_observed_kst": "2025-01-13T03:00:00.554000+09:00",
+      "max_observed_kst": "2025-01-13T03:26:50.082000+09:00",
+      "unmatched_rows_are_not_benign_labels": true,
+      "training_admitted": 0,
+      "integrity_scope": "Caller must verify archive/member CRC and compression EOF separately.",
+      "bz2_eof_verified": true,
+      "matches_sha256": "aa7e7af4f3751534c16ffb43274b677fefbb5be4fc02a1ad98ace2e284ea3a5f",
+      "missing_label_records": 0,
+      "provided_raw_jsonl_md5": "12cf6f9ddc3473438c750258b51d3a6b",
+      "provided_raw_jsonl_md5_verified": true
+    },
+    {
+      "raw_member": "daily_winlogbeat/D21_H11_2025-01-12T11_winlogbeat_F492.jsonl.bz2",
+      "counts": {
+        "rows": 29333,
+        "invalid_identity_or_time": 0,
+        "out_of_window": 0,
+        "same_identity_different_content": 0,
+        "matched_rows": 2,
+        "time_regressions": 0
+      },
+      "bytes": 72650739,
+      "sha256": "65e00a033eb46744a477ef8d0e0a25ffbc3f2e6786001e47604bfa241d65af12",
+      "iterator_exhausted": true,
+      "expected_label_records": 2,
+      "matched_unique_records": 2,
+      "duplicate_matches": 0,
+      "matched_class_1": 2,
+      "matched_class_2_only": 0,
+      "min_observed_kst": "2025-01-12T20:00:00.640000+09:00",
+      "max_observed_kst": "2025-01-12T20:59:31.657000+09:00",
+      "unmatched_rows_are_not_benign_labels": true,
+      "training_admitted": 0,
+      "integrity_scope": "Caller must verify archive/member CRC and compression EOF separately.",
+      "bz2_eof_verified": true,
+      "matches_sha256": "7185f988a8a0787ca8c460796637bef0b23dbd16b199bb9a753b277fd037a8ee",
+      "missing_label_records": 0,
+      "provided_raw_jsonl_md5": "3e257121660f22dd7af81f23d4e025d4",
+      "provided_raw_jsonl_md5_verified": true
+    },
+    {
+      "raw_member": "daily_winlogbeat/D21_H8_2025-01-12T08_winlogbeat_F489.jsonl.bz2",
+      "counts": {
+        "rows": 20345,
+        "invalid_identity_or_time": 0,
+        "out_of_window": 0,
+        "same_identity_different_content": 415,
+        "matched_rows": 191,
+        "time_regressions": 0
+      },
+      "bytes": 64863005,
+      "sha256": "7b29f99fff5f09796dcff269f9e76dec47e4682926e7098bd32accf00a8090da",
+      "iterator_exhausted": true,
+      "expected_label_records": 191,
+      "matched_unique_records": 191,
+      "duplicate_matches": 0,
+      "matched_class_1": 191,
+      "matched_class_2_only": 0,
+      "min_observed_kst": "2025-01-12T17:04:22.164000+09:00",
+      "max_observed_kst": "2025-01-12T17:59:18.849000+09:00",
+      "unmatched_rows_are_not_benign_labels": true,
+      "training_admitted": 0,
+      "integrity_scope": "Caller must verify archive/member CRC and compression EOF separately.",
+      "bz2_eof_verified": true,
+      "matches_sha256": "d3dac457c062fa63043e3f8118da6d9e5810159c45e65d14c2bd3eb0b7a8d054",
+      "missing_label_records": 0,
+      "provided_raw_jsonl_md5": "54a9d8c2b5496a68c46e8b7a0d7d3814",
+      "provided_raw_jsonl_md5_verified": true
+    },
+    {
+      "raw_member": "daily_winlogbeat/D20_H8_2025-01-11T08_winlogbeat_F465.jsonl.bz2",
+      "counts": {
+        "rows": 22540,
+        "invalid_identity_or_time": 0,
+        "out_of_window": 0,
+        "same_identity_different_content": 347,
+        "matched_rows": 191,
+        "time_regressions": 0
+      },
+      "bytes": 71155091,
+      "sha256": "de299ac06a78d3373997bb12eab36f2042c1a1d8e92d034e0de276e8a2103741",
+      "iterator_exhausted": true,
+      "expected_label_records": 191,
+      "matched_unique_records": 191,
+      "duplicate_matches": 0,
+      "matched_class_1": 191,
+      "matched_class_2_only": 0,
+      "min_observed_kst": "2025-01-11T17:18:25.992000+09:00",
+      "max_observed_kst": "2025-01-11T17:59:21.419000+09:00",
+      "unmatched_rows_are_not_benign_labels": true,
+      "training_admitted": 0,
+      "integrity_scope": "Caller must verify archive/member CRC and compression EOF separately.",
+      "bz2_eof_verified": true,
+      "matches_sha256": "d9123bf3baee56bb4c8cb88e5052738836e04164ee7e56d063124622b3ba3eec",
+      "missing_label_records": 0,
+      "provided_raw_jsonl_md5": "45fa500e20b097e84f42d248a2eac58c",
+      "provided_raw_jsonl_md5_verified": true
+    },
+    {
+      "raw_member": "daily_winlogbeat/D20_H11_2025-01-11T11_winlogbeat_F468.jsonl.bz2",
+      "counts": {
+        "rows": 42287,
+        "invalid_identity_or_time": 0,
+        "out_of_window": 0,
+        "same_identity_different_content": 0,
+        "matched_rows": 3,
+        "time_regressions": 0
+      },
+      "bytes": 105993248,
+      "sha256": "c85cd68c1b78b2cd81c4c5deb52c53c72e0d175223050630be3bba21c8c96430",
+      "iterator_exhausted": true,
+      "expected_label_records": 3,
+      "matched_unique_records": 3,
+      "duplicate_matches": 0,
+      "matched_class_1": 3,
+      "matched_class_2_only": 0,
+      "min_observed_kst": "2025-01-11T20:00:15.018000+09:00",
+      "max_observed_kst": "2025-01-11T20:59:01.039000+09:00",
+      "unmatched_rows_are_not_benign_labels": true,
+      "training_admitted": 0,
+      "integrity_scope": "Caller must verify archive/member CRC and compression EOF separately.",
+      "bz2_eof_verified": true,
+      "matches_sha256": "08119812ac226cc0941186ddf694980f1d7b08441cec5fe4d1ac05bcc095d86b",
+      "missing_label_records": 0,
+      "provided_raw_jsonl_md5": "58fe4f468f2e1abc879dfaf47899429b",
+      "provided_raw_jsonl_md5_verified": true
+    }
+  ],
+  "validation": {
+    "linkage_regression_tests": 12,
+    "existing_range_tests": 6,
+    "independent_full_raw_reread": "Direct decoded-object equality plus all matched coordinates, raw/label SHA, class membership and explicit-zone KST. No linkage module import.",
+    "independent_proof_sha256": "eadc44bef54b9dfaeaa7cd3efba6247adbca9715f1c9b78e57a043542576904e",
+    "selected_raw_md5_verified": 7,
+    "whole_archives_md5_verified": false,
+    "sig_files_are_plain_md5_manifests_not_verified_digital_signatures": true,
+    "source_sha256": {
+      "link_dedale_labels.py": "ba0b8cdc3dee98649706130f97e397a8b51ec02ba2ed90e4d228e31ac754800c",
+      "remote_zip.py": "b068e0be87f8ae697732b59247d983766fcdfc2e4636b04b3c12335451be31d6",
+      "tests/test_dedale_linkage.py": "c72144b0f8fa93c1b34561c7ea257016e3e793c2accc6d04c0d72d577d23a8d5"
+    }
+  },
+  "selection_and_limits": [
+    "Linux selection covers all 5190 provider internal-server labels; Windows selection covers 391 of 10593 labels, all class 1.",
+    "Six Windows hours were selected for smaller compressed size; they are not a random or representative sample.",
+    "Seven time windows belong to one connected exercise; 5581 events are not 5581 independent incidents or training dialogues.",
+    "Unmatched raw events are not automatically benign. Same host/time with different content is not a faulty label or an exact match.",
+    "Official attack-period evaluation role is preserved. Inspected source content is review-exposed, not an untouched final evaluation for model selection.",
+    "Whole archive checksum, all remaining raw logs, network/Suricata correlation and independent expert label validation remain unverified.",
+    "No new training, model evaluation score, deployment or operational SOC completeness claim follows from record consistency."
+  ],
+  "failed_attempts": [
+    {
+      "attempt": "R1",
+      "cause": "urllib default CA store could not verify repository TLS; retried with existing Requests CA bundle and certificate verification enabled. No TLS bypass."
+    },
+    {
+      "attempt": "R2",
+      "cause": "Explicit 4GiB decoded-stream limit reached; not a complete scan. Verified compressed member retained and rehashed for R3."
+    },
+    {
+      "attempt": "R3",
+      "resolution": "Explicit 16GiB streaming limit per member, complete EOF/CRC/SHA and independent raw MD5 checks; no whole decoded JSON file on disk."
+    }
+  ],
+  "execution_scope": {
+    "training_admitted": 0,
+    "new_packages_on_Mac": 0,
+    "gpu_or_server_access": false,
+    "production_changed": false,
+    "actual_MCP_chat_attack_E2E": false,
+    "whole_training_pack_created": false,
+    "new_server_installation": false,
+    "runtime_logs_and_match_coordinates": "Local ignored evidence only; raw messages and commands are not copied into this report."
+  }
+}

@@ -1,5 +1,18 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**실제 토큰·과거 자료 검사 완료 — 2026-10-30 KST:** [후속 원장](SOC_OBSERVATION_GATE_REVIEW.json)은 R2의 고정 dialogue/lineage SHA에 대한 실제 Qwen 검사와 V4/V5 대조를 담는다. 17/17개 통과, 최대2,876토큰·답변절단0·입력/패딩 마스크 정합이다. 기존 R2의 `tokenizer_length_verified:false`는 생성 당시 기록으로 보존하고, 이 별도 증빙을 최신 결과로 참조한다. 원본 모델 메타데이터11파일도 고정 manifest와 일치했다. Thor 기존 이미지/venv에서 CPU만 사용했고 Ollama를 중지하지 않았다.
+
+`audit_soc_observation_history.py`는 V4/V5 고정원장에 맞는 6분할·2사례파일의 해시/건수/ID/분할을 확인한 뒤 기존 자료의 첫 질문과 환경을 비교한다. 실제39파일44,630행은 중복판본을 포함한 행 방문 수이며 고유사건 수가 아니다. 첫 질문 완전일치0, AIT9후보는 V4 학습환경5개/78사례와 같은환경이다. 기존 검증/시험환경 충돌0이다. V4 원본54행의 좌표/해시 비교는 처리된 ADS행과 별개이며 전체의미·원천독립성을 보장하지 않는다. Linux-APT가 V4/V5의 명시된 출처목록에 없다는 사실도 모든이전자료/사전학습에 없었다는 의미가 아니다.
+
+```sh
+python3 -B finetuning/audit_soc_observation_history.py \
+  --candidate-dir finetuning/data-soc-observation-candidate-20261030-r2 \
+  --output /new/local-history-audit.json
+python3 -B -m unittest discover -s finetuning/tests -p 'test_soc_observation*.py'
+```
+
+후보·과거본문은 Git 제외 자료다. 기존 고정경로의 원본이 필요하며 해시가 다르거나 출력파일이 있으면 덮어쓰지 않는다. 원장의 통과 상태는 SFT 편입허가나 모델점수가 아니다. 새 학습0·새 독립평가0이며 배합/별도평가 고정이 다음 단계다. 이 검사 소스/원장만 pack 허용목록에 추가했고 R2 후보·복구한 본문을 자동 학습편입하지 않는다. 실제MCP/메신저·승인/쓰기/원복·공격E2E와 전체학습pack 실행은 별도 미완료다.
+
 **CAM 입력 검수:** `audit_cam_inputs.py`는 공식 고정파일의 질문990개↔라벨883개 연결, 반복/기법범위와 입력의ATT&CK ID를 검사한다. 라벨의상위81개와질문의80개 차이는원천범위 차이다. 구조화센서주석의정답완전일치23개(고유12입력)를별도표시하며 단순ID문자열출현을모두정답누출로세지않는다. [버전·출처·11회귀·독립대조](CAM_INPUT_REVIEW.json).
 
 ```sh

@@ -1,0 +1,657 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T16:36:50.901924+09:00",
+  "status": "token_and_scoped_history_gates_passed_admission_pending",
+  "actual_tokenizer": {
+    "records": [
+      {
+        "id": "OBS-f3065e69e689a02ad770",
+        "tokens": 1086,
+        "prompt_tokens": 691,
+        "supervised_tokens": 395,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-e919546d6602f1a1cbbc",
+        "tokens": 1129,
+        "prompt_tokens": 548,
+        "supervised_tokens": 581,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-46006b922fa39f807796",
+        "tokens": 1578,
+        "prompt_tokens": 1020,
+        "supervised_tokens": 558,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-5ff728a72add111f418a",
+        "tokens": 1052,
+        "prompt_tokens": 656,
+        "supervised_tokens": 396,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-949d7835f633a927703f",
+        "tokens": 1117,
+        "prompt_tokens": 545,
+        "supervised_tokens": 572,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-a78236312e57a359fa22",
+        "tokens": 1092,
+        "prompt_tokens": 528,
+        "supervised_tokens": 564,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-d31f9c60c6cb5325c57e",
+        "tokens": 1117,
+        "prompt_tokens": 545,
+        "supervised_tokens": 572,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-2b7df3408040eda076c6",
+        "tokens": 1344,
+        "prompt_tokens": 789,
+        "supervised_tokens": 555,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-508136c59500515fd4aa",
+        "tokens": 1171,
+        "prompt_tokens": 580,
+        "supervised_tokens": 591,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-52d3313479d0b4f963f5",
+        "tokens": 2876,
+        "prompt_tokens": 2461,
+        "supervised_tokens": 415,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-3e4858b99efb4ae15bbf",
+        "tokens": 731,
+        "prompt_tokens": 553,
+        "supervised_tokens": 178,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-c113869aede8276540eb",
+        "tokens": 540,
+        "prompt_tokens": 408,
+        "supervised_tokens": 132,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-750ffd03d135fe562cf7",
+        "tokens": 515,
+        "prompt_tokens": 373,
+        "supervised_tokens": 142,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-6cbf2e14a1c90742b02e",
+        "tokens": 544,
+        "prompt_tokens": 384,
+        "supervised_tokens": 160,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-b3f418384db0435f6218",
+        "tokens": 518,
+        "prompt_tokens": 392,
+        "supervised_tokens": 126,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-dfa85a51e78251499ddc",
+        "tokens": 633,
+        "prompt_tokens": 474,
+        "supervised_tokens": 159,
+        "truncated": false,
+        "failure": null
+      },
+      {
+        "id": "OBS-c984373506708f1f8e8d",
+        "tokens": 451,
+        "prompt_tokens": 336,
+        "supervised_tokens": 115,
+        "truncated": false,
+        "failure": null
+      }
+    ],
+    "failures": {},
+    "all_fit_and_aligned": true,
+    "measured_records": 17,
+    "max_tokens": 2876,
+    "training_admitted": 0,
+    "checked_at_kst": "2026-10-30T16:29:34.439988+09:00",
+    "model": "Qwen/Qwen3.6-35B-A3B",
+    "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "tokenizer_metadata_sha256": {
+      "chat_template.jinja": "e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259",
+      "config.json": "93a4693fa9d8392fbfccd4b3c9873f4bfdcb14fdede978b123d07d19675efe99",
+      "configuration.json": "c1b09db419119513247e9b8b912c4b9897106c9b20c6cada7e107d993c5435eb",
+      "generation_config.json": "e70c136c1b78ddc1fb0905bac8e733a4dc448d4f852a5dd75143fffc70be550e",
+      "merges.txt": "a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d",
+      "model.safetensors.index.json": "41b9356101ebf8e7519e150dc811f80c4226e727301fbb032b890f006ed0be83",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+      "tokenizer_config.json": "5186f0defcd7f232382c7f0aebcd2252d073bb921ab240e407b7ae8745d2b29b",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003"
+    },
+    "candidate_dialogues_sha256": "5f0256aa0b9c4f8aa97871b0a7e0789253a261670e8c0b5342559665e651f426",
+    "candidate_lineage_sha256": "c7c8277e3f48eb97378fa58beaa04a475416d7690618b74691a4e3759625099d",
+    "checker_sha256": "b3ba36fc8dabab88f8717f6a0320303efe439ebe93b40ea088fbfb30d060ac2e",
+    "actual_tokenizer": true,
+    "max_length": 4096,
+    "GPU_training": false
+  },
+  "runtime": {
+    "image": "nvcr.io/nvidia/pytorch@sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb",
+    "configuration": {
+      "Runtime": "runc",
+      "NetworkMode": "none",
+      "Memory": 8589934592,
+      "MemorySwap": 8589934592,
+      "NanoCpus": 4000000000,
+      "DeviceRequests": null,
+      "ReadonlyRootfs": true
+    },
+    "started_at_kst": "2026-10-30T16:29:27.779652+09:00",
+    "finished_at_kst": "2026-10-30T16:29:35.543408+09:00",
+    "exit_code": 0,
+    "oom_killed": false,
+    "weight_loading": false,
+    "inference_requests": 0,
+    "ollama_active_before_and_after": true,
+    "service_restarts_requested": 0,
+    "packages_installed_on_mac_or_server": 0
+  },
+  "historical_audit": {
+    "schema": 1,
+    "checked_at_kst": "2026-10-30T16:33:26.819743+09:00",
+    "status": "scoped_history_checks_passed_not_admitted",
+    "candidate_dialogues_sha256": "5f0256aa0b9c4f8aa97871b0a7e0789253a261670e8c0b5342559665e651f426",
+    "candidate_lineage_sha256": "c7c8277e3f48eb97378fa58beaa04a475416d7690618b74691a4e3759625099d",
+    "historical_integrity": {
+      "V4": {
+        "splits": [
+          {
+            "file": "data-soc-operator-v4-r1/train.jsonl",
+            "rows": 332,
+            "sha256": "fcbcc6331c5d004a338148baeada48211314aa227c3dbfa145867fe58481b331"
+          },
+          {
+            "file": "data-soc-operator-v4-r1/validation.jsonl",
+            "rows": 94,
+            "sha256": "6eec2eadbf471761771db1a0d4621ef80c1845dc8392af32c07a27d93e584591"
+          },
+          {
+            "file": "data-soc-operator-v4-r1/test.jsonl",
+            "rows": 94,
+            "sha256": "ec401cadcbaf119e4a389df4f3e536ad322a715f8823ef3cb332072059077ff9"
+          }
+        ],
+        "source_cases": "data-soc-source-operator-v4-r1/cases.jsonl",
+        "source_cases_sha256": "0307e26799f0d2b9734c31604c7a1f21b03a463d05ef598cb6560c606ed1a578",
+        "cases": 520,
+        "spec_sha256": "2be7f3f32288a814944dfd8932d783500f29c1fa49e770c595819de2eff3ec83"
+      },
+      "V5": {
+        "splits": [
+          {
+            "file": "data-soc-evidence-v5-r3/train.jsonl",
+            "rows": 1024,
+            "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2"
+          },
+          {
+            "file": "data-soc-evidence-v5-r3/validation.jsonl",
+            "rows": 128,
+            "sha256": "ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6dd9ccbf593b7"
+          },
+          {
+            "file": "data-soc-evidence-v5-r3/test.jsonl",
+            "rows": 128,
+            "sha256": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045"
+          }
+        ],
+        "source_cases": "data-soc-source-evidence-v5-r3/cases.jsonl",
+        "source_cases_sha256": "dad7f409e64a628bc35602651e5f2f3e06a982f58c3d05516f7701828d8673e9",
+        "cases": 1280,
+        "spec_sha256": "17cc241cd1144e2092a6f4b4b4b53be9742fca6088bf6c3e496ff72861e41eda"
+      }
+    },
+    "prompt_audit": {
+      "method": "Whitespace-normalized exact first-user-input SHA256; no semantic independence claim",
+      "scanned": [
+        {
+          "file": "data/test.jsonl",
+          "rows": 932,
+          "sha256": "15b9f79720b78dce1f7c60f4388c683512c01e9c124d65ee82a052a0bd1b23cf"
+        },
+        {
+          "file": "data/train.jsonl",
+          "rows": 18872,
+          "sha256": "76bd506368e9a88a3d3c362a215de346d2b1236eef17890fc5ebda6b84b84dda"
+        },
+        {
+          "file": "data/validation.jsonl",
+          "rows": 980,
+          "sha256": "81f3819e415b3bd0fc752efe831218d188ba605215338cbdea969e7cd8e39a47"
+        },
+        {
+          "file": "data-soc-archive/v2-draft-01/test.jsonl",
+          "rows": 32,
+          "sha256": "f3ce6586bf8d37c878c940797765dcc6573cd8a825fb656b5b708416f406a74c"
+        },
+        {
+          "file": "data-soc-archive/v2-draft-01/train.jsonl",
+          "rows": 192,
+          "sha256": "fd97dbdefadabadd090793c958acaa4a265096213336f1b0412f889e76114cd3"
+        },
+        {
+          "file": "data-soc-archive/v2-draft-01/validation.jsonl",
+          "rows": 32,
+          "sha256": "39529c7dbef4939cd01757f3bac07bfb988c001185b4880306f94bea42b13a3b"
+        },
+        {
+          "file": "data-soc-archive/v2-draft-02/test.jsonl",
+          "rows": 32,
+          "sha256": "fff53f78373fbb34bb3685a54344b3144d7c72e1bdefa8bc3659864278233258"
+        },
+        {
+          "file": "data-soc-archive/v2-draft-02/train.jsonl",
+          "rows": 192,
+          "sha256": "330564ca7e27dca6b7ef8632a155a04d1c7bc19f60c6840de1ea643b0d182afe"
+        },
+        {
+          "file": "data-soc-archive/v2-draft-02/validation.jsonl",
+          "rows": 32,
+          "sha256": "f98dc1d5ac72bdf5bea455cbf5ddc177cc6d1e8e77b809c8090bed2fad210a97"
+        },
+        {
+          "file": "data-soc-evidence-v5-r3/test.jsonl",
+          "rows": 128,
+          "sha256": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045"
+        },
+        {
+          "file": "data-soc-evidence-v5-r3/train.jsonl",
+          "rows": 1024,
+          "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2"
+        },
+        {
+          "file": "data-soc-evidence-v5-r3/validation.jsonl",
+          "rows": 128,
+          "sha256": "ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6dd9ccbf593b7"
+        },
+        {
+          "file": "data-soc-operator-v3/test.jsonl",
+          "rows": 48,
+          "sha256": "155b398bc07625d8b5dbd89ff0cc0dd30f350bb61da8f36662945e6bf3fc2ea6"
+        },
+        {
+          "file": "data-soc-operator-v3/train.jsonl",
+          "rows": 192,
+          "sha256": "6b821d61760b1343c999fc054122a3bd3a75e6464e5a9ebc4f78dc2a7456a759"
+        },
+        {
+          "file": "data-soc-operator-v3/validation.jsonl",
+          "rows": 48,
+          "sha256": "55067e38742ddce0514cb1718832c660c85c38fcb2dc1224c2dec39802e56d77"
+        },
+        {
+          "file": "data-soc-operator-v3-r1/test.jsonl",
+          "rows": 60,
+          "sha256": "0873bc148ca2ccab683df1c53a4460cd6a1861736b54afeb9bd0379093a2e8c5"
+        },
+        {
+          "file": "data-soc-operator-v3-r1/train.jsonl",
+          "rows": 264,
+          "sha256": "b2110b772aa0e3d8c7f40da4fd2e4d41a5f9a50ff99fc649e30c13c95b43e484"
+        },
+        {
+          "file": "data-soc-operator-v3-r1/validation.jsonl",
+          "rows": 60,
+          "sha256": "919ffd74b36aaa0d9c6ebd16e7735b7cef15db539c9ac7b7cf195108f4cc4812"
+        },
+        {
+          "file": "data-soc-operator-v4-r1/test.jsonl",
+          "rows": 94,
+          "sha256": "ec401cadcbaf119e4a389df4f3e536ad322a715f8823ef3cb332072059077ff9"
+        },
+        {
+          "file": "data-soc-operator-v4-r1/train.jsonl",
+          "rows": 332,
+          "sha256": "fcbcc6331c5d004a338148baeada48211314aa227c3dbfa145867fe58481b331"
+        },
+        {
+          "file": "data-soc-operator-v4-r1/validation.jsonl",
+          "rows": 94,
+          "sha256": "6eec2eadbf471761771db1a0d4621ef80c1845dc8392af32c07a27d93e584591"
+        },
+        {
+          "file": "data-soc-v1/test.jsonl",
+          "rows": 36,
+          "sha256": "7717cc575ca111e70fa176a8da37d30450cf1cc15baaa27c3969171d136cf2db"
+        },
+        {
+          "file": "data-soc-v1/train.jsonl",
+          "rows": 144,
+          "sha256": "bd5c1272966dc75b7504997bccbfc6c74c55335c2592267f16271d0544116830"
+        },
+        {
+          "file": "data-soc-v1/validation.jsonl",
+          "rows": 32,
+          "sha256": "c65380b6c3812ad42564682494c3bbcb903d5e4effab5c9b87b3a7bae7ae71e8"
+        },
+        {
+          "file": "data-soc-v1-schema-only/test.jsonl",
+          "rows": 16,
+          "sha256": "f3e6ebd7410dd38bedac0999b02c9687433bad59ae80e6eecf346a5c8b7c0003"
+        },
+        {
+          "file": "data-soc-v1-schema-only/train.jsonl",
+          "rows": 72,
+          "sha256": "b588f709e39782cea3c4c069f0a780b0def7c82919752af2fcc61e65f4fec9a7"
+        },
+        {
+          "file": "data-soc-v1-schema-only/validation.jsonl",
+          "rows": 12,
+          "sha256": "ca2e51bdd856cfc5fbeaa16a2b74842992377ecdf1ff13f7dabf25c7b50096c7"
+        },
+        {
+          "file": "data-soc-v2/test.jsonl",
+          "rows": 32,
+          "sha256": "b07241983adc9d3eef686a9283645f4bfcabba06f4eae0b6c3c5e0bc4d22bf28"
+        },
+        {
+          "file": "data-soc-v2/train.jsonl",
+          "rows": 192,
+          "sha256": "f13d53fad444fd59440d6c29d8475d13f40950371de9e25422efa8dd9117d931"
+        },
+        {
+          "file": "data-soc-v2/validation.jsonl",
+          "rows": 32,
+          "sha256": "f98dc1d5ac72bdf5bea455cbf5ddc177cc6d1e8e77b809c8090bed2fad210a97"
+        },
+        {
+          "file": "data-soc-v2-r2/test.jsonl",
+          "rows": 32,
+          "sha256": "4e7bf5e8f988895fcd9efb437c1c231295befdf7e0bc1d59614481974edb755d"
+        },
+        {
+          "file": "data-soc-v2-r2/train.jsonl",
+          "rows": 192,
+          "sha256": "73e6345fd0e7fdd35c31272bcdd271528ffee52d86d9fd15af363d23bef25ac7"
+        },
+        {
+          "file": "data-soc-v2-r2/validation.jsonl",
+          "rows": 32,
+          "sha256": "ac515b0ed1ad2e7c613512d5e32c9aa707ed68c03356e55dcb59cfcfa6320850"
+        },
+        {
+          "file": "data-toolace-archive/v1-first-structural/test.jsonl",
+          "rows": 980,
+          "sha256": "a42368f5b47d39e5bb52545b38369978d528c4a12f3b9b591eb7f2c4b37b8b34"
+        },
+        {
+          "file": "data-toolace-archive/v1-first-structural/train.jsonl",
+          "rows": 8031,
+          "sha256": "2a86098be2accc79ea9b21b12ddd677f6c0c0ac0c071988edd2ce5641b133c79"
+        },
+        {
+          "file": "data-toolace-archive/v1-first-structural/validation.jsonl",
+          "rows": 1008,
+          "sha256": "5e113a88ea4be68423be70a890e93b1ba91ce1cf6c88ffa31180387a06a750fc"
+        },
+        {
+          "file": "data-toolace-v2/test.jsonl",
+          "rows": 980,
+          "sha256": "a42368f5b47d39e5bb52545b38369978d528c4a12f3b9b591eb7f2c4b37b8b34"
+        },
+        {
+          "file": "data-toolace-v2/train.jsonl",
+          "rows": 8031,
+          "sha256": "2a86098be2accc79ea9b21b12ddd677f6c0c0ac0c071988edd2ce5641b133c79"
+        },
+        {
+          "file": "data-toolace-v2/validation.jsonl",
+          "rows": 1008,
+          "sha256": "5e113a88ea4be68423be70a890e93b1ba91ce1cf6c88ffa31180387a06a750fc"
+        }
+      ],
+      "matches": [],
+      "required_historical_files_missing": [],
+      "full_cross_corpus_audit_complete": true,
+      "source_family_policy": "All candidates training-only; AIT historical environments reused, never new final test."
+    },
+    "source_group_audit": {
+      "candidate_groups": [
+        {
+          "candidate": "OBS-f3065e69e689a02ad770",
+          "group": "ait-lds-ads:fox",
+          "matched_v4_cases_by_split": {
+            "train": 12
+          }
+        },
+        {
+          "candidate": "OBS-e919546d6602f1a1cbbc",
+          "group": "ait-lds-ads:fox",
+          "matched_v4_cases_by_split": {
+            "train": 12
+          }
+        },
+        {
+          "candidate": "OBS-46006b922fa39f807796",
+          "group": "ait-lds-ads:fox",
+          "matched_v4_cases_by_split": {
+            "train": 12
+          }
+        },
+        {
+          "candidate": "OBS-5ff728a72add111f418a",
+          "group": "ait-lds-ads:russellmitchell",
+          "matched_v4_cases_by_split": {
+            "train": 30
+          }
+        },
+        {
+          "candidate": "OBS-949d7835f633a927703f",
+          "group": "ait-lds-ads:russellmitchell",
+          "matched_v4_cases_by_split": {
+            "train": 30
+          }
+        },
+        {
+          "candidate": "OBS-a78236312e57a359fa22",
+          "group": "ait-lds-ads:santos",
+          "matched_v4_cases_by_split": {
+            "train": 12
+          }
+        },
+        {
+          "candidate": "OBS-d31f9c60c6cb5325c57e",
+          "group": "ait-lds-ads:shaw",
+          "matched_v4_cases_by_split": {
+            "train": 12
+          }
+        },
+        {
+          "candidate": "OBS-2b7df3408040eda076c6",
+          "group": "ait-lds-ads:shaw",
+          "matched_v4_cases_by_split": {
+            "train": 12
+          }
+        },
+        {
+          "candidate": "OBS-508136c59500515fd4aa",
+          "group": "ait-lds-ads:wardbeck",
+          "matched_v4_cases_by_split": {
+            "train": 12
+          }
+        },
+        {
+          "candidate": "OBS-52d3313479d0b4f963f5",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        },
+        {
+          "candidate": "OBS-3e4858b99efb4ae15bbf",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        },
+        {
+          "candidate": "OBS-c113869aede8276540eb",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        },
+        {
+          "candidate": "OBS-750ffd03d135fe562cf7",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        },
+        {
+          "candidate": "OBS-6cbf2e14a1c90742b02e",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        },
+        {
+          "candidate": "OBS-b3f418384db0435f6218",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        },
+        {
+          "candidate": "OBS-dfa85a51e78251499ddc",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        },
+        {
+          "candidate": "OBS-c984373506708f1f8e8d",
+          "group": "linux-apt-2024-all-releases-and-derivatives",
+          "matched_v4_cases_by_split": {}
+        }
+      ],
+      "known_held_out_group_conflicts": [],
+      "candidates_reusing_v4_training_environments": 9,
+      "shared_v4_cases": 78,
+      "v4_raw_rows_comparable": 54,
+      "exact_original_row_matches": [],
+      "same_coordinate_different_hash": [],
+      "v4_source_uris": {
+        "project:soc-operator-curriculum-v3": 288,
+        "https://doi.org/10.5281/zenodo.8263181": 96,
+        "https://doi.org/10.5281/zenodo.5789064": 54,
+        "https://github.com/cisagov/kev-data/blob/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/known_exploited_vulnerabilities.json": 60,
+        "project:SOC_ROLE_MATRIX.json": 20,
+        "project:live-MCP-snapshot-2026-10-29T02:43:57+09:00": 2
+      },
+      "v5_providers": {
+        "MITRE ATT&CK": 1208,
+        "CISA AA24-038A": 49,
+        "CISA AA23-061A": 15,
+        "CISA AA24-131A": 8
+      },
+      "limitations": [
+        "Group linkage covers frozen V4/V5 metadata; other corpora receive exact-prompt checks only.",
+        "Original-row comparison covers V4 gather/ archive rows, not processed ADS hashes.",
+        "Linux-APT is absent from the declared V4/V5 source inventory; this is not a proof of absence from every older corpus or pretraining.",
+        "AIT environments already used in historical training cannot become new independent final evaluation.",
+        "All 17 reviewed candidates remain training-only candidates, not unseen evaluation or admitted SFT."
+      ]
+    },
+    "historical_row_visits": 44630,
+    "counts_are_unique_incidents": false,
+    "training_admitted": 0,
+    "independent_final_evaluation_created": 0,
+    "model_quality_tested": false,
+    "auditor_sha256": "613fe6ee9add17c998c77eb7cdb3fe7e590073ff872a5b304ae9fd357f8d224c"
+  },
+  "independent_cross_check": {
+    "at_kst": "2026-10-30T16:36:50.901924+09:00",
+    "independent_string_normalization_scan_files": 39,
+    "row_visits": 44630,
+    "exact_prompt_matches": 0,
+    "v4_training_environment_case_matches": 78,
+    "v4_held_out_environment_matches": 0,
+    "v5_frozen_sources_unchanged": 25
+  },
+  "retrieval": {
+    "files": 10,
+    "uncompressed_bytes": 10731875,
+    "frozen_split_hashes_verified": 6,
+    "source_case_hashes_verified": 2,
+    "manifests_verified_against_authenticated_server": 2,
+    "new_local_files_are_ignored_training_provenance": true
+  },
+  "execution_issue": {
+    "initial_start_failed": "Docker local logging rejects compression with max-file=1; no process started",
+    "correction": "Verified created/not-running state, removed only that failed container, restarted with max-file=2",
+    "successful_runtime_seconds": 7.763756
+  },
+  "remote_cleanup": {
+    "at_kst": "2026-10-30T16:34:24.189429+09:00",
+    "removed_temporary_files": 16,
+    "removed_temporary_bytes": 247992,
+    "container_removed": true,
+    "frozen_v5_sources_unchanged": 25,
+    "frozen_splits_and_source_cases_unchanged": true,
+    "retained_evidence_relative": "observation-gate-20261030-1629/{launch,retry-launch,token-check,observation,cleanup}.json"
+  },
+  "verification": {
+    "offline_regressions": 39,
+    "new_history_regressions": 9,
+    "old_inputs_targets_regressions": 30,
+    "model_quality_evaluation": false,
+    "MCP_chat_write_rollback_E2E": false,
+    "attack_E2E": false,
+    "new_server_full_install": false,
+    "complete_training_pack": false,
+    "cli_reproduced_except_timestamp": true,
+    "existing_output_refused": true,
+    "pack_initial_allowlist_paths_checked": 124
+  },
+  "decisions": {
+    "training_admitted": 0,
+    "new_final_evaluation_records": 0,
+    "existing_R1_R2_and_R8_preserved": true,
+    "original_model_not_replaced": true,
+    "immutable_R2_tokenizer_flag": "R2 sidecar retains its creation-time false flag; this later report proves exact-token checks for the same dialogue/lineage SHA."
+  },
+  "remaining": [
+    "Select a source/case-grouped learning mixture and review operator targets without treating institutional logs as certified expert responses.",
+    "Freeze a separate unused final evaluation; the 17 reviewed historical candidates are ineligible.",
+    "Handle CAM input labels, BETH capture/host mapping and other corpus-specific limitations before their inclusion.",
+    "Only after a frozen candidate plan, run small training/quality comparison and then evaluate real MCP/chat/approval/write/rollback behavior."
+  ],
+  "mac_cleanup": {
+    "at_kst": "2026-10-30T16:39:16.916236+09:00",
+    "removed_temporary_files": 10,
+    "removed_temporary_bytes": 2169895,
+    "only_publish_helper_pending_until_git_receipt": true,
+    "package_installations": 0,
+    "ignored_training_provenance_preserved": true
+  }
+}

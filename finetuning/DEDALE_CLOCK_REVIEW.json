@@ -272,5 +272,14 @@
     "Preserve provider temporal split and review exposure; no training admission from the official test period.",
     "Confirm host/flow/process and sensor coverage before assigning incident, benign, blocking or success labels.",
     "Keep new independent evaluation separate from the already-used final CTI test; resume tokenizer/live checks only when access is available."
-  ]
+  ],
+  "flow_followup": {
+    "at_kst": "2026-10-30T13:13:51.712930+09:00",
+    "file": "DEDALE_FLOW_REVIEW.json",
+    "network_uid_tuple_link": true,
+    "host_to_network_clock_conflict": true,
+    "host_after_flow_end_seconds": "5.308222",
+    "automatic_correction": false,
+    "training_admitted": 0
+  }
 }

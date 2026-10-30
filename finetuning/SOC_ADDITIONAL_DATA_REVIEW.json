@@ -580,5 +580,13 @@
     "epoch_ms_verified_for_pinned_export": true,
     "new_training_admitted": 0,
     "prior_unknown_clock_status_is_historical": true
+  },
+  "dedale_flow_followup": {
+    "at_kst": "2026-10-30T13:13:51.712930+09:00",
+    "file": "DEDALE_FLOW_REVIEW.json",
+    "raw_connections": 868616,
+    "raw_label_missing_value_changes": 3980,
+    "review_cases": 1,
+    "training_admitted": 0
   }
 }

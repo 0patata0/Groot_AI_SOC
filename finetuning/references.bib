@@ -534,3 +534,37 @@
   url = {https://gitlab.inria.fr/mlanvin/rescousse/-/tree/ba47b61ed577d2854fb2c1ebb5868652836eb88f},
   note = {Accessed 2026-10-30 KST. 11 selected file blobs verified. GPLv3 reference source, not incorporated or executed. Exact acquisition deployment revision not established. This is separate from the dedale_labeling license conflict.}
 }
+
+@manual{zeek_710_conn,
+  author = {{The Zeek Project}},
+  title = {Book of Zeek v7.1.0: conn.log},
+  url = {https://docs.zeek.org/en/v7.1.0/logs/conn.html},
+  urldate = {2026-10-30},
+  note = {Field and UID semantics reference; not proof of the DEDALE acquisition engine version or a security verdict.}
+}
+
+@manual{zeek_710_tsv,
+  author = {{The Zeek Project}},
+  title = {Book of Zeek v7.1.0: Log Formats and Inspection},
+  url = {https://docs.zeek.org/en/v7.1.0/log-formats.html},
+  urldate = {2026-10-30},
+  note = {TSV header and unset-value semantics used in original-versus-labeled data comparison.}
+}
+
+@misc{zeek_710_ntp_source,
+  author = {{The Zeek Project}},
+  title = {Zeek v7.1.0 NTP logging implementation},
+  url = {https://github.com/zeek/zeek/blob/v7.1.0/scripts/base/protocols/ntp/main.zeek},
+  urldate = {2026-10-30},
+  note = {Reference only, no source reuse. SHA256 03302cf555f5b670ab5c02b5dd2cf864a4f35d5a9ea08d421cf6e955064e44c8. Capture time and packet-declared transmit time remain distinct.}
+}
+
+@techreport{rfc5905_ntpv4,
+  author = {Mills, David and Martin, Jim and Burbank, Jack and Kasch, William},
+  title = {Network Time Protocol Version 4: Protocol and Algorithms Specification},
+  institution = {Internet Engineering Task Force},
+  number = {RFC 5905},
+  year = {2010},
+  url = {https://www.rfc-editor.org/rfc/rfc5905.html},
+  note = {Accessed 2026-10-30 KST. Sections 7.3--7.4: stratum 0, INIT and invalid KoD timestamps. Observed NTP headers are not a verified clock correction.}
+}

@@ -1,5 +1,15 @@
 # 데이터 출처와 사용 범위
 
+## DEDALE D19 flow·SSH·NTP 및 결측 표현 — 2026-10-30 KST
+
+[공식 V2.1 데이터](https://doi.org/10.57745/Y5JLDG), Lanvin·Majorczyk, CC BY4.0. [Zeek archive](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717877)의 D19 4멤버를 중앙목록 포함81,079,064B 범위 읽기했다. 3,405,887,752B 전체 ZIP 다운로드/MD5 검증은 하지 않았으며 선택멤버 CRC/SHA를 확인했다. 네트워크868,616행·SSH15행·NTP9,324행은 실제 연구 시험망 수집 기록이며 운영 피해사고 로그나 학습 대화 수가 아니다. [상세 무결성·분할·검증 원장](DEDALE_FLOW_REVIEW.json).
+
+원문과 제공 CSV의 전체 필드 대조에서864,636행 일치,3,980행의 결측 표현 차이를 발견했다. service '-'→빈칸3,956행, duration/orig_bytes/resp_bytes '-'→0 각각1,094행이다. 원문 결측을 보존하며 class0/1과 관측값·판단을 분리한다. class1 다섯 흐름은 같은 collection/TA0009/T1005 단계 주석이며 독립 사건5개로 합산하지 않는다.
+
+[Zeek v7.1.0 conn 문서](https://docs.zeek.org/en/v7.1.0/logs/conn.html)·[TSV 문서](https://docs.zeek.org/en/v7.1.0/log-formats.html)와 [NTP 태그 소스](https://github.com/zeek/zeek/blob/v7.1.0/scripts/base/protocols/ntp/main.zeek)를 필드 해석에 참조했다. 실제 수집 당시 버전/배포 증명은 아니며 코드를 복사하지 않았다. [RFC5905 §7.3–7.4](https://www.rfc-editor.org/rfc/rfc5905.html)는 stratum0/INIT·무효 시각 해석 근거다. 관측한 mode3 전송-캡처 차이를 인증된 시계 오프셋으로 쓰지 않는다.
+
+D19는 공식 마지막2주 시험기간이며 검토 노출됐다. 개발 사례의 질문/검수 기준은 프로젝트 작성이고 기관 공식 정답/독립 전문가 검수가 아니다. SFT 및 미사용 최종평가 편입0, 모델 호출0. 이전 원문/라벨/경보 검증과 중복 합산하지 않는다.
+
 ## DEDALE 원본 syslog 시각·정밀도 확인 — 2026-10-30 KST
 
 [공식 syslog ZIP](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717890)125,537,856B의 전체 제공MD5/SHA와 내부672개 원시 JSONL MD5를 검증했다. 해제 원문5,017,693행에서 경보1,465,627행 전체를 기존 Suricata export에 연결해 UTC epoch-ms 표현을 확인했다. [원장·정규화 경계·재현](DEDALE_CLOCK_REVIEW.json). 비시간 필드는 모두 대조하고 `@version`/`pid`의 문자열↔정수만 명시적으로 변환했다.

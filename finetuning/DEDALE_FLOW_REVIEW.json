@@ -1,0 +1,344 @@
+{
+  "schema": "dedale-flow-review-v1",
+  "reviewed_at_kst": "2026-10-30T13:13:51.712930+09:00",
+  "status": "source evidence reviewed; no training admission or production change",
+  "dataset": {
+    "name": "DEDALE",
+    "doi": "10.57745/Y5JLDG",
+    "version": "2.1",
+    "record_url": "https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_sha256": "d6b12c27d80c9b10ebb7910b7bb5a084556f1ee51c68e7eef56eda1596c8ba6d",
+    "metadata_rechecked_unchanged": true,
+    "license": "CC BY 4.0; attribution required",
+    "nature": "Four-week virtualized research testbed, not production victim incident logs",
+    "attribution": "Maxime Lanvin and Frederic Majorczyk, DEDALE, Recherche Data Gouv, DOI 10.57745/Y5JLDG, V2.1; paper DOI 10.1007/978-3-032-16092-8_1"
+  },
+  "archive": {
+    "file_id": 717877,
+    "filename": "zeek_orange_servers.zip",
+    "bytes": 3405887752,
+    "provider_checksum": {
+      "type": "MD5",
+      "value": "ed2256f2f385e0755096f72d05c04707"
+    },
+    "metadata_sha256": "d6b12c27d80c9b10ebb7910b7bb5a084556f1ee51c68e7eef56eda1596c8ba6d",
+    "entry_count": 502,
+    "range_bytes": 112904,
+    "range_calls": 1,
+    "whole_archive_downloaded": false,
+    "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717877",
+    "file_doi": "10.57745/NOYZVU",
+    "whole_archive_md5_verified": false,
+    "selected_members": [
+      {
+        "member": "orange_servers/D19_2025-01-10_output_orange_servers_Zeek/ssh.log",
+        "bytes": 4986,
+        "compressed_bytes": 913,
+        "zip_crc32": "008f9c53",
+        "zip_crc_verified": true,
+        "sha256": "ff9472f8533e61178e523c68ed0ad0b8de02d88006823004055eb7094fb55906",
+        "at_kst": "2026-10-30T12:49:44.943238+09:00"
+      },
+      {
+        "member": "orange_servers/D19_2025-01-10_output_orange_servers_Zeek/conn.log",
+        "bytes": 104463446,
+        "compressed_bytes": 30271263,
+        "zip_crc32": "cba76980",
+        "zip_crc_verified": true,
+        "sha256": "896945607d22360c1d6ae62ec1223a3963c4417b075deb08b300573abbddbb68",
+        "at_kst": "2026-10-30T12:50:59.822832+09:00"
+      },
+      {
+        "member": "orange_servers/D19_2025-01-10_output_orange_servers_Zeek/conn_labeled.csv",
+        "bytes": 142489433,
+        "compressed_bytes": 36049201,
+        "zip_crc32": "342855ea",
+        "zip_crc_verified": true,
+        "sha256": "ff5ab79234f5330c51bc0a081858d9fc49ca8fe7a987f9702e95485f5ebedcd9",
+        "at_kst": "2026-10-30T12:52:57.956844+09:00"
+      },
+      {
+        "member": "orange_servers/D19_2025-01-10_output_orange_servers_Zeek/ntp.log",
+        "bytes": 1709386,
+        "compressed_bytes": 279751,
+        "zip_crc32": "6b708016",
+        "sha256": "b439144ed451ed3e710dd037cff3672febe98dee46c812776bb37817e08daafb",
+        "zip_crc_verified": true,
+        "range_bytes": 1161480,
+        "range_calls": 2,
+        "whole_archive_md5_verified": false
+      }
+    ],
+    "member_range_bytes": 80966160,
+    "central_directory_range_bytes": 112904,
+    "total_zeek_range_bytes": 81079064,
+    "whole_archive_bytes": 3405887752
+  },
+  "selection": {
+    "day": "D19_2025-01-10",
+    "environment": "orange_servers",
+    "reason": "Follow up the existing host audit/sshd session candidate with flow, SSH and NTP evidence. Targeted selection is not representative sampling.",
+    "official_period": "final two-week test period; not SFT",
+    "review_exposed": true
+  },
+  "counts": {
+    "raw_connections": 868616,
+    "labeled_connections": 868616,
+    "provider_labels": {
+      "0": 868611,
+      "1": 5
+    },
+    "ssh_records": 15,
+    "ntp_records": 9324,
+    "ntp_mode_counts": {
+      "3": 4662,
+      "4": 4662
+    },
+    "full_core_matches": 864636,
+    "raw_label_field_mismatches": 3980,
+    "independent_incidents_not_counted": true
+  },
+  "raw_label_differences": {
+    "all_mismatches_provider_class": "0",
+    "independent_uid_mapping_unique": true,
+    "changed_field_sets": {
+      "duration,orig_bytes,resp_bytes,service": 1070,
+      "service": 2886,
+      "duration,orig_bytes,resp_bytes": 24
+    },
+    "transitions": {
+      "[\"service\", \"-\", \"\"]": 3956,
+      "[\"duration\", \"-\", \"0\"]": 1094,
+      "[\"orig_bytes\", \"-\", \"0\"]": 1094,
+      "[\"resp_bytes\", \"-\", \"0\"]": 1094
+    },
+    "policy": "Preserve raw unset values; retain annotations separately. Missing is not measured zero. No implicit repair, deletion or benign inference. All other core fields agree for these unique UIDs.",
+    "timestamp_difference_rows": 0,
+    "scientific_notation": "CSV durations may use exponent notation; only mathematically exact microseconds accepted. Raw Zeek remains strict."
+  },
+  "session": {
+    "uid": "CoBp3M27hpAVBv1n38",
+    "tuple": [
+      "172.16.1.2",
+      56325,
+      "172.16.0.2",
+      22
+    ],
+    "protocol": "tcp",
+    "network_comparison": {
+      "network_logs_linked": true,
+      "connection_start_kst": "2025-01-10T20:34:02.108849+09:00",
+      "connection_end_kst": "2025-01-10T20:34:04.453778+09:00",
+      "ssh_transaction_kst": "2025-01-10T20:34:02.142877+09:00",
+      "host_timestamp_kst": "2025-01-10T20:34:09.762000+09:00",
+      "duration_us": 2344929,
+      "host_inside_raw_network_interval": false,
+      "host_after_network_end_us": 5308222,
+      "clock_adjustment_applied_us": 0,
+      "host_to_network_confirmation": "Requires independently justified clock alignment and process/session context."
+    },
+    "raw_conn_reference": {
+      "line": 259555,
+      "byte_offset": 31267194,
+      "raw_line_sha256": "9167da8270787f6f32c9ce1a379c99d7cb3db90e0aa21616d893c3770e40cd7e"
+    },
+    "label_reference": {
+      "line": 259640,
+      "end_line": 259640,
+      "byte_offset": 42646397,
+      "raw_line_sha256": "0a83e7f968fd245b4b18d08fbdd6749bcbc41eac2acc35eaa9e729b05e09bb1d"
+    },
+    "provider_annotation": {
+      "label": "1",
+      "step": "15",
+      "attack_step": "collection",
+      "tactic": "TA0009",
+      "technique": "T1005",
+      "independent_certification": false
+    },
+    "host_prior_report": "DEDALE_CLOCK_REVIEW.json#host_session_support",
+    "judgment": "Network conn and SSH share UID/endpoints; host correlation remains a candidate with conflicting clocks. RSTO and auth_success are not security verdicts."
+  },
+  "ntp": {
+    "selected_observations": [
+      {
+        "capture_kst": "2025-01-10T20:17:55.226519+09:00",
+        "declared_transmit_minus_capture_us": 6918052,
+        "stratum": "0",
+        "ref_id": "INIT",
+        "usable_as_authoritative_clock_correction": false,
+        "reason": "Packet header difference alone is not a verified synchronization result."
+      },
+      {
+        "capture_kst": "2025-01-10T20:17:57.226687+09:00",
+        "declared_transmit_minus_capture_us": 6918052,
+        "stratum": "0",
+        "ref_id": "INIT",
+        "usable_as_authoritative_clock_correction": false,
+        "reason": "Packet header difference alone is not a verified synchronization result."
+      },
+      {
+        "capture_kst": "2025-01-10T20:34:55.220660+09:00",
+        "declared_transmit_minus_capture_us": 6923950,
+        "stratum": "0",
+        "ref_id": "INIT",
+        "usable_as_authoritative_clock_correction": false,
+        "reason": "Packet header difference alone is not a verified synchronization result."
+      },
+      {
+        "capture_kst": "2025-01-10T20:34:57.220594+09:00",
+        "declared_transmit_minus_capture_us": 6923975,
+        "stratum": "0",
+        "ref_id": "INIT",
+        "usable_as_authoritative_clock_correction": false,
+        "reason": "Packet header difference alone is not a verified synchronization result."
+      },
+      {
+        "capture_kst": "2025-01-10T20:34:59.220574+09:00",
+        "declared_transmit_minus_capture_us": 6923986,
+        "stratum": "0",
+        "ref_id": "INIT",
+        "usable_as_authoritative_clock_correction": false,
+        "reason": "Packet header difference alone is not a verified synchronization result."
+      },
+      {
+        "capture_kst": "2025-01-10T20:35:01.220612+09:00",
+        "declared_transmit_minus_capture_us": 6923979,
+        "stratum": "0",
+        "ref_id": "INIT",
+        "usable_as_authoritative_clock_correction": false,
+        "reason": "Packet header difference alone is not a verified synchronization result."
+      }
+    ],
+    "mode3_originator_requests": 492,
+    "automatic_adjustment_applied": false,
+    "boundary": "Packet-declared transmit time minus capture time is not an authenticated/verified clock offset; stratum 0 INIT cannot justify synchronization or correction. Response time must not be attributed to the originator."
+  },
+  "suricata_query": {
+    "at_kst": "2026-10-30T13:01:04.389293+09:00",
+    "archive_url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717879",
+    "archive_bytes": 24596811,
+    "archive_md5": "3e824b0967e2e397eac04c8c253db842",
+    "archive_sha256": "4a5140ca94d5f73649dc3743a9806e255ffde21bb3669e93f1953337cf539128",
+    "member_sha256": "4733ea1c72179ffd98927c201292f941d62831636b7ffa4e85e38769f30137ff",
+    "rows": 1465627,
+    "bytes": 699465555,
+    "zip_crc_verified": true,
+    "transport": "tcp",
+    "queried_tuple": [
+      "172.16.1.2",
+      56325,
+      "172.16.0.2",
+      22
+    ],
+    "reverse_direction_checked": true,
+    "time_filter": null,
+    "port_prefilter_candidates": 55,
+    "exact_tuple_matches": [],
+    "no_normal_or_sensor_health_inference": true,
+    "independent_all_json_scan": {
+      "rows": 1465627,
+      "sha256": "4733ea1c72179ffd98927c201292f941d62831636b7ffa4e85e38769f30137ff",
+      "decoded_every_json_row": true,
+      "raw_substring_prefilter": false,
+      "endpoint_parse_failures": 0,
+      "exact_tuple_matches": [],
+      "time_filter": null,
+      "zip_crc_checked": true
+    },
+    "interpretation": "No exact tuple in this exported alert file. Does not prove benign activity, full capture coverage, no attack, or sensor health."
+  },
+  "time_handling": {
+    "display": "KST; raw timestamp strings and clock domains preserved",
+    "zeek_open_close": "Processing wall time with unknown zone, not event time",
+    "label_date": "Derived offset-free date string, not superior precision to raw ts",
+    "clock_sync_confirmed": false
+  },
+  "references": [
+    {
+      "url": "https://docs.zeek.org/en/v7.1.0/logs/conn.html",
+      "purpose": "conn fields and UID semantics, not acquisition-version proof"
+    },
+    {
+      "url": "https://docs.zeek.org/en/v7.1.0/log-formats.html",
+      "purpose": "unset/empty and TSV headers"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/zeek/zeek/v7.1.0/scripts/base/protocols/ntp/main.zeek",
+      "bytes": 3524,
+      "sha256": "03302cf555f5b670ab5c02b5dd2cf864a4f35d5a9ea08d421cf6e955064e44c8",
+      "purpose": "Pinned-tag reference: capture network_time and packet xmt_time are separate. No source reuse."
+    },
+    {
+      "url": "https://www.rfc-editor.org/rfc/rfc5905.html",
+      "sections": [
+        "7.3",
+        "7.4"
+      ],
+      "purpose": "Stratum 0, INIT and invalid KoD timestamps; no authoritative offset from the observed request headers"
+    }
+  ],
+  "validation": {
+    "unit_tests_passed": 15,
+    "public_cli_full_comparison": true,
+    "independent_full_comparison": true,
+    "independent_alert_all_rows_decoded": true,
+    "independent_coordinates": {
+      "at_kst": "2026-10-30T13:11:30.594645+09:00",
+      "member_hashes_verified": 4,
+      "selected_coordinates_verified": 14,
+      "network_uid_and_endpoints_match": true,
+      "host_after_end_seconds": "5.308222",
+      "ntp_observations_exact": 6,
+      "metadata_sha256": "d6b12c27d80c9b10ebb7910b7bb5a084556f1ee51c68e7eef56eda1596c8ba6d",
+      "independent_arithmetic": "Decimal seconds, no project parser imported"
+    },
+    "source_sha256": "fc7b3ddd1b208c5059587df2f9185c78588eae0b9a031e6ff78b371feffcb6b9",
+    "r2_execution_source_sha256": "9a0097a8fbb70b27a1cc56d038c9194b263738d95c283268fda9010ff0e0843a",
+    "tests_sha256": "eeb67283a16456a32a6149dfae1e4a273c3fd093eab75c39e4c077c4f81bd5ec",
+    "evidence_sha256": {
+      "failed-r1-source.json": "8ec9d0c8106523fa2940ddeb04cbebdfbc04b53d4a83343e5fa3e0b8727c607d",
+      "alert-tuple-query.json": "3c4147025c8ebaf3e2613c5492c7b64c84123e0079bece9307c5624c3e90720c",
+      "independent-flow.json": "c41dc57283667702cda0d6052a0ed2e2cb5feef93eb3b28ca05947083ef5d1b8",
+      "independent-coordinates.json": "99651787387aadb3f47e7600d7c4867a2a150a68f3257df1fc4008128b7341fc",
+      "flow-r2.json": "4d65692437b50af3838f4616a9048917749a0930b9a154b33b57dc9c185ec4b0",
+      "flow-r1.json": "605bfbe5de7d667b69fa10be13f03649bbbaaec2efd36ecd1ceba83ff679b419",
+      "review-case.json": "4116cd21d6352436b74f45ae713f1a3720a1b4ea825a34349af907b80ca9672e",
+      "independent-flow-detail.json": "b7dd799206e2435e81621c3a703cdc6edcb35ecdf4ebb1a86c710692d5d7a7e1",
+      "cli-comparison.json": "b39e1c14b44e133885f62156b0165cb1b70a5612ae8c9ad37fee47b6c79464ac",
+      "independent-alerts.json": "9bed43f894382ebeb05d1b4651b95b9cbd97a7aad2cde0e9a6ca473080053dd1"
+    },
+    "failed_attempt": "R1 stopped on CSV scientific duration notation, preserved locally. R2 completed; 3,980 source differences are data findings, not silently corrected.",
+    "existing_output_rejected_exit_code": 2,
+    "physical_line_and_byte_coordinates_verified": 14,
+    "pack_static_inputs": 113,
+    "frozen_sources_unchanged": 25,
+    "bibliography_keys_unique": 67
+  },
+  "review_case": {
+    "count": 1,
+    "sha256": "4116cd21d6352436b74f45ae713f1a3720a1b4ea825a34349af907b80ca9672e",
+    "question_and_criteria_project_authored": true,
+    "provider_labels_hidden_from_model_input": true,
+    "model_calls": 0,
+    "independent_expert_review": false,
+    "training_admitted": 0,
+    "unseen_final_test": false
+  },
+  "execution_scope": {
+    "training": 0,
+    "server_access": 0,
+    "production_changes": 0,
+    "mac_packages_installed": 0,
+    "mcp_messenger_attack_e2e": "not run",
+    "fresh_server_install": "not run",
+    "full_training_bundle": "not generated",
+    "deploy_offline_changes": "not applicable: no service/package/policy change"
+  },
+  "next_steps": [
+    "Review case context and clock alignment without changing source observations.",
+    "Build truly independent source/incident splits and preserve official test periods.",
+    "Resolve actual tokenizer, remaining prior-data overlap and independent expert review before any new training."
+  ]
+}

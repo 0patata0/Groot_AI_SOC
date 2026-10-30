@@ -1,5 +1,17 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**DEDALE flow·결측값 검수:** `inspect_dedale_flows.py`는 Zeek 원문 필드·미설정 표지·물리 좌표를 유지하고 제공 분류표의 전체 원문 필드를 반복 횟수까지 대조한다. 868,616행 중864,636행 일치, 결측→빈칸/0 차이3,980행을 확인했다. 과학표기는 정확한 마이크로초만 허용하며 자동 반올림/결측 대체는 없다. 15검사·CLI 전수 재현/독립 전수 대조 완료. [원장](DEDALE_FLOW_REVIEW.json).
+
+```sh
+python3 -B finetuning/inspect_dedale_flows.py \
+  --conn /path/conn.log --labels /path/conn_labeled.csv \
+  --output /new/path/flow-comparison.json
+```
+
+CLI 종료 성공은 검사가 실행됐다는 뜻이다. `full_core_matches`·`unmatched_labels`·`unmatched_raw`를 반드시 확인하며 불일치를 자동 수리하지 않는다. 출력 덮어쓰기는 거부한다. `assess_session`/`ntp_request_observation`은 서로 다른 시계를 자동 합치지 않는 검토 함수다. 전체 재현은 원장을 기준으로 동일4멤버 CRC/SHA를 먼저 확인한다. 처리용 `#open/#close`와 offset 없는 CSV `date`를 원본 이벤트 시각으로 대신하지 않는다.
+
+conn↔SSH UID/양끝은 일치하나 host 수락이 종료5.308222초 뒤여서 상관은 후보로 남는다. NTP stratum0 INIT의 약6.924초 차이는 검증된 보정값이 아니다. 개발 사례1개는 공식 시험기간·검토 노출 자료이며 제공 라벨은 입력에서 분리했다. 모델 호출/학습 편입0, 기관 공식 정답이나 새 독립 평가 성능을 주장하지 않는다.
+
 **DEDALE 시각·중복 후속:** `compare_dedale_clocks.py`는 공식 고정 ZIP2개를 원본 syslog672시간/5,017,693행과 경보1,465,627행 전체로 대조한다. 비시간 필드를 유지하고 `@version`/`pid` 타입2개와 시각 정밀도만 명시적으로 맞춘다. 원문 UTC시각과 epoch-ms의 동일성을 확인했으며 반복 횟수는 제거하지 않는다. 신규11검사/CLI재현·별도 전수검증 통과. [결과/출처](DEDALE_CLOCK_REVIEW.json).
 
 ```bash

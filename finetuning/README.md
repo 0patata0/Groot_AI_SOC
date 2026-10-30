@@ -1,5 +1,7 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+> **2026-10-30 운영 경로 후속:** 실제 FW 채팅12건에서는 공통 하네스가 전체 객체·기본정책/범위를 검증·표시했고 페이지 누락 자료도 미완료로 거부했다. 명시 페이지 크기를 유지하는 보완을 별도 적용했다. 이는 아래 정규화 SDK의 모델 자체 관측판단 점수47.41을 개선·재채점한 결과가 아니다. 학습 추가0이며 현재/과거 승인·해시 판단과 독립 평가가 남아 있다. [운영 검증](../STATUS.md).
+
 ## 정규화 SDK 실제 응답 평가 — 2026-10-30T20:15:42.926021+09:00
 
 [실행·채점·한계](OPERATIONAL_RESPONSE_REVIEW.json). `run_operational_review_arm.py`는 기존 B의 Hermes 컨테이너 또는 Ollama 봇 venv에서 한 사례를 실행하는 전용 시험 소스다. private HOME/HERMES_HOME, `inputs.jsonl`·`catalog.json`·공통정책 `system.txt`만 필요하다. 두 SDK의 첫 모델 요청을 동일한 두 메시지/38도구/생성옵션으로 고정한다. 현재 B의 고정모델프록시만 연결하며 실제 도구 dispatch는 연결하지 않는다. gold/provenance와 타측 답변은 전달하지 않는다. 운영 gateway/하네스 전체를 비교하는 CLI가 아니다.

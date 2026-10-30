@@ -751,6 +751,14 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
             props['snapshot']['enum'] = [state['snapshot']]
             props['offset']['enum'] = [state['next_offset']]
             result[fw]['required'] = ['snapshot', 'offset']
+        if fw in result:
+            # Preserve an explicit per-page bound on every model-selected call.
+            # The MCP may return fewer objects when its byte budget is reached.
+            limits = {int(v) for v in re.findall(r'(?<!\d)(\d{1,6})\s*개씩', normalized(question))}
+            if len(limits) == 1 and 1 <= next(iter(limits)) <= 200:
+                schema = result[fw]
+                schema['properties']['limit']['enum'] = [next(iter(limits))]
+                schema['required'] = list(dict.fromkeys([*schema.get('required', []), 'limit']))
     p = read_plan(question)
     if p and p['kind'] == 'agent_identity':
         if READ.AGENTS not in result: return {}

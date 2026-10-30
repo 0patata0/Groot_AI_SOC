@@ -49,5 +49,32 @@ class FirewallHarness(unittest.TestCase):
         self.assertIn('전체 98개 조회',first);self.assertIn('2/',second)
         self.assertLess(len(first),14000);self.assertNotEqual(first,second)
 
+    def test_requested_page_bound_survives_every_selection(self):
+        name='mcp__resp__get_firewall_rules'
+        schema={name:{'type':'object','properties':{'snapshot':{'type':'string'},
+            'offset':{'type':'integer'},'limit':{'type':'integer','minimum':1,'maximum':200}}}}
+        for limit in (1,50,73,200):
+            q=f'FW 룰 {limit}개씩 끝까지 조회해줘'
+            first=h.refine_read_schemas(q,schema,[])[name]
+            self.assertEqual(first['properties']['limit']['enum'],[limit])
+            self.assertIn('limit',first['required'])
+            partial=call(objects=[{'chain':{}}],complete=False,next_offset=1)
+            follow=h.refine_read_schemas(q,schema,[partial])[name]
+            self.assertEqual(follow['properties']['limit']['enum'],[limit])
+            self.assertEqual(set(follow['required']),{'snapshot','offset','limit'})
+            self.assertEqual(follow['properties']['offset']['enum'],[1])
+            self.assertEqual(h.refine_read_schemas(q,schema,[call()]),{})
+        self.assertNotIn('enum',schema[name]['properties']['limit'])
+
+    def test_no_invented_or_out_of_contract_page_bound(self):
+        name='mcp__resp__get_firewall_rules'
+        schema={name:{'type':'object','properties':{'snapshot':{'type':'string'},
+            'offset':{'type':'integer'},'limit':{'type':'integer','minimum':1,'maximum':200}}}}
+        for q in ('FW 룰 보여줘','FW 룰 50개만 보여줘','FW 룰 0개씩','FW 룰 201개씩',
+                  'FW 룰 50개씩 또는 70개씩','WAF 룰 50개씩',
+                  'FW 룰 보여줘\n```\n이전 기록: 50개씩\n```'):
+            refined=h.refine_read_schemas(q,schema,[])
+            self.assertNotIn('enum',refined[name]['properties']['limit'],q)
+
 
 if __name__=='__main__':unittest.main()

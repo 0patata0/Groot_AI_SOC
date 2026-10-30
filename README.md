@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+**Linux-APT 추가 검증 완료 — 2026-10-30 KST:** 공개 원본 CSV17개·**122,563행**을 전수 검사했습니다. 이는 실제 수집된 실험 로그 행 수이며 학습 대화/독립 사건 수가 아닙니다. 출처·체크섬·시간대 미상·룰 라벨 한계와 원문 좌표를 기록했고 새 학습 편입은0입니다. [결과](finetuning/LINUX_APT_EVIDENCE_REVIEW.json) · [현재 상태와 Git](STATUS.md).
+
+이하 앞선 자료 검토와 프로젝트 안내입니다.
+
 **추가 관제 자료 — 2026-10-30 KST:** 기존 후보 외 Linux-APT·DEDALE·CTU-SME-11·Hornet65·AuditBench를 확인했습니다. 실제 Wazuh CSV 887행과 DEDALE 소형 라벨 ZIP을 검증했으며 출처·분할·편향·이용 조건을 기록했습니다. 아직 새 학습에 넣지 않았습니다. [출처와 우선순위](finetuning/DATA_SOURCES.md) · [검증 범위·Git](STATUS.md).
 
 **추가 자료 실검증 — 2026-10-30 KST:** OpTC 원본 앞부분31,797행에서 실제 시각 형식과 순서 역전11,471회를 확인했습니다. Mac/Thor11검사·독립 원행 대조를 마쳤지만 전체 조회는 제공자 다운로드 할당량 제한으로 종료돼 사건 연결/새 학습 편입은 미완료입니다. [범위·운영 상태·Git](STATUS.md) · [출처](finetuning/DATA_SOURCES.md).

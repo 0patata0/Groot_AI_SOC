@@ -1,5 +1,15 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**전수 검증 결과 — 2026-10-30 KST:** 17 CSV·122,563행·208,367,683B의 MD5/크기 검증을 완료했습니다. 139개 구조 그룹에서 245개 좌표를 골랐고 아래 도구는 정답/대화 생성을 하지 않습니다. 시간대 미상 122,563행·full_log 공백 973행·룰 주석 24,779행의 한계는 [원장](LINUX_APT_EVIDENCE_REVIEW.json)에 있습니다. 아래887행은 앞선 부분 검토 이력입니다. 전체 원시 로그와 검토 좌표는 학습 pack에 자동 포함하지 않습니다.
+
+**Linux-APT 원본 검토 도구:** `prepare_linux_apt.py`는 [고정 파일 목록](LINUX_APT_SOURCE_SPEC.json)의 CSV를 메모리에서 읽고 제공 MD5/크기, 중복 문서·레코드, 시각과 룰 주석을 확인합니다. 정상/악성 정답이나 SFT 대화를 생성하지 않습니다. 원문·명령·계정/주소를 복사하지 않고 파일/논리 CSV행/물리행/SHA 및 구조 코드만 보존합니다. 상세 원문 검수에는 해당 좌표를 다시 조회해야 합니다.
+
+```sh
+python3 -B prepare_linux_apt.py --spec LINUX_APT_SOURCE_SPEC.json --output data-linux-apt-review-NEW
+```
+
+전체 파일을 내려받아 보존하는 명령이 아니지만 원격 원문 바이트를 읽는 네트워크 전송은 필요합니다. 기존 출력 폴더는 덮어쓰지 않습니다. 완전히 검증한 파일마다 체크포인트를 남기며, 실패 원인을 확인한 후 같은 명령에 `--resume`을 추가하면 검증 완료 파일은 다시 읽지 않습니다. 소스 목록·검사기 코드·체크포인트 해시가 다르면 재개를 거부합니다. 실패한 실행은 완료본이 아니며 실패 파일의 부분 집계는 재개에 사용하지 않습니다. 오프라인 회귀는 `python3 -B -m unittest discover -s tests -p test_linux_apt_evidence.py`로 실행합니다. 고정 source-family 전체와 Mendeley/SecCoRA 파생본은 같은 분할로 유지하며, 현재 분류는 학습 후보일 뿐 실제 편입이 아닙니다.
+
 **추가 실제 데이터 원천 — 2026-10-30 KST:** Linux-APT·DEDALE·CTU-SME-11·Hornet65·AuditBench를 조사했습니다. Wazuh CSV 887행과 DEDALE 라벨 ZIP의 무결성/한 멤버 10,593행 형식을 확인했습니다. [출처·용도·제약](DATA_SOURCES.md) · [파일별 검증](SOC_ADDITIONAL_DATA_REVIEW.json). 기관 자료의 원행 수를 학습 대화 수로 세지 않으며 신규 편입은0입니다. 원시자료를 pack에 넣지 않고 검토 원장만 포함합니다. DEDALE 공식 시험 분할과 OpTC 파생 중복을 보존하고, 이용 조건 미확인 AuditBench/SecCoRA 등은 편입 보류입니다.
 
 **OpTC 원본 검사기 — 2026-10-30 KST:** [OPTC_EVIDENCE_REVIEW.json](OPTC_EVIDENCE_REVIEW.json)에 실제 prefix31,797행과 시각/부분입력 한계를 기록했습니다. `inspect_optc_evidence.inspect_prefix`는 gzip 시작부분 bytes와 원본 크기를 받아 완전/부분 입력을 구분합니다. `scan_records`는 JSONL iterator를 끝까지 읽고 제한된 메타데이터만 보존하며, 전체 파일 무결성은 호출 측의 별도 검증이 필요합니다. 두 함수 모두 악성 정답·학습 대화를 만들지 않습니다.

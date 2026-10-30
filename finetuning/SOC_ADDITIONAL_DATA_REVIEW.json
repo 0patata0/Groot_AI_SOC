@@ -547,5 +547,13 @@
     "Prepare DEDALE correlation/evaluation cases without merging duplicate label subsets or violating author split.",
     "Select CTU-SME devices/days and verify Hornet raw-file integrity without whole-corpus download.",
     "Retain original production model; new training window and release depend on future verification."
-  ]
+  ],
+  "linux_apt_full_scan_followup": {
+    "review": "LINUX_APT_EVIDENCE_REVIEW.json",
+    "reviewed_at_kst": "2026-10-30T09:03:43.834943+09:00",
+    "csv_files": 17,
+    "event_rows": 122563,
+    "training_admitted": 0,
+    "prior_887_row_review_preserved": true
+  }
 }

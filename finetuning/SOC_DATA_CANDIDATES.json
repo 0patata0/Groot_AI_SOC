@@ -369,6 +369,13 @@
       "new_source_families": 5,
       "training_admitted": 0,
       "scope": "New real-file checks and metadata; preserve earlier candidate review history."
+    },
+    {
+      "review": "LINUX_APT_EVIDENCE_REVIEW.json",
+      "reviewed_at_kst": "2026-10-30T09:03:43.834943+09:00",
+      "new_source_families": 0,
+      "scope": "Full 17-file review of an existing candidate, not a newly independent dataset.",
+      "training_admitted": 0
     }
   ]
 }

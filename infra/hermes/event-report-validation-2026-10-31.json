@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "verified_at_kst": "2026-10-31T02:15:14.762156+09:00",
+  "versions": {
+    "query_completion": "1.15.4",
+    "chat_contract": "1.5.1"
+  },
+  "tests": {
+    "passed": 690,
+    "skipped": 2,
+    "scope": "local/isolated; not fresh-server installation or attack-response E2E"
+  },
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "962ca44822ab8bf9463fd9975bea356150d39038426609994b4e4c1f328278f3",
+    "infra/hermes/query-completion/__init__.py": "4e5c967970fb872b9b770cf450b9753874fcad8b8fee77e16d2f308ca928f46c",
+    "infra/hermes/query-completion/alignment.py": "1055dd886b8f811b81dd44c3e9585b0c71c58a3425dac6170bf2de04fc5d581a",
+    "infra/hermes/chat_contract.py": "3542aad0d71d986b8185ad61d216e30171733fa8713f935279980ed371ed1de6",
+    "infra/hermes/soc_alert_watch.prompt": "5d0f5190d414311b4a16015bac44ead01b85a6565562c32d785777dc9aa6c4a4",
+    "infra/ollama-trial/harness.py": "a8482798c2a4ae0d8d2aea82abac9aa1a868ab644d4a7fe30b2457d878e676b5",
+    "infra/ollama-trial/runtime.py": "b41261534ea312de7cde5be716305d8f5cc8be16aebf32ac8029a038cd40f092"
+  },
+  "chat_tests": [
+    {
+      "engine": "hermes",
+      "development_label": "hermes",
+      "reply_received": true,
+      "latency_seconds": 17.866,
+      "final_sha256": "2bb1d3117fa2031612a139aa39d8c9c9f9da3eb42460ff952d154b0ea7137447",
+      "model_calls": 2,
+      "tool_calls": 3,
+      "event_reads": 0,
+      "strict_incident_completion": false,
+      "outcome": "rule_inventory_instead_of_incident"
+    },
+    {
+      "engine": "hermes",
+      "development_label": "hermes-retest",
+      "reply_received": true,
+      "latency_seconds": 16.951,
+      "final_sha256": "2bb1d3117fa2031612a139aa39d8c9c9f9da3eb42460ff952d154b0ea7137447",
+      "model_calls": 2,
+      "tool_calls": 3,
+      "event_reads": 0,
+      "strict_incident_completion": false,
+      "outcome": "rule_inventory_instead_of_incident"
+    },
+    {
+      "engine": "hermes",
+      "development_label": "hermes-final",
+      "reply_received": false,
+      "latency_seconds": null,
+      "final_sha256": null,
+      "strict_incident_completion": false,
+      "outcome": "no_reply_during_restart"
+    },
+    {
+      "engine": "hermes",
+      "development_label": "hermes-connected",
+      "reply_received": true,
+      "latency_seconds": 31.843,
+      "final_sha256": "ee4a38f4895798675b96e49f4437bcfc749a7245a71f8a564a4f4bdd06960d98",
+      "model_calls": 1,
+      "tool_calls": 0,
+      "event_reads": 0,
+      "strict_incident_completion": false,
+      "outcome": "no_successful_event_read"
+    },
+    {
+      "engine": "ollama",
+      "development_label": "ollama",
+      "reply_received": true,
+      "latency_seconds": 57.198,
+      "final_sha256": "4435b98ec79a692c3f134d07830f10647538316c6dc96687354d201ed1e58b8c",
+      "model_calls": 1,
+      "tool_calls": 0,
+      "event_reads": 0,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "unobserved_attack_absence_claim",
+        "unobserved_event_source:suricata"
+      ],
+      "strict_incident_completion": false,
+      "outcome": "no_successful_event_read"
+    },
+    {
+      "engine": "hermes",
+      "development_label": "hermes-evidence",
+      "reply_received": true,
+      "latency_seconds": 41.092,
+      "final_sha256": "ee4a38f4895798675b96e49f4437bcfc749a7245a71f8a564a4f4bdd06960d98",
+      "model_calls": 3,
+      "tool_calls": 0,
+      "event_reads": 0,
+      "strict_incident_completion": false,
+      "outcome": "no_successful_event_read"
+    },
+    {
+      "engine": "ollama",
+      "development_label": "ollama-evidence",
+      "reply_received": true,
+      "latency_seconds": 81.349,
+      "final_sha256": "8caff6257b25e5590e26d367843d932b097189f750e9baea1b62f420146c5d17",
+      "model_calls": 4,
+      "tool_calls": 2,
+      "event_reads": 2,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "sample_zero_presented_as_absence"
+      ],
+      "strict_incident_completion": false,
+      "outcome": "verified_evidence_only_incident_judgment_incomplete"
+    },
+    {
+      "engine": "hermes",
+      "development_label": "hermes-selection",
+      "reply_received": true,
+      "latency_seconds": 52.125,
+      "final_sha256": "f3e3a759e7a8e2bd4df42e5a9123a1cbcbbda373c4cab95a554aa9889fce7491",
+      "model_calls": 2,
+      "tool_calls": 3,
+      "event_reads": 3,
+      "strict_incident_completion": false,
+      "outcome": "verified_evidence_only_incident_judgment_incomplete"
+    },
+    {
+      "engine": "ollama",
+      "development_label": "ollama-selection",
+      "reply_received": true,
+      "latency_seconds": 77.333,
+      "final_sha256": "486ef5523c0a484a51a399959737f071566acad02c0037ceaeb66849584efa9c",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "event_reads": 3,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "sample_zero_presented_as_absence"
+      ],
+      "strict_incident_completion": false,
+      "outcome": "verified_evidence_only_incident_judgment_incomplete"
+    },
+    {
+      "engine": "hermes",
+      "development_label": "hermes-schema",
+      "reply_received": true,
+      "latency_seconds": 54.69,
+      "final_sha256": "238a27106112924c0ae546bfcaaffff247878d9c1a4fed6e1af5fc82591c5f7b",
+      "model_calls": 2,
+      "tool_calls": 3,
+      "event_reads": 3,
+      "strict_incident_completion": false,
+      "outcome": "verified_evidence_only_incident_judgment_incomplete"
+    },
+    {
+      "engine": "ollama",
+      "development_label": "ollama-schema",
+      "reply_received": true,
+      "latency_seconds": 83.332,
+      "final_sha256": "9de5d390efd3a90a7545ae19c0d2ba9f03ea9c5e129b1ac2724a9d0bea009d09",
+      "model_calls": 4,
+      "tool_calls": 3,
+      "event_reads": 3,
+      "protected_calls": 0,
+      "remaining_issues": [
+        "sample_zero_presented_as_absence"
+      ],
+      "strict_incident_completion": false,
+      "outcome": "verified_evidence_only_incident_judgment_incomplete"
+    }
+  ],
+  "chat_summary": {
+    "posted": 11,
+    "replied": 10,
+    "strict_incident_completion": 0,
+    "protected_calls": 0,
+    "latest_pair_actual_event_reads": 6
+  },
+  "final_pair": {
+    "hermes": {
+      "requested_window_exact": true,
+      "waf_sample": 2,
+      "ids_sample": 0,
+      "judgment_complete": false
+    },
+    "ollama": {
+      "requested_window_exact": false,
+      "extra_minutes_before_request": 10,
+      "waf_sample": 2,
+      "ids_sample": 0,
+      "judgment_complete": false
+    }
+  },
+  "limitations": [
+    "Same development question reused in separate roots; no independent benchmark or training examples",
+    "No controlled cache/shared-server-load experiment; latencies are individual observed chat turnaround",
+    "Final judgments did not pass validation; verified facts fallback is not SOC analyst replacement",
+    "One pre-WebSocket post unprocessed; reconnect catch-up remains unverified",
+    "No firewall/rule changes, attack injection, model training or weights change"
+  ],
+  "recovery_backups": [
+    "/var/backups/capstone-report-grounding-20261031-013039",
+    "/var/backups/capstone-report-grounding-20261031-014628",
+    "/var/backups/capstone-report-grounding-20261031-015309",
+    "/var/backups/capstone-report-grounding-20261031-020103",
+    "/var/backups/capstone-report-grounding-20261031-020740"
+  ],
+  "automatic_readonly_review": {
+    "finished_kst": "2026-10-31T02:14:10.584640+09:00",
+    "elapsed_seconds": 97.998,
+    "read_calls": 3,
+    "failed_calls": 0,
+    "write_calls": 0,
+    "case_state": "needs_review",
+    "delivery_state": "sent",
+    "trace_sha256": "0932eefbba2fa5ec055d4158ef46d4f29f9c63bb9040f8f63065857f45147e4c",
+    "judgment_verified_correct": false,
+    "remaining": [
+      "Korean output filter replaced part of one evidence paragraph",
+      "Index lag/omission claimed as reason for unknown count without separate evidence",
+      "Sensor-rule descriptions and full investigation/response need verification"
+    ]
+  }
+}

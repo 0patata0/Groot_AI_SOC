@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-10-31 관제 보고 보완:** query-completion 1.15.4과 동일 공용 grounding 소스/SHA 핀을 두 봇·자동 조사에 함께 반영합니다. 센서 룰과 Wazuh 상관 규칙, 반환 건수와 신뢰 경계 필드의 혼동을 실제 응답과 대조해 LLM 정정을 요청합니다. 기존 단일 설치 경로·의존성과 승인/도구 권한을 유지합니다. [동작·검증 범위](../infra/hermes/event-report-grounding.md).
+
 > **2026-10-30 변경안 준비 보완:** 기존 source bundle의 공통 harness.py/read_contract.py와 회귀 소스를 갱신합니다. 새 패키지·이미지·포트·설정 키·권한은 없습니다. B 복구용 묶음에서 빠져 있던 기존 test_alignment 검사255행도 canonical과 대조해 동기화했습니다. [설치 경로·복구](../infra/hermes/write-preparation.md) · [검증 범위](../STATUS.md).
 
 > **2026-10-30 서비스·임시차단/IDS 조회:** 기존 source bundle의 service_action_executor.py·공통 read_contract.py/harness.py와 회귀 소스를 갱신합니다. deploy.sh의 기존 설치 복사 경로를 유지하며 추가 deb/wheel/이미지·설정 키·포트·권한은 없습니다. 운영 B 복구용 source bundle에도 같은 소스와 검사를 반영했습니다. [사용·복구](../infra/mcp/operation-status-read.md) · [증분 배포/새 설치 검증 구분](../STATUS.md).

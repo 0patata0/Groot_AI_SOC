@@ -26,6 +26,54 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_incident_selects_real_reads_then_restores_native_judgment(self):
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        q='DVWA 공격이었나? 사건 근거와 대응 필요성을 판단해줘.'
+        agent=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,_current_turn_id='t')
+        tools=[{'type':'function','function':{'name':n,'parameters':{'type':'object','properties':{}}}}
+               for n in ('mcp__security_events__search_modsecurity_alerts','mcp__rule_a__get_rule_change_target')]
+        rows=[{'role':'user','content':q}]
+        def request(*a,**kw):return Request({'messages':kw['messages'],'tools':tools})
+        wrap=alignment.request_wrapper(request,PLUGIN,H)
+        first=wrap(agent,original_user_message=q,turn_id='t',messages=rows)
+        schema=first.api_kwargs['response_format']['json_schema']['schema']
+        self.assertEqual(schema['properties']['calls']['items']['anyOf'][0]['properties']['tool']['const'],'mcp__security_events__search_modsecurity_alerts')
+        self.assertNotIn('tools',first.api_kwargs)
+        raw=json.dumps({'source':'modsecurity','alerts':[],'returned_count':0})
+        call={'server':'security-events','name':'search_modsecurity_alerts','arguments':{},'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        rows+=H.linked_rows([call])
+        second=wrap(agent,original_user_message=q,turn_id='t',messages=rows)
+        self.assertNotIn('response_format',second.api_kwargs)
+        self.assertEqual(len(second.api_kwargs['tools']),2)
+        self.assertIsNone(agent._capstone_read_selection)
+
+    def test_incident_read_gap_retries_with_model_selection_and_existing_bound(self):
+        q='DVWA 요청이 공격이었나? 탐지 근거와 대응 필요성을 판단해줘. 읽기 전용으로 조사해줘.'
+        h=Harness(text='공격은 없습니다.',request=q)
+        h.agent.model='qwen3.6:35b';h.agent.provider='custom'
+        h.wrapper=alignment.final_wrapper(h.wrapper,h.original,h.native,h.append,h.reanchor,PLUGIN,H)
+        result=h.call()
+        self.assertEqual(result.action,'continue')
+        self.assertIn('읽기 도구와 인자를 직접 선택',h.kw['messages'][-1]['content'])
+        h.agent._capstone_incident_repairs=(h.agent._current_turn_id,H.CONTRACT.REPAIR_PASSES)
+        result=h.call()
+        self.assertEqual(result.action,'break')
+        self.assertNotIn('공격은 없습니다',result.final_response)
+
+    def test_incident_guard_does_not_replay_protected_call(self):
+        q='DVWA 공격인지 판단해줘. 읽기 전용으로 조사해줘.'
+        h=Harness(text='추가 확인 필요.',request=q)
+        h.agent.model='qwen3.6:35b';h.agent.provider='custom'
+        h.kw['messages'] += H.linked_rows([proposal('a:modsecurity-custom')])
+        h.wrapper=alignment.final_wrapper(h.wrapper,h.original,h.native,h.append,h.reanchor,PLUGIN,H)
+        result=h.call()
+        self.assertEqual(result.action,'break')
+        self.assertFalse(hasattr(h.agent,'_capstone_incident_repairs'))
+
     def test_proposal_receipt_does_not_require_extra_apply_request_or_claim_engine_proof(self):
         submitted=proposal('a:modsecurity-custom')
         progress=H.write_progress('WAF 변경안을 만들어줘',[submitted])

@@ -98,5 +98,45 @@
     "Normal level0 is no_log; absence in Indexer alone is not delivery proof",
     "Existing fixed-host monitor is not a portable fresh-server bootstrap; full new-server install not tested",
     "No package install, alert suppression, data deletion, model training or protected firewall change"
-  ]
+  ],
+  "later_scheduled_followup": {
+    "a": {
+      "at_kst": "2026-10-31T02:08:31.537395+09:00",
+      "status.json": {
+        "available_bytes": 44990500864,
+        "host": "a",
+        "scan_status": "complete",
+        "status": "ok",
+        "used_percent": 23
+      },
+      "inventory.json": {
+        "backup_directory_count": 67,
+        "backup_entry_count": 67,
+        "backup_entry_limit": 256,
+        "backup_file_count": 0,
+        "backup_scan_status": "complete",
+        "host": "a"
+      },
+      "service": "Result=success\nExecMainExitTimestamp=Sat 2026-10-31 02:02:02 KST\nExecMainStatus=0\n"
+    },
+    "b": {
+      "at_kst": "2026-10-31T02:08:32.047499+09:00",
+      "status.json": {
+        "available_bytes": 105632677888,
+        "host": "b",
+        "scan_status": "complete",
+        "status": "ok",
+        "used_percent": 29
+      },
+      "inventory.json": {
+        "backup_directory_count": 197,
+        "backup_entry_count": 198,
+        "backup_entry_limit": 256,
+        "backup_file_count": 1,
+        "backup_scan_status": "complete",
+        "host": "b"
+      },
+      "service": "Result=success\nExecMainExitTimestamp=Sat 2026-10-31 02:02:04 KST\nExecMainStatus=0\n"
+    }
+  }
 }

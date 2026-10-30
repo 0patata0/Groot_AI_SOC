@@ -253,7 +253,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
         else:
             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
             tick = time.perf_counter()
-            structured = harness.structured_read(current)
+            structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, []))
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
             if policy_answer:
                 report['policy_definition_rendered'] = True
@@ -272,8 +272,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                 issues = [] if literal else harness.violations(current, str(final), report['calls'])
                 repair_passes = 0
                 gap = harness.preparation_gap(current, report['calls'])
+                incident_gap = harness.incident_evidence_gap(current, report['calls'])
                 preparation_used = False
-                while (missing or issues or (gap and not preparation_used)) and not harness.action_claim_violations(current, str(final), report['calls']) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
+                while (missing or issues or incident_gap or (gap and not preparation_used)) and (incident_gap or not harness.action_claim_violations(current, str(final), report['calls'])) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
                     repair_passes += 1
                     report['repair'] = {'missing_targets': missing, 'issues': issues}
                     instruction = ('현재 질문: ' + current + '\n조회 근거 점검 결과: ' + json.dumps(report['repair'], ensure_ascii=False) +
@@ -284,7 +285,10 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                         report['write_preparation_attempts'] = 1
                         report['repair']['missing_write_targets'] = gap
                         instruction = '현재 질문: ' + current + '\n' + harness.preparation_instruction(gap)
-                    read_scope = harness.tool_scope(current, report['calls'])
+                    if incident_gap:
+                        instruction = harness.incident_evidence_instruction(current)
+                        report['repair']['incident_evidence_missing'] = True
+                    read_scope = harness.incident_selection_scope(current, report['calls']) or harness.tool_scope(current, report['calls'])
                     if read_scope and not gap and budget.used < budget.limit:
                         # The same LLM selects real read calls in constrained JSON
                         # when native tool calling stalls. No fixed fallback reads,
@@ -299,7 +303,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                         selector = llm.with_structured_output(schema, method='json_schema')
                         plan = await asyncio.wait_for(selector.ainvoke([
                             ('system', harness.CONTRACT.system_prompt(read_only=True) + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
-                             '절대 구간이 미지원이어도 사용자 요청에 따라 지원되는 최근 상대 구간의 표본을 조회하세요. '
+                             'security-events는 until_kst와 lookback_minutes로 과거 구간을 선택하고 실제 반환 구간을 확인하세요. '
                              '요청한 장비/대상을 빠짐없이 포함하고 이미 성공한 조회를 반복하지 마세요. 요청구간을 지원한다고 꾸미지 마세요.' + harness.guidance(current)),
                             ('human', instruction + '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
                         report.setdefault('read_selections', []).append(plan)
@@ -312,12 +316,16 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                                 await selected_tools[choice['tool']].ainvoke(choice['arguments'])
                         finally:
                             selection_active = False
-                        final = ''  # Only observed facts can render this bounded read path.
+                        if incident_gap and not harness.incident_evidence_gap(current, report['calls']):
+                            final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'])), 180)
+                        else:
+                            final = ''  # Failed/missing reads cannot become observations.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
                     if report['protected_calls'] or preparation_used:
                         break
                     gap = harness.preparation_gap(current, report['calls'])
+                    incident_gap = harness.incident_evidence_gap(current, report['calls'])
                     missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
                     issues = [] if harness.read_report(current, report['calls']) else harness.violations(current, str(final), report['calls'])
                 rendered = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or

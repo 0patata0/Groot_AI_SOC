@@ -13,12 +13,14 @@ import runtime
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False):
         calls, prompts = [], []
         self.protected_starts = []
         content = '# heading\nbody\n'
         sha = hashlib.sha256(content.encode()).hexdigest()
         available = {'rule-a':['get_rule_change_target'], 'rule-write-a':['propose_rule_edit']}
+        if read_incident:
+            available['security-events']=['search_modsecurity_alerts']
         class Connector:
             def __init__(self, server): self.server = server
             async def list_tools(self):
@@ -28,6 +30,9 @@ class PreparationLoop(unittest.TestCase):
                 calls.append(name)
                 data = ({'target':'a:modsecurity-custom','content':content,'sha256':sha}
                         if name=='get_rule_change_target' else
+                        {'source':'modsecurity','returned_count':0,'alerts':[],
+                         'requested_since_kst':'2026-10-30T12:00:00+09:00','requested_until_kst':'2026-10-30T12:01:00+09:00'}
+                        if name=='search_modsecurity_alerts' else
                         {'target':'a:modsecurity-custom','proposal_id':'1'*32,'before_sha256':sha,
                          'after_sha256':hashlib.sha256(content.replace(arguments['edits'][0]['old_text'],arguments['edits'][0]['new_text']).encode()).hexdigest(),
                          'status':'pending','review_posted':True})
@@ -43,12 +48,17 @@ class PreparationLoop(unittest.TestCase):
         class LLM:
             def __init__(self, **kw): self.callbacks=kw.get('callbacks',[])
             def with_structured_output(self, *a, **kw):
+                if read_incident:
+                    return types.SimpleNamespace(ainvoke=AsyncMock(return_value={'calls':[
+                        {'tool':'mcp__security_events__search_modsecurity_alerts','arguments':{'target':'fixture'}}]}))
                 raise AssertionError('write preparation was narrowed to read-only selection')
         class Agent:
             def __init__(self, client, **kw): self.client=client;self.llm=kw['llm']
             async def initialize(self): await self.adapter.create_all(self.client)
             async def run(self, prompt):
                 prompts.append(prompt);tools={t.name:t for t in self.adapter.tools}
+                if read_incident:
+                    return 'WAF 반환 표본 0건. 구간 전체와 사건 영향·위험은 미확인이며 추가 조사가 필요합니다.'
                 if len(prompts)==1:
                     if bad_input:
                         refused = json.loads(await tools['mcp__rule_a__get_rule_change_target'].ainvoke({}))
@@ -80,6 +90,8 @@ class PreparationLoop(unittest.TestCase):
             @staticmethod
             def check_schema(*a):pass
             def validate(self,args):
+                if read_incident and 'calls' in args:
+                    return
                 if 'target' not in args:raise ValidationError('missing target')
         definitions={
             'mcp_use':{'MCPClient':Client,'MCPAgent':Agent},
@@ -101,10 +113,22 @@ class PreparationLoop(unittest.TestCase):
             report=asyncio.run(runtime.run({'model':'qwen3.6:35b','base_url':'http://fixture.invalid',
                 'access_mode':'hermes-parity','mcpServers':{s:{} for s in available}},
                 {'question':question or 'WAF 파일 선두에 주석 변경안을 만들어줘. 실제 적용하지 말고 승인 카드까지만 준비해줘.'},
-                connection_pool=pool,on_protected_start=lambda:self.protected_starts.append(True)))
+                connection_pool=None if read_incident else pool,on_protected_start=lambda:self.protected_starts.append(True)))
             pool.borrow.assert_not_awaited()
         self.assertNotEqual(report['status'],'failed',report)
         return report,prompts,calls
+
+    def test_incident_selection_executes_model_choice_then_returns_evidence_for_judgment(self):
+        report,prompts,calls=self.execute(question='DVWA 공격이었나? 탐지 규칙과 근거를 조사하고 위험을 판단해줘.',read_incident=True)
+        self.assertEqual(len(prompts),1)
+        self.assertIn('<untrusted_tool_observations>',prompts[0])
+        self.assertIn('search_modsecurity_alerts',prompts[0])
+        self.assertIn('2026-10-30T12:00:00+09:00',prompts[0])
+        self.assertEqual(calls,['search_modsecurity_alerts'])
+        self.assertEqual(report['protected_calls'],0)
+        self.assertEqual(report.get('remaining_issues',[]),[])
+        self.assertIn('추가 조사가 필요',report['final_response'])
+        self.assertEqual(report['calls'][0]['via'],'structured_read_selection')
 
     def test_stalled_model_receives_exactly_one_preparation_continuation(self):
         report,prompts,calls=self.execute()

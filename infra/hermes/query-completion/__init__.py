@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.14.0"
+VERSION = "groot-query-completion:1.15.4"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "f5bf061398f4c6066d888565efb22f50ccb4fa9645eb778fa2d22e6462d0e051"
+EVIDENCE_SOURCE_SHA256 = "962ca44822ab8bf9463fd9975bea356150d39038426609994b4e4c1f328278f3"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -149,6 +149,8 @@ def live_rule_request(request):
     if not isinstance(request, str) or not 1 <= len(request) <= 20000:
         return False
     request = _unquoted_text(request)
+    if EVIDENCE.incident_investigation_request(request):
+        return False
     if _WRITE.search(request) or _NON_LIVE_REQUEST.search(request):
         return False
     return bool((_RULE.search(request) and _READ.search(request)
@@ -594,6 +596,8 @@ def _inventory_request(request):
     if not isinstance(request, str):
         return False
     request = _unquoted_text(request)
+    if EVIDENCE.incident_investigation_request(request):
+        return False
     return (isinstance(request, str) and bool(_LOCAL_RULE.search(request) or
                 _RULE.search(request) and live_rule_request(request) or _DEVICE_TABLE.search(request))
             and bool(re.search(r"확인|조회|보여|목록|리스트|개수|몇\s*개|\b(?:ID|SID)\b", request, re.I))

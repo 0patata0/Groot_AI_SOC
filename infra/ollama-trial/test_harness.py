@@ -122,7 +122,9 @@ class Grounding(unittest.TestCase):
         self.assertIn('반환 표본 1건', text)
         self.assertIn('2026-10-25T06:45:00+09:00', text)
         self.assertEqual(text.count('조회 미완료/실패'), 2)
-        self.assertIn('절대 시작/종료 구간을 지원하지', text)
+        self.assertIn('until_kst와 lookback_minutes로 과거 구간을 조회', text)
+        self.assertIn('Wazuh 요약은 최신 표본', text)
+        self.assertNotIn('이 도구들은 고정 절대', text)
         calls[0]['result'] = json.loads(raw)['result']
         calls[0]['result_sha256'] = hashlib.sha256(calls[0]['result'].encode()).hexdigest()
         self.assertIn('반환 표본 1건', harness.event_report('WAF IDS Wazuh 보안 로그 조회', calls))

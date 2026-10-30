@@ -1,0 +1,276 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T12:42:16.867007+09:00",
+  "status": "full exported-alert clock representation verified against original syslog; incident correlation still incomplete",
+  "dataset": {
+    "name": "DEDALE",
+    "doi": "10.57745/Y5JLDG",
+    "version": "2.1",
+    "record_url": "https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.57745/Y5JLDG",
+    "metadata_sha256": "d6b12c27d80c9b10ebb7910b7bb5a084556f1ee51c68e7eef56eda1596c8ba6d",
+    "metadata_rechecked_unchanged": true,
+    "license": "CC BY 4.0; attribution required",
+    "nature": "Four-week virtualized research testbed, not production victim incident logs",
+    "attribution": "Maxime Lanvin and Frederic Majorczyk, DEDALE, Recherche Data Gouv, DOI 10.57745/Y5JLDG, V2.1; paper DOI 10.1007/978-3-032-16092-8_1"
+  },
+  "archives": [
+    {
+      "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717890",
+      "filename": "system_logs_syslog.zip",
+      "bytes": 125537856,
+      "md5": "8223168b7cf857c40a2f0d84a1eab885",
+      "sha256": "d7b94d9c6df0dbe22ac31ccc0898471d05d4bc5bc290dc4c224c757c1c373ea7",
+      "seconds": 23.763,
+      "at_kst": "2026-10-30T12:28:12.342311+09:00"
+    },
+    {
+      "url": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/717879",
+      "filename": "suricata_alerts.zip",
+      "bytes": 24596811,
+      "md5": "3e824b0967e2e397eac04c8c253db842",
+      "sha256": "4a5140ca94d5f73649dc3743a9806e255ffde21bb3669e93f1953337cf539128",
+      "seconds": 9.21,
+      "at_kst": "2026-10-30T12:27:57.789989+09:00"
+    }
+  ],
+  "method": {
+    "comparison": "Full event-object comparison after only three explicit time fields and decimal @version/pid type normalization; preserve multiset counts.",
+    "source_clocks": "Timezone-explicit original @timestamp, timestamp and timestamp8601; no timezone inferred.",
+    "export_clock_representation": "Each integer equals floor(original UTC epoch microseconds / 1000).",
+    "clock_claim_boundary": "Representation of these pinned exports verified. This does not establish wall-clock accuracy, inter-host synchronization, or universal syslog semantics.",
+    "archive_validation": "Whole archive SHA256 and provider MD5; all 672 raw JSONL provider MD5; selected member set is the entire syslog archive, with ZIP CRC and complete BZ2 reads.",
+    "no_new_incident_join": "This binds two representations of the same alert observations, not network alerts to host attack labels."
+  },
+  "counts": {
+    "rows": 5017693,
+    "suricata": 1465627,
+    "matched": 1465627,
+    "not_in_export_or_excess": 0,
+    "source_hour_members": 672,
+    "source_decoded_bytes": 3154221475,
+    "missing_export_instances": 0,
+    "normalized_unique_export_events": 1445924,
+    "normalized_repeat_instances": 19703,
+    "source_with_submillisecond_precision": 1464142
+  },
+  "repetition": {
+    "normalized_repeated_groups": 12047,
+    "instances_in_repeated_groups": 31750,
+    "groups_with_distinct_precise_source_objects": 2535,
+    "distinct_precise_source_objects_in_repeated_groups": 22230,
+    "exact_original_object_repeat_instances": 9520,
+    "normalization_repeat_instances": 19703,
+    "groups_with_distinct_microsecond_clocks": 2535,
+    "distinct_microsecond_clock_tuples": 22230,
+    "precision_collision_example": {
+      "source": "daily_syslog/D10_H10_2025-01-01T10_syslog_F227.jsonl.bz2",
+      "line": 12674,
+      "byte_offset": 7615790,
+      "raw_line_sha256": "9c677d7958208473546c3ffd2c33a8b24809f1ebe77ac52158c8254ffaba60bb",
+      "epoch_ms": 1735728338694,
+      "distinct_source_epoch_us": [
+        [
+          1735728338694000,
+          1735728338694149,
+          1735728338694149
+        ],
+        [
+          1735728338694000,
+          1735728338694510,
+          1735728338694510
+        ]
+      ]
+    }
+  },
+  "normalization_risk": {
+    "distinct_precise_source_events_collapsed_by_ms": 10183,
+    "policy": "Keep raw timestamps and source coordinates. Do not deduplicate exported alerts solely on millisecond-normalized identity. Exact raw repeats also remain provenance, not extra independent incidents.",
+    "correction": "Earlier progress wording called all 19,703 normalized repeats identical events; only 9,520 are additional identical original objects. Another 10,183 distinguishable original observations lose distinction at millisecond precision."
+  },
+  "timestamp_examples": [
+    {
+      "source": "daily_syslog/D10_H0_2025-01-01T00_syslog_F217.jsonl.bz2",
+      "line": 7,
+      "byte_offset": 5991,
+      "raw_line_sha256": "8efc5798ad92b1ab0e621d82422d60628a67b9a6e54dc4dd6fbe24bce28b9277",
+      "normalized_event_sha256": "f3b257405ca3f72cff826935dad75190493ae0f24659efd3c0838a477a986dd6",
+      "source_timestamps": {
+        "@timestamp": "2025-01-01T00:00:11.339Z",
+        "timestamp": "2025-01-01T00:00:11.339595+00:00",
+        "timestamp8601": "2025-01-01T00:00:11.339595+00:00"
+      },
+      "epoch_ms": 1735689611339,
+      "timestamp_kst": "2025-01-01T09:00:11.339000+09:00"
+    },
+    {
+      "source": "daily_syslog/D9_H9_2024-12-31T09_syslog_F202.jsonl.bz2",
+      "line": 4,
+      "byte_offset": 4611,
+      "raw_line_sha256": "007b56612ab1a5db83054a540f7341f4ffbeafe9d40f737ab74dcb37180e5438",
+      "normalized_event_sha256": "9fef6f180251f796216b4285970b0602f8655959129d38923de8bbe3159bc9d6",
+      "source_timestamps": {
+        "@timestamp": "2024-12-31T09:00:01.095Z",
+        "timestamp": "2024-12-31T09:00:01.095841+00:00",
+        "timestamp8601": "2024-12-31T09:00:01.095841+00:00"
+      },
+      "epoch_ms": 1735635601095,
+      "timestamp_kst": "2024-12-31T18:00:01.095000+09:00"
+    }
+  ],
+  "host_session_support": {
+    "status": "One source-supported audit/syslog session candidate; not a confirmed host-to-Suricata incident or TCP flow mapping.",
+    "same_observed_host": "internalserver",
+    "same_pid": 26186,
+    "same_remote_ip": "172.16.1.2",
+    "remote_port_in_ssh_log": 56325,
+    "syslog_sender_address": "172.16.0.2",
+    "sender_address_is_not_assumed_service_destination": true,
+    "audit_timestamp_kst": "2025-01-10T20:34:10.072000+09:00",
+    "ssh_accept_timestamp_kst": "2025-01-10T20:34:09.762000+09:00",
+    "timestamp_delta_ms": 310,
+    "audit_label": {
+      "line": 1447,
+      "byte_offset": 2138496,
+      "raw_line_sha256": "56c120743437a026a9c0f84c25a344901da46fad93ee01a406a05e68b0a922ad"
+    },
+    "audit_raw_reference": {
+      "raw_member": "daily_auditbeat/D19_H11_2025-01-10T11_auditbeat_F444.jsonl.bz2",
+      "raw_line": 3826737,
+      "raw_byte_offset": 6056331292,
+      "raw_line_sha256": "f97b10bc0748a6d6b043480ed623c0f11fdf8ac02631e4dd326d4b6f193b16d7",
+      "provider_class_1": true,
+      "provider_class_2_only": false
+    },
+    "syslog_reference": {
+      "source": "daily_syslog/D19_H11_2025-01-10T11_syslog_F444.jsonl.bz2",
+      "line": 14928,
+      "byte_offset": 8323680,
+      "raw_line_sha256": "bbcf705fc257810f3c34f639f1e49cfab4291760ea667a71e05816c6080b7420"
+    },
+    "limits": "PID/source address and nearby time corroborate a session. Labels are provider-generated; host IP lease, destination port/transport, process lifetime and attack outcome require additional evidence. Do not declare an attack or block from this candidate alone."
+  },
+  "configuration_reference": {
+    "repository": "https://gitlab.inria.fr/mlanvin/rescousse",
+    "commit": "ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+    "files": [
+      {
+        "path": "LICENSE.txt",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/LICENSE.txt/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 35220,
+        "git_blob": "bca23e3fb1be42c91134302eb4295618d6155cc3",
+        "sha256": "33c59a94a3d64963a9d8174579ec69c7ac36c0c80304bdd8f6ae44f508761761"
+      },
+      {
+        "path": "README.md",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/README.md/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 12616,
+        "git_blob": "08190296b1a9507126f87896ca57488576d7a455",
+        "sha256": "6b43c854ae7245592c5a9951fb72dbbeb5ec6848f7283b0f2d44c9693210adab"
+      },
+      {
+        "path": "provisioning/ansible/roles/logstash/templates/SyslogToElasticsearch.conf.j2",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Froles%2Flogstash%2Ftemplates%2FSyslogToElasticsearch.conf.j2/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 185,
+        "git_blob": "89d1093a65574aa941b3a7aaeba0ef8c5ec03eb2",
+        "sha256": "f1ee23297de54fc444b3689d9fd4171312d1dfcd31feb374822343569d4e6e36"
+      },
+      {
+        "path": "provisioning/ansible/roles/logstash/templates/syslog_raw_SyslogToKafka.conf.j2",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Froles%2Flogstash%2Ftemplates%2Fsyslog_raw_SyslogToKafka.conf.j2/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 193,
+        "git_blob": "ee073129515c8bd0d89b49b4288e671ad79aa412",
+        "sha256": "f71d8eb030ccded1843960ea95d24e178bac28d201a06348a5ef1b0d67b0fa21"
+      },
+      {
+        "path": "provisioning/ansible/roles/logstash/templates/syslog_processed_KafkaToElasticsearch.conf.j2",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Froles%2Flogstash%2Ftemplates%2Fsyslog_processed_KafkaToElasticsearch.conf.j2/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 286,
+        "git_blob": "cb899b01136d2883099fe4a9d09f061945d90b96",
+        "sha256": "36fe075128e2b52cbd1a0c0ff280344ca8314efec5a4e2c7aaf1ab150e163057"
+      },
+      {
+        "path": "provisioning/ansible/group_vars/all/setting.yml",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Fgroup_vars%2Fall%2Fsetting.yml/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 251,
+        "git_blob": "2a042587d5e96db5efe771dfbb9bbd4a9b24c525",
+        "sha256": "28bfbecbc66ecd83b3625d3ed88efa7723d346aa5a8660d8b47acac6575a019d"
+      },
+      {
+        "path": "provisioning/ansible/roles/configure_intcompanyclient_win10/files/sysmon/sysmonconfig-export.xml",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Froles%2Fconfigure_intcompanyclient_win10%2Ffiles%2Fsysmon%2Fsysmonconfig-export.xml/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 21082,
+        "git_blob": "891ff3ec5d344e840f6c7e97a0f84cde0821cd59",
+        "sha256": "ffb4c5bda3f932ed2ae5069fbd38220e7daab4ce4ff60d6784a05b0629a7b553"
+      },
+      {
+        "path": "provisioning/ansible/hosts",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Fhosts/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 2103,
+        "sha256": "7cfac393ddcaf57b76e1e65c6c3e06e98ac24f4133b8451ff07d38f843f1c8a3",
+        "git_blob": "b687419584893bca695f8426a1bde862b90cbfcc"
+      },
+      {
+        "path": "provisioning/ansible/roles/configure_company_router2/files/dhcpd.conf",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Froles%2Fconfigure_company_router2%2Ffiles%2Fdhcpd.conf/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 8982,
+        "sha256": "dddfa949b562cbfe844efab9a5f7bf3778009b2dd06d909fd38bf6a942a34d04",
+        "git_blob": "a6f24f2cd88f39903c06dce9ed2836dc8a38d9f0"
+      },
+      {
+        "path": "src/vmcontrol/sessionhandler/sessionhandler.py",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/src%2Fvmcontrol%2Fsessionhandler%2Fsessionhandler.py/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 13464,
+        "sha256": "7662f2629ac3d700c604e406dd82a8d7b1513a0c76ef8888c5ae7b82f4026862",
+        "git_blob": "63cf29300ef0dae71c7cecf765eecd775c3e7914"
+      },
+      {
+        "path": "provisioning/ansible/roles/set_win10_client_network_config/tasks/main.yml",
+        "url": "https://gitlab.inria.fr/api/v4/projects/58191/repository/files/provisioning%2Fansible%2Froles%2Fset_win10_client_network_config%2Ftasks%2Fmain.yml/raw?ref=ba47b61ed577d2854fb2c1ebb5868652836eb88f",
+        "bytes": 671,
+        "sha256": "b261d9f60926b7baded39326e48bc7dbe9c778678efd8a96fbb155430f0d77fb",
+        "git_blob": "074ab8ba503be5214eb3e6638d88a6855b01a6b8"
+      }
+    ],
+    "license": "GPLv3 source reference; inspected only, no code incorporated into this project or executed.",
+    "sysmon_configuration": "Pinned template includes NetworkConnect exclusion blocks. Absence of event 3 in provided malicious labels does not prove disabled collection.",
+    "mapping_limit": "DHCP template has numbered reservations, not proof of a named client lease during the collected run. No named CLIENT1/CLIENT2 DHCPACK mapping established by the inspected syslog parser.",
+    "deployment_limit": "Current pinned repository config is not independently proven to be the exact deployed acquisition revision.",
+    "distinct_repository": "This RESCOUSSE license does not resolve the separate MIT/GPLv3 conflict in dedale_labeling."
+  },
+  "validation": {
+    "unit_tests_passed": 11,
+    "public_cli_full_run_passed": true,
+    "independent_calendar_integer_full_scan_passed": true,
+    "member_result_matches_first_run": true,
+    "all_672_raw_md5_sha_bytes_rechecked": true,
+    "existing_output_rejected_exit_code": 2,
+    "source_sha256": "dbc72e5c3bf1ac1f4f90b4bf32489ef8ad17c99ab91b2d44f694555bb71642cc",
+    "evidence_sha256": {
+      "clock-comparison.json": "0bfe7fed3113d8a6344cd58ff0d9a067f4ea76cc7eb0592704e93c8eec44fefa",
+      "cli-comparison.json": "98c05855fbee9c9650d338b2145581e3b350c797b73c4eb9ae13b548de4d2a96",
+      "independent-validation-precision.json": "bdea61ef66297d0f77accdea80f7c63c238d4d9b3a4b54e20e94f2859dbd1a9c",
+      "reproduction-verification.json": "cd0ef8e35ce943823031cc0579172cf90986f5963ffa64617f82fb90b655bf04"
+    },
+    "reproduction_command": "python3 -B finetuning/compare_dedale_clocks.py --alerts-zip /path/suricata_alerts.zip --syslog-zip /path/system_logs_syslog.zip --output /new/path/clock-comparison.json",
+    "cli_completion_vs_gate": "Exit success means comparison ran; representation_verified, missing_export_instances/remaining_export_instances and not_in_export_or_excess must also be checked."
+  },
+  "execution_scope": {
+    "new_training_admitted": 0,
+    "gpu_training": false,
+    "server_access_this_unit": false,
+    "current_live_service_verified": false,
+    "production_changed": false,
+    "new_mac_packages": 0,
+    "decoded_raw_json_files_saved": 0,
+    "fresh_server_install_or_attack_e2e": false,
+    "installer_change_required": false,
+    "full_training_pack_run": false,
+    "temporary_cleanup": "Own archives, references and helpers removed after provenance recording; final receipt in STATUS/local session."
+  },
+  "next_steps": [
+    "Preserve provider temporal split and review exposure; no training admission from the official test period.",
+    "Confirm host/flow/process and sensor coverage before assigning incident, benign, blocking or success labels.",
+    "Keep new independent evaluation separate from the already-used final CTI test; resume tokenizer/live checks only when access is available."
+  ]
+}

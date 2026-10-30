@@ -1,5 +1,15 @@
 # 데이터 출처와 사용 범위
 
+## DEDALE 원본 syslog 시각·정밀도 확인 — 2026-10-30 KST
+
+[공식 syslog ZIP](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717890)125,537,856B의 전체 제공MD5/SHA와 내부672개 원시 JSONL MD5를 검증했다. 해제 원문5,017,693행에서 경보1,465,627행 전체를 기존 Suricata export에 연결해 UTC epoch-ms 표현을 확인했다. [원장·정규화 경계·재현](DEDALE_CLOCK_REVIEW.json). 비시간 필드는 모두 대조하고 `@version`/`pid`의 문자열↔정수만 명시적으로 변환했다.
+
+원본의 마이크로초는 보존해야 한다. 정규화 반복19,703개 중9,520개만 원문 객체 반복이고10,183개는 밀리초 축소로 구분되지 않는 별개 원문이다. 경보 수를 독립 사건으로 세거나 정규화 후 일괄 삭제하지 않는다. 숫자 단위의 전수 확인은 수집 장비 시계 정확도/동기화나 사건 성공 판정의 근거가 아니다.
+
+[작성자의 RESCOUSSE 고정 소스](https://gitlab.inria.fr/mlanvin/rescousse/-/tree/ba47b61ed577d2854fb2c1ebb5868652836eb88f)11파일의 Gitblob/SHA·GPLv3 고지를 확인했다. 로그 수집 경로·Sysmon 템플릿·DHCP 예약은 참조했으나 해당revision의 실제 수집 당시 배포는 미증명이다. 코드는 실행/설치/프로젝트 포팅·재배포하지 않았다. 이는 별도 `dedale_labeling` 저장소의 MIT/GPLv3 충돌을 해결하지 않는다. 공식 [데이터 README](https://entrepot.recherche.data.gouv.fr/api/access/datafile/722195)와 데이터 CC BY4.0·인용 의무도 유지한다.
+
+동일 호스트/PID/출발지와 가까운 시각의 audit·sshd 세션 후보1개를 좌표/해시로 연결했지만 host↔IDS 공격사건 정답이나 이름별 호스트-IP 임대 증명은 아니다. 공식 평가기간/검토 노출을 보존하며 신규 학습 편입은0이다. 모든 추가 검증은 로컬 자료 분석이고 운영 보안 정책·LLM 모델 변경은 없다.
+
 ## DEDALE IDS 원자료 및 작성자 라벨링 근거 — 2026-10-30 KST
 
 [공식 V2.1](https://doi.org/10.57745/Y5JLDG)의 [Suricata ZIP](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717879)24,596,811B를 전체 취득해 제공 MD5/ZIP CRC/SHA를 대조했다. 해제된 경보1,465,627행·699,465,555B와 [호스트 라벨 ZIP](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717882)의 combined15,783행을 전수 조사했다. class1 부분집합은 더하지 않는다. [필드/독립 검증/제약](DEDALE_CORRELATION_REVIEW.json).

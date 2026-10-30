@@ -1,5 +1,18 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**DEDALE 시각·중복 후속:** `compare_dedale_clocks.py`는 공식 고정 ZIP2개를 원본 syslog672시간/5,017,693행과 경보1,465,627행 전체로 대조한다. 비시간 필드를 유지하고 `@version`/`pid` 타입2개와 시각 정밀도만 명시적으로 맞춘다. 원문 UTC시각과 epoch-ms의 동일성을 확인했으며 반복 횟수는 제거하지 않는다. 신규11검사/CLI재현·별도 전수검증 통과. [결과/출처](DEDALE_CLOCK_REVIEW.json).
+
+```bash
+python3 -B finetuning/compare_dedale_clocks.py \
+  --alerts-zip /path/suricata_alerts.zip \
+  --syslog-zip /path/system_logs_syslog.zip \
+  --output /new/path/clock-comparison.json
+```
+
+프로젝트 루트에서 실행하며 출력의 상위 디렉터리는 먼저 존재해야 한다. 네트워크 다운로드나 서버 변경 없이 지정 파일을 읽고, 고정 SHA가 다른 입력과 기존 출력 덮어쓰기를 거부한다. 성공 종료는 비교 실행 완료이며, `representation_verified=true`, `remaining_export_instances=0`, `counts.not_in_export_or_excess=0`도 확인한다. 전체 원문 MD5와 모든 ZIP/BZ2 멤버 완독을 검증한다. 해제 원문을 디스크에 쓰지 않고, 경보 다중집합 인덱스에는 메모리를 사용한다. 증거 파일은 로컬 전용 경로에 보관한다.
+
+현재 고정 파일에는 `inspect_alerts(..., timestamp_unit='epoch-ms')`를 사용할 근거가 생겼다. 다른 입력에 대한 기본값 `None`은 유지한다. 19,703개의 정규화 반복 중9,520개는 동일 원문 객체 반복이고10,183개는 서로 다른 정밀 원문이다. 시각만 줄여 중복 제거하지 않는다. 학습 편입·호스트↔IDS 사건 연결은 별도 검수 대상이다.
+
 **DEDALE IDS·호스트 후속:** `inspect_dedale_network.py`는 Suricata syslog 요약의 센서·통신 양끝·룰ID·경보 우선순위를 구분하고, 호스트 라벨의 명시적 연결 필드를 조사한다. 경보1,465,627행 전수/독립 재대조와12회귀를 통과했다. [검증 원장](DEDALE_CORRELATION_REVIEW.json). 사건 연계·학습 편입은0이며 작성자 저장소 MIT/GPLv3 표기 충돌을 기록했다.
 
 호출은 `inspect_alerts(bounded_lines(stream), timestamp_unit=None)`와 `inspect_host_records(bounded_lines(stream), source=member)`를 사용한다. 입력 취득·ZIP CRC/제공MD5·용량 한도는 호출자가 검증한다. 시각 단위 계약 없이 정수를 변환하지 않으며, `epoch-ms` 옵션 테스트 통과는 실제 데이터 단위 확인을 뜻하지 않는다. `host_transport_tuple`은 명시적 TCP/UDP·양끝 주소/포트만 허용한다. DNS 답변/unspecified 주소/부분 주소·시각만으로 사건을 연결하지 않는다. 이 도구는 해당 공개 자료 진단용이며 범용 로그 수집기나 운영 차단기/학습기 아니다. pack에는 자체 검사 소스·원장만 추가하고 원본/작성자 코드/다운로드물은 넣지 않는다.

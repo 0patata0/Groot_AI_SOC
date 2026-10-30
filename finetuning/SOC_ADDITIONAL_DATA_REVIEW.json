@@ -571,5 +571,14 @@
     "confirmed_host_incident_links": 0,
     "new_training_admitted": 0,
     "author_code_license": "MIT root / GPLv3 subdirectory README conflict; reuse held"
+  },
+  "dedale_clock_followup": {
+    "at_kst": "2026-10-30T12:42:16.867007+09:00",
+    "file": "DEDALE_CLOCK_REVIEW.json",
+    "source_rows": 5017693,
+    "all_alerts_matched": 1465627,
+    "epoch_ms_verified_for_pinned_export": true,
+    "new_training_admitted": 0,
+    "prior_unknown_clock_status_is_historical": true
   }
 }

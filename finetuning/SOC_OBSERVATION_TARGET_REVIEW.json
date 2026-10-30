@@ -1,0 +1,561 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T15:51:59.946478+09:00",
+  "status": "targets_reviewed_actual_tokenizer_and_admission_pending",
+  "manifest": {
+    "schema": 1,
+    "prepared_at_kst": "2026-10-30T15:41:33.181363+09:00",
+    "status": "semantically_refined_candidate_not_admitted",
+    "records": 17,
+    "input_dialogues_sha256": "203c5fd83b9563de95ceadda7ebef2c34713910b24a8dd59af1b7eefc0096c6c",
+    "input_lineage_sha256": "fba12886193573e8b8782028ca8038aa8fcf7934d88d8c03b917823b9df0b50c",
+    "dialogues_sha256": "5f0256aa0b9c4f8aa97871b0a7e0789253a261670e8c0b5342559665e651f426",
+    "lineage_sha256": "c7c8277e3f48eb97378fa58beaa04a475416d7690618b74691a4e3759625099d",
+    "code_sha256": "821dcec492552715891bebe8e75e926ed287866097710ec1ee712bdee867b881",
+    "changed_targets": 10,
+    "unchanged_targets": 7,
+    "evidence_bindings": 94,
+    "all_input_bytes_unchanged": true,
+    "all_source_bindings_unchanged": true,
+    "original_unique_complete_targets": 14,
+    "revised_unique_complete_targets": 17,
+    "task_family_counts": {
+      "request_with_shell_tcp_literal": 2,
+      "service_start_stop": 5,
+      "provider_annotated_command_request": 2,
+      "queue": 1,
+      "auth": 1,
+      "fim": 1,
+      "apparmor": 1,
+      "audit_config": 1,
+      "audit_stop": 1,
+      "account": 1,
+      "missing_raw": 1
+    },
+    "source_family_counts": {
+      "AIT-LDS-ADS-all-derivatives": 9,
+      "linux-apt-2024-all-releases-and-derivatives": 8
+    },
+    "leakage_groups": [
+      "ait-lds-ads:fox",
+      "ait-lds-ads:russellmitchell",
+      "ait-lds-ads:santos",
+      "ait-lds-ads:shaw",
+      "ait-lds-ads:wardbeck",
+      "linux-apt-2024-all-releases-and-derivatives"
+    ],
+    "input_utf8_bytes": 21777,
+    "target_utf8_bytes_before": 16218,
+    "target_utf8_bytes_after": 22916,
+    "training_admitted": 0,
+    "tokenizer_verified": false,
+    "independent_expert_review": false,
+    "new_independent_incidents_claimed": 0,
+    "new_final_test_records": 0,
+    "reviews": [
+      {
+        "record_id": "OBS-f3065e69e689a02ad770",
+        "original_case_id": "ait-source-review:fox:reverse_shell",
+        "task_family": "request_with_shell_tcp_literal",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-e919546d6602f1a1cbbc",
+        "original_case_id": "ait-source-review:fox:service_stop",
+        "task_family": "service_start_stop",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-46006b922fa39f807796",
+        "original_case_id": "ait-source-review:fox:webshell",
+        "task_family": "provider_annotated_command_request",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-5ff728a72add111f418a",
+        "original_case_id": "ait-source-review:russellmitchell:reverse_shell",
+        "task_family": "request_with_shell_tcp_literal",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-949d7835f633a927703f",
+        "original_case_id": "ait-source-review:russellmitchell:service_stop",
+        "task_family": "service_start_stop",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-a78236312e57a359fa22",
+        "original_case_id": "ait-source-review:santos:service_stop",
+        "task_family": "service_start_stop",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-d31f9c60c6cb5325c57e",
+        "original_case_id": "ait-source-review:shaw:service_stop",
+        "task_family": "service_start_stop",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-2b7df3408040eda076c6",
+        "original_case_id": "ait-source-review:shaw:webshell",
+        "task_family": "provider_annotated_command_request",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-508136c59500515fd4aa",
+        "original_case_id": "ait-source-review:wardbeck:service_stop",
+        "task_family": "service_start_stop",
+        "changes": [
+          "bind_claims_to_observed_fields",
+          "record_sensor_modes_and_sample_scope",
+          "conditional_limits_only"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-52d3313479d0b4f963f5",
+        "original_case_id": "linux-apt-queue",
+        "task_family": "queue",
+        "changes": [],
+        "target_changed": false,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-3e4858b99efb4ae15bbf",
+        "original_case_id": "linux-apt-auth",
+        "task_family": "auth",
+        "changes": [],
+        "target_changed": false,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-c113869aede8276540eb",
+        "original_case_id": "linux-apt-fim",
+        "task_family": "fim",
+        "changes": [],
+        "target_changed": false,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-750ffd03d135fe562cf7",
+        "original_case_id": "linux-apt-apparmor",
+        "task_family": "apparmor",
+        "changes": [],
+        "target_changed": false,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-6cbf2e14a1c90742b02e",
+        "original_case_id": "linux-apt-audit_config",
+        "task_family": "audit_config",
+        "changes": [
+          "remove_claim_about_unprovided_structured_result_contents"
+        ],
+        "target_changed": true,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-b3f418384db0435f6218",
+        "original_case_id": "linux-apt-audit_stop",
+        "task_family": "audit_stop",
+        "changes": [],
+        "target_changed": false,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-dfa85a51e78251499ddc",
+        "original_case_id": "linux-apt-account",
+        "task_family": "account",
+        "changes": [],
+        "target_changed": false,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      },
+      {
+        "record_id": "OBS-c984373506708f1f8e8d",
+        "original_case_id": "linux-apt-missing_raw",
+        "task_family": "missing_raw",
+        "changes": [],
+        "target_changed": false,
+        "prompt_unchanged": true,
+        "source_bindings_unchanged": true,
+        "review_author": "project_agent",
+        "independent_expert_review": false
+      }
+    ],
+    "limits": [
+      "Unique targets include different observed times/units; uniqueness is not quality or task diversity.",
+      "Nine AIT windows were selected for zero ADS records; selection bias remains.",
+      "Historical no-tools investigation tasks do not teach actual tool selection/approval/write/rollback.",
+      "Provider annotations are input evidence; not label-free detection evaluation.",
+      "No new raw acquisition, actual tokenizer, missing V4/V5 overlap audit, GPU run or live verification."
+    ]
+  },
+  "independent_implementation_check": {
+    "at_kst": "2026-10-30T15:50:16.407297+09:00",
+    "records": 17,
+    "evidence_bindings": 94,
+    "AMiner_links": 14,
+    "time_relations": {
+      "same_recorded_timestamp": 4,
+      "start_before_stop": 1
+    },
+    "separate_diary_relations": {
+      "after_interval": 4,
+      "before_interval": 1
+    },
+    "findings": [
+      {
+        "record_id": "OBS-f3065e69e689a02ad770",
+        "case": "ait-source-review:fox:reverse_shell",
+        "evidence_count": 3,
+        "target_changed": true,
+        "source_projection_verified": true
+      },
+      {
+        "record_id": "OBS-e919546d6602f1a1cbbc",
+        "case": "ait-source-review:fox:service_stop",
+        "evidence_count": 2,
+        "target_changed": true,
+        "source_projection_verified": true,
+        "recorded_time_relation": "same_recorded_timestamp",
+        "diary_relation": "after_interval"
+      },
+      {
+        "record_id": "OBS-46006b922fa39f807796",
+        "case": "ait-source-review:fox:webshell",
+        "evidence_count": 6,
+        "target_changed": true,
+        "source_projection_verified": true
+      },
+      {
+        "record_id": "OBS-5ff728a72add111f418a",
+        "case": "ait-source-review:russellmitchell:reverse_shell",
+        "evidence_count": 2,
+        "target_changed": true,
+        "source_projection_verified": true
+      },
+      {
+        "record_id": "OBS-949d7835f633a927703f",
+        "case": "ait-source-review:russellmitchell:service_stop",
+        "evidence_count": 2,
+        "target_changed": true,
+        "source_projection_verified": true,
+        "recorded_time_relation": "same_recorded_timestamp",
+        "diary_relation": "before_interval"
+      },
+      {
+        "record_id": "OBS-a78236312e57a359fa22",
+        "case": "ait-source-review:santos:service_stop",
+        "evidence_count": 2,
+        "target_changed": true,
+        "source_projection_verified": true,
+        "recorded_time_relation": "same_recorded_timestamp",
+        "diary_relation": "after_interval"
+      },
+      {
+        "record_id": "OBS-d31f9c60c6cb5325c57e",
+        "case": "ait-source-review:shaw:service_stop",
+        "evidence_count": 2,
+        "target_changed": true,
+        "source_projection_verified": true,
+        "recorded_time_relation": "same_recorded_timestamp",
+        "diary_relation": "after_interval"
+      },
+      {
+        "record_id": "OBS-2b7df3408040eda076c6",
+        "case": "ait-source-review:shaw:webshell",
+        "evidence_count": 4,
+        "target_changed": true,
+        "source_projection_verified": true
+      },
+      {
+        "record_id": "OBS-508136c59500515fd4aa",
+        "case": "ait-source-review:wardbeck:service_stop",
+        "evidence_count": 2,
+        "target_changed": true,
+        "source_projection_verified": true,
+        "recorded_time_relation": "start_before_stop",
+        "diary_relation": "after_interval"
+      },
+      {
+        "record_id": "OBS-52d3313479d0b4f963f5",
+        "case": "linux-apt-queue",
+        "evidence_count": 56,
+        "target_changed": false,
+        "source_projection_verified": true,
+        "validated_task": "queue"
+      },
+      {
+        "record_id": "OBS-3e4858b99efb4ae15bbf",
+        "case": "linux-apt-auth",
+        "evidence_count": 4,
+        "target_changed": false,
+        "source_projection_verified": true,
+        "validated_task": "auth"
+      },
+      {
+        "record_id": "OBS-c113869aede8276540eb",
+        "case": "linux-apt-fim",
+        "evidence_count": 2,
+        "target_changed": false,
+        "source_projection_verified": true,
+        "validated_task": "fim"
+      },
+      {
+        "record_id": "OBS-750ffd03d135fe562cf7",
+        "case": "linux-apt-apparmor",
+        "evidence_count": 1,
+        "target_changed": false,
+        "source_projection_verified": true,
+        "validated_task": "apparmor"
+      },
+      {
+        "record_id": "OBS-6cbf2e14a1c90742b02e",
+        "case": "linux-apt-audit_config",
+        "evidence_count": 1,
+        "target_changed": true,
+        "source_projection_verified": true,
+        "validated_task": "audit_config"
+      },
+      {
+        "record_id": "OBS-b3f418384db0435f6218",
+        "case": "linux-apt-audit_stop",
+        "evidence_count": 1,
+        "target_changed": false,
+        "source_projection_verified": true,
+        "validated_task": "audit_stop"
+      },
+      {
+        "record_id": "OBS-dfa85a51e78251499ddc",
+        "case": "linux-apt-account",
+        "evidence_count": 3,
+        "target_changed": false,
+        "source_projection_verified": true,
+        "validated_task": "account"
+      },
+      {
+        "record_id": "OBS-c984373506708f1f8e8d",
+        "case": "linux-apt-missing_raw",
+        "evidence_count": 1,
+        "target_changed": false,
+        "source_projection_verified": true,
+        "validated_task": "missing_raw"
+      }
+    ],
+    "source_projection_method": "Separate stdlib implementation, not refiner/expander reuse",
+    "raw_files_refetched": false,
+    "independent_expert_review": false,
+    "actual_tokenizer": false,
+    "frozen_v5_source_files_unchanged": 25
+  },
+  "historical_prompt_audit": {
+    "files": 33,
+    "rows": 42830,
+    "exact_matches": 0,
+    "missing": [
+      "data-soc-evidence-v5-r3/train.jsonl",
+      "data-soc-evidence-v5-r3/validation.jsonl",
+      "data-soc-evidence-v5-r3/test.jsonl",
+      "data-soc-operator-v4-r1/train.jsonl",
+      "data-soc-operator-v4-r1/validation.jsonl",
+      "data-soc-operator-v4-r1/test.jsonl"
+    ],
+    "method": "Whitespace-normalized exact first-user-input SHA256; no semantic independence claim",
+    "complete": false,
+    "semantic_or_source_independence_proven": false
+  },
+  "source_reports": [
+    "SOC_OBSERVATION_INPUT_REVIEW.json",
+    "AIT_CASE_REVIEW.json",
+    "LINUX_APT_CASE_REVIEW.json"
+  ],
+  "source_inputs": {
+    "ait_cases_sha256": "57d1499fe18ba8a867d9672a3d9d962b19f59402a246b561ce56aafc57e85127",
+    "linux_cases_sha256": "e419284f9a197cb0736129890c76414297378fb821660b82f3355a058147dc96",
+    "ait_notice_sha256": "cd809e61c6b73666a0090f0393e1dc535d1a91e400e1a20b51f20ab0f274c5c3",
+    "linux_notice_sha256": "cf52b6569f3c9991950171b2b544166951210ed7456f9afb1acb93e82d2dce1f"
+  },
+  "artifacts_sha256": {
+    "refine_soc_observation_targets.py": "821dcec492552715891bebe8e75e926ed287866097710ec1ee712bdee867b881",
+    "check_soc_observation_tokens.py": "b3ba36fc8dabab88f8717f6a0320303efe439ebe93b40ea088fbfb30d060ac2e",
+    "tests/test_soc_observation_targets.py": "dd30acb4926a4aa322256b0f9a52e4abc2e9236feff7cde597460cfae06064db",
+    "tests/test_soc_observation_inputs.py": "7253e7a363e26a2c363995b66f531a93f807e970994038c2cc3105eceb17a10a"
+  },
+  "validation": {
+    "target_regression_tests": 14,
+    "existing_input_regression_tests": 16,
+    "all_passed": true,
+    "public_CLI_reproduction": {
+      "at_kst": "2026-10-30T15:50:17.978849+09:00",
+      "candidate_lineage_and_notices_byte_identical": true,
+      "existing_output_refused_exit": 1
+    },
+    "R1_and_R2_loader_integrity_checks_passed": true,
+    "frozen_V5_manifest_and_25_source_files_unchanged": true,
+    "R1_input_dialogues_and_lineage_unchanged": true,
+    "actual_Qwen_tokenizer": false,
+    "unit_test_tokenizer": "Synthetic only; not real token length, quality, or speed measurement"
+  },
+  "authorship": {
+    "observations": "Prior source-verified institutional research records; not refetched raw files in this unit",
+    "questions_and_targets": "Project-authored evidence interpretation, not institutional official answers",
+    "independent_expert_review": false
+  },
+  "licenses": {
+    "AIT_LDS": "CC-BY-NC-SA-4.0",
+    "AIT_ADS": "CC-BY-4.0",
+    "Linux_APT": "CC-BY-4.0",
+    "notices_preserved_byte_identical": true
+  },
+  "network_checks": [
+    {
+      "at_kst": "2026-10-30T15:43:21.482640+09:00",
+      "mode": "normal",
+      "results": [
+        {
+          "name": "A",
+          "tcp": "TimeoutError",
+          "authenticated": false
+        },
+        {
+          "name": "Thor",
+          "tcp": "TimeoutError",
+          "authenticated": false
+        }
+      ]
+    },
+    {
+      "at_kst": "2026-10-30T15:44:08.894599+09:00",
+      "mode": "escalated",
+      "results": [
+        {
+          "name": "A",
+          "tcp": "TimeoutError",
+          "authenticated": false
+        },
+        {
+          "name": "Thor",
+          "tcp": "TimeoutError",
+          "authenticated": false
+        }
+      ]
+    }
+  ],
+  "remaining": [
+    "Actual pinned Qwen tokenizer: full prompt/target/loss-mask and 4096-token budget; longer revised targets may exceed the budget",
+    "Access missing V4/V5 six split files and complete semantic/source-group overlap audit",
+    "Balance zero-ADS and needs-review selection; these 17 records cover 2 source families and 6 historical groups, not 17 independent incidents",
+    "Separate unseen source/incident evaluation with high penalties for omitted evidence, false-normal conclusions and invented actions; existing final128 remains consumed",
+    "Historical no-tool cases do not validate live MCP selection, approval, write, rollback or attack E2E"
+  ],
+  "execution_scope": {
+    "new_training_admitted": 0,
+    "new_raw_downloads": 0,
+    "GPU_training": false,
+    "production_changes": false,
+    "authenticated_server_access": false,
+    "new_Mac_packages": 0,
+    "MCP_Mattermost_attack_E2E": false,
+    "new_server_install": false,
+    "full_training_pack_generated": false,
+    "pack_policy": "Only preparation/checker/report and tests; local R1/R2 candidate data not automatically bundled",
+    "presentation_content_changes": 0
+  }
+}

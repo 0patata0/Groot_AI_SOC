@@ -11,6 +11,7 @@ from download_model import verify_artifact
 from dialogue_encoding import encode_dialogue, label_values
 from train import encode_completion
 from prepare_soc_observation_inputs import require, verified
+from prepare_data import canonical
 
 MODEL = 'Qwen/Qwen3.6-35B-A3B'
 REVISION = '995ad96eacd98c81ed38be0c5b274b04031597b0'
@@ -67,6 +68,27 @@ def measure(rows, tokenizer, max_length):
             'training_admitted': 0}
 
 
+def load_candidates(directory):
+    manifest = json.loads((directory / 'manifest.json').read_text())
+    require(manifest['status'] in ('formatted_candidate_not_admitted_training',
+                                   'semantically_refined_candidate_not_admitted')
+            and type(manifest['training_admitted']) is int and manifest['training_admitted'] == 0,
+            'Unexpected candidate status')
+    raw = verified(directory / 'candidate-dialogues.jsonl', manifest['dialogues_sha256'])
+    traces = verified(directory / 'lineage.jsonl', manifest['lineage_sha256'])
+    require(len(raw) <= 2_000_000 and len(traces) <= 2_000_000, 'Candidate byte budget exceeded')
+    rows = [json.loads(x) for x in raw.splitlines()]
+    lineage = [json.loads(x) for x in traces.splitlines()]
+    require(len(rows) == len(lineage) == manifest['records'] == 17 and
+            len({r['id'] for r in rows}) == 17, 'Candidate records missing/repeated')
+    for row, trace in zip(rows, lineage):
+        require(trace['record_id'] == row['id'] and trace['training_admitted'] is False
+                and trace['partition'] == 'historical_training_candidate_only'
+                and trace['record_sha256'] == hashlib.sha256(canonical(row).encode()).hexdigest(),
+                'Candidate lineage/partition differs')
+    return manifest, rows
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidate-dir', type=Path, required=True)
@@ -76,15 +98,7 @@ def main():
     parser.add_argument('--max-length', type=int, default=4096)
     args = parser.parse_args()
     require(not args.output.exists(), 'Output already exists')
-    manifest = json.loads((args.candidate_dir / 'manifest.json').read_text())
-    require(manifest['status'] == 'formatted_candidate_not_admitted_training'
-            and manifest['training_admitted'] == 0, 'Unexpected candidate status')
-    raw = verified(args.candidate_dir / 'candidate-dialogues.jsonl', manifest['dialogues_sha256'])
-    verified(args.candidate_dir / 'lineage.jsonl', manifest['lineage_sha256'])
-    require(len(raw) <= 2_000_000, 'Candidate byte budget exceeded')
-    rows = [json.loads(x) for x in raw.splitlines()]
-    require(len(rows) == manifest['records'] == 17 and len({r['id'] for r in rows}) == 17,
-            'Candidate records missing/repeated')
+    manifest, rows = load_candidates(args.candidate_dir)
     base_manifest = json.loads(args.base_manifest.read_text())
     hashes = metadata_check(args.base_dir, base_manifest)
     os.environ.update(CUDA_VISIBLE_DEVICES='', TOKENIZERS_PARALLELISM='false',

@@ -1,5 +1,18 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**관측 후보 답변 검수 — 2026-10-30 KST:** `refine_soc_observation_targets.py`는 고정 R1의17개 후보를 대조해 입력/근거94개는 보존하고10개 답변을 수정한다. 같은 시각의 선후 추측, 요청과 실행 성공의 혼동, 입력에 없는 필드 내용의 추정을 막고 관측별 근거를 연결한다. R1을 덮어쓰지 않으며 별도 R2에도 학습 미편입 상태와 출처 고지를 유지한다. [수정·30회귀·재현·별도 대조 결과](SOC_OBSERVATION_TARGET_REVIEW.json).
+
+```sh
+python3 -B finetuning/refine_soc_observation_targets.py \
+  --source finetuning/data-soc-observation-candidate-20261030-r1 \
+  --output /new/local-candidate-directory
+python3 -B -m unittest discover -s finetuning/tests -p test_soc_observation_targets.py -v
+```
+
+원장의 R1 후보/lineage/고지 해시와 일치하는 로컬 자료가 필요하다. 결과를 생성했다고 학습에 편입하지 않는다. `check_soc_observation_tokens.py`는 R1/R2 각각의 후보·lineage 해시와 기록별 연결을 검증한 뒤 기존 Thor 환경의 고정 tokenizer로 전체 정답/마스크를 검사한다. **실제 tokenizer는 접속 시간 초과로 아직 실행하지 못했다.** 답변 크기가16,218→22,916B로 늘었으므로4096토큰 적합성을 별도 확인해야 한다. 고유답변14→17은 정확도 상승 수치가 아니다. 원천2종/기존학습환경6묶음·과거 관측 전용으로, 실제 MCP·승인·쓰기·원복 능력은 별도 검증한다. 후보 데이터는 Git/자동pack에서 제외하고 준비 소스·원장·검사만 포함한다.
+
+이하 원문·입력 검수 이력을 보존한다.
+
 **BETH 분할 검사:** `audit_beth_splits.py`는 고정 취득manifest의 ZIP/CSV를 스트림으로 읽어 CRC·SHA·전체행을 검증한다. 원문 특징 전체와 공통11특징 투영을 별도로 대조하고, 라벨을 해시에서 제외하여 상충하는 라벨 때문에 중복이 숨지 않게 한다. 빈칸/0·문자열·반복횟수를 보존하며 학습 편입·라벨 수정·자동분할은 하지 않는다. [실제114만여행·별도원본 검증](BETH_SPLIT_REVIEW.json).
 
 ```sh
@@ -77,7 +90,7 @@ python3 -B finetuning/prepare_soc_observation_inputs.py --ait-dir finetuning/dat
 python3 -B check_soc_observation_tokens.py --candidate-dir /path/to/candidate --base-dir "$HOME/Capstone_Groot_training/qwen36-20261027/base" --base-manifest "$HOME/Capstone_Groot_training/qwen36-20261027/base-manifest.json" --output /new/path/token-check.json
 ```
 
-현재 실제 tokenizer 검사는 Thor 연결 시간 초과로 미실행이다. 합성 tokenizer를 포함한16개 단위검사 통과와 구분한다. V4/V5 여섯 파일 대조·같은 답변4개의 배합·독립 평가가 남았으며 학습 편입은0이다. pack에는 준비/검사 소스·테스트·원장만 추가하고, 이 후보 데이터와 원문은 자동 포함하지 않는다. 질문·해석은 프로젝트 작성이며 기관 공식 정답이 아니다.
+실제 tokenizer 검사는 Thor 연결 시간 초과로 미실행이다. 합성 tokenizer를 포함한16개 입력 단위검사 통과와 구분한다. 이후 상단 R2에서 반복 답변의 사건별 근거를 보완했고, V4/V5 여섯 파일 대조·전체 업무 배합·독립 평가는 남았다. 학습 편입은0이다. pack에는 준비/검사 소스·테스트·원장만 추가하고, 이 후보 데이터와 원문은 자동 포함하지 않는다. 질문·해석은 프로젝트 작성이며 기관 공식 정답이 아니다.
 
 이하 이전 준비·검수 이력이다.
 

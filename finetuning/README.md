@@ -1,5 +1,23 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**원문 기반 입력 후보 검수 — 2026-10-30 KST:** `prepare_soc_observation_inputs.py`는 해시로 고정한 AIT9·Linux-APT8 조사 초안을 입력 후보17개와 별도 출처 원장으로 만든다. 근거94개를 보존하고 반복 필드를 묶는다. 과거 자료의 첫 사용자 입력 완전일치 검사는 수행하지만 의미상 독립성을 보증하지 않는다. 후보는 기존 학습 환경에만 속하며 새 최종평가로 쓰지 않는다. [결과·권리·한계](SOC_OBSERVATION_INPUT_REVIEW.json).
+
+프로젝트 루트에서 새 출력 경로를 지정한다. 기존 결과를 덮어쓰지 않는다.
+
+```bash
+python3 -B finetuning/prepare_soc_observation_inputs.py --ait-dir finetuning/data-ait-case-review-20261030-r3 --linux-dir finetuning/data-linux-apt-cases-20261030-r2 --output finetuning/data-soc-observation-candidate-NEW
+```
+
+`check_soc_observation_tokens.py`는 Thor의 기존 Transformers 환경에서 고정 Qwen revision의 tokenizer만 로컬로 읽는다. 모델 가중치·GPU·학습·네트워크 다운로드를 사용하지 않는다. 전체 답변·학습 마스크·4096토큰 한도를 검사하며 초과 자료를 자르거나 조용히 제외하지 않는다. 검토 자료와 소스를 명시적으로 반입한 뒤 다음과 같이 실행한다. Mac에는 관련 패키지를 설치하지 않는다.
+
+```bash
+python3 -B check_soc_observation_tokens.py --candidate-dir /path/to/candidate --base-dir "$HOME/Capstone_Groot_training/qwen36-20261027/base" --base-manifest "$HOME/Capstone_Groot_training/qwen36-20261027/base-manifest.json" --output /new/path/token-check.json
+```
+
+현재 실제 tokenizer 검사는 Thor 연결 시간 초과로 미실행이다. 합성 tokenizer를 포함한16개 단위검사 통과와 구분한다. V4/V5 여섯 파일 대조·같은 답변4개의 배합·독립 평가가 남았으며 학습 편입은0이다. pack에는 준비/검사 소스·테스트·원장만 추가하고, 이 후보 데이터와 원문은 자동 포함하지 않는다. 질문·해석은 프로젝트 작성이며 기관 공식 정답이 아니다.
+
+이하 이전 준비·검수 이력이다.
+
 **Linux-APT 관제 조사 초안:** `prepare_linux_apt_cases.py`는 고정 원장에 해시가 등록된 `01-05-October.csv`와 `06-20-October.csv`를 읽어 원문 69개에 연결된 초안 8개를 만든다. 파일 크기·MD5·SHA·행 수를 확인한 뒤 원문 좌표, 최소 관측값, 사례별 별칭, 프로젝트 작성 해석과 출처 고지를 보존한다. 누락과 상충 근거를 드러내며 시간대·공격 성공·도구 실행을 만들어 넣지 않는다.
 
 ```sh

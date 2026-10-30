@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T10:10:13.398703+09:00",
+  "status": "formatted_candidate_not_admitted_training",
+  "manifest": {
+    "schema": 1,
+    "prepared_at_kst": "2026-10-30T10:01:05.626392+09:00",
+    "status": "formatted_candidate_not_admitted_training",
+    "code_sha256": "546e88436c9a7266ba0b15ef53c4433d01e4a079c090b7f60c49c5ad0fdbc6c7",
+    "source_inputs": {
+      "ait_cases_sha256": "57d1499fe18ba8a867d9672a3d9d962b19f59402a246b561ce56aafc57e85127",
+      "linux_cases_sha256": "e419284f9a197cb0736129890c76414297378fb821660b82f3355a058147dc96",
+      "ait_notice_sha256": "cd809e61c6b73666a0090f0393e1dc535d1a91e400e1a20b51f20ab0f274c5c3",
+      "linux_notice_sha256": "cf52b6569f3c9991950171b2b544166951210ed7456f9afb1acb93e82d2dce1f"
+    },
+    "records": 17,
+    "evidence_records": 94,
+    "dialogues_sha256": "203c5fd83b9563de95ceadda7ebef2c34713910b24a8dd59af1b7eefc0096c6c",
+    "lineage_sha256": "fba12886193573e8b8782028ca8038aa8fcf7934d88d8c03b917823b9df0b50c",
+    "partition_counts": {
+      "historical_training_candidate_only": 17
+    },
+    "source_family_counts": {
+      "AIT-LDS-ADS-all-derivatives": 9,
+      "linux-apt-2024-all-releases-and-derivatives": 8
+    },
+    "leakage_groups": [
+      "ait-lds-ads:fox",
+      "ait-lds-ads:russellmitchell",
+      "ait-lds-ads:santos",
+      "ait-lds-ads:shaw",
+      "ait-lds-ads:wardbeck",
+      "linux-apt-2024-all-releases-and-derivatives"
+    ],
+    "input_utf8_bytes": 21777,
+    "uncompacted_input_utf8_bytes": 38203,
+    "max_input_characters": 3444,
+    "max_input_utf8_bytes": 3498,
+    "token_counts": null,
+    "tokenizer_check_completed": false,
+    "truncated_records": 0,
+    "training_admitted": 0,
+    "independent_final_test_records": 0,
+    "historical_audit": {
+      "files": 33,
+      "rows": 42830,
+      "exact_matches": 0,
+      "missing": [
+        "data-soc-evidence-v5-r3/train.jsonl",
+        "data-soc-evidence-v5-r3/validation.jsonl",
+        "data-soc-evidence-v5-r3/test.jsonl",
+        "data-soc-operator-v4-r1/train.jsonl",
+        "data-soc-operator-v4-r1/validation.jsonl",
+        "data-soc-operator-v4-r1/test.jsonl"
+      ],
+      "complete": false
+    },
+    "remaining": [
+      "Actual pinned tokenizer with complete target/mask verification",
+      "Missing historical V4/V5 row audit and independent evaluation design",
+      "Task balance and semantic review before any training admission"
+    ]
+  },
+  "independent_projection_check": {
+    "at_kst": "2026-10-30T10:05:46.998345+09:00",
+    "records": 17,
+    "evidence_bindings": 94,
+    "unique_bound_source_records": 94,
+    "all_projected_observations_and_answer_bindings_verified": true,
+    "AIT_historical_v3_manifest_train_groups_verified": 5,
+    "notice_bytes_unchanged": true,
+    "cross_family_final_test_created": false,
+    "exact_duplicate_target_groups": [
+      4
+    ],
+    "complete_target_unique_count": 14,
+    "input_bytes_saved": 16426,
+    "byte_reduction_fraction": 0.42996623301834935,
+    "actual_tokenizer_executed": false,
+    "original_raw_files_refetched": false,
+    "scope": "Reprojection against previously source-verified drafts; not a new raw-file audit or model score."
+  },
+  "artifacts": {
+    "finetuning/prepare_soc_observation_inputs.py": "546e88436c9a7266ba0b15ef53c4433d01e4a079c090b7f60c49c5ad0fdbc6c7",
+    "finetuning/check_soc_observation_tokens.py": "69b56b592cdc7cb9fc915cfcfdf6254baa68db9a70f05ab8b1587f9a4a4472c5",
+    "finetuning/tests/test_soc_observation_inputs.py": "7253e7a363e26a2c363995b66f531a93f807e970994038c2cc3105eceb17a10a",
+    "finetuning/data-soc-observation-candidate-20261030-r1/manifest.json": "81260a8f55e5cc334d970e59244cbcdbff1a709ee29fd594502ef17aa127f25b",
+    "finetuning/data-soc-observation-candidate-20261030-r1/historical-prompt-audit.json": "bb19d43bc123abe4df62ff2dc863555f4d231d310d1efd9a530e5d4085db2c37"
+  },
+  "source_reports": [
+    "AIT_CASE_REVIEW.json",
+    "LINUX_APT_CASE_REVIEW.json"
+  ],
+  "authorship": {
+    "observations": "Previously source-verified research collection records; not newly fetched raw events in this unit.",
+    "questions_and_assessments": "Project-authored; not institutional official answers or independent expert certification."
+  },
+  "licenses": {
+    "AIT_LDS": "CC-BY-NC-SA-4.0",
+    "AIT_ADS": "CC-BY-4.0",
+    "Linux_APT": "CC-BY-4.0",
+    "notices": "Both source notices preserved byte-for-byte; no blanket license assigned."
+  },
+  "validation": {
+    "unit_tests": 16,
+    "unit_test_result": "passed",
+    "tokenizer_in_unit_tests": "Synthetic fake tokenizer only; no actual Qwen token counts or model-quality result.",
+    "source_bindings": 94,
+    "source_bindings_verified": 94,
+    "new_original_raw_file_audit": false,
+    "exact_full_target_unique_count": 14,
+    "repeated_full_target_group_sizes": [
+      4
+    ],
+    "all_evidence_rows_preserved": true,
+    "model_training": false,
+    "actual_tokenizer": false
+  },
+  "network": {
+    "thor_tcp_probes": 2,
+    "result": "TimeoutError on both ordinary and escalated attempts; SSH authentication not attempted.",
+    "actual_service_state": "unverified",
+    "impact": "Pinned tokenizer gate pending; no inference shutdown or remote change."
+  },
+  "limits": [
+    "17 examples are 2 source families / 6 existing historical train groups, not 17 independent incidents.",
+    "Available historical 33-file/42830-row exact first-user prompt scan found 0 matches; row total includes archives, not unique records.",
+    "V4/V5 train/validation/test files are unavailable locally; full cross-corpus audit is incomplete.",
+    "Input byte reduction 42.9966% is not token reduction, latency or model quality.",
+    "Four complete targets repeat across distinct inputs; balance/review before admission.",
+    "Provider annotations are identified observations for investigation, not label-free technique-prediction evaluation.",
+    "Existing final 128 examples remain consumed; no new independent final test created."
+  ],
+  "remaining": [
+    "Actual pinned tokenizer length, full assistant target and loss-mask validation on existing Thor environment",
+    "Restore/access V4/V5 evidence for full overlap review",
+    "Context/semantic correctness and task-balance review; independent expert review remains absent",
+    "New independent evaluation with heavy omission/false-normal penalties before training proposal"
+  ],
+  "execution_scope": {
+    "new_training_admitted": 0,
+    "GPU_training": false,
+    "production_changes": false,
+    "MCP_Mattermost_attack_E2E": false,
+    "new_server_install": false,
+    "full_pack_generated": false,
+    "new_Mac_packages": 0,
+    "new_raw_dataset_downloads_this_unit": 0,
+    "pack": "Only preparation/checker/report sources and tests; no automatic candidate inclusion."
+  }
+}

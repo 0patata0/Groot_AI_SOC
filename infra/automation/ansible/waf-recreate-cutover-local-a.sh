@@ -94,7 +94,7 @@ wrc_inspect() {
 wrc_pin_runtime() {
     local item name sha
     for item in \
-      coordinator.sh:4b741931945035d1a99d953998cf2543c35d406a647ccaffcb6deb8158ee39c0 \
+      coordinator.sh:9f9ad7996bc0bec3b6b35d00b0f6c7776b346d24c39aef8b7e74ebdd65049592 \
       guard.sh:7f78865f4be32dbd647b46f15c4d5118471ef5eca607e6f966aa4579b9b3037e \
       state-lib.sh:d754d17726310a56c77e5d37c41f0ae3883881dfbc91bfa20b7ef916fe428f3a \
       state.jq:3db6baef5c679521bdc257cbe1aca66fd6884714f734a1778ca27b249e40a775 \
@@ -268,7 +268,7 @@ wrc_preflight() {
       jq -e --slurpfile expected "$WRC_BASE/candidate-create/candidate-inspect.json" 'def normalized: map(.Mounts |= sort_by(.Destination)); normalized==($expected[0]|normalized)' >/dev/null || return 1
     wrc_target "$WRC_RAW/capstone-managed/audit-path.conf" 444 || return 1
     wrc_file "$WRC_LIB/waf-rebind-metadata.sh" 400 &&
-      [[ $(wrc_sha "$WRC_LIB/waf-rebind-metadata.sh") == 884dbf89cf1a031ae3193100a13832cb76437cf466e02857221c014bb7e550ca ]] || return 1
+      [[ $(wrc_sha "$WRC_LIB/waf-rebind-metadata.sh") == ab576dc77b70893d82b435edda77f30ab2b6b873981b3d8d86360f0f09f2ff99 ]] || return 1
     wrc_file /usr/local/sbin/capstone-raw-operations 500 &&
       [[ $(wrc_sha /usr/local/sbin/capstone-raw-operations) == 1f5c13ed2ea2b2a0553ff8102c0517a3640da586ee2b50f2e393cc34c2952537 ]] || return 1
     wrc_file /usr/local/sbin/capstone-vector-maintenance 700 &&
@@ -579,7 +579,7 @@ wrc_main() {
         return
     elif [[ $phase == prepare-metadata || $phase == apply-metadata ]]; then
         wrc_file "$WRC_LIB/waf-rebind-metadata.sh" 400 &&
-          [[ $(wrc_sha "$WRC_LIB/waf-rebind-metadata.sh") == 884dbf89cf1a031ae3193100a13832cb76437cf466e02857221c014bb7e550ca ]] || return 77
+          [[ $(wrc_sha "$WRC_LIB/waf-rebind-metadata.sh") == ab576dc77b70893d82b435edda77f30ab2b6b873981b3d8d86360f0f09f2ff99 ]] || return 77
         if [[ $phase == prepare-metadata ]]; then
             wrc_descriptor && /bin/bash "$WRC_LIB/waf-rebind-metadata.sh" prepare
         else /bin/bash "$WRC_LIB/waf-rebind-metadata.sh" apply; fi

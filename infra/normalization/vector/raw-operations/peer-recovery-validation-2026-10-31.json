@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "scope": "actual A Vector peer rotation recovery; not whole outage delivery proof",
+  "observed_at_kst": "2026-10-31T04:01:31.805568+09:00",
+  "reported_counts": {
+    "systemd_failure": 13,
+    "vector_inactive": 4,
+    "rotation_failure": 3,
+    "exact_report_window_verified": false
+  },
+  "before": {
+    "vector_stopped_at_kst": "2026-10-29T17:06:03+09:00",
+    "suricata_phase": "switch_pending",
+    "suricata_revision": 78,
+    "waf_phase": "publish_pending",
+    "waf_revision": 68,
+    "shared_stop_owner": "modsecurity",
+    "suricata_writer": "old_closed/new_open",
+    "reader_guard_refusal": "writer_signal_intent_present"
+  },
+  "deployment": {
+    "deployed": true,
+    "backup": "/var/backups/capstone-vector-peer-recovery-20261031-035230",
+    "files": {
+      "/usr/local/lib/capstone-raw-operations/coordinator.sh": "9f9ad7996bc0bec3b6b35d00b0f6c7776b346d24c39aef8b7e74ebdd65049592",
+      "/usr/local/lib/capstone-raw-operations/waf-rebind-metadata.sh": "ab576dc77b70893d82b435edda77f30ab2b6b873981b3d8d86360f0f09f2ff99"
+    },
+    "service_actions": 0,
+    "state_or_checkpoint_overwrite": false,
+    "at_kst": "2026-10-31T03:52:30.573893+09:00"
+  },
+  "source_sha256": {
+    "infra/normalization/vector/raw-operations/coordinator-writer-intent-fix.sh": "9f9ad7996bc0bec3b6b35d00b0f6c7776b346d24c39aef8b7e74ebdd65049592",
+    "infra/normalization/vector/raw-operations/waf-rebind-metadata.sh": "ab576dc77b70893d82b435edda77f30ab2b6b873981b3d8d86360f0f09f2ff99",
+    "infra/automation/ansible/waf-recreate-cutover-local-a.sh": "61f1429a1a96cebd1df1003ca78d690e91b566ca25df4b4282f74536a3a4a7ec",
+    "infra/normalization/vector/raw-operations/test-writer-intent-native.sh": "067c616e0f58359c61fdd6b5610ca530114dbf1de76e86bf89f2814c5082f42c",
+    "infra/normalization/vector/raw-operations/test-coordinator-writer-intent-fix.py": "336287ef5384ae7fbedd9f68191b5710390cf391c80a166b2bd30a6275f9d624"
+  },
+  "checks": {
+    "linux_isolated_native_cases_passed": 87,
+    "source_checks_passed": 2,
+    "linux_wrapper_tests_passed": 5,
+    "wrapper_cases_are_not_additional_native_cases": true,
+    "initial_install_contract_tests_passed": 39,
+    "mac_native_suites_skipped": 3,
+    "linux_services_in_fixture_tests_called": false,
+    "new_server_full_install": false
+  },
+  "recovery": {
+    "suricata_writer_finalized_at_kst": "2026-10-31T03:53:40+09:00",
+    "vector_first_restored_at_kst": "2026-10-31T03:54:20+09:00",
+    "scheduled_output_rotation_completed_at_kst": "2026-10-31T03:59:23+09:00",
+    "scheduled_suricata_completed_at_kst": "2026-10-31T04:00:14+09:00",
+    "scheduled_waf_completed_at_kst": "2026-10-31T04:01:12+09:00",
+    "states": {
+      "suricata": {
+        "phase": "active",
+        "generation": 16,
+        "revision": 82,
+        "pending": null,
+        "writer_intent": false
+      },
+      "modsecurity": {
+        "phase": "active",
+        "generation": 15,
+        "revision": 69,
+        "pending": null,
+        "writer_intent": false
+      }
+    },
+    "pending": {
+      "/var/lib/capstone-raw-operations/vector-stop-intent.json": false,
+      "/var/lib/capstone-vector-maintenance/resume.pending": false
+    },
+    "vector_active": true,
+    "failed_units": 0,
+    "maintenance_check_exit": 0,
+    "maintenance_collection_statuses": [],
+    "output_file_snapshots": {
+      "/var/log/capstone-vector/ready/normalized.jsonl": {
+        "bytes": 36636,
+        "inode": 417669,
+        "mtime_kst": "2026-10-31T04:01:27.055948+09:00"
+      },
+      "/var/log/capstone-vector/evidence/normalized.jsonl": {
+        "bytes": 37866,
+        "inode": 418391,
+        "mtime_kst": "2026-10-31T04:01:27.055948+09:00"
+      },
+      "/var/log/capstone-vector/telemetry/health.jsonl": {
+        "bytes": 3104,
+        "inode": 418392,
+        "mtime_kst": "2026-10-31T04:01:27.547992+09:00"
+      }
+    },
+    "reader_guards": {
+      "vector": {
+        "exit": 0,
+        "stdout": "{\"schema_version\":1,\"status\":\"ready\",\"reason\":\"reader_start_guard\",\"engine\":\"modsecurity\",\"raw_deleted\":false,\"checkpoint_rewritten\":false,\"delivery_acknowledged\":false}\n",
+        "stderr": ""
+      },
+      "wazuh": {
+        "exit": 0,
+        "stdout": "{\"schema_version\":1,\"status\":\"ready\",\"reason\":\"reader_start_guard\",\"engine\":\"modsecurity\",\"raw_deleted\":false,\"checkpoint_rewritten\":false,\"delivery_acknowledged\":false}\n",
+        "stderr": ""
+      }
+    },
+    "installed_files": {
+      "coordinator.sh": {
+        "sha256": "9f9ad7996bc0bec3b6b35d00b0f6c7776b346d24c39aef8b7e74ebdd65049592",
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o400"
+      },
+      "waf-rebind-metadata.sh": {
+        "sha256": "ab576dc77b70893d82b435edda77f30ab2b6b873981b3d8d86360f0f09f2ff99",
+        "uid": 0,
+        "gid": 0,
+        "mode": "0o400"
+      }
+    },
+    "old_generations_preserved": {
+      "suricata": {
+        "bytes": 95605150,
+        "inode": 1442051,
+        "sha256": "b6036bb42f6a5fd4b623772a41b3fdb786e6e97ee62da381dcc347ca62853c3f",
+        "uid": 0,
+        "mode": "0o400"
+      },
+      "modsecurity": {
+        "bytes": 6304,
+        "inode": 1442049,
+        "sha256": "c5c8b20c694c2cd3669f8e9d70d69fc1a022301d66a39bd9dc3e88196bb890a0",
+        "uid": 0,
+        "mode": "0o400"
+      }
+    },
+    "timers": "NextElapseUSecRealtime=Sat 2026-10-31 04:03:00 KST\nId=capstone-vector-maintenance.timer\nActiveState=active\nUnitFileState=enabled\n\nNextElapseUSecRealtime=Sat 2026-10-31 04:05:00 KST\nId=capstone-raw-operations@suricata.timer\nActiveState=active\nUnitFileState=enabled\n\nNextElapseUSecRealtime=Sat 2026-10-31 04:06:00 KST\nId=capstone-raw-operations@modsecurity.timer\nActiveState=active\nUnitFileState=enabled\n"
+  },
+  "indexer_observation": {
+    "since_kst": "2026-10-31T03:59:23+09:00",
+    "until_kst": "2026-10-31T04:00:37.972774+09:00",
+    "shards": {
+      "total": 105,
+      "successful": 105,
+      "skipped": 102,
+      "failed": 0
+    },
+    "timed_out": false,
+    "exact_total": {
+      "value": 5,
+      "relation": "eq"
+    },
+    "rule_counts": {
+      "100261": 5
+    },
+    "queried_rule_ids": [
+      "100243",
+      "100244",
+      "40704",
+      "100261",
+      "100262"
+    ],
+    "zero_counts_do_not_prove_no_unreported_failure": true
+  },
+  "limitations": [
+    "Original report 13/4/3 time window and all systemd events not individually mapped.",
+    "Native file offsets and observed new Suricata indexed evidence do not prove all outage-period events delivered exactly once.",
+    "Actual attack/detection/LLM approval/block/recovery E2E not run in this unit.",
+    "Host reboot/new WAF container/new server full installation not tested.",
+    "Current-turn clock/failed-read feedback bot source remains local and not deployed."
+  ],
+  "safety": {
+    "raw_deleted": false,
+    "native_checkpoint_overwritten": false,
+    "reader_guard_bypassed": false,
+    "new_packages_installed": false,
+    "llm_privileges_expanded": false,
+    "model_or_firewall_policy_changed": false,
+    "historical_alerts_deleted_or_suppressed": false
+  },
+  "evidence_sha256": {
+    "vector-probe-a.json": "7d17bea2fc37dd712a6a5c29c3c20b9152e783560d57353620308f1ff79782f6",
+    "vector-details-a.json": "f4a6144122f1c34809783c869421c9639fa59b58dc3cc74e5266e27a72dc6524",
+    "vector-guard-a.json": "dd981c2ba72b3ee2422f03270832f38a5c60f01c456932836d74f5e05b17962f",
+    "vector-checkpoints-a.json": "df8b437b116c3a6f9980bca24ff926ebfcd7bdf480e934bb838fd50d74830d06",
+    "vector-native-tests-a.json": "1374706605a08d7318f40a647ffb552f31a1258a3ba66a534c996fc91eb472f6",
+    "vector-tests-validation.json": "ad27d0745a1383c217c407d93f93346e4f0fdfd7f409559155f138194878039a",
+    "vector-deploy-a.json": "7db927fd0d2f2d7355e37b012cd0775d4c1219ce1f8267c43abb8bf3f660d93a",
+    "vector-checkpoints2-a.json": "13735bc3aefb453540387788bc91ca778e5a4bc321b2546e9566fdc00a865688",
+    "vector-postcheck3-a.json": "91a0d13827194ac35bdf96d2de8c01ec383a7b38e5373398d29c8c74ed0a3d30",
+    "vector-final-guards-a.json": "c2229ce0e5dd171ef99b21dca7c9ec5c036d39d5bc96bc89718f641af4d9b047",
+    "vector-indexer-postcheck1-b.json": "b46cd52a9f4c19f24a3df52ebb3a192412a5ee4a26ed561d23e99f731d82430f",
+    "vector-postcheck4-a.json": "2f455730d73aab808d9c2e130abb6d87a9faa48a437bc5ca8fc6d13f8fe13433"
+  },
+  "scheduled_followup": {
+    "at_kst": "2026-10-31T04:03:31.691648+09:00",
+    "maintenance_completed_at_kst": "2026-10-31T04:03:02+09:00",
+    "maintenance_exit": 0,
+    "same_vector_pid": 1100883,
+    "vector_active": true,
+    "collection_statuses": [],
+    "pending": {
+      "/var/lib/capstone-raw-operations/vector-stop-intent.json": false,
+      "/var/lib/capstone-vector-maintenance/resume.pending": false
+    },
+    "telemetry": {
+      "bytes": 6206,
+      "inode": 418392,
+      "mtime_kst": "2026-10-31T04:03:27.547760+09:00"
+    }
+  }
+}

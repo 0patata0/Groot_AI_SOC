@@ -265,6 +265,30 @@ shared_lock_second_refused() {
     exec 9>&-
     [[ $rc == 1 ]] && no_hup
 }
+peer_pause_existing_reopen() {
+    local mode=$1 before marker
+    ro_writer_signal_create || return 1
+    before=$RO_STATE_SHA; marker=$(ro_writer_signal_path)
+    case $mode in
+      completed) printf 'closed\n' > "$stage/old"; printf 'open\n' > "$stage/new" ;;
+      pending) ;;
+      both_open) printf 'open\n' > "$stage/new" ;;
+      changed_identity) WG_ID=$(jq -c '.pid=4321' <<< "$WG_ID") ;;
+      absent) rm -- "$marker" ;;
+    esac
+    ro_reconcile_stop_intent() { printf 'pause-owner-check\n' >> "$stage/calls"; ro_refuse another_engine_owns_vector_pause; }
+    refused ro_operation resume modsecurity || return 1
+    case $mode in
+      completed)
+        [[ $RO_PHASE == old_closed && ! -e $marker && $RO_STATE_SHA != "$before" &&
+           $RO_REASON == another_engine_owns_vector_pause && $(cat "$stage/calls") == pause-owner-check &&
+           $(stat -c %u:%g:%a "$RO_CURRENT") == 0:0:400 ]] ;;
+      absent)
+        [[ $RO_PHASE == switch_pending && $RO_STATE_SHA == "$before" &&
+           $(cat "$stage/calls") == pause-owner-check ]] ;;
+      *) [[ $RO_PHASE == switch_pending && $RO_STATE_SHA == "$before" && -f $marker ]] && no_hup ;;
+    esac
+}
 run_case one_signal_then_durable_cleanup complete_case
 run_case existing_intent_no_signal preexisting_armed
 run_case killed_after_intent_before_signal kill_before_signal
@@ -293,6 +317,11 @@ run_case shorter_same_new_does_not_stop_vector drain_prefix_case short_same no_s
 run_case distinct_new_reaches_stop drain_prefix_case distinct stop
 run_case old_zero_reaches_stop drain_prefix_case old_zero stop
 run_case shared_lock_second_worker_refused shared_lock_second_refused
+run_case completed_reopen_finalizes_before_peer_pause_check peer_pause_existing_reopen completed
+run_case pending_reopen_does_not_resignal_for_peer_pause peer_pause_existing_reopen pending
+run_case both_open_cannot_bypass_peer_pause peer_pause_existing_reopen both_open
+run_case changed_writer_cannot_finalize_for_peer_pause peer_pause_existing_reopen changed_identity
+run_case no_intent_does_not_start_writer_under_peer_pause peer_pause_existing_reopen absent
 cleanup && [[ ! -e $stage ]] || exit 1
 trap - EXIT
 printf '{"status":"passed","cases":%s,"native_state_and_fsync":true,"private_sigkill_reaped":true,"systemd_or_docker_called":false,"operational_files_touched":false,"fixture_removed":true}\n' "$passed"

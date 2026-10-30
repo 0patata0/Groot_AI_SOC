@@ -450,7 +450,7 @@ wr_context() {
     while read -r hash name; do
         wr_file "$WR_LIBRARY/$name" 400 131072 && [[ $(wr_sha "$WR_LIBRARY/$name") == "$hash" ]] || return 1
     done <<'PINS'
-4b741931945035d1a99d953998cf2543c35d406a647ccaffcb6deb8158ee39c0 coordinator.sh
+9f9ad7996bc0bec3b6b35d00b0f6c7776b346d24c39aef8b7e74ebdd65049592 coordinator.sh
 7f78865f4be32dbd647b46f15c4d5118471ef5eca607e6f966aa4579b9b3037e guard.sh
 d754d17726310a56c77e5d37c41f0ae3883881dfbc91bfa20b7ef916fe428f3a state-lib.sh
 3db6baef5c679521bdc257cbe1aca66fd6884714f734a1778ca27b249e40a775 state.jq

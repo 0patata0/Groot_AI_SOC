@@ -68,8 +68,8 @@ class Native(unittest.TestCase):
         for name, digest in hashes.items():
             self.assertEqual(hashlib.sha256((HERE / name).read_bytes()).hexdigest(), digest)
 
-    def test_native_durable_intent_28(self):
-        self.run_suite('test-writer-intent-native.sh', 28)
+    def test_native_durable_intent_33(self):
+        self.run_suite('test-writer-intent-native.sh', 33)
 
     def test_existing_dispatch_and_guard_30(self):
         self.run_suite('test-coordinator-native.sh', 30, True)

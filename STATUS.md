@@ -1,5 +1,24 @@
 # 인프라 현황 — 2026-10-31 현재 작업 상태
 
+## Vector 정제 중단·회전 상호 대기 복구 — 2026-10-31 04:01 KST
+
+**보고된 Vector 경보는 실제 서버 장애였다. A의 원인을 수정하고 정제·예약 회전·새 수신을 확인했다.** Storage unavailable의 정상 백업 파일 오거절과 별개다. 10/29 17:06부터 멈춘 Vector를 Suricata 완료 intent와 WAF 공유 정지 소유권의 상호 대기가 막고 있었다. 정확히 완료된 writer 전환만 먼저 기록하도록 수정했으며 원본/CP 수동 수정·시작 가드 우회는 하지 않았다.
+
+| 항목 | 실제 확인 |
+| --- | --- |
+| 운영 반영 | A coordinator/rebind2파일 CAS·root 복구본 보존. 초기 설치 candidate·WAF cutover 핀 동기화 |
+| 정제·유지관리 | Vector active. 03:58 예약 출력 회전03:59:23 종료0, Suricata04:00:14/WAF04:01:12 예약 실행 종료0. 각각 active gen16/rev82·gen15/rev69 |
+| 사후 점검 | 실패 unit0, pending/intent0, reader 가드2통과, 세 timer active/enabled, 정제/evidence/telemetry 갱신, `recovery=no collection=[]` |
+| 수신 근거 | B03:59:23~04:00:37 KST Suricata 정제 evidence100261 신규5건,105 shard 성공. 같은 구간100243/100244/40704=0. 짧은 관측·경보 ignore를 고려해 장기 보증으로 확대하지 않음 |
+| 검사 | Linux native87+소스2, 초기 설치 계약39통과. Mac Linux 전용3생략. 실제 새 서버 전체 설치/공격·승인·대응 E2E는 생략 |
+| 잔여 | 중단 기간 전체 누락·중복 전수 대조, 봇 턴 시각/실패 피드백 후속 배포·실답변 검증, 전체 실전 관제E2E |
+
+사용자 카드의13/4/3은 정확 집계 구간·Systemd13건 전체 대응을 아직 확인하지 않았다. 이전 경보와 원본을 보존한다. [원인·복구·한계](infra/normalization/vector/raw-operations/peer-recovery-2026-10-31.md) · [실측 원장](infra/normalization/vector/raw-operations/peer-recovery-validation-2026-10-31.json).
+
+04:03:31 KST 후속: 다음 예약 maintenance도04:03:02 종료0이며 Vector PID 유지·두 엔진 active·pending0·telemetry 갱신을 재확인했다.
+
+Git: 이 Vector 완료 단위만 명시적으로 자동 커밋·푸시하며 미완료 봇 소스는 포함하지 않는다. 현재 게시 전이고 완료 영수증은 후속 반영한다. 원본 검증·세션·업무분담은 로컬 전용이다.
+
 ## Storage unavailable 재확인 — 2026-10-31 03:13 KST
 
 **반복 경보의 원인은 수정됐고, 이번 실제 조회에서도 재발을 확인하지 않았다.** A/B 최신 예약 실행은 03:02 KST에 모두 `complete/ok`, 종료0이며 timer는 active/enabled다. 디스크 사용률은 A23%/B29%다. 수정 후 01:15:49~03:13:58 KST의 Wazuh100313은 Indexer 전체105 shard 성공·실패0·timeout false·정확 집계0건이다. 정상 백업 JSON을 디렉터리 전용 검사에서 거절하던 문제이며 용량 부족은 아니었다. [조회·시각·원본 상태 해시](infra/automation/storage-retention/deployment-validation-2026-10-31.json).

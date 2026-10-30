@@ -804,6 +804,18 @@ ro_operation() {
     ro_reconcile_writer_signal || return 2
     ro_reconcile_link || return 2
     ro_validate || return 2
+    # A peer engine can own the shared reader pause while this engine's
+    # already-signalled writer has finished reopening. Finalize ONLY that
+    # existing closed->open transition before checking reader ownership.
+    # Otherwise its durable signal blocks the peer's reader-start guard while
+    # the peer's pause blocks this engine's signal cleanup: a circular wait.
+    # No new signal, alias publication, reader stop/start or CP write here.
+    if [[ $RO_PHASE == switch_pending && ( -e $(ro_writer_signal_path) || -L $(ro_writer_signal_path) ) ]]; then
+        ro_writer_signal_read && ro_writer_signal_identity && ro_writer_pair || return 2
+        [[ $RO_OLD_WRITER_STATUS == closed && $RO_NEW_WRITER_STATUS == open ]] ||
+          { ro_refuse existing_writer_reopen_not_complete; return 2; }
+        ro_switch_writer && ro_reconcile_writer_signal || return 2
+    fi
     ro_reconcile_stop_intent || return 2
     if [[ $RO_PHASE == active ]]; then
         [[ $action != resume ]] || return 0

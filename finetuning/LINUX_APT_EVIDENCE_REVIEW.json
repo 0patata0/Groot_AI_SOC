@@ -545,5 +545,12 @@
     "new_server_install_test": false,
     "mcp_chat_attack_e2e": false,
     "full_training_bundle_built": false
+  },
+  "case_review_followup": {
+    "review": "LINUX_APT_CASE_REVIEW.json",
+    "reviewed_at_kst": "2026-10-30T09:19:39.524227+09:00",
+    "cases": 8,
+    "original_record_bindings": 69,
+    "training_admitted": 0
   }
 }

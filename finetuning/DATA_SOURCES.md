@@ -1,5 +1,15 @@
 # 데이터 출처와 사용 범위
 
+## Linux-APT 원문 조사 초안 후속 — 2026-10-30 KST
+
+[원장](LINUX_APT_CASE_REVIEW.json)에 CSV 2개의 원문 69개와 조사 초안 8개를 연결했다. 데이터·논문 출처는 기존 Linux-APT DOI를 따르며 질문·해석·추가 조사는 프로젝트 작성이다. 기관 공식 QA, 독립 사건 8개 또는 새 학습 편입으로 세지 않는다. 감사 결과에 제어문자 뒤의 식별 값이 섞인 사례, decoder와 FIM 원문이 다른 사례, SELinux 설명과 AppArmor 원문이 다른 사례를 원문 해시와 좌표로 검증했다.
+
+큐 해석은 [Wazuh v4.5.2 공식 룰](https://github.com/wazuh/wazuh/blob/v4.5.2/ruleset/rules/0016-wazuh_rules.xml)의 해시와 [현재 큐 문서](https://documentation.wazuh.com/current/user-manual/manager/wazuh-server-queue.html)를 별도로 확인했다. 큐 정상 복귀는 유실 로그 재수집의 증거가 아니다. 69행의 시간대는 미상으로 보존한다. 출발지와 보고 에이전트가 같다는 사실만으로 동일 세션이나 공격 성공을 단정하지 않는다. 자료에 없는 정답·실운영 정상 판정·도구 실행은 추가하지 않았다.
+
+이전 122,563행 전수 검증과 이번 69행 맥락 검수는 범위가 다르다. 큐 사례만 선택 CSV의 대상 룰 전수이며 나머지는 명시된 일부 기록이다. 같은 원천과 파생본을 같은 분할에 두고, 독립 최종 평가와 입력 길이·문항을 검수하는 일이 남았다.
+
+이하 이전 출처 이력이다.
+
 ## Linux-APT 전수 확인 후속 — 2026-10-30T09:04:02.365903+09:00
 
 [공식 원본](https://zenodo.org/records/10685642)의 17 CSV **122,563행 / 208,367,683B**를 제공 MD5·크기와 대조하고 SHA256을 남겼다. [공개 검사 원장](LINUX_APT_EVIDENCE_REVIEW.json)과 [고정 파일 목록](LINUX_APT_SOURCE_SPEC.json)으로 재현한다. 아래887행은 최초 부분 검토 이력이며 이 후속 검토가 확인 범위를 확장한다.

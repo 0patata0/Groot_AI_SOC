@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T09:19:39.524227+09:00",
+  "status": "source_bound_investigation_drafts_verified_against_original_records_not_admitted_training",
+  "source": {
+    "dataset_doi": "10.5281/zenodo.10685642",
+    "dataset_url": "https://zenodo.org/records/10685642",
+    "paper_doi": "10.1016/j.dib.2024.110290",
+    "creator": "Sohaib Karim",
+    "license": "CC-BY-4.0",
+    "citation_keys": [
+      "karim2024linux_apt_data",
+      "karim2024linux_apt_paper"
+    ],
+    "nature": "Real Wazuh logs from a research testbed with general activities and emulated attacks, not independent victim-enterprise incidents."
+  },
+  "manifest": {
+    "schema": 1,
+    "created_at_kst": "2026-10-30T09:15:42.224977+09:00",
+    "code_sha256": "67bc5b59791193d23b754e3b110d78801abd996523ce5d7beb2d01851da80872",
+    "parser_sha256": "2b3ed23256491359f7a9335d2b027b58f1322965c0ce11aeca332985d7767636",
+    "source_spec_sha256": "e23f1b689cc359e7cc8bb79ae2aa9e8ddff1f4951586598c5199ed9aef24f67a",
+    "source_files": [
+      {
+        "name": "01-05-October.csv",
+        "url": "https://zenodo.org/api/records/10685642/files/01-05-October.csv/content",
+        "bytes": 1025160,
+        "provider_md5_verified": true,
+        "sha256": "0964fd2b7462c8b9eaa435a9881eacb8460b7a4b87cc697668478be1304fc81d",
+        "rows": 819,
+        "columns": 123
+      },
+      {
+        "name": "06-20-October.csv",
+        "url": "https://zenodo.org/api/records/10685642/files/06-20-October.csv/content",
+        "bytes": 5329146,
+        "provider_md5_verified": true,
+        "sha256": "fd20eb2c552d7090dc3eede662f0185a256ddb1253107ef9c045fb398d577e29",
+        "rows": 4953,
+        "columns": 136
+      }
+    ],
+    "case_count": 8,
+    "selected_record_count": 69,
+    "cases_sha256": "e419284f9a197cb0736129890c76414297378fb821660b82f3355a058147dc96",
+    "notice_sha256": "cf52b6569f3c9991950171b2b544166951210ed7456f9afb1acb93e82d2dce1f",
+    "training_admitted": 0,
+    "independent_incident_count_claimed": 0
+  },
+  "independent_verification": {
+    "at_kst": "2026-10-30T09:17:40.267308+09:00",
+    "files_parsed": 2,
+    "source_rows": 5772,
+    "cases": 8,
+    "unique_evidence_records": 69,
+    "all_selected_coordinates_sha_labels_entities_verified": true,
+    "queue_all_in_scope_events_covered": true,
+    "r1_r2_evidence_and_answers_equal": true,
+    "r2_source_scope_extended_to_include_204": true,
+    "source_clock_remains_unknown": true,
+    "cases_sha256": "e419284f9a197cb0736129890c76414297378fb821660b82f3355a058147dc96",
+    "notice_sha256": "cf52b6569f3c9991950171b2b544166951210ed7456f9afb1acb93e82d2dce1f"
+  },
+  "roles_covered": [
+    "collection continuity and loss investigation",
+    "authentication evidence correlation",
+    "file integrity event reconciliation",
+    "audit module and result parsing",
+    "audit configuration and daemon lifecycle investigation",
+    "account-change triage",
+    "missing evidence acknowledgement"
+  ],
+  "cases": [
+    {
+      "id": "linux-apt-queue",
+      "question": "수집 큐는 정상 복귀했나? 그 전 누락 로그까지 복구됐다고 볼 수 있나?",
+      "source_file": "06-20-October.csv",
+      "record_numbers": [
+        65,
+        1704,
+        66,
+        70,
+        3386,
+        68,
+        3387,
+        1728,
+        1729,
+        1730,
+        3381,
+        3382,
+        1735,
+        3384,
+        3385,
+        69,
+        83,
+        72,
+        73,
+        3392,
+        74,
+        75,
+        1732,
+        77,
+        1722,
+        78,
+        1723,
+        1733,
+        3388,
+        3389,
+        1734,
+        1725,
+        79,
+        1726,
+        80,
+        1737,
+        82,
+        1738,
+        1739,
+        3391,
+        3393,
+        81,
+        1740,
+        84,
+        3408,
+        47,
+        51,
+        44,
+        45,
+        3406,
+        48,
+        3411,
+        52,
+        49,
+        3404,
+        50
+      ],
+      "evidence_count": 56,
+      "findings": {
+        "backfill_verified": false,
+        "last_observed_state": "normal",
+        "lost_events": null,
+        "observed_returns_to_normal": 16,
+        "state_counts": {
+          "90%": 16,
+          "full": 24,
+          "normal": 16
+        }
+      },
+      "critical_error_to_penalize": "Do not equate normal queue load with recovered missing events or complete monitoring."
+    },
+    {
+      "id": "linux-apt-auth",
+      "question": "이 네 기록만으로 같은 SSH 세션의 공격 성공을 확정할 수 있나?",
+      "source_file": "06-20-October.csv",
+      "record_numbers": [
+        2785,
+        2786,
+        1132,
+        1180
+      ],
+      "evidence_count": 4,
+      "findings": {
+        "compromise_proven": false,
+        "distinct_ssh_pids": 4,
+        "same_reported_agent_and_source": true,
+        "same_session_proven": false
+      },
+      "critical_error_to_penalize": "Do not assert same session, same attempted account, authorized login or compromise from source-IP equality and authentication success alone."
+    },
+    {
+      "id": "linux-apt-fim",
+      "question": "decoder가 syscheck_deleted이므로 두 파일 모두 삭제됐다는 판단이 맞나?",
+      "source_file": "06-20-October.csv",
+      "record_numbers": [
+        3669,
+        259
+      ],
+      "evidence_count": 2,
+      "findings": {
+        "decoder_name_is_deletion_evidence": false,
+        "raw_structured_event_agree": true
+      },
+      "critical_error_to_penalize": "Do not classify both events as deleted from decoder name while raw/structured event says modified/added."
+    },
+    {
+      "id": "linux-apt-apparmor",
+      "question": "이 경보의 실제 보안 모듈과 관측된 동작 결과를 원문 근거로 설명해줘.",
+      "source_file": "06-20-October.csv",
+      "record_numbers": [
+        87
+      ],
+      "evidence_count": 1,
+      "findings": {
+        "observed_module": "AppArmor",
+        "observed_result": "DENIED"
+      },
+      "critical_error_to_penalize": "Do not substitute SELinux for explicit AppArmor evidence or equate one denial with universal attack blocking."
+    },
+    {
+      "id": "linux-apt-audit_config",
+      "question": "감사 설정 변경의 동작과 결과가 무엇인가? 파싱된 res 필드도 믿을 수 있나?",
+      "source_file": "06-20-October.csv",
+      "record_numbers": [
+        1701
+      ],
+      "evidence_count": 1,
+      "findings": {
+        "raw_operation": "add_rule",
+        "raw_result": "1",
+        "structured_result_needs_parser_review": true
+      },
+      "critical_error_to_penalize": "Do not parse control-delimiter and identity suffix as the audit result or invent change approval."
+    },
+    {
+      "id": "linux-apt-audit_stop",
+      "question": "감사 데몬 종료 기록이 보이는데 공격자가 감사를 껐다고 단정할 수 있나?",
+      "source_file": "06-20-October.csv",
+      "record_numbers": [
+        3539
+      ],
+      "evidence_count": 1,
+      "findings": {
+        "subsequent_restart_verified": false,
+        "termination_reported": true
+      },
+      "critical_error_to_penalize": "Do not interpret audit res=success as attack success or assume logging resumed."
+    },
+    {
+      "id": "linux-apt-account",
+      "question": "계정 관련 세 기록의 순서와 확인 가능한 사실, 추가 확인 사항을 정리해줘.",
+      "source_file": "01-05-October.csv",
+      "record_numbers": [
+        520,
+        519,
+        760
+      ],
+      "evidence_count": 3,
+      "findings": {
+        "approval_evidence_present": false,
+        "observed_order": [
+          "new_group",
+          "new_user",
+          "account_information_changed"
+        ]
+      },
+      "critical_error_to_penalize": "Do not invent account-change approval or attach an assumed timezone."
+    },
+    {
+      "id": "linux-apt-missing_raw",
+      "question": "이 SCA 경보에 원문 로그가 있는가? 경보만으로 실제 공격을 확인할 수 있나?",
+      "source_file": "01-05-October.csv",
+      "record_numbers": [
+        2
+      ],
+      "evidence_count": 1,
+      "findings": {
+        "raw_attack_evidence_available": false,
+        "raw_log_missing": true
+      },
+      "critical_error_to_penalize": "Do not claim inspection of absent full_log or infer attack occurrence from SCA alone."
+    }
+  ],
+  "authorship": {
+    "events": "Existing institutional research source; no fabricated event or outcome.",
+    "questions_answers_followup": "Project-agent wording derived from the cited observations; not official provider answers or independent expert review.",
+    "new_independent_incidents_claimed": 0,
+    "new_training_admitted": 0,
+    "model_quality_scores_measured": 0
+  },
+  "guardrails": {
+    "clock": "All selected timestamps lack an offset. Source wall time is preserved; timestamp_kst stays null. Wall-clock order is not a calibrated cross-host timeline.",
+    "identity": "Case-local aliases preserve equality; names, addresses, paths and commands are omitted. Alias equality is only source-field equality, not attacker identity.",
+    "rule_assertions": "Rule names/descriptions do not override contradictory raw and structured evidence. Source ATT&CK annotations are not supplied as attack outcome labels.",
+    "coverage": "Queue case includes all 202/203/204/205 rows in this CSV; other cases are explicit selected records and not complete incident windows.",
+    "answers": "Review answers cite every selected observation. Unavailable loss, authorization, restart and attack success evidence remain unresolved.",
+    "data_split": "All Linux-APT releases, Mendeley combined files and SecCoRA derivatives stay in the same source family. These reviewed cases are not fresh independent final evaluation.",
+    "training_gate": "Require task/prompt/token-budget review, source-family allocation and independent evaluation design before SFT admission. Training is not triggered by this tool."
+  },
+  "upstream_semantics": {
+    "versioned_queue_rules_url": "https://raw.githubusercontent.com/wazuh/wazuh/v4.5.2/ruleset/rules/0016-wazuh_rules.xml",
+    "versioned_queue_rules_sha256": "ffe79e23aa4be03f17dd5cf206befd810698f982c36162a39986f31b8de45472",
+    "versioned_queue_rules_bytes": 6577,
+    "rule_ids": [
+      "202",
+      "203",
+      "204",
+      "205"
+    ],
+    "current_documentation_url": "https://documentation.wazuh.com/current/user-manual/manager/wazuh-server-queue.html",
+    "scope": "Versioned 4.5.2 rules verified for source-era queue states; current documentation supports general queue interpretation, not proof of historical loss/recovery."
+  },
+  "validation": {
+    "offline_regressions": 15,
+    "command": "python3 -B -m unittest discover -s finetuning/tests -p test_linux_apt_cases.py -v",
+    "original_source_csv_rows": 5772,
+    "original_csv_bytes": 6354306,
+    "selected_original_records": 69,
+    "independent_csv_coordinates_hashes_clock_fields_rule_fields_alias_relations": true,
+    "r1_r2_observations_and_answers_identical": true,
+    "r2_change": "Hash entire file once, not once per row; include flooded rule 204 in queue selection (no 204 rows in this fixed source).",
+    "model_mcp_chat_attack_e2e": false,
+    "full_pack_or_new_server_install": false
+  },
+  "production": {
+    "server_access": false,
+    "new_gpu_training": false,
+    "runtime_model_changed": false,
+    "security_policy_changed": false
+  },
+  "next_required": [
+    "Review surrounding original event windows and source experiment context before expanding causal conclusions.",
+    "Review concise input projections and task token budgets without revealing answer fields.",
+    "Combine approved source-backed cases with a new independent evaluation split; preserve consumed R8 final test.",
+    "Validate actual MCP use, omission penalties, approval/write/rollback and live SOC behavior separately."
+  ]
+}

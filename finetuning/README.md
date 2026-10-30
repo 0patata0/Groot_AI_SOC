@@ -1,5 +1,14 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**Linux-APT 관제 조사 초안:** `prepare_linux_apt_cases.py`는 고정 원장에 해시가 등록된 `01-05-October.csv`와 `06-20-October.csv`를 읽어 원문 69개에 연결된 초안 8개를 만든다. 파일 크기·MD5·SHA·행 수를 확인한 뒤 원문 좌표, 최소 관측값, 사례별 별칭, 프로젝트 작성 해석과 출처 고지를 보존한다. 누락과 상충 근거를 드러내며 시간대·공격 성공·도구 실행을 만들어 넣지 않는다.
+
+```sh
+python3 -B finetuning/prepare_linux_apt_cases.py --source-dir /path/to/verified-csv --output /new/local-review-directory
+python3 -B -m unittest discover -s finetuning/tests -p test_linux_apt_cases.py -v
+```
+
+출력의 `cases.jsonl`은 검토 초안이며 바로 SFT에 넣는 파일이 아니다. 같은 경로를 덮어쓰지 않으며, 원문 누락·해시 차이·검토한 사실관계의 차이가 있으면 오류로 중단한다. 공개 pack에는 소스·테스트·원장만 추가하며 원문과 초안은 학습 입력에 자동 포함하지 않는다. [결과·검증·한계](LINUX_APT_CASE_REVIEW.json).
+
 **전수 검증 결과 — 2026-10-30 KST:** 17 CSV·122,563행·208,367,683B의 MD5/크기 검증을 완료했습니다. 139개 구조 그룹에서 245개 좌표를 골랐고 아래 도구는 정답/대화 생성을 하지 않습니다. 시간대 미상 122,563행·full_log 공백 973행·룰 주석 24,779행의 한계는 [원장](LINUX_APT_EVIDENCE_REVIEW.json)에 있습니다. 아래887행은 앞선 부분 검토 이력입니다. 전체 원시 로그와 검토 좌표는 학습 pack에 자동 포함하지 않습니다.
 
 **Linux-APT 원본 검토 도구:** `prepare_linux_apt.py`는 [고정 파일 목록](LINUX_APT_SOURCE_SPEC.json)의 CSV를 메모리에서 읽고 제공 MD5/크기, 중복 문서·레코드, 시각과 룰 주석을 확인합니다. 정상/악성 정답이나 SFT 대화를 생성하지 않습니다. 원문·명령·계정/주소를 복사하지 않고 파일/논리 CSV행/물리행/SHA 및 구조 코드만 보존합니다. 상세 원문 검수에는 해당 좌표를 다시 조회해야 합니다.

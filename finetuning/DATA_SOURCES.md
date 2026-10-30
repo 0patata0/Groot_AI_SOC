@@ -1,5 +1,19 @@
 # 데이터 출처와 사용 범위
 
+## CAM-LDS·BETH·RBD24 추가 확인 — 2026-10-30 KST
+
+[파일/버전/체크섬·검증 원장](SOC_EXTRA_CORPORA_REVIEW.json). 아래 수량은 이벤트·반복 입력이며 새 학습 대화 수가 아니다. **신규 학습 편입0**.
+
+| 자료·1차 출처 | 실제 확인 범위 | 관제 용도와 남은 검수 |
+|---|---|---|
+| [CAM-LDS · AIT/Zenodo v2](https://zenodo.org/records/18861762), [학술지 논문](https://doi.org/10.1007/s10207-026-01318-x) | 고정 Git 입력990개/198단계/고유393개·제공라벨일치. 방화벽 관련8선택파일 CRC/SHA 검증. 데이터CC BY4.0, 저장소GPL3 별도 | Wazuh·감사·방화벽 로그와 ATT&CK 해석. 연구 시험망 자료이며 정상 사용자 시뮬레이션 없음. v1입력/v2로그·95ID/카탈로그81의 범위차이·AIT와의 원천중복 미해결. 모델의 답변은 정답집으로 사용하지 않음. |
+| [BETH · 저자 공식 배포](https://www.kaggle.com/datasets/katehighnam/beth-dataset), [CAMLIS2021 논문](https://ceur-ws.org/Vol-3095/paper1.pdf) | v3 CC0. 프로세스199,222행·DNS269행 검수. 두DNS파일은 바이트동일하여 중복합산 금지 | 실제 인터넷 허니팟의 프로세스/DNS 조사. 현재 프로세스표본은 제공정상라벨만 포함. 파일명대센서·공식분할/원본중복 검수 필요. uptime을 KST날짜로 만들지 않음. |
+| [RBD24 · i2CAT/Zenodo](https://zenodo.org/records/13787591), [Computers & Security 논문](https://doi.org/10.1016/j.cose.2024.104290) | CC BY4.0,12파일/1.45GB 목록·제공체크섬 확인. 원행취득0 | 실제조직의 가공 사용자위험행위. 피싱·낡은TLS/소프트웨어·P2P 등. IDS/실험라벨이며 침해확정 정답과 구분. 선별Parquet/누출·분할 검수 예정. |
+
+CAM 제공자 [고정 README](https://github.com/ait-aecid/attack-manifestations-interpretation/blob/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/README.md)는 반복 입력과v2 Docker감사 추가를 명시한다. BETH 논문상14특징+2라벨과 실제선택CSV11특징+2라벨 차이도 원장에 남겼다. 원자료 없는 사실이나 관제 정답을 자체 생성해 메우지 않았다. 논문·기관 출처, 실파일 무결성, 개별 라벨 타당성, 모델 성능은 별도 검증이다.
+
+이하 이전 출처 검토를 보존한다.
+
 ## Hornet65 공식 원자료 접근·선별 검증 — 2026-10-30 KST
 
 [CTU/Stratosphere 공식 자료](https://data.mendeley.com/datasets/nt4p9zsv5k/1), Valeros·Garcia (2024), DOI10.17632/nt4p9zsv5k.1, **CC BY4.0**. [논문 서지·초록](https://pubmed.ncbi.nlm.nih.gov/39877806/)은 Data in Brief58(2025),111261·DOI10.1016/j.dib.2024.111261과연결된다. 이번전체논문본문은접근제한으로재검수하지않았다. 전체성능/개별정답을기관이인증했다고표현하지않는다.

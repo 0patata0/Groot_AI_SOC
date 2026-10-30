@@ -1,0 +1,1029 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T13:50:22.485653+09:00",
+  "scope": "Three additional dataset candidates; official source/rights/selected real-file checks, not model quality or training admission.",
+  "new_dataset_candidates": 3,
+  "independent_source_families_asserted": false,
+  "training_examples_admitted": 0,
+  "model_calls": 0,
+  "new_synthetic_scenarios": 0,
+  "production_changed": false,
+  "mac_packages_installed": 0,
+  "server_probe": {
+    "time_kst": "2026-10-30T13:38:05+09:00",
+    "targets": [
+      "Thor SSH",
+      "A gateway SSH"
+    ],
+    "normal_and_escalated_tcp": "TimeoutError",
+    "ssh_authenticated": false,
+    "current_live_service_status": "unknown"
+  },
+  "candidates": [
+    {
+      "id": "cam_lds",
+      "provider": "AIT Austrian Institute of Technology",
+      "nature": "AttackBed virtual testbed; genuinely executed/captured experiments, not logs of production victims. Provider describes synthetic log/traffic dataset. No benign user simulation during collection.",
+      "paper": {
+        "url": "https://link.springer.com/article/10.1007/s10207-026-01318-x",
+        "doi": "10.1007/s10207-026-01318-x",
+        "journal": "International Journal of Information Security",
+        "year": 2026
+      },
+      "log_release": {
+        "record_id": 18861762,
+        "doi": "10.5281/zenodo.18861762",
+        "license": "cc-by-4.0",
+        "file_count": 36,
+        "listed_bytes": 7410964762,
+        "metadata": {
+          "url": "https://zenodo.org/api/records/18861762",
+          "bytes": 21227,
+          "sha256": "acc7219f686e8deb60004b2823bfc661c1d7806e50561622a2b43a6bec67ed03"
+        },
+        "files": [
+          {
+            "file": "scenario_6_macro_binary.zip",
+            "bytes": 202319131,
+            "provider_checksum": "md5:aedd7c0b51700b16c04539f10784d5d4",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_6_macro_binary.zip/content"
+          },
+          {
+            "file": "scenario_5.zip",
+            "bytes": 202788200,
+            "provider_checksum": "md5:c56fce722a7b714eba004d6fd6319879",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_5.zip/content"
+          },
+          {
+            "file": "scenario_6_macro_cron.zip",
+            "bytes": 198574204,
+            "provider_checksum": "md5:1fb5d4047c39eb3664ac96a05d7e4add",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_6_macro_cron.zip/content"
+          },
+          {
+            "file": "scenario_6_plugin.zip",
+            "bytes": 199726530,
+            "provider_checksum": "md5:5ee9684d14d15c924f885faa16b9a95b",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_6_plugin.zip/content"
+          },
+          {
+            "file": "manifestations_filtered.zip",
+            "bytes": 213771977,
+            "provider_checksum": "md5:cfc14140b2e396a60989b8379eafca1f",
+            "url": "https://zenodo.org/api/records/18861762/files/manifestations_filtered.zip/content"
+          },
+          {
+            "file": "scenario_1_racecondition_pam.zip",
+            "bytes": 174295743,
+            "provider_checksum": "md5:8a5a5e30d3e0895646560bc96f5cb07b",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_racecondition_pam.zip/content"
+          },
+          {
+            "file": "scenario_2_rootkit.zip",
+            "bytes": 160978125,
+            "provider_checksum": "md5:322b249ab429a1718e97f0086a321645",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_2_rootkit.zip/content"
+          },
+          {
+            "file": "scenario_3_ssh_apt.zip",
+            "bytes": 206764324,
+            "provider_checksum": "md5:0837edd952382f1d917d5491775cd0af",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_3_ssh_apt.zip/content"
+          },
+          {
+            "file": "scenario_3_vnc_apt.zip",
+            "bytes": 206560146,
+            "provider_checksum": "md5:bfd7e44cdb2d038a9deab800350e4b98",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_3_vnc_apt.zip/content"
+          },
+          {
+            "file": "scenario_3_vnc_puppet.zip",
+            "bytes": 198838647,
+            "provider_checksum": "md5:7b818ded4dc38d0e4dd717e7d97135c1",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_3_vnc_puppet.zip/content"
+          },
+          {
+            "file": "scenario_1_sudo_sshkey.zip",
+            "bytes": 173530479,
+            "provider_checksum": "md5:2788b802adc9ed6f009b0d1f5b03c37e",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_sudo_sshkey.zip/content"
+          },
+          {
+            "file": "scenario_1_sudo_localaccount.zip",
+            "bytes": 177980339,
+            "provider_checksum": "md5:f1c441a222148634afc3afa3100281c0",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_sudo_localaccount.zip/content"
+          },
+          {
+            "file": "scenario_6_screensharing_cron.zip",
+            "bytes": 447085304,
+            "provider_checksum": "md5:c1f7938bbbfec05bbf3e29604b69b479",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_6_screensharing_cron.zip/content"
+          },
+          {
+            "file": "scenario_7.zip",
+            "bytes": 160106901,
+            "provider_checksum": "md5:88122133a82079e07e7ed1b782bc203f",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_7.zip/content"
+          },
+          {
+            "file": "scenario_1_pwnkit_localaccount.zip",
+            "bytes": 173975360,
+            "provider_checksum": "md5:eaa091433ff9002b6b85bf2fa0080ba7",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_pwnkit_localaccount.zip/content"
+          },
+          {
+            "file": "scenario_1_validaccount_pam.zip",
+            "bytes": 172879344,
+            "provider_checksum": "md5:a3a30007ea1e87bc894698db9f4bfdca",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_validaccount_pam.zip/content"
+          },
+          {
+            "file": "scenario_1_racecondition_localaccount.zip",
+            "bytes": 176172801,
+            "provider_checksum": "md5:f53684af8dee51574577424937e01a5c",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_racecondition_localaccount.zip/content"
+          },
+          {
+            "file": "scenario_1_racecondition_sshkey.zip",
+            "bytes": 174723116,
+            "provider_checksum": "md5:3a241884c830495d00b2243bf9070ad8",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_racecondition_sshkey.zip/content"
+          },
+          {
+            "file": "scenario_1_autostart_localaccount.zip",
+            "bytes": 177994758,
+            "provider_checksum": "md5:95ba3c1ff5ab98613631df3301fad442",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_autostart_localaccount.zip/content"
+          },
+          {
+            "file": "scenario_1_pwnkit_pam.zip",
+            "bytes": 173449419,
+            "provider_checksum": "md5:874eb73fc20470f53b629ab00388826b",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_pwnkit_pam.zip/content"
+          },
+          {
+            "file": "scenario_1_autostart_pam.zip",
+            "bytes": 177377781,
+            "provider_checksum": "md5:3449b840fc5acb675a6581f0e4d0cd0e",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_autostart_pam.zip/content"
+          },
+          {
+            "file": "scenario_1_sudo_pam.zip",
+            "bytes": 175337707,
+            "provider_checksum": "md5:e7e5bd19cda62a5bfb9a68525715cd78",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_sudo_pam.zip/content"
+          },
+          {
+            "file": "scenario_3_ssh_healthcheck.zip",
+            "bytes": 203434673,
+            "provider_checksum": "md5:5c9618023dcf6b44a69eb877d6135392",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_3_ssh_healthcheck.zip/content"
+          },
+          {
+            "file": "scenario_3_ssh_puppet.zip",
+            "bytes": 197830161,
+            "provider_checksum": "md5:845049f82c502e255ff93eda15ff4c81",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_3_ssh_puppet.zip/content"
+          },
+          {
+            "file": "scenario_3_vnc_healthcheck.zip",
+            "bytes": 202659566,
+            "provider_checksum": "md5:d6e6ae004c8cc253838a5256274141b0",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_3_vnc_healthcheck.zip/content"
+          },
+          {
+            "file": "manifestations_raw.zip",
+            "bytes": 535892639,
+            "provider_checksum": "md5:9cbce6fd08044d298335a77eacd2e83f",
+            "url": "https://zenodo.org/api/records/18861762/files/manifestations_raw.zip/content"
+          },
+          {
+            "file": "scenario_1_cron_localaccount.zip",
+            "bytes": 173921269,
+            "provider_checksum": "md5:aef4d07305b30b37010780250becba07",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_cron_localaccount.zip/content"
+          },
+          {
+            "file": "scenario_1_autostart_sshkey.zip",
+            "bytes": 176618307,
+            "provider_checksum": "md5:5953fe50f084aa1adbc14ec50eee5ff4",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_autostart_sshkey.zip/content"
+          },
+          {
+            "file": "scenario_1_pwnkit_sshkey.zip",
+            "bytes": 175696803,
+            "provider_checksum": "md5:e3c0c22fb072e9add09bb62ab8e0853d",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_pwnkit_sshkey.zip/content"
+          },
+          {
+            "file": "scenario_1_cron_pam.zip",
+            "bytes": 173711152,
+            "provider_checksum": "md5:fbfaa124a628b73486702cbf31d33564",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_cron_pam.zip/content"
+          },
+          {
+            "file": "scenario_1_validaccount_localaccount.zip",
+            "bytes": 173005247,
+            "provider_checksum": "md5:24b2faf18e8810b989184b5b84218c5f",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_validaccount_localaccount.zip/content"
+          },
+          {
+            "file": "scenario_2_cron.zip",
+            "bytes": 160486494,
+            "provider_checksum": "md5:c33aca73d6962414bd6c2c3f82b934c4",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_2_cron.zip/content"
+          },
+          {
+            "file": "scenario_6_screensharing_binary.zip",
+            "bytes": 364265061,
+            "provider_checksum": "md5:1b8ed751081f0221a7153919addc8da2",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_6_screensharing_binary.zip/content"
+          },
+          {
+            "file": "scenario_4.zip",
+            "bytes": 201474676,
+            "provider_checksum": "md5:f1bf6ecd793c6c51f922ee43e33d7cf4",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_4.zip/content"
+          },
+          {
+            "file": "scenario_1_validaccount_sshkey.zip",
+            "bytes": 173130114,
+            "provider_checksum": "md5:514017c08291ac392cb3b6557711b139",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_validaccount_sshkey.zip/content"
+          },
+          {
+            "file": "scenario_1_cron_sshkey.zip",
+            "bytes": 173608264,
+            "provider_checksum": "md5:d9da77c3e5fb2e50d068dde0069b7026",
+            "url": "https://zenodo.org/api/records/18861762/files/scenario_1_cron_sshkey.zip/content"
+          }
+        ]
+      },
+      "packet_release": {
+        "record_id": 18701095,
+        "doi": "10.5281/zenodo.18701095",
+        "license": "cc-by-4.0",
+        "file_count": 34,
+        "listed_bytes": 182067814396,
+        "metadata": {
+          "url": "https://zenodo.org/api/records/18701095",
+          "bytes": 14307,
+          "sha256": "f9419ea7e6aee809310780ee1828c0e5da66ff82ba8eeacdb830d44d03be8457"
+        },
+        "files": [
+          {
+            "file": "scenario_3_ssh_apt_pcaps.zip",
+            "bytes": 5027177406,
+            "provider_checksum": "md5:959fc75a1968c7fd9c6e62342062ce53",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_3_ssh_apt_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_3_ssh_healthcheck_pcaps.zip",
+            "bytes": 4215433590,
+            "provider_checksum": "md5:b53919d57cf3ee4b5e200b668edd06f7",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_3_ssh_healthcheck_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_3_ssh_puppet_pcaps.zip",
+            "bytes": 3843078230,
+            "provider_checksum": "md5:6f43e5524468c86982cc059355b377c6",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_3_ssh_puppet_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_autostart_localaccount_pcaps.zip",
+            "bytes": 5910716518,
+            "provider_checksum": "md5:39e36275b88aa0765df5b60b282f7307",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_autostart_localaccount_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_7_pcaps.zip",
+            "bytes": 6125419680,
+            "provider_checksum": "md5:b00566c467fd0440f589e5655e610f7a",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_7_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_cron_pam_pcaps.zip",
+            "bytes": 5385084240,
+            "provider_checksum": "md5:5205565db259ca4f694fadbeef6d5622",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_cron_pam_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_autostart_pam_pcaps.zip",
+            "bytes": 5630642739,
+            "provider_checksum": "md5:78903bab80783c44c83c2603e8fd2924",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_autostart_pam_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_3_vnc_apt_pcaps.zip",
+            "bytes": 6296161189,
+            "provider_checksum": "md5:28de2776c332528d84c3cd81cd193201",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_3_vnc_apt_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_4_pcaps.zip",
+            "bytes": 5395347008,
+            "provider_checksum": "md5:9a1431e71c16b27765341b67f5a04d1e",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_4_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_3_vnc_healthcheck_pcaps.zip",
+            "bytes": 4865538647,
+            "provider_checksum": "md5:9aaa9d15790248255cbfaa76041d8e87",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_3_vnc_healthcheck_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_3_vnc_puppet_pcaps.zip",
+            "bytes": 4931888632,
+            "provider_checksum": "md5:d8b1958660d797d10388d89d9520a825",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_3_vnc_puppet_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_5_pcaps.zip",
+            "bytes": 2115990931,
+            "provider_checksum": "md5:b3f117a81f1b89a1f019827b8aeecfc6",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_5_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_6_macro_cron_pcaps.zip",
+            "bytes": 5565698046,
+            "provider_checksum": "md5:f0c80d98814b43dc0852b27a3588802b",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_6_macro_cron_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_6_plugin_pcaps.zip",
+            "bytes": 2698429280,
+            "provider_checksum": "md5:862e38a8feaad90e9501bce8b1b8ac50",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_6_plugin_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_6_macro_binary_pcaps.zip",
+            "bytes": 8178821429,
+            "provider_checksum": "md5:0e287b362e7b9922f1adbac5d04e599e",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_6_macro_binary_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_6_screensharing_binary_pcaps.zip",
+            "bytes": 6340364836,
+            "provider_checksum": "md5:9daefc24139cebe145997fd69b380a69",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_6_screensharing_binary_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_6_screensharing_cron_pcaps.zip",
+            "bytes": 7776143780,
+            "provider_checksum": "md5:6e848424b6b0de31260467a89f80e019",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_6_screensharing_cron_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_pwnkit_pam_pcaps.zip",
+            "bytes": 5914698674,
+            "provider_checksum": "md5:08d1fc60e8ade015cfcf2b1ac5d36495",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_pwnkit_pam_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_cron_localaccount_pcaps.zip",
+            "bytes": 5340762399,
+            "provider_checksum": "md5:097884343240789324ec34436129ae4d",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_cron_localaccount_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_cron_sshkey_pcaps.zip",
+            "bytes": 5019212273,
+            "provider_checksum": "md5:deba8e9dac294918b5bc9ce1190f06f5",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_cron_sshkey_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_pwnkit_localaccount_pcaps.zip",
+            "bytes": 5895982692,
+            "provider_checksum": "md5:1b4aa7d4959a342f291ee38759de7e18",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_pwnkit_localaccount_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_racecondition_pam_pcaps.zip",
+            "bytes": 6272737164,
+            "provider_checksum": "md5:bb2bb160b941ad475f5492594da37283",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_racecondition_pam_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_racecondition_sshkey_pcaps.zip",
+            "bytes": 6314902884,
+            "provider_checksum": "md5:3d6dcd09dce0f8839835e39de0bee36b",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_racecondition_sshkey_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_sudo_localaccount_pcaps.zip",
+            "bytes": 4925744669,
+            "provider_checksum": "md5:e516c736f745009c20a159a5e8bd28c8",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_sudo_localaccount_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_sudo_pam_pcaps.zip",
+            "bytes": 4976849052,
+            "provider_checksum": "md5:fc3adf3406ed24dacb2dc727e3f63e3c",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_sudo_pam_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_sudo_sshkey_pcaps.zip",
+            "bytes": 5918872841,
+            "provider_checksum": "md5:d286f29309cc042e177149f576bd9888",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_sudo_sshkey_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_2_rootkit_pcaps.zip",
+            "bytes": 5035956936,
+            "provider_checksum": "md5:19b2d47558e5146b78cc50b30953116c",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_2_rootkit_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_pwnkit_sshkey_pcaps.zip",
+            "bytes": 5831363737,
+            "provider_checksum": "md5:79f603113fc4104f68e3def2f47098ae",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_pwnkit_sshkey_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_autostart_sshkey_pcaps.zip",
+            "bytes": 5274720145,
+            "provider_checksum": "md5:2046bf07b8c6753f4477dfbc11f11dbf",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_autostart_sshkey_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_racecondition_localaccount_pcaps.zip",
+            "bytes": 7478361516,
+            "provider_checksum": "md5:5fc303adacdd04e443a03b7efc6a65e7",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_racecondition_localaccount_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_validaccount_localaccount_pcaps.zip",
+            "bytes": 4663298023,
+            "provider_checksum": "md5:fb48f7845d42d3f178e34577c6999384",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_validaccount_localaccount_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_validaccount_pam_pcaps.zip",
+            "bytes": 4307482689,
+            "provider_checksum": "md5:6380be251dd078b592898329690e2440",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_validaccount_pam_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_2_cron_pcaps.zip",
+            "bytes": 3781246514,
+            "provider_checksum": "md5:fdd2ce60e0d04f0fb35a193e2e6ffa1c",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_2_cron_pcaps.zip/content"
+          },
+          {
+            "file": "scenario_1_validaccount_sshkey_pcaps.zip",
+            "bytes": 4813686007,
+            "provider_checksum": "md5:3abd7f66d7df366f4fad046f691263b5",
+            "url": "https://zenodo.org/api/records/18701095/files/scenario_1_validaccount_sshkey_pcaps.zip/content"
+          }
+        ]
+      },
+      "repository": {
+        "url": "https://github.com/ait-aecid/attack-manifestations-interpretation",
+        "commit": "42bbd2cf8409f64a1e6c8fc936c91725e8c558b2",
+        "root_license": "GPL-3.0",
+        "selected_files": [
+          {
+            "file": "README.md",
+            "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/README.md",
+            "bytes": 16820,
+            "sha256": "cc135060e31c6ee6aed80a129a4d06fc67739854a4946b2bd37ef1782707cdc6",
+            "git_blob": "7cc4da8fa0508d8e13cacae5c47d485b2e0f48fc",
+            "git_blob_verified": true
+          },
+          {
+            "file": "LICENSE",
+            "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/LICENSE",
+            "bytes": 35149,
+            "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+            "git_blob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7",
+            "git_blob_verified": true
+          },
+          {
+            "file": "attack_times.csv",
+            "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/attack_times.csv",
+            "bytes": 106740,
+            "sha256": "e300f508c5611e11a835d2dea575b152e85c9eed08ac3e945ec7f42cc0433d81",
+            "git_blob": "070d86ac8aae1a941d366d3dff40a09724dd3221",
+            "git_blob_verified": true
+          },
+          {
+            "file": "labels.json",
+            "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/labels.json",
+            "bytes": 791024,
+            "sha256": "cc27fee6d78b6de3d5d2172b334269bbcd9747dac80b6882e8982229b2540afe",
+            "git_blob": "556d3ffb0b231bfef752991b838fdaeff6861c37",
+            "git_blob_verified": true
+          },
+          {
+            "file": "llm_queries.json",
+            "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/llm_queries.json",
+            "bytes": 6884757,
+            "sha256": "ab7f948e9019cacf0fa94236e1303c5523a39d87a4253c2802ea8fd60d2f7ee5",
+            "git_blob": "e3183c7eba0e2f399d83f68e0af0c59440f6b5d4",
+            "git_blob_verified": true
+          }
+        ],
+        "upstream_code_executed": false,
+        "model_responses_downloaded": false
+      },
+      "input_artifact_audit": {
+        "query_rows": 990,
+        "unique_prompts": 393,
+        "scenario_steps": 198,
+        "group_repetitions": {
+          "5": 198
+        },
+        "same_prompt_all_repetitions_steps": 89,
+        "unique_scenarios": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ],
+        "distinct_techniques_in_queries": 95,
+        "labels": 883,
+        "time_rows": 904,
+        "unmatched_label_keys": [],
+        "ground_truth_mismatches": [],
+        "query_file_format": "JSONL despite .json suffix",
+        "training_admitted": 0,
+        "unique_parent_technique_ids_in_queries": 80,
+        "provider_catalog_techniques": 81,
+        "count_difference_status": "Unresolved scope/version difference: current artifact has 95 unique technique/subtechnique IDs, 80 parent IDs; do not replace the provider catalog count or treat these as new incidents.",
+        "readme_data_version": "Queries based on Zenodo v1 record 18390561; current v2 record 18861762 additionally includes runc-init audit events in five Scenario7 steps. Do not silently mix."
+      },
+      "selected_observations": {
+        "source_record": 18861762,
+        "url": "https://zenodo.org/api/records/18861762/files/manifestations_filtered.zip/content",
+        "archive_bytes": 213771977,
+        "whole_archive_checksum_verified": false,
+        "range_bytes": 9299657,
+        "selected": [
+          {
+            "member": "manifestations_filtered/steps/4-18/inetfw/logs/log/syslog",
+            "bytes": 48,
+            "sha256": "5ec1cee688dc4b07dfaef5c1d0b0814317b9c2d1c5ded0d57dcb19768ccdb7dd",
+            "crc32": 3209973199,
+            "crc_verified": true,
+            "lines": 1
+          },
+          {
+            "member": "manifestations_filtered/steps/4-18/inetfw/logs/log/shorewall-init.log",
+            "bytes": 35424,
+            "sha256": "232a830072ab27dd142c738333bd02fbcf36a2647c37c822c53ec214d3286b81",
+            "crc32": 490684186,
+            "crc_verified": true,
+            "lines": 556
+          },
+          {
+            "member": "manifestations_filtered/steps/4-18/inetfw/logs/log/audit/audit.log",
+            "bytes": 375464,
+            "sha256": "2550775a8a15ceb8d5704c5d7dc998f3318c50493ed3e3cfdc63f6037a214f57",
+            "crc32": 3706399749,
+            "crc_verified": true,
+            "lines": 1524
+          },
+          {
+            "member": "manifestations_filtered/steps/4-18/attacker/logs/attackmate.json",
+            "bytes": 512,
+            "sha256": "44c8fd7bd4a4207712bacd34f43098d31c94e781891b10dbcde1fcb099e33430",
+            "crc32": 2529557977,
+            "crc_verified": true,
+            "lines": 1
+          },
+          {
+            "member": "manifestations_filtered/steps/4-17/wazuh/logs/alerts/alerts.json",
+            "bytes": 5583,
+            "sha256": "a2a51aa60894bc1258d560c39836288dc35da3b98e2c19e967e61f2afc9ceec8",
+            "crc32": 986976442,
+            "crc_verified": true,
+            "lines": 6,
+            "json_rows_verified": 6,
+            "observed_rule_ids": {
+              "5402": 2,
+              "5501": 2,
+              "5502": 2
+            }
+          },
+          {
+            "member": "manifestations_filtered/steps/4-17/inetfw/logs/log/auth.log",
+            "bytes": 360,
+            "sha256": "ed81b88cf9b5d958e4ef88d0a7d2e52c14bf278bd83baae3ea39604e815f85e1",
+            "crc32": 4008137856,
+            "crc_verified": true,
+            "lines": 3
+          },
+          {
+            "member": "manifestations_filtered/steps/4-17/inetfw/logs/log/audit/audit.log",
+            "bytes": 12142,
+            "sha256": "cb95700a468e27fc1068afea4721f3480b2e2c22c9bdac8b572fd8f139ded223",
+            "crc32": 382161947,
+            "crc_verified": true,
+            "lines": 45
+          },
+          {
+            "member": "manifestations_filtered/steps/4-17/attacker/logs/attackmate.json",
+            "bytes": 601,
+            "sha256": "104f9c48eedd44d0754a207e5b310a8058af1fbf4669fc1df068277ab01ccffa",
+            "crc32": 3011473379,
+            "crc_verified": true,
+            "lines": 1
+          }
+        ],
+        "sensor_log_lines": 2135,
+        "execution_diary_lines": 2,
+        "audit_record_types": {
+          "SYSCALL": 362,
+          "SOCKADDR": 139,
+          "PROCTITLE": 362,
+          "EXECVE": 212,
+          "PATH": 438,
+          "NETFILTER_CFG": 50,
+          "USER_ACCT": 1,
+          "USER_CMD": 1,
+          "CRED_REFR": 1,
+          "USER_START": 1,
+          "USER_END": 1,
+          "CRED_DISP": 1
+        },
+        "independent_raw_hash_crc_size_line_checks": true
+      },
+      "archive_inventory": {
+        "members": 42596,
+        "range_bytes": 7202505,
+        "inventory_sha256": "b94f51296de992916861fa9c03f455f4ac806b12117ae5acee060f4ca3935e6c"
+      },
+      "fit": "Host/network/IDS evidence interpretation and ATT&CK mapping; select raw evidence and preserve execution-diary labels separately. Firewall-related steps4-17/18 verified for format and integrity only.",
+      "limitations": [
+        "7 scenarios/34 execution variants, 198 prompted steps,990 repetitions and393 unique prompts are distinct counts, not independent incidents.",
+        "Queries use v1 while selected logs use v2; Docker audit changes documented upstream. No cross-version exact equivalence asserted.",
+        "95 technique/subtechnique IDs (80 parent IDs) in queried artifact differs in scope from catalog81; unresolved, not silently corrected.",
+        "steps/sequences/techniques and repeated variants overlap. Existing AIT-LDS/ADS infrastructure/source-family overlap requires audit before train/evaluation split.",
+        "Zenodo data CC-BY4.0 and repository GPL3 treated separately; downloaded query/label artifacts not automatically relabeled or incorporated in training.",
+        "No benign-user simulation means attack-interval logs may still include idle/background activity; neither all lines malicious nor false-positive rate established.",
+        "No upstream model response is a ground-truth operator explanation. Full ZIP MD5 and raw-versus-filtered completeness unverified."
+      ]
+    },
+    {
+      "id": "beth_v3",
+      "provider": "Highnam et al.; Imperial College London / Alan Turing Institute and coauthors",
+      "nature": "Internet-facing cloud honeypot observations; real activity rather than manually fabricated dialogue.",
+      "paper": {
+        "url": "https://ceur-ws.org/Vol-3095/paper1.pdf",
+        "title": "BETH Dataset: Real Cybersecurity Data for Unsupervised Anomaly Detection Research",
+        "year": 2021,
+        "venue": "CAMLIS 2021 proceedings; also ICML UDL workshop"
+      },
+      "dataset_url": "https://www.kaggle.com/datasets/katehighnam/beth-dataset",
+      "api_metadata": {
+        "url": "https://www.kaggle.com/api/v1/datasets/view/katehighnam/beth-dataset",
+        "bytes": 13735,
+        "sha256": "b3efc47347f33cecfa64a7e84d4edeeacfec6c010197d6f40cd7cad5e4f0c526"
+      },
+      "version": 3,
+      "license": "CC0: Public Domain (provider data API); paper CC-BY4.0 separately",
+      "listed_files": 15,
+      "listed_bytes": 928188305,
+      "selected_files": [
+        {
+          "file": "labelled_2021may-ubuntu.csv",
+          "url": "https://www.kaggle.com/api/v1/datasets/download/katehighnam/beth-dataset/labelled_2021may-ubuntu.csv?datasetVersionNumber=3",
+          "download_bytes": 1846705,
+          "download_sha256": "cd3d812c06ca192516cfbf015070ef8700f5308745f5110b4b68ce03f2463c9c",
+          "raw_bytes": 41272813,
+          "raw_sha256": "9d12e29b80b586278f802f46e832ce87d6a64e98966e54ee25f7fd9c91913de4",
+          "provider_size_verified": true,
+          "zip_crc32": 1322054265,
+          "rows": 199222,
+          "columns": [
+            "timestamp",
+            "processId",
+            "parentProcessId",
+            "userId",
+            "processName",
+            "hostName",
+            "eventId",
+            "eventName",
+            "argsNum",
+            "returnValue",
+            "args",
+            "sus",
+            "evil"
+          ],
+          "label_counts": [
+            {
+              "labels": {
+                "sus": "0",
+                "evil": "0"
+              },
+              "count": 199222
+            }
+          ],
+          "hosts": {
+            "ubuntu": 199222
+          },
+          "event_counts": {
+            "kill": 488,
+            "close": 60645,
+            "sched_process_exit": 488,
+            "security_file_open": 4521,
+            "openat": 59240,
+            "fstat": 41879,
+            "stat": 2288,
+            "bind": 488,
+            "getsockname": 428,
+            "socket": 1978,
+            "clone": 427,
+            "prctl": 419,
+            "unlink": 1952,
+            "access": 14523,
+            "lstat": 6047,
+            "cap_capable": 3271,
+            "security_inode_unlink": 140
+          },
+          "empty_fields": {},
+          "timestamp_range_source_units": [
+            "123.745986",
+            "18881.747393"
+          ],
+          "source_timezone": "not inferred",
+          "training_admitted": 0,
+          "timestamp_semantics": "Seconds since system boot, BETH paper Table3; cannot derive KST calendar time without boot anchor."
+        },
+        {
+          "file": "labelled_2021may-ubuntu-dns.csv",
+          "url": "https://www.kaggle.com/api/v1/datasets/download/katehighnam/beth-dataset/labelled_2021may-ubuntu-dns.csv?datasetVersionNumber=3",
+          "download_bytes": 40348,
+          "download_sha256": "422b8f64c7f6e2c488d3219a812dabb074769e9d13def16c23dbeda8ee5baa4b",
+          "raw_bytes": 40348,
+          "raw_sha256": "422b8f64c7f6e2c488d3219a812dabb074769e9d13def16c23dbeda8ee5baa4b",
+          "provider_size_verified": true,
+          "zip_crc32": null,
+          "rows": 269,
+          "columns": [
+            "Timestamp",
+            "SourceIP",
+            "DestinationIP",
+            "DnsQuery",
+            "DnsAnswer",
+            "DnsAnswerTTL",
+            "DnsQueryNames",
+            "DnsQueryClass",
+            "DnsQueryType",
+            "NumberOfAnswers",
+            "DnsResponseCode",
+            "DnsOpCode",
+            "SensorId",
+            "sus",
+            "evil"
+          ],
+          "label_counts": [
+            {
+              "labels": {
+                "sus": "0",
+                "evil": "0"
+              },
+              "count": 248
+            },
+            {
+              "labels": {
+                "sus": "1",
+                "evil": "0"
+              },
+              "count": 17
+            },
+            {
+              "labels": {
+                "sus": "1",
+                "evil": "1"
+              },
+              "count": 4
+            }
+          ],
+          "hosts": {},
+          "event_counts": {},
+          "empty_fields": {
+            "DnsAnswer": 204,
+            "DnsAnswerTTL": 204
+          },
+          "timestamp_range_source_units": [
+            "None",
+            "None"
+          ],
+          "source_timezone": "not inferred",
+          "training_admitted": 0,
+          "timestamp_semantics": "Timestamp contains UTC Z; all269 rows roundtrip to KST. Filename is not a reliable sensor partition."
+        },
+        {
+          "file": "labelled_2021may-ip-10-100-1-105-dns.csv",
+          "url": "https://www.kaggle.com/api/v1/datasets/download/katehighnam/beth-dataset/labelled_2021may-ip-10-100-1-105-dns.csv?datasetVersionNumber=3",
+          "download_bytes": 40348,
+          "download_sha256": "422b8f64c7f6e2c488d3219a812dabb074769e9d13def16c23dbeda8ee5baa4b",
+          "raw_bytes": 40348,
+          "raw_sha256": "422b8f64c7f6e2c488d3219a812dabb074769e9d13def16c23dbeda8ee5baa4b",
+          "provider_size_verified": true,
+          "zip_crc32": null,
+          "rows": 269,
+          "columns": [
+            "Timestamp",
+            "SourceIP",
+            "DestinationIP",
+            "DnsQuery",
+            "DnsAnswer",
+            "DnsAnswerTTL",
+            "DnsQueryNames",
+            "DnsQueryClass",
+            "DnsQueryType",
+            "NumberOfAnswers",
+            "DnsResponseCode",
+            "DnsOpCode",
+            "SensorId",
+            "sus",
+            "evil"
+          ],
+          "label_counts": [
+            {
+              "labels": {
+                "sus": "0",
+                "evil": "0"
+              },
+              "count": 248
+            },
+            {
+              "labels": {
+                "sus": "1",
+                "evil": "0"
+              },
+              "count": 17
+            },
+            {
+              "labels": {
+                "sus": "1",
+                "evil": "1"
+              },
+              "count": 4
+            }
+          ],
+          "hosts": {},
+          "event_counts": {},
+          "empty_fields": {
+            "DnsAnswer": 204,
+            "DnsAnswerTTL": 204
+          },
+          "timestamp_range_source_units": [
+            "None",
+            "None"
+          ],
+          "source_timezone": "not inferred",
+          "training_admitted": 0,
+          "timestamp_semantics": "Timestamp contains UTC Z; all269 rows roundtrip to KST. Filename is not a reliable sensor partition."
+        }
+      ],
+      "duplicate_files": {
+        "byte_identical": [
+          "labelled_2021may-ubuntu-dns.csv",
+          "labelled_2021may-ip-10-100-1-105-dns.csv"
+        ],
+        "unique_dns_rows_without_double_count": 269,
+        "sensor_ids_in_each_dns_file": 5,
+        "source_ips_in_each_dns_file": 15
+      },
+      "fit": "Process-tree and DNS investigation, normal-background context. Current process selection contains199222 provider-labeled benign rows; not an attack-detection benchmark.",
+      "limitations": [
+        "Paper aggregate8,004,918 events is not locally acquired count. Selected files total199760 rows with269 duplicated by whole-file identity; counts are events, not incidents/dialogues.",
+        "Current process CSV has13 columns (11features+2labels), differing from paper14features+2labels; do not invent missing threadId/mountNamespace/stackAddresses.",
+        "DNS labels248 nonsuspicious/17suspicious-only/4evil are provider labels, not independent truth certification;204 blank answer/TTL fields remain missing.",
+        "Process uptime and DNS UTC need a verified boot anchor for temporal correlation; no fabricated KST process timestamps.",
+        "Keep official train/validation/test grouping and host/sensor mapping; raw per-host vs pre-split overlap remains unchecked. Reviewed data is exposed for development.",
+        "Size and ZIP CRC where applicable checked, SHA recorded; provider cryptographic checksum not available in inspected API."
+      ]
+    },
+    {
+      "id": "rbd24",
+      "provider": "i2CAT / Calvo et al.",
+      "nature": "Anonymized time-window aggregates from real organizational application logs; IDS and experimental phishing-campaign labels.",
+      "paper": {
+        "url": "https://doi.org/10.1016/j.cose.2024.104290",
+        "title": "RBD24: A labelled dataset with risk activities using log application data",
+        "journal": "Computers & Security",
+        "volume": 150,
+        "article": "104290",
+        "year": 2025
+      },
+      "release": {
+        "record_id": 13787591,
+        "doi": "10.5281/zenodo.13787591",
+        "license": "cc-by-4.0",
+        "file_count": 12,
+        "listed_bytes": 1453849650,
+        "metadata": {
+          "url": "https://zenodo.org/api/records/13787591",
+          "bytes": 12783,
+          "sha256": "6d1b4a77ae5932978334d04607e3c626dee9d7e45373acfcdcf6a7eb64785715"
+        },
+        "files": [
+          {
+            "file": "Phishing_desktop.parquet",
+            "bytes": 12559333,
+            "provider_checksum": "md5:c55ef9d902973ab50b21399f5e50fabe",
+            "url": "https://zenodo.org/api/records/13787591/files/Phishing_desktop.parquet/content"
+          },
+          {
+            "file": "Phishing_smartphone.parquet",
+            "bytes": 31827461,
+            "provider_checksum": "md5:a20c8f65d4752d2efa45398dbb4e3a65",
+            "url": "https://zenodo.org/api/records/13787591/files/Phishing_smartphone.parquet/content"
+          },
+          {
+            "file": "Crypto_smartphone.parquet",
+            "bytes": 134127624,
+            "provider_checksum": "md5:f60e4497ddaaa4f174cca10c6094945a",
+            "url": "https://zenodo.org/api/records/13787591/files/Crypto_smartphone.parquet/content"
+          },
+          {
+            "file": "Crypto_desktop.parquet",
+            "bytes": 120310344,
+            "provider_checksum": "md5:19b9d5d13854cd1abf9d017f449daeaf",
+            "url": "https://zenodo.org/api/records/13787591/files/Crypto_desktop.parquet/content"
+          },
+          {
+            "file": "OutFlash_desktop.parquet",
+            "bytes": 127323324,
+            "provider_checksum": "md5:4845366860c8acd81e5470598a1bcb74",
+            "url": "https://zenodo.org/api/records/13787591/files/OutFlash_desktop.parquet/content"
+          },
+          {
+            "file": "OutFlash_smartphone.parquet",
+            "bytes": 138333047,
+            "provider_checksum": "md5:3f2b78c779d4d3c82cdf01442c01dffe",
+            "url": "https://zenodo.org/api/records/13787591/files/OutFlash_smartphone.parquet/content"
+          },
+          {
+            "file": "NonEnc_smartphone.parquet",
+            "bytes": 164081363,
+            "provider_checksum": "md5:14b7fcd7777e05f8648e0348e820db3d",
+            "url": "https://zenodo.org/api/records/13787591/files/NonEnc_smartphone.parquet/content"
+          },
+          {
+            "file": "NonEnc_desktop.parquet",
+            "bytes": 163674363,
+            "provider_checksum": "md5:e73163185bc0b868538172c12862efa4",
+            "url": "https://zenodo.org/api/records/13787591/files/NonEnc_desktop.parquet/content"
+          },
+          {
+            "file": "P2P_desktop.parquet",
+            "bytes": 151226809,
+            "provider_checksum": "md5:4ba610a28b833dfbecca0c237198d6ec",
+            "url": "https://zenodo.org/api/records/13787591/files/P2P_desktop.parquet/content"
+          },
+          {
+            "file": "OutTLS_desktop.parquet",
+            "bytes": 121135444,
+            "provider_checksum": "md5:c6b7e134653818063d4bfd372bcaca40",
+            "url": "https://zenodo.org/api/records/13787591/files/OutTLS_desktop.parquet/content"
+          },
+          {
+            "file": "P2P_smartphone.parquet",
+            "bytes": 153914493,
+            "provider_checksum": "md5:fb2d3e17123bb0c5b3610f6d706ead61",
+            "url": "https://zenodo.org/api/records/13787591/files/P2P_smartphone.parquet/content"
+          },
+          {
+            "file": "OutTLS_smartphone.parquet",
+            "bytes": 135336045,
+            "provider_checksum": "md5:c190dd676207ee682b6cbd8936550237",
+            "url": "https://zenodo.org/api/records/13787591/files/OutTLS_smartphone.parquet/content"
+          }
+        ]
+      },
+      "raw_files_downloaded": 0,
+      "rows_inspected": 0,
+      "fit": "User/entity risk triage: phishing, outdated TLS/software, P2P, credentials exposure and crypto activity.",
+      "limitations": [
+        "Only official metadata and file list verified, not Parquet rows or provider MD5. Smallest file12,559,333B; entire collection1,453,849,650B deferred.",
+        "Existing Mac has no Parquet reader; none installed. Inspect on authorized existing server environment after connectivity returns.",
+        "Aggregated risk behavior is not a full incident time line or proof of compromise. Feature-label leakage and entity/time/source splits require review."
+      ]
+    }
+  ],
+  "verification": {
+    "independent_record": "대화기록/검증/2026-10-30-extra-corpora/independent-verification.json",
+    "new_unit_tests": 0,
+    "reason": "Source/data review with independent real-file counts/hash/CRC checks; no runtime behavior changed.",
+    "raw_documents_in_git": false,
+    "live_mcp_or_attack_e2e": false,
+    "full_training_pack_built": false,
+    "new_server_install": false
+  },
+  "remaining": [
+    "Resolve per-source variant/host/sensor and previous-corpus overlap; preserve exposed-vs-unseen distinction.",
+    "Validate source labels against evidence and benign coverage before constructing operator answers.",
+    "Actual Qwen tokenizer and missing V4/V5 split audit still blocked by server connectivity.",
+    "No new training or promotion based solely on source authority or record volume."
+  ],
+  "cleanup_policy": "Temporary downloaded originals and helpers removed after validation; source URLs/versions/hashes and local verification records retained. No package installation or server transfer."
+}

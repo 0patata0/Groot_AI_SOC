@@ -1,5 +1,9 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**추가 데이터 3종 검토 — 2026-10-30 KST:** CAM-LDS·BETH·RBD24의 기관/학술 출처와 이용 조건을 확인했습니다. CAM-LDS 제공 입력990개는198단계의 반복이며 고유 입력393개입니다. BETH 프로세스199,222행·DNS269행을 검수했고 다른 이름의 DNS파일2개가 동일함을 확인했습니다. 실제 인터넷 관측과 연구 시험망 자료를 구분하며 신규학습0입니다. [원장](SOC_EXTRA_CORPORA_REVIEW.json).
+
+CAM-LDS의 Zenodo v2 로그와 GitHub v1 기반 입력을 혼합하지 않습니다. `pack.py`는 새 출처 원장만 포함하고 원본·검토 입력을 학습에 자동 편입하지 않습니다. BETH 프로세스 시각은 부팅 후 초여서 KST 날짜를 추정할 수 없으며 DNS의 UTC는 별도 변환 가능합니다. RBD24는 파일 목록/권리만 확인했고 Parquet 원행 검수는 미완료입니다. 출처가 검증되었다는 사실과 개별 정답/모델 품질 보증은 구분합니다.
+
 **Hornet65 실제 원문 검수:** `inspect_hornet.py`는 완료된 선택취득manifest의gzip/raw해시·행수를확인하고conn/수집손실/notice/stats를집계한다. 결측은0/false로채우지않고원문Decimal시각자릿수를KST표시에보존한다. 198파일/20,728행·10회귀·공개CLI/독립전수대조완료. [출처·파일manifest·검증](HORNET_EVIDENCE_REVIEW.json).
 
 ```sh

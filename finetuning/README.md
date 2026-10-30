@@ -1,5 +1,17 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**Hornet65 실제 원문 검수:** `inspect_hornet.py`는 완료된 선택취득manifest의gzip/raw해시·행수를확인하고conn/수집손실/notice/stats를집계한다. 결측은0/false로채우지않고원문Decimal시각자릿수를KST표시에보존한다. 198파일/20,728행·10회귀·공개CLI/독립전수대조완료. [출처·파일manifest·검증](HORNET_EVIDENCE_REVIEW.json).
+
+```sh
+python3 -B finetuning/inspect_hornet.py --manifest /path/acquisition.json \
+  --directory /path/selected-gzip --own-ip OBSERVER_IP \
+  --output /new/path/review.json
+```
+
+동일observer의주소가여럿이면 `--own-ip`를반복한다. 주소는원제공README로확인하고게이트웨이를자기주소로추정하지않는다. 원장 `acquisitions`의선택manifest와같은파일을출처URL에서재취득해CRC/SHA를확인한다. 기존출력은덮어쓰지않는다. pack에는검사기/원장만포함하고원문·검토과제는학습에자동편입하지않는다.
+
+손실률0/ACK0/Too_Little_Traffic192건이동시에있고drop0도전체수집완전성증명이아니다. 두ZIP목록에SSH로그가없다는사실은센서장애나정상판정근거가아니다. 공통유입출발지1,137개를분할검수에반영하며 개별공격/정상정답은생성하지않았다. 개발과제1개의질문/기준은프로젝트작성이고검토노출상태다. 새학습/모델호출0.
+
 **DEDALE flow·결측값 검수:** `inspect_dedale_flows.py`는 Zeek 원문 필드·미설정 표지·물리 좌표를 유지하고 제공 분류표의 전체 원문 필드를 반복 횟수까지 대조한다. 868,616행 중864,636행 일치, 결측→빈칸/0 차이3,980행을 확인했다. 과학표기는 정확한 마이크로초만 허용하며 자동 반올림/결측 대체는 없다. 15검사·CLI 전수 재현/독립 전수 대조 완료. [원장](DEDALE_FLOW_REVIEW.json).
 
 ```sh

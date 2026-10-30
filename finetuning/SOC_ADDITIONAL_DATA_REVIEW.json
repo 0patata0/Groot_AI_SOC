@@ -588,5 +588,15 @@
     "raw_label_missing_value_changes": 3980,
     "review_cases": 1,
     "training_admitted": 0
+  },
+  "hornet_followup": {
+    "at_kst": "2026-10-30T13:31:18.052453+09:00",
+    "file": "HORNET_EVIDENCE_REVIEW.json",
+    "official_mendeley_route_verified": true,
+    "members": 198,
+    "rows": 20728,
+    "connections": 19772,
+    "new_training": 0,
+    "prior_tls_issue_is_historical_for_original_host": true
   }
 }

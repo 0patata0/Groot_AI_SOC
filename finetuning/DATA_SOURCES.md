@@ -1,5 +1,15 @@
 # 데이터 출처와 사용 범위
 
+## Hornet65 공식 원자료 접근·선별 검증 — 2026-10-30 KST
+
+[CTU/Stratosphere 공식 자료](https://data.mendeley.com/datasets/nt4p9zsv5k/1), Valeros·Garcia (2024), DOI10.17632/nt4p9zsv5k.1, **CC BY4.0**. [논문 서지·초록](https://pubmed.ncbi.nlm.nih.gov/39877806/)은 Data in Brief58(2025),111261·DOI10.1016/j.dib.2024.111261과연결된다. 이번전체논문본문은접근제한으로재검수하지않았다. 전체성능/개별정답을기관이인증했다고표현하지않는다.
+
+과거mcfp호스트의TLS체인문제와별개로공식Mendeley public API/파일경로에서TLS검증을유지해취득했다. README/집계CSV제공SHA일치,2ZIP의198선택gzip CRC/해제EOF/SHA·20,728행독립대조완료. 전체ZIP제공SHA는미검증이다. 암스테르담/시드니4월30일의연결19,772·capture_loss192·notice192·stats572이며전체12,477,164흐름은제공집계수다. [검증·manifest](HORNET_EVIDENCE_REVIEW.json).
+
+실제인터넷관측이지만운영피해기관침해사고정답집은아니다. 관리용트래픽이포함될수있으며모든흐름을악성으로정하지않는다. 0손실추정과ACK0/Too_Little_Traffic를함께유지한다. [Zeek7.1.0필드해석](https://docs.zeek.org/en/v7.1.0/scripts/policy/misc/capture-loss.zeek.html)은참고이며실제수집버전증명이아니다. 공개README와실제두ZIP목록은4/28시작,논문초록은4/29시작으로시작일차이를보존한다.
+
+질문/기준은프로젝트작성이며원문근거2묶음의개발검토과제1개를로컬에보존했다. 별도공식공인QA가아니다. 공통유입출발지1,137개가있으므로다른도시/날짜를자동으로독립최종평가로간주하지않는다. 라이선스/출처·수정고지보존,새학습/모델호출0. CTU-SME11은공식metadata/README만후속확인했으며큰tar.bz2원문은이번에받지않았다.
+
 ## DEDALE D19 flow·SSH·NTP 및 결측 표현 — 2026-10-30 KST
 
 [공식 V2.1 데이터](https://doi.org/10.57745/Y5JLDG), Lanvin·Majorczyk, CC BY4.0. [Zeek archive](https://entrepot.recherche.data.gouv.fr/api/access/datafile/717877)의 D19 4멤버를 중앙목록 포함81,079,064B 범위 읽기했다. 3,405,887,752B 전체 ZIP 다운로드/MD5 검증은 하지 않았으며 선택멤버 CRC/SHA를 확인했다. 네트워크868,616행·SSH15행·NTP9,324행은 실제 연구 시험망 수집 기록이며 운영 피해사고 로그나 학습 대화 수가 아니다. [상세 무결성·분할·검증 원장](DEDALE_FLOW_REVIEW.json).

@@ -1,5 +1,23 @@
 # 데이터 출처와 사용 범위
 
+## 추가 관제 판단 자료 검수 — 2026-10-31T00:05:55.759765+09:00
+
+[검수 원장](SOC_GUIDE_SOURCE_REVIEW.json). 기존1197행 후보·학습본은 변경하지 않았다. 추가5항목을 검토했지만 우선순위 확장은 GUIDE 파생, ALERT-BENCH는 기존 AIT 파생이므로 서로 독립된 새 데이터셋5개로 세지 않는다.
+
+| 원출처 | 확인한 내용 | 편입 판단 |
+| --- | --- | --- |
+| [Microsoft GUIDE v2](https://www.kaggle.com/datasets/Microsoft/microsoft-security-incident-prediction) | 공식 API·CDLA-Permissive-2.0·[ACM Companion2025 논문 DOI](https://doi.org/10.1145/3701716.3715209)의 Crossref 서지 확인. 실제 train1MiB에 완전행4111·45열, 조치 라벨29행·분류 미상27행. | 사건분류/조치추천 학습 우선후보. 사건 전체 연결·라벨/누수 검수 전 신규 학습행0. |
+| [GUIDE 우선순위 확장](https://arxiv.org/abs/2607.16963) | 원파일136325B 전수:499조직×20순위=9980행/중복쌍0. 실제 열은 OrgId/IncidentId/QueueRank, 논문의 Rank/Split와 다르고 Split 없음. | 원 GUIDE test 기반이므로 평가용 예약. 논문은2026사전논문, 공식 분할을 임의 생성했다고 주장하지 않는다. |
+| [ALERT-BENCH/AIDA](https://arxiv.org/abs/2610.10608) | AIT-LDSv2/AIT-ADS 기반 조사 벤치마크 사전논문. | 조사 방법/평가 참고. 기존 AIT와 원천 중복 확인 필요·새 로그 반입0. |
+| [AWS 저자 SIR-Bench/OUAT](https://arxiv.org/abs/2604.12040) | 실제 사건 패턴에서 만든 클라우드 재현 실험을 기술하며 본문은 공개 예정으로 안내. | 검증된 배포본/데이터 이용조건 미확인·학습 제외. advertised794건을 반입 건수로 세지 않는다. |
+| [WitFoo Precinct6 v2](https://www.witfoo.com/research/precinct-6-dataset/) | 운영 로그지만 라벨은 탐지 규칙 생성, 보고서는 템플릿. 제공자가 사람 검수 정답이 아님을 명시. | 보조 관측 후보. 관제 위험판단의 확정 정답으로 쓰지 않는다. |
+
+기관·학회 출처는 추적 가능성의 근거이며 각 라벨의 정확성 보장은 아니다. GUIDE의 익명화 IP/SHA 숫자는 불투명 식별자이며 실제 차단 대상으로 해석하지 않는다. IncidentGrade/ActionGrouped/ActionGranular는 입력에서 분리하고, LastVerdict 등 사후정보는 시간상 누수 여부를 검수한다. 조치 라벨은 추천 근거이며 MCP 실행·성공·사후검증 기록을 대신하지 않는다. 프로젝트가 만든 한국어 질문/도구 매핑은 별도 가공 주석으로 표시한다.
+
+큰 파일은 전체 다운로드하지 않았다. GUIDE train앞1MiB만 두 차례 메모리에서 확인해 SHA 일치·형식검사를 했고 본문은 저장하지 않았다. 작은 순위 파일은 로컬 검증용으로 보존하며 학습에 넣지 않는다. URL만 참조해서 가중치가 학습되는 것은 아니며 실제 선택 구간을 읽어야 한다. 원본 데이터 공유 시 [CDLA 이용조건](https://cdla.dev/permissive-2-0/) 전문을 동봉한다. 실제 학습·GPU사용·운영 변경·Mac 패키지 설치0.
+
+이하 이전 출처 기록을 보존한다.
+
 ## 운영 평가 실제 응답·검수 출처 — 2026-10-30T20:15:42.926021+09:00
 
 [실측 원장](OPERATIONAL_RESPONSE_REVIEW.json). 기존 프로젝트29개 관측을 사용해 실제35B 응답58개를 얻었다. 두SDK의 답변29쌍이 같으며 검토260사실은 Codex의 근거 대조다. 기관 인증 정답·독립 전문가 검토·신규사건58개 또는 학습자료 추가로 분류하지 않는다. 입력/정답 분리와 원행/원응답 해시를 보존하고 이번 사용으로 개발회귀임을 명시했다.

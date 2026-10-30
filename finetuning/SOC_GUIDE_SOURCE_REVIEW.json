@@ -1,0 +1,339 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-31T00:05:55.759765+09:00",
+  "scope": "Additional SOC decision/investigation source review; bounded official-file verification, not training admission or quality certification.",
+  "training_examples_admitted": 0,
+  "gpu_training_started": false,
+  "production_changed": false,
+  "mac_packages_installed": 0,
+  "existing_mixture_rows_unchanged": 1197,
+  "primary_research_entries": 5,
+  "independent_new_source_families_asserted": false,
+  "download_policy": {
+    "full_archives_downloaded": false,
+    "guide_train_prefix_bytes_per_read": 1048576,
+    "guide_train_prefix_read_count": 2,
+    "guide_rank_file_bytes": 136325,
+    "guide_rank_read_count": 2,
+    "train_raw_body_retained": false,
+    "rank_retained_locally_for_verification_only": true,
+    "reference_only_is_not_weight_training": true,
+    "large_followup": "Prefer a bounded selected incident extraction on Thor, with a byte/time limit and complete incident coverage verification; fetching a prefix cannot establish complete incidents."
+  },
+  "candidates": [
+    {
+      "id": "microsoft_guide_v2",
+      "provider": "Microsoft Security Research / Microsoft official Kaggle organization",
+      "provider_url": "https://www.kaggle.com/datasets/Microsoft/microsoft-security-incident-prediction",
+      "role": "priority_training_source_candidate_after_incident_join_and_label_audit",
+      "paper": {
+        "title": "AI-Driven Guided Response for Security Operation Centers with Microsoft Copilot for Security",
+        "doi": "10.1145/3701716.3715209",
+        "url": "https://doi.org/10.1145/3701716.3715209",
+        "publication": "Companion Proceedings of the ACM on Web Conference 2025",
+        "publisher": "ACM",
+        "published_date": "2025-05-08",
+        "verification": "Crossref publisher-supplied record plus provider description; ACM landing page returned HTTP403. Companion proceedings is not asserted to be a main-track paper or independent certification."
+      },
+      "version": 2,
+      "provider_updated_at_kst": "2026-07-19T06:17:21.403+09:00",
+      "license": "CDLA-Permissive-2.0",
+      "license_url": "https://cdla.dev/permissive-2-0/",
+      "rights_evidence": "Provider description explicitly names this license; summary license field says Other. Preserve license text with any shared data.",
+      "provider_reported_scale": {
+        "evidence_points": "more than 13 million",
+        "incidents": "approximately 1 million",
+        "remediation_labelled_incidents": "approximately 26000",
+        "organizations": "more than 6100",
+        "scope": "Provider counts, not independently counted here."
+      },
+      "nature": "De-identified production evidence/alerts/incidents, customer-provided triage and remediation labels; not raw full investigation transcripts or verified MCP execution traces.",
+      "soc_roles": [
+        "incident triage",
+        "evidence grouping and comparison",
+        "containment action recommendation"
+      ],
+      "listed_files": [
+        {
+          "name": "GUIDE_Test.csv",
+          "bytes": 1087963831
+        },
+        {
+          "name": "GUIDE_Test_Queue_Rankings.csv",
+          "bytes": 136325
+        },
+        {
+          "name": "GUIDE_Train.csv",
+          "bytes": 2425409087
+        }
+      ],
+      "metadata_evidence": {
+        "guide-api": {
+          "url": "https://www.kaggle.com/api/v1/datasets/list/Microsoft/microsoft-security-incident-prediction",
+          "final_url": "https://www.kaggle.com/api/v1/datasets/list/Microsoft/microsoft-security-incident-prediction",
+          "status": 200,
+          "type": "application/json",
+          "bytes": 1125,
+          "sha256": "3216dd327553c216045f3fc142db507da1ead7b8a0d85ca4beef0daf2fe8d424",
+          "at_kst": "2026-10-31T00:00:07.705028+09:00"
+        },
+        "guide-view": {
+          "url": "https://www.kaggle.com/api/v1/datasets/view/Microsoft/microsoft-security-incident-prediction",
+          "final_url": "https://www.kaggle.com/api/v1/datasets/view/Microsoft/microsoft-security-incident-prediction",
+          "status": 200,
+          "type": "application/json",
+          "bytes": 24409,
+          "sha256": "2fa87ef7bddc98f78b317e0cf177cb8f564191fb9596b239ef45822b32bb317b",
+          "at_kst": "2026-10-31T00:00:08.169286+09:00"
+        },
+        "guide-crossref": {
+          "url": "https://api.crossref.org/works/10.1145/3701716.3715209",
+          "bytes": 11231,
+          "sha256": "7ed0f581607d453866b70c5ead965d4677eb891b8df432b508427d260f5447e0",
+          "status": 200,
+          "content_range": null,
+          "at_kst": "2026-10-31T00:02:51.828994+09:00"
+        }
+      },
+      "actual_prefix_verification": {
+        "url": "https://www.kaggle.com/api/v1/datasets/download/Microsoft/microsoft-security-incident-prediction/GUIDE_Train.csv?datasetVersionNumber=2",
+        "bytes": 1048576,
+        "sha256": "6923227d705e137f9d494ef996e13f3bfe836eeff443c331a428d449842a4026",
+        "status": 206,
+        "content_range": "bytes 0-1048575/2425409087",
+        "at_kst": "2026-10-31T00:02:51.110681+09:00",
+        "complete_prefix_rows": 4111,
+        "columns": [
+          "Id",
+          "OrgId",
+          "IncidentId",
+          "AlertId",
+          "Timestamp",
+          "DetectorId",
+          "AlertTitle",
+          "Category",
+          "MitreTechniques",
+          "IncidentGrade",
+          "ActionGrouped",
+          "ActionGranular",
+          "EntityType",
+          "EvidenceRole",
+          "DeviceId",
+          "Sha256",
+          "IpAddress",
+          "Url",
+          "AccountSid",
+          "AccountUpn",
+          "AccountObjectId",
+          "AccountName",
+          "DeviceName",
+          "NetworkMessageId",
+          "EmailClusterId",
+          "RegistryKey",
+          "RegistryValueName",
+          "RegistryValueData",
+          "ApplicationId",
+          "ApplicationName",
+          "OAuthApplicationId",
+          "ThreatFamily",
+          "FileName",
+          "FolderPath",
+          "ResourceIdName",
+          "ResourceType",
+          "Roles",
+          "OSFamily",
+          "OSVersion",
+          "AntispamDirection",
+          "SuspicionLevel",
+          "LastVerdict",
+          "CountryCode",
+          "State",
+          "City"
+        ],
+        "parse_width_valid": true,
+        "triage_counts": {
+          "TruePositive": 1405,
+          "FalsePositive": 862,
+          "BenignPositive": 1817,
+          "": 27
+        },
+        "action_grouped_counts": {
+          "": 4082,
+          "ContainAccount": 27,
+          "IsolateDevice": 2
+        },
+        "action_granular_counts": {
+          "": 4082,
+          "account password changed": 5,
+          "update stsrefreshtokenvalidfrom timestamp.": 13,
+          "account disabled": 2,
+          "disable account.": 2,
+          "isolateresponse": 1,
+          "reset user password.": 1,
+          "change user password.": 4,
+          "quarantinefile": 1
+        },
+        "org_count": 740,
+        "incident_pairs": 3252,
+        "complete_incidents_asserted": false,
+        "labels_not_model_input": [
+          "IncidentGrade",
+          "ActionGrouped",
+          "ActionGranular"
+        ],
+        "admitted_training": 0,
+        "raw_body_retained": false
+      },
+      "admission_gates": [
+        "Select incident groups by (OrgId,IncidentId) and retrieve complete evidence before claiming incident-level labels/context. Prefix ordering is not representative sampling.",
+        "Confirm label agreement at incident/affected entity level. Missing label is unknown, not benign. Do not merge different action strings without documented mapping.",
+        "Keep IncidentGrade/ActionGrouped/ActionGranular out of model input. Audit post-decision fields such as LastVerdict/SuspicionLevel for time leakage.",
+        "Reserve original test/ranking incident groups; compare train/eval organization and incident overlap before constructing split manifests.",
+        "Treat scrubbed IP/SHA/account integers as opaque IDs, not operational indicators. No exact server action arguments can be inferred from them.",
+        "Project MCP/action mappings require separate operational evidence, permissions and post-action checks; customer action labels do not prove successful execution.",
+        "Retain original file version/range/hash and label provenance; derived Korean QA is project annotation, not Microsoft-authored ground truth."
+      ],
+      "status": "source_and_bounded_format_verified; full incident extraction, label audit, train/eval split and token validation pending"
+    },
+    {
+      "id": "microsoft_guide_priority_v2",
+      "provider": "Microsoft Security Research",
+      "role": "evaluation_only_reserved",
+      "paper_url": "https://arxiv.org/abs/2607.16963",
+      "publication_status": "2026 arXiv preprint; peer-reviewed venue not established here",
+      "parent_source": "microsoft_guide_v2",
+      "independent_source": false,
+      "license": "CDLA-Permissive-2.0 per shared provider dataset description",
+      "provider_label_nature": "Expert queue-relative top20 rankings over selected original GUIDE test organizations, not binary maliciousness.",
+      "actual_verification": {
+        "url": "https://www.kaggle.com/api/v1/datasets/download/Microsoft/microsoft-security-incident-prediction/GUIDE_Test_Queue_Rankings.csv?datasetVersionNumber=2",
+        "bytes": 136325,
+        "sha256": "e4ea9308f45821128a3cd446ab19e6559edfc50709e72034ce957b6f0e2e65d6",
+        "status": 206,
+        "content_range": "bytes 0-136324/136325",
+        "at_kst": "2026-10-31T00:02:49.117869+09:00",
+        "rows": 9980,
+        "columns": [
+          "OrgId",
+          "IncidentId",
+          "QueueRank"
+        ],
+        "orgs": 499,
+        "unique_pairs": 9980,
+        "all_orgs_twenty_rows": true,
+        "all_rank_one_to_twenty": true,
+        "split_column_present": false,
+        "paper_schema_diff": {
+          "paper": [
+            "OrgId",
+            "IncidentId",
+            "Rank",
+            "Split"
+          ],
+          "file": [
+            "OrgId",
+            "IncidentId",
+            "QueueRank"
+          ]
+        },
+        "admitted_training": 0,
+        "reserved_role": "evaluation_only; original GUIDE test incidents; join and organization split still required"
+      },
+      "limitations": [
+        "No official Split column in delivered v2 file despite paper description. Do not invent or assume supplied organization split.",
+        "Ranked rows require joining actual GUIDE_Test evidence; rank CSV alone has no investigation context.",
+        "Do not treat omitted incidents as benign or mutually order all non-top20 incidents.",
+        "Do not add this original-test-derived label file to fine-tuning."
+      ],
+      "status": "full_small_file_verified; evaluation context join and organization partition pending"
+    },
+    {
+      "id": "alert_bench_aida",
+      "provider": "Virginia Tech / Google / North Carolina State University authors",
+      "paper_url": "https://arxiv.org/abs/2610.10608",
+      "full_text_url": "https://arxiv.org/html/2610.10608v1",
+      "publication_status": "arXiv preprint, not confirmed peer-reviewed",
+      "provider_reported_alerts": 1247,
+      "parent_source": "AIT-LDSv2 with AIT-ADS matching",
+      "independent_source": false,
+      "soc_roles": [
+        "active evidence retrieval",
+        "triage uncertainty",
+        "checking evidence before closing an alert"
+      ],
+      "rights": "Paper CC-BY-4.0 is not automatically a dataset/code license; original AIT releases and any separate artifact terms need independent review.",
+      "status": "methodology_reference_and_possible_evaluation; no new log rows acquired",
+      "limitations": [
+        "Existing project AIT use requires environment/case overlap audit.",
+        "No empty-search equals benign rule.",
+        "Author-reported results do not transfer to this model, MCP tools or infrastructure."
+      ]
+    },
+    {
+      "id": "sir_bench_ouat",
+      "provider": "Amazon Web Services authors",
+      "paper_url": "https://arxiv.org/abs/2604.12040",
+      "full_text_url": "https://arxiv.org/html/2604.12040v1",
+      "publication_status": "arXiv preprint; peer-reviewed venue not established",
+      "provider_reported_cases": 794,
+      "provider_reported_incident_patterns": 129,
+      "nature": "Controlled cloud attack simulations based on sanitized incident patterns, not original customer logs; expert-validated findings are author claims.",
+      "soc_roles": [
+        "investigation depth",
+        "novel evidence discovery",
+        "appropriate tool use"
+      ],
+      "rights": "No verified public data/OUAT release license located in checked primary sources.",
+      "status": "watchlist_not_acquired_not_training",
+      "limitations": [
+        "Paper future-work section states public release planned. Do not count advertised cases as downloaded or usable.",
+        "Unrelated similarly named repositories are not author data.",
+        "LLM-as-judge metrics need independent factual review; do not adopt alert repetition as investigation."
+      ]
+    },
+    {
+      "id": "witfoo_precinct6_v2",
+      "provider": "WitFoo",
+      "provider_url": "https://www.witfoo.com/research/precinct-6-dataset/",
+      "dataset_url": "https://huggingface.co/datasets/witfoo/precinct6-cybersecurity-100m",
+      "version": "2.0.0; provider says built 2026-09-11",
+      "license": "Apache-2.0 per provider/data card; actual release pin and license-file verification pending",
+      "provider_reported_events": 114421340,
+      "provider_reported_size": "13.9 GB",
+      "nature": "Production records, but labels derive from detection rules; attack reports are templates. No analyst-adjudicated ground truth asserted.",
+      "soc_roles": [
+        "multisource log retrieval",
+        "evidence graph/lead tracing",
+        "distinguishing detector output from confirmed incident"
+      ],
+      "status": "auxiliary_observation_candidate; exclude as primary supervised risk-decision ground truth",
+      "limitations": [
+        "Provider reports one organization contributes87.0% of capture.",
+        "Historical incident leads are malicious by construction; no representative incident class balance.",
+        "v1 was withdrawn over sanitization failures; do not fetch or compare v1.",
+        "Raw v2 metadata/records not downloaded or independently checked here.",
+        "Vendor scale and automation labels do not establish reliable analyst decisions."
+      ]
+    }
+  ],
+  "next_steps": [
+    "Prioritize GUIDE original-train complete-incident extraction and sparse action-label coverage; retain existing AIT/Linux/CISA evidence candidates.",
+    "Create evidence/target separation and source-group split manifests before tokenization; do not synthesize unsupported response outcomes or investigative reasoning.",
+    "Use a small controlled comparison with same base model/harness/compute; grade critical omissions, false closure and unsupported execution separately.",
+    "Concrete Thor resource/runtime/outage plan before training; no operational model swap without passing independent evaluation."
+  ],
+  "validation": {
+    "guide_rank_rows": 9980,
+    "guide_rank_unique_org_incident_pairs": 9980,
+    "guide_rank_orgs": 499,
+    "all_orgs_twenty_ranks_one_to_twenty": true,
+    "guide_rank_delivered_split_column": false,
+    "guide_train_prefix_rows": 4111,
+    "guide_train_prefix_columns": 45,
+    "guide_train_prefix_rows_with_action": 29,
+    "guide_train_prefix_rows_missing_triage": 27,
+    "train_prefix_complete_incidents_asserted": false,
+    "large_files_not_downloaded": true,
+    "new_training_rows": 0
+  }
+}

@@ -13,8 +13,9 @@ import runtime
 
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False):
         calls, prompts = [], []
+        self.protected_starts = []
         content = '# heading\nbody\n'
         sha = hashlib.sha256(content.encode()).hexdigest()
         available = {'rule-a':['get_rule_change_target'], 'rule-write-a':['propose_rule_edit']}
@@ -28,7 +29,8 @@ class PreparationLoop(unittest.TestCase):
                 data = ({'target':'a:modsecurity-custom','content':content,'sha256':sha}
                         if name=='get_rule_change_target' else
                         {'target':'a:modsecurity-custom','proposal_id':'1'*32,'before_sha256':sha,
-                         'after_sha256':'2'*64,'status':'pending','review_posted':True})
+                         'after_sha256':hashlib.sha256(content.replace(arguments['edits'][0]['old_text'],arguments['edits'][0]['new_text']).encode()).hexdigest(),
+                         'status':'pending','review_posted':True})
                 return types.SimpleNamespace(isError=False,content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
         class Client:
             def __init__(self, **kw): pass
@@ -53,7 +55,12 @@ class PreparationLoop(unittest.TestCase):
                         assert refused['executed'] is False
                         assert refused['error']=='tool_input_schema_validation_failed'
                     await tools['mcp__rule_a__get_rule_change_target'].ainvoke({'target':'a:modsecurity-custom'})
-                if len(prompts)==submit_on:
+                if correct_preflight:
+                    await tools['mcp__rule_write_a__propose_rule_edit'].ainvoke({
+                        'target':'a:modsecurity-custom','base_sha256':sha,
+                        'edits':[{'old_text':'body\n','new_text':'body\n'+ ('\n' if len(prompts)==1 else '')+'# AUDIT-NOTE\n'}],
+                        'reason':'requested comment'})
+                elif len(prompts)==submit_on:
                     await tools['mcp__rule_write_a__propose_rule_edit'].ainvoke({
                         'target':'a:modsecurity-custom','base_sha256':sha,
                         'edits':[{'old_text':'# heading\n','new_text':'# new\n# heading\n'}],'reason':'requested comment'})
@@ -86,7 +93,7 @@ class PreparationLoop(unittest.TestCase):
             report=asyncio.run(runtime.run({'model':'qwen3.6:35b','base_url':'http://fixture.invalid',
                 'access_mode':'hermes-parity','mcpServers':{s:{} for s in available}},
                 {'question':question or 'WAF 파일 선두에 주석 변경안을 만들어줘. 실제 적용하지 말고 승인 카드까지만 준비해줘.'},
-                connection_pool=pool))
+                connection_pool=pool,on_protected_start=lambda:self.protected_starts.append(True)))
             pool.borrow.assert_not_awaited()
         self.assertNotEqual(report['status'],'failed',report)
         return report,prompts,calls
@@ -125,10 +132,24 @@ class PreparationLoop(unittest.TestCase):
         q='WAF 맨 끝에 # AUDIT-NOTE 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용은 유지해줘.'
         report,prompts,calls=self.execute(question=q,submit_on=1)
         self.assertEqual(report['status'],'partial')
-        self.assertEqual(report['write_progress']['scope_checks'][0]['status'],'mismatch')
-        self.assertIn('승인 보류',report['final_response'])
-        self.assertEqual(len(prompts),1)
+        self.assertEqual(report['proposal_input_rejections'][0]['rejection']['error'],'proposal_preflight_scope_mismatch')
+        self.assertIn('편집 검증 거절',report['final_response'])
+        self.assertEqual(len(prompts),2)
+        self.assertEqual(calls,['get_rule_change_target'])
+        self.assertEqual(report['protected_calls'],0)
+        self.assertEqual(self.protected_starts,[])
+
+    def test_model_corrects_local_scope_error_before_exactly_one_submission(self):
+        q='WAF 맨 끝에 # AUDIT-NOTE 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용은 유지해줘.'
+        report,prompts,calls=self.execute(question=q,correct_preflight=True)
+        self.assertEqual(report['status'],'completed')
+        self.assertEqual(len(prompts),2)
         self.assertEqual(calls,['get_rule_change_target','propose_rule_edit'])
+        self.assertEqual(report['protected_calls'],1)
+        self.assertEqual(self.protected_starts,[True])
+        self.assertEqual(len(report['proposal_input_rejections']),1)
+        self.assertEqual(report['write_progress']['scope_checks'][0]['status'],'match')
+        self.assertIn('이전 편집 검증 거절',report['final_response'])
 
     def test_preserve_mode_proposal_uses_one_model_continuation(self):
         q='WAF 파일 끝에 주석 한 줄을 추가하는 승인안을 만들어줘. 기존 내용과 모드는 유지하고, 원복 방법도 알려줘.'

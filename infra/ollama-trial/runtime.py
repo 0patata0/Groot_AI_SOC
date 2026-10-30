@@ -173,6 +173,12 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                                         'validator': str(exc.validator), 'executed': False}
                                     report.setdefault('input_rejections', []).append(rejection)
                                     return canonical({**rejection, 'expected_schema': input_schema})
+                                rejection = harness.proposal_preflight(current, report['calls'], backend, bare_name, arguments)
+                                if rejection:
+                                    report.setdefault('proposal_input_rejections', []).append({
+                                        'server': backend, 'name': bare_name, 'arguments': arguments,
+                                        'after_call_count': len(report['calls']), 'rejection': rejection})
+                                    return canonical(rejection)  # No MCP call/protected-start; the model may correct input.
                                 if read_plan and read_plan['kind'] in ('wazuh', 'multi') and 'agent_id' in arguments:
                                     expected = harness.READ.verified_ids(read_plan, report['calls'])
                                     if arguments['agent_id'] not in expected:
@@ -332,7 +338,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
             if action_issues:
                 report['remaining_issues'] = sorted(set(report.get('remaining_issues', []) + action_issues))
                 final = harness.action_fallback(current, report['calls'])
-            progress = harness.write_progress(current, report['calls'])
+            progress = harness.write_progress(current, harness.proposal_history(report['calls'], report.get('proposal_input_rejections', ())))
             if progress:
                 report['write_progress'] = progress
                 final = harness.write_report(final, progress)
@@ -344,7 +350,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                 report['evidence'] = {'question': current, 'at_kst': report['at_kst'], 'calls': report['calls']}
     except Exception as exc:
         report.update(status='failed', error_type=type(exc).__name__)
-        progress = harness.write_progress(current, report['calls'])
+        progress = harness.write_progress(current, harness.proposal_history(report['calls'], report.get('proposal_input_rejections', ())))
         if progress:
             report.update(status='partial', write_progress=progress,
                           final_response='실행이 중단되었습니다. 아래는 중단 전 확인된 제출 근거이며 요청 전체 완료가 아닙니다.\n\n' + progress['text'])

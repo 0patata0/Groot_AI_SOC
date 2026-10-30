@@ -1275,9 +1275,9 @@ def preparation_gap(question, calls):
     if (not READ.wants_write(text) or re.search(r'모드|컨테이너|재구성|' + mode_token, action_text, re.I)
             or not re.search(r'변경안|수정안|주석|description|\bmsg\b', text, re.I)):
         return []
-    if any('write' in c.get('server', '') or
+    if any(not local_preproposal_rejection(c) and ('write' in c.get('server', '') or
            (c.get('server') == 'resp' and c.get('name') not in {'list_blocks', 'get_firewall_rules'}) or
-           re.match(r'propose_|submit_|apply_|temporarily_|restart_|block_|unblock_', c.get('name', ''))
+           re.match(r'propose_|submit_|apply_|temporarily_|restart_|block_|unblock_', c.get('name', '')))
            for c in calls):
         return []
     progress = write_progress(question, calls)
@@ -1296,12 +1296,142 @@ def preparation_instruction(targets):
 def rejected_before_proposal(error):
     # These exact executor validations precede _propose_candidate and cannot have
     # submitted a card. Transport/timeouts/unknown errors remain unresolved.
-    return bool(re.fullmatch(
+    return bool(preproposal_rejection(error) or re.fullmatch(
         r'edit [1-9][0-9]* old_text (?:must match exactly once in|is absent from) the original file'
         r'|candidate must end with a newline'
         r'|base_sha256 must be a SHA-256 from get_rule_change_target'
         r'|target changed since it was read; fetch current content and retry'
         r'|Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden', error))
+
+
+def preproposal_rejection(value):
+    """Recognize the bounded local rejection envelope, never a transport error."""
+    if not isinstance(value, str) or len(value.encode()) > 16384:
+        return None
+    try:
+        data = json.loads(value)
+    except (ValueError, TypeError):
+        return None
+    codes = {'context_unavailable', 'read_required', 'source_invalid', 'base_mismatch',
+             'edit_invalid', 'scope_mismatch', 'scope_unverified', 'duplicate', 'outcome_unknown'}
+    if (isinstance(data, dict) and data.get('stage') == 'before_mcp' and data.get('executed') is False
+            and data.get('error') in {'proposal_preflight_' + code for code in codes}):
+        return data
+    return None
+
+
+def proposal_preflight(question, calls, server, name, arguments):
+    """Validate model-produced bytes before dispatch; never fill/repair tool arguments."""
+    try:
+        return _proposal_preflight(question, calls, server, name, arguments)
+    except UnicodeError:
+        return {'error':'proposal_preflight_edit_invalid','executed':False,'stage':'before_mcp',
+                'detail':'편집 문구는 올바른 UTF-8 텍스트여야 합니다.'}
+
+
+def _proposal_preflight(question, calls, server, name, arguments):
+    if server not in ('rule-write-a', 'rule-write-b') or name not in ('propose_rule_edit', 'propose_rule_change'):
+        return None
+
+    def reject(code, detail, **fields):
+        return {'error': 'proposal_preflight_' + code, 'executed': False,
+                'stage': 'before_mcp', 'detail': detail, **fields}
+
+    target = arguments.get('target') if isinstance(arguments, dict) else None
+    targets = {'a:modsecurity-custom', 'a:suricata-local', 'b:wazuh-local-rules'}
+    if not isinstance(target,str) or target not in targets or not target.startswith(server[-1] + ':'):
+        return reject('edit_invalid', '고정 장비와 대상의 일치가 필요합니다.')
+    reads = [c for c in calls if c.get('server') == 'rule-' + target[0]
+             and c.get('name') == 'get_rule_change_target' and c.get('arguments', {}).get('target') == target]
+    source = payload(reads[-1]) if reads else None
+    if not source or source.get('target') != target:
+        return reject('read_required', '이번 턴에서 해당 대상의 현재 파일을 실제로 조회해야 합니다.')
+    content = source.get('content')
+    if (not isinstance(content, str) or len(content.encode()) > 128 * 1024
+            or hashlib.sha256(content.encode()).hexdigest() != source.get('sha256')):
+        return reject('source_invalid', '읽은 원문 전체와 SHA를 검증하지 못했습니다.')
+    if arguments.get('base_sha256') != source['sha256']:
+        return reject('base_mismatch', '가장 최근 실제 조회의 SHA를 그대로 사용하세요.', source_sha256=source['sha256'])
+    if name == 'propose_rule_change':
+        candidate = arguments.get('candidate_content')
+        if not isinstance(candidate, str):
+            return reject('edit_invalid', '전체 후보는 문자열이어야 합니다.')
+    else:
+        edits = arguments.get('edits')
+        if not isinstance(edits, list) or not 1 <= len(edits) <= 16:
+            return reject('edit_invalid', '부분 편집은 1~16개여야 합니다.')
+        spans, size = [], 0
+        for edit in edits:
+            if (not isinstance(edit, dict) or set(edit) != {'old_text', 'new_text'}
+                    or not all(isinstance(edit[k], str) for k in edit) or not edit['old_text']):
+                return reject('edit_invalid', '비어 있지 않은 old_text와 문자열 new_text가 필요합니다.')
+            old, new = edit['old_text'], edit['new_text']
+            size += len(old.encode()) + len(new.encode())
+            start = content.find(old)
+            if size > 64 * 1024 or start < 0 or content.find(old, start + 1) != -1:
+                return reject('edit_invalid', '편집 문구는 원문에서 정확히 한 번 일치해야 하며 합계 64KiB 이하여야 합니다.',
+                              edit_anchors=rule_edit_anchors(source))
+            spans.append((start, start + len(old), new))
+        spans.sort()
+        if any(a[1] > b[0] for a, b in zip(spans, spans[1:])):
+            return reject('edit_invalid', '모든 편집은 원문 기준이며 편집 범위가 겹치면 안 됩니다.')
+        candidate = content
+        for start, end, new in reversed(spans):
+            candidate = candidate[:start] + new + candidate[end:]
+    if not candidate or len(candidate.encode()) > 128 * 1024 or not candidate.endswith('\n') or '\x00' in candidate:
+        return reject('edit_invalid', '후보는 종료 개행이 있는 128KiB 이하의 비어 있지 않은 텍스트여야 합니다.')
+    if candidate == content:
+        return reject('edit_invalid', '원문과 후보가 같습니다. 변경안을 제출하지 않았습니다.')
+    after = hashlib.sha256(candidate.encode()).hexdigest()
+    scope = exact_comment_scope(question, source, {'before_sha256':source['sha256'], 'after_sha256':after})
+    if scope and scope['status'] != 'match':
+        return reject('scope_' + ('mismatch' if scope['status'] == 'mismatch' else 'unverified'),
+                      '요청한 주석 한 줄·위치와 원문 보존 조건을 만족하지 않습니다. old_text 전체와 기존 개행을 보존하고 새 문구만 지정한 앞/뒤에 붙이세요.',
+                      candidate_sha256=after, scope=scope, edit_anchors=rule_edit_anchors(source))
+    for c in calls:
+        if c.get('server') != server or c.get('name') not in ('propose_rule_edit','propose_rule_change') or c.get('arguments',{}).get('target') != target:
+            continue
+        raw = c.get('result', '')
+        try:
+            data = json.loads(raw) if hashlib.sha256(raw.encode()).hexdigest() == c.get('result_sha256') else None
+        except (ValueError, AttributeError, TypeError):
+            data = None
+        if isinstance(data, dict) and data.get('error') and rejected_before_proposal(proposal_error(data['error'])):
+            continue  # Known rejection before submission; the model may correct its arguments.
+        if (not isinstance(data,dict) or c.get('is_error') or data.get('error') or
+                data.get('status') != 'pending' or data.get('review_posted') is not True):
+            return reject('outcome_unknown', '이전 보호 호출의 결과가 미확인입니다. 상태를 확인하고 재제출하지 마세요.')
+        if data.get('before_sha256') == source['sha256'] and data.get('after_sha256') == after:
+            return reject('duplicate', '같은 원문·후보의 승인 카드가 이미 제출됐습니다. 기존 제안 상태를 확인하세요.', proposal_id=data.get('proposal_id'))
+    return None
+
+
+def local_preproposal_rejection(call):
+    raw = call.get('result', '')
+    if (call.get('server') not in ('rule-write-a','rule-write-b') or
+            call.get('name') not in ('propose_rule_edit','propose_rule_change') or
+            not isinstance(raw,str) or hashlib.sha256(raw.encode()).hexdigest() != call.get('result_sha256')):
+        return None
+    try:
+        data = json.loads(raw)
+        return preproposal_rejection(data.get('error')) if isinstance(data,dict) else None
+    except (ValueError,TypeError):
+        return None
+
+
+def proposal_history(calls, rejections=()):
+    """Report local input failures in order without putting them in actual MCP calls."""
+    output = []
+    for i in range(len(calls) + 1):
+        for row in rejections:
+            if row['after_call_count'] != i:
+                continue
+            raw = json.dumps({'error':json.dumps(row['rejection'],ensure_ascii=False)},ensure_ascii=False)
+            output.append({k:row[k] for k in ('server','name','arguments')} |
+                          {'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest(),
+                           'is_error':True,'mcp_executed':False})
+        if i < len(calls): output.append(calls[i])
+    return output
 
 
 def exact_comment_scope(question, source, receipt):
@@ -1363,7 +1493,10 @@ def write_progress(question, calls):
         elif c.get('is_error') or data.get('error'):
             # Transport errors may occur after a server has accepted the call.
             error = proposal_error(data.get('error', '도구 오류'))
-            if rejected_before_proposal(error):
+            local_rejection = local_preproposal_rejection(c)
+            if local_rejection:
+                entry['rejected_edits'].append('제출 전 검사 (MCP 미호출): ' + local_rejection['error'])
+            elif rejected_before_proposal(error):
                 entry['rejected_edits'].append(error)
             else:
                 entry['failures'].append('오류 반환/처리 상태 확인 필요: ' + error[:160])

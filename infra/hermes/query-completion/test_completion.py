@@ -1221,7 +1221,9 @@ class RegistrationTests(unittest.TestCase):
         self.loop = SimpleNamespace(finish_text_response=self.h.original, build_api_request=self.build,
                                     perform_api_call=self.call)
         self.result_call = mock.AsyncMock()
+        self.pre_tool = lambda agent,ref: (None,ref.args)
         self.modules = {
+            'agent.tool_executor': SimpleNamespace(_pre_tool_block=self.pre_tool),
             'tools.mcp_tool_handlers': SimpleNamespace(_call_tool_racing_stdio_death=self.result_call),
             'agent.turn_final_response': self.native,
             'agent.turn_api_request': SimpleNamespace(build_api_request=self.build),
@@ -1265,12 +1267,14 @@ class RegistrationTests(unittest.TestCase):
         self.assertIsNot(installed, self.h.original)
         self.assertEqual(inspect.signature(installed), inspect.signature(self.h.original))
         self.assertIsNot(self.modules['tools.mcp_tool_handlers']._call_tool_racing_stdio_death, self.result_call)
+        self.assertIsNot(self.modules['agent.tool_executor']._pre_tool_block,self.pre_tool)
         self.assertEqual(len(self.callbacks), 1)
         PLUGIN.register(self.ctx)
         self.assertIs(self.native.finish_text_response, installed)
         self.assertIs(self.loop.finish_text_response, installed)
         self.assertEqual(len(self.callbacks), 1)
         self.callbacks[0]()
+        self.assertIs(self.modules['agent.tool_executor']._pre_tool_block,self.pre_tool)
         self.assertIs(self.modules['tools.mcp_tool_handlers']._call_tool_racing_stdio_death, self.result_call)
         self.assertIs(self.native.finish_text_response, self.h.original)
         self.assertIs(self.loop.finish_text_response, self.h.original)

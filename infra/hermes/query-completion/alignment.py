@@ -15,6 +15,7 @@ from pathlib import Path
 import re
 import stat
 import sys
+import threading
 import uuid
 
 
@@ -233,6 +234,9 @@ def request_wrapper(original, query, harness):
         idx = next((i for i in range(len(rows) - 1, -1, -1) if isinstance(rows[i], dict)
                     and rows[i].get('role') == 'user' and rows[i].get('content') == kw.get('original_user_message')), -1)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload) if idx >= 0 else []
+        # Per-agent, per-turn evidence snapshot. Native execution/recording stay
+        # native; a tool batch cannot borrow another conversation's file read.
+        agent._capstone_proposal_context = (turn, request, calls, threading.Lock(), set()) if idx >= 0 else None
         notice = harness.scope_notice(request)
         if notice and not calls:
             agent._capstone_read_selection = None
@@ -329,6 +333,38 @@ def request_wrapper(original, query, harness):
         return replace(result, api_kwargs=data, api_messages=data.get("messages", result.api_messages),
                        _original_api_kwargs=copy.deepcopy(data))
     wrapped.__capstone_query_completion__ = query.VERSION
+    return wrapped
+
+
+def proposal_input_wrapper(original, harness, version):
+    """Native pre-tool hook, after existing plugin blocks/argument modifications."""
+    @functools.wraps(original)
+    def wrapped(agent, ref):
+        block, arguments = original(agent, ref)
+        match = re.fullmatch(r'mcp__(rule_write_[ab])__(propose_rule_edit|propose_rule_change)', ref.name)
+        if block is not None or not enabled(agent) or not match:
+            return block, arguments
+        context = getattr(agent, '_capstone_proposal_context', None)
+        if not context or context[0] != getattr(agent, '_current_turn_id', None):
+            rejection = {'error':'proposal_preflight_context_unavailable','executed':False,
+                         'stage':'before_mcp','detail':'현재 턴의 요청·실제 파일 조회 근거를 확인하지 못했습니다.'}
+        else:
+            with context[3]:
+                rejection = harness.proposal_preflight(context[1], context[2],
+                    match[1].replace('_','-'), match[2], arguments)
+                if not rejection:
+                    target = arguments['target']
+                    if target in context[4]:
+                        rejection = {'error':'proposal_preflight_outcome_unknown','executed':False,
+                            'stage':'before_mcp','detail':'같은 실행 묶음에서 이 대상의 제안 호출이 이미 시작됐습니다. 다음 턴에서 실제 결과를 확인하세요.'}
+                    else:
+                        context[4].add(target)
+        if rejection:
+            logging.getLogger('capstone.query_completion').info(
+                'event=proposal_input_rejected call_id=%s code=%s mcp_executed=False', ref.call_id, rejection['error'])
+            return json.dumps(rejection, ensure_ascii=False), arguments
+        return None, arguments
+    wrapped.__capstone_query_completion__ = version
     return wrapped
 
 

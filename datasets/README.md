@@ -1,5 +1,20 @@
 # 에이전트 파인튜닝 데이터셋 카탈로그 (2026-10-01)
 
+## Attack Flow 분기 보존 후속 — 2026-10-30 KST
+
+기존 최소 변환기의 액션 BFS 나열을 제거하고 `attack_flow_graph.py`로 원본 그래프를 보존한다. 고정 CTID commit의 41개 파일을 Git blob/크기/SHA와 대조했다. 노드1,990개·연결2,113개, 조건147개·AND89개·OR29개와 참167/거짓10 연결을 보존했다. 그래프는 사건25개 외 캠페인·악성코드·훈련 등의 범주도 포함한다. 새 데이터41개나 시간순 정답41개가 아니다. [검증 원장](ATTACK_FLOW_GRAPH_REVIEW.json) · [고정 원본/공식 의미 정의](ATTACK_FLOW_SOURCE_SPEC.json).
+
+```bash
+python3 -B datasets/prep.py --stages attack-flow --attack-flow-output datasets/processed/reference/attack-flow-graphs-NEW
+python3 -B -m unittest discover -s datasets/tests -p test_attack_flow_graph.py
+```
+
+독립 stage는 다른 자료와 STATS를 읽거나 갱신하지 않는다. `attack`/기본 전체 stage도 같은 파서를 사용하며, 출력 경로가 있으면 다른 stage 수행 전에 중단한다. `graphs.jsonl`·manifest·원본 LICENSE·변경 NOTICE를 새 디렉터리에 만든다. 이전 `knowledge/attack_flows.jsonl`은 이력으로 보존하며 재생성하지 않는다. 렌더링 정보와 명시된 구조 민감필드는 투영에서 제외하지만 모든 노드/연결·분기·인용·나머지 속성은 검증한다. 원본 UTC 등 시각 표기는 그대로 보존하며 처리 보고 시각은 KST다.
+
+12개 회귀 검사와 별도 파서의 모든 연결 양끝·원문 속성 대조를 마쳤다. 조건의 일반 anchor에서 나온 연결1개는 참으로 추정하지 않는다. 해당 Maastricht 흐름은 공식 보고서의 관련 단락과 일부 기법/도구 표현이 일치한다고 확인할 수 없어 사실 정답 생성에서 보류한다. 그래프 자체의 보존과 사건 의미의 정확성은 별개다. STIX 완전 변환기·학습 QA·운영 모델 학습 완료로 표시하지 않으며 신규 학습 편입0이다.
+
+아래 학습 보류/진행 문구는 당시 이력이다. 최신 학습·운영 판단은 [STATUS](../STATUS.md)를 따른다.
+
 **현재: 학습 실행 보류·계획만 정리.** 사용자 지시로 재개 작업을 중지했고 기존35B를13:21:19KST복구했다. 본 학습은 미시작이며 학습 컨테이너/활성 복구타이머는 없다. Thor 학습 차단은 원복 상태를 유지하고, 다음 재개 지시가 있을 때만 원래설정의 시험→1024개1epoch/512step→복구/검증→후보비교·적재를 진행한다. [실행 계획](../PLAN.md) · [현재 상태](../STATUS.md).
 
 이하 내용은 과거 시점의 기록이다.

@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+**사건 자료 정제 보완 — 2026-10-30 KST:** Attack Flow 변환에서 누락되던 조건·AND/OR·전체2,113연결을 보존했습니다. 12회귀와 전수 대조를 완료했으며, 기존 BFS 나열을 시간순 정답으로 만드는 경로를 제거했습니다. 사건 의미 검수와 신규 학습은 별도 단계입니다. [결과·한계](datasets/ATTACK_FLOW_GRAPH_REVIEW.json) · [현황/Git](STATUS.md).
+
+이하 이전 자료 검토와 프로젝트 안내입니다.
+
 **실제 로그 기반 입력 후보 — 2026-10-30 KST:** AIT9·Linux-APT8 초안을 원문 근거94개에 연결하고 반복 입력을 줄였습니다. 16개 단위검사와 근거 보존 대조를 완료했으며, 실제 tokenizer와 누락된 과거 자료 대조는 남았습니다. 질문·해석은 프로젝트 작성이고 신규 학습 편입은0입니다. [결과·한계](finetuning/SOC_OBSERVATION_INPUT_REVIEW.json) · [현재 상태/Git](STATUS.md).
 
 이하 이전 자료 검토와 프로젝트 안내입니다.

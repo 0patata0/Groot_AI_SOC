@@ -11,14 +11,28 @@
   eval      평가셋 통일 스키마(학습 금지)                                   → eval/*.jsonl
   knowledge 룰·지식 JSONL(Wazuh/ET Open/CRS/Sigma/Atomic/ATT&CK/KEV)       → knowledge/*.jsonl
   defense   방어 지식: ATT&CK 완화·탐지전략·분석, D3FEND 매핑, CAR, CTID 통제 매핑, RE&CT 응답 액션 → knowledge/*.jsonl
-  attack    ATT&CK 보강: 절차 예시(uses)·그룹·소프트웨어·캠페인·전술·폐기 매핑 + TRAM 문장→기법 + Attack Flow 사건 체인 (+TTP-Mapping 참고용) → knowledge/, reference/
+  attack    ATT&CK 보강: 절차 예시(uses)·그룹·소프트웨어·캠페인·전술·폐기 매핑 + TRAM 문장→기법 + Attack Flow 분기 그래프 (+TTP-Mapping 참고용) → knowledge/, reference/
+  attack-flow Attack Flow 그래프만 독립 정제 (새 --attack-flow-output 경로, 기존 자료/STATS 보존)
 """
 import argparse, csv, hashlib, io, json, os, random, re, zipfile, tarfile, collections, datetime, glob, sys
 ap=argparse.ArgumentParser()
 ap.add_argument('--stages',default='all'); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--benign-ratio',type=float,default=1.0)
 ap.add_argument('--ait-normal-cap',type=int,default=20000); ap.add_argument('--ait-phase-cap',type=int,default=5000); ap.add_argument('--ait-window-pad',type=float,default=0.0)
 ap.add_argument('--ait-val',default='wheeler'); ap.add_argument('--ait-holdout',default='wilson')
+ap.add_argument('--attack-flow-output', default='datasets/processed/reference/attack-flow-graphs', help='New directory for pinned graph references; existing output is never overwritten')
 A=ap.parse_args(); ST=set(A.stages.split(',')) if A.stages!='all' else {'hermes','glaive2','traces','sevenllm','attacklm','salad','ait','eval','knowledge','defense','attack'}
+if ST & {'attack', 'attack-flow'} and os.path.exists(A.attack_flow_output):
+    ap.error('Attack Flow output exists; choose a new --attack-flow-output before any stage runs')
+def run_attack_flow():
+    from attack_flow_graph import prepare
+    return prepare('datasets/raw/attack-flow', A.attack_flow_output)
+
+# Isolated reference preparation does not load or rewrite unrelated datasets/STATS.
+if ST == {'attack-flow'}:
+    result = run_attack_flow()
+    print(json.dumps({k: v for k, v in result.items() if k != 'files'}, ensure_ascii=False))
+    raise SystemExit(0)
+
 R='datasets/raw'; O='datasets/processed'
 for d in ['', 'ait','eval','knowledge']: os.makedirs(f'{O}/{d}',exist_ok=True)
 random.seed(A.seed); stats=json.load(open(f'{O}/STATS.json'))['stats'] if os.path.exists(f'{O}/STATS.json') else {}
@@ -555,38 +569,17 @@ if 'attack' in ST:
             except Exception: labs=[r[1]]
             rows.append({'text':r[0],'techniques':labs,'split':sp,'source':'tumeteor/Security-TTP-Mapping','license_note':'README 배지 CC-BY-NC-SA-4.0 vs 본문 CC-BY-4.0 모호 → 학습 제외, 참고/평가용'})
     wjsonl(f'{O}/reference/ttp_mapping.jsonl',rows); ka['ttp_mapping_reference']=len(rows)
-    # Attack Flow (빌더 .afb): action 노드 + latch/anchor 로 간선 복원 → 순서
-    flows=[]
-    for f in sorted(glob.glob(f'{R}/attack-flow/*.afb')):
-        try: d=json.load(open(f,encoding='utf-8'))
-        except Exception: continue
-        objs2=d.get('objects',[]); P=lambda o: {k:v for k,v in (o.get('properties') or []) if isinstance(k,str)}
-        root=next((o for o in objs2 if o.get('id')=='flow'),None); meta=P(root) if root else {}
-        nodes={o['instance']:o for o in objs2 if o.get('id') in ('action','process','tool','asset','condition','operator','infrastructure','vulnerability','malware','url','file','ipv4-addr','domain-name','email-addr','network-traffic','process','user-account','windows-registry-key','directory','artifact','software','note')}
-        anchor2node={}; 
-        for inst,o in nodes.items():
-            for a in (o.get('anchors') or {}).values(): anchor2node[a]=inst
-        latch2node={}
-        for o in objs2:
-            if o.get('id') in ('vertical_anchor','horizontal_anchor') and o['instance'] in anchor2node:
-                for l in o.get('latches',[]): latch2node[l]=anchor2node[o['instance']]
-        edges=[(latch2node.get(o.get('source')),latch2node.get(o.get('target'))) for o in objs2 if o.get('id')=='dynamic_line']
-        edges=[(a,b) for a,b in edges if a and b and a!=b]
-        acts={inst:o for inst,o in nodes.items() if o.get('id')=='action'}
-        # 순서: 진입 간선 없는 액션부터 BFS
-        indeg=collections.Counter(b for a,b in edges if b in acts); order=[]; seen2=set()
-        q=[i for i in acts if indeg[i]==0]
-        while q:
-            i=q.pop(0)
-            if i in seen2: continue
-            seen2.add(i); order.append(i)
-            for a,b in edges:
-                if a==i and b in acts and b not in seen2: q.append(b)
-        order+= [i for i in acts if i not in seen2]
-        steps=[{'name':P(acts[i]).get('name'),'technique_id':P(acts[i]).get('technique_id'),'tactic_id':P(acts[i]).get('tactic_id'),'description':P(acts[i]).get('description',''),'confidence':P(acts[i]).get('confidence')} for i in order]
-        flows.append({'flow':meta.get('name') or os.path.basename(f)[:-4],'description':meta.get('description',''),'author':meta.get('author'),'n_actions':len(acts),'n_edges':len([e for e in edges if e[0] in acts and e[1] in acts]),'steps':steps,'techniques':sorted({s['technique_id'] for s in steps if s['technique_id']}),'file':os.path.basename(f),'parser':'afb-builder minimal'})
-    wjsonl(f'{O}/knowledge/attack_flows.jsonl',flows); ka['attack_flows']=len(flows); ka['attack_flow_actions']=sum(x['n_actions'] for x in flows); ka['attack_flow_edges']=sum(x['n_edges'] for x in flows)
+    # Preserve the legacy knowledge/attack_flows.jsonl as history. The new
+    # reference graph retains conditions/operators/routes instead of BFS steps.
+    graph_report = run_attack_flow()
+    ka['attack_flow_graphs'] = graph_report['flows']
+    ka['attack_flow_graph_nodes'] = graph_report['nodes']
+    ka['attack_flow_graph_edges'] = graph_report['edges']
     stats['attack']=ka; print(f"[attack] {ka}")
+
+if 'attack-flow' in ST and 'attack' not in ST:
+    graph_report = run_attack_flow()
+    stats['attack_flow_graph'] = {k: graph_report[k] for k in ('flows', 'nodes', 'edges')}
 
 json.dump({'args':vars(A),'stats':stats},open(f'{O}/STATS.json','w'),ensure_ascii=False,indent=1)
 print("STATS →", f'{O}/STATS.json')

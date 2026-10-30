@@ -1,4 +1,4 @@
-"""Coverage-preserving scoring of evidence review responses, with human adjudication.
+"""Coverage-preserving scoring of evidence review responses, with explicit adjudication.
 
 No automatic prose truth grading. Reviewer decisions bind the exact response and
 quote correct/incorrect claims. Missing, failed, unsupported and unreviewed cases
@@ -72,11 +72,22 @@ def score(inputs, gold, catalog, predictions, reviews):
             critical.append('no_final_response')
         if p['status']=='unsupported':unsupported.append('unsupported_response')
         r=review.get(key)
+        extra_findings=[]
         adjudicated=False; weighted=0; denominator=sum(f['weight'] for f in truth[key]['facts'])
         require(denominator>0,'No scoring facts')
         if r is not None:
             require(r.get('response_sha256')==sha(encoded(p)), 'Review bound to different response')
             require(isinstance(r.get('reviewer'),str) and bool(r['reviewer'].strip()),'Reviewer identity required')
+            seen_findings=set()
+            for finding in r.get('findings',[]):
+                require(isinstance(finding.get('id'),str) and finding['id'] not in seen_findings,'Duplicate/invalid finding')
+                seen_findings.add(finding['id'])
+                require(finding.get('severity') in ('critical','major','minor'),'Invalid finding severity')
+                require(isinstance(finding.get('reason'),str) and bool(finding['reason'].strip()),'Finding reason required')
+                quote=finding.get('quote','')
+                require(isinstance(quote,str) and bool(quote.strip()) and quote in p.get('answer',''),'Finding quote absent from answer')
+                extra_findings.append(finding)
+                if finding['severity']=='critical':critical.append('finding:'+finding['id'])
             facts={f['id']:f for f in truth[key]['facts']}
             require(len(facts)==len(truth[key]['facts']),'Duplicate fact IDs')
             decisions=indexed(r['facts'],facts,'review fact');adjudicated=set(decisions)==set(facts)
@@ -95,9 +106,11 @@ def score(inputs, gold, catalog, predictions, reviews):
         elif not adjudicated or unsupported:
             value=None;status='review_pending'
         else:
-            value=100*weighted/denominator;status='reviewed'
+            penalty=sum({'critical':0,'major':20,'minor':5}[f['severity']] for f in extra_findings)
+            value=max(0,100*weighted/denominator-penalty);status='reviewed'
         rows.append({'id':key,'status':status,'score':value,'critical':critical,
-                     'unsupported_read_branches':unsupported,'semantic_review_complete':adjudicated})
+                     'unsupported_read_branches':unsupported,'semantic_review_complete':adjudicated,
+                     'additional_findings':extra_findings})
     n=len(rows);pending=sum(r['score'] is None for r in rows)
     lower=sum(r['score'] or 0 for r in rows)/n
     blockers=[r['id'] for r in rows if r['critical'] or r['score'] is None]
@@ -108,6 +121,7 @@ def score(inputs, gold, catalog, predictions, reviews):
         'score_bounds_all_cases':[lower,lower+100*pending/n],
         'comparison_ready':not blockers,'blocker_cases':blockers,'model_promotion_allowed':False,
         'promotion_reason':'Independent operational evaluation and runtime validation still required.',
+        'additional_claim_penalties':{'major':20,'minor':5,'critical':'case zero and comparison blocked'},
         'rows':rows}
 
 

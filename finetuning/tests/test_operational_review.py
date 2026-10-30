@@ -170,5 +170,20 @@ class ScoreTests(unittest.TestCase):
         r=self.run_score();self.assertEqual(r['all_case_score'],100)
         self.assertTrue(r['comparison_ready']);self.assertFalse(r['model_promotion_allowed'])
 
+    def test_extra_fabricated_claim_blocks_even_when_all_gold_facts_present(self):
+        self.reviews[0]['findings']=[{'id':'fabricated_action','severity':'critical','quote':'불완전한 조회',
+                                    'reason':'Unit test explicit unsupported claim outside predeclared facts'}]
+        r=self.run_score();self.assertEqual(r['all_case_score'],50)
+        self.assertFalse(r['comparison_ready'])
+
+    def test_extra_finding_requires_actual_answer_quote(self):
+        self.reviews[0]['findings']=[{'id':'claim','severity':'major','quote':'없는 인용','reason':'test'}]
+        with self.assertRaisesRegex(ValueError,'Finding quote absent'):self.run_score()
+
+    def test_major_and_minor_claim_errors_deduct_without_hiding_facts(self):
+        self.reviews[0]['findings']=[{'id':'workflow','severity':'major','quote':'불완전한 조회','reason':'test'},
+                                    {'id':'wording','severity':'minor','quote':'불완전한 조회','reason':'test'}]
+        r=self.run_score();self.assertEqual(r['rows'][0]['score'],75);self.assertEqual(r['all_case_score'],87.5)
+
 
 if __name__=='__main__':unittest.main()

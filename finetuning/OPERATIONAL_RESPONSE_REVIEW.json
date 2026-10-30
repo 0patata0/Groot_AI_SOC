@@ -1,0 +1,250 @@
+{
+  "schema": 1,
+  "at_kst": "2026-10-30T20:15:42.926021+09:00",
+  "decision": "Both normalized SDK arms have identical answers and fail the critical operational review gate. No model/runtime promotion.",
+  "protocol": {
+    "suite": "data-operational-review-20261030-r3",
+    "suite_manifest_sha256": "1a16d699ee0170ccc8c8d7673d522d30f074562f131ec844d4893f180d403e5e",
+    "arms": [
+      "Hermes AIAgent SDK",
+      "mcp-use MCPAgent + ChatOllama SDK"
+    ],
+    "model": "qwen3.6:35b",
+    "model_digest_before_after": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+    "quantization": "Q4_K_M",
+    "context": 262144,
+    "output_tokens": 2048,
+    "temperature": 0,
+    "top_p": 0.95,
+    "seed": 17,
+    "reasoning": false,
+    "catalog_tools": 38,
+    "system_sha256": "6bc437c60ef1d226052125f5cd84a6f590aa4abfa3ebb006d1ee21ac72b5715e",
+    "fresh_private_home_and_empty_history_each_call": true,
+    "api_requests_per_case": 1,
+    "order": "AB/BA alternating over29 cases; serial",
+    "source_inputs": "Only questions/observations/catalog/common policy; gold/provenance/other-arm replies excluded",
+    "first_request_normalized": true,
+    "production_gateway_or_renderer_or_memory": false,
+    "live_tools_attached": false,
+    "chat_posts": 0,
+    "pilot": "Hermes1 and corrected Ollama1 actual model calls, excluded. Initial Ollama harness import failure had0 API calls."
+  },
+  "comparison": {
+    "actual_main_model_calls": 58,
+    "all_outputs_untruncated": true,
+    "arms": {
+      "hermes": {
+        "comparison_ready": false,
+        "correct_facts": 113,
+        "critical_cases": 14,
+        "incorrect_facts": 6,
+        "mean_seconds": 19.26384180380786,
+        "median_api_seconds": 9.36441100598313,
+        "median_init_seconds": 5.141603083000518,
+        "median_seconds": 15.244661418022588,
+        "missing_facts": 11,
+        "order_strata": {
+          "first": {
+            "median_api_seconds": 22.722582342103124,
+            "median_seconds": 28.42863382701762,
+            "n": 15
+          },
+          "second": {
+            "median_api_seconds": 7.447860841988586,
+            "median_seconds": 13.062644642603118,
+            "n": 14
+          }
+        },
+        "p95_seconds": 32.51241831295192,
+        "perfect_cases": 7,
+        "responses": 29,
+        "score": 47.41379310344828,
+        "total_facts": 130
+      },
+      "ollama": {
+        "comparison_ready": false,
+        "correct_facts": 113,
+        "critical_cases": 14,
+        "incorrect_facts": 6,
+        "mean_seconds": 17.486672140292598,
+        "median_api_seconds": 8.474088225979358,
+        "median_init_seconds": 4.150370034039952,
+        "median_seconds": 12.718776482972316,
+        "missing_facts": 11,
+        "order_strata": {
+          "first": {
+            "median_api_seconds": 21.695899735495914,
+            "median_seconds": 25.933694850536995,
+            "n": 14
+          },
+          "second": {
+            "median_api_seconds": 7.4783191359601915,
+            "median_seconds": 11.696450447081588,
+            "n": 15
+          }
+        },
+        "p95_seconds": 30.997167171910405,
+        "perfect_cases": 7,
+        "responses": 29,
+        "score": 47.41379310344828,
+        "total_facts": 130
+      }
+    },
+    "chat_posts": 0,
+    "independent_arithmetic_and_58_response_bindings": "pass",
+    "live_tool_dispatches": 0,
+    "not_chat_roundtrip": true,
+    "paired_identical_answers": 29,
+    "paired_same_request_and_tokens": 29,
+    "prompt_tokens_max": 29611,
+    "prompt_tokens_min": 14959,
+    "reasoning_output_chars": 0,
+    "score_is_development_case_penalty_not_general_accuracy": true,
+    "semantic_reviewer": "Codex, not independent human expert",
+    "tests": 43
+  },
+  "judgment": {
+    "reviewer": "Codex evidence review, not independent human expert",
+    "facts_per_arm": 130,
+    "fact_correct_fraction": 0.8692307692307693,
+    "critical_fact_missing_or_incorrect": "case score0 and blocks comparison/promotion",
+    "additional_claims": {
+      "critical": "case0/block",
+      "major_deduction": 20,
+      "minor_deduction": 5
+    },
+    "rubric_change": "During development review, added explicit quoted findings outside130 predefined facts. Same rules applied to both arms. Not a preregistered/blind final score.",
+    "score_meaning": "47.41 is a strict development case score, not general model accuracy. All29 cases remain in the denominator."
+  },
+  "priority_findings": [
+    {
+      "topic": "Missing FW first page",
+      "cases": [
+        "opr-027"
+      ],
+      "detail": "Both reported the provided offset50/100 observations as complete from the last complete=true flag;50 of145 objects missing. No live tool calls occurred."
+    },
+    {
+      "topic": "Approval history",
+      "cases": [
+        "opr-006",
+        "opr-013",
+        "opr-021",
+        "opr-022"
+      ],
+      "detail": "Both treated historic proposal.pending as current no approval despite one consumed approval and execution results."
+    },
+    {
+      "topic": "Approval unavailable",
+      "cases": [
+        "opr-008",
+        "opr-016",
+        "opr-024"
+      ],
+      "detail": "Broker decision unavailable was reported as pending/unknown approver; opr024 also denied an already posted card."
+    },
+    {
+      "topic": "Current versus base hash",
+      "cases": [
+        "opr-023"
+      ],
+      "detail": "Concurrent changed readback was incorrectly reported as unchanged base."
+    },
+    {
+      "topic": "Omitted coverage or result delivery",
+      "cases": [
+        "opr-007",
+        "opr-015",
+        "opr-023",
+        "opr-025",
+        "opr-026",
+        "opr-028"
+      ],
+      "detail": "Approval consumption, notification retry/no replay, FW set/default-policy/excluded scope, or IDS actual source/ET+local evidence omitted."
+    }
+  ],
+  "references": [
+    {
+      "url": "https://docs.suricata.io/en/suricata-8.0.0/command-line-options.html",
+      "accessed_at_kst": "2026-10-30T20:15:42.926021+09:00",
+      "use": "-S specifies the exclusive rule file set. Operational restart policy is a separate contract; no claim that this deployed configuration supports live reload."
+    }
+  ],
+  "timing_limits": [
+    "Complete API response and SDK interval only; Mattermost delivery/network posting excluded.",
+    "Common full prompt/tool catalog and first request normalized: does not compare native routing/retry/Memory/rendering behavior.",
+    "New private conversation does not flush Ollama KV cache. First/second medians differ substantially; order strata recorded.",
+    "Only one pass per arm, shared-server load not controlled; startup/imports included, no production speed winner established."
+  ],
+  "verification": {
+    "tests": 43,
+    "score_CLI_reproductions": 2,
+    "score_existing_output_refusals": 2,
+    "independent_58_pair_token_hash_bindings": true,
+    "independent_score_arithmetic": true,
+    "raw_response_files_downloaded_and_hashed": 58,
+    "source_runner_sha256": "2705ddf70b7755cacb1fb38489d2174841f22cd8559fbbe051633fc12507ae16",
+    "model_digest_stable_at_observations": true,
+    "B_runtime_harness_contract_unchanged": {
+      "runtime.py": "012e49055ba3b79bebe11b069cd1a4604ae05557d6b3ca0b4acd2f6989e852de",
+      "harness.py": "05f6af8c472fa423a315483ee57732a2879317fb71444025aa106842ef7a15ae",
+      "chat_contract.py": "0d7b1a7e0cb31ef16e0ac933c6537dd2a21ca02f2d27e2c117a088136c1835ba"
+    },
+    "V5_sources25_and_six_splits_preserved": true,
+    "prompt_tokens_range": [
+      14959,
+      29611
+    ],
+    "truncation": 0
+  },
+  "sdk_versions": {
+    "hermes": {
+      "versions": {
+        "openai": "2.24.0",
+        "httpx": "0.28.1"
+      },
+      "source_sha256": "244da863d3c21591a3b5326dc14c2962d4e31131dda52df628502cd9fcbfea33"
+    },
+    "ollama": {
+      "mcp-use": "1.7.1",
+      "langchain-ollama": "1.1.0",
+      "ollama": "0.6.3"
+    }
+  },
+  "cleanup": {
+    "B_files_removed": 157,
+    "B_bytes_removed": 781369,
+    "Hermes_private_files_removed": 304,
+    "Hermes_private_bytes_removed": 6381731,
+    "both_task_directories_absent": true,
+    "ollama_chat_active": "active",
+    "hermes_running": "true",
+    "Mac_temporary_helpers": "All17 task helpers/output copies removed; publication helper will be removed after final push and recorded locally.",
+    "packages_installed": 0,
+    "Mac_temporary_files_removed": 17,
+    "Mac_temporary_bytes_removed": 561010
+  },
+  "remaining": [
+    "Fix/verify current-vs-historic evidence interpretation and completion/approval uncertainty before training admission or production promotion.",
+    "Separate live-harness interaction/short-query tool choice/storage failure/approved apply-rollback/chat E2E; normalized review does not replace them.",
+    "Independent evidence/holdout and equal-compute training/harness comparison."
+  ],
+  "new_training_rows": 0,
+  "GPU_training_runs": 0,
+  "production_configuration_changes": 0,
+  "model_promoted": false,
+  "presentation_created": false,
+  "full_pack_executed": false,
+  "artifact_sha256": {
+    "comparison.json": "3b1a49846daca4a2bdd20b0f464049261014c6820464f32675a1fc9ca8b81e73",
+    "hermes-predictions.jsonl": "15e8aecc04b26bf2dd0e774a30865244712771e021dfc4a3f549b9eba44f079c",
+    "ollama-predictions.jsonl": "15e8aecc04b26bf2dd0e774a30865244712771e021dfc4a3f549b9eba44f079c",
+    "hermes-reviews.jsonl": "0a2a0d2884657b2b6873b2109ee7bdc6a5d68b8bcd01265e0bd7801b21793ff7",
+    "ollama-reviews.jsonl": "0a2a0d2884657b2b6873b2109ee7bdc6a5d68b8bcd01265e0bd7801b21793ff7",
+    "hermes-score.json": "8a9ece4b7157e3e746739e21a1d1365d440601ccc99d8f88656c6746d2fbc12c",
+    "ollama-score.json": "8a9ece4b7157e3e746739e21a1d1365d440601ccc99d8f88656c6746d2fbc12c",
+    "review-spec.json": "dba0b937e93da6b89cff66485bebfa79bf7405f622ba7c0cdd1c3dcefb043c8d",
+    "final-verification.json": "d56077a609e5bbad330bf438c57bc2fbbee83df1bb8035fa27a0d4a4ab9f5593"
+  }
+}

@@ -5,6 +5,7 @@ selects every tool and argument. A successful unrelated read never satisfies a
 requested device. Legacy Wazuh strings are parsed conservatively, not executed.
 """
 from collections import Counter
+from datetime import datetime
 import hashlib
 import json
 import re
@@ -107,6 +108,20 @@ def _single_plan(question, aware_time):
     if stamps and re.search(r'시간|시각|계산|KST|UTC|timeline', text, re.I):
         return {'kind': 'time', 'stamps': stamps, 'question': question}
     ids = re.findall(r'(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])', text)
+    if ids and re.search(r'요청|작업|operation', text, re.I) and re.search(r'재시작|재로드|reload|restart|임시\s*차단|containment', text, re.I):
+        if re.search(r'임시\s*차단|containment', text, re.I):
+            targets = ['a:incident-ip']
+        else:
+            patterns = [('WAF|ModSecurity', 'a:waf'), ('IDS|Suricata', 'a:suricata'),
+                        (r'chatproxy|채팅\s*프록시', 'a:chatproxy'),
+                        ('대시보드|dashboard', 'b:wazuh-dashboard')]
+            targets = [target for pattern, target in patterns if re.search(pattern, text, re.I)]
+            if re.search(r'Wazuh|와주', text, re.I) and 'b:wazuh-dashboard' not in targets:
+                targets.append('b:wazuh-manager')
+        if len(targets) == 1:
+            return {'kind':'operation', 'ids':list(dict.fromkeys(ids)), 'target':targets[0],
+                    'current': targets[0] != 'a:incident-ip' and bool(re.search(r'현재|지금|최신', text)), 'question':question}
+        return None
     if ids and re.search(r'제안|proposal|변경', text, re.I) and re.search(r'상태|이력|실패|처리|승인|적용|원복|복구|알림|결과|해시', text):
         targets = [t for pattern, t in [('WAF|ModSecurity', 'a:modsecurity-custom'),
             ('IDS|Suricata', 'a:suricata-local'), ('Wazuh|와주', 'b:wazuh-local-rules')]
@@ -454,6 +469,9 @@ def scope(p, calls=None):
     if p['kind'] == 'multi':
         return set().union(*(scope(part, calls) for part in p['plans']))
     if p['kind'] == 'time': return {TIME}
+    if p['kind'] == 'operation':
+        prefix = 'mcp__rule_' + p['target'][0] + '__'
+        return {prefix + 'get_operation_status'} | ({prefix + 'get_service_action_target'} if p['current'] else set())
     if p['kind'] == 'status':
         prefix = 'mcp__rule_' + p['target'][0] + '__'
         return {prefix + 'get_rule_change_status'} | ({prefix + 'get_rule_change_target'} if p['current'] else set())
@@ -476,6 +494,30 @@ def matching(p, calls, name, **args):
     if name == 'get_wazuh_vulnerability_summary':
         found = [c for c in found if not any(v not in (None, '') for k, v in c.get('arguments', {}).items() if k != 'agent_id')]
     return found[-1] if found else None
+
+
+def operation_attempt(p, calls, rid):
+    # A hash-bound failed lookup is evidence of failure, not of completion or
+    # absent/expired state. Do not blindly repeat the same terminal error.
+    rows = [c for c in calls if c.get('server') == 'rule-' + p['target'][0]
+            and c.get('name') == 'get_operation_status' and c.get('arguments') == {'request_id':rid}
+            and isinstance(c.get('result'), str)
+            and hashlib.sha256(c['result'].encode()).hexdigest() == c.get('result_sha256')]
+    return rows[-1] if rows else None
+
+
+def operation_record(p, calls, rid):
+    c = operation_attempt(p, calls, rid)
+    d = unpack(c['result']) if c and not c.get('is_error') else None
+    return d if isinstance(d, dict) and not d.get('error') and d.get('request_id') == rid and d.get('target') == p['target'] and isinstance(d.get('status'), str) else None
+
+
+def operation_current(p, calls):
+    c = matching(p, calls, 'get_service_action_target', target=p['target']) if p['current'] else None
+    d = unpack(c['result']) if c else None
+    if not isinstance(d, dict) or d.get('target') != p['target'] or not isinstance(d.get('observation'), dict): return None
+    raw = json.dumps(d['observation'], sort_keys=True, separators=(',', ':'), ensure_ascii=True).encode()
+    return d if hashlib.sha256(raw).hexdigest() == d.get('base_state_sha256') else None
 
 
 def port_filters(p):
@@ -531,6 +573,10 @@ def missing(p, calls, evidence):
     if p['kind'] == 'agent_identity': return identity_missing(p, calls)
     if p['kind'] == 'multi':
         return [part_label(part) + ' / ' + item for part in p['plans'] for item in missing(part, calls, evidence)]
+    if p['kind'] == 'operation':
+        pending = ['operation:' + rid for rid in p['ids'] if not operation_record(p,calls,rid)]
+        if p['current'] and not operation_current(p,calls): pending.append(p['target'])
+        return pending
     if p['kind'] == 'time':
         for c in reversed(calls):
             if c.get('name') != 'calculate_time' or c.get('server') != 'system-diagnostics' or not successful(c): continue
@@ -603,6 +649,11 @@ def guidance(p, calls=()):
     elif p['kind'] == 'time':
         text += ('calculate_time에 사용자 원본 시각과 비교 기준을 옮기고 반환값을 요청한 표로 보여주세요. '
                  'reference에는 사건 ID나 base/ref라는 이름이 아니라 offset이 포함된 실제 시각 문자열을 넣으세요. ')
+    elif p['kind'] == 'operation':
+        text += ('서비스 재시작/재로드·임시차단 요청은 get_operation_status(request_id)로 조회하세요. '
+                 '룰 파일 제안 상태 도구와 다릅니다. 과거 실행 상태와 현재 서비스/실시간 차단 상태를 구분하세요. '
+                 'missing or ambiguous는 조회 실패이며 삭제·만료·미등록·미차단을 확정하지 않습니다. '
+                 'WAF/IDS/채팅프록시·임시차단은 A, Wazuh Manager/Dashboard는 B입니다. 조회 실패를 새 변경 요청으로 바꾸지 마세요. ')
     else:
         text += ('제안의 실행 상태와 승인 상태·승인 소모·결과 알림 전달 여부를 구분하세요. '
                  '실행 pending만으로 미승인이라 단정하지 말고 approval_status를 확인하세요. '
@@ -653,7 +704,44 @@ def table(headers, rows):
         '| ' + ' | '.join(cell(v) for v in row) + ' |' for row in rows]
 
 
+def operation_report(p, calls, evidence):
+    pending = missing(p,calls,evidence)
+    rows = ['**요약**', '작업 기록을 조회했습니다. 과거 처리 상태와 현재 관측을 구분합니다.' if not pending else
+            '작업 상태 조회가 미완료입니다. 실행 성공·만료·차단 해제나 요청 부재로 단정하지 않습니다.', '', '**확인 내역**']
+    def stamp(value):
+        if type(value) not in (int,float): return '미확인'
+        try:return datetime.fromtimestamp(value,evidence.KST).isoformat()
+        except (ValueError,OverflowError,OSError):return '미확인'
+    for rid in p['ids']:
+        rows += ['', '- 요청 ID: `' + rid + '`; 대상: `' + p['target'] + '`']
+        d = operation_record(p,calls,rid)
+        if not d:
+            c = operation_attempt(p,calls,rid);error = unpack(c['result']) if c else None
+            rows += ['조회 결과: ' + cell(error.get('error') if isinstance(error,dict) and error.get('error') else '실제 조회 근거 없음 또는 대상/응답 검증 실패'),
+                     '등록되지 않음·삭제·만료·다른 서버 제출 중 어느 원인인지 확인되지 않았습니다.']
+            continue
+        rows += table(['기록 항목','값'], [('처리 상태(현재 상태와 별개)',d.get('status')),('승인 상태',d.get('approval_status')),
+                     ('결과 알림 게시 확인',d.get('result_posted')),('실행 결과',d.get('result'))])
+        if d.get('approval_status') == 'unavailable':rows += ['승인 조회 실패이며 승인 대기로 단정하지 않습니다.']
+        if p['target'] == 'a:incident-ip':
+            rows += table(['현재 차단 관측','값'], [('대상 IP',d.get('ip')),('현재 상태',d.get('live_block_state')),
+                        ('관측 시각(KST)',stamp(d.get('live_observed_at'))),('확인된 잔여 초',d.get('live_remaining_seconds')),
+                        ('소유 차단 만료(KST)',stamp(d.get('live_owned_deadline'))),('과거 워크플로 만료(KST)',stamp(d.get('owned_deadline')))])
+            rows += ['owned는 이 요청 소유의 차단, foreign은 다른 소유의 규칙, absent는 이번 nft 집합 조회에서 부재, unavailable은 조회 실패입니다. 과거 기한만으로 현재 차단 여부를 계산하지 않습니다.']
+        else:
+            rows += ['과거 실행 후 관측 해시: ' + cell(d.get('after_observation_sha256')) + ' (현재 서비스 관측이 아님)']
+    current = operation_current(p,calls)
+    if current:
+        obs=current['observation']
+        rows += ['', *table(['현재 서비스','running','health','관측 해시'],[(p['target'],obs.get('running'),obs.get('health'),current.get('base_state_sha256'))]),
+                 '현재 서비스 가동은 과거 재시작 요청의 승인·성공 증명이 아닙니다.']
+    elif p['target'] != 'a:incident-ip':rows += ['현재 서비스 상태는 별도 확인되지 않았습니다.']
+    rows += ['', '**조치 및 다음 단계**', '조회만 수행했습니다. 재시작·차단·새 승인안 제출은 수행하지 않았습니다.']
+    return '\n'.join(rows)
+
+
 def report(p, calls, evidence):
+    if p['kind'] == 'operation': return operation_report(p,calls,evidence)
     if p['kind'] == 'agent_identity': return identity_report(p, calls, evidence)
     if p['kind'] == 'multi':
         pending = missing(p, calls, evidence)

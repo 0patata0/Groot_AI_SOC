@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **2026-10-30 서비스·임시차단/IDS 읽기:** get_operation_status의 요청 기록과 현재 서비스/실시간 nft 관측을 구분합니다. get_service_action_target(a:suricata)에 전후 적재 시각·컨테이너를 대조한 단일 tenant 엔진 카운터를 추가했습니다. 조회 실패는 unavailable이며 승인용 observation/base 해시·보호 실행 경계는 유지합니다. [필드·복구·한계](operation-status-read.md) · [운영 검증](../../STATUS.md).
+
 > **2026-10-30 변경 기록 읽기:** get_rule_change_status의 승인 소모·결과 알림·과거 읽기 해시 누락을 보완했습니다. current_file_checked=false이며 현재 파일은 별도 getter로 검증합니다. 기존 읽기 전용 계정·승인/worker 경계를 유지합니다. [필드와 복구](change-status-read.md) · [실제 검증](../../STATUS.md).
 
 > **2026-10-29 FW 전체 읽기:** 기존 `resp`에 `get_firewall_rules`를 추가했다. A 호스트의 기본 정책·모든 체인·NAT/Docker·전체 nftables를 읽으며 임시 차단 목록과 구분한다. [사용·범위·페이지·복구](firewall-read.md) · [운영 검증](../../STATUS.md).

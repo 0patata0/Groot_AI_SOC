@@ -5,7 +5,7 @@ Imported only from a root-owned fixed deployment path by rule-change-executor.
 No caller field becomes a command, path, Docker option, probe URL or identity.
 """
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import hmac
 import http.client
@@ -301,6 +301,42 @@ class ServiceActionService:
             except (OSError, self.error):
                 result["rule_source_evidence"] = {"status": "unavailable",
                     "evidence_scope": "rule source not verified; do not infer its path or loading failure"}
+            result["rule_engine_evidence"] = self._rule_engine_evidence(observation)
+        return result
+
+    def _rule_engine_evidence(self, observation):
+        """Read counters without changing the approval-bound service snapshot.
+
+        A reload on either side of the counter read or a container restart
+        invalidates this receipt. Counts do not identify individual loaded SIDs
+        or prove that current disk bytes are the engine's loaded generation.
+        """
+        kst = timezone(timedelta(hours=9))
+        result = {"status": "unavailable", "scope": "single_tenant_engine_counters",
+                  "per_sid_load_verified": False, "current_file_load_verified": False}
+        try:
+            with self.engine.locked():
+                spec = self.engine.spec("a:suricata-local")
+                before = self.engine._inspect(spec, timeout=5)
+                first = self.engine._suricata_socket("ruleset-reload-time", 5).get("last_reload")
+                stats = self.engine._suricata_socket("ruleset-stats", 5)
+                last = self.engine._suricata_socket("ruleset-reload-time", 5).get("last_reload")
+                after = self.engine._inspect(spec, timeout=5)
+                loaded = self.engine._suricata_time(first)
+                now = self.engine.clock()
+                keys = ("rules_loaded", "rules_failed", "rules_skipped")
+                if (any(type(stats.get(key)) is not int or stats[key] < 0 for key in keys)
+                        or loaded != self.engine._suricata_time(last)
+                        or not self.engine._suricata_time(before["started_at"]) <= loaded <= now + 5
+                        or any(before.get(key) != after.get(key) or before.get(key) != observation.get(key)
+                               for key in ("container_id", "started_at"))):
+                    raise self.error("inconsistent Suricata counter observation")
+                result.update(status="observed", **{key: stats[key] for key in keys},
+                              last_reload_kst=datetime.fromtimestamp(loaded, kst).isoformat(),
+                              container_id=before["container_id"])
+        except (OSError, self.error, ValueError, KeyError, TypeError):
+            result["reason"] = "runtime_counter_unavailable_or_inconsistent"
+        result["observed_at_kst"] = datetime.fromtimestamp(self.engine.clock(), kst).isoformat()
         return result
 
     def _post(self, record):

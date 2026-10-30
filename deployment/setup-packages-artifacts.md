@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-10-30 서비스·임시차단/IDS 조회:** 기존 source bundle의 service_action_executor.py·공통 read_contract.py/harness.py와 회귀 소스를 갱신합니다. deploy.sh의 기존 설치 복사 경로를 유지하며 추가 deb/wheel/이미지·설정 키·포트·권한은 없습니다. 운영 B 복구용 source bundle에도 같은 소스와 검사를 반영했습니다. [사용·복구](../infra/mcp/operation-status-read.md) · [증분 배포/새 설치 검증 구분](../STATUS.md).
+
 > **2026-10-30 변경 상태 조회:** 추가 deb/wheel/이미지는 없습니다. 기존 SOC 소스 bundle의 rule_change_executor.py와 공통 read_contract.py/harness.py를 반입하며 루트 deploy.sh의 기존 설치 경로를 유지합니다. 상태 반환만 확장하며 설정 예제 키·포트·권한은 변하지 않습니다. B 복구 bundle에 빠졌던 기존 Wazuh XML 주석 검사도 canonical과 맞췄습니다. [사용·복구](../infra/mcp/change-status-read.md) · [운영/새 설치 검증 구분](../STATUS.md).
 
 > 2026-10-29 사설 출발지 정책 변경은 기존 소스 bundle의 `incident_containment.py`·`operations_approval.py`·`rule_change_mcp.py`, 공통 SOC 지침/하네스와 `soc_runtime.py`에 반영한다. 추가 deb·wheel·이미지·포트·공통 키는 없다. `deploy.sh`가 기존 내부 설치 경로로 이 소스를 반입하며 예제의 명시적 관리자/인프라 보호를 적용한다.

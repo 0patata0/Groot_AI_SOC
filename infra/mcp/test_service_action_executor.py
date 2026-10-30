@@ -129,6 +129,9 @@ class ServiceTests(unittest.TestCase):
         self.reader = mock.patch.object(self.engine, "get_target", return_value={"runtime": {"container_id": "a" * 64, "rule_source_path": "/rules/all.rules"}})
         self.reader.start()
         self.addCleanup(self.reader.stop)
+        self.inspector = mock.patch.object(self.engine, '_inspect', side_effect=helper.RuleChangeError('test runtime unavailable'))
+        self.inspector.start()
+        self.addCleanup(self.inspector.stop)
 
     def test_read_source_evidence_never_changes_approval_state_hash(self):
         result = self.svc.get_target('a:suricata')
@@ -141,6 +144,54 @@ class ServiceTests(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def test_engine_counters_are_read_only_and_outside_approval_snapshot(self):
+        observed = self.backend.observe('a:suricata')
+        stamp = datetime.fromtimestamp(self.now-20, timezone.utc).isoformat()
+        stats = {'id':0,'rules_loaded':12345,'rules_failed':2,'rules_skipped':1}
+        with mock.patch.object(self.engine,'_inspect',return_value=observed), mock.patch.object(
+                self.engine,'_suricata_socket',side_effect=[{'last_reload':stamp},stats,{'last_reload':stamp}]) as socket:
+            out = self.svc.get_target('a:suricata')
+        evidence = out['rule_engine_evidence']
+        self.assertEqual(evidence['status'],'observed')
+        self.assertEqual(evidence['rules_failed'],2)
+        self.assertFalse(evidence['per_sid_load_verified'])
+        self.assertFalse(evidence['current_file_load_verified'])
+        self.assertTrue(evidence['last_reload_kst'].endswith('+09:00'))
+        self.assertEqual(out['base_state_sha256'], service.digest(observed))
+        self.assertEqual([c.args[0] for c in socket.call_args_list],['ruleset-reload-time','ruleset-stats','ruleset-reload-time'])
+        self.assertEqual(self.backend.actions,[])
+        self.assertEqual(self.broker.consumes,0)
+        self.assertFalse(list(self.svc.state_dir.glob('*.json')))
+
+    def test_engine_counters_reject_bad_counts_reload_races_and_container_changes(self):
+        observed = self.backend.observe('a:suricata')
+        stamp = datetime.fromtimestamp(self.now-20, timezone.utc).isoformat()
+        good = {'rules_loaded':12345,'rules_failed':0,'rules_skipped':0}
+        cases=[]
+        for key in good:
+            for bad in (-1,True,'0',None):cases.append(({**good,key:bad},stamp,stamp,observed))
+        for bad in ('', '2026-01-01T00:00:00',datetime.fromtimestamp(self.now+10,timezone.utc).isoformat(),datetime.fromtimestamp(self.now-120,timezone.utc).isoformat()):
+            cases.append((good,bad,bad,observed))
+        cases.append((good,stamp,datetime.fromtimestamp(self.now-10,timezone.utc).isoformat(),observed))
+        cases.append((good,stamp,stamp,{**observed,'container_id':'f'*64}))
+        cases.append((good,stamp,stamp,{**observed,'started_at':stamp}))
+        for stats,first,last,after in cases:
+            with self.subTest(stats=stats,first=first,last=last,after=after), mock.patch.object(self.engine,'_inspect',side_effect=[observed,after]), mock.patch.object(self.engine,'_suricata_socket',side_effect=[{'last_reload':first},stats,{'last_reload':last}]):
+                out=self.svc._rule_engine_evidence(observed)
+            self.assertEqual(out['status'],'unavailable')
+            self.assertNotIn('rules_loaded',out)
+        self.assertEqual(self.backend.actions,[])
+
+    def test_empty_engine_and_socket_failure_are_distinct(self):
+        observed=self.backend.observe('a:suricata');stamp=observed['started_at']
+        with mock.patch.object(self.engine,'_inspect',return_value=observed), mock.patch.object(self.engine,'_suricata_socket',side_effect=[{'last_reload':stamp},{'rules_loaded':0,'rules_failed':0,'rules_skipped':0},{'last_reload':stamp}]):
+            out=self.svc._rule_engine_evidence(observed)
+        self.assertEqual((out['status'],out['rules_loaded']),('observed',0))
+        with mock.patch.object(self.engine,'_inspect',return_value=observed), mock.patch.object(self.engine,'_suricata_socket',side_effect=helper.RuleChangeError('unavailable')):
+            out=self.svc._rule_engine_evidence(observed)
+        self.assertEqual(out['status'],'unavailable')
+        self.assertNotIn('rules_loaded',out)
 
     def propose(self, target="a:waf", action="reload"):
         base = self.svc.get_target(target)["base_state_sha256"]

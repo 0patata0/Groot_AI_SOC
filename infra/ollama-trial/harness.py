@@ -642,6 +642,8 @@ def diagnostic_scope(question, targets):
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
     if scope_notice(question): return set()
+    operation = read_plan(question)
+    if operation and operation['kind'] == 'operation': return READ.scope(operation,calls)
     request = firewall_request(question)
     if request:
         other = [d for d in request['devices'] if d != 'FW']
@@ -760,6 +762,17 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
                 schema['properties']['limit']['enum'] = [next(iter(limits))]
                 schema['required'] = list(dict.fromkeys([*schema.get('required', []), 'limit']))
     p = read_plan(question)
+    if p and p['kind'] == 'operation':
+        prefix = 'mcp__rule_' + p['target'][0] + '__'
+        wanted = {prefix+'get_operation_status':('request_id',[rid for rid in p['ids'] if not READ.operation_attempt(p,calls,rid)])}
+        if p['current'] and not READ.operation_current(p,calls):
+            wanted[prefix+'get_service_action_target'] = ('target',[p['target']])
+        narrowed = {}
+        for alias,(key,values) in wanted.items():
+            if alias in result and values:
+                schema=result[alias];schema['properties'][key]['enum']=values
+                schema['required']=list(dict.fromkeys([*schema.get('required',[]),key]));narrowed[alias]=schema
+        return narrowed
     if p and p['kind'] == 'status':
         pending = READ.missing(p, calls, EVIDENCE)
         prefix = 'mcp__rule_' + p['target'][0] + '__'
@@ -977,8 +990,25 @@ def service_report(question, calls):
         if type(observed) in (int, float):
             from datetime import datetime
             rows.append('- 근거 관측 시각: ' + datetime.fromtimestamp(observed, EVIDENCE.KST).isoformat())
+    engine = data.get('rule_engine_evidence')
+    valid_engine = (isinstance(engine, dict) and engine.get('status') == 'observed'
+                    and engine.get('scope') == 'single_tenant_engine_counters'
+                    and isinstance(engine.get('container_id'), str) and re.fullmatch(r'[0-9a-f]{64}',engine['container_id'])
+                    and engine.get('container_id') == observation.get('container_id')
+                    and all(type(engine.get(key)) is int and engine[key] >= 0
+                            for key in ('rules_loaded', 'rules_failed', 'rules_skipped'))
+                    and EVIDENCE.parse_instant(engine.get('last_reload_kst'))
+                    and EVIDENCE.parse_instant(engine.get('observed_at_kst')))
+    if valid_engine:
+        rows += ['', '| 엔진 적재 | 로딩 실패 | 건너뜀 |', '| --- | --- | --- |',
+                 '| ' + ' | '.join(str(engine[key]) for key in ('rules_loaded','rules_failed','rules_skipped')) + ' |',
+                 '- 마지막 적재 시각: ' + EVIDENCE.kst_time(engine['last_reload_kst']),
+                 '- 엔진 통계 관측 시각: ' + EVIDENCE.kst_time(engine['observed_at_kst']),
+                 '- 엔진 전체 카운터입니다. 로컬 파일 정의 수·개별 SID 적재·현재 파일과 적재 세대의 일치를 뜻하지 않습니다.']
+    else:
+        rows += ['- 엔진 적재 통계는 조회 불가 또는 근거 미확인입니다. 실패 수 0이나 정상 적재로 판단하지 않습니다.']
     rows.extend(['', '**조치 및 다음 단계**', '- 위 근거는 컨테이너 가동과 현재 지정 파일에 관한 것입니다. -S 옵션 자체로 비활성을 뜻하지 않습니다.',
-                 '- 전체 엔진 활성 규칙 수·SID별 실제 적재·탐지 성공은 확인하지 않았습니다. 변경/재시작은 수행하지 않았습니다.'])
+                 '- SID별 실제 적재·탐지 성공은 확인하지 않았습니다. 변경/재시작은 수행하지 않았습니다.'])
     return '\n'.join(rows)
 
 

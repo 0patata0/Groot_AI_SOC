@@ -47,6 +47,7 @@ def main():
              "prepare_soc_mixture.py", "check_soc_mixture_tokens.py", "SOC_MIXTURE_REVIEW.json",
              "refine_v4_observation_targets.py", "V4_OBSERVATION_TARGET_REVIEW.json",
              "prepare_soc_pilot.py", "check_pilot_loss_contract.py", "SOC_PILOT_REVIEW.json",
+             "audit_cam_isolation.py", "CAM_ISOLATION_REVIEW.json",
              "evidence_groups.py", "cisa_tables.py", "prepare_evidence_v5.py", "audit_evidence_v5.py", "evaluate_evidence_v5.py", "evaluate_evidence_pair.py", "review_evidence_results.py", "verify_evidence_training.py", "V5_EVIDENCE_SPEC.json", "config.qwen36-soc-v5.json",
              "SOC_ROLE_MATRIX.json", "V4_DATA_PREPARATION.json", "V4_DATA_REVIEW.json", "V4_TRAINING_INPUTS.json", "V4_ASSESSMENT_POLICY.json", "config.qwen36-soc-v4.json", "config.qwen36-soc-v4-full.json", "SOURCE_EXPANSION.json", "dialogue_encoding.py", "remote_zip.py", "acquire_institutional.py", "institutional_sources.py", "prepare_institutional.py",
              "setup_gpu.sh", "prepare_data.py", "train.py", "merge_adapter.py", "merge_streaming.py", "evaluate.py",

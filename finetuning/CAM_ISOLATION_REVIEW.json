@@ -1,0 +1,974 @@
+{
+  "schema": 1,
+  "checked_at_kst": "2026-10-30T18:36:58.298253+09:00",
+  "status": "scoped_exact_checks_passed_not_final_evaluation",
+  "sources": [
+    {
+      "file": "create_llm_prompt.py",
+      "sha256": "f50a680abbe5d7378846b21ff005f83433f4e5ea50d8649ba964fba6bab675bb",
+      "bytes": 7208,
+      "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/create_llm_prompt.py"
+    },
+    {
+      "file": "README.md",
+      "sha256": "cc135060e31c6ee6aed80a129a4d06fc67739854a4946b2bd37ef1782707cdc6",
+      "bytes": 16820,
+      "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/README.md"
+    }
+  ],
+  "source_interpretation": {
+    "pinned_provider_generator_executed": false,
+    "provider_filtering_scope": "Normal-behavior filtering uses all34 simulation runs according to pinned README; do not treat scenario partitions as independent preprocessing.",
+    "reservation_unit": "Entire CAM corpus, all variants and steps; no CAM training admission."
+  },
+  "CAM_events": {
+    "inputs": 393,
+    "scenario_groups": 7,
+    "event_occurrences": 7424,
+    "unique_exact_events": 7061,
+    "cross_step_exact_events": 5,
+    "cross_scenario_exact_events": 0,
+    "blank_event_occurrences_not_identity": 2,
+    "common_header_occurrences_not_identity": 1,
+    "non_identity_rule": "Only empty/whitespace lines and the exact standard Python traceback heading are nonblocking; retained in raw counts.",
+    "source_paths": [
+      {
+        "host": "adminpc",
+        "source": "logs/attackmate.log",
+        "occurrences": 8
+      },
+      {
+        "host": "adminpc",
+        "source": "logs/log/auth.log",
+        "occurrences": 1
+      },
+      {
+        "host": "adminpc",
+        "source": "logs/log/syslog",
+        "occurrences": 2
+      },
+      {
+        "host": "adminpc",
+        "source": "logs/output.log",
+        "occurrences": 10
+      },
+      {
+        "host": "client",
+        "source": "logs/log/audit/audit.log",
+        "occurrences": 730
+      },
+      {
+        "host": "client",
+        "source": "logs/log/auth.log",
+        "occurrences": 56
+      },
+      {
+        "host": "client",
+        "source": "logs/log/dpkg.log",
+        "occurrences": 20
+      },
+      {
+        "host": "client",
+        "source": "logs/log/syslog",
+        "occurrences": 76
+      },
+      {
+        "host": "corpdns",
+        "source": "logs/log/audit/audit.log",
+        "occurrences": 90
+      },
+      {
+        "host": "corpdns",
+        "source": "logs/log/syslog",
+        "occurrences": 82
+      },
+      {
+        "host": "docker",
+        "source": "logs/containers/9d0ef814b64bee018f64c6dc1ca99c71434598848265022b10b864b0f09cc63b/9d0ef814b64bee018f64c6dc1ca99c71434598848265022b10b864b0f09cc63b-json.log",
+        "occurrences": 8
+      },
+      {
+        "host": "docker",
+        "source": "logs/log/audit/audit.log",
+        "occurrences": 97
+      },
+      {
+        "host": "docker",
+        "source": "logs/log/kern.log",
+        "occurrences": 10
+      },
+      {
+        "host": "docker",
+        "source": "logs/log/syslog",
+        "occurrences": 18
+      },
+      {
+        "host": "docker",
+        "source": "logs/nclog/audit.log",
+        "occurrences": 10
+      },
+      {
+        "host": "docker",
+        "source": "logs/nclog/nextcloud.log",
+        "occurrences": 22
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/audit/audit.log",
+        "occurrences": 273
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/auth.log",
+        "occurrences": 41
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/kern.log",
+        "occurrences": 77
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/shorewall-init.log",
+        "occurrences": 10
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/squid/access.log",
+        "occurrences": 105
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/squid/cache.log",
+        "occurrences": 5
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/suricata/fast.log",
+        "occurrences": 257
+      },
+      {
+        "host": "inetfw",
+        "source": "logs/log/syslog",
+        "occurrences": 568
+      },
+      {
+        "host": "linuxshare",
+        "source": "logs/log/audit/audit.log",
+        "occurrences": 440
+      },
+      {
+        "host": "linuxshare",
+        "source": "logs/log/auth.log",
+        "occurrences": 30
+      },
+      {
+        "host": "linuxshare",
+        "source": "logs/log/cron.log",
+        "occurrences": 11
+      },
+      {
+        "host": "linuxshare",
+        "source": "logs/log/dpkg.log",
+        "occurrences": 18
+      },
+      {
+        "host": "linuxshare",
+        "source": "logs/log/exim4/mainlog",
+        "occurrences": 60
+      },
+      {
+        "host": "linuxshare",
+        "source": "logs/log/syslog",
+        "occurrences": 49
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/apache2/access.log",
+        "occurrences": 20
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/audit/audit.log",
+        "occurrences": 536
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/auth.log",
+        "occurrences": 84
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/kern.log",
+        "occurrences": 1
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/puppetlabs/puppetserver/puppetserver-access.log",
+        "occurrences": 84
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/puppetlabs/puppetserver/puppetserver.log",
+        "occurrences": 26
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/syslog",
+        "occurrences": 136
+      },
+      {
+        "host": "reposerver",
+        "source": "logs/log/vsftpd.log",
+        "occurrences": 30
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/access.log.1",
+        "occurrences": 110
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/access.log.2",
+        "occurrences": 20
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/error.log.1",
+        "occurrences": 53
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/error.log.2",
+        "occurrences": 10
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/apache2/error.log",
+        "occurrences": 58
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/audit/audit.log",
+        "occurrences": 1741
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/auth.log",
+        "occurrences": 154
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/cloud-init.log",
+        "occurrences": 20
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/daemon.log",
+        "occurrences": 185
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/debug",
+        "occurrences": 20
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/kern.log",
+        "occurrences": 55
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/messages",
+        "occurrences": 62
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/syslog",
+        "occurrences": 216
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/unattended-upgrades/unattended-upgrades-shutdown.log",
+        "occurrences": 6
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/web_php.log",
+        "occurrences": 13
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/zmdc.log",
+        "occurrences": 30
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/zmfilter_1.log",
+        "occurrences": 6
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/zmfilter_2.log",
+        "occurrences": 6
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/zmpkg.log",
+        "occurrences": 15
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/zmstats.log",
+        "occurrences": 9
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/zmupdate.log",
+        "occurrences": 2
+      },
+      {
+        "host": "videoserver",
+        "source": "logs/log/zm/zmwatch.log",
+        "occurrences": 9
+      },
+      {
+        "host": "wazuh",
+        "source": "logs/alerts/alerts.json",
+        "occurrences": 523
+      }
+    ],
+    "shared_event_coordinates": [
+      {
+        "event_sha256": "232f298139ed909470b4e22021eba7a8878d49f7516d8881f6d40dd127299e3d",
+        "occurrences": [
+          {
+            "input_id": "CAM-1692a38812da3313c4a807dd",
+            "scenario": "cam-scenario:1",
+            "step": "1-3",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 73
+          },
+          {
+            "input_id": "CAM-761177f44eac6df4072df79c",
+            "scenario": "cam-scenario:1",
+            "step": "1-52",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 70
+          }
+        ]
+      },
+      {
+        "event_sha256": "2d55b18df8f61af28032428c7554156513bed3c823cb0ad5e152a6a6e75754d6",
+        "occurrences": [
+          {
+            "input_id": "CAM-1692a38812da3313c4a807dd",
+            "scenario": "cam-scenario:1",
+            "step": "1-3",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 72
+          },
+          {
+            "input_id": "CAM-761177f44eac6df4072df79c",
+            "scenario": "cam-scenario:1",
+            "step": "1-52",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 69
+          }
+        ]
+      },
+      {
+        "event_sha256": "3b4e2581552fdbc62453b5406386e78bd4db38c7a971a634191f19bda0168695",
+        "occurrences": [
+          {
+            "input_id": "CAM-1692a38812da3313c4a807dd",
+            "scenario": "cam-scenario:1",
+            "step": "1-3",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 70
+          },
+          {
+            "input_id": "CAM-761177f44eac6df4072df79c",
+            "scenario": "cam-scenario:1",
+            "step": "1-52",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 67
+          }
+        ]
+      },
+      {
+        "event_sha256": "d3379cbf4f75347732c0ed714619bd4a2a21b8b0f6f1f94fda78206fed17a7e1",
+        "occurrences": [
+          {
+            "input_id": "CAM-1692a38812da3313c4a807dd",
+            "scenario": "cam-scenario:1",
+            "step": "1-3",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 69
+          },
+          {
+            "input_id": "CAM-761177f44eac6df4072df79c",
+            "scenario": "cam-scenario:1",
+            "step": "1-52",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 66
+          }
+        ]
+      },
+      {
+        "event_sha256": "f60bd80abe963107650d3dadff762d85d60289f09ce910cfe4e16bfab440f148",
+        "occurrences": [
+          {
+            "input_id": "CAM-1692a38812da3313c4a807dd",
+            "scenario": "cam-scenario:1",
+            "step": "1-3",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 71
+          },
+          {
+            "input_id": "CAM-761177f44eac6df4072df79c",
+            "scenario": "cam-scenario:1",
+            "step": "1-52",
+            "host": "videoserver",
+            "source": "logs/log/apache2/error.log",
+            "prompt_line": 68
+          }
+        ]
+      }
+    ],
+    "scope": "Selected source events in393 provided prompts, not the whole raw-log archive."
+  },
+  "comparison": {
+    "files": 44,
+    "historical_split_files": 39,
+    "historical_split_row_visits": 44630,
+    "source_case_row_visits": 1800,
+    "candidate_row_visits": 1197,
+    "total_row_visits": 47627,
+    "unique_incident_count_claimed": false,
+    "blocking_row_visits": 0,
+    "nonidentity_header_row_visits": 100,
+    "method": "All JSON payload roles including nested/JSON-encoded tool results; whole prompts, lines, whitespace-normalized lines, canonical JSON and explicit source identifiers.",
+    "scans": [
+      {
+        "file": "data/test.jsonl",
+        "role": "historical_split",
+        "rows": 932,
+        "bytes": 3858183,
+        "sha256": "15b9f79720b78dce1f7c60f4388c683512c01e9c124d65ee82a052a0bd1b23cf",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 5
+      },
+      {
+        "file": "data/train.jsonl",
+        "role": "historical_split",
+        "rows": 18872,
+        "bytes": 61541017,
+        "sha256": "76bd506368e9a88a3d3c362a215de346d2b1236eef17890fc5ebda6b84b84dda",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 68
+      },
+      {
+        "file": "data/validation.jsonl",
+        "role": "historical_split",
+        "rows": 980,
+        "bytes": 5389392,
+        "sha256": "81f3819e415b3bd0fc752efe831218d188ba605215338cbdea969e7cd8e39a47",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 27
+      },
+      {
+        "file": "data-soc-archive/v2-draft-01/test.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96037,
+        "sha256": "f3ce6586bf8d37c878c940797765dcc6573cd8a825fb656b5b708416f406a74c",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-archive/v2-draft-01/train.jsonl",
+        "role": "historical_split",
+        "rows": 192,
+        "bytes": 566706,
+        "sha256": "fd97dbdefadabadd090793c958acaa4a265096213336f1b0412f889e76114cd3",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-archive/v2-draft-01/validation.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96086,
+        "sha256": "39529c7dbef4939cd01757f3bac07bfb988c001185b4880306f94bea42b13a3b",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-archive/v2-draft-02/test.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96558,
+        "sha256": "fff53f78373fbb34bb3685a54344b3144d7c72e1bdefa8bc3659864278233258",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-archive/v2-draft-02/train.jsonl",
+        "role": "historical_split",
+        "rows": 192,
+        "bytes": 569832,
+        "sha256": "330564ca7e27dca6b7ef8632a155a04d1c7bc19f60c6840de1ea643b0d182afe",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-archive/v2-draft-02/validation.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96607,
+        "sha256": "f98dc1d5ac72bdf5bea455cbf5ddc177cc6d1e8e77b809c8090bed2fad210a97",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-evidence-v5-r3/test.jsonl",
+        "role": "historical_split",
+        "rows": 128,
+        "bytes": 315503,
+        "sha256": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-evidence-v5-r3/train.jsonl",
+        "role": "historical_split",
+        "rows": 1024,
+        "bytes": 2619327,
+        "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-evidence-v5-r3/validation.jsonl",
+        "role": "historical_split",
+        "rows": 128,
+        "bytes": 309267,
+        "sha256": "ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6dd9ccbf593b7",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v3/test.jsonl",
+        "role": "historical_split",
+        "rows": 48,
+        "bytes": 347160,
+        "sha256": "155b398bc07625d8b5dbd89ff0cc0dd30f350bb61da8f36662945e6bf3fc2ea6",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v3/train.jsonl",
+        "role": "historical_split",
+        "rows": 192,
+        "bytes": 1388128,
+        "sha256": "6b821d61760b1343c999fc054122a3bd3a75e6464e5a9ebc4f78dc2a7456a759",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v3/validation.jsonl",
+        "role": "historical_split",
+        "rows": 48,
+        "bytes": 346824,
+        "sha256": "55067e38742ddce0514cb1718832c660c85c38fcb2dc1224c2dec39802e56d77",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v3-r1/test.jsonl",
+        "role": "historical_split",
+        "rows": 60,
+        "bytes": 412845,
+        "sha256": "0873bc148ca2ccab683df1c53a4460cd6a1861736b54afeb9bd0379093a2e8c5",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v3-r1/train.jsonl",
+        "role": "historical_split",
+        "rows": 264,
+        "bytes": 1752908,
+        "sha256": "b2110b772aa0e3d8c7f40da4fd2e4d41a5f9a50ff99fc649e30c13c95b43e484",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v3-r1/validation.jsonl",
+        "role": "historical_split",
+        "rows": 60,
+        "bytes": 412772,
+        "sha256": "919ffd74b36aaa0d9c6ebd16e7735b7cef15db539c9ac7b7cf195108f4cc4812",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v4-r1/test.jsonl",
+        "role": "historical_split",
+        "rows": 94,
+        "bytes": 549501,
+        "sha256": "ec401cadcbaf119e4a389df4f3e536ad322a715f8823ef3cb332072059077ff9",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v4-r1/train.jsonl",
+        "role": "historical_split",
+        "rows": 332,
+        "bytes": 2030142,
+        "sha256": "fcbcc6331c5d004a338148baeada48211314aa227c3dbfa145867fe58481b331",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-operator-v4-r1/validation.jsonl",
+        "role": "historical_split",
+        "rows": 94,
+        "bytes": 547901,
+        "sha256": "6eec2eadbf471761771db1a0d4621ef80c1845dc8392af32c07a27d93e584591",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v1/test.jsonl",
+        "role": "historical_split",
+        "rows": 36,
+        "bytes": 83469,
+        "sha256": "7717cc575ca111e70fa176a8da37d30450cf1cc15baaa27c3969171d136cf2db",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v1/train.jsonl",
+        "role": "historical_split",
+        "rows": 144,
+        "bytes": 363403,
+        "sha256": "bd5c1272966dc75b7504997bccbfc6c74c55335c2592267f16271d0544116830",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v1/validation.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 65173,
+        "sha256": "c65380b6c3812ad42564682494c3bbcb903d5e4effab5c9b87b3a7bae7ae71e8",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v1-schema-only/test.jsonl",
+        "role": "historical_split",
+        "rows": 16,
+        "bytes": 48348,
+        "sha256": "f3e6ebd7410dd38bedac0999b02c9687433bad59ae80e6eecf346a5c8b7c0003",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v1-schema-only/train.jsonl",
+        "role": "historical_split",
+        "rows": 72,
+        "bytes": 235497,
+        "sha256": "b588f709e39782cea3c4c069f0a780b0def7c82919752af2fcc61e65f4fec9a7",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v1-schema-only/validation.jsonl",
+        "role": "historical_split",
+        "rows": 12,
+        "bytes": 29868,
+        "sha256": "ca2e51bdd856cfc5fbeaa16a2b74842992377ecdf1ff13f7dabf25c7b50096c7",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v2/test.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96542,
+        "sha256": "b07241983adc9d3eef686a9283645f4bfcabba06f4eae0b6c3c5e0bc4d22bf28",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v2/train.jsonl",
+        "role": "historical_split",
+        "rows": 192,
+        "bytes": 569768,
+        "sha256": "f13d53fad444fd59440d6c29d8475d13f40950371de9e25422efa8dd9117d931",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v2/validation.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96607,
+        "sha256": "f98dc1d5ac72bdf5bea455cbf5ddc177cc6d1e8e77b809c8090bed2fad210a97",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v2-r2/test.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96729,
+        "sha256": "4e7bf5e8f988895fcd9efb437c1c231295befdf7e0bc1d59614481974edb755d",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v2-r2/train.jsonl",
+        "role": "historical_split",
+        "rows": 192,
+        "bytes": 570924,
+        "sha256": "73e6345fd0e7fdd35c31272bcdd271528ffee52d86d9fd15af363d23bef25ac7",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-v2-r2/validation.jsonl",
+        "role": "historical_split",
+        "rows": 32,
+        "bytes": 96797,
+        "sha256": "ac515b0ed1ad2e7c613512d5e32c9aa707ed68c03356e55dcb59cfcfa6320850",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-toolace-archive/v1-first-structural/test.jsonl",
+        "role": "historical_split",
+        "rows": 980,
+        "bytes": 3508203,
+        "sha256": "a42368f5b47d39e5bb52545b38369978d528c4a12f3b9b591eb7f2c4b37b8b34",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-toolace-archive/v1-first-structural/train.jsonl",
+        "role": "historical_split",
+        "rows": 8031,
+        "bytes": 29187845,
+        "sha256": "2a86098be2accc79ea9b21b12ddd677f6c0c0ac0c071988edd2ce5641b133c79",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-toolace-archive/v1-first-structural/validation.jsonl",
+        "role": "historical_split",
+        "rows": 1008,
+        "bytes": 3639509,
+        "sha256": "5e113a88ea4be68423be70a890e93b1ba91ce1cf6c88ffa31180387a06a750fc",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-toolace-v2/test.jsonl",
+        "role": "historical_split",
+        "rows": 980,
+        "bytes": 3508203,
+        "sha256": "a42368f5b47d39e5bb52545b38369978d528c4a12f3b9b591eb7f2c4b37b8b34",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-toolace-v2/train.jsonl",
+        "role": "historical_split",
+        "rows": 8031,
+        "bytes": 29187845,
+        "sha256": "2a86098be2accc79ea9b21b12ddd677f6c0c0ac0c071988edd2ce5641b133c79",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-toolace-v2/validation.jsonl",
+        "role": "historical_split",
+        "rows": 1008,
+        "bytes": 3639509,
+        "sha256": "5e113a88ea4be68423be70a890e93b1ba91ce1cf6c88ffa31180387a06a750fc",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-source-operator-v4-r1/cases.jsonl",
+        "role": "frozen_source_cases",
+        "rows": 520,
+        "bytes": 2652717,
+        "sha256": "0307e26799f0d2b9734c31604c7a1f21b03a463d05ef598cb6560c606ed1a578",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-source-evidence-v5-r3/cases.jsonl",
+        "role": "frozen_source_cases",
+        "rows": 1280,
+        "bytes": 1701837,
+        "sha256": "dad7f409e64a628bc35602651e5f2f3e06a982f58c3d05516f7701828d8673e9",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-mixture-candidate-20261030-r4/cti-replay-candidates.jsonl",
+        "role": "candidate_not_trained",
+        "rows": 1024,
+        "bytes": 2619327,
+        "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-mixture-candidate-20261030-r4/observation-candidates.jsonl",
+        "role": "candidate_not_trained",
+        "rows": 143,
+        "bytes": 732392,
+        "sha256": "2a00f9956b58e5067bda0fe962d2edd58dac9fe931e3817d6bca8d240439869f",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      },
+      {
+        "file": "data-soc-mixture-candidate-20261030-r4/optional-harness-candidates.jsonl",
+        "role": "candidate_not_trained",
+        "rows": 30,
+        "bytes": 206329,
+        "sha256": "45eeed78f37da561d708c8c331b22ff42adc58cb12b644398bccccc1218602b2",
+        "blocking_row_visits": 0,
+        "nonidentity_header_rows": 0
+      }
+    ]
+  },
+  "first_audit_correction": {
+    "initial_matching_row_visits": 40342,
+    "initial_report_preserved_locally": true,
+    "cause": "Empty source log lines matched empty strings/newlines in unrelated payloads. One standard Python traceback heading also matched100 historical rows.",
+    "fix": "Keep every original event; ignore only blank lines for identity and retain exact standard traceback heading matches as nonblocking counts. All other matches still block for review.",
+    "parser_corrections": "Parse newline only (not ASCII GS); check8-space event before4-space source headers so event lines ending colon are not misclassified. First CLI relative/absolute path mismatch was corrected before audit output."
+  },
+  "independent_verification": {
+    "event_occurrences": 7424,
+    "unique_events": 7061,
+    "files": 44,
+    "row_visits": 47627,
+    "matching_event_rows": 0,
+    "common_header_rows": 100,
+    "method": "Independent regex extraction plus string/whitespace/JSON membership; all roles/nested JSON; no auditor imported."
+  },
+  "verification": {
+    "CLI_reproduction_except_time": true,
+    "existing_output_refused": true,
+    "R3_R4_arm_bytes_identical": true,
+    "actual_reserved_injections_refused": [
+      "original_log_in_tool",
+      "different_prompt_same_source"
+    ],
+    "regressions": {
+      "new": 16,
+      "existing": 40,
+      "total": 56
+    }
+  },
+  "pilot_builder_guard": {
+    "implemented": true,
+    "candidate_files_checked": {
+      "cti-replay-candidates.jsonl": {
+        "rows": 1024,
+        "bytes": 2619327,
+        "sha256": "f77744550af37cc547be548b0f82ab5e25ef3a28dc186bb39088c103d8a6ecd2",
+        "matches": [],
+        "blocking_row_visits": 0
+      },
+      "observation-candidates.jsonl": {
+        "rows": 143,
+        "bytes": 732392,
+        "sha256": "2a00f9956b58e5067bda0fe962d2edd58dac9fe931e3817d6bca8d240439869f",
+        "matches": [],
+        "blocking_row_visits": 0
+      },
+      "optional-harness-candidates.jsonl": {
+        "rows": 30,
+        "bytes": 206329,
+        "sha256": "45eeed78f37da561d708c8c331b22ff42adc58cb12b644398bccccc1218602b2",
+        "matches": [],
+        "blocking_row_visits": 0
+      }
+    },
+    "latest_candidate": "data-soc-pilot-candidate-20261030-r4",
+    "manifest_sha256": "1a2ef51f47c8928ed86de55ec0816ead0e4cdbb07ca9c3f869f83863c659224c",
+    "arm_files": {
+      "evidence-only.jsonl": {
+        "rows": 191,
+        "sha256": "acee5ff65c57b50991620504713d0b22703516715ffa9ae7107aa9444dddaf84"
+      },
+      "evidence-plus-harness.jsonl": {
+        "rows": 221,
+        "sha256": "157f81e604137b488c7f3583bbaf982ba1a893f1402ddb002434ceba50adac0c"
+      }
+    },
+    "same_arm_bytes_as_R3": true,
+    "before_output_creation": true,
+    "training_release_created": false,
+    "scope": "Pilot builder only; existing frozen production trainer/pack inputs unchanged."
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-10-30T18:36:58.298253+09:00",
+    "files": 17,
+    "bytes": 2046406,
+    "mac_packages_installed": 0,
+    "publisher_pending_final_push": true
+  },
+  "training_admitted": 0,
+  "model_called": false,
+  "new_tokenization": false,
+  "server_changed": false,
+  "final_operational_evaluation_created": 0,
+  "limits": [
+    "Exact absence is scoped to available44 files and selected7424 CAM event occurrences, not whole upstream raw archives or semantic independence.",
+    "Public benchmark pretraining contamination is unknown; report this limitation, do not claim a sealed unseen final test.",
+    "CAM technique ranking does not establish FW completeness, approval/write/rollback, failure handling or live incident response.",
+    "No GPU training, new model quality test, MCP/chat/attack E2E, new-server installation or full pack run.",
+    "Three current V4 code files already differ from its old manifest at task start; frozen V4 repack/reproduction is not verified. All25 V5 frozen sources match."
+  ],
+  "remaining": [
+    "Prepare unused operational tasks and gold evidence covering full catalog/FW, pagination, approved edit/apply/verify/rollback and unavailable tools/storage.",
+    "Freeze fair compute/runtime comparison and original-model rollback before any new training outage."
+  ],
+  "auditor_sha256": "ec97e98b3f66c012f5212e5bcebbb83289173f39aff240b414d3597279fc2e46",
+  "preservation": {
+    "V4": {
+      "data_splits_and_source_cases_match_frozen": true,
+      "source_count": 11,
+      "all_sources_unchanged_from_task_start": true,
+      "preexisting_source_mismatches_against_older_manifest": [
+        "train.py",
+        "container_task.py",
+        "thor_container.py"
+      ]
+    },
+    "V5": {
+      "data_splits_and_source_cases_match_frozen": true,
+      "source_count": 25,
+      "all_sources_unchanged_from_task_start": true,
+      "preexisting_source_mismatches_against_older_manifest": []
+    }
+  }
+}

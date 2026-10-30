@@ -15,6 +15,7 @@ from audit_soc_observation_history import read_frozen
 from prepare_data import canonical
 from prepare_soc_observation_inputs import require, verified
 from score_cam_benchmark import load_bundle as load_cam_bundle
+from audit_cam_isolation import guard_candidates
 
 SEED = 'soc-source-grouped-pilot-20261030-v1'
 
@@ -122,6 +123,8 @@ def build(root, inventory, token_proof, output, loss_proof):
     cam_manifest, _ = load_cam_bundle(root/'data-cam-benchmark-20261030-r2')
     require(cam_manifest['status'] == 'reserved_benchmark_candidate_not_final_test'
             and cam_manifest['counts']['training_admitted'] == 0, 'CAM partition changed')
+    isolation = guard_candidates(root/'data-cam-benchmark-20261030-r2',
+                                 [inventory/name for name in sorted(pools)])
     v5 = json.loads((root/'V5_TRAINING_INPUTS.json').read_text())
     loss_observation = json.loads(loss_proof.read_text());loss_check = loss_observation['loss_check']
     require(loss_observation['state']['Running'] is False and loss_observation['state']['ExitCode'] == 0
@@ -161,7 +164,8 @@ def build(root, inventory, token_proof, output, loss_proof):
             {'name': 'CAM_external_candidate', 'role': 'reserved_public_benchmark_candidate', 'eligible_as_new_final': False,
              'rows': cam_manifest['counts']['unique_inputs'], 'manifest_sha256': sha((root/'data-cam-benchmark-20261030-r2/manifest.json').read_bytes()),
              'scope': 'Provider technique ranking, source-ID strata/ceiling limits; not all-role operational evidence',
-             'remaining': 'Whole-source/episode separation and final model/harness freeze'},
+             'isolation': 'Entire CAM corpus reserved, including variants/steps; candidate all-role payload exact-log/source scan passed',
+             'remaining': 'Semantic/raw-archive/pretraining overlap remains unproven; freeze final model/harness and separate operational evaluation'},
             {'name': 'final_operational', 'role': 'not_created', 'rows': 0, 'eligible_as_new_final': False,
              'required': ['fresh source/incident-grouped evidence', 'full tool catalog including FW',
                           'read/target/pagination completeness', 'approval/edit/apply/verify/rollback',
@@ -189,6 +193,7 @@ def build(root, inventory, token_proof, output, loss_proof):
         'why_48': 'Exploratory CTI replay cap near one quarter of the no-harness arm; keeps all143 reviewed observations and avoids CTI row-frequency dominance. Not an empirically optimized ratio.',
         'full_inventory_manifest_sha256': sha((inventory/'manifest.json').read_bytes()),
         'token_observation_sha256': sha(token_proof.read_bytes()), 'frozen_V5': frozen,
+        'CAM_isolation_guard': isolation,
         'runtime_loss_observation_sha256': sha(loss_proof.read_bytes()),
         'runtime_loss_contract': loss_check,
         'historical_source_groups_by_split': partitions,

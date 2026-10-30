@@ -334,5 +334,16 @@
     "publish_helper_pending_until_git_receipt": true,
     "source_and_benchmark_project_artifacts_preserved": true,
     "packages_installed": 0
+  },
+  "CAM_isolation_follow_up": {
+    "at_kst": "2026-10-30T18:36:58.298253+09:00",
+    "report": "CAM_ISOLATION_REVIEW.json",
+    "scanned_row_visits": 47627,
+    "blocking_row_visits": 0,
+    "entire_CAM_corpus_reserved": true,
+    "latest_pilot_candidate": "data-soc-pilot-candidate-20261030-r4",
+    "pilot_manifest_sha256": "1a2ef51f47c8928ed86de55ec0816ead0e4cdbb07ca9c3f869f83863c659224c",
+    "arm_bytes_unchanged": true,
+    "new_final_operational_evaluation": 0
   }
 }

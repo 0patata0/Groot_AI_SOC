@@ -1,0 +1,1106 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T16:11:16.349336+09:00",
+  "status": "version_scope_and_visible_annotation_audit_complete_not_training_admission",
+  "sources": {
+    "at_kst": "2026-10-30T16:00:33.203458+09:00",
+    "files": [
+      {
+        "file": "README.md",
+        "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/README.md",
+        "bytes": 16820,
+        "sha256": "cc135060e31c6ee6aed80a129a4d06fc67739854a4946b2bd37ef1782707cdc6",
+        "git_blob_verified": true
+      },
+      {
+        "file": "LICENSE",
+        "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/LICENSE",
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "git_blob_verified": true
+      },
+      {
+        "file": "attack_times.csv",
+        "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/attack_times.csv",
+        "bytes": 106740,
+        "sha256": "e300f508c5611e11a835d2dea575b152e85c9eed08ac3e945ec7f42cc0433d81",
+        "git_blob_verified": true
+      },
+      {
+        "file": "labels.json",
+        "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/labels.json",
+        "bytes": 791024,
+        "sha256": "cc27fee6d78b6de3d5d2172b334269bbcd9747dac80b6882e8982229b2540afe",
+        "git_blob_verified": true
+      },
+      {
+        "file": "llm_queries.json",
+        "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/llm_queries.json",
+        "bytes": 6884757,
+        "sha256": "ab7f948e9019cacf0fa94236e1303c5523a39d87a4253c2802ea8fd60d2f7ee5",
+        "git_blob_verified": true
+      },
+      {
+        "file": "zenodo-18390561.json",
+        "url": "https://zenodo.org/api/records/18390561",
+        "bytes": 21049,
+        "sha256": "7616b3a5d978c30add953ffdaf65efb0f603e1732fc615bbba4175113e06437b",
+        "git_blob_verified": false
+      },
+      {
+        "file": "zenodo-18861762.json",
+        "url": "https://zenodo.org/api/records/18861762",
+        "bytes": 21227,
+        "sha256": "ea9224431a1a69a9fadb8cf21918a2e6c6159975faf9599902ddc20a6f8ce158",
+        "git_blob_verified": false
+      },
+      {
+        "file": "zenodo-5789064.json",
+        "url": "https://zenodo.org/api/records/5789064",
+        "bytes": 17209,
+        "sha256": "658604a9ba3681224a5d9df6443617c0294805cae88958b2d9242301711a7eaf",
+        "git_blob_verified": false
+      },
+      {
+        "file": "git-tree.json",
+        "url": "https://api.github.com/repos/ait-aecid/attack-manifestations-interpretation/git/trees/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2?recursive=1",
+        "bytes": 10202,
+        "sha256": "e4a4b2d099b6ccbca77237a7684f911b83cc766060479156a0c7455aec84b833",
+        "git_blob_verified": false
+      },
+      {
+        "file": "create_llm_prompt.py",
+        "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/create_llm_prompt.py",
+        "bytes": 7208,
+        "sha256": "f50a680abbe5d7378846b21ff005f83433f4e5ea50d8649ba964fba6bab675bb",
+        "git_blob": "fe9e82503bbd9a54613b4ef4bfc250b158048157",
+        "git_blob_verified": true
+      },
+      {
+        "file": "count_identical_prompts.py",
+        "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/count_identical_prompts.py",
+        "bytes": 10740,
+        "sha256": "bc36e7b01adcb7ace3f9ae8d94c56b0b6cca38d8a596f6c88b619dfb2055481f",
+        "git_blob": "a609dd43a533ba5627b2eed83909e183bdb6436a",
+        "git_blob_verified": true
+      }
+    ]
+  },
+  "input_audit": {
+    "label_records": 883,
+    "query_records": 990,
+    "all_label_ids": [
+      "T1003",
+      "T1003.008",
+      "T1005",
+      "T1007",
+      "T1010",
+      "T1014",
+      "T1016",
+      "T1018",
+      "T1021",
+      "T1021.004",
+      "T1021.005",
+      "T1033",
+      "T1036.005",
+      "T1039",
+      "T1040",
+      "T1041",
+      "T1046",
+      "T1049",
+      "T1053",
+      "T1053.003",
+      "T1056.001",
+      "T1056.004",
+      "T1057",
+      "T1059",
+      "T1059.004",
+      "T1059.006",
+      "T1068",
+      "T1069",
+      "T1070.003",
+      "T1070.004",
+      "T1071.001",
+      "T1072",
+      "T1074.001",
+      "T1078.002",
+      "T1078.003",
+      "T1080",
+      "T1082",
+      "T1083",
+      "T1087",
+      "T1087.001",
+      "T1095",
+      "T1098.004",
+      "T1105",
+      "T1110.001",
+      "T1115",
+      "T1120",
+      "T1124",
+      "T1133",
+      "T1136.001",
+      "T1176",
+      "T1190",
+      "T1201",
+      "T1204.001",
+      "T1204.002",
+      "T1205.001",
+      "T1210",
+      "T1213",
+      "T1218",
+      "T1219",
+      "T1222.002",
+      "T1485",
+      "T1486",
+      "T1489",
+      "T1490",
+      "T1497.001",
+      "T1518",
+      "T1525",
+      "T1528",
+      "T1531",
+      "T1543.002",
+      "T1546",
+      "T1547",
+      "T1548.003",
+      "T1550.001",
+      "T1556.003",
+      "T1557.002",
+      "T1560.001",
+      "T1564",
+      "T1564.001",
+      "T1565.001",
+      "T1566.004",
+      "T1569",
+      "T1573",
+      "T1573.001",
+      "T1574",
+      "T1574.008",
+      "T1589.002",
+      "T1590.002",
+      "T1591",
+      "T1592.002",
+      "T1595",
+      "T1595.002",
+      "T1595.003",
+      "T1599",
+      "T1610",
+      "T1614",
+      "T1615"
+    ],
+    "all_label_parent_ids": [
+      "T1003",
+      "T1005",
+      "T1007",
+      "T1010",
+      "T1014",
+      "T1016",
+      "T1018",
+      "T1021",
+      "T1033",
+      "T1036",
+      "T1039",
+      "T1040",
+      "T1041",
+      "T1046",
+      "T1049",
+      "T1053",
+      "T1056",
+      "T1057",
+      "T1059",
+      "T1068",
+      "T1069",
+      "T1070",
+      "T1071",
+      "T1072",
+      "T1074",
+      "T1078",
+      "T1080",
+      "T1082",
+      "T1083",
+      "T1087",
+      "T1095",
+      "T1098",
+      "T1105",
+      "T1110",
+      "T1115",
+      "T1120",
+      "T1124",
+      "T1133",
+      "T1136",
+      "T1176",
+      "T1190",
+      "T1201",
+      "T1204",
+      "T1205",
+      "T1210",
+      "T1213",
+      "T1218",
+      "T1219",
+      "T1222",
+      "T1485",
+      "T1486",
+      "T1489",
+      "T1490",
+      "T1497",
+      "T1518",
+      "T1525",
+      "T1528",
+      "T1531",
+      "T1543",
+      "T1546",
+      "T1547",
+      "T1548",
+      "T1550",
+      "T1556",
+      "T1557",
+      "T1560",
+      "T1564",
+      "T1565",
+      "T1566",
+      "T1569",
+      "T1573",
+      "T1574",
+      "T1589",
+      "T1590",
+      "T1591",
+      "T1592",
+      "T1595",
+      "T1599",
+      "T1610",
+      "T1614",
+      "T1615"
+    ],
+    "query_ids": [
+      "T1003",
+      "T1003.008",
+      "T1005",
+      "T1007",
+      "T1010",
+      "T1014",
+      "T1016",
+      "T1018",
+      "T1021",
+      "T1021.004",
+      "T1021.005",
+      "T1033",
+      "T1036.005",
+      "T1039",
+      "T1040",
+      "T1041",
+      "T1046",
+      "T1049",
+      "T1053",
+      "T1053.003",
+      "T1056.001",
+      "T1056.004",
+      "T1057",
+      "T1059",
+      "T1059.004",
+      "T1059.006",
+      "T1068",
+      "T1069",
+      "T1070.003",
+      "T1070.004",
+      "T1071.001",
+      "T1072",
+      "T1074.001",
+      "T1078.002",
+      "T1078.003",
+      "T1080",
+      "T1082",
+      "T1083",
+      "T1087",
+      "T1087.001",
+      "T1095",
+      "T1098.004",
+      "T1105",
+      "T1110.001",
+      "T1115",
+      "T1120",
+      "T1124",
+      "T1133",
+      "T1136.001",
+      "T1176",
+      "T1190",
+      "T1201",
+      "T1204.001",
+      "T1204.002",
+      "T1205.001",
+      "T1210",
+      "T1213",
+      "T1218",
+      "T1219",
+      "T1222.002",
+      "T1485",
+      "T1486",
+      "T1489",
+      "T1490",
+      "T1497.001",
+      "T1518",
+      "T1525",
+      "T1528",
+      "T1531",
+      "T1543.002",
+      "T1546",
+      "T1547",
+      "T1548.003",
+      "T1550.001",
+      "T1556.003",
+      "T1560.001",
+      "T1564",
+      "T1564.001",
+      "T1565.001",
+      "T1566.004",
+      "T1569",
+      "T1573.001",
+      "T1574",
+      "T1574.008",
+      "T1589.002",
+      "T1590.002",
+      "T1591",
+      "T1592.002",
+      "T1595",
+      "T1595.002",
+      "T1595.003",
+      "T1599",
+      "T1610",
+      "T1614",
+      "T1615"
+    ],
+    "query_parent_ids": [
+      "T1003",
+      "T1005",
+      "T1007",
+      "T1010",
+      "T1014",
+      "T1016",
+      "T1018",
+      "T1021",
+      "T1033",
+      "T1036",
+      "T1039",
+      "T1040",
+      "T1041",
+      "T1046",
+      "T1049",
+      "T1053",
+      "T1056",
+      "T1057",
+      "T1059",
+      "T1068",
+      "T1069",
+      "T1070",
+      "T1071",
+      "T1072",
+      "T1074",
+      "T1078",
+      "T1080",
+      "T1082",
+      "T1083",
+      "T1087",
+      "T1095",
+      "T1098",
+      "T1105",
+      "T1110",
+      "T1115",
+      "T1120",
+      "T1124",
+      "T1133",
+      "T1136",
+      "T1176",
+      "T1190",
+      "T1201",
+      "T1204",
+      "T1205",
+      "T1210",
+      "T1213",
+      "T1218",
+      "T1219",
+      "T1222",
+      "T1485",
+      "T1486",
+      "T1489",
+      "T1490",
+      "T1497",
+      "T1518",
+      "T1525",
+      "T1528",
+      "T1531",
+      "T1543",
+      "T1546",
+      "T1547",
+      "T1548",
+      "T1550",
+      "T1556",
+      "T1560",
+      "T1564",
+      "T1565",
+      "T1566",
+      "T1569",
+      "T1573",
+      "T1574",
+      "T1589",
+      "T1590",
+      "T1591",
+      "T1592",
+      "T1595",
+      "T1599",
+      "T1610",
+      "T1614",
+      "T1615"
+    ],
+    "unqueried_ids": [
+      "T1557.002",
+      "T1573"
+    ],
+    "unqueried_id_label_keys": {
+      "T1557.002": [
+        "5-1"
+      ],
+      "T1573": [
+        "2_rootkit-24"
+      ]
+    },
+    "scenario_steps": 198,
+    "unique_prompts": 393,
+    "step_repetition_counts": {
+      "5": 198
+    },
+    "steps_with_identical_all_repetitions": 89,
+    "cross_step_identical_prompt_groups": 0,
+    "identical_prompt_conflicting_label_groups": 0,
+    "visible_literal_id_queries": 883,
+    "visible_literal_exact_gold_queries": 23,
+    "visible_literal_parent_gold_queries": 80,
+    "parsed_annotation_id_queries": 128,
+    "parsed_annotation_exact_gold_queries": 23,
+    "parsed_annotation_parent_gold_queries": 57,
+    "unique_prompt_identifier_counts": {
+      "literal_ids": 348,
+      "literal_exact_gold_overlap": 12,
+      "literal_parent_gold_overlap": 35,
+      "parsed_annotation_ids": 54,
+      "parsed_exact_gold_overlap": 12,
+      "parsed_parent_gold_overlap": 25
+    },
+    "training_admitted": 0,
+    "new_final_evaluation_records": 0,
+    "limits": [
+      "Literal technique IDs are review flags, not proof that every occurrence is an answer label.",
+      "Parsed detector/audit annotations are pre-existing sensor judgments, not label-free log inference.",
+      "Source labels are attack-step metadata, not a verdict that every selected log is malicious.",
+      "Same step/repetition/variant must not be randomly split across train and evaluation.",
+      "Zero identical prompts across steps does not prove episode/source independence.",
+      "No original log removal, new operator answer, tokenizer or model execution."
+    ],
+    "checked_at_kst": "2026-10-30T16:08:12.870092+09:00",
+    "source_commit": "42bbd2cf8409f64a1e6c8fc936c91725e8c558b2",
+    "source_sha256": {
+      "labels.json": "cc27fee6d78b6de3d5d2172b334269bbcd9747dac80b6882e8982229b2540afe",
+      "llm_queries.json": "ab7f948e9019cacf0fa94236e1303c5523a39d87a4253c2802ea8fd60d2f7ee5"
+    },
+    "checker_sha256": "302da22c13a31de3254682ba8e95441163b824642626995adaf9dd5e0b38aff7",
+    "all_label_ids_count": 97,
+    "all_label_parent_ids_count": 81,
+    "query_ids_count": 95,
+    "query_parent_ids_count": 80
+  },
+  "exact_gold_visible_unique_input_coordinates": [
+    {
+      "line": 14,
+      "scenario_step": "1-3",
+      "variant": "validaccount_pam",
+      "prompt_sha256": "e176b7f4580bc2ac5ed2398b892e425b9c2057f6401bd01865076685209b0604",
+      "label_key": "1_validaccount_pam-3",
+      "parsed_exact_gold_overlap": [
+        "T1595.002"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 1
+      }
+    },
+    {
+      "line": 42,
+      "scenario_step": "1-53",
+      "variant": "sudo_pam",
+      "prompt_sha256": "19e01f381cf15724c1aecc3bb6359e3cd5503c898c6c698375c105d796f95c5b",
+      "label_key": "1_sudo_pam-53",
+      "parsed_exact_gold_overlap": [
+        "T1548.003"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 4
+      }
+    },
+    {
+      "line": 68,
+      "scenario_step": "2-22",
+      "variant": "rootkit",
+      "prompt_sha256": "f6280ddf93914727b24cdf445a48188d888641b477ee54c80cf8bed00d269d1e",
+      "label_key": "2_rootkit-22",
+      "parsed_exact_gold_overlap": [
+        "T1021"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 6
+      }
+    },
+    {
+      "line": 137,
+      "scenario_step": "4-8",
+      "variant": "",
+      "prompt_sha256": "2418eb9ecd89d0957a4cea5e79e47583b1ba78ce5594b554e059085fc3d29004",
+      "label_key": "4-8",
+      "parsed_exact_gold_overlap": [
+        "T1548.003"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 4
+      }
+    },
+    {
+      "line": 202,
+      "scenario_step": "1-13",
+      "variant": "pwnkit_sshkey",
+      "prompt_sha256": "32e33ca1d3776ec8db355d83e6761bc01950a5b045a7e9d127c93329fd679210",
+      "label_key": "1_pwnkit_sshkey-13",
+      "parsed_exact_gold_overlap": [
+        "T1057"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 3
+      }
+    },
+    {
+      "line": 212,
+      "scenario_step": "1-3",
+      "variant": "sudo_sshkey",
+      "prompt_sha256": "1692a38812da3313c4a807dd9d895254735a4997770a80f57290ef0cb7dcbdbd",
+      "label_key": "1_sudo_sshkey-3",
+      "parsed_exact_gold_overlap": [
+        "T1595.002"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 1
+      }
+    },
+    {
+      "line": 240,
+      "scenario_step": "1-53",
+      "variant": "sudo_localaccount",
+      "prompt_sha256": "4dbe18ec0d4e0685dacaa0b3f5f9358feea1bdae3374f05c82ad44bf682ebda9",
+      "label_key": "1_sudo_localaccount-53",
+      "parsed_exact_gold_overlap": [
+        "T1548.003"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 4
+      }
+    },
+    {
+      "line": 400,
+      "scenario_step": "1-13",
+      "variant": "sudo_localaccount",
+      "prompt_sha256": "45a30947f0432c9de7c3fc2cdda0177a98e611de8895af11bf51b24fa510456d",
+      "label_key": "1_sudo_localaccount-13",
+      "parsed_exact_gold_overlap": [
+        "T1057"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 4
+      }
+    },
+    {
+      "line": 410,
+      "scenario_step": "1-3",
+      "variant": "pwnkit_sshkey",
+      "prompt_sha256": "d8fcbc59bbf26be519c081e0986950f4943a37ec6dedfe0b5dbf42cd19afe71a",
+      "label_key": "1_pwnkit_sshkey-3",
+      "parsed_exact_gold_overlap": [
+        "T1595.002"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 1
+      }
+    },
+    {
+      "line": 598,
+      "scenario_step": "1-13",
+      "variant": "sudo_pam",
+      "prompt_sha256": "386733d98227cb053af40cca5c7149c279c4cdfd2633465e3a36003ab0490fec",
+      "label_key": "1_sudo_pam-13",
+      "parsed_exact_gold_overlap": [
+        "T1057"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 1
+      }
+    },
+    {
+      "line": 796,
+      "scenario_step": "1-13",
+      "variant": "validaccount_localaccount",
+      "prompt_sha256": "28d64b5ec664b85b1277b086d64ca43318ebbcf94e3f34e47e02d5466d7b9832",
+      "label_key": "1_validaccount_localaccount-13",
+      "parsed_exact_gold_overlap": [
+        "T1057",
+        "T1083"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 6
+      }
+    },
+    {
+      "line": 806,
+      "scenario_step": "1-3",
+      "variant": "cron_sshkey",
+      "prompt_sha256": "c6981fd45e0922ee92287e43dd451339a766549c4d6daa11d59a232951326d70",
+      "label_key": "1_cron_sshkey-3",
+      "parsed_exact_gold_overlap": [
+        "T1595.002"
+      ],
+      "parsed_annotation_line_counts": {
+        "rule.mitre.id": 1
+      }
+    }
+  ],
+  "step_coverage": {
+    "label_groups": 243,
+    "input_groups": 198,
+    "groups_without_queries": 45,
+    "eligible_archive_groups_equal_query_groups": true,
+    "missing_label_explanation": "T1573 in 2_rootkit-24 and T1557.002 in 5-1 occur only in attacker-host files in the filtered steps inventories. The pinned generator excludes attacker hosts; they are absent from supplied queries. T1557 has other queried subtechniques, so only one parent is lost.",
+    "missing_steps_files": {
+      "2_rootkit-24": [
+        {
+          "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/attackmate.json",
+          "bytes": 682,
+          "host": "attacker"
+        },
+        {
+          "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/attackmate.log",
+          "bytes": 262,
+          "host": "attacker"
+        },
+        {
+          "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/output.log",
+          "bytes": 74,
+          "host": "attacker"
+        }
+      ],
+      "5-1": [
+        {
+          "member": "manifestations_filtered/steps/5-1/attacker/logs/attackmate.json",
+          "bytes": 651,
+          "host": "attacker"
+        },
+        {
+          "member": "manifestations_filtered/steps/5-1/attacker/logs/attackmate.log",
+          "bytes": 297,
+          "host": "attacker"
+        },
+        {
+          "member": "manifestations_filtered/steps/5-1/attacker/logs/log/auth.log",
+          "bytes": 162,
+          "host": "attacker"
+        },
+        {
+          "member": "manifestations_filtered/steps/5-1/attacker/logs/output.log",
+          "bytes": 93,
+          "host": "attacker"
+        }
+      ]
+    },
+    "scope": "Archive file inventory/nonzero size and inspected generator exclusions, not a full re-run of upstream generator or audit of every event."
+  },
+  "version_comparison": {
+    "at_kst": "2026-10-30T16:07:15.351736+09:00",
+    "same_zenodo_concept": "18390560",
+    "versions": [
+      {
+        "record": 18390561,
+        "archive": {
+          "id": "aaf2fd05-6b9a-45b4-a27e-a402d6f75193",
+          "key": "manifestations_filtered.zip",
+          "size": 213728643,
+          "checksum": "md5:e9d17ad99897b952abddb25838a56a7b",
+          "links": {
+            "self": "https://zenodo.org/api/records/18390561/files/manifestations_filtered.zip/content"
+          }
+        },
+        "file_members": 17242,
+        "step_file_members": 4744,
+        "delta_transferred": 393216,
+        "delta_requested": 393216,
+        "inventory_sha256": "75bf39ae9d42123261b153b49bfa769f3c662ec744bfe6ca06c225a6fb3a1a73"
+      },
+      {
+        "record": 18861762,
+        "archive": {
+          "id": "8f80f73a-6f95-45a1-9125-235da240e0a5",
+          "key": "manifestations_filtered.zip",
+          "size": 213771977,
+          "checksum": "md5:cfc14140b2e396a60989b8379eafca1f",
+          "links": {
+            "self": "https://zenodo.org/api/records/18861762/files/manifestations_filtered.zip/content"
+          }
+        },
+        "file_members": 17242,
+        "step_file_members": 4744,
+        "delta_transferred": 327680,
+        "delta_requested": 327680,
+        "inventory_sha256": "907e876604ef469afa8bd1783f9638ed904ec9339332007e697e22469158d2ac"
+      }
+    ],
+    "shared_step_paths": 4744,
+    "same_size_crc_step_paths": 4739,
+    "changed_step_paths": [
+      "manifestations_filtered/steps/7-10/docker/logs/log/audit/audit.log",
+      "manifestations_filtered/steps/7-13/docker/logs/log/audit/audit.log",
+      "manifestations_filtered/steps/7-3/docker/logs/log/audit/audit.log",
+      "manifestations_filtered/steps/7-6/docker/logs/log/audit/audit.log",
+      "manifestations_filtered/steps/7-8/docker/logs/log/audit/audit.log"
+    ],
+    "added_step_paths": [],
+    "removed_step_paths": [],
+    "selected_deltas": [
+      {
+        "member": "manifestations_filtered/steps/7-10/docker/logs/log/audit/audit.log",
+        "versions": {
+          "18390561": {
+            "file": "delta-0-18390561.log",
+            "bytes": 170723,
+            "lines": 625,
+            "sha256": "8cfcc549aa69d2c6256ab0343b7473b011e1380307622da158e7bd276a2824f8",
+            "crc32_verified": true,
+            "runc_init_lines": 1
+          },
+          "18861762": {
+            "file": "delta-0-18861762.log",
+            "bytes": 212841,
+            "lines": 782,
+            "sha256": "cd9cdd06cc4925436ff277bd9ea30d74de9f2abe7b6c7683ed890b3b54866c85",
+            "crc32_verified": true,
+            "runc_init_lines": 5
+          }
+        },
+        "v1_lines_removed": 0,
+        "v2_lines_added": 157,
+        "v1_lines_multiset_preserved": true
+      },
+      {
+        "member": "manifestations_filtered/steps/7-13/docker/logs/log/audit/audit.log",
+        "versions": {
+          "18390561": {
+            "file": "delta-1-18390561.log",
+            "bytes": 5321,
+            "lines": 22,
+            "sha256": "bfad4dc4d2515431154ce7b7cdc8b3e3e656b36529365eece3557035ec513856",
+            "crc32_verified": true,
+            "runc_init_lines": 0
+          },
+          "18861762": {
+            "file": "delta-1-18861762.log",
+            "bytes": 15596,
+            "lines": 60,
+            "sha256": "e793168aa3bbda3bc97cc97e0a17ddfe742e0cba1e4e39a46b05e41eb3adaa95",
+            "crc32_verified": true,
+            "runc_init_lines": 1
+          }
+        },
+        "v1_lines_removed": 0,
+        "v2_lines_added": 38,
+        "v1_lines_multiset_preserved": true
+      },
+      {
+        "member": "manifestations_filtered/steps/7-3/docker/logs/log/audit/audit.log",
+        "versions": {
+          "18390561": {
+            "file": "delta-2-18390561.log",
+            "bytes": 135269,
+            "lines": 518,
+            "sha256": "da4a70e7ca32a3780cad20f7dda21b25a5bd22c799dc537baa7367b6988522e2",
+            "crc32_verified": true,
+            "runc_init_lines": 0
+          },
+          "18861762": {
+            "file": "delta-2-18861762.log",
+            "bytes": 239284,
+            "lines": 902,
+            "sha256": "bc2af97f6e98e181a103465628473281b5af2f7a37d231b38ee4d7ce82b6dede",
+            "crc32_verified": true,
+            "runc_init_lines": 10
+          }
+        },
+        "v1_lines_removed": 0,
+        "v2_lines_added": 384,
+        "v1_lines_multiset_preserved": true
+      },
+      {
+        "member": "manifestations_filtered/steps/7-6/docker/logs/log/audit/audit.log",
+        "versions": {
+          "18390561": {
+            "file": "delta-3-18390561.log",
+            "bytes": 22621,
+            "lines": 87,
+            "sha256": "dc6e6c55601f54471e3cdb93e605d85f444e0ea11853fd74e86554eee103bcef",
+            "crc32_verified": true,
+            "runc_init_lines": 0
+          },
+          "18861762": {
+            "file": "delta-3-18861762.log",
+            "bytes": 32896,
+            "lines": 125,
+            "sha256": "3ad8965625109653d2efb960128c8bddaa5fa5d89ba82016f83debff2a04f91f",
+            "crc32_verified": true,
+            "runc_init_lines": 1
+          }
+        },
+        "v1_lines_removed": 0,
+        "v2_lines_added": 38,
+        "v1_lines_multiset_preserved": true
+      },
+      {
+        "member": "manifestations_filtered/steps/7-8/docker/logs/log/audit/audit.log",
+        "versions": {
+          "18390561": {
+            "file": "delta-4-18390561.log",
+            "bytes": 2310,
+            "lines": 9,
+            "sha256": "1fe648a82e2bd0cd0d702673190d894d0c2138e56fb6862d0c307983adedc862",
+            "crc32_verified": true,
+            "runc_init_lines": 0
+          },
+          "18861762": {
+            "file": "delta-4-18861762.log",
+            "bytes": 12596,
+            "lines": 47,
+            "sha256": "9051810464ae5b4db0f3a2edd83407061591d1beeaca4c0adf57da996001166b",
+            "crc32_verified": true,
+            "runc_init_lines": 1
+          }
+        },
+        "v1_lines_removed": 0,
+        "v2_lines_added": 38,
+        "v1_lines_multiset_preserved": true
+      }
+    ],
+    "same_crc_size_is_not_cryptographic_equality": true,
+    "whole_ZIP_MD5_verified": false,
+    "initial_inventory_attempt": {
+      "exit": 1,
+      "reason": "metadata.version field absent; no source corruption assumed",
+      "complete_central_inventories_preserved_and_reused": true,
+      "transfer_bytes_not_retained": true
+    },
+    "version_identity": "Pinned official record IDs and common concept; v1/v2 documented in official record pages/README, not missing API metadata.version"
+  },
+  "independent_check": {
+    "at_kst": "2026-10-30T16:09:25.088598+09:00",
+    "all_query_rows": 990,
+    "all_label_rows": 883,
+    "provider_label_groups": 243,
+    "eligible_input_groups": 198,
+    "omitted_provider_label_groups": [
+      "1-11",
+      "1-18",
+      "1-19",
+      "1-31",
+      "1-45",
+      "1-47",
+      "1-51",
+      "1-6",
+      "1-9",
+      "2-24",
+      "2-25",
+      "2-7",
+      "3-13",
+      "3-15",
+      "3-21",
+      "3-24",
+      "3-33",
+      "3-36",
+      "3-38",
+      "3-39",
+      "3-44",
+      "3-52",
+      "3-53",
+      "3-56",
+      "3-57",
+      "3-59",
+      "4-1",
+      "4-11",
+      "4-2",
+      "5-1",
+      "6-25",
+      "6-27",
+      "6-38",
+      "6-40",
+      "6-42",
+      "6-48",
+      "6-50",
+      "6-52",
+      "6-54",
+      "6-55",
+      "6-56",
+      "6-58",
+      "6-60",
+      "6-7",
+      "7-5"
+    ],
+    "all_query_to_label_links_equal": true,
+    "parsed_annotation_queries": 128,
+    "exact_gold_queries": 23,
+    "parent_gold_queries": 57,
+    "inventory_scope": {
+      "18390561": {
+        "file_entries": 17242,
+        "all_step_groups": 243,
+        "eligible_step_groups": 198,
+        "omitted_label_steps": {
+          "2_rootkit-24": [
+            {
+              "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/attackmate.json",
+              "bytes": 682,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/attackmate.log",
+              "bytes": 262,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/output.log",
+              "bytes": 74,
+              "host": "attacker"
+            }
+          ],
+          "5-1": [
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/attackmate.json",
+              "bytes": 651,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/attackmate.log",
+              "bytes": 297,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/log/auth.log",
+              "bytes": 162,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/output.log",
+              "bytes": 93,
+              "host": "attacker"
+            }
+          ]
+        }
+      },
+      "18861762": {
+        "file_entries": 17242,
+        "all_step_groups": 243,
+        "eligible_step_groups": 198,
+        "omitted_label_steps": {
+          "2_rootkit-24": [
+            {
+              "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/attackmate.json",
+              "bytes": 682,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/attackmate.log",
+              "bytes": 262,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/2_rootkit-24/attacker/logs/output.log",
+              "bytes": 74,
+              "host": "attacker"
+            }
+          ],
+          "5-1": [
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/attackmate.json",
+              "bytes": 651,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/attackmate.log",
+              "bytes": 297,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/log/auth.log",
+              "bytes": 162,
+              "host": "attacker"
+            },
+            {
+              "member": "manifestations_filtered/steps/5-1/attacker/logs/output.log",
+              "bytes": 93,
+              "host": "attacker"
+            }
+          ]
+        }
+      }
+    },
+    "delta_bytes_sha_and_multisets_rechecked": true,
+    "new_tokenizer_or_model_run": false,
+    "frozen_V5_sources_unchanged": 25,
+    "verification_correction": "Initial independent summary used a full key for variants without underscores; corrected to explicit scenario_variant and asserted query groups subset before publication."
+  },
+  "corpus_identity": {
+    "CAM_concept": "18390560",
+    "CAM_setup": "AttackBed; no benign-user simulation",
+    "AIT_LDS_concept": "5789063",
+    "AIT_LDS_setup": "Eight Kyoushi-based enterprise testbeds; benign users simulated",
+    "official_sources": [
+      "https://zenodo.org/records/18861762",
+      "https://zenodo.org/records/5789064",
+      "https://link.springer.com/article/10.1007/s10207-026-01318-x"
+    ],
+    "conclusion": "Distinct published corpus/collection design; same institute alone does not establish identical records. Full cross-corpus byte/semantic overlap not verified, so no independent final-evaluation claim."
+  },
+  "policy": {
+    "pin_query_data_version": "v1 record18390561; v2 Docker data not silently substituted",
+    "annotation_assisted_investigation": "Preserve identified sensor judgments as evidence with source limits",
+    "label_free_evaluation": "Current input is not label-free; separate/review identifier-bearing sensor/audit annotations before asserting raw-log inference. Do not auto-delete raw records.",
+    "split": "Keep repeated prompts, same step and related variants/episodes together; full source overlap and fresh evaluation remain pending",
+    "provider_labels": "Technique execution labels, not institutional operator decisions or proof of each line malicious",
+    "upstream_model_responses_used_as_gold": false,
+    "training_examples_admitted": 0
+  },
+  "validation": {
+    "new_regression_tests": 11,
+    "result": "passed",
+    "independent_all_query_label_links": 990,
+    "independent_label_records": 883,
+    "delta_original_files_verified": 10,
+    "new_tokenizer": false,
+    "new_model_quality_measurement": false,
+    "new_MAC_packages": 0,
+    "whole_archives_downloaded": false,
+    "whole_ZIP_MD5_verified": false,
+    "upstream_code_executed": false
+  },
+  "artifacts_sha256": {
+    "audit_cam_inputs.py": "302da22c13a31de3254682ba8e95441163b824642626995adaf9dd5e0b38aff7",
+    "tests/test_cam_inputs.py": "9a9dc4bac7cc9fcbc4ce95bedf8d041ffaa7a92793ca4b998f72c9bd4e572b7d"
+  },
+  "remaining": [
+    "Actual Qwen tokenizer and historical V4/V5 six split files",
+    "Annotation handling and episode/source split before admission",
+    "New independent evaluation; operational MCP/write/rollback/attack E2E"
+  ],
+  "execution_scope": {
+    "server_connections": 0,
+    "GPU_training": false,
+    "production_changes": false,
+    "new_training": 0,
+    "presentation_content_changes": 0,
+    "full_pack_generated": false
+  }
+}

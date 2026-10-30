@@ -1,5 +1,15 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**CAM 입력 검수:** `audit_cam_inputs.py`는 공식 고정파일의 질문990개↔라벨883개 연결, 반복/기법범위와 입력의ATT&CK ID를 검사한다. 라벨의상위81개와질문의80개 차이는원천범위 차이다. 구조화센서주석의정답완전일치23개(고유12입력)를별도표시하며 단순ID문자열출현을모두정답누출로세지않는다. [버전·출처·11회귀·독립대조](CAM_INPUT_REVIEW.json).
+
+```sh
+python3 -B finetuning/audit_cam_inputs.py --directory /path/pinned-cam-files \
+  --output /new/local-cam-audit.json
+python3 -B -m unittest discover -s finetuning/tests -p test_cam_inputs.py -v
+```
+
+`SOC_EXTRA_CORPORA_REVIEW.json`에 고정한 `labels.json`과 `llm_queries.json`이 필요하며 SHA/크기가 다르면 거부한다. 질문파일은 확장자와 달리 JSONL이다. 결과는 상세 좌표/해시를 가진 검토 원장으로 학습 데이터가 아니다. 원본 수정·제공자코드 실행·모델호출·자동분할/편입은 없다. 같은 질문/단계/관련변형은 분할 전에 묶으며, 기존 센서판단을 이용한 조사 성능을 주석 없는 추론 성능이라고 표현하지 않는다. v1 기반 질문과 v2 Docker감사 추가5파일을 구분하고 전체ZIP MD5/원천독립성은 검증완료로 표시하지 않는다.
+
 **관측 후보 답변 검수 — 2026-10-30 KST:** `refine_soc_observation_targets.py`는 고정 R1의17개 후보를 대조해 입력/근거94개는 보존하고10개 답변을 수정한다. 같은 시각의 선후 추측, 요청과 실행 성공의 혼동, 입력에 없는 필드 내용의 추정을 막고 관측별 근거를 연결한다. R1을 덮어쓰지 않으며 별도 R2에도 학습 미편입 상태와 출처 고지를 유지한다. [수정·30회귀·재현·별도 대조 결과](SOC_OBSERVATION_TARGET_REVIEW.json).
 
 ```sh

@@ -1,5 +1,26 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+## 운영 상태 판단 평가 29개 — 2026-10-30T19:32:47.172812+09:00
+
+[검수/경계](OPERATIONAL_REVIEW_CASES.json). 최신 로컬 자료는 `data-operational-review-20261030-r3`이다. 질문과 제공 관측은 `inputs.jsonl`, 전체38도구는 `catalog.json`, 사실 채점 근거130개는 `gold.jsonl`, 출처/장애 주입조건은 `provenance.json`이다. 모델에는 앞의 두 파일만 전달한다. `gold.jsonl`/`provenance.json`과 상태를 암시하는 중간R1/R2를 모델에 보내지 않는다. 같은 정책/시험 가족을 사용하는 개발평가이며 학습·독립 최종평가에 편입하지 않는다.
+
+```sh
+python3 -B finetuning/prepare_operational_cases.py \
+  --evidence finetuning/data-operational-evidence-20261030-r1 \
+  --output finetuning/data-operational-review-NEW
+python3 -B finetuning/score_operational_review.py \
+  --suite finetuning/data-operational-review-20261030-r3 \
+  --predictions /path/to/predictions.jsonl \
+  --reviews /path/to/reviews.jsonl \
+  --output /path/to/new-score.json
+```
+
+첫 명령은 실제 변경기와 기존 시험 대역을 임시 파일에서 실행한다. 외부 연결/프로세스 실행을 막으며 Docker·MCP·메신저·운영파일을 호출하지 않는다. 임시 파일은 종료 시 정리하고 출력은 덮어쓰지 않는다. 서비스 문법 검사/재시작 결과는 대역이므로 운영 엔진 정상 증명이 아니다. 기존 시험의 고정 시계는 모의 시각이며 현재 서버 시각으로 해석하지 않는다.
+
+응답 JSONL은 `id`, `status`(`ok/error/timeout/unsupported`), `answer`, `tool_calls`(각 `name`, `arguments`)를 사용한다. 의미검토 JSONL은 `id`, `reviewer`, `response_sha256`, `facts`를 갖는다. 응답 해시는 `sha256(encoded(prediction))`이며 `encoded`는 생성기의 정렬/들여쓰기/마지막LF 직렬화다. 각 사실에는 `id`, `verdict`(`correct/incorrect/missing/uncertain`), `reason`을 적고 correct/incorrect에는 답변에 실제 존재하는 `quote`를 붙인다. 사실 정답과 인용의 의미 일치는 검토자가 판단한다. 이 도구는 문자열 일치만으로 사실 정확성을 자동 인증하지 않는다.
+
+누락/오류/시간 초과는 전체분모에 남고 중요누락·잘못된 대상·가짜 도구·조회 평가 중 보호행동은 비교 통과를 차단한다. 적법한 추가 조회는 이 정적 관측 평가에서 실행되지 않으므로 미검토로 남는다. 미검토가 있으면 단일 총점 대신 전체분모 기준 점수 범위만 표시한다. 통과해도 운영 승격은 허용하지 않는다. 실제 모델 응답0, 전체도구를 사용한 대화형 실행·저장소 장애·운영 적용/원복/채팅 E2E와 최종 독립평가는 별도로 남아 있다.
+
 ## 라이브 도구 설명 보완·운영 조회 근거 — 2026-10-30T19:12:15.868392+09:00
 
 최신 전체 후보는 `data-soc-mixture-candidate-20261030-r5`, 소규모 비교 후보는 `data-soc-pilot-candidate-20261030-r5`다. 기존R4는보존한다. 라이브38도구의스키마/권한은기존과같았고임시차단설명1개만달랐다. `refresh_soc_tool_descriptions.py`는 명시적으로 검수한 이 차이만 허용하며 새 도구/스키마/권한·다른 설명 변화는 중단한다. 후보3개 도구 설명만현재RFC1918 정책에맞췄고질문·답변·인자/권한·TTL은유지했다. [원장](OPERATIONAL_EVIDENCE_REVIEW.json).

@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "at_kst": "2026-10-30T19:32:47.172812+09:00",
+  "decision": "Evidence-grounded development review suite prepared; no model score or training admission.",
+  "suite": {
+    "local_directory": "data-operational-review-20261030-r3",
+    "manifest_sha256": "1a16d699ee0170ccc8c8d7673d522d30f074562f131ec844d4893f180d403e5e",
+    "files": {
+      "catalog.json": {
+        "bytes": 42811,
+        "sha256": "4bd1501ae9d0e766f12ce77f8aafa7029e51a38c6c7226a7f3d7e8e734170cd9"
+      },
+      "gold.jsonl": {
+        "bytes": 24601,
+        "sha256": "b8677e3baf328c7d7a002261483ae8129334bbe68367cfbb79f8934b2dad1761"
+      },
+      "inputs.jsonl": {
+        "bytes": 269825,
+        "sha256": "ee738017c96797fe982695903d4fbbc78f7200485b4ead72d538cd2c11ffb515"
+      },
+      "provenance.json": {
+        "bytes": 5321,
+        "sha256": "c3faade3a314e43d7d0d0b250a0c1cf2514445b7544e7310ea943caf39c79aa8"
+      }
+    },
+    "cases": 29,
+    "scoring_facts": 130,
+    "families": 12,
+    "full_catalog_tools": 38,
+    "read_tools": 29,
+    "protected_tools": 9
+  },
+  "evidence": {
+    "actual_executor_scenarios": 25,
+    "devices": [
+      "WAF",
+      "Suricata",
+      "Wazuh"
+    ],
+    "states": [
+      "pending",
+      "approved but pending execution",
+      "denied",
+      "applied",
+      "rolled_back",
+      "recovery_failed",
+      "stale base aborted",
+      "broker unavailable"
+    ],
+    "additional_scenarios": [
+      "result notification retry without reapplying",
+      "full FW captured pages",
+      "withheld first FW page",
+      "Suricata -S combined file scope",
+      "unavailable forensic imaging tool"
+    ],
+    "source_type": "Project-controlled executor tests and project operational snapshot. Not institutional incidents or expert-certified answers.",
+    "source_files": {
+      "rule_change_executor.py": "741a4eead24b54e5bd7dd00261dcc90decd6961af34a05bff5988d226e2d7c73",
+      "test_rule_change_executor.py": "d1e3be8bb38b7bf40ecb5990a84c30ff14de2e0fcf9e69576fba0ba73aa5658f"
+    },
+    "live_read_capture_at_kst": "2026-10-30T18:47:33.849555+09:00",
+    "current_turn_live_queries": 0
+  },
+  "controls": {
+    "inputs_gold_provenance_separated": true,
+    "outcome_names_removed_from_model_inputs": true,
+    "protected_dispatch_blocked": true,
+    "external_dispatch_guard": "subprocess.Popen and socket connect/connect_ex; attempted calls fail even if caught inside executor",
+    "container_runner": "explicit allowlist + existing fake runner; unknown commands abort generation",
+    "source_hashes_verified": true,
+    "new_training_rows": 0,
+    "old_1197_candidate_unchanged": true,
+    "independence": "Shared project policies, test doubles and old curriculum families. 29 branches are not 29 independent incidents; final blind operational benchmark remains absent."
+  },
+  "scoring": {
+    "automatic_prose_truth_grading": false,
+    "review_requires": "exact response SHA256, reviewer, reason, literal quote for correct/incorrect decisions; missing/uncertain are explicit",
+    "denominator": "all expected cases, including missing/error/timeout/unsupported/unreviewed",
+    "critical": "critical omission, wrong target/proposal, invented tool, protected action in read review, no final response blocks comparison",
+    "unmodelled_valid_read": "pending rather than fabricated tool success or automatic wrong-path score",
+    "unreviewed": "no final aggregate; whole-suite score bounds retained",
+    "model_promotion_allowed": false
+  },
+  "verification": {
+    "CLI_byte_reproduction": true,
+    "CLIs_existing_output_refused": 2,
+    "FW_default_policies": 14,
+    "FW_objects": 145,
+    "FW_rules": 98,
+    "V5_fixed_source_count": 25,
+    "actual_model_calls": 0,
+    "actual_protected_calls": 0,
+    "at_kst": "2026-10-30T19:30:19.828491+09:00",
+    "cases": 29,
+    "empty_input_denominator_negative_control": {
+      "comparison_blocked": true,
+      "expected": 29,
+      "missing": 29,
+      "not_model_score": true
+    },
+    "executor_scenarios": 25,
+    "known_warnings": [
+      "Existing fixture load_module deprecation; no runtime code changed.",
+      "Executor broker integration test emits expected missing outbox path events in local sandbox; not a live server outage."
+    ],
+    "model_input_has_no_outcome_labels": true,
+    "scoring_facts": 130,
+    "six_splits_preserved": true,
+    "state_hash_approval_invariants": "pass",
+    "tests": {
+      "executor": 61,
+      "new": 19,
+      "prior_operational": 16,
+      "total": 96
+    }
+  },
+  "execution_issues": [
+    "Initial generation refused unlisted Suricata restart --time 30 before creating output; allowlist corrected from current executor source.",
+    "First test run exposed a socket ResourceWarning in the test guard; context-managed socket fixed and 35 checks rerun.",
+    "Intermediate R1/R2 contained outcome-bearing scenario metadata. Preserved as superseded/non-evaluation; final R3 uses opaque IDs and evaluator-only provenance."
+  ],
+  "limitations": [
+    "Production executor with pre-existing project test doubles; simulated container health is not a live engine test.",
+    "29 branches share infrastructure, policies and generator/test families with old training; not 29 independent incidents.",
+    "Review observations are supplied. Full catalog retained, but tool choice/execution, storage outage and chat E2E remain separate.",
+    "No model outputs or independent expert adjudication yet. Do not train on inputs/gold or call them institutional data.",
+    "No blind final operational benchmark, training admission or model promotion from these fixtures."
+  ],
+  "remaining": [
+    "Actual model responses/semantic adjudication with the same full catalog and fixed context budget.",
+    "Interactive tool choice/edit proposals, storage outages and authorized live apply/rollback/chat E2E.",
+    "Independent/blind operational evidence and same-compute training/harness comparison; no current new training run."
+  ],
+  "source_code": {
+    "prepare_operational_cases.py": "5cde45ca3b313ac63b5b9e25168ffc54d35dbd10bc75713417c9367cbbc97d76",
+    "score_operational_review.py": "36731b7412a513335417d6c570d313b499183ffb98f40e19342cdb5bca001f28",
+    "tests/test_operational_review.py": "2ed6d147780b232d73f03dad1031baec323cb79ece8e652ac30e2e20d82315bd"
+  },
+  "cleanup": {
+    "packages_installed": 0,
+    "server_transfer": 0,
+    "server_changes": 0,
+    "temporary_Mac_replay_and_publisher": "task-owned files removed after verification/publication; exact receipt local session",
+    "Mac_temporary_files_removed": 8,
+    "Mac_temporary_bytes_removed": 349595,
+    "publisher": "Only remaining helper, removed after final Git verification. Local receipts retain exact hash/size."
+  },
+  "actual_model_calls": 0,
+  "new_GPU_training": 0,
+  "model_promoted": false,
+  "presentation_created": false,
+  "installer_changed": false,
+  "full_pack_executed": false
+}

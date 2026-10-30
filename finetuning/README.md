@@ -1,5 +1,21 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**CAM 벤치마크 후보 구성 — 2026-10-30 KST:** [원장](CAM_BENCHMARK_REVIEW.json). 원본990질문을 고유393입력으로 묶고 `inputs.jsonl`, `gold.jsonl`, `lineage.jsonl`을 분리했다. 입력 원문과990개 출처좌표는 보존하며 정답·시나리오·주석층은 모델 메시지에 추가하지 않는다. 구조화ID54·기타ID294·ID없음45개이며, 이를 순수 원시로그 추론 성능으로 동일시하지 않는다. 전체393개는 학습에서 제외한 평가후보이며 아직 독립최종시험으로 확정하지 않았다. 로컬R1은 초기원장으로 보존하고R2를 최신으로 사용한다(같은393개를 두 번세지 않음).
+
+```sh
+python3 -B finetuning/prepare_cam_benchmark.py --directory /path/pinned-cam-files \
+  --output finetuning/data-cam-benchmark-NEW
+python3 -B finetuning/score_cam_benchmark.py --bundle finetuning/data-cam-benchmark-NEW \
+  --predictions /path/predictions.jsonl --output /new/cam-score.json
+python3 -B -m unittest discover -s finetuning/tests -p 'test_cam*.py'
+```
+
+입력은 고정SHA의 `llm_queries.json`·`labels.json`·`LICENSE`가 필요하다. 상류 모델응답은 정답으로 쓰지 않는다. 원로그의CC BY4.0과 저장소GPL-3.0을 구분해 고지를 보존했다. 예측파일은 각행 `{"id":"CAM-…","response":"모델의 원문 JSON 문자열"}` 형식이다. 원제공 질문대로 고유기법10개·정해진confidence·빈칸이아닌explanation을 검사한다. 누락/형식실패는0점과누락건수에남기고, 중복/알수없는ID는거부한다. 출력파일은덮어쓰지않으며자동모델호출/승격/학습편입은없다.
+
+`1-13` 단계의5개고유질문은 정답13개라 top10의 exact recall 상한이10/13이다. 이는순위과제의제약이며전부일치실패를모델의보안누락으로잘못감점하지않는다. 기법순위top1·recall@1/3/5/10·MRR와상위기법매칭을분리하고, 같은단계내고유입력평균→시나리오내단계평균→7시나리오평균을주지표로쓴다. 입력수평균도별도제공한다. 요청된10후보중정답외선택을곧바로환각으로세지않고confidence정확도·설명사실성·운영능력은자동채점하지않는다. 무응답393개를입력한0점확인은검사기의음성대조시험이며모델점수가아니다.
+
+`check_cam_benchmark_tokens.py`는 기존고정모델/manifest·번들의해시를검증한후CPU에서문맥크기를실측한다. 입력최대14,069토큰,답변512예약시14,581토큰이므로16K에서모두수용한다. 4K초과90개·8K초과25개를임의로자르지않는다. transformers5.4.0의BatchEncoding 필드수를세던초기검사결과는폐기했고,본문보존(템플릿의바깥공백정리4개허용)·명시적인flat IDs·두토큰화방식전수일치로수정했다. 실제응답출력길이/서버문맥설정은별도확인대상이다. 소스/원장만pack허용목록에추가했으며원본·평가정답·후보본문은자동학습pack에서제외한다.
+
 **실제 토큰·과거 자료 검사 완료 — 2026-10-30 KST:** [후속 원장](SOC_OBSERVATION_GATE_REVIEW.json)은 R2의 고정 dialogue/lineage SHA에 대한 실제 Qwen 검사와 V4/V5 대조를 담는다. 17/17개 통과, 최대2,876토큰·답변절단0·입력/패딩 마스크 정합이다. 기존 R2의 `tokenizer_length_verified:false`는 생성 당시 기록으로 보존하고, 이 별도 증빙을 최신 결과로 참조한다. 원본 모델 메타데이터11파일도 고정 manifest와 일치했다. Thor 기존 이미지/venv에서 CPU만 사용했고 Ollama를 중지하지 않았다.
 
 `audit_soc_observation_history.py`는 V4/V5 고정원장에 맞는 6분할·2사례파일의 해시/건수/ID/분할을 확인한 뒤 기존 자료의 첫 질문과 환경을 비교한다. 실제39파일44,630행은 중복판본을 포함한 행 방문 수이며 고유사건 수가 아니다. 첫 질문 완전일치0, AIT9후보는 V4 학습환경5개/78사례와 같은환경이다. 기존 검증/시험환경 충돌0이다. V4 원본54행의 좌표/해시 비교는 처리된 ADS행과 별개이며 전체의미·원천독립성을 보장하지 않는다. Linux-APT가 V4/V5의 명시된 출처목록에 없다는 사실도 모든이전자료/사전학습에 없었다는 의미가 아니다.

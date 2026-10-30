@@ -1,0 +1,338 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T17:02:31.690153+09:00",
+  "status": "benchmark_candidate_prepared_not_training_or_final_test",
+  "sources": [
+    {
+      "file": "README.md",
+      "bytes": 16820,
+      "sha256": "cc135060e31c6ee6aed80a129a4d06fc67739854a4946b2bd37ef1782707cdc6",
+      "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/README.md"
+    },
+    {
+      "file": "LICENSE",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/LICENSE"
+    },
+    {
+      "file": "labels.json",
+      "bytes": 791024,
+      "sha256": "cc27fee6d78b6de3d5d2172b334269bbcd9747dac80b6882e8982229b2540afe",
+      "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/labels.json"
+    },
+    {
+      "file": "llm_queries.json",
+      "bytes": 6884757,
+      "sha256": "ab7f948e9019cacf0fa94236e1303c5523a39d87a4253c2802ea8fd60d2f7ee5",
+      "url": "https://raw.githubusercontent.com/ait-aecid/attack-manifestations-interpretation/42bbd2cf8409f64a1e6c8fc936c91725e8c558b2/llm_queries.json"
+    }
+  ],
+  "original_log_version": "CAM-LDS v1 / DOI10.5281/zenodo.18390561",
+  "original_log_license": "CC BY 4.0",
+  "repository_license": "GPL-3.0; preserved with query/label derivatives, not replaced by the log license",
+  "publication": "https://doi.org/10.1007/s10207-026-01318-x",
+  "manifest": {
+    "schema": 1,
+    "prepared_at_kst": "2026-10-30T16:52:12.925034+09:00",
+    "status": "reserved_benchmark_candidate_not_final_test",
+    "counts": {
+      "source_queries": 990,
+      "unique_inputs": 393,
+      "source_repetitions_collapsed": 597,
+      "scenario_steps": 198,
+      "scenario_groups": 7,
+      "inputs_by_scenario": {
+        "cam-scenario:1": 143,
+        "cam-scenario:3": 90,
+        "cam-scenario:2": 41,
+        "cam-scenario:6": 86,
+        "cam-scenario:4": 19,
+        "cam-scenario:7": 12,
+        "cam-scenario:5": 2
+      },
+      "inputs_by_stratum": {
+        "other_literal_technique_identifier": 294,
+        "structured_technique_identifier": 54,
+        "no_literal_technique_identifier": 45
+      },
+      "exact_gold_identifier_visible_inputs": 12,
+      "max_labels_per_input": 13,
+      "inputs_with_more_than_10_provider_labels": 5,
+      "label_count_distribution": {
+        "1": 288,
+        "2": 78,
+        "3": 17,
+        "13": 5,
+        "4": 5
+      },
+      "provider_top_k_request": 10,
+      "training_admitted": 0,
+      "independent_final_evaluation_records": 0,
+      "original_user_prompt_bytes_unchanged": true,
+      "normal_vs_attack_confidence_accuracy_supported": false
+    },
+    "source_commit": "42bbd2cf8409f64a1e6c8fc936c91725e8c558b2",
+    "source_sha256": {
+      "labels.json": "cc27fee6d78b6de3d5d2172b334269bbcd9747dac80b6882e8982229b2540afe",
+      "llm_queries.json": "ab7f948e9019cacf0fa94236e1303c5523a39d87a4253c2802ea8fd60d2f7ee5",
+      "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    "outputs": {
+      "inputs.jsonl": {
+        "sha256": "d6900d46d0a82cde74469a72e3adeef82e91e2655703fcd6f2bde8b34064d50d",
+        "bytes": 2622902
+      },
+      "gold.jsonl": {
+        "sha256": "7b1525fb24c0cc3a61308872fff0ea90a907e1f0adcf380e70939957e05301bc",
+        "bytes": 53109
+      },
+      "lineage.jsonl": {
+        "sha256": "3c18d9c3cb6ff6e5f026e4cc621b911dd1708355ac4bc7455cbae0f67783ac6f",
+        "bytes": 243778
+      },
+      "SOURCE_NOTICE.txt": {
+        "sha256": "b2481aba0ae9fa4a7b2d4feeaec3a8efcce920f63b5cd3023e7059f1c6878e05",
+        "bytes": 828
+      },
+      "UPSTREAM_LICENSE.txt": {
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "bytes": 35149
+      }
+    },
+    "builder_sha256": "a2b33a79d1085fa4c49760342f20bd574c188b003fc363eee25bf612b4dd9f2b",
+    "scoring_contract": {
+      "request": "Preserved provider JSON: exactly10 unique ranked techniques, confidence enum and nonempty explanation.",
+      "main_aggregation": "Each unique prompt once; equal mean within each step, then equal step means within each scenario, then equal scenario means.",
+      "strata": "Report structured IDs, other literal IDs, and no literal IDs separately; none proves pure raw-log reasoning.",
+      "metrics": [
+        "top1_hit",
+        "exact_recall_at_1_3_5_10",
+        "parent_recall_at_1_3_5_10",
+        "label_mean_reciprocal_rank",
+        "omitted_provider_labels_at10",
+        "response_coverage",
+        "schema_failures"
+      ],
+      "missing_or_invalid": "Zero credit and all provider labels counted omitted; never silently skip.",
+      "extra_ranked_choices": "The prompt explicitly requests10 choices; non-gold choices are not automatically hallucinations.",
+      "over_10_reference_labels": "Report the attainable recall ceiling and unavoidable omissions separately; do not penalize impossible exhaustive coverage as a model omission.",
+      "prohibited_claims": [
+        "benign detection accuracy",
+        "SOC approval/write/rollback ability",
+        "new independent final-test score",
+        "institution-certified Korean operator decisions"
+      ]
+    },
+    "remaining": [
+      "Actual tokenizer/context coverage without truncation",
+      "Historical whole-source overlap and held-out episode review",
+      "Freeze model/harness/runtime before final use; curator audit is not blindness",
+      "Separate operational MCP/approval/write/rollback evaluation"
+    ]
+  },
+  "preparation": {
+    "local_latest_bundle": "data-cam-benchmark-20261030-r2",
+    "manifest_sha256": "bf8f2804e1941b8abaeae8c26261887d1ec50b638717e4e36c3665f4002cb93b",
+    "R1_preserved": "Earlier local manifest without top10-capacity findings; same393 inputs, not another393 examples.",
+    "gold_separate_from_model_messages": true,
+    "all_original_prompt_bytes_preserved": true,
+    "upstream_model_answers_used_as_gold": false,
+    "new_operator_answers_authored": 0
+  },
+  "ranking_limit": {
+    "affected_unique_inputs": 5,
+    "affected_scenario_steps": [
+      "1-13"
+    ],
+    "labels_per_affected_input": 13,
+    "requested_ranked_outputs": 10,
+    "best_possible_exact_recall_for_these_inputs": 0.7692307692307693,
+    "unavoidable_omitted_labels_per_input": 3,
+    "policy": "Valid top10 ranking task, but exhaustive-label completeness is impossible. Report the ceiling; do not blame the model for the cap or call all nine distractors hallucinations.",
+    "coordinates": [
+      {
+        "id": "CAM-1cdaf9943bd6b17be563ac1e",
+        "scenario_step": "1-13",
+        "provider_label_count": 13
+      },
+      {
+        "id": "CAM-28d64b5ec664b85b1277b086",
+        "scenario_step": "1-13",
+        "provider_label_count": 13
+      },
+      {
+        "id": "CAM-32e33ca1d3776ec8db355d83",
+        "scenario_step": "1-13",
+        "provider_label_count": 13
+      },
+      {
+        "id": "CAM-386733d98227cb053af40cca",
+        "scenario_step": "1-13",
+        "provider_label_count": 13
+      },
+      {
+        "id": "CAM-45a30947f0432c9de7c3fc2c",
+        "scenario_step": "1-13",
+        "provider_label_count": 13
+      }
+    ]
+  },
+  "tokenization": {
+    "inputs": 393,
+    "completion_reserve_tokens": 512,
+    "max_prompt_tokens": 14069,
+    "max_required_context": 14581,
+    "rendered_and_direct_token_ids_equal": true,
+    "inputs_with_template_outer_whitespace_trimmed": 4,
+    "context_budget_analysis": {
+      "4096": {
+        "fit": 303,
+        "over": 90
+      },
+      "8192": {
+        "fit": 368,
+        "over": 25
+      },
+      "16384": {
+        "fit": 393,
+        "over": 0
+      },
+      "32768": {
+        "fit": 393,
+        "over": 0
+      }
+    },
+    "scope": "Hypothetical context budgets; not a claim about live server settings or actual completion length.",
+    "checked_at_kst": "2026-10-30T16:59:51.361331+09:00",
+    "actual_tokenizer": true,
+    "model": "Qwen/Qwen3.6-35B-A3B",
+    "revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "tokenizer_metadata_sha256": {
+      "chat_template.jinja": "e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259",
+      "config.json": "93a4693fa9d8392fbfccd4b3c9873f4bfdcb14fdede978b123d07d19675efe99",
+      "configuration.json": "c1b09db419119513247e9b8b912c4b9897106c9b20c6cada7e107d993c5435eb",
+      "generation_config.json": "e70c136c1b78ddc1fb0905bac8e733a4dc448d4f852a5dd75143fffc70be550e",
+      "merges.txt": "a9d356d7bdf1ef4949e3e748e95b8e10ad9d4e2e838eddc38a0a7b6b94d1db8d",
+      "model.safetensors.index.json": "41b9356101ebf8e7519e150dc811f80c4226e727301fbb032b890f006ed0be83",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+      "tokenizer_config.json": "5186f0defcd7f232382c7f0aebcd2252d073bb921ab240e407b7ae8745d2b29b",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003"
+    },
+    "input_sha256": "d6900d46d0a82cde74469a72e3adeef82e91e2655703fcd6f2bde8b34064d50d",
+    "bundle_manifest_sha256": "bf8f2804e1941b8abaeae8c26261887d1ec50b638717e4e36c3665f4002cb93b",
+    "checker_sha256": "f7299e9c4dd7b61515f1434ca0c96bd6fa896d6ee57003c3c75d255b5a745821",
+    "model_generation": false,
+    "GPU_training": false
+  },
+  "token_report_sha256": "3e543ed7bdc79e8d6c429ced998f8c996c4931f9a7c52c57dbb70b1dd41cc016",
+  "runtime": {
+    "image": "nvcr.io/nvidia/pytorch@sha256:ace9a848c0ae543317e3c4763b6b4248961c47902625abfe3c77a0fb931c50fb",
+    "configuration": {
+      "Runtime": "runc",
+      "DeviceRequests": null,
+      "NetworkMode": "none",
+      "ReadonlyRootfs": true,
+      "Memory": 8589934592,
+      "NanoCpus": 4000000000
+    },
+    "started_at_kst": "2026-10-30T16:59:41.312034+09:00",
+    "finished_at_kst": "2026-10-30T16:59:52.409726+09:00",
+    "exit_code": 0,
+    "OOMKilled": false,
+    "ollama_active_before_and_after": true,
+    "service_changes_requested": 0,
+    "packages_installed": 0
+  },
+  "fixed_checker_issues": [
+    {
+      "issue": "Initial tokenize=True returned BatchEncoding with2fields under transformers5.4.0; len(mapping) incorrectly appeared as2tokens.",
+      "disposition": "Initial token-check-shape-bug.json invalidated and retained; never used as admission/fit evidence. Explicit flat token IDs now required."
+    },
+    {
+      "issue": "Strict substring preservation rejected4provider prompts because the pinned template strips outer whitespace.",
+      "disposition": "Fail-closed run retained. Permit only outer whitespace normalization and prove render+encode equals direct tokenize(return_dict=False) for every input; original bundle bytes unchanged."
+    }
+  ],
+  "runtime_library_versions": {
+    "transformers": "5.4.0",
+    "tokenizers": "0.22.2",
+    "default_tokenized_type": "BatchEncoding",
+    "default_keys": [
+      "input_ids",
+      "attention_mask"
+    ]
+  },
+  "independent_check": {
+    "all_source_coordinates_exactly_once": 990,
+    "unique_inputs_checked": 393,
+    "gold_original_label_matches": true,
+    "historical_files": 39,
+    "historical_row_visits": 44630,
+    "first_prompt_matches": [],
+    "not_a_model_result": true
+  },
+  "verification": {
+    "cam_regressions": 28,
+    "new_benchmark_regressions": 17,
+    "existing_audit_regressions": 11,
+    "all990_coordinates_original_prompt_and_label_verified": true,
+    "cli_reproduction_except_timestamp": true,
+    "existing_outputs_refused": true,
+    "empty_prediction_control": {
+      "inputs": 393,
+      "missing_responses": 393,
+      "score_and_coverage": 0,
+      "model_result": false
+    },
+    "frozen_R8_sources_unchanged": 25,
+    "pack_initial_allowlist_paths": 128,
+    "private_ignore_checked": true,
+    "new_content_credential_matches": 0
+  },
+  "remote_cleanup": {
+    "at_kst": "2026-10-30T17:01:11.535198+09:00",
+    "removed_temporary_files": 20,
+    "removed_temporary_bytes": 3083679,
+    "all_task_containers_absent": true,
+    "retained_report_files": 10,
+    "retained_relative_path": "cam-benchmark-tokens-20261030"
+  },
+  "role_scope": {
+    "supported_subtask": "ATT&CK ranking from supplied historical sensor/log evidence",
+    "not_demonstrated": [
+      "benign-vs-attack detection",
+      "full SOC analyst competence",
+      "incident closure",
+      "MCP tool choice and invocation",
+      "approval/write/rollback",
+      "live server knowledge"
+    ]
+  },
+  "decisions": {
+    "training_admitted": 0,
+    "model_generations": 0,
+    "independent_final_evaluation_records": 0,
+    "recommended_comparison_context_budget": 16384,
+    "completion_reserve_assumption": 512,
+    "live_runtime_changed": false,
+    "confidence_or_explanation_quality_automatically_scored": false,
+    "model_promotion_allowed": false
+  },
+  "remaining": [
+    "Whole-source/episode overlap and benchmark partition review before any independent final-evaluation claim.",
+    "Freeze learning mixture and a separate unused final operational evaluation; CAM is a reserved candidate and cannot serve as all-role evidence.",
+    "Freeze equal model/harness parameters and run controlled quality comparisons; a512token output allowance is an assumption, not measured completion sufficiency.",
+    "Keep source-ID strata, ranking ceilings, missing responses and case/scenario weighting visible; do not average away security-critical operational omissions."
+  ],
+  "mac_cleanup": {
+    "at_kst": "2026-10-30T17:05:08.844656+09:00",
+    "removed_temporary_files": 21,
+    "removed_temporary_bytes": 16552003,
+    "publish_helper_pending_until_git_receipt": true,
+    "source_and_benchmark_project_artifacts_preserved": true,
+    "packages_installed": 0
+  }
+}

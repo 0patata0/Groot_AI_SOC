@@ -1102,5 +1102,13 @@
     "new_training": 0,
     "presentation_content_changes": 0,
     "full_pack_generated": false
+  },
+  "benchmark_followup": {
+    "review": "CAM_BENCHMARK_REVIEW.json",
+    "at_kst": "2026-10-30T17:02:31.690153+09:00",
+    "unique_inputs": 393,
+    "tokenization_verified": true,
+    "training_admitted": 0,
+    "independent_final_evaluation_records": 0
   }
 }

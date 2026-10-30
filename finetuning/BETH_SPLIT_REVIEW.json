@@ -1,0 +1,798 @@
+{
+  "schema": 1,
+  "reviewed_at_kst": "2026-10-30T14:01:09.546820+09:00",
+  "status": "official_splits_audited_not_admitted_training",
+  "source": {
+    "provider": "Highnam et al.",
+    "dataset_url": "https://www.kaggle.com/datasets/katehighnam/beth-dataset",
+    "version": 3,
+    "data_license": "CC0: Public Domain; provider API verified in SOC_EXTRA_CORPORA_REVIEW.json",
+    "paper_url": "https://ceur-ws.org/Vol-3095/paper1.pdf",
+    "paper_venue": "CAMLIS2021",
+    "paper_license": "CC-BY4.0",
+    "paper_tables_referenced": [
+      2,
+      3,
+      4
+    ]
+  },
+  "acquisition": {
+    "schema": 1,
+    "source": "BETH",
+    "version": 3,
+    "metadata_url": "https://www.kaggle.com/api/v1/datasets/list/katehighnam/beth-dataset?datasetVersionNumber=3",
+    "metadata_sha256": "225f874ee8cecafe7076f2cdf5b851f289b7430e2f9e7a454e7554a8eb38fd2d",
+    "files": [
+      {
+        "partition": "train",
+        "file": "train.download",
+        "member": "labelled_training_data.csv",
+        "url": "https://www.kaggle.com/api/v1/datasets/download/katehighnam/beth-dataset/labelled_training_data.csv?datasetVersionNumber=3",
+        "format": "zip",
+        "download_bytes": 10005965,
+        "download_sha256": "63cb309aca913bb4883a19f5f17caac4d78edd84f4aa034d4c614f5bdf605350",
+        "raw_bytes": 197348537,
+        "provider_size_verified": true,
+        "provider_crc32": 236768113,
+        "header": "timestamp,processId,threadId,parentProcessId,userId,mountNamespace,processName,hostName,eventId,eventName,stackAddresses,argsNum,returnValue,args,sus,evil"
+      },
+      {
+        "partition": "validation",
+        "file": "validation.download",
+        "member": "labelled_validation_data.csv",
+        "url": "https://www.kaggle.com/api/v1/datasets/download/katehighnam/beth-dataset/labelled_validation_data.csv?datasetVersionNumber=3",
+        "format": "zip",
+        "download_bytes": 2120177,
+        "download_sha256": "af1d41f3e282be60577af630f1ffcafc3d7a7016af2b3ec98ebfdb1bf16a7ec1",
+        "raw_bytes": 45417796,
+        "provider_size_verified": true,
+        "provider_crc32": 1987600561,
+        "header": "timestamp,processId,threadId,parentProcessId,userId,mountNamespace,processName,hostName,eventId,eventName,stackAddresses,argsNum,returnValue,args,sus,evil"
+      },
+      {
+        "partition": "test",
+        "file": "test.download",
+        "member": "labelled_testing_data.csv",
+        "url": "https://www.kaggle.com/api/v1/datasets/download/katehighnam/beth-dataset/labelled_testing_data.csv?datasetVersionNumber=3",
+        "format": "zip",
+        "download_bytes": 2047510,
+        "download_sha256": "98f0b4290b894218aab8189e7ce73f4b4169d300b61ddca2a59e950bf4aff08d",
+        "raw_bytes": 57289002,
+        "provider_size_verified": true,
+        "provider_crc32": 1685184207,
+        "header": "timestamp,processId,threadId,parentProcessId,userId,mountNamespace,processName,hostName,eventId,eventName,stackAddresses,argsNum,returnValue,args,sus,evil"
+      },
+      {
+        "partition": "reference",
+        "file": "reference.download",
+        "member": "labelled_2021may-ubuntu.csv",
+        "url": "https://www.kaggle.com/api/v1/datasets/download/katehighnam/beth-dataset/labelled_2021may-ubuntu.csv?datasetVersionNumber=3",
+        "format": "zip",
+        "download_bytes": 1846705,
+        "download_sha256": "cd3d812c06ca192516cfbf015070ef8700f5308745f5110b4b68ce03f2463c9c",
+        "raw_bytes": 41272813,
+        "provider_size_verified": true,
+        "provider_crc32": 1322054265,
+        "header": "timestamp,processId,parentProcessId,userId,processName,hostName,eventId,eventName,argsNum,returnValue,args,sus,evil"
+      }
+    ],
+    "provider_cryptographic_checksums_available": false
+  },
+  "download_bytes": 16020357,
+  "decoded_bytes_streamed": 341328148,
+  "decoded_originals_saved_to_disk": false,
+  "official_split_rows": 1141078,
+  "additional_reference_rows": 199222,
+  "official_split_host_name_counts": {
+    "train": 8,
+    "validation": 4,
+    "test": 1
+  },
+  "official_split_distinct_host_names": 12,
+  "result": {
+    "schema": 1,
+    "checked_at_kst": "2026-10-30T13:57:51.614358+09:00",
+    "source": "BETH v3",
+    "shared_feature_columns": [
+      "args",
+      "argsNum",
+      "eventId",
+      "eventName",
+      "hostName",
+      "parentProcessId",
+      "processId",
+      "processName",
+      "returnValue",
+      "timestamp",
+      "userId"
+    ],
+    "files": {
+      "train": {
+        "rows": 763144,
+        "columns": [
+          "timestamp",
+          "processId",
+          "threadId",
+          "parentProcessId",
+          "userId",
+          "mountNamespace",
+          "processName",
+          "hostName",
+          "eventId",
+          "eventName",
+          "stackAddresses",
+          "argsNum",
+          "returnValue",
+          "args",
+          "sus",
+          "evil"
+        ],
+        "feature_columns": [
+          "args",
+          "argsNum",
+          "eventId",
+          "eventName",
+          "hostName",
+          "mountNamespace",
+          "parentProcessId",
+          "processId",
+          "processName",
+          "returnValue",
+          "stackAddresses",
+          "threadId",
+          "timestamp",
+          "userId"
+        ],
+        "projection_omits": [
+          "mountNamespace",
+          "stackAddresses",
+          "threadId"
+        ],
+        "label_pairs_sus_evil": {
+          "10": 1269,
+          "00": 761875
+        },
+        "hosts": {
+          "ip-10-100-1-120": 95747,
+          "ip-10-100-1-173": 74593,
+          "ip-10-100-1-28": 75648,
+          "ip-10-100-1-34": 73295,
+          "ip-10-100-1-55": 75208,
+          "ip-10-100-1-57": 162378,
+          "ip-10-100-1-79": 15775,
+          "ubuntu": 190500
+        },
+        "empty_fields": {},
+        "raw_bytes": 197348537,
+        "raw_sha256": "18ceb80a7eb4b71296df13e3967e074a81ed5b80c2212b044c061ac81a1797e2",
+        "container_sha256": "63cb309aca913bb4883a19f5f17caac4d78edd84f4aa034d4c614f5bdf605350",
+        "zip_crc_checked_on_full_read": true,
+        "uptime_ranges_by_host": {
+          "ip-10-100-1-120": [
+            "134.392931",
+            "3954.587643"
+          ],
+          "ip-10-100-1-173": [
+            "135.020881",
+            "3828.047985"
+          ],
+          "ip-10-100-1-28": [
+            "132.630256",
+            "3833.186367"
+          ],
+          "ip-10-100-1-34": [
+            "274.801843",
+            "3931.835358"
+          ],
+          "ip-10-100-1-55": [
+            "272.61814",
+            "3930.395619"
+          ],
+          "ip-10-100-1-57": [
+            "133.667448",
+            "3931.489979"
+          ],
+          "ip-10-100-1-79": [
+            "135.190437",
+            "878.725637"
+          ],
+          "ubuntu": [
+            "132.560721",
+            "3920.464289"
+          ]
+        },
+        "within_file": {
+          "full_features": {
+            "unique_signatures": 763144,
+            "repeated_rows_beyond_first": 0,
+            "conflicting_label_signatures": 0
+          },
+          "shared_projection": {
+            "unique_signatures": 763144,
+            "repeated_rows_beyond_first": 0,
+            "conflicting_label_signatures": 0
+          }
+        }
+      },
+      "validation": {
+        "rows": 188967,
+        "columns": [
+          "timestamp",
+          "processId",
+          "threadId",
+          "parentProcessId",
+          "userId",
+          "mountNamespace",
+          "processName",
+          "hostName",
+          "eventId",
+          "eventName",
+          "stackAddresses",
+          "argsNum",
+          "returnValue",
+          "args",
+          "sus",
+          "evil"
+        ],
+        "feature_columns": [
+          "args",
+          "argsNum",
+          "eventId",
+          "eventName",
+          "hostName",
+          "mountNamespace",
+          "parentProcessId",
+          "processId",
+          "processName",
+          "returnValue",
+          "stackAddresses",
+          "threadId",
+          "timestamp",
+          "userId"
+        ],
+        "projection_omits": [
+          "mountNamespace",
+          "stackAddresses",
+          "threadId"
+        ],
+        "label_pairs_sus_evil": {
+          "00": 188181,
+          "10": 786
+        },
+        "hosts": {
+          "ip-10-100-1-129": 15026,
+          "ubuntu": 143296,
+          "ip-10-100-1-165": 16010,
+          "ip-10-100-1-169": 14635
+        },
+        "empty_fields": {},
+        "raw_bytes": 45417796,
+        "raw_sha256": "5a08ec47060af1cb8bb24ba632b5db0c2b1ac783aedc72693247b87c1170192e",
+        "container_sha256": "af1d41f3e282be60577af630f1ffcafc3d7a7016af2b3ec98ebfdb1bf16a7ec1",
+        "zip_crc_checked_on_full_read": true,
+        "uptime_ranges_by_host": {
+          "ip-10-100-1-129": [
+            "124.439221",
+            "766.470795"
+          ],
+          "ubuntu": [
+            "128.57564",
+            "778.14605"
+          ],
+          "ip-10-100-1-165": [
+            "131.865118",
+            "773.351605"
+          ],
+          "ip-10-100-1-169": [
+            "141.447232",
+            "778.146811"
+          ]
+        },
+        "within_file": {
+          "full_features": {
+            "unique_signatures": 188967,
+            "repeated_rows_beyond_first": 0,
+            "conflicting_label_signatures": 0
+          },
+          "shared_projection": {
+            "unique_signatures": 188967,
+            "repeated_rows_beyond_first": 0,
+            "conflicting_label_signatures": 0
+          }
+        }
+      },
+      "test": {
+        "rows": 188967,
+        "columns": [
+          "timestamp",
+          "processId",
+          "threadId",
+          "parentProcessId",
+          "userId",
+          "mountNamespace",
+          "processName",
+          "hostName",
+          "eventId",
+          "eventName",
+          "stackAddresses",
+          "argsNum",
+          "returnValue",
+          "args",
+          "sus",
+          "evil"
+        ],
+        "feature_columns": [
+          "args",
+          "argsNum",
+          "eventId",
+          "eventName",
+          "hostName",
+          "mountNamespace",
+          "parentProcessId",
+          "processId",
+          "processName",
+          "returnValue",
+          "stackAddresses",
+          "threadId",
+          "timestamp",
+          "userId"
+        ],
+        "projection_omits": [
+          "mountNamespace",
+          "stackAddresses",
+          "threadId"
+        ],
+        "label_pairs_sus_evil": {
+          "00": 17508,
+          "11": 158432,
+          "10": 13027
+        },
+        "hosts": {
+          "ip-10-100-1-217": 188967
+        },
+        "empty_fields": {},
+        "raw_bytes": 57289002,
+        "raw_sha256": "e56aad64df13b9dde7be2d333f1f6b7da7f41596cb9b4105deb0fd051900706b",
+        "container_sha256": "98f0b4290b894218aab8189e7ce73f4b4169d300b61ddca2a59e950bf4aff08d",
+        "zip_crc_checked_on_full_read": true,
+        "uptime_ranges_by_host": {
+          "ip-10-100-1-217": [
+            "129.050634",
+            "496.629091"
+          ]
+        },
+        "within_file": {
+          "full_features": {
+            "unique_signatures": 188967,
+            "repeated_rows_beyond_first": 0,
+            "conflicting_label_signatures": 0
+          },
+          "shared_projection": {
+            "unique_signatures": 188967,
+            "repeated_rows_beyond_first": 0,
+            "conflicting_label_signatures": 0
+          }
+        }
+      },
+      "reference": {
+        "rows": 199222,
+        "columns": [
+          "timestamp",
+          "processId",
+          "parentProcessId",
+          "userId",
+          "processName",
+          "hostName",
+          "eventId",
+          "eventName",
+          "argsNum",
+          "returnValue",
+          "args",
+          "sus",
+          "evil"
+        ],
+        "feature_columns": [
+          "args",
+          "argsNum",
+          "eventId",
+          "eventName",
+          "hostName",
+          "parentProcessId",
+          "processId",
+          "processName",
+          "returnValue",
+          "timestamp",
+          "userId"
+        ],
+        "projection_omits": [],
+        "label_pairs_sus_evil": {
+          "00": 199222
+        },
+        "hosts": {
+          "ubuntu": 199222
+        },
+        "empty_fields": {},
+        "raw_bytes": 41272813,
+        "raw_sha256": "9d12e29b80b586278f802f46e832ce87d6a64e98966e54ee25f7fd9c91913de4",
+        "container_sha256": "cd3d812c06ca192516cfbf015070ef8700f5308745f5110b4b68ce03f2463c9c",
+        "zip_crc_checked_on_full_read": true,
+        "uptime_ranges_by_host": {
+          "ubuntu": [
+            "123.745986",
+            "18881.747393"
+          ]
+        },
+        "within_file": {
+          "full_features": {
+            "unique_signatures": 199221,
+            "repeated_rows_beyond_first": 1,
+            "conflicting_label_signatures": 0
+          },
+          "shared_projection": {
+            "unique_signatures": 199221,
+            "repeated_rows_beyond_first": 1,
+            "conflicting_label_signatures": 0
+          }
+        }
+      }
+    },
+    "pairs": [
+      {
+        "partitions": [
+          "train",
+          "validation"
+        ],
+        "shared_host_names": [
+          "ubuntu"
+        ],
+        "full_features": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        },
+        "shared_projection": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        }
+      },
+      {
+        "partitions": [
+          "train",
+          "test"
+        ],
+        "shared_host_names": [],
+        "full_features": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        },
+        "shared_projection": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        }
+      },
+      {
+        "partitions": [
+          "train",
+          "reference"
+        ],
+        "shared_host_names": [
+          "ubuntu"
+        ],
+        "full_features": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        },
+        "shared_projection": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        }
+      },
+      {
+        "partitions": [
+          "validation",
+          "test"
+        ],
+        "shared_host_names": [],
+        "full_features": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        },
+        "shared_projection": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        }
+      },
+      {
+        "partitions": [
+          "validation",
+          "reference"
+        ],
+        "shared_host_names": [
+          "ubuntu"
+        ],
+        "full_features": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        },
+        "shared_projection": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        }
+      },
+      {
+        "partitions": [
+          "test",
+          "reference"
+        ],
+        "shared_host_names": [],
+        "full_features": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        },
+        "shared_projection": {
+          "unique_shared_signatures": 0,
+          "left_rows": 0,
+          "right_rows": 0,
+          "matched_multiplicity": 0,
+          "conflicting_label_signatures": 0
+        }
+      }
+    ],
+    "training_admitted": 0,
+    "model_calls": 0,
+    "scope": "Exact strings after CSV parsing; SHA256 signatures, not semantic/event identity proof.",
+    "limits": [
+      "Shared projection can collapse observations when fields are absent; never call it full-row equality.",
+      "Labels are excluded from fingerprints and remain provider annotations, not certified truth.",
+      "Host names and uptime do not identify capture sessions without boot/capture provenance.",
+      "No timestamp conversion, label repair, deduplication, repartition or training occurs.",
+      "Statistically reviewed official test data is not automatically a new independent final test."
+    ],
+    "manifest_sha256": "f92778f8a2046a05fe37a10064c76c273be27732789654acce2e227ea8c299c2"
+  },
+  "decisions": [
+    {
+      "finding": "All three official splits contain14features and2labels; the separately downloaded May ubuntu file contains11features and2labels.",
+      "decision": "Keep full-schema and shared11feature-projection results separate. Do not invent fields missing from the reference."
+    },
+    {
+      "finding": "No shared full-feature or shared-projection fingerprints between any of four files; no repeated features in three official splits.",
+      "decision": "Exact equality check passes at the defined scope only; semantic independence, actor independence and historical V4/V5 overlap remain unproved."
+    },
+    {
+      "finding": "train and validation both have hostName ubuntu, with overlapping uptime ranges. Distinct host names across official splits total12 although per-split counts sum13.",
+      "decision": "Host-name collision is unresolved, not proof of leakage or proof of independent hosts. Need capture/boot identity; preserve provided splits, no automatic random resplit."
+    },
+    {
+      "finding": "Reference ubuntu file has1 repeated feature row (logical records4533 and20630), identical labels.",
+      "decision": "Keep multiplicity/coordinates; do not count it as a new independent case or discard blindly."
+    },
+    {
+      "finding": "Official train:761875 sus0evil0,1269 sus1evil0; validation:188181 sus0evil0,786 sus1evil0; test:17508 sus0evil0,13027 sus1evil0,158432 sus1evil1.",
+      "decision": "This is an unsupervised-anomaly benchmark split. No provider-evil1 training examples; not a ready-made supervised SOC operator answer corpus."
+    },
+    {
+      "finding": "Test provider-evil prevalence158432/188967 =0.8384109394762048.",
+      "decision": "Always predicting evil scores83.84% accuracy against those labels, with30535 false positives. This calculated trivial baseline is not a model result; report precision/recall, misses and false alarms separately."
+    }
+  ],
+  "verification": {
+    "new_regression_tests_passed": 9,
+    "independent_full_scan": {
+      "at_kst": "2026-10-30T13:58:56.683180+09:00",
+      "algorithm": "Independent DictReader, SHA512 length-framed field/value hashing, in-memory counters; production audit uses CSV reader, JSON/SHA256 and SQLite.",
+      "files": [
+        {
+          "partition": "train",
+          "rows": 763144,
+          "raw_sha_verified": true,
+          "container_sha_crc_verified": true,
+          "labels_verified": true,
+          "host_counts_verified": true,
+          "repeated_coordinates": []
+        },
+        {
+          "partition": "validation",
+          "rows": 188967,
+          "raw_sha_verified": true,
+          "container_sha_crc_verified": true,
+          "labels_verified": true,
+          "host_counts_verified": true,
+          "repeated_coordinates": []
+        },
+        {
+          "partition": "test",
+          "rows": 188967,
+          "raw_sha_verified": true,
+          "container_sha_crc_verified": true,
+          "labels_verified": true,
+          "host_counts_verified": true,
+          "repeated_coordinates": []
+        },
+        {
+          "partition": "reference",
+          "rows": 199222,
+          "raw_sha_verified": true,
+          "container_sha_crc_verified": true,
+          "labels_verified": true,
+          "host_counts_verified": true,
+          "repeated_coordinates": [
+            {
+              "first_logical_record": 4533,
+              "repeated_logical_record": 20630,
+              "independent_signature": "e681d5ee746e6f71b9cb81e3e1afe772df1150a208e1722f39f59509cd82d4b8"
+            }
+          ]
+        }
+      ],
+      "pairs": [
+        {
+          "partitions": [
+            "train",
+            "validation"
+          ],
+          "full_features": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          },
+          "shared_projection": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          }
+        },
+        {
+          "partitions": [
+            "train",
+            "test"
+          ],
+          "full_features": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          },
+          "shared_projection": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          }
+        },
+        {
+          "partitions": [
+            "train",
+            "reference"
+          ],
+          "full_features": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          },
+          "shared_projection": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          }
+        },
+        {
+          "partitions": [
+            "validation",
+            "test"
+          ],
+          "full_features": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          },
+          "shared_projection": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          }
+        },
+        {
+          "partitions": [
+            "validation",
+            "reference"
+          ],
+          "full_features": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          },
+          "shared_projection": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          }
+        },
+        {
+          "partitions": [
+            "test",
+            "reference"
+          ],
+          "full_features": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          },
+          "shared_projection": {
+            "unique_shared_signatures": 0,
+            "left_rows": 0,
+            "right_rows": 0,
+            "matched_multiplicity": 0
+          }
+        }
+      ],
+      "all_matched": true,
+      "training_admitted": 0
+    },
+    "audit_source_sha256": "d535c68158720aa1f639c2451e20a88f324d83a8915a90dbe451efb43329676f",
+    "test_source_sha256": "5c8d056b938511f66d85a7f5e42d7bb43710494046e806654f08a818fa4ed1b9",
+    "production_and_independent_algorithms": "SQLite+JSON/SHA256 vs in-memory counters+length-framed/SHA512; all6file pairs, full/shared modes, counts and repeated coordinates verified.",
+    "provider_cryptographic_checksums_available": false,
+    "container_sha_and_full_zip_crc_and_raw_sha": true,
+    "overwrite_refused": true,
+    "scratch_database_removed": true
+  },
+  "training_admitted": 0,
+  "model_calls": 0,
+  "server_access_this_unit": false,
+  "production_changed": false,
+  "mac_packages_installed": 0,
+  "remaining": [
+    "Capture/boot mapping for ubuntu and DNS SensorId, semantic/source-family and V4/V5 overlap.",
+    "Expert-reviewed incident interpretation and actual operator-tool/approval/write/rollback evidence.",
+    "Actual Qwen tokenizer and new source/incident-independent final evaluation; these official test data are now structurally reviewed."
+  ],
+  "not_run": [
+    "Full training bundle",
+    "GPU training or tokenizer",
+    "Live MCP/Mattermost or attack E2E",
+    "New server installation"
+  ],
+  "cleanup": "Only temporary compressed downloads and local task helpers; delete after validation and preserve URLs, SHA/CRC, source code and local audit evidence."
+}

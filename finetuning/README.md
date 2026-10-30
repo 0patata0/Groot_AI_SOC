@@ -1,5 +1,15 @@
 # SOC 모델 파인튜닝 준비 폴더
 
+**BETH 분할 검사:** `audit_beth_splits.py`는 고정 취득manifest의 ZIP/CSV를 스트림으로 읽어 CRC·SHA·전체행을 검증한다. 원문 특징 전체와 공통11특징 투영을 별도로 대조하고, 라벨을 해시에서 제외하여 상충하는 라벨 때문에 중복이 숨지 않게 한다. 빈칸/0·문자열·반복횟수를 보존하며 학습 편입·라벨 수정·자동분할은 하지 않는다. [실제114만여행·별도원본 검증](BETH_SPLIT_REVIEW.json).
+
+```sh
+python3 -B finetuning/audit_beth_splits.py   --manifest /path/acquisition.json --directory /path/downloads   --scratch /path/task-temp --output /new/path/beth-audit.json
+```
+
+원장의 `acquisition`과 같은 고정파일/해시를 준비하고 출력상위경로·scratch는 미리 만든다. 출력덮어쓰기/해시변경/비정상스키마는 거부한다. 파일전체를 추출하지 않으며 임시SQLite는 종료/오류시 정리한다. 성공종료는 검사완료이며 분할독립/정답/모델품질 보증이 아니다. 원문행·호스트간 중복을 `pairs`에서 확인하고 공유열투영을 전체열일치로 해석하지 않는다. Mac에 새의존성 설치가 필요없다.
+
+공식분할1141078행과5월ubuntu199222행 전체를 별도구현으로 대조했다. 공식파일16열·5월파일13열 차이를 유지한다. 같은호스트명은 같은capture/boot라는 뜻이아니며 uptime을 KST날짜로변환하지 않는다. 9회귀통과·새학습/모델호출0. pack은검사기/원장만추가한다.
+
 **추가 데이터 3종 검토 — 2026-10-30 KST:** CAM-LDS·BETH·RBD24의 기관/학술 출처와 이용 조건을 확인했습니다. CAM-LDS 제공 입력990개는198단계의 반복이며 고유 입력393개입니다. BETH 프로세스199,222행·DNS269행을 검수했고 다른 이름의 DNS파일2개가 동일함을 확인했습니다. 실제 인터넷 관측과 연구 시험망 자료를 구분하며 신규학습0입니다. [원장](SOC_EXTRA_CORPORA_REVIEW.json).
 
 CAM-LDS의 Zenodo v2 로그와 GitHub v1 기반 입력을 혼합하지 않습니다. `pack.py`는 새 출처 원장만 포함하고 원본·검토 입력을 학습에 자동 편입하지 않습니다. BETH 프로세스 시각은 부팅 후 초여서 KST 날짜를 추정할 수 없으며 DNS의 UTC는 별도 변환 가능합니다. RBD24는 파일 목록/권리만 확인했고 Parquet 원행 검수는 미완료입니다. 출처가 검증되었다는 사실과 개별 정답/모델 품질 보증은 구분합니다.

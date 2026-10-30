@@ -36,6 +36,7 @@ def main():
              "compare_dedale_clocks.py", "DEDALE_CLOCK_REVIEW.json",
              "inspect_dedale_flows.py", "DEDALE_FLOW_REVIEW.json",
              "inspect_hornet.py", "HORNET_EVIDENCE_REVIEW.json", "SOC_EXTRA_CORPORA_REVIEW.json",
+             "audit_beth_splits.py", "BETH_SPLIT_REVIEW.json",
              "prepare_linux_apt.py", "LINUX_APT_SOURCE_SPEC.json", "LINUX_APT_EVIDENCE_REVIEW.json",
              "prepare_linux_apt_cases.py", "LINUX_APT_CASE_REVIEW.json",
              "prepare_soc_observation_inputs.py", "check_soc_observation_tokens.py", "SOC_OBSERVATION_INPUT_REVIEW.json",

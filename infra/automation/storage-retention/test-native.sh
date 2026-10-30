@@ -55,6 +55,40 @@ tree_missing() { expect_fail st_tree "$WORK" "$ROOT/missing"; }
 disk_ok() { local text available used; text=$(st_disk "$ROOT"); read -r available used <<< "$text"; st_uint "$available"; [[ $used =~ ^[0-9]+$ ]] && (( used<=100 )); }
 backup_ok() { mkdir "$ROOT/backups" "$ROOT/backups/capstone-saved" "$ROOT/backups/other"; [[ $(st_backup_list "$ROOT/backups") == "$ROOT/backups/capstone-saved" ]]; }
 backup_symlink() { ln -s "$ROOT/tree" "$ROOT/backups/capstone-link"; expect_fail st_backup_list "$ROOT/backups"; rm "$ROOT/backups/capstone-link"; }
+backup_receipt() {
+    printf '{"synthetic":"receipt"}\n' > "$ROOT/backups/capstone-receipt.json"
+    local before output expected
+    before=$(sha256sum "$ROOT/backups/capstone-receipt.json")
+    expected=$(stat -c %s "$ROOT/backups/capstone-receipt.json")
+    output=$(st_backup_list "$ROOT/backups")
+    [[ $(printf '%s\n' "$output" | wc -l) == 2 ]]
+    [[ $(st_backup_size "$WORK" "$ROOT/backups/capstone-receipt.json") == "$expected" ]]
+    [[ $(sha256sum "$ROOT/backups/capstone-receipt.json") == "$before" ]]
+    expect_fail st_tree "$WORK" "$ROOT/backups/capstone-receipt.json"
+}
+backup_receipt_links() {
+    ln "$ROOT/backups/capstone-receipt.json" "$ROOT/receipt-link"
+    expect_fail st_backup_list "$ROOT/backups"
+    expect_fail st_backup_size "$WORK" "$ROOT/backups/capstone-receipt.json"
+    rm "$ROOT/receipt-link"
+}
+backup_receipt_mutable() {
+    chmod 622 "$ROOT/backups/capstone-receipt.json"
+    expect_fail st_backup_list "$ROOT/backups"
+    chmod 600 "$ROOT/backups/capstone-receipt.json"
+    chown 65534 "$ROOT/backups/capstone-receipt.json"
+    expect_fail st_backup_list "$ROOT/backups"
+    chown 0 "$ROOT/backups/capstone-receipt.json"
+}
+backup_special() {
+    mkfifo "$ROOT/backups/capstone-pipe"
+    expect_fail st_backup_list "$ROOT/backups"
+    rm "$ROOT/backups/capstone-pipe"
+}
+backup_receipt_changed() {
+    du() { command du "$@"; printf 'changed\n' >> "$ROOT/backups/capstone-receipt.json"; }
+    expect_fail st_backup_size "$WORK" "$ROOT/backups/capstone-receipt.json"
+}
 backup_many() {
     local i output
     mkdir "$ROOT/backups-many"
@@ -121,6 +155,11 @@ run_case missing_scan_unavailable tree_missing
 run_case native_df_parse disk_ok
 run_case backup_fixed_directory_selection backup_ok
 run_case backup_symlink_refused backup_symlink
+run_case standalone_receipt_included_and_payload_unchanged backup_receipt
+run_case standalone_receipt_hardlink_refused backup_receipt_links
+run_case standalone_receipt_mutable_or_nonroot_refused backup_receipt_mutable
+run_case standalone_fifo_refused backup_special
+run_case standalone_receipt_changed_during_scan_refused backup_receipt_changed
 run_case backup_256_directories_fully_listed backup_many
 run_case backup_257_refused_without_partial_success backup_limit
 run_case aged_raw_review_not_current_pending_unsealed raw_review

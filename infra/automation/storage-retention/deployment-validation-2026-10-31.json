@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "verified_at_kst": "2026-10-31T01:17:46.154578+09:00",
+  "problem": "B regular backup receipt rejected by directory-only scanner; recurring Wazuh 100313, not disk exhaustion",
+  "reproduction": {
+    "old_backup_selection_exit": 3,
+    "directories": 192,
+    "regular_files": 1
+  },
+  "change": "Count validated root-owned regular backup files without reading contents; preserve link/type/mutation rejection and existing limits",
+  "source_sha256": {
+    "monitor.sh": "ae05c3641a35024e190e84b071c2a51b2d533d043186edd03b15e4b1a997b870",
+    "monitor-lib.sh": "f18839b72581599cc2418889450b966e36671e31358812babe4f0ca508b923cc",
+    "policy.jq": "0c6f43d05eca8b0355b833dbbc54a1c3ccefff6fda49995c64105308c30bd37d",
+    "test-native.sh": "ade2e7fab1fac682230d2f1f4c5023d655144be5dd13099c66475766674d71d8"
+  },
+  "tests": {
+    "linux_native_cases": 37,
+    "all_passed": true,
+    "real_b_shadow_complete": true,
+    "bash_syntax_passed": true
+  },
+  "deployed": {
+    "a": {
+      "started_kst": "2026-10-31T01:15:38.554110+09:00",
+      "backup": "/var/backups/capstone-storage-fix-20261031-011538",
+      "before": {
+        "monitor-lib.sh": "f5618183136b2ab7669df440871f45931214c473d88040c26464bed84f20b33c",
+        "monitor.sh": "4e4c8eae264fbc24f2b9d5b6b78a81b33672f5122ffc8ebecbf5e1738e0e33dd"
+      },
+      "after": {
+        "monitor-lib.sh": "f18839b72581599cc2418889450b966e36671e31358812babe4f0ca508b923cc",
+        "monitor.sh": "ae05c3641a35024e190e84b071c2a51b2d533d043186edd03b15e4b1a997b870"
+      },
+      "applied": true,
+      "timer": "NextElapseUSecRealtime=Sat 2026-10-31 01:17:00 KST\nActiveState=active",
+      "finished_kst": "2026-10-31T01:15:38.595517+09:00"
+    },
+    "b": {
+      "started_kst": "2026-10-31T01:15:25.446384+09:00",
+      "backup": "/var/backups/capstone-storage-fix-20261031-011525",
+      "before": {
+        "monitor-lib.sh": "f5618183136b2ab7669df440871f45931214c473d88040c26464bed84f20b33c",
+        "monitor.sh": "4e4c8eae264fbc24f2b9d5b6b78a81b33672f5122ffc8ebecbf5e1738e0e33dd"
+      },
+      "after": {
+        "monitor-lib.sh": "f18839b72581599cc2418889450b966e36671e31358812babe4f0ca508b923cc",
+        "monitor.sh": "ae05c3641a35024e190e84b071c2a51b2d533d043186edd03b15e4b1a997b870"
+      },
+      "applied": true,
+      "timer": "NextElapseUSecRealtime=Sat 2026-10-31 01:17:00 KST\nActiveState=active",
+      "finished_kst": "2026-10-31T01:15:25.487424+09:00"
+    }
+  },
+  "natural_timer": {
+    "a": {
+      "host": "a",
+      "scan_status": "complete",
+      "status": "ok",
+      "used_percent": 23,
+      "available_bytes": 44993077248,
+      "backup_bytes": 40133264,
+      "history_bytes": 118935609,
+      "observed_at_kst": "2026-10-31T01:17:02+09:00"
+    },
+    "b": {
+      "host": "b",
+      "scan_status": "complete",
+      "status": "ok",
+      "used_percent": 29,
+      "available_bytes": 105643401216,
+      "backup_bytes": 535057709,
+      "history_bytes": 118701272,
+      "observed_at_kst": "2026-10-31T01:17:03+09:00"
+    }
+  },
+  "b_inventory": {
+    "backup_directory_count": 193,
+    "backup_directory_limit": 256,
+    "backup_entry_count": 194,
+    "backup_entry_limit": 256,
+    "backup_file_count": 1,
+    "backup_scan_status": "complete"
+  },
+  "b_delivery": {
+    "relay_bytes": 776927,
+    "collector_offset": 776927,
+    "status_sha_matches_relay_receipt": true,
+    "native_actual_status_rule": "100310",
+    "native_actual_status_level": 0,
+    "new_100313_since_kst": "2026-10-31T01:15:49+09:00",
+    "new_100313_count": 0
+  },
+  "preserved_original_receipt_sha256": "b3cd79bacfefc098ad9cfdce277f140ead7739cd55826760690a4c19d74fb6b8",
+  "limitations": [
+    "One scheduled tick verified; not a long-duration availability guarantee",
+    "Historical alerts/cards preserved and may appear within requested lookback",
+    "Normal level0 is no_log; absence in Indexer alone is not delivery proof",
+    "Existing fixed-host monitor is not a portable fresh-server bootstrap; full new-server install not tested",
+    "No package install, alert suppression, data deletion, model training or protected firewall change"
+  ]
+}

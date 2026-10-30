@@ -49,9 +49,31 @@ st_backup_list() {
     (( ${#paths[@]}<=256 )) || return 2
     for p in "${paths[@]}"; do
         name=${p##*/}
-        [[ $name =~ ^capstone-[A-Za-z0-9][A-Za-z0-9._-]{0,95}$ && -d $p && ! -L $p && $(stat -c %u "$p") == 0 ]] || return 3
+        [[ $name =~ ^capstone-[A-Za-z0-9][A-Za-z0-9._-]{0,95}$ && ! -L $p && $(stat -c %u "$p") == 0 ]] || return 3
+        if [[ ! -d $p ]]; then st_backup_file "$p" || return 3; fi
         printf '%s\n' "$p"
     done
+}
+st_backup_file() {
+    # A root-owned receipt/archive is a backup too. Never follow links or read
+    # its payload; reject mutable, special or multiply-linked entries.
+    local p=$1 mode
+    st_ancestors "${p%/*}" || return 1
+    [[ -f $p && ! -L $p && $(stat -c %u:%g:%h -- "$p") == 0:0:1 ]] || return 1
+    mode=$(stat -c %a -- "$p") || return 1
+    (( (8#$mode & 0022)==0 )) || return 1
+}
+st_backup_size() {
+    local work=$1 path=$2 before after value
+    if [[ -d $path && ! -L $path ]]; then st_tree "$work" "$path"; return; fi
+    st_backup_file "$path" || return 1
+    before=$(stat -c %d:%i:%u:%g:%a:%h:%s:%y:%z -- "$path") || return 1
+    value=$(du -xsb -- "$path") || return 1
+    value=${value%%$'\t'*}; st_uint "$value" || return 1
+    st_backup_file "$path" || return 1
+    after=$(stat -c %d:%i:%u:%g:%a:%h:%s:%y:%z -- "$path") || return 1
+    [[ $before == "$after" ]] || return 1
+    printf '%s\n' "$value"
 }
 st_state() {
     local file=$1 engine=$2 raw canonical
@@ -99,7 +121,7 @@ st_raw_review() {
 }
 st_worker() {
     local host=$1 work=$2 machine observed now cutoff errors=0 raw=0 backups=0 history=0 due=0 review=0 disk available=null used=null value path lists rawreview=null
-    local backup_status=complete backup_count=null backup_error=0
+    local backup_status=complete backup_count=null backup_files=null backup_entries=null backup_error=0
     local -a raws=() histories=() disks=(/var/backups) backup_paths=()
     case "$host" in
       a) machine=096e90b6243e438aa8a7b392be754732
@@ -128,10 +150,11 @@ st_worker() {
     done
     if lists=$(st_backup_list /var/backups); then
         while IFS= read -r path; do [[ -n $path ]] && backup_paths+=("$path"); done <<< "$lists"
-        backup_count=${#backup_paths[@]}
+        backup_entries=${#backup_paths[@]}; backup_count=0; backup_files=0
         for path in "${backup_paths[@]}"; do
+            if [[ -d $path && ! -L $path ]]; then backup_count=$((backup_count+1)); else backup_files=$((backup_files+1)); fi
             disks+=("$path")
-            if value=$(st_tree "$work" "$path"); then if (( backups>=0 )); then backups=$((backups+value)); fi; else backups=-1; backup_status=tree_or_metadata_unavailable; errors=$((errors+1)); fi
+            if value=$(st_backup_size "$work" "$path"); then if (( backups>=0 )); then backups=$((backups+value)); fi; else backups=-1; backup_status=tree_or_metadata_unavailable; errors=$((errors+1)); fi
             if value=$(stat -c %Y -- "$path") && st_uint "$value"; then
                 if (( due>=0 && value<=cutoff )); then due=$((due+1)); fi
             else due=-1; backup_status=tree_or_metadata_unavailable; errors=$((errors+1)); fi
@@ -166,7 +189,9 @@ st_worker() {
     # Keep the inventory small even after many years; counts remain complete.
     head -n 32 "$work/raw-review.jsonl" | jq -sc --arg host "$host" --argjson total "${rawreview:-null}" \
       --arg backup_status "$backup_status" --argjson backup_count "$backup_count" \
-      '{backup_scan_status:$backup_status,backup_directory_count:$backup_count,backup_directory_limit:256,schema_version:1,host:$host,raw_review_rows:.,raw_review_total:$total,
+      --argjson backup_files "$backup_files" --argjson backup_entries "$backup_entries" \
+      '{backup_scan_status:$backup_status,backup_directory_count:$backup_count,backup_file_count:$backup_files,backup_entry_count:$backup_entries,
+        backup_entry_limit:256,backup_directory_limit:256,schema_version:1,host:$host,raw_review_rows:.,raw_review_total:$total,
         all_capstone_backups_protected:true,referenced_backups_always_protected:true,
         archive_authorized:false,automatic_deletion:false,checkpoint_changed:false}' > "$work/inventory.json"
 }

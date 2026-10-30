@@ -649,6 +649,44 @@ def verified_sensor_events(requirements, receipts):
                for source, ip, stamp, rule in requirements)
 
 
+def sensor_disposition_error(text, successful_reads):
+    """Require the model's explicit incident judgment, not just a matched alert.
+
+    This validates attribution and completeness, not the truth of the model's
+    semantic assessment. Raw model output remains in the private run trace.
+    """
+    lines = re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text, re.M)
+    if len(lines) != 1 or len(re.findall(r'^INCIDENT_DISPOSITION:[^\r\n]*$', text, re.M)) != 1:
+        return 'incident_disposition_missing'
+    def unique(pairs):
+        value = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError('duplicate disposition key')
+            value[key] = item
+        return value
+    try:
+        value = json.loads(lines[0], object_pairs_hook=unique)
+    except (TypeError, ValueError):
+        return 'incident_disposition_invalid'
+    if (not isinstance(value, dict) or set(value) != {'assessment', 'basis', 'evidence_tools'}
+            or value['assessment'] not in ('benign', 'remediated', 'unresolved')
+            or not isinstance(value['basis'], str) or not 20 <= len(value['basis'].strip()) <= 2000
+            or not isinstance(value['evidence_tools'], list)
+            or not 1 <= len(value['evidence_tools']) <= 16
+            or any(not isinstance(name, str) for name in value['evidence_tools'])):
+        return 'incident_disposition_invalid'
+    if value['assessment'] == 'unresolved':
+        return 'incident_disposition_unresolved'
+    evidence_tools = set(value['evidence_tools'])
+    sensor_tools = {'mcp__security_events__search_modsecurity_alerts',
+                    'mcp__security_events__search_suricata_alerts'}
+    if (len(evidence_tools) != len(value['evidence_tools']) or
+            not evidence_tools <= successful_reads or not evidence_tools & sensor_tools):
+        return 'incident_disposition_evidence_missing'
+    return None
+
+
 class Trace:
     def __init__(self, store, case, run_id):
         self.store, self.case, self.run_id = store, case, run_id
@@ -805,6 +843,10 @@ class Trace:
                 and not text[markers[0].end():].strip() else "unclassified")
             verified = sum(row[0] not in CALCULATION_TOOLS for row in db.execute(
                 "SELECT name FROM tool_calls WHERE run_id=? AND completed=1 AND is_write=0 AND is_error=0", (self.run_id,)))
+            successful_reads = {row[0] for row in db.execute(
+                "SELECT name FROM tool_calls WHERE run_id=? AND completed=1 AND is_write=0 AND is_error=0", (self.run_id,))
+                if row[0] not in CALCULATION_TOOLS}
+            decision_error = sensor_disposition_error(text, successful_reads) if self.sensor_requirements else None
             missing_bound_read = any(not verified_proposal(p, self.read_receipts, self.later_proposals) for p in proposals)
             if self.case["mode"] == "verify" and (not verified or missing_bound_read):
                 state, detail, due = "needs_review", "live_verification_missing", now
@@ -816,6 +858,8 @@ class Trace:
                 state, detail, due = "needs_review", "incident_event_verification_missing", now
             elif pending:
                 state, detail, due = "waiting_approval", "awaiting_broker_event", now + 120
+            elif disposition == "resolved" and decision_error:
+                state, detail, due = "needs_review", decision_error, now
             elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):
                 state, detail, due = "needs_review", "live_investigation_missing", now
             elif disposition == "monitor" and self.case["monitor_count"] < 3:
@@ -888,6 +932,12 @@ def prompt_for(base, case, evidence):
                 "최근24시간이나 서비스 정상 조회는 과거 사건의 경보 조회를 대신하지 않는다. "
                 "반환 경보의 정확한 출처·출발지·시각·Wazuh 상관 규칙 ID를 대조하고 공격/허용 판단은 별도 근거로 내린다. "
                 "사건 당시 표본을 찾지 못하거나 원본 근거가 잘렸다면 해결 완료로 종결하지 않는다.")
+            current_request += ("\n경보 재발견·시간/IP/경로 일치는 조회 성공이지 사건 해결이 아니다. "
+                "읽기 전용 재검토에서도 사건 위험과 대응 필요성의 판단을 주도한다. "
+                "조치 필요성을 판단할 근거가 부족하거나 공격 성공/영향/대응 결과가 미확인이면 "
+                "조회만 끝났다는 이유로 resolved를 쓰지 말고 needs_review 또는 monitor로 남긴다. "
+                "정상/승인된 활동 또는 위험 해소로 판단한다면 실제 사건별 근거를 설명한다. "
+                "현재 proposals와 후속 변경 목록 later_proposals는 별개이며 후자가 비었다고 승인 대기 부재를 추론하지 않는다.")
             windows = sorted({(source, ip, (int(stamp) // 60 + 1) * 60 - 0.000001)
                               for source, ip, stamp, rule in references if ip is not None and stamp is not None})
             current_request += ("\n조회할 사건 분 단위 구간(각 limit=50, lookback_minutes=1; 경계 중복 허용): " + canonical([
@@ -943,6 +993,20 @@ event time and source. A Wazuh correlation rule.id (for example 100110/100102)
 is NOT the sensor Suricata SID or ModSecurity rule ID; discover the returned
 sensor IDs before filtering them. Recent unrelated alerts cannot verify
 a past incident. A zero bounded sample does not prove the old attack was harmless.
+Matching a sensor event is retrieval success, not incident resolution. For an
+incident with WAF/Suricata evidence, a resolved report must explicitly assess
+the incident as benign (including evidence-confirmed authorized activity) or
+remediated, explain the actual incident-specific basis, and name the successful
+read tools from THIS run supporting that judgment. Before MANAGEMENT_STATUS,
+emit one line: INCIDENT_DISPOSITION: {"assessment":"benign|remediated|unresolved","basis":"Korean explanation of actual evidence and risk/response judgment, at least 20 characters","evidence_tools":["exact registered successful read tool name"]}
+Choose one assessment value, never the literal pipe-separated choices. Include
+the actual sensor search tool among evidence_tools. This control line is hidden
+from the channel report; explain the same judgment in ordinary Korean prose.
+If risk, response need or the result remains unknown, choose unresolved and
+needs_review/monitor. Never invent authorization, execution or benign activity
+to satisfy the format. Read-only scope and absent proposals do not justify
+closing an unresolved incident. Proposal-only reviews without sensor evidence
+do not require this disposition. This format does not authorize any action.
 For SCA configuration alerts use mcp__security_events__get_wazuh_sca_checks with
 the exact agent_id, then the returned policy_id and relevant check_ids, or
 title_contains using the check title from the event (e.g. GSSAPIAuthentication).
@@ -1153,6 +1217,7 @@ def deliver(webhook, text, case_id, state, report_id=None):
     if not webhook or not webhook.startswith(("https://", "http://10.200.10.", "http://127.0.0.1")):
         raise ControllerError("report_webhook_invalid")
     text = re.sub(r'(?m)^MANAGEMENT_STATUS:[^\r\n]*$', "", text).strip()
+    text = re.sub(r'(?m)^INCIDENT_DISPOSITION:[^\r\n]*$', "", text).strip()
     silent_review = state == "needs_review" and text in ("[SILENT]", "SILENT")
     if text in ("[SILENT]", "SILENT"):
         if not silent_review:

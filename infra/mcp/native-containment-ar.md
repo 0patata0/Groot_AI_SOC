@@ -1,5 +1,7 @@
 # Native Wazuh 사건 → LLM 판단 → 제한된 Containment
 
+> **2026-10-31 자동 조사 후속:** A의 RFC1918 집행 정책과 두 봇의 공통 정책은 갱신되어 있었으나 자동 조사 프롬프트에 공인 전용 설명이 남아 있음을 운영에서 확인했다. 이 프롬프트도 현재 정책으로 교체했다. 자동 조사에 없는 `resp.block_ip/unblock_ip`와 대화형 승인 경로도 구분했다. 보호주소·증거·TTL·관리자 승인 범위와 실제 nft 규칙은 변경하지 않았다. [초기 설치 동기화](../../deployment/SOC_MANAGEMENT.md) · [운영 검증·미완료](../../STATUS.md).
+
 > 2026-10-29 정정: 아래 과거 공인 전용·사설 전체 제외 설명은 현재 정책이 아니다. LLM 조사 후 공인/RFC1918 출발지를 동일 증거 기준으로 검증하며 live never_block·관리·필수 서버 보호는 유지한다. Native AR은 계속 사건 등록만 수행한다. [현재 정책](approved-operations.md)을 기준으로 한다.
 
 <!-- current-project-context:2026-10-24 -->

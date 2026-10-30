@@ -144,6 +144,25 @@ class BindingTests(unittest.TestCase):
         self.assertFalse(m.allowed("mcp__rule_write_a__temporarily_contain_ip", "verify"))
         self.assertFalse(m.allowed("mcp__rule_write_b__temporarily_contain_ip", "manage"))
 
+    def test_installer_management_prompt_matches_private_source_and_tool_gate(self):
+        # Ownership is tested separately; the workspace is intentionally not root-owned.
+        with mock.patch.object(install, 'read', side_effect=lambda p: Path(p).read_bytes()):
+            prompt = install.source_bundle({'source': ROOT})['soc_alert_watch.prompt'].decode()
+        self.assertIn('Public or RFC1918 attacker IPv4 addresses can be eligible', prompt)
+        self.assertIn('3 independent inbound TCP severity-1 attack flows within 5 minutes', prompt)
+        self.assertIn('never_block', prompt)
+        self.assertIn('blocks for 600 seconds', prompt)
+        self.assertIn('automatic management tool gate does not expose block_ip/unblock_ip', prompt)
+        self.assertNotIn('Only a public EXTERNAL', prompt)
+        self.assertNotIn('Internal, private lab, management', prompt)
+        gate = module('soc_management_run.py', 'b')
+        for mode in ('manage', 'verify'):
+            self.assertFalse(gate.allowed('mcp__resp__block_ip', mode))
+            self.assertFalse(gate.allowed('mcp__resp__unblock_ip', mode))
+        engine = module('incident_containment.py', 'a')
+        for source_ip in ('10.1.2.3', '172.20.0.5', '192.168.16.233'):
+            self.assertEqual(str(engine.checked_ip(source_ip)), source_ip)
+
     def test_actual_embedded_gate_exposes_fw_read_and_applies_read_first(self):
         controller = module('soc_management_controller.py', 'b')
         command = controller.command_for({'mode':'verify', 'session_id':None, 'fast_readonly':True})

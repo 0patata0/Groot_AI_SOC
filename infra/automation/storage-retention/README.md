@@ -1,5 +1,7 @@
 # 고정 A/B 저장공간 감시와 보존 검토 목록
 
+> **10/31 정상 백업 파일 계측 보완:** B의 root:root0600/nlink1 기록 JSON 576B가 디렉터리 전용 목록 검사에서 거절되어100313이 반복됐다. 일반파일도 root 소유·그룹/외부 쓰기 금지·단일 링크·전후 메타 동일 조건으로 용량을 합산한다. 파일 내용·기존 이력은 보존한다. Linux37검사와 실제 B shadow를 거쳐 A/B launcher/worker를 함께 반영했고 01:17 KST 자연 주기에서 양쪽 complete/ok, B relay/수집기 EOF·native 정상100310 및 수정 후 오류0을 확인했다. [운영 영수증](deployment-validation-2026-10-31.json). 이하 날짜별 관측은 당시 기록이며 새 서버 bootstrap 완료를 뜻하지 않는다.
+
 > **10/26 계측 보완:** 17:25 KST B의 정상 백업 디렉터리117개가 기존64개 제한에 걸린 원인을 재확인했다. 제한을256개로 조정하되 트리100,000항목·worker30초·symlink 거절은 유지한다. `inventory.json`의 `backup_scan_status`는 complete/directory_limit_exceeded/invalid_backup_entry/backup_root_unavailable/tree_or_metadata_unavailable을 구분하고, 정상 목록의 개수와 상한도 표시한다. 공개 status18키·Wazuh 규칙/차단 정책·삭제 금지는 그대로다. 17:32 KST A/B에 같은 검증 소스를 증분 반영해 두 호스트 complete/ok·실제 oneshot exit0를 확인했다. 기존 고정 호스트 모듈의 새 서버 bootstrap 검증은 별도 미완료다. 최신 운영 검증은 [STATUS](../../../STATUS.md)를 따른다.
 
 <!-- current-project-context:2026-10-24 -->
@@ -23,18 +25,20 @@ A 08:50:39 관측은 사용률20%·여유46,845,345,792B·managed raw28,107,392B
 | A raw | `logs/suricata/capstone-managed`, `logs/modsec/capstone-managed`의 합계(앞 경로 `/home/groot_a/capstone/secstack/`) |
 | A history | `/var/lib/capstone-vector-history-auto/store`, `/var/lib/capstone-vector-history` |
 | B history | `/var/lib/capstone-history-receipts` |
-| 두 호스트 backup | `/var/backups/capstone-*`의 직접 하위 디렉터리만, 최대 256개 |
+| 두 호스트 backup | `/var/backups/capstone-*`의 직접 하위 디렉터리와 검증된 일반파일, 합계 최대 256개 |
 | disk | 위 고정 경로들이 있는 filesystem의 최소 여유 bytes/최대 사용률 |
 
 A는 기존 `vector.lock`을 shared/nonblocking으로 잡아 세대 선택을 보호한다. 회전/관리자 작업과 경합하면 기다리거나 서비스를 조작하지 않고 unavailable을 낸다. 원문 파일은 stat/du로만 조사하며 내용을 읽지 않는다. raw state JSON은 current/pending 번호를 판단할 만큼만 읽는다. CP·자격증명·환경 파일·DB는 열지 않는다.
 
-각 트리는 최대 100,000 entry, 한 filesystem만 읽는다. symlink, FIFO/socket 등 비정규 entry, 읽기 실패, state 형식 오류, 디렉터리 교체는 해당 계측을 null로 만든다. backup 이름이 prefix와 일치해도 symlink/일반파일이면 무시하여 0으로 만드는 대신 unavailable이다. worker는 30초(TERM 후 2초 KILL), wrapper는 40초, unit은 45초 상한이다. 시간 초과/잘못된 worker 결과는 성공한 0B 관측이 아니다. 디스크·status 쓰기 자체가 실패하면 unit 실패로 남으며 journal 성공까지 보장하지 않는다.
+각 트리는 최대 100,000 entry, 한 filesystem만 읽는다. symlink, FIFO/socket 등 비정규 entry, 읽기 실패, state 형식 오류, 디렉터리 교체는 해당 계측을 null로 만든다. backup 이름이 prefix와 일치해도 symlink/특수파일/부적합 일반파일이면 무시하여 0으로 만드는 대신 unavailable이다. 일반파일은 root:root·nlink1·no022와 측정 전후 dev/inode/uid/gid/mode/nlink/size/mtime/ctime 일치를 검사한다. raw/history는 계속 디렉터리만 허용한다. worker는 30초(TERM 후 2초 KILL), wrapper는 40초, unit은 45초 상한이다. 시간 초과/잘못된 worker 결과는 성공한 0B 관측이 아니다. 디스크·status 쓰기 자체가 실패하면 unit 실패로 남으며 journal 성공까지 보장하지 않는다.
 
 `du -xsb`는 apparent bytes다. 같은 트리 안 hardlink 중복은 GNU du가 제외하지만 서로 다른 고정 root 사이의 hardlink는 각각 합산될 수 있다. 실제 쓰기는 계속되므로 측정은 관측 구간의 용량 표본이지 원자적 filesystem 스냅샷이나 최대 증가량 보장이 아니다. entry 개수/시간 한도를 넘으면 범위를 임의로 생략해 healthy로 표시하지 않는다.
 
 ## 고정 판정과 JSON 계약
 
-18개 flat key만 방출한다. 계측 실패 값은 null이며 `scan_status=unavailable`이다.
+보조 `inventory.json`에는 실제 `backup_directory_count`, `backup_file_count`, 합계 `backup_entry_count`와 `backup_entry_limit=256`을 표시한다. 기존 `backup_directory_limit=256`과 `directory_limit_exceeded` 문자열은 호환성을 위해 유지하며 전체 최상위 항목에 한도가 적용된다.
+
+공개 상태는 기존 18개 flat key만 방출한다. 계측 실패 값은 null이며 `scan_status=unavailable`이다.
 
 ```
 schema_version policy machine_id host observed_at_utc status reason scan_status
@@ -58,7 +62,7 @@ B 담당의 예정 규칙 매핑은 100310 정상 level0/no_log, 100311 warning 
 
 A raw의 30일 경과 파일 중 root:root0400/nlink1이고 current/pending 번호가 아닌 generation만 검토 목록에 넣는다. 이는 **archive/delete 승인이나 reader drain·writer FD0·B 수신증 증명은 아니다**. count 이름을 `raw_archive_review_due_count`로 제한했고 inventory에도 archive_authorized/delete_authorized=false를 쓴다. 목록은 최대 32행, 전수 count는 별도 유지한다. 이 조사만으로 원문을 옮기거나 지우지 않는다.
 
-backup은 root 디렉터리 mtime가 A30일/B90일을 넘으면 검토 count에 넣는다. 디렉터리 mtime는 완료 시각/최근 내부 파일 수정 시각의 증명이 아니다. runtime/guard/migration receipt가 참조하는 backup은 항상 보호하며 현재는 모든 capstone backup을 삭제 금지로 취급한다. B history/receipts도 용량만 계측한다. B90일 archive 검토 후 실제 삭제/자동 보존수명 집행은 별도 승인된 reference·receipt 검증 설계가 남는다. systemd-tmpfiles의 단순 age-delete를 raw/backup에 연결하지 않는다.
+backup은 최상위 디렉터리 또는 일반파일 mtime가 A30일/B90일을 넘으면 검토 count에 넣는다. 디렉터리 mtime는 완료 시각/최근 내부 파일 수정 시각의 증명이 아니다. runtime/guard/migration receipt가 참조하는 backup은 항상 보호하며 현재는 모든 capstone backup을 삭제 금지로 취급한다. B history/receipts도 용량만 계측한다. B90일 archive 검토 후 실제 삭제/자동 보존수명 집행은 별도 승인된 reference·receipt 검증 설계가 남는다. systemd-tmpfiles의 단순 age-delete를 raw/backup에 연결하지 않는다.
 
 ## 설치 및 검증 계약
 
@@ -68,6 +72,6 @@ backup은 root 디렉터리 mtime가 A30일/B90일을 넘으면 검토 count에 
 - `/var/lib/capstone-storage-monitor`: root:root0700. `.lock`, `status.json`, `inventory.json`은 root0600. 다른 저장 경로의 권한은 바꾸지 않는다.
 - unit 두 개는 `/etc/systemd/system/` root0644. `systemd-analyze verify`와 calendar 해석을 native로 먼저 확인한다.
 
-`test-native.sh --policy-only`는 순수 jq 시험16개다. Linux root에서 `test-native.sh`는 새 `/var/tmp/capstone-storage-native.*`만 사용해 총32개를 시험한다. 실제 GNU du/df, symlink/없음, 세대 검토 제외, worker timeout/오염, status fsync/rename을 확인한다. publisher 시험만 world-writable `/var/tmp` 위 조상 대신 자신의 root0700 fixture까지 trust boundary를 제한하는 stub을 사용한다. 운영 상태·원문·서비스는 접근하지 않는다.
+`test-native.sh --policy-only`는 순수 jq 시험16개다. Linux root에서 `test-native.sh`는 새 `/var/tmp/capstone-storage-native.*`만 사용해 총37개를 시험한다. 실제 GNU du/df, symlink/없음, 세대 검토 제외, worker timeout/오염, status fsync/rename을 확인한다. publisher 시험만 world-writable `/var/tmp` 위 조상 대신 자신의 root0700 fixture까지 trust boundary를 제한하는 stub을 사용한다. 운영 상태·원문·서비스는 접근하지 않는다.
 
 native 시험 후 A/B에서 `monitor.sh check`의 정확 18키와 live 경로/용량을 대조하고 B 규칙을 연결한다. 첫 `systemctl start capstone-storage-monitor.service`와 journal 1건, 상태 파일 root0600, 기존 보호 SHA/CP 불변을 확인한 뒤 timer를 활성화한다. timer는 KST 매시 02/17/32/47분, Persistent=false다. 기존 raw(0/1분대)와 output(3분대) 회전 일정은 바꾸지 않는다. 이후 자연 tick은 별도로 관찰한다.

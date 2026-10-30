@@ -132,7 +132,47 @@ class ControllerTests(unittest.TestCase):
         self.store.review(trace.case['id'],'Exact historical evidence required');trace=self.trace()
         payload['alerts'][0]['timestamp']='2026-10-22T20:46:50.158+09:00'
         self.tool(trace,name,payload,{'until_kst':'2026-10-22T21:00:00+09:00','source_ip':event['src_ip']})
-        self.result(trace);self.assertEqual(trace.finish(0)['state'],'completed')
+        decision={'assessment':'benign','basis':'시험 대역에서 제공한 사건 근거를 모델이 오탐으로 판정했다. 의미 판단의 진실성 검사가 아니다.',
+                  'evidence_tools':[name]}
+        self.result(trace, '모델의 사건 판단.\nINCIDENT_DISPOSITION: '+json.dumps(decision,ensure_ascii=False)+'\nMANAGEMENT_STATUS: resolved')
+        self.assertEqual(trace.finish(0)['state'],'completed')
+
+    def test_matching_real_event_does_not_resolve_an_unassessed_incident(self):
+        event=self.alert('real-waf','2026-10-29T19:15:45.764+09:00',rule='100102')
+        event.update(src_ip='192.168.16.233',location='/logs/modsec/audit.log')
+        self.alerts(event);trace=self.trace()
+        name='mcp__security_events__search_modsecurity_alerts'
+        self.tool(trace,name,{'source':'modsecurity','source_scope':'wazuh_indexed_alerts','alerts':[
+            {'timestamp':event['timestamp'],'source_ip':event['src_ip'],'wazuh_rule_id':'100102'}]})
+        text='사건 경보를 재확인했다. 추가 조치 필요성을 판단할 충분한 근거는 부족하나 재조회 종결을 보고한다.\nMANAGEMENT_STATUS: resolved'
+        self.result(trace,text)
+        self.assertEqual(trace.finish(0)['state'],'needs_review')
+        row=self.store.db.execute('select detail,final_text from cases where id=?',(trace.case['id'],)).fetchone()
+        self.assertEqual(row[0],'incident_disposition_missing')
+        self.assertEqual(row[1],text)  # preserve the failed model claim
+        self.assertEqual(self.store.db.execute('select count(*) from proposals').fetchone()[0],0)
+
+    def test_sensor_disposition_requires_real_successful_reads_and_unambiguous_fields(self):
+        name='mcp__security_events__search_modsecurity_alerts'
+        valid={'assessment':'benign','basis':'원 경보의 실제 요청 내용과 대상 영향에 대한 모델의 사건별 판단 근거입니다.',
+               'evidence_tools':[name]}
+        render=lambda d:'INCIDENT_DISPOSITION: '+json.dumps(d,ensure_ascii=False)+'\nMANAGEMENT_STATUS: resolved'
+        self.assertIsNone(m.sensor_disposition_error(render(valid),{name}))
+        self.assertEqual(m.sensor_disposition_error(render(valid),set()),'incident_disposition_evidence_missing')
+        self.assertEqual(m.sensor_disposition_error(render(dict(valid,assessment='unresolved')),{name}), 'incident_disposition_unresolved')
+        for change in ({'assessment':'retrieved'}, {'basis':'확인'}, {'evidence_tools':[name,name]},
+                       {'evidence_tools':['mcp__wazuh_ro__get_wazuh_alert_summary']}, {'extra':'approved'}):
+            with self.subTest(change=change):self.assertIsNotNone(m.sensor_disposition_error(render(dict(valid,**change)),{name}))
+        self.assertIsNotNone(m.sensor_disposition_error(render(valid)+'\nINCIDENT_DISPOSITION:bad',{name}))
+        self.assertIsNotNone(m.sensor_disposition_error('INCIDENT_DISPOSITION: {"assessment":"benign","assessment":"unresolved"}',{name}))
+
+    def test_pending_proposal_does_not_require_a_resolved_sensor_assessment(self):
+        event=self.alert('sensor-pending',rule='100102');event['location']='/logs/modsec/audit.log'
+        self.alerts(event);trace=self.trace()
+        self.tool(trace,'mcp__security_events__search_modsecurity_alerts',{'source':'modsecurity','source_scope':'wazuh_indexed_alerts','alerts':[
+            {'timestamp':event['timestamp'],'source_ip':event['src_ip'],'wazuh_rule_id':'100102'}]})
+        self.tool(trace,'mcp__rule_write_a__propose_rule_edit',{'proposal_id':'d'*32,'status':'pending'})
+        self.result(trace);self.assertEqual(trace.finish(0)['state'],'waiting_approval')
 
     def test_sensor_empty_wrong_source_or_ip_and_truncation_cannot_resolve(self):
         event={'location':'/logs/suricata/eve.json','timestamp':'2026-10-22T01:00:00Z','src_ip':'192.0.2.8','rule':{'id':'100110'}}
@@ -785,6 +825,16 @@ class ControllerTests(unittest.TestCase):
 
 class DeliveryTests(unittest.TestCase):
     webhook = "https://mattermost.invalid/hooks/review-fixture"
+
+    def test_internal_disposition_is_not_shown_in_channel_report(self):
+        opener=mock.Mock();opener.open.return_value=Response(b'', '')
+        text='사건 위험과 조치 필요성이 아직 미확인입니다.\nINCIDENT_DISPOSITION: {"assessment":"unresolved"}\nMANAGEMENT_STATUS: needs_review'
+        with mock.patch.object(m.urllib.request,'build_opener',return_value=opener):
+            m.deliver(self.webhook,text,'a'*32,'needs_review')
+        message=json.loads(opener.open.call_args.args[0].data)['text']
+        self.assertIn('추가 검토 필요',message)
+        self.assertIn('사건 위험과 조치 필요성이 아직 미확인',message)
+        self.assertNotIn('INCIDENT_DISPOSITION',message)
 
     def test_needs_review_silent_sends_fixed_review_notice(self):
         for text in ("[SILENT]", "SILENT", " [SILENT]\nMANAGEMENT_STATUS: resolved",

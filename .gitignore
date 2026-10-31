@@ -13,6 +13,7 @@
 
 # 자격증명 노트 (git 커밋 금지)
 *CREDENTIALS*.md
+/.CREDENTIALS.local.md.sw?
 *credentials*.md
 
 # 공인 인증서 개인키·ACME 작업 상태는 저장소에 넣지 않음

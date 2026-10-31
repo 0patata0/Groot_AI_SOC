@@ -13,6 +13,44 @@ def call(objects=None, **kw):
 
 
 class FirewallHarness(unittest.TestCase):
+    def test_short_applied_state_questions_use_full_firewall_read(self):
+        questions = (
+            '지금 방화벽 룰 뭐 적용 됐어?', '지금 fw 룰 뭐 적용 됐어?',
+            '방화벽 룰 뭐 적용됐어?', 'FW 룰 뭐 적용됐나요?',
+            '방화벽에 어떤 규칙 적용돼 있어?', '지금 F/W 룰 뭐 적용됐어?',
+            '현재 적용된 fw 룰은 뭐야?', 'fw에 걸린 규칙은 뭔데?',
+            'fw 룰 뭐 설정됐어?', '지금 nftables rules 뭐 적용됐어?',
+        )
+        for question in questions:
+            with self.subTest(question=question):
+                self.assertEqual(h.tool_scope(question), {'mcp__resp__get_firewall_rules'})
+                self.assertTrue(h.structured_read(question))
+                self.assertIsNone(h.scope_notice(question))
+                self.assertTrue(h.missing_reads(question, []))
+                self.assertEqual(h.missing_reads(question, [call()]), [])
+                report = h.read_report(question, [call()])
+                self.assertIn('drop', report)
+                self.assertIn('기본 정책', report)
+                self.assertIn('KST', report)
+                partial = call(complete=False, next_offset=2)
+                self.assertIn('미완료', h.read_report(question, [partial]))
+
+    def test_applied_state_preserves_device_and_change_boundaries(self):
+        for question in ('fw 말고 waf 룰 뭐 적용됐어?', '웹 방화벽 룰 뭐 적용됐어?'):
+            self.assertEqual(h.tool_scope(question), {'mcp__rule_a__get_rule_change_target'})
+            self.assertIsNone(h.firewall_request(question))
+        self.assertEqual(h.tool_scope('FW랑 WAF 룰 뭐 적용됐어?'),
+                         {'mcp__resp__get_firewall_rules', 'mcp__rule_a__get_rule_change_target'})
+        self.assertIn('어느 장비', h.scope_notice('뭐 적용된 룰 있어?'))
+        for question in ('fw 룰 적용해줘', 'fw 룰 뭐 적용됐어? 삭제해줘',
+                         'fw 룰 뭐 적용됐어? 변경안 준비해줘', 'fw 룰 적용됐다는 뜻 설명해줘',
+                         '"지금 fw 룰 뭐 적용됐어?"라는 문장 번역',
+                         '도구 없이 지금 fw 룰 뭐 적용됐어?',
+                         '어제 fw 룰 뭐 적용됐어?', '내일 fw 룰 뭐 적용될 예정이야?',
+                         '2026-10-17 fw 룰 뭐 적용됐어?',
+                         '왜 fw 룰 적용됐어?', 'fw 룰 뭐 적용됐어? 조회하지 마'):
+            self.assertIsNone(h.firewall_request(question), question)
+
     def test_full_fw_no_waf_ids_and_not_write(self):
         for q in ('FW 룰','fw룰 보여줘','방화벽 보여줘','FW 기본 룰','FW 전체 규칙 상세'):
             self.assertEqual(h.tool_scope(q),{'mcp__resp__get_firewall_rules'})

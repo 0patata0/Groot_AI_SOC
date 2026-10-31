@@ -62,7 +62,8 @@ class ShortQueries(unittest.TestCase):
 
     def test_firewall_variants_cannot_become_custom_rule_queries(self):
         for question in ('FW 룰', 'fw룰 보여줘', '방화벽 규칙 조회', 'nftables rules 목록',
-                         'F/W 룰 출력', '지금 fw 률 츌력해볼래', '방화벽 보여줘'):
+                         'F/W 룰 출력', '지금 fw 률 츌력해볼래', '방화벽 보여줘',
+                         '지금 방화벽 룰 뭐 적용 됐어?', '지금 fw 룰 뭐 적용 됐어?'):
             with self.subTest(question=question):
                 self.assertEqual(H.rule_scope_request(question)['devices'], ['FW'])
                 self.assertEqual(H.tool_scope(question), {'mcp__resp__get_firewall_rules'})

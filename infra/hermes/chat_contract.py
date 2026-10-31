@@ -5,7 +5,7 @@ import hashlib
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.5'
+VERSION = 'soc-chat-contract:1.5.6'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -82,7 +82,14 @@ def rule_scope_request(text):
     if not re.search(r'룰|규칙|(?<![A-Za-z])rules?(?![A-Za-z])', text, re.I):
         if not fw_fields and not (devices == ['FW'] and re.fullmatch(r'[\s?？.!]*(?:현재\s*|지금\s*)?FW\s*(?:보여줘|조회|출력|목록)[\s?？.!]*', text, re.I)):
             return None
-    if not fw_fields and not re.search(r'조회|확인|보여|알려|목록|리스트|출력|개수|몇|\b(?:show|list)\b', text, re.I):
+    # "뭐 적용됐어?" asks about observed state, not permission to apply.
+    # Keep historical/future and conceptual questions on the general model path.
+    state_question = bool(
+        re.search(r'뭐|무엇|어떤|뭔', text)
+        and re.search(r'적용\s*(?:됐|되었|되어|돼|된|중)|걸(?:린|려\s*있)|'
+                      r'설정\s*(?:됐|되었|되어|돼|된)', text)
+        and not re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d', text))
+    if not fw_fields and not state_question and not re.search(r'조회|확인|보여|알려|목록|리스트|출력|개수|몇|\b(?:show|list)\b', text, re.I):
         return None
     global_scope = bool(re.search(r'모든\s*장비|전체\s*장비|장비별|WAF\s*[/,·]\s*IDS\s*[/,·]\s*Wazuh', text, re.I))
     # The established explicit all-device inventory remains possible. A bare

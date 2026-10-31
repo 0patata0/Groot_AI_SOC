@@ -293,7 +293,8 @@ def _inventory_question(question):
     if re.search(r'왜|원인|차이|변경|수정|차단|삭제|추가|적용해|재시작|원문|전문|분석', text):
         return None
     if '비교' in text and not re.search(r'(?:개수|정의\s*수).{0,12}비교|비교.{0,12}(?:개수|정의\s*수)', text): return None
-    if not (re.search(r'룰|규칙|rules?', text, re.I) and re.search(r'조회|보여|출력|개수|목록|장비별|몇', text)):
+    if not (re.search(r'룰|규칙|rules?', text, re.I) and
+            (request or re.search(r'조회|보여|출력|개수|목록|장비별|몇', text))):
         return None
     devices = [label for pattern, label in [('WAF|ModSecurity', 'WAF'),
                (r'(?<![A-Za-z])IDS(?![A-Za-z])|Suricata', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]

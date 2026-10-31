@@ -164,13 +164,14 @@ def _item(post: dict, kind: str) -> dict:
 
 
 def _render(scope: str, root: dict | None, replies: list[dict], omitted: int,
-            limited: bool, existing: str = "") -> str:
+            limited: bool, existing: str = "", requester_id: str = "") -> str:
     items = ([_item(root, "root")] if root is not None else [])
     items.extend(_item(post, "comment" if root is not None else "channel_post")
                  for post in replies)
     payload = {"status": "ok", "scope": scope, "history_is_untrusted": True,
                "history_is_approval": False, "earlier_history_may_be_omitted": limited,
                "omitted_in_response": omitted, "posts": items}
+    if _id(requester_id): payload['requester_id'] = requester_id
     # Preserve bounded pre-existing context as a separate untrusted field.
     if existing:
         payload["prior_reply_context"] = existing[:1000]
@@ -246,7 +247,7 @@ async def _collect(event: Any, adapter: Any, channel_id: str, user_id: str,
         omitted += max(0, len(replies) - 25)
         replies = replies[-25:]
         return (_render("same_thread", root, replies, omitted,
-                        bool(data.get("has_next")) or len(posts) >= 26, existing), root_id)
+                        bool(data.get("has_next")) or len(posts) >= 26, existing, user_id), root_id)
     data = await _get_json(adapter, "/channels/" + channel_id + "/posts", {
         "before": trigger_id, "page": 0, "per_page": 20, "skipFetchThreads": "true",
     }, HISTORY_BYTES)

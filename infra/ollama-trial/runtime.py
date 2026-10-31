@@ -62,6 +62,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
     question = request.get('question', '')
     current = request.get('current_question', question)
     require(isinstance(current, str) and len(current) <= 16000, 'current_question')
+    resolved = harness.resolve_short_read(current, request.get('read_scope_history', []))
+    if resolved != current:
+        report['read_subject_resolved'] = True
+        question += '\n현재 조회 대상만 이전 사용자 요청에서 이어받았습니다: ' + resolved + '\n이전 상태/승인은 재사용하지 말고 새로 조회하세요.'
+        current = resolved
     report['access_mode'] = mode
     notice = harness.scope_notice(current)
     if notice and not request.get('discover_only'):

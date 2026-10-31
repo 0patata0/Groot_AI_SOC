@@ -112,6 +112,12 @@ class BindingTests(unittest.TestCase):
             m = module("service_action_executor.py", role)
             self.assertNotIn("a:chatproxy", m.PROFILES)
             for value in m.PROFILES.values():
+                if value['kind'].startswith('systemd-'):
+                    self.assertEqual(value['actions'], ['restart'])
+                    self.assertIn(value['unit'], ('capstone-vector.service', 'wazuh-agent.service'))
+                    self.assertNotIn('container', value)
+                    self.assertNotIn('expected_id', value)
+                    continue
                 self.assertEqual(value["expected_id"], profile(role)["container_ids"][value["container"]])
                 self.assertNotIn("create", value["actions"])
         tree = ast.parse(rendered("service_action_executor.py"))

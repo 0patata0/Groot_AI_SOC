@@ -26,6 +26,27 @@ SHA = re.compile(r"^[0-9a-f]{64}$")
 MAX_STATE = 512 * 1024
 POLICY_VERSION = 1
 PROFILES = {
+    "a:vector": {
+        "host": "a", "kind": "systemd-vector", "unit": "capstone-vector.service", "actions": ["restart"],
+        "stop_seconds": 60, "verify_seconds": 180,
+        "impact": "Host log normalization pauses during restart; no configuration, source logs or checkpoints are changed.",
+        "files": ["/etc/capstone-vector/vector.toml", "/etc/capstone-vector/vector.env",
+                  "/etc/capstone-vector/transforms/correlation.vrl", "/etc/capstone-vector/transforms/nftables.vrl",
+                  "/etc/capstone-vector/transforms/suricata.vrl", "/etc/capstone-vector/transforms/waf_audit_context.vrl",
+                  "/etc/capstone-vector/transforms/waf_json_guard.vrl"],
+    },
+    "a:wazuh-agent": {
+        "host": "a", "kind": "systemd-agent", "unit": "wazuh-agent.service", "actions": ["restart"],
+        "stop_seconds": 120, "verify_seconds": 180,
+        "impact": "A host agent collection pauses during restart; the Wazuh manager is not restarted.",
+        "files": ["/var/ossec/etc/ossec.conf", "/var/ossec/etc/local_internal_options.conf"],
+    },
+    "b:wazuh-agent": {
+        "host": "b", "kind": "systemd-agent", "unit": "wazuh-agent.service", "actions": ["restart"],
+        "stop_seconds": 120, "verify_seconds": 180,
+        "impact": "B host agent collection pauses during restart; the Wazuh manager is not restarted.",
+        "files": ["/var/ossec/etc/ossec.conf", "/var/ossec/etc/local_internal_options.conf"],
+    },
     "a:waf": {
         "host": "a", "container": "waf", "kind": "nginx", "actions": ["reload", "restart"],
         "stop_seconds": 30, "verify_seconds": 90,
@@ -96,6 +117,8 @@ class ServiceBackend:
 
     def observe(self, target):
         profile = PROFILES[target]
+        if profile['kind'].startswith('systemd-'):
+            return self.observe_systemd(target)
         try:
             info = json.loads(self._call(["inspect", profile["container"]]))[0]
             cid = info["Id"]
@@ -148,7 +171,119 @@ class ServiceBackend:
         except (KeyError, IndexError, ValueError, UnicodeError) as exc:
             raise self.error("invalid service observation") from exc
 
+    def observe_systemd(self, target):
+        profile = PROFILES[target]
+        fields = ('Id', 'LoadState', 'ActiveState', 'SubState', 'Result', 'Type', 'InvocationID',
+                  'MainPID', 'ExecMainStartTimestampMonotonic', 'FragmentPath', 'DropInPaths',
+                  'NeedDaemonReload', 'Transient',
+                  'TimeoutStartUSec', 'TimeoutStopUSec', 'KillMode', 'Restart')
+        # Exec* properties include runtime timestamps and can contain embedded
+        # newlines. Unit/drop-in bytes below bind the executable configuration.
+        raw = self.engine.runner.call(['/usr/bin/systemctl', 'show', '--all', '--no-pager',
+            '--property=' + ','.join(fields), profile['unit']], timeout=10).decode('utf-8', 'strict')
+        rows = [line.split('=', 1) for line in raw.splitlines()]
+        if any(len(row) != 2 for row in rows) or len({row[0] for row in rows}) != len(rows):
+            raise self.error('invalid systemd observation')
+        p = dict(rows)
+        if (set(p) != set(fields) or p['Id'] != profile['unit'] or p['LoadState'] != 'loaded'
+                or p['Transient'] != 'no' or p['NeedDaemonReload'] != 'no'
+                or p['ActiveState'] not in ('active', 'inactive', 'failed')
+                or not re.fullmatch(r'[a-z][a-z-]{0,47}', p['SubState'])
+                or not re.fullmatch(r'[a-z][a-z-]{0,47}', p['Result'])
+                or not re.fullmatch(r'[0-9a-f]{32}|', p['InvocationID'])
+                or any(not re.fullmatch(r'[0-9]{1,20}', p[k]) for k in ('MainPID','ExecMainStartTimestampMonotonic'))):
+            raise self.error('systemd unit unavailable, transitional, or needs daemon reload')
+        paths = [p['FragmentPath']] + p['DropInPaths'].split()
+        if not paths[0] or len(paths) > 33 or any(not re.fullmatch(
+                r'/(?:etc|run|usr/lib|lib)/systemd/system/[A-Za-z0-9_.@/-]+', name) for name in paths):
+            raise self.error('systemd unit paths outside fixed roots')
+        hashes = {}
+        for name in paths + profile['files']:
+            data, meta = self.helper._read_regular(name, 4 * 1024 * 1024)
+            if meta.st_uid != 0 or meta.st_mode & (0o022 if name in paths else 0o002):
+                raise self.error('systemd configuration must be root owned and not world writable')
+            hashes[name] = hashlib.sha256(data).hexdigest()
+        immutable = {k:p[k] for k in fields if k not in ('ActiveState','SubState','Result','InvocationID','MainPID','ExecMainStartTimestampMonotonic')}
+        boot = Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+        if not re.fullmatch(r'[0-9a-f-]{36}', boot): raise self.error('boot identity unavailable')
+        return {'runtime_kind':'systemd', 'unit':p['Id'], 'boot_id':boot,
+            'active_state':p['ActiveState'], 'sub_state':p['SubState'], 'result':p['Result'],
+            'running':p['ActiveState']=='active' and p['SubState']=='running',
+            'invocation_id':p['InvocationID'], 'main_pid':int(p['MainPID']),
+            'start_monotonic_us':int(p['ExecMainStartTimestampMonotonic']),
+            'config_sha256':digest(immutable), 'files_sha256':digest(hashes)}
+
+    def preflight_systemd(self, target):
+        profile = PROFILES[target]
+        if profile['kind'] == 'systemd-vector':
+            # Only three path variables from the fixed root-owned environment
+            # file are passed. No shell source/eval or arbitrary environment.
+            raw, _ = self.helper._read_regular('/etc/capstone-vector/vector.env', 65536)
+            values = {}
+            for line in raw.decode().splitlines():
+                if not line.strip() or line.lstrip().startswith('#'): continue
+                key, sep, value = line.partition('=')
+                if key in ('SURICATA_EVE_PATH','WAF_AUDIT_PATH','WAF_ACCESS_PATH'):
+                    value = value.strip().strip('\"\'')
+                    if not sep or key in values or not re.fullmatch(r'/[A-Za-z0-9_./-]{1,240}', value):
+                        raise self.error('invalid Vector path environment')
+                    values[key] = value
+            if len(values) != 3: raise self.error('Vector path environment incomplete')
+            argv = ['/usr/bin/env','-C','/etc/capstone-vector','-i','PATH=/usr/bin:/bin',
+                    'VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION=true', 'INVOCATION_ID='+'0'*32]
+            argv += [k+'='+v for k,v in sorted(values.items())]
+            argv += ['/usr/local/bin/vector','validate','--no-environment','/etc/capstone-vector/vector.toml']
+            self.engine.runner.call(argv, timeout=45)
+        else:
+            for binary in ('wazuh-agentd','wazuh-logcollector','wazuh-syscheckd','wazuh-modulesd'):
+                self.engine.runner.call(['/var/ossec/bin/'+binary,'-t'], timeout=30)
+
+    def verify_systemd(self, target, before):
+        after = self.observe_systemd(target)
+        if (any(after[k] != before[k] for k in ('unit','boot_id','config_sha256','files_sha256'))
+                or not after['running'] or after['result'] != 'success'
+                or not after['invocation_id'] or after['invocation_id'] == before['invocation_id']):
+            raise self.error('systemd restart identity, configuration or readiness not verified')
+        if PROFILES[target]['kind'] == 'systemd-vector':
+            pid = after['main_pid']
+            if pid <= 0 or Path('/proc/'+str(pid)+'/exe').resolve() != Path('/usr/local/bin/vector').resolve():
+                raise self.error('Vector executable not verified')
+            fd = os.open('/var/log/capstone-vector/telemetry/health.jsonl', os.O_RDONLY | os.O_NOFOLLOW)
+            with os.fdopen(fd, 'rb') as f:
+                meta = os.fstat(f.fileno())
+                if (not stat.S_ISREG(meta.st_mode) or meta.st_uid != 0 or meta.st_nlink != 1
+                        or meta.st_mode & 0o022): raise self.error('Vector telemetry unavailable')
+                offset = max(0,meta.st_size-1048576)
+                f.seek(offset); lines=f.read(1048576).splitlines()
+                if offset: lines = lines[1:]
+            matching = []
+            for line in lines:
+                try: item=json.loads(line)['capstone_collection_health']
+                except (ValueError,KeyError,TypeError): continue
+                if not isinstance(item,dict): continue
+                if (item.get('metric')=='uptime_seconds' and str(item.get('vector_pid'))==str(pid)
+                        and item.get('invocation_id')==after['invocation_id']
+                        and type(item.get('observed_unix')) in (int,float)):
+                    matching.append(item['observed_unix'])
+            if not matching or not -5 <= self.engine.clock()-max(matching) <= 30:
+                raise self.error('Vector fresh invocation telemetry unavailable')
+        else:
+            # Wazuh forking units can legitimately report MainPID=0. Verify
+            # actual host executables and a fresh post-dispatch connection state.
+            for name in ('wazuh-agentd','wazuh-logcollector'):
+                raw = self.engine.runner.call(['/usr/bin/pgrep','-x',name[:15]], timeout=5).decode()
+                pids = raw.split()
+                if len(pids)>128 or any(not p.isdecimal() for p in pids): raise self.error('agent PID evidence invalid')
+                found = [p for p in pids if Path('/proc/'+p+'/exe').resolve() == Path('/var/ossec/bin/'+name).resolve()]
+                if len(found)!=1: raise self.error('agent host processes unavailable')
+            state, meta = self.helper._read_regular('/var/ossec/var/run/wazuh-agentd.state',65536)
+            if self.engine.clock()-meta.st_mtime > 30 or not re.search(rb"(?m)^status=['\"]?connected['\"]?\s*$",state):
+                raise self.error('agent connection not verified')
+        return after
+
     def preflight(self, target, observation):
+        if PROFILES[target]['kind'].startswith('systemd-'):
+            return self.preflight_systemd(target)
         kind, cid = PROFILES[target]["kind"], observation["container_id"]
         if kind == "nginx":
             self._call(["exec", cid, "nginx", "-t"], timeout=30)
@@ -158,6 +293,9 @@ class ServiceBackend:
             self._call(["exec", cid, "/var/ossec/bin/wazuh-analysisd", "-t"], timeout=60)
 
     def dispatch(self, target, action, before):
+        if PROFILES[target]['kind'].startswith('systemd-'):
+            if action != 'restart': raise self.error('systemd action not allowlisted')
+            return self.engine.runner.call(['/usr/bin/systemctl','--no-block','restart',PROFILES[target]['unit']],timeout=10)
         cid = before["container_id"]
         if action == "reload":
             self._call(["exec", cid, "nginx", "-s", "reload"], timeout=30)
@@ -202,6 +340,12 @@ class ServiceBackend:
 
     def verify(self, target, action, before, dispatched_at):
         profile = PROFILES[target]
+        if profile['kind'].startswith('systemd-'):
+            after = self.verify_systemd(target, before)
+            if profile['kind']=='systemd-agent':
+                _, meta = self.helper._read_regular('/var/ossec/var/run/wazuh-agentd.state',65536)
+                if meta.st_mtime < dispatched_at: raise self.error('agent connection evidence predates dispatch')
+            return after
         after = self.observe(target)
         for key in ("container_id", "image_id", "config_sha256", "files_sha256", "nginx_config_sha256"):
             if after.get(key) != before.get(key):
@@ -290,6 +434,9 @@ class ServiceActionService:
                     "impact": profile["impact"], "automatic_recovery": "none",
                     "restart_grace_seconds": profile["stop_seconds"],
                     "restart_timeout_effect": "Docker may SIGKILL after the fixed graceful-stop interval"}
+            if profile['kind'].startswith('systemd-'):
+                result['restart_grace_seconds'] = None
+                result['restart_timeout_effect'] = 'Existing systemd unit timeouts apply; no timeout or kill policy is changed. Worker verifies one queued restart only.'
         if profile["kind"] == "suricata":
             # Reuse the canonical reader after releasing the workflow lock.
             # Approval still binds only the original observation, unchanged.
@@ -370,10 +517,13 @@ class ServiceActionService:
             self.backend.preflight(target, before)
             if self.backend.observe(target) != before:
                 raise self.error("service changed during preflight")
+            summary = ("unit=%s; active=%s; sub=%s; invocation=%s" %
+                (before['unit'],before['active_state'],before['sub_state'],before['invocation_id'])) if before.get('runtime_kind')=='systemd' else (
+                "container=%s; started=%s; running=%s; health=%s" %
+                (before['container_id'][:12],before['started_at'],before['running'],before['health']))
             plan = {"action": action, "before_observation_sha256": base_state_sha256,
                     "policy_sha256": digest(_policy(target)), "reason": reason.strip(),
-                    "before_summary": "container=%s; started=%s; running=%s; health=%s" % (
-                        before["container_id"][:12], before["started_at"], before["running"], before["health"])}
+                    "before_summary": summary}
             active = 0
             for path in self.state_dir.glob("*.json"):
                 old = self._load(path.stem)

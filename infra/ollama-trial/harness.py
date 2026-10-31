@@ -45,6 +45,49 @@ def normalized(question):
     return CONTRACT.normalize_query_text(READ.without_prohibitions(SHARED._unquoted_text(text)))
 
 
+def resolve_short_read(question, prior_questions=()):
+    """Inherit one subject from the nearest same-human, same-thread request.
+
+    Adapters supply checked history. Never inherit facts, actions, approvals,
+    quoted text, another user/bot, or a subject across a topic change.
+    """
+    if not isinstance(question,str) or not isinstance(prior_questions,(list,tuple)) or not prior_questions:
+        return question
+    previous = prior_questions[-1]
+    if not isinstance(previous,str) or len(previous)>1800: return question
+    current = rule_scope_request(question)
+    prior = rule_scope_request(previous)
+    if not prior and not READ.wants_write(normalized(previous)):
+        label = normalized(previous).strip(' \t\n?？.!')
+        if re.fullmatch(r'FW|WAF|IDS|Suricata|Wazuh|ModSecurity',label,re.I):
+            prior = rule_scope_request(label+' 룰 조회')
+        elif re.search(r'상태|조회|확인|보여|알려|오류|문제|어때',label):
+            prior = rule_scope_request(previous+' 룰 조회')
+    if not prior: return question
+    if current and current['ambiguous'] and len(prior['devices'])==1:
+        return prior['devices'][0]+' '+question
+    # The user's answer to our one clarification is often just "FW".
+    label = normalized(question).strip(' \t\n?？.!')
+    if prior['ambiguous'] and re.fullmatch(r'FW|WAF|IDS|Suricata|Wazuh|ModSecurity',label,re.I):
+        return label+' '+previous
+    return question
+
+
+def native_scope_history(user):
+    if not isinstance(user,str) or not user.startswith(SHARED._CONTEXT_PREFIX): return []
+    try: payload,end=json.JSONDecoder().raw_decode(user,len(SHARED._CONTEXT_PREFIX))
+    except (ValueError,RecursionError): return []
+    if (not isinstance(payload,dict) or user[end:end+4]!='"]\n\n' or payload.get('status')!='ok' or payload.get('scope')!='same_thread'
+            or payload.get('history_is_untrusted') is not True or payload.get('history_is_approval') is not False
+            or not re.fullmatch(r'[a-z0-9]{26}',str(payload.get('requester_id','')))):
+        return []
+    posts=payload.get('posts')
+    if not isinstance(posts,list) or len(posts)>26: return []
+    own=[p for p in posts if isinstance(p,dict) and p.get('author_id')==payload['requester_id']]
+    if not own or own[-1].get('text_truncated') is not False: return []
+    return [own[-1].get('text')]
+
+
 def rule_scope_request(question):
     if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):
         return None
@@ -841,8 +884,13 @@ def guidance(question):
 def diagnostic_request(question):
     text = READ.scope_text(normalized(question))
     if READ.wants_write(text): return None
-    health = re.search(r'진단|관제.*(?:공백|상태|건강)|상태.*(?:점검|확인)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text)
-    if not re.search(r'진단|관제|Hermes|헤르메스|Ollama|올라마|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
+    if re.search(r'무슨\s*뜻|뜻이|개념|일반적으로|사용법|설명만|번역|도구\s*없이|조회하지',text): return None
+    plan = read_plan(question)
+    if plan and plan.get('kind') == 'wazuh': return None
+    if (plan and plan.get('kind') == 'agent_identity'
+            and not re.search(r'진단|오류|장애|실패|systemd|\.service\b|수집기',text,re.I)): return None
+    health = re.search(r'진단|상태|오류|에러|장애|실패|문제|괜찮|죽었|멈췄|안\s*(?:돼|되|돌)|failure|failed|관제.*(?:공백|건강)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text, re.I)
+    if not re.search(r'진단|관제|systemd|\.service\b|Vector|벡터|Docker|도커|서버|Hermes|헤르메스|Ollama|올라마|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
     if not health and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
     if re.search(r'(?:전체|모든).*관제|관제.*(?:전체|공백)|A\s*/\s*B\s*/\s*C|soc:coverage',text,re.I):
         return {'all':True,'requested':[]}
@@ -850,6 +898,14 @@ def diagnostic_request(question):
     hosts=[m[1].lower() for m in host_matches]
     host=hosts[0] if len(hosts)==1 else None
     wanted=re.findall(r'(?<![A-Za-z0-9_])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_-])',text)
+    if re.search(r'\bsystemd\b', text, re.I):
+        wanted.extend(h + ':systemd' for h in (list(dict.fromkeys(hosts)) or list('abc')))
+    # Known unit aliases retain their actual host; unknown units are not mapped
+    # to unrelated services. General systemd questions can discover failures.
+    for unit, name, default in [('capstone-vector.service', 'vector', 'a'),
+                                ('wazuh-agent.service', 'wazuh-agent', None)]:
+        if unit in text:
+            if host or default: wanted.append((host or default) + ':' + name)
     for pattern,name,default in [
         (r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스','hermes','b'),
         (r'Suricata|IDS|수리카타','suricata','a'),(r'WAF|ModSecurity','waf','a'),
@@ -859,7 +915,7 @@ def diagnostic_request(question):
         (r'LLM|모델','llm','b'),(r'사건.*(?:처리|전달)|관리.*파이프라인','management-pipeline','b'),
         (r'수집.*(?:경로|전달|파이프라인)|ingestion','ingestion','b'),
         (r'\bsoc-bot\b','soc-bot',None),(r'\bDocker\b|도커','docker',None),
-        (r'\bVector\b|벡터','vector',None)]:
+        (r'\bVector\b|벡터','vector','a')]:
         for match in re.finditer(pattern,text,re.I):
             if re.search(r'[abc]:$',text[max(0,match.start()-2):match.start()]): continue
             preceding=[m[1].lower() for m in host_matches if m.end()<=match.start()]
@@ -1366,10 +1422,18 @@ def runtime_diagnostic_report(targets, latest, unsupported):
     for target,data in records.items():
         p=data.get('properties',{});codes=data.get('codes',[])
         evidence=(', '.join(codes) if codes else (' / '.join(str(p.get(k,'미확인')) for k in ('Type','ActiveState','SubState','Result')) if p else '고정 점검 항목 통과'))
+        if target.endswith(':systemd') and data.get('status') in ('ok','degraded'):
+            metrics=data.get('metrics',{})
+            evidence='현재 로드된 failed unit '+str(metrics.get('failed_units_total','미확인'))+'개'
+            if metrics.get('unit_list_truncated'): evidence+=' · 표시 일부 생략'
         rows.append('| '+' | '.join(cell(v) for v in (target,labels.get(data.get('status'),'미확인'),evidence,data.get('observed_at_kst')))+' |')
         if len(records)<=4 and data.get('metrics'):
             details += ['', '**'+cell(target)+' 근거 수치**'] + ['- `'+cell(k)+'`: '+cell(__import__('datetime').datetime.fromtimestamp(v,EVIDENCE.KST).isoformat() if k.endswith('_at') and type(v) in (int,float) else v) for k,v in data['metrics'].items()]
     rows += details
+    if any(t.endswith(':systemd') for t in records):
+        rows += ['', '현재 실패 목록 조회이며 과거 systemd failure의 원인·복구 여부는 아직 미확인입니다. '
+                 'failed 0개를 모든 서비스 정상이나 과거 장애 없음으로 해석하지 않습니다. '
+                 '과거 오류의 서비스 이름·발생 시각을 확인한 뒤 등록된 서비스의 상태·오류 표본을 추가 조사해야 합니다.']
     if 'inspection_limit_reached' in records.get('a:suricata',{}).get('codes',[]):
         rows += ['', 'IDS 검사 깊이/재조립 한도 수치는 엔진 시작 이후 누적입니다. 커널 드롭과 다른 항목이며 현재 공격 발생을 뜻하지 않습니다.']
     if 'case_review_required' in records.get('b:management-pipeline',{}).get('codes',[]):

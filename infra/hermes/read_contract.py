@@ -116,7 +116,13 @@ def _single_plan(question, aware_time):
                         (r'chatproxy|채팅\s*프록시', 'a:chatproxy'),
                         ('대시보드|dashboard', 'b:wazuh-dashboard')]
             targets = [target for pattern, target in patterns if re.search(pattern, text, re.I)]
-            if re.search(r'Wazuh|와주', text, re.I) and 'b:wazuh-dashboard' not in targets:
+            if re.search(r'Vector|벡터', text, re.I): targets.append('a:vector')
+            agent = re.search(r'wazuh-agent|(?:Wazuh|와주)\s*(?:에이전트|agent)', text, re.I)
+            hosts = set(re.findall(r'(?<![A-Za-z0-9])([AB])\s*(?:서버|호스트|:)', text, re.I))
+            if agent:
+                if len(hosts) != 1: return None
+                targets.append(next(iter(hosts)).lower()+':wazuh-agent')
+            if not agent and re.search(r'Wazuh|와주', text, re.I) and 'b:wazuh-dashboard' not in targets:
                 targets.append('b:wazuh-manager')
         if len(targets) == 1:
             return {'kind':'operation', 'ids':list(dict.fromkeys(ids)), 'target':targets[0],

@@ -4,10 +4,11 @@
 
 ## 두 봇의 공통 진단
 
-Hermes와 Ollama는 같은 `system-diagnostics.get_system_diagnostics`를 사용한다. 기존 systemd25대상에 아래 runtime13대상을 추가했다. `soc:coverage`는 전체38대상을 한 번에 집계하는 선택값으로, 별도 장비가 아니다. MCP 이름·보호 도구 권한은 늘리지 않는다.
+Hermes와 Ollama는 같은 `system-diagnostics.get_system_diagnostics`를 사용한다. 기존 systemd25대상에 아래 runtime16대상을 사용한다. `soc:coverage`는 전체41대상을 한 번에 집계하는 선택값으로, 별도 장비가 아니다. MCP 이름·보호 도구 권한은 늘리지 않는다.
 
 | 서버 | 고정 runtime 대상 | 확인하는 근거 |
 | --- | --- | --- |
+| A/B/C | `a:systemd`, `b:systemd`, `c:systemd` | 현재 failed unit 이름·상태·총계/잘림. 과거 장애 원인이나 전체 정상 판정이 아님 |
 | A | `a:waf`, `a:suricata`, `a:collection` | 컨테이너, IDS 실제 적재/실패/드롭/검사 한계, 에이전트·Vector 최신성/손실 지표 |
 | B | `b:hermes`, `b:ollama` | 현재 프로세스 ID·시작 시각에 연결된 인증 WebSocket/worker heartbeat, 대기 작업 |
 | B | `b:wazuh-manager`, `b:wazuh-indexer`, `b:mattermost` | manager 필수6프로세스·큐/드롭, Indexer cluster health, Mattermost API |
@@ -15,7 +16,7 @@ Hermes와 Ollama는 같은 `system-diagnostics.get_system_diagnostics`를 사용
 | B | `b:collection` | 호스트 agent 연결·상태 최신성·실제 호스트 바이너리의 필수 프로세스 |
 | C | `c:collection` | 에이전트 연결·필수 프로세스·상태 최신성 |
 
-root collector가 약60초마다 schema2 스냅샷을 발행한다. 기존 schema1은 이관용으로 읽을 수 있지만 runtime 근거가 없으면 미확인이다. 최대 유효기간180초, 한 호스트 누락도 전체38대상 중 미확인으로 남긴다. `lookback_minutes`가 있어도 runtime은 최신 스냅샷이며 해당 기간 전체 이력을 조회한 것이 아니다. systemd 오류 수는 반환 표본 수이며 전체 발생 건수가 아니다. KST 표시 시각은 서버에서 계산한다.
+root collector가 약60초마다 schema2 스냅샷을 발행한다. 기존 schema1은 이관용으로 읽을 수 있지만 runtime 근거가 없으면 미확인이다. 최대 유효기간180초, 한 호스트 누락도 전체41대상 중 미확인으로 남긴다. `lookback_minutes`가 있어도 runtime은 최신 스냅샷이며 해당 기간 전체 이력을 조회한 것이 아니다. systemd 오류 수는 반환 표본 수이며 전체 발생 건수가 아니다. KST 표시 시각은 서버에서 계산한다.
 
 현재 B의 `b:vector`는 의도된 미설치다. `b:wazuh-agent`는 설치된 호스트 unit이며 `b:collection`에서 연결 단절·오래된 상태·프로세스 부재를 별도로 검사한다. manager 컨테이너와 같은 이름의 프로세스는 실제 실행파일 inode를 비교해 호스트 프로세스로 잘못 세지 않는다. 컨테이너의 manager를 host agent로 대신 세지 않는다. Indexer 단일 노드의 yellow, oneshot의 성공 후 inactive, 누적 Suricata 검사 깊이 제한을 현재 서비스 중단으로 단정하지 않는다. `needs_review/outcome_unknown` 사건은 정상이나 완료로 바꾸지 않는다.
 

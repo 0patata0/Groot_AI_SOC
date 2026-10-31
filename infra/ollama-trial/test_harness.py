@@ -143,7 +143,7 @@ class Grounding(unittest.TestCase):
         self.assertNotIn('정상 가동', text)
 
     def test_state_and_test_label_do_not_hide_inventory(self):
-        question = '[비교시험 Q1] 현재 적용된 룰 보여줘. 현재 상태 조회만 해줘.'
+        question = '[비교시험 Q1] WAF IDS Wazuh 현재 적용된 룰 보여줘. 현재 상태 조회만 해줘.'
         missing = harness.inventory(question, [fixture()], missing_targets=True)
         self.assertEqual(missing, ['a:suricata-local', 'b:wazuh-local-rules'])
 
@@ -160,7 +160,7 @@ class Grounding(unittest.TestCase):
         self.assertEqual(harness.inventory('WAF 규칙 보여줘', [good, failed], verified_targets=True), [])
 
     def test_reformat_requires_complete_verified_evidence(self):
-        evidence = {'question': '현재 적용된 규칙 보여줘', 'calls': [fixture()], 'at_kst': '2026-10-25T06:00:00+09:00'}
+        evidence = {'question': 'WAF IDS Wazuh 현재 적용된 규칙 보여줘', 'calls': [fixture()], 'at_kst': '2026-10-25T06:00:00+09:00'}
         self.assertIsNone(harness.prior_inventory('장비별로 표로 보여줘', evidence))
         evidence['calls'] += [fixture('a:suricata-local'), fixture('b:wazuh-local-rules')]
         self.assertIn('이전 실제 조회 시각', harness.prior_inventory('장비별로 표로 보여줘', evidence))

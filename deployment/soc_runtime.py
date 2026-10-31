@@ -148,7 +148,8 @@ def render(name, raw, profile, run_source=None):
         profiles = replace_profile_paths(ast.literal_eval(node.value), mapping, containers)
         profiles = {k: v for k, v in profiles.items() if v["host"] == p["role"]}
         for value in profiles.values():
-            value["expected_id"] = p["container_ids"][value["container"]]
+            if not value['kind'].startswith('systemd-'):
+                value["expected_id"] = p["container_ids"][value["container"]]
         if "a:waf" in profiles:
             profiles["a:waf"]["probe"] = {"port": p["waf_port"], "path": "/dvwa/login.php", "host": "capstone-service", "marker": "DVWA"}
         if "b:wazuh-dashboard" in profiles:
@@ -193,7 +194,7 @@ def render(name, raw, profile, run_source=None):
         mapping.update({"995:986": str(p["hermes_uid"]) + ":" + str(p["hermes_gid"]),
                         "hermes": p["container_ids"]["capstone-hermes"],
                         "http://10.200.10.": "http://" + p["siem_host"] + ":8065/hooks/"})
-        assigned(tree, "SERVICE_TARGETS").value = ast.parse("frozenset(('a:waf','a:suricata','b:wazuh-manager','b:wazuh-dashboard'))", mode="eval").body
+        assigned(tree, "SERVICE_TARGETS").value = ast.parse("frozenset(('a:waf','a:suricata','b:wazuh-manager','b:wazuh-dashboard','a:vector','a:wazuh-agent','b:wazuh-agent'))", mode="eval").body
     if name == "soc_bot.py":
         # New installs have a private CA, so preserve real chain/IP validation.
         assigned(tree, "CTX").value = ast.parse("ssl.create_default_context(cafile='/etc/socbot/root-ca.pem')", mode="eval").body

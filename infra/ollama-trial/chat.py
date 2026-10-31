@@ -254,11 +254,21 @@ class Gateway:
             try:
                 self.runtime = agent_config('/etc/capstone-ollama-trial/config.json')
                 current = request_text(post['message'])
-                question = question_with_history({**post, 'message': current}, await self.history_for(post), self.c['bot_id'],
+                history = await self.history_for(post)
+                question = question_with_history({**post, 'message': current}, history, self.c['bot_id'],
                                                  self.c.get('report_bot_ids', []))
+                scope_history = sorted([p for p in history if post.get('root_id') and
+                    p.get('id') != post['id'] and p.get('user_id') == post['user_id'] and
+                    p.get('channel_id') == post['channel_id'] and
+                    (p.get('root_id') or p.get('id')) == post['root_id'] and
+                    not p.get('delete_at') and not p.get('type') and
+                    (p.get('create_at',0),p.get('id','')) < (post['create_at'],post['id'])],
+                    key=lambda p:(p['create_at'],p['id']))
+                prior_questions = [scope_history[-1].get('message')] if scope_history else []
                 with contextlib.redirect_stdout(sys.stderr):
                     report = await asyncio.wait_for(agent_run(self.runtime, {'question': question,
-                        'current_question': current, 'prior_evidence': self.prior_evidence(post)},
+                        'current_question': current, 'read_scope_history': prior_questions,
+                        'prior_evidence': self.prior_evidence(post)},
                         on_protected_start=protected_start, connection_pool=self.read_pool), 1110)
                 answer = final_text(report, time.perf_counter() - started)
                 evidence = json.dumps(report['evidence'], ensure_ascii=False) if report.get('evidence') else None

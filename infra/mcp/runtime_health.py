@@ -22,10 +22,10 @@ from urllib.parse import urlsplit
 
 CONFIG = Path('/etc/capstone-diagnostics/runtime.json')
 ROLE_TARGETS = {
-    'security': ('a:waf', 'a:suricata', 'a:collection'),
+    'security': ('a:waf', 'a:suricata', 'a:collection', 'a:systemd'),
     'siem': ('b:hermes', 'b:ollama', 'b:wazuh-manager', 'b:wazuh-indexer',
-             'b:mattermost', 'b:llm', 'b:management-pipeline', 'b:ingestion', 'b:collection'),
-    'service': ('c:collection',),
+             'b:mattermost', 'b:llm', 'b:management-pipeline', 'b:ingestion', 'b:collection', 'b:systemd'),
+    'service': ('c:collection', 'c:systemd'),
 }
 TARGETS = frozenset(t for values in ROLE_TARGETS.values() for t in values)
 STATUSES = frozenset(('ok', 'degraded', 'unavailable', 'not_installed'))
@@ -36,7 +36,7 @@ CODES = frozenset(('container_stopped', 'container_unhealthy', 'container_restar
     'pipeline_probe_stale', 'pipeline_probe_mismatch', 'probe_unavailable',
     'model_not_loaded', 'model_request_failed', 'chat_disconnected',
     'chat_heartbeat_stale', 'job_stalled', 'case_stalled', 'report_delivery_pending',
-    'not_installed', 'expected_agent_missing', 'runtime_not_configured', 'inspection_limit_reached', 'rules_failed', 'case_review_required'))
+    'not_installed', 'expected_agent_missing', 'runtime_not_configured', 'inspection_limit_reached', 'rules_failed', 'case_review_required', 'systemd_unit_failed'))
 CONTAINERS = {
     'groot': {'a:waf': 'waf', 'a:suricata': 'suricata', 'b:hermes': 'hermes',
         'b:wazuh-manager': 'single-node-wazuh.manager-1',
@@ -120,7 +120,9 @@ def validate(rows, role, now):
             require(isinstance(key, str) and re.fullmatch(r'[a-z][a-z0-9_]{0,63}', key))
             require(value is None or type(value) is bool or
                     type(value) in (int, float) and math.isfinite(value) and abs(value) <= 2**63 or
-                    isinstance(value, str) and re.fullmatch(r'[a-zA-Z0-9_.:+-]{1,80}', value), 'runtime_metric_value')
+                    isinstance(value, str) and (re.fullmatch(r'[a-zA-Z0-9_.:+-]{1,80}', value) or
+                        target.endswith(':systemd') and re.fullmatch(r'failed_unit_[0-9]+', key)
+                        and re.fullmatch(r'[a-zA-Z0-9_.:@\\-]{1,255}', value)), 'runtime_metric_value')
     require(len(json.dumps(rows).encode()) <= 32768, 'runtime_size')
     return rows
 
@@ -388,7 +390,37 @@ def probe_receipt(kind, now):
     return observation(kind + '_probe', now, metrics, codes, limits=('bounded_synthetic_probe_not_all_events',))
 
 
+def systemd_failures(runner, now):
+    """All loaded failed units, independent of the curated diagnostic catalog.
+
+    Return identities and state only; descriptions/raw journal never leave the
+    root collector. A failed command cannot turn into a zero-failure report.
+    """
+    text = command(runner, ['/usr/bin/systemctl', 'list-units', '--failed', '--all',
+                           '--no-legend', '--no-pager', '--plain'], maximum=131072, seconds=6)
+    units = {}
+    for line in text.splitlines():
+        if not line.strip(): continue
+        fields = line.split(None, 4)
+        require(len(fields) >= 4 and re.fullmatch(r'[a-zA-Z0-9_.:@\\-]{1,255}', fields[0])
+                and fields[2] == 'failed' and fields[0] not in units, 'systemd_list_invalid')
+        require(all(re.fullmatch(r'[a-z][a-z-]{0,47}', s) for s in fields[1:4]), 'systemd_state_invalid')
+        units[fields[0]] = fields[1:4]
+        require(len(units) <= 512, 'systemd_list_bound')
+    metrics = {'failed_units_total': len(units), 'returned_units': min(len(units), 16),
+               'unit_list_truncated': len(units) > 16}
+    for i, (unit, states) in enumerate(sorted(units.items())[:16]):
+        metrics['failed_unit_' + str(i)] = unit
+        for key, value in zip(('load', 'active', 'sub'), states):
+            metrics['unit_' + str(i) + '_' + key] = value
+    codes = (['systemd_unit_failed'] if units else []) + (['inspection_limit_reached'] if len(units) > 16 else [])
+    return observation('systemd_failed_units', now, metrics, codes,
+        limits=['loaded_failed_units_only', 'not_a_historical_journal_query',
+                'zero_failed_units_is_not_all_services_healthy', 'unit_detail_requires_registered_target'])
+
+
 def collect_one(target, cfg, runner, now):
+    if target.endswith(':systemd'): return systemd_failures(runner, now)
     if target == 'b:wazuh-manager': return wazuh(cfg, runner, now)
     if target in ('a:collection', 'b:collection', 'c:collection'): return agent_collection(cfg['role'], runner, now)
     if target in ('b:hermes', 'b:ollama'): return bot(target, cfg, runner, now)

@@ -1,5 +1,9 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+## 2026-10-31 현재 실패 집계와 승인형 호스트 서비스
+
+`a:systemd`/`b:systemd`/`c:systemd`로 등록 unit 밖의 현재 실패도 발견한다. systemd25+runtime16=41관측 대상이며 `soc:coverage` 포함 enum42다. 0개는 과거 장애 부재나 전체 정상의 증거가 아니다. 기존 서비스5개에 A Vector·A/B Wazuh host-agent restart3개를 추가했고, 모델의 진단·승인안 준비→정확한 관리자 승인→한 번 실행·확인 경계를 유지한다. C 쓰기·임의 shell·unit·설정 편집·패키지 권한은 추가하지 않았다. [사용·허용 범위·복구](host-service-actions.md) · [실제 배포/검증](../../STATUS.md).
+
 > **2026-10-30 서비스·임시차단/IDS 읽기:** get_operation_status의 요청 기록과 현재 서비스/실시간 nft 관측을 구분합니다. get_service_action_target(a:suricata)에 전후 적재 시각·컨테이너를 대조한 단일 tenant 엔진 카운터를 추가했습니다. 조회 실패는 unavailable이며 승인용 observation/base 해시·보호 실행 경계는 유지합니다. [필드·복구·한계](operation-status-read.md) · [운영 검증](../../STATUS.md).
 
 > **2026-10-30 변경 기록 읽기:** get_rule_change_status의 승인 소모·결과 알림·과거 읽기 해시 누락을 보완했습니다. current_file_checked=false이며 현재 파일은 별도 getter로 검증합니다. 기존 읽기 전용 계정·승인/worker 경계를 유지합니다. [필드와 복구](change-status-read.md) · [실제 검증](../../STATUS.md).

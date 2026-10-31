@@ -126,7 +126,7 @@ def library():
 def tools():
     return [{
         'name': 'get_system_diagnostics',
-        'description': 'Read fixed A/B/C systemd and SOC runtime health snapshots. soc:coverage returns every target in one call, including missing evidence. Hermes, Ollama, Wazuh manager/indexer, Mattermost, model and collection have dedicated targets. '
+        'description': 'Read A/B/C systemd and SOC runtime health snapshots. a:systemd/b:systemd/c:systemd list currently failed loaded units, including units outside the curated target catalog; they are not a historical journal or full system health check. soc:coverage returns every target in one call, including missing evidence. Hermes, Ollama, Wazuh manager/indexer, Mattermost, model and collection have dedicated targets. '
             'Root collectors update every 60 seconds; this is not a live shell or raw journal reader. '
             'Quote observed_at_kst directly for KST time; do not mentally convert the epoch. '
             'returned_error_count counts only returned samples; requested_window_total_count is unknown. '

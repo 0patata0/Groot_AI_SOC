@@ -1,3 +1,4 @@
+# 2026-10-31 contract1.5.7/query1.17: 단문 대상1회확인·동일사용자/스레드 대상상속, systemd 현재실패3대상, 승인형 A Vector/A·B host wazuh-agent restart. MCP/키/포트 추가 없음. 세부 infra/mcp/host-service-actions.md
 # 2026-10-25 chat-contract1.0/query-completion1.7: 일반 Mattermost 추론off/temp0/top_p0.95/output2048, native iteration<=12. MCP 읽기90초/보호720초. 자동관리CLI 추론설정 별도.
 # query-completion1.6.0: IDS=a:suricata, 조회 time_display 및 calculate_time의 KST/경과값 사용. 원본 로그/승인 해시는 보존.
 # 2026-10-25 현행: 조회는 rule-a/b(ruleview), 변경 제안은 rule-write-a/b(rulechg) 단일 경로. 총8논리 MCP/36도구이며 추가 VM은 없다. 아래 과거 배포 이력은 당시 범위다.

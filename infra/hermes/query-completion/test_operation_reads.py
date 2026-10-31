@@ -10,7 +10,8 @@ class OperationReads(unittest.TestCase):
     rid='c7'*16
 
     def test_service_and_containment_requests_choose_the_right_host_and_tool(self):
-        for device,target in [('WAF','a:waf'),('IDS','a:suricata'),('채팅 프록시','a:chatproxy'),('Wazuh Manager','b:wazuh-manager'),('Wazuh 대시보드','b:wazuh-dashboard')]:
+        for device,target in [('WAF','a:waf'),('IDS','a:suricata'),('채팅 프록시','a:chatproxy'),('Wazuh Manager','b:wazuh-manager'),('Wazuh 대시보드','b:wazuh-dashboard'),
+                              ('Vector','a:vector'),('A 서버 Wazuh 에이전트','a:wazuh-agent'),('B 서버 wazuh-agent','b:wazuh-agent')]:
             q=device+' 재시작 요청 '+self.rid+' 처리됐어?'
             p=H.read_plan(q);self.assertEqual((p['kind'],p['target']),('operation',target))
             self.assertEqual(H.tool_scope(q),{'mcp__rule_'+target[0]+'__get_operation_status'})
@@ -18,6 +19,7 @@ class OperationReads(unittest.TestCase):
         self.assertEqual(H.read_plan(q)['target'],'a:incident-ip')
         self.assertIsNone(H.read_plan('WAF 요청 '+self.rid+' 재시작해줘'))
         self.assertIsNone(H.read_plan('WAF와 IDS 재시작 요청 '+self.rid+' 상태 알려줘'))
+        self.assertIsNone(H.read_plan('Wazuh 에이전트 재시작 요청 '+self.rid+' 상태 알려줘'))
 
     def test_failed_operation_read_stays_unknown_and_is_not_replayed(self):
         q='WAF 재시작 요청 '+self.rid+' 처리됐어?'

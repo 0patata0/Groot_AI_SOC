@@ -26,6 +26,32 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_short_followup_resolves_before_native_tool_selection(self):
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        for current, prior, scope in [('룰 조회해줘','FW 룰 조회해줘','same_thread'),
+                                      ('FW','룰 조회해줘','same_thread'),
+                                      ('룰 조회해줘','FW 룰 조회해줘','same_channel_top_level')]:
+            user=hydrated(current,status='ok',scope=scope,requester_id='u'*26,
+                posts=[{'author_id':'u'*26,'text':prior,'text_truncated':False}])
+            rows=[{'role':'system','content':'native'},{'role':'user','content':user}]
+            agent=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,_current_turn_id='a')
+            source={'messages':rows,'tools':[{'type':'function','function':{'name':'mcp__resp__get_firewall_rules',
+                'description':'read firewall','parameters':{'type':'object','properties':{},'additionalProperties':False}}}]}
+            wrap=alignment.request_wrapper(lambda *args,**kw:Request(copy.deepcopy(source)),PLUGIN,H)
+            result=wrap(agent,original_user_message=user,turn_id='a',messages=rows)
+            if scope=='same_thread':
+                self.assertEqual(H.tool_scope(agent._capstone_proposal_context[1]), {'mcp__resp__get_firewall_rules'})
+                self.assertIsNotNone(agent._capstone_read_selection)
+                self.assertIn('mcp__resp__get_firewall_rules',str(result.api_kwargs))
+            else:
+                self.assertIn('어느 장비',agent._capstone_query_completion_local_format[1])
+                self.assertIsNone(agent._capstone_read_selection)
+            self.assertEqual(rows[-1]['content'],user)
+
     def test_runtime_clock_is_stable_in_turn_and_refreshed_between_turns(self):
         from unittest.mock import patch
         @dataclass
@@ -634,7 +660,7 @@ class SharedContract(unittest.TestCase):
         self.assertTrue(h.agent._capstone_alignment_partial)
 
     def test_native_read_repair_is_bounded_and_never_creates_fake_evidence(self):
-        h = Harness(text='조회 완료')
+        h = Harness(request='WAF IDS Wazuh 현재 적용된 룰 보여줘', text='조회 완료')
         h.agent.model = 'qwen3.6:35b'; h.agent.provider = 'custom'
         h.wrapper = alignment.final_wrapper(h.wrapper, h.original, h.native, h.append, h.reanchor, PLUGIN, H)
         first = h.call()

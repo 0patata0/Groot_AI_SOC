@@ -26,6 +26,9 @@ from datetime import datetime, timedelta, timezone
 
 
 SERVICE_ACTIONS = {
+    "a:vector": frozenset(("restart",)),
+    "a:wazuh-agent": frozenset(("restart",)),
+    "b:wazuh-agent": frozenset(("restart",)),
     "a:waf": frozenset(("reload", "restart")),
     "a:suricata": frozenset(("restart",)),
     "a:chatproxy": frozenset(("reload", "restart")),
@@ -33,6 +36,9 @@ SERVICE_ACTIONS = {
     "b:wazuh-dashboard": frozenset(("restart",)),
 }
 SERVICE_IMPACT = {
+    "a:vector": "A 호스트 로그 정제가 잠시 중단됩니다. 설정·원본 로그·체크포인트는 변경하지 않습니다.",
+    "a:wazuh-agent": "A 호스트 로그 수집이 잠시 중단됩니다. Wazuh Manager는 재시작하지 않습니다.",
+    "b:wazuh-agent": "B 호스트 로그 수집이 잠시 중단됩니다. Wazuh Manager는 재시작하지 않습니다.",
     "a:waf": "웹 보안 프록시 연결이 잠시 중단될 수 있습니다.",
     "a:suricata": "IDS 탐지가 잠시 중단됩니다.",
     "a:chatproxy": "채팅·대시보드 접속이 잠시 중단될 수 있습니다.",
@@ -182,6 +188,8 @@ class OperationsBroker:
             expected = ("같은 컨테이너·설정을 유지하고, 시작 시각이 바뀌며 정상 상태를 확인합니다."
                         if plan["action"] == "restart" else
                         "같은 master 프로세스를 유지하고, 새 worker와 정상 응답을 확인합니다.")
+            if rec['target'] in ('a:vector','a:wazuh-agent','b:wazuh-agent'):
+                expected = '같은 systemd unit·설정과 부팅 세대를 유지하고 새 실행 ID·프로세스 및 대상별 준비 상태를 검증합니다.'
             return (header + "\n\n작업: `%s`\n고정 실행 정책 SHA-256: `%s`\n변경 전 상태:\n\n    %s\n\n"
                     "예상 변경 후 상태: %s\n영향: %s\n"
                     "사유:\n\n    %s\n\n지정된 서비스의 이 작업 한 건만 승인합니다. "

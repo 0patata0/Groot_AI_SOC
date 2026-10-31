@@ -32,7 +32,7 @@ class RuntimeTests(unittest.TestCase):
 
     def test_catalog_has_no_arbitrary_paths_and_matches_validator(self):
         self.assertEqual(d.RUNTIME_TARGETS,h.ROLE_TARGETS)
-        self.assertEqual(len(d.TARGETS),39)
+        self.assertEqual(len(d.TARGETS),42)
         self.assertIn('soc:coverage',d.TARGETS)
 
     def test_missing_configuration_is_not_healthy(self):

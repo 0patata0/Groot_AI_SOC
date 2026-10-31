@@ -221,6 +221,7 @@ def request_wrapper(original, query, harness):
         if not enabled(agent):
             return original(agent, **kw)
         request = query.current_request_text(kw.get("original_user_message"))
+        request = harness.resolve_short_read(request, harness.native_scope_history(kw.get('original_user_message')))
         turn = kw.get("turn_id")
         if not request or turn != getattr(agent, "_current_turn_id", None):
             return original(agent, **kw)
@@ -485,6 +486,7 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
                 or getattr(agent, "_interrupt_requested", False)):
             return legacy(agent, **kw)
         request = query.current_request_text(user)
+        request = harness.resolve_short_read(request, harness.native_scope_history(user))
         idx = reanchor(rows, user)
         if type(idx) is not int or idx < 0 or idx >= len(rows) or rows[idx].get("content") != user:
             return legacy(agent, **kw)

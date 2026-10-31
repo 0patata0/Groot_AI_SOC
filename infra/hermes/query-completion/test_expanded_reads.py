@@ -73,7 +73,7 @@ class ExpandedReads(unittest.TestCase):
     def test_explicit_rule_table_reuses_verified_prior_and_respects_no_new_reads(self):
         from test_inventory_render import payload, FILES
         q = '방금 확인한 규칙 목록을 장비별 표로 다시 정리해줘. 추가 조회는 하지 말고 앞선 실제 조회 시점을 밝혀줘.'
-        previous = '현재 적용된 룰 보여줘. 파일에 선언된 규칙과 엔진 활성 확인을 구분해줘.'
+        previous = 'WAF IDS Wazuh 현재 적용된 룰 보여줘. 파일에 선언된 규칙과 엔진 활성 확인을 구분해줘.'
         calls = []
         for target in FILES:
             data = payload(target); data['time_display'] = {'rendered_at_kst': '2026-10-25T10:01:02+09:00'}
@@ -95,7 +95,7 @@ class ExpandedReads(unittest.TestCase):
             api_kwargs: object
             api_messages: object = None
             _original_api_kwargs: object = None
-        q = '현재 적용된 룰 보여줘. 엔진 활성 확인과 구분해줘.'
+        q = 'WAF IDS Wazuh 현재 적용된 룰 보여줘. 엔진 활성 확인과 구분해줘.'
         rows = [{'role': 'user', 'content': q}]
         tools = [{'type': 'function', 'function': {'name': name, 'parameters': {'type': 'object', 'properties': {'target': {'type': 'string'}}}}}
                  for name in ('mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target', 'mcp__rule_write_a__propose_rule_edit')]

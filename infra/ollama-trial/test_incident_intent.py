@@ -140,7 +140,7 @@ class IncidentIntent(unittest.TestCase):
                 self.assertFalse(h.structured_read(question))
 
     def test_plain_rule_inventory_remains_supported(self):
-        for question in ('현재 적용된 룰 보여줘','WAF 룰 보여줘','장비별 규칙 목록 확인해줘'):
+        for question in ('WAF IDS Wazuh 현재 적용된 룰 보여줘','WAF 룰 보여줘','장비별 규칙 목록 확인해줘'):
             self.assertIsNotNone(h.inventory_question(question))
         self.assertFalse(h.EVIDENCE.incident_investigation_request('현재 WAF 공격 탐지 규칙 목록 보여줘'))
 

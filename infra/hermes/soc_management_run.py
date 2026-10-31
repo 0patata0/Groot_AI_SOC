@@ -654,7 +654,8 @@ def status_read_requirements(raw):
             if (not isinstance(row, dict) or set(row) != {'proposal_id','target'} or
                     not isinstance(row['proposal_id'], str) or not re.fullmatch(r'[0-9a-f]{32}', row['proposal_id']) or
                     row['target'] not in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules',
-                        'a:waf','a:suricata','a:chatproxy','b:wazuh-manager','b:wazuh-dashboard','a:incident-ip')):
+                        'a:waf','a:suricata','a:chatproxy','b:wazuh-manager','b:wazuh-dashboard','a:incident-ip',
+                        'a:vector','a:wazuh-agent','b:wazuh-agent')):
                 raise ValueError()
         return value
     except (ValueError, TypeError):

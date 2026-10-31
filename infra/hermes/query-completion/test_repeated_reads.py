@@ -343,7 +343,8 @@ class RepeatedReads(unittest.TestCase):
         self.assertEqual(H.tool_scope('Wazuh 규칙 목록 보여줘'), {b})
         self.assertEqual(H.tool_scope('WAF와 IDS 규칙 목록 보여줘'), {a})
         self.assertEqual(H.tool_scope('WAF Wazuh 규칙 목록 보여줘'), {a,b})
-        self.assertEqual(H.tool_scope('전체 규칙 목록 보여줘'), {a,b})
+        self.assertEqual(H.tool_scope('전체 규칙 목록 보여줘'), set())
+        self.assertEqual(H.tool_scope('WAF IDS Wazuh 전체 규칙 목록 보여줘'), {a,b})
         self.assertEqual(H.tool_scope('IDS 규칙 목록과 구동 경로 보여줘'), {a,'mcp__rule_a__get_service_action_target'})
 
     def test_policy_facts_require_exact_available_definitions_and_exclude_incidents(self):

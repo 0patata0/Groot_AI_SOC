@@ -48,7 +48,7 @@ ID = re.compile(r"[0-9a-f]{16,64}\Z")
 SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 SESSION = re.compile(r"[A-Za-z0-9_.:-]{1,128}\Z")
 RULE_TARGETS = frozenset(("a:suricata-local", "a:modsecurity-custom", "b:wazuh-local-rules"))
-SERVICE_TARGETS = frozenset(("a:waf", "a:suricata", "a:chatproxy", "b:wazuh-manager", "b:wazuh-dashboard"))
+SERVICE_TARGETS = frozenset(("a:waf", "a:suricata", "a:chatproxy", "b:wazuh-manager", "b:wazuh-dashboard", "a:vector", "a:wazuh-agent", "b:wazuh-agent"))
 TERMINAL = frozenset(("denied", "expired", "applied", "rolled_back", "recovery_failed", "failed", "aborted", "kept", "released", "error"))
 FINAL_STATUS = re.compile(r"(?:^|\n)MANAGEMENT_STATUS: (resolved|monitor|needs_review|awaiting_approval)\s*\Z")
 

@@ -1,5 +1,9 @@
 # 초기 설치기의 Hermes 확장
 
+## 2026-10-31 단문·systemd 호스트 작업 소스
+
+`deploy.sh`의 기존 진단/관리/Hermes/Ollama 설치 경로에 공통 단문 계약1.5.7·query1.17.0, 현재 failed 집계3대상, A Vector·A/B Wazuh host-agent 승인형 restart를 함께 반입한다. SOC renderer는 systemd 프로필을 컨테이너 ID 바인딩에서 제외하고 관리 gate/controller의 대상 목록을 동기화한다. SOUL·source pin·어댑터·context 소스도 함께 배치한다. 기존 키·계정·포트·deb/wheel/image 목록은 유지하며 **추가 오프라인 바이너리0**, 갱신 소스가 반입 대상이다. 운영은 root 백업 후 증분 적용이며 새3VM 전체 설치 시험은 미실시. [사용/복구/검증 구분](../infra/mcp/host-service-actions.md) · [현황](../STATUS.md).
+
 > **2026-10-31 사건 판단 정정:** 기존 `deploy.sh` 소스 경로로 query-completion1.15.7/chat-contract1.5.2와 두 봇 공통 하네스를 설치합니다. B 운영 파일과 오프라인 source cache를 동기화했으며 새 패키지·포트·설정 키는 없습니다. 운영 증분 반영과 새 서버 전체 설치 검증은 구분합니다. [동작·복구·검증](../infra/hermes/incident-judgment-repair.md).
 
 > **2026-10-29 FW 읽기:** root `deploy.sh`의 기존 SOC/두 봇 소스 경로에 전체 FW 조회를 포함했다. 응답 MCP 4도구 계약과 공통 38도구 허용 목록을 사용한다. 신규 설정 키·포트·패키지는 없다. [설치·오프라인·복구 범위](../infra/mcp/firewall-read.md) · [검증](../STATUS.md).

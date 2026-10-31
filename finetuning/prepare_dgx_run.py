@@ -12,7 +12,7 @@ FILES=('train.py','model_profile.py','memory_budget.py','memory_telemetry.py',
        'bounded_loading.py','completion_loss.py','dialogue_encoding.py','training_lineage.py',
        'guarded_process.py','download_model.py','dgx_task.py','dgx_supervisor.py',
        'requirements.qwen36-thor.txt','requirements.qwen36-dgx.txt','admit_guide_sft.py',
-       'check_dgx_architecture.py')
+       'check_dgx_architecture.py','resume_training.py')
 
 
 def build(output, root, uid, gid, image, deadline, guide_mix=None, run_id='capstone-dgx-20261031'):

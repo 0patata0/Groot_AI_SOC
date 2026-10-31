@@ -27,6 +27,7 @@ import model_profile
 import memory_budget
 import memory_telemetry
 from bounded_loading import checkpoint_loading
+from resume_training import validate_resume, remaining_seconds
 
 
 def deadline_reached(config, now=None):
@@ -349,6 +350,7 @@ def tokenize_only(config, checks):
 def run_training(config, checks, hardware):
     if deadline_reached(config):
         raise RuntimeError("Training deadline already reached")
+    resume = validate_resume(config, checks)
     os.environ.setdefault("HF_HOME", str(ROOT / ".cache" / "huggingface"))
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -363,6 +365,8 @@ def run_training(config, checks, hardware):
     if output.exists() and any(output.iterdir()):
         raise ValueError("Output directory is not empty. Select a new --output-dir for this run.")
     output.mkdir(parents=True, exist_ok=True)
+    if resume:
+        write_json(output/'resume_verification.json', resume)
     set_seed(config["seed"])
     load_args = {"revision": config["revision"], "trust_remote_code": False, "local_files_only": config["offline"]}
     write_json(output / 'progress.json', {'status':'tokenizing', 'at_kst':kst_now()})
@@ -446,7 +450,8 @@ def run_training(config, checks, hardware):
             write_json(output / 'progress.json', {'status':status, 'at_kst':kst_now(),
                 'step':state.global_step, 'max_steps':state.max_steps, 'epoch':state.epoch,
                 'elapsed_seconds':round(elapsed, 2),
-                'estimated_remaining_seconds':round(elapsed / state.global_step * (state.max_steps-state.global_step), 1) if state.global_step else None,
+                'resumed_from_step':resume['step'] if resume else 0,
+                'estimated_remaining_seconds':remaining_seconds(elapsed, state.global_step, state.max_steps, resume['step'] if resume else 0),
                 'peak_cuda_allocated_gib':round(torch.cuda.max_memory_allocated()/2**30, 2),
                 'peak_cuda_reserved_gib':round(torch.cuda.max_memory_reserved()/2**30, 2),
                 'memory':memory_telemetry.record(output,torch.cuda,phase=status,step=state.global_step),
@@ -461,6 +466,8 @@ def run_training(config, checks, hardware):
             self.record(state, 'stopping_deadline' if deadline_reached(config) else 'training')
             return control
         def on_train_begin(self, args, state, control, **kwargs):
+            if resume and (state.global_step != resume['step'] or state.max_steps != resume['max_steps']):
+                raise RuntimeError('Trainer did not restore the exact checkpoint step/plan')
             if bool(model.is_gradient_checkpointing) != checkpointing:
                 raise RuntimeError('Actual activation checkpointing differs from the reviewed configuration')
             self.record(state, 'training')
@@ -485,7 +492,7 @@ def run_training(config, checks, hardware):
     trainer = trainer_type(model=model, args=args, train_dataset=train, eval_dataset=val, data_collator=collator,
                       processing_class=tokenizer, callbacks=[progress])
     try:
-        result = trainer.train()
+        result = trainer.train(**({'resume_from_checkpoint':config['resume_from_checkpoint']} if resume else {}))
     except Exception as exc:
         memory_telemetry.record(output,torch.cuda,phase='training_failed',step=trainer.state.global_step,error_type=type(exc).__name__)
         raise

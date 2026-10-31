@@ -21,7 +21,7 @@ RESTORE_MINUTES=245
 STAGES=('smoke','main')
 SOURCE_FILES={'train.py','model_profile.py','memory_budget.py','memory_telemetry.py',
               'bounded_loading.py','completion_loss.py','dialogue_encoding.py',
-              'training_lineage.py','guarded_process.py','durable_training_task.py'}
+              'training_lineage.py','guarded_process.py','durable_training_task.py','resume_training.py'}
 
 def select_run(run_id):
     global RUN_ID,UNIT,STATE,RESTORE,LIMIT,RESTORE_MINUTES,STAGES

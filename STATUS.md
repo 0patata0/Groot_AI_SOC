@@ -1,5 +1,23 @@
 # 인프라 현황 — 2026-11-01 현재 작업 상태
 
+## DGX checkpoint136 독립 재개 — 2026-11-01 08:36 KST 등록
+
+사용자 “학습은 돌려놓고 끌 수 있으니까 재개시켜놔” 지시로 기존136checkpoint에서 남은88step과 마지막validation176을 실행하는 새 run을 등록했다. **08:36:40 KST systemd/PID1 독립 실행 등록을 확인했고 당시 단계는 원본 재검증이다. 실제 재개 step 증가 확인은 아래 후속 기록을 기준으로 한다.** [재개·설치·복구](finetuning/DGX_OVERNIGHT.md#11월1일-오전-재개).
+
+| 항목 | 이번 반영·검증 | 한계·보존 |
+| --- | --- | --- |
+| 메모리 원인 후속 | 02:46:26 KST 공유 Ollama의27B 새 worker 시작·262144 context·약34,217MiB 적재계획을 확인.02:46:33/36 driver0x51·reserve중단과 시간상 일치 | 동시 적재 경쟁 근거. 모든드라이버오류의근본원인해결/타작업유발자식별 아님 |
+| 조기 감지 | `/api/ps`에 뜨기 전 실제Ollama llama-server/runner 시작도 감지. GPU단계감시1초·기존16GiB보호유지 | 다른프로세스 종료/추론중지0. 새공유적재시우리학습만종료;경쟁상황에서무조건완주보장아님 |
+| 재개 계약 | 원데이터3분할SHA·base revision/manifest·학습설정·checkpoint11파일을동결검증,표준Trainer resume로adapter/optimizer/scheduler/RNG/step복원·기학습batchskip | 새출력에기록/원본readonly,학습률·seed·batch·LoRA/자료동일.재개후ETA는이번프로세스실진행step만계산 |
+| 실제 사전검사 | DGX CPU에서380adapter텐서finite,작은PEFT모델4step연속과2step중단후재개가가중치bitwise동일 | 작은CPU호환시험이며35BGPU재개성공을대신하지않음 |
+| 독립 실행 | capstone-dgx-20261101-r1,08:36:40시작·부모PID1.검증→token→136복원/224까지→validation176 | 자동운영모델교체0/Thor적재0,서버재부팅자동재개0 |
+| 시간 상한 | 11:20 KST 새단계금지/step후저장,11:35 KST 독립timer·RuntimeMaxSec | Mac종료/SSH단절과독립,다른사용자업무는유지.이번연산은새재개지시에따른새창 |
+| 코드·설치 | root deploy.sh --training-dgx와--check-resume,별도resume준비도구·반입allowlist·기존Thor의새train의존성목록동기화 | 672학습검사(3환경skip)+218설치검사=890실행887PASS3skip.신규OS전체/오프라인전체설치/E2E·새모델품질미시험 |
+
+첫CPU호환검사는시험용GPT2 config가float대신int0을거절해실패했다.0.0으로수정후실검증성공,실패소스/receipt/시험출력은 `precheck-attempt1`에보존하며GPU학습실패로합치지않는다. CPU전용컨테이너의GPU미탐지안내·기존pynvml/소형PEFT경고도구분한다. 원본base/venv는readonly재사용하고72GB모델을Mac에복사하거나새패키지를설치하지않았다.
+
+**남은 확인·Git:** 실제136복원/새optimizer step과원스케줄/lineage를대조한뒤원격독립상태·입력해시·timer를최종확인한다. 본학습/최종검증/점수/Thor후보는그후별도결과다. 공개소스·문서는로컬갱신중이며현재Git게시완료가아니다.
+
 ## DGX 야간 실행 결과 확인 — 2026-11-01 08:27 KST
 
 사용자 현황 문의에 따라 DGX를 읽기 조회했다. **본학습은 224step 중139step(62.05%)까지 진행한 뒤 02:46 KST 메모리 보호로 실패 종료했다. 완료 모델·최종 품질 점수는 아직 없다.** 아래 00:45~01:04 등록/전송 중 기록은 당시 사실로 보존한다.

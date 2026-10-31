@@ -82,8 +82,8 @@ def main(stage):
                 released.append(artifact['path'])
             save(ROOT/'base-read-cache.json',{'scope':'verified run-owned weight files only',
                 'files':released,'global_cache_flush':False})
-        elif stage in ('tokenize', 'smoke', 'main'):
-            config = json.loads((ROOT/'profiles'/('main.json' if stage=='tokenize' else stage+'.json')).read_text())
+        elif stage in ('tokenize', 'smoke', 'main', 'resume-check'):
+            config = json.loads((ROOT/'profiles'/('main.json' if stage in ('tokenize','resume-check') else stage+'.json')).read_text())
             raw = (ROOT/'base-manifest.json').read_bytes()
             manifest = json.loads(raw)
             if not manifest.get('verified') or manifest['revision'] != config['revision'] or manifest['model'] != 'Qwen/Qwen3.6-35B-A3B':
@@ -91,6 +91,11 @@ def main(stage):
             config['base_artifact_manifest'] = {'model': manifest['model'], 'revision':manifest['revision'],
                 'manifest_sha256':hashlib.sha256(raw).hexdigest()}
             config.update(data_dir='/data', output_dir=str(ROOT/stage), model_name_or_path=str(ROOT/'base'), offline=True)
+            if stage=='resume-check':
+                from check_resume_runtime import check
+                save(ROOT/'resume-runtime-check.json',check(config,ROOT/'resume-cpu-test'))
+                status['status']='completed'
+                return
             profile = ROOT/(stage+'-resolved.json')
             save(profile, config)
             args = [str(PYTHON), '-B', str(SOURCE/'train.py'), '--config', str(profile),

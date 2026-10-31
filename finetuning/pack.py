@@ -29,6 +29,7 @@ def main():
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
              "DGX_OVERNIGHT.md", "DGX_TRAINING_THOR_INFERENCE.md", "requirements.qwen36-dgx.txt",
              "dgx_supervisor.py", "dgx_task.py", "prepare_dgx_run.py", "check_dgx_architecture.py",
+             "resume_training.py", "prepare_dgx_resume.py", "check_resume_runtime.py",
              "prepare_guide_sft.py", "admit_guide_sft.py", "GUIDE_ADMISSION_20261101.json",
              "prepare_evidence_run.py", "prepare_evidence_retry.py", "durable_training_window.py", "durable_training_task.py", "durable_training_basecheck.py", "DURABLE_EVIDENCE_RUN.md",
              "prepare_ait_evidence.py", "AIT_EVIDENCE_REVIEW.json", "SOC_DATA_CANDIDATES.json",

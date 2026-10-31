@@ -75,3 +75,28 @@ GUIDE 전처리는 `prepare_guide_sft.py`, 실제 토큰 편입은 `admit_guide_
 오프라인 환경의 필요 목록은 동일 digest의 NVIDIA ARM64 이미지 archive, 해당 CUDA vendor 환경의 torch 계열, requirements.qwen36-dgx.txt와 모든 전이 의존 wheel/해시, 고정 base revision `995ad96eacd98c81ed38be0c5b274b04031597b0`의39artifact/manifest, source/data/profiles/control SHA 묶음이다. 이번 DGX는 네트워크가 있어 직접 준비했다. 이 모드의 인터넷 없는 pip 설치나 신규 OS부터의 전체 설치는 이번 검증 범위가 아니다. 기존 A/B/C 오프라인 설치 목록을 변경한 것으로 표시하지 않는다.
 
 이전 준비 source/data/profiles/control과 실패 영수증은 `before-guide-training/`, `environment-attempt1/`, `environment-attempt2/`에 보존한다. 원본35B·Thor 원자료·과거 학습 산출물도 보존한다. 실제 공유 모델 적재를 확인해 유휴 대기를 추가한 R2와 설치기 CPU-admission 경로 일치를 확인한 R3로 전송 대기 중 실행기만 갱신했다. 이전 pipeline-attempt1/2 기록을 보존했고 아직 전체35B 학습을 중단한 적은 없다. 중단은 root 진입점의 `--stop`으로 해당 run만 종료하며 체크포인트·원자료는 삭제하지 않는다. 작업별 Mac 전송/인증 helper·원자료 임시 복사본은 게시 후 정리하고 프로젝트 정제 데이터·출처/대화 근거는 보존한다.
+
+## 11월1일 오전 재개
+
+08:31 KST의후속journal조회에서직전중단10초전(02:46:26)공유Ollama가27B/262144context의llama-server를새로적재한사실을확인했다.약34,217MiB추가계획과기존학습의메모리사용이겹쳤다.이는동시적재경쟁근거이며드라이버0x51의모든내부실패조건을증명한것은아니다. `/api/ps`는적재완료전worker를놓칠수있어실제Ollama worker executable도조회한다. GPU단계poll은1초,기존16GiB reserve/110GiB컨테이너상한/swap0유지.추론/다른사용자프로세스에는신호를보내지않는다.
+
+[Trainer공식재개계약](https://huggingface.co/docs/transformers/main_classes/trainer)과DGX설치5.4.0소스를대조했다.명시checkpoint의adapter/optimizer/scheduler/RNG/state를복원하고이미학습한batch를skip한다. `resume_training.py`는원실행manifest/11checkpoint파일hash·원데이터3분할·base manifest·학습설정을대조하며암묵latest/boolean재개·누락optimizer/변조·설정변경을거절한다.새출력디렉터리에만기록,원본checkpoint/base/venv는readonlymount다.재개ETA는이번프로세스에서증가한step만사용한다.라이브러리의재개후train_loss를전체학습품질점수로해석하지않는다.
+
+서버내전용source staging에현재소스를SHA검사하여준비한후새입력묶음을만든다.아래root/account는예시이며과거deadline/기존run덮어쓰기/원체크포인트쓰기지시는아니다.
+
+```sh
+python3 -B SOURCE/prepare_dgx_resume.py \
+  --parent /home/ACCOUNT/Capstone_Groot_training/dgx-20261031 \
+  --root /home/ACCOUNT/Capstone_Groot_training/dgx-resume-20261101-r1 \
+  --sources SOURCE --step 136 --run-id capstone-dgx-20261101-r1 \
+  --deadline 2026-11-01T11:35:00+09:00
+sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --check-resume
+sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --apply
+sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --verify
+```
+
+입력묶음작성은관리자가검증한root소유source와기존root소유control을사용한다.실제설치진입점은root `deploy.sh`로유지한다. `--check-resume`는GPU/네트워크없는4GiB컨테이너에서380adapter텐서finite와실설치Trainer/PEFT의작은4step연속vs2step중단재개동등성을검사한다.동등성실패시GPU단계로진행하지않는다.첫검사의시험모델config float검증실패는수정후재시험했고원본실패기록은보존했다.
+
+이번run은08:36:40 KST등록,11:20저장정리/11:35독립timer+RuntimeMaxSec상한이다.72GB원본을새로다운로드하지않고기존39파일을재검증한다.기존full35B smoke성공을확인하고CPU재개검사→base검증→token→main순서로실행한다.대기중공유worker가있으면11:20까지기다리고,학습도중새worker가뜨면우리run만중지한다.실패의자동재시도/공유모델강제unload는없다.실제GPU재개step과전체완료는[STATUS](../STATUS.md)를기준으로한다.
+
+오프라인추가목록은 `resume_training.py`, `prepare_dgx_resume.py`, `check_resume_runtime.py`,39입력manifest및원checkpoint11파일/기존base/NGC환경이다.새외부패키지는없다.일반portable/Thor/evidence반입목록에도새train의존성을함께포함한다.복구는기존root진입점 `--stop`으로이번run만종료하며원checkpoint128/136·과거실행/실패·현재새checkpoint를보존한다.중지후직접원본에덮어쓰지않고다음별도run을준비한다.

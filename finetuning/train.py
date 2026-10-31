@@ -29,6 +29,15 @@ import memory_telemetry
 from bounded_loading import checkpoint_loading
 
 
+def deadline_reached(config, now=None):
+    deadline = config.get('training_deadline_epoch')
+    if deadline is None:
+        return False
+    if type(deadline) not in (float, int) or not math.isfinite(deadline) or deadline <= 0:
+        raise ValueError('training_deadline_epoch must be a positive finite timestamp')
+    return (time.time() if now is None else now) >= deadline
+
+
 def write_json(path, value):
     path = Path(path)
     temporary = path.with_suffix('.tmp')
@@ -110,6 +119,9 @@ def read_config(path):
         raise ValueError('assistant_only_logits must be a boolean')
     checkpointing_enabled(config)
     deterministic_training_enabled(config)
+    if type(config.get('final_eval_only', False)) is not bool:
+        raise ValueError('final_eval_only must be a boolean')
+    deadline_reached(config)  # Validate an optional timestamp before allocating weights.
     return config
 
 
@@ -335,6 +347,8 @@ def tokenize_only(config, checks):
 
 
 def run_training(config, checks, hardware):
+    if deadline_reached(config):
+        raise RuntimeError("Training deadline already reached")
     os.environ.setdefault("HF_HOME", str(ROOT / ".cache" / "huggingface"))
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -398,7 +412,7 @@ def run_training(config, checks, hardware):
         per_device_train_batch_size=config["per_device_train_batch_size"], per_device_eval_batch_size=1,
         gradient_accumulation_steps=config["gradient_accumulation_steps"], learning_rate=config["learning_rate"],
         lr_scheduler_type="cosine", warmup_ratio=config["warmup_ratio"], optim="paged_adamw_8bit" if quantized else "adamw_torch",
-        logging_steps=config["logging_steps"], eval_strategy="steps", eval_steps=config["eval_steps"],
+        logging_steps=config["logging_steps"], eval_strategy="no" if config.get('final_eval_only',False) else "steps", eval_steps=config["eval_steps"],
         save_strategy="steps", save_steps=config["save_steps"], save_total_limit=config["save_total_limit"],
         bf16=hardware["bf16_supported"], fp16=not hardware["bf16_supported"], gradient_checkpointing=checkpointing,
         gradient_checkpointing_kwargs={"use_reentrant": False}, max_grad_norm=1.0, seed=config["seed"], data_seed=config["seed"],
@@ -440,7 +454,12 @@ def run_training(config, checks, hardware):
 
         def on_step_end(self, args, state, control, **kwargs):
             first_step_trace.stop()
-            self.record(state, 'training')
+            if deadline_reached(config):
+                control.should_training_stop = True
+                control.should_save = True
+                control.should_evaluate = False
+            self.record(state, 'stopping_deadline' if deadline_reached(config) else 'training')
+            return control
         def on_train_begin(self, args, state, control, **kwargs):
             if bool(model.is_gradient_checkpointing) != checkpointing:
                 raise RuntimeError('Actual activation checkpointing differs from the reviewed configuration')
@@ -474,9 +493,16 @@ def run_training(config, checks, hardware):
     trainer.save_model(str(output / "adapter"))
     tokenizer.save_pretrained(str(output / "adapter"))
     trainer.save_metrics("train", result.metrics)
-    trainer.save_metrics("eval", final_eval_metrics(trainer))
     trainer.save_state()
-    progress.record(trainer.state, 'completed')
+    evaluated = any('eval_loss' in entry and entry.get('step') == trainer.state.global_step
+                    for entry in trainer.state.log_history)
+    if evaluated or not deadline_reached(config):
+        progress.record(trainer.state, 'validating')
+        trainer.save_metrics("eval", final_eval_metrics(trainer))
+        evaluated = True
+    status = ('stopped_deadline' if trainer.state.global_step < trainer.state.max_steps else
+              'completed' if evaluated else 'completed_training_validation_pending')
+    progress.record(trainer.state, status)
     print(f"Saved adapter and tokenizer to {output / 'adapter'}. Requires the original base model. No upload performed.")
 
 

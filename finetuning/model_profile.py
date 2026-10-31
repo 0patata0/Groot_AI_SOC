@@ -67,8 +67,12 @@ def check_training_capacity(config, hardware):
         return
     if not hardware.get('bf16_supported'):
         raise RuntimeError('35B BF16 recipe requires BF16 GPU support')
-    if hardware.get('platform') != 'aarch64' or hardware.get('compute_capability') != [11, 0]:
-        raise RuntimeError('This profile targets thor-05 / aarch64 / SM110; use a separately reviewed hardware profile')
+    profile = config.get('hardware_profile', 'thor-sm110')
+    capabilities = {'thor-sm110': [11, 0], 'dgx-spark-sm121': [12, 1]}
+    if profile not in capabilities:
+        raise ValueError('Unknown reviewed hardware profile')
+    if hardware.get('platform') != 'aarch64' or hardware.get('compute_capability') != capabilities[profile]:
+        raise RuntimeError('This profile targets '+profile+' / aarch64; use a separately reviewed hardware profile')
     available = hardware.get('available_memory_gib')
     if available is None or available < config['min_available_memory_gib']:
         raise RuntimeError('Insufficient free memory for the 35B planning floor. Arrange a training window; do not stop Ollama automatically.')

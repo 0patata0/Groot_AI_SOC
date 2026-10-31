@@ -1,0 +1,5 @@
+# NGC 25.11 vendor Torch remains pinned by dgx_task.py.
+-r requirements.qwen36-thor.txt
+# NGC nvidia-resiliency-ext declares this legacy distribution dependency.
+# Official NVML bindings remain provided by the image's nvidia-ml-py.
+pynvml==13.0.1

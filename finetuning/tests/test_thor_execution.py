@@ -21,7 +21,7 @@ class MemoryTests(unittest.TestCase):
     def test_thor_reclaimable_cache_counts_but_not_on_discrete_gpu(self):
         self.assertEqual(memory_budget.budget(100, 20, 123, 'aarch64', [11,0])['available_memory_gib'],100)
         self.assertEqual(memory_budget.budget(100, 20, 123, 'x86_64', [9,0])['available_memory_gib'],20)
-        self.assertEqual(memory_budget.budget(100, 20, 123, 'aarch64', [12,1])['available_memory_gib'],20)
+        self.assertEqual(memory_budget.budget(100, 20, 123, 'aarch64', [12,1])['available_memory_gib'],100)
 
     def test_cgroup_cannot_be_bypassed_by_large_host_memory(self):
         with tempfile.TemporaryDirectory() as directory:

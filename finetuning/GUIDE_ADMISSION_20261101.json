@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "source_review": "SOC_GUIDE_EVIDENCE_REVIEW.json",
+  "source_provider": "Microsoft GUIDE v2",
+  "source_url": "https://www.kaggle.com/datasets/Microsoft/microsoft-security-incident-prediction",
+  "license": "CDLA-Permissive-2.0",
+  "candidate_review": {
+    "status": "candidates_waiting_actual_tokenizer",
+    "at_kst": "2026-11-01T00:27:38.644939+09:00",
+    "source_selected_sha256": "f333a2750d165ff92df6dbdc26e113d5aafa8403e1110d4583013d9376e120b9",
+    "source_incidents": 3882,
+    "source_rows": 34087,
+    "candidate_counts": {
+      "train": {
+        "TruePositive": 704,
+        "BenignPositive": 938,
+        "FalsePositive": 1440
+      },
+      "validation": {
+        "TruePositive": 54,
+        "FalsePositive": 81,
+        "BenignPositive": 86
+      },
+      "test": {
+        "FalsePositive": 124,
+        "TruePositive": 44,
+        "BenignPositive": 53
+      }
+    },
+    "candidate_incidents": 3524,
+    "excluded_incidents": 358,
+    "excluded_reasons": {
+      "missing_conflicting_or_unknown_provider_triage": 351,
+      "whole_incident_projection_over_candidate_byte_budget": 7
+    },
+    "organization_counts": {
+      "train": 847,
+      "validation": 94,
+      "test": 100
+    },
+    "cross_split_organization_overlap": 0,
+    "retained_fields": [
+      "Timestamp",
+      "Category",
+      "MitreTechniques",
+      "EntityType"
+    ],
+    "post_verdict_fields_in_input": 0,
+    "labels_in_input": 0,
+    "source_rows_preserved_per_admitted_incident": true,
+    "projection_is_full_raw_evidence": false,
+    "training_admitted": 0,
+    "action_supervision_admitted": 0,
+    "original_test_used_for_training": false,
+    "limitations": [
+      "Retrospective classification only; publication does not establish decision-time availability.",
+      "Opaque alert/entity identifiers and evidence role excluded; no reconstructed narratives or executable action targets.",
+      "Source labels are provider annotations, not independently audited clinical-style gold or correct SOC decisions in this deployment.",
+      "All source rows contribute retained fields/counts; excluded source fields remain in preserved source and are listed in lineage."
+    ],
+    "files": {
+      "CDLA-Permissive-2.0.txt": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868",
+      "excluded.jsonl": "aa4edc1c95a6ca442109e6da4424a871d3170bd55d21ffe815bdb56680e43702",
+      "source-lineage.jsonl": "20a8aaad42061651c8074c1c365bc2cc4ce3656680f392ec41ecf3616a5e066a",
+      "test.candidates.jsonl": "d5ba51d44432ffc55cc0c89f8e0654f2e68424cf62fb785cc8ef238c3e1efe8e",
+      "train.candidates.jsonl": "02e4100e54b666a055bcda4530d59824ad7aacffdcf251612bb5bcdb4f859d94",
+      "validation.candidates.jsonl": "fe62c1ed2068342b28b14bbc4e18d2d7354f3db561ceeb825070a5ee34fbad6a"
+    }
+  },
+  "admission": {
+    "status": "source_and_token_verified_bounded_pilot",
+    "at_kst": "2026-11-01T00:34:51.926217+09:00",
+    "model": "Qwen/Qwen3.6-35B-A3B",
+    "base_revision": "995ad96eacd98c81ed38be0c5b274b04031597b0",
+    "tokenizer_class": "TokenizersBackend",
+    "max_length": 4096,
+    "truncation": false,
+    "candidate_review_sha256": "de2b4a3a26c85ecfda42eba16799685446053cddc357875ffd9a19c26f00b665",
+    "prior_manifest_sha256": "002cabf939832bad6e19e583421af49befdd39d7943349b4d492947ab3bcf2b2",
+    "candidate_incidents": 3524,
+    "token_eligible_counts": {
+      "train": {
+        "TruePositive": 703,
+        "BenignPositive": 937,
+        "FalsePositive": 1440
+      },
+      "validation": {
+        "TruePositive": 54,
+        "FalsePositive": 81,
+        "BenignPositive": 86
+      },
+      "test": {
+        "FalsePositive": 124,
+        "TruePositive": 44,
+        "BenignPositive": 53
+      }
+    },
+    "token_rejected_incidents": 2,
+    "max_eligible_tokens": {
+      "train": 4067,
+      "validation": 1545,
+      "test": 3511
+    },
+    "outputs": {
+      "train": {
+        "records": 447,
+        "sha256": "42572fafd3c471e176e052c2693efc40a04425e92079d2e0bb88de26fc8ca463",
+        "guide_records": 256,
+        "prior_records": 191
+      },
+      "validation": {
+        "records": 176,
+        "sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+        "guide_records": 48,
+        "prior_records": 128
+      },
+      "test": {
+        "records": 176,
+        "sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+        "guide_records": 48,
+        "prior_records": 128
+      }
+    },
+    "guide_training_admitted": 256,
+    "guide_validation_admitted": 48,
+    "guide_test_reserved": 48,
+    "selected_max_tokens": {
+      "train": 4067,
+      "validation": 1246,
+      "test": 1828
+    },
+    "selected_class_counts": {
+      "train": {
+        "BenignPositive": 85,
+        "TruePositive": 86,
+        "FalsePositive": 85
+      },
+      "validation": {
+        "TruePositive": 16,
+        "FalsePositive": 16,
+        "BenignPositive": 16
+      },
+      "test": {
+        "BenignPositive": 16,
+        "TruePositive": 16,
+        "FalsePositive": 16
+      }
+    },
+    "cross_split_organization_overlap": 0,
+    "provider_test_training_records": 0,
+    "mcp_action_supervision_records": 0,
+    "scope": "Provider-labelled retrospective triage, plus previous evidence/CTI replay; not real-time decision or execution ground truth.",
+    "quality_passed": false,
+    "automatic_promotion": false,
+    "limitations": [
+      "Class-balanced development sample is not an estimate of natural incident prevalence.",
+      "Prior CTI validation/test were used before. New GUIDE test is reserved and not used for gradient or validation.",
+      "Provider label provenance and exact extraction do not establish live deployment judgement accuracy."
+    ]
+  },
+  "independent_verification": {
+    "source_labels_checked": 352,
+    "source_projection_counts_and_ordinal_hashes_checked": 352,
+    "prior_records_preserved": 447,
+    "cross_split_org_overlap": 0,
+    "cross_split_exact_GUIDE_input_overlap": 0
+  },
+  "code_sha256": {
+    "prepare_guide_sft.py": "e02a07dc8109c55ac207c75e941b078ac5c99efacc56cfd42846d6c4b3b2de76",
+    "admit_guide_sft.py": "81da8d2ded6bf4d6da1f8960783cf8be20020d2efdb4b225938c8dcba193c2cb",
+    "dialogue_encoding.py": "851ddd55f5ac7b31729aeaa17fe5f0d911dee00eadcbb99ae915327fd663f498",
+    "train.py": "8a8d4973cb23bd3941a172f4d65ceef8be15a9d6e2708da8820ad3c782e20025"
+  },
+  "gpu_training_completed": false,
+  "production_promotion": false,
+  "unselected_token_eligible_incidents": 3170,
+  "action_only_cases_retained_in_original_source": 351,
+  "code_snapshot_note": "Current reproducibility sources include the later final-evaluation orchestration update. Token encoding functions were unchanged; the actual admission runtime is preserved in before-guide-training/source on DGX.",
+  "admission_runtime_train_sha256": "8ff2404b0f570a2388daad24ecca9b336853b3b7f5fdfd1f2a179ee28195a30f"
+}

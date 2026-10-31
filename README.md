@@ -2,7 +2,7 @@
 
 ## 학습·추론 서버 방침 — 2026-10-31
 
-앞으로 **DGX Spark에서 학습하고 검증한 추론용 가중치를 Jetson Thor에 적재**합니다. 봇과 MCP는 기존 B 서버에 유지합니다. DGX SSH 접속·기초 환경은 확인했으며 학습 환경 구축과 새 학습·모델 교체는 아직 하지 않았습니다. [역할·실행 순서](finetuning/DGX_TRAINING_THOR_INFERENCE.md) · [검증 상태](STATUS.md).
+앞으로 **DGX Spark에서 학습하고 검증한 추론용 가중치를 Jetson Thor에 적재**합니다. 봇과 MCP는 기존 B 서버에 유지합니다. 11월1일 DGX 학습 환경/GPU 축소 구조 검사와 GUIDE256건 편입을 완료하고, 447건 학습→검증의 독립 실행을 등록했습니다. 관측 시점은 원본 가중치 전송 단계이며 본학습·품질 완료는 아닙니다. [야간 실행·상한](finetuning/DGX_OVERNIGHT.md). [역할·실행 순서](finetuning/DGX_TRAINING_THOR_INFERENCE.md) · [검증 상태](STATUS.md).
 
 
 ## 경보 카드·요약·작업 진행 표시 — 2026-10-31

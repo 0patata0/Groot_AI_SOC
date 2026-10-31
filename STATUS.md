@@ -1,4 +1,29 @@
-# 인프라 현황 — 2026-10-31 현재 작업 상태
+# 인프라 현황 — 2026-11-01 현재 작업 상태
+
+## GUIDE 편입·DGX 독립 학습 실행 등록 — 2026-11-01 00:45 KST
+
+사용자가 DGX 환경준비·야간학습을 승인하고 **11월1일06:30 KST 종료 상한**, Mac 종료 후 지속, 독립 실행 준비 뒤 대화 작업 마감을 지정했다. 추가로 보류 GUIDE를 Codex가 정제해 DGX 학습에 편입하도록 지시했다. **00:45:30 실행기는 실제 가동 중이며 현재 base 직접 전송/검증 대기 단계다. 전체35B 시험·본학습 optimizer step·최종검증 완료를 관측한 것은 아니다.** [실행·상한·설치/반입·복구](finetuning/DGX_OVERNIGHT.md) · [자료 편입 원장](finetuning/GUIDE_ADMISSION_20261101.json).
+
+| 항목 | 완료·실제 근거 | 남은 범위 |
+| --- | --- | --- |
+| GUIDE 정제 | 확보3882사건/34087행 재검사, 사후분류 라벨 없는351·전체입력 byte 초과7·실4096token 초과2 제외. 조직 분리/입력 정답·사후 판정 제거 | 전 원천951만행을 새 SFT로 정제한 것이 아님. 조치/실시간판단 정답 생성0 |
+| 실제 편입 | GUIDE train256/validation48/test48, 기존191/128/128과합쳐447/176/176. 새352건 모든 정답·투영행수·원행ordinal/SHA를 원자료와 독립 대조, 기존447개 record 객체 불변 | 토큰적합나머지3170건은 후보, 운영판단 정확도/공신력 인증 아님 |
+| 평가 구분 | GUIDE 조직/정확 입력 분할중복0, 원test·순위자료 학습0, 새GUIDE test 모델평가 미사용 | 기존CTI validation/test는 기사용 개발회귀. 클래스균형 표본을 자연분포 성능으로 해석하지 않음 |
+| DGX 환경 | NGC25.11 pinned digest, Torch2.10a0/CUDA13·transformers5.4/peft0.18.1/accelerate1.12.0. 실제GB10 SM121 BF16 역전파·축소40층/190대상·gradient380개/2step 통과 | 전체35B 최장2건 시험은 base전송 뒤 필수 gate. deprecation/PyTorch fallback 경고와 전 모델 성능은 별도 |
+| 초기 실패 보완 | vendor의 빠진pynvml 배포의존성 충족 후 pipcheck 통과. CUDAfree74GiB와MemAvailable116GiB 차이를 공식NVIDIA UMA근거로 처리, 예산109GiB/96floor |110GiB cgroup·swap0/호스트16GiB reserve 유지. 전역캐시flush·타서비스중지0 |
+| 독립 실행 | capstone-dgx-20261031.service active/PID2902218. 준비→base검증→전체토큰→최장2건2step→447건224step→validation176건1회 | 00:45 관측stage=download, base71926864255B 직접전송중. 학습 시작/완료로 표시하지 않음 |
+| 종료·보존 | 06:15 KST step후저장·새단계금지,06:30 KST 별도timer+RuntimeMaxSec. 매8step/최근2checkpoint·검증전adapter/state저장 | 절대시간까지 모든학습·검증 완료보장없음. 미완료/검증대기/실패를 구분, 운영승격0 |
+| 종료 실검증 | 별도GPU없는시험컨테이너를10초 독립timer로종료·원본services유지. actualdeadline next=06:30KST 확인 | 서버전원/커널정지까지정시종료보장아님. 서버재부팅학습자동재개0 |
+| 코드·설치 | root deploy.sh --training-dgx, profiles/hash·environment/admission/supervisor 경로와반입목록동기화. 학습664+기존설치218=882검사실행879PASS3환경skip | 실제신규OS전체설치/오프라인pip전체설치/공격E2E·학습본품질미시험 |
+
+DGX의 기존 Ollama와 Thor의 추론/현재35B·B봇/MCP는 유지했다. 공유 Ollama 적재가 생기면 해당 학습만 중단한다. 원본·GUIDE 원자료·이전 학습 산출물/실패 준비 source·receipt는 보존한다. Mac에는 패키지 설치/모델가중치 저장0, GUIDE 원자료40,265,128B는 이번 직접 정제용 임시 사본으로만 받았고 검수/전송 후 제거한다. 프로젝트 정제 데이터·출처/대화·검증은 보존/기존 Git 제외를 유지한다.
+
+네트워크 단절(00:18~00:20)로 처음2회 전송 전에 실패했고 사용자 재연결 후 재개했다. sandbox 밖 재시도도 동일 network-unreachable였으며 자격 변경이나 인증 실패로 오판하지 않았다. 환경 첫 dependency/두번째 UMA 예산 실패, GUIDE 첫 import 실패는 수정 후 성공과 구분해 원장을 보존했다. 본학습·미사용시험품질·GGUF변환·Thor후보적재/운영선택은 후속이며 이번 마감 뒤 주기적 서버 조회는 재지시 때 재개한다.
+
+**01:02 KST 후속:** 00:56 다른 사용자의 qwen3.8:27b 적재를 실제 확인했다. GPU단계 시작 전 유휴대기(06:15상한), 진행 중 새 공유 적재 시 우리 학습만 중단하도록 보완했다. own base 가중치26파일의 검증 후 읽기캐시 회수 권고도 추가했다. 설치기 CPU전용 admission 명령을 회귀시험한 최종 실행기는 `capstone-dgx-20261031-r3`이며 R1/R2 전송대기 상태·source/control을 보존하고 GPU학습 없이 교체했다. 06:30 독립timer는 최신R3만 활성화한다. 00:56 실조회에서 실행기/직접전송 모두 부모PID1을 확인했다. 임시probe timer는 이미자동제거돼정리명령exit5가난것이며본deadline장애가아니다. probe스크립트도제거했다.
+
+**Git:** 소스·설치·출처·현황 문서 검증 후 자동 커밋/푸시 진행 중. 이 문단의 갱신 자체는 게시 완료가 아니며, 실제 원격 일치·임시 정리는 후속 영수증으로 남긴다. 대화·업무·자격·로컬 검증/데이터는 Git 제외한다.
+
 
 ## 향후 학습 위치 결정 — DGX 학습·Thor 추론 (2026-10-31T15:58:06.084084+09:00)
 

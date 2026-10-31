@@ -95,7 +95,7 @@ class ExpandedReads(unittest.TestCase):
             api_kwargs: object
             api_messages: object = None
             _original_api_kwargs: object = None
-        q = 'WAF IDS Wazuh 현재 적용된 룰 보여줘. 엔진 활성 확인과 구분해줘.'
+        q = 'WAF IDS Wazuh 현재 커스텀 파일 룰 보여줘. 엔진 활성 확인과 구분해줘.'
         rows = [{'role': 'user', 'content': q}]
         tools = [{'type': 'function', 'function': {'name': name, 'parameters': {'type': 'object', 'properties': {'target': {'type': 'string'}}}}}
                  for name in ('mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target', 'mcp__rule_write_a__propose_rule_edit')]

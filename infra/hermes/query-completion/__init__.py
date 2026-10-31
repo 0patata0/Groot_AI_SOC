@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.17.0"
+VERSION = "groot-query-completion:1.18.0"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "282c1fc5a1eda198bdd93a123e8634d44fd12a377b125d743d4dd1abd0b3e7a3"
+EVIDENCE_SOURCE_SHA256 = "c6f9ae920a90e3c8ee527e961695699cee2250ec43b3071c54ea30cc5c65a923"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -94,7 +94,7 @@ _HONEST_FAILURE = re.compile(r"(?:조회|확인|점검)\s*(?:미실행|실패|�
 _READ_TOOL_NAMES = frozenset(
     f"mcp__{server}__{name}"
     for server in ("rule_a", "rule_b")
-    for name in ("get_rule_change_target", "get_rule_change_status",
+    for name in ("get_security_rules", "get_rule_change_target", "get_rule_change_status",
                  "get_service_action_target", "get_operation_status")
 ) | frozenset({
     "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts",

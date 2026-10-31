@@ -84,7 +84,7 @@ class RuleChangeTransportTests(unittest.TestCase):
                 call.assert_not_called()
 
     def test_operation_schemas_expose_no_arbitrary_install_or_container_tool(self):
-        self.assertEqual(len(mcp.TOOLS), 8)
+        self.assertEqual(len(mcp.TOOLS), 9)
         for tool in mcp.TOOLS:
             self.assertFalse(tool['inputSchema']['additionalProperties'])
         tool = next(t for t in mcp.TOOLS if t['name']=='propose_service_action')

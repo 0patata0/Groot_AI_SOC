@@ -127,6 +127,11 @@ def render(name, raw, profile, run_source=None):
     if name == "rule_change_mcp.py":
         node = assigned(tree, "SERVICE_TARGETS")
         node.value = literal([target for target in ast.literal_eval(node.value) if target != "a:chatproxy"])
+    if name == "security_rule_inventory.py" and p["role"] == "b":
+        assigned(tree, "WAZUH_CREDENTIALS").value = literal(p["root"] + "/siem/capstone-mcp/credentials.json")
+        assigned(tree, "WAZUH_CREDENTIAL_FORMAT").value = literal("json")
+        assigned(tree, "WAZUH_API_HOST").value = literal(p["siem_host"])
+        assigned(tree, "WAZUH_API_USER").value = literal("capstone-ro")
     if name == "rule_change_executor.py":
         node = assigned(tree, "TARGETS")
         node.value = literal(replace_profile_paths(ast.literal_eval(node.value), mapping, containers))

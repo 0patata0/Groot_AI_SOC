@@ -30,8 +30,8 @@ class ReadPolicy(unittest.TestCase):
                 policy.filter_catalog('resp', changed, 'read-only')
     def test_unique_names_and_exact_read_count(self):
         names = [policy.alias(s, t) for s, ts in policy.READ_TOOLS.items() for t in ts]
-        self.assertEqual(len(names), 29)
-        self.assertEqual(len(set(names)), 29)
+        self.assertEqual(len(names), 31)
+        self.assertEqual(len(set(names)), 31)
         self.assertNotEqual(policy.alias('rule-a', 'get_service_action_target'),
                             policy.alias('rule-b', 'get_service_action_target'))
 

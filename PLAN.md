@@ -1,5 +1,11 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+## 10/31 전체 규칙·상관 조건 실제 조회 확장
+
+A/B의 읽기 전용 `get_security_rules`와 두 봇 공통 하네스를 반영했다. Wazuh 공식 API 전체/조건, IDS 공식 엔진 통계+상세 파서, WAF Include/chain 정의를 사용한다. 기본은 전체 집계이며 특정 ID·상관 조건·동일 스냅샷 상세 페이지를 조회한다. 커스텀 파일 편집과 승인 쓰기 범위는 기존 경계를 유지한다. [도구 비교·사용·복구](infra/mcp/security-rule-inventory.md).
+
+실제 MCP12건과 SDK·native 단문 각3건은 성공했다. native는 운영 plugin/정책을 사용한 읽기2도구 격리 시험이며 Mattermost 전달 시험은 아니다. 최종 검증 범위·실패 수정·Git 상태는 [STATUS](STATUS.md)를 기준으로 한다. 이번 단위의 검증·문서·자동 게시·임시 정리 후 일시정지하며, 학습본 품질/승격·실제 공격 E2E·추론 분산은 별도 재지시에 따른다.
+
 ## 10/31 단문·호스트 진단 보완 및 추후 추론 분산 우선안
 
 단문 대상 확인/같은 사용자·스레드 대상 상속, systemd 실패 집계, 승인형 Vector·Wazuh host-agent 조치를 운영에 반영하고 검증 범위를 [STATUS](STATUS.md)에 기록한다. 일반 sudo·미등록 설정 편집으로 확대하지 않는다. 이 단위의 기록·자동 커밋/푸시 후, 추가 지시된 WAF·IDS·Wazuh 기본/커스텀 전체 규칙과 Wazuh 상관 규칙 조회를 확장한다. 추가 범위 검증·게시 뒤 일시정지하며 주기 확인이나 다른 작업을 자동 재개하지 않는다. [기능·복구](infra/mcp/host-service-actions.md).

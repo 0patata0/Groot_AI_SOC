@@ -34,7 +34,7 @@ class Grounding(unittest.TestCase):
         call['result']=json.dumps(data);call['result_sha256']=hashlib.sha256(call['result'].encode()).hexdigest();return call
 
     def test_rule_detail_keeps_level_zero_description_and_cross_device_absence(self):
-        q='Wazuh ID 42 level과 description을 조회하고 WAF 같은 ID 존재 여부도 보여줘'
+        q='Wazuh 커스텀 파일 ID 42 level과 description을 조회하고 WAF 같은 ID 존재 여부도 보여줘'
         calls=[self.detail_fixture(),fixture()]
         self.assertTrue(harness.structured_read(q))
         self.assertEqual(harness.tool_scope(q),{'mcp__rule_a__get_rule_change_target','mcp__rule_b__get_rule_change_target'})
@@ -45,19 +45,19 @@ class Grounding(unittest.TestCase):
         self.assertIn('a:modsecurity-custom | 42 | 없음 (파일에 미정의)',answer)
 
     def test_rule_detail_failed_or_hash_changed_source_is_not_absence(self):
-        q='Wazuh ID 42의 level과 description을 조회해줘'
+        q='Wazuh 커스텀 파일 ID 42의 level과 description을 조회해줘'
         call=self.detail_fixture();call['result_sha256']='0'*64
         self.assertEqual(harness.missing_reads(q,[call]),['b:wazuh-local-rules'])
         self.assertIn('미조회·미확인',harness.read_report(q,[call]))
         self.assertNotIn('없음 (파일에 미정의)',harness.read_report(q,[call]))
 
     def test_rule_detail_does_not_assign_different_ids_or_replace_change_analysis(self):
-        for q in ('Wazuh ID 42와 WAF ID 43을 조회해줘','Wazuh ID 42 설명을 변경해줘',
-                  'Wazuh ID 42가 위험한 원인을 분석해서 보여줘'):
+        for q in ('Wazuh 커스텀 파일 ID 42와 WAF ID 43을 조회해줘','Wazuh 커스텀 파일 ID 42 설명을 변경해줘',
+                  'Wazuh 커스텀 파일 ID 42가 위험한 원인을 분석해서 보여줘'):
             self.assertIsNone(harness.rule_detail_request(q))
 
     def test_rule_detail_rejects_doctype_and_missing_xml_fields(self):
-        q='Wazuh ID 42 level과 description을 조회해줘'
+        q='Wazuh 커스텀 파일 ID 42 level과 description을 조회해줘'
         for content in ('<!DOCTYPE x><group><rule id="42" level="0"><description>x</description></rule></group>',
                         '<group><rule id="42" level="0"/></group>',
                         '<group><rule id="42" level="0"><description>x</description></rule><rule id="42" level="1"><description>y</description></rule></group>'):
@@ -79,7 +79,7 @@ class Grounding(unittest.TestCase):
         self.assertEqual(schema['properties']['calls']['maxItems'], 2)
 
     def test_inventory_and_ids_read_scope_do_not_strip_change_authority(self):
-        self.assertEqual(harness.tool_scope('현재 적용된 규칙을 장비별로 표로 보여줘'),
+        self.assertEqual(harness.tool_scope('현재 커스텀 파일 규칙을 장비별로 표로 보여줘'),
                          {'mcp__rule_a__get_rule_change_target', 'mcp__rule_b__get_rule_change_target'})
         self.assertEqual(harness.tool_scope('IDS는 왜 활성화 안됐지? 지금 실제 상태와 SID 적재 확인해줘'),
                          {'mcp__rule_a__get_service_action_target'})
@@ -143,7 +143,7 @@ class Grounding(unittest.TestCase):
         self.assertNotIn('정상 가동', text)
 
     def test_state_and_test_label_do_not_hide_inventory(self):
-        question = '[비교시험 Q1] WAF IDS Wazuh 현재 적용된 룰 보여줘. 현재 상태 조회만 해줘.'
+        question = '[비교시험 Q1] WAF IDS Wazuh 현재 커스텀 파일 룰 보여줘. 현재 상태 조회만 해줘.'
         missing = harness.inventory(question, [fixture()], missing_targets=True)
         self.assertEqual(missing, ['a:suricata-local', 'b:wazuh-local-rules'])
 
@@ -261,7 +261,7 @@ class Grounding(unittest.TestCase):
 class Parity(unittest.TestCase):
     def test_exact_hermes_capabilities_and_no_general_execution(self):
         tools = policy.capabilities('hermes-parity')
-        self.assertEqual(sum(map(len, tools.values())), 38)
+        self.assertEqual(sum(map(len, tools.values())), 40)
         self.assertEqual(sum(policy.protected(s, t) for s, names in tools.items() for t in names), 9)
         policy.validate_call('rule-write-a', 'propose_service_action', {'target': 'a:suricata'}, 'hermes-parity')
         for server, name, args in [('rule-write-a', 'propose_service_action', {'target': 'b:wazuh-manager'}),

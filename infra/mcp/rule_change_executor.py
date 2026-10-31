@@ -1451,7 +1451,7 @@ def _secure_config(path=CONFIG_PATH):
 
 def _load_extension(name):
     """Never import an operation executor from cwd, PYTHONPATH or caller input."""
-    if name not in ("service_action_executor", "incident_containment"):
+    if name not in ("security_rule_inventory", "service_action_executor", "incident_containment"):
         raise RuleChangeError("unsupported operation extension")
     if name in _EXTENSIONS:
         return _EXTENSIONS[name]
@@ -1547,7 +1547,7 @@ def main(argv=None):
         request = json.loads(raw, object_pairs_hook=_unique_request)
         if not isinstance(request, dict):
             raise RuleChangeError("request must be a JSON object")
-        read_operations = {"get", "status", "service-get", "operation-status"}
+        read_operations = {"inventory", "get", "status", "service-get", "operation-status"}
         if readonly and request.get("operation") not in read_operations:
             raise RuleChangeError("operation is not read-only")
         if caller == "rulechg" and request.get("operation") in read_operations:
@@ -1576,7 +1576,13 @@ def main(argv=None):
         result["processed"] = engine.worker_once()
         result["operations"].extend(services[0].worker_once())
     elif readonly or not argv:
-        if request.get("operation") == "get" and set(request) == {"operation", "target"}:
+        if request.get("operation") == "inventory":
+            try:
+                result = _load_extension("security_rule_inventory").inventory(engine, sys.modules[__name__],
+                    {k:v for k,v in request.items() if k != "operation"})
+            except (ValueError, ET.ParseError, UnicodeError, OSError) as exc:
+                raise RuleChangeError("inventory unavailable: " + type(exc).__name__ + ": " + str(exc)[:160]) from None
+        elif request.get("operation") == "get" and set(request) == {"operation", "target"}:
             result = engine.get_target(request["target"])
         elif request.get("operation") == "propose" and set(request) == {"operation", "target", "base_sha256", "candidate_content", "reason"}:
             result = engine.propose(request["target"], request["base_sha256"], request["candidate_content"], request["reason"])

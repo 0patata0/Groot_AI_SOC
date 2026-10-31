@@ -19,10 +19,25 @@ SUPPORTED = {"2024-11-05", "2025-03-26", PROTOCOL}
 HELPER = "/usr/local/sbin/rule-change-executor"
 MAX_INPUT = 1024 * 1024
 MAX_OUTPUT = 4 * 1024 * 1024
-READ_TOOLS = frozenset({"get_rule_change_target", "get_rule_change_status",
+READ_TOOLS = frozenset({"get_security_rules", "get_rule_change_target", "get_rule_change_status",
                         "get_service_action_target", "get_operation_status"})
 
 TOOLS = [
+    {
+        "name": "get_security_rules",
+        "description": "Read full installed builtin AND custom rule definitions and configuration selection for WAF, IDS or Wazuh. Default summary counts every parsed definition, with a labeled sample; use view=details for conditions/definitions and snapshot-bound pagination. Wazuh correlation_only includes frequency/timeframe, if_matched_sid/group and same/different-field conditions with reference availability. Configuration selection is NOT proof of per-rule runtime loading or actual detections. Partial/unavailable is not zero. For writes, separately read get_rule_change_target and use its exact approved custom-file proposal; vendor files stay read-only.",
+        "inputSchema": {"type":"object", "additionalProperties":False, "properties": {
+            "target":{"type":"string", "enum":["a:waf","a:suricata","b:wazuh"]},
+            "origin":{"type":"string", "enum":["all","builtin","custom"], "default":"all"},
+            "view":{"type":"string", "enum":["summary","details"], "default":"summary"},
+            "correlation_only":{"type":"boolean", "default":False},
+            "rule_id":{"type":"string", "pattern":"^[0-9]{1,10}$"},
+            "offset":{"type":"integer", "minimum":0, "maximum":200000, "default":0},
+            "limit":{"type":"integer", "minimum":1, "maximum":100, "default":20},
+            "snapshot_id":{"type":"string", "pattern":"^[0-9a-f]{64}$", "description":"Copy first response snapshot_id for every page after offset 0. If changed, restart pagination."}},
+            "required":["target"]},
+        "annotations":{"title":"Read complete security rule inventory", "readOnlyHint":True,"destructiveHint":False,"idempotentHint":True},
+    },
     {
         "name": "get_rule_change_target",
         "description": "Read the complete current content, SHA-256, and runtime state of one fixed local rule target.",
@@ -237,7 +252,9 @@ def handle(message, access="write", host="a"):
         if target and args.get("target") not in target["enum"]:
             return {"jsonrpc": "2.0", "id": mid, "result": _result({"error": "target is not allowlisted on this host"}, True)}
         call_helper = lambda payload: _call_helper(payload, readonly=(access == "read"))
-        if name == "get_rule_change_target":
+        if name == "get_security_rules":
+            result = call_helper({"operation":"inventory", **args}) if 'target' in args and not set(args)-{'target','origin','view','correlation_only','rule_id','offset','limit','snapshot_id'} else _result({"error":"required/unsupported arguments"}, True)
+        elif name == "get_rule_change_target":
             if set(args) != {"target"}:
                 result = _result({"error": "required/unsupported arguments"}, True)
             else:

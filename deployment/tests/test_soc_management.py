@@ -51,11 +51,19 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_full_rule_api_uses_fresh_readonly_credentials_and_pinned_host(self):
+        m=module('security_rule_inventory.py','b')
+        self.assertEqual(m.WAZUH_CREDENTIALS,'/opt/capstone/siem/capstone-mcp/credentials.json')
+        self.assertEqual(m.WAZUH_CREDENTIAL_FORMAT,'json')
+        self.assertEqual(m.WAZUH_API_HOST,profile('b')['siem_host'])
+        self.assertEqual(m.WAZUH_API_USER,'capstone-ro')
+        self.assertIn('infra/mcp/security_rule_inventory.py',install.SOURCES)
+
     def test_fresh_mcp_schemas_have_exclusive_roles_and_no_legacy_chatproxy(self):
         for host in ('a', 'b'):
             m = module('rule_change_mcp.py', host)
             reads, writes = m.tool_list('read', host), m.tool_list('write', host)
-            self.assertEqual(len(reads), 4)
+            self.assertEqual(len(reads), 5)
             self.assertEqual(len(writes), 4 if host == 'a' else 3)
             self.assertFalse({t['name'] for t in reads} & {t['name'] for t in writes})
             for tool in reads + writes:

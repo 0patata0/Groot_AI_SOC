@@ -2,7 +2,7 @@
 import re
 from urllib.parse import urlsplit
 
-RULE_READS = {'get_rule_change_target', 'get_rule_change_status',
+RULE_READS = {'get_security_rules', 'get_rule_change_target', 'get_rule_change_status',
               'get_service_action_target', 'get_operation_status'}
 READ_TOOLS = {
     'rule-a': RULE_READS, 'rule-b': RULE_READS,

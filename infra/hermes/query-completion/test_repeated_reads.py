@@ -16,7 +16,7 @@ from test_expanded_reads import call
 from test_inventory_render import payload, FILES
 
 MULTI = '보안 서버와 서비스 서버의 프로세스와 TCP LISTENING 포트를 각각 최대 3개 조회해줘. 변경·차단·재시작은 하지 마.'
-COMBINED = 'WAF·IDS·Wazuh 규칙 개수와 IDS가 local.rules를 실제 사용하는지 함께 조회해줘.'
+COMBINED = 'WAF·IDS·Wazuh 커스텀 파일 규칙 개수와 IDS가 local.rules를 실제 사용하는지 함께 조회해줘.'
 POLICY = '보호된 DGX 차단 요청은 왜 거절하는지 정책 근거만 설명해줘. 조회나 차단 도구는 호출하지 마.'
 NAMES = ('groot-sec', 'groot-web')
 IDS = ('019', '017')
@@ -65,7 +65,7 @@ class RepeatedReads(unittest.TestCase):
         q='보안 서버 TCP 포트 최대 7개 조회해줘. 서비스 서버는 이번 대상에서 제외해줘.'
         p=H.read_plan(q);self.assertEqual(p['agent_name'],'groot-sec');self.assertNotEqual(p['kind'],'multi')
         q='WAF 규칙 정의 개수와 IDS 규칙 정의 개수를 비교해줘. Wazuh는 이번 조회에서 빼고 표로 보여줘.'
-        self.assertEqual(set(H.missing_reads(q,[])),{'a:modsecurity-custom','a:suricata-local'})
+        self.assertEqual(set(H.missing_reads(q,[])),{'a:waf','a:suricata'})
         q='WAF 규칙을 삭제하고 IDS는 제외해줘'
         self.assertTrue(H.READ.wants_write(H.normalized(q)));self.assertIsNone(H.read_plan(q))
         self.assertIn('서비스 서버',H.READ.scope_text('서비스 서버를 제외하지 마.'))
@@ -329,16 +329,16 @@ class RepeatedReads(unittest.TestCase):
         q = 'IDS 룰 목록과 현재 엔진 적재 상태도 조회해줘'
         self.assertIsNotNone(H.combined_rule_request(q))
         self.assertIn('a:suricata', H.missing_reads(q, []))
-        self.assertIn('a:suricata-local', H.missing_reads(q, []))
-        q = 'Suricata 규칙 목록과 해시 보여줘. 엔진 활성 여부는 파일 정의와 구분해줘.'
+        self.assertIn('mcp__rule_a__get_security_rules', H.tool_scope(q))
+        q = 'Suricata 커스텀 파일 규칙 목록과 해시 보여줘. 엔진 활성 여부는 파일 정의와 구분해줘.'
         target='a:suricata-local'; data=payload(target)
         calls=[call('get_rule_change_target',data,{'target':target},server='rule-a')]
         self.assertIn(data['sha256'], H.inventory(q,calls))
         for spelling in ('SHA를', 'SHA256을', 'SHA-256도'):
-            self.assertIn(data['sha256'], H.inventory('Suricata 규칙 목록과 '+spelling+' 보여줘',calls))
+            self.assertIn(data['sha256'], H.inventory('Suricata 커스텀 파일 규칙 목록과 '+spelling+' 보여줘',calls))
 
     def test_inventory_discovery_uses_only_requested_hosts(self):
-        a='mcp__rule_a__get_rule_change_target'; b='mcp__rule_b__get_rule_change_target'
+        a='mcp__rule_a__get_security_rules'; b='mcp__rule_b__get_security_rules'
         self.assertEqual(H.tool_scope('IDS 규칙 목록 보여줘'), {a})
         self.assertEqual(H.tool_scope('Wazuh 규칙 목록 보여줘'), {b})
         self.assertEqual(H.tool_scope('WAF와 IDS 규칙 목록 보여줘'), {a})

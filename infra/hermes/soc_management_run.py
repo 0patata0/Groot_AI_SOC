@@ -18,7 +18,7 @@ import sys
 import threading
 import time
 
-READ = frozenset({'get_rule_change_target', 'get_rule_change_status',
+READ = frozenset({'get_security_rules', 'get_rule_change_target', 'get_rule_change_status',
                   'get_service_action_target', 'get_operation_status'})
 WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
@@ -230,6 +230,9 @@ def observation_facts(name, result):
                     row['process_termination'] = {k: v for k, v in data['process_termination'].items()
                         if k in ('kind', 'exit_status', 'signal_number') and (v is None or type(v) is int or v in ('exited', 'killed', 'dumped', 'not_recorded'))}
                 rows.append(row)
+            elif name == 'get_security_rules' and data.get('schema_version') == 1:
+                rows.append({'kind':'security_rule_definitions', 'target':data.get('target'),
+                    **{k:data[k] for k in ('counts','status','snapshot_id','runtime_load_verified','observed_at_kst','filter') if k in data}})
             elif name == 'get_rule_change_target' and isinstance(data.get('rule_inventory'), dict):
                 inv = data['rule_inventory']
                 rows.append({'kind': 'rules', 'target': data.get('target'),

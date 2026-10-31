@@ -462,7 +462,9 @@ class SharedContract(unittest.TestCase):
                          'Wazuh 규칙 description을 보여줘'):
             with self.subTest(question=question):
                 self.assertIsNone(H.inventory_question(question))
-                self.assertIsNone(H.inventory(question, []))
+                plan=H.security_inventory_request(question)
+                if plan:self.assertEqual(plan['view'],'details')
+                else:self.assertIsNone(H.inventory(question, []))
                 self.assertFalse(PLUGIN._inventory_request(question))
         self.assertIsNotNone(H.inventory_question('WAF와 Wazuh의 규칙 개수와 ID 목록 보여줘'))
 

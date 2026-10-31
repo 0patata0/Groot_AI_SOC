@@ -1,5 +1,7 @@
 # B 호스트의 Ollama 기반 SOC 비교 실행부
 
+> **2026-10-31 전체 규칙:** 공통 하네스1.18.0 경로에서 WAF/IDS/Wazuh 기본+커스텀·Wazuh 상관 조건을 `get_security_rules`로 조회한다. 읽기31/전체40 스키마, 기존 승인형 쓰기 경계 유지. [API·파서 비교와 사용](../mcp/security-rule-inventory.md) · [운영 검증 상태](../../STATUS.md).
+
 > **2026-10-31 사건 판단 정정 보완:** query-completion1.15.7/chat-contract1.5.2. 읽기 전용 조사에서 초안·검사 사유를 비공개로 보존하고, 기존 한도 안에서 모델이 정정합니다. 같은 근거·오류 초안 반복은 조기 종료하며 사설 IP/실습 환경을 승인·정상 근거로 삼는 실제 실패를 공통 검사에 추가했습니다. [동작·복구·한계](../hermes/incident-judgment-repair.md).
 
 > **2026-10-31 관제 보고 보완:** query-completion 1.15.4과 동일 공용 grounding 소스/SHA 핀을 두 봇·자동 조사에 함께 반영합니다. 센서 룰과 Wazuh 상관 규칙, 반환 건수와 신뢰 경계 필드의 혼동을 실제 응답과 대조해 LLM 정정을 요청합니다. 기존 단일 설치 경로·의존성과 승인/도구 권한을 유지합니다. [동작·검증 범위](../hermes/event-report-grounding.md).

@@ -1,5 +1,11 @@
 # Groot_AI_SOC
 
+## 전체 규칙·상관 조건 조회 — 2026-10-31
+
+`WAF 룰`, `IDS 룰`, `Wazuh ID 5712 조건 보여줘`처럼 짧게 요청해도 기본·커스텀 전체 정의 또는 해당 ID의 실제 조건을 조회하도록 두 봇을 보완했습니다. Wazuh는 공식 API를 사용하며 frequency/timeframe/if_matched_sid 등의 상관 조건을 제공합니다. IDS는 공식 엔진 통계와 상세 정의를 함께 읽습니다. summary의 전체 집계와20개 예시, 전체 상세 페이지 완료 여부를 구분합니다.
+
+[공식 도구·Python 파서 비교와 사용법](infra/mcp/security-rule-inventory.md) · [운영 검증·한계·Git 상태](STATUS.md). 기본 규칙 조회가 해당 규칙 편집 권한이나 실제 탐지 성공을 뜻하지 않습니다. 아래 이전 진행 기록의 전체 규칙 확장은 이번에 반영했으며, 상세 완료 범위는 최신 STATUS를 따릅니다.
+
 ## 짧은 질문·호스트 서비스 승인형 조치 — 2026-10-31
 
 새 대화의 `룰 조회해줘`는 장비를 한 번 확인하고, 같은 사용자·스레드에서는 대상만 이어받아 새로 조회합니다. A/B/C의 현재 failed unit 조회와 A Vector·A/B Wazuh 호스트 에이전트의 승인형 restart를 추가했습니다. 운영 배포·실제 읽기·격리 검사와 실제 재시작 E2E는 구분합니다. [사용·권한·복구](infra/mcp/host-service-actions.md) · [최신 검증/Git 상태](STATUS.md).

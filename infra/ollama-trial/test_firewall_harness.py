@@ -37,10 +37,10 @@ class FirewallHarness(unittest.TestCase):
 
     def test_applied_state_preserves_device_and_change_boundaries(self):
         for question in ('fw 말고 waf 룰 뭐 적용됐어?', '웹 방화벽 룰 뭐 적용됐어?'):
-            self.assertEqual(h.tool_scope(question), {'mcp__rule_a__get_rule_change_target'})
+            self.assertEqual(h.tool_scope(question), {'mcp__rule_a__get_security_rules'})
             self.assertIsNone(h.firewall_request(question))
         self.assertEqual(h.tool_scope('FW랑 WAF 룰 뭐 적용됐어?'),
-                         {'mcp__resp__get_firewall_rules', 'mcp__rule_a__get_rule_change_target'})
+                         {'mcp__resp__get_firewall_rules', 'mcp__rule_a__get_security_rules'})
         self.assertIn('어느 장비', h.scope_notice('뭐 적용된 룰 있어?'))
         for question in ('fw 룰 적용해줘', 'fw 룰 뭐 적용됐어? 삭제해줘',
                          'fw 룰 뭐 적용됐어? 변경안 준비해줘', 'fw 룰 적용됐다는 뜻 설명해줘',
@@ -63,8 +63,8 @@ class FirewallHarness(unittest.TestCase):
 
     def test_mixed_scope_missing_other_device_not_falsely_complete(self):
         q='FW와 WAF 룰 보여줘'
-        self.assertEqual(h.missing_reads(q,[call()]),['a:modsecurity-custom'])
-        self.assertIn('집계 확인 불가',h.read_report(q,[call()]))
+        self.assertEqual(h.missing_reads(q,[call()]),['a:waf'])
+        self.assertIn('미조회·검증 실패',h.read_report(q,[call()]))
 
     def test_partial_changed_hash_wrong_target_and_noncontiguous_not_complete(self):
         first=call(objects=[{'chain':{}}],complete=False,next_offset=1)

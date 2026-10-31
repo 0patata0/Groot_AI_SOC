@@ -105,15 +105,132 @@ def scope_notice(question):
     if request['ambiguous']:
         return ('어느 장비의 규칙을 볼까요? FW(네트워크 방화벽), WAF, IDS(Suricata), Wazuh 중 '
                 '대상을 알려주세요. 아직 조회하지 않았습니다.')
-    if request['basic_only'] and 'FW' not in request['devices']:
-        return ('요청하신 기본·내장 규칙 전체는 현재 커스텀 파일 조회 도구로 확인할 수 없습니다. '
-                '커스텀 규칙을 기본 규칙 대신 표시하지 않았습니다. 기본 룰 목록은 미조회·미확인입니다.')
     return None
 
 
 def firewall_request(question):
     request = rule_scope_request(question)
     return request if request and 'FW' in request['devices'] else None
+
+
+def security_inventory_request(question):
+    """Full device definitions by default; a named edit file remains distinct."""
+    if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):return None
+    text = READ.scope_text(normalized(question))
+    if READ.wants_write(text) or EVIDENCE.incident_investigation_request(text): return None
+    if re.search(r'에이전트|호스트|\bagents?\b|\bhosts?\b',text,re.I) and not re.search(r'규칙|룰|rules?',text,re.I):return None
+    if ids_runtime_question(question) and not combined_rule_request(question):return None
+    if re.search(r'도구\s*없이|조회하지|조회\s*(?:는\s*)?말|원문|전문|local_rules\.xml|GROOT_A_local\.rules|GROOT_A_WAF\.conf|커스텀\s*파일',text,re.I): return None
+    # ID-specific reads also cover vendor definitions; analysis/write routing remains with the LLM.
+    if re.search(r'위험|원인|왜|분석', text.replace('상관분석','상관')):return None
+    scope_text=text.replace('상관분석','상관').replace('설명','조건')
+    if re.search(r'\b(?:ID|SID)\s*[:=]?\s*[0-9]',scope_text,re.I) and not re.search(r'규칙|룰|rules?',scope_text,re.I):
+        scope_text += ' 룰 조회'
+    request = CONTRACT.rule_scope_request(scope_text)
+    if not request or request['ambiguous']: return None
+    devices=request['devices'] or ['WAF','Suricata','Wazuh']
+    targets=[t for d,t in [('WAF','a:waf'),('Suricata','a:suricata'),('Wazuh','b:wazuh')] if d in devices]
+    if not targets:return None
+    ids=list(dict.fromkeys(re.findall(r'\b(?:ID|SID)\s*[:=]?\s*([0-9]{1,10})(?![0-9])',text,re.I)))
+    if len(ids)>1:return None
+    detailed=bool(ids or re.search(r'상세|자세|조건|설명|레벨|상관|참조|frequency|timeframe|description|level|msg|severity',text,re.I))
+    all_details=bool(re.search(r'(?:전체|모든).{0,12}(?:상세|목록|ID|SID)|(?:상세|목록).{0,12}(?:전체|모두)',text,re.I))
+    return {'targets':targets, 'origin':'custom' if request['custom_only'] else 'builtin' if request['basic_only'] else 'all',
+            'view':'details' if detailed or all_details else 'summary', 'rule_id':ids[0] if ids else None,
+            'correlation_only':bool(re.search(r'상관',text)), 'all_details':all_details, 'fw':'FW' in devices,
+            'ids_runtime':bool(combined_rule_request(question))}
+
+
+def security_inventory_state(plan,calls,target):
+    pages=[];next_offset=0;snapshot=None
+    for call in calls:
+        if call.get('name')!='get_security_rules' or call.get('server')!='rule-'+target[0]:continue
+        args=call.get('arguments',{})
+        if args.get('target')!=target:continue
+        if args.get('offset',0)==0 or call.get('is_error'):
+            pages=[];next_offset=0;snapshot=None
+        if call.get('is_error'):continue
+        data=payload(call)
+        if not isinstance(data,dict):continue
+        body={k:v for k,v in data.items() if k!='receipt_sha256'}
+        receipt=hashlib.sha256(json.dumps(body,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        expected={'origin':plan['origin'],'rule_id':plan['rule_id'],'correlation_only':plan['correlation_only'] and target=='b:wazuh'}
+        counts=data.get('counts',{})
+        if not isinstance(counts,dict) or not all(type(counts.get(k)) is int and counts[k]>=0 for k in
+                ('definitions','builtin','custom','configured','excluded','correlation','temporal_correlation','dependency_rules')):continue
+        if counts['builtin']+counts['custom']!=counts['definitions']:continue
+        if counts['configured']+counts['excluded']>counts['definitions'] or counts['temporal_correlation']+counts['dependency_rules']!=counts['correlation']:continue
+        if any(counts[k]>counts['definitions'] for k in ('configured','excluded','correlation')):continue
+        if {k:args.get(k,default) for k,default in [('origin','all'),('rule_id',None),('correlation_only',False)]}!=expected:continue
+        if (data.get('receipt_sha256')!=receipt or data.get('target')!=target or data.get('schema_version')!=1
+                or data.get('scope')!='installed_rule_definitions_and_configuration_selection'
+                or data.get('filter')!=expected or data.get('view')!=plan['view']
+                or data.get('runtime_load_verified') is not False or data.get('status') not in ('complete','partial')
+                or not EVIDENCE.parse_instant(data.get('observed_at_kst'))):continue
+        if not all(type(data.get(k)) is int and data[k]>=0 for k in ('offset','limit','returned_count','matched_count')):continue
+        if not re.fullmatch('[0-9a-f]{64}',str(data.get('snapshot_id',''))):continue
+        if not isinstance(data.get('warnings'),list) or not all(isinstance(x,str) for x in data['warnings']):continue
+        if data['status']=='complete' and data['warnings']:continue
+        if not isinstance(data.get('rules'),list) or len(data['rules'])!=data['returned_count'] or not 1<=data['limit']<=100:continue
+        if data['returned_count']>data['limit'] or (not data['returned_count'] and data['matched_count']>data['offset']):continue
+        if any(not isinstance(r,dict) or not isinstance(r.get('id'),str) or not isinstance(r.get('source'),str) or r.get('origin') not in ('builtin','custom') or r.get('configuration') not in ('selected','excluded','unselected') for r in data['rules']):continue
+        if any((expected['origin']!='all' and r['origin']!=expected['origin']) or (expected['rule_id'] is not None and r['id']!=expected['rule_id']) or (expected['correlation_only'] and r.get('correlation') is not True) for r in data['rules']):continue
+        maximum=counts[expected['origin']] if expected['origin']!='all' else counts['definitions']
+        if data['matched_count']>maximum:continue
+        if data['offset']!=args.get('offset',0) or data['limit']!=args.get('limit',20):continue
+        if data['offset']==0:
+            pages=[];next_offset=0;snapshot=data.get('snapshot_id')
+        if data['offset']!=next_offset or data.get('snapshot_id')!=snapshot or (pages and args.get('snapshot_id')!=snapshot):continue
+        count=data['offset']+data['returned_count']
+        if count>data['matched_count'] or (count<data['matched_count'] and data.get('next_offset')!=count) or (count==data['matched_count'] and data.get('next_offset') is not None):continue
+        if pages and data['matched_count']!=pages[0]['matched_count']:continue
+        pages.append(data);next_offset=data.get('next_offset')
+    if not pages:return None
+    return {'pages':pages,'data':pages[-1], 'complete':all(p['status']=='complete' for p in pages) and
+            (not plan['all_details'] or next_offset is None), 'next_offset':next_offset,'snapshot_id':snapshot,
+            'rules':[r for page in pages for r in page['rules']]}
+
+
+def security_inventory_report(plan,calls):
+    cell=lambda value:str(value).replace('|',r'\|').replace('\n',' ')
+    lines=['**보안장비 규칙 조회**','기본·커스텀 정의와 설정상 포함 여부를 구분했습니다. 개별 룰의 실제 엔진 적재·탐지 성공은 미확인입니다.','',
+           '| 장비 | 기본 정의 | 커스텀 정의 | 설정상 포함 | 설정상 제외 | 시간·횟수 상관 | 상태 |',
+           '| --- | ---: | ---: | ---: | ---: | ---: | --- |']
+    for target in plan['targets']:
+        state=security_inventory_state(plan,calls,target)
+        if not state:
+            lines.append('| '+target+' | — | — | — | — | — | 미조회·검증 실패(0개 아님) |');continue
+        d=state['data'];c=d['counts']
+        lines.append('| '+target+' | '+' | '.join(str(c[k]) for k in ('builtin','custom','configured','excluded','temporal_correlation'))+
+                     ' | '+('정의 집계 완료' if d['status']=='complete' else '부분 집계·누락 있음')+' |')
+    for target in plan['targets']:
+        state=security_inventory_state(plan,calls,target)
+        if not state:continue
+        d=state['data'];rows=state['rules'];shown=len(rows)
+        lines+=['', '**'+target+'** — 조회 '+d['observed_at_kst']+' (KST)',
+                '선택 범위 `'+plan['origin']+'`'+('·상관/의존 규칙' if plan['correlation_only'] and target=='b:wazuh' else '')+
+                ': '+str(d['matched_count'])+'개 정의 중 '+str(shown)+'개 '+('상세 표시' if plan['view']=='details' else '예시 표시')+'.']
+        if plan['view']=='summary':
+            lines+=['ID/SID 예시: '+', '.join('`'+cell(r['id'])+'`' for r in rows)+'.',
+                    '개별 조건 전체는 위 요약에서 생략했습니다. 특정 ID 상세 또는 범위를 지정해 조회할 수 있습니다.']
+        else:
+            for row in rows:
+                lines+=['- `'+cell(row['id'])+'` · '+cell(row['origin'])+' / '+cell(row['configuration'])+' · `'+cell(row['source'])+'`']
+                detail={k:v for k,v in row.items() if k not in ('id','origin','configuration','source')}
+                lines+=['```json',json.dumps(detail,ensure_ascii=False,separators=(',',':')).replace('```','\\u0060\\u0060\\u0060'),'```']
+        counters=d.get('runtime',{}).get('engine_counters',{})
+        if counters.get('status')=='observed':
+            lines+=['엔진 실조회: 적재 '+str(counters['rules_loaded'])+' · 실패 '+str(counters['rules_failed'])+' · 건너뜀 '+str(counters['rules_skipped'])+' · 마지막 적재 '+str(counters['last_reload_kst'])+' (KST).']
+        if d.get('duplicate_rule_ids'):
+            lines+=['중복 ID 정의: '+cell(json.dumps(d['duplicate_rule_ids'],ensure_ascii=False))+'. 정의를 합치거나 누락하지 않았습니다.']
+        if d['warnings']:lines+=['집계 경고: '+cell('; '.join(d['warnings']))]
+        if plan['all_details'] and not state['complete']:lines+=['전체 상세 조회 미완료입니다. 다음 offset: '+str(state['next_offset'])+'. 일부를 전체로 보고하지 않습니다.']
+        lines+=['스냅샷: `'+d['snapshot_id']+'`.']
+        if d.get('exclusions_and_updates'):lines+=['WAF 제외·수정 지시 '+str(len(d['exclusions_and_updates']))+'건은 요청 조건에 따라 달라질 수 있어 정의 수에서 단순 차감하지 않았습니다.']
+    if 'b:wazuh' in plan['targets']:
+        lines+=['','Wazuh의 시간·횟수 상관과 if_sid/if_group 의존 규칙은 구분합니다. 규칙 정의가 있어도 실제 경보 발생·LLM 판단 성공을 뜻하지 않습니다.']
+    lines+=['','규칙 변경은 기존 커스텀 대상의 정확 후보·승인 절차를 사용하며 이번 조회에서는 변경하지 않았습니다.']
+    return '\n'.join(lines)
 
 
 def firewall_state(calls):
@@ -198,7 +315,9 @@ def firewall_report(question, calls):
 
 def read_plan(question):
     text = normalized(question)
-    if EVIDENCE.incident_investigation_request(text):
+    # A vendor rule ID must not become a Wazuh agent identity. Full-device
+    # inventory has its own schema/receipt path in both bot adapters.
+    if security_inventory_request(question) or EVIDENCE.incident_investigation_request(text):
         return None
     # Recover literal data only, never instructions inside quotations.
     literals = EVIDENCE._AWARE_TIME.findall(question) + re.findall(r'(?<![0-9a-f])[0-9a-f]{32}(?![0-9a-f])', question)
@@ -209,6 +328,7 @@ def read_plan(question):
 
 
 def rule_detail_request(question):
+    if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):return None
     text = READ.scope_text(normalized(question))
     if EVIDENCE.incident_investigation_request(text):
         return None
@@ -283,6 +403,11 @@ def rule_detail_report(request, calls):
 def read_report(question, calls):
     notice = scope_notice(question)
     if notice: return notice
+    security=security_inventory_request(question)
+    if security:
+        report=security_inventory_report(security,calls)
+        if security['ids_runtime']:report+='\n\n'+(service_report('IDS 실제 가동 상태 조회',calls) or 'IDS 구동 근거 조회 미완료')
+        return (firewall_report(question,calls)+'\n\n' if security['fw'] else '')+report
     scope = rule_scope_request(question)
     if scope and 'FW' in scope['devices']:
         other = [d for d in scope['devices'] if d != 'FW']
@@ -320,6 +445,7 @@ def ids_runtime_question(question):
 
 
 def _inventory_question(question):
+    if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):return None
     text = rule_scope_text(question)
     if EVIDENCE.incident_investigation_request(text):
         return None
@@ -349,6 +475,7 @@ def _inventory_question(question):
 
 
 def combined_rule_request(question):
+    if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):return None
     text = rule_scope_text(question)
     if EVIDENCE.incident_investigation_request(text):
         return None
@@ -356,7 +483,7 @@ def combined_rule_request(question):
     runtime = re.search(r'(?:IDS|Suricata|수리카타)(?:가|는|의)?[^.!?。]{0,90}(?:local\.rules|all\.rules|구동\s*경로|실행\s*경로|룰\s*경로|실제\s*사용|사용하는지|가동\s*상태|(?:활성|적재|로드)\s*(?:상태|여부))', text, re.I)
     if runtime and re.search(r'(?:규칙|룰|파일\s*정의).{0,35}(?:개수|목록|정의\s*수)|(?:개수|목록|정의\s*수).{0,20}(?:규칙|룰|파일\s*정의)', text):
         labels = [label for pattern, label in [('WAF|ModSecurity', 'WAF'), ('IDS|Suricata|수리카타', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]
-        return '현재 규칙 목록 보여줘 ' + ' '.join(labels) + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
+        return '현재 '+('커스텀 파일 ' if re.search(r'커스텀\s*파일',text) else '')+'규칙 목록 보여줘 ' + ' '.join(labels) + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
     return None
 
 
@@ -365,7 +492,7 @@ def inventory_question(question):
 
 
 def structured_read(question):
-    return bool(firewall_request(question) or rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
+    return bool(security_inventory_request(question) or firewall_request(question) or rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
                 tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
 
 
@@ -385,6 +512,12 @@ def linked_rows(calls):
 
 
 def inventory(question, calls, **kwargs):
+    security=security_inventory_request(question)
+    if security:
+        complete=[t for t in security['targets'] if (security_inventory_state(security,calls,t) or {}).get('complete')]
+        if kwargs.get('verified_targets'):return complete
+        if kwargs.get('missing_targets'):return [t for t in security['targets'] if t not in complete]
+        return security_inventory_report(security,calls)
     request = inventory_question(question)
     rendered = SHARED.render_rule_inventory(request, linked_rows(calls), **kwargs) if request else None
     scope = rule_scope_request(question)
@@ -844,6 +977,8 @@ def prior_inventory(question, evidence):
         return None
     combined = previous + '\n' + question
     calls = evidence.get('calls', [])
+    if any(c.get('name')=='get_rule_change_target' for c in calls) and not any(c.get('name')=='get_security_rules' for c in calls):
+        combined += '\n커스텀 파일 조회 범위만 재구성'
     if inventory(combined, calls, missing_targets=True):
         return None
     verified = inventory(combined, calls, verified_targets=True)
@@ -872,9 +1007,11 @@ def guidance(question):
     plan = read_plan(question)
     if plan:
         result += '\n' + READ.guidance(plan)
-    if combined_rule_request(question):
+    if combined_rule_request(question) and not security_inventory_request(question):
         result += '\n이 요청에는 규칙 파일 목록과 IDS 구동 경로라는 두 조회가 있습니다. get_rule_change_target의 모든 요청 파일과 rule-a.get_service_action_target(a:suricata)를 각각 선택하세요. 한쪽만 완료한 것을 전체 완료로 보고하지 마세요.'
-    if inventory_question(question):
+    if security_inventory_request(question):
+        result += '\n규칙 목록은 get_security_rules로 기본·커스텀 전체 정의를 조회하세요(origin=all). 기본만/커스텀만 명시되면 해당 origin을 사용합니다. Wazuh 상관 규칙은 correlation_only=true, 조건·참조·특정 ID는 view=details입니다. get_rule_change_target은 편집 대상 파일용이며 전체 조회를 대신하지 않습니다. summary는 전체 집계와 표시 예시를 구분하고 details 전체 목록은 동일 snapshot_id로 next_offset을 끝까지 조회합니다. 설정상 포함은 실제 엔진 개별 적재/탐지 증거가 아닙니다.'
+    elif inventory_question(question):
         result += '\n명시한 장비만 조회하세요. 이 도구는 커스텀 파일 조회이며 기본 룰·전체 적재 확인이 아닙니다. 전체 요청이면 미조회 범위를 먼저 밝히세요.'
     if tool_scope(question):
         result += '\n현재 상태를 답할 근거가 아직 없습니다. 첫 응답에서 제공된 읽기 도구를 실제로 호출하세요. 도구 설명이나 예시 숫자를 조회 결과로 제시하지 마세요.'
@@ -937,6 +1074,11 @@ def tool_scope(question, calls=None):
     if EVIDENCE.incident_investigation_request(normalized(question)):
         return None  # Investigation can require multiple kinds of evidence.
     if scope_notice(question): return set()
+    security=security_inventory_request(question)
+    if security:
+        return ({'mcp__rule_'+t[0]+'__get_security_rules' for t in security['targets']}
+                | ({'mcp__resp__get_firewall_rules'} if security['fw'] else set())
+                | ({'mcp__rule_a__get_service_action_target'} if security['ids_runtime'] else set()))
     operation = read_plan(question)
     if operation and operation['kind'] == 'operation': return READ.scope(operation,calls)
     request = firewall_request(question)
@@ -993,6 +1135,12 @@ def inventory_tool_scope(request):
 def missing_reads(question, calls, diagnostic_targets=()):
     if EVIDENCE.incident_investigation_request(normalized(question)):
         return ['사건 경보 조회 근거'] if incident_evidence_gap(question, calls) else []
+    security=security_inventory_request(question)
+    if security:
+        missing=[t for t in security['targets'] if not (security_inventory_state(security,calls,t) or {}).get('complete')]
+        if security['fw'] and not (firewall_state(calls) or {}).get('verified_complete'):missing.append('FW 전체 규칙: 조회 미완료')
+        if security['ids_runtime']:missing+=missing_reads('IDS 실제 가동 상태 조회',calls)
+        return missing
     request = rule_scope_request(question)
     if request and 'FW' in request['devices']:
         other = [d for d in request['devices'] if d != 'FW']
@@ -1040,6 +1188,28 @@ def missing_reads(question, calls, diagnostic_targets=()):
 def refine_read_schemas(question, schemas, calls, diagnostic_targets=()):
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     result = json.loads(json.dumps(schemas))
+    security=security_inventory_request(question)
+    if security:
+        # Bind target and every requested filter as one variant. No early page,
+        # changed snapshot or a custom subset can satisfy a full-device query.
+        for host in ('a','b'):
+            alias='mcp__rule_'+host+'__get_security_rules'
+            if alias not in result:continue
+            variants=[]
+            for target in security['targets']:
+                if not target.startswith(host+':'):continue
+                state=security_inventory_state(security,calls,target)
+                if state and (state['complete'] or state['data']['status']=='partial'):continue
+                if any(c.get('server')=='rule-'+host and c.get('name')=='get_security_rules' and c.get('arguments',{}).get('target')==target and c.get('is_error') for c in calls):continue
+                exact={'target':target,'origin':security['origin'],'view':security['view'],
+                       'correlation_only':security['correlation_only'] and target=='b:wazuh',
+                       'offset':state['next_offset'] if state else 0,'limit':100 if security['all_details'] else 20}
+                if security['rule_id'] is not None:exact['rule_id']=security['rule_id']
+                if state:exact['snapshot_id']=state['snapshot_id']
+                variants.append({'type':'object','properties':{k:{'enum':[v]} for k,v in exact.items()},
+                                 'required':list(exact),'additionalProperties':False})
+            if variants:result[alias]={'anyOf':variants}
+            else:result.pop(alias)
     if incident_evidence_gap(question, calls):
         text = normalized(question)
         addresses = set()

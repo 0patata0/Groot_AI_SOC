@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **2026-10-31 전체·상관 규칙 조회:** `get_security_rules`로 기본+커스텀 정의·Wazuh 공식 API 상관 조건·IDS 공식 엔진 통계를 조회한다. 변경 대상 파일 조회와 구분하며 샘플/전체 페이지·부분 실패를 검증한다. [도구 비교·호출·권한·설치·복구](security-rule-inventory.md) · [운영 반영 상태](../../STATUS.md).
+
 ## 2026-10-31 현재 실패 집계와 승인형 호스트 서비스
 
 `a:systemd`/`b:systemd`/`c:systemd`로 등록 unit 밖의 현재 실패도 발견한다. systemd25+runtime16=41관측 대상이며 `soc:coverage` 포함 enum42다. 0개는 과거 장애 부재나 전체 정상의 증거가 아니다. 기존 서비스5개에 A Vector·A/B Wazuh host-agent restart3개를 추가했고, 모델의 진단·승인안 준비→정확한 관리자 승인→한 번 실행·확인 경계를 유지한다. C 쓰기·임의 shell·unit·설정 편집·패키지 권한은 추가하지 않았다. [사용·허용 범위·복구](host-service-actions.md) · [실제 배포/검증](../../STATUS.md).

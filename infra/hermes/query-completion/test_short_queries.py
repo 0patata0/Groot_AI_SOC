@@ -39,7 +39,7 @@ class ShortQueries(unittest.TestCase):
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'ollama-trial'))
         import runtime
-        for question in ('룰 보여줘', 'WAF 기본 룰'):
+        for question in ('룰 보여줘', '규칙 보여줘'):
             result = asyncio.run(runtime.run({'model':'qwen3.6:35b'}, {'question':question}))
             self.assertEqual(result['status'], 'partial')
             self.assertEqual(result['calls'], [])
@@ -54,10 +54,10 @@ class ShortQueries(unittest.TestCase):
                 'result':raw, 'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
         full = H.inventory('WAF 룰', [call])
         custom = H.inventory('WAF 커스텀 룰', [call])
-        self.assertTrue(full.startswith('**조회 범위: 커스텀 파일만 확인**'))
-        self.assertIn('전체 룰 확인은 미완료', full)
+        self.assertIn('미조회·검증 실패', full)
+        self.assertIn('a:waf', H.missing_reads('WAF 룰', [call]))
         self.assertNotIn('전체 룰 확인은 미완료', custom)
-        self.assertIn(str(data['rule_inventory']['declared_count']), full)
+        self.assertTrue(H.missing_reads('WAF 커스텀 룰', [call]))
         self.assertTrue(H.missing_reads('FW 룰', [call]))
 
     def test_firewall_variants_cannot_become_custom_rule_queries(self):
@@ -94,19 +94,19 @@ class ShortQueries(unittest.TestCase):
 
     def test_basic_only_never_uses_custom_rule_as_substitute(self):
         for question in ('WAF 기본 룰', 'IDS 내장 규칙 보여줘', 'Wazuh 기본 규칙 조회'):
-            self.assertIn('기본·내장', H.scope_notice(question))
-            self.assertEqual(H.tool_scope(question), set())
-            self.assertIsNone(H.inventory_question(question))
+            self.assertIsNone(H.scope_notice(question))
+            self.assertTrue(all(x.endswith('__get_security_rules') for x in H.tool_scope(question)))
+            self.assertEqual(H.security_inventory_request(question)['origin'], 'builtin')
             self.assertTrue(H.missing_reads(question, []))
 
     def test_mixed_fw_and_waf_keeps_both_requested_scopes(self):
         question = 'FW와 WAF 룰 보여줘'
         self.assertIsNone(H.scope_notice(question))
-        self.assertEqual(H.tool_scope(question), {'mcp__rule_a__get_rule_change_target', 'mcp__resp__get_firewall_rules'})
+        self.assertEqual(H.tool_scope(question), {'mcp__rule_a__get_security_rules', 'mcp__resp__get_firewall_rules'})
         missing = H.missing_reads(question, [])
         self.assertEqual(len(missing), 2)
-        self.assertIn('FW', missing[0])
-        self.assertEqual(missing[1], 'a:modsecurity-custom')
+        self.assertTrue(any('FW' in item for item in missing))
+        self.assertIn('a:waf', missing)
         self.assertNotIn('Suricata', H.inventory_question(question))
 
     def test_negated_device_is_not_retained_as_positive_scope(self):
@@ -114,7 +114,7 @@ class ShortQueries(unittest.TestCase):
             self.assertIsNone(H.scope_notice(question))
             self.assertEqual(H.rule_scope_request(question)['devices'], ['WAF'])
         question = 'WAF 말고 IDS 룰 보여줘'
-        self.assertEqual(H.missing_reads(question, []), ['a:suricata-local'])
+        self.assertEqual(H.missing_reads(question, []), ['a:suricata'])
         self.assertNotIn('WAF', H.inventory_question(question))
 
     def test_actions_and_explanations_are_not_replaced_with_read_notices(self):
@@ -130,7 +130,7 @@ class ShortQueries(unittest.TestCase):
             api_kwargs: dict
             api_messages: list
             _original_api_kwargs: object = None
-        for question in ('룰 보여줘', 'WAF 기본 룰'):
+        for question in ('룰 보여줘', '규칙 보여줘'):
             agent = SimpleNamespace(platform='mattermost', model='qwen3.6:35b', provider='custom',
                                     _current_turn_id='t', max_iterations=12)
             rows = [{'role': 'user', 'content': question}]

@@ -39,7 +39,7 @@ CODE = Path("/opt/capstone-soc")
 FIXED_ENV = {"PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
              "LC_ALL": "C.UTF-8", "TZ": "Asia/Seoul", "PYTHONDONTWRITEBYTECODE": "1"}
 SOURCES = tuple("infra/mcp/" + name for name in (
-    "rule_change_executor.py", "rule_change_mcp.py", "rule_readonly_install.py", "service_action_executor.py", "incident_containment.py",
+    "rule_change_executor.py", "rule_change_mcp.py", "security_rule_inventory.py", "rule_readonly_install.py", "service_action_executor.py", "incident_containment.py",
     "soc_bot.py", "soc_management_events.py", "operations_approval.py", "approval_card_cleanup.py",
     "response-mcp.py", "wazuh_containment_ar.py", "managed_suricata_evidence.py")) + tuple("infra/hermes/" + name for name in (
     "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md",
@@ -347,7 +347,7 @@ def install_docker(profile):
 def install_rules(bundle, p, token, key, readonly_key):
     user = forced_account("rulechg", "/opt/rule-change", key, "/opt/rule-change/run-rule-change.sh", "/usr/local/sbin/rule-change-executor")
     mkdir("/etc/rule-change"); mkdir("/var/lib/rule-change")
-    for name in ("rule_change_mcp.py", "service_action_executor.py", "incident_containment.py", "managed_suricata_evidence.py"):
+    for name in ("security_rule_inventory.py", "rule_change_mcp.py", "service_action_executor.py", "incident_containment.py", "managed_suricata_evidence.py"):
         write(Path("/opt/rule-change") / name, render(name, bundle[name], p), 0o640, 0, user.pw_gid)
     write("/usr/local/sbin/rule-change-executor", render("rule_change_executor.py", bundle["rule_change_executor.py"], p), 0o750)
     write("/opt/rule-change/run-rule-change.sh", b"#!/bin/sh\nexec /usr/bin/env -i PATH=/usr/sbin:/usr/bin:/sbin:/bin /usr/bin/python3 -I -B /opt/rule-change/rule_change_mcp.py\n", 0o750, 0, user.pw_gid)

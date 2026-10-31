@@ -40,7 +40,7 @@ def digest(value):
                           json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
-def bounded_command(argv):
+def bounded_command(argv, *, diagnostics=False):
     """Drain stderr as well; stop before an unbounded archive enters memory."""
     process = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     buffers = [bytearray(), bytearray()]
@@ -61,9 +61,10 @@ def bounded_command(argv):
                     buffers[key.data].extend(raw)
                     if len(buffers[key.data]) > (MAX_ARCHIVE if key.data == 0 else 65536):
                         raise ValueError('inventory_read_too_large')
-            if process.wait(timeout=max(.1, deadline-time.monotonic())) != 0:
+            exit_code = process.wait(timeout=max(.1, deadline-time.monotonic()))
+            if exit_code != 0 and not diagnostics:
                 raise ValueError('inventory_read_failed')
-        return bytes(buffers[0])
+        return (bytes(buffers[0]), bytes(buffers[1]), exit_code) if diagnostics else bytes(buffers[0])
     finally:
         if process.poll() is None:
             process.kill()
@@ -223,68 +224,244 @@ def wazuh_rules(items):
     return rows, files, []
 
 
-def waf_rules(files, parser):
+def waf_statements(content, parser):
+    """Retain the starting physical line while using the reviewed lexer."""
+    pending = ''; start = None
+    for number, line in enumerate(content.split('\n'), 1):
+        if not line.strip() or line.lstrip().startswith('#'):
+            if pending: raise ValueError('comment_inside_continuation')
+            continue
+        if start is None: start = number
+        pending += line[:-1] if line.endswith('\\') else line
+        if not line.endswith('\\'):
+            # The existing parser validates escapes and argument boundaries.
+            yield start, pending, parser._waf_inventory_arguments(pending)
+            pending = ''; start = None
+    if pending: raise ValueError('unfinished_continuation')
+
+
+def waf_actions(text, parser):
+    if not text: return []
+    parser._waf_inventory_actions(text)
+    parts = []; start = 0; quote = None; escaped = False
+    for index, char in enumerate(text):
+        if escaped: escaped = False
+        elif char == '\\': escaped = True
+        elif quote:
+            if char == quote: quote = None
+        elif char in "\"'": quote = char
+        elif char == ',': parts.append(text[start:index]); start = index + 1
+    parts.append(text[start:])
+    result = []
+    for part in parts:
+        key, colon, value = part.strip().partition(':'); value = value.strip()
+        if len(value) >= 2 and value[0] in "\"'" and value[-1] == value[0]: value = value[1:-1]
+        result.append({'name':key.strip().lower(), 'value':value if colon else None})
+    return result
+
+
+def waf_rules(files, parser, metadata=None):
     rows, sources, warnings, selected = [], [], [], set()
-    statements = {}
-    for name, raw in files.items():
-        if name.endswith('.conf'):
-            try:
-                statements[name] = list(parser._waf_inventory_statements(raw.decode('utf-8')))
+    statements = {}; ordered = []; include_edges = []
+    def parse(name):
+        if name not in statements:
+            try: statements[name] = list(waf_statements(files[name].decode('utf-8'), parser))
             except (ValueError, UnicodeError):
-                warnings.append('unparsed_rule_file:'+name)
+                warnings.append('unparsed_rule_file:'+name); statements[name] = []
+        return statements[name]
     def visit(name, stack=()):
-        if name in stack:
-            warnings.append('include_cycle:'+name); return
+        if len(stack) > 32 or name in stack:
+            warnings.append('include_cycle_or_depth:'+name); return
+        if name in selected:
+            warnings.append('repeated_include:'+name); return
+        if name not in files:
+            warnings.append('unread_include:'+name); return
         selected.add(name)
-        for line in statements.get(name, []):
-            if re.match(r'^\s*Include\s', line, re.I):
-                value = line.split(None, 1)[1].strip().strip('"\'')
-                if not value.startswith(WAF_ROOT) and value != WAF_AUDIT:
+        for number, line, args in parse(name):
+            if args and args[0].lower() == 'include':
+                if len(args) != 2:
+                    warnings.append('unsupported_include:'+name+':'+str(number)); continue
+                value = args[1]
+                if (not value.startswith(WAF_ROOT) and value != WAF_AUDIT) or '..' in value.split('/'):
                     warnings.append('unread_include:'+value); continue
-                matches = sorted(n for n in statements if fnmatch.fnmatchcase(n, value))
-                if not matches:
-                    warnings.append('unmatched_include:'+value)
-                for match in matches:
-                    visit(match, stack+(name,))
+                matches = sorted(n for n in files if fnmatch.fnmatchcase(n, value))
+                include_edges.append({'source':name,'line':number,'pattern':value,'matches':matches})
+                if not matches: warnings.append('unmatched_include:'+value)
+                for match in matches: visit(match, stack+(name,))
+            else: ordered.append((name,number,line,args,True))
     visit(WAF_ROOT+'setup.conf')
-    removals = []
+    for name in sorted(files):
+        if name.endswith('.conf') and name not in selected:
+            ordered.extend((name,n,line,args,False) for n,line,args in parse(name))
     for name in sorted(statements):
-        origin = 'custom' if re.search(r'(?:GROOT|CAPSTONE)',posixpath.basename(name)) else 'builtin'
-        sources.append({'path':name, 'sha256':digest(files[name]), 'origin':origin,
+        sources.append({'path':name,'sha256':digest(files[name]),
+                        'origin':'custom' if re.search(r'(?:GROOT|CAPSTONE)',posixpath.basename(name)) else 'builtin',
                         'configuration':'selected' if name in selected else 'unselected'})
-        previous = None
-        for line in statements[name]:
-            try:
-                args = parser._waf_inventory_arguments(line)
-                directive = args[0].lower()
-                if name in selected and directive.startswith(('secruleremove','secruleupdate')):
-                    removals.append({'source':name,'directive':line})
-                if directive not in ('secrule','secaction'):
-                    continue
-                actions = args[3] if directive=='secrule' and len(args)==4 else args[1] if directive=='secaction' and len(args)==2 else ''
-                ids, chain = parser._waf_inventory_actions(actions) if actions else ([],False)
-                if not ids:
-                    if previous is None or not previous.pop('_chain',False):
-                        raise ValueError('missing_rule_id')
-                    previous['definition'] += '\n'+line
-                    previous['_chain'] = chain
-                    continue
-                if len(ids) != 1:
-                    raise ValueError('multiple_rule_ids')
-                if previous is not None and previous.get('_chain'):
-                    raise ValueError('unfinished_chain')
-                previous = {'id':str(ids[0]),'source':name,'origin':origin,'configuration':sources[-1]['configuration'],
-                            'directive':directive,'definition':line,'_chain':chain,'correlation':False}
+    origins = {s['path']:s['origin'] for s in sources}
+    removals = []; markers = []; defaults = {}; modes = []; previous = None; controls = []
+    disruptive = {'allow','block','deny','drop','pass','redirect','proxy'}
+    for name, number, line, args, included in ordered:
+        try:
+            directive = args[0].lower(); location = {'source':name,'line':number}
+            if previous and previous.get('_chain') and (directive != 'secrule' or previous['source'] != name):
+                warnings.append('interrupted_rule_chain:'+previous['source']+':'+str(previous['line'])); previous['_chain'] = False
+            if included and directive == 'secruleengine':
+                if len(args) != 2 or args[1].lower() not in ('on','off','detectiononly'): raise ValueError('invalid_engine_mode')
+                modes.append({**location,'value':args[1]})
+            if included and directive == 'secdefaultaction':
+                actions = waf_actions(args[1],parser) if len(args)==2 else []
+                phases = [a['value'] for a in actions if a['name']=='phase']
+                if len(phases)!=1 or phases[0] not in ('1','2','3','4','5'): raise ValueError('unsupported_default_phase')
+                defaults[phases[0]] = {**location,'actions':actions}
+            if included and directive == 'secmarker':
+                if len(args)!=2: raise ValueError('invalid_marker')
+                markers.append({**location,'name':args[1]})
+            if included and directive.startswith(('secruleremove','secruleupdate')):
+                removals.append({**location,'directive':line,'kind':directive,'arguments':args[1:],
+                                 'scope':'configuration_time_exception_or_update'})
+            if directive not in ('secrule','secaction'):
+                if included and (directive in ('secrulescript','secremoterules','includeoptional') or directive.startswith('<')):
+                    warnings.append('unsupported_rule_source:'+name+':'+str(number))
+                continue
+            if (directive=='secrule' and len(args) not in (3,4)) or (directive=='secaction' and len(args)!=2):
+                raise ValueError('invalid_rule_arguments')
+            text = args[3] if len(args)==4 else args[1] if directive=='secaction' else ''
+            ids, chain = parser._waf_inventory_actions(text) if text else ([],False)
+            actions = waf_actions(text,parser)
+            segment = {**location,'variables':args[1] if directive=='secrule' else None,
+                       'operator':args[2] if directive=='secrule' else None,'actions':actions}
+            if not ids:
+                if previous is None or not previous.pop('_chain',False) or previous['source']!=name:
+                    raise ValueError('missing_rule_id')
+                previous['definition'] += '\n'+line; previous['conditions'].append(segment); previous['_chain']=chain
+            else:
+                if len(ids)!=1: raise ValueError('multiple_rule_ids')
+                if previous and previous.get('_chain'): raise ValueError('unfinished_chain')
+                values = lambda key:[a['value'] for a in actions if a['name']==key]
+                phase_values = values('phase'); phase = phase_values[-1] if phase_values else '2'
+                if phase not in ('1','2','3','4','5'): raise ValueError('unsupported_phase')
+                default = defaults.get(phase) if included else None
+                declared = [a['name'] for a in actions if a['name'] in disruptive]
+                inherited = [a['name'] for a in (default or {}).get('actions',[]) if a['name'] in disruptive]
+                # Expose the configured base action, before updates and runtime ctl.
+                action = declared[-1] if declared else (inherited[-1] if inherited else 'pass')
+                if action=='block': action = inherited[-1] if inherited else 'pass'
+                previous = {'id':str(ids[0]),'source':name,'line':number,'origin':origins[name],
+                            'configuration':'selected' if included else 'unselected','directive':directive,
+                            'definition':line,'_chain':chain,'correlation':False,'conditions':[segment],
+                            'description':(values('msg') or [''])[0],
+                            'attributes':{'phase':phase,'phase_explicit':bool(phase_values),'severity':values('severity'),
+                                          'tags':values('tag'),'revision':values('rev')},
+                            'default_actions':default,'declared_disruptive_actions':declared,
+                            'configured_base_action':action if included else None,
+                            'action_scope':'before_configuration_updates_and_request_time_controls'}
                 rows.append(previous)
-            except (ValueError,IndexError):
-                warnings.append('unparsed_rule_statement:'+name)
-        if previous and previous.get('_chain'):
-            warnings.append('unfinished_rule_chain:'+name)
+            if included:
+                controls.extend({**location,'rule_id':previous['id'],'control':a['value'],
+                                 'scope':'conditional_on_matching_rule_and_chain'} for a in actions if a['name']=='ctl')
+        except (ValueError,IndexError):
+            warnings.append('unparsed_rule_statement:'+name+':'+str(number))
+    if previous and previous.get('_chain'): warnings.append('unfinished_rule_chain:'+previous['source'])
     for row in rows:
         row.pop('_chain',None)
-    # Dynamic ctl exclusions/updates depend on request context. Never calculate
-    # an effective/active count by subtracting textual remove directives.
+        row['chain_length'] = len(row['conditions'])
+        row['runtime_controls'] = [c for c in controls if c['rule_id']==row['id'] and c['source']==row['source']]
+        row['configuration_changes_by_id'] = []
+        for change in removals:
+            if not change['kind'].endswith('byid'): continue
+            selectors = change['arguments'] if change['kind']=='secruleremovebyid' else change['arguments'][:1]
+            for selector in selectors:
+                spans = re.split(r'[,\s]+',selector)
+                if not all(re.fullmatch(r'[0-9]+(?:-[0-9]+)?',span) for span in spans): continue
+                if any(int(span.split('-')[0]) <= int(row['id']) <= int(span.split('-')[-1]) for span in spans):
+                    row['configuration_changes_by_id'].append(change); break
+    chosen = [r for r in rows if r['configuration']=='selected']
+    info = {'schema_version':1,'scope':'single_fixed_ModSecurity_file_context',
+            'engine_mode':{'on':'On','off':'Off','detectiononly':'DetectionOnly'}[modes[-1]['value'].lower()] if modes else 'Off','engine_mode_directives':modes,
+            'default_actions_by_phase':defaults,'include_graph':include_edges,'markers':markers,
+            'id_definitions':len(chosen),'chain_continuations':sum(len(r['conditions'])-1 for r in chosen),
+            'configuration_exceptions':len(removals),'runtime_controls':controls,
+            'native_count_formula':'ID definitions + SecMarker declarations * 7 (libmodsecurity 3.0.16 only)',
+            'native_expected_objects_3_0_16':len(chosen)+len(markers)*7,
+            'per_request_effective_actions_verified':False}
+    if metadata is not None: metadata.update(info)
     return rows, sources, warnings, removals
+
+
+def nginx_security_directives(text):
+    """Read nginx -T's actual loaded sources, exposing only ModSecurity flags.
+
+    This does not infer request matching or inherited per-location coverage.
+    Unknown inline/remote rule contexts are reported as coverage gaps.
+    """
+    sections = re.split(r'(?m)^# configuration file ([^\n]+):\n',text)
+    result = []; warnings = []
+    for i in range(1,len(sections),2):
+        source, body = sections[i:i+2]
+        # Quoted multiline values are handled by the lexer; comments and quoted
+        # strings mentioning modsecurity never become directives.
+        tokens=[]; token=''; quote=None; escaped=False; comment=False; line=1; start=1
+        for char in body:
+            if comment:
+                if char=='\n': comment=False
+            elif escaped: token+=char; escaped=False
+            elif char=='\\': token+=char; escaped=True
+            elif quote:
+                if char==quote: quote=None
+                else: token+=char
+            elif char in "\"'": quote=char
+            elif char=='#': comment=True
+            elif char.isspace() or char in ';{}':
+                if token: tokens.append(token);token=''
+                if char in ';{}':
+                    if char==';' and tokens and tokens[0].startswith('modsecurity'):
+                        key=tokens[0];args=tokens[1:]
+                        if key=='modsecurity' and len(args)==1 and args[0] in ('on','off'):
+                            result.append({'source':source,'line':start,'directive':key,'value':args[0]})
+                        elif key=='modsecurity_rules_file' and len(args)==1:
+                            result.append({'source':source,'line':start,'directive':key,'value':args[0]})
+                        elif key in ('modsecurity_rules','modsecurity_rules_remote'):
+                            warnings.append('additional_nginx_rule_context:'+source+':'+str(start))
+                            result.append({'source':source,'line':start,'directive':key,'value_sha256':digest(args)})
+                        elif key not in ('modsecurity_transaction_id',):
+                            warnings.append('unparsed_nginx_modsecurity_directive:'+source+':'+str(start))
+                    tokens=[];start=line
+            else:
+                if not tokens and not token:start=line
+                token+=char
+            if char=='\n':line+=1
+        if quote or escaped or tokens or token: warnings.append('unparsed_nginx_dump:'+source)
+    if not result: warnings.append('nginx_modsecurity_directives_missing')
+    rule_files=[r['value'] for r in result if r['directive']=='modsecurity_rules_file']
+    if rule_files != [WAF_ROOT+'setup.conf']: warnings.append('waf_rule_context_not_fully_covered')
+    return result,warnings
+
+
+def waf_native_result(stdout, stderr, exit_code, metadata):
+    """Actual nginx/libmodsecurity parser check; never a running-worker claim."""
+    text=stdout.decode('utf-8'); diagnostic=stderr.decode('utf-8','replace')
+    directives,warnings=nginx_security_directives(text)
+    versions=re.findall(r'libmodsecurity3 version ([0-9.]+)',diagnostic)
+    counts=re.findall(r'rules loaded inline/local/remote: ([0-9]+)/([0-9]+)/([0-9]+)',diagnostic)
+    success=exit_code==0 and 'syntax is ok' in diagnostic and 'test is successful' in diagnostic
+    result={'status':'passed' if success else 'failed','exit_code':exit_code,
+            'scope':'new_nginx_configuration_test_not_running_worker_memory',
+            'nginx_configuration_sha256':digest(stdout),'diagnostic_sha256':digest(stderr),
+            'libmodsecurity_version':versions[-1] if versions else None,
+            'explicit_nginx_directives':directives,'connector_object_counts':[
+                dict(zip(('inline','local','remote'),map(int,c))) for c in counts],
+            'running_worker_rule_state_verified':False,
+            'warning_codes':(['ssl_stapling_issuer_missing'] if '"ssl_stapling" ignored, issuer certificate not found' in diagnostic else [])}
+    if not success:warnings.append('native_waf_configuration_check_failed')
+    if len(counts)!=1:warnings.append('native_waf_count_unavailable_or_multiple_contexts')
+    if versions and versions[-1]=='3.0.16' and len(counts)==1:
+        expected=metadata['native_expected_objects_3_0_16'];actual=sum(map(int,counts[0]))
+        result['object_count_reconciliation']={'matched':actual==expected,'expected':expected,'observed':actual,
+            'id_definitions':metadata['id_definitions'],'marker_declarations':len(metadata['markers']),
+            'internal_marker_phases':7,'chain_continuations_counted_separately':metadata['chain_continuations']}
+        if actual!=expected:warnings.append('native_waf_object_count_mismatch')
+    else:result['object_count_reconciliation']={'matched':None,'reason':'unverified_native_version_or_context'}
+    return result,warnings
 
 
 def suricata_options(line):
@@ -324,7 +501,7 @@ def suricata_rules(data, source, origin, parser):
     return rows
 
 
-def inventory(engine, parser, request, command=bounded_command, api_reader=None):
+def inventory(engine, parser, request, command=bounded_command, api_reader=None, native_check=None):
     target=request.get('target'); origin=request.get('origin','all'); view=request.get('view','summary')
     offset=request.get('offset',0); limit=request.get('limit',20); rid=request.get('rule_id'); correlation=request.get('correlation_only',False)
     expected=request.get('snapshot_id')
@@ -362,6 +539,8 @@ def inventory(engine, parser, request, command=bounded_command, api_reader=None)
             runtime.update(definition_source='official_wazuh_API_rules', API_identity='existing_readonly_account',
                            status_scope='API_configuration_selection_not_engine_memory')
         else:
+            validate = native_check or (lambda argv: bounded_command(argv, diagnostics=True))
+            check_before = validate([parser.DOCKER,'exec',spec['container'],'nginx','-T'])
             roots=[WAF_ROOT+n for n in ('setup.conf','modsecurity.conf','modsecurity-override.conf','owasp-crs/crs-setup.conf',
                                         'owasp-crs/plugins','owasp-crs/rules')]+[WAF_AUDIT]
             raw=command([parser.DOCKER,'exec',spec['container'],'tar','-chf','-',*roots])
@@ -369,11 +548,19 @@ def inventory(engine, parser, request, command=bounded_command, api_reader=None)
             second=archive_files(command([parser.DOCKER,'exec',spec['container'],'tar','-chf','-',*roots]),roots)
             if contents != second:
                 raise ValueError('rules_changed_during_read')
-            entry=engine.runner.call([parser.DOCKER,'exec',spec['container'],'cat','/etc/nginx/conf.d/modsecurity.conf']).decode()
-            if not re.search(r'^\s*modsecurity\s+on;',entry,re.M) or not re.search(r'^\s*modsecurity_rules_file\s+/etc/modsecurity\.d/setup\.conf;',entry,re.M):
-                raise ValueError('waf_entrypoint_changed')
-            rows,files,warnings,exclusions=waf_rules(contents,parser)
-            files.append({'path':'/etc/nginx/conf.d/modsecurity.conf','sha256':digest(entry.encode()),'origin':'builtin','configuration':'selected'})
+            check_after = validate([parser.DOCKER,'exec',spec['container'],'nginx','-T'])
+            if (check_before[0],check_before[2]) != (check_after[0],check_after[2]):
+                raise ValueError('nginx_configuration_changed_during_read')
+            waf = {}
+            rows,files,warnings,exclusions=waf_rules(contents,parser,waf)
+            native, gaps = waf_native_result(*check_after,waf)
+            first_native, _ = waf_native_result(*check_before,waf)
+            if any(native[k]!=first_native[k] for k in ('libmodsecurity_version','connector_object_counts')):
+                raise ValueError('nginx_validation_changed_during_read')
+            warnings.extend(gaps)
+            runtime.update(waf_configuration=waf,native_configuration_validation=native)
+            files.append({'path':'nginx:-T:loaded_configuration','sha256':digest(check_after[0]),
+                          'origin':'builtin','configuration':'selected'})
         final=json.loads(engine.runner.call([parser.DOCKER,'inspect',spec['container']]))[0]
         if final['Id']!=identity['id'] or final['State']['StartedAt']!=identity['started_at']:
             raise ValueError('engine_changed_during_read')
@@ -407,6 +594,12 @@ def inventory(engine, parser, request, command=bounded_command, api_reader=None)
     page=selected[offset:offset+limit]
     if view=='summary':
         page=[{k:v for k,v in r.items() if k in ('id','gid','source','origin','configuration','correlation','description')} for r in page]
+        if target=='a:waf':
+            full=runtime['waf_configuration']
+            runtime['waf_configuration']={k:v for k,v in full.items() if k not in ('include_graph','markers','runtime_controls')}
+            runtime['waf_configuration'].update(marker_declarations=len(full['markers']),
+                runtime_control_count=len(full['runtime_controls']),include_edge_count=len(full['include_graph']),
+                detail_collections_scope='omitted_in_summary_available_in_details')
     result={'schema_version':1,'target':target,'status':'partial' if warnings else 'complete',
             'observed_at_kst':datetime.now(timezone(timedelta(hours=9))).isoformat(), 'snapshot_id':snapshot,
             'scope':'installed_rule_definitions_and_configuration_selection','runtime_load_verified':False,

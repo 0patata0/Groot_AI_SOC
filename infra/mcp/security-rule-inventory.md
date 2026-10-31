@@ -4,6 +4,25 @@
 
 `get_security_rules`는 기본/내장 규칙과 프로젝트 규칙을 함께 조회한다. 기존 `get_rule_change_target`은 승인할 커스텀 파일의 전문·기준 SHA 조회로 유지한다. 읽기 도구 확장이 기본 규칙 편집 권한, 임의 경로·명령 실행 권한을 추가하지 않는다.
 
+## WAF 보완 — 2026-10-31 후속
+
+WAF 조회는 기존 컨테이너의 **Nginx/ModSecurity 공식 설정 검사(`nginx -T`)와 상세 정의 파서**를 함께 사용한다. 검사 프로세스가 새로 읽은 설정의 구문/객체 수를 검증하며, 실행 중 worker 메모리나 실제 공격 차단 성공으로 표시하지 않는다. 운영 룰·모드·컨테이너를 재구성하거나 reload하지 않는다.
+
+| 보완 | 조회 결과와 경계 |
+| --- | --- |
+| 전체 집계 대조 | 실제 ID655 = 기본640+프로젝트15. 공식 libmodsecurity3.0.16 검사 객체865 = ID655 + SecMarker30 × 내부7단계. 체인 하위94개는 독립 ID로 더하지 않음. 다른 버전에는 이 공식을 검증 없이 적용하지 않음 |
+| 구조화 상세 | 원문과 출처/물리 행번호, 대상 변수·연산자, 순서 있는 action·반복 tag·severity·phase, chain 각 조건을 보존 |
+| 모드·기본 동작 | Include 실행 순서로 SecRuleEngine/phase별 SecDefaultAction을 확인. 현행 DetectionOnly·phase1~5 pass. `block`은 기본 disruptive action을 참조하며, 이것을 그 자체로 실제 차단 성공이라 해석하지 않음 |
+| 예외 | 현행 설정 시점 대상 수정55건과 조건부 ctl17건을 구분. 특정 ID에는 ID/범위로 연결된 지시도 반환. ID941100은 대상 수정4건. Tag/Msg 기반 예외의 실제 일치나 요청별 최종 동작을 임의 계산하지 않음 |
+| Nginx 연결 설정 | 실제 `-T`에 나온 ModSecurity on/off·rules_file 지시와 출처를 반환. 문맥별 상속·URL 선택을 모두 계산한 것으로 표시하지 않음. 추가 inline/remote/다른 파일의 룰은 범위 공백으로 표시 |
+| 누락·변경 감지 | Include 반복/순환/미열람·미지원 rule source·끊긴 chain·공식 객체 수 불일치/검사 실패는 미완료. Nginx dump와 규칙 파일을 두 번 비교하고 dump 해시도 페이지 snapshot에 포함 |
+
+summary에는 전체 집계와 기본 동작·모드·공식 대조 결과를 제공하고, marker/include graph/전체 ctl 컬렉션은 생략했음을 표시한다. details에는 해당 컬렉션과 상세 정의를 제공한다. 같은 snapshot의 모든 페이지를 끝까지 가져와야 전체 상세 완료다. 현재 `ssl_stapling_issuer_missing`은 기존 인증서 경고로 별도 표시하며 규칙 구문 실패와 구분한다. TLS 설정 변경/경고 해결은 이번 조회 보완 범위에 포함하지 않는다.
+
+새 패키지/도구 설치 없이 기존 이미지의 Nginx와 libmodsecurity를 사용한다. 기존 `deploy.sh`의 `security_rule_inventory.py` 및 두 봇 공통 하네스 설치·오프라인 소스 경로를 그대로 갱신한다. 운영 적용/검증·생략·Git은 [STATUS](../../STATUS.md) 참조. 복구는 해당 변경의 root manifest에서 파일·소유권·권한을 복원하고 두 채팅 런타임을 다시 시작하는 절차이며 실제 원복 시험은 별도다.
+
+근거: [설치 버전3.0.16 marker/chain 처리](https://github.com/owasp-modsecurity/ModSecurity/blob/v3.0.16/src/parser/driver.cc), [7개 내부 단계](https://github.com/owasp-modsecurity/ModSecurity/blob/v3.0.16/headers/modsecurity/modsecurity.h), [Nginx 연결 지시의 문맥](https://github.com/owasp-modsecurity/ModSecurity-nginx#usage), [SecDefaultAction/DetectionOnly 공식 문법](https://github.com/owasp-modsecurity/ModSecurity/wiki/Reference-Manual-%28v3.x%29). 공식 새 문서 사이트는 조회 당시 도달 실패해 공식 저장소와 설치 버전 소스로 교차 확인했다.
+
 ## 공식 도구와 직접 파서 비교
 
 | 대상·방법 | 실제 확인한 범위 | 판단 |

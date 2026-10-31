@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+## WAF 조회 보완 — 2026-10-31
+
+WAF 조회를 공식 Nginx/ModSecurity 설정 검사와 대조하도록 보완했습니다. ID655개와 내부 객체865개의 차이, 체인94조건, 기본 동작·예외 지시를 구분합니다. `WAF ID 941100 조건 보여줘`로 상세와 해당 ID의 대상 수정4건을 확인할 수 있습니다. [사용·한계·복구](infra/mcp/security-rule-inventory.md) · [실제 운영 검증/Git](STATUS.md).
+
 ## 전체 규칙·상관 조건 조회 — 2026-10-31
 
 `WAF 룰`, `IDS 룰`, `Wazuh ID 5712 조건 보여줘`처럼 짧게 요청해도 기본·커스텀 전체 정의 또는 해당 ID의 실제 조건을 조회하도록 두 봇을 보완했습니다. Wazuh는 공식 API를 사용하며 frequency/timeframe/if_matched_sid 등의 상관 조건을 제공합니다. IDS는 공식 엔진 통계와 상세 정의를 함께 읽습니다. summary의 전체 집계와20개 예시, 전체 상세 페이지 완료 여부를 구분합니다.

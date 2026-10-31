@@ -223,6 +223,21 @@ def security_inventory_report(plan,calls):
             lines+=['엔진 실조회: 적재 '+str(counters['rules_loaded'])+' · 실패 '+str(counters['rules_failed'])+' · 건너뜀 '+str(counters['rules_skipped'])+' · 마지막 적재 '+str(counters['last_reload_kst'])+' (KST).']
         if d.get('duplicate_rule_ids'):
             lines+=['중복 ID 정의: '+cell(json.dumps(d['duplicate_rule_ids'],ensure_ascii=False))+'. 정의를 합치거나 누락하지 않았습니다.']
+        waf=d.get('runtime',{}).get('waf_configuration',{})
+        native=d.get('runtime',{}).get('native_configuration_validation',{})
+        if target=='a:waf' and waf.get('schema_version')==1:
+            mode=waf.get('engine_mode','미확인')
+            lines+=['조회한 WAF 규칙 파일의 설정 모드: `'+cell(mode)+'`. '+('DetectionOnly는 기본 설정상 차단하지 않는 탐지 모드입니다.' if mode=='DetectionOnly' else '요청별 예외·실제 탐지/차단 여부는 별도 증거가 필요합니다.')]
+            lines+=['체인 하위 조건 '+str(waf.get('chain_continuations','미확인'))+'개 · 조건부 ctl '+str(waf.get('runtime_control_count',len(waf.get('runtime_controls',[]))))+'개. 기본 동작·예외 적용 전후를 구분합니다.']
+            if native:
+                switches=[str(x.get('value','미확인')) for x in native.get('explicit_nginx_directives',[]) if x.get('directive')=='modsecurity']
+                if switches:lines+=['Nginx ModSecurity 명시 설정: '+cell(', '.join(switches))+'. 요청 경로별 상속·조건부 엔진 변경은 별도 확인 대상입니다.']
+                lines+=['공식 Nginx/ModSecurity 설정 검사: '+cell(native.get('status','미확인'))+' (새 검사 프로세스 기준, 실행 중 worker 메모리 검증 아님).']
+                counts=native.get('object_count_reconciliation',{})
+                if counts.get('matched') is True:
+                    lines+=['공식 집계 대조: ID '+str(counts['id_definitions'])+' + marker '+str(counts['marker_declarations'])+' × 내부 '+str(counts['internal_marker_phases'])+'단계 = '+str(counts['observed'])+'개 객체, 일치. 객체 수를 별도 룰 ID 수로 세지 않습니다.']
+                elif counts.get('matched') is False:lines+=['공식 객체 수와 파서 집계가 불일치하여 전체 검증 미완료입니다.']
+                if native.get('warning_codes'):lines+=['설정 검사 경고: '+cell(', '.join(native['warning_codes']))+'.']
         if d['warnings']:lines+=['집계 경고: '+cell('; '.join(d['warnings']))]
         if plan['all_details'] and not state['complete']:lines+=['전체 상세 조회 미완료입니다. 다음 offset: '+str(state['next_offset'])+'. 일부를 전체로 보고하지 않습니다.']
         lines+=['스냅샷: `'+d['snapshot_id']+'`.']

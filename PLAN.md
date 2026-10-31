@@ -1,5 +1,9 @@
 # Agentic SOC 구축 실행 계획 (ESXi 온프레미스)
 
+## WAF 조회 보완 — 2026-10-31
+
+WAF 공식 설정 검사·객체 수 대조·구조화 상세·기본 동작/예외·Include/Nginx 변경 감지를 구현하고 A/B에 증분 반영했다. 기존 초기 설치/오프라인 소스 경로를 재사용한다. 실제 전체7페이지655고유ID와 두 봇 단문 각2건 검증을 완료했다. 기록/자동 Git 후 이번 요청을 마감하고 일시정지한다. 실제 공격 차단·worker 메모리 검증·TLS 경고 해결·모델/학습 변경은 별도 범위다. [근거와 한계](infra/mcp/security-rule-inventory.md) · [진행 상태](STATUS.md).
+
 ## 10/31 전체 규칙·상관 조건 실제 조회 확장
 
 A/B의 읽기 전용 `get_security_rules`와 두 봇 공통 하네스를 반영했다. Wazuh 공식 API 전체/조건, IDS 공식 엔진 통계+상세 파서, WAF Include/chain 정의를 사용한다. 기본은 전체 집계이며 특정 ID·상관 조건·동일 스냅샷 상세 페이지를 조회한다. 커스텀 파일 편집과 승인 쓰기 범위는 기존 경계를 유지한다. [도구 비교·사용·복구](infra/mcp/security-rule-inventory.md).

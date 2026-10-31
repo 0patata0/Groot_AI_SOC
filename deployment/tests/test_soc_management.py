@@ -59,6 +59,13 @@ class BindingTests(unittest.TestCase):
         self.assertEqual(m.WAZUH_API_USER,'capstone-ro')
         self.assertIn('infra/mcp/security_rule_inventory.py',install.SOURCES)
 
+    def test_waf_native_validation_is_in_existing_offline_source_bundle(self):
+        m=module('security_rule_inventory.py','a')
+        self.assertTrue(callable(m.waf_native_result))
+        self.assertTrue(callable(m.nginx_security_directives))
+        self.assertEqual(m.WAF_ROOT,'/etc/modsecurity.d/')
+        self.assertIn('infra/mcp/security_rule_inventory.py',install.SOURCES)
+
     def test_fresh_mcp_schemas_have_exclusive_roles_and_no_legacy_chatproxy(self):
         for host in ('a', 'b'):
             m = module('rule_change_mcp.py', host)

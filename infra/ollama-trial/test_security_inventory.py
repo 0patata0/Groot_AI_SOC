@@ -111,6 +111,22 @@ class FullInventory(unittest.TestCase):
         for question,target in (('WAF 룰','a:waf'),('IDS 룰','a:suricata')):
             self.assertNotIn('Wazuh',H.read_report(question,[fixture(target=target)]))
 
+    def test_waf_native_object_count_and_detection_only_are_not_blocking_proof(self):
+        call=fixture(target='a:waf');data=json.loads(call['result'])
+        data['runtime']={'waf_configuration':{'schema_version':1,'engine_mode':'DetectionOnly',
+                         'chain_continuations':94,'runtime_control_count':17},
+                         'native_configuration_validation':{'status':'passed','explicit_nginx_directives':[{'directive':'modsecurity','value':'on'},{'directive':'modsecurity','value':'off'}],'object_count_reconciliation':{
+                             'matched':True,'id_definitions':655,'marker_declarations':30,
+                             'internal_marker_phases':7,'observed':865},'warning_codes':[]}}
+        seal(call,data);report=H.read_report('WAF 룰',[call])
+        for fact in ('655','30','865','기본 설정상 차단하지 않는','worker 메모리 검증 아님','94','17','명시 설정: on, off'):
+            self.assertIn(fact,report)
+        self.assertNotIn('Wazuh',report)
+        data['status']='partial';data['warnings']=['native_waf_object_count_mismatch']
+        data['runtime']['native_configuration_validation']['object_count_reconciliation']['matched']=False
+        seal(call,data);report=H.read_report('WAF 룰',[call])
+        self.assertIn('불일치',report);self.assertTrue(H.missing_reads('WAF 룰',[call]))
+
     def test_no_current_read_plan_for_write_incident_or_quoted_instruction(self):
         for q in ('Wazuh 룰 삭제해줘','IDS 룰 바꿔줘','WAF 룰 위험 원인을 분석해줘',
                   'Wazuh 룰 조회하지 마','"WAF 룰 보여줘"'):

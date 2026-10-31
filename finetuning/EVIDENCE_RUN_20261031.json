@@ -1,0 +1,186 @@
+{
+  "at_kst": "2026-10-31T09:40:53.003413+09:00",
+  "status": "main_training_started_not_completed",
+  "run_id": "soc-evidence-20261031-r2",
+  "training_rows": 191,
+  "expected_optimizer_steps": 96,
+  "data_composition": {
+    "source_bound_operator_observation_rows": 143,
+    "existing_cti_replay_rows": 48,
+    "optional_harness": 0,
+    "guide": 0
+  },
+  "quality_limit": "Source-bound project interpretation is not expert-certified; no final operational evaluation or promotion",
+  "observed_progress": {
+    "status": "training",
+    "at_kst": "2026-10-31T09:40:27.587991+09:00",
+    "step": 1,
+    "max_steps": 96,
+    "epoch": 0.010471204188481676,
+    "elapsed_seconds": 35.12,
+    "estimated_remaining_seconds": 3336.3,
+    "peak_cuda_allocated_gib": 65.86,
+    "peak_cuda_reserved_gib": 66.06,
+    "metrics": {
+      "loss": 0.554187536239624,
+      "grad_norm": 1.1792222261428833,
+      "learning_rate": 0.0,
+      "epoch": 0.010471204188481676
+    }
+  },
+  "successful_microbatches_observed": 3,
+  "systemd_supervisor_parent_pid": 1,
+  "service_active": true,
+  "independent_restore_active": true,
+  "pause_started_at_kst": "2026-10-31T09:38:32.779952+09:00",
+  "main_started_at_kst": "2026-10-31T09:38:35.204578+09:00",
+  "estimated_main_seconds_conservative": 12330.651835849998,
+  "estimate_method": {
+    "estimated_main_seconds": 12330.651835849998,
+    "longest_example_seconds": 52.215269,
+    "scope": "Worst measured longest-input optimizer step times all191 rows plus15% and one128-row evaluation, loading/save margin; not completion guarantee",
+    "optimizer_step_seconds": [
+      52.215269,
+      34.058905
+    ],
+    "evaluation_counted_once": true,
+    "observed_train_runtime": 121.9679
+  },
+  "bounds": {
+    "r2_training_seconds": 14100,
+    "r2_independent_restore_minutes": 240,
+    "restore_timeout_minutes": 6,
+    "supervisor_runtime_minutes": 242,
+    "supervisor_cleanup_minutes": 7,
+    "r1_actual_outage_seconds": 220.92727,
+    "combined_interruption_limit_seconds": 15300
+  },
+  "tokenization": {
+    "train_rows": 191,
+    "validation_rows": 128,
+    "test_rows": 128,
+    "train_tokens": 161128,
+    "train_supervised_tokens": 66281,
+    "train_max_tokens": 2876,
+    "max_length": 4096,
+    "dropped_or_truncated": 0,
+    "all_assistant_targets_covered": true
+  },
+  "base_artifact_recheck": {
+    "status": "passed",
+    "elapsed_seconds": 76.1997477801051,
+    "manifest_sha256": "475511a52001faf52b775b6699f696eaef21c929ca03789e276c391f29162515"
+  },
+  "tests": [
+    {
+      "suite": "test_durable_training.py",
+      "passed": 26,
+      "skipped": 0
+    },
+    {
+      "suite": "test_training_window.py",
+      "passed": 20,
+      "skipped": 0
+    },
+    {
+      "suite": "test_training_r8.py",
+      "passed": 4,
+      "skipped": 0
+    },
+    {
+      "suite": "test_thor_execution.py",
+      "passed": 21,
+      "skipped": 0
+    },
+    {
+      "suite": "test_training_lineage.py",
+      "passed": 2,
+      "skipped": 0
+    }
+  ],
+  "tested_sources": {
+    "prepare_evidence_run.py": "904b0c0bfaac88d5bc510604e5a7df956b970add0e27bfd6415dc54cb48d3ea8",
+    "prepare_evidence_retry.py": "4c1b301f47f6dc2fa6f5ccebda1e0abac5bacc32f3fa24b1224f387a6fda1500",
+    "durable_training_task.py": "db1e0c8320b011d6fcefb56a7af36a23bfb6e86d1d5a0371508b3316f0f0065f",
+    "durable_training_window.py": "38fa4804c950b31011f4379e8aa4a61c4d896a60039450b1225e1d74bffeab0d",
+    "durable_training_basecheck.py": "45773c0008e3ae981c5b54a65402c45a50d49787d9d1ffe7fd7fb35f600d63fb",
+    "training_window.py": "8006741c61b629353a1b5407d463cb46f65cfe908246a6cc7901988e8fd7a7a4",
+    "download_model.py": "3642c4b7ced0c49d5dfe07c6025985bc1b8f35d130530fe0afd733da2c1b28ad",
+    "tests/test_durable_training.py": "3ed98ff6d132e4c88e6cdaa7ee189cccb02bf685b41d7b427b8b519567f44a17"
+  },
+  "deployed_operator_sha256": {
+    "prepare_evidence_retry.py": "4c1b301f47f6dc2fa6f5ccebda1e0abac5bacc32f3fa24b1224f387a6fda1500",
+    "durable_training_window.py": "38fa4804c950b31011f4379e8aa4a61c4d896a60039450b1225e1d74bffeab0d",
+    "release.sha256": "ad5fe7a5ec3f4806d2f9a05dd6c4edaadba8ff82d97374b66869c38d7340a60c",
+    "training_window.py": "8006741c61b629353a1b5407d463cb46f65cfe908246a6cc7901988e8fd7a7a4"
+  },
+  "release_sha256": "68abaadc2f2f46e7159dc3bc6f962b4868274220e5599d38f1383aea503aeb94",
+  "frozen_input_hashes": {
+    "base-recheck.json": "82e78ad37253e330e7ac40d3936aa9d83cb567475099620cbc29f45a703c7124",
+    "data/AIT_NOTICE.txt": "cd809e61c6b73666a0090f0393e1dc535d1a91e400e1a20b51f20ab0f274c5c3",
+    "data/LINUX_APT_NOTICE.txt": "cf52b6569f3c9991950171b2b544166951210ed7456f9afb1acb93e82d2dce1f",
+    "data/MITRE-ATTACK-LICENSE.txt": "738144f7fb054722a4ef9d3367c51710341dc12fc574c6ac3a41daaaecd8bf5e",
+    "data/REVIEWED_V4_AIT_NOTICE.txt": "cd809e61c6b73666a0090f0393e1dc535d1a91e400e1a20b51f20ab0f274c5c3",
+    "data/REVIEWED_V4_SOURCE_NOTICE.txt": "a10754ebb5ae49ab3e680a59719d525e184e2e2f2adb62c496ca5b52b6c8bf60",
+    "data/SOURCE_NOTICE.txt": "0c1529b73140e19c8e113919e06ad722905547a569da2a8af1fa368c8b7f070e",
+    "data/V5_SOURCE_ATTRIBUTION.json": "ab001ce661b6838e5faf257cb451f4407ada53887a96824e2db6df210f919816",
+    "data/evaluation-boundaries.json": "53d1261712c4223a8b81d3c2483e6aafe6d50bcccd371e6e4a06297b4a7807e6",
+    "data/manifest.json": "8fcfb70134ce366fea1670fbf1613ecc388a1221bb2e348163d520b567ee36c4",
+    "data/observation-source-bindings.jsonl": "c7c8277e3f48eb97378fa58beaa04a475416d7690618b74691a4e3759625099d",
+    "data/source-lineage.jsonl": "6ce99d993f6df884e6d16ddf4ca197bb4f3fd52d25bfa068212fc13da9dbe35b",
+    "data/test.jsonl": "a3906e018b6ad2cdfd02dcbe2bf21ea542d9aae60536a21d7617ad44b3fa5045",
+    "data/train.jsonl": "acee5ff65c57b50991620504713d0b22703516715ffa9ae7107aa9444dddaf84",
+    "data/validation.jsonl": "ebd242dbea94545b5beb2fce4c2e3f55c4d00c1687ad51dd88c6dd9ccbf593b7",
+    "profiles/main.json": "6cc754ad90d30931041573b1440f43977caf6a444e71be31a929c5f1e32b3dd4",
+    "profiles/smoke.json": "b1779ad4ed5582e2b226cb32bbd85ca5763911ca755adb2c7acc711e36c1d8e8",
+    "profiles/tokenize.json": "e7e71017772170adb62fa4b88fa7447104976f786810379ebd3c82ac3c009991",
+    "smoke-reference.json": "d45df216dc6ea5b8e7dbafd8e165b79035deb4f5b59c20fb7761b4e6d6dca7f3",
+    "smoke-status.json": "b4372e0f0350c9f67660641ca0abe77e2c95981107c6baf5030262a4d355e23c",
+    "smoke/eval_results.json": "0ed1acccf5e58edd1180ed1571f25d809040a9092274b11284a03d55866a8e76",
+    "smoke/memory_telemetry.jsonl": "d4699e726a82dfac09000974e574e001b8b5ac4e8e6213f86977eff90062027a",
+    "smoke/progress.json": "b32b59da1742d0d97825afbb2bb602437f05945289a54b1989d559410e912161",
+    "smoke/run_manifest.json": "d7583f63fc554c4891e651602eb5a874d4ff556541d951ca3072934dd8aa4711",
+    "smoke/successful_microbatch_lineage.jsonl": "6ce434642f5bb99c1bc8ccd496158fc4afd672eca9cc60720cae36580643b5fa",
+    "smoke/train_results.json": "e33b7aa50d29b7792b87c7ba0561bf2d32308de70c1c78f73ff545efbd28a8fe",
+    "source/bounded_loading.py": "aa435193120df0ada7d11960478d8f6de1cc6e4203862fe9e1e41ce0b4b9ebbc",
+    "source/completion_loss.py": "a634fa9d5d1a5ad0a292cd1828d7975837460d6286154b1b8ecd1cd5c20078c9",
+    "source/dialogue_encoding.py": "851ddd55f5ac7b31729aeaa17fe5f0d911dee00eadcbb99ae915327fd663f498",
+    "source/durable_training_task.py": "db1e0c8320b011d6fcefb56a7af36a23bfb6e86d1d5a0371508b3316f0f0065f",
+    "source/guarded_process.py": "a30a3a41051cd46e9fd7398e5a2952eb4066f6619a7bc5b2ceefe77ddcc39ff8",
+    "source/memory_budget.py": "662d9d5c1fe77933286582a813d048760a3fd2373798b9aba9df4f70ca6fe0c3",
+    "source/memory_telemetry.py": "1d85a4f2845e9a9a7e81f7b98431365f7b55950ccc87a49648c3a95d8981c5bf",
+    "source/model_profile.py": "52f902d46f9447b87328d2468645a64e376727a927b5f9a6068b2025798d314e",
+    "source/train.py": "688b6f08f845a023ea85ced6ca76282cc741c9added0702d2017f7549eebac42",
+    "source/training_lineage.py": "8bea81d9aa8b84e895105b412fc0582ad66bc3d66779d665b4a1b87b362acca9",
+    "tokenization/data_check.json": "9311b7e79942c93889adc517e908084a57b5105169e6ffbb292faaf1ce9259a2",
+    "tokenization/tokenization_report.json": "c82624f4281e17981338b4a18e1cf5cf9b5046ed47984ce20e9558b95a5b36a4",
+    "tokenize-status.json": "4f36ce3d3b01e4fc871eced4515bb82a55c8938dcf6bfd16e7d965e4775eb754"
+  },
+  "r1_history": {
+    "smoke_completed": true,
+    "steps": 2,
+    "main_started": false,
+    "reason": "Estimated duration counted validation within per-row training and again separately; rejected before main; fixed using first optimizer completion telemetry",
+    "original_restored_at_kst": "2026-10-31T09:34:20.060005+09:00",
+    "original_registry_unchanged": true,
+    "operator_source_sha256": "4b3fe88c36fe9fc2f01661562575d1ff9cc511f1ec920703acfcb6d19c4c6c7f"
+  },
+  "followup": "Leave independent training/restoration running; no periodic reports or status queries until user instruction",
+  "not_performed": [
+    "Training completion verification not yet due",
+    "Quality comparison",
+    "Operational model promotion",
+    "Bot/security/harness changes",
+    "New model/package download",
+    "New-server full installation"
+  ],
+  "private_evidence_sha256": {
+    "handoff.json": "3fd6dddb8dd05891ae7955637ca0a2e8e46b9c5bc1e8be2a48ab178ae4d880d7",
+    "status-5.json": "15190641b15770578cc1b955c4c108b04180b099195456117706e0a95109be09",
+    "smoke-details.json": "0923ceaa587fe3eba0a3d4321c73c747232bd8b48b093f4cd68ff38de8d02315",
+    "tests-r2.json": "c14a4092904160b761a26f4128b90dae0783b70184740e751d12bb3961cb7886",
+    "recovery-probe.json": "fa70a717b2fd00d204fb933b8226ca8e7b24fac0ee614a6c25a76618f29a4160",
+    "install-r2.json": "b93d80a64a404251bb6a0ebe585d833bc15abf1259073f09fe0da8563aa65137",
+    "launch-r2.json": "bdf07cc01f54b125c3428bed760fd925f5d91865574bcac2b8efab3fd3f5f354"
+  }
+}

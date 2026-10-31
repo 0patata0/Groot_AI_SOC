@@ -27,6 +27,7 @@ def main():
         parser.error("Portable bundle requires an output_dir inside finetuning/")
     check_data(config)
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
+             "prepare_evidence_run.py", "prepare_evidence_retry.py", "durable_training_window.py", "durable_training_task.py", "durable_training_basecheck.py", "DURABLE_EVIDENCE_RUN.md",
              "prepare_ait_evidence.py", "AIT_EVIDENCE_REVIEW.json", "SOC_DATA_CANDIDATES.json",
              "link_ait_labels.py", "AIT_GAP_LINKAGE.json",
              "prepare_ait_case_review.py", "AIT_CASE_REVIEW.json", "SOC_SOURCE_ACCESS_REVIEW.json",

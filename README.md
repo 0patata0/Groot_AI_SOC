@@ -1,8 +1,10 @@
 # Groot_AI_SOC
 
+**2026-11-01 08:27 KST 확인:** DGX의 원본 전송·데이터 검사·전체35B 시험은 완료됐으나 본학습은139/224step 후 메모리 보호로 중단됐습니다. 최신 저장본136step을 보존했으며 최종검증·품질 점수·Thor운영 반영은 아직입니다. 메모리 원인 확인과 재개 검증이 다음 순서입니다. [실측 결과·Git](STATUS.md).
+
 ## 학습·추론 서버 방침 — 2026-10-31
 
-앞으로 **DGX Spark에서 학습하고 검증한 추론용 가중치를 Jetson Thor에 적재**합니다. 봇과 MCP는 기존 B 서버에 유지합니다. 11월1일 DGX 학습 환경/GPU 축소 구조 검사와 GUIDE256건 편입을 완료하고, 447건 학습→검증의 독립 실행을 등록했습니다. 관측 시점은 원본 가중치 전송 단계이며 본학습·품질 완료는 아닙니다. [야간 실행·상한](finetuning/DGX_OVERNIGHT.md). [역할·실행 순서](finetuning/DGX_TRAINING_THOR_INFERENCE.md) · [검증 상태](STATUS.md).
+앞으로 **DGX Spark에서 학습하고 검증한 추론용 가중치를 Jetson Thor에 적재**합니다. 봇과 MCP는 기존 B 서버에 유지합니다. 11월1일 DGX 학습 환경/GPU 축소 구조 검사와 GUIDE256건 편입을 완료하고, 447건 학습→검증의 독립 실행을 등록했습니다. 등록 당시 관측은 원본 가중치 전송 단계였고, 이후 실행 결과는 위 최신 현황과 STATUS를 따릅니다. [야간 실행·상한](finetuning/DGX_OVERNIGHT.md). [역할·실행 순서](finetuning/DGX_TRAINING_THOR_INFERENCE.md) · [검증 상태](STATUS.md).
 
 
 ## 경보 카드·요약·작업 진행 표시 — 2026-10-31

@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.18.1"
+VERSION = "groot-query-completion:1.19.2"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "c6f9ae920a90e3c8ee527e961695699cee2250ec43b3071c54ea30cc5c65a923"
+EVIDENCE_SOURCE_SHA256 = "992b24f2745bb8c3f08b664fb69142ccb538c28397ab973ab844160cb22b92c8"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -1172,6 +1172,13 @@ def register(ctx):
         mcp_handlers._call_tool_racing_stdio_death = result_wrapped
         tool_executor._pre_tool_block = pre_tool_wrapped
         finalizer._resolve_budget_fallback = budget_wrapped
+        try:
+            progress_spec=importlib.util.spec_from_file_location('_capstone_chat_progress',Path(__file__).with_name('progress.py'))
+            progress_module=importlib.util.module_from_spec(progress_spec)
+            progress_spec.loader.exec_module(progress_module)
+            progress_module.install(ctx,EVIDENCE,SOURCE_ROOT)
+        except Exception:
+            logging.getLogger('capstone.chat_progress').error('progress_unavailable')
         try:
             logging.getLogger("capstone.query_completion").info(
                 "version=%s aliases_installed=%s pid=%d", VERSION,

@@ -261,7 +261,7 @@ class Grounding(unittest.TestCase):
 class Parity(unittest.TestCase):
     def test_exact_hermes_capabilities_and_no_general_execution(self):
         tools = policy.capabilities('hermes-parity')
-        self.assertEqual(sum(map(len, tools.values())), 40)
+        self.assertEqual(sum(map(len, tools.values())), 41)
         self.assertEqual(sum(policy.protected(s, t) for s, names in tools.items() for t in names), 9)
         policy.validate_call('rule-write-a', 'propose_service_action', {'target': 'a:suricata'}, 'hermes-parity')
         for server, name, args in [('rule-write-a', 'propose_service_action', {'target': 'b:wazuh-manager'}),

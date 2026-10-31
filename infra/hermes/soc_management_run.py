@@ -22,7 +22,7 @@ READ = frozenset({'get_security_rules', 'get_rule_change_target', 'get_rule_chan
                   'get_service_action_target', 'get_operation_status'})
 WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
-EVENT_READ = frozenset({'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks'})
+EVENT_READ = frozenset({'search_wazuh_alerts', 'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks'})
 DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
 MAX_EVENT_AUDIT_BYTES = 128 * 1024
 NO_OBSERVATION_REPORT = ('성공한 MCP 조회 근거를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
@@ -213,7 +213,7 @@ def observation_facts(name, result):
             if name == 'calculate_time' and data.get('kind') == 'time_calculation' and data.get('live_observation') is False:
                 rows.append({'kind': 'time_calculation', **{k:data[k] for k in
                     ('timestamps','chronological_order','differences','reference_kst') if k in data}})
-            if name in EVENT_READ and data.get('source') in ('suricata', 'modsecurity'):
+            if name in EVENT_READ and data.get('source') in ('suricata', 'modsecurity','wazuh'):
                 keep = ('source', 'requested_since_kst', 'requested_until_kst', 'returned_count',
                         'indexed_window_total_count', 'scan_capped')
                 row = {k: data[k] for k in keep if k in data}
@@ -341,7 +341,10 @@ def incident_investigation_request(text):
     """Preserve investigation intent; naming rules does not request an inventory."""
     return isinstance(text, str) and bool(
         re.search(r'사건|경보|로그|공격|침해|오탐|탐지|DVWA|Log4Shell', text, re.I)
-        and re.search(r'조사|판단|분석|위험|대응\s*필요|(?:공격|오탐).{0,5}(?:이었|였|인가|인지)', text))
+        and re.search(r'조사|판단|분석|위험|대응\s*필요|(?:공격|오탐).{0,5}(?:이었|였|인가|인지)|'
+                      r'무슨\s*(?:로그|경보|의미)|뭐가\s*문제|뭐\s*때문|'
+                      r'(?:로그|경보|탐지된\s*(?:거|것)).{0,35}(?:왜|원인|의미|설명|알고\s*싶)|'
+                      r'(?:왜|원인).{0,35}(?:로그|경보)', text))
 
 
 def argument_refusal(name, result):
@@ -545,7 +548,7 @@ def literal_evidence_summary(facts):
                         and type(value.get('seconds')) in (int,float)):
                     rows.append('- 시간차 ' + value['from'] + ' → ' + value['to'] + ': ' + str(value['seconds']) + '초')
         elif kind == 'events':
-            name = 'Suricata' if row.get('source') == 'suricata' else 'WAF'
+            name = {'suricata':'Suricata','modsecurity':'WAF','wazuh':'Wazuh'}.get(row.get('source'),'경보')
             rows.append(f"- {name}: 요청 {iso(row.get('requested_since_kst'))} ~ {iso(row.get('requested_until_kst'))}; "
                         f"색인 반환 표본 {count(row.get('returned_count'))}건 (returned_count={count(row.get('returned_count'))}). "
                         f"요청 구간 전체 건수 {count(row.get('indexed_window_total_count'))} "

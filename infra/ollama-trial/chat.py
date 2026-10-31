@@ -196,11 +196,12 @@ class Gateway:
         root = post.get('root_id')
         if not root:
             return None
-        for row in self.db.execute("select post,evidence from jobs where status='done' and evidence is not null order by rowid desc limit 200"):
+        for row in self.db.execute("select post,evidence,status from jobs order by rowid desc limit 200"):
             previous = json.loads(row['post'])
             if (previous['channel_id'] == post['channel_id'] and previous['user_id'] == post['user_id'] and
                     (previous.get('root_id') or previous['id']) == root and previous['create_at'] < post['create_at']):
-                return json.loads(row['evidence'])
+                # Do not skip a newer failed/unrelated turn to borrow old facts.
+                return json.loads(row['evidence']) if row['status']=='done' and row['evidence'] else None
         return None
 
     async def reply_id(self, job, post):
@@ -220,12 +221,33 @@ class Gateway:
                 self.db.execute("update jobs set status='uncertain' where id=?", (post['id'],))
             reply = (await self.api('POST', '/posts', {
                 'channel_id': post['channel_id'], 'root_id': post.get('root_id') or post['id'],
-                'message': '확인하고 있습니다. 조회가 끝나면 이 답변을 갱신하겠습니다.',
+                'message': '⏳ 요청을 접수했습니다. 작업 중 상태를 표시하고, 완료되면 이 답변을 결과로 갱신합니다.',
                 'pending_post_id': 'ollama-' + post['id'],
                 'props': {'capstone_ollama_source': post['id'], 'from_bot': 'true'}}))['id']
         with self.db:
             self.db.execute("update jobs set reply=?,status='queued' where id=?", (reply, post['id']))
         return reply
+
+    async def progress_loop(self, post, reply, state, started, wakeup=None):
+        """One bound status post, no new messages or model text/arguments."""
+        labels={'connecting':'조회 도구 연결 중','interpreting':'요청 해석 중',
+                'querying':'MCP 조회 중','analyzing':'조회 결과 분석 중',
+                'protected':'승인·작업 절차 진행 중'}
+        while True:
+            if wakeup is None:
+                await asyncio.sleep(1)
+            else:
+                try:await asyncio.wait_for(wakeup.wait(),1)
+                except asyncio.TimeoutError:pass
+                wakeup.clear()
+            try:
+                existing=await asyncio.wait_for(self.api('GET','/posts/'+reply),4)
+                require(existing.get('user_id')==self.c['bot_id'] and existing.get('channel_id')==post['channel_id']
+                    and existing.get('props',{}).get('capstone_ollama_source')==post['id'],'progress_binding')
+                text='⏳ 작업 중 · '+labels[state['stage']]+' · '+str(int(time.perf_counter()-started))+'초 경과\n완료되면 이 메시지를 결과로 갱신합니다.'
+                await asyncio.wait_for(self.api('PUT','/posts/'+reply+'/patch',{'message':text}),4)
+            except Exception as exc:
+                log('progress_update_failed',post_id=post['id'],error_type=type(exc).__name__)
 
     async def process(self, job):
         post = json.loads(job['post'])
@@ -246,6 +268,14 @@ class Gateway:
             with self.db:
                 self.db.execute("update jobs set status='running',attempts=attempts+1 where id=?", (post['id'],))
             started = time.perf_counter()
+            progress_state={'stage':'connecting'}
+            progress_wakeup=asyncio.Event()
+            def progress(stage):
+                if stage in ('connecting','interpreting','querying','analyzing','protected'):
+                    if progress_state['stage']!=stage:
+                        progress_state['stage']=stage
+                        progress_wakeup.set()
+            progress_task=asyncio.create_task(self.progress_loop(post,reply,progress_state,started,progress_wakeup))
             evidence = None
             audit = None
             def protected_start():
@@ -269,7 +299,7 @@ class Gateway:
                     report = await asyncio.wait_for(agent_run(self.runtime, {'question': question,
                         'current_question': current, 'read_scope_history': prior_questions,
                         'prior_evidence': self.prior_evidence(post)},
-                        on_protected_start=protected_start, connection_pool=self.read_pool), 1110)
+                        on_protected_start=protected_start, connection_pool=self.read_pool,on_progress=progress), 1110)
                 answer = final_text(report, time.perf_counter() - started)
                 evidence = json.dumps(report['evidence'], ensure_ascii=False) if report.get('evidence') else None
                 audit = audit_json(report)
@@ -282,6 +312,9 @@ class Gateway:
             except Exception as exc:
                 answer = final_text({'status': 'failed'}, time.perf_counter() - started)
                 log('generation_failed', post_id=post['id'], error_type=type(exc).__name__)
+            finally:
+                progress_task.cancel()
+                with contextlib.suppress(asyncio.CancelledError):await progress_task
             with self.db:
                 self.db.execute("update jobs set answer=?,evidence=?,report=?,status='delivery' where id=?", (answer, evidence, audit, post['id']))
         existing = await self.api('GET', '/posts/' + reply)

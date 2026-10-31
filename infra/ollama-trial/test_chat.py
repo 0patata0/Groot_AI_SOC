@@ -142,6 +142,20 @@ class DurableDelivery(unittest.IsolatedAsyncioTestCase):
     def job(self):
         return self.gateway.db.execute('select * from jobs where id=?', (POST,)).fetchone()
 
+    async def test_progress_updates_only_bound_reply_and_stops_on_cancel(self):
+        await self.gateway.accept(POST)
+        await self.gateway.reply_id(self.job(),SOURCE)
+        with patch.object(chat.asyncio,'sleep',AsyncMock(side_effect=[None,asyncio.CancelledError()])):
+            with self.assertRaises(asyncio.CancelledError):
+                await self.gateway.progress_loop(SOURCE,REPLY,{'stage':'querying'},chat.time.perf_counter())
+        self.assertEqual((self.sent,self.patched),(1,1))
+        self.assertIn('MCP 조회 중',self.posts[REPLY]['message'])
+        self.posts[REPLY]['user_id']='z'*26
+        with patch.object(chat.asyncio,'sleep',AsyncMock(side_effect=[None,asyncio.CancelledError()])):
+            with self.assertRaises(asyncio.CancelledError):
+                await self.gateway.progress_loop(SOURCE,REPLY,{'stage':'querying'},chat.time.perf_counter())
+        self.assertEqual(self.patched,1)
+
     async def test_duplicate_events_generate_and_post_once(self):
         await self.gateway.accept(POST)
         await self.gateway.accept(POST)

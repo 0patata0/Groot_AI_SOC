@@ -111,6 +111,7 @@ class Dispatcher:
             self.db.execute("UPDATE jobs SET status='delivery',result=? WHERE status='running'",
                             (json.dumps({'status': 'failed', 'final_response': FAILURE}),))
         self.active = {}
+        self.progress_clock = {}
         self.last_poll = 0
 
     def add(self, post):
@@ -203,6 +204,17 @@ class Dispatcher:
                          'peer', 0, 'queued', policy.peer_question(original['message'], json.loads(lead['result'])),
                          None, None, time.time(), 0))
 
+    def show_progress(self,engine,jid):
+        row=self.db.execute('SELECT * FROM jobs WHERE id=?',(jid,)).fetchone()
+        if not row or not row['reply']:return
+        job=dict(row);api=self.apis[engine]
+        post=api.call('GET','/posts/'+job['reply'])
+        if (post.get('user_id')!=self.c['bots'][engine] or post.get('channel_id')!=self.c['channel_id']
+                or post.get('root_id') or post.get('props',{}).get('capstone_review_job')!=jid):raise ValueError('progress_binding')
+        elapsed=int(time.monotonic()-self.progress_clock.setdefault(jid,time.monotonic()))
+        label='독립 조회·교차검토 진행 중' if job['phase']=='peer' else '조회·분석 진행 중'
+        api.call('PUT','/posts/'+job['reply']+'/patch',{'message':policy.render('⏳ '+label+' · '+str(elapsed)+'초 경과',job,self.c['site_url'])})
+
     def tick(self, pool):
         for engine, (future, jid) in list(self.active.items()):
             if future.done():
@@ -213,6 +225,10 @@ class Dispatcher:
                 with self.db:
                     self.db.execute("UPDATE jobs SET result=?,status='delivery' WHERE id=?", (json.dumps(summary, ensure_ascii=False), jid))
                 del self.active[engine]
+                self.progress_clock.pop(jid,None)
+            else:
+                try:self.show_progress(engine,jid)
+                except Exception as exc:log('progress_update_failed',error_type=type(exc).__name__)
         for row in self.db.execute("SELECT * FROM jobs WHERE status='delivery' ORDER BY created LIMIT 10").fetchall():
             self.deliver(dict(row))
         for engine in ('ollama', 'hermes'):
@@ -235,6 +251,7 @@ class Dispatcher:
             job['current_question'] = policy.task_question(source['message'])
             job['readonly'] = job['phase'] == 'peer' or (policy.verification_request(source['message'])
                 and not self.harness.READ.wants_write(self.harness.normalized(source['message'])))
+            self.progress_clock[job['id']]=time.monotonic()
             self.active[engine] = (pool.submit(worker, job), job['id'])
 
     def heartbeat(self):
@@ -280,7 +297,7 @@ def main():
                 except Exception as exc:
                     log('dispatch_error', error_type=type(exc).__name__)
                 dispatcher.heartbeat()
-                time.sleep(2)
+                time.sleep(1)
 
 
 if __name__ == '__main__':

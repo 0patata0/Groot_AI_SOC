@@ -142,7 +142,7 @@ def hermes_extension_files():
         base + 'startup/' + name: 'hooks/groot-mattermost-channel-sync/' + name
         for name in ('HOOK.yaml', 'handler.py')} | {
         'infra/hermes/query-completion/' + name: 'plugins/groot-query-completion/' + name
-        for name in ('__init__.py', 'plugin.yaml', 'alignment.py')} | {
+        for name in ('__init__.py', 'plugin.yaml', 'alignment.py', 'progress.py')} | {
         'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py',
         'infra/hermes/gateway_health.py': 'plugins/groot-query-completion/gateway_health.py',
         'infra/hermes/chat_contract.py': 'plugins/groot-query-completion/chat_contract.py',
@@ -193,14 +193,18 @@ def hermes_response_format(raw=None):
     return '### SOC 응답 서식\n'+body+'\n'
 def readonly_soul():
     # Copy only the shared presentation section, never live write-tool policies.
-    return '''# SOC 읽기 보조자
+    policy=read(SOURCE/'infra/hermes/SOUL.groot.md',512*1024).decode('utf-8')
+    a='<!-- soc-role-policy:start -->';b='<!-- soc-role-policy:end -->'
+    need(policy.count(a)==1 and policy.count(b)==1 and policy.index(a)<policy.index(b),'SOC_role_contract_invalid')
+    role=policy[policy.index(a):policy.index(b)+len(b)]
+    return role+'''\n# SOC 관제 담당자 — 읽기 전용 배치
 설명은 한국어로 작성하고 IP, 경로, 규칙 ID, 해시 등 식별자는 원문을 보존한다.
 현재 제공된 Wazuh 읽기 MCP와 security-events MCP에서 확인한 사실만 보고한다.
 이 환경에는 쓰기 승인·차단·규칙 수정 도구가 배포되지 않았다. 수행했다고 주장하지 않는다.
 본문/비밀을 요청하거나 노출하지 말고 필요한 경보 메타데이터만 요약한다.
 시각은 명시된 offset을 기준으로 Asia/Seoul로 변환해 KST 또는 +09:00를 붙인다.
 확인하지 못한 내용과 표본·지연의 한계를 명시한다.
-\n'''+hermes_response_format()
+\n'''+hermes_response_format(policy.encode('utf-8'))
 def install_hermes_extensions(data, hu, creds, hc):
     for key in ('mattermost_admin_id','mattermost_team_id','mattermost_channel_id','mattermost_bot_id'):
         need(re.fullmatch(r'[a-z0-9]{26}',creds.get(key,'')), 'invalid_Mattermost_identity_' + key)
@@ -689,7 +693,8 @@ os.execve(args[0],args,env)
     hc={'mcp_servers':servers,'security':{'allow_lazy_installs':False},'model':{'provider':'custom','base_url':LLM,'default':MODEL},
         'toolsets':tools,'platform_toolsets':{'mattermost':tools,'cli':tools},'tools':{'tool_search':{'enabled':False}},
         'agent':{'reasoning_overrides':{MODEL:'none'}},'display':{'platforms':{'mattermost':{
-            'streaming':False,'interim_assistant_messages':False,'show_reasoning':False,'thinking_progress':False}}}}
+            'streaming':False,'interim_assistant_messages':False,'show_reasoning':False,'thinking_progress':False,
+            'tool_progress':'off','cleanup_progress':True,'long_running_notifications':'generic'}}}}
     menv=install_hermes_extensions(data,hu,creds,hc)
     publish(data/'config.yaml',canonical(hc),0o600,hu.pw_uid,hu.pw_gid)
     # Only public-channel membership sync is started; no proactive chat/report.
@@ -771,7 +776,7 @@ async def one(suffix):
     initialized=await session.initialize(); assert initialized.server_info.name
     response=await session.list_tools(); assert response.next_cursor is None
     names={x.name for x in response.tools}; assert len(names)==len(response.tools)
-    assert names=={'search_suricata_alerts','search_modsecurity_alerts'} if suffix else (len(names)==14 and 'get_wazuh_agents' in names)
+    assert names=={'search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts','get_wazuh_sca_checks'} if suffix else (len(names)==14 and 'get_wazuh_agents' in names)
     if not suffix:
      result=await session.call_tool('get_wazuh_agents',{'status':'active'})
      assert not result.isError and len(result.model_dump_json())<1048576

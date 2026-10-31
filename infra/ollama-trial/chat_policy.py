@@ -53,7 +53,7 @@ def question_with_history(post, prior, bot_id, report_bot_ids=()):
     context = []
     for p in rows[-10:]:
         text = footer_free(str(p.get('message', '')))[:1800]
-        if p.get('user_id') == bot_id and text.startswith('확인하고 있습니다.'):
+        if p.get('user_id') == bot_id and text.startswith(('확인하고 있습니다.','⏳ 요청을 접수했습니다.','⏳ 작업 중')):
             continue
         context.append({'role': 'assistant' if p['user_id'] == bot_id else 'user', 'text': text})
     while len(json.dumps(context, ensure_ascii=False)) > 8000:
@@ -65,13 +65,13 @@ def question_with_history(post, prior, bot_id, report_bot_ids=()):
                 not p.get('delete_at') and p.get('type', '') in ('', 'slack_attachment') and
                 p.get('create_at', 0) <= post['create_at']):
             parts = [str(p.get('message', ''))[:4000]]
-            for a in p.get('props', {}).get('attachments', [])[:4]:
+            for a in (p.get('props', {}).get('attachments') or [])[:4]:
                 if not isinstance(a, dict):
                     continue
                 parts.extend(str(a.get(k, ''))[:2500] for k in ('title', 'text'))
                 parts.extend(str(f.get('title', ''))[:200] + ': ' + str(f.get('value', ''))[:1000]
                              for f in a.get('fields', [])[:20] if isinstance(f, dict))
-            report.append({'post_id': p['id'], 'text': '\n'.join(parts)[:8000]})
+            report.append({'post_id': p['id'], 'created_at_ms':p['create_at'], 'text': '\n'.join(parts)[:8000]})
     if not context and not report:
         return post['message']
     report_context = ('\n<referenced_report>\n' + json.dumps(report, ensure_ascii=False) +

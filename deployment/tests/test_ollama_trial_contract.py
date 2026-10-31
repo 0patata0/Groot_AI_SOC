@@ -21,7 +21,7 @@ class InstallContract(unittest.TestCase):
         for server,names in policy.capabilities('read-only').items():
             for name in names:self.assertFalse(policy.protected(server,name))
         self.assertIn('get_wazuh_sca_checks',policy.capabilities('read-only')['security-events'])
-        self.assertEqual(sum(map(len,policy.capabilities('read-only').values())),31)
-        self.assertEqual(sum(map(len,policy.capabilities('hermes-parity').values())),40)
+        self.assertEqual(sum(map(len,policy.capabilities('read-only').values())),32)
+        self.assertEqual(sum(map(len,policy.capabilities('hermes-parity').values())),41)
 
 if __name__=='__main__':unittest.main()

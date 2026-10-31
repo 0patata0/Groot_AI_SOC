@@ -45,6 +45,49 @@ class API:
 
 
 class Tests(unittest.TestCase):
+    def test_peer_synthesis_uses_role_contract_and_actual_tool_names(self):
+        import asyncio
+        prompts=[]
+        class LLM:
+            def __init__(self,**kw):pass
+            async def ainvoke(self,messages):
+                prompts.extend(messages)
+                return SimpleNamespace(content=json.dumps({'claims':[{'kind':'agree','text':'정책 일치','other_quote':'정책 drop','missing_field':'','call_index':0,'evidence_quote':'drop'}]}))
+        contract=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'SOC_ACTIVE_ROLE: '+kw['agent_role'])
+        h=SimpleNamespace(CONTRACT=contract,READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda *a:None,
+            EVIDENCE=SimpleNamespace(literal_evidence_summary=lambda x:'facts',kst_display=lambda x:x),facts_for=lambda x:[],guidance=lambda x:'')
+        report={'status':'completed','calls':[{'name':'get_firewall_rules','arguments':{},'result':'policy drop'}],'final_response':'현재 FW 근거'}
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=LLM)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},
+                {'question':p.peer_question('FW 룰',{'final_response':'정책 drop'}),'current_question':'FW 룰'},report))
+        self.assertIn('SOC_ACTIVE_ROLE: ollama',prompts[0][1]);self.assertIn('get_firewall_rules',prompts[0][1])
+        self.assertIn('전문 분야는 우선 담당',prompts[0][1]);self.assertEqual(result['peer_review'],'source_bound_claims')
+
+    def test_peer_rejects_false_omission_and_invented_quotes(self):
+        source={'other_agent_answer':'runtime_load_verified: false; ID 10100','other_answer_truncated':False}
+        calls=[{'result':'runtime_load_verified: false'}]
+        claim={'kind':'omission','text':'필드 누락','other_quote':'','missing_field':'runtime_load_verified','call_index':0,'evidence_quote':'false'}
+        with self.assertRaisesRegex(ValueError,'omission_not_established'):
+            w.validate_peer_claims({'claims':[claim]},source,calls)
+        claim.update(kind='disagree',other_quote='ID 10020')
+        with self.assertRaisesRegex(ValueError,'quote_not_in_answer'):
+            w.validate_peer_claims({'claims':[claim]},source,calls)
+        claim.update(kind='unverified',other_quote='',evidence_quote='true')
+        with self.assertRaisesRegex(ValueError,'evidence_quote_not_in_result'):
+            w.validate_peer_claims({'claims':[claim]},source,calls)
+        claim.update(kind='omission',missing_field='other_field',evidence_quote='false')
+        with self.assertRaisesRegex(ValueError,'omission_not_established'):
+            w.validate_peer_claims({'claims':[claim]},{**source,'other_answer_truncated':True},calls)
+
+    def test_peer_projection_retains_tail_metadata_and_bounds_samples(self):
+        raw=json.dumps({'exclusions':[{'directive':'sample'}]*60,'counts':{'builtin':19},
+                        'runtime':{'engine_mode':'DetectionOnly'},'runtime_load_verified':False})
+        value=json.loads(w.compact_peer_result(raw))
+        self.assertEqual(value['runtime']['engine_mode'],'DetectionOnly')
+        self.assertFalse(value['runtime_load_verified'])
+        self.assertEqual(value['exclusions']['returned_items'],60)
+        self.assertEqual(value['exclusions']['omitted_items'],57)
+
     def test_ollama_peer_reads_original_question_before_separate_comparison(self):
         captured=[]
         async def run(config, request):

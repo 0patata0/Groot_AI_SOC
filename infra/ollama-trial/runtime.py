@@ -23,7 +23,7 @@ os.environ.update(MCP_USE_ANONYMIZED_TELEMETRY='false', DO_NOT_TRACK='1',
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from policy import PROFILES, Budget, alias, capabilities, filter_catalog, protected, require, validate_call, validate_endpoint, validate_model
 import harness
-SYSTEM_PROMPT = harness.SYSTEM_PROMPT
+SYSTEM_PROMPT = harness.CONTRACT.system_prompt(agent_role='ollama')
 
 
 def canonical(value):
@@ -50,23 +50,36 @@ def load_config(path):
     return c
 
 
-async def run(config, request, *, on_protected_start=None, connection_pool=None):
+async def run(config, request, *, on_protected_start=None, connection_pool=None, on_progress=None):
     started = time.perf_counter()
     report = {'at_kst': datetime.now(timezone(timedelta(hours=9))).isoformat(),
-              'engine': 'mcp-use/ChatOllama', 'model': config['model'],
+              'agent_role':'ollama','engine': 'mcp-use/ChatOllama', 'model': config['model'],
               'calls': [], 'model_calls': [], 'chat_posts': 0, 'protected_calls': 0,
               'network_mode': 'host_process', 'telemetry_enabled': False}
     report['turn_clock'] = harness.CONTRACT.turn_clock(report['at_kst'])
+    def emit_progress(stage):
+        # Status transport is independent of model/tool correctness.
+        if on_progress is not None:
+            try:on_progress(stage)
+            except Exception:pass
+    emit_progress('connecting')
     mode = config.get('access_mode', 'read-only')
     available = capabilities(mode)
     question = request.get('question', '')
     current = request.get('current_question', question)
     require(isinstance(current, str) and len(current) <= 16000, 'current_question')
+    recovered = harness.summary_recovery_request(current, request.get('prior_evidence'), request.get('read_scope_history', []))
+    if recovered != current:
+        report['summary_investigation_resumed'] = True
+        current = recovered
+        question += '\n'+recovered
     resolved = harness.resolve_short_read(current, request.get('read_scope_history', []))
     if resolved != current:
         report['read_subject_resolved'] = True
         question += '\n현재 조회 대상만 이전 사용자 요청에서 이어받았습니다: ' + resolved + '\n이전 상태/승인은 재사용하지 말고 새로 조회하세요.'
         current = resolved
+    current = harness.resolve_card_request(question,current)
+    question = harness.card_query_context(question,current)
     report['access_mode'] = mode
     notice = harness.scope_notice(current)
     if notice and not request.get('discover_only'):
@@ -76,11 +89,14 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                       unqueried=harness.missing_reads(current, []),
                       conversation_seconds=time.perf_counter() - started)
         return report
+    reference = harness.card_reference(question,current)
     read_plan = harness.read_plan(current)
-    cached = harness.prior_inventory(current, request.get('prior_evidence'))
+    cached = (harness.prior_summary(current, request.get('prior_evidence')) or
+              harness.prior_inventory(current, request.get('prior_evidence')))
     if cached and not request.get('discover_only'):
-        report.update(status='completed', final_response=cached, evidence_reused=True,
-                      evidence=request['prior_evidence'], total_seconds=time.perf_counter() - started)
+        report.update(status='partial' if getattr(cached,'partial',False) else 'completed',
+                      final_response=str(cached), evidence_reused=getattr(cached,'reused',True),
+                      evidence=request.get('prior_evidence'), total_seconds=time.perf_counter() - started)
         return report
     if harness.reuse_only(current) and not request.get('discover_only'):
         report.update(status='partial', final_response='같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.', total_seconds=time.perf_counter() - started)
@@ -115,6 +131,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
             self.used = 0
 
         async def on_chat_model_start(self, serialized, messages, *, run_id, **kwargs):
+            emit_progress('analyzing' if report['calls'] else 'interpreting')
             history = harness.proposal_history(report['calls'], report.get('proposal_input_rejections', ()))
             if harness.proposal_recovery(current, history):
                 report['stop_reason'] = 'repeated_local_proposal_failure'
@@ -211,6 +228,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                                         on_protected_start()
                                     report['protected_calls'] += 1
                                 try:
+                                    emit_progress('protected' if is_protected else 'querying')
                                     timeout = harness.CONTRACT.PROTECTED_TIMEOUT if is_protected else harness.CONTRACT.READ_TIMEOUT
                                     result = await asyncio.wait_for(connection.call_tool(bare_name, arguments,
                                         read_timeout_seconds=timedelta(seconds=timeout)), timeout + 5)
@@ -230,6 +248,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                                 finally:
                                     event['seconds'] = time.perf_counter() - tick
                                     report['calls'].append(event)
+                                    emit_progress('analyzing')
                         return call
                     call = make_call(server, tool.name, connector, schema)
                     self.tools.append(StructuredTool(name=name, description=tool.description or name,
@@ -259,7 +278,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
         else:
             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
             tick = time.perf_counter()
-            structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, []))
+            structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference))
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
             if policy_answer:
                 report['policy_definition_rendered'] = True
@@ -275,13 +294,13 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                            harness.service_report(current, report['calls']) or
                            harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
                            harness.event_report(current, report['calls']))
-                issues = [] if literal else harness.violations(current, str(final), report['calls'])
-                audit = harness.incident_judgment_check(current, str(final), report['calls'])
+                issues = [] if literal else (harness.violations(current, str(final), report['calls']) + harness.card_answer_issues(reference,str(final),report['calls']))
+                audit = harness.incident_judgment_check(current, str(final), report['calls'],reference)
                 if audit:
                     report.setdefault('judgment_audit', []).append(audit)
                 repair_passes = 0
                 gap = harness.preparation_gap(current, report['calls'])
-                incident_gap = harness.incident_evidence_gap(current, report['calls'])
+                incident_gap = harness.incident_evidence_gap(current, report['calls'],reference)
                 preparation_used = False
                 while (missing or issues or incident_gap or (gap and not preparation_used)) and (incident_gap or audit or not harness.action_claim_violations(current, str(final), report['calls'])) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
                     repair_passes += 1
@@ -295,31 +314,36 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                         report['repair']['missing_write_targets'] = gap
                         instruction = '현재 질문: ' + current + '\n' + harness.preparation_instruction(gap)
                     if incident_gap:
-                        instruction = harness.incident_evidence_instruction(current, report['calls'])
+                        instruction = harness.incident_evidence_instruction(current, report['calls'])+'\n카드 미조회 유형: '+', '.join(harness.card_evidence_gaps(reference,report['calls']) if reference else [])
                         report['repair']['incident_evidence_missing'] = True
                     elif audit and issues:
                         instruction = harness.incident_judgment_instruction(current, str(final), report['calls'], issues)
-                    read_scope = harness.incident_selection_scope(current, report['calls']) or harness.tool_scope(current, report['calls'])
+                    read_scope = harness.incident_selection_scope(current, report['calls'],reference) or harness.tool_scope(current, report['calls'])
                     if read_scope and not gap and budget.used < budget.limit:
                         # The same LLM selects real read calls in constrained JSON
                         # when native tool calling stalls. No fixed fallback reads,
                         # protected tools, inferred approvals or incident decisions.
                         selected_tools = {t.name: t for t in agent.adapter.tools if t.name in read_scope}
                         schemas = {name: json.loads(json.dumps(tool.args_schema)) for name, tool in selected_tools.items()}
-                        schemas = harness.refine_read_schemas(current, schemas, report['calls'], report.get('diagnostic_targets', ()))
+                        schemas = harness.refine_read_schemas(current, schemas, report['calls'], report.get('diagnostic_targets', ()),harness.card_reference(question,current))
                         if not schemas:
                             break  # Report a verified terminal failure; no blind repeat.
-                        schema = harness.selection_schema(schemas, budget.limit - budget.used)
+                        schema = harness.selection_schema(schemas, budget.limit - budget.used,reference)
                         report['repair']['method'] = 'structured_read_selection'
                         selector = llm.with_structured_output(schema, method='json_schema')
                         plan = await asyncio.wait_for(selector.ainvoke([
-                            ('system', harness.CONTRACT.system_prompt(read_only=True) + '\n' + report['turn_clock'] + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
+                            ('system', harness.CONTRACT.system_prompt(read_only=True,agent_role='ollama') + '\n' + report['turn_clock'] + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
                              'security-events는 정확한 시작·종료에 since_kst와 until_kst를 선택하세요(lookback_minutes와 혼용 금지). 종료와 조회 폭만 있으면 until_kst와 lookback_minutes를 사용하세요. 실제 반환 구간을 확인하세요. '
                              '요청한 장비/대상을 빠짐없이 포함하고 이미 성공한 조회를 반복하지 마세요. 요청구간을 지원한다고 꾸미지 마세요.' + harness.guidance(current)),
-                            ('human', instruction + '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
+                            ('human', instruction + harness.read_background(question,current) + '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
                         report.setdefault('read_selections', []).append(plan)
-                        report['read_selection_prompt_sha256'] = harness.CONTRACT.fingerprint(read_only=True)
-                        plan, removed = harness.validated_selection(plan, schema)
+                        report['read_selection_prompt_sha256'] = harness.CONTRACT.fingerprint(read_only=True,agent_role='ollama')
+                        try:plan, removed = harness.validated_selection(plan, schema)
+                        except Exception as exc:
+                            if not type(exc).__module__.startswith('jsonschema'):raise
+                            report['invalid_read_selections']=report.get('invalid_read_selections',0)+1
+                            final=''
+                            continue  # No partial dispatch; bounded model repair selects again.
                         report['deduplicated_read_selections'] = report.get('deduplicated_read_selections', 0) + removed
                         selection_active = True
                         try:
@@ -327,13 +351,13 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                                 await selected_tools[choice['tool']].ainvoke(choice['arguments'])
                         finally:
                             selection_active = False
-                        if incident_gap and not harness.incident_evidence_gap(current, report['calls']):
-                            final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'])), 180)
+                        if incident_gap and not harness.incident_evidence_gap(current, report['calls'],reference):
+                            final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'])+harness.read_background(question,current)), 180)
                         else:
                             final = ''  # Failed/missing reads cannot become observations.
                     else:
                         final = await asyncio.wait_for(agent.run(instruction), 180)
-                    audit = harness.incident_judgment_check(current, str(final), report['calls'])
+                    audit = harness.incident_judgment_check(current, str(final), report['calls'],reference)
                     if audit:
                         report.setdefault('judgment_audit', []).append(audit)
                         report['judgment_audit'] = report['judgment_audit'][-4:]
@@ -343,14 +367,14 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                     if report['protected_calls'] or preparation_used:
                         break
                     gap = harness.preparation_gap(current, report['calls'])
-                    incident_gap = harness.incident_evidence_gap(current, report['calls'])
+                    incident_gap = harness.incident_evidence_gap(current, report['calls'],reference)
                     missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
-                    issues = [] if harness.read_report(current, report['calls']) else harness.violations(current, str(final), report['calls'])
+                    issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls']) + harness.card_answer_issues(reference,str(final),report['calls']))
                 rendered = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
                             harness.service_report(current, report['calls']) or
                             harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
                             harness.event_report(current, report['calls']))
-                issues = harness.violations(current, str(final), report['calls'])
+                issues = (harness.violations(current, str(final), report['calls']) + harness.card_answer_issues(reference,str(final),report['calls']))
                 still_missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
                 if still_missing:
                     report['unqueried'] = still_missing
@@ -373,10 +397,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None)
                 report['write_progress'] = progress
                 final = harness.write_report(final, progress)
             final = harness.EVIDENCE.kst_display(harness.footer_free(str(final)))
-            report['chat_contract'] = {'version': harness.CONTRACT.VERSION, 'system_sha256': harness.CONTRACT.fingerprint(), 'model_steps': steps, 'tool_calls': budget.limit}
+            report['chat_contract'] = {'version': harness.CONTRACT.VERSION, 'system_sha256': harness.CONTRACT.fingerprint(agent_role='ollama'), 'model_steps': steps, 'tool_calls': budget.limit}
             report.update(status='partial' if (progress and not progress['complete']) or report.get('unqueried') or report.get('remaining_issues') else 'completed', final_response=final,
                           conversation_seconds=time.perf_counter() - tick)
-            if not report['protected_calls'] and harness.inventory(current, report['calls'], verified_targets=True):
+            if not report['protected_calls'] and report['calls'] and all(
+                    harness.EVIDENCE.allowed(alias(c['server'],c['name']),'verify') for c in report['calls']):
                 report['evidence'] = {'question': current, 'at_kst': report['at_kst'], 'calls': report['calls']}
     except Exception as exc:
         report.update(status='failed', error_type=type(exc).__name__)

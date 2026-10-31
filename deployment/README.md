@@ -1,5 +1,8 @@
 # 초기 설치기의 Hermes 확장
 
+> **2026-10-31 카드 조사·진행 표시:** `deploy.sh`의 SIEM 설치 경로에 `progress.py`와 Mattermost 진행/cleanup 설정을 포함한다. security-events4읽기 도구와 SDK 기본32/parity41도구 계약을 동기화한다. 기존 패키지·포트·키를 사용하며, 운영 증분 반영과 새 서버 전체 설치 시험은 구분한다. [동작·복구](../infra/hermes/card-investigation-progress.md) · [현재 상태](../STATUS.md).
+
+
 ## 2026-10-31 단문·systemd 호스트 작업 소스
 
 `deploy.sh`의 기존 진단/관리/Hermes/Ollama 설치 경로에 공통 단문 계약1.5.7·query1.17.0, 현재 failed 집계3대상, A Vector·A/B Wazuh host-agent 승인형 restart를 함께 반입한다. SOC renderer는 systemd 프로필을 컨테이너 ID 바인딩에서 제외하고 관리 gate/controller의 대상 목록을 동기화한다. SOUL·source pin·어댑터·context 소스도 함께 배치한다. 기존 키·계정·포트·deb/wheel/image 목록은 유지하며 **추가 오프라인 바이너리0**, 갱신 소스가 반입 대상이다. 운영은 root 백업 후 증분 적용이며 새3VM 전체 설치 시험은 미실시. [사용/복구/검증 구분](../infra/mcp/host-service-actions.md) · [현황](../STATUS.md).

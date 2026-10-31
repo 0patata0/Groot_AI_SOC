@@ -10,6 +10,7 @@ context; opaque transaction/User-Agent hashes support correlation, not identity.
 """
 
 import base64
+import copy
 import hashlib
 from datetime import datetime, timedelta, timezone
 import ipaddress
@@ -47,6 +48,8 @@ WAF_FIELDS = COMMON_FIELDS + [
     "data.transaction.unique_id", "data.transaction.request.uri",
     "data.transaction.request.headers.User-Agent",  # hashed, never returned verbatim
 ]
+WAZUH_FIELDS = COMMON_FIELDS + ['agent.id','rule.description','decoder.name','predecoder.program_name',
+    'data.srcip','data.src_ip','data.dstip','data.systemd.unit','full_log']  # full_log is projected to a service name only
 
 TOOLS = [
     {
@@ -82,6 +85,15 @@ TOOLS = [
         "annotations": {"title": "Search ModSecurity alerts", "readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
     },
 ]
+
+_wazuh_schema=copy.deepcopy(TOOLS[0]['inputSchema'])
+_wazuh_schema['properties'].pop('signature_id')
+_wazuh_schema['properties'].update({
+    'wazuh_rule_id':{'type':'string','pattern':'^[0-9]{1,10}$','description':'Exact Wazuh rule ID, not a sensor SID'},
+    'agent_id':{'type':'string','pattern':'^[0-9]{3,8}$'}})
+TOOLS.append({'name':'search_wazuh_alerts',
+    'description':'Read historical Wazuh alerts in an exact KST interval, optionally by Wazuh rule ID, agent ID or source IP. Includes bounded rule description, decoder, service unit and exit status when recorded. Does not return raw logs, commands or credentials; it cannot prove recovery or attack success. limit 1..50, interval at most 24 hours and end at most 90 days old.',
+    'inputSchema':_wazuh_schema,'annotations':{'title':'Search historical Wazuh alerts','readOnlyHint':True,'destructiveHint':False,'idempotentHint':True}})
 
 TOOLS.append({
     "name": "get_wazuh_sca_checks",
@@ -279,8 +291,9 @@ def validate_args(kind, args):
     if not isinstance(args, dict):
         raise ValueError("arguments must be an object")
     allowed = {"lookback_minutes", "limit", "source_ip", "until_kst", "since_kst"}
-    id_key = "signature_id" if kind == "suricata" else "rule_id"
+    id_key = {'suricata':'signature_id','modsecurity':'rule_id','wazuh':'wazuh_rule_id'}[kind]
     allowed.add(id_key)
+    if kind=='wazuh':allowed.add('agent_id')
     unknown = set(args) - allowed
     if unknown:
         raise ValueError("unsupported argument: %s" % sorted(unknown)[0])
@@ -317,6 +330,9 @@ def validate_args(kind, args):
         if not isinstance(value, str) or not RULE_ID_RE.fullmatch(value):
             raise ValueError("%s must contain 1 to 10 digits" % id_key)
         out[id_key] = value
+    if 'agent_id' in args:
+        if not isinstance(args['agent_id'],str) or not re.fullmatch('[0-9]{3,8}',args['agent_id']):raise ValueError('invalid agent_id')
+        out['agent_id']=args['agent_id']
     return out
 
 
@@ -344,11 +360,15 @@ def build_query(kind, args, at=None):
                                   "lte": at.isoformat()}}},
         {"bool": {"should": identity, "minimum_should_match": 1}},
     ]
+    if kind=='wazuh':filters=filters[:1]
     if "source_ip" in args:
-        fields = ("data.src_ip", "data.srcip") if kind == "suricata" else ("data.transaction.client_ip",)
+        fields = ("data.src_ip", "data.srcip") if kind in ("suricata","wazuh") else ("data.transaction.client_ip",)
         filters.append({"bool": {"should": [{"term": {field: args["source_ip"]}} for field in fields], "minimum_should_match": 1}})
     if kind == "suricata" and "signature_id" in args:
         filters.append({"term": {"data.alert.signature_id": args["signature_id"]}})
+    if kind=='wazuh':
+        for arg,field in [('wazuh_rule_id','rule.id'),('agent_id','agent.id')]:
+            if arg in args:filters.append({'term':{field:args[arg]}})
     # A WAF rule ID may live in Wazuh's string-flattened messages array. Avoid
     # a mapping-dependent text query; inspect a capped set and filter exact IDs.
     scan_size = MAX_SCAN if kind == "modsecurity" and "rule_id" in args else args["limit"]
@@ -356,7 +376,7 @@ def build_query(kind, args, at=None):
         "size": scan_size,
         "track_total_hits": False,
         "sort": [{"timestamp": {"order": "desc"}}],
-        "_source": {"includes": SURICATA_FIELDS if kind == "suricata" else WAF_FIELDS},
+        "_source": {"includes": {'suricata':SURICATA_FIELDS,'modsecurity':WAF_FIELDS,'wazuh':WAZUH_FIELDS}[kind]},
         "query": {"bool": {"filter": filters}},
     }
 
@@ -563,6 +583,23 @@ def summarize_modsecurity(source):
     }
 
 
+def summarize_wazuh(source):
+    data,rule,agent=_obj(source.get('data')),_obj(source.get('rule')),_obj(source.get('agent'))
+    raw=source.get('full_log') if isinstance(source.get('full_log'),str) else ''
+    units=re.findall(r'(?<![A-Za-z0-9_.@-])([A-Za-z0-9_][A-Za-z0-9_.@-]{0,160}\.service)(?![A-Za-z0-9_.@-])',raw[:8192])
+    explicit=_obj(data.get('systemd')).get('unit')
+    if isinstance(explicit,str) and re.fullmatch('[A-Za-z0-9_][A-Za-z0-9_.@-]{0,160}\\.service',explicit):units.insert(0,explicit)
+    exit_status=re.search(r'code=(exited|killed|dumped),\s*status=([0-9]{1,3})(?:/([A-Z0-9_-]{1,24}))?',raw[:8192])
+    return {'timestamp':_kst_timestamp(source.get('timestamp')),'agent':_scalar(agent.get('name'),80),
+            'agent_id':_scalar(agent.get('id'),8),'wazuh_rule_id':_scalar(rule.get('id'),16),
+            'wazuh_rule_description':_scalar(rule.get('description'),240),'wazuh_level':_scalar(rule.get('level'),8),
+            'decoder':_scalar(_obj(source.get('decoder')).get('name'),80),
+            'source_ip':_scalar(data.get('srcip') or data.get('src_ip'),64),
+            'destination_ip':_scalar(data.get('dstip'),64),'service_units':list(dict.fromkeys(units))[:4],
+            'exit_status':({'code':exit_status[1],'status':exit_status[2],'label':exit_status[3]} if exit_status else None),
+            'raw_log_returned':False}
+
+
 def search(kind, args):
     params = validate_args(kind, args)
     query = build_query(kind, params)
@@ -573,7 +610,7 @@ def search(kind, args):
     rows = []
     for hit in hits:
         source = _obj(_obj(hit).get("_source"))
-        row = summarize_suricata(source) if kind == "suricata" else summarize_modsecurity(source)
+        row = {'suricata':summarize_suricata,'modsecurity':summarize_modsecurity,'wazuh':summarize_wazuh}[kind](source)
         if kind == "modsecurity" and "rule_id" in params and params["rule_id"] not in row["waf_rule_ids"]:
             # Search against all extracted IDs, even if display is capped.
             transaction = _obj(_obj(source.get("data")).get("transaction"))
@@ -591,7 +628,7 @@ def search(kind, args):
         "source_scope": "wazuh_indexed_alerts", "untrusted_evidence": True,
         "field_semantics": {
             "wazuh_rule_id": "correlation_rule_id_not_sensor_rule_id",
-            "wazuh_rule_description": "not_returned",
+            "wazuh_rule_description": "bounded_untrusted_rule_label" if kind=='wazuh' else "not_returned",
             **({"engine": "mode_recorded_in_event_not_current_configuration",
                 "http_status": "response_code_not_proof_of_block_actor_or_exploit_outcome",
                 "transaction_id_sha256": "sha256_of_original_id_not_original_id",
@@ -610,7 +647,7 @@ def tool_text(value, is_error=False):
 
 
 def call_tool(name, args):
-    kind = {"search_suricata_alerts": "suricata", "search_modsecurity_alerts": "modsecurity"}.get(name) if isinstance(name, str) else None
+    kind = {"search_suricata_alerts": "suricata", "search_modsecurity_alerts": "modsecurity",'search_wazuh_alerts':'wazuh'}.get(name) if isinstance(name, str) else None
     if kind is None and name != "get_wazuh_sca_checks":
         return None
     try:

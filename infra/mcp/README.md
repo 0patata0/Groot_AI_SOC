@@ -1,5 +1,8 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+> **2026-10-31 과거 Wazuh 사건 조회:** `security-events.search_wazuh_alerts`를 추가했다. 절대 KST 구간·Wazuh 규칙 ID·agent·출발지로 고정 인덱스를 읽고, service unit/종료 상태를 반환한다. 원문 로그·명령·인증 값은 반환하지 않는다. security-events4읽기 도구이며 신규 패키지/권한 확대는 없다. [범위·검증·복구](../hermes/card-investigation-progress.md). 아래2/3도구 수치는 당시 기록이다.
+
+
 > **2026-10-31 전체·상관 규칙 조회:** `get_security_rules`로 기본+커스텀 정의·Wazuh 공식 API 상관 조건·IDS 공식 엔진 통계를 조회한다. 변경 대상 파일 조회와 구분하며 샘플/전체 페이지·부분 실패를 검증한다. [도구 비교·호출·권한·설치·복구](security-rule-inventory.md) · [운영 반영 상태](../../STATUS.md).
 
 ## 2026-10-31 현재 실패 집계와 승인형 호스트 서비스

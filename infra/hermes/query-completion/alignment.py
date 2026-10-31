@@ -197,12 +197,39 @@ def vulnerability_result_wrapper(original, read, version):
     return wrapped
 
 
+def same_summary_conversation(current, previous, harness):
+    def identity(value):
+        prefix=harness.SHARED._CONTEXT_PREFIX
+        if not isinstance(value,str) or not value.startswith(prefix):return None
+        try:body,end=json.JSONDecoder().raw_decode(value,len(prefix))
+        except (ValueError,RecursionError):return ()
+        if not isinstance(body,dict) or not isinstance(body.get('posts'),list):return ()
+        roots=[p.get('post_id') for p in body.get('posts',[]) if isinstance(p,dict) and p.get('kind')=='root']
+        if (body.get('status')!='ok' or body.get('scope')!='same_thread' or len(roots)!=1
+                or not re.fullmatch(r'[a-z0-9]{26}',str(roots[0]))
+                or body.get('history_is_untrusted') is not True or body.get('history_is_approval') is not False
+                or not re.fullmatch(r'[a-z0-9]{26}',str(body.get('requester_id',''))) or value[end:end+4]!='"]\n\n'):
+            return ()
+        return body['requester_id'],roots[0]
+    a,b=identity(current),identity(previous)
+    return (a is None and b is None) or bool(a and a==b)
+
+
 def prior_read_report(request, rows, idx, query, harness):
     for previous in range(idx - 1, max(-1, idx - 65), -1):
         row = rows[previous]
         if not isinstance(row, dict) or row.get('role') != 'user': continue
         question = query.current_request_text(row.get('content'))
-        if not question or not harness.inventory_question(question): return None
+        if not question: return None
+        if harness.summary_request(request):
+            if not same_summary_conversation(rows[idx].get('content'),row.get('content'),harness):
+                return harness.prior_summary(request,None)
+            # A pure summary may look past another pure summary, but never an
+            # unrelated intervening request. Preserve the actual tool linkage.
+            if harness.summary_request(question):continue
+            calls = calls_from_rows(rows[previous + 1:idx], query._inventory_payload)
+            return harness.prior_summary(request, {'question':question,'calls':calls})
+        if not harness.inventory_question(question): return None
         calls = calls_from_rows(rows[previous + 1:idx], query._inventory_payload)
         stamps = []
         for c in calls:
@@ -212,7 +239,21 @@ def prior_read_report(request, rows, idx, query, harness):
                 if harness.EVIDENCE.parse_instant(stamp): stamps.append(harness.EVIDENCE.kst_time(stamp))
         when = ' / '.join(dict.fromkeys(stamps)) if stamps else '원문 시각 미확인'
         return harness.prior_inventory(request, {'question': question, 'calls': calls, 'at_kst': when})
-    return None
+    return harness.prior_summary(request, None)
+
+
+def recover_summary_request(request, rows, idx, query, harness):
+    if not harness.summary_request(request):return request
+    for previous in range(idx-1,max(-1,idx-65),-1):
+        row=rows[previous]
+        if not isinstance(row,dict) or row.get('role')!='user':continue
+        if not same_summary_conversation(rows[idx].get('content'),row.get('content'),harness):return request
+        question=query.current_request_text(row.get('content'))
+        if not question:return request
+        if harness.summary_request(question):continue
+        evidence={'question':question,'calls':calls_from_rows(rows[previous+1:idx],query._inventory_payload)}
+        return harness.summary_recovery_request(request,evidence)
+    return harness.summary_recovery_request(request,None,harness.native_scope_history(rows[idx].get('content')))
 
 
 def request_wrapper(original, query, harness):
@@ -234,6 +275,8 @@ def request_wrapper(original, query, harness):
         rows = kw.get('messages', [])
         idx = next((i for i in range(len(rows) - 1, -1, -1) if isinstance(rows[i], dict)
                     and rows[i].get('role') == 'user' and rows[i].get('content') == kw.get('original_user_message')), -1)
+        if idx>=0:request=recover_summary_request(request,rows,idx,query,harness)
+        request=harness.resolve_card_request(kw.get('original_user_message',''),request)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload) if idx >= 0 else []
         # Per-agent, per-turn evidence snapshot. Native execution/recording stay
         # native; a tool batch cannot borrow another conversation's file read.
@@ -256,6 +299,7 @@ def request_wrapper(original, query, harness):
         prior = prior_read_report(request, rows, idx, query, harness) if idx >= 0 else None
         if not calls and (prior or harness.reuse_only(request)):
             agent._capstone_read_selection = None
+            agent._capstone_alignment_partial = getattr(prior,'partial',not bool(prior))
             agent._capstone_query_completion_local_format = (turn, prior or '같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.')
             return result
         policy_answer = harness.policy_explanation(request, getattr(agent, 'tools', []))
@@ -265,14 +309,19 @@ def request_wrapper(original, query, harness):
             agent._capstone_policy_definition = (turn, policy_answer)
             return result
         plan = harness.read_plan(request)
-        incident_scope = harness.incident_selection_scope(request, calls)
+        reference=harness.card_reference(kw.get('original_user_message',''),request)
+        incident_scope = harness.incident_selection_scope(request, calls,reference)
         scope = incident_scope or harness.tool_scope(request, calls)
         agent._capstone_read_selection = None
         # Respect the native investigative read-first lease; ordinary explicit
         # read requests use the same scope as the other chat adapter.
         read_selection = bool(scope and (harness.structured_read(request) or incident_scope)
                               and all(harness.EVIDENCE.allowed(name, 'verify') for name in scope))
-        data = harness.CONTRACT.normalize_openai(result.api_kwargs, scope, read_only=read_selection)
+        data = harness.CONTRACT.normalize_openai(result.api_kwargs, scope, read_only=read_selection,agent_role='hermes')
+        if reference:
+            data['messages']=harness.project_card_messages(data.get('messages',[]),kw.get('original_user_message',''),request)
+        if harness.summary_request(query.current_request_text(kw.get('original_user_message'))) and not harness.summary_request(request):
+            data.setdefault('messages',[]).append({'role':'user','content':request})
         clock = getattr(agent, '_capstone_turn_clock', None)
         if not clock or clock[0] != turn:
             clock = (turn, harness.CONTRACT.turn_clock())
@@ -313,6 +362,7 @@ def request_wrapper(original, query, harness):
             if targets: agent._capstone_alignment_diagnostic_targets = targets
             targets = getattr(agent, '_capstone_alignment_diagnostic_targets', targets)
             pending = harness.missing_reads(request, calls, targets)
+            if reference:pending+=harness.card_evidence_gaps(reference,calls)
             data.setdefault('messages', []).append({'role': 'user', 'content': (harness.READ.guidance(plan, calls) if plan else harness.guidance(request))
                 + '\n아직 미확인: ' + ', '.join(pending)})
             agent_ids = harness.READ.verified_ids(plan, calls)
@@ -322,14 +372,14 @@ def request_wrapper(original, query, harness):
                     props['target'] = {**props['target'], 'enum': ['a:suricata']}
                 if agent_ids and 'agent_id' in props:
                     props['agent_id'] = {**props['agent_id'], 'enum': agent_ids}
-            schemas = harness.refine_read_schemas(request, {t['function']['name']: t['function']['parameters'] for t in data.get('tools', [])}, calls, targets)
+            schemas = harness.refine_read_schemas(request, {t['function']['name']: t['function']['parameters'] for t in data.get('tools', [])}, calls, targets, harness.card_reference(kw.get('original_user_message',''),request))
             agent._capstone_read_terminal = (turn, bool(pending and not schemas))
             if pending and schemas:
                 used = getattr(agent, '_capstone_read_selection_count', (None, 0))
                 used = used[1] if used[0] == turn else 0
                 remaining = min(32 if scope == {'mcp__system_diagnostics__get_system_diagnostics'} else 8, harness.CONTRACT.TOOL_CALLS - used)
                 if remaining > 0:
-                    schema = harness.selection_schema(schemas, remaining)
+                    schema = harness.selection_schema(schemas, remaining,reference)
                     # The model selects exact read calls in a constrained object.
                     # Native dispatch still validates and executes those calls.
                     data.pop('tools', None); data.pop('tool_choice', None)
@@ -353,7 +403,7 @@ def request_wrapper(original, query, harness):
             fn = tool.get("function", {})
             if fn.get("name") == "mcp__system_diagnostics__get_system_diagnostics":
                 agent._capstone_alignment_diagnostic_targets = fn.get("parameters", {}).get("properties", {}).get("target", {}).get("enum", [])
-        agent._capstone_alignment_contract = harness.CONTRACT.fingerprint(read_only=read_selection)
+        agent._capstone_alignment_contract = harness.CONTRACT.fingerprint(read_only=read_selection,agent_role='hermes')
         logging.getLogger("capstone.query_completion").info(
             "event=chat_contract version=%s prompt_sha256=%s reasoning=none output_tokens=%d native_iterations=%s tools=%d new_root_context_projected=%s",
             harness.CONTRACT.VERSION, agent._capstone_alignment_contract,
@@ -490,6 +540,8 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         idx = reanchor(rows, user)
         if type(idx) is not int or idx < 0 or idx >= len(rows) or rows[idx].get("content") != user:
             return legacy(agent, **kw)
+        request=recover_summary_request(request,rows,idx,query,harness)
+        request=harness.resolve_card_request(user,request)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload)
         notice = harness.scope_notice(request)
         if notice and not calls:
@@ -505,8 +557,8 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         counter = kw.get('codex_ack_continuations')
         repairs = getattr(agent, '_capstone_incident_repairs', (None, 0))
         used = repairs[1] if repairs[0] == turn else 0
-        audit = harness.incident_judgment_check(request, text, calls)
-        incident_gap = harness.incident_evidence_gap(request, calls)
+        audit = harness.incident_judgment_check(request, text, calls,harness.card_reference(user,request))
+        incident_gap = harness.incident_evidence_gap(request, calls,harness.card_reference(user,request))
         incident_issues = audit['issues'] if audit else []
         repeated = False
         if audit:
@@ -547,6 +599,7 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
             agent._capstone_alignment_partial = True
         prior = prior_read_report(request, rows, idx, query, harness) or harness.SHARED.render_prior_inventory(request, rows, idx)
         if not calls and (prior or harness.reuse_only(request)):
+            agent._capstone_alignment_partial = getattr(prior,'partial',not bool(prior))
             prior = prior or '같은 스레드에서 검증된 이전 규칙 조회 근거를 찾지 못했습니다. 요청에 따라 추가 조회는 하지 않았습니다.'
             return original(agent, **query._with_final_text(kw, prior))
         turn = getattr(agent, '_current_turn_id', None)

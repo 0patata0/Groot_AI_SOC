@@ -139,3 +139,6 @@ display:
       interim_assistant_messages: false
       show_reasoning: false
       thinking_progress: false
+      tool_progress: "off"
+      cleanup_progress: true
+      long_running_notifications: generic

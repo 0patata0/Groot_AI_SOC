@@ -193,6 +193,80 @@ class Tests(unittest.TestCase):
     def job(self, phase='lead'):
         return dict(self.d.db.execute('SELECT * FROM jobs WHERE phase=?', (phase,)).fetchone())
 
+    def actual_harness(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('_review_actual_harness',
+            Path(__file__).resolve().parents[1]/'ollama-trial/harness.py')
+        h = importlib.util.module_from_spec(spec); spec.loader.exec_module(h)
+        self.d.harness = h
+        return h
+
+    def follow(self, message, **fields):
+        post = dict(self.post, id='n'*26, create_at=2200, message=message, **fields)
+        self.posts[post['id']] = post
+        self.d.add(post)
+        return dict(self.d.db.execute("SELECT * FROM jobs WHERE source_id=? AND phase='lead'", (post['id'],)).fetchone())
+
+    def test_clarification_answer_stays_with_asking_bot_and_resolves_worker_scope(self):
+        self.actual_harness(); self.post['message'] = '룰 각각 표에다가 정리해서 보여줘'
+        self.d.add(self.post); self.finish('partial', '어느 장비의 규칙을 볼까요?',
+            scope_resolution='clarification_required', protected_calls=0, calls=[])
+        job = self.follow('waf')
+        self.assertEqual(job['engine'], 'ollama'); self.assertFalse(job['cross_review'])
+        self.assertIn('waf 룰 각각', job['question'])
+        self.assertNotIn('이전 대화', job['question'])
+        pool=mock.Mock(); self.d.tick(pool)
+        request=pool.submit.call_args.args[1]
+        self.assertEqual(request['current_question'], 'waf 룰 각각 표에다가 정리해서 보여줘')
+        self.assertFalse(request['direct'])  # Previous mention never grants write access.
+
+    def test_read_detail_followups_keep_one_subject_and_owner(self):
+        h=self.actual_harness()
+        for current in ('좀 더 자세하게 보고싶은데', '표로 보여줄래', '상세조회한거 표로 보여줄래'):
+            resolved=p.resolve_followup(current, 'WAF 룰 조회', h)
+            self.assertIn('WAF 룰',resolved)
+            self.assertEqual(p.route(resolved,h)['engine'],'ollama')
+        self.post['message']='@hermes WAF 룰 조회'
+        self.d.add(self.post); self.finish()
+        self.assertEqual(self.follow('좀 더 자세하게 보고싶은데')['engine'],'hermes')
+
+    def test_followup_never_inherits_write_approval_or_new_subject(self):
+        h=self.actual_harness()
+        for current,previous in [('승인','WAF 룰 조회'),('삭제해줘','WAF 룰 조회'),
+            ('waf','룰 삭제해줘'),('IDS 룰 조회','WAF 룰 조회'),
+            ('서버 상태 알려줘','WAF 룰 조회'),('표로 서버 상태 보여줘','WAF 룰 조회'),
+            ('조회하지 말고 표로만','WAF 룰 조회')]:
+            self.assertEqual(p.resolve_followup(current,previous,h),current)
+
+    def test_explicit_new_bot_overrides_followup_owner(self):
+        self.actual_harness();self.post['message']='WAF 룰 조회'
+        self.d.add(self.post);self.finish()
+        self.assertEqual(self.follow('@hermes 좀 더 자세하게 보고싶은데')['engine'],'hermes')
+
+    def test_followup_is_bounded_by_user_time_thread_and_topic(self):
+        self.actual_harness();self.post['message']='룰 조회해줘'
+        self.d.add(self.post);self.finish('partial','어느 장비?')
+        for current in [dict(self.post,id='b'*26,create_at=2200,message='waf',user_id='v'*26),
+                        dict(self.post,id='c'*26,create_at=2200,message='waf',root_id='t'*26),
+                        dict(self.post,id='d'*26,create_at=1000000,message='waf')]:
+            self.config['allowed_users'].append('v'*26)
+            self.d.add(current)
+            stored=self.d.db.execute('SELECT current_question,parent_source_id FROM request_context WHERE source_id=?',(current['id'],)).fetchone()
+            self.assertEqual(tuple(stored),('waf',None))
+        self.d.db.execute('DELETE FROM requests WHERE id<>?',(self.post['id'],))
+        self.d.add(dict(self.post,id='e'*26,create_at=1500,message='서버 상태 알려줘'))
+        self.assertEqual(self.follow('waf')['engine'],'hermes')
+
+    def test_resolved_read_context_survives_restart_without_replay(self):
+        h=self.actual_harness();self.post['message']='WAF 룰 조회'
+        self.d.add(self.post);self.finish()
+        job=self.follow('룰 각각 표로 보여줘')
+        expected=self.d.db.execute('SELECT current_question FROM request_context WHERE source_id=?',(job['source_id'],)).fetchone()[0]
+        self.d.db.close();self.d=m.Dispatcher(self.config,self.apis,self.database,h)
+        pool=mock.Mock();self.d.tick(pool)
+        self.assertEqual(pool.submit.call_args.args[1]['current_question'],expected)
+        self.assertIn('WAF',expected)
+
     def test_only_authorized_human_sources_are_accepted(self):
         self.assertTrue(p.eligible(self.post, self.config))
         for field, value in [('user_id', 'o' * 26), ('channel_id', 'd' * 26), ('create_at', 1),
@@ -311,6 +385,28 @@ class Tests(unittest.TestCase):
         self.assertIsNone(self.d.placeholder(self.job()))
         self.assertEqual(self.apis['ollama'].sent, [])
 
+    def test_missing_source_cancels_only_queued_job_and_unblocks_lane(self):
+        self.d.add(self.post)
+        later=dict(self.post,id='n'*26,create_at=1200)
+        self.posts[later['id']]=later;self.d.add(later)
+        real=self.apis['ollama'].call
+        def call(method,path,body=None):
+            if path=='/posts/'+self.post['id']:raise ValueError('mattermost_http_404')
+            return real(method,path,body)
+        pool=mock.Mock()
+        with mock.patch.object(self.apis['ollama'],'call',side_effect=call):
+            self.d.tick(pool);pool.submit.assert_not_called()
+            self.assertEqual(self.job()['status'],'cancelled')
+            self.d.tick(pool)
+        self.assertEqual(pool.submit.call_args.args[1]['source_id'],later['id'])
+
+    def test_auth_or_server_error_never_cancels_source(self):
+        self.d.add(self.post)
+        for error in ('mattermost_http_401','mattermost_http_403','mattermost_http_500'):
+            with mock.patch.object(self.apis['ollama'],'call',side_effect=ValueError(error)):
+                with self.assertRaisesRegex(ValueError,error):self.d.tick(mock.Mock())
+            self.assertEqual(self.job()['status'],'queued')
+
     def test_restart_never_replays_running_model_or_protected_request(self):
         self.d.add(self.post)
         with self.d.db:
@@ -320,10 +416,10 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.job()['status'], 'delivery')
         self.assertEqual(json.loads(self.job()['result'])['status'], 'failed')
 
-    def finish(self, status='completed', text='실제 파일 정의 목록입니다.', phase='lead'):
+    def finish(self, status='completed', text='실제 파일 정의 목록입니다.', phase='lead', **extra):
         reply = self.d.placeholder(self.job(phase))
         with self.d.db:
-            self.d.db.execute("UPDATE jobs SET status='delivery',result=? WHERE phase=?", (json.dumps({'status': status, 'final_response': text}), phase))
+            self.d.db.execute("UPDATE jobs SET status='delivery',result=? WHERE phase=?", (json.dumps({'status': status, 'final_response': text, **extra}), phase))
         self.d.deliver(self.job(phase))
         return reply
 

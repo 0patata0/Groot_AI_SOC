@@ -56,6 +56,36 @@ def route(question, harness):
             'cross_review': significant or not pure_read or verification_request(question)}
 
 
+def resolve_followup(question, previous, harness):
+    """Carry only a read subject, never a prior action, approval or observation.
+
+    The dispatcher supplies the immediately preceding same-user conversation
+    within its time/thread boundary. Explicit new subjects always take priority.
+    """
+    current = clean_question(question)
+    previous = clean_question(previous)
+    if (not previous or len(previous) > 1800 or mutual_verification(current)
+            or harness.READ.wants_write(harness.normalized(current))
+            or harness.READ.wants_write(harness.normalized(previous))):
+        return current
+    resolver = getattr(harness, 'resolve_short_read', None)
+    resolved = resolver(current, [previous]) if resolver else current
+    if resolved != current:
+        return resolved
+    scope = getattr(harness, 'rule_scope_request', lambda _: None)
+    prior, present = scope(previous), scope(current)
+    # A bounded natural-language detail/format request can omit "rules".
+    if (prior and len(prior['devices']) == 1 and not present and len(current) <= 120
+            and re.fullmatch(r'(?:좀\s*더\s*|더\s*|방금\s*|그거\s*|그걸\s*|상세조회한거\s*)?'
+                             r'(?:자세[하게히]*|상세[히하게]*|표로|테이블로|원문으로)'
+                             r'\s*(?:정리해서\s*)?(?:보여(?:줘|주세요|줄래|줄래요)|'
+                             r'보고\s*싶(?:은데|어|어요)|알려(?:줘|주세요)|해(?:줘|주세요))?[?.!]*', current)):
+        origin = '커스텀 ' if prior.get('custom_only') else '기본 ' if prior.get('basic_only') else ''
+        detail = '상세 ' if re.search(r'자세|상세|원문', current) else ''
+        return prior['devices'][0] + ' 룰 ' + origin + detail + '조회. ' + current
+    return current
+
+
 def uncertain(report):
     if (report.get('scope_resolution') in ('clarification_required', 'unsupported_scope')
             and report.get('protected_calls') == 0 and not report.get('calls')):

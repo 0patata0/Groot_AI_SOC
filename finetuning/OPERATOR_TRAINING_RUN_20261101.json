@@ -1,7 +1,7 @@
 {
   "at_kst": "2026-11-01T15:54:40.915682+09:00",
   "status": "main_execution_running",
-  "observed_at_kst": "2026-11-01T16:03:21.163584+09:00",
+  "observed_at_kst": "2026-11-01T16:07:46.218875+09:00",
   "user_authorization": "Start main training and automatically resume when shared inference finishes; do not assume every failure is inference-related",
   "data": {
     "train": 8695,
@@ -55,13 +55,13 @@
     "attempt_stage": "main",
     "progress": {
       "status": "training",
-      "at_kst": "2026-11-01T16:02:55.303352+09:00",
-      "step": 5,
+      "at_kst": "2026-11-01T16:07:37.950627+09:00",
+      "step": 18,
       "max_steps": 4348,
-      "elapsed_seconds": 86.18,
-      "estimated_remaining_seconds": 74859.9,
-      "peak_cuda_allocated_gib": 66.34,
-      "peak_cuda_reserved_gib": 67.38
+      "elapsed_seconds": 368.83,
+      "estimated_remaining_seconds": 88724.5,
+      "peak_cuda_allocated_gib": 67.97,
+      "peak_cuda_reserved_gib": 69.35
     },
     "loaded_shared_models": 0,
     "own_container_count": 1,
@@ -132,5 +132,19 @@
   "operational_quality_passed": false,
   "weights_in_git": false,
   "public_paths_use_ACCOUNT_placeholder": true,
-  "model_selection_decision": "User confirmed retaining Qwen3.6-35B-A3B; do not start alternative base-model training without a new instruction"
+  "model_selection_decision": "User confirmed retaining Qwen3.6-35B-A3B; do not start alternative base-model training without a new instruction",
+  "time_estimate": {
+    "basis": "18 actual optimizer steps; initial sample, excludes future waiting/reloads/final evaluation/deployment",
+    "seconds_per_step": 20.49,
+    "remaining_training_hours": 24.65,
+    "end_to_end_planning_days": [
+      1,
+      1.5
+    ],
+    "end_to_end_measured": false,
+    "continuous_run_required_beyond_current_deadline": true,
+    "deadline_extended": false,
+    "post_training_validation_reference_seconds": 398.7065,
+    "post_training_validation_reference": "Prior 447-record run, same validation count176; historical, not current timing"
+  }
 }

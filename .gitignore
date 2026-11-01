@@ -41,3 +41,29 @@ deployment/*.local.conf
 
 # 졸업논문 참고자료와 작성 중 원고는 로컬에 보관
 /논문/
+
+# Model weights and generated training/export artifacts stay on DGX/Thor.
+# Keep small source/config/provenance manifests in Git; never force-add weights.
+*.[gG][gG][uU][fF]
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+*.pth.tar
+*.onnx
+*.keras
+pytorch_model*.bin
+adapter_model*.bin
+ggml*.bin
+*.ggml
+model.bin
+*weights*.bin
+consolidated*.bin
+model-*-of-*.bin
+optimizer*.bin
+optimizer*.pkl
+model*.h5
+model*.hdf5
+/finetuning/checkpoints/
+/finetuning/outputs/
+/finetuning/exports/

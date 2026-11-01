@@ -8,6 +8,7 @@ REQUIRED = {'adapter_model.safetensors', 'adapter_config.json', 'trainer_state.j
             'optimizer.pt', 'scheduler.pt', 'rng_state.pth', 'training_args.bin'}
 RUNTIME_FIELDS = {'data_dir', 'output_dir', 'training_deadline_epoch',
                   'base_artifact_manifest', 'resume_from_checkpoint', 'resume_manifest'}
+COMPLETION_MARKER='checkpoint-complete.json'
 
 
 def digest(path):
@@ -28,6 +29,7 @@ def make_receipt(prior_output, checkpoint):
     for p in checkpoint.iterdir():
         if not p.is_file() or p.is_symlink():
             raise ValueError('Checkpoint must contain regular files only')
+        if p.name==COMPLETION_MARKER:continue
         files[p.name] = digest(p)
     if not REQUIRED <= files.keys():
         raise ValueError('Incomplete optimizer/RNG/adapter checkpoint')
@@ -42,6 +44,28 @@ def make_receipt(prior_output, checkpoint):
             'config': prior['config'], 'data': prior['data'],
             'base_artifact_manifest': prior['base_artifact_manifest'],
             'prior_run_manifest_sha256': digest(prior_output/'run_manifest.json')}
+
+
+def mark_completed(prior_output, checkpoint):
+    # Called only after Trainer._save_checkpoint returns (optimizer/RNG/state saved).
+    # Full-plan checkpoints remain preserved, but automatic retries use a partial
+    # checkpoint so Trainer never accidentally performs an extra optimizer step.
+    checkpoint=Path(checkpoint)
+    state=json.loads((checkpoint/'trainer_state.json').read_text())
+    if state['global_step']==state['max_steps']:return
+    receipt=make_receipt(prior_output,checkpoint)
+    temp=checkpoint/(COMPLETION_MARKER+'.tmp')
+    temp.write_text(json.dumps(receipt,sort_keys=True)+'\n')
+    temp.replace(checkpoint/COMPLETION_MARKER)
+
+
+def verified_completion(prior_output, checkpoint):
+    marker=Path(checkpoint)/COMPLETION_MARKER
+    if marker.is_symlink():raise ValueError('Completion marker cannot be a symlink')
+    expected=json.loads(marker.read_text())
+    actual=make_receipt(prior_output,checkpoint)
+    if actual!=expected:raise ValueError('Completed checkpoint bytes changed')
+    return actual
 
 
 def validate_resume(config, checks):

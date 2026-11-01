@@ -1,5 +1,7 @@
 # DGX 독립 학습 실행 — 2026-11-01
 
+> **09:31 KST 재개 등록:** checkpoint168을 읽기 전용으로 복원하는 새 독립 실행과 제한 자동 재개를 추가했다. 현재 실제 진행·Git은 [STATUS](../STATUS.md), 실행 기준은 아래 [자동 재개](#11월1일-168단계-재개와-제한-자동-재시도)를 따른다.
+
 > **09:20 KST 후속:** 오전재개는175/224step에서09:00:52 공유Ollama새worker감지로종료됐다.최신checkpoint168·최종검증미실행·현재자동재개없음.09:00:51 driver0x51도1건있어충돌예방완료가아니다.[최신근거·후속](../STATUS.md).아래등록/진행기록은당시이력으로보존한다.
 
 > **08:27 KST 후속 실조회:** 전송/토큰/최장2건2step 시험 완료 후 본학습139/224step에서02:46 메모리 보호로 실패 종료했다. 가용15.81GiB<reserve16GiB,같은 시각NVIDIA0x51 할당 실패2건. checkpoint136을 보존했으며 최종validation/품질/Thor적재는 미완료다.06:30 cutoff 확인도 성공했으나 실제 학습은그보다일찍끝났다. 재개는 원인/저장본/실행경로 확인이 필요하며 이번현황조회에서는재실행하지않았다. [상세·Git](../STATUS.md).
@@ -102,3 +104,30 @@ sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --ver
 이번run은08:36:40 KST등록,11:20저장정리/11:35독립timer+RuntimeMaxSec상한이다.72GB원본을새로다운로드하지않고기존39파일을재검증한다.기존full35B smoke성공을확인하고CPU재개검사→base검증→token→main순서로실행한다.대기중공유worker가있으면11:20까지기다리고,학습도중새worker가뜨면우리run만중지한다.실패의자동재시도/공유모델강제unload는없다.실제GPU재개step과전체완료는[STATUS](../STATUS.md)를기준으로한다.
 
 오프라인추가목록은 `resume_training.py`, `prepare_dgx_resume.py`, `check_resume_runtime.py`,39입력manifest및원checkpoint11파일/기존base/NGC환경이다.새외부패키지는없다.일반portable/Thor/evidence반입목록에도새train의존성을함께포함한다.복구는기존root진입점 `--stop`으로이번run만종료하며원checkpoint128/136·과거실행/실패·현재새checkpoint를보존한다.중지후직접원본에덮어쓰지않고다음별도run을준비한다.
+
+## 11월1일 168단계 재개와 제한 자동 재시도
+
+09:31 KST 새 `capstone-dgx-20261101-r2.service`를 등록했다. 기존 168단계 저장본에서 남은56단계와 validation176건을 진행한다. 등록과 실제 optimizer 재개·학습 완료는 [STATUS](../STATUS.md)에서 구분한다. Mac/SSH가 종료되어도 systemd가 실행하며 기존 상한 **11:20 KST 새 단계 금지·저장 정리 / 11:35 KST 독립 종료**를 유지한다. 공유 추론 서비스와 다른 사용자의 모델은 중지하지 않는다.
+
+- `resource_root`는 최초 검증된 base/venv 실행을 가리키고 `resume_parent`는 실제 체크포인트 실행을 가리킨다. 재개 이력을 따라 원본 경로·이미지·UID/GID·입력 SHA를 대조하며 순환/경로변조를 거절한다. 원본 가중치·환경·직전 체크포인트는 읽기 전용으로 재사용한다.
+- `retry_policy`는 이번 창에서 최대4회 실행, 연속60초 공유 worker/API 모델 없음과 호스트 가용96GiB 이상을 요구한다. 공유 추론 시작 또는 API 상태 확인 불가 시 우리 컨테이너만 종료하고, 조건이 회복되면 최신 정상 저장본부터 이어간다. 일반 학습 오류·비정상 수치·무결성 오류는 재시도하지 않는다. 서버 재부팅 후 자동 재시작은 설정하지 않는다.
+- 각 시도는 `dgx-resume-20261101-r2-a1` 등의 별도 출력에 기록한다. 동일한 전용 container 이름/label과 원래 systemd/timer를 사용하며 동시에 여러 학습을 시작하지 않는다. 최상위 `supervisor-status.json`의 `current_attempt_root`를 따라 해당 시도의 상태·진행을 확인한다. 종료된 시도의 오래된 `training` 문구를 실행 중 근거로 사용하지 않는다.
+- 저장 완료 callback 이후 `checkpoint-complete.json`에 파일 SHA·원본 manifest를 원자적으로 기록한다. 자동 재개는 이 marker와 실제 바이트가 맞는 최신 **부분** checkpoint만 사용한다. 저장 도중 종료되거나 파일이 바뀐 후보는 제외한다. 전체224단계 후 validation 중단 시216단계부터 마지막8단계를 다시 수행할 수 있으며,224에서 추가 optimizer step이 실행되는 경로는 사용하지 않는다.
+- 공유 상태 API timeout0.5초/GPU poll0.25초로 조기 확인한다. 기존110GiB cgroup/swap0·호스트16GiB reserve는 유지한다. 추론의 급격한 메모리 할당과 검사 사이 경쟁은 남으며 드라이버 경고 완전 예방이나 이번 시간 내 학습 완료를 보장하지 않는다.
+
+재개 bundle 준비에는 현재 source20파일(기존 목록 + `check_resume_runtime.py`, `prepare_dgx_resume.py`, `prepare_dgx_run.py`), 원본 환경/base, 부모checkpoint/manifest·동결 자료가 필요하다. 외부 패키지나 Mac 모델 다운로드는 추가하지 않는다. 예시는 다음과 같으며 설치 진입점은 계속 루트 `deploy.sh`다.
+
+```sh
+python3 -B SOURCE/prepare_dgx_resume.py \
+  --parent /home/ACCOUNT/Capstone_Groot_training/dgx-resume-20261101-r1 \
+  --root /home/ACCOUNT/Capstone_Groot_training/dgx-resume-20261101-r2 \
+  --sources SOURCE --step 168 --run-id capstone-dgx-20261101-r2 \
+  --deadline 2026-11-01T11:35:00+09:00 --retry-attempts 4 --idle-seconds 60
+sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --check-resume
+sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --apply
+sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --verify
+```
+
+실제 DGX CPU 검사에서 checkpoint168의380텐서 finite, 설치된 Trainer/PEFT의 연속4step과2+2step 재개의 비트 단위 동등성, 실제 `on_save` 이후 marker 검증을 확인했다. 로컬 학습682검사(679PASS/환경3skip)·설치218PASS. 자동 충돌 재시도는 격리 검사로 확인했으며 다른 사용자의 모델을 일부러 적재하여 운영 충돌을 재현하지 않았다. 전체 학습 완료·관제품질·Thor 후보 적재는 별도 단계다.
+
+중지는 기존 `--stop`으로 최상위 run의 실행기/정확한 label 컨테이너만 종료한다. 원본/과거 실패·각 시도의 checkpoint와 제어기 snapshot을 보존한다. 자동 재개를 끈 별도 run을 만들 수 있으나 기존 실행 상태를 덮어쓰거나 보호 기준을 낮추지 않는다.

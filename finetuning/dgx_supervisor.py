@@ -11,9 +11,12 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import time
 import urllib.request
 from zoneinfo import ZoneInfo
+
+sys.path.insert(0,str(Path(__file__).resolve().parent))
 
 
 def now():
@@ -30,18 +33,28 @@ def cutoff(value):
 def read_config(path):
     c = json.loads(Path(path).read_text())
     required = {'run_id','root','uid','gid','image','deadline_kst','files'}
-    if not required <= c.keys() or c.keys()-required-{'resume_parent'}:
+    if not required <= c.keys() or c.keys()-required-{'resume_parent','resource_root','retry_policy'}:
         raise ValueError('Unexpected DGX configuration fields')
     if not re.fullmatch(r'capstone-dgx-[0-9]{8}(?:-[a-z0-9]+)?', c['run_id']):
         raise ValueError('Unsafe run identifier')
     root = Path(c['root'])
     if not root.is_absolute() or (root.exists() and root.resolve() != root) or len(root.parts) != 5 or root.parts[1] != 'home' or root.parts[3] != 'Capstone_Groot_training':
         raise ValueError('Use /home/USER/Capstone_Groot_training/RUN without symlinks')
-    if 'resume_parent' in c:
-        parent = Path(c['resume_parent'])
+    for field in ('resume_parent','resource_root'):
+        if field not in c: continue
+        parent = Path(c[field])
         if (parent == root or parent.parent != root.parent or not parent.is_absolute()
                 or (parent.exists() and parent.resolve() != parent)):
             raise ValueError('Resume only from a distinct sibling run without symlinks')
+    if 'resource_root' in c and 'resume_parent' not in c:
+        raise ValueError('Resource reuse requires an explicit checkpoint parent')
+    if 'retry_policy' in c:
+        policy=c['retry_policy']
+        if ('resume_parent' not in c or not isinstance(policy,dict)
+                or set(policy)!={'max_attempts','idle_seconds'}
+                or type(policy['max_attempts']) is not int or not 1<=policy['max_attempts']<=4
+                or type(policy['idle_seconds']) is not int or not 30<=policy['idle_seconds']<=300):
+            raise ValueError('Require a bounded resume retry policy')
     if any(type(c[k]) is not int or c[k] < 1000 for k in ('uid','gid')):
         raise ValueError('Training must use an unprivileged identity')
     if not re.fullmatch(r'nvcr.io/nvidia/pytorch@sha256:[a-f0-9]{64}', c['image']):
@@ -54,6 +67,28 @@ def read_config(path):
         if p.is_absolute() or '..' in p.parts or p.parts[0] not in ('source','data','profiles','installer','guide-candidates') or not re.fullmatch('[a-f0-9]{64}', digest):
             raise ValueError('Unsafe manifest entry')
     return c
+
+
+def resource_config(c):
+    """Resolve the original validated environment, never an empty resume mountpoint."""
+    origin=c
+    seen=set()
+    declared=[]
+    for _ in range(16):
+        if c['root'] in seen: raise ValueError('Cyclic resume provenance')
+        seen.add(c['root'])
+        verify_files(c)
+        if 'resource_root' in c:declared.append(c['resource_root'])
+        if 'resume_parent' not in c:
+            if any(root!=c['root'] for root in declared):
+                raise ValueError('Declared resource root differs from original provenance')
+            return c
+        parent=read_config(Path(c['resume_parent'])/'control.json')
+        if (parent['root']!=c['resume_parent']
+                or any(parent[k]!=origin[k] for k in ('image','uid','gid'))):
+            raise ValueError('Resume resource identity differs')
+        c=parent
+    raise ValueError('Resume provenance chain is too deep')
 
 
 def verify_files(c):
@@ -85,8 +120,9 @@ def docker_args(c, stage):
         '-w','/workspace']
     if 'resume_parent' in c:
         parent = Path(c['resume_parent'])/'workspace'
+        resources = Path(c.get('resource_root',c['resume_parent']))/'workspace'
         for name in ('base','venv'):
-            args += ['--mount',f'type=bind,src={parent}/{name},dst=/workspace/{name},readonly']
+            args += ['--mount',f'type=bind,src={resources}/{name},dst=/workspace/{name},readonly']
         args += ['--mount',f'type=bind,src={parent}/main,dst=/resume,readonly']
     for item in ('TZ=Asia/Seoul','HOME=/workspace','PYTHONDONTWRITEBYTECODE=1','PYTHONUNBUFFERED=1',
         'PIP_NO_CACHE_DIR=1','PIP_DISABLE_PIP_VERSION_CHECK=1','HF_HOME=/workspace/.cache/huggingface',
@@ -122,8 +158,21 @@ def shared_model_active():
     # If a shared Ollama workload appears, yield our training resources.
     if loading_inference_process():
         return True
-    with urllib.request.urlopen('http://127.0.0.1:11434/api/ps', timeout=3) as response:
+    with urllib.request.urlopen('http://127.0.0.1:11434/api/ps', timeout=0.5) as response:
         return bool(json.load(response)['models'])
+
+
+class SharedInferenceBusy(RuntimeError):
+    """Only this resource-contention condition permits a bounded retry."""
+
+
+def check_shared_during_training():
+    try:
+        active=shared_model_active()
+    except (OSError, ValueError) as exc:
+        raise SharedInferenceBusy('Shared inference state unavailable; releasing only this training') from exc
+    if active:
+        raise SharedInferenceBusy('Shared inference became active; stopping only this training')
 
 
 def stop_container(c):
@@ -138,7 +187,7 @@ def stop_container(c):
     subprocess.run(['docker','kill',name], check=True)
 
 
-def run(c):
+def run_once(c):
     root = Path(c['root'])
     if (root/'supervisor-status.json').exists():
         raise RuntimeError('Run already attempted; restarting is not automatic')
@@ -179,9 +228,9 @@ def run(c):
                     while child.poll() is None:
                         if time.time() >= cutoff(c['deadline_kst']):
                             raise RuntimeError('Hard deadline reached')
-                        if stage in ('smoke','main') and shared_model_active():
-                            raise RuntimeError('Shared inference became active; stopping only this training')
-                        time.sleep(1 if stage in ('smoke','main') else 5)
+                        if stage in ('smoke','main'):
+                            check_shared_during_training()
+                        time.sleep(0.25 if stage in ('smoke','main') else 5)
                     if child.returncode:
                         raise RuntimeError(stage+' container failed: '+str(child.returncode))
                 finally:
@@ -200,6 +249,80 @@ def run(c):
         raise
     finally:
         save(c,status)
+
+
+def available_memory():
+    for line in Path('/proc/meminfo').read_text().splitlines():
+        if line.startswith('MemAvailable:'):return int(line.split()[1])*1024
+    raise RuntimeError('MemAvailable is unavailable')
+
+
+def wait_idle(c, status):
+    """Require a continuous healthy idle window; never unload shared models."""
+    start=None
+    while time.time()<cutoff(c['deadline_kst'])-900:
+        try:
+            idle=not shared_model_active() and available_memory()>=96*2**30
+        except (OSError, ValueError):
+            idle=False
+        if not idle:start=None
+        elif start is None:start=time.monotonic()
+        elapsed=0 if start is None else time.monotonic()-start
+        status.update(stage='waiting_for_idle_resources',idle_seconds=round(elapsed))
+        save(c,status)
+        if elapsed>=c['retry_policy']['idle_seconds']:return True
+        time.sleep(2)
+    return False
+
+
+def newest_checkpoint(root, minimum):
+    from resume_training import verified_completion
+    output=Path(root)/'workspace/main'
+    if not output.exists():return None
+    candidates=[]
+    for checkpoint in output.glob('checkpoint-*'):
+        try:receipt=verified_completion(output,checkpoint)
+        except (OSError,ValueError,KeyError):continue
+        if receipt['step']>minimum:candidates.append(receipt['step'])
+    return max(candidates) if candidates else None
+
+
+def run(c):
+    if 'retry_policy' not in c:return run_once(c)
+    from prepare_dgx_resume import build
+    root=Path(c['root'])
+    if (root/'supervisor-status.json').exists():
+        raise RuntimeError('Controller already attempted; refuse implicit restart')
+    status={'status':'running','started_at_kst':now(),'deadline_kst':c['deadline_kst'],'attempts':[]}
+    parent=Path(c['resume_parent'])
+    step=json.loads((root/'profiles/resume.json').read_text())['step']
+    try:
+        for number in range(1,c['retry_policy']['max_attempts']+1):
+            verify_files(c)
+            if not wait_idle(c,status):
+                status.update(status='stopped_deadline',stage='idle_cutoff');return
+            attempt=root.with_name(root.name+'-a'+str(number))
+            build(parent,attempt,c['run_id'],c['deadline_kst'],root/'source',step)
+            current=read_config(attempt/'control.json')
+            status.update(stage='attempt_running',current_attempt_root=str(attempt),resumed_from_step=step)
+            record={'attempt':number,'root':str(attempt),'resumed_from_step':step,'started_at_kst':now()}
+            status['attempts'].append(record);save(c,status)
+            try:
+                run_once(current)
+            except SharedInferenceBusy as exc:
+                record.update(status='yielded_to_shared_inference',error=str(exc),ended_at_kst=now())
+                saved=newest_checkpoint(attempt,step)
+                if saved is not None:parent,step=attempt,saved
+                status.update(latest_checkpoint_parent=str(parent),latest_checkpoint_step=step)
+                save(c,status)
+                continue
+            result=json.loads((attempt/'supervisor-status.json').read_text())
+            record.update(status=result['status'],ended_at_kst=now())
+            status.update(status=result['status'],stage='finished');return
+        status.update(status='stopped_retry_limit',stage='finished')
+    except BaseException as exc:
+        status.update(status='failed',error=type(exc).__name__+': '+str(exc));raise
+    finally:save(c,status)
 
 
 def apply(c, path):

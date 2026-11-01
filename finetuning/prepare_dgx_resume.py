@@ -5,29 +5,30 @@ import os
 from pathlib import Path
 import shutil
 
-from dgx_supervisor import read_config, verify_files, cutoff
+from dgx_supervisor import read_config, verify_files, cutoff, resource_config
 from prepare_dgx_run import FILES
 from resume_training import make_receipt, digest
 
 
-def build(parent, root, run_id, deadline, sources, step):
+def build(parent, root, run_id, deadline, sources, step, retry_policy=None):
     parent, root, sources = Path(parent), Path(root), Path(sources)
     old = read_config(parent/'control.json')
     verify_files(old)
     if str(parent) != old['root'] or root.parent != parent.parent or root == parent:
         raise ValueError('Use a separate sibling run')
     workspace = parent/'workspace'
+    resources=Path(resource_config(old)['root'])/'workspace'
     for name in ('prepare-status.json', 'smoke-status.json'):
-        if json.loads((workspace/name).read_text())['status'] != 'completed':
+        if json.loads((resources/name).read_text())['status'] != 'completed':
             raise ValueError('Original environment and full-model smoke must have passed')
-    hardware = json.loads((workspace/'hardware.json').read_text())
+    hardware = json.loads((resources/'hardware.json').read_text())
     if hardware['compute_capability'] != [12, 1] or hardware['cuda_forward_backward'] != 'passed':
         raise ValueError('Original environment was not validated on Spark')
     receipt = make_receipt(workspace/'main', workspace/'main'/('checkpoint-'+str(step)))
     root.mkdir(exist_ok=False)
     for name in ('source','profiles','data','installer/finetuning','workspace'):
         (root/name).mkdir(parents=True,exist_ok=True)
-    for name in (*FILES, 'check_resume_runtime.py'):
+    for name in (*FILES, 'check_resume_runtime.py','prepare_dgx_resume.py','prepare_dgx_run.py'):
         shutil.copyfile(sources/name, root/'source'/name)
     for rel in old['files']:
         if rel.startswith('data/'):
@@ -41,7 +42,7 @@ def build(parent, root, run_id, deadline, sources, step):
     shutil.copyfile(parent/'installer/deploy.sh',root/'installer/deploy.sh')
     shutil.copyfile(sources/'dgx_supervisor.py',root/'installer/finetuning/dgx_supervisor.py')
     for name in ('base-manifest.json','base-transfer.json','hardware.json'):
-        shutil.copyfile(workspace/name,root/'workspace'/name)
+        shutil.copyfile(resources/name,root/'workspace'/name)
     # Read-only mounts reuse the existing environment/base/checkpoint. No copy of weights.
     for name in ('base','venv'):
         (root/'workspace'/name).mkdir()
@@ -52,7 +53,9 @@ def build(parent, root, run_id, deadline, sources, step):
     hashes={str(p.relative_to(root)):digest(p) for folder in ('source','data','profiles','installer')
             for p in sorted((root/folder).rglob('*')) if p.is_file()}
     c={**old,'root':str(root),'run_id':run_id,'deadline_kst':deadline,
-       'resume_parent':str(parent),'files':hashes}
+       'resume_parent':str(parent),'resource_root':str(resources.parent),'files':hashes}
+    c.pop('retry_policy',None)
+    if retry_policy is not None:c['retry_policy']=retry_policy
     (root/'control.json').write_text(json.dumps(c,indent=2)+'\n')
     read_config(root/'control.json');verify_files(c)
     return {'run_id':run_id,'step':receipt['step'],'max_steps':receipt['max_steps'],
@@ -64,4 +67,8 @@ if __name__=='__main__':
     for arg in ('parent','root','sources'):p.add_argument('--'+arg,type=Path,required=True)
     for arg in ('run-id','deadline'):p.add_argument('--'+arg,required=True)
     p.add_argument('--step',type=int,required=True)
-    a=p.parse_args();print(json.dumps(build(a.parent,a.root,a.run_id,a.deadline,a.sources,a.step)))
+    p.add_argument('--retry-attempts',type=int,choices=range(1,5))
+    p.add_argument('--idle-seconds',type=int,default=60)
+    a=p.parse_args()
+    policy={'max_attempts':a.retry_attempts,'idle_seconds':a.idle_seconds} if a.retry_attempts else None
+    print(json.dumps(build(a.parent,a.root,a.run_id,a.deadline,a.sources,a.step,policy)))

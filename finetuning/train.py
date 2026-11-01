@@ -27,7 +27,7 @@ import model_profile
 import memory_budget
 import memory_telemetry
 from bounded_loading import checkpoint_loading
-from resume_training import validate_resume, remaining_seconds
+from resume_training import validate_resume, remaining_seconds, mark_completed
 
 
 def deadline_reached(config, now=None):
@@ -472,6 +472,10 @@ def run_training(config, checks, hardware):
                 raise RuntimeError('Actual activation checkpointing differs from the reviewed configuration')
             self.record(state, 'training')
             first_step_trace.start()
+
+        def on_save(self, args, state, control, **kwargs):
+            mark_completed(output,output/('checkpoint-'+str(state.global_step)))
+            return control
 
         def on_log(self, args, state, control, logs=None, **kwargs):
             self.metrics.update(logs or {})

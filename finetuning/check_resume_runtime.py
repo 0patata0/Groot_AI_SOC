@@ -9,7 +9,7 @@ def check(config, output):
     from transformers import GPT2Config, GPT2LMHeadModel, Trainer, TrainingArguments, TrainerCallback, set_seed
     from peft import get_peft_model, LoraConfig
     from train import check_data
-    from resume_training import validate_resume
+    from resume_training import validate_resume,mark_completed,verified_completion
     torch.set_num_threads(2)
     receipt=validate_resume(config,check_data(config))
     if not receipt:raise ValueError('Explicit resume receipt required')
@@ -29,13 +29,19 @@ def check(config, output):
         def on_step_end(self,args,state,control,**kw):
             if state.global_step==2:control.should_training_stop=True;control.should_save=True
             return control
+    class Mark(TrainerCallback):
+        def on_save(self,args,state,control,**kw):
+            mark_completed(Path(args.output_dir),Path(args.output_dir)/('checkpoint-'+str(state.global_step)))
+            return control
     def trainer(name,callbacks=None):
         args=TrainingArguments(output_dir=str(output/name),use_cpu=True,max_steps=4,
             per_device_train_batch_size=1,gradient_accumulation_steps=2,
             learning_rate=1e-3,save_steps=2,save_total_limit=2,logging_steps=1,
             report_to=[],disable_tqdm=True,seed=42,data_seed=42,dataloader_pin_memory=False,
             optim='adamw_torch',lr_scheduler_type='cosine')
-        return Trainer(model=model(),args=args,train_dataset=examples,callbacks=callbacks or [])
+        directory=output/name;directory.mkdir()
+        (directory/'run_manifest.json').write_text(json.dumps({'config':{},'data':{},'base_artifact_manifest':{}}))
+        return Trainer(model=model(),args=args,train_dataset=examples,callbacks=[Mark(),*(callbacks or [])])
     full=trainer('full');full.train()
     split=trainer('split',[Stop()]);split.train()
     resumed=trainer('resumed');resumed.train(resume_from_checkpoint=str(output/'split/checkpoint-2'))
@@ -43,6 +49,9 @@ def check(config, output):
     full_weights=full.model.state_dict();resumed_weights=resumed.model.state_dict()
     if full_weights.keys()!=resumed_weights.keys() or not all(torch.equal(v,resumed_weights[k]) for k,v in full_weights.items()):
         raise RuntimeError('CPU continuation differs from uninterrupted training')
+    if verified_completion(output/'split',output/'split/checkpoint-2')['step']!=2:
+        raise RuntimeError('Post-save completion marker verification failed')
     return {'checkpoint_step':receipt['step'],'adapter_tensors_finite':expected,
             'cpu_trainer_peft_resume':'bitwise_equal_to_uninterrupted_4_steps',
+            'post_save_checkpoint_completion':'verified_on_installed_trainer',
             'scope':'Small CPU integration; full 35B resumption still requires actual GPU progress'}

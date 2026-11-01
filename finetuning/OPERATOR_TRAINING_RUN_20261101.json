@@ -1,7 +1,7 @@
 {
   "at_kst": "2026-11-01T15:54:40.915682+09:00",
-  "status": "main_execution_running",
-  "observed_at_kst": "2026-11-01T16:07:46.218875+09:00",
+  "status": "main_execution_waiting_for_shared_inference",
+  "observed_at_kst": "2026-11-01T21:23:42.542199+09:00",
   "user_authorization": "Start main training and automatically resume when shared inference finishes; do not assume every failure is inference-related",
   "data": {
     "train": 8695,
@@ -51,28 +51,63 @@
     "controller_active": true,
     "deadline_timer_active": true,
     "parent_pid_is_systemd": true,
-    "attempt": 1,
-    "attempt_stage": "main",
+    "attempt": 4,
+    "attempt_stage": "waiting_for_idle_resources",
     "progress": {
       "status": "training",
-      "at_kst": "2026-11-01T16:07:37.950627+09:00",
-      "step": 18,
+      "at_kst": "2026-11-01T21:06:10.720008+09:00",
+      "step": 735,
       "max_steps": 4348,
-      "elapsed_seconds": 368.83,
-      "estimated_remaining_seconds": 88724.5,
-      "peak_cuda_allocated_gib": 67.97,
-      "peak_cuda_reserved_gib": 69.35
+      "resumed_from_step": 456,
+      "elapsed_seconds": 5057.72,
+      "estimated_remaining_seconds": 65496.6,
+      "peak_cuda_allocated_gib": 68.13,
+      "peak_cuda_reserved_gib": 70.85
     },
-    "loaded_shared_models": 0,
-    "own_container_count": 1,
-    "actual_shared_interruption_and_resume_observed_in_this_run": false,
+    "loaded_shared_models": 1,
+    "own_container_count": 0,
+    "actual_shared_interruption_and_resume_observed_in_this_run": true,
     "whole_training_completed": false,
-    "latest_verified_checkpoint": 4,
+    "latest_verified_checkpoint": 732,
     "checkpoint_files_verified": 11,
-    "checkpoint_receipt_sha256": "7aa7c1d6ddfb652f92e44643795cec29722c111b05908a9bb2165bdbedb225e7",
     "cuda_ooms": 0,
     "cuda_alloc_retries": 0,
-    "early_time_estimate_not_completion_promise": true
+    "early_time_estimate_not_completion_promise": true,
+    "checkpoint_marker_sha256": "cb13fae225e77f8eefd5f10ed7a29bb38771492a59fa63f6c887fcf08364b922",
+    "progress_is_last_training_observation": true,
+    "successful_automatic_resume_records": 3,
+    "shared_inference_yields": 4,
+    "current_mem_available_gib": 74.0,
+    "attempt_history": [
+      {
+        "attempt": 1,
+        "resumed_from_step": 0,
+        "started_at_kst": "2026-11-01T15:50:06.618715+09:00",
+        "ended_at_kst": "2026-11-01T16:34:15.719889+09:00",
+        "status": "yielded_to_shared_inference"
+      },
+      {
+        "attempt": 2,
+        "resumed_from_step": 104,
+        "started_at_kst": "2026-11-01T16:40:54.007465+09:00",
+        "ended_at_kst": "2026-11-01T17:06:24.969181+09:00",
+        "status": "yielded_to_shared_inference"
+      },
+      {
+        "attempt": 3,
+        "resumed_from_step": 156,
+        "started_at_kst": "2026-11-01T17:26:21.032384+09:00",
+        "ended_at_kst": "2026-11-01T19:08:22.532107+09:00",
+        "status": "yielded_to_shared_inference"
+      },
+      {
+        "attempt": 4,
+        "resumed_from_step": 456,
+        "started_at_kst": "2026-11-01T19:30:47.172258+09:00",
+        "ended_at_kst": "2026-11-01T21:06:25.198216+09:00",
+        "status": "yielded_to_shared_inference"
+      }
+    ]
   },
   "transfer": {
     "root": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261101-r5",
@@ -134,17 +169,14 @@
   "public_paths_use_ACCOUNT_placeholder": true,
   "model_selection_decision": "User confirmed retaining Qwen3.6-35B-A3B; do not start alternative base-model training without a new instruction",
   "time_estimate": {
-    "basis": "18 actual optimizer steps; initial sample, excludes future waiting/reloads/final evaluation/deployment",
-    "seconds_per_step": 20.49,
-    "remaining_training_hours": 24.65,
-    "end_to_end_planning_days": [
-      1,
-      1.5
-    ],
+    "basis": "Latest attempt completed 279 optimizer steps from456 to735; estimate resumes from verified732 and excludes future waits/reloads/final evaluation/deployment",
+    "seconds_per_step": 18.13,
+    "remaining_training_hours": 18.21,
     "end_to_end_measured": false,
     "continuous_run_required_beyond_current_deadline": true,
     "deadline_extended": false,
     "post_training_validation_reference_seconds": 398.7065,
-    "post_training_validation_reference": "Prior 447-record run, same validation count176; historical, not current timing"
+    "post_training_validation_reference": "Prior 447-record run, same validation count176; historical, not current timing",
+    "remaining_from_verified_checkpoint_seconds": 65551.0
   }
 }

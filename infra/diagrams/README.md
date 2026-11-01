@@ -4,9 +4,13 @@
 
 ## 서버와 네트워크
 
-![현재 서버·네트워크 배치](current-network-topology.svg)
+**형식 기준:** 사용자 정정에 따라 `topology/`의 기존 ESXi·Groot-sec·vSwitch·Groot-siem/Groot-web 상세형과 SVC/vNIC·INT/EXT 버스형을 사용한다. 두 SVG와 재생성 소스는 [topology/](../../topology/README.md)에 둔다. 아래 구성 사실은 직전 조회 근거를 유지하며 형식 수정 중 서버 재조회·변경은 하지 않았다. 기존 ESXi 경계는 과거 배치 문서 근거이며 이번 게스트 SSH 조회를 하이퍼바이저 확인으로 확대하지 않는다.
 
-[SVG 원본](current-network-topology.svg)은 확대 가능한 벡터 문서다. 아래 Mermaid는 연결 관계의 텍스트 원본이다. 선은 논리 경로이며 실제 케이블·스위치 배선이나 전용선을 뜻하지 않는다. Docker 내부 브리지는 호스트별로 존재하지만 그림에서는 생략했다.
+![기존 형태를 유지한 상세 토폴로지](../../topology/groot_soc_network_architecture.svg)
+
+[상세형 SVG](../../topology/groot_soc_network_architecture.svg) · [버스형 SVG](../../topology/groot_soc_topology_bus.svg).
+
+SVG는 확대 가능한 벡터 문서다. 아래 Mermaid는 연결 관계의 텍스트 원본이다. 선은 논리 경로이며 실제 케이블·스위치 배선이나 전용선을 뜻하지 않는다. Docker 내부 브리지는 호스트별로 존재하지만 그림에서는 생략했다.
 
 ```mermaid
 flowchart LR
@@ -88,4 +92,4 @@ DGX 일반 모델과 Thor 학습본에 두 봇을 나누는 자동 추론 분산
 
 - 라이브 읽기: A/B/C 주소·경로/서비스, WAF `SecRuleEngine`, Suricata 실행 인자, A의 `nginx -T`, B 모델/터널 설정과 API tags, Thor listener/ps. 민감값 없는 상세 영수증은 로컬 `대화기록/검증/2026-11-01-topology/`에 보존한다.
 - 위 라이브 읽기와 [학습 실행 원장](../../finetuning/OPERATOR_TRAINING_RUN_20261101.json)·[MCP 계약](../../finetuning/mcp_contract.20261101.json)을 구분한다. 이번 도식 업데이트는 서버 설정·보안 정책·학습 실행을 변경하지 않았다.
-- [10/8 도식·프롬프트와 후속 기록](history-20261008.md)은 역사 자료로 보존한다. 예전 DGX 추론/단일 봇/5 MCP 표기를 현재 구성으로 읽지 않는다. [더 오래된 생성 입력](../../topology/README.md)도 현재 도식과 구분한다.
+- [10/8 도식·프롬프트와 후속 기록](history-20261008.md)은 역사 자료로 보존한다. 예전 DGX 추론/단일 봇/5 MCP 표기를 현재 구성으로 읽지 않는다. `topology/`의 원본 PNG는 형태 기준으로 보존하되 내용은 과거 기록이다. [최신 상세형·버스형과 원본의 구분](../../topology/README.md)을 따른다.

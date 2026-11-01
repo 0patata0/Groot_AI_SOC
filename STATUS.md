@@ -29,14 +29,15 @@
 
 ## 현재 토폴로지
 
-[서버·네트워크](infra/diagrams/current-network-topology.svg) · [관제·MCP·승인](infra/diagrams/current-soc-flow.svg) · [조회 근거·Mermaid·한계](infra/diagrams/README.md).
+[기존 형태 상세형](topology/groot_soc_network_architecture.svg) · [버스형](topology/groot_soc_topology_bus.svg) · [관제·MCP·승인](infra/diagrams/current-soc-flow.svg) · [조회 근거·Mermaid·한계](infra/diagrams/README.md).
 
 | 갱신 | 확인·표시 범위 |
 |---|---|
 | 실제 배치 | B의Hermes/Ollama 봇→B:11435 제한SSH→A→Thor loopback:11434, 운영원본35B. DGX학습·로컬정제 분리 |
 | 네트워크/웹 | A 외부/내부 주소·B/C의A기본경로, WAF DetectionOnly·passive IDS, 채팅 내부TLS·실습 관리 프록시 반영 |
 | 관제/승인 | 기존14:24 계약의MCP8서버/41도구, FW전체/상관조건 조회·정확후보승인·임시차단 별도 경계 표시 |
-| 이력/검증 | 이전10/8 PNG·프롬프트 보존. SVG2개 렌더 확인·링크/XML/계약 대조. 새 공격E2E·채팅 왕복·승인실행·서버전체설치 시험은 미실행 |
+| 형태 정정 | 사용자 지정 `topology/` 원본의 ESXi 상단A·중앙vSwitch·하단B/C 상세형과 SVC/vNIC·INT/EXT 버스형으로 교체. SVG2종·표준라이브러리 재생성 소스 유지 |
+| 이력/검증 | 원본PNG3개·Swift와10/8 그림/프롬프트 보존. 기존 사실 근거 유지, 이번 형식 수정은 서버 재조회·변경 없음. 렌더/링크/XML/재생성·원본SHA 검증 |
 
 도식과 관련 문서만 수정했다. 서버 설정·학습 입력·제어기·종료 기한·운영 모델은 변경하지 않았다. DGX→Thor의 현재 본학습 승격과 자동 추론 분산은 완료로 표시하지 않는다.
 
@@ -70,4 +71,4 @@
 
 ## Git 반영
 
-직전 학습 상태 조회는 `f9c3246bc9b2e96162fe9c59863f45edfe00ce23`까지 게시했다. 이번 토폴로지·관련 공개11파일은 `1b1884d2607068baa652a7338a0109177d921b17`로 커밋·푸시하고22:04 KST 실제 원격main 일치·당시clean을 확인했다. SVG2개 렌더·XML/문자 좌표·계약41도구·라이브 설정 대조, 신규 깨진 링크0·추가 내용 자격값 일치0·diff 검사를 통과했다. 이전 PNG/프롬프트는 보존했고 새 SVG2개 합계약21.7KB로 큰 이미지 복사본을 Git에 늘리지 않았다. 이 게시 영수증도 후속 커밋·푸시하며 최종SHA·원격일치·임시정리는 로컬 세션에 남긴다. 상세 SSH 조회·렌더 검증·대화기록은 로컬 전용이다. 서버 재배포는 없다.
+직전 토폴로지와 게시 영수증은 `b05381f9bcb2c819b279462991b3c14011e87bc2`까지 원격main 일치를 확인했다. 이번에는 사용자 지정의 기존 상세형·버스형으로 도식·참조를 교체하고 원본PNG/Swift를 보존했다. 공개파일 검증 후 커밋·푸시하며 게시 영수증은 그 뒤 갱신한다. 상세 검증·대화기록·업무분담은 로컬 전용이다. 서버·학습 실행은 변경하지 않았다.

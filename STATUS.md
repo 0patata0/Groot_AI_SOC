@@ -17,6 +17,8 @@
 
 **검증·Git:** 입력39SHA일치,supervisor/progress/state·stage/log/journal·Ollama·run컨테이너를교차확인했다.이번에는소스/운영변경이없어코드테스트·새서버설치·실공격E2E를반복하지않았다.현황/계획/README·로컬기록을갱신했으며자동커밋/푸시는다음단계다.비밀값·원로그·로컬검증자료는공개Git에서제외한다.
 
+**게시 확인:** 결과문서5개를 `84622b0edc36c80d31f72ee9327624605b089cf6`로자동커밋/푸시했고 actual origin/main 일치·당시clean을확인했다(2026-11-01T09:22:03.517166+09:00).지정자격파일PAT만일회성참조·helper/HTTPtrace비활성,문서diff/링크/비밀값부재/localignore검사완료.이게시영수증도후속커밋/푸시하고최종SHA·원격일치·작업트리·Mac임시helper제거결과는로컬기록/최종답변에남긴다.원격변경/재개/추가GPU시험0이며관측은09:20 KST기준이다.
+
 ## DGX checkpoint136 독립 재개 — 2026-11-01 08:36 KST 등록
 
 사용자 “학습은 돌려놓고 끌 수 있으니까 재개시켜놔” 지시로 기존136checkpoint에서 남은88step과 마지막validation176을 실행하는 새 run을 등록했다. **08:36:40 KST systemd/PID1 독립 실행 등록을 확인했고 당시 단계는 원본 재검증이다. 실제 재개 step 증가 확인은 아래 후속 기록을 기준으로 한다.** [재개·설치·복구](finetuning/DGX_OVERNIGHT.md#11월1일-오전-재개).

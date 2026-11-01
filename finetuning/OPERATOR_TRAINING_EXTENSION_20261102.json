@@ -1,6 +1,6 @@
 {
-  "observed_at_kst": "2026-11-02T05:21:10.038428+09:00",
-  "status": "waiting_for_shared_inference",
+  "observed_at_kst": "2026-11-02T05:36:10.154091+09:00",
+  "status": "automatic_resume_model_reload",
   "authorization": "User requested extending training cutoff to the estimated completion time; final fixed cutoff includes save/evaluation margin",
   "run_id": "capstone-dgx-20261102-r6",
   "root": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6",
@@ -48,11 +48,11 @@
     "memory_floor_gib": 96,
     "shared_inference_priority": true,
     "automatic_deadline_extension": false,
-    "stage": "waiting_for_idle_resources",
-    "attempt": 3,
+    "stage": "attempt_running",
+    "attempt": 4,
     "shared_inference_yields": 3,
     "latest_resume_checkpoint": 1900,
-    "successful_automatic_restart_records": 2
+    "successful_automatic_restart_records": 3
   },
   "verification": {
     "local_tests_passed": 42,
@@ -88,10 +88,10 @@
     "projects_beyond_soft_cutoff": null,
     "estimate_requires_more_samples": true,
     "projects_beyond_hard_deadline": null,
-    "projected_if_immediate_training_resume_kst": "2026-11-02T17:39:04.042956+09:00",
+    "projected_if_immediate_training_resume_kst": "2026-11-02T17:54:04.154091+09:00",
     "immediate_resume_projection_beyond_soft_cutoff": true,
     "immediate_resume_projection_beyond_hard_deadline": true,
-    "projection_scope": "Hypothetical immediate optimizer work at observation time using last attempt mean; not actual ETA, excludes further wait, reload and final evaluation"
+    "projection_scope": "Hypothetical immediate optimizer work at observation time using last attempt mean; current attempt loading_model, excludes remaining load, future wait and final evaluation"
   },
   "operating_models_changed": false,
   "weights_in_git": false,
@@ -105,14 +105,14 @@
     "elapsed_seconds": 3543.83
   },
   "live": {
-    "stage": "waiting_for_shared_inference",
-    "stage_at_kst": "2026-11-02T05:21:08.481491+09:00",
+    "stage": "loading_model",
+    "stage_at_kst": "2026-11-02T05:35:04.916848+09:00",
     "service_active": true,
     "parent_pid": 1,
     "timer_active": true,
-    "shared_models_loaded": 1,
-    "own_container_count": 0,
-    "new_optimizer_steps_observed": true,
+    "shared_models_loaded": 0,
+    "own_container_count": 1,
+    "new_optimizer_steps_observed": false,
     "step": 1902,
     "max_steps": 4348,
     "resumed_from_step": 1584,
@@ -126,14 +126,14 @@
     "last_full_checkpoint_hash_check_at_kst": "2026-11-02T00:37:58.216736+09:00",
     "last_training_at_kst": "2026-11-02T05:15:07.334776+09:00",
     "progress_is_last_training_observation": true,
-    "training_process_currently_running": false,
-    "current_attempt_resumed_from_step": 1584,
-    "current_attempt_optimizer_steps_observed": true,
-    "training_process_phase": "waiting_for_shared_inference",
+    "training_process_currently_running": true,
+    "current_attempt_resumed_from_step": 1900,
+    "current_attempt_optimizer_steps_observed": false,
+    "training_process_phase": "loading_model",
     "checkpoint_marker_observed_at_kst": "2026-11-02T05:21:10.038428+09:00",
     "cuda_counters_scope": "last attempt3 at05:15:07 KST, not current training",
     "current_attempt_cuda_counters_available": false,
-    "current_attempt_new_steps_observed": 318
+    "current_attempt_new_steps_observed": 0
   },
   "shared_yield_history": [
     {
@@ -159,6 +159,11 @@
       "status": "yielded_to_shared_inference",
       "error": "Shared inference became active; stopping only this training",
       "ended_at_kst": "2026-11-02T05:15:18.894748+09:00"
+    },
+    {
+      "attempt": 4,
+      "resumed_from_step": 1900,
+      "started_at_kst": "2026-11-02T05:33:26.538100+09:00"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "observed_at_kst": "2026-11-02T01:06:33.007468+09:00",
-  "status": "main_training_active",
+  "observed_at_kst": "2026-11-02T01:21:11.493973+09:00",
+  "status": "waiting_for_shared_inference",
   "authorization": "User requested extending training cutoff to the estimated completion time; final fixed cutoff includes save/evaluation margin",
   "run_id": "capstone-dgx-20261102-r6",
   "root": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6",
@@ -48,8 +48,10 @@
     "memory_floor_gib": 96,
     "shared_inference_priority": true,
     "automatic_deadline_extension": false,
-    "stage": "main",
-    "attempt": 1
+    "stage": "waiting_for_idle_resources",
+    "attempt": 1,
+    "shared_inference_yields": 1,
+    "latest_resume_checkpoint": 1260
   },
   "verification": {
     "local_tests_passed": 42,
@@ -68,17 +70,19 @@
     "old_control_sha256_unchanged": true
   },
   "time_estimate": {
-    "basis_at_kst": "2026-11-02T01:06:20.869892+09:00",
-    "seconds_per_step": 18.324375,
+    "basis_at_kst": "2026-11-02T01:13:58.461868+09:00",
+    "seconds_per_step": 18.115,
     "remaining_steps_at_resume": 3176,
-    "remaining_training_hours": 15.84,
+    "remaining_training_hours": 15.54,
     "excludes": [
       "shared inference wait",
       "reload",
       "final evaluation"
     ],
     "not_completion_promise": true,
-    "remaining_steps_at_observation": 3112
+    "remaining_steps_at_observation": 3086,
+    "remaining_steps_from_checkpoint": 3088,
+    "remaining_from_checkpoint_seconds": 55939.1
   },
   "operating_models_changed": false,
   "weights_in_git": false,
@@ -92,24 +96,37 @@
     "elapsed_seconds": 3543.83
   },
   "live": {
-    "stage": "training",
-    "stage_at_kst": "2026-11-02T01:06:20.869892+09:00",
+    "stage": "waiting_for_idle_resources",
+    "stage_at_kst": "2026-11-02T01:21:09.521635+09:00",
     "service_active": true,
     "parent_pid": 1,
     "timer_active": true,
-    "shared_models_loaded": 0,
-    "own_container_count": 1,
+    "shared_models_loaded": 1,
+    "own_container_count": 0,
     "new_optimizer_steps_observed": true,
-    "step": 1236,
+    "step": 1262,
     "max_steps": 4348,
     "resumed_from_step": 1172,
-    "new_steps": 64,
+    "new_steps": 90,
     "cuda_ooms": 0,
     "cuda_alloc_retries": 0,
-    "checkpoint_complete_marker_step": 1236,
+    "checkpoint_complete_marker_step": 1260,
     "checkpoint_marker_files": 11,
     "checkpoint_file_hashes_rechecked_this_poll": false,
     "latest_fully_hashed_checkpoint_step": 1172,
-    "last_full_checkpoint_hash_check_at_kst": "2026-11-02T00:37:58.216736+09:00"
-  }
+    "last_full_checkpoint_hash_check_at_kst": "2026-11-02T00:37:58.216736+09:00",
+    "last_training_at_kst": "2026-11-02T01:13:58.461868+09:00",
+    "progress_is_last_training_observation": true,
+    "training_process_currently_running": false
+  },
+  "shared_yield_history": [
+    {
+      "attempt": 1,
+      "resumed_from_step": 1172,
+      "started_at_kst": "2026-11-02T00:35:38.860618+09:00",
+      "status": "yielded_to_shared_inference",
+      "error": "Shared inference became active; stopping only this training",
+      "ended_at_kst": "2026-11-02T01:14:14.965518+09:00"
+    }
+  ]
 }

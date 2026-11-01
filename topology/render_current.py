@@ -60,9 +60,11 @@ class Diagram:
         self.text(x + w / 2, y + 38, title, title_size, title_color, True, True)
         self.lines(x + w / 2, y + 75, lines, size, center=True)
 
-    def line(self, d, kind="management", arrow=False, both=False, dashed=False, width=3):
+    def line(self, d, kind="management", arrow=False, both=False, dashed=False, width=3,
+             edge_id=None):
         self.parts.append(
-            f'<path d="{d}" fill="none" stroke="{COLORS[kind]}" stroke-width="{width}" '
+            '<path' + (f' id="{edge_id}"' if edge_id else '')
+            + f' d="{d}" fill="none" stroke="{COLORS[kind]}" stroke-width="{width}" '
             'stroke-linejoin="round"'
             + (f' marker-end="url(#{kind})"' if arrow else '')
             + (f' marker-start="url(#{kind})"' if both else '')
@@ -113,11 +115,13 @@ def architecture():
     d.box(1320, 565, 365, 195, "Suricata IDS", ["PASSIVE · ens192 패킷 관측", "ET + local → all.rules", "인라인 차단 엔진 아님"], stroke="#cf7757")
     d.box(1725, 565, 365, 195, "Vector + Wazuh Agent", ["FW · WAF · IDS 로그", "정제·수집 → B Wazuh", "호스트 진단 근거"], stroke="#cf7757", title_size=24)
     d.box(2130, 565, 365, 195, "nftables Firewall", ["B/C 외부 통신 NAT", "정책·보호 주소·차단 TTL", "승인된 조치 실행·검증"], stroke="#cf7757")
-    d.line("M2495 650H2535V360H1880V307", "llm", True)
+    d.line("M2495 650H2535V360H1880V307", "llm", True, True,
+           edge_id="gateway-thor-inference")
     d.text(1628, 391, "B 추론 터널 → A 경유 → Thor", 20, COLORS["llm"])
 
     for x, kind in [(298, "management"), (692, "mcp"), (1097, "attack"), (1907, "logs")]:
         d.line(f"M{x} 760V872", kind, arrow=(kind == "mcp"), both=(kind == "mcp"))
+    d.line("M2315 872V760", "llm", True, True, edge_id="switch-gateway-inference")
     d.rect(85, 872, 2430, 50, "#d8d6cf", "#85837c", 5)
     d.text(1300, 905, "vSwitch · 내부망 10.200.10.0/24", 25, bold=True, center=True)
     d.rect(85, 974, 1510, 440, "#e5f4ee", "#3d9b85", 18)
@@ -144,12 +148,22 @@ def architecture():
     d.line("M1857 1020V922", "logs", True)
     d.line("M2497 922V1190H2450V1210", "attack", True)
     d.line("M330 1210V1160", "mcp", True)
-    d.line("M575 1280H545", "mcp", True)
-    d.line("M805 1160V1210", "approval", True, True)
+    # Keep the existing equipment geometry. Each bot gets its own explicit
+    # chat, A/B MCP and inference arrows; shared tails are logical transport.
+    d.line("M575 1280H545", "mcp", True, True, edge_id="hermes-mcp-b")
+    d.line("M1085 1280H1070V1360H555V1330H545", "mcp", True, True,
+           edge_id="ollama-mcp-b")
+    d.line("M805 1160V1210", "approval", True, True, edge_id="mattermost-hermes")
+    d.line("M1000 1160V1166H1210V1210", "approval", True, True,
+           edge_id="mattermost-ollama")
     d.line("M1105 1090H1075", "approval", True)
-    d.line("M1500 1210V1184H1625V922", "llm")
-    d.line("M1470 1210V1174H1608V922", "mcp")
-    d.text(965, 1192, "공통 하네스 · MCP 8서버 / 41도구", 21, "#4e429e", True, True)
+    d.line("M1010 1210V1184H1625V922", "llm", True, True,
+           edge_id="hermes-inference")
+    d.line("M1500 1210V1184H1625V922", "llm", True, True,
+           edge_id="ollama-inference")
+    d.line("M1035 1210V1174H1608V922", "mcp", True, True, edge_id="hermes-mcp-a")
+    d.line("M1470 1210V1174H1608V922", "mcp", True, True, edge_id="ollama-mcp-a")
+    d.text(1240, 1390, "공통 하네스 · MCP 8서버 / 41도구", 21, "#4e429e", True, True)
 
     d.rect(45, 1490, 1085, 245, "white", "#c7c7c7", 12)
     d.text(70, 1528, "범례 · 원본 도식의 색상 구분 유지", 24, bold=True)

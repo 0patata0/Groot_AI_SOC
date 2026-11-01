@@ -2,6 +2,17 @@
 
 2026-11-01 사용자 지시에 따라 **이 폴더의 기존 상세형·버스형 도식 형태를 최신 토폴로지의 기준**으로 사용한다. 상세형은 ESXi 경계, 상단 Groot-sec, 중앙 vSwitch, 하단 Groot-siem/Groot-web, 외부 시험·GPU 노드를 유지한다. 버스형은 SVC/vNIC 상자와 INT/EXT 용도별 가로선을 유지한다. 색상도 원본의 공격 빨강·관리 회색·로그 파랑·추론 보라·MCP 주황·승인 초록을 따른다.
 
+**동일한 내용은 그대로 유지하고 실제 변경된 부분만 수정한다.** 이번 후속 보완은 장비 상자·설명·색상과 버스형을 유지한 채 상세형의 연결 화살표만 명확히 했다. 연결선과 겹치던 공통 하네스 설명은 같은 문구로 위치만 옮겼다.
+
+| 봇별 연결 | 표시 |
+|---|---|
+| Mattermost ↔ Hermes / Ollama | 각 봇에 초록 화살표 |
+| Hermes / Ollama ↔ B MCP | 각 봇에 주황 화살표 |
+| Hermes / Ollama ↔ A MCP | 각 봇에서 vSwitch 논리 경로로 이어지는 주황 화살표 |
+| Hermes / Ollama ↔ Thor | 각 봇의 보라 화살표와 vSwitch → A → Thor 연결 |
+
+왕복 화살표는 요청·결과의 논리 흐름이다. 승인 권한이나 새로운 네트워크 접속을 추가한 것은 아니다. 같은 색으로 합쳐지는 선은 공유 전송 경로이며 다른 색 선의 교차는 연결 지점을 뜻하지 않는다.
+
 | 현재 도식 | 기존 형태 기준 |
 |---|---|
 | [상세 네트워크 토폴로지](groot_soc_network_architecture.svg) | `groot_soc_network_architecture_preview.png` 및 같은 구조의 `groot_soc_topology_slide.png` |

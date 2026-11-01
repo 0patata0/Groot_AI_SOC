@@ -1,0 +1,386 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-01T12:21:16.302507+09:00",
+  "purpose": "Prior evaluation weaknesses plus SOC task coverage; not rule-only training",
+  "sources": [
+    {
+      "id": "crs",
+      "repo": "coreruleset/coreruleset",
+      "ref": "main",
+      "commit": "ca679721f6df320c88b81cdb52aea68588ff2859",
+      "tree": "f9262c40737ce444ebfcc42d8952433836dd18ee",
+      "date": "2026-10-26T18:44:24Z",
+      "license_review": "Apache-2.0",
+      "files": 356,
+      "bytes": 4206702,
+      "licenses": [
+        {
+          "path": "LICENSE",
+          "sha256": "676a192d3fc5205a288934ee02c5f934b782b91604a4b93589ba64520a4fec13",
+          "url": "https://raw.githubusercontent.com/coreruleset/coreruleset/ca679721f6df320c88b81cdb52aea68588ff2859/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "wazuh",
+      "repo": "wazuh/wazuh",
+      "ref": "v4.14.8",
+      "commit": "f470ad7db717b18db7feeed568949643698f0f34",
+      "tree": "92e4716b6af69e170c946abc77c2b2a8042982df",
+      "date": "2026-09-18T08:43:02Z",
+      "license_review": "GPL-2.0 with bundled notices; preserve per-file conditions",
+      "files": 415,
+      "bytes": 3536674,
+      "licenses": [
+        {
+          "path": "LICENSE",
+          "sha256": "9136fd9ef577a45b1bcea8c8cd761e8c9c21e15cc2a09e7c139755e581bde00e",
+          "url": "https://raw.githubusercontent.com/wazuh/wazuh/f470ad7db717b18db7feeed568949643698f0f34/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "suricata_verify",
+      "repo": "OISF/suricata-verify",
+      "ref": "master",
+      "commit": "5ee54126be5161695200b7bbb714d3b354ee6880",
+      "tree": "68bf80711ac446acc7ae5562d2147471d2a98238",
+      "date": "2026-10-29T19:43:47Z",
+      "license_review": "MIT; metadata reference only this wave",
+      "files": 2,
+      "bytes": 11764,
+      "licenses": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "cfcec4cbfb1928bad7eae43a129dffa96e55c7c6e4b93b9ab2cc99b115291b51",
+          "url": "https://raw.githubusercontent.com/OISF/suricata-verify/5ee54126be5161695200b7bbb714d3b354ee6880/LICENSE.txt"
+        }
+      ]
+    },
+    {
+      "id": "modsecurity_docs",
+      "repo": "owasp-modsecurity/documentation",
+      "ref": "main",
+      "commit": "9946c9f60ed247179f57a602e79c0ef045dc3d3c",
+      "tree": "cad7f4dc11dcc7c513b1e2dced4ba83915405019",
+      "date": "2026-10-26T17:11:38Z",
+      "license_review": "Apache-2.0",
+      "files": 39,
+      "bytes": 506946,
+      "licenses": [
+        {
+          "path": "LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "url": "https://raw.githubusercontent.com/owasp-modsecurity/documentation/9946c9f60ed247179f57a602e79c0ef045dc3d3c/LICENSE"
+        }
+      ]
+    },
+    {
+      "id": "nist_controls",
+      "repo": "usnistgov/oscal-content",
+      "ref": "main",
+      "commit": "f0de6d8d8c059d374f15e0ae07508d82e370fc1d",
+      "tree": "4f7aed297fd5299535b51d296635ae0fff1c2a5f",
+      "date": "2026-10-22T21:56:10Z",
+      "license_review": "CC0-1.0 with NIST disclaimer",
+      "files": 3,
+      "bytes": 10454685,
+      "licenses": [
+        {
+          "path": "LICENSE.md",
+          "sha256": "9f0ddd1ed71f691bb483965a7c46e1315ab6cc28dac0426d4c3d27108aafde13",
+          "url": "https://raw.githubusercontent.com/usnistgov/oscal-content/f0de6d8d8c059d374f15e0ae07508d82e370fc1d/LICENSE.md"
+        }
+      ]
+    },
+    {
+      "id": "cisa_counter",
+      "repo": "cisagov/coun7er",
+      "ref": "main",
+      "commit": "811fa2f5c283cea53124909910409359d1693dc1",
+      "tree": "9ba33197c52eb1d27c2c0e6a020c8e23dc9940f6",
+      "date": "2026-10-30T15:40:21Z",
+      "license_review": "MIT, preserve ATT&CK attribution and provider disclaimer; procedures are not successful incident outcomes",
+      "files": 156,
+      "bytes": 821829,
+      "licenses": [
+        {
+          "path": "LICENSE.txt",
+          "sha256": "ffdbbbb6c604414ae2bf524f42489e62d23a5515099f83c336674c16c1efc1df",
+          "url": "https://raw.githubusercontent.com/cisagov/coun7er/811fa2f5c283cea53124909910409359d1693dc1/LICENSE.txt"
+        }
+      ]
+    }
+  ],
+  "git_files_verified": 971,
+  "git_source_bytes": 19538600,
+  "regression_review": {
+    "at_kst": "2026-11-01T12:17:46.991088+09:00",
+    "stage": "static_linkage_review_not_training_admission",
+    "sources": {
+      "crs": {
+        "provider_records": 5221,
+        "static_linked": 5159,
+        "quarantined": 62,
+        "reason_counts": {
+          "duplicate_input_and_assertion": 49,
+          "same_input_conflicting_assertions": 12,
+          "rule_definition_unresolved": 1
+        },
+        "provisional_partitions": {
+          "training_candidate": 4051,
+          "reserved_evaluation": 1108
+        },
+        "split_groups": 16
+      },
+      "wazuh": {
+        "provider_records": 2055,
+        "static_linked": 1787,
+        "quarantined": 268,
+        "reason_counts": {
+          "same_input_conflicting_assertions": 55,
+          "duplicate_input_and_assertion": 186,
+          "rule_definition_unresolved": 28,
+          "incomplete_tuple_requires_engine_semantics": 19
+        },
+        "provisional_partitions": {
+          "training_candidate": 1400,
+          "reserved_evaluation": 387
+        },
+        "split_groups": 102
+      }
+    },
+    "knowledge_units": {
+      "modsecurity_docs": 526,
+      "nist_controls": 481,
+      "cisa_counter": 152
+    },
+    "xml_parse_errors": [
+      "rules/0910-ms-exchange-proxylogon_rules.xml"
+    ],
+    "empty_or_nonmapping_yaml": [
+      "tests/regression/tests/REQUEST-920-PROTOCOL-ENFORCEMENT/920539.yaml"
+    ],
+    "output_sha256": {
+      "regression-records.jsonl": "58398eb5757f51a9593752960d0a3095c6c96f213238b3068b67bedfdd0025be",
+      "knowledge-records.jsonl": "a3bc1cdd346e4440dc918833884c382da525e2b6c8f66c451101e45aa401022f"
+    },
+    "limitations": [
+      "No engine replay or model tokenization",
+      "Provisional family partitions need cross-history/semantic overlap review",
+      "No institutional certification of generated dialogues",
+      "No new SFT admission or GPU training"
+    ],
+    "training_admitted": 0,
+    "raw_cases_are_independent_incidents": false
+  },
+  "incident_reports": {
+    "files_acquired": 4,
+    "bytes": 5055884,
+    "files": [
+      {
+        "id": "CERTFR-2025-CTI-007",
+        "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2025-CTI-007.pdf",
+        "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2025-CTI-007/",
+        "format": "pdf",
+        "nature": "apt28_investigation",
+        "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license",
+        "resolved_url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2025-CTI-007.pdf",
+        "sha256": "b4dea9ce6f46bec7e431ce9b1df23eec3f0baf8b697610247c25db9d0ea0d703",
+        "bytes": 372459,
+        "at_kst": "2026-11-01T12:15:39.462690+09:00",
+        "reused": false,
+        "training_admitted": false,
+        "extracted_sha256": "1ccb20ffc6be65d22fc3c27de273c45a6e62285406599194ec148817af359aa9",
+        "extraction_status": "needs_visual_review",
+        "pages": 7,
+        "sparse_pages": []
+      },
+      {
+        "id": "CERTFR-2025-CTI-009",
+        "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2025-CTI-009.pdf",
+        "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2025-CTI-009/",
+        "format": "pdf",
+        "nature": "houken_investigation",
+        "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license",
+        "resolved_url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2025-CTI-009.pdf",
+        "sha256": "d1241188aedf159759ff71f21c20a4d52b5d02306744b17c27d650e21697163c",
+        "bytes": 423607,
+        "at_kst": "2026-11-01T12:15:10.559830+09:00",
+        "reused": false,
+        "training_admitted": false,
+        "extracted_sha256": "7932a9153f8d53f86795015eeb31028e7beb8c9f9c165bb2322c5201cdf4687c",
+        "extraction_status": "needs_visual_review",
+        "pages": 22,
+        "sparse_pages": []
+      },
+      {
+        "id": "CERTFR-2026-CTI-005",
+        "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2026-CTI-005.pdf",
+        "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2026-CTI-005/",
+        "format": "pdf",
+        "nature": "turla_investigation",
+        "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license",
+        "resolved_url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2026-CTI-005.pdf",
+        "sha256": "04975abb1356ef5946f450182210a7b8662fcada5911f2550904826b8ab0df19",
+        "bytes": 1897096,
+        "at_kst": "2026-11-01T12:15:40.556456+09:00",
+        "reused": false,
+        "training_admitted": false,
+        "extracted_sha256": "7700fbd475d26517fc8dae4aeaa6d1d005692a2229381599917aae2f7ae1c249",
+        "extraction_status": "needs_visual_review",
+        "pages": 7,
+        "sparse_pages": []
+      },
+      {
+        "id": "CERTFR-2026-CTI-008",
+        "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2026-CTI-008.pdf",
+        "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2026-CTI-008/",
+        "format": "pdf",
+        "nature": "application_data_breach_lessons",
+        "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license",
+        "resolved_url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2026-CTI-008.pdf",
+        "sha256": "2cb497d2ba6689f0c193151e84ebaacbd67807edc9e7e0710897a322172aaffc",
+        "bytes": 2362722,
+        "at_kst": "2026-11-01T12:15:37.753961+09:00",
+        "reused": false,
+        "training_admitted": false,
+        "extracted_sha256": "526c429552ae43208082b295c451cf332e03f1e5bdadf2ab8da64db6eedd22e3",
+        "extraction_status": "needs_visual_review",
+        "pages": 80,
+        "sparse_pages": [
+          80
+        ]
+      }
+    ],
+    "failed_downloads": [
+      {
+        "id": "acsc_apt40",
+        "url": "https://www.cyber.gov.au/advisory/apt40-advisory",
+        "error": "RemoteDisconnected"
+      },
+      {
+        "id": "acsc_network",
+        "url": "https://www.cyber.gov.au/publication/network-segmentation-and-segregation-anti-patterns",
+        "error": "RemoteDisconnected"
+      },
+      {
+        "id": "acsc_copyright",
+        "url": "https://www.cyber.gov.au/copyright",
+        "error": "TimeoutError"
+      },
+      {
+        "id": "acsc_bianlian",
+        "url": "https://www.cyber.gov.au/advisory/stopransomware-bianlian-ransomware-group",
+        "error": "TimeoutError"
+      },
+      {
+        "id": "acsc_badcandy",
+        "url": "https://www.cyber.gov.au/advisory/dont-take-badcandy-from-strangers-how-your-devices-could-be-implanted-and-what-to-do-about-it",
+        "error": "TimeoutError"
+      },
+      {
+        "id": "acsc_report2025",
+        "url": "https://www.cyber.gov.au/publication/annual-cyber-threat-report-2024-2025",
+        "error": "TimeoutError"
+      },
+      {
+        "id": "acsc_report2024",
+        "url": "https://www.cyber.gov.au/publication/annual-cyber-threat-report-2023-2024",
+        "error": "TimeoutError"
+      },
+      {
+        "id": "acsc_ttp",
+        "url": "https://www.cyber.gov.au/advisory/summary-of-tactics-techniques-and-procedures-used-to-target-australian-networks",
+        "error": "TimeoutError"
+      },
+      {
+        "id": "acsc_ir",
+        "url": "https://www.cyber.gov.au/publication/cyber-security-incident-response-planning-practitioner-guidance",
+        "error": "RemoteDisconnected"
+      },
+      {
+        "id": "acsc_ransomware",
+        "url": "https://www.cyber.gov.au/guidance/ransomware-playbook",
+        "error": "TimeoutError"
+      },
+      {
+        "id": "acsc_logging",
+        "url": "https://www.cyber.gov.au/publication/best-practices-for-event-logging-and-threat-detection",
+        "error": "TimeoutError"
+      }
+    ],
+    "pages": 116,
+    "rights_review": "Copyright reuse/license pending; TLP/PAP CLEAR alone insufficient",
+    "visual_spot_check": {
+      "pages": {
+        "CERTFR-2025-CTI-009": [
+          15
+        ],
+        "CERTFR-2025-CTI-007": [
+          3
+        ],
+        "CERTFR-2026-CTI-005": [
+          3
+        ],
+        "CERTFR-2026-CTI-008": [
+          9
+        ]
+      },
+      "scope": "Assistant spot-check of text/table layout; not whole-document semantic or visual certification",
+      "sparse_page": "CERTFR-2026-CTI-008 page80 held from text-only learning"
+    }
+  },
+  "history_review": {
+    "at_kst": "2026-11-01T12:17:47.945016+09:00",
+    "unique_file_contents": 83,
+    "rows_read": 34037,
+    "history_string_hashes": 119477,
+    "new_input_values_checked": 8715,
+    "scope": "Local retained JSONL exact string values >=40 characters, whitespace trimmed",
+    "limitations": [
+      "Does not detect substrings, paraphrases or unretained server-only history",
+      "No proof of semantic novelty or final train/evaluation separation"
+    ],
+    "training_admitted": 0
+  },
+  "history_files": 129,
+  "history_matched_records": 0,
+  "training_admitted": 0,
+  "new_gpu_training": false,
+  "production_changed": false,
+  "storage": {
+    "storage": "~/Capstone_Groot_training/source-collections/20261101-soc-source-expansion-r1",
+    "files": 1016,
+    "bytes": 72908160,
+    "archive_sha256": "372c8f8d2f0284c7156ed6f430752da8cc8c1e0eedd6739ead377437fe644f15",
+    "readback_all_sha256": true,
+    "training_started": false,
+    "services_changed": false
+  },
+  "tests": {
+    "discovered": 715,
+    "passed": 712,
+    "environment_skipped": 3
+  },
+  "future_gates": [
+    "Resolve licensing/source spans and facts vs hypotheses in incident reports",
+    "Replay relevant WAF/Wazuh fixtures with correct engine/config/data dependencies",
+    "Create source-grounded SOC trajectories with live tool schemas and exact approval binding",
+    "Audit semantic/event-family history overlap, PII/secret redaction, answer leakage and token budgets",
+    "Reserve independent questions before admission; compare severe omissions/approval failures and latency against the unchanged base"
+  ],
+  "held_candidates": {
+    "siabench": {
+      "repo": "llmslayer/SIABench",
+      "commit": "99327f02d4c0eb9902b4df00881e527255d14ca6",
+      "listed_sia_json": 25,
+      "listed_triage_json": 35,
+      "license_files": [],
+      "training_admitted": 0,
+      "decision": "reserve_evaluation_metadata_only_until_rights_and_source_artifacts_verified"
+    },
+    "cisa_csaf": "105 IT/3995 OT/5 VA advisory JSON paths inspected in pinned tree; not acquired or counted as incident cases",
+    "acsc": "11 selected pages verified by browser, file acquisition failed locally and one DGX copyright probe timed out; not counted as acquired data"
+  }
+}

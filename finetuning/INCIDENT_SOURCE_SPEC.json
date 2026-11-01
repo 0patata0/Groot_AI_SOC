@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "sources": [
+    {
+      "id": "acsc_copyright",
+      "url": "https://www.cyber.gov.au/copyright",
+      "format": "html",
+      "nature": "license",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_apt40",
+      "url": "https://www.cyber.gov.au/advisory/apt40-advisory",
+      "format": "html",
+      "nature": "anonymized_incident_investigations",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_network",
+      "url": "https://www.cyber.gov.au/publication/network-segmentation-and-segregation-anti-patterns",
+      "format": "html",
+      "nature": "guidance_with_investigation_case",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_bianlian",
+      "url": "https://www.cyber.gov.au/advisory/stopransomware-bianlian-ransomware-group",
+      "format": "html",
+      "nature": "joint_advisory_from_investigations",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_badcandy",
+      "url": "https://www.cyber.gov.au/advisory/dont-take-badcandy-from-strangers-how-your-devices-could-be-implanted-and-what-to-do-about-it",
+      "format": "html",
+      "nature": "incident_observations_and_remediation",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_ttp",
+      "url": "https://www.cyber.gov.au/advisory/summary-of-tactics-techniques-and-procedures-used-to-target-australian-networks",
+      "format": "html",
+      "nature": "investigation_observations",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_report2024",
+      "url": "https://www.cyber.gov.au/publication/annual-cyber-threat-report-2023-2024",
+      "format": "html",
+      "nature": "annual_report_with_case_studies",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_report2025",
+      "url": "https://www.cyber.gov.au/publication/annual-cyber-threat-report-2024-2025",
+      "format": "html",
+      "nature": "annual_report_with_case_studies",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_logging",
+      "url": "https://www.cyber.gov.au/publication/best-practices-for-event-logging-and-threat-detection",
+      "format": "html",
+      "nature": "logging_and_correlation_guidance",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_ir",
+      "url": "https://www.cyber.gov.au/publication/cyber-security-incident-response-planning-practitioner-guidance",
+      "format": "html",
+      "nature": "incident_response_and_reporting_guidance",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "acsc_ransomware",
+      "url": "https://www.cyber.gov.au/guidance/ransomware-playbook",
+      "format": "html",
+      "nature": "containment_and_recovery_guidance",
+      "license": "CC-BY-4.0 except third-party content, logos and expressly excluded material; verify each selected extract",
+      "license_url": "https://www.cyber.gov.au/copyright"
+    },
+    {
+      "id": "CERTFR-2025-CTI-009",
+      "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2025-CTI-009.pdf",
+      "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2025-CTI-009/",
+      "format": "pdf",
+      "nature": "houken_investigation",
+      "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license"
+    },
+    {
+      "id": "CERTFR-2025-CTI-007",
+      "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2025-CTI-007.pdf",
+      "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2025-CTI-007/",
+      "format": "pdf",
+      "nature": "apt28_investigation",
+      "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license"
+    },
+    {
+      "id": "CERTFR-2026-CTI-005",
+      "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2026-CTI-005.pdf",
+      "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2026-CTI-005/",
+      "format": "pdf",
+      "nature": "turla_investigation",
+      "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license"
+    },
+    {
+      "id": "CERTFR-2026-CTI-008",
+      "url": "https://cert.cyber.gouv.fr/uploads/CERTFR-2026-CTI-008.pdf",
+      "landing_url": "https://cert.cyber.gouv.fr/cti/CERTFR-2026-CTI-008/",
+      "format": "pdf",
+      "nature": "application_data_breach_lessons",
+      "license": "Per-document review pending; TLP/PAP CLEAR is not a copyright license"
+    }
+  ],
+  "limits": {
+    "max_files": 20,
+    "max_bytes_per_file": 16777216,
+    "max_total_bytes": 67108864
+  },
+  "purpose": "Broaden SOC investigation, correlation, false-positive alternatives, containment, recovery and reporting beyond rule fixtures.",
+  "held_alternatives": {
+    "siabench": "25 SIA / 35 alert JSON in current tree, not paper total; no LICENSE, third-party artifacts; metadata only",
+    "cisa_csaf": "Vulnerability advisories, vendor republications; not incident gold; metadata only"
+  },
+  "training_admitted": 0
+}

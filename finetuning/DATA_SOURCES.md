@@ -1,5 +1,20 @@
 # 데이터 출처와 사용 범위
 
+## 2026-11-01 평가 약점 보완·관제 전반 자료 확대
+
+[고정버전·라이선스·SHA·검수원장](DEFENSIVE_SOURCE_REVIEW.json) · [재현/업무 연결](SOURCE_REVIEW_WORKFLOW.md). 평가에서 실패한 승인·WAF문법·증거해석을 우선하고 실제 사건조사/대응/복구 자료를 추가했다. 기존 GUIDE/CISA/MITRE 자료를 새수집으로 세지 않는다.
+
+| 원출처 | 확보량과 성격 | 인용/이용조건 |
+|---|---|---|
+| [OWASP CRS](https://github.com/coreruleset/coreruleset) | 5,221 공급자 회귀시험 | Apache-2.0,원장 고정commit |
+| [Wazuh v4.14.8](https://github.com/wazuh/wazuh/tree/v4.14.8/ruleset/testing) | 2,055 로그/기대튜플 시험 | GPL-2.0·파일별고지,실사건 아님 |
+| [ModSecurity](https://github.com/owasp-modsecurity/documentation) | 526 공식문서 절 | Apache-2.0,엔진버전 구분 |
+| [NIST OSCAL SP800-53](https://github.com/usnistgov/oscal-content) | 481 통제/강화항목 | CC0·NIST고지,프로젝트승인규약과 구분 |
+| [CISA COUN7ER](https://github.com/cisagov/coun7er) | 152 준비/위험/대응 지침 | MIT·ATT&CK고지,성공사건 정답 아님 |
+| [ANSSI Houken](https://cert.cyber.gouv.fr/cti/CERTFR-2025-CTI-009/)·[APT28](https://cert.cyber.gouv.fr/cti/CERTFR-2025-CTI-007/)·[Turla](https://cert.cyber.gouv.fr/cti/CERTFR-2026-CTI-005/)·[웹 정보유출](https://cert.cyber.gouv.fr/cti/CERTFR-2026-CTI-008/) | 보고서4건/116쪽 | 원문/페이지좌표보존,이용조건확정 전 학습보류 |
+
+원문은 기관/제품팀 저작물이고 입력 분리·fingerprint·분할·한국어 설명은 프로젝트 작성이다. 기관이 우리 학습세트의 정답이나 성능을 인증한 것으로 인용하지 않는다. 회귀시험 정적연결6,946/보류330,새SFT편입0. PDF의TLP/PAP CLEAR는공유표시이며 저작권라이선스와다르다. [ASD 원문이용조건](https://www.cyber.gov.au/copyright)은CCBY4.0에제3자/로고등예외가있고 이번11페이지파일수집은실패했다. [SIABench 사전공개논문](https://arxiv.org/abs/2603.06422)과 [저자저장소](https://github.com/llmslayer/SIABench)는독립평가후보metadata만확인했으며학회채택/원자료이용허가/새학습을확인한것이아니다.
+
 > **2026-11-01 GUIDE 후속 편입:** 공식 train에서 보존한3,882사건을 검수하여3,522건이 사후 분류용 입력/토큰 조건을 통과했다. 이번에 train256/validation48/test48을 선별하고 기존191/128/128과 합쳤다. 정답은 제공 IncidentGrade, 질문·특징투영은 프로젝트 작성이다. 실시간 판단·MCP 실행·조치 성공 정답으로 확장하지 않는다. 원 test/순위 자료 학습0, 조치 라벨만 있는351사건은 원자료 유지. [출처·검증·해시/한계](GUIDE_ADMISSION_20261101.json) · [재현](DGX_OVERNIGHT.md). 이전 편입0 기록은 당시 이력으로 보존한다.
 
 ## GUIDE 실제 사건 자료 선별·업무별 검수 — 2026-10-31T00:36:55.016621+09:00

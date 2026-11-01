@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "source_pins": [
+    {
+      "id": "crs",
+      "repo": "coreruleset/coreruleset",
+      "ref": "main",
+      "commit": "ca679721f6df320c88b81cdb52aea68588ff2859",
+      "tree": "f9262c40737ce444ebfcc42d8952433836dd18ee",
+      "date": "2026-10-26T18:44:24Z",
+      "license_review": "Apache-2.0"
+    },
+    {
+      "id": "wazuh",
+      "repo": "wazuh/wazuh",
+      "ref": "v4.14.8",
+      "commit": "f470ad7db717b18db7feeed568949643698f0f34",
+      "tree": "92e4716b6af69e170c946abc77c2b2a8042982df",
+      "date": "2026-09-18T08:43:02Z",
+      "license_review": "GPL-2.0 with bundled notices; preserve per-file conditions"
+    },
+    {
+      "id": "suricata_verify",
+      "repo": "OISF/suricata-verify",
+      "ref": "master",
+      "commit": "5ee54126be5161695200b7bbb714d3b354ee6880",
+      "tree": "68bf80711ac446acc7ae5562d2147471d2a98238",
+      "date": "2026-10-29T19:43:47Z",
+      "license_review": "MIT; metadata reference only this wave"
+    },
+    {
+      "id": "modsecurity_docs",
+      "repo": "owasp-modsecurity/documentation",
+      "ref": "main",
+      "commit": "9946c9f60ed247179f57a602e79c0ef045dc3d3c",
+      "tree": "cad7f4dc11dcc7c513b1e2dced4ba83915405019",
+      "date": "2026-10-26T17:11:38Z",
+      "license_review": "Apache-2.0"
+    },
+    {
+      "id": "nist_controls",
+      "repo": "usnistgov/oscal-content",
+      "ref": "main",
+      "commit": "f0de6d8d8c059d374f15e0ae07508d82e370fc1d",
+      "tree": "4f7aed297fd5299535b51d296635ae0fff1c2a5f",
+      "date": "2026-10-22T21:56:10Z",
+      "license_review": "CC0-1.0 with NIST disclaimer"
+    },
+    {
+      "id": "cisa_counter",
+      "repo": "cisagov/coun7er",
+      "ref": "main",
+      "commit": "811fa2f5c283cea53124909910409359d1693dc1",
+      "tree": "9ba33197c52eb1d27c2c0e6a020c8e23dc9940f6",
+      "date": "2026-10-30T15:40:21Z",
+      "license_review": "MIT, preserve ATT&CK attribution and provider disclaimer; procedures are not successful incident outcomes"
+    }
+  ],
+  "failure_targets": [
+    {
+      "id": "approval_candidate_integrity",
+      "severity": "critical",
+      "evidence": "2026-11-01 candidate approval_changed failed; original passed",
+      "sources": [
+        "nist_controls"
+      ],
+      "limits": "NIST change approval controls are references; exact hash binding is project policy and requires separately audited trajectories."
+    },
+    {
+      "id": "invalid_waf_configuration",
+      "severity": "critical",
+      "evidence": "candidate waf_mode suggested unsupported SecRuleEngine Block/Deny",
+      "sources": [
+        "modsecurity_docs"
+      ],
+      "limits": "Select syntax for actual engine version; do not infer deployment."
+    },
+    {
+      "id": "waf_detection_vs_block",
+      "severity": "critical",
+      "evidence": "original/candidate confused definitions/matches/block outcomes",
+      "sources": [
+        "crs",
+        "modsecurity_docs"
+      ],
+      "limits": "Rule logging expectations are not proof of blocking or compromise."
+    },
+    {
+      "id": "evidence_vs_inference",
+      "severity": "critical",
+      "evidence": "original private_attack false inversion and HTTP500 unsupported inference; WAF no-tool count fabrication",
+      "sources": [
+        "wazuh",
+        "crs",
+        "nist_controls"
+      ],
+      "limits": "Regression tuples do not supply production incident verdicts."
+    },
+    {
+      "id": "rule_scope",
+      "severity": "high",
+      "evidence": "short WAF query has no verified read in both models",
+      "sources": [
+        "wazuh",
+        "crs"
+      ],
+      "limits": "Harness intent and evidence-completion bugs require code fixes too."
+    },
+    {
+      "id": "tool_schema_runtime",
+      "severity": "high",
+      "evidence": "candidate WAF Ollama HTTP500 properties must be an object",
+      "sources": [],
+      "limits": "Runtime compatibility bug; no dataset alone can establish the fix."
+    }
+  ],
+  "scope": "official source collection plus concurrent static review; no training automatically",
+  "provenance_policy": "AGENTS.md: 검증에서 확인한 약점 중심의 학습자료 수집",
+  "bounds": {
+    "max_files": 2000,
+    "total_selected_bytes": 67108864,
+    "per_file_bytes": 16777216,
+    "workers": 6
+  },
+  "holdout_policy": "Never train the 2026-11-01 comparison prompts/answers; group by connected rule family before provisional partitions; semantic and full historical holdout audit still required.",
+  "coverage_expansion": {
+    "user_request": "Existing failures are priorities, not the only training scope. Cover investigation, correlation, benign alternatives, containment, recovery and reporting.",
+    "additional_source": "cisa_counter",
+    "pending_evidence_sources": [
+      "ASD ACSC real incident investigations",
+      "ANSSI CERT-FR incident reports"
+    ],
+    "do_not_repeat_prior_cisa": [
+      "AA24-038A",
+      "AA23-061A",
+      "AA24-131A"
+    ]
+  }
+}

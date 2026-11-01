@@ -65,4 +65,58 @@ class CandidateTests(unittest.TestCase):
         with self.assertRaises(ValueError):c.source_notice(self.root)
 
 
+class ReadinessTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        self.root=Path(self.temp.name);folder=self.root/f'exports/qwen36-soc-{c.VARIANT}-gguf';folder.mkdir(parents=True)
+        (folder/'registration-status.json').write_text(json.dumps({'status':'completed','model':c.MODEL,'digest':'candidate','original_digest':'original'}))
+        self.loaded=[];self.memory=96*1024**3;self.posts=[];self.calls=0;self.error=False;self.cpu=False;self.race=None
+        self.tags={'models':[{'name':c.MODEL,'digest':'candidate'},{'name':'qwen3.6:35b','digest':'original'}]}
+
+    def api(self,path,payload=None,**kwargs):
+        if path=='/api/tags':return self.tags
+        if path=='/api/ps':
+            self.calls+=1
+            if self.race==self.calls:self.loaded.append({'name':'other'})
+            return {'models':list(self.loaded)}
+        self.posts.append(payload)
+        if self.error:raise TimeoutError('fixture')
+        self.loaded=[{'name':c.MODEL,'digest':'candidate','size':100,'size_vram':50 if self.cpu else 100,'context_length':262144}]
+        return {'done':True,'response':'준비 완료','load_duration':1,'total_duration':2}
+
+    def run_gate(self,warm=True):
+        return c.readiness(self.root,warm=warm,api_fn=self.api,memory_fn=lambda:{'MemAvailable':self.memory})
+
+    def test_other_model_is_never_evicted_or_warmed_over(self):
+        self.loaded=[{'name':'qwen3.6:35b'}]
+        self.assertEqual(self.run_gate()['status'],'blocked');self.assertEqual(self.posts,[])
+
+    def test_low_margin_blocks_and_preflight_never_allocates(self):
+        self.memory=63*1024**3;self.assertEqual(self.run_gate()['status'],'blocked')
+        self.memory=96*1024**3;self.assertEqual(self.run_gate(False)['status'],'preflight_passed')
+        self.assertEqual(self.posts,[])
+
+    def test_changed_registered_digest_blocks(self):
+        self.tags['models'][0]['digest']='changed'
+        self.assertEqual(self.run_gate()['status'],'blocked');self.assertEqual(self.posts,[])
+
+    def test_preallocation_race_blocks_and_late_race_cannot_report_ready(self):
+        self.race=2;self.assertEqual(self.run_gate()['status'],'blocked');self.assertEqual(self.posts,[])
+        self.loaded=[];self.calls=0;self.race=3
+        self.assertEqual(self.run_gate()['status'],'failed');self.assertEqual(len(self.posts),1)
+
+    def test_failed_load_is_not_retried_or_promoted(self):
+        self.error=True;result=self.run_gate()
+        self.assertEqual(result['status'],'failed');self.assertEqual(len(self.posts),1)
+        self.assertFalse(result['automatic_retry']);self.assertFalse(result['automatic_promotion'])
+        self.assertEqual(len(list((self.root/'inference-readiness').glob('*.json'))),1)
+
+    def test_partial_cpu_offload_does_not_pass_gpu_readiness(self):
+        self.cpu=True;self.assertEqual(self.run_gate()['status'],'failed')
+
+    def test_complete_gpu_result_is_readiness_not_driver_fix(self):
+        result=self.run_gate();self.assertEqual(result['status'],'ready')
+        self.assertEqual(len(self.posts),1);self.assertFalse(result['driver_fix_proven'])
+
+
 if __name__=='__main__':unittest.main()

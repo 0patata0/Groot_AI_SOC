@@ -11,6 +11,7 @@ import math
 from pathlib import Path
 import shutil
 import sys
+import time
 from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -116,9 +117,87 @@ def verify_conversion(root, conversion):
     return receipt
 
 
+def memory_snapshot():
+    values = {}
+    for line in Path('/proc/meminfo').read_text().splitlines():
+        name, rest = line.split(':', 1)
+        if name in ('MemTotal', 'MemFree', 'MemAvailable', 'Cached', 'SReclaimable', 'Unevictable', 'CmaFree'):
+            values[name] = int(rest.split()[0]) * 1024
+    if values.get('MemAvailable', -1) < 0: raise ValueError('Memory availability unknown')
+    return values
+
+
+def readiness(root, *, warm=False, api_fn=None, memory_fn=memory_snapshot):
+    """Opt-in preparation gate; no eviction, service changes, retry or promotion.
+
+    64 GiB is a conservative admission policy for this 35B candidate, not proof
+    that the NVIDIA allocator will succeed. External API callers can race this
+    check; the final loaded-model check catches overlap but cannot prevent it.
+    """
+    import fcntl
+    from register_soc import api
+    root = Path(root); api_fn = api_fn or api
+    registration = read(root/f'exports/qwen36-soc-{VARIANT}-gguf/registration-status.json')
+    if registration.get('status') != 'completed' or registration.get('model') != MODEL:
+        raise ValueError('Completed candidate registration required')
+    receipt = {'at_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat(), 'model': MODEL,
+               'status': 'checking', 'warm_requested': warm, 'model_posts': 0,
+               'minimum_available_bytes': 64*1024**3, 'automatic_promotion': False,
+               'automatic_retry': False, 'driver_fix_proven': False}
+    directory = root/'inference-readiness'; directory.mkdir(exist_ok=True)
+    lock = directory/'gate.lock'
+    if lock.is_symlink(): raise ValueError('Unsafe readiness lock')
+    with lock.open('a') as handle:
+        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        record = directory/(datetime.now(ZoneInfo('Asia/Seoul')).strftime('%Y%m%dT%H%M%S%f')+'.json')
+        def inspect():
+            tags = {m['name']: m['digest'] for m in api_fn('/api/tags')['models']}
+            loaded = api_fn('/api/ps')['models']
+            memory = memory_fn()
+            reasons = []
+            if tags.get(MODEL) != registration['digest']: reasons.append('candidate_digest_changed')
+            if tags.get('qwen3.6:35b') != registration['original_digest']: reasons.append('original_digest_changed')
+            if any(m['name'] != MODEL for m in loaded): reasons.append('other_models_loaded')
+            if memory['MemAvailable'] < receipt['minimum_available_bytes']: reasons.append('insufficient_memory_margin')
+            return {'loaded': loaded, 'memory': memory, 'reasons': reasons}
+        def on_gpu(snapshot):
+            return any(m['name'] == MODEL and m.get('digest') == registration['digest']
+                       and m.get('size', 0) > 0 and m.get('size_vram', 0) >= m['size'] * 0.99
+                       and m.get('context_length') == 262144
+                       for m in snapshot['loaded'])
+        started = time.monotonic()
+        try:
+            receipt['before'] = inspect()
+            if receipt['before']['reasons']:
+                receipt['status'] = 'blocked'
+            elif not warm:
+                receipt['status'] = 'preflight_passed'
+            else:
+                # Recheck immediately before allocation; never unload someone else's model.
+                receipt['admission'] = inspect()
+                if receipt['admission']['reasons']:
+                    receipt['status'] = 'blocked'
+                else:
+                    receipt['model_posts'] = 1
+                    result = api_fn('/api/generate', {'model': MODEL, 'prompt': '준비 완료라고만 답하세요.',
+                        'stream': False, 'think': False, 'keep_alive': '5m',
+                        'options': {'temperature': 0, 'num_predict': 16, 'num_ctx': 262144}}, timeout=90)
+                    receipt['after'] = inspect()
+                    if (not result.get('done') or not result.get('response', '').strip()
+                            or receipt['after']['reasons'] or not on_gpu(receipt['after'])):
+                        raise ValueError('Candidate GPU readiness not established')
+                    receipt.update(status='ready', load_duration_ns=result.get('load_duration'),
+                                   total_duration_ns=result.get('total_duration'))
+        except Exception as error:
+            receipt.update(status='failed', error_type=type(error).__name__)
+        receipt['seconds'] = time.monotonic() - started
+        record.write_text(json.dumps(receipt, ensure_ascii=False, indent=2)+'\n')
+        return receipt
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--phase', choices=('check', 'merge', 'convert', 'register'), required=True)
+    p.add_argument('--phase', choices=('check', 'merge', 'convert', 'register', 'preflight', 'warmup'), required=True)
     p.add_argument('--root', type=Path, required=True)
     p.add_argument('--training-output', type=Path)
     p.add_argument('--data', type=Path)
@@ -140,10 +219,14 @@ def main():
     elif a.phase == 'convert':
         from convert_soc import convert
         result = convert(a.root, VARIANT, tools_root=a.tools)
-    else:
+    elif a.phase == 'register':
         from register_soc import register
         result = register(a.root, VARIANT)
+    else:
+        if sys.platform != 'linux': raise SystemExit('Readiness must run on the Thor host')
+        result = readiness(a.root, warm=a.phase == 'warmup')
     print(json.dumps(result, ensure_ascii=False))
+    if result.get('status') in ('blocked', 'failed'): raise SystemExit(2)
 
 
 if __name__ == '__main__': main()

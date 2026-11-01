@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-01T14:35:06.379258+09:00",
+  "execution_assignment": {
+    "local": [
+      "collection",
+      "cleansing",
+      "source_and_answer_review",
+      "dialogue_composition",
+      "training_control"
+    ],
+    "dgx": [
+      "training_runtime_validation",
+      "training",
+      "weight_export"
+    ],
+    "thor": [
+      "candidate_deployment",
+      "inference"
+    ]
+  },
+  "mcp": {
+    "tools": 41,
+    "reads": 17,
+    "schema_audit": {
+      "counts": {
+        "rows": 17,
+        "rows_with_calls": 17,
+        "calls": 17,
+        "current_named_calls": 17,
+        "schema_valid_calls": 17,
+        "rows_with_current_names_and_valid_arguments": 17
+      },
+      "unknown_tool_names": {},
+      "policy_and_answer_accuracy_reviewed": false,
+      "note": "Schema compatibility only. No tool executed, renamed, approved, or judged semantically correct."
+    },
+    "training_admitted": false,
+    "answer_accuracy_reviewed": false,
+    "captured_at_kst": "2026-11-01T14:24:15.291133+09:00",
+    "capture_sha256": "8f8a62e9ee94334a19b4e1e3773fdf3717f900407d460b6c2ae3c510dadb6fb5",
+    "catalog": "mcp_contract.20261101.json",
+    "catalog_sha256": "29ec48053e17144ac7eea3fcd01d0ae9d1ca3258925ac6e49362177213b03820",
+    "added_tools": [
+      "mcp__resp__get_firewall_rules",
+      "mcp__rule_a__get_security_rules",
+      "mcp__rule_b__get_security_rules",
+      "mcp__security_events__search_wazuh_alerts"
+    ],
+    "removed_tools": [],
+    "changed_existing_tools": [
+      "mcp__rule_a__get_service_action_target",
+      "mcp__rule_b__get_service_action_target",
+      "mcp__rule_write_a__propose_service_action",
+      "mcp__rule_write_a__temporarily_contain_ip",
+      "mcp__rule_write_b__propose_service_action",
+      "mcp__security_events__search_modsecurity_alerts",
+      "mcp__security_events__search_suricata_alerts",
+      "mcp__system_diagnostics__get_system_diagnostics"
+    ],
+    "strict_auditor_unsupported_raw_schemas": [
+      "mcp__wazuh_ro__get_wazuh_agent_ports",
+      "mcp__wazuh_ro__get_wazuh_agent_processes",
+      "mcp__wazuh_ro__get_wazuh_agents",
+      "mcp__wazuh_ro__get_wazuh_alert_summary",
+      "mcp__wazuh_ro__get_wazuh_cluster_nodes",
+      "mcp__wazuh_ro__get_wazuh_critical_vulnerabilities",
+      "mcp__wazuh_ro__get_wazuh_manager_error_logs",
+      "mcp__wazuh_ro__get_wazuh_rules_summary",
+      "mcp__wazuh_ro__get_wazuh_vulnerability_summary",
+      "mcp__wazuh_ro__search_wazuh_manager_logs"
+    ],
+    "protected_calls": 0,
+    "model_calls": 0,
+    "chat_posts": 0
+  },
+  "loss_runtime": {
+    "tests": 3,
+    "passed": 3,
+    "skipped": 0,
+    "seconds": 3.402,
+    "execution": "DGX existing pinned image/venv; CPU-only isolated tiny model; network none; container removed",
+    "receipt_sha256": "ad41d5fe160371611981174a24c8b176f71ac947eb5a2e305e4b2a5af8271bd1",
+    "source_sha256": {
+      "completion_loss.py": "a634fa9d5d1a5ad0a292cd1828d7975837460d6286154b1b8ecd1cd5c20078c9",
+      "tests/test_completion_loss.py": "729b0156ad77c9ad4711bc66eed5bda7c29907f14c62498936233be3bd25961f"
+    },
+    "full_model_loaded": false,
+    "warning": "Existing image pynvml deprecation FutureWarning; not a failing test; package not changed"
+  },
+  "local_capture_tests": {
+    "tests": 7,
+    "passed": 7
+  },
+  "new_gpu_training_started": false,
+  "operational_model_changed": false,
+  "training_admitted": false,
+  "ready_for_gpu_training": false,
+  "remaining": [
+    "Locally compose and semantically review source-grounded SOC dialogues; separate source facts and project contract fixtures",
+    "Bind current MCP schemas and real results; test raw schema normalization compatibility",
+    "Preserve independent evaluation sources; review privacy and historical semantic overlap",
+    "Freeze role/class mixture and exact token admission",
+    "Run longest-input GPU smoke and resource/time preflight before bounded independent main training",
+    "Compare independently; deploy to Thor only after weight/quality verification"
+  ],
+  "local_data_schema_tests": {
+    "tests": 18,
+    "passed": 18
+  }
+}

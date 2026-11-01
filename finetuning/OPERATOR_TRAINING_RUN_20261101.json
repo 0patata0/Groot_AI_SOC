@@ -1,7 +1,7 @@
 {
   "at_kst": "2026-11-01T15:54:40.915682+09:00",
   "status": "main_execution_running",
-  "observed_at_kst": "2026-11-01T15:52:13.052302+09:00",
+  "observed_at_kst": "2026-11-01T16:03:21.163584+09:00",
   "user_authorization": "Start main training and automatically resume when shared inference finishes; do not assume every failure is inference-related",
   "data": {
     "train": 8695,
@@ -54,13 +54,25 @@
     "attempt": 1,
     "attempt_stage": "main",
     "progress": {
-      "status": "loading_model",
-      "at_kst": "2026-11-01T15:51:36.071557+09:00"
+      "status": "training",
+      "at_kst": "2026-11-01T16:02:55.303352+09:00",
+      "step": 5,
+      "max_steps": 4348,
+      "elapsed_seconds": 86.18,
+      "estimated_remaining_seconds": 74859.9,
+      "peak_cuda_allocated_gib": 66.34,
+      "peak_cuda_reserved_gib": 67.38
     },
     "loaded_shared_models": 0,
     "own_container_count": 1,
     "actual_shared_interruption_and_resume_observed_in_this_run": false,
-    "whole_training_completed": false
+    "whole_training_completed": false,
+    "latest_verified_checkpoint": 4,
+    "checkpoint_files_verified": 11,
+    "checkpoint_receipt_sha256": "7aa7c1d6ddfb652f92e44643795cec29722c111b05908a9bb2165bdbedb225e7",
+    "cuda_ooms": 0,
+    "cuda_alloc_retries": 0,
+    "early_time_estimate_not_completion_promise": true
   },
   "transfer": {
     "root": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261101-r5",

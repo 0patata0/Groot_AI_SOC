@@ -367,15 +367,23 @@ def run(c):
     finally:save(c,status)
 
 
-def apply(c, path):
+def reviewed_remaining_seconds(c, window_hours=12):
+    """Keep the default window; an explicitly reviewed extension stays bounded."""
+    if type(window_hours) is not int or window_hours not in (12, 24):
+        raise ValueError('Reviewed installation window must be 12 or 24 hours')
+    remaining = int(cutoff(c['deadline_kst'])-time.time())
+    if not 1800 < remaining <= window_hours*3600:
+        raise ValueError(f'Start only in a reviewed future window of 30 minutes to {window_hours} hours')
+    return remaining
+
+
+def apply(c, path, *, reviewed_window_hours=12):
     if c.get('purpose')=='preflight_only':
         raise ValueError('Preflight-only control cannot start main training')
     if 'environment_parent' in c and resource_config(c)['root']!=c['environment_parent']:
         raise ValueError('Environment reuse must name the original resource root')
     verify_files(c)
-    remaining = int(cutoff(c['deadline_kst'])-time.time())
-    if not 1800 < remaining <= 12*3600:
-        raise ValueError('Start only in a reviewed future window of 30 minutes to 12 hours')
+    remaining = reviewed_remaining_seconds(c, reviewed_window_hours)
     subprocess.run(['docker','image','inspect',c['image']], check=True, stdout=subprocess.DEVNULL)
     source = Path(c['root'])/'source/dgx_supervisor.py'
     if str(path) != str(Path(c['root'])/'control.json'):
@@ -511,10 +519,14 @@ def start_preflight_queue(c, path):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config',type=Path,required=True)
+    parser.add_argument('--reviewed-window-hours',type=int,choices=(12,24),default=12,
+                        help='Explicitly reviewed installation window; only --apply may use 24')
     group=parser.add_mutually_exclusive_group(required=True)
     for action in ('check','apply','verify','run','stop','stop-container','prepare-environment','admit-guide','check-resume','smoke-only','run-smoke','queue-smoke','run-queued-smoke'):
         group.add_argument('--'+action,action='store_true')
     args=parser.parse_args()
+    if args.reviewed_window_hours != 12 and not args.apply:
+        parser.error('--reviewed-window-hours 24 requires --apply')
     c=read_config(args.config)
     if args.check:
         verify_files(c)
@@ -570,7 +582,7 @@ def main():
         elif args.run_queued_smoke:run_queued_smoke(c,args.config.resolve())
         elif args.smoke_only:start_preflight(c,args.config.resolve())
         elif args.run_smoke:run_once(c,smoke_only=True)
-        elif args.apply: apply(c,args.config.resolve())
+        elif args.apply: apply(c,args.config.resolve(),reviewed_window_hours=args.reviewed_window_hours)
         elif args.run: run(c)
         else:
             stop_container(c)

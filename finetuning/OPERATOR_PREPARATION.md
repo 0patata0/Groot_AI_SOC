@@ -1,5 +1,22 @@
 # 관제 학습 자료·실행 준비 — 2026-11-01
 
+## 현재 실행과 명시 기한 연장 — 2026-11-02
+
+사용자 지시로 종료를 **11/2 17:30 KST**, 저장 정리를 **17:15 KST**로 연장했다. 기존 프로세스는 시작 시 읽은 기한을 유지하므로 기존 control/profile을 덮어쓰지 않고 검증된 checkpoint1172에서 `operator-main-20261102-r6`로 계승했다. 원실행·checkpoint·학습자료·계산 설정은 보존한다. 최신 단계는 [STATUS](../STATUS.md), 제어기/체크포인트/검증 근거는 [연장 원장](OPERATOR_TRAINING_EXTENSION_20261102.json)을 따른다. 아래11/1의03:47기한은 원실행 당시 이력이다.
+
+설치 창의 기본 상한은12시간이다. 사용자가 더 긴 특정 기한을 승인한 **새 실행의 설치**에만 다음 옵션을 명시한다. 30분 초과~24시간 이하의 미래기한을 검사하며,24시간을 넘거나 `--apply` 이외 작업에 이 옵션을 사용하면 거절한다. 이미 실행 중인 작업의 인메모리 기한을 바꾸거나 무기한 재시작하는 옵션이 아니다.
+
+```bash
+sudo bash /home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/installer/deploy.sh --training-dgx --config /home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/control.json --apply --reviewed-window-hours 24
+sudo bash /home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/installer/deploy.sh --training-dgx --config /home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/control.json --verify
+```
+
+위 `--apply`는 이미 등록한 r6에 다시 실행하지 않는다. 후속 연장도 새 디렉터리·새 run_id·완전 checkpoint를 사용한다. 중지는 해당 새 control로 같은 진입점의 `--stop`을 사용한다. 독립 hard timer, RuntimeMaxSec, 학습 내부 soft cutoff, 공유 추론 우선·최대32회 조건부 재개를 유지한다. 기존 timer는 이전 run만 대상으로 하며 이번 계승 후 비활성화했다. 자동 기한 연장이나 운영 모델 승격은 없다.
+
+새 외부 패키지는 없다. 반입 소스는 기존 allowlist의 `dgx_supervisor.py`와 대응 installer 복사본, 데이터/프로필/체크포인트 검증 정보다. `pack.py`는 소스와 작은 연장 원장을 포함하고 가중치를 제외한다. 로컬42검사·DGX격리32검사 및 실제CPU checkpoint/Trainer 재개검증을 통과했다. GPU 실진행·전체학습완료·관제품질은 각각 별도 확인한다.
+
+## 11/1 준비·원실행 이력
+
 **최종 준비 결과:** 15:36:36 KST 전체35B GPU 시험2/2step·4역전파·validation8 완료,최종adapter/checkpoint2 SHA 일치를 확인했습니다. 최대예약70.10GiB/최저가용44.92GiB·CUDA OOM/재시도0입니다. `release.json`을 발행했고,이후 사용자 지시로 아래 본학습을 시작했습니다. 아래 대기/모델적재 기록은 준비 당시 이력입니다.
 
 로컬에서 출처 검수·정제·대화 구성을 마친 **8,695건**을 DGX 시험 묶음에 넣었다. 실제 토큰 검사와 반입 해시 검증은 통과했다. 첫 GPU 시험은 공유 추론 사용으로 시작 전 거절됐다. 이후 사용자 지시로 **공유 추론 종료 후 자동 시험하는 대기 unit을 등록**했다. 공유 추론 종료를 감지해 **15:24:37 KST 실행, 원본 무결성/토큰 재검사 후15:26 GPU 모델 적재 단계**에 진입했다. 시험 완료·본학습·Thor 적재·운영 교체는 아직이다. [검증 원장](OPERATOR_PREPARATION_20261101.json)과 [현재 현황](../STATUS.md)을 우선한다.

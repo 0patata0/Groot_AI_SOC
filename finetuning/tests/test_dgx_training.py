@@ -85,5 +85,47 @@ class DgxTests(unittest.TestCase):
             with self.assertRaises(ValueError): dgx.apply(self.c,Path('/unused'))
             run.assert_not_called()
 
+    def test_extended_window_requires_explicit_choice_and_is_bounded(self):
+        deadline=dgx.cutoff(self.c['deadline_kst'])
+        with patch.object(dgx.time,'time',return_value=deadline-17*3600):
+            with self.assertRaises(ValueError): dgx.reviewed_remaining_seconds(self.c)
+            self.assertEqual(dgx.reviewed_remaining_seconds(self.c,24),17*3600)
+        for remaining in (0,1800,24*3600+1):
+            with self.subTest(remaining=remaining),patch.object(dgx.time,'time',return_value=deadline-remaining):
+                with self.assertRaises(ValueError): dgx.reviewed_remaining_seconds(self.c,24)
+        for choice in (True,13,25,24.0):
+            with self.subTest(choice=choice),self.assertRaises(ValueError):
+                dgx.reviewed_remaining_seconds(self.c,choice)
+
+    def test_extended_window_rejected_before_service_creation_without_choice(self):
+        with patch.object(dgx,'verify_files'),patch.object(dgx.time,'time',return_value=dgx.cutoff(self.c['deadline_kst'])-17*3600),patch.object(dgx.subprocess,'run') as run:
+            with self.assertRaises(ValueError): dgx.apply(self.c,Path('/unused'))
+            run.assert_not_called()
+
+    def test_extended_choice_cannot_change_stop_or_verify(self):
+        for action in ('--stop','--verify','--run','--queue-smoke'):
+            with self.subTest(action=action),patch.object(sys,'argv',['dgx','--config','unused',action,'--reviewed-window-hours','24']),patch.object(dgx,'read_config') as read:
+                with self.assertRaises(SystemExit): dgx.main()
+                read.assert_not_called()
+
+    def test_extended_apply_keeps_matching_runtime_and_independent_kst_timer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            units=Path(tmp)
+            def paths(value):
+                return units if str(value)=='/etc/systemd/system' else Path(value)
+            with patch.object(dgx,'Path',side_effect=paths),patch.object(dgx,'verify_files'), \
+                 patch.object(dgx.time,'time',return_value=dgx.cutoff(self.c['deadline_kst'])-17*3600), \
+                 patch.object(dgx.subprocess,'run') as run:
+                dgx.apply(self.c,Path(self.c['root'])/'control.json',reviewed_window_hours=24)
+            service=(units/(self.c['run_id']+'.service')).read_text()
+            timer=(units/(self.c['run_id']+'-deadline.timer')).read_text()
+            self.assertIn('RuntimeMaxSec=61200',service)
+            self.assertIn('KillMode=control-group',service)
+            self.assertIn('--stop-container',service)
+            self.assertIn('2026-11-01 06:30:00 Asia/Seoul',timer)
+            self.assertIn('Persistent=true',timer)
+            calls=[call.args[0] for call in run.call_args_list]
+            self.assertLess(calls.index(['systemctl','is-active','--quiet',self.c['run_id']+'-deadline.timer']),calls.index(['systemctl','start',self.c['run_id']+'.service']))
+
 
 if __name__=='__main__': unittest.main()

@@ -1,0 +1,93 @@
+{
+  "observed_at_kst": "2026-11-02T00:37:58.216736+09:00",
+  "status": "main_model_reload",
+  "authorization": "User requested extending training cutoff to the estimated completion time; final fixed cutoff includes save/evaluation margin",
+  "run_id": "capstone-dgx-20261102-r6",
+  "root": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6",
+  "previous_run_id": "capstone-dgx-20261101-r5main",
+  "prior_record": "OPERATOR_TRAINING_RUN_20261101.json",
+  "model": "Qwen/Qwen3.6-35B-A3B",
+  "data": {
+    "train": 8695,
+    "validation": 176,
+    "test": 176,
+    "additional_reserved_evaluation": 31,
+    "train_sha256": "eb102b962c3b5f3a772fb747939d054bd70ad8a7ff9bfacc7b0cd4f73ae9ea87",
+    "num_train_epochs": 1,
+    "planned_optimizer_steps": 4348,
+    "all_assistant_turns": 8754,
+    "truncation": false
+  },
+  "deadline_kst": "2026-11-02T17:30:00+09:00",
+  "soft_cutoff_kst": "2026-11-02T17:15:00+09:00",
+  "reviewed_window_hours": 24,
+  "default_window_hours_unchanged": 12,
+  "resume": {
+    "step": 1172,
+    "verified_files": 11,
+    "checkpoint_marker_sha256": "52511d358de57ffe65970177ad9cdab2b1e3e543a3708c27161c8b8c515e7d04",
+    "optimizer_rng_scheduler_restored": null,
+    "cpu_resume_check": {
+      "checkpoint_step": 1172,
+      "adapter_tensors_finite": 380,
+      "cpu_trainer_peft_resume": "bitwise_equal_to_uninterrupted_4_steps",
+      "post_save_checkpoint_completion": "verified_on_installed_trainer",
+      "scope": "Small CPU integration; full 35B resumption still requires actual GPU progress"
+    },
+    "old_checkpoint_read_only": true,
+    "previous_runs_preserved": true,
+    "actual_full_model_restore": "pending during model reload"
+  },
+  "controller": {
+    "active": true,
+    "parent_pid": 1,
+    "deadline_timer_active": true,
+    "original_timer_disabled": true,
+    "retry_attempts": 32,
+    "idle_seconds": 60,
+    "memory_floor_gib": 96,
+    "shared_inference_priority": true,
+    "automatic_deadline_extension": false,
+    "stage": "main",
+    "attempt": 1
+  },
+  "verification": {
+    "local_tests_passed": 42,
+    "dgx_isolated_tests_passed": 32,
+    "new_input_files_sha_verified": 54,
+    "data_and_training_math_unchanged": true,
+    "source_sha256": "4fe9f2bccc1ca8a4658a96ca1a1cf71745cab38ebff8749d2c18c98f9a7a218c",
+    "control_sha256": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
+    "new_packages": 0,
+    "new_server_install_test": false,
+    "actual_attack_e2e": false,
+    "whole_training_completed": false,
+    "actual_gpu_continuation_observed": false,
+    "remote_staging_files_removed": 26,
+    "remote_staging_removed": true,
+    "old_control_sha256_unchanged": true
+  },
+  "time_estimate": {
+    "basis_at_kst": "2026-11-02T00:34:13.970769+09:00",
+    "seconds_per_step": 18.17348717948718,
+    "remaining_steps_at_resume": 3176,
+    "remaining_training_hours": 16.03,
+    "excludes": [
+      "shared inference wait",
+      "reload",
+      "final evaluation"
+    ],
+    "not_completion_promise": true
+  },
+  "operating_models_changed": false,
+  "weights_in_git": false,
+  "public_paths_use_ACCOUNT_placeholder": true,
+  "last_observed_training_step_before_extension": {
+    "status": "training",
+    "at_kst": "2026-11-02T00:34:13.970769+09:00",
+    "step": 1175,
+    "max_steps": 4348,
+    "resumed_from_step": 980,
+    "elapsed_seconds": 3543.83
+  }
+}

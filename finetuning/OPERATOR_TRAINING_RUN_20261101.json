@@ -178,5 +178,14 @@
     "post_training_validation_reference_seconds": 398.7065,
     "post_training_validation_reference": "Prior 447-record run, same validation count176; historical, not current timing",
     "remaining_from_verified_checkpoint_seconds": 65551.0
+  },
+  "subsequent_execution": {
+    "observed_at_kst": "2026-11-02T00:34:38.543197+09:00",
+    "reason": "User explicitly extended to estimated completion window",
+    "new_run_id": "capstone-dgx-20261102-r6",
+    "new_record": "OPERATOR_TRAINING_EXTENSION_20261102.json",
+    "last_preserved_checkpoint": 1172,
+    "original_run_preserved": true,
+    "original_deadline_timer_disabled": true
   }
 }

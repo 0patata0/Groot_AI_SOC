@@ -1,5 +1,5 @@
 {
-  "observed_at_kst": "2026-11-02T00:37:58.216736+09:00",
+  "observed_at_kst": "2026-11-02T00:39:37.029297+09:00",
   "status": "main_model_reload",
   "authorization": "User requested extending training cutoff to the estimated completion time; final fixed cutoff includes save/evaluation margin",
   "run_id": "capstone-dgx-20261102-r6",
@@ -89,5 +89,16 @@
     "max_steps": 4348,
     "resumed_from_step": 980,
     "elapsed_seconds": 3543.83
+  },
+  "live": {
+    "stage": "loading_model",
+    "stage_at_kst": "2026-11-02T00:37:18.156096+09:00",
+    "service_active": true,
+    "parent_pid": 1,
+    "timer_active": true,
+    "shared_models_loaded": 0,
+    "own_container_count": 1,
+    "memory_available_gib": 50.04,
+    "new_optimizer_steps_observed": false
   }
 }

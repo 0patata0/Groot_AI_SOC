@@ -4,6 +4,10 @@ set -euo pipefail
 umask 077
 
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+if [[ ${1:-} == --model-candidate ]]; then
+  shift
+  exec python3 -IB "$HERE/finetuning/candidate_model.py" "$@"
+fi
 if [[ ${1:-} == --training-dgx ]]; then
   shift
   exec python3 -IB "$HERE/finetuning/dgx_supervisor.py" "$@"

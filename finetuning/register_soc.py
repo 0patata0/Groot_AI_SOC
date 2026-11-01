@@ -83,6 +83,9 @@ def verify_runtime(original,show,expected_template,files):
 
 
 def candidate_name(variant):
+    if variant=='dgx-guide':
+        from candidate_model import MODEL
+        return MODEL
     if variant in ('base','main'):return f'soc-qwen36:35b-{variant}-q4km-20261027'
     if variant in ('v2-step24','v2-step48'):return f'soc-qwen36:35b-{variant}-q4km-20261028'
     if variant=='v5':return 'soc-qwen36:35b-evidence-v5-q4km-20261029'
@@ -124,6 +127,13 @@ def register(root,variant):
         if model in before:raise ValueError('Candidate already exists; refusing replacement')
         original=api('/api/show',{'model':'qwen3.6:35b'})
         expected_runtime=original
+        if variant=='dgx-guide':
+            from candidate_model import verify_conversion, source_notice
+            state['training_coverage']=verify_conversion(root,conversion)
+            notice=source_notice(root)
+            expected_runtime=with_source_notice(original,notice)
+            (folder/'training-source-attribution.txt').write_text(notice)
+            state['training_source_attribution_sha256']=hashlib.sha256(notice.encode()).hexdigest()
         if variant=='v5':
             from verify_evidence_training import verify
             state['training_coverage']=verify(root)

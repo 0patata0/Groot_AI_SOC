@@ -13,8 +13,8 @@ from convert_reference import REVISION,digest
 from download_model import verify_artifact
 
 
-def convert(root,variant):
-    root=Path(root);tools=root/'comparisons/foundation-sec-8b-instruct-20261027'
+def convert(root,variant,tools_root=None):
+    root=Path(root);tools=Path(tools_root) if tools_root is not None else root/'comparisons/foundation-sec-8b-instruct-20261027'
     source=tools/'llama.cpp';quantizer=source/'build-cpu/bin/llama-quantize'
     if subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip()!=REVISION:
         raise ValueError('Pinned converter source required')
@@ -27,11 +27,14 @@ def convert(root,variant):
         if not manifest.get('verified') or manifest['revision']!='995ad96eacd98c81ed38be0c5b274b04031597b0':
             raise ValueError('Verified pinned base required')
         files=manifest['files']
-    elif variant in ('pilot','main','v2-step24','v2-step48','v5'):
+    elif variant in ('pilot','main','v2-step24','v2-step48','v5','dgx-guide'):
         model=root/f'exports/qwen36-soc-{variant}-hf';manifest=json.loads((model/'merge-status.json').read_text())
         if manifest.get('status')!='completed' or manifest['base_revision']!='995ad96eacd98c81ed38be0c5b274b04031597b0' or manifest['verified_tensors']!=1045 or manifest['target_modules']!=190 or manifest['preserved_mtp_tensors']!=19:
             raise ValueError('Complete verified SOC merge required')
         files=manifest['files']
+        if variant=='dgx-guide':
+            from candidate_model import verified_receipt
+            verified_receipt(root,manifest)
         if variant=='v5':
             from verify_evidence_training import verify
             if verify(root)['adapter_sha256']!=manifest['adapter_sha256']:
@@ -44,6 +47,8 @@ def convert(root,variant):
     else:raise ValueError('Unknown conversion variant')
     folder=root/f'exports/qwen36-soc-{variant}-gguf';folder.mkdir(parents=True,exist_ok=False)
     record=folder/'conversion-status.json';state={'status':'checking','variant':variant,'started_at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),'llama_cpp_revision':REVISION}
+    if variant=='dgx-guide':
+        state.update(adapter_sha256=manifest['adapter_sha256'],training_verification_sha256=digest(root/'training-verification.json'))
     def save():
         temp=record.with_suffix('.tmp');temp.write_text(json.dumps(state,indent=2)+'\n');temp.replace(record)
     save()
@@ -57,6 +62,8 @@ def convert(root,variant):
                 raise ValueError('Source model artifact mismatch: '+item['path'])
         env=os.environ.copy();env.update(PYTHONDONTWRITEBYTECODE='1',HF_HUB_OFFLINE='1',TRANSFORMERS_OFFLINE='1',
             PYTHONPATH=str(tools/'conversion-python-deps')+os.pathsep+str(source/'gguf-py'))
+        # Pinned CPU builds may use a build-tree RPATH from their source host.
+        env['LD_LIBRARY_PATH']=str(source/'build-cpu/bin')+os.pathsep+env.get('LD_LIBRARY_PATH','')
         with (folder/'conversion.log').open('a',buffering=1) as log:
             def run(args):
                 subprocess.run([str(a) for a in args],cwd=source,env=env,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=3600)

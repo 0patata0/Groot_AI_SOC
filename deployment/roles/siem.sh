@@ -146,6 +146,7 @@ def hermes_extension_files():
         'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py',
         'infra/hermes/gateway_health.py': 'plugins/groot-query-completion/gateway_health.py',
         'infra/hermes/chat_contract.py': 'plugins/groot-query-completion/chat_contract.py',
+        'infra/hermes/chat_markdown.py': 'plugins/groot-query-completion/chat_markdown.py',
         'infra/hermes/read_contract.py': 'plugins/groot-query-completion/read_contract.py',
         'infra/hermes/SOUL.groot.md': 'plugins/groot-query-completion/soc_policy.md',
         'infra/ollama-trial/harness.py': 'plugins/groot-query-completion/chat_harness.py'}

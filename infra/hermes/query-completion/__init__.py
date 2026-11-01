@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.19.2"
+VERSION = "groot-query-completion:1.19.3"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "992b24f2745bb8c3f08b664fb69142ccb538c28397ab973ab844160cb22b92c8"
@@ -35,6 +35,15 @@ def _load_evidence():
     module.__file__ = str(path)
     exec(compile(raw, str(path), 'exec'), module.__dict__)
     return module
+
+def _load_chat_markdown():
+    path=Path(__file__).with_name('chat_markdown.py')
+    if not path.exists():path=Path(__file__).parent.parent/'chat_markdown.py'
+    module=ModuleType('_capstone_chat_markdown')
+    exec(compile(path.read_bytes(),str(path),'exec'),module.__dict__)
+    return module
+
+CHAT_MARKDOWN = _load_chat_markdown()
 
 EVIDENCE = _load_evidence()
 SOURCE_ROOT = Path("/opt/hermes")
@@ -948,7 +957,7 @@ def make_wrapper(original, native, append_message, reanchor):
         if (str(getattr(platform, 'value', platform)).lower() == 'mattermost'
                 and kw.get('finish_reason') == 'stop' and isinstance(text, str)
                 and not getattr(kw.get('assistant_message'), 'tool_calls', None)):
-            shown = EVIDENCE.kst_display(text)
+            shown = CHAT_MARKDOWN.normalize_tables(EVIDENCE.kst_display(text))
             if shown != text:
                 kw = _with_final_text(kw, shown)
         return original(agent, **kw)

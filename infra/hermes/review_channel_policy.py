@@ -2,6 +2,13 @@
 import hashlib
 import json
 import re
+from pathlib import Path
+from types import ModuleType
+
+_format = ModuleType('_review_chat_markdown')
+_format_path = Path(__file__).with_name('chat_markdown.py')
+exec(compile(_format_path.read_bytes(),str(_format_path),'exec'),_format.__dict__)
+normalize_tables = _format.normalize_tables
 
 ID = re.compile(r'[a-z0-9]{26}\Z')
 
@@ -86,4 +93,5 @@ def render(answer, job, site_url):
     text = re.sub(r'(?m)^MANAGEMENT_STATUS:[^\r\n]*$', '', answer).strip()
     if len(text) > 13500:
         text = text[:13500] + '\n(길이 제한으로 일부 생략됨)'
+    text = normalize_tables(text)
     return f'**{role}** · [원질문]({site_url}/_redirect/pl/{source})\n\n{text}'

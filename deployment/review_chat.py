@@ -14,7 +14,7 @@ from urllib.parse import urlsplit
 ROOT = Path('/opt/capstone-review-chat')
 ETC = Path('/etc/capstone-review-chat')
 STATE = Path('/var/lib/capstone-review-chat')
-SOURCES = ('review_channel.py', 'review_channel_worker.py', 'review_channel_policy.py')
+SOURCES = ('review_channel.py', 'review_channel_worker.py', 'review_channel_policy.py', 'chat_markdown.py')
 UNIT = '/etc/systemd/system/capstone-review-chat.service'
 
 

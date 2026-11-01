@@ -227,14 +227,14 @@ class Tests(unittest.TestCase):
         config={'mcp_servers':{'only-readonly':{}},'toolsets':['mcp-wazuh-ro']}
         baseline=copy.deepcopy(config)
         env=self.n['install_hermes_extensions'](self.n['DEST']/'bot',user,creds,config)
-        self.assertEqual(len(written),15)
-        self.assertEqual(len(reads),15)
+        self.assertEqual(len(written),16)
+        self.assertEqual(len(reads),16)
         self.assertEqual({pathlib.Path(p).name for p in written},{'__init__.py','plugin.yaml','channel_sync.py','HOOK.yaml','handler.py','grounding.py',
-            'alignment.py','progress.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
+            'alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
         self.assertTrue(any('/plugins/groot-mattermost-context/' in p for p in written))
         self.assertTrue(any('/hooks/groot-mattermost-channel-sync/' in p for p in written))
         self.assertEqual({pathlib.Path(p).name for p in written if '/plugins/groot-query-completion/' in p},
-                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','progress.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
+                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
         self.assertTrue(all(value[1:]==(0o600,995,986) for value in written.values()))
         self.assertTrue(all(value[1:]==(0o700,995,986) for value in created))
         self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context','groot-query-completion']})

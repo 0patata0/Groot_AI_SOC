@@ -71,8 +71,8 @@ class Diagram:
             + (' stroke-dasharray="9 7"' if dashed else '') + '/>'
         )
 
-    def dot(self, x, y, kind):
-        self.parts.append(f'<circle cx="{x}" cy="{y}" r="6" fill="{COLORS[kind]}"/>')
+    def dot(self, x, y, kind, radius=6):
+        self.parts.append(f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{COLORS[kind]}"/>')
 
     def write(self, filename):
         (ROOT / filename).write_text('\n'.join(self.parts + ['</svg>']) + '\n')
@@ -96,7 +96,7 @@ def architecture():
           "#eeecfd", "#7b6adb", "#4e429e", 22, 28)
     d.box(2170, 142, 385, 165, "DGX Spark", ["학습·체크포인트 / 공유 추론 우선", "본학습 자동 운영 승격 없음"],
           "#e7f4ee", "#44947d", "#246b55", 20, 27)
-    d.line("M2360 307V346H2040V307", "training", True, dashed=True)
+    d.line("M2360 307C2360 365 2040 365 2040 307", "training", True, dashed=True)
     d.text(2070, 376, "가중치 검증 → 후보 적재·비교", 20, COLORS["training"])
 
     d.rect(45, 400, 2510, 1050, "#fcfcfb", "#555555", 22)
@@ -115,7 +115,7 @@ def architecture():
     d.box(1320, 565, 365, 195, "Suricata IDS", ["PASSIVE · ens192 패킷 관측", "ET + local → all.rules", "인라인 차단 엔진 아님"], stroke="#cf7757")
     d.box(1725, 565, 365, 195, "Vector + Wazuh Agent", ["FW · WAF · IDS 로그", "정제·수집 → B Wazuh", "호스트 진단 근거"], stroke="#cf7757", title_size=24)
     d.box(2130, 565, 365, 195, "nftables Firewall", ["B/C 외부 통신 NAT", "정책·보호 주소·차단 TTL", "승인된 조치 실행·검증"], stroke="#cf7757")
-    d.line("M2495 650H2535V360H1880V307", "llm", True, True,
+    d.line("M2495 650C2560 650 2550 360 2450 360H1900Q1880 360 1880 340V307", "llm", True, True,
            edge_id="gateway-thor-inference")
     d.text(1628, 391, "B 추론 터널 → A 경유 → Thor", 20, COLORS["llm"])
 
@@ -146,24 +146,35 @@ def architecture():
                          (1335, 1020, "approval"), (2270, 1020, "attack")]:
         d.line(f"M{x} 922V{end}", kind, True)
     d.line("M1857 1020V922", "logs", True)
-    d.line("M2497 922V1190H2450V1210", "attack", True)
+    d.line("M2500 922V1260Q2500 1280 2480 1280", "attack", True)
     d.line("M330 1210V1160", "mcp", True)
-    # Keep the existing equipment geometry. Each bot gets its own explicit
-    # chat, A/B MCP and inference arrows; shared tails are logical transport.
-    d.line("M575 1280H545", "mcp", True, True, edge_id="hermes-mcp-b")
-    d.line("M1085 1280H1070V1360H555V1330H545", "mcp", True, True,
-           edge_id="ollama-mcp-b")
+    # Preserve equipment geometry. Short bot branches meet one shared route
+    # per protocol, avoiding duplicated zigzags. Gaps mark non-joining chat
+    # crossings; colored dots mark actual schematic joins. These are logical
+    # connections, not extra brokers, services or physical links.
+    d.line("M560 1180H795M815 1180H1088M1110 1180H1590Q1606 1180 1606 1164V922",
+           "mcp", True, edge_id="mcp-shared-to-a")
+    d.line("M560 1180V1272Q560 1280 552 1280H545", "mcp", True,
+           edge_id="mcp-shared-to-b")
+    d.line("M1015 1210V1180", "mcp", both=True, width=2,
+           edge_id="hermes-mcp-shared")
+    d.line("M1470 1210V1180", "mcp", both=True, width=2,
+           edge_id="ollama-mcp-shared")
+    for x in [1015, 1470]:
+        d.dot(x, 1180, "mcp", radius=3)
     d.line("M805 1160V1210", "approval", True, True, edge_id="mattermost-hermes")
-    d.line("M1000 1160V1166H1210V1210", "approval", True, True,
+    d.line("M1075 1145L1120 1210", "approval", True, True,
            edge_id="mattermost-ollama")
     d.line("M1105 1090H1075", "approval", True)
-    d.line("M1010 1210V1184H1625V922", "llm", True, True,
+    d.line("M980 1372H1612Q1628 1372 1628 1356V922", "llm", True,
+           edge_id="inference-shared-to-gateway")
+    d.line("M980 1350V1372", "llm", both=True, width=2,
            edge_id="hermes-inference")
-    d.line("M1500 1210V1184H1625V922", "llm", True, True,
+    d.line("M1510 1350V1372", "llm", both=True, width=2,
            edge_id="ollama-inference")
-    d.line("M1035 1210V1174H1608V922", "mcp", True, True, edge_id="hermes-mcp-a")
-    d.line("M1470 1210V1174H1608V922", "mcp", True, True, edge_id="ollama-mcp-a")
-    d.text(1240, 1390, "공통 하네스 · MCP 8서버 / 41도구", 21, "#4e429e", True, True)
+    for x in [980, 1510]:
+        d.dot(x, 1372, "llm", radius=3)
+    d.text(1240, 1404, "공통 하네스 · MCP 8서버 / 41도구", 21, "#4e429e", True, True)
 
     d.rect(45, 1490, 1085, 245, "white", "#c7c7c7", 12)
     d.text(70, 1528, "범례 · 원본 도식의 색상 구분 유지", 24, bold=True)

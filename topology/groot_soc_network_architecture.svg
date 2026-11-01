@@ -35,7 +35,7 @@
 <text x="2362.5" y="180" font-size="27" style="fill:#246b55" text-anchor="middle" font-weight="700">DGX Spark</text>
 <text x="2362.5" y="217" font-size="20" style="fill:#4b5563" text-anchor="middle">학습·체크포인트 / 공유 추론 우선</text>
 <text x="2362.5" y="248" font-size="20" style="fill:#4b5563" text-anchor="middle">본학습 자동 운영 승격 없음</text>
-<path d="M2360 307V346H2040V307" fill="none" stroke="#168577" stroke-width="3" stroke-linejoin="round" marker-end="url(#training)" stroke-dasharray="9 7"/>
+<path d="M2360 307C2360 365 2040 365 2040 307" fill="none" stroke="#168577" stroke-width="3" stroke-linejoin="round" marker-end="url(#training)" stroke-dasharray="9 7"/>
 <text x="2070" y="376" font-size="20" style="fill:#168577" text-anchor="start">가중치 검증 → 후보 적재·비교</text>
 <rect x="45" y="400" width="2510" height="1050" rx="22" fill="#fcfcfb" stroke="#555555" stroke-width="2"/>
 <text x="1298" y="432" font-size="27" style="fill:#262626" text-anchor="middle" font-weight="700">ESXi Host</text>
@@ -76,7 +76,7 @@
 <text x="2312.5" y="640" font-size="21" style="fill:#4b5563" text-anchor="middle">B/C 외부 통신 NAT</text>
 <text x="2312.5" y="671" font-size="21" style="fill:#4b5563" text-anchor="middle">정책·보호 주소·차단 TTL</text>
 <text x="2312.5" y="702" font-size="21" style="fill:#4b5563" text-anchor="middle">승인된 조치 실행·검증</text>
-<path id="gateway-thor-inference" d="M2495 650H2535V360H1880V307" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)" marker-start="url(#llm)"/>
+<path id="gateway-thor-inference" d="M2495 650C2560 650 2550 360 2450 360H1900Q1880 360 1880 340V307" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)" marker-start="url(#llm)"/>
 <text x="1628" y="391" font-size="20" style="fill:#7360e6" text-anchor="start">B 추론 터널 → A 경유 → Thor</text>
 <path d="M298 760V872" fill="none" stroke="#606060" stroke-width="3" stroke-linejoin="round"/>
 <path d="M692 760V872" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)" marker-start="url(#mcp)"/>
@@ -131,18 +131,23 @@
 <path d="M1335 922V1020" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)"/>
 <path d="M2270 922V1020" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" marker-end="url(#attack)"/>
 <path d="M1857 1020V922" fill="none" stroke="#2465b5" stroke-width="3" stroke-linejoin="round" marker-end="url(#logs)"/>
-<path d="M2497 922V1190H2450V1210" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" marker-end="url(#attack)"/>
+<path d="M2500 922V1260Q2500 1280 2480 1280" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" marker-end="url(#attack)"/>
 <path d="M330 1210V1160" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
-<path id="hermes-mcp-b" d="M575 1280H545" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)" marker-start="url(#mcp)"/>
-<path id="ollama-mcp-b" d="M1085 1280H1070V1360H555V1330H545" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)" marker-start="url(#mcp)"/>
+<path id="mcp-shared-to-a" d="M560 1180H795M815 1180H1088M1110 1180H1590Q1606 1180 1606 1164V922" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
+<path id="mcp-shared-to-b" d="M560 1180V1272Q560 1280 552 1280H545" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
+<path id="hermes-mcp-shared" d="M1015 1210V1180" fill="none" stroke="#cc8a19" stroke-width="2" stroke-linejoin="round" marker-start="url(#mcp)"/>
+<path id="ollama-mcp-shared" d="M1470 1210V1180" fill="none" stroke="#cc8a19" stroke-width="2" stroke-linejoin="round" marker-start="url(#mcp)"/>
+<circle cx="1015" cy="1180" r="3" fill="#cc8a19"/>
+<circle cx="1470" cy="1180" r="3" fill="#cc8a19"/>
 <path id="mattermost-hermes" d="M805 1160V1210" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)" marker-start="url(#approval)"/>
-<path id="mattermost-ollama" d="M1000 1160V1166H1210V1210" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)" marker-start="url(#approval)"/>
+<path id="mattermost-ollama" d="M1075 1145L1120 1210" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)" marker-start="url(#approval)"/>
 <path d="M1105 1090H1075" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)"/>
-<path id="hermes-inference" d="M1010 1210V1184H1625V922" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)" marker-start="url(#llm)"/>
-<path id="ollama-inference" d="M1500 1210V1184H1625V922" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)" marker-start="url(#llm)"/>
-<path id="hermes-mcp-a" d="M1035 1210V1174H1608V922" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)" marker-start="url(#mcp)"/>
-<path id="ollama-mcp-a" d="M1470 1210V1174H1608V922" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)" marker-start="url(#mcp)"/>
-<text x="1240" y="1390" font-size="21" style="fill:#4e429e" text-anchor="middle" font-weight="700">공통 하네스 · MCP 8서버 / 41도구</text>
+<path id="inference-shared-to-gateway" d="M980 1372H1612Q1628 1372 1628 1356V922" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)"/>
+<path id="hermes-inference" d="M980 1350V1372" fill="none" stroke="#7360e6" stroke-width="2" stroke-linejoin="round" marker-start="url(#llm)"/>
+<path id="ollama-inference" d="M1510 1350V1372" fill="none" stroke="#7360e6" stroke-width="2" stroke-linejoin="round" marker-start="url(#llm)"/>
+<circle cx="980" cy="1372" r="3" fill="#7360e6"/>
+<circle cx="1510" cy="1372" r="3" fill="#7360e6"/>
+<text x="1240" y="1404" font-size="21" style="fill:#4e429e" text-anchor="middle" font-weight="700">공통 하네스 · MCP 8서버 / 41도구</text>
 <rect x="45" y="1490" width="1085" height="245" rx="12" fill="white" stroke="#c7c7c7" stroke-width="2"/>
 <text x="70" y="1528" font-size="24" style="fill:#262626" text-anchor="start" font-weight="700">범례 · 원본 도식의 색상 구분 유지</text>
 <path d="M75 1567h60" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round"/>

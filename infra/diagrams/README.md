@@ -10,7 +10,7 @@
 
 [상세형 SVG](../../topology/groot_soc_network_architecture.svg) · [버스형 SVG](../../topology/groot_soc_topology_bus.svg).
 
-상세형에서 Hermes와 Ollama 각각의 채팅·A/B MCP·추론 화살표를 확인할 수 있다. 기존 장비 배치·문구·색상과 버스형은 유지하며 변경된 연결만 보완한다. [화살표 구분](../../topology/README.md).
+상세형에서 Hermes와 Ollama 각각의 채팅·A/B MCP·추론 화살표를 확인할 수 있다. MCP와 추론은 각각 공통선과 짧은 봇별 분기로 표시해 중복 우회를 줄였다. 장비 배치·문구·색상과 버스형은 유지한다. [화살표·연결점·교차 구분](../../topology/README.md).
 
 SVG는 확대 가능한 벡터 문서다. 아래 Mermaid는 연결 관계의 텍스트 원본이다. 선은 논리 경로이며 실제 케이블·스위치 배선이나 전용선을 뜻하지 않는다. Docker 내부 브리지는 호스트별로 존재하지만 그림에서는 생략했다.
 

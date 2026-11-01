@@ -1,5 +1,7 @@
 # DGX 독립 학습 실행 — 2026-11-01
 
+> **10:48 KST 완료 확인:** 447건/1epoch·224step 본학습과 validation176건을 마치고10:05:56 KST에 정상 종료했다. 최종adapter 저장·checkpoint224 가중치 SHA 일치,부분checkpoint216의11파일 SHA를 확인했다. eval_loss0.596903은 실전 정답률이 아니며 원본 대비 관제품질·Thor 후보 적재는 아직이다. 아래 재개·중단 기록은 당시 이력으로 보존한다. [최신 상태·Git](../STATUS.md).
+
 > **09:31 KST 재개 등록:** checkpoint168을 읽기 전용으로 복원하는 새 독립 실행과 제한 자동 재개를 추가했다. 현재 실제 진행·Git은 [STATUS](../STATUS.md), 실행 기준은 아래 [자동 재개](#11월1일-168단계-재개와-제한-자동-재시도)를 따른다.
 
 > **09:20 KST 후속:** 오전재개는175/224step에서09:00:52 공유Ollama새worker감지로종료됐다.최신checkpoint168·최종검증미실행·현재자동재개없음.09:00:51 driver0x51도1건있어충돌예방완료가아니다.[최신근거·후속](../STATUS.md).아래등록/진행기록은당시이력으로보존한다.
@@ -131,3 +133,13 @@ sudo bash RUN/installer/deploy.sh --training-dgx --config RUN/control.json --ver
 실제 DGX CPU 검사에서 checkpoint168의380텐서 finite, 설치된 Trainer/PEFT의 연속4step과2+2step 재개의 비트 단위 동등성, 실제 `on_save` 이후 marker 검증을 확인했다. 로컬 학습682검사(679PASS/환경3skip)·설치218PASS. 자동 충돌 재시도는 격리 검사로 확인했으며 다른 사용자의 모델을 일부러 적재하여 운영 충돌을 재현하지 않았다. 전체 학습 완료·관제품질·Thor 후보 적재는 별도 단계다.
 
 중지는 기존 `--stop`으로 최상위 run의 실행기/정확한 label 컨테이너만 종료한다. 원본/과거 실패·각 시도의 checkpoint와 제어기 snapshot을 보존한다. 자동 재개를 끈 별도 run을 만들 수 있으나 기존 실행 상태를 덮어쓰거나 보호 기준을 낮추지 않는다.
+
+## 11월1일 본학습·validation 완료
+
+10:47~10:48 KST 읽기 조회에서 최상위/시도 supervisor, main-status, progress의 completed와 systemd Result=success/exit0/MainPID0을 대조했다. 168단계에서 재개한 첫 시도가224/224에 도달해10:05:56 KST 종료했다. 실제 토큰 검사에서 train447/validation176건 모두 유지했고 최종 eval_loss는0.5969030857086182,eval_runtime은398.7065초다. 재개 후 train_loss를 전체 학습의 품질 점수로 해석하지 않는다.
+
+최종 산출물은 `~/Capstone_Groot_training/dgx-resume-20261101-r2-a1/workspace/main/adapter/`다. 어댑터·설정·tokenizer·템플릿 등7파일 SHA를 로컬 검증 기록에 남겼다. `adapter_model.safetensors`는65,061,752B/380텐서이며 header와데이터offset 범위가 유효하고 checkpoint224 가중치와 SHA가 일치한다. 최종 SHA256은 `05953537d3f081c796f67f46ff6ecf93b526a9aaaaad16234068dfe73d028c67`이다. GPU에 모델을 올리거나 전체 텐서 수치 검사를 수행한 것은 아니다.
+
+checkpoint216은 재개용 marker의11파일 SHA가 모두 일치한다. checkpoint224에는 `resume_training.mark_completed`가 의도적으로 부분 재개 marker를 만들지 않는다. 이 상태를 저장 실패로 오인하거나224부터 추가 학습을 수행하지 않는다. 최종 어댑터/원본 base·이전 저장본은 보존하고,후속 수치·호환 검증과 동일 하네스 독립 품질 평가 후 Thor 후보를 준비한다.
+
+이번 조회는 서버 상태/파일의 읽기와 로컬 기록만 수행했다. 학습/공유추론 재시작·타이머 변경·패키지 설치·가중치 다운로드/반입·운영 모델 교체는 없었다. 보호기는 정상 종료했고 실행 중 최소가용 메모리35.86GiB를 기록했다.10:47 GPU0%/가용118.71GiB는 순간 관측이다. 11:35 KST 독립 타이머는 기존 대기를 유지한다. 코드/설치 경로 변경이 없어 회귀 테스트나 새 서버 설치 시험을 추가 실행하지 않았으며 이번 검증은 실서버 읽기 근거다.

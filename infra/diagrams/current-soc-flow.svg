@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1620" height="1140" viewBox="0 0 1620 1140" role="img" aria-labelledby="title desc">
+<title id="title">Groot SOC · 관제·MCP·승인 흐름</title><desc id="desc">두 봇 실행 위치: B  |  추론: Thor 원본 35B  |  MCP 계약: 2026-11-01 14:24 KST · 8개 논리 서버 / 41도구</desc>
+<defs>
+<marker id="blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
+<marker id="teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#087f8c"/></marker>
+<marker id="amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#b45309"/></marker>
+<marker id="gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#64748b"/></marker>
+</defs>
+<style>text{font-family:"Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif} .title{font-weight:700} .note{fill:#52657e}</style>
+<rect x="0" y="0" width="1620" height="1140" rx="0" fill="#f7f9fc"/>
+<text x="42" y="58" font-size="34" fill="#172b4d" text-anchor="start" font-weight="700">Groot SOC · 관제·MCP·승인 흐름</text>
+<text x="42" y="94" font-size="19" fill="#64748b" text-anchor="start">두 봇 실행 위치: B  |  추론: Thor 원본 35B  |  MCP 계약: 2026-11-01 14:24 KST · 8개 논리 서버 / 41도구</text>
+<rect x="40" y="145" width="280" height="180" rx="16" fill="white" stroke="#2563eb"/>
+<rect x="40" y="145" width="7" height="180" rx="3" fill="#2563eb"/>
+<text x="63" y="184" font-size="25" fill="#2563eb" text-anchor="start" font-weight="700">요청 · 사건</text>
+<text x="63" y="225" font-size="20" fill="#172b4d" text-anchor="start">사용자 자연어 요청</text>
+<text x="63" y="259" font-size="20" fill="#172b4d" text-anchor="start">자동 경보 / 조사 요청</text>
+<text x="63" y="293" font-size="20" fill="#172b4d" text-anchor="start">LLM이 관제 판단 주도</text>
+<rect x="385" y="145" width="350" height="180" rx="16" fill="white" stroke="#2563eb"/>
+<rect x="385" y="145" width="7" height="180" rx="3" fill="#2563eb"/>
+<text x="408" y="184" font-size="25" fill="#2563eb" text-anchor="start" font-weight="700">B · Mattermost</text>
+<text x="408" y="225" font-size="19" fill="#172b4d" text-anchor="start">담당 봇 배정 · 후속 문맥</text>
+<text x="408" y="259" font-size="19" fill="#172b4d" text-anchor="start">공동 검토 · 진행 상황 표시</text>
+<text x="408" y="293" font-size="19" fill="#172b4d" text-anchor="start">-agent / -hermes / -ollama</text>
+<rect x="805" y="145" width="390" height="180" rx="16" fill="white" stroke="#2563eb"/>
+<rect x="805" y="145" width="7" height="180" rx="3" fill="#2563eb"/>
+<text x="828" y="184" font-size="25" fill="#2563eb" text-anchor="start" font-weight="700">B · Hermes / Ollama 봇</text>
+<text x="828" y="225" font-size="20" fill="#172b4d" text-anchor="start">조사 · 상관분석 · 위험 판단</text>
+<text x="828" y="259" font-size="20" fill="#172b4d" text-anchor="start">변경안 작성 · 승인 요청</text>
+<text x="828" y="293" font-size="20" fill="#172b4d" text-anchor="start">적용 후 검증 · 결과 보고</text>
+<rect x="1260" y="145" width="320" height="180" rx="16" fill="white" stroke="#087f8c"/>
+<rect x="1260" y="145" width="7" height="180" rx="3" fill="#087f8c"/>
+<text x="1283" y="184" font-size="25" fill="#087f8c" text-anchor="start" font-weight="700">Thor · Ollama</text>
+<text x="1283" y="225" font-size="20" fill="#172b4d" text-anchor="start">qwen3.6:35b</text>
+<text x="1283" y="259" font-size="20" fill="#172b4d" text-anchor="start">B:11435 → A → SSH</text>
+<text x="1283" y="293" font-size="20" fill="#172b4d" text-anchor="start">Thor loopback:11434</text>
+<path d="M320 235H385" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round" marker-end="url(#blue)" marker-start="url(#blue)"/>
+<path d="M735 235H805" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round" marker-end="url(#blue)" marker-start="url(#blue)"/>
+<path d="M1195 235H1260" fill="none" stroke="#087f8c" stroke-width="3" stroke-linejoin="round" marker-end="url(#teal)" marker-start="url(#teal)" stroke-dasharray="8 7"/>
+<rect x="40" y="455" width="380" height="230" rx="16" fill="white" stroke="#087f8c"/>
+<rect x="40" y="455" width="7" height="230" rx="3" fill="#087f8c"/>
+<text x="63" y="494" font-size="25" fill="#087f8c" text-anchor="start" font-weight="700">증거 · 관측 원천</text>
+<text x="63" y="535" font-size="20" fill="#172b4d" text-anchor="start">A: FW / WAF / IDS · 호스트</text>
+<text x="63" y="569" font-size="20" fill="#172b4d" text-anchor="start">C: 웹 / 실습 · 호스트 로그</text>
+<text x="63" y="603" font-size="20" fill="#172b4d" text-anchor="start">B: Wazuh 경보·원문·상관 규칙</text>
+<text x="63" y="637" font-size="20" fill="#172b4d" text-anchor="start">현재 설정 · 수집 시각 · 범위</text>
+<rect x="500" y="455" width="440" height="230" rx="16" fill="white" stroke="#087f8c"/>
+<rect x="500" y="455" width="7" height="230" rx="3" fill="#087f8c"/>
+<text x="523" y="494" font-size="25" fill="#087f8c" text-anchor="start" font-weight="700">읽기 MCP · 근거 확보</text>
+<text x="523" y="535" font-size="21" fill="#172b4d" text-anchor="start">FW 전체 · WAF/IDS 전체 규칙</text>
+<text x="523" y="569" font-size="21" fill="#172b4d" text-anchor="start">Wazuh 기본·커스텀·상관 조건</text>
+<text x="523" y="603" font-size="21" fill="#172b4d" text-anchor="start">호스트/서비스 진단 · 실제 사건</text>
+<text x="523" y="637" font-size="21" fill="#172b4d" text-anchor="start">페이지·누락·관측 시각 확인</text>
+<rect x="1050" y="455" width="530" height="230" rx="16" fill="white" stroke="#b45309"/>
+<rect x="1050" y="455" width="7" height="230" rx="3" fill="#b45309"/>
+<text x="1073" y="494" font-size="25" fill="#b45309" text-anchor="start" font-weight="700">보호 변경안 · MCP 제안</text>
+<text x="1073" y="535" font-size="21" fill="#172b4d" text-anchor="start">정확한 대상 · 원본/후보 해시</text>
+<text x="1073" y="569" font-size="21" fill="#172b4d" text-anchor="start">허용된 규칙·서비스·차단 요청</text>
+<text x="1073" y="603" font-size="21" fill="#172b4d" text-anchor="start">LLM의 제안과 실제 실행을 구분</text>
+<text x="1073" y="637" font-size="21" fill="#172b4d" text-anchor="start">권한·승인 경계는 서버에서 강제</text>
+<path d="M920 325V385H720V455" fill="none" stroke="#087f8c" stroke-width="3" stroke-linejoin="round" marker-end="url(#teal)" marker-start="url(#teal)"/>
+<text x="750" y="414" font-size="20" fill="#087f8c" text-anchor="start">조회 ↔ 근거</text>
+<path d="M1120 325V455" fill="none" stroke="#b45309" stroke-width="3" stroke-linejoin="round" marker-end="url(#amber)"/>
+<text x="1139" y="400" font-size="20" fill="#b45309" text-anchor="start">조치 필요 시</text>
+<path d="M420 567H500" fill="none" stroke="#087f8c" stroke-width="3" stroke-linejoin="round" marker-end="url(#teal)" marker-start="url(#teal)"/>
+<rect x="1050" y="790" width="530" height="165" rx="16" fill="white" stroke="#b45309"/>
+<rect x="1050" y="790" width="7" height="165" rx="3" fill="#b45309"/>
+<text x="1073" y="829" font-size="25" fill="#b45309" text-anchor="start" font-weight="700">B · 승인 브로커 / 관리자 카드</text>
+<text x="1073" y="870" font-size="21" fill="#172b4d" text-anchor="start">지정 관리자 승인·거부 · 정확 후보 결속</text>
+<text x="1073" y="904" font-size="21" fill="#172b4d" text-anchor="start">동료 봇의 동의는 승인이 아님</text>
+<text x="1073" y="938" font-size="21" fill="#172b4d" text-anchor="start">승인 뒤에도 상태·범위 재검사</text>
+<rect x="500" y="790" width="440" height="165" rx="16" fill="white" stroke="#b45309"/>
+<rect x="500" y="790" width="7" height="165" rx="3" fill="#b45309"/>
+<text x="523" y="829" font-size="25" fill="#b45309" text-anchor="start" font-weight="700">A/B · 제한 helper / worker</text>
+<text x="523" y="870" font-size="20" fill="#172b4d" text-anchor="start">승인·해시·보호 주소·TTL 검증</text>
+<text x="523" y="904" font-size="20" fill="#172b4d" text-anchor="start">허용된 작업만 실행 · 결과 기록</text>
+<text x="523" y="938" font-size="20" fill="#172b4d" text-anchor="start">일반 sudo / 임의 shell 위임 없음</text>
+<rect x="40" y="790" width="380" height="165" rx="16" fill="white" stroke="#2563eb"/>
+<rect x="40" y="790" width="7" height="165" rx="3" fill="#2563eb"/>
+<text x="63" y="829" font-size="25" fill="#2563eb" text-anchor="start" font-weight="700">허용 대상 · 적용 후 확인</text>
+<text x="63" y="870" font-size="20" fill="#172b4d" text-anchor="start">nft 차단 · 규칙 · 고정 서비스</text>
+<text x="63" y="904" font-size="20" fill="#172b4d" text-anchor="start">실제 적용 상태와 효과 재조회</text>
+<text x="63" y="938" font-size="20" fill="#172b4d" text-anchor="start">미확인·실패·원복 결과도 보고</text>
+<path d="M1315 685V790" fill="none" stroke="#b45309" stroke-width="3" stroke-linejoin="round" marker-end="url(#amber)"/>
+<text x="1335" y="743" font-size="20" fill="#b45309" text-anchor="start">승인 요청</text>
+<path d="M1050 872H940" fill="none" stroke="#b45309" stroke-width="3" stroke-linejoin="round" marker-end="url(#amber)"/>
+<text x="994" y="850" font-size="16" fill="#b45309" text-anchor="middle">승인 소비</text>
+<path d="M500 872H420" fill="none" stroke="#b45309" stroke-width="3" stroke-linejoin="round" marker-end="url(#amber)"/>
+<path d="M230 790V685" fill="none" stroke="#087f8c" stroke-width="3" stroke-linejoin="round" marker-end="url(#teal)"/>
+<text x="248" y="740" font-size="19" fill="#087f8c" text-anchor="start">사후 검증</text>
+<rect x="40" y="995" width="1540" height="108" rx="12" fill="#fff8ed" stroke="#e9ccab"/>
+<text x="62" y="1027" font-size="20" fill="#b45309" text-anchor="start" font-weight="700">별도 긴급 경로: LLM 조사·판단 → 임시차단 MCP → 증거·보호 주소·짧은 TTL 검사 → 유지 승인 / 만료 해제</text>
+<text x="62" y="1059" font-size="20" fill="#172b4d" text-anchor="start">읽기는 제한 SSH stdio MCP. 패킷 전달과 LLM·관리자 승인은 별도 흐름이며, 승인 대기 동안 패킷을 붙잡는 구조가 아님.</text>
+<text x="62" y="1087" font-size="19" fill="#64748b" text-anchor="start">A: resp · rule-a · rule-write-a   |   B: wazuh-ro · security-events · system-diagnostics · rule-b · rule-write-b</text>
+</svg>

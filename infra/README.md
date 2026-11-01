@@ -1,10 +1,8 @@
-# infra — Docker 기반 배포 (B-1)
+# infra — 서버 구성·배포
 
-<!-- current-project-context:2026-10-24 -->
-> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
-> 현재 구성은 A/B/C 역할 분리·MCP6서버·HTTP3/터미널3·단일 deploy.sh(service schema9)다.6CVE 공격·탐지 시험은 사용자 지시로 보류하고 LLM 진단/알림 실패 보완과 문서 정리를 우선한다. 실제 검증 범위와 새 서버 설치 제외를 함께 확인한다.
-> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
-<!-- /current-project-context -->
+**현행 토폴로지 — 2026-11-01:** [서버·연결·근거](diagrams/README.md) · [네트워크 SVG](diagrams/current-network-topology.svg) · [관제·승인 SVG](diagrams/current-soc-flow.svg).
+
+A/B/C·Thor의21:53~21:55 KST 읽기 확인을 반영했다. 두 봇은B, 원본35B 추론은B SSH터널→A→Thor, 학습은DGX다. MCP는11/1 14:24 계약 기준8서버/41도구이며 현재 단계·한계는 [STATUS](../STATUS.md)를 따른다. 아래 날짜별 배포·시험 내용은 당시 이력이다. 도식 최신화로 서버 설정이나 보안 정책을 변경하지 않았다.
 
 > 2026-10-15: 채팅 인증서 만료 감시를 A(매일09:00KST)에, 전용 XML 디코더·규칙100300~100305를 B에 적용·검증했다. 만료일2027-01-06 15:02:33KST, 갱신은 수동이다. [현재 구성·갱신 절차](groot-a/certificate-monitor/README.md). 아래 기록은 해당 시점의 이력이다.
 
@@ -79,9 +77,9 @@ B의 `analysisd.event_threads=1`, `analysisd.rule_matching_threads=1`을 18:48:5
 
 각 ESXi VM(Groot_A/B/C)의 Docker Compose·설정·운영 문서. 아래 배포 순서는 최초 구축 이력이다. 현재 단계와 사양은 [PLAN.md](../PLAN.md), 호스트별 절차는 [A](groot-a/README.md)·[B](groot-b/README.md)·[C](groot-c/C_구축_표준설정.md) 문서를 참조한다.
 
-시각 자료: [현재 배포 네트워크 토폴로지](diagrams/current-network-topology-2026-10-08.png) · [버스형 토폴로지 개념도](diagrams/bus-topology-concept-2026-10-08.png). 버스형 그림은 실제 물리 배선이 아니라 내부망을 설명하기 위한 재배치다.
+시각 자료: [현재 토폴로지](diagrams/README.md). 기존10/8 PNG와 버스 개념도는 [역사 자료](diagrams/history-20261008.md)로 보존한다.
 
-## 현재 상태 (2026-10-08 라이브 확인·배포 기록 기준)
+## 과거 상태 (2026-10-08 라이브 확인·배포 기록)
 - B/C의 `ens192` vNIC는 제거됐고 기본 경로는 A(`10.200.10.1`)를 지난다. 외부망 주소 `.231`/`.232`는 과거 설치 주소다.
 - A의 FW v2는 적용·확정됐다(`FORWARD=DROP`, `CAPSTONE-FWD` 14룰). WAF의 GROOT 커스텀 룰 마운트·`DetectionOnly`·`nginx -t` 통과와 Suricata의 ET+로컬 `all.rules`·Phase-A 수동 탐지 설정을 SSH로 재확인했다.
 - B의 Wazuh 에이전트 000/001/002는 Active다. 신규 FW 접두어·WAF 100200대 전용 분류는 없지만, 보안 이벤트 읽기 조회에서 Suricata 로컬 SID `1000010`→Wazuh `100110`, ModSecurity CRS `920350`→Wazuh `100101`을 확인했다. 나머지 로컬 룰 분류와 시나리오별 공격 트래픽 실발화는 미검증이다. WAF `On`·IPS 인라인 차단 전환은 별도 작업이다.

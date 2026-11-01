@@ -1,5 +1,20 @@
 # Groot_AI_SOC
 
+## 현재 배치 · 2026-11-01
+
+[최신 토폴로지와 근거](infra/diagrams/README.md) · [서버·네트워크 그림](infra/diagrams/current-network-topology.svg) · [관제·MCP·승인 흐름](infra/diagrams/current-soc-flow.svg)
+
+| 위치 | 역할 |
+|---|---|
+| A | 보안 게이트웨이·FW/NAT·WAF DetectionOnly·passive IDS |
+| B | Mattermost·Hermes/Ollama 봇·Wazuh·MCP·승인 브로커 |
+| C | DVWA·Log4Shell·CVE 콘솔·비웹 실습 서비스 |
+| Thor | 두 봇의 현행 원본35B 추론. B의 제한 SSH 터널·A 경유 |
+| DGX | 공유 추론을 우선하는 독립 학습·체크포인트 관리 |
+| 로컬 | 자료 수집·정제·검수·대화 구성. 검수본 반입 후 DGX 학습 |
+
+A/B/C·Thor는11/1 21:53~21:55 KST 읽기 확인, MCP는14:24 계약의8서버/41도구 기준입니다. 현재 본학습 완료나 학습본 운영 승격을 뜻하지 않으며 동적 진행률은 [STATUS](STATUS.md)를 따릅니다. 아래 날짜별 기록은 당시 상태입니다.
+
 **저장소 유지:** [현재 현황](STATUS.md)·[현재 계획](PLAN.md)과 [과거 이력/복원](archive/REPOSITORY_CLEANUP.md)을 분리했습니다. 데이터는 [통합 원본1개·정제본1개 무손실 압축 규칙](datasets/STORAGE_POLICY.md)을 따릅니다. 아래 날짜별 내용은 당시 이력입니다.
 
 **16:03 KST 실측:** 같은 Qwen3.6-35B-A3B 본학습5/4,348단계·checkpoint4(11파일 SHA) 확인. 공유 추론 종료 후 조건부 자동 재개·Mac 종료 후 지속,11/2 03:47 KST 상한입니다. 기한 내 전체 완료를 보장하지 않으며 미완료 시 저장 후 정지합니다.

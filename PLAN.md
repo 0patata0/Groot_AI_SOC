@@ -1,6 +1,6 @@
 # Agentic SOC 실행 계획
 
-현재 완료 범위는 [STATUS.md](STATUS.md)를 따른다. 시점별 계획과 변경 근거는 [계획 이력](archive/PLAN-history-20261101.md)에 보존했다. 아래 일정은 목표이며 완료 약속이나 무조건 자동 실행 승인이 아니다.
+현재 완료 범위는 [STATUS.md](STATUS.md), 서버·봇·MCP·학습의 실제 배치는 [토폴로지](infra/diagrams/README.md)를 따른다. 시점별 계획과 변경 근거는 [계획 이력](archive/PLAN-history-20261101.md)에 보존했다. 아래 일정은 목표이며 완료 약속이나 무조건 자동 실행 승인이 아니다.
 
 ## 목표와 역할
 

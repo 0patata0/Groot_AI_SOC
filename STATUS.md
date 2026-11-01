@@ -17,7 +17,7 @@
 
 [수집·검수·후속 조건](finetuning/SOURCE_REVIEW_WORKFLOW.md) · [출처/해시/실측 원장](finetuning/DEFENSIVE_SOURCE_REVIEW.json). DGX `~/Capstone_Groot_training/source-collections/20261101-soc-source-expansion-r1`,로컬ignored검수사본 보존. Mac패키지설치/모델다운로드0. 이번 단계는 자료수집·구조검수·보존이며 새 Mattermost/공격E2E·새서버설치·학습/모델품질향상을 검증하지 않았다.
 
-**Git:** 이 작업의 공개 소스·지침·현황 반영을 마쳤으며 자동커밋·푸시/일치확인 전이다. 원문·로컬보고서·대화·자격·가중치는 제외한다. 게시결과는 확인후 별도 기록한다.
+**Git 게시 확인(12:27:09 KST):** 공개16파일의 수집/검수 소스·출처·지침·현황을 `70c41014ddaf770215b31b4ad0db3b5507a6ea29`로 커밋·푸시하고 실제 `origin/main` 일치와 당시 작업트리 clean을 확인했다. 자격·원자료·로컬검증/대화·가중치는 제외했다. 이 문단은 그 확인 뒤 작성한 게시 영수증이다. 후속 문서 커밋의 마지막 ID·원격 일치·최종 작업트리는 로컬 세션과 최종 답변에 기록한다.
 
 ## DGX 학습본 비교 완료·Thor 메모리 적재 보호 — 2026-11-01 11:48 KST
 

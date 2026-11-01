@@ -14,7 +14,17 @@
 
 공유Ollama/다른사용자 작업은 유지한다. 보호기준110GiB cgroup/swap0·호스트16GiB reserve는 바꾸지 않았다. API timeout0.5초/GPUpoll0.25초로 확인 간격을 줄였으나 급격한 동시할당/드라이버 경고의 완전 예방은 보장하지 않는다. [재현·단일설치기·반입목록·중지/복구](finetuning/DGX_OVERNIGHT.md#11월1일-168단계-재개와-제한-자동-재시도).
 
+**09:43 KST 실제 재개 확인:** checkpoint168을 복원하고175/224단계까지 진행했다. 원본11파일SHA불변·41입력SHA·systemd부모PID1/11:35timer·현재새할당경고0을 확인했다. Mac 연결 없이 학습/최종검증은 계속된다. 이후 사용자가 Hermes 표 출력을 수정하도록 추가 지시해 해당 보완을 진행 중이며 학습 전체 완료·품질 합격과 구분한다.
+
 **Git·정리:** 소스5개/신규시험1개·재개 문서/현황을 반영 중이며 아직 이번 변경을 커밋·푸시 완료로 표시하지 않는다. 자격/대화/로컬검증/업무분담은 제외한다. 서버 source임시반입/CPU작은시험물과 Mac임시helper를 정리하고 확인자료·실행/복구 snapshot을 보존한다. 실제 GPU 재개/최종 게시 결과는 후속기록을 따른다.
+
+**09:36 게시·운영 확인:** 구현/문서11파일을 `90d2fad1bf79e556a5caa5a94fdcae165363b463`로 커밋·푸시하고 실제 origin/main 일치·clean을 재확인했다. 최초 게시 때 HTTP verbose 변수의 문자0이 추적을 켜는 동작을 확인해 변수를 완전히 제거했고 후속 검증에서 헤더 추적 부재를 확인했다. 지정 PAT는 해당 Git 프로세스에만 전달했다. 서버 준비용 임시3디렉터리94파일389,176B는 SHA 기록 후 제거,41개 실행 입력/원본checkpoint를 보존했다. 09:37 실제조회에서 제어기 부모PID1·독립timer·attempt1 모델적재35%·새할당경고0, 아직 optimizer step 증가는 확인 전이다.
+
+## Mattermost Hermes 표 표시 원인 — 2026-11-01 09:39 KST 읽기 점검
+
+추가 사용자 질문에 따라 실제 채팅과 B의 Hermes adapter를 읽기 확인했다. [09:28 Hermes 답변](https://chat.grootlab.duckdns.org/soc/pl/pct3jt16wbn75b1ondxp8y7nsw)은 확인 내역 문장과 표 사이 빈 줄이 없고, [09:30 Ollama 답변](https://chat.grootlab.duckdns.org/soc/pl/4fayetpfgj8wtqdfx17bgomscr)은 빈 줄이 있다. Hermes adapter의 `format_message`는 이미지 링크만 바꾸고 표는 그대로 전송한다.
+
+Mattermost의 공식 marked 고정소스 `467bc9e99fc75d69424188dfbea7fe0409a9fc15`로 실제 메시지 문자열을 검사했다. Hermes 원문 table token0→빈줄1개추가후1, Ollama 원문1→동일1로 원인을 재현했다. [공식 파서](https://github.com/mattermost/marked/blob/467bc9e99fc75d69424188dfbea7fe0409a9fc15/lib/marked.js). 이는 공식 파서 격리 재현이며 설치된 웹 번들의 브라우저 UI 시험은 아니다. 전송 전 문단/표 경계 정규화가 보완 지점이다. 이번은 질문에 대한 원인 점검으로 채팅 게시/수정·봇 코드 배포0, 수정 완료로 표시하지 않는다. API 로그인 세션은 logout했고 임시 원문/파서파일은 Mac 작업종료시 제거한다.
 
 ## DGX 재개 학습 현황 — 2026-11-01 09:20 KST 확인
 

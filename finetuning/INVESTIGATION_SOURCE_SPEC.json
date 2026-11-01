@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "source_pins": [
+    {
+      "id": "microsoft_aces",
+      "repo": "microsoft/ACESEvals",
+      "commit": "2c76fbdea415d6fa6a87bbad846686fefd6ee9bb",
+      "tree": "79872b4f8daf23a4a806ccd35630d6f7db05d590",
+      "license": "MIT; preserve Microsoft copyright and NOTICE.md",
+      "nature": "Controlled/simulated Azure investigations; graph-derived LLM questions and mock range evidence, not production incidents or expert-written execution trajectories",
+      "purpose": "Multi-hop evidence collection, correlation, scope, detection, remediation verification and false-positive discipline",
+      "excluded": ["attack execution tasks", "attack scripts", "container/runtime installation", "legacy and regenerated duplicate question sets"]
+    }
+  ],
+  "related_raw_dataset": {
+    "repo": "anandmudgerikar/excytin-bench",
+    "revision": "8bc9ce1f97f8a6880c815dfba76d88651ddb761a",
+    "license": "CDLA-Permissive-2.0 per dataset card; retain transparency note",
+    "archive": "data.zip",
+    "archive_bytes": 280428179,
+    "archive_sha256": "6b2a2247f5b25132a8ad716641438c42dc30e38b57ba764f97f22626e7be5f31",
+    "mode": "Reference pinned archive; separately account for any selected byte ranges or extracted files. No whole archive download implied."
+  },
+  "split_policy": {
+    "unit": "Base incident and all variants across ExCyTIn and SABER-Sim",
+    "evaluation_incidents": ["134", "166"],
+    "training_candidate_incidents": ["5", "34", "38", "39", "55", "322"],
+    "provider_test_rows_never_train": true,
+    "warning": "Provider train/test sets share all eight incident IDs; six base incidents also share alert identities. Connected components from the 32 selected tables are {134}, {166}, {5,34,38,39,55,322}. Reserve the first two; all variants of the connected six stay on the training-source side, and their provider-test questions still never train. Earlier provisional {134,55} reservation was corrected before any model evaluation/training or transfer. This is not a measured evaluation result."
+  },
+  "gates": [
+    "Pinned provenance, license scope, source hashes and strict parsing",
+    "Original evidence versus generated question/answer and hindsight fields separated",
+    "Answer/checkpoint-to-log alignment and privacy review",
+    "Cross-family duplicate/leakage checks and incident-level split",
+    "Current MCP schema mapping, exact-candidate approval, post-check/rollback contracts",
+    "Token validation and independent performance/critical-omission evaluation"
+  ],
+  "training_admitted": 0,
+  "production_changed": false
+}

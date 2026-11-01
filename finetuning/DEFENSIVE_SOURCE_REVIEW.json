@@ -382,5 +382,9 @@
     },
     "cisa_csaf": "105 IT/3995 OT/5 VA advisory JSON paths inspected in pinned tree; not acquired or counted as incident cases",
     "acsc": "11 selected pages verified by browser, file acquisition failed locally and one DGX copyright probe timed out; not counted as acquired data"
+  },
+  "storage_path_correction_20261101": {
+    "verified_absolute_path": "/root/Capstone_Groot_training/source-collections/20261101-soc-source-expansion-r1",
+    "verification": "Read-only DGX directory existence; earlier tilde meant root home, not SSH login home. Original historical receipt retained."
   }
 }

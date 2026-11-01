@@ -1,5 +1,50 @@
 # 관제 학습자료 수집·동시 검수
 
+## 조사 자료 확대와 정제 후 반입 — 2026-11-01 13:12 KST
+
+[고정 출처](INVESTIGATION_SOURCE_SPEC.json) · [최종 검수·정제·반입 원장](INVESTIGATION_SOURCE_REVIEW.json). 사용자의 지시에 따라 **수집→동시 검수→정제→묶음 검증→반입** 순서를 적용했다. 이번 추가 원자료를 DGX에 먼저 전송하지 않았다.
+
+| 출처/처리 | 결과 | 해석 |
+|---|---|---|
+| Microsoft ExCyTIn/ACESEvals | 질문1,017개(train418/test599), 선택4테이블32CSV·8,383행 | 기관 연구/모의 Azure 환경의 그래프 기반 생성 질문. 최신 논문7,542건과 다른 고정artifact 버전 |
+| Microsoft SABER-Sim | 8원사건·40변형, 탐지/보안설정/복구/위협정보160과제·869모의관측 | ExCyTIn과 원천계열 중복. 공격실행 과제·스크립트/컨테이너는 실행하지 않음 |
+| 연구용 agentic-pcap | 44조사·3,464도구호출 검수 | 저자모델 답변/실패기록이며 기관검수 정답 아님. 이번 정제·반입·학습 제외 |
+| 최종 정제 후보 | 조사349개, 모의관측615개, 연결 근거행847개 | **학습 전 소스 후보**; SFT messages나 검증된 MCP 실행 궤적이 아님 |
+| 평가 보존 | 조사186개, 모의관측126개, 연결 근거행92개 | 사건134/166 및 모든 파생변형 보존, 실제모델 평가 미실행 |
+| 제외 | 질문482개·관측128개=610항목 | 사유 중복 가능. 원제공test 학습제외·정답노출·근거미연결·중복/공통문자열 등 |
+
+Microsoft Research/저자 저장소는 ExCyTIn의 ICML2026채택을 명시한다. 원논문/공식저장소/버전/원문해시를 인용하며, 자체 가공이나 우리 정답의 품질이 기관 인증을 받았다고 쓰지 않는다. 저장소MIT/NOTICE, 데이터카드CDLA-Permissive-2.0, 프레임워크 투명성 문서의MIT 표기를 함께 보존한다. CDLA전문도 정제묶음에 동봉했다.
+
+### 검수에서 바로잡은 항목
+
+- ZIP280,428,179B를 통째로 받지 않고 정확한HTTPS Range로 선택회원만 읽었다. 선택CSV전송5,254,663B 외에 디렉터리/probe/SQL형식참고 요청은 별도다. ZIP CRC32와 각파일SHA는 검증했고 전체ZIP SHA는 제공값만 기록했다.
+- 초기 일반CSV 파싱은 잘못된10,472행을 반환했다. 공급자SQL의`FIELDS TERMINATED BY '❖'`, 쌍따옴표·다중행을 대조한 뒤32파일을 엄격히 재파싱해8,383행/열불일치0을 확인했다. SQL은읽기만했으며실행하지않았다. 초기영수증은보존하고`review/csv-review.json`을최종계수로사용한다.
+- 전체질문 정답입력노출10개·선택로그에정답텍스트미연결21개를 보류했다. 텍스트연결996개도 인과적 정답을 전수검증한 건수는 아니다. 최종후보는 질문/관측/공급자답후보/근거행을 분리하고 공급자checkpoint의 추정서술을 학습답변으로 복사하지 않는다.
+- 모의관측의AttackTechnique/AttackTechniques/SubTechniques/Techniques를입력과분리했다. 전체중복관측107개와과거보존자료의정확문자열공유21개를보류했다. 공통해시/문자열은의미중복확정과다르므로원자료를삭제하지않는다.
+- **사건번호만으로 분리하지 않는다.** 32CSV전체의SystemAlertId/AlertId대조에서5/34/38/39/55/322가연결돼한쪽으로묶었다. 독립연결요소134/166을평가보존하고나머지공급자test454개는학습제외했다. 초기134/55예약·후보283개는실제평가/학습/반입전에정정했다. 선택테이블의공유경보교차0이며전체원시로그·의미독립성까지입증한것은아니다.
+- 연구trace의completed상태를실행성공으로보지않았다. 비정상exit92·명시오류1·exit미상50을기록했다. 라벨규약`Attack N detected`를정규화하면33/44일치하며, 이는저자QwenBF16실험의문자열대조로우리학습모델성능/전문가정답이아니다. 전체44개를이번학습반입에서제외했다.
+
+### 재현·검증
+
+아래는 소스 검수 유틸리티다. Mac 패키지 설치·원자료 명령 실행·운영 서비스 변경은 하지 않는다. 기존Python/PyYAML을 사용하며 원문과 정제본은ignored `data-*`에만쓴다.
+
+```bash
+python3 -B finetuning/collect_defensive_sources.py --phase plan --spec finetuning/INVESTIGATION_SOURCE_SPEC.json --root finetuning/data-investigation-expansion-20261101-r2
+python3 -B finetuning/collect_defensive_sources.py --phase collect --root finetuning/data-investigation-expansion-20261101-r2
+python3 -B finetuning/collect_excytin_evidence.py --phase collect --root finetuning/data-investigation-expansion-20261101-r2
+python3 -B finetuning/review_investigation_sources.py --root finetuning/data-investigation-expansion-20261101-r2 --history-root finetuning
+python3 -B finetuning/prepare_investigation_candidates.py --root finetuning/data-investigation-expansion-20261101-r2 --output finetuning/data-investigation-clean-20261101-r2
+python3 -B finetuning/prepare_investigation_candidates.py --validate --root finetuning/data-investigation-clean-20261101-r2
+```
+
+기존정제묶음은덮어쓰지않는다. 새재현에는다른`data-*`출력을지정한다. 연구trace가필요하면`collect_investigation_traces.py --phase plan`/`collect`를같은원자료root에별도로실행하며,그결과는정제묶음에포함하지않는다. 전체732검사729PASS/3기존환경skip,후속관련18PASS. 실제묶음검증에서15payload파일SHA·질문근거포인터·분할·정답필드제외통과;manifest/validation포함17파일을전송했다.
+
+정제본만 `/root/Capstone_Groot_training/source-collections/20261101-investigation-clean-r2`에8,421,068B로저장하고전파일재읽기SHA확인했다. 압축전송718,651B/SHA`2e90b2fed41fb50497728e2417e675bf7c9ee1dd77e380b86cd2de0f5584baea`. 이전R1자료의`~/...`는실조회상root홈이며정확한위치는`/root/Capstone_Groot_training/source-collections/20261101-soc-source-expansion-r1`이다. 기존운영파일/권한은변경하지않았다.
+
+**남은 단계:** 인과관계/사후정보·정답 의미 검수, 현재MCP스키마·정확후보승인/사후검증/원복과의연결, 토큰/개인정보검수, 독립평가. `ready_for_gpu_training=false`·새SFT편입0·GPU학습0·운영변경0. 단순분류/로그수량을관제전과정학습완료로환산하지않는다.
+
+이하 앞선 수집 이력을 보존한다.
+
 2026-11-01 KST. [실측·출처 원장](DEFENSIVE_SOURCE_REVIEW.json), [고정 Git 출처](DEFENSIVE_SOURCE_SPEC.json), [사건 보고서 후보](INCIDENT_SOURCE_SPEC.json).
 
 수집 기준은 **이전 평가의 실패 보완과 관제 업무의 미검증 영역**이다. 이번 후보의 승인 대상 불일치·잘못된 WAF 설정값, 기존 모델의 무조회 단정·탐지/차단 혼동을 우선한다. 여기에 사건 조사·상관분석·오탐 배제·영향 평가·대응·복구·보고를 함께 다룬다. 룰 시험만으로 관제 전체를 학습했다고 표시하지 않는다. 정책은 루트 `AGENTS.md`에 지속 적용한다.

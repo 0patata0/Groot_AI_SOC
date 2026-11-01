@@ -19,7 +19,8 @@ ALLOWED_REPOS = {'crs': 'coreruleset/coreruleset', 'wazuh': 'wazuh/wazuh',
                  'suricata_verify': 'OISF/suricata-verify',
                  'modsecurity_docs': 'owasp-modsecurity/documentation',
                  'nist_controls': 'usnistgov/oscal-content',
-                 'cisa_counter': 'cisagov/coun7er'}
+                 'cisa_counter': 'cisagov/coun7er',
+                 'microsoft_aces': 'microsoft/ACESEvals'}
 LIMIT = 16 * 1024 * 1024
 
 
@@ -70,6 +71,17 @@ def select_path(source, path):
     if source == 'nist_controls': return path == 'nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_catalog.json'
     if source == 'cisa_counter':
         return path.startswith('countermeasures/') and path.endswith('.md') or path in ('CMCategories.md','CountermeasureTitleIntendedOutcome.md')
+    if source == 'microsoft_aces':
+        if path in ('NOTICE.md', 'domains/excytin/setup.py', 'domains/excytin/tasks/global.yaml'):
+            return True
+        if path.startswith(('domains/excytin/tasks/latest_train_set/',
+                            'domains/excytin/tasks/latest_test_set/')):
+            return path.endswith('.yaml')
+        if path.startswith('domains/eval_ranges/'):
+            roles = ('detection', 'posture_analysis', 'remediation', 'threat_intel')
+            return ('/tasks/' in path and any(path.endswith('_'+role+'.yaml') for role in roles)
+                    or '/data/' in path and path.endswith(('base_infrastructure.yaml', 'azure_log_schemas.yaml'))
+                    or '/inputs/attack_corpus/' in path and path.endswith('.json'))
     return False
 
 

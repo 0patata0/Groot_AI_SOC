@@ -1,0 +1,373 @@
+{
+  "at_kst": "2026-11-01T13:13:38.303685+09:00",
+  "status": "source_collection_review_cleaning_and_clean_bundle_transfer_complete_not_training_admission",
+  "authority": {
+    "excytin_paper": "https://arxiv.org/abs/2507.14201",
+    "institution_record": "https://www.microsoft.com/en-us/research/publication/excytin-bench-evaluating-llm-agents-on-cyber-threat-investigation/",
+    "publication_status": "Microsoft Research and author repository list ICML 2026 acceptance; paper count7542 is not the retrieved1017-question artifact version",
+    "repo": "https://github.com/microsoft/ACESEvals",
+    "repo_commit": "2c76fbdea415d6fa6a87bbad846686fefd6ee9bb",
+    "repo_license": "MIT with NOTICE; HF source data card CDLA-Permissive-2.0; transparency note says MIT for framework. Both notices retained, no claim of institutional certification of project annotations."
+  },
+  "acquisition": {
+    "git": {
+      "files_verified": 1625,
+      "bytes_retained": 12094835,
+      "errors": []
+    },
+    "selected_csv": {
+      "files": 32,
+      "stored_bytes": 43431049,
+      "selected_download_bytes": 5254663,
+      "source_archive_bytes": 280428179,
+      "url": "https://huggingface.co/datasets/anandmudgerikar/excytin-bench/resolve/8bc9ce1f97f8a6880c815dfba76d88651ddb761a/data.zip",
+      "declared_archive_sha256": "6b2a2247f5b25132a8ad716641438c42dc30e38b57ba764f97f22626e7be5f31",
+      "full_archive_hash_verified": false,
+      "integrity": "Exact HTTPS Content-Range/size, per-member ZIP CRC32 and local SHA256; separate index/probe/SQL-format-reference requests are additional",
+      "format": "Provider U+2756 delimiter, quoted multiline cells, UTF-8 BOM; all32 strictly reparsed"
+    },
+    "research_traces": {
+      "repo": "maureille/agentic-pcap",
+      "revision": "54ce8ca45a3fe2566d3b0daa54941427ab642797",
+      "files": 94,
+      "bytes": 13607654,
+      "sessions": 44,
+      "pcaps_downloaded": 0,
+      "license": "CC-BY-4.0",
+      "peer_review": "Author says manuscript submitted; acceptance not verified",
+      "training_admitted": 0,
+      "transferred": false
+    }
+  },
+  "audit": {
+    "at_kst": "2026-11-01T13:10:43.501152+09:00",
+    "files_reverified": 1625,
+    "excytin": {
+      "questions": 1017,
+      "by_provider_split": {
+        "train": 418,
+        "test": 599
+      },
+      "incidents": [
+        "134",
+        "166",
+        "322",
+        "34",
+        "38",
+        "39",
+        "5",
+        "55"
+      ],
+      "provider_train_test_share_incidents": [
+        "134",
+        "166",
+        "322",
+        "34",
+        "38",
+        "39",
+        "5",
+        "55"
+      ],
+      "cross_incident_shared_alert_links": [
+        {
+          "a": "322",
+          "b": "38",
+          "shared_alerts": 4
+        },
+        {
+          "a": "322",
+          "b": "39",
+          "shared_alerts": 4
+        },
+        {
+          "a": "322",
+          "b": "55",
+          "shared_alerts": 5
+        },
+        {
+          "a": "34",
+          "b": "39",
+          "shared_alerts": 81
+        },
+        {
+          "a": "34",
+          "b": "5",
+          "shared_alerts": 67
+        },
+        {
+          "a": "34",
+          "b": "55",
+          "shared_alerts": 81
+        },
+        {
+          "a": "38",
+          "b": "39",
+          "shared_alerts": 16
+        },
+        {
+          "a": "38",
+          "b": "55",
+          "shared_alerts": 16
+        },
+        {
+          "a": "39",
+          "b": "5",
+          "shared_alerts": 67
+        },
+        {
+          "a": "39",
+          "b": "55",
+          "shared_alerts": 150
+        },
+        {
+          "a": "5",
+          "b": "55",
+          "shared_alerts": 67
+        }
+      ],
+      "family_components": [
+        [
+          "134"
+        ],
+        [
+          "166"
+        ],
+        [
+          "322",
+          "34",
+          "38",
+          "39",
+          "5",
+          "55"
+        ]
+      ],
+      "reserved_families": [
+        "134",
+        "166"
+      ],
+      "cross_partition_shared_alert_ids_in_selected_tables": 0,
+      "selected_csv_files": 32,
+      "selected_log_rows": 8383,
+      "target_text_linked_only": 996,
+      "target_already_in_input": 10,
+      "duplicate_input_groups": 0,
+      "conflicting_target_groups": 0,
+      "cross_provider_split_duplicate_groups": 0,
+      "provisional_partition_counts": {
+        "reserved_evaluation_family": 202,
+        "training_source_candidate": 361,
+        "provider_test_excluded_from_training": 454
+      },
+      "training_source_without_static_issues": 349,
+      "limitation": "Target occurrence is not causal answer validation; selected tables are alert/incident/evidence products, not complete raw telemetry"
+    },
+    "saber_sim": {
+      "base_incidents": 8,
+      "variants": 40,
+      "defensive_tasks": 160,
+      "roles": {
+        "detection": 40,
+        "posture_analysis": 40,
+        "remediation": 40,
+        "threat_intel": 40
+      },
+      "simulated_event_rows": 869,
+      "label_fields_separated": {
+        "AttackTechnique": 868,
+        "AttackTechniques": 90,
+        "SubTechniques": 45,
+        "Techniques": 45
+      },
+      "unique_observable_hashes": 815,
+      "duplicate_audit": {
+        "unique": 815,
+        "duplicate_rows_held": 107,
+        "cross_partition_rows_held": 5
+      },
+      "history_overlap_rows_held": 21,
+      "limitation": "Same eight base incident families as ExCyTIn; 40 variants are not 40 independent real incidents. No baseline telemetry or execution traces acquired."
+    },
+    "research_traces": {
+      "sessions": 44,
+      "tool_calls": 3464,
+      "input_output_pairs": 3463,
+      "explicit_errors": 1,
+      "nonzero_exit": 92,
+      "unknown_exit": 50,
+      "normalized_label_match": 33,
+      "structural_issues": 0,
+      "note": "Author Qwen3.6-35B BF16 no-thinking P0 testbed runs, not this project trained model or performance result; all held from SFT"
+    },
+    "history_exact_overlap": {
+      "unique_file_contents": 87,
+      "rows_read": 50755,
+      "new_input_values_checked": 2560,
+      "matched_record_ids": [
+        "domains/eval_ranges/saber_sim_incident_322_v1/docker/scenarios/incident_322_v1/inputs/attack_corpus/DeviceFileEvents.json:1",
+        "domains/eval_ranges/saber_sim_incident_322_v1/docker/scenarios/incident_322_v1/inputs/attack_corpus/DeviceProcessEvents.json:1",
+        "domains/eval_ranges/saber_sim_incident_322_v1/docker/scenarios/incident_322_v1/inputs/attack_corpus/EmailAttachmentInfo.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v1/docker/scenarios/incident_5_v1/inputs/attack_corpus/DeviceFileEvents.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v1/docker/scenarios/incident_5_v1/inputs/attack_corpus/DeviceProcessEvents.json:3",
+        "domains/eval_ranges/saber_sim_incident_5_v1/docker/scenarios/incident_5_v1/inputs/attack_corpus/EmailAttachmentInfo.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v1/docker/scenarios/incident_5_v1/inputs/attack_corpus/EmailAttachmentInfo.json:1",
+        "domains/eval_ranges/saber_sim_incident_5_v2/docker/scenarios/incident_5_v2/inputs/attack_corpus/DeviceFileEvents.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v2/docker/scenarios/incident_5_v2/inputs/attack_corpus/EmailAttachmentInfo.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v2/docker/scenarios/incident_5_v2/inputs/attack_corpus/EmailAttachmentInfo.json:1",
+        "domains/eval_ranges/saber_sim_incident_5_v3/docker/scenarios/incident_5_v3/inputs/attack_corpus/DeviceFileEvents.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v3/docker/scenarios/incident_5_v3/inputs/attack_corpus/DeviceProcessEvents.json:5",
+        "domains/eval_ranges/saber_sim_incident_5_v3/docker/scenarios/incident_5_v3/inputs/attack_corpus/EmailAttachmentInfo.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v4/docker/scenarios/incident_5_v4/inputs/attack_corpus/DeviceFileEvents.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v4/docker/scenarios/incident_5_v4/inputs/attack_corpus/DeviceProcessEvents.json:7",
+        "domains/eval_ranges/saber_sim_incident_5_v4/docker/scenarios/incident_5_v4/inputs/attack_corpus/EmailAttachmentInfo.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v4/docker/scenarios/incident_5_v4/inputs/attack_corpus/EmailAttachmentInfo.json:1",
+        "domains/eval_ranges/saber_sim_incident_5_v5/docker/scenarios/incident_5_v5/inputs/attack_corpus/DeviceFileEvents.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v5/docker/scenarios/incident_5_v5/inputs/attack_corpus/DeviceProcessEvents.json:6",
+        "domains/eval_ranges/saber_sim_incident_5_v5/docker/scenarios/incident_5_v5/inputs/attack_corpus/EmailAttachmentInfo.json:0",
+        "domains/eval_ranges/saber_sim_incident_5_v5/docker/scenarios/incident_5_v5/inputs/attack_corpus/EmailAttachmentInfo.json:1"
+      ]
+    },
+    "training_admitted": 0,
+    "gpu_training_started": false,
+    "production_changed": false
+  },
+  "clean_bundle": {
+    "prepared_at_kst": "2026-11-01T13:10:44.261030+09:00",
+    "status": "cleaned_source_candidates_NOT_SFT_admitted",
+    "counts": {
+      "investigation-train-candidates": 349,
+      "investigation-eval-reserved": 186,
+      "observations-train-candidates": 615,
+      "observations-eval-reserved": 126
+    },
+    "evidence_counts": {
+      "train": 847,
+      "eval": 92
+    },
+    "excluded": 610,
+    "exclusion_reasons": {
+      "target_not_linked_in_selected_tables": 21,
+      "target_already_in_input": 10,
+      "missing_question_context_or_target": 2,
+      "provider_test_never_train": 454,
+      "duplicate_observable_requires_review": 107,
+      "cross_partition_observable_overlap": 5,
+      "shared_history_string_requires_review": 21
+    },
+    "malformed_embedded_json_evidence_rows_held": 0,
+    "train_incidents": [
+      "322",
+      "34",
+      "38",
+      "39",
+      "5",
+      "55"
+    ],
+    "reserved_eval_incidents": [
+      "134",
+      "166"
+    ],
+    "raw_archives_included": false,
+    "research_model_traces_included": false,
+    "provider_checkpoint_prose_or_synthetic_tool_trajectories_included": false,
+    "remaining_gates": [
+      "Causal checkpoint/answer review, not simple target presence",
+      "Current MCP schemas and exact-approval/post-check/rollback conversion",
+      "Privacy and license attribution of final derivatives",
+      "Real tokenizer limits and independent critical-error evaluation"
+    ],
+    "ready_for_gpu_training": false,
+    "training_admitted": 0,
+    "production_changed": false,
+    "source_incident_components": [
+      [
+        "134"
+      ],
+      [
+        "166"
+      ],
+      [
+        "322",
+        "34",
+        "38",
+        "39",
+        "5",
+        "55"
+      ]
+    ]
+  },
+  "clean_manifest_sha256": "a60f1829d663509f321fb495d9839d02d5b19cbe9ace6a102fda05d5a2de7a75",
+  "transfer": {
+    "destination": "/root/Capstone_Groot_training/source-collections/20261101-investigation-clean-r2",
+    "files": 17,
+    "bytes": 8421068,
+    "archive_bytes": 718651,
+    "archive_sha256": "2e90b2fed41fb50497728e2417e675bf7c9ee1dd77e380b86cd2de0f5584baea",
+    "all_readback_sha256_verified": true,
+    "cleaned_source_candidates_only": true,
+    "ready_for_gpu_training": false,
+    "gpu_or_services_changed": false
+  },
+  "corrections": [
+    {
+      "issue": "Early comma-CSV count10472 was wrong",
+      "resolution": "Provider SQL delimiter confirmed and32files strictly parsed to8383rows; original receipt retained and review/csv-review.json supersedes row count"
+    },
+    {
+      "issue": "Initial exact label comparison returned15/44",
+      "resolution": "Provider Attack N detected output contract normalized;33/44label matches. These are author research-model runs, not project model quality."
+    },
+    {
+      "issue": "Provisional incident134/55 reservation and283candidate claim",
+      "resolution": "Full selected-log alert identity audit found6connectedincidents; before any transfer/training/model evaluation reserved134/166 instead. Final349questions/615observations train-source candidates; no provider-test row trained."
+    },
+    {
+      "issue": "Previous source collection path used ambiguous tilde",
+      "resolution": "Live read-only filesystem check locates earlier R1 in /root/Capstone_Groot_training/source-collections/20261101-soc-source-expansion-r1. Login-user home does not contain that source collection."
+    },
+    {
+      "issue": "User requires cleaning before transfer",
+      "resolution": "Raw R2 transfer never started. Only17-filecleanbundle was uploaded after local manifest/linkage/partition checks; raw archive/traces excluded."
+    }
+  ],
+  "alternatives": {
+    "siabench": {
+      "dataset_card": "https://huggingface.co/datasets/SIABench/SIA_Dataset",
+      "revision": "ec48d6049811c48273a23c77e3000124e238cb64",
+      "new_finding": "HF card declares Apache-2.0; prior GitHub no-LICENSE record was repo-specific. Third-party artifact rights and evaluation-only purpose remain unresolved; metadata only, no training."
+    },
+    "sir_bench": {
+      "paper": "https://arxiv.org/abs/2604.12040",
+      "source_dataset_acquired": 0,
+      "reason": "No verified distributable794case package/license found; same-name scientific-induction repository is unrelated."
+    }
+  },
+  "validation": {
+    "full_suite": {
+      "run": 732,
+      "passed": 729,
+      "skipped": 3,
+      "skip": "Existing environment-dependent checks"
+    },
+    "later_targeted_tests": {
+      "run": 18,
+      "passed": 18
+    },
+    "clean_bundle_sha_and_linkage": true,
+    "server_all_file_readback_sha": true,
+    "live_model_evaluation": false,
+    "attack_e2e": false,
+    "new_server_install": false,
+    "gpu_training": false,
+    "operating_model_changed": false
+  },
+  "remaining": [
+    "Causal graph/checkpoint verification rather than target-string presence",
+    "Current MCP and exact-candidate approval/post-check/rollback examples grounded in real tool observations",
+    "Source/incident-family diversity beyond the three connected components identified in selected tables",
+    "Full privacy/semantic/tokenizer admission checks and independent evaluation",
+    "MCP JSON-schema runtime error remains a separate implementation issue"
+  ],
+  "local_source_root": "finetuning/data-investigation-expansion-20261101-r2",
+  "local_clean_root": "finetuning/data-investigation-clean-20261101-r2",
+  "training_admitted": 0
+}

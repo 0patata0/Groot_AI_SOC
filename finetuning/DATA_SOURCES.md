@@ -1,5 +1,19 @@
 # 데이터 출처와 사용 범위
 
+## 2026-11-01 조사 자료·정제 후 반입
+
+[검수·정제·해시 원장](INVESTIGATION_SOURCE_REVIEW.json) · [원출처 고정버전/분할](INVESTIGATION_SOURCE_SPEC.json).
+
+| 자료 | 원출처·확보 범위 | 신뢰 근거·이용조건·제한 |
+|---|---|---|
+| ExCyTIn-Bench | [Microsoft ACESEvals](https://github.com/microsoft/ACESEvals/tree/2c76fbdea415d6fa6a87bbad846686fefd6ee9bb), train418/test599 질문; [저자 데이터](https://huggingface.co/datasets/anandmudgerikar/excytin-bench/tree/8bc9ce1f97f8a6880c815dfba76d88651ddb761a)에서4테이블32CSV·8,383행 선택 | [Microsoft Research의ICML2026기록](https://www.microsoft.com/en-us/research/publication/excytin-bench-evaluating-llm-agents-on-cyber-threat-investigation/), [논문](https://arxiv.org/abs/2507.14201). 모의Azure/그래프기반LLM질문,실운영사건아님. repoMIT/NOTICE·데이터CDLA2·투명성고지동봉. 논문7,542개는이번1,017artifact와구분 |
+| SABER-Sim | 같은Microsoft고정repo,40변형×4방어업무160·모의관측869개 | MIT. ExCyTIn과같은8기초사건계열,독립새40사건아님. 관측정답필드/중복분리후학습전615·평가126,실행/복구성공정답은아님 |
+| agentic-pcap | [저자 공개자료](https://huggingface.co/datasets/maureille/agentic-pcap/tree/54ce8ca45a3fe2566d3b0daa54941427ab642797),같은Qwen계열no-thinking/P0의44조사 | CC-BY4.0. 모델이작성한조사기록/학회심사중이며전문가골드아님. 연구검수만실시,전체PCAP/정제본/서버반입/학습에서제외 |
+
+정제 후 조사349개·모의관측615개를후속검수후보로반입했다. 평가질문186/관측126·제외610항목은분리한다. 원로그파일/실제CSV행번호/SHA로근거를추적하며,공유경보로연결된6사건은같은분할에둔다. 기관출처가우리프로젝트가공/정답정확성을인증하는것은아니다. 인과적정답·MCP계약·토큰검수전으로SFT편입0이다. 큰ZIP전체대신선택Range를읽었고전체archiveSHA를검증했다고표시하지않는다.
+
+**추가확인/정정:** [SIABench HF카드](https://huggingface.co/datasets/SIABench/SIA_Dataset/tree/ec48d6049811c48273a23c77e3000124e238cb64)는Apache-2.0을선언한다. 앞선GitHubLICENSE부재기록은해당repo범위였으며,제3자포렌식원자료권리/평가분리미확정때문에여전히metadata만보존한다. AWS저자SIR-Bench는배포본/이용조건을확인하지못해이번수집0이다. 동일이름의과학적귀납추론SIRBench저장소와혼동하지않는다.
+
 ## 2026-11-01 평가 약점 보완·관제 전반 자료 확대
 
 [고정버전·라이선스·SHA·검수원장](DEFENSIVE_SOURCE_REVIEW.json) · [재현/업무 연결](SOURCE_REVIEW_WORKFLOW.md). 평가에서 실패한 승인·WAF문법·증거해석을 우선하고 실제 사건조사/대응/복구 자료를 추가했다. 기존 GUIDE/CISA/MITRE 자료를 새수집으로 세지 않는다.

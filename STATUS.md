@@ -19,7 +19,7 @@
 
 반입 위치는 **`/root/Capstone_Groot_training/source-collections/20261101-investigation-clean-r2`**. 원자료·실패/초기감사본은 로컬ignored `finetuning/data-investigation-expansion-20261101-r2`, 정제사본은 `finetuning/data-investigation-clean-20261101-r2`에 보존한다. 앞선 R1자료도 실조회 결과 `/root/Capstone_Groot_training/source-collections/20261101-soc-source-expansion-r1`에 있다. 과거 `~/...`는 root 문맥이며 SSH 로그인 계정 홈 경로로 사용하면 안 된다. 기존파일·권한·추론서비스 변경0, Mac 패키지 설치0.
 
-`ready_for_gpu_training=false`를 유지한다. 다음은 조사 경로/정답 의미 검수 → 현재 MCP 계약·정확 후보 승인·사후검증/원복 자료 구성 → 토큰 검수·독립평가다. 새수집만으로 기존 JSON schema 오류나 운영 품질 문제가 해결된 것은 아니다. [출처·정제·반입 원장](finetuning/INVESTIGATION_SOURCE_REVIEW.json) · [재현](finetuning/SOURCE_REVIEW_WORKFLOW.md). 공개 코드·현황 반영을 마쳤으며 자동 커밋·푸시 확인 전 상태다.
+`ready_for_gpu_training=false`를 유지한다. 다음은 조사 경로/정답 의미 검수 → 현재 MCP 계약·정확 후보 승인·사후검증/원복 자료 구성 → 토큰 검수·독립평가다. 새수집만으로 기존 JSON schema 오류나 운영 품질 문제가 해결된 것은 아니다. [출처·정제·반입 원장](finetuning/INVESTIGATION_SOURCE_REVIEW.json) · [재현](finetuning/SOURCE_REVIEW_WORKFLOW.md). 공개18파일을 `835983a6df226a7d732e96c9f23a223185531ae6`로 커밋·푸시하고 실제origin/main일치·당시clean을 확인했다. 이 게시영수증은 후속 문서변경이며 다시 커밋·푸시한다. 최종커밋·원격일치·작업트리와임시정리는로컬세션/최종응답에남긴다.
 
 ## 학습자료 충분성·도구 실행 과정 범위 재점검 — 2026-11-01 12:42 KST
 

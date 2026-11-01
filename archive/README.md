@@ -10,3 +10,8 @@
 > 참고: 이 문서들의 `suggestion.md` 등 최상위 링크는 `../`로 봐야 한다(이동 전 경로 기준으로 작성됨).
 
 > 2026-10-06 정리: B-1 원본 `인프라_구축순서.md`는 사용자가 직접 삭제했다. 아래 k3s 변형 문서는 당시의 비교·설계 기록이며, 원본 Phase를 참조하는 부분만으로는 배포 절차가 완결되지 않는다. 현재 구성은 [PLAN.md](../PLAN.md)와 [infra/README.md](../infra/README.md)를 따른다.
+
+## 현황·계획 이력과 복원
+
+- [현황 이력](STATUS-history-20261101.md) · [계획 이력](PLAN-history-20261101.md): 정리 전 기록이며 현재 상태는 루트 STATUS/PLAN을 따른다.
+- [저장소 정리·복원](REPOSITORY_CLEANUP.md) · [파일별 원장](REPOSITORY_CLEANUP_20261101.json).

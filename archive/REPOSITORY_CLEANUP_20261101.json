@@ -1,0 +1,145 @@
+{
+  "at_kst": "2026-11-01T16:29:33.569404+09:00",
+  "base_commit": "f9291ac6625fc5dc2a6535f17e124f9ffb604a13",
+  "backup_sha256": "7cacc0ec6823a33e3ca7923c8ee19969183f6246f90024a6e4438938dad613c6",
+  "backup_file_count": 1567,
+  "backup_restore_verified": true,
+  "history_documents": {
+    "STATUS.md": "archive/STATUS-history-20261101.md",
+    "PLAN.md": "archive/PLAN-history-20261101.md"
+  },
+  "history_text_preserved_except_relative_link_rebasing": true,
+  "projected_results": [
+    {
+      "path": "infra/normalization/wazuh-vector/indexer-native/delay-audit-20261015/load/validation-2026-10-15.json",
+      "before_bytes": 1373655,
+      "after_bytes": 10972,
+      "original_sha256": "cb58fb416dc4b1949382d4bafb666647c11739b822af6164c67b6352efd06af2",
+      "details": [
+        {
+          "pointer": "/load/samples",
+          "count": 609,
+          "canonical_json_sha256": "15212da3d9a1f635f96e5b87d154f8dafdf2b5afc355bbf2b882451624f165a2"
+        }
+      ]
+    },
+    {
+      "path": "infra/normalization/wazuh-vector/correlation-fix/load-validation-2026-10-14.json",
+      "before_bytes": 743847,
+      "after_bytes": 370641,
+      "original_sha256": "9f206cf517a2cbf948f14b1f0e63bd769f11e77f63b2411bce0b5a1e180894b1",
+      "details": [
+        {
+          "pointer": "/arms/0/load/samples",
+          "count": 80,
+          "canonical_json_sha256": "5d428c4061d593557fbfefe594e8b90cbbe6f0cef136e33d08895238dfc965fb"
+        },
+        {
+          "pointer": "/arms/1/load/samples",
+          "count": 70,
+          "canonical_json_sha256": "04f10363a91a309a02fb02c7022a64d6f310f8173c877d91f71ee57056de9083"
+        }
+      ]
+    }
+  ],
+  "removed_generated_files": [
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-1609/results.jsonl",
+      "bytes": 60109,
+      "sha256": "2501a125905dc0f0006ed45668bcb9afa77c2901735ef315dc866aad19205291"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-rule-edit/candidate-110-r1.conf",
+      "bytes": 22696,
+      "sha256": "2ffa7e827c3ca066e9e838f61efb3ae4d8e09e1e6f27a18787a6b3d8b720cff4"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-rule-edit/candidate-110-r2.conf",
+      "bytes": 22696,
+      "sha256": "2ffa7e827c3ca066e9e838f61efb3ae4d8e09e1e6f27a18787a6b3d8b720cff4"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-rule-edit/results.jsonl",
+      "bytes": 4410,
+      "sha256": "66382c32cd0bb70306cf2fd77df955daa57b3b8adca6ed5391ed55f18c87b856"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-write-candidate/candidate-110-r1.conf",
+      "bytes": 22695,
+      "sha256": "172f049ca20375ad0367c12d22567fe19e2bca31243106cd177324cec987815b"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-write-candidate/candidate-110-r2.conf",
+      "bytes": 22695,
+      "sha256": "172f049ca20375ad0367c12d22567fe19e2bca31243106cd177324cec987815b"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-write-candidate/candidate-111-r1.conf",
+      "bytes": 22695,
+      "sha256": "172f049ca20375ad0367c12d22567fe19e2bca31243106cd177324cec987815b"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-write-candidate/candidate-111-r2.conf",
+      "bytes": 22695,
+      "sha256": "172f049ca20375ad0367c12d22567fe19e2bca31243106cd177324cec987815b"
+    },
+    {
+      "path": "infra/hermes/benchmarks/results/2026-10-13-write-candidate/results.jsonl",
+      "bytes": 109388,
+      "sha256": "fba0a9918e0bb280df2b257536106586a435271defcd73c5b69b640ed71cb0d5"
+    },
+    {
+      "path": "topology/groot_soc_network_architecture_rule_mcp.png",
+      "bytes": 354169,
+      "sha256": "cfa406752bcfd987d6eb7ec7719d1bddd340a16a12d53ad2747c668644f94ff0"
+    },
+    {
+      "path": "topology/groot_soc_topology_bus_rule_mcp.png",
+      "bytes": 131463,
+      "sha256": "9044e34f9292991a99dd1c7c1dec3e280e7d8048892c11d93ab318ccab55aca3"
+    },
+    {
+      "path": "topology/groot_soc_topology_slide_rule_mcp.png",
+      "bytes": 626924,
+      "sha256": "d45e9b5dcdf488210c88e47ff26b1f1bfe3191d0b4682bc2ca262c53d1fb0b57"
+    }
+  ],
+  "removed_bytes": 1422635,
+  "detail_bytes_reduced": 1735889,
+  "rewritten_markdown_links_in": [
+    "infra/README.md",
+    "infra/diagrams/README.md",
+    "infra/hermes/benchmarks/README.md",
+    "infra/hermes/benchmarks/results/2026-10-13-1609/REPORT.md",
+    "simulation_report.md",
+    "suggestion_review.md"
+  ],
+  "other_validation_json_preserved": 140,
+  "git_history_rewritten": false,
+  "runtime_code_changed": false,
+  "operational_servers_changed": false,
+  "dataset_migration_performed": false,
+  "verification": {
+    "full_backup_restore_verified": true,
+    "history_prose_preserved": true,
+    "json_projection_all_retained_values_identical": true,
+    "projected_files": 2,
+    "archived_sample_count": 759,
+    "new_broken_markdown_targets": 0,
+    "all_remaining_json_parse": true,
+    "ignore_path_checks": 16,
+    "files_after": 1561,
+    "bytes_after": 22161109,
+    "git_history_rewritten": false
+  },
+  "net_tracked_bytes_before": 25285752,
+  "net_tracked_bytes_after_observed": 22161109,
+  "net_tracked_reduction_observed": 3124643,
+  "dataset_archive_rule": {
+    "scope": "all datasets combined",
+    "original_archive": "datasets/archives/original.tar.gz",
+    "cleaned_archive": "datasets/archives/cleaned.tar.gz",
+    "persistent_archive_count": 2,
+    "existing_data_migrated": false
+  }
+}

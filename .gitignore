@@ -42,6 +42,9 @@ deployment/*.local.conf
 # 포스터 및 모든 하위 폴더·파일은 로컬에만 보관
 /포스터/
 
+# 통합 데이터셋 원본·정제본 압축 보관소와 검증/작업 공간은 로컬 전용
+/datasets/archives/
+
 # 졸업논문 참고자료와 작성 중 원고는 로컬에 보관
 /논문/
 
@@ -70,3 +73,8 @@ model*.hdf5
 /finetuning/checkpoints/
 /finetuning/outputs/
 /finetuning/exports/
+
+# 재생성 가능한 벤치마크 원시 출력·룰 후보·토폴로지 중간 산출물
+/infra/hermes/benchmarks/results/**/results.jsonl
+/infra/hermes/benchmarks/results/**/candidate-*.conf
+/topology/*_rule_mcp.png

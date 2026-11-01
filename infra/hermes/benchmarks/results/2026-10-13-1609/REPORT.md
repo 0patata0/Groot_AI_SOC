@@ -57,7 +57,7 @@
 ## 재현 자료
 
 - [입력과 정답](cases.json)
-- [원본 응답·시간](results.jsonl)
+- [원본 응답·시간](../../../../../archive/REPOSITORY_CLEANUP.md)
 - [엄격 재채점 집계](validated_summary.json)
 - [준비 요청](warmup.json)
 - [측정 전 메타데이터](metadata_before.json) · [측정 후 메타데이터](metadata_after.json)

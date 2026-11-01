@@ -67,7 +67,7 @@ python3 -B infra/hermes/benchmarks/compare_write_candidate.py \
 - 입력/예상 후보/실제 후보·응답·메타데이터를 결과 폴더에 보존한다. 추론 본문은 저장하지 않는다. 스트림 8MiB, 소켓 180초, 수신 줄마다 경과 300초를 제한하므로 무응답 구간에서는 전체 제한을 초과할 수 있다.
 - 운영의 약 25k 초기 API 입력·42~88k 후속 API 입력과 전체 도구 목록·Hermes 처리 경로는 재현하지 않는다. 합성 파일 복사 시험 2회씩이며 일반적인 룰 수정 정확도나 승인 후 적용 속도의 평가가 아니다.
 
-**2026-10-13 16:40~16:44 KST 결과:** [원본 응답](results/2026-10-13-write-candidate/results.jsonl) · [집계](results/2026-10-13-write-candidate/summary.json) · [입력 조건](results/2026-10-13-write-candidate/case.json) · [파일 해시](results/2026-10-13-write-candidate/manifest.json).
+**2026-10-13 16:40~16:44 KST 결과:** [원본 응답](../../../archive/REPOSITORY_CLEANUP.md) · [집계](results/2026-10-13-write-candidate/summary.json) · [입력 조건](results/2026-10-13-write-candidate/case.json) · [파일 해시](results/2026-10-13-write-candidate/manifest.json).
 
 | 항목 | `.110` | `.111` |
 |---|---:|---:|
@@ -102,7 +102,7 @@ python3 -B infra/hermes/benchmarks/compare_rule_edit.py \
 - 실제 MCP·승인·특권 실행·서버 파일 쓰기·재로딩은 호출하지 않는다. 저장된 `candidate-*.conf`는 시험 프로세스가 로컬에서 재구성한 파일이다. 운영 환경에서의 승인·적용 완료 시험은 별도로 필요하다.
 - `case.json`에 요청과 실행 당시 스키마·전송 코드 해시를 기록한다. `manifest.json`은 독립 검토 후 결과 파일 해시를 추가하며, 벤치마크 본체 해시는 실행 후 수집한 값임을 구분한다. 추론 본문은 저장하지 않고 문자 수만 기록한다.
 
-**2026-10-13 18:52~18:55 KST 결과:** [원본 응답](results/2026-10-13-rule-edit/results.jsonl) · [집계](results/2026-10-13-rule-edit/summary.json) · [입력 조건](results/2026-10-13-rule-edit/case.json) · [독립 검증·파일 해시](results/2026-10-13-rule-edit/manifest.json).
+**2026-10-13 18:52~18:55 KST 결과:** [원본 응답](../../../archive/REPOSITORY_CLEANUP.md) · [집계](results/2026-10-13-rule-edit/summary.json) · [입력 조건](results/2026-10-13-rule-edit/case.json) · [독립 검증·파일 해시](results/2026-10-13-rule-edit/manifest.json).
 
 | 항목 | 이전 전체 후보 출력 `.110` | 부분편집 출력 `.110` |
 |---|---:|---:|

@@ -23,6 +23,33 @@ def rows(call):
 
 
 class NativeFullInventory(unittest.TestCase):
+    def test_native_reformat_reuses_bound_details_and_keeps_id(self):
+        previous='Wazuh ID 5712 조건 보여줘';current='룰 각각 표로 보여줘'
+        call=fixtures.fixture(view='details',rule_id='5712',total=1)
+        messages=[{'role':'user','content':previous},*rows(call),{'role':'assistant','content':'untrusted paraphrase'},
+                  {'role':'user','content':current}]
+        resolved=alignment.resolve_rule_history(current,messages,len(messages)-1,PLUGIN,H)
+        self.assertEqual(H.security_inventory_request(resolved)['rule_id'],'5712')
+        report=alignment.prior_read_report(resolved,messages,len(messages)-1,PLUGIN,H)
+        self.assertIn('| 5712 |',report);self.assertIn('새 조회 없음',report)
+        messages[2]['content']='tampered tool body'
+        self.assertIsNone(alignment.prior_read_report(resolved,messages,len(messages)-1,PLUGIN,H))
+
+    def test_native_request_builder_returns_table_locally_without_read_selection(self):
+        from types import SimpleNamespace
+        from dataclasses import dataclass
+        @dataclass
+        class Request:
+            api_kwargs:object
+        previous='WAF 커스텀 룰 상세 조회';current='룰 각각 표로 보여줘'
+        messages=[{'role':'user','content':previous},*rows(fixtures.fixture(target='a:waf',origin='custom',view='details')),
+                  {'role':'user','content':current}]
+        agent=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,_current_turn_id='a')
+        wrap=alignment.request_wrapper(lambda *a,**k:Request({'messages':messages,'tools':[]}),PLUGIN,H)
+        wrap(agent,original_user_message=current,turn_id='a',messages=messages)
+        self.assertIn('| 5712 |',agent._capstone_query_completion_local_format[1])
+        self.assertIsNone(agent._capstone_read_selection)
+
     def test_native_wrapped_vendor_correlation_is_identical_to_sdk_evidence(self):
         call=fixtures.fixture(view='details',rule_id='5712',total=1)
         native=alignment.calls_from_rows(rows(call),PLUGIN._inventory_payload)

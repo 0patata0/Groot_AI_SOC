@@ -13,6 +13,14 @@ def call(objects=None, **kw):
 
 
 class FirewallHarness(unittest.TestCase):
+    def test_individual_table_request_displays_each_fw_rule(self):
+        q=h.resolve_short_read('룰 각각 표로 보여줘',['FW 룰 상세 조회'])
+        report=h.read_report(q,[call()])
+        self.assertIn('| family / table / chain | handle |',report)
+        self.assertIn('| 7 |',report)
+        reused=h.prior_inventory('룰 각각 표로 보여줘',{'question':'FW 룰 상세 조회','calls':[call()]})
+        self.assertTrue(reused.reused)
+
     def test_short_applied_state_questions_use_full_firewall_read(self):
         questions = (
             '지금 방화벽 룰 뭐 적용 됐어?', '지금 fw 룰 뭐 적용 됐어?',

@@ -229,7 +229,8 @@ def prior_read_report(request, rows, idx, query, harness):
             if harness.summary_request(question):continue
             calls = calls_from_rows(rows[previous + 1:idx], query._inventory_payload)
             return harness.prior_summary(request, {'question':question,'calls':calls})
-        if not harness.inventory_question(question): return None
+        if not same_summary_conversation(rows[idx].get('content'),row.get('content'),harness):return None
+        if not (harness.inventory_question(question) or harness.security_inventory_request(question) or harness.firewall_request(question)):return None
         calls = calls_from_rows(rows[previous + 1:idx], query._inventory_payload)
         stamps = []
         for c in calls:
@@ -240,6 +241,16 @@ def prior_read_report(request, rows, idx, query, harness):
         when = ' / '.join(dict.fromkeys(stamps)) if stamps else '원문 시각 미확인'
         return harness.prior_inventory(request, {'question': question, 'calls': calls, 'at_kst': when})
     return harness.prior_summary(request, None)
+
+
+def resolve_rule_history(request, rows, idx, query, harness):
+    if not harness.rule_table_request(request):return request
+    for row in reversed(rows[max(0,idx-64):idx]):
+        if not isinstance(row,dict) or row.get('role')!='user':continue
+        if not same_summary_conversation(rows[idx].get('content'),row.get('content'),harness):return request
+        previous=query.current_request_text(row.get('content'))
+        return harness.resolve_short_read(request,[previous]) if previous else request
+    return request
 
 
 def recover_summary_request(request, rows, idx, query, harness):
@@ -275,7 +286,9 @@ def request_wrapper(original, query, harness):
         rows = kw.get('messages', [])
         idx = next((i for i in range(len(rows) - 1, -1, -1) if isinstance(rows[i], dict)
                     and rows[i].get('role') == 'user' and rows[i].get('content') == kw.get('original_user_message')), -1)
-        if idx>=0:request=recover_summary_request(request,rows,idx,query,harness)
+        if idx>=0:
+            request=recover_summary_request(request,rows,idx,query,harness)
+            request=resolve_rule_history(request,rows,idx,query,harness)
         request=harness.resolve_card_request(kw.get('original_user_message',''),request)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload) if idx >= 0 else []
         # Per-agent, per-turn evidence snapshot. Native execution/recording stay
@@ -541,6 +554,7 @@ def final_wrapper(legacy, original, native, append_message, reanchor, query, har
         if type(idx) is not int or idx < 0 or idx >= len(rows) or rows[idx].get("content") != user:
             return legacy(agent, **kw)
         request=recover_summary_request(request,rows,idx,query,harness)
+        request=resolve_rule_history(request,rows,idx,query,harness)
         request=harness.resolve_card_request(user,request)
         calls = calls_from_rows(rows[idx + 1:], query._inventory_payload)
         notice = harness.scope_notice(request)

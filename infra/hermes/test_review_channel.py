@@ -267,6 +267,55 @@ class Tests(unittest.TestCase):
         self.assertEqual(pool.submit.call_args.args[1]['current_question'],expected)
         self.assertIn('WAF',expected)
 
+    def rule_fixture(self):
+        import importlib.util
+        path=Path(__file__).resolve().parents[1]/'ollama-trial/test_security_inventory.py'
+        spec=importlib.util.spec_from_file_location('_shared_rule_fixture',path)
+        mod=importlib.util.module_from_spec(spec)
+        with mock.patch.dict(sys.modules,{'harness':self.d.harness}):spec.loader.exec_module(mod)
+        return mod.fixture(target='a:waf',origin='custom',view='details')
+
+    def test_shared_reformat_reuses_evidence_without_worker_and_retains_chain(self):
+        self.actual_harness();self.post['message']='WAF 커스텀 룰 상세 조회'
+        self.d.add(self.post);first=self.job();self.finish()
+        evidence={'question':self.post['message'],'calls':[self.rule_fixture()]}
+        self.d.db.execute('INSERT INTO request_evidence VALUES(?,?)',(first['id'],json.dumps(evidence)))
+        job=self.follow('룰 각각 표로 보여줘')
+        pool=mock.Mock();self.d.tick(pool);pool.submit.assert_not_called()
+        report=json.loads(self.d.db.execute('SELECT result FROM jobs WHERE id=?',(job['id'],)).fetchone()[0])
+        self.assertTrue(report['evidence_reused']);self.assertEqual(report['calls'],[])
+        self.assertIn('| 5712 |',report['final_response']);self.assertIn('새 조회 없음',report['final_response'])
+        self.assertIsNotNone(self.d.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(job['id'],)).fetchone())
+
+    def test_shared_bad_or_fresh_evidence_falls_back_to_same_scope_worker(self):
+        self.actual_harness();self.post['message']='WAF 커스텀 룰 상세 조회'
+        self.d.add(self.post);first=self.job();self.finish()
+        call=self.rule_fixture();call['result_sha256']='f'*64
+        self.d.db.execute('INSERT INTO request_evidence VALUES(?,?)',(first['id'],json.dumps({'question':self.post['message'],'calls':[call]})))
+        self.follow('룰 각각 표로 보여줘')
+        pool=mock.Mock();self.d.tick(pool)
+        q=pool.submit.call_args.args[1]['current_question']
+        self.assertEqual(self.d.harness.security_inventory_request(q)['origin'],'custom')
+        self.assertEqual(self.d.harness.security_inventory_request(q)['targets'],['a:waf'])
+
+    def test_shared_completed_read_receipts_are_persisted_but_writes_are_not(self):
+        self.actual_harness();self.post['message']='WAF 커스텀 룰 상세 조회';self.d.add(self.post)
+        job=self.job();self.d.placeholder(job)
+        future=concurrent.futures.Future();future.set_result({'status':'completed','final_response':'observed',
+            'structured_scope_complete':True,'protected_calls':0,'calls':[self.rule_fixture()]})
+        self.d.active['ollama']=(future,job['id']);self.d.tick(mock.Mock())
+        saved=json.loads(self.d.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(job['id'],)).fetchone()[0])
+        self.assertEqual(saved['question'],self.post['message'])
+        self.assertEqual(saved['calls'][0]['arguments']['origin'],'custom')
+        second=dict(self.post,id='n'*26,create_at=2200,message='@ollama WAF 변경안 준비')
+        self.posts[second['id']]=second;self.d.add(second)
+        job=dict(self.d.db.execute('SELECT * FROM jobs WHERE source_id=?',(second['id'],)).fetchone())
+        self.d.placeholder(job)
+        future=concurrent.futures.Future();future.set_result({'status':'completed','final_response':'proposal',
+            'structured_scope_complete':True,'protected_calls':1,'calls':[{'server':'rule-write-a','name':'propose_rule_edit'}]})
+        self.d.active['ollama']=(future,job['id']);self.d.tick(mock.Mock())
+        self.assertIsNone(self.d.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(job['id'],)).fetchone())
+
     def test_only_authorized_human_sources_are_accepted(self):
         self.assertTrue(p.eligible(self.post, self.config))
         for field, value in [('user_id', 'o' * 26), ('channel_id', 'd' * 26), ('create_at', 1),

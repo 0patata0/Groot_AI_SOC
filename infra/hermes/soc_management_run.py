@@ -992,7 +992,8 @@ def main():
         return original_result(self, data, session_id, exit_code)
 
     def receipt_progress(self, event_type, tool_name=None, preview=None, args=None, **kwargs):
-        if event_type == 'tool.completed' and (tool_name == 'mcp__resp__get_firewall_rules' or tool_name in {
+        if event_type == 'tool.completed' and (tool_name in {'mcp__resp__get_firewall_rules',
+                'mcp__rule_a__get_security_rules','mcp__rule_b__get_security_rules'} or tool_name in {
                 'mcp__security_events__' + name for name in EVENT_READ}):
             # Native CLI previews stop at 5,000 characters, in the middle of JSON.
             # Keep the bounded real result for host verification, without changing

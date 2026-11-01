@@ -38,6 +38,80 @@ def seal(call,data):
 
 
 class FullInventory(unittest.TestCase):
+    def test_rule_tables_preserve_filters_and_use_details_for_each_device(self):
+        for previous,target,origin in [('WAF 커스텀 룰 상세 조회','a:waf','custom'),
+                                      ('IDS 기본 룰 상세 조회','a:suricata','builtin'),
+                                      ('Wazuh 룰 상세 조회','b:wazuh','all')]:
+            q=H.resolve_short_read('룰 각각 표에다가 정리해서 보여줘',[previous])
+            plan=H.security_inventory_request(q)
+            self.assertEqual((plan['targets'],plan['origin'],plan['view']),([target],origin,'details'))
+            text=H.read_report(q,[fixture(target=target,origin=origin,view='details')])
+            self.assertIn('| ID/SID |',text);self.assertIn('| 5712 |',text)
+            self.assertNotIn('ID/SID 예시:',text)
+
+    def test_reformat_keeps_id_and_correlation_but_new_scope_wins(self):
+        q=H.resolve_short_read('표로 보여줘',['Wazuh ID 5712 조건 보여줘'])
+        self.assertEqual(H.security_inventory_request(q)['rule_id'],'5712')
+        q=H.resolve_short_read('룰별 표로 정리해줘',['Wazuh 상관 룰 상세 조회'])
+        self.assertTrue(H.security_inventory_request(q)['correlation_only'])
+        q=H.resolve_short_read('IDS 룰 각각 표로 보여줘',['WAF 커스텀 룰 상세 조회'])
+        self.assertEqual(H.security_inventory_request(q)['targets'],['a:suricata'])
+        self.assertEqual(H.security_inventory_request(q)['origin'],'all')
+        q=H.resolve_short_read('기본 룰 각각 표로 보여줘',['WAF 커스텀 룰 상세 조회'])
+        self.assertEqual(H.security_inventory_request(q)['origin'],'builtin')
+
+    def test_actual_complaint_is_individual_table_not_summary(self):
+        q='WAF 요약해서 하나로 보여주지 말고 룰 각각 표에다가 정리해서 보여줘야지'
+        self.assertTrue(H.security_inventory_request(q)['table_output'])
+        self.assertEqual(H.security_inventory_request(q)['view'],'details')
+        for q in ('WAF 장비별 룰 개수 표로 보여줘','WAF 룰 집계 표로 보여줘'):
+            self.assertFalse(H.security_inventory_request(q)['table_output'])
+
+    def test_verified_prior_details_are_reused_with_original_timestamp(self):
+        evidence={'question':'WAF 커스텀 룰 상세 조회','calls':[fixture(target='a:waf',origin='custom',view='details')]}
+        rendered=H.prior_inventory('룰 각각 표로 보여줘',evidence)
+        self.assertTrue(rendered.reused);self.assertFalse(rendered.partial)
+        for value in ('새 조회 없음','2026-10-31T13:00:00+09:00','| 5712 |','커스텀'):
+            self.assertIn(value,rendered)
+        for q in ('지금 다시 조회해서 룰 각각 표로 보여줘','새로 조회해서 룰 각각 표로 보여줘',
+                  '다시 확인해서 룰 각각 표로 보여줘','재조회해서 개별 룰 표로 보여줘',
+                  '룰 refresh해서 각각 표로 보여줘','IDS 룰 각각 표로 보여줘',
+                  'WAF ID 9999 룰 표로 보여줘','기본 룰 각각 표로 보여줘'):
+            self.assertIsNone(H.prior_inventory(q,evidence),q)
+        evidence['calls'][0]['result_sha256']='f'*64
+        self.assertIsNone(H.prior_inventory('룰 각각 표로 보여줘',evidence))
+
+    def test_summary_does_not_supply_unread_details_or_invent_fields(self):
+        evidence={'question':'WAF 룰 조회','calls':[fixture(target='a:waf')]}
+        self.assertIsNone(H.prior_inventory('룰 각각 표로 보여줘',evidence))
+        self.assertTrue(H.missing_reads('WAF 룰 각각 표로 보여줘',evidence['calls']))
+
+    def test_table_escapes_rule_content_and_keeps_duplicate_ids_separate(self):
+        rows=[{'id':'42','origin':'builtin','configuration':'selected','source':'/rules/a',
+               'description':'bad | cell\n<script>*x*</script>', 'definition':r'a \| b'},
+              {'id':'42','origin':'custom','configuration':'excluded','source':'/rules/b','definition':'other'}]
+        text='\n'.join(H.rule_rows_table(rows))
+        lines=[x for x in text.splitlines() if x.startswith('| 42 |')]
+        self.assertEqual(len(lines),2)
+        self.assertTrue(all(x.count('|')==6 for x in lines))
+        self.assertIn('&#124;',text);self.assertNotIn('<script>',text)
+        self.assertIn('포함',text);self.assertIn('제외',text)
+
+    def test_display_pages_are_bounded_and_do_not_claim_missing_rows_absent(self):
+        rows=[{'id':str(i),'origin':'builtin','configuration':'selected','source':'/rules/'+str(i),
+               'description':'x'*1000,'definition':'y'*1000} for i in range(100)]
+        first='\n'.join(H.rule_rows_table(rows,1));second='\n'.join(H.rule_rows_table(rows,2))
+        self.assertLess(len(first),7500);self.assertIn('조회된 100개 중',first)
+        self.assertIn('표시 축약',first);self.assertIn('| 0 |',first);self.assertNotIn('| 0 |',second)
+        self.assertIn('전체 규칙이 0개라는 뜻은 아닙니다','\n'.join(H.rule_rows_table(rows,999)))
+
+    def test_raw_json_remains_explicit_and_write_never_becomes_format(self):
+        q='Wazuh 룰 각각 표로 보여줘 JSON 원문도'
+        self.assertTrue(H.security_inventory_request(q)['raw_output'])
+        self.assertIn('```json',H.read_report(q,[fixture(view='details')]))
+        for q in ('룰 삭제하고 표로 보여줘','승인해줘','차단해줘'):
+            self.assertEqual(H.resolve_short_read(q,['WAF 룰 상세 조회']),q)
+
     def test_short_device_requests_select_full_read_only_tools(self):
         for q,target in [('WAF 룰','a:waf'),('IPS 룰','a:suricata'),('와주 룰','b:wazuh')]:
             with self.subTest(q=q):

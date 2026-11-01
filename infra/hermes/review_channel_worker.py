@@ -319,7 +319,8 @@ def main():
             plan = harness.read_plan(current)
             if result['completed'] and scope_complete and (fw_only or (plan and plan['kind'] == 'agent_identity')):
                 status = 'completed'  # Completion of these read fields, not incident closure.
-            print(json.dumps({'status': status, 'peer_review': peer_review,
+            evidence=({'question':current,'calls':receipts} if result['completed'] and scope_complete and not any(c['is_write'] for c in calls) else None)
+            print(json.dumps({'status': status, 'peer_review': peer_review, 'evidence':evidence,
                               'final_response': text,
                               'management_state': result['state'], 'case_id': cid, 'run_id': result['run_id'],
                               'structured_scope_complete': scope_complete,

@@ -111,12 +111,18 @@ class Dispatcher:
         # queue during rollback. Never rewrite the user's stored message.
         self.db.execute('CREATE TABLE IF NOT EXISTS request_context ('
                         'source_id TEXT PRIMARY KEY, current_question TEXT NOT NULL, parent_source_id TEXT)')
+        self.db.execute('CREATE TABLE IF NOT EXISTS request_evidence (job_id TEXT PRIMARY KEY, evidence TEXT NOT NULL)')
         with self.db:
             self.db.execute("UPDATE jobs SET status='delivery',result=? WHERE status='running'",
                             (json.dumps({'status': 'failed', 'final_response': FAILURE}),))
         self.active = {}
         self.progress_clock = {}
         self.last_poll = 0
+
+    def retain_evidence(self, jid, raw):
+        self.db.execute('INSERT OR REPLACE INTO request_evidence VALUES(?,?)',(jid,raw))
+        self.db.execute('DELETE FROM request_evidence WHERE job_id NOT IN ('
+            'SELECT e.job_id FROM request_evidence e JOIN jobs j ON j.id=e.job_id ORDER BY j.created DESC LIMIT 200)')
 
     def add(self, post):
         if not policy.eligible(post, self.c) or self.db.execute('SELECT 1 FROM requests WHERE id=?', (post['id'],)).fetchone():
@@ -252,6 +258,23 @@ class Dispatcher:
                 summary['calls'] = [{k: c[k] for k in ('server', 'name', 'is_error', 'is_write', 'result_sha256') if k in c} for c in report.get('calls', [])]
                 with self.db:
                     self.db.execute("UPDATE jobs SET result=?,status='delivery' WHERE id=?", (json.dumps(summary, ensure_ascii=False), jid))
+                    # Private, bounded read receipts. Bot prose and write results
+                    # are never cached as an authority for a later request.
+                    job=self.db.execute('SELECT phase,source_id FROM jobs WHERE id=?',(jid,)).fetchone()
+                    evidence=report.get('evidence')
+                    if job['phase']=='lead' and report.get('status')=='completed' and not report.get('protected_calls'):
+                        if not evidence and report.get('calls'):
+                            q=self.db.execute('SELECT current_question FROM request_context WHERE source_id=?',(job['source_id'],)).fetchone()
+                            evidence={'question':q[0] if q else '', 'calls':report['calls']}
+                        if (isinstance(evidence,dict) and isinstance(evidence.get('calls'),list)
+                                and evidence['calls'] and all(isinstance(c,dict) and isinstance(c.get('arguments'),dict)
+                                and isinstance(c.get('result'),str) and not c.get('is_error') and not c.get('is_write')
+                                and self.harness.EVIDENCE.allowed('mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name',''),'verify')
+                                and hashlib.sha256(c['result'].encode()).hexdigest()==c.get('result_sha256')
+                                for c in evidence['calls'])):
+                            raw=json.dumps(evidence,ensure_ascii=False)
+                            if len(raw.encode())<=1048576:
+                                self.retain_evidence(jid,raw)
                 del self.active[engine]
                 self.progress_clock.pop(jid,None)
             else:
@@ -283,7 +306,23 @@ class Dispatcher:
                 with self.db:
                     self.db.execute("UPDATE jobs SET status='cancelled' WHERE id=?", (job['id'],))
                 continue
+            context=self.db.execute('SELECT current_question,parent_source_id FROM request_context WHERE source_id=?',(job['source_id'],)).fetchone()
+            reused=None;evidence=None
+            if job['phase']=='lead' and context and context['parent_source_id'] and not job['cross_review']:
+                rows=self.db.execute("SELECT e.evidence FROM jobs j JOIN request_evidence e ON e.job_id=j.id "
+                    "WHERE j.source_id=? AND j.engine=? AND j.phase='lead' AND j.status='done'",
+                    (context['parent_source_id'],job['engine'])).fetchall()
+                if len(rows)==1:
+                    evidence=json.loads(rows[0]['evidence'])
+                    reused=self.harness.prior_inventory(context['current_question'],evidence)
             if not self.placeholder(job):
+                continue
+            if reused:
+                report={'status':'completed','final_response':str(reused),'protected_calls':0,
+                        'structured_scope_complete':True,'evidence_reused':True,'calls':[]}
+                with self.db:
+                    self.db.execute("UPDATE jobs SET status='delivery',result=? WHERE id=?",(json.dumps(report,ensure_ascii=False),job['id']))
+                    self.retain_evidence(job['id'],json.dumps(evidence,ensure_ascii=False))
                 continue
             with self.db:
                 self.db.execute("UPDATE jobs SET status='running' WHERE id=?", (job['id'],))

@@ -4,6 +4,7 @@ The installer copies the two canonical Hermes sources verbatim. Development
 imports those same sources, rather than maintaining a second rules parser.
 """
 import hashlib
+import html
 from datetime import datetime, timezone, timedelta
 import ipaddress
 import importlib.util
@@ -68,6 +69,7 @@ def resolve_short_read(question, prior_questions=()):
         return question
     previous = prior_questions[-1]
     if not isinstance(previous,str) or len(previous)>1800: return question
+    if READ.wants_write(normalized(question)) or READ.wants_write(normalized(previous)):return question
     current = rule_scope_request(question)
     prior = rule_scope_request(previous)
     if not prior and not READ.wants_write(normalized(previous)):
@@ -77,6 +79,22 @@ def resolve_short_read(question, prior_questions=()):
         elif re.search(r'상태|조회|확인|보여|알려|오류|문제|어때',label):
             prior = rule_scope_request(previous+' 룰 조회')
     if not prior: return question
+    if rule_table_request(question) and prior['devices']:
+        # Reformatting preserves the previous selection, including vendor IDs
+        # and correlation filters, but never carries an action or old facts.
+        if current and current['devices'] and current['devices'] != prior['devices']:return question
+        text=normalized(question)
+        old=security_inventory_request(previous)
+        prefix=' '.join(prior['devices'])+' 룰 '
+        if not re.search(r'커스텀|custom|기본|내장|builtin|전체|모든',text,re.I):
+            prefix += '커스텀 ' if prior.get('custom_only') else '기본 ' if prior.get('basic_only') else ''
+        if old:
+            if old['rule_id'] is not None and not re.search(r'\b(?:ID|SID)\s*[:=]?\s*\d',text,re.I):prefix+='ID '+old['rule_id']+' '
+            if old['correlation_only'] and '상관' not in text:prefix+='상관 '
+            if old['all_details']:prefix+='전체 상세 목록 '
+            elif old['view']=='details':prefix+='상세 '
+        resolved=prefix+'조회. '+question
+        return resolved if len(resolved)<=1800 else question
     if current and current['ambiguous'] and len(prior['devices'])==1:
         return prior['devices'][0]+' '+question
     # The user's answer to our one clarification is often just "FW".
@@ -126,6 +144,15 @@ def firewall_request(question):
     return request if request and 'FW' in request['devices'] else None
 
 
+def rule_table_request(question):
+    text=normalized(question)
+    if READ.wants_write(text) or not re.search(r'표|테이블',text):return False
+    individual=bool(re.search(r'각각|개별|하나씩|한\s*(?:행|줄)씩|(?:룰|규칙)별',text))
+    if not individual and re.search(r'장비별|개수|집계|통계|요약',text):return False
+    return individual or bool(re.search(r'룰|규칙|rules?|상세|자세|방금|그거|그걸',text,re.I)) or bool(
+        re.fullmatch(r'(?:표로|테이블로)\s*(?:정리해서\s*)?(?:보여줘|보여줄래|정리해줘|해줘|보여주세요)?[?.!]*',text.strip()))
+
+
 def security_inventory_request(question):
     """Full device definitions by default; a named edit file remains distinct."""
     if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):return None
@@ -146,12 +173,15 @@ def security_inventory_request(question):
     if not targets:return None
     ids=list(dict.fromkeys(re.findall(r'\b(?:ID|SID)\s*[:=]?\s*([0-9]{1,10})(?![0-9])',text,re.I)))
     if len(ids)>1:return None
-    detailed=bool(ids or re.search(r'원문|JSON|전체\s*필드|상세|자세|조건|설명|레벨|상관|참조|frequency|timeframe|description|level|msg|severity',text,re.I))
-    all_details=bool(re.search(r'(?:전체|모든).{0,12}(?:상세|목록|ID|SID)|(?:상세|목록).{0,12}(?:전체|모두)',text,re.I))
+    table=rule_table_request(question)
+    detailed=bool(table or ids or re.search(r'원문|JSON|전체\s*필드|상세|자세|조건|설명|레벨|상관|참조|frequency|timeframe|description|level|msg|severity',text,re.I))
+    all_details=bool(re.search(r'(?:전체|모든).{0,12}(?:상세|목록|ID|SID)|(?:상세|목록).{0,12}(?:전체|모두)',text,re.I)
+                     or table and re.search(r'전체|모든|전부|모두',text))
     return {'targets':targets, 'origin':'custom' if request['custom_only'] else 'builtin' if request['basic_only'] else 'all',
             'view':'details' if detailed or all_details else 'summary', 'rule_id':ids[0] if ids else None,
             'correlation_only':bool(re.search(r'상관',text)), 'all_details':all_details, 'fw':'FW' in devices,
             'raw_output':bool(re.search(r'원문|\bJSON\b|전체\s*필드',text,re.I)),
+            'table_output':table, 'display_page':int(re.search(r'([1-9][0-9]{0,3})\s*페이지',text)[1]) if re.search(r'([1-9][0-9]{0,3})\s*페이지',text) else 1,
             'ids_runtime':bool(combined_rule_request(question))}
 
 
@@ -227,6 +257,10 @@ def security_inventory_report(plan,calls):
         if plan['view']=='summary':
             lines+=['ID/SID 예시: '+', '.join('`'+cell(r['id'])+'`' for r in rows)+'.',
                     '개별 조건 전체는 위 요약에서 생략했습니다. 특정 ID 상세 또는 범위를 지정해 조회할 수 있습니다.']
+        elif plan.get('table_output') and not plan.get('raw_output'):
+            lines+=rule_rows_table(rows,plan['display_page'],max(1200,6000//len(plan['targets'])))
+            if state['next_offset'] is not None:
+                lines+=['아직 조회하지 않은 정의 '+str(d['matched_count']-shown)+'개가 있습니다. 전체 상세 조회가 필요하면 같은 장비·범위의 전체 상세 목록을 요청하세요.']
         else:
             for row in rows:
                 lines+=['- `'+cell(row['id'])+'` · '+cell(row['origin'])+' / '+cell(row['configuration'])+' · `'+cell(row['source'])+'`']
@@ -311,7 +345,7 @@ def firewall_report(question, calls):
         n = sum(tuple(r.get(k) for k in ('family', 'table', 'chain')) == key for r in rules)
         rows.append('| ' + ' | '.join(map(cell, [str(c.get('family')) + ' / ' + str(c.get('table')), c.get('name'),
             str(c.get('hook', '일반 체인')) + ' / ' + str(c.get('prio', '—')), c.get('policy', '해당 없음'), n])) + ' |')
-    if re.search(r'상세|자세|개별|전문|원문|조건|전체\s*(?:룰|규칙)', normalized(question)):
+    if rule_table_request(question) or re.search(r'상세|자세|개별|전문|원문|조건|전체\s*(?:룰|규칙)', normalized(question)):
         # Mattermost posts are bounded. All kernel objects were read, while
         # display pages are explicitly separate from MCP capture pagination.
         requested = re.search(r'([1-9][0-9]{0,3})\s*페이지', normalized(question))
@@ -1178,6 +1212,43 @@ def rule_detail_brief(row):
     return lines
 
 
+def rule_rows_table(rows, page_number=1, budget=6000):
+    """One verified definition per row; display paging never implies full capture."""
+    def table_cell(value, limit):
+        raw=str(value if value is not None else '미제공').replace('\r',' ').replace('\n',' ')
+        if len(raw)>limit:raw=raw[:limit]+'…[표시 축약]'
+        raw=html.escape(raw,quote=False)
+        for char,entity in (('|','&#124;'),('\\','&#92;'),('`','&#96;'),('[','&#91;'),(']','&#93;'),('*','&#42;'),('_','&#95;')):
+            raw=raw.replace(char,entity)
+        if len(raw)>limit+20:
+            # Keep entity boundaries intact when display escaping expands text.
+            parts=re.findall(r'&(?:#\d+|[A-Za-z]+);|.',raw)
+            kept=[];size=0
+            for part in parts:
+                if size+len(part)>limit:break
+                kept.append(part);size+=len(part)
+            raw=''.join(kept)+'…[표시 축약]'
+        return raw
+    pages=[];page=[];size=0
+    for row in rows:
+        brief=' · '.join(s.strip().removeprefix('- ') for s in rule_detail_brief(row)) or '조건 상세 미제공'
+        values=(row['id'], {'builtin':'기본','custom':'커스텀'}.get(row['origin'],row['origin']),
+                {'selected':'포함','excluded':'제외','unselected':'미선택'}.get(row['configuration'],row['configuration']),
+                brief,row['source'])
+        line='| '+' | '.join(table_cell(v,n) for v,n in zip(values,(64,20,20,520,180)))+' |'
+        if page and (len(page)>=20 or size+len(line)>budget):pages.append(page);page=[];size=0
+        page.append(line);size+=len(line)
+    if page:pages.append(page)
+    selected=pages[page_number-1] if 0<page_number<=len(pages) else []
+    output=['', '개별 룰 표 '+str(page_number)+'/'+str(max(1,len(pages)))+'페이지: 조회된 '+str(len(rows))+'개 중 '+str(len(selected))+'개 표시.',
+            '', '| ID/SID | 구분 | 설정상 포함 | 설명·조건·동작 (요약) | 출처 파일 |',
+            '| --- | --- | --- | --- | --- |', *selected, '',
+            '긴 필드·연결 조건은 표시 축약될 수 있습니다. 표시가 전체 조건을 대신하지 않으며, 특정 ID 원문으로 확인할 수 있습니다.']
+    if len(pages)>1:output+=['나머지 조회 결과는 같은 범위에서 “룰 표 N페이지”로 확인하세요. 표시 페이지와 미조회 정의는 별도입니다.']
+    if not selected:output+=['해당 표시 페이지가 비어 있습니다. 전체 규칙이 0개라는 뜻은 아닙니다.']
+    return output
+
+
 class ReadSummary(str):
     """Text plus verified-reuse status, shared by both adapters."""
     def __new__(cls, text, *, reused=False, partial=True):
@@ -1260,13 +1331,22 @@ def summary_recovery_request(question, evidence, prior_questions=()):
 def prior_inventory(question, evidence):
     # Pure reformat only. Fresh roots never receive evidence from the gateway.
     if (not isinstance(evidence, dict) or not re.search(r'표|테이블|정리', question)
-            or re.search(r'현재|지금|다시\s*조회|최신|갱신|변경|수정|삭제|추가', normalized(question))):
+            or re.search(r'현재|지금|다시\s*(?:조회|확인)|새로\s*(?:조회|확인|불러)|재조회|최신|갱신|변경|수정|삭제|추가|(?<![a-z])refresh(?![a-z])', normalized(question),re.I)):
         return None
     previous = evidence.get('question', '')
+    calls = evidence.get('calls', [])
+    if (security_inventory_request(previous) or firewall_request(previous)) and rule_table_request(question):
+        if (not isinstance(calls,list) or not calls or any(not isinstance(c,dict) or
+                not EVIDENCE.allowed('mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name',''),'verify') for c in calls)):
+            return None
+        resolved=resolve_short_read(question,[previous])
+        if not (security_inventory_request(resolved) or firewall_request(resolved)) or missing_reads(resolved,calls):return None
+        rendered=read_report(resolved,calls)
+        if rendered:
+            return ReadSummary('**이전 조회 결과 재정리 · 새 조회 없음**\n아래 시각은 앞선 실제 관측 시각입니다. 현재 상태를 다시 확인한 결과가 아닙니다.\n\n'+rendered,reused=True,partial=False)
     if not inventory_question(previous):
         return None
     combined = previous + '\n' + question
-    calls = evidence.get('calls', [])
     if any(c.get('name')=='get_rule_change_target' for c in calls) and not any(c.get('name')=='get_security_rules' for c in calls):
         combined += '\n커스텀 파일 조회 범위만 재구성'
     if inventory(combined, calls, missing_targets=True):

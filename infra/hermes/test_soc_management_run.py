@@ -494,6 +494,16 @@ class ManagementWrapper(unittest.TestCase):
                 self.assertFalse(events[0]['is_error'])
                 self.assertEqual(controller.tool_payload(events[0]['output']), payload)
 
+    def test_full_rule_receipt_does_not_truncate_detail_tables(self):
+        for name in ('mcp__rule_a__get_security_rules','mcp__rule_b__get_security_rules'):
+            payload={'schema_version':1,'rules':[{'id':str(i),'description':'condition '*80} for i in range(20)]}
+            raw=json.dumps({'result':json.dumps(payload)})
+            self.assertGreater(len(raw),5000)
+            def check(h):h.Emitter().on_tool_progress('tool.completed',name,result=raw,tool_call_id='rule-page',duration=.2)
+            h=Harness();h.run(check,'verify');event=json.loads(h.stdout.getvalue())
+            self.assertEqual(event['output'],raw);self.assertFalse(event['is_error'])
+            self.assertEqual(controller.tool_payload(event['output']),payload)
+
     def test_event_audit_utf8_limit_and_native_errors_fail_closed(self):
         for result, error in (('가' * (wrapper.MAX_EVENT_AUDIT_BYTES // 3 + 1), False),
                               (json.dumps({'error': 'denied'}), True)):

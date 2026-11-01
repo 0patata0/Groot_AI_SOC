@@ -1,0 +1,236 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-01T13:40:20.260871+09:00",
+  "purpose": "Collect/review/clean broadly for one future combined SOC training batch with prior cleaned sources.",
+  "source_pins": [
+    {
+      "id": "splunk_attack",
+      "repo": "splunk/attack_data",
+      "commit": "f08d6815063ceabc82b297dcf55c930dd1cc4a68",
+      "tree": "aafd8381c2b696fc514ddfe5ecaa6752a3876b89",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "otrf",
+      "repo": "OTRF/Security-Datasets",
+      "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
+      "tree": "cf0528d5c718284d2a68c6d4565868c148eac731",
+      "license": "UNRESOLVED: LICENSE and README badge MIT, README footer GPL-3.0"
+    },
+    {
+      "id": "cti_realm",
+      "repo": "microsoft/ACESEvals",
+      "commit": "2c76fbdea415d6fa6a87bbad846686fefd6ee9bb",
+      "tree": "79872b4f8daf23a4a806ccd35630d6f7db05d590",
+      "license": "MIT for repository; external HF data rights unverified"
+    }
+  ],
+  "metadata_files": 1539,
+  "metadata_bytes": 1701866,
+  "acquired_events": {
+    "files": 1393,
+    "bytes": 402411434,
+    "errors": [],
+    "sources": {
+      "splunk_attack": {
+        "files": 1231,
+        "bytes": 307709420
+      },
+      "otrf": {
+        "files": 162,
+        "bytes": 94702014
+      }
+    }
+  },
+  "splunk_clean_review": {
+    "at_kst": "2026-11-01T13:38:41.780186+09:00",
+    "source_cases": 1411,
+    "unique_provider_ids": 1388,
+    "known_file_identity_components": 1372,
+    "reviewed_transfer_sources": [
+      "splunk_attack"
+    ],
+    "rights_held_files": 162,
+    "rights_hold": "OTRF LICENSE/header MIT but README footer GPL-3.0; exclude OTRF data from transfer pending clarification.",
+    "acquired_files": 1393,
+    "acquired_bytes": 402411434,
+    "cleaned_files": 1217,
+    "held_files": 14,
+    "observation_blocks": {
+      "train": 26079,
+      "eval": 9224
+    },
+    "formats": {
+      "text_block_not_event": 25495,
+      "json_record": 9808
+    },
+    "redactions": {
+      "secret_text_spans": 38,
+      "annotation_fields": 40,
+      "secret_fields": 17
+    },
+    "duplicate_exclusions": {
+      "duplicate_block": 5269,
+      "cross_partition_duplicate_block": 10
+    },
+    "cases_with_retained_blocks": 931,
+    "complete_linked_cases": 897,
+    "held_reasons": {
+      "whole_line_exceeds_block_bound": 1,
+      "whole_record_exceeds_block_bound": 5,
+      "Expecting ',' delimiter: line 1 column 141 (char 140)": 1,
+      "Expecting ',' delimiter: line 1 column 1742 (char 1741)": 1,
+      "Expecting ',' delimiter: line 1 column 2010 (char 2009)": 1,
+      "Expecting ',' delimiter: line 1 column 6 (char 5)": 1,
+      "Expecting value: line 1 column 520 (char 519)": 2,
+      "Expecting value: line 1 column 2 (char 1)": 1,
+      "Expecting value: line 1 column 1169 (char 1168)": 1
+    },
+    "cross_partition_exact_observation_overlap": 0,
+    "training_admitted": 0,
+    "ready_for_gpu_training": false,
+    "limitations": [
+      "Observation blocks are not independent incidents or supervised answers.",
+      "Scenario attack descriptions do not label every event as malicious; no invented benign or success targets.",
+      "Only explicit sensitive fields/text patterns are redacted; final privacy and semantic review remain.",
+      "Splits join provider IDs/shared acquired files; semantic and historical-family overlap remain to review.",
+      "All logs are untrusted data, never executable tool instructions."
+    ]
+  },
+  "covered_cases": {
+    "metadata_records": 931,
+    "unique_provider_ids": 919,
+    "train": 748,
+    "eval": 183,
+    "all_linked_files_cleaned": 897,
+    "warning": "Controlled vendor lab recordings; not 931 independent real incidents. Provider IDs/files/duplicate blocks are grouped; semantic independence not established."
+  },
+  "expanded_sft": {
+    "at_kst": "2026-11-01T13:36:16.135673+09:00",
+    "status": "source_and_fresh_cpu_token_verified_expanded_subset",
+    "candidate_counts": {
+      "train": 3273,
+      "validation": 176,
+      "test": 176
+    },
+    "guide_train_candidates": 3082,
+    "prior_replay": 191,
+    "provider_test_training_records": 0,
+    "prior_evaluation_preserved": true,
+    "guide_organization_overlap": 0,
+    "cross_split_exact_message_overlap": 0,
+    "source_candidate_review_sha256": "de2b4a3a26c85ecfda42eba16799685446053cddc357875ffd9a19c26f00b665",
+    "prior_admission_sha256": "7cab310b636298ae535703891dd6c741bce92a271e6aacc6cafa96b60c92ad07",
+    "ready_for_gpu_training": false,
+    "quality_passed": false,
+    "outputs": {
+      "train": {
+        "records": 3271,
+        "sha256": "c6357736e513dd78b445c5121f15eebc429f5d575e1759c1875f965a564a3708",
+        "max_tokens": 4067
+      },
+      "validation": {
+        "records": 176,
+        "sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+        "max_tokens": 1246
+      },
+      "test": {
+        "records": 176,
+        "sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+        "max_tokens": 1828
+      }
+    },
+    "guide_train_records": 3080,
+    "guide_class_counts": {
+      "TruePositive": 703,
+      "BenignPositive": 937,
+      "FalsePositive": 1440
+    },
+    "token_rejected": 2,
+    "token_report_sha256": "76673e5907ee761f05224a08dd7b96162a6f9c77303d6a09456a2c6847e59925",
+    "mcp_execution_trajectories": 0,
+    "training_started": false,
+    "limitations": [
+      "GUIDE is retrospective analyst-labelled triage; not action success or live evidence.",
+      "Expanded subset is class-imbalanced. Final mixture weighting/length/runtime and independent quality gate remain.",
+      "Old validation/test remain development regression, not a fresh unseen performance claim."
+    ]
+  },
+  "validation": {
+    "at_kst": "2026-11-01T13:39:43.504972+09:00",
+    "status": "passed_integrity_and_structural_boundaries",
+    "files_verified": 392,
+    "counts": {
+      "sft_train": 3271,
+      "sft_validation": 176,
+      "sft_test": 176,
+      "event_train": 26079,
+      "event_eval": 9224,
+      "regression_train": {
+        "wazuh": 1400,
+        "crs": 4051
+      },
+      "regression_eval": {
+        "wazuh": 387,
+        "crs": 1108
+      }
+    },
+    "event_exact_input_overlap": 0,
+    "event_known_case_group_overlap": 0,
+    "sft_exact_input_overlap": 0,
+    "ready_for_gpu_training": false,
+    "not_verified": [
+      "Cross-source historical/semantic deduplication",
+      "New observation/fixture answer correctness and current MCP supervision",
+      "Live deployment performance or GPU training"
+    ]
+  },
+  "transfer": {
+    "at_kst": "2026-11-01T13:40:20.260871+09:00",
+    "destination": "/root/Capstone_Groot_training/source-collections/20261101-joint-clean-r3",
+    "files_verified": 394,
+    "bytes": 373611669,
+    "compressed_bytes": 29546900,
+    "archive_sha256": "89c07c5e07034c456d325180ff7347614e9301535a411b67dd8d316eb95d43af",
+    "all_readback_sha256_match": true,
+    "new_gpu_training": false,
+    "production_changed": false
+  },
+  "remaining_gates": [
+    "Event/case causal and privacy review; source-specific labelling; historical/semantic overlap.",
+    "Current MCP schema and multi-turn evidence/approval/postcheck/rollback supervision with verifiable execution evidence.",
+    "Final sample mix weights and token/runtime budget; new modules must pass actual tokenizer and critical-error quality checks.",
+    "Independent evaluation before a reviewed training run; no service interruption authorized by this collection."
+  ],
+  "held_sources": [
+    {
+      "id": "otrf",
+      "reason": "LICENSE/header MIT versus README footer GPL-3.0 conflict. All 162 recording files and derived observations excluded from transferred batch; local acquisition/initial review preserved.",
+      "source_readme_sha256": "4fe95fb46ada0c6d364fd4a1ee2b91774560dc17b3bf7a2a1fe0c7cc18f66ae2"
+    },
+    {
+      "id": "cti_realm_hf",
+      "revision": "0fa6744b0e1d8b5b65cad0d5356a8e968bd22b02",
+      "reason": "No dataset card/license; external CTI report and Sigma rights unresolved. Only Microsoft MIT repository 50 task definitions transferred as evaluation-reserved; HF telemetry/reports not downloaded."
+    }
+  ],
+  "correction": "Initial provisional mixed Splunk/OTRF cleanup had 167966 observation blocks. License review removed OTRF before any transfer; final 35303 Splunk blocks. Initial local snapshots retained, never trained or transferred.",
+  "new_gpu_training": false,
+  "operational_model_changed": false,
+  "mac_packages_installed": 0,
+  "tests": {
+    "full_finetuning": {
+      "run": 744,
+      "passed": 741,
+      "skipped": 3
+    },
+    "followup_new_tests_passed": 11,
+    "token_inputs": 3625,
+    "accepted": 3623,
+    "rejected_over_4096": 2,
+    "actual_cpu_only": true,
+    "pinned_tokenizer_integrity": true,
+    "new_live_bot_or_attack_e2e": false,
+    "new_server_install_test": false
+  }
+}

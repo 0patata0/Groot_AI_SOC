@@ -100,3 +100,35 @@ DGX 보존 위치: `~/Capstone_Groot_training/source-collections/20261101-soc-so
 3. 과거 사건·기관·규칙 계열·의미 중복·평가 정답 유출·개인정보/비밀값·실제 토큰 한도를 검사한다. 이전 비교8문항을 정답째 학습에 넣지 않는다.
 4. 룰 시험이 실제 사건 조사·정상/오탐·복구 자료를 압도하지 않도록 역할별 수량과 혼합 비중을 검토한다. 미검증 분야는 별도 평가를 만든다.
 5. 독립 질문에서 치명적 누락/승인 오류·근거 없는 정상 판정과 응답 시간을 원본 대비 재비교한다. 확보량·loss만으로 운영 교체하지 않는다.
+
+
+## 2026-11-01 R3: 넓은 로그 수집과 한 번의 학습을 위한 통합 준비
+
+고정 버전은 `JOINT_SOURCE_SPEC.json`, 실측/보류/반입 영수증은 `JOINT_SOURCE_REVIEW.json`이다. Splunk 공식 연구팀의 Apache-2.0 시험 기록은 탐지 조사 근거로 수집한다. 시험 시나리오에 공격 이름이 있다는 이유로 모든 이벤트에 악성 라벨을 붙이지 않는다. OTRF는 LICENSE/배지 MIT 대 README 하단 GPL-3.0 충돌을 다시 확인해, 로컬 원자료 검수만 보존하고 최종 서버 묶음에서는 제외했다. CTI-REALM은 Microsoft MIT 저장소의 50개 평가 정의만 보존한다. HF 카드/라이선스와 제3자 CTI/Sigma 권리 미확인 데이터는 학습 자료가 아니다.
+
+```sh
+python3 -B finetuning/collect_defensive_sources.py --root finetuning/data-joint-expansion-20261101-r3 --spec finetuning/JOINT_SOURCE_SPEC.json --phase plan
+python3 -B finetuning/collect_defensive_sources.py --root finetuning/data-joint-expansion-20261101-r3 --phase collect
+python3 -B finetuning/collect_soc_event_sources.py --root finetuning/data-joint-expansion-20261101-r3 --phase plan
+python3 -B finetuning/collect_soc_event_sources.py --root finetuning/data-joint-expansion-20261101-r3 --phase collect
+python3 -B finetuning/prepare_soc_event_candidates.py --root finetuning/data-joint-expansion-20261101-r3 --output finetuning/data-soc-events-clean-NEW
+python3 -B finetuning/prepare_joint_soc_bundle.py --phase prepare-sft --output finetuning/data-joint-sft-NEW
+```
+
+출력은 기존 경로를 덮어쓰지 않는 새 이름으로 만든다. 메타데이터는 고정Git blob, LFS 실데이터는 포인터OID/SHA와 크기를 검증한다. 전송한도는 파일16MiB/총384MiB이며 Linux·웹·DNS·방화벽·네트워크와 정상 기록을 먼저 선정한 뒤 작은 완전 파일로 범위를 확장했다. 큰 파일·범위외·누락경로는 `event-plan.json`에 사유와 참조를 남긴다. 사용자는 많은 자료를 요청했지만 대용량을 일부 바이트만 잘라 완전 사건이라고 부르지 않는다. 원문 명령·공격 시뮬레이션은 실행하지 않는다.
+
+`prepare_soc_event_candidates.py`는 승인된 출처만 정제/반입 대상으로 삼는다. 알려진 같은 공급자ID/공유파일을 같은 분할로 묶고 관측 정답표시/명시적 비밀필드·문자열을 제거한다. 잘못된 JSON/긴 레코드는 파일째 보류하며 잘라서 성공 처리하지 않는다. JSON record와 여러 줄 text block을 구분한다. 분할간 정확 중복은 전부 제외, 같은 분할 중복은 하나만 보존한다. 이 검사는 전체 과거 의미중복이나 최종 개인정보 검수를 대신하지 않는다. 사건ID·공급자라벨·출처경로는 별도 lineage이며 입력 정답으로 사용하지 않는다.
+
+SFT 확대는 GUIDE train만 사용한다. 이전 후보·검수·분할 SHA, 원라벨/특징/원천 행수와 조직 분할을 확인하고 이전447건에서 GUIDE256을 중복 재추가하지 않는다. 기존 근거191 + GUIDE train후보3082를 검사했다. `check_joint_tokens.py BASE`는 표준입력에 `{"split":"train","row":...}` JSONL을 받고 실제 기존 encoder/tokenizer로 전수 토큰 검사한다. 기존 DGX 격리환경을 CPU전용, network none, weights 읽기/적재 없이 사용했고 토크나이저4파일을 원base manifest와 재대조했다. 새 설치를 Mac에 수행하지 않는다.
+
+```sh
+python3 -B finetuning/prepare_joint_soc_bundle.py --phase admit-sft --output finetuning/data-joint-sft-NEW --token-report TOKEN_REPORT.json
+python3 -B finetuning/prepare_joint_soc_bundle.py --phase assemble --output finetuning/data-joint-bundle-NEW --sft finetuning/data-joint-sft-NEW --events finetuning/data-soc-events-clean-NEW
+python3 -B finetuning/validate_joint_soc_bundle.py --root finetuning/data-joint-bundle-NEW
+```
+
+R3 최종 SFT는3271/176/176(긴train2건제외,최대4067/4096), 새근거는train26079/eval9224블록이다. 기존 회귀시험/공식참고/ExCyTIn정제본도 모듈별로 통합했다. `sft/train.jsonl`만 source/token 검사된 부분집합이며, 전체묶음 `BATCH-PLAN.json`은 `ready_for_gpu_training=false`다. 후보/평가폴더를 glob하여 학습loader에 넣지 않는다. 전과정MCP학습·관제품질향상·안전한승인경계는 아직 입증하지 않았다.
+
+최종 반입은 `/root/Capstone_Groot_training/source-collections/20261101-joint-clean-r3`에 새 디렉터리로만 수행했다. 394파일/373611669B, 압축29546900B를 메모리에서 전송하고 서버에 전체SHA 재읽기 검증; `TRANSFER-MANIFEST.json`은 별도1파일이다. 원자료·OTRF관측·추정도구trace·모델가중치는 이 반입에 없다. 기존 운영서비스/포트/이미지설치는 변경하지 않았으며 초기설치기나 신규서버 전체설치 검증을 실행한 것이 아니다. 로컬 초기정제본은 라이선스정정 감사이력으로 보존한다.
+
+다음은 사건별 인과정답/최종privacy/과거의미중복 → 현재MCP도구계약/실제결과와정확승인·사후검증·원복 근거 → 최종역할/클래스혼합비율·시간예산을 확정하는 일이다. 이를 통과한 자료를 한 번의 검토된 학습 실행으로 연결하며 자료 개수만으로 품질을 보증하지 않는다.

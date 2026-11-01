@@ -20,7 +20,10 @@ ALLOWED_REPOS = {'crs': 'coreruleset/coreruleset', 'wazuh': 'wazuh/wazuh',
                  'modsecurity_docs': 'owasp-modsecurity/documentation',
                  'nist_controls': 'usnistgov/oscal-content',
                  'cisa_counter': 'cisagov/coun7er',
-                 'microsoft_aces': 'microsoft/ACESEvals'}
+                 'microsoft_aces': 'microsoft/ACESEvals',
+                 'cti_realm': 'microsoft/ACESEvals',
+                 'splunk_attack': 'splunk/attack_data',
+                 'otrf': 'OTRF/Security-Datasets'}
 LIMIT = 16 * 1024 * 1024
 
 
@@ -48,7 +51,7 @@ def verify_blob(data, item):
 def arrival_review(data, name):
     text = data.decode('utf-8')
     result = {'utf8': True, 'nul_bytes': '\x00' in text}
-    if name.endswith('.yaml'):
+    if name.endswith(('.yaml', '.yml')):
         import yaml
         # Parse only data; never use unsafe YAML constructors or execute test commands.
         value = yaml.safe_load(text)
@@ -60,6 +63,12 @@ def arrival_review(data, name):
 
 def select_path(source, path):
     if path in ('LICENSE','LICENSE.txt','LICENSE.md','README.md'): return True
+    if source == 'splunk_attack':
+        return path.startswith('datasets/') and path.endswith('.yml') and path != 'datasets/TEMPLATE.yml'
+    if source == 'otrf':
+        return path.startswith(('datasets/atomic/_metadata/', 'datasets/compound/_metadata/')) and path.endswith('.yaml')
+    if source == 'cti_realm':
+        return path == 'NOTICE.md' or path == 'domains/cti_realm/README.md' or path.startswith('domains/cti_realm/tasks/') and path.endswith(('.yaml', '.md'))
     if source == 'crs':
         return (path.startswith('tests/regression/tests/') and path.endswith('.yaml') or
                 path.startswith('rules/') and path.endswith('.conf') or path == 'crs-setup.conf.example')

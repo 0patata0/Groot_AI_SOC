@@ -35,6 +35,8 @@ def main():
              "DEFENSIVE_SOURCE_SPEC.json", "DEFENSIVE_SOURCE_REVIEW.json", "INCIDENT_SOURCE_SPEC.json", "SOURCE_REVIEW_WORKFLOW.md", "TRAINING_COVERAGE_20261101.json",
              "collect_excytin_evidence.py", "collect_investigation_traces.py", "review_investigation_sources.py", "prepare_investigation_candidates.py",
              "INVESTIGATION_SOURCE_SPEC.json", "INVESTIGATION_SOURCE_REVIEW.json",
+             "collect_soc_event_sources.py", "prepare_soc_event_candidates.py", "prepare_joint_soc_bundle.py",
+             "check_joint_tokens.py", "validate_joint_soc_bundle.py", "JOINT_SOURCE_SPEC.json", "JOINT_SOURCE_REVIEW.json",
              "prepare_evidence_run.py", "prepare_evidence_retry.py", "durable_training_window.py", "durable_training_task.py", "durable_training_basecheck.py", "DURABLE_EVIDENCE_RUN.md",
              "prepare_ait_evidence.py", "AIT_EVIDENCE_REVIEW.json", "SOC_DATA_CANDIDATES.json",
              "link_ait_labels.py", "AIT_GAP_LINKAGE.json",

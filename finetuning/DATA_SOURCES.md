@@ -681,3 +681,16 @@ Cisco 두 후보의 [Instruct NOTICE](https://huggingface.co/fdtn-ai/Foundation-
 [검수 원장](V4_OBSERVATION_TARGET_REVIEW.json). 공식 [CISA KEV 고정본](https://github.com/cisagov/kev-data/blob/30a09b6f3f7e2f03618cc8c95d212966d3c14e6e/known_exploited_vulnerabilities.json) 36레코드에서 기존 입력의 forensicTriage/notes 누락을 복원했다. Yes3/No33 표시는 수집본 필드이며 조직별 법적 의무나 현 자산 침해 여부로 확대하지 않는다. 문서SHA·JSON포인터/레코드SHA·전체선택원문을 후보 원장에 보존한다. CC0-1.0 고지 및 관련 원문 참조를 유지한다.
 
 [AIT LDS](https://zenodo.org/records/5789064)의 정확한 원행·제공자 규칙 라벨, [AIT ADS](https://doi.org/10.5281/zenodo.8263181)의 원본 경보를 대조했다. 연구 시험망/센서주석/시나리오구간과 실제 침해 확정을 구분하며 한국어 관제 해석은 프로젝트 작성이다. LDS CC BY-NC-SA4.0·ADS CC BY4.0 고지/저자/논문 출처를 유지한다. 동일시각27쌍과 sensor MITRE 주석31쌍을 새 독립사건으로 세지 않는다. 재검수로 신규학습 편입·독립최종평가가 이루어진 것은 아니다.
+
+
+## 2026-11-01 R3 추가 수집·통합 출처와 반입 경계
+
+| 출처 | 고정 버전·이용조건 | 이번에 확보/사용한 범위 | 학습 상태 |
+|---|---|---|---|
+| [Splunk Attack Data](https://github.com/splunk/attack_data) · [공식 연구팀 설명](https://www.splunk.com/en_us/blog/security/threat-hunting-splunk-analytics-tools.html) | f08d6815063ceabc82b297dcf55c930dd1cc4a68, Apache-2.0 | 사례메타1411, 로그1231파일307709420B; 1217파일정제/14보류,931목록(고유ID919)에 연결된35303블록 | 공급자 실험실 관측후보. 개별이벤트악성/조치성공 정답 아님; source/token 적격SFT 추가0 |
+| [OTRF Security-Datasets](https://github.com/OTRF/Security-Datasets) | d9d40ef123d2c87d5d3df28c96bcab4f0faccc87; LICENSE/배지MIT와README하단GPL-3.0충돌 | 메타113/선택ZIP162개94702014B를 로컬 검수 | **권리확인 보류**, 파생관측포함 서버통합묶음 반입0·학습0. 위 과거보류기록과 일치하며 초기MIT단정 정정 |
+| [Microsoft CTI-REALM](https://github.com/microsoft/ACESEvals/tree/main/domains/cti_realm) · [공식 발표](https://www.microsoft.com/en-us/security/blog/2026/03/20/cti-realm-a-new-benchmark-for-end-to-end-detection-rule-generation-with-ai-agents/) | ACESEvals 2c76fbdea415d6fa6a87bbad846686fefd6ee9bb MIT, 외부HF0fa6744b0e1d8b5b65cad0d5356a8e968bd22b02 이용조건미확인 | repo평가정의50개,25부분집합중복합산0; 외부HF텔레메트리/제3자보고서미수집 | 평가예약·GPU학습0. 기관이 프로젝트판단/실제성능을인증한자료로주장하지않음 |
+| 기존 Microsoft GUIDE v2 | 기존원자료/조직분할/출처동일, CDLA-Permissive2.0 | 이미정제한train3082 재토큰검수→3080적격;기존191과3271 SFT부분집합 | 기존학습256 대비새2824편입준비. 새학습실행0, 사후분류 범위 |
+| 기존 R1/R2 정제 모듈 | `DEFENSIVE_SOURCE_REVIEW.json`/`INVESTIGATION_SOURCE_REVIEW.json` | 장비시험train5451/eval1495,참고1159절,조사질문349/모의관측615및평가/근거 | 기존자료 재포장, 신규독립자료로중복집계하지않음; 새로운MCP정답0 |
+
+[실측·해시·보류·서버반입 원장](JOINT_SOURCE_REVIEW.json). 문헌신뢰도,원데이터의출처,공급자라벨,프로젝트질문/정제/분할과실제관제품질은서로다르다. 공격실험기록을현재서버실사건/보편적악성판정으로일반화하지않는다. 논문에는 provider case/고유ID/관측block/SFTdialogue 단위를 구별하고 OTRF/외부HF보류를 함께 명시한다.

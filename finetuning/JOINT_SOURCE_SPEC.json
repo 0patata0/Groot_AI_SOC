@@ -1,0 +1,37 @@
+{
+  "source_pins": [
+    {
+      "id": "splunk_attack",
+      "repo": "splunk/attack_data",
+      "commit": "f08d6815063ceabc82b297dcf55c930dd1cc4a68",
+      "tree": "aafd8381c2b696fc514ddfe5ecaa6752a3876b89",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "otrf",
+      "repo": "OTRF/Security-Datasets",
+      "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
+      "tree": "cf0528d5c718284d2a68c6d4565868c148eac731",
+      "license": "UNRESOLVED: LICENSE and README badge MIT, README footer GPL-3.0"
+    },
+    {
+      "id": "cti_realm",
+      "repo": "microsoft/ACESEvals",
+      "commit": "2c76fbdea415d6fa6a87bbad846686fefd6ee9bb",
+      "tree": "79872b4f8daf23a4a806ccd35630d6f7db05d590",
+      "license": "MIT for repository; external HF data rights unverified"
+    }
+  ],
+  "purpose": "Expand source-grounded SOC investigation and detection evidence; prepare a joint batch with existing cleaned modules.",
+  "training_automatic": false,
+  "limits": {
+    "max_event_file_bytes": 16777216,
+    "max_total_event_bytes": 402653184,
+    "max_archive_uncompressed_bytes": 268435456
+  },
+  "source_classes": {
+    "splunk_attack": "Vendor-curated controlled attack/benign datasets; scenario metadata is not per-event gold.",
+    "otrf": "Community-maintained controlled recordings; not an institution-certified incident verdict. Rights conflict: local source review only, no training bundle transfer.",
+    "cti_realm": "Microsoft research benchmark, repository tasks reserved for evaluation; HF telemetry/report reuse unresolved."
+  }
+}

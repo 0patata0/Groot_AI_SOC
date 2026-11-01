@@ -32,7 +32,7 @@ def main():
              "resume_training.py", "prepare_dgx_resume.py", "check_resume_runtime.py", "candidate_model.py",
              "prepare_guide_sft.py", "admit_guide_sft.py", "GUIDE_ADMISSION_20261101.json",
              "collect_defensive_sources.py", "review_defensive_sources.py", "collect_incident_sources.py",
-             "DEFENSIVE_SOURCE_SPEC.json", "DEFENSIVE_SOURCE_REVIEW.json", "INCIDENT_SOURCE_SPEC.json", "SOURCE_REVIEW_WORKFLOW.md",
+             "DEFENSIVE_SOURCE_SPEC.json", "DEFENSIVE_SOURCE_REVIEW.json", "INCIDENT_SOURCE_SPEC.json", "SOURCE_REVIEW_WORKFLOW.md", "TRAINING_COVERAGE_20261101.json",
              "prepare_evidence_run.py", "prepare_evidence_retry.py", "durable_training_window.py", "durable_training_task.py", "durable_training_basecheck.py", "DURABLE_EVIDENCE_RUN.md",
              "prepare_ait_evidence.py", "AIT_EVIDENCE_REVIEW.json", "SOC_DATA_CANDIDATES.json",
              "link_ait_labels.py", "AIT_GAP_LINKAGE.json",

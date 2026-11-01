@@ -1,0 +1,36 @@
+{
+  "at_kst": "2026-11-01T12:42:17.000757+09:00",
+  "scope": "Retained actual latest training input; no new model or server execution",
+  "train_sha256": "42572fafd3c471e176e052c2693efc40a04425e92079d2e0bb88de26fc8ca463",
+  "counts": {
+    "records": 447,
+    "nonempty_tool_catalog": 0,
+    "tool_or_function_result_role": 0,
+    "assistant_tool_or_function_call": 0,
+    "tool_call_markup": 0,
+    "multiple_assistant_turns": 0
+  },
+  "source_counts": {
+    "soc-reviewed-v4": 126,
+    "source-labelled-evidence-v5": 48,
+    "soc-source-observation-candidate": 17,
+    "microsoft-guide-v2-retrospective-triage": 256
+  },
+  "interpretation": "Single-response source-grounded analysis/triage set; no explicit multi-step MCP execution trajectories in this run. Base pretrained tool ability and earlier separate experiments are not absent by implication.",
+  "guide_train_token_eligible": 3080,
+  "guide_train_selected": 256,
+  "guide_unselected_train_candidates": 2824,
+  "guide_unselected_train_admitted_now": 0,
+  "limitations": [
+    "Structured messages and explicit tool-call markers checked; not proof of absence of every textual procedure reference",
+    "No universally sufficient dataset count inferred",
+    "Training data increase alone cannot repair MCP schema errors",
+    "6/8 judgment performance tied the same-HF untrained control; two critical candidate errors remain"
+  ],
+  "next_training_scope": [
+    "Source-grounded multi-step investigations with observed tool results",
+    "Exact approval binding and post-change verification/rollback under existing protections",
+    "Benign alternatives, missing evidence and tool failures",
+    "Independent evaluation by incident/org/rule family before promotion"
+  ]
+}

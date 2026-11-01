@@ -5,7 +5,9 @@
 사용자 용량 제한 요청에 따라 `.gitignore`에 GGUF/safetensors/LoRA·checkpoint·optimizer 형식과 학습 output/export 디렉터리 제외를 추가하고 `AGENTS.md`·README에 Git/Git LFS 업로드 금지를 명시했다. 현재 추적 파일 및 로컬 도달 가능한 Git 전체 이력4,348blob에서 해당 가중치 파일0개를 확인했다. Git 객체는 pack12.51MiB+loose3.29MiB였으며 이는 GitHub 계정 전체 용량 조회가 아니다. 기존 가중치의 Git 삭제나 이력 재작성은 필요하지 않았고 서버 파일도 유지한다. 대표 제외8경로/코드·메타데이터 유지3경로 검증 완료. 자동 커밋·푸시 후 결과를 기록한다.
 
 
-## DGX 학습본의 Thor 후보 준비 — 2026-11-01 11:10 KST 진행 중
+**가중치 제외 게시:** `ebafea0a3ad02cb0d3af107df1ae3edce49afab0` 커밋·푸시,11:15:52 KST actual origin/main 일치/당시 clean 확인. 제외규칙과 상시작업지침/README/현황5파일만 게시했고 모델 파일 업로드는0이다.
+
+## DGX 학습본의 Thor 후보 준비 — 2026-11-01 11:19 KST 진행 중
 
 사용자가 학습본을 Thor에 적재해 운용 가능한지 검증하도록 지시했다. 기존 운영 모델을 보존한 별도 후보 `soc-qwen36:35b-dgx-guide-q4km-20261101`을 준비한다. Thor의 디스크 여유63.99GiB를 고려해 큰 병합/변환은 DGX(CPU2·24GiB·GPU/네트워크 없는 컨테이너)에서 수행하고 최종 Q4_K_M과 검증 자료만 반입한다. Mac에는 패키지나 가중치를 저장하지 않는다.
 
@@ -13,8 +15,8 @@
 | --- | --- | --- |
 | 학습본 검사 | 실제380텐서 finite·190LoRA쌍,완료224step/447학습·176validation·원본/분할 SHA 확인 | 완료 |
 | CPU 병합 | 10:59:32 KST 전체1,045텐서 검증,학습대상190변경·855보존·MTP19보존 | 완료·DGX 독립 작업 정상 종료 |
-| 변환 도구 | 기존 공식 llama.cpp 고정 소스/CPU binary·projector를 Thor→DGX 직접 SSH 전송,버전/해시 대조 | 반입/실제 작은 CPU 양자화 통과·BF16 완료/Q4_K_M 변환 진행 |
-| Thor 후보·비교 | 동일 Q4_K_M·기존 runtime 설정/출처 고지·별도 태그로 준비 | 아직 등록/실제추론/동일 하네스 품질검증 전 |
+| 변환 도구 | 기존 공식 llama.cpp 고정 소스/CPU binary·projector를 Thor→DGX 직접 SSH 전송,버전/해시 대조 | 11:19:07 BF16→Q4_K_M/753텍스트·334projector텐서/전체SHA 완료 |
+| Thor 후보·비교 | 동일 Q4_K_M·기존 runtime 설정/출처 고지·별도 태그로 준비 | 직접 서버 간 반입 중·등록/후보추론/동일 하네스 검증은 아직 |
 
 신규 `deploy.sh --model-candidate`가 CPU 확인·병합·변환·별도 등록의 단일 진입점이며 기존 설치/반입 목록도 갱신 중이다. 학습 receipt→병합 adapter SHA→변환 receipt를 연결하고 불완전한 학습/검증·달라진 자료·누락된 출처 고지를 거절한다. 로컬 학습687검사(684PASS/환경3skip)·설치218PASS와 실제CPU380텐서 검증을 완료했으며 이번 기능의 Git 게시/운영 적합성 판단은 진행 중이다. 기존 두 봇 모델 선택·공유 추론 서비스·학습 완료 산출물은 유지한다.
 

@@ -1,0 +1,223 @@
+{
+  "at_kst": "2026-11-01T15:28:35.335061+09:00",
+  "status": "gpu_preflight_running_after_shared_inference_finished",
+  "cleansing_location": "local",
+  "training_location": "DGX Spark",
+  "deployment_location": "Jetson Thor",
+  "source_rows": {
+    "soc-reviewed-v4": 126,
+    "source-labelled-evidence-v5": 48,
+    "soc-source-observation-candidate": 17,
+    "microsoft-guide-v2-retrospective-triage": 3080,
+    "wazuh": 1399,
+    "crs": 3776,
+    "cisa_counter": 152,
+    "microsoft_excytin": 16,
+    "splunk_attack": 40,
+    "project_live_mcp": 17,
+    "project_isolated_executor": 24
+  },
+  "train_rows": 8695,
+  "validation_rows": 176,
+  "test_rows": 176,
+  "full_mcp_dialogues": 35,
+  "initial_tool_selection_only": 6,
+  "valid_tool_calls": 65,
+  "source_tokens": {
+    "soc-reviewed-v4": 128100,
+    "source-labelled-evidence-v5": 15534,
+    "soc-source-observation-candidate": 17494,
+    "microsoft-guide-v2-retrospective-triage": 1163285,
+    "wazuh": 852810,
+    "crs": 1958051,
+    "cisa_counter": 160735,
+    "microsoft_excytin": 16305,
+    "splunk_attack": 103320,
+    "project_live_mcp": 35580,
+    "project_isolated_executor": 51491
+  },
+  "max_tokens": 4067,
+  "total_tokens": 4502705,
+  "truncation": false,
+  "train_sha256": "eb102b962c3b5f3a772fb747939d054bd70ad8a7ff9bfacc7b0cd4f73ae9ea87",
+  "validation_sha256": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+  "test_sha256": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b",
+  "token_receipt_sha256": "a6943f1fea237197c9eab477c55bf5762a654c6166862d1958199a359d2300c7",
+  "token_probe": {
+    "candidates": 9070,
+    "pass": 9058,
+    "over_max_length": 12,
+    "gpu": false,
+    "weights_loaded": false,
+    "container_removed": true
+  },
+  "additional_evaluation": {
+    "status": "source_and_exact_token_verified_reserved_evaluation",
+    "rows": 31,
+    "max_tokens": 2245,
+    "case_sha256": "daa05246cc96ecbe6027b5bb559c2ac09c38bb9682eeae769b14b3a359015f80",
+    "receipt_sha256": "aa79db90795cc14f2ddda9c59c518924e7e5e2e055d7872ee798ba41f5b1759d",
+    "model_evaluation_run": false,
+    "training_included": false
+  },
+  "local_review": {
+    "exact_duplicate_input_groups": 0,
+    "exact_evaluation_input_overlap": 0,
+    "explicit_credential_pattern_flags": 0,
+    "independent_expert_review_all_answers": false,
+    "semantic_overlap_fully_ruled_out": false
+  },
+  "isolated_execution": {
+    "devices": 3,
+    "outcomes_per_device": 7,
+    "actual_temp_file_and_hash_checks": true,
+    "broker_and_device_mocked": true,
+    "production_writes": 0,
+    "chat_posts": 0
+  },
+  "transfer": {
+    "root": "/home/ACCOUNT/Capstone_Groot_training/operator-preflight-20261101-r5-queued",
+    "files": 55,
+    "bytes": 28460890,
+    "archive_sha256": "c5fc31b84d99f86b6c570becd1f74a46a0665ef5f2a37fddee4675bd24c91f40",
+    "archive_bytes": 1557663,
+    "all_remote_hashes_match": true,
+    "check": {
+      "inputs_verified": 54,
+      "deadline_kst": "2026-11-01T18:21:16.282858+09:00"
+    },
+    "metadata_only_environment_reuse": true,
+    "main_training_started": false,
+    "gpu_training_started": false
+  },
+  "control_sha256": "e8ad586bb5bb8e5246fc1cde86619d3105866297c7e29195d051889b6fe6b7d4",
+  "gpu_smoke": {
+    "started": true,
+    "passed": false,
+    "blocked_at_kst": "2026-11-01T15:15:46.659393+09:00",
+    "reason": "shared_inference_active",
+    "resident_model_count": 1,
+    "mem_available_gib": 75.22,
+    "floor_gib": 96,
+    "own_containers": [],
+    "background_job_running": true,
+    "latest_observed_at_kst": "2026-11-01T15:27:43.499465+09:00",
+    "stage": "loading_model"
+  },
+  "planned_smoke": {
+    "selection": "longest admitted conversation plus longest complete trajectory with at least two tool calls and three assistant turns",
+    "records": [
+      {
+        "id": "guide-v2-1405-8842",
+        "tokens": 4067,
+        "assistant_turns": 1
+      },
+      {
+        "id": "operator-proposal-suricata",
+        "tokens": 2920,
+        "assistant_turns": 3
+      }
+    ],
+    "train_sha256": "eb102b962c3b5f3a772fb747939d054bd70ad8a7ff9bfacc7b0cd4f73ae9ea87",
+    "smoke_sha256": "8158d78561ac86c1f9397c0ca07d51f933c2014d8af1e60e8d6cb0402fb599ff",
+    "main_training_rows": 8695,
+    "planned_main_optimizer_steps": 4348,
+    "smoke_optimizer_steps": 2,
+    "smoke_gradient_accumulation": 2,
+    "main_training_started": false
+  },
+  "new_main_training_started": false,
+  "production_model_changed": false,
+  "ready_for_gpu_training": false,
+  "release_issued": false,
+  "checks": {
+    "local_finetuning_tests_total": 775,
+    "passed": 772,
+    "skipped": 3,
+    "skip_reason": "Mac lacks torch/transformers; earlier DGX CPU loss checks3 passed; not the new full35B GPU test",
+    "portable_operator_tests_passed": 30,
+    "initial_portable_bundle_sha256": "dded488c29f0e39fc53ae6944c73e9bb0f47daed7c94ded37ec112a86f8b4076"
+  },
+  "sources_sha256": {
+    "prepare_operator_sources.py": "1575d157382809663a91defdee0cf7b7702f2867a5a31f931eeb7637ccc638a6",
+    "prepare_operator_mcp.py": "281e4effe396ee87685862c451f56e479e15c2c3afd186ca34fce061516719f4",
+    "prepare_operator_release.py": "28747c89d848c64d7b913b56595117670314b2c800f15bc16ab85f942e5aee82",
+    "prepare_operator_evaluation.py": "b50322153037233bafffbc56149bb4fa544edc74b0ff5f44d9131b3cd890e795",
+    "prepare_operator_run.py": "d815063b873a3ff49c308a7161771191a5f8942927af0c0b2cce26db686b5bcd",
+    "dgx_supervisor.py": "5d7565affeb52728f68ce5526ff3e8cff01a155b409add467d46d55aaa91687f",
+    "prepare_dgx_resume.py": "87da4709b2f5a02e9df19d36750a611704be0911a154def706f094f9caf604fe"
+  },
+  "remaining": [
+    "GPU smoke in an idle shared server",
+    "bounded main training budget and checkpoint plan",
+    "same-base quality comparison with fatal-error gate",
+    "Thor candidate validation before operational selection"
+  ],
+  "limits": [
+    "Source-derived questions/rendering are project authored; no institutional endorsement",
+    "Provider regression oracles are not live detection success",
+    "Research entity answers and vendor log relations do not prove causality",
+    "Raw Wazuh nullable/format schema compatibility is still separate",
+    "No live attack E2E or fresh-server full-install test"
+  ],
+  "previous_transfer": {
+    "root": "/home/ACCOUNT/Capstone_Groot_training/operator-preflight-20261101-r5",
+    "files": 55,
+    "bytes": 28452293,
+    "archive_sha256": "ef858fb05523810e0b0b927ae5b52180b4127b84381e82fdf6e0b671d222b434",
+    "archive_bytes": 1556098,
+    "all_remote_hashes_match": true,
+    "check": {
+      "inputs_verified": 54,
+      "deadline_kst": "2026-11-01T16:05:18.788802+09:00"
+    },
+    "metadata_only_environment_reuse": true,
+    "main_training_started": false,
+    "gpu_training_started": false
+  },
+  "queue": {
+    "unit": "capstone-dgx-20261101-r5queued-preflight.service",
+    "registered_at_kst": "2026-11-01T15:21:27+09:00",
+    "status": "running_smoke",
+    "deadline_kst": "2026-11-01T18:21:16.282858+09:00",
+    "idle_seconds": 60,
+    "memory_floor_gib": 96,
+    "smoke_runtime_max_seconds": 1800,
+    "automatic_main_training": false,
+    "survives_local_disconnect": true,
+    "automatic_retry_after_smoke_failure": false,
+    "started_at_kst": "2026-11-01T15:24:37.796257+09:00",
+    "effective_trial_cutoff_kst": "2026-11-01T15:54:37+09:00"
+  },
+  "control_management": {
+    "root": "/home/ACCOUNT/Capstone_Groot_training/operator-preflight-20261101-r5-control",
+    "files": {
+      "installer/deploy.sh": "115a519ed7f98979633ab5787dc16e19d3d1575644c0112bd58a89f98dde430f",
+      "installer/finetuning/dgx_supervisor.py": "5d7565affeb52728f68ce5526ff3e8cff01a155b409add467d46d55aaa91687f"
+    },
+    "verify_active_unit": true,
+    "running_immutable_bundle_changed": false,
+    "production_services_changed": false
+  },
+  "gpu_run_supervisor_sha256": "27e973adcde185ea3646684c4fb7f07f13dba7c2936b5a4755fde9e41d13b8ba",
+  "control_only_followup": "Frozen running bundle preserved. Current management frontend fixes verify/stop preflight unit selection; actual verify passed, stop tested in isolation. Training/model code unchanged.",
+  "unit_verification": {
+    "unit": "capstone-dgx-20261101-r5queued-preflight.service",
+    "active": true,
+    "parent_pid_is_systemd": true,
+    "runtime_max": "2h 59min 48s",
+    "kill_mode": "control-group",
+    "restart": "no",
+    "owned_container_stop_post": true,
+    "queue": {
+      "status": "waiting",
+      "at_kst": "2026-11-01T15:23:37.743446+09:00",
+      "main_training_started": false,
+      "reason": "confirming_60_seconds_idle",
+      "available_bytes": 127480655872,
+      "deadline_kst": "2026-11-01T18:21:16.282858+09:00"
+    },
+    "main_training_started": false
+  },
+  "public_paths_use_ACCOUNT_placeholder": true
+}

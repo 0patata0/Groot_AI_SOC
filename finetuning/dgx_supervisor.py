@@ -33,14 +33,14 @@ def cutoff(value):
 def read_config(path):
     c = json.loads(Path(path).read_text())
     required = {'run_id','root','uid','gid','image','deadline_kst','files'}
-    if not required <= c.keys() or c.keys()-required-{'resume_parent','resource_root','retry_policy'}:
+    if not required <= c.keys() or c.keys()-required-{'resume_parent','resource_root','retry_policy','environment_parent','purpose','smoke_data_subdir'}:
         raise ValueError('Unexpected DGX configuration fields')
     if not re.fullmatch(r'capstone-dgx-[0-9]{8}(?:-[a-z0-9]+)?', c['run_id']):
         raise ValueError('Unsafe run identifier')
     root = Path(c['root'])
     if not root.is_absolute() or (root.exists() and root.resolve() != root) or len(root.parts) != 5 or root.parts[1] != 'home' or root.parts[3] != 'Capstone_Groot_training':
         raise ValueError('Use /home/USER/Capstone_Groot_training/RUN without symlinks')
-    for field in ('resume_parent','resource_root'):
+    for field in ('resume_parent','resource_root','environment_parent'):
         if field not in c: continue
         parent = Path(c[field])
         if (parent == root or parent.parent != root.parent or not parent.is_absolute()
@@ -48,6 +48,14 @@ def read_config(path):
             raise ValueError('Resume only from a distinct sibling run without symlinks')
     if 'resource_root' in c and 'resume_parent' not in c:
         raise ValueError('Resource reuse requires an explicit checkpoint parent')
+    if 'environment_parent' in c and 'resume_parent' in c:
+        raise ValueError('Fresh training environment reuse is not checkpoint continuation')
+    if c.get('purpose','main_training') not in ('main_training','preflight_only'):
+        raise ValueError('Unknown run purpose')
+    if c.get('purpose')=='preflight_only' and ('environment_parent' not in c or 'retry_policy' in c):
+        raise ValueError('Preflight only reuses an existing environment without automatic retries')
+    if 'smoke_data_subdir' in c and c['smoke_data_subdir']!='smoke':
+        raise ValueError('Only the manifest-bound data/smoke directory is allowed')
     if 'retry_policy' in c:
         policy=c['retry_policy']
         if ('resume_parent' not in c or not isinstance(policy,dict)
@@ -79,12 +87,13 @@ def resource_config(c):
         seen.add(c['root'])
         verify_files(c)
         if 'resource_root' in c:declared.append(c['resource_root'])
-        if 'resume_parent' not in c:
+        parent_root=c.get('resume_parent') or c.get('environment_parent')
+        if parent_root is None:
             if any(root!=c['root'] for root in declared):
                 raise ValueError('Declared resource root differs from original provenance')
             return c
-        parent=read_config(Path(c['resume_parent'])/'control.json')
-        if (parent['root']!=c['resume_parent']
+        parent=read_config(Path(parent_root)/'control.json')
+        if (parent['root']!=parent_root
                 or any(parent[k]!=origin[k] for k in ('image','uid','gid'))):
             raise ValueError('Resume resource identity differs')
         c=parent
@@ -110,20 +119,24 @@ def save(c, value):
 
 def docker_args(c, stage):
     root = Path(c['root'])
+    data=root/'data'
+    if stage=='smoke' and c.get('smoke_data_subdir'):
+        data=data/c['smoke_data_subdir']
     args = ['docker','run','--rm','--name',c['run_id']+'-job','--label','capstone.run='+c['run_id'],
         '--user',str(c['uid'])+':'+str(c['gid']), '--cap-drop=ALL','--security-opt=no-new-privileges',
         '--pids-limit=512','--memory=110g','--memory-swap=110g','--shm-size=2g',
         '--mount',f'type=bind,src={root}/workspace,dst=/workspace',
         '--mount',f'type=bind,src={root}/source,dst=/source,readonly',
-        '--mount',f'type=bind,src={root}/data,dst=/data,readonly',
+        '--mount',f'type=bind,src={data},dst=/data,readonly',
         '--mount',f'type=bind,src={root}/profiles,dst=/workspace/profiles,readonly',
         '-w','/workspace']
-    if 'resume_parent' in c:
-        parent = Path(c['resume_parent'])/'workspace'
-        resources = Path(c.get('resource_root',c['resume_parent']))/'workspace'
+    if 'resume_parent' in c or 'environment_parent' in c:
+        resources = Path(c.get('resource_root') or c.get('environment_parent') or c['resume_parent'])/'workspace'
         for name in ('base','venv'):
             args += ['--mount',f'type=bind,src={resources}/{name},dst=/workspace/{name},readonly']
-        args += ['--mount',f'type=bind,src={parent}/main,dst=/resume,readonly']
+        if 'resume_parent' in c:
+            parent = Path(c['resume_parent'])/'workspace'
+            args += ['--mount',f'type=bind,src={parent}/main,dst=/resume,readonly']
     for item in ('TZ=Asia/Seoul','HOME=/workspace','PYTHONDONTWRITEBYTECODE=1','PYTHONUNBUFFERED=1',
         'PIP_NO_CACHE_DIR=1','PIP_DISABLE_PIP_VERSION_CHECK=1','HF_HOME=/workspace/.cache/huggingface',
         'HF_HUB_DISABLE_IMPLICIT_TOKEN=1','HF_HUB_DISABLE_TELEMETRY=1',
@@ -131,7 +144,9 @@ def docker_args(c, stage):
         args += ['-e',item]
     if stage in ('prepare','smoke','main'):
         args += ['--gpus','all']
-    if stage not in ('prepare','download'):
+    else:
+        args += ['--runtime=runc','-e','CUDA_VISIBLE_DEVICES=','-e','NVIDIA_VISIBLE_DEVICES=void']
+    if stage not in ('prepare','download') or (stage=='download' and 'environment_parent' in c):
         args += ['--network=none','-e','HF_HUB_OFFLINE=1','-e','TRANSFORMERS_OFFLINE=1']
     python = 'python3' if stage == 'prepare' else '/workspace/venv/bin/python'
     return args+[c['image'], python,'-IB','/source/dgx_task.py',stage]
@@ -187,14 +202,26 @@ def stop_container(c):
     subprocess.run(['docker','kill',name], check=True)
 
 
-def run_once(c):
+def run_once(c, *, smoke_only=False):
+    if (c.get('purpose')=='preflight_only') != smoke_only:
+        raise ValueError('Preflight cannot enter the main-training execution path')
+    if 'environment_parent' in c and resource_config(c)['root']!=c['environment_parent']:
+        raise ValueError('Environment reuse must name the original resource root')
     root = Path(c['root'])
     if (root/'supervisor-status.json').exists():
         raise RuntimeError('Run already attempted; restarting is not automatic')
-    status = {'status':'running','started_at_kst':now(),'deadline_kst':c['deadline_kst']}
+    status = {'status':'running','started_at_kst':now(),'deadline_kst':c['deadline_kst'],
+              'purpose':'preflight_only' if smoke_only else 'main_training'}
     save(c,status)
     try:
-        stages = ('resume-check','download','tokenize','main') if 'resume_parent' in c else ('prepare','download','tokenize','smoke','main')
+        if smoke_only:
+            stages=('download','tokenize','smoke')
+        elif 'resume_parent' in c:
+            stages=('resume-check','download','tokenize','main')
+        elif 'environment_parent' in c:
+            stages=('download','tokenize','smoke','main')
+        else:
+            stages=('prepare','download','tokenize','smoke','main')
         for stage in stages:
             verify_files(c)
             if time.time() >= cutoff(c['deadline_kst'])-900:
@@ -326,6 +353,10 @@ def run(c):
 
 
 def apply(c, path):
+    if c.get('purpose')=='preflight_only':
+        raise ValueError('Preflight-only control cannot start main training')
+    if 'environment_parent' in c and resource_config(c)['root']!=c['environment_parent']:
+        raise ValueError('Environment reuse must name the original resource root')
     verify_files(c)
     remaining = int(cutoff(c['deadline_kst'])-time.time())
     if not 1800 < remaining <= 12*3600:
@@ -357,11 +388,116 @@ def apply(c, path):
     print(json.dumps({'started':prefix,'deadline_kst':c['deadline_kst'],'at_kst':now()}))
 
 
+def start_preflight(c, path):
+    """PID 1 owns a bounded smoke run; it cannot proceed to the main stage."""
+    if c.get('purpose')!='preflight_only' or 'environment_parent' not in c:
+        raise ValueError('Require an explicit environment-reusing preflight control')
+    verify_files(c)
+    resources=resource_config(c)
+    if resources['root']!=c['environment_parent']:
+        raise ValueError('Preflight environment must name the original resource root')
+    workspace=Path(resources['root'])/'workspace'
+    prepared=json.loads((workspace/'prepare-status.json').read_text())
+    hardware=json.loads((workspace/'hardware.json').read_text())
+    if prepared['status']!='completed' or hardware.get('compute_capability')!=[12,1] or hardware.get('cuda_forward_backward')!='passed':
+        raise ValueError('Environment has not passed the Spark runtime checks')
+    remaining=int(cutoff(c['deadline_kst'])-time.time())
+    if not 1800<remaining<=3600:
+        raise ValueError('Preflight control needs a bounded 30-to-60-minute window')
+    if shared_model_active():raise SharedInferenceBusy('Shared inference is active; no smoke run started')
+    if available_memory()<96*2**30:raise RuntimeError('Insufficient available memory for smoke')
+    path=Path(path)
+    if str(path)!=str(Path(c['root'])/'control.json') or not re.fullmatch(r'[/a-zA-Z0-9_.-]+',str(path)):
+        raise ValueError('Unsafe control path')
+    if (Path(c['root'])/'supervisor-status.json').exists():raise RuntimeError('Preflight already attempted')
+    source=Path(c['root'])/'source/dgx_supervisor.py'
+    command=['/usr/bin/python3','-IB',str(source),'--config',str(path)]
+    subprocess.run(['systemd-run','--unit='+c['run_id']+'-preflight',
+        '--property=RuntimeMaxSec=1800','--property=Restart=no','--property=KillMode=control-group',
+        '--property=TimeoutStopSec=20',
+        '--property=ExecStopPost='+' '.join(command+['--stop-container']),
+        *command,'--run-smoke'],check=True)
+    print(json.dumps({'started':c['run_id']+'-preflight','purpose':'preflight_only',
+                      'runtime_max_seconds':1800,'main_training_started':False,'at_kst':now()}))
+
+
+def save_queue(c, status, **fields):
+    path=Path(c['root'])/'preflight-queue.json'
+    temporary=path.with_suffix('.tmp')
+    temporary.write_text(json.dumps({'status':status,'at_kst':now(),'main_training_started':False,**fields},indent=2)+'\n')
+    temporary.replace(path)
+
+
+def wait_for_preflight_idle(c):
+    """Reserve 30 minutes for the smoke itself; unknown shared state is busy."""
+    idle_since=None
+    while time.time()<cutoff(c['deadline_kst'])-1800:
+        available=None;reason='shared_inference_active'
+        try:
+            busy=shared_model_active();available=available_memory()
+            if not busy and available<96*2**30:reason='insufficient_available_memory'
+            ready=not busy and available>=96*2**30
+        except (OSError,ValueError,RuntimeError):
+            ready=False;reason='shared_state_unavailable'
+        instant=time.time()
+        if ready:
+            if idle_since is None:idle_since=instant
+            if instant-idle_since>=60:return
+            reason='confirming_60_seconds_idle'
+        else:idle_since=None
+        save_queue(c,'waiting',reason=reason,available_bytes=available,deadline_kst=c['deadline_kst'])
+        time.sleep(10)
+    raise RuntimeError('No idle training window before preflight cutoff')
+
+
+def run_queued_smoke(c, path):
+    if c.get('purpose')!='preflight_only':raise ValueError('Queue accepts only preflight')
+    if (Path(c['root'])/'supervisor-status.json').exists():raise RuntimeError('Preflight already attempted')
+    try:
+        wait_for_preflight_idle(c)
+        save_queue(c,'running_smoke',runtime_max_seconds=1800)
+        subprocess.run(['/usr/bin/python3','-IB',str(Path(c['root'])/'source/dgx_supervisor.py'),
+                        '--config',str(path),'--run-smoke'],check=True,timeout=1800)
+        result=json.loads((Path(c['root'])/'supervisor-status.json').read_text())
+        if result['status']!='completed':raise RuntimeError('Smoke has no successful completion receipt')
+        save_queue(c,'completed',gpu_smoke_passed=True)
+    except BaseException as exc:
+        save_queue(c,'failed',error=type(exc).__name__+': '+str(exc),gpu_smoke_passed=False)
+        raise
+    finally:stop_container(c)
+
+
+def start_preflight_queue(c, path):
+    if c.get('purpose')!='preflight_only' or 'environment_parent'not in c:
+        raise ValueError('Only fresh-base preflight may wait for shared inference')
+    verify_files(c);resources=resource_config(c)
+    if resources['root']!=c['environment_parent']:raise ValueError('Require original resource root')
+    workspace=Path(resources['root'])/'workspace'
+    prepared=json.loads((workspace/'prepare-status.json').read_text())
+    hardware=json.loads((workspace/'hardware.json').read_text())
+    if prepared['status']!='completed' or hardware.get('compute_capability')!=[12,1] or hardware.get('cuda_forward_backward')!='passed':
+        raise ValueError('Environment has not passed the Spark runtime checks')
+    remaining=int(cutoff(c['deadline_kst'])-time.time())
+    if not 2100<remaining<=12*3600:raise ValueError('Queue needs a bounded window, including a 30-minute smoke reserve')
+    path=Path(path);root=Path(c['root'])
+    if str(path)!=str(root/'control.json') or not re.fullmatch(r'[/a-zA-Z0-9_.-]+',str(path)):
+        raise ValueError('Unsafe control path')
+    if any((root/name).exists()for name in ('preflight-queue.json','supervisor-status.json')):
+        raise RuntimeError('Preflight queue already attempted')
+    command=['/usr/bin/python3','-IB',str(root/'source/dgx_supervisor.py'),'--config',str(path)]
+    subprocess.run(['systemd-run','--unit='+c['run_id']+'-preflight',
+        '--property=RuntimeMaxSec='+str(remaining),'--property=Restart=no','--property=KillMode=control-group',
+        '--property=TimeoutStopSec=20','--property=ExecStopPost='+' '.join(command+['--stop-container']),
+        *command,'--run-queued-smoke'],check=True)
+    print(json.dumps({'queued':c['run_id']+'-preflight','deadline_kst':c['deadline_kst'],
+                      'smoke_runtime_max_seconds':1800,'main_training_started':False,'at_kst':now()}))
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config',type=Path,required=True)
     group=parser.add_mutually_exclusive_group(required=True)
-    for action in ('check','apply','verify','run','stop','stop-container','prepare-environment','admit-guide','check-resume'):
+    for action in ('check','apply','verify','run','stop','stop-container','prepare-environment','admit-guide','check-resume','smoke-only','run-smoke','queue-smoke','run-queued-smoke'):
         group.add_argument('--'+action,action='store_true')
     args=parser.parse_args()
     c=read_config(args.config)
@@ -370,8 +506,11 @@ def main():
         print(json.dumps({'inputs_verified':len(c['files']),'deadline_kst':c['deadline_kst']}))
     elif args.verify:
         verify_files(c)
-        subprocess.run(['systemctl','show',c['run_id']+'.service',c['run_id']+'-deadline.timer',
+        units=[c['run_id']+'-preflight.service']if c.get('purpose')=='preflight_only'else[c['run_id']+'.service',c['run_id']+'-deadline.timer']
+        subprocess.run(['systemctl','show',*units,
             '-p','ActiveState','-p','SubState','-p','MainPID','-p','Result','-p','NextElapseUSecRealtime'],check=True)
+        queue=Path(c['root'])/'preflight-queue.json'
+        if queue.exists():print(queue.read_text())
         status=Path(c['root'])/'supervisor-status.json'
         if status.exists(): print(status.read_text())
     else:
@@ -412,12 +551,21 @@ def main():
                 '--property=RuntimeMaxSec=1800','--property=Restart=no',
                 '--property=ExecStopPost=/usr/bin/python3 -IB '+str(Path(c['root'])/'source/dgx_supervisor.py')+' --config '+str(args.config.resolve())+' --stop-container',
                 *docker_args(c,'prepare')],check=True)
+        elif args.queue_smoke:start_preflight_queue(c,args.config.resolve())
+        elif args.run_queued_smoke:run_queued_smoke(c,args.config.resolve())
+        elif args.smoke_only:start_preflight(c,args.config.resolve())
+        elif args.run_smoke:run_once(c,smoke_only=True)
         elif args.apply: apply(c,args.config.resolve())
         elif args.run: run(c)
         else:
             stop_container(c)
             if args.stop:
-                subprocess.run(['systemctl','stop',c['run_id']+'.service'],check=True)
+                preflight=c.get('purpose')=='preflight_only'
+                unit=c['run_id']+('-preflight.service'if preflight else'.service')
+                subprocess.run(['systemctl','stop',unit],check=True)
+                if preflight:
+                    save_queue(c,'stopped_by_operator',gpu_smoke_passed=False)
+                    return
                 status_path=Path(c['root'])/'supervisor-status.json'
                 status=json.loads(status_path.read_text()) if status_path.exists() else {'status':'not_started'}
                 if status['status']=='running': status['status']='stopped_deadline'

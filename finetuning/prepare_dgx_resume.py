@@ -13,6 +13,8 @@ from resume_training import make_receipt, digest
 def build(parent, root, run_id, deadline, sources, step, retry_policy=None):
     parent, root, sources = Path(parent), Path(root), Path(sources)
     old = read_config(parent/'control.json')
+    if old.get('purpose')=='preflight_only':
+        raise ValueError('A preflight smoke adapter is not a main-training checkpoint')
     verify_files(old)
     if str(parent) != old['root'] or root.parent != parent.parent or root == parent:
         raise ValueError('Use a separate sibling run')
@@ -32,6 +34,7 @@ def build(parent, root, run_id, deadline, sources, step, retry_policy=None):
         shutil.copyfile(sources/name, root/'source'/name)
     for rel in old['files']:
         if rel.startswith('data/'):
+            (root/rel).parent.mkdir(parents=True,exist_ok=True)
             shutil.copyfile(parent/rel, root/rel)
     profile = json.loads((parent/'profiles/main.json').read_text())
     profile.update(training_deadline_epoch=cutoff(deadline)-900,
@@ -55,6 +58,7 @@ def build(parent, root, run_id, deadline, sources, step, retry_policy=None):
     c={**old,'root':str(root),'run_id':run_id,'deadline_kst':deadline,
        'resume_parent':str(parent),'resource_root':str(resources.parent),'files':hashes}
     c.pop('retry_policy',None)
+    c.pop('environment_parent',None)
     if retry_policy is not None:c['retry_policy']=retry_policy
     (root/'control.json').write_text(json.dumps(c,indent=2)+'\n')
     read_config(root/'control.json');verify_files(c)

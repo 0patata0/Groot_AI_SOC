@@ -39,6 +39,7 @@ def main():
              "check_joint_tokens.py", "validate_joint_soc_bundle.py", "JOINT_SOURCE_SPEC.json", "JOINT_SOURCE_REVIEW.json",
              "prepare_operator_sources.py", "prepare_operator_mcp.py", "prepare_operator_release.py",
              "prepare_operator_evaluation.py", "prepare_operator_run.py", "OPERATOR_PREPARATION_20261101.json", "OPERATOR_PREPARATION.md",
+             "OPERATOR_TRAINING_RUN_20261101.json",
              "capture_training_mcp.py", "mcp_contract.20261101.json", "TRAINING_PREFLIGHT_20261101.json",
              "prepare_evidence_run.py", "prepare_evidence_retry.py", "durable_training_window.py", "durable_training_task.py", "durable_training_basecheck.py", "DURABLE_EVIDENCE_RUN.md",
              "prepare_ait_evidence.py", "AIT_EVIDENCE_REVIEW.json", "SOC_DATA_CANDIDATES.json",

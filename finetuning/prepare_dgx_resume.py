@@ -10,6 +10,32 @@ from prepare_dgx_run import FILES
 from resume_training import make_receipt, digest
 
 
+def build_fresh(control, root):
+    """A retry before the first complete checkpoint restarts the exact fresh base."""
+    if control.get('purpose')!='main_training' or 'environment_parent'not in control or 'resume_parent'in control:
+        raise ValueError('Fresh attempt requires a reviewed fresh-base training controller')
+    verify_files(control)
+    original=Path(control['root']);root=Path(root)
+    if root.parent!=original.parent or root==original:raise ValueError('Fresh attempt must be a distinct sibling')
+    resources=Path(resource_config(control)['root'])/'workspace'
+    root.mkdir(exist_ok=False)
+    os.chmod(root,0o755);os.chown(root,0,0)
+    for rel in control['files']:
+        destination=root/rel;destination.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(original/rel,destination)
+    workspace=root/'workspace';workspace.mkdir()
+    for name in ('base','venv'):(workspace/name).mkdir()
+    for name in ('base-manifest.json','base-transfer.json','hardware.json'):
+        shutil.copyfile(resources/name,workspace/name)
+    for path in root.rglob('*'):
+        os.chmod(path,0o755 if path.is_dir()else 0o644);os.chown(path,0,0)
+    os.chown(workspace,control['uid'],control['gid'])
+    current={**control,'root':str(root)};current.pop('retry_policy',None)
+    (root/'control.json').write_text(json.dumps(current,indent=2)+'\n')
+    read_config(root/'control.json');verify_files(current)
+    return current
+
+
 def build(parent, root, run_id, deadline, sources, step, retry_policy=None):
     parent, root, sources = Path(parent), Path(root), Path(sources)
     old = read_config(parent/'control.json')
@@ -28,6 +54,7 @@ def build(parent, root, run_id, deadline, sources, step, retry_policy=None):
         raise ValueError('Original environment was not validated on Spark')
     receipt = make_receipt(workspace/'main', workspace/'main'/('checkpoint-'+str(step)))
     root.mkdir(exist_ok=False)
+    os.chmod(root,0o755);os.chown(root,0,0)
     for name in ('source','profiles','data','installer/finetuning','workspace'):
         (root/name).mkdir(parents=True,exist_ok=True)
     for name in (*FILES, 'check_resume_runtime.py','prepare_dgx_resume.py','prepare_dgx_run.py'):
@@ -71,7 +98,7 @@ if __name__=='__main__':
     for arg in ('parent','root','sources'):p.add_argument('--'+arg,type=Path,required=True)
     for arg in ('run-id','deadline'):p.add_argument('--'+arg,required=True)
     p.add_argument('--step',type=int,required=True)
-    p.add_argument('--retry-attempts',type=int,choices=range(1,5))
+    p.add_argument('--retry-attempts',type=int,choices=range(1,33))
     p.add_argument('--idle-seconds',type=int,default=60)
     a=p.parse_args()
     policy={'max_attempts':a.retry_attempts,'idle_seconds':a.idle_seconds} if a.retry_attempts else None

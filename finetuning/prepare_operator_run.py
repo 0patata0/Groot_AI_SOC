@@ -22,9 +22,10 @@ def data_manifest(directory):
     return outputs
 
 
-def build(data, output, root, environment_parent, run_id, image, deadline, purpose='preflight_only'):
+def build(data, output, root, environment_parent, run_id, image, deadline, purpose='preflight_only', retry_policy=None, release_review=None):
     data, output = Path(data), Path(output)
     if purpose not in ('preflight_only','main_training'):raise ValueError('Unknown purpose')
+    if retry_policy is not None and purpose!='main_training':raise ValueError('Retry policy is for main training only')
     if output.exists():raise ValueError('Preserve previous run bundles')
     admission=json.loads((data/'admission.json').read_text())
     if admission['status']!='source_and_token_verified_waiting_final_review_and_gpu_smoke' or admission['truncation']:
@@ -35,12 +36,15 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
     if sha((data/'token-review.json').read_bytes())!=admission['token_receipt_sha256']:
         raise ValueError('Token receipt changed')
     if purpose=='main_training':
-        review=json.loads((data/'release.json').read_text())
+        release_path=Path(release_review)if release_review else data/'release.json'
+        review=json.loads(release_path.read_text())
         if (review['status']!='ready_for_bounded_training' or not review['gpu_preflight_passed']
                 or review['train_sha256']!=admission['files']['train.jsonl']):
             raise ValueError('Final source/quality-boundary/GPU preparation review is incomplete')
         for name,digest in review['runtime_sources'].items():
             if sha((SOURCE/name).read_bytes())!=digest:raise ValueError('Runtime differs from tested preparation')
+        expected_names=set((*FILES,'check_resume_runtime.py','prepare_dgx_resume.py','prepare_dgx_run.py'))
+        if set(review['runtime_sources'])!=expected_names:raise ValueError('Release must cover every runtime source')
     full=rows(data/'train.jsonl')
     token_counts={r['id']:r['tokens']for r in receipt['records']if r['reason']is None}
     longest=max(full,key=lambda r:(token_counts[r['id']],r['id']))
@@ -63,7 +67,7 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
     shutil.copytree(data/'licenses',output/'data/licenses')
     for name in ('admission.json','composition.json','token-review.json','mcp-contract.json'):
         shutil.copyfile(data/name,output/'data'/name)
-    if purpose=='main_training':shutil.copyfile(data/'release.json',output/'data/release.json')
+    if purpose=='main_training':shutil.copyfile(release_path,output/'data/release.json')
     selection={'selection':'longest admitted conversation plus longest complete trajectory with at least two tool calls and three assistant turns',
                'records':[{'id':r['id'],'tokens':token_counts[r['id']],
                            'assistant_turns':sum(m['role']=='assistant'for m in r['messages'])}for r in selected.values()],
@@ -75,7 +79,7 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
         config=json.loads((SOURCE/'data-evidence-run-20261031-r1-final/profiles'/(stage+'.json')).read_text())
         config.update(hardware_profile='dgx-spark-sm121',data_dir='/data',output_dir='/workspace/'+stage,
                       training_deadline_epoch=cutoff(deadline)-900,final_eval_only=True,
-                      save_steps=8 if stage=='main'else 2)
+                      save_steps=4 if stage=='main'else 2)
         if stage=='main':config['eval_steps']=(len(full)+1)//2
         else:
             config.update(smoke_longest_prefixes=False,max_train_samples=0,
@@ -88,6 +92,7 @@ def build(data, output, root, environment_parent, run_id, image, deadline, purpo
     hashes={str(p.relative_to(output)):sha(p.read_bytes())for p in sorted(output.rglob('*'))if p.is_file()}
     control={'run_id':run_id,'root':root,'uid':1000,'gid':1000,'image':image,'deadline_kst':deadline,
              'files':hashes,'environment_parent':environment_parent,'purpose':purpose,'smoke_data_subdir':'smoke'}
+    if retry_policy is not None:control['retry_policy']=retry_policy
     path=output/'control.json';path.write_text(json.dumps(control,indent=2)+'\n');read_config(path)
     return {'purpose':purpose,'root':root,'files':len(hashes),'selection':selection,
             'control_sha256':sha(path.read_bytes()),'main_training_started':False}
@@ -98,5 +103,9 @@ if __name__=='__main__':
     for name in ('data','output'):parser.add_argument('--'+name,type=Path,required=True)
     for name in ('root','environment-parent','run-id','image','deadline'):parser.add_argument('--'+name,required=True)
     parser.add_argument('--purpose',choices=('preflight_only','main_training'),default='preflight_only')
+    parser.add_argument('--retry-attempts',type=int,choices=range(1,33))
+    parser.add_argument('--idle-seconds',type=int,default=60)
+    parser.add_argument('--release-review',type=Path)
     args=parser.parse_args()
-    print(json.dumps(build(args.data,args.output,args.root,args.environment_parent,args.run_id,args.image,args.deadline,args.purpose),ensure_ascii=False,indent=2))
+    retry={'max_attempts':args.retry_attempts,'idle_seconds':args.idle_seconds}if args.retry_attempts else None
+    print(json.dumps(build(args.data,args.output,args.root,args.environment_parent,args.run_id,args.image,args.deadline,args.purpose,retry,args.release_review),ensure_ascii=False,indent=2))

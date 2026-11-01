@@ -1,5 +1,7 @@
 # 관제 학습 자료·실행 준비 — 2026-11-01
 
+**최종 준비 결과:** 15:36:36 KST 전체35B GPU 시험2/2step·4역전파·validation8 완료,최종adapter/checkpoint2 SHA 일치를 확인했습니다. 최대예약70.10GiB/최저가용44.92GiB·CUDA OOM/재시도0입니다. `release.json`을 발행했고,이후 사용자 지시로 아래 본학습을 시작했습니다. 아래 대기/모델적재 기록은 준비 당시 이력입니다.
+
 로컬에서 출처 검수·정제·대화 구성을 마친 **8,695건**을 DGX 시험 묶음에 넣었다. 실제 토큰 검사와 반입 해시 검증은 통과했다. 첫 GPU 시험은 공유 추론 사용으로 시작 전 거절됐다. 이후 사용자 지시로 **공유 추론 종료 후 자동 시험하는 대기 unit을 등록**했다. 공유 추론 종료를 감지해 **15:24:37 KST 실행, 원본 무결성/토큰 재검사 후15:26 GPU 모델 적재 단계**에 진입했다. 시험 완료·본학습·Thor 적재·운영 교체는 아직이다. [검증 원장](OPERATOR_PREPARATION_20261101.json)과 [현재 현황](../STATUS.md)을 우선한다.
 
 ## 자료와 근거
@@ -64,3 +66,23 @@ sudo bash /home/ACCOUNT/Capstone_Groot_training/operator-preflight-20261101-r5-c
 ```
 
 취소할 때만 마지막 `--verify`를 `--stop`으로 바꾼다. 해당 시험 unit과 그 소유 컨테이너만 정지하며 다른 추론 서비스는 건드리지 않는다. 진행 중 실행 소스의 해시와 후속 관리 소스의 해시는 검증 원장에 각각 기록했다.
+
+## 승인된 본학습과 자동 재개 — 11/1 15:49 시작
+
+[현재 실행 원장](OPERATOR_TRAINING_RUN_20261101.json). 사용자 “학습 시작, 공유 추론 완료 후 재시작” 지시를 반영했다. 8,695건 전체1epoch/4,348step·누적2,기존 validation176 전체 평가,별도 test176/새31문항은 학습하지 않는다. 실제 학습 구성의 save_steps는4이며,마지막 완전 저장 이후 연산은 재개 시 다시 수행될 수 있다.
+
+`retry_policy={"max_attempts":32,"idle_seconds":60}`를 fresh main에도 적용한다. 이전에는 checkpoint 재개 실행만 이 정책을 지원했다. 첫 시도/첫 저장 전에는 검수된 동일 fresh base를 사용하고,완료 marker와 파일 SHA가 검증된 부분 checkpoint가 생기면 다음 시도부터 optimizer/RNG/scheduler를 함께 복원한다. 시도별 경로를 분리해 이전 파일을 덮어쓰지 않는다. 완료 step의 checkpoint는 추가 optimizer step을 만들지 않도록 재개 후보에서 제외한다.
+
+공유 모델/로딩 워커 감지 또는 GPU 실행 중 공유 상태를 확인할 수 없을 때만 자기 컨테이너를 양보한다. 건강한 API·공유모델 없음·MemAvailable96GiB 이상을60초 확인해야 재시도한다. 데이터 오류·비정상loss·일반 메모리 실패를 공유 추론으로 추정해 무한 재시작하지 않는다. 지금 실행에서 일부러 다른 추론을 호출하거나 학습을 죽여 재개하는 실험은 하지 않았다. 격리 제어시험과 실제 DGX fresh 복제/해시/인계 검사를 완료했으며 실제 충돌이 발생하면 별도 기록한다.
+
+종료기한은 **2026-11-02 03:47:48 KST**,학습 soft cutoff는15분 앞이다. 최초 포함 최대32회 시도이며 시간/횟수 상한에서 멈추고 checkpoint를 보존한다. 기한 자동 연장이나 새 실행 창 무한 생성은 하지 않는다. 소스는PID1에서실행돼SSH/Mac종료와무관하다. 서비스 Restart=no는 전체 프로세스의무조건재시작을금지하며,공유추론만대상으로한내부제어재시도와구분한다.
+
+본학습 control/데이터/runtime 원장의 exact SHA가 GPU 준비완료 기록과 맞을 때만 중복 GPU smoke를 생략한다. fresh main의 준비/토큰/가중치·loss 계산 코드는 GPU시험본과 동일하고 이번 추가 변경은 호스트 자동재개 제어다. 새로운 runtime 검수 기록은 `release-main-control-v2.json`으로 보존하고 과거 `release.json`을 덮어쓰지 않았다.
+
+현재 본학습의 단일 진입점은 아래와 같다. 공개 경로의ACCOUNT는 DGX로그인계정으로바꾼다. 조회는 `--verify`,해당실행만중지할때는 `--stop`이다.
+
+```bash
+sudo bash /home/ACCOUNT/Capstone_Groot_training/operator-main-20261101-r5/installer/deploy.sh --training-dgx --config /home/ACCOUNT/Capstone_Groot_training/operator-main-20261101-r5/control.json --verify
+```
+
+루트 `supervisor-status.json`은현재시도/재개위치,`-aN/workspace/main/progress.json`은실제학습단계,checkpoint-complete.json은부분저장완료증거다. 원본가중치/이전adapter/서비스/방화벽은유지한다. 본학습완료후최종validation과동일base품질비교를거쳐Thor후보를검토하며운영자동승격은없다.

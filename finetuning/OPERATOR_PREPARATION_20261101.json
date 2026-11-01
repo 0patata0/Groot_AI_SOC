@@ -1,6 +1,6 @@
 {
-  "at_kst": "2026-11-01T15:28:35.335061+09:00",
-  "status": "gpu_preflight_running_after_shared_inference_finished",
+  "at_kst": "2026-11-01T15:54:40.915682+09:00",
+  "status": "ready_for_bounded_training",
   "cleansing_location": "local",
   "training_location": "DGX Spark",
   "deployment_location": "Jetson Thor",
@@ -93,16 +93,34 @@
   "control_sha256": "e8ad586bb5bb8e5246fc1cde86619d3105866297c7e29195d051889b6fe6b7d4",
   "gpu_smoke": {
     "started": true,
-    "passed": false,
-    "blocked_at_kst": "2026-11-01T15:15:46.659393+09:00",
-    "reason": "shared_inference_active",
-    "resident_model_count": 1,
-    "mem_available_gib": 75.22,
-    "floor_gib": 96,
+    "passed": true,
+    "completed_at_kst": "2026-11-01T15:36:36.847084+09:00",
+    "successful_optimizer_steps": 2,
+    "successful_microbatches": 4,
+    "validation_examples": 8,
+    "all_selected_assistant_turns_verified": true,
+    "eval_loss": 0.554972767829895,
+    "train_runtime_seconds": 131.5777,
+    "evaluation_runtime_seconds": 18.2204,
+    "peak_cuda_allocated_gib": 68.96,
+    "peak_cuda_reserved_gib": 70.1,
+    "minimum_available_gib": 44.92,
+    "cuda_ooms": 0,
+    "cuda_alloc_retries": 0,
     "own_containers": [],
-    "background_job_running": true,
-    "latest_observed_at_kst": "2026-11-01T15:27:43.499465+09:00",
-    "stage": "loading_model"
+    "background_job_running": false,
+    "adapter_matches_checkpoint": true,
+    "adapter_metadata_only": {
+      "adapter": {
+        "sha256": "802176fd42464142c190b4ac0b4fb220ac76decf21336a8428110406a1bf9f9f",
+        "bytes": 65061752
+      },
+      "checkpoint-2": {
+        "sha256": "802176fd42464142c190b4ac0b4fb220ac76decf21336a8428110406a1bf9f9f",
+        "bytes": 65061752
+      }
+    },
+    "result_receipt_sha256": "d7624e36d6caea6bfe58795aa8f1ddbfbbc01af6bb13b950167d2fd9da36d014"
   },
   "planned_smoke": {
     "selection": "longest admitted conversation plus longest complete trajectory with at least two tool calls and three assistant turns",
@@ -128,8 +146,8 @@
   },
   "new_main_training_started": false,
   "production_model_changed": false,
-  "ready_for_gpu_training": false,
-  "release_issued": false,
+  "ready_for_gpu_training": true,
+  "release_issued": true,
   "checks": {
     "local_finetuning_tests_total": 775,
     "passed": 772,
@@ -148,8 +166,7 @@
     "prepare_dgx_resume.py": "87da4709b2f5a02e9df19d36750a611704be0911a154def706f094f9caf604fe"
   },
   "remaining": [
-    "GPU smoke in an idle shared server",
-    "bounded main training budget and checkpoint plan",
+    "Authorized main training and its final validation",
     "same-base quality comparison with fatal-error gate",
     "Thor candidate validation before operational selection"
   ],
@@ -178,7 +195,7 @@
   "queue": {
     "unit": "capstone-dgx-20261101-r5queued-preflight.service",
     "registered_at_kst": "2026-11-01T15:21:27+09:00",
-    "status": "running_smoke",
+    "status": "completed",
     "deadline_kst": "2026-11-01T18:21:16.282858+09:00",
     "idle_seconds": 60,
     "memory_floor_gib": 96,
@@ -187,7 +204,8 @@
     "survives_local_disconnect": true,
     "automatic_retry_after_smoke_failure": false,
     "started_at_kst": "2026-11-01T15:24:37.796257+09:00",
-    "effective_trial_cutoff_kst": "2026-11-01T15:54:37+09:00"
+    "effective_trial_cutoff_kst": "2026-11-01T15:54:37+09:00",
+    "completed_at_kst": "2026-11-01T15:36:36.847084+09:00"
   },
   "control_management": {
     "root": "/home/ACCOUNT/Capstone_Groot_training/operator-preflight-20261101-r5-control",
@@ -219,5 +237,26 @@
     },
     "main_training_started": false
   },
-  "public_paths_use_ACCOUNT_placeholder": true
+  "public_paths_use_ACCOUNT_placeholder": true,
+  "scope": "preparation completed before the subsequent main-training request; see OPERATOR_TRAINING_RUN_20261101.json for live execution",
+  "initial_shared_inference_deferral": {
+    "blocked_at_kst": "2026-11-01T15:15:46.659393+09:00",
+    "reason": "shared_inference_active",
+    "resident_model_count": 1,
+    "mem_available_gib": 75.22
+  },
+  "release_sha256": "12a213eb55fb7b52d61935d630f3e9b734ce93144c55d3d7f7f5d93054161a73",
+  "review_transfer": {
+    "files": {
+      "release.json": "12a213eb55fb7b52d61935d630f3e9b734ce93144c55d3d7f7f5d93054161a73",
+      "local-review.json": "908a76fe2680a3f9615d05f278025c8115fa0a447a777438727478c5879b49ee",
+      "tool-audit.json": "10d6c141ae4f07102e667c3820bdf4a9677e77e2700f11c50a6b4e5e759f6b7c",
+      "evaluation/cases.jsonl": "daa05246cc96ecbe6027b5bb559c2ac09c38bb9682eeae769b14b3a359015f80",
+      "evaluation/manifest.json": "70e715775e31ec3412547e5367b0910ef01ae3936ec0404691ce617a040f4770",
+      "evaluation/token-review.json": "aa79db90795cc14f2ddda9c59c518924e7e5e2e055d7872ee798ba41f5b1759d",
+      "evaluation/admission.json": "4d864db0e66097aa74f39e1bfc6113d5f94a5a6244c8c642273fa88678946a59"
+    },
+    "new_training_started": false,
+    "evaluations_added_to_training": false
+  }
 }

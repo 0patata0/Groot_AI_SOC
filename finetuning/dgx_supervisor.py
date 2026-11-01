@@ -58,9 +58,9 @@ def read_config(path):
         raise ValueError('Only the manifest-bound data/smoke directory is allowed')
     if 'retry_policy' in c:
         policy=c['retry_policy']
-        if ('resume_parent' not in c or not isinstance(policy,dict)
+        if (not ('resume_parent' in c or ('environment_parent' in c and c.get('purpose')=='main_training')) or not isinstance(policy,dict)
                 or set(policy)!={'max_attempts','idle_seconds'}
-                or type(policy['max_attempts']) is not int or not 1<=policy['max_attempts']<=4
+                or type(policy['max_attempts']) is not int or not 1<=policy['max_attempts']<=32
                 or type(policy['idle_seconds']) is not int or not 30<=policy['idle_seconds']<=300):
             raise ValueError('Require a bounded resume retry policy')
     if any(type(c[k]) is not int or c[k] < 1000 for k in ('uid','gid')):
@@ -82,7 +82,7 @@ def resource_config(c):
     origin=c
     seen=set()
     declared=[]
-    for _ in range(16):
+    for _ in range(64):
         if c['root'] in seen: raise ValueError('Cyclic resume provenance')
         seen.add(c['root'])
         verify_files(c)
@@ -202,6 +202,18 @@ def stop_container(c):
     subprocess.run(['docker','kill',name], check=True)
 
 
+def verified_operator_release(c):
+    """Skip the repeated smoke only for the exact reviewed data/runtime bundle."""
+    if 'data/release.json'not in c['files']:return False
+    release=json.loads((Path(c['root'])/'data/release.json').read_text())
+    if (release.get('status')!='ready_for_bounded_training' or release.get('gpu_preflight_passed')is not True
+            or release.get('train_sha256')!=c['files'].get('data/train.jsonl')):
+        raise ValueError('Operator release does not bind the passed GPU test and training data')
+    expected={name.removeprefix('source/'):digest for name,digest in c['files'].items()if name.startswith('source/')}
+    if release.get('runtime_sources')!=expected:raise ValueError('Operator release runtime coverage or digest differs')
+    return True
+
+
 def run_once(c, *, smoke_only=False):
     if (c.get('purpose')=='preflight_only') != smoke_only:
         raise ValueError('Preflight cannot enter the main-training execution path')
@@ -219,7 +231,7 @@ def run_once(c, *, smoke_only=False):
         elif 'resume_parent' in c:
             stages=('resume-check','download','tokenize','main')
         elif 'environment_parent' in c:
-            stages=('download','tokenize','smoke','main')
+            stages=('download','tokenize','main')if verified_operator_release(c)else('download','tokenize','smoke','main')
         else:
             stages=('prepare','download','tokenize','smoke','main')
         for stage in stages:
@@ -316,20 +328,23 @@ def newest_checkpoint(root, minimum):
 
 def run(c):
     if 'retry_policy' not in c:return run_once(c)
-    from prepare_dgx_resume import build
+    from prepare_dgx_resume import build, build_fresh
     root=Path(c['root'])
     if (root/'supervisor-status.json').exists():
         raise RuntimeError('Controller already attempted; refuse implicit restart')
     status={'status':'running','started_at_kst':now(),'deadline_kst':c['deadline_kst'],'attempts':[]}
-    parent=Path(c['resume_parent'])
-    step=json.loads((root/'profiles/resume.json').read_text())['step']
+    parent=Path(c['resume_parent'])if 'resume_parent'in c else None
+    step=json.loads((root/'profiles/resume.json').read_text())['step']if parent else 0
     try:
         for number in range(1,c['retry_policy']['max_attempts']+1):
             verify_files(c)
             if not wait_idle(c,status):
                 status.update(status='stopped_deadline',stage='idle_cutoff');return
             attempt=root.with_name(root.name+'-a'+str(number))
-            build(parent,attempt,c['run_id'],c['deadline_kst'],root/'source',step)
+            if parent is None:
+                build_fresh(c,attempt)
+            else:
+                build(parent,attempt,c['run_id'],c['deadline_kst'],root/'source',step)
             current=read_config(attempt/'control.json')
             status.update(stage='attempt_running',current_attempt_root=str(attempt),resumed_from_step=step)
             record={'attempt':number,'root':str(attempt),'resumed_from_step':step,'started_at_kst':now()}
@@ -340,7 +355,7 @@ def run(c):
                 record.update(status='yielded_to_shared_inference',error=str(exc),ended_at_kst=now())
                 saved=newest_checkpoint(attempt,step)
                 if saved is not None:parent,step=attempt,saved
-                status.update(latest_checkpoint_parent=str(parent),latest_checkpoint_step=step)
+                status.update(latest_checkpoint_parent=str(parent)if parent else None,latest_checkpoint_step=step)
                 save(c,status)
                 continue
             result=json.loads((attempt/'supervisor-status.json').read_text())

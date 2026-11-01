@@ -1,5 +1,7 @@
 # DGX 독립 학습 실행 — 2026-11-01
 
+> **11/1 15:52 후속:** 새자료8,695건의 GPU 준비 시험(2step·4microbatch·validation8) 완료 후 사용자 지시로 본학습/공유추론종료후 자동재개를 등록했습니다. 전체11/2 03:47KST·32시도 상한,4step저장·최신 완전checkpoint 재개이며 현재 모델 적재 중입니다. [실행 설정](OPERATOR_TRAINING_RUN_20261101.json) · [운용](OPERATOR_PREPARATION.md) · [현황](../STATUS.md).
+
 > **10:48 KST 완료 확인:** 447건/1epoch·224step 본학습과 validation176건을 마치고10:05:56 KST에 정상 종료했다. 최종adapter 저장·checkpoint224 가중치 SHA 일치,부분checkpoint216의11파일 SHA를 확인했다. eval_loss0.596903은 실전 정답률이 아니며 원본 대비 관제품질·Thor 후보 적재는 아직이다. 아래 재개·중단 기록은 당시 이력으로 보존한다. [최신 상태·Git](../STATUS.md).
 
 > **09:31 KST 재개 등록:** checkpoint168을 읽기 전용으로 복원하는 새 독립 실행과 제한 자동 재개를 추가했다. 현재 실제 진행·Git은 [STATUS](../STATUS.md), 실행 기준은 아래 [자동 재개](#11월1일-168단계-재개와-제한-자동-재시도)를 따른다.

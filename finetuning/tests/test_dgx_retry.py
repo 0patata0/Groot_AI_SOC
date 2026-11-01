@@ -124,4 +124,35 @@ class RetryTests(unittest.TestCase):
         with patch.object(dgx,'shared_model_active',side_effect=TimeoutError('timeout')):
             with self.assertRaisesRegex(dgx.SharedInferenceBusy,'unavailable'):dgx.check_shared_during_training()
 
+    def fresh_build(self,control,root):
+        root.mkdir()
+        current={k:v for k,v in control.items()if k!='retry_policy'}
+        current['root']=str(root);(root/'control.json').write_text(json.dumps(current))
+
+    def test_fresh_training_retries_before_first_checkpoint_then_resumes_verified_checkpoint(self):
+        self.c.pop('resume_parent');self.c.update(environment_parent=str(self.root.parent/'original'),purpose='main_training')
+        seen=[]
+        def action(c):
+            seen.append(c)
+            if len(seen)==1:raise dgx.SharedInferenceBusy('other model loaded before checkpoint')
+            if len(seen)==2:
+                out,p=self.checkpoint(Path(c['root']),step=4);resume.mark_completed(out,p)
+                raise dgx.SharedInferenceBusy('other model after checkpoint')
+            dgx.save(c,{'status':'completed'})
+        with patch.object(builder,'build_fresh',side_effect=self.fresh_build)as fresh:
+            count,status=self.run_controller(action)
+        self.assertEqual(count,3);self.assertEqual(fresh.call_count,2)
+        self.assertEqual([r['resumed_from_step']for r in status['attempts']],[0,0,4])
+        self.assertNotIn('resume_parent',seen[0]);self.assertNotIn('resume_parent',seen[1])
+        self.assertEqual(seen[2]['resume_parent'],seen[1]['root']);self.assertEqual(status['status'],'completed')
+
+    def test_verified_release_requires_full_runtime_and_exact_training_data(self):
+        data=self.root/'data';data.mkdir()
+        c={**self.c,'files':{'data/release.json':'r'*64,'data/train.jsonl':'a'*64,'source/train.py':'b'*64}}
+        valid={'status':'ready_for_bounded_training','gpu_preflight_passed':True,'train_sha256':'a'*64,'runtime_sources':{'train.py':'b'*64}}
+        p=data/'release.json';p.write_text(json.dumps(valid));self.assertTrue(dgx.verified_operator_release(c))
+        for change in ({'train_sha256':'c'*64},{'runtime_sources':{}},{'gpu_preflight_passed':False}):
+            p.write_text(json.dumps({**valid,**change}))
+            with self.subTest(change=change),self.assertRaises(ValueError):dgx.verified_operator_release(c)
+
 if __name__=='__main__':unittest.main()

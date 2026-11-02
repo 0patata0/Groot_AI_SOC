@@ -1,6 +1,6 @@
 # infra — 서버 구성·배포
 
-**현행 토폴로지 — 2026-11-01:** [서버·연결·근거](diagrams/README.md) · [기존 형태 상세형](../topology/groot_soc_network_architecture.svg) · [버스형](../topology/groot_soc_topology_bus.svg) · [관제·승인 SVG](diagrams/current-soc-flow.svg).
+**운영 토폴로지 — 2026-11-02:** [서버·연결·근거](diagrams/README.md) · [기존 형태 상세형](../topology/토폴로지_상세.svg) · [버스형](../topology/토폴로지_버스.svg) · [관제·승인 SVG](diagrams/current-soc-flow.svg).
 
 A/B/C·Thor의21:53~21:55 KST 읽기 확인을 반영했다. 두 봇은B, 원본35B 추론은B SSH터널→A→Thor, 학습은DGX다. MCP는11/1 14:24 계약 기준8서버/41도구이며 현재 단계·한계는 [STATUS](../STATUS.md)를 따른다. 아래 날짜별 배포·시험 내용은 당시 이력이다. 도식 최신화로 서버 설정이나 보안 정책을 변경하지 않았다.
 

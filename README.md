@@ -4,7 +4,7 @@
 
 ## 현재 배치 · 2026-11-01
 
-[최신 토폴로지와 근거](infra/diagrams/README.md) · [기존 형태 상세형](topology/groot_soc_network_architecture.svg) · [버스형](topology/groot_soc_topology_bus.svg) · [관제·MCP·승인 흐름](infra/diagrams/current-soc-flow.svg)
+[최신 토폴로지와 근거](infra/diagrams/README.md) · [기존 형태 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg) · [관제·MCP·승인 흐름](infra/diagrams/current-soc-flow.svg)
 
 | 위치 | 역할 |
 |---|---|

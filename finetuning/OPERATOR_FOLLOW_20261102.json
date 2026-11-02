@@ -1,5 +1,5 @@
 {
-  "observed_at_kst": "2026-11-02T12:07:01.295647+09:00",
+  "observed_at_kst": "2026-11-02T12:58:27.764468+09:00",
   "status": "installed_active_waiting_for_current_training",
   "authorization": "User authorized future ETA-matched deadline extension and immediate finish when training completes; preserve running training",
   "policy": {
@@ -25,15 +25,15 @@
   "policy_sha256": "1760742eeac2e7f1311908baede0756d9b075846e3aa137796f7049aef9f3530",
   "follower_pid": 444075,
   "follower_parent_pid": 1,
-  "last_heartbeat_kst": "2026-11-02T12:06:30.952565+09:00",
+  "last_heartbeat_kst": "2026-11-02T12:57:33.160984+09:00",
   "estimate": {
-    "basis_step": 2922,
-    "seconds_per_step_with_observed_waits": 23.72149980190822,
-    "remaining_training_seconds": 33826.85871752112,
+    "basis_step": 3092,
+    "seconds_per_step_with_observed_waits": 23.21605889586111,
+    "remaining_training_seconds": 29159.369973201556,
     "validation_reserve_seconds": 1800,
-    "window_seconds": 37800,
+    "window_seconds": 33300,
     "window_capped": false,
-    "proposed_deadline_kst": "2026-11-02T22:36:30.952510+09:00",
+    "proposed_deadline_kst": "2026-11-02T22:12:33.160937+09:00",
     "scope": "estimate, includes observed waits; not a completion guarantee"
   },
   "original_training_pid_unchanged": true,

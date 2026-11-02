@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2600" height="1780" viewBox="0 0 2600 1780" role="img" aria-labelledby="title desc">
 <title id="title">Groot Agentic SOC — 네트워크 토폴로지</title>
-<desc id="desc">기존 topology 상세형 배치: 외부 시험 호스트, ESXi 내 상단 보안 게이트웨이, 중앙 vSwitch, 하단 SIEM과 웹 서버. Thor 추론과 DGX 학습을 구분한다.</desc>
+<desc id="desc">기존 topology 상세형 배치: 외부 시험 호스트, ESXi 내 상단 보안 게이트웨이, 중앙 vSwitch, 하단 SIEM과 웹 서버, 외부 Thor 운영 추론 서버.</desc>
 <style>text{font-family:"Apple SD Gothic Neo","Noto Sans CJK KR","Malgun Gothic",sans-serif;fill:#262626}</style>
 <defs>
 <marker id="attack" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#dc2626"/></marker>
@@ -11,32 +11,21 @@
 <marker id="approval" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#478b2d"/></marker>
 <marker id="internal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#cf5389"/></marker>
 <marker id="external" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#ef9848"/></marker>
-<marker id="training" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#168577"/></marker>
 </defs>
 <rect x="0" y="0" width="2600" height="1780" rx="0" fill="#ffffff" stroke="none" stroke-width="2"/>
 <text x="55" y="52" font-size="38" style="fill:#262626" text-anchor="start" font-weight="700">Groot Agentic SOC — 네트워크 토폴로지</text>
 <text x="55" y="88" font-size="22" style="fill:#666666" text-anchor="start">구성 확인: 2026-11-01 21:53~21:55 KST · MCP 계약: 14:24 KST · 물리 배선이 아닌 논리 흐름</text>
-<rect x="55" y="148" width="550" height="160" rx="10" fill="#f4f5f6" stroke="#aaaaaa" stroke-width="2"/>
-<text x="330.0" y="186" font-size="25" style="fill:#262626" text-anchor="middle" font-weight="700">로컬 Mac / Codex</text>
-<text x="330.0" y="223" font-size="21" style="fill:#4b5563" text-anchor="middle">수집·정제·검수·학습 대화 구성</text>
-<text x="330.0" y="254" font-size="21" style="fill:#4b5563" text-anchor="middle">검수된 정제본 → DGX 학습</text>
-<rect x="865" y="120" width="490" height="210" rx="10" fill="#faf9f5" stroke="#bab5aa" stroke-width="2" stroke-dasharray="9 7"/>
-<text x="888" y="149" font-size="21" style="fill:#666666" text-anchor="start" font-weight="700">EXT · 승인된 실습망</text>
-<rect x="890" y="166" width="440" height="135" rx="10" fill="#fce9eb" stroke="#e34b50" stroke-width="2"/>
-<text x="1110.0" y="204" font-size="27" style="fill:#c7252d" text-anchor="middle" font-weight="700">공격 시험 호스트 / Kali</text>
-<text x="1110.0" y="241" font-size="20" style="fill:#4b5563" text-anchor="middle">승인된 시험 출발지 · IP는 시험별 지정</text>
-<path d="M1110 302V396" fill="none" stroke="#dc2626" stroke-width="14" stroke-linejoin="round" marker-end="url(#attack)"/>
-<text x="1190" y="357" font-size="21" style="fill:#dc2626" text-anchor="start" font-weight="700">공격·웹 요청</text>
+<rect x="420" y="120" width="490" height="210" rx="10" fill="#faf9f5" stroke="#bab5aa" stroke-width="2" stroke-dasharray="9 7"/>
+<text x="443" y="149" font-size="21" style="fill:#666666" text-anchor="start" font-weight="700">EXT · 승인된 실습망</text>
+<rect x="445" y="166" width="440" height="135" rx="10" fill="#fce9eb" stroke="#e34b50" stroke-width="2"/>
+<text x="665.0" y="204" font-size="27" style="fill:#c7252d" text-anchor="middle" font-weight="700">공격 시험 호스트 / Kali</text>
+<text x="665.0" y="241" font-size="20" style="fill:#4b5563" text-anchor="middle">승인된 시험 출발지 · IP는 시험별 지정</text>
+<path d="M665 302V396" fill="none" stroke="#dc2626" stroke-width="14" stroke-linejoin="round" marker-end="url(#attack)"/>
+<text x="745" y="357" font-size="21" style="fill:#dc2626" text-anchor="start" font-weight="700">공격·웹 요청</text>
 <rect x="1665" y="142" width="430" height="165" rx="10" fill="#eeecfd" stroke="#7b6adb" stroke-width="2"/>
 <text x="1880.0" y="180" font-size="28" style="fill:#4e429e" text-anchor="middle" font-weight="700">Jetson Thor · Ollama</text>
 <text x="1880.0" y="217" font-size="22" style="fill:#4b5563" text-anchor="middle">운영 추론 · qwen3.6:35b</text>
 <text x="1880.0" y="248" font-size="22" style="fill:#4b5563" text-anchor="middle">127.0.0.1:11434 · SSH 8022</text>
-<rect x="2170" y="142" width="385" height="165" rx="10" fill="#e7f4ee" stroke="#44947d" stroke-width="2"/>
-<text x="2362.5" y="180" font-size="27" style="fill:#246b55" text-anchor="middle" font-weight="700">DGX Spark</text>
-<text x="2362.5" y="217" font-size="20" style="fill:#4b5563" text-anchor="middle">학습·체크포인트 / 공유 추론 우선</text>
-<text x="2362.5" y="248" font-size="20" style="fill:#4b5563" text-anchor="middle">본학습 자동 운영 승격 없음</text>
-<path d="M2360 307C2360 365 2040 365 2040 307" fill="none" stroke="#168577" stroke-width="3" stroke-linejoin="round" marker-end="url(#training)" stroke-dasharray="9 7"/>
-<text x="2070" y="376" font-size="20" style="fill:#168577" text-anchor="start">가중치 검증 → 후보 적재·비교</text>
 <rect x="45" y="400" width="2510" height="1050" rx="22" fill="#fcfcfb" stroke="#555555" stroke-width="2"/>
 <text x="1298" y="432" font-size="27" style="fill:#262626" text-anchor="middle" font-weight="700">ESXi Host</text>
 <rect x="85" y="464" width="2430" height="355" rx="18" fill="#fbeee7" stroke="#c95a35" stroke-width="2"/>

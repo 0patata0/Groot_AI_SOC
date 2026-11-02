@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent
 COLORS = {
     "attack": "#dc2626", "management": "#606060", "logs": "#2465b5",
     "llm": "#7360e6", "mcp": "#cc8a19", "approval": "#478b2d",
-    "internal": "#cf5389", "external": "#ef9848", "training": "#168577",
+    "internal": "#cf5389", "external": "#ef9848",
 }
 
 
@@ -81,23 +81,17 @@ class Diagram:
 def architecture():
     d = Diagram(2600, 1780, "Groot Agentic SOC — 네트워크 토폴로지",
                 "기존 topology 상세형 배치: 외부 시험 호스트, ESXi 내 상단 보안 게이트웨이, "
-                "중앙 vSwitch, 하단 SIEM과 웹 서버. Thor 추론과 DGX 학습을 구분한다.")
+                "중앙 vSwitch, 하단 SIEM과 웹 서버, 외부 Thor 운영 추론 서버.")
     d.text(55, 52, "Groot Agentic SOC — 네트워크 토폴로지", 38, bold=True)
     d.text(55, 88, "구성 확인: 2026-11-01 21:53~21:55 KST · MCP 계약: 14:24 KST · 물리 배선이 아닌 논리 흐름", 22, "#666666")
-    d.box(55, 148, 550, 160, "로컬 Mac / Codex", ["수집·정제·검수·학습 대화 구성", "검수된 정제본 → DGX 학습"],
-          "#f4f5f6", "#aaaaaa")
-    d.rect(865, 120, 490, 210, "#faf9f5", "#bab5aa", dash=True)
-    d.text(888, 149, "EXT · 승인된 실습망", 21, "#666666", True)
-    d.box(890, 166, 440, 135, "공격 시험 호스트 / Kali", ["승인된 시험 출발지 · IP는 시험별 지정"],
+    d.rect(420, 120, 490, 210, "#faf9f5", "#bab5aa", dash=True)
+    d.text(443, 149, "EXT · 승인된 실습망", 21, "#666666", True)
+    d.box(445, 166, 440, 135, "공격 시험 호스트 / Kali", ["승인된 시험 출발지 · IP는 시험별 지정"],
           "#fce9eb", "#e34b50", "#c7252d", 20, 27)
-    d.line("M1110 302V396", "attack", True, width=14)
-    d.text(1190, 357, "공격·웹 요청", 21, COLORS["attack"], True)
+    d.line("M665 302V396", "attack", True, width=14)
+    d.text(745, 357, "공격·웹 요청", 21, COLORS["attack"], True)
     d.box(1665, 142, 430, 165, "Jetson Thor · Ollama", ["운영 추론 · qwen3.6:35b", "127.0.0.1:11434 · SSH 8022"],
           "#eeecfd", "#7b6adb", "#4e429e", 22, 28)
-    d.box(2170, 142, 385, 165, "DGX Spark", ["학습·체크포인트 / 공유 추론 우선", "본학습 자동 운영 승격 없음"],
-          "#e7f4ee", "#44947d", "#246b55", 20, 27)
-    d.line("M2360 307C2360 365 2040 365 2040 307", "training", True, dashed=True)
-    d.text(2070, 376, "가중치 검증 → 후보 적재·비교", 20, COLORS["training"])
 
     d.rect(45, 400, 2510, 1050, "#fcfcfb", "#555555", 22)
     d.text(1298, 432, "ESXi Host", 27, bold=True, center=True)
@@ -196,16 +190,16 @@ def architecture():
         "④ 긴급 임시차단은 별도 제한 경로: LLM 판단·MCP 호출·증거 검증 후 짧은 TTL 적용.",
         "WAF DetectionOnly / IDS passive. 조사·승인 대기 동안 패킷을 붙잡는 INLINE 구조가 아님.",
     ], size=21, gap=32)
-    d.write("groot_soc_network_architecture.svg")
+    d.write("토폴로지_상세.svg")
 
 
 def bus():
-    d = Diagram(2900, 1100, "Groot Agentic SOC — Bus Topology",
+    d = Diagram(2530, 1000, "Groot Agentic SOC — Bus Topology",
                 "기존 topology 버스형 배치: 상단 ESXi 서버·SVC·vNIC, 하단 INT/EXT 논리 버스. "
-                "Thor 추론과 DGX 학습은 별도 노드이며 같은 물리망을 뜻하지 않는다.")
+                "Thor 운영 추론 경로를 표시하며 같은 물리망을 뜻하지 않는다.")
     d.text(35, 51, "Groot Agentic SOC — Bus Topology", 36, bold=True)
     d.text(35, 88, "2026-11-01 구성 · 기존 SVC/vNIC/INT/EXT 배치 유지 · 논리적 재배치이며 실제 버스 배선·동일 L2망이 아님", 22, "#666666")
-    d.rect(30, 118, 2840, 935, "white", "#444444", 0)
+    d.rect(30, 118, 2470, 860, "white", "#444444", 0)
     d.rect(65, 153, 1660, 470, "none", "#888888", 0, True)
     d.text(83, 183, "ESXi Host", 23, bold=True)
 
@@ -249,20 +243,19 @@ def bus():
     ], [("ens160", 710)])
     host(1765, 340, "Kali / 시험 호스트", "승인된 시험 출발지", ["승인된 시험 요청", "대상: DVWA", "대상: Log4Shell"], [("시험 NIC", 785)])
     tx = host(2140, 340, "Jetson Thor", "현재 운영 추론 서버", ["Ollama", "qwen3.6:35b", "loopback:11434", "SSH 8022"], [("NIC", None)])
-    dx = host(2515, 320, "DGX Spark", "학습 · 공유 추론 우선", ["검수본 학습", "체크포인트", "후보 산출물", "자동 승격 없음"], [("NIC", None)])
     # Long INT/EXT lines are conceptual paths, not separate real NICs or broadcast domains.
     for y, kind, label in [(710, "internal", "10.200.10.0/24"), (785, "external", "승인된 실습·관리 경로"),
-                            (860, "external", "B → A → Thor SSH 8022"), (935, "training", "로컬 정제 → DGX 학습 → 검증 후 Thor 후보")]:
-        d.line(f"M440 {y}H2820", kind if kind != "training" else "training", True)
-        d.text(740 if y < 935 else 455, y - 15, label, 20, COLORS[kind])
+                            (860, "external", "B → A → Thor SSH 8022")]:
+        d.line(f"M440 {y}H2460", kind, True)
+        d.text(740, y - 15, label, 20, COLORS[kind])
     d.rect(70, 688, 130, 45, "white", COLORS["internal"], 0)
     d.text(135, 719, "INT", 22, bold=True, center=True)
     d.rect(235, 688, 180, 45, "white", COLORS["internal"], 0)
     d.text(325, 719, "vSwitch", 22, bold=True, center=True)
     d.line("M200 710H235M415 710H440", "internal")
-    d.rect(70, 762, 130, 195, "white", COLORS["external"], 0)
-    d.text(135, 864, "EXT", 22, bold=True, center=True)
-    for y, label in [(785, "Attack / Admin"), (860, "LLM Inference"), (935, "Training")]:
+    d.rect(70, 762, 130, 120, "white", COLORS["external"], 0)
+    d.text(135, 830, "EXT", 22, bold=True, center=True)
+    for y, label in [(785, "Attack / Admin"), (860, "LLM Inference")]:
         d.rect(235, y - 23, 180, 46, "white", COLORS["external"], 0)
         d.text(325, y + 8, label, 21, bold=True, center=True)
         d.line(f"M200 {y}H235M415 {y}H440", "external")
@@ -270,10 +263,9 @@ def bus():
     d.line(f"M{ax+50} 651H{ax+75}V860", "external")
     d.dot(ax + 75, 860, "external")
     d.line(f"M{tx} 463V860", "external"); d.dot(tx, 860, "external")
-    d.line(f"M{dx} 463V935", "training"); d.dot(dx, 935, "training")
-    d.text(70, 1000, "B/C는 A가 기본 게이트웨이. EXT 세 줄은 용도별 논리 경로이며 실제 별도 NIC·전용선·동일 네트워크를 의미하지 않는다.", 22, "#666666")
-    d.text(70, 1032, "추론은 Thor 원본35B 유지. DGX 학습본은 무결성·품질·호환 검증 후 후보 적재/승격. 연결·관제 상세는 상세형 토폴로지 참조.", 22, "#666666")
-    d.write("groot_soc_topology_bus.svg")
+    d.text(70, 925, "B/C는 A가 기본 게이트웨이. EXT 두 줄은 용도별 논리 경로이며 실제 별도 NIC·전용선·동일 네트워크를 의미하지 않는다.", 22, "#666666")
+    d.text(70, 957, "추론은 Thor 원본35B 유지. 두 봇·MCP·승인·보안장비의 연결은 상세형 토폴로지 참조.", 22, "#666666")
+    d.write("토폴로지_버스.svg")
 
 
 if __name__ == "__main__":

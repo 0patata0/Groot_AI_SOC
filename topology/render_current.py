@@ -109,7 +109,7 @@ def architecture():
     d.rect(85, 464, 2430, 355, "#fbeee7", "#c95a35", 18)
     d.text(120, 501, "Groot-sec / A", 30, "#a84a27", True)
     d.text(380, 501, "보안 게이트웨이 · 192.168.16.230/25 ↔ 10.200.10.1/24", 23, "#a84a27")
-    d.text(2080, 501, "외부 NIC ens192 · 내부 ens160", 22, "#a84a27")
+    d.text(1740, 501, "외부 NIC ens192 · 내부 ens160", 22, "#a84a27")
     d.rect(895, 540, 1605, 246, "none", "#bd5634", 10, True)
     d.rect(920, 527, 203, 28, "white", "#bd5634", 8)
     d.text(1021, 548, "Security Group", 20, "#a84a27", True, True)
@@ -120,7 +120,7 @@ def architecture():
     d.box(1320, 565, 365, 195, "Suricata IDS", ["PASSIVE · ens192 패킷 관측", "ET + local → all.rules", "인라인 차단 엔진 아님"], stroke="#cf7757")
     d.box(1725, 565, 365, 195, "Vector + Wazuh Agent", ["FW · WAF · IDS 로그", "정제·수집 → B Wazuh", "호스트 진단 근거"], stroke="#cf7757", title_size=24)
     d.box(2130, 565, 365, 195, "nftables Firewall", ["B/C 외부 통신 NAT", "정책·보호 주소·차단 TTL", "승인된 조치 실행·검증"], stroke="#cf7757")
-    d.line("M2495 650C2560 650 2550 360 2450 360H1915Q1895 360 1895 340V301", "llm", True, True,
+    d.line("M2315 565V360H1895V301", "llm", True, True,
            edge_id="gateway-thor-inference")
     d.text(1628, 391, "B 추론 터널 → A 경유 → Thor", 20, COLORS["llm"])
 
@@ -151,15 +151,15 @@ def architecture():
                          (1335, 1020, "approval"), (2270, 1020, "attack")]:
         d.line(f"M{x} 922V{end}", kind, True)
     d.line("M1857 1020V922", "logs", True)
-    d.line("M2500 922V1260Q2500 1280 2480 1280", "attack", True)
+    d.line("M2500 922V1280H2480", "attack", True)
     d.line("M330 1210V1160", "mcp", True)
     # Preserve equipment geometry. Short bot branches meet one shared route
     # per protocol, avoiding duplicated zigzags. Gaps mark non-joining chat
     # crossings; colored dots mark actual schematic joins. These are logical
     # connections, not extra brokers, services or physical links.
-    d.line("M560 1180H795M815 1180H1088M1110 1180H1590Q1606 1180 1606 1164V922",
+    d.line("M560 1180H795M815 1180H1055M1075 1180H1606V922",
            "mcp", True, edge_id="mcp-shared-to-a")
-    d.line("M560 1180V1272Q560 1280 552 1280H545", "mcp", True,
+    d.line("M560 1180V1280H545", "mcp", True,
            edge_id="mcp-shared-to-b")
     d.line("M1015 1210V1180", "mcp", both=True,
            edge_id="hermes-mcp-shared")
@@ -168,10 +168,10 @@ def architecture():
     for x in [1015, 1470]:
         d.dot(x, 1180, "mcp", radius=3)
     d.line("M805 1160V1210", "approval", True, True, edge_id="mattermost-hermes")
-    d.line("M1075 1145L1120 1210", "approval", True, True,
+    d.line("M1065 1160V1240H1085", "approval", True, True,
            edge_id="mattermost-ollama")
     d.line("M1105 1090H1075", "approval", True)
-    d.line("M980 1372H1612Q1628 1372 1628 1356V922", "llm", True,
+    d.line("M980 1372H1628V922", "llm", True,
            edge_id="inference-shared-to-gateway")
     d.line("M980 1350V1372", "llm", both=True,
            edge_id="hermes-inference")

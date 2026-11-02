@@ -12,7 +12,7 @@ Hermes와 Ollama는 같은 `system-diagnostics.get_system_diagnostics`를 사용
 | A | `a:waf`, `a:suricata`, `a:collection` | 컨테이너, IDS 실제 적재/실패/드롭/검사 한계, 에이전트·Vector 최신성/손실 지표 |
 | B | `b:hermes`, `b:ollama` | 현재 프로세스 ID·시작 시각에 연결된 인증 WebSocket/worker heartbeat, 대기 작업 |
 | B | `b:wazuh-manager`, `b:wazuh-indexer`, `b:mattermost` | manager 필수6프로세스·큐/드롭, Indexer cluster health, Mattermost API |
-| B | `b:llm`, `b:management-pipeline`, `b:ingestion` | DGX 소량 추론, 사건/보고 대기 및 검토 필요 상태, 합성 로그 전달 대조 |
+| B | `b:llm`, `b:management-pipeline`, `b:ingestion` | 운영 Thor 연결의 소량 추론, 사건/보고 대기 및 검토 필요 상태, 합성 로그 전달 대조 |
 | B | `b:collection` | 호스트 agent 연결·상태 최신성·실제 호스트 바이너리의 필수 프로세스 |
 | C | `c:collection` | 에이전트 연결·필수 프로세스·상태 최신성 |
 
@@ -30,7 +30,7 @@ SCA는 마지막 저장 스캔이다. 개별 항목의 결과·스캔 종료 시
 
 A의 `capstone-soc-observe.timer`는 A 로컬 및 B/C의 고정 읽기 전용 스냅샷을 확인한다. 전용 키는 source IP 제한·강제 reader·host key pin을 사용하며 셸, sudo, Docker, 터널 권한이 없다. A의 키는 기존 B→A/C 진단 키와 분리한다. B의 root 전달 검증은 기존 B→A/C snapshot 전용 identity의 root600 사본을 사용한다. 원래 MCP 그룹640키·원격 허용 범위는 유지하며 NoNewPrivileges를 끄거나 실행 중 계정을 전환하지 않는다. B가 중단돼도 A의 로컬 감시 기록은 계속 가능하다.
 
-2회 연속 이상/미확인일 때 장애를 기록하고, 정상 회복1회에 복구를 기록한다. `/var/lib/capstone-diagnostics/monitor.sqlite3`의 WAL/FULL 영속 outbox에 미전송 기록을 무기한 보관하고, 확인된 전송 이력만90일 후 정리한다. 한 번에 최대10건, 시도 횟수를 전송 전에 저장한다. HTTP200/본문ok 확인 뒤 전송 완료로 표시한다. 응답 확인이 유실되면 같은 사건 ID가 중복 게시될 수 있는 at-least-once 방식이다.
+감시 관측2회 연속 이상/미확인일 때 장애를 기록하고, 정상 회복1회에 복구를 기록한다. **현재2회는 서로 다른 진단 실행2개를 뜻하지 않는다.** 약3분 주기의 모델 진단 결과를1분 관측이 반복해서 읽어도2회가 될 수 있다. 복구는 지표 정상화이며 자동 수리 실행이나 서버 재부팅의 증명이 아니다. `/var/lib/capstone-diagnostics/monitor.sqlite3`의 WAL/FULL 영속 outbox에 미전송 기록을 무기한 보관하고, 확인된 전송 이력만90일 후 정리한다. 한 번에 최대10건, 시도 횟수를 전송 전에 저장한다. HTTP200/본문ok 확인 뒤 전송 완료로 표시한다. 응답 확인이 유실되면 같은 사건 ID가 중복 게시될 수 있는 at-least-once 방식이다.
 
 기존 Mattermost의 HTTPS SiteURL과 동일 웹훅을 사용하며 인증서 검증을 끄지 않는다. fresh 설치에서는 기존 내부 TLS8444와 A에 전달한 공개 CA를 재사용한다. 비밀 값은 서버 간 SSH 표준입력으로만 전달하고 root 전용 설정에 저장한다. 기존 서버의 제한된 HTTP8065 포트를 새로 개방하지 않는다.
 
@@ -57,3 +57,7 @@ root 운영 확인 명령은 `systemctl status capstone-system-diagnostics.timer
 ## 재시작과 채팅 시험 주의
 
 프로세스 시작 완료와 Mattermost 인증 연결 완료는 다르다. 재시작 직후 인증 전에 게시한 질문은 native Hermes가 자동으로 다시 읽는다고 보장하지 않는다. 실제 최종 시험은 현재 PID/시작 identity의 인증 heartbeat·worker·대기0을 확인한 뒤 새 스레드로 수행한다. 연결 전 무응답1건은 별도 실패로 보존하며 성공 표본에서 지우지 않는다. 이 기능은 gateway 연결을 감시하지만, 중단 중 모든 채팅 입력을 영속 수신하는 backfill을 새로 구현한 것은 아니다.
+
+## 2026-11-02 반복 알림 읽기 조사
+
+A outbox와 실제채널 #212~223을 대조해 각각전송1회·미전송0을 확인했다. b:llm의이상/복구4쌍과Vector/collection의1쌍이원인이며같은메시지재전송은확인되지않았다. 모델진단은35초제한이고실패주변실행시간35.18초가관측됐지만과거예외종류는보존하지않아시간초과패턴과근본원인을구분한다. Vector는로그읽기위치/구writer종료보호검사로3회시작보류후12:42:59에시작했다. 현재표본정상과중단구간전체무손실은별도다. 진단실행identity/구체실패사유보존·지연/접속장애분리·독립진단기준연속판정이개선과제이며이번에는알림기준이나보호검사를변경하지않았다. 최신범위는[STATUS](../../STATUS.md)를따른다.

@@ -33,7 +33,7 @@
 <rect x="85" y="464" width="2430" height="355" rx="18" fill="#fbeee7" stroke="#c95a35" stroke-width="2"/>
 <text x="120" y="501" font-size="30" style="fill:#a84a27" text-anchor="start" font-weight="700">Groot-sec / A</text>
 <text x="380" y="501" font-size="23" style="fill:#a84a27" text-anchor="start">보안 게이트웨이 · 192.168.16.230/25 ↔ 10.200.10.1/24</text>
-<text x="2080" y="501" font-size="22" style="fill:#a84a27" text-anchor="start">외부 NIC ens192 · 내부 ens160</text>
+<text x="1740" y="501" font-size="22" style="fill:#a84a27" text-anchor="start">외부 NIC ens192 · 내부 ens160</text>
 <rect x="895" y="540" width="1605" height="246" rx="10" fill="none" stroke="#bd5634" stroke-width="2" stroke-dasharray="9 7"/>
 <rect x="920" y="527" width="203" height="28" rx="8" fill="white" stroke="#bd5634" stroke-width="2"/>
 <text x="1021" y="548" font-size="20" style="fill:#a84a27" text-anchor="middle" font-weight="700">Security Group</text>
@@ -67,7 +67,7 @@
 <text x="2312.5" y="640" font-size="21" style="fill:#4b5563" text-anchor="middle">B/C 외부 통신 NAT</text>
 <text x="2312.5" y="671" font-size="21" style="fill:#4b5563" text-anchor="middle">정책·보호 주소·차단 TTL</text>
 <text x="2312.5" y="702" font-size="21" style="fill:#4b5563" text-anchor="middle">승인된 조치 실행·검증</text>
-<path id="gateway-thor-inference" d="M2495 650C2560 650 2550 360 2450 360H1915Q1895 360 1895 340V301" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)" marker-start="url(#llm)"/>
+<path id="gateway-thor-inference" d="M2315 565V360H1895V301" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)" marker-start="url(#llm)"/>
 <text x="1628" y="391" font-size="20" style="fill:#7360e6" text-anchor="start">B 추론 터널 → A 경유 → Thor</text>
 <path d="M298 760V872" fill="none" stroke="#606060" stroke-width="3" stroke-linejoin="round"/>
 <path d="M692 760V872" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)" marker-start="url(#mcp)"/>
@@ -122,18 +122,18 @@
 <path d="M1335 922V1020" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)"/>
 <path d="M2270 922V1020" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" marker-end="url(#attack)"/>
 <path d="M1857 1020V922" fill="none" stroke="#2465b5" stroke-width="3" stroke-linejoin="round" marker-end="url(#logs)"/>
-<path d="M2500 922V1260Q2500 1280 2480 1280" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" marker-end="url(#attack)"/>
+<path d="M2500 922V1280H2480" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" marker-end="url(#attack)"/>
 <path d="M330 1210V1160" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
-<path id="mcp-shared-to-a" d="M560 1180H795M815 1180H1088M1110 1180H1590Q1606 1180 1606 1164V922" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
-<path id="mcp-shared-to-b" d="M560 1180V1272Q560 1280 552 1280H545" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
+<path id="mcp-shared-to-a" d="M560 1180H795M815 1180H1055M1075 1180H1606V922" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
+<path id="mcp-shared-to-b" d="M560 1180V1280H545" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-end="url(#mcp)"/>
 <path id="hermes-mcp-shared" d="M1015 1210V1180" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-start="url(#mcp)"/>
 <path id="ollama-mcp-shared" d="M1470 1210V1180" fill="none" stroke="#cc8a19" stroke-width="3" stroke-linejoin="round" marker-start="url(#mcp)"/>
 <circle cx="1015" cy="1180" r="3" fill="#cc8a19"/>
 <circle cx="1470" cy="1180" r="3" fill="#cc8a19"/>
 <path id="mattermost-hermes" d="M805 1160V1210" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)" marker-start="url(#approval)"/>
-<path id="mattermost-ollama" d="M1075 1145L1120 1210" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)" marker-start="url(#approval)"/>
+<path id="mattermost-ollama" d="M1065 1160V1240H1085" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)" marker-start="url(#approval)"/>
 <path d="M1105 1090H1075" fill="none" stroke="#478b2d" stroke-width="3" stroke-linejoin="round" marker-end="url(#approval)"/>
-<path id="inference-shared-to-gateway" d="M980 1372H1612Q1628 1372 1628 1356V922" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)"/>
+<path id="inference-shared-to-gateway" d="M980 1372H1628V922" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-end="url(#llm)"/>
 <path id="hermes-inference" d="M980 1350V1372" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-start="url(#llm)"/>
 <path id="ollama-inference" d="M1510 1350V1372" fill="none" stroke="#7360e6" stroke-width="3" stroke-linejoin="round" marker-start="url(#llm)"/>
 <circle cx="980" cy="1372" r="3" fill="#7360e6"/>

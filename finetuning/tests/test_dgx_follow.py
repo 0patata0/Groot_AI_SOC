@@ -167,5 +167,20 @@ class FollowTests(unittest.TestCase):
                 with self.subTest(field=field),self.assertRaises(ValueError):follow.load_policy(root/'follow.json')
                 p[field]=old
 
+    def test_current_checkpoint_does_not_revalidate_unrelated_original_controller_source(self):
+        current=Path(self.s['attempt']);old=current.parent/'older-controller'
+        checkpoint=current/'workspace/main/checkpoint-80';checkpoint.mkdir(parents=True)
+        (checkpoint/'checkpoint-complete.json').write_text('{}')
+        c={**self.c,'resume_parent':str(old)}
+        resume=types.SimpleNamespace(COMPLETION_MARKER='checkpoint-complete.json',
+                verified_completion=lambda output,path:{'step':80,'max_steps':100})
+        def bound(path,*args):
+            if path.parent==old:raise ValueError('Old controller source differs')
+            return c
+        with patch.object(follow,'bound_control',side_effect=bound) as checked:
+            step,parent,_=follow.checkpoint(self.s,c,self.c,None,resume)
+        self.assertEqual(step,80);self.assertEqual(parent,current)
+        self.assertEqual([call.args[0] for call in checked.call_args_list],[current/'control.json'])
+
 
 if __name__=='__main__':unittest.main()

@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "root": "/home/ACCOUNT/Capstone_Groot_training/operator-follow-20261102-r6",
-  "unit": "capstone-dgx-20261102-followr6",
+  "root": "/home/ACCOUNT/Capstone_Groot_training/operator-follow-20261102-r6v2",
+  "unit": "capstone-dgx-20261102-followr6v2",
   "parent_control": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/control.json",
   "parent_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "authorized_at_kst": "2026-11-02T10:37:30+09:00",

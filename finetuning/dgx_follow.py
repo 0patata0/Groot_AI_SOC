@@ -211,7 +211,9 @@ def estimate(p, progress, current_time):
 
 
 def checkpoint(s, c, origin, dgx, resume):
-    candidates = {s['attempt'], c['resume_parent']}
+    # The initial parent may use an older controller implementation. Only
+    # checkpoints produced/selected by this controller can establish new progress.
+    candidates = {s['attempt']}
     if s['status'].get('latest_checkpoint_parent'):
         candidates.add(s['status']['latest_checkpoint_parent'])
     found = []

@@ -88,10 +88,10 @@
     "new_server_full_install": false
   },
   "remaining": [
-    "Post-expiry fresh readonly review after exact status-tool routing hints; earlier tool errors retained as needs_review",
+    "Post-block reporting: exact readonly status/sensor/block queries succeeded after routing hints, but model exceeded native210-second timeout; outcome_unknown retained",
     "Independent long-term collection continuity and complete attack coverage",
     "Full fresh-server managed-raw/proxy setup test",
-    "Training completion, final validation and independent candidate quality; no model promotion"
+    "Training/final validation/artifact hashes complete; independent candidate SOC quality and Thor validation remain"
   ],
   "sources_sha256": {
     "infra/mcp/incident_containment.py": "f2f203979b8f6a52e0907cfb4b8aee510c2b24851dc7868f20e20eabf6a58348",
@@ -119,5 +119,20 @@
     "trusted_exact_tool_arguments_hint": true,
     "executes_no_tool_for_model": true,
     "no_permission_expansion": true
+  },
+  "followup_report_observed_at_kst": "2026-11-03T03:49:03+09:00",
+  "followup_report": {
+    "run_count": 4,
+    "state": "outcome_unknown",
+    "detail": "model_subprocess_timeout_requires_review",
+    "after_status_hints_exact_reads_succeeded": [
+      "get_operation_status",
+      "search_modsecurity_alerts",
+      "list_blocks"
+    ],
+    "wrong_tool_after_hints": 0,
+    "native_timeout_seconds": 210,
+    "report_delivered": true,
+    "complete": false
   }
 }

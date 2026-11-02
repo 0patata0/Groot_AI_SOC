@@ -1,6 +1,6 @@
 {
-  "observed_at_kst": "2026-11-02T19:09:19.713814+09:00",
-  "status": "original_r6_saved_deadline_exit_followed_by_f1_training",
+  "observed_at_kst": "2026-11-03T03:50:27.833233+09:00",
+  "status": "training_and_final_validation_completed",
   "authorization": "User requested extending training cutoff to the estimated completion time; final fixed cutoff includes save/evaluation margin",
   "run_id": "capstone-dgx-20261102-r6",
   "root": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6",
@@ -71,15 +71,11 @@
     "old_control_sha256_unchanged": true
   },
   "time_estimate": {
-    "observed_at_kst": "2026-11-02T19:09:19.713814+09:00",
-    "step": 4095,
-    "max_steps": 4348,
-    "estimated_pure_remaining_seconds": 4541.1,
-    "estimated_pure_finish_kst": "2026-11-02T20:24:44+09:00",
-    "excludes_future_shared_wait_and_final_validation": true,
-    "actual_current_deadline_kst": "2026-11-02T21:45:44.568445+09:00",
-    "follow_proposed_deadline_kst": "2026-11-02T21:53:51.018052+09:00",
-    "not_completion_guarantee": true
+    "status": "completed",
+    "completed_at_kst": "2026-11-02T21:09:51.169828+09:00",
+    "remaining_training_seconds": 0,
+    "scheduled_f1_deadline_kst": "2026-11-02T21:45:44.568445+09:00",
+    "ended_before_deadline": true
   },
   "operating_models_changed": false,
   "weights_in_git": false,
@@ -93,37 +89,37 @@
     "elapsed_seconds": 3543.83
   },
   "live": {
-    "stage": "training",
-    "stage_at_kst": "2026-11-02T19:09:03.284219+09:00",
-    "service_active": true,
+    "stage": "completed",
+    "stage_at_kst": "2026-11-02T21:09:48.332626+09:00",
+    "service_active": false,
     "parent_pid": 1,
-    "timer_active": true,
+    "timer_active": false,
     "shared_models_loaded": 0,
-    "own_container_count": 1,
+    "own_container_count": 0,
     "new_optimizer_steps_observed": true,
-    "step": 4095,
+    "step": 4348,
     "max_steps": 4348,
-    "resumed_from_step": 3805,
-    "new_steps": 290,
+    "resumed_from_step": 4104,
+    "new_steps": 244,
     "cuda_ooms": 0,
     "cuda_alloc_retries": 0,
-    "checkpoint_complete_marker_step": 4092,
+    "checkpoint_complete_marker_step": 4344,
     "checkpoint_marker_files": 11,
     "checkpoint_file_hashes_rechecked_this_poll": false,
     "latest_fully_hashed_checkpoint_step": 2500,
     "last_full_checkpoint_hash_check_at_kst": "2026-11-02T10:56:53.679150+09:00",
-    "last_training_at_kst": "2026-11-02T19:09:03.284219+09:00",
+    "last_training_at_kst": "2026-11-02T21:09:48.332626+09:00",
     "progress_is_last_training_observation": false,
-    "training_process_currently_running": true,
-    "current_attempt_resumed_from_step": 3805,
+    "training_process_currently_running": false,
+    "current_attempt_resumed_from_step": 4104,
     "current_attempt_optimizer_steps_observed": true,
-    "training_process_phase": "training",
-    "checkpoint_marker_observed_at_kst": "2026-11-02T19:09:19.713814+09:00",
-    "cuda_counters_scope": "current f1-a2 at19:09 KST",
+    "training_process_phase": "completed",
+    "checkpoint_marker_observed_at_kst": "2026-11-03T03:50:27.833233+09:00",
+    "cuda_counters_scope": "completed final f1-a4 process; no current GPU training",
     "current_attempt_cuda_counters_available": true,
-    "current_attempt_new_steps_observed": 290,
+    "current_attempt_new_steps_observed": 244,
     "source_run_id": "capstone-dgx-20261102-f1",
-    "current_training_pid": 688109
+    "current_training_pid": 0
   },
   "shared_yield_history": [
     {
@@ -213,5 +209,7 @@
     "same_data_model_training_math": true,
     "original_service_result": "success",
     "original_last_saved_step": 3805
-  }
+  },
+  "completion_record": "OPERATOR_COMPLETION_20261103.json",
+  "training_and_final_validation_complete": true
 }

@@ -1,0 +1,102 @@
+{
+  "observed_at_kst": "2026-11-03T03:50:27.833233+09:00",
+  "status": "training_and_final_validation_complete_artifact_hashes_verified",
+  "completed_at_kst": "2026-11-02T21:09:51.169828+09:00",
+  "progress_completed_at_kst": "2026-11-02T21:09:48.332626+09:00",
+  "model": "Qwen/Qwen3.6-35B-A3B",
+  "run_id": "capstone-dgx-20261102-f1",
+  "attempt": "operator-auto-20261102-f1-a4",
+  "storage_root": "/home/ACCOUNT/Capstone_Groot_training/operator-auto-20261102-f1-a4/workspace/main",
+  "steps": {
+    "completed": 4348,
+    "planned": 4348,
+    "epoch": 1.0,
+    "final_attempt_resumed_from_step": 4104
+  },
+  "data": {
+    "records": {
+      "train": 8695,
+      "validation": 176,
+      "test": 176
+    },
+    "sha256": {
+      "train": "eb102b962c3b5f3a772fb747939d054bd70ad8a7ff9bfacc7b0cd4f73ae9ea87",
+      "validation": "4be35f814f55d2a68891cb1f1b15d4538dceed3418d2dad6c2e81269eb7ec10c",
+      "test": "64954f1779ae7c4402547267a49f211a5af8f3835ac32a258514cd54e50ebb9b"
+    },
+    "model": "/workspace/base"
+  },
+  "final_validation": {
+    "epoch": 1.0,
+    "eval_loss": 0.31751391291618347,
+    "eval_runtime": 393.726,
+    "eval_samples_per_second": 0.447,
+    "eval_steps_per_second": 0.447
+  },
+  "artifacts_currently_rehashed": {
+    "step": 4348,
+    "validation_loss": 0.31751391291618347,
+    "adapter": {
+      "README.md": {
+        "sha256": "3856c7595b8bcdbb1f9239cb31ec92ef72ce0390a68b7dcb4256597dae5fa76d",
+        "bytes": 5184
+      },
+      "adapter_config.json": {
+        "sha256": "b738e42f40ffaf75c906fadf2688e2e071da2b2d3422072b73d01381b456c0e8",
+        "bytes": 1095
+      },
+      "tokenizer_config.json": {
+        "sha256": "83febe739ecefd99f984f546dfdc10149cedf293b9ee0291b99894341188b613",
+        "bytes": 1098
+      },
+      "chat_template.jinja": {
+        "sha256": "e84f32a23fdda27689f868aa4a1a5621f41133e51a48d7f3efcbea2839574259",
+        "bytes": 7764
+      },
+      "adapter_model.safetensors": {
+        "sha256": "5d3b15dbe7caee11ef2aa08d757afd91f14c08769317cbd3350491f0938179e4",
+        "bytes": 65061752
+      },
+      "tokenizer.json": {
+        "sha256": "87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4",
+        "bytes": 19989343
+      },
+      "training_args.bin": {
+        "sha256": "73b3669ed14020d1cebd35ccdba38e8f1196400ec56d32a82c51027a1b62d71e",
+        "bytes": 5201
+      }
+    },
+    "run_manifest_sha256": "0178aac1309d6b5a185c9a09ce38bdf5190ade2d58ed25efccd7036fdf1dc6c1",
+    "operational_quality_passed": false
+  },
+  "source_and_data_integrity": {
+    "original_control_sha256": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
+    "current_control_sha256": "1d481cde8f02e65a28ec8b6e60b47d49668e55ab26952de5209df3932dde11bf",
+    "original_files_verified": 54,
+    "current_files_verified": 54,
+    "same_model_data_training_math": true
+  },
+  "service_result": "success",
+  "active_training_pid": 0,
+  "own_containers": 0,
+  "follower_status": "completed",
+  "stopped_before_original_f1_deadline": true,
+  "original_f1_deadline_kst": "2026-11-02T21:45:44.568445+09:00",
+  "final_attempt_cuda_ooms": 0,
+  "final_attempt_cuda_alloc_retries": 0,
+  "last_periodic_checkpoint_marker": 4344,
+  "weights_downloaded_to_mac": false,
+  "weights_in_git_or_lfs": false,
+  "thor_operating_model_replaced": false,
+  "independent_operational_quality_passed": false,
+  "next": [
+    "Compare original and trained model on held-out SOC tasks under matching harness and permissions",
+    "Check critical omissions, approval boundaries, false success, tool selection and latency",
+    "Only then validate conversion, Thor candidate loading and rollback before any promotion"
+  ],
+  "limitations": [
+    "Validation loss is not an SOC task accuracy score or proof of improved generalization.",
+    "No hourly Codex observations occurred during the Git approval wait; completion time is read from authenticated server records and final files verified now.",
+    "Final adapter files were rehashed now; optimizer checkpoint4344 was not rehashed in this poll."
+  ]
+}

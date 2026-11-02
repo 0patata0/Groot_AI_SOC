@@ -649,7 +649,7 @@ def verified_sensor_events(requirements, receipts):
                for source, ip, stamp, rule in requirements)
 
 
-def sensor_disposition_error(text, successful_reads):
+def sensor_disposition_error(text, successful_tools):
     """Require the model's explicit incident judgment, not just a matched alert.
 
     This validates attribution and completeness, not the truth of the model's
@@ -676,14 +676,14 @@ def sensor_disposition_error(text, successful_reads):
             or not 1 <= len(value['evidence_tools']) <= 16
             or any(not isinstance(name, str) for name in value['evidence_tools'])):
         return 'incident_disposition_invalid'
-    if value['assessment'] == 'unresolved':
-        return 'incident_disposition_unresolved'
     evidence_tools = set(value['evidence_tools'])
     sensor_tools = {'mcp__security_events__search_modsecurity_alerts',
                     'mcp__security_events__search_suricata_alerts'}
     if (len(evidence_tools) != len(value['evidence_tools']) or
-            not evidence_tools <= successful_reads or not evidence_tools & sensor_tools):
+            not evidence_tools <= successful_tools or not evidence_tools & sensor_tools):
         return 'incident_disposition_evidence_missing'
+    if value['assessment'] == 'unresolved':
+        return 'incident_disposition_unresolved'
     return None
 
 
@@ -846,9 +846,18 @@ class Trace:
             successful_reads = {row[0] for row in db.execute(
                 "SELECT name FROM tool_calls WHERE run_id=? AND completed=1 AND is_write=0 AND is_error=0", (self.run_id,))
                 if row[0] not in CALCULATION_TOOLS}
-            decision_error = sensor_disposition_error(text, successful_reads) if self.sensor_requirements else None
+            successful_tools = {row[0] for row in db.execute(
+                "SELECT name FROM tool_calls WHERE run_id=? AND completed=1 AND is_error=0", (self.run_id,))
+                if row[0] not in CALCULATION_TOOLS}
+            decision_error = sensor_disposition_error(text, successful_tools) if self.sensor_requirements else None
             missing_bound_read = any(not verified_proposal(p, self.read_receipts, self.later_proposals) for p in proposals)
-            if self.case["mode"] == "verify" and (not verified or missing_bound_read):
+            if decision_error in ('incident_disposition_evidence_missing', 'incident_disposition_invalid'):
+                state, detail, due = "needs_review", decision_error, now
+                # A review label cannot legitimize fabricated citations. The
+                # native wrapper gets one evidence-driven correction first;
+                # keep any residual invalid report only in the private trace.
+                text = incomplete_report(detail)
+            elif self.case["mode"] == "verify" and (not verified or missing_bound_read):
                 state, detail, due = "needs_review", "live_verification_missing", now
             elif pending and self.case["run_count"] >= 8:
                 state, detail, due = "needs_review", "pending_verification_limit", now
@@ -993,15 +1002,38 @@ event time and source. A Wazuh correlation rule.id (for example 100110/100102)
 is NOT the sensor Suricata SID or ModSecurity rule ID; discover the returned
 sensor IDs before filtering them. Recent unrelated alerts cannot verify
 a past incident. A zero bounded sample does not prove the old attack was harmless.
+Report every observation time in KST using the returned timestamp_kst/time_display
+fields, including short HH:MM ranges. Raw UTC 03:00 is 12:00 KST, never 03:00 KST.
+Keep sensor destination IP, Wazuh agent identity and proxy host distinct: an
+agent name is not proof that its management address was the attacked destination.
+DetectionOnly records detection, not prevention or absence of compromise. Read
+the actual sensor events and response/block status before assessing outcome;
+HTTP 200/400/403 alone is not proof of execution success or attack prevention.
+get_service_action_target defines the current allowed action policy. reload and
+restart only operate the service with existing configuration; they cannot change
+SecRuleEngine. If the target requires DetectionOnly to remain enabled, proposing
+On via service action or custom-rule editing is outside that policy. Investigate
+registered response tools and their actual target/evidence/approval constraints
+instead of inventing a mode switch or treating missing evidence as denial of all
+response authority. Prepare supported necessary proposals within those bounds.
 Matching a sensor event is retrieval success, not incident resolution. For an
 incident with WAF/Suricata evidence, a resolved report must explicitly assess
 the incident as benign (including evidence-confirmed authorized activity) or
 remediated, explain the actual incident-specific basis, and name the successful
-read tools from THIS run supporting that judgment. Before MANAGEMENT_STATUS,
-emit one line: INCIDENT_DISPOSITION: {"assessment":"benign|remediated|unresolved","basis":"Korean explanation of actual evidence and risk/response judgment, at least 20 characters","evidence_tools":["exact registered successful read tool name"]}
+tools from THIS run supporting that judgment (sensor reads and, when relevant,
+actual protected-operation receipts). Before MANAGEMENT_STATUS,
+emit one line: INCIDENT_DISPOSITION: {"assessment":"benign|remediated|unresolved","basis":"Korean explanation of actual evidence and risk/response judgment, at least 20 characters","evidence_tools":["exact registered successful tool name"]}
 Choose one assessment value, never the literal pipe-separated choices. Include
 the actual sensor search tool among evidence_tools. This control line is hidden
 from the channel report; explain the same judgment in ordinary Korean prose.
+The actual-call citation requirement applies equally to monitor/needs_review and
+unresolved reports. An uncalled tool is a missing investigation step, not evidence:
+read it if relevant or remove the unsupported claim. Tool availability is not use.
+Before temporarily_contain_ip, read fresh Suricata evidence for that exact source
+in THIS run and judge the response need. The helper's own independent validation
+is still mandatory and does not replace your investigation. An explicit block
+request is not a fabricated sensor receipt. Current block status and this source's
+events are relevant; unrelated agent/rule inventories are not prerequisites.
 If risk, response need or the result remains unknown, choose unresolved and
 needs_review/monitor. Never invent authorization, execution or benign activity
 to satisfy the format. Read-only scope and absent proposals do not justify

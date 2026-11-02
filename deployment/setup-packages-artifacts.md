@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+> **2026-11-02 보고 근거 보완:** 공용 grounding·query-completion 1.19.5와 자동 관리 controller를 기존 소스 묶음으로 설치한다. 실제 성공 호출에 없는 인용, 짧은 KST 시각 오표기, 서비스 재적용과 WAF 모드 변경의 혼동을 정정 대상으로 삼는다. 기존 초기 설치 경로가 두 봇의 원본/SHA 핀과 embedded gate를 함께 생성한다. 추가 패키지·포트·이미지·승인 권한은 없다. 운영 반영 범위와 새 모델 재시험 결과는 [STATUS](../STATUS.md)를 따른다.
+
 > **2026-10-31 관제 보고 보완:** query-completion 1.15.4과 동일 공용 grounding 소스/SHA 핀을 두 봇·자동 조사에 함께 반영합니다. 센서 룰과 Wazuh 상관 규칙, 반환 건수와 신뢰 경계 필드의 혼동을 실제 응답과 대조해 LLM 정정을 요청합니다. 기존 단일 설치 경로·의존성과 승인/도구 권한을 유지합니다. [동작·검증 범위](../infra/hermes/event-report-grounding.md).
 
 > **2026-10-30 변경안 준비 보완:** 기존 source bundle의 공통 harness.py/read_contract.py와 회귀 소스를 갱신합니다. 새 패키지·이미지·포트·설정 키·권한은 없습니다. B 복구용 묶음에서 빠져 있던 기존 test_alignment 검사255행도 canonical과 대조해 동기화했습니다. [설치 경로·복구](../infra/hermes/write-preparation.md) · [검증 범위](../STATUS.md).

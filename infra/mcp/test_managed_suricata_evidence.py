@@ -61,6 +61,44 @@ class ManagedEvidence(unittest.TestCase):
                               sensor_uid=os.geteuid(), sensor_gid=os.getegid(),
                               trusted_state_ancestors=False)
 
+    def test_previous_boot_needs_current_live_writer_before_and_after(self):
+        self.obj['boot_id']='c'*32;self.save()
+        proof={'pid':123,'start_ticks':40,'device':self.obj['current']['device'],'inode':self.obj['current']['inode'],'fds':['5']}
+        with mock.patch.object(reader,'writer_snapshot',return_value=proof) as writer:
+            rows,receipt=self.scan()
+        self.assertEqual(len(rows),3);self.assertEqual(writer.call_count,2)
+        self.assertEqual(receipt['observed_boot_id'],BOOT)
+        self.assertEqual(receipt['state_boot_id'],'c'*32)
+        self.assertEqual(receipt['current_boot_writer'],proof)
+        self.assertEqual(json.loads(self.state.read_text())['boot_id'],'c'*32)
+        with mock.patch.object(reader,'writer_snapshot',side_effect=[proof,dict(proof,start_ticks=41)]):
+            with self.assertRaisesRegex(reader.EvidenceUnavailable,'current_boot_writer_changed'):self.scan()
+        with mock.patch.object(reader,'writer_snapshot',side_effect=reader.EvidenceUnavailable('no writer')):
+            with self.assertRaises(reader.EvidenceUnavailable):self.scan()
+
+    def test_live_writer_proc_binding_rejects_wrong_container_config_fd_and_pid(self):
+        proc=self.root/'proc';process=proc/'123';(process/'fd').mkdir(parents=True);(process/'fdinfo').mkdir()
+        (process/'root/etc/suricata').mkdir(parents=True)
+        config=b'fixture sensor configuration'
+        (process/'root/etc/suricata/suricata.yaml').write_bytes(config)
+        self.obj['source_pins']['engine_config_sha256']=hashlib.sha256(config).hexdigest()
+        (process/'comm').write_text('Suricata-Main\n')
+        (process/'cgroup').write_text('0::/system.slice/docker-'+self.obj['source_pins']['container_id']+'.scope\n')
+        (process/'status').write_text('Uid: 998 998 998 998\nGid: 998 998 998 998\n')
+        (process/'stat').write_text('123 (Suricata-Main) S '+'0 '*18+'50')
+        (process/'exe').symlink_to('/usr/bin/suricata')
+        (process/'fd/5').symlink_to(self.gen)
+        (process/'fdinfo/5').write_text('flags:\t0102001\n')
+        self.assertEqual(reader.writer_snapshot(self.obj,proc)['pid'],123)
+        for target,bad in [('cgroup','0::/unrelated\n'),('status','Uid: 0 0 0 0\nGid: 0 0 0 0\n'),
+                           ('root/etc/suricata/suricata.yaml','modified'),('fdinfo/5','flags: 0100000\n'),
+                           ('stat','123 (Suricata-Main) Z '+'0 '*18+'50')]:
+            path=process/target;old=path.read_bytes();path.write_text(bad)
+            with self.subTest(target=target),self.assertRaises(reader.EvidenceUnavailable):reader.writer_snapshot(self.obj,proc)
+            path.write_bytes(old)
+        (process/'fd/5').unlink()
+        with self.assertRaises(reader.EvidenceUnavailable):reader.writer_snapshot(self.obj,proc)
+
     def test_three_links_current_success_and_same_existing_policy(self):
         rows, proof = self.scan()
         result = containment.validated_evidence(rows, PUBLIC, NOW)

@@ -166,6 +166,21 @@ class ControllerTests(unittest.TestCase):
         self.assertIsNotNone(m.sensor_disposition_error(render(valid)+'\nINCIDENT_DISPOSITION:bad',{name}))
         self.assertIsNotNone(m.sensor_disposition_error('INCIDENT_DISPOSITION: {"assessment":"benign","assessment":"unresolved"}',{name}))
 
+    def test_unresolved_report_cannot_publish_a_tool_that_did_not_run(self):
+        event=self.alert('citation-failure',rule='100102');event['location']='/logs/modsec/audit.log'
+        self.alerts(event);trace=self.trace()
+        name='mcp__security_events__search_suricata_alerts'
+        self.tool(trace,name,{'source':'suricata','source_scope':'wazuh_indexed_alerts','alerts':[]})
+        decision={'assessment':'unresolved','basis':'실제 조회한 근거와 추가로 필요한 조사를 구분하여 보고해야 합니다.',
+                  'evidence_tools':[name,'mcp__security_events__search_modsecurity_alerts']}
+        self.result(trace,'허위 인용 본문\nINCIDENT_DISPOSITION: '+json.dumps(decision,ensure_ascii=False)+'\nMANAGEMENT_STATUS: needs_review')
+        result=trace.finish(0)
+        self.assertEqual(result['state'],'needs_review')
+        row=self.store.db.execute('select detail,final_text from cases').fetchone()
+        self.assertEqual(row[0],'incident_disposition_evidence_missing')
+        self.assertNotIn('허위 인용 본문',row[1])
+        self.assertNotIn('search_modsecurity_alerts',row[1])
+
     def test_pending_proposal_does_not_require_a_resolved_sensor_assessment(self):
         event=self.alert('sensor-pending',rule='100102');event['location']='/logs/modsec/audit.log'
         self.alerts(event);trace=self.trace()

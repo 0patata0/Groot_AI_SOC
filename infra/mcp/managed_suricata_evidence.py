@@ -90,7 +90,7 @@ def uint(value, maximum):
     return type(value) is int and 0 <= value <= maximum
 
 
-def active_state(raw, boot):
+def active_state(raw, boot, *, allow_previous_boot=False):
     try:
         state = json.loads(raw, object_pairs_hook=unique)
     except (ValueError, UnicodeDecodeError):
@@ -100,7 +100,9 @@ def active_state(raw, boot):
         "phase", "current", "pending", "proof", "source_pins"}, "state_shape")
     need(type(state["schema_version"]) is int and state["schema_version"] == 1 and
          state["policy"] == "capstone-raw-operations-v1" and state["engine"] == "suricata" and
-         state["machine_id"] == MID and state["boot_id"] == boot and
+         state["machine_id"] == MID and isinstance(state["boot_id"], str) and
+         re.fullmatch(r'[0-9a-f]{32}', state["boot_id"]) and
+         (state["boot_id"] == boot or allow_previous_boot) and
          uint(state["revision"], 2147483647), "state_identity")
     need(state["phase"] == "active" and state["pending"] is None and
          state["proof"] == {"old_closed": None, "publish_guard": None, "readers_drained": None},
@@ -119,6 +121,72 @@ def active_state(raw, boot):
         all(isinstance(v, str) and HEX.fullmatch(v) for v in pins.values()), "pins_shape")
     need(generation["writer_config_sha256"] == pins["engine_config_sha256"], "generation_config_pin")
     return state
+
+
+def writer_snapshot(state, proc=Path('/proc')):
+    """Attest a previous-boot generation using the current kernel's live writer.
+
+    Rotation preserves the initial state.boot_id. Do not rewrite it or trust a
+    stale 'active' label: require the pinned container, exact sensor process,
+    pinned configuration and a writable FD to this generation, twice. Only
+    fixed procfs files are read; no Docker commands or mutation are exposed.
+    """
+    deadline = time.monotonic() + 2
+    cid = state['source_pins']['container_id']
+    current = state['current']
+    candidates = []
+    need(proc.is_dir(), 'current_boot_writer_unconfirmed')
+    entries = list(proc.iterdir())
+    need(len(entries) <= 32768, 'writer_process_budget')
+    for path in entries:
+        need(time.monotonic() <= deadline, 'writer_scan_deadline')
+        if not path.name.isdigit():
+            continue
+        try:
+            if (path / 'comm').read_text().strip() != 'Suricata-Main':
+                continue
+            cgroups = (path / 'cgroup').read_text().splitlines()
+            if not any(row.split(':', 2)[-1] == '/system.slice/docker-' + cid + '.scope' for row in cgroups):
+                continue
+            need(os.readlink(path / 'exe') == '/usr/bin/suricata', 'writer_executable_changed')
+            before = (path / 'stat').read_text().rsplit(')', 1)[1].split()
+            need(len(before) >= 20 and before[0] not in ('Z', 'X') and before[19].isdigit(), 'writer_not_live')
+            status = dict(line.split(':', 1) for line in (path / 'status').read_text().splitlines() if ':' in line)
+            need(status.get('Uid', '').split() == ['998'] * 4 and status.get('Gid', '').split() == ['998'] * 4,
+                 'writer_identity_changed')
+            config = path / 'root/etc/suricata/suricata.yaml'
+            fd = os.open(config, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+            try:
+                st = os.fstat(fd)
+                need(stat.S_ISREG(st.st_mode) and 0 < st.st_size <= 1024 * 1024, 'writer_config_metadata')
+                raw = os.read(fd, 1024 * 1024 + 1)
+                need(len(raw) == st.st_size and hashlib.sha256(raw).hexdigest() == state['source_pins']['engine_config_sha256'],
+                     'writer_config_changed')
+            finally:
+                os.close(fd)
+            descriptors = list((path / 'fd').iterdir())
+            need(len(descriptors) <= 1024, 'writer_descriptor_budget')
+            matched = []
+            for descriptor in descriptors:
+                try:
+                    st = descriptor.stat()
+                    if (st.st_dev, st.st_ino) != (current['device'], current['inode']):
+                        continue
+                    info = (path / 'fdinfo' / descriptor.name).read_text()
+                    flags = re.search(r'^flags:\s*([0-7]+)$', info, re.M)
+                    need(flags is not None and (int(flags[1], 8) & os.O_ACCMODE) in (os.O_WRONLY, os.O_RDWR),
+                         'writer_fd_not_writable')
+                    matched.append(descriptor.name)
+                except FileNotFoundError:
+                    continue
+            after = (path / 'stat').read_text().rsplit(')', 1)[1].split()
+            need(len(after) >= 20 and after[19] == before[19] and after[0] not in ('Z', 'X') and matched, 'writer_fd_unconfirmed')
+            candidates.append({'pid': int(path.name), 'start_ticks': int(before[19]),
+                               'device': current['device'], 'inode': current['inode'], 'fds': sorted(matched)})
+        except (FileNotFoundError, ProcessLookupError):
+            continue
+    need(time.monotonic() <= deadline and len(candidates) == 1, 'current_boot_writer_unconfirmed')
+    return candidates[0]
 
 
 @contextlib.contextmanager
@@ -147,7 +215,8 @@ def _events(state_path, base, pins, boot, *, root_uid=0, root_gid=0, sensor_uid=
     need(state_path.parent.lstat().st_uid == root_uid and
          stat.S_IMODE(state_path.parent.lstat().st_mode) == 0o700, "state_parent_metadata")
     state_raw, state_meta = read_fixed(state_path, 16384, 0o600, root_uid)
-    state = active_state(state_raw, boot)
+    state = active_state(state_raw, boot, allow_previous_boot=True)
+    writer = writer_snapshot(state) if state['boot_id'] != boot else None
     config_snapshot = {}
     for key, path in pins.items():
         mode = 0o660 if key == "wazuh_config_sha256" else 0o600
@@ -211,12 +280,15 @@ def _events(state_path, base, pins, boot, *, root_uid=0, root_gid=0, sensor_uid=
                  "managed_links_changed")
         need(not any(os.path.lexists(managed / name) for name in (".publish-link", ".audit-path.next")),
              "unfinished_publication")
+        if writer is not None:
+            need(writer_snapshot(state) == writer, 'current_boot_writer_changed')
         need(time.monotonic() <= deadline, "evidence_scan_deadline")
         return events, {"policy": "managed_active_current_generation_v1",
             "state_sha256": hashlib.sha256(state_raw).hexdigest(), "revision": state["revision"],
             "generation": current["number"], "device": current["device"], "inode": current["inode"],
             "link_count": 3, "snapshot_start": start, "snapshot_end": end,
             "complete_lines_bytes": len(complete), "complete_lines_sha256": hashlib.sha256(complete).hexdigest(),
+            "state_boot_id": state['boot_id'], "observed_boot_id": boot, "current_boot_writer": writer,
             "older_generations_scanned": False, "delivery_acknowledged": False}
     finally:
         for fd in handles:

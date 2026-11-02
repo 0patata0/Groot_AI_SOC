@@ -13,6 +13,98 @@ def sample():
 
 
 class LiteralEvidence(unittest.TestCase):
+    def test_short_kst_clock_is_checked_against_real_instants_without_rewriting(self):
+        facts=[{'kind':'times','instants':['2026-10-30T21:12:10Z','2026-10-31T06:13:04+09:00']}]
+        for text in ('시각 KST 21:12~21:13', '21:12~21:13 KST'):
+            self.assertIn('brief_timestamp_offset_relabelled', m.evidence_claim_violations(text,facts))
+        for text in ('KST 06:12~06:13', '원문 UTC 21:12 → KST 06:12',
+                     '잘못된 표기 KST 21:12', '```log\nKST 21:12\n```', '> KST 21:12'):
+            self.assertNotIn('brief_timestamp_offset_relabelled',m.evidence_claim_violations(text,facts))
+        # Ambiguous clocks from different days cannot be corrected automatically.
+        facts[0]['instants'].append('2026-10-31T21:12:00+09:00')
+        self.assertNotIn('brief_timestamp_offset_relabelled',m.evidence_claim_violations('KST 21:12',facts))
+
+    def test_detection_and_lifecycle_are_not_prevention_or_config_change(self):
+        facts=[{'kind':'service_policy','target':'a:waf','mode_change_allowed':False}]
+        for text in ('DetectionOnly이므로 실제 피해를 방지한 것으로 볼 수 있습니다.',
+                     'WAF DetectionOnly 탐지로 공격을 차단했습니다.'):
+            self.assertIn('detection_only_is_not_prevention',m.evidence_claim_violations(text,facts))
+        for text in ('DetectionOnly는 실제 피해 방지 근거가 아닙니다.',
+                     'WAF DetectionOnly이며 실제 차단 여부는 미확인입니다.',
+                     'WAF DetectionOnly 유지. 방화벽 차단으로 공격을 차단했습니다.'):
+            self.assertNotIn('detection_only_is_not_prevention',m.evidence_claim_violations(text,facts))
+        self.assertIn('service_action_is_not_mode_change',m.evidence_claim_violations(
+            'WAF를 propose_service_action(target=a:waf, action=reload)으로 Mode 변경 후 확인',facts))
+        self.assertIn('waf_mode_change_outside_policy',m.evidence_claim_violations('WAF를 On으로 전환해야 합니다.',facts))
+        self.assertEqual(m.evidence_claim_violations('WAF를 On으로 전환하는 것은 정책 밖입니다. reload는 모드 변경이 아닙니다.',facts),[])
+        self.assertNotIn('service_action_is_not_mode_change',m.evidence_claim_violations(
+            '별도 허용된 설정 수정 승인 후 reload하여 On 모드 변경을 검증합니다.',[]))
+
+    def test_waf_policy_extracted_only_from_actual_target_metadata(self):
+        data={'target':'a:waf','impact':'DetectionOnly must remain enabled.', 'observation':{'running':True}}
+        result=types.SimpleNamespace(is_error=False,content=[types.SimpleNamespace(text=json.dumps(data))])
+        facts=m.observation_facts('get_service_action_target',result)
+        self.assertIn({'kind':'service_policy','target':'a:waf','mode_change_allowed':False},facts)
+        self.assertIn('DetectionOnly 유지',m.literal_evidence_summary(facts))
+        data['target']='a:suricata';result.content[0].text=json.dumps(data)
+        self.assertFalse(any(f['kind']=='service_policy' for f in m.observation_facts('get_service_action_target',result)))
+
+    def test_uncalled_citation_requires_real_read_even_when_unresolved(self):
+        actual='mcp__security_events__search_suricata_alerts'
+        missing='mcp__security_events__search_modsecurity_alerts'
+        text='INCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved','evidence_tools':[actual,missing]})+'\nMANAGEMENT_STATUS: needs_review'
+        self.assertIn('unobserved_disposition_tools',m.evidence_claim_violations(text,[],{actual}))
+        self.assertNotIn('unobserved_disposition_tools',m.evidence_claim_violations(text,[],{actual,missing}))
+        h=grounding_fixtures.Grounding();h.setUp();h.completed.append('search_suricata_alerts')
+        h.kw['assistant_message'].content=text
+        call=m.grounding_wrapper(lambda agent,**kw:'original',
+            types.SimpleNamespace(FinalResponseVerdict=types.SimpleNamespace),lambda rows,row:rows.append(row),
+            lambda rows,user:0,h.completed,[],successful_reads={actual})
+        result=call(h.agent,**h.kw)
+        self.assertEqual(result.action,'continue')
+        self.assertEqual(h.agent._build_api_kwargs()['tool_choice'],'required')
+        self.assertIn('이번 실행의 성공한 도구: '+actual,h.kw['messages'][-1]['content'])
+
+    def test_real_write_receipt_may_be_cited_but_monitor_is_not_assessment(self):
+        names={'mcp__security_events__search_suricata_alerts','mcp__rule_write_a__temporarily_contain_ip'}
+        obj={'assessment':'unresolved','basis':'서버가 검증한 임시 차단 결과와 실제 차단 조회를 별개로 확인했습니다.','evidence_tools':sorted(names)}
+        self.assertEqual(m.disposition_citation_violations('INCIDENT_DISPOSITION: '+json.dumps(obj),names),[])
+        obj['assessment']='monitor'
+        self.assertIn('invalid_incident_disposition',m.disposition_citation_violations('INCIDENT_DISPOSITION: '+json.dumps(obj),names))
+
+    def test_containment_requires_real_prior_sensor_read_for_same_ip(self):
+        for observed in (None,'192.0.2.8','192.168.16.233'):
+            h=Harness()
+            def run(h):
+                if observed:
+                    payload=dict(sample(),source='suricata',alerts=[{'source_ip':observed}])
+                    asyncio.run(h.ClientSession([types.SimpleNamespace(text=json.dumps(payload))]).call_tool('search_suricata_alerts',{}))
+                call=h.ClientSession()
+                if observed=='192.168.16.233':
+                    asyncio.run(call.call_tool('temporarily_contain_ip',{'ip':'192.168.16.233','reason':'test'}))
+                else:
+                    with self.assertRaisesRegex(PermissionError,'requires_prior_sensor_read'):
+                        asyncio.run(call.call_tool('temporarily_contain_ip',{'ip':'192.168.16.233','reason':'test'}))
+                    self.assertFalse(any(row[0]=='temporarily_contain_ip' for row in h.wire_calls))
+            h.run(run,'manage')
+
+    def test_emitter_citations_are_bound_to_actual_success_not_tool_availability(self):
+        actual='mcp__security_events__search_suricata_alerts'
+        missing='mcp__security_events__search_modsecurity_alerts'
+        for missing_error in (True,False):
+            h=Harness()
+            def run(h):
+                result=h.ClientSession([types.SimpleNamespace(text=json.dumps(dict(sample(),source='suricata')))])
+                asyncio.run(result.call_tool('search_suricata_alerts',{'limit':10}))
+                emitter=h.Emitter()
+                emitter.on_tool_progress('tool.completed',actual,result=json.dumps(sample()),is_error=False)
+                emitter.on_tool_progress('tool.completed',missing,result=json.dumps({'error':'unavailable'}),is_error=missing_error)
+                text='INCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved','evidence_tools':[actual,missing]})+'\nMANAGEMENT_STATUS: needs_review'
+                emitter.emit_result({'final_response':text})
+            h.run(run,'verify')
+            self.assertNotIn(missing,h.emissions[0][0]['final_response'])
+            self.assertIn('MANAGEMENT_STATUS: needs_review',h.emissions[0][0]['final_response'])
+
     def test_total_claim_is_rejected_even_with_unknown_footer(self):
         for text in ('경보 총 2건입니다.\n전체 건수는 미확인입니다.', '경보 총 2건 (전체 건수 미확인)'):
             self.assertIn('unknown_window_total_claimed',m.evidence_claim_violations(text,[sample()]))

@@ -219,6 +219,8 @@ def observation_facts(name, result):
                 row = {k: data[k] for k in keep if k in data}
                 row['kind'] = 'events'
                 row.update(event_rule_facts(data))
+                row['source_ips'] = sorted({str(x.get('source_ip')) for x in data.get('alerts', [])[:50]
+                    if isinstance(x, dict) and re.fullmatch(r'(?:[0-9]{1,3}\.){3}[0-9]{1,3}', str(x.get('source_ip', '')))})
                 row['forwarding_evidence'] = any('forward' in str(x.get('signature', '')).lower()
                     for x in data.get('alerts', [])[:50] if isinstance(x, dict))
                 rows.append(row)
@@ -244,6 +246,10 @@ def observation_facts(name, result):
                              'started_at': observed.get('started_at') if parse_instant(observed.get('started_at')) else None})
                 if parse_instant(observed.get('started_at')):
                     stamps.append(observed['started_at'])
+                if (data.get('target') == 'a:waf' and
+                        'DetectionOnly must remain enabled' in str(data.get('impact', ''))):
+                    rows.append({'kind': 'service_policy', 'target': 'a:waf',
+                                 'mode_change_allowed': False})
             if name in ('get_rule_change_target', 'get_service_action_target'):
                 runtime = data.get('rule_source_evidence', data.get('runtime'))
                 if isinstance(runtime, dict) and runtime.get('rule_source_option') == '-S' and runtime.get('rule_source_path') == '/rules/all.rules':
@@ -361,11 +367,89 @@ def argument_refusal(name, result):
     return False
 
 
-def evidence_claim_violations(text, facts):
+def disposition_citation_violations(text, successful_reads):
+    """Check model citations against completed native calls, for every disposition.
+
+    An unresolved assessment is not permission to invent evidence. Missing
+    citations cause a model-selected read/rewrite, never a fabricated receipt.
+    The controller independently validates the complete disposition schema.
+    """
+    if successful_reads is None:
+        return []
+    issues = []
+    for line in re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text, re.M):
+        try:
+            value = json.loads(line)
+            names = value.get('evidence_tools') if isinstance(value, dict) else None
+            if (not isinstance(value, dict) or set(value) != {'assessment', 'basis', 'evidence_tools'} or
+                    value.get('assessment') not in ('benign', 'remediated', 'unresolved') or
+                    not isinstance(value.get('basis'), str) or not 20 <= len(value['basis'].strip()) <= 2000):
+                issues.append('invalid_incident_disposition')
+            if not isinstance(names, list) or not 1 <= len(names) <= 16 or any(not isinstance(n, str) for n in names):
+                issues.append('invalid_disposition_citations')
+            elif len(set(names)) != len(names):
+                issues.append('invalid_disposition_citations')
+            elif set(names) - set(successful_reads):
+                issues.append('unobserved_disposition_tools')
+        except (ValueError, RecursionError):
+            issues.append('invalid_disposition_citations')
+    return issues
+
+
+def brief_kst_violations(text, facts):
+    """Detect a UTC clock relabelled KST, without guessing a date or changing it."""
+    instants = [parse_instant(v) for f in facts if f.get('kind') == 'times' for v in f.get('instants', [])]
+    instants = [v for v in instants if v is not None and 1 < v.year < 9999]
+    utc = {v.astimezone(timezone.utc).strftime('%H:%M') for v in instants}
+    kst = {v.astimezone(KST).strftime('%H:%M') for v in instants}
+    in_fence = False
+    for line in text.splitlines():
+        if line.lstrip().startswith('```'):
+            in_fence = not in_fence
+            continue
+        if in_fence or line.lstrip().startswith('>') or not re.search(r'KST|한국\s*시간', line):
+            continue
+        if re.search(r'UTC|원문|잘못|오표기|아니|정정\s*전|예시', line):
+            continue
+        # Full timestamps have their own date-aware check below.
+        clocks = re.findall(r'(?<![\dT:])([0-2][0-9]:[0-5][0-9])(?![\d:])', _AWARE_TIME.sub('', line))
+        if any(clock in utc and clock not in kst for clock in clocks):
+            return ['brief_timestamp_offset_relabelled']
+    return []
+
+
+def waf_action_violations(text, facts):
+    """Lifecycle actions cannot change configuration; detection is not prevention."""
+    issues = set()
+    mode_locked = any(f.get('kind') == 'service_policy' and f.get('target') == 'a:waf'
+                      and f.get('mode_change_allowed') is False for f in facts)
+    for line in text.splitlines():
+        if line.lstrip().startswith(('>', 'INCIDENT_DISPOSITION:')):
+            continue
+        negative = re.search(r'불가|금지|못|않|아니|아닙|아님|미확인|확인.{0,8}없|근거.{0,8}없|허용되지|정책\s*밖|권한\s*밖', line)
+        change = re.search(r'전환|변경|활성화', line) and re.search(r'(?<![A-Za-z])On(?![A-Za-z])|차단\s*모드|Mode\s*변경', line, re.I)
+        if change and not negative:
+            if re.search(r'propose_service_action|\breload\b|\brestart\b', line):
+                # A separately approved configuration edit followed by reload
+                # is different from claiming reload changes a setting.
+                if not re.search(r'설정.{0,20}(?:승인|수정|편집).{0,15}(?:후|뒤)', line):
+                    issues.add('service_action_is_not_mode_change')
+            if mode_locked and re.search(r'WAF|DetectionOnly|a:waf', text, re.I):
+                issues.add('waf_mode_change_outside_policy')
+        if ('DetectionOnly' in line and not negative and
+                re.search(r'피해.{0,15}방지(?:한|했|됨|되었|됐)|공격.{0,15}차단(?:한|했|됨|되었|됐)', line) and
+                not re.search(r'방화벽|nftables|FW', line, re.I)):
+            issues.add('detection_only_is_not_prevention')
+    return sorted(issues)
+
+
+def evidence_claim_violations(text, facts, successful_reads=None):
     """Narrow checks of known evidence limits; no incident classification rules."""
     if not isinstance(text, str):
         return []
-    issues = set(event_field_violations(text, facts) + event_window_violations(text, facts))
+    issues = set(event_field_violations(text, facts) + event_window_violations(text, facts) +
+                 disposition_citation_violations(text, successful_reads) +
+                 brief_kst_violations(text, facts) + waf_action_violations(text, facts))
     observed_event_sources = {x.get('source') for x in facts if x.get('kind') == 'events'}
     for source, names in (('suricata', r'Suricata|IDS'), ('modsecurity', r'WAF|ModSecurity')):
         if source in observed_event_sources:
@@ -583,6 +667,8 @@ def literal_evidence_summary(facts):
             rows.append(f"- Suricata 구동 근거 관측 {iso(stamp)}: -S /rules/all.rules; ET+local 정확 결합={row.get('combined_is_exact_et_plus_local') is True}; 시작 {iso(row.get('started_at'))}. 현재 SID별 엔진 적재는 미확인.")
         elif kind == 'times':
             rows.append('- 현재 조회에 포함된 시각(KST): ' + ', '.join(iso(v) for v in row.get('instants', [])[:12]))
+        elif kind == 'service_policy' and row.get('mode_change_allowed') is False:
+            rows.append('- a:waf 대상 정책: DetectionOnly 유지. reload/restart는 기존 설정 재적용/재시작이며 모드 변경 권한이 아닙니다.')
         elif kind == 'blocks':
             rows.append(f"- 차단 목록: 현재 항목 {count(row.get('count'))}개. 이 조회는 경보·서비스 상태 조회가 아닙니다.")
     return '\n'.join(rows)
@@ -730,7 +816,7 @@ def arm_grounding_read(agent, turn):
     return True
 
 
-def grounding_wrapper(original, native, append_message, reanchor, completed_calls, facts=None, argument_errors=None):
+def grounding_wrapper(original, native, append_message, reanchor, completed_calls, facts=None, argument_errors=None, successful_reads=None):
     @functools.wraps(original)
     def wrapped(agent, **kw):
         restore = getattr(agent, '_capstone_grounding_restore', None)
@@ -741,7 +827,7 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         count, maximum, counter = kw.get('api_call_count'), getattr(agent, 'max_iterations', None), kw.get('codex_ack_continuations')
         remaining = getattr(getattr(agent, 'iteration_budget', None), 'remaining', None)
         content = getattr(message, 'content', None)
-        issues = evidence_claim_violations(content, facts or [])
+        issues = evidence_claim_violations(content, facts or [], successful_reads)
         if completed_calls and management_status(content) is None:
             issues.append('missing_or_invalid_management_status')
         factual = bool(completed_calls and issues)
@@ -773,9 +859,17 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                 'WAF와 IDS를 같은 시각의 근거로 대조하려면 실제 조회 구간에 사건 시각이 포함되어야 합니다. '
                 '서로 겹치지 않는 조회를 동일 시간대라고 설명하지 말고 필요한 구간을 직접 다시 조회하세요. '
                 '보고 항목에 실제 조회 근거가 없으면 필요한 읽기 도구와 인자를 직접 선택해 확보해야 합니다. '
+                'INCIDENT_DISPOSITION의 evidence_tools는 이번 실행에서 성공한 도구만 인용하세요. '
+                'assessment는 benign/remediated/unresolved 중 하나이며 monitor는 MANAGEMENT_STATUS에만 사용합니다. '
+                '임시 차단의 pending은 유지/해제 결정을 기다리는 절차 상태입니다. 현재 차단은 live 상태로 별도 확인하세요. '
+                '날짜를 생략한 시각도 timestamp_kst의 KST 값을 사용하고 UTC 시계에 KST 이름만 붙이지 마세요. '
+                'DetectionOnly는 탐지 모드이며 피해 방지 증명이 아닙니다. reload/restart는 설정값 변경이 아닙니다. '
+                '대상 도구가 반환한 DetectionOnly 유지 정책은 모드 전환 제안으로 우회할 수 없습니다. '
                 '불확실성은 미확인으로 남기세요. 마지막 줄에는 모델이 판단한 상태를 '
                 'MANAGEMENT_STATUS: resolved 또는 monitor 또는 needs_review 또는 awaiting_approval 중 '
                 '정확히 하나로 쓰세요. 상태를 본문의 표현에서 추측하거나 새 승인을 만들지 마세요.\n' + literal_evidence_summary(facts or []))
+            if successful_reads is not None:
+                nudge += '\n이번 실행의 성공한 도구: ' + ', '.join(sorted(set(successful_reads)))
         elif argument_retry:
             agent._capstone_argument_turn = turn
             nudge = ('읽기 도구가 인자 검증에서 거절되어 성공한 조회 근거가 없습니다. 원래 사용자 요청은 유지합니다. '
@@ -801,7 +895,7 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
     return wrapped
 
 
-def install_grounding_retry(completed_calls, facts=None, argument_errors=None):
+def install_grounding_retry(completed_calls, facts=None, argument_errors=None, successful_reads=None):
     root = Path('/opt/hermes')
     try:
         unchanged = all(hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
@@ -816,7 +910,7 @@ def install_grounding_retry(completed_calls, facts=None, argument_errors=None):
         raise RuntimeError('management_native_grounding_alias_changed')
     native.finish_text_response = loop.finish_text_response = grounding_wrapper(
         native.finish_text_response, native, metadata.append_message,
-        context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors)
+        context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors, successful_reads)
 
 
 def allowed(name, mode):
@@ -918,6 +1012,7 @@ def main():
     original_progress = StreamJsonEmitter.on_tool_progress
     evidence = []
     completed_wire_calls = []
+    successful_read_names = set()  # Includes successful protected receipts, not tool availability.
     read_facts = []
     status_receipts = []
     requirements = status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))
@@ -939,6 +1034,10 @@ def main():
     async def gated_wire(self, name, arguments=None, *args, **kwargs):
         if not wire_allowed(name, mode):
             raise PermissionError('management_wire_tool_not_allowed')
+        if name == 'temporarily_contain_ip' and not any(
+                f.get('kind') == 'events' and f.get('source') == 'suricata' and
+                (arguments or {}).get('ip') in f.get('source_ips', []) for f in read_facts):
+            raise PermissionError('containment_requires_prior_sensor_read_for_requested_ip')
         result = await wire(self, name, arguments, *args, **kwargs)
         if argument_refusal(name, result):
             argument_errors.append(name)
@@ -988,10 +1087,18 @@ def main():
         if not completed_wire_calls:
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
-        data['final_response'] = factual_review_report(read_facts) if evidence_claim_violations(text, read_facts) else kst_display(text)
+        data['final_response'] = factual_review_report(read_facts) if evidence_claim_violations(text, read_facts, successful_read_names) else kst_display(text)
         return original_result(self, data, session_id, exit_code)
 
     def receipt_progress(self, event_type, tool_name=None, preview=None, args=None, **kwargs):
+        if event_type == 'tool.completed' and allowed(tool_name, mode) and not kwargs.get('is_error', False):
+            output = kwargs.get('result')
+            try:
+                payload = _unpack(json.loads(output)) if isinstance(output, str) else None
+            except (ValueError, TypeError):
+                payload = None
+            if output and not (isinstance(payload, dict) and (payload.get('error') or payload.get('isError'))):
+                successful_read_names.add(tool_name)
         if event_type == 'tool.completed' and (tool_name in {'mcp__resp__get_firewall_rules',
                 'mcp__rule_a__get_security_rules','mcp__rule_b__get_security_rules'} or tool_name in {
                 'mcp__security_events__' + name for name in EVENT_READ}):
@@ -1026,7 +1133,7 @@ def main():
     # Imports performed for the gates precede the CLI's background discovery.
     from tools.mcp_tool_discovery import discover_mcp_tools
     discover_mcp_tools()
-    install_grounding_retry(completed_wire_calls, read_facts, argument_errors)
+    install_grounding_retry(completed_wire_calls, read_facts, argument_errors, successful_read_names)
     from hermes_cli.main import main as native_main
     native_main()
 

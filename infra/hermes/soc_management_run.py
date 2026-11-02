@@ -495,6 +495,16 @@ def evidence_claim_violations(text, facts, successful_reads=None):
                     issues.add('unverified_engine_loading_claimed')
     event_facts = [x for x in facts if x.get('kind') == 'events']
     if event_facts:
+        for clause in re.split(r'[\n.!?;]|[。！？]', text):
+            # Correct an explicit policy error, never decide attack severity or
+            # dispatch containment. Actual evidence/protection gates still win.
+            context = re.search(r'내부망|내망|사설\s*(?:IP|주소)|내부\s*IP|실습|공격\s*(?:시험|테스트)', clause)
+            cause = re.search(r'이므로|이라서|이어서|따라서|때문에|이유로|판단(?:되어|해)|간주하여', clause)
+            exemption = re.search(r'차단.{0,18}(?:불필요|하지\s*않|생략|제외|보류|미실행)|모니터링만', clause)
+            denial = re.search(r'(?:생략|제외|보류)하지\s*(?:않|마|말)|불필요.{0,15}(?:아니|아님|아닙)|'
+                               r'(?:이유|근거).{0,12}(?:될\s*수\s*없|아니|아님|아닙)', clause)
+            if context and cause and exemption and not denial:
+                issues.add('lab_or_private_source_used_as_containment_exemption')
         if re.search(r'(?:내망|내부망|사설\s*(?:IP|주소)|내부\s*IP).{0,100}(?:이므로|이라서|따라서|때문에).{0,60}(?:외부\s*공격.{0,20}(?:아니|아닙|아님|없)|무해|정상|안전)', text):
             issues.add('private_address_used_as_attribution_proof')
         if (not any(x.get('forwarding_evidence') for x in event_facts) and
@@ -768,13 +778,21 @@ def initial_review_read(request, completed_calls, requirements=(), facts=()):
         if {t['function']['name'] for t in reads} != names:
             raise RuntimeError('required_status_read_tools_unavailable')
         return {**value, 'tools':reads, 'tool_choice':'required'}
-    # The shared-channel FW lane offers only resp reads. Match the chat
-    # adapters' single-tool scope and do not let list_blocks satisfy FW reads.
+    # The controller binds a parsed read scope out of band. A block-list
+    # question must not be narrowed to get_firewall_rules before the native
+    # adapter applies its list_blocks-only scope (which would leave no tools).
     value = permitted_request(request, 'verify')
     names = {t['function']['name'] for t in value.get('tools', [])}
-    if names == {'mcp__resp__get_firewall_rules', 'mcp__resp__list_blocks'} and 'get_firewall_rules' not in completed_calls:
-        return {**value, 'tools':[t for t in value['tools']
-                if t['function']['name'] == 'mcp__resp__get_firewall_rules'], 'tool_choice':'required'}
+    selected = os.environ.get('CAPSTONE_FAST_READ_TOOL')
+    if selected is not None and selected not in ('get_firewall_rules', 'list_blocks'):
+        raise RuntimeError('fast_read_tool_invalid')
+    if selected is None and names == {'mcp__resp__get_firewall_rules', 'mcp__resp__list_blocks'}:
+        selected = 'get_firewall_rules'  # Existing FW callers without scope metadata.
+    if selected and selected not in completed_calls:
+        reads = [t for t in value.get('tools', []) if t['function']['name'] == 'mcp__resp__' + selected]
+        if not reads:
+            raise RuntimeError('fast_read_tool_unavailable')
+        return {**value, 'tools':reads, 'tool_choice':'required'}
     if completed_calls:
         return request
     reads = value.get('tools', [])
@@ -856,6 +874,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             nudge = ('조회 근거 일치 검사에서 다음 문제가 발견됐습니다: ' + ','.join(issues) +
                 '. 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. '
                 '표본을 전체 건수로, 정의 파일을 실제 적재로, 사설 주소를 무해성/행위자 증명으로 바꾸지 마세요. '
+                '내부망 실습·승인된 공격 시험은 차단 예외가 아닙니다. 관리 범위에서는 실제 공격 의심과 대응 필요성을 판단하고 '
+                '서버 요건을 충족하면 임시 차단 후 시험 여부 확인·해제 승인 절차를 따르세요. 읽기 전용·보호 주소·증거·TTL 경계는 유지하세요. '
                 'WAF와 IDS를 같은 시각의 근거로 대조하려면 실제 조회 구간에 사건 시각이 포함되어야 합니다. '
                 '서로 겹치지 않는 조회를 동일 시간대라고 설명하지 말고 필요한 구간을 직접 다시 조회하세요. '
                 '보고 항목에 실제 조회 근거가 없으면 필요한 읽기 도구와 인자를 직접 선택해 확보해야 합니다. '
@@ -1034,10 +1054,10 @@ def main():
     async def gated_wire(self, name, arguments=None, *args, **kwargs):
         if not wire_allowed(name, mode):
             raise PermissionError('management_wire_tool_not_allowed')
-        if name == 'temporarily_contain_ip' and not any(
-                f.get('kind') == 'events' and f.get('source') == 'suricata' and
-                (arguments or {}).get('ip') in f.get('source_ips', []) for f in read_facts):
-            raise PermissionError('containment_requires_prior_sensor_read_for_requested_ip')
+        # A received attack alert can justify provisional containment before an
+        # extra model-side lookup. A's fixed helper independently validates the
+        # current raw sensor event, protected IPs and bounded TTL. Verify mode
+        # still forbids the write; no helper or scheduler chooses the action.
         result = await wire(self, name, arguments, *args, **kwargs)
         if argument_refusal(name, result):
             argument_errors.append(name)

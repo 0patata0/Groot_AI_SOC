@@ -153,15 +153,18 @@ class ContainmentTests(unittest.TestCase):
         self.tmp.cleanup()
     def propose(self):
         return self.service.propose(PUBLIC, "repeated inbound exploit alerts")
-    def test_independent_flow_required(self):
-        with self.assertRaises(c.ContainmentError):
-            c.validated_evidence([event(1), event(1), event(1)], PUBLIC, NOW)
+    def test_one_attack_flow_is_enough_and_duplicates_are_not_inflated(self):
+        self.assertEqual(c.validated_evidence([event(1)], PUBLIC, NOW)['independent_flows'],1)
+        self.assertEqual(c.validated_evidence([event(1),event(1)], PUBLIC, NOW)['independent_flows'],1)
+        moderate=event(2);moderate['alert']['severity']=2
+        self.assertEqual(c.validated_evidence([moderate],PUBLIC,NOW)['events'][0]['severity'],2)
+        with self.assertRaises(c.ContainmentError):c.validated_evidence([],PUBLIC,NOW)
     def test_evidence_checks_fail_closed(self):
         changes = [{"src_ip": "192.168.16.230"}, {"dest_ip": "8.8.8.8"}, {"in_iface": "ens160"},
             {"proto": "UDP"}, {"direction": "to_client"}, {"app_proto": "unknown"}, {"flow": {}},
             {"timestamp": "2026-10-13T00:00:00"}, {"timestamp": "2020-01-01T00:00:00+00:00"},
             {"alert": {"signature_id": 2034806, "severity": 1, "category": "Attempted Administrator Privilege Gain"}},
-            {"alert": {"signature_id": 1000030, "severity": 2, "category": "Attempted Administrator Privilege Gain"}}]
+            {"alert": {"signature_id": 1000030, "severity": 3, "category": "Attempted Administrator Privilege Gain"}}]
         for change in changes:
             with self.subTest(change=change), self.assertRaises(c.ContainmentError):
                 c.validated_evidence([event(i, **change) for i in (1, 2, 3)], PUBLIC, NOW)
@@ -176,7 +179,7 @@ class ContainmentTests(unittest.TestCase):
                 events = [event(i, src_ip=ip, flow={"src_ip": ip, "dest_ip": "192.168.16.230",
                           "pkts_toserver": 3, "pkts_toclient": 2}) for i in (1, 2, 3)]
                 with self.assertRaises(c.ContainmentError):
-                    c.validated_evidence(events[:2], ip, NOW)
+                    c.validated_evidence([], ip, NOW)
                 evidence = c.validated_evidence(events, ip, NOW)
                 service = c.ContainmentService(self.engine, self.backend, lambda *args: evidence)
                 self.backend.protected.add(ip)
@@ -305,6 +308,23 @@ class ContainmentTests(unittest.TestCase):
         self.service.worker_once()
         self.engine.now += 60
         with self.assertRaises(c.ContainmentError): self.propose()
+
+    def test_one_minute_cooldown_applies_to_legacy_records_without_rewriting_plan(self):
+        r=self.propose();rec=self.service._load(r['request_id'])
+        rec['cooldown_until']=rec['owned_deadline']+3600
+        self.service._save(rec)
+        before=self.service._path(r['request_id']).read_bytes()
+        summary=self.service.status(r['request_id'])
+        self.assertEqual(summary['cooldown_seconds'],60)
+        self.assertEqual(summary['cooldown_until'],NOW+660)
+        self.assertEqual(self.service._path(r['request_id']).read_bytes(),before)
+        self.engine.now=NOW+659
+        with self.assertRaisesRegex(c.ContainmentError,'cooldown'):self.propose()
+        self.engine.now=NOW+660
+        self.service.evidence=lambda ip,now:c.validated_evidence([event(9,timestamp=datetime.fromtimestamp(now-1,timezone.utc).isoformat())],ip,now)
+        fresh=self.propose()
+        self.assertNotEqual(fresh['request_id'],r['request_id'])
+        self.assertEqual(fresh['owned_deadline'],NOW+1260)
     def test_interrupted_create_releases_without_new_card(self):
         r = self.propose()
         rec = self.service._load(r["request_id"])

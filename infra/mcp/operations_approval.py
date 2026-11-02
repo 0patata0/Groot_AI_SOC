@@ -197,6 +197,9 @@ class OperationsBroker:
                     (plan["action"], plan["policy_sha256"], display_summary_kst(plan["before_summary"]), expected,
                      SERVICE_IMPACT[rec["target"]], plan["reason"]))
         return (header + "\n\n출발지 IP `%s`는 이미 임시 차단했습니다.\n"
+                "관리자 확인: 이 요청이 승인된 공격 시험인지 확인해 주세요. 내부망 실습도 먼저 차단하며, "
+                "시험 확인 후 해제하려면 아래 [해제 요청]으로 이 차단의 해제를 승인해 주세요. "
+                "시험 승인이나 일반 채팅 답변만으로 자동 해제하지 않습니다.\n"
                 "증거 SHA-256: `%s`\n무응답 시 최초 임시 차단 후 10분 이내 자동 해제됩니다.\n"
                 "[60분 유지]는 승인 시각부터 60분까지만 유지하고, [해제 요청]은 다음 worker 처리에서 해제합니다. "
                 "진행 중인 룰·서비스 작업 때문에 처리가 늦어질 수 있지만, 유지 승인이 적용되기 전에는 "
@@ -241,7 +244,7 @@ class OperationsBroker:
                         "proposal_digest": proposal_digest, "decision": decision}}}
                    for index, (label, decision) in enumerate(choices)]
         payload = {"username": "SOC-Agent", "attachments": [{"color": "#e0a800",
-                   "title": "서비스 작업 승인 요청" if rec["kind"] == "service" else "임시 IP 차단 · 유지 또는 해제",
+                   "title": "서비스 작업 승인 요청" if rec["kind"] == "service" else "임시 IP 차단 · 시험 여부 확인 및 유지/해제",
                    "text": rec["card_text"], "actions": actions, "footer": "capstone operations HITL", "ts": int(time.time())}]}
         posted, _ = self.post_card(rec, payload)
         with self.lock:

@@ -51,6 +51,17 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_rendered_controller_keeps_exact_read_scope_and_embedded_gate(self):
+        m = module('soc_management_controller.py', 'b')
+        command = m.command_for({'mode':'verify','session_id':None,
+            'fast_readonly':True,'fast_read_tool':'list_blocks'})
+        self.assertIn('CAPSTONE_FAST_READ_TOOL=list_blocks', command)
+        gate = command[command.index('-c') + 1]
+        tree = ast.parse(gate)
+        reader = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'initial_review_read')
+        self.assertIn('CAPSTONE_FAST_READ_TOOL', ast.unparse(reader))
+        self.assertIn('fast_read_tool_unavailable', ast.unparse(reader))
+
     def test_full_rule_api_uses_fresh_readonly_credentials_and_pinned_host(self):
         m=module('security_rule_inventory.py','b')
         self.assertEqual(m.WAZUH_CREDENTIALS,'/opt/capstone/siem/capstone-mcp/credentials.json')
@@ -118,7 +129,7 @@ class BindingTests(unittest.TestCase):
                 self.assertEqual(ast.dump(old[0], include_attributes=False), ast.dump(new[0], include_attributes=False), name)
         m = module("rule_change_executor.py")
         with self.assertRaises(m.RuleChangeError):
-            m._validate_candidate("waf", "SecRuleEngine On\n")
+            m._validate_candidate("waf", "SecRuleEngine DetectionOnly\n")
         with self.assertRaises(m.RuleChangeError):
             m._validate_candidate("suricata", 'drop tcp any any -> any any (sid:1000001; rev:1;)\n')
 
@@ -327,7 +338,8 @@ class ContainmentTests(unittest.TestCase):
                     "alert": {"signature_id": 1000030, "severity": 1, "category": "Web Application Attack"}}
         rows = [event(i) for i in (1, 2, 3)]
         self.assertTrue(m.validated_evidence(rows, ip, now))
-        for invalid in ([rows[0]] * 3, [dict(e, in_iface="ens192") for e in rows],
+        self.assertEqual(m.validated_evidence([rows[0]],ip,now)["independent_flows"],1)
+        for invalid in ([], [dict(e, in_iface="ens192") for e in rows],
                         [dict(e, timestamp="2000-01-01T00:00:00+00:00") for e in rows]):
             with self.assertRaises(m.ContainmentError):
                 m.validated_evidence(invalid, ip, now)

@@ -264,7 +264,9 @@ def main():
                 raise ValueError('hermes_job_replay_refused')
             fw_scope = harness.firewall_request(current)
             fw_only = bool(fw_scope and fw_scope['devices'] == ['FW'])
-            readonly = request['phase'] == 'peer' or request.get('readonly') or fw_only
+            read_plan = harness.read_plan(current)
+            response_read = fw_only or bool(read_plan and read_plan['kind'] == 'block_list')
+            readonly = request['phase'] == 'peer' or request.get('readonly') or response_read
             cid = store.new_case('review-channel:' + request['id'], 'verify' if readonly else 'manage')
             # new_case hashes the external key; bind that identity separately.
             store.db.commit()
@@ -274,11 +276,13 @@ def main():
             # explicitly untrusted original answer, not become an inventory.
             case['chat_request'] = (request['question'] if request['phase'] == 'peer'
                                     else request.get('current_question', request['question']))
-            if fw_only:
+            if response_read:
                 # Same bounded read scope as the chat adapters. Native Hermes
                 # still chooses/calls the actual read; no prefetch or shell.
                 # verify mode hides block/unblock before a model sees them.
                 case['fast_readonly'] = True
+                case['fast_read_tool'] = ('list_blocks' if read_plan and
+                    read_plan['kind'] == 'block_list' else 'get_firewall_rules')
                 m.TOOLSETS = ('mcp-resp',)
             # Cross-review needs the normal investigation reasoning profile.
             # The low-reasoning historical-case shortcut skipped real reads in
@@ -317,7 +321,7 @@ def main():
             if (harness.read_plan(current) or fw_only) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)
-            if result['completed'] and scope_complete and (fw_only or (plan and plan['kind'] == 'agent_identity')):
+            if result['completed'] and scope_complete and (response_read or (plan and plan['kind'] == 'agent_identity')):
                 status = 'completed'  # Completion of these read fields, not incident closure.
             evidence=({'question':current,'calls':receipts} if result['completed'] and scope_complete and not any(c['is_write'] for c in calls) else None)
             print(json.dumps({'status': status, 'peer_review': peer_review, 'evidence':evidence,

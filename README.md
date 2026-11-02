@@ -2,20 +2,20 @@
 
 **학습 시간 관리:** 11/2 후속 승인으로 DGX에 [예상시간 기반 자동 계승과 완료 즉시 종료](finetuning/DGX_FOLLOW.md)를 추가했습니다. 진행 중인 학습은 유지하고 정상 기한 저장 종료 후 같은 계획의 검증된 checkpoint에서 새 창을 자동 시작합니다. Mac 연결과 독립적이며 현재 r6 자체의17:30기한과 전체 학습 완료는 구분합니다. 최신 실행·검증 범위는 [STATUS](STATUS.md)를 따릅니다.
 
-## 현재 배치 · 2026-11-01
+## 현재 배치 · 2026-11-02
 
 [최신 토폴로지와 근거](infra/diagrams/README.md) · [기존 형태 상세형](topology/토폴로지_상세.svg) · [버스형](topology/토폴로지_버스.svg) · [관제·MCP·승인 흐름](infra/diagrams/current-soc-flow.svg)
 
 | 위치 | 역할 |
 |---|---|
-| A | 보안 게이트웨이·FW/NAT·WAF DetectionOnly·passive IDS |
+| A | 보안 게이트웨이·FW/NAT·WAF On·passive IDS 탐지와 지정 룰의 Native FW 임시차단 |
 | B | Mattermost·Hermes/Ollama 봇·Wazuh·MCP·승인 브로커 |
 | C | DVWA·Log4Shell·CVE 콘솔·비웹 실습 서비스 |
 | Thor | 두 봇의 현행 원본35B 추론. B의 제한 SSH 터널·A 경유 |
 | DGX | 공유 추론을 우선하는 독립 학습·체크포인트 관리 |
 | 로컬 | 자료 수집·정제·검수·대화 구성. 검수본 반입 후 DGX 학습 |
 
-두 봇의 공통 근거 검사는11/2 14:03 KST **1.19.5**로 운영 반영했습니다. [보고 근거·복구](infra/hermes/event-report-grounding.md)와 [독립 감시](infra/mcp/monitoring.md)의 실측·남은 검증은 STATUS를 따릅니다.
+WAF On·임시차단10분·관리자 카드 유지 승인60분·기한 종료 후 재차단 대기1분을11/2 반영했습니다. 내부망/승인 실습도 자동 면제하지 않습니다. 지정 IDS Native 선차단은 명시 승인 예외이며 LLM이 후속 조사·승인 카드·결과 검증을 맡습니다. WAF 요청 차단과 FW IP 차단의 지원 범위·봇 배포·실측·남은 검증은 [STATUS](STATUS.md)와 [승인형 작업](infra/mcp/approved-operations.md)을 따릅니다.
 
 A/B/C·Thor는11/1 21:53~21:55 KST 읽기 확인, MCP는14:24 계약의8서버/41도구 기준입니다. 현재 본학습 완료나 학습본 운영 승격을 뜻하지 않으며 동적 진행률은 [STATUS](STATUS.md)를 따릅니다. 아래 날짜별 기록은 당시 상태입니다.
 

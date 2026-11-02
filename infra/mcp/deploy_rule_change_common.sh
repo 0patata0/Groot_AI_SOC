@@ -96,7 +96,7 @@ wp='/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf'
 sd='/home/groot_a/capstone/suricata/ruleset'
 mount(waf, wp, '/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf', False)
 mount(sur, sd, '/rules', False)
-assert 'MODSEC_RULE_ENGINE=DetectionOnly' in waf['Config']['Env']
+assert 'MODSEC_RULE_ENGINE=On' in waf['Config']['Env']
 args=sur.get('Args') or sur.get('Config',{}).get('Cmd') or []
 assert any(a=='-S' for a in args) and '/rules/all.rules' in args
 assert '-i' in args and 'ens192' in args

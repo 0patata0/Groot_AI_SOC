@@ -7,6 +7,7 @@ requested device. Legacy Wazuh strings are parsed conservatively, not executed.
 from collections import Counter
 from datetime import datetime
 import hashlib
+import ipaddress
 import json
 import re
 
@@ -15,6 +16,7 @@ MAX_VULNERABILITY_BYTES = 8 * 1024 * 1024
 WAZUH = 'mcp__wazuh_ro__'
 AGENTS = WAZUH + 'get_wazuh_agents'
 TIME = 'mcp__system_diagnostics__calculate_time'
+BLOCKS = 'mcp__resp__list_blocks'
 STATES = ('active', 'disconnected', 'pending', 'never_connected')
 ASSET_NAMES = {'groot-web': ('groot-web', 'capstone-service'),
                'groot-sec': ('groot-sec', 'capstone-security'),
@@ -104,6 +106,9 @@ def _single_plan(question, aware_time):
     text = scope_text(without_prohibitions(question))
     if wants_write(text) or re.search(r'도구\s*없이|조회(?:는|하지)\s*말|설명만|번역|라는\s*문장', text):
         return None
+    block = block_list_plan(text)
+    if block:
+        return block
     stamps = aware_time.findall(text)
     if stamps and re.search(r'시간|시각|계산|KST|UTC|timeline', text, re.I):
         return {'kind': 'time', 'stamps': stamps, 'question': question}
@@ -343,6 +348,78 @@ def requested_limit(question):
     return min(100, max(1, int(next(x for x in found.groups() if x)))) if found else 5
 
 
+def block_list_plan(text):
+    """Only an explicit current dynamic-block inventory, not rules or decisions.
+
+    A whole-request match prevents narrowing away a second requested subject,
+    history, a write, or an explanation. Unrecognized requests stay with the
+    ordinary agent; this function never dispatches an MCP call.
+    """
+    prefix = r'(?:(?:지금|현재|FW|의|에서|에)\s*)*'
+    subject = (r'(?:(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)'
+               r'\s*(?:IP|아이피|주소)(?:\s*(?:목록|리스트))?|차단\s*(?:목록|리스트))')
+    suffix = (r'(?:(?:만|을|를|은|는|이|가|좀|전체|모두|전부|현재|지금|표로|상세히|자세히|'
+              r'정리해서|한눈에|몇\s*개|몇\s*건|있어|있나|있니|뭐야|누구야|알려줘|조회해줘|조회|'
+              r'확인해줘|확인|보여줘|보여줄래|보여주세요|알려주세요|알려줄래|부탁해|조회해줄래|'
+              r'정리해줘|[1-9][0-9]{0,3}\s*페이지)\s*|[?.!？])*')
+    if not re.fullmatch(r'\s*' + prefix + subject + r'\s*' + suffix + r'\s*', text, re.I):
+        return None
+    page = re.search(r'([1-9][0-9]{0,3})\s*페이지', text)
+    return {'kind': 'block_list', 'question': text, 'page': int(page[1]) if page else 1}
+
+
+def block_list_state(calls):
+    """Latest integrity-checked response; never fall back across a failed read."""
+    call = next((c for c in reversed(calls)
+                 if c.get('server') == 'resp' and c.get('name') == 'list_blocks'), None)
+    if not call or not successful(call) or call.get('arguments') != {}:
+        return None
+    try:
+        data = json.loads(call['result'])
+        for _ in range(3):
+            if not isinstance(data, dict) or 'result' not in data:
+                break
+            if (set(data) - {'result', 'isError', 'is_error'}
+                    or data.get('isError') or data.get('is_error')
+                    or not isinstance(data['result'], str)):
+                return None
+            data = json.loads(data['result'])
+        if not isinstance(data, dict) or set(data) != {'blocks'} or not isinstance(data['blocks'], list):
+            return None
+        addresses = []
+        for item in data['blocks']:
+            value = item
+            if isinstance(item, dict) and set(item) == {'elem'} and isinstance(item['elem'], dict):
+                value = item['elem'].get('val')
+            if not isinstance(value, str):
+                return None
+            address = str(ipaddress.IPv4Address(value))
+            if address in addresses:
+                return None
+            addresses.append(address)
+        return addresses
+    except (ValueError, TypeError, RecursionError):
+        return None
+
+
+def block_list_report(p, calls):
+    addresses = block_list_state(calls)
+    if addresses is None:
+        return '현재 동적 차단 목록 조회가 미완료입니다. 조회 실패·미확인을 차단 IP 0개로 해석하지 않습니다.'
+    rows = ['이번 조회 결과: A 서버의 동적 차단 IP **' + str(len(addresses)) + '개**.']
+    if addresses:
+        pages = (len(addresses) + 49) // 50
+        start = (p['page'] - 1) * 50
+        shown = addresses[start:start + 50]
+        rows += ['', '| 차단 IP |', '| --- |', *['| ' + a + ' |' for a in shown]]
+        rows += ['전체 ' + str(len(addresses)) + '개 조회 · 표시 ' + str(len(shown))
+                 + '개 · ' + str(p['page']) + '/' + str(pages) + '페이지.']
+        if not shown: rows += ['요청한 표시 페이지가 범위를 벗어났습니다. 차단 목록이 비었다는 뜻은 아닙니다.']
+        elif p['page'] < pages: rows += ['나머지는 차단 목록 ' + str(p['page'] + 1) + '페이지로 확인할 수 있습니다.']
+    rows += ['범위: `agent_block` 집합. FW의 기본 정책·전체 규칙 조회와는 별개입니다.']
+    return '\n'.join(rows)
+
+
 def plan(question, aware_time):
     text = scope_text(without_prohibitions(question))
     p = _single_plan(text, aware_time)
@@ -471,6 +548,7 @@ def target_id(p, calls):
 
 
 def scope(p, calls=None):
+    if p['kind'] == 'block_list': return {BLOCKS}
     if p['kind'] == 'agent_identity': return {AGENTS}
     if p['kind'] == 'multi':
         return set().union(*(scope(part, calls) for part in p['plans']))
@@ -576,6 +654,8 @@ def ambiguous_empty(p, calls, name, c):
 
 
 def missing(p, calls, evidence):
+    if p['kind'] == 'block_list':
+        return [] if block_list_state(calls) is not None else ['list_blocks: 현재 동적 차단 목록 미확인']
     if p['kind'] == 'agent_identity': return identity_missing(p, calls)
     if p['kind'] == 'multi':
         return [part_label(part) + ' / ' + item for part in p['plans'] for item in missing(part, calls, evidence)]
@@ -625,6 +705,10 @@ def missing(p, calls, evidence):
 
 
 def guidance(p, calls=()):
+    if p['kind'] == 'block_list':
+        return ('현재 동적 차단 IP 목록 요청입니다. resp.list_blocks를 실제로 선택해 조회하세요. '
+                'FW 전체 규칙이나 WAF/IDS 규칙으로 대체하지 마세요. 조회는 변경·차단·해제 승인이 아닙니다. '
+                '실제 반환 목록만 표시하고 실패·미확인을 0건으로 보고하지 마세요.')
     if p['kind'] == 'agent_identity':
         return ('이 요청은 에이전트 식별/연결 상태의 읽기 전용 조회입니다. 모델이 get_wazuh_agents를 실제 선택하세요. '
                 'B 호스트/SIEM은 groot-siem-host(새 설치 capstone-siem-host), A는 groot-sec(capstone-security), '
@@ -747,6 +831,7 @@ def operation_report(p, calls, evidence):
 
 
 def report(p, calls, evidence):
+    if p['kind'] == 'block_list': return block_list_report(p, calls)
     if p['kind'] == 'operation': return operation_report(p,calls,evidence)
     if p['kind'] == 'agent_identity': return identity_report(p, calls, evidence)
     if p['kind'] == 'multi':

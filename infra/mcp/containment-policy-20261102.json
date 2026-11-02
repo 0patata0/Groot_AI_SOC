@@ -1,0 +1,103 @@
+{
+  "observed_at_kst": "2026-11-02T15:58:33.845944+09:00",
+  "policy": {
+    "waf_mode": "On",
+    "native_rule": {
+      "agent": "001",
+      "rule_id": "100110",
+      "level": 9,
+      "sensor_severity": 1,
+      "exact_raw_flow_and_sid_required": true
+    },
+    "llm_containment_minimum": {
+      "lookback_seconds": 300,
+      "independent_attack_flows": 1,
+      "severity": [
+        1,
+        2
+      ]
+    },
+    "initial_ttl_seconds": 600,
+    "keep_after_exact_card_decision_seconds": 3600,
+    "reblock_cooldown_after_deadline_seconds": 60,
+    "duplicate_renews_deadline": false,
+    "retention_release_authority": "existing designated-operator approval card"
+  },
+  "deployment": {
+    "a_kst": "2026-11-02T15:28:35+09:00",
+    "b_version": "1.19.8",
+    "contract_version": "1.5.13",
+    "b_verified_kst": "2026-11-02T15:46:08+09:00",
+    "final_native_adapter_kst": "2026-11-02T15:53:06+09:00",
+    "waf_container_and_bind_inode_preserved": true,
+    "new_packages_images_ports_keys": 0,
+    "new_server_full_install_test": false
+  },
+  "tests": {
+    "local_mcp": 495,
+    "local_ollama": 163,
+    "local_native_run": 380,
+    "local_native_skipped": 2,
+    "installer": 53,
+    "b_isolated": 431,
+    "a_isolated": 434,
+    "last_relative_alias_test_local_only": true
+  },
+  "live_test": {
+    "attack_source": "Kali 192.168.16.233",
+    "target": "A ingress DVWA",
+    "single_flow": true,
+    "waf_http_status": 403,
+    "waf_is_interrupted": true,
+    "waf_engine": "Enabled",
+    "waf_block_rule": "949110",
+    "suricata_sid": 2009714,
+    "native_helper_exit": 0,
+    "request_id": "da0624793c5a17b0a0f8a9c1e9aeb796",
+    "native_requester": "wazuh-native-ar",
+    "initial_block_kst": "2026-11-02T15:53:31+09:00",
+    "card_post_id": "gtfm9ha9otb4fy9ybh34ecgp3w",
+    "card_rest_identity_verified": true,
+    "decision": "keep",
+    "decision_at_kst": "2026-11-02T15:53:50.026058+09:00",
+    "keep_deadline_kst": "2026-11-02T16:53:50+09:00",
+    "authorized_card_decision_consumed": true,
+    "keep_result_posted": true,
+    "kernel_agent_block_observed_tcp_ports": [
+      80,
+      443
+    ],
+    "this_request_expiry_verified": false,
+    "codex_clicked_approval": false
+  },
+  "dvwa_recovery": {
+    "not_dynamic_ip_block_at_initial_report": true,
+    "cause": "unbounded injected ping holding PHP session flock",
+    "only_ping_terminated": true,
+    "recovered_at_kst": "2026-11-02T15:43:02+09:00",
+    "remaining_session_fds_and_locks": 0,
+    "apache_master_restarted": false,
+    "https_configured": false
+  },
+  "sources_sha256": {
+    "infra/mcp/wazuh_containment_ar.py": "2b40b30e7da6f7b9c51cddfc5f90673cbf069bc0b66a7fe48328db7c32d7a944",
+    "infra/mcp/incident_containment.py": "59b6db867865a066ad2726fd8df1bfa325c473e36bb3a046e988fe02d1dc0c2d",
+    "infra/mcp/rule_change_executor.py": "8027f8b70b056d466abb57a90846527d8407b3ac89f52b12b74ccd123eb58fac",
+    "infra/mcp/service_action_executor.py": "f9b9c2747c2c29c7a5f492de5e1a662a4253126c2ecfafb7ece05991401added",
+    "new_rule/GROOT_A_WAF.conf": "2ab96de8a6e7de9d64e020d610b235d82c4142ee4dc5d681257bee1d9258d357",
+    "infra/hermes/soc_management_controller.py": "5bd66470910625bb443b55e7bc6e5a330cdc921c037deb35b6b84c10799c1792",
+    "infra/hermes/soc_management_run.py": "86cad9490bddd81dc28afcae2dca9db1dbd26f7596b4f8428edb9206b0e880c0",
+    "infra/hermes/read_contract.py": "c9c6449bed52c47b4f9aab4d84f9f2011efc783e97c424be15cf62e61d5e3dd6",
+    "infra/hermes/chat_contract.py": "3484c542dd49486e73b6444f980011e2a8709eb1539b4449a51e8c96af1a3025",
+    "infra/hermes/query-completion/__init__.py": "4bdcdccd08f4329e0a1f114ac5c6b0b258fa715284ebca33e8a396d15d7f0df2"
+  },
+  "remaining": [
+    "Current keep deadline expiry and Kali temporary source cleanup",
+    "WAF-only event to FW IP containment is not implemented",
+    "New Mattermost UI request/reply regression and Hermes latency",
+    "Complete attack coverage, collection continuity and full new-server installation"
+  ],
+  "sources": [
+    "https://documentation.wazuh.com/current/user-manual/capabilities/active-response/custom-active-response-scripts.html"
+  ]
+}

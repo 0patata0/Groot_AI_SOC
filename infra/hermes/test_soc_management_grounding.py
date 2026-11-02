@@ -8,6 +8,26 @@ from test_soc_management_run import wrapper, definition, READ_NAMES, WRITE_NAMES
 
 
 class Grounding(unittest.TestCase):
+    def test_response_read_scope_survives_native_filter_and_never_offers_writes(self):
+        names = ['mcp__resp__get_firewall_rules', 'mcp__resp__list_blocks']
+        request = {**self.request, 'tools':[definition(n) for n in names + WRITE_NAMES]}
+        env = {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify'}
+        for selected in ('get_firewall_rules', 'list_blocks'):
+            with self.subTest(selected=selected), patch.dict(wrapper.os.environ,
+                    {**env, 'CAPSTONE_FAST_READ_TOOL':selected}):
+                result = wrapper.initial_review_read(request, [])
+                self.assertEqual([t['function']['name'] for t in result['tools']], ['mcp__resp__'+selected])
+                self.assertEqual(result['tool_choice'], 'required')
+                self.assertNotIn('arguments', result)
+                # The native adapter can already have narrowed to that tool.
+                self.assertEqual(wrapper.initial_review_read(result, [])['tools'], result['tools'])
+                self.assertIs(wrapper.initial_review_read(request, [selected]), request)
+                with self.assertRaisesRegex(RuntimeError, 'fast_read_tool_unavailable'):
+                    wrapper.initial_review_read({**request,'tools':[]}, [])
+        with patch.dict(wrapper.os.environ, {**env,'CAPSTONE_FAST_READ_TOOL':'block_ip'}):
+            with self.assertRaisesRegex(RuntimeError, 'fast_read_tool_invalid'):
+                wrapper.initial_review_read(request, [])
+
     def test_proposal_review_requires_exact_fresh_status_before_other_queries(self):
         requirements=[{'proposal_id':'a'*32,'target':'b:wazuh-local-rules'}]
         with patch.dict(wrapper.os.environ, {'CAPSTONE_MANAGEMENT_REVIEW':'1','CAPSTONE_MANAGEMENT_MODE':'verify'}):

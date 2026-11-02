@@ -381,6 +381,8 @@ def firewall_report(question, calls):
 
 
 def read_plan(question):
+    if re.search(r'조회(?:는|하지)?\s*(?:마|말)|조회하지|도구\s*없이', SHARED._unquoted_text(question)):
+        return None
     text = normalized(question)
     # A vendor rule ID must not become a Wazuh agent identity. Full-device
     # inventory has its own schema/receipt path in both bot adapters.
@@ -1559,6 +1561,11 @@ def missing_reads(question, calls, diagnostic_targets=()):
 def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), reference=None):
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     result = json.loads(json.dumps(schemas))
+    selected = read_plan(question)
+    if selected and selected['kind'] == 'block_list':
+        if any(c.get('server') == 'resp' and c.get('name') == 'list_blocks' for c in calls):
+            return {}  # A failed/malformed latest read stays incomplete, never empty.
+        return {READ.BLOCKS: result[READ.BLOCKS]} if READ.BLOCKS in result else {}
     security=security_inventory_request(question)
     if security:
         # Bind target and every requested filter as one variant. No early page,

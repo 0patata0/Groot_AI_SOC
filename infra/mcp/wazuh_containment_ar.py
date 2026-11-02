@@ -1,5 +1,5 @@
 #!/usr/bin/python3 -I
-"""Stateless native Wazuh adapter: register evidence for LLM investigation only.
+"""Stateless native Wazuh adapter: bounded attack containment, then LLM review.
 
 No shell, arbitrary operation/argument/path, firewall command, sudo, approval
 token, delete command or independent retry. Never print the alert or source IP.
@@ -41,6 +41,32 @@ def unique(pairs):
     return result
 
 
+
+def sensor_integer(value, maximum):
+    # Wazuh 4.x's decoded numeric fields are strings, including flow IDs such
+    # as "936564706804900.000000". Never round or use a binary float here.
+    if type(value) is int:
+        number = value
+    elif isinstance(value, str) and re.fullmatch(r"[0-9]{1,20}(?:\.0{1,6})?", value):
+        number = int(value.split(".", 1)[0])
+    else:
+        return None
+    return number if 0 <= number < maximum else None
+
+
+def audit(result):
+    # Execd does not persist arbitrary script stdout. Only fixed status metadata
+    # goes to the system journal; alerts, IPs, raw payloads and tokens never do.
+    keys = ("status", "reason", "helper_exit_code", "containment_requested", "automatic_retry")
+    value = {k: result[k] for k in keys if k in result}
+    try:
+        import syslog
+        syslog.openlog("capstone-containment", syslog.LOG_PID, syslog.LOG_AUTHPRIV)
+        syslog.syslog(syslog.LOG_NOTICE, json.dumps(value, sort_keys=True))
+    except (ImportError, OSError):
+        pass
+
+
 def request(raw, now):
     need(isinstance(raw, bytes) and 0 < len(raw) <= MAX_INPUT and raw.endswith(b"\n") and
          raw.count(b"\n") == 1 and b"\0" not in raw, "input_bounds")
@@ -55,7 +81,8 @@ def request(raw, now):
          origin["module"] == "wazuh-execd" and isinstance(origin["name"], str) and
          re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", origin["name"]), "native_origin")
     need(type(parameters) is dict and set(parameters) == {"extra_args", "alert", "program"} and
-         parameters["extra_args"] == [] and parameters["program"] == PROGRAM, "fixed_program")
+         parameters["extra_args"] == [] and
+         parameters["program"] in (PROGRAM, "active-response/bin/capstone-containment"), "fixed_program")
     alert = parameters["alert"]
     need(type(alert) is dict and type(alert.get("rule")) is dict and
          type(alert.get("agent")) is dict and type(alert.get("data")) is dict, "alert_shape")
@@ -80,8 +107,9 @@ def request(raw, now):
     except (ValueError, ipaddress.AddressValueError):
         raise Refused("ipv4_required") from None
     need(str(ip) == source, "canonical_ipv4_required")
-    # An internal/protected address is still evidence worth investigating.
-    # This registration path cannot invoke containment or approve a change.
+    # All valid alerts remain investigation evidence. Only a complete sensor
+    # identity requests the fixed native policy; the helper rechecks the raw
+    # event, attack category, direction, protected IPs, TTL and shared ownership.
     incident = {"timestamp": value, "agent_id": "001", "rule_id": "100110",
                 "level": 9, "src_ip": source, "location": LOCATION}
     if "id" in alert:
@@ -89,14 +117,18 @@ def request(raw, now):
         need(isinstance(event_id, str) and
              re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", event_id), "event_id_invalid")
     else:
-        flow = data.get("flow_id")
-        need(type(flow) is int or (isinstance(flow, str) and
-             re.fullmatch(r"[0-9]{1,20}", flow)), "fallback_flow_id_required")
-        need(0 <= int(flow) < 2**64, "fallback_flow_id_invalid")
+        flow = sensor_integer(data.get("flow_id"), 2**64)
+        need(flow is not None, "fallback_flow_id_invalid")
         canonical = json.dumps(dict(incident, flow_id=str(int(flow))),
                                sort_keys=True, separators=(",", ":")).encode("utf-8")
         event_id = "sha256:" + hashlib.sha256(canonical).hexdigest()
-    return {"operation": "submit-incident", "incident": dict(incident, event_id=event_id)}
+    incident = dict(incident, event_id=event_id)
+    flow_id = sensor_integer(data.get("flow_id"), 2**64)
+    sid = sensor_integer(data["alert"].get("signature_id"), 2**32)
+    if flow_id is not None and sid is not None and flow_id > 0 and sid >= 1000000:
+        return {'operation': 'native-contain', 'incident': incident,
+                'sensor': {'flow_id': flow_id, 'signature_id': sid}}
+    return {"operation": "submit-incident", "incident": incident}
 
 
 def helper_metadata():
@@ -111,8 +143,10 @@ def helper_metadata():
 
 
 def dispatch(payload):
-    need(type(payload) is dict and set(payload) == {"operation", "incident"} and
-         payload["operation"] == "submit-incident", "registration_only")
+    need(type(payload) is dict and (
+        (set(payload) == {'operation','incident'} and payload['operation'] == 'submit-incident') or
+        (set(payload) == {'operation','incident','sensor'} and payload['operation'] == 'native-contain')),
+        'fixed_native_operation')
     helper_metadata()
     data = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode() + b"\n"
     proc = subprocess.Popen([str(HELPER)], stdin=subprocess.PIPE, stdout=subprocess.DEVNULL,
@@ -130,8 +164,8 @@ def dispatch(payload):
         # so a delivered signal cannot cause killpg of a reused leader PID.
         completed = True
         code = proc.wait(timeout=3)
-        return {"status": "incident_registration_helper_returned", "helper_exit_code": code,
-                "containment_requested": False,
+        return {"status": "native_incident_helper_returned", "helper_exit_code": code,
+                "containment_requested": payload['operation'] == 'native-contain',
                 "automatic_retry": False, "native_delete_supported": False}, 0 if code == 0 else 75
     finally:
         if not completed:
@@ -160,6 +194,7 @@ def main():
     signal.alarm(0)
     payload = request(raw, time.time())
     result, code = dispatch(payload)
+    audit(result)
     print(json.dumps(result, sort_keys=True))
     return code
 
@@ -169,5 +204,7 @@ if __name__ == "__main__":
         sys.exit(main())
     except (Refused, OSError, ValueError, KeyError, TypeError) as exc:
         code = str(exc) if isinstance(exc, Refused) else type(exc).__name__
-        print(json.dumps({"status": "refused_or_outcome_unknown", "reason": code, "automatic_retry": False}))
+        result = {"status": "refused_or_outcome_unknown", "reason": code, "automatic_retry": False}
+        audit(result)
+        print(json.dumps(result))
         sys.exit(75)

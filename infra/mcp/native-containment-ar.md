@@ -1,4 +1,26 @@
-# Native Wazuh 사건 → LLM 판단 → 제한된 Containment
+# Native IDS 임시 선차단과 LLM 사후 관제
+
+## 현재 정책 — 2026-11-02
+
+사용자가 지정 IDS 공격 룰의 즉시 FW 차단과 사후 LLM 조사를 승인했다. 일반 대응의 LLM 주도 원칙과 정확 후보 승인은 유지하며 아래 고정 경로만 예외다.
+
+```text
+A Suricata → Wazuh agent001 / rule100110 level9 / severity1
+ → Native adapter 고정 envelope·최근 시각·flow_id/SID 확인
+ → 기존 사건 등록 + A helper의 실제 원본 동일 흐름/SID 대조
+ → 공통 임시차단 600초 + 기존 관리자 유지/해제 카드
+ → LLM 사건 조사·실습 여부 확인·카드 승인 요청·실제 결과 검증
+```
+
+Native는 정상 DNS·상태/정찰·제외 SID·보호 주소를 차단하지 않는다. 지정 조건 밖의 severity2는 일반 LLM/MCP 대응에서 검증한다. A helper의 공통 기준은 최근5분의 양방향 ingress TCP 공격 흐름1개·지정 공격 분류·severity1/2다. 추가 모델 선조회·3흐름을 기다리던 조건은 제거했다. 모든 임시차단의 유지/해제는 카드 승인으로 결정하며 최초10분·승인 시점부터60분 유지·기한 종료 후 재차단 대기60초다. 중복 탐지/요청으로 갱신하지 않는다.
+
+운영 Wazuh가 `flow_id`를 `.000000` 문자열로 전달하는 것을 실제 경보에서 확인했다. 어댑터는 정수부를 문자열에서 정확하게 읽고, 비영 소수·지수·bool·float·범위 밖을 센서 ID로 인정하지 않는다. 고정 실행 프로그램은 절대 경로와 Wazuh의 정확한 상대 경로1개만 허용한다. 임의 basename/상위경로는 거절한다. 상태/거절 코드만 `capstone-containment` system journal에 남기며 원본 경보·IP·토큰은 기록하지 않는다. [Wazuh 공식 프로토콜](https://documentation.wazuh.com/current/user-manual/capabilities/active-response/custom-active-response-scripts.html).
+
+WAF는On에서 HTTP 요청 자체를 즉시 거절한다. WAF 원본만으로 FW IP 임시차단하는 경로는 아직 구현하지 않았으며 두 차단 계층의 성공을 혼동하지 않는다. 실제 배포·공격·카드·만료 증거와 한계는 [STATUS](../../STATUS.md)를 따른다. 루트 `deploy.sh`의 기존 소스 배치 경로에 반영하며 추가 패키지·이미지·포트·키는 없다. root 복구본·고정 모듈 SHA·정확한 승인을 보존한다.
+
+## 아래 내용은 정책 변경 전 기록
+
+11/2의 앞선 reader 보완과10/15 배포 당시의 흐름·수치·SHA를 보존했다. 아래의3흐름·LLM 선행·Native 사건등록 전용 문구는 현재 정책을 뜻하지 않는다.
 
 > **2026-11-02 실제 차단 시험 보완:** 관리 상태의 최초 `boot_id`는 로그 회전 뒤에도 보존되므로 현재 부팅과 다를 수 있었다. managed 증거 읽기는 다른 부팅 ID를 곧바로 허용하지 않고 현재 커널의 Suricata 프로세스·고정 container cgroup·UID/GID·실행 파일·설정 SHA·해당 generation의 쓰기 FD를 읽기 전후에 검증한다. 원래 상태/로그/부팅 ID는 수정하지 않는다. PID 재사용·다른 컨테이너·설정 드리프트·읽기 전용 FD·다른 inode·프로세스 소멸은 거절한다. 기존 source pin/정확3링크/잠금/스냅샷/최근5분3flow/보호 주소/TTL은 유지한다. 로컬77·A 격리77검사와 실제 A 읽기를 확인했다. 설치기는 같은 갱신 reader를 반입하며 신규 패키지·서비스·포트는 없다. 실제 LLM→MCP 임시 차단과 만료 복구의 최신 범위는 [STATUS](../../STATUS.md)를 따른다.
 
@@ -12,7 +34,7 @@
 > 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
 <!-- /current-project-context -->
 
-## 현재 운영: LLM 판단 선행 구조 배포 완료 (2026-10-15 14:08 KST)
+## 과거 운영: LLM 판단 선행 구조 배포 완료 (2026-10-15 14:08 KST)
 
 Native AR의 역할을 **사건 등록**으로 변경하여 운영에 반영했다. 사건의 대응 필요성과 도구 선택은 LLM이 판단하고, 관리자는 보호된 변경의 승인·거부를 결정한다. helper/worker는 고정 정책 검증과 실행을 담당한다. 긴급 임시 차단도 LLM 호출을 먼저 거치며, 모델 지연·장애 때 Native AR가 대신 직접 차단하는 경로는 없다.
 

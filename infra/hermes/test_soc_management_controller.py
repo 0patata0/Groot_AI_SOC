@@ -87,6 +87,31 @@ class ControllerTests(unittest.TestCase):
     def alerts(self, *values):
         self.store.ingest_alerts({"alerts": list(values), "total": len(values), "total_relation": "eq", "truncated": False})
 
+    def test_fresh_sensor_alert_precedes_routine_backlog_without_an_automatic_action(self):
+        old=self.store.new_case('old-routine');self.now+=1
+        a=self.alert('fresh',timestamp='1970-01-01T00:16:40+00:00')
+        a.update(src_ip='192.168.16.233',location='/logs/suricata/eve.json')
+        self.alerts(a)
+        fresh=self.store.next_case()
+        self.assertNotEqual(fresh['id'],old)
+        self.assertEqual(fresh['state'],'ready')
+        self.assertEqual(fresh['mode'],'manage')
+        self.assertEqual(self.store.db.execute('select count(*) from tool_calls').fetchone()[0],0)
+        self.now=1301
+        self.assertEqual(self.store.next_case()['id'],old)
+
+    def test_missing_stale_future_or_invalid_source_does_not_gain_urgency(self):
+        old=self.store.new_case('old-routine');self.now+=1
+        for i,(stamp,ip,location) in enumerate((
+            ('1970-01-01T00:10:00+00:00','192.168.16.233','/logs/suricata/eve.json'),
+            ('1970-01-01T00:30:00+00:00','192.168.16.233','/logs/suricata/eve.json'),
+            ('1970-01-01T00:16:40+00:00','not-an-ip','/logs/suricata/eve.json'),
+            ('1970-01-01T00:16:40+00:00','192.168.16.233','systemd'),
+        )):
+            a=self.alert(str(i),timestamp=stamp);a.update(src_ip=ip,location=location);self.alerts(a)
+        self.assertEqual(self.store.next_case()['id'],old)
+        self.assertEqual(self.store.db.execute('select max(urgent_until) from cases').fetchone()[0],0)
+
     def trace(self):
         case = self.store.next_case()
         rid = self.store.start(case)
@@ -348,6 +373,17 @@ class ControllerTests(unittest.TestCase):
         self.tool(verification, "mcp__rule_a__get_rule_change_target", {"target": "a:suricata-local", "sha256": "0" * 64, "runtime": {"running": True, "health": "not_reported"}}, {"target": "a:suricata-local"})
         self.result(verification)
         self.assertEqual(verification.finish(0)["state"], "completed")
+
+    def test_fast_response_read_scope_is_out_of_band_and_readonly(self):
+        case = {"mode":"verify", "session_id":None, "fast_readonly":True}
+        for name in ("get_firewall_rules", "list_blocks"):
+            command = m.command_for({**case, "fast_read_tool":name})
+            self.assertIn("CAPSTONE_FAST_READ_TOOL="+name, command)
+            self.assertIn("CAPSTONE_MANAGEMENT_REVIEW=1", command)
+            self.assertNotIn("--yolo", command)
+        for change in ({"mode":"manage"}, {"fast_readonly":False}, {"fast_read_tool":"block_ip"}):
+            with self.assertRaisesRegex(m.ControllerError, "fast_read_tool_invalid"):
+                m.command_for({**case, "fast_read_tool":"list_blocks", **change})
 
     def test_missing_write_result_is_unknown_and_cannot_retry_on_late_approval(self):
         self.events(self.incident())

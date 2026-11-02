@@ -168,6 +168,8 @@ class Store:
         """)
         if "target" not in {row[1] for row in self.db.execute("PRAGMA table_info(proposals)")}:
             self.db.execute("ALTER TABLE proposals ADD COLUMN target TEXT NOT NULL DEFAULT ''")
+        if "urgent_until" not in {row[1] for row in self.db.execute("PRAGMA table_info(cases)")}:
+            self.db.execute("ALTER TABLE cases ADD COLUMN urgent_until REAL NOT NULL DEFAULT 0")
         self.db.commit()
 
     def close(self):
@@ -302,6 +304,20 @@ class Store:
             self.db.execute("UPDATE cases SET state='ready',mode='manage',due=?,updated=? WHERE id=? AND state='completed'", (now, now, cid))
             if kind == "incident":
                 self.db.execute("UPDATE cases SET priority=0 WHERE id=?", (cid,))
+            # Scheduling only: a fresh sensor/source alert gets the next
+            # investigation ahead of historical routine work. The model still
+            # decides whether containment is warranted; never reopen ambiguous
+            # writes or manufacture an action from a severity/queue branch.
+            ref = sensor_event_reference(payload)
+            if ref and ref[1] is not None and ref[2] is not None and now - 300 <= ref[2] <= now + 2:
+                try:
+                    address = ipaddress.IPv4Address(ref[1])
+                    routable = address.is_global or any(address in ipaddress.ip_network(n)
+                        for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"))
+                except (ValueError, TypeError):
+                    routable = False
+                if routable:
+                    self.db.execute("UPDATE cases SET urgent_until=max(urgent_until,?) WHERE id=?", (ref[2] + 300, cid))
         if proposal:
             status, result = str(payload.get("status", "")), str(payload.get("result_status", ""))
             # Event IDs may bind a new verification-only case, never confer a tool-call origin.
@@ -362,7 +378,11 @@ class Store:
                 self.queue_report(row["id"], row["case_id"], "outcome_unknown", incomplete_report("interrupted_run_requires_review"))
 
     def next_case(self):
-        row = self.db.execute("SELECT * FROM cases WHERE state IN ('ready','monitor','waiting_approval','review_ready') AND due<=? ORDER BY priority,created LIMIT 1", (self.clock(),)).fetchone()
+        now = self.clock()
+        row = self.db.execute("""SELECT * FROM cases
+            WHERE state IN ('ready','monitor','waiting_approval','review_ready') AND due<=?
+            ORDER BY CASE WHEN priority<=5 THEN priority WHEN urgent_until>? THEN 2 ELSE priority END,
+                     created LIMIT 1""", (now, now)).fetchone()
         if row is not None and row["state"] == "review_ready":
             review = self.db.execute("SELECT reason FROM reviews WHERE case_id=? AND run_id IS NULL ORDER BY requested DESC,rowid DESC LIMIT 1", (row["id"],)).fetchone()
             return dict(row, operator_review=True, operator_review_reason=review[0] if review else "")
@@ -1011,14 +1031,14 @@ the actual sensor events and response/block status before assessing outcome;
 HTTP 200/400/403 alone is not proof of execution success or attack prevention.
 get_service_action_target defines the current allowed action policy. reload and
 restart only operate the service with existing configuration; they cannot change
-SecRuleEngine. If the target requires DetectionOnly to remain enabled, proposing
-On via service action or custom-rule editing is outside that policy. Investigate
+SecRuleEngine. The current fixed WAF policy is On; retain it through rule/service changes.
+A reload alone does not change engine mode. Investigate
 registered response tools and their actual target/evidence/approval constraints
 instead of inventing a mode switch or treating missing evidence as denial of all
 response authority. Prepare supported necessary proposals within those bounds.
 Matching a sensor event is retrieval success, not incident resolution. For an
 incident with WAF/Suricata evidence, a resolved report must explicitly assess
-the incident as benign (including evidence-confirmed authorized activity) or
+the incident as benign (with evidence beyond a private source or lab approval) or
 remediated, explain the actual incident-specific basis, and name the successful
 tools from THIS run supporting that judgment (sensor reads and, when relevant,
 actual protected-operation receipts). Before MANAGEMENT_STATUS,
@@ -1029,11 +1049,23 @@ from the channel report; explain the same judgment in ordinary Korean prose.
 The actual-call citation requirement applies equally to monitor/needs_review and
 unresolved reports. An uncalled tool is a missing investigation step, not evidence:
 read it if relevant or remove the unsupported claim. Tool availability is not use.
-Before temporarily_contain_ip, read fresh Suricata evidence for that exact source
-in THIS run and judge the response need. The helper's own independent validation
-is still mandatory and does not replace your investigation. An explicit block
-request is not a fabricated sensor receipt. Current block status and this source's
-events are relevant; unrelated agent/rule inventories are not prerequisites.
+For a received current attack alert, judge provisional containment first; do not
+wait for an extra sensor query, complete attribution, proof of compromise, or
+three independent flows. A's helper validates one recent inbound severity-1/2
+attack flow and protected addresses. Then investigate using actual MCP tools.
+The user-authorized native IDS path may already have contained the IP without
+waiting for an LLM. Read its exact operation and live block state; use the shared
+ten-minute TTL, approval-based sixty-minute retention/release and sixty-second
+post-deadline cooldown. Duplicate requests never renew the deadline. Native
+containment is not proof of remediation or permission to skip investigation.
+Internal/private sources and lab targets, even an authorized attack exercise,
+are not containment exemptions. In manage mode, when observed suspicious attack
+activity warrants containment and the existing server evidence checks permit it,
+request bounded temporary containment BEFORE waiting for exercise confirmation.
+Then ask the administrator whether this was an authorized exercise and use the
+existing exact request's release approval. Exercise authorization alone is not
+release approval. Preserve protected addresses, the 600-second initial TTL,
+approved keep/release, and read-only scope; never force an unsupported block.
 If risk, response need or the result remains unknown, choose unresolved and
 needs_review/monitor. Never invent authorization, execution or benign activity
 to satisfy the format. Read-only scope and absent proposals do not justify
@@ -1137,6 +1169,12 @@ def command_for(case):
                "--source", "capstone-management", "-t", ",".join(TOOLSETS)]
     if dict(case).get("operator_review") or dict(case).get("fast_readonly"):
         command[2:2] = ["-e", "CAPSTONE_MANAGEMENT_REVIEW=1"]
+    fast_read = dict(case).get("fast_read_tool")
+    if fast_read is not None:
+        if (not dict(case).get("fast_readonly") or case["mode"] != "verify"
+                or fast_read not in ("get_firewall_rules", "list_blocks")):
+            raise ControllerError("fast_read_tool_invalid")
+        command[2:2] = ["-e", "CAPSTONE_FAST_READ_TOOL=" + fast_read]
     if dict(case).get("operator_review"):
         command[2:2] = ["-e", "CAPSTONE_OPERATOR_REVIEW=1"]
     required = dict(case).get("required_status_reads", [])

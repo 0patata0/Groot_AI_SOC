@@ -72,21 +72,19 @@ class LiteralEvidence(unittest.TestCase):
         obj['assessment']='monitor'
         self.assertIn('invalid_incident_disposition',m.disposition_citation_violations('INCIDENT_DISPOSITION: '+json.dumps(obj),names))
 
-    def test_containment_requires_real_prior_sensor_read_for_same_ip(self):
-        for observed in (None,'192.0.2.8','192.168.16.233'):
+    def test_provisional_containment_does_not_wait_for_extra_read_but_verify_forbids_it(self):
+        for mode in ('manage','verify'):
             h=Harness()
             def run(h):
-                if observed:
-                    payload=dict(sample(),source='suricata',alerts=[{'source_ip':observed}])
-                    asyncio.run(h.ClientSession([types.SimpleNamespace(text=json.dumps(payload))]).call_tool('search_suricata_alerts',{}))
                 call=h.ClientSession()
-                if observed=='192.168.16.233':
+                if mode=='manage':
                     asyncio.run(call.call_tool('temporarily_contain_ip',{'ip':'192.168.16.233','reason':'test'}))
+                    self.assertTrue(any(row[0]=='temporarily_contain_ip' for row in h.wire_calls))
                 else:
-                    with self.assertRaisesRegex(PermissionError,'requires_prior_sensor_read'):
+                    with self.assertRaisesRegex(PermissionError,'management_wire_tool_not_allowed'):
                         asyncio.run(call.call_tool('temporarily_contain_ip',{'ip':'192.168.16.233','reason':'test'}))
                     self.assertFalse(any(row[0]=='temporarily_contain_ip' for row in h.wire_calls))
-            h.run(run,'manage')
+            h.run(run,mode)
 
     def test_emitter_citations_are_bound_to_actual_success_not_tool_availability(self):
         actual='mcp__security_events__search_suricata_alerts'
@@ -180,6 +178,24 @@ class LiteralEvidence(unittest.TestCase):
         self.assertEqual(facts[0]['returned_count'],2)
         self.assertNotIn('sensitive',repr(facts));self.assertNotIn('ignore policy',repr(facts))
         result.is_error=True;self.assertEqual(m.observation_facts('search_suricata_alerts',result),[])
+
+    def test_lab_authorization_is_not_a_containment_exemption(self):
+        issue = 'lab_or_private_source_used_as_containment_exemption'
+        for text in (
+            '내부망 실습이므로 차단하지 않았습니다.',
+            '승인된 공격 테스트이므로 차단 불필요로 판단했습니다.',
+            '사설 IP이기 때문에 차단을 생략했습니다.',
+            '실습으로 판단되어 모니터링만 수행합니다.',
+        ):
+            self.assertIn(issue, m.evidence_claim_violations(text, [sample()]), text)
+        for text in (
+            '내부망이라는 이유로 차단을 생략하지 않습니다.',
+            '실습이므로 차단 불필요하다는 뜻이 아닙니다.',
+            '내부망 실습 여부는 미확인입니다. 서버가 보호 주소로 거절했습니다.',
+            '실습이어도 최근 3개 흐름 증거가 부족하여 임시 차단 요건 미충족입니다.',
+            '내부망 공격 의심을 먼저 임시 차단하고 관리자에게 시험 여부를 확인합니다.',
+        ):
+            self.assertNotIn(issue, m.evidence_claim_violations(text, [sample()]), text)
 
     def test_literal_fallback_reports_evidence_and_review_without_a_security_decision(self):
         text=m.factual_review_report([sample()])

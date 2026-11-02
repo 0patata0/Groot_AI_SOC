@@ -121,7 +121,7 @@ class Tests(unittest.TestCase):
         store=SimpleNamespace(db=DB(),locked=lambda:nullcontext(),reporting=lambda _:nullcontext(),
             new_case=lambda key,mode:chosen.append(mode) or 'c'*32,context=lambda _:[],close=lambda:None)
         def run(store,case,prompt):
-            chosen.append((case['fast_readonly'],controller.TOOLSETS))
+            chosen.append((case['fast_readonly'],case['fast_read_tool'],controller.TOOLSETS))
             return {'completed':False,'state':'needs_review','text':'미완료','run_id':'d'*32}
         controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
             run_hermes=run,prompt_for=lambda *a:'prompt')
@@ -132,7 +132,17 @@ class Tests(unittest.TestCase):
              mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
              mock.patch.object(sys,'stdout',io.StringIO()),mock.patch.object(w.os,'geteuid',return_value=0):
             w.main()
-        self.assertEqual(chosen,['verify',(True,('mcp-resp',))])
+        self.assertEqual(chosen,['verify',(True,'get_firewall_rules',('mcp-resp',))])
+        chosen.clear()
+        harness.firewall_request=lambda _:None
+        harness.read_plan=lambda _:{'kind':'block_list'}
+        request['question']='지금 FW 차단 목록만 보여줘'
+        with mock.patch.dict(sys.modules,{'harness':harness,'soc_management_controller':controller}), \
+             mock.patch.object(sys,'argv',['worker','hermes']), \
+             mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+             mock.patch.object(sys,'stdout',io.StringIO()),mock.patch.object(w.os,'geteuid',return_value=0):
+            w.main()
+        self.assertEqual(chosen,['verify',(True,'list_blocks',('mcp-resp',))])
 
     def test_fw_scope_controls_completion_instead_of_model_disposition(self):
         from contextlib import nullcontext

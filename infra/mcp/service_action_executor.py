@@ -24,7 +24,7 @@ import unicodedata
 REQUEST_ID = re.compile(r"^[0-9a-f]{32}$")
 SHA = re.compile(r"^[0-9a-f]{64}$")
 MAX_STATE = 512 * 1024
-POLICY_VERSION = 1
+POLICY_VERSION = 2
 PROFILES = {
     "a:vector": {
         "host": "a", "kind": "systemd-vector", "unit": "capstone-vector.service", "actions": ["restart"],
@@ -50,7 +50,7 @@ PROFILES = {
     "a:waf": {
         "host": "a", "container": "waf", "kind": "nginx", "actions": ["reload", "restart"],
         "stop_seconds": 30, "verify_seconds": 90,
-        "impact": "Web security proxy connections can be interrupted; DetectionOnly must remain enabled.",
+        "impact": "Web security proxy connections can be interrupted; On blocking mode must remain enabled.",
         "files": ["/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf"],
         "mounts": [["/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf", "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf", False]],
         "probe": {"port": 80, "path": "/dvwa/login.php", "host": "localhost", "marker": "DVWA"},
@@ -161,8 +161,12 @@ class ServiceBackend:
             if target == "a:waf":
                 data, _ = self.helper._read_regular(profile["files"][0])
                 self.helper._validate_candidate("waf", data.decode("utf-8"))
-                if "MODSEC_RULE_ENGINE=DetectionOnly" not in info["Config"].get("Env", []):
-                    raise self.error("WAF DetectionOnly mode is not fixed")
+                modes = [v.split("=",1)[1] for v in info["Config"].get("Env",[]) if v.startswith("MODSEC_RULE_ENGINE=")]
+                if len(modes) != 1 or modes[0] not in ("On", "DetectionOnly"):
+                    raise self.error("WAF startup mode is unavailable or disabled")
+                observed["configured_engine_mode"] = "On"
+                observed["engine_mode_source"] = "fixed_late_custom_include"
+                observed["startup_engine_mode"] = modes[0]
             if target == "a:suricata":
                 spec = self.engine.spec("a:suricata-local")
                 self.engine._inspect(spec)

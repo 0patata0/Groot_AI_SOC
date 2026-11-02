@@ -22,7 +22,7 @@ import stat
 TARGET = "a:incident-ip"
 TEMP_SECONDS = 600
 KEEP_SECONDS = 3600
-COOLDOWN_SECONDS = 3600
+COOLDOWN_SECONDS = 60
 LOOKBACK_SECONDS = 300
 EVE_PATH = Path("/home/groot_a/capstone/secstack/logs/suricata/eve.json")
 MANAGED_ROOT = Path("/var/lib/capstone-raw-operations")
@@ -87,12 +87,13 @@ def timestamp(value):
 
 
 def validated_evidence(events, ip, now):
-    """Independent bidirectional TCP flows, never duplicate SID alerts on one flow.
+    """One recent bidirectional attack flow is enough for provisional containment.
 
     Alert content/signatures are never copied into the approval card. The input
     is trusted only for its provenance: the helper reads the fixed sensor log.
-    WAF, caller descriptions, fabricated IDs, outbound alerts and low severity
-    events do not authorize automatic containment.
+    A completed investigation or three independent flows is not required.
+    Caller descriptions, fabricated IDs, outbound traffic and non-attack events
+    are not sensor evidence. The LLM requests containment; this is validation.
     """
     checked_ip(ip)
     rows = {}
@@ -114,7 +115,7 @@ def validated_evidence(events, ip, now):
                      flow.get("src_ip") == ip and flow.get("dest_ip") == str(destination) and
                      event.get("in_iface") == "ens192" and
                      any(destination in n for n in DESTINATIONS) and
-                     type(alert.get("severity")) is int and alert.get("severity") == 1 and
+                     type(alert.get("severity")) is int and alert.get("severity") in (1, 2) and
                      alert.get("category") in ATTACK_CATEGORIES and
                      sid not in EXCLUDED_SIDS and sid >= 1000000 and
                      isinstance(fid, int) and not isinstance(fid, bool) and fid > 0 and
@@ -126,7 +127,7 @@ def validated_evidence(events, ip, now):
             row = {"timestamp": event["timestamp"], "flow_id": fid,
                    "src_ip": ip, "dest_ip": str(destination),
                    "dest_port": int(event["dest_port"]), "signature_id": sid,
-                   "severity": 1, "category": alert["category"]}
+                   "severity": alert["severity"], "category": alert["category"]}
             if not 1 <= row["dest_port"] <= 65535:
                 continue
             # Multiple signatures/repeated packets in one flow count once.
@@ -135,8 +136,8 @@ def validated_evidence(events, ip, now):
         except (KeyError, ValueError, TypeError, ContainmentError):
             continue
     ordered = sorted(rows.values(), key=lambda r: (r["timestamp"], r["flow_id"]))
-    if len(ordered) < 3:
-        raise ContainmentError("insufficient verified evidence: need 3 recent independent inbound severity-1 attack flows")
+    if not ordered:
+        raise ContainmentError("no recent inbound severity-1/2 attack flow observed by the trusted sensor")
     return {"sensor": "a:suricata", "window_seconds": LOOKBACK_SECONDS,
             "independent_flows": len(ordered), "events": ordered[-16:]}
 
@@ -445,10 +446,18 @@ class ContainmentService:
         return [self._load(p.stem) for p in paths]
 
     @staticmethod
+    def _cooldown_until(r):
+        # Apply the current user-approved interval to existing records without
+        # rewriting their historical signed evidence/plan or extending a block.
+        return min(r["cooldown_until"], r["owned_deadline"] + COOLDOWN_SECONDS)
+
+    @staticmethod
     def _summary(r):
         return {"request_id": r["request_id"], "target": TARGET, "kind": "containment", "ip": r["ip"],
                 "status": r["status"], "temporary_expires_at": r["payload"]["expires_at"],
                 "owned_deadline": r["owned_deadline"], "keep_seconds": KEEP_SECONDS,
+                "cooldown_seconds": COOLDOWN_SECONDS,
+                "cooldown_until": ContainmentService._cooldown_until(r),
                 "evidence_sha256": r["payload"]["plan"]["evidence_sha256"],
                 "independent_flows": r["evidence"]["independent_flows"],
                 "result": r.get("result", ""), "result_posted": r.get("result_posted", False)}
@@ -496,7 +505,7 @@ class ContainmentService:
                 if old["ip"] == ip:
                     if old["status"] not in TERMINAL and now < old["owned_deadline"]:
                         return dict(self._summary(old), duplicate=True)
-                    if now < old["cooldown_until"]:
+                    if now < self._cooldown_until(old):
                         raise ContainmentError("same-IP cooldown active; repeated requests cannot renew containment")
             if sum(r["status"] not in TERMINAL and now < r["owned_deadline"] for r in records) >= 8:
                 raise ContainmentError("concurrent temporary containment limit reached")

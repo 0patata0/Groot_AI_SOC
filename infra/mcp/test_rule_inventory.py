@@ -15,7 +15,7 @@ SURICATA_IDS = [1000000, 1000001, 1000002, 1000010, 1000030, 1000031, 1000032,
 WAZUH_IDS = [100100, 100101, 100102, 100103, 100110, 100111, 100112,
              100120, 100121, 100122, 100123, 100124, 100125, 100126,
              100127, 100128, 100129, 100130, 100131]
-WAF = b'SecRuleEngine DetectionOnly\nSecRule ARGS "@rx test" "id:10100,phase:2,pass,log"\n'
+WAF = b'SecRuleEngine On\nSecRule ARGS "@rx test" "id:10100,phase:2,pass,log"\n'
 SURICATA = b'alert tcp any any -> any any (msg:"fixture"; sid:1000001; rev:1;)\n'
 WAZUH = b'<group name="fixture,"><rule id="100100" level="0"><description>base</description></rule></group>\n'
 
@@ -96,14 +96,14 @@ class InventoryTests(unittest.TestCase):
     def test_waf_comment_and_quoted_id_mentions_are_not_rules(self):
         data = (b'# SecAction "id:10010,phase:1,pass"\n'
                 b'# Reserved id:19999; chain\n'
-                b'SecRuleEngine DetectionOnly\n'
+                b'SecRuleEngine On\n'
                 b'SecRule ARGS "@rx id:18888" "id:10100,phase:2,pass,msg:\'text id:17777, chain\',logdata:\'id:16666\'"\n')
         result = self.complete('waf', data, [10100])
         self.assertEqual(result['details']['secrule_directives'], 1)
         self.assertEqual(result['details']['chain_continuations'], 0)
 
     def test_waf_multiline_chain_is_one_id_with_two_condition_directives(self):
-        data = (b'SecRuleEngine DetectionOnly\n'
+        data = (b'SecRuleEngine On\n'
                 b'SecRule ARGS "@contains fixture" \\\n'
                 b' "id:10100,phase:2,chain,\\\n'
                 b' msg:\'fixture\'"\n'

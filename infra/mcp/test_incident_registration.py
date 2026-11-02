@@ -148,6 +148,62 @@ class IncidentRegistration(unittest.TestCase):
             self.assertEqual(result["error"]["code"], -32602)
             helper.assert_not_called()
 
+    def test_native_exception_uses_same_service_after_exact_raw_trigger_validation(self):
+        request={'operation':'native-contain','incident':incident(),
+                 'sensor':{'flow_id':1234,'signature_id':2009714}}
+        observation={'events':[{'flow_id':1234,'signature_id':2009714,'severity':1}],
+                     'independent_flows':1,'sensor':'a:suricata','window_seconds':300}
+        selected=[]
+        extension=mock.Mock()
+        extension.read_evidence.return_value=observation
+        def service(engine, *, evidence):
+            def propose(ip,reason,requested_by):
+                selected.append((ip,requested_by,evidence(ip,NOW)))
+                return {'request_id':'a'*32,'owned_deadline':int(NOW)+600}
+            return SimpleNamespace(propose=propose)
+        extension.ContainmentService.side_effect=service
+        with mock.patch.object(executor,'Engine',return_value=SimpleNamespace(host='a')), \
+             mock.patch.object(executor,'_load_extension',return_value=extension):
+            value=executor._native_contain('a',self.broker,request)
+            self.assertEqual(value['containment']['owned_deadline'],NOW+600)
+            self.assertTrue(value['incident']['queued'])
+            self.assertEqual(selected[0][1],'wazuh-native-ar')
+            self.assertEqual(selected[0][2]['events'],observation['events'])
+            for mismatch in ({'flow_id':999,'signature_id':2009714},
+                             {'flow_id':1234,'signature_id':1000010}):
+                with self.assertRaisesRegex(executor.RuleChangeError,'not a current eligible'):
+                    executor._native_contain('a',self.broker,{**request,'sensor':mismatch})
+
+    def test_native_exception_rejects_mcp_identity_and_invalid_trigger_before_dispatch(self):
+        request={'operation':'native-contain','incident':incident(),
+                 'sensor':{'flow_id':1234,'signature_id':2009714}}
+        for user in ('rulechg','ruleview','root',''):
+            with mock.patch.dict(os.environ,{'SUDO_USER':user}), \
+                 mock.patch.object(executor,'Engine') as engine, \
+                 self.assertRaisesRegex(executor.RuleChangeError,'direct root'):
+                executor._native_contain('a',self.broker,request)
+            engine.assert_not_called()
+        for sensor in ({'flow_id':True,'signature_id':2009714},
+                       {'flow_id':0,'signature_id':2009714},
+                       {'flow_id':1234,'signature_id':2009714,'command':'flush'}):
+            with self.assertRaisesRegex(executor.RuleChangeError,'sensor identity'):
+                executor._native_contain('a',self.broker,{**request,'sensor':sensor})
+        self.assertEqual(self.broker.calls,[])
+
+    def test_native_adapter_requests_containment_only_with_complete_sensor_identity(self):
+        row=incident()
+        alert={'id':row['event_id'],'timestamp':row['timestamp'],'agent':{'id':'001'},
+               'rule':{'id':'100110','level':9},'location':ar.LOCATION,
+               'data':{'event_type':'alert','src_ip':row['src_ip'],'flow_id':'1234',
+                       'alert':{'severity':'1','signature_id':'2009714'}}}
+        envelope={'version':1,'origin':{'name':'groot-sec','module':'wazuh-execd'},'command':'add',
+                  'parameters':{'extra_args':[],'program':ar.PROGRAM,'alert':alert}}
+        payload=ar.request(json.dumps(envelope).encode()+b'\n',NOW)
+        self.assertEqual(payload['operation'],'native-contain')
+        self.assertEqual(payload['sensor'],{'flow_id':1234,'signature_id':2009714})
+        del alert['data']['alert']['signature_id']
+        self.assertEqual(ar.request(json.dumps(envelope).encode()+b'\n',NOW)['operation'],'submit-incident')
+
     def test_old_native_direct_containment_refused_but_mcp_attributed(self):
         payload = {"operation": "contain-ip", "ip": "93.184.216.34", "reason": "LLM evidence judgment"}
         extension = mock.Mock()

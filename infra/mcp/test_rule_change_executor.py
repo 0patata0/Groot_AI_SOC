@@ -111,7 +111,7 @@ class FakeRunner:
                               "Health": {"Status": "healthy" if self.healthy else "unhealthy"}},
                     "Mounts": [{"Source": spec["mount_source"], "Destination": spec["mount_dest"],
                                 "RW": spec["kind"] == "wazuh"}],
-                    "Config": {"Env": ["MODSEC_RULE_ENGINE=DetectionOnly"], "Cmd": ["-i", "ens192", "-S", "/rules/all.rules"]}}
+                    "Config": {"Env": ["MODSEC_RULE_ENGINE=On"], "Cmd": ["-i", "ens192", "-S", "/rules/all.rules"]}}
             return json.dumps([info]).encode()
         if argv[1] == "restart":
             self.restart_count += 1
@@ -156,7 +156,7 @@ class ExecutorTests(unittest.TestCase):
         root.mkdir()
         if kind == "waf":
             target = "a:modsecurity-custom"
-            current = b"SecRuleEngine DetectionOnly\nSecRule ARGS \"@rx old\" \"id:10100,phase:1,log\"\n"
+            current = b"SecRuleEngine On\nSecRule ARGS \"@rx old\" \"id:10100,phase:1,log\"\n"
             spec = {"host": "a", "kind": kind, "path": str(root / "GROOT_A_WAF.conf"),
                     "container": "waf", "container_path": "/etc/custom.conf",
                     "mount_source": str(root / "GROOT_A_WAF.conf"), "mount_dest": "/etc/custom.conf", "impact": "WAF reload"}
@@ -183,7 +183,7 @@ class ExecutorTests(unittest.TestCase):
 
     def candidate(self, kind):
         if kind == "waf":
-            return 'SecRuleEngine DetectionOnly\nSecRule ARGS "@rx new" "id:10100,phase:1,log"\n'
+            return 'SecRuleEngine On\nSecRule ARGS "@rx new" "id:10100,phase:1,log"\n'
         if kind == "suricata":
             return 'alert tcp any any -> any any (msg:"new"; sid:1000001; rev:2;)\n'
         return '<group name="x,"><rule id="100100" level="4"><description>new</description></rule></group>\n'
@@ -192,7 +192,7 @@ class ExecutorTests(unittest.TestCase):
         return engine.propose(target, digest(current), self.candidate(kind), "user requested adjustment")
 
     def max_waf_comment(self, character):
-        prefix = "SecRuleEngine DetectionOnly\n# "
+        prefix = "SecRuleEngine On\n# "
         remaining = MOD.MAX_CANDIDATE - len(prefix.encode("utf-8")) - 1
         copies, padding = divmod(remaining, len(character.encode("utf-8")))
         return prefix + character * copies + " " * padding + "\n"
@@ -346,7 +346,7 @@ class ExecutorTests(unittest.TestCase):
         engine, _, target, current = self.engine("waf")
         path = Path(engine.targets[target]["path"])
         edits = [
-            [{"old_text": "DetectionOnly", "new_text": "On"}],
+            [{"old_text": "On", "new_text": "DetectionOnly"}],
             [{"old_text": "old", "new_text": "bad\x00"}],
             [{"old_text": "old", "new_text": "bad\r"}],
             [{"old_text": "old", "new_text": "bad\u202e"}],
@@ -1115,7 +1115,7 @@ class ExecutorTests(unittest.TestCase):
         engine, _, target, current = self.engine("waf")
         proposal = self.propose(engine, target, current, "waf")
         self.broker.rows[proposal["proposal_id"]]["status"] = "approved"
-        Path(engine.targets[target]["path"]).write_text("SecRuleEngine DetectionOnly\n# unrelated live edit\n")
+        Path(engine.targets[target]["path"]).write_text("SecRuleEngine On\n# unrelated live edit\n")
         self.assertEqual(engine.worker_once()[0]["status"], "aborted")
         self.assertEqual(self.broker.consumes, 0)
         self.assertEqual(len(self.broker.aborts), 1)
@@ -1124,7 +1124,7 @@ class ExecutorTests(unittest.TestCase):
         engine, _, target, current = self.engine("waf")
         proposal = self.propose(engine, target, current, "waf")
         self.broker.rows[proposal["proposal_id"]]["status"] = "approved"
-        Path(engine.targets[target]["path"]).write_text("SecRuleEngine DetectionOnly\n# drift\n")
+        Path(engine.targets[target]["path"]).write_text("SecRuleEngine On\n# drift\n")
         self.broker.fail_abort_once = True
         self.assertEqual(engine.worker_once()[0]["status"], "abort_pending")
         self.assertEqual(engine.worker_once()[0]["status"], "aborted")
@@ -1232,7 +1232,7 @@ class ExecutorTests(unittest.TestCase):
         self.assertIsNone(out['approval_consumed'])
 
     def test_reject_mode_escalation(self):
-        for kind, candidate in (("waf", "SecRuleEngine DetectionOnly\nSecRule ARGS @rx x \"ctl:ruleEngine=On\"\n"),
+        for kind, candidate in (("waf", "SecRuleEngine On\nSecRule ARGS @rx x \"ctl:ruleEngine=On\"\n"),
                                 ("suricata", 'drop tcp any any -> any any (msg:"x"; sid:1000001; rev:1;)\n')):
             with self.subTest(kind=kind):
                 with self.assertRaises(MOD.RuleChangeError):

@@ -241,11 +241,44 @@ class NativeAdapter(unittest.TestCase):
             with self.assertRaises(containment.ContainmentError): containment.read_evidence(PUBLIC, NOW)
             opened.assert_not_called()
 
-    def test_add_maps_only_incident_registration(self):
+    def test_add_maps_fixed_native_trigger_with_raw_sensor_identity(self):
         result = ar.request(reader.canonical(ar_event()), NOW)
-        self.assertEqual(set(result), {"operation", "incident"})
-        self.assertEqual(result["operation"], "submit-incident")
+        self.assertEqual(set(result), {"operation", "incident", "sensor"})
+        self.assertEqual(result["operation"], "native-contain")
         self.assertEqual(result["incident"]["src_ip"], PUBLIC)
+
+    def test_exact_wazuh_decimal_identity_without_float_rounding(self):
+        obj = ar_event()
+        obj['parameters']['alert']['data']['flow_id'] = '936564706804900.000000'
+        result = ar.request(reader.canonical(obj), NOW)
+        self.assertEqual(result['operation'], 'native-contain')
+        self.assertEqual(result['sensor']['flow_id'], 936564706804900)
+        obj['parameters']['alert']['data']['flow_id'] = '18446744073709551615.000000'
+        self.assertEqual(ar.request(reader.canonical(obj), NOW)['sensor']['flow_id'], 2**64-1)
+
+    def test_fractional_exponent_boolean_float_and_overflow_not_sensor_identity(self):
+        for value in ('12.000001', '1e3', True, 12.0, '18446744073709551616.000000'):
+            self.assertIsNone(ar.sensor_integer(value, 2**64))
+
+    def test_status_journal_excludes_raw_payload(self):
+        fake = mock.Mock()
+        with mock.patch.dict('sys.modules', {'syslog': fake}):
+            ar.audit({'status':'refused_or_outcome_unknown','reason':'fixed_program',
+                      'src_ip':'192.168.16.233','alert':'untrusted secret'})
+        posted = fake.syslog.call_args.args[1]
+        self.assertNotIn('192.168.16.233', posted)
+        self.assertNotIn('untrusted secret', posted)
+        self.assertEqual(json.loads(posted)['reason'], 'fixed_program')
+
+    def test_fixed_wazuh_relative_executable_alias_only(self):
+        obj = ar_event()
+        expected = ar.request(reader.canonical(obj), NOW)
+        obj['parameters']['program'] = 'active-response/bin/capstone-containment'
+        self.assertEqual(ar.request(reader.canonical(obj), NOW), expected)
+        for name in ('../active-response/bin/capstone-containment',
+                     '/tmp/capstone-containment','capstone-containment'):
+            obj['parameters']['program'] = name
+            with self.assertRaises(ar.Refused): ar.request(reader.canonical(obj), NOW)
 
     def test_wrong_envelopes(self):
         for field, value in (("command", "delete"), ("version", True), ("extra", 1)):
@@ -269,13 +302,13 @@ class NativeAdapter(unittest.TestCase):
             with self.subTest(key=key), self.assertRaises(ar.Refused):
                 ar.request(reader.canonical(obj), NOW)
 
-    def test_protected_ips_still_register_for_investigation(self):
+    def test_address_policy_is_checked_by_helper_after_incident_registration(self):
         for source in ("211.170.162.111", "8.8.8.8", "10.1.2.3", "127.0.0.1"):
             obj = ar_event(); obj["parameters"]["alert"]["data"]["src_ip"] = source
             with self.subTest(source=source):
                 result = ar.request(reader.canonical(obj), NOW)
                 self.assertEqual(result["incident"]["src_ip"], source)
-                self.assertEqual(result["operation"], "submit-incident")
+                self.assertEqual(result["operation"], "native-contain")
 
     def test_invalid_ipv4_refused(self):
         for source in ("::1", "93.184.216.034", "not an IP"):

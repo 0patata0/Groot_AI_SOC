@@ -18,7 +18,7 @@ class SourceBundle(unittest.TestCase):
         self.assertIn('chat_markdown.py',files)
         with tempfile.TemporaryDirectory() as root:
             for name,path in files.items():(Path(root)/name).write_bytes(path.read_bytes())
-            code="import sys;sys.path.insert(0,sys.argv[1]);import harness;assert harness.security_inventory_request('WAF 룰 각각 표로 보여줘')['view']=='details'"
+            code="import sys;sys.path.insert(0,sys.argv[1]);import harness;assert harness.security_inventory_request('WAF 룰 각각 표로 보여줘')['view']=='details';assert harness.tool_scope('지금 FW 차단 목록만 보여줘')=={'mcp__resp__list_blocks'};assert '승인된 공격 시험도 차단 예외가 아닙니다' in harness.SYSTEM_PROMPT"
             result=subprocess.run([sys.executable,'-I','-B','-c',code,root],capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stderr)
 

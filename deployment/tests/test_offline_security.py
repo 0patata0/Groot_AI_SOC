@@ -53,7 +53,7 @@ class SecurityFixtures(unittest.TestCase):
         self.command = ['/usr/bin/docker', '--host', 'unix:///var/run/docker.sock']
 
     def compose(self):
-        return {'services': {'waf': {'environment': {'MODSEC_RULE_ENGINE': 'DetectionOnly'},
+        return {'services': {'waf': {'environment': {'MODSEC_RULE_ENGINE': 'On'},
                                     'volumes': [str(self.role/'config/GROOT_A_WAF.conf') + ':/rules/custom.conf:ro',
                                                 str(self.role/'logs/modsecurity') + ':/var/log/modsecurity']},
                              'suricata': {'network_mode': 'host'}}, 'networks': {'waf': {'driver': 'bridge'}}}
@@ -143,7 +143,7 @@ class SecurityFixtures(unittest.TestCase):
         self.assertEqual(edge['networks'], {'waf': {'ipv4_address': '172.30.247.3'}})
         self.assertEqual(waf['networks'], {'waf': {'ipv4_address': '172.30.247.2'}})
         self.assertEqual(value['services']['suricata'], {'network_mode': 'host'})
-        self.assertEqual(waf['environment']['MODSEC_RULE_ENGINE'], 'DetectionOnly')
+        self.assertEqual(waf['environment']['MODSEC_RULE_ENGINE'], 'On')
         self.assertTrue(all(v['read_only'] and v['bind'] == {'create_host_path': False} for v in edge['volumes']))
 
     def test_runtime_rejects_privilege_mutation_mount_writes_and_wrong_tls_publish(self):

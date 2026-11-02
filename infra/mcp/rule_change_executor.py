@@ -66,7 +66,7 @@ TARGETS = {
         "host": "a", "kind": "waf", "path": "/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf",
         "container": "waf", "container_path": "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf",
         "mount_source": "/home/groot_a/capstone/secstack/conf/GROOT_A_WAF.conf", "mount_dest": "/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf",
-        "impact": "WAF nginx configuration test and reload; DetectionOnly remains enabled. Single-file bind requires inode-preserving write.",
+        "impact": "WAF nginx configuration test and reload; On blocking mode remains enabled. Single-file bind requires inode-preserving write.",
     },
     "a:suricata-local": {
         "host": "a", "kind": "suricata", "path": "/home/groot_a/capstone/suricata/ruleset/GROOT_A_local.rules",
@@ -369,8 +369,8 @@ def _validate_candidate(kind, content):
     active = "\n".join(line for line in content.splitlines() if not line.lstrip().startswith("#"))
     if kind == "waf":
         modes = re.findall(r"(?im)^\s*SecRuleEngine\s+(\S+)\s*$", active)
-        if modes != ["DetectionOnly"]:
-            raise RuleChangeError("WAF candidate must retain exactly one SecRuleEngine DetectionOnly directive")
+        if modes != ["On"]:
+            raise RuleChangeError("WAF candidate must retain exactly one SecRuleEngine On directive")
         if re.search(r"(?im)^\s*(?:Include|SecRemoteRules|SecAuditLog|SecUploadDir|SecDataDir)\b", active):
             raise RuleChangeError("WAF candidate may not redirect includes, logs, or paths")
         if re.search(r"(?i)\bexec\s*:|\bctl\s*:\s*ruleEngine\b", active):
@@ -791,8 +791,16 @@ class Engine:
             raise RuleChangeError("live container mount differs from fixed target")
         if spec["kind"] == "waf":
             env = info.get("Config", {}).get("Env") or []
-            if "MODSEC_RULE_ENGINE=DetectionOnly" not in env:
-                raise RuleChangeError("WAF is not in DetectionOnly mode")
+            startup = [v.split("=", 1)[1] for v in env if v.startswith("MODSEC_RULE_ENGINE=")]
+            if len(startup) != 1 or startup[0] not in ("On", "DetectionOnly"):
+                raise RuleChangeError("WAF startup mode is unavailable or disabled")
+            # The fixed late CRS include overrides the legacy startup Env.
+            # This preserves the existing CID/raw-log binding during transition.
+            data, _ = _read_regular(spec["path"])
+            active = "\n".join(line for line in data.decode("utf-8").splitlines()
+                               if not line.lstrip().startswith("#"))
+            if re.findall(r"(?im)^\s*SecRuleEngine\s+(\S+)\s*$", active) != ["On"]:
+                raise RuleChangeError("fixed WAF configuration must retain SecRuleEngine On")
         if spec["kind"] == "suricata":
             cmd = info.get("Config", {}).get("Cmd") or []
             if (cmd.count("-S") != 1 or cmd.index("-S") + 1 >= len(cmd)
@@ -926,7 +934,7 @@ class Engine:
             current.decode("utf-8").splitlines(keepends=True), candidate_content.splitlines(keepends=True),
             fromfile=target + " before", tofile=target + " after",
         ))
-        mode = {"waf": "DetectionOnly", "suricata": "passive", "wazuh": "manager"}[spec["kind"]]
+        mode = {"waf": "On", "suricata": "passive", "wazuh": "manager"}[spec["kind"]]
         diff = ("Impact: " + spec["impact"] + "\nReason: " + reason.strip() +
                 "\nPreflight: " + validation + "\nRuntime: " + runtime["container"] +
                 " running, health=" + runtime["health"] + ", mode=" + mode + "\n" + diff)
@@ -1532,6 +1540,35 @@ def _submit_incident(host, broker, incident):
     return result
 
 
+def _native_contain(host, broker, request):
+    """User-approved native exception; shared TTL/approval path, never raw nft."""
+    if host != 'a' or os.geteuid() != 0 or 'SUDO_USER' in os.environ:
+        raise RuleChangeError('native containment requires direct root on host a')
+    if set(request) != {'operation','incident','sensor'}:
+        raise RuleChangeError('invalid native containment fields')
+    sensor = request['sensor']
+    if (type(sensor) is not dict or set(sensor) != {'flow_id','signature_id'} or
+            type(sensor['flow_id']) is not int or not 0 < sensor['flow_id'] < 2**64 or
+            type(sensor['signature_id']) is not int or not 1000000 <= sensor['signature_id'] < 2**32):
+        raise RuleChangeError('invalid native sensor identity')
+    # Persist the original incident before the shared operation. Registration
+    # validates fixed agent/rule/location/time and never grants an arbitrary IP.
+    queued = _submit_incident(host, broker, request['incident'])
+    extension = _load_extension('incident_containment')
+    def evidence(ip, now):
+        observed = extension.read_evidence(ip, now)
+        matching = [r for r in observed['events'] if r['flow_id'] == sensor['flow_id']
+                    and r['signature_id'] == sensor['signature_id'] and r['severity'] == 1]
+        if not matching:
+            raise RuleChangeError('native trigger is not a current eligible inbound attack flow')
+        return {**observed,'independent_flows':1,'events':matching[:1]}
+    engine = Engine(host, broker)
+    result = extension.ContainmentService(engine, evidence=evidence).propose(
+        request['incident']['src_ip'], 'Native IDS attack trigger; investigation follows containment',
+        requested_by='wazuh-native-ar')
+    return {'incident':queued,'containment':result}
+
+
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     if os.geteuid() != 0:
@@ -1554,6 +1591,10 @@ def main(argv=None):
             raise RuleChangeError("queries belong to the read-only MCP")
     host, broker = _secure_config()
     if readonly or not argv:
+        if request.get('operation') == 'native-contain':
+            result = _native_contain(host, broker, request)
+            print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+            return
         if request.get("operation") == "submit-incident":
             if set(request) != {"operation", "incident"}:
                 raise RuleChangeError("invalid incident request fields")

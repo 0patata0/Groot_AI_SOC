@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "component": "soc-chat-contract:1.5.14",
+  "observed_at_kst": "2026-11-03T07:35:57.864476+09:00",
+  "scope": "Actual production Mattermost dedicated-channel round trips, read-only short questions and a bound clarification follow-up",
+  "production_model": "qwen3.6:35b",
+  "code_or_configuration_changed": false,
+  "protocol": {
+    "independent_root_questions": 6,
+    "same_thread_followups": 2,
+    "questions_per_engine": 4,
+    "engines_sequential": true,
+    "new_tests_reused_as_training": false,
+    "latency_definition": "Local monotonic time after POST /posts returned until the final post was observed through GET thread, polled about once a second; browser typing/render latency excluded",
+    "raw_transcripts": "Local-only audit; native calls bound to user source post/session, Ollama calls bound to durable job/report/reply",
+    "native_root_session_isolation_verified": true
+  },
+  "totals": {
+    "channel_responses": 8,
+    "expected_behavior_passed": 8,
+    "actual_mcp_reads": 6,
+    "successful_diagnostic_reads": 4,
+    "successful_full_firewall_reads": 2,
+    "clarifications_without_mcp": 2,
+    "cross_bot_responses": 0,
+    "protected_calls": 0,
+    "read_turns_with_visible_progress": 6
+  },
+  "cases": [
+    {
+      "index": 0,
+      "engine": "hermes",
+      "question": "헤르메스 살아 있나?",
+      "source_post_id": "ci6c5sfxm3fy3ccpr61wrx6c3a",
+      "source_create_at": 1793658629469,
+      "root_id": "",
+      "reply_post_id": "a6b18im94pg4tkkxejomn75rba",
+      "first_visible_seconds": 2.254,
+      "answer_observed_seconds": 16.433,
+      "progress_observed": true,
+      "observed_message_versions": 14,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": [
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:hermes"
+          },
+          "result_sha256": "23325c2cba9db31359f77d38fe114a02bc842beae7e8f89ed7b666950395e151",
+          "target": "b:hermes",
+          "observed_at_kst": "2026-11-03T07:29:41+09:00",
+          "status": "ok",
+          "complete": null,
+          "counts": null
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "engine": "ollama",
+      "question": "헤르메스 살아 있나?",
+      "source_post_id": "q8nuxregzj8ctfmph6czd5wzoh",
+      "source_create_at": 1793658645992,
+      "root_id": "",
+      "reply_post_id": "inbqapszdtnwigo1augc4uofuy",
+      "first_visible_seconds": 0.08,
+      "answer_observed_seconds": 7.697,
+      "progress_observed": true,
+      "observed_message_versions": 5,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": [
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:hermes"
+          },
+          "result_sha256": "f8938f3e783bf262e21550eea8c1c1000c439b52113707ebd2c1e719e7173a46",
+          "target": "b:hermes",
+          "observed_at_kst": "2026-11-03T07:30:42+09:00",
+          "status": "ok",
+          "complete": null,
+          "counts": null
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "engine": "hermes",
+      "question": "인덱서 돌아가나?",
+      "source_post_id": "5w3mjnbtkpdixbgqmjdziact4c",
+      "source_create_at": 1793658653779,
+      "root_id": "",
+      "reply_post_id": "97t63u3cbpr9mr6pr1iebwy16a",
+      "first_visible_seconds": 2.261,
+      "answer_observed_seconds": 15.367,
+      "progress_observed": true,
+      "observed_message_versions": 13,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": [
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:wazuh-indexer"
+          },
+          "result_sha256": "9ee1fbe2f1c4791d080812d97bc3d80971030f8a8a8754d8298221121dc20a4d",
+          "target": "b:wazuh-indexer",
+          "observed_at_kst": "2026-11-03T07:30:42+09:00",
+          "status": "ok",
+          "complete": null,
+          "counts": null
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "engine": "ollama",
+      "question": "인덱서 돌아가나?",
+      "source_post_id": "cj7xkbpoqibs3y5tj8i8azq8qo",
+      "source_create_at": 1793658669232,
+      "root_id": "",
+      "reply_post_id": "yp8xd8yuq3feby96xuiwdbs4bo",
+      "first_visible_seconds": 0.119,
+      "answer_observed_seconds": 3.391,
+      "progress_observed": true,
+      "observed_message_versions": 4,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": [
+        {
+          "name": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:wazuh-indexer"
+          },
+          "result_sha256": "fb0a56f3b462a2255f9ec1a4833f33c46d836b805eb244248e6fc1b64fb10922",
+          "target": "b:wazuh-indexer",
+          "observed_at_kst": "2026-11-03T07:30:42+09:00",
+          "status": "ok",
+          "complete": null,
+          "counts": null
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "engine": "hermes",
+      "question": "룰 조회해줘",
+      "source_post_id": "b3xzt1ni9pd8jxm8qu718fq5uo",
+      "source_create_at": 1793658672713,
+      "root_id": "",
+      "reply_post_id": "1bit37ieybnp9kmry1f83rssqe",
+      "first_visible_seconds": 1.17,
+      "answer_observed_seconds": 1.17,
+      "progress_observed": false,
+      "observed_message_versions": 1,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": []
+    },
+    {
+      "index": 5,
+      "engine": "ollama",
+      "question": "룰 조회해줘",
+      "source_post_id": "e4xqy61nrjf38ncftzdzi8x7sh",
+      "source_create_at": 1793658673974,
+      "root_id": "",
+      "reply_post_id": "8yyzb7w443ngigej85cxeztozc",
+      "first_visible_seconds": 0.085,
+      "answer_observed_seconds": 0.085,
+      "progress_observed": false,
+      "observed_message_versions": 1,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": []
+    },
+    {
+      "index": 6,
+      "engine": "hermes",
+      "question": "FW",
+      "source_post_id": "x1tczk1pd3gb7jbr6o19hpebze",
+      "source_create_at": 1793658734124,
+      "root_id": "b3xzt1ni9pd8jxm8qu718fq5uo",
+      "reply_post_id": "5436461oypdo7p36i1riiruwah",
+      "first_visible_seconds": 1.176,
+      "answer_observed_seconds": 16.418,
+      "progress_observed": true,
+      "observed_message_versions": 15,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": [
+        {
+          "name": "mcp__resp__get_firewall_rules",
+          "arguments": {},
+          "result_sha256": "ca14138a9e64c6e69aa138ce68b58a9fa2cd4b143444f408b66facaa0314c932",
+          "target": "a:firewall",
+          "observed_at_kst": "2026-11-03T07:32:29.377835+09:00",
+          "status": null,
+          "complete": true,
+          "counts": {
+            "table": 8,
+            "chain": 30,
+            "rule": 99,
+            "set": 9
+          }
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "engine": "ollama",
+      "question": "FW",
+      "source_post_id": "jfhobq4awfg7prci1jzcp3k7xh",
+      "source_create_at": 1793658750644,
+      "root_id": "e4xqy61nrjf38ncftzdzi8x7sh",
+      "reply_post_id": "g83wbkin73nhzb5o98h8sdgt4h",
+      "first_visible_seconds": 0.077,
+      "answer_observed_seconds": 4.445,
+      "progress_observed": true,
+      "observed_message_versions": 5,
+      "other_bot_posts": 0,
+      "protected_calls": 0,
+      "verdict": "pass",
+      "calls": [
+        {
+          "name": "mcp__resp__get_firewall_rules",
+          "arguments": {},
+          "result_sha256": "bd345243de4dd3cc8cfa3acfdb33aa17a3a835161084313113c25d9bba9e0938",
+          "target": "a:firewall",
+          "observed_at_kst": "2026-11-03T07:32:34.710573+09:00",
+          "status": null,
+          "complete": true,
+          "counts": {
+            "table": 8,
+            "chain": 30,
+            "rule": 99,
+            "set": 9
+          }
+        }
+      ]
+    }
+  ],
+  "health_after": {
+    "checked_at_kst": "2026-11-03T07:35:57.864476+09:00",
+    "hermes_host_pid": 2487875,
+    "ollama_chat_pid": 2487904,
+    "review_pid": 2487909,
+    "websockets_and_workers_healthy": true,
+    "source_sha_matches_previous_deployment": true,
+    "model_config_and_soul_sha_unchanged": true,
+    "no_service_restart": true,
+    "new_packages_or_weights_downloaded": 0,
+    "temporary_server_files_created": 0
+  },
+  "limits": [
+    "Small sequential sample of the same original operating model; not a new model accuracy ranking or general latency guarantee",
+    "Actual posts/updates and final text verified through the Mattermost API, not browser rendering; CUA failed to initialize with missing kernel assets",
+    "No new protected write, approval, attack or rollback test",
+    "Converted HF/trained model no-arg schema acceptance retains the previous six-condition evidence; not repeated in this original-model chat test"
+  ],
+  "separate_metadata_followup": "Ollama channel header/purpose still says read-only/changes through Hermes although parity paths exist; no channel metadata edit in this read-only check."
+}

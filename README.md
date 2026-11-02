@@ -15,6 +15,8 @@
 | DGX | 공유 추론을 우선하는 독립 학습·체크포인트 관리 |
 | 로컬 | 자료 수집·정제·검수·대화 구성. 검수본 반입 후 DGX 학습 |
 
+두 봇의 공통 근거 검사는11/2 14:03 KST **1.19.5**로 운영 반영했습니다. [보고 근거·복구](infra/hermes/event-report-grounding.md)와 [독립 감시](infra/mcp/monitoring.md)의 실측·남은 검증은 STATUS를 따릅니다.
+
 A/B/C·Thor는11/1 21:53~21:55 KST 읽기 확인, MCP는14:24 계약의8서버/41도구 기준입니다. 현재 본학습 완료나 학습본 운영 승격을 뜻하지 않으며 동적 진행률은 [STATUS](STATUS.md)를 따릅니다. 아래 날짜별 기록은 당시 상태입니다.
 
 **저장소 유지:** [현재 현황](STATUS.md)·[현재 계획](PLAN.md)과 [과거 이력/복원](archive/REPOSITORY_CLEANUP.md)을 분리했습니다. 데이터는 [통합 원본1개·정제본1개 무손실 압축 규칙](datasets/STORAGE_POLICY.md)을 따릅니다. 아래 날짜별 내용은 당시 이력입니다.

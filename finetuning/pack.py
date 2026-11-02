@@ -28,7 +28,8 @@ def main():
     check_data(config)
     names = [".gitignore", "README.md", "DATA_SOURCES.md", "config.json", "requirements.txt",
              "DGX_OVERNIGHT.md", "DGX_TRAINING_THOR_INFERENCE.md", "DGX_CANDIDATE.md", "requirements.qwen36-dgx.txt",
-             "dgx_supervisor.py", "dgx_task.py", "prepare_dgx_run.py", "check_dgx_architecture.py",
+             "dgx_supervisor.py", "dgx_follow.py", "DGX_FOLLOW.md", "config.dgx-follow.example.json",
+             "dgx_task.py", "prepare_dgx_run.py", "check_dgx_architecture.py",
              "resume_training.py", "prepare_dgx_resume.py", "check_resume_runtime.py", "candidate_model.py",
              "prepare_guide_sft.py", "admit_guide_sft.py", "GUIDE_ADMISSION_20261101.json",
              "collect_defensive_sources.py", "review_defensive_sources.py", "collect_incident_sources.py",

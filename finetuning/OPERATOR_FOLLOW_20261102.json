@@ -1,0 +1,64 @@
+{
+  "observed_at_kst": "2026-11-02T10:50:45.149332+09:00",
+  "status": "installed_active_waiting_for_current_training",
+  "authorization": "User authorized future ETA-matched deadline extension and immediate finish when training completes; preserve running training",
+  "policy": {
+    "schema": 1,
+    "root": "/home/ACCOUNT/Capstone_Groot_training/operator-follow-20261102-r6",
+    "unit": "capstone-dgx-20261102-followr6",
+    "parent_control": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/control.json",
+    "parent_sha256": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
+    "authorized_at_kst": "2026-11-02T10:37:30+09:00",
+    "max_steps": 4348,
+    "initial_step": 1172,
+    "initial_started_at_kst": "2026-11-02T00:34:38.327857+09:00",
+    "fallback_seconds_per_step": 18,
+    "validation_seconds": 1800,
+    "startup_seconds": 900,
+    "save_grace_seconds": 900,
+    "poll_seconds": 60,
+    "files": {
+      "deploy.sh": "978583643e899a61e792b13ad4b3423bc58f232a856ca709ce87e48cd783ab9e",
+      "finetuning/dgx_follow.py": "6435c7544000f571d3b1b456776b3abd0a7639b28a758816cb0eeb58c645fa94"
+    }
+  },
+  "policy_sha256": "c548f62dc25ae57529747cae0826552a0426225aaad8b573176d4bc7cc12ea49",
+  "follower_pid": 393747,
+  "follower_parent_pid": 1,
+  "last_heartbeat_kst": "2026-11-02T10:50:41.203194+09:00",
+  "estimate": {
+    "basis_step": 2762,
+    "seconds_per_step_with_observed_waits": 23.247091389452137,
+    "remaining_training_seconds": 36869.88694367109,
+    "validation_reserve_seconds": 1800,
+    "window_seconds": 40500,
+    "window_capped": false,
+    "proposed_deadline_kst": "2026-11-02T22:05:41.203166+09:00",
+    "scope": "estimate, includes observed waits; not a completion guarantee"
+  },
+  "original_training_pid_unchanged": true,
+  "original_control_sha256_unchanged": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
+  "original_inputs_verified": 54,
+  "automatic_continuation_executed": false,
+  "completed_training_and_validation": false,
+  "early_completion_observed": false,
+  "validation": {
+    "local_follow_tests_passed": 14,
+    "dgx_isolated_follow_tests_passed": 14,
+    "local_related_suite_passed_before_final_policy_test": 37,
+    "actual_installer_check": true,
+    "actual_service_and_ppid1": true,
+    "heartbeat_advanced": true,
+    "new_server_full_install": false,
+    "gpu_transition_forced": false
+  },
+  "packages_installed": 0,
+  "gpu_training_source_data_profile_changed": false,
+  "operating_model_changed": false,
+  "rollback": "Stop follow unit through deploy.sh; preserve current training and checkpoints",
+  "limitations": [
+    "Current r6 fixed cutoff remains; continuation starts only after a verified successful saved deadline exit.",
+    "Training-only completion without final validation is reported validation_pending, not retrained or promoted.",
+    "A transient observation failure waits; manual early stops, unknown failures and no-progress windows do not restart."
+  ]
+}

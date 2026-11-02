@@ -1,5 +1,7 @@
 # Groot_AI_SOC
 
+**학습 시간 관리:** 11/2 후속 승인으로 DGX에 [예상시간 기반 자동 계승과 완료 즉시 종료](finetuning/DGX_FOLLOW.md)를 추가했습니다. 진행 중인 학습은 유지하고 정상 기한 저장 종료 후 같은 계획의 검증된 checkpoint에서 새 창을 자동 시작합니다. Mac 연결과 독립적이며 현재 r6 자체의17:30기한과 전체 학습 완료는 구분합니다. 최신 실행·검증 범위는 [STATUS](STATUS.md)를 따릅니다.
+
 ## 현재 배치 · 2026-11-01
 
 [최신 토폴로지와 근거](infra/diagrams/README.md) · [기존 형태 상세형](topology/groot_soc_network_architecture.svg) · [버스형](topology/groot_soc_topology_bus.svg) · [관제·MCP·승인 흐름](infra/diagrams/current-soc-flow.svg)
@@ -17,7 +19,7 @@ A/B/C·Thor는11/1 21:53~21:55 KST 읽기 확인, MCP는14:24 계약의8서버/4
 
 **저장소 유지:** [현재 현황](STATUS.md)·[현재 계획](PLAN.md)과 [과거 이력/복원](archive/REPOSITORY_CLEANUP.md)을 분리했습니다. 데이터는 [통합 원본1개·정제본1개 무손실 압축 규칙](datasets/STORAGE_POLICY.md)을 따릅니다. 아래 날짜별 내용은 당시 이력입니다.
 
-**11/2 00:37 KST 최신:** 사용자 지시로 본학습 종료를 **오늘17:30 KST(저장 정리17:15)**로 연장했습니다. checkpoint1172/11파일SHA·CPU재개검증 후 별도r6를등록했으며,PID1·독립timer와본학습모델재적재단계를확인했습니다. 기존본학습량/모델/공유추론우선정책은유지하며Mac종료후지속합니다. [연장·검증 원장](finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json). 아래11/1시각/기한은당시이력입니다.
+**11/2 00:37 KST 연장 이력:** 사용자 지시로 본학습 종료를 **오늘17:30 KST(저장 정리17:15)**로 연장했습니다. checkpoint1172/11파일SHA·CPU재개검증 후 별도r6를등록했으며,PID1·독립timer와본학습모델재적재단계를확인했습니다. 기존본학습량/모델/공유추론우선정책은유지하며Mac종료후지속합니다. [연장·검증 원장](finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json). 아래11/1시각/기한은당시이력입니다.
 
 **16:03 KST 실측:** 같은 Qwen3.6-35B-A3B 본학습5/4,348단계·checkpoint4(11파일 SHA) 확인. 공유 추론 종료 후 조건부 자동 재개·Mac 종료 후 지속,11/2 03:47 KST 상한입니다. 기한 내 전체 완료를 보장하지 않으며 미완료 시 저장 후 정지합니다.
 

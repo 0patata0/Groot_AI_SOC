@@ -8,6 +8,10 @@ if [[ ${1:-} == --model-candidate ]]; then
   shift
   exec python3 -IB "$HERE/finetuning/candidate_model.py" "$@"
 fi
+if [[ ${1:-} == --training-dgx-follow ]]; then
+  shift
+  exec python3 -IB "$HERE/finetuning/dgx_follow.py" "$@"
+fi
 if [[ ${1:-} == --training-dgx ]]; then
   shift
   exec python3 -IB "$HERE/finetuning/dgx_supervisor.py" "$@"

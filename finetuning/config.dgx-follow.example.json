@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "root": "/home/ACCOUNT/Capstone_Groot_training/operator-follow-20261102-r6",
+  "unit": "capstone-dgx-20261102-followr6",
+  "parent_control": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/control.json",
+  "parent_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "authorized_at_kst": "2026-11-02T10:37:30+09:00",
+  "max_steps": 4348,
+  "initial_step": 1172,
+  "initial_started_at_kst": "2026-11-02T00:34:38.327857+09:00",
+  "fallback_seconds_per_step": 18,
+  "validation_seconds": 1800,
+  "startup_seconds": 900,
+  "save_grace_seconds": 900,
+  "poll_seconds": 60,
+  "files": {
+    "deploy.sh": "0000000000000000000000000000000000000000000000000000000000000000",
+    "finetuning/dgx_follow.py": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

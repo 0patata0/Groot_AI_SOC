@@ -30,7 +30,8 @@ class Diagram:
         for name, color in COLORS.items():
             self.parts.append(
                 f'<marker id="{name}" viewBox="0 0 10 10" refX="9" refY="5" '
-                f'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+                'markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" '
+                'orient="auto-start-reverse">'
                 f'<path d="M0 0L10 5L0 10Z" fill="{color}"/></marker>'
             )
         self.parts.append('</defs>')
@@ -74,6 +75,14 @@ class Diagram:
     def dot(self, x, y, kind, radius=6):
         self.parts.append(f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{COLORS[kind]}"/>')
 
+    def vertical(self, x, start, end, kind, crossings=()):
+        """Leave a visible gap at rails that this route crosses but does not join."""
+        path = f"M{x} {start}"
+        for y in sorted(crossings):
+            if start + 8 < y < end - 8:
+                path += f"V{y-8}M{x} {y+8}"
+        self.line(path + f"V{end}", kind)
+
     def write(self, filename):
         (ROOT / filename).write_text('\n'.join(self.parts + ['</svg>']) + '\n')
 
@@ -88,10 +97,12 @@ def architecture():
     d.text(443, 149, "EXT · 승인된 실습망", 21, "#666666", True)
     d.box(445, 166, 440, 135, "공격 시험 호스트 / Kali", ["승인된 시험 출발지 · IP는 시험별 지정"],
           "#fce9eb", "#e34b50", "#c7252d", 20, 27)
-    d.line("M665 302V396", "attack", True, width=14)
+    d.line("M665 302V396", "attack", True)
     d.text(745, 357, "공격·웹 요청", 21, COLORS["attack"], True)
-    d.box(1665, 142, 430, 165, "Jetson Thor · Ollama", ["운영 추론 · qwen3.6:35b", "127.0.0.1:11434 · SSH 8022"],
-          "#eeecfd", "#7b6adb", "#4e429e", 22, 28)
+    d.rect(1650, 120, 490, 210, "#faf9fd", "#b5aace", dash=True)
+    d.text(1673, 149, "EXT · 운영 추론", 21, "#666666", True)
+    d.box(1675, 166, 440, 135, "Jetson Thor · Ollama", ["운영 추론 · qwen3.6:35b", "127.0.0.1:11434 · SSH 8022"],
+          "#eeecfd", "#7b6adb", "#4e429e", 20, 27)
 
     d.rect(45, 400, 2510, 1050, "#fcfcfb", "#555555", 22)
     d.text(1298, 432, "ESXi Host", 27, bold=True, center=True)
@@ -109,7 +120,7 @@ def architecture():
     d.box(1320, 565, 365, 195, "Suricata IDS", ["PASSIVE · ens192 패킷 관측", "ET + local → all.rules", "인라인 차단 엔진 아님"], stroke="#cf7757")
     d.box(1725, 565, 365, 195, "Vector + Wazuh Agent", ["FW · WAF · IDS 로그", "정제·수집 → B Wazuh", "호스트 진단 근거"], stroke="#cf7757", title_size=24)
     d.box(2130, 565, 365, 195, "nftables Firewall", ["B/C 외부 통신 NAT", "정책·보호 주소·차단 TTL", "승인된 조치 실행·검증"], stroke="#cf7757")
-    d.line("M2495 650C2560 650 2550 360 2450 360H1900Q1880 360 1880 340V307", "llm", True, True,
+    d.line("M2495 650C2560 650 2550 360 2450 360H1915Q1895 360 1895 340V301", "llm", True, True,
            edge_id="gateway-thor-inference")
     d.text(1628, 391, "B 추론 터널 → A 경유 → Thor", 20, COLORS["llm"])
 
@@ -150,9 +161,9 @@ def architecture():
            "mcp", True, edge_id="mcp-shared-to-a")
     d.line("M560 1180V1272Q560 1280 552 1280H545", "mcp", True,
            edge_id="mcp-shared-to-b")
-    d.line("M1015 1210V1180", "mcp", both=True, width=2,
+    d.line("M1015 1210V1180", "mcp", both=True,
            edge_id="hermes-mcp-shared")
-    d.line("M1470 1210V1180", "mcp", both=True, width=2,
+    d.line("M1470 1210V1180", "mcp", both=True,
            edge_id="ollama-mcp-shared")
     for x in [1015, 1470]:
         d.dot(x, 1180, "mcp", radius=3)
@@ -162,9 +173,9 @@ def architecture():
     d.line("M1105 1090H1075", "approval", True)
     d.line("M980 1372H1612Q1628 1372 1628 1356V922", "llm", True,
            edge_id="inference-shared-to-gateway")
-    d.line("M980 1350V1372", "llm", both=True, width=2,
+    d.line("M980 1350V1372", "llm", both=True,
            edge_id="hermes-inference")
-    d.line("M1510 1350V1372", "llm", both=True, width=2,
+    d.line("M1510 1350V1372", "llm", both=True,
            edge_id="ollama-inference")
     for x in [980, 1510]:
         d.dot(x, 1372, "llm", radius=3)
@@ -224,9 +235,13 @@ def bus():
             # NIC ports leave the host at distinct x values, no false join between EXT buses.
             if port is not None:
                 px = nx + 25 + i * 50
-                d.line(f"M{px} {ny+70}" + (f"H{nx-6}" if len(nic) > 1 and i == 0 else "") + f"V{port}", "internal" if n == "ens160" else "external")
-                if len(nic) > 1 and i == 0:
-                    px = nx - 6
+                if n == "ens160":
+                    if len(nic) > 1 and i == 0:
+                        d.line(f"M{px} {ny+70}H{nx-6}", "internal")
+                        px = nx - 6
+                    d.vertical(px, ny + 70, port, "internal")
+                else:
+                    d.vertical(px, ny + 70, port, "external", crossings=(710,))
                 d.dot(px, port, "internal" if n == "ens160" else "external")
         return x + w - 100
 
@@ -260,11 +275,14 @@ def bus():
         d.text(325, y + 8, label, 21, bold=True, center=True)
         d.line(f"M200 {y}H235M415 {y}H440", "external")
     # A ens192 carries routed external traffic; the stub is not an extra NIC.
-    d.line(f"M{ax+50} 651H{ax+75}V860", "external")
+    d.line(f"M{ax+50} 651H{ax+75}", "external")
+    d.dot(ax + 50, 651, "external", radius=4)
+    d.vertical(ax + 75, 651, 860, "external", crossings=(710, 785))
     d.dot(ax + 75, 860, "external")
-    d.line(f"M{tx} 463V860", "external"); d.dot(tx, 860, "external")
+    d.vertical(tx, 463, 860, "external", crossings=(710, 785))
+    d.dot(tx, 860, "external")
     d.text(70, 925, "B/C는 A가 기본 게이트웨이. EXT 두 줄은 용도별 논리 경로이며 실제 별도 NIC·전용선·동일 네트워크를 의미하지 않는다.", 22, "#666666")
-    d.text(70, 957, "추론은 Thor 원본35B 유지. 두 봇·MCP·승인·보안장비의 연결은 상세형 토폴로지 참조.", 22, "#666666")
+    d.text(70, 957, "점은 연결, 틈은 연결 없는 교차. 추론은 Thor 원본35B 유지. 두 봇·MCP·승인·보안장비의 연결은 상세형 토폴로지 참조.", 22, "#666666")
     d.write("토폴로지_버스.svg")
 
 

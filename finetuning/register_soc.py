@@ -10,17 +10,27 @@ import json
 from pathlib import Path
 import platform
 import re
-from urllib import request,error
+from urllib import request,error,parse
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from convert_reference import digest
 from download_model import verify_artifact
 
+API_BASE_URL = 'http://127.0.0.1:11434'
+
+
+def set_api_base_url(url):
+    """Operator CLI only: production daemon or a task-owned loopback daemon."""
+    global API_BASE_URL
+    if url not in ('http://127.0.0.1:11434', 'http://127.0.0.1:11435'):
+        raise ValueError('Only the fixed local Ollama endpoints are permitted')
+    API_BASE_URL = url
+
 
 def api(path,payload=None,timeout=30):
     data=None if payload is None else json.dumps(payload).encode()
-    req=request.Request('http://127.0.0.1:11434'+path,data=data,headers={'Content-Type':'application/json'})
+    req=request.Request(API_BASE_URL+path,data=data,headers={'Content-Type':'application/json'})
     try:
         with request.urlopen(req,timeout=timeout) as response:return json.load(response)
     except error.HTTPError as exc:
@@ -41,11 +51,12 @@ def parameters(text):
 def upload(path,sha):
     url='/api/blobs/sha256:'+sha
     try:
-        with request.urlopen(request.Request('http://127.0.0.1:11434'+url,method='HEAD'),timeout=15) as response:
+        with request.urlopen(request.Request(API_BASE_URL+url,method='HEAD'),timeout=15) as response:
             if response.status==200:return
     except error.HTTPError as exc:
         if exc.code!=404:raise
-    connection=http.client.HTTPConnection('127.0.0.1',11434,timeout=1200)
+    endpoint=parse.urlsplit(API_BASE_URL)
+    connection=http.client.HTTPConnection(endpoint.hostname,endpoint.port,timeout=1200)
     try:
         connection.putrequest('POST',url);connection.putheader('Content-Type','application/octet-stream')
         connection.putheader('Content-Length',str(path.stat().st_size));connection.endheaders()
@@ -82,10 +93,10 @@ def verify_runtime(original,show,expected_template,files):
             'hf_template_sha256':hashlib.sha256(expected_template.encode()).hexdigest()}
 
 
-def candidate_name(variant):
+def candidate_name(variant, root=None):
     if variant=='dgx-guide':
-        from candidate_model import MODEL
-        return MODEL
+        from candidate_model import MODEL, model_name
+        return model_name(root) if root is not None else MODEL
     if variant in ('base','main'):return f'soc-qwen36:35b-{variant}-q4km-20261027'
     if variant in ('v2-step24','v2-step48'):return f'soc-qwen36:35b-{variant}-q4km-20261028'
     if variant=='v5':return 'soc-qwen36:35b-evidence-v5-q4km-20261029'
@@ -112,7 +123,7 @@ def with_source_notice(original,notice):
 
 
 def register(root,variant):
-    model=candidate_name(variant)
+    model=candidate_name(variant, root)
     folder=Path(root)/f'exports/qwen36-soc-{variant}-gguf';record=folder/'registration-status.json'
     if record.exists():raise ValueError('Inspect previous registration before explicitly retrying')
     state={'status':'checking','model':model,'variant':variant,'started_at_kst':datetime.now(ZoneInfo('Asia/Seoul')).isoformat()}

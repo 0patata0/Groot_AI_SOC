@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import re
 import shutil
 import sys
 import time
@@ -35,7 +36,31 @@ def read(path):
     return json.loads(path.read_text())
 
 
-def metadata(output, base_manifest, data, expected_adapter):
+def candidate_profile(root):
+    path = Path(root)/'candidate-profile.json'
+    if path.is_symlink(): raise ValueError('Candidate profile must not be a symlink')
+    if not path.exists(): return None  # Preserve historical candidate receipts.
+    value = read(path)
+    if (set(value) != {'schema', 'model', 'adapter_sha256', 'run_manifest_sha256', 'source_notices'}
+            or type(value['schema']) is not int or value['schema'] != 1
+            or not isinstance(value['model'], str)
+            or not re.fullmatch(r'soc-qwen36:35b-[a-z0-9][a-z0-9-]{1,79}', value['model'])
+            or any(not isinstance(value[k], str) or not re.fullmatch(r'[0-9a-f]{64}', value[k])
+                   for k in ('adapter_sha256', 'run_manifest_sha256'))
+            or not isinstance(value['source_notices'], dict) or not value['source_notices']
+            or any(not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,127}', name)
+                   or not isinstance(sha, str) or not re.fullmatch(r'[0-9a-f]{64}', sha)
+                   for name, sha in value['source_notices'].items())):
+        raise ValueError('Invalid immutable candidate profile')
+    return value
+
+
+def model_name(root):
+    profile = candidate_profile(root)
+    return profile['model'] if profile else MODEL
+
+
+def metadata(output, base_manifest, data, expected_adapter, *, model=MODEL):
     output, data = Path(output), Path(data)
     progress, state = read(output/'progress.json'), read(output/'trainer_state.json')
     if (progress.get('status') != 'completed' or type(state.get('global_step')) is not int
@@ -62,7 +87,7 @@ def metadata(output, base_manifest, data, expected_adapter):
         if count != manifest['data']['records'][split]: raise ValueError('Training record count mismatch')
         if split != 'test' and token[split]['kept'] != count: raise ValueError('Token coverage incomplete')
     return {'schema': 1, 'status': 'metadata_verified', 'at_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat(),
-            'model': MODEL, 'steps': state['global_step'], 'records': manifest['data']['records'],
+            'model': model, 'steps': state['global_step'], 'records': manifest['data']['records'],
             'adapter_sha256': expected_adapter, 'base_revision': base['revision'],
             'base_manifest_sha256': digest(base_manifest), 'run_manifest_sha256': digest(output/'run_manifest.json'),
             'data_sha256': manifest['data']['sha256'], 'eval_loss': metrics['eval_loss'],
@@ -75,7 +100,13 @@ def verify(output, root, data, expected_adapter):
     from merge_adapter import inspect_adapter
     from merge_streaming import plan_lora
     output, root = Path(output), Path(root)
-    result = metadata(output, root/'base-manifest.json', data, expected_adapter)
+    result = metadata(output, root/'base-manifest.json', data, expected_adapter, model=model_name(root))
+    profile = candidate_profile(root)
+    if profile:
+        if (profile['adapter_sha256'] != result['adapter_sha256'] or
+                profile['run_manifest_sha256'] != result['run_manifest_sha256']):
+            raise ValueError('Candidate profile differs from selected completed training')
+        result['candidate_profile_sha256'] = digest(root/'candidate-profile.json')
     info = inspect_adapter(output/'adapter')
     index = read(Path(info['base_model_name_or_path'])/'model.safetensors.index.json')['weight_map']
     peft = read(output/'adapter/adapter_config.json')
@@ -92,7 +123,12 @@ def verified_receipt(root, merge=None):
     receipt = read(root/'training-verification.json')
     if (receipt.get('status') != 'verified' or receipt.get('finite_tensors') != 380
             or receipt.get('lora_pairs') != 190 or receipt.get('automatic_promotion') is not False
-            or receipt.get('model') != MODEL): raise ValueError('Verified candidate training receipt required')
+            or receipt.get('model') != model_name(root)): raise ValueError('Verified candidate training receipt required')
+    profile = candidate_profile(root)
+    if profile and (receipt.get('candidate_profile_sha256') != digest(root/'candidate-profile.json')
+            or receipt.get('adapter_sha256') != profile['adapter_sha256']
+            or receipt.get('run_manifest_sha256') != profile['run_manifest_sha256']):
+        raise ValueError('Candidate profile or selected training changed')
     if merge and merge['adapter_sha256'] != receipt['adapter_sha256']: raise ValueError('Merged candidate differs from selected adapter')
     return receipt
 
@@ -100,11 +136,14 @@ def verified_receipt(root, merge=None):
 def source_notice(root):
     root = Path(root); receipt = verified_receipt(root)
     files = receipt['source_notices']
-    if set(files) != set(NOTICES): raise ValueError('Complete training-source notices required')
-    chunks = ['SOC DGX GUIDE candidate training sources; provenance is not institutional certification.']
-    for name in NOTICES:
+    profile = candidate_profile(root)
+    expected = profile['source_notices'] if profile else {name: None for name in NOTICES}
+    if set(files) != set(expected): raise ValueError('Complete training-source notices required')
+    chunks = ['SOC DGX candidate training sources; provenance is not institutional certification.']
+    for name in sorted(expected):
         path = root/'source-notices'/name
-        if digest(path) != files[name]: raise ValueError('Training-source notice changed')
+        if digest(path) != files[name] or (profile and files[name] != expected[name]):
+            raise ValueError('Training-source notice changed')
         chunks += [name, path.read_text()]
     return '\n\n'+'\n\n'.join(chunks)
 
@@ -133,16 +172,20 @@ def readiness(root, *, warm=False, api_fn=None, memory_fn=memory_snapshot):
     64 GiB is a conservative admission policy for this 35B candidate, not proof
     that the NVIDIA allocator will succeed. External API callers can race this
     check; the final loaded-model check catches overlap but cannot prevent it.
+    Once this exact model is fully on GPU, retain a separate 32 GiB reserve;
+    allocated model memory must not count against the admission margin twice.
     """
     import fcntl
     from register_soc import api
     root = Path(root); api_fn = api_fn or api
+    model = model_name(root)
     registration = read(root/f'exports/qwen36-soc-{VARIANT}-gguf/registration-status.json')
-    if registration.get('status') != 'completed' or registration.get('model') != MODEL:
+    if registration.get('status') != 'completed' or registration.get('model') != model:
         raise ValueError('Completed candidate registration required')
-    receipt = {'at_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat(), 'model': MODEL,
+    receipt = {'at_kst': datetime.now(ZoneInfo('Asia/Seoul')).isoformat(), 'model': model,
                'status': 'checking', 'warm_requested': warm, 'model_posts': 0,
                'minimum_available_bytes': 64*1024**3, 'automatic_promotion': False,
+               'minimum_loaded_available_bytes': 32*1024**3,
                'automatic_retry': False, 'driver_fix_proven': False}
     directory = root/'inference-readiness'; directory.mkdir(exist_ok=True)
     lock = directory/'gate.lock'
@@ -155,13 +198,15 @@ def readiness(root, *, warm=False, api_fn=None, memory_fn=memory_snapshot):
             loaded = api_fn('/api/ps')['models']
             memory = memory_fn()
             reasons = []
-            if tags.get(MODEL) != registration['digest']: reasons.append('candidate_digest_changed')
+            if tags.get(model) != registration['digest']: reasons.append('candidate_digest_changed')
             if tags.get('qwen3.6:35b') != registration['original_digest']: reasons.append('original_digest_changed')
-            if any(m['name'] != MODEL for m in loaded): reasons.append('other_models_loaded')
-            if memory['MemAvailable'] < receipt['minimum_available_bytes']: reasons.append('insufficient_memory_margin')
-            return {'loaded': loaded, 'memory': memory, 'reasons': reasons}
+            if any(m['name'] != model for m in loaded): reasons.append('other_models_loaded')
+            minimum = (receipt['minimum_loaded_available_bytes'] if on_gpu({'loaded': loaded})
+                       else receipt['minimum_available_bytes'])
+            if memory['MemAvailable'] < minimum: reasons.append('insufficient_memory_margin')
+            return {'loaded': loaded, 'memory': memory, 'minimum_available_bytes': minimum, 'reasons': reasons}
         def on_gpu(snapshot):
-            return any(m['name'] == MODEL and m.get('digest') == registration['digest']
+            return any(m['name'] == model and m.get('digest') == registration['digest']
                        and m.get('size', 0) > 0 and m.get('size_vram', 0) >= m['size'] * 0.99
                        and m.get('context_length') == 262144
                        for m in snapshot['loaded'])
@@ -179,7 +224,7 @@ def readiness(root, *, warm=False, api_fn=None, memory_fn=memory_snapshot):
                     receipt['status'] = 'blocked'
                 else:
                     receipt['model_posts'] = 1
-                    result = api_fn('/api/generate', {'model': MODEL, 'prompt': '준비 완료라고만 답하세요.',
+                    result = api_fn('/api/generate', {'model': model, 'prompt': '준비 완료라고만 답하세요.',
                         'stream': False, 'think': False, 'keep_alive': '5m',
                         'options': {'temperature': 0, 'num_predict': 16, 'num_ctx': 262144}}, timeout=90)
                     receipt['after'] = inspect()
@@ -203,7 +248,13 @@ def main():
     p.add_argument('--data', type=Path)
     p.add_argument('--adapter-sha256')
     p.add_argument('--tools', type=Path)
+    p.add_argument('--api-base-url', choices=('http://127.0.0.1:11434', 'http://127.0.0.1:11435'),
+                   default='http://127.0.0.1:11434')
     a = p.parse_args()
+    if a.api_base_url != 'http://127.0.0.1:11434' and a.phase not in ('register','preflight','warmup'):
+        p.error('An isolated inference endpoint is only used for registration/readiness')
+    from register_soc import set_api_base_url
+    set_api_base_url(a.api_base_url)
     if a.phase in ('check', 'merge'):
         if not all((a.training_output, a.data, a.adapter_sha256)): p.error('Training output, data and selected adapter SHA required')
         result = verify(a.training_output, a.root, a.data, a.adapter_sha256)
@@ -211,8 +262,14 @@ def main():
             receipt = a.root/'training-verification.json'
             if receipt.exists(): raise ValueError('Use a new candidate export directory')
             notices = a.root/'source-notices'; notices.mkdir(exist_ok=False)
-            for name in NOTICES: shutil.copyfile(a.data/name, notices/name)
-            result['source_notices'] = {name: digest(notices/name) for name in NOTICES}
+            profile = candidate_profile(a.root)
+            selected = profile['source_notices'] if profile else {name: None for name in NOTICES}
+            for name, expected in selected.items():
+                source = a.data/'licenses'/name if profile else a.data/name
+                if expected is not None and digest(source) != expected:
+                    raise ValueError('Pinned training source notice differs')
+                shutil.copyfile(source, notices/name)
+            result['source_notices'] = {name: digest(notices/name) for name in selected}
             receipt.write_text(json.dumps(result, indent=2)+'\n')
             from merge_streaming import merge
             result = merge(a.training_output/'adapter', a.root/f'exports/qwen36-soc-{VARIANT}-hf', a.root/'base-manifest.json')

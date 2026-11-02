@@ -8,6 +8,36 @@ from soc_evaluate import select_cases
 
 
 class CandidateTests(unittest.TestCase):
+    def test_blob_upload_uses_selected_local_daemon_for_head_and_stream(self):
+        import register_soc as r
+        import tempfile
+        from unittest.mock import patch, MagicMock
+        from urllib.error import HTTPError
+        previous=r.API_BASE_URL
+        try:
+            r.set_api_base_url('http://127.0.0.1:11435')
+            with tempfile.TemporaryDirectory() as directory:
+                path=Path(directory)/'test.gguf';path.write_bytes(b'local fixture')
+                response=MagicMock();response.status=201;response.read.return_value=b''
+                connection=MagicMock();connection.getresponse.return_value=response
+                with patch.object(r.request,'urlopen',side_effect=HTTPError('fixture',404,'missing',{},None)) as head, patch.object(r.http.client,'HTTPConnection',return_value=connection) as client:
+                    r.upload(path,'a'*64)
+                self.assertEqual(head.call_args.args[0].full_url,'http://127.0.0.1:11435/api/blobs/sha256:'+'a'*64)
+                client.assert_called_once_with('127.0.0.1',11435,timeout=1200)
+                connection.send.assert_called_once_with(b'local fixture')
+                connection.close.assert_called_once()
+        finally:r.set_api_base_url(previous)
+
+    def test_operator_endpoint_is_fixed_loopback_and_legacy_default_is_preserved(self):
+        import register_soc as r
+        previous=r.API_BASE_URL
+        try:
+            r.set_api_base_url('http://127.0.0.1:11435')
+            self.assertEqual(r.API_BASE_URL,'http://127.0.0.1:11435')
+            for url in ('http://example.org:11434','http://127.0.0.1:8090','http://user:secret@127.0.0.1:11435','http://127.0.0.1:11435/v1'):
+                with self.assertRaises(ValueError):r.set_api_base_url(url)
+        finally:r.set_api_base_url(previous)
+
     def test_checkpoint_models_have_distinct_names_and_cannot_replace_original(self):
         names={candidate_name(v) for v in ('base','main','v2-step24','v2-step48')}
         self.assertEqual(len(names),4);self.assertNotIn('qwen3.6:35b',names)

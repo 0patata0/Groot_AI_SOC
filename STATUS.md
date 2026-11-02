@@ -1,6 +1,6 @@
-# 인프라 현황 — 2026-11-03 03:50 KST
+# 인프라 현황 — 2026-11-03 05:16 KST
 
-현재 상태와 활성 과제를 요약한다. [WAF 연동 전 기록](archive/STATUS-20261102-before-waf-evidence.md) · [11/2 정책 전환 전 기록](archive/STATUS-20261102-before-native-containment.md) · [11/1 이전 현황](archive/STATUS-history-20261101.md) · [계획](PLAN.md). [이번 배포·시험 원장](infra/mcp/containment-policy-20261102.json). 시각은 KST이며 관측 범위와 미완료를 구분한다.
+현재 상태와 활성 과제를 요약한다. [이번 후보 준비 전 기록](archive/STATUS-20261103-before-operator-candidate.md) · [WAF 연동 전 기록](archive/STATUS-20261102-before-waf-evidence.md) · [11/2 정책 전환 전 기록](archive/STATUS-20261102-before-native-containment.md) · [11/1 이전 현황](archive/STATUS-history-20261101.md) · [계획](PLAN.md). [이번 배포·시험 원장](infra/mcp/containment-policy-20261102.json). 시각은 KST이며 관측 범위와 미완료를 구분한다.
 
 ## 현재 운영 정책과 검증
 
@@ -48,17 +48,17 @@
 
 [구조·제한·복구](infra/mcp/waf-containment.md) · [작은 원장](infra/mcp/waf-containment-20261102.json). 단순403·스캐너/프로토콜·출처 미확인 로그만으로 IP를 차단하지 않는다. root 복구본은 유지한다.
 
-## DGX 학습 — 본학습·최종 평가 완료
+## 본학습 완료·Thor 새 후보 비교
 
-| 항목 | 실제 확인 | 남은 조건 |
+| 항목 | 실제 확인 | 한계·다음 작업 |
 |---|---|---|
-| 본학습 | **4,348/4,348단계·1epoch 완료**,11/2 21:09:48 progress·21:09:51 controller completed | 같은 Qwen3.6-35B-A3B·train8,695건. 모델 성능 향상 판정과 구분 |
-| 최종 평가 | 고정 validation176건·`eval_loss=0.31751391291618347`,393.726초.03:50 현재 파일/기록 대조 | 테스트176건의 독립 SOC 품질 점수는 아직 측정하지 않음. 손실을 정확도 점수로 환산하지 않음 |
-| 계보·가중치 | 원본/현재 source·data각54파일·동일 학습수학·원controlSHA 유지. 최종 adapter7파일·run_manifest SHA를03:50 직접 재검사해21:09 완료 영수증과 일치 | 가중치 다운로드/커밋/Git LFS0. 최종 adapter약65MB는DGX 승인 경로에 유지 |
-| 종료 | 학습 MainPID0·Resultsuccess·inactive·자기컨테이너0. follow completed/finished_early_without_waiting_for_deadline | 원래21:45 상한을 기다리지 않고 종료. 진행률 정기 조회 대상은 종료 |
-| 운영 | Thor와 두 봇은 기존 원본35B 유지 | 미사용 SOC 평가·중요누락/승인/허위성공/도구·지연 비교, 변환·Thor 후보 적재·복구 검증 뒤 교체 판단 |
+| 본학습 | 4,348/4,348단계·train8,695·validation176·eval_loss0.31751391291618347,11/2 21:09 완료.11/3 03:50 adapter7파일/원장SHA 재확인 | loss는 독립 관제 정확도 점수가 아님. 과거224step 후보와 구분 |
+| DGX 내보내기 | 05:10:02 CPU2/메모리24GiB 병합·Q4_K_M 완료.380finite/190LoRA쌍·1,045텐서 대조/855보존/MTP19보존 | 같은 고정 HF base와 llama.cpp. 기존 학습/공유 서비스 변경0 |
+| Thor 반입·등록 | 21,713,462,816B의 전체SHA 일치.변경분793,378,816B·87.25초.05:13:54 별도 loopback11435에 `soc-qwen36:35b-operator-q4km-20261103` 등록·출처17고지SHA·기존 모델digest 보존 | 원본 서비스11434/PID/선택 유지. HF서식은원본과다르므로 동일HF미학습 대조군도 비교. 아직운영API후보등록과두봇전환없음 |
+| 실제 GPU | context262144·전체GPU·응답22.49초 확인.적재후64GiB를계속요구한기존검사로첫receipt실패,적재전64/적재완료후32GiB로분리하고기존GPU모델재사용검증05:16 ready | 원본별도인스턴스coldload90초시간초과/NVIDIA0x51도보존.0.261초재검증을coldload개선/드라이버수정으로표시하지않음.실패자동재시도/원본강제해제0 |
+| 동일 조건 비교 | 새읽기7질문+격리판단12문항·같은운영Ollama하네스·읽기권한으로3군비교시작 | 정답은로컬만,보호쓰기/공격/실제MattermostE2E0.현재새학습본부터측정중,점수/승격판정아직없음 |
 
-Git 승인 대기 동안 Codex가 매시간 조회한 것으로 표시하지 않는다. 완료 시각은 서버 기록이며03:49~03:50 현재 읽기·해시로 재확인했다. [완료·파일별SHA 원장](finetuning/OPERATOR_COMPLETION_20261103.json) · [실행 원장](finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json) · [자동 계승](finetuning/OPERATOR_FOLLOW_20261102.json).
+[본학습 완료 원장](finetuning/OPERATOR_COMPLETION_20261103.json) · [반입·적재·비교 원장](finetuning/OPERATOR_CANDIDATE_20261103.json) · [실행·고정출처·복구](finetuning/DGX_CANDIDATE.md). 가중치는서버승인경로에만보존하고Mac/Git/GitLFS다운로드0. 신규 패키지 설치0,운영 모델선택0. 작업파일에만POSIX_FADV_DONTNEED를사용했으며전역캐시삭제/공유서비스재시작0.
 
 ## 시연·관제와 잔여 과제
 
@@ -67,7 +67,7 @@ Git 승인 대기 동안 Codex가 매시간 조회한 것으로 표시하지 않
 | 기존 Kali17스크립트 | 11/2 VM 내부 제한 실행·원본17SHA 유지. SQLi/명령삽입/외부리다이렉트 악용 재현, 인증401·CSRF 거절 등 분리 | Nuclei템플릿 경로/표본0/로그인 오판·BlindSQLi·전체스캔 미완료. Log4Shell RCE 미시험 |
 | 과거 실차단 | 12:49 LLM/MCP→A233 DROP, 승인KEEP 기한 후13:50 만료·재접속/13:51 임시 실행기 정리 | 새 Native/On 정책의 실제 차단·카드·만료와 별도 결과 |
 | 반복 복구 알림 | 13:47 A/B에 진단 ID 중복 집계 방지·독립2실패/2성공·오류 종류 보존 배포. 격리69씩·자연 주기 확인 | 장기 알림 빈도·Vector guard 지연/수집 중단 구간 전체 무손실 미검증 |
-| 모델·하네스 | 기존224step 후보와 원본 비교는 표본 작고 치명 오류가 남아 운영 교체 보류 | 본학습·최종validation완료. 다음은 미사용 평가, 누락/승인/허위성공/지연, 원본/학습본 × 기존/정리 하네스 비교·Thor 후보 검증 |
+| 모델·하네스 | 기존224step 후보와 원본 비교는 표본 작고 치명 오류가 남아 운영 교체 보류 | 새4348step 후보반입/등록/전체GPU확인.현재동일하네스3군비교중;누락/승인/허위성공/지연판정뒤하네스정리효과분리 |
 | 데이터 보관 | 전체 통합 원본1개+정제본1개 규칙/제외/문서 반영 | 기존 약7.7GB 일괄 압축 이전·전멤버 SHA/복원 검증 미실행. 진행 학습 입력 보존 |
 | 논문·발표 | 기존 출처·실험 근거 보존.11/3 교수 시연 준비,12/1 최종 목표 활성 | 논문 초안 구성도·독립 평가·실전 검증 근거/한계 현행화. **발표 작성은11월둘째주 리마인더 이후** |
 
@@ -78,6 +78,8 @@ Google Harness² 운영 연동/전후 비교, SSL VPN·모바일 푸시, GPU 드
 Kali 시험 실행기는710초 제한으로 종료됐고,16:45 카드 승인 해제 후 SSH 재접속·임시worker.py/log/pid 제거·원본17SHA 불변을 확인했다. probe79행과 원본SHA만 보존한다. Mac에는 패키지를 설치/다운로드하지 않았다.
 
 ## Git 반영
+
+이번후보프로필·고정loopback선택·적재전/후메모리검사와문서는로컬/Thor반영·finetuning804중801PASS/3환경skip·설치controller46PASS다.새서버전체설치는미시험이며커밋·푸시를진행한다.아래게시확인은이전작업이다.
 
 WAF 원본·전용 프록시·자동조사 보완과11/2 19:09 학습 관측은 `9579cfbc`로 커밋·푸시했고11/3 03:49:03 원격main 일치를 확인했다. 본학습 완료·최종 파일SHA와후속보고시간초과 기록은 `28160334`로 후속 커밋·푸시했고11/3 03:53:42 원격main 일치를 확인했다. 이 게시 확인 문구도 마지막 문서 커밋에 반영한다. 다른 작업의 topology5파일은 기존 stage를 보존했다. 가중치·데이터·자격·대화/검증·업무분담·발표/논문 자료는 Git 제외다.
 

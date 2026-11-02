@@ -1,6 +1,25 @@
 # DGX 학습본의 Thor 후보 내보내기
 
-2026-11-01 완료된447건/224step·validation176 학습본을 별도 Ollama 모델로 준비한다. 모델명은 `soc-qwen36:35b-dgx-guide-q4km-20261101`이다. 이 이름의 등록은 두 봇의 운영 모델 선택을 바꾸지 않는다. 현재 진행/검증/Git은 [STATUS](../STATUS.md)가 기준이다.
+현재 후보는 8,695건/4,348step·validation176을 완료한 `soc-qwen36:35b-operator-q4km-20261103`이다. 11/3 CPU 병합·변환과 Thor 별도 등록·전체 GPU 적재를 확인했고 동일 하네스 비교를 진행한다. [현행 원장](OPERATOR_CANDIDATE_20261103.json) · [STATUS](../STATUS.md). 등록·적재·품질 합격·두 봇의 운영 선택을 구분한다.
+
+과거 11/1의447건/224step 후보는 `soc-qwen36:35b-dgx-guide-q4km-20261101`이며 산출물과 당시 실패·점수를 보존한다. 아래 날짜가 있는 11/1 수치는 이번 본학습 결과가 아니다.
+
+## 새 후보 프로필과 별도 Ollama
+
+새 root의 `candidate-profile.json`은 정확한 `schema: 1`, `model`, `adapter_sha256`, `run_manifest_sha256`, `source_notices` 키를 갖는다. 모델 이름은 별도 `soc-qwen36:35b-...` 범위이며 운영 이름을 쓸 수 없다. `source_notices`는 고지 파일명→SHA256 사전이다. 이번에는 실제 학습의17개 고지를 모두 고정한다. profile SHA→완료 학습/adapter/run manifest→변환 receipt→등록 blob을 연결하고 어느 단계가 달라도 거절한다. 프로필이 없는 과거 root는 기존 이름과8개 고지 검증을 유지한다.
+
+기본 API는 기존 `http://127.0.0.1:11434`다. 작업자가 준비한 격리 Ollama를 사용할 때만 register/preflight/warmup에 `--api-base-url http://127.0.0.1:11435`를 지정할 수 있다. 외부 주소·다른 포트·사용자정보·URL 경로는 허용하지 않는다. 기존 설치 바이너리를 재사용하며 패키지·이미지 추가가 없다. 별도 loopback fixture 생성은 서버 초기 설치나 운영 서비스 전환이 아니다.
+
+```sh
+bash SOURCE/deploy.sh --model-candidate --phase register \
+  --root CANDIDATE_ROOT --api-base-url http://127.0.0.1:11435
+bash SOURCE/deploy.sh --model-candidate --phase warmup \
+  --root CANDIDATE_ROOT --api-base-url http://127.0.0.1:11435
+```
+
+11/3 Thor의 새 root는 `~/Capstone_Groot_training/operator-candidate-20261103-r1`다. 임시 loopback 서비스는 private model store와2시간 상한·단일 적재를 사용한다. 기존 모델/승인/봇 설정을 유지한다. 동일 파일시스템에서 기존 검증 blob을 hardlink로 읽기 재사용하되 전송 출력은 **별도 inode**에만 쓴다. 새 후보는 전체 SHA 검증 후 최종 blob과 export 경로를 hardlink하여 디스크 중복을 피한다. 주 서비스에 후보를 별도로 등록했는지는 현행 원장을 확인한다.
+
+원본·동일 HF 미학습·학습본을 같은 하네스/권한/새 질문으로 비교해 서식/변환 효과와 학습 효과를 분리한다. 실제 MCP 읽기와 격리 판단을 나누고 보호 쓰기·공격·Mattermost E2E를 대신했다고 표시하지 않는다. 정답은 로컬에만 보존한다. 중요 누락·허위 정상/실행·승인 위반은 별도 치명 오류로 집계한다.
 
 ## 실행 순서와 입력
 
@@ -12,7 +31,7 @@
 | `--phase merge` | 같은 검사 후 CPU BF16 병합.190대상만 변경,전체1,045텐서 재대조·나머지855/MTP19 보존.출처 고지와 training-verification 기록 |
 | `--phase convert` | 고정 공식 llama.cpp·CPU quantizer 검사,모든 병합 파일 SHA 재확인 후 BF16 GGUF→Q4_K_M.비전 projector 재사용·Qwen35MoE/MTP metadata 검사 |
 | `--phase register` | Thor loopback Ollama에 새 태그만 생성.훈련receipt→변환adapter/receipt SHA→text/projector blob SHA 검증·기존 모델 digest 유지·runtime/템플릿/출처 고지 대조 |
-| `--phase preflight` | Thor에서 모델 digest·다른 모델 적재 여부·사용 가능 메모리64GiB 검사. GPU 할당 요청 없이 기록 |
+| `--phase preflight` | Thor에서 모델 digest·다른 모델 적재 여부·사용 가능 메모리 검사. 적재 전64GiB, 정확한 후보가 전체GPU/context262144로 이미 적재된 경우32GiB 잔여 여유. GPU 할당 요청 없이 기록 |
 | `--phase warmup` | 같은 검사/직전 재검사 후90초 단일 예열. 실제 응답/전체GPU/context262144 확인,실패 시 자동 재시도·운영전환 없음 |
 
 학습의 base 경로는 `/workspace/base`다. 검증된 기존 NVIDIA ARM64 환경/venv를 `/workspace/venv`,원본 base를 `/workspace/base`,학습 출력은 `/input`,자료는 `/data`에 **읽기 전용**으로 연결한다. 새 후보 workspace만 쓰기 가능하게 둔다. 기존 학습 출력/원래 모델 경로를 덮어쓰지 않는다.
@@ -59,7 +78,7 @@ bash SOURCE/deploy.sh --model-candidate --phase preflight --root CANDIDATE_ROOT
 bash SOURCE/deploy.sh --model-candidate --phase warmup --root CANDIDATE_ROOT
 ```
 
-두 명령은 **Thor 호스트**에서 실행한다. Linux `/proc/meminfo`와 loopback Ollama를 읽고 `inference-readiness/`에 KST 영수증을 남긴다. 다른 모델이 올라와 있으면 이를 내리지 않고 exit2/blocked로 종료한다. 등록 당시 원본/후보 digest가 바뀌거나 MemAvailable64GiB 미만도 차단한다. 64GiB는 이35B 후보의 보수적 시작 조건이며 NVIDIA 할당 성공을 보장하지 않는다. 같은 진입점의 동시 실행은 파일 lock으로 제한하고 할당 직전/이후도 재확인한다. 외부 클라이언트가 Ollama에 직접 요청하는 경쟁은 전역 차단할 수 없다.
+두 명령은 **Thor 호스트**에서 실행한다. Linux `/proc/meminfo`와 loopback Ollama를 읽고 `inference-readiness/`에 KST 영수증을 남긴다. 다른 모델이 올라와 있으면 이를 내리지 않고 exit2/blocked로 종료한다. 등록 당시 원본/후보 digest가 바뀌면 차단한다. 적재 전 MemAvailable64GiB, 정확한 digest·전체GPU·context262144가 확인된 후보는 적재 후32GiB 잔여 여유를 적용한다. 64GiB는 이35B 후보의 보수적 시작 조건이며 NVIDIA 할당 성공을 보장하지 않는다. 적재가 소비한 메모리를 두 번 요구하지 않는다.32GiB도 이번 운영 검증의 보수적 잔여 기준이지 모든 부하의 안전 보증은 아니다. 같은 진입점의 동시 실행은 파일 lock으로 제한하고 할당 직전/이후도 재확인한다. 외부 클라이언트가 Ollama에 직접 요청하는 경쟁은 전역 차단할 수 없다.
 
 허용됐을 때만 최대90초의 단일 API 예열을 실행한다. 응답완료·비어 있지 않은 답·동일digest/context262144·전체GPU 배치가 확인돼야 `ready`다. 여기서90초는 클라이언트 요청 제한으로 커널/서버의 할당 작업이 반드시 끝난다는 보증은 아니다. 실패·미확인에 자동 재시도/운영 승격을 하지 않는다. 실제 모델 선택과 보호 권한은 바꾸지 않는다. 이번에는 원본이 계속 서비스 중이므로 새guard의 성공경로를 위해 원본을 강제로 내리지 않았고 실제 `warmup`의 POST0 거절과 Thor12검사를 확인했다.
 
@@ -78,3 +97,5 @@ Thor root는 `~/Capstone_Groot_training/dgx-candidate-20261101-r1`다. 후보sou
 11/1 10:56 CPU 검사에서380 finite 텐서/190LoRA쌍을 확인했고10:59:32 병합의1,045텐서 대조/855보존을 완료했다.11:00:31 DGX의 실제 작은 CPU 양자화가 통과했다. 공식 source/quantizer/projector 전송과해시 대조도 완료했다. 11:19:07 CPU 변환까지 정상 완료했고 text753/projector334텐서·MTP/전체SHA를 확인했다. 최종Q4 21,713,462,816B의 SHA256은 `e3715090637654d989034d7d7ae699de270d0a1f44a4da6c67b5e53ccbc14f34`다. 11:27:46 Thor 별도 등록도 완료했다. 등록 digest는 `49e72cd8ce10047876ecc1e3ee3a42745d4198c95f431d1503fa48ef79b428cb`이며 기존 모델은 유지했다. 이후 실제추론/품질의 최신 결과는 [STATUS](../STATUS.md)를 따른다.
 
 병합은 PEFT0.18.1의 CPU safe_merge BF16 반올림 순서를 유지하는 기존 검증 구현을 사용한다. Ollama의 [GGUF 반입 절차](https://docs.ollama.com/import)와 [create API](https://docs.ollama.com/api/create)를 확인했고,현행 Thor0.40.2의 runtime/template/blob 동작은 실제 등록 후 대조한다. 온라인 최신 문서가 설치 버전의 모든 기능을 보장한다고 간주하지 않는다.
+
+11/3 원본 별도 인스턴스의90초coldload는NVIDIA0x51로실패했다.작업파일캐시반환후새후보는22.49초응답/전체GPU에성공했지만기존사후64GiB검사로실패표시됐다.검사를수정한뒤이미GPU에올라간동일후보의명시적재검증은0.261초ready였다.첫실패기록을보존하며이수치를coldload단축이나드라이버근본해결로해석하지않는다. 전역캐시삭제/공유서비스재시작/원본강제해제는하지않았다.

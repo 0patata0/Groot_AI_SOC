@@ -10,6 +10,36 @@ import candidate_model as c
 
 
 class CandidateTests(unittest.TestCase):
+    def test_full_run_profile_binds_new_name_adapter_manifest_and_all_licenses(self):
+        from register_soc import candidate_name
+        notices=self.root/'source-notices';notices.mkdir()
+        names={'MICROSOFT-MIT.txt','SOURCE_NOTICE.txt'}
+        for name in names:(notices/name).write_text('verified source license '+name)
+        selected={name:c.digest(notices/name) for name in names}
+        profile={'schema':1,'model':'soc-qwen36:35b-operator-q4km-20261103',
+                 'adapter_sha256':'a'*64,'run_manifest_sha256':'b'*64,'source_notices':selected}
+        self.put(self.root/'candidate-profile.json',profile)
+        receipt={'status':'verified','finite_tensors':380,'lora_pairs':190,'automatic_promotion':False,
+                 'model':profile['model'],'adapter_sha256':'a'*64,'run_manifest_sha256':'b'*64,
+                 'candidate_profile_sha256':c.digest(self.root/'candidate-profile.json'),'source_notices':selected}
+        self.put(self.root/'training-verification.json',receipt)
+        self.assertEqual(candidate_name('dgx-guide',self.root),profile['model'])
+        self.assertIn('MICROSOFT-MIT.txt',c.source_notice(self.root))
+        self.assertEqual(c.MODEL,'soc-qwen36:35b-dgx-guide-q4km-20261101')
+        profile['adapter_sha256']='c'*64;self.put(self.root/'candidate-profile.json',profile)
+        with self.assertRaises(ValueError):c.verified_receipt(self.root)
+
+    def test_candidate_profile_cannot_select_production_or_drop_bound_notices(self):
+        profile={'schema':1,'model':'qwen3.6:35b','adapter_sha256':'a'*64,'run_manifest_sha256':'b'*64,
+                 'source_notices':{'SOURCE_NOTICE.txt':'c'*64}}
+        self.put(self.root/'candidate-profile.json',profile)
+        with self.assertRaises(ValueError):c.model_name(self.root)
+        profile['model']='soc-qwen36:35b-operator-20261103';profile['source_notices']={'../escape.txt':'c'*64}
+        self.put(self.root/'candidate-profile.json',profile)
+        with self.assertRaises(ValueError):c.model_name(self.root)
+        (self.root/'candidate-profile.json').unlink();(self.root/'candidate-profile.json').symlink_to(self.root/'missing')
+        with self.assertRaises(ValueError):c.model_name(self.root)
+
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name);self.output=self.root/'main';self.output.mkdir()
@@ -94,6 +124,26 @@ class ReadinessTests(unittest.TestCase):
     def test_low_margin_blocks_and_preflight_never_allocates(self):
         self.memory=63*1024**3;self.assertEqual(self.run_gate()['status'],'blocked')
         self.memory=96*1024**3;self.assertEqual(self.run_gate(False)['status'],'preflight_passed')
+        self.assertEqual(self.posts,[])
+
+    def test_realistic_postload_memory_drop_uses_separate_reserve(self):
+        result=c.readiness(self.root,warm=True,api_fn=self.api,
+                          memory_fn=lambda:{'MemAvailable':(45 if self.posts else 80)*1024**3})
+        self.assertEqual(result['status'],'ready')
+        self.assertEqual(result['admission']['minimum_available_bytes'],64*1024**3)
+        self.assertEqual(result['after']['minimum_available_bytes'],32*1024**3)
+        self.memory=31*1024**3
+        self.assertEqual(self.run_gate(False)['status'],'blocked')
+        self.assertEqual(len(self.posts),1)
+
+    def test_loaded_reserve_requires_exact_digest_full_gpu_and_context(self):
+        self.loaded=[{'name':c.MODEL,'digest':'candidate','size':100,'size_vram':100,'context_length':262144}]
+        self.memory=45*1024**3
+        self.assertEqual(self.run_gate(False)['status'],'preflight_passed')
+        for field,value in [('digest','changed'),('size_vram',50),('context_length',32768)]:
+            original=self.loaded[0][field];self.loaded[0][field]=value
+            self.assertEqual(self.run_gate(False)['status'],'blocked')
+            self.loaded[0][field]=original
         self.assertEqual(self.posts,[])
 
     def test_changed_registered_digest_blocks(self):

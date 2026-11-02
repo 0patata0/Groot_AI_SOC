@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "observed_at_kst": "2026-11-03T05:16:35+09:00",
+  "model": "soc-qwen36:35b-operator-q4km-20261103",
+  "training_completion": "OPERATOR_COMPLETION_20261103.json",
+  "adapter_sha256": "5d3b15dbe7caee11ef2aa08d757afd91f14c08769317cbd3350491f0938179e4",
+  "run_manifest_sha256": "0178aac1309d6b5a185c9a09ce38bdf5190ade2d58ed25efccd7036fdf1dc6c1",
+  "candidate_profile_sha256": "effb95fa66b5ebcee24ff651fd4bc7aa352b5795e8ccb9d27a8a7685edb61f3d",
+  "source_notices": {
+    "AIT_NOTICE.txt": "cd809e61c6b73666a0090f0393e1dc535d1a91e400e1a20b51f20ab0f274c5c3",
+    "CDLA-Permissive-2.0.txt": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868",
+    "EXCYTIN-DATA-CARD.md": "44fb9ab9c369127ff4c78136e183635ba99691a74fc5b6724a7423e32ca05f89",
+    "EXCYTIN-TRANSPARENCY.md": "9dc28468f2add3ab4462a50d482dfa543ef01ba102bfb982b024d53d932c007d",
+    "GUIDE_LICENSE.txt": "4531a67d443284d93ffed0803df5b10634aff21c3d77e381f2d48af01d875868",
+    "LINUX_APT_NOTICE.txt": "cf52b6569f3c9991950171b2b544166951210ed7456f9afb1acb93e82d2dce1f",
+    "MICROSOFT-MIT.txt": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+    "MICROSOFT-NOTICE.md": "bd6d55721d205d23d45b4a2239d1d82bca48648323a285c10ade20ef4d79c52b",
+    "MITRE-ATTACK-LICENSE.txt": "738144f7fb054722a4ef9d3367c51710341dc12fc574c6ac3a41daaaecd8bf5e",
+    "REVIEWED_V4_AIT_NOTICE.txt": "cd809e61c6b73666a0090f0393e1dc535d1a91e400e1a20b51f20ab0f274c5c3",
+    "REVIEWED_V4_SOURCE_NOTICE.txt": "a10754ebb5ae49ab3e680a59719d525e184e2e2f2adb62c496ca5b52b6c8bf60",
+    "SOURCE_NOTICE.txt": "0c1529b73140e19c8e113919e06ad722905547a569da2a8af1fa368c8b7f070e",
+    "V5_SOURCE_ATTRIBUTION.json": "ab001ce661b6838e5faf257cb451f4407ada53887a96824e2db6df210f919816",
+    "cisa_counter-LICENSE.txt": "ffdbbbb6c604414ae2bf524f42489e62d23a5515099f83c336674c16c1efc1df",
+    "crs-LICENSE.txt": "676a192d3fc5205a288934ee02c5f934b782b91604a4b93589ba64520a4fec13",
+    "splunk_attack-LICENSE.txt": "8505946b2464fa90223996d99eecbc7639a86648ca071f0cac21695be2623a0a",
+    "wazuh-LICENSE.txt": "9136fd9ef577a45b1bcea8c8cd761e8c9c21e15cc2a09e7c139755e581bde00e"
+  },
+  "export": {
+    "root": "~/Capstone_Groot_training/dgx-operator-export-20261103-r1",
+    "completed_at_kst": "2026-11-03T05:10:02.517936+09:00",
+    "device": "CPU",
+    "cpus": 2,
+    "memory_gib": 24,
+    "llama_cpp_revision": "276378515ceebee5d14bcc8536603dd5c87491a2",
+    "artifacts": [
+      {
+        "path": "qwen36-soc-bf16.gguf",
+        "bytes": 71066994528,
+        "sha256": "0c42a158ad71e186478426bd8564d4c60e79adf2185a964f6fd1d207381d84c7"
+      },
+      {
+        "path": "qwen36-soc-q4_k_m.gguf",
+        "bytes": 21713462816,
+        "sha256": "18f955eb8d7b614cbed8e8ce69b0a079a3f068fe73bf84373c0884eafff4be5b"
+      },
+      {
+        "path": "mmproj-qwen36-soc-f16.gguf",
+        "bytes": 899283200,
+        "sha256": "daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1"
+      }
+    ],
+    "merged_tensors": 1045,
+    "changed_targets": 190,
+    "preserved_tensors": 855,
+    "preserved_mtp_tensors": 19
+  },
+  "thor": {
+    "root": "~/Capstone_Groot_training/operator-candidate-20261103-r1",
+    "ollama_version": "0.40.2",
+    "isolated_api": "http://127.0.0.1:11435",
+    "registration_at_kst": "2026-11-03T05:13:54.411886+09:00",
+    "digest": "5bfc2d9d3f245df44041db799cc24c32e09fd85af6fbf856a8aa109ddcbb90af",
+    "original_digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+    "files": {
+      "qwen36-soc-q4_k_m.gguf": "sha256:18f955eb8d7b614cbed8e8ce69b0a079a3f068fe73bf84373c0884eafff4be5b",
+      "mmproj-qwen36-soc-f16.gguf": "sha256:daa33f8da67ddd23c452a2016c4900ff186315bceb4a95d8f99da41ad29f32a1"
+    },
+    "runtime_options_match_original": true,
+    "chat_template_matches_hf": true,
+    "chat_template_matches_original": false,
+    "registered_only_in_isolated_store": true,
+    "full_transfer_sha_verified": true,
+    "literal_transfer_bytes": 793378816,
+    "matched_transfer_bytes": 20920084000,
+    "transfer_seconds": 87.24584970111027,
+    "gpu_readiness": {
+      "status": "ready",
+      "seconds": 0.2614569109864533,
+      "context_length": 262144,
+      "all_gpu": true,
+      "available_bytes": 47470776320,
+      "minimum_before_bytes": 68719476736,
+      "minimum_after_bytes": 34359738368
+    }
+  },
+  "failures_preserved": [
+    {
+      "stage": "original_isolated_cold_load",
+      "result": "90s timeout; NVIDIA NV_ERR_NO_MEMORY 0x51; primary stayed loaded"
+    },
+    {
+      "stage": "candidate_first_readiness",
+      "result": "GPU load/response completed in 22.49s; former postload 64GiB margin rejected actual 44GiB remaining"
+    },
+    {
+      "stage": "controlled_loaded_verification",
+      "result": "32GiB loaded reserve; reused exact GPU-resident candidate; ready 0.261s; not a cold-load latency improvement or driver fix"
+    }
+  ],
+  "comparison": {
+    "status": "running",
+    "arms": [
+      "qwen3.6:35b",
+      "soc-qwen36:35b-base-q4km-20261027",
+      "soc-qwen36:35b-operator-q4km-20261103"
+    ],
+    "read_cases_per_arm": 7,
+    "judgment_cases_per_arm": 12,
+    "harness": "current production Ollama harness, unchanged",
+    "new_questions": true,
+    "gold_sent_to_inference": false,
+    "protected_write_dispatch": false,
+    "mattermost_e2e": false,
+    "quality_passed": false
+  },
+  "production_model_changed": false,
+  "automatic_promotion": false,
+  "mac_weights_downloaded": false,
+  "git_weights_allowed": false,
+  "verification": {
+    "finetuning_tests": {
+      "total": 804,
+      "passed": 801,
+      "environment_skipped": 3
+    },
+    "deployment_controller_tests": {
+      "total": 46,
+      "passed": 46
+    },
+    "new_server_full_install": false
+  }
+}

@@ -7,16 +7,25 @@
 | 항목 | 현재 확인 | 한계·다음 확인 |
 |---|---|---|
 | WAF | **15:28:35 SecRuleEngine On 반영**, 같은 컨테이너·bind inode 유지, nginx 검사/reload·일반 DVWA302/Log4Shell308 | 15:46:59 Kali 단일 공격403·is_interrupted=true·engine=Enabled·941100/949110 확인. 기존 Env DetectionOnly는 기동 당시 값이며 고정된 후순위 include가On을 지정. compose/초기 설치 기본값도On |
-| IDS→FW | 지정100110/level9·severity1 Native AR가 실제 flow_id/SID를 대조하고 공통 임시차단 호출하도록 A 배포 | LLM 대기 없는 선차단은11/2 명시 승인 예외. 전체 IDS 경보·일반 Wazuh 경보를 대상에 포함하지 않음. Wazuh flow_id 소수점0 문자열과 고정 프로그램 상대 경로 호환을 수정·15:53 반영. **15:53:31 Native 실제 차단·카드 게시 성공**, 관리자 유지 승인15:53:50·결정1회소비·실제FW 80/443 DROP·유지 결과 게시 확인. 16:53:50 만료 예정이며 이번 요청 만료는 미검증 |
+| IDS→FW | 지정100110/level9·severity1 Native AR가 실제 flow_id/SID를 대조하고 공통 임시차단 호출하도록 A 배포 | LLM 대기 없는 선차단은11/2 명시 승인 예외. 전체 IDS 경보·일반 Wazuh 경보를 대상에 포함하지 않음. Wazuh flow_id 소수점0 문자열과 고정 프로그램 상대 경로 호환을 수정·15:53 반영. **15:53:31 Native 실제 차단·카드 게시 성공**, 관리자 유지 승인15:53:50·결정1회소비·실제FW 80/443 DROP·유지 결과 게시 확인. 이후16:44 별도 unblock 카드 승인으로 조기 해제·16:45 커널 부재/원기록released 확인. 이번 요청의 자연 만료 시험과 구분 |
 | 공통 임시차단 | 최근5분 양방향 ingress TCP 공격 흐름1개·severity1/2·공격 분류·보호 주소·소유권 검증 | 모델측 추가 선조회·3흐름 조건 제거. WAF 원본 경보만으로 FW IP 임시차단하는 기능은 미구현 |
 | 유지·해제 | 최초10분, **기존 관리자 카드**의 유지 승인 시 결정 시각부터60분, 카드 해제 승인 또는 만료. 중복 호출/채팅/봇 합의로 연장하지 않음 | 차단 기한 종료 후 재차단 대기60초. 이전 기록도 같은 간격을 적용하되 과거 서명 계획은 덮어쓰지 않음 |
 | 내부망·실습 | 내부 IP·승인 실습이라는 사실로 자동 면제하지 않음. Kali233은 보호 목록에 추가하지 않음 | 명시적 관리·서비스 보호 주소와 일반 sudo/Docker 위임 금지 유지 |
-| 두 봇 | 공통 단문 차단 목록 조회와 실제 영수증 표시 보완. **15:46 B1.19.8/계약1.5.13 배포 검증 완료** | 현재 처리 중 요청이 끝난 뒤 독립 배포·복구 타이머 사용. 실제 Mattermost 새 게시/UI 왕복은 별도 |
+| 두 봇 | 공통 단문 차단 목록 조회와 실제 영수증 표시 보완. **16:29:43 B1.19.9/계약1.5.13 배포·연결 검증 완료** | 현재 처리 중 요청이 끝난 뒤 독립 배포·복구 타이머 사용. 실제 Mattermost 새 게시/UI 왕복은 별도 |
 | DVWA 접속 장애 | **15:43:02 C의 주입된 무기한 ping만TERM 종료**, PHP 세션 잠금 해제·Apache master 유지 | Kali HTTP302/login200·IP차단0 확인. 사용자 기존 로그인 세션의 잠금0 확인. 브라우저 재접속은 이후 명시 KEEP 차단과 구분. HTTPS는 vhost 미등록/자체서명 기본서버로 별도 미지원 |
 
 검사: MCP495PASS·Ollama163PASS·Hermes380 중378PASS/2환경skip·설치36+16+1PASS. B 격리431PASS·A 격리434PASS와 임시 검사본 제거를 확인했다. 정적/격리 검사는 실제 공격·새 서버 전체 설치를 대신하지 않는다. A root 복구본과 SHA/CAS·독립 복구 타이머를 보존했다. 추가 패키지·이미지·포트·키0. 설치는 기존 루트 `deploy.sh` 경로에 같은 소스를 반영한다.
 
 [차단/카드 기준](infra/mcp/approved-operations.md) · [Native 경계](infra/mcp/native-containment-ar.md) · [공통 하네스](infra/hermes/chat-harness.md) · [보고 근거 검사](infra/hermes/event-report-grounding.md).
+
+## review 차단 해제 — 현재 작업 마무리
+
+기존 `unblock_ip`에는 카드 승인/일회 소비/해제가 이미 구현돼 있었으나 Hermes review lead의 관리 실행 경로에서 제외돼 있었다. 별도 비동기 해제 MCP 추가안은 사용자 지시로 철회했고 배포하지 않았다. **기존 도구만** lead에 노출하고 자동 관리·peer/verify는 계속 차단한다. Ollama의 기존 직접 태그 lead 권한은 유지한다.
+
+- B12파일 root복구본/CAS·독립복구타이머·유휴확인 후16:29:43 반영, 두 봇 인증 heartbeat·공동채널·파일SHA 확인. 승인 브로커 소스/서비스는 변경하지 않았다.
+- 관리179PASS·root해제 소유권4PASS·Response 승인7PASS·MCP495PASS·review37PASS·native380 중378PASS/2skip·Ollama163PASS·설치36PASS·독립 source bundle1PASS. 실제 `UNBLOCKED` 텍스트 처리와 이후 IP 부재 재조회가 없으면 완료 금지 경계를 추가했다.
+- 기존600초 카드 대기를 실행기가 먼저 끊지 않도록 review lead 한도만 정렬했다. MCP/API/패키지/포트/모델 추가0.
+- 기존 사용자의 review 해제 요청으로 실제 list_blocks→unblock_ip→기존 해제 카드 게시·승인/일회소비를 확인했다. 첫 실행은 root helper가 response: 이외의 contain: 소유권을 거절해 물리 해제 실패. A helper를16:40:51 기존 도구 승인 뒤 정확 parent ID/IP/기한/소유권을 대조해 해제하고 원기록을released로 갱신하도록 수정했다. 알 수 없는 다른 소유권은 유지하며 일반 보호검사는 그대로다. 잘못된 보호주소 단정 대신 고정 reason_code를 반환한다. **최종판은 실제 list_blocks→unblock_ip→카드 승인/일회 소비→UNBLOCKED→list_blocks 성공**, 관리 실행completed로16:45:07 종료했다. A 커널0건·원기록released·Kali SSH 재접속을16:45 확인했다. 새 MCP/API·사용자 질문 게시·Codex 승인 클릭0.
 
 ## 조회와 응답 지연
 
@@ -35,7 +44,7 @@
 | 종료/예상 | r6 soft17:15/hard17:30 유지. 순수 잔여 약4.1시간/20:01 추정, follow 대기 반영 제안22:12:40 | 실제 다음 창 계승은 미검증. 완료 보장·운영 교체 아님 |
 | 저장 | checkpoint3548/11파일 완료 marker 관측, 전체 가중치 SHA 재검사는 이번 조회에서 생략 | 마지막 전체 SHA 검사는10:56 checkpoint2500 |
 
-Codex 정기 조회·보고는1시간 간격이며 다음 **16:58 KST**다. follow 내부60초 주기·공유 추론 우선·정상 저장 후 ETA 계승·완료 즉시 종료는 기존 정책을 유지한다. 기존운영 `qwen3.6:35b` 유지, 새 본학습 자동 승격0. [실행 원장](finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json) · [자동 계승](finetuning/OPERATOR_FOLLOW_20261102.json) · [준비/복구](finetuning/OPERATOR_PREPARATION.md).
+Codex 정기 조회·보고는1시간 간격이며 다음 정기 시각은16:58 KST였으나 **현재 작업 마무리 후 사용자 요청으로 일시정지**하므로 재지시 전 정기 조회를 수행하지 않는다. follow 내부60초 주기·공유 추론 우선·정상 저장 후 ETA 계승·완료 즉시 종료는 기존 정책을 유지한다. 기존운영 `qwen3.6:35b` 유지, 새 본학습 자동 승격0. [실행 원장](finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json) · [자동 계승](finetuning/OPERATOR_FOLLOW_20261102.json) · [준비/복구](finetuning/OPERATOR_PREPARATION.md).
 
 ## 시연·관제와 잔여 과제
 
@@ -52,8 +61,10 @@ Codex 정기 조회·보고는1시간 간격이며 다음 **16:58 KST**다. foll
 
 Google Harness² 운영 연동/전후 비교, SSL VPN·모바일 푸시, GPU 드라이버 실패 근본원인/후보 장기 안정성, 새 서버 전체 설치는 기존 미완료·보류를 유지한다. 계정 잔여율1%시 중지 조건은 유지하나 현재 도구로 잔여율은 확인할 수 없다. 전체 목표는 완료되지 않았다.
 
-Kali 시험 실행기는710초 독립 제한이며 승인된 IP 차단 때문에15:57 A경유SSH 관찰이 거절됐다. 실행기 종료/서버 임시 소스 정리는 차단 만료 후 확인한다. 보호 예외·강제 해제로 우회하지 않는다. Mac에는 패키지를 설치/다운로드하지 않았다.
+Kali 시험 실행기는710초 제한으로 종료됐고,16:45 카드 승인 해제 후 SSH 재접속·임시worker.py/log/pid 제거·원본17SHA 불변을 확인했다. probe79행과 원본SHA만 보존한다. Mac에는 패키지를 설치/다운로드하지 않았다.
 
 ## Git 반영
+
+이번 기존 unblock_ip 연결·Native 소유 해제 보완의 운영 검증·문서 반영을 완료했다. 현재 작업의 커밋/푸시는 마지막 단계이며 아래 앞선 작업의 게시 확인과 구분한다.
 
 차단 정책·단문 조회·설치 경로·실제 검증·학습15:58 관측을 `32865ce`로 커밋·푸시했고16:01 KST 원격main 일치를 확인했다. 실제 게시 확인 시각은 로컬 검증 영수증을 따른다. 이 게시 확인 문구는 후속 문서 커밋으로 반영한다. 대화/검증·자격·업무분담·가중치·데이터·포스터는 제외한다. 다른 작업의 topology 생성물5개는 미추적 상태를 유지한다. 최종 SHA·원격 일치·작업 트리는 로컬 세션 기록과 최종 답변에 남긴다.

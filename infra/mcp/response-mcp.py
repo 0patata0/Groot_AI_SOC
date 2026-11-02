@@ -232,7 +232,7 @@ def firewall_rules(args):
 
 
 EXIT_MEANING = {0: "ok", 1: "agent_block internal (not root / fw sets missing / sudo denied)", 2: "invalid argument",
-                3: "rejected (protected IP or active SSH session)", 4: "firewall error", 124: "timeout"}
+                3: "rejected by fixed response policy (see reason_code)", 4: "firewall error", 124: "timeout"}
 
 
 def norm_reason(reason, default=""):

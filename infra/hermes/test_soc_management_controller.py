@@ -374,6 +374,38 @@ class ControllerTests(unittest.TestCase):
         self.result(verification)
         self.assertEqual(verification.finish(0)["state"], "completed")
 
+    def test_existing_unblock_receipt_requires_later_exact_absence(self):
+        for label, after, expected in (
+                ('absent', [], 'completed'),
+                ('present', ['192.168.16.233'], 'needs_review'),
+                ('no-read', None, 'needs_review')):
+            self.store.new_case('review-release-'+label)
+            trace = self.trace()
+            trace.case = dict(trace.case, review_response_write=True)
+            self.tool(trace, 'mcp__resp__unblock_ip', 'UNBLOCKED 192.168.16.233 (ok)',
+                      {'ip':'192.168.16.233','reason':'operator requested release'})
+            if after is not None:
+                self.tool(trace, 'mcp__resp__list_blocks', {'nftables':[{'set':{
+                    'family':'inet','table':'capstone_fw','name':'agent_block','type':'ipv4_addr','elem':after}}]})
+            self.result(trace)
+            self.assertFalse(trace.protocol_error)
+            self.assertEqual(trace.finish(0)['state'], expected)
+        self.assertEqual(m.response_block_ips({'blocks':[]}), set())
+        self.assertEqual(m.response_block_ips({'blocks':[{'elem':{'val':'192.168.16.233'}}]}), {'192.168.16.233'})
+        self.assertIsNone(m.response_block_ips({'nftables':[]}))
+        self.assertIsNone(m.response_block_ips({'nftables':[{'set':{
+            'family':'inet','table':'capstone_fw','name':'agent_block','type':'ipv4_addr','elem':['bad']}}]}))
+
+    def test_review_release_flag_is_bound_to_manage_lead(self):
+        case = {'mode':'manage','session_id':None,'chat_task':'lead','review_response_write':True}
+        self.assertIn('CAPSTONE_REVIEW_RESPONSE_WRITE=1', m.command_for(case))
+        self.assertIn('900s', m.command_for(case))
+        self.assertEqual(m.command_for(case)[m.command_for(case).index('--run-budget')+1], '840')
+        for change in ({'mode':'verify'}, {'chat_task':'peer'}, {'chat_task':None}):
+            with self.assertRaisesRegex(m.ControllerError,'review_response_write_invalid'):
+                m.command_for({**case,**change})
+        self.assertNotIn('CAPSTONE_REVIEW_RESPONSE_WRITE=1', m.command_for({**case,'review_response_write':False}))
+
     def test_fast_response_read_scope_is_out_of_band_and_readonly(self):
         case = {"mode":"verify", "session_id":None, "fast_readonly":True}
         for name in ("get_firewall_rules", "list_blocks"):

@@ -61,3 +61,8 @@ Town Square [운영 공지](https://chat.grootlab.duckdns.org/soc/pl/4qsrius8n7n
 설치는루트`deploy.sh`→`deployment/review_chat.py`의기존고정소스목록을사용한다. 오프라인반입은갱신프로젝트소스이며새패키지/포트/이미지없음. B10:00증분반영은`review_channel.py`/`review_channel_policy.py`2파일과receipt만변경했다. 복구원본은`/var/backups/capstone-review-followup-20261101-r1/manifest.json`,부분설치소스6파일은`/opt/capstone-automation/releases/review-followup-20261101-r1`이다. 유휴시manifest의소스/receipt를복원하고review서비스만재시작한다. 보조테이블은구버전이무시하므로DB/이력은복원하거나삭제하지않는다. 부분snapshot은신규서버전체설치bundle이아니다.
 
 34회귀검사와배포115검사,실설치2SHA/보호설정4SHA·queue0/poll정상,실제원질문2쌍격리재생을확인했다. 기존Ollama읽기worker의WAF상세실MCP1회9.646초/보호호출0·게시0을확인했다. 과거동일후속요청의Hermes209.82초와비교할수있지만새채팅전체왕복A/B측정은아니다. 이전글수정/실UI/새서버전체설치/E2E는미실시다. 개별룰을각행표로출력하는요청이summary로분류되는별도한계는[STATUS](../../STATUS.md)에남긴다.
+
+
+## review에서 차단 해제 요청 — 2026-11-02
+
+`192.168.16.233 IP 차단 해제해줘`처럼 요청하면 담당 lead가 현재 목록을 조회하고 기존 `unblock_ip`로 해제 승인 카드를 요청한다. `@ollama`로 직접 요청해도 같은 승인 도구를 사용하며, 자동 peer 교차 검토는 읽기 전용이다. 관리자 카드 승인 이후 해제와 목록 재조회가 끝나야 완료다. 별도 MCP를 추가하지 않았으며600초 승인 대기와 실행 한도를 맞췄다. 무응답/거부/실패를 해제 성공으로 보고하지 않는다. [현재 검증 범위](../../STATUS.md).

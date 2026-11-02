@@ -1,0 +1,75 @@
+{
+  "updated_at_kst": "2026-11-02T16:45:12+09:00",
+  "user_scope": "Use existing unblock_ip; no additional MCP/API",
+  "version": "1.19.9",
+  "new_mcp_tools": 0,
+  "new_packages": 0,
+  "review_lead_existing_unblock_enabled": true,
+  "automatic_management_and_peer_verify_unblock_allowed": false,
+  "existing_approval_required": true,
+  "existing_card_wait_seconds": 600,
+  "native_review_lead_bounds_seconds": {
+    "model_budget": 840,
+    "cli": 900,
+    "controller": 940,
+    "dispatcher": 980
+  },
+  "verification_requires_post_unblock_ip_absence": true,
+  "native_containment_release_requires_parent_id_ip_deadline_and_ownership": true,
+  "unknown_owner_preserved": true,
+  "first_real_test": {
+    "actual_reads": 1,
+    "actual_unblock_call": 1,
+    "card_created": true,
+    "card_consumed": true,
+    "physical_release": false,
+    "reason": "containment ownership was excluded by the previous Response helper"
+  },
+  "final_live_test_status": "completed",
+  "local_tests": {
+    "management": 179,
+    "review": 37,
+    "native_passed": 378,
+    "native_skipped": 2,
+    "ollama": 163,
+    "installer": 36,
+    "bundle": 1,
+    "response_approval": 7,
+    "owned_release": 4,
+    "mcp": 495
+  },
+  "deployment": {
+    "B_initial": "2026-11-02T16:29:43+09:00",
+    "A_final_helper": "2026-11-02T16:40:51+09:00",
+    "B_final_controller": "2026-11-02T16:40:52+09:00"
+  },
+  "source_sha256": {
+    "deployment/soc_agent_block.py": "dd7699105a4412e194c6f2359189cb098801d178af0f69983d653101035cb260",
+    "infra/mcp/response-mcp.py": "cffa1ac71cfcc9a2212be1f91e2d798d2b5d8b35c238dd609661616a79e98405",
+    "infra/hermes/soc_management_controller.py": "d356ace7de82debcc511c12d3638262f114abbf6c74bcacb2811c61fc8173db4",
+    "infra/hermes/soc_management_run.py": "81ed6d404ab4d348240cc56cfc482d8fcfefe4a5538437bd1c8e9aa748105231",
+    "infra/hermes/review_channel_worker.py": "9f12c9cde57291e2fc6f0ee736472ac085d95ac61bb4f3d2f6b9a79eeaa79570"
+  },
+  "new_server_full_install_test": false,
+  "final_live_test": {
+    "engine": "hermes",
+    "calls": [
+      "resp.list_blocks",
+      "resp.unblock_ip",
+      "resp.list_blocks"
+    ],
+    "all_calls_completed_without_error": true,
+    "legacy_card_id": "d15e450dea194630",
+    "legacy_card_post": "9gdzbe8fhirj7yuspgnrq8bffr",
+    "approval_bypassed": false,
+    "original_containment_state": "released",
+    "kernel_block_count": 0,
+    "management_state": "completed",
+    "codex_clicked_approval": false,
+    "kali_ssh_reconnected": true,
+    "kali_original17_unchanged": true,
+    "kali_temporary_worker_files_removed": 3,
+    "kali_probes_preserved": 79,
+    "separate_ollama_live_unblock_test": false
+  }
+}

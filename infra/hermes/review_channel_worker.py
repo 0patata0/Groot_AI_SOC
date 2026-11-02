@@ -272,6 +272,7 @@ def main():
             store.db.commit()
             case = dict(store.db.execute('SELECT * FROM cases WHERE id=?', (cid,)).fetchone())
             case['chat_task'] = request['phase']
+            case['review_response_write'] = request['phase'] == 'lead' and not readonly
             # A factual retry must retain the peer's comparison task and the
             # explicitly untrusted original answer, not become an inventory.
             case['chat_request'] = (request['question'] if request['phase'] == 'peer'

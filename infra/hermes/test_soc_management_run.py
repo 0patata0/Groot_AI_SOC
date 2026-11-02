@@ -148,6 +148,30 @@ class Harness:
 
 
 class ManagementWrapper(unittest.TestCase):
+    def test_existing_unblock_only_for_trusted_review_lead(self):
+        def check(h):
+            os.environ['CAPSTONE_REVIEW_RESPONSE_WRITE'] = '1'
+            names = h.AIAgent().call_model()
+            self.assertIn('mcp__resp__unblock_ip', names)
+            self.assertNotIn('mcp__resp__block_ip', names)
+            h.registry.dispatch('mcp__resp__unblock_ip', {'ip':'192.168.16.233'})
+            asyncio.run(h.ClientSession().call_tool('unblock_ip', {'ip':'192.168.16.233'}))
+            with self.assertRaises(PermissionError):
+                asyncio.run(h.ClientSession().call_tool('block_ip', {}))
+        h = Harness(); h.run(check)
+        self.assertEqual(len(h.dispatches), 1)
+        self.assertEqual(h.wire_calls[0][0], 'unblock_ip')
+
+    def test_review_unblock_flag_never_overrides_verify(self):
+        for mode in ('verify', 'other'):
+            with mock.patch.dict(os.environ, {'CAPSTONE_REVIEW_RESPONSE_WRITE':'1'}):
+                self.assertFalse(wrapper.allowed('mcp__resp__unblock_ip', mode))
+                self.assertFalse(wrapper.wire_allowed('unblock_ip', mode))
+        for flag in ('', 'true', '0'):
+            with mock.patch.dict(os.environ, {'CAPSTONE_REVIEW_RESPONSE_WRITE':flag}):
+                self.assertFalse(wrapper.allowed('mcp__resp__unblock_ip', 'manage'))
+                self.assertFalse(wrapper.wire_allowed('unblock_ip', 'manage'))
+
     def test_management_model_sees_only_allowed_tools(self):
         def check(h):
             names = h.AIAgent().call_model()

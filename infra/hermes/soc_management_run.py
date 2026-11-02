@@ -933,6 +933,12 @@ def install_grounding_retry(completed_calls, facts=None, argument_errors=None, s
         context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors, successful_reads)
 
 
+def review_unblock_allowed(mode):
+    # Root dispatcher metadata for a lead response to an authorized channel
+    # request. Model prose and peer material cannot enable this environment.
+    return mode == 'manage' and os.environ.get('CAPSTONE_REVIEW_RESPONSE_WRITE') == '1'
+
+
 def allowed(name, mode):
     if mode not in {'manage', 'verify'} or not isinstance(name, str):
         return False
@@ -942,6 +948,8 @@ def allowed(name, mode):
         return name.removeprefix('mcp__security_events__') in EVENT_READ
     if name.startswith('mcp__system_diagnostics__'):
         return name.removeprefix('mcp__system_diagnostics__') in DIAGNOSTIC_READ
+    if name == 'mcp__resp__unblock_ip':
+        return review_unblock_allowed(mode)
     if name in {'mcp__resp__list_blocks', 'mcp__resp__get_firewall_rules'}:
         return True
     for server in ('rule_a', 'rule_b'):
@@ -958,6 +966,8 @@ def allowed(name, mode):
 
 
 def wire_allowed(name, mode):
+    if name == 'unblock_ip':
+        return review_unblock_allowed(mode)
     return mode in {'manage', 'verify'} and isinstance(name, str) and (name.startswith(('get_wazuh_', 'search_wazuh_')) or
         name in READ | EVENT_READ | DIAGNOSTIC_READ | {'list_blocks', 'get_firewall_rules'} or (mode == 'manage' and name in WRITE))
 

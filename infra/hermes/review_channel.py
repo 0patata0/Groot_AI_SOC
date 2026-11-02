@@ -83,7 +83,7 @@ def worker(job):
     # is passed to either model. The Hermes controller retains its fixed UID gate.
     try:
         result = subprocess.run(cmd, input=json.dumps(request, ensure_ascii=False).encode(), capture_output=True,
-                                timeout=1140 if job['engine'] == 'ollama' else 270, env=env, **identity)
+                                timeout=1140 if job['engine'] == 'ollama' else 980 if job['phase'] == 'lead' and not job.get('readonly') else 270, env=env, **identity)
         if len(result.stdout) > 4194304:
             raise ValueError('worker_output_limit')
         value = json.loads(result.stdout)

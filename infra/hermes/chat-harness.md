@@ -1,5 +1,11 @@
 # Hermes·Ollama 공통 채팅 기준
 
+## review 채널의 기존 차단 해제 도구 (2026-11-02)
+
+1.19.9는 review의 허용 사용자 요청을 처리하는 lead Hermes에게 기존 `mcp__resp__unblock_ip`를 노출한다. 새로운 MCP/해제 API는 추가하지 않았다. root dispatcher가 `review_response_write`를 구성하고 모델 프로세스에는 고정 환경 플래그로 전달한다. 자동 사건 관리와 peer/verify는 해제 도구를 계속 거절한다. Ollama는 기존대로 직접 태그한 lead의 Hermes parity에서 같은 도구를 쓸 수 있고 peer는 읽기 전용이다.
+
+기존 도구의600초 카드 대기/720초 MCP 제한과 lead 실행 한도를 맞췄다(Hermes budget840·CLI900·controller940·dispatcher980초 상한). 승인되면 즉시 이어 처리하며 이 상한만큼 기다린다는 뜻은 아니다. `UNBLOCKED`의 비정형 텍스트를 비동기 제안 ID로 오해하지 않고, 이후 실제 `list_blocks`에서 해당 IP가 빠진 것을 확인해야 완료로 표시한다. Native의 `contain:` 차단도 기존 `unblock_ip`의 별도 카드 승인 뒤 정확 parent/IP/기한/소유권을 대조해 해제하고 영속 상태를released로 갱신한다. 알 수 없는 소유권을 삭제하지 않는다. 채팅 요청 자체가 카드 승인은 아니다. 수동/일반 차단 해제에도 기존 Response MCP의 동일 승인·일회 소비가 적용된다. [운영 반영·실제 검증·일시정지 지점](../../STATUS.md).
+
 ## 현재 차단 목록 조회·내부 실습 대응 (2026-11-02)
 
 공통 contract1.5.13/query1.19.8은 `지금 FW 차단 목록만 보여줘`, `막힌 아이피` 같은 현재 동적 차단 조회를 실제 `resp.list_blocks`로 연결한다. `FW 룰`은 계속 전체 정책의 `resp.get_firewall_rules`를 요구한다. 모델이 실제 도구를 선택하고 호출하며, 실패·잘못된 IPv4·중복·이전 성공 뒤 최신 실패는 0건으로 표시하지 않는다. 표는 페이지당 최대50개와 전체/생략 범위를 표시한다. 쓰기·과거 이력·여러 장비를 섞은 질문은 이 단문 경로로 강제하지 않는다.

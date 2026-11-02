@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "observed_at_kst": "2026-11-03T05:16:35+09:00",
+  "observed_at_kst": "2026-11-03T05:37:15+09:00",
   "model": "soc-qwen36:35b-operator-q4km-20261103",
   "training_completion": "OPERATOR_COMPLETION_20261103.json",
   "adapter_sha256": "5d3b15dbe7caee11ef2aa08d757afd91f14c08769317cbd3350491f0938179e4",
@@ -68,7 +68,7 @@
     "runtime_options_match_original": true,
     "chat_template_matches_hf": true,
     "chat_template_matches_original": false,
-    "registered_only_in_isolated_store": true,
+    "registered_only_in_isolated_store": false,
     "full_transfer_sha_verified": true,
     "literal_transfer_bytes": 793378816,
     "matched_transfer_bytes": 20920084000,
@@ -81,6 +81,12 @@
       "available_bytes": 47470776320,
       "minimum_before_bytes": 68719476736,
       "minimum_after_bytes": 34359738368
+    },
+    "primary_registration": {
+      "completed_at_kst": "2026-11-03T05:25:42.792010+09:00",
+      "digest": "5bfc2d9d3f245df44041db799cc24c32e09fd85af6fbf856a8aa109ddcbb90af",
+      "existing_models_unchanged": true,
+      "receipt": "~/Capstone_Groot_training/operator-candidate-20261103-r1/primary-registration/exports/qwen36-soc-dgx-guide-gguf/registration-status.json"
     }
   },
   "failures_preserved": [
@@ -98,7 +104,7 @@
     }
   ],
   "comparison": {
-    "status": "running",
+    "status": "completed",
     "arms": [
       "qwen3.6:35b",
       "soc-qwen36:35b-base-q4km-20261027",
@@ -111,7 +117,9 @@
     "gold_sent_to_inference": false,
     "protected_write_dispatch": false,
     "mattermost_e2e": false,
-    "quality_passed": false
+    "quality_passed": false,
+    "result_ledger": "OPERATOR_COMPARISON_20261103.json",
+    "production_promotion": false
   },
   "production_model_changed": false,
   "automatic_promotion": false,
@@ -128,5 +136,28 @@
       "passed": 46
     },
     "new_server_full_install": false
+  },
+  "cleanup": {
+    "thor_private_stopped": true,
+    "port_11435_closed": true,
+    "thor_temporary_files_removed": [
+      "transfer/askpass.py",
+      "transfer/known_hosts",
+      "transfer/worker.py",
+      "register-worker.py",
+      "warmup-worker.py",
+      "primary-registration/register-worker.py"
+    ],
+    "remaining_free_bytes": 25213714432,
+    "primary_pid_unchanged": 715615,
+    "b_fixture_cleanup": {
+      "verified": true,
+      "listener_11448_absent": true,
+      "watchdogs_removed": 2,
+      "root_only_evidence_files_preserved": 77,
+      "production_chat_pid_unchanged": 3851156
+    },
+    "mac_cleanup": "pending after final publication",
+    "weights_preserved": true
   }
 }

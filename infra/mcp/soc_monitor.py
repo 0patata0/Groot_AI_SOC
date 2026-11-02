@@ -14,6 +14,7 @@ import json
 import os
 from pathlib import Path
 import re
+import secrets
 import sqlite3
 import stat
 import tempfile
@@ -25,6 +26,8 @@ CODE = Path('/opt/capstone-diagnostics')
 STATE = Path('/var/lib/capstone-diagnostics')
 ETC = Path('/etc/capstone-diagnostics')
 KST = timezone(timedelta(hours=9))
+PROBE_REASONS = frozenset(('response_ok', 'request_timeout', 'connection_failure',
+    'network_failure', 'http_failure', 'protocol_failure', 'invalid_response', 'legacy_unknown'))
 
 
 def core():
@@ -107,21 +110,72 @@ def database(path):
     db.execute('pragma journal_mode=WAL');db.execute('pragma synchronous=FULL')
     db.execute('create table if not exists health (target text primary key,status text,first_seen integer,streak integer,announced text)')
     db.execute('create table if not exists outbox (id integer primary key autoincrement,target text,status text,started integer,observed integer,delivered integer,attempts integer not null default 0)')
+    # Additive migration preserves delivered/pending event IDs and supports
+    # restoring the previous executable without rewriting notification history.
+    if 'reason' not in {row[1] for row in db.execute('pragma table_info(outbox)')}:
+        db.execute('alter table outbox add column reason text')
+    db.execute('create table if not exists samples (target text primary key,sample_key text)')
+    db.execute('create table if not exists episodes (target text primary key,started integer)')
     db.commit();return db
 
 
-def record(db, rows, now):
+def probe_samples(snapshots):
+    """A cached model result is one trial, not one trial per collector tick.
+
+    Stale/missing evidence and live transport failures deliberately keep the
+    ordinary observer cadence: a stopped probe must not suppress an outage.
+    """
+    row=(snapshots.get('b') or {}).get('runtime',{}).get('b:llm',{})
+    metrics=row.get('metrics',{});rid=metrics.get('probe_run_id')
+    codes=row.get('codes',[])
+    if (row.get('status') not in ('ok','degraded') or
+            any(code!='model_request_failed' for code in codes) or
+            not isinstance(rid,str) or not re.fullmatch('[0-9a-f]{32}',rid)):
+        return {},{}
+    reason=metrics.get('probe_result_reason','legacy_unknown')
+    return {'b:llm':rid},{'b:llm':reason if isinstance(reason,str) and reason in PROBE_REASONS else 'legacy_unknown'}
+
+
+def record(db, rows, now, sample_keys=None, reasons=None):
+    sample_keys=sample_keys or {};reasons=reasons or {}
     with db:
         for target, status in sorted(rows.items()):
+            key=sample_keys.get(target)
+            prior=None
+            if key is not None:
+                if not isinstance(key,str) or not re.fullmatch('[0-9a-f]{32}',key):
+                    raise ValueError('invalid_probe_identity')
+                key=status+':'+key
+                prior=db.execute('select sample_key from samples where target=?',(target,)).fetchone()
+                if prior and prior[0]==key: continue
+                db.execute('insert or replace into samples values(?,?)',(target,key))
+            else:
+                # A live transport/staleness failure breaks a cached success
+                # streak. Its later recovery must be counted afresh.
+                db.execute('delete from samples where target=?',(target,))
             old=db.execute('select status,first_seen,streak,announced from health where target=?',(target,)).fetchone()
             first=now if not old or old[0]!=status else old[1]
             streak=1 if not old or old[0]!=status else old[2]+1
+            if key is not None and prior is None: streak=1
             announced=old[3] if old else 'ok'
+            if old and announced not in ('ok','not_installed'):
+                db.execute('insert or ignore into episodes values(?,?)',(target,old[1]))
+            else:
+                # A rollback may have closed the incident using the old
+                # executable; do not reuse its episode for a later failure.
+                db.execute('delete from episodes where target=?',(target,))
             healthy=status in ('ok','not_installed')
-            if status!=announced and ((healthy and announced not in ('ok','not_installed')) or (not healthy and streak>=2)):
+            recovery_required=2 if target=='b:llm' and key is not None else 1
+            if status!=announced and ((healthy and announced not in ('ok','not_installed') and streak>=recovery_required) or (not healthy and streak>=2)):
                 # Recovery carries the original outage first-seen time.
-                started=old[1] if healthy and old else first
-                db.execute('insert into outbox(target,status,started,observed) values(?,?,?,?)',(target,status,started,now))
+                episode=db.execute('select started from episodes where target=?',(target,)).fetchone()
+                started=episode[0] if healthy and episode else old[1] if healthy and old else first
+                reason=reasons.get(target)
+                if not isinstance(reason,str) or reason not in PROBE_REASONS: reason=None
+                if healthy and recovery_required==2: reason='independent_probe_recovery'
+                db.execute('insert into outbox(target,status,started,observed,reason) values(?,?,?,?,?)',(target,status,started,now,reason))
+                if healthy: db.execute('delete from episodes where target=?',(target,))
+                else: db.execute('insert or ignore into episodes values(?,?)',(target,first))
                 announced=status
             db.execute('insert or replace into health values(?,?,?,?,?)',(target,status,first,streak,announced))
         # Pending outages are retained without expiration. Only old delivered
@@ -143,12 +197,19 @@ def webhook_send(url, text):
 
 
 def deliver(db, url, now, sender=webhook_send):
-    rows=db.execute('select id,target,status,started,observed from outbox where delivered is null order by id limit 10').fetchall()
+    rows=db.execute('select id,target,status,started,observed,reason from outbox where delivered is null order by id limit 10').fetchall()
     if not rows: return 0
     lines=['[SOC 독립 감시 · A 서버] 장애 기록/복구 알림 (KST)']
-    for identifier,target,status,started,observed in rows:
+    labels={'request_timeout':'35초 내 추론 응답 없음(서버 중단 여부 미확정)',
+        'connection_failure':'추론 연결 실패', 'network_failure':'추론 전송 실패',
+        'http_failure':'추론 API 오류 응답', 'protocol_failure':'추론 통신 응답 오류',
+        'invalid_response':'추론 결과 형식/모델 불일치', 'legacy_unknown':'과거 진단의 상세 원인 미기록',
+        'independent_probe_recovery':'서로 다른 소량 추론 진단 2회 성공'}
+    for identifier,target,status,started,observed,reason in rows:
         state='복구' if status in ('ok','not_installed') else '이상·미확인'
+        if target=='b:llm': state='추론 진단 정상 재확인' if status=='ok' else '추론 진단 이상·미확인'
         lines.append(f'- #{identifier} `{target}` {state} ({status}) · 발생 {datetime.fromtimestamp(started,KST).isoformat()} · 확인 {datetime.fromtimestamp(observed,KST).isoformat()}')
+        if reason in labels: lines.append('  원인/근거: '+labels[reason])
     lines.append('지연 전송될 수 있습니다. 보안 사고 정상 판정이나 자동 조치를 수행한 알림이 아닙니다.')
     ids=[row[0] for row in rows]
     with db: db.executemany('update outbox set attempts=attempts+1 where id=?',[(i,) for i in ids])
@@ -165,7 +226,8 @@ def observer(d,cfg):
     with ThreadPoolExecutor(max_workers=3) as pool: snapshots=dict(pool.map(get,('a','b','c')))
     now=int(time.time());db=database(STATE/'monitor.sqlite3')
     try:
-        record(db,signals(d,snapshots),now)
+        keys,reasons=probe_samples(snapshots)
+        record(db,signals(d,snapshots),now,keys,reasons)
         try:
             b=snapshots.get('b') or {}
             allowed=b.get('runtime',{}).get('b:ingestion',{}).get('metrics',{}).get('canary_allowed') is True
@@ -188,18 +250,43 @@ def model_probe(d):
     h=d.runtime_library();cfg=h.load_config('siem');now=int(time.time())
     backend=hashlib.sha256(json.dumps([cfg['llm_url'],cfg['model']]).encode()).hexdigest()
     previous=STATE/'model-probe.json'
+    old={}
     if previous.exists():
         old=d.parsed(d.root_file(previous,4096))
         if old.get('backend_sha256')==backend and 0<=now-old['checked_at']<180: return
-    start=time.monotonic();ok=False
+    start=time.monotonic();ok=False;reason='invalid_response';http_status=None
     try:
         response=h.request_json(cfg['llm_url'],'/api/generate',timeout=35,body={
             'model':cfg['model'],'prompt':'Reply OK.','stream':False,'think':False,'keep_alive':'10m',
             'options':{'num_predict':4,'temperature':0}})
         ok=response.get('done') is True and response.get('model')==cfg['model'] and isinstance(response.get('response'),str) and bool(response['response'].strip())
-    except (ValueError,OSError,http.client.HTTPException): pass
-    atomic(previous,{'schema':1,'checked_at':now,'success':ok,'backend_sha256':backend,'elapsed_ms':round((time.monotonic()-start)*1000),
-        'scope':'bounded_inference_only_no_tool_or_security_judgement'})
+        if ok: reason='response_ok'
+    except TimeoutError: reason='request_timeout'
+    except ConnectionError: reason='connection_failure'
+    except OSError: reason='network_failure'
+    except http.client.HTTPException: reason='protocol_failure'
+    except (ValueError,AttributeError) as exc:
+        status=getattr(exc,'status_code',None)
+        if type(status) is int and 100<=status<=599: reason='http_failure';http_status=status
+    result={'schema':1,'run_id':secrets.token_hex(16),'checked_at':now,'completed_at':int(time.time()),
+        'success':ok,'reason':reason,'backend_sha256':backend,'elapsed_ms':round((time.monotonic()-start)*1000),
+        'scope':'bounded_inference_only_no_tool_or_security_judgement'}
+    if http_status is not None: result['http_status']=http_status
+    if not ok:
+        result['last_failure']={k:result[k] for k in ('run_id','checked_at','completed_at','reason','elapsed_ms')}
+    elif old.get('backend_sha256')==backend and isinstance(old.get('last_failure'),dict):
+        failure=old['last_failure']
+        if (isinstance(failure.get('run_id'),str) and re.fullmatch('[0-9a-f]{32}',failure['run_id'])
+                and failure.get('reason') in PROBE_REASONS-{'response_ok'}
+                and all(type(failure.get(k)) is int and 0<=failure[k]<=2**63 for k in ('checked_at','completed_at','elapsed_ms'))):
+            result['last_failure']={k:failure[k] for k in ('run_id','checked_at','completed_at','reason','elapsed_ms')}
+    atomic(previous,result)
+    # Fixed fields only: never persist model text, exception strings, URLs or
+    # credentials. Every actual trial has a durable system journal entry.
+    print(json.dumps({'event':'model_probe_result','run_id':result['run_id'],'success':ok,
+        'reason':reason,'elapsed_ms':result['elapsed_ms'],'http_status':http_status,
+        'started_at_kst':datetime.fromtimestamp(now,KST).isoformat(),
+        'completed_at_kst':datetime.fromtimestamp(result['completed_at'],KST).isoformat()}))
 
 
 def main():

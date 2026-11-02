@@ -2,10 +2,13 @@ import copy
 import importlib.util
 import json
 import os
+import io
+import contextlib
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+from types import SimpleNamespace
 
 
 def load(name):
@@ -153,6 +156,112 @@ class ObserverTests(unittest.TestCase):
     def test_bad_webhook_is_rejected_without_network(self):
         for url in ('file:///etc/passwd','http://u:p@host/hooks/'+'x'*26,'https://host/arbitrary','https://host/hooks/'+'a'*26+'?redirect=x'):
             with self.assertRaises(ValueError):m.webhook_send(url,'body')
+
+    def test_cached_failure_is_not_two_trials_and_recovery_needs_two_new_successes(self):
+        def put(status,rid,offset):
+            m.record(self.db,{'b:llm':status},NOW+offset,{'b:llm':rid*32},
+                     {'b:llm':'request_timeout' if status=='degraded' else 'response_ok'})
+        for t in (0,60,120):put('degraded','a',t)
+        self.assertEqual(self.db.execute('select streak from health').fetchone()[0],1)
+        self.assertEqual(self.db.execute('select count(*) from outbox').fetchone()[0],0)
+        put('degraded','b',180)
+        self.assertEqual(self.db.execute('select reason,started from outbox').fetchone(),('request_timeout',NOW))
+        put('ok','c',360);put('ok','c',420)
+        self.assertEqual(self.db.execute('select count(*) from outbox').fetchone()[0],1)
+        # Reopen retains identity, episode start and pending notifications.
+        self.db.close();self.db=m.database(Path(self.tmp.name)/'state.sqlite3')
+        put('ok','c',480);put('ok','d',540)
+        self.assertEqual(self.db.execute('select status,started,reason from outbox order by id').fetchall(),
+            [('degraded',NOW,'request_timeout'),('ok',NOW,'independent_probe_recovery')])
+        sent=[];m.deliver(self.db,'ignored',NOW+540,sender=lambda u,b:sent.append(b))
+        self.assertIn('35초',sent[0]);self.assertIn('서버 중단 여부 미확정',sent[0]);self.assertIn('2회 성공',sent[0])
+
+    def test_one_failed_trial_followed_by_success_is_preserved_as_observation_not_false_outage(self):
+        m.record(self.db,{'b:llm':'degraded'},NOW,{'b:llm':'a'*32})
+        m.record(self.db,{'b:llm':'degraded'},NOW+60,{'b:llm':'a'*32})
+        m.record(self.db,{'b:llm':'ok'},NOW+180,{'b:llm':'b'*32})
+        self.assertEqual(self.db.execute('select status,streak,announced from health').fetchone(),('ok',1,'ok'))
+        self.assertEqual(self.db.execute('select count(*) from outbox').fetchone()[0],0)
+
+    def test_legacy_streak_does_not_count_as_a_new_independent_probe(self):
+        m.record(self.db,{'b:llm':'degraded'},NOW)
+        m.record(self.db,{'b:llm':'degraded'},NOW+60,{'b:llm':'a'*32})
+        self.assertEqual(self.db.execute('select count(*) from outbox').fetchone()[0],0)
+        m.record(self.db,{'b:llm':'degraded'},NOW+180,{'b:llm':'b'*32})
+        self.assertEqual(self.db.execute('select count(*) from outbox').fetchone()[0],1)
+
+    def test_rollback_closed_episode_is_not_reused(self):
+        self.db.execute("insert into health values('b:llm','ok',?,4,'ok')",(NOW,))
+        self.db.execute("insert into episodes values('b:llm',?)",(NOW-1000,));self.db.commit()
+        for t,rid in [(0,'a'),(180,'b')]:m.record(self.db,{'b:llm':'degraded'},NOW+t,{'b:llm':rid*32})
+        for t,rid in [(360,'c'),(540,'d')]:m.record(self.db,{'b:llm':'ok'},NOW+t,{'b:llm':rid*32})
+        self.assertEqual(self.db.execute('select started from outbox order by id').fetchall(),[(NOW,),(NOW,)])
+
+    def test_stopped_probe_and_transport_failure_keep_live_observer_detection(self):
+        snap={'b':{'runtime':{'b:llm':{'status':'degraded','codes':['pipeline_probe_stale'],
+             'metrics':{'probe_run_id':'a'*32,'probe_result_reason':'response_ok'}}}}}
+        self.assertEqual(m.probe_samples(snap),({},{}))
+        for t in (0,60):m.record(self.db,{'b:llm':'degraded'},NOW+t,*m.probe_samples(snap))
+        self.assertEqual(self.db.execute('select count(*) from outbox').fetchone()[0],1)
+        snap['b']['runtime']['b:llm'].update(status='unavailable',codes=['runtime_collection_failed'])
+        self.assertEqual(m.probe_samples(snap),({},{}))
+
+    def test_probe_metadata_is_used_only_for_actual_model_results(self):
+        row={'status':'degraded','codes':['model_request_failed'],
+             'metrics':{'probe_run_id':'a'*32,'probe_result_reason':'request_timeout'}}
+        self.assertEqual(m.probe_samples({'b':{'runtime':{'b:llm':row}}}),
+                         ({'b:llm':'a'*32},{'b:llm':'request_timeout'}))
+        row['metrics']['probe_run_id']='not-an-id'
+        self.assertEqual(m.probe_samples({'b':{'runtime':{'b:llm':row}}}),({},{}))
+
+    def test_additive_database_migration_preserves_old_pending_event(self):
+        import sqlite3
+        path=Path(self.tmp.name)/'legacy.sqlite3';db=sqlite3.connect(path)
+        db.execute('create table outbox (id integer primary key autoincrement,target text,status text,started integer,observed integer,delivered integer,attempts integer not null default 0)')
+        db.execute("insert into outbox values(9,'b:snapshot','unavailable',?,?,null,3)",(NOW,NOW));db.commit();db.close();path.chmod(0o600)
+        db=m.database(path)
+        self.assertEqual(db.execute('select id,attempts,reason from outbox').fetchone(),(9,3,None))
+        sent=[];self.assertEqual(m.deliver(db,'ignored',NOW+60,sender=lambda u,b:sent.append(b)),1)
+        self.assertIn('#9',sent[0]);db.close()
+
+
+class ProbeDiagnosticsTests(unittest.TestCase):
+    def test_distinct_trials_preserve_sanitized_failure_after_success_and_log_each_trial(self):
+        with tempfile.TemporaryDirectory() as root:
+            cfg={'llm_url':'http://127.0.0.1:11435','model':'test:35b'}
+            health=SimpleNamespace(load_config=lambda role:cfg,request_json=Mock(side_effect=TimeoutError('private url token')))
+            core=SimpleNamespace(runtime_library=lambda:health,root_file=lambda p,*a:p.read_bytes(),parsed=json.loads)
+            path=Path(root)/'model-probe.json';log=io.StringIO()
+            with patch.object(m,'STATE',Path(root)),patch.object(m.time,'time',return_value=NOW),contextlib.redirect_stdout(log):m.model_probe(core)
+            failure=json.loads(path.read_text());self.assertFalse(failure['success']);self.assertEqual(failure['reason'],'request_timeout')
+            health.request_json.side_effect=None;health.request_json.return_value={'done':True,'model':cfg['model'],'response':'OK'}
+            with patch.object(m,'STATE',Path(root)),patch.object(m.time,'time',return_value=NOW+181),contextlib.redirect_stdout(log):m.model_probe(core)
+            success=json.loads(path.read_text());self.assertTrue(success['success']);self.assertNotEqual(failure['run_id'],success['run_id'])
+            self.assertEqual(success['last_failure'],failure['last_failure']);self.assertNotIn('private',path.read_text()+log.getvalue())
+            self.assertEqual(len(log.getvalue().splitlines()),2)
+            with patch.object(h,'read_file',return_value=(path.read_bytes(),NOW+181)):
+                row=h.probe_receipt('model',NOW+181)
+            self.assertEqual(row['status'],'ok');self.assertEqual(row['metrics']['last_probe_failure_reason'],'request_timeout')
+
+    def test_network_http_protocol_and_invalid_result_are_distinct_and_redacted(self):
+        import http.client
+        for effect,reason in [(ConnectionRefusedError('private'),'connection_failure'),
+                (OSError('private'),'network_failure'),(h.RuntimeHTTPError(503),'http_failure'),
+                (http.client.BadStatusLine('private'),'protocol_failure'),(ValueError('private'),'invalid_response')]:
+            with self.subTest(reason=reason),tempfile.TemporaryDirectory() as root:
+                health=SimpleNamespace(load_config=lambda _: {'llm_url':'http://127.0.0.1:11435','model':'test'},request_json=Mock(side_effect=effect))
+                core=SimpleNamespace(runtime_library=lambda:health)
+                with patch.object(m,'STATE',Path(root)),contextlib.redirect_stdout(io.StringIO()):m.model_probe(core)
+                text=(Path(root)/'model-probe.json').read_text();v=json.loads(text)
+                self.assertEqual(v['reason'],reason);self.assertNotIn('private',text)
+                if reason=='http_failure':self.assertEqual(v['http_status'],503)
+
+    def test_legacy_receipt_identity_is_stable_and_stale_receipt_is_not_recovery(self):
+        receipt={'schema':1,'checked_at':NOW,'success':True,'backend_sha256':'b'*64,'elapsed_ms':20}
+        with patch.object(h,'read_file',return_value=(json.dumps(receipt).encode(),NOW)):
+            first=h.probe_receipt('model',NOW);second=h.probe_receipt('model',NOW+60)
+            self.assertEqual(first['metrics']['probe_run_id'],second['metrics']['probe_run_id'])
+            self.assertIn('pipeline_probe_stale',h.probe_receipt('model',NOW+601)['codes'])
 
 
 class PipelineTests(unittest.TestCase):

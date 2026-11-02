@@ -7,6 +7,7 @@ performed here. Missing evidence remains unavailable, including idle pipelines.
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import http.client
+import hashlib
 import ipaddress
 import json
 import math
@@ -53,6 +54,12 @@ LOSS_METRICS = frozenset(('component_discarded_events_total', 'buffer_discarded_
 
 def require(ok, code='invalid_runtime_evidence'):
     if not ok: raise ValueError(code)
+
+
+class RuntimeHTTPError(ValueError):
+    def __init__(self, status_code):
+        self.status_code=status_code
+        super().__init__('runtime_http_status')
 
 
 def read_file(path, maximum=65536, tail=False, uid=0):
@@ -141,7 +148,8 @@ def request_json(url, path, timeout=4, body=None):
         payload = None if body is None else json.dumps(body).encode()
         conn.request('GET' if body is None else 'POST', path, body=payload,
                      headers={'Content-Type': 'application/json'})
-        response = conn.getresponse(); require(response.status == 200, 'runtime_http_status')
+        response = conn.getresponse()
+        if response.status != 200: raise RuntimeHTTPError(response.status)
         raw = response.read(131073); require(len(raw) <= 131072, 'runtime_http_bound')
         return json.loads(raw)
     finally: conn.close()
@@ -385,9 +393,30 @@ def probe_receipt(kind, now):
             require(isinstance(value.get('run_id'),str) and re.fullmatch('[0-9a-f]{32}',value['run_id']))
             metrics['verified_run_id']=value['run_id']
             require(value.get('manager_matches')==2 and value.get('indexer_matches')==2 and value.get('exact_tuples_match') is True)
+    else:
+        backend=value.get('backend_sha256')
+        require(isinstance(backend,str) and re.fullmatch('[0-9a-f]{64}',backend))
+        rid=value.get('run_id')
+        if rid is None: rid=hashlib.sha256((backend+':'+str(value['checked_at'])).encode()).hexdigest()[:32]
+        require(isinstance(rid,str) and re.fullmatch('[0-9a-f]{32}',rid))
+        reasons={'response_ok','request_timeout','connection_failure','network_failure',
+                 'http_failure','protocol_failure','invalid_response','legacy_unknown'}
+        reason=value.get('reason','response_ok' if metrics['probe_succeeded'] else 'legacy_unknown')
+        require(reason in reasons)
+        metrics.update(probe_run_id=rid,probe_checked_at=value['checked_at'],probe_result_reason=reason)
+        for key in ('elapsed_ms','http_status'):
+            if key in value:
+                require(type(value[key]) is int and 0<=value[key]<=2**63)
+                metrics['probe_'+key]=value[key]
+        failure=value.get('last_failure')
+        if failure is not None:
+            require(isinstance(failure,dict) and failure.get('reason') in reasons-{'response_ok'}
+                    and type(failure.get('checked_at')) is int and 0<=failure['checked_at']<=now+5)
+            metrics.update(last_probe_failure_at=failure['checked_at'],last_probe_failure_reason=failure['reason'])
     if metrics['probe_age_seconds'] > (1200 if kind == 'ingestion' else 600): codes.append('pipeline_probe_stale')
     if not metrics['probe_succeeded']: codes.append('pipeline_probe_mismatch' if kind == 'ingestion' else 'model_request_failed')
-    return observation(kind + '_probe', now, metrics, codes, limits=('bounded_synthetic_probe_not_all_events',))
+    return observation(kind + '_probe', now, metrics, codes, limits=('bounded_synthetic_probe_not_all_events',) +
+        (('last_failure_is_history_not_current_status',) if kind == 'model' else ()))
 
 
 def systemd_failures(runner, now):

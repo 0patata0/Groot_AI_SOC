@@ -1,6 +1,6 @@
 {
-  "observed_at_kst": "2026-11-02T15:58:33.845944+09:00",
-  "status": "installed_active_waiting_for_current_training",
+  "observed_at_kst": "2026-11-02T19:09:19.713814+09:00",
+  "status": "automatic_continuation_training",
   "authorization": "User authorized future ETA-matched deadline extension and immediate finish when training completes; preserve running training",
   "policy": {
     "schema": 1,
@@ -25,21 +25,21 @@
   "policy_sha256": "1760742eeac2e7f1311908baede0756d9b075846e3aa137796f7049aef9f3530",
   "follower_pid": 444075,
   "follower_parent_pid": 1,
-  "last_heartbeat_kst": "2026-11-02T15:57:40.698330+09:00",
+  "last_heartbeat_kst": "2026-11-02T19:08:51.018089+09:00",
   "estimate": {
-    "basis_step": 3547,
-    "seconds_per_step_with_observed_waits": 23.31889281995673,
-    "remaining_training_seconds": 18678.43314878534,
+    "basis_step": 4094,
+    "seconds_per_step_with_observed_waits": 22.879086309063524,
+    "remaining_training_seconds": 5811.287922502135,
     "validation_reserve_seconds": 1800,
-    "window_seconds": 22500,
+    "window_seconds": 9900,
     "window_capped": false,
-    "proposed_deadline_kst": "2026-11-02T22:12:40.698304+09:00",
+    "proposed_deadline_kst": "2026-11-02T21:53:51.018052+09:00",
     "scope": "estimate, includes observed waits; not a completion guarantee"
   },
-  "original_training_pid_unchanged": true,
+  "original_training_pid_unchanged": false,
   "original_control_sha256_unchanged": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
   "original_inputs_verified": 54,
-  "automatic_continuation_executed": false,
+  "automatic_continuation_executed": true,
   "completed_training_and_validation": false,
   "early_completion_observed": false,
   "validation": {
@@ -59,9 +59,9 @@
   "operating_model_changed": false,
   "rollback": "Stop follow unit through deploy.sh; preserve current training and checkpoints",
   "limitations": [
-    "Current r6 fixed cutoff remains; continuation starts only after a verified successful saved deadline exit.",
     "Training-only completion without final validation is reported validation_pending, not retrained or promoted.",
-    "A transient observation failure waits; manual early stops, unknown failures and no-progress windows do not restart."
+    "A transient observation failure waits; manual early stops, unknown failures and no-progress windows do not restart.",
+    "Automatic handoff is observed. Current f1 deadline is21:45:44 KST; follow ETA21:53:51 is a proposal, not the actual cutoff or completion guarantee."
   ],
   "superseded_follower": {
     "unit": "capstone-dgx-20261102-followr6",
@@ -104,5 +104,32 @@
     "reason": "Tokenizing progress had no numeric step; follower failed while training remained active",
     "retained_for_rollback": true
   },
-  "preparation_progress_fix": "While actual training remains active, progress without both step and max_steps waits without a stale ETA; numeric plan mismatch still fails closed."
+  "preparation_progress_fix": "While actual training remains active, progress without both step and max_steps waits without a stale ETA; numeric plan mismatch still fails closed.",
+  "current_inputs_verified": 54,
+  "current_execution": {
+    "run_id": "capstone-dgx-20261102-f1",
+    "root": "/home/ACCOUNT/Capstone_Groot_training/operator-auto-20261102-f1",
+    "control_sha256": "1d481cde8f02e65a28ec8b6e60b47d49668e55ab26952de5209df3932dde11bf",
+    "started_at_kst": "2026-11-02T17:15:46.084169+09:00",
+    "deadline_kst": "2026-11-02T21:45:44.568445+09:00",
+    "resumed_from_step": 3805,
+    "step": 4095,
+    "max_steps": 4348,
+    "checkpoint_marker_step": 4092,
+    "checkpoint_marker_files": 11,
+    "checkpoint_weights_rehashed_this_poll": false,
+    "current_attempt_cuda_ooms": 0,
+    "current_attempt_cuda_alloc_retries": 0,
+    "training_pid": 688109,
+    "training_parent_pid": 1
+  },
+  "origin_handoff_verified": {
+    "original_status": "stopped_deadline",
+    "original_service_inactive": true,
+    "original_service_result": "success",
+    "original_attempt_ended_at_kst": "2026-11-02T17:15:19.532899+09:00",
+    "original_saved_step": 3805,
+    "original_control_sha256": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
+    "source_data_identity_and_training_math_unchanged": true
+  }
 }

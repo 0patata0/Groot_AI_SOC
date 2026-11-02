@@ -72,6 +72,7 @@ def substitutions(p):
         "/home/groot_a/capstone/suricata/ruleset/suricata.rules": root + "/security/rules/suricata.rules",
         "/home/groot_a/capstone/suricata/ruleset/all.rules": root + "/security/rules/all.rules",
         "/home/groot_a/capstone/suricata/ruleset": root + "/security/rules",
+        "/home/groot_a/capstone/secstack/logs/modsec": root + "/security/logs/modsec",
         "/home/groot_a/capstone/secstack/logs/suricata/eve.json": root + "/security/logs/suricata/eve.json",
         "/home/groot_a/capstone/secstack/logs/suricata": root + "/security/logs/suricata",
         "/var/lib/docker/volumes/single-node_wazuh_etc/_data/rules/local_rules.xml": p["manager_etc"] + "/rules/capstone_portable_rules.xml",

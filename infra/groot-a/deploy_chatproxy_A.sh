@@ -33,6 +33,7 @@ mkcert chat chat.groot.lab; mkcert wazuh wazuh.groot.lab
 mkcert chatduck chat.grootlab.duckdns.org; mkcert wazuhduck wazuh.grootlab.duckdns.org   # 팀원 무설정 이름(DuckDNS)
 
 say "P2 validate nginx config"
+docker network inspect secstack_waf-net >/dev/null 2>&1 || die "security stack's shared WAF network is required before chatproxy"
 docker run --rm -v "$CD/nginx.conf:/etc/nginx/nginx.conf:ro" -v "$CD/tls:/etc/nginx/tls:ro" nginx:1.27-alpine nginx -t 2>&1 | sed 's/^/  /' | grep -E 'syntax is ok|successful' || die "nginx -t failed"
 
 say "P3 compose up (+ restart to apply nginx.conf edits — bind mount)"

@@ -1556,7 +1556,7 @@ def _native_contain(host, broker, request):
     queued = _submit_incident(host, broker, request['incident'])
     extension = _load_extension('incident_containment')
     def evidence(ip, now):
-        observed = extension.read_evidence(ip, now)
+        observed = extension.read_suricata_evidence(ip, now)
         matching = [r for r in observed['events'] if r['flow_id'] == sensor['flow_id']
                     and r['signature_id'] == sensor['signature_id'] and r['severity'] == 1]
         if not matching:

@@ -155,7 +155,7 @@ class IncidentRegistration(unittest.TestCase):
                      'independent_flows':1,'sensor':'a:suricata','window_seconds':300}
         selected=[]
         extension=mock.Mock()
-        extension.read_evidence.return_value=observation
+        extension.read_suricata_evidence.return_value=observation
         def service(engine, *, evidence):
             def propose(ip,reason,requested_by):
                 selected.append((ip,requested_by,evidence(ip,NOW)))
@@ -169,6 +169,7 @@ class IncidentRegistration(unittest.TestCase):
             self.assertTrue(value['incident']['queued'])
             self.assertEqual(selected[0][1],'wazuh-native-ar')
             self.assertEqual(selected[0][2]['events'],observation['events'])
+            extension.read_evidence.assert_not_called()
             for mismatch in ({'flow_id':999,'signature_id':2009714},
                              {'flow_id':1234,'signature_id':1000010}):
                 with self.assertRaisesRegex(executor.RuleChangeError,'not a current eligible'):

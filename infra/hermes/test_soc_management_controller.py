@@ -45,6 +45,20 @@ class Opener:
 
 
 class ControllerTests(unittest.TestCase):
+    def test_prompt_routes_rule_service_and_containment_status_without_execution(self):
+        self.events(self.incident())
+        case=self.store.next_case();context=self.store.context(case['id'])
+        context['proposals']=[{'id':str(i)*32,'target':target,'tool':'trusted','status':'pending','result_status':''}
+            for i,target in enumerate(('a:incident-ip','a:waf','b:wazuh-local-rules'),1)]
+        prompt=m.prompt_for('policy',case,context)
+        raw=prompt.split('TRUSTED_CONTROLLER_JSON\n',1)[1].split('\nUNTRUSTED_EVIDENCE_JSON',1)[0]
+        routes=json.loads(raw)['status_read_requests']
+        self.assertEqual(routes,[
+            {'tool':'mcp__rule_a__get_operation_status','arguments':{'request_id':'1'*32}},
+            {'tool':'mcp__rule_a__get_operation_status','arguments':{'request_id':'2'*32}},
+            {'tool':'mcp__rule_b__get_rule_change_status','arguments':{'proposal_id':'3'*32}}])
+        self.assertEqual(self.store.db.execute('select count(*) from tool_calls').fetchone()[0],0)
+
     def test_interrupted_and_timeout_results_remain_unresolved_with_precise_diagnostics(self):
         for index,(returncode,native,outer,expected) in enumerate((
             (124,130,None,'model_subprocess_timeout_requires_review'),
@@ -824,6 +838,9 @@ class ControllerTests(unittest.TestCase):
         self.result(trace)
         self.assertEqual(trace.finish(0)["state"], "needs_review")
         self.assertEqual(self.store.db.execute("SELECT detail FROM cases").fetchone()[0], "model_tool_failure_requires_review")
+        text = self.store.db.execute("SELECT final_text FROM cases").fetchone()[0]
+        self.assertEqual(text, m.incomplete_report("model_tool_failure_requires_review"))
+        self.assertNotIn("MANAGEMENT_STATUS: resolved", text)
 
     def test_manage_successful_diagnostic_read_can_resolve(self):
         self.events(self.incident())

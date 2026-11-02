@@ -1,0 +1,123 @@
+{
+  "observed_at_kst": "2026-11-02T19:04:17.726455+09:00",
+  "implementation": "deployed_with_actual_waf_llm_mcp_firewall_card_expiry_verification",
+  "new_mcp_api_packages_images_public_ports": 0,
+  "policy": {
+    "lookback_seconds": 300,
+    "waf_engine": "Enabled",
+    "interrupted_required": true,
+    "http_status": 403,
+    "concrete_attack_tag_required": true,
+    "initial_seconds": 600,
+    "keep_after_card_decision_seconds": 3600,
+    "cooldown_after_original_deadline_seconds": 60,
+    "llm_is_decision_maker": true,
+    "native_ids_reader_remains_suricata_only": true
+  },
+  "provenance": {
+    "managed_current_generation": 17,
+    "hardlinks": 2,
+    "producer_v2_clock_and_binding": true,
+    "exact_live_writers_and_fds_observed_twice": true,
+    "configuration_and_container_pins": true,
+    "proxy_source_endpoint": "172.18.0.3",
+    "waf_destination": "172.18.0.2",
+    "allowed_evidence_ports": [
+      8080,
+      8443
+    ],
+    "server_postread_real_ip": true,
+    "proxy_infrastructure_protected": true,
+    "older_generations_scanned": false,
+    "delivery_acknowledged": false
+  },
+  "deployment": {
+    "a_base_at_kst": "2026-11-02T18:30:11+09:00",
+    "narrow_acl_at_kst": "2026-11-02T18:45:23+09:00",
+    "postread_fix_at_kst": "2026-11-02T18:50:46+09:00",
+    "four_policy_copies_synced_at_kst": "2026-11-02T18:55:45+09:00",
+    "container_recreated": false,
+    "raw_generation_inode_preserved": true,
+    "whole_firewall_reloaded": false,
+    "new_server_full_install_test": false
+  },
+  "live_test": {
+    "attack_source": "Kali VM 192.168.16.233",
+    "target": "Log4Shell HTTPS443 through trusted proxy",
+    "attack_type": "XSS, not Log4Shell RCE",
+    "waf_http_status": 403,
+    "waf_transaction_count": 1,
+    "independent_tcp_flow_count_claimed": 0,
+    "attacker_identity_restored": true,
+    "request_id": "b4739cdec8cf96687c657f3f4707f3d2",
+    "requested_by": "hermes-mcp",
+    "kernel_owned_block_observed": true,
+    "created_at_kst": "2026-11-02T18:53:20+09:00",
+    "original_deadline_kst": "2026-11-02T19:03:20+09:00",
+    "card_post_id": "59sxibf7zjf78cd6fqfrzwy8ca",
+    "card_bot_channel_verified": true,
+    "card_actions": [
+      "60분 유지",
+      "해제 요청"
+    ],
+    "codex_clicked_approval": false,
+    "observed_after_expiry_at_kst": "2026-11-02T19:04:17.726455+09:00",
+    "persistent_final_status": "expired",
+    "expiry_result_posted": true,
+    "kernel_block_absent_after_expiry": true,
+    "kali_ssh_reconnected": true,
+    "dvwa_http_after_expiry": 200,
+    "original17_sha_rechecked_unchanged": true
+  },
+  "failures_found_and_corrected": [
+    "TLS8443 missing in fixed evidence policy",
+    "image nginx101:101/0664 configuration metadata mismatch",
+    "proxy test SNI absent; certificate pin refused before HTTP",
+    "existing forward ACL refused new direct proxy path; exact single path added",
+    "location-only real_ip ran after ModSecurity phase1; moved to server postread",
+    "automatic investigation prompt and management/SOUL retained old3-flow requirement/wrong MCP alias",
+    "failed-tool review state could publish contradictory resolved text; original retained privately and pending report emitted"
+  ],
+  "validation": {
+    "local_mcp": 507,
+    "local_installer_soc_management": 37,
+    "local_controller": 76,
+    "a_actual_source_match_isolated": 105,
+    "b_actual_embedded_runner_isolated": 76,
+    "static_shell_syntax": true,
+    "new_server_full_install": false
+  },
+  "remaining": [
+    "Post-expiry fresh readonly review after exact status-tool routing hints; earlier tool errors retained as needs_review",
+    "Independent long-term collection continuity and complete attack coverage",
+    "Full fresh-server managed-raw/proxy setup test",
+    "Training completion, final validation and independent candidate quality; no model promotion"
+  ],
+  "sources_sha256": {
+    "infra/mcp/incident_containment.py": "f2f203979b8f6a52e0907cfb4b8aee510c2b24851dc7868f20e20eabf6a58348",
+    "infra/mcp/managed_suricata_evidence.py": "802a420ded2ad99701aa4d5be8444dd2f765067ab004a25caf7504f61b06a460",
+    "infra/mcp/managed_waf_evidence.py": "9f036bd0a38b8110a4abb8f4b25202866ba75591c0e6884a67aa9bfea7265cac",
+    "infra/mcp/configure_waf_evidence.py": "5735ee75dec6b96aaba31d6ff1bf0810e1d5649ef5b91183579b095c5dd560ea",
+    "infra/mcp/rule_change_executor.py": "ba7503e4ca65d876e42fde1f91849287b522427d01edb9c5761ff58afe4f4519",
+    "infra/mcp/rule_change_mcp.py": "5c7023c13b999d8f4b5d439634787cde8bf240c461531b9a03f0e35808ce7e2d",
+    "infra/groot-a/fw-v2/capstone-nat.sh": "59598667ae43708a541260c72788aeec7322ecc54fa5e85ae59f9cc5dd0e52f6",
+    "infra/groot-a/chatproxy-compose.yml": "6bb7a052012fce60f57bc35a8b85bdb49394450365d81a2cd50856d30a8fb9d7",
+    "infra/groot-c/offline-labs/waf-log4shell-server.conf": "e6aa5a836918f0e3c57a4f5a3e29f53514c9779c05df93b41532bbf9c4d5969f",
+    "infra/groot-c/offline-labs/nginx-log4shell-server.conf": "aafe2bdf1c9e6cf285d029961e1ac29c1b05abdc1cac2c07ee5fbe6a8be0120f",
+    "infra/hermes/SOUL.groot.md": "b100b13f833a06a08d92bbd2ffe6c7819c27b7bcb68ff72608b8d7a0e16170da",
+    "infra/hermes/soc_alert_watch.prompt": "0f50d30b0e1f895b9839065d4fa1347a6a0a8d97f9614ef75952283966bc82e3",
+    "infra/hermes/soc_management_controller.py": "5ddf3dda9d2b0d17e09ceecf87a7ff2c641896c767345733d3c59d776528742f",
+    "deployment/soc_management.py": "f5dceb8f0b72bca1a55d3d0faf9fa826a5ab5d9f9950895f7b408dfb4e8bfe3e",
+    "deployment/soc_runtime.py": "a74c31b704cdf3fb682ce8bfa504ec0a2d17bb36f0093c312e717e5c413390db"
+  },
+  "sources": [
+    "https://nginx.org/en/docs/http/ngx_http_realip_module.html",
+    "https://docs.docker.com/reference/cli/docker/network/connect/"
+  ],
+  "status_read_routing": {
+    "deployed_at_kst": "2026-11-02T19:11:56+09:00",
+    "trusted_exact_tool_arguments_hint": true,
+    "executes_no_tool_for_model": true,
+    "no_permission_expansion": true
+  }
+}

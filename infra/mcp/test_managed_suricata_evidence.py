@@ -238,7 +238,7 @@ class NativeAdapter(unittest.TestCase):
         with mock.patch.object(containment, "MANAGED_ROOT", Path(__file__)), \
              mock.patch.object(containment, "_managed_evidence", side_effect=containment.ContainmentError("denied")), \
              mock.patch.object(containment.os, "open") as opened:
-            with self.assertRaises(containment.ContainmentError): containment.read_evidence(PUBLIC, NOW)
+            with self.assertRaises(containment.ContainmentError): containment.read_suricata_evidence(PUBLIC, NOW)
             opened.assert_not_called()
 
     def test_add_maps_fixed_native_trigger_with_raw_sensor_identity(self):

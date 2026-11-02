@@ -72,7 +72,7 @@ def read_fixed(path, limit, mode=None, owner=0):
     fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     try:
         before = os.fstat(fd)
-        need(stat.S_ISREG(before.st_mode) and before.st_uid == owner and
+        need(stat.S_ISREG(before.st_mode) and (owner is None or before.st_uid == owner) and
              before.st_nlink == 1 and not stat.S_IMODE(before.st_mode) & 0o002 and
              (mode is not None or not stat.S_IMODE(before.st_mode) & 0o020) and
              (mode is None or stat.S_IMODE(before.st_mode) == mode) and
@@ -90,7 +90,7 @@ def uint(value, maximum):
     return type(value) is int and 0 <= value <= maximum
 
 
-def active_state(raw, boot, *, allow_previous_boot=False):
+def active_state(raw, boot, *, allow_previous_boot=False, engine="suricata"):
     try:
         state = json.loads(raw, object_pairs_hook=unique)
     except (ValueError, UnicodeDecodeError):
@@ -99,7 +99,7 @@ def active_state(raw, boot, *, allow_previous_boot=False):
         "schema_version", "policy", "engine", "machine_id", "boot_id", "revision",
         "phase", "current", "pending", "proof", "source_pins"}, "state_shape")
     need(type(state["schema_version"]) is int and state["schema_version"] == 1 and
-         state["policy"] == "capstone-raw-operations-v1" and state["engine"] == "suricata" and
+         state["policy"] == "capstone-raw-operations-v1" and state["engine"] == engine and
          state["machine_id"] == MID and isinstance(state["boot_id"], str) and
          re.fullmatch(r'[0-9a-f]{32}', state["boot_id"]) and
          (state["boot_id"] == boot or allow_previous_boot) and
@@ -119,7 +119,10 @@ def active_state(raw, boot, *, allow_previous_boot=False):
     need(type(pins) is dict and set(pins) == {"container_id", "engine_config_sha256",
         "producer_format_sha256", *PINS} and
         all(isinstance(v, str) and HEX.fullmatch(v) for v in pins.values()), "pins_shape")
-    need(generation["writer_config_sha256"] == pins["engine_config_sha256"], "generation_config_pin")
+    need(isinstance(generation["writer_config_sha256"], str) and
+         HEX.fullmatch(generation["writer_config_sha256"]), "generation_config_pin")
+    if engine == "suricata":
+        need(generation["writer_config_sha256"] == pins["engine_config_sha256"], "generation_config_pin")
     return state
 
 
@@ -208,15 +211,17 @@ def shared_rotation_lock(path=LOCK):
 
 
 def _events(state_path, base, pins, boot, *, root_uid=0, root_gid=0, sensor_uid=998, sensor_gid=998,
-            trusted_state_ancestors=True):
+            trusted_state_ancestors=True, engine="suricata", writer_probe=None, parse_line=None):
     """Internal fixture API. Production entry supplies only constants above."""
     deadline = time.monotonic() + 5
     state_dirs = directories(state_path.parent, root_only=trusted_state_ancestors)
     need(state_path.parent.lstat().st_uid == root_uid and
          stat.S_IMODE(state_path.parent.lstat().st_mode) == 0o700, "state_parent_metadata")
     state_raw, state_meta = read_fixed(state_path, 16384, 0o600, root_uid)
-    state = active_state(state_raw, boot, allow_previous_boot=True)
-    writer = writer_snapshot(state) if state['boot_id'] != boot else None
+    need(engine in ("suricata", "modsecurity"), "engine_invalid")
+    state = active_state(state_raw, boot, allow_previous_boot=True, engine=engine)
+    probe = writer_probe or writer_snapshot
+    writer = probe(state) if state['boot_id'] != boot or engine == "modsecurity" else None
     config_snapshot = {}
     for key, path in pins.items():
         mode = 0o660 if key == "wazuh_config_sha256" else 0o600
@@ -230,13 +235,14 @@ def _events(state_path, base, pins, boot, *, root_uid=0, root_gid=0, sensor_uid=
     need(not any(os.path.lexists(managed / name) for name in (".publish-link", ".audit-path.next")),
          "unfinished_publication")
     current = state["current"]
-    paths = (managed / current["basename"], managed / "active.jsonl", base / "eve.json")
+    paths = ((managed / current["basename"], managed / "active.jsonl", base / "eve.json")
+             if engine == "suricata" else (managed / current["basename"], base / "audit.log"))
     handles = []
     try:
         for path in paths:
             handles.append(os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK))
         baseline = [os.fstat(fd) for fd in handles]
-        expected = (current["device"], current["inode"], sensor_uid, sensor_gid, 0o644, 3)
+        expected = (current["device"], current["inode"], sensor_uid, sensor_gid, 0o644, len(paths))
         need(all(stat.S_ISREG(s.st_mode) and identity(s) == expected for s in baseline), "managed_links_not_exact")
         end = baseline[0].st_size
         need(0 <= end <= 2147483648, "generation_size_bound")
@@ -263,8 +269,8 @@ def _events(state_path, base, pins, boot, *, root_uid=0, root_gid=0, sensor_uid=
             if len(line) > MAX_LINE:
                 continue
             try:
-                event = json.loads(line, object_pairs_hook=unique)
-            except (ValueError, UnicodeDecodeError, RecursionError):
+                event = parse_line(line) if parse_line else json.loads(line, object_pairs_hook=unique)
+            except (ValueError, UnicodeDecodeError, RecursionError, KeyError, TypeError):
                 continue
             if isinstance(event, dict):
                 events.append(event)
@@ -281,12 +287,12 @@ def _events(state_path, base, pins, boot, *, root_uid=0, root_gid=0, sensor_uid=
         need(not any(os.path.lexists(managed / name) for name in (".publish-link", ".audit-path.next")),
              "unfinished_publication")
         if writer is not None:
-            need(writer_snapshot(state) == writer, 'current_boot_writer_changed')
+            need(probe(state) == writer, 'current_boot_writer_changed')
         need(time.monotonic() <= deadline, "evidence_scan_deadline")
         return events, {"policy": "managed_active_current_generation_v1",
             "state_sha256": hashlib.sha256(state_raw).hexdigest(), "revision": state["revision"],
             "generation": current["number"], "device": current["device"], "inode": current["inode"],
-            "link_count": 3, "snapshot_start": start, "snapshot_end": end,
+            "link_count": len(paths), "snapshot_start": start, "snapshot_end": end,
             "complete_lines_bytes": len(complete), "complete_lines_sha256": hashlib.sha256(complete).hexdigest(),
             "state_boot_id": state['boot_id'], "observed_boot_id": boot, "current_boot_writer": writer,
             "older_generations_scanned": False, "delivery_acknowledged": False}

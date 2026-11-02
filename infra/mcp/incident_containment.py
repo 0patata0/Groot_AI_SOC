@@ -27,12 +27,14 @@ LOOKBACK_SECONDS = 300
 EVE_PATH = Path("/home/groot_a/capstone/secstack/logs/suricata/eve.json")
 MANAGED_ROOT = Path("/var/lib/capstone-raw-operations")
 MANAGED_READER = Path("/opt/rule-change/managed_suricata_evidence.py")
+WAF_READER = Path("/opt/rule-change/managed_waf_evidence.py")
 NFT = "/usr/sbin/nft"
 BLOCK_LOCK = Path("/var/lib/capstone/agent_block.lock")
 RID = re.compile(r"[0-9a-f]{32}\Z")
 SHA = re.compile(r"[0-9a-f]{64}\Z")
 PROTECTED = tuple(ipaddress.ip_network(x) for x in (
     "211.170.162.0/24",  # campus DGX endpoints .110/.111 and their infrastructure
+    "172.18.0.2/32", "172.18.0.3/32", "172.19.0.2/32",  # fixed WAF / trusted proxy endpoints
     "168.126.63.1/32", "168.126.63.2/32", "8.8.8.8/32", "8.8.4.4/32",
     "1.1.1.1/32", "1.0.0.1/32", "9.9.9.9/32"))
 # RFC1918 is an address class, not an implicit trust boundary. Live role-based
@@ -142,14 +144,14 @@ def validated_evidence(events, ip, now):
             "independent_flows": len(ordered), "events": ordered[-16:]}
 
 
-def _managed_evidence(ip, now):
+def _reader_namespace(path):
     # Fixed extension loaded from the exact verified bytes. Neither caller path
     # nor cwd/PYTHONPATH participates; malformed managed state never falls back.
-    for directory in (MANAGED_READER.parent, *MANAGED_READER.parent.parents):
+    for directory in (path.parent, *path.parent.parents):
         st = directory.lstat()
         if not stat.S_ISDIR(st.st_mode) or st.st_uid != 0 or stat.S_IMODE(st.st_mode) & 0o022:
             raise ContainmentError("unsafe managed evidence extension directory")
-    fd = os.open(MANAGED_READER, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
     try:
         before = os.fstat(fd)
         if (not stat.S_ISREG(before.st_mode) or before.st_uid != 0 or before.st_nlink != 1 or
@@ -160,19 +162,24 @@ def _managed_evidence(ip, now):
             return (st.st_dev, st.st_ino, st.st_uid, st.st_gid, st.st_mode,
                     st.st_nlink, st.st_size, st.st_mtime_ns, st.st_ctime_ns)
         if (len(raw) != before.st_size or identity(before) != identity(os.fstat(fd)) or
-                identity(before) != identity(MANAGED_READER.lstat())):
+                identity(before) != identity(path.lstat())):
             raise ContainmentError("managed evidence extension changed")
     finally:
         os.close(fd)
-    namespace = {"__name__": "_capstone_managed_evidence", "__file__": str(MANAGED_READER)}
-    exec(compile(raw, str(MANAGED_READER), "exec"), namespace)
+    namespace = {"__name__": "_capstone_managed_evidence", "__file__": str(path)}
+    exec(compile(raw, str(path), "exec"), namespace)
+    return namespace
+
+
+def _managed_evidence(ip, now):
+    namespace = _reader_namespace(MANAGED_READER)
     try:
         return namespace["read_evidence"](ip, now, validated_evidence)
     except (OSError, ValueError, KeyError, TypeError, RecursionError):
         raise ContainmentError("managed sensor evidence unavailable or insufficient; no legacy fallback") from None
 
 
-def read_evidence(ip, now, path=EVE_PATH):
+def read_suricata_evidence(ip, now, path=EVE_PATH):
     if Path(path) == EVE_PATH and os.path.lexists(MANAGED_ROOT):
         return _managed_evidence(ip, now)
     events = []
@@ -208,6 +215,22 @@ def read_evidence(ip, now, path=EVE_PATH):
         finally:
             os.close(fd)
     return validated_evidence(events, ip, now)
+
+
+def read_evidence(ip, now, path=EVE_PATH):
+    checked_ip(ip)
+    try:
+        return read_suricata_evidence(ip, now, path)
+    except (ContainmentError, OSError):
+        if Path(path) != EVE_PATH:
+            raise
+    # A failed sensor is never replaced with an unverified copy of its log.
+    # An independently attested WAF denial is another trusted source instead.
+    try:
+        return _reader_namespace(WAF_READER)["read_evidence"](
+            ip, now, _reader_namespace(MANAGED_READER))
+    except (OSError, ValueError, KeyError, TypeError, RecursionError):
+        raise ContainmentError("no verified recent Suricata attack flow or WAF attack denial; containment refused") from None
 
 
 def _set_object(data, name):
@@ -460,6 +483,8 @@ class ContainmentService:
                 "cooldown_until": ContainmentService._cooldown_until(r),
                 "evidence_sha256": r["payload"]["plan"]["evidence_sha256"],
                 "independent_flows": r["evidence"]["independent_flows"],
+                "evidence_sensor": r["evidence"]["sensor"],
+                "http_transactions": r["evidence"].get("http_transactions", 0),
                 "result": r.get("result", ""), "result_posted": r.get("result_posted", False)}
 
     def status(self, rid):

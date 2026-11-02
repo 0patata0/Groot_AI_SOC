@@ -72,20 +72,20 @@ capstone_tls_endpoint(){
 }
 capstone_log4shell_tls_waf_forward(){
   local source destination source_ip source_bridge destination_ip destination_bridge
-  if ! source=$(capstone_tls_endpoint chatproxy chatproxy_chat-net) || \
+  if ! source=$(capstone_tls_endpoint chatproxy secstack_waf-net) || \
      ! destination=$(capstone_tls_endpoint waf secstack_waf-net); then
     echo 'WARN: Log4Shell TLS WAF endpoints unavailable; narrow forward rule omitted' >&2
     return 0
   fi
   read -r source_ip source_bridge <<<"$source"
   read -r destination_ip destination_bridge <<<"$destination"
-  if [[ $source_ip == "$destination_ip" ]]; then
-    echo 'WARN: Log4Shell TLS WAF endpoint addresses overlap; narrow forward rule omitted' >&2
+  if [[ $source_ip != 172.18.0.3 || $destination_ip != 172.18.0.2 || $source_bridge != "$destination_bridge" ]]; then
+    echo 'WARN: Log4Shell TLS WAF fixed shared endpoints changed; narrow forward rule omitted' >&2
     return 0
   fi
   F -s "$source_ip/32" -i "$source_bridge" -d "$destination_ip/32" -o "$destination_bridge" \
     -p tcp --dport 8080 -m conntrack --ctstate NEW --ctdir ORIGINAL \
-    --ctorigdst 192.168.16.230 --ctorigdstport 80 \
+    --ctorigdst 172.18.0.2 --ctorigdstport 8080 \
     -m comment --comment capstone-log4shell-tls-waf -j ACCEPT
 }
 # END LOG4SHELL_TLS_WAF_HELPERS
@@ -149,7 +149,7 @@ if iptables -L DOCKER-USER -n >/dev/null 2>&1; then
   for e in "${EASTWEST_ALLOW[@]}"; do IFS=: read -r dst proto ports desc <<<"$e"
     F -i 'br-+' -o "$INT_IF" -d "$dst" -p "$proto" -m multiport --dports "$ports" -m conntrack --ctstate NEW -j ACCEPT
   done
-  # TLS proxy -> existing public WAF DNAT only; never a general bridge-to-bridge allow.
+  # Fixed TLS proxy -> WAF 8080 on their shared bridge only; no general bridge allow.
   capstone_log4shell_tls_waf_forward
   # 그 외(컨테이너→외부, 내부→컨테이너, 비허용 ext→int, 내부→비허용 외부) : 로그 후 drop (P9)
   F -m limit --limit 5/min --limit-burst 10 -j LOG --log-prefix "FW_DROP_FWD " --log-level notice

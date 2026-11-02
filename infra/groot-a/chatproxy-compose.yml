@@ -11,8 +11,16 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./tls:/etc/nginx/tls:ro
-    networks: [chat-net]
+    networks:
+      chat-net: {}
+      waf-evidence:
+        ipv4_address: 172.18.0.3
+        gw_priority: -1
 
 networks:
   chat-net:
     driver: bridge
+  # Security stack creates this network before chatproxy.
+  waf-evidence:
+    external: true
+    name: secstack_waf-net

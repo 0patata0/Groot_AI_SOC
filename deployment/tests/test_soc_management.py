@@ -181,7 +181,8 @@ class BindingTests(unittest.TestCase):
         with mock.patch.object(install, 'read', side_effect=lambda p: Path(p).read_bytes()):
             prompt = install.source_bundle({'source': ROOT})['soc_alert_watch.prompt'].decode()
         self.assertIn('Public or RFC1918 attacker IPv4 addresses can be eligible', prompt)
-        self.assertIn('3 independent inbound TCP severity-1 attack flows within 5 minutes', prompt)
+        self.assertNotIn('3 independent inbound TCP severity-1 attack flows within 5 minutes', prompt)
+        self.assertIn('one inbound bidirectional TCP Suricata severity-1/2 attack flow OR one interrupted WAF', prompt)
         self.assertIn('never_block', prompt)
         self.assertIn('blocks for 600 seconds', prompt)
         self.assertIn('automatic management tool gate does not expose block_ip/unblock_ip', prompt)
@@ -225,6 +226,13 @@ class BindingTests(unittest.TestCase):
         text = rendered("managed_suricata_evidence.py").decode()
         self.assertIn("managed_links_not_exact", text)
         self.assertIn("no legacy fallback", rendered("incident_containment.py").decode())
+
+    def test_waf_reader_installed_with_fixed_rendered_log_path_and_no_new_mcp(self):
+        m = module("managed_waf_evidence.py")
+        self.assertEqual(str(m.BASE), "/opt/capstone/security/logs/modsec")
+        self.assertEqual(str(m.POLICY), "/etc/rule-change/waf-evidence.json")
+        self.assertEqual(str(m.STATE), "/var/lib/capstone-raw-operations/modsecurity/state.json")
+        module("configure_waf_evidence.py")
 
 
 class RenderedInvestigationBoundaryTests(unittest.TestCase):

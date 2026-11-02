@@ -704,6 +704,23 @@ def violations(question, answer, calls):
     if (not calls and not READ.wants_write(text)
             and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
         issues.append('current_state_requires_actual_read')
+    diagnostic = diagnostic_request(question)
+    observed = None
+    if diagnostic:
+        observed = diagnostic_observations(calls)
+        if (diagnostic.get('unresolved') or not any(observed.values())
+                or any(not observed.get(t) for t in diagnostic['requested'])):
+            issues.append('current_state_requires_actual_read')
+    # A second boundary checks an observed-state assertion even when an
+    # unfamiliar short question was not routed as a diagnostic. Appending a
+    # scope word here only interprets the subject; it never dispatches a tool.
+    if service_state_asserted(answer):
+        subject = diagnostic or diagnostic_request(question + ' 상태')
+        if subject:
+            if observed is None: observed = diagnostic_observations(calls)
+            if (subject.get('unresolved') or not any(observed.values())
+                    or any(not observed.get(t) for t in subject['requested'])):
+                issues.append('unverified_service_state_claim')
     issues.extend(action_claim_violations(question, answer, calls))
     if EVIDENCE.incident_investigation_request(normalized(question)):
         issues.extend(incident_context_violations(answer))
@@ -711,6 +728,19 @@ def violations(question, answer, calls):
     if incident_evidence_gap(question, calls):
         issues.append('incident_evidence_missing')
     return sorted(set(issues))
+
+
+def service_state_asserted(answer):
+    """A positive service observation, not an honest unknown/negated state."""
+    pattern = r'정상(?:입니다|이다|이에요|적으로|\s*(?:상태|작동|동작|운영|실행|가동)|\s*[|.!]|$)|(?:실행|가동|작동)\s*중|(?:오류|장애).{0,8}없|\b(?:active|running|healthy)\b'
+    text = re.sub(r'[*`]', '', answer)
+    for clause in re.split(r'\n|(?<=[.!?。])\s*|하지만|다만|그러나', text):
+        for match in re.finditer(pattern, clause, re.I):
+            context = clause[max(0, match.start()-12):min(len(clause), match.end()+24)]
+            if re.search(r'미확인|(?:단정|판단).{0,12}(?:않|없|불가)|확인.{0,6}(?:못|불가)|(?:여부|인지).{0,12}(?:모르|확인|불명)|아니|아님|뜻.{0,8}(?:않|아님)|\bnot\b', context, re.I):
+                continue
+            return True
+    return False
 
 
 def incident_field_violations(answer, calls):
@@ -1394,13 +1424,14 @@ def diagnostic_request(question):
     text = READ.scope_text(normalized(question))
     if READ.wants_write(text): return None
     if request_kind(question) != 'other': return None
-    if re.search(r'무슨\s*뜻|뜻이|개념|일반적으로|사용법|설명만|번역|도구\s*없이|조회하지',text): return None
+    if ids_runtime_question(question): return None  # Preserve the existing engine/load proof path.
+    if re.search(r'무슨\s*뜻|뜻이|개념|일반적으로|사용법|설명만|번역|동작\s*원리|작동\s*원리|도구\s*없이|조회하지',text): return None
     plan = read_plan(question)
     if plan and plan.get('kind') == 'wazuh': return None
     if (plan and plan.get('kind') == 'agent_identity'
             and not re.search(r'진단|오류|장애|실패|systemd|\.service\b|수집기',text,re.I)): return None
-    health = re.search(r'진단|상태|오류|에러|장애|실패|문제|괜찮|죽었|멈췄|안\s*(?:돼|되|돌)|failure|failed|관제.*(?:공백|건강)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text, re.I)
-    if not re.search(r'진단|관제|systemd|\.service\b|Vector|벡터|Docker|도커|서버|Hermes|헤르메스|Ollama|올라마|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
+    health = re.search(r'진단|상태|오류|에러|장애|실패|문제|괜찮|죽었|멈췄|살아\s*있|돌아\s*가|돌고\s*있|작동\s*중|가동\s*중|켜져|안\s*(?:돼|되|돌)|\b(?:failure|failed|alive|running|healthy|up)\b|관제.*(?:공백|건강)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text, re.I)
+    if not re.search(r'진단|관제|systemd|\.service\b|Vector|벡터|Docker|도커|서버|Hermes|헤르메스|Ollama|올라마|WAF|ModSecurity|Suricata|IDS|수리카타|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
     if not health and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
     if re.search(r'(?:전체|모든).*관제|관제.*(?:전체|공백)|A\s*/\s*B\s*/\s*C|soc:coverage',text,re.I):
         return {'all':True,'requested':[]}
@@ -1440,6 +1471,30 @@ def diagnostic_scope(question, targets):
     if request['all']: return (['soc:coverage'] if 'soc:coverage' in targets else list(targets)),[]
     return ([t for t in request['requested'] if t in targets],
             [t for t in request['requested'] if t not in targets]+(['요청 서비스 이름/범위 해석 미확인'] if request.get('unresolved') else []))
+
+
+def diagnostic_observations(calls):
+    """Latest bound/hash-verified diagnostic or service read per target.
+
+    An error or malformed last receipt must invalidate an earlier success.
+    A similarly named tool on another server is not diagnostic evidence.
+    """
+    latest = {}
+    for call in calls:
+        server, name = call.get('server'), call.get('name')
+        if not ((server == 'system-diagnostics' and name == 'get_system_diagnostics')
+                or (server in ('rule-a', 'rule-b') and name == 'get_service_action_target')):
+            continue
+        arguments = call.get('arguments')
+        target = arguments.get('target') if isinstance(arguments, dict) else None
+        if not isinstance(target, str): continue
+        if server.startswith('rule-') and not target.startswith(server[-1] + ':'): continue
+        data = payload(call)
+        valid = bool(data and data.get('target') == target and (
+            type(data.get('schema')) is int and data['schema'] == 1 if name == 'get_system_diagnostics'
+            else isinstance(data.get('observation'), dict)))
+        latest[target] = data if valid else None
+    return latest
 
 
 def tool_scope(question, calls=None):
@@ -1549,8 +1604,7 @@ def missing_reads(question, calls, diagnostic_targets=()):
                          and c.get('arguments', {}).get('target') == 'a:suricata'
                          and payload(c) for c in successful) else ['a:suricata']
     if scope == {'mcp__system_diagnostics__get_system_diagnostics'}:
-        done = {c['arguments'].get('target') for c in successful if c['name'] == 'get_system_diagnostics'
-                and payload(c) and payload(c).get('schema') == 1 and payload(c).get('target') == c['arguments'].get('target')}
+        done = {t for t, data in diagnostic_observations(calls).items() if data}
         selected, unsupported = diagnostic_scope(question, diagnostic_targets)
         return [t for t in selected if t not in done] + ['진단 대상 미지원/미확인: ' + t for t in unsupported]
     if scope and any('search_' in n or 'alert_summary' in n for n in scope):
@@ -1930,12 +1984,7 @@ def diagnostic_report(question, calls, targets):
     selected, unsupported = diagnostic_scope(question, targets)
     catalog = list(targets)
     targets = selected
-    latest = {}
-    for call in calls:
-        if call['name'] == 'get_system_diagnostics':
-            target = call['arguments'].get('target')
-            data = payload(call)
-            latest[target] = data if data and data.get('target') == target and data.get('schema') == 1 else None
+    latest = diagnostic_observations(calls)
     if not latest and not unsupported:
         return None
     if any(v and v.get('kind') in ('runtime','coverage') for v in latest.values()):

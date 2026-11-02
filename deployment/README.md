@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+11/3 공통 계약1.5.14는 기존 루트 `deploy.sh`의 Ollama source bundle과 SIEM Hermes 플러그인 복사 경로에 반영한다. canonical `infra/ollama-trial/harness.py`·`infra/hermes/chat_contract.py`가 두 봇에 배치된다. 운영은 SHA를 대조한4파일 증분 적용으로 검증했으며 새 서버 전체 설치는 미실시다. 추가 패키지·이미지·설정 키·MCP·공개 포트는 없다. [단문진단·스키마·근거 검사와 복구](../infra/hermes/diagnostic-harness.md).
+
 11/2 WAF 원본 임시차단 보완은 기존 SOC source bundle에 `managed_waf_evidence.py`·공통 reader·운영자 전용 `configure_waf_evidence.py`와 최신 자동 조사 prompt를 포함한다. 추가 오프라인 바이너리·포트·키는 없다. 검증된 managed 원본·producer v2·전용 프록시와 root SHA manifest가 필요하며, 코드 설치만으로 이 전제까지 완료됐다고 표시하지 않는다. [구성·복구·새 서버 미검증 범위](../infra/mcp/waf-containment.md).
 
 > **2026-10-31 카드 조사·진행 표시:** `deploy.sh`의 SIEM 설치 경로에 `progress.py`와 Mattermost 진행/cleanup 설정을 포함한다. security-events4읽기 도구와 SDK 기본32/parity41도구 계약을 동기화한다. 기존 패키지·포트·키를 사용하며, 운영 증분 반영과 새 서버 전체 설치 시험은 구분한다. [동작·복구](../infra/hermes/card-investigation-progress.md) · [현재 상태](../STATUS.md).

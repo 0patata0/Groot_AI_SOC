@@ -1,0 +1,404 @@
+{
+  "schema": 1,
+  "component": "soc-chat-contract:1.5.14",
+  "observed_at_kst": "2026-11-03T06:58:54.661020+09:00",
+  "purpose": "Colloquial diagnostic routing, no-argument tool schema compatibility, and evidence-bound service state reporting",
+  "code_source_sha256": {
+    "infra/ollama-trial/harness.py": "ca7dffc70d868036e9668a09af1cb81dcd41269224d40823070b6165d4986c77",
+    "infra/hermes/chat_contract.py": "5f5a4a4fb4b7733815520ff678c7c62355e6bc34f99944b84454f3c93c9b9242",
+    "infra/ollama-trial/test_diagnostic_grounding.py": "6301595b713acdab05a447465ec37660f08337f63dbc001b8d45c79beea3be8e",
+    "infra/ollama-trial/test_harness.py": "1242744296f57b20a256c08ab99d54e59a004dbbc4bad43d0538a734de506a38"
+  },
+  "changes": {
+    "colloquial_health_routes": "Known service/host aliases and read-only live intent; concepts, translations, changes and the original IDS engine path retain their routes",
+    "service_claim_boundary": "Checks positive service claims even when the initial phrase is unclassified; binds server/target/full receipt hash/latest result; failed latest read invalidates prior success",
+    "schema_normalization": {
+      "actual_read_catalog_tools": 32,
+      "tool_names_unchanged": true,
+      "wire_changes": [
+        {
+          "name": "mcp__wazuh_ro__get_wazuh_cluster_health",
+          "before": {
+            "type": "object"
+          },
+          "after": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "mcp__wazuh_ro__get_wazuh_remoted_stats",
+          "before": {
+            "type": "object"
+          },
+          "after": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "mcp__wazuh_ro__get_wazuh_weekly_stats",
+          "before": {
+            "type": "object"
+          },
+          "after": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      ],
+      "confirmed": "Three no-argument SDK wire schemas omitted properties. Adding an explicit object properties map removes the reproduced GGUF backend error.",
+      "internal_transport_limit": "The exact internal stage creating a non-object/null properties value was not instrumented. Valid MCP omission is normalized rather than a tool being removed."
+    }
+  },
+  "local_checks": {
+    "ollama": {
+      "total": 171,
+      "passed": 171
+    },
+    "hermes_native_shared": {
+      "total": 380,
+      "passed": 378,
+      "environment_skipped": 2
+    },
+    "installer_contract": {
+      "total": 1,
+      "passed": 1
+    },
+    "independent_installer_source_bundle": {
+      "total": 1,
+      "passed": 1
+    }
+  },
+  "staging_replay": {
+    "same_stateless_questions": 4,
+    "new_variants": 3,
+    "previous_failure_regression": 1,
+    "gold_or_expected_answers_sent_to_model": false,
+    "same_original_model_endpoint": true,
+    "before": [
+      {
+        "id": "fresh-chat",
+        "question_sha256": "71db4d766e12e6b47c49d2c1bd31ed3d195cada05a841ed6a12a12f0ea628bb3",
+        "runtime_status": "completed",
+        "actual_read_count": 0,
+        "actual_tools": [],
+        "seconds": 34.25662992207799
+      },
+      {
+        "id": "fresh-indexer",
+        "question_sha256": "e165153a8725f477edf81b546f05ac93aa8f505bd7af13d792d7408061918484",
+        "runtime_status": "completed",
+        "actual_read_count": 1,
+        "actual_tools": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "target": "b:wazuh-indexer"
+          }
+        ],
+        "seconds": 35.250843062996864
+      },
+      {
+        "id": "fresh-waf",
+        "question_sha256": "c1ed9d979c1043192ddcbb9f54fbb5eb0b55fe1dc39fee49663575ee5924ebc6",
+        "runtime_status": "completed",
+        "actual_read_count": 1,
+        "actual_tools": [
+          {
+            "server": "rule-a",
+            "name": "get_service_action_target",
+            "target": "a:waf"
+          }
+        ],
+        "seconds": 37.49144318792969
+      },
+      {
+        "id": "regression-vector",
+        "question_sha256": "25bc7af2131062c9376bbc4014209d33d0e0743c658fff7c23b3393303678320",
+        "runtime_status": "completed",
+        "actual_read_count": 0,
+        "actual_tools": [],
+        "seconds": 26.65645500307437
+      }
+    ],
+    "after": [
+      {
+        "id": "fresh-chat",
+        "question_sha256": "71db4d766e12e6b47c49d2c1bd31ed3d195cada05a841ed6a12a12f0ea628bb3",
+        "runtime_status": "completed",
+        "actual_read_count": 1,
+        "actual_tools": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "target": "b:mattermost"
+          }
+        ],
+        "seconds": 9.221851357957348
+      },
+      {
+        "id": "fresh-indexer",
+        "question_sha256": "e165153a8725f477edf81b546f05ac93aa8f505bd7af13d792d7408061918484",
+        "runtime_status": "completed",
+        "actual_read_count": 1,
+        "actual_tools": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "target": "b:wazuh-indexer"
+          }
+        ],
+        "seconds": 11.291829610941932
+      },
+      {
+        "id": "fresh-waf",
+        "question_sha256": "c1ed9d979c1043192ddcbb9f54fbb5eb0b55fe1dc39fee49663575ee5924ebc6",
+        "runtime_status": "completed",
+        "actual_read_count": 1,
+        "actual_tools": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "target": "a:waf"
+          }
+        ],
+        "seconds": 9.789299287949689
+      },
+      {
+        "id": "regression-vector",
+        "question_sha256": "25bc7af2131062c9376bbc4014209d33d0e0743c658fff7c23b3393303678320",
+        "runtime_status": "completed",
+        "actual_read_count": 1,
+        "actual_tools": [
+          {
+            "server": "system-diagnostics",
+            "name": "get_system_diagnostics",
+            "target": "a:vector"
+          }
+        ],
+        "seconds": 17.907307815970853
+      }
+    ],
+    "chat_delivery_included": false,
+    "minor_validation_guard_hardening_after_staging": "Final-source unit tests and the separate seven deployed-source requests below validate the final build.",
+    "before_median_seconds": 34.75373649253743,
+    "before_grounded_requests": 2,
+    "after_median_seconds": 10.54056444944581,
+    "after_grounded_requests": 4
+  },
+  "schema_backend_probe": {
+    "runtime": "Thor Ollama 0.40.2, task-owned loopback daemon, existing verified files",
+    "purpose": "Schema acceptance only; num_predict=1. Not a semantic tool-choice or SOC quality benchmark.",
+    "actual_mcp_dispatches": 0,
+    "cases": [
+      {
+        "model": "soc-qwen36:35b-base-q4km-20261027",
+        "case": "before-noargs",
+        "tool_count": 1,
+        "expected_error": true,
+        "http": 500,
+        "error": "{\"error\":\"{\\\"error\\\":{\\\"code\\\":500,\\\"message\\\":\\\"JSON schema error at #: properties must be an object\\\",\\\"type\\\":\\\"server_error\\\"}}\"}",
+        "seconds": 10.561566127929837,
+        "at_kst": "2026-11-03T06:34:40.550695+09:00"
+      },
+      {
+        "model": "soc-qwen36:35b-base-q4km-20261027",
+        "case": "after-noargs",
+        "tool_count": 1,
+        "expected_error": false,
+        "http": 200,
+        "error": null,
+        "seconds": 1.6786518162116408,
+        "at_kst": "2026-11-03T06:34:51.112598+09:00"
+      },
+      {
+        "model": "soc-qwen36:35b-base-q4km-20261027",
+        "case": "after-all",
+        "tool_count": 32,
+        "expected_error": false,
+        "http": 200,
+        "error": null,
+        "seconds": 12.14097681734711,
+        "at_kst": "2026-11-03T06:34:52.791751+09:00"
+      },
+      {
+        "model": "soc-qwen36:35b-operator-q4km-20261103",
+        "case": "before-noargs",
+        "tool_count": 1,
+        "expected_error": true,
+        "http": 500,
+        "error": "{\"error\":\"{\\\"error\\\":{\\\"code\\\":500,\\\"message\\\":\\\"JSON schema error at #: properties must be an object\\\",\\\"type\\\":\\\"server_error\\\"}}\"}",
+        "seconds": 10.236708634067327,
+        "at_kst": "2026-11-03T06:35:06.340437+09:00"
+      },
+      {
+        "model": "soc-qwen36:35b-operator-q4km-20261103",
+        "case": "after-noargs",
+        "tool_count": 1,
+        "expected_error": false,
+        "http": 200,
+        "error": null,
+        "seconds": 1.411542777903378,
+        "at_kst": "2026-11-03T06:35:16.577772+09:00"
+      },
+      {
+        "model": "soc-qwen36:35b-operator-q4km-20261103",
+        "case": "after-all",
+        "tool_count": 32,
+        "expected_error": false,
+        "http": 200,
+        "error": null,
+        "seconds": 12.197022836189717,
+        "at_kst": "2026-11-03T06:35:17.989710+09:00"
+      }
+    ]
+  },
+  "deployed_source_requests": [
+    {
+      "id": "original-docker",
+      "engine": "ollama-runtime",
+      "model": "qwen3.6:35b",
+      "question_sha256": "2e6f5d4ea7fc342f6c35ac5e69c9c4fcbe003a8548e834b3c8cd782611623598",
+      "actual_read_calls": 1,
+      "target": "a:docker",
+      "status": "completed",
+      "seconds": 16.5577789619565,
+      "protected_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "id": "original-hermes",
+      "engine": "ollama-runtime",
+      "model": "qwen3.6:35b",
+      "question_sha256": "6ef7811f6813b4beefdcb1b0398e72ca44b786b1d33bef8d53165a6873386c53",
+      "actual_read_calls": 1,
+      "target": "b:hermes",
+      "status": "completed",
+      "seconds": 8.928344741929322,
+      "protected_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "id": "original-waf",
+      "engine": "ollama-runtime",
+      "model": "qwen3.6:35b",
+      "question_sha256": "eee7b47e6268954e6f9fee653ab0d8996f85e89b26910710def6b53969bf2896",
+      "actual_read_calls": 1,
+      "target": "a:waf",
+      "status": "completed",
+      "seconds": 11.503955050022341,
+      "protected_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "id": "trained-indexer",
+      "engine": "ollama-runtime",
+      "model": "soc-qwen36:35b-operator-q4km-20261103",
+      "question_sha256": "889c4d6c18720f1dc44e41427996d60ddb4104fbcfac8afe699498795e478069",
+      "actual_read_calls": 1,
+      "target": "b:wazuh-indexer",
+      "status": "completed",
+      "seconds": 23.065246362937614,
+      "protected_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "id": "trained-vector",
+      "engine": "ollama-runtime",
+      "model": "soc-qwen36:35b-operator-q4km-20261103",
+      "question_sha256": "244c38a2f66a5edadeabc1961b3939621afa25755d0832e1d540d965ad01d59d",
+      "actual_read_calls": 1,
+      "target": "a:vector",
+      "status": "completed",
+      "seconds": 10.327775934012607,
+      "protected_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "id": "post-indexer-result.json",
+      "engine": "hermes-native",
+      "model": "qwen3.6:35b",
+      "question_sha256": "75b28ccada6ea5c57dcf6f873f9618e7f2baf12698598a9d0d824ef991587d58",
+      "actual_read_calls": 1,
+      "target": "b:wazuh-indexer",
+      "status": "passed",
+      "seconds": 31.436647106078453,
+      "protected_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "id": "post-vector-result.json",
+      "engine": "hermes-native",
+      "model": "qwen3.6:35b",
+      "question_sha256": "91d5f0c9a05ac1508f280deb52785d9274f0d0b79b7a3efd09c125e529eabb0c",
+      "actual_read_calls": 1,
+      "target": "a:vector",
+      "status": "passed",
+      "seconds": 22.39675683504902,
+      "protected_calls": 0,
+      "chat_posts": 0
+    }
+  ],
+  "deployment": {
+    "applied_at_kst": "2026-11-03T06:50:58.125294+09:00",
+    "confirmed_at_kst": "2026-11-03T06:58:54.661020+09:00",
+    "operating_files": {
+      "/opt/capstone-ollama-trial/harness.py": "ca7dffc70d868036e9668a09af1cb81dcd41269224d40823070b6165d4986c77",
+      "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": "ca7dffc70d868036e9668a09af1cb81dcd41269224d40823070b6165d4986c77",
+      "/opt/capstone-ollama-trial/chat_contract.py": "5f5a4a4fb4b7733815520ff678c7c62355e6bc34f99944b84454f3c93c9b9242",
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "5f5a4a4fb4b7733815520ff678c7c62355e6bc34f99944b84454f3c93c9b9242"
+    },
+    "source_sha_matches_local": true,
+    "configuration_model_soul_sha_unchanged": true,
+    "model_promotion": false,
+    "production_model": "qwen3.6:35b",
+    "service_restart": "One existing Hermes container restart and one stop/start of each existing Ollama/review consumer after durable queues had no running jobs",
+    "hermes_and_ollama_websocket_workers_healthy": true,
+    "rollback": {
+      "root": "/var/lib/capstone-harness-updates/20261103-r1",
+      "manifest_sha256": "0cabf075bdcc079690ea90273ae47785373a86a4fa7eb8dbb67c1ca2ca99f110",
+      "helper_sha256": "d25230487b47e178f4f53a166ca11b0abb6e4f0512c86569c2b8e98b58ae81ed",
+      "independent_timer_seconds": 720,
+      "timer_stopped_after_confirmation": true,
+      "actual_production_rollback_performed": false,
+      "manual_operator_flag": "--manual",
+      "concurrent_source_drift_preserved": true
+    },
+    "new_packages_images_keys_public_ports_or_mcp_tools": 0
+  },
+  "cleanup": {
+    "b": {
+      "root_only_backup": "/var/lib/capstone-harness-updates/20261103-r1/validation",
+      "validation_entries_preserved": 43,
+      "temporary_fixtures_removed": true,
+      "temporary_forward_and_watchdog_stopped": true,
+      "port_11448_absent": true,
+      "model_config_and_soul_sha_unchanged": true,
+      "deployed_sources_sha_matched": true,
+      "backup_sources_and_manual_rollback_preserved": true
+    },
+    "thor": {
+      "private_model_service_stopped": true,
+      "port_11435_absent": true,
+      "temporary_runner_removed": true,
+      "schema_proof_and_weight_files_preserved": true,
+      "primary_service_unchanged": "MainPID=715615\nActiveState=active\n",
+      "model_digests_unchanged": true,
+      "meminfo": [
+        "MemFree:        20700852 kB",
+        "MemAvailable:   81612108 kB"
+      ]
+    },
+    "mac_packages_or_weights_downloaded": false,
+    "mac_task_scripts": "Removed after final publication; exact completion is recorded locally."
+  },
+  "validation_limits": [
+    "No new Mattermost post/UI round trip; authenticated live gateway heartbeat and deployed-source private engine/MCP sessions were checked",
+    "Hermes gateway INFO alias-installation message was not observed; no registration/source-pin error marker was seen",
+    "No protected write/approval/attack E2E or new OS installation in this unit",
+    "No weight retraining/promotion or independent 176-record model evaluation",
+    "Old model comparison scores are not overwritten or re-scored by these harness checks",
+    "Small sequential staging timing sample, shared inference resource and startup costs; no general messenger latency guarantee"
+  ]
+}

@@ -105,7 +105,7 @@ class Grounding(unittest.TestCase):
             raw = json.dumps({'schema': 1, 'target': target, 'properties': {'Type': 'oneshot',
                 'ActiveState': 'inactive', 'SubState': 'dead', 'Result': 'success'},
                 'returned_error_count': 0, 'recent_errors': [], 'observed_at_kst': '2026-10-25T07:00:00+09:00'})
-            calls.append({'name': 'get_system_diagnostics', 'arguments': {'target': target},
+            calls.append({'server': 'system-diagnostics', 'name': 'get_system_diagnostics', 'arguments': {'target': target},
                 'result': raw, 'result_sha256': hashlib.sha256(raw.encode()).hexdigest()})
         text = harness.diagnostic_report('A/B/C 서버 실패한 서비스 오류 조회', calls,
                                          ['a:one', 'b:two', 'c:three', 'c:missing'])

@@ -1,5 +1,7 @@
 # Hermes·Ollama 공통 채팅 기준
 
+현재 공통 계약은 **soc-chat-contract:1.5.14**다. 11/3 단문 서비스 진단·Wazuh no-arg 3도구 스키마 호환·최신 실제 근거 검사를 두 봇에 반영했다. native 진입점1.19.9·운영35B·기존 승인 경계는 유지한다. [동작·실측·복구·미검증 범위](diagnostic-harness.md). 아래 날짜별 버전은 당시 기록이다.
+
 ## review 채널의 기존 차단 해제 도구 (2026-11-02)
 
 1.19.9는 review의 허용 사용자 요청을 처리하는 lead Hermes에게 기존 `mcp__resp__unblock_ip`를 노출한다. 새로운 MCP/해제 API는 추가하지 않았다. root dispatcher가 `review_response_write`를 구성하고 모델 프로세스에는 고정 환경 플래그로 전달한다. 자동 사건 관리와 peer/verify는 해제 도구를 계속 거절한다. Ollama는 기존대로 직접 태그한 lead의 Hermes parity에서 같은 도구를 쓸 수 있고 peer는 읽기 전용이다.

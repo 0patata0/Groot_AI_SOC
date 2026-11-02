@@ -5,7 +5,7 @@ import hashlib
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.13'
+VERSION = 'soc-chat-contract:1.5.14'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -252,6 +252,13 @@ def project_messages(messages, *, read_only=False, agent_role=None):
 def normalized_schema(name, schema):
     """Advertise the actual host target enum without inventing new capabilities."""
     result = copy.deepcopy(schema)
+    # Rust MCP no-argument tools legitimately omit properties. Ollama's typed
+    # parameter transport can turn that omission into null, which the GGUF
+    # runner rejects before inference. Keep the JSON Schema's open-object
+    # semantics explicit instead of inventing arguments or dropping a tool.
+    if result.get('type') == 'object' and 'properties' not in result:
+        result['properties'] = {}
+        result.setdefault('additionalProperties', True)
     target = result.get('properties', {}).get('target')
     if isinstance(target, dict) and isinstance(target.get('enum'), list):
         host = ('a:' if name.startswith(('mcp__rule_a__', 'mcp__rule_write_a__')) else

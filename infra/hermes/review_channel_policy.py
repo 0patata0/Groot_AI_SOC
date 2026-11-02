@@ -11,6 +11,7 @@ exec(compile(_format_path.read_bytes(),str(_format_path),'exec'),_format.__dict_
 normalize_tables = _format.normalize_tables
 
 ID = re.compile(r'[a-z0-9]{26}\Z')
+VERSION = 'soc-review-routing:1.1.0'
 
 
 def direct_targets(question):
@@ -49,11 +50,17 @@ def route(question, harness):
     text = harness.normalized(question)
     # This only chooses an execution lane. Neither branch decides to block or
     # approve; every security action still requires LLM judgment and MCP gates.
-    significant = bool(re.search(r'변경|수정|추가|삭제|적용|차단|해제|재시작|원복|복구|사건|침해|공격|조사|의심|분석|검토', text))
+    change = harness.READ.wants_write(text)
+    investigation = bool(re.search(r'변경.{0,12}(?:위험|영향)|침해|의심|사건|조사|상관\s*분석|원인|영향\s*범위|복구|분석', text))
     pure_read = bool(harness.firewall_request(question) or harness.scope_notice(question) or harness.rule_detail_request(question) or harness.read_plan(question) or harness.combined_rule_request(question)
-                     or harness.inventory_question(question) or harness.ids_runtime_question(question))
-    return {'engine': 'ollama' if pure_read and not significant else 'hermes',
-            'cross_review': significant or not pure_read or verification_request(question)}
+                     or harness.inventory_question(question) or harness.ids_runtime_question(question)
+                     or getattr(harness, 'diagnostic_request', lambda _: None)(question))
+    # A normal conversation or a known read needs one responder. In particular,
+    # "차단 목록" is a read, not a change merely because it contains "차단".
+    # Actual failures/uncertainty still request one peer after the lead result.
+    significant = bool(change or investigation or (not pure_read and re.search(r'공격', text)))
+    return {'engine': 'hermes' if significant else 'ollama',
+            'cross_review': significant or verification_request(question)}
 
 
 def resolve_followup(question, previous, harness):

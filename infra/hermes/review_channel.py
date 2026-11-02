@@ -147,6 +147,11 @@ class Dispatcher:
         plan['cross_review'] = plan['cross_review'] or policy.verification_request(post['message'])
         direct = policy.direct_targets(post['message'])
         engines = direct or (['hermes', 'ollama'] if policy.mutual_verification(post['message']) else [plan['engine']])
+        if self.harness.READ.wants_write(self.harness.normalized(current)):
+            # One change owner, even if both bots were named. The other bot
+            # reviews read-only after the lead; it cannot submit a duplicate.
+            engines = direct if len(direct) == 1 else ['hermes']
+            plan['cross_review'] = True
         if previous and not direct and not policy.mutual_verification(post['message']):
             owners = self.db.execute("SELECT DISTINCT engine FROM jobs WHERE source_id=? AND phase='lead' AND status='done'", (previous,)).fetchall()
             if len(owners) == 1:
@@ -328,8 +333,8 @@ class Dispatcher:
                 self.db.execute("UPDATE jobs SET status='running' WHERE id=?", (job['id'],))
             resolved = self.db.execute('SELECT current_question FROM request_context WHERE source_id=?', (job['source_id'],)).fetchone()
             job['current_question'] = resolved[0] if resolved else policy.task_question(source['message'])
-            job['readonly'] = job['phase'] == 'peer' or (policy.verification_request(source['message'])
-                and not self.harness.READ.wants_write(self.harness.normalized(job['current_question'])))
+            job['readonly'] = job['phase'] == 'peer' or not self.harness.READ.wants_write(
+                self.harness.normalized(job['current_question']))
             self.progress_clock[job['id']]=time.monotonic()
             self.active[engine] = (pool.submit(worker, job), job['id'])
 

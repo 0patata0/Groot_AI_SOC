@@ -265,7 +265,12 @@ class Tests(unittest.TestCase):
             self.assertEqual(tuple(stored),('waf',None))
         self.d.db.execute('DELETE FROM requests WHERE id<>?',(self.post['id'],))
         self.d.add(dict(self.post,id='e'*26,create_at=1500,message='서버 상태 알려줘'))
-        self.assertEqual(self.follow('waf')['engine'],'hermes')
+        job=self.follow('waf')
+        self.assertEqual(job['engine'],'ollama')
+        stored=self.d.db.execute('SELECT current_question,parent_source_id FROM request_context WHERE source_id=?',
+                                (job['source_id'],)).fetchone()
+        self.assertEqual(tuple(stored),('waf 서버 상태 알려줘','e'*26))
+        self.assertNotIn('룰',stored['current_question'])
 
     def test_resolved_read_context_survives_restart_without_replay(self):
         h=self.actual_harness();self.post['message']='WAF 룰 조회'
@@ -345,6 +350,43 @@ class Tests(unittest.TestCase):
             self.assertTrue(p.route('Wazuh ID 42 level 조회 후 서로 검증해줘', Harness)['cross_review'])
             self.assertEqual(p.route('Wazuh ID 42 변경 위험 분석해줘', Harness),
                              {'engine':'hermes','cross_review':True})
+
+    def test_general_dialogue_health_and_block_inventory_have_one_fast_responder(self):
+        h=self.actual_harness()
+        for question in ('안녕', '어떻게 질문하면 돼?', '벡터 지금 살아 있나?',
+                         '인덱서 돌아가나?', '현재 차단된 IP 목록 보여줘', 'FW 기본 룰 조회'):
+            with self.subTest(question=question):
+                self.assertEqual(p.route(question,h),{'engine':'ollama','cross_review':False})
+        for question in ('침해 의심 사건을 조사해줘', '벡터 오류 원인을 분석해줘',
+                         '두 장비의 경보를 상관분석해줘', 'WAF 룰 수정안을 작성해줘'):
+            with self.subTest(question=question):
+                self.assertEqual(p.route(question,h),{'engine':'hermes','cross_review':True})
+
+    def test_named_read_still_runs_readonly_without_an_automatic_peer(self):
+        self.actual_harness();self.post['message']='@hermes 벡터 지금 살아 있나?'
+        self.d.add(self.post);job=self.job()
+        self.assertEqual(job['engine'],'hermes');self.assertFalse(job['cross_review'])
+        pool=mock.Mock();self.d.tick(pool)
+        self.assertTrue(pool.submit.call_args.args[1]['readonly'])
+
+    def test_both_named_changes_have_one_owner_and_one_readonly_peer(self):
+        self.actual_harness()
+        for text,owner in (('@hermes @ollama WAF 수정안을 작성하고 서로 검증해줘','hermes'),
+                           ('WAF 수정안을 작성하고 서로 검증해줘','hermes'),
+                           ('@ollama WAF 수정안을 작성하고 서로 검증해줘','ollama')):
+            with self.subTest(question=text):
+                post=dict(self.post,id=chr(97+self.d.db.execute('SELECT count(*) FROM requests').fetchone()[0])*26,message=text)
+                self.posts[post['id']]=post;self.d.add(post)
+                leads=self.d.db.execute("SELECT * FROM jobs WHERE source_id=? AND phase='lead'",(post['id'],)).fetchall()
+                self.assertEqual(len(leads),1);self.assertEqual(leads[0]['engine'],owner)
+                self.assertTrue(leads[0]['cross_review'])
+                job=dict(leads[0]);self.d.placeholder(job)
+                with self.d.db:
+                    self.d.db.execute("UPDATE jobs SET result=?,status='delivery' WHERE id=?",(json.dumps({'status':'completed','final_response':'승인 대기입니다.'}),job['id']))
+                self.d.deliver(dict(self.d.db.execute('SELECT * FROM jobs WHERE id=?',(job['id'],)).fetchone()))
+                peers=self.d.db.execute("SELECT * FROM jobs WHERE source_id=? AND phase='peer'",(post['id'],)).fetchall()
+                self.assertEqual(len(peers),1);self.assertNotEqual(peers[0]['engine'],owner)
+                self.assertIn('쓰기·승인은 금지',peers[0]['question'])
 
     def test_source_dedup_and_top_level_reply(self):
         self.d.add(self.post); self.d.add(self.post)

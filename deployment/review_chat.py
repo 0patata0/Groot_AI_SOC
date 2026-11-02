@@ -102,7 +102,8 @@ def install(bundle, api, chat, bots, hermes_env, site_url):
     channel,_ = api('GET','/teams/'+chat['team_id']+'/channels/name/soc-review-agent', absent=True)
     if channel is None:
         channel,_ = api('POST','/channels',{'team_id':chat['team_id'],'name':'soc-review-agent','display_name':'soc-review-agent',
-            'type':'O','header':'@hermes / @ollama 직접 요청 · 둘 다 태그하고 서로 검증 요청 가능 · 멘션 없으면 역할 분담 · 스레드 없이 대화'})
+            'type':'O','header':'일반 대화·조회 Ollama / 사건·변경 Hermes · 중요·불확실만 교차검토 · 변경 담당은 한 봇 · 직접 태그 가능 · 스레드 없이 대화',
+            'purpose':'두 SOC 관제 담당자의 역할 분담과 선택적 독립 검토. 변경은 한 봇이 담당하고 기존 관리자 카드 승인을 따릅니다.'})
     if channel['team_id'] != chat['team_id'] or channel.get('delete_at'):
         raise ValueError('review_channel_identity')
     for bid in bots.values():

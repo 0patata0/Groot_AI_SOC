@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "routing_policy": "soc-review-routing:1.1.0",
+  "applied_at_kst": "2026-11-03T08:38:08.233548+09:00",
+  "confirmed_at_kst": "2026-11-03T08:42:26.314366+09:00",
+  "placement": {
+    "agents": "B",
+    "inference": "Thor original qwen3.6:35b",
+    "ollama": "dialogue, rapid reads, initial evidence organization",
+    "hermes": "automatic investigation, complex incidents and change/approval workflow",
+    "dgx": "training/comparison",
+    "trained_model_promoted": false
+  },
+  "checks": {
+    "review_passed": 40,
+    "native_passed": 378,
+    "native_environment_skipped": 2,
+    "ollama_passed": 171,
+    "installer_passed": 2
+  },
+  "source_sha256": {
+    "infra/hermes/review_channel.py": "43077814a473f3092e0876e57ccf2268ece24cb566ff97704b63cd017200c93e",
+    "infra/hermes/review_channel_policy.py": "b13bd97b46adfafbbcfd20fec76c6198790536b535625dd6d2bcd4d513e25ed3",
+    "infra/hermes/test_review_channel.py": "70ccf58757078170a283a0a7491bfdb8246592bfc19fdc0629d4e4d845573766",
+    "deployment/review_chat.py": "ba6c943bb193bac704ea227c7f7c11c750eaa5e579b6f251db459d6797b860cb",
+    "deployment/ollama_trial_chat.py": "38ec1b39b7aa6f2a3faec5ce82ddb5008f62146618538e93ccdbc49221059329"
+  },
+  "live": {
+    "routing_cases_passed": 3,
+    "delivered_jobs": 4,
+    "direct_reads_completed": 2,
+    "peer_semantic_comparison_partial": 1,
+    "protected_calls": 0,
+    "cases": [
+      {
+        "question": "매터모스트 지금 살아 있나?",
+        "source_post_id": "7gi8rr6i8j87bryugf1ick3pna",
+        "seconds": 10.957,
+        "jobs": [
+          {
+            "engine": "ollama",
+            "phase": "lead",
+            "delivery": "done",
+            "status": "completed",
+            "peer_review": null,
+            "error_type": null,
+            "calls": [
+              {
+                "server": "system-diagnostics",
+                "name": "get_system_diagnostics",
+                "is_error": false,
+                "result_sha256": "00339039774e62f07ca8aaac9459528673691994e9566cc7d71d71153e2f64c2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "question": "지금 차단된 IP 목록만 보여줘",
+        "source_post_id": "woczewjj3tfuixexy4nf6wrkua",
+        "seconds": 9.923,
+        "jobs": [
+          {
+            "engine": "ollama",
+            "phase": "lead",
+            "delivery": "done",
+            "status": "completed",
+            "peer_review": null,
+            "error_type": null,
+            "calls": [
+              {
+                "server": "resp",
+                "name": "list_blocks",
+                "is_error": false,
+                "result_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "question": "@hermes 인덱서 살아 있니? 서로 검증해줘",
+        "source_post_id": "xoc8mdf6zi84ibkdyhtpozj7pr",
+        "seconds": 56.214,
+        "jobs": [
+          {
+            "engine": "hermes",
+            "phase": "lead",
+            "delivery": "done",
+            "status": "completed",
+            "peer_review": null,
+            "error_type": null,
+            "calls": [
+              {
+                "name": "mcp__system_diagnostics__get_system_diagnostics",
+                "is_error": 0,
+                "is_write": 0
+              },
+              {
+                "name": "mcp__wazuh_ro__get_wazuh_cluster_health",
+                "is_error": 0,
+                "is_write": 0
+              }
+            ]
+          },
+          {
+            "engine": "ollama",
+            "phase": "peer",
+            "delivery": "done",
+            "status": "partial",
+            "peer_review": "synthesis_failed",
+            "error_type": "ValueError",
+            "calls": [
+              {
+                "server": "system-diagnostics",
+                "name": "get_system_diagnostics",
+                "is_error": false,
+                "result_sha256": "e272f0a72a3276171264d5dda9fa05681d9dd070e35cf08dc0374ae091742a82"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "deployment": {
+    "root": "/var/lib/capstone-role-routing/20261103-r1",
+    "manifest_sha256": "a93190b06c19e3e9557c10ccd67162271279031737960212379a624ee8e55e7b",
+    "review_pid": 2858581,
+    "review_restarted_once": true,
+    "other_bot_restarts": 0,
+    "protected_configuration_soul_and_model_preserved": true,
+    "single_change_owner_and_readonly_peers_tested": true,
+    "existing_worker_receipt_pin_reconciled": [
+      "/opt/capstone-review-chat/review_channel_worker.py"
+    ],
+    "rollback_timer_inactive": true,
+    "manual_rollback": "rollback.py --manual",
+    "actual_rollback_performed": false,
+    "new_packages_images_ports_configuration_keys_permissions": 0
+  },
+  "metadata": {
+    "verified_updates": 3,
+    "scope": "Ollama/review channel descriptions and Ollama bot description; identity/membership/permissions unchanged",
+    "backup": "Local and root-only before/after evidence"
+  },
+  "remaining": [
+    "Peer independent indexer read succeeded but semantic comparison raised ValueError/synthesis_failed; explicitly partial, no false agreement",
+    "Hermes additionally queried Wazuh cluster health on an indexer question; scope/wording follow-up remains",
+    "Parent-folder discovery had import-path/missing-local-regex errors and an unchanged prestart MCP source-pin assertion failure. Supported target suites passed; no full-repository pass claim",
+    "No actual protected write/approval, browser visual or new-server full install test",
+    "Original shared model retained; no model quality/concurrency improvement claim"
+  ],
+  "cleanup": {
+    "server_temporary_test_scripts_created": 0,
+    "mac_packages_or_weights_downloaded": 0,
+    "task_scripts": "Removed after final publication; final closeout recorded locally"
+  }
+}

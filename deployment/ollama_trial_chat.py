@@ -143,7 +143,7 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
         pending = {'schema': 1, 'team_id': team_id, 'hermes_channel_before': previous}
         write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
         bot, _ = api.call('POST', '/bots', {'username': 'ollama', 'display_name': 'ollama',
-            'description': 'DGX Ollama 기반 SOC 읽기 전용 시험 봇. soc-ollama 또는 DM에서 질문하세요.'})
+            'description': 'SOC 신속 조회·경보 분류·증거 정리 담당. 허용된 변경은 기존 MCP 승인 절차를 따릅니다.'})
         bid = bot['user_id']; pending['bot_id'] = bid
         write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
         pending['bot_profile'] = set_profile_image(base_url, api.token, bid, 'ollama',
@@ -152,8 +152,8 @@ def install(source, admin, team_id, admin_id, hermes_channel_id, base_url):
         api.call('POST', '/teams/' + team_id + '/members', {'team_id': team_id, 'user_id': bid})
         channel, _ = api.call('POST', '/channels', {'team_id': team_id, 'name': 'soc-ollama',
             'display_name': 'soc-ollama', 'type': 'O',
-            'header': 'ollama 읽기 전용 시험 · 멘션 없이 질문 · 후속 질문은 같은 스레드 · 변경/승인은 기존 Hermes',
-            'purpose': '기존 Hermes와 분리한 Ollama 기반 실행부 직접 비교'})
+            'header': 'Ollama · 신속 조회·경보 분류·증거 정리 우선 · 멘션 없이 질문 · 변경은 기존 MCP 승인 절차',
+            'purpose': 'Ollama SOC 관제 담당자. 빠른 대화와 조회를 우선하며 허용된 변경·교차 검토도 수행합니다.'})
         cid = channel['id']; pending['channel_id'] = cid
         write(ETC / 'chat-pending.json', json.dumps(pending).encode(), mode=0o600)
         api.call('POST', '/channels/' + cid + '/members', {'user_id': bid})

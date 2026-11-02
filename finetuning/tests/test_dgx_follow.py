@@ -104,6 +104,28 @@ class FollowTests(unittest.TestCase):
         self.assertEqual(args[6],{'max_attempts':32,'idle_seconds':60})
         self.assertEqual(dgx.apply.call_args.kwargs,{'reviewed_window_hours':24})
 
+    def test_preparation_between_attempts_waits_without_stale_eta_or_restart(self):
+        preparing = {**self.s, 'progress': {'status': 'tokenizing'}}
+        dgx,builder,ctx=self.runtime(['wait','wait','complete'])
+        states=[]
+        with ctx,patch.object(follow,'snapshot',side_effect=[self.s,preparing,self.s]), \
+             patch.object(follow.time,'sleep',side_effect=lambda _:states.append(follow.read(self.root/'follow-status.json'))), \
+             patch.object(follow.subprocess,'run'):
+            follow.run(self.p)
+        self.assertIn('estimate',states[0])
+        self.assertNotIn('estimate',states[1])
+        self.assertIn('estimate_pending',states[1])
+        self.assertEqual(states[1]['status'],'running')
+        self.assertEqual(follow.read(self.root/'follow-status.json')['status'],'completed')
+        builder.build.assert_not_called();dgx.apply.assert_not_called()
+
+    def test_numeric_plan_mismatch_still_fails_while_waiting(self):
+        self.s['progress']['max_steps']=101
+        dgx,builder,ctx=self.runtime(['wait'])
+        with ctx,self.assertRaisesRegex(ValueError,'matching progress'):
+            follow.run(self.p)
+        builder.build.assert_not_called();dgx.apply.assert_not_called()
+
     def test_no_progress_or_existing_output_never_restarts(self):
         dgx,builder,ctx=self.runtime(['continue'],step=10)
         with ctx,self.assertRaisesRegex(RuntimeError,'forward progress'):

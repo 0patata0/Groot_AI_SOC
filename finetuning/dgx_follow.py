@@ -285,7 +285,16 @@ def run(p):
             state.pop('observation_error',None)
             action = decision(s,c,time.time())
             state.update(stage=action, observation=s)
-            if s['progress']:
+            progress = s['progress']
+            if action == 'wait' and (not progress or
+                    ('step' not in progress and 'max_steps' not in progress)):
+                # A fresh attempt publishes preparation/tokenization before its
+                # first numeric progress. Keep observing the actual live job;
+                # neither fail the follower nor reuse a stale throughput ETA.
+                state.pop('estimate', None)
+                state['estimate_pending'] = 'Waiting for numeric training progress'
+            elif progress:
+                state.pop('estimate_pending', None)
                 state['estimate'] = estimate(p,s['progress'],time.time())
             write_state(p,state)
             if action == 'wait':

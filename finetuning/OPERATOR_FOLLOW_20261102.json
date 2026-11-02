@@ -1,11 +1,11 @@
 {
-  "observed_at_kst": "2026-11-02T10:58:26.296156+09:00",
+  "observed_at_kst": "2026-11-02T12:07:01.295647+09:00",
   "status": "installed_active_waiting_for_current_training",
   "authorization": "User authorized future ETA-matched deadline extension and immediate finish when training completes; preserve running training",
   "policy": {
     "schema": 1,
-    "root": "/home/ACCOUNT/Capstone_Groot_training/operator-follow-20261102-r6v2",
-    "unit": "capstone-dgx-20261102-followr6v2",
+    "root": "/home/ACCOUNT/Capstone_Groot_training/operator-follow-20261102-r6v3",
+    "unit": "capstone-dgx-20261102-followr6v3",
     "parent_control": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/control.json",
     "parent_sha256": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
     "authorized_at_kst": "2026-11-02T10:37:30+09:00",
@@ -19,21 +19,21 @@
     "poll_seconds": 60,
     "files": {
       "deploy.sh": "978583643e899a61e792b13ad4b3423bc58f232a856ca709ce87e48cd783ab9e",
-      "finetuning/dgx_follow.py": "796a3c0a611c1bc606715b73d3a548bd5b8812f15e5079197c40b66949d97917"
+      "finetuning/dgx_follow.py": "e2fc0eee8cdf5d808a445fa9853ab67f5fdc57c4553daa19cd9c886106dda050"
     }
   },
-  "policy_sha256": "fefc132663c0c62d6ae58a3a7c7c2c8d2665669911209b3e5d21eaf02a9c9797",
-  "follower_pid": 394492,
+  "policy_sha256": "1760742eeac2e7f1311908baede0756d9b075846e3aa137796f7049aef9f3530",
+  "follower_pid": 444075,
   "follower_parent_pid": 1,
-  "last_heartbeat_kst": "2026-11-02T10:57:52.728454+09:00",
+  "last_heartbeat_kst": "2026-11-02T12:06:30.952565+09:00",
   "estimate": {
-    "basis_step": 2784,
-    "seconds_per_step_with_observed_waits": 23.19751895509346,
-    "remaining_training_seconds": 36280.919645766175,
+    "basis_step": 2922,
+    "seconds_per_step_with_observed_waits": 23.72149980190822,
+    "remaining_training_seconds": 33826.85871752112,
     "validation_reserve_seconds": 1800,
-    "window_seconds": 40500,
+    "window_seconds": 37800,
     "window_capped": false,
-    "proposed_deadline_kst": "2026-11-02T22:12:52.728413+09:00",
+    "proposed_deadline_kst": "2026-11-02T22:36:30.952510+09:00",
     "scope": "estimate, includes observed waits; not a completion guarantee"
   },
   "original_training_pid_unchanged": true,
@@ -43,8 +43,8 @@
   "completed_training_and_validation": false,
   "early_completion_observed": false,
   "validation": {
-    "local_follow_tests_passed": 15,
-    "dgx_isolated_follow_tests_passed": 15,
+    "local_follow_tests_passed": 17,
+    "dgx_isolated_follow_tests_passed": 17,
     "local_related_suite_passed_before_final_policy_test": 37,
     "actual_installer_check": true,
     "actual_service_and_ppid1": true,
@@ -74,5 +74,35 @@
     "files": 11,
     "marker_sha256": "a2db136d1b6fd64db316b77283f037edc9f36ac01666a88ace39d77656589f13"
   },
-  "source_binding_fix": "Select checkpoints produced/selected by the current controller; do not reject a valid current checkpoint because an unrelated original controller had older source"
+  "source_binding_fix": "Select checkpoints produced/selected by the current controller; do not reject a valid current checkpoint because an unrelated original controller had older source",
+  "superseded_follower_v2": {
+    "policy": {
+      "schema": 1,
+      "root": "/home/ACCOUNT/Capstone_Groot_training/operator-follow-20261102-r6v2",
+      "unit": "capstone-dgx-20261102-followr6v2",
+      "parent_control": "/home/ACCOUNT/Capstone_Groot_training/operator-main-20261102-r6/control.json",
+      "parent_sha256": "573f95280115e38b011afa5f27f560ecf2229b53f5398bf3799b871d0be3afa0",
+      "authorized_at_kst": "2026-11-02T10:37:30+09:00",
+      "max_steps": 4348,
+      "initial_step": 1172,
+      "initial_started_at_kst": "2026-11-02T00:34:38.327857+09:00",
+      "fallback_seconds_per_step": 18,
+      "validation_seconds": 1800,
+      "startup_seconds": 900,
+      "save_grace_seconds": 900,
+      "poll_seconds": 60,
+      "files": {
+        "deploy.sh": "978583643e899a61e792b13ad4b3423bc58f232a856ca709ce87e48cd783ab9e",
+        "finetuning/dgx_follow.py": "796a3c0a611c1bc606715b73d3a548bd5b8812f15e5079197c40b66949d97917"
+      }
+    },
+    "policy_sha256": "fefc132663c0c62d6ae58a3a7c7c2c8d2665669911209b3e5d21eaf02a9c9797",
+    "follower_pid": 394492,
+    "last_heartbeat_kst": "2026-11-02T10:57:52.728454+09:00",
+    "active": false,
+    "failure_at_kst": "2026-11-02T11:28:54+09:00",
+    "reason": "Tokenizing progress had no numeric step; follower failed while training remained active",
+    "retained_for_rollback": true
+  },
+  "preparation_progress_fix": "While actual training remains active, progress without both step and max_steps waits without a stale ETA; numeric plan mismatch still fails closed."
 }

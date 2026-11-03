@@ -4,7 +4,20 @@
 
 ## 실제 구조와 사용 증거
 
-12:09 KST에 8테이블·99규칙·9집합을 읽었다. 5테이블은 Docker/iptables 호환 계층, 2테이블은 프로젝트 NAT, 1테이블은 프로젝트 호스트 방화벽이다. Docker 테이블 안의 `CAPSTONE-*` 사용자 체인은 프로젝트가 관리하므로 테이블 소유자와 규칙 소유자도 구분한다.
+12:09 KST에 8테이블·99규칙·9집합을 읽었고, **13:05:48 KST A SSH 인증·sudo 읽기 재조회에서도 같은 구성**을 확인했다. 카운터·handle·만료 시간 제외 구조가 일치하며 정책은 변경하지 않았다. 5테이블은 Docker/iptables 호환 계층, 2테이블은 프로젝트 NAT, 1테이블은 프로젝트 호스트 방화벽이다. Docker 테이블 안의 `CAPSTONE-*` 사용자 체인은 프로젝트가 관리하므로 테이블 소유자와 규칙 소유자도 구분한다.
+
+| 테이블 | 규칙 수 | 주요 체인 | 용도·정리 판단 |
+|---|---:|---|---|
+| `ip nat` | 8 | PREROUTING·OUTPUT·POSTROUTING·DOCKER | Docker 포트 DNAT·송신 NAT. 실제 사용 확인, 유지 |
+| `ip filter` | 42 | FORWARD·DOCKER-*·CAPSTONE-FWD·CAPSTONE-PUSH | Docker/프로젝트 전달 정책. 소유 체인 구분해 정리 |
+| `ip6 nat` | 2 | PREROUTING·OUTPUT·DOCKER | Docker IPv6 NAT. 미사용/자동 재생성 여부 확인 후 정리 |
+| `ip6 filter` | 5 | FORWARD·DOCKER-* | Docker IPv6 전달 정책. 미사용/자동 재생성 여부 확인 후 정리 |
+| `ip raw` | 3 | PREROUTING | Docker 초기 필터. 실제 참조·동작 보존 필요 |
+| `ip capstone_gw` | 1 | postrouting | 내부망 외부 통신 masquerade. 프로젝트 NAT 통합 후보 |
+| `ip capstone_fwd` | 2 | prerouting·postrouting | 관리10443 DNAT와 응답 NAT. 통합/해당 경로 폐지 검토 |
+| `inet capstone_fw` | 36 | prerouting_block·input·output | 호스트 방화벽·초기 차단·9집합. 프로젝트 정책 통합 대상 |
+
+총8테이블·30체인·99규칙·9집합이며 A 호스트 네트워크 네임스페이스 범위다. PREROUTING은 독립 테이블 이름이 아니라 위 여러 테이블에서 사용하는 체인/hook이다. 재조회는 A에 한정하며 B/Thor 접속·시험 프로세스/결과 복구를 확인한 것은 아니다.
 
 | 기능 | 규칙 수 | 설명 |
 |---|---:|---|
@@ -41,7 +54,7 @@ python3 -B -m unittest discover -s infra/mcp -p test_fw_policy_layout.py
 
 ## 적용 전 남은 작업
 
-1. 관리망 연결을 복구하고 새 관리자 IP·왕복/복구 경로를 확인한다. 사용자는211.170.162.85의 관리자/경유지 지정을 취소했고 새 IP를 전달할 예정이다. 기존 캠퍼스 허용 정책은 아직 변경하지 않았다.
+1. A는13:05 읽기 재접속에 성공했다. B/Thor의 기존 시험 프로세스·결과부터 재확인하고 새 관리자 IP·왕복/복구 경로를 확인한다. 사용자는211.170.162.85의 관리자/경유지 지정을 취소했고 새 IP를 전달할 예정이다. 기존 캠퍼스 허용 정책은 아직 변경하지 않았다.
 2. A/B/C의 관리 listener·프록시 실제 사용자 IP·MCP 전용 키/고정 명령·필수 수집 경로를 대조한다. DVWA·Log4Shell 공개 웹과 관리 접속을 구분한다.
 3. 실제 커널/nft 버전과 Docker 호환 규칙의 전체 의미를 확인하고, 격리 네트워크 네임스페이스에서 NAT 우선순위/응답 경로를 검증한다. `nft --check`와 실제 통신 검증을 구분한다.
 4. 기존 `capstone-nat.sh`의 지속 설정·부팅 unit·legacy 참조를 함께 정리하고 루트 `deploy.sh` 설치 경로를 동기화한다. 새 서버 설치와 기존 운영 서버 증분 변경을 구분한다.

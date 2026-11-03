@@ -93,5 +93,17 @@
     "project_dashboard_dnat_retirement_pending_use_review": true,
     "early_containment_requires_equivalent_input_forward_validation_before_move": true,
     "changed": false
+  },
+  "live_recheck": {
+    "observed_at_kst": "2026-11-03T13:05:48.560320+09:00",
+    "source_ruleset_sha256": "aea09fb24ef375fc55a0c0f281e03743232985e79171304c7553615b19245c61",
+    "tables": 8,
+    "chains": 30,
+    "rules": 99,
+    "sets": 9,
+    "structure_matches_1209_excluding_counters_handles_expiry": true,
+    "a_authenticated_sudo_read": true,
+    "policy_changed": false,
+    "b_thor_rechecked": false
   }
 }

@@ -1,0 +1,203 @@
+{
+  "at_kst": "2026-11-03T16:27:45.539922+09:00",
+  "run_id": "pcap-web-20261103-expanded-r1",
+  "counts": {
+    "scanner": 3,
+    "sqli": 4,
+    "traversal": 5,
+    "shellshock": 3,
+    "xss": 6
+  },
+  "cases": [
+    {
+      "case_id": "scanner-1",
+      "family": "scanner",
+      "source": "2015-03-06/snort.log.1425650399",
+      "pcap_sha256": "077626c7b475a0e33884c0d9f5ec8d74d053a3d0433e27e329a3da99464c1a56",
+      "frame": 50040,
+      "original_payload_sha256": "b8b05795ba5cff76b9c64449c15332901a56430620c072389c6cdd6cd9ffe4f9",
+      "original_uri_sha256": "8a5edab282632443219e051e4ade2d1d5bbc671c781051bf1437897cbdfea0f1"
+    },
+    {
+      "case_id": "scanner-2",
+      "family": "scanner",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 133124,
+      "original_payload_sha256": "69ef514953b1572c80fd926e695d773a22f0348cdfa1b77e055ec3278eee292c",
+      "original_uri_sha256": "8a5edab282632443219e051e4ade2d1d5bbc671c781051bf1437897cbdfea0f1"
+    },
+    {
+      "case_id": "scanner-3",
+      "family": "scanner",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 140084,
+      "original_payload_sha256": "2df5cbffe2135a6364fbe2d3fb0a7627c18c0d80179a80e733a05b66fac768f3",
+      "original_uri_sha256": "0a33a864bd4e16143dfe4b1e6f41ae0ca7255763209d627a29e4baf163f51e93"
+    },
+    {
+      "case_id": "sqli-1",
+      "family": "sqli",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 129601,
+      "original_payload_sha256": "ddacfd91aa9c91599a57c525af16ad97e6f375a7c1cc21f9afeccd7111ea2c66",
+      "original_uri_sha256": "9b904e1e1f9b529da86c83a0914adb2cd01377445e984339c6f06ae619a708c1"
+    },
+    {
+      "case_id": "sqli-2",
+      "family": "sqli",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 129633,
+      "original_payload_sha256": "d17013b8ab2cba4ea45801d00c10521a44a6f0a9e9ce80db6035597305198319",
+      "original_uri_sha256": "405bb7c6e201f121ab8c47297b29ad43d033dc96a1eca5a8cae30563cff12130"
+    },
+    {
+      "case_id": "sqli-3",
+      "family": "sqli",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 155268,
+      "original_payload_sha256": "d183acb981407a5cdc1e6e04b25350203c7d4f711842641248f5b8f6b195b463",
+      "original_uri_sha256": "f24f26c8ca8c184036734c97c086195e5d9a0a1d8f13ca109c9abde93ed8589f"
+    },
+    {
+      "case_id": "sqli-4",
+      "family": "sqli",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 155272,
+      "original_payload_sha256": "4fe9d0abc82971435c543c92ded7fe44a185a2282a5301dba3faf4dbbccfa435",
+      "original_uri_sha256": "6ec4d26c200b7010a8f93d6ff5954ba924f3f37a404743813a7c0111875b6814"
+    },
+    {
+      "case_id": "traversal-1",
+      "family": "traversal",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 135270,
+      "original_payload_sha256": "a7247a1e90f13d9e6e3710ecb07edd74b97823aeb51f63f844270a4a292b599f",
+      "original_uri_sha256": "9664150e86407aa06b3161e1e0c39b2db8815f4a26df6ab41ad60fcecb9c89c8"
+    },
+    {
+      "case_id": "traversal-2",
+      "family": "traversal",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 135282,
+      "original_payload_sha256": "7bd77732cb2cacd22c95ffa92632422b1554fcd4fb16c136987d52281a2cc6a5",
+      "original_uri_sha256": "9bd8d1ad3c721b9d06d05aebe9b3a7d08f7a0507c2cf1499ae680167459d0622"
+    },
+    {
+      "case_id": "traversal-3",
+      "family": "traversal",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 135292,
+      "original_payload_sha256": "82a1726950e83b5ca11b6c65ad650ba83a74e546236b1648526549d33b6e5e3b",
+      "original_uri_sha256": "0fc11bba4717c8bdce3bb716b9faeb818e5b5ca131f14f1158bc54cf9c13ff2a"
+    },
+    {
+      "case_id": "traversal-4",
+      "family": "traversal",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 135303,
+      "original_payload_sha256": "017432e3092f63c4af68b0144abd826a7adb8bb8380fb32b04933de3639e26b8",
+      "original_uri_sha256": "66d4de8a534c129b5227f4e08546634b9413a73bac13cc765ff18023560602d4"
+    },
+    {
+      "case_id": "traversal-5",
+      "family": "traversal",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 135322,
+      "original_payload_sha256": "9b4f02ec969611129572db27ec08cbf720c9a9be5d5e46abf48a2401d191151d",
+      "original_uri_sha256": "9cb5cd2b46e58a72c0e79ee3f8009a23a11a3918a7936bbbe32acbebbe76fef3"
+    },
+    {
+      "case_id": "shellshock-1",
+      "family": "shellshock",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 183086,
+      "original_payload_sha256": "471e21f92f14181dd9c654254ba02879e3a2e5e87adba46b705ed529e54c5044",
+      "original_uri_sha256": "5b0d0f4c826136d55ee5e26a1a1fae3d59bd39c76f2ff8958dc718d4cc33880f"
+    },
+    {
+      "case_id": "shellshock-2",
+      "family": "shellshock",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 183147,
+      "original_payload_sha256": "1171b8d337e75a764167ace05a4d7ad9e436abd5e5108ce69aae8b0ce3ab0820",
+      "original_uri_sha256": "5b0d0f4c826136d55ee5e26a1a1fae3d59bd39c76f2ff8958dc718d4cc33880f"
+    },
+    {
+      "case_id": "shellshock-3",
+      "family": "shellshock",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 183211,
+      "original_payload_sha256": "9be642d03d0e89f121514167961f1adb79daa1f0191c5492c56764bc833ad1c0",
+      "original_uri_sha256": "5b0d0f4c826136d55ee5e26a1a1fae3d59bd39c76f2ff8958dc718d4cc33880f"
+    },
+    {
+      "case_id": "xss-1",
+      "family": "xss",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 132529,
+      "original_payload_sha256": "f7141f227023ac1fe7100b94670a4017704e04e246ab0135e209580cf10f56e0",
+      "original_uri_sha256": "c3274e382a38234fe2ad013374dc0e718d5b0f4e4296e456a22b9bee3bdf46d0"
+    },
+    {
+      "case_id": "xss-2",
+      "family": "xss",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 132583,
+      "original_payload_sha256": "dff6ac78391c16c5292d1b7d758c43b02bae05410c4ba773173ff271f23e339e",
+      "original_uri_sha256": "72831c4396a0b2fbc7876863e99071dd8a753ab64ecd8432c40a0ca2093d35c4"
+    },
+    {
+      "case_id": "xss-3",
+      "family": "xss",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 132593,
+      "original_payload_sha256": "47643fb99f893ba1f3e6e640d07964df0b8e96b3a66a7ba50d0b9c15b7d4fabd",
+      "original_uri_sha256": "85762bd3b9a67dee00a82eed10bd681797401e29f04564c759d599c336a7cce2"
+    },
+    {
+      "case_id": "xss-4",
+      "family": "xss",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 132607,
+      "original_payload_sha256": "b10b4ba27acaf4ae0efb86caaf5bf8545e80b8d7b1d851ddc87d4a4d3b3312bd",
+      "original_uri_sha256": "d6065f33aa053d723c43c1ec179386d1489df15e863f9784ef4700f624755dc5"
+    },
+    {
+      "case_id": "xss-5",
+      "family": "xss",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 132672,
+      "original_payload_sha256": "42add43ea0e4af3e9caa11872d05e412760691958888fe3396f52030555c6114",
+      "original_uri_sha256": "95bc1ffbbe7383b75a07a2f73e6ffd295e26ca3b97ab5957bd59d0a8fdd0f62f"
+    },
+    {
+      "case_id": "xss-6",
+      "family": "xss",
+      "source": "2015-03-17/snort.log.1426550408",
+      "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+      "frame": 132694,
+      "original_payload_sha256": "f59dee5f1673cec0341cc37e3b8298d9a2dccdfbb86279d8c5429a9a2b3f3579",
+      "original_uri_sha256": "12035417e8bbf604f49047d629966b48a834034822befc235fd180ec8ae9a91a"
+    }
+  ],
+  "manifest_sha256": "f132ed752bb1704dc0a64559e6c1cc5cb0b2ebf6b75063f8b7ab1a8d575328c9"
+}

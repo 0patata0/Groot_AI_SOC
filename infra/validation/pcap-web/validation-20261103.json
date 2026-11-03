@@ -1,0 +1,493 @@
+{
+  "schema_version": 1,
+  "observed_date_kst": "2026-11-03",
+  "state": "partial_live_validation_with_remaining_checks",
+  "scan": {
+    "at_kst": "2026-11-03T16:19:51.854273+09:00",
+    "completed": 58,
+    "total": 58,
+    "http_tcp_requests": 59672,
+    "candidates": 4600,
+    "candidate_by_type": {
+      "sqli": 126,
+      "traversal": 1149,
+      "xss": 784,
+      "shell": 1690,
+      "shellshock": 903,
+      "callback": 0,
+      "scanner": 695,
+      "download": 293
+    },
+    "errors": [],
+    "work_dir": "/home/attack/.local/state/capstone-web-eval/20261103-r1"
+  },
+  "scan_count_limit": "candidate regex matches are not malicious labels; thorough stream and packet counts are not interchangeable",
+  "initial_mixed": {
+    "run_id": "pcap-web-20261103-r1",
+    "started_kst": "2026-11-03T16:22:26.901+09:00",
+    "ended_kst": "2026-11-03T16:23:13.257+09:00",
+    "attempted": 100,
+    "sent": 86,
+    "normal": {
+      "200": 42,
+      "308": 41,
+      "None": 14
+    },
+    "source_ips": [
+      "192.168.16.233"
+    ],
+    "runtime_s": 46.357,
+    "results_sha256": "3ed39e2381753ae4458388ff4837fac945acf36042acc58bc0b2f70d5c1ed090"
+  },
+  "mixed_limit": "97 normal +3 samples attempted, 86 HTTP requests actually sent; fourteen normal connection failures overlapped actual IP containment; not delivered 97:3 and not 100% LLM accuracy",
+  "initial_samples": [
+    {
+      "seq": 34,
+      "case": "sqli",
+      "status": 403,
+      "sent": true
+    },
+    {
+      "seq": 67,
+      "case": "xss",
+      "status": 403,
+      "sent": true
+    },
+    {
+      "seq": 100,
+      "case": "traversal",
+      "status": 403,
+      "sent": true
+    }
+  ],
+  "expanded_233": {
+    "attempted": 21,
+    "sent": 21,
+    "waf_correlated": 21,
+    "families": {
+      "scanner": 3,
+      "sqli": 4,
+      "traversal": 5,
+      "shellshock": 3,
+      "xss": 6
+    },
+    "cases": [
+      {
+        "case_id": "scanner-1",
+        "source_pcap": "2015-03-06/snort.log.1425650399",
+        "frame": 50040,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "913100",
+          "949110"
+        ],
+        "transaction_id": "235966848e8b17194c5419d7ef8de07c",
+        "test_id": "pcap-web-20261103-expanded-r1/scanner-1"
+      },
+      {
+        "case_id": "scanner-2",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 133124,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "913100",
+          "949110"
+        ],
+        "transaction_id": "ff5ab4482202d541e6ddbe87d7eae876",
+        "test_id": "pcap-web-20261103-expanded-r1/scanner-2"
+      },
+      {
+        "case_id": "scanner-3",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 140084,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "913100",
+          "949110"
+        ],
+        "transaction_id": "0bda59bc34f8f9d19965b07b4f414363",
+        "test_id": "pcap-web-20261103-expanded-r1/scanner-3"
+      },
+      {
+        "case_id": "sqli-1",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 129601,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10200",
+          "942100",
+          "942160",
+          "949110"
+        ],
+        "transaction_id": "f749af0dff504fe9917d3c65249cede9",
+        "test_id": "pcap-web-20261103-expanded-r1/sqli-1"
+      },
+      {
+        "case_id": "sqli-2",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 129633,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10200",
+          "942160",
+          "949110"
+        ],
+        "transaction_id": "d70274a9a71bc21e0e46a79a0358e64b",
+        "test_id": "pcap-web-20261103-expanded-r1/sqli-2"
+      },
+      {
+        "case_id": "sqli-3",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 155268,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10200",
+          "942100",
+          "942190",
+          "942270",
+          "942360",
+          "949110"
+        ],
+        "transaction_id": "14e53ee8bc54fc373026f0130c086a13",
+        "test_id": "pcap-web-20261103-expanded-r1/sqli-3"
+      },
+      {
+        "case_id": "sqli-4",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 155272,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10200",
+          "942100",
+          "942190",
+          "942270",
+          "942360",
+          "949110"
+        ],
+        "transaction_id": "86ae1dc0d501ef9f62ee6d47bdbb8349",
+        "test_id": "pcap-web-20261103-expanded-r1/sqli-4"
+      },
+      {
+        "case_id": "traversal-1",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 135270,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10500",
+          "930100",
+          "930110",
+          "949110"
+        ],
+        "transaction_id": "20de067d5589f30220d9a827c15dfcbd",
+        "test_id": "pcap-web-20261103-expanded-r1/traversal-1"
+      },
+      {
+        "case_id": "traversal-2",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 135282,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10500",
+          "930100",
+          "930110",
+          "949110"
+        ],
+        "transaction_id": "14563c8b32c81ca8e79e1ade3184eeaf",
+        "test_id": "pcap-web-20261103-expanded-r1/traversal-2"
+      },
+      {
+        "case_id": "traversal-3",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 135292,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10500",
+          "930100",
+          "930110",
+          "949110"
+        ],
+        "transaction_id": "c667675d36e5ca4fac4ef2bf7fbc1b03",
+        "test_id": "pcap-web-20261103-expanded-r1/traversal-3"
+      },
+      {
+        "case_id": "traversal-4",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 135303,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10500",
+          "920270",
+          "930100",
+          "930110",
+          "949110"
+        ],
+        "transaction_id": "90e354d6544be620155f82c054a61e95",
+        "test_id": "pcap-web-20261103-expanded-r1/traversal-4"
+      },
+      {
+        "case_id": "traversal-5",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 135322,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10500",
+          "920270",
+          "930100",
+          "930110",
+          "949110"
+        ],
+        "transaction_id": "b7503b3a47f77c2d5265e69164ded63a",
+        "test_id": "pcap-web-20261103-expanded-r1/traversal-5"
+      },
+      {
+        "case_id": "shellshock-1",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 183086,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10400",
+          "932170",
+          "949110"
+        ],
+        "transaction_id": "b16f25dc0f096172ec744ec81b90dcdb",
+        "test_id": "pcap-web-20261103-expanded-r1/shellshock-1"
+      },
+      {
+        "case_id": "shellshock-2",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 183147,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "932170",
+          "949110"
+        ],
+        "transaction_id": "eff66f310fa259310fb53350f32297b6",
+        "test_id": "pcap-web-20261103-expanded-r1/shellshock-2"
+      },
+      {
+        "case_id": "shellshock-3",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 183211,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "932160",
+          "932170",
+          "949110"
+        ],
+        "transaction_id": "84299dbcecbf632eedc4e570d6fffc78",
+        "test_id": "pcap-web-20261103-expanded-r1/shellshock-3"
+      },
+      {
+        "case_id": "xss-1",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 132529,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10300",
+          "941100",
+          "941110",
+          "941160",
+          "941390",
+          "949110"
+        ],
+        "transaction_id": "f2b592643b85f76aaf05a9c2aa1f92d0",
+        "test_id": "pcap-web-20261103-expanded-r1/xss-1"
+      },
+      {
+        "case_id": "xss-2",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 132583,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10300",
+          "941100",
+          "941110",
+          "941160",
+          "941390",
+          "949110"
+        ],
+        "transaction_id": "8f1a5da799a20766eed8012f2725976e",
+        "test_id": "pcap-web-20261103-expanded-r1/xss-2"
+      },
+      {
+        "case_id": "xss-3",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 132593,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10300",
+          "941100",
+          "941120",
+          "941160",
+          "941170",
+          "941210",
+          "941390",
+          "949110"
+        ],
+        "transaction_id": "f419ed5c7f3bb47d21374a97912e163e",
+        "test_id": "pcap-web-20261103-expanded-r1/xss-3"
+      },
+      {
+        "case_id": "xss-4",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 132607,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10300",
+          "941100",
+          "941120",
+          "941160",
+          "941170",
+          "941210",
+          "941390",
+          "949110"
+        ],
+        "transaction_id": "6d4782f39bf11c67b43cdff84fc3e72b",
+        "test_id": "pcap-web-20261103-expanded-r1/xss-4"
+      },
+      {
+        "case_id": "xss-5",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 132672,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10300",
+          "941100",
+          "941120",
+          "941160",
+          "941170",
+          "941210",
+          "941390",
+          "949110"
+        ],
+        "transaction_id": "14a0e0a97f69832772359c4704b0ad91",
+        "test_id": "pcap-web-20261103-expanded-r1/xss-5"
+      },
+      {
+        "case_id": "xss-6",
+        "source_pcap": "2015-03-17/snort.log.1426550408",
+        "frame": 132694,
+        "client_http_status": 403,
+        "waf_status": 403,
+        "waf_engine": "Enabled",
+        "waf_rule_ids": [
+          "10300",
+          "941100",
+          "941110",
+          "941160",
+          "941390",
+          "949110"
+        ],
+        "transaction_id": "467eaed289bc046a23c9eafdc9b83110",
+        "test_id": "pcap-web-20261103-expanded-r1/xss-6"
+      }
+    ],
+    "statement": "21 variants from 5 families, not 21 distinct exploit classes; 403 is prevention evidence, not successful compromise"
+  },
+  "sftp": {
+    "at_kst": "2026-11-03T16:39:22.777898+09:00",
+    "source": "192.168.16.233:/home/attack/Desktop/PCAP",
+    "destination": "192.168.16.232:/home/att/Desktop/PCAP",
+    "files": 58,
+    "bytes": 4379309075,
+    "duration_s": 131.71,
+    "all_sha256_verified": true,
+    "protocol": "direct SSH/SFTP with pinned ED25519 host key",
+    "progress_sha256": "3c6e7b0e0a1eb9a240beb89d01a5a44819cb6809e36522b17bf83929b91f365c"
+  },
+  "kali232_exception": {
+    "at_kst": "2026-11-03T16:40:03.164010+09:00",
+    "ssh_connection": "192.168.16.231 40032 192.168.16.230 22",
+    "fw_sha256": "bfff08e3f13251177995292c21e7bf6d6cb749d45c0bfb22c68cc397e9d464af",
+    "removed_exception": "192.168.16.232",
+    "preserved_block_handle": 7
+  },
+  "kali232_live_replay": {
+    "state": "unknown",
+    "reason": "SSH returned 255 without result; do not rerun until private results file and process state are recovered",
+    "network_probe_kst": "2026-11-03T18:13:15+09:00",
+    "network": "management host231 and Kali232/233 TCP22 timeout",
+    "last_successful_direct_operation_kst": "2026-11-03T16:42:44.200620+09:00"
+  },
+  "wazuh_observed_rule_ids": [
+    "100102",
+    "100103",
+    "100110",
+    "100111",
+    "100121",
+    "100122",
+    "100261",
+    "100262",
+    "5402",
+    "86601"
+  ],
+  "gaps": [
+    "SID1000002 flags any URI at 40 requests/10seconds: benign repeated paths triggered; no production rule correction made",
+    "233 FW 24 attempts produced no distinct FW_DROP_IN24 success receipt; never score timeout alone as FW-rule success",
+    "232 FW attempt24 client timeouts recorded; kernel/100129 correlation remains unconfirmed because connection was lost",
+    "normal308 responses were redirects only and not Log4Shell backend success",
+    "native immediate IDS containment and LLM later containment are distinct; approval-card and investigation terminal outcomes need separate recovery",
+    "strict management INPUT narrowing and administrator alert exception remain unimplemented",
+    "fresh-server full install, IPv6 removal, NAT consolidation are not validated by these tests"
+  ],
+  "source_sha256": {
+    "scan_http.py": "5c7acce278304dd2d10e2541301630862e3aca124ecf1edcc7be83d73f6987b3",
+    "scan_packets.py": "22fc36c69d4170a0a76775e69ca3535f4b5ffce9a132cff1caa48c9523a08dff",
+    "select_cases.py": "56fc1d3591bf9b3f6bd933297f5f9f7ee2842ddc9455ada5dd13acfe32094cac",
+    "replay_mixed.py": "0c9fd591b137cfc118a2f5062900833ca172512af40679f806a95aa0f9b4f79f",
+    "replay_variants.py": "77af3be6458d3852cc9f20ca713b679a7717a44f68e2954fdb16b85188ae9a83",
+    "probe_fw.py": "42954b080a66b77b81874aaea5d2b490152bec40730819914abfc252016eb46c"
+  },
+  "local_evidence_sha256": {
+    "kali-expand-prepare.json": "65008d0e10e914aa65abbb0a3f40a68a7087d1d7a3dc024a99c9068246bdcb88",
+    "kali-expanded-results.json": "21c6a40e1cafa57480fba92e0c8068bc6a3b798554d75fedbfe2d8776ef0e985",
+    "a-web-observe2.json": "9078545201f5e7a869371b573f75367797b8628274954dacf083b251a3ee04e4",
+    "b-web-observe3.json": "90eb68257d756863474d9915bb5ad91bbdfad7c8ec816c390a329308407dd570",
+    "kali-initial-results.json": "e56e03d0bc963ce550f3575ef8d732f2f1db7baf29ddac220794852e3aaca557",
+    "a-web-containment.json": "8fffbb5a5f114a88fc6c0907073c91c057121e31065aa164a910d1e1c74a3efe",
+    "kali-sftp-transfer.json": "910636784a04dd1c23409d8b1bcb41f8739e1a5083e7755b820deae841cd385f",
+    "confirm-remove-232.json": "b98e425fddba54d7c4b8adf9c7ae56137dfa209ebf2c482c1906c3b644ec74c4",
+    "kali232-fw-scan.json": "6f563b37cb765c75376e627ba0d5df41f4bee1f2b51123a090f41196fca9b4c0",
+    "kali232-expanded-results.json": "f7886490fc6c7ae72b5b23a1d5a1e427fc7958110f3816b1a79037face6953fd"
+  }
+}

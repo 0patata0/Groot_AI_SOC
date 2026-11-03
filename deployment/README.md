@@ -1,5 +1,7 @@
 # 초기 설치기의 Hermes 확장
 
+11/3 조기 해제 재차단 보완은 기존 root `deploy.sh` SOC source bundle의 `incident_containment.py`·`soc_agent_block.py`·`soc_alert_watch.prompt`를 갱신한다. 확인된 해제+60초/자연 기한+60초와 종료 이후 새 공격 근거를 적용하고 WAF 사건에 Native IDS를 추가 요구하지 않는다. 운영에는 재시작 없는 SHA 대조 증분 반영이며 새 서버 전체 설치 시험과 구분한다. 추가 오프라인 바이너리·키·포트·MCP 권한은 없다. [원인·검증·복구](../infra/mcp/containment-reblock.md).
+
 11/3 역할 배정1.1.0은 기존 루트 `deploy.sh`의 공동 채널 source 묶음(review_channel.py/review_channel_policy.py)과 Ollama·review 채널 안내에 반영한다. 추가 deb/wheel/이미지/포트/설정 키/권한은0이며 기존 SOUL·운영35B·endpoint를 유지한다. 운영은 idle/CAS 복구본을 둔 증분 적용이고 새 서버 전체 설치는 별도 미검증이다. [사용·설치·복구](../infra/hermes/agent-deployment.md).
 
 11/3 공통 계약1.5.14는 기존 루트 `deploy.sh`의 Ollama source bundle과 SIEM Hermes 플러그인 복사 경로에 반영한다. canonical `infra/ollama-trial/harness.py`·`infra/hermes/chat_contract.py`가 두 봇에 배치된다. 운영은 SHA를 대조한4파일 증분 적용으로 검증했으며 새 서버 전체 설치는 미실시다. 추가 패키지·이미지·설정 키·MCP·공개 포트는 없다. [단문진단·스키마·근거 검사와 복구](../infra/hermes/diagnostic-harness.md).

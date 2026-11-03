@@ -304,10 +304,60 @@ class ContainmentTests(unittest.TestCase):
         self.assertEqual(self.backend.entries[PUBLIC]["comment"], "operator")
     def test_cooldown_after_release(self):
         r = self.propose()
+        self.engine.now += 6
         self.engine.broker.decide(r["request_id"], "release")
         self.service.worker_once()
-        self.engine.now += 60
-        with self.assertRaises(c.ContainmentError): self.propose()
+        posted_after_release = len(self.engine.broker.cards)
+        self.engine.now += 59
+        with self.assertRaisesRegex(c.ContainmentError,'cooldown'): self.propose()
+        self.engine.now += 1
+        self.service.evidence=lambda ip,now:c.validated_evidence([event(9,timestamp=datetime.fromtimestamp(now-1,timezone.utc).isoformat())],ip,now)
+        new = self.propose()
+        self.assertNotEqual(new['request_id'],r['request_id'])
+        self.assertEqual(len(self.engine.broker.cards),posted_after_release+1)
+        self.assertEqual(new['owned_deadline'],NOW+66+600)
+        old=self.service._load(r['request_id'])
+        self.assertEqual(old['closed_at'],NOW+6)
+        self.assertEqual(old['owned_deadline'],NOW+600)
+        self.assertEqual(old['payload']['expires_at'],NOW+600)
+
+    def test_early_release_does_not_reblock_using_old_lookback_evidence(self):
+        r=self.propose();self.engine.now+=6
+        self.engine.broker.decide(r['request_id'],'release');self.service.worker_once()
+        posted_after_release=len(self.engine.broker.cards)
+        self.engine.now+=120
+        with self.assertRaisesRegex(c.ContainmentError,'no new verified attack'):self.propose()
+        self.assertEqual(self.backend.creates,1);self.assertEqual(len(self.engine.broker.cards),posted_after_release)
+
+    def test_latest_attack_in_same_flow_is_retained_and_signatures_count_one_flow(self):
+        newer=event(1,timestamp=datetime.fromtimestamp(NOW-1,timezone.utc).isoformat())
+        another=copy.deepcopy(newer);another['alert']['signature_id']=1000031
+        observed=c.validated_evidence([event(1),newer,another],PUBLIC,NOW)
+        self.assertEqual(observed['independent_flows'],1);self.assertEqual(len(observed['events']),2)
+        fresh=self.service._fresh_evidence(observed,NOW-5)
+        self.assertEqual(len(fresh['events']),2);self.assertEqual(fresh['independent_flows'],1)
+
+    def test_waf_reblock_requires_a_transaction_after_release(self):
+        evidence={'sensor':'a:modsecurity','independent_flows':0,'http_transactions':2,'events':[
+            {'timestamp':datetime.fromtimestamp(NOW-20,timezone.utc).isoformat(),'transaction_id':'old'},
+            {'timestamp':datetime.fromtimestamp(NOW-1,timezone.utc).isoformat(),'transaction_id':'new'}]}
+        fresh=self.service._fresh_evidence(evidence,NOW-10)
+        self.assertEqual(fresh['http_transactions'],1);self.assertEqual(fresh['events'][0]['transaction_id'],'new')
+
+    def test_old_ids_flow_cannot_hide_a_new_waf_attack_after_release(self):
+        old=c.validated_evidence([event(1)],PUBLIC,NOW)
+        waf={'sensor':'a:modsecurity','independent_flows':0,'http_transactions':1,'events':[
+            {'timestamp':datetime.fromtimestamp(NOW-1,timezone.utc).isoformat(),'transaction_id':'fresh'}]}
+        def namespace(path):
+            return {'read_evidence':lambda *args:waf} if path==c.WAF_READER else {}
+        with mock.patch.object(c,'read_suricata_evidence',return_value=old),mock.patch.object(c,'_reader_namespace',side_effect=namespace):
+            observed=c.read_evidence(PUBLIC,NOW,after=NOW-10)
+        self.assertEqual(observed['sensor'],'a:modsecurity')
+        self.assertEqual(observed['events'][0]['transaction_id'],'fresh')
+
+    def test_late_expiry_worker_does_not_start_a_new_one_minute_wait(self):
+        r=self.propose();self.engine.now+=900;self.service.worker_once()
+        self.assertEqual(self.service.status(r['request_id'])['cooldown_until'],NOW+660)
 
     def test_one_minute_cooldown_applies_to_legacy_records_without_rewriting_plan(self):
         r=self.propose();rec=self.service._load(r['request_id'])

@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-03",
+  "scope": "early release cooldown, fresh evidence, WAF LLM response ordering",
+  "sources": {
+    "infra/mcp/incident_containment.py": "4ea7410546c6b2da26aff4482afdc19e9d47484a052822b438b5d2f633695e14",
+    "deployment/soc_agent_block.py": "2387265201472570c2551836c0d5374f893fad2f787a5312373d59b04150117c",
+    "infra/hermes/soc_alert_watch.prompt": "e1fbbd3454667c0ed0ef8c460a70db3752f708013bda565d3b4ed0aaaffb1ed0"
+  },
+  "local_tests": {
+    "containment": 43,
+    "response_release": 4,
+    "rule_executor": 65,
+    "managed_suricata": 44,
+    "managed_waf": 10,
+    "approval_broker": 14,
+    "initial_install_contract": 37,
+    "total": 217
+  },
+  "server_tests": {
+    "containment_and_response_release": 47,
+    "passed": 47,
+    "skipped": 0
+  },
+  "deployment": {
+    "a_applied_kst": "2026-11-03T14:49:06+09:00",
+    "b_applied_kst": "2026-11-03T14:49:51+09:00",
+    "a_confirmed_kst": "2026-11-03T15:01:48+09:00",
+    "b_confirmed_kst": "2026-11-03T15:01:50+09:00",
+    "a_source_files": 2,
+    "b_prompt_files": 1,
+    "restarts": 0,
+    "legacy_release_metadata_repairs": 3,
+    "immutable_plans_and_original_deadlines_preserved": true,
+    "recovery_each_host": "/var/lib/capstone-reblock/20261103-r1"
+  },
+  "live_sequence": {
+    "source_ip": "192.168.16.233",
+    "previous_request_id": "dadbd90f3640b81496cb59f6e41e95d9",
+    "previous_release_kst": "2026-11-03T15:00:10+09:00",
+    "reblock_allowed_after_kst": "2026-11-03T15:01:10+09:00",
+    "new_waf_observation_kst": "2026-11-03T15:03:01.602+09:00",
+    "waf_rule_ids": [
+      942100
+    ],
+    "waf_http_status": 403,
+    "new_request_id": "ddb6224b55cba5fcd44845ca26a22fab",
+    "new_request_created_kst": "2026-11-03T15:04:58+09:00",
+    "new_request_deadline_kst": "2026-11-03T15:14:58+09:00",
+    "new_request_source": "a:modsecurity",
+    "actual_requester": "hermes-mcp",
+    "actual_production_case_id": "cdc88d3719b07928256404b75a3a9f7a",
+    "actual_production_run_id": "01d36f3425fe3548ec4c9eb4ea79805b",
+    "actual_tool": "mcp__rule_write_a__temporarily_contain_ip",
+    "actual_tool_ordinal": 1,
+    "actual_tool_is_error": false,
+    "approval_post_id": "4gswcfd1ci8bt85z337rujsk4h",
+    "last_kernel_read_kst": "2026-11-03T15:08:11+09:00",
+    "kernel_owned_tag_verified": true,
+    "kernel_set_handle_preserved": 7
+  },
+  "method": {
+    "execution_host": "Kali 192.168.16.233",
+    "target": "A 192.168.16.230 HTTP80, Host dvwa.grootlab.duckdns.org",
+    "request": "one GET /dvwa/vulnerabilities/sqli/ with id=1' OR '1'='1 and Submit=Submit",
+    "no_database_extraction": true,
+    "response_body_not_logged": true,
+    "timing_authority": "gateway WAF producer and root workflow timestamps; Kali clock was approximately 8 seconds behind",
+    "user_traffic_not_globally_stopped": true
+  },
+  "limits": [
+    "Card/temporary-block path passed; full automatic investigation completion is not proven.",
+    "Private model r1/r2 ended outcome_unknown; r1 repeated a refused call and used invalid arguments.",
+    "Private r2 returned a duplicate of a real production-created request; it did not create that first card.",
+    "Private r3/r4 ended before model execution due a strict fresh-WAF-input requirement; not counted as model failures.",
+    "A later Kali SSH probe timed out while its source was actually IP-blocked; no new SQLi request from that probe is claimed.",
+    "No promotion/training/model switch, new MCP permission, NAT/IPv6/management ACL change, keep-for-60-minute retest, full expiry retest or fresh-OS installation in this unit."
+  ],
+  "private_evidence_sha256": {
+    "reblock-apply.json": "1b09d4d22c4433e307a57d250f16b624644709cbdd77d0c9d3bddfbf42a156c7",
+    "b-prompt-apply.json": "158d9c70cec0df86fc1ea4c3393c0d5368c945dc7a4028a00da9559bc1354cd8",
+    "a-confirmed.json": "b4a07d3d67ebc8d064f3dc124f3ff1c79b5a8d286193f8ba246d19c86a1fabc0",
+    "b-confirmed.json": "8677703d8535fdc4cf05087cd6af621b0fe95f968dae2843433d15563dbe564b",
+    "repair-third.json": "ae11db8e54252b84dc3fc20062e7a2a3c52a9b9d2adf0f744a4d1f577cac8e8e",
+    "a-current-proof-r3.json": "65de57af6c085dd250b6b5eb6dca75e809d2d5c8883d0eb4e17f5c531828cf94",
+    "b-card-proof.json": "9b80c5c9b141c4942f5e1931b8a1afc974b252b63616f33b0dbc59ea3f004088",
+    "reblock-success-final.json": "df125934b4cd351c4985d88070e9484168edcf080517254d58f48c8c721be460"
+  },
+  "cleanup": {
+    "server_a_test_fixtures_removed": 6,
+    "server_b_test_drivers_removed": 4,
+    "private_model_units_all_terminal": true,
+    "own_two_input_absence_failures_reset": true,
+    "recovery_and_private_evidence_preserved": true,
+    "mac_task_temporary_sources": "pending final publication cleanup"
+  }
+}

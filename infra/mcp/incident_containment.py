@@ -132,16 +132,19 @@ def validated_evidence(events, ip, now):
                    "severity": alert["severity"], "category": alert["category"]}
             if not 1 <= row["dest_port"] <= 65535:
                 continue
-            # Multiple signatures/repeated packets in one flow count once.
-            if fid not in rows or canonical(row) < canonical(rows[fid]):
-                rows[fid] = row
+            # Keep the newest observation per flow/signature. An older alert
+            # in the same persistent TCP flow must not hide a later attack
+            # after administrator release. Independent flows still count once.
+            key = (fid, sid)
+            if key not in rows or (seen, canonical(row)) > (timestamp(rows[key]['timestamp']), canonical(rows[key])):
+                rows[key] = row
         except (KeyError, ValueError, TypeError, ContainmentError):
             continue
     ordered = sorted(rows.values(), key=lambda r: (r["timestamp"], r["flow_id"]))
     if not ordered:
         raise ContainmentError("no recent inbound severity-1/2 attack flow observed by the trusted sensor")
     return {"sensor": "a:suricata", "window_seconds": LOOKBACK_SECONDS,
-            "independent_flows": len(ordered), "events": ordered[-16:]}
+            "independent_flows": len({row['flow_id'] for row in ordered}), "events": ordered[-16:]}
 
 
 def _reader_namespace(path):
@@ -217,18 +220,18 @@ def read_suricata_evidence(ip, now, path=EVE_PATH):
     return validated_evidence(events, ip, now)
 
 
-def read_evidence(ip, now, path=EVE_PATH):
+def read_evidence(ip, now, path=EVE_PATH, *, after=None):
     checked_ip(ip)
     try:
-        return read_suricata_evidence(ip, now, path)
+        return ContainmentService._fresh_evidence(read_suricata_evidence(ip, now, path), after)
     except (ContainmentError, OSError):
         if Path(path) != EVE_PATH:
             raise
     # A failed sensor is never replaced with an unverified copy of its log.
     # An independently attested WAF denial is another trusted source instead.
     try:
-        return _reader_namespace(WAF_READER)["read_evidence"](
-            ip, now, _reader_namespace(MANAGED_READER))
+        return ContainmentService._fresh_evidence(_reader_namespace(WAF_READER)["read_evidence"](
+            ip, now, _reader_namespace(MANAGED_READER)), after)
     except (OSError, ValueError, KeyError, TypeError, RecursionError):
         raise ContainmentError("no verified recent Suricata attack flow or WAF attack denial; containment refused") from None
 
@@ -460,6 +463,9 @@ class ContainmentService:
                 payload["expires_at"] != record["created_at"] + TEMP_SECONDS or
                 not record["created_at"] < record["owned_deadline"] <= record["created_at"] + TEMP_SECONDS + KEEP_SECONDS):
             raise ContainmentError("incident state plan or absolute deadline is inconsistent")
+        if 'closed_at' in record and (type(record['closed_at']) is not int or
+                record['closed_at'] < record['created_at'] or record['status'] not in TERMINAL):
+            raise ContainmentError('incident close time is inconsistent')
         return record
 
     def _records(self):
@@ -469,10 +475,41 @@ class ContainmentService:
         return [self._load(p.stem) for p in paths]
 
     @staticmethod
+    def _ended_at(r):
+        # Old records without verified close metadata retain their original
+        # deadline. Never infer a release from mtime, card time, or an empty set.
+        return min(r['owned_deadline'], r.get('closed_at', r['owned_deadline']))
+
+    @staticmethod
     def _cooldown_until(r):
         # Apply the current user-approved interval to existing records without
         # rewriting their historical signed evidence/plan or extending a block.
-        return min(r["cooldown_until"], r["owned_deadline"] + COOLDOWN_SECONDS)
+        return min(r["cooldown_until"], ContainmentService._ended_at(r) + COOLDOWN_SECONDS)
+
+    def _mark_closed(self, record):
+        """Call only after ownership-bound release and absent-element readback."""
+        now = int(self.engine.clock())
+        if now < record['created_at']:
+            raise ContainmentError('clock moved before incident creation')
+        record.setdefault('closed_at', now)
+        record['cooldown_until'] = self._ended_at(record) + COOLDOWN_SECONDS
+
+    @staticmethod
+    def _fresh_evidence(evidence, after):
+        if after is None:
+            return evidence
+        events = [row for row in evidence.get('events', [])
+                  if isinstance(row, dict) and timestamp(row.get('timestamp')) > after]
+        if not events:
+            raise ContainmentError('no new verified attack after previous containment ended; old evidence cannot reblock')
+        evidence = dict(evidence, events=events, after_previous_containment_at=after)
+        if evidence.get('sensor') == 'a:suricata':
+            evidence['independent_flows'] = len({row['flow_id'] for row in events})
+        elif evidence.get('sensor') == 'a:modsecurity':
+            evidence['http_transactions'] = len({row['transaction_id'] for row in events})
+        else:
+            raise ContainmentError('unknown trusted evidence sensor')
+        return evidence
 
     @staticmethod
     def _summary(r):
@@ -481,6 +518,7 @@ class ContainmentService:
                 "owned_deadline": r["owned_deadline"], "keep_seconds": KEEP_SECONDS,
                 "cooldown_seconds": COOLDOWN_SECONDS,
                 "cooldown_until": ContainmentService._cooldown_until(r),
+                "closed_at": r.get('closed_at'),
                 "evidence_sha256": r["payload"]["plan"]["evidence_sha256"],
                 "independent_flows": r["evidence"]["independent_flows"],
                 "evidence_sensor": r["evidence"]["sensor"],
@@ -526,15 +564,22 @@ class ContainmentService:
         with self.engine.locked():
             now = int(self.engine.clock())
             records = self._records()
+            ended = []
             for old in records:
                 if old["ip"] == ip:
                     if old["status"] not in TERMINAL and now < old["owned_deadline"]:
                         return dict(self._summary(old), duplicate=True)
                     if now < self._cooldown_until(old):
                         raise ContainmentError("same-IP cooldown active; repeated requests cannot renew containment")
+                    ended.append(self._ended_at(old))
             if sum(r["status"] not in TERMINAL and now < r["owned_deadline"] for r in records) >= 8:
                 raise ContainmentError("concurrent temporary containment limit reached")
-            evidence = self.evidence(ip, now)
+            cutoff = max(ended) if ended else None
+            # Apply the boundary before selecting the default source: a stale
+            # but still-in-lookback IDS flow cannot hide a NEW WAF transaction.
+            observed = (self.evidence(ip, now, after=cutoff) if self.evidence is read_evidence
+                        else self.evidence(ip, now))
+            evidence = self._fresh_evidence(observed, cutoff)
             self.engine.broker.health()  # authenticated availability before mutation
             rid = secrets.token_hex(16)
             deadline = now + TEMP_SECONDS
@@ -591,6 +636,7 @@ class ContainmentService:
             with self.backend.locked():
                 after = self.backend.release(record)
             record["status"], record["result"] = terminal, detail
+            self._mark_closed(record)
         except Exception:
             record["status"], record["result"] = "ownership_lost", "release not confirmed; never removing a different owner's block; original kernel TTL still applies to any owned entry"
             after = {"ip": record["ip"], "observation": "unavailable_or_changed"}

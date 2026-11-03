@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+11/3 해제 후 재차단 보완의 추가 deb/wheel/이미지는 없다. 기존 source archive의 `infra/mcp/incident_containment.py`, `deployment/soc_agent_block.py`, `infra/hermes/soc_alert_watch.prompt`만 갱신하며 root `deploy.sh`의 기존 SOC 경로로 반입한다. 운영 증분 반영/복구와 새 서버 미검증 범위는 [검증 문서](../infra/mcp/containment-reblock.md)를 따른다.
+
 11/3 역할 배정1.1.0은 기존 루트 `deploy.sh`의 공동 채널 source 묶음(review_channel.py/review_channel_policy.py)과 Ollama·review 채널 안내에 반영한다. 추가 deb/wheel/이미지/포트/설정 키/권한은0이며 기존 SOUL·운영35B·endpoint를 유지한다. 운영은 idle/CAS 복구본을 둔 증분 적용이고 새 서버 전체 설치는 별도 미검증이다. [사용·설치·복구](../infra/hermes/agent-deployment.md).
 
 현재 반입 소스는11/3 공통 계약1.5.14의 `infra/ollama-trial/harness.py`와 `infra/hermes/chat_contract.py`를 포함한다. 인자 없는 Wazuh3도구의 스키마 호환·단문 진단·근거 검사는 기존 source archive만 갱신하며 추가 deb/wheel/이미지는0이다. 새 설정·키·MCP 권한은 필요하지 않다. 루트 `deploy.sh`의 기존 두 봇 복사 경로를 유지한다. [운영 검증·원복·새 서버 미검증 범위](../infra/hermes/diagnostic-harness.md). 아래 날짜별 항목은 각 변경 당시의 반입 내역이다.

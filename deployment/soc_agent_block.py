@@ -66,6 +66,7 @@ def release_owned_containment(engine, containment, backend, ip, before):
     if after.get("element") is not None:
         raise ValueError("release_readback_failed")
     record["status"] = "released"
+    service._mark_closed(record)
     record["result"] = "released by existing Response MCP after separate operator unblock approval"
     record["after_observation_sha256"] = containment.digest(after)
     service._save(record)

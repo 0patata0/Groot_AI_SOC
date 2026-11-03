@@ -14,7 +14,7 @@ class ReleaseTests(unittest.TestCase):
         self.rid='a'*32
         self.record={'ip':'192.168.16.233','owned_deadline':1800000000,'status':'kept'}
         self.before={'comment':'contain:'+self.rid+':1800000000'}
-        self.service=SimpleNamespace(_load=mock.Mock(side_effect=lambda rid:copy.deepcopy(self.record)),_save=mock.Mock())
+        self.service=SimpleNamespace(_load=mock.Mock(side_effect=lambda rid:copy.deepcopy(self.record)),_save=mock.Mock(),_mark_closed=mock.Mock())
         self.c=SimpleNamespace(ContainmentService=mock.Mock(return_value=self.service),digest=lambda v:'b'*64)
         self.b=SimpleNamespace(owned=mock.Mock(return_value=True),release=mock.Mock(return_value={'element':None}))
     def call(self):m.release_owned_containment('engine',self.c,self.b,'192.168.16.233',self.before)
@@ -23,6 +23,7 @@ class ReleaseTests(unittest.TestCase):
         saved=self.service._save.call_args.args[0]
         self.assertEqual(saved['status'],'released');self.assertEqual(saved['owned_deadline'],1800000000)
         self.b.release.assert_called_once()
+        self.service._mark_closed.assert_called_once_with(saved)
     def test_unknown_tags_never_delete(self):
         for tag in ('manual','response:x','contain:bad:1800000000'):
             self.before['comment']=tag
@@ -40,5 +41,6 @@ class ReleaseTests(unittest.TestCase):
         self.b.release.return_value={'element':self.before}
         with self.assertRaises(ValueError):self.call()
         self.service._save.assert_not_called()
+        self.service._mark_closed.assert_not_called()
 
 if __name__=='__main__':unittest.main()

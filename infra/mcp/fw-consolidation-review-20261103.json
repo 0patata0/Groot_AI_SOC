@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "observed_at_kst": "2026-11-03T12:09:27+09:00",
+  "source_ruleset_sha256": "11a5571f7f1fbcb39d23eebf149deb76188f649ab8caae5b5d4a3abed565062e",
+  "scope": "A host network namespace; read-only snapshot, not all equipment",
+  "rules": 99,
+  "tables": 8,
+  "sets": 9,
+  "functional_groups": {
+    "INPUT": 14,
+    "OUTPUT": 14,
+    "FORWARD": 47,
+    "NAT": 13,
+    "MANGLE": 0,
+    "PREROUTING_RAW": 11
+  },
+  "nat_usage_observed": {
+    "window_kst": [
+      "2026-11-03T12:09:27+09:00",
+      "2026-11-03T12:14:16+09:00"
+    ],
+    "docker_dnat_443_packet_counter_delta": 16,
+    "docker_nat_prerouting_packet_counter_delta": 43,
+    "docker_container_snat_packet_counter_delta": 79,
+    "project_nat_tables_have_no_counters": true,
+    "conntrack_cli_or_proc_unavailable": true,
+    "dashboard_10443_recent_use": "unverified"
+  },
+  "merge_candidate": {
+    "status": "offline_generated_not_applied",
+    "source_tables": [
+      "ip capstone_gw",
+      "ip capstone_fwd"
+    ],
+    "target": "inet capstone_fw",
+    "preserved_nat_rules": 3,
+    "new_chains": [
+      "nat_prerouting",
+      "nat_postrouting"
+    ],
+    "ipv4_guard_explicit": true,
+    "docker_tables_touched": false,
+    "host_filter_or_block_sets_replaced": false
+  },
+  "unused_tables_proven": [],
+  "administrator_policy": {
+    "new_admin_ip": "pending_user_input",
+    "withdrawn_candidate": "211.170.162.85/32",
+    "sole_admin_restriction_applied": false,
+    "existing_campus_allowlist_changed": false
+  },
+  "verification": {
+    "unit_tests": 6,
+    "actual_snapshot_accounted_rules": 99,
+    "nft_syntax_check": false,
+    "isolated_network_namespace": false,
+    "live_policy_apply": false,
+    "mcp_api_or_bot_view_deployed": false,
+    "new_server_full_install": false
+  },
+  "remaining": [
+    "restore management connectivity",
+    "get new administrator IP and test recovery path",
+    "audit all security-device management listeners and proxy trust",
+    "integrate persistence and root deploy.sh without overwriting live installation",
+    "validate syntax and isolated flows with exact rollback",
+    "apply after comparison and verify management/web/inference/containment flows"
+  ]
+}

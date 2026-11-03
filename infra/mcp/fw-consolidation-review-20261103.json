@@ -65,5 +65,33 @@
     "integrate persistence and root deploy.sh without overwriting live installation",
     "validate syntax and isolated flows with exact rollback",
     "apply after comparison and verify management/web/inference/containment flows"
-  ]
+  ],
+  "ipv6_retirement": {
+    "requested": true,
+    "candidate_tables": [
+      {
+        "family": "ip6",
+        "table": "nat",
+        "rules": 2
+      },
+      {
+        "family": "ip6",
+        "table": "filter",
+        "rules": 5
+      }
+    ],
+    "unused_proven": false,
+    "live_evidence_pending": [
+      "addresses/routes/sysctl/listeners and actual flows",
+      "Docker EnableIPv6/IPv6 host port mapping",
+      "active Docker regeneration policy"
+    ],
+    "deleted_tables": []
+  },
+  "prerouting_review": {
+    "docker_dnat_required": true,
+    "project_dashboard_dnat_retirement_pending_use_review": true,
+    "early_containment_requires_equivalent_input_forward_validation_before_move": true,
+    "changed": false
+  }
 }

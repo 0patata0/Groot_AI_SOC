@@ -47,3 +47,9 @@ python3 -B -m unittest discover -s infra/mcp -p test_fw_policy_layout.py
 4. 기존 `capstone-nat.sh`의 지속 설정·부팅 unit·legacy 참조를 함께 정리하고 루트 `deploy.sh` 설치 경로를 동기화한다. 새 서버 설치와 기존 운영 서버 증분 변경을 구분한다.
 5. 정확한 이전 바이트·SHA/CAS·독립 복구 타이머와 임시차단 TTL 보존을 준비한다. 비교 중인 모델의 실제 조회 대상은 비교 완료 전에 바꾸지 않는다.
 6. 적용 후 관리 SSH/대시보드·공개 웹·내부/외부 통신·MCP·차단/승인/만료·재생성 경로를 확인한 뒤 운영 반영을 확정한다.
+
+## 추가 정리 범위: IPv6와 PREROUTING
+
+사용자는 미사용 IPv6 테이블도 제거하도록 요청했다. 현재 A 스냅샷에는 Docker 소유 `ip6 nat`(2규칙)·`ip6 filter`(5규칙)가 있고, 확인된 IPv6 카운터는0이다. 이것만으로 미사용을 입증하지 않는다. 연결 복구 후 비루프백IPv6주소/라우팅·실제서비스/통신·인터페이스sysctl·Docker네트워크의EnableIPv6·IPv6포트공개/IPv4매핑·daemon의규칙재생성설정을확인한다. 미사용이입증되면 해당테이블과생성원인을함께정리하고재시작/부팅재생성·관리/웹통신·복구를검증한다. 이번실제삭제는0이다.
+
+PREROUTING은표시용테이블이아니라패킷처리hook이다. 현재Docker외부포트DNAT와프로젝트10443DNAT,DNAT이전임시선차단에사용한다. INPUT만으로이동하면전달패킷을놓칠수있다. 선차단은INPUT/FORWARD공통체인으로재설계할수있지만보호주소·기존연결차단·TTL·Docker순서를재검증해야한다. 10443이불필요하다고확인되면그DNAT경로를정리할수있으며,이것이DockerDNAT의PREROUTING제거를뜻하지않는다.

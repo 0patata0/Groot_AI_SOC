@@ -350,7 +350,9 @@
     "thor_primary_preserved": true,
     "thor_available_bytes_after": 83248549888,
     "weights_deleted": false,
-    "server_results_and_recovery_evidence_preserved": true
+    "server_results_and_recovery_evidence_preserved": true,
+    "expired_test_unit_failure_reset_after_evidence_preservation": true,
+    "expired_test_unit_reset_at_kst": "2026-11-03T13:26:12+09:00"
   },
   "decision": {
     "operating_model": "qwen3.6:35b",

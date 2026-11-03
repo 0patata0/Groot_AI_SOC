@@ -59,7 +59,6 @@
     "new_server_full_install": false
   },
   "remaining": [
-    "recover final original model comparison result and stop private test services",
     "get new administrator IP and test recovery path",
     "audit all security-device management listeners and proxy trust",
     "integrate persistence and root deploy.sh without overwriting live installation",
@@ -153,5 +152,6 @@
     "live_applied": false,
     "final_isolated_source_sha256": "63ed343b701ee0456a67a6b23a37acfc5f252f791c75a5b1aed51b2952663a48",
     "final_isolated_recheck_at_kst": "2026-11-03T13:15:44.417593+09:00"
-  }
+  },
+  "model_comparison_and_test_cleanup_completed_at_kst": "2026-11-03T13:19:33+09:00"
 }

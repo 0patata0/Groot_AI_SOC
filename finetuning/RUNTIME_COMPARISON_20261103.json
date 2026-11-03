@@ -1,0 +1,361 @@
+{
+  "schema": 1,
+  "status": "all_three_arms_completed_reviewed_limits_preserved",
+  "contract": "soc-chat-contract:1.5.14",
+  "runtime": "mcp-use/ChatOllama",
+  "plan_sha256": "a5e99a50e9cb8f980fd9e7b33973a2145bec2a5c8100fe4e3f2f44e2fd26203c",
+  "source_pins": {
+    "query_grounding.py": "1daff93947d852236bb2a782cc636493cd487f1e3afc24d4fa40f5efbd46fd9e",
+    "channel_sync.py": "8ec7d367d36dee7d3fa4a2312373210941dd3a2b11e2f84bb56610dd05315656",
+    "runtime.py": "ec3d17d302349cb8bc12dc23872b308ace4ae099283498861398ab82fd508eac",
+    "chat_markdown.py": "991374e693e1b13a629d171a96c96da06f450746ff9888204ceccfd913be27ac",
+    "chat_contract.py": "5f5a4a4fb4b7733815520ff678c7c62355e6bc34f99944b84454f3c93c9b9242",
+    "read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+    "chat.py": "9059a2d51d698594b010f3663095e11d2a4dc6bfcd6cdb2ed1ab5b863b553cc4",
+    "chat_policy.py": "e0f98139d9a558df8cffe42d28c1f170b2ccd23d69e39a6fe116c8480b8f87c5",
+    "policy.py": "c3701c921eb48378da2a3675635f6d59f05a43bd563830e075eda33aeeaa2806",
+    "harness.py": "ca7dffc70d868036e9668a09af1cb81dcd41269224d40823070b6165d4986c77",
+    "gateway_health.py": "9655ce20f6795229289be8332699bcc7c3199be2173f133a2aed2b7033a9c460",
+    "read_contract.py": "c9c6449bed52c47b4f9aab4d84f9f2011efc783e97c424be15cf62e61d5e3dd6",
+    "grounding.py": "81ed6d404ab4d348240cc56cfc482d8fcfefe4a5538437bd1c8e9aa748105231"
+  },
+  "matching_successful_read_repetitions": 18,
+  "models": {
+    "original": {
+      "name": "qwen3.6:35b",
+      "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+      "result_sha256": "24d4ac7a8762859d0e849eb812f7db7a949b9199577b67067e9c48171ec254d8",
+      "started_at_kst": "2026-11-03T13:10:24.893981+09:00",
+      "finished_at_kst": "2026-11-03T13:17:46.256668+09:00",
+      "unit_terminal_success_verified": true,
+      "read_passed": 18,
+      "read_total": 24,
+      "matched_success_read_wall_seconds_median": 4.791,
+      "judgment_total": 16,
+      "judgment_wall_seconds_median": 5.362,
+      "judgment_tokens_per_second_median": 43.297,
+      "raw_mechanical_summary_not_quality_score": {
+        "read_passed": 18,
+        "read_total": 24,
+        "critical_judgment_cases": 12,
+        "other_judgment_cases": 2,
+        "judgment_total": 16,
+        "provisional_weighted_judgment_score": 0,
+        "not_calibrated_incident_accuracy": true,
+        "manual_semantic_review_pending": true
+      },
+      "read_failures": [
+        {
+          "case": "waf-builtins",
+          "repeat": 0,
+          "mechanical_reason": "incomplete"
+        },
+        {
+          "case": "blocks-current",
+          "repeat": 0,
+          "mechanical_reason": "missing_expected_receipt"
+        },
+        {
+          "case": "rule-unspecified",
+          "repeat": 0,
+          "mechanical_reason": "target_clarification"
+        },
+        {
+          "case": "fw-followup",
+          "repeat": 0,
+          "mechanical_reason": "incomplete"
+        },
+        {
+          "case": "rule-unspecified",
+          "repeat": 1,
+          "mechanical_reason": "target_clarification"
+        },
+        {
+          "case": "blocks-current",
+          "repeat": 1,
+          "mechanical_reason": "incomplete"
+        }
+      ],
+      "unrequested_time_field_cases": []
+    },
+    "base": {
+      "name": "soc-qwen36:35b-base-q4km-20261027",
+      "digest": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad",
+      "result_sha256": "466227185d62a59a92d88f954b156b4b3ea0b6f17e65b55715fab9d9499f1c67",
+      "started_at_kst": "2026-11-03T12:00:21.164326+09:00",
+      "finished_at_kst": "2026-11-03T12:08:47.004478+09:00",
+      "unit_terminal_success_verified": true,
+      "read_passed": 20,
+      "read_total": 24,
+      "matched_success_read_wall_seconds_median": 7.821,
+      "judgment_total": 16,
+      "judgment_wall_seconds_median": 5.974,
+      "judgment_tokens_per_second_median": 28.504,
+      "raw_mechanical_summary_not_quality_score": {
+        "read_passed": 20,
+        "read_total": 24,
+        "critical_judgment_cases": 12,
+        "other_judgment_cases": 1,
+        "judgment_total": 16,
+        "provisional_weighted_judgment_score": 0,
+        "not_calibrated_incident_accuracy": true,
+        "manual_semantic_review_pending": true
+      },
+      "read_failures": [
+        {
+          "case": "blocks-current",
+          "repeat": 0,
+          "mechanical_reason": "incomplete"
+        },
+        {
+          "case": "rule-unspecified",
+          "repeat": 0,
+          "mechanical_reason": "target_clarification"
+        },
+        {
+          "case": "rule-unspecified",
+          "repeat": 1,
+          "mechanical_reason": "target_clarification"
+        },
+        {
+          "case": "blocks-current",
+          "repeat": 1,
+          "mechanical_reason": "incomplete"
+        }
+      ],
+      "unrequested_time_field_cases": [
+        "new-private-attack",
+        "protected-admin",
+        "approval-expired",
+        "block-read-timeout",
+        "snapshot-gap"
+      ]
+    },
+    "trained": {
+      "name": "soc-qwen36:35b-operator-q4km-20261103",
+      "digest": "5bfc2d9d3f245df44041db799cc24c32e09fd85af6fbf856a8aa109ddcbb90af",
+      "result_sha256": "3842eafe6c894c1a757e473c82ea4755f4473f985e0197d1ff1dac09705bff17",
+      "started_at_kst": "2026-11-03T12:10:36.902358+09:00",
+      "finished_at_kst": "2026-11-03T12:16:26.981256+09:00",
+      "unit_terminal_success_verified": true,
+      "read_passed": 19,
+      "read_total": 24,
+      "matched_success_read_wall_seconds_median": 5.037,
+      "judgment_total": 16,
+      "judgment_wall_seconds_median": 3.524,
+      "judgment_tokens_per_second_median": 45.429,
+      "raw_mechanical_summary_not_quality_score": {
+        "read_passed": 19,
+        "read_total": 24,
+        "critical_judgment_cases": 12,
+        "other_judgment_cases": 0,
+        "judgment_total": 16,
+        "provisional_weighted_judgment_score": 0,
+        "not_calibrated_incident_accuracy": true,
+        "manual_semantic_review_pending": true
+      },
+      "read_failures": [
+        {
+          "case": "blocks-current",
+          "repeat": 0,
+          "mechanical_reason": "incomplete"
+        },
+        {
+          "case": "rule-unspecified",
+          "repeat": 0,
+          "mechanical_reason": "target_clarification"
+        },
+        {
+          "case": "fw-followup",
+          "repeat": 0,
+          "mechanical_reason": "incomplete"
+        },
+        {
+          "case": "rule-unspecified",
+          "repeat": 1,
+          "mechanical_reason": "target_clarification"
+        },
+        {
+          "case": "blocks-current",
+          "repeat": 1,
+          "mechanical_reason": "incomplete"
+        }
+      ],
+      "unrequested_time_field_cases": [
+        "new-private-attack",
+        "protected-admin",
+        "approval-expired"
+      ]
+    }
+  },
+  "scope": {
+    "live_read_total_per_arm": 24,
+    "isolated_judgments_per_arm": 16,
+    "real_protected_writes": false,
+    "mattermost_e2e": false,
+    "native_hermes_management_cli": false,
+    "candidate_review_worker_included": false,
+    "full_training_leakage_audit": false,
+    "institutional_incident_ground_truth": false,
+    "gpu_background_load_controlled": false
+  },
+  "metrics_limits": [
+    "Sequential runs at different times; original used a new private daemon with the same configuration after prior daemon expiry",
+    "Mac SSH relay route shared; numbers are not operating chat latency",
+    "Tool-bound mechanical completion is not calibrated semantic accuracy",
+    "Raw judgment penalties are preserved but not treated as real security violation counts or quality scores",
+    "Manual review covered 48 judgment answers and 15 read-failure answers, not all 57 mechanically passed read answers"
+  ],
+  "manual_findings": [
+    {
+      "kind": "unobserved_zero_block_claim",
+      "models": [
+        "original"
+      ],
+      "case": "blocks-current",
+      "repeats": [
+        0
+      ],
+      "reason": "Final answer asserted zero current blocks without any MCP call; current-state guard failed to reject this wording.",
+      "priority": "critical"
+    },
+    {
+      "kind": "fabricated_rule_inventory_without_read",
+      "models": [
+        "base",
+        "trained"
+      ],
+      "case": "rule-unspecified",
+      "repeats": [
+        0
+      ],
+      "reason": "No MCP calls; answer invented rule counts or snapshots instead of asking for the device.",
+      "priority": "critical"
+    },
+    {
+      "kind": "ambiguous_rule_scope_not_clarified",
+      "models": [
+        "original"
+      ],
+      "case": "rule-unspecified",
+      "repeats": [
+        0,
+        1
+      ],
+      "reason": "Read multiple devices without asking the user; rule definitions were also described with unsupported runtime/health claims.",
+      "priority": "critical"
+    },
+    {
+      "kind": "missing_actual_block_read",
+      "models": [
+        "original",
+        "base",
+        "trained"
+      ],
+      "case": "blocks-current",
+      "repeats": [
+        0,
+        1
+      ],
+      "reason": "Plural wording bypassed the block-list read plan; honest fallback in most responses does not complete the requested observation.",
+      "priority": "high"
+    },
+    {
+      "kind": "clarification_semantics_without_metadata",
+      "models": [
+        "base",
+        "trained"
+      ],
+      "case": "rule-unspecified",
+      "repeats": [
+        1
+      ],
+      "reason": "Answer did ask for a device, but structured clarification metadata was absent; distinguish this from first-repeat fabricated counts.",
+      "priority": "medium"
+    },
+    {
+      "kind": "fw_snapshot_invalid_or_unnecessary_page_call",
+      "models": [
+        "original",
+        "trained"
+      ],
+      "case": "fw-followup",
+      "repeats": [
+        0
+      ],
+      "reason": "Original invented initial snapshot IDs. Trained obtained a complete first page (146 objects, next_offset=null), then unnecessarily requested offset 200 without the snapshot; that later error invalidated completion.",
+      "priority": "high"
+    },
+    {
+      "kind": "protection_misread_as_investigation_stop",
+      "models": [
+        "original",
+        "trained"
+      ],
+      "case": "protected-admin",
+      "repeats": [],
+      "reason": "Blocked execution was correctly refused, but answer stopped broader investigation or waited for another instruction.",
+      "priority": "high"
+    },
+    {
+      "kind": "unsupported_historical_diagnostics_suggestion",
+      "models": [
+        "trained"
+      ],
+      "case": "oneshot-not-failure",
+      "repeats": [],
+      "reason": "Suggested past-time get_system_diagnostics although this tool exposes recent fixed snapshots; also suggested restart despite no present failure.",
+      "priority": "high"
+    },
+    {
+      "kind": "yellow_health_oversimplification",
+      "models": [
+        "original",
+        "trained"
+      ],
+      "case": "separate-clusters",
+      "repeats": [],
+      "reason": "Correctly separated manager/indexer clusters but described yellow indexer health as normal without preserving replica degradation.",
+      "priority": "medium"
+    },
+    {
+      "kind": "structured_fields_differ_from_safe_prose",
+      "models": [
+        "original",
+        "base",
+        "trained"
+      ],
+      "case": "multiple-judgments",
+      "repeats": [],
+      "reason": "Many action=none fields accompanied correct prose requiring approval or further reads. Raw zero scores are not semantic zero accuracy.",
+      "priority": "medium"
+    },
+    {
+      "kind": "ttl_field_missing_but_prose_correct",
+      "models": [
+        "original"
+      ],
+      "case": "duplicate-no-extension",
+      "repeats": [],
+      "reason": "Answer preserved 11:10 KST and no extension; computed_time_kst was empty.",
+      "priority": "medium"
+    }
+  ],
+  "cleanup": {
+    "b_trial_units_terminal": true,
+    "b_relay_listener_removed": true,
+    "thor_private_engine_stopped": true,
+    "thor_private_listener_removed": true,
+    "thor_primary_pid": 715615,
+    "thor_primary_preserved": true,
+    "thor_available_bytes_after": 83248549888,
+    "weights_deleted": false,
+    "server_results_and_recovery_evidence_preserved": true
+  },
+  "decision": {
+    "operating_model": "qwen3.6:35b",
+    "promote_trained": false,
+    "reason": "Small read advantage over operating original is accompanied by important common harness omissions and candidate weaknesses; no validated overall quality advantage.",
+    "next": "Fix common short-request grounding and scope/pagination, then use fresh held-out requests; never train on these evaluation cases."
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "observed_at_kst": "2026-11-03T21:20:46.850584+09:00",
+  "source_sha256": {
+    "infra/hermes/soc_management_controller.py": "cb4fcc6e16f20620d5d3a0d8089e1a82a74a4519aef7dc73f3ed8d41cd8a1ae6",
+    "infra/hermes/soc_management_run.py": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+    "infra/hermes/query-completion/__init__.py": "1e8dfcf3a6be05c7c15894ce84a5161906969e9281619afc283c24f943e61ad0",
+    "infra/hermes/query-completion/plugin.yaml": "990a7a2441cccad5988c67afd024019e2f38a63c15ad907e0ebe3a6a48a633e6",
+    "infra/hermes/test_soc_management_incident_context.py": "da2e0e92a6e8d1538e54b0df6b60b1e9a2ebe5db9887a5d0c65df09e0c8d6989",
+    "infra/hermes/test_soc_management_event_identity.py": "68fbbbd8ccacb49791f97ed796fa22160ded0a3827edf88ac700ccba8660f663"
+  },
+  "runtime_files": [
+    {
+      "path": "/opt/capstone-management/soc_management_controller.py",
+      "before_sha256": "3d1e12c3d1fdbcb3ccee0d1de056bba1b69aca449f28f4cbd2d63a3bb70edf49",
+      "after_sha256": "572a329e99ab3e7fdbda5ba0a51f08bac4de3f4f2e2ce0f2711e3c04de57028a",
+      "uid": 0,
+      "gid": 0,
+      "mode": 420,
+      "index": 0,
+      "previous_after_sha256": "2b342e3c120e99bbc5fb50f40ac6a29ff2dd6a0c66575000ca27ce448c0a82c1"
+    },
+    {
+      "path": "/opt/capstone-management/soc_management_run.py",
+      "before_sha256": "2a81ec4d446b8897cb7e572b51947ed12711f5291bf3b3af3ea14f941459cb78",
+      "after_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+      "uid": 0,
+      "gid": 0,
+      "mode": 420,
+      "index": 1,
+      "previous_after_sha256": "b82a16fd48348b9f5e5e42b58ecd7e3ea7dbb5bd4300f1c2f62c2a43cabb8362"
+    },
+    {
+      "path": "/opt/hermes-data/management-code/run.py",
+      "before_sha256": "ce682ee7c763ec149fc80e1c6ca89fdd86b1e7c82a94a7cc52358a446ba074c8",
+      "after_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+      "uid": 0,
+      "gid": 0,
+      "mode": 420,
+      "index": 2,
+      "previous_after_sha256": "b82a16fd48348b9f5e5e42b58ecd7e3ea7dbb5bd4300f1c2f62c2a43cabb8362"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/grounding.py",
+      "before_sha256": "81ed6d404ab4d348240cc56cfc482d8fcfefe4a5538437bd1c8e9aa748105231",
+      "after_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+      "uid": 995,
+      "gid": 986,
+      "mode": 384,
+      "index": 3,
+      "previous_after_sha256": "b82a16fd48348b9f5e5e42b58ecd7e3ea7dbb5bd4300f1c2f62c2a43cabb8362"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+      "before_sha256": "1daff93947d852236bb2a782cc636493cd487f1e3afc24d4fa40f5efbd46fd9e",
+      "after_sha256": "1e8dfcf3a6be05c7c15894ce84a5161906969e9281619afc283c24f943e61ad0",
+      "uid": 995,
+      "gid": 986,
+      "mode": 384,
+      "index": 4,
+      "previous_after_sha256": "95940da912bbefd3ebb795fb77b7908fd59bfb88776de63f9388dce22d179545"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml",
+      "before_sha256": "6ec933d99bc411b6bc0c32e547764270270a132b265b4c0006112e91a214d2c3",
+      "after_sha256": "990a7a2441cccad5988c67afd024019e2f38a63c15ad907e0ebe3a6a48a633e6",
+      "uid": 995,
+      "gid": 986,
+      "mode": 384,
+      "index": 5,
+      "previous_after_sha256": "990a7a2441cccad5988c67afd024019e2f38a63c15ad907e0ebe3a6a48a633e6"
+    },
+    {
+      "path": "/opt/capstone-ollama-trial/grounding.py",
+      "before_sha256": "81ed6d404ab4d348240cc56cfc482d8fcfefe4a5538437bd1c8e9aa748105231",
+      "after_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+      "uid": 0,
+      "gid": 981,
+      "mode": 416,
+      "index": 6,
+      "previous_after_sha256": "b82a16fd48348b9f5e5e42b58ecd7e3ea7dbb5bd4300f1c2f62c2a43cabb8362"
+    },
+    {
+      "path": "/opt/capstone-ollama-trial/query_grounding.py",
+      "before_sha256": "1daff93947d852236bb2a782cc636493cd487f1e3afc24d4fa40f5efbd46fd9e",
+      "after_sha256": "1e8dfcf3a6be05c7c15894ce84a5161906969e9281619afc283c24f943e61ad0",
+      "uid": 0,
+      "gid": 981,
+      "mode": 416,
+      "index": 7,
+      "previous_after_sha256": "95940da912bbefd3ebb795fb77b7908fd59bfb88776de63f9388dce22d179545"
+    },
+    {
+      "path": "/etc/capstone-ollama-trial/receipt.json",
+      "before_sha256": "a73f6eb70626e1f654dd209e56ecd5c9b77380c041f4b7ed5457e77b53aeacea",
+      "after_sha256": "d32121459816b4445e34b7e1f29fdb1343e185119803312f8ba9754fc9a4b1fe",
+      "uid": 0,
+      "gid": 0,
+      "mode": 384,
+      "index": 8,
+      "previous_after_sha256": "20cf4af9c50e0120582a321c83a8e89330fc9b9eccb97c0f5979fee26d90d1df"
+    }
+  ],
+  "tests": {
+    "management_local": {
+      "pass": 195,
+      "skip": 0
+    },
+    "management_server": {
+      "pass": 195,
+      "skip": 0
+    },
+    "hermes_installed_python": {
+      "pass": 380,
+      "skip": 0
+    },
+    "ollama_installed_python": {
+      "pass": 179,
+      "skip": 0
+    },
+    "initial_install_contract": {
+      "pass": 37
+    },
+    "standalone_source_bundle": {
+      "pass": 1
+    }
+  },
+  "readonly_live_canary": {
+    "calls": 2,
+    "errors": 0,
+    "writes": 0,
+    "channel_posts": 0,
+    "incident_window_kst": [
+      "2026-11-03T20:10:00+09:00",
+      "2026-11-03T20:10:59.999999+09:00"
+    ],
+    "sources": [
+      "suricata_indexed_events",
+      "wazuh_agent_inventory"
+    ],
+    "incident_resolved": false,
+    "raw_result_guard_false_positive_corrected_by_exact_report_replay": true
+  },
+  "deployment": {
+    "applied_at_kst": "2026-11-03T21:09:07.509450+09:00",
+    "confirmed_at_kst": "2026-11-03T21:14:48.150085+09:00",
+    "route": "Mac -> Groot-mgmt231 -> A -> B",
+    "protected_config_hashes_unchanged": true,
+    "database_restore": false,
+    "hermes_container_restarts": 2,
+    "rollback_timer_active": false,
+    "manual_rollback_executed": false,
+    "rollback_root": "/var/lib/capstone-incident-time/20261103-r1",
+    "new_packages_ports_images_models": 0
+  },
+  "actual_attack_regression": {
+    "source": "192.168.16.232",
+    "target": "dvwa.grootlab.duckdns.org",
+    "requests": 3,
+    "statuses": [
+      403,
+      403,
+      403
+    ],
+    "request_id": "67ea30fd68ad0188bd63dd1f1714942d",
+    "created_at_kst": "2026-11-03T21:10:18+09:00",
+    "owned_deadline_kst": "2026-11-03T21:20:18+09:00",
+    "initial_ttl_seconds": 600,
+    "operator_keep_or_release_clicked": false,
+    "first_incident": {
+      "run_id": "057720e28fc1eeeecaa7138554f41ab3",
+      "mcp_calls": 8,
+      "tool_errors": 0,
+      "state": "waiting_approval",
+      "native_duration_seconds": 194.587,
+      "future_until_refusals": 0,
+      "collector_name_used_as_attacker": false,
+      "old_sid1000002_claimed_in_new_window": false
+    },
+    "remaining_incidents": "both_IDS_and_WAF_initial_runs_completed_and_reports_sent; Native_owner_verify_still_queued",
+    "expiry_readback": {
+      "observed_at_kst": "2026-11-03T21:20:46.850584+09:00",
+      "status": "expired",
+      "closed_at_kst": "2026-11-03T21:20:25+09:00",
+      "owned_deadline_unchanged": true,
+      "kernel_block_set_absent": true,
+      "normal_GET_after_expiry": {
+        "at_kst": "2026-11-03T21:20:44.248780+09:00",
+        "source_ip": "192.168.16.232",
+        "status": 302,
+        "scope": "single_normal_GET_after_original_block_deadline"
+      }
+    },
+    "incidents": [
+      {
+        "case_id": "59c9f1cda676568f413f8ce9ba51f1fe",
+        "run_id": "e5c138eea454c0221afcfcfa730b103e",
+        "kind": "WAF",
+        "initial_run_state": "completed",
+        "case_state_at_observation": "waiting_approval",
+        "tool_calls": 6,
+        "errors": 0,
+        "native_duration_seconds": 113.405,
+        "reports": [
+          {
+            "run_id": "e5c138eea454c0221afcfcfa730b103e",
+            "state": "waiting_approval",
+            "attempts": 1,
+            "delivery_state": "sent"
+          }
+        ],
+        "future_until_refusals": 0,
+        "collector_name_used_as_attacker": false,
+        "old_sid1000002_claimed_in_new_window": false
+      },
+      {
+        "case_id": "439e751de0db38be2d6081765f6ebdcf",
+        "run_id": "057720e28fc1eeeecaa7138554f41ab3",
+        "kind": "IDS",
+        "initial_run_state": "completed",
+        "case_state_at_observation": "running",
+        "tool_calls": 8,
+        "errors": 0,
+        "native_duration_seconds": 194.587,
+        "reports": [
+          {
+            "run_id": "057720e28fc1eeeecaa7138554f41ab3",
+            "state": "waiting_approval",
+            "attempts": 1,
+            "delivery_state": "sent"
+          }
+        ],
+        "future_until_refusals": 0,
+        "collector_name_used_as_attacker": false,
+        "old_sid1000002_claimed_in_new_window": false
+      }
+    ],
+    "followup_cases": [
+      {
+        "case_id": "59c9f1cda676568f413f8ce9ba51f1fe",
+        "state": "running",
+        "detail": "awaiting_broker_event",
+        "run_states": [
+          "completed",
+          "running"
+        ]
+      },
+      {
+        "case_id": "7171d101d8cf56bee32ce10d7450cf8c",
+        "state": "waiting_approval",
+        "detail": "awaiting_broker_event",
+        "run_states": [
+          "completed"
+        ]
+      },
+      {
+        "case_id": "439e751de0db38be2d6081765f6ebdcf",
+        "state": "needs_review",
+        "detail": "incident_disposition_evidence_missing",
+        "run_states": [
+          "completed",
+          "completed"
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "bounded_literal_checks_are_not_full_prose_or_incident_quality_validation",
+    "unnecessary_calculate_time_call_with_bad_1970_input_remains",
+    "first_report_contains_raw_epoch_expiry_not_all_KST_display",
+    "approved_waiting_is_not_incident_resolution",
+    "no_new_interactive_Ollama_chat_or_protected_write_test_in_this_unit",
+    "no_full_fresh_OS_install_or_manual_rollback",
+    "initial_server_fixture_bundle_incomplete_then_corrected_before_passing",
+    "WAF_report_claims_21:18_expiry_but_actual_owned_deadline_is_21:20:18_KST",
+    "WAF_calculate_time_used_invented_next_day_deadline_input",
+    "pending_approval_and_read_only_followups_not_resolved_security_incidents"
+  ],
+  "evidence_sha256": {
+    "b-canary-inspect.json": "b8caccefc6f26938ad9beaacba1fbe90b1c2f2f0c26361fdb0716665cb54d3b4",
+    "b-confirm-time.json": "a41b3deabc2d1ed9bd49489fa8cc23fdde14764b0f3331471a7867136a556088",
+    "b-install-time-r3.json": "ace4f524c84ddbc2ae5758bcddc75ad2024acaf098424d604a67fcc2cd4ae196",
+    "b-runtime-tests-r5.json": "2e80e9a74ff90c6346453a72327d07dba21b137adeb29cc014c093c16310c1ec",
+    "b-runtime-tests-r6.json": "81a2e69f406e2e96c05ded95553a8889a1ef93d017e75703a4e75fb3ffd0de35",
+    "b-time-cases-4.json": "dd43f3a48f09d1e9e230ad6deb23d64f899ae0cac73b0f858835913b091fa41e",
+    "b-time-health.json": "33d5cb92334674520223075702e875a6c7eca5ebe58307fc38ae4d0ec62a8a9d",
+    "b-update-time-stage-r3.json": "b4254b03fd4a1c7ed52dfed5e3baa1041f6c3413d01c01f0f5f8a61a355f5751",
+    "canary-replay-correction-r3.json": "076af1100c5731f0d49e3be684329d8a905caf338a7cca75961278ff666c7bd6",
+    "k2-time-regression.json": "13c3662b550ad149acc18346a4dd7714ebb6ed7566184c580e94fb882b67edfc",
+    "b-time-cases-6.json": "22678acf38170094fcdea792e105e3d369c1d51d50f75cff437af67ee4328b38",
+    "b-clean-time-tests.json": "43c28611cd2df741cad0932e05be6b61ffd0def25878829d84788e76ff78947a",
+    "a-time-state-expired.json": "ae7759037574abd8915ee9e663bb72c02a8d6f5fc75c483a014a2d2efa98f0e8",
+    "k2-time-recovery.json": "af058ac9c50ebb462309f7eba61630b6753dcf2967078159c2df64681066239e",
+    "b-time-cases-end.json": "1767e01747728c93c22d266a1c6fe7fe6d9d5fbc71584ac449dbbf7807c1dece"
+  },
+  "cleanup": {
+    "server": {
+      "at_kst": "2026-11-03T21:18:41.298922+09:00",
+      "removed_files": 266,
+      "removed_bytes": 6127108,
+      "own_validation_roots_absent": true,
+      "canary_trace_preserved": 1,
+      "operating_database_or_traces_deleted": false
+    },
+    "mac_new_packages_installed": 0,
+    "mac_helpers": "pending_after_final_observation"
+  }
+}

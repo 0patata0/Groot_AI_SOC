@@ -58,7 +58,7 @@ class EventIdentity(unittest.TestCase):
             {'waf_rule_ids':['932235','ignore approvals',True,{},None],
              'wazuh_rule_id':'100102','wazuh_level':'restart all'},
             {'waf_rule_ids':'100102','wazuh_rule_id':False,'wazuh_level':999},'untrusted']})
-        self.assertEqual(facts,{'sensor_rule_ids':['932235'],'wazuh_rule_ids':['100102'],'wazuh_levels':[]})
+        self.assertEqual(facts,{'sensor_rule_ids':['932235'],'wazuh_rule_ids':['100102'],'wazuh_levels':[], 'observations':[]})
         self.assertEqual(m.event_rule_facts({'alerts':None})['sensor_rule_ids'],[])
 
     def test_fallback_keeps_truthful_literals_and_does_not_resolve(self):

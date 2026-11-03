@@ -1,0 +1,253 @@
+{
+  "image": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+  "purpose": "standalone unprivileged offline PCAP reader on Kali232, no service installation",
+  "members": [
+    {
+      "path": "usr/bin/suricata",
+      "bytes": 117696088,
+      "sha256": "c2f2ec727be9d6f925e9164b59786ba5bf6f6b61452a6901a4013c996a06aa8d"
+    },
+    {
+      "path": "lib64/ld-linux-x86-64.so.2",
+      "bytes": 938792,
+      "sha256": "58b211cde994b9373c9a39abeb2633191b832574c7ca0bd44e362d33e0cc6111"
+    },
+    {
+      "path": "lib64/libacl.so.1",
+      "bytes": 44656,
+      "sha256": "65c479508b966795f7f53accf0b383643c74e02c66b29f85c70849ca8a763538"
+    },
+    {
+      "path": "lib64/libarchive.so.13",
+      "bytes": 840832,
+      "sha256": "7495ef1a63323fe31c70b71cfc61b9791ffd698d7be2c96aa2ed3a491c09cc7b"
+    },
+    {
+      "path": "lib64/libbpf.so.1",
+      "bytes": 436216,
+      "sha256": "338ec2ea4c01850e4eaa42422d242f599bfa5d40d6cf106ff06aec34cb7084c8"
+    },
+    {
+      "path": "lib64/libbz2.so.1",
+      "bytes": 76168,
+      "sha256": "2b6e2c055a33f71883a66a454b1e0ef4e8cd523e3952e2e9e42620e63a07560c"
+    },
+    {
+      "path": "lib64/libc.so.6",
+      "bytes": 2549360,
+      "sha256": "c6b12761834ea9a2fde7a17682ebfaf37982a0df6e9345e5b9d298ac1ca3c746"
+    },
+    {
+      "path": "lib64/libcap-ng.so.0",
+      "bytes": 32528,
+      "sha256": "a0d2f6d7ed589468a79d9f8d3dc6572cbea98741945751c35303472e3f259bb2"
+    },
+    {
+      "path": "lib64/libcrypto.so.3",
+      "bytes": 6167064,
+      "sha256": "895e0fe8a92776f86cbcafb57455848d364da293a924ed852369fc9c437015f2"
+    },
+    {
+      "path": "lib64/libelf.so.1",
+      "bytes": 111616,
+      "sha256": "7e1418e14d4e28af12b80b8cda38647c87c8e37d35232388d0380d8973e3c3d9"
+    },
+    {
+      "path": "lib64/libevent-2.1.so.7",
+      "bytes": 365296,
+      "sha256": "e9309e90afc78f8eb9fb4cc9b70eb055d8bc92eebb1bc194fd71400ff835139b"
+    },
+    {
+      "path": "lib64/libevent_pthreads-2.1.so.7",
+      "bytes": 15184,
+      "sha256": "ab0adeaa89d51313a8dab76af3f4dd7c7b407e31907ee6ce2b10bc39c7db8e76"
+    },
+    {
+      "path": "lib64/libgcc_s.so.1",
+      "bytes": 116408,
+      "sha256": "7074679107af381bb9cd0915e835668eb94f238df649f508f32199285eb38823"
+    },
+    {
+      "path": "lib64/libhiredis.so.1.0.0",
+      "bytes": 82144,
+      "sha256": "adf4c0ced9da2f7a6c278e1702081cdf8e1741faaf7b5796148b23f26a9bf0ab"
+    },
+    {
+      "path": "lib64/libhs.so.5",
+      "bytes": 7798144,
+      "sha256": "6da643b9be49314ca1610802a09aefecf81d6fa4cffd3931ede6c8085bb7ab3b"
+    },
+    {
+      "path": "lib64/libibverbs.so.1",
+      "bytes": 141992,
+      "sha256": "50d334e64f301bc361fd2267ca72a74423d88de4f473cd63111a6bd7d6060f50"
+    },
+    {
+      "path": "lib64/libjansson.so.4",
+      "bytes": 62440,
+      "sha256": "ec070ed494a62a708862cb0b207b7f4d175de033d7994f0551b7b31ab520c0b5"
+    },
+    {
+      "path": "lib64/liblz4.so.1",
+      "bytes": 144152,
+      "sha256": "9ba322f507d8a158ff98695eff72da5cf62df8c8a396a4de7029a7d0d4331dc0"
+    },
+    {
+      "path": "lib64/liblzma.so.5",
+      "bytes": 178760,
+      "sha256": "270e41f36ee8a00b56887c8c17472c69ae2de54a325eae4e91e58a70d45474fa"
+    },
+    {
+      "path": "lib64/libm.so.6",
+      "bytes": 912968,
+      "sha256": "f0734a09a0602ccde6b98ea7fbb3c9cfc62b3a4cf4a7b17ccd36d774ca22b8df"
+    },
+    {
+      "path": "lib64/libmagic.so.1",
+      "bytes": 185432,
+      "sha256": "f5f2c799f3ea1eebebb32ff1fc06556523a499cd45ba82802132b201cf212a6a"
+    },
+    {
+      "path": "lib64/libmaxminddb.so.0",
+      "bytes": 23832,
+      "sha256": "3a89d1ff72a9aea4008c00cfea8200923504f9eb7eaff20a211da36221ffe074"
+    },
+    {
+      "path": "lib64/libmnl.so.0",
+      "bytes": 28272,
+      "sha256": "f02ad3944d36f108c79427bb95d2adaa7ae1cf9a781506a66164c50c51341af9"
+    },
+    {
+      "path": "lib64/libnet.so.1",
+      "bytes": 102232,
+      "sha256": "4fd1db02960b6443afe179e2fcdfe391287c846e598c51a2ae5c9d705956a5b0"
+    },
+    {
+      "path": "lib64/libnetfilter_queue.so.1",
+      "bytes": 36504,
+      "sha256": "3520184c9f998f4deda2e7d7d239f870813d67846f44a6331906c78119ebb59d"
+    },
+    {
+      "path": "lib64/libnfnetlink.so.0",
+      "bytes": 35624,
+      "sha256": "a30c7c2d55f0f4f03a7fc82958d90d13658223bd13e88f4156288759e3ea6672"
+    },
+    {
+      "path": "lib64/libnl-3.so.200",
+      "bytes": 154768,
+      "sha256": "1abc6b9a0e5265ee60295f807a745ed7e6121a762ea6df37e08417d01ec62893"
+    },
+    {
+      "path": "lib64/libnl-route-3.so.200",
+      "bytes": 638808,
+      "sha256": "696637ef013ddc94248730bbe6a65e2789bcad71146f2808ec5d282bfbc502ee"
+    },
+    {
+      "path": "lib64/libnuma.so.1",
+      "bytes": 62056,
+      "sha256": "9d1485039ea6afb9cb696d390425c53ec87da05e03a5fcfe697264bb2831c0ed"
+    },
+    {
+      "path": "lib64/libpcap.so.1",
+      "bytes": 319736,
+      "sha256": "14f9e5390331fe1cd025be7249c3239cce8861fc9f9a8a67e8a1e9b4cd6fcd48"
+    },
+    {
+      "path": "lib64/libpcre2-8.so.0",
+      "bytes": 636840,
+      "sha256": "b77f698a788b85ceb43dfc9b155b17e4f33d567814c8b9b556324750f4f7efa7"
+    },
+    {
+      "path": "lib64/librte_argparse.so.26",
+      "bytes": 23592,
+      "sha256": "8f0cbac97170a4a70d352f624ba867e136fa28f0d08468adf0a711f6c9f7fac9"
+    },
+    {
+      "path": "lib64/librte_eal.so.26",
+      "bytes": 407664,
+      "sha256": "1122f6a9b1a2f656295dffdf9c85f8060aee3da253edcc952186d6f2e9d5042b"
+    },
+    {
+      "path": "lib64/librte_ethdev.so.26",
+      "bytes": 462656,
+      "sha256": "ba84f90be15209683123163b582117977700f5818e217716d356a97b49e0a0a3"
+    },
+    {
+      "path": "lib64/librte_kvargs.so.26",
+      "bytes": 15280,
+      "sha256": "d31a9da2afe2f17562d8d44b06c45eef62a0a18a3e8b11a9ff7a0876b55677b6"
+    },
+    {
+      "path": "lib64/librte_log.so.26",
+      "bytes": 32416,
+      "sha256": "b92c4d84b59054521233a57803ff01217a58cc50764b65e21b47551ed51f7ba8"
+    },
+    {
+      "path": "lib64/librte_mbuf.so.26",
+      "bytes": 74968,
+      "sha256": "a9e983ae9b89452c6ed5727ef4ddff77b9b1c3af595017fae0ae04a31e101d9d"
+    },
+    {
+      "path": "lib64/librte_mempool.so.26",
+      "bytes": 53656,
+      "sha256": "8a840b03b18b2fed488c6c7ca7d26cd09ba58ffdfc6ba6c862f8fa328d5017fe"
+    },
+    {
+      "path": "lib64/librte_net.so.26",
+      "bytes": 31904,
+      "sha256": "38bd8edb426043521858c45bb8874a9e8efd3c5dc25f46e9d6d5449e396a3e8e"
+    },
+    {
+      "path": "lib64/librte_telemetry.so.26",
+      "bytes": 37992,
+      "sha256": "f0956b3f1003bcf5362e80dc6cdd7f94c57bc1defa4a218dbb713bc9bef2b230"
+    },
+    {
+      "path": "lib64/libstdc++.so.6",
+      "bytes": 2314624,
+      "sha256": "95d70798b44b492fb46402ab43aed570558480a21cbc04449da1a15467daf603"
+    },
+    {
+      "path": "lib64/libxml2.so.2",
+      "bytes": 1641392,
+      "sha256": "aee7f5cee505564103bf674cf390cc3a21625641f6722cd225dc6d8eca708e60"
+    },
+    {
+      "path": "lib64/libyaml-0.so.2",
+      "bytes": 136080,
+      "sha256": "5ce27cfd7d589261aa34e8ddfeba86f387fa3537999ab43676138c9a29c2ca12"
+    },
+    {
+      "path": "lib64/libz.so.1",
+      "bytes": 102552,
+      "sha256": "4d3dac7a48e8f147507f818eda0c5afafd0846d163b997ad24b3e2e4c791f039"
+    },
+    {
+      "path": "lib64/libzstd.so.1",
+      "bytes": 754200,
+      "sha256": "82d8f7e09de63bfc2a31b76483ab91ec66a58974ed2f81dd604769a8e6ab76f0"
+    },
+    {
+      "path": "rules/all.rules",
+      "bytes": 47698411,
+      "sha256": "b808ceba89dead5d1de8bd4f17cd4370e2f0d565424d979672e25426a60f7f4b"
+    },
+    {
+      "path": "rules/local.rules",
+      "bytes": 13822,
+      "sha256": "220f9e70958566dbd56464813161b2fc472bfe03d9b03b22eb6f5e2c8330723c"
+    },
+    {
+      "path": "etc/classification.config",
+      "bytes": 3327,
+      "sha256": "54c5b94ba7cb7e1371c1c967dd8c3b95960938eaed6cecb8788195c19622cbd6"
+    },
+    {
+      "path": "etc/reference.config",
+      "bytes": 1701,
+      "sha256": "5b911ec14b8138eb7c5d6d28d51ab1bf154571a94a420c8860ebd72bb6410772"
+    }
+  ],
+  "sha256": "a8a64c79ef8194529f922477fb5c74441bd4f0a8c54b6cbd1460d4e5e0a575e3",
+  "bytes": 55563160
+}

@@ -1,0 +1,1000 @@
+{
+  "schema": 1,
+  "test_date_kst": "2026-11-03",
+  "scope": {
+    "import_hosts": [
+      "192.168.16.232",
+      "192.168.16.233"
+    ],
+    "only_new_test_host": "192.168.16.232",
+    "pcaps": 11,
+    "pcap_bytes": 99096119,
+    "answer_pdfs": 4,
+    "both_hosts_file_sha256_match": true,
+    "download_files_verified": 30,
+    "training_inclusion": false
+  },
+  "captures": [
+    {
+      "case": "mta-20261001",
+      "path": "mta-20261001/2026-10-01-traffic-analysis-exercise.pcap",
+      "bytes": 36838132,
+      "sha256": "287d6dee90cfef71f98a97c42e30444608de2cf59d2f7392a0a6df8dbbc8274b"
+    },
+    {
+      "case": "mta-20260228",
+      "path": "mta-20260228/2026-02-28-traffic-analysis-exercise.pcap",
+      "bytes": 6581991,
+      "sha256": "3dc470f5490ec15b4024c513e87c67e0b17caeae2a2ce3d83541be24ef407e61"
+    },
+    {
+      "case": "mta-20260131",
+      "path": "mta-20260131/2026-01-31-traffic-analysis-exercise.pcap",
+      "bytes": 27242609,
+      "sha256": "f755444d0b6eac847e07b73dea0774084b232d8577f536547a12f39b959d7833"
+    },
+    {
+      "case": "mta-20250122",
+      "path": "mta-20250122/2025-01-22-traffic-analysis-exercise.pcap",
+      "bytes": 26759675,
+      "sha256": "e59db1c07c6fdefafa0abdbca03248c341cdc36c09c34753204d3162802a3586"
+    },
+    {
+      "case": "ctu-normal4-dns",
+      "path": "ctu-normal4-dns/2015-03-24_capture1-only-dns.pcap",
+      "bytes": 772961,
+      "sha256": "7fbefbe1a18867bc683f59890cbc0124e5f6166e5aa13035fcf1ccf2f06f7ae4"
+    },
+    {
+      "case": "ctu-normal13",
+      "path": "ctu-normal13/2017-07-03_capture-win2.pcap",
+      "bytes": 506351,
+      "sha256": "ebd495484e66dea49a7ff95f9ae7415b6a51a963713014ac0e822d2828afb2c7"
+    },
+    {
+      "case": "ctu-malware281-1",
+      "path": "ctu-malware281-1/2017-07-03_capture-win13.pcap",
+      "bytes": 10619,
+      "sha256": "a3f8d1b0934fd79e8b62a79feddc6e0f8aad7ef474047ab21b2700c8ddd8e9f2"
+    },
+    {
+      "case": "wireshark-http",
+      "path": "wireshark-http/http.cap",
+      "bytes": 25803,
+      "sha256": "25a72bdf10339f2c29916920c8b9501d294923108de8f29b19aba7cc001ab60d"
+    },
+    {
+      "case": "wireshark-http-gzip",
+      "path": "wireshark-http-gzip/http_gzip.cap",
+      "bytes": 1707,
+      "sha256": "79e0ae3b23c0de4289b4cb73901091ac0b744dc417532a84dcd3fb882eaec12e"
+    },
+    {
+      "case": "wireshark-http-chunked",
+      "path": "wireshark-http-chunked/http-chunked-gzip.pcap",
+      "bytes": 29517,
+      "sha256": "0a9df2fa7fc8bcda8d336b3ebbf1f6b215a55734721ffbe3ff67a4fa7a4dd703"
+    },
+    {
+      "case": "wireshark-http-jpegs",
+      "path": "wireshark-http-jpegs/http_with_jpegs.cap",
+      "bytes": 326754,
+      "sha256": "b562d12dbd1b5b5fc0e7af67a0185d0c537dcbc7d5d82c7a3f30f7ec60ab0d0d"
+    }
+  ],
+  "answer_pdfs": [
+    {
+      "case": "mta-20261001",
+      "path": "mta-20261001/2026-10-01-traffic-analysis-exercise-answers.pdf",
+      "bytes": 989699,
+      "sha256": "ce564b65f5a9c38d8cb504ae387bb37d4525c2593aebcd26fb80a41e55844005"
+    },
+    {
+      "case": "mta-20260228",
+      "path": "mta-20260228/2026-02-28-traffic-analysis-exercise-answers.pdf",
+      "bytes": 2219100,
+      "sha256": "eaf22c53e43955307d319285f0a9e71e2345a3241836336a396f3c04f95ec92d"
+    },
+    {
+      "case": "mta-20260131",
+      "path": "mta-20260131/2026-01-31-traffic-analysis-exercise-answers.pdf",
+      "bytes": 2693994,
+      "sha256": "147e0a2a9463b45a45ec637488f898389dabdab5fb2d4354979cabfce3522ad9"
+    },
+    {
+      "case": "mta-20250122",
+      "path": "mta-20250122/2025-01-22-traffic-analysis-exercise-answers.pdf",
+      "bytes": 291035,
+      "sha256": "d4dbf0b0258c9f148333b31afa1355a92b8cfc3534af08a7240751643f70b300"
+    }
+  ],
+  "offline": {
+    "schema": 1,
+    "source_ip": "192.168.16.232",
+    "mode": "offline-no-transmission",
+    "config_sha256": "786366f6594c981855235ecae9518b0fd4dc2d537681b2722b9f48005c64599e",
+    "rule_sha256": "b808ceba89dead5d1de8bd4f17cd4370e2f0d565424d979672e25426a60f7f4b",
+    "checksum_validation": "disabled for capture offload compatibility; not live configuration",
+    "home_net": "capture private networks; differs from production CLI HOME_NET",
+    "rows": [
+      {
+        "case": "mta-20261001",
+        "started_kst": "2026-11-03T19:33:59.318385+09:00",
+        "pcap_sha256": "287d6dee90cfef71f98a97c42e30444608de2cf59d2f7392a0a6df8dbbc8274b",
+        "bytes": 36838132,
+        "tshark_rc": 0,
+        "http_requests": 16,
+        "engine_rc": 0,
+        "elapsed_s": 36.613,
+        "ended_kst": "2026-11-03T19:34:38.764378+09:00",
+        "event_counts": {
+          "dns": 319,
+          "alert": 6,
+          "http": 16,
+          "tls": 87,
+          "stats": 1
+        },
+        "signatures": {
+          "2031071": {
+            "signature": "ET INFO Microsoft Connection Test",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 1
+          },
+          "2016141": {
+            "signature": "ET INFO Executable Download from dotted-quad Host",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          },
+          "2034567": {
+            "signature": "ET HUNTING curl User-Agent to Dotted Quad",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          },
+          "2018959": {
+            "signature": "ET INFO PE EXE or DLL Windows file download HTTP",
+            "category": "Potential Corporate Privacy Violation",
+            "severity": 1,
+            "count": 1
+          },
+          "2021076": {
+            "signature": "ET HUNTING SUSPICIOUS Dotted Quad Host MZ Response",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          },
+          "2047866": {
+            "signature": "ET INFO Observed Google DNS over HTTPS Domain (dns .google in TLS SNI)",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 1
+          }
+        },
+        "categories": {
+          "Misc activity": 2,
+          "Potentially Bad Traffic": 3,
+          "Potential Corporate Privacy Violation": 1
+        },
+        "decoder": {
+          "pkts": 42497,
+          "bytes": 36158156,
+          "invalid": 0,
+          "ipv4": 42344,
+          "ipv6": 0,
+          "tcp": 41600,
+          "udp": 736
+        },
+        "eve_sha256": "b3cce65b71327a46177a7d95eda2f144a18025a7ee7e86c0b0954224de1fc962"
+      },
+      {
+        "case": "mta-20260228",
+        "started_kst": "2026-11-03T19:34:38.791308+09:00",
+        "pcap_sha256": "3dc470f5490ec15b4024c513e87c67e0b17caeae2a2ce3d83541be24ef407e61",
+        "bytes": 6581991,
+        "tshark_rc": 0,
+        "http_requests": 335,
+        "engine_rc": 0,
+        "elapsed_s": 36.957,
+        "ended_kst": "2026-11-03T19:35:16.625707+09:00",
+        "event_counts": {
+          "dns": 809,
+          "alert": 531,
+          "http": 308,
+          "tls": 152,
+          "stats": 1
+        },
+        "signatures": {
+          "2031071": {
+            "signature": "ET INFO Microsoft Connection Test",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 1
+          },
+          "2013926": {
+            "signature": "ET INFO HTTP traffic on port 443 (POST)",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 264
+          },
+          "2035892": {
+            "signature": "ET REMOTE_ACCESS NetSupport Remote Admin Checkin",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 264
+          },
+          "2035895": {
+            "signature": "ET REMOTE_ACCESS NetSupport Remote Admin Response",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 2
+          }
+        },
+        "categories": {
+          "Misc activity": 267,
+          "Potentially Bad Traffic": 264
+        },
+        "decoder": {
+          "pkts": 15512,
+          "bytes": 6333775,
+          "invalid": 0,
+          "ipv4": 14676,
+          "ipv6": 0,
+          "tcp": 12544,
+          "udp": 2113
+        },
+        "eve_sha256": "0e441b2b9b519aa9cbb4842ccf4cfffb7e4088b78ea573a7a902f0355b426e36"
+      },
+      {
+        "case": "mta-20260131",
+        "started_kst": "2026-11-03T19:35:16.723705+09:00",
+        "pcap_sha256": "f755444d0b6eac847e07b73dea0774084b232d8577f536547a12f39b959d7833",
+        "bytes": 27242609,
+        "tshark_rc": 0,
+        "http_requests": 15,
+        "engine_rc": 0,
+        "elapsed_s": 36.721,
+        "ended_kst": "2026-11-03T19:35:55.807613+09:00",
+        "event_counts": {
+          "dns": 418,
+          "alert": 51,
+          "http": 8,
+          "tls": 106,
+          "stats": 1
+        },
+        "signatures": {
+          "2031071": {
+            "signature": "ET INFO Microsoft Connection Test",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 1
+          },
+          "2066850": {
+            "signature": "ET MALWARE Win32/Lumma Stealer Related CnC Domain in DNS Lookup (whooptm .cyou)",
+            "category": "Domain Observed Used for C2 Detected",
+            "severity": 1,
+            "count": 2
+          },
+          "2066851": {
+            "signature": "ET MALWARE Observed Win32/Lumma Stealer Related Domain (whooptm .cyou) in TLS SNI",
+            "category": "Domain Observed Used for C2 Detected",
+            "severity": 1,
+            "count": 1
+          },
+          "2066541": {
+            "signature": "ET MALWARE Win32/Lumma Stealer Related CnC Domain in DNS Lookup (whitepepper .su)",
+            "category": "Domain Observed Used for C2 Detected",
+            "severity": 1,
+            "count": 10
+          },
+          "2014169": {
+            "signature": "ET DNS Query for .su TLD (Soviet Union) Often Malware Related",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 10
+          },
+          "2066542": {
+            "signature": "ET MALWARE Observed Win32/Lumma Stealer Related Domain (whitepepper .su) in TLS SNI",
+            "category": "Domain Observed Used for C2 Detected",
+            "severity": 1,
+            "count": 16
+          },
+          "2066606": {
+            "signature": "ET MALWARE Lumma Stealer Victim Fingerprinting Activity",
+            "category": "Malware Command and Control Activity Detected",
+            "severity": 1,
+            "count": 1
+          },
+          "2014170": {
+            "signature": "ET INFO HTTP Request to .su TLD (Soviet Union) Often Malware Related",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 6
+          },
+          "2027758": {
+            "signature": "ET DNS Query for .cc TLD",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 4
+          }
+        },
+        "categories": {
+          "Misc activity": 1,
+          "Domain Observed Used for C2 Detected": 29,
+          "Potentially Bad Traffic": 20,
+          "Malware Command and Control Activity Detected": 1
+        },
+        "decoder": {
+          "pkts": 51181,
+          "bytes": 26423689,
+          "invalid": 0,
+          "ipv4": 51127,
+          "ipv6": 0,
+          "tcp": 50296,
+          "udp": 818
+        },
+        "eve_sha256": "5f5ce746bb28d73f6a54bd7c6eab2c8e50f3d866d04057eb53192ad3487eb314"
+      },
+      {
+        "case": "mta-20250122",
+        "started_kst": "2026-11-03T19:35:55.897094+09:00",
+        "pcap_sha256": "e59db1c07c6fdefafa0abdbca03248c341cdc36c09c34753204d3162802a3586",
+        "bytes": 26759675,
+        "tshark_rc": 0,
+        "http_requests": 655,
+        "engine_rc": 0,
+        "elapsed_s": 36.551,
+        "ended_kst": "2026-11-03T19:36:34.162849+09:00",
+        "event_counts": {
+          "dns": 1512,
+          "tls": 228,
+          "alert": 23,
+          "http": 627,
+          "stats": 1
+        },
+        "signatures": {
+          "2031071": {
+            "signature": "ET INFO Microsoft Connection Test",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 2
+          },
+          "2400000": {
+            "signature": "ET DROP Spamhaus DROP Listed Traffic Inbound group 1",
+            "category": "Misc Attack",
+            "severity": 2,
+            "count": 1
+          },
+          "2059607": {
+            "signature": "ET MALWARE Fake Microsoft Teams CnC Payload Request (GET)",
+            "category": "Malware Command and Control Activity Detected",
+            "severity": 1,
+            "count": 2
+          },
+          "2062715": {
+            "signature": "ET INFO Observed UA-CPU Header",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 1
+          },
+          "2032162": {
+            "signature": "ET INFO PS1 Powershell File Request",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 2
+          },
+          "2059608": {
+            "signature": "ET MALWARE Fake Microsoft Teams VBS Payload Inbound",
+            "category": "Malware Command and Control Activity Detected",
+            "severity": 1,
+            "count": 1
+          },
+          "2026988": {
+            "signature": "ET ATTACK_RESPONSE PowerShell NoProfile Command Received In Powershell Stagers",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          },
+          "2032169": {
+            "signature": "ET HUNTING Generic Powershell DownloadString Command",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          },
+          "2032170": {
+            "signature": "ET HUNTING Generic Powershell DownloadFile Command",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          },
+          "2018959": {
+            "signature": "ET INFO PE EXE or DLL Windows file download HTTP",
+            "category": "Potential Corporate Privacy Violation",
+            "severity": 1,
+            "count": 1
+          },
+          "2016538": {
+            "signature": "ET INFO Executable Retrieved With Minimal HTTP Headers - Potential Second Stage Download",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 3
+          },
+          "2021076": {
+            "signature": "ET HUNTING SUSPICIOUS Dotted Quad Host MZ Response",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 3
+          },
+          "2060630": {
+            "signature": "ET REMOTE_ACCESS TeamViewer RMM Domain (teamviewer .com) in DNS Lookup",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 1
+          },
+          "2009475": {
+            "signature": "ET INFO TeamViewer Dyngate User-Agent",
+            "category": "Potential Corporate Privacy Violation",
+            "severity": 1,
+            "count": 1
+          },
+          "2400006": {
+            "signature": "ET DROP Spamhaus DROP Listed Traffic Inbound group 7",
+            "category": "Misc Attack",
+            "severity": 2,
+            "count": 2
+          }
+        },
+        "categories": {
+          "Misc activity": 4,
+          "Misc Attack": 3,
+          "Malware Command and Control Activity Detected": 3,
+          "Potentially Bad Traffic": 11,
+          "Potential Corporate Privacy Violation": 2
+        },
+        "decoder": {
+          "pkts": 39427,
+          "bytes": 26128819,
+          "invalid": 0,
+          "ipv4": 39087,
+          "ipv6": 0,
+          "tcp": 36749,
+          "udp": 2318
+        },
+        "eve_sha256": "c822a6e46abfa45694474cd41701e4d03647f1b65bb618295b3735efe6fb6813"
+      },
+      {
+        "case": "ctu-normal4-dns",
+        "started_kst": "2026-11-03T19:36:34.171407+09:00",
+        "pcap_sha256": "7fbefbe1a18867bc683f59890cbc0124e5f6166e5aa13035fcf1ccf2f06f7ae4",
+        "bytes": 772961,
+        "tshark_rc": 0,
+        "http_requests": 0,
+        "engine_rc": 0,
+        "elapsed_s": 36.452,
+        "ended_kst": "2026-11-03T19:37:11.066037+09:00",
+        "event_counts": {
+          "dns": 5966,
+          "stats": 1
+        },
+        "signatures": {},
+        "categories": {},
+        "decoder": {
+          "pkts": 5966,
+          "bytes": 677481,
+          "invalid": 0,
+          "ipv4": 5966,
+          "ipv6": 0,
+          "tcp": 0,
+          "udp": 5966
+        },
+        "eve_sha256": "4694e8137d198fe1a3c8810f55a6cdc2f4d0a22b0bc80c418f3f45954ba38eff"
+      },
+      {
+        "case": "ctu-normal13",
+        "started_kst": "2026-11-03T19:37:11.082360+09:00",
+        "pcap_sha256": "ebd495484e66dea49a7ff95f9ae7415b6a51a963713014ac0e822d2828afb2c7",
+        "bytes": 506351,
+        "tshark_rc": 0,
+        "http_requests": 0,
+        "engine_rc": 0,
+        "elapsed_s": 35.982,
+        "ended_kst": "2026-11-03T19:37:47.320414+09:00",
+        "event_counts": {
+          "dns": 34,
+          "tls": 24,
+          "stats": 1
+        },
+        "signatures": {},
+        "categories": {},
+        "decoder": {
+          "pkts": 949,
+          "bytes": 491143,
+          "invalid": 0,
+          "ipv4": 884,
+          "ipv6": 49,
+          "tcp": 876,
+          "udp": 40
+        },
+        "eve_sha256": "1e63243906a6416b86d4f6b58123119330998f15844cc4873d81040b21bddae8"
+      },
+      {
+        "case": "ctu-malware281-1",
+        "started_kst": "2026-11-03T19:37:47.323697+09:00",
+        "pcap_sha256": "a3f8d1b0934fd79e8b62a79feddc6e0f8aad7ef474047ab21b2700c8ddd8e9f2",
+        "bytes": 10619,
+        "tshark_rc": 0,
+        "http_requests": 0,
+        "engine_rc": 0,
+        "elapsed_s": 36.276,
+        "ended_kst": "2026-11-03T19:38:23.782286+09:00",
+        "event_counts": {
+          "dns": 10,
+          "tls": 1,
+          "stats": 1
+        },
+        "signatures": {},
+        "categories": {},
+        "decoder": {
+          "pkts": 64,
+          "bytes": 9571,
+          "invalid": 0,
+          "ipv4": 22,
+          "ipv6": 31,
+          "tcp": 18,
+          "udp": 16
+        },
+        "eve_sha256": "dc8e9a243352ae9457dcdc233762ede404051fb28a7a522272ae38142f23df49"
+      },
+      {
+        "case": "wireshark-http",
+        "started_kst": "2026-11-03T19:38:23.785998+09:00",
+        "pcap_sha256": "25a72bdf10339f2c29916920c8b9501d294923108de8f29b19aba7cc001ab60d",
+        "bytes": 25803,
+        "tshark_rc": 0,
+        "http_requests": 2,
+        "engine_rc": 0,
+        "elapsed_s": 36.166,
+        "ended_kst": "2026-11-03T19:39:00.133441+09:00",
+        "event_counts": {
+          "dns": 2,
+          "http": 1,
+          "stats": 1
+        },
+        "signatures": {},
+        "categories": {},
+        "decoder": {
+          "pkts": 43,
+          "bytes": 25091,
+          "invalid": 0,
+          "ipv4": 43,
+          "ipv6": 0,
+          "tcp": 41,
+          "udp": 2
+        },
+        "eve_sha256": "0df57c78adacdd60d31bd2391f98a3eb8bfa1e9f3d8d657726de94567105282a"
+      },
+      {
+        "case": "wireshark-http-gzip",
+        "started_kst": "2026-11-03T19:39:00.140212+09:00",
+        "pcap_sha256": "79e0ae3b23c0de4289b4cb73901091ac0b744dc417532a84dcd3fb882eaec12e",
+        "bytes": 1707,
+        "tshark_rc": 0,
+        "http_requests": 1,
+        "engine_rc": 0,
+        "elapsed_s": 36.087,
+        "ended_kst": "2026-11-03T19:39:36.415497+09:00",
+        "event_counts": {
+          "http": 1,
+          "stats": 1
+        },
+        "signatures": {},
+        "categories": {},
+        "decoder": {
+          "pkts": 10,
+          "bytes": 1523,
+          "invalid": 0,
+          "ipv4": 10,
+          "ipv6": 0,
+          "tcp": 10,
+          "udp": 0
+        },
+        "eve_sha256": "f93b9c2594df82d113c90a53142c507c646913d542aa5aa0a78f197b724f5ea2"
+      },
+      {
+        "case": "wireshark-http-chunked",
+        "started_kst": "2026-11-03T19:39:36.421635+09:00",
+        "pcap_sha256": "0a9df2fa7fc8bcda8d336b3ebbf1f6b215a55734721ffbe3ff67a4fa7a4dd703",
+        "bytes": 29517,
+        "tshark_rc": 0,
+        "http_requests": 1,
+        "engine_rc": 0,
+        "elapsed_s": 36.355,
+        "ended_kst": "2026-11-03T19:40:12.953249+09:00",
+        "event_counts": {
+          "http": 1,
+          "stats": 1
+        },
+        "signatures": {},
+        "categories": {},
+        "decoder": {
+          "pkts": 28,
+          "bytes": 29045,
+          "invalid": 0,
+          "ipv4": 28,
+          "ipv6": 0,
+          "tcp": 28,
+          "udp": 0
+        },
+        "eve_sha256": "467d20665cdf2e9f9172ee783522b9b49c3fe9949a3a8e9f20e0518969e700e2"
+      },
+      {
+        "case": "wireshark-http-jpegs",
+        "started_kst": "2026-11-03T19:40:12.959188+09:00",
+        "pcap_sha256": "b562d12dbd1b5b5fc0e7af67a0185d0c537dcbc7d5d82c7a3f30f7ec60ab0d0d",
+        "bytes": 326754,
+        "tshark_rc": 0,
+        "http_requests": 19,
+        "engine_rc": 0,
+        "elapsed_s": 36.26,
+        "ended_kst": "2026-11-03T19:40:49.415162+09:00",
+        "event_counts": {
+          "http": 19,
+          "alert": 2,
+          "stats": 1
+        },
+        "signatures": {
+          "2016879": {
+            "signature": "ET INFO Unsupported/Fake Windows NT Version 5.0",
+            "category": "Potential Corporate Privacy Violation",
+            "severity": 1,
+            "count": 2
+          }
+        },
+        "categories": {
+          "Potential Corporate Privacy Violation": 2
+        },
+        "decoder": {
+          "pkts": 483,
+          "bytes": 319002,
+          "invalid": 0,
+          "ipv4": 483,
+          "ipv6": 0,
+          "tcp": 464,
+          "udp": 0
+        },
+        "eve_sha256": "7b73a7e0d92d8f3336d8d01762f0dd610b3420e7f8a878c2ae2a0c68400bf74c"
+      }
+    ],
+    "ended_kst": "2026-11-03T19:40:49.566815+09:00",
+    "elapsed_s": 410.363
+  },
+  "official_indicator_matches": [
+    {
+      "case": "mta-20261001",
+      "matches": [
+        {
+          "sid": 2016141,
+          "src_ip": "10.10.1.128",
+          "dest_ip": "107.175.82.242",
+          "src_port": 63723,
+          "dest_port": 9000
+        },
+        {
+          "sid": 2018959,
+          "src_ip": "107.175.82.242",
+          "dest_ip": "10.10.1.128",
+          "src_port": 9000,
+          "dest_port": 63723
+        },
+        {
+          "sid": 2021076,
+          "src_ip": "107.175.82.242",
+          "dest_ip": "10.10.1.128",
+          "src_port": 9000,
+          "dest_port": 63723
+        }
+      ]
+    },
+    {
+      "case": "mta-20260228",
+      "matches": [
+        {
+          "sid": 2035892,
+          "src_ip": "10.2.28.88",
+          "dest_ip": "45.131.214.85",
+          "src_port": 51912,
+          "dest_port": 443
+        },
+        {
+          "sid": 2035895,
+          "src_ip": "45.131.214.85",
+          "dest_ip": "10.2.28.88",
+          "src_port": 443,
+          "dest_port": 51912
+        },
+        {
+          "sid": 2035892,
+          "src_ip": "10.2.28.88",
+          "dest_ip": "45.131.214.85",
+          "src_port": 51912,
+          "dest_port": 443
+        },
+        {
+          "sid": 2035895,
+          "src_ip": "45.131.214.85",
+          "dest_ip": "10.2.28.88",
+          "src_port": 443,
+          "dest_port": 51912
+        },
+        {
+          "sid": 2035892,
+          "src_ip": "10.2.28.88",
+          "dest_ip": "45.131.214.85",
+          "src_port": 51912,
+          "dest_port": 443
+        },
+        {
+          "sid": 2035892,
+          "src_ip": "10.2.28.88",
+          "dest_ip": "45.131.214.85",
+          "src_port": 51912,
+          "dest_port": 443
+        }
+      ]
+    },
+    {
+      "case": "mta-20260131",
+      "matches": [
+        {
+          "sid": 2066606,
+          "src_ip": "10.1.21.58",
+          "dest_ip": "153.92.1.49",
+          "src_port": 54492,
+          "dest_port": 80
+        }
+      ]
+    },
+    {
+      "case": "ctu-malware281-1",
+      "matches": []
+    }
+  ],
+  "live_web": {
+    "run_id": "public-pcap-20261103-kali232-web-mixed-r1",
+    "started_kst": "2026-11-03T19:37:41.973+09:00",
+    "ended_kst": "2026-11-03T19:38:06.837+09:00",
+    "attempted": 100,
+    "normal_sent": 97,
+    "attack_sent": 3,
+    "normal_statuses": {
+      "302": 49,
+      "308": 48
+    },
+    "attack_results": [
+      {
+        "seq": 98,
+        "case_id": "sqli-1",
+        "label": "attack-control",
+        "at_kst": "2026-11-03T19:38:06.582+09:00",
+        "uri_sha256": "337819a0a9b0913972b666418a4e7f12cc40025579bfd2eb13bc000f98f6725e",
+        "connected": true,
+        "sent": true,
+        "status": 403,
+        "local_endpoint": [
+          "192.168.16.232",
+          52051
+        ],
+        "peer_endpoint": [
+          "192.168.16.230",
+          80
+        ],
+        "response_prefix_sha256": "25fb23868ebf48348f9e438e00cb9b9d9b3a054f32482a781c762cc4f9cc6393"
+      },
+      {
+        "seq": 99,
+        "case_id": "traversal-1",
+        "label": "attack-control",
+        "at_kst": "2026-11-03T19:38:06.668+09:00",
+        "uri_sha256": "36878c88ce1a752e965608f1db37511c8dfe6811aa5bb3b0e16afb520cf7c61a",
+        "connected": true,
+        "sent": true,
+        "status": 403,
+        "local_endpoint": [
+          "192.168.16.232",
+          35151
+        ],
+        "peer_endpoint": [
+          "192.168.16.230",
+          80
+        ],
+        "response_prefix_sha256": "25fb23868ebf48348f9e438e00cb9b9d9b3a054f32482a781c762cc4f9cc6393"
+      },
+      {
+        "seq": 100,
+        "case_id": "xss-1",
+        "label": "attack-control",
+        "at_kst": "2026-11-03T19:38:06.752+09:00",
+        "uri_sha256": "010f8fd259bbe38e827dafcbd0d93d9868e30bbef66c6852e3ff45b73ffa8014",
+        "connected": true,
+        "sent": true,
+        "status": 403,
+        "local_endpoint": [
+          "192.168.16.232",
+          37847
+        ],
+        "peer_endpoint": [
+          "192.168.16.230",
+          80
+        ],
+        "response_prefix_sha256": "25fb23868ebf48348f9e438e00cb9b9d9b3a054f32482a781c762cc4f9cc6393"
+      }
+    ],
+    "elapsed_s": 24.864,
+    "results_sha256": "72bef42fa09134ae560ed17d3897e0e52641b3af0edadc771e1ab9e4a2508642",
+    "normal_sources": [
+      {
+        "case_id": "wireshark-http-chunked",
+        "frame": 4,
+        "pcap_sha256": "0a9df2fa7fc8bcda8d336b3ebbf1f6b215a55734721ffbe3ff67a4fa7a4dd703",
+        "original_uri_sha256": "8a5edab282632443219e051e4ade2d1d5bbc671c781051bf1437897cbdfea0f1"
+      },
+      {
+        "case_id": "wireshark-http-jpegs",
+        "frame": 4,
+        "pcap_sha256": "b562d12dbd1b5b5fc0e7af67a0185d0c537dcbc7d5d82c7a3f30f7ec60ab0d0d",
+        "original_uri_sha256": "8a5edab282632443219e051e4ade2d1d5bbc671c781051bf1437897cbdfea0f1"
+      }
+    ],
+    "attack_sources": [
+      {
+        "case_id": "sqli-1",
+        "family": "sqli",
+        "source": "2015-03-17/snort.log.1426550408",
+        "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+        "frame": 129601
+      },
+      {
+        "case_id": "traversal-1",
+        "family": "traversal",
+        "source": "2015-03-17/snort.log.1426550408",
+        "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+        "frame": 135270
+      },
+      {
+        "case_id": "xss-1",
+        "family": "xss",
+        "source": "2015-03-17/snort.log.1426550408",
+        "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+        "frame": 132529
+      }
+    ]
+  },
+  "waf_matches": [
+    {
+      "test_id": "public-pcap-20261103-kali232-web-mixed-r1/98",
+      "uri_sha256": "337819a0a9b0913972b666418a4e7f12cc40025579bfd2eb13bc000f98f6725e",
+      "response": 403,
+      "engine": "Enabled",
+      "rule_ids": [
+        "10200",
+        "942100",
+        "942160",
+        "949110"
+      ]
+    },
+    {
+      "test_id": "public-pcap-20261103-kali232-web-mixed-r1/99",
+      "uri_sha256": "36878c88ce1a752e965608f1db37511c8dfe6811aa5bb3b0e16afb520cf7c61a",
+      "response": 403,
+      "engine": "Enabled",
+      "rule_ids": [
+        "10500",
+        "930100",
+        "930110",
+        "949110"
+      ]
+    },
+    {
+      "test_id": "public-pcap-20261103-kali232-web-mixed-r1/100",
+      "uri_sha256": "010f8fd259bbe38e827dafcbd0d93d9868e30bbef66c6852e3ff45b73ffa8014",
+      "response": 403,
+      "engine": "Enabled",
+      "rule_ids": [
+        "10300",
+        "941100",
+        "941110",
+        "941160",
+        "941390",
+        "949110"
+      ]
+    }
+  ],
+  "live_ids": {
+    "sid1000002_in_interval": 0,
+    "normal_curl_information_alert": 2002825,
+    "attack_xss": 2009714,
+    "normality_is_not_absence_of_every_policy_alert": true
+  },
+  "native_containment": {
+    "request_id": "90bd33b8168442418b488fa165fa40f7",
+    "ip": "192.168.16.232",
+    "added_kst": "2026-11-03T19:38:09.524776+09:00",
+    "deadline_kst": "2026-11-03T19:48:09+09:00",
+    "configured_ttl_seconds": 600,
+    "card_url": "https://chat.grootlab.duckdns.org/soc/pl/tyirz5gqef8djqymbqioq3973w",
+    "new_keep_or_release_approval_clicked": false,
+    "expiry_verified": true,
+    "operation_state": "expired",
+    "closed_kst": "2026-11-03T19:48:11+09:00",
+    "expiry_checked_kst": "2026-11-03T19:49:04.944518+09:00",
+    "post_expiry_http_status": 302,
+    "card_state_checked_kst": "2026-11-03T19:42:35.339845+09:00",
+    "approval_state_at_check": "pending"
+  },
+  "wazuh_rule_ids": [
+    "100102",
+    "100110",
+    "100111",
+    "100121",
+    "100261"
+  ],
+  "llm_followup": {
+    "waf_case": "outcome_unknown after six completed MCP calls",
+    "ids_case": "monitor report returned, but stale SID1000002 included and old asset name assigned to Kali232",
+    "fully_correct_incident_conclusion": false
+  },
+  "limits": [
+    "99MB is eleven selected captures, not every corpus on the four sites.",
+    "MTA and CTU infection captures contain background; no per-packet accuracy score inferred.",
+    "CTU-Malware281-1 had 64 packets and no alert; malicious flow ground truth is unresolved, not passed or a proven false negative.",
+    "MTA Natureforce download indicators matched; a CNCmachineRMS-specific C2 signature was not observed.",
+    "Normal Wireshark JPEG capture emitted two ET INFO 2016879 unsupported-old-OS signals, not proven maliciousness.",
+    "Normal web responses are redirects, not authenticated application end-to-end tests.",
+    "Live web attack controls are old reviewed source frames, not new malware C2 requests.",
+    "Offline HOME_NET and checksum handling differ from live production CLI; offline replay does not verify live FW/WAF/LLM.",
+    "CAIDA not downloaded: access/application terms and payload-free packet headers unsuitable for this HTTP replay.",
+    "MTA answer PDFs preserved, but not used as a fully reviewed packet-level truth set."
+  ],
+  "cleanup": {
+    "mac_download_files_removed": 36,
+    "mac_download_bytes_removed": 231865005,
+    "mac_new_packages_installed": 0,
+    "server_temporary_transport_archives_removed": true,
+    "server_pcaps_answer_sources_and_unprivileged_tool_preserved": true
+  },
+  "proof_sha256": {
+    "public-download-manifest.json": "a26c7909a7682e3c491dd8a4d0e4bb81a0efd738acfd347017d861f07bef03dd",
+    "kali232-public-import.json": "3a71a4e865e51a18892aaf560999651f15d0dac5d737a03e6d7634654753c9ab",
+    "kali233-public-import.json": "2a9ee72561860468bc73334d923fb90efe3de1572be4a3af4c4b59fa91eb859b",
+    "kali232-offline-complete.json": "ca927356f7ec1d75a6562c7aec65f89411fd084abdbd79cb94a99595bbd9ffbb",
+    "kali232-public-web-results.json": "ecf6926604a9ce0cd95fb5fc3b07cdcd2b700db9b55cb460bbcdc78054dd5086",
+    "a-public-web-observation.json": "fb58c8cc14f3ed25a7b331235ec9c8f87b080ab5b7841cd447f1bbe8a1e069c6",
+    "a-public-containment.json": "428fe77704d64569c8c842272f4f4bcb86568adb875f6e54439e96982a746725",
+    "b-public-cases.json": "376747892bf350e17a4a27bcec88fb1f473d81866c6fc125079598c8251895d9",
+    "kali232-public-groundtruth.json": "381edf964891937caf5e3aa1997ffa3bcee91c1d8534553a036e17e03f104406",
+    "kali232-public-cleanup.json": "313ddcc79db3fe421b7a4b8773c00775e31e476201dc8488bae3e1680b8e3c2d",
+    "kali233-public-cleanup.json": "fea5b444db5949562a8c27ca1a366e06354b475d2e7a5aa240f7a2491815f821",
+    "a-public-tool-cleanup.json": "c36f304ef6e4093ced1d97f2b9868596c78ef48bece4997fca6fbd17bf4fcfa0",
+    "mac-public-download-cleanup.json": "dbfe82ea57c796ae901f689966e0b90d0e1cf8ac3a303f6fcffb71533fe5f9ee",
+    "a-public-containment-expired.json": "bcd6b259e2d2cbc0cead54743a7e19ccf560677214fef3ef6c77b715cbac7b2c",
+    "kali232-web-expiry-recovery.json": "319b6d4e2ec1fa8aad05ad158ce8a81cae8c4fb426bfafcacee7eb6d73307762",
+    "a-pcap-final-status.json": "19324e2783cf11e520d0f7b7ef34b1fd8190dda74e55da24880fee1c692b23d8",
+    "kali232-pcap-final-status.json": "24602f029b266ac0927cc2479c9063d0984be4874e68b393445ebba20da8440a"
+  },
+  "live_recovery": {
+    "at_kst": "2026-11-03T19:49:02.984213+09:00",
+    "status": 302,
+    "source": "192.168.16.232",
+    "response_prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "attack": false
+  },
+  "source_sha256": {
+    "public-catalog-20261103.json": "73ecd4cc73e4e33db324ae8131a4d641e4aa8df0ede5920e6e79f4f2af997289",
+    "public_import.py": "523889dd54b54d9939bcd7502859abfe78c29b78992ac9ff8a8e0ee8dad6b96e",
+    "public_offline.py": "6d352f3391c7b0ae0940a68690b4af0c4c8a15b473e23c4fec9d4bdb48138db6",
+    "public_web_mixed.py": "685d30fd6f902c46e1181a144f1326e5d41bc2e71580a26789b2305ea8431c2c",
+    "public-offline-20261103.yaml": "786366f6594c981855235ecae9518b0fd4dc2d537681b2722b9f48005c64599e",
+    "build_public_tool.py": "ec91c92c8de87678cd70ed7b628db5edaf2e27ec9953cbb6d885d17d7f94a1ef"
+  }
+}

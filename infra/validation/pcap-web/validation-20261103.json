@@ -462,7 +462,7 @@
     "86601"
   ],
   "gaps": [
-    "SID1000002 flags any URI at 40 requests/10seconds: benign repeated paths triggered; no production rule correction made",
+    "SID1000002 matches any URI at 40 requests/10seconds. In the mixed batch, the triggering URL was normal /log4shell/; the interval also included a SQLi request. Pure-benign false-positive rate is not measured. No production rule correction made.",
     "233 FW 24 attempts produced no distinct FW_DROP_IN24 success receipt; never score timeout alone as FW-rule success",
     "232 FW attempt24 client timeouts recorded; kernel/100129 correlation remains unconfirmed because connection was lost",
     "normal308 responses were redirects only and not Log4Shell backend success",
@@ -489,5 +489,13 @@
     "confirm-remove-232.json": "b98e425fddba54d7c4b8adf9c7ae56137dfa209ebf2c482c1906c3b644ec74c4",
     "kali232-fw-scan.json": "6f563b37cb765c75376e627ba0d5df41f4bee1f2b51123a090f41196fca9b4c0",
     "kali232-expanded-results.json": "f7886490fc6c7ae72b5b23a1d5a1e427fc7958110f3816b1a79037face6953fd"
+  },
+  "normal_path_rule_observation": {
+    "sid": 1000002,
+    "at_kst": "2026-11-03T16:22:45.077991+09:00",
+    "flow_id": 1454435264793477,
+    "uri_sha256": "4b2fc8fa4ed03abf3e4b5073c41fe44e940c95ec85c3267b0bc859b31e4e34dc",
+    "uri": "/log4shell/",
+    "pure_benign_control_run": false
   }
 }

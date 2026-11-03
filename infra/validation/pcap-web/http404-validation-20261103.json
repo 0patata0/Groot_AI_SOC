@@ -1,0 +1,324 @@
+{
+  "schema": 1,
+  "sid": 1000002,
+  "revision": 2,
+  "approved_proposal": "276f9799b17caa35a96a19b2f5bee7a0",
+  "approval_card": "https://chat.grootlab.duckdns.org/soc/pl/c87izcdndffjpxa1qkwz3z9rch",
+  "before_sha256": "82f41d6532f5b2333178ea51e92ce5c2beedd1052c6a585deb6b91e42bcbe9cf",
+  "after_sha256": "220f9e70958566dbd56464813161b2fc472bfe03d9b03b22eb6f5e2c8330723c",
+  "suricata_image": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+  "offline": {
+    "production_unchanged_during_validation": true,
+    "fixture_sha256": "8692256e87b8ce2eff0fde8454048ff87471cfafb9fba950653d69708f7a2ca1",
+    "packets": 8624,
+    "results": [
+      {
+        "mode": "baseline",
+        "check": {
+          "mode": "baseline",
+          "pass": true,
+          "cases": [
+            {
+              "case": "normal_200",
+              "observed_alerts": 2,
+              "expected_alerts": 2,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "normal_308",
+              "observed_alerts": 2,
+              "expected_alerts": 2,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "denied_403",
+              "observed_alerts": 2,
+              "expected_alerts": 2,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "missing_39",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 39,
+              "expected_control": 39,
+              "pass": true
+            },
+            {
+              "case": "missing_40",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "missing_80",
+              "observed_alerts": 2,
+              "expected_alerts": 2,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "mixed_below_threshold",
+              "observed_alerts": 2,
+              "expected_alerts": 2,
+              "observed_control": 100,
+              "expected_control": 100,
+              "pass": true
+            },
+            {
+              "case": "two_clients_20_each",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "one_client_two_servers",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "slow_404",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "segmented_status_404",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "retransmitted_39",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 39,
+              "expected_control": 39,
+              "pass": true
+            },
+            {
+              "case": "keepalive_404",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "request_mentions_404",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 60,
+              "expected_control": 60,
+              "pass": true
+            }
+          ],
+          "unknown_sids": [],
+          "identity_errors": [],
+          "pcap_sha256": "8692256e87b8ce2eff0fde8454048ff87471cfafb9fba950653d69708f7a2ca1",
+          "packets": 8624
+        },
+        "recovered_existing_output": true
+      },
+      {
+        "mode": "candidate",
+        "rc": 0,
+        "elapsed_s": 0.562,
+        "check": {
+          "mode": "candidate",
+          "pass": true,
+          "cases": [
+            {
+              "case": "normal_200",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "normal_308",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "denied_403",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "missing_39",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 39,
+              "expected_control": 39,
+              "pass": true
+            },
+            {
+              "case": "missing_40",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "missing_80",
+              "observed_alerts": 2,
+              "expected_alerts": 2,
+              "observed_control": 80,
+              "expected_control": 80,
+              "pass": true
+            },
+            {
+              "case": "mixed_below_threshold",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 100,
+              "expected_control": 100,
+              "pass": true
+            },
+            {
+              "case": "two_clients_20_each",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "one_client_two_servers",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "slow_404",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "segmented_status_404",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "retransmitted_39",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 39,
+              "expected_control": 39,
+              "pass": true
+            },
+            {
+              "case": "keepalive_404",
+              "observed_alerts": 1,
+              "expected_alerts": 1,
+              "observed_control": 40,
+              "expected_control": 40,
+              "pass": true
+            },
+            {
+              "case": "request_mentions_404",
+              "observed_alerts": 0,
+              "expected_alerts": 0,
+              "observed_control": 60,
+              "expected_control": 60,
+              "pass": true
+            }
+          ],
+          "unknown_sids": [],
+          "identity_errors": [],
+          "pcap_sha256": "8692256e87b8ce2eff0fde8454048ff87471cfafb9fba950653d69708f7a2ca1",
+          "packets": 8624
+        }
+      },
+      {
+        "mode": "full-syntax",
+        "rc": 0,
+        "elapsed_s": 35.351
+      }
+    ]
+  },
+  "live": {
+    "applied_checked_kst": "2026-11-03T19:18:10.160004+09:00",
+    "status": "applied",
+    "approval_consumed": true,
+    "result_posted": true,
+    "source_sha256": "220f9e70958566dbd56464813161b2fc472bfe03d9b03b22eb6f5e2c8330723c",
+    "container_id": "39ce628179fb39cac72fa59ccb562475a8f874a58eec401b6c6e187614bebd0d",
+    "normal_before": {
+      "requests": 100,
+      "statuses": {
+        "200": 50,
+        "308": 50
+      },
+      "sid1000002_alerts": 2
+    },
+    "normal_after": {
+      "requests": 100,
+      "statuses": {
+        "200": 50,
+        "308": 50
+      },
+      "sid1000002_alerts": 0,
+      "results_sha256": "131738436c29b9f61dd99b6d935e2225098040e1632bee85f667d7997d448653"
+    },
+    "positive_after": {
+      "requests": 45,
+      "statuses": {
+        "404": 45
+      },
+      "sid1000002_alerts": 1,
+      "native_alert_source": "192.168.16.232",
+      "native_alert_target": "192.168.16.230",
+      "results_sha256": "e51cfae97cc365892b4317f4b5c47c9c9b2cc562b725abb41fc1a9b9f15b8238"
+    }
+  },
+  "limits": [
+    "404 burst is an enumeration signal, not proof of maliciousness.",
+    "No additional native automatic block rule or general bot permission added.",
+    "Fresh-server full installation and manual production rollback not exercised.",
+    "LLM follow-up outcome_unknown remains a separate issue."
+  ],
+  "proof_sha256": {
+    "a-http404-r2-complete.json": "22f042aaea96650f3755aec94ec8fab1d362869610d7e8f679531f0de6b797e0",
+    "a-http404-applied-status.json": "cdf1312ecc7ab48a6957eb3702d88fed8f4f41f09a0f2e64e3527398eb807bd1",
+    "a-postfix-observation.json": "a3667eb20d352e13ece4a67f6e29e44a02593d190d14a78e15c98fac32321691",
+    "a-positive404-observation.json": "ee7bc493b74871e95af49213353c810deef43f822ebed7c0e0899a17fcb41c2f",
+    "kali232-postfix-results.json": "648699025462a9feb02548a451a1866c43bd22bb69fc33bfe0f3cf871e473ab9",
+    "kali232-positive404.json": "ce0f4d8862fbe48d9c064e81b7cc90d339670a80c1f82cfae6dd3af09cafecf8"
+  }
+}

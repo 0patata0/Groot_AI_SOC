@@ -1,5 +1,7 @@
 # Suricata IPS 룰셋 (ET Open) — 반입 기록
 
+**2026-11-03 19:27 KST 갱신:** SID1000002 rev2의정확후보승인·실제재시작/적용을확인했다. 정상HTTP40/10초오탐을실404응답40/10초로수정했다. local SHA `220f9e70958566dbd56464813161b2fc472bfe03d9b03b22eb6f5e2c8330723c`,전후14조건/전체ET구문·실정상100건경보0/40445건경보1·native방향을검증했다. 아래이전해시/미검증표시는당시기록이며현재정확범위는[실험원장](../validation/pcap-web/http404-validation-20261103.json)을따른다. 초기설치기는canonical룰을계속자동포함한다.
+
 > **2026-10-24 직접 재확인:** Suricata는 `-S /rules/all.rules`로 ET+로컬 합본을 읽고 있다. 호스트 합본=ET+로컬 바이트·컨테이너 해시 일치, socket 통계52,497 loaded/failed0/skipped0을 확인했다. 로컬 파일 정의14개(자체12+ET override2)와 엔진 전체 카운터는 범위가 다르며 개별 룰 발화 E2E를 의미하지 않는다. `-S` 자체가 커스텀 비활성이라는 채팅 답변은 잘못됐다. 새 설치기도 같은 all.rules 경로이며 아래9/26 초기 템플릿을 운영에 재적용하지 않는다. [현재 상태](../../STATUS.md) · [공식 -S 의미](https://docs.suricata.io/en/suricata-8.0.2/command-line-options.html).
 
 <!-- current-project-context:2026-10-24 -->

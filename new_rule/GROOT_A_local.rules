@@ -88,15 +88,18 @@ alert http any any -> any any ( \
     metadata:mitre_technique_id T1595.002, groot_scenario S1, groot_layer ips; \
     sid:1000001; rev:1;)
 
-# High-rate 404 path enumeration (directory brute force) from one source.
+# Count actual 404 responses per receiving client, not every HTTP request.
+# The wire source is the responding server. target:src_ip preserves that fact
+# and identifies alert.source as the requesting client / alert.target as server.
+# This is an enumeration signal, not proof that all failures are malicious.
 alert http any any -> any any ( \
-    msg:"GROOT-LOCAL S1 directory/content brute force (many requests, scanner cadence)"; \
-    flow:to_server,established; \
-    http.uri; content:"/"; \
-    threshold:type threshold, track by_src, count 40, seconds 10; \
-    classtype:attempted-recon; \
+    msg:"GROOT-LOCAL S1 HTTP 404 response burst to one client (40 per 10s, enumeration signal)"; \
+    flow:to_client,established; \
+    http.stat_code; content:"404"; bsize:3; \
+    threshold:type threshold, track by_dst, count 40, seconds 10; \
+    classtype:attempted-recon; target:src_ip; \
     metadata:mitre_technique_id T1595.003, groot_scenario S1, groot_layer ips; \
-    sid:1000002; rev:1;)
+    sid:1000002; rev:2;)
 
 
 # --- 1000010-1000019  Web attack surface, CLEARTEXT only  (S1, T1190) --------

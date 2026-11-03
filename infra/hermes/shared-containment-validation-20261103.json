@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "source_date_kst": "2026-11-03",
+  "problem": "An authentic duplicate of an existing Native containment ID was rejected as cross-case proposal ownership conflict, discarding the native final report.",
+  "correction_to_prior_report": "The recorded native final result existed with exit_code=0 and six completed MCP calls. The host controller rejected it; this case did not prove a missing model final response.",
+  "deployment": {
+    "path": "/opt/capstone-management/soc_management_controller.py",
+    "before_sha256": "41d11277244af9f9880a564fee54b00fdccddae157cb091d3a6159178d607185",
+    "after_sha256": "3d1e12c3d1fdbcb3ccee0d1de056bba1b69aca449f28f4cbd2d63a3bb70edf49",
+    "uid": 0,
+    "gid": 0,
+    "mode": 420,
+    "changed_methods": [
+      "Store.__init__",
+      "Store.add_evidence",
+      "Store.case_proposals",
+      "Store.context",
+      "Store.reference_containment",
+      "Trace.accept",
+      "Trace.finish"
+    ],
+    "canonical_source_sha256": "5f79df5c0050beb329d2b0583fec1ae46988b26cba72df12478f341b4f96cfdc"
+  },
+  "confirmed": {
+    "confirmed_at_kst": "2026-11-03T20:16:15.459031+09:00",
+    "source_sha256": "3d1e12c3d1fdbcb3ccee0d1de056bba1b69aca449f28f4cbd2d63a3bb70edf49",
+    "reference_count": 2,
+    "foreign_key_errors": 0,
+    "rollback_timer_active": false,
+    "recovery_root": "/var/lib/capstone-shared-containment/20261103-r1",
+    "no_database_restore_or_delete": true
+  },
+  "tests": {
+    "local_management_regressions": 185,
+    "server_management_regressions": 185,
+    "controller_subset_included": 81,
+    "installer_contract_regressions": 37,
+    "fresh_os_full_install": false
+  },
+  "historical_replay": {
+    "rows": [
+      {
+        "source": "before",
+        "source_sha256": "41d11277244af9f9880a564fee54b00fdccddae157cb091d3a6159178d607185",
+        "protocol_error": true,
+        "state": "outcome_unknown",
+        "completed": false,
+        "original_owner_unchanged": true,
+        "references": 0,
+        "calls": 6
+      },
+      {
+        "source": "candidate",
+        "source_sha256": "3d1e12c3d1fdbcb3ccee0d1de056bba1b69aca449f28f4cbd2d63a3bb70edf49",
+        "protocol_error": false,
+        "state": "waiting_approval",
+        "completed": true,
+        "original_owner_unchanged": true,
+        "references": 1,
+        "calls": 6
+      }
+    ],
+    "real_tools_reexecuted": 0,
+    "production_db_writes": 0,
+    "replay_type": "historical private database clones; pending state reconstructed from authentic receipt",
+    "model_semantic_accuracy": "not established by replay"
+  },
+  "live_probe": {
+    "source_ip": "192.168.16.232",
+    "rows": [
+      {
+        "seq": 1,
+        "case": "xss-1",
+        "status": 403,
+        "at_kst": "2026-11-03T20:10:28.066628+09:00",
+        "uri_sha256": "010f8fd259bbe38e827dafcbd0d93d9868e30bbef66c6852e3ff45b73ffa8014",
+        "response_sha256": "25fb23868ebf48348f9e438e00cb9b9d9b3a054f32482a781c762cc4f9cc6393"
+      },
+      {
+        "seq": 2,
+        "case": "sqli-1",
+        "status": 403,
+        "at_kst": "2026-11-03T20:10:28.150864+09:00",
+        "uri_sha256": "337819a0a9b0913972b666418a4e7f12cc40025579bfd2eb13bc000f98f6725e",
+        "response_sha256": "25fb23868ebf48348f9e438e00cb9b9d9b3a054f32482a781c762cc4f9cc6393"
+      },
+      {
+        "seq": 3,
+        "case": "traversal-1",
+        "status": 403,
+        "at_kst": "2026-11-03T20:10:28.235762+09:00",
+        "uri_sha256": "36878c88ce1a752e965608f1db37511c8dfe6811aa5bb3b0e16afb520cf7c61a",
+        "response_sha256": "25fb23868ebf48348f9e438e00cb9b9d9b3a054f32482a781c762cc4f9cc6393"
+      }
+    ]
+  },
+  "live_cases_at_kst": "2026-11-03T20:16:15.708665+09:00",
+  "live_cases": [
+    {
+      "id": "cee5fb1667efffec24d963000c78a300",
+      "case_state": "waiting_approval",
+      "detail": "awaiting_broker_event",
+      "runs": [
+        {
+          "id": "ed9d641aabcbd81a0db5076826d2c3a2",
+          "run_state": "completed",
+          "calls": 6,
+          "failed_calls": 0,
+          "write_calls": 1
+        }
+      ]
+    },
+    {
+      "id": "13254f9279ee96afe8a5176af8507f5b",
+      "case_state": "running",
+      "detail": "",
+      "runs": [
+        {
+          "id": "1fc16a74d8c42f94fee959a4cf7b249e",
+          "run_state": "running",
+          "calls": 0,
+          "failed_calls": 0,
+          "write_calls": 0
+        }
+      ]
+    },
+    {
+      "id": "45b3846344b52c12c86b1cd287faeda2",
+      "case_state": "needs_review",
+      "detail": "model_tool_failure_requires_review",
+      "runs": [
+        {
+          "id": "ca4edaef75ef0359e97e56d6988e438b",
+          "run_state": "completed",
+          "calls": 10,
+          "failed_calls": 3,
+          "write_calls": 1
+        }
+      ]
+    }
+  ],
+  "live_shared_references": [
+    {
+      "case_id": "45b3846344b52c12c86b1cd287faeda2",
+      "request_id": "44e23dcd2b2db102a41134cfb73a45a5",
+      "ip": "192.168.16.232",
+      "receipt_sha256": "4dda43b0de693345bc12adaed3c925a03bc925d0360e3a0ce234a6f6d6f52ec9",
+      "owner_case_id": "13254f9279ee96afe8a5176af8507f5b",
+      "status": "pending",
+      "result_status": "",
+      "target": "a:incident-ip",
+      "observed_at_kst": "2026-11-03T20:12:52.276217+09:00"
+    },
+    {
+      "case_id": "cee5fb1667efffec24d963000c78a300",
+      "request_id": "44e23dcd2b2db102a41134cfb73a45a5",
+      "ip": "192.168.16.232",
+      "receipt_sha256": "4dda43b0de693345bc12adaed3c925a03bc925d0360e3a0ce234a6f6d6f52ec9",
+      "owner_case_id": "13254f9279ee96afe8a5176af8507f5b",
+      "status": "pending",
+      "result_status": "",
+      "target": "a:incident-ip",
+      "observed_at_kst": "2026-11-03T20:14:54.879781+09:00"
+    }
+  ],
+  "invariants": [
+    "One authoritative owner per approval/request ID; references never transfer ownership.",
+    "Only actual temporarily_contain_ip duplicate:true, kind=containment, target=a:incident-ip and exact requested IPv4 are eligible.",
+    "Other rule/service/write ID collisions remain protocol errors.",
+    "Current exact-IP operation status read is required for a referenced containment.",
+    "Broker decisions schedule waiting dependent investigations read-only.",
+    "Protected addresses, 600s initial TTL, approval-based retention/release, cooldown and tool permissions unchanged.",
+    "CAS source rollback preserves live SQLite and new conversations/references."
+  ],
+  "remaining": [
+    "Source hostname and sensor/Wazuh agent identity can still be confused.",
+    "Historical sensor IDs can still be attributed to an unrelated current time range.",
+    "Live IDS investigation made three invalid future until_kst queries; its case remains needs_review.",
+    "Semantic correctness of old/new model prose is not proven by a valid protocol or pending approval.",
+    "Fresh full server installation, actual source rollback and broker-expiry wakeup are separate validation scopes."
+  ],
+  "proof_sha256": {
+    "b-replay-trace.json": "0491b20874fe75572e594346feea72aacc4fc4a47bc4868b90cdcb4188c54505",
+    "b-read-duplicate.json": "cc0a5502acaa3eedd172099676188dcd9d6efda56da1fd062d8e77c8c66e340e",
+    "b-prepare-shared.json": "2ad03b42641e267bfc19343fe96a4342c64e2229c5de688c289517b933fe7941",
+    "b-replay-candidate.json": "5524e1fa3b7ad081cda77a9f9c376ed796cebb8c92a45058938cf001eccc1b68",
+    "b-apply-shared.json": "9a73aeb688b2c3e133001630109126816ff7ab4153f66a89f866f08f739dbff0",
+    "b-confirm-shared.json": "ffe532a9b74742f2e51e3f3435209963217f16de38d04a5016354cc2c619a7ac",
+    "kali232-shared-regression.json": "f0c99501682fe2ebad10f19af0ff3e9027d370a57439044edd55029143d499a0",
+    "b-shared-case-results3.json": "9987f8ea42c87ae5be31129cdf197ec5ecd8ef53c012dedf79b243c6f7d59ef2",
+    "b-new-call-errors.json": "f477576e7b59981a3b897427152e67703d6115a9b12973d0ecb2e10f0ff4b630",
+    "b-timeline-evidence.json": "e60181c55504e8ffaa7877e772c09913e39ad38a4cb06795249f97ecbaf9a795",
+    "b-cleanup-shared-tests.json": "4cd0b43718701083692cc16d25287e5d710d63cb755b0e992779dc55de6e32b8"
+  },
+  "cleanup": {
+    "removed_test_files": 10,
+    "removed_bytes": 19029703,
+    "recovery_sources_preserved": true,
+    "live_database_touched": false
+  }
+}

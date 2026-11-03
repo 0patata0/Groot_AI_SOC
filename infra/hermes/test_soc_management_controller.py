@@ -141,6 +141,88 @@ class ControllerTests(unittest.TestCase):
         trace.accept({"type": "tool_result", "name": name, "is_error": error,
                       "output": json.dumps({"content": [{"type": "text", "text": json.dumps(payload)}], "isError": error})})
 
+    def shared_containment_trace(self, suffix='one'):
+        owner = self.store.new_case('native-owner-' + suffix)
+        cid = self.store.new_case('waf-reference-' + suffix)
+        pid = hashlib.sha256(suffix.encode()).hexdigest()[:32]
+        self.store.db.execute("INSERT INTO proposals(id,case_id,tool,status,target) VALUES(?,?,?,?,?)",
+                              (pid, owner, 'broker_event', 'pending', 'a:incident-ip'))
+        self.store.db.commit()
+        case = self.store.db.execute('SELECT * FROM cases WHERE id=?', (cid,)).fetchone()
+        trace = m.Trace(self.store, case, self.store.start(case))
+        trace.accept({'type': 'system', 'subtype': 'init', 'session_id': 'shared-session-' + suffix})
+        receipt = {'request_id': pid, 'target': 'a:incident-ip', 'kind': 'containment',
+                   'ip': '192.168.16.232', 'duplicate': True, 'status': 'pending'}
+        return trace, owner, receipt
+
+    def test_existing_native_containment_is_referenced_without_moving_ownership(self):
+        trace, owner, receipt = self.shared_containment_trace()
+        self.tool(trace, 'mcp__rule_write_a__temporarily_contain_ip', receipt, {'ip': receipt['ip']})
+        self.assertFalse(trace.protocol_error)
+        self.assertEqual(self.store.db.execute('SELECT case_id FROM proposals WHERE id=?',
+                                              (receipt['request_id'],)).fetchone()[0], owner)
+        self.assertEqual(self.store.db.execute('SELECT count(*) FROM proposals').fetchone()[0], 1)
+        proposals = self.store.context(trace.case['id'])['proposals']
+        self.assertEqual((proposals[0]['ownership'], proposals[0]['owner_case_id']), ('reference', owner))
+        self.tool(trace, 'mcp__rule_a__get_operation_status',
+                  {**receipt, 'live_block_state': 'owned', 'live_remaining_seconds': 300},
+                  {'request_id': receipt['request_id']})
+        self.result(trace, '기존 조치의 유지/해제 결정을 기다립니다.\nMANAGEMENT_STATUS: monitor')
+        result = trace.finish(0)
+        self.assertTrue(result['completed'])
+        self.assertEqual(result['state'], 'waiting_approval')
+
+    def test_shared_containment_requires_fresh_exact_ip_status_read(self):
+        for variant in ('missing', 'wrong-ip', 'wrong-target'):
+            trace, owner, receipt = self.shared_containment_trace(variant)
+            self.tool(trace, 'mcp__rule_write_a__temporarily_contain_ip', receipt, {'ip': receipt['ip']})
+            if variant != 'missing':
+                status = dict(receipt)
+                status['ip' if variant == 'wrong-ip' else 'target'] = '192.168.16.233' if variant == 'wrong-ip' else 'a:waf'
+                self.tool(trace, 'mcp__rule_a__get_operation_status', status,
+                          {'request_id': receipt['request_id']})
+            self.result(trace, '기존 차단 상태를 확인했습니다.\nMANAGEMENT_STATUS: monitor')
+            self.assertEqual(trace.finish(0)['state'], 'needs_review')
+            self.assertEqual(self.store.db.execute('SELECT target FROM proposals WHERE id=?',
+                                                  (receipt['request_id'],)).fetchone()[0], 'a:incident-ip')
+
+    def test_other_cross_case_write_ids_still_fail_closed(self):
+        for index, field in enumerate(('duplicate', 'kind', 'target', 'ip', 'tool')):
+            trace, owner, receipt = self.shared_containment_trace(str(index))
+            name = 'mcp__rule_write_a__temporarily_contain_ip'
+            if field == 'tool':
+                name = 'mcp__rule_write_a__propose_service_action'
+            else:
+                receipt[field] = {'duplicate': False, 'kind': 'service', 'target': 'a:waf',
+                                  'ip': '192.168.16.233'}[field]
+            self.tool(trace, name, receipt, {'ip': '192.168.16.232'})
+            self.assertTrue(trace.protocol_error, field)
+            self.assertEqual(self.store.db.execute('SELECT case_id FROM proposals WHERE id=?',
+                                                  (receipt['request_id'],)).fetchone()[0], owner)
+            self.assertIsNone(self.store.db.execute('SELECT 1 FROM containment_references WHERE case_id=?',
+                                                   (trace.case['id'],)).fetchone())
+
+    def test_broker_decision_wakes_reference_readonly_and_keeps_one_owner(self):
+        trace, owner, receipt = self.shared_containment_trace()
+        self.tool(trace, 'mcp__rule_write_a__temporarily_contain_ip', receipt, {'ip': receipt['ip']})
+        self.tool(trace, 'mcp__rule_a__get_operation_status', receipt, {'request_id': receipt['request_id']})
+        self.result(trace, '승인 대기 중입니다.\nMANAGEMENT_STATUS: monitor')
+        self.assertEqual(trace.finish(0)['state'], 'waiting_approval')
+        self.events({'seq': 1, 'event_key': 'native-expired', 'kind': 'operation', 'at': 1010,
+                     'payload': {**receipt, 'status': 'expired', 'result_status': 'expired'}})
+        row = self.store.db.execute('SELECT state,mode FROM cases WHERE id=?', (trace.case['id'],)).fetchone()
+        self.assertEqual(tuple(row), ('ready', 'verify'))
+        proposal = self.store.case_proposals(trace.case['id'])[0]
+        self.assertEqual((proposal['owner_case_id'], proposal['status']), (owner, 'expired'))
+
+    def test_reference_status_cannot_reopen_a_terminal_broker_decision(self):
+        trace, owner, receipt = self.shared_containment_trace()
+        self.tool(trace, 'mcp__rule_write_a__temporarily_contain_ip', receipt, {'ip': receipt['ip']})
+        self.store.db.execute("UPDATE proposals SET status='expired' WHERE id=?", (receipt['request_id'],))
+        self.tool(trace, 'mcp__rule_a__get_operation_status', receipt, {'request_id': receipt['request_id']})
+        self.assertTrue(trace.tool_error)
+        self.assertEqual(self.store.case_proposals(trace.case['id'])[0]['status'], 'expired')
+
     def test_sca_resolution_requires_exact_newer_pass_not_policy_summary(self):
         self.now=m.datetime.fromisoformat('2026-10-26T15:00:00+09:00').timestamp()
         event=self.alert('sca-1','2026-10-23T12:00:00Z',rule='19011')

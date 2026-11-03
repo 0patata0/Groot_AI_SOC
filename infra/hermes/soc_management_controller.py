@@ -145,6 +145,11 @@ class Store:
             CREATE TABLE IF NOT EXISTS proposals (
                 id TEXT PRIMARY KEY, case_id TEXT NOT NULL REFERENCES cases(id), tool TEXT NOT NULL,
                 status TEXT NOT NULL, result_status TEXT NOT NULL DEFAULT '');
+            CREATE TABLE IF NOT EXISTS containment_references (
+                case_id TEXT NOT NULL REFERENCES cases(id),
+                request_id TEXT NOT NULL REFERENCES proposals(id),
+                ip TEXT NOT NULL, receipt_sha256 TEXT NOT NULL, observed REAL NOT NULL,
+                PRIMARY KEY(case_id,request_id));
             CREATE TABLE IF NOT EXISTS runs (
                 id TEXT PRIMARY KEY, case_id TEXT NOT NULL REFERENCES cases(id), started REAL NOT NULL,
                 finished REAL, state TEXT NOT NULL, session_id TEXT, detail TEXT NOT NULL DEFAULT '');
@@ -328,6 +333,12 @@ class Store:
             row = self.db.execute("SELECT state FROM cases WHERE id=?", (cid,)).fetchone()
             if row[0] not in ("outcome_unknown", "running", "needs_review", "review_ready"):
                 self.db.execute("UPDATE cases SET state='ready',mode='verify',due=?,updated=?,priority=4 WHERE id=?", (now, now, cid))
+            # A receipt can reference another incident's existing containment,
+            # never transfer ownership or create another approval. A broker
+            # decision wakes those dependent investigations read-only too.
+            self.db.execute("""UPDATE cases SET state='ready',mode='verify',due=?,updated=?
+                WHERE id IN (SELECT case_id FROM containment_references WHERE request_id=?)
+                AND state IN ('waiting_approval','monitor')""", (now, now, proposal))
         return cid
 
     def ingest_events(self, response):
@@ -388,10 +399,44 @@ class Store:
             return dict(row, operator_review=True, operator_review_reason=review[0] if review else "")
         return row
 
+    def case_proposals(self, cid):
+        owned = [dict(row) for row in self.db.execute(
+            "SELECT id,tool,status,result_status,target FROM proposals WHERE case_id=?", (cid,))]
+        linked = [dict(row) for row in self.db.execute("""SELECT p.id,p.tool,p.status,p.result_status,p.target,
+            p.case_id AS owner_case_id,r.ip AS reference_ip,'reference' AS ownership
+            FROM containment_references r JOIN proposals p ON p.id=r.request_id
+            WHERE r.case_id=? AND p.case_id!=? AND p.target='a:incident-ip'""", (cid, cid))]
+        return owned + linked
+
+    def reference_containment(self, cid, name, args, payload):
+        """Bind a real duplicate MCP receipt without adopting its approval ID."""
+        if (name != "mcp__rule_write_a__temporarily_contain_ip"
+                or payload.get("duplicate") is not True or payload.get("kind") != "containment"
+                or payload.get("target") != "a:incident-ip"):
+            return False
+        try:
+            ip = str(ipaddress.IPv4Address(args["ip"]))
+        except (KeyError, ValueError, TypeError, ipaddress.AddressValueError):
+            return False
+        pid = payload.get("request_id")
+        if payload.get("ip") != ip or not isinstance(pid, str) or not ID.fullmatch(pid):
+            return False
+        owner = self.db.execute("SELECT case_id,target FROM proposals WHERE id=?", (pid,)).fetchone()
+        prior = self.db.execute("SELECT ip FROM containment_references WHERE case_id=? AND request_id=?",
+                                (cid, pid)).fetchone()
+        if (not owner or owner[0] == cid or owner[1] != "a:incident-ip"
+                or prior and prior[0] != ip):
+            return False
+        self.db.execute("""INSERT INTO containment_references VALUES(?,?,?,?,?)
+            ON CONFLICT(case_id,request_id) DO UPDATE SET
+            receipt_sha256=excluded.receipt_sha256,observed=excluded.observed""",
+                        (cid, pid, ip, digest(canonical(payload)), self.clock()))
+        return True
+
     def context(self, cid):
         events = self.db.execute("SELECT kind,at,payload FROM inbox WHERE case_id=? ORDER BY at DESC,rowid DESC LIMIT 40", (cid,)).fetchall()
         total = self.db.execute("SELECT count(*) FROM inbox WHERE case_id=?", (cid,)).fetchone()[0]
-        proposals = [dict(row) for row in self.db.execute("SELECT id,tool,status,result_status,target FROM proposals WHERE case_id=?", (cid,))]
+        proposals = self.case_proposals(cid)
         related = self.later_proposals(cid)
         # Full descriptions remain limited to 40 rows. A separate bounded list
         # identifies every sensor event that the actual MCP reads must cover.
@@ -821,7 +866,9 @@ class Trace:
                     if isinstance(pid, str) and ID.fullmatch(pid):
                         previous = db.execute("SELECT case_id FROM proposals WHERE id=?", (pid,)).fetchone()
                         if previous and previous[0] != self.case["id"]:
-                            self.protocol_error = True
+                            if not self.store.reference_containment(
+                                    self.case["id"], name, self.arguments[pending[0]["ordinal"]], payload):
+                                self.protocol_error = True
                         else:
                             target = str(payload.get("target") or self.arguments[pending[0]["ordinal"]].get("target") or "")
                             db.execute("""INSERT INTO proposals(id,case_id,tool,status,target) VALUES(?,?,?,?,?)
@@ -836,18 +883,26 @@ class Trace:
                         status = effective_status(payload)
                         self.read_receipts[("status", pid)] = {key: payload[key] for key in (
                             "target", "status", "approval_status", "after_sha256", "before_sha256",
-                            "live_block_state", "live_remaining_seconds") if key in payload}
+                            "live_block_state", "live_remaining_seconds", "ip") if key in payload}
                         if status == "unavailable":
                             self.tool_error = True
                         else:
-                            prior = db.execute("SELECT status,result_status FROM proposals WHERE id=? AND case_id=?", (pid, self.case["id"])).fetchone()
+                            access = """id=? AND (case_id=? OR EXISTS (
+                                SELECT 1 FROM containment_references r
+                                WHERE r.request_id=proposals.id AND r.case_id=?))"""
+                            prior = db.execute("SELECT status,result_status FROM proposals WHERE " + access,
+                                               (pid, self.case["id"], self.case["id"])).fetchone()
+                            linked = db.execute("SELECT ip FROM containment_references WHERE case_id=? AND request_id=?",
+                                                (self.case["id"], pid)).fetchone()
                             if prior and (prior[1] or prior[0]) in TERMINAL and status not in TERMINAL:
                                 self.tool_error = True  # never overwrite a known decision with stale pending
+                            elif linked and (payload.get("target") != "a:incident-ip" or payload.get("ip") != linked[0]):
+                                self.tool_error = True
                             else:
                                 db.execute("""UPDATE proposals SET status=?,result_status=?,
-                                    target=CASE WHEN ?!='' THEN ? ELSE target END WHERE id=? AND case_id=?""",
+                                    target=CASE WHEN ?!='' THEN ? ELSE target END WHERE """ + access,
                                            (status, str(payload.get("result_status", "")), str(payload.get("target", "")),
-                                            str(payload.get("target", "")), pid, self.case["id"]))
+                                            str(payload.get("target", "")), pid, self.case["id"], self.case["id"]))
                 elif not error and payload and name.endswith(("__get_rule_change_target", "__get_service_action_target")):
                     target = self.arguments[pending[0]["ordinal"]].get("target")
                     if target and payload.get("target") == target:
@@ -912,8 +967,8 @@ class Trace:
             # Preserve its original output only in the private run trace.
             text = incomplete_report(detail)
         else:
-            proposals = list(db.execute("SELECT id,status,result_status,target FROM proposals WHERE case_id=?", (self.case["id"],)))
-            pending = any((p[2] or p[1]) not in TERMINAL for p in proposals)
+            proposals = self.store.case_proposals(self.case["id"])
+            pending = any((p["result_status"] or p["status"]) not in TERMINAL for p in proposals)
             markers = list(FINAL_STATUS.finditer(text))
             marker_lines = re.findall(r'^MANAGEMENT_STATUS:[^\r\n]*$', text, re.M)
             disposition = (markers[0].group(1) if len(markers) == len(marker_lines) == 1
@@ -927,9 +982,19 @@ class Trace:
                 "SELECT name FROM tool_calls WHERE run_id=? AND completed=1 AND is_error=0", (self.run_id,))
                 if row[0] not in CALCULATION_TOOLS}
             decision_error = sensor_disposition_error(text, successful_tools) if self.sensor_requirements else None
-            missing_bound_read = any(not verified_proposal(p, self.read_receipts, self.later_proposals) for p in proposals)
+            missing_bound_read = any(not verified_proposal(
+                tuple(p[k] for k in ("id", "status", "result_status", "target")),
+                self.read_receipts, self.later_proposals) for p in proposals)
+            missing_reference_read = any(
+                p.get("ownership") == "reference" and
+                (self.read_receipts.get(("status", p["id"]), {}).get("target") != "a:incident-ip" or
+                 self.read_receipts.get(("status", p["id"]), {}).get("ip") != p["reference_ip"])
+                for p in proposals)
             if self.unblocks_pending_readback:
                 state, detail, due = "needs_review", "unblock_live_verification_missing", now
+                text = incomplete_report(detail)
+            elif missing_reference_read:
+                state, detail, due = "needs_review", "shared_containment_verification_missing", now
                 text = incomplete_report(detail)
             elif decision_error in ('incident_disposition_evidence_missing', 'incident_disposition_invalid'):
                 state, detail, due = "needs_review", decision_error, now

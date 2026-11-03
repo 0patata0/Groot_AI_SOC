@@ -78,3 +78,5 @@ A의 기존 이미지에서 읽은 Suricata **8.0.6**, 실제 합본 룰 SHA `b8
 최종 읽기에서 운영 Suricata PID1577695·local/합본SHA와정확후보의 primary/all 백업SHA를확인했다. 종료된자체실패제안unit만 reset-failed했고 실패원문은보존했다. 232 시험worker/Suricata 프로세스잔여0을확인했다.
 
 게시확인: IDS수정9파일 `57b754d`와공개PCAP13파일 `c875813`을각각푸시·원격main일치확인했다. 자체Mac임시도우미65파일은로컬검증사본을보존한후삭제했고작업임시부모도없다. 공개파일후속확인보완은별도문서커밋으로게시한다.
+
+후속정정(20:16 KST): 당시WAF건의원문native 최종보고/exit_code0은존재했고,DB와게시에서outcome_unknown이된원인은공유Native차단ID를컨트롤러가다른사건소유권충돌로거절한것이었다. [후속수정/실검증](../../hermes/shared-containment.md)을따른다. 이전보고의관측상태와당시모델문장/시간·자산오류는보존한다.

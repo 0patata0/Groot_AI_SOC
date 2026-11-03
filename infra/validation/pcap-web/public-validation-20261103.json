@@ -961,7 +961,9 @@
     "mac_download_bytes_removed": 231865005,
     "mac_new_packages_installed": 0,
     "server_temporary_transport_archives_removed": true,
-    "server_pcaps_answer_sources_and_unprivileged_tool_preserved": true
+    "server_pcaps_answer_sources_and_unprivileged_tool_preserved": true,
+    "mac_temporary_helper_files_removed": 65,
+    "mac_temporary_parent_absent": true
   },
   "proof_sha256": {
     "public-download-manifest.json": "a26c7909a7682e3c491dd8a4d0e4bb81a0efd738acfd347017d861f07bef03dd",
@@ -980,7 +982,9 @@
     "a-public-containment-expired.json": "bcd6b259e2d2cbc0cead54743a7e19ccf560677214fef3ef6c77b715cbac7b2c",
     "kali232-web-expiry-recovery.json": "319b6d4e2ec1fa8aad05ad158ce8a81cae8c4fb426bfafcacee7eb6d73307762",
     "a-pcap-final-status.json": "19324e2783cf11e520d0f7b7ef34b1fd8190dda74e55da24880fee1c692b23d8",
-    "kali232-pcap-final-status.json": "24602f029b266ac0927cc2479c9063d0984be4874e68b393445ebba20da8440a"
+    "kali232-pcap-final-status.json": "24602f029b266ac0927cc2479c9063d0984be4874e68b393445ebba20da8440a",
+    "mac-resume-helper-cleanup.json": "5338cb7556833759d027cf20e673ab51c02d3b6cba952c013fbc809b2ba5075e",
+    "resume-source-snapshot.json": "3518db82e5627aa3c912fe16d86bbe5dbd184a8171c755c040706dc0bb88fc32"
   },
   "live_recovery": {
     "at_kst": "2026-11-03T19:49:02.984213+09:00",

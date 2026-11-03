@@ -1,15 +1,16 @@
-# 인프라 현황 — 2026-11-03 21:23 KST
+# 인프라 현황 — 2026-11-03 22:33 KST
 
 현재 상태와 활성 과제를 요약한다. 전체 목표는 **LLM의 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 미완료 active다. 핵심 기능은11/9 KST까지 마감하는 목표를 유지한다. 발표 작성은11월둘째주 리마인더 이후다.
 
-[계획](PLAN.md) · [이번 수정 전 현황](archive/STATUS-20261103-before-incident-context.md) · [공유 차단 수정 전](archive/STATUS-20261103-before-shared-containment.md) · [PCAP/IDS 수정 전 기록](archive/STATUS-20261103-before-http404.md) · [11/1 이전 이력](archive/STATUS-history-20261101.md). 과거 관측을 현재 라이브 사실로 대신하지 않으며 시각은 KST다.
+[계획](PLAN.md) · [이번 수정 전 현황](archive/STATUS-20261103-before-operation-time.md) · [사건 시각 보완 전](archive/STATUS-20261103-before-incident-context.md) · [공유 차단 수정 전](archive/STATUS-20261103-before-shared-containment.md) · [PCAP/IDS 수정 전 기록](archive/STATUS-20261103-before-http404.md) · [11/1 이전 이력](archive/STATUS-history-20261101.md). 과거 관측을 현재 라이브 사실로 대신하지 않으며 시각은 KST다.
 
 ## 현재 우선 과제와 최신 결과
 
 | 작업 | 완료·실제 확인 | 잔여·한계 |
 |---|---|---|
+| 차단 만료 KST·절차 검증 | A/B MCP의 KST/관측 기준 남은 시간·모델 사본 투영·result 결과문장 오해석 수정. 별도 대상 도구가 없는 차단 상태는 정확한 ID의 실제 커널 관측으로 검증. 관리207·Hermes380·SDK179·양서버MCP23·설치38 PASS | 최종 A1/B14파일 반영·확정. 다른 ID의 새 Native/SDK 각각1 MCP·오류/산술0·절차 completed,60.8/9.5초 표본(게시 제외·조건 상이). 중간 자동원복1회 후 재반영/DB보존·timer 비활성. 장문/사건판단·UI왕복/새 공격 E2E는 별도. [처리/복구](infra/hermes/operation-time.md)·[원장](infra/hermes/operation-time-validation-20261103.json) |
 | 공유 Native 차단 참조 |20:08:59 B 컨트롤러 반영·20:16:15 확정. 기존 차단 ID를 다른 사건에서 참조하면 소유권 충돌로 최종 보고를 버리던 오류 수정. 로컬/서버185검사·설치계약37검사, 실제 과거 trace 전후 재생 성공. 새232공격3건/403 뒤 실제 두 사건이 같은 Native 조치에 참조2개·원소유권 유지. WAF건은6 MCP 후 승인 대기까지 성공 | 이전20:10 IDS건은10 MCP 중 미래시각 조회3실패로 needs_review. 프로토콜/공유조치 성공은 사건 판단 정확성·해결 완료가 아님. [수정/복구](infra/hermes/shared-containment.md)·[검증 원장](infra/hermes/shared-containment-validation-20261103.json) |
-| 자산·시간 근거·종결 | 실제 사건 KST 구간/미래 종료시각 제한·동일 필터/실사건 행 정정 조회 회복·반환 경보별 시각/룰/IP/수집 센서 결속을 구현. 오래된 자동 관리 내장 gate와 두 봇 공통 grounding을1.19.10으로 동기화. 로컬/서버195·실환경Hermes380/SDK179·설치38 검사 PASS |21:09 최종9파일 반영·실제 읽기전용2 MCP 오류/쓰기/게시0, 과거 실제보고의 잘못된 검사 재생 정정. 새232 공격3요청403/600초Native차단. IDS8/WAF6 MCP 모두 오류0·승인대기 보고 sent. 미래 until 거절/과거SID/센서명 혼용은 새 표본에서0. 불필요 시간계산2회·WAF만료시각오답/epoch 표시·후속조사종결은 잔여. [처리/복구](infra/hermes/incident-context.md)·[원장](infra/hermes/incident-context-validation-20261103.json) |
+| 자산·시간 근거·종결 | 실제 사건 KST 구간/미래 종료시각 제한·동일 필터/실사건 행 정정 조회 회복·반환 경보별 시각/룰/IP/수집 센서 결속을 구현. 오래된 자동 관리 내장 gate와 두 봇 공통 grounding을1.19.10으로 동기화. 로컬/서버195·실환경Hermes380/SDK179·설치38 검사 PASS |21:09 최종9파일 반영·실제 읽기전용2 MCP 오류/쓰기/게시0, 과거 실제보고의 잘못된 검사 재생 정정. 새232 공격3요청403/600초Native차단. IDS8/WAF6 MCP 모두 오류0·승인대기 보고 sent. 미래 until 거절/과거SID/센서명 혼용은 새 표본에서0. 당시 시간계산/만료 오답은 위 후속 보완과 구분하며 후속 사건 위험/피해 판단·종결은 잔여. [처리/복구](infra/hermes/incident-context.md)·[원장](infra/hermes/incident-context-validation-20261103.json) |
 | 관리 접속 | 관리자231→A SSH허용 한주소/영구파일 추가,16:35:34 peer231/root확정. A/B/C 변경은Mac→관리자231→A→B/C. 두Kali232/233은직결 예외. 18:13단절은18:45복구 | 관리자/MCP전용 엄격INPUT축소·관리접속로그예외 미반영. [접속](팀접속안내.md)·[FW 정책/복구](infra/groot-a/fw-v2/README.md) |
 | FW 통합 | A14:21 실제8테이블/30체인/99룰/9집합. 프로젝트NAT2테이블→inet두체인 후보는문법/격리기존·통합·원복과TTL보존검증 | 지속로더/루트설치기6후보는미커밋·운영미적용. IPv6 SSH/웹수신이남아테이블단순삭제안함. Docker NAT 사용량은과거실확인,10443프로젝트NAT최근사용은미확인. [FW 검토](infra/mcp/fw-consolidation.md) |
 
@@ -31,7 +32,7 @@
 | WAF | SecRuleEngine On. 요청별실룰/Enabled/403 검증. HTTP상태만으로침해성공/영향해소를단정하지않음 |
 | 지정 IDS→FW | 사용자승인 예외로Native선차단 후 LLM조사/관리자유지·해제확인. 비대상DNS/상태·정보성신호 자동차단 아님 |
 | 차단 시간 | 최초600초·관리자유지승인 시결정부터60분·해제승인/만료. 실제해제 또는원기한종료 후60초재차단대기,새공격근거 필요·중복요청연장없음 |
-| 모델/봇 | Thor 원본qwen3.6:35b 유지·Ollama 대화/조회, Hermes 조사/변경 우선. 이번 시간/자산 보완은 공통검사/자동관리 gate9복사본과SDK receipt만 반영·모델/일반권한 변경0 |
+| 모델/봇 | Thor 원본qwen3.6:35b 유지·Ollama 대화/조회, Hermes 조사/변경 우선. 현행 공통 계약1.5.16·query-completion1.19.12·A/B MCP 시각/절차 보완, 모델/승인·일반권한 변경0 |
 | 학습/비교 |11/2 4,348단계/8,695학습·평가176완료·eval_loss0.3175. DGX→Thor 후보Q4_K_M 적재/해시확인,운영승격없음. 고정1.5.14 비교원본18/24·HF기본20/24·학습19/24로승격근거부족. [방법](finetuning/RUNTIME_COMPARISON_20261103.md) |
 
 현재소프트웨어/프로토콜검사·실센서/차단·실제LLM판단·독립모델품질·새OS전체설치검증은서로대신하지않는다. 이전세부관측/원문/소스핀은위날짜별archive와각검증원장에보존한다.
@@ -51,8 +52,8 @@
 
 ## 변경·복구·Git 상태
 
-이번9파일 운영 증분은21:09:07 관리자231→A→B로 반영했다. 실제 controller SHA572a329e…/공통 gate bbbb340a…이며 기존root deploy.sh의 소스복사/내장gate 생성 경로도 같은 canonical을 사용한다. 추가 패키지·포트·키·모델0, 기존 SOUL/설정hash 보존·DB/WAL 되돌림0이다. 복구 소스/uid/gid/mode와 독립 CAS timer는 B `/var/lib/capstone-incident-time/20261103-r1`에 보존한다. 21:14:48 소스9개/메타데이터·서비스·첫 실제 조사8 MCP/오류0를 확인해 확정하고 독립 timer를 해제했다. 새차단은21:20:18 원기한 후expired·21:20:46 커널0/정상GET302복구를 확인했다. 후속 IDS는판단근거미완료needs_review·WAF는verify중으로전체종결을주장하지않는다. 수동 원복/새 OS 전체 설치는 미실시다.
+A1/B14파일을 관리자231→A→B 경유로 증분 반영했다. 최종 B22:15:54 반영/확정·22:25 양서버 실제SHA/uid/gid/mode·서비스·timer 비활성을 확인했다. 중간22:10:52 B자동원복1회 후 최종 후보를 재반영했으며 운영DB/WAL·승인/대화는 복원하지 않았다. 원본/중간/최종소스·원문/실제 canary·멱등 복구는 양서버 root `/var/lib/capstone-operation-time/20261103-r1`에 보존한다. 실제 수동 원복/새 OS 전체 설치는 미실시다.
 
-이번 시각/자산 보완16파일은 `9addf1a63624c7cc3de9b1be4111ed63580416a4`로 커밋했고21:22:19 KST 실제 원격main일치를 확인했다. 게시확인·정리결과 보완은 후속 문서 커밋으로 게시한다. 기존peer6/NAT6후보와별도topology5stage는포함하지 않는다. 자격·대화/검증원문·업무분담·발표/논문·데이터/가중치는 Git 제외다.
+기존 deploy.sh의 MCP/render/내장gate·양봇 소스 묶음은 같은 canonical을 사용한다. 추가 패키지·이미지·포트·키·모델0, SOUL/설정·승인/TTL 유지다. 초기 설치기로 운영 서버를 덮어쓰지 않았다. 서버 자체 검증 작업본/재생 복제본을 정리했으며 실제 canary DB/trace·복구·운영 데이터는 보존한다. Mac 자체 도우미 35파일/3753205B·임시부모/SSH mux도 제거·부재 확인했다. 비밀 값 없는 도우미 소스 사본과 실제 검증 원문은 로컬 전용이다. 최종 게시 결과는 완료 후 보완한다.
 
-서버 자체 시험/복제본266파일/6,127,108B와 Mac 자체 도우미34파일/3,463,578B·임시부모/SSH mux를 정리했다. canary 원문trace·복구소스·운영DB/대화·두Kali PCAP/결과는 보존했고, Mac 새 패키지 설치0이다. 도우미 소스 사본/최종 원격커밋·작업트리 상태는 로컬 기록에 남긴다. 기존 별도 후보와topology5stage 때문에 전체 작업트리는 clean이 아니다. 계정잔여1% 중지 조건은 유지하나 현재 도구로 잔여율을 조회할 수 없다.
+직전 c6bc18a는21:23:50 원격main일치다. 이번 만료/절차 보완은 아직 로컬 변경·게시 전이며 완료 후 명시 경로만 자동 커밋·푸시/원격 확인한다. 기존peer6/NAT6 후보와 별도topology5stage는 보존·미포함한다. 자격·대화/검증원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 기존 별도 작업 때문에 전체 작업트리는 clean이 아니다. 계정잔여1% 중지 조건은 유지하나 현재 도구로 잔여율을 조회할 수 없다.

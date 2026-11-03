@@ -644,6 +644,17 @@ def verified_proposal(row, receipts, later=()):
         return effective_status(observed_status) == effective
     if effective not in TERMINAL:
         return effective_status(observed_status) not in TERMINAL
+    # This status endpoint already includes the fresh nft ownership snapshot.
+    # There is no separate get_*_target endpoint for a:incident-ip. Requiring
+    # one here makes a valid single-read containment verification impossible.
+    if target == "a:incident-ip":
+        if observed_status.get("target") != target or effective_status(observed_status) != effective:
+            return False
+        if effective == "kept":
+            seconds = observed_status.get("live_remaining_seconds")
+            return (observed_status.get("live_block_state") == "owned"
+                    and type(seconds) in (int, float) and 0 < seconds < float('inf'))
+        return effective in ("released", "expired") and observed_status.get("live_block_state") == "absent"
     current = receipts.get(("target", target))
     if not target or not current or observed_status.get("target") != target:
         return False
@@ -674,11 +685,6 @@ def verified_proposal(row, receipts, later=()):
         return False
     if target in SERVICE_TARGETS:
         return effective == "applied" and current.get("target") == target and healthy_observation(current.get("observation"))
-    if target == "a:incident-ip":
-        if effective == "kept":
-            seconds = observed_status.get("live_remaining_seconds")
-            return observed_status.get("live_block_state") == "owned" and isinstance(seconds, (int, float)) and seconds > 0
-        return effective in ("released", "expired") and observed_status.get("live_block_state") == "absent"
     return False
 
 
@@ -1283,6 +1289,10 @@ the event time and source. A Wazuh correlation rule.id (for example 100110/10010
 is NOT the sensor Suricata SID or ModSecurity rule ID; discover the returned
 sensor IDs before filtering them. Recent unrelated alerts cannot verify
 a past incident. A zero bounded sample does not prove the old attack was harmless.
+Containment responses have *_kst and remaining_seconds_at_observation in the model view.
+Use those exact observation-time values; do not call calculate_time just to display
+a deadline or the supplied remaining time. Never invent an ISO date from an epoch.
+A deadline is not the event time or proof of incident resolution.
 Report every observation time in KST using the returned timestamp_kst/time_display
 fields, including short HH:MM ranges. Raw UTC 03:00 is 12:00 KST, never 03:00 KST.
 Keep sensor destination IP, Wazuh agent identity and proxy host distinct: an

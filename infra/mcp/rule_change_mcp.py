@@ -183,7 +183,7 @@ def _call_helper(payload, readonly=False):
         return _result({"error": "invalid helper response"}, True)
     if proc.returncode and not (isinstance(data, dict) and isinstance(data.get("error"), str)):
         return _result({"error": "rule-change helper rejected the request"}, True)
-    if readonly and payload.get('operation') in {'get','service-get'} and not data.get('error'):
+    if payload.get('operation') in {'get', 'service-get', 'status', 'operation-status', 'contain-ip'} and not data.get('error'):
         data = with_time_display(data)
     return _result(data, bool(data.get("error")))
 
@@ -220,6 +220,30 @@ def with_time_display(data, now=None):
                     'elapsed_display':('-' if elapsed<0 else '') + f'{int(days)}일 {int(hours)}시간 {int(minutes)}분 {seconds:g}초'})
             except (ValueError, OverflowError, OSError):
                 continue
+    # These are protocol-defined POSIX seconds, not milliseconds or model text.
+    # Keep every original field (and therefore signed plans/hashes) unchanged.
+    fields = ('approval_expires_at', 'temporary_expires_at', 'owned_deadline',
+              'live_owned_deadline', 'live_observed_at', 'cooldown_until', 'closed_at')
+    for field in fields:
+        value = data.get(field)
+        if type(value) not in (int, float):
+            continue
+        try:
+            instant = datetime.fromtimestamp(value, timezone.utc)
+            display['values'].append({'source_field': field, 'kst': instant.astimezone(kst).isoformat(),
+                                      'seconds_until_rendered_at': round((now-instant).total_seconds(), 6)})
+        except (ValueError, OverflowError, OSError):
+            continue
+    if (data.get('kind') == 'containment' and data.get('target') == 'a:incident-ip'
+            and data.get('live_block_state') == 'owned'
+            and type(data.get('live_owned_deadline')) is int and type(data.get('live_observed_at')) is int):
+        clocks = {row['source_field']: row['kst'] for row in display['values']}
+        if {'live_owned_deadline', 'live_observed_at'} <= clocks.keys():
+            display['containment'] = {'reference_field': 'live_observed_at',
+                'observed_at_kst': clocks['live_observed_at'],
+                'owned_deadline_kst': clocks['live_owned_deadline'],
+                'remaining_seconds_at_observation': max(0, data['live_owned_deadline']-data['live_observed_at']),
+                'scope': 'owned_block_at_observation_not_current_time_or_incident_resolution'}
     return {**data, 'time_display':display}
 
 

@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "observed_at_kst": "2026-11-03T22:25:27.644991+09:00",
+  "versions": {
+    "chat_contract": "1.5.16",
+    "query_completion": "1.19.12"
+  },
+  "canonical_source_sha256": {
+    "infra/mcp/rule_change_mcp.py": "e4813790fddff44d330b1cf67db60b61f2872e569221c2174e3f4ba4654ca8f3",
+    "infra/mcp/test_rule_time_display.py": "94d8c697354ff3e6b6c7bb802446f93b9a455800994ad1e739c02efef89abf8f",
+    "infra/hermes/soc_management_controller.py": "c80c339465adce4e0a729cfa6fe20e21e1abbb9379c78f5c56c3e3cbf303c065",
+    "infra/hermes/soc_management_run.py": "38a9bf66a1ef872af7906e8fdcb4c6af73c640490ba13d739d6ea6c07917ed5d",
+    "infra/hermes/chat_contract.py": "e44693fbaa60108b7eac7102ae5d8d2719d3474dba76653288f07abf933949f7",
+    "infra/hermes/query-completion/__init__.py": "a6e23bdcd50d36e34d9927c04db71415cfd62b58067982b0e0bf369c2561eea7",
+    "infra/hermes/query-completion/plugin.yaml": "402c9ca0eef44ac0e2e96f2ca74703cca775362d8116b44191e6ce87a1f1c483",
+    "infra/ollama-trial/harness.py": "9766a729a5d0c659a2dd2dbad0448d81589f848a89057960e1e4830cccc97fa1",
+    "infra/hermes/test_soc_management_operation_time.py": "672d0a1b16179082fc5647c877c5fc9fb5fcf92c4276ec1331cda7f024d0b965"
+  },
+  "runtime_files": {
+    "a": {
+      "index": 0,
+      "path": "/opt/rule-change/rule_change_mcp.py",
+      "before_sha256": "5c7023c13b999d8f4b5d439634787cde8bf240c461531b9a03f0e35808ce7e2d",
+      "after_sha256": "d8be2d96855355d10c480cc7ee6e101d9a30b7d842354e59062302237e5b02f5",
+      "uid": 0,
+      "gid": 987,
+      "mode": 420
+    },
+    "b": [
+      {
+        "index": 0,
+        "path": "/opt/rule-change/rule_change_mcp.py",
+        "before_sha256": "560c257bc404ba55faedaec7a54edcd5aa17817fd9b6af9484355cc6acc24400",
+        "after_sha256": "829026011f9ab6b516745ca5d3b8acb069f9817da6e439e9f9127e3b7a6392e5",
+        "uid": 0,
+        "gid": 985,
+        "mode": 420,
+        "previous_after_sha256": "829026011f9ab6b516745ca5d3b8acb069f9817da6e439e9f9127e3b7a6392e5"
+      },
+      {
+        "index": 1,
+        "path": "/opt/capstone-management/soc_management_controller.py",
+        "before_sha256": "572a329e99ab3e7fdbda5ba0a51f08bac4de3f4f2e2ce0f2711e3c04de57028a",
+        "after_sha256": "37a374824c99b2b819d5b4fd7969e8a8164477cf7c727374da10df7cd382b80c",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "previous_after_sha256": "37a374824c99b2b819d5b4fd7969e8a8164477cf7c727374da10df7cd382b80c"
+      },
+      {
+        "index": 2,
+        "path": "/opt/capstone-management/soc_management_run.py",
+        "before_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+        "after_sha256": "38a9bf66a1ef872af7906e8fdcb4c6af73c640490ba13d739d6ea6c07917ed5d",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "previous_after_sha256": "766a5c871b092385f70dba4657c39c742dec844bcd3f2e55088e45a91f63d78a"
+      },
+      {
+        "index": 3,
+        "path": "/opt/hermes-data/management-code/run.py",
+        "before_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+        "after_sha256": "38a9bf66a1ef872af7906e8fdcb4c6af73c640490ba13d739d6ea6c07917ed5d",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420,
+        "previous_after_sha256": "766a5c871b092385f70dba4657c39c742dec844bcd3f2e55088e45a91f63d78a"
+      },
+      {
+        "index": 4,
+        "path": "/opt/hermes-data/plugins/groot-query-completion/grounding.py",
+        "before_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+        "after_sha256": "38a9bf66a1ef872af7906e8fdcb4c6af73c640490ba13d739d6ea6c07917ed5d",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384,
+        "previous_after_sha256": "766a5c871b092385f70dba4657c39c742dec844bcd3f2e55088e45a91f63d78a"
+      },
+      {
+        "index": 5,
+        "path": "/opt/capstone-ollama-trial/grounding.py",
+        "before_sha256": "bbbb340ae5d65ec88fa1c413c0633ba9a63916f6fa7246334a28376f60e1b721",
+        "after_sha256": "38a9bf66a1ef872af7906e8fdcb4c6af73c640490ba13d739d6ea6c07917ed5d",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416,
+        "previous_after_sha256": "766a5c871b092385f70dba4657c39c742dec844bcd3f2e55088e45a91f63d78a"
+      },
+      {
+        "index": 6,
+        "path": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+        "before_sha256": "1e8dfcf3a6be05c7c15894ce84a5161906969e9281619afc283c24f943e61ad0",
+        "after_sha256": "a6e23bdcd50d36e34d9927c04db71415cfd62b58067982b0e0bf369c2561eea7",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384,
+        "previous_after_sha256": "e3b01745ab0a1642731d229bd56cc7ac3ac61dc027f2c8ff25ed9b8eaf9cbcb6"
+      },
+      {
+        "index": 7,
+        "path": "/opt/capstone-ollama-trial/query_grounding.py",
+        "before_sha256": "1e8dfcf3a6be05c7c15894ce84a5161906969e9281619afc283c24f943e61ad0",
+        "after_sha256": "a6e23bdcd50d36e34d9927c04db71415cfd62b58067982b0e0bf369c2561eea7",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416,
+        "previous_after_sha256": "e3b01745ab0a1642731d229bd56cc7ac3ac61dc027f2c8ff25ed9b8eaf9cbcb6"
+      },
+      {
+        "index": 8,
+        "path": "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml",
+        "before_sha256": "990a7a2441cccad5988c67afd024019e2f38a63c15ad907e0ebe3a6a48a633e6",
+        "after_sha256": "402c9ca0eef44ac0e2e96f2ca74703cca775362d8116b44191e6ce87a1f1c483",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384,
+        "previous_after_sha256": "bbca3212935a17534aaad82b900cf9af37457cb5694d91eb8268e3b5724c8d64"
+      },
+      {
+        "index": 9,
+        "path": "/opt/capstone-ollama-trial/harness.py",
+        "before_sha256": "a7d7c433d90fc1cd00d715ad28d031bf7b527b2a76e171e78aa371935e1f0277",
+        "after_sha256": "9766a729a5d0c659a2dd2dbad0448d81589f848a89057960e1e4830cccc97fa1",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416,
+        "previous_after_sha256": "9766a729a5d0c659a2dd2dbad0448d81589f848a89057960e1e4830cccc97fa1"
+      },
+      {
+        "index": 10,
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+        "before_sha256": "a7d7c433d90fc1cd00d715ad28d031bf7b527b2a76e171e78aa371935e1f0277",
+        "after_sha256": "9766a729a5d0c659a2dd2dbad0448d81589f848a89057960e1e4830cccc97fa1",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384,
+        "previous_after_sha256": "9766a729a5d0c659a2dd2dbad0448d81589f848a89057960e1e4830cccc97fa1"
+      },
+      {
+        "index": 11,
+        "path": "/opt/capstone-ollama-trial/chat_contract.py",
+        "before_sha256": "7b39858b15499c33d2d87c1e91cf26b5b5a9017e2a0f325b39e7982e87f43ece",
+        "after_sha256": "e44693fbaa60108b7eac7102ae5d8d2719d3474dba76653288f07abf933949f7",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416,
+        "previous_after_sha256": "e44693fbaa60108b7eac7102ae5d8d2719d3474dba76653288f07abf933949f7"
+      },
+      {
+        "index": 12,
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+        "before_sha256": "7b39858b15499c33d2d87c1e91cf26b5b5a9017e2a0f325b39e7982e87f43ece",
+        "after_sha256": "e44693fbaa60108b7eac7102ae5d8d2719d3474dba76653288f07abf933949f7",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384,
+        "previous_after_sha256": "e44693fbaa60108b7eac7102ae5d8d2719d3474dba76653288f07abf933949f7"
+      },
+      {
+        "index": 13,
+        "path": "/etc/capstone-ollama-trial/receipt.json",
+        "before_sha256": "d32121459816b4445e34b7e1f29fdb1343e185119803312f8ba9754fc9a4b1fe",
+        "after_sha256": "c60c3284dc339278e7fe9b807acbd4ce680b6ae4c6becfc18fabc5e076cd6549",
+        "uid": 0,
+        "gid": 0,
+        "mode": 384,
+        "previous_after_sha256": "36b14e102a07158dc281efba4b63436223378165dde4d13d251df5a5712b8f99"
+      }
+    ]
+  },
+  "tests": {
+    "management_local_and_installed_python": {
+      "passed_each": 207,
+      "skip": 0
+    },
+    "native_installed_python": {
+      "pass": 380,
+      "skip": 0
+    },
+    "sdk_installed_python": {
+      "pass": 179,
+      "skip": 0
+    },
+    "mcp_a_and_b": {
+      "passed_each": 23,
+      "skip": 0
+    },
+    "initial_install_contract": {
+      "pass": 37
+    },
+    "standalone_source_bundle": {
+      "pass": 1
+    }
+  },
+  "historical_clock_replay": {
+    "actual_reports": 2,
+    "IDS_epoch_claim_detected": true,
+    "WAF_21_18_vs_actual_21_20_18_detected": true,
+    "new_tool_calls": 0,
+    "operating_data_modified": false
+  },
+  "single_status_read_replay": [
+    {
+      "run_id": "f940b94dd0167f273b09bc2324294c30",
+      "case_id": "67fcf9995362f0da6e900c6c7f1bff14",
+      "state": "needs_review",
+      "completed": true,
+      "kind": "before",
+      "tool_calls": 1,
+      "writes_to_operating_database": false,
+      "new_tool_calls": 0
+    },
+    {
+      "run_id": "f940b94dd0167f273b09bc2324294c30",
+      "case_id": "67fcf9995362f0da6e900c6c7f1bff14",
+      "state": "completed",
+      "completed": true,
+      "kind": "after",
+      "tool_calls": 1,
+      "writes_to_operating_database": false,
+      "new_tool_calls": 0
+    }
+  ],
+  "live_private_canaries": {
+    "native": [
+      {
+        "version": 2,
+        "state": "needs_review",
+        "completed": true,
+        "seconds": 93.719,
+        "calls": [
+          "mcp__rule_a__get_operation_status"
+        ],
+        "errors": 0,
+        "writes": 0,
+        "channel_posts": 0
+      },
+      {
+        "version": 3,
+        "state": "completed",
+        "completed": true,
+        "seconds": 60.77,
+        "calls": [
+          "mcp__rule_a__get_operation_status"
+        ],
+        "errors": 0,
+        "writes": 0,
+        "channel_posts": 0
+      }
+    ],
+    "sdk": [
+      {
+        "version": 2,
+        "state": "completed",
+        "seconds": 17.5784496240085,
+        "calls": [
+          "get_operation_status"
+        ],
+        "errors": 0,
+        "writes": 0,
+        "channel_posts": 0
+      },
+      {
+        "version": 3,
+        "state": "completed",
+        "seconds": 9.521131973015144,
+        "calls": [
+          "get_operation_status"
+        ],
+        "errors": 0,
+        "writes": 0,
+        "channel_posts": 0
+      }
+    ],
+    "native_r3_request_id": "90bd33b8168442418b488fa165fa40f7",
+    "native_r3_expected_deadline_kst": "2026-11-03T19:48:09+09:00",
+    "native_r3_expected_close_record_kst": "2026-11-03T19:48:11+09:00",
+    "sdk_r3_request_id": "44e23dcd2b2db102a41134cfb73a45a5",
+    "sdk_r3_expected_workflow_deadline_kst": "2026-11-03T20:20:30+09:00",
+    "chat_delivery_measured": false,
+    "matched_agent_performance_benchmark": false,
+    "different_questions_catalog_scopes_and_contexts": true
+  },
+  "deployment": {
+    "a_applied_at_kst": "2026-11-03T21:42:25.408611+09:00",
+    "a_confirmed_at_kst": "2026-11-03T21:53:40.202917+09:00",
+    "b_final_applied_at_kst": "2026-11-03T22:15:54.909152+09:00",
+    "b_final_confirmed_at_kst": "2026-11-03T22:15:54.931368+09:00",
+    "b_active_services_checked": true,
+    "timer_states": {
+      "capstone-operation-time-rollback-20261103-r1.timer": "inactive",
+      "capstone-operation-time-rollback-20261103-r2.timer": "inactive"
+    },
+    "hermes_restarts": {
+      "deployments": 3,
+      "automatic_rollback": 1
+    },
+    "automatic_rollback": {
+      "occurred": true,
+      "at_kst": "2026-11-03T22:10:52.829858+09:00",
+      "files_restored": 14,
+      "operating_database_restored": false,
+      "final_candidate_reapplied_and_confirmed": true
+    },
+    "rollback_idempotence": {
+      "all_sources_already_original": true,
+      "service_stop_start_restart_commands": 0,
+      "fixture_removed": true
+    },
+    "manual_rollback_executed": false,
+    "new_packages_ports_images_keys_models": 0,
+    "approval_and_TTL_policy_changed": false,
+    "root_backup": "/var/lib/capstone-operation-time/20261103-r1"
+  },
+  "cleanup": {
+    "servers": [
+      {
+        "at_kst": "2026-11-03T22:29:54.435259+09:00",
+        "role": "a",
+        "removed_files": 57,
+        "removed_bytes": 1104709,
+        "own_validation_roots_absent": true,
+        "canary_databases_traces_results_backups_preserved": true,
+        "operating_data_deleted": false
+      },
+      {
+        "at_kst": "2026-11-03T22:29:55.008950+09:00",
+        "role": "b",
+        "removed_files": 304,
+        "removed_bytes": 6951115,
+        "own_validation_roots_absent": true,
+        "canary_databases_traces_results_backups_preserved": true,
+        "operating_data_deleted": false
+      }
+    ],
+    "Mac_new_packages": 0,
+    "Mac_helpers": {
+      "at_kst": "2026-11-03T22:35:44.723757+09:00",
+      "source_snapshot_files": 35,
+      "source_snapshot_bytes": 3753205,
+      "own_temp_parent_absent": true,
+      "new_Mac_packages": 0,
+      "other_task_or_user_files_removed": false
+    }
+  },
+  "limitations": [
+    "Native r1 timed out after correction; not counted as successful",
+    "Native r2 clock answer correct but controller falsely required a separate target read; exact replay and fresh r3 now complete the procedure",
+    "procedural containment completion is not incident risk resolution",
+    "Hermes still produces excessive prose for a simple status request",
+    "SDK operation table does not separately expose the close record timestamp",
+    "read_only_private_native_and_SDK_calls_not_Mattermost_delivery_or_fresh_attack_E2E",
+    "no_whole_fresh_OS_install",
+    "latency samples are not a controlled_before_after_or_agent_comparison"
+  ],
+  "evidence_sha256": {
+    "b-prepare.json": "c45b370b2a5bc271d28858770b36764a6557daa89b264208ce66529eb6f9e6f8",
+    "b-cleanup.json": "a3852c26ca3cf6b58ad889aaaa352f4a7ed5cd7fd9bdb92afcc88318c798f119",
+    "a-final-health.json": "a0346dfdd0382cefcd5c49fe5a9dc02dcf21353355fdbddd86458eed292a3946",
+    "b-final-health.json": "7551036fce11bf3f55a664457579c803cfe64e8d3795414fefda80ffcb915125",
+    "b-replay-verification.json": "1325874f7308833d79f5f308141296b096a3cae814ff316d69ffb4340a691618",
+    "b-prepare-verification.json": "9206999cb18c0185015a74c5db9389cad83a43d1c0b3a6c604b0c933b2fd662b",
+    "b-recovery-check.json": "ec37d4852c2e1d12ad3158d1630d7c0e1428f5f6e39824bdbec9a39812bb30e2",
+    "b-install-final-retry.json": "f34db8d25ae49df2c88bb077a970647ae692714c485bd66fa9def800b5884a7d",
+    "a-prepare.json": "7a1d7bf869f35dafd140cda8d12f9e109270ca8e07640cd2d92a39fe8f67b628",
+    "a-cleanup.json": "d0e0811258a38fe4b07a7e1704a57377c32f1131c6f0d39783b02b39022fa0ec",
+    "b-rollback-idempotence.json": "f4cfa16f884f9298f9c536035225b1ae31532c43e1fe9df24d8de263a9f833d8",
+    "b-tests-r2.json": "09c046067314452bb1d9a0f486a9088f0c37ba2d4cb962eb5f0baf1b667bc6b3",
+    "historical-clock-replay.json": "f6f4a75d73dc54d3881540d2de169a4b962f92834fab2e8b3918124d5b058d5e",
+    "Mac-cleanup.json": "a69038e9b9867a0c87018fc68cf6c4a67c8bca2d44e6bce8a649a912dd0ed66c"
+  }
+}

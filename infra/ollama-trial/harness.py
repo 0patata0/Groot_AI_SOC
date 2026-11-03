@@ -647,6 +647,8 @@ def rule_edit_anchors(data):
 
 
 def model_view(server, name, raw):
+    if server in ('rule-a', 'rule-b', 'rule-write-a', 'rule-write-b') and name in ('get_operation_status', 'temporarily_contain_ip'):
+        return EVIDENCE.operation_time_view(raw)
     if server in ('rule-a', 'rule-b') and name == 'get_rule_change_target':
         try:
             data = json.loads(raw)

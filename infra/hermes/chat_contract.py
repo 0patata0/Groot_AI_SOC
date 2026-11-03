@@ -5,7 +5,7 @@ import hashlib
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.14'
+VERSION = 'soc-chat-contract:1.5.15'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -59,6 +59,20 @@ QUERY_GUIDANCE += (
     '시스템 조치는 get_service_action_target으로 허용 작업·현재 근거를 읽고 '
     'propose_service_action으로 정확한 대상/작업의 승인을 요청합니다. 승인 전에는 실행하지 않으며 '
     '승인만으로 임의 shell·패키지·미등록 설정 변경 권한이 생기는 것은 아닙니다.\n'
+)
+QUERY_GUIDANCE += (
+    '보호 주소의 차단 금지는 허용된 읽기 조사·위험 판단·보고를 중단할 이유가 아닙니다. '
+    '다시 지시를 기다리지 말고 실제 근거를 조사하되 보호 변경은 우회하지 마세요. '
+    'get_system_diagnostics는 최근 고정 스냅샷이며 과거 시각을 지정해 journal을 조회하는 도구가 아닙니다. '
+    '성공 종료한 oneshot의 inactive/dead만으로 재시작을 권하지 마세요. '
+    'OpenSearch yellow는 복제 샤드 미할당이 있는 상태이므로 전체 정상·완전 복제로 표시하지 마세요.\n'
+)
+
+# Request endings only; analysis, historical questions and writes still yield
+# to their own paths below. This changes intent classification, never dispatch.
+READ_VIEW_ENDING = (
+    r'(?:볼\s*(?:래(?:요)?|까(?:요)?|수\s*있(?:어(?:요)?|나(?:요)?|니|을까(?:요)?))'
+    r'|봐(?:줘|줄래(?:요)?|주실래(?:요)?)?)[\s?？.!]*$'
 )
 
 
@@ -123,7 +137,9 @@ def rule_scope_request(text):
     if (devices and not re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d',text)
             and re.search(r'어때|어떻게.{0,12}(?:되어|돼|설정|적용)',text)):
         state_question=True
-    if not fw_fields and not state_question and not re.search(r'조회|확인|보여|알려|목록|리스트|출력|개수|몇|\b(?:show|list)\b', text, re.I):
+    view_request = (re.search(READ_VIEW_ENDING, text) and
+                    not re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d', text))
+    if not fw_fields and not state_question and not view_request and not re.search(r'조회|확인|보여|알려|목록|리스트|출력|개수|몇|\b(?:show|list)\b', text, re.I):
         return None
     global_scope = bool(re.search(r'모든\s*장비|전체\s*장비|장비별|WAF\s*[/,·]\s*IDS\s*[/,·]\s*Wazuh', text, re.I))
     # The established explicit all-device inventory remains possible. A bare

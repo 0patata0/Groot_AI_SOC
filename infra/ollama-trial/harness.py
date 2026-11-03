@@ -988,19 +988,34 @@ def action_claim_violations(question, answer, calls):
         raw = call.get('result')
         if isinstance(raw, str) and hashlib.sha256(raw.encode()).hexdigest() == call.get('result_sha256'):
             verified.append(call)
-    block_reads = any(c.get('server') == 'resp' and c.get('name') == 'list_blocks'
-                      and payload(c) for c in verified)
+    block_reads = READ.block_list_state(calls) is not None
     event_reads = any(c.get('name') in ('search_suricata_alerts', 'search_modsecurity_alerts', 'search_wazuh_alerts',
                       'get_wazuh_alert_summary') and payload(c) for c in verified)
     actual_actions = [c for c in verified if (c.get('server'), c.get('name')) in (
         ('resp', 'block_ip'), ('resp', 'unblock_ip'),
         ('rule-write-a', 'temporarily_contain_ip'))]
     issues = set()
+    rule_observation = (request_kind(question) == 'other'
+        and re.search(r'룰|규칙|\brules?\b', normalized(question), re.I)
+        and re.search(r'뭐|무엇|어떤|몇|현재|지금|조회|확인|보여|볼|봐|있어|있나|있니', normalized(question))
+        and not re.search(r'개념|원리|예시|예제|번역|설명|정의|차이|방법', normalized(question)))
+    rule_reads = bool((firewall_state(calls) or {}).get('verified_complete')) or any(
+        c.get('server') in ('rule-a', 'rule-b') and
+        c.get('name') in ('get_security_rules', 'get_rule_change_target') and payload(c) for c in verified)
     for line in answer.splitlines():
         clean = re.sub(r'[*`]', '', line)
         unobserved = re.search(r'미조회|미확인|조회하지|조회\s*(?:못|안)|확인하지|확인\s*불가|알\s*수\s*없|단정.{0,8}(?:않|없)', clean)
-        if not block_reads and not unobserved and re.search(r'차단\s*(?:목록|리스트)', clean) and re.search(r'없|비어|포함|등록|있습니다|있음', clean):
+        block_subject = (r'차단\s*(?:목록|리스트)|(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)'
+                         r'\s*(?:IPv[46]|IP|아이피|주소)(?:들)?')
+        hypothetical = re.search(r'(?:없|있)(?:다면|으면)|조회\s*(?:전(?![가-힣])|시(?![가-힣])|하면)|정책\s*설명|가정', clean)
+        if (not block_reads and not unobserved and not hypothetical and re.search(block_subject, clean, re.I)
+                and re.search(r'없|비어|포함|등록|있습니다|있음|0\s*(?:건|개)', clean)):
             issues.add('unobserved_block_list_claim')
+        if (rule_observation and not rule_reads and not unobserved
+                and re.search(r'룰|규칙|WAF|IDS|Suricata|Wazuh', clean, re.I)
+                and re.search(r'\d[\d,]*\s*(?:개|건)|조회했|확인했|설치되|적용되|로드했|로드되', clean)
+                and not re.search(r'조회할|확인할|조회해야|확인해야|예시|가정', clean)):
+            issues.add('unobserved_rule_inventory_claim')
         event = r'(?:공격(?!자)|경보|[Ss]everity\s*[0-9]+)'
         absence = (event + r'[^.!?;\n]{0,60}?(?:확인되지|발견되지|관측되지)\s*않|'
                    + event + r'(?:\s*(?:증거|징후|기록|발생|로그))?\s*(?:은|는|이|가)?\s*(?:없(?:습|음|다|었)|0\s*건)')
@@ -1701,6 +1716,15 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
             props['snapshot']['enum'] = [state['snapshot']]
             props['offset']['enum'] = [state['next_offset']]
             result[fw]['required'] = ['snapshot', 'offset']
+        elif state:
+            result.pop(fw)  # Malformed terminal page cannot become full coverage.
+        else:
+            props = result[fw].get('properties', {})
+            props.pop('snapshot', None)  # Only an actual prior result can name one.
+            if 'offset' in props:
+                props['offset']['enum'] = [0]
+            result[fw]['required'] = [k for k in result[fw].get('required', []) if k != 'snapshot']
+            result[fw]['additionalProperties'] = False
         if fw in result:
             # Preserve an explicit per-page bound on every model-selected call.
             # The MCP may return fewer objects when its byte budget is reached.
@@ -1875,6 +1899,7 @@ def validated_selection(value, schema):
     from jsonschema import Draft202012Validator
     strict = json.loads(json.dumps(schema))
     strict['properties']['calls'].pop('uniqueItems', None)
+    strict['properties']['calls']['maxItems'] = 40  # Bound raw duplicates; final unique calls retain the real cap.
     Draft202012Validator(strict).validate(value)
     result = json.loads(json.dumps(value));seen = set();calls = []
     for item in result['calls']:
@@ -1886,6 +1911,11 @@ def validated_selection(value, schema):
         key = json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
         if key not in seen: calls.append(item);seen.add(key)
     removed = len(result['calls']) - len(calls);result['calls'] = calls
+    # A later FW page depends on the preceding real result. A preselected batch
+    # cannot know its next_offset/snapshot or whether the first page is complete.
+    if sum(item['tool'] == 'mcp__resp__get_firewall_rules' for item in calls) > 1:
+        from jsonschema import ValidationError
+        raise ValidationError('firewall_pages_require_sequential_observations')
     Draft202012Validator(schema).validate(result)
     return result, removed
 
@@ -1893,6 +1923,8 @@ def validated_selection(value, schema):
 def selection_schema(schemas, limit, reference=None):
     if not schemas or not 1 <= limit <= 40 or any(not EVIDENCE.allowed(n, 'verify') for n in schemas):
         raise ValueError('read_selection_scope')
+    if set(schemas) == {'mcp__resp__get_firewall_rules'}:
+        limit = 1
     if reference:
         count=sum(max(1,len(reference.get('host_rule_ids',[])) if family=='wazuh' else len(reference.get('source_ips',[])))
                   for family in reference['families'] if 'mcp__security_events__search_'+family+'_alerts' in schemas)

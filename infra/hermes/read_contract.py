@@ -356,13 +356,16 @@ def block_list_plan(text):
     ordinary agent; this function never dispatches an MCP call.
     """
     prefix = r'(?:(?:지금|현재|FW|의|에서|에)\s*)*'
+    address = r'(?:(?:IPv[46]|IP|아이피)(?:\s*주소)?|주소)(?:들)?'
     subject = (r'(?:(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)'
-               r'\s*(?:IP|아이피|주소)(?:\s*(?:목록|리스트))?|차단\s*(?:목록|리스트))')
+               r'\s*' + address + r'(?:\s*(?:목록|리스트))?|차단\s*(?:목록|리스트))')
     suffix = (r'(?:(?:만|을|를|은|는|이|가|좀|전체|모두|전부|현재|지금|표로|상세히|자세히|'
               r'정리해서|한눈에|몇\s*개|몇\s*건|있어|있나|있니|뭐야|누구야|알려줘|조회해줘|조회|'
               r'확인해줘|확인|보여줘|보여줄래|보여주세요|알려주세요|알려줄래|부탁해|조회해줄래|'
               r'정리해줘|[1-9][0-9]{0,3}\s*페이지)\s*|[?.!？])*')
-    if not re.fullmatch(r'\s*' + prefix + subject + r'\s*' + suffix + r'\s*', text, re.I):
+    reverse = (r'(?:어느|어떤)\s*' + address + r'\s*(?:이|가|은|는)?\s*'
+               r'(?:차단\s*됐|막혔)(?:어|니|나(?:요)?)')
+    if not re.fullmatch(r'\s*' + prefix + '(?:' + subject + '|' + reverse + r')\s*' + suffix + r'\s*', text, re.I):
         return None
     page = re.search(r'([1-9][0-9]{0,3})\s*페이지', text)
     return {'kind': 'block_list', 'question': text, 'page': int(page[1]) if page else 1}

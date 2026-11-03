@@ -1,0 +1,440 @@
+{
+  "schema": 1,
+  "component": "soc-chat-contract:1.5.15",
+  "applied_at_kst": "2026-11-03T13:46:29+09:00",
+  "confirmed_at_kst": "2026-11-03T13:54:38.031629+09:00",
+  "model": "qwen3.6:35b",
+  "model_promoted": false,
+  "changes": [
+    "Colloquial rule-read endings and plural/reversed block-list questions preserve scope; unspecified devices ask once",
+    "Unknown block-zero and rule-count assertions require actual bound read receipts; latest failed/tampered block reads invalidate older success",
+    "Initial FW selection cannot invent snapshots/nonzero offsets; next page binds actual snapshot/next_offset; one FW page per selection batch; completion removes the tool",
+    "Protected address refusal preserves permitted investigation; recent diagnostics/oneshot/yellow limits clarified"
+  ],
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "7b39858b15499c33d2d87c1e91cf26b5b5a9017e2a0f325b39e7982e87f43ece",
+    "infra/hermes/read_contract.py": "1ecb4c89900a2bdc576f50bb0b5e56e7f175fb6462e5c6df43616ff5f65a7c38",
+    "infra/ollama-trial/harness.py": "a7d7c433d90fc1cd00d715ad28d031bf7b527b2a76e171e78aa371935e1f0277",
+    "infra/ollama-trial/test_short_request_regressions.py": "66009bc19ce4cf146c493b4d350b2e0dd9cd46d06bed684758c4040e8d3ce74f",
+    "infra/hermes/query-completion/test_short_queries.py": "6c9d199a80e6d6f72c8f720b24537f9032d3a3c7928dcc8c3ad5ff4705f4ebce"
+  },
+  "checks": {
+    "mac_ollama": {
+      "total": 179,
+      "passed": 176,
+      "missing_jsonschema_skipped": 3
+    },
+    "mac_hermes": {
+      "total": 380,
+      "passed": 378,
+      "environment_skipped": 2
+    },
+    "server_existing_sdk_ollama": {
+      "total": 179,
+      "passed": 179,
+      "skipped": 0
+    },
+    "server_existing_sdk_hermes": {
+      "total": 380,
+      "passed": 380,
+      "skipped": 0
+    },
+    "fresh_install_contract": 1,
+    "standalone_source_bundle": 1,
+    "sdk_live_cases": [
+      {
+        "id": "ambiguous",
+        "question": "규칙 좀 볼 수 있나요?",
+        "rc": 0,
+        "seconds": 0.49921830906532705,
+        "passed": true
+      },
+      {
+        "id": "blocks-plural",
+        "question": "지금 차단돼 있는 주소들은?",
+        "rc": 0,
+        "seconds": 7.869501368957572,
+        "passed": true
+      },
+      {
+        "id": "blocks-reverse",
+        "question": "어떤 아이피가 막혔니?",
+        "rc": 0,
+        "seconds": 7.886637269984931,
+        "passed": true
+      },
+      {
+        "id": "fw",
+        "question": "방화벽 규칙 봐줄래?",
+        "rc": 0,
+        "seconds": 7.7191218310035765,
+        "passed": true
+      },
+      {
+        "id": "waf",
+        "question": "와프 규칙 볼까요?",
+        "rc": 0,
+        "seconds": 9.84236011793837,
+        "passed": true
+      }
+    ],
+    "sdk_live_passed": 5,
+    "mattermost_chat": {
+      "total": 10,
+      "passed": 10,
+      "actual_read_calls": 8,
+      "clarifications": 2,
+      "protected_calls": 0,
+      "progress_seen_on_reads": 8,
+      "cases": [
+        {
+          "bot": "ollama",
+          "kind": "blocks",
+          "question": "지금 막혀 있는 주소들은?",
+          "post_id": "5ubz8ec5zbyobbo651jooer1sw",
+          "seconds": 6.555,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "resp",
+              "tool": "list_blocks",
+              "arguments": {},
+              "result_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+            }
+          ]
+        },
+        {
+          "bot": "ollama",
+          "kind": "fw",
+          "question": "지금 FW 규칙 볼 수 있나요?",
+          "post_id": "gkgsopkf13b5bqx56fkuip6kkh",
+          "seconds": 3.297,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "resp",
+              "tool": "get_firewall_rules",
+              "arguments": {
+                "limit": 200
+              },
+              "result_sha256": "fc030ccd6a47a5ad52afbba648da9c1590070a42d1d9b0e835a1fac1d6c3d72d"
+            }
+          ]
+        },
+        {
+          "bot": "ollama",
+          "kind": "waf",
+          "question": "웹 방화벽 규칙 봐줄래?",
+          "post_id": "kd9e3jm6xjyuxjsgiid9hre4iy",
+          "seconds": 5.421,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "rule-a",
+              "tool": "get_security_rules",
+              "arguments": {
+                "target": "a:waf",
+                "origin": "all",
+                "view": "summary",
+                "correlation_only": false,
+                "offset": 0,
+                "limit": 20
+              },
+              "result_sha256": "bab363ad90e347f988a2b71b66a26c1983c90259c82f3261542d3afd07539a8a"
+            }
+          ]
+        },
+        {
+          "bot": "ollama",
+          "kind": "ambiguous",
+          "question": "규칙 볼까?",
+          "post_id": "pbzwd9apubn1id8duij3rrzmja",
+          "seconds": 0.124,
+          "actual_calls": 0,
+          "passed": true,
+          "progress_seen": false,
+          "targets": []
+        },
+        {
+          "bot": "ollama",
+          "kind": "followup",
+          "question": "Wazuh",
+          "post_id": "r8bubuam9jd7jfk3d6qupj987o",
+          "seconds": 9.771,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "rule-b",
+              "tool": "get_security_rules",
+              "arguments": {
+                "target": "b:wazuh",
+                "origin": "all",
+                "view": "summary",
+                "correlation_only": false,
+                "offset": 0,
+                "limit": 20
+              },
+              "result_sha256": "febba11f082075a80d6dd9dee12f19f85446fa45e41b2b90bd1a468b0d051190"
+            }
+          ]
+        },
+        {
+          "bot": "hermes",
+          "kind": "blocks",
+          "question": "지금 막혀 있는 주소들은?",
+          "post_id": "7nw84kb4bjgkpehna795t6h7cc",
+          "seconds": 16.207,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "resp",
+              "tool": "list_blocks",
+              "arguments": {},
+              "result_sha256": "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+            }
+          ]
+        },
+        {
+          "bot": "hermes",
+          "kind": "fw",
+          "question": "지금 FW 규칙 볼 수 있나요?",
+          "post_id": "o3w9umcqgtd48bwpfjf7ju4w8c",
+          "seconds": 16.096,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "resp",
+              "tool": "get_firewall_rules",
+              "arguments": {
+                "offset": 0,
+                "limit": 200
+              },
+              "result_sha256": "1ebc72990bac60b2ec03e669b960a4cbb89053918b2556d69371f420553d9a67"
+            }
+          ]
+        },
+        {
+          "bot": "hermes",
+          "kind": "waf",
+          "question": "웹 방화벽 규칙 봐줄래?",
+          "post_id": "rwkgedkcxbbf3nzb8c4h1t6ekw",
+          "seconds": 17.108,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "rule-a",
+              "tool": "get_security_rules",
+              "arguments": {
+                "target": "a:waf",
+                "origin": "all",
+                "view": "summary",
+                "correlation_only": false,
+                "offset": 0,
+                "limit": 20
+              },
+              "result_sha256": "d6990ab5c3c693c8553c4223248d50475964e942c082b6dae151e7f1b889f646"
+            }
+          ]
+        },
+        {
+          "bot": "hermes",
+          "kind": "ambiguous",
+          "question": "규칙 볼까?",
+          "post_id": "qsc8hih37bbyuet8tu1e1jwo5o",
+          "seconds": 1.178,
+          "actual_calls": 0,
+          "passed": true,
+          "progress_seen": false,
+          "targets": []
+        },
+        {
+          "bot": "hermes",
+          "kind": "followup",
+          "question": "Wazuh",
+          "post_id": "twme5wkxkjnkmeeurtwyepmofr",
+          "seconds": 28.964,
+          "actual_calls": 1,
+          "passed": true,
+          "progress_seen": true,
+          "targets": [
+            {
+              "server": "rule-b",
+              "tool": "get_security_rules",
+              "arguments": {
+                "target": "b:wazuh",
+                "origin": "all",
+                "view": "summary",
+                "correlation_only": false,
+                "offset": 0,
+                "limit": 20
+              },
+              "result_sha256": "2a02b5b2448efa9bcc5c2c35c4492b9d5c909fd8bf9e0bf0717069427cf41814"
+            }
+          ]
+        }
+      ]
+    },
+    "mattermost_pagination": {
+      "total": 2,
+      "passed": 2,
+      "actual_read_calls": 6,
+      "protected_calls": 0,
+      "objects_per_snapshot": 146,
+      "requested_page_limit": 50,
+      "cases": [
+        {
+          "bot": "ollama",
+          "question": "FW 규칙을 50개씩 끝까지 확인해줄래?",
+          "post_id": "3q3hjabs4fyr7n5x5yy5fzumcc",
+          "seconds": 9.772,
+          "passed": true,
+          "progress_seen": true,
+          "offsets": [
+            0,
+            50,
+            100
+          ],
+          "one_bound_snapshot": true,
+          "terminal_complete": true,
+          "calls": [
+            {
+              "arguments": {
+                "limit": 50,
+                "offset": 0
+              },
+              "result_sha256": "287eccf602ff5eaf9afb7237fdc75d19074bc3f068bc5e489bfcab6cfc4bec59"
+            },
+            {
+              "arguments": {
+                "snapshot": "9ddf09fad529942cba41256bc7ed2ce5",
+                "offset": 50,
+                "limit": 50
+              },
+              "result_sha256": "cadcbede6aa5a872f60aea6c226d878f05b79d2a97487e388d089880c95df3b7"
+            },
+            {
+              "arguments": {
+                "snapshot": "9ddf09fad529942cba41256bc7ed2ce5",
+                "offset": 100,
+                "limit": 50
+              },
+              "result_sha256": "6361aeeadfe9bfbdd0ef4cad13420ec660a5a9323b3691367338990b09a99f5b"
+            }
+          ]
+        },
+        {
+          "bot": "hermes",
+          "question": "FW 규칙을 50개씩 끝까지 확인해줄래?",
+          "post_id": "hyzshn9zz7gj9qtwdwkkjjoigo",
+          "seconds": 33.022,
+          "passed": true,
+          "progress_seen": true,
+          "offsets": [
+            0,
+            50,
+            100
+          ],
+          "one_bound_snapshot": true,
+          "terminal_complete": true,
+          "calls": [
+            {
+              "arguments": {
+                "limit": 50,
+                "offset": 0
+              },
+              "result_sha256": "22dda4cd66c5b6b8ee5c219ff4f62c2415d19047e57cf3e9e12b5f8ba772d355"
+            },
+            {
+              "arguments": {
+                "snapshot": "8c008c83c4e2ed380ba9d1b44aa079fd",
+                "offset": 50,
+                "limit": 50
+              },
+              "result_sha256": "a139d2eb5ae60a24d929a50e2299d70c0cffbc264950051efcfe32fcff9798aa"
+            },
+            {
+              "arguments": {
+                "snapshot": "8c008c83c4e2ed380ba9d1b44aa079fd",
+                "offset": 100,
+                "limit": 50
+              },
+              "result_sha256": "142bfc6d407b12d35f5a5eccf90a2480cca1dee121f5efa71ed41079f8b14ccc"
+            }
+          ]
+        }
+      ]
+    },
+    "mattermost_total": {
+      "requests": 12,
+      "expected_processing": 12,
+      "actual_read_calls": 14,
+      "clarifications": 2,
+      "protected_calls": 0,
+      "progress_seen_on_read_requests": 10
+    }
+  },
+  "deployment": {
+    "source_copies": 6,
+    "receipt_files": 1,
+    "preexisting_stale_receipt_entries_corrected": [
+      "harness.py",
+      "chat_contract.py"
+    ],
+    "protected_configuration_and_soul_hashes_unchanged": true,
+    "current_queues_idle": true,
+    "authenticated_gateway_heartbeats": true,
+    "restart": "One Hermes container restart and one stop/start of each existing Ollama/review consumer while durable queues were idle; management timer resumed",
+    "rollback_root": "/var/lib/capstone-short-read/20261103-r1/deployment",
+    "manifest_sha256": "d5bff29730ba40ca6524c6cf1afac35c6bf573074a65ae2340eb9c466e3ffa72",
+    "independent_timer_seconds": 900,
+    "timer_stopped_after_confirmation": true,
+    "manual_rollback": "python3 -B /var/lib/capstone-short-read/20261103-r1/deployment/rollback.py --manual",
+    "concurrent_drift_preserved": true,
+    "busy_work_defers_rollback": true,
+    "actual_rollback_executed": false,
+    "new_packages_images_keys_public_ports_permissions": 0
+  },
+  "retained_failures": [
+    "Local jsonschema dependency absent; no Mac package installed",
+    "Server staging reference files initially missing; fixed fixtures before all 559 passed",
+    "First live SDK collector mixed SDK log text and JSON; actual terminal worker confirmed before new bounded run",
+    "Second SDK run exposed our added rule-observation guard rejecting an actual complete FW receipt; corrected and final five cases passed"
+  ],
+  "validation_limits": [
+    "Small sequential original-model samples; no before/after general accuracy or model superiority claim",
+    "No protected writes/approval/attack E2E in this unit",
+    "No browser visual table rendering verification or new OS installation",
+    "Native management CLI read omission and uncommitted peer-review candidate remain separate unfinished tasks",
+    "Full model-comparison plan/results remain frozen at 1.5.14; these tests do not overwrite those scores",
+    "No retraining or evaluation-question ingestion"
+  ],
+  "cleanup": {
+    "server_recovery_and_evidence": "Preserve root-only backups, receipts and test evidence",
+    "mac_temporary_scripts": "Remove after final publication; exact result in local log",
+    "weights_or_packages_downloaded_to_mac": false,
+    "server": {
+      "at_kst": "2026-11-03T14:04:31.167208+09:00",
+      "temporary_source_fixtures_removed": 188,
+      "kept_manifest_delta_sources": 3,
+      "all_test_units_terminal": true,
+      "rollback_timer_inactive": true,
+      "source_and_configuration_sha_preserved": true,
+      "root_validation_and_manual_rollback_preserved": true,
+      "packages_or_weights_removed": false
+    }
+  }
+}

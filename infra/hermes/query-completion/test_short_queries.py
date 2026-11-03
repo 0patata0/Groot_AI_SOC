@@ -39,7 +39,7 @@ class ShortQueries(unittest.TestCase):
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'ollama-trial'))
         import runtime
-        for question in ('룰 보여줘', '규칙 보여줘'):
+        for question in ('룰 보여줘', '규칙 보여줘', '규칙 좀 볼 수 있나요?'):
             result = asyncio.run(runtime.run({'model':'qwen3.6:35b'}, {'question':question}))
             self.assertEqual(result['status'], 'partial')
             self.assertEqual(result['calls'], [])
@@ -83,7 +83,7 @@ class ShortQueries(unittest.TestCase):
                 self.assertIsNone(H.scope_notice(short))
 
     def test_subjectless_short_query_requests_only_one_clarification(self):
-        for question in ('룰 보여줘', '규칙 출력', '기본 룰', '룰?'):
+        for question in ('룰 보여줘', '규칙 출력', '기본 룰', '룰?', '규칙 좀 볼래?', '룰 봐줄래요?'):
             with self.subTest(question=question):
                 self.assertIn('어느 장비', H.scope_notice(question))
                 self.assertEqual(H.tool_scope(question), set())

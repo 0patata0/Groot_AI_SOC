@@ -42,3 +42,7 @@ Native IDS가 이미 차단한 IP를 WAF 조사 LLM이 `temporarily_contain_ip`�
 소스는 [컨트롤러](soc_management_controller.py)와 [회귀 검사](test_soc_management_controller.py)에 반영했다. 원문 trace·복제 DB·실제 도구 응답·대화는 Git 제외다. 공개 원장에는 출처·소스/증거 SHA·집계·상태와 한계만 남긴다.
 
 검증 후 자체 private 재생 DB 복제본과 서버검사 작업본만 제거했다. 원문 운영 DB/trace·원소유 승인/차단·원본/후보 코드·복구 메타데이터·재생 결과/검사 로그는 보존한다.
+
+20:25 추가조회:원래20:20:30 기한의차단은20:20:33 expired·커널집합부재였고두참조도expired였다. WAF후속은읽기전용verify로진행중이다. 즉시broker깨움의인과나사건전체종결을별도검증한것은아니다.
+
+공유참조9파일 `618c08d`는20:23:40 KST 실제원격main일치확인했다. 자체Mac도우미19파일/임시부모와서버시험/재생클론10파일을정리했으며,게시확인보완은후속문서로게시한다.

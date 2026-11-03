@@ -190,12 +190,30 @@
     "b-shared-case-results3.json": "9987f8ea42c87ae5be31129cdf197ec5ecd8ef53c012dedf79b243c6f7d59ef2",
     "b-new-call-errors.json": "f477576e7b59981a3b897427152e67703d6115a9b12973d0ecb2e10f0ff4b630",
     "b-timeline-evidence.json": "e60181c55504e8ffaa7877e772c09913e39ad38a4cb06795249f97ecbaf9a795",
-    "b-cleanup-shared-tests.json": "4cd0b43718701083692cc16d25287e5d710d63cb755b0e992779dc55de6e32b8"
+    "b-cleanup-shared-tests.json": "4cd0b43718701083692cc16d25287e5d710d63cb755b0e992779dc55de6e32b8",
+    "a-shared-state.json": "828cfbc887bafbe68f3bef0034c0df7106389549dff84a9c863786a9bda672e1",
+    "b-shared-case-results5.json": "02dda1353c6482d5fcea73b66088b12cd63779414447dfb145787f7bfe234b22",
+    "mac-cleanup.json": "4c058bd8abde19118bc4aa852b440d52bd2d2f710d56242b29fa9ebfb6ed44c3"
   },
   "cleanup": {
     "removed_test_files": 10,
     "removed_bytes": 19029703,
     "recovery_sources_preserved": true,
-    "live_database_touched": false
+    "live_database_touched": false,
+    "mac_temporary_helpers_removed": 19,
+    "mac_temporary_parent_absent": true
+  },
+  "expiry_checked": {
+    "checked_at_kst": "2026-11-03T20:25:08.817373+09:00",
+    "status": "expired",
+    "deadline_kst": "2026-11-03T20:20:30+09:00",
+    "closed_at_kst": "2026-11-03T20:20:33+09:00",
+    "kernel_element_absent": true,
+    "both_reference_statuses_expired": true,
+    "waf_followup": {
+      "case_state": "running",
+      "mode": "verify"
+    },
+    "instant_broker_wakeup_causality_verified": false
   }
 }

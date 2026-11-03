@@ -291,7 +291,8 @@
     "b-clean-time-tests.json": "43c28611cd2df741cad0932e05be6b61ffd0def25878829d84788e76ff78947a",
     "a-time-state-expired.json": "ae7759037574abd8915ee9e663bb72c02a8d6f5fc75c483a014a2d2efa98f0e8",
     "k2-time-recovery.json": "af058ac9c50ebb462309f7eba61630b6753dcf2967078159c2df64681066239e",
-    "b-time-cases-end.json": "1767e01747728c93c22d266a1c6fe7fe6d9d5fbc71584ac449dbbf7807c1dece"
+    "b-time-cases-end.json": "1767e01747728c93c22d266a1c6fe7fe6d9d5fbc71584ac449dbbf7807c1dece",
+    "mac-cleanup.json": "201511534d184026d7e1e0b6a6816101ab10949acd5e7263ad649a3d0ac38852"
   },
   "cleanup": {
     "server": {
@@ -303,6 +304,19 @@
       "operating_database_or_traces_deleted": false
     },
     "mac_new_packages_installed": 0,
-    "mac_helpers": "pending_after_final_observation"
+    "mac_helpers": {
+      "at_kst": "2026-11-03T21:22:18.118263+09:00",
+      "source_snapshot_files": 34,
+      "source_snapshot_bytes": 3463578,
+      "own_temp_parent_absent": true,
+      "new_Mac_packages_installed": 0,
+      "other_user_or_task_files_removed": false
+    }
+  },
+  "publication": {
+    "source_commit": "9addf1a63624c7cc3de9b1be4111ed63580416a4",
+    "remote_main_verified_at_kst": "2026-11-03T21:22:19.412540+09:00",
+    "remote_matched": true,
+    "post_publication_cleanup_documentation": "followup_commit"
   }
 }

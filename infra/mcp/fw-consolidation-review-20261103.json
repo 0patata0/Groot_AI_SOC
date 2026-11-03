@@ -52,19 +52,19 @@
   "verification": {
     "unit_tests": 6,
     "actual_snapshot_accounted_rules": 99,
-    "nft_syntax_check": false,
-    "isolated_network_namespace": false,
+    "nft_syntax_check": true,
+    "isolated_network_namespace": true,
     "live_policy_apply": false,
     "mcp_api_or_bot_view_deployed": false,
     "new_server_full_install": false
   },
   "remaining": [
-    "restore management connectivity",
+    "recover final original model comparison result and stop private test services",
     "get new administrator IP and test recovery path",
     "audit all security-device management listeners and proxy trust",
     "integrate persistence and root deploy.sh without overwriting live installation",
-    "validate syntax and isolated flows with exact rollback",
-    "apply after comparison and verify management/web/inference/containment flows"
+    "apply after comparison and verify management/web/inference/containment flows",
+    "validate actual Docker/host firewall/containment TTL and operating rollback after persistence integration"
   ],
   "ipv6_retirement": {
     "requested": true,
@@ -82,11 +82,27 @@
     ],
     "unused_proven": false,
     "live_evidence_pending": [
-      "addresses/routes/sysctl/listeners and actual flows",
-      "Docker EnableIPv6/IPv6 host port mapping",
-      "active Docker regeneration policy"
+      "confirm service IPv6 dependency over representative interval",
+      "prepare IPv4-only published ports and SSH policy with rollback",
+      "validate Docker regeneration and recreate/restart behavior without service loss"
     ],
-    "deleted_tables": []
+    "deleted_tables": [],
+    "observed_at_kst": "2026-11-03T13:08:28+09:00",
+    "live_observed": {
+      "global_or_ula_address": false,
+      "default_route": false,
+      "established_connections": 0,
+      "docker_networks_ipv6_enabled": 0,
+      "docker_networks_checked": 5,
+      "kernel_ipv6_enabled": true,
+      "ipv6_tcp_listeners": [
+        22,
+        80,
+        443,
+        8443
+      ],
+      "docker_explicit_ipv6_daemon_settings": false
+    }
   },
   "prerouting_review": {
     "docker_dnat_required": true,
@@ -105,5 +121,37 @@
     "a_authenticated_sudo_read": true,
     "policy_changed": false,
     "b_thor_rechecked": false
+  },
+  "nat_validation": {
+    "syntax_check_at_kst": "2026-11-03T13:11:07.963989+09:00",
+    "syntax_check_exit_code": 0,
+    "candidate_sha256": "4f0e89145525bf07eb93f66de3400a04570fa36f5101c4e857cf79e7c06bd5d0",
+    "isolated_at_kst": "2026-11-03T13:14:02.586585+09:00",
+    "isolated_scope": "isolated_three_rule_NAT_parity_only",
+    "phases": [
+      {
+        "name": "legacy",
+        "passed": true
+      },
+      {
+        "name": "merged",
+        "passed": true
+      },
+      {
+        "name": "restored_legacy",
+        "passed": true
+      }
+    ],
+    "checks_per_phase": [
+      "DNAT and return masquerade",
+      "outbound masquerade",
+      "outside source range not forwarded"
+    ],
+    "namespace_cleanup_complete": true,
+    "host_policy_structure_unchanged": true,
+    "docker_and_host_filter_and_block_ttl_included": false,
+    "live_applied": false,
+    "final_isolated_source_sha256": "63ed343b701ee0456a67a6b23a37acfc5f252f791c75a5b1aed51b2952663a48",
+    "final_isolated_recheck_at_kst": "2026-11-03T13:15:44.417593+09:00"
   }
 }

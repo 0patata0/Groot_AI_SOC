@@ -369,5 +369,11 @@
     "b-tests-r2.json": "09c046067314452bb1d9a0f486a9088f0c37ba2d4cb962eb5f0baf1b667bc6b3",
     "historical-clock-replay.json": "f6f4a75d73dc54d3881540d2de169a4b962f92834fab2e8b3918124d5b058d5e",
     "Mac-cleanup.json": "a69038e9b9867a0c87018fc68cf6c4a67c8bca2d44e6bce8a649a912dd0ed66c"
+  },
+  "publication": {
+    "source_commit": "fa40b84e90e781398022250c7d36b79017bdb323",
+    "remote_main_verified_at_kst": "2026-11-03T22:40:07.401651+09:00",
+    "remote_matched": true,
+    "post_publication_documentation": "followup_commit"
   }
 }

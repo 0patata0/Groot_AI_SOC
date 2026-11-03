@@ -4,18 +4,18 @@
 
 ## 실제 구조와 사용 증거
 
-12:09 KST에 8테이블·99규칙·9집합을 읽었고, **13:05:48 KST A SSH 인증·sudo 읽기 재조회에서도 같은 구성**을 확인했다. 카운터·handle·만료 시간 제외 구조가 일치하며 정책은 변경하지 않았다. 5테이블은 Docker/iptables 호환 계층, 2테이블은 프로젝트 NAT, 1테이블은 프로젝트 호스트 방화벽이다. Docker 테이블 안의 `CAPSTONE-*` 사용자 체인은 프로젝트가 관리하므로 테이블 소유자와 규칙 소유자도 구분한다.
+12:09 KST에 8테이블·99규칙·9집합을 읽었고, **13:05:48 KST A SSH 인증·sudo 읽기 재조회에서도 같은 구성**을 확인했다. 카운터·handle·만료 시간 제외 구조가 일치하며 정책은 변경하지 않았다. **14:21:46 KST `nft -j list ruleset` 재조회에서도 아래 8테이블·30체인·99규칙·9집합을 확인했다.** 이번 재조회는 목록·체인·규칙 수 확인이며 NAT 사용량·IPv6 수신·서비스 통신 시험을 다시 수행한 것은 아니다. IPv6 테이블 삭제나 NAT 통합은 적용하지 않았다. 5테이블은 Docker/iptables 호환 계층, 2테이블은 프로젝트 NAT, 1테이블은 프로젝트 호스트 방화벽이다. Docker 테이블 안의 `CAPSTONE-*` 사용자 체인은 프로젝트가 관리하므로 테이블 소유자와 규칙 소유자도 구분한다.
 
-| 테이블 | 규칙 수 | 주요 체인 | 용도·정리 판단 |
-|---|---:|---|---|
-| `ip nat` | 8 | PREROUTING·OUTPUT·POSTROUTING·DOCKER | Docker 포트 DNAT·송신 NAT. 실제 사용 확인, 유지 |
-| `ip filter` | 42 | FORWARD·DOCKER-*·CAPSTONE-FWD·CAPSTONE-PUSH | Docker/프로젝트 전달 정책. 소유 체인 구분해 정리 |
-| `ip6 nat` | 2 | PREROUTING·OUTPUT·DOCKER | Docker IPv6 NAT. 미사용/자동 재생성 여부 확인 후 정리 |
-| `ip6 filter` | 5 | FORWARD·DOCKER-* | Docker IPv6 전달 정책. 미사용/자동 재생성 여부 확인 후 정리 |
-| `ip raw` | 3 | PREROUTING | Docker 초기 필터. 실제 참조·동작 보존 필요 |
-| `ip capstone_gw` | 1 | postrouting | 내부망 외부 통신 masquerade. 프로젝트 NAT 통합 후보 |
-| `ip capstone_fwd` | 2 | prerouting·postrouting | 관리10443 DNAT와 응답 NAT. 통합/해당 경로 폐지 검토 |
-| `inet capstone_fw` | 36 | prerouting_block·input·output | 호스트 방화벽·초기 차단·9집합. 프로젝트 정책 통합 대상 |
+| 테이블 | 체인 수 | 규칙 수 | 주요 체인 | 용도·정리 판단 |
+|---|---:|---:|---|---|
+| `ip nat` | 4 | 8 | PREROUTING·OUTPUT·POSTROUTING·DOCKER | Docker 포트 DNAT·송신 NAT. 실제 사용 확인, 유지 |
+| `ip filter` | 9 | 42 | FORWARD·DOCKER-*·CAPSTONE-FWD·CAPSTONE-PUSH | Docker/프로젝트 전달 정책. 소유 체인 구분해 정리 |
+| `ip6 nat` | 3 | 2 | PREROUTING·OUTPUT·DOCKER | Docker IPv6 NAT. 미사용/자동 재생성 여부 확인 후 정리 |
+| `ip6 filter` | 7 | 5 | FORWARD·DOCKER-* | Docker IPv6 전달 정책. 미사용/자동 재생성 여부 확인 후 정리 |
+| `ip raw` | 1 | 3 | PREROUTING | Docker 초기 필터. 실제 참조·동작 보존 필요 |
+| `ip capstone_gw` | 1 | 1 | postrouting | 내부망 외부 통신 masquerade. 프로젝트 NAT 통합 후보 |
+| `ip capstone_fwd` | 2 | 2 | prerouting·postrouting | 관리10443 DNAT와 응답 NAT. 통합/해당 경로 폐지 검토 |
+| `inet capstone_fw` | 3 | 36 | prerouting_block·input·output | 호스트 방화벽·초기 차단·9집합. 프로젝트 정책 통합 대상 |
 
 총8테이블·30체인·99규칙·9집합이며 A 호스트 네트워크 네임스페이스 범위다. PREROUTING은 독립 테이블 이름이 아니라 위 여러 테이블에서 사용하는 체인/hook이다. 재조회는 A에 한정하며 B/Thor 접속·시험 프로세스/결과 복구를 확인한 것은 아니다.
 

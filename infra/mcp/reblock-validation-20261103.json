@@ -92,6 +92,10 @@
     "private_model_units_all_terminal": true,
     "own_two_input_absence_failures_reset": true,
     "recovery_and_private_evidence_preserved": true,
-    "mac_task_temporary_sources": "pending final publication cleanup"
+    "mac_task_temporary_sources": {
+      "removed_files": 44,
+      "removed_directory": true,
+      "packages_or_weights_downloaded": 0
+    }
   }
 }

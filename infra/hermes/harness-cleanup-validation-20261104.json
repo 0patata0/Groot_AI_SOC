@@ -119,8 +119,11 @@
     "independent 176 quality comparison"
   ],
   "publication": {
-    "source_commit": null,
-    "remote_verified_at_kst": null
+    "source_commit": "a5d806b632c890ba0008f921ea890a36f2beab24",
+    "remote_verified_at_kst": "2026-11-04T17:29:08.251052+09:00",
+    "remote_main_matches_source_commit": true,
+    "public_files": 40,
+    "publication_receipt_followup_pending": true
   },
   "cleanup": {
     "at_kst": "2026-11-04T17:28:22.087378+09:00",

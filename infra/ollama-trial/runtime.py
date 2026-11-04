@@ -34,6 +34,17 @@ def digest(value):
     return hashlib.sha256(canonical(value).encode()).hexdigest()
 
 
+def service_read_schema(question, schema):
+    """Bind a service read to its plan, rather than the old IDS-only default."""
+    result=json.loads(json.dumps(schema))
+    if harness.tool_scope(question)=={'mcp__rule_a__get_service_action_target'}:
+        plan=harness.read_plan(question)
+        target=plan.get('target') if plan else 'a:suricata'
+        if target in result['properties']['target'].get('enum',[]):
+            result['properties']['target']['enum']=[target]
+    return result
+
+
 def load_config(path):
     p = Path(path)
     require(p.is_absolute() and not p.is_symlink(), 'config_path')
@@ -181,8 +192,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     if chosen is not None and name not in chosen:
                         continue
                     schema = harness.CONTRACT.normalized_schema(name, schema)
-                    if harness.tool_scope(current) == {'mcp__rule_a__get_service_action_target'}:
-                        schema['properties']['target']['enum'] = ['a:suricata']
+                    if name == 'mcp__rule_a__get_service_action_target':
+                        schema = service_read_schema(current, schema)
 
                     def make_call(backend, bare_name, connection, input_schema):
                         async def call(**arguments):

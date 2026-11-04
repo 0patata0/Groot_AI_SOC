@@ -356,10 +356,21 @@ def observation_facts(name, result):
                              'started_at': observed.get('started_at') if parse_instant(observed.get('started_at')) else None})
                 if parse_instant(observed.get('started_at')):
                     stamps.append(observed['started_at'])
-                if (data.get('target') == 'a:waf' and
-                        'DetectionOnly must remain enabled' in str(data.get('impact', ''))):
-                    rows.append({'kind': 'service_policy', 'target': 'a:waf',
-                                 'mode_change_allowed': False})
+                if data.get('target') == 'a:waf':
+                    mode = observed.get('configured_engine_mode')
+                    startup = observed.get('startup_engine_mode')
+                    if mode in ('On', 'DetectionOnly') or startup in ('On', 'DetectionOnly'):
+                        rows.append({'kind':'waf_configuration','target':'a:waf',
+                            'configured_engine_mode':mode if mode in ('On','DetectionOnly') else None,
+                            'startup_engine_mode':startup if startup in ('On','DetectionOnly') else None,
+                            'engine_mode_source':('fixed_late_custom_include' if
+                                observed.get('engine_mode_source')=='fixed_late_custom_include' else None)})
+                    impact = str(data.get('impact', ''))
+                    required = ('On' if 'On blocking mode must remain enabled' in impact else
+                                'DetectionOnly' if 'DetectionOnly must remain enabled' in impact else None)
+                    if required:
+                        rows.append({'kind':'service_policy','target':'a:waf',
+                                     'mode_change_allowed':False,'required_engine_mode':required})
             if name in ('get_rule_change_target', 'get_service_action_target'):
                 runtime = data.get('rule_source_evidence', data.get('runtime'))
                 if isinstance(runtime, dict) and runtime.get('rule_source_option') == '-S' and runtime.get('rule_source_path') == '/rules/all.rules':
@@ -623,10 +634,24 @@ def waf_action_violations(text, facts):
     issues = set()
     mode_locked = any(f.get('kind') == 'service_policy' and f.get('target') == 'a:waf'
                       and f.get('mode_change_allowed') is False for f in facts)
+    modes = {f['configured_engine_mode'] for f in facts if f.get('kind')=='waf_configuration'
+             and f.get('target')=='a:waf' and f.get('configured_engine_mode') in ('On','DetectionOnly')}
     for line in text.splitlines():
         if line.lstrip().startswith(('>', 'INCIDENT_DISPOSITION:')):
             continue
         negative = re.search(r'불가|금지|못|않|아니|아닙|아님|미확인|확인.{0,8}없|근거.{0,8}없|허용되지|정책\s*밖|권한\s*밖', line)
+        # Reading configured bytes does not inspect the running worker's memory.
+        # Keep this separate from mode mismatch and from request-level prevention.
+        if modes and not negative and re.search(r'WAF|ModSecurity|worker|실행\s*중인\s*설정',line,re.I):
+            if (re.search(r'로드되어|적재되어|로드됐|적재됐|로드되었|적재되었',line) and
+                    re.search(r'현재|실행\s*중|worker|메모리',line,re.I)):
+                issues.add('waf_config_is_not_worker_memory')
+        if len(modes)==1 and not negative and not re.search(r'당시|과거|이전|예전|만약|정책\s*요구|시작값',line):
+            for claim in re.finditer(r'(?:현재|지금)\s*(?:WAF\s*)?(?:(?:설정|엔진|모드)\s*){0,3}'
+                    r'(?:은|는|이|가|:)?\s*[`*]*(On|DetectionOnly)[`*]*(?:\s*모드)?\s*'
+                    r'(?:입니다|이다|이므로|이며|로\s*설정(?:되어|돼)|$)',line,re.I):
+                if claim[1].lower()!=next(iter(modes)).lower():
+                    issues.add('waf_current_mode_mismatch')
         change = re.search(r'전환|변경|활성화', line) and re.search(r'(?<![A-Za-z])On(?![A-Za-z])|차단\s*모드|Mode\s*변경', line, re.I)
         if change and not negative:
             if re.search(r'propose_service_action|\breload\b|\brestart\b', line):
@@ -986,9 +1011,18 @@ def literal_evidence_summary(facts):
             stamp = datetime.fromtimestamp(observed, KST).isoformat() if type(observed) in (int, float) else None
             rows.append(f"- Suricata 구동 근거 관측 {iso(stamp)}: -S /rules/all.rules; ET+local 정확 결합={row.get('combined_is_exact_et_plus_local') is True}; 시작 {iso(row.get('started_at'))}. 현재 SID별 엔진 적재는 미확인.")
         elif kind == 'times':
-            rows.append('- 현재 조회에 포함된 시각(KST): ' + ', '.join(iso(v) for v in row.get('instants', [])[:12]))
+            rows.append('- 현재 조회에 포함된 시각(KST): ' + ', '.join(dict.fromkeys(iso(v) for v in row.get('instants', [])[:12])))
+        elif kind == 'waf_configuration':
+            mode = row.get('configured_engine_mode')
+            startup = row.get('startup_engine_mode')
+            rows.append('- a:waf 설정 관측: '+(mode if mode in ('On','DetectionOnly') else '미확인')+
+                        '; 컨테이너 시작값: '+(startup if startup in ('On','DetectionOnly') else '미확인')+
+                        '; 설정 출처: '+('고정된 후순위 사용자 설정' if row.get('engine_mode_source')=='fixed_late_custom_include' else '미확인')+
+                        '. worker 메모리나 개별 요청의 실제 차단 검증은 별도입니다.')
         elif kind == 'service_policy' and row.get('mode_change_allowed') is False:
-            rows.append('- a:waf 대상 정책: DetectionOnly 유지. reload/restart는 기존 설정 재적용/재시작이며 모드 변경 권한이 아닙니다.')
+            required = row.get('required_engine_mode')
+            rows.append('- a:waf helper 정책 요구 모드: '+(required if required in ('On','DetectionOnly') else '미확인')+
+                        '. 이는 현재 설정 관측과 별개입니다. reload/restart는 기존 설정 재적용/재시작이며 모드 변경 권한이 아닙니다.')
         elif kind == 'blocks':
             rows.append(f"- 차단 목록: 현재 항목 {count(row.get('count'))}개. 이 조회는 경보·서비스 상태 조회가 아닙니다.")
     return '\n'.join(rows)

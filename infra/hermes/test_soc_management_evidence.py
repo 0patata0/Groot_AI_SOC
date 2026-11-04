@@ -13,6 +13,14 @@ def sample():
 
 
 class LiteralEvidence(unittest.TestCase):
+    def test_same_display_instant_is_not_repeated_and_raw_facts_are_preserved(self):
+        values=['2026-10-24T07:03:12+09:00','2026-10-23T22:03:12Z','2026-10-24T07:04:12+09:00']
+        facts=[{'kind':'times','instants':values.copy()}]
+        text=m.literal_evidence_summary(facts)
+        self.assertEqual(text.count('2026-10-24T07:03:12+09:00'),1)
+        self.assertEqual(text.count('2026-10-24T07:04:12+09:00'),1)
+        self.assertEqual(facts[0]['instants'],values)
+
     def test_short_kst_clock_is_checked_against_real_instants_without_rewriting(self):
         facts=[{'kind':'times','instants':['2026-10-30T21:12:10Z','2026-10-31T06:13:04+09:00']}]
         for text in ('시각 KST 21:12~21:13', '21:12~21:13 KST'):
@@ -44,10 +52,52 @@ class LiteralEvidence(unittest.TestCase):
         data={'target':'a:waf','impact':'DetectionOnly must remain enabled.', 'observation':{'running':True}}
         result=types.SimpleNamespace(is_error=False,content=[types.SimpleNamespace(text=json.dumps(data))])
         facts=m.observation_facts('get_service_action_target',result)
-        self.assertIn({'kind':'service_policy','target':'a:waf','mode_change_allowed':False},facts)
-        self.assertIn('DetectionOnly 유지',m.literal_evidence_summary(facts))
+        self.assertIn({'kind':'service_policy','target':'a:waf','mode_change_allowed':False,
+                       'required_engine_mode':'DetectionOnly'},facts)
+        summary=m.literal_evidence_summary(facts)
+        self.assertIn('helper 정책 요구 모드: DetectionOnly',summary)
+        self.assertIn('현재 설정 관측과 별개',summary)
+        self.assertNotIn('DetectionOnly 유지',summary)
         data['target']='a:suricata';result.content[0].text=json.dumps(data)
         self.assertFalse(any(f['kind']=='service_policy' for f in m.observation_facts('get_service_action_target',result)))
+
+    def test_waf_current_setting_startup_value_and_policy_are_distinct(self):
+        data={'target':'a:waf','impact':'Web security proxy connections can be interrupted; On blocking mode must remain enabled.',
+              'observation':{'running':True,'configured_engine_mode':'On','startup_engine_mode':'DetectionOnly',
+                             'engine_mode_source':'fixed_late_custom_include'}}
+        result=types.SimpleNamespace(is_error=False,content=[types.SimpleNamespace(text=json.dumps(data))])
+        facts=m.observation_facts('get_service_action_target',result);text=m.literal_evidence_summary(facts)
+        self.assertIn('설정 관측: On; 컨테이너 시작값: DetectionOnly',text)
+        self.assertIn('helper 정책 요구 모드: On',text)
+        self.assertNotIn('DetectionOnly 유지',text)
+        for claim in ('현재 WAF 모드는 DetectionOnly입니다.','현재 설정은 DetectionOnly로 설정되어 있습니다.'):
+            self.assertIn('waf_current_mode_mismatch',m.evidence_claim_violations(claim,facts))
+        for claim in ('현재 WAF 모드는 On입니다.','과거에는 DetectionOnly였습니다.',
+                      '현재 WAF가 DetectionOnly인지 미확인입니다.','컨테이너 시작값은 DetectionOnly입니다.'):
+            self.assertNotIn('waf_current_mode_mismatch',m.evidence_claim_violations(claim,facts))
+        data['impact']='DetectionOnly must remain enabled.'
+        result.content[0].text=json.dumps(data);text=m.literal_evidence_summary(m.observation_facts('get_service_action_target',result))
+        self.assertIn('설정 관측: On',text);self.assertIn('helper 정책 요구 모드: DetectionOnly',text)
+
+    def test_waf_startup_value_alone_cannot_prove_current_mode(self):
+        data={'target':'a:waf','impact':'unrecognized policy','observation':{
+            'running':True,'configured_engine_mode':'unknown','startup_engine_mode':'On'}}
+        result=types.SimpleNamespace(is_error=False,content=[types.SimpleNamespace(text=json.dumps(data))])
+        facts=m.observation_facts('get_service_action_target',result);text=m.literal_evidence_summary(facts)
+        self.assertIn('설정 관측: 미확인; 컨테이너 시작값: On',text)
+        self.assertFalse(any(f['kind']=='service_policy' for f in facts))
+        self.assertNotIn('waf_current_mode_mismatch',m.evidence_claim_violations('현재 WAF 모드는 DetectionOnly입니다.',facts))
+        result.is_error=True;self.assertEqual(m.observation_facts('get_service_action_target',result),[])
+
+    def test_waf_config_does_not_prove_worker_loaded_mode(self):
+        facts=[{'kind':'waf_configuration','target':'a:waf','configured_engine_mode':'On'}]
+        for claim in ('현재 실행 중인 설정은 On으로 로드되어 있습니다.',
+                      'WAF worker 메모리에 On이 적재되어 있습니다.'):
+            self.assertIn('waf_config_is_not_worker_memory',m.evidence_claim_violations(claim,facts))
+        for claim in ('현재 WAF 설정값은 On입니다.',
+                      'WAF worker에 On이 로드되어 있는지는 미확인입니다.',
+                      'WAF는 과거 시작 시 DetectionOnly로 적재되어 있었습니다.'):
+            self.assertNotIn('waf_config_is_not_worker_memory',m.evidence_claim_violations(claim,facts))
 
     def test_uncalled_citation_requires_real_read_even_when_unresolved(self):
         actual='mcp__security_events__search_suricata_alerts'

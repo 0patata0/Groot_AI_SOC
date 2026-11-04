@@ -1,10 +1,6 @@
 # 환경 값 입력과 단일 셸 실행
 
-<!-- current-project-context:2026-10-24 -->
-> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
-> 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP8논리 서버/35도구·고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.
-> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
-<!-- /current-project-context -->
+> **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/deployment-configuration-guide-before-ncsc-20261104.md).
 
 새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 현재 service 상태는 **schema9**, security 상태는 **schema2**다. 기존 운영 A/B/C를 새 설치 대상으로 인수하지 않는다. **새 VM 3대에서 전체 `--apply`를 실제 실행한 검증은 아직 하지 않았다.**
 
@@ -113,7 +109,7 @@ LLM_MODEL=qwen3.6:35b
 | `SURICATA_IMAGE`, `WAF_IMAGE`, `DVWA_IMAGE`, `MARIADB_IMAGE` | 선택 로컬 이미지 참조. 반입된 ID·플랫폼·역할 계약을 검사하며 pull하지 않음 |
 | `ET_RULES_FILE` | 선택 security 룰 경로. 기본 `/opt/capstone-prereqs/suricata.rules` |
 
-읽기 전용 시스템 진단에는 별도 비밀번호 입력이 없다. 설치기가 `SECURITY_HOST`·`SIEM_HOST`·`SERVICE_HOST`와 `SSH_PORT`를 새 진단 전용 SSH 경로에도 결속한다. B에서 생성한 새 키는 A/C의 고정 snapshot reader만 호출하며 관리자 SSH 키·WAF 예외 키·Wazuh 자격증명을 공유하지 않는다. collector는 root로 고정 상태와 오류 분류 메타데이터만 수집하고, MCP 계정에는 root·sudo·Docker·원본 journal 읽기 권한을 주지 않는다. 기존 서버는 새 진단 namespace가 없는지 확인한 뒤 확장 부분만 별도 배포한다.
+읽기 전용 시스템 진단에는 별도 비밀번호 입력이 없다. 설치기가 `SECURITY_HOST`·`SIEM_HOST`·`SERVICE_HOST`와 `SSH_PORT`를 새 진단 전용 SSH 경로에도 결속한다. B에서 생성한 새 키는 A/C의 고정 snapshot reader만 호출하며 관리자 SSH 키·Lab 관리자 인증 키·Wazuh 자격증명을 공유하지 않는다. collector는 root로 고정 상태와 오류 분류 메타데이터만 수집하고, MCP 계정에는 root·sudo·Docker·원본 journal 읽기 권한을 주지 않는다. 기존 서버는 새 진단 namespace가 없는지 확인한 뒤 확장 부분만 별도 배포한다.
 
 `LAB_ADMIN_KEY_FILE`은 controller의 고정 전달 경로이며 설정 파일의 입력 키가 아니다. `LAB_ADMIN_KEY`나 비밀번호 값도 넣지 않는다. 구형 `LOG4SHELL_IMAGE`, `LOG4SHELL_APP_JAR`, `LOG4SHELL_HOSTNAME`은 더 이상 쓰지 않으며 값이 있으면 거절한다. schema9은 준비된 관리형 이미지로 실행하고 초기 설치 중 Java JAR를 빌드·마운트하지 않는다. 기존 schema6·7·8 서비스는 자동으로 인수하지 않는다.
 
@@ -153,11 +149,11 @@ sudoedit /opt/capstone-prereqs/siem.json
 |---|---|
 | `schema_version` | 숫자1 |
 | `wazuh_api_username` | 3~32자, 영문자로 시작. 영문/숫자/`.`/`_`/`-` 허용. 예시 `wazuh-wui` |
-| `indexer_username` | `admin` 고정. Dashboard 로그인과 실습 차단 예외 키의 공통 계정 |
+| `indexer_username` | `admin` 고정. Dashboard 로그인 계정. 초기 설치는 lab_key.py로 관리자 HMAC 키도 연계하므로 자격 교체는 연계 검토 필요 |
 | `mattermost_admin_username` | 3~32자, 영문 소문자로 시작. 소문자/숫자/`.`/`_`/`-` 허용 |
 | `mattermost_admin_email` | 운영자가 관리하는 이메일 형식. 이 설정만으로 SMTP가 구성되는 것은 아님 |
 | 네 `*_password` | 각각 새 값, UTF-8 기준16~72바이트. `CHANGE_ME`와 제어문자 금지 |
-| Indexer 암호 추가 조건 | Lab 예외 키와 공통 사용하므로 8자 이상. 원문을 로컬 설정 파일에 넣지 않음 |
+| Indexer 암호 추가 조건 | Lab 관리자 인증 키도 연계하므로 8자 이상. 원문을 로컬 설정 파일에 넣지 않음 |
 | Wazuh API 암호 추가 조건 | 영문 대문자·소문자·숫자·특수문자 모두 포함 |
 | `hermes_image` | 준비한 로컬 `sha256:64자리` 또는 검증된 `registry/image@sha256:64자리`. 태그만 지정 불가 |
 
@@ -205,13 +201,13 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 
 운영 파일은 `/opt/capstone/{siem,service,security}`, 소스는 `/opt/capstone/releases/<SHA>`에 보존한다. 콘솔은 `/opt/capstone-offline-labs`, 상태는 `/var/lib/capstone-offline-labs`, sudo 설치 상태는 `/var/lib/capstone-sudo-bootstrap`를 사용한다. 반입된 CA·자격·TLS·운영 복구 archive를 작업 임시파일과 혼동해 지우지 않는다.
 
-### 접속과 공통 예외 키
+### 공개 열람과 관리자 제어 인증
 
 - DVWA는 기존 독립 경로 `http://SECURITY_HOST:WAF_PORT/dvwa/`다. Lab Console 카탈로그에 넣지 않는다.
 - 콘솔은 `LAB_PUBLIC_ORIGIN/log4shell/`, Java는 `/log4shell/labs/CVE-2021-44228/`, Apache 실습은 동일 origin의 해당 CVE 경로다.
-- 정상 무키 요청과 웹 실습 실행·중지는 허용된다. WAF 규칙에 걸린 요청을 차단하며, 키가 없다는 이유만으로 모든 요청을 차단하지 않는다.
-- 선택 예외 키는 Dashboard `admin` 암호와 같다. 브라우저가 30초·1회용 challenge를 HMAC 서명해 보내며 원문·고정 키 해시를 보내지 않는다. 성공 시 별도 HttpOnly 세션 쿠키가600초 유지된다. 같은 브라우저 탭 사이에 공유되며 키 자체가 쿠키에 들어가는 것은 아니다.
-- 관리·인증 API는 Lab WAF를 우회하고 고정된 실제 실습 경로만 WAF를 지난다. 예외는 해당 WAF 차단에만 적용되며 Suricata·기존 IP 차단·보호 주소·LLM 승인/TTL 정책을 해제하지 않는다.
+- 웹 허용 정책 안의 정상 무키 열람은 가능하다. 실행·중지·터미널은 MANAGEMENT_ALLOWED_CIDRS와 관리자 HMAC 인증이 모두 필요하다.
+- 초기 설치의 관리자 HMAC 키는 Dashboard `admin` 암호에서 연계된다. WAF 검사 면제 키가 아니다. 브라우저가 30초·1회용 challenge를 HMAC 서명해 보내며 원문·고정 키 해시를 보내지 않는다. 성공 시 별도 HttpOnly 세션 쿠키가600초 유지된다. 같은 브라우저 탭 사이에 공유되며 키 자체가 쿠키에 들어가는 것은 아니다.
+- UI·관리/인증 API·고정 실습 경로 모두 WAF On을 통과한다. 관리자 세션도 WAF·Suricata·기존 IP 차단·LLM 승인/TTL을 해제하지 않는다.
 - sudo도 콘솔에서 시작한 뒤 같은 사이트의 웹 터미널로 연다. 별도 UID1991 rootless 런타임·컨테이너 UID1000을 유지하며 웹/LLM에 일반 Docker나 호스트 sudo 권한을 주지 않는다. sudo는 전체 사용자 중 한 터미널만 허용하고 연결 종료·유휴/수명 만료 때 해당 컨테이너 전체를 중지한다. 환경/패키지 검증은 실제 권한상승·host auditd 시나리오 성공을 뜻하지 않는다.
 
 기본 설치는 웹 실습3개 이미지만 준비하며 자동 기동하지 않는다. 콘솔에서 선택해 실행한 뒤 같은 HTTPS 링크로 접속한다. SSH 포트포워딩은 일반 접속의 필수 절차가 아니다. 추가 CVE는 이미지·카탈로그뿐 아니라 제한된 same-origin 라우트 계약도 별도로 준비해야 한다.

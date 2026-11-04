@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-04T19:11:31+09:00",
+  "tests": {
+    "management": 222,
+    "sdk": 195,
+    "native": 390,
+    "review": 59,
+    "installation_contract": 37,
+    "skip": 0
+  },
+  "chat_samples": [
+    {
+      "case": "disconnected-ollama",
+      "seconds": 10.824,
+      "mcp_calls": 1
+    },
+    {
+      "case": "disconnected-hermes",
+      "seconds": 27.67,
+      "mcp_calls": 4
+    },
+    {
+      "case": "waf-mode-hermes",
+      "seconds": 26.314,
+      "mcp_calls": 1
+    },
+    {
+      "case": "waf-mode-ollama-final",
+      "seconds": 9.874,
+      "mcp_calls": 1
+    }
+  ],
+  "fresh_os_install": false,
+  "manual_rollback": false,
+  "full_incident_closure": false,
+  "production_targets": 16,
+  "protected_files_unchanged": 8,
+  "publication": "pending",
+  "installer_fake_ssh_tests": 46,
+  "installer_published_head_isolated": true,
+  "remote_action_boundary_cases": 12,
+  "mac_cleanup": {
+    "files": 679,
+    "bytes": 261162992,
+    "parent_absent": true,
+    "new_mac_packages": 0
+  }
+}

@@ -267,7 +267,7 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
                                         'security soc-check', 'siem soc-check', 'siem dashboard-check',
                                         'security diag-check','siem diag-check','service diag-check',
-                                        'service host-check','siem host-check',
+                                        'security host-check','service host-check','siem host-check',
                                         'siem apply', 'siem verify', 'service apply'])
         self.assertNotIn('구축 완료.', result.stdout)
         self.assert_clean()
@@ -285,7 +285,7 @@ class ControllerContract(unittest.TestCase):
         self.assertEqual(self.phases(), ['security check', 'siem check', 'service check',
                                         'security soc-check', 'siem soc-check', 'siem dashboard-check',
                                         'security diag-check','siem diag-check','service diag-check',
-                                        'service host-check','siem host-check'])
+                                        'security host-check','service host-check','siem host-check'])
         self.assert_clean()
 
     def test_legacy_build_override_is_rejected_before_ssh(self):
@@ -338,7 +338,7 @@ class ControllerContract(unittest.TestCase):
                                         'security soc-verify', 'security log-verify',
                                         'siem soc-verify', 'siem log-verify', 'siem dashboard-verify',
                                         'security diag-verify','service diag-verify','siem diag-verify',
-                                        'siem tls-verify','service host-verify','siem host-verify'])
+                                        'siem tls-verify','security host-verify','service host-verify','siem host-verify'])
         self.assert_clean()
 
     def test_soc_streams_never_appear_in_outputs_or_arguments(self):

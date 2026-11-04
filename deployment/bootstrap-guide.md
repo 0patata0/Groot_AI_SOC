@@ -1,31 +1,6 @@
 # 단일 Bash 초기 설치
 
-> **2026-11-04 현행 웹 제어:** 공개 열람은 `LAB_ALLOWED_CIDRS`, 실습 실행·중지·터미널은 `MANAGEMENT_ALLOWED_CIDRS`에서 설치한 관리자 CIDR과 HMAC 인증이 모두 필요하다. UI/API 포함4개 경로는 WAF On을 유지하며 이전 검사 예외는 제거했다. 기존 운영은 [증분 유지보수/복구](../infra/validation/web-policy/README.md)를 따른다. 아래 날짜별 예외 설명은 과거 이력이다.
-
-> 2026-10-29 차단 예외: RFC1918 전체는 기본 보호하지 않는다. `LOG_PROTECTED_IPS`의 정확한 필수 주소와 `ADMIN_PROTECTED_CIDRS`의 명시적 관리 범위를 보호한다. 예제의 관리자 `211.170.162.85`는 기존 승인된 campus /24에도 포함된다. SSH 허용은 `MANAGEMENT_ALLOWED_CIDRS`, Wazuh HTTPS는 `DASHBOARD_ALLOWED_CIDRS`로 별도 설정한다. 운영 서버 전체 재설치는 하지 않는다.
-
-> **2026-10-26 학과망 관리 예제:** 현장 `211.170.162.0/24` 정책은 `ADMIN_PROTECTED_CIDRS`, `MANAGEMENT_ALLOWED_CIDRS`, `DASHBOARD_ALLOWED_CIDRS`에 각각 명시한다. 세 값은 차단 예외·SSH·Wazuh라는 서로 다른 권한이다. 새 환경에서는 실제 관리 대역으로 교체하며 기존 A의 증분 설정을 초기 설치기로 덮어쓰지 않는다. 추가 패키지·오프라인 바이너리는 없다.
-
-> **2026-10-26 실습 웹 공개 설정:** `LAB_ALLOWED_CIDRS=all`은 실습 HTTPS의 모든 출발지를 허용한다. 기존 CIDR 목록 방식과 사설 /29 프록시 충돌 검사는 유지하며 입력을 생략해 자동 공개하지 않는다. 콘솔의 기존 목록·시작/중지·터미널 경로도 이 웹 접근 범위에 포함된다. WAF 예외 키·세션, SSH·Wazuh·MCP의 별도 정책은 그대로다. 추가 패키지/이미지는 없고 기존 소스 반입 목록에 포함된 `validate_lab_site.py`, `offline_security.py`, `nginx-log4shell-server.conf`로 재현한다. 새 서버 전체 설치 검증과 기존 A의 ACL 증분 적용은 구분한다.
-
-> **2026-10-26 감시 단계:** 기존 진단 및 선택 Ollama 구성 뒤 `monitor-configure/prepare/authorize/trust/activate/verify` 내부 단계를 루트 deploy.sh가 호출한다. A→B/C 전용 snapshot 키·기존 HTTPS SiteURL/CA·웹훅 스트림을 연결한다. 새3VM 전체 설치 성공 여부는 운영 증분 검증과 구분해 [STATUS](../STATUS.md)에 기록한다. [감시 상세](../infra/mcp/monitoring.md).
-
-> **2026-10-25 선택적 시험 분기:** `OLLAMA_TRIAL_ENABLE=1`과 `OLLAMA_TRIAL_BUNDLE`을 지정하면 B의 반입물을 사전검사하고 SOC/진단 구성 뒤 host venv의 Ollama 기반 읽기 실행부를 설치·검증한다. 모델은 DGX에 유지한다. `OLLAMA_TRIAL_CHAT_ENABLE=1`을 함께 지정하면 ollama 봇과 비공개 soc-ollama 채널·host gateway 서비스도 추가하며 기존 Hermes 채널 ID를 유지해 soc-hermes로 이름 변경한다. 두 옵션 기본값0이며 기존 운영 서버에는 전체 bootstrap을 재실행하지 않는다. [추가 반입·권한·복구](../infra/ollama-trial/README.md), [실제 검증 범위](../STATUS.md).
-
-
-<!-- current-project-context:2026-10-24 -->
-> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
-> 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP6서버/고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.
-> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
-<!-- /current-project-context -->
-
-새 Ubuntu 24.04 amd64 서버 3대의 진입점은 저장소 루트의 `deploy.sh` 하나다. 서버 주소, SSH 접근, 관리자 승인된 오프라인 반입 파일을 준비한 후 다음 한 번으로 패키지·이미지 준비와 역할 설치·검증을 실행한다.
-
-```bash
-bash deploy.sh --apply --batch --config deployment/site.local.conf
-```
-
-`deployment/config.example.conf`를 로컬 전용 `site.local.conf`에 복사하고 실제 주소·HTTPS 이름·허용 내부망을 입력한다. 비밀번호를 이 파일에 넣지 않는다. 전체 저장소가 필요하며 `deploy.sh`만 따로 복사해서 실행하는 방식은 아니다. 내부 Python/Bash helper는 진입점이 자동으로 호출한다. Mac에는 패키지를 설치하지 않는다.
+> **2026-11-04 현행 웹 제어:** 공개 열람은 `LAB_ALLOWED_CIDRS`, 실습 실행·중지·터미널은 `MANAGEMENT_ALLOWED_CIDRS`에서 설치한 관리자 CIDR과 HMAC 인증이 모두 필요하다. UI/API 포함4개 경로는 WAF On을 유지하며 이전 검사 예외는 제거했다. 기존 운영은 [증분 유지보수/복구](../infra/validation/web-policy/README.md)를 따른다. 과거 설명은 [보존본](../archive/deployment-bootstrap-guide-before-ncsc-20261104.md)을 참조한다. [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md).
 
 ## 2026-10-24 보안 경계와 오프라인 준비
 
@@ -51,12 +26,12 @@ A의 필수 WAF·Suricata와 TLS 프록시는 재부팅 때 복구되도록 `res
 4. 준비된 상태에서 security·siem·service 역할을 모두 사전검사한다. 역할 충돌, 포트 충돌, 자료 누락이 있으면 서비스 설치 전에 중단한다. 이 단계의 실패 시 앞 단계에서 설치한 패키지는 유지한다.
 5. SIEM을 설치·검증하고 등록 CA·암호를 두 agent 서버로 전달한다. Wazuh Dashboard의 `admin` 암호(`siem.json`의 `indexer_password`)는 SSH 파이프로 service의 root0600 파일에 직접 전달한다. Mac 파일·명령 인수·로그에는 저장하지 않는다.
 6. service에 독립 DVWA/MariaDB, FastAPI 콘솔·제한된 Docker broker·nft guard, 전용 Nginx gateway, 별도 sudo rootless 환경과 Redis·Samba·sudo 웹 터미널 서비스, Wazuh agent를 구성한다. 콘솔 계정 생성과 sudo 준비 다음에 별도 nonweb bundle을 검증·반입한다.
-7. security에 Suricata·기존 DVWA WAF와 별도 Log4Shell TLS 진입점을 구성한다. 관리·예외 키 인증은 콘솔에 직접 연결하고, 고정된3개 실습 경로만 WAF를 지난다. 일반 요청은 규칙에 걸릴 때 차단하며 유효한 예외 세션은 감사 로그를 유지한다.
+7. security에 Suricata·기존 DVWA WAF와 별도 Log4Shell TLS 진입점을 구성한다. UI·관리/인증 API와 고정된 실습 경로 모두 WAF를 지난다. WAF는 On을 유지한다. 공개 열람은 웹 허용 정책, 실행·중지·터미널은 관리자 CIDR+HMAC 인증을 모두 확인한다. 인증은 WAF 검사 면제가 아니다.
 8. SIEM의 비권한 내부 TLS8444/8445를 설치하고 공개 CA만 security에 전달·신뢰시킨 뒤 SOC를 구성한다. SIEM이 생성한 Mattermost 관리자 ID를 승인자로 고정하고 승인 브로커·정확 후보 worker·규칙 MCP·제한된 응답 MCP·Native AR 사건 전달을 구성한다. 전용 토큰은 B→A SSH 파이프로 전달하며, 승인자 암호를 MCP에 배포하지 않는다. 관리용 SSH는 고정 명령과 검증된 host key만 사용한다.
 9. Vector0.59.0 정제·원본 세대 회전·출력 유지관리·이전 부트 로컬 보관을 구성하고, 실제 등록 agent ID에 결속한 Indexer 상관관측 모니터를 추가한다. 관측 모니터의 `actions`는 비어 있으며 자체 차단을 실행하지 않는다.
 10. 통합 SOC 대시보드의 14개 패널을 구성한다. 기존 saved object와 내용이 충돌하면 덮어쓰지 않고 중단한다. 없는 객체만 생성하고 전체 내용을 재조회한다. 그 뒤 Hermes 관리 경로를 활성화한다.
 11. 세 호스트에 고정 읽기 진단 수집기를 설치한다. root 수집기가60초마다 systemd 상태와 분류한 오류 메타데이터만 게시하고, B의 비권한 MCP는 로컬 snapshot 또는 A/C의 강제 snapshot reader를 읽는다. 새 전용 키의 공개키만 A/C로 전달하고, 기존 관리자·대응용 키는 재사용하지 않는다. SSH host key는 기존에 검증한 배포 SSH 경로로 받아 별도 known_hosts에 고정한다.
-12. service/siem의 별도 host guard를 적용하고 인증된 SSH 원천을 보존한다. 기본 역할과 SOC 확장의 파일·이미지·컨테이너·서비스·승인 경계, 세 호스트 진단 snapshot·MCP 호출, 내부 TLS와 host guard를 최종 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제를 하지 않는다. 대시보드의 아직 완료되지 않은 동일 내용 생성만 제한적으로 재개할 수 있고, 다른 확장 부분 설치는 검토 없이 재시도하지 않는다.
+12. security/service/siem의 별도 host guard를 적용하고 인증된 SSH 원천을 보존한다. 기본 역할과 SOC 확장의 파일·이미지·컨테이너·서비스·승인 경계, 세 호스트 진단 snapshot·MCP 호출, 내부 TLS와 host guard를 최종 검증한다. 임시 전송 폴더를 정리한다. 실패 시 부분 설치 상태와 서버의 복구 자료를 남기고 임의 덮어쓰기·전체 삭제를 하지 않는다. 대시보드의 아직 완료되지 않은 동일 내용 생성만 제한적으로 재개할 수 있고, 다른 확장 부분 설치는 검토 없이 재시도하지 않는다.
 
 카탈로그는 웹 실습3개와 Redis·Samba·sudo 터미널3개로 총6개다. 준비된 로컬 이미지만 사용하며 사용자가 콘솔에서 시작한 뒤 웹 화면 또는 같은 사이트의 터미널을 연다. 웹3개와 Redis/Samba는 초기 설치 중 시작하지 않는다. sudo 초기 bootstrap은 패키지·격리 검증을 위해 한 번 기동하며, 이후 중지 상태도 정상 설치로 검증한다. 터미널은 고정된 해당 실습 컨테이너에만 연결하며 호스트 셸·임의 Docker API·LLM 권한을 추가하지 않는다. sudo는 별도 UID1991 rootless 런타임을 유지하고 중앙 터미널의 고정 어댑터로만 연결한다. sudo 터미널은 전체 사용자 중 한 연결만 허용하며 연결 종료·입력 유휴/수명 만료 때 해당 sudo 컨테이너 전체를 중지한다. Redis/Samba 세션과 다른 실습은 중지하지 않는다. DVWA는 `http://SECURITY_HOST:WAF_PORT/dvwa/`, 콘솔·실습 페이지는 `LAB_PUBLIC_ORIGIN/log4shell/` 아래다. DVWA를 Log4Shell 메뉴에 다시 추가하지 않는다.
 
@@ -68,7 +43,7 @@ A/C의 진단 SSH 계정은 공개키 인증과 고정 `read-snapshot` 실행만
 
 ## 폐쇄망 반입물
 
-모든 자료는 해당 서버의 `/opt/capstone-prereqs` 아래 root 소유·그룹/기타 쓰기 금지 경로에 둔다. 자격 JSON·TLS 개인키·공통 예외 키는0600이다. manifest의 해시는 **관리자가 승인한 파일의 동일성**을 검증한다. 그 자체가 공급자 서명 검증을 대신하지 않는다. 외부 준비 서버에서 공식 출처·저장소 서명·버전·라이선스를 검토하고 반입 대장을 보존한다.
+모든 자료는 해당 서버의 `/opt/capstone-prereqs` 아래 root 소유·그룹/기타 쓰기 금지 경로에 둔다. 자격 JSON·TLS 개인키·공통 관리자 인증 키는0600이다. manifest의 해시는 **관리자가 승인한 파일의 동일성**을 검증한다. 그 자체가 공급자 서명 검증을 대신하지 않는다. 외부 준비 서버에서 공식 출처·저장소 서명·버전·라이선스를 검토하고 반입 대장을 보존한다.
 
 `artifacts.json`은 다음 형식이다. 예시는 구조 설명이며 `REVIEWED_*` 자리에 실제 검증값을 입력해야 한다. 역할마다 파일이 다르다. 배열이 비어 있으면 이미 설치된 패키지·이미지를 사용하며 역할별 버전 검증은 그대로 실행한다.
 
@@ -129,11 +104,11 @@ SOC 연결의 설치 코드는 포함하되, 이 변경의 새 VM 설치 시험�
 관리자 차단 예외는 별도 선택 항목 `ADMIN_PROTECTED_CIDRS`다. 대화형 초기 설정에서 다음처럼 묻고, 값이 없으면 Enter로 넘어간다. 설정 파일에 빈 `ADMIN_PROTECTED_CIDRS=`를 적거나 batch 모드에서 생략해도 추가 예외 없이 진행한다.
 
 ```text
-차단 예외 관리자 IPv4 또는 CIDR 대역 (쉼표 구분, 없으면 Enter): 192.168.10.25,192.168.15.0/24
-관리자 IP 차단 예외: 192.168.10.25/32,192.168.15.0/24
+차단 예외 관리자 IPv4 또는 CIDR 대역 (쉼표 구분, 없으면 Enter): 192.168.10.25
+관리자 IP 차단 예외: 192.168.10.25/32
 ```
 
-단일 IP는 `/32`로, 호스트 비트가 있는 대역은 실제 네트워크 주소로 정리하고 중복·포함 범위를 합친다. 값은 서버 프로필과 nft `never_block`에 저장하고, LLM 임시 차단·관리자 승인형 IP 차단의 실행 전에도 검사한다. 관리자 대역의 탐지·원본 로그 수집은 계속 수행한다. 이 항목은 HTTPS 접속 허용망 `LAB_ALLOWED_CIDRS`나 WAF 요청 검사 예외 세션과 별개다.
+단일 IP는 `/32`로, 호스트 비트가 있는 대역은 실제 네트워크 주소로 정리하고 중복·포함 범위를 합친다. 값은 서버 프로필과 nft `never_block`에 저장하고, LLM 임시 차단·관리자 승인형 IP 차단의 실행 전에도 검사한다. 관리자 대역의 탐지·원본 로그 수집은 계속 수행한다. 이 항목은 HTTPS 접속 허용망 `LAB_ALLOWED_CIDRS`와 별개이며 WAF 요청 검사를 면제하지 않는다.
 
 운영망 FORWARD/NAT/VPN/DNS 자체, 공개 인증서 발급·채팅 HTTPS, 기존 SOC의 수동 이력·기존 승인 DB, A→B 이전 로그 전송, 긴 장애 구간의 무손실 회수·일반 백업·실제 공격 E2E는 별도 범위다. Suricata는 수동 탐지 모드를 유지하고 제한된 별도 nft 대응 경로를 사용한다. LLM에 일반 sudo/Docker·패키지 설치 권한을 부여하지 않는다.
 

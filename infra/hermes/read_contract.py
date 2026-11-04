@@ -102,10 +102,47 @@ def wants_write(text):
         r'|(?:추가|삭제|수정|변경|원복|복구|재시작|설치|배포|차단|해제|승인|거부|적용)(?:해|하(?:고|라|세요|는|여|자)|해줘|해주|해줄)', text))
 
 
+def connection_states(text):
+    """Manager connection states, never service health or enabled/disabled.
+
+    Wazuh's agent-life-cycle distinguishes disconnected, pending and never
+    connected. Unknown Korean state filters stay on the general agent path.
+    """
+    patterns = {
+        'active': r'(?<![가-힣])활성(?:화)?(?:된|인)?(?=\s*(?:Wazuh|에이전트|agent|상태|목록|만|제외|말고|아닌)|$)|연결(?:되어\s*있는|된)(?!\s*적)',
+        'disconnected': r'(?:연결|접속)(?:이|가)?\s*끊(?:긴|어진|겨\s*있는)',
+        'pending': r'(?:인증|연결)\s*대기(?:\s*중)?',
+        'never_connected': r'never\s+connected|한\s*번도\s*(?:연결|접속)(?:이|을|한\s*적(?:이)?|된\s*적(?:이)?)?\s*(?:없(?:는|던)?|안\s*된|되지\s*않은|못한)',
+    }
+    matches = [(m.start(), m.end(), state) for state in STATES
+               for m in re.finditer(r'(?<![a-z_])'+state+r'(?![a-z_])', text, re.I)]
+    matches += [(m.start(), m.end(), state) for state, pattern in patterns.items()
+                for m in re.finditer(pattern, text, re.I)]
+    matches = [m for m in matches if not any(a <= m[0] and b >= m[1] and b-a > m[1]-m[0]
+                                           for a,b,_ in matches)]
+    positive, excluded = set(), set()
+    residual = text
+    for start,end,state in sorted(matches, reverse=True):
+        before, after = text[:start], text[end:]
+        negative = (re.search(r'(?<![a-z])not\s*$', before, re.I)
+                    or re.match(r'[\s`\'\"]*(?:(?:인|상태(?:는|인)?|만)\s*)?(?:제외|말고|빼고|아닌|아니고)', after))
+        (excluded if negative else positive).add(state)
+        residual = residual[:start]+' '*(end-start)+residual[end:]
+    if re.search(r'비활성|오프라인|\b(?:offline|inactive|not\s+connected)\b|미접속|미연결|대기|(?:연결|접속)(?:이|가)?\s*(?:안\s*된|안\s*되는|되지\s*않|없)', residual, re.I):
+        return None
+    selected = (positive if positive else set(STATES) if excluded else set())-excluded
+    if excluded and not selected:
+        return None  # An empty/contradictory filter must not become all states.
+    return [state for state in STATES if state in selected]
+
+
 def _single_plan(question, aware_time):
     text = scope_text(without_prohibitions(question))
     if wants_write(text) or re.search(r'도구\s*없이|조회(?:는|하지)\s*말|설명만|번역|라는\s*문장', text):
         return None
+    if (re.search(r'WAF|ModSecurity',text,re.I) and re.search(r'모드|engine\s*mode',text,re.I)
+            and not re.search(r'과거|어제|이전|왜|원인|분석|사건|경보|로그|규칙|룰|IDS|Suricata|Wazuh',text,re.I)):
+        return {'kind':'waf_mode','target':'a:waf','current':True,'question':question}
     block = block_list_plan(text)
     if block:
         return block
@@ -145,10 +182,11 @@ def _single_plan(question, aware_time):
     for pattern, name in FEATURES:
         if re.search(pattern, text, re.I):
             features.append(name)
-    states = [s for s in STATES if re.search(r'(?<![a-z_])' + s + r'(?![a-z_])', text, re.I)]
-    if re.search(r'(?<![가-힣])활성(?:화)?(?:된|인)?\s*(?:Wazuh\s*)?(?:에이전트|agent)|(?:에이전트|agent).{0,20}활성\s*(?:상태|목록)', text, re.I):
-        if 'active' not in states:
-            states.append('active')
+    states = connection_states(text)
+    if states is None:
+        return None
+    if states and re.search(r'과거|어제|지난|최근|당시|이력|끊겼던|원인|분석|침해|위험|왜', text):
+        return None
     if not features:
         identity = identity_plan(text, states)
         if identity:
@@ -175,6 +213,8 @@ def _single_plan(question, aware_time):
 
 def identity_plan(text, states):
     """Current identity/state only; never reinterpret a diagnosis or a change."""
+    if re.search(r'과거|어제|지난|당시|이력|끊겼던', text):
+        return None
     if re.search(r'비활성|원인|분석|위험|침해|왜|설명|정책|설정|룰|규칙|로그|경보|보안', text, re.I):
         # A server alias itself may contain 보안; remove that alias for this test.
         residual = text
@@ -189,9 +229,10 @@ def identity_plan(text, states):
     literal = re.search(r'이름(?:이|은|으로)?\s*[`\'\"]?([A-Za-z][A-Za-z0-9_.-]*)', text)
     if not mentions and literal and re.search(r'장비|에이전트|서버', text[literal.end():literal.end()+20]):
         mentions.append((literal.start(), literal.end(), literal[1], None))
-    if not mentions and (states or not re.search(r'Wazuh|에이전트|\bagents?\b', text, re.I)):
+    if not mentions and not re.search(r'Wazuh|에이전트|\bagents?\b', text, re.I):
         return None
-    if not re.search(r'(?<![a-z])ID(?![a-z])|식별|연결|상태|등록|목록|리스트|status|identity', text, re.I):
+    if not (re.search(r'(?<![a-z])ID(?![a-z])|식별|연결|상태|등록|목록|리스트|status|identity', text, re.I)
+            or states and re.search(r'보여|조회|확인|몇\s*개|개수', text)):
         return None
     subjects = []
     previous_end = 0
@@ -279,11 +320,17 @@ def identity_report(p, calls, evidence):
             if len(matched) == 1: displayed.extend(matched)
             else: rows += ['실제 반환에서 일치하는 대상을 유일하게 식별하지 못했습니다. 후보 ' + str(len(matched)) + '개; 상태 미확인.']
     else: displayed = all_rows
-    rows += table(['ID', '이름', '주소', '상태', '마지막 연결 KST'], [(a['id'], a['name'], a['ip'], a['status'],
-        '특수값: 실제 연결 시각 미확인' if (a['last_keepalive'] or '').startswith('9999-') else evidence.kst_time(a['last_keepalive'])) for a in displayed])
+    if displayed:
+        rows += table(['ID', '이름', '주소', '상태', '마지막 연결 KST'], [(a['id'], a['name'], a['ip'], a['status'],
+            '특수값: 실제 연결 시각 미확인' if (a['last_keepalive'] or '').startswith('9999-') else evidence.kst_time(a['last_keepalive'])) for a in displayed])
+    elif not pending:
+        rows += ['요청 상태에 일치하는 반환 레코드가 없습니다.']
     rows += ['표시한 반환 레코드: ' + str(len(displayed)) + '개. 이름/ID로 대조했으며 IP만으로 호스트를 추정하지 않았습니다.']
     queried = [state for state in p['states'] or STATES if identity_call(p, calls, state)]
     rows += ['확인한 상태 범위: ' + (', '.join(queried) or '없음') + '. 반환 목록/페이지 밖과 모든 보안 기능의 정상 여부는 미확인입니다.']
+    other_unqueried = [state for state in STATES if not identity_call(p,calls,state)]
+    if p['states'] and other_unqueried:
+        rows += ['다른 상태는 별도 확인하지 않았습니다: '+', '.join(other_unqueried)+'.']
     if pending: rows += ['미확인: ' + '; '.join(pending)]
     rows += ['', '**조치 및 다음 단계**', '조회만 수행했습니다. 보호된 변경은 실행하지 않았습니다.']
     return '\n'.join(rows)
@@ -551,6 +598,7 @@ def target_id(p, calls):
 
 
 def scope(p, calls=None):
+    if p['kind'] == 'waf_mode': return {'mcp__rule_a__get_service_action_target'}
     if p['kind'] == 'block_list': return {BLOCKS}
     if p['kind'] == 'agent_identity': return {AGENTS}
     if p['kind'] == 'multi':
@@ -657,6 +705,9 @@ def ambiguous_empty(p, calls, name, c):
 
 
 def missing(p, calls, evidence):
+    if p['kind'] == 'waf_mode':
+        d=operation_current(p,calls)
+        return [] if d and d['observation'].get('configured_engine_mode') in ('On','DetectionOnly') else ['a:waf: 현재 설정 모드 미확인']
     if p['kind'] == 'block_list':
         return [] if block_list_state(calls) is not None else ['list_blocks: 현재 동적 차단 목록 미확인']
     if p['kind'] == 'agent_identity': return identity_missing(p, calls)
@@ -708,6 +759,10 @@ def missing(p, calls, evidence):
 
 
 def guidance(p, calls=()):
+    if p['kind'] == 'waf_mode':
+        return ('현재 WAF 설정 모드 조회입니다. rule-a.get_service_action_target(target=a:waf)를 실제 선택하세요. '
+                'configured_engine_mode와 startup_engine_mode, helper 정책 요구를 구분하세요. '
+                '설정 파일의 관측은 worker 메모리 적재·요청 차단 증명이 아닙니다. 변경 도구를 사용하지 마세요.')
     if p['kind'] == 'block_list':
         return ('현재 동적 차단 IP 목록 요청입니다. resp.list_blocks를 실제로 선택해 조회하세요. '
                 'FW 전체 규칙이나 WAF/IDS 규칙으로 대체하지 마세요. 조회는 변경·차단·해제 승인이 아닙니다. '
@@ -834,6 +889,17 @@ def operation_report(p, calls, evidence):
 
 
 def report(p, calls, evidence):
+    if p['kind'] == 'waf_mode':
+        d=operation_current(p,calls)
+        if not d:
+            return '현재 WAF 설정 모드 조회가 미완료입니다. 실패·미확인을 DetectionOnly나 On으로 추정하지 않았습니다.'
+        o=d['observation'];mode=o.get('configured_engine_mode');startup=o.get('startup_engine_mode')
+        rows=['**WAF 설정 모드**','',*table(['구분','현재 조회 근거'],[
+            ('설정값',mode if mode in ('On','DetectionOnly') else '미확인'),
+            ('컨테이너 시작값',startup if startup in ('On','DetectionOnly') else '미확인'),
+            ('설정 출처','고정 후순위 사용자 설정' if o.get('engine_mode_source')=='fixed_late_custom_include' else '미확인')]),'',
+            '근거: rule-a.get_service_action_target(a:waf). 설정 관측이며 worker 메모리 적재·개별 요청의 실제 차단 여부는 별도 검증입니다. 변경은 수행하지 않았습니다.']
+        return '\n'.join(rows)
     if p['kind'] == 'block_list': return block_list_report(p, calls)
     if p['kind'] == 'operation': return operation_report(p,calls,evidence)
     if p['kind'] == 'agent_identity': return identity_report(p, calls, evidence)

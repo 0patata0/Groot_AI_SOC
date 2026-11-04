@@ -11,11 +11,7 @@
 - 부분 설치 실패의 pending/원본 config는 보존한다. 다른 agent 키를 삭제하거나 등록 파일을 비워 재시도하지 않는다. 실패 시 새 host agent만 중지되며 manager/다른 agent는 재시작하지 않는다.
 
 
-<!-- current-project-context:2026-10-24 -->
-> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
-> 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP6서버/고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.
-> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
-<!-- /current-project-context -->
+> **2026-11-04 기준:** [현황](../STATUS.md) · [구축 준비도](INSTALLER_READINESS.md) · [운영](OPERATIONS.md) · [공식 지침 대조](SECURITY_GUIDELINES.md). 신규3VM 실제 설치는 미실시다. 과거 문구는 [보존본](../archive/deployment-verify-troubleshoot-before-ncsc-20261104.md).
 
 이 문서는 [README](../README.md)의 단일 설치기로 **새 환경**을 구성한 뒤 사용하는 절차입니다. 경로와 성공 판정은 `deploy.sh`와 `deployment/roles/{security,siem,service}.sh`의 구현을 기준으로 작성했습니다. 기존 운영 서버의 이름·계정·경로와 혼용하지 않습니다. **새 Ubuntu VM 세 대에서의 실제 통합 구축 검증은 아직 수행하지 않았습니다.** 아래 명령은 운영자가 해당 환경에서 실행할 검증 절차이며, 이미 확인된 라이브 결과를 뜻하지 않습니다.
 
@@ -38,7 +34,7 @@ bash deploy.sh --verify --batch --config deployment/site.local.conf
 | `--apply`의 최종 성공 | 세 서버 반입물 검사→오프라인 패키지/이미지 설치→역할 사전검사→SIEM→공통 키/등록 자격 전달→service→security 및 아래 검증 | 외부 브라우저 접근, 공격 시나리오, LLM 답변의 정확성·지연 |
 | `--verify` | SIEM API/TLS·Indexer·Mattermost·읽기 MCP·Hermes, service schema9의 DB/콘솔/broker/gateway/sudo·Redis/Samba 터미널 서비스·agent, security schema2의 TLS/WAF/IDS·agent·nft 상태 | 신규 모델 요청, 채팅 메시지 전송, 실제 공격 탐지·운영 보존 정책 |
 
-SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출, Mattermost 봇 인증, 60초 이내 Hermes heartbeat를 확인합니다. `model_requests_sent: 0`, `chat_messages_sent: 0`, `write_approval_configured: false`는 초기 설치 범위에 맞는 결과입니다. service는 독립 DVWA/DB, 6항목 카탈로그·고정 웹이미지3개·터미널3개, 별도 rootless sudo와 agent를 검사합니다. security는 `waf_mode: DetectionOnly`(DVWA), `lab_waf_mode: enforce_or_signed_session_exempt`(실습), `suricata_mode: IDS`를 구분합니다. 자동 IP 차단·Vector 설치는 포함하지 않습니다.
+SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출, Mattermost 봇 인증, 60초 이내 Hermes heartbeat를 확인합니다. `model_requests_sent: 0`, `chat_messages_sent: 0`, `write_approval_configured: false`는 초기 설치 범위에 맞는 결과입니다. service는 독립 DVWA/DB, 6항목 카탈로그·고정 웹이미지3개·터미널3개, 별도 rootless sudo와 agent를 검사합니다. security의 DVWA/UI/API/실습 WAF 설정은 On이며 Suricata는 IDS 캡처입니다. base_role 검사와 SOC/Vector 확장 검증은 구분합니다. 오래된 lab_waf_mode 표시 문자열만으로 검사 면제를 추정하지 말고 실제 생성 설정과 별도 경로 검사를 확인합니다.
 
 `--check`는 패키지를 설치하지 않으므로 빈 서버에서 도구 누락으로 실패할 수 있습니다. `--apply`는 먼저 승인된 로컬 deb·이미지를 설치한 뒤 역할 검사를 합니다. 이때 역할 사전검사가 실패해도 앞서 설치한 OS 패키지는 자동 롤백되지 않습니다.
 
@@ -49,7 +45,7 @@ SIEM 검증은 MCP 두 개의 도구 목록과 `get_wazuh_agents` 읽기 호출,
 | Wazuh Dashboard | `https://192.0.2.20/` | 사용자 `admin`; SIEM의 `/opt/capstone-prereqs/siem.json` 중 `indexer_password` |
 | Mattermost | `http://192.0.2.20:8065/` | 같은 JSON의 `mattermost_admin_username` / `mattermost_admin_password` |
 | DVWA, 독립 WAF 경유 | `http://192.0.2.10:8080/dvwa/` | 사용자 `admin`; service의 `/opt/capstone/service/credentials/admin-password` |
-| Lab Console | `https://lab.example.org/log4shell/` | 무키 실습 가능. 선택 차단 예외 키는 Dashboard `admin` 암호와 같음 |
+| Lab Console | `https://lab.example.org/log4shell/` | 공개 열람은 웹 허용 정책. 제어는 관리자 CIDR+HMAC 인증 필요 |
 | Java 실습 | `https://lab.example.org/log4shell/labs/CVE-2021-44228/` | 콘솔에서 실행 후 같은 HTTPS 경로 사용. CSRF 세션은 앱이 별도로 관리 |
 | Hermes | 별도 웹 로그인 없음 | Mattermost의 `capstone` 팀 → `soc` 채널에서 봇 멘션 |
 
@@ -126,20 +122,13 @@ Mattermost 관리자 계정은 설치 중 생성됩니다. 최초 화면에서 �
 
 WAF 주소로 로그인하고 기본 보안 수준이 `impossible`인지 확인합니다. 설치기가 DB와 계정을 이미 초기화하므로 `Setup / Reset DB`를 다시 실행하지 않습니다. 일반 관리 컴퓨터에서 `http://192.0.2.30/`에 직접 접근하면 Apache ACL의 `403`이 기대값입니다. 실제 네트워크 방화벽이 먼저 제한하는 환경에서는 연결 자체가 제한될 수도 있습니다. 실습을 위해 보안 수준을 낮추는 것은 별도 실습 작업이며 초기 구축 확인에 필요하지 않습니다.
 
-### Lab Console·Java·선택 예외 키 첫 사용
+### Lab Console·Java·관리자 인증 첫 사용
 
-**허용된 내부망/VPN 클라이언트 브라우저**에서 `LAB_PUBLIC_ORIGIN/log4shell/`를 엽니다. 예시는 `https://lab.example.org/log4shell/`입니다. DNS/hosts는 security를 가리키고 인증서가 해당 이름과 일치해야 합니다. 옛 `LOG4SHELL_HOSTNAME`·HTTP 직접 Java 경로는 신규 설정이 아닙니다.
+웹 허용 범위의 클라이언트에서 `LAB_PUBLIC_ORIGIN/log4shell/`의 카탈로그·상태를 확인한다. DNS·인증서 이름이 일치해야 한다. 웹3개/터미널3개가 stopped/not_deployed인 것과 실제 앱 가동은 구분한다.
 
-1. 키 없이 카탈로그6개와 상태가 보이는지 확인합니다. 웹3개·터미널3개는 `not_deployed` 또는 `stopped`여도 설치 상태로 정상일 수 있습니다. 이미지 존재와 `deployment_allowed=true`를 확인합니다. sudo도 실습 환경 시작 → 환경 열기로 연결하며, 기존 UID1991 rootless 환경과 고정 컨테이너 UID1000을 사용합니다. sudo 터미널은 전체 사용자 중 한 연결만 허용하고 연결 종료·유휴/수명 만료 때 해당 sudo 컨테이너 전체를 중지합니다.
-2. Java 항목을 선택해 실행합니다. 이는 관리자 또는 사용자가 요청한 **실제 컨테이너 기동**입니다. `running`을 확인하고 화면의 같은 HTTPS 링크를 엽니다. 로컬 포트18081을 클라이언트 컴퓨터의 localhost로 오해하지 않으며 SSH 터널이 필수는 아닙니다.
-3. Java·Log4j API/core2.14.1 표시를 확인하고 `capstone-spring-verification` 같은 무해한 메시지 한 건을 기록합니다. HTTP200·요청 ID·시각을 확인하되 CSRF 값·쿠키를 작업 기록에 복사하지 않습니다. Apache 두 버전은 각각 CVE-2021-41773/42013의 같은 origin 링크와 버전·정상 공개 파일만 확인합니다.
-4. 필요한 경우 `차단 예외 키 (선택)`에 Wazuh Dashboard `admin` 암호를 직접 입력합니다. 브라우저 WebCrypto가 30초·1회용 challenge에 HMAC 서명하며, 키 원문이나 고정 키 해시를 서버에 보내지 않습니다. 검증 후 입력/참조를 비우지만 완전한 메모리 삭제를 보장하는 기능은 아닙니다.
-5. 예외 적용 후 `관리자 실습 · 탐지만 기록`, 만료 시각을 확인합니다. 별도 HttpOnly 쿠키는600초 유효하며 같은 브라우저 탭 사이에 공유됩니다. `예외 해제` 후 일반 모드로 돌아오는지 확인합니다. 키·proof·쿠키를 개발자 도구나 로그에서 복사하지 않습니다.
-6. DVWA를 기존 독립 주소로 다시 열어 로그인 페이지가 유지되는지 확인합니다. DVWA는 콘솔 카탈로그와 예외 세션 적용 대상이 아닙니다.
+실행·중지·터미널은 `MANAGEMENT_ALLOWED_CIDRS`에 속한 관리자 단말에서 HMAC challenge 인증을 마친 뒤 사용한다. 초기 설치는 Dashboard admin 암호를 관리자 키에 연계하며, 키·proof·쿠키는 기록하지 않는다. 세션 인증은 WAF 검사 면제가 아니고 UI/API/실습 경로 모두 WAF On을 유지한다. 일반 출발지의 제어 요청403은 정상 경계다.
 
-일반 모드는 정상 요청을 허용하고 보안 규칙에 걸릴 때 WAF에서 차단합니다. 콘솔 관리·인증 경로는 실습 WAF를 지나지 않고, 고정된 실제 실습3개 경로만 WAF를 통과합니다. 선택 예외는 해당 WAF 검사 정책만 바꾸며 Suricata·기존 L4/IP 차단·보호 주소·LLM 승인/TTL 정책을 해제하지 않습니다. 기존 IP 차단으로 접속이 끊긴 상태는 키 입력으로 복구할 수 없습니다.
-
-위 정상 요청은 앱 처리와 브라우저 연결의 근거입니다. 실제 취약점 공격·LDAP 콜백·Wazuh 상관/색인 E2E 성공을 의미하지 않습니다. WAF canary 차단/예외 시험과 보안 로그 수신 시험은 승인된 별도 검증으로 기록합니다. 신규 서버의 WAF raw 로그, Wazuh manager 수신, indexer 색인, Dashboard 표시도 각각 확인해야 합니다.
+관리자가 실제 기동한 경우에만 running·동일 origin 앱 응답/요청 ID를 확인한다. HTTP200은 취약점 공격·콜백·상관/색인 성공을 뜻하지 않는다. DVWA 직접 우회 제한, raw로그→Wazuh수신→색인→LLM판단→MCP/승인→결과를 별도 검증한다. [현재 실제 검증 범위](../infra/validation/web-e2e/README.md).
 
 ## 3. 서버별 읽기 검증
 
@@ -232,7 +221,7 @@ sudo grep -E '^SecRuleEngine[[:space:]]' /opt/capstone/security/config/GROOT_A_W
 sudo docker inspect --format '{{json .Config.Cmd}}' capstone-security-suricata
 ```
 
-security manifest/deployment는 `schema_version:2`, 완료 상태여야 합니다. `capstone-security-waf`는 healthy, `capstone-security-suricata`와 `capstone-security-lab-edge`는 running이어야 합니다. Suricata 이미지에는 Docker healthcheck가 없을 수 있으므로 표에 `healthy`가 없다는 이유만으로 실패로 보지 않습니다. 최상위 검증은 엔진 시작 로그·고정 이미지·마운트·agent 상태를 추가 확인합니다. 기본 DVWA WAF는 DetectionOnly이며, 별도 Lab Host/경로 정책은 일반 enforce 또는 유효한 서명 세션 exempt입니다. 기본 설정의 SecRuleEngine 한 줄만 보고 Lab 차단이 꺼졌다고 판단하지 않습니다. Suricata는 지정 NIC의 IDS 캡처와 `/rules/all.rules` 사용이 기준입니다. nft `capstone_portable`은 허용 테이블이며 차단 엔진이나 전체 방화벽 정책의 정상 판정을 대신하지 않습니다.
+security manifest/deployment는 `schema_version:2`, 완료 상태여야 합니다. `capstone-security-waf`는 healthy, `capstone-security-suricata`와 `capstone-security-lab-edge`는 running이어야 합니다. Suricata 이미지에는 Docker healthcheck가 없을 수 있으므로 표에 `healthy`가 없다는 이유만으로 실패로 보지 않습니다. 최상위 검증은 엔진 시작 로그·고정 이미지·마운트·agent 상태를 추가 확인합니다. DVWA·UI/API·고정 Lab 경로는 WAF On을 기준으로 합니다. 관리자 세션도 검사 면제가 아닙니다. 설정 관측과 실제 worker 적재/요청 차단 검증을 구분합니다. Suricata는 지정 NIC의 IDS 캡처와 `/rules/all.rules` 사용이 기준입니다. nft `capstone_portable`은 허용 테이블이며 차단 엔진이나 전체 방화벽 정책의 정상 판정을 대신하지 않습니다.
 
 security에서 service의 정상 웹 페이지에 접근해 실제 출발지/라우팅/ACL을 확인합니다.
 
@@ -261,7 +250,7 @@ curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS \
   "$LAB_PUBLIC_ORIGIN/log4shell/api/session" | jq '{mode,expires_at}'
 ```
 
-카탈로그6개와 새 클라이언트의 `mode:enforce`, `expires_at:null`이 정상 기준입니다. 유효한 예외 쿠키가 있는 브라우저는 exempt일 수 있으며 위 curl은 브라우저 쿠키를 공유하지 않습니다. security 자체의 `--verify` TLS probe는 Docker SNAT/클라이언트 ACL로200 또는403을 허용하고 `allowed_client_e2e_verified:false`를 출력합니다. 따라서 서버 검사 성공과 허용 클라이언트200을 별도 확인합니다.403을 없애려고 전체 CIDR 허용·프록시 신뢰 범위를 확대하지 않습니다.
+카탈로그6개와 새 클라이언트의 `mode:enforce`, `expires_at:null`이 정상 기준입니다. 관리자 인증 세션도 enforce를 유지하며 위 curl은 브라우저 쿠키를 공유하지 않습니다. security 자체의 `--verify` TLS probe는 Docker SNAT/클라이언트 ACL로200 또는403을 허용하고 `allowed_client_e2e_verified:false`를 출력합니다. 따라서 서버 검사 성공과 허용 클라이언트200을 별도 확인합니다.403을 없애려고 전체 CIDR 허용·프록시 신뢰 범위를 확대하지 않습니다.
 
 ## 4. 파일·로그·완료 기록 위치
 
@@ -316,7 +305,7 @@ curl --noproxy '*' --connect-timeout 5 --max-time 15 -fsS \
 | `lab_common_key_precondition_failed` / 공통 키 전달 실패 | SIEM admin 암호 입력 계약·SSH pipe·service 키 root0600·기존 다른 키 | 원문을 로그에 출력하지 않고 연결 정책/권한을 점검. 기존 키를 덮어써 암호 회전하지 않음 |
 | TLS/site preflight 실패 | origin/port·SAN·키 일치·유효기간·허용 CIDR·/29 충돌 | DNS·인증서·네트워크 계획 수정. 웹 공개를 의도한 경우에만 `LAB_ALLOWED_CIDRS=all` 지정. `-k`로 TLS 검사를 우회하지 않음 |
 | 콘솔404/502 또는 실습503 | HTTPS→edge→gateway→콘솔, 실습 실행 상태·고정 경로 | 관리 API와 실제 WAF 실습 경로를 분리 확인. Java를 DVWA Apache의 직접 JAR 프록시로 복원하지 않음 |
-| 예외 인증401/429 | 입력 키·30초 challenge 만료/재사용·발급 제한·HTTPS/WebCrypto·시각 | 새 challenge로 재입력 또는 제한 시간 후 재시도. raw키/Bearer/고정해시 프로토콜은 거절되는 것이 정상 |
+| 관리자 인증401/429 | 입력 키·30초 challenge 만료/재사용·발급 제한·HTTPS/WebCrypto·시각 | 새 challenge로 재입력 또는 제한 시간 후 재시도. raw키/Bearer/고정해시 프로토콜은 거절되는 것이 정상 |
 | `deployment_allowed:false` | `safety_error`, nft guard·network 계약 | 배포가 차단된 원인을 복구. 상태 조회·관리 중지는 별도 가능하며 LLM에 일반 Docker 권한 추가 금지 |
 | sudo `needs_setup` / `sudo_runtime_install_failed_private_evidence_preserved` | UID1991/subid 충돌, OS 전제, 고정 bundle, manifest phase, rootless/publisher receipt TTL | 부분 상태를 보존하고 전용 helper 근거로 복구. host sudo 변경·전역 userns/AppArmor 완화 금지 |
 | `prepared_image_validation` 실패 | [Hermes 이미지 준비](hermes-image.md)의 기반 이미지, MCP SDK, regex 버전·가드 해시 | Linux에서 이미지를 올바르게 준비하고 검증. 이 단계가 root 상태 생성 전 실패했는지도 확인 |

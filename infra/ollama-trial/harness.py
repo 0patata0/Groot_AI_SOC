@@ -1754,6 +1754,13 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     result = json.loads(json.dumps(schemas))
     selected = read_plan(question)
+    if selected and selected['kind'] == 'waf_mode':
+        alias='mcp__rule_a__get_service_action_target'
+        if alias not in result or READ.operation_current(selected,calls): return {}
+        schema=result[alias];schema['properties']['target']['enum']=['a:waf']
+        schema['required']=list(dict.fromkeys([*schema.get('required',[]),'target']))
+        schema['additionalProperties']=False
+        return {alias:schema}
     if selected and selected['kind'] == 'block_list':
         if any(c.get('server') == 'resp' and c.get('name') == 'list_blocks' for c in calls):
             return {}  # A failed/malformed latest read stays incomplete, never empty.

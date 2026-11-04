@@ -1,125 +1,20 @@
-# 초기 설치기의 Hermes 확장
+# 구축·운영 가이드
 
-11/3 조기 해제 재차단 보완은 기존 root `deploy.sh` SOC source bundle의 `incident_containment.py`·`soc_agent_block.py`·`soc_alert_watch.prompt`를 갱신한다. 확인된 해제+60초/자연 기한+60초와 종료 이후 새 공격 근거를 적용하고 WAF 사건에 Native IDS를 추가 요구하지 않는다. 운영에는 재시작 없는 SHA 대조 증분 반영이며 새 서버 전체 설치 시험과 구분한다. 추가 오프라인 바이너리·키·포트·MCP 권한은 없다. [원인·검증·복구](../infra/mcp/containment-reblock.md).
+2026-11-04 KST. 신규 설치의 사용자 진입점은 루트 `deploy.sh` 하나다. 운영 중인 A/B/C는 초기 설치기로 덮어쓰지 않는다. 현재 구축·운영의 전 항목 정합과 전체 새 서버 설치를 완료한 상태는 아니다.
 
-11/3 역할 배정1.1.0은 기존 루트 `deploy.sh`의 공동 채널 source 묶음(review_channel.py/review_channel_policy.py)과 Ollama·review 채널 안내에 반영한다. 추가 deb/wheel/이미지/포트/설정 키/권한은0이며 기존 SOUL·운영35B·endpoint를 유지한다. 운영은 idle/CAS 복구본을 둔 증분 적용이고 새 서버 전체 설치는 별도 미검증이다. [사용·설치·복구](../infra/hermes/agent-deployment.md).
+| 목적 | 기준 문서 |
+|---|---|
+| 현재 구현/실제 운영/미검증 | [STATUS](../STATUS.md) · [PLAN](../PLAN.md) |
+| 신규 환경 준비·단일 설치 흐름 | [bootstrap](bootstrap-guide.md) · [입력 설정](configuration-guide.md) |
+| 네트워크·SSH·관리 경로 | [준비](setup-network-ssh.md) · [현재 관리 정책](../infra/groot-a/management-access.md) |
+| 오프라인 패키지·이미지/무결성 | [반입 목록](setup-packages-artifacts.md) · [설치 준비도/공백](INSTALLER_READINESS.md) |
+| 설치 후 확인·문제 진단 | [검증](verify-troubleshoot.md) |
+| 일상 관제·승인·대응·복구·보고 | [운영 절차](OPERATIONS.md) · [LLM 관리 경계](SOC_MANAGEMENT.md) |
+| 공식 기준과의 부분 대조 | [NCSC 기본지침·국정원 AI/공급망 지침](SECURITY_GUIDELINES.md) |
+| 공통 출력·단순 조회 속도/근거 | [출력 스킬](../infra/hermes/skills/soc-output/SKILL.md) · [조회 지연](../infra/hermes/lookup-latency.md) · [읽기 정확성](../infra/hermes/read-accuracy.md) |
 
-11/3 공통 계약1.5.14는 기존 루트 `deploy.sh`의 Ollama source bundle과 SIEM Hermes 플러그인 복사 경로에 반영한다. canonical `infra/ollama-trial/harness.py`·`infra/hermes/chat_contract.py`가 두 봇에 배치된다. 운영은 SHA를 대조한4파일 증분 적용으로 검증했으며 새 서버 전체 설치는 미실시다. 추가 패키지·이미지·설정 키·MCP·공개 포트는 없다. [단문진단·스키마·근거 검사와 복구](../infra/hermes/diagnostic-harness.md).
+UI/API를 포함한 WAF 경로는 On을 기준으로 한다. 공개 열람 허용과 실행·중지·터미널 제어 권한을 구분하며, 제어에는 관리자 CIDR과 HMAC 인증이 모두 필요하다. 과거 차단 검사 면제 세션 설명은 현행 사용법이 아니다.
 
-11/2 WAF 원본 임시차단 보완은 기존 SOC source bundle에 `managed_waf_evidence.py`·공통 reader·운영자 전용 `configure_waf_evidence.py`와 최신 자동 조사 prompt를 포함한다. 추가 오프라인 바이너리·포트·키는 없다. 검증된 managed 원본·producer v2·전용 프록시와 root SHA manifest가 필요하며, 코드 설치만으로 이 전제까지 완료됐다고 표시하지 않는다. [구성·복구·새 서버 미검증 범위](../infra/mcp/waf-containment.md).
+단순 조회는 기본 Ollama 담당, 복합 사건/변경은 Hermes 우선이며 직접 태그를 존중한다. 모델·MCP·승인·서비스 동작과 실제 공격 E2E는 각각 검증한다. 새 서버 전체 설치는 사용자 조건으로 실행하지 않았다. 오프라인 전체 패키지·WAF 증거 초기등록·기관별 보존/복구 등 미완료는 준비도/현황에 남긴다.
 
-> **2026-10-31 카드 조사·진행 표시:** `deploy.sh`의 SIEM 설치 경로에 `progress.py`와 Mattermost 진행/cleanup 설정을 포함한다. security-events4읽기 도구와 SDK 기본32/parity41도구 계약을 동기화한다. 기존 패키지·포트·키를 사용하며, 운영 증분 반영과 새 서버 전체 설치 시험은 구분한다. [동작·복구](../infra/hermes/card-investigation-progress.md) · [현재 상태](../STATUS.md).
-
-
-## 2026-10-31 단문·systemd 호스트 작업 소스
-
-`deploy.sh`의 기존 진단/관리/Hermes/Ollama 설치 경로에 공통 단문 계약1.5.7·query1.17.0, 현재 failed 집계3대상, A Vector·A/B Wazuh host-agent 승인형 restart를 함께 반입한다. SOC renderer는 systemd 프로필을 컨테이너 ID 바인딩에서 제외하고 관리 gate/controller의 대상 목록을 동기화한다. SOUL·source pin·어댑터·context 소스도 함께 배치한다. 기존 키·계정·포트·deb/wheel/image 목록은 유지하며 **추가 오프라인 바이너리0**, 갱신 소스가 반입 대상이다. 운영은 root 백업 후 증분 적용이며 새3VM 전체 설치 시험은 미실시. [사용/복구/검증 구분](../infra/mcp/host-service-actions.md) · [현황](../STATUS.md).
-
-> **2026-10-31 사건 판단 정정:** 기존 `deploy.sh` 소스 경로로 query-completion1.15.7/chat-contract1.5.2와 두 봇 공통 하네스를 설치합니다. B 운영 파일과 오프라인 source cache를 동기화했으며 새 패키지·포트·설정 키는 없습니다. 운영 증분 반영과 새 서버 전체 설치 검증은 구분합니다. [동작·복구·검증](../infra/hermes/incident-judgment-repair.md).
-
-> **2026-10-29 FW 읽기:** root `deploy.sh`의 기존 SOC/두 봇 소스 경로에 전체 FW 조회를 포함했다. 응답 MCP 4도구 계약과 공통 38도구 허용 목록을 사용한다. 신규 설정 키·포트·패키지는 없다. [설치·오프라인·복구 범위](../infra/mcp/firewall-read.md) · [검증](../STATUS.md).
-
-> **2026-10-27 선택 추론 터널:** root `deploy.sh`에 `LLM_TUNNEL_CONFIG`를 추가했다. 기존 OpenSSH/Python/systemd로 B 전용 주소에서 외부 추론 서버의 loopback API에 연결하며 별도 모델·패키지 다운로드나 키 위임을 하지 않는다. [준비·권한·검증·복구](inference-transport.md)와 [실제 운영 상태](../STATUS.md)를 구분한다.
-
-> **2026-10-27 B 호스트 agent:** `deploy.sh`의 SIEM 역할도 검증된 미등록 Wazuh4.14.8-1 deb를 요구한다. manager 준비 후 `siem_host_agent.py`로 별도 host agent 등록·연결을 검증하고 초기 소스 프로필에 포함한다. 응답 서식은 정책 블록 안의 정확한5항목만 추출해 앞쪽 조회 범위 지침이 추가돼도 초기 설치가 실패하지 않는다. 기존 서버에는 초기 설치기를 재실행하지 않는다. 두 봇의 host/manager 구분과 공통38대상 진단을 함께 배포한다. [반입](setup-packages-artifacts.md#오프라인-b-호스트-패키지와-검증) · [검증](verify-troubleshoot.md#b-호스트-수집과-manager-컨테이너-구분).
-
-> **2026-10-27 Ollama 연결 수명:** `deploy.sh`의 기존 Ollama 설치/upgrade 소스 목록에 `infra/ollama-trial/read_pool.py`를 포함한다. 오프라인 반입은 기존 source archive만 갱신하며 deb/wheel/이미지 추가는 없다. `OLLAMA_TRIAL_CHAT_ENABLE=1`의 일반 채팅은 순수 읽기 연결을 최대300초 유휴 유지한다. SSH 설정·키 교체 시 gateway 재시작이 필요하다. 설치 계약/운영 증분 배포와 새3VM 전체설치 미실행 범위는 [STATUS](../STATUS.md)를 따른다.
-
-> **2026-10-27 공통 SSH MAC:** root `deploy.sh`의 security·siem·service 역할에5종 제외·정확한 구4종 정책 이행·충돌 거절·백업/원복·검증을 연결한다. 기존 OpenSSH/Python3/systemd를 사용하며 추가 패키지는 없다. 소스 archive에 `deployment/ssh_macs.py`와 세 역할을 함께 포함한다. 운영 적용은 별도 증분 경로이며 새3VM 전체 설치 검증과 구분한다. [정책·복구](setup-network-ssh.md#세-호스트-공통-ssh-mac-정책--2026-10-27) · [현재 검증 상태](../STATUS.md).
-
-> **10/26 조사 필드 반입:** security-events canonical 소스의 제한된 DNS/HTTP 조사 문맥을 기존 root deploy.sh SIEM 경로가 반입한다. 기존 서버는 해당1파일만 백업 후 증분 적용하며 재시작·새키·포트·deb/wheel/이미지 추가0이다. 기존 내부 MCP 배포기의 도구 목록 검사도 현행3개로 맞췄다. 새3VM 전체설치 검증과 [운영 증분/검증](../STATUS.md)은 구분한다.
-
-> **10/26 22:53 감사 전송 보완:** 기존 소스 반입의 관리 controller/run과 H/O 공통 grounding·핀을 함께 갱신한다. security-events 감사128KiB/사건 식별500건 상한 및 초과 거절, 운영자 사유 전달이 deploy.sh 기존 렌더링에 반영된다. 추가 패키지/이미지/포트0이며 운영 증분과 새3VM전체설치를 구분한다. [검증·Git](../STATUS.md).
-
-> **10/26 사건 종결 검증:** 기존 deploy.sh→SOC 관리 controller 렌더링 경로가 대상 서버별 읽기 도구·후속 변경 참조·SCA 개별 점검 제목과 센서 사건의 출처/출발지/시각/상관 규칙 ID 근거 검증을 함께 반영한다. SCA 특정 인자 오류의 실제 재조회 확인을 포함한 관리139/설치30 검사를 통과했고 운영은 root controller만 증분 교체했다. 추가 패키지·이미지·포트·키0이며 새3VM 전체 설치는 미실행이다. [STATUS](../STATUS.md).
-
-> **10/26 저장소 계측 소스:** 기존 소스 묶음의 `infra/automation/storage-retention/{monitor.sh,monitor-lib.sh,test-native.sh,README.md}`를 함께 갱신한다. lib SHA pin·256개 상한/실패 분류를 기존 고정 A/B 운영 설치에 증분 반영했다. 새 deb/wheel/이미지·포트·키 변경0이며 기존 오프라인 목록을 유지한다. 이 고정 호스트 모듈의 새 서버 bootstrap/전체 설치 검증은 미완료다. [설치 계약](../infra/automation/storage-retention/README.md) · [실측/잔여](../STATUS.md).
-
-> **10/26 사건 조회 소스:** 기존 반입 소스의 `infra/mcp/security-events-mcp.py`, 관리 controller/gate, query-completion 근거핀, Ollama 정책/설치기를 함께 반영한다. SCA는 기존 API 계정의 읽기 권한을 재사용하며 추가 deb/wheel/이미지는0이다. 기본 read-only 설치에도 resp 조회 연결을 포함해 실행부 계약(6서버/28읽기)에 맞춘다. 운영 증분과 새 서버 전체 설치 검증은 [STATUS](../STATUS.md)에서 구분한다.
-
-> **2026-10-26 독립 감시:** 루트 deploy.sh의 진단 연결 이후 A/B/C runtime 수집·A outbox/B 모델·수집 검사와 키 연결을 자동 구성한다. 별도 설치 진입점·패키지·이미지·포트는 추가하지 않는다. [구성·키·제한](../infra/mcp/monitoring.md) · [운영 검증](../STATUS.md).
-
-> **2026-10-25 새 질문 보완 소스1.10.0 / 계약1.3.0:** 장비별 요청 결합·복수 ID·제외/검색 조건·진단 지원 범위 검사는 루트 deploy.sh의 기존 SIEM/Ollama 소스 매핑으로 함께 배치한다. 운영 서버는 root 백업 후 증분 교체하고 실제 Mattermost WebSocket 인증 복귀를 확인했다. 새 deb/wheel/이미지/포트·설정 예제·키/권한 계약 변경은 없어 기존 오프라인 바이너리 목록을 유지하고 갱신 소스를 반입한다. 실제 새3VM 전체 설치는 미실행이다. [검사·운영 검증·한계](../STATUS.md).
-
-> **당시 기록 — 2026-10-25 반복 개선 소스1.9.2:** 루트 deploy.sh의 기존 SIEM/Ollama 설치 경로가 공통 read_contract·harness·계약1.2.2 및 Ollama chat 감사 저장 보완을 함께 배치한다. 기존 오프라인 manifest 바이너리를 유지하고 갱신 소스 전체를 반입한다. 추가 deb/wheel/이미지/포트0이며 설정 예제·키/권한 계약 변경도 없다. 운영은 백업 후 증분 upgrade로 반영했고 실제 새3VM 전체 설치는 미실행이다. [구현·검증 구분](../STATUS.md).
-
-> **2026-10-25 공통 채팅 소스:** 초기 SIEM 설치에 query 플러그인8파일(문맥/훅과 합계13)을 배치한다. Ollama도 같은 정책/근거 소스를 사용하며 읽기90초·보호720초 설정을 연계한다. 추가 패키지·이미지·포트는 없다. 기존 운영은 증분 반영만 수행했고 새3VM 전체 설치는 미검증이다. [전체 파일과 native 차이](../infra/hermes/chat-harness.md) · [현황](../STATUS.md).
-
-> **2026-10-25 봇 프로필:** 초기 Hermes 봇과 선택적 Ollama 봇 생성 시 [동봉 아이콘](bot-icons/sources.json)을 지정한다. `deploy.sh` 소스 archive에 PNG·출처/SHA·라이선스와 `bot_profiles.py`를 포함하므로 서버 외부 다운로드와 추가 패키지는 없다. 운영 기존 계정은 별도 최소 API 갱신으로 적용했으며 새3VM 전체 설치 시험과 구분한다.
-
-
-> **2026-10-25 Ollama 하네스·동등 권한 재시험 완료:** 같은 DGX qwen3.6:35b와 8서버·36도구(읽기27·보호9)로 실제 채팅을 비교했다. 새 스레드 룰/표 약10초·IDS14.9초·로그14.9초·25대상 진단50.1초, 검증된 같은 스레드 표 재정리0.063초였다. 조회 근거·KST·대상/범위 오류를 보완했으며 전체 진단 지연과 Hermes의 일부 조회 누락은 후속이다. 기존 정확 승인/TTL 경계와 Hermes 자동 관리 controller는 유지한다. 전체 자연어 정확도·보호 실행 E2E·새3VM 설치 완료를 뜻하지 않는다. [결과·한계·Git 상태](../STATUS.md).
-
-
-> **2026-10-25 설치 동기화:** 루트 `deploy.sh`의 기존 source bundle에 IDS 대상 제한·KST 저장용 플러그인/공용 gate/SOUL과 A/B 룰 MCP의 `time_display`, B 진단 MCP의 `calculate_time`을 포함한다. 진단 설치 probe는 SDK의 `is_error`/`isError` 차이를 처리하고 실제 두 도구·KST 날짜 경계·10분 계산을 검증한다. 추가 deb/wheel/이미지나 오프라인 반입 항목은 없으며 기존 목록을 유지한다. 운영은 별도 최소 교체로 반영했고 새 서버 전체 설치 시험은 미실행이다.
-
-> **2026-10-25 설치 계약:** deploy.sh는 Hermes `timezone: Asia/Seoul`, query-completion 1.6.0의3파일(공용 grounding 포함), 동일 관리 gate·KST 정책·승인 카드·정확한 진단 범위 오류를 반입한다. 현재 조회의 API 문맥 축소와 첫 읽기/간결한 상태 설명 안내를 포함하며 소스 변경은 기존 배포 해시 계약에 반영된다. 추가 패키지 없음. 운영 최소 변경과 새 서버 전체 설치 시험은 구분하며 [STATUS](../STATUS.md)를 따른다.
-
-> **2026-10-24 Memory/읽기 근거 보완:** 초기 deploy.sh가 사용하는 SOUL에 메모보다 현재 관측을 우선하는 원칙을 추가했고 동일 rule/service getter가 현재 명령·결합 파일의 검증 근거를 제공한다. 운영은 root 검토 Memory와 활성 참조만 최소 갱신했으며 신규 서버에 날짜가 고정된 운영 Memory를 심지 않는다. 추가 deb/이미지/포트0,865회귀 통과·새3VM 설치 미실행. 실제 자연어 재질문의 남은 오류/지연은 [STATUS](../STATUS.md)에 구분한다.
-
-> **2026-10-24 현행:** root deploy.sh는 독립 읽기 키·ruleview 계정과 rule-write-a/b를 자동 연결한다. 룰 조회/변경은 서로 다른 경로이며 기존 읽기 도구 이름을 유지한다. 전체 설치 후 논리 MCP8개/35도구다. 새로운 deb/이미지/포트는 없다.47 SOC 렌더/정책 검사와40 SIEM 검사를 통과했으며 새3VM 전체 설치 검증은 제외한다. [현황](../STATUS.md) · [권한 경계](../infra/mcp/README.md).
-
-<!-- current-project-context:2026-10-24 -->
-> **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
-> 사용자 진입점은 루트 deploy.sh 하나이고 service schema9·HTTP3/터미널3·MCP8논리 서버/고정 진단을 연결한다. 새3VM 전체 설치 시험은 사용자 제외 범위를 유지하며 기존 운영 서버를 초기 설치기로 덮어쓰지 않는다. 이번 운영 보완은 별도 최소 이관이다.
-> 아래 날짜·PID·시험 수치·완료 문구는 각 기록 당시의 범위로 보존한다. 이번에 전수 재시험한 결과가 아니다.
-<!-- /current-project-context -->
-
-단일 설치 스크립트와 오프라인 반입 준비는 [초기 설치 가이드](bootstrap-guide.md)를 따른다. `deploy.sh --apply`는 승인된 로컬 deb와 Docker save archive를 설치한다. 이미지·패키지를 인터넷에서 다운로드하거나 Mac에 도구를 설치하지 않는다. Hermes 이미지는 [이미지 준비 절차](hermes-image.md)에 따라 외부 Linux 준비 환경에서 먼저 만든다.
-
-2026-10-23부터 기본 SIEM의 읽기 MCP2개 구성 뒤에 승인 브로커·규칙 MCP2개·제한된 응답 MCP·LLM 관리 경로를 연결한다. 설치 검증은 모델 요청·시험 채팅을 발신하지 않지만 마지막에 활성화되는 관리 타이머는 실제 운영 사건을 조사하고 필요한 승인 요청을 수행한다. Vector 정제·보존·상관관측과 통합 SOC 대시보드 설치도 같은 진입점에 포함한다. 아래 조회 플러그인 설명과10/16 실측은 보존하며, 새 VM3대 설치 시험은 사용자 요청으로 제외한다.
-
-## 2026-10-24 일반 채팅 조회 보완
-
-조회 플러그인 소스는1.3.1이며, 첫 요청의 읽기 목록 제한·A/B 대상 enum 축소·일반 현재 룰/표의 해시 연결 집계·부분 조회의 한 번 보완·완전히 검증된 직전 조회의 표 재정리와 근거 시점 표시를 포함한다. 적용·검증 상태와 시간 표본은 [STATUS](../STATUS.md)를 따른다. 실제 도구/인자는 모델이 선택하고 승인형 쓰기·LLM 관리 역할은 유지한다. 아래1.1의 명시적 표 제외와 기본 추론 설명은 당시 기록이며 새 동작은 [플러그인 안내](../infra/hermes/query-completion/README.md)를 따른다.
-
-SIEM 설치기의 조회 플러그인2파일 매핑과 소스 SHA 프로필이 새 바이트를 자동 포함하고 기존6개와 API실행 단계1개를 더한7 native pin을 검사한다. 새 의존성/이미지/포트가 없어 패키지·오프라인 바이너리 추가는 없다. 인증서 pure fixture는 root chown을 실제 실행하는 대신 요구하는5개 `(0,1000)` 소유권 인자를 검사해 Mac에서도 실행된다. 새3VM 전체 설치 검증과 기존 운영 최소 반영은 구분한다.
-
-완전한 파일 집계/검증된 직전 표 재정리는 provider 없이 기존 native 정규화·저장으로 넘긴다. 이 로컬 표시의 단계 수를 실제 모델 호출 수로 세지 않으며, 이름/레벨·원인/분석·원문/변경은 기존 경로다. 현재 조회의 실제 도구 선택·승인 경계를 유지하고 API실행 함수/loop alias까지6alias를 등록·해제한다. 실제 표본/적용과 새VM 제외는 STATUS를 따른다.
-
-장애 조사는 첫 읽기 뒤 원래 승인형 변경안 준비 도구를 보존하며 단순 목록/표의 읽기 제한과 구분한다. 현재 query177+SIEM40 검사는217개이고 실제 새3VM 설치·승인형 변경 E2E를 대신하지 않는다.
-
-## 포함 파일과 권한
-
-SIEM 설치기는 기존 Mattermost 문맥 플러그인·공개 채널 동기화 훅 5개 파일에 [조회 응답 보완 플러그인](../infra/hermes/query-completion/__init__.py)의 `__init__.py`, `plugin.yaml`, `alignment.py`, `grounding.py`, `chat_harness.py`, `chat_contract.py`, `soc_policy.md`, `read_contract.py`를 더해 총13개 파일을 배치한다. `plugins.enabled`에는 `groot-mattermost-context`, `groot-query-completion`을 지정한다. 모든 파일은 신규 Hermes 서비스 계정 소유, 파일 `0600`·디렉터리 `0700`이며, 소스 SHA는 배포 프로필에 포함된다. 설치 후 소스가 달라지면 같은 설치의 재검증에서 프로필 불일치로 거절한다.
-
-기본 SIEM 단계의 도구는 Wazuh·security-events 읽기 MCP2개다. 이후 별도 SOC 확장 단계가 정확 후보 승인 도구와 운영 SOUL을 설치한다. 조회 플러그인 자체가 쓰기 권한이나 승인 우회 경로를 추가하지는 않는다.
-
-## 조회 응답 보완과 버전 검사
-
-새 플러그인은 Mattermost의 한국어 읽기 요청에서 현재 턴의 실제 도구 호출 없이 “조회 중” 같은 진행 약속으로 끝나는 답변을 제한적으로 처리한다. 명시적인 현재 커스텀·로컬 룰 조회에 대해서는 근거 없는 조회 완료·현재 적용 상태 주장도 좁게 검사한다. 이 추가 검사는 개념 설명, 과거 결과 요약, 제공한 내용 분석, 인용, 정직한 실패 안내와 질문을 구분한다. 여유 실행 횟수와 알려진 읽기 도구가 있으면 기존 Hermes 루프에 한 번 더 답변을 요청한다. `chat_completions`의 다음 요청 한 번에만 현재 노출된 읽기 도구 집합과 `tool_choice=required`를 제공하며, 도구·인자는 LLM이 선택한다. 재차 도구 호출 없이 끝나면 완료를 주장하더라도 현재 상태를 확인하지 못했다는 문구로 종료한다. 변경 요청과 승인·거부는 이 보완 대상이 아니다. 모든 표현의 감지, 응답 정확도, 조회 성공이나 일정 시간 내 완료를 보장하지 않는다.
-
-`1.1.0`에는 단순한 현재 커스텀·로컬 룰 목록·개수에 한해 파일 집계 표시를 보완하는 2단계를 구현했고 로컬 회귀와 native 집계 경로 검증을 마쳤다. 현재 턴의 실제 도구 호출 ID, 대상 파일 본문과 집계의 SHA-256이 일치하는 `rule_inventory`만 사용한다. native 외부 자료 포장은 호출 도구 이름과 고정 형식이 정확히 일치할 때만 한 겹 해석한다. 정의 수·고유 ID를 표시하고, 부분 실패는 0개로 채우지 않으며 엔진 적재·탐지·차단 성공을 주장하지 않는다. 분석·원문·변경·과거 자료, 서비스·상태·로그·경보가 섞인 요청과 명시적 표/JSON/CSV 출력 요청은 원래 모델 경로를 유지한다. 순수 집계에서 알려진 다른 읽기를 함께 했더라도 파일 집계 근거는 정확한 대상 읽기 결과에서만 받는다. 자세한 범위는 [플러그인 안내](../infra/hermes/query-completion/README.md)를 따른다. 기존 운영 서버에는 2026-10-16 21:00:20 KST 반영했고 21:02:22 KST 실제 프로세스 연결·등록 등 배포 후 검증이 통과했다. 이 반영을 새 VM 초기 설치 시험으로 해석하지 않는다.
-
-집계 표시에는 `rule_a/rule_b.get_rule_change_target`의 집계 결과가 필요하다. 기본 읽기 MCP2개 단계만으로는 이 집계 경로가 준비되지 않으며, SOC 확장의 규칙 MCP 구성이 끝나야 사용할 수 있다. LLM이 노출된 도구를 선택하는 구조와 승인 권한은 유지한다.
-
-`tool_choice=required`를 전달했다는 사실은 실행 보장이 아니다. 2026-10-16 확인한 [Ollama 공식 호환 문서](https://github.com/ollama/ollama/blob/main/docs/api/openai-compatibility.mdx)는 `tools`는 지원, `tool_choice`는 미지원으로 표시한다. 실제 읽기 도구 스키마 8개와 `required`를 전달해도 도구 호출 없이 `finish_reason=stop`으로 끝난 평가 사례가 있다. 따라서 재시도 뒤 실제 도구 호출을 확인하고 0회면 조회 미실행 안내로 끝내는 `FALLBACK` 검사가 최종 확인 단계다. [검증 근거](../infra/hermes/rule-query-execution-validation-20261016.json)에서 요청 옵션과 실제 실행 결과를 구분한다.
-
-추가 보완은 provider `custom`, 모델 `qwen3.6:35b`, API 주소 `http://211.170.162.111:11434/v1`가 모두 맞고 실제 요청의 모델도 일치하는 경로에 한정한다. 보완 재시도 요청 한 번에서만 최상위와 `extra_body`의 `think`, `reasoning_effort`, `reasoning`을 제거하여, 검증된 이 모델의 기본 thinking 동작을 사용한다. 현재 전역 reasoning 비활성 설정을 변경하지 않으며, 이후 요청은 기존 비활성 설정으로 돌아간다. 다른 모델·서버는 원래 설정을 따르고, 새 환경의 다른 주소로 예외가 자동 확대되지 않는다.
-
-앞서 시험한 `extra_body.think=true` 단독 추가는 유효한 활성화 방법이 아니었다. 해당 실제 요청에는 `reasoning_effort=none`이 남아 있었으며, [Ollama v0.40.4의 OpenAI 호환 변환 코드](https://github.com/ollama/ollama/blob/v0.40.4/openai/openai.go)는 `reasoning.effort`, 그다음 `reasoning_effort`로 추론 설정을 결정한다. 이전 실패 결과는 검증 JSON에 남기고 현재 동작 설명은 위의 한 요청 옵션 제거 방식으로 정정한다.
-
-이 선택의 근거인 같은 모델·문제 이력의 native thinking 활성 비교 평가에서는 49.444초 동안 실제 읽기 조회 3건과 최종 답변이 완료됐다. 다만 답변은 표를 사용했고 DetectionOnly 상태를 차단 상태처럼 설명하는 등 정확도 검사를 통과하지 못했다. 해당 결과는 조회 실행 성공과 답변 정확도 실패로 구분하며, 보완 요청 한 번에 모델 기본 thinking을 사용하는 최종 플러그인의 운영 배포 성공과도 구분한다. 추가 추론과 재시도 때문에 지연이 늘 수 있으며, 이 표본 시간은 응답 시간 보장이 아니다.
-
-이 구현은 공개 완료 훅이 아니라 검토한 Hermes 내부 함수의 실행 중 참조를 감싸므로 정확한 소스 버전에 고정한다. 설치기는 플러그인 원문의 `SOURCE_SHA256` 상수를 실행 없이 파싱하고 다음 6개 원본 파일의 SHA를 준비 이미지와 대조한다.
-
-- `agent/turn_final_response.py`
-- `agent/conversation_loop.py`
-- `agent/turn_context.py`
-- `agent/message_metadata.py`
-- `agent/turn_api_request.py`
-- `agent/chat_completion_helpers.py`
-
-SHA 값은 플러그인 한 곳에서 관리한다. `PluginContext.on_unload` 등 기존 native API도 검사하며, 누락·불일치 시 신규 서비스·계정·배포 상태를 만들기 전에 중단한다. 이미지 검사는 `apply` 초기에 네트워크·호스트 마운트 없는 읽기 전용 임시 컨테이너에서 수행한다. `check`는 소스 상수와 준비 자료의 정적 검사까지만 수행하며 이미지 실행 검사는 아직 남아 있음을 표시한다. 버전을 바꿀 때는 핀을 임의로 지우지 말고 내부 루프와 회귀 시험을 다시 검토한다.
-
-운영 중 해제는 `plugins.enabled`에서 해당 플러그인만 제외하고 idle 확인 후 같은 Hermes 컨테이너를 재시작하는 방식으로 수행한다. `on_unload`는 모듈 함수 참조를 원복하지만, 이미 agent 인스턴스에 예약된 1회 API 요청 builder까지 즉시 제거하지는 않는다. 그 참조는 다음 호출에서 해제되므로 hot unload만으로 즉시 완전 해제됐다고 판단하지 않는다. 이전 대화 DB는 복원하지 않는다.
-
-## 검증 범위
-
-로컬 회귀 시험은 `bash deployment/roles/siem-test.sh`로 실행한다. 파일 복사·권한·기존 도구 범위 보존, 7개 파일의 프로필 포함, 6개 소스 핀 각각의 누락·변조 거절, unload API 및 설치 전 검사 순서를 가짜 이미지·파일 응답으로 확인한다. 실제 Docker·서버·모델·Mattermost 호출은 없다.
-
-2단계 파일 집계와 응답 경계는 `python3 -B infra/mcp/test_rule_inventory.py`, `python3 -B infra/hermes/query-completion/test_inventory_render.py`로 별도 검사한다. 이 검사는 로컬 소스·가짜 native 저장 경로를 사용하며 운영 서버 변경이나 실제 모델·채팅 호출을 하지 않는다.
-
-현재 집계 렌더링 회귀 65개와 기존 조회 보완 85개가 통과했다. 별도 실제 native 모델 평가는 57.38초·API 3회·실제 읽기 3건으로 정확한 WAF 10/Suricata 14/Wazuh 19개와 ID 목록, 반환·저장 본문 일치를 확인했다. 잘못된 999개 답변을 공급한 합성 응답 시험도 12.046초·native 반복 2회·실제 읽기 3건으로 통과했다. 초기 두 시험의 보호 포장 미인식 실패는 검증 이력에 남긴다. 이 평가와 초기 설치기의 새 VM 구축·사용자 채팅 전달·운영 배포는 별도 범위다.
-
-새 VM에서 초기 설치를 실행한 시험은 아직 하지 않았다. 기본 SIEM 단계의 완료 검사는 컨테이너 실행과 읽기 MCP 연결을 확인하고, 후속 SOC 확장은 승인·대응을 포함한 MCP 5개의 도구 목록을 검사한다. 이것만으로 새 플러그인의 실제 등록과 대화 동작까지 입증하지는 않는다. 실제 배포에서는 `agent.log`의 `capstone.query_completion` 등록 기록과 `aliases_installed=True`를 기동 시각 이후 기록인지 대조해야 한다. 기존 서버 배포의 첫 검사는 Docker 로그만 조회해 실패했고, 실제 등록 INFO가 남는 `agent.log`를 확인해 통과했다. 등록 기록은 해당 프로세스에 보완 함수가 연결됐다는 근거이며, 실제 조회 완료·결과 정확도·채팅 전달까지 검증한 근거는 아니다.
+이전 날짜별 설치 확장 설명과 시험 수치는 [과거 기록](../archive/deployment-README-before-ncsc-20261104.md)에 보존한다. 과거 모델/API 주소·버전·권한·검사 면제·시험 성공 문구를 현재 환경에 그대로 적용하지 않는다.

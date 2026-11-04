@@ -15,6 +15,71 @@ def empty(state):
 
 
 class Identity(unittest.TestCase):
+    def test_short_waf_mode_requires_current_hash_bound_read(self):
+        import json,hashlib
+        q='지금 WAF 모드 뭐야?';p=H.read_plan(q)
+        self.assertEqual(p['kind'],'waf_mode');self.assertTrue(H.structured_read(q))
+        alias='mcp__rule_a__get_service_action_target'
+        selected=H.refine_read_schemas(q,{alias:{'type':'object','properties':{'target':{'type':'string'}}}},[])
+        self.assertEqual(selected[alias]['properties']['target']['enum'],['a:waf'])
+        self.assertTrue(H.missing_reads(q,[]));self.assertIn('미완료',H.read_report(q,[]))
+        o={'configured_engine_mode':'On','startup_engine_mode':'DetectionOnly','engine_mode_source':'fixed_late_custom_include'}
+        d={'target':'a:waf','observation':o,'base_state_sha256':hashlib.sha256(json.dumps(o,sort_keys=True,separators=(',',':'),ensure_ascii=True).encode()).hexdigest()}
+        c={'server':'rule-a','name':'get_service_action_target','arguments':{'target':'a:waf'},'result':json.dumps(d),'is_error':False}
+        c['result_sha256']=hashlib.sha256(c['result'].encode()).hexdigest()
+        self.assertEqual(H.missing_reads(q,[c]),[]);r=H.read_report(q,[c]);self.assertIn('| 설정값 | On |',r);self.assertIn('별도 검증',r)
+        d['observation']['configured_engine_mode']='DetectionOnly';c['result']=json.dumps(d);c['result_sha256']=hashlib.sha256(c['result'].encode()).hexdigest()
+        self.assertTrue(H.missing_reads(q,[c]))
+        for text in ('WAF 모드 변경해줘','어제 WAF 모드 뭐였지?','WAF 모드 왜 바뀌었어?','WAF 모드와 IDS 룰 보여줘'):
+            self.assertIsNone(H.read_plan(text))
+
+    def test_korean_manager_connection_states_preserve_scope_and_read_schema(self):
+        cases={'연결 끊긴 에이전트만 보여줘':['disconnected'],
+               '접속이 끊어진 에이전트 목록':['disconnected'],
+               '인증 대기 중 에이전트 목록':['pending'],
+               '한 번도 연결된 적 없는 에이전트 보여줘':['never_connected'],
+               '한번도 연결안된 에이전트 보여줘':['never_connected'],
+               '연결된 에이전트만 보여줘':['active'],
+               '활성 에이전트만 보여줘':['active'],
+               'active 말고 에이전트 목록':['disconnected','pending','never_connected'],
+               '연결 끊긴 에이전트와 인증 대기 중 에이전트 목록':['disconnected','pending']}
+        for q,states in cases.items():
+            with self.subTest(q=q):
+                plan=H.read_plan(q);self.assertEqual(plan['kind'],'agent_identity');self.assertEqual(plan['states'],states)
+                selected=H.refine_read_schemas(q,schemas(),[])
+                self.assertEqual(set(selected),{H.READ.AGENTS})
+                self.assertEqual(selected[H.READ.AGENTS]['properties']['status']['enum'],states)
+                self.assertFalse(selected[H.READ.AGENTS]['additionalProperties'])
+
+    def test_filtered_zero_is_observed_only_in_requested_connection_state(self):
+        q='연결 끊긴 에이전트만 보여줘'
+        self.assertTrue(H.missing_reads(q,[observed()]))
+        self.assertTrue(H.missing_reads(q,[]))
+        calls=[empty('disconnected')]
+        self.assertEqual(H.missing_reads(q,calls),[])
+        text=H.read_report(q,calls)
+        self.assertIn('레코드: 0개',text);self.assertIn('상태 범위: disconnected',text)
+        self.assertNotIn('| ID |',text);self.assertNotIn('ACTIVE',text)
+        bad=copy.deepcopy(calls[0]);bad['is_error']=True
+        self.assertTrue(H.missing_reads(q,[bad]))
+        self.assertIn('미완료',H.read_report(q,[bad]))
+
+    def test_filtered_rows_cannot_include_another_state_or_drop_error(self):
+        q='연결이 끊어진 에이전트 목록'
+        c=observed(state='disconnected')
+        self.assertEqual(H.missing_reads(q,[c,observed()]),[])
+        text=H.read_report(q,[c,observed()]);self.assertIn('DISCONNECTED',text);self.assertNotIn('| ACTIVE |',text)
+        wrong=observed();wrong['arguments']['status']='disconnected'
+        self.assertTrue(H.missing_reads(q,[wrong]))
+
+    def test_ambiguous_health_history_and_action_do_not_become_connection_filters(self):
+        for q in ('오프라인 에이전트 목록','inactive 에이전트 목록','미접속 에이전트 목록',
+                  '연결 안된 에이전트 목록','과거 연결 끊긴 에이전트 목록',
+                  'active 제외 disconnected 제외 pending 제외 never_connected 제외 에이전트 목록',
+                  '연결 끊긴 에이전트 원인 분석해줘','연결 끊긴 에이전트를 재시작해줘'):
+            with self.subTest(q=q):
+                self.assertIsNone(H.read_plan(q))
+
     def test_short_and_full_prompts_share_the_observed_target(self):
         for q in ['B 호스트 ID와 상태','B 호스트(Wazuh 에이전트)의 ID와 현재 연결 상태를 실제 조회하고 서로 검증해줘.',
                   '[socadmin] @hermes B 서버의 에이전트 연결 상태', 'SIEM 호스트 등록 ID 확인']:

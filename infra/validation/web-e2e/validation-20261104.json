@@ -166,7 +166,10 @@
     "new real report after display fix and manual source rollback"
   ],
   "publication": {
-    "state": "pending",
+    "state": "source_pushed_and_remote_verified; publication metadata preserved in follow-up docs commit",
+    "source_commit": "3cb201b298237308d589f7416901333bbbf086bd",
+    "remote_main": "3cb201b298237308d589f7416901333bbbf086bd",
+    "verified_at_kst": "2026-11-04T15:22:34.471221+09:00",
     "previous_unit_final_commit": "01c93f941842846e93c34c61af65fb19df11742f"
   }
 }

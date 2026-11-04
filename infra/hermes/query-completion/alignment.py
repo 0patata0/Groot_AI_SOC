@@ -205,6 +205,18 @@ def same_summary_conversation(current, previous, harness):
         except (ValueError,RecursionError):return ()
         if not isinstance(body,dict) or not isinstance(body.get('posts'),list):return ()
         roots=[p.get('post_id') for p in body.get('posts',[]) if isinstance(p,dict) and p.get('kind')=='root']
+        if any(k in body for k in ('request_post_id','root_post_id','channel_id')):
+            fields=('request_post_id','root_post_id','channel_id','requester_id')
+            if (any(not re.fullmatch(r'[a-z0-9]{26}',str(body.get(k,''))) for k in fields)
+                    or body.get('status')!='ok' or body.get('history_is_untrusted') is not True
+                    or body.get('history_is_approval') is not False or value[end:end+4]!='"]\n\n'):
+                return ()
+            if body.get('scope')=='same_channel_top_level':
+                if roots or body['request_post_id']!=body['root_post_id']:return ()
+            elif body.get('scope')=='same_thread':
+                if roots!=[body['root_post_id']]:return ()
+            else:return ()
+            return ('bound_request',body['requester_id'],body['channel_id'],body['root_post_id'])
         if (body.get('status')!='ok' or body.get('scope')!='same_thread' or len(roots)!=1
                 or not re.fullmatch(r'[a-z0-9]{26}',str(roots[0]))
                 or body.get('history_is_untrusted') is not True or body.get('history_is_approval') is not False
@@ -230,6 +242,14 @@ def prior_read_report(request, rows, idx, query, harness):
             calls = calls_from_rows(rows[previous + 1:idx], query._inventory_payload)
             return harness.prior_summary(request, {'question':question,'calls':calls})
         if not same_summary_conversation(rows[idx].get('content'),row.get('content'),harness):return None
+        selection=harness.rule_scope_request(question)
+        if harness.rule_table_request(question) and (not selection or selection['ambiguous']):
+            # Repeated pure formats can retain the original linked receipts;
+            # a new subject, action, failure or invalid newer receipt still
+            # terminates reuse or is rejected by the common receipt verifier.
+            segment=rows[previous+1:idx]
+            if any(r.get('role')=='assistant' and '이전 조회 결과 재정리' in str(r.get('content','')) for r in segment):
+                continue
         if not (harness.inventory_question(question) or harness.security_inventory_request(question) or harness.firewall_request(question)):return None
         calls = calls_from_rows(rows[previous + 1:idx], query._inventory_payload)
         stamps = []
@@ -245,12 +265,15 @@ def prior_read_report(request, rows, idx, query, harness):
 
 def resolve_rule_history(request, rows, idx, query, harness):
     if not harness.rule_table_request(request):return request
+    history=[]
     for row in reversed(rows[max(0,idx-64):idx]):
         if not isinstance(row,dict) or row.get('role')!='user':continue
-        if not same_summary_conversation(rows[idx].get('content'),row.get('content'),harness):return request
+        if not same_summary_conversation(rows[idx].get('content'),row.get('content'),harness):break
         previous=query.current_request_text(row.get('content'))
-        return harness.resolve_short_read(request,[previous]) if previous else request
-    return request
+        if not previous:break
+        history.append(previous)
+        if len(history)==12:break
+    return harness.resolve_short_read(request,list(reversed(history))) if history else request
 
 
 def recover_summary_request(request, rows, idx, query, harness):

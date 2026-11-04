@@ -294,7 +294,7 @@ class Gateway:
                     not p.get('delete_at') and not p.get('type') and
                     (p.get('create_at',0),p.get('id','')) < (post['create_at'],post['id'])],
                     key=lambda p:(p['create_at'],p['id']))
-                prior_questions = [scope_history[-1].get('message')] if scope_history else []
+                prior_questions = [p.get('message') for p in scope_history[-12:]]
                 with contextlib.redirect_stdout(sys.stderr):
                     report = await asyncio.wait_for(agent_run(self.runtime, {'question': question,
                         'current_question': current, 'read_scope_history': prior_questions,

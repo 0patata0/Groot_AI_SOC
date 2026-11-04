@@ -5,7 +5,7 @@ import hashlib
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.17'
+VERSION = 'soc-chat-contract:1.5.18'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -110,17 +110,26 @@ def normalize_query_text(text):
     return text
 
 
+FIREWALL_HOOK_ALIASES = {'input':'input','인풋':'input','output':'output','아웃풋':'output',
+    'forward':'forward','포워드':'forward','포워딩':'forward',
+    'prerouting':'prerouting','프리라우팅':'prerouting',
+    'postrouting':'postrouting','포스트라우팅':'postrouting',
+    'ingress':'ingress','인그레스':'ingress','egress':'egress','이그레스':'egress'}
+
+
+def bare_firewall_view(text):
+    """A terse view with no device still needs a subject or one clarification."""
+    return bool(re.fullmatch(r'\s*(?:'+'|'.join(FIREWALL_HOOK_ALIASES)+r')'
+        r'(?:\s*(?:만|룰|규칙|목록|조회|확인|보여줘|보여줄래|표로|출력))*[\s?？.!]*',text,re.I))
+
+
 def firewall_display_scope(text):
     """Explicit display scope only; never nft arguments, dispatch or approval.
 
     Hook requests include reachable chains. Exact named chains are separate
     from hook names; case is retained because nft identifiers are case-sensitive.
     """
-    aliases = {'input':'input','인풋':'input','output':'output','아웃풋':'output',
-               'forward':'forward','포워드':'forward','포워딩':'forward',
-               'prerouting':'prerouting','프리라우팅':'prerouting',
-               'postrouting':'postrouting','포스트라우팅':'postrouting',
-               'ingress':'ingress','인그레스':'ingress','egress':'egress','이그레스':'egress'}
+    aliases = FIREWALL_HOOK_ALIASES
     hooks, excluded, chains = [], [], []
     pattern = r'(?<![A-Za-z0-9_.-])(?:'+'|'.join(aliases)+r')(?![A-Za-z0-9_.-])'
     for match in re.finditer(pattern,text,re.I):
@@ -155,6 +164,7 @@ def rule_scope_request(text):
         return None
     text = normalize_query_text(text)
     if re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d',text):return None
+    if bare_firewall_view(text):text+=' 룰 조회'
     device_pattern = r'(?<![A-Za-z])(?:FW|WAF|IDS|Suricata|Wazuh|ModSecurity)(?![A-Za-z])'
     text = re.sub(device_pattern + r'\s*(?:은|는|을|를)?\s*(?:말고|제외(?:해|하고|하고는)?|빼고)', '', text, flags=re.I)
     devices = [label for pattern, label in ((r'(?<![A-Za-z])FW(?![A-Za-z])','FW'),

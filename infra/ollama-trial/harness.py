@@ -70,6 +70,12 @@ def resolve_short_read(question, prior_questions=()):
     previous = prior_questions[-1]
     if not isinstance(previous,str) or len(previous)>1800: return question
     if READ.wants_write(normalized(question)) or READ.wants_write(normalized(previous)):return question
+    # Fold only consecutive short read/format turns, never skip a new topic.
+    previous_scope=rule_scope_request(previous)
+    if len(prior_questions)>1 and (rule_table_request(previous) or
+            CONTRACT.bare_firewall_view(normalized(previous)) or
+            previous_scope and previous_scope['ambiguous']):
+        previous=resolve_short_read(previous,prior_questions[-12:-1])
     current = rule_scope_request(question)
     prior = rule_scope_request(previous)
     if not prior and not READ.wants_write(normalized(previous)):
@@ -128,8 +134,13 @@ def native_scope_history(user):
     posts=payload.get('posts')
     if not isinstance(posts,list) or len(posts)>26: return []
     own=[p for p in posts if isinstance(p,dict) and p.get('author_id')==payload['requester_id']]
-    if not own or own[-1].get('text_truncated') is not False: return []
-    return [own[-1].get('text')]
+    history=[]
+    for post in reversed(own):
+        text=post.get('text')
+        if post.get('text_truncated') is not False or not isinstance(text,str) or len(text)>1800:break
+        history.append(text)
+        if len(history)==12:break
+    return list(reversed(history))
 
 
 def rule_scope_request(question):
@@ -452,6 +463,7 @@ def firewall_report(question, calls):
         selected = display_pages[number - 1] if number <= len(display_pages) else []
         rows += ['', '**개별 규칙 표시 ' + str(number) + '/' + str(len(display_pages)) + '페이지 (전체 ' + str(len(rules)) + '개 조회, 이 페이지 ' + str(len(selected)) + '개 표시)**',
             '채팅 표시 페이지입니다. 이어 보기는 “'+cell(followup)+' N페이지”입니다. MCP 조회 누락과 구분합니다.',
+            '',
             '| family / table / chain | handle | 조건·동작 (nft JSON, counter 제외) |', '| --- | --- | --- |', *selected]
         if not selected: rows += ['요청한 표시 페이지에 규칙이 없습니다. 전체 규칙 0개라는 뜻은 아닙니다.']
         sets = [o for o in objects if 'set' in o or 'map' in o or 'element' in o]
@@ -1086,8 +1098,9 @@ def action_claim_violations(question, answer, calls):
         ('rule-write-a', 'temporarily_contain_ip'))]
     issues = set()
     rule_observation = (request_kind(question) == 'other'
-        and re.search(r'룰|규칙|\brules?\b', normalized(question), re.I)
-        and re.search(r'뭐|무엇|어떤|몇|현재|지금|조회|확인|보여|볼|봐|있어|있나|있니', normalized(question))
+        and (CONTRACT.bare_firewall_view(normalized(question)) or
+             re.search(r'룰|규칙|\brules?\b', normalized(question), re.I)
+             and re.search(r'뭐|무엇|어떤|몇|현재|지금|조회|확인|보여|볼|봐|있어|있나|있니', normalized(question)))
         and not re.search(r'개념|원리|예시|예제|번역|설명|정의|차이|방법', normalized(question)))
     rule_reads = bool((firewall_state(calls) or {}).get('verified_complete')) or any(
         c.get('server') in ('rule-a', 'rule-b') and

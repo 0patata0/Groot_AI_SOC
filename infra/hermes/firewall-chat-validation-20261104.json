@@ -1,0 +1,511 @@
+{
+  "schema": 1,
+  "observed_date_kst": "2026-11-04",
+  "contract": "soc-chat-contract:1.5.18",
+  "query_plugin": "1.19.13",
+  "context_plugin": "1.0.1",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "874381366d0b83f4709d2d8b0c0d7f8599a33a8e080e3ad899f3e69ded0ae328",
+    "infra/ollama-trial/harness.py": "da137df7602bba0881a34b08cb47a6c6211c04ecccbb8849d73a6197d98ad8fc",
+    "infra/ollama-trial/chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+    "infra/hermes/mattermost-context/__init__.py": "38babd919b270fad1e62a96a76ca6763f243ac940deef47c4de3208ffde766d9",
+    "infra/hermes/mattermost-context/plugin.yaml": "df42176306131aae1ba9998e22e3068421d6c412f208b3c0adfb5a9c37817268",
+    "infra/hermes/mattermost-context/test_context.py": "b803254e876db2a8b3252966c941158947d4675d71644a370783f05a8a63dd9a",
+    "infra/hermes/query-completion/__init__.py": "254e13a58f0b476a3aadfc4923f342d1fc6bc3b042c06c422abdd269ac47d7d0",
+    "infra/hermes/query-completion/alignment.py": "29799bf73f272bf78ab998a51b35270d6a32a2ca621451fa98bb9083acfced40",
+    "infra/hermes/query-completion/plugin.yaml": "a0b2d62575fad89f9775c2a6caf5ae388c2b712d3459c7124e6ff11b78888c92",
+    "infra/hermes/query-completion/test_firewall_scope.py": "0520374d7b971423382bc9ebc3f6440e1ab34cda18bd3cd24e8c066929f54cd0",
+    "infra/ollama-trial/test_firewall_scope.py": "625c66ca9e56cecc9b09df39b1231f906ffb2777f28b8236eea7d2b3cf36d94b",
+    "infra/ollama-trial/test_chat.py": "649fb9a41591ff85956b5026d51cac96e08b2a61e8e49e6f353521c907152b4b"
+  },
+  "live_failures_before": {
+    "Ollama_terse_output": {
+      "model_calls": 1,
+      "MCP_calls": 0,
+      "asserted_output_rules": 12,
+      "asserted_observed_at_was_not_from_tool": true
+    },
+    "Hermes_terse_output": {
+      "MCP_calls": 1,
+      "asserted_chains": 1,
+      "asserted_rules": 18,
+      "scope_not_grounded": true
+    },
+    "reference_scope": {
+      "inet_capstone_fw_output_rules": 14,
+      "all_OUTPUT_roots_and_references_chains": 5,
+      "all_OUTPUT_roots_and_references_rules": 19
+    },
+    "Hermes_reformat_unnecessary_read_calls": 1
+  },
+  "server_tests": {
+    "SDK_passed": 191,
+    "native_passed": 384,
+    "context_passed": 66,
+    "unique_total": 641,
+    "environment_skip": 0,
+    "formatting_revision_rechecked": [
+      "SDK191",
+      "native384"
+    ],
+    "repeat_runs_not_added_to_unique_total": true
+  },
+  "source_bundle_and_tool_contract_tests_passed": 2,
+  "actual_chat_cases": [
+    {
+      "case": "r2-hermes-bare",
+      "agent": "hermes",
+      "expected_behavior": "bare",
+      "read_calls": 0,
+      "SDK_model_calls": null,
+      "passed": true,
+      "channel_seconds": 0.236,
+      "posted_body_sha256": "cf67dcf51072ed13dbf13e3c9e493a42c77a739336596a2092c20fe9bed1a402"
+    },
+    {
+      "case": "r2-hermes-input",
+      "agent": "hermes",
+      "expected_behavior": "input",
+      "read_calls": 1,
+      "SDK_model_calls": null,
+      "passed": true,
+      "channel_seconds": 15.973,
+      "posted_body_sha256": "5572b15e239c45ecfb269c852e6bc48e4b935d2535033360eda2207eec409554"
+    },
+    {
+      "case": "r2-hermes-output",
+      "agent": "hermes",
+      "expected_behavior": "output",
+      "read_calls": 1,
+      "SDK_model_calls": null,
+      "passed": true,
+      "channel_seconds": 26.29,
+      "posted_body_sha256": "b4ac2eb1c545369ab5811c29fb573a52adb11a6fe1c9f8cbdbe110f99cd650bb"
+    },
+    {
+      "case": "r2-hermes-reset",
+      "agent": "hermes",
+      "expected_behavior": "reset",
+      "read_calls": 1,
+      "SDK_model_calls": null,
+      "passed": true,
+      "channel_seconds": 49.447,
+      "posted_body_sha256": "65422081ae4a30fa7fbe0f0f3338fb9dc791445b0da3f1bb1a0f4205e5fe0e52"
+    },
+    {
+      "case": "r2-hermes-table",
+      "agent": "hermes",
+      "expected_behavior": "table",
+      "read_calls": 0,
+      "SDK_model_calls": null,
+      "passed": true,
+      "channel_seconds": 0.223,
+      "posted_body_sha256": "64ad328a9f549a4d92a731753882426fc4b97da03b2039ae7e036b47f7a1fae9"
+    },
+    {
+      "case": "r2-ollama-bare",
+      "agent": "ollama",
+      "expected_behavior": "bare",
+      "read_calls": 0,
+      "SDK_model_calls": 0,
+      "passed": true,
+      "channel_seconds": 0.069,
+      "posted_body_sha256": "07418499b2831fd42139e28918168dfea9521d6d0dc76dfc83e8fbf49e3f5e4c"
+    },
+    {
+      "case": "r2-ollama-input",
+      "agent": "ollama",
+      "expected_behavior": "input",
+      "read_calls": 1,
+      "SDK_model_calls": 1,
+      "passed": true,
+      "channel_seconds": 7.036,
+      "posted_body_sha256": "b9c9d06a152f1eea02908e5678f7a62d1d831dd27aa60fe222684a290117a4c1"
+    },
+    {
+      "case": "r2-ollama-output",
+      "agent": "ollama",
+      "expected_behavior": "output",
+      "read_calls": 1,
+      "SDK_model_calls": 1,
+      "passed": true,
+      "channel_seconds": 6.054,
+      "posted_body_sha256": "26c72493e4bf48f7294e64976451f69085ff80bdc5fb5e16d463191cfa9e0b49"
+    },
+    {
+      "case": "r2-ollama-reset",
+      "agent": "ollama",
+      "expected_behavior": "reset",
+      "read_calls": 1,
+      "SDK_model_calls": 1,
+      "passed": true,
+      "channel_seconds": 7.349,
+      "posted_body_sha256": "715769aa70c6ee76a92a0d68e4d73f5c4f4ae5028572963c758c4a457a789d79"
+    },
+    {
+      "case": "r2-ollama-table",
+      "agent": "ollama",
+      "expected_behavior": "table",
+      "read_calls": 0,
+      "SDK_model_calls": 0,
+      "passed": true,
+      "channel_seconds": 0.074,
+      "posted_body_sha256": "b96d1c26bde971bac07776a3be46a90f535014c6bb01e35461d3e3edddc0d63c"
+    }
+  ],
+  "protected_calls_in_tests": 0,
+  "other_bot_responses_in_test_threads": 0,
+  "actual_progress_updates_observed_for_both": true,
+  "formatting": {
+    "parser_source": {
+      "source": "https://raw.githubusercontent.com/mattermost/marked/467bc9e99fc75d69424188dfbea7fe0409a9fc15/lib/marked.js",
+      "bytes": 36485,
+      "sha256": "7a7e73ca0aad7145c2c38ff4d02ae431c264221f6fa1771dfa662f125e60789c",
+      "use": "temporary syntax verification only; not browser UI or training data"
+    },
+    "existing_Node": "26.8.2",
+    "cases": [
+      {
+        "case": "r2-hermes-bare",
+        "tables": 0,
+        "unparsed_table_rows": 0,
+        "table_rows": []
+      },
+      {
+        "case": "r2-hermes-input",
+        "tables": 1,
+        "unparsed_table_rows": 16,
+        "table_rows": [
+          1
+        ]
+      },
+      {
+        "case": "r2-hermes-output",
+        "tables": 1,
+        "unparsed_table_rows": 18,
+        "table_rows": [
+          5
+        ]
+      },
+      {
+        "case": "r2-hermes-reset",
+        "tables": 1,
+        "unparsed_table_rows": 18,
+        "table_rows": [
+          30
+        ]
+      },
+      {
+        "case": "r2-hermes-table",
+        "tables": 1,
+        "unparsed_table_rows": 16,
+        "table_rows": [
+          1
+        ]
+      },
+      {
+        "case": "r2-ollama-bare",
+        "tables": 0,
+        "unparsed_table_rows": 0,
+        "table_rows": []
+      },
+      {
+        "case": "r2-ollama-input",
+        "tables": 1,
+        "unparsed_table_rows": 16,
+        "table_rows": [
+          1
+        ]
+      },
+      {
+        "case": "r2-ollama-output",
+        "tables": 1,
+        "unparsed_table_rows": 18,
+        "table_rows": [
+          5
+        ]
+      },
+      {
+        "case": "r2-ollama-reset",
+        "tables": 1,
+        "unparsed_table_rows": 18,
+        "table_rows": [
+          30
+        ]
+      },
+      {
+        "case": "r2-ollama-table",
+        "tables": 1,
+        "unparsed_table_rows": 16,
+        "table_rows": [
+          1
+        ]
+      },
+      {
+        "case": "r3-hermes-output",
+        "tables": 2,
+        "unparsed_table_rows": 2,
+        "table_rows": [
+          5,
+          14
+        ]
+      },
+      {
+        "case": "r3-ollama-output",
+        "tables": 2,
+        "unparsed_table_rows": 0,
+        "table_rows": [
+          5,
+          16
+        ]
+      }
+    ],
+    "SDK_correction_detail_rows_parsed": 16,
+    "Hermes_correction_detail_rows_parsed": 14,
+    "Hermes_correction_detail_rows_plain_text": 2,
+    "all_16_display_rows_preserved_in_post_bodies": true,
+    "full_OUTPUT_rule_count_in_tool": 19,
+    "native_MAX_POST_LENGTH": 4000,
+    "native_base_source_sha256": "502a8371735acfb016968d6df5bac3394b21d292f1b64b5a988df3dafeb7549f",
+    "browser_UI_verified": false,
+    "native_split_table_headers_remaining": true
+  },
+  "deployment": {
+    "first_applied_at_kst": "2026-11-04T13:33:22.475365+09:00",
+    "formatting_amendment_at_kst": "2026-11-04T13:41:35.834192+09:00",
+    "confirmed": {
+      "confirmed_at_kst": "2026-11-04T13:47:38.584713+09:00",
+      "contract": "soc-chat-contract:1.5.18",
+      "query": "1.19.13",
+      "context": "1.0.1",
+      "source_and_receipt_sha_match": true,
+      "protected_configurations_unchanged": true,
+      "health": {
+        "hermes": {
+          "websocket_connected": true,
+          "worker_alive": true,
+          "age_seconds": 9.57
+        },
+        "ollama": {
+          "websocket_connected": true,
+          "worker_alive": true,
+          "age_seconds": 1.57
+        }
+      },
+      "actual_chat_sequence_cases": 10,
+      "read_scope_and_clarification_cases_verified": true,
+      "known_remaining_native_chunk_table_rows": 2,
+      "browser_UI_verified": false,
+      "manual_rollback_exercised": false,
+      "rollback_timer_inactive": true,
+      "confirmed_recovery_noop": true
+    },
+    "targets": [
+      {
+        "path": "/opt/capstone-ollama-trial/harness.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-0",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-0",
+        "before": "af8e8c782718dd415b02d13107c0eee105fd053612cf30ea18bb9cb5ffe247ea",
+        "after": "da137df7602bba0881a34b08cb47a6c6211c04ecccbb8849d73a6197d98ad8fc",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416,
+        "accepted_after": [
+          "8688090e5fb1db2418ad3e87663b5373fa6a4ae09431a020bff4bdb6e8c72133",
+          "da137df7602bba0881a34b08cb47a6c6211c04ecccbb8849d73a6197d98ad8fc"
+        ]
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-1",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-1",
+        "before": "af8e8c782718dd415b02d13107c0eee105fd053612cf30ea18bb9cb5ffe247ea",
+        "after": "da137df7602bba0881a34b08cb47a6c6211c04ecccbb8849d73a6197d98ad8fc",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384,
+        "accepted_after": [
+          "8688090e5fb1db2418ad3e87663b5373fa6a4ae09431a020bff4bdb6e8c72133",
+          "da137df7602bba0881a34b08cb47a6c6211c04ecccbb8849d73a6197d98ad8fc"
+        ]
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/chat_contract.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-2",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-2",
+        "before": "1e50e0bd7fdf7394d62bf1fe9c5bfb2d2e945668a401541e2196db2ae43b3385",
+        "after": "874381366d0b83f4709d2d8b0c0d7f8599a33a8e080e3ad899f3e69ded0ae328",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-3",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-3",
+        "before": "1e50e0bd7fdf7394d62bf1fe9c5bfb2d2e945668a401541e2196db2ae43b3385",
+        "after": "874381366d0b83f4709d2d8b0c0d7f8599a33a8e080e3ad899f3e69ded0ae328",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/query_grounding.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-4",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-4",
+        "before": "a6e23bdcd50d36e34d9927c04db71415cfd62b58067982b0e0bf369c2561eea7",
+        "after": "254e13a58f0b476a3aadfc4923f342d1fc6bc3b042c06c422abdd269ac47d7d0",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-5",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-5",
+        "before": "a6e23bdcd50d36e34d9927c04db71415cfd62b58067982b0e0bf369c2561eea7",
+        "after": "254e13a58f0b476a3aadfc4923f342d1fc6bc3b042c06c422abdd269ac47d7d0",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/alignment.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-6",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-6",
+        "before": "e0721f2d628460ef4d7ebafe7def2bbb7079119868d27ddaa5f11a701acc130a",
+        "after": "29799bf73f272bf78ab998a51b35270d6a32a2ca621451fa98bb9083acfced40",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-7",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-7",
+        "before": "402c9ca0eef44ac0e2e96f2ca74703cca775362d8116b44191e6ce87a1f1c483",
+        "after": "a0b2d62575fad89f9775c2a6caf5ae388c2b712d3459c7124e6ff11b78888c92",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-mattermost-context/__init__.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-8",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-8",
+        "before": "a4f97fde2c312cd8d156170ff5e48e6c059fcbd63339b4045afb602e7764484c",
+        "after": "38babd919b270fad1e62a96a76ca6763f243ac940deef47c4de3208ffde766d9",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-mattermost-context/plugin.yaml",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-9",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-9",
+        "before": "5bfae95e71616d81f142c143d0350f64969e32a66ba20057e8e511a293233412",
+        "after": "df42176306131aae1ba9998e22e3068421d6c412f208b3c0adfb5a9c37817268",
+        "uid": 0,
+        "gid": 0,
+        "mode": 420
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/chat.py",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-10",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-10",
+        "before": "9059a2d51d698594b010f3663095e11d2a4dc6bfcd6cdb2ed1ab5b863b553cc4",
+        "after": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416
+      },
+      {
+        "path": "/etc/capstone-ollama-trial/receipt.json",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-11",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-11",
+        "before": "36b98a1213526af776d5d650978bf51cf3683a1f5975a21a22d9a14d774d519e",
+        "after": "1a6383a5fb27825590b3052f8bebedda1fb2fcc32db6b95f48503b92fadf00b6",
+        "uid": 0,
+        "gid": 0,
+        "mode": 384,
+        "accepted_after": [
+          "f7c8883ac797ff328e00f9cfdfd961be773dc3fdb01dd898d86ee1bd2711567c",
+          "1a6383a5fb27825590b3052f8bebedda1fb2fcc32db6b95f48503b92fadf00b6"
+        ]
+      },
+      {
+        "path": "/etc/capstone-ollama-trial/chat-receipt.json",
+        "backup": "/var/lib/capstone-fw-chat/20261104-r1/deployment/before-12",
+        "candidate": "/var/lib/capstone-fw-chat/20261104-r1/deployment/candidate-12",
+        "before": "d27821b826ef4f23f2f94d355d651bd1a88a69b14899bfa30a64abc3becdbd3f",
+        "after": "446448d61c52db37f2139e66a2e425158acc9fc13f1eef35338a12cde8879799",
+        "uid": 0,
+        "gid": 0,
+        "mode": 384
+      }
+    ],
+    "protected_configurations": 6,
+    "operator_recovery_directory": "/var/lib/capstone-fw-chat/20261104-r1/deployment",
+    "independent_recovery_minutes": 15,
+    "manual_recovery_exercised": false,
+    "queues_and_DB_restored_or_removed": false
+  },
+  "scope_limits": [
+    "Browser control initialization failed; parser/API observations are not browser UI proof.",
+    "Hermes table rows split across posts still need repeated headers; not marked complete.",
+    "No new install, model training/weights, firewall policy, or MCP approval/authority change.",
+    "No latency/agent superiority claim from single sequential chat cases.",
+    "Questions and responses are operational regression only, not SFT/training input."
+  ],
+  "cleanup": {
+    "server": {
+      "at_kst": "2026-11-04T13:56:44.800448+09:00",
+      "removed": [
+        {
+          "path": "/var/lib/capstone-fw-chat/20261104-r1/validation",
+          "files": 359,
+          "bytes": 5893835
+        },
+        {
+          "path": "/opt/hermes-data/.fw-chat-20261104-r1",
+          "files": 359,
+          "bytes": 5893835
+        },
+        {
+          "path": "owned test source/log files",
+          "files": 6,
+          "bytes": 8134
+        }
+      ],
+      "original_and_final_recovery_sources_preserved": true,
+      "actual_chat_posts_and_DB_preserved": true,
+      "downloaded_packages_on_server": 0,
+      "source_and_config_hashes_match": true
+    },
+    "Mac": {
+      "at_kst": "2026-11-04T13:58:31.491615+09:00",
+      "removed_files": 25,
+      "removed_bytes": 12444592,
+      "source_snapshot_files": 24,
+      "own_mux_shutdown": [
+        {
+          "name": "ctl-cps-b",
+          "exit": 0
+        },
+        {
+          "name": "ctl-cps-admin-direct",
+          "exit": 0
+        }
+      ],
+      "downloaded_marked_js_removed": true,
+      "downloaded_parser_bytes": 36485,
+      "parser_not_copied_to_snapshot": true,
+      "parent_absent": true,
+      "new_Mac_packages": 0,
+      "other_task_directories_preserved": true
+    }
+  },
+  "git_publication": {
+    "state": "pending"
+  }
+}

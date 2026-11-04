@@ -125,6 +125,10 @@ class ContextTests(unittest.IsolatedAsyncioTestCase):
         await PLUGIN.pre_gateway_dispatch(event=event, gateway=gateway)
         self.assertEqual(parsed(event)['status'], 'ok')
         self.assertEqual(parsed(event)['scope'], 'same_channel_top_level')
+        self.assertEqual(parsed(event)['requester_id'], U)
+        self.assertEqual(parsed(event)['request_post_id'], TRIGGER)
+        self.assertEqual(parsed(event)['root_post_id'], TRIGGER)
+        self.assertEqual(parsed(event)['channel_id'], C)
         self.assertEqual(event.source.thread_id, TRIGGER)
         self.assertEqual(event.reply_to_message_id, TRIGGER)
 

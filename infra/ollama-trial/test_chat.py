@@ -168,6 +168,17 @@ class DurableDelivery(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.job()['status'], 'done')
         self.assertEqual(self.posts[REPLY]['root_id'], POST)
 
+    async def test_same_human_thread_scope_history_keeps_multiple_short_turns(self):
+        root={**SOURCE,'id':'r'*26,'message':'FW input만 보여줘','create_at':110}
+        prior={**SOURCE,'id':'g'*26,'root_id':root['id'],'message':'각각 표로 보여줘','create_at':150}
+        other={**prior,'id':'h'*26,'user_id':'z'*26,'message':'WAF 룰'}
+        current={**SOURCE,'root_id':root['id'],'message':'output만'}
+        self.posts={POST:current,root['id']:root,prior['id']:prior,other['id']:other}
+        await self.gateway.accept(POST)
+        generate=AsyncMock(return_value={'status':'completed','final_response':'선택 조회','calls':[]})
+        with patch.object(chat,'agent_run',generate):await self.gateway.process(self.job())
+        self.assertEqual(generate.await_args.args[1]['read_scope_history'],['FW input만 보여줘','각각 표로 보여줘'])
+
     async def test_ambiguous_post_never_blindly_resends(self):
         await self.gateway.accept(POST)
         with self.gateway.db:

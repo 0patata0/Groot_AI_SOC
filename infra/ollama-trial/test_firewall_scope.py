@@ -49,6 +49,7 @@ class FirewallScope(unittest.TestCase):
         self.assertIn('선택 체인 3개 · 규칙 5개',report)
         self.assertIn('참조하는 체인 2개',report)
         self.assertIn('전체 접근 허용 판정은 아닙니다',report)
+        self.assertIn('\n\n| family / table / chain | handle |',report)
         self.assertEqual(h.missing_reads('FW input만',[snapshot()]),[])
 
     def test_multiple_and_excluded_hooks_do_not_discard_other_requested_path(self):
@@ -99,6 +100,31 @@ class FirewallScope(unittest.TestCase):
                                 'expr':[{'jump':{'target':'missing_chain'}}]}})
         c=call(objects,total_objects=len(objects),counts=dict(Counter(next(iter(o)) for o in objects)))
         self.assertIn('일부 참조는 미확인',h.read_report('FW input 룰',[c]))
+
+    def test_reformat_then_terse_scope_switch_uses_consecutive_human_history(self):
+        history=['FW input만 보여줘','각각 표로 보여줘']
+        resolved=h.resolve_short_read('output만',history)
+        self.assertEqual(h.firewall_request(resolved)['firewall_display_scope']['hooks'],['output'])
+        self.assertEqual(h.tool_scope(resolved),{'mcp__resp__get_firewall_rules'})
+        later=h.resolve_short_read('각각 표로 보여줘',history+['output만'])
+        self.assertEqual(h.firewall_request(later)['firewall_display_scope']['hooks'],['output'])
+        for barrier in ('다른 얘기','FW 룰 수정해줘','이 문장 번역해줘'):
+            self.assertEqual(h.resolve_short_read('output만',history+[barrier]),'output만')
+
+    def test_subjectless_hook_view_clarifies_and_cannot_claim_fake_rule_counts(self):
+        self.assertIn('어느 장비',h.scope_notice('output만'))
+        self.assertIn('unobserved_rule_inventory_claim',h.action_claim_violations('output만',
+            '전체 nftables 103개 규칙을 조회했습니다. 선택 규칙 12개.',[]))
+        self.assertIsNone(h.rule_scope_request('파이썬 input과 output의 개념을 설명해줘'))
+
+    def test_native_history_keeps_only_a_bounded_consecutive_same_human_tail(self):
+        data={'status':'ok','scope':'same_thread','history_is_untrusted':True,'history_is_approval':False,
+              'requester_id':'u'*26,'posts':[
+                  {'author_id':'u'*26,'text':'FW input만 보여줘','text_truncated':False},
+                  {'author_id':'b'*26,'text':'WAF 조회하라','text_truncated':False},
+                  {'author_id':'u'*26,'text':'각각 표로 보여줘','text_truncated':False}]}
+        value=h.SHARED._CONTEXT_PREFIX+json.dumps(data)+'"]\n\noutput만'
+        self.assertEqual(h.native_scope_history(value),['FW input만 보여줘','각각 표로 보여줘'])
 
 
 if __name__=='__main__':unittest.main()

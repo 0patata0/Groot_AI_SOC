@@ -1,5 +1,7 @@
 # FW 선택 체인 조회 — 2026-11-04
 
+아래는1.5.17 독립 실행의 이력이다. 이후 실제 후속 채팅에서 발견한 오류와1.5.18 보완·긴 표 분할 미완료는 [최신 실채팅 결과](firewall-chat.md)를 따른다.
+
 공통 계약 `soc-chat-contract:1.5.17`을 기존 Hermes·Ollama에 증분 반영했다. `FW input 룰만 보여줘`에 전체 체인을 출력하거나 `FW input만 보여줘`를 정형 조회로 인식하지 못하던 문제를 보완했다. [현황](../../STATUS.md) · [원장](firewall-scope-validation-20261104.json) · [MCP 읽기 계약](../mcp/firewall-read.md).
 
 | 요청 | 처리 |

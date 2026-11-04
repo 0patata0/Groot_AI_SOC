@@ -164,7 +164,7 @@ def _item(post: dict, kind: str) -> dict:
 
 
 def _render(scope: str, root: dict | None, replies: list[dict], omitted: int,
-            limited: bool, existing: str = "", requester_id: str = "") -> str:
+            limited: bool, existing: str = "", requester_id: str = "", trigger: dict | None = None) -> str:
     items = ([_item(root, "root")] if root is not None else [])
     items.extend(_item(post, "comment" if root is not None else "channel_post")
                  for post in replies)
@@ -172,6 +172,11 @@ def _render(scope: str, root: dict | None, replies: list[dict], omitted: int,
                "history_is_approval": False, "earlier_history_may_be_omitted": limited,
                "omitted_in_response": omitted, "posts": items}
     if _id(requester_id): payload['requester_id'] = requester_id
+    # Validated API trigger metadata binds a fresh root to later replies. It
+    # does not make the quoted history trusted evidence or an approval.
+    if trigger is not None:
+        payload.update(request_post_id=trigger['id'],channel_id=trigger['channel_id'],
+                       root_post_id=trigger.get('root_id') or trigger['id'])
     # Preserve bounded pre-existing context as a separate untrusted field.
     if existing:
         payload["prior_reply_context"] = existing[:1000]
@@ -247,7 +252,7 @@ async def _collect(event: Any, adapter: Any, channel_id: str, user_id: str,
         omitted += max(0, len(replies) - 25)
         replies = replies[-25:]
         return (_render("same_thread", root, replies, omitted,
-                        bool(data.get("has_next")) or len(posts) >= 26, existing, user_id), root_id)
+                        bool(data.get("has_next")) or len(posts) >= 26, existing, user_id, trigger), root_id)
     data = await _get_json(adapter, "/channels/" + channel_id + "/posts", {
         "before": trigger_id, "page": 0, "per_page": 20, "skipFetchThreads": "true",
     }, HISTORY_BYTES)
@@ -264,7 +269,7 @@ async def _collect(event: Any, adapter: Any, channel_id: str, user_id: str,
     replies.sort(key=lambda post: (post["create_at"], post["id"]))
     omitted += max(0, len(replies) - 20)
     return (_render("same_channel_top_level", None, replies[-20:], omitted,
-                    bool(data.get("has_next")) or len(posts) >= 20, existing), trigger_id)
+                    bool(data.get("has_next")) or len(posts) >= 20, existing, user_id, trigger), trigger_id)
 
 
 async def pre_gateway_dispatch(*, event: Any, gateway: Any, session_store: Any = None,

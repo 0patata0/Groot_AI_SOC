@@ -7,6 +7,7 @@ import unittest
 
 import alignment
 from test_completion import PLUGIN
+from test_completion import hydrated
 from test_security_inventory import rows
 
 path=Path(__file__).resolve().parents[2]/'ollama-trial/test_firewall_scope.py'
@@ -17,6 +18,25 @@ H=alignment.load_harness()
 
 
 class NativeFirewallScope(unittest.TestCase):
+    def bound(self,text,*,root='r'*26,actor='u'*26,channel='c'*26,request=None):
+        top=request is None
+        return hydrated(text,status='ok',scope='same_channel_top_level' if top else 'same_thread',
+            requester_id=actor,channel_id=channel,root_post_id=root,request_post_id=root if top else request,
+            posts=[] if top else [{'kind':'root','post_id':root,'author_id':actor,
+                                  'text':'FW input만 보여줘','text_truncated':False}])
+
+    def test_validated_new_root_identity_allows_its_own_first_reformat_only(self):
+        prior=self.bound('FW input만 보여줘');current=self.bound('각각 표로 보여줘',request='t'*26)
+        self.assertTrue(alignment.same_summary_conversation(current,prior,H))
+        messages=[{'role':'user','content':prior},*rows(fixtures.snapshot()),{'role':'user','content':current}]
+        resolved=alignment.resolve_rule_history('각각 표로 보여줘',messages,len(messages)-1,PLUGIN,H)
+        report=alignment.prior_read_report(resolved,messages,len(messages)-1,PLUGIN,H)
+        self.assertTrue(report.reused);self.assertIn('새 조회 없음',report)
+        for changed in (self.bound('표로',request='t'*26,root='s'*26),
+                        self.bound('표로',request='t'*26,actor='v'*26),
+                        self.bound('표로',request='t'*26,channel='d'*26)):
+            self.assertFalse(alignment.same_summary_conversation(changed,prior,H))
+
     def test_wrapped_native_and_sdk_selected_tables_are_identical(self):
         call=fixtures.snapshot();native=alignment.calls_from_rows(rows(call),PLUGIN._inventory_payload)
         for question in ('FW input만 보여줘','FW output 룰','FW mapped 체인 룰'):

@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-04 14:33 KST
+# 인프라 현황 — 2026-11-04 14:35 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](archive/STATUS-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/STATUS-20261104-before-fw-chat.md) · [FW 선택 전](archive/STATUS-20261104-before-fw-scope.md) · [룰 감사 전](archive/STATUS-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/STATUS-20261104-before-web-policy.md) · [과거 이력](archive/STATUS-history-20261101.md).
 
@@ -44,4 +44,4 @@ OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3�
 
 이번 B source12개·영수증2개와 원본 SHA/소유권·중간/최종 후보·복구는 `/var/lib/capstone-table-chunks/20261104-r1/deployment`에 보존한다.14:14 표 분할 반영·14:22 실제 페이지 결함 보완으로 기존 Hermes를 각각1회 재시작했고,14:26:57 실제10채팅/소스14·보호6 SHA·WS/worker를 확인한 뒤 독립15분 원복 타이머를 해제했다. 확정 recover no-op만 확인했으며 실제 수동 원복은 미실시다. DB/큐·원래 오답 게시글은 복원·삭제하지 않았다. 초기 설치기는 실행/수정하지 않았고 canonical 복사·오프라인 소스 목록만 맞췄다.
 
-이번 공개 소스·검증 문서는 Git 커밋·푸시 전이다. 이전 단위 최종 `7ceff2d812dcd11d80e6cc6eec5dd8fb7ace3225`의 원격main 일치는14:05:01에 확인했고 [직전 상태](archive/STATUS-20261104-before-table-chunks.md)에 보존했다. 이번 자체 Mac/서버 시험 작업본과 파서 다운로드는 제거·부재 확인했고 운영 복구본과 로컬 원문은 보존한다. 서버 원문 로그12개 SHA와 자체 helper snapshot도 로컬 전용으로 보존한다. 기존 peer6/NAT6와 topology5 stage는 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.
+이번 공개 소스·검증 문서20개는 `86c5ec5a3f2343529dd8eeff8cd79063a6682370`로 커밋·푸시하고 2026-11-04T14:34:51.894411+09:00 원격main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 보존한다. 이전 단위 최종 `7ceff2d812dcd11d80e6cc6eec5dd8fb7ace3225`의 원격main 일치는14:05:01에 확인했고 [직전 상태](archive/STATUS-20261104-before-table-chunks.md)에 보존했다. 이번 자체 Mac/서버 시험 작업본과 파서 다운로드는 제거·부재 확인했고 운영 복구본과 로컬 원문은 보존한다. 서버 원문 로그12개 SHA와 자체 helper snapshot도 로컬 전용으로 보존한다. 기존 peer6/NAT6와 topology5 stage는 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 계정 잔여1% 중지 조건은 유지하나 잔여율 조회 도구는 없다.

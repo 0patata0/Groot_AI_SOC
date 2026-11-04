@@ -1,0 +1,208 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-03",
+  "scope": "existing A management ingress and fresh installer source; not full SOC completion",
+  "applied_at_kst": "2026-11-03T23:13:55.344734+09:00",
+  "confirmed_at_kst": "2026-11-03T23:15:00.101835+09:00",
+  "last_live_checked_at_kst": "2026-11-03T23:17:46+09:00",
+  "admin": "192.168.16.231/32",
+  "mcp_internal": "10.200.10.10/32",
+  "deployment_route": "Mac -> Groot-mgmt -> A; B/C via A",
+  "server_sources": {
+    "firewall": {
+      "path": "/etc/nftables.d/capstone-fw.nft",
+      "before_sha256": "bfff08e3f13251177995292c21e7bf6d6cb749d45c0bfb22c68cc397e9d464af",
+      "after_sha256": "f820c798320979788a37f9574fd625ac34fa93971ea6893d226b4f70ad18c9cb"
+    },
+    "loader": {
+      "path": "/usr/local/sbin/capstone-nat.sh",
+      "before_sha256": "59598667ae43708a541260c72788aeec7322ecc54fa5e85ae59f9cc5dd0e52f6",
+      "after_sha256": "9e6063ca215c8c43a0bc9f514c91b6e9c18c4b58c9b8b7345e9bb17a70eda844"
+    },
+    "dnat": {
+      "path": "/etc/nftables.d/capstone-fwd.nft",
+      "before_sha256": "51ecf92084cd27fb85b4b62d3d41761200e0603250a54d68afcfadf0ce9918b0",
+      "after_sha256": "ebd54e6190425f918d02ff6e15a5b4fa372c203c4279ef3627bab0a2612d902c"
+    },
+    "proxy": {
+      "path": "/home/groot_a/capstone/chatproxy/nginx.conf",
+      "before_sha256": "1c5bac856fd78a5bb1071b2325fee19c6db15885b62f7ea936a5adff1b185e2c",
+      "after_sha256": "071c11b12850dc525418f0a7cf54c4b99fc62042c5aceef43895423bde4c1bd9"
+    }
+  },
+  "native_isolated": {
+    "status": "passed",
+    "namespace": "disconnected-unshare-net",
+    "cases": [
+      {
+        "case": "admin-ssh",
+        "counter": "test-pass",
+        "pass": true
+      },
+      {
+        "case": "campus-ssh",
+        "counter": "capstone-management-ext4",
+        "pass": true
+      },
+      {
+        "case": "old-vpn-ssh",
+        "counter": "capstone-management-ext4",
+        "pass": true
+      },
+      {
+        "case": "kali-ssh",
+        "counter": "capstone-management-ext4",
+        "pass": true
+      },
+      {
+        "case": "admin-dnat",
+        "counter": "test-pass",
+        "pass": true
+      },
+      {
+        "case": "kali-dnat",
+        "counter": "capstone-management-ext4",
+        "pass": true
+      },
+      {
+        "case": "mcp-ssh",
+        "counter": "test-pass",
+        "pass": true
+      },
+      {
+        "case": "service-ssh",
+        "counter": "capstone-management-int4",
+        "pass": true
+      },
+      {
+        "case": "service-external-address",
+        "counter": "capstone-management-int4",
+        "pass": true
+      },
+      {
+        "case": "v6-external-ssh",
+        "counter": "capstone-management-ext6",
+        "pass": true
+      },
+      {
+        "case": "v6-external-dnat",
+        "counter": "capstone-management-ext6",
+        "pass": true
+      },
+      {
+        "case": "v6-internal-ssh",
+        "counter": "capstone-management-int6",
+        "pass": true
+      },
+      {
+        "case": "public-http",
+        "counter": "test-pass",
+        "pass": true
+      },
+      {
+        "case": "public-https",
+        "counter": "test-pass",
+        "pass": true
+      },
+      {
+        "case": "v6-public-https",
+        "counter": "test-pass",
+        "pass": true
+      },
+      {
+        "case": "transit-ssh-not-local",
+        "counter": "test-pass",
+        "pass": true
+      }
+    ],
+    "count": 16,
+    "incremental_apply_and_rollback": true,
+    "block_ttl_seconds": 119,
+    "fresh_security_native_syntax": true,
+    "production_packets": 0
+  },
+  "local_tests": {
+    "management_access": 7,
+    "host_security": 7,
+    "offline_security": 16,
+    "soc_management": 37,
+    "ollama_source_bundle": 1
+  },
+  "before_after": {
+    "kali232_wazuh_https": [
+      302,
+      403
+    ],
+    "C_to_A_ssh": [
+      "connected",
+      "denied_with_matching_guard_counter"
+    ],
+    "admin10443": [
+      "timeout",
+      "connected"
+    ],
+    "admin_wazuh_https": [
+      302,
+      302
+    ]
+  },
+  "public_from_kali232_after": {
+    "mattermost_ping": 200,
+    "dvwa": 302,
+    "log4shell": 200
+  },
+  "https": {
+    "public_domain_system_ca_verified": true,
+    "legacy_domain_pinned_public_certificate_verified": true,
+    "forged_forwarding_headers_from_kali_denied": true,
+    "10443_tcp_only_no_login_claim": true
+  },
+  "actual_mcp": {
+    "hermes_ssh_firewall": "complete",
+    "hermes_ssh_a_systemd": "ok",
+    "hermes_ssh_c_systemd": "ok",
+    "sdk_firewall_calls": 1,
+    "sdk_total_seconds": 7.621011712006293,
+    "channel_posts": 0,
+    "protected_writes": 0,
+    "sdk_answer_scope": "failed_to_limit_to_input_management_rules; returned full chain summary"
+  },
+  "recovery": {
+    "backup_directory": "/var/lib/capstone-management-access/c65d6ee3bd13d319",
+    "independent_timer_minutes": 15,
+    "timer_confirmed_inactive": true,
+    "confirmed_recovery_noop_tested": true,
+    "live_rollback_executed": false,
+    "isolated_inverse_transaction_tested": true,
+    "agent_block_reloaded": false,
+    "database_restored": false
+  },
+  "unchanged_operating_scope": [
+    "B/C runtime firewall sources",
+    "Docker-owned rules",
+    "WAF/IDS engines and rules",
+    "inference model",
+    "approval/containment TTL"
+  ],
+  "new_packages": 0,
+  "new_images": 0,
+  "limits": [
+    "fresh OS three-server installation not executed",
+    "B/C container-to-host management paths still require audit",
+    "administrator scan-noise exception not implemented",
+    "NAT table consolidation not deployed; deferred candidate must rebase loader hash/source",
+    "complex incident judgement and full independent model evaluation pending"
+  ],
+  "source_files": {
+    "deployment/management_access.py": "92ee3eb0fc5d83571d6ce6b8395542b899dddb02810562ec90d893905f93e832",
+    "deployment/validate_management_isolated.py": "57445945e769656d802f64809feb58ac7c635f58f9a1e32909ab9f712254a534",
+    "deployment/host_security.py": "f8d55cdd2a19ca3aefffbb31b073b9005dbf88f0a1cac5100f72422c140c12fd",
+    "deployment/remote.sh": "170bd3db97775b1cb4e25f8a89d94569c25fc6ba44de6dad60a308cb7eb3cad3",
+    "deployment/offline_security.py": "c82bc2d221884ab793dda620297b52bed11d62341c3a18560f45199809da155f",
+    "deployment/config.example.conf": "f1dae1cb729a8115c1106b8f85abb9991c7562a51365cac328068a8910bf3907",
+    "infra/groot-a/fw-v2/capstone-fw.nft": "f820c798320979788a37f9574fd625ac34fa93971ea6893d226b4f70ad18c9cb",
+    "infra/groot-a/chatproxy.nginx.conf": "b4391cbdef1251caab5cfcb4ef5a37c272c11369fea89d9d3e013facc9ec885a",
+    "deploy.sh": "1cc8f016382fb1372c5334e6e033d542ac3186fb1638edefef21ff1f6bdaae2b",
+    "infra/groot-a/fw-v2/capstone-nat.sh": "9e6063ca215c8c43a0bc9f514c91b6e9c18c4b58c9b8b7345e9bb17a70eda844"
+  }
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Additive host/management segmentation for the service and SIEM roles.
+"""Additive host/management segmentation for all three fresh-install roles.
 
 Only this module's table is replaced atomically. Docker, existing lab guards,
 operator SSH routes, and the security host's perimeter policy stay separately
@@ -30,7 +30,7 @@ def configuration(value):
     optional = {"management_cidrs", "dashboard_cidrs", "chat_cidrs", "dashboard_denied_cidrs"}
     if not isinstance(value, dict) or not required <= set(value) or set(value) - required - optional or value["schema"] != 1:
         raise ValueError("host_guard_config_fields")
-    if value["role"] not in ("siem", "service"):
+    if value["role"] not in ("security", "siem", "service"):
         raise ValueError("host_guard_role")
     hosts = [value[k] for k in ("security_host", "siem_host", "service_host")]
     if len(set(hosts)) != 3 or any(str(ipaddress.IPv4Address(x)) != x or
@@ -65,7 +65,15 @@ def rules(value):
               f'iifname "{nic}" ip protocol icmp limit rate 10/second accept']
     management = ([f'iifname "{nic}" ip saddr {{ {", ".join(c["management_cidrs"])} }} tcp dport {ssh} accept']
                   if c["management_cidrs"] else [])
-    if c["role"] == "siem":
+    if c["role"] == "security":
+        # All ingress interfaces are covered. Source checks come before generic
+        # established handling; a block-protection CIDR grants no SSH access.
+        sources = sorted(set(c['management_cidrs'] + [b + '/32']))
+        incoming = ['iifname "lo" accept',
+                    f'ip saddr {{ {", ".join(sources)} }} tcp dport {ssh} accept',
+                    f'tcp dport {ssh} drop']
+        forwarding = []
+    elif c["role"] == "siem":
         dashboard_denied = ([f'iifname "{nic}" ip saddr {{ {", ".join(c["dashboard_denied_cidrs"])} }} tcp dport 443 drop']
                             if c["dashboard_denied_cidrs"] else [])
         dashboard = ([f'iifname "{nic}" ip saddr {{ {", ".join(c["dashboard_cidrs"])} }} tcp dport 443 accept']
@@ -139,7 +147,8 @@ def authenticated_ssh_peer():
 
 def from_environment(role):
     a = str(ipaddress.IPv4Address(os.environ["SECURITY_HOST"]))
-    route = json.loads(run(["ip", "-j", "route", "get", a]))
+    route_target = os.environ['SIEM_HOST'] if role == 'security' else a
+    route = json.loads(run(["ip", "-j", "route", "get", route_target]))
     if len(route) != 1 or not route[0].get("dev"):
         raise ValueError("host_guard_management_route")
     networks = [x for x in os.environ.get("MANAGEMENT_ALLOWED_CIDRS", "").split(",") if x]
@@ -258,7 +267,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("print", "check", "install", "apply", "verify"))
     parser.add_argument("--configuration", type=Path)
-    parser.add_argument("--role", choices=("siem", "service"))
+    parser.add_argument("--role", choices=("security", "siem", "service"))
     args = parser.parse_args()
     c = (configuration(json.loads(args.configuration.read_text())) if args.configuration else
          from_environment(args.role) if args.role else load())

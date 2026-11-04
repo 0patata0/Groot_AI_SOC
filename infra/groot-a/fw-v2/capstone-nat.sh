@@ -18,7 +18,7 @@ EXT_IF="ens192"            # 외부(캠퍼스) NIC
 INT_IF="ens160"            # 내부망 NIC
 INT_NET="10.200.10.0/24"   # 내부망 (A=.1 GW, B=.10, C=.20)
 B_IP="10.200.10.10"; C_IP="10.200.10.20"
-MGMT_DNAT_SRC="192.168.16.0/25"      # P11: 관리 DNAT 를 허용할 출발지(VM 세그먼트 직결)
+MGMT_DNAT_SRC="192.168.16.231/32"      # P11: 관리 DNAT 를 허용할 출발지(VM 세그먼트 직결)
 NFT_FILE="/etc/nftables.d/capstone-gw.nft"
 FWD_FILE="/etc/nftables.d/capstone-fwd.nft"
 FWD_CHAIN="CAPSTONE-FWD"

@@ -4,6 +4,10 @@ set -euo pipefail
 umask 077
 
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+if [[ ${1:-} == --management-access ]]; then
+  shift
+  exec python3 -IB "$HERE/deployment/management_access.py" "$@"
+fi
 if [[ ${1:-} == --model-candidate ]]; then
   shift
   exec python3 -IB "$HERE/finetuning/candidate_model.py" "$@"
@@ -290,6 +294,7 @@ if [[ $MODE == verify ]]; then
   remote_role "$SERVICE_HOST" service diag-verify
   remote_role "$SIEM_HOST" siem diag-verify
   remote_role "$SIEM_HOST" siem tls-verify
+  remote_role "$SECURITY_HOST" security host-verify
   remote_role "$SERVICE_HOST" service host-verify
   remote_role "$SIEM_HOST" siem host-verify
   if [[ $OLLAMA_TRIAL_ENABLE == 1 ]]; then remote_role "$SIEM_HOST" siem trial-verify; fi
@@ -320,6 +325,7 @@ remote_role "$SIEM_HOST" siem dashboard-check
 remote_role "$SECURITY_HOST" security diag-check
 remote_role "$SIEM_HOST" siem diag-check
 remote_role "$SERVICE_HOST" service diag-check
+remote_role "$SECURITY_HOST" security host-check
 remote_role "$SERVICE_HOST" service host-check
 remote_role "$SIEM_HOST" siem host-check
 if [[ $OLLAMA_TRIAL_ENABLE == 1 ]]; then remote_role "$SIEM_HOST" siem trial-check; fi
@@ -412,8 +418,10 @@ remote_role "$SIEM_HOST" siem monitor-verify
 remote_role "$SERVICE_HOST" service monitor-verify
 # Host management and the old default Docker bridge must not bypass the
 # dedicated lab guards. Preserve the authenticated controller's SSH source.
+remote_role "$SECURITY_HOST" security host-apply
 remote_role "$SERVICE_HOST" service host-apply
 remote_role "$SIEM_HOST" siem host-apply
+remote_role "$SECURITY_HOST" security host-verify
 remote_role "$SERVICE_HOST" service host-verify
 remote_role "$SIEM_HOST" siem host-verify
 remote_role "$SECURITY_HOST" security verify

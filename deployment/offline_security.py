@@ -176,7 +176,12 @@ def render(data, sources):
     edge = edge.replace('/etc/nginx/tls/chatduck.crt', '/etc/capstone-tls/lab.crt').replace('/etc/nginx/tls/chatduck.key', '/etc/capstone-tls/lab.key')
     edge, count = re.subn(r'(?:        allow [^;]+;\n)+        deny all;', ''.join('        allow ' + net + ';\n' for net in data['allowed']) + '        deny all;', edge)
     need(count == 1, 'edge_acl_template_changed')
-    edge = edge.replace('10.200.10.20:80', data['backend']).replace('192.168.16.230:80', data['waf_ip'] + ':8080')
+    edge = edge.replace('10.200.10.20:80', data['backend'])
+    # The reviewed TLS template now talks directly to the shared WAF bridge.
+    # Keep the old host-published form compatible without leaking either site's
+    # endpoint into a fresh installation's dedicated subnet.
+    for endpoint in ('192.168.16.230:80', '172.18.0.2:8080'):
+        edge = edge.replace(endpoint, data['waf_ip'] + ':8080')
     edge = '''worker_processes 1;
 pid /tmp/nginx.pid;
 error_log /dev/stderr warn;
@@ -195,7 +200,9 @@ http {
     # scope. Repeating raw REQUEST_URI checks would reopen normalization bypasses.
     waf = waf.replace('https://' + old, data['origin']).replace(old, data['authority'])
     waf = waf.replace('server_name ' + data['authority'] + ';', 'server_name ' + data['hostname'] + ';')
-    waf = waf.replace('172.18.0.1', data['edge_ip']).replace('10.200.10.20:80', data['backend'])
+    for endpoint in ('172.18.0.1', '172.18.0.3'):
+        waf = waf.replace(endpoint, data['edge_ip'])
+    waf = waf.replace('10.200.10.20:80', data['backend'])
     waf = re.sub(r'^.*capstone_waf_evidence;\n', '', waf, flags=re.M)
     # Comments describe the portable setup, not the previous SNAT deployment.
     waf = waf[waf.index('map $realip_remote_addr'):]

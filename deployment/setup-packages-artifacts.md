@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+**2026-11-03 관리 ACL 반입 목록:** deployment/management_access.py·validate_management_isolated.py·host_security.py·remote.sh·offline_security.py·config.example.conf와 루트deploy.sh, A의 FW/프록시 소스를 소스 묶음에 포함한다. 기존 Python표준라이브러리·OpenSSH·nft/iptables·systemd·Docker를 사용하며 추가 deb/wheel/이미지0이다. 신규 security host guard·portable TLS endpoint를 설치 검사에 연결했다. 운영 A는4파일 증분/프록시reload만 수행했고 B/C 운영 소스는 유지했다. [검증/복구](../infra/groot-a/management-access.md).
+
 11/3 해제 후 재차단 보완의 추가 deb/wheel/이미지는 없다. 기존 source archive의 `infra/mcp/incident_containment.py`, `deployment/soc_agent_block.py`, `infra/hermes/soc_alert_watch.prompt`만 갱신하며 root `deploy.sh`의 기존 SOC 경로로 반입한다. 운영 증분 반영/복구와 새 서버 미검증 범위는 [검증 문서](../infra/mcp/containment-reblock.md)를 따른다.
 
 11/3 역할 배정1.1.0은 기존 루트 `deploy.sh`의 공동 채널 source 묶음(review_channel.py/review_channel_policy.py)과 Ollama·review 채널 안내에 반영한다. 추가 deb/wheel/이미지/포트/설정 키/권한은0이며 기존 SOUL·운영35B·endpoint를 유지한다. 운영은 idle/CAS 복구본을 둔 증분 적용이고 새 서버 전체 설치는 별도 미검증이다. [사용·설치·복구](../infra/hermes/agent-deployment.md).

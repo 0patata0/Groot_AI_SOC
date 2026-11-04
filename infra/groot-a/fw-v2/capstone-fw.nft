@@ -1,5 +1,5 @@
 #!/usr/sbin/nft -f
-# capstone_Groot_A — 호스트 방화벽 v2 (빡빡한 룰 초안, 2026-10-01). **초안 — 아직 미적용.**
+# capstone_Groot_A — 호스트 방화벽 v2 (빡빡한 룰 초안, 2026-10-01). **2026-11-03 관리 ACL 적용.**
 # 배포 경로(적용 시): /etc/nftables.d/capstone-fw.nft (capstone-nat.sh v2 가 부팅·재적용 시 원자적으로 로드)
 #
 # v1 대비 변경(보안룰_취합.md 0-B 의 P 번호):
@@ -40,8 +40,8 @@ table inet capstone_fw {
     set mgmt_src {
         type ipv4_addr
         flags interval
-        comment "mgmt SSH sources for ens192 (P4): VPN, dept LANs, ESXi. 192.168.16.0/25 excluded on purpose"
-        elements = { 192.168.15.0/24, 192.168.10.0/24, 192.168.12.0/24, 192.168.16.130, 211.170.162.0/24, 192.168.16.231 }
+        comment "named administrator only; containment exemptions do not grant management access"
+        elements = { 192.168.16.231 }
     }
 
     set spoof_src_ext {
@@ -72,6 +72,11 @@ table inet capstone_fw {
         iifname "ens160" ip saddr != 10.200.10.0/24 update @spoof_meter { ip saddr limit rate 6/minute burst 3 packets } log prefix "SPOOF " level notice
         iifname "ens160" ip saddr != 10.200.10.0/24 counter drop
         # agent containment (v1)
+        # Source checks precede exemptions and established sessions.
+        iifname "ens192" fib daddr type local meta nfproto ipv6 tcp dport { 22, 10443 } counter drop comment "capstone-management-ext6"
+        iifname "ens192" fib daddr type local ip saddr != @mgmt_src tcp dport { 22, 10443 } counter drop comment "capstone-management-ext4"
+        iifname "ens160" fib daddr type local meta nfproto ipv6 tcp dport 22 counter drop comment "capstone-management-int6"
+        iifname "ens160" fib daddr type local ip saddr != 10.200.10.10 tcp dport 22 counter drop comment "capstone-management-int4"
         ip saddr @never_block accept
         ip saddr @agent_block update @block_log_meter { ip saddr limit rate 6/minute burst 3 packets } log prefix "AGENT_BLOCK " level notice
         ip saddr @agent_block counter drop
@@ -85,7 +90,7 @@ table inet capstone_fw {
         meta nfproto ipv6 counter drop comment "P7: IPv6 unused on A - never logged"
         icmp type { echo-request, echo-reply, destination-unreachable, time-exceeded, parameter-problem } limit rate 20/second accept
         iifname "ens160" udp dport 123 accept comment "chrony serving B/C"
-        iifname "ens160" tcp dport 22 accept comment "SSH from internal net (Hermes@B -> resp@A ForceCommand)"
+        iifname "ens160" ip saddr 10.200.10.10 tcp dport 22 accept comment "SSH from internal net (Hermes@B -> resp@A ForceCommand)"
         # P4: management SSH over ens192 — source-restricted + per-source new-connection rate limit
         iifname "ens192" tcp dport 22 ct state new ip saddr @mgmt_src update @ssh_new_meter { ip saddr limit rate 6/minute burst 10 packets } accept comment "mgmt SSH (VPN / dept LAN / ESXi)"
         iifname "ens192" tcp dport 22 ct state new ip saddr @mgmt_src log prefix "FW_SSH_RATE " level notice drop comment "mgmt source over SSH rate limit"

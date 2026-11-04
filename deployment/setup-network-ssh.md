@@ -1,5 +1,7 @@
 # 새 환경의 네트워크·SSH 준비
 
+**2026-11-03 관리 접속:** 새 root deploy.sh는 security에도 host guard check/install/verify를 연결한다. security SSH는 관리 CIDR·현재 인증된 설치자 peer·SIEM 출발지만 허용하며 나머지 IPv4/IPv6 SSH는 established 예외 이전에 거부한다. ADMIN_PROTECTED_CIDRS는 SSH허용이 아니다. 예제의관리/대시보드231/32는 새 환경 관리자 주소로 교체한다. 기존 dual-NIC A는 전체 초기 설치 대신 [--management-access 증분 이관](../infra/groot-a/management-access.md)을 사용했다. 새OS 전체설치는 별도 미검증이다.
+
 ## 세 호스트 공통 SSH MAC 정책 — 2026-10-27
 
 루트 `deploy.sh`의 security·siem·service 역할은 `deployment/ssh_macs.py`의 check/install/verify를 호출한다. `/etc/ssh/sshd_config.d/01-capstone-macs.conf`에 아래 정책을 배치하고 소스 SHA와 실제 유효 설정을 검증한다. 정확히 일치하는 종전 A의4종 제외 파일만 백업 후5종 제외로 이행한다. 다른 기존 파일·더 엄격한 정책·MAC 외 옵션 변경은 거절한다.

@@ -52,5 +52,15 @@ class Policy(unittest.TestCase):
             c=m.from_environment('siem')
         self.assertEqual(c['management_cidrs'],['10.200.10.1/32','192.168.12.0/24'])
 
+    def test_security_ssh_covers_all_interfaces_and_ipv6_before_established(self):
+        c=self.config('security');c['management_cidrs']=['192.168.16.231/32']
+        text=m.rules(c);incoming=text.split(' chain input ')[1].split(' chain forward ')[0]
+        self.assertIn('192.168.16.231/32',incoming)
+        self.assertIn('10.200.10.10/32',incoming)
+        self.assertIn('tcp dport 22 drop',incoming)
+        self.assertNotIn('ct state established',incoming)
+        self.assertNotIn('iifname "ens160"',incoming)
+        self.assertNotIn('8090',text)
+
 
 if __name__ == '__main__': unittest.main()

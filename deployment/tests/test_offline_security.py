@@ -97,7 +97,11 @@ class SecurityFixtures(unittest.TestCase):
         self.assertNotIn('allow 10.200.10.0/24;', edge)
         self.assertIn('https://lab.example.test:9443/log4shell/static/theme.js', edge)
         self.assertIn('172.30.247.3 1;', waf)
-        self.assertEqual(waf.count('set_real_ip_from 172.30.247.3;'), 3)
+        # Restore the client before ModSecurity phase 1, at server scope.
+        self.assertEqual(waf.count('set_real_ip_from 172.30.247.3;'), 1)
+        self.assertLess(waf.index('set_real_ip_from 172.30.247.3;'), waf.index('location ='))
+        self.assertNotIn('172.18.0.2:8080', edge)
+        self.assertNotIn('172.18.0.3', waf)
         self.assertEqual(waf.count('if ($capstone_lab_peer_allowed = 0) { return 403; }'), 3)
         self.assertNotIn('capstone_waf_evidence', waf)
         for value in (edge, waf):

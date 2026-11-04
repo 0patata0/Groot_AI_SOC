@@ -45,6 +45,56 @@ class Opener:
 
 
 class ControllerTests(unittest.TestCase):
+    def lookup_case(self):
+        cid=self.store.new_case('review-channel:'+'a'*32,'verify')
+        case=dict(self.store.db.execute('select * from cases where id=?',(cid,)).fetchone())
+        case.update(chat_task='lead',chat_readonly_lookup=True,
+                    chat_request='지금 Wazuh 에이전트 상태 보여줘',
+                    chat_lookup_tools=['mcp__wazuh_ro__get_wazuh_agents'],
+                    chat_lookup_guidance='active/disconnected/pending/never_connected를 각각 실제 조회한다.')
+        return case,self.store.context(cid)
+
+    def test_fresh_chat_lookup_has_scoped_prompt_and_original_status_guard(self):
+        case,context=self.lookup_case()
+        prompt=m.prompt_for('irrelevant previous incident prose',case,context)
+        self.assertIn('TRUSTED_CHAT_LOOKUP_CONTRACT',prompt)
+        self.assertNotIn('irrelevant previous incident prose',prompt)
+        self.assertNotIn('incident_read_plan',prompt)
+        self.assertEqual(prompt.count('SOC_OUTPUT_CONTRACT_V1'),1)
+        self.assertEqual(runner.current_management_request(prompt),case['chat_request'])
+        self.assertIn('MANAGEMENT_STATUS: resolved',prompt)
+        self.assertIn('MANAGEMENT_STATUS: needs_review',prompt)
+        self.assertIn('never close another incident',prompt)
+        self.assertEqual(self.store.db.execute('select count(*) from tool_calls').fetchone()[0],0)
+        regular=m.prompt_for('ordinary incident',dict(case,chat_readonly_lookup=False),context)
+        self.assertIn('incident_read_plan',regular)
+        self.assertLess(len(prompt),len(regular))
+
+    def test_lookup_prompt_rejects_peer_write_resume_and_operator_review(self):
+        case,context=self.lookup_case()
+        for change in ({'chat_task':'peer'},{'mode':'manage'},{'operator_review':True},
+                       {'review_response_write':True},{'run_count':1},{'session_id':'old-session'}):
+            with self.subTest(change=change),self.assertRaisesRegex(m.ControllerError,'context_invalid'):
+                m.prompt_for('base',dict(case,**change),context)
+
+    def test_lookup_prompt_cannot_drop_incident_or_proposal_evidence(self):
+        case,context=self.lookup_case()
+        for change in ({'events':[{'kind':'incident'}]},{'proposals':[{'id':'a'*32}]},
+                       {'later_proposals':[{'id':'b'*32}]},{'evidence_total':1},
+                       {'evidence_included':1},{'evidence_truncated':True}):
+            with self.subTest(change=change),self.assertRaisesRegex(m.ControllerError,'context_invalid'):
+                m.prompt_for('base',case,dict(context,**change))
+
+    def test_lookup_scope_rejects_protected_tools_and_malformed_metadata(self):
+        case,context=self.lookup_case()
+        for tools in ([],['terminal'],['mcp__resp__unblock_ip'],['mcp__rule_write_a__propose_rule_edit'],
+                      ['mcp__wazuh_ro__get_wazuh_agents']*2,['mcp__resp__list_blocks','mcp__resp__block_ip']):
+            with self.subTest(tools=tools),self.assertRaisesRegex(m.ControllerError,'scope_invalid'):
+                m.prompt_for('base',dict(case,chat_lookup_tools=tools),context)
+        for change in ({'chat_request':''},{'chat_request':'a'*3001},{'chat_lookup_guidance':None}):
+            with self.subTest(change=change),self.assertRaisesRegex(m.ControllerError,'scope_invalid'):
+                m.prompt_for('base',dict(case,**change),context)
+
     def test_prompt_routes_rule_service_and_containment_status_without_execution(self):
         self.events(self.incident())
         case=self.store.next_case();context=self.store.context(case['id'])

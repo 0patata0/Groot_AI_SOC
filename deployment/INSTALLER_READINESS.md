@@ -1,3 +1,5 @@
+> 18:13 후속: 신규 읽기 전용 chat_lookup_prompt도 기존 canonical controller/worker 소스 복사를 사용한다. 새로운 패키지·이미지·포트·복사 경로0, 설치/렌더37검사 통과·실제 신규 설치0. [운영 검증](../infra/hermes/lookup-latency.md).
+
 > 11/4 후속 하네스 동기화: 출력 스킬 `infra/hermes/skills/soc-output/SKILL.md`와 공통 `output_contract.py`, 관리용 `chat_markdown.py`를 기존 source bundle/역할 설치·SDK 복사 목록에 연결했다. 소스 기반 설치계약37·SIEM 서식40 검사를 통과했다. 새 패키지/이미지/포트는 없으며 기존 Python과 소스만 필요하다. 실제 새 서버 설치는 실행하지 않았다. 아래 최초 점검의 ‘설치 코드 수정0’은 당시 범위이며 현재 소스 복사 갱신과 구분한다. 원격 허용목록·전체 오프라인 묶음 등 기존 잔여를 해결한 것은 아니다. [운영 적용·재현·한계](../infra/hermes/harness-cleanup.md).
 
 # 초기 설치·통합 패키지 준비 상태

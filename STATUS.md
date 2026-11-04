@@ -1,12 +1,12 @@
-# 인프라 현황 — 2026-11-04 17:28 KST
+# 인프라 현황 — 2026-11-04 18:17 KST
 
-전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](archive/STATUS-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/STATUS-20261104-before-web-e2e.md) · [표 보완 전](archive/STATUS-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/STATUS-20261104-before-fw-chat.md) · [FW 선택 전](archive/STATUS-20261104-before-fw-scope.md) · [룰 감사 전](archive/STATUS-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/STATUS-20261104-before-web-policy.md) · [과거 이력](archive/STATUS-history-20261101.md).
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](archive/STATUS-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/STATUS-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/STATUS-20261104-before-web-e2e.md) · [표 보완 전](archive/STATUS-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/STATUS-20261104-before-fw-chat.md) · [FW 선택 전](archive/STATUS-20261104-before-fw-scope.md) · [룰 감사 전](archive/STATUS-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/STATUS-20261104-before-web-policy.md) · [과거 이력](archive/STATUS-history-20261101.md).
 
 ## 현재 우선 과제와 실제 결과
 
 | 과제 | 구현·실제 확인 | 남은 범위 |
 |---|---|---|
-| 채팅 담당 분배 | 공통1.5.20/query1.19.15/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 직접 지정 Hermes의 최종 같은 조회는4MCP·4행 완료/128.644초로 지연 잔여. 저추론/서버 축소 후보는 실조회 실패로 채택하지 않음. [검증·복구](infra/hermes/harness-cleanup.md) |
+| 채팅 담당 분배 | 공통1.5.20/query1.19.15/review1.1.4 적용. 단순 조회·사건/공격 목록은 Ollama, partial만으로 Hermes 호출0. 직접 태그/사건·변경·명시 검증 구분. 실제 새 조회2건 Ollama 단독16.676/13.019초 | 새 조회 전용 프롬프트/저추론으로 직접 Hermes 같은 조회4MCP·4행/34.147초·보정0. 별도Vector 진단1회/48.611초. 각1표본이며 부하/캐시 분리·전체 평균 지연은 미검증. Native discovery 유지. [검증·복구](infra/hermes/lookup-latency.md) |
 | 공통 출력·카드 | soc-output 단일 SKILL, 짧은 표 정규화·상태/조치/근거 분리. 실제 새 Hermes/Ollama4행씩 표 파서 정상. 서버1,048PASS/skip0·보호config5SHA/기존 broker PID 유지 | 브라우저 UI·새 정기 카드 게시·native UX/skill_manage의 실제 제한 연결은 잔여. 기존 broker 재시작0 |
 | 사건 근거·중복 | 반복 시각 JSON은 동일 요청/상태/기한만 요약, 변경/불명확 원문 유지. 인용한 누락 센서의 모델 재조회 범위 보완. Wazuh ID/상관 정의 구분 | 소스/격리검사·운영 배포 범위이며 새 공격 사건 종결 성공은 아직 미검증 |
 | 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
@@ -17,7 +17,7 @@
 | 실제 DVWA 대응 |14:48:01.609 WAF Enabled942100/949110·403→Wazuh100102, LLM4MCP 성공→600초 차단·실제 카드/보고. 차단 중 같은 Kali232 TCP SYN DROP,15:00:28 기한 뒤 커널0·정상HTTP200·expired 결과 카드 | 첫 차단까지 약146.4초(1표본).4회 조사 뒤 needs_review/근거 부족. KEEP/RELEASE 승인·재차단/다른 공격·실제 Log4 앱 미시험. [근거·한계](infra/validation/web-e2e/README.md) |
 | 자동 보고 표시 보완 | B15:11:14 한 파일 적용·15:12:14 확정. escape된 내부 제어 줄 숨김, strict 판정/승인 불변. 관리209·설치계약37 PASS, 보호6SHA·모델/서비스 재시작0 | 설치된 함수의 격리 송신2경우 검증. 수정 뒤 새 실제 Mattermost 보고 전달·수동 원복은 미시험 |
 | Vector 사전 복구 |14:41 cursor guard 거절/재시작을 관측해 공격 보류.14:42 자동 복구·14:46:19 회전 완료·14:47:48 raw 양 active/pending0 후 시험 | 강제 재시작/CP 변경/guard 완화0. 전체 과거 무손실·장기 무장애로 확대하지 않음 |
-| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·중복 JSON·미등록 Socorro 언급/실습 추정·Wazuh 분류/상관 명칭 혼동·최초 차단 지연. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
+| LLM 전 관제 업무 | 기존 필수 SOC 역할·두 봇 전문화 유지. 실제 SDK8서버/41도구 discovery·hermes-parity 성공, Native7서버 목록과 coverage 읽기 성공 | C 승인형 제어·미등록 unit 상세 journal·사건 종결 근거 부족·미등록 Socorro 언급/실습 추정·최초 차단 지연. 고정DetectionOnly 서비스 요약 문구와 ‘연결 끊긴 에이전트만’ 상태 필터 공백 추가 발견. 후속 정정 필요. 도구 연결 성공을 전 업무 완료로 표시하지 않음. [업무별 범위](infra/validation/web-policy/SOC_CAPABILITIES.md) |
 | 초기 설치·패키지 점검 | 최신 웹 정책·관리자 CIDR 소스 연결 확인, 단일deploy.sh·오프라인 SHA 설치 기반. 해당 설치 점검에서 서버 접속/설치/설치 코드 수정0 | review 원격 허용목록 누락64, 컨트롤러46중3 fixture 불일치, WAF 증거 자동등록 연결 미확인·전체 의존성 패키지 미완성. 실제 새3VM 설치는 사용자 지시로 실행하지 않음. [점검](deployment/INSTALLER_READINESS.md) |
 | 관리 접속 | A SSH·Wazuh443/10443 관리자231/32, A 내부 SSH MCP B10.200.10.10/32.11/3 실제 경로 검증·11/4 세서버 재확인, 이번 공개웹 변경 뒤 관리자 접속/Wazuh도 유지 | B/C 컨테이너→호스트 관리·관리자 접속 경보 소음 예외·새 OS 전체 설치는 잔여. [정책](infra/groot-a/management-access.md) |
 
@@ -48,6 +48,6 @@ OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3�
 
 ## 복구·Git·로컬 정리
 
-이번 하네스 단위는 B 운영 소스30+영수증3개이며 원본/후보/중간SHA·확정·복구를 `/var/lib/capstone-harness-cleanup/20261104-r1/deployment-v3`에 보존한다.17:05:59 초기 적용·17:12:29 역할 추가 보완·17:21:08 불합격 일반 저추론 후보 제외,17:23:09 소스/보호5SHA·WS/worker/PID 확인 뒤 확정했다.17:23:48 타이머 해제·recover no-op 확인. 실제 수동 원복·새 OS 설치·새 공격 E2E는 미실시다. 기존 SDK/역할 설치의 소스 복사 목록만 동기화했으며 새 패키지·이미지·포트·모델/FW정책 변경0이다.
+이번 조회 지연 단위는 B controller/worker·소유 영수증3개다. `/var/lib/capstone-native-latency/20261104-r1/deployment`에 원본/후보·중간SHA·확정·복구를 보존한다.18:01:31 조회 프롬프트 적용·18:06:01 저추론 후보·18:13:10 실제3질문/파일·보호8SHA·WS/서비스 확인 뒤 확정하고 원복 타이머를 해제했다. 관리218/review59/설치37=314PASS, 낮은 추론의review59 재검증. Native gate/Trace AST·모델/설정/SOUL 유지·서비스/컨테이너/모델 재시작0, 실제 수동 원복·새 OS 설치·새 공격 E2E는 미실시다.
 
-자체 서버 시험본/미적용 준비본과 내보낸17로그를 정리했고 실제 복구본/작은 영수증/채팅·승인·DB는 보존한다. Mac 자체 임시58파일/22,734,198B와 다운로드 파서·자체 SSH mux를 정리했고 부모 디렉터리 부재를 확인했다. 새 Mac 패키지0이며 관련 공개 파일의 소스 게시를 완료했다. 이번 공개40파일은 `a5d806b632c890ba0008f921ea890a36f2beab24`로 커밋·푸시하고 2026-11-04T17:29:08.251052+09:00 실제 원격main 일치를 확인했다. 이 게시 확인 STATUS/작은 원장2파일은 후속 문서 커밋으로 보존한다. 직전 단위 최종2585dd7 기록은 위 archive에 보존한다. Ansible2/NAT6/topology5 stage는 이번 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 전체 목표 active·미완료이며 계정 잔여율 조회 도구는 없다.
+서버 격리419소스와 내보낸4로그를 정리했고 실제 복구본·DB/채팅/승인은 보존한다. Mac 자체 임시18파일/4,048,629B·SSH mux2개를 정리하고 부모 부재를 확인했다. 새 Mac 패키지/다운로드0, 이번 관련 공개파일 커밋·푸시는 마감 중이다. 원격 기준은 직전 단위 최종 `b521cb3d7fd4fa7cc4304deb9b8939d0d290634d`이며 이번 수정의 게시 완료는 아직 아니다. Ansible2/NAT6/topology5 stage는 이번 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 전체 목표 active·미완료이고 계정 잔여율 조회 도구는 없다. 직전40파일 게시·복구·정리 기록은 위 archive에 보존한다.

@@ -1173,7 +1173,57 @@ def output_policy():
     return output_contract().policy()
 
 
+def chat_lookup_prompt(case, evidence):
+    """A fresh, bounded chat lookup is not an incident-resolution request.
+
+    Root worker metadata selects this prompt only. The native MCP-only gate,
+    evidence checks, status parser and executor remain unchanged.
+    """
+    c = dict(case)
+    if (c.get("chat_task") != "lead" or c.get("mode") != "verify"
+            or c.get("operator_review") or c.get("review_response_write")
+            or c.get("run_count") != 0 or c.get("session_id") is not None
+            or evidence.get("events") or evidence.get("proposals")
+            or evidence.get("later_proposals") or evidence.get("evidence_total")
+            or evidence.get("evidence_included") or evidence.get("evidence_truncated")):
+        raise ControllerError("chat_lookup_context_invalid")
+    question, guidance, tools = (c.get("chat_request"), c.get("chat_lookup_guidance"),
+                                 c.get("chat_lookup_tools"))
+    read_name = (r"mcp__(?:wazuh_ro__(?:get_wazuh_|search_wazuh_)[a-z_]+|"
+                 r"rule_[ab]__(?:get_security_rules|get_rule_change_target|get_service_action_target|"
+                 r"get_rule_change_status|get_operation_status)|resp__(?:get_firewall_rules|list_blocks)|"
+                 r"system_diagnostics__get_system_diagnostics|security_events__search_"
+                 r"(?:wazuh|suricata|modsecurity)_alerts)")
+    if (not isinstance(question, str) or not 1 <= len(question) <= 3000
+            or not isinstance(guidance, str) or not 1 <= len(guidance) <= 16384
+            or not isinstance(tools, list) or not 1 <= len(tools) <= 16
+            or any(not isinstance(n, str) or not re.fullmatch(read_name, n) for n in tools)
+            or len(set(tools)) != len(tools)):
+        raise ControllerError("chat_lookup_scope_invalid")
+    contract = """TRUSTED_CHAT_LOOKUP_CONTRACT
+This is a scoped factual lookup from an authorized Mattermost user, not an
+incident-resolution review. Select and call the existing read-only MCP tools
+needed for the current request. Tool names below are navigation, not receipts.
+Do not submit changes, approvals, containment or an INCIDENT_DISPOSITION.
+Complete every requested state/target/page or explicitly report what is missing.
+Connection status is not proof that an asset is secure or an incident is benign.
+Use the shared SOC output skill, verified KST values, concise tables and actual
+read results. Do not calculate or generate facts absent from those results.
+End with one exact separate line: MANAGEMENT_STATUS: resolved only when this
+lookup's requested fields are verified; otherwise MANAGEMENT_STATUS: needs_review.
+These labels concern this lookup only and never close another incident.
+"""
+    control = {"case_id": c["id"], "mode": "verify", "chat_task": "lead",
+               "report_scope": "chat_lookup_only", "read_tools": sorted(tools),
+               "requested_at_kst": datetime.now(timezone(timedelta(hours=9))).isoformat()}
+    return (contract + "\n" + output_policy() + "\nTRUSTED_LOOKUP_GUIDANCE\n" + guidance +
+            "\nTRUSTED_CONTROLLER_JSON\n" + canonical(control) +
+            "\nTRUSTED_CURRENT_REQUEST_JSON\n" + canonical({"request": question}))
+
+
 def prompt_for(base, case, evidence):
+    if dict(case).get("chat_readonly_lookup"):
+        return chat_lookup_prompt(case, evidence)
     requested_at = datetime.now(timezone(timedelta(hours=9)))
     current_request = dict(case).get("chat_request", base)
     if dict(case).get("operator_review"):

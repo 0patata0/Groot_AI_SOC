@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-04T18:16:25.813670+09:00",
+  "source_hashes": {
+    "infra/hermes/soc_management_controller.py": "55c4df87b319bdfd5fa4bac6938fd09cec2324eca989bff2a933cf29cddec106",
+    "infra/hermes/review_channel_worker.py": "fe0276a8d5e3f74e1e424ce4bee0f36721f5843967c8dd099097ad7aff069f68",
+    "infra/hermes/test_soc_management_controller.py": "32f707946ac00050d1a5a62eb3dae83c309838b1d85bea09c3cbf6fe35d4bbd6"
+  },
+  "scope": "fresh read-only shared-chat lead lookup only",
+  "runtime": {
+    "applied_at_kst": "2026-11-04T18:01:31+09:00",
+    "low_reasoning_trial_at_kst": "2026-11-04T18:06:01+09:00",
+    "confirmed_at_kst": "2026-11-04T18:13:10.528186+09:00",
+    "root_source_and_receipt_targets": 3,
+    "protected_configuration_hashes_unchanged": 8,
+    "restarts": 0,
+    "native_gate_and_Trace_AST_unchanged": true,
+    "recovery_directory": "/var/lib/capstone-native-latency/20261104-r1/deployment",
+    "manual_rollback_tested": false,
+    "confirmed_recovery_noop_tested": true,
+    "fresh_install_tested": false,
+    "new_attack_E2E_tested": false
+  },
+  "regression": {
+    "distinct_suite_passes": {
+      "management": 218,
+      "review": 59,
+      "installation": 37
+    },
+    "total": 314,
+    "focused_review_repeat_passes": 59,
+    "skip": 0
+  },
+  "observations": {
+    "before_shared_named_hermes": {
+      "chat_seconds": 128.644,
+      "native_seconds": 127.314822,
+      "MCP_calls": 4,
+      "MCP_ms_sum": 314,
+      "extra_correction_users": 1,
+      "request_body_chars": 18671,
+      "output_tokens": 4816
+    },
+    "scoped_prompt_original_reasoning": {
+      "chat_seconds": 50.651,
+      "native_seconds": 49.027487,
+      "MCP_calls": 4,
+      "agent_rows": 4,
+      "extra_correction_users": 0,
+      "request_body_chars": 3351,
+      "output_tokens": 1065
+    },
+    "scoped_prompt_low_reasoning": {
+      "chat_seconds": 34.147,
+      "native_seconds": 32.746969,
+      "MCP_calls": 4,
+      "agent_rows": 4,
+      "extra_correction_users": 0,
+      "reasoning_fields_empty": true,
+      "output_tokens": 923
+    },
+    "different_Vector_question": {
+      "chat_seconds": 48.611,
+      "MCP_calls": 1,
+      "target": "a:vector",
+      "structured_scope_complete": true
+    }
+  },
+  "limits": [
+    "each timing is one fresh-question sample, not an average",
+    "server load and cache effects not independently isolated",
+    "existing full native discovery retained",
+    "no new model or tool permissions",
+    "browser table UI not visually verified",
+    "native UX/skill_manage integration remains open",
+    "fixed DetectionOnly policy-summary wording and disconnected-agent Korean filter gap remain open"
+  ],
+  "publication": {
+    "source_commit": null,
+    "remote_verified_at_kst": null
+  },
+  "cleanup": {
+    "at_kst": "2026-11-04T18:17:33.104852+09:00",
+    "removed_files": 18,
+    "removed_bytes": 4048629,
+    "parent_absent": true,
+    "new_Mac_packages": 0,
+    "downloads": 0
+  }
+}

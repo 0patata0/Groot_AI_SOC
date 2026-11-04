@@ -1,6 +1,6 @@
 # Agentic SOC 실행 계획
 
-전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [직전 계획](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
+전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [직전 계획](archive/PLAN-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
 
 ## 역할과 승인
 
@@ -26,7 +26,7 @@ A 관리 SSH·Wazuh443/10443을 관리자231/32·내부 SSH를 MCP B 한주소�
 
 [실제 DVWA 단일 SQLi](infra/validation/web-e2e/README.md)에서 WAF403→Wazuh→LLM4MCP→600초FW/카드→만료·정상HTTP200 복구를 확인했다. 최초 차단 약146.4초·4회 조사 뒤 needs_review/근거 부족으로 종결 실패를 남긴다. 내부 제어 문구 노출만 게시 단계에서 보완·관리209/설치계약37PASS·B한파일15:12:14확정, strict 결정/승인/서비스·모델은 유지한다. 수정 후 새 실제 보고 전달은 별도 미검증이다.
 
-11/4 [하네스 정리](infra/hermes/harness-cleanup.md)를 운영 적용했다. 일반 조회의 Ollama 담당 유지·단일 출력 스킬·짧은 표/정기 카드·증거 요약/누락 센서 재조회 보완과 서버1,048PASS를 확인했다. 실제 새 일반 조회2건은 Ollama 단독16.676/13.019초이며 단순 partial로 자동 peer를 만들지 않는다. 공동 Hermes 일반 조회의 추가 저추론/서버 축소는 실제 MCP 누락으로 채택하지 않았다. native 사용자 피드백/skill_manage 제한 노출·실제 새 사건 종결·브라우저 표 UI는 남는다.
+11/4 [하네스 정리](infra/hermes/harness-cleanup.md)를 운영 적용했다. 일반 조회의 Ollama 담당 유지·단일 출력 스킬·짧은 표/정기 카드·증거 요약/누락 센서 재조회 보완과 서버1,048PASS를 확인했다. 실제 새 일반 조회2건은 Ollama 단독16.676/13.019초이며 단순 partial로 자동 peer를 만들지 않는다. 17시대 사건 프롬프트/서버 축소 후보는 실제 MCP 누락으로 제외했다.18:13에는 별도 조회 전용 프롬프트와 낮은 추론을 실제3질문으로 검증해128.644→34.147초 표본을 확인했다. Native discovery·사건/peer/쓰기 판단은 유지한다. [검증·복구](infra/hermes/lookup-latency.md). native 사용자 피드백/skill_manage 제한 노출·실제 새 사건 종결·브라우저 표 UI는 남는다.
 
 ## 다음 실행 순서
 
@@ -34,7 +34,7 @@ A 관리 SSH·Wazuh443/10443을 관리자231/32·내부 SSH를 MCP B 한주소�
 |---|---|---|
 |1 ·11/4~11/6| DVWA/Log4Shell을 일반 서비스로 운용하는 실제 경로·가동·정상/악성 분리 | 관리형 앱의 기존 중지 의도/필요 가동을 구분. 새 정상·SQLi/XSS/JNDI 등→실제 WAF/IDS/raw·Wazuh·LLM 판단/차단/유지·해제 카드·TTL/60초 재차단 확인. UI200·격리 stub403으로 전체 공격 성공 주장 안함 |
 |2 ·같은 구간| 장비 룰 중복/우회·FW·egress 정리 | IDS7쌍의 원문/설정 참조와 전체 룰 격리 전후14조건은 확인. Wazuh17쌍 중8쌍 native 양성 확인, Windows9쌍은 별도 격리 EventChannel 엔진 검증이 남음. 운영 통합 전 별칭/상관/AR·외부 참조·vendor 업데이트 지속성·정확 승인/독립 원복을 준비. 의도된 ET override/상호보완 탐지를 중복으로 삭제하지 않음. FW chain hook·순서·container→host·공개 직접 포트·IPv6 확인 |
-|3 ·11/4~11/7| LLM 업무 공백·하네스/도구·채팅 회귀 | 우선 실제 사건의 종결 근거/미등록 Socorro/실습 추정·Wazuh 분류와 상관 구분·중복 JSON/최초 차단 지연 보완. C 지정 서비스/미등록 unit의 제한된 진단/승인형 제어 준비, 정확 후보 카드와 worker/검증·복구. FW 연속 후속·표 분할/페이지1.5.19 실제10조건/669검사까지 확인.19개 조건·handle/실제 근거 일치, 표시/조회량 축소0. 실제 브라우저 UI·초장문 단일 행은 잔여. 미지원 필터는 별도 잔여. 단문·동일 대화 후속·근거 확보·동료 검토·정보성 DNS/정찰·종결 품질 검증 |
+|3 ·11/4~11/7| LLM 업무 공백·하네스/도구·채팅 회귀 | 우선 고정DetectionOnly 서비스 요약 문구·한국어 연결 끊김 상태 필터 정정, 실제 사건의 종결 근거/미등록 Socorro/실습 추정·Wazuh 분류와 상관 구분·최초 차단 지연 보완. C 지정 서비스/미등록 unit의 제한된 진단/승인형 제어 준비, 정확 후보 카드와 worker/검증·복구. FW 연속 후속·표 분할/페이지1.5.19 실제10조건/669검사까지 확인.19개 조건·handle/실제 근거 일치, 표시/조회량 축소0. 실제 브라우저 UI·초장문 단일 행은 잔여. 미지원 필터는 별도 잔여. 단문·동일 대화 후속·근거 확보·동료 검토·정보성 DNS/정찰·종결 품질 검증 |
 |4 ·11/5~11/7| NAT·기존 peer 후보 마감/독립 모델 비교 | NAT6의 관리자231/새 loader SHA 재기준·지속 설정/증분/TTL/독립 복구. peer4는 이번 하네스 범위로 인수·운영 검증, Ansible2는 미확정. 미사용176 평가·승인형 쓰기/원복·원본/학습+하네스 조합 비교 |
 |5 ·11/7~11/9| 핵심 회귀·장애/복구·재현/출처 정리 | 장기 Vector/수집/알림 재전송·미확인 사건, 데이터 무손실 원본1+정제본1 통합/SHA·설치/원복 문서. 새 OS3대 설치/장기 드라이버 원인은 별도 미검증 |
 |6 ·이후~12/1| 논문·최종 발표 | 논문은 실제 관측·공식 원출처·검증/환경 한계를 반영. 발표자료는11월둘째주 리마인더 이후 작성 |

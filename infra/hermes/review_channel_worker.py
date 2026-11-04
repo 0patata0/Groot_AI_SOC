@@ -544,6 +544,11 @@ def main():
             # explicitly untrusted original answer, not become an inventory.
             case['chat_request'] = (request['question'] if request['phase'] == 'peer'
                                     else request.get('current_question', request['question']))
+            if lookup_scope:
+                case['chat_readonly_lookup'] = True
+                case['chat_lookup_tools'] = sorted(lookup_scope)
+                case['chat_lookup_guidance'] = harness.guidance(current)
+                case['fast_readonly'] = True
             if response_read:
                 # Same bounded read scope as the chat adapters. Native Hermes
                 # still chooses/calls the actual read; no prefetch or shell.
@@ -555,11 +560,9 @@ def main():
             elif diagnostic_targets:
                 case['fast_readonly'] = True
                 m.TOOLSETS = ('mcp-system-diagnostics',)
-            # Generic inventory lookups use verify mode without changing the
-            # native discovery/reasoning profile. The attempted generic low-
-            # reasoning/server-subset path returned no MCP evidence in a live
-            # trial and is deliberately not promoted. Existing FW/diagnostic
-            # fast paths above retain their separately verified behavior.
+            # The fresh lookup contract can use the existing low-reasoning
+            # read-only profile. Keep native discovery intact: an earlier
+            # incident-prompt/server-subset combination lost read evidence.
             # Cross-review needs the normal investigation reasoning profile.
             # The low-reasoning historical-case shortcut skipped real reads in
             # shared-chat trials; keep the read-only gate without that shortcut.

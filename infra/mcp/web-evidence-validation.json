@@ -156,9 +156,10 @@
     "latest thesis PDF and independent evaluation"
   ],
   "publication": {
-    "source_commit": null,
-    "remote_verified": false,
-    "state": "pending"
+    "source_commit": "1470a6391bc1722c76b96f91ec40b74d65d8ed04",
+    "remote_verified": true,
+    "verified_at_kst": "2026-11-04T23:56:20.551510+09:00",
+    "state": "source published; this receipt is a follow-up documentation commit"
   },
   "cleanup": {
     "server_removed_files": 463,

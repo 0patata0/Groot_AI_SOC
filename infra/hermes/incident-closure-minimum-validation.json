@@ -125,6 +125,10 @@
   "sdk_full_closure_parity_complete": false,
   "full_impact_or_incident_closure_complete": false,
   "source_publication": {
-    "status": "pending"
+    "status": "pushed_verified",
+    "commit": "14d1a6649eb28e668e28e32b5699b7b9d304ced3",
+    "remote_main": "14d1a6649eb28e668e28e32b5699b7b9d304ced3",
+    "at_kst": "2026-11-05T00:54:24.542402+09:00",
+    "subsequent_status_ledger_update": "separate documentation commit; final head and remote recorded locally"
   }
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only MCP view of indexed security alerts and stored SCA scans on Groot_B.
+"""Read-only indexed alerts/SCA and fixed C backend web evidence on Groot_B.
 
 Uses the existing mcp-ro Indexer credentials from /etc/mcp/wazuh-ro.env. Only
 the fixed wazuh-alerts-* index is queried, so events not yet indexed by Wazuh
@@ -16,9 +16,12 @@ from datetime import datetime, timedelta, timezone
 import ipaddress
 import json
 import os
+from pathlib import Path
 import re
 import ssl
+import stat
 import sys
+import types
 import urllib.request
 from urllib.parse import urlsplit
 
@@ -109,6 +112,39 @@ TOOLS.append({
     "annotations": {"title": "Read Wazuh SCA checks", "readOnlyHint": True,
         "destructiveHint": False, "idempotentHint": True},
 })
+
+WEB_TARGETS = ['c:dvwa','c:lab-console','c:lab-java','c:lab-httpd49','c:lab-httpd50']
+for _operation in ('get_web_service_target','search_web_access'):
+    _properties={'target':{'type':'string','enum':WEB_TARGETS}}
+    _required=['target']
+    if _operation=='search_web_access':
+        _properties.update({'since_kst':{'type':'string','description':'Explicit start with seconds and +09:00; requires until_kst, excludes lookback_minutes. Retained at most 14 days. Interval at most 24 hours.'},
+            'until_kst':{'type':'string','description':'Explicit end with seconds and +09:00; never future.'},
+            'lookback_minutes':{'type':'integer','minimum':1,'maximum':1440,'default':60,'description':'Server-calculated recent window, optionally ending at until_kst. Do not combine with since_kst.'},
+            'source_ip':{'type':'string','description':'Optional exact source IP. Omit for all requests to the selected backend.'},
+            'limit':{'type':'integer','minimum':1,'maximum':50,'default':10}})
+    TOOLS.append({'name':_operation,'description':
+        ('Read C backend service mapping, agent identity and Apache state from a fresh root-published snapshot. This is a fixed file-configuration view, not proof of frontend WAF routing or proxied application health.' if _operation=='get_web_service_target' else
+         'Read bounded sanitized C Apache backend access logs for a fixed service and exact KST interval. No raw query/headers/cookies/body. Retained index counts are not total requests; zero is not proof of absence or no compromise. entry_sha256 identifies line bytes, not a unique HTTP transaction. Snapshot age/limits remain evidence boundaries.'),
+        'inputSchema':{'type':'object','additionalProperties':False,'properties':_properties,'required':_required},
+        'annotations':{'readOnlyHint':True,'destructiveHint':False,'idempotentHint':True}})
+
+
+def web_read(operation,args):
+    path=Path(__file__).with_name('web_evidence_client.py')
+    for parent in (path.parent,*path.parent.parents):
+        meta=parent.lstat()
+        if not stat.S_ISDIR(meta.st_mode) or meta.st_uid!=0 or meta.st_mode&0o022:
+            raise ValueError('web_reader_unsafe')
+    fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    with os.fdopen(fd,'rb') as source:
+        meta=os.fstat(source.fileno())
+        if not stat.S_ISREG(meta.st_mode) or meta.st_uid!=0 or meta.st_nlink!=1 or meta.st_mode&0o022 or meta.st_size>131072:
+            raise ValueError('web_reader_unsafe')
+        raw=source.read(131073)
+    module=types.ModuleType('fixed_web_reader');module.__file__=str(path)
+    exec(compile(raw,str(path),'exec'),module.__dict__)
+    return module.call(operation,args)
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -647,6 +683,10 @@ def tool_text(value, is_error=False):
 
 
 def call_tool(name, args):
+    if name in ('get_web_service_target','search_web_access'):
+        try:return tool_text(web_read(name,args))
+        except ValueError as exc:return tool_text({'error':str(exc)},True)
+        except Exception:return tool_text({'error':'web_evidence_unavailable'},True)
     kind = {"search_suricata_alerts": "suricata", "search_modsecurity_alerts": "modsecurity",'search_wazuh_alerts':'wazuh'}.get(name) if isinstance(name, str) else None
     if kind is None and name != "get_wazuh_sca_checks":
         return None
@@ -668,7 +708,7 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if isinstance(requested, str) and requested in SUPPORTED_PROTOCOLS else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.1.0"},
+            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.2.0"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None

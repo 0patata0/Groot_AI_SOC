@@ -1271,8 +1271,8 @@ def chat_lookup_prompt(case, evidence):
     read_name = (r"mcp__(?:wazuh_ro__(?:get_wazuh_|search_wazuh_)[a-z_]+|"
                  r"rule_[ab]__(?:get_security_rules|get_rule_change_target|get_service_action_target|"
                  r"get_rule_change_status|get_operation_status)|resp__(?:get_firewall_rules|list_blocks)|"
-                 r"system_diagnostics__get_system_diagnostics|security_events__search_"
-                 r"(?:wazuh|suricata|modsecurity)_alerts)")
+                 r"system_diagnostics__get_system_diagnostics|security_events__(?:get_web_service_target|search_web_access|search_"
+                 r"(?:wazuh|suricata|modsecurity)_alerts))")
     if (not isinstance(question, str) or not 1 <= len(question) <= 3000
             or not isinstance(guidance, str) or not 1 <= len(guidance) <= 16384
             or not isinstance(tools, list) or not 1 <= len(tools) <= 16
@@ -1387,6 +1387,8 @@ def prompt_for(base, case, evidence):
             "침해 영향은 공격 출발지가 아니라 실제 보호 대상 서비스·목적지 자산에서 조사한다. "
             "출발지 IP가 Wazuh 자산 목록에 없다는 이유로 목적지 조사를 중단하지 않는다. "
             "센서의 목적지/URL·수집 agent와 실제 자산 목록을 대조하고 프록시와 백엔드를 구분한다. "
+            "웹 백엔드는 get_web_service_target의 등록 target·실제 agent·진단 대상과 search_web_access의 사건/후속 접근 표본을 읽는다. "
+            "C Apache 설정 파일 관측은 프런트 WAF 연결 적재 증명이 아니며, 접근0표본도 미도달·침해 부재 증거가 아니다. "
             "아래 등록된 자산·진단 도구로 조사 대상을 찾고, 확인된 agent_id의 사건 구간 경보와 필요한 프로세스/진단을 읽는다. "
             "상태·최근 센서를 반복 조회하기 전에 보호 대상의 사건 구간을 agent_id로 조사한다. "
             "임시차단·변경 대응이 연결된 센서 사건이나 remediated 판정은 종결 전에 해당 보호 대상의 search_wazuh_alerts를 agent_id와 명시적 사건 구간으로 실제 조회하고 인용해야 한다. "

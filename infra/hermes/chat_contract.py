@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.23'
+VERSION = 'soc-chat-contract:1.5.25'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -54,6 +54,14 @@ QUERY_SECTIONS = {
         "DNS는 실제 도메인·발신/목적지·A/AAAA·SID를 확인하며 다중 룰 매칭 수와 실제 질의 수, 도메인 분류와 C2/유출 증거를 구분합니다. "
         "표시된 *_kst/time_display/+09:00/remaining_seconds_at_observation을 그대로 사용합니다. "
         "KST 표시/만료를 위해 UTC로 되돌리거나 calculate_time을 호출하지 않습니다. 시간 차이·정렬 계산만 해당 도구로 수행합니다."
+    ),
+    '웹 백엔드 근거': (
+        "C 웹 서비스 영향은 security-events의 get_web_service_target으로 실제 고정 target·agent·진단 대상을 확인하고 "
+        "search_web_access로 사건/후속 구간의 백엔드 접근 표본을 읽습니다. DVWA는 c:dvwa, Lab Console과 등록 HTTP 앱은 실제 enum으로 구별합니다. "
+        "이 조회는 C Apache의 정제 접근 로그 스냅샷이며 Wazuh 경보 검색과 다른 출처입니다. 현재 수집 시각/나이·14일 보관 상한·24시간 조회 폭·limit50·잘림을 확인합니다. "
+        "retained_index_match_count는 보관 색인 일치 행 수이고 실제 전체 요청 수는 미확인입니다. 반환0행으로 백엔드 미도달·침해 부재를 단정하지 않습니다. 보관/반환 잘림·읽기 제한이 있으면 반드시 보고합니다. "
+        "entry_sha256는 로그 행 바이트 해시이며 고유 HTTP 거래 ID가 아닙니다. 서로 같은 행 해시를 임의로 한 요청으로 합치지 않습니다. "
+        "파일 설정/Apache active는 프런트 WAF 경로 적재나 Java 등 프록시 앱 정상 증명이 아닙니다. active는 프로세스 실행 상태로만 쓰고 정상이라는 평가를 덧붙이지 않습니다. 필요한 c:apache·c:collection 진단과 실제 agent_id의 사건/후속 경보도 조회하고 부족한 근거는 남깁니다."
     ),
     '호스트 진단': (
         "get_system_diagnostics는 최근 고정 스냅샷이며 과거 journal의 임의 구간 조회가 아닙니다. "

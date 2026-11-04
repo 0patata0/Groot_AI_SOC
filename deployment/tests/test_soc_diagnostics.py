@@ -48,12 +48,12 @@ class Profiles(unittest.TestCase):
                 d.settings({**env, **change})
 
     def test_source_bundle_includes_exact_runtime_sources_and_installer(self):
-        source = {name: b'# fixture\n' for name in d.SOURCES}
+        source = {name: b'# fixture\n' for name in (*d.SOURCES,*d.webdeploy.SOURCES,'web_access_deploy.py')}
         def read(path, *args, **kwargs):
             return b'# installer\n' if str(path).endswith('/deployment/soc_diagnostics.py') else source[Path(path).name]
         with mock.patch.object(d.common, 'read', side_effect=read):
             bundle = d.source_bundle(settings())
-        self.assertEqual(set(bundle), set(d.SOURCES) | {'soc_diagnostics.py'})
+        self.assertEqual(set(bundle), set(d.SOURCES) | set(d.webdeploy.SOURCES) | {'soc_diagnostics.py','web_access_deploy.py'})
         source['system_diagnostics.py'] = b'def invalid(:\n'
         with mock.patch.object(d.common, 'read', side_effect=read), self.assertRaises(SyntaxError):
             d.source_bundle(settings())
@@ -146,6 +146,7 @@ class PublicTransport(unittest.TestCase):
              mock.patch.object(d, 'profile', return_value={'fixed': True}), \
              mock.patch.object(d, 'installed_record', return_value={'sha256': 'f' * 64}), \
              mock.patch.object(d, 'verify_ssh_policy'), \
+             mock.patch.object(d.webdeploy, 'install_service'), \
              mock.patch.object(d, 'verify'), mock.patch.object(d, 'reader_public', return_value={'status': 'ready'}):
             d.apply_reader(settings(), 'service', json.dumps(self.stream()).encode())
         keys = next(raw for path, raw in calls if path.endswith('/authorized_keys')).decode()

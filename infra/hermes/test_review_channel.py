@@ -357,6 +357,34 @@ class Tests(unittest.TestCase):
                 self.assertEqual(result['structured_scope_complete'],not failure)
                 self.assertNotIn('unguarded model healthy text',result['final_response'])
 
+    def test_plain_web_lead_completion_is_bound_to_receipt_and_keeps_case_state(self):
+        from contextlib import nullcontext
+        from test_web_read_contract import call as web_call
+        h=self.actual_harness()
+        for complete,phase,expected in ((True,'lead','completed'),(False,'lead','partial'),(True,'peer','partial')):
+            with self.subTest(complete=complete,phase=phase):
+                class DB:
+                    def execute(self,sql,args=()):
+                        if 'tool_calls' in sql:return [{'name':'mcp__security_events__search_web_access','completed':1,'is_write':0,'is_error':0}]
+                        return SimpleNamespace(fetchone=lambda:None if 'SELECT 1' in sql else
+                            {'id':'c'*32,'mode':'verify','run_count':0,'session_id':None})
+                    def commit(self):pass
+                store=SimpleNamespace(db=DB(),locked=lambda:nullcontext(),reporting=lambda _:nullcontext(),
+                    new_case=lambda *a:'c'*32,context=lambda _:[],close=lambda:None)
+                controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
+                    run_hermes=lambda *a:{'completed':True,'state':'needs_review','text':'model text','run_id':'d'*32},
+                    prompt_for=lambda *a:'prompt',incomplete_report=lambda _:'incomplete')
+                request={'id':'a'*32,'phase':phase,'readonly':True,'question':'DVWA 접근 기록 좀 보여줘'};output=io.StringIO()
+                with mock.patch.dict(sys.modules,{'harness':h,'soc_management_controller':controller}), \
+                     mock.patch.object(sys,'argv',['worker','hermes']), \
+                     mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+                     mock.patch.object(sys,'stdout',output),mock.patch.object(w.os,'geteuid',return_value=0), \
+                     mock.patch.object(w,'read_trace_calls',return_value=[web_call()] if complete else []):
+                    w.main()
+                result=json.loads(output.getvalue());self.assertEqual(result['status'],expected)
+                self.assertEqual(result['structured_scope_complete'],complete)
+                self.assertEqual(result['management_state'],'needs_review')
+
     def test_broad_diagnostic_and_changes_do_not_get_a_single_service_shortcut(self):
         h=self.actual_harness()
         self.assertEqual(w.diagnostic_read_targets(h,'인덱서 살아있어?'),['b:wazuh-indexer'])

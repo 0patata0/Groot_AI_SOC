@@ -1,5 +1,7 @@
 # 초기 설치·통합 패키지 준비 상태
 
+11/4 웹 읽기 연계: 기존 단일deploy.sh→service diag-apply 내부 설치와 SIEM 복사 경로에 `web_access_deploy.py`·`web_evidence.py`·`read-web-evidence.py`·`web_evidence_client.py`를 연결했다. 별도 계정/SSH 강제 명령·publisher/timer 계약6과 진단18·관리38 검사를 통과했다. 기존 운영 증분 적용/MCP 조회는 [별도 근거](../infra/mcp/web-evidence.md)이며 새 OS 전체 설치 증거가 아니다.
+
 2026-11-04 KST. 단일 `deploy.sh` 기반은 구현했으나 완성된 일괄 배포 제품으로 표시하지 않는다. 실제 새3VM 설치는 사용자 조건으로 실행하지 않았다. [현황](../STATUS.md) · [운영](OPERATIONS.md) · [공식 지침 부분 대조](SECURITY_GUIDELINES.md) · [이전 점검](../archive/deployment-INSTALLER_READINESS-before-read-accuracy-ncsc-20261104.md).
 
 | 항목 | 확인한 범위 | 남은 범위 |

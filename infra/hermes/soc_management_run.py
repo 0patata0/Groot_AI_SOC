@@ -23,7 +23,8 @@ READ = frozenset({'get_security_rules', 'get_rule_change_target', 'get_rule_chan
                   'get_service_action_target', 'get_operation_status'})
 WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
-EVENT_READ = frozenset({'search_wazuh_alerts', 'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks'})
+EVENT_READ = frozenset({'search_wazuh_alerts', 'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks',
+                        'get_web_service_target', 'search_web_access'})
 DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
 MAX_EVENT_AUDIT_BYTES = 128 * 1024
 NO_OBSERVATION_REPORT = ('성공한 MCP 조회 근거를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
@@ -325,7 +326,13 @@ def observation_facts(name, result):
             if name == 'calculate_time' and data.get('kind') == 'time_calculation' and data.get('live_observation') is False:
                 rows.append({'kind': 'time_calculation', **{k:data[k] for k in
                     ('timestamps','chronological_order','differences','reference_kst') if k in data}})
-            if name in EVENT_READ and data.get('source') in ('suricata', 'modsecurity','wazuh'):
+            if name in ('get_web_service_target','search_web_access') and data.get('source')=='c_apache_access_snapshot':
+                keep=('target','observed_at_kst','requested_since_kst','requested_until_kst','returned_count',
+                      'retained_index_match_count','actual_request_total_count','returned_rows_truncated',
+                      'logging_continuity_verified','identity_scope','service','apache_unit','agent','agent_identity_source','coverage')
+                rows.append({'kind':'web_access' if name=='search_web_access' else 'web_service',
+                             **{k:data[k] for k in keep if k in data}})
+            elif name in EVENT_READ and data.get('source') in ('suricata', 'modsecurity','wazuh'):
                 keep = ('source', 'requested_since_kst', 'requested_until_kst', 'returned_count',
                         'indexed_window_total_count', 'scan_capped')
                 row = {k: data[k] for k in keep if k in data}
@@ -675,6 +682,26 @@ def waf_action_violations(text, facts):
     return sorted(issues)
 
 
+def web_evidence_violations(text, facts):
+    rows=[f for f in facts if f.get('kind') in ('web_access','web_service')]
+    if not rows:return []
+    issues=set()
+    limited=any(f.get('kind')=='web_access' and (f.get('returned_rows_truncated') or
+        any(f.get('coverage',{}).get(k) for k in ('rows_truncated','scan_limited','files_unavailable'))) for f in rows)
+    if limited and not re.search(r'잘림|상한|제한|일부.{0,10}(?:보관|색인)',text):
+        issues.add('web_access_coverage_limit_omitted')
+    # An Apache process/configuration and access rows are not an application
+    # health check. Inspect the claim itself, not an unrelated disclaimer.
+    for match in re.finditer(r'(?:Apache|아파치|DVWA|웹\s*서비스|앱)[^\n.!?;|]{0,40}?(?:정상|건강)',text,re.I):
+        before=re.split(r'[.!?;|\n]',text[max(0,match.start()-30):match.start()])[-1]
+        after=text[match.end():match.end()+20]
+        if re.search(r'미확인|확인\s*불가|단정.{0,5}않',before):continue
+        if re.match(r'(?:\s|[/*`])+?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
+        if re.match(r'\s*(?:을|를|이라고)?\s*(?:단정|보장|증명|판단).{0,8}(?:않|없|못)',after):continue
+        issues.add('web_snapshot_is_not_application_health')
+    return sorted(issues)
+
+
 def evidence_claim_violations(text, facts, successful_reads=None):
     """Narrow checks of known evidence limits; no incident classification rules."""
     if not isinstance(text, str):
@@ -682,7 +709,7 @@ def evidence_claim_violations(text, facts, successful_reads=None):
     issues = set(event_field_violations(text, facts) + event_window_violations(text, facts) +
                  incident_binding_violations(text, facts) + containment_time_violations(text, facts) +
                  disposition_citation_violations(text, successful_reads) +
-                 brief_kst_violations(text, facts) + waf_action_violations(text, facts))
+                 brief_kst_violations(text, facts) + waf_action_violations(text, facts) + web_evidence_violations(text,facts))
     observed_event_sources = {x.get('source') for x in facts if x.get('kind') == 'events'}
     for source, names in (('suricata', r'Suricata|IDS'), ('modsecurity', r'WAF|ModSecurity')):
         if source in observed_event_sources:
@@ -693,7 +720,8 @@ def evidence_claim_violations(text, facts, successful_reads=None):
                     not re.search(r'미조회|조회하지|조회.{0,8}못|알\s*수\s*없|확인\s*불가|확인되지', line)):
                 issues.add('unobserved_event_source:' + source)
     unknown = any((x.get('kind') == 'events' and x.get('indexed_window_total_count') is None) or
-                  (x.get('kind') == 'diagnostics' and x.get('requested_window_total_count') is None) for x in facts)
+                  (x.get('kind') == 'diagnostics' and x.get('requested_window_total_count') is None) or
+                  (x.get('kind') == 'web_access' and x.get('actual_request_total_count') is None) for x in facts)
     if unknown:
         for match in re.finditer(r'(?:총|전체)\s*[0-9][0-9,]*\s*건', text):
             before = text[max(0, match.start() - 25):match.start()]
@@ -943,7 +971,17 @@ def literal_evidence_summary(facts):
     rows = []
     for row in display_evidence(facts):
         kind = row.get('kind')
-        if kind == 'time_calculation':
+        if kind in ('web_access','web_service'):
+            rows.append('- 웹 백엔드 '+str(row.get('target'))+': 관측 '+iso(row.get('observed_at_kst'))+
+                '; Apache 설정 파일/프로세스 관측은 앱 정상·침해 부재·프런트 경로 적재 증명이 아님.')
+            if kind=='web_access':
+                rows.append('- 웹 접근 조회 '+iso(row.get('requested_since_kst'))+' ~ '+iso(row.get('requested_until_kst'))+
+                    ': 반환 표본 '+count(row.get('returned_count'))+'행; 보관 색인 일치 '+count(row.get('retained_index_match_count'))+
+                    '행; 실제 전체 요청 수 미확인. 행 SHA는 고유 HTTP 거래 ID가 아님.')
+                coverage=row.get('coverage',{})
+                if any(coverage.get(k) for k in ('rows_truncated','scan_limited','files_unavailable')) or row.get('returned_rows_truncated'):
+                    rows.append('- 웹 접근 근거에 보관 행 상한/반환 제한·읽기 제한 또는 일부 파일 누락이 있음. 잘림·제한을 보고하고 전체 기록으로 표현하지 말 것.')
+        elif kind == 'time_calculation':
             order = row.get('chronological_order', [])
             if order and all(isinstance(x, str) and re.fullmatch(r'[A-Za-z0-9_.:-]{1,32}', x) for x in order):
                 rows.append('- 계산된 시간순(과거 → 최근): ' + ' → '.join(order))
@@ -1058,7 +1096,18 @@ def factual_review_report(facts):
     for row in display_evidence(facts):
         kind=row.get('kind')
         if kind=='times':deferred.extend(row.get('instants',[]));continue
-        if kind=='events':
+        if kind in ('web_access','web_service'):
+            result=('반환 표본 '+count(row.get('returned_count'))+'행 · 보관 색인 '+count(row.get('retained_index_match_count'))+'행 · 실제 전체 요청 수 미확인'
+                    if kind=='web_access' else '고정 서비스의 설정 파일·Apache 프로세스 관측; 앱 상태/프런트 적재 미확인')
+            basis='관측 '+stamp(row.get('observed_at_kst'))+'; 로깅 연속성 미검증'
+            if kind=='web_access':
+                basis+='; 조회 '+stamp(row.get('requested_since_kst'))+' ~ '+stamp(row.get('requested_until_kst'))
+                coverage=row.get('coverage',{})
+                if coverage.get('rows_truncated'):basis+='; 보관 행 상한으로 잘림'
+                if coverage.get('scan_limited') or coverage.get('files_unavailable'):basis+='; 파일 읽기 제한/일부 누락'
+                if row.get('returned_rows_truncated'):basis+='; 반환 행 제한'
+            rows.append((str(row.get('target'))+' 웹 근거',result,basis))
+        elif kind=='events':
             source={'modsecurity':'WAF','suricata':'IDS','wazuh':'Wazuh'}.get(row.get('source'),'센서')
             result='색인 반환 표본 '+count(row.get('returned_count'))+'건 · 전체 건수 '+count(row.get('indexed_window_total_count'))
             basis=['조회 '+stamp(row.get('requested_since_kst'))+' ~ '+stamp(row.get('requested_until_kst'))]

@@ -5,7 +5,7 @@ selects every tool and argument. A successful unrelated read never satisfies a
 requested device. Legacy Wazuh strings are parsed conservatively, not executed.
 """
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 import ipaddress
 import json
@@ -140,6 +140,14 @@ def _single_plan(question, aware_time):
     text = scope_text(without_prohibitions(question))
     if wants_write(text) or re.search(r'도구\s*없이|조회(?:는|하지)\s*말|설명만|번역|라는\s*문장', text):
         return None
+    # Plain web-log lookup only. Investigations, mixed devices, filters and
+    # explicit time requests retain the full model path and their own scope.
+    targets=re.findall(r'(?<![A-Za-z0-9])DVWA(?![A-Za-z0-9])|c:lab-(?:console|java|httpd49|httpd50)',text,re.I)
+    targets=list(dict.fromkeys('c:dvwa' if t.casefold()=='dvwa' else t.casefold() for t in targets))
+    if (len(targets)==1 and re.search(r'(?:접근|요청|access).{0,8}(?:기록|로그|log)',text,re.I)
+            and not re.search(r'사건|공격|의심|분석|원인|영향|왜|정상|WAF|IDS|Suricata|Wazuh|방화벽|규칙|룰|FW|Log4Shell|Log4j|다른|나머지|그\s*외|그리고|및|와|랑|칼리|출발지|소스|특정|에서|부터|어제|오늘|시간|분|[0-9]',
+                             re.sub(r'c:lab-httpd(?:49|50)','',text),re.I)):
+        return {'kind':'web_access','target':targets[0],'lookback_minutes':60,'question':question}
     if (re.search(r'WAF|ModSecurity',text,re.I) and re.search(r'모드|engine\s*mode',text,re.I)
             and not re.search(r'과거|어제|이전|왜|원인|분석|사건|경보|로그|규칙|룰|IDS|Suricata|Wazuh',text,re.I)):
         return {'kind':'waf_mode','target':'a:waf','current':True,'question':question}
@@ -598,6 +606,7 @@ def target_id(p, calls):
 
 
 def scope(p, calls=None):
+    if p['kind']=='web_access':return {'mcp__security_events__search_web_access'}
     if p['kind'] == 'waf_mode': return {'mcp__rule_a__get_service_action_target'}
     if p['kind'] == 'block_list': return {BLOCKS}
     if p['kind'] == 'agent_identity': return {AGENTS}
@@ -705,6 +714,7 @@ def ambiguous_empty(p, calls, name, c):
 
 
 def missing(p, calls, evidence):
+    if p['kind']=='web_access':return [] if web_access_view(p,calls) else [p['target']+': 최근 접근 기록 실제 조회 미완료']
     if p['kind'] == 'waf_mode':
         d=operation_current(p,calls)
         return [] if d and d['observation'].get('configured_engine_mode') in ('On','DetectionOnly') else ['a:waf: 현재 설정 모드 미확인']
@@ -759,6 +769,11 @@ def missing(p, calls, evidence):
 
 
 def guidance(p, calls=()):
+    if p['kind']=='web_access':
+        return ('일반 웹 접근 기록 조회이며 사건 평가 요청이 아닙니다. security-events.search_web_access(target='+p['target']+
+                ', lookback_minutes=60)를 실제 선택하세요. 시간 범위를 지정하지 않아 최근 1시간을 기본으로 조회하며 서버가 KST 구간을 계산합니다. '
+                '실제 반환 기록/시각/상태와 보관·반환 제한을 표로 보고하세요. 0행은 전체 요청/공격 부재가 아니며 Apache active는 프로세스 실행 상태입니다. '
+                '이 요청에서 정상/위험 해소·사건 종결을 평가하거나 INCIDENT_DISPOSITION을 작성하지 마세요. 조회는 변경 승인이 아닙니다.')
     if p['kind'] == 'waf_mode':
         return ('현재 WAF 설정 모드 조회입니다. rule-a.get_service_action_target(target=a:waf)를 실제 선택하세요. '
                 'configured_engine_mode와 startup_engine_mode, helper 정책 요구를 구분하세요. '
@@ -888,7 +903,52 @@ def operation_report(p, calls, evidence):
     return '\n'.join(rows)
 
 
+def web_access_view(p,calls):
+    for call in reversed(calls):
+        if (call.get('server')!='security-events' or call.get('name')!='search_web_access'
+                or call.get('arguments',{}).get('target')!=p['target'] or not successful(call)):continue
+        data=unpack(call['result'])
+        try:
+            if (not isinstance(data,dict) or data.get('error') or data.get('target')!=p['target']
+                    or data.get('source')!='c_apache_access_snapshot' or data.get('mutation_performed') is not False
+                    or data.get('actual_request_total_count') is not None or not isinstance(data.get('records'),list)
+                    or type(data.get('returned_count')) is not int or not 0<=data['returned_count']<=50
+                    or data['returned_count']!=len(data['records']) or not isinstance(data.get('coverage'),dict)):continue
+            start,end,observed=(datetime.fromisoformat(data[k]) for k in ('requested_since_kst','requested_until_kst','observed_at_kst'))
+            if (any(v.utcoffset()!=timedelta(hours=9) for v in (start,end,observed))
+                    or end-start!=timedelta(minutes=p['lookback_minutes'])
+                    or not -5<=(end-observed).total_seconds()<=185):continue
+            for row in data['records']:
+                if (not isinstance(row,dict) or not {'timestamp_kst','path','source_ip','method','status'}<=set(row)
+                        or type(row['status']) is not int or not 100<=row['status']<=599 or not isinstance(row['method'],str)):raise ValueError()
+                stamp=datetime.fromisoformat(row['timestamp_kst'])
+                if not start<=stamp<=end or not isinstance(row['path'],str) or not isinstance(row['source_ip'],str):raise ValueError()
+            return data
+        except (KeyError,TypeError,ValueError,OverflowError):continue
+    return None
+
+
+def web_access_report(p,calls):
+    data=web_access_view(p,calls)
+    if not data:return '웹 접근 기록 조회를 완료하지 못했습니다. 실패·미확인을 0건이나 정상으로 표시하지 않았습니다.'
+    coverage=data['coverage'];limits=[]
+    if coverage.get('rows_truncated'):limits.append('보관 행 상한으로 잘림')
+    if coverage.get('scan_limited') or coverage.get('files_unavailable'):limits.append('파일 읽기 제한/일부 누락')
+    if data.get('returned_rows_truncated'):limits.append('반환 행 제한')
+    rows=['웹 백엔드 접근 기록의 최근 1시간 조회 결과입니다.','',*table(['항목','조회 근거'],[
+        ('대상',p['target']),('요청 구간',data['requested_since_kst']+' ~ '+data['requested_until_kst']),
+        ('스냅샷 관측',data['observed_at_kst']),('반환/실제 전체','반환 표본 '+str(data['returned_count'])+'행 · 실제 전체 요청 수 미확인'),
+        ('근거 제한','; '.join(limits+['로깅 연속성 미검증']))])]
+    if data['records']:
+        rows+=['',*table(['KST 시각','로그 출발지','메서드','경로','HTTP 상태'],[
+            (x['timestamp_kst'],x['source_ip'],x['method'],x['path']+(' [경로 잘림]' if x.get('path_truncated') else ''),x['status']) for x in data['records']])]
+    rows+=['','반환 표본만 표시했습니다. 0행·HTTP 상태·Apache 실행 상태로 앱 정상이나 침해 부재를 판단하지 않습니다. '
+           '로그 출발지 주소의 실제 사용자 신원·프런트 경로 적재는 별도 확인이 필요합니다. 변경은 수행하지 않았습니다.']
+    return '\n'.join(rows)
+
+
 def report(p, calls, evidence):
+    if p['kind']=='web_access':return web_access_report(p,calls)
     if p['kind'] == 'waf_mode':
         d=operation_current(p,calls)
         if not d:

@@ -1,0 +1,174 @@
+{
+  "schema": 1,
+  "updated_at_kst": "2026-11-04T23:51:12.112761+09:00",
+  "contract": "1.5.25",
+  "query": "1.19.20",
+  "security_events_version": "1.2.0",
+  "tools_added": [
+    "get_web_service_target",
+    "search_web_access"
+  ],
+  "fixed_targets": [
+    "c:dvwa",
+    "c:lab-console",
+    "c:lab-java",
+    "c:lab-httpd49",
+    "c:lab-httpd50"
+  ],
+  "catalog": {
+    "status": "discovered",
+    "servers": 8,
+    "tools": 43,
+    "model_calls": 0,
+    "protected_calls": 0,
+    "chat_posts": 0
+  },
+  "tests": {
+    "suites": {
+      "web": 19,
+      "events": 24,
+      "diagnostics": 37,
+      "install-web": 6,
+      "install-diagnostics": 18,
+      "install-management": 38,
+      "management": 247,
+      "web-grounding": 5,
+      "web-read": 5,
+      "sdk": 195,
+      "native": 390,
+      "review": 60,
+      "output": 5,
+      "markdown": 8,
+      "table-chunks": 18
+    },
+    "total": 1075,
+    "passed": 1074,
+    "skipped": 1,
+    "skip_reason": "native installed splitter import unavailable in host unit environment; previous installed split/UI verification retained"
+  },
+  "actual_mcp": {
+    "successful_reads": 8,
+    "refused_invalid_calls": 2,
+    "existing_diagnostics_read_successful": true,
+    "agent_id": "002",
+    "agent_name": "groot-web"
+  },
+  "actual_model_trials": {
+    "scope": "fresh production worker executions without chat posting; original 35B, read-only, no training changes",
+    "before": {
+      "ollama_seconds": 36.99816572107375,
+      "ollama_calls": 2,
+      "ollama_failure": "active called normal and bounded retention omitted",
+      "hermes_seconds": 104.42105572705623,
+      "hermes_calls": 2,
+      "hermes_failure": "plain lookup turned into benign/risk-resolved assessment"
+    },
+    "after": {
+      "ollama_seconds": 13.36864476907067,
+      "ollama_status": "completed",
+      "ollama_calls": 1,
+      "hermes_seconds": 45.3347591040656,
+      "hermes_status": "completed",
+      "hermes_calls": 1,
+      "hermes_read_scope_complete": true,
+      "underlying_case_state_unchanged": "needs_review",
+      "protected_calls": 0
+    },
+    "intermediate_native": {
+      "seconds": 53.05059528897982,
+      "lookup_scope_complete": true,
+      "worker_status": "partial",
+      "fixed": "completed read fields separated from case status for lead only"
+    },
+    "limits": [
+      "single samples, shared inference load/cache not controlled",
+      "no new chat/UI round trip",
+      "no fresh attack or approval/block changes",
+      "0 sample and Apache state do not prove no compromise"
+    ]
+  },
+  "deployment": {
+    "b_targets": 19,
+    "b_confirmed": {
+      "confirmed_at_epoch": 1793803572,
+      "targets": 19,
+      "services": [
+        "active",
+        "active",
+        "active"
+      ],
+      "container": "running",
+      "actual_mcp_reads": 8,
+      "rejected_inputs": 2,
+      "embedded_gate_matches_reference": true,
+      "manual_rollback_executed": false
+    },
+    "c_confirmed_at_kst": "2026-11-04T23:25:43.064826+09:00",
+    "c_recovery_noop": "confirmed_noop",
+    "b_recovery_noop": "confirmed_noop",
+    "manual_rollback_tested": false,
+    "native_container_restarts": 3,
+    "sdk_worker_restarts": 3,
+    "review_worker_restarts": 4,
+    "private_key_exported": false,
+    "new_general_sudo_or_shell": false,
+    "new_packages_or_ports": 0,
+    "fresh_os_install_tested": false
+  },
+  "runtime_sha256": {
+    "/opt/mcp/security-events-mcp.py": "c4a49752ce376f3c13bfef317bc3553f91f323f7cfe61f154af0e88ad1a1ee7a",
+    "/opt/mcp/web_evidence.py": "1f8824a2221295c9509863479c4813990b05d230942f9b66b0b9292689224c42",
+    "/opt/mcp/web_evidence_client.py": "7b39d91534dfeaea7e729fd0491862bb3666cb50e6eb025244791b27b73b8497",
+    "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "bc0eb3ad10aba7ceacc4adb4bb60a5971e1f6252ebde1549b4854ab64cf0505b",
+    "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "482741df0c83c8c808697732aa66020483d27e7bc40408950691f6f4ba5398a2",
+    "/opt/hermes-data/plugins/groot-query-completion/read_contract.py": "f7a8a6b9e9fd22e1fc04a7cbda628cee7810b9cee924be4cfde8e2c5a78daedd",
+    "/opt/capstone-ollama-trial/grounding.py": "bc0eb3ad10aba7ceacc4adb4bb60a5971e1f6252ebde1549b4854ab64cf0505b",
+    "/opt/capstone-ollama-trial/chat_contract.py": "482741df0c83c8c808697732aa66020483d27e7bc40408950691f6f4ba5398a2",
+    "/opt/capstone-ollama-trial/read_contract.py": "f7a8a6b9e9fd22e1fc04a7cbda628cee7810b9cee924be4cfde8e2c5a78daedd",
+    "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "eb05c23f43530403226acabe6f36fe2a990b79fd08bc3c13c75389273c2f6d84",
+    "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "ce96aad446a20603dcd4e9fc4bec81c0a63c20a0a3d80c6a45a16d82344a6a0b",
+    "/opt/capstone-ollama-trial/query_grounding.py": "eb05c23f43530403226acabe6f36fe2a990b79fd08bc3c13c75389273c2f6d84",
+    "/opt/capstone-ollama-trial/policy.py": "334b01644d2641fcd56de2fad45f5e59c21bf4e39a1a9d3e072a811a5e3b3fce",
+    "/opt/hermes-data/management-code/run.py": "bc0eb3ad10aba7ceacc4adb4bb60a5971e1f6252ebde1549b4854ab64cf0505b",
+    "/opt/capstone-management/soc_management_run.py": "bc0eb3ad10aba7ceacc4adb4bb60a5971e1f6252ebde1549b4854ab64cf0505b",
+    "/opt/capstone-management/soc_management_controller.py": "2544dfad0cafb57ceb691a1a355435e9034e488a5d8d03a4a0815f36c6880e38",
+    "/etc/capstone-ollama-trial/receipt.json": "e73fceffb09a7f613b01cd3f4441cf970c63356e3db9cb172c4f2a403ccfaac8",
+    "/opt/capstone-review-chat/review_channel_worker.py": "64c80550a2e20b873dcbb93bb923f07377884615c2e39fc128d58e7f6929ec0d",
+    "/etc/capstone-review-chat/receipt.json": "ed97a66b1c9171d1cd70427dd67ee58932d8a5d3406343e5c3c4ffe127d8c4eb"
+  },
+  "source_sha256": {
+    "infra/mcp/security-events-mcp.py": "c4a49752ce376f3c13bfef317bc3553f91f323f7cfe61f154af0e88ad1a1ee7a",
+    "infra/mcp/web_evidence.py": "1f8824a2221295c9509863479c4813990b05d230942f9b66b0b9292689224c42",
+    "infra/mcp/web_evidence_client.py": "7b39d91534dfeaea7e729fd0491862bb3666cb50e6eb025244791b27b73b8497",
+    "infra/mcp/read-web-evidence.py": "0347f95644bd8b02057deb7e84a633eeec49e83f3158560537bdb5d44ff1f6dd",
+    "deployment/web_access_deploy.py": "53645d34328d17178429901a38ec5268eb80e81927ba5272e6c81506643a77ab",
+    "infra/hermes/soc_management_run.py": "bc0eb3ad10aba7ceacc4adb4bb60a5971e1f6252ebde1549b4854ab64cf0505b",
+    "infra/hermes/read_contract.py": "f7a8a6b9e9fd22e1fc04a7cbda628cee7810b9cee924be4cfde8e2c5a78daedd",
+    "infra/hermes/review_channel_worker.py": "64c80550a2e20b873dcbb93bb923f07377884615c2e39fc128d58e7f6929ec0d"
+  },
+  "remaining": [
+    "application/host/post-incident impact and complete investigation",
+    "SDK incident-closure parity",
+    "bounded retention and logging continuity",
+    "C protected service control",
+    "first containment latency",
+    "new-machine full installation",
+    "latest thesis PDF and independent evaluation"
+  ],
+  "publication": {
+    "source_commit": null,
+    "remote_verified": false,
+    "state": "pending"
+  },
+  "cleanup": {
+    "server_removed_files": 463,
+    "server_removed_bytes": 6801170,
+    "server_recovery_preserved": true,
+    "mac_removed_files": 61,
+    "mac_removed_bytes": 10263399,
+    "mac_temp_parent_absent": true,
+    "own_ssh_processes_remaining": 0,
+    "package_downloads_or_installs": 0,
+    "state": "complete"
+  }
+}

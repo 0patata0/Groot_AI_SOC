@@ -1,5 +1,7 @@
 # Groot_AI_SOC
 
+11/4 웹 백엔드 읽기 보완: C Apache 접근 기록을 고정 MCP2도구로 조회하고 단문 요청의 불필요한 사건 평가·근거 제한 누락을 보완했습니다. 실제 운영 worker의 새 질문에서 Ollama13.369초·Hermes45.335초/각1읽기·쓰기0을 확인했습니다. 채팅 왕복 평균·실제 침해 영향/사건 종결 완료를 뜻하지 않습니다. [구성·검증·복구](infra/mcp/web-evidence.md).
+
 구축·운영의 현행 진입점은 [배포 가이드](deployment/README.md)이며, [NCSC/NIS 공식 지침 부분 대조](deployment/SECURITY_GUIDELINES.md)와 [운영 절차](deployment/OPERATIONS.md)를 연결한다. 전체 기관 준수·새3VM 설치 검증 완료를 뜻하지 않는다. [조회 정확성 보완](infra/hermes/read-accuracy.md)은 실제 관측/시작값·도구 대상·한국어 필터를 구분한다.
 
 **채팅 하네스·담당 분배(11/4):** 공통1.5.23/query1.19.18/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).

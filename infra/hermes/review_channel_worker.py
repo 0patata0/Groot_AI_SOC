@@ -610,7 +610,8 @@ def main():
             if (harness.read_plan(current) or fw_only or diagnostic_targets) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)
-            if result['completed'] and scope_complete and (response_read or diagnostic_targets or (plan and plan['kind'] == 'agent_identity')):
+            if result['completed'] and scope_complete and (response_read or diagnostic_targets or (plan and
+                    (plan['kind']=='agent_identity' or plan['kind']=='web_access' and request['phase']=='lead'))):
                 status = 'completed'  # Completion of these read fields, not incident closure.
             evidence=({'question':current,'calls':receipts} if result['completed'] and scope_complete and not any(c['is_write'] for c in calls) else None)
             print(json.dumps({'status': status, 'peer_review': peer_review, 'evidence':evidence, 'native_seconds':native_seconds,

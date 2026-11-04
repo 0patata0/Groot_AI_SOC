@@ -21,6 +21,7 @@ import sys
 import tempfile
 
 import soc_management as common
+import web_access_deploy as webdeploy
 
 STATE = Path('/var/lib/capstone-diagnostics')
 PRIVATE = STATE / 'installation'
@@ -59,9 +60,10 @@ def settings(env=None):
 
 def source_bundle(s):
     data = {name: common.read(s['source'] / 'infra/mcp' / name, 256 * 1024) for name in SOURCES}
+    data['soc_diagnostics.py'] = common.read(s['source'] / 'deployment/soc_diagnostics.py')
+    data.update(webdeploy.source_bundle(s))
     for name, raw in data.items():
         if name.endswith('.py'): ast.parse(raw)
-    data['soc_diagnostics.py'] = common.read(s['source'] / 'deployment/soc_diagnostics.py')
     return data
 
 
@@ -242,6 +244,7 @@ def apply_reader(s, role, raw):
         saved = common.parse(common.read(PRIVATE / 'active.json', secret=True))
         need(saved.get('reader_public_key') == public, 'diagnostic_reader_key_changed')
         verify(s, role)
+        if role == 'service': webdeploy.install_service(s, public)
         return reader_public(s, role)
     gid = install_common(s, role)
     common.run(['/usr/sbin/useradd', '--system', '--gid', GROUP, '--no-create-home',
@@ -264,6 +267,7 @@ def apply_reader(s, role, raw):
     common.write(PRIVATE / 'active.json', common.canonical({'schema': 1, 'profile': profile(s, role),
         'reader_public_key': public, 'files': {str(p): installed_record(p) for p in files}}))
     verify(s, role)
+    if role == 'service': webdeploy.install_service(s, public)
     return reader_public(s, role)
 
 

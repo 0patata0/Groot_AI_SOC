@@ -223,7 +223,7 @@ def profile(snap, images):
             'prerequisite_credentials_sha256':digest(read(PRE/'siem.json',16384,True)),
             'source_sha256':{p:digest(read(SOURCE/p)) for p in (
                 'deployment/ssh_macs.py','deployment/siem_host_agent.py','deployment/inference_tunnel.py',
-                'infra/mcp/security-events-mcp.py','infra/hermes/korean_output_guard.py',
+                'infra/mcp/security-events-mcp.py','infra/mcp/web_evidence.py','infra/mcp/web_evidence_client.py','infra/hermes/korean_output_guard.py',
                 'infra/hermes/SOUL.groot.md',
                 'deployment/bot_profiles.py','deployment/bot-icons/sources.json',
                 'deployment/bot-icons/hermes.png','deployment/bot-icons/ollama.png',
@@ -307,7 +307,7 @@ def preflight():
     binary = read(PRE/'mcp/mcp-server-wazuh', 64*1024*1024)
     pin = read(PRE/'mcp/mcp-server-wazuh.sha256', 128).decode().strip()
     need(re.fullmatch(r'[0-9a-f]{64}', pin) and digest(binary) == pin and binary.startswith(b'\x7fELF'), 'reviewed_mcp_binary_SHA_required')
-    for p in ('infra/mcp/security-events-mcp.py', 'infra/hermes/korean_output_guard.py',
+    for p in ('infra/mcp/security-events-mcp.py', 'infra/mcp/web_evidence.py', 'infra/mcp/web_evidence_client.py', 'infra/hermes/korean_output_guard.py',
               'infra/hermes/SOUL.groot.md',
               'deployment/bot_profiles.py','deployment/bot-icons/sources.json',
               'deployment/bot-icons/hermes.png','deployment/bot-icons/ollama.png',
@@ -642,6 +642,8 @@ def setup_mcp_and_hermes(c, images, creds):
     mkdir(data/'home/.ssh',0o700,hu.pw_uid,hu.pw_gid)
     publish(mcp/'mcp-server-wazuh',read(PRE/'mcp/mcp-server-wazuh',64*1024*1024),0o550,0,mc.pw_gid)
     publish(mcp/'security-events-mcp.py',read(SOURCE/'infra/mcp/security-events-mcp.py'),0o440,0,mc.pw_gid)
+    for name in ('web_evidence.py','web_evidence_client.py'):
+        publish(mcp/name,read(SOURCE/'infra/mcp'/name),0o440,0,mc.pw_gid)
     publish(mcp/'root-ca.pem',read(DEST/'tls/root-ca.pem'),0o440,0,mc.pw_gid)
     env={'WAZUH_API_HOST':IP,'WAZUH_API_PORT':'55000','WAZUH_API_USERNAME':creds['readonly_username'],
          'WAZUH_API_PASSWORD':creds['readonly_password'],'WAZUH_INDEXER_HOST':IP,'WAZUH_INDEXER_PORT':'9200',

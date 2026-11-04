@@ -1,6 +1,6 @@
 # Agentic SOC 실행 계획
 
-전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [이번 작업 전](archive/PLAN-before-incident-impact-20261104.md) · [직전 계획](archive/PLAN-before-gate-binding-20261104.md) · [사건 표 전](archive/PLAN-before-incident-review-20261104.md) · [조회 지연 전](archive/PLAN-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
+전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [이번 작업 전](archive/PLAN-before-web-evidence-20261104.md) · [영향 검사 전](archive/PLAN-before-incident-impact-20261104.md) · [직전 계획](archive/PLAN-before-gate-binding-20261104.md) · [사건 표 전](archive/PLAN-before-incident-review-20261104.md) · [조회 지연 전](archive/PLAN-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
 
 ## 역할과 승인
 
@@ -60,3 +60,5 @@ OpenClaw·Google Harness²·SSL VPN/모바일 푸시는 후보/검토 범위다.
 [사건 후속·표 출력 검증](infra/hermes/incident-followup.md)은 표시/필수 읽기 검증의 완료와 실제 조사 미완료를 구분한다. 신규 학습·운영 모델 교체·추가 권한·보호 조치 실행을 이번 결과로 승인하지 않는다.
 
 [실제 포함gate 결속](infra/hermes/management-gate-binding.md) 후 필수읽기 누락은 마지막 표본에서 해소됐다.195.332초는 속도 향상 증거가 아니며 다음은 영향 근거와 보고의 사실 정확성을 보완한다. 논문 초안은11/4 운영·실험, 현행 시스템SVG 단독 시각검수와 참고문헌11개 서지/개념 대조를 반영했다. 최신PDF·전체 출판본/제출형식·최종 독립평가가 남는다. [사건 의미·최소 영향 조회/복구](infra/hermes/incident-impact.md).
+
+[웹 백엔드 읽기](infra/mcp/web-evidence.md)2도구와 단순 접근 조회 경로를11/4 운영 반영했다. 원시 로그 대신 제한된 정제 스냅샷을 LLM이 직접 MCP로 읽는다. 새 단문 최종 표본은 Ollama13.369초·Hermes45.335초/각1MCP·쓰기0이다. 반환0행·Apache active로 정상/침해 부재를 판단하지 않으며 조회 완료와 실제 사건 종결을 구분한다. 다음은 이 근거로 실제 사건의 앱/호스트·사후 영향과 SDK 종결 검사 동등성을 확인한다. 추가 학습/모델 교체·새 공격·C 제어 권한을 이번 읽기 결과로 승인하지 않는다.

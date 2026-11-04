@@ -366,7 +366,8 @@ class SecurityEventsMcpTests(unittest.TestCase):
         lines = [json.loads(line) for line in proc.stdout.splitlines()]
         self.assertEqual([row["id"] for row in lines], [1, 2, 3])
         self.assertEqual({tool["name"] for tool in lines[1]["result"]["tools"]},
-                         {"search_suricata_alerts", "search_modsecurity_alerts", "get_wazuh_sca_checks", "search_wazuh_alerts"})
+                         {"search_suricata_alerts", "search_modsecurity_alerts", "get_wazuh_sca_checks", "search_wazuh_alerts",
+                          "get_web_service_target", "search_web_access"})
         self.assertTrue(lines[2]["result"]["isError"])
 
 

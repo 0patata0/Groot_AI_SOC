@@ -1,5 +1,7 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
+**11/4 현재 웹 근거:** 기존 security-events에 고정 웹 읽기2개를 더해6도구다. C 접근 로그·등록 자산/Apache 관측을 기존 경보 색인과 구분하고, 기존 진단 프로토콜/승인 경계를 유지한다. [조회·단문·권한·실측·복구](web-evidence.md). 아래 도구 수치는 해당 시점의 기록이다.
+
 > **2026-10-31 과거 Wazuh 사건 조회:** `security-events.search_wazuh_alerts`를 추가했다. 절대 KST 구간·Wazuh 규칙 ID·agent·출발지로 고정 인덱스를 읽고, service unit/종료 상태를 반환한다. 원문 로그·명령·인증 값은 반환하지 않는다. security-events4읽기 도구이며 신규 패키지/권한 확대는 없다. [범위·검증·복구](../hermes/card-investigation-progress.md). 아래2/3도구 수치는 당시 기록이다.
 
 

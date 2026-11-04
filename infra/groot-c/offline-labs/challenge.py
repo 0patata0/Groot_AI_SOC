@@ -1,4 +1,4 @@
-"""Bounded, single-use challenges for the WAF practice exception key.
+"""Bounded, single-use challenges for web administrator authentication.
 
 The browser sends HMAC-SHA-256(SHA-256(UTF-8(key)), UTF-8(message)).
 Neither the key nor its reusable SHA-256 digest is part of this protocol.
@@ -15,7 +15,7 @@ import time
 TTL = 30
 PER_ADDRESS_LIMIT = 8
 GLOBAL_LIMIT = 256
-CONTEXT = 'capstone-waf-practice-session-v1'
+CONTEXT = 'capstone-web-admin-session-v2'
 
 
 class ChallengeLimit(Exception):

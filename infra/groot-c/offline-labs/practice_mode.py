@@ -1,4 +1,4 @@
-"""Short-lived, client-bound WAF observation sessions; never an IP allowlist."""
+"""Client-bound web administrator sessions; never a WAF exemption."""
 import base64
 import hashlib
 import hmac
@@ -8,7 +8,7 @@ import re
 import secrets
 import time
 
-COOKIE = 'groot_lab_mode'
+COOKIE = 'groot_lab_admin'
 TTL = 600
 JAVA_COOKIES = frozenset(('groot_log4shell_java_http', '__Secure-groot_log4shell_java_https'))
 
@@ -24,7 +24,7 @@ def client_address(request):
 
 
 def signing_key(secret):
-    return hmac.new(secret.encode(), b'capstone-practice-mode-v1', hashlib.sha256).digest()
+    return hmac.new(secret.encode(), b'capstone-web-admin-session-v2', hashlib.sha256).digest()
 
 
 def issue(secret, address, now=None):

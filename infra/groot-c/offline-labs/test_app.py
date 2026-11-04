@@ -29,7 +29,15 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         await self.life.__aexit__(None, None, None)
         self.env.stop();self.temp.cleanup()
 
-    async def request(self, path, method='GET', body=b'', token=False, extra=None, host=b'127.0.0.1:18090'):
+    async def request(self, path, method='GET', body=b'', token=False, extra=None, host=b'127.0.0.1:18090', authenticated=False):
+        extra = list(extra or [])
+        if not any(k == b'x-lab-client-ip' for k, _ in extra):
+            extra.append((b'x-lab-client-ip', b'192.168.16.231'))
+        if authenticated and not any(k == b'cookie' for k, _ in extra):
+            from practice_mode import issue, COOKIE
+            address = next(v.decode() for k,v in extra if k == b'x-lab-client-ip')
+            value, _ = issue(self.token, address)
+            extra.append((b'cookie', (COOKIE + '=' + value).encode()))
         headers = [(b'host', host)]
         if token:headers.append((b'authorization', ('Bearer ' + self.token).encode()))
         if body:headers.append((b'content-type', b'application/json'))
@@ -50,7 +58,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         content=b''.join(x.get('body',b'') for x in sent if x['type']=='http.response.body')
         return start['status'],content,dict(start['headers'])
 
-    async def challenge_proof(self, extra=None, host=b'127.0.0.1:18090'):
+    async def challenge_proof(self, extra=None, host=b'127.0.0.1:18090', authenticated=False):
         code, body, headers = await self.request('/api/challenge', extra=extra, host=host)
         self.assertEqual(code, 200)
         challenge = json.loads(body)
@@ -71,6 +79,34 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
                 cookies.load(value.decode())
         return cookies
 
+    async def test_control_requires_administrator_network_and_new_session_without_RPC(self):
+        from practice_mode import COOKIE, issue
+        origin=[(b'origin',b'http://127.0.0.1:18090')]
+        body=json.dumps({'cve_id':'CVE-2021-44228'}).encode()
+        with patch.object(self.module,'rpc') as rpc:
+            for action in ('deploy','stop'):
+                for extra,status in ((origin,401),
+                    (origin+[(b'cookie',b'groot_lab_mode=legacy-session')],401),
+                    (origin+[(b'x-lab-client-ip',b'192.168.16.232')],403)):
+                    self.assertEqual((await self.request('/api/'+action,'POST',body,extra=extra))[0],status)
+            token,_=issue(self.token,'192.168.16.232')
+            self.assertEqual((await self.request('/api/stop','POST',body,extra=origin+[
+                (b'x-lab-client-ip',b'192.168.16.232'),(b'cookie',(COOKIE+'='+token).encode())]))[0],403)
+            rpc.assert_not_called()
+
+    async def test_admin_status_is_separate_from_isolation_and_WAF_always_enforces(self):
+        with patch.object(self.module,'rpc',return_value={'labs':{},'deployment_allowed':True}):
+            for authenticated in (False,True):
+                code,body,_=await self.request('/api/status',authenticated=authenticated)
+                data=json.loads(body)
+                self.assertEqual(code,200);self.assertTrue(data['isolation_verified'])
+                self.assertEqual(data['deployment_allowed'],authenticated)
+                self.assertTrue(data['administrator_required'])
+                _,body,_=await self.request('/api/session',authenticated=authenticated)
+                data=json.loads(body)
+                self.assertEqual(data['mode'],'enforce');self.assertIsNone(data['expires_at'])
+                self.assertEqual(data['admin_authenticated'],authenticated)
+
     async def test_only_primary_cookie_is_issued_or_deleted(self):
         from practice_mode import COOKIE, check
         public = b'log4shell.grootlab.duckdns.org'
@@ -85,7 +121,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(cookies[COOKIE]['samesite'], 'strict')
             self.assertTrue(cookies[COOKIE]['httponly'])
             self.assertEqual(bool(cookies[COOKIE]['secure']), host == public)
-            self.assertEqual(check(self.token, cookies[COOKIE].value, '127.0.0.1'), json.loads(body)['expires_at'])
+            self.assertEqual(check(self.token, cookies[COOKIE].value, '192.168.16.231'), json.loads(body)['admin_expires_at'])
             for method, data, expected in (('DELETE', b'{}', 200), ('POST', b'{}', 401)):
                 code, _, _ = await self.request('/api/session', method, data, host=host, extra=extra)
                 self.assertEqual(code, expected)
@@ -100,12 +136,12 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         payload = await self.challenge_proof(host=host)
         self.assertEqual((await self.request('/api/session', 'POST', payload, host=host))[0], 200)
         cookies = self.response_cookies()
-        self.assertTrue(cookies['groot_lab_mode']['secure'])
+        self.assertTrue(cookies['groot_lab_admin']['secure'])
         self.assertEqual((await self.request('/api/session', host=b'log4shell.grootlab.duckdns.org'))[0], 400)
         payload = await self.challenge_proof()
         self.assertEqual((await self.request('/api/session', 'POST', payload,
                                             extra=[(b'x-forwarded-proto', b'https')]))[0], 200)
-        self.assertFalse(self.response_cookies()['groot_lab_mode']['secure'])
+        self.assertFalse(self.response_cookies()['groot_lab_admin']['secure'])
 
     async def test_unconfigured_application_allows_only_loopback_origins(self):
         with patch.dict(os.environ):
@@ -151,7 +187,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         cookie = headers[b'set-cookie'].split(b';', 1)[0]
         code, _, headers = await self.request('/api/gateway-session', extra=[
             (b'cookie', cookie), (b'x-lab-gateway', b'1'), (b'x-lab-id', b'CVE-2021-44228')])
-        self.assertEqual(code, 204); self.assertEqual(headers[b'x-lab-mode'], b'exempt')
+        self.assertEqual(code, 204); self.assertEqual(headers[b'x-lab-mode'], b'enforce')
         self.assertEqual(headers[b'x-lab-cookie'], b'')
         with patch.object(self.module, 'rpc') as rpc:
             self.assertEqual((await self.request('/api/deploy', 'POST', b'{"cve_id":"CVE-2021-44228"}',
@@ -161,23 +197,23 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
     async def test_anonymous_practice_and_enforced_default(self):
         self.assertEqual((await self.request('/api/list',token=False))[0],200)
         code,body,_=await self.request('/api/session',token=False)
-        self.assertEqual(code,200);self.assertEqual(json.loads(body),{'mode':'enforce','expires_at':None})
+        self.assertEqual(code,200);self.assertEqual(json.loads(body),{'mode':'enforce','expires_at':None,'admin_authenticated':False,'admin_expires_at':None})
         with patch.object(self.module,'rpc',return_value={'ok':True}) as mock:
             for identifier in ('CVE-2021-44228', 'CVE-2021-3156'):
                 mock.reset_mock()
-                self.assertEqual((await self.request('/api/deploy','POST',json.dumps({'cve_id':identifier}).encode(),token=False))[0],200)
-                mock.assert_called_once_with('deploy',identifier)
+                self.assertEqual((await self.request('/api/deploy','POST',json.dumps({'cve_id':identifier}).encode(),token=False))[0],401)
+                mock.assert_not_called()
 
     async def test_proof_is_only_for_short_lived_observation_session(self):
         self.assertEqual((await self.request('/api/session','POST',b'{}',token=False))[0],401)
         payload = await self.challenge_proof()
         code,body,headers=await self.request('/api/session','POST',payload)
-        self.assertEqual(code,200);self.assertEqual(json.loads(body)['mode'],'exempt')
+        self.assertEqual(code,200);self.assertTrue(json.loads(body)['admin_authenticated']);self.assertEqual(json.loads(body)['mode'],'enforce')
         self.assertNotIn(self.token.encode(),body+headers[b'set-cookie'])
         self.assertIn(b'HttpOnly',headers[b'set-cookie']);self.assertIn(b'SameSite=strict',headers[b'set-cookie'])
         cookie=headers[b'set-cookie'].split(b';',1)[0]
         code,body,_=await self.request('/api/session',token=False,extra=[(b'cookie',cookie)])
-        self.assertEqual(json.loads(body)['mode'],'exempt')
+        self.assertTrue(json.loads(body)['admin_authenticated']);self.assertEqual(json.loads(body)['mode'],'enforce')
         code,body,_=await self.request('/api/session',token=False,extra=[(b'cookie',cookie),(b'x-lab-client-ip',b'192.168.15.222')])
         self.assertEqual(json.loads(body)['mode'],'enforce')
         code,body,headers=await self.request('/api/session','DELETE',b'{}',token=False,extra=[(b'cookie',cookie)])
@@ -206,7 +242,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
         now[0] = 1030
         self.assertEqual((await self.request('/api/session','POST',payload))[0],401)
         payload = await self.challenge_proof()
-        self.assertEqual((await self.request('/api/session','POST',payload,extra=[(b'x-lab-client-ip',b'192.168.15.222')]))[0],401)
+        self.assertEqual((await self.request('/api/session','POST',payload,extra=[(b'x-lab-client-ip',b'192.168.15.222')]))[0],403)
         self.assertEqual((await self.request('/api/session','POST',payload))[0],401)
 
     async def test_verification_errors_are_bounded_and_do_not_reflect_input(self):
@@ -280,7 +316,7 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
                 original,self.app=self.app,replacement
                 try:
                     self.assertEqual(json.loads((await self.request('/api/list'))[1]),catalog)
-                    self.assertEqual((await self.request('/terminal/CVE-2021-3156/'))[0],404)
+                    self.assertEqual((await self.request('/terminal/CVE-2021-3156/', authenticated=True))[0],404)
                     raw=b'groot_lab_mode=forged; PHPSESSID=0123456789abcdef0123456789; security=low; groot_log4shell_java_http=abc.123'
                     for identifier,expected in ((b'LAB-DVWA',b'PHPSESSID=0123456789abcdef0123456789; security=low'),
                                                  (b'CVE-2021-41773',b''),(b'CVE-2021-3156',b'')):
@@ -292,11 +328,11 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_selection_accepts_only_cve_or_exact_dvwa_identifier(self):
         with patch.object(self.module,'rpc',return_value={'ok':True}) as rpc:
-            self.assertEqual((await self.request('/api/stop','POST',b'{"cve_id":"LAB-DVWA"}'))[0],200)
+            self.assertEqual((await self.request('/api/stop','POST',b'{"cve_id":"LAB-DVWA"}', authenticated=True))[0],200)
             rpc.assert_called_once_with('stop','LAB-DVWA')
             rpc.reset_mock()
             for identifier in ('LAB-OTHER','LAB-DVWA/../','LAB-DVWA\n'):
-                self.assertEqual((await self.request('/api/stop','POST',json.dumps({'cve_id':identifier}).encode()))[0],422)
+                self.assertEqual((await self.request('/api/stop','POST',json.dumps({'cve_id':identifier}).encode(), authenticated=True))[0],422)
             rpc.assert_not_called()
 
     async def test_cross_origin_cannot_enable_observation(self):
@@ -326,14 +362,14 @@ class AppTests(unittest.IsolatedAsyncioTestCase):
                             {'cve_id':'CVE-2021-3156','container_id':'a'*64},
                             {'cve_id':'CVE-2021-3156','user':'0:0'},
                             {'cve_id':'CVE-2021-3156','socket':'/var/run/docker.sock'}]:
-                self.assertEqual((await self.request('/api/deploy','POST',json.dumps(payload).encode()))[0],422)
+                self.assertEqual((await self.request('/api/deploy','POST',json.dumps(payload).encode(), authenticated=True))[0],422)
             mock.assert_not_called()
 
     async def test_bound_body_and_valid_id(self):
         with patch.object(self.module,'rpc',return_value={'ok':True,'lab':{'status':'running'}}) as mock:
-            self.assertEqual((await self.request('/api/deploy','POST',b'x'*4097))[0],413)
+            self.assertEqual((await self.request('/api/deploy','POST',b'x'*4097, authenticated=True))[0],413)
             mock.assert_not_called()
-            self.assertEqual((await self.request('/api/deploy','POST',b'{"cve_id":"CVE-2021-44228"}'))[0],200)
+            self.assertEqual((await self.request('/api/deploy','POST',b'{"cve_id":"CVE-2021-44228"}', authenticated=True))[0],200)
             mock.assert_called_once_with('deploy','CVE-2021-44228')
 
     async def test_status_dictionary_adapted(self):

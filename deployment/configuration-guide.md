@@ -91,6 +91,8 @@ LLM_BASE_URL=http://192.0.2.40:11434/v1
 LLM_MODEL=qwen3.6:35b
 ```
 
+`MANAGEMENT_ALLOWED_CIDRS`는 신규 C 콘솔의 `OFFLINE_LABS_ADMIN_CIDRS`에도 기록된다. 공개 웹 열람과 관리자 제어를 분리하며, 인증해도 WAF On이다. 현재 운영의 관리자 주소는192.168.16.231/32다. [검증·복구](../infra/validation/web-policy/README.md).
+
 | 설정 | 의미·제약 |
 |---|---|
 | `SECURITY_HOST`, `SIEM_HOST`, `SERVICE_HOST` | 서로 다른 사용 가능한 IPv4 리터럴. 호스트명·CIDR 금지 |

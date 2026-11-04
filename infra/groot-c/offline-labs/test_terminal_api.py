@@ -33,7 +33,7 @@ class TerminalApiTests(unittest.IsolatedAsyncioTestCase):
         key = base / 'key'
         key.write_text('test-only-terminal-fixture-key')
         self.environment = mock.patch.dict(os.environ, {'OFFLINE_LABS_MANIFEST': str(manifest),
-            'OFFLINE_LABS_TOKEN_FILE': str(key), 'OFFLINE_LABS_ORIGINS': ORIGIN.decode()})
+            'OFFLINE_LABS_TOKEN_FILE': str(key), 'OFFLINE_LABS_ORIGINS': ORIGIN.decode(), 'OFFLINE_LABS_ADMIN_CIDRS':'127.0.0.1/32'})
         self.environment.start()
         self.module = importlib.import_module('app')
         self.terminal = importlib.import_module('terminal_api')
@@ -52,7 +52,12 @@ class TerminalApiTests(unittest.IsolatedAsyncioTestCase):
     async def request(self, path, method='POST', payload=None, body=None, extra=(), origin=ORIGIN, query=b'', host=b'127.0.0.1:18090'):
         if body is None:
             body = json.dumps(payload).encode() if payload is not None else b''
+        from practice_mode import issue, COOKIE
+        address = next((v.decode() for k,v in extra if k == b'x-lab-client-ip'), '127.0.0.1')
+        value, _ = issue('test-only-terminal-fixture-key', address)
         headers = [(b'host', host)]
+        if not any(k == b'cookie' for k, _ in extra):
+            headers.append((b'cookie', (COOKIE + '=' + value).encode()))
         if not any(name == b'content-type' for name, _ in extra):
             headers.append((b'content-type', b'application/json'))
         if origin is not None:
@@ -169,6 +174,8 @@ class TerminalApiTests(unittest.IsolatedAsyncioTestCase):
         self.call.assert_not_called()
 
     async def test_owner_changes_with_trusted_proxy_client_address(self):
+        import ipaddress
+        self.app.state.admin_networks = (ipaddress.IPv4Network('192.168.15.0/24'),)
         await self.open(extra=[(b'x-lab-client-ip', b'192.168.15.10')])
         first = self.call.call_args.args[0]['owner']
         await self.open(extra=[(b'x-lab-client-ip', b'192.168.15.11')])
@@ -211,6 +218,8 @@ class TerminalApiTests(unittest.IsolatedAsyncioTestCase):
     async def test_mode_key_and_cookie_do_not_replace_terminal_origin_boundary(self):
         code, _, _ = await self.open(origin=None, extra=[(b'authorization', b'Bearer test-only-terminal-fixture-key'),
                                                        (b'cookie', b'groot_lab_mode=invalid')])
+        self.assertEqual(code, 401)
+        code, _, _ = await self.open(origin=None)
         self.assertEqual(code, 403)
         self.call.assert_not_called()
 

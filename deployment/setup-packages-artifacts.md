@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+**2026-11-04 웹 보안 소스:** `deployment/web_security.py`·루트deploy.sh, offline-labs API/인증/UI/프록시/정책/bootstrap, `configure_waf_evidence.py`와 native 검증기를 기존 source bundle로 반입한다. 실제 설치된 이미지·Python/Node·systemd/Docker를 사용하며 추가 deb/wheel/이미지0이다. [운영·검증·원복](../infra/validation/web-policy/README.md).
+
 **2026-11-03 관리 ACL 반입 목록:** deployment/management_access.py·validate_management_isolated.py·host_security.py·remote.sh·offline_security.py·config.example.conf와 루트deploy.sh, A의 FW/프록시 소스를 소스 묶음에 포함한다. 기존 Python표준라이브러리·OpenSSH·nft/iptables·systemd·Docker를 사용하며 추가 deb/wheel/이미지0이다. 신규 security host guard·portable TLS endpoint를 설치 검사에 연결했다. 운영 A는4파일 증분/프록시reload만 수행했고 B/C 운영 소스는 유지했다. [검증/복구](../infra/groot-a/management-access.md).
 
 11/3 해제 후 재차단 보완의 추가 deb/wheel/이미지는 없다. 기존 source archive의 `infra/mcp/incident_containment.py`, `deployment/soc_agent_block.py`, `infra/hermes/soc_alert_watch.prompt`만 갱신하며 root `deploy.sh`의 기존 SOC 경로로 반입한다. 운영 증분 반영/복구와 새 서버 미검증 범위는 [검증 문서](../infra/mcp/containment-reblock.md)를 따른다.

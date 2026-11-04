@@ -5,6 +5,7 @@ import json
 import os
 import socket
 import time
+import ipaddress
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -115,6 +116,10 @@ def create_app():
             raise RuntimeError('invalid administrator token file')
         app.state.token = token
         app.state.challenges = ChallengeStore()
+        app.state.admin_networks = tuple(ipaddress.IPv4Network(x, strict=True) for x in
+            os.environ.get('OFFLINE_LABS_ADMIN_CIDRS', '192.168.16.231/32').split(','))
+        if not app.state.admin_networks or any(n.prefixlen == 0 for n in app.state.admin_networks):
+            raise RuntimeError('explicit administrator networks required')
         app.state.origins = set(os.environ.get('OFFLINE_LABS_ORIGINS', 'http://127.0.0.1:18090,http://localhost:18090').split(','))
         app.state.hosts = {x.split('://', 1)[-1] for x in app.state.origins}
         yield
@@ -147,8 +152,26 @@ def create_app():
             raise HTTPException(415, detail='application/json 요청이 필요합니다.')
 
     def mode(request):
-        expiry = check(request.app.state.token, request.cookies.get(COOKIE, ''), client_address(request))
-        return {'mode': 'exempt' if expiry else 'enforce', 'expires_at': expiry}
+        address = client_address(request)
+        expiry = check(request.app.state.token, request.cookies.get(COOKIE, ''), address)
+        if not address or not any(ipaddress.ip_address(address) in n for n in request.app.state.admin_networks):
+            expiry = None
+        return {'mode': 'enforce', 'expires_at': None,
+                'admin_authenticated': bool(expiry), 'admin_expires_at': expiry}
+
+    def admin_network(request: Request):
+        try:
+            address = ipaddress.ip_address(client_address(request))
+        except ValueError:
+            raise HTTPException(403, detail='관리자 접속 주소가 필요합니다.') from None
+        if not any(address in n for n in request.app.state.admin_networks):
+            raise HTTPException(403, detail='관리자 접속 주소가 필요합니다.')
+
+    def admin_control(request: Request):
+        boundary(request)
+        admin_network(request)
+        if not mode(request)['admin_authenticated']:
+            raise HTTPException(401, detail='관리자 인증이 필요합니다.')
 
     def secure_cookie(request):
         # Only root-configured HTTPS origins select Secure cookies. Do not
@@ -163,17 +186,17 @@ def create_app():
     def session(request: Request):
         return mode(request)
 
-    @app.get('/api/challenge', dependencies=[Depends(boundary)])
+    @app.get('/api/challenge', dependencies=[Depends(boundary), Depends(admin_network)])
     def challenge(request: Request):
         try:
             return request.app.state.challenges.issue(client_address(request), request.headers.get('host', ''))
         except ChallengeLimit:
-            raise HTTPException(429, detail={'code': 'challenge_limit', 'message': '잠시 후 WAF 실습 예외 키 검증을 다시 시도하세요.'}, headers={'Retry-After': '30'}) from None
+            raise HTTPException(429, detail={'code': 'challenge_limit', 'message': '잠시 후 관리자 인증을 다시 시도하세요.'}, headers={'Retry-After': '30'}) from None
         except ValueError:
             raise HTTPException(400, detail='접속 정보를 확인하지 못했습니다.') from None
 
     @app.post('/api/session', dependencies=[Depends(boundary)])
-    async def enable_observation(request: Request):
+    async def authenticate_administrator(request: Request):
         # Parse manually so validation errors never reflect submitted key/proof
         # material in a Pydantic error response. The middleware bounds the body.
         try:
@@ -185,13 +208,17 @@ def create_app():
         verified = request.app.state.challenges.verify(
             request.app.state.token, supplied.get('challenge_id'), supplied.get('proof'),
             address, request.headers.get('host', ''))
+        # An attempted proof is consumed even when the source is outside the
+        # management network. It cannot later be replayed from the right IP.
+        admin_network(request)
         if not verified or set(supplied) != {'challenge_id', 'proof'} or 'authorization' in request.headers:
-            response = JSONResponse({'detail': {'code': 'invalid_key', 'message': 'WAF 실습 예외 키 검증에 실패했습니다. 새 검증을 시작하세요.'}}, 401)
+            response = JSONResponse({'detail': {'code': 'invalid_key', 'message': '관리자 인증에 실패했습니다. 새 검증을 시작하세요.'}}, 401)
             response.delete_cookie(COOKIE, path='/', secure=secure_cookie(request), httponly=True, samesite='strict')
             return response
         issued_at = int(time.time())
         value, expiry = issue(request.app.state.token, address, now=issued_at)
-        response = JSONResponse({'mode': 'exempt', 'expires_at': expiry})
+        response = JSONResponse({'mode': 'enforce', 'expires_at': None,
+                                 'admin_authenticated': True, 'admin_expires_at': expiry})
         response.set_cookie(COOKIE, value, max_age=TTL, path='/', secure=secure_cookie(request), httponly=True, samesite='strict')
         return response
 
@@ -199,7 +226,8 @@ def create_app():
     def disable_observation(request: Request, body: dict):
         if body:
             raise HTTPException(422, detail='빈 JSON 객체가 필요합니다.')
-        response = JSONResponse({'mode': 'enforce', 'expires_at': None})
+        response = JSONResponse({'mode': 'enforce', 'expires_at': None,
+                                 'admin_authenticated': False, 'admin_expires_at': None})
         response.delete_cookie(COOKIE, path='/', secure=secure_cookie(request), httponly=True, samesite='strict')
         return response
 
@@ -223,15 +251,15 @@ def create_app():
         return request.app.state.catalog
 
     @app.get('/api/status', dependencies=[Depends(boundary)])
-    def status():
+    def status(request: Request):
         result = rpc('status')
-        return {'labs': [{'cve_id': key, **value} for key, value in result['labs'].items()], 'checked_at': int(time.time()), 'offline': True, 'deployment_allowed': result.get('deployment_allowed', False), 'safety_error': result.get('safety_error')}
+        return {'labs': [{'cve_id': key, **value} for key, value in result['labs'].items()], 'checked_at': int(time.time()), 'offline': True, 'deployment_allowed': bool(result.get('deployment_allowed', False) and mode(request)['admin_authenticated']), 'isolation_verified': result.get('deployment_allowed', False), 'administrator_required': True, 'safety_error': result.get('safety_error')}
 
-    @app.post('/api/deploy', dependencies=[Depends(boundary)])
+    @app.post('/api/deploy', dependencies=[Depends(admin_control)])
     def deploy(body: Selection):
         return rpc('deploy', body.cve_id)
 
-    @app.post('/api/stop', dependencies=[Depends(boundary)])
+    @app.post('/api/stop', dependencies=[Depends(admin_control)])
     def stop(body: Selection):
         return rpc('stop', body.cve_id)
 
@@ -240,7 +268,7 @@ def create_app():
         return FileResponse(BASE / 'static' / 'index.html')
 
     from terminal_api import install_routes
-    install_routes(app, boundary, BASE)
+    install_routes(app, admin_control, BASE)
     app.mount('/static', StaticFiles(directory=BASE / 'static'), name='static')
     return app
 

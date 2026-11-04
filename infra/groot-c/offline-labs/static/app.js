@@ -11,7 +11,7 @@
     busy: false, sessionBusy: false, action: "", epoch: 0, closed: false,
     labs: [], catalogLoaded: false, statuses: new Map(), selected: "CVE-2021-44228",
     statusFresh: false, lastUpdated: null, refreshing: false, deploymentAllowed: false, safetyError: false,
-    mode: "enforce", expiresAt: null, sessionFresh: false, expiryChecked: false,
+    mode: "enforce", expiresAt: null, adminAuthenticated: false, sessionFresh: false, expiryChecked: false,
     poll: null, clock: null, controllers: new Set(), policy: "", url: ""
   };
   const runnableStates = new Set(["stopped", "exited", "created", "absent", "not_created", "not_deployed", "missing"]);
@@ -28,7 +28,7 @@
   const selectedStatus = () => state.statuses.get(state.selected);
   const validPort = (value) => Number.isInteger(Number(value)) && Number(value) >= 1 && Number(value) <= 65535;
   const secondsLeft = () => state.expiresAt === null ? 0 : Math.max(0, Math.ceil(state.expiresAt - Date.now() / 1000));
-  const isExempt = () => state.sessionFresh && state.mode === "exempt" && secondsLeft() > 0;
+  const isAdministrator = () => state.sessionFresh && state.adminAuthenticated && secondsLeft() > 0;
 
   function notice(message, kind = "info") {
     text("notice-text", message);
@@ -44,38 +44,36 @@
     const left = secondsLeft();
     const remaining = String(Math.floor(left / 60)).padStart(2, "0") + ":" + String(left % 60).padStart(2, "0");
     const expires = new Date(state.expiresAt * 1000).toLocaleString("ko-KR", {
-      year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+      year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "Asia/Seoul"
     });
-    return "만료 " + expires + " (브라우저 현지 시각) · 남은 " + remaining;
+    return "만료 " + expires + " (KST) · 남은 " + remaining;
   }
 
   function renderPolicy() {
-    const exempt = isExempt();
+    const authenticated = isAdministrator();
     const unknown = !state.sessionFresh;
-    $("connection-badge").className = "connection-badge" + (exempt ? " connected" : state.sessionBusy ? " connecting" : "");
-    text("connection-label", unknown ? "검사 정책 확인 필요" : exempt ? "관리자 실습 · 탐지만 기록" : "일반 실습 · 차단 적용");
-    text("auth-title", "차단 예외 키 (선택)");
-    text("auth-help", exempt ? "WAF 차단 예외가 적용되었습니다. 키 자체는 전송하지 않습니다."
-      : !signingAvailable ? "예외 서명에는 보안 연결과 WebCrypto 지원 브라우저가 필요합니다. 일반 실습은 키 없이 가능합니다."
-        : "일회용 서명으로 검증하며, 키 자체는 전송하지 않습니다.");
-    text("session-expiry", exempt ? expiryText() + " · 같은 브라우저의 다른 탭에도 적용"
-      : "예외 세션은 같은 브라우저의 다른 탭과 공유되며, 적용 후 10분에 만료됩니다.");
+    $("connection-badge").className = "connection-badge" + (authenticated ? " connected" : state.sessionBusy ? " connecting" : "");
+    text("connection-label", unknown ? "정책 확인 필요" : "WAF 차단 적용");
+    text("auth-title", "관리자 인증");
+    text("auth-help", authenticated ? "실습 시작·중지·터미널 제어를 사용할 수 있습니다. WAF 차단은 계속 적용됩니다."
+      : !signingAvailable ? "관리자 인증에는 보안 연결과 WebCrypto 지원 브라우저가 필요합니다. 공개 웹 조회는 가능합니다."
+        : "관리자 접속 주소에서 인증 후 실습 제어를 사용할 수 있습니다. 키 자체는 전송하지 않습니다.");
+    text("session-expiry", authenticated ? expiryText() : "웹 요청은 인증 여부와 관계없이 동일하게 검사합니다.");
     $("secure-access").hidden = signingAvailable;
-    $("access-key").hidden = exempt;
-    $("access-key").disabled = !signingAvailable || exempt || state.sessionBusy || state.busy || state.refreshing;
-    $("access-key").required = !exempt;
-    $("connect-button").hidden = exempt;
+    $("access-key").hidden = authenticated;
+    $("access-key").disabled = !signingAvailable || authenticated || state.sessionBusy || state.busy || state.refreshing;
+    $("access-key").required = !authenticated;
+    $("connect-button").hidden = authenticated;
     $("connect-button").disabled = !signingAvailable || state.sessionBusy || state.busy || state.refreshing;
-    text("connect-label", state.sessionBusy ? "처리 중…" : "예외 적용");
-    $("disconnect-button").hidden = state.mode !== "exempt" && state.sessionFresh;
+    text("connect-label", state.sessionBusy ? "처리 중…" : "관리자 인증");
+    $("disconnect-button").hidden = !state.adminAuthenticated && state.sessionFresh;
     $("disconnect-button").disabled = state.sessionBusy || state.busy || state.refreshing;
     $("lab-select").disabled = !state.catalogLoaded || !state.labs.length || state.busy;
     $("refresh-button").disabled = state.busy || state.sessionBusy || state.refreshing;
     text("refresh-caption", "10초마다 상태·정책 갱신");
-    state.policy = unknown ? "현재 WAF 검사 정책을 확인할 수 없습니다.\n새로고침해 적용 상태를 확인하세요."
-      : exempt ? "관리자 실습 · WAF 탐지만 기록\nWAF 탐지를 기록하고 즉시 차단을 예외 처리합니다.\n" + expiryText()
-        : "일반 실습 · WAF 차단 적용\n정상 요청은 허용하고, 보안 규칙에 탐지된 요청은 WAF에서 차단합니다.";
-    state.policy += "\nSuricata와 기존 IP 보호 정책은 별도로 적용됩니다.";
+    state.policy = unknown ? "현재 검사 정책을 확인할 수 없습니다. 새로고침해 확인하세요."
+      : "WAF 차단 적용\n공개 웹 요청은 WAF를 거칩니다. 관리자 인증도 차단을 해제하지 않습니다.";
+    state.policy += "\nSuricata·FW·Wazuh 관제는 별도로 적용됩니다.";
     text("policy-summary", state.policy);
     $("copy-policy").disabled = false;
   }
@@ -85,7 +83,7 @@
     text("metric-ready", state.statusFresh ? state.labs.filter((lab) => state.statuses.get(lab.cve_id)?.image_present === true).length : "—");
     text("metric-running", state.statusFresh ? state.labs.filter((lab) => state.statuses.get(lab.cve_id)?.status === "running").length : "—");
     text("last-updated", state.statusFresh && state.lastUpdated
-      ? "최근 확인 " + state.lastUpdated.toLocaleTimeString("ko-KR", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      ? "최근 확인 " + state.lastUpdated.toLocaleTimeString("ko-KR", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Seoul" })
       : "실습 상태를 확인해 주세요");
   }
 
@@ -120,8 +118,8 @@
     const external = type === "existing-http";
     const cli = type === "local-cli";
     const available = known && !!lab && !state.busy && !state.sessionBusy && !state.refreshing;
-    const manageable = available && managed;
-    const deploymentAllowed = terminal ? live?.deployment_allowed === true : state.deploymentAllowed && !state.safetyError;
+    const manageable = available && managed && isAdministrator();
+    const deploymentAllowed = isAdministrator() && (terminal ? live?.deployment_allowed === true : state.deploymentAllowed && !state.safetyError);
     const deployable = manageable && imagePresent && deploymentAllowed;
     const color = running ? "running" : ["error", "dead", "conflict"].includes(status) ? "error" : runnableStates.has(status) ? "stopped" : "unknown";
     text("lab-cve", lab ? lab.cve_id : state.catalogLoaded ? "LAB CATALOG" : "CVE-2021-44228");
@@ -145,13 +143,14 @@
     text("deploy-label", state.action === "deploy" ? "실행 요청 중…" : terminal ? "실습 환경 시작" : "실습 실행");
     text("stop-label", state.action === "stop" ? "중지 중…" : "중지");
 
-    let help = "최신 상태를 확인한 뒤 키 없이 실습을 실행할 수 있습니다.";
+    let help = "공개 웹은 조회할 수 있고 실습 제어에는 관리자 인증이 필요합니다.";
     if (state.action) help = "요청을 처리하고 있습니다. 완료 후 서버 상태를 다시 확인합니다.";
     else if (known) {
-      if (!deploymentAllowed) help = running ? "격리 설정 확인이 필요합니다. 실행 중인 이 실습은 중지할 수 있습니다." : "격리 설정 확인 전에는 실습을 실행할 수 없습니다. 운영자가 설정을 확인해야 합니다.";
+      if (!isAdministrator()) help = "실습 시작·중지·터미널 제어에는 관리자 인증이 필요합니다. WAF 차단은 계속 적용됩니다.";
+      else if (!deploymentAllowed) help = running ? "격리 설정 확인이 필요합니다. 실행 중인 이 실습은 중지할 수 있습니다." : "격리 설정 확인 전에는 실습을 실행할 수 없습니다. 운영자가 설정을 확인해야 합니다.";
       else if (!imagePresent) help = running ? "로컬 이미지가 확인되지 않습니다. 실행 중인 이 실습은 중지할 수 있습니다." : "서버에 로컬 이미지가 없습니다. 운영자가 이미지를 준비한 뒤 새로고침하세요.";
       else if (running) help = "실습이 실행 중입니다. 사용을 마치면 중지해 주세요.";
-      else if (runnableStates.has(status)) help = "키 없이 준비된 로컬 이미지로 이 실습 환경을 실행할 수 있습니다.";
+      else if (runnableStates.has(status)) help = "관리자 인증으로 준비된 실습 환경을 실행할 수 있습니다.";
       else help = "현재 상태에서 실행·중지를 요청할 수 없습니다. 운영자가 상태를 확인해야 합니다.";
     }
     text("action-help", help);
@@ -280,11 +279,13 @@
   }
 
   function acceptSession(payload) {
-    if (!payload || !["enforce", "exempt"].includes(payload.mode) || (payload.mode === "exempt"
-      ? !Number.isFinite(payload.expires_at) || payload.expires_at <= 0 : payload.expires_at !== null)) throw new ApiError("검사 정책 응답 형식이 올바르지 않습니다.");
-    const changed = state.mode !== payload.mode || state.expiresAt !== payload.expires_at;
-    state.mode = payload.mode;
-    state.expiresAt = payload.expires_at;
+    if (!payload || payload.mode !== "enforce" || payload.expires_at !== null || typeof payload.admin_authenticated !== "boolean" ||
+      (payload.admin_authenticated ? !Number.isFinite(payload.admin_expires_at) || payload.admin_expires_at <= 0 : payload.admin_expires_at !== null))
+      throw new ApiError("검사 정책·관리자 인증 응답을 확인하지 못했습니다.");
+    const changed = state.adminAuthenticated !== payload.admin_authenticated || state.expiresAt !== payload.admin_expires_at;
+    state.mode = "enforce";
+    state.adminAuthenticated = payload.admin_authenticated;
+    state.expiresAt = payload.admin_expires_at;
     state.sessionFresh = true;
     if (changed) state.expiryChecked = false;
   }
@@ -327,10 +328,10 @@
 
   $("auth-form").addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!signingAvailable || state.sessionBusy || state.busy || state.refreshing || isExempt()) return;
+    if (!signingAvailable || state.sessionBusy || state.busy || state.refreshing || isAdministrator()) return;
     let key = $("access-key").value;
     $("access-key").value = "";
-    if (!key) { notice("예외를 적용하려면 차단 예외 키를 입력하세요. 일반 실습에는 키가 필요하지 않습니다.", "warning"); return; }
+    if (!key) { notice("관리자 인증을 하려면 관리자 인증 키를 입력하세요. 공개 웹 조회에는 키가 필요하지 않습니다.", "warning"); return; }
     state.sessionBusy = true;
     const epoch = state.epoch;
     let keyBytes = null;
@@ -362,13 +363,13 @@
       const pending = api("session", "POST", { challenge_id: challenge.challenge_id, proof });
       proof = "";
       acceptSession(await pending);
-      notice(isExempt() ? "WAF 차단 예외를 적용했습니다. 같은 브라우저의 다른 탭에도 적용되며 표시된 시각에 만료됩니다." : "현재 일반 실습 정책이 적용되어 있습니다.");
+      notice(isAdministrator() ? "관리자 인증을 완료했습니다. WAF 차단은 계속 적용됩니다." : "현재 일반 실습 정책이 적용되어 있습니다.");
     } catch (error) {
       if (epoch === state.epoch) {
         if (submitted) state.sessionFresh = false;
         const failure = error instanceof ApiError || error.name === "AbortError" ? error
           : new ApiError("브라우저에서 일회용 서명을 생성하지 못했습니다. 지원되는 HTTPS 브라우저에서 다시 시도하세요.");
-        handleError(failure, submitted ? "예외 적용 결과를 확인해야 합니다." : "예외 서명을 준비하지 못했습니다.");
+        handleError(failure, submitted ? "관리자 인증 결과를 확인해야 합니다." : "인증 서명을 준비하지 못했습니다.");
       }
     } finally {
       key = "";
@@ -389,9 +390,9 @@
     notice(""); render();
     try {
       acceptSession(await api("session", "DELETE", {}));
-      notice("차단 예외를 해제했습니다. 같은 브라우저의 다른 탭에도 일반 실습 정책이 적용됩니다.");
+      notice("관리자 인증을 해제했습니다. WAF 차단은 계속 적용됩니다.");
     } catch (error) {
-      if (epoch === state.epoch) { state.sessionFresh = false; handleError(error, "예외 해제 결과를 확인해야 합니다."); }
+      if (epoch === state.epoch) { state.sessionFresh = false; handleError(error, "인증 해제 결과를 확인해야 합니다."); }
     } finally {
       if (epoch === state.epoch) { state.sessionBusy = false; render(); }
     }
@@ -437,7 +438,7 @@
     state.clock = setInterval(() => {
       if (document.hidden || state.closed) return;
       renderPolicy();
-      if (state.mode === "exempt" && state.sessionFresh && secondsLeft() === 0 && !state.expiryChecked && !state.busy && !state.sessionBusy && !state.refreshing) {
+      if (state.adminAuthenticated && state.sessionFresh && secondsLeft() === 0 && !state.expiryChecked && !state.busy && !state.sessionBusy && !state.refreshing) {
         state.expiryChecked = true;
         refresh();
       }

@@ -1,0 +1,531 @@
+{
+  "schema": 1,
+  "observed_at_kst": "2026-11-04T11:52:28.089381+09:00",
+  "status": "live_applied_confirmed_scoped_verification_not_full_SOC_E2E",
+  "approvals": {
+    "a": {
+      "directory": "/var/lib/capstone-web-security/change-822c1487022f414f",
+      "plan_sha256": "b4ef6da3041951f8fe0c1e8c53bd5024ab4794abc4dad84990d4490363066339",
+      "files": {
+        "/home/groot_a/capstone/chatproxy/nginx.conf": {
+          "before": "071c11b12850dc525418f0a7cf54c4b99fc62042c5aceef43895423bde4c1bd9",
+          "after": "3fd11d800d035a78cb006995559db81efe48b624631ca2ba965322ff52b60423"
+        },
+        "/etc/capstone-offline-labs-waf/REQUEST-900-CAPSTONE-LABS.conf": {
+          "before": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db",
+          "after": "57372b4f039ffd245a3255a5879591d15418f43b9b0388badc33ad00fc2ede7d"
+        },
+        "/etc/capstone-offline-labs-waf/waf-log4shell-server.conf": {
+          "before": "e6aa5a836918f0e3c57a4f5a3e29f53514c9779c05df93b41532bbf9c4d5969f",
+          "after": "4051abd3d4e5ae11caba359faaf78af83e612aa395f42d1cdafb39f6d3caef96"
+        }
+      }
+    },
+    "c": {
+      "directory": "/var/lib/capstone-web-security/change-913fdb0a9c0c4d8e",
+      "plan_sha256": "7b9bb4109a2180fd2a52d12e3e169586ec6fc33f60a78100899ccdb652bf1f1b",
+      "files": {
+        "/opt/capstone-offline-labs/app.py": {
+          "before": "7b5929c78e6b0dd9fcf56440db92f8abb520493494a7327186b8a92a523d7b7e",
+          "after": "53383b3584473687b2cb7566a49ae6c7e88338b78fc81dbd6940561d60724cfa"
+        },
+        "/opt/capstone-offline-labs/practice_mode.py": {
+          "before": "ee6adb5a09415414acd934d25af66483856ac580dbced0c37db226450cd544b3",
+          "after": "1e20d6b733089075d41d7c93e6366029d6c19181b54b8521ff80d3b01f50c1a8"
+        },
+        "/opt/capstone-offline-labs/challenge.py": {
+          "before": "f3fd8f071608978f0de1ca554acbab4765014ca7cb7fb6036743ed099f636c1f",
+          "after": "71167a5f55ea4de5e0073fd070bebc2200d3f53045507fdc78bd734bbd566da0"
+        },
+        "/opt/capstone-offline-labs/static/app.js": {
+          "before": "357c8bb28e9f80588429e726eb45169e561cc162a72657fa98f0b64f589a7fc8",
+          "after": "dc836946b1990f97b58fc4651c797328568aa73a80ca083058d8cbda1cf14add"
+        },
+        "/opt/capstone-offline-labs/static/index.html": {
+          "before": "95bed6b3683aa89cb3ec55813418e7e5c3f2f687fd39b57d26a7e0e9d32ae87f",
+          "after": "6099c2d7a98e2eb143de9d01359d82c261573afd97b3bf070b702d52db1b66b9"
+        },
+        "/opt/capstone-offline-labs/REQUEST-900-CAPSTONE-LABS.conf": {
+          "before": "f53ea48e48579f2bf5b3836749828344202c848f5e280b895a5b14cc7023b5db",
+          "after": "57372b4f039ffd245a3255a5879591d15418f43b9b0388badc33ad00fc2ede7d"
+        },
+        "/opt/capstone-offline-labs/waf-log4shell-server.conf": {
+          "before": "463e44a172fc01daf23e9311348b5fa831b389c839d6fb79fefe5d561b61c971",
+          "after": "4051abd3d4e5ae11caba359faaf78af83e612aa395f42d1cdafb39f6d3caef96"
+        },
+        "/opt/capstone-offline-labs/nginx-log4shell-server.conf": {
+          "before": "b1593b0488a031d4055df71095a53269f120ef1cc5c04fa4e0af6d89b03da488",
+          "after": "908a4f0e31b6a15bc0402b4c67da9a8236ac50761d23e220357fb5d084a06474"
+        },
+        "/opt/capstone-offline-labs/scripts/bootstrap.py": {
+          "before": "132bf284670d66e261f8211eec4b628ed1be0423a874ca2ff78b06be6aefdf41",
+          "after": "d354c46a8f02031a1640cdba6caef909c24fff8616fcf61ebbb743727a8b2236"
+        }
+      }
+    }
+  },
+  "implementation_sources": {
+    "deployment/web_security.py": {
+      "bytes": 14652,
+      "sha256": "1ae9ddc7e37cc9527d2ee24e7eff658b847af92e34ec49957f1dc265210cdd05"
+    },
+    "deployment/tests/test_web_security.py": {
+      "bytes": 3898,
+      "sha256": "9f1d083d50d9ed5215aef25b9c5c07c9ceb1325449d3fbfe31ef2948eae1756a"
+    },
+    "deployment/tests/test_offline_security.py": {
+      "bytes": 19036,
+      "sha256": "fa682c7d13aa6bff5ddf6def029d1952fba805e54976d9ed1d0f9f2d0f6afcf4"
+    },
+    "infra/mcp/configure_waf_evidence.py": {
+      "bytes": 4510,
+      "sha256": "cd193a97a34a3ad5a136a87b8d78cef75aab249fcc7b615341773d64d1482e07"
+    },
+    "infra/validation/web-policy/native_waf.py": {
+      "bytes": 12811,
+      "sha256": "5c2ea72e96bc2a2f7b0438880fd1a704f395741d1792d2c4f19618155b5833b5"
+    },
+    "infra/groot-c/offline-labs/REQUEST-900-CAPSTONE-LABS.conf": {
+      "bytes": 2013,
+      "sha256": "57372b4f039ffd245a3255a5879591d15418f43b9b0388badc33ad00fc2ede7d"
+    },
+    "infra/groot-c/offline-labs/app.py": {
+      "bytes": 15301,
+      "sha256": "53383b3584473687b2cb7566a49ae6c7e88338b78fc81dbd6940561d60724cfa"
+    },
+    "infra/groot-c/offline-labs/challenge.py": {
+      "bytes": 3578,
+      "sha256": "71167a5f55ea4de5e0073fd070bebc2200d3f53045507fdc78bd734bbd566da0"
+    },
+    "infra/groot-c/offline-labs/nginx-log4shell-server.conf": {
+      "bytes": 9702,
+      "sha256": "908a4f0e31b6a15bc0402b4c67da9a8236ac50761d23e220357fb5d084a06474"
+    },
+    "infra/groot-c/offline-labs/practice_mode.py": {
+      "bytes": 3263,
+      "sha256": "1e20d6b733089075d41d7c93e6366029d6c19181b54b8521ff80d3b01f50c1a8"
+    },
+    "infra/groot-c/offline-labs/scripts/bootstrap.py": {
+      "bytes": 23086,
+      "sha256": "d354c46a8f02031a1640cdba6caef909c24fff8616fcf61ebbb743727a8b2236"
+    },
+    "infra/groot-c/offline-labs/scripts/test_bootstrap.py": {
+      "bytes": 16791,
+      "sha256": "60cb184e6fd7ea6031fcf026db598c74502ac7109712eda14cdcfcacc58bf655"
+    },
+    "infra/groot-c/offline-labs/static/app.js": {
+      "bytes": 31282,
+      "sha256": "dc836946b1990f97b58fc4651c797328568aa73a80ca083058d8cbda1cf14add"
+    },
+    "infra/groot-c/offline-labs/static/index.html": {
+      "bytes": 14369,
+      "sha256": "6099c2d7a98e2eb143de9d01359d82c261573afd97b3bf070b702d52db1b66b9"
+    },
+    "infra/groot-c/offline-labs/test_app.py": {
+      "bytes": 24526,
+      "sha256": "783d53ad624a9391452ff22e8bfb590558ccb7617db5b001f700d56cec06cea1"
+    },
+    "infra/groot-c/offline-labs/test_terminal_api.py": {
+      "bytes": 12602,
+      "sha256": "3846e156980e1503fe5a36701d8214734d7763850c3504ed35d62bb91f415a9e"
+    },
+    "infra/groot-c/offline-labs/test_terminal_ui.js": {
+      "bytes": 6412,
+      "sha256": "cbc253693ee41f5937ef1190170eed2348dd855bd31b6cf7c624bc88c3f6c876"
+    },
+    "infra/groot-c/offline-labs/waf-log4shell-server.conf": {
+      "bytes": 9564,
+      "sha256": "4051abd3d4e5ae11caba359faaf78af83e612aa395f42d1cdafb39f6d3caef96"
+    },
+    "infra/groot-a/chatproxy.nginx.conf": {
+      "bytes": 16331,
+      "sha256": "3ddbb18bd4f85fd89b69eed9415eb939fbe162f74987dabb39e79d0410713b1e"
+    }
+  },
+  "deploy_entrypoint": "--web-security (pending unrelated NAT hunk excluded from commit)",
+  "validation": {
+    "native_waf_requests": 47,
+    "before_requests": 20,
+    "candidate_requests": 27,
+    "C_existing_vendor_ASGI": 54,
+    "rollout_unit": 6,
+    "portable_TLS": 16,
+    "soc_installer": 37,
+    "service_installer": 50,
+    "bootstrap": 14,
+    "source_bundle": 1,
+    "node_UI": "passed",
+    "bash_syntax": "passed",
+    "Kali232_external_conditions": 14,
+    "administrator231_challenge_status": 200,
+    "administrator231_Wazuh_status": 302,
+    "manual_production_rollback": "not_run",
+    "actual_attack_sensor_LLM_approval_full_E2E": "pending",
+    "fresh_OS_install": "not_run"
+  },
+  "enrollment": {
+    "before_sha256": "c86cab0f525fef402309811a77fab83a810d72cb2390f1681f2c78f4c92e5f82",
+    "after_sha256": "6c427faf5930fdd7329b90a1909572f33c6adf287a7aaa5bb63bb0c9650a37ec",
+    "changed_fields": [
+      "proxy_config_sha256",
+      "config_sha256./etc/nginx/conf.d/zz-capstone-labs.conf"
+    ],
+    "actual_writer_attestation_twice": true,
+    "scope_and_binding_unchanged": true,
+    "operator_tool_sync": {
+      "status": "operator_only_enroller_source_synchronized",
+      "path": "/opt/rule-change/configure_waf_evidence.py",
+      "before_sha256": "5735ee75dec6b96aaba31d6ff1bf0810e1d5649ef5b91183579b095c5dd560ea",
+      "after_sha256": "cd193a97a34a3ad5a136a87b8d78cef75aab249fcc7b615341773d64d1482e07",
+      "no_mcp_or_sudo_added": true
+    }
+  },
+  "rules": {
+    "waf_rules": {
+      "definitions": 654,
+      "equivalent_condition_candidates": [],
+      "truncated": false,
+      "automatically_removed": false
+    },
+    "suricata_rules": {
+      "definitions": 52497,
+      "equivalent_condition_candidates": [
+        [
+          {
+            "id": "2031294",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          },
+          {
+            "id": "2031293",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "2014493",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          },
+          {
+            "id": "2013684",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "2022484",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          },
+          {
+            "id": "2022949",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "2009486",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          },
+          {
+            "id": "2016471",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "2047884",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          },
+          {
+            "id": "2045358",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "2016534",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          },
+          {
+            "id": "2016535",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "2066629",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          },
+          {
+            "id": "2066625",
+            "source": "/home/groot_a/capstone/suricata/ruleset/suricata.rules",
+            "origin": "builtin"
+          }
+        ]
+      ],
+      "truncated": false,
+      "automatically_removed": false
+    },
+    "wazuh_rules": {
+      "definitions": 4571,
+      "equivalent_condition_candidates": [
+        [
+          {
+            "id": "12122",
+            "source": "/var/ossec/ruleset/rules/0195-named_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "12127",
+            "source": "/var/ossec/ruleset/rules/0195-named_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "24038",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "24039",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "24105",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "24106",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "24123",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "24124",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "24127",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "24128",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "24131",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "24132",
+            "source": "/var/ossec/ruleset/rules/0545-osquery_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "44681",
+            "source": "/var/ossec/ruleset/rules/0392-fortimail_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "44682",
+            "source": "/var/ossec/ruleset/rules/0392-fortimail_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "44711",
+            "source": "/var/ossec/ruleset/rules/0392-fortimail_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "44715",
+            "source": "/var/ossec/ruleset/rules/0392-fortimail_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "60700",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "60701",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "60729",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "60737",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "60731",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "60742",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "60732",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "60745",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "60843",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "60845",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "60862",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "60864",
+            "source": "/var/ossec/ruleset/rules/0585-win-application_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "62163",
+            "source": "/var/ossec/ruleset/rules/0600-win-wdefender_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "62192",
+            "source": "/var/ossec/ruleset/rules/0600-win-wdefender_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "62206",
+            "source": "/var/ossec/ruleset/rules/0600-win-wdefender_rules.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "62210",
+            "source": "/var/ossec/ruleset/rules/0600-win-wdefender_rules.xml",
+            "origin": "builtin"
+          }
+        ],
+        [
+          {
+            "id": "92022",
+            "source": "/var/ossec/ruleset/rules/0800-sysmon_id_1.xml",
+            "origin": "builtin"
+          },
+          {
+            "id": "92030",
+            "source": "/var/ossec/ruleset/rules/0800-sysmon_id_1.xml",
+            "origin": "builtin"
+          }
+        ]
+      ],
+      "truncated": false,
+      "automatically_removed": false
+    }
+  },
+  "capabilities": {
+    "SDK_discovery_servers": 8,
+    "SDK_discovery_tools": 41,
+    "access_mode": "hermes-parity",
+    "diagnostic_targets": 41,
+    "diagnostic_enum_including_aggregate": 42,
+    "model_calls_during_discovery": 0,
+    "protected_calls": 0,
+    "channel_posts": 0,
+    "full_SOC_workflow_complete": false
+  },
+  "server_cleanup": {
+    "a": {
+      "status": "owned_server_staging_removed",
+      "path": "/var/lib/capstone-web-policy/20261104-r1",
+      "files": 559,
+      "bytes": 9523690,
+      "recovery_backups_preserved": true,
+      "operating_sources_removed": false
+    },
+    "c": {
+      "status": "owned_server_staging_removed",
+      "path": "/var/lib/capstone-web-policy/20261104-r1",
+      "files": 29,
+      "bytes": 336626,
+      "recovery_backups_preserved": true,
+      "operating_sources_removed": false
+    }
+  },
+  "new_packages_images_downloads_on_Mac": 0,
+  "remaining": [
+    "managed_HTTP3_stopped_before_and_after",
+    "IDS7_Wazuh17_vendor_candidate_reference_and_replay_review",
+    "FW_egress_direct_and_container_management_paths",
+    "C_approved_MCP_service_control",
+    "FW_scoped_reporting_and_full_Mattermost_followup",
+    "new_attack_evidence_LLM_cards_release_and_reblock_E2E"
+  ]
+}

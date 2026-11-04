@@ -57,8 +57,10 @@ def main():
     matches = re.findall(r'modsecurity_transaction_id "v2:([0-9a-f]{64}):\$request_id:\$msec:\$time_iso8601";', producer)
     need(len(matches) == 1, "producer_binding_invalid")
     proxy_config = run(["exec", proxy["Id"], "cat", "/etc/nginx/nginx.conf"])
-    need(proxy_config.count(b"proxy_pass http://172.18.0.2:8080;") == 3 and
-         b"proxy_pass http://192.168.16.230:80;" not in proxy_config, "direct_proxy_route_required")
+    need(proxy_config.count(b"proxy_pass http://172.18.0.2:8080;") == 4 and
+         proxy_config.count(b"proxy_set_header X-Capstone-Lab-Mode enforce;") == 4 and
+         b"proxy_pass http://10.200.10.20:80/_offline-labs/;" not in proxy_config and
+         b"proxy_pass http://192.168.16.230:80;" not in proxy_config, "enforced_proxy_routes_required")
     value = {"schema_version": 1, "container_id": waf["Id"], "proxy_container_id": proxy["Id"],
         "proxy_config_sha256": hashlib.sha256(proxy_config).hexdigest(), "deployment_binding": matches[0],
         "destination_ip": "172.18.0.2", "destination_ports": [8080, 8443],

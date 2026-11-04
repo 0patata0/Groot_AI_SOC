@@ -4,6 +4,10 @@ set -euo pipefail
 umask 077
 
 HERE=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+if [[ ${1:-} == --web-security ]]; then
+  shift
+  exec python3 -IB "$HERE/deployment/web_security.py" "$@"
+fi
 if [[ ${1:-} == --management-access ]]; then
   shift
   exec python3 -IB "$HERE/deployment/management_access.py" "$@"

@@ -359,7 +359,8 @@ def apply(plan, host=None):
         settings = {'OFFLINE_LABS_MANIFEST': str(CONFIG / 'cve_list.json'), 'OFFLINE_LABS_TOKEN_FILE': str(CONFIG / 'admin-token'),
                     'OFFLINE_LABS_SOCKET': '/run/capstone-offline-labs/control.sock', 'OFFLINE_LABS_STATE': str(STATE / 'runtime.json'),
                     'OFFLINE_LABS_UID': str(account.pw_uid), 'OFFLINE_LABS_GID': str(account.pw_gid),
-                    'OFFLINE_LABS_DOCKER': plan['tools']['docker'], 'OFFLINE_LABS_ORIGINS': ','.join(summary(plan)['origins'])}
+                    'OFFLINE_LABS_DOCKER': plan['tools']['docker'], 'OFFLINE_LABS_ORIGINS': ','.join(summary(plan)['origins']),
+                    'OFFLINE_LABS_ADMIN_CIDRS': os.environ.get('MANAGEMENT_ALLOWED_CIDRS', '') or '192.168.16.231/32'}
         install_file(CONFIG / 'settings.env', ''.join(k + '=' + v + '\n' for k, v in settings.items()).encode(), 0o640, account.pw_gid)
         record('install_guard')
         host.run(['/usr/bin/python3', '-B', str(TARGET / 'guard.py'), 'install'])

@@ -17,10 +17,11 @@ const $ = id => {
   assert(nodes.has(id), "renderer must use an existing HTML id: " + id);
   return nodes.get(id);
 };
+let authenticated = true;
 const state = {catalogLoaded: true, statusFresh: true, labs: [], statuses: new Map(),
   selected: "", busy: false, sessionBusy: false, refreshing: false,
   deploymentAllowed: false, safetyError: true, action: ""};
-const context = vm.createContext({$, state, URL,
+const context = vm.createContext({$, state, URL, isAdministrator: () => authenticated,
   window: {location: {href: "https://lab.example/log4shell/"}},
   ApiError: class extends Error {}, renderCatalog() {},
   text: (id, value) => { $(id).textContent = String(value); },
@@ -100,3 +101,10 @@ state.statuses.get("CVE-2021-3156").image_present = false;
 vm.runInContext("renderMetrics()", context);
 assert.equal($("metric-ready").textContent, "5", "unavailable images must not be counted ready");
 console.log("terminal selection UI: PASS (3 terminals, image counts, independent guard, CLI and HTTP boundaries)");
+
+// Public visitors can view a normal web URL but cannot operate a terminal.
+authenticated = false;
+select("managed-terminal", "CVE-2021-3156", "running");
+assert.equal($("deploy-button").disabled, true);
+assert.equal($("stop-button").disabled, true);
+assert.equal($("open-lab")["aria-disabled"], "true");

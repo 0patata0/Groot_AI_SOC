@@ -1,5 +1,7 @@
 # Groot_AI_SOC
 
+**공개 웹·관제 업무 현행(11/4):** Log4Shell UI/API·등록 HTTP3개는 모두 WAF On을 거치며 실습 검사 예외를 제거했다. 실행·중지·터미널은 관리자231/32와 인증이 필요하다. A/C 적용·외부14조건·신뢰 해시/writer 확인을 마쳤고 실제 공격 전체 회귀·C 승인형 MCP 제어는 남는다. [정책·검증·복구](infra/validation/web-policy/README.md) · [SOC 업무별 실행 범위](infra/validation/web-policy/SOC_CAPABILITIES.md). 아래 날짜별 예외 키/익명 제어 설명은 과거 이력이다.
+
 **관리 접속 현행(11/3 실접속 시험·11/4 10:33 KST 정책 재확인):** A SSH·Wazuh443/10443은 관리자 `192.168.16.231/32`, A 내부 SSH는 MCP B `10.200.10.10/32`만 허용한다. Kali232의 Wazuh302→403·C의 A SSH거부·관리자 신규접속·공개 DVWA/Log4Shell/채팅·실제 MCP읽기를 검증했다. 루트 설치기/새 security host guard도 동기화했다. [정책·원복·미검증](infra/groot-a/management-access.md) · [현황](STATUS.md). 아래 날짜가 있는 VPN/학과망 허용은 당시 이력이다.
 
 **11/3 차단 상태 보완:** 실제 결과 문장을 도구 포장으로 잘못 해석하던 오류와 존재하지 않는 별도 차단 대상 조회 요구를 수정했습니다. KST/관측 기준 남은 시간을 원문과 구분해 제공하고, 다른 요청 ID의 새 Native·Ollama 시험은 각각1 MCP·시간 계산0회로 절차 검증까지 완료했습니다. 관리207·Hermes380·SDK179·양서버MCP23·설치38 PASS입니다. 전체 사건 판단·장문/채팅 지연과 새 공격 E2E는 별도입니다. [결과·복구·한계](infra/hermes/operation-time.md) · [현재 상태](STATUS.md).
@@ -641,7 +643,7 @@ bash deploy.sh --apply --batch --config deployment/site.local.conf
 | [VM·네트워크·SSH 준비](deployment/setup-network-ssh.md) | 고정 주소·라우팅·키 검증·sudo |
 | [패키지·이미지 반입 자료](deployment/setup-packages-artifacts.md) | 외부 Linux 준비 환경에서 공식 패키지·이미지 확보 |
 | [Hermes 이미지 준비](deployment/hermes-image.md) | 기반 이미지·가드·의존성·빌드 |
-| [실습 소스·이미지](infra/groot-c/offline-labs/README.md) |6항목 카탈로그·3개 웹이미지·Redis/Samba 터미널·차단 예외·테마·독립 DVWA |
+| [실습 소스·이미지](infra/groot-c/offline-labs/README.md) |6항목 카탈로그·3개 웹이미지·관리자 인증·WAF On·터미널 격리·독립 DVWA |
 | [sudo 초기 준비](infra/groot-c/offline-labs/nonweb/sudo/runtime/BOOTSTRAP.md) | 고정 rootless bundle·서명 검증·초기 구성 |
 | [Redis/Samba 준비](infra/groot-c/nonweb-labs/README.md) | 별도 이미지 bundle·고정 런타임·웹 터미널·격리 계약 |
 

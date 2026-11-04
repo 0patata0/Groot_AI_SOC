@@ -1,5 +1,7 @@
 # 단일 Bash 초기 설치
 
+> **2026-11-04 현행 웹 제어:** 공개 열람은 `LAB_ALLOWED_CIDRS`, 실습 실행·중지·터미널은 `MANAGEMENT_ALLOWED_CIDRS`에서 설치한 관리자 CIDR과 HMAC 인증이 모두 필요하다. UI/API 포함4개 경로는 WAF On을 유지하며 이전 검사 예외는 제거했다. 기존 운영은 [증분 유지보수/복구](../infra/validation/web-policy/README.md)를 따른다. 아래 날짜별 예외 설명은 과거 이력이다.
+
 > 2026-10-29 차단 예외: RFC1918 전체는 기본 보호하지 않는다. `LOG_PROTECTED_IPS`의 정확한 필수 주소와 `ADMIN_PROTECTED_CIDRS`의 명시적 관리 범위를 보호한다. 예제의 관리자 `211.170.162.85`는 기존 승인된 campus /24에도 포함된다. SSH 허용은 `MANAGEMENT_ALLOWED_CIDRS`, Wazuh HTTPS는 `DASHBOARD_ALLOWED_CIDRS`로 별도 설정한다. 운영 서버 전체 재설치는 하지 않는다.
 
 > **2026-10-26 학과망 관리 예제:** 현장 `211.170.162.0/24` 정책은 `ADMIN_PROTECTED_CIDRS`, `MANAGEMENT_ALLOWED_CIDRS`, `DASHBOARD_ALLOWED_CIDRS`에 각각 명시한다. 세 값은 차단 예외·SSH·Wazuh라는 서로 다른 권한이다. 새 환경에서는 실제 관리 대역으로 교체하며 기존 A의 증분 설정을 초기 설치기로 덮어쓰지 않는다. 추가 패키지·오프라인 바이너리는 없다.

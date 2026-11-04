@@ -84,7 +84,9 @@ class BootstrapTests(unittest.TestCase):
         (self.source / 'cve_list.json').write_text(json.dumps(self.catalog))
         for name in ('app.py', 'broker.py', 'guard.py', 'manifest.py', 'practice_mode.py', 'challenge.py', 'terminal_api.py',
                      'static/index.html', 'static/app.js', 'static/app.css', 'static/style.css', 'static/theme.js', 'static/theme.css',
-                     'static/favicon.svg', 'static/terminal.html', 'static/terminal.js', 'static/terminal.css',
+                     'static/favicon.svg', 'static/favicon.png', 'static/favicon.ico',
+                     'static/lab-console-icon.ico', 'static/apple-touch-icon.png',
+                     'static/terminal.html', 'static/terminal.js', 'static/terminal.css',
                      'static/terminal-vendor/xterm.js', 'static/terminal-vendor/xterm.css', 'static/terminal-vendor/addon-fit.js',
                      'static/terminal-vendor/xterm.LICENSE', 'static/terminal-vendor/addon-fit.LICENSE',
                      'static/terminal-vendor/provenance.json'):

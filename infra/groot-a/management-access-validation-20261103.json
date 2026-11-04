@@ -204,5 +204,31 @@
     "infra/groot-a/chatproxy.nginx.conf": "b4391cbdef1251caab5cfcb4ef5a37c272c11369fea89d9d3e013facc9ec885a",
     "deploy.sh": "1cc8f016382fb1372c5334e6e033d542ac3186fb1638edefef21ff1f6bdaae2b",
     "infra/groot-a/fw-v2/capstone-nat.sh": "9e6063ca215c8c43a0bc9f514c91b6e9c18c4b58c9b8b7345e9bb17a70eda844"
+  },
+  "publication": {
+    "source_commit": "4301dba66f36bdc19973f572c5a7c9d2b96a042b",
+    "source_remote_main": "4301dba66f36bdc19973f572c5a7c9d2b96a042b",
+    "verified_at_kst": "2026-11-04T10:33:02.801441+09:00",
+    "followup_documentation": "separate commit; final ID in local session and final reply"
+  },
+  "followup_health": {
+    "at_kst": "2026-11-04T10:33:54+09:00",
+    "route": "new administrator-hop SSH",
+    "a_sources_and_policy": "verified",
+    "confirmed_recovery": "noop",
+    "rollback_timer": "inactive",
+    "b_c_existing_guard": "verified",
+    "all_wazuh_agents": "connected",
+    "repeat_http_mcp_packet_tests": false
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-11-04T10:34:50.227542+09:00",
+    "regular_files": 18,
+    "bytes": 312657,
+    "task_parent_absent": true,
+    "nonsecret_helper_sources_local_only": 17,
+    "new_packages": 0,
+    "new_downloads": 0,
+    "server_backup_preserved": true
   }
 }

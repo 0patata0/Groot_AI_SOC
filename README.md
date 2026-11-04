@@ -1,6 +1,6 @@
 # Groot_AI_SOC
 
-**관리 접속 현행(2026-11-03 23:17 KST):** A SSH·Wazuh443/10443은 관리자 `192.168.16.231/32`, A 내부 SSH는 MCP B `10.200.10.10/32`만 허용한다. Kali232의 Wazuh302→403·C의 A SSH거부·관리자 신규접속·공개 DVWA/Log4Shell/채팅·실제 MCP읽기를 검증했다. 루트 설치기/새 security host guard도 동기화했다. [정책·원복·미검증](infra/groot-a/management-access.md) · [현황](STATUS.md). 아래 날짜가 있는 VPN/학과망 허용은 당시 이력이다.
+**관리 접속 현행(11/3 실접속 시험·11/4 10:33 KST 정책 재확인):** A SSH·Wazuh443/10443은 관리자 `192.168.16.231/32`, A 내부 SSH는 MCP B `10.200.10.10/32`만 허용한다. Kali232의 Wazuh302→403·C의 A SSH거부·관리자 신규접속·공개 DVWA/Log4Shell/채팅·실제 MCP읽기를 검증했다. 루트 설치기/새 security host guard도 동기화했다. [정책·원복·미검증](infra/groot-a/management-access.md) · [현황](STATUS.md). 아래 날짜가 있는 VPN/학과망 허용은 당시 이력이다.
 
 **11/3 차단 상태 보완:** 실제 결과 문장을 도구 포장으로 잘못 해석하던 오류와 존재하지 않는 별도 차단 대상 조회 요구를 수정했습니다. KST/관측 기준 남은 시간을 원문과 구분해 제공하고, 다른 요청 ID의 새 Native·Ollama 시험은 각각1 MCP·시간 계산0회로 절차 검증까지 완료했습니다. 관리207·Hermes380·SDK179·양서버MCP23·설치38 PASS입니다. 전체 사건 판단·장문/채팅 지연과 새 공격 E2E는 별도입니다. [결과·복구·한계](infra/hermes/operation-time.md) · [현재 상태](STATUS.md).
 

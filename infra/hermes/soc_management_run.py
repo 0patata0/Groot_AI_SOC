@@ -283,7 +283,7 @@ def argument_error(data):
     if isinstance(error, str):
         if re.fullmatch(r'unsupported argument: [A-Za-z_][A-Za-z0-9_]{0,63}', error):
             return True
-        if error in ('invalid_arguments', 'unknown_target', 'invalid_range') or re.fullmatch(
+        if error in ('invalid_arguments', 'unknown_target', 'invalid_range', 'tool_input_schema_validation_failed') or re.fullmatch(
                 r'(?:limit|lookback_minutes) must be an integer (?:from|between) [0-9]+ (?:to|and) [0-9]+', error):
             return True
         if len(error) < 4096:
@@ -292,6 +292,57 @@ def argument_error(data):
             except (ValueError, RecursionError):
                 pass
     return False
+
+
+def tool_input_schema(name, schema):
+    """Normalize a verified catalog schema; no dispatch or argument correction."""
+    value=json.loads(json.dumps(schema))
+    if name=='mcp__wazuh_ro__search_wazuh_manager_logs':
+        props=value.get('properties',{})
+        if isinstance(props.get('level'),dict) and props['level'].get('type')=='string':
+            # Exact enum returned by the operating Wazuh API's 400 validator.
+            props['level']['enum']=['critical','debug','debug2','error','info','warning']
+            value['additionalProperties']=False
+    return value
+
+
+def tool_input_rejection(name, arguments, schema):
+    """Reject invalid reads before native MCP bookkeeping; never alter inputs."""
+    if not allowed(name,'verify'):return None
+    base={'executed':False,'mcp_executed':False,'stage':'before_mcp'}
+    if not isinstance(schema,dict):return {**base,'error':'tool_input_schema_unavailable'}
+    schema=tool_input_schema(name,schema)
+    if schema=={'type':'object'} and isinstance(arguments,dict):return None
+    try:
+        from jsonschema import Draft202012Validator, ValidationError
+    except ImportError:return {**base,'error':'tool_input_validator_unavailable'}
+    try:
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(arguments)
+    except ValidationError as exc:
+        return {**base,'error':'tool_input_schema_validation_failed','validator':str(exc.validator),
+                'path':[str(v)[:80] for v in list(exc.absolute_path)[:8]],'expected_schema':schema,
+                'detail':'호출하지 않았습니다. 이 도구의 스키마로 인자를 정정하세요.'}
+    except Exception:return {**base,'error':'tool_input_schema_unavailable'}
+    return None
+
+
+def read_protocol_error_result(name, exc):
+    """Keep an actual invalid-params response as an application error, no replay."""
+    if not wire_allowed(name,'verify'):return None
+    try:
+        errors=importlib.import_module('mcp.shared.exceptions')
+    except ImportError:return None
+    classes=tuple(c for key in ('McpError','MCPError') if isinstance(c:=getattr(errors,key,None),type))
+    error=getattr(exc,'error',None)
+    if not classes or not isinstance(exc,classes) or getattr(error,'code',getattr(exc,'code',None))!=-32602:return None
+    body={'error':'invalid_arguments','mcp_protocol_code':-32602,'server_responded':True,
+          'executed':False,'detail':str(getattr(error,'message','Invalid params'))[:1200]}
+    # The installed Rust client exposes MCPError but may not export Python SDK
+    # result constructors. Native rendering accepts the same content attributes.
+    from types import SimpleNamespace
+    return SimpleNamespace(isError=True,is_error=True,
+        content=[SimpleNamespace(type='text',text=json.dumps(body,ensure_ascii=False))])
 
 
 def observation_facts(name, result):
@@ -1621,9 +1672,13 @@ def wire_allowed(name, mode):
 def permitted_tools(tools, mode):
     if not isinstance(tools, list):
         return []
-    return [tool for tool in tools if isinstance(tool, dict) and tool.get('type') == 'function'
-            and isinstance(tool.get('function'), dict)
-            and allowed(tool['function'].get('name'), mode)]
+    selected=[json.loads(json.dumps(tool)) for tool in tools if isinstance(tool, dict) and tool.get('type') == 'function'
+              and isinstance(tool.get('function'), dict) and allowed(tool['function'].get('name'), mode)]
+    for tool in selected:
+        f=tool['function']
+        if allowed(f['name'],'verify') and isinstance(f.get('parameters'),dict):
+            f['parameters']=tool_input_schema(f['name'],f['parameters'])
+    return selected
 
 
 def permitted_request(request, mode):
@@ -1707,6 +1762,12 @@ def main():
     def gated_dispatch(name, args, **kwargs):
         if not allowed(name, mode):
             raise PermissionError('management_tool_not_allowed')
+        if allowed(name,'verify'):
+            definition=registry.get_schema(name)
+            rejection=tool_input_rejection(name,args,definition.get('parameters') if isinstance(definition,dict) else None)
+            if rejection:
+                argument_errors.append(name)
+                return json.dumps(rejection,ensure_ascii=False)
         return dispatch(name, args, **kwargs)
 
     async def gated_wire(self, name, arguments=None, *args, **kwargs):
@@ -1716,7 +1777,10 @@ def main():
         # extra model-side lookup. A's fixed helper independently validates the
         # current raw sensor event, protected IPs and bounded TTL. Verify mode
         # still forbids the write; no helper or scheduler chooses the action.
-        result = await wire(self, name, arguments, *args, **kwargs)
+        try:result = await wire(self, name, arguments, *args, **kwargs)
+        except Exception as exc:
+            result=read_protocol_error_result(name,exc)
+            if result is None:raise
         receipt=sensor_read_receipt(name,arguments,result)
         if receipt:sensor_receipts.append(receipt)
         if argument_refusal(name, result):

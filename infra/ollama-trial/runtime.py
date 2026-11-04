@@ -192,6 +192,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     if chosen is not None and name not in chosen:
                         continue
                     schema = harness.CONTRACT.normalized_schema(name, schema)
+                    schema = harness.EVIDENCE.tool_input_schema(name, schema)
                     if name == 'mcp__rule_a__get_service_action_target':
                         schema = service_read_schema(current, schema)
 

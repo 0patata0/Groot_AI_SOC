@@ -56,7 +56,8 @@ class Harness:
             harness.dispatches.append((name, args, kwargs))
             return {"ok": True}
 
-        self.registry = types.SimpleNamespace(dispatch=dispatch)
+        self.registry = types.SimpleNamespace(dispatch=dispatch,
+            get_schema=lambda name: next((t['function'] for t in self.initial_tools if t['function']['name']==name),None))
 
         class ClientSession:
             def __init__(self, content=None, failure=None, is_error=False):

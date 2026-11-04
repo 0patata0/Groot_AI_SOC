@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.19.21"
+VERSION = "groot-query-completion:1.19.22"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "d803fa30b4217feca7c26cee3a0ac91a4f9886bc843532173e2ad5898ebb7c4b"
+EVIDENCE_SOURCE_SHA256 = "465d859944753608190a08217083f8d85da5b130a8e43303e04d3ac8ecae1e1f"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -1153,7 +1153,7 @@ def register(ctx):
             context.reanchor_current_turn_user_idx, query_adapter, shared_chat)
         build_wrapped = alignment.request_wrapper(build_wrapped, query_adapter, shared_chat)
         call_wrapped = alignment.selection_call_wrapper(call_wrapped, query_adapter, shared_chat)
-        result_wrapped = alignment.vulnerability_result_wrapper(original_result, shared_chat.READ, VERSION)
+        result_wrapped = alignment.vulnerability_result_wrapper(original_result, shared_chat.READ, VERSION, shared_chat.EVIDENCE)
         pre_tool_wrapped = alignment.proposal_input_wrapper(original_pre_tool, shared_chat, VERSION)
         budget_wrapped = alignment.budget_fallback_wrapper(original_budget, query_adapter, shared_chat, context.reanchor_current_turn_user_idx)
 

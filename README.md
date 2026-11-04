@@ -4,9 +4,9 @@
 
 구축·운영의 현행 진입점은 [배포 가이드](deployment/README.md)이며, [NCSC/NIS 공식 지침 부분 대조](deployment/SECURITY_GUIDELINES.md)와 [운영 절차](deployment/OPERATIONS.md)를 연결한다. 전체 기관 준수·새3VM 설치 검증 완료를 뜻하지 않는다. [조회 정확성 보완](infra/hermes/read-accuracy.md)은 실제 관측/시작값·도구 대상·한국어 필터를 구분한다.
 
-**채팅 하네스·담당 분배(11/4):** 공통1.5.26/query1.19.21/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
+**채팅 하네스·담당 분배(11/4):** 공통1.5.27/query1.19.22/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
 
-**사건 종결·SDK 실행 검증:** 두 봇이 명시 판단·실제 인용·자산별 사건 시각 조회의 최소 기준을 공유합니다. 과거 잘못된 종결은 양쪽에서 거절했고 서버951검사를 통과했습니다. SDK의 잘못된 조회 계획 반복을 보완한 새 시험은 실제6읽기/오류0까지 진행됐지만 당시 자산 경보 누락·해소 단정 때문에 partial입니다. 실패 보고도 공통 근거 표로 연결했습니다. Native의 도구/인자 오류와 실제 영향·종결·전체 쓰기 동등성은 남습니다. [실제 실패·배포·복구](infra/hermes/incident-closure-minimum.md).
+**사건 조사·입력 검증:** 두 봇의 최소 종결 근거를 공유하고 Native도 실제 도구 스키마로 읽기 인자를 전송 전에 검사합니다. 실제-32602 요청 거절은 통신 장애와 구분합니다. 서버961검사·실제9거절/wire0 및 오류 뒤 정상MCP 회복을 확인했습니다. 새 사건 재검토는149.645초·8조회0오류/추적 관찰이며 최초 차단시각 보고 오류·실제영향/종결은 남습니다. [입력·실제검증·복구](infra/hermes/mcp-input-validation.md) · [최소 종결/SDK](infra/hermes/incident-closure-minimum.md).
 
 **사건 출력·표 표시(11/4):** 단일 `soc-output/SKILL.md`를 사건/자동 조사와 검증실패 보고에도 적용했습니다. 실제 브라우저에서 양봇 WAF·새 사건대체보고·FW 긴/분할 답변6게시물8표가 정상 표시됨을 확인했습니다.918회귀 통과·과거 게시물 소급 수정0이며 모든 출력 경로/단일 초장문 행 검증은 별도입니다. 사건 후속 조회는 원구간/후속 범위·실제 영수증을 대조하고, 마지막 재검토는 근거 부족으로 추가 검토 상태를 유지합니다. [범위·실패·복구](infra/hermes/incident-followup.md).
 

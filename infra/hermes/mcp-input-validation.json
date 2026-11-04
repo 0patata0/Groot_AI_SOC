@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-05T01:21:36+09:00",
+  "contract": "1.5.27",
+  "query": "1.19.22",
+  "tests": {
+    "management": 257,
+    "sdk": 216,
+    "native": 390,
+    "installation_contract": 38,
+    "review": 60,
+    "total": 961,
+    "skipped": 0
+  },
+  "native_actual_boundary": {
+    "historical_invalid_calls_locally_rejected": 9,
+    "local_rejection_native_wire_calls": 0,
+    "rejections": [
+      {
+        "name": "mcp__rule_b__get_rule_change_target",
+        "validator": "enum"
+      },
+      {
+        "name": "mcp__system_diagnostics__get_system_diagnostics",
+        "validator": "additionalProperties"
+      },
+      {
+        "name": "mcp__wazuh_ro__search_wazuh_manager_logs",
+        "validator": "type"
+      },
+      {
+        "name": "mcp__security_events__search_suricata_alerts",
+        "validator": "additionalProperties"
+      },
+      {
+        "name": "mcp__wazuh_ro__search_wazuh_manager_logs",
+        "validator": "type"
+      },
+      {
+        "name": "mcp__wazuh_ro__search_wazuh_manager_logs",
+        "validator": "enum"
+      },
+      {
+        "name": "mcp__wazuh_ro__search_wazuh_manager_logs",
+        "validator": "type"
+      },
+      {
+        "name": "mcp__wazuh_ro__search_wazuh_manager_logs",
+        "validator": "type"
+      },
+      {
+        "name": "mcp__system_diagnostics__get_system_diagnostics",
+        "validator": "additionalProperties"
+      }
+    ],
+    "invalid_protocol_reply_preserved": true,
+    "protocol_error_application_only": true,
+    "application_strikes_before_valid_read": 1,
+    "real_valid_manager_read": true,
+    "native_wire_calls": 2,
+    "strikes_after_valid_read": 0,
+    "model_calls": 0,
+    "protected_writes": 0
+  },
+  "native_fresh_review": {
+    "run_id": "fca4c83a4fb78e8817fb44826b51712b",
+    "seconds": 149.6451506614685,
+    "actual_calls": 8,
+    "errors": 0,
+    "protected_writes": 0,
+    "case_state": "monitor",
+    "detail": "model_requested_followup",
+    "report_delivered": 1,
+    "incident_closed": false,
+    "tool_names": [
+      "mcp__rule_a__get_operation_status",
+      "mcp__security_events__search_modsecurity_alerts",
+      "mcp__security_events__search_modsecurity_alerts",
+      "mcp__security_events__search_suricata_alerts",
+      "mcp__security_events__get_web_service_target",
+      "mcp__security_events__search_web_access",
+      "mcp__wazuh_ro__get_wazuh_agents",
+      "mcp__security_events__search_wazuh_alerts"
+    ],
+    "speed_improvement_proven": false,
+    "report_fully_correct": false,
+    "confirmed_report_error": "initial containment time incorrectly labelled with temporary expiry; API does not return an initial application time"
+  },
+  "before_review": {
+    "seconds": 148.76626563072205,
+    "actual_calls": 13,
+    "errors": 9,
+    "case_state": "needs_review"
+  },
+  "deployment": {
+    "confirmed_at_epoch": 1793809296,
+    "files_verified": 14,
+    "protected_unchanged": 7,
+    "gate_sha256": "465d859944753608190a08217083f8d85da5b130a8e43303e04d3ac8ecae1e1f",
+    "controller_sha256": "529ae4911826f4f71dfad1e462f7bc5d007cecc2285a03dfe2dc60fc7de19088",
+    "gate_matches_reference": true,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 4.72801661491394,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 16.728081941604614,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "confirmed_recovery_noop": true,
+    "recovery_backup": "/var/lib/capstone-native-input/20261105-r1/deployment",
+    "native_restarts": 1,
+    "sdk_restarts": 1,
+    "review_worker_restarts": 1,
+    "root_ast_only_embedded_gate_changed": true
+  },
+  "remaining": [
+    "unsupported initial-containment time claim and report semantics",
+    "agent-wide samples do not prove benign activity or whole-window absence",
+    "complete impact investigation and closure",
+    "SDK full mixed/protected-write parity",
+    "fresh installation and full attack E2E"
+  ],
+  "new_packages_images_ports_keys": 0,
+  "model_or_fw_policy_changes": 0,
+  "fresh_os_install": false,
+  "new_attack_e2e": false,
+  "source_publication": {
+    "status": "pending"
+  },
+  "cleanup": {
+    "removed_files": 441,
+    "removed_bytes": 6421312,
+    "deployment_backup_preserved": true,
+    "operating_db_chat_approvals_unchanged": true,
+    "temporary_native_candidate_absent": true,
+    "mac_removed_files": 29,
+    "mac_removed_bytes": 6478101,
+    "own_mac_temp_and_ssh_processes_remaining": 0
+  }
+}

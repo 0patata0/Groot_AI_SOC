@@ -170,11 +170,14 @@ def calls_from_rows(rows, unwrap):
     return output
 
 
-def vulnerability_result_wrapper(original, read, version):
+def vulnerability_result_wrapper(original, read, version, evidence=None):
     """Aggregate one actual result before native lossy capping; no new call/retry."""
     @functools.wraps(original)
     async def wrapped(server, server_name, tool_name, args):
-        result = await original(server, server_name, tool_name, args)
+        try:result = await original(server, server_name, tool_name, args)
+        except Exception as exc:
+            result=evidence.read_protocol_error_result(tool_name,exc) if evidence is not None else None
+            if result is None:raise
         if (server_name != 'wazuh-ro' or tool_name != 'get_wazuh_vulnerability_summary'
                 or getattr(result, 'is_error', False) or getattr(result, 'isError', False)):
             return result
@@ -354,6 +357,10 @@ def request_wrapper(original, query, harness):
         read_selection = bool(scope and (harness.structured_read(request) or incident_scope)
                               and all(harness.EVIDENCE.allowed(name, 'verify') for name in scope))
         data = harness.CONTRACT.normalize_openai(result.api_kwargs, scope, read_only=read_selection,agent_role='hermes')
+        for tool in data.get('tools',[]):
+            f=tool.get('function',{})
+            if harness.EVIDENCE.allowed(f.get('name'),'verify') and isinstance(f.get('parameters'),dict):
+                f['parameters']=harness.EVIDENCE.tool_input_schema(f['name'],f['parameters'])
         if reference:
             data['messages']=harness.project_card_messages(data.get('messages',[]),kw.get('original_user_message',''),request)
         if harness.summary_request(query.current_request_text(kw.get('original_user_message'))) and not harness.summary_request(request):
@@ -455,6 +462,11 @@ def proposal_input_wrapper(original, harness, version):
     @functools.wraps(original)
     def wrapped(agent, ref):
         block, arguments = original(agent, ref)
+        if block is None and enabled(agent) and harness.EVIDENCE.allowed(ref.name,'verify'):
+            schema=next((t['function'].get('parameters') for t in getattr(agent,'tools',[])
+                         if isinstance(t,dict) and t.get('function',{}).get('name')==ref.name),None)
+            rejection=harness.EVIDENCE.tool_input_rejection(ref.name,arguments,schema)
+            if rejection:return json.dumps(rejection,ensure_ascii=False),arguments
         match = re.fullmatch(r'mcp__(rule_write_[ab])__(propose_rule_edit|propose_rule_change)', ref.name)
         if block is not None or not enabled(agent) or not match:
             return block, arguments

@@ -1,6 +1,6 @@
 # 두 봇의 공통 하네스
 
-현재 계약은 **soc-chat-contract:1.5.26 / query1.19.21 / soc-review-routing:1.1.4**다. 센서 사건의 명시적 판단·자산별 시각 조회/인용 최소 검사를 공유하고 SDK의 구조화 조회 선택 오류를 보완했다. 전체 사건 종결·Native 도구 인자 오류·SDK 혼합/보호 쓰기 동등성은 미완료다. [최소 근거와 실제 실패](incident-closure-minimum.md). 운영 반영·실제 새 채팅·미완료 범위는 [앞선 검증](harness-cleanup.md)과 [현황](../../STATUS.md)을 따른다. 모델은 기존 Thor 원본35B이며 학습본 승격은 하지 않았다.
+현재 계약은 **soc-chat-contract:1.5.27 / query1.19.22 / soc-review-routing:1.1.4**다. 센서 사건의 명시적 판단·자산별 시각 조회/인용 최소 검사를 공유하고 SDK의 구조화 조회 선택 오류를 보완했다. 전체 사건 종결·Native 인자/프로토콜 오류 구분은 [후속 보완](mcp-input-validation.md)했다. 실제 보고의 시각/의미·SDK 혼합/보호 쓰기 동등성은 미완료다. [최소 근거와 실제 실패](incident-closure-minimum.md). 운영 반영·실제 새 채팅·미완료 범위는 [앞선 검증](harness-cleanup.md)과 [현황](../../STATUS.md)을 따른다. 모델은 기존 Thor 원본35B이며 학습본 승격은 하지 않았다.
 
 | 범위 | 공통 기준 |
 |---|---|

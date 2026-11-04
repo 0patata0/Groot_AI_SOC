@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.26'
+VERSION = 'soc-chat-contract:1.5.27'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -50,6 +50,8 @@ QUERY_SECTIONS = {
         "종료와 길이만 지정하면 until_kst+lookback_minutes를 사용합니다. 최대90일 전·조회 폭24시간·limit50의 실제 스키마를 확인합니다. "
         "반환 requested_since_kst/requested_until_kst가 사건 시각을 포함하는지 확인하고 과거 SID를 새 사건에 섞지 않습니다. "
         "get_wazuh_alert_summary는 지정 절대 구간을 지원하지 않으므로 반환 alert timestamp 범위만 인용합니다. "
+        "search_wazuh_manager_logs는 manager 자체 로그이며 agent의 과거 경보·사건 구간 검색이 아닙니다. "
+        "agent 경보는 search_wazuh_alerts의 실제 agent_id와 구간으로 읽고, manager 로그의 level은 숫자 경보 레벨과 구분합니다. "
         "센서 목적지·source_ip·sensor_agent/agent 수집 주체를 구분하고 IP만으로 호스트 이름을 만들지 않습니다. "
         "DNS는 실제 도메인·발신/목적지·A/AAAA·SID를 확인하며 다중 룰 매칭 수와 실제 질의 수, 도메인 분류와 C2/유출 증거를 구분합니다. "
         "표시된 *_kst/time_display/+09:00/remaining_seconds_at_observation을 그대로 사용합니다. "

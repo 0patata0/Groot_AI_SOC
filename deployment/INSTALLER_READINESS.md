@@ -11,7 +11,7 @@
 | 공동 채널 | remote.sh에 siem review-chat-install/verify 두 작업만 추가. 역할3×작업명4=12조건으로 허용/거부 검사 | 실제 신규 review 설치는 미실행 |
 | 컨트롤러 | 누락된 security host-check/verify fixture3을 실제 실행 순서로 정정. 가짜SSH46PASS | 가짜SSH는 실제 remote dispatcher/VM 설치·복구 증거 아님. 별도 NAT/Ansible 후보는 이번 검증·게시 범위 밖 |
 | 공통 하네스 | read_contract/chat_harness/grounding/query·SDK runtime/harness와 출력 SKILL이 기존 복사/묶음 경로 사용. 사건/검증실패에도 단일soc-output재사용·내부 실행별 읽기 metadata·불변 포함gate와root참조SHA결속. 설치계약38PASS | 새 OS 실행 시험 없음·패키지/포트/키 추가0 |
-| 사건 종결 검사 | Native/SDK가 공통의 명시적 판단·자산별 사건 시각 조회/인용 최소 검사 사용. SDK 구조화 선택 묶음/오류 피드백도 기존 소스 복사 경로로 설치. 관리247/설치38·전체951PASS, 실제 오류 출력 거절·미해결 유지 재생 | SDK 보호 쓰기/혼합 요청 전체 동등성·실제 영향/종결·Native 인자 오류·신규 설치 미완료. 새 패키지/포트/키0이며 오프라인 반입은 기존 소스 갱신만 필요. [범위](../infra/hermes/incident-closure-minimum.md) |
+| 사건 종결 검사 | Native/SDK가 공통의 명시적 판단·자산별 사건 시각 조회/인용 최소 검사 사용. SDK 구조화 선택 묶음/오류 피드백도 기존 소스 복사 경로로 설치. 관리247/설치38·전체951PASS, 실제 오류 출력 거절·미해결 유지 재생 | SDK 보호 쓰기/혼합 요청 전체 동등성·실제 영향/종결·새 보고 시각/의미·신규 설치 미완료. Native 읽기 인자의 실제 스키마 검사/실제-32602 응답 구분도 같은 common/query/SDK 경로에 포함·서버961PASS. 기존 고정Native/SDK의jsonschema/MCP 의존성을 사용하며 새 패키지/포트/키0, 오프라인 반입은 기존 소스 갱신만 필요. [범위](../infra/hermes/incident-closure-minimum.md) |
 | 두 봇 프로필 | trial/chat/review 옵션·제한된 권한 모드 | 기본enable0/read-only와 현행 운영 두 봇 프로필을 구분. 완성된 제품 프로필 필요 |
 | WAF 원문 대응 | configure_waf_evidence 소스 포함 | 초기 producer/raw/pin/enrollment 자동 연결 미확인 |
 | 오프라인 | 역할별 deb/image SHA·버전 검사·로컬 설치 | wheel/TLS/runtime/catalog 등 포함 최종 통합 반입물·하위 의존성/서명 대장 미완성 |

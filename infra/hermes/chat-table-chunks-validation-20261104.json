@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-04",
+  "deployment_status": "confirmed",
+  "versions": {
+    "contract": "1.5.19",
+    "native_query": "1.19.14",
+    "context": "1.0.1",
+    "model": "qwen3.6:35b original"
+  },
+  "confirmed_at_kst": "2026-11-04T14:26:57.463885+09:00",
+  "scope": {
+    "runtime_source_files": 12,
+    "receipts": 2,
+    "protected_configuration_hashes_unchanged": 6,
+    "controlled_existing_gateway_restarts": 2,
+    "new_packages_images_ports_keys_permissions": 0,
+    "FW_policy_or_model_changes": 0,
+    "new_server_installation": false,
+    "installer_runtime_changes": false
+  },
+  "tests": {
+    "server": {
+      "SDK": 193,
+      "native": 385,
+      "context": 66,
+      "markdown": 8,
+      "chunks": 17,
+      "passed": 669,
+      "skipped": 0
+    },
+    "source_bundle_contract": {
+      "passed": 1
+    },
+    "actual_chat": {
+      "actual_chat_cases": 10,
+      "all_19_rows_and_expressions_equal_actual_MCP_snapshot": true,
+      "first_page_rows": 16,
+      "second_page_rows": 3,
+      "raw_table_rows": 0,
+      "SDK_followup_model_calls": 0,
+      "SDK_followup_MCP_calls": 0,
+      "native_total_MCP_calls_for_four_thread_requests": 1,
+      "standalone_clarification_MCP_calls": 0,
+      "snapshot_sha256": "849fb3151b1c5933df5556a1c8d9041b2f3d6b97c71cd784db062ec6bab6b2ef",
+      "browser_UI_verified": false
+    },
+    "old_thread_corrections": {
+      "each_bot_new_MCP_calls": 1,
+      "detail_rows": 3,
+      "match_verified_snapshot": true,
+      "old_posts_preserved": true
+    }
+  },
+  "before": {
+    "native_first_page": {
+      "table_rows": 14,
+      "plain_rows": 2,
+      "displayed_rows": 16
+    },
+    "relative_page": {
+      "SDK": {
+        "nonexistent_rule_keys": 3,
+        "model_calls": 1,
+        "MCP_calls": 0
+      },
+      "native": {
+        "rows_with_wrong_expression": 1,
+        "unsupported_referenced_set_claim": true,
+        "additional_MCP_calls": 0
+      }
+    }
+  },
+  "parser": {
+    "source": "https://raw.githubusercontent.com/mattermost/marked/467bc9e99fc75d69424188dfbea7fe0409a9fc15/lib/marked.js",
+    "sha256": "7a7e73ca0aad7145c2c38ff4d02ae431c264221f6fa1771dfa662f125e60789c",
+    "bytes": 36485,
+    "license": "MIT",
+    "browser_UI_verified": false
+  },
+  "source_hashes": [
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/chat_markdown.py",
+      "before": "991374e693e1b13a629d171a96c96da06f450746ff9888204ceccfd913be27ac",
+      "after": "835445d7abb492a39f96f9f250e8d89c1eb82beda60fa1674dee9b23e178c5c9"
+    },
+    {
+      "path": "/opt/capstone-ollama-trial/chat_markdown.py",
+      "before": "991374e693e1b13a629d171a96c96da06f450746ff9888204ceccfd913be27ac",
+      "after": "835445d7abb492a39f96f9f250e8d89c1eb82beda60fa1674dee9b23e178c5c9"
+    },
+    {
+      "path": "/opt/capstone-review-chat/chat_markdown.py",
+      "before": "991374e693e1b13a629d171a96c96da06f450746ff9888204ceccfd913be27ac",
+      "after": "835445d7abb492a39f96f9f250e8d89c1eb82beda60fa1674dee9b23e178c5c9"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/gateway_health.py",
+      "before": "9655ce20f6795229289be8332699bcc7c3199be2173f133a2aed2b7033a9c460",
+      "after": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85"
+    },
+    {
+      "path": "/opt/capstone-ollama-trial/gateway_health.py",
+      "before": "9655ce20f6795229289be8332699bcc7c3199be2173f133a2aed2b7033a9c460",
+      "after": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/__init__.py",
+      "before": "254e13a58f0b476a3aadfc4923f342d1fc6bc3b042c06c422abdd269ac47d7d0",
+      "after": "e21e2f3ea9520cb2a0c209a95f11f0f67b72241d58bb33a4cb0e00eb33b36f91"
+    },
+    {
+      "path": "/opt/capstone-ollama-trial/query_grounding.py",
+      "before": "254e13a58f0b476a3aadfc4923f342d1fc6bc3b042c06c422abdd269ac47d7d0",
+      "after": "e21e2f3ea9520cb2a0c209a95f11f0f67b72241d58bb33a4cb0e00eb33b36f91"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml",
+      "before": "a0b2d62575fad89f9775c2a6caf5ae388c2b712d3459c7124e6ff11b78888c92",
+      "after": "b87542adc70e563208641d9acb83fd954efd6417cb4e0b9483817b805f3504cc"
+    },
+    {
+      "path": "/etc/capstone-ollama-trial/receipt.json",
+      "before": "1a6383a5fb27825590b3052f8bebedda1fb2fcc32db6b95f48503b92fadf00b6",
+      "after": "a64a82fc0bad00e38c919270aa26bc6bd53a8510c0cac6a06866626d802e728a"
+    },
+    {
+      "path": "/etc/capstone-review-chat/receipt.json",
+      "before": "ee098c4a5a691426cfde6df6707565cfb0de8eb6c08f1f82d00f0439a36a23c5",
+      "after": "cd932ff87a2e1ea2e38dc568f5063925c83b7b6e4633c8ebce574b39060c18d7"
+    },
+    {
+      "path": "/opt/capstone-ollama-trial/harness.py",
+      "before": "da137df7602bba0881a34b08cb47a6c6211c04ecccbb8849d73a6197d98ad8fc",
+      "after": "732d6c60dec25c68ea8feac62805957a829b957d2278d7d09881d8bcfe0c357d"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+      "before": "da137df7602bba0881a34b08cb47a6c6211c04ecccbb8849d73a6197d98ad8fc",
+      "after": "732d6c60dec25c68ea8feac62805957a829b957d2278d7d09881d8bcfe0c357d"
+    },
+    {
+      "path": "/opt/capstone-ollama-trial/chat_contract.py",
+      "before": "874381366d0b83f4709d2d8b0c0d7f8599a33a8e080e3ad899f3e69ded0ae328",
+      "after": "4ad004598546167d536063adc4168f8932b560ea558097b9160bb8d95670acae"
+    },
+    {
+      "path": "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+      "before": "874381366d0b83f4709d2d8b0c0d7f8599a33a8e080e3ad899f3e69ded0ae328",
+      "after": "4ad004598546167d536063adc4168f8932b560ea558097b9160bb8d95670acae"
+    }
+  ],
+  "recovery": {
+    "directory": "/var/lib/capstone-table-chunks/20261104-r1/deployment",
+    "independent_rollback_minutes": 15,
+    "timer_disabled_after_confirmation": true,
+    "intermediate_receipt_hash_supported": true,
+    "manual_rollback_exercised": false,
+    "confirmed_recovery_noop": true,
+    "database_or_chat_history_restored_or_deleted": false
+  },
+  "limits": [
+    "Browser UI unverified because computer-use initialization failed.",
+    "A single header plus row exceeding a post budget retains the native fallback; table rendering is not guaranteed.",
+    "Existing marked truncation of extremely long FW display rows is not removed; full MCP evidence remains separate.",
+    "Verification of these 19 rules is not proof of all device queries, incident judgment, attack E2E or a fresh installation."
+  ],
+  "cleanup": {
+    "server": {
+      "at_kst": "2026-11-04T14:31:59.887751+09:00",
+      "removed": [
+        {
+          "path": "/var/lib/capstone-table-chunks/20261104-r1/validation",
+          "files": 358,
+          "bytes": 5846425
+        },
+        {
+          "path": "/opt/hermes-data/.table-chunks-20261104-r1",
+          "files": 358,
+          "bytes": 5846425
+        },
+        {
+          "path": "owned test source/log files",
+          "files": 11,
+          "bytes": 8482
+        }
+      ],
+      "original_and_final_recovery_sources_preserved": true,
+      "actual_chat_posts_and_DB_preserved": true,
+      "downloaded_packages_on_server": 0,
+      "source_and_config_hashes_match": true
+    },
+    "Mac": {
+      "at_kst": "2026-11-04T14:33:23.716236+09:00",
+      "removed_files": 24,
+      "removed_bytes": 12105398,
+      "source_snapshot_files": 23,
+      "own_mux_shutdown": [
+        {
+          "name": "ctl-cps-b",
+          "exit": 0
+        },
+        {
+          "name": "ctl-cps-admin-direct",
+          "exit": 0
+        },
+        {
+          "name": "ctl-cps-a",
+          "exit": 255
+        }
+      ],
+      "downloaded_marked_js_removed": true,
+      "parser_not_copied_to_snapshot": true,
+      "parent_absent": true,
+      "new_Mac_packages": 0,
+      "other_task_directories_preserved": true
+    }
+  },
+  "git_publication": {
+    "state": "pending"
+  }
+}

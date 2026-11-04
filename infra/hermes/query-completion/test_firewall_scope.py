@@ -18,6 +18,18 @@ H=alignment.load_harness()
 
 
 class NativeFirewallScope(unittest.TestCase):
+    def test_relative_page_uses_bound_snapshot_instead_of_model_generated_rules(self):
+        prior=self.bound('FW output 룰 개별로 표로 보여줘')
+        current=self.bound('다음 페이지',request='t'*26)
+        messages=[{'role':'user','content':prior},*rows(fixtures.snapshot()),{'role':'user','content':current}]
+        resolved=alignment.resolve_rule_history('다음 페이지',messages,len(messages)-1,PLUGIN,H)
+        self.assertIn('2페이지',resolved)
+        report=alignment.prior_read_report(resolved,messages,len(messages)-1,PLUGIN,H)
+        self.assertTrue(report.reused)
+        self.assertIn('새 조회 없음',report)
+        self.assertIn('규칙이 없습니다',report)
+        self.assertNotIn('| 80 |',report)
+
     def bound(self,text,*,root='r'*26,actor='u'*26,channel='c'*26,request=None):
         top=request is None
         return hydrated(text,status='ok',scope='same_channel_top_level' if top else 'same_thread',

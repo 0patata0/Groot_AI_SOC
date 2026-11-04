@@ -1,7 +1,9 @@
 """Separate valid top-level Markdown tables from prose without changing cells.
 
-Only blank lines are inserted. Fenced/indented code, quotes, raw HTML blocks,
-and malformed table-like text are preserved. No model or tool is called.
+Normalization only inserts blank lines. The optional transport splitter repeats
+table headers across posts without dropping rows. Fenced/indented code, quotes,
+raw HTML blocks, and malformed table-like text use the original splitter.
+No model or tool is called.
 """
 import re
 
@@ -49,3 +51,103 @@ def normalize_tables(text):
             out.append(lines[i]);i+=1
         if i<len(lines) and lines[i].strip():out.append(ending)
     return ''.join(out)
+
+
+def _table_spans(lines):
+    """Find the same top-level pipe tables accepted by normalize_tables."""
+    spans=[];i=0;fence=None;raw=None
+    while i<len(lines):
+        body=lines[i].rstrip('\r\n');marker=_FENCE.match(body)
+        if fence:
+            if marker and marker[1][0]==fence[0] and len(marker[1])>=len(fence) and not marker[2].strip():fence=None
+            i+=1;continue
+        if raw:
+            if re.search(r'</'+raw+r'\s*>',body,re.I):raw=None
+            i+=1;continue
+        if marker:fence=marker[1];i+=1;continue
+        html=_RAW.match(body)
+        if html:
+            raw=html[1]
+            if re.search(r'</'+raw+r'\s*>',body,re.I):raw=None
+            i+=1;continue
+        separator=lines[i+1].rstrip('\r\n') if i+1<len(lines) else ''
+        if (_ROW.fullmatch(body) and _ROW.fullmatch(separator)
+            and len(_cells(body))==len(_cells(separator))>=2
+            and all(re.fullmatch(r'\s*:?-{3,}:?\s*',cell) for cell in _cells(separator))):
+            start=i;i+=2
+            while i<len(lines) and _ROW.fullmatch(lines[i].rstrip('\r\n')):i+=1
+            spans.append((start,i))
+        else:i+=1
+    return spans
+
+
+def split_tables(text, max_length=4000, len_fn=None, *, fallback):
+    """Split recognized tables at row boundaries and repeat their exact header.
+
+    The pinned native splitter remains responsible for prose and code fences.
+    Non-table messages, unsupported oversized rows/headers, or an unexpected
+    native split contract return its unchanged result. That fallback preserves
+    content but cannot promise a valid table for a row larger than one post.
+    """
+    measure=len_fn or len
+    if measure(text)<=max_length or '|' not in text:
+        return fallback(text,max_length,len_fn)
+    normalized=normalize_tables(text)
+    lines=normalized.splitlines(keepends=True)
+    spans=_table_spans(lines)
+    if not spans:return fallback(text,max_length,len_fn)
+    # More conservative than the actual part count; reserve before packing so
+    # indicators can never push a complete row over the platform limit.
+    bound=max(1,len(normalized))
+    budget=max_length-measure(f'\n\n({bound}/{bound})')
+    if budget<=0:return fallback(text,max_length,len_fn)
+    for start,end in spans:
+        header=''.join(lines[start:start+2])
+        if measure(header)>budget or any(measure(header+row)>budget for row in lines[start+2:end]):
+            return fallback(text,max_length,len_fn)
+    chunks=[];current=''
+
+    def flush():
+        nonlocal current
+        if current.strip():chunks.append(current)
+        current=''
+
+    def prose(value):
+        nonlocal current
+        if measure(current+value)<=budget:
+            current+=value;return True
+        flush()
+        parts=fallback(value,budget,len_fn)
+        if len(parts)>1:
+            bodies=[]
+            for index,part in enumerate(parts,1):
+                suffix=f' ({index}/{len(parts)})'
+                if not part.endswith(suffix):return False
+                bodies.append(part[:-len(suffix)])
+            parts=bodies
+        for index,part in enumerate(parts):
+            if measure(part)>budget:return False
+            if index:flush()  # native continuations are already standalone
+            if measure(current+part)>budget:flush()
+            current+=part
+        return True
+
+    cursor=0
+    for start,end in spans:
+        if not prose(''.join(lines[cursor:start])):return fallback(text,max_length,len_fn)
+        header=''.join(lines[start:start+2]);rows=lines[start+2:end]
+        # A new table and every continuation are standalone Markdown blocks.
+        gap='' if not current or current.endswith('\n\n') or current.endswith('\r\n\r\n') else ('\n' if current.endswith('\n') else '\n\n')
+        first=header+(rows[0] if rows else '')
+        if measure(current+gap+first)>budget:flush();gap=''
+        current+=gap+header
+        for row in rows:
+            if measure(current+row)>budget:
+                flush();current=header
+            current+=row
+        cursor=end
+    if not prose(''.join(lines[cursor:])):return fallback(text,max_length,len_fn)
+    flush()
+    if len(chunks)>1:chunks=[part+f'\n\n({i}/{len(chunks)})' for i,part in enumerate(chunks,1)]
+    if not chunks or any(measure(part)>max_length for part in chunks):return fallback(text,max_length,len_fn)
+    return chunks

@@ -96,8 +96,18 @@ def resolve_short_read(question, prior_questions=()):
         if not current and explicit:
             resolved='FW 룰 '+question
             if rule_scope_request(resolved):return resolved
-        if re.fullmatch(r'\s*[1-9][0-9]{0,3}\s*페이지\s*(?:보여줘|보여줄래|만)?[?.!？\s]*',text):
-            return fw_prefix+'룰 상세 '+question
+        page=display_page_request(text)
+        if page is not None:
+            previous_number=re.search(r'([1-9][0-9]{0,3})\s*페이지',normalized(previous))
+            number=int(previous_number[1]) if previous_number else 1
+            number=number+1 if page=='next' else max(1,number-1) if page=='previous' else page
+            return fw_prefix+'룰 상세 표 '+str(number)+'페이지'
+    if display_page_request(text) is not None:
+        page=display_page_request(text)
+        previous_number=re.search(r'([1-9][0-9]{0,3})\s*페이지',normalized(previous))
+        number=int(previous_number[1]) if previous_number else 1
+        number=number+1 if page=='next' else max(1,number-1) if page=='previous' else page
+        question='룰 표 '+str(number)+'페이지'
     if rule_table_request(question) and prior['devices']:
         # Reformatting preserves the previous selection, including vendor IDs
         # and correlation filters, but never carries an action or old facts.
@@ -149,7 +159,7 @@ def rule_scope_request(question):
     text = READ.scope_text(normalized(question))
     if request_kind(question) != 'other':
         return None
-    return CONTRACT.rule_scope_request(text)
+    return CONTRACT.rule_scope_request('룰 조회' if display_page_request(question) is not None else text)
 
 
 def scope_notice(question):
@@ -223,8 +233,18 @@ def firewall_display_objects(objects, scope):
     return output,{'roots':len(roots),'referenced_chains':len(selected-roots),'unresolved':sorted(missing)}
 
 
+def display_page_request(question):
+    """A display navigation request is not permission or a fresh observation."""
+    if not isinstance(question,str) or READ.wants_write(normalized(question)):return None
+    match=re.fullmatch(r'\s*(다음|이전|앞|첫|[1-9][0-9]{0,3})\s*페이지\s*(?:보여줘|보여줄래|보여주세요|만)?[?.!？\s]*',normalized(question))
+    if not match:return None
+    return {'다음':'next','이전':'previous','앞':'previous','첫':1}.get(match[1],int(match[1]) if match[1].isdigit() else None)
+
+
 def rule_table_request(question):
     text=normalized(question)
+    if display_page_request(question) is not None:return True
+    if not READ.wants_write(text) and rule_scope_request(question) and re.search(r'[1-9][0-9]{0,3}\s*페이지',text):return True
     if READ.wants_write(text) or not re.search(r'표|테이블',text):return False
     individual=bool(re.search(r'각각|개별|하나씩|한\s*(?:행|줄)씩|(?:룰|규칙)별',text))
     if not individual and re.search(r'장비별|개수|집계|통계|요약',text):return False
@@ -1480,7 +1500,7 @@ def summary_recovery_request(question, evidence, prior_questions=()):
 
 def prior_inventory(question, evidence):
     # Pure reformat only. Fresh roots never receive evidence from the gateway.
-    if (not isinstance(evidence, dict) or not re.search(r'표|테이블|정리', question)
+    if (not isinstance(evidence, dict) or not (re.search(r'표|테이블|정리|페이지', question))
             or re.search(r'현재|지금|다시\s*(?:조회|확인)|새로\s*(?:조회|확인|불러)|재조회|최신|갱신|변경|수정|삭제|추가|(?<![a-z])refresh(?![a-z])', normalized(question),re.I)):
         return None
     previous = evidence.get('question', '')

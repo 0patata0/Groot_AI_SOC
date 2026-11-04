@@ -41,7 +41,7 @@ async def ollama_watch(ws, path, worker):
         publish(path, 'ollama', False, worker is not None and not worker.done())
 
 
-def install_hermes(ctx):
+def install_hermes(ctx, markdown=None):
     """Wrap the established native connection hook, preserving its behavior.
 
     The adapter's authentication acknowledgement is observed, never inferred
@@ -54,6 +54,7 @@ def install_hermes(ctx):
     original = BasePlatformAdapter._mark_connected
     if getattr(original, '_capstone_health', False): return
     tasks = set()
+    splitters = []
 
     async def watch(adapter):
         destination = Path(os.environ['HERMES_HOME']) / 'health/chat.json'
@@ -67,6 +68,9 @@ def install_hermes(ctx):
 
     def wrapped(adapter, *args, **kwargs):
         result = original(adapter, *args, **kwargs)
+        if type(adapter).__name__ == 'MattermostAdapter' and markdown is not None:
+            restore = install_table_splitter(adapter, markdown)
+            if restore is not None:splitters.append(restore)
         if type(adapter).__name__ == 'MattermostAdapter' and not getattr(adapter, '_capstone_health_started', False):
             adapter._capstone_health_started = True
             adapter._capstone_authenticated_ws = None
@@ -83,8 +87,29 @@ def install_hermes(ctx):
     BasePlatformAdapter._mark_connected = wrapped
     def unload():
         if BasePlatformAdapter._mark_connected is wrapped: BasePlatformAdapter._mark_connected = original
+        for restore in reversed(splitters):restore()
         for task in tasks: task.cancel()
     ctx.on_unload(unload)
 
 
 ADAPTER_SHA256 = '1bbe71e24cf7fd212f38b13cb421bb5b05c841ea4d70a061d6dcb57253e6c47b'
+
+
+def install_table_splitter(adapter, markdown):
+    """Patch only this Mattermost instance; preserve native send/guard/retries."""
+    if type(adapter).__name__ != 'MattermostAdapter':return None
+    original=adapter.truncate_message
+    if getattr(original,'_capstone_table_splitter',False):return None
+    had_own='truncate_message' in vars(adapter)
+    previous=vars(adapter).get('truncate_message')
+
+    def split(content,max_length=4096,len_fn=None):
+        return markdown.split_tables(content,max_length,len_fn,fallback=original)
+
+    split._capstone_table_splitter=True
+    adapter.truncate_message=split
+    def restore():
+        if vars(adapter).get('truncate_message') is split:
+            if had_own:adapter.truncate_message=previous
+            else:del adapter.truncate_message
+    return restore

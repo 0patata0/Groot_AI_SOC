@@ -1,5 +1,7 @@
 # Mattermost 표 경계 보정
 
+**후속 상태(11/4 14:26 KST):** 아래는 당시 기록이다. 분할 표 머리글과 실제 근거 기반 페이지 이동은 [후속 검증](chat-table-chunks.md)에서 보완·운영 확정했다. 브라우저 UI는 여전히 미확인이다.
+
 2026-11-01. Native query plugin1.19.3과 공동 검토 채널에 [공통 보정기](chat_markdown.py)를 적용한다. 최종 운영 검증/Git 상태는 [STATUS](../../STATUS.md)를 따른다.
 
 09:28 Hermes 답변은 설명 문장 다음 줄에 표를 바로 붙여 전송했다. 공식 Mattermost marked 파서 `467bc9e99fc75d69424188dfbea7fe0409a9fc15`에서 실제 원문은 table token0, 빈 줄 추가 후1로 재현했다. 09:30 Ollama 답변은 원래1이다. Hermes Mattermost adapter는 이미지 링크를 변환할 뿐 표를 텍스트로 바꾸는 기능은 없었다.

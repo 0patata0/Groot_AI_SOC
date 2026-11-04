@@ -32,6 +32,29 @@ def snapshot():
 
 
 class FirewallScope(unittest.TestCase):
+    def test_relative_and_numbered_pages_are_format_requests_with_retained_scope(self):
+        history=['FW output 룰 개별로 표로 보여줘']
+        for question,number in [('다음 페이지',2),('다음 페이지',3),('이전 페이지',2),('첫 페이지',1),('2페이지',2)]:
+            resolved=h.resolve_short_read(question,history)
+            self.assertEqual(h.firewall_request(resolved)['firewall_display_scope']['hooks'],['output'])
+            self.assertIn(str(number)+'페이지',resolved)
+            self.assertTrue(h.rule_table_request(resolved))
+            history.append(question)
+        for history in ([],['다른 얘기'],['FW 룰 수정해줘']):
+            self.assertEqual(h.resolve_short_read('다음 페이지',history),'다음 페이지')
+        self.assertIn('어느 장비',h.scope_notice('다음 페이지'))
+
+    def test_navigation_reuses_verified_snapshot_and_never_invents_a_rule(self):
+        prior='FW output 룰 개별로 표로 보여줘'
+        for question in ('다음 페이지','2페이지','FW output 룰 상세 2페이지'):
+            report=h.prior_inventory(question,{'question':prior,'calls':[snapshot()]})
+            self.assertIsNotNone(report)
+            self.assertTrue(report.reused)
+            self.assertIn('새 조회 없음',report)
+            self.assertIn('규칙이 없습니다',report)
+            self.assertNotIn('| 80 |',report)
+        self.assertIsNone(h.prior_inventory('다음 페이지',{'question':prior,'calls':[]}))
+
     def test_hook_aliases_and_short_phrases_use_existing_read_only_tool(self):
         for text,hook in [('FW input만 보여줘','input'),('방화벽 인풋 룰','input'),
                           ('FW OUTPUT 규칙 조회','output'),('FW 포워드만','forward'),

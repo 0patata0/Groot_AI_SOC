@@ -8,7 +8,7 @@
 
 11/3 역할 배정1.1.0은 기존 루트 `deploy.sh`의 공동 채널 source 묶음(review_channel.py/review_channel_policy.py)과 Ollama·review 채널 안내에 반영한다. 추가 deb/wheel/이미지/포트/설정 키/권한은0이며 기존 SOUL·운영35B·endpoint를 유지한다. 운영은 idle/CAS 복구본을 둔 증분 적용이고 새 서버 전체 설치는 별도 미검증이다. [사용·설치·복구](../infra/hermes/agent-deployment.md).
 
-현재 반입 소스는11/3 공통 계약1.5.16·query-completion1.19.12·canonical grounding/controller 및 룰 MCP를 포함한다. 차단 상태의 KST/관측 기준 남은 시간·실제 result 영수증 해석을 같은 source archive로 설치한다. 두 봇/자동 관리 내장 gate·원본/SHA 핀을 함께 갱신하며 추가 deb/wheel/이미지/포트/키는0이다. 기존 루트 `deploy.sh` 진입점과 승인/권한을 유지한다. [이번 반영·검증·복구](../infra/hermes/operation-time.md). 아래 날짜별 항목은 각 변경 당시의 반입 내역이다.
+현재 반입 소스는11/4 공통 계약1.5.19·query-completion1.19.14·canonical chat_markdown/gateway_health/harness와 grounding/controller 및 룰 MCP를 포함한다. 표 분할 헤더와 실제 근거 기반 표시 페이지 이동은 기존 SIEM·Ollama·review source 복사 경로를 사용한다. 새 패키지/이미지/포트/키/설정 항목은 없으며 실제 초기 설치 시험은 사용자 조건으로 보류한다. [검증·복구](../infra/hermes/chat-table-chunks.md). 차단 상태의 KST/관측 기준 남은 시간·실제 result 영수증 해석을 같은 source archive로 설치한다. 두 봇/자동 관리 내장 gate·원본/SHA 핀을 함께 갱신하며 추가 deb/wheel/이미지/포트/키는0이다. 기존 루트 `deploy.sh` 진입점과 승인/권한을 유지한다. [이번 반영·검증·복구](../infra/hermes/operation-time.md). 아래 날짜별 항목은 각 변경 당시의 반입 내역이다.
 
 > **2026-11-02 보고 근거 보완:** 공용 grounding·query-completion 1.19.5와 자동 관리 controller를 기존 소스 묶음으로 설치한다. 실제 성공 호출에 없는 인용, 짧은 KST 시각 오표기, 서비스 재적용과 WAF 모드 변경의 혼동을 정정 대상으로 삼는다. 기존 초기 설치 경로가 두 봇의 원본/SHA 핀과 embedded gate를 함께 생성한다. 추가 패키지·포트·이미지·승인 권한은 없다. 운영 반영 범위와 새 모델 재시험 결과는 [STATUS](../STATUS.md)를 따른다.
 

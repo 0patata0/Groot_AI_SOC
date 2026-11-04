@@ -19,7 +19,7 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.19.13"
+VERSION = "groot-query-completion:1.19.14"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
 EVIDENCE_SOURCE_SHA256 = "38a9bf66a1ef872af7906e8fdcb4c6af73c640490ba13d739d6ea6c07917ed5d"
@@ -1144,7 +1144,7 @@ def register(ctx):
             health_spec = importlib.util.spec_from_file_location('_capstone_gateway_health', health_path)
             health = importlib.util.module_from_spec(health_spec)
             health_spec.loader.exec_module(health)
-            health.install_hermes(ctx)
+            health.install_hermes(ctx, CHAT_MARKDOWN)
         except Exception:
             logging.getLogger('capstone.gateway_health').error('gateway_health_unavailable')
         query_adapter = SimpleNamespace(VERSION=VERSION, current_request_text=current_request_text,

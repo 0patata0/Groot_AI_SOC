@@ -45,6 +45,31 @@ class Opener:
 
 
 class ControllerTests(unittest.TestCase):
+    def test_post_incident_plan_queries_recurrence_without_deciding_impact(self):
+        at=m.datetime.fromisoformat('2026-11-04T19:00:00+09:00')
+        stamp=m.datetime.fromisoformat('2026-11-04T14:48:02.598+09:00').timestamp()
+        ctx={'sensor_references':[('modsecurity','192.0.2.60',stamp,'100102')],'sensor_references_complete':True}
+        p=m.incident_followup_plan(ctx,at)
+        self.assertEqual(len(p['requests']),2);self.assertFalse(p['impact_verified']);self.assertEqual(p['uncovered_intervals'],[])
+        self.assertTrue(p['boundary_inclusive']);self.assertIn('transaction hash',p['identity_check'])
+        self.assertEqual({r['tool'] for r in p['requests']},runner.SENSOR_SEARCH_TOOLS)
+        for r in p['requests']:
+            self.assertEqual(r['arguments']['since_kst'],'2026-11-04T14:48:02.598000+09:00')
+            self.assertEqual(r['arguments']['until_kst'],at.isoformat());self.assertEqual(r['arguments']['limit'],50)
+            self.assertNotIn('lookback_minutes',r['arguments']);self.assertNotIn('rule_id',r['arguments'])
+        older=dict(ctx,sensor_references=[('suricata','192.0.2.60',stamp-86400*3,'100103')])
+        p=m.incident_followup_plan(older,at);self.assertTrue(p['uncovered_intervals'])
+        self.assertEqual(p['requests'][0]['arguments']['since_kst'],'2026-11-03T19:00:00+09:00')
+        with self.assertRaises(ValueError):m.incident_followup_plan(ctx,at.replace(tzinfo=None))
+
+    def test_sensor_navigation_metadata_stays_verify_only(self):
+        case,context=self.lookup_case();r={'tool':'mcp__security_events__search_modsecurity_alerts','arguments':{}}
+        command=m.command_for(dict(case,required_sensor_reads=[r]))
+        self.assertIn('CAPSTONE_REQUIRED_SENSOR_JSON=',','.join(command))
+        self.assertNotIn('CAPSTONE_REQUIRED_SENSOR_JSON=',','.join(m.command_for(case)))
+        with self.assertRaisesRegex(m.ControllerError,'sensor_read_requirements_invalid'):
+            m.command_for(dict(case,mode='manage',required_sensor_reads=[r]))
+
     def lookup_case(self):
         cid=self.store.new_case('review-channel:'+'a'*32,'verify')
         case=dict(self.store.db.execute('select * from cases where id=?',(cid,)).fetchone())

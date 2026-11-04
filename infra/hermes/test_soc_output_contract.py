@@ -8,6 +8,13 @@ import chat_contract
 
 
 class OutputSkill(unittest.TestCase):
+    def test_incident_and_verification_failure_reuse_one_table_policy(self):
+        policy=output_contract.policy()
+        self.assertIn('LLM 사건관리·자동 조사·재검토',policy)
+        self.assertIn('검증 실패 보고',policy)
+        self.assertIn('원문 JSON·제어 필드 설명·중복 시각 목록',policy)
+        self.assertEqual(policy.count('SOC_OUTPUT_CONTRACT_V1'),1)
+
     def test_native_and_sdk_use_one_output_skill_and_keep_user_history(self):
         original=[{'role':'system','content':chat_contract.system_prompt(agent_role='hermes')},
                   {'role':'user','content':'이전 표를 유지하고 WAF 룰을 보여줘'}]

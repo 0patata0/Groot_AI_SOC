@@ -792,6 +792,37 @@ def incident_read_plan(context, at):
             'references_complete': context.get('sensor_references_complete', not context.get('evidence_truncated', False))}
 
 
+def incident_followup_plan(context, at):
+    """Bounded recurrence navigation, never a risk or remediation decision."""
+    if not isinstance(at, datetime) or at.tzinfo is None:
+        raise ValueError('aware incident reference time required')
+    at=at.astimezone(timezone(timedelta(hours=9)))
+    latest={};unavailable=0
+    for source,ip,stamp,_rule in sensor_review_requirements(context):
+        try:
+            if source not in ('suricata','modsecurity') or type(stamp) not in (int,float):
+                raise ValueError()
+            address=str(ipaddress.ip_address(ip));instant=datetime.fromtimestamp(stamp,at.tzinfo)
+            if not at-timedelta(days=90)<=instant<at:raise ValueError()
+        except (ValueError,TypeError,OverflowError,OSError):
+            unavailable+=1;continue
+        latest[address]=max(latest.get(address,instant),instant)
+    requests=[];gaps=[]
+    for ip,instant in sorted(latest.items()):
+        after=instant;start=max(after,at-timedelta(hours=24))
+        if start>=at:continue
+        if start>after:gaps.append({'source_ip':ip,'since_kst':after.isoformat(),'until_kst':start.isoformat()})
+        for source in ('modsecurity','suricata'):
+            requests.append({'tool':'mcp__security_events__search_'+source+'_alerts',
+                'arguments':{'source_ip':ip,'since_kst':start.isoformat(),'until_kst':at.isoformat(),'limit':50}})
+    return {'purpose':'post_event_recurrence_only','boundary_inclusive':True,
+            'identity_check':'Compare actual original transaction hash; a repeated boundary event is not recurrence. Missing identity stays unverified.',
+            'requests':requests[:16],
+            'truncated':len(requests)>16,'unqueryable_reference_count':unavailable,
+            'uncovered_intervals':gaps,'impact_verified':False,
+            'references_complete':context.get('sensor_references_complete',not context.get('evidence_truncated',False))}
+
+
 def event_time_query_scope(name, args, output):
     """Only a known read-time validation refusal is eligible for correction."""
     if name not in ('mcp__security_events__search_suricata_alerts',
@@ -1224,7 +1255,10 @@ These labels concern this lookup only and never close another incident.
 def prompt_for(base, case, evidence):
     if dict(case).get("chat_readonly_lookup"):
         return chat_lookup_prompt(case, evidence)
-    requested_at = datetime.now(timezone(timedelta(hours=9)))
+    requested_at = (datetime.fromisoformat(case['incident_read_at']) if dict(case).get('incident_read_at')
+                    else datetime.now(timezone(timedelta(hours=9))))
+    if requested_at.tzinfo is None:raise ControllerError('incident_reference_time_invalid')
+    references = sensor_review_requirements(evidence)
     current_request = dict(case).get("chat_request", base)
     if dict(case).get("operator_review"):
         current_request = ("기존 사건 " + case["id"] + "를 읽기 전용으로 재검토한다. "
@@ -1290,6 +1324,15 @@ def prompt_for(base, case, evidence):
                 "policy_id만 넣은 최초50개 표본이나 정책 전체 점수는 이 항목의 검증이 아니다. "
                 "check_id를 추측하지 말고 반환된 점검 제목/결과와 스캔 시각을 대조한다. "
                 "정확한 항목이 failed 또는 누락이면 해결 완료로 종결하지 않는다.")
+    if case['mode']=='verify' and references:
+        current_request += ("\n원래 사건 재발견과 차단 만료 확인만으로 조사를 끝내지 않는다. "
+            "post_incident_read_plan은 원래 사건 시각을 포함한 재발 대조 구간이며 실제 등록된 WAF/IDS 읽기를 직접 선택한다. 경계 시각에서 원래 경보가 다시 반환될 수 있다. WAF는 실제 최초 조회의 transaction_id_sha256를 대조하고, 원래 거래의 재반환을 새 공격으로 세지 않는다. 시각을 임의로 조금 옮기거나 시간/IP만으로 다른 사건을 합치지 않는다. 거래/이벤트 식별이 없으면 재발 여부 미확인으로 남긴다. "
+            "상한에 닿거나 조회가 실패하면 해당 범위를 미확인으로 남긴다. "
+            "재발 표본이 없다는 결과는 앱 실행/호스트 침해 부재 증명이 아니다. "
+            "침해 영향이 필요하면 실제 자산을 식별한 뒤 관련 Wazuh 경보/프로세스/진단을 추가 조사한다. "
+            "필수 근거가 도구에 없다면 어떤 로그/대상/구간이 없어 판단할 수 없는지 명시한다. "
+            "관리자의 새 지시를 기다린다는 문장으로 가능한 읽기를 대신하지 않는다. "
+            "ModSecurity는 WAF 룰 ID, Suricata는 SID, Wazuh는 Wazuh 규칙 ID로 구별한다.")
     control = {"case_id": case["id"], "mode": case["mode"], "session_id": case["session_id"],
                "requested_at_kst": requested_at.isoformat(),
                "run_number": case["run_count"] + 1, "proposals": evidence["proposals"],
@@ -1302,6 +1345,8 @@ def prompt_for(base, case, evidence):
     control["chat_task"] = dict(case).get("chat_task")
     control["review_response_write"] = bool(dict(case).get("review_response_write"))
     control["incident_read_plan"] = incident_read_plan(evidence, requested_at)
+    if case['mode']=='verify' and references:
+        control['post_incident_read_plan']=incident_followup_plan(evidence,requested_at)
     # Approval IDs share a shape, but rule and operation status are different
     # APIs. Give the model exact read-only routing without executing for it.
     control["status_read_requests"] = []
@@ -1538,6 +1583,11 @@ def command_for(case):
         if not dict(case).get("operator_review") or case["mode"] != "verify" or len(required) > 32:
             raise ControllerError("status_read_requirements_invalid")
         command[2:2] = ["-e", "CAPSTONE_REQUIRED_STATUS_JSON=" + canonical(required)]
+    sensor_reads=dict(case).get('required_sensor_reads',[])
+    if sensor_reads:
+        if case['mode']!='verify' or not isinstance(sensor_reads,list) or len(sensor_reads)>32:
+            raise ControllerError('sensor_read_requirements_invalid')
+        command[2:2]=['-e','CAPSTONE_REQUIRED_SENSOR_JSON='+canonical(sensor_reads)]
     if case["session_id"]:
         if not SESSION.fullmatch(case["session_id"]):
             raise ControllerError("session_id_invalid")
@@ -1551,6 +1601,11 @@ def run_hermes(store, case, prompt):
         # The model still selects the required read's tool/arguments and disposition.
         case = dict(case, required_status_reads=[{"proposal_id": p["id"], "target": p["target"]}
             for p in store.context(case["id"])["proposals"]])
+    if case['mode']=='verify':
+        evidence=store.context(case['id']);at=(datetime.fromisoformat(case['incident_read_at'])
+            if dict(case).get('incident_read_at') else datetime.now(timezone(timedelta(hours=9))))
+        reads=incident_read_plan(evidence,at)['requests']+incident_followup_plan(evidence,at)['requests']
+        case=dict(case,required_sensor_reads=[{'tool':r['tool'],'arguments':r['arguments']} for r in reads])
     rid = store.start(case)
     trace, error, returncode = Trace(store, case, rid), None, 1
     path = store.root / (rid + ".jsonl")
@@ -1689,6 +1744,7 @@ def once(store, broker, base, no_deliver=False, runner=run_hermes):
         case = None if backlog else store.next_case()
         result = None
         if case:
+            case=dict(case,incident_read_at=datetime.now(timezone(timedelta(hours=9))).isoformat())
             result = runner(store, case, prompt_for(base, case, store.context(case["id"])))
         if not delivery["attempted"]:
             delivery = store.flush_report()

@@ -13,6 +13,35 @@ def sample():
 
 
 class LiteralEvidence(unittest.TestCase):
+    def test_review_fallback_uses_readable_table_and_preserves_raw_fact_scope(self):
+        import copy
+        facts=[sample(),{'kind':'blocks','count':0},
+               {'kind':'proposal_status','target':'a:incident-ip','proposal_id':'a'*32,'status':'expired'}]
+        before=copy.deepcopy(facts);text=m.factual_review_report(facts)
+        self.assertIn('\n\n| 확인 항목 | 조회 결과 | 근거·범위 |\n| --- | --- | --- |',text)
+        self.assertIn('색인 반환 표본 2건',text);self.assertIn('전체 건수 미확인',text)
+        self.assertIn('차단 목록',text);self.assertIn('expired',text);self.assertIn('a'*32,text)
+        self.assertNotIn('requested_count 필드는 없음',text);self.assertNotIn('{"timestamp',text)
+        self.assertEqual(m.evidence_claim_violations(text,facts),[]);self.assertEqual(facts,before)
+        self.assertEqual(m.management_status(text),'needs_review')
+
+    def test_review_table_cells_cannot_create_html_or_extra_rows(self):
+        facts=[{'kind':'proposal_status','target':'a:waf|<script>test</script>\nforged',
+                'proposal_id':'b'*32,'status':'expired'}]
+        text=m.factual_review_report(facts)
+        self.assertNotIn('<script>',text);self.assertIn('&lt;script&gt;',text);self.assertIn(r'waf\|',text)
+        self.assertEqual(len([l for l in text.splitlines() if l.startswith('|')]),3)
+
+    def test_waf_rule_id_is_not_an_ids_sid_even_in_a_table_label(self):
+        facts=[dict(sample(),source='modsecurity',sensor_rule_ids=['942100'],wazuh_rule_ids=['100102'])]
+        for text in ('| WAF 규칙 ID (ModSecurity SID) | 942100 |','ModSecurity SID: 942100'):
+            self.assertIn('modsecurity_rule_id_mislabelled_as_sid',m.evidence_claim_violations(text,facts))
+        for text in ('WAF 룰 ID: 942100; Wazuh 규칙 ID: 100102',
+                     'WAF 룰 ID와 Suricata SID는 별개입니다.',
+                     'ModSecurity 규칙 ID는 SID가 아닙니다.',
+                     '> ModSecurity SID: 942100', '원문 인용: ModSecurity SID 942100'):
+            self.assertNotIn('modsecurity_rule_id_mislabelled_as_sid',m.evidence_claim_violations(text,facts))
+
     def test_same_display_instant_is_not_repeated_and_raw_facts_are_preserved(self):
         values=['2026-10-24T07:03:12+09:00','2026-10-23T22:03:12Z','2026-10-24T07:04:12+09:00']
         facts=[{'kind':'times','instants':values.copy()}]
@@ -166,6 +195,11 @@ class LiteralEvidence(unittest.TestCase):
                      '최근15분 오류가 없습니다. 다른 문장의 반환 표본은 별개입니다.'):
             self.assertIn('sample_zero_presented_as_absence',m.evidence_claim_violations(text,[sample()]))
         self.assertEqual(m.evidence_claim_violations('오류 없음이라고 단정할 수 없습니다.',[sample()]),[])
+        for text in ('IDS 경보 0건은 전체 부재를 의미하지 않음.',
+                     '경보 0건으로 정상임을 증명할 수 없습니다.'):
+            self.assertNotIn('sample_zero_presented_as_absence',m.evidence_claim_violations(text,[sample()]))
+        self.assertIn('sample_zero_presented_as_absence',m.evidence_claim_violations(
+            'IDS 경보 0건은 전체 부재를 의미하지 않음, 현재 공격 없음.',[sample()]))
 
     def test_rule_file_is_not_runtime_loading(self):
         facts=[{'kind':'rules','runtime_load_verified':False}]

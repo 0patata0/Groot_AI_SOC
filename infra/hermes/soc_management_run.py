@@ -315,7 +315,9 @@ def observation_facts(name, result):
             if name in ('get_rule_change_status', 'get_operation_status'):
                 pid = data.get('proposal_id', data.get('request_id'))
                 if isinstance(pid, str) and re.fullmatch(r'[0-9a-f]{32}', pid) and isinstance(data.get('target'), str):
-                    rows.append({'kind':'proposal_status', 'tool':name, 'proposal_id':pid, 'target':data['target']})
+                    row={'kind':'proposal_status', 'tool':name, 'proposal_id':pid, 'target':data['target']}
+                    if isinstance(data.get('status'),str) and re.fullmatch('[a-z_]{1,32}',data['status']):row['status']=data['status']
+                    rows.append(row)
             if name in ('get_operation_status', 'temporarily_contain_ip'):
                 clock = containment_clock(data)
                 if clock:
@@ -516,6 +518,11 @@ def event_field_violations(text, facts):
         clean = re.sub(r'[*`]', '', line)
         # Negative corrections/quoted field absence are not affirmative claims.
         correction = re.search(r'아니|아님|아닙|오표기|오답|잘못|존재하지|필드.{0,5}없', clean)
+        if (not correction and not line.lstrip().startswith('>') and
+                any(f.get('source')=='modsecurity' for f in events) and
+                re.search(r'(?:WAF|ModSecurity)[^|\n]{0,35}\bSID\b',clean,re.I) and
+                not re.search(r'Suricata|IDS|원문|인용',clean,re.I)):
+            issues.add('modsecurity_rule_id_mislabelled_as_sid')
         for source, names in (('modsecurity', r'WAF|ModSecurity'), ('suricata', r'Suricata|IDS|SID')):
             rows = [f for f in events if f.get('source') == source]
             sensor = {v for f in rows for v in f.get('sensor_rule_ids', [])}
@@ -701,6 +708,12 @@ def evidence_claim_violations(text, facts, successful_reads=None):
             scope_line = re.sub(r'(?:시간\s*밖|구간\s*밖|과거|부적합)\s*경보\s*'
                                 r'(?:혼입|혼합|섞임)(?:\s*오류)?(?:가|는|은)?\s*없(?:음|다|습니다)?',
                                 '', re.sub(r'[`"“”]', '', line))
+            # Remove only an explicit caution about an empty sample, retaining
+            # any separate affirmative "공격 없음" claim on the same line.
+            scope_line = re.sub(r'(?:경보|이벤트|오류|공격)\s*0\s*건(?:은|으로|만으로)?\s*'
+                r'(?:전체\s*)?(?:부재|없음|정상|무해)(?:임)?(?:를|을)?\s*'
+                r'(?:의미|뜻|증명|보장|확정)(?:하지\s*않(?:음|다|습니다)?|할\s*수\s*없(?:음|다|습니다)?)',
+                '',scope_line)
             if (re.search(r'(?:경보|이벤트|오류|공격).{0,15}(?:0\s*건|없(?:었|습|음|다|는)|전혀\s*없)', scope_line) and
                     not re.search(r'표본|반환|검색\s*결과|미확인|단정.{0,8}(?:않|없)|확인.{0,5}못|아니|아닙|아님', line)):
                 issues.add('sample_zero_presented_as_absence')
@@ -1029,8 +1042,68 @@ def literal_evidence_summary(facts):
 
 
 def factual_review_report(facts):
-    return ('모델 보고서가 조회 근거의 범위와 일치하지 않아 추가 검토가 필요합니다.\n' +
-            literal_evidence_summary(facts) + '\nMANAGEMENT_STATUS: needs_review')
+    """Human view of observed facts; full literals remain in retry/audit evidence.
+
+    Mirrors the common soc-output skill. This renderer makes no attack,
+    remediation or approval decision and never changes the underlying facts.
+    """
+    def cell(value):
+        return str(value).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('|',r'\|').replace('\r',' ').replace('\n',' ')
+    def count(value):return str(value) if type(value) is int and value>=0 else '미확인'
+    rows=[];shown_times=set();deferred=[]
+    def stamp(value):
+        instant=parse_instant(value)
+        if instant:shown_times.add(instant)
+        return kst_time(value)
+    for row in display_evidence(facts):
+        kind=row.get('kind')
+        if kind=='times':deferred.extend(row.get('instants',[]));continue
+        if kind=='events':
+            source={'modsecurity':'WAF','suricata':'IDS','wazuh':'Wazuh'}.get(row.get('source'),'센서')
+            result='색인 반환 표본 '+count(row.get('returned_count'))+'건 · 전체 건수 '+count(row.get('indexed_window_total_count'))
+            basis=['조회 '+stamp(row.get('requested_since_kst'))+' ~ '+stamp(row.get('requested_until_kst'))]
+            for label,key in [('WAF 룰 ID' if source=='WAF' else 'Suricata SID','sensor_rule_ids'),('Wazuh 규칙 ID','wazuh_rule_ids')]:
+                ids=[v for v in row.get(key,[]) if isinstance(v,str) and re.fullmatch('[0-9]{1,10}',v)]
+                if ids:basis.append(label+' '+', '.join(ids))
+            observations=[]
+            for o in row.get('observations',[]):
+                item=' / '.join(str(v) for v in (stamp(o.get('timestamp_kst')),o.get('source_ip'),o.get('sensor_agent')) if v)
+                if item not in observations:observations.append(item)
+            if observations:basis.append('관측 '+ '; '.join(observations))
+            rows.append((source+' 경보',result,'; '.join(basis)))
+        elif kind=='containment_clock':
+            state=row.get('live_block_state');state=state if state in ('owned','absent','foreign','unavailable') else '미확인'
+            labels={'temporary_expires_at':'최초 기한','live_owned_deadline':'실제 기한','live_observed_at':'관측','cooldown_until':'재차단 대기 종료','closed_at':'종료'}
+            by_time={}
+            for key,label in labels.items():
+                v=row.get('times',{}).get(key)
+                if parse_instant(v):by_time.setdefault(stamp(v),[]).append(label)
+            basis=['요청 '+str(row.get('request_id','미확인'))]+['/'.join(names)+' '+value for value,names in by_time.items()]
+            rows.append(('실제 차단 관측',state+' / '+str(row.get('ip','미확인')),'; '.join(basis)))
+        elif kind=='proposal_status':
+            rows.append(('요청 실행 기록',row.get('status','상태 세부값 미확인'),
+                         str(row.get('target','미확인'))+' / '+str(row.get('proposal_id','미확인'))+'; 승인·실제 차단 관측과 별개'))
+        elif kind=='agent_inventory':
+            for agent in row.get('agents',[]):
+                rows.append(('등록 에이전트',str(agent.get('name','미확인')),
+                             'ID '+str(agent.get('agent_id',agent.get('id','미확인')))+' / 관측 주소 '+str(agent.get('reported_ip','미확인'))))
+        else:
+            # Non-event evidence already has bounded, literal labels. Do not
+            # expose dictionary repr/JSON or model-provided prose as a table.
+            text=literal_evidence_summary([row])
+            if text:rows.append(('기타 조회 근거',str(kind),text.replace('\n','; ')))
+    remaining=[]
+    for value in deferred:
+        instant=parse_instant(value)
+        if instant and instant not in shown_times:
+            rendered=stamp(value)
+            if rendered not in remaining:remaining.append(rendered)
+    if remaining:rows.append(('기타 관측 시각','KST','; '.join(remaining)))
+    if not rows:rows=[('조회 근거','구조화해 표시할 근거 미확인','누락·실패 원문과 실제 호출 기록 확인 필요')]
+    table=['| 확인 항목 | 조회 결과 | 근거·범위 |','| --- | --- | --- |']
+    table+=['| '+' | '.join(cell(v) for v in row)+' |' for row in rows]
+    return ('모델 보고서가 조회 근거의 범위와 일치하지 않아 추가 검토가 필요합니다.\n\n'+
+            '\n'.join(table)+'\n\n판단·조치의 완료를 뜻하지 않습니다. 상세 원문은 감사 기록에 보존합니다.\nMANAGEMENT_STATUS: needs_review')
 
 
 def management_status(text):
@@ -1066,7 +1139,7 @@ def current_management_request(user):
     return user if len(user) <= 16384 else '원본 현재 사용자 요청을 다시 확인하세요. 권한과 증거의 구분은 유지합니다.'
 
 
-def management_reasoning(request, agent):
+def management_reasoning(request, agent, *, required_read_phase=False):
     """Use the verified Ollama compatibility control in this process only."""
     extra = dict(request.get('extra_body') or {})
     if (getattr(agent, 'provider', None) != 'custom' or getattr(agent, 'model', None) != 'qwen3.6:35b'
@@ -1083,10 +1156,15 @@ def management_reasoning(request, agent):
     # A recognized non-none effort maps to true for a boolean-only model.
     review = os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') == '1' and os.environ.get('CAPSTONE_MANAGEMENT_MODE') == 'verify'
     operator_review = review and os.environ.get('CAPSTONE_OPERATOR_REVIEW') == '1'
+    # Only trusted, still-unmet concrete reads use this phase. The next build
+    # restores the existing reasoning profile before risk/closure assessment.
+    lookup=required_read_phase is True and os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
     if review:
         result.pop('max_completion_tokens', None)
-        result['max_tokens'] = 6144 if operator_review else 2048
-    return {**result, 'reasoning_effort': 'none' if review and not operator_review else 'medium', 'extra_body': extra}
+        result['max_tokens'] = 6144 if operator_review and not lookup else 2048
+    if lookup:
+        result.pop('max_completion_tokens',None);result['max_tokens']=2048
+    return {**result, 'reasoning_effort': 'none' if lookup or review and not operator_review else 'medium', 'extra_body': extra}
 
 
 def status_read_requirements(raw):
@@ -1108,13 +1186,61 @@ def status_read_requirements(raw):
         raise RuntimeError('status_read_requirements_invalid') from None
 
 
-def initial_review_read(request, completed_calls, requirements=(), facts=()):
-    if (os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') != '1'
-            or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'):
+SENSOR_SEARCH_TOOLS = {'mcp__security_events__search_modsecurity_alerts',
+                       'mcp__security_events__search_suricata_alerts'}
+
+
+def sensor_read_requirements(raw):
+    """Root navigation metadata only; no log text, write tools or decisions."""
+    if raw is None:return []
+    try:
+        value=json.loads(raw)
+        if not isinstance(value,list) or not 1<=len(value)<=32:raise ValueError()
+        for row in value:
+            if not isinstance(row,dict) or set(row)!={'tool','arguments'} or row['tool'] not in SENSOR_SEARCH_TOOLS:
+                raise ValueError()
+            args=row['arguments']
+            if not isinstance(args,dict) or set(args)!={'source_ip','since_kst','until_kst','limit'}:raise ValueError()
+            if not literal_ip(args['source_ip']) or type(args['limit']) is not int or not 1<=args['limit']<=50:raise ValueError()
+            if any(not isinstance(args[k],str) or not args[k].endswith('+09:00') for k in ('since_kst','until_kst')):raise ValueError()
+            start,end=(parse_instant(args[k]) for k in ('since_kst','until_kst'))
+            if not start or not end or not 0<(end-start).total_seconds()<=86400:raise ValueError()
+        return value
+    except (ValueError,TypeError,KeyError):
+        raise RuntimeError('sensor_read_requirements_invalid') from None
+
+
+def sensor_read_receipt(name, arguments, result):
+    if name not in ('search_modsecurity_alerts','search_suricata_alerts') or not isinstance(arguments,dict):return None
+    if getattr(result,'is_error',getattr(result,'isError',False)):return None
+    for item in getattr(result,'content',[])[:20]:
+        raw=getattr(item,'text',None)
+        try:data=_unpack(json.loads(raw)) if isinstance(raw,str) else None
+        except (ValueError,TypeError):continue
+        source=name.removeprefix('search_').removesuffix('_alerts')
+        if (not isinstance(data,dict) or data.get('error') or data.get('isError') or
+                data.get('source_scope')!='wazuh_indexed_alerts' or data.get('source')!=source):continue
+        start,end=(parse_instant(data.get(k)) for k in ('requested_since_kst','requested_until_kst'))
+        if start and end and start<end and literal_ip(arguments.get('source_ip')):
+            return {'tool':'mcp__security_events__'+name,'source_ip':arguments['source_ip'],
+                    'since':start,'until':end}
+    return None
+
+
+def missing_sensor_reads(requirements, receipts):
+    return [r for r in requirements if not any(c.get('tool')==r['tool'] and
+        c.get('source_ip')==r['arguments']['source_ip'] and
+        c['since']<=parse_instant(r['arguments']['since_kst']) and
+        c['until']>=parse_instant(r['arguments']['until_kst']) for c in receipts)]
+
+
+def initial_review_read(request, completed_calls, requirements=(), facts=(), sensor_requirements=(), sensor_receipts=()):
+    if os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify':
         return request
+    review=os.environ.get('CAPSTONE_MANAGEMENT_REVIEW')=='1'
     missing = [r for r in requirements if not any(f.get('kind') == 'proposal_status' and
         f.get('proposal_id') == r['proposal_id'] and f.get('target') == r['target'] for f in facts)]
-    if missing:
+    if review and missing:
         names = {'mcp__rule_'+r['target'][0]+'__'+('get_rule_change_status' if
             r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status') for r in missing}
         value = permitted_request(request, 'verify')
@@ -1122,6 +1248,25 @@ def initial_review_read(request, completed_calls, requirements=(), facts=()):
         if {t['function']['name'] for t in reads} != names:
             raise RuntimeError('required_status_read_tools_unavailable')
         return {**value, 'tools':reads, 'tool_choice':'required'}
+    missing=missing_sensor_reads(sensor_requirements,sensor_receipts)
+    if missing:
+        value=permitted_request(request,'verify');tools=[]
+        for original in value.get('tools',[]):
+            name=original['function']['name'];rows=[r for r in missing if r['tool']==name]
+            if not rows:continue
+            tool=json.loads(json.dumps(original));variants=[]
+            base=tool['function'].get('parameters',{})
+            for row in rows:
+                if not set(row['arguments'])<=set(base.get('properties',{})):
+                    raise RuntimeError('required_sensor_read_schema_unavailable')
+                variant={**base,'properties':{k:{**base['properties'][k],'enum':[v]} for k,v in row['arguments'].items()},
+                         'required':list(row['arguments']),'additionalProperties':False}
+                variants.append(variant)
+            tool['function']['parameters']={'anyOf':variants};tools.append(tool)
+        if {t['function']['name'] for t in tools}!={r['tool'] for r in missing}:
+            raise RuntimeError('required_sensor_read_tools_unavailable')
+        return {**value,'tools':tools,'tool_choice':'required'}
+    if not review:return request
     # The controller binds a parsed read scope out of band. A block-list
     # question must not be narrowed to get_firewall_rules before the native
     # adapter applies its list_blocks-only scope (which would leave no tools).
@@ -1408,6 +1553,8 @@ def main():
     read_facts = []
     status_receipts = []
     requirements = status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))
+    sensor_requirements=sensor_read_requirements(os.environ.get('CAPSTONE_REQUIRED_SENSOR_JSON'))
+    sensor_receipts=[]
     argument_errors = []
     output_lock = threading.Lock()
 
@@ -1431,6 +1578,8 @@ def main():
         # current raw sensor event, protected IPs and bounded TTL. Verify mode
         # still forbids the write; no helper or scheduler chooses the action.
         result = await wire(self, name, arguments, *args, **kwargs)
+        receipt=sensor_read_receipt(name,arguments,result)
+        if receipt:sensor_receipts.append(receipt)
         if argument_refusal(name, result):
             argument_errors.append(name)
         if wire_allowed(name, 'verify') and getattr(result, 'is_error', getattr(result, 'isError', False)) is False:
@@ -1468,8 +1617,12 @@ def main():
             args = (args[0], permitted_tools(args[1], mode), *args[2:])
         if 'tools_for_api' in kwargs and kwargs['tools_for_api'] is not None:
             kwargs['tools_for_api'] = permitted_tools(kwargs['tools_for_api'], mode)
-        return initial_review_read(management_reasoning(operation_time_request(permitted_request(builder(self, *args, **kwargs), mode)), self),
-                                   completed_wire_calls, requirements, status_receipts)
+        value=initial_review_read(management_reasoning(operation_time_request(permitted_request(builder(self, *args, **kwargs), mode)), self),
+                                   completed_wire_calls, requirements, status_receipts,sensor_requirements,sensor_receipts)
+        pending_status=any(not any(f.get('kind')=='proposal_status' and f.get('proposal_id')==r['proposal_id']
+            and f.get('target')==r['target'] for f in status_receipts) for r in requirements)
+        pending=mode=='verify' and (pending_status or bool(missing_sensor_reads(sensor_requirements,sensor_receipts)))
+        return management_reasoning(value,self,required_read_phase=True) if pending else value
 
     def guarded_result(self, result, session_id='', exit_code=0):
         data = dict(result) if isinstance(result, dict) else {'final_response': str(result or '')}
@@ -1479,7 +1632,8 @@ def main():
         if not completed_wire_calls:
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
-        data['final_response'] = factual_review_report(read_facts) if evidence_claim_violations(text, read_facts, successful_read_names) else kst_display(text)
+        data['final_response'] = factual_review_report(read_facts) if (missing_sensor_reads(sensor_requirements,sensor_receipts)
+            or evidence_claim_violations(text, read_facts, successful_read_names)) else kst_display(text)
         return original_result(self, data, session_id, exit_code)
 
     def receipt_progress(self, event_type, tool_name=None, preview=None, args=None, **kwargs):

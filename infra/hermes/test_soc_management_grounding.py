@@ -8,6 +8,105 @@ from test_soc_management_run import wrapper, definition, READ_NAMES, WRITE_NAMES
 
 
 class Grounding(unittest.TestCase):
+    def sensor_plan(self):
+        return [{'tool':'mcp__security_events__search_modsecurity_alerts','arguments':{
+            'source_ip':'192.0.2.60','since_kst':'2026-11-04T14:48:00+09:00',
+            'until_kst':'2026-11-04T19:00:00+09:00','limit':50}}]
+
+    def sensor_catalog(self):
+        request=copy.deepcopy(self.request)
+        for t in request['tools']:
+            if t['function']['name'] in wrapper.SENSOR_SEARCH_TOOLS:
+                t['function']['parameters']={'type':'object','properties':{
+                    **{k:{'type':'string'} for k in ('source_ip','since_kst','until_kst','lookback_minutes')},
+                    'limit':{'type':'integer','minimum':1,'maximum':50}}}
+        return request
+
+    def test_verify_requires_actual_sensor_window_after_status_read(self):
+        plan=self.sensor_plan();original=self.sensor_catalog();before=copy.deepcopy(original)
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_MANAGEMENT_REVIEW':'0'}):
+            narrowed=wrapper.initial_review_read(original,['get_operation_status'],sensor_requirements=plan)
+            self.assertEqual(narrowed['tool_choice'],'required')
+            self.assertEqual([t['function']['name'] for t in narrowed['tools']],[plan[0]['tool']])
+            args=narrowed['tools'][0]['function']['parameters']['anyOf'][0]
+            self.assertEqual(args['properties']['source_ip']['enum'],['192.0.2.60'])
+            self.assertNotIn('lookback_minutes',args['properties'])
+            self.assertNotIn('arguments',narrowed)
+            self.assertEqual(original,before)
+            receipt={'tool':plan[0]['tool'],'source_ip':'192.0.2.60',
+                     'since':wrapper.parse_instant(plan[0]['arguments']['since_kst']),
+                     'until':wrapper.parse_instant(plan[0]['arguments']['until_kst'])}
+            self.assertIs(wrapper.initial_review_read(original,['read'],sensor_requirements=plan,sensor_receipts=[receipt]),original)
+            for bad in (dict(receipt,source_ip='192.0.2.61'),dict(receipt,tool='mcp__rule_a__get_operation_status'),
+                        dict(receipt,until=wrapper.parse_instant('2026-11-04T14:49:00+09:00'))):
+                self.assertTrue(wrapper.missing_sensor_reads(plan,[bad]))
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertIs(wrapper.initial_review_read(original,[],sensor_requirements=plan),original)
+
+    def test_sensor_requirements_cannot_add_authority_and_missing_catalog_is_error(self):
+        plan=self.sensor_plan();self.assertEqual(wrapper.sensor_read_requirements(json.dumps(plan)),plan)
+        for bad in ([],[dict(plan[0],tool=WRITE_NAMES[0])],[dict(plan[0],command='sudo')],
+                    [{'tool':plan[0]['tool'],'arguments':dict(plan[0]['arguments'],limit=True)}],
+                    [{'tool':plan[0]['tool'],'arguments':dict(plan[0]['arguments'],until_kst='2026-11-06T19:00:00+09:00')}],
+                    [{'tool':plan[0]['tool'],'arguments':dict(plan[0]['arguments'],since_kst='2026-11-04T14:48:00')}],
+                    [{'tool':plan[0]['tool'],'arguments':dict(plan[0]['arguments'],source_ip='$(id)')} ]):
+            with self.subTest(bad=bad),self.assertRaises(RuntimeError):wrapper.sensor_read_requirements(json.dumps(bad))
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            with self.assertRaisesRegex(RuntimeError,'sensor_read_tools_unavailable'):
+                wrapper.initial_review_read({'tools':[]},[],sensor_requirements=plan)
+
+    def test_sensor_receipts_require_real_matching_scope_not_log_claims(self):
+        plan=self.sensor_plan();a=plan[0]['arguments'];d={'source':'modsecurity','source_scope':'wazuh_indexed_alerts',
+            'requested_since_kst':a['since_kst'],'requested_until_kst':a['until_kst'],'alerts':[],'returned_count':0}
+        result=types.SimpleNamespace(is_error=False,content=[types.SimpleNamespace(text=json.dumps(d))])
+        receipt=wrapper.sensor_read_receipt('search_modsecurity_alerts',a,result)
+        self.assertEqual(wrapper.missing_sensor_reads(plan,[receipt]),[])
+        result.is_error=True;self.assertIsNone(wrapper.sensor_read_receipt('search_modsecurity_alerts',a,result));result.is_error=False
+        for change in ({'source':'suricata'},{'source_scope':'assistant_text'},{'error':'timeout'}):
+            result.content[0].text=json.dumps({**d,**change})
+            self.assertIsNone(wrapper.sensor_read_receipt('search_modsecurity_alerts',a,result))
+
+    def test_native_wire_receipt_releases_only_its_completed_sensor_requirement(self):
+        from test_soc_management_run import Harness
+        plan=self.sensor_plan();a=plan[0]['arguments'];h=Harness(tools=self.sensor_catalog()['tools'])
+        def check(h):
+            import asyncio
+            agent=h.AIAgent();before=agent._build_api_kwargs()
+            self.assertEqual(before['tool_choice'],'required')
+            self.assertEqual([t['function']['name'] for t in before['tools']],[plan[0]['tool']])
+            data={'source':'modsecurity','source_scope':'wazuh_indexed_alerts','requested_since_kst':a['since_kst'],
+                  'requested_until_kst':a['until_kst'],'alerts':[],'returned_count':0}
+            client=h.ClientSession(content=[types.SimpleNamespace(text=json.dumps(data))])
+            asyncio.run(client.call_tool('search_modsecurity_alerts',a))
+            after=agent._build_api_kwargs()
+            self.assertNotIn('tool_choice',after)
+            self.assertIn('mcp__rule_a__get_operation_status',[t['function']['name'] for t in after['tools']])
+            self.assertFalse(set(t['function']['name'] for t in after['tools'])&set(WRITE_NAMES))
+        with patch.object(wrapper,'sensor_read_requirements',return_value=plan):h.run(check,'verify')
+
+    def test_required_read_phase_is_low_only_until_real_receipt_and_cannot_fake_completion(self):
+        from test_soc_management_run import Harness
+        plan=self.sensor_plan();a=plan[0]['arguments']
+        for complete in (False,True):
+            with self.subTest(complete=complete):
+                h=Harness(tools=self.sensor_catalog()['tools'])
+                def check(h):
+                    import asyncio
+                    wrapper.os.environ.update(CAPSTONE_MANAGEMENT_REVIEW='1',CAPSTONE_OPERATOR_REVIEW='1')
+                    agent=h.AIAgent();agent.provider='custom';agent.model='qwen3.6:35b';agent.base_url='http://10.200.10.10:11435/v1'
+                    h.api_kwargs={'model':'qwen3.6:35b','tools':h.initial_tools}
+                    request=agent._build_api_kwargs();self.assertEqual(request['reasoning_effort'],'none');self.assertEqual(request['max_tokens'],2048)
+                    data={'source':'modsecurity','source_scope':'wazuh_indexed_alerts','requested_since_kst':a['since_kst'],
+                          'requested_until_kst':a['until_kst'],'alerts':[],'returned_count':0}
+                    if complete:
+                        client=h.ClientSession(content=[types.SimpleNamespace(text=json.dumps(data))]);asyncio.run(client.call_tool('search_modsecurity_alerts',a))
+                        request=agent._build_api_kwargs();self.assertEqual(request['reasoning_effort'],'medium');self.assertEqual(request['max_tokens'],6144)
+                    else:
+                        asyncio.run(h.ClientSession().call_tool('get_operation_status',{'request_id':'a'*32}))
+                    h.Emitter().emit_result({'final_response':'허용된 요청의 확인 결과입니다.\nMANAGEMENT_STATUS: resolved'})
+                with patch.object(wrapper,'sensor_read_requirements',return_value=plan):h.run(check,'verify')
+                self.assertIn('MANAGEMENT_STATUS: '+('resolved' if complete else 'needs_review'),h.emissions[0][0]['final_response'])
+
     def test_response_read_scope_survives_native_filter_and_never_offers_writes(self):
         names = ['mcp__resp__get_firewall_rules', 'mcp__resp__list_blocks']
         request = {**self.request, 'tools':[definition(n) for n in names + WRITE_NAMES]}

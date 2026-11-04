@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-04",
+  "contract": "1.5.22",
+  "query": "1.19.17",
+  "tests": {
+    "output": 5,
+    "management": 232,
+    "sdk": 195,
+    "native": 390,
+    "review": 59,
+    "installation_contract": 37,
+    "total": 918,
+    "skipped": 0
+  },
+  "deployment": {
+    "at_kst": "2026-11-04T20:24:31.586785+09:00",
+    "targets": 14,
+    "protected": 8,
+    "tests_passed": 918,
+    "actual_case_state": "needs_review",
+    "actual_run_count": 8,
+    "case_closed": false,
+    "browser_tables_verified": 3,
+    "scope": "bounded read selection, guards and incident report rendering; unresolved impact remains needs_review",
+    "recovery_noop": true
+  },
+  "runtime_sha256": {
+    "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "d9bef8ea784c9f47fb9576a74a4deddfde2e000329449f91255d02378da1f2ea",
+    "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "30fe141dc56c12a9d301ae0f517bbce822f30e400394f9f5cf0f21a818092c62",
+    "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "12b019d15d81034c0fae11a5f2ae356b6f2ce6b6baadae5e46147757b7ddf681",
+    "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "6400f8becc9e6ee015a81ba43c53e2a968783cad5737f9b7bfbfdd727fa3f513",
+    "/opt/capstone-ollama-trial/grounding.py": "d9bef8ea784c9f47fb9576a74a4deddfde2e000329449f91255d02378da1f2ea",
+    "/opt/capstone-ollama-trial/chat_contract.py": "30fe141dc56c12a9d301ae0f517bbce822f30e400394f9f5cf0f21a818092c62",
+    "/opt/capstone-ollama-trial/query_grounding.py": "12b019d15d81034c0fae11a5f2ae356b6f2ce6b6baadae5e46147757b7ddf681",
+    "/opt/capstone-management/soc_management_controller.py": "ccdd4d1c5531af83165b1809f1533f8b993e4a7619d38a9fb8bcd13dd2d06994",
+    "/opt/capstone-management/soc_management_run.py": "d9bef8ea784c9f47fb9576a74a4deddfde2e000329449f91255d02378da1f2ea",
+    "/opt/hermes-data/management-code/run.py": "d9bef8ea784c9f47fb9576a74a4deddfde2e000329449f91255d02378da1f2ea",
+    "/etc/capstone-ollama-trial/receipt.json": "b626c863a36c09b8a7f8e27b78f14ad722e8cf54cc9fa750f786b464a23fdc80",
+    "/opt/capstone-management/SKILL.md": "f0d565a9ca2457a784dc7086e863e00c6c33b49607ce7f29ea8f8522647e4ebc",
+    "/opt/hermes-data/plugins/groot-query-completion/SKILL.md": "f0d565a9ca2457a784dc7086e863e00c6c33b49607ce7f29ea8f8522647e4ebc",
+    "/opt/capstone-ollama-trial/SKILL.md": "f0d565a9ca2457a784dc7086e863e00c6c33b49607ce7f29ea8f8522647e4ebc"
+  },
+  "actual_read_only_review": {
+    "seconds": 79.068,
+    "calls": 4,
+    "tool_errors": 0,
+    "state": "needs_review",
+    "original_required_read_complete": false,
+    "impact_verified": false,
+    "new_protected_actions": 0
+  },
+  "browser": {
+    "posts": 6,
+    "tables": 8,
+    "table_code_blocks": 0,
+    "fw_individual_rows": {
+      "hermes_first": 14,
+      "hermes_continuation": 2,
+      "ollama": 16
+    },
+    "all_output_paths_verified": false
+  },
+  "fresh_install": false,
+  "manual_rollback_tested": false,
+  "source_publication": {
+    "status": "pending"
+  }
+}

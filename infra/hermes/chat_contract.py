@@ -5,7 +5,7 @@ import hashlib
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.16'
+VERSION = 'soc-chat-contract:1.5.17'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -61,6 +61,11 @@ QUERY_GUIDANCE += (
     '승인만으로 임의 shell·패키지·미등록 설정 변경 권한이 생기는 것은 아닙니다.\n'
 )
 QUERY_GUIDANCE += (
+    '\nFW INPUT/OUTPUT/FORWARD 등 특정 hook이나 이름을 지정한 체인은 그 선택 범위를 유지하세요. '
+    '고정 get_firewall_rules 전체 페이지를 읽고 공통 표시 단계에서 요청 범위와 jump/goto·집합/맵 참조를 표시합니다. '
+    '특정 INPUT 목록을 전체 웹 접근 허용 여부로 단정하거나, 다른 체인을 대신 나열하지 마세요.\n'
+)
+QUERY_GUIDANCE += (
     '보호 주소의 차단 금지는 허용된 읽기 조사·위험 판단·보고를 중단할 이유가 아닙니다. '
     '다시 지시를 기다리지 말고 실제 근거를 조사하되 보호 변경은 우회하지 마세요. '
     'get_system_diagnostics는 최근 고정 스냅샷이며 과거 시각을 지정해 journal을 조회하는 도구가 아닙니다. '
@@ -105,6 +110,38 @@ def normalize_query_text(text):
     return text
 
 
+def firewall_display_scope(text):
+    """Explicit display scope only; never nft arguments, dispatch or approval.
+
+    Hook requests include reachable chains. Exact named chains are separate
+    from hook names; case is retained because nft identifiers are case-sensitive.
+    """
+    aliases = {'input':'input','인풋':'input','output':'output','아웃풋':'output',
+               'forward':'forward','포워드':'forward','포워딩':'forward',
+               'prerouting':'prerouting','프리라우팅':'prerouting',
+               'postrouting':'postrouting','포스트라우팅':'postrouting',
+               'ingress':'ingress','인그레스':'ingress','egress':'egress','이그레스':'egress'}
+    hooks, excluded, chains = [], [], []
+    pattern = r'(?<![A-Za-z0-9_.-])(?:'+'|'.join(aliases)+r')(?![A-Za-z0-9_.-])'
+    for match in re.finditer(pattern,text,re.I):
+        hook=aliases[match[0].lower()]
+        negative=re.match(r'\s*(?:은|는|을|를)?\s*(?:말고|빼고|제외)',text[match.end():])
+        (excluded if negative else hooks).append(hook)
+    name=r'([A-Za-z_][A-Za-z0-9_.-]{0,63})'
+    for pattern in (r'\bchain\s*[:=]\s*'+name,
+                    r'(?<![A-Za-z0-9_.-])'+name+r'\s*체인',
+                    r'체인\s*[:=]\s*'+name):
+        for match in re.finditer(pattern,text,re.I):
+            value=match[1]
+            if value.lower() in aliases or value.upper() in ('FW','WAF','IDS','NAT'):continue
+            if re.match(r'\s*(?:은|는|을|를)?\s*(?:말고|빼고|제외)',text[match.end():]):continue
+            chains.append(value)
+    if not (hooks or excluded or chains):return None
+    return {'hooks':list(dict.fromkeys(h for h in hooks if h not in excluded)),
+            'exclude_hooks':list(dict.fromkeys(excluded)),
+            'chains':list(dict.fromkeys(chains))}
+
+
 def rule_scope_request(text):
     """Inventory scope only. Unsupported and ambiguous scope never means empty.
 
@@ -117,13 +154,14 @@ def rule_scope_request(text):
                       r'도구\s*없이|조회하지|조회\s*(?:는\s*)?말|라는\s*문장', text)):
         return None
     text = normalize_query_text(text)
+    if re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d',text):return None
     device_pattern = r'(?<![A-Za-z])(?:FW|WAF|IDS|Suricata|Wazuh|ModSecurity)(?![A-Za-z])'
     text = re.sub(device_pattern + r'\s*(?:은|는|을|를)?\s*(?:말고|제외(?:해|하고|하고는)?|빼고)', '', text, flags=re.I)
     devices = [label for pattern, label in ((r'(?<![A-Za-z])FW(?![A-Za-z])','FW'),
                (r'(?<![A-Za-z])(?:WAF|ModSecurity)(?![A-Za-z])','WAF'),
                (r'(?<![A-Za-z])(?:IDS|Suricata)(?![A-Za-z])','Suricata'),
                (r'(?<![A-Za-z])Wazuh(?![A-Za-z])','Wazuh')) if re.search(pattern, text, re.I)]
-    fw_fields = devices == ['FW'] and bool(re.search(r'기본\s*정책|체인|\bNAT\b|집합|상세|자세', text, re.I))
+    fw_fields = devices == ['FW'] and bool(firewall_display_scope(text) or re.search(r'기본\s*정책|체인|\bNAT\b|집합|상세|자세', text, re.I))
     if not re.search(r'룰|규칙|(?<![A-Za-z])rules?(?![A-Za-z])', text, re.I):
         if not fw_fields and not (devices == ['FW'] and re.fullmatch(r'[\s?？.!]*(?:현재\s*|지금\s*)?FW\s*(?:보여줘|조회|출력|목록)[\s?？.!]*', text, re.I)):
             return None
@@ -150,6 +188,7 @@ def rule_scope_request(text):
     return {'devices': devices, 'ambiguous': ambiguous,
             'custom_only': custom and not basic,
             'basic_only': basic and not custom,
+            'firewall_display_scope':firewall_display_scope(text) if 'FW' in devices else None,
             'question': text}
 
 

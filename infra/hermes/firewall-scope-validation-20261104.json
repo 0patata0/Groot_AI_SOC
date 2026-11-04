@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "contract": "soc-chat-contract:1.5.17",
+  "scope": "FW hook/named-chain display and same-human followup; no new tool dispatch or approval",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "1e50e0bd7fdf7394d62bf1fe9c5bfb2d2e945668a401541e2196db2ae43b3385",
+    "infra/ollama-trial/harness.py": "af8e8c782718dd415b02d13107c0eee105fd053612cf30ea18bb9cb5ffe247ea",
+    "infra/ollama-trial/test_firewall_scope.py": "681e20c861aa7ed4e1ff25bee3a4a5a022d1411abc595e8add5942bbd125d558",
+    "infra/hermes/query-completion/test_firewall_scope.py": "7ce9a9ca9445cfe8bc38b6ce753269a43f778f779091b7b103527faf9bedf9fd",
+    "deployment/test_ollama_source_bundle.py": "7ec86cf9fad3c3a23b785939dadf987bf4433e2e860ef5fee14c54288fc8063f"
+  },
+  "local_tests": {
+    "sdk": {
+      "total": 187,
+      "passed": 184,
+      "environment_skip": 3
+    },
+    "native_existing": {
+      "total": 380,
+      "passed": 378,
+      "environment_skip": 2
+    },
+    "native_new": {
+      "passed": 3
+    },
+    "source_bundle_and_tool_contract": {
+      "passed": 2
+    }
+  },
+  "server_tests": {
+    "sdk": {
+      "passed": 187,
+      "skip": 0
+    },
+    "native": {
+      "passed": 383,
+      "skip": 0
+    },
+    "staging_failures": [
+      "MCP test source omitted from isolated source copy",
+      "Wazuh local_rules.xml fixture omitted; corrected before deployment"
+    ]
+  },
+  "deployment": {
+    "applied_at_kst": "2026-11-04T13:05:30.079377+09:00",
+    "confirmed": {
+      "confirmed_at_kst": "2026-11-04T13:08:42.260798+09:00",
+      "contract": "soc-chat-contract:1.5.17",
+      "source_and_receipt_SHA_match": true,
+      "protected_configurations_unchanged": true,
+      "health": {
+        "hermes": {
+          "websocket_connected": true,
+          "worker_alive": true,
+          "receipt_age_seconds": 20.24
+        },
+        "ollama": {
+          "websocket_connected": true,
+          "worker_alive": true,
+          "receipt_age_seconds": 11.24
+        }
+      },
+      "live_read_cases": 2,
+      "read_calls": [
+        1,
+        1
+      ],
+      "full_kernel_rules": 103,
+      "displayed_input_rules": 14,
+      "protected_calls": 0,
+      "actual_channel_posts": 0,
+      "manual_rollback_exercised": false,
+      "independent_rollback_timer_inactive": true,
+      "confirmed_recovery_is_noop": true
+    },
+    "targets": [
+      {
+        "path": "/opt/capstone-ollama-trial/harness.py",
+        "before": "9766a729a5d0c659a2dd2dbad0448d81589f848a89057960e1e4830cccc97fa1",
+        "after": "af8e8c782718dd415b02d13107c0eee105fd053612cf30ea18bb9cb5ffe247ea",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py",
+        "before": "9766a729a5d0c659a2dd2dbad0448d81589f848a89057960e1e4830cccc97fa1",
+        "after": "af8e8c782718dd415b02d13107c0eee105fd053612cf30ea18bb9cb5ffe247ea",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384
+      },
+      {
+        "path": "/opt/capstone-ollama-trial/chat_contract.py",
+        "before": "e44693fbaa60108b7eac7102ae5d8d2719d3474dba76653288f07abf933949f7",
+        "after": "1e50e0bd7fdf7394d62bf1fe9c5bfb2d2e945668a401541e2196db2ae43b3385",
+        "uid": 0,
+        "gid": 981,
+        "mode": 416
+      },
+      {
+        "path": "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py",
+        "before": "e44693fbaa60108b7eac7102ae5d8d2719d3474dba76653288f07abf933949f7",
+        "after": "1e50e0bd7fdf7394d62bf1fe9c5bfb2d2e945668a401541e2196db2ae43b3385",
+        "uid": 995,
+        "gid": 986,
+        "mode": 384
+      },
+      {
+        "path": "/etc/capstone-ollama-trial/receipt.json",
+        "before": "c60c3284dc339278e7fe9b807acbd4ce680b6ae4c6becfc18fabc5e076cd6549",
+        "after": "36b98a1213526af776d5d650978bf51cf3683a1f5975a21a22d9a14d774d519e",
+        "uid": 0,
+        "gid": 0,
+        "mode": 384
+      }
+    ],
+    "operator_recovery_directory": "/var/lib/capstone-fw-scope/20261104-r1/deployment",
+    "independent_recovery_minutes": 15,
+    "manual_recovery_not_exercised": true
+  },
+  "private_live_probes": [
+    {
+      "agent": "Ollama",
+      "question": "FW input만 보여줘",
+      "status": "completed",
+      "read_calls": 1,
+      "seconds": 7.794334096950479,
+      "full_rules_observed": 103,
+      "input_chains_displayed": 1,
+      "input_rules_displayed": 14,
+      "chat_posts": 0,
+      "protected_calls": 0,
+      "response_sha256": "e5b1f47c70afb8c2ca4fbff50b52ae0acc9cc259ec53f974bda95f2e22fcf1d5"
+    },
+    {
+      "agent": "Hermes",
+      "question": "FW input만 보여줘",
+      "status": "passed",
+      "read_calls": 1,
+      "seconds": 21.544473899994045,
+      "full_rules_observed": 103,
+      "input_chains_displayed": 1,
+      "input_rules_displayed": 14,
+      "chat_posts": 0,
+      "protected_calls": 0,
+      "response_sha256": "e3e04953418c50bc08fa440410903ae0be20e5b137a20b2bb02055cdb385bc9f"
+    }
+  ],
+  "limits": [
+    "No actual Mattermost channel posts or UI observation.",
+    "Single sequential original-model runs are not latency or agent superiority benchmarks.",
+    "INPUT view is not complete ingress exposure analysis.",
+    "Port/address/action natural-language filters are not added.",
+    "No fresh installation, installer runtime edit, firewall policy, model or LLM authority changes."
+  ],
+  "packages_or_binary_downloads_on_Mac": 0,
+  "git_publication": {
+    "state": "pending"
+  },
+  "cleanup": {
+    "server": {
+      "at_kst": "2026-11-04T13:11:41.734680+09:00",
+      "removed": [
+        {
+          "path": "/var/lib/capstone-fw-scope/20261104-r1/validation",
+          "files": 316,
+          "bytes": 5399886
+        },
+        {
+          "path": "/opt/hermes-data/.fw-scope-20261104-r1",
+          "files": 334,
+          "bytes": 5735971
+        },
+        {
+          "path": "owned test runner/log files",
+          "files": 14,
+          "bytes": 451600
+        }
+      ],
+      "operational_backups_preserved": true,
+      "model_packages_untouched": true,
+      "sources_and_config_unchanged_after_confirm": true,
+      "native_stage_absent": true,
+      "SDK_stage_absent": true,
+      "rollback_timer_inactive": true
+    },
+    "Mac": {
+      "at_kst": "2026-11-04T13:12:44.264085+09:00",
+      "removed_files": 21,
+      "removed_bytes": 10102091,
+      "source_snapshot_files": 21,
+      "own_mux_shutdown": [
+        {
+          "name": "ctl-cps-b",
+          "exit": 0
+        },
+        {
+          "name": "ctl-cps-admin-direct",
+          "exit": 0
+        }
+      ],
+      "parent_absent": true,
+      "new_Mac_packages": 0,
+      "binary_downloads": 0,
+      "other_tasks_and_operational_backups_preserved": true
+    }
+  }
+}

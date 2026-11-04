@@ -79,13 +79,26 @@ def resolve_short_read(question, prior_questions=()):
         elif re.search(r'상태|조회|확인|보여|알려|오류|문제|어때',label):
             prior = rule_scope_request(previous+' 룰 조회')
     if not prior: return question
+    text=normalized(question)
+    fw_prefix='FW '
+    if prior['devices']==['FW']:
+        explicit=CONTRACT.firewall_display_scope(text)
+        reset=bool(re.search(r'FW\s*(?:의\s*)?(?:전체|모든)|(?:전체|모든)\s*FW|(?:전체|모든)\s*체인',text,re.I))
+        inherited=None if reset else (explicit or prior.get('firewall_display_scope'))
+        if inherited:fw_prefix+=firewall_scope_text(inherited)+' '
+        # A same-human followup may supply only the new hook or display page.
+        if not current and explicit:
+            resolved='FW 룰 '+question
+            if rule_scope_request(resolved):return resolved
+        if re.fullmatch(r'\s*[1-9][0-9]{0,3}\s*페이지\s*(?:보여줘|보여줄래|만)?[?.!？\s]*',text):
+            return fw_prefix+'룰 상세 '+question
     if rule_table_request(question) and prior['devices']:
         # Reformatting preserves the previous selection, including vendor IDs
         # and correlation filters, but never carries an action or old facts.
         if current and current['devices'] and current['devices'] != prior['devices']:return question
         text=normalized(question)
         old=security_inventory_request(previous)
-        prefix=' '.join(prior['devices'])+' 룰 '
+        prefix=(fw_prefix if prior['devices']==['FW'] else ' '.join(prior['devices'])+' ')+'룰 '
         if not re.search(r'커스텀|custom|기본|내장|builtin|전체|모든',text,re.I):
             prefix += '커스텀 ' if prior.get('custom_only') else '기본 ' if prior.get('basic_only') else ''
         if old:
@@ -96,7 +109,7 @@ def resolve_short_read(question, prior_questions=()):
         resolved=prefix+'조회. '+question
         return resolved if len(resolved)<=1800 else question
     if current and current['ambiguous'] and len(prior['devices'])==1:
-        return prior['devices'][0]+' '+question
+        return (fw_prefix if prior['devices']==['FW'] else prior['devices'][0]+' ')+question
     # The user's answer to our one clarification is often just "FW".
     label = normalized(question).strip(' \t\n?？.!')
     if prior['ambiguous'] and re.fullmatch(r'FW|WAF|IDS|Suricata|Wazuh|ModSecurity',label,re.I):
@@ -142,6 +155,61 @@ def scope_notice(question):
 def firewall_request(question):
     request = rule_scope_request(question)
     return request if request and 'FW' in request['devices'] else None
+
+
+def firewall_scope_text(scope):
+    return ' '.join([h.upper() for h in scope['hooks']]+
+                    [h.upper()+' 제외' for h in scope['exclude_hooks']]+
+                    ['chain='+c for c in scope['chains']])
+
+
+def firewall_display_objects(objects, scope):
+    """Select roots and their transitive chain/set/map dependencies, read only.
+
+    Preserve table/family identity and exact case. A referenced verdict map can
+    introduce another chain, so dependency discovery continues to a fixed point.
+    """
+    chains={};named={}
+    for obj in objects:
+        if 'chain' in obj:
+            c=obj['chain'];chains[tuple(c.get(k) for k in ('family','table','name'))]=c
+        for kind in ('set','map','element'):
+            if kind in obj:
+                c=obj[kind];named.setdefault(tuple(c.get(k) for k in ('family','table','name')),[]).append(obj)
+    roots={key for key,c in chains.items() if c.get('name') in scope['chains'] or
+           (c.get('hook') not in scope['exclude_hooks'] and c.get('hook') is not None and
+            (c.get('hook') in scope['hooks'] or not scope['hooks'] and bool(scope['exclude_hooks'])))}
+    selected=set(roots);sets=set();missing=set()
+    def refs(value, namespace):
+        if isinstance(value,str) and re.fullmatch(r'@[A-Za-z_][A-Za-z0-9_.-]{0,63}',value):
+            key=(*namespace,value[1:])
+            if key in named:sets.add(key)
+            else:missing.add('/'.join(map(str,key)))
+        elif isinstance(value,dict):
+            for kind,child in value.items():
+                if kind in ('jump','goto') and isinstance(child,dict) and isinstance(child.get('target'),str):
+                    key=(*namespace,child['target'])
+                    if key in chains:selected.add(key)
+                    else:missing.add('/'.join(map(str,key)))
+                refs(child,namespace)
+        elif isinstance(value,list):
+            for child in value:refs(child,namespace)
+    while True:
+        size=(len(selected),len(sets))
+        for obj in objects:
+            if 'rule' in obj:
+                r=obj['rule'];key=tuple(r.get(k) for k in ('family','table','chain'))
+                if key in selected:refs(r.get('expr',[]),key[:2])
+        for key in list(sets):
+            for obj in named[key]:refs(next(iter(obj.values())).get('elem',[]),key[:2])
+        if size==(len(selected),len(sets)):break
+    output=[]
+    for obj in objects:
+        for kind,body in obj.items():
+            key=tuple(body.get(k) for k in ('family','table','chain' if kind=='rule' else 'name')) if isinstance(body,dict) else ()
+            if (kind in ('chain','rule') and key in selected or
+                    kind in ('set','map','element') and key in sets):output.append(obj)
+    return output,{'roots':len(roots),'referenced_chains':len(selected-roots),'unresolved':sorted(missing)}
 
 
 def rule_table_request(question):
@@ -334,9 +402,28 @@ def firewall_report(question, calls):
     def cell(value):
         return str(value).replace('|', r'\|').replace('\n', ' ').replace('`', "'").replace('<', '&lt;').replace('>', '&gt;')
     counts = data['counts']; objects = data['objects']
-    rows = ['**A 서버 FW 전체 nftables 조회**', '조회 시각: ' + data['observed_at_kst'] + ' (KST)',
-            '테이블 ' + str(counts.get('table', 0)) + '개 · 체인 ' + str(counts.get('chain', 0)) + '개 · 규칙 ' + str(counts.get('rule', 0)) + '개 · 집합 ' + str(counts.get('set', 0)) + '개.',
-            '호스트 네임스페이스의 기본 정책·NAT·Docker·커스텀을 함께 조회했습니다. 다음 표는 체인별 요약입니다.', '',
+    selection=(firewall_request(question) or {}).get('firewall_display_scope')
+    followup='FW 전체 규칙 상세'
+    if selection:
+        objects,coverage=firewall_display_objects(objects,selection)
+        selected_counts={kind:sum(kind in obj for obj in objects) for kind in ('chain','rule','set','map','element')}
+        followup='FW '+firewall_scope_text(selection)+' 룰 상세'
+        rows=['**A 서버 FW 선택 범위: '+cell(firewall_scope_text(selection))+'**',
+              '조회 시각: '+data['observed_at_kst']+' (KST)',
+              '전체 nftables '+str(counts.get('rule',0))+'개 규칙의 완전한 조회에서 선택했습니다. '
+              '선택 체인 '+str(selected_counts['chain'])+'개 · 규칙 '+str(selected_counts['rule'])+'개.',
+              '시작 체인 '+str(coverage['roots'])+'개와 jump/goto·집합/맵으로 참조하는 체인 '+str(coverage['referenced_chains'])+'개를 함께 표시합니다.']
+        if not coverage['roots']:
+            rows+=['요청한 hook/정확한 체인 이름에 해당하는 시작 체인이 없습니다. 다른 범위로 대체하지 않았습니다.']
+        if coverage['unresolved']:
+            rows+=['선택 범위의 일부 참조는 미확인입니다: '+cell(', '.join(coverage['unresolved']))]
+        if 'input' in selection['hooks']:
+            rows+=['INPUT 경로의 선택 목록입니다. 앞단 PREROUTING이나 전달 경로를 포함한 전체 접근 허용 판정은 아닙니다.']
+    else:
+        rows = ['**A 서버 FW 전체 nftables 조회**', '조회 시각: ' + data['observed_at_kst'] + ' (KST)',
+                '테이블 ' + str(counts.get('table', 0)) + '개 · 체인 ' + str(counts.get('chain', 0)) + '개 · 규칙 ' + str(counts.get('rule', 0)) + '개 · 집합 ' + str(counts.get('set', 0)) + '개.',
+                '호스트 네임스페이스의 기본 정책·NAT·Docker·커스텀을 함께 조회했습니다. 다음 표는 체인별 요약입니다.']
+    rows += ['',
             '| family / table | chain | hook / 우선순위 | 기본 정책 | 규칙 수 |', '| --- | --- | --- | --- | --- |']
     rules = [o['rule'] for o in objects if 'rule' in o]
     for obj in objects:
@@ -345,7 +432,8 @@ def firewall_report(question, calls):
         n = sum(tuple(r.get(k) for k in ('family', 'table', 'chain')) == key for r in rules)
         rows.append('| ' + ' | '.join(map(cell, [str(c.get('family')) + ' / ' + str(c.get('table')), c.get('name'),
             str(c.get('hook', '일반 체인')) + ' / ' + str(c.get('prio', '—')), c.get('policy', '해당 없음'), n])) + ' |')
-    if rule_table_request(question) or re.search(r'상세|자세|개별|전문|원문|조건|전체\s*(?:룰|규칙)', normalized(question)):
+    if (selection and not re.search(r'기본\s*정책만|요약만|개수만',normalized(question)) or
+            rule_table_request(question) or re.search(r'상세|자세|개별|전문|원문|조건|전체\s*(?:룰|규칙)', normalized(question))):
         # Mattermost posts are bounded. All kernel objects were read, while
         # display pages are explicitly separate from MCP capture pagination.
         requested = re.search(r'([1-9][0-9]{0,3})\s*페이지', normalized(question))
@@ -363,7 +451,7 @@ def firewall_report(question, calls):
         if page: display_pages.append(page)
         selected = display_pages[number - 1] if number <= len(display_pages) else []
         rows += ['', '**개별 규칙 표시 ' + str(number) + '/' + str(len(display_pages)) + '페이지 (전체 ' + str(len(rules)) + '개 조회, 이 페이지 ' + str(len(selected)) + '개 표시)**',
-            '채팅 표시 페이지입니다. 다른 규칙은 “FW 전체 규칙 상세 N페이지”로 확인하세요. MCP 조회 누락과 구분합니다.',
+            '채팅 표시 페이지입니다. 이어 보기는 “'+cell(followup)+' N페이지”입니다. MCP 조회 누락과 구분합니다.',
             '| family / table / chain | handle | 조건·동작 (nft JSON, counter 제외) |', '| --- | --- | --- |', *selected]
         if not selected: rows += ['요청한 표시 페이지에 규칙이 없습니다. 전체 규칙 0개라는 뜻은 아닙니다.']
         sets = [o for o in objects if 'set' in o or 'map' in o or 'element' in o]
@@ -373,7 +461,7 @@ def firewall_report(question, calls):
             if len(raw) <= 2000: rows += ['```json', raw, '```']
             else: rows += ['집합 원문은 채팅 길이 제한으로 표시 생략했습니다. 전체 원소는 MCP 응답에 보존되어 있습니다.']
     else:
-        rows += ['', '개별 조건·집합 원소는 위 요약표에 생략했습니다. “FW 전체 규칙 상세”로 확인할 수 있습니다.']
+        rows += ['', '개별 조건·집합 원소는 위 요약표에 생략했습니다. “'+cell(followup)+'”로 확인할 수 있습니다.']
     rows += ['', '범위: A 호스트 nftables만 확인했습니다. 다른 서버·컨테이너 내부 네임스페이스·legacy iptables는 포함하지 않습니다.',
              'list_blocks는 별도의 임시 차단 목록입니다. 이번 조회로 규칙을 변경하지 않았습니다.']
     rows += [str(w) for w in data.get('coverage_warnings', [])]

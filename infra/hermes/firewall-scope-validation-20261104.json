@@ -156,7 +156,11 @@
   ],
   "packages_or_binary_downloads_on_Mac": 0,
   "git_publication": {
-    "state": "pending"
+    "source_commit": "5c806061d576ff00531d7c52420781dbf8476d0d",
+    "remote_main": "5c806061d576ff00531d7c52420781dbf8476d0d",
+    "confirmed_at_kst": "2026-11-04T13:13:39.464913+09:00",
+    "state": "source_commit_published_and_remote_matched",
+    "publication_note": "Confirmation metadata is in a subsequent documentation commit; final HEAD recorded locally."
   },
   "cleanup": {
     "server": {

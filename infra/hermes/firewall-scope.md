@@ -32,7 +32,7 @@ INPUT 목록은 앞단 PREROUTING·별도 네임스페이스를 포함한 전체
 
 11/4 13:05:30 KST 적용 후13:08:42 KST 운영 검증을 확정했다. 관리자231→A→B로 source SHA/CAS를 확인해 `/opt/capstone-ollama-trial`과 Hermes 플러그인의 공통 harness/contract 사본4개, 관련 영수증1개만 교체했다. 큐 유휴와 management 실행 부재를 확인하고 두 소비자와 기존 Hermes를 각각 한 번 재시작했다. management timer를 재개했으며 모델·config/SOUL·운영 DB·MCP 권한·FW 룰을 변경하지 않았다.
 
-루트 `deploy.sh`의 기존 canonical 소스 복사 경로가 같은 harness/contract를 사용한다. 독립 묶음 import에서 선택 범위를 확인했으며 새 서비스·포트·키·이미지·deb/wheel은 없다. 오프라인 반입은 갱신된 프로젝트 소스를 사용하고 기존 서버를 초기 설치기로 덮어쓰지 않는다. 사용자 지시대로 신규 설치기 전체 실행은 하지 않았다.
+루트 `deploy.sh`의 기존 canonical 소스 복사 경로가 같은 harness/contract를 사용한다. 독립 묶음 import에서 선택 범위를 확인했으며 새 상시 서비스·포트·키·이미지·deb/wheel은 없다. 오프라인 반입은 갱신된 프로젝트 소스를 사용하고 기존 서버를 초기 설치기로 덮어쓰지 않는다. 사용자 지시대로 신규 설치기 전체 실행은 하지 않았다.
 
 root 복구본은 B `/var/lib/capstone-fw-scope/20261104-r1/deployment`에 보존한다. 원본·후보 바이트/권한/SHA·manifest·적용/확정 기록과 운영자용 apply/rollback을 포함한다. 독립15분 원복 타이머를 만들고 실제 검증 뒤 해제했으며, 확정 상태에서 recover no-op을 확인했다. 승인된 운영자의 수동 복구는 아래 명령이다.
 

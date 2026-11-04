@@ -592,6 +592,64 @@ def argument_refusal(name, result):
     return False
 
 
+def parse_incident_disposition(text, successful_reads=None):
+    """Parse one explicit decision; validate citations, never choose a verdict."""
+    lines=re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$',text,re.M)
+    if len(lines)!=1 or len(re.findall(r'^INCIDENT_DISPOSITION:[^\r\n]*$',text,re.M))!=1:
+        return None,'incident_disposition_missing'
+    def unique(pairs):
+        value={}
+        for key,item in pairs:
+            if key in value:raise ValueError('duplicate disposition key')
+            value[key]=item
+        return value
+    try:value=json.loads(lines[0],object_pairs_hook=unique)
+    except (TypeError,ValueError,RecursionError):return None,'incident_disposition_invalid'
+    if (not isinstance(value,dict) or set(value)!={'assessment','basis','evidence_tools'}
+            or value['assessment'] not in ('benign','remediated','unresolved')
+            or not isinstance(value['basis'],str) or not 20<=len(value['basis'].strip())<=2000
+            or not isinstance(value['evidence_tools'],list) or not 1<=len(value['evidence_tools'])<=16
+            or any(not isinstance(n,str) for n in value['evidence_tools'])):
+        return None,'incident_disposition_invalid'
+    names=set(value['evidence_tools'])
+    if len(names)!=len(value['evidence_tools']) or successful_reads is not None and not names<=set(successful_reads):
+        return None,'incident_disposition_evidence_missing'
+    return value,None
+
+
+def incident_impact_read_timestamps(name,args,payload,requirements):
+    """Same minimum agent-wide incident-time receipt for Native and SDK."""
+    if (name!='mcp__security_events__search_wazuh_alerts'
+            or not isinstance(args,dict) or not isinstance(payload,dict)
+            or not re.fullmatch(r'[0-9]{3,8}',str(args.get('agent_id','')))
+            or set(args)-{'agent_id','since_kst','until_kst','limit'}
+            or payload.get('source')!='wazuh' or payload.get('source_scope')!='wazuh_indexed_alerts'
+            or not isinstance(payload.get('alerts'),list)):
+        return set()
+    try:
+        start,end=(datetime.fromisoformat(args[k]) for k in ('since_kst','until_kst'))
+        observed=[datetime.fromisoformat(payload[k]) for k in ('requested_since_kst','requested_until_kst')]
+        if (start.tzinfo is None or end.tzinfo is None or not start<end or end-start>timedelta(hours=24)
+                or any(d.tzinfo is None for d in observed) or observed!=[start,end]
+                or len(payload['alerts'])>50 or 'returned_count' in payload and
+                    (type(payload['returned_count']) is not int or payload['returned_count']!=len(payload['alerts']))
+                or any(not isinstance(row,dict) or row.get('agent_id')!=args['agent_id'] for row in payload['alerts'])):
+            return set()
+        for row in payload['alerts']:
+            stamp=parse_instant(row.get('timestamp'))
+            if stamp is None or not start<=stamp<=end:return set()
+        return {stamp for _source,_ip,stamp,_rule in requirements
+                if type(stamp) in (int,float) and start.timestamp()<=stamp<=end.timestamp()}
+    except (ValueError,TypeError,KeyError,OverflowError):return set()
+
+
+def incident_impact_missing(decision,requirements,receipts,linked_response=False):
+    """An evidence postcondition, not classification or automatic investigation."""
+    return bool(requirements and (linked_response or decision.get('assessment')=='remediated') and
+        (any(type(stamp) not in (int,float) or stamp not in receipts for _source,_ip,stamp,_rule in requirements)
+         or 'mcp__security_events__search_wazuh_alerts' not in decision.get('evidence_tools',[])))
+
+
 def disposition_citation_violations(text, successful_reads):
     """Check model citations against completed native calls, for every disposition.
 

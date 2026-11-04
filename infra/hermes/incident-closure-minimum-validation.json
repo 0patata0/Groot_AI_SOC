@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-05T00:51:40.089282+09:00",
+  "contract": "1.5.26",
+  "query": "1.19.21",
+  "tests": {
+    "management": 247,
+    "sdk": 216,
+    "native": 390,
+    "installer_contract": 38,
+    "review": 60,
+    "total": 951,
+    "skipped": 0
+  },
+  "actual_trace_replays": {
+    "replay": [
+      {
+        "original_run": "02f8ac52794abd0fe546110bb0dff135",
+        "actual_calls": 8,
+        "sdk_issues": [
+          "incident_impact_verification_missing"
+        ],
+        "native_replay_state": "needs_review",
+        "native_replay_detail": "incident_impact_verification_missing",
+        "operating_db_changed": false,
+        "final_public_text_sha256": "2bbf7e393a20f8ea0d23c8b6f262b8882728d10a25c6248deae39fb8fbf6a0b0"
+      },
+      {
+        "original_run": "0394bcc8a3a1ebace1fe54e9e341d735",
+        "actual_calls": 8,
+        "sdk_issues": [],
+        "native_replay_state": "needs_review",
+        "native_replay_detail": "model_needs_review",
+        "operating_db_changed": false,
+        "final_public_text_sha256": "58301d2da88c20eb6977d41664c1245fe036de4bc50fba70d9f4a46af0700578"
+      }
+    ],
+    "new_model_or_mcp_calls": 0
+  },
+  "native_fresh_read_review": {
+    "seconds": 148.76626563072205,
+    "actual_calls": 13,
+    "errors": 9,
+    "protected_writes": 0,
+    "case_state": "needs_review",
+    "detail": "model_tool_failure_requires_review",
+    "limitations": [
+      "wrong rule server/target",
+      "unsupported extra arguments",
+      "manager logs used for agent history",
+      "input failures followed by server circuit breaker; no proven network outage"
+    ]
+  },
+  "sdk_before": {
+    "seconds": 103.68227854697034,
+    "status": "partial",
+    "actual_calls": 0,
+    "model_calls": 3,
+    "invalid_selections": 3
+  },
+  "sdk_after": {
+    "seconds": 120.06761180504691,
+    "status": "partial",
+    "actual_calls": 6,
+    "errors": 0,
+    "model_calls": 5,
+    "protected_writes": 0,
+    "invalid_selections": 0,
+    "remaining_issues": [
+      "incident_impact_verification_missing",
+      "sample_zero_presented_as_absence"
+    ],
+    "sources": [
+      "search_modsecurity_alerts",
+      "search_suricata_alerts",
+      "get_web_service_target",
+      "search_wazuh_alerts",
+      "get_web_service_target",
+      "search_web_access"
+    ],
+    "direct_worker_execution": true,
+    "new_chat_posts": 0,
+    "speed_improvement_proven": false,
+    "incident_resolved": false
+  },
+  "final_display_revision": {
+    "verification": "same actual six receipts replayed through installed canonical factual table; no fresh model or UI test",
+    "backend_and_limits_retained": true,
+    "internal_control_hidden": true,
+    "sha256": "dbc0a74d3f457df3ecad93df096b5570dc2a54624af71f5d7caf7e259df5a688"
+  },
+  "deployment": {
+    "confirmed": true,
+    "confirmed_at_epoch": 1793807358,
+    "runtime_files_verified": 13,
+    "protected_configs_unchanged": 7,
+    "controller_sha256": "a9322add2a4d5fcc5d74c65cfd3b7ef8fb6be73c0f7d4b5ebfc018434549f922",
+    "embedded_gate_sha256": "d803fa30b4217feca7c26cee3a0ac91a4f9886bc843532173e2ad5898ebb7c4b",
+    "sdk_source_sha256": {
+      "harness.py": "a71034fb804bd4ec34e312a4e92a685e5524434d0b126eeedd96a64509b2d23a",
+      "runtime.py": "f3bba28ab960d2946f69502a20200c5b6ec889c8cdf9ef3cb3f638503d08d25d"
+    },
+    "native_restarts": 1,
+    "sdk_restarts": 3,
+    "review_worker_restarts": 3,
+    "both_gateway_heartbeats_verified": true,
+    "recovery_backup": "/var/lib/capstone-incident-parity/20261105-r1/deployment",
+    "confirmed_recovery_noop": true,
+    "manual_rollback_tested": false,
+    "deployment_helper_json_trailer_error_repaired": true
+  },
+  "cleanup": {
+    "removed_files": 440,
+    "removed_bytes": 25435455,
+    "deployment_backup_preserved": true,
+    "operating_db_approvals_chat_unchanged": true,
+    "mac_removed_files": 29,
+    "mac_removed_bytes": 14304481,
+    "own_mac_temp_path_and_ssh_processes_remaining": 0
+  },
+  "new_packages_ports_keys": 0,
+  "fw_policy_or_model_changes": 0,
+  "fresh_os_install": false,
+  "new_attack_e2e": false,
+  "sdk_full_closure_parity_complete": false,
+  "full_impact_or_incident_closure_complete": false,
+  "source_publication": {
+    "status": "pending"
+  }
+}

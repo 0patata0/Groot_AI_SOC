@@ -721,7 +721,7 @@ def inventory(question, calls, **kwargs):
 def facts_for(calls):
     facts = []
     for call in calls:
-        if call.get('is_error') or not call.get('result'):
+        if not READ.successful(call):
             continue
         name = 'mcp__' + call['server'].replace('-', '_') + '__' + call['name']
         if EVIDENCE.allowed(name, 'verify'):
@@ -816,12 +816,13 @@ def wazuh_text(raw):
         return raw if isinstance(raw, str) else None
 
 
-def violations(question, answer, calls):
+def violations(question, answer, calls, reference=None):
     facts = facts_for(calls)
     # Configuration terminology is not an event observation. Preserve other
     # claims on the same line, and use the untouched answer for JSON/time checks.
     claim_text = re.sub(r'탐지\s*(?:모드|규칙|룰|설정|정책)', '설정', answer)
     issues = EVIDENCE.evidence_claim_violations(claim_text, facts) + EVIDENCE.calculated_json_violations(answer, facts)
+    issues += incident_completion_issues(question,answer,calls,reference)
     text = normalized(question)
     if (not calls and not READ.wants_write(text)
             and (tool_scope(question) or re.search(r'현재|실제.{0,12}(?:조회|확인)|조회해|확인해|보여줘', text))):
@@ -1006,6 +1007,55 @@ def incident_evidence_instruction(question, calls=()):
             '이 안내는 차단·변경·승인이 아니며 실제 쓰기 도구를 호출하지 마세요.' + feedback)
 
 
+def incident_completion_issues(question,answer,calls,reference=None):
+    """Require the same minimum evidence for a sensor judgment as Native.
+
+    Only hash-verified, completed tool receipts count. User/card prose supplies
+    search scope, never an observed incident, approved response or decision.
+    """
+    if not EVIDENCE.incident_investigation_request(normalized(question)) or READ.wants_write(question):return []
+    requirements=set();reads=set();receipts=set();actual=[]
+    for call in calls:
+        data=payload(call)
+        if not isinstance(data,dict):continue
+        name='mcp__'+call.get('server','').replace('-','_')+'__'+call.get('name','')
+        if not EVIDENCE.allowed(name,'verify'):continue
+        reads.add(name);actual.append((name,call.get('arguments',{}),data))
+        if (name not in ('mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts')
+                or data.get('source_scope')!='wazuh_indexed_alerts' or not isinstance(data.get('alerts'),list)):continue
+        source=data.get('source')
+        expected=name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
+        if source!=expected:continue
+        for alert in data['alerts'][:50]:
+            if not isinstance(alert,dict):continue
+            stamp=EVIDENCE.parse_instant(alert.get('timestamp'))
+            ip=alert.get('source_ip');rule=alert.get('wazuh_rule_id')
+            if reference:
+                start,end=(EVIDENCE.parse_instant(reference.get(k)) for k in ('since_kst','until_kst'))
+                if not (stamp and start and end and start<=stamp<=end and source in reference.get('families',[])):continue
+                if reference.get('source_ips') and ip not in reference['source_ips']:continue
+            requirements.add((source,ip,stamp.timestamp() if stamp else None,rule))
+    sensor_context=any(c.get('server')=='security-events' and c.get('name') in
+        ('search_modsecurity_alerts','search_suricata_alerts') for c in calls)
+    sensor_context|=bool(reference and set(reference.get('families',[]))&{'modsecurity','suricata'})
+    if not sensor_context and not requirements:return []
+    decision,error=EVIDENCE.parse_incident_disposition(answer,reads)
+    if error:return [error]
+    sensor_tools={'mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts'}
+    if not set(decision['evidence_tools'])&sensor_tools:return ['incident_disposition_evidence_missing']
+    if decision['assessment']=='unresolved':return []
+    if not requirements or any(not isinstance(ip,str) or not ip or type(stamp) not in (int,float)
+                              for _source,ip,stamp,_rule in requirements):
+        return ['incident_event_verification_missing']
+    sources={ip for _source,ip,_stamp,_rule in requirements if ip}
+    linked=any(name=='mcp__rule_a__get_operation_status' and data.get('target')=='a:incident-ip'
+        and data.get('ip') in sources and isinstance(args.get('request_id'),str)
+        and data.get('request_id',data.get('proposal_id'))==args['request_id'] for name,args,data in actual)
+    for name,args,data in actual:
+        receipts.update(EVIDENCE.incident_impact_read_timestamps(name,args,data,requirements))
+    return ['incident_impact_verification_missing'] if EVIDENCE.incident_impact_missing(decision,requirements,receipts,linked) else []
+
+
 def incident_judgment_check(question, answer, calls, reference=None):
     """Bounded private audit of a model draft; never a replacement judgment."""
     if (not EVIDENCE.incident_investigation_request(normalized(question))
@@ -1015,7 +1065,7 @@ def incident_judgment_check(question, answer, calls, reference=None):
         return None
     return {'draft': answer[:16384], 'draft_truncated': len(answer) > 16384,
             'draft_sha256': hashlib.sha256(answer.encode()).hexdigest(),
-            'issues': violations(question, answer, calls) + card_answer_issues(reference,answer,calls),
+            'issues': violations(question, answer, calls,reference) + card_answer_issues(reference,answer,calls),
             'tool_result_sha256': [c.get('result_sha256') for c in calls[-32:]],
             'earlier_tool_results_omitted': len(calls) > 32}
 
@@ -1035,6 +1085,9 @@ def incident_judgment_instruction(question, answer, calls, issues):
             '실제 승인 근거가 없으면 시험 여부는 미확인으로 두고 관측된 행위로 위험을 판단하세요. '
             '비인가 행위를 이유로 화이트리스트나 탐지 예외 추가를 권하지 마세요. '
             '공격 시도 여부, 실제 성공·피해 여부, 필요한 후속 조사를 구분하고 '
+            '실제 센서 사건을 판단하면 INCIDENT_DISPOSITION 한 줄의 assessment/근거/evidence_tools를 작성하세요. '
+            '위험 해소 또는 연결된 대응의 정상 종결 전에는 실제 보호 자산의 사건 시각을 덮는 search_wazuh_alerts를 agent_id와 명시적 구간으로 조회·인용해야 합니다. '
+            '출발지/룰 필터로 다른 호스트 징후를 제외하지 말고 파일 설정/현재 Apache 상태로 대신하지 마세요. '
             + CONTRACT.EVENT_FIELD_GUIDANCE +
             '현재 자료가 뒷받침하는 범위에서 위험과 대응 필요성을 직접 판단하세요. '
             '성공한 조회는 반복하지 말고 부족한 근거만 읽기 도구로 보완하세요. '
@@ -1060,6 +1113,8 @@ def incident_selection_scope(question, calls, reference=None):
     if reference:return {'mcp__security_events__search_'+kind+'_alerts' for kind in card_evidence_gaps(reference,calls)}
     scope = {'mcp__security_events__search_wazuh_alerts', 'mcp__security_events__search_modsecurity_alerts',
              'mcp__security_events__search_suricata_alerts'}
+    # Navigation is evidence, not an event or a guessed agent assignment.
+    scope.update(('mcp__wazuh_ro__get_wazuh_agents', 'mcp__security_events__get_web_service_target'))
     if not historical_incident_request(question):
         scope.add('mcp__wazuh_ro__get_wazuh_alert_summary')
     return scope
@@ -1210,6 +1265,7 @@ def action_fallback(question, calls):
 
 
 def footer_free(text):
+    text=re.sub(r'^(?:INCIDENT_DISPOSITION|MANAGEMENT_STATUS):[^\r\n]*(?:\r?\n|$)','',text,flags=re.M)
     return re.sub(r'\n*(?:---\s*\n)?(?:읽기 전용 시험|SOC 비교 시험)\s*·[^\n]*', '', text).strip()
 
 
@@ -1542,6 +1598,9 @@ def guidance(question):
     result = SHARED.status_lookup_guidance(text)
     if EVIDENCE.incident_investigation_request(text):
         result += '\n사건의 실제 경보부터 조회한 뒤 위험·대응 필요성을 판단하세요. 현재 규칙 파일 목록만으로 조사를 대신하지 마세요.'
+        result += ('\n실제 센서 사건의 최종 판단은 공개 보고 뒤에 INCIDENT_DISPOSITION: {"assessment":"benign 또는 remediated 또는 unresolved 중 하나","basis":"실제 근거와 한계를 설명하는 20~2000자","evidence_tools":["실제로 성공한 mcp__서버__도구"]} 한 줄로 기록하세요. '
+                   '이 내부 감사 줄은 채팅 표시에서 제외됩니다. 위험 해소나 대응이 연결된 센서 사건의 종결은 보호 자산의 agent_id+명시적 사건 구간을 search_wazuh_alerts로 실제 읽고 인용해야 합니다. '
+                   '미확인 사건을 형식 충족 때문에 정상/위험 해소로 바꾸지 말고 unresolved와 필요한 다음 조사를 보고하세요.')
     if firewall_request(question):
         result += '\nFW는 resp.get_firewall_rules로 기본 정책·체인·NAT 포함 전체 nftables를 조회하세요. list_blocks나 WAF/IDS 파일로 대체하지 마세요. next_offset이 있으면 같은 snapshot으로 끝까지 조회하고 complete/전체 개수를 검증하세요. 실패를 0건으로 보고하지 마세요.'
     plan = read_plan(question)
@@ -1753,6 +1812,29 @@ def missing_reads(question, calls, diagnostic_targets=()):
 def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), reference=None):
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     result = json.loads(json.dumps(schemas))
+    if EVIDENCE.incident_investigation_request(normalized(question)) and not READ.wants_write(question):
+        known_agents = set(re.findall(r'(?:agent[_ ]?id|에이전트\s*ID)\s*[:=]?\s*[`\'\"]?(\d{3,8})(?!\d)', question, re.I))
+        for call in calls:
+            data = payload(call)
+            if not data: continue
+            if call.get('server') == 'wazuh-ro' and call.get('name') == 'get_wazuh_agents':
+                known_agents.update(a['id'] for a in READ.agents(READ.text_result(call) or ''))
+            if (call.get('server') == 'security-events' and call.get('name') in ('get_web_service_target', 'search_web_access')
+                    and data.get('source') == 'c_apache_access_snapshot'):
+                agent = data.get('agent', {})
+                if isinstance(agent, dict) and isinstance(agent.get('id'), str) and re.fullmatch(r'\d{3,8}', agent['id']):
+                    known_agents.add(agent['id'])
+        for name, schema in list(result.items()):
+            if name != 'mcp__security_events__search_wazuh_alerts': continue
+            props = schema.get('properties', {})
+            if 'agent_id' not in props: continue
+            if known_agents:
+                props['agent_id'] = {**props['agent_id'], 'enum': sorted(known_agents)}
+            elif 'agent_id' in schema.get('required', []):
+                result.pop(name)
+            else:
+                props.pop('agent_id')
+            schema['additionalProperties'] = False
     selected = read_plan(question)
     if selected and selected['kind'] == 'waf_mode':
         alias='mcp__rule_a__get_service_action_target'
@@ -2055,6 +2137,9 @@ def selection_schema(schemas, limit, reference=None):
         raise ValueError('read_selection_scope')
     if set(schemas) == {'mcp__resp__get_firewall_rules'}:
         limit = 1
+    # Keep a complete plan within the existing 2048-token generation budget.
+    # Further batches retain the request-wide model/tool caps and missing scope.
+    limit = min(limit, 4)
     if reference:
         count=sum(max(1,len(reference.get('host_rule_ids',[])) if family=='wazuh' else len(reference.get('source_ips',[])))
                   for family in reference['families'] if 'mcp__security_events__search_'+family+'_alerts' in schemas)
@@ -2064,6 +2149,17 @@ def selection_schema(schemas, limit, reference=None):
             {'type': 'object', 'additionalProperties': False, 'required': ['tool', 'arguments'],
              'properties': {'tool': {'type': 'string', 'const': name}, 'arguments': schema}}
             for name, schema in schemas.items()]}}}, 'required': ['calls']}
+
+
+def selection_error_feedback(error, plan, schema):
+    """Bounded validation facts; never echo argument values or raw model prose."""
+    calls = plan.get('calls') if isinstance(plan, dict) else None
+    return {'error': 'read_selection_schema_validation_failed',
+            'validator': str(getattr(error, 'validator', '') or 'selection_constraint')[:80],
+            'path': [x if isinstance(x, int) else str(x)[:80] for x in list(getattr(error, 'absolute_path', ()))[:8]],
+            'selected_calls': len(calls) if isinstance(calls, list) else None,
+            'maximum_calls': schema['properties']['calls']['maxItems'],
+            'missing_arguments_at': [i for i, c in enumerate(calls or []) if isinstance(c, dict) and 'arguments' not in c][:40]}
 
 
 def payload(call):
@@ -2271,6 +2367,13 @@ def fallback(question, calls):
     rendered = read_report(question, calls) or inventory(question, calls)
     if rendered:
         return rendered
+    if EVIDENCE.incident_investigation_request(normalized(question)):
+        # Use the same factual table as Native, including backend limitations;
+        # the short previous-answer summary deliberately omits such detail.
+        text = footer_free(EVIDENCE.factual_review_report(facts_for(calls)))
+        failures = sorted({c.get('server','')+'.'+c.get('name','') for c in calls if c.get('is_error')})
+        return ('위험 판단은 검증 미완료입니다.\n\n'+text+
+                ('\n\n조회 실패: '+', '.join(failures) if failures else ''))
     brief=prior_summary('요약해줘',{'question':question,'calls':calls})
     if brief and brief.reused and not detailed_output(question):
         text=str(brief).replace('**이전 조회 요약** (새 조회 없음)','확인된 조회 자료')

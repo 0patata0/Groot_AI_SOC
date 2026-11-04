@@ -232,7 +232,8 @@ class Grounding(unittest.TestCase):
 
     def test_wazuh_legacy_text_times_are_grounded_and_presented_in_kst(self):
         raw = json.dumps({'result': 'Time: 2026-10-24T21:45:00.110+0000'})
-        call = {'server': 'wazuh-ro', 'name': 'get_wazuh_alert_summary', 'result': raw}
+        call = {'server': 'wazuh-ro', 'name': 'get_wazuh_alert_summary', 'result': raw,
+                'result_sha256':hashlib.sha256(raw.encode()).hexdigest(),'is_error':False}
         facts = harness.facts_for([call])
         self.assertEqual(facts[0]['instants'], ['2026-10-24T21:45:00.110+0000'])
         self.assertIn('2026-10-25T06:45:00.110000+09:00', harness.model_view('wazuh-ro', call['name'], raw))

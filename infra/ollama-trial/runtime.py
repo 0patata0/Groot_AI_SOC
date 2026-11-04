@@ -305,11 +305,12 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                            harness.service_report(current, report['calls']) or
                            harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
                            harness.event_report(current, report['calls']))
-                issues = [] if literal else (harness.violations(current, str(final), report['calls']) + harness.card_answer_issues(reference,str(final),report['calls']))
+                issues = [] if literal else (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 audit = harness.incident_judgment_check(current, str(final), report['calls'],reference)
                 if audit:
                     report.setdefault('judgment_audit', []).append(audit)
                 repair_passes = 0
+                selection_failures = []
                 gap = harness.preparation_gap(current, report['calls'])
                 incident_gap = harness.incident_evidence_gap(current, report['calls'],reference)
                 preparation_used = False
@@ -345,14 +346,20 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         plan = await asyncio.wait_for(selector.ainvoke([
                             ('system', harness.CONTRACT.system_prompt(read_only=True,agent_role='ollama') + '\n' + report['turn_clock'] + '\n조회 호출 선택 단계입니다. 결과 문장 대신 실제 읽기 도구와 인자를 선택하세요. '
                              'security-events는 정확한 시작·종료에 since_kst와 until_kst를 선택하세요(lookback_minutes와 혼용 금지). 종료와 조회 폭만 있으면 until_kst와 lookback_minutes를 사용하세요. 실제 반환 구간을 확인하세요. '
+                             '이번 묶음은 최대4호출이며 나머지 범위는 후속 조회로 이어갑니다. 각 호출에 arguments를 반드시 넣으세요. '
+                             'agent ID를 추정하지 말고 필요하면 실제 등록/인벤토리부터 조회하세요. '
                              '요청한 장비/대상을 빠짐없이 포함하고 이미 성공한 조회를 반복하지 마세요. 요청구간을 지원한다고 꾸미지 마세요.' + harness.guidance(current)),
-                            ('human', instruction + harness.read_background(question,current) + '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
+                            ('human', instruction + harness.read_background(question,current) +
+                             ('\n이전 선택은 실행되지 않았습니다. 아래 검증 오류를 고쳐 다른 유효한 계획을 선택하세요:\n'+canonical(selection_failures[-1]) if selection_failures else '') +
+                             '\n허용된 도구와 정확한 선택 JSON Schema:\n' + canonical(schema))]), 90)
                         report.setdefault('read_selections', []).append(plan)
                         report['read_selection_prompt_sha256'] = harness.CONTRACT.fingerprint(read_only=True,agent_role='ollama')
                         try:plan, removed = harness.validated_selection(plan, schema)
                         except Exception as exc:
                             if not type(exc).__module__.startswith('jsonschema'):raise
                             report['invalid_read_selections']=report.get('invalid_read_selections',0)+1
+                            selection_failures.append(harness.selection_error_feedback(exc, plan, schema))
+                            report['read_selection_errors'] = selection_failures
                             final=''
                             continue  # No partial dispatch; bounded model repair selects again.
                         report['deduplicated_read_selections'] = report.get('deduplicated_read_selections', 0) + removed
@@ -380,12 +387,12 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     gap = harness.preparation_gap(current, report['calls'])
                     incident_gap = harness.incident_evidence_gap(current, report['calls'],reference)
                     missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
-                    issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls']) + harness.card_answer_issues(reference,str(final),report['calls']))
+                    issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 rendered = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
                             harness.service_report(current, report['calls']) or
                             harness.diagnostic_report(current, report['calls'], report.get('diagnostic_targets', ())) or
                             harness.event_report(current, report['calls']))
-                issues = (harness.violations(current, str(final), report['calls']) + harness.card_answer_issues(reference,str(final),report['calls']))
+                issues = (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 still_missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
                 if still_missing:
                     report['unqueried'] = still_missing

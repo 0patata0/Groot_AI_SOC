@@ -895,72 +895,25 @@ def verified_sensor_events(requirements, receipts):
 
 
 def sensor_disposition_error(text, successful_tools):
-    """Require the model's explicit incident judgment, not just a matched alert.
-
-    This validates attribution and completeness, not the truth of the model's
-    semantic assessment. Raw model output remains in the private run trace.
-    """
-    lines = re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text, re.M)
-    if len(lines) != 1 or len(re.findall(r'^INCIDENT_DISPOSITION:[^\r\n]*$', text, re.M)) != 1:
-        return 'incident_disposition_missing'
-    def unique(pairs):
-        value = {}
-        for key, item in pairs:
-            if key in value:
-                raise ValueError('duplicate disposition key')
-            value[key] = item
-        return value
-    try:
-        value = json.loads(lines[0], object_pairs_hook=unique)
-    except (TypeError, ValueError):
-        return 'incident_disposition_invalid'
-    if (not isinstance(value, dict) or set(value) != {'assessment', 'basis', 'evidence_tools'}
-            or value['assessment'] not in ('benign', 'remediated', 'unresolved')
-            or not isinstance(value['basis'], str) or not 20 <= len(value['basis'].strip()) <= 2000
-            or not isinstance(value['evidence_tools'], list)
-            or not 1 <= len(value['evidence_tools']) <= 16
-            or any(not isinstance(name, str) for name in value['evidence_tools'])):
-        return 'incident_disposition_invalid'
-    evidence_tools = set(value['evidence_tools'])
-    sensor_tools = {'mcp__security_events__search_modsecurity_alerts',
-                    'mcp__security_events__search_suricata_alerts'}
-    if (len(evidence_tools) != len(value['evidence_tools']) or
-            not evidence_tools <= successful_tools or not evidence_tools & sensor_tools):
-        return 'incident_disposition_evidence_missing'
-    if value['assessment'] == 'unresolved':
-        return 'incident_disposition_unresolved'
-    return None
+    """Validate the shared explicit decision; source/closure remain separate."""
+    from soc_management_run import parse_incident_disposition
+    value,error=parse_incident_disposition(text,successful_tools)
+    if error:return error
+    sensor_tools={'mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts'}
+    if not set(value['evidence_tools'])&sensor_tools:return 'incident_disposition_evidence_missing'
+    return 'incident_disposition_unresolved' if value['assessment']=='unresolved' else None
 
 
 def impact_read_timestamps(name, args, payload, requirements):
-    """Validate minimum host-evidence coverage; never classify an incident.
+    """Use the same minimum host-evidence contract as the SDK."""
+    from soc_management_run import incident_impact_read_timestamps
+    return incident_impact_read_timestamps(name,args,payload,requirements)
 
-    A sensor recurrence query or a current health snapshot cannot substitute
-    for the protected agent's incident-time investigation. The model chooses
-    the actual asset and judges the returned evidence, including its limits.
-    """
-    if (name != 'mcp__security_events__search_wazuh_alerts'
-            or not isinstance(args, dict) or not isinstance(payload, dict)
-            or not re.fullmatch(r'[0-9]{3,8}', str(args.get('agent_id', '')))
-            or set(args) - {'agent_id', 'since_kst', 'until_kst', 'limit'}
-            or payload.get('source') != 'wazuh'
-            or payload.get('source_scope') != 'wazuh_indexed_alerts'
-            or not isinstance(payload.get('alerts'), list)):
-        return set()
-    try:
-        start, end = (datetime.fromisoformat(args[k]) for k in ('since_kst', 'until_kst'))
-        observed = [datetime.fromisoformat(payload[k]) for k in ('requested_since_kst', 'requested_until_kst')]
-        if (start.tzinfo is None or end.tzinfo is None or not start < end
-                or end - start > timedelta(hours=24)
-                or any(d.tzinfo is None for d in observed)
-                or observed != [start, end]
-                or any(not isinstance(row, dict) or row.get('agent_id') != args['agent_id']
-                       for row in payload['alerts'])):
-            return set()
-        return {stamp for _source, _ip, stamp, _rule in requirements
-                if type(stamp) in (int, float) and start.timestamp() <= stamp <= end.timestamp()}
-    except (ValueError, TypeError, KeyError, OverflowError):
-        return set()
+
+def sensor_impact_verification_missing(text,requirements,receipts,linked_response):
+    from soc_management_run import parse_incident_disposition,incident_impact_missing
+    value,error=parse_incident_disposition(text)
+    return bool(error) or incident_impact_missing(value,requirements,receipts,linked_response)
 
 
 class Trace:
@@ -1199,13 +1152,8 @@ class Trace:
                 state, detail, due = "waiting_approval", "awaiting_broker_event", now + 120
             elif disposition == "resolved" and decision_error:
                 state, detail, due = "needs_review", decision_error, now
-            elif (disposition == "resolved" and self.sensor_requirements
-                  and (proposals or any(json.loads(line).get('assessment') == 'remediated'
-                                        for line in re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text, re.M)))
-                  and (any(type(stamp) not in (int, float) or stamp not in self.impact_receipts
-                           for _source, _ip, stamp, _rule in self.sensor_requirements)
-                       or not any('mcp__security_events__search_wazuh_alerts' in json.loads(line).get('evidence_tools', [])
-                                  for line in re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text, re.M)))):
+            elif (disposition == "resolved" and self.sensor_requirements and
+                  sensor_impact_verification_missing(text,self.sensor_requirements,self.impact_receipts,bool(proposals))):
                 state, detail, due = "needs_review", "incident_impact_verification_missing", now
                 text = incomplete_report(detail)
             elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):

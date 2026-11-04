@@ -11,9 +11,14 @@ from unittest.mock import AsyncMock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import runtime
 
+def unresolved_report(text):
+    return text+'\nINCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved',
+        'basis':'반환된 경보 표본만 확인했으며 사건의 승인 여부와 실제 영향은 아직 미확인입니다.',
+        'evidence_tools':['mcp__security_events__search_modsecurity_alerts']},ensure_ascii=False)
+
 
 class PreparationLoop(unittest.TestCase):
-    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False):
+    def execute(self, *, submit_on=0, narrow_repair=False, bad_input=False, question=None, correct_preflight=False, repeat_preflight=False, read_incident=False, incident_drafts=None, incident_read_error=False, selector_plans=None):
         calls, prompts = [], []
         self.selector_prompts=[];self.agent_system_prompts=[]
         selector_prompts=self.selector_prompts;agent_system_prompts=self.agent_system_prompts
@@ -55,6 +60,8 @@ class PreparationLoop(unittest.TestCase):
                 if read_incident:
                     async def select(messages):
                         selector_prompts.append(messages)
+                        if selector_plans:
+                            return selector_plans[min(len(selector_prompts)-1,len(selector_plans)-1)]
                         return {'calls':[{'tool':'mcp__security_events__search_modsecurity_alerts',
                             'arguments':{'target':'bad-year' if incident_read_error and len(selector_prompts)==1 else 'fixture'}}]}
                     return types.SimpleNamespace(ainvoke=select)
@@ -68,7 +75,7 @@ class PreparationLoop(unittest.TestCase):
                 if read_incident:
                     if incident_drafts:
                         return incident_drafts[min(len(prompts)-1,len(incident_drafts)-1)]
-                    return 'WAF 반환 표본 0건. 구간 전체와 사건 영향·위험은 미확인이며 추가 조사가 필요합니다.'
+                    return unresolved_report('WAF 반환 표본 0건. 구간 전체와 사건 영향·위험은 미확인이며 추가 조사가 필요합니다.')
                 if len(prompts)==1:
                     if bad_input:
                         refused = json.loads(await tools['mcp__rule_a__get_rule_change_target'].ainvoke({}))
@@ -95,12 +102,16 @@ class PreparationLoop(unittest.TestCase):
                 return 'ModSecurity 파일을 확인했습니다. 변경안은 준비하지 못했습니다.'
         class ValidationError(Exception):
             validator='required'
+            absolute_path=('calls',0)
+        ValidationError.__module__='jsonschema.exceptions'
         class Validator:
             def __init__(self,*a):pass
             @staticmethod
             def check_schema(*a):pass
             def validate(self,args):
                 if read_incident and 'calls' in args:
+                    if any('arguments' not in item for item in args['calls']):
+                        raise ValidationError('missing arguments')
                     return
                 if 'target' not in args:raise ValidationError('missing target')
         definitions={
@@ -157,11 +168,23 @@ class PreparationLoop(unittest.TestCase):
         self.assertEqual(report['protected_calls'],0)
         self.assertEqual(report['status'],'completed')
 
+    def test_invalid_plan_is_not_dispatched_and_next_selection_receives_error(self):
+        tool='mcp__security_events__search_modsecurity_alerts'
+        report, prompts, calls=self.execute(question='DVWA 사건 조사하고 위험 판단해줘',read_incident=True,
+            selector_plans=[{'calls':[{'tool':tool}]},{'calls':[{'tool':tool,'arguments':{'target':'fixed'}}]}])
+        self.assertEqual(calls,['search_modsecurity_alerts'])
+        self.assertEqual(report['invalid_read_selections'],1)
+        self.assertEqual(report['read_selection_errors'][0]['missing_arguments_at'],[0])
+        self.assertNotIn('read_selection_schema_validation_failed',self.selector_prompts[0][1][1])
+        self.assertIn('read_selection_schema_validation_failed',self.selector_prompts[1][1][1])
+        self.assertEqual(report['status'],'completed')
+        self.assertEqual(report['protected_calls'],0)
+
     def test_incident_factual_repair_keeps_failed_draft_without_repeating_reads(self):
         failed='WAF 경보는 0건입니다.'
         fixed='WAF 반환 표본 0건. 실제 공격 여부와 영향은 미확인이고 추가 조사가 필요합니다.'
         report,prompts,calls=self.execute(question='DVWA 공격인지 근거와 대응 필요성을 조사해줘.',
-            read_incident=True,incident_drafts=[failed,fixed])
+            read_incident=True,incident_drafts=[failed,unresolved_report(fixed)])
         self.assertEqual(report['status'],'completed')
         self.assertEqual(report['final_response'],fixed)
         self.assertEqual(calls,['search_modsecurity_alerts'])
@@ -188,7 +211,7 @@ class PreparationLoop(unittest.TestCase):
         failed='사설 주소이므로 대응이 불필요합니다.'
         fixed='WAF 반환 표본 0건. 승인 여부와 실제 영향은 미확인이고 추가 조사가 필요합니다.'
         report,prompts,calls=self.execute(question='DVWA 공격인지 근거와 대응 필요성을 조사해줘.',
-            read_incident=True,incident_drafts=[failed,fixed])
+            read_incident=True,incident_drafts=[failed,unresolved_report(fixed)])
         self.assertEqual(report['final_response'],fixed)
         self.assertIn('environment_used_as_authorization',report['judgment_audit'][0]['issues'])
         self.assertEqual(calls,['search_modsecurity_alerts'])

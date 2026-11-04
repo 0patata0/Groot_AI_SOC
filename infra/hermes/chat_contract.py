@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.25'
+VERSION = 'soc-chat-contract:1.5.26'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -73,6 +73,8 @@ QUERY_SECTIONS = {
         "OpenSearch yellow는 복제 샤드 미할당을 포함하므로 전체 정상·완전 복제로 표시하지 않습니다."
     ),
     '완료와 보고': (
+        "실제 센서 사건의 조사 판단은 INCIDENT_DISPOSITION 한 줄에 assessment·basis·실제로 성공한 evidence_tools를 남깁니다. "
+        "내부 감사 줄은 채팅에 표시하지 않으며 unresolved를 정상/종결로 바꾸지 않습니다. "
         "요청한 여러 장비·항목을 추적하고 실패/미조회/0건을 구분합니다. 기억·봇 답변·도구 설명은 새 조회 근거가 아닙니다. "
         "현재 상태 질문은 실제 읽기를 마친 뒤 답하고 미지원 범위를 숨기지 않습니다. "
         "관측·판단·미확인·수행 조치·승인 대기를 구분하며 상세 요청이 없으면 핵심만 짧게 보고합니다. "

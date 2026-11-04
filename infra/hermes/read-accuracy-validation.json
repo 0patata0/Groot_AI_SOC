@@ -36,7 +36,12 @@
   "full_incident_closure": false,
   "production_targets": 16,
   "protected_files_unchanged": 8,
-  "publication": "pending",
+  "publication": {
+    "source_commit": "367d8f84b3199cb8736af78beb5424ce10281711",
+    "remote_main_matches": true,
+    "verified_at_kst": "2026-11-04T19:18:45.804263+09:00",
+    "publication_receipt_followup": true
+  },
   "installer_fake_ssh_tests": 46,
   "installer_published_head_isolated": true,
   "remote_action_boundary_cases": 12,

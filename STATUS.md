@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-04 19:12 KST
+# 인프라 현황 — 2026-11-04 19:18 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](archive/STATUS-before-read-accuracy-ncsc-20261104.md) · [조회 지연 전](archive/STATUS-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/STATUS-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/STATUS-20261104-before-web-e2e.md) · [표 보완 전](archive/STATUS-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/STATUS-20261104-before-fw-chat.md) · [FW 선택 전](archive/STATUS-20261104-before-fw-scope.md) · [룰 감사 전](archive/STATUS-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/STATUS-20261104-before-web-policy.md) · [과거 이력](archive/STATUS-history-20261101.md).
 
@@ -52,4 +52,4 @@ OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3�
 
 이번 단위는 B Native/SDK/관리 gate와 SDK 실행기16대상이다.18:44 최초 적용·중간 오답/미조회 확인 뒤 보완·19:11:31 source/보호8SHA·broker원PID·양WS/worker 확인 후 확정, 원복 timer 정지·confirmed recovery no-op. 원본/후보·중간SHA/복구는 `/var/lib/capstone-read-accuracy/20261104-r1/deployment`에 보존한다.903PASS/skip0, 실제 신규 설치·수동 원복·새 공격 E2E는 미실시다. 자세한 실패/최종 성공 표본은 read-accuracy 문서에 구분한다.
 
-공식 지침 자료3개는 기존 Swift/PDFKit으로 확인하고 원문SHA·판본·페이지를 작은 대조표에 기록했다. Mac 새 패키지 설치0. 자체 공식PDF3개/Swift캐시/격리소스/스크립트 679파일·261162992B와 SSH mux를 정리하고 임시 부모 부재를 확인했다. 서버validation/mirror 각422파일·6,429,692B도 로그5개 SHA 내보내기 뒤 제거·실제 복구본/DB/채팅/승인 보존. 공개HEAD 설치기를 사용한 추가 격리 fakeSSH46PASS로 별도 NAT후보를 배제했다. 현재 공개 소스·문서 변경은 아직 커밋/푸시 전이다. 이전 확정 커밋은416835f이며 이번 변경 게시와 구분한다. 타 Ansible2/NAT6/topology5 stage는 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 전체 목표active·미완료다.
+공식 지침 자료3개는 기존 Swift/PDFKit으로 확인하고 원문SHA·판본·페이지를 작은 대조표에 기록했다. Mac 새 패키지 설치0. 자체 공식PDF3개/Swift캐시/격리소스/스크립트 679파일·261162992B와 SSH mux를 정리하고 임시 부모 부재를 확인했다. 서버validation/mirror 각422파일·6,429,692B도 로그5개 SHA 내보내기 뒤 제거·실제 복구본/DB/채팅/승인 보존. 공개HEAD 설치기를 사용한 추가 격리 fakeSSH46PASS로 별도 NAT후보를 배제했다. 이번 공개33파일은 `367d8f84b3199cb8736af78beb5424ce10281711`로 커밋·푸시하고 2026-11-04T19:18:45.804263+09:00 실제 원격main 일치를 확인했다. 게시 확인 STATUS/작은 검증원장2파일은 후속 문서 커밋으로 보존한다. 직전416835f와 이번 소스 게시를 구분한다. 타 Ansible2/NAT6/topology5 stage는 미포함·보존한다. 자격·대화/검증 원문·업무분담·발표/논문·데이터/가중치는 Git 제외다. 전체 목표active·미완료다.

@@ -1,0 +1,613 @@
+{
+  "schema": 1,
+  "observed_date_kst": "2026-11-04",
+  "scope": "read_only_audit_and_native_regression_not_live_deployment",
+  "live_rule_writes": 0,
+  "fresh_installs": 0,
+  "network_packets_sent": 0,
+  "model_or_LLM_authority_changes": 0,
+  "suricata": {
+    "source_definitions": 52497,
+    "ET_definitions": 52483,
+    "local_definitions": 14,
+    "source_sha256": {
+      "ET_sha256": "f11a97da8db542030b5767860eb7e5c4d5045d57385baf5b1cca6ff540faef97",
+      "local_sha256": "220f9e70958566dbd56464813161b2fc472bfe03d9b03b22eb6f5e2c8330723c",
+      "all_sha256": "b808ceba89dead5d1de8bd4f17cd4370e2f0d565424d979672e25426a60f7f4b"
+    },
+    "candidate_ET_sha256": "bcf046940bb2182a965da12b8e5653b02b72babd1e05b1445ebc2bbdc9ea5bba",
+    "image_sha256": "sha256:d4fd70f7955f1f9d5c8f54d0b91dd22e359bebce6fba5423d1182f33ae0d59ff",
+    "pcap_sha256": "cca34b92453a9e136734ea44fa5659088285be39a4614b00877af96aedeaf370",
+    "packets": 134,
+    "positive_cases": 7,
+    "negative_cases": 7,
+    "keep_remove_candidate_pairs": [
+      [
+        2031294,
+        2031293
+      ],
+      [
+        2014493,
+        2013684
+      ],
+      [
+        2022484,
+        2022949
+      ],
+      [
+        2009486,
+        2016471
+      ],
+      [
+        2047884,
+        2045358
+      ],
+      [
+        2016534,
+        2016535
+      ],
+      [
+        2066629,
+        2066625
+      ]
+    ],
+    "before_passed_cases": 14,
+    "candidate_passed_cases": 14,
+    "target_alerts_before": 14,
+    "target_alerts_candidate": 7,
+    "retained_alert_observations": 9,
+    "retained_alerts_equal": true,
+    "retained_alert_observations_sha256": "f9eb6ca1047008e0bff7551642791d67c085e720d2709d09a46c9a00fe1c741d",
+    "preserved_local_override_ids": [
+      2034806,
+      2034802
+    ],
+    "source_count_is_not_proof_of_live_active_signature_count": true,
+    "configuration_files_scanned": 5,
+    "native_execution": {
+      "network": "none",
+      "read_only": true,
+      "user": "998:998",
+      "cap_drop": "ALL",
+      "no_new_privileges": true,
+      "memory_bytes": 1073741824,
+      "cpus": 1,
+      "pids_limit": 128,
+      "tmpfs_bytes": 33554432,
+      "timeout_seconds": 180,
+      "termination_grace_seconds": 5,
+      "before_exit": 0,
+      "candidate_exit": 0
+    },
+    "operating_container_and_sources_unchanged": true,
+    "temporary_server_files_removed": 29,
+    "temporary_server_bytes_removed": 191075067,
+    "temporary_containers_remaining": 0,
+    "staging_parent_absent": true
+  },
+  "wazuh": {
+    "API_definitions": 4571,
+    "native_XML_definitions": 4571,
+    "source_files": 172,
+    "source_files_manifest_sha256": "0bdfd95e6b744cb6d860de014eecf4d7ce8b59c90b58f67cd62a81f841b69d2e",
+    "native_XML_loader": "installed_wazuh.core.utils.load_wazuh_xml",
+    "duplicate_source_and_id_rows": 0,
+    "candidate_pairs": [
+      {
+        "ids": [
+          "12122",
+          "12127"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0195-named_rules.xml"
+        ],
+        "condition_action_sha256": "6b9a27b5ce31a412ee53ff0b3f5bb0e3af78f4f3118c81e8802f31b4ac781fa5",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "24038",
+          "24039"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0545-osquery_rules.xml"
+        ],
+        "condition_action_sha256": "2dc9d7529854d65b6011d678e78257749df8610880bd78b8a1e89d9a7217ee66",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "24105",
+          "24106"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0545-osquery_rules.xml"
+        ],
+        "condition_action_sha256": "ad88539a43d84dafe6403101f02703efe1eba3617dbd48aef87fa2c7090e8812",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "24123",
+          "24124"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0545-osquery_rules.xml"
+        ],
+        "condition_action_sha256": "5431d6bb7cd62c93ca616dd0f06f13f676850b549acc2466ae89cad47e777789",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "24127",
+          "24128"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0545-osquery_rules.xml"
+        ],
+        "condition_action_sha256": "5a7ba0842f5ae747c933a3a3b64684e2d3c1a51058f969f5ef58841b71d34ad2",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "24131",
+          "24132"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0545-osquery_rules.xml"
+        ],
+        "condition_action_sha256": "afaa704be035d05597824dfaa0f6651c21ee9c2d42aaeac2a84bfff3bbfbeca3",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "44681",
+          "44682"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0392-fortimail_rules.xml"
+        ],
+        "condition_action_sha256": "8c6464fdc80f69d3de2f3ea2273d5daa46b56edb114e7c2b65195dbf9dd4fcb7",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "44711",
+          "44715"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": false,
+        "source_files": [
+          "0392-fortimail_rules.xml"
+        ],
+        "condition_action_sha256": "42f169e3264f9a5f5e45bee3920fe09cc6c5f8d2f707455177837f1af9976a10",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "60700",
+          "60701"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": false,
+        "source_files": [
+          "0585-win-application_rules.xml"
+        ],
+        "condition_action_sha256": "84f9a1f64cb1b8426cff44e0dd7dbd54c52f59a90838415e7cace412b65c406a",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "60729",
+          "60737"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0585-win-application_rules.xml"
+        ],
+        "condition_action_sha256": "eb180d2dc361c2da2db519a9fa3da4a9277e9c25dce9ec9161b0296bdc47337a",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "60731",
+          "60742"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0585-win-application_rules.xml"
+        ],
+        "condition_action_sha256": "50cad53377c2569418513aec4b7d6dbf12c4864092fbe572f93c0429eca202f6",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "60732",
+          "60745"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": false,
+        "source_files": [
+          "0585-win-application_rules.xml"
+        ],
+        "condition_action_sha256": "b3322a9ba889f5f0b27bf794f24e57b59c0d39d58f4293f6897d6f898eb1abf9",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "60843",
+          "60845"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0585-win-application_rules.xml"
+        ],
+        "condition_action_sha256": "5bf54c172a936226919bfc943d68c15f75d3de63bba60d2f3dfeb117a59270a0",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "60862",
+          "60864"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0585-win-application_rules.xml"
+        ],
+        "condition_action_sha256": "0dcf18c0ca5df13755e744c9633cab03946625b575582e85bd7aa1c11899c364",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "62163",
+          "62192"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0600-win-wdefender_rules.xml"
+        ],
+        "condition_action_sha256": "30fad31d95200bb42111dcff5d97b64a214f9f8e4a4e784b85146c6a57418fb0",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "62206",
+          "62210"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0600-win-wdefender_rules.xml"
+        ],
+        "condition_action_sha256": "25eb2df171abf99af6c8c745cd5d308ef5b3b06eb8cea0d489e43582d16c2a56",
+        "references_from_rules": 0
+      },
+      {
+        "ids": [
+          "92022",
+          "92030"
+        ],
+        "conditions_actions_equal": true,
+        "definition_equal_except_id": true,
+        "source_files": [
+          "0800-sysmon_id_1.xml"
+        ],
+        "condition_action_sha256": "305d724d39676529ede8cd494d7e27014c3791c69af98cc87dd936dff0e7228d",
+        "references_from_rules": 0
+      }
+    ],
+    "signature_id_field_conditions": 0,
+    "native_baseline": {
+      "cases": [
+        {
+          "name": "named-zone-origin",
+          "candidate_ids": [
+            "12122",
+            "12127"
+          ],
+          "log_format": "syslog",
+          "actual_id": "12122",
+          "level": 1,
+          "decoder": "named",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "osquery-incident-response-alf",
+          "candidate_ids": [
+            "24038",
+            "24039"
+          ],
+          "log_format": "syslog",
+          "actual_id": "24038",
+          "level": 4,
+          "decoder": "json",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "osquery-it-compliance-alf",
+          "candidate_ids": [
+            "24105",
+            "24106"
+          ],
+          "log_format": "syslog",
+          "actual_id": "24105",
+          "level": 4,
+          "decoder": "json",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "osquery-it-compliance-keychain_items",
+          "candidate_ids": [
+            "24123",
+            "24124"
+          ],
+          "log_format": "syslog",
+          "actual_id": "24123",
+          "level": 4,
+          "decoder": "json",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "osquery-it-compliance-portage_packages",
+          "candidate_ids": [
+            "24127",
+            "24128"
+          ],
+          "log_format": "syslog",
+          "actual_id": "24127",
+          "level": 4,
+          "decoder": "json",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "osquery-it-compliance-rpm_packages",
+          "candidate_ids": [
+            "24131",
+            "24132"
+          ],
+          "log_format": "syslog",
+          "actual_id": "24131",
+          "level": 4,
+          "decoder": "json",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "fortimail-44681",
+          "candidate_ids": [
+            "44681",
+            "44682"
+          ],
+          "log_format": "syslog",
+          "actual_id": "44681",
+          "level": 3,
+          "decoder": "fortimail-like",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "fortimail-44711",
+          "candidate_ids": [
+            "44711",
+            "44715"
+          ],
+          "log_format": "syslog",
+          "actual_id": "44711",
+          "level": 3,
+          "decoder": "fortimail-like",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "windows-60700",
+          "candidate_ids": [
+            "60700",
+            "60701"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "windows-60729",
+          "candidate_ids": [
+            "60729",
+            "60737"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "windows-60731",
+          "candidate_ids": [
+            "60731",
+            "60742"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "windows-60732",
+          "candidate_ids": [
+            "60732",
+            "60745"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "windows-60843",
+          "candidate_ids": [
+            "60843",
+            "60845"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "windows-60862",
+          "candidate_ids": [
+            "60862",
+            "60864"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "defender-62163",
+          "candidate_ids": [
+            "62163",
+            "62192"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": "1002",
+          "level": 2,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "defender-62206",
+          "candidate_ids": [
+            "62206",
+            "62210"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": "1002",
+          "level": 2,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "sysmon-qwinsta",
+          "candidate_ids": [
+            "92022",
+            "92030"
+          ],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        },
+        {
+          "name": "negative-osquery",
+          "candidate_ids": [],
+          "log_format": "syslog",
+          "actual_id": "24010",
+          "level": 3,
+          "decoder": "json",
+          "classification": "pass",
+          "test_session_removed": true
+        },
+        {
+          "name": "negative-VSS-event",
+          "candidate_ids": [],
+          "log_format": "eventchannel",
+          "actual_id": null,
+          "level": null,
+          "decoder": "json",
+          "classification": "unverified_eventchannel_path",
+          "test_session_removed": true
+        }
+      ],
+      "client_sha256": "59fb8b25a9315f3007aaea3bd572a8e5098012ca12046617b9615ce367672414",
+      "session_tokens_exported": false,
+      "operating_rule_writes": 0,
+      "external_messages": 0,
+      "scope": "native_test_sessions_not_live_agent_detection_or_alert_pipeline",
+      "counts": {
+        "pass": 9,
+        "fail": 0,
+        "unverified_eventchannel_path": 10,
+        "test_session_cleanup_failed": 0
+      },
+      "status": "partial",
+      "fixture_sha256": "33edee37f314c7bf2f75f6c9b9b26eca2d3994fe64ed7c5f4df83c82300331cc"
+    },
+    "candidate_engine_comparison_performed": false,
+    "requires_isolated_native_eventchannel_validation": true
+  },
+  "reproducibility_files_sha256": {
+    "suricata_regression.py": "9b370706a6b2a4a220ac4649aac830b72a3ced5d4ecff0612030c50198e6b5cd",
+    "wazuh-fixtures.json": "33edee37f314c7bf2f75f6c9b9b26eca2d3994fe64ed7c5f4df83c82300331cc",
+    "wazuh_regression.py": "e3001584288256ddc9e6b8583f617802a45625480d9c63524382c709b1c1ebb7"
+  },
+  "limitations": [
+    "Synthetic packet/log regression is not live attack or SOC E2E validation.",
+    "Same conditions do not prove all external references and historical aliases are redundant.",
+    "Windows EventChannel positive cases are unverified, not detector failures.",
+    "Installer audit remains read-only; no fresh installation or code fix performed."
+  ],
+  "git_publication": {
+    "state": "pending_at_generation",
+    "commit_and_remote_verification": "STATUS.md and local session record"
+  },
+  "local_validation": {
+    "Python_compile": "passed",
+    "unknown_ET_source": "rejected",
+    "missing_alert_CLI_exit": 1,
+    "PCAP_fixture_SHA": "matched",
+    "Wazuh_post_native_original_172_files_and_container": "unchanged"
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-11-04T12:48:25.972604+09:00",
+    "files_removed": 26,
+    "bytes_removed": 207989,
+    "source_snapshot_files": 26,
+    "parent_absent": true,
+    "new_Mac_packages": 0,
+    "downloaded_binaries": 0,
+    "server_operational_backups_preserved": true,
+    "other_task_directories_preserved": true
+  }
+}

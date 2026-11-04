@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "purpose": "rule_overlap_regression_not_training_data",
+  "fixtures": [
+    {
+      "name": "named-zone-origin",
+      "candidate_ids": [
+        "12122",
+        "12127"
+      ],
+      "input": "Nov  4 12:20:00 fixture named[1234]: zone example.test/IN: loading from master file example.test failed: not at top of zone",
+      "location": "stdin",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "osquery-incident-response-alf",
+      "candidate_ids": [
+        "24038",
+        "24039"
+      ],
+      "input": "{\"osquery\": {\"pack\": \"incident-response\", \"name\": \"alf\", \"subquery\": \"alf\", \"columns\": {\"version\": \"fixture\", \"label\": \"fixture\", \"path\": \"/synthetic\", \"package\": \"fixture\", \"flags\": \"fixture\", \"name\": \"fixture\"}}}",
+      "location": "/var/log/osquery",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "osquery-it-compliance-alf",
+      "candidate_ids": [
+        "24105",
+        "24106"
+      ],
+      "input": "{\"osquery\": {\"pack\": \"it-compliance\", \"name\": \"alf\", \"subquery\": \"alf\", \"columns\": {\"version\": \"fixture\", \"label\": \"fixture\", \"path\": \"/synthetic\", \"package\": \"fixture\", \"flags\": \"fixture\", \"name\": \"fixture\"}}}",
+      "location": "/var/log/osquery",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "osquery-it-compliance-keychain_items",
+      "candidate_ids": [
+        "24123",
+        "24124"
+      ],
+      "input": "{\"osquery\": {\"pack\": \"it-compliance\", \"name\": \"keychain_items\", \"subquery\": \"keychain_items\", \"columns\": {\"version\": \"fixture\", \"label\": \"fixture\", \"path\": \"/synthetic\", \"package\": \"fixture\", \"flags\": \"fixture\", \"name\": \"fixture\"}}}",
+      "location": "/var/log/osquery",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "osquery-it-compliance-portage_packages",
+      "candidate_ids": [
+        "24127",
+        "24128"
+      ],
+      "input": "{\"osquery\": {\"pack\": \"it-compliance\", \"name\": \"portage_packages\", \"subquery\": \"portage_packages\", \"columns\": {\"version\": \"fixture\", \"label\": \"fixture\", \"path\": \"/synthetic\", \"package\": \"fixture\", \"flags\": \"fixture\", \"name\": \"fixture\"}}}",
+      "location": "/var/log/osquery",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "osquery-it-compliance-rpm_packages",
+      "candidate_ids": [
+        "24131",
+        "24132"
+      ],
+      "input": "{\"osquery\": {\"pack\": \"it-compliance\", \"name\": \"rpm_packages\", \"subquery\": \"rpm_packages\", \"columns\": {\"version\": \"fixture\", \"label\": \"fixture\", \"path\": \"/synthetic\", \"package\": \"fixture\", \"flags\": \"fixture\", \"name\": \"fixture\"}}}",
+      "location": "/var/log/osquery",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "fortimail-44681",
+      "candidate_ids": [
+        "44681",
+        "44682"
+      ],
+      "input": "date=2026-11-04 time=12:20:00 device_id=fixture log_id=000001 pri=information type=event subtype=smtp msg=\"Permission of mail\"",
+      "location": "stdin",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "fortimail-44711",
+      "candidate_ids": [
+        "44711",
+        "44715"
+      ],
+      "input": "date=2026-11-04 time=12:20:00 device_id=fixture log_id=000001 pri=information type=event subtype=smtp msg=\"Successfully loaded virus db\"",
+      "location": "stdin",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "windows-60700",
+      "candidate_ids": [
+        "60700",
+        "60701"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"VSS\",\"channel\":\"Application\",\"eventID\":\"8213\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "windows-60729",
+      "candidate_ids": [
+        "60729",
+        "60737"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-WMI\",\"channel\":\"Application\",\"eventID\":\"43\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "windows-60731",
+      "candidate_ids": [
+        "60731",
+        "60742"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-WMI\",\"channel\":\"Application\",\"eventID\":\"5601\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "windows-60732",
+      "candidate_ids": [
+        "60732",
+        "60745"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-WMI\",\"channel\":\"Application\",\"eventID\":\"5612\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "windows-60843",
+      "candidate_ids": [
+        "60843",
+        "60845"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-MSDTC\",\"channel\":\"Application\",\"eventID\":\"4102\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "windows-60862",
+      "candidate_ids": [
+        "60862",
+        "60864"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-MSDTC\",\"channel\":\"Application\",\"eventID\":\"4137\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "defender-62163",
+      "candidate_ids": [
+        "62163",
+        "62192"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-Windows Defender\",\"channel\":\"Microsoft-Windows-Windows Defender/Operational\",\"eventID\":\"5000\",\"severityValue\":\"ERROR\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{\"errorCode\":\"0x8050800C\"}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "defender-62206",
+      "candidate_ids": [
+        "62206",
+        "62210"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-Windows Defender\",\"channel\":\"Microsoft-Windows-Windows Defender/Operational\",\"eventID\":\"5000\",\"severityValue\":\"ERROR\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{\"errorCode\":\"0x8050A002\"}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "sysmon-qwinsta",
+      "candidate_ids": [
+        "92022",
+        "92030"
+      ],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-Sysmon\",\"channel\":\"Microsoft-Windows-Sysmon/Operational\",\"eventID\":\"1\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{\"originalFileName\":\"qwinsta.exe\",\"commandLine\":\"qwinsta /server:fixture.invalid\"}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    },
+    {
+      "name": "negative-osquery",
+      "candidate_ids": [],
+      "input": "{\"osquery\": {\"pack\": \"unrelated-fixture\", \"name\": \"not-a-match\"}}",
+      "location": "/var/log/osquery",
+      "log_format": "syslog",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "baseline_verified"
+    },
+    {
+      "name": "negative-VSS-event",
+      "candidate_ids": [],
+      "input": "{\"win\":{\"system\":{\"providerName\":\"VSS\",\"channel\":\"Application\",\"eventID\":\"99999\",\"severityValue\":\"INFORMATION\",\"level\":\"4\",\"computer\":\"fixture.invalid\"},\"eventdata\":{}}}",
+      "location": "stdin",
+      "log_format": "eventchannel",
+      "scope": "synthetic_test_only_not_SFT",
+      "native_logtest_support": "unverified_eventchannel_path"
+    }
+  ]
+}

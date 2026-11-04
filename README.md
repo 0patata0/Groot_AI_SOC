@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+**초기 설치 확인(11/4):** 단일 `deploy.sh`와 최신 웹 정책의 소스 연결은 확인했다. 공동 검토 채널의 원격 허용 목록 누락, WAF 대응 근거의 초기 등록 연결, 두 봇 배포 프로필과 전체 오프라인 묶음은 미완료다. 사용자 지시대로 실제 신규 설치와 설치 코드 수정은 하지 않았다. [점검 결과](deployment/INSTALLER_READINESS.md).
+
+**룰 중복 감사(11/4):** IDS7쌍은 전체 룰을 사용한 격리 전후14조건을 모두 통과했고, 대상 중복 경보14→7·유지 경보9개 관측 동일을 확인했다. Wazuh17쌍은 조건/동작 동일하나 native 양성 확인8쌍·Windows9쌍 미검증이다. 운영 룰 통합/삭제는 미적용이다. [근거·재현·한계](infra/validation/rule-overlap/README.md).
+
 **공개 웹·관제 업무 현행(11/4):** Log4Shell UI/API·등록 HTTP3개는 모두 WAF On을 거치며 실습 검사 예외를 제거했다. 실행·중지·터미널은 관리자231/32와 인증이 필요하다. A/C 적용·외부14조건·신뢰 해시/writer 확인을 마쳤고 실제 공격 전체 회귀·C 승인형 MCP 제어는 남는다. [정책·검증·복구](infra/validation/web-policy/README.md) · [SOC 업무별 실행 범위](infra/validation/web-policy/SOC_CAPABILITIES.md). 아래 날짜별 예외 키/익명 제어 설명은 과거 이력이다.
 
 **관리 접속 현행(11/3 실접속 시험·11/4 10:33 KST 정책 재확인):** A SSH·Wazuh443/10443은 관리자 `192.168.16.231/32`, A 내부 SSH는 MCP B `10.200.10.10/32`만 허용한다. Kali232의 Wazuh302→403·C의 A SSH거부·관리자 신규접속·공개 DVWA/Log4Shell/채팅·실제 MCP읽기를 검증했다. 루트 설치기/새 security host guard도 동기화했다. [정책·원복·미검증](infra/groot-a/management-access.md) · [현황](STATUS.md). 아래 날짜가 있는 VPN/학과망 허용은 당시 이력이다.

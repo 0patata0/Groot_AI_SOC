@@ -589,8 +589,11 @@
     "Installer audit remains read-only; no fresh installation or code fix performed."
   ],
   "git_publication": {
-    "state": "pending_at_generation",
-    "commit_and_remote_verification": "STATUS.md and local session record"
+    "audit_commit": "5024f093b60567307cf3165654e10c739c0c3710",
+    "remote_main": "5024f093b60567307cf3165654e10c739c0c3710",
+    "confirmed_at_kst": "2026-11-04T12:49:25.924107+09:00",
+    "state": "audit_commit_published_remote_matched",
+    "publication_followup": "This metadata is in a later documentation commit; final HEAD is recorded locally."
   },
   "local_validation": {
     "Python_compile": "passed",

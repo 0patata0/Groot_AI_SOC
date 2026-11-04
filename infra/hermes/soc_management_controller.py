@@ -932,6 +932,37 @@ def sensor_disposition_error(text, successful_tools):
     return None
 
 
+def impact_read_timestamps(name, args, payload, requirements):
+    """Validate minimum host-evidence coverage; never classify an incident.
+
+    A sensor recurrence query or a current health snapshot cannot substitute
+    for the protected agent's incident-time investigation. The model chooses
+    the actual asset and judges the returned evidence, including its limits.
+    """
+    if (name != 'mcp__security_events__search_wazuh_alerts'
+            or not isinstance(args, dict) or not isinstance(payload, dict)
+            or not re.fullmatch(r'[0-9]{3,8}', str(args.get('agent_id', '')))
+            or set(args) - {'agent_id', 'since_kst', 'until_kst', 'limit'}
+            or payload.get('source') != 'wazuh'
+            or payload.get('source_scope') != 'wazuh_indexed_alerts'
+            or not isinstance(payload.get('alerts'), list)):
+        return set()
+    try:
+        start, end = (datetime.fromisoformat(args[k]) for k in ('since_kst', 'until_kst'))
+        observed = [datetime.fromisoformat(payload[k]) for k in ('requested_since_kst', 'requested_until_kst')]
+        if (start.tzinfo is None or end.tzinfo is None or not start < end
+                or end - start > timedelta(hours=24)
+                or any(d.tzinfo is None for d in observed)
+                or observed != [start, end]
+                or any(not isinstance(row, dict) or row.get('agent_id') != args['agent_id']
+                       for row in payload['alerts'])):
+            return set()
+        return {stamp for _source, _ip, stamp, _rule in requirements
+                if type(stamp) in (int, float) and start.timestamp() <= stamp <= end.timestamp()}
+    except (ValueError, TypeError, KeyError, OverflowError):
+        return set()
+
+
 class Trace:
     def __init__(self, store, case, run_id):
         self.store, self.case, self.run_id = store, case, run_id
@@ -946,6 +977,7 @@ class Trace:
         self.pending_event_time_errors = set()
         self.sensor_requirements = sensor_review_requirements(store.context(case["id"]))
         self.sensor_receipts = set()
+        self.impact_receipts = set()
         self.unblocks_pending_readback = set()
 
     def accept(self, event):
@@ -1074,6 +1106,8 @@ class Trace:
                         "mcp__security_events__search_wazuh_alerts"):
                     source = name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
                     if payload.get("source_scope") == "wazuh_indexed_alerts" and payload.get("source") == source:
+                        self.impact_receipts.update(impact_read_timestamps(
+                            name, self.arguments[pending[0]['ordinal']], payload, self.sensor_requirements))
                         for alert in payload.get("alerts", [])[:50]:
                             if isinstance(alert, dict):
                                 reference = sensor_event_reference(alert, source)
@@ -1165,6 +1199,15 @@ class Trace:
                 state, detail, due = "waiting_approval", "awaiting_broker_event", now + 120
             elif disposition == "resolved" and decision_error:
                 state, detail, due = "needs_review", decision_error, now
+            elif (disposition == "resolved" and self.sensor_requirements
+                  and (proposals or any(json.loads(line).get('assessment') == 'remediated'
+                                        for line in re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text, re.M)))
+                  and (any(type(stamp) not in (int, float) or stamp not in self.impact_receipts
+                           for _source, _ip, stamp, _rule in self.sensor_requirements)
+                       or not any('mcp__security_events__search_wazuh_alerts' in json.loads(line).get('evidence_tools', [])
+                                  for line in re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text, re.M)))):
+                state, detail, due = "needs_review", "incident_impact_verification_missing", now
+                text = incomplete_report(detail)
             elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):
                 state, detail, due = "needs_review", "live_investigation_missing", now
             elif disposition == "monitor" and self.case["monitor_count"] < 3:
@@ -1185,10 +1228,15 @@ def proposal_read_reference(proposal):
     """Name the registered read endpoints from authenticated target metadata."""
     target = proposal["target"]
     reference = {"proposal_id": proposal["id"], "target": target}
-    if isinstance(target, str) and target.startswith(("a:", "b:")):
+    if target in RULE_TARGETS | SERVICE_TARGETS | {"a:incident-ip"}:
         prefix = "mcp__rule_" + target[0] + "__"
-        reference.update(status_tool=prefix + "get_rule_change_status",
-                         target_tool=prefix + "get_rule_change_target")
+        rule = target in RULE_TARGETS
+        reference.update(
+            status_tool=prefix + ("get_rule_change_status" if rule else "get_operation_status"),
+            status_arguments={"proposal_id" if rule else "request_id": proposal["id"]},
+            target_tool=("mcp__resp__list_blocks" if target == "a:incident-ip" else
+                         prefix + ("get_rule_change_target" if rule else "get_service_action_target")),
+            target_arguments={} if target == "a:incident-ip" else {"target": target})
     return reference
 
 
@@ -1263,11 +1311,14 @@ def prompt_for(base, case, evidence):
     if dict(case).get("operator_review"):
         current_request = ("기존 사건 " + case["id"] + "를 읽기 전용으로 재검토한다. "
             "연결 제안이 있으면 해당 ID의 결정/실행 상태와 필요한 현재 대상·후속 변경의 근거를 직접 조회한다. "
-            "만료·거부는 적용 성공이 아닌 승인 절차의 종료다. 후속 원복이 있으면 필요한 상태 조회를 이번 실행에서 끝낸다. "
+            "룰·서비스의 사전 승인과 이미 실행된 임시차단의 유지/해제 승인을 구분한다. "
+            "expired는 그 요청의 기한 종료이며 최초 적용 부재나 승인 요청 부재를 뜻하지 않는다. "
+            "후속 원복이 있으면 필요한 상태 조회를 이번 실행에서 끝낸다. "
             "연결 제안이 없으면 사건 자체의 현재 근거를 조사한다. 관련 없는 경보·클러스터 조회로 대체하지 않는다. "
             "get_rule_change_target의 target은 필수다. 빈 {}는 권한 부족이 아니라 필수 인자 누락이다. "
             "A/B 도구와 실제 target 접두사를 맞춘다. get_rule_change_status에는 proposal_id를 지정한다. "
-            "만료·거부의 실제 상태가 확인됐다면 승인 절차의 종결 여부를 판단하되, 미적용을 미완료 사고와 혼동하지 않는다. "
+            "상태·result·실제 관측을 각각 확인한다. 기한 내 유지 미승인과 승인 카드 미게시를 혼동하지 않는다. "
+            "result_posted는 결과 보고 여부이며 최초 승인 요청 카드의 게시 증거가 아니다. "
             "전체 보안 정상이나 공격 부재 증명이 아닌 이 사건의 미완료 항목을 판단한다. "
             "현재 경보를 해당 과거 사건과 연결할 근거가 없으면 관련 사건이라고 서술하지 않는다. "
             "근거·남은 한계와 결론을 12줄 이내로 보고하고 마지막 MANAGEMENT_STATUS 표지를 반드시 붙인다.")
@@ -1290,10 +1341,14 @@ def prompt_for(base, case, evidence):
             current_request += ("\n각 참조의 status_tool/target_tool은 해당 대상 서버의 등록된 읽기 도구다. "
                 "b: 대상 제안을 A 도구로 조회한 오류는 B 저장소에서 제안이 소실됐다는 증거가 아니다. "
                 "명시된 서버의 도구로 실제 조회하고 실패와 미확인을 구분한다.")
-            current_request += ("\n이번 사건의 종결 범위는 해당 변경 절차와 현재 대상의 복구 상태다. "
-                "파일·실행 상태 확인과 SID별 탐지 시험을 구분하고 미시험 한계를 명시한다. "
-                "SID별 미시험만으로 정상 복구를 적용 실패라고 단정하지 않는다. "
-                "현재 대상이나 후속 변경 근거가 불충분하면 종결하지 않는다.")
+            if references:
+                current_request += ("\n이 사건은 센서 경보를 포함하므로 변경·차단 절차의 종료만으로 종결하지 않는다. "
+                    "실제 공격 대상의 영향·위험·대응 결과까지 조사한다. 차단 만료/현재 absent는 침해 해소 증거가 아니다.")
+            else:
+                current_request += ("\n센서 경보가 없는 변경 절차만의 검토는 해당 절차와 현재 대상의 복구 상태를 판단한다. "
+                    "파일·실행 상태 확인과 SID별 탐지 시험을 구분하고 미시험 한계를 명시한다. "
+                    "SID별 미시험만으로 정상 복구를 적용 실패라고 단정하지 않는다. "
+                    "현재 대상이나 후속 변경 근거가 불충분하면 종결하지 않는다.")
         references = sensor_review_requirements(evidence)
         if references:
             current_request += ("\n이 사건의 실제 경보 조회에서 대조할 출처·출발지·사건 시각: " + canonical([
@@ -1329,7 +1384,14 @@ def prompt_for(base, case, evidence):
             "post_incident_read_plan은 원래 사건 시각을 포함한 재발 대조 구간이며 실제 등록된 WAF/IDS 읽기를 직접 선택한다. 경계 시각에서 원래 경보가 다시 반환될 수 있다. WAF는 실제 최초 조회의 transaction_id_sha256를 대조하고, 원래 거래의 재반환을 새 공격으로 세지 않는다. 시각을 임의로 조금 옮기거나 시간/IP만으로 다른 사건을 합치지 않는다. 거래/이벤트 식별이 없으면 재발 여부 미확인으로 남긴다. "
             "상한에 닿거나 조회가 실패하면 해당 범위를 미확인으로 남긴다. "
             "재발 표본이 없다는 결과는 앱 실행/호스트 침해 부재 증명이 아니다. "
-            "침해 영향이 필요하면 실제 자산을 식별한 뒤 관련 Wazuh 경보/프로세스/진단을 추가 조사한다. "
+            "침해 영향은 공격 출발지가 아니라 실제 보호 대상 서비스·목적지 자산에서 조사한다. "
+            "출발지 IP가 Wazuh 자산 목록에 없다는 이유로 목적지 조사를 중단하지 않는다. "
+            "센서의 목적지/URL·수집 agent와 실제 자산 목록을 대조하고 프록시와 백엔드를 구분한다. "
+            "아래 등록된 자산·진단 도구로 조사 대상을 찾고, 확인된 agent_id의 사건 구간 경보와 필요한 프로세스/진단을 읽는다. "
+            "상태·최근 센서를 반복 조회하기 전에 보호 대상의 사건 구간을 agent_id로 조사한다. "
+            "임시차단·변경 대응이 연결된 센서 사건이나 remediated 판정은 종결 전에 해당 보호 대상의 search_wazuh_alerts를 agent_id와 명시적 사건 구간으로 실제 조회하고 인용해야 한다. "
+            "이 조회에 source_ip나 규칙 필터를 덧붙여 다른 침해 징후를 제외하지 않는다. "
+            "자산·경로를 식별하지 못하면 추측하지 말고 unresolved/needs_review로 남긴다. 조회 성공이나0표본만으로 정상·침해 부재를 주장하지 않는다. "
             "필수 근거가 도구에 없다면 어떤 로그/대상/구간이 없어 판단할 수 없는지 명시한다. "
             "관리자의 새 지시를 기다린다는 문장으로 가능한 읽기를 대신하지 않는다. "
             "ModSecurity는 WAF 룰 ID, Suricata는 SID, Wazuh는 Wazuh 규칙 ID로 구별한다.")
@@ -1381,8 +1443,14 @@ If proposals is empty, verify means read-only investigation of the incident,
 not 'nothing to verify'. Read fresh relevant evidence; do not stop merely because
 no proposal exists. Do not infer that a private address or a lab URL is benign.
 An operator_readonly_review starts a fresh session and does not authorize replay.
-Expired/denied proposals are terminal: resolution means their decision is
-confirmed, not that the proposed change was applied or the incident was harmless.
+Expired/denied is a terminal workflow decision, not proof of never applied,
+never requested approval, or a harmless incident. Rule/service proposals require
+prior approval; provisional containment may already have executed before a
+retention/release decision. Read kind, result, deadlines and live state separately.
+"no timely retention approval" means no timely approval to EXTEND the temporary
+block, not "no approval request". result_posted reports a result notification,
+not delivery of the initial approval card. If card history is not returned, leave
+delivery unknown. expired and live_block_state=absent are not an approved release.
 later_proposals lists authenticated later broker result references for the same
 target. An old candidate may have been intentionally replaced or reverted.
 Read the exact status of the original and relevant later proposal IDs, and the
@@ -1410,6 +1478,30 @@ is relevant, read actual registered agent/interface information and match the
 address; otherwise report the source IP and explicitly leave its host name unknown.
 Registered IP is not an exhaustive list of interfaces and no match is not proof
 of maliciousness, benignness, a private-address exemption or missing authority.
+For impact investigation identify the PROTECTED destination, not just the source.
+Use mcp__wazuh_ro__get_wazuh_agents with its required status and bounded limit to
+discover actual agent IDs; do not invent an ID or assume only active assets exist.
+Use mcp__system_diagnostics__get_system_diagnostics(target="soc:coverage") to
+discover actual published diagnostic coverage, then read a relevant target.
+For that verified agent and event interval use the typed
+mcp__security_events__search_wazuh_alerts(agent_id, since_kst, until_kst, limit<=50),
+not an invented query argument. Select relevant existing process/port reads when
+needed. Agent/diagnostic discovery alone is not an impact check, and current
+snapshots cannot prove historical absence of compromise. Missing source inventory
+does not prevent investigation of the protected service. Never guess a backend
+mapping from an agent name; report the exact missing route/asset/log evidence.
+For sensor incidents with a linked containment/change, or a remediated
+assessment, resolution requires a successful protected-agent incident-time
+search_wazuh_alerts read (agent_id + explicit since_kst/until_kst, no source/rule
+filter) and citation is a minimum evidence requirement. Repeating sensor/status
+reads, listing agents or reading soc:coverage alone does not satisfy it. It is
+necessary, not sufficient: returned0/full-window unknown is never proof of no
+compromise. Assess application/host impact with actual relevant evidence or
+remain unresolved. Do not guess an asset merely to satisfy the read contract.
+This action-verification requirement does not force an unacted benign DNS/noise
+classification to invent a monitored external destination. Judge that case using
+its actual sensor/context evidence; private IP, lab purpose and zero samples
+alone still do not establish benignness.
 DetectionOnly records detection, not prevention or absence of compromise. Read
 the actual sensor events and response/block status before assessing outcome;
 HTTP 200/400/403 alone is not proof of execution success or attack prevention.
@@ -1705,6 +1797,12 @@ def run_hermes(store, case, prompt):
 
 
 def incomplete_report(detail):
+    if detail == 'incident_impact_verification_missing':
+        return ("사건 종결의 근거가 부족해 추가 검토가 필요합니다. 종결·정상 판정은 채택하지 않았습니다.\n\n"
+                "| 확인 항목 | 검증 결과 | 미확인·다음 조치 |\n|---|---|---|\n"
+                "| 센서·대응 조회 | 조회 이력은 보존됨 | 경보 매칭·403·만료만으로 침해 해소를 판단할 수 없음 |\n"
+                "| 보호 대상 영향 | 사건 구간의 자산별 경보 조회·인용 미충족 | 실제 목적지 자산과 앱·호스트 근거 추가 조사 |\n"
+                "| 사건 상태 | 추가 검토 | 조회 성공·반환0건을 정상·종결로 바꾸지 않음 |")
     safe = detail if detail in {"model_outer_timeout", "model_process_failure", "model_trace_limit",
         "model_prompt_too_large", "interrupted_run_requires_review", "incomplete_model_run_requires_review",
         "model_subprocess_timeout_requires_review", "model_interrupted_requires_review"} else "diagnostic_run_incomplete"

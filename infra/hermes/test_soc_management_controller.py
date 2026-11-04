@@ -160,6 +160,66 @@ class ControllerTests(unittest.TestCase):
             {'tool':'mcp__rule_b__get_rule_change_status','arguments':{'proposal_id':'3'*32}}])
         self.assertEqual(self.store.db.execute('select count(*) from tool_calls').fetchone()[0],0)
 
+    def test_reference_routes_each_real_target_to_its_typed_readonly_api(self):
+        request_id='a'*32
+        for target in m.RULE_TARGETS | m.SERVICE_TARGETS | {'a:incident-ip'}:
+            with self.subTest(target=target):
+                ref=m.proposal_read_reference({'id':request_id,'target':target})
+                rule=target in m.RULE_TARGETS
+                self.assertEqual(ref['status_tool'],'mcp__rule_'+target[0]+'__'+
+                                 ('get_rule_change_status' if rule else 'get_operation_status'))
+                self.assertEqual(ref['status_arguments'],
+                                 {'proposal_id' if rule else 'request_id':request_id})
+                expected=('mcp__resp__list_blocks' if target=='a:incident-ip' else
+                          'mcp__rule_'+target[0]+'__'+
+                          ('get_rule_change_target' if rule else 'get_service_action_target'))
+                self.assertEqual(ref['target_tool'],expected)
+                self.assertEqual(ref['target_arguments'],{} if target=='a:incident-ip' else {'target':target})
+                for key in ('status_tool','target_tool'):
+                    self.assertTrue(runner.allowed(ref[key],'verify'))
+        self.assertEqual(self.store.db.execute('select count(*) from tool_calls').fetchone()[0],0)
+
+    def test_sensor_containment_review_does_not_shrink_to_expired_approval(self):
+        event=self.alert('impact-review',rule='100102')
+        event['location']='/logs/modsec/audit.log'
+        self.alerts(event)
+        case=dict(self.store.next_case(),mode='verify',operator_review=True)
+        evidence=self.store.context(case['id'])
+        evidence['proposals']=[{'id':'a'*32,'target':'a:incident-ip','status':'expired'}]
+        prompt=m.prompt_for('policy',case,evidence)
+        current=json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n',1)[1])['request']
+        self.assertIn('센서 경보를 포함하므로',current)
+        self.assertNotIn('이번 사건의 종결 범위는 해당 변경 절차',current)
+        self.assertIn('유지 미승인과 승인 카드 미게시를 혼동하지',current)
+        self.assertIn('공격 출발지가 아니라 실제 보호 대상',current)
+        self.assertIn('mcp__resp__list_blocks',current)
+        self.assertNotIn('mcp__rule_a__get_rule_change_target',current)
+        self.assertIn('result_posted reports a result notification',prompt)
+
+    def test_change_only_review_keeps_its_bounded_recovery_scope(self):
+        case,evidence=self.lookup_case()
+        case.update(chat_readonly_lookup=False,operator_review=True)
+        evidence['proposals']=[{'id':'a'*32,'target':'b:wazuh-local-rules'}]
+        prompt=m.prompt_for('policy',case,evidence)
+        current=json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n',1)[1])['request']
+        self.assertIn('센서 경보가 없는 변경 절차만의 검토',current)
+        self.assertNotIn('이 사건은 센서 경보를 포함하므로',current)
+        self.assertNotIn('post_incident_read_plan',prompt)
+
+    def test_sensor_impact_discovery_is_navigation_not_a_read_or_a_completion(self):
+        event=self.alert('no-proposal-impact',rule='100102')
+        event['location']='/logs/modsec/audit.log'
+        self.alerts(event)
+        case=dict(self.store.next_case(),mode='verify',operator_review=True)
+        prompt=m.prompt_for('policy',case,self.store.context(case['id']))
+        self.assertIn('get_system_diagnostics(target="soc:coverage")',prompt)
+        self.assertIn('get_wazuh_agents with its required status',prompt)
+        self.assertIn('not an invented query argument',prompt)
+        self.assertIn('discovery alone is not an impact check',prompt)
+        self.assertIn('current snapshots cannot prove historical absence',' '.join(prompt.split()))
+        self.assertIn('Missing source inventory',prompt)
+        self.assertEqual(self.store.db.execute('select count(*) from tool_calls').fetchone()[0],0)
+
     def test_interrupted_and_timeout_results_remain_unresolved_with_precise_diagnostics(self):
         for index,(returncode,native,outer,expected) in enumerate((
             (124,130,None,'model_subprocess_timeout_requires_review'),
@@ -354,10 +414,75 @@ class ControllerTests(unittest.TestCase):
         self.store.review(trace.case['id'],'Exact historical evidence required');trace=self.trace()
         payload['alerts'][0]['timestamp']='2026-10-22T20:46:50.158+09:00'
         self.tool(trace,name,payload,{'until_kst':'2026-10-22T21:00:00+09:00','source_ip':event['src_ip']})
+        host='mcp__security_events__search_wazuh_alerts'
+        args={'agent_id':'002','since_kst':'2026-10-22T20:46:00+09:00','until_kst':'2026-10-22T21:00:00+09:00','limit':50}
+        self.tool(trace,host,{'source':'wazuh','source_scope':'wazuh_indexed_alerts','alerts':[],
+            'requested_since_kst':args['since_kst'],'requested_until_kst':args['until_kst']},args)
         decision={'assessment':'benign','basis':'시험 대역에서 제공한 사건 근거를 모델이 오탐으로 판정했다. 의미 판단의 진실성 검사가 아니다.',
-                  'evidence_tools':[name]}
+                  'evidence_tools':[name,host]}
         self.result(trace, '모델의 사건 판단.\nINCIDENT_DISPOSITION: '+json.dumps(decision,ensure_ascii=False)+'\nMANAGEMENT_STATUS: resolved')
         self.assertEqual(trace.finish(0)['state'],'completed')
+
+    def test_impact_query_requires_agent_wide_incident_time_receipt(self):
+        at=m.datetime.fromisoformat('2026-10-29T19:15:45+09:00').timestamp()
+        refs={('modsecurity','192.0.2.45',at,'100102')}
+        args={'agent_id':'002','since_kst':'2026-10-29T19:15:00+09:00','until_kst':'2026-10-29T19:16:00+09:00','limit':50}
+        payload={'source':'wazuh','source_scope':'wazuh_indexed_alerts','alerts':[],
+                 'requested_since_kst':args['since_kst'],'requested_until_kst':args['until_kst']}
+        name='mcp__security_events__search_wazuh_alerts'
+        self.assertEqual(m.impact_read_timestamps(name,args,payload,refs),{at})
+        for change in ({'source_ip':'192.0.2.45'},{'wazuh_rule_id':'100102'},{'agent_id':''},
+                       {'since_kst':'2026-10-29T19:15:00'},{'until_kst':'2026-10-29T19:15:00+09:00'}):
+            with self.subTest(change=change):self.assertEqual(m.impact_read_timestamps(name,dict(args,**change),payload,refs),set())
+        for change in ({'source':'suricata'},{'requested_until_kst':'2026-10-29T19:15:30+09:00'},
+                       {'alerts':[{'agent_id':'003'}]},{'source_scope':'current_snapshot'}):
+            with self.subTest(change=change):self.assertEqual(m.impact_read_timestamps(name,args,dict(payload,**change),refs),set())
+        self.assertEqual(m.impact_read_timestamps('mcp__wazuh_ro__get_wazuh_agents',args,payload,refs),set())
+
+    def test_sensor_match_and_discovery_or_expiry_cannot_replace_host_investigation(self):
+        for index,variant in enumerate(('no-impact','discovery-only','uncited-impact')):
+            event=self.alert('closure-'+variant,'2026-10-29T19:15:45+09:00','100102')
+            event.update(location='/logs/modsec/audit.log',src_ip='192.0.2.'+str(40+index))
+            self.alerts(event);trace=self.trace();name='mcp__security_events__search_modsecurity_alerts'
+            request_id=str(index+1)*32
+            self.store.db.execute('insert into proposals(id,case_id,tool,status,result_status,target) values(?,?,?,?,?,?)',
+                (request_id,trace.case['id'],'mcp__rule_write_a__temporarily_contain_ip','expired','expired','a:incident-ip'))
+            self.tool(trace,'mcp__rule_a__get_operation_status',{'request_id':request_id,'target':'a:incident-ip','status':'expired','live_block_state':'absent'},
+                {'request_id':request_id})
+            self.tool(trace,name,{'source':'modsecurity','source_scope':'wazuh_indexed_alerts',
+                'alerts':[{'timestamp':event['timestamp'],'source_ip':event['src_ip'],'wazuh_rule_id':'100102'}]})
+            self.tool(trace,'mcp__resp__list_blocks',{'blocks':[]})
+            if variant=='discovery-only':
+                self.tool(trace,'mcp__wazuh_ro__get_wazuh_agents',{'agents':[{'id':'002'}]},{'status':'active'})
+                self.tool(trace,'mcp__system_diagnostics__get_system_diagnostics',{'targets':[]},{'target':'soc:coverage'})
+            if variant=='uncited-impact':
+                args={'agent_id':'002','since_kst':'2026-10-29T19:15:00+09:00','until_kst':'2026-10-29T19:16:00+09:00'}
+                self.tool(trace,'mcp__security_events__search_wazuh_alerts',{'source':'wazuh','source_scope':'wazuh_indexed_alerts','alerts':[],
+                    'requested_since_kst':args['since_kst'],'requested_until_kst':args['until_kst']},args)
+            decision={'assessment':'benign','basis':'WAF403과 경보 표본 부재만으로 위험이 해소됐다고 주장하는 잘못된 모델 결과입니다.',
+                      'evidence_tools':[name]}
+            self.result(trace,'정상으로 종결할 수 있다는 미검증 주장입니다.\nINCIDENT_DISPOSITION: '+json.dumps(decision,ensure_ascii=False)+'\nMANAGEMENT_STATUS: resolved')
+            result=trace.finish(0)
+            with self.subTest(variant=variant):
+                self.assertEqual(result['state'],'needs_review')
+                row=self.store.db.execute('select detail,final_text from cases where id=?',(trace.case['id'],)).fetchone()
+                self.assertEqual(row[0],'incident_impact_verification_missing')
+                self.assertNotIn('정상으로 종결할 수 있다는',row[1])
+                self.assertIn('| 보호 대상 영향 |',row[1])
+
+    def test_unacted_benign_sensor_classification_does_not_invent_an_external_agent(self):
+        event=self.alert('unacted-dns','2026-10-29T19:15:45+09:00','100110')
+        event['location']='/logs/suricata/eve.json';self.alerts(event)
+        name='mcp__security_events__search_suricata_alerts'
+        for assessment,expected in [('benign','completed'),('remediated','needs_review')]:
+            trace=self.trace()
+            self.tool(trace,name,{'source':'suricata','source_scope':'wazuh_indexed_alerts',
+                'alerts':[{'timestamp':event['timestamp'],'source_ip':event['src_ip'],'wazuh_rule_id':'100110'}]})
+            decision={'assessment':assessment,'basis':'관측된 DNS 요청과 운영 문맥을 대조한 모델의 판정이며 실제 조치 이력이 없는 사건이다.',
+                      'evidence_tools':[name]}
+            self.result(trace,'사건별 근거를 대조했습니다.\nINCIDENT_DISPOSITION: '+json.dumps(decision,ensure_ascii=False)+'\nMANAGEMENT_STATUS: resolved')
+            self.assertEqual(trace.finish(0)['state'],expected)
+            if expected=='completed':self.store.review(trace.case['id'],'Verify a distinct remediation claim without invented action',reopen_completed=True)
 
     def test_matching_real_event_does_not_resolve_an_unassessed_incident(self):
         event=self.alert('real-waf','2026-10-29T19:15:45.764+09:00',rule='100102')
@@ -1081,11 +1206,11 @@ class ControllerTests(unittest.TestCase):
     def test_operator_proposal_prompt_routes_original_and_successors_to_same_host(self):
         self.events(self.incident())
         case = dict(self.store.next_case(), operator_review=True)
-        for host in ('a', 'b'):
+        for host,target in (('a','a:suricata-local'),('b','b:wazuh-local-rules')):
             with self.subTest(host=host):
                 evidence = self.store.context(case['id'])
-                evidence['proposals'] = [{'id': 'a' * 32, 'target': host + ':rules'}]
-                evidence['later_proposals'] = [{'id': 'b' * 32, 'target': host + ':rules', 'follows': ['a' * 32]}]
+                evidence['proposals'] = [{'id': 'a' * 32, 'target': target}]
+                evidence['later_proposals'] = [{'id': 'b' * 32, 'target': target, 'follows': ['a' * 32]}]
                 prompt = m.prompt_for('policy', case, evidence)
                 current = json.loads(prompt.rsplit('\nTRUSTED_CURRENT_REQUEST_JSON\n', 1)[1])['request']
                 for name in ('get_rule_change_status', 'get_rule_change_target'):
@@ -1097,7 +1222,7 @@ class ControllerTests(unittest.TestCase):
                 self.assertNotIn('mcp__rule_write_', current)
 
     def test_unknown_proposal_target_does_not_invent_a_registered_tool(self):
-        for target in ('', 'c:rules', 'b', 'b__;sudo', None):
+        for target in ('', 'a:rules', 'b:rules', 'c:rules', 'b', 'b__;sudo', None):
             with self.subTest(target=target):
                 self.assertEqual(m.proposal_read_reference({'id': 'a' * 32, 'target': target}),
                                  {'proposal_id': 'a' * 32, 'target': target})

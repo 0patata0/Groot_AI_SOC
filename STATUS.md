@@ -1,6 +1,6 @@
-# 인프라 현황 — 2026-11-04 21:13 KST
+# 인프라 현황 — 2026-11-04 22:04 KST
 
-전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [직전 상태](archive/STATUS-before-gate-binding-20261104.md) · [사건 표 전](archive/STATUS-before-incident-review-20261104.md) · [조회·지침 전](archive/STATUS-before-read-accuracy-ncsc-20261104.md) · [조회 지연 전](archive/STATUS-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/STATUS-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/STATUS-20261104-before-web-e2e.md) · [표 보완 전](archive/STATUS-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/STATUS-20261104-before-fw-chat.md) · [FW 선택 전](archive/STATUS-20261104-before-fw-scope.md) · [룰 감사 전](archive/STATUS-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/STATUS-20261104-before-web-policy.md) · [과거 이력](archive/STATUS-history-20261101.md).
+전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전](archive/STATUS-before-incident-impact-20261104.md) · [직전 상태](archive/STATUS-before-gate-binding-20261104.md) · [사건 표 전](archive/STATUS-before-incident-review-20261104.md) · [조회·지침 전](archive/STATUS-before-read-accuracy-ncsc-20261104.md) · [조회 지연 전](archive/STATUS-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/STATUS-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/STATUS-20261104-before-web-e2e.md) · [표 보완 전](archive/STATUS-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/STATUS-20261104-before-fw-chat.md) · [FW 선택 전](archive/STATUS-20261104-before-fw-scope.md) · [룰 감사 전](archive/STATUS-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/STATUS-20261104-before-web-policy.md) · [과거 이력](archive/STATUS-history-20261101.md).
 
 ## 현재 우선 과제와 실제 결과
 
@@ -10,7 +10,7 @@
 | 공통 출력·카드 | 단일soc-output SKILL에 사건/자동조사/검증실패 표를 통합. 실제 브라우저에서 Hermes·Ollama WAF와 새 사건대체보고 각1표와 양봇FW분할3게시물5표·총6게시물8표/표코드블록0 확인,918PASS/skip0 | 모든 출력 경로·새 정기 카드·단일 초장문 행/native UX/skill_manage 실제 제한 연결은 별도. 과거 게시물 소급 수정0. [검증·범위](infra/hermes/incident-followup.md) |
 | 조회 정확성 | 한국어 상태 필터·WAF 설정/시작값/정책 분리·단문 실제MCP·SDK 대상 바인딩 보완,903PASS/skip0. 실제 새 WAF Hermes26.314초·Ollama9.874초/각1MCP·보호쓰기0 | 중간 오답/미조회 후보는 실패로 보존. worker 메모리/개별 공격·평균 지연 보장 아님. [배포·복구·원출처](infra/hermes/read-accuracy.md) |
 | 구축·운영 지침 | NCSC 기본지침2026.5.1·NIS AI가이드v2.0/공급망 번역 공식원문3개 SHA·조항/페이지 대조, 운영절차 신설·과거 WAF 우회/면제 안내 정정 | 부분 대조이며 기관 준수 인증 아님. 로그1년/백업복원·NTP/전체 관리 경로·인력 요건·새 설치 미검증. [대조표](deployment/SECURITY_GUIDELINES.md) · [운영](deployment/OPERATIONS.md) |
-| 사건 근거·중복 | 실제 포함gate가 파일과 달라 이번 초반 보완이 실행되지 않은 원인 확인·SHA 결속 검사/실행코드 동기화. 마지막 상태+원WAF+후속WAF/IDS4MCP·필수센서3/3·오류0·927PASS |195.332초/needs_review. 침해영향·사건 종결, 승인요청/미승인만료 혼동 문구·시각 경계/표본 표현 잔여. 속도 향상으로 표시하지 않음. [실제 실행·검증·복구](infra/hermes/management-gate-binding.md) |
+| 사건 근거·종결 검사 | 실제 포함gate SHA 결속/필수센서3/3 유지. 룰·서비스·차단 상태 API/ID를 분리하고 대응 사건의 종결 전 자산별 사건 구간 조회·인용을 검사. 실제8호출의 잘못된 종결 재생은 거절·최종344PASS | 새 실재검토8MCP·오류0·193.809초, agent002 경보7표본/전체미확인·진단coverage조회 뒤 unresolved/needs_review. 실제 백엔드 진단/앱·사후영향, 초기적용/유지승인 경과 상세·보고 의미 전반·SDK일반채팅 동일 종결검사는 잔여. [실제 실패·검증·복구](infra/hermes/incident-impact.md) |
 | 공개 웹 보안 경로 |11/4 C11:36:56·A11:37:21 적용,11:39 각각 확정. Log4Shell UI/API와 등록 HTTP3개 모두 WAF,10031 DetectionOnly 예외 제거. 제어는 관리자231/32+새 HMAC 세션. A reload·C API만 재시작 | 실제 브라우저 인증→제어는 미검증. 관리형 HTTP3개는 기존 중지·등록 Log4 앱503, 별도 legacy 컨테이너와 구분. 단일 DVWA SQLi 경로는 아래 실검증 범위. [변경·검증·원복](infra/validation/web-policy/README.md) |
 | 실제 공개 경로 검증 | Kali23214조건: UI/상태/세션200·DVWA302·채팅200, 익명 제어/위조 관리자 헤더403, 비공개/미등록404, UI/API 무해 canary403, C 직접 웹 시간 초과. 관리자231 challenge200·Wazuh302 | 시간 초과를 특정 DROP 카운터 증명으로 표시하지 않음. 정상 열람과 취약 서비스 가동·침해 여부를 구분 |
 | WAF 대응 증거 | 이전 관리 ACL 전 proxy SHA가 남은 신뢰 기록 발견.11:41 검토한 proxy/vhost 두 SHA만 갱신, CID/binding/포트·요건 유지.11:42 실제 WAF/proxy writer3개씩 두 번 확인 | 이번 DVWA 단일 SQLi의 실제 원문→LLM MCP 차단/카드·만료는 확인. 전체 공격/승인 실행·종결은 미완료. 원복 시 정확 설정 재등록 필요 |
@@ -41,15 +41,15 @@
 | 순서 | 다음 작업 | 완료 근거 |
 |---|---|---|
 |1| 웹 실제 가동/공격·증거·대응, IDS7 통합의 지속성/별칭/승인·복구, Wazuh9쌍의 격리 EventChannel 검증, FW 우회·egress·B/C 컨테이너 관리 경로 | 단일 WAF→LLM→600초/카드/만료는 확인. 실제 앱·다른 공격·유지/해제 승인·재차단 대조와 사건 종결이 남음. 검증한 중복만 승인형 통합, 근거 없는 삭제 없음 |
-|2| LLM 전 업무 공백 보완 | 최우선 실제 사건의 근거 인용/종결·중복 시각 JSON/미등록 자산명/분류·상관 혼동·임시 차단 지연 보완. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
+|2| LLM 전 업무 공백 보완 | 최우선 가능한 실제 백엔드 진단/앱·호스트 영향과 사건 사후구간 조사, 목적지/수집 agent 관계·승인 경과 상세와 종결 의미 보완. Root 최소 종결검사는 적용했지만 SDK 일반채팅 동일 검사·미등록 자산명/분류·상관 혼동·임시 차단 지연은 잔여. C/고정 host 제어의 승인형 MCP·권한/검증/복구, 실제 브라우저 UI·단일 초장문 규칙 표시·단문/추가 요청·상관분석/종결·교차 검토 새 채팅 회귀 |
 |3| FW NAT 통합·운영 하네스 후보 정리 | 기존 NAT6을 관리자231/현재 로더SHA로 재기준·kernel/TTL/복구 검증. 기존 peer4는 이번 인수·배포했고 Ansible2는 별도 미확정 |
 |4| 독립 평가·보호쓰기/원복·장애/복구·재현 |176 미사용 평가, 원본/학습·하네스 조합 비교, 장기 알림/Vector·수집 장애 무손실, 데이터 원본1+정제본1 통합/SHA |
-|5| 논문·최종 발표 |11/4 로컬 초안을 현행WAF/Native 예외·실PCAP/단일DVWA·최신학습3군/한영초록·한계로 최신화/이전본 보존. 그림/PDF·전체인용·제출형식/독립평가·전과정결과 미완료. 발표작성11월둘째주 이후·최종12/1 |
+|5| 논문·최종 발표 |11/4 초안의 현행WAF/Native 예외·실PCAP/단일DVWA·학습3군/한영초록·한계 및 시스템SVG 단독 시각검수, 참고문헌11개 서지/해당 개념 대조·이전본 보존. 최신PDF·전체 출판본/제출형식·독립평가/전과정 결과 미완료. 발표작성11월둘째주 이후·최종12/1 |
 
 OpenClaw/Harness², SSL VPN/모바일, GPU 드라이버 장기 원인·새 OS3대 전체 설치는 별도 검토다. 모든 공격 차단·보안 구멍0·LLM 전 업무 완성을 선언하지 않는다.
 
 ## 복구·Git·로컬 정리
 
-이번 단위는 공통1.5.23/query1.19.18·B 총11대상이다. 초반 파일 갱신과 실제 불변 포함gate의 불일치를 발견해21:02:51 root 제어기 포함코드/검사를 동기화했다.21:08:12 소스11/보호8/출력SKILL3SHA·양WS/worker·broker3698161·실제 필수읽기3/3을 확인해 확정·자체timer정지·confirmed recovery no-op. 원본/후보/중간SHA는 `/var/lib/capstone-incident-coverage/20261104-r1/deployment`에 보존한다. 초반 Native컨테이너/SDK/review각2회 재시작, 마지막root한파일반영은재시작0. 모델·일반권한·FW·승인·패키지·포트 변경0.927PASS/skip0·설치38은 소스/렌더 계약이며 새 OS 설치/수동원복/새공격E2E 미실시다.
+이번 단위는 B root 관리 제어기 한파일의 대상별 API 안내·승인/만료 의미·최소 영향 조회/인용 검사다. 공통1.5.23/query1.19.18·포함gate67197ac8·보호config8/출력SKILL3/브로커3698161·양worker 유지,22:03:34 최종확정·독립원복timer정지/confirmed recovery no-op. 원본/세후보/manifest/복구는 `/var/lib/capstone-report-impact/20261104-r1/deployment`에 보존한다. 컨테이너/worker/모델 재시작0·FW/승인/일반권한/패키지/포트 변경0이다. 첫 후보의 실제 잘못된 종결은 보존·기존 API로 읽기전용 재개했고 최신 사건은 미해결이다. r3는 일반 DNS 정상 분류까지 과도하게 막지 않도록 범위를 정밀화·두 실제 출력 재생/344검사로 검증했고 별도 r3모델 생성은 하지 않았다.
 
-서버18검사로그 SHA/원문 내보내기 뒤 검증copy/mirror 각424파일·6,463,160B를 정리했다. Mac 자체33파일·7,387,183B/스크립트·묶음·SSH mux를 제거하고 임시 부모 부재를 확인했다. 관련 공개22파일을 `61d232875beb837cd2a4124259008e4b5ff5e52e`로 커밋·푸시했고 2026-11-04T21:14:04.209379+09:00 실제원격main 일치를 확인했다. 이 게시 확인 STATUS/작은원장2파일은 후속 문서 커밋으로 보존하며 최종원격·작업트리는 로컬기록에 확인한다. 직전4c7eb1d와 이번소스 게시를 구분한다. 논문은 로컬 전용으로 이전본·수정SHA를 보존했고 발표작성0이다. 타NAT6/Ansible2/topology5 stage·자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.
+서버9로그 SHA 반출 뒤 격리424소스와 재생DB복사2개(총426파일·25,435,198B)를 제거했다. Mac 자체237파일·212,659,087B/반입묶음·스크립트·Swift module cache·SSH mux3개를 정리하고 임시부모/자체SSH잔여0을 확인했다. 운영 DB/승인/채팅·원본·복구·가중치는 보존한다. 이번 공개 소스/문서는 아직 Git 게시 전이며 직전64443e8과 구별한다. 논문·참고문헌 원장·그림/PNG 검수는 로컬 전용, 최신 PDF 미생성·발표작성0이다. 타NAT6/Ansible2/topology5 stage·자격/대화/검증/업무분담/논문·발표/데이터·가중치 제외를 유지한다. 전체 목표active·미완료다.

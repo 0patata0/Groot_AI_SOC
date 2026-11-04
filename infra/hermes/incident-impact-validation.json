@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-04T22:03:34.567099+09:00",
+  "contract": "1.5.23",
+  "query": "1.19.18",
+  "controller_revision": "20261104-impact-r3",
+  "tests": {
+    "management": 247,
+    "installation_contract": 38,
+    "review": 59,
+    "total": 344,
+    "skipped": 0
+  },
+  "first_candidate": {
+    "seconds": 179.45132565498352,
+    "actual_reads": 8,
+    "tool_errors": 0,
+    "unsupported_closure_admitted": true,
+    "record_preserved": true
+  },
+  "actual_error_replay": {
+    "original_run_id": "02f8ac52794abd0fe546110bb0dff135",
+    "original_case_state": "completed",
+    "new_state": "needs_review",
+    "new_detail": "incident_impact_verification_missing",
+    "actual_replayed_tool_calls": 8,
+    "operating_db_mutated": false,
+    "original_model_output_retained": true,
+    "latest_live_run_replay": {
+      "original_run_id": "0394bcc8a3a1ebace1fe54e9e341d735",
+      "new_state": "needs_review",
+      "actual_tool_calls": 8,
+      "host_time_receipt_present": true
+    }
+  },
+  "deployment": {
+    "at_kst": "2026-11-04T22:03:34.567099+09:00",
+    "controller_sha256": "8a952ba8bca260e4cb06113793494b6ad703c47b57dbe2202e2ec15b8c20c8ff",
+    "gate_sha256": "67197ac874e587676d9a4db6d8d7408ee0b43ae75757cc09370e9b40600defe0",
+    "protected_unchanged": 8,
+    "skills_sha256": {
+      "/opt/capstone-management/SKILL.md": "f0d565a9ca2457a784dc7086e863e00c6c33b49607ce7f29ea8f8522647e4ebc",
+      "/opt/hermes-data/plugins/groot-query-completion/SKILL.md": "f0d565a9ca2457a784dc7086e863e00c6c33b49607ce7f29ea8f8522647e4ebc",
+      "/opt/capstone-ollama-trial/SKILL.md": "f0d565a9ca2457a784dc7086e863e00c6c33b49607ce7f29ea8f8522647e4ebc"
+    },
+    "services": {
+      "capstone-review-chat.service": "MainPID=1665454\nActiveState=active\nSubState=running\n",
+      "capstone-ollama-chat.service": "MainPID=1665466\nActiveState=active\nSubState=running\n",
+      "soc-bot.service": "MainPID=3698161\nActiveState=active\nSubState=running\n"
+    },
+    "tests_passed": 344,
+    "actual_run_id": "0394bcc8a3a1ebace1fe54e9e341d735",
+    "actual_seconds": 193.80876755714417,
+    "actual_tool_calls": 8,
+    "actual_tool_errors": 0,
+    "actual_protected_writes": 0,
+    "case_state": "needs_review",
+    "report_delivery_state": "sent",
+    "host_read": {
+      "agent_id": "002",
+      "returned_count": 7,
+      "whole_window_total": null,
+      "requested_since_kst": "2026-11-04T14:48:02.598000+09:00",
+      "requested_until_kst": "2026-11-04T14:48:59.999999+09:00"
+    },
+    "host_time_coverage_verified": true,
+    "actual_backend_diagnostic_read": false,
+    "case_closed": false,
+    "runtime_restarts": 0,
+    "manual_rollback_tested": false,
+    "actual_model_generation_revision": "r2",
+    "final_code_actual_trace_replay": "r3, erroneous closure rejected and latest unresolved preserved",
+    "scope": "typed proposal routing and minimum host-time read/citation admission; full impact and report semantics incomplete",
+    "confirmed_recovery_noop": true
+  },
+  "source_publication": {
+    "status": "pending"
+  },
+  "fresh_install": false,
+  "sdk_chat_closure_parity_complete": false,
+  "full_impact_investigation_complete": false,
+  "report_semantics_complete": false,
+  "cleanup": {
+    "server_validation_and_replay_removed": true,
+    "server_exported_logs": 9,
+    "server_recovery_preserved": true,
+    "mac_temporary_parent_absent": true,
+    "mac_owned_files_removed": 237,
+    "mac_owned_bytes_removed": 212659087,
+    "mac_owned_mux_remaining": 0
+  }
+}

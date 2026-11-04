@@ -123,7 +123,8 @@
     "remote_verified_at_kst": "2026-11-04T17:29:08.251052+09:00",
     "remote_main_matches_source_commit": true,
     "public_files": 40,
-    "publication_receipt_followup_pending": true
+    "receipt_followup_commit": "4744fe18292030464e7a27d553ecc73c00abbcf9",
+    "receipt_followup_remote_verified_at_kst": "2026-11-04T17:29:53.603940+09:00"
   },
   "cleanup": {
     "at_kst": "2026-11-04T17:28:22.087378+09:00",

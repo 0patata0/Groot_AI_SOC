@@ -506,6 +506,10 @@
     }
   },
   "git_publication": {
-    "state": "pending"
+    "state": "source_published_remote_verified",
+    "source_commit": "0a73804e5d7d1d46f23a4e8b1cefdda029e78680",
+    "source_remote_main": "0a73804e5d7d1d46f23a4e8b1cefdda029e78680",
+    "source_verified_at_kst": "2026-11-04T13:59:33.399446+09:00",
+    "publication_metadata": "Recorded by a follow-up documentation commit; final commit and remote proof remain in the local session record."
   }
 }

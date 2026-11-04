@@ -132,7 +132,11 @@
   "fresh_os_install": false,
   "new_attack_e2e": false,
   "source_publication": {
-    "status": "pending"
+    "status": "pushed_verified",
+    "commit": "7f2d1ee2f342635de0287d2c12857827815a56ef",
+    "remote_main": "7f2d1ee2f342635de0287d2c12857827815a56ef",
+    "at_kst": "2026-11-05T01:26:47.341008+09:00",
+    "subsequent_status_update": "separate documentation commit; final head/remote recorded locally"
   },
   "cleanup": {
     "removed_files": 441,

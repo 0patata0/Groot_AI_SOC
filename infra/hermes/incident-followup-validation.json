@@ -64,6 +64,9 @@
   "fresh_install": false,
   "manual_rollback_tested": false,
   "source_publication": {
-    "status": "pending"
+    "status": "pushed_verified",
+    "commit": "7362546865981f02b7d7bf443985d63128039d79",
+    "remote_main": "7362546865981f02b7d7bf443985d63128039d79",
+    "at_kst": "2026-11-04T20:31:43.442957+09:00"
   }
 }

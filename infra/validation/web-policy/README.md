@@ -47,3 +47,7 @@ sudo python3 -I -B /var/lib/capstone-web-security/change-정확한ID/recovery.py
 `deploy.sh`의 source bundle에는 `deployment/`·`infra/`가 포함된다. 기존 service bootstrap이 새 API·UI와 관리자 CIDR을 설치하고 security renderer가 UI/API를 포함한4개 WAF 경로를 렌더링한다. 관리자 CIDR은 신규 설치의 `MANAGEMENT_ALLOWED_CIDRS`를 사용한다. 공개 `LAB_ALLOWED_CIDRS=all`은 웹 열람 범위이고 제어 권한은 아니다. 추가 deb/wheel/이미지·포트·일반 sudo 위임은 없다.
 
 ModSecurity의 요청별 제어와 감사 부분 설정은 [공식 동작](https://modsecurity.org/docs/3-reference-manual/3-5-actions/#ctl)을 기준으로 실제 설치 이미지에서 검증했다. bulk 감사 제외는 모든 탐지 메시지에 임의 비밀 값이 절대 포함되지 않는다는 보증이 아니므로 실제 키를 공격 문자열에 넣거나 로그/채팅으로 전달하지 않는다.
+
+## 게시와 작업용 자료 정리
+
+소스33파일은 `683a2cf5760171291cef26f56778f3b4b0d2754a`로 게시했고 2026-11-04T12:00:28.130347+09:00에 원격main 일치를 확인했다. 게시 확인/정리 결과는 후속 문서 커밋으로 남긴다. A/C 시험 스테이지559/29파일과 Mac 자체 임시36파일을 제거·부재 확인했으며, 운영 root 복구본·로컬 검증 원문과 다른 작업 자료는 보존했다. 실제 가중치/패키지/PCAP·자격·대화 원문은 이 커밋에 포함하지 않았다.

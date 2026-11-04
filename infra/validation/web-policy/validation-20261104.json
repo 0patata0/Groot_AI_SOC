@@ -527,5 +527,20 @@
     "C_approved_MCP_service_control",
     "FW_scoped_reporting_and_full_Mattermost_followup",
     "new_attack_evidence_LLM_cards_release_and_reblock_E2E"
-  ]
+  ],
+  "source_publication": {
+    "head": "683a2cf5760171291cef26f56778f3b4b0d2754a",
+    "remote_main": "683a2cf5760171291cef26f56778f3b4b0d2754a",
+    "at_kst": "2026-11-04T12:00:28.130347+09:00"
+  },
+  "mac_cleanup": {
+    "at_kst": "2026-11-04T12:00:59.108138+09:00",
+    "removed_files": 36,
+    "removed_bytes": 580951,
+    "parent_absent": true,
+    "source_snapshot_files": 36,
+    "new_mac_packages_downloads": 0,
+    "other_tasks_and_server_recovery_preserved": true
+  },
+  "publication_followup": "This post-publication status update is committed separately; final commit and remote match are recorded in local session log."
 }

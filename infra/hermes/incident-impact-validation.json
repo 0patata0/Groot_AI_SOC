@@ -74,7 +74,10 @@
     "confirmed_recovery_noop": true
   },
   "source_publication": {
-    "status": "pending"
+    "status": "pushed_verified",
+    "commit": "58419cf41c527d945fdcb3b7e5532a7f7f6e03b9",
+    "remote_main": "58419cf41c527d945fdcb3b7e5532a7f7f6e03b9",
+    "at_kst": "2026-11-04T22:12:00.284538+09:00"
   },
   "fresh_install": false,
   "sdk_chat_closure_parity_complete": false,

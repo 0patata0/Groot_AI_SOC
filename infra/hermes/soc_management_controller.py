@@ -1576,8 +1576,9 @@ def incomplete_report(detail):
 def deliver(webhook, text, case_id, state, report_id=None):
     if not webhook or not webhook.startswith(("https://", "http://10.200.10.", "http://127.0.0.1")):
         raise ControllerError("report_webhook_invalid")
-    text = re.sub(r'(?m)^MANAGEMENT_STATUS:[^\r\n]*$', "", text).strip()
-    text = re.sub(r'(?m)^INCIDENT_DISPOSITION:[^\r\n]*$', "", text).strip()
+    # Transport only: hide a Markdown-escaped protocol label too. Admission,
+    # evidence validation and case disposition still require the strict syntax.
+    text = re.sub(r'(?m)^(?:MANAGEMENT\\?_STATUS|INCIDENT\\?_DISPOSITION):[^\r\n]*$', "", text).strip()
     silent_review = state == "needs_review" and text in ("[SILENT]", "SILENT")
     if text in ("[SILENT]", "SILENT"):
         if not silent_review:

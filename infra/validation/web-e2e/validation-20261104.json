@@ -1,0 +1,172 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-04T15:21:52.112230+09:00",
+  "scope": "one project-authored non-destructive DVWA SQLi filtering request, existing deployment only",
+  "source_host": "Kali 192.168.16.232, direct SSH",
+  "target": "http://dvwa.grootlab.duckdns.org/dvwa/login.php via A WAF",
+  "training_ingestion": false,
+  "initial_install_executed": false,
+  "installer_code_changed": false,
+  "model_changed": false,
+  "test_id": "soc-e2e-1104-1bd357efbb",
+  "case_id": "d80b6cf203fb35fbdc50699cf9c0e455",
+  "containment_request_id": "7d99282abc03a483fafde20555cf78d9",
+  "actual": {
+    "waf_at_kst": "2026-11-04T14:48:01.609+09:00",
+    "waf_engine": "Enabled",
+    "waf_rule_ids": [
+      942100,
+      949110
+    ],
+    "waf_http_status": 403,
+    "wazuh_at_kst": "2026-11-04T14:48:02.598+09:00",
+    "wazuh_rule_id": 100102,
+    "wazuh_rule_is_frequency_correlation": false,
+    "raw_input": "Wazuh raw audit input, not a proven serial normalized pipeline",
+    "ids_response_direction": "A -> Kali232:59294; HTTP403 signature, not inbound Native attack eligibility",
+    "llm_first_run_mcp_calls": [
+      "mcp__security_events__search_modsecurity_alerts",
+      "mcp__wazuh_ro__get_wazuh_alert_summary",
+      "mcp__rule_write_a__temporarily_contain_ip",
+      "mcp__resp__list_blocks"
+    ],
+    "llm_first_run_mcp_errors": 0,
+    "temporary_block_at_kst": "2026-11-04T14:50:28+09:00",
+    "temporary_deadline_kst": "2026-11-04T15:00:28+09:00",
+    "ttl_seconds": 600,
+    "card_posted_kst": "2026-11-04T14:50:29.119+09:00",
+    "first_report_posted_kst": "2026-11-04T14:51:02.282+09:00",
+    "blocked_tcp_source_port": 43019,
+    "matched_kernel_syn_logs": 3,
+    "http_sent_during_block": false,
+    "after_expiry_http_status": 200,
+    "expired_record_consumed": true,
+    "expired_result_card_actions": 0,
+    "approval_keep_release_executed": false,
+    "case_after_4_runs": "needs_review",
+    "case_detail": "incident_disposition_evidence_missing",
+    "single_sample_request_to_block_seconds_approx": 146.4,
+    "managed_log4_app_http_status": 503,
+    "managed_http_apps_running": 0
+  },
+  "vector": {
+    "guard_rejections_kst": [
+      "14:41:19",
+      "14:41:53"
+    ],
+    "guard_error": "new_generation_cursor_unsafe",
+    "automatic_recovery_kst": "14:42:28",
+    "rotation_completed_kst": "14:46:19",
+    "both_raw_active_no_pending_at_kst": "14:47:48",
+    "guard_relaxed_or_checkpoint_reset": false,
+    "whole_history_no_loss_proven": false
+  },
+  "clock_remote_minus_Mac_seconds_bounds": {
+    "A": [
+      -0.033162381,
+      0.139083619
+    ],
+    "B": [
+      -0.053377072,
+      1.040166928
+    ],
+    "Kali232": [
+      -8.080858355,
+      -7.595166355
+    ]
+  },
+  "display_fix": {
+    "file": "infra/hermes/soc_management_controller.py",
+    "function": "deliver",
+    "decision_or_approval_validation_changed": false,
+    "installed_before_sha256": "37a374824c99b2b819d5b4fd7969e8a8164477cf7c727374da10df7cd382b80c",
+    "installed_after_sha256": "76f006ff77b41045233f1678692d5940ac5cf49c5872c3242478acee459ba271",
+    "applied_kst": "2026-11-04T15:11:14.248699+09:00",
+    "verified_kst": "2026-11-04T15:12:14.191429+09:00",
+    "other_AST_nodes_unchanged": true,
+    "protected_configurations_unchanged": 6,
+    "service_or_model_restarts": 0,
+    "installed_function_isolated_sender_cases": 2,
+    "new_real_Mattermost_delivery_verified": false,
+    "management_tests_pass": 209,
+    "installation_contract_tests_pass": 37,
+    "tests_skip": 0,
+    "first_fixture_failures_preserved_locally": true,
+    "initial_installer_receipt_absent": true,
+    "recovery_path": "/var/lib/capstone-report-controls/20261104-r1/deployment",
+    "manual_rollback_exercised": false,
+    "confirmed_recovery_noop": true
+  },
+  "source_sha256": {
+    "infra/hermes/soc_management_controller.py": "6cc327eba41bb1240a2c49463972ebad8714effbab730a6f3fbb04a8205393d6",
+    "infra/hermes/test_soc_management_controller.py": "dca85879bdef8db6b7e46c412059b09a3dc71150f757ebb47d88131806cdb0ad"
+  },
+  "proof_files_sha256": {
+    "a-before.json": "f27a821f3ddb0e0a69f0bf59b1250bd11cd993444bf13b8f398f594c4a94c2cf",
+    "a-containment-final.json": "ad891ae500e3d048237926a1f57bd64afa78eeccf4dd270f063dbba0bbab45f1",
+    "a-current-readers.json": "224c09303a6879e11ba34367be227c9cc0b04147aad247894695bc4683ead504",
+    "a-cursor-read.json": "8910cb42501bf9dbbf29277d9fe6af1487f5df84b47f8a93bc0abdc6364cb145",
+    "a-event-baseline-final.json": "b4a0bc7df56a27011552281a8a25c0dd7c6a751697a8725fcd1221f938bb73dc",
+    "a-event-baseline.json": "2751ba64e7bf3a58127edbbae8b80b8408a3b14c872ca5115a2179b4c702a1ce",
+    "a-events1.json": "0a6aaa47bf20eb1cb387ab629a90ef0031cbf9e7a2f85d92a8e70e8fd1d54230",
+    "a-events2.json": "1c3fde57c5b0730f0c7facf185b398093e06bf7c806942053806973ef5d7ec46",
+    "a-expiry.json": "3604a6e8805a6ed42718e2409b1614c6103ecc5aa6ef5e07724b33cea29d9059",
+    "a-inventory.json": "897045eb01fe368405e712e1009c78f6384aba0efa2d66fe03cea2a7ecee9cea",
+    "a-pipeline-diagnose.json": "919cef626f242c5cc6cff7b95e0940fb26780077f100d38ed28b7ea73f049218",
+    "b-controller-inventory.json": "088ca4ba78c8cc59124b403e96694137f8a4a004cd026bc7feca86c9fa97fe99",
+    "b-events1.json": "e75e210c4fb02e268dde5fdcd8adc67d1c9d0393c2bbd6b61f190f887dc0629f",
+    "b-events2.json": "dad601fcf3d4db1dab6eb0b890eed69ef3888f7e6ea6f3f9085bdfa1dd60fb49",
+    "b-events3.json": "80ce3b8f59d656d0458a4ecea645d1a16d41d2aad510f35a5e14532e7a33ff41",
+    "b-events4.json": "132a2ecec5782c2da377aed02d3ce6de798dcff987a9a544db066a15529a550a",
+    "b-expiry.json": "fd8c843ea611993dba7c58829395b05786526875ecd85e8bdd74fc89350b838f",
+    "b-inventory.json": "1317bfc56ed512c81298db43af525960de6e5a50bc604d350a649cc9d1e17222",
+    "b-trace-final.json": "d113448bfd49252141c343c9e81d4607ca236a591787ae9f3acd326a6d7f4dc6",
+    "b-trace1.json": "d2a90358d06b4c66e30649cb7f2cf3de97ab8a5691c6cfce40a9a88f105a73f5",
+    "c-inventory.json": "0a45debd8c2d795e8718767f4ecc6ecc49dcfcd862dfbd164e67450b7a682141",
+    "clock-A.json": "1962eba4142cdc0d2fd08ce1a04f040ba07f96a2b70f1f0e16b581da77c2b6bc",
+    "clock-B.json": "bbf0b2989b9f13191f37741c38dae29721d764965ebe3b0e84342e971aba63e2",
+    "clock-K2.json": "0e5d7628b54d7ba3954521d10d3a692941a59150d916daaca1d911c229930bd1",
+    "clock-pair-A.json": "6de8b20c83747aba5923f822fe66ed76a8019704f56cfc0b19bf07042238498b",
+    "clock-pair-B.json": "d630de6be999648deca64b9dc73c04afb6f3dda3b337217e7560c18673edc6b9",
+    "clock-pair-K2.json": "6bbaae578c5d0ce8b711c79b475bfe9d19402f55ce64ff14340778b0bebb9082",
+    "k2-after-expiry.json": "c226adf1ea821934404e2694302ef1c600abb9f4f1015d4eb1b7db7a6535ac20",
+    "k2-attack.json": "93a16963d449e37835cba531fbc5bcaafb5c46f1320196b75b1787fdb883a7d0",
+    "k2-baseline.json": "7324abbf842250ad9f87531862b6a960311d298c71b5416a6fb0da65109322ad",
+    "k2-blocked-normal.json": "eee118343672632aa1840f4ad072f91b0113c4c67d729decf7e28c33ec60c76e",
+    "mac-cleanup.json": "209e42300a3eb297770e102e8bdc8bce0ea2e2d7bd26a8d9fb2ed37e693da1e8",
+    "mattermost-events-before-expiry.json": "79aff2d18e8650ab063c164be2d95ffde61d5953031c52cccecc31d9a390bcc2",
+    "mattermost-events.json": "9b181d115200e99c2a6a2bc5aef1d6db6f84ceec2eb295347a61d1fcdc8cf8ef",
+    "report-applied.json": "ae0b092b394306110e97d28afdc27eed7ebbef0df5b8cd0bc803842202197686",
+    "report-export.json": "f80ac968c4b6bbdd4d48e7ec4705f0c63d1e2c77bfcc4352cf5505e465d79844",
+    "report-tests-final.json": "527b650232258331fd3532f9c0c9e3cc35990bb7b778ae0b9c12ba5329f74d85",
+    "report-tests-final2.json": "87098c1ee82afa6086245daeefeb02cbbd71cf014b40fc544595930f38d01e95",
+    "report-tests.json": "cdc2465697f25fed3897824cd1a8d9a1301042869fd5f050774e2784a3496f95",
+    "report-verified-final.json": "db7c960a376cba545041d5dca5b510e972a8cf77c468bee0b57f46653b9704d2",
+    "report-verified.json": "88929e1289dc0b6ccd6742700c6eed35849f01869889f5c06d8a3623af74c47e",
+    "run.json": "ee4edf953c7c770712af5a47813311ecdc2ca2275be685df27e19b6364d6576a",
+    "server-cleanup.json": "51cb0d2f9dcfd4d2a628287b1d9a513bc0307956c6a3623c9621cd1aca8ddac4",
+    "workspace.json": "c7179dcbba6fa95dcecf54740f59fdd6e0f6b15485909c6327f0e74746773c41"
+  },
+  "cleanup": {
+    "server_at_kst": "2026-11-04T15:18:45.254379+09:00",
+    "server_validation_removed_files": 362,
+    "server_recovery_and_small_receipt_preserved": true,
+    "Mac_at_kst": "2026-11-04T15:21:52.110911+09:00",
+    "Mac_temp_parent_absent": true,
+    "Mac_packages_installed": 0,
+    "package_downloads": 0
+  },
+  "remaining": [
+    "case disposition evidence and duplicate JSON fallback",
+    "unregistered Socorro/lab assumption/Wazuh classification vs correlation",
+    "first containment delay",
+    "real Log4 managed app availability",
+    "KEEP/RELEASE approval execution, new attack and cooldown",
+    "broader attacks, long-term pipeline no-loss, new-server full install",
+    "new real report after display fix and manual source rollback"
+  ],
+  "publication": {
+    "state": "pending",
+    "previous_unit_final_commit": "01c93f941842846e93c34c61af65fb19df11742f"
+  }
+}

@@ -1008,6 +1008,30 @@ class ControllerTests(unittest.TestCase):
 class DeliveryTests(unittest.TestCase):
     webhook = "https://mattermost.invalid/hooks/review-fixture"
 
+    def test_escaped_internal_labels_hidden_without_changing_report_or_decision_admission(self):
+        opener=mock.Mock();opener.open.return_value=Response(b'', '')
+        body='차단 요청은 승인 대기입니다. request\\_id='+('b'*32)
+        text=body+'\nINCIDENT\\_DISPOSITION: {"assessment":"remediated","basis":"internal-only"}\nMANAGEMENT\\_STATUS: resolved'
+        with mock.patch.object(m.urllib.request,'build_opener',return_value=opener):
+            m.deliver(self.webhook,text,'a'*32,'needs_review')
+        message=json.loads(opener.open.call_args.args[0].data)['text']
+        self.assertIn(body,message)
+        self.assertIn('추가 검토 필요',message)
+        self.assertNotIn('DISPOSITION',message)
+        self.assertNotIn('MANAGEMENT',message)
+        self.assertNotIn('internal-only',message)
+        self.assertIsNone(m.FINAL_STATUS.search(text))
+        self.assertIsNotNone(m.sensor_disposition_error(text,{'mcp__security_events__search_modsecurity_alerts'}))
+
+    def test_protocol_words_inside_ordinary_prose_are_not_removed(self):
+        opener=mock.Mock();opener.open.return_value=Response(b'', '')
+        body='요청한 INCIDENT_DISPOSITION 설명과 MANAGEMENT_STATUS 설명은 여기 있습니다.'
+        with mock.patch.object(m.urllib.request,'build_opener',return_value=opener):
+            m.deliver(self.webhook,body+'\nMANAGEMENT_STATUS: needs_review','a'*32,'needs_review')
+        message=json.loads(opener.open.call_args.args[0].data)['text']
+        self.assertIn(body,message)
+        self.assertNotIn('MANAGEMENT_STATUS: needs_review',message)
+
     def test_internal_disposition_is_not_shown_in_channel_report(self):
         opener=mock.Mock();opener.open.return_value=Response(b'', '')
         text='사건 위험과 조치 필요성이 아직 미확인입니다.\nINCIDENT_DISPOSITION: {"assessment":"unresolved"}\nMANAGEMENT_STATUS: needs_review'

@@ -146,6 +146,8 @@ def hermes_extension_files():
         'infra/hermes/soc_management_run.py': 'plugins/groot-query-completion/grounding.py',
         'infra/hermes/gateway_health.py': 'plugins/groot-query-completion/gateway_health.py',
         'infra/hermes/chat_contract.py': 'plugins/groot-query-completion/chat_contract.py',
+        'infra/hermes/output_contract.py': 'plugins/groot-query-completion/output_contract.py',
+        'infra/hermes/skills/soc-output/SKILL.md': 'plugins/groot-query-completion/SKILL.md',
         'infra/hermes/chat_markdown.py': 'plugins/groot-query-completion/chat_markdown.py',
         'infra/hermes/read_contract.py': 'plugins/groot-query-completion/read_contract.py',
         'infra/hermes/SOUL.groot.md': 'plugins/groot-query-completion/soc_policy.md',
@@ -174,24 +176,15 @@ def query_completion_source_pins(raw=None):
          'query_completion_source_pins_invalid')
     return pins
 def hermes_response_format(raw=None):
+    # One maintained output skill, including read-only installations. Parsing
+    # lives beside the runtime loader rather than another installer template.
+    source = SOURCE/'infra/hermes/output_contract.py'
+    namespace = {'__file__':str(source), '__name__':'_soc_output_install_check'}
+    exec(compile(read(source,64*1024),str(source),'exec'),namespace)
     if raw is None:
-        raw = read(SOURCE/'infra/hermes/SOUL.groot.md',512*1024)
-    try: text = raw.decode('utf-8')
-    except (AttributeError,UnicodeError): raise Refused('SOC_response_format_encoding_invalid')
-    policy_start = '<!-- rule-change-policy:start -->'
-    policy_end = '<!-- rule-change-policy:end -->'
-    start = '\n### SOC 응답 서식\n'
-    end = '\n## 보안 룰 변경 요청\n'
-    need(all(text.count(anchor)==1 for anchor in (policy_start,policy_end,start,end)),
-         'SOC_response_format_anchor_invalid')
-    begin = text.index(start)+len(start); finish = text.index(end)
-    need(text.index(policy_start) < begin < finish < text.index(policy_end),
-         'SOC_response_format_order_invalid')
-    body = text[begin:finish].strip()
-    lines = body.splitlines()
-    need(len(lines)==5 and all(line.startswith('- ') and len(line)>2 for line in lines)
-         and len(body)<=16384, 'SOC_response_format_five_bullets_required')
-    return '### SOC 응답 서식\n'+body+'\n'
+        raw = read(SOURCE/'infra/hermes/skills/soc-output/SKILL.md',16384)
+    try: return namespace['policy_text'](raw)+'\n'
+    except (AttributeError,UnicodeError,ValueError): raise Refused('SOC_output_skill_invalid')
 def readonly_soul():
     # Copy only the shared presentation section, never live write-tool policies.
     policy=read(SOURCE/'infra/hermes/SOUL.groot.md',512*1024).decode('utf-8')
@@ -205,7 +198,7 @@ def readonly_soul():
 본문/비밀을 요청하거나 노출하지 말고 필요한 경보 메타데이터만 요약한다.
 시각은 명시된 offset을 기준으로 Asia/Seoul로 변환해 KST 또는 +09:00를 붙인다.
 확인하지 못한 내용과 표본·지연의 한계를 명시한다.
-\n'''+hermes_response_format(policy.encode('utf-8'))
+\n'''+hermes_response_format()
 def install_hermes_extensions(data, hu, creds, hc):
     for key in ('mattermost_admin_id','mattermost_team_id','mattermost_channel_id','mattermost_bot_id'):
         need(re.fullmatch(r'[a-z0-9]{26}',creds.get(key,'')), 'invalid_Mattermost_identity_' + key)

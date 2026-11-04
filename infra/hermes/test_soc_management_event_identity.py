@@ -19,7 +19,7 @@ class EventIdentity(unittest.TestCase):
     def test_separate_actual_sensor_and_wazuh_fields(self):
         text=m.literal_evidence_summary(observed())
         self.assertIn('ModSecurity WAF 룰 ID: 932235',text)
-        self.assertIn('Wazuh 상관 규칙 ID: 100102',text)
+        self.assertIn('Wazuh 규칙 ID: 100102',text)
         self.assertIn('Wazuh 경보 level (센서 severity 아님): 10',text)
         self.assertIn('returned_count=1',text)
         self.assertIn('indexed_window_total_count=미확인',text)

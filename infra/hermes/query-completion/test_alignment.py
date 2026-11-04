@@ -272,14 +272,19 @@ class SharedContract(unittest.TestCase):
         self.assertIn('승인 보류',result.final_response)
         self.assertTrue(h.agent._capstone_alignment_partial)
 
-    def test_read_selection_omits_only_write_completion_guidance(self):
+    def test_read_selection_keeps_roles_and_environment_without_actuator_instructions(self):
         full, read = C.system_prompt(), C.system_prompt(read_only=True)
         self.assertLess(len(read), len(full))
         self.assertIn(C.QUERY_GUIDANCE, read)
         self.assertIn(C.READ_COMPLETION_GUIDANCE, read)
         self.assertNotIn(C.COMPLETION_GUIDANCE, read)
         policy = full.split(C.QUERY_GUIDANCE)[0]
-        self.assertTrue(read.startswith(policy))  # Full SOUL security policy retained.
+        for label in ('soc-role-policy','soc-environment-policy','korean-output-policy'):
+            start,end='<!-- '+label+':start -->','<!-- '+label+':end -->'
+            block=policy[policy.index(start):policy.index(end)+len(end)]
+            self.assertIn(block,read)
+        self.assertNotIn('<!-- bounded-operations-policy:start -->',read)
+        self.assertIn(C.READ_COMPLETION_GUIDANCE,read)
         original = {'messages':[{'role':'system','content':'native policy'},
                                 {'role':'user','content':'Wazuh 규칙 조회'}]}
         snapshot = copy.deepcopy(original)

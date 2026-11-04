@@ -178,4 +178,25 @@ class Grounding(unittest.TestCase):
             self.assertEqual(wrapper.management_reasoning(copy.deepcopy(self.request),self.agent)['reasoning_effort'],'medium')
 
 
+    def test_missing_sensor_citation_retry_cannot_repeat_only_operation_status(self):
+        missing='mcp__security_events__search_modsecurity_alerts'
+        old='mcp__rule_a__get_operation_status'
+        text='INCIDENT_DISPOSITION: '+json.dumps({'evidence_tools':[old,missing]})
+        names=wrapper.missing_cited_sensor_reads(text,{old})
+        self.assertEqual(names,{missing})
+        self.assertTrue(wrapper.arm_grounding_read(self.agent,'turn-a',names))
+        request=self.agent._build_api_kwargs()
+        self.assertEqual([x['function']['name'] for x in request['tools']],[missing])
+        self.assertEqual(request['tool_choice'],'required')
+        self.assertNotIn('arguments',request)
+        self.assertIs(self.agent._build_api_kwargs,self.builder)
+        self.assertFalse(wrapper.missing_cited_sensor_reads(text,{old,missing}))
+
+    def test_missing_citations_never_add_write_or_unregistered_tools(self):
+        text='INCIDENT_DISPOSITION: '+json.dumps({'evidence_tools':['terminal',WRITE_NAMES[0],'mcp__unknown__search_modsecurity_alerts']})
+        self.assertEqual(wrapper.missing_cited_sensor_reads(text,set()),set())
+        self.assertFalse(wrapper.arm_grounding_read(self.agent,'turn-a',{WRITE_NAMES[0]}))
+        self.assertFalse(wrapper.arm_grounding_read(self.agent,'turn-a',{'unregistered'}))
+        self.assertIs(self.agent._build_api_kwargs,self.builder)
+
 if __name__=='__main__':unittest.main()

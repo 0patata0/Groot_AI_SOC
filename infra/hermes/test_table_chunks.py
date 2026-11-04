@@ -60,6 +60,14 @@ class SplitTests(unittest.TestCase):
                 self.assertEqual(markdown.split_tables(text,4000,fallback=original),['exact native result'])
                 original.assert_called_once_with(text,4000,None)
 
+    def test_short_native_local_report_normalizes_table_boundaries_before_delegation(self):
+        table=HEADER+''.join(rows(4))
+        original='**확인 내역**\n'+table+'다음 안내'
+        chunks=self.split(original)
+        self.assertEqual(chunks,['**확인 내역**\n\n'+table+'\n다음 안내'])
+        self.assert_rows(chunks,rows(4))
+        self.assertEqual(original,'**확인 내역**\n'+table+'다음 안내')
+
     def test_many_boundaries_lengths_no_rule_omission(self):
         expected=rows(80)
         for limit in (128,199,253,400,999,4000):

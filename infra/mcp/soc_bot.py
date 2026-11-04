@@ -177,6 +177,54 @@ def vuln_count(agent="groot-web"):
         return None
 
 
+def report_table(headers, rows):
+    """Display-only escaping; never rewrite alert/audit bytes or parse actions."""
+    def cell(value):
+        text = ' '.join(str(value if value is not None else '미확인').splitlines())
+        text = text.replace('\\', '\\\\')
+        text = re.sub(r'([|`*_\[\]<>])', r'\\\1', text)
+        return text.replace('@', '@\u200b')
+    return '\n'.join(['| ' + ' | '.join(cell(v) for v in headers) + ' |',
+                       '|' + '|'.join('---' for _ in headers) + '|'] +
+                      ['| ' + ' | '.join(cell(v) for v in row) + ' |' for row in rows])
+
+
+def action_observations(minutes):
+    """Indexed response logs, including level-4 releases; not current FW state."""
+    labels = {'100121':'차단 적용 로그', '100122':'해제 로그', '100123':'거절·실패 로그',
+              '100124':'전체 해제 로그', '100125':'FW 재적재 로그', '100130':'FW 자동 원복 로그', '100131':'기한 만료 로그'}
+    body = {'size':0, 'query':{'bool':{'filter':[
+        {'range':{'timestamp':{'gte':'now-%dm' % minutes}}}, {'terms':{'rule.id':list(labels)}}]}},
+        'aggs':{'actions':{'terms':{'field':'rule.id','size':len(labels)},
+                          'aggs':{'latest':{'top_hits':{'size':1,'sort':[{'timestamp':'desc'}],
+                              '_source':['timestamp','data.result']}}}}}}
+    try:
+        value = idx_search('wazuh-alerts-*', body)
+        if value.get('timed_out') or value.get('_shards',{}).get('failed',0):
+            raise ValueError('partial_action_query')
+        buckets = value['aggregations']['actions']['buckets']
+        rows = []
+        for bucket in buckets:
+            rid, count = bucket['key'], bucket['doc_count']
+            if rid not in labels or type(count) is not int or count < 0:
+                raise ValueError('invalid_action_aggregation')
+            source = bucket['latest']['hits']['hits'][0]['_source']
+            result = source.get('data',{}).get('result', '미확인')
+            rows.append([labels[rid]+' ('+rid+')', count, _alert_time_kst(source.get('timestamp')), result])
+        return rows, None
+    except Exception:
+        return [], '조치 이력 조회 실패·현재 차단/복구 결과 미확인'
+
+
+def action_report(minutes):
+    rows, error = action_observations(minutes)
+    if error:
+        return error
+    if not rows:
+        return '해당 구간의 등록된 조치 로그 반환 0건. 실제 미조치·현재 미차단을 뜻하지 않습니다.'
+    return report_table(['조치 기록', '로그 수', '최근 시각(KST)', '최근 result'], rows)
+
+
 def build_summary(hours=12):
     """Telemetry only: lookup failures and empty results are not SOC judgments."""
     mins = hours * 60
@@ -188,16 +236,22 @@ def build_summary(hours=12):
     vc = vuln_count("groot-web")
     unavailable = bool(agent_error or ag is None or alert_error or agg is None or vc is None)
     color, status = ("#e0a800", "일부 조회 실패") if unavailable else ("#439fe0", "수집 현황")
-    fields = [{"short": True, "title": "에이전트", "value": "조회 실패" if agent_error or ag is None else "%d/%d active%s" % (act, tot, (" · 비활성: %s" % ",".join(disc)) if disc else "")},
-              {"short": True, "title": "경보(level≥5, %dh)" % hours, "value": str(total) if total is not None else "조회 실패"}]
-    if agg and agg.get("rules"):
-        fields.append({"short": False, "title": "상위 규칙", "value": "\n".join("• %s — %d" % (k, v) for k, v in agg["rules"][:5])})
-    if agg and agg.get("src"):
-        fields.append({"short": True, "title": "출처 IP", "value": "\n".join("%s(%d)" % (k, v) for k, v in agg["src"][:5]) or "-"})
-    fields.append({"short": True, "title": "취약점(groot-web)", "value": str(vc) if vc is not None else "조회 실패"})
-    text = "정기 수집 현황 — %s. 최근 %dh의 조회 결과입니다. 위험도·오탐·대응 필요성은 LLM 관리 에이전트가 근거를 조회해 판단합니다. 경보 0건은 정상 판정이 아닙니다." % (status, hours)
-    return {"username": "soc-report", "attachments": [{"color": color, "title": "%s · SOC 정기 상태 요약" % status,
-            "text": text, "fields": fields, "footer": "capstone SOC telemetry (정기)", "ts": int(time.time())}]}
+    agents = '조회 실패' if agent_error or ag is None else '%d/%d active%s' % (act, tot, (' · 비활성: %s' % ','.join(disc)) if disc else '')
+    overview = report_table(['점검 항목','조회 결과','확인 범위'], [
+        ['에이전트',agents,'반환 목록; 전체 등록 수와 구분'],
+        ['경보 level≥5',total if total is not None else '조회 실패','최근 %dh 색인 집계' % hours],
+        ['취약점 groot-web',vc if vc is not None else '조회 실패','색인 건수; 실제 악용 여부 미확인']])
+    text = ('최근 %dh 수집 상태입니다. 이 발행기는 자료 조회·보고만 수행하며, 판단·대응은 LLM 관리 에이전트가 주도합니다.\n\n' % hours +
+            overview + '\n\n**기록된 조치** (색인 로그이며 현재 상태/사건 종결 증명이 아님)\n\n' + action_report(mins))
+    if agg and agg.get('rules'):
+        text += '\n\n**상위 규칙**\n\n' + report_table(['탐지 규칙','집계 건수'],agg['rules'][:5])
+        if len(agg['rules']) > 5:
+            text += '\n\n집계 상위 '+str(len(agg['rules']))+'개 중 5개 표시; 나머지 상세 조회 필요.'
+    text += '\n\n추가 확인: 경보/조치 표본을 실제 사건과 연결해 위험·조치 효과를 조사해야 합니다. 0건은 정상 판정이 아닙니다.'
+    return {'username':'soc-report','attachments':[{'color':color,'title':status+' · SOC 정기 상태 요약',
+            'text':text,'fields':[{'short':True,'title':'수행','value':'조회·집계·보고'},
+                                   {'short':True,'title':'현재 조치 상태','value':'이 카드에서 검증하지 않음'}],
+            'footer':'capstone SOC telemetry (정기)','ts':int(time.time())}]}
 
 
 def post_mm(payload):
@@ -250,19 +304,22 @@ def build_report(minutes):
     rows, rows_error = recent_alerts(minutes, size=5)
     if rows_error:
         return {"error": "경보 집계 조회 성공, 상세 경보 조회 실패; 분석 결과를 생성하지 않았습니다."}
-    fields = []
-    if agg["rules"]:
-        fields.append({"short": False, "title": "탐지 규칙(상위)", "value": "\n".join("• %s — %d건" % (k, v) for k, v in agg["rules"])})
-    if agg["src"]:
-        fields.append({"short": True, "title": "관측 출처 IP", "value": "\n".join("%s (%d)" % (k, v) for k, v in agg["src"]) or "-"})
-    if agg["agent"]:
-        fields.append({"short": True, "title": "영향 자산", "value": "\n".join("%s (%d)" % (k, v) for k, v in agg["agent"]) or "-"})
-    sample = "\n".join("`%s` id=%s lv%s %s [%s]" % (r["ts"], r["id"], r["level"], r["desc"][:50], r["srcip"]) for r in rows[:5])
-    text = ("**경보 조회 자료** (최근 %d분, level>=5 경보 %d건)\n%s\n\n"
-            "이 자료는 집계·표본입니다. 위험도·오탐·대응 필요성은 LLM 관리 에이전트가 추가 근거와 현재 상태를 조회해 판단합니다." % (minutes, agg["total"], sample))
-    return {"username": "soc-report",
-            "attachments": [{"color": "#439fe0", "title": "SOC 경보 조회 자료", "text": text, "fields": fields,
-                             "footer": "capstone SOC telemetry", "ts": int(time.time())}]}
+    text = ('최근 %d분 level≥5 경보 **%d건**의 색인 집계·최근 표본입니다.\n\n' % (minutes,agg['total']) +
+            report_table(['보고 내용','확인된 수행','다음 확인'],[['경보·조치 기록 조회','자료 수집·집계·보고','LLM 관리 에이전트의 사건 판단·조치 검증']]))
+    if agg['rules']:
+        text += '\n\n**탐지 규칙(상위)**\n\n'+report_table(['규칙 설명','집계 건수'],agg['rules'])
+    text += '\n\n**기록된 조치** (색인 로그이며 현재 차단/복구 상태와 구분)\n\n'+action_report(minutes)
+    if rows:
+        text += '\n\n**최근 경보 표본** ('+str(len(rows[:5]))+'개 표시, 전체 상세 아님)\n\n'+report_table(
+            ['시각(KST)','Wazuh ID/레벨','수집 자산','출처 IP'],
+            [[r.get('ts'),str(r.get('id'))+'/'+str(r.get('level')),r.get('agent','미확인'),r.get('srcip') or '미확인'] for r in rows[:5]])
+    fields = [{'short':True,'title':'발행자 수행','value':'조회·집계·보고; 보안 변경 없음'},
+              {'short':True,'title':'판단·조치 주체','value':'LLM 관리 에이전트 · 카드 승인자는 관리자'}]
+    if agg['src']:
+        text += '\n\n**관측 출처 IP(상위)**\n\n'+report_table(['주소','색인 집계 건수'],agg['src'])
+    text += '\n\n미확인: 공격 여부·영향·현재 조치 결과·사건 종결은 이 집계만으로 확정하지 않습니다.'
+    return {'username':'soc-report','attachments':[{'color':'#439fe0','title':'SOC 경보 조회 자료',
+            'text':text,'fields':fields,'footer':'capstone SOC telemetry','ts':int(time.time())}]}
 
 
 # ---- Tier 2 승인 브로커 ----

@@ -863,13 +863,47 @@ def calculated_json_violations(text, facts):
             if key in answer and (type(answer[key]) is bool or answer[key] != value)]
 
 
+def display_evidence(facts):
+    """Coalesce only unchanged containment observations; retain audit facts.
+
+    A changed state/deadline, another request/IP or a missing observation clock
+    stays separate. Generic timestamps already shown by these observations need
+    not be repeated as a second list of internal fields.
+    """
+    result, groups = [], {}
+    clock_times = {v for row in facts[-16:] if row.get('kind') == 'containment_clock'
+                   for v in row.get('times', {}).values()}
+    for row in facts[-16:]:
+        if row.get('kind') == 'times':
+            remaining = [v for v in row.get('instants', []) if v not in clock_times]
+            if remaining:
+                result.append({**row, 'instants': remaining})
+            continue
+        observed = parse_instant(row.get('times', {}).get('live_observed_at'))
+        if row.get('kind') != 'containment_clock' or observed is None:
+            result.append(row)
+            continue
+        key = json.dumps({k: v for k, v in row.items() if k not in ('times', 'remaining_seconds_at_observation')}, sort_keys=True)
+        key += json.dumps({k: v for k, v in row['times'].items() if k != 'live_observed_at'}, sort_keys=True)
+        if key not in groups:
+            groups[key] = len(result)
+            result.append({**row, '_display_observations': 1, '_display_first': observed.isoformat()})
+            continue
+        index = groups[key]
+        old = result[index]
+        first = min(parse_instant(old['_display_first']), observed).isoformat()
+        latest = row if observed > parse_instant(old['times']['live_observed_at']) else old
+        result[index] = {**latest, '_display_observations': old['_display_observations'] + 1, '_display_first': first}
+    return result
+
+
 def literal_evidence_summary(facts):
     """Render exact observed quantities/limits, leaving every response decision to the model."""
     iso = kst_time
     def count(value):
         return str(value) if type(value) is int and value >= 0 else '미확인'
     rows = []
-    for row in facts[-16:]:
+    for row in display_evidence(facts):
         kind = row.get('kind')
         if kind == 'time_calculation':
             order = row.get('chronological_order', [])
@@ -898,7 +932,7 @@ def literal_evidence_summary(facts):
                         f"(indexed_window_total_count={count(row.get('indexed_window_total_count'))}). "
                         "이 표본만으로 행위자·공격 여부 확정 불가.")
             sensor_label = 'Suricata SID' if row.get('source') == 'suricata' else 'ModSecurity WAF 룰 ID'
-            for label, key in ((sensor_label, 'sensor_rule_ids'), ('Wazuh 상관 규칙 ID', 'wazuh_rule_ids'),
+            for label, key in ((sensor_label, 'sensor_rule_ids'), ('Wazuh 규칙 ID', 'wazuh_rule_ids'),
                                ('Wazuh 경보 level (센서 severity 아님)', 'wazuh_levels')):
                 values = [v for v in row.get(key, []) if isinstance(v, str) and re.fullmatch(r'[0-9]{1,10}', v)]
                 if values:
@@ -908,9 +942,27 @@ def literal_evidence_summary(facts):
             for event in row.get('observations', [])[:12]:
                 rows.append('  경보 시각/주체/룰: ' + json.dumps(event, ensure_ascii=False))
         elif kind == 'containment_clock':
-            rows.append('- 실제 차단 시각(KST, 조회 당시 상태이며 사건 해결의 증거가 아님): ' +
-                        json.dumps({k:row[k] for k in ('request_id','ip','times','live_block_state',
-                                   'remaining_seconds_at_observation') if k in row}, ensure_ascii=False))
+            rid, ip = row.get('request_id'), row.get('ip')
+            if not isinstance(rid, str) or not re.fullmatch(r'[0-9a-f]{32}', rid) or not literal_ip(ip):
+                continue
+            state = row.get('live_block_state')
+            state = state if state in ('owned', 'absent', 'foreign', 'unavailable') else '미확인'
+            fields = ['요청 `' + rid + '` / ' + ip, '조회시점 상태 ' + state]
+            labels = {'temporary_expires_at':'최초 만료', 'owned_deadline':'소유 기한',
+                      'live_owned_deadline':'실제 차단 기한', 'live_observed_at':'관측',
+                      'cooldown_until':'재차단 대기 종료', 'closed_at':'종료'}
+            by_instant = {}
+            for key, label in labels.items():
+                value = row.get('times', {}).get(key)
+                if parse_instant(value):
+                    by_instant.setdefault(value, []).append(label)
+            fields += ['/'.join(labels) + ' ' + iso(value) for value, labels in by_instant.items()]
+            remaining = row.get('remaining_seconds_at_observation')
+            if type(remaining) in (int, float) and remaining >= 0:
+                fields.append('해당 관측시점 남음 ' + str(remaining) + '초')
+            if row.get('_display_observations', 1) > 1:
+                fields.append('동일 상태 ' + str(row['_display_observations']) + '회 관측; 최초 ' + iso(row['_display_first']))
+            rows.append('- 차단 조회: ' + '; '.join(fields) + '. 사건 해결의 증거와 구분합니다.')
         elif kind == 'agent_inventory':
             rows.append('- 실제 Wazuh 등록 정보(전체 인터페이스/출발 호스트 이름의 증거와 구분): ' +
                         json.dumps(row.get('agents', [])[:50], ensure_ascii=False))
@@ -1057,7 +1109,23 @@ def initial_review_read(request, completed_calls, requirements=(), facts=()):
     return {**value, 'tool_choice': 'required'} if reads else value
 
 
-def arm_grounding_read(agent, turn):
+def missing_cited_sensor_reads(text, successful_reads):
+    """Navigation only: names may restrict existing reads, never add authority."""
+    sensors = {'mcp__security_events__search_modsecurity_alerts',
+               'mcp__security_events__search_suricata_alerts'}
+    missing = set()
+    for line in re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$', text or '', re.M):
+        try:
+            value = json.loads(line)
+        except (ValueError, RecursionError):
+            continue
+        names = value.get('evidence_tools') if isinstance(value, dict) else None
+        if isinstance(names, list) and all(isinstance(n, str) for n in names):
+            missing.update(set(names) & sensors - set(successful_reads or ()))
+    return missing
+
+
+def arm_grounding_read(agent, turn, required_reads=None):
     """One native request requires a model-selected existing read, never a named tool."""
     build = getattr(agent, '_build_api_kwargs', None)
     offered = permitted_tools(getattr(agent, 'tools', None), 'verify')
@@ -1065,6 +1133,10 @@ def arm_grounding_read(agent, turn):
             getattr(agent, 'api_mode', 'chat_completions') != 'chat_completions'):
         return False
     names = {x['function']['name'] for x in offered}
+    if required_reads:
+        if not set(required_reads) <= names:
+            return False
+        names &= set(required_reads)
     own, old = '_build_api_kwargs' in vars(agent), vars(agent).get('_build_api_kwargs')
 
     def restore():
@@ -1109,6 +1181,7 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         factual = bool(completed_calls and issues)
         argument_retry = bool(not completed_calls and argument_errors)
         missing_evidence = any(x.startswith('unobserved_') for x in issues)
+        needed_sensors = missing_cited_sensor_reads(content, successful_reads) if missing_evidence else set()
         marker = '_capstone_factual_turn' if factual else '_capstone_argument_turn' if argument_retry else '_capstone_grounding_turn'
         known_retries = sum(getattr(agent, name, None) == turn for name in
                             ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn'))
@@ -1125,33 +1198,24 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         if (type(idx) is not int or not 0 <= idx < len(messages) or
                 not isinstance(messages[idx], dict) or
                 messages[idx].get('role') != 'user' or messages[idx].get('content') != user or
-                ((not factual or missing_evidence) and not arm_grounding_read(agent, turn))):
+                ((not factual or missing_evidence) and not arm_grounding_read(agent, turn, needed_sensors))):
             return original(agent, **kw)
         if factual:
             agent._capstone_factual_turn = turn
-            nudge = ('조회 근거 일치 검사에서 다음 문제가 발견됐습니다: ' + ','.join(issues) +
-                '. 마지막 보고서를 정정하세요. 아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. '
-                '표본을 전체 건수로, 정의 파일을 실제 적재로, 사설 주소를 무해성/행위자 증명으로 바꾸지 마세요. '
-                '내부망 실습·승인된 공격 시험은 차단 예외가 아닙니다. 관리 범위에서는 실제 공격 의심과 대응 필요성을 판단하고 '
-                '서버 요건을 충족하면 임시 차단 후 시험 여부 확인·해제 승인 절차를 따르세요. 읽기 전용·보호 주소·증거·TTL 경계는 유지하세요. '
-                'WAF와 IDS를 같은 시각의 근거로 대조하려면 실제 조회 구간에 사건 시각이 포함되어야 합니다. '
-                '각 경보의 timestamp_kst와 룰 ID를 함께 대조하고, 과거 SID를 현재 사건 시간에 섞지 마세요. '
-                'sensor_agent/agent는 수집 주체이며 source_ip의 호스트 이름이 아닙니다. '
-                '호스트 이름이 필요하면 실제 에이전트/인터페이스 정보를 조회해 IP를 대조하고, '
-                '그 연결 근거가 없으면 출발 IP와 호스트명 미확인을 구분해 보고하세요. '
-                '서로 겹치지 않는 조회를 동일 시간대라고 설명하지 말고 필요한 구간을 직접 다시 조회하세요. '
-                '보고 항목에 실제 조회 근거가 없으면 필요한 읽기 도구와 인자를 직접 선택해 확보해야 합니다. '
-                'INCIDENT_DISPOSITION의 evidence_tools는 이번 실행에서 성공한 도구만 인용하세요. '
-                'assessment는 benign/remediated/unresolved 중 하나이며 monitor는 MANAGEMENT_STATUS에만 사용합니다. '
-                '임시 차단의 pending은 유지/해제 결정을 기다리는 절차 상태입니다. 현재 차단은 live 상태로 별도 확인하세요. '
-                '차단의 *_kst와 remaining_seconds_at_observation은 원문에서 변환한 정확한 표시입니다. '
-                '이미 표시된 만료시각/남은시간을 다시 calculate_time으로 계산하거나 epoch를 임의 ISO로 만들지 마세요. '
-                '날짜를 생략한 시각도 timestamp_kst의 KST 값을 사용하고 UTC 시계에 KST 이름만 붙이지 마세요. '
-                'DetectionOnly는 탐지 모드이며 피해 방지 증명이 아닙니다. reload/restart는 설정값 변경이 아닙니다. '
-                '대상 도구가 반환한 DetectionOnly 유지 정책은 모드 전환 제안으로 우회할 수 없습니다. '
-                '불확실성은 미확인으로 남기세요. 마지막 줄에는 모델이 판단한 상태를 '
-                'MANAGEMENT_STATUS: resolved 또는 monitor 또는 needs_review 또는 awaiting_approval 중 '
-                '정확히 하나로 쓰세요. 상태를 본문의 표현에서 추측하거나 새 승인을 만들지 마세요.\n' + literal_evidence_summary(facts or []))
+            nudge = ('조회 근거 일치 검사: ' + ','.join(issues) +
+                '. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. '
+                '아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. '
+                '표본/전체·정의/적재·수집 주체/출발 호스트·사건/조회 구간을 구분하고 '
+                '없는 시각·원인·건수·성공·상관 조건을 만들지 마세요. '
+                '미조회 항목이 필요하면 실제 등록된 읽기 도구와 정확한 사건 구간을 선택하세요. '
+                'INCIDENT_DISPOSITION은 exact JSON 한 줄이며 assessment는 benign/remediated/unresolved 중 하나, '
+                'evidence_tools는 이번 실행에서 실제 성공한 정확한 도구 이름만 사용하세요. '
+                '이전 실행/세션의 성공은 이번 실행의 인용이 아닙니다. 필요한 센서 근거를 새로 읽고 인용하거나 '
+                '미확인으로 남기세요. 상태 조회만으로 센서 조사/위험 해소를 대신하지 마세요. '
+                '기존 KST/관측시점 남은시간을 그대로 쓰고 DetectionOnly·reload/restart를 차단/모드 변경 증거로 바꾸지 마세요. '
+                '보호 주소·읽기 전용·증거·TTL·정확 승인 경계는 유지합니다. '
+                '불확실성을 숨기지 말고 마지막 줄에 MANAGEMENT_STATUS: resolved/monitor/needs_review/awaiting_approval 중 '
+                '실제 판단한 값 하나를 정확하게 쓰세요. slash로 묶은 선택지를 그대로 쓰지 마세요.\n' + literal_evidence_summary(facts or []))
             if successful_reads is not None:
                 nudge += '\n이번 실행의 성공한 도구: ' + ', '.join(sorted(set(successful_reads)))
         elif argument_retry:

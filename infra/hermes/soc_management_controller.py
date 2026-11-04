@@ -15,6 +15,7 @@ from datetime import datetime
 import fcntl
 import hashlib
 import hmac
+import importlib.util
 import ipaddress
 import json
 import os
@@ -1160,6 +1161,18 @@ def proposal_read_reference(proposal):
     return reference
 
 
+def output_contract():
+    path = Path(__file__).resolve().with_name('output_contract.py')
+    spec = importlib.util.spec_from_file_location('_soc_management_output_contract', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def output_policy():
+    return output_contract().policy()
+
+
 def prompt_for(base, case, evidence):
     requested_at = datetime.now(timezone(timedelta(hours=9)))
     current_request = dict(case).get("chat_request", base)
@@ -1204,7 +1217,7 @@ def prompt_for(base, case, evidence):
                 for source, ip, stamp, rule in sorted(references, key=str) if ip is not None and stamp is not None]) +
                 "\n사건 시각을 포함하는 until_kst/ lookback_minutes와 source_ip로 조회한다. "
                 "최근24시간이나 서비스 정상 조회는 과거 사건의 경보 조회를 대신하지 않는다. "
-                "반환 경보의 정확한 출처·출발지·시각·Wazuh 상관 규칙 ID를 대조하고 공격/허용 판단은 별도 근거로 내린다. "
+                "반환 경보의 정확한 출처·출발지·시각·Wazuh 규칙 ID를 대조하고 공격/허용 판단은 별도 근거로 내린다. "
                 "사건 당시 표본을 찾지 못하거나 원본 근거가 잘렸다면 해결 완료로 종결하지 않는다.")
             current_request += ("\n경보 재발견·시간/IP/경로 일치는 조회 성공이지 사건 해결이 아니다. "
                 "읽기 전용 재검토에서도 사건 위험과 대응 필요성의 판단을 주도한다. "
@@ -1327,8 +1340,11 @@ unresolved reports. An uncalled tool is a missing investigation step, not eviden
 read it if relevant or remove the unsupported claim. Tool availability is not use.
 For a received current attack alert, judge provisional containment first; do not
 wait for an extra sensor query, complete attribution, proof of compromise, or
-three independent flows. A's helper validates one recent inbound severity-1/2
-attack flow and protected addresses. Then investigate using actual MCP tools.
+three independent flows. A's helper validates EITHER one recent inbound
+bidirectional Suricata severity-1/2 attack flow OR one trusted interrupted WAF
+On/Enabled attack-denial transaction with HTTP403, plus protected addresses.
+Generic403/scanner/protocol noise is insufficient; WAF transactions are not TCP
+flow counts. Then investigate using actual MCP tools.
 The user-authorized native IDS path may already have contained the IP without
 waiting for an LLM. Read its exact operation and live block state; use the shared
 ten-minute TTL, approval-based sixty-minute retention/release and sixty-second
@@ -1437,7 +1453,7 @@ explicitly distinguish agreement, disagreement/omissions, and unverified claims.
 Do not replace peer review with a fresh inventory alone. Evidence correction
 must preserve the original review task and its scope.
 """
-    return (base + "\n" + contract + "\nTRUSTED_CONTROLLER_JSON\n" + canonical(control) +
+    return (base + "\n" + contract + "\n" + output_policy() + "\nTRUSTED_CONTROLLER_JSON\n" + canonical(control) +
             "\nUNTRUSTED_EVIDENCE_JSON\n" + canonical(evidence["events"]) +
             "\nTRUSTED_CURRENT_REQUEST_JSON\n" + canonical({"request": current_request}))
 
@@ -1579,6 +1595,7 @@ def deliver(webhook, text, case_id, state, report_id=None):
     # Transport only: hide a Markdown-escaped protocol label too. Admission,
     # evidence validation and case disposition still require the strict syntax.
     text = re.sub(r'(?m)^(?:MANAGEMENT\\?_STATUS|INCIDENT\\?_DISPOSITION):[^\r\n]*$', "", text).strip()
+    text = output_contract().normalize_tables(text)
     silent_review = state == "needs_review" and text in ("[SILENT]", "SILENT")
     if text in ("[SILENT]", "SILENT"):
         if not silent_review:

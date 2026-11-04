@@ -90,9 +90,11 @@ def split_tables(text, max_length=4000, len_fn=None, *, fallback):
     content but cannot promise a valid table for a row larger than one post.
     """
     measure=len_fn or len
-    if measure(text)<=max_length or '|' not in text:
+    if '|' not in text:
         return fallback(text,max_length,len_fn)
     normalized=normalize_tables(text)
+    if measure(normalized)<=max_length:
+        return fallback(normalized,max_length,len_fn)
     lines=normalized.splitlines(keepends=True)
     spans=_table_spans(lines)
     if not spans:return fallback(text,max_length,len_fn)

@@ -22,6 +22,12 @@ SOURCE = {'id': POST, 'user_id': HUMAN, 'channel_id': CHANNEL,
 
 
 class Routing(unittest.TestCase):
+    def test_short_report_table_is_not_fenced_or_attached_to_prose(self):
+        table='| 대상 | 상태 |\n|---|---|\n| WAF | 미확인 |\n'
+        text=policy.final_text({'status':'completed','final_response':'확인 내역\n'+table+'다음 확인'},1)
+        self.assertIn('확인 내역\n\n'+table+'\n다음 확인',text)
+        self.assertNotIn('```',text)
+
     def test_alerts_need_explicit_mention_and_new_enable_time(self):
         channel = {'id': 'x'*26, 'team_id': TEAM, 'name': 'soc-alerts-agent', 'type': 'O'}
         cfg = {**CONFIG, 'mention_channel_ids': [channel['id']], 'mention_enabled_at_ms': 150}

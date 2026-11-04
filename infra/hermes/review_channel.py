@@ -153,8 +153,8 @@ class Dispatcher:
             engines = direct if len(direct) == 1 else ['hermes']
             plan['cross_review'] = True
         if previous and not direct and not policy.mutual_verification(post['message']):
-            owners = self.db.execute("SELECT DISTINCT engine FROM jobs WHERE source_id=? AND phase='lead' AND status='done'", (previous,)).fetchall()
-            if len(owners) == 1:
+            owners = self.db.execute("SELECT DISTINCT engine,direct FROM jobs WHERE source_id=? AND phase='lead' AND status='done'", (previous,)).fetchall()
+            if len(owners) == 1 and owners[0]['direct']:
                 engines = [owners[0]['engine']]
         # Main-channel followups use bounded history from this same human only.
         prior = self.db.execute("SELECT r.post,j.result,j.engine,j.phase FROM requests r JOIN jobs j ON j.source_id=r.id WHERE j.status='done' ORDER BY r.created DESC,j.created DESC LIMIT 12").fetchall()
@@ -229,18 +229,21 @@ class Dispatcher:
         with self.db:
             self.db.execute("UPDATE jobs SET status='done' WHERE id=?", (job['id'],))
             leads = self.db.execute("SELECT * FROM jobs WHERE source_id=? AND phase='lead'", (job['source_id'],)).fetchall()
+            original = json.loads(self.db.execute('SELECT post FROM requests WHERE id=?', (job['source_id'],)).fetchone()[0])
+            resolved = self.db.execute('SELECT current_question FROM request_context WHERE source_id=?', (job['source_id'],)).fetchone()
+            peer_scope = resolved[0] if resolved else original['message']
             if (job['phase'] == 'lead' and all(r['status'] == 'done' for r in leads)
-                    and any(r['cross_review'] or policy.uncertain(json.loads(r['result'])) for r in leads)):
-                original = json.loads(self.db.execute('SELECT post FROM requests WHERE id=?', (job['source_id'],)).fetchone()[0])
-                resolved = self.db.execute('SELECT current_question FROM request_context WHERE source_id=?', (job['source_id'],)).fetchone()
-                peer_scope = resolved[0] if resolved else original['message']
+                    and any(policy.review_required(peer_scope, json.loads(r['result']), self.harness,
+                                                   requested=bool(r['cross_review'])) for r in leads)):
                 # Each peer sees the other ORIGINAL answer, never the other peer's
                 # response. At most two leads + two reviews, even after restart.
                 for lead in leads:
                     peer = 'hermes' if lead['engine'] == 'ollama' else 'ollama'
+                    source_receipt=self.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(lead['id'],)).fetchone()
                     self.db.execute('INSERT OR IGNORE INTO jobs VALUES(?,?,?,?,?,?,?,?,?,?,?)',
                         (policy.job_id(job['source_id'], 'peer', peer), job['source_id'], peer,
-                         'peer', 0, 'queued', policy.peer_question(peer_scope, json.loads(lead['result'])),
+                         'peer', 0, 'queued', policy.peer_question(peer_scope, json.loads(lead['result']),
+                            json.loads(source_receipt[0]) if source_receipt else None),
                          None, None, time.time(), 0))
 
     def show_progress(self,engine,jid):
@@ -259,8 +262,9 @@ class Dispatcher:
             if future.done():
                 report = future.result()
                 # Retain bounded audit facts, without exposing raw tool bodies in chat.
-                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'structured_scope_complete', 'scope_resolution', 'unqueried') if k in report}
-                summary['calls'] = [{k: c[k] for k in ('server', 'name', 'is_error', 'is_write', 'result_sha256') if k in c} for c in report.get('calls', [])]
+                summary = {k: report[k] for k in ('status', 'error_type', 'final_response', 'remaining_issues', 'protected_calls', 'management_state', 'run_id', 'case_id', 'peer_review', 'peer_attempts', 'peer_validation_errors', 'peer_error_code', 'structured_scope_complete', 'scope_resolution', 'unqueried', 'total_seconds', 'native_seconds', 'model_calls') if k in report}
+                summary['calls'] = [{k: c[k] for k in ('server', 'name', 'seconds', 'is_error', 'is_write', 'result_sha256') if k in c} for c in report.get('calls', [])]
+                summary['worker_seconds'] = max(0, time.monotonic()-self.progress_clock.get(jid,time.monotonic()))
                 with self.db:
                     self.db.execute("UPDATE jobs SET result=?,status='delivery' WHERE id=?", (json.dumps(summary, ensure_ascii=False), jid))
                     # Private, bounded read receipts. Bot prose and write results

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import sys
+import subprocess
 import unittest
 from unittest import mock
 
@@ -45,14 +46,80 @@ class API:
 
 
 class Tests(unittest.TestCase):
+    def peer_fixture(self, replies):
+        import copy
+        calls=[]
+        class LLM:
+            def __init__(self,**kw):self.check='checks' in kw.get('format',{}).get('properties',{})
+            async def ainvoke(self,messages):
+                if self.check:
+                    value=json.loads(messages[-1][1].split('\n',1)[1])
+                    return SimpleNamespace(content=json.dumps({'checks':[{'index':i,'supported':True,'reason':'fixture semantic pass'}
+                        for i,_ in enumerate(value['candidate'])]}))
+                calls.append(copy.deepcopy(messages));value=replies[min(len(calls)-1,len(replies)-1)]
+                if isinstance(value,Exception):raise value
+                return SimpleNamespace(content=json.dumps(value) if isinstance(value,dict) else value)
+        h=SimpleNamespace(CONTRACT=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'role'),
+            READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda _:None,
+            EVIDENCE=SimpleNamespace(kst_display=lambda x:x),guidance=lambda _:'')
+        report={'status':'completed','calls':[{'server':'system-diagnostics','name':'get_system_diagnostics',
+                'arguments':{'target':'a:vector'},'result':json.dumps({'target':'a:vector','state':'running'}),
+                'is_error':False}],'final_response':'fresh facts','protected_calls':0}
+        request={'question':p.peer_question('벡터 살아있어?',{'final_response':'벡터는 실행 중입니다.'}),
+                 'current_question':'벡터 살아있어?'}
+        return LLM,h,report,request,calls
+
+    def test_peer_corrects_invalid_reference_once_without_new_reads_or_weaker_validation(self):
+        import asyncio,copy
+        bad={'claims':[{'kind':'agree','text':'실행 중 상태 일치','source_ref':'a0',
+              'missing_field':'','evidence_ref':'e99'}]}
+        good=copy.deepcopy(bad);good['claims'][0]['evidence_ref']='e1'
+        llm,h,report,request,calls=self.peer_fixture([bad,good]);original=copy.deepcopy(report['calls'])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        self.assertEqual(result['peer_review'],'source_bound_claims');self.assertEqual(result['status'],'completed')
+        self.assertEqual(result['peer_attempts'],2);self.assertEqual(result['peer_validation_errors'],['peer_evidence_ref_invalid'])
+        self.assertEqual(result['calls'],original);self.assertEqual(len(calls),2)
+        self.assertIn('peer_evidence_ref_invalid',calls[1][-1][1])
+        self.assertIn('한쪽의 활성/비활성',calls[0][0][1])
+
+    def test_peer_two_invalid_outputs_remain_partial_without_false_agreement(self):
+        import asyncio
+        bad={'claims':[{'kind':'agree','text':'만든 상태','source_ref':'a99','missing_field':'','evidence_ref':'e1'}]}
+        llm,h,report,request,calls=self.peer_fixture([bad])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        self.assertEqual(result['status'],'partial');self.assertEqual(result['peer_review'],'synthesis_failed')
+        self.assertEqual(result['peer_error_code'],'peer_source_ref_invalid');self.assertEqual(len(calls),2)
+        self.assertNotIn('만든 상태',result['final_response'])
+
+    def test_peer_selects_exact_literals_without_generating_escaped_json_quotes(self):
+        import asyncio
+        good={'claims':[{'kind':'agree','text':'실행 상태 일치','source_ref':'a0','missing_field':'','evidence_ref':'e1'}]}
+        llm,h,report,request,calls=self.peer_fixture([good])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        evidence=json.loads(calls[0][2][1].split('\n',1)[1])
+        self.assertEqual(evidence['evidence'][1]['quote'],'"state": "running"')
+        self.assertEqual(result['peer_claims'][0]['evidence_quote'],'"state": "running"')
+        self.assertEqual(result['peer_attempts'],1)
+
+    def test_peer_transport_timeout_is_not_retried_as_a_validation_repair(self):
+        import asyncio
+        llm,h,report,request,calls=self.peer_fixture([TimeoutError()])
+        with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=llm)}):
+            result=asyncio.run(w.review_answer({'model':'fixture','base_url':'http://fixture'},request,report))
+        self.assertEqual(result['status'],'partial');self.assertEqual(len(calls),1)
+
     def test_peer_synthesis_uses_role_contract_and_actual_tool_names(self):
         import asyncio
         prompts=[]
         class LLM:
-            def __init__(self,**kw):pass
+            def __init__(self,**kw):self.check='checks' in kw.get('format',{}).get('properties',{})
             async def ainvoke(self,messages):
+                if self.check:return SimpleNamespace(content=json.dumps({'checks':[{'index':0,'supported':True,'reason':'fixture pass'}]}))
                 prompts.extend(messages)
-                return SimpleNamespace(content=json.dumps({'claims':[{'kind':'agree','text':'정책 일치','other_quote':'정책 drop','missing_field':'','call_index':0,'evidence_quote':'drop'}]}))
+                return SimpleNamespace(content=json.dumps({'claims':[{'kind':'agree','text':'정책 일치','source_ref':'a0','missing_field':'','evidence_ref':'e0'}]}))
         contract=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'SOC_ACTIVE_ROLE: '+kw['agent_role'])
         h=SimpleNamespace(CONTRACT=contract,READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda *a:None,
             EVIDENCE=SimpleNamespace(literal_evidence_summary=lambda x:'facts',kst_display=lambda x:x),facts_for=lambda x:[],guidance=lambda x:'')
@@ -87,6 +154,87 @@ class Tests(unittest.TestCase):
         self.assertFalse(value['runtime_load_verified'])
         self.assertEqual(value['exclusions']['returned_items'],60)
         self.assertEqual(value['exclusions']['omitted_items'],57)
+
+    def test_reference_scope_rejects_cross_component_and_snapshot_disagreement(self):
+        source={'other_agent_answer':'Wazuh 매니저 클러스터 비활성: cluster is not enabled','other_answer_truncated':False}
+        observed=[{'name':'get_system_diagnostics','arguments':{'target':'b:wazuh-indexer'},
+            'result':json.dumps({'target':'b:wazuh-indexer','observed_at_kst':'2026-11-03T09:00:00+09:00',
+                                 'metrics':{'cluster_status':'yellow','running':True}})}]
+        catalog=w.peer_reference_catalog(source,observed)
+        for path,code in [('result.observed_at_kst','peer_snapshot_scope_mismatch'),
+                          ('result.metrics.cluster_status','peer_component_scope_mismatch')]:
+            proof=next(p for p in catalog['evidence'] if p['path']==path)
+            claim={'kind':'disagree','text':'잘못 연결한 이견','source_ref':'a0','evidence_ref':proof['id'],'missing_field':''}
+            with self.assertRaisesRegex(ValueError,code):w.bind_peer_references({'claims':[claim]},catalog)
+            claim.update(kind='unverified',text='독립 조회 대상이 달라 미확인')
+            bound=w.bind_peer_references({'claims':[claim]},catalog)
+            self.assertIn('미확인',w.validate_peer_claims(bound,source,observed))
+
+    def test_reference_catalog_keeps_metadata_and_every_quote_is_literal(self):
+        source={'other_agent_answer':'요청 대상 42\n지금 관측한 상태만 확인','other_answer_truncated':False}
+        call={'name':'get_security_rules','arguments':{'target':'a:waf'},'result':json.dumps({
+            'rules':[{'id':i,'description':'rule '+str(i)} for i in range(200)],
+            'runtime_load_verified':False,'target':'a:waf','counts':{'builtin':200}})}
+        catalog=w.peer_reference_catalog(source,[call]);raw=w.compact_peer_result(call['result'])
+        self.assertTrue(any(p['path']=='result.runtime_load_verified' for p in catalog['evidence']))
+        self.assertTrue(all(p['quote'] in raw for p in catalog['evidence']))
+        self.assertTrue(all(p['quote'] in source['other_agent_answer'] for p in catalog['answers']))
+
+    def test_peer_historical_read_context_is_hash_bound_and_not_fresh_truth(self):
+        import hashlib
+        raw=json.dumps({'target':'b:wazuh-indexer','observed_at_kst':'2026-11-03T08:00:00+09:00','status':'ok'})
+        call={'server':'system-diagnostics','name':'get_system_diagnostics','arguments':{'target':'b:wazuh-indexer'},
+              'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        q=p.peer_question('인덱서 살아있어?',{'final_response':'과거 관측 정상'},{'calls':[call]})
+        source=w.peer_source_answer(q)
+        self.assertEqual(source['other_read_context'][0]['observed_at_kst'],'2026-11-03T08:00:00+09:00')
+        bad=dict(call,result_sha256='0'*64)
+        self.assertFalse(w.peer_source_answer(p.peer_question('상태',{'final_response':'text'},{'calls':[bad]}))['other_read_context'])
+        wrong=dict(call,arguments={'target':'b:wazuh-manager'})
+        self.assertFalse(w.peer_source_answer(p.peer_question('상태',{'final_response':'text'},{'calls':[wrong]}))['other_read_context'])
+
+    def test_diagnostic_comparison_binds_canonical_source_and_exact_field_values(self):
+        import hashlib,copy
+        h=self.actual_harness();current='인덱서 살아있어?';targets=['b:wazuh-indexer']
+        def call(running=True,stamp='2026-11-03T10:00:00+09:00'):
+            raw=json.dumps({'schema':1,'target':targets[0],'kind':'runtime','status':'ok',
+                'observed_at_kst':stamp,'metrics':{'running':running,'cluster_status':'yellow'}})
+            return {'server':'system-diagnostics','name':'get_system_diagnostics','arguments':{'target':targets[0]},
+                'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        prior=[call()];fresh=[call(stamp='2026-11-03T10:03:00+09:00')]
+        source=w.peer_source_answer(p.peer_question(current,{'final_response':w.diagnostic_literal(h,current,prior,targets)}, {'calls':prior}))
+        report={'status':'completed','calls':fresh,'protected_calls':0}
+        for change in ('none','state_changed','source_tampered','source_proof_tampered','source_missing'):
+            with self.subTest(change=change):
+                s=copy.deepcopy(source);obs=copy.deepcopy(fresh)
+                if change=='state_changed':obs=[call(False)]
+                if change=='source_tampered':s['other_agent_answer']='미확인. 정상이라는 뜻은 아닙니다.'
+                if change=='source_proof_tampered':s['other_diagnostic_receipts'][0]['result_sha256']='0'*64
+                if change=='source_missing':s['other_diagnostic_receipts']=[]
+                out=w.compare_diagnostic_receipts(h,current,s,obs,copy.deepcopy(report))
+                self.assertNotIn('**이견**',out['final_response'])
+                self.assertEqual(out['status'],'completed' if change=='none' else 'partial')
+                if change=='none':
+                    self.assertEqual(out['peer_review'],'diagnostic_receipt_comparison')
+                    self.assertIn('metrics.running',out['final_response']);self.assertIn('10:03:00',out['final_response'])
+                    self.assertIn('10:00:00',out['final_response'])
+                elif change=='state_changed':self.assertIn('변화·미확인',out['final_response'])
+                else:self.assertEqual(out['peer_review'],'diagnostic_source_unverified')
+
+    def test_diagnostic_comparison_never_substitutes_for_incident_judgment_or_failed_read(self):
+        h=self.actual_harness()
+        for question in ('공격 사건을 조사해줘','인덱서 재시작해줘','인덱서 살아있어?'):
+            self.assertIsNone(w.compare_diagnostic_receipts(h,question,{'other_agent_answer':'정상'},[],{'protected_calls':0}))
+
+    def test_diagnostic_receipts_do_not_accept_another_tool_or_unbounded_payload(self):
+        import hashlib
+        def call(name='get_system_diagnostics',padding=''):
+            raw=json.dumps({'target':'b:hermes','padding':padding})
+            return {'server':'system-diagnostics','name':name,'arguments':{'target':'b:hermes'},
+                'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+        for c in (call('get_other'),call(padding='x'*20000)):
+            source=w.peer_source_answer(p.peer_question('헤르메스 살아있어?',{'final_response':'test'},{'calls':[c]}))
+            self.assertEqual(source['other_diagnostic_receipts'],[])
 
     def test_ollama_peer_reads_original_question_before_separate_comparison(self):
         captured=[]
@@ -170,6 +318,50 @@ class Tests(unittest.TestCase):
                 w.main()
             report=json.loads(output.getvalue())
             self.assertEqual(report['status'],expected);self.assertEqual(report['structured_scope_complete'],verified)
+
+    def test_native_diagnostic_uses_only_diagnostic_profile_and_bound_receipt(self):
+        from contextlib import nullcontext
+        import hashlib
+        h=self.actual_harness()
+        for failure in (None,'error','wrong_target','missing'):
+            with self.subTest(failure=failure):
+                chosen=[]
+                class DB:
+                    def execute(self,sql,args=()):
+                        if 'tool_calls' in sql:return [{'name':'mcp__system_diagnostics__get_system_diagnostics','is_write':0,'is_error':int(failure=='error')}]
+                        return SimpleNamespace(fetchone=lambda:None if 'SELECT 1' in sql else
+                            {'id':'c'*32,'mode':'verify','run_count':0,'session_id':None})
+                    def commit(self):pass
+                store=SimpleNamespace(db=DB(),locked=lambda:nullcontext(),reporting=lambda _:nullcontext(),
+                    new_case=lambda *a:'c'*32,context=lambda _:[],close=lambda:None)
+                def run(store,case,prompt):
+                    chosen.append((case['fast_readonly'],controller.TOOLSETS,case['review_response_write']))
+                    return {'completed':True,'state':'needs_review','text':'unguarded model healthy text','run_id':'d'*32}
+                controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*64,TOOLSETS=('all',),
+                    run_hermes=run,prompt_for=lambda *a:'prompt',incomplete_report=lambda _:'incomplete')
+                raw=json.dumps({'schema':1,'target':'b:wazuh-manager' if failure=='wrong_target' else 'b:wazuh-indexer',
+                    'kind':'runtime','status':'ok','observed_at_kst':'2026-11-03T09:30:00+09:00','metrics':{'running':True}})
+                receipts=[] if failure=='missing' else [{'server':'system-diagnostics','name':'get_system_diagnostics',
+                    'arguments':{'target':'b:wazuh-indexer'},'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest(),
+                    'is_error':failure=='error'}]
+                request={'id':'a'*32,'phase':'lead','question':'인덱서 살아 있니?'};output=io.StringIO()
+                with mock.patch.dict(sys.modules,{'harness':h,'soc_management_controller':controller}), \
+                     mock.patch.object(sys,'argv',['worker','hermes']), \
+                     mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))), \
+                     mock.patch.object(sys,'stdout',output),mock.patch.object(w.os,'geteuid',return_value=0), \
+                     mock.patch.object(w,'read_trace_calls',return_value=receipts):
+                    w.main()
+                result=json.loads(output.getvalue())
+                self.assertEqual(chosen,[(True,('mcp-system-diagnostics',),False)])
+                self.assertEqual(result['status'],'partial' if failure else 'completed')
+                self.assertEqual(result['structured_scope_complete'],not failure)
+                self.assertNotIn('unguarded model healthy text',result['final_response'])
+
+    def test_broad_diagnostic_and_changes_do_not_get_a_single_service_shortcut(self):
+        h=self.actual_harness()
+        self.assertEqual(w.diagnostic_read_targets(h,'인덱서 살아있어?'),['b:wazuh-indexer'])
+        for question in ('전체 관제 공백 진단해줘','인덱서 재시작해줘','실제 공격 사건을 조사해줘'):
+            self.assertEqual(w.diagnostic_read_targets(h,question),[])
 
     def test_native_receipt_unwraps_bound_result_and_refuses_missing_input(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -362,6 +554,36 @@ class Tests(unittest.TestCase):
             with self.subTest(question=question):
                 self.assertEqual(p.route(question,h),{'engine':'hermes','cross_review':True})
 
+    def test_plain_hermes_lead_lookup_is_readonly_without_incident_or_peer_downgrade(self):
+        h=self.actual_harness()
+        scope=w.lookup_read_scope(h,'지금 Wazuh 에이전트 상태 보여줘','lead')
+        self.assertTrue(scope)
+        self.assertTrue(all(h.EVIDENCE.allowed(name,'verify') for name in scope))
+        for q,phase in [('두 장비 경보를 상관분석해줘','lead'),('WAF 룰 변경해줘','lead'),
+                        ('지금 Wazuh 에이전트 상태 보여줘','peer')]:
+            self.assertIsNone(w.lookup_read_scope(h,q,phase))
+
+    def test_lookup_routing_loads_in_actual_isolated_worker_mode(self):
+        base=Path(__file__).resolve().parent
+        script="""import importlib.util,sys
+def load(name,path):
+ s=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(s);s.loader.exec_module(m);return m
+w=load('worker',sys.argv[1]);h=load('harness',sys.argv[2])
+assert w.lookup_read_scope(h,'지금 Wazuh 에이전트 상태 보여줘','lead')
+assert w.lookup_read_scope(h,'침해 사건 조사해줘','lead') is None
+"""
+        result=subprocess.run([sys.executable,'-I','-B','-c',script,
+            str(base/'review_channel_worker.py'),str(base.parent/'ollama-trial/harness.py')],
+            capture_output=True,text=True,timeout=20)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_correlation_rule_definition_is_reader_work_not_an_incident(self):
+        h=self.actual_harness()
+        for q in ('Wazuh 상관분석 룰 조건 조회','Wazuh 상관분석 규칙 보여줘'):
+            self.assertEqual(p.route(q,h),{'engine':'ollama','cross_review':False})
+        self.assertEqual(p.route('두 장비 경보를 상관분석해줘',h),{'engine':'hermes','cross_review':True})
+        self.assertTrue(p.route('Wazuh 상관분석 룰 조회하고 서로 검증해줘',h)['cross_review'])
+
     def test_named_read_still_runs_readonly_without_an_automatic_peer(self):
         self.actual_harness();self.post['message']='@hermes 벡터 지금 살아 있나?'
         self.d.add(self.post);job=self.job()
@@ -551,13 +773,37 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.d.db.execute('select count(*) from jobs').fetchone()[0], 1)
         pool.submit.assert_not_called()
 
-    def test_uncertain_read_gets_one_readonly_peer_and_never_loops(self):
+    def test_partial_read_keeps_one_owner_and_reports_unknowns(self):
+        self.d.add(self.post); self.finish('partial', '일부 대상은 미확인입니다.')
+        self.assertEqual(self.d.db.execute('SELECT count(*) FROM jobs').fetchone()[0], 1)
+        self.assertIn('미확인', json.loads(self.job()['result'])['final_response'])
+
+    def test_explicit_review_of_partial_read_gets_one_peer_and_never_loops(self):
+        self.post['message'] += ' 답변 검증해줘'
         self.d.add(self.post); self.finish('partial', '일부 대상은 미확인입니다.')
         peer = self.job('peer')
-        self.assertEqual(peer['engine'], 'hermes')
         self.assertIn('쓰기·승인은 금지', peer['question'])
         self.finish('partial', '여전히 미확인입니다.', 'peer')
-        self.assertEqual(self.d.db.execute('SELECT count(*) FROM jobs').fetchone()[0], 2)
+        self.assertLessEqual(self.d.db.execute('SELECT count(*) FROM jobs').fetchone()[0], 4)
+
+    def test_unexpected_protected_call_in_read_still_gets_peer(self):
+        self.d.add(self.post); self.finish(protected_calls=1)
+        self.assertEqual(self.job('peer')['engine'], 'hermes')
+
+    def test_incident_record_list_is_not_an_investigation(self):
+        h=self.actual_harness()
+        for q in ('현재 사건 목록 보여줘','최근 공격 로그 보여줘','침해 경보 목록 보여줘'):
+            self.assertEqual(p.route(q,h),{'engine':'ollama','cross_review':False})
+        for q in ('공격 로그 조회하고 원인 알려줘','사건 목록 조회 후 차단해줘',
+                  '최근 경보가 실제 침해인지 판단해줘','침해 경보 조사해줘'):
+            self.assertEqual(p.route(q,h),{'engine':'hermes','cross_review':True})
+
+    def test_read_followup_rechecks_role_after_automatic_hermes_owner(self):
+        self.actual_harness(); self.post['message'] = 'WAF 룰 위험 분석해줘'
+        self.d.add(self.post); self.finish()
+        self.assertEqual(self.job()['engine'], 'hermes')
+        follow = self.follow('표로 보여줄래')
+        self.assertEqual(follow['engine'], 'ollama')
 
     def test_change_gets_ollama_peer_and_preserves_disagreement(self):
         self.post['message'] = 'WAF 규칙 수정안을 작성해줘'

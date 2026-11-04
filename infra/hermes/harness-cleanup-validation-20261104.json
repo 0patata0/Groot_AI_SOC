@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-04T17:26:14.207552+09:00",
+  "versions": {
+    "contract": "1.5.20",
+    "query": "1.19.15",
+    "review": "1.1.4"
+  },
+  "sources": {
+    "infra/hermes/SOUL.groot.md": "3d2c2f467e150a7095e1a5f86a21be386da221e8a0d1dbd47e8eeeca4eb76485",
+    "infra/hermes/chat_contract.py": "34f58dbe36e75657d540c2a7b8c2e8168cc997f9977b1111bc35a73f8d7ed52b",
+    "infra/hermes/output_contract.py": "924a859a9960b9439dc2e5a7581439134814739fd3d6b7daa4f7ea9bbc73abe1",
+    "infra/hermes/skills/soc-output/SKILL.md": "797488a09a7930bb3863934fb4dad18cbd7171c6f5c716d78301ddd5d2a8d8b8",
+    "infra/hermes/soc_management_run.py": "2dac3cbebab530953c607b7a63c4d0d6e895559e6a1e72a998e5b04c0f97de7e",
+    "infra/hermes/soc_management_controller.py": "214fd2ae32178caf6811c7891d1f50b6a4cb0ee0bd19541b8b9926d011470744",
+    "infra/hermes/soc_alert_watch.prompt": "8a8b4b999db7df1ce25e31e3ba6841eeec71427d4e51299ffafd99fe3c7d783b",
+    "infra/hermes/query-completion/__init__.py": "116bcb1677ddbf38e62b9581eac29bfeb00ad5b6fac960e6c1c36db0a5337e10",
+    "infra/hermes/query-completion/plugin.yaml": "310161caf1972c65b7435d1c7bc27eaa687872765e5d6636fdbeefc39a6b78d4",
+    "infra/hermes/test_soc_output_contract.py": "a50b46a54678c8a1fb4d073dd17520d7be10f81fc7101d8e312aa3be632e7b23",
+    "infra/hermes/test_soc_management_grounding.py": "d72dea20b1eec7f6f4805ab3b5886534e8545f6edb070737034d40281dae8d2c",
+    "infra/hermes/test_soc_management_operation_time.py": "fb8fb65d5af4685e83085a70a87bc68dbb0d9d3bcc3f3d1673929ae5bc5d50f3",
+    "infra/hermes/test_soc_management_event_identity.py": "10753dcf4ac02be084281b70d1204b972190bf51a6871d4bc1efccc0b3d1c818",
+    "infra/mcp/soc_bot.py": "72e84417d0a8c72e88778c783297b78445af943df8d96ef82858f6dd9119e28d",
+    "infra/mcp/test_soc_management_events.py": "1d93ad1da5c6e7e19327a2cd2f9cba867663edd6273008157f96346777f845cd",
+    "deployment/ollama_trial.py": "4b81030e105b8a1e8b11daac3e6880d147d7e45a1b2de1e532836f9e924aace7",
+    "deployment/roles/siem.sh": "34a19e3d26f0357dbbc2750509606ea36b0eb5285b3dcafb5eb9ad0432d20d61",
+    "deployment/roles/siem-test.sh": "eca90245c22da068538ea2f5f9d1813e909e62864f50ef14ae774623f407ac19",
+    "deployment/soc_management.py": "b1e9c1bde535615687938a51457bc2acb2a8dd09e4e48699141240a5319df29a",
+    "infra/hermes/chat_markdown.py": "3111c15e5613e41d212f32bc2225b457c2662b0029df9ab0934cd2d1b3e89b15",
+    "infra/hermes/test_table_chunks.py": "7e57074407d53e95b0a42a259b234e0b5e73bec51486ffd4fc412c85b0804b68",
+    "infra/hermes/review_channel.py": "8e0c793e2945a488f545985a5c223e29c50690e2fb4265461676297c84e03b5e",
+    "infra/hermes/review_channel_policy.py": "28af09a0594387db61e1b76eeb03fa791933a4184c346ce8184ddfb7c9f9854f",
+    "infra/hermes/review_channel_worker.py": "2db7778aaf1d0d4884bfcc6e36cfe7841ad6f15ded0fff8385525a68a56ef755",
+    "infra/hermes/test_review_channel.py": "65b1eac83519e45281b093c4dc3721021a76db1e8b8fe421a9dab7ebff14beaa",
+    "infra/ollama-trial/chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+    "infra/ollama-trial/test_chat.py": "30b1cd9449581a26779653ae10e1876388e5986455ba8d4bf64e77dedb839b94",
+    "infra/hermes/test_soc_management_controller.py": "dd6760dc7517c2bc1562ea7a1a23af4338e602a30abb9e41e4e100b38443b774",
+    "infra/hermes/query-completion/test_alignment.py": "053724d2b1d3dc29fe0f19dd533d6245a6ce38733257f281e0d5f73ae24f70cf"
+  },
+  "deployment": {
+    "initial_apply_at_kst": "2026-11-04T17:05:59+09:00",
+    "role_patch_at_kst": "2026-11-04T17:12:29+09:00",
+    "native_profile_fix_at_kst": "2026-11-04T17:21:08+09:00",
+    "confirmed_at_kst": "2026-11-04T17:23:09.297291+09:00",
+    "runtime_targets": 33,
+    "protected_configuration_hashes_unchanged": 5,
+    "rollback_directory": "/var/lib/capstone-harness-cleanup/20261104-r1/deployment-v3",
+    "manual_rollback_tested": false,
+    "confirmed_recovery_noop_tested": true,
+    "broker_restarted": false,
+    "native_container_restarts": 1,
+    "new_images_packages_ports_models": 0
+  },
+  "regression_passes": {
+    "sdk": 194,
+    "management": 218,
+    "report": 23,
+    "installation": 37,
+    "siem": 40,
+    "native": 385,
+    "context": 66,
+    "markdown": 8,
+    "chunks": 18,
+    "review": 59
+  },
+  "total_passes": 1048,
+  "actual_chat_samples": {
+    "shared_ollama_agents": {
+      "seconds_to_final": 16.676,
+      "lead": "ollama",
+      "peers": 0,
+      "MCP_reads": 4,
+      "agent_rows": 4
+    },
+    "shared_ollama_blocks": {
+      "seconds_to_final": 13.019,
+      "lead": "ollama",
+      "peers": 0,
+      "MCP_reads": 1
+    },
+    "dedicated_hermes_agents": {
+      "before_seconds": 17.049,
+      "after_seconds": 13.045,
+      "agent_rows": 4
+    },
+    "shared_named_hermes_baseline": {
+      "seconds": 57.6,
+      "status": "partial",
+      "automatic_peer_seconds_from_question": 70.017
+    },
+    "generic_Hermes_low_reasoning_trial": {
+      "status": "partial",
+      "MCP_calls": 0,
+      "promoted": false
+    },
+    "shared_named_hermes_final": {
+      "seconds_to_final": 128.644,
+      "status": "completed",
+      "MCP_reads": 4,
+      "agent_rows": 4,
+      "peers": 0
+    }
+  },
+  "parser": {
+    "source": "https://raw.githubusercontent.com/mattermost/marked/467bc9e99fc75d69424188dfbea7fe0409a9fc15/lib/marked.js",
+    "sha256": "7a7e73ca0aad7145c2c38ff4d02ae431c264221f6fa1771dfa662f125e60789c",
+    "license": "MIT",
+    "actual_post_tables": 3,
+    "actual_agent_rows_each": 4,
+    "unparsed_rows": 0,
+    "actual_browser_UI_tested": false
+  },
+  "not_completed": [
+    "native skill_manage feedback workflow connection",
+    "generic Hermes shared-chat read latency",
+    "fresh full-server installation",
+    "new attack incident closure E2E",
+    "IPv6 removal",
+    "independent 176 quality comparison"
+  ],
+  "publication": {
+    "source_commit": null,
+    "remote_verified_at_kst": null
+  },
+  "cleanup": {
+    "at_kst": "2026-11-04T17:28:22.087378+09:00",
+    "removed_files": 58,
+    "removed_bytes": 22734198,
+    "parent_absent": true,
+    "new_Mac_packages": 0,
+    "downloaded_parser_removed": true
+  }
+}

@@ -1023,6 +1023,15 @@ class DeliveryTests(unittest.TestCase):
         self.assertIsNone(m.FINAL_STATUS.search(text))
         self.assertIsNotNone(m.sensor_disposition_error(text,{'mcp__security_events__search_modsecurity_alerts'}))
 
+    def test_real_delivery_normalizes_short_table_without_touching_rows_or_review_state(self):
+        opener=mock.Mock();opener.open.return_value=Response(b'', '')
+        table='| 대상 | 결과 |\n|---|---|\n| WAF | 미확인 |\n'
+        with mock.patch.object(m.urllib.request,'build_opener',return_value=opener):
+            m.deliver(self.webhook,'**확인 내역**\n'+table+'추가 확인 필요','a'*32,'needs_review')
+        message=json.loads(opener.open.call_args.args[0].data)['text']
+        self.assertIn('**확인 내역**\n\n'+table+'\n추가 확인 필요',message)
+        self.assertIn('추가 검토 필요',message)
+
     def test_protocol_words_inside_ordinary_prose_are_not_removed(self):
         opener=mock.Mock();opener.open.return_value=Response(b'', '')
         body='요청한 INCIDENT_DISPOSITION 설명과 MANAGEMENT_STATUS 설명은 여기 있습니다.'

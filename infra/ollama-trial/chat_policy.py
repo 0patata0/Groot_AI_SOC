@@ -2,7 +2,7 @@
 import json
 import re
 from datetime import datetime, timezone, timedelta
-from harness import footer_free, EVIDENCE
+from harness import footer_free, EVIDENCE, SHARED
 try:
     import channel_sync
 except ModuleNotFoundError as exc:
@@ -92,7 +92,7 @@ def final_text(report, elapsed):
     if report.get('status') not in ('completed', 'partial') or not isinstance(report.get('final_response'), str):
         answer = '이번 요청을 끝까지 확인하지 못했습니다. 잠시 후 다시 질문해 주세요. 서버 상태가 정상이라는 뜻은 아닙니다.'
     else:
-        answer = kst_text(footer_free(report['final_response'])).strip()
+        answer = SHARED.CHAT_MARKDOWN.normalize_tables(kst_text(footer_free(report['final_response']))).strip()
     if not answer:
         answer = '확인한 답변을 생성하지 못했습니다. 다시 질문해 주세요.'
     # Bound the Mattermost post; do not silently claim a truncated answer is complete.

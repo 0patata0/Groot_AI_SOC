@@ -227,14 +227,14 @@ class Tests(unittest.TestCase):
         config={'mcp_servers':{'only-readonly':{}},'toolsets':['mcp-wazuh-ro']}
         baseline=copy.deepcopy(config)
         env=self.n['install_hermes_extensions'](self.n['DEST']/'bot',user,creds,config)
-        self.assertEqual(len(written),16)
-        self.assertEqual(len(reads),16)
+        self.assertEqual(len(written),18)
+        self.assertEqual(len(reads),18)
         self.assertEqual({pathlib.Path(p).name for p in written},{'__init__.py','plugin.yaml','channel_sync.py','HOOK.yaml','handler.py','grounding.py',
-            'alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
+            'alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py','output_contract.py','SKILL.md'})
         self.assertTrue(any('/plugins/groot-mattermost-context/' in p for p in written))
         self.assertTrue(any('/hooks/groot-mattermost-channel-sync/' in p for p in written))
         self.assertEqual({pathlib.Path(p).name for p in written if '/plugins/groot-query-completion/' in p},
-                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py'})
+                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py','output_contract.py','SKILL.md'})
         self.assertTrue(all(value[1:]==(0o600,995,986) for value in written.values()))
         self.assertTrue(all(value[1:]==(0o700,995,986) for value in created))
         self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context','groot-query-completion']})
@@ -345,71 +345,33 @@ class Tests(unittest.TestCase):
         prepare=next(n for n in ast.walk(main) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='prepare_files')
         self.assertLess(image.lineno,prepare.lineno)
     def response_policy(self):
-        return (pathlib.Path(sys.argv[1]).resolve().parents[2]/'infra/hermes/SOUL.groot.md').read_bytes()
-    def test_response_format_extracts_only_exact_shared_five_bullets(self):
-        raw=self.response_policy();block=self.n['hermes_response_format'](raw)
-        expected='### SOC 응답 서식\n'+raw.decode().split('### SOC 응답 서식\n',1)[1].split('\n## 보안 룰 변경 요청\n',1)[0].strip()+'\n'
-        self.assertEqual(block,expected)
-        self.assertEqual(sum(line.startswith('- ') for line in block.splitlines()),5)
-        for text in ('`**요약**`','`**확인 내역**`','`**조치 및 다음 단계**`'):
-            self.assertIn(text,block)
-        self.assertNotIn('get_rule_change_target',block)
+        return (pathlib.Path(sys.argv[1]).resolve().parents[2]/'infra/hermes/skills/soc-output/SKILL.md').read_bytes()
+    def use_output_sources(self):
+        root=pathlib.Path(sys.argv[1]).resolve().parents[2]
+        self.n['read']=lambda path,*args:(root/path.relative_to(self.n['SOURCE'])).read_bytes()
+    def test_response_format_loads_one_skill_without_frontmatter_or_write_policy(self):
+        self.use_output_sources();block=self.n['hermes_response_format']()
+        self.assertEqual(block.count('SOC_OUTPUT_CONTRACT_V1'),1)
+        self.assertNotIn('description:',block)
         self.assertNotIn('propose_rule_edit',block)
-        self.assertNotIn('LLM이 SOC 운영의 관리 주체다',block)
-    def test_response_format_uses_chat_lists_and_limits_table_exception(self):
-        block=self.n['hermes_response_format'](self.response_policy())
-        bullets=[line for line in block.splitlines() if line.startswith('- ')]
-        self.assertIn('`- **대상명**: 상태 — 근거`',bullets[0])
-        self.assertNotIn('`대상 | 상태 | 근거`',block)
-        self.assertNotIn('`항목 | 내용`',block)
-        for form in ('파이프(`|`)로 열을 나눈 표','공백으로 정렬한 표','HTML 표','표를 감싼 코드 블록'):
-            self.assertIn(form,bullets[2])
-        self.assertIn('기본 서식으로 쓰지 않는다',bullets[2])
-        self.assertIn('Markdown 문서·파일 생성 요청의 문서 본문이나 사용자가 명시적으로 표를 요청한 경우에만 표를 사용한다',bullets[2])
-        self.assertIn('파일을 제공하는 채팅 안내 자체는 목록으로 쓴다',bullets[2])
-        self.assertIn('전체 답변을 코드 블록으로 감싸지 않는다',bullets[2])
-    def test_response_format_approval_lists_keep_six_fields_and_card_authority(self):
-        block=self.n['hermes_response_format'](self.response_policy())
-        approval=[line for line in block.splitlines() if line.startswith('- ')][1]
-        self.assertIn('`- **항목명**: 내용`',approval)
-        fields=('대상','변경 전','변경 후','예상 영향','검증','승인 상태')
-        positions=[approval.index('`'+field+'`') for field in fields]
-        self.assertEqual(positions,sorted(positions))
-        self.assertIn('여섯 항목을 각각 별도 줄에 쓴다',approval)
-        self.assertIn('실제 도구가 제공한 승인 링크',approval)
-        self.assertIn('아직 제출하지 않은 후보를 승인 요청 완료로 표시하지 않는다',approval)
-        self.assertIn('일반 채팅의 동의는 카드 승인이 아니다',approval)
-    def test_response_format_fails_closed_for_missing_duplicate_or_changed_structure(self):
-        raw=self.response_policy()
-        start='\n### SOC 응답 서식\n'.encode()
-        end='\n## 보안 룰 변경 요청\n'.encode()
-        variants=(raw.replace(start,b'',1),raw+start,raw.replace(end,b'',1),raw+end,
-                  raw.replace(end,b'\n- extra policy\n'+end,1),
-                  raw.replace(end,b'\n## unexpected capability\n'+end,1),b'\xff',
-                  end+raw.replace(end,b'',1),
-                  raw.replace(b'<!-- rule-change-policy:start -->',b'',1),
-                  raw.replace(b'<!-- rule-change-policy:end -->',b'',1))
+        self.assertNotIn('temporarily_contain_ip',block)
+        self.assertIn('Markdown',block)
+    def test_response_format_missing_duplicate_malformed_contract_is_refused(self):
+        self.use_output_sources();raw=self.response_policy()
+        variants=[b'\xff',raw.replace(b'name: soc-output',b'name: other',1),
+                  raw+raw,raw.replace(b'SOC_OUTPUT_CONTRACT_V1',b'',1),raw+b'\nextra policy',raw.replace(b'---\n',b'',1)]
         for invalid in variants:
             with self.subTest(case=variants.index(invalid)):
                 self.reject(lambda:self.n['hermes_response_format'](invalid))
-    def test_response_format_allows_separate_scope_guidance_without_copying_it(self):
-        raw=self.response_policy()
-        marker=b'<!-- rule-change-policy:start -->'
-        extra='\n### 조회 범위\n- 다른 장비로 대체하지 않는다.\n'.encode()
-        self.assertEqual(self.n['hermes_response_format'](raw.replace(marker,marker+extra,1)),
-                         self.n['hermes_response_format'](raw))
-    def test_response_format_read_is_bounded_and_readonly_soul_retains_capabilities(self):
-        calls=[]
+    def test_response_format_bounded_reads_and_readonly_authority_unchanged(self):
+        root=pathlib.Path(sys.argv[1]).resolve().parents[2];calls=[]
         def read(path,cap):
-            calls.append((path,cap));return self.response_policy()
+            calls.append((str(path.relative_to(self.n['SOURCE'])),cap));return (root/path.relative_to(self.n['SOURCE'])).read_bytes()
         self.n['read']=read;soul=self.n['readonly_soul']()
-        self.assertEqual(calls,[(self.n['SOURCE']/'infra/hermes/SOUL.groot.md',512*1024)])
-        self.assertTrue(soul.startswith('<!-- soc-role-policy:start -->'))
+        self.assertEqual(calls,[('infra/hermes/SOUL.groot.md',512*1024),('infra/hermes/output_contract.py',64*1024),('infra/hermes/skills/soc-output/SKILL.md',16384)])
         self.assertEqual(soul.count('SOC_ROLE_CONTRACT_V1'),1)
-        self.assertIn('# SOC 관제 담당자 — 읽기 전용 배치',soul)
-        self.assertIn('현재 제공된 Wazuh 읽기 MCP와 security-events MCP에서 확인한 사실만 보고한다.',soul)
+        self.assertEqual(soul.count('SOC_OUTPUT_CONTRACT_V1'),1)
         self.assertIn('이 환경에는 쓰기 승인·차단·규칙 수정 도구가 배포되지 않았다. 수행했다고 주장하지 않는다.',soul)
-        self.assertTrue(soul.endswith(self.n['hermes_response_format'](self.response_policy())))
         self.assertNotIn('propose_rule_edit',soul)
     def test_response_format_source_hash_changes_deployment_profile(self):
         values={'policy':b'first'}
@@ -425,6 +387,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(format_calls),1)
         self.assertLess(format_calls[0].lineno,min(n.lineno for n in calls if n.func.id=='image_id'))
         self.assertIn('infra/hermes/SOUL.groot.md',ast.unparse(preflight))
+        format_fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='hermes_response_format')
+        self.assertIn('infra/hermes/skills/soc-output/SKILL.md',ast.unparse(format_fn))
     def test_prepared_image_native_contract_accepts_supported_and_rejects_unsafe_image(self):
         codes=[n.value.value for n in ast.walk(tree) if isinstance(n,ast.Assign)
                and any(isinstance(t,ast.Name) and t.id=='code' for t in n.targets)

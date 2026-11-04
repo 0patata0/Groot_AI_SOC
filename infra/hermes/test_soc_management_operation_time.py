@@ -148,6 +148,25 @@ class OperationTime(unittest.TestCase):
                 content=[SimpleNamespace(text=raw)]))
             self.assertTrue(any(f['kind']=='containment_clock' for f in facts))
 
+    def test_duplicate_unchanged_status_has_one_latest_display_without_audit_loss(self):
+        first=receipt();latest=receipt(live_observed_at=first['live_observed_at']+10)
+        facts=[m.containment_clock(first),{'kind':'times','instants':list(m.containment_clock(first)['times'].values())},m.containment_clock(latest)]
+        original=copy.deepcopy(facts);text=m.literal_evidence_summary(facts)
+        self.assertEqual(text.count('- 차단 조회:'),1)
+        self.assertIn('동일 상태 2회 관측',text)
+        self.assertIn('488초',text)
+        self.assertNotIn('remaining_seconds_at_observation',text)
+        self.assertNotIn('현재 조회에 포함된 시각',text)
+        self.assertEqual(facts,original)
+        self.assertEqual(m.evidence_claim_violations(text,facts),[])
+
+    def test_changed_state_deadline_other_id_and_missing_clock_stay_separate(self):
+        base=receipt()
+        for change in ({'live_block_state':'absent'},{'owned_deadline':base['owned_deadline']+60},
+                       {'request_id':'b'*32},{'ip':'198.51.100.90'},{'live_observed_at':None}):
+            facts=[m.containment_clock(base),m.containment_clock(receipt(**change))]
+            self.assertEqual(m.literal_evidence_summary(facts).count('- 차단 조회:'),2,change)
+
 
 class SingleStatusRead(unittest.TestCase):
     setUp=controller_tests.ControllerTests.setUp

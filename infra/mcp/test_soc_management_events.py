@@ -40,7 +40,7 @@ def index_response():
 
 class ManagementTest(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory(prefix="capstone-management-test-", dir="/private/tmp")
+        self.tmp = tempfile.TemporaryDirectory(prefix="capstone-management-test-")
         self.root = Path(self.tmp.name)
         self.db = self.root / "events.sqlite3"
         self.env = patch.dict(os.environ, {"SOC_MANAGEMENT_EVENTS_DB": str(self.db)})
@@ -306,7 +306,7 @@ class ManagementTest(unittest.TestCase):
         self.assertNotIn("credential", json.dumps(result))
 
     def test_summary_failed_queries_never_report_healthy_or_zero(self):
-        with patch.object(bot, "list_agents", return_value=(None, "failed")), patch.object(bot, "agg_alerts", return_value=(None, "failed")), patch.object(bot, "vuln_count", return_value=None):
+        with patch.object(bot, "action_observations", return_value=([], "조치 조회 실패")), patch.object(bot, "list_agents", return_value=(None, "failed")), patch.object(bot, "agg_alerts", return_value=(None, "failed")), patch.object(bot, "vuln_count", return_value=None):
             result = json.dumps(bot.build_summary(), ensure_ascii=False)
         self.assertIn("조회 실패", result)
         self.assertNotIn("이상 없음", result)
@@ -315,13 +315,39 @@ class ManagementTest(unittest.TestCase):
     def test_report_telemetry_never_selects_action_from_ip_prefix(self):
         agg = {"total": 1, "rules": [("x", 1)], "src": [("192.168.16.2", 1)], "agent": [("sensor", 1)]}
         row = {"ts": "KST", "id": "100110", "level": 9, "desc": "x", "srcip": "192.168.16.2"}
-        with patch.object(bot, "agg_alerts", return_value=(agg, None)), patch.object(bot, "recent_alerts", return_value=([row], None)):
+        with patch.object(bot, "action_observations", return_value=([], None)), patch.object(bot, "agg_alerts", return_value=(agg, None)), patch.object(bot, "recent_alerts", return_value=([row], None)):
             result = json.dumps(bot.build_report(5), ensure_ascii=False)
         self.assertIn("LLM 관리 에이전트", result)
         self.assertNotIn("자동 차단 보류", result)
         self.assertNotIn("차단 검토", result)
         with patch.object(bot, "agg_alerts", return_value=(agg, None)), patch.object(bot, "recent_alerts", return_value=([], "failed")):
             self.assertIn("error", bot.build_report(5))
+
+    def test_periodic_card_separates_actions_from_telemetry_and_uses_tables(self):
+        agg={'total':1,'rules':[('SQLi | payload\nsecond line',1)],'src':[('192.0.2.1',1)],'agent':[('sensor',1)]}
+        row={'ts':'2026-11-04 15:00:00 KST','id':'100102','level':10,'desc':'x','srcip':'192.0.2.1','agent':'sensor'}
+        actions=[['기한 만료 로그 (100131)',1,'2026-11-04 15:00:28 KST','ok']]
+        with patch.object(bot,'agg_alerts',return_value=(agg,None)),patch.object(bot,'recent_alerts',return_value=([row],None)),patch.object(bot,'action_observations',return_value=(actions,None)):
+            card=bot.build_report(60)['attachments'][0]
+        self.assertIn('|---|',card['text']);self.assertNotIn('```',card['text'])
+        self.assertIn(r'SQLi \| payload second line',card['text'])
+        self.assertIn('100131',card['text']);self.assertIn('100102/10',card['text'])
+        self.assertIn('현재 차단/복구 상태와 구분',card['text'])
+        self.assertNotIn('위험 해소',card['text'])
+        self.assertEqual(card['fields'][0]['value'],'조회·집계·보고; 보안 변경 없음')
+
+    def test_action_history_includes_release_level4_and_rejects_partial_or_failed_query(self):
+        captured=[]
+        def search(index,body):
+            captured.append(body)
+            return {'timed_out':False,'_shards':{'failed':0},'aggregations':{'actions':{'buckets':[{'key':'100122','doc_count':2,'latest':{'hits':{'hits':[{'_source':{'timestamp':'2026-11-04T06:00:00Z','data':{'result':'ok'}}}]}}}]}}}
+        with patch.object(bot,'idx_search',side_effect=search):rows,error=bot.action_observations(60)
+        self.assertIsNone(error);self.assertEqual(rows[0][1],2);self.assertIn('15:00:00',rows[0][2])
+        self.assertIn('100122',json.dumps(captured));self.assertNotIn('rule.level',json.dumps(captured))
+        for value in ({'timed_out':True},{'_shards':{'failed':1}},{}):
+            with patch.object(bot,'idx_search',return_value=value):self.assertIsNotNone(bot.action_observations(60)[1])
+        with patch.object(bot,'action_observations',return_value=([],None)):
+            self.assertIn('현재 미차단을 뜻하지 않습니다',bot.action_report(60))
 
 
 if __name__ == "__main__":

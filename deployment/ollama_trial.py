@@ -153,6 +153,8 @@ def source_files(source):
     files['query_grounding.py'] = safe(source.parent / 'hermes/query-completion/__init__.py')
     files['grounding.py'] = safe(source.parent / 'hermes/soc_management_run.py')
     files['chat_contract.py'] = safe(source.parent / 'hermes/chat_contract.py')
+    files['output_contract.py'] = safe(source.parent / 'hermes/output_contract.py')
+    files['SKILL.md'] = safe(source.parent / 'hermes/skills/soc-output/SKILL.md')
     files['chat_markdown.py'] = safe(source.parent / 'hermes/chat_markdown.py')
     files['gateway_health.py'] = safe(source.parent / 'hermes/gateway_health.py')
     files['read_contract.py'] = safe(source.parent / 'hermes/read_contract.py')

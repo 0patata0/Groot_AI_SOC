@@ -42,7 +42,7 @@ SOURCES = tuple("infra/mcp/" + name for name in (
     "rule_change_executor.py", "rule_change_mcp.py", "security_rule_inventory.py", "rule_readonly_install.py", "service_action_executor.py", "incident_containment.py",
     "soc_bot.py", "soc_management_events.py", "operations_approval.py", "approval_card_cleanup.py",
     "response-mcp.py", "wazuh_containment_ar.py", "managed_suricata_evidence.py", "managed_waf_evidence.py", "configure_waf_evidence.py")) + tuple("infra/hermes/" + name for name in (
-    "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md",
+    "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md", "output_contract.py", "chat_markdown.py", "skills/soc-output/SKILL.md",
     "capstone-management.service.example", "capstone-management.timer.example")) + (
     "deployment/soc_management.py", "deployment/soc_runtime.py", "deployment/soc_agent_block.py", "deployment/response_entrypoint.py",
     "deployment/report_publisher.py")
@@ -504,6 +504,9 @@ def prepare_siem(s):
     mkdir("/opt/capstone-management", 0o755); mkdir("/etc/capstone-management"); mkdir("/var/lib/capstone-management")
     write("/opt/capstone-management/soc_management_controller.py", controller, 0o750)
     write("/opt/capstone-management/soc_alert_watch.prompt", bundle["soc_alert_watch.prompt"], 0o644)
+    write("/opt/capstone-management/output_contract.py", bundle["output_contract.py"], 0o644)
+    write("/opt/capstone-management/chat_markdown.py", bundle["chat_markdown.py"], 0o644)
+    write("/opt/capstone-management/SKILL.md", bundle["SKILL.md"], 0o644)
     write("/etc/capstone-management/controller.env", ("RULE_BROKER_TOKEN=" + share["rule_token"] + "\nMM_WEBHOOK=" + webhook + "\n").encode())
     for name in ("capstone-management.service.example", "capstone-management.timer.example"):
         write(Path("/etc/systemd/system") / name.removesuffix(".example"), read(s["source"] / "infra/hermes" / name), 0o644)

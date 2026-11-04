@@ -675,3 +675,5 @@ unset et_work suri_id
 현재 역할은 로컬 수집·정제, DGX 학습, Thor 검증 가중치 적재·추론이다. DGX의 명시 기한 연장은 [현재 실행 절차](../finetuning/OPERATOR_PREPARATION.md#현재-실행과-명시-기한-연장--2026-11-02)를 따른다. 기존 allowlist의 `dgx_supervisor.py`/installer 복사본·동결 data/profile·checkpoint 무결성 정보와 작은 [연장 원장](../finetuning/OPERATOR_TRAINING_EXTENSION_20261102.json)을 사용하며 새 외부 패키지는 없다. 기본12시간·명시 `--apply --reviewed-window-hours 24`의24시간상한을 구분한다. 아래 Thor 학습 환경 설명은 이전 구성 이력이다.
 
 SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하지 않는다. 기존 Thor의 별도 학습 환경은 [35B 컨테이너·반입 목록](../finetuning/THOR_35B.md#현재-사용하는-격리-컨테이너-경로)을 따른다. 기존 arm64 NGC25.08 이미지 digest를 고정하고 별도 venv의 설치 버전/출처/SHA를 기록한다. 폐쇄망 별도 학습 장비에는 해당 이미지·동일 플랫폼 wheel·고정 HF snapshot과 검증 manifest·데이터 포함 소스 묶음이 필요하다. 이번 Thor 직접 다운로드/격리 검증을 새 폐쇄망 전체 설치 검증으로 보지 않는다. A/B/C 서비스·포트·추론 연결은 이 학습 준비에서 바꾸지 않는다.
+
+2026-11-04 포함gate 결속: 기존 소스 묶음의 `soc_management_run.py`를 root 참조파일로도 기록하고 controller의 불변 포함코드와 SHA를 대조한다. 바이너리·deb/wheel/image·하위 의존성 추가0이며 운영에 초기 설치기를 다시 실행하지 않는다. [검증·한계](../infra/hermes/management-gate-binding.md).

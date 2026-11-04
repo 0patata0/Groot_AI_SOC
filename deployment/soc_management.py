@@ -503,6 +503,7 @@ def prepare_siem(s):
     install_rules(bundle, p, share["rule_token"], key, share["readonly_public_key"])
     mkdir("/opt/capstone-management", 0o755); mkdir("/etc/capstone-management"); mkdir("/var/lib/capstone-management")
     write("/opt/capstone-management/soc_management_controller.py", controller, 0o750)
+    write("/opt/capstone-management/soc_management_run.py", gate, 0o750)
     write("/opt/capstone-management/soc_alert_watch.prompt", bundle["soc_alert_watch.prompt"], 0o644)
     write("/opt/capstone-management/output_contract.py", bundle["output_contract.py"], 0o644)
     write("/opt/capstone-management/chat_markdown.py", bundle["chat_markdown.py"], 0o644)

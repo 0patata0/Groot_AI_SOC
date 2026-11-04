@@ -51,6 +51,25 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_rendered_inline_gate_matches_the_root_reference_and_rejects_stale_source(self):
+        m=module('soc_management_controller.py','b')
+        case={'mode':'verify','session_id':None,'operator_review':True,'required_sensor_reads':[{
+            'tool':'mcp__security_events__search_modsecurity_alerts','arguments':{
+                'source_ip':'192.0.2.60','since_kst':'2026-11-04T14:48:00+09:00',
+                'until_kst':'2026-11-04T14:48:59.999999+09:00','limit':50}}]}
+        gate=rendered('soc_management_run.py','b')
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(m,'__file__',str(Path(d)/'controller.py')):
+            reference=Path(d)/'soc_management_run.py';reference.write_bytes(gate)
+            command=m.verified_management_command(case)
+            self.assertEqual(command[command.index('-c')+1].encode(),gate)
+            self.assertTrue(any(x.startswith('CAPSTONE_REQUIRED_SENSOR_JSON=') for x in command))
+            tree=ast.parse(gate);entry=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
+            call=next(n for n in ast.walk(entry) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='install_grounding_retry')
+            self.assertEqual([ast.unparse(n) for n in call.args[-4:]],
+                ['requirements','status_receipts','sensor_requirements','sensor_receipts'])
+            reference.write_bytes(b'# stale reference\n')
+            with self.assertRaisesRegex(Exception,'embedded_gate_source_mismatch'):m.verified_management_command(case)
+
     def test_rendered_controller_keeps_exact_read_scope_and_embedded_gate(self):
         m = module('soc_management_controller.py', 'b')
         command = m.command_for({'mode':'verify','session_id':None,

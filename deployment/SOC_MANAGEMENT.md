@@ -82,3 +82,9 @@ multi-root AR·재실행 무변경·Wazuh live/source 교체와 복원을 검사
 kernel TTL은 브로커 장애와 무관하게 만료하며, 재부팅 뒤 임시 차단을 자동 재생성하지 않는다.
 과거 로그 일괄 전송, 일반 백업/복구, 장기 장애 backfill, 모델 판단 정확도 평가는 별도 과제다.
 승인으로 룰 원문이 바뀐 뒤 초기 역할의 원본 SHA 검증과 운영 변경 영수증을 조정하는 일반 업데이트 기능도 별도다.
+
+## 2026-11-04 실제 포함 gate와 참조 결속
+
+운영 CLI는 `python -I -B -c`의 불변 포함 코드를 실행한다. `run.py` 복사본만 갱신한 것으로 실행 코드 갱신을 판단하지 않는다. 신규 설치는 동일 렌더링 gate를 `/opt/capstone-management/soc_management_run.py`에도 root750으로 기록하고 기존 managed-files 원장에 포함한다. controller는 포함코드 SHA가 root참조와 다르면 자식 실행 전에 거절한다. 기존 운영 증분에서도 포함코드·참조·plugin/SDK 핀과 실제 MCP 구간을 함께 확인한다.
+
+현재 임시차단은 독립3흐름이 아닌 적격 ingress1흐름 또는 검증한WAF 거부 거래를 사용하는11/2이후 정책이다. 지정IDS Native 예외·원래600초·유지승인3600초·해제/만료후60초와 새근거 조건을 유지한다. 위날짜별3흐름설명은과거기록이다. [현재정책](../infra/mcp/approved-operations.md) · [실제 배포/927검사/잔여](../infra/hermes/management-gate-binding.md). 새패키지/포트/일반권한·실제새3VM설치 추가0이다.

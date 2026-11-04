@@ -13,6 +13,32 @@ import soc_management_controller as m
 import soc_management_run as runner
 
 
+class EmbeddedGateBinding(unittest.TestCase):
+    def test_stale_embedded_gate_is_refused_before_a_child_can_start(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(m,'__file__',str(Path(d)/'controller.py')):
+            source=Path(d)/'soc_management_run.py';source.write_bytes(b'print("current")\n')
+            command=['docker','exec','hermes','python','-I','-B','-c','print("stale")\n']
+            with mock.patch.object(m,'command_for',return_value=command):
+                with self.assertRaisesRegex(m.ControllerError,'embedded_gate_source_mismatch'):
+                    m.verified_management_command({})
+                command[-1]=source.read_text()
+                self.assertEqual(m.verified_management_command({}),command)
+
+    def test_inline_gate_requires_its_regular_reference_and_unambiguous_command(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(m,'__file__',str(Path(d)/'controller.py')):
+            command=['docker','exec','hermes','python','-I','-B','-c','print("gate")\n']
+            with mock.patch.object(m,'command_for',return_value=command):
+                with self.assertRaisesRegex(m.ControllerError,'gate_reference_missing'):m.verified_management_command({})
+                other=Path(d)/'other.py';other.write_text(command[-1]);(Path(d)/'soc_management_run.py').symlink_to(other)
+                with self.assertRaisesRegex(m.ControllerError,'gate_reference_missing'):m.verified_management_command({})
+                command+=['-c','ambiguous']
+                with self.assertRaisesRegex(m.ControllerError,'embedded_gate_shape_invalid'):m.verified_management_command({})
+
+    def test_canonical_development_file_command_is_preserved(self):
+        case={'mode':'verify','session_id':None}
+        self.assertEqual(m.verified_management_command(case),m.command_for(case))
+
+
 class Response:
     def __init__(self, raw, signature):
         self.raw, self.status = raw, 200

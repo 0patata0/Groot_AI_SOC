@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-04T21:08:12.240097+09:00",
+  "contract": "1.5.23",
+  "query": "1.19.18",
+  "tests": {
+    "output": 5,
+    "management": 240,
+    "sdk": 195,
+    "native": 390,
+    "review": 59,
+    "installation_contract": 38,
+    "total": 927,
+    "skipped": 0
+  },
+  "deployment": {
+    "at_kst": "2026-11-04T21:08:12.240097+09:00",
+    "targets": 11,
+    "protected": 8,
+    "unchanged_skill_sources": 3,
+    "tests_passed": 927,
+    "actual_read_coverage": "3/3",
+    "actual_tool_errors": 0,
+    "actual_case_state": "needs_review",
+    "actual_seconds": 195.3315281867981,
+    "embedded_gate_sha256": "67197ac874e587676d9a4db6d8d7408ee0b43ae75757cc09370e9b40600defe0",
+    "installed_stale_gate_rejected": true,
+    "case_closed": false,
+    "scope": "exact immutable source binding and mandatory read coverage; report/impact quality remains incomplete",
+    "confirmed_recovery_noop": true
+  },
+  "runtime_sha256": {
+    "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "67197ac874e587676d9a4db6d8d7408ee0b43ae75757cc09370e9b40600defe0",
+    "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "2fab5b41dde5a329b1ca6cf966036a1682a93158b0d5afd35ec310693bca0b94",
+    "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "ee84f52b98f77db87a17b0a9fc0cec76e3ce4508f9d1d9021957d25d85d562be",
+    "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "baea3a11845c9c75f137f449dd9ec9a5fd2f7dfcad3e47ff7dc280944f821a89",
+    "/opt/capstone-ollama-trial/grounding.py": "67197ac874e587676d9a4db6d8d7408ee0b43ae75757cc09370e9b40600defe0",
+    "/opt/capstone-ollama-trial/chat_contract.py": "2fab5b41dde5a329b1ca6cf966036a1682a93158b0d5afd35ec310693bca0b94",
+    "/opt/capstone-ollama-trial/query_grounding.py": "ee84f52b98f77db87a17b0a9fc0cec76e3ce4508f9d1d9021957d25d85d562be",
+    "/opt/capstone-management/soc_management_run.py": "67197ac874e587676d9a4db6d8d7408ee0b43ae75757cc09370e9b40600defe0",
+    "/opt/hermes-data/management-code/run.py": "67197ac874e587676d9a4db6d8d7408ee0b43ae75757cc09370e9b40600defe0",
+    "/etc/capstone-ollama-trial/receipt.json": "8302500303e5c51b50528c4578a4f43d380b364f0645d4b57101faf0cd35263f",
+    "/opt/capstone-management/soc_management_controller.py": "61719e0fad5a03c068925991925e314bf91b4fd7332486b4254b0ff36e38224f"
+  },
+  "model_changed": false,
+  "new_protected_actions": 0,
+  "fresh_install": false,
+  "manual_rollback_tested": false,
+  "report_semantics_complete": false,
+  "source_publication": {
+    "status": "pending"
+  }
+}

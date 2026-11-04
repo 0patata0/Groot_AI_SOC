@@ -48,3 +48,5 @@ B19:38/19:51/20:15 후보를 거쳐20:24:31에14대상·보호config/SOUL8SHA·�
 `/var/lib/capstone-incident-review/20261104-r1/deployment`에 원본/후보/중간SHA·manifest·독립 recovery를 보존한다. 검증 연장은 새15분 타이머를 먼저 등록한 뒤 기존 것을 정지했고, 확정 뒤 자체 타이머 정지·confirmed recovery no-op을 확인했다. 복구는 살아 있는 job/oneshot MainPID를 확인해 중단하지 않으며 외부 drift를 거절한다. 실제 수동 원복·새 공격E2E는 미시험이다.
 
 단일deploy.sh의 기존 management·queryplugin·SDK 설치 복사/출력SKILL 경로를 그대로 사용한다. 내부 CAPSTONE_REQUIRED_SENSOR_JSON은 controller가 사건별로 전달하는 고정 읽기 metadata이며 사용자가 입력하는 사이트 설정/권한이 아니다. 새 바이너리·오프라인 패키지나 설치 진입점 추가0, 사용자 조건으로 새3VM 설치0이다. 검사 원문·브라우저PNG·세션은 로컬 전용, 작은 검증 원장만 Git에 포함한다.
+
+후속 정정(11/4 21:08 KST): 다음1.5.23 단위 초반에 파일만 새로 쓰고 직전1.5.22 포함gate를 실행한 불일치를 발견했다. 실제 포함코드를 맞추고 SHA불일치 거절을 추가해 마지막 필수센서3/3·4MCP 오류0을 확인했다. 이 문서의 직전1.5.22 표/UI·79.068초는 당시 범위로 보존한다. [후속 근거·미완료](management-gate-binding.md).

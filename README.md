@@ -2,7 +2,9 @@
 
 구축·운영의 현행 진입점은 [배포 가이드](deployment/README.md)이며, [NCSC/NIS 공식 지침 부분 대조](deployment/SECURITY_GUIDELINES.md)와 [운영 절차](deployment/OPERATIONS.md)를 연결한다. 전체 기관 준수·새3VM 설치 검증 완료를 뜻하지 않는다. [조회 정확성 보완](infra/hermes/read-accuracy.md)은 실제 관측/시작값·도구 대상·한국어 필터를 구분한다.
 
-**채팅 하네스·담당 분배(11/4):** 공통1.5.22/query1.19.17/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
+**채팅 하네스·담당 분배(11/4):** 공통1.5.23/query1.19.18/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
+
+**관리 CLI 실행코드(11/4):** 파일 복사본과 제어기 안의 실제 포함코드가 달랐던 원인을 정정하고, 실행 전 root 참조 SHA와 일치하도록 검사합니다. 마지막 실제 재검토는4MCP/필수센서3구간 전부 조회·오류0,927검사 통과입니다. 사건은침해영향·보고 문구 보완이 필요해 추가 검토 상태이며 속도 개선으로 표시하지 않습니다. [실제 실행·복구·한계](infra/hermes/management-gate-binding.md).
 
 **사건 출력·표 표시(11/4):** 단일 `soc-output/SKILL.md`를 사건/자동 조사와 검증실패 보고에도 적용했습니다. 실제 브라우저에서 양봇 WAF·새 사건대체보고·FW 긴/분할 답변6게시물8표가 정상 표시됨을 확인했습니다.918회귀 통과·과거 게시물 소급 수정0이며 모든 출력 경로/단일 초장문 행 검증은 별도입니다. 사건 후속 조회는 원구간/후속 범위·실제 영수증을 대조하고, 마지막 재검토는 근거 부족으로 추가 검토 상태를 유지합니다. [범위·실패·복구](infra/hermes/incident-followup.md).
 

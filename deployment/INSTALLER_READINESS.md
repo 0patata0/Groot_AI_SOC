@@ -8,7 +8,7 @@
 | 웹 정책 | On·UI/API 포함 WAF·관리 CIDR+HMAC 소스 연결 | role 검증의 lab_waf_mode 구 설명 문자열 잔여·실제 새 환경 경로 검증 |
 | 공동 채널 | remote.sh에 siem review-chat-install/verify 두 작업만 추가. 역할3×작업명4=12조건으로 허용/거부 검사 | 실제 신규 review 설치는 미실행 |
 | 컨트롤러 | 누락된 security host-check/verify fixture3을 실제 실행 순서로 정정. 가짜SSH46PASS | 가짜SSH는 실제 remote dispatcher/VM 설치·복구 증거 아님. 별도 NAT/Ansible 후보는 이번 검증·게시 범위 밖 |
-| 공통 하네스 | read_contract/chat_harness/grounding/query·SDK runtime/harness와 출력 SKILL이 기존 복사/묶음 경로 사용. 사건/검증실패에도 단일soc-output재사용·내부 실행별 읽기 metadata. 설치계약37PASS | 새 OS 실행 시험 없음·패키지/포트/키 추가0 |
+| 공통 하네스 | read_contract/chat_harness/grounding/query·SDK runtime/harness와 출력 SKILL이 기존 복사/묶음 경로 사용. 사건/검증실패에도 단일soc-output재사용·내부 실행별 읽기 metadata·불변 포함gate와root참조SHA결속. 설치계약38PASS | 새 OS 실행 시험 없음·패키지/포트/키 추가0 |
 | 두 봇 프로필 | trial/chat/review 옵션·제한된 권한 모드 | 기본enable0/read-only와 현행 운영 두 봇 프로필을 구분. 완성된 제품 프로필 필요 |
 | WAF 원문 대응 | configure_waf_evidence 소스 포함 | 초기 producer/raw/pin/enrollment 자동 연결 미확인 |
 | 오프라인 | 역할별 deb/image SHA·버전 검사·로컬 설치 | wheel/TLS/runtime/catalog 등 포함 최종 통합 반입물·하위 의존성/서명 대장 미완성 |

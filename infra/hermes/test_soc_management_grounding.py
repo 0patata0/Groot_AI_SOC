@@ -28,7 +28,8 @@ class Grounding(unittest.TestCase):
             narrowed=wrapper.initial_review_read(original,['get_operation_status'],sensor_requirements=plan)
             self.assertEqual(narrowed['tool_choice'],'required')
             self.assertEqual([t['function']['name'] for t in narrowed['tools']],[plan[0]['tool']])
-            args=narrowed['tools'][0]['function']['parameters']['anyOf'][0]
+            args=narrowed['tools'][0]['function']['parameters']
+            self.assertEqual(args['type'],'object');self.assertNotIn('anyOf',args)
             self.assertEqual(args['properties']['source_ip']['enum'],['192.0.2.60'])
             self.assertNotIn('lookback_minutes',args['properties'])
             self.assertNotIn('arguments',narrowed)
@@ -42,6 +43,80 @@ class Grounding(unittest.TestCase):
                 self.assertTrue(wrapper.missing_sensor_reads(plan,[bad]))
         with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
             self.assertIs(wrapper.initial_review_read(original,[],sensor_requirements=plan),original)
+
+    def test_original_window_is_offered_before_recurrence_for_the_same_tool(self):
+        first=self.sensor_plan()[0]
+        second={'tool':first['tool'],'arguments':dict(first['arguments'],
+            since_kst='2026-11-04T14:48:02.598000+09:00',until_kst='2026-11-04T20:00:00+09:00')}
+        first={'tool':first['tool'],'arguments':dict(first['arguments'],until_kst='2026-11-04T14:48:59.999999+09:00')}
+        plan=[first,second];catalog=self.sensor_catalog()
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            request=wrapper.initial_review_read(catalog,['get_operation_status'],sensor_requirements=plan)
+            params=request['tools'][0]['function']['parameters']
+            self.assertEqual(params['properties']['since_kst']['enum'],[first['arguments']['since_kst']])
+            self.assertEqual(params['properties']['until_kst']['enum'],[first['arguments']['until_kst']])
+            receipt={'tool':first['tool'],'source_ip':first['arguments']['source_ip'],
+                'since':wrapper.parse_instant(first['arguments']['since_kst']),
+                'until':wrapper.parse_instant(first['arguments']['until_kst'])}
+            request=wrapper.initial_review_read(catalog,['search_modsecurity_alerts'],
+                sensor_requirements=plan,sensor_receipts=[receipt])
+            params=request['tools'][0]['function']['parameters']
+            self.assertEqual(params['properties']['since_kst']['enum'],[second['arguments']['since_kst']])
+            self.assertEqual(params['properties']['until_kst']['enum'],[second['arguments']['until_kst']])
+
+    def required_retry(self,plan,receipts,status=(),statuses=()):
+        return wrapper.grounding_wrapper(lambda agent,**kw:'original',
+            types.SimpleNamespace(FinalResponseVerdict=types.SimpleNamespace),lambda rows,row:rows.append(row),
+            lambda rows,user:0,self.completed,sensor_requirements=plan,sensor_receipts=receipts,
+            status_requirements=status,status_receipts=statuses)
+
+    def test_partial_success_cannot_end_before_missing_required_window_and_retry_is_bounded(self):
+        plan=self.sensor_plan();receipts=[];self.completed.append('get_operation_status')
+        self.kw['assistant_message'].content='표본을 확인했습니다.\nMANAGEMENT_STATUS: monitor'
+        call=self.required_retry(plan,receipts)
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            verdict=call(self.agent,**self.kw);self.assertEqual(verdict.action,'continue')
+            self.assertIn('필수 조회 영수증',self.kw['messages'][-1]['content'])
+            self.assertIn(plan[0]['arguments']['since_kst'],self.kw['messages'][-1]['content'])
+            request=self.agent._build_api_kwargs()
+            self.assertEqual([x['function']['name'] for x in request['tools']],[plan[0]['tool']])
+            self.assertEqual(request['reasoning_effort'],'none');self.assertNotIn('arguments',request)
+            # No SDK/wire dispatch is performed by the retry adapter.
+            self.assertEqual(self.completed,['get_operation_status'])
+            self.kw['codex_ack_continuations']=1
+            self.assertEqual(call(self.agent,**self.kw),'original')
+
+    def test_fresh_matching_receipt_allows_completion_and_manage_is_unchanged(self):
+        plan=self.sensor_plan();a=plan[0]['arguments'];receipts=[]
+        self.completed.append('search_modsecurity_alerts')
+        self.kw['assistant_message'].content='표본을 확인했습니다.\nMANAGEMENT_STATUS: monitor'
+        call=self.required_retry(plan,receipts)
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertEqual(call(self.agent,**self.kw),'original')
+        receipts.append({'tool':plan[0]['tool'],'source_ip':a['source_ip'],
+            'since':wrapper.parse_instant(a['since_kst']),'until':wrapper.parse_instant(a['until_kst'])})
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            self.assertEqual(call(self.agent,**self.kw),'original')
+
+    def test_required_status_retry_cannot_be_satisfied_by_an_unrelated_health_read(self):
+        self.completed.append('get_system_diagnostics')
+        self.kw['assistant_message'].content='서비스 확인.\nMANAGEMENT_STATUS: monitor'
+        req=[{'proposal_id':'a'*32,'target':'a:incident-ip'}]
+        call=self.required_retry(self.sensor_plan(),[],status=req)
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            verdict=call(self.agent,**self.kw);self.assertEqual(verdict.action,'continue')
+            request=self.agent._build_api_kwargs()
+            self.assertEqual([x['function']['name'] for x in request['tools']],['mcp__rule_a__get_operation_status'])
+            self.assertIn('status_reads',self.kw['messages'][-1]['content'])
+
+    def test_required_retry_still_preserves_interrupt_iteration_and_readonly_boundaries(self):
+        self.completed.append('get_operation_status');call=self.required_retry(self.sensor_plan(),[])
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            self.agent._interrupt_requested=True;self.assertEqual(call(self.agent,**self.kw),'original')
+            self.agent._interrupt_requested=False;self.kw['api_call_count']=11
+            self.assertEqual(call(self.agent,**self.kw),'original')
+            self.kw['api_call_count']=1;self.agent.tools=[definition(WRITE_NAMES[0])]
+            self.assertEqual(call(self.agent,**self.kw),'original')
 
     def test_sensor_requirements_cannot_add_authority_and_missing_catalog_is_error(self):
         plan=self.sensor_plan();self.assertEqual(wrapper.sensor_read_requirements(json.dumps(plan)),plan)

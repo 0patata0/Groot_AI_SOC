@@ -1595,6 +1595,24 @@ def command_for(case):
     return command
 
 
+def verified_management_command(case):
+    """An installed immutable inline gate must match its root-side source."""
+    command=command_for(case)
+    if '-c' not in command:
+        return command  # Canonical, unrendered development file entry point.
+    if command.count('-c')!=1:
+        raise ControllerError('management_embedded_gate_shape_invalid')
+    reference=Path(__file__).with_name('soc_management_run.py')
+    if reference.is_symlink() or not reference.is_file():
+        raise ControllerError('management_gate_reference_missing')
+    expected=reference.read_bytes()
+    index=command.index('-c')+1
+    if (index>=len(command) or not isinstance(command[index],str) or
+            len(expected)>MAX_RESPONSE or hashlib.sha256(command[index].encode()).digest()!=hashlib.sha256(expected).digest()):
+        raise ControllerError('management_embedded_gate_source_mismatch')
+    return command
+
+
 def run_hermes(store, case, prompt):
     if dict(case).get("operator_review") and case["mode"] == "verify":
         # Authenticated controller metadata reaches the wrapper out of band.
@@ -1613,7 +1631,7 @@ def run_hermes(store, case, prompt):
     proc = None
     try:
         with os.fdopen(fd, "wb") as output:
-            proc = subprocess.Popen(command_for(case), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+            proc = subprocess.Popen(verified_management_command(case), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
             # Bound prompt size keeps stdin below the controller's evidence cap.
             encoded = prompt.encode("utf-8")
             if len(encoded) > MAX_RESPONSE:

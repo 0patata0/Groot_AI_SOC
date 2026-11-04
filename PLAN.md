@@ -1,6 +1,6 @@
 # Agentic SOC 실행 계획
 
-전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [직전 계획](archive/PLAN-before-incident-review-20261104.md) · [조회 지연 전](archive/PLAN-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
+전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [직전 계획](archive/PLAN-before-gate-binding-20261104.md) · [사건 표 전](archive/PLAN-before-incident-review-20261104.md) · [조회 지연 전](archive/PLAN-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
 
 ## 역할과 승인
 
@@ -34,7 +34,7 @@ A 관리 SSH·Wazuh443/10443을 관리자231/32·내부 SSH를 MCP B 한주소�
 |---|---|---|
 |1 ·11/4~11/6| DVWA/Log4Shell을 일반 서비스로 운용하는 실제 경로·가동·정상/악성 분리 | 관리형 앱의 기존 중지 의도/필요 가동을 구분. 새 정상·SQLi/XSS/JNDI 등→실제 WAF/IDS/raw·Wazuh·LLM 판단/차단/유지·해제 카드·TTL/60초 재차단 확인. UI200·격리 stub403으로 전체 공격 성공 주장 안함 |
 |2 ·같은 구간| 장비 룰 중복/우회·FW·egress 정리 | IDS7쌍의 원문/설정 참조와 전체 룰 격리 전후14조건은 확인. Wazuh17쌍 중8쌍 native 양성 확인, Windows9쌍은 별도 격리 EventChannel 엔진 검증이 남음. 운영 통합 전 별칭/상관/AR·외부 참조·vendor 업데이트 지속성·정확 승인/독립 원복을 준비. 의도된 ET override/상호보완 탐지를 중복으로 삭제하지 않음. FW chain hook·순서·container→host·공개 직접 포트·IPv6 확인 |
-|3 ·11/4~11/7| LLM 업무 공백·하네스/도구·채팅 회귀 | 고정DetectionOnly 요약·한국어 연결 끊김·단문 WAF/SDK 대상 고정은 보완/903검사·새실채팅 확인. 사건 원래/후속 필수 읽기와 영수증·이름공간/부재 주의문 guard·공통사건표를1.5.22/query1.19.17로 적용,918검사·마지막79.068초/4MCP·표 게시를 확인했다. 일부 필수 원구간 조회/침해영향·종결은 미완료이고 미등록 자산/실습 추정 재발 회귀·최초 차단 지연은 계속 보완한다. C 지정 서비스/미등록 unit의 제한된 진단/승인형 제어 준비, 정확 후보 카드와 worker/검증·복구. FW 연속 후속·표 분할/페이지1.5.19 실제10조건/669검사까지 확인.19개 조건·handle/실제 근거 일치, 표시/조회량 축소0. 실제 브라우저 UI·초장문 단일 행은 잔여. 미지원 필터는 별도 잔여. 단문·동일 대화 후속·근거 확보·동료 검토·정보성 DNS/정찰·종결 품질 검증 |
+|3 ·11/4~11/7| LLM 업무 공백·하네스/도구·채팅 회귀 | 고정DetectionOnly 요약·한국어 연결 끊김·단문 WAF/SDK 대상 고정은 보완/903검사·새실채팅 확인. 사건 원래/후속 필수 읽기와 영수증·이름공간/부재 주의문 guard·공통사건표를1.5.22/query1.19.17로 적용,918검사·마지막79.068초/4MCP·표 게시를 확인했다. 이후1.5.23에서 실제 포함코드 불일치를 정정해 필수센서3/3·4MCP 오류0·927검사를 확인했다. 침해영향·종결/승인요청과 미승인만료 혼동·시각 경계·보고 품질은 미완료이고 미등록 자산/실습 추정 재발 회귀·최초 차단 지연은 계속 보완한다. C 지정 서비스/미등록 unit의 제한된 진단/승인형 제어 준비, 정확 후보 카드와 worker/검증·복구. FW 연속 후속·표 분할/페이지1.5.19 실제10조건/669검사까지 확인.19개 조건·handle/실제 근거 일치, 표시/조회량 축소0. 실제 브라우저 UI·초장문 단일 행은 잔여. 미지원 필터는 별도 잔여. 단문·동일 대화 후속·근거 확보·동료 검토·정보성 DNS/정찰·종결 품질 검증 |
 |4 ·11/5~11/7| NAT·기존 peer 후보 마감/독립 모델 비교 | NAT6의 관리자231/새 loader SHA 재기준·지속 설정/증분/TTL/독립 복구. peer4는 이번 하네스 범위로 인수·운영 검증, Ansible2는 미확정. 미사용176 평가·승인형 쓰기/원복·원본/학습+하네스 조합 비교 |
 |5 ·11/7~11/9| 핵심 회귀·장애/복구·재현/출처 정리 | 장기 Vector/수집/알림 재전송·미확인 사건, 데이터 무손실 원본1+정제본1 통합/SHA·설치/원복 문서. 새 OS3대 설치/장기 드라이버 원인은 별도 미검증 |
 |6 ·이후~12/1| 논문·최종 발표 | 논문은 실제 관측·공식 원출처·검증/환경 한계를 반영. 발표자료는11월둘째주 리마인더 이후 작성 |
@@ -58,3 +58,5 @@ OpenClaw·Google Harness²·SSL VPN/모바일 푸시는 후보/검토 범위다.
 [NCSC/NIS 부분 대조표](deployment/SECURITY_GUIDELINES.md)와 [운영 절차](deployment/OPERATIONS.md)를 기준으로 관리 경로·도구/승인·공개 웹·로그/시각·공급망·사고 대응을 연결한다. 이전 WAF 우회/검사 면제 사용법은 현행 가이드에서 정정·원문은 archive에 보존한다. 기관 준수/인력 요건 충족을 선언하지 않으며 로그1년 보존·NTP·전체 백업복원·MCP 취약점/메모리 정기 점검·새 설치의 미검증을 활성 과제로 유지한다. 실제 설치·기관 정책 변경을 자동 실행하는 지시가 아니다.
 
 [사건 후속·표 출력 검증](infra/hermes/incident-followup.md)은 표시/필수 읽기 검증의 완료와 실제 조사 미완료를 구분한다. 신규 학습·운영 모델 교체·추가 권한·보호 조치 실행을 이번 결과로 승인하지 않는다.
+
+[실제 포함gate 결속](infra/hermes/management-gate-binding.md) 후 필수읽기 누락은 마지막 표본에서 해소됐다.195.332초는 속도 향상 증거가 아니며 다음은 영향 근거와 보고의 사실 정확성을 보완한다. 논문 초안은11/4 현재 운영·실험을 반영했으나 그림/PDF·전체인용/제출형식·최종 독립평가가 남는다.

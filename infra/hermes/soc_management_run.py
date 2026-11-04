@@ -1254,15 +1254,18 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
         for original in value.get('tools',[]):
             name=original['function']['name'];rows=[r for r in missing if r['tool']==name]
             if not rows:continue
-            tool=json.loads(json.dumps(original));variants=[]
+            tool=json.loads(json.dumps(original))
             base=tool['function'].get('parameters',{})
-            for row in rows:
-                if not set(row['arguments'])<=set(base.get('properties',{})):
-                    raise RuntimeError('required_sensor_read_schema_unavailable')
-                variant={**base,'properties':{k:{**base['properties'][k],'enum':[v]} for k,v in row['arguments'].items()},
-                         'required':list(row['arguments']),'additionalProperties':False}
-                variants.append(variant)
-            tool['function']['parameters']={'anyOf':variants};tools.append(tool)
+            # Keep the original event's narrow window before recurrence for
+            # this tool. A top-level object also preserves native tool schema
+            # properties instead of hiding them behind alternative schemas.
+            row=rows[0]
+            if not set(row['arguments'])<=set(base.get('properties',{})):
+                raise RuntimeError('required_sensor_read_schema_unavailable')
+            tool['function']['parameters']={**base,'type':'object',
+                'properties':{k:{**base['properties'][k],'enum':[v]} for k,v in row['arguments'].items()},
+                'required':list(row['arguments']),'additionalProperties':False}
+            tools.append(tool)
         if {t['function']['name'] for t in tools}!={r['tool'] for r in missing}:
             raise RuntimeError('required_sensor_read_tools_unavailable')
         return {**value,'tools':tools,'tool_choice':'required'}
@@ -1304,7 +1307,7 @@ def missing_cited_sensor_reads(text, successful_reads):
     return missing
 
 
-def arm_grounding_read(agent, turn, required_reads=None):
+def arm_grounding_read(agent, turn, required_reads=None, *, required_read_phase=False):
     """One native request requires a model-selected existing read, never a named tool."""
     build = getattr(agent, '_build_api_kwargs', None)
     offered = permitted_tools(getattr(agent, 'tools', None), 'verify')
@@ -1336,14 +1339,15 @@ def arm_grounding_read(agent, turn, required_reads=None):
         result = permitted_request(result, 'verify')
         reads = [x for x in result.get('tools', []) if x['function']['name'] in names]
         result = {**result, 'tools': reads, 'tool_choice': 'required' if reads else 'none'}
-        return management_reasoning(result, agent)
+        return management_reasoning(result, agent, required_read_phase=required_read_phase)
 
     agent._build_api_kwargs = once
     agent._capstone_grounding_restore = restore
     return True
 
 
-def grounding_wrapper(original, native, append_message, reanchor, completed_calls, facts=None, argument_errors=None, successful_reads=None):
+def grounding_wrapper(original, native, append_message, reanchor, completed_calls, facts=None, argument_errors=None, successful_reads=None,
+                      status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=()):
     @functools.wraps(original)
     def wrapped(agent, **kw):
         restore = getattr(agent, '_capstone_grounding_restore', None)
@@ -1357,14 +1361,30 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         issues = evidence_claim_violations(content, facts or [], successful_reads)
         if completed_calls and management_status(content) is None:
             issues.append('missing_or_invalid_management_status')
-        factual = bool(completed_calls and issues)
-        argument_retry = bool(not completed_calls and argument_errors)
+        verify=os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
+        pending_status=[r for r in status_requirements if not any(f.get('kind')=='proposal_status' and
+            f.get('proposal_id')==r['proposal_id'] and f.get('target')==r['target'] for f in status_receipts)] if verify else []
+        pending_sensors=missing_sensor_reads(sensor_requirements,sensor_receipts) if verify and not pending_status else []
+        required_retry=bool(pending_status or pending_sensors)
+        if status_requirements or sensor_requirements:
+            # Bounded audit metadata only; never log model text or reasoning.
+            sys.stderr.write('management_read_completion '+json.dumps({
+                'verify':verify,'required_status':len(status_requirements),
+                'required_sensors':len(sensor_requirements),'sensor_receipts':len(sensor_receipts),
+                'pending_status':len(pending_status),'pending_sensors':len(pending_sensors),
+                'continuations':counter,'finish_reason':kw.get('finish_reason')})+'\n')
+        factual = bool(completed_calls and issues and not required_retry)
+        argument_retry = bool(not completed_calls and argument_errors and not required_retry)
         missing_evidence = any(x.startswith('unobserved_') for x in issues)
         needed_sensors = missing_cited_sensor_reads(content, successful_reads) if missing_evidence else set()
+        if required_retry:
+            needed_sensors=({('mcp__rule_'+r['target'][0]+'__'+('get_rule_change_status' if
+                r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status'))
+                for r in pending_status} if pending_status else {r['tool'] for r in pending_sensors})
         marker = '_capstone_factual_turn' if factual else '_capstone_argument_turn' if argument_retry else '_capstone_grounding_turn'
         known_retries = sum(getattr(agent, name, None) == turn for name in
                             ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn'))
-        if ((completed_calls and not factual) or kw.get('finish_reason') != 'stop' or
+        if ((completed_calls and not factual and not required_retry) or kw.get('finish_reason') != 'stop' or
                 getattr(agent, '_interrupt_requested', False) or kw.get('_pending_verification_response') is not None or
                 not isinstance(turn, str) or not turn or not isinstance(user, str) or not isinstance(messages, list)
                 or getattr(message, 'tool_calls', None) or type(counter) is not int or not 0 <= counter <= 2
@@ -1377,9 +1397,19 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         if (type(idx) is not int or not 0 <= idx < len(messages) or
                 not isinstance(messages[idx], dict) or
                 messages[idx].get('role') != 'user' or messages[idx].get('content') != user or
-                ((not factual or missing_evidence) and not arm_grounding_read(agent, turn, needed_sensors))):
+                ((not factual or missing_evidence) and not arm_grounding_read(agent, turn, needed_sensors,
+                    required_read_phase=required_retry))):
             return original(agent, **kw)
-        if factual:
+        if required_retry:
+            agent._capstone_grounding_turn = turn
+            pending=({'status_reads':pending_status} if pending_status else {'sensor_reads':pending_sensors})
+            nudge=('필수 조회 영수증이 아직 충족되지 않았습니다. 이미 실행한 다른 조회나 일부가 겹치는 구간은 '
+                '빠진 대상/구간의 확인을 대신하지 않습니다. 다음은 신뢰된 제어기가 제공한 읽기 참조이며 '
+                '성공 근거나 판단·쓰기/승인 지시가 아닙니다. 실제 등록된 MCP 도구와 정확한 인자를 직접 '
+                '선택해 빠진 조회를 수행한 뒤 현재 근거로 판단·보고를 이어가세요. '
+                '조회가 실패하거나 필요한 자료가 없으면 그 범위와 오류를 명시하고 종결하지 마세요.\n'+
+                json.dumps(pending,ensure_ascii=False))
+        elif factual:
             agent._capstone_factual_turn = turn
             nudge = ('조회 근거 일치 검사: ' + ','.join(issues) +
                 '. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. '
@@ -1422,7 +1452,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
     return wrapped
 
 
-def install_grounding_retry(completed_calls, facts=None, argument_errors=None, successful_reads=None):
+def install_grounding_retry(completed_calls, facts=None, argument_errors=None, successful_reads=None,
+                            status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=()):
     root = Path('/opt/hermes')
     try:
         unchanged = all(hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
@@ -1437,7 +1468,8 @@ def install_grounding_retry(completed_calls, facts=None, argument_errors=None, s
         raise RuntimeError('management_native_grounding_alias_changed')
     native.finish_text_response = loop.finish_text_response = grounding_wrapper(
         native.finish_text_response, native, metadata.append_message,
-        context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors, successful_reads)
+        context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors, successful_reads,
+        status_requirements,status_receipts,sensor_requirements,sensor_receipts)
 
 
 def review_unblock_allowed(mode):
@@ -1679,7 +1711,8 @@ def main():
     # Imports performed for the gates precede the CLI's background discovery.
     from tools.mcp_tool_discovery import discover_mcp_tools
     discover_mcp_tools()
-    install_grounding_retry(completed_wire_calls, read_facts, argument_errors, successful_read_names)
+    install_grounding_retry(completed_wire_calls, read_facts, argument_errors, successful_read_names,
+                            requirements,status_receipts,sensor_requirements,sensor_receipts)
     from hermes_cli.main import main as native_main
     native_main()
 

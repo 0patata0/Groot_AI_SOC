@@ -48,6 +48,9 @@
   "manual_rollback_tested": false,
   "report_semantics_complete": false,
   "source_publication": {
-    "status": "pending"
+    "status": "pushed_verified",
+    "commit": "61d232875beb837cd2a4124259008e4b5ff5e52e",
+    "remote_main": "61d232875beb837cd2a4124259008e4b5ff5e52e",
+    "at_kst": "2026-11-04T21:14:04.209379+09:00"
   }
 }

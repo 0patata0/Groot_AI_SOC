@@ -1,0 +1,826 @@
+{
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "3f5718e1fff090672582e48b69d3838781b06262c80204580dfd465c8ba759d2",
+    "infra/hermes/soc_management_controller.py": "c843c3c325761b49046d6abcf78e7592577f1cfbe73d0ab16f043f5ebf6dcafb",
+    "infra/hermes/query-completion/__init__.py": "e8ef14a7da01527c90871a7a8247904fe1656fdc3e4b38e733c065f6e5ec0078",
+    "infra/hermes/query-completion/plugin.yaml": "8774ee017a65e80f41d0e1091b6ee9583cd5c4bd27e74cc49ee6e78b3e586bb9",
+    "infra/ollama-trial/harness.py": "043d1d5f27e7ac5e0033709477e3ca35e5b9f0c0b99e50b370f8ab485d448837"
+  },
+  "unique_tests": 1024,
+  "final_skips": 0,
+  "projection": {
+    "before_bytes": 26976,
+    "after_bytes": 9463,
+    "reduction_pct": 64.92,
+    "all_rows_preserved": true
+  },
+  "actual_review": {
+    "ids": {
+      "run_id": "7ea68b03828a1a78be1503c60fdad187",
+      "seconds": 41.252336263656616,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 41.30359172821045,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 15,
+        "case_resolved": false,
+        "semantic_review": {
+          "backend_target_correct": true,
+          "no_expiry_recurrence_conflation": true,
+          "unresolved_and_incomplete_impact_retained": true,
+          "semantic_accuracy_exhaustively_proven": false
+        }
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.098383,
+          "input_message_bytes": 1828,
+          "usage": {
+            "completion_tokens": 47,
+            "prompt_tokens": 634,
+            "total_tokens": 681,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.512887,
+          "input_message_bytes": 6443,
+          "usage": {
+            "completion_tokens": 38,
+            "prompt_tokens": 2735,
+            "total_tokens": 2773,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 687
+            }
+          },
+          "compact_report": false
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 3.667383,
+          "input_message_bytes": 6945,
+          "usage": {
+            "completion_tokens": 40,
+            "prompt_tokens": 2966,
+            "total_tokens": 3006,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 18.660681,
+          "input_message_bytes": 38108,
+          "usage": {
+            "completion_tokens": 216,
+            "prompt_tokens": 15433,
+            "total_tokens": 15649,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true
+        }
+      ]
+    },
+    "waf": {
+      "run_id": "7a72ded81910581a7797607deb6b8ec5",
+      "seconds": 35.47252178192139,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 35.5182843208313,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 15,
+        "case_resolved": false,
+        "semantic_review_remaining": [
+          "원본 침해라는 명칭이 확정 침해로 읽힐 수 있음",
+          "재시도에 불과 표현은 위험 축소로 읽힐 수 있음",
+          "WAF 결과만이라는 문구는 실제 호스트/웹 표본을 충분한 영향 근거로 인정하지 않은 취지이나 표현 보완 필요"
+        ]
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.184188,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 57,
+            "prompt_tokens": 633,
+            "total_tokens": 690,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.420571,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 40,
+            "prompt_tokens": 1914,
+            "total_tokens": 1954,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.631105,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 43,
+            "prompt_tokens": 2146,
+            "total_tokens": 2189,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 94
+            }
+          },
+          "compact_report": false
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 13.205899,
+          "input_message_bytes": 30204,
+          "usage": {
+            "completion_tokens": 201,
+            "prompt_tokens": 10140,
+            "total_tokens": 10341,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true
+        }
+      ]
+    }
+  },
+  "attack_or_load_or_pcap_replay": 0,
+  "new_os_install": false,
+  "git_publication": "pending",
+  "live_r1": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793882809,
+      "files_verified": 11,
+      "protected_unchanged": 7,
+      "gate_sha256": "add0d5390e808c2432e82c3522c75965ba8d782f96589d00cb3be124dcc8924a",
+      "controller_sha256": "e7927f29621174c0e40fc0dde85f658d93952b0f3de803410baa5e6618e35f79",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 54739,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 11.101460218429565,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 4.101531505584717,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "first_candidate_actual": {
+    "run_id": "7fe942102f559ad252b137992c04ef1d",
+    "seconds": 214.50475,
+    "reads": 7,
+    "tool_errors": 0,
+    "protected_writes": 0,
+    "state": "outcome_unknown",
+    "detail": "model_subprocess_timeout_requires_review",
+    "cause_observed": "unobserved_disposition_tools_after_initial_report"
+  },
+  "live_r2": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793883398,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "79a2a70b28c9c2af6f993fa0cd2dd8db0f430b155e1884410033db503e1fb8dd",
+      "controller_sha256": "daa59e7130c634b9aa9e7e8f6e05925aee484cae442bed6ad6cf59e92ba202b3",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 55807,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 19.717057466506958,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 12.717135429382324,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "second_candidate_actual": {
+    "run_id": "11871019395b345e01d37201c9007b20",
+    "seconds": 214.363576,
+    "reads": 7,
+    "tool_errors": 0,
+    "protected_writes": 0,
+    "state": "outcome_unknown",
+    "detail": "model_subprocess_timeout_requires_review",
+    "literal_citation_repair_profile_observed": true
+  },
+  "read_only_web_review_profile": {
+    "scope": "verify+operator_review+web_impact_review after required and actual target/host/access reads",
+    "reasoning_effort": "none",
+    "max_tokens": 3072,
+    "protected_work_profile_changed": false,
+    "all_evidence_and_closure_checks_retained": true,
+    "iteration_limit_changed": false,
+    "time_limit_changed": false,
+    "compact_report_max_tokens": 800
+  },
+  "live_r3": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793883968,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "448e491c9f195a23554c7637ce8110dbeafec224646b70cf7d4478c809db20d0",
+      "controller_sha256": "6edcbaf06b74c7ab7e66ed9f4af8745696547f7f0043aff853e26aab318c938e",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 56235,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 2.312098979949951,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 14.312160730361938,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "third_candidate_actual": {
+    "run_id": "4625b496d4b3f632895e4c9c133689a3",
+    "seconds": 148.422943,
+    "reads": 7,
+    "tool_errors": 0,
+    "protected_writes": 0,
+    "state": "completed",
+    "report_state": "needs_review",
+    "assessment": "unresolved",
+    "quality_accepted": false,
+    "remaining_quality_errors": [
+      "internal_instruction_echo",
+      "observation_vs_incident_time",
+      "waiting_for_admin_instruction"
+    ]
+  },
+  "structured_report": {
+    "model_owns": [
+      "additional_read_selection",
+      "assessment",
+      "basis",
+      "limitations",
+      "next_steps",
+      "status"
+    ],
+    "receipt_projection": [
+      "times",
+      "counts",
+      "scope_limits",
+      "service_observation"
+    ],
+    "current_run_successful_citations_only": true,
+    "native_dispatch_retained": true,
+    "source_report_tables_not_model_generated": true
+  },
+  "live_r4": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793884908,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "b70d7327020837b45adca2fcd178c7120088cba74f49ff66cf3217fbab96b15f",
+      "controller_sha256": "154389c6bc9343ae6d8a341ce9e168467386a6e11d7478cbac918d1e61297c57",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 58299,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 13.071091175079346,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 5.071153879165649,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "target_seconds": 30,
+  "r5_actual": {
+    "seconds": 55.86481046676636,
+    "outbox_seconds": 55.919671297073364,
+    "reads": 7,
+    "semantic_limit": "sensor agent confused with protected target",
+    "automatic_followup_timeout_seconds": 214.3439745903015
+  },
+  "r5_changes": [
+    "current nonce bound indexed exact read choices",
+    "independent required status/sensor choices together",
+    "current receipts and verbatim user/controller requests in compact model copy",
+    "model may explicitly enter full read investigation",
+    "max_tokens 256 read-selection / 800 compact report"
+  ],
+  "live_r5": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793886490,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "945c5fb3f05a28ce4aaa78207afd149e7d1a6235a7e01282462077da47a30a0a",
+      "controller_sha256": "efa031fde45de743f5761bc1ebf934c398637a23bc0b424540c0400a4c12578b",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 62463,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 20.380603313446045,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 12.38066554069519,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "live_r6": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793887248,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "c4f8423f7b4b8f043b04e17f8d61e92ff7ae719d8260f17fc7c663d65d3b56d6",
+      "controller_sha256": "60e6bf364ec87d9fda9cf1902fa79d5f9a044aaa3c4e41942b09937a3882f3db",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 62919,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 18.26284885406494,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 1.2629103660583496,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "live_r7": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793887557,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "37334519106a143c4b21d03a9349e55abd7f29a302419ae9e61343cf0fa474c0",
+      "controller_sha256": "c67815929288df67e2d5f2e2e5c5638bd11b300f4a0f29716dc960b25e327a5b",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 63403,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 1.840127944946289,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 13.840186357498169,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "live_r8": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793887945,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "3f5718e1fff090672582e48b69d3838781b06262c80204580dfd465c8ba759d2",
+      "controller_sha256": "a89de21187286132d1049f9dd9ae23f48cc918a7e4e200f566589827872865d2",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 64171,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 2.480865716934204,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 14.48092770576477,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "live": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793887945,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "3f5718e1fff090672582e48b69d3838781b06262c80204580dfd465c8ba759d2",
+      "controller_sha256": "a89de21187286132d1049f9dd9ae23f48cc918a7e4e200f566589827872865d2",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 64171,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 2.480865716934204,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 14.48092770576477,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "r6_actual": {
+    "seconds": 41.81792855262756,
+    "successful_report": false,
+    "reason": "incident_disposition_evidence_missing"
+  },
+  "r7-ids-summary": {
+    "run_id": "eeefe5b46588cd9f8cfc06db095a1455",
+    "seconds": 42.44479846954346,
+    "reads": 7,
+    "tool_errors": 0,
+    "protected_writes": 0,
+    "run_state": "completed",
+    "run_detail": "model_needs_review",
+    "report_state": "needs_review",
+    "assessment": "unresolved",
+    "outbox": "sent",
+    "outbox_seconds": 42.50630211830139,
+    "quality_checks": {
+      "internal_hint_echo": false,
+      "factual_table_exact": true,
+      "evidence_guard_violations": [],
+      "citation_error": null,
+      "citations_current_successful": true,
+      "fact_rows": 15,
+      "case_resolved": false
+    },
+    "provider_calls": [
+      {
+        "selected_reads": 4,
+        "provider_seconds": 2.262276,
+        "input_message_bytes": 1828,
+        "usage": {
+          "completion_tokens": 56,
+          "prompt_tokens": 633,
+          "total_tokens": 689,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": false
+      },
+      {
+        "selected_reads": 1,
+        "provider_seconds": 3.335172,
+        "input_message_bytes": 6443,
+        "usage": {
+          "completion_tokens": 38,
+          "prompt_tokens": 2735,
+          "total_tokens": 2773,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": false
+      },
+      {
+        "selected_reads": 2,
+        "provider_seconds": 3.607014,
+        "input_message_bytes": 6945,
+        "usage": {
+          "completion_tokens": 41,
+          "prompt_tokens": 2967,
+          "total_tokens": 3008,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": false
+      },
+      {
+        "selected_reads": 0,
+        "provider_seconds": 18.802121,
+        "input_message_bytes": 36200,
+        "usage": {
+          "completion_tokens": 239,
+          "prompt_tokens": 14730,
+          "total_tokens": 14969,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": true
+      }
+    ]
+  },
+  "r7-waf-summary": {
+    "run_id": "d4f823f679e99fd42c9905d820ab32c7",
+    "seconds": 175.4174988269806,
+    "reads": 7,
+    "tool_errors": 0,
+    "protected_writes": 0,
+    "run_state": "completed",
+    "run_detail": "model_needs_review",
+    "report_state": "needs_review",
+    "assessment": null,
+    "outbox": "sent",
+    "outbox_seconds": 175.46286797523499,
+    "quality_checks": {
+      "internal_hint_echo": false,
+      "factual_table_exact": true,
+      "evidence_guard_violations": [],
+      "citation_error": "incident_disposition_missing",
+      "citations_current_successful": false,
+      "fact_rows": 15,
+      "case_resolved": false
+    },
+    "provider_calls": [
+      {
+        "selected_reads": 4,
+        "provider_seconds": 1.961265,
+        "input_message_bytes": 1831,
+        "usage": {
+          "completion_tokens": 44,
+          "prompt_tokens": 630,
+          "total_tokens": 674,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": false
+      },
+      {
+        "selected_reads": 1,
+        "provider_seconds": 2.456507,
+        "input_message_bytes": 4923,
+        "usage": {
+          "completion_tokens": 40,
+          "prompt_tokens": 1914,
+          "total_tokens": 1954,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": false
+      },
+      {
+        "selected_reads": 2,
+        "provider_seconds": 2.844239,
+        "input_message_bytes": 5425,
+        "usage": {
+          "completion_tokens": 39,
+          "prompt_tokens": 2142,
+          "total_tokens": 2181,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": false
+      },
+      {
+        "selected_reads": 0,
+        "provider_seconds": 9.528716,
+        "input_message_bytes": 28330,
+        "usage": {
+          "completion_tokens": 44,
+          "prompt_tokens": 9451,
+          "total_tokens": 9495,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": true
+      }
+    ]
+  },
+  "current_version": "query1.19.40",
+  "all_complex_cases_target_achieved": false,
+  "r8_changes": [
+    "root-bound exact operator context and evidence scope",
+    "full actual successful receipt citations",
+    "strict inner JSON model view with original hash",
+    "sample-only per-sensor expiry chronology",
+    "one concise judgment/limitation/next-step; full literal evidence table",
+    "additional model-selected inquiry retained"
+  ],
+  "final_health": {
+    "confirmed_at_epoch": 1793888160,
+    "files_verified": 11,
+    "protected_unchanged": 7,
+    "gate_sha256": "3f5718e1fff090672582e48b69d3838781b06262c80204580dfd465c8ba759d2",
+    "controller_sha256": "a89de21187286132d1049f9dd9ae23f48cc918a7e4e200f566589827872865d2",
+    "gate_matches_reference": true,
+    "ids_path_impact_enabled": true,
+    "gate_argument_bytes": 64171,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 17.356656074523926,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 9.35672378540039,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "automatic_shared_status_required": 1,
+    "sensor_reads_required": 3
+  },
+  "server_cleanup": {
+    "r1": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6610763,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r1/deployment"
+    },
+    "r2": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6618598,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r2/deployment"
+    },
+    "r3": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6622047,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r3/deployment"
+    },
+    "r4": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6638707,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r4/deployment"
+    },
+    "r5": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6661102,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r5/deployment"
+    },
+    "r6": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6666869,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r6/deployment"
+    },
+    "r7": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6670425,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r7/deployment"
+    },
+    "r8": {
+      "source_files_removed": 439,
+      "source_bytes_removed": 6673832,
+      "test_records_copied_then_removed": 9,
+      "backup_preserved": "/var/lib/capstone-case-latency/20261105-r8/deployment"
+    }
+  },
+  "mac_cleanup": {
+    "path": "/private/tmp/capstone-case-latency-20261105-OtiFRr",
+    "path_absent": true,
+    "files": 89,
+    "bytes": 34401464,
+    "task_processes_before_cleanup": 0,
+    "mac_packages_installed": 0,
+    "audit": "helper-audit/ and helper-manifest.json"
+  }
+}

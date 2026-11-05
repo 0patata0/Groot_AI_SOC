@@ -47,3 +47,7 @@
 A는 기존 ip nat/filter/raw와 inet capstone_fw를 사용한다. 관리자 정책·차단/예외는 capstone_fw, Docker 경로는 자동 테이블에 유지한다. NAT3규칙은 기본 nat로 통합했고 IPv6 전용 테이블은 A/B/C에서 제거했다. 유지보수는 root deploy.sh --firewall-nat/--ipv4-only로 하며 LLM 일반 sudo를 추가하지 않는다. [운영 검증·복구·미시험](../infra/mcp/fw-consolidation.md).
 
 HTTP Wazuh는같은호스트HTTPS308,관리ACL유지다. 웹 보호의429는요청제한이며그자체로IP차단/악성판정이아니다. 임시차단카드의검증근거와요청자판단사유를구분한다. 공격시험은사용자재지시전중단한다. [운영값·복구](../infra/validation/web-traffic/README.md) · [사유/조회](../infra/mcp/containment-display.md).
+
+복합 사건 지연은 [query1.19.40 검증](../infra/hermes/case-latency.md)을 따른다. 웹 조회 원문은 감사에 보존하고 모델 요청에만 무손실 열식 표현을 적용한다. 실제 등록 후 독립 host/앱 읽기 동시 선택과 간결 보고를 허용하되 필수 조회 뒤 지정 읽기 전용 웹 재검토만 none/3072로 조정한다. 추가 읽기/모델 판단은 유지하고 실제 영수증으로 표를 구성한다. 일반 관리/보호쓰기·12turn/180·210초·승인/종결 경계는 유지한다. 기존 source복사/gate렌더·설치41검사를 사용하고 새 의존성/설정키/포트는 없다.
+
+제어기가 단일 사건의 정확한 운영자 요청/증거 범위를 내부 CAPSTONE_REVIEW_CONTEXT_JSON으로 전달하며 원문감사는 보존한다. 모델 선택256/보고800토큰·실제 인용 전체·시각 대조·추가조사 복귀를 적용한다. 새 사용자설정키는 아니다.30초 목표·예외/실패는 위 검증 원장으로 확인한다.

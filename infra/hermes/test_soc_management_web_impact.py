@@ -23,7 +23,7 @@ class WebImpactNavigation(unittest.TestCase):
         self.assertIs(m.web_impact_review_request(self.request,[],[],self.plan),self.request)
     def test_candidate_reads_use_only_observed_registration_and_exact_incident_bounds(self):
         r=m.web_impact_review_request(self.request,[self.events,self.target],['get_web_service_target'],self.plan)
-        self.assertEqual(self.names(r),['mcp__security_events__search_wazuh_alerts'])
+        self.assertEqual(set(self.names(r)),{'mcp__security_events__search_wazuh_alerts','mcp__security_events__search_web_access'})
         for t in r['tools']:
             p=t['function']['parameters'];self.assertNotIn('source_ip',p['properties']);self.assertNotIn('wazuh_rule_id',p['properties'])
             self.assertEqual(p['properties']['since_kst']['enum'],[self.plan[0]['arguments']['since_kst']])
@@ -62,7 +62,7 @@ class WebImpactNavigation(unittest.TestCase):
         g.kw['codex_ack_continuations']=1;self.assertEqual(call(g.agent,**g.kw),'original')
         attempted.append('get_web_service_target');facts.append(self.target)
         v=call(g.agent,**g.kw);self.assertEqual(v.codex_ack_continuations,2)
-        self.assertEqual(self.names(g.agent._build_api_kwargs()),['mcp__security_events__search_wazuh_alerts'])
+        self.assertEqual(set(self.names(g.agent._build_api_kwargs())),{'mcp__security_events__search_wazuh_alerts','mcp__security_events__search_web_access'})
         g.kw['codex_ack_continuations']=2;self.assertEqual(call(g.agent,**g.kw),'original')
         attempted.append('search_wazuh_alerts')
         v=call(g.agent,**g.kw);self.assertEqual(v.codex_ack_continuations,3)
@@ -85,3 +85,23 @@ class WebImpactNavigation(unittest.TestCase):
             self.assertIs(m.web_impact_review_request(self.request,[self.events],[],self.plan),self.request)
         with self.assertRaisesRegex(RuntimeError,'web_impact_read_tools_unavailable'):
             m.web_impact_review_request({'tools':[]},[self.events],[],self.plan)
+
+
+class ReceiptChronology(unittest.TestCase):
+    def test_actual_times_partition_each_sensor_without_absence_conclusion(self):
+        import soc_management_run as m
+        facts=[{'kind':'containment_clock','times':{'temporary_expires_at':'2026-11-05T12:35:46+09:00'}},
+            {'kind':'events','source':'suricata','observations':[{'timestamp_kst':'2026-11-05T12:25:46+09:00'}]},
+            {'kind':'events','source':'modsecurity','observations':[{'timestamp_kst':'2026-11-05T19:56:29+09:00'},{'timestamp_kst':'2026-11-05T12:35:46+09:00'}]}]
+        result=m.temporal_review_observations(facts)
+        self.assertEqual([(r['sample_at_or_before_expiry'],r['sample_after_expiry']) for r in result],[(1,0),(1,1)])
+        self.assertTrue(all('not_total_or_absence_proof' in r['scope'] for r in result))
+        self.assertFalse(any('assessment' in r for r in result))
+
+    def test_invalid_naive_or_missing_times_never_compare_as_known(self):
+        import soc_management_run as m
+        self.assertEqual(m.temporal_review_observations([{'kind':'containment_clock','times':{'temporary_expires_at':'2026-11-05T12:35:46'}}]),[])
+        facts=[{'kind':'containment_clock','times':{'temporary_expires_at':'2026-11-05T12:35:46+09:00'}},
+            {'kind':'events','source':'suricata','observations':[{}, {'timestamp_kst':'bad'}, {'timestamp_kst':'2026-11-05T12:40:00'}]}]
+        row=m.temporal_review_observations(facts)[0]
+        self.assertEqual(row['sample_time_unknown'],3);self.assertEqual(row['sample_after_expiry'],0)

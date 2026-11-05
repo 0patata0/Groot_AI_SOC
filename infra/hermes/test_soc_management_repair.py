@@ -2,6 +2,7 @@
 import copy
 import contextlib
 import io
+import json
 import os
 import types
 import unittest
@@ -82,5 +83,91 @@ class LiteralRepair(unittest.TestCase):
         self.assertEqual(result['tool_choice'],'auto')
         self.assertIn('containment_deadline_clock_mismatch',fixture.kw['messages'][-1]['content'])
         self.assertIs(fixture.agent._build_api_kwargs,fixture.builder)
+
+    def test_unknown_citation_is_rewritten_without_inventing_or_requiring_a_read(self):
+        good='mcp__security_events__search_suricata_alerts'
+        typo='mcp__security_events::search_suricata_alerts'
+        catalog=[{'type':'function','function':{'name':good}}]
+        text='INCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved',
+            'basis':'실제 센서 표본을 확인했지만 전체 침해 영향은 아직 미확인입니다.',
+            'evidence_tools':[good,typo]})+'\nMANAGEMENT_STATUS: needs_review'
+        self.assertTrue(m.citation_name_repair(text,[good],catalog))
+        self.assertEqual(m.evidence_claim_violations(text,[],[good]),['unobserved_disposition_tools'])
+        import test_soc_management_grounding as g
+        fixture=g.Grounding();fixture.setUp();fixture.completed.append(good)
+        fixture.kw['assistant_message'].content=text
+        callback=m.grounding_wrapper(lambda agent,**kw:'original',
+            types.SimpleNamespace(FinalResponseVerdict=types.SimpleNamespace),
+            lambda rows,row:rows.append(row),lambda rows,user:0,
+            fixture.completed,successful_reads=[good])
+        verdict=callback(fixture.agent,**fixture.kw)
+        self.assertEqual(verdict.action,'continue')
+        with contextlib.redirect_stderr(io.StringIO()):request=fixture.agent._build_api_kwargs()
+        self.assertEqual(request['tool_choice'],'auto')
+        self.assertEqual(request['reasoning_effort'],'none')
+        self.assertIn('unobserved_disposition_tools',fixture.kw['messages'][-1]['content'])
+        self.assertIn(typo,text)  # No automatic name correction or fabricated receipt.
+
+    def test_registered_unread_or_resolved_citation_retains_normal_evidence_retry(self):
+        good='mcp__security_events__search_suricata_alerts'
+        missing='mcp__security_events__search_modsecurity_alerts'
+        catalog=[{'type':'function','function':{'name':n}} for n in (good,missing)]
+        def report(assessment,names):
+            return 'INCIDENT_DISPOSITION: '+json.dumps({'assessment':assessment,
+                'basis':'실제 센서 표본을 확인했지만 전체 침해 영향은 아직 미확인입니다.',
+                'evidence_tools':names})+'\nMANAGEMENT_STATUS: needs_review'
+        for text in (report('unresolved',[good,missing]),report('benign',[good,'misspelled']),
+                     report('unresolved',['misspelled']),report('unresolved',[good,good,'misspelled'])):
+            self.assertFalse(m.citation_name_repair(text,[good],catalog))
+
+    def test_model_citation_hint_uses_only_successful_permitted_names_without_mutation(self):
+        good='mcp__security_events__search_suricata_alerts'
+        request={'messages':[{'role':'system','content':'관제 지시'}, {'role':'tool','content':'untrusted'}]}
+        before=copy.deepcopy(request)
+        shown=m.completed_citation_request(request,[good,good,'arbitrary','mcp__rule_write_a__propose_rule_edit'])
+        self.assertEqual(request,before)
+        self.assertEqual(shown['messages'][0]['content'].count(good),1)
+        self.assertNotIn('arbitrary',shown['messages'][0]['content'])
+        self.assertNotIn('propose_rule_edit',shown['messages'][0]['content'])
+        self.assertEqual(shown['messages'][1],before['messages'][1])
+        with patch.dict(os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertIs(m.completed_citation_request(request,[good]),request)
+        self.assertIs(m.completed_citation_request(request,[]),request)
+
+    def test_complete_web_review_uses_lower_thinking_without_changing_tools_or_judgment(self):
+        reads=['mcp__security_events__'+n for n in ('get_web_service_target','search_wazuh_alerts','search_web_access')]
+        before=copy.deepcopy(self.agent.request)
+        with patch.dict(os.environ,{'CAPSTONE_WEB_IMPACT_REVIEW':'1'}), contextlib.redirect_stderr(io.StringIO()):
+            result=m.completed_web_review_request(before,self.agent,reads,requirements_complete=True)
+        self.assertEqual(result['reasoning_effort'],'none');self.assertEqual(result['max_tokens'],3072)
+        self.assertEqual(before,self.agent.request)
+        for key in ('tools','tool_choice','messages'):self.assertEqual(result[key],before[key])
+
+    def test_incomplete_unrelated_write_or_other_model_review_keeps_original_profile(self):
+        reads=['mcp__security_events__'+n for n in ('get_web_service_target','search_wazuh_alerts','search_web_access')]
+        request=self.agent.request
+        with patch.dict(os.environ,{'CAPSTONE_WEB_IMPACT_REVIEW':'1'}):
+            self.assertIs(m.completed_web_review_request(request,self.agent,reads),request)
+            self.assertIs(m.completed_web_review_request(request,self.agent,reads[:-1],requirements_complete=True),request)
+            for key in ('CAPSTONE_WEB_IMPACT_REVIEW','CAPSTONE_OPERATOR_REVIEW','CAPSTONE_MANAGEMENT_REVIEW'):
+                with patch.dict(os.environ,{key:'0'}):
+                    self.assertIs(m.completed_web_review_request(request,self.agent,reads,requirements_complete=True),request)
+            with patch.dict(os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
+                self.assertIs(m.completed_web_review_request(request,self.agent,reads,requirements_complete=True),request)
+            self.agent.model='unverified-model'
+            self.assertIs(m.completed_web_review_request(request,self.agent,reads,requirements_complete=True),request)
+
+    def test_model_more_evidence_choice_reenters_real_read_selection_with_existing_budget(self):
+        import test_soc_management_grounding as g
+        f=g.Grounding();f.setUp();f.completed.append('get_operation_status')
+        f.agent._capstone_more_evidence_turn=f.agent._current_turn_id
+        f.agent._capstone_full_review_turn=f.agent._current_turn_id
+        f.kw['assistant_message'].content='추가 근거를 실제 조회하겠습니다.'
+        verdict=f.call(f.agent,**f.kw)
+        self.assertEqual(verdict.action,'continue')
+        self.assertEqual(f.agent._build_api_kwargs()['tool_choice'],'required')
+        self.assertIn('model_requested_additional_evidence',f.kw['messages'][-1]['content'])
+        self.assertIsNone(f.agent._capstone_more_evidence_turn)
+        self.assertEqual(f.agent._capstone_full_review_turn,f.agent._current_turn_id)
 
 if __name__=='__main__':unittest.main()

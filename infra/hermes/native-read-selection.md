@@ -1,6 +1,6 @@
 # 자동 검증의 요청별 읽기 선택
 
-2026-11-05 KST. common1.5.32/query1.19.32/security-events1.2.2. [현황](../../STATUS.md) · [검증 원장](native-read-selection.validation.json) · [직전 IDS 영향 조사](ids-impact-report.md).
+2026-11-05 당시 검증 기록. common1.5.32/query1.19.32/security-events1.2.2. 현재 운영 후속은 [복합 조사 지연](case-latency.md)을 따른다. [현황](../../STATUS.md) · [검증 원장](native-read-selection.validation.json) · [직전 IDS 영향 조사](ids-impact-report.md).
 
 ## 원인과 변경
 

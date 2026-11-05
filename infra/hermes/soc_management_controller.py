@@ -1381,6 +1381,12 @@ def prompt_for(base, case, evidence):
                 "check_id를 추측하지 말고 반환된 점검 제목/결과와 스캔 시각을 대조한다. "
                 "정확한 항목이 failed 또는 누락이면 해결 완료로 종결하지 않는다.")
     if case['mode']=='verify' and references:
+        current_request += ("\n보고는 핵심 판단 2문장과 센서·대응·호스트·앱의 근거/미확인을 묶은 간결한 표로 작성한다. "
+            "중요 근거나 한계는 빠뜨리지 않되 원문 JSON·동일 시각/식별자·이미 설명한 정책을 반복 출력하지 않는다. "
+            "이번 실행에서 확인한 상태·등록 정보는 재사용하고, 상태 변화 확인이나 새 근거 목적이 있을 때만 다시 조회한다. "
+            "반환 표본이0건이면 반드시 '반환 표본0건·전체/침해 여부 미확인'으로 구분한다. "
+            "일부 표본의403/302나 낮은 경보 level만으로 모든 공격 차단·사건 무관·침해 부재를 단정하지 않는다. "
+            "가능한 필수 읽기를 마친 뒤 남은 근거 공백과 다음 조치를 보고하며, 근거 없는 정상/종결로 시간을 줄이지 않는다.")
         current_request += ("\n원래 사건 재발견과 차단 만료 확인만으로 조사를 끝내지 않는다. "
             "post_incident_read_plan은 원래 사건 시각을 포함한 재발 대조 구간이며 실제 등록된 WAF/IDS 읽기를 직접 선택한다. 경계 시각에서 원래 경보가 다시 반환될 수 있다. WAF는 실제 최초 조회의 transaction_id_sha256를 대조하고, 원래 거래의 재반환을 새 공격으로 세지 않는다. 시각을 임의로 조금 옮기거나 시간/IP만으로 다른 사건을 합치지 않는다. 거래/이벤트 식별이 없으면 재발 여부 미확인으로 남긴다. "
             "상한에 닿거나 조회가 실패하면 해당 범위를 미확인으로 남긴다. "
@@ -1659,6 +1665,22 @@ must preserve the original review task and its scope.
             "\nTRUSTED_CURRENT_REQUEST_JSON\n" + canonical({"request": current_request}))
 
 
+def compact_review_context(case):
+    """Root-owned current request for a completed-evidence API projection."""
+    row=dict(case)
+    if (row.get('mode')!='verify' or row.get('operator_review') is not True
+            or row.get('web_impact_review') is not True):return None
+    reads=row.get('required_status_reads',[]);scope=row.get('compact_review_evidence_scope')
+    if (not isinstance(reads,list) or len(reads)!=1 or reads[0].get('target')!='a:incident-ip'
+            or not isinstance(scope,dict)):return None
+    cid=row.get('id');reason=row.get('operator_review_reason','')
+    if (not isinstance(cid,str) or not re.fullmatch(r'[0-9a-f]{32}',cid)
+            or not isinstance(reason,str) or len(reason)>4096):
+        raise ControllerError('compact_review_context_invalid')
+    return {'case_id':cid,'operator_reason':reason,'mode':'verify','evidence_scope':scope,
+        'purpose':'기존 사건의 실제 영향·위험·대응 결과를 읽기 전용으로 재검토하고 필요한 조사/승인안을 주도한다.'}
+
+
 def command_for(case):
     command = ["/usr/local/bin/docker", "exec", "-i", "-u", "995:986", "-e", "HERMES_HOME=/opt/data/management",
                "-e", "CAPSTONE_MANAGEMENT_MODE=" + case["mode"], "-w", "/opt/data/management", "hermes",
@@ -1698,6 +1720,9 @@ def command_for(case):
         if case['mode']!='verify' or not sensor_reads:
             raise ControllerError('web_impact_review_invalid')
         command[2:2]=['-e','CAPSTONE_WEB_IMPACT_REVIEW=1']
+    compact_context=compact_review_context(case)
+    if compact_context is not None:
+        command[2:2]=['-e','CAPSTONE_REVIEW_CONTEXT_JSON='+canonical(compact_context)]
     if case["session_id"]:
         if not SESSION.fullmatch(case["session_id"]):
             raise ControllerError("session_id_invalid")
@@ -1746,8 +1771,14 @@ def verification_case(store, case, at=None):
             for p in evidence["proposals"]])
         at=at or (datetime.fromisoformat(case['incident_read_at'])
             if dict(case).get('incident_read_at') else datetime.now(timezone(timedelta(hours=9))))
-        reads=incident_read_plan(evidence,at)['requests']+incident_followup_plan(evidence,at)['requests']
+        incident=incident_read_plan(evidence,at);followup=incident_followup_plan(evidence,at)
+        reads=incident['requests']+followup['requests']
         case=dict(case,required_sensor_reads=[{'tool':r['tool'],'arguments':r['arguments']} for r in reads],
+            compact_review_evidence_scope={
+                'evidence_total':evidence.get('evidence_total'),'evidence_included':evidence.get('evidence_included'),
+                'evidence_truncated':evidence.get('evidence_truncated',True),
+                'incident_plan':{k:v for k,v in incident.items() if k!='requests'},
+                'followup_plan':{k:v for k,v in followup.items() if k!='requests'}},
             web_impact_review=bool(sensor_review_requirements(evidence))
                 and any(p.get('target')=='a:incident-ip' for p in evidence['proposals']))
     return case

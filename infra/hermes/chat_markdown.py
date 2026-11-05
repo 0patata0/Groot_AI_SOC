@@ -98,6 +98,69 @@ def _table_spans(lines):
     return spans
 
 
+def labeled_report_tables(text):
+    """Format parallel labelled report bullets, preserving values and decisions.
+
+    Only standalone, fully labelled blocks with at least two values qualify.
+    Unlabelled/continued lists, code, quotes, HTML and existing tables stay as-is.
+    No model text is summarized or replaced by a controller decision.
+    """
+    if not isinstance(text,str):raise TypeError('Markdown text must be a string')
+    lines=text.splitlines(keepends=True)
+    if _table_spans(lines) or re.search(r'(?m)^ {0,3}<[A-Za-z!/]',text):return text
+    def rows(block):
+        result=[];parent=None;used=False
+        for line in block:
+            item=re.fullmatch(r'( {0,2})[-*][ \t]+(.*)',line.rstrip('\r\n'))
+            if not item or len(item[1]) not in (0,2):return None
+            body=item[2]
+            if re.search(r'```|~~~|<[A-Za-z!/][^>]*>',body):return None
+            pair=re.fullmatch(r'\*\*(.{1,120}?)\*\*[ \t]*[:：][ \t]*(.*)',body)
+            if pair is None:
+                pair=re.fullmatch(r'([^:*`][^:：]{0,119})[:：][ \t]*(.*)',body)
+            if pair is None:return None
+            key,value=pair[1].strip(),pair[2]
+            if not key or '**' in key:return None
+            if not item[1]:
+                if parent and not used:return None
+                parent=None;used=False
+                if not value:
+                    parent=key;continue
+            elif not parent or not value:return None
+            if parent:key=parent+' / '+key;used=True
+            if not value:return None
+            result.append((key,value))
+        return result if len(result)>=2 and (not parent or used) else None
+    def cell(value):
+        return re.sub(r'(\\*)\|',lambda m:m[1]+('\\' if len(m[1])%2==0 else '')+'|',value)
+    out=[];i=0;fence=None;raw=None
+    while i<len(lines):
+        line=lines[i];body=line.rstrip('\r\n');marker=_FENCE.match(body)
+        if fence:
+            out.append(line);i+=1
+            if marker and marker[1][0]==fence[0] and len(marker[1])>=len(fence) and not marker[2].strip():fence=None
+            continue
+        if raw:
+            out.append(line);i+=1
+            if re.search(r'</'+raw+r'\s*>',body,re.I):raw=None
+            continue
+        if marker:fence=marker[1];out.append(line);i+=1;continue
+        html=_RAW.match(body)
+        if html:
+            raw=html[1] if not re.search(r'</'+html[1]+r'\s*>',body,re.I) else None
+            out.append(line);i+=1;continue
+        if not re.match(r'^[-*][ \t]+',body) or i and lines[i-1].strip():
+            out.append(line);i+=1;continue
+        end=i+1
+        while end<len(lines) and lines[end].strip() and re.match(r'^(?:[-*][ \t]|[ \t])',lines[end]):end+=1
+        values=rows(lines[i:end]) if end==len(lines) or not lines[end].strip() else None
+        if values is None:out.extend(lines[i:end]);i=end;continue
+        nl='\r\n' if line.endswith('\r\n') else '\n'
+        table=['| 확인 항목 | 보고 내용 |','| --- | --- |']+['| '+cell(k)+' | '+cell(v)+' |' for k,v in values]
+        out.append(nl.join(table)+(nl if lines[end-1].endswith(('\n','\r')) else ''));i=end
+    return ''.join(out)
+
+
 def split_tables(text, max_length=4000, len_fn=None, *, fallback):
     """Split recognized tables at row boundaries and repeat their exact header.
 

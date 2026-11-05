@@ -1,5 +1,9 @@
 # Groot_AI_SOC
 
+발표자료는11/5 새 지시에 따라 호스팅 없는 다운로드 PDF 초안20쪽으로 작성했습니다. 발표·논문·메모·검증 원문은 로컬 전용으로 유지하며 저장소에는 포함하지 않습니다. 최종 제출본·독립 평가·전 업무 완료 여부는 [현재 현황](STATUS.md)을 따릅니다.
+
+**IDS 영향·보고 표 후속(11/5):** 기존 operation 보고의 값을 유지해7행 표로 보완했고 실제 Mattermost 내부 화면에서 정상 표를 확인했습니다. IDS 교차 WAF 경로의 호스트 우선 조사와 실제 읽기 진전에 따른 제한 continuation을 적용했습니다. 고유965검사·B15파일 확정이며 실제8조회/오류0로 호스트6표본·백엔드49행까지 회복했지만214.3초 시간초과로 종결은 미완료입니다. 필수 도구 선택 미보장·JSON 형식 시험과 묶음 후보 미승격/1.19.30 복구를 구분했습니다. [실제 범위·한계·복구](infra/hermes/ids-impact-report.md).
+
 **자동 후속 검증 보완(11/5):** 공유 차단 상태를 새로 읽도록 자동 verify에도 필수 조회를 연결하고 정확 ID를 안내했습니다. 이번 반영에서 드러난 Linux 실행 인자 한도는 SHA 결속 압축 인자로 해결했습니다. 서버935검사·B고유9파일 확정/보호설정7SHA 유지이며, operation2읽기/오류0·73.4초, IDS4읽기/오류0·190.5초를 확인했습니다. IDS는 호스트 영향 미조회로 종결 거절됐고 operation은 목록형 출력이 남습니다. [원인·검증·복구](infra/hermes/shared-status-verification.md).
 
 **추가PCAP·실웹 확인(11/5):** 새7개와정답PDF2개를두Kali에동일SHA로반입하고 `PCAP_설명.txt`에자료별설명/출처/결과를두었습니다. 시험은232만,100,006패킷/엔진7성공·정상HTTP97/공격대조3의403·Native600초차단/카드/만료/302복구확인입니다. 경보29개는정탐수/모든정상·악성정답이아니며LLM후속검증/시간초과·시각차이는미완료입니다. [보관경로·실측·한계](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md).
@@ -20,7 +24,7 @@
 
 구축·운영의 현행 진입점은 [배포 가이드](deployment/README.md)이며, [NCSC/NIS 공식 지침 부분 대조](deployment/SECURITY_GUIDELINES.md)와 [운영 절차](deployment/OPERATIONS.md)를 연결한다. 전체 기관 준수·새3VM 설치 검증 완료를 뜻하지 않는다. [조회 정확성 보완](infra/hermes/read-accuracy.md)은 실제 관측/시작값·도구 대상·한국어 필터를 구분한다.
 
-**채팅 하네스·담당 분배(11/5 현행):** 공통1.5.32/query1.19.28/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
+**채팅 하네스·담당 분배(11/5 현행):** 공통1.5.32/query1.19.30/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
 
 **사건 조사·입력 검증:** 두 봇의 최소 종결 근거를 공유하고 Native도 실제 도구 스키마로 읽기 인자를 전송 전에 검사합니다. 실제-32602 요청 거절은 통신 장애와 구분합니다. 서버961검사·실제9거절/wire0 및 오류 뒤 정상MCP 회복을 확인했습니다. 새 사건 재검토는149.645초·8조회0오류/추적 관찰이며 최초/만료 시각 오표기는 후속 상태API·공통 검사로 보완했으며 새 실제 조사 시간초과·영향/종결은 남습니다. [입력·실제검증·복구](infra/hermes/mcp-input-validation.md) · [최소 종결/SDK](infra/hermes/incident-closure-minimum.md).
 

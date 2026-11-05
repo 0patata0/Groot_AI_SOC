@@ -4,10 +4,67 @@ import sys
 import unittest
 from types import SimpleNamespace
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from chat_markdown import normalize_tables
+from chat_markdown import normalize_tables,labeled_report_tables
 import review_channel_policy as policy
 
 TABLE='| 항목 | 상태 |\n|---|---|\n| IDS | 정상 |'
+
+class LabelledReportTests(unittest.TestCase):
+    def test_actual_operation_shape_preserves_values_context_and_decision(self):
+        text=('현재 상태를 조회했습니다.\n\n### 변경 절차 재검토\n\n'
+              '- **대상 IP**: 192.168.16.232\n- **현재 차단 상태 (`list_blocks`)**: `blocks: []` (확인 없음)\n'
+              '- **작업 결과**: expired / result_posted: true\n- **시점 기록 (KST)**:\n'
+              '  - 최초 적용 확인 시점: 12:25:47 (~68분 전)\n  - 만료 시각: 12:35:46 (~58분 전)\n'
+              '  - 쿨다운 종료: 12:36:46 (~57분 전)\n- **판단**: 해당 변경 절차 확인 완료\n\n'
+              '추가 영향은 별도 확인합니다.\nMANAGEMENT_STATUS: resolved')
+        out=labeled_report_tables(text)
+        self.assertEqual(sum(l.startswith('|') for l in out.splitlines()),9)
+        for value in ['192.168.16.232','`blocks: []` (확인 없음)','expired / result_posted: true',
+                      '시점 기록 (KST) / 최초 적용 확인 시점','12:25:47 (~68분 전)',
+                      '12:35:46 (~58분 전)','12:36:46 (~57분 전)','해당 변경 절차 확인 완료']:
+            self.assertIn(value,out)
+        self.assertTrue(out.startswith('현재 상태를 조회했습니다.\n\n### 변경 절차 재검토\n\n'))
+        self.assertTrue(out.endswith('추가 영향은 별도 확인합니다.\nMANAGEMENT_STATUS: resolved'))
+        self.assertEqual(labeled_report_tables(out),out)
+        # General chat table normalization alone does not reinterpret lists.
+        self.assertEqual(normalize_tables(text),text)
+
+    def test_escaped_pipes_links_code_and_whitespace_values_are_retained(self):
+        text='- ID: `x|y`\n- 근거: [source](https://example.test/a) `a\\|b`\n'
+        out=labeled_report_tables(text)
+        self.assertIn('`x\\|y`',out);self.assertIn('`a\\|b`',out)
+        self.assertIn('[source](https://example.test/a)',out)
+        self.assertEqual(labeled_report_tables(out),out)
+
+    def test_fences_quotes_html_indentation_and_multiline_lists_stay_byte_exact(self):
+        block='- A: one\n- B: two'
+        for text in ('```log\n'+block+'\n```','> '+block.replace('\n','\n> '),
+                     '    '+block.replace('\n','\n    '),'<div>\n\n'+block+'\n\n</div>',
+                     '- A: one\n  continued\n- B: two','- A: one\n- unlabeled',
+                     '- A: one\nplain continuation\n- B: two'):
+            self.assertEqual(labeled_report_tables(text),text)
+
+    def test_single_empty_or_unowned_nested_labels_are_not_fabricated(self):
+        for text in ('- A: one','- A:\n- B: two','- A: one\n  - B: two',
+                     '- A:\n    - B: two\n- C: three'):
+            self.assertEqual(labeled_report_tables(text),text)
+
+    def test_existing_tables_and_ordered_lists_are_preserved(self):
+        for text in (TABLE+'\n\n- A: one\n- B: two','1. A: one\n2. B: two'):
+            self.assertEqual(labeled_report_tables(text),text)
+
+    def test_crlf_and_missing_final_newline(self):
+        text='- A: one\r\n- B: two'
+        out=labeled_report_tables(text);self.assertNotIn('\n',out.replace('\r\n',''))
+        self.assertFalse(out.endswith('\n'));self.assertIn('| B | two |',out)
+
+    def test_root_output_contract_reuses_formatter_without_a_model_or_decision(self):
+        import output_contract
+        text='- 현재 상태: 미확인\n- 다음 확인: 실제 호스트 조회 필요\n'
+        out=output_contract.normalize_tables(text)
+        self.assertIn('| 현재 상태 | 미확인 |',out)
+        self.assertIn('| 다음 확인 | 실제 호스트 조회 필요 |',out)
+        self.assertNotIn('resolved',out)
 
 class TableTests(unittest.TestCase):
     def test_actual_incident_header_without_outer_pipes_is_canonicalized(self):

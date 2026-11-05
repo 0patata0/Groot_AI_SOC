@@ -36,7 +36,7 @@ def normalize_tables(text):
     spec = importlib.util.spec_from_file_location('_soc_output_markdown', path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.normalize_tables(text)
+    return module.normalize_tables(module.labeled_report_tables(text))
 
 
 def incident_failure(detail):

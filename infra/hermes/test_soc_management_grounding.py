@@ -171,6 +171,47 @@ class Grounding(unittest.TestCase):
                 bad=copy.deepcopy(request);bad['tools']=[definition('mcp__rule_a__get_operation_status')]
                 wrapper.initial_review_read(bad,[],req,[])
 
+    def test_status_then_partial_sensor_progress_has_distinct_bounded_continuations(self):
+        first=self.sensor_plan()[0]
+        plan=[{'tool':first['tool'],'arguments':dict(first['arguments'],
+            since_kst=f'2026-11-04T{hour:02d}:00:00+09:00',until_kst=f'2026-11-04T{hour:02d}:59:00+09:00')}
+            for hour in (14,15,16)]
+        receipts=[];statuses=[];status=[{'proposal_id':'a'*32,'target':'a:incident-ip'}]
+        self.agent.tools=self.sensor_catalog()['tools'];self.agent._build_api_kwargs=lambda:self.sensor_catalog()
+        call=self.required_retry(plan,receipts,status,statuses)
+        original_budget=self.agent.iteration_budget.remaining
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            v=call(self.agent,**self.kw);self.assertEqual(v.codex_ack_continuations,1)
+            self.agent._build_api_kwargs();self.kw['codex_ack_continuations']=1
+            self.completed.append('get_system_diagnostics')
+            self.assertEqual(call(self.agent,**self.kw),'original')  # Unrelated read is no progress.
+            statuses.append({'kind':'proposal_status','proposal_id':'a'*32,'target':'a:incident-ip'})
+            for n,row in enumerate(plan,2):
+                v=call(self.agent,**self.kw);self.assertEqual(v.codex_ack_continuations,n)
+                self.agent._build_api_kwargs();self.kw['codex_ack_continuations']=n
+                a=row['arguments'];receipts.append({'tool':row['tool'],'source_ip':a['source_ip'],
+                    'since':wrapper.parse_instant(a['since_kst']),'until':wrapper.parse_instant(a['until_kst'])})
+            self.assertEqual(call(self.agent,**self.kw),'original')
+        self.assertEqual(self.agent.iteration_budget.remaining,original_budget)
+        self.assertEqual(self.agent.max_iterations,12)
+
+    def test_required_progress_continuation_cap_still_stops_before_seventh_retry(self):
+        first=self.sensor_plan()[0]
+        plan=[{'tool':first['tool'],'arguments':dict(first['arguments'],
+            since_kst=f'2026-11-04T{hour:02d}:00:00+09:00',until_kst=f'2026-11-04T{hour:02d}:59:00+09:00')}
+            for hour in range(7,14)]
+        receipts=[];self.agent.tools=self.sensor_catalog()['tools']
+        self.agent._build_api_kwargs=lambda:self.sensor_catalog();call=self.required_retry(plan,receipts)
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            for n,row in enumerate(plan[:6],1):
+                v=call(self.agent,**self.kw);self.assertEqual(v.codex_ack_continuations,n)
+                self.agent._build_api_kwargs();self.kw['codex_ack_continuations']=n
+                a=row['arguments'];receipts.append({'tool':row['tool'],'source_ip':a['source_ip'],
+                    'since':wrapper.parse_instant(a['since_kst']),'until':wrapper.parse_instant(a['until_kst'])})
+            self.assertTrue(wrapper.missing_sensor_reads(plan,receipts))
+            self.assertEqual(call(self.agent,**self.kw),'original')
+        self.assertEqual(len(self.agent._capstone_required_read_retries[1]),6)
+
     def test_required_retry_still_preserves_interrupt_iteration_and_readonly_boundaries(self):
         self.completed.append('get_operation_status');call=self.required_retry(self.sensor_plan(),[])
         with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):

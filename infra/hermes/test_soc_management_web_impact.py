@@ -23,7 +23,7 @@ class WebImpactNavigation(unittest.TestCase):
         self.assertIs(m.web_impact_review_request(self.request,[],[],self.plan),self.request)
     def test_candidate_reads_use_only_observed_registration_and_exact_incident_bounds(self):
         r=m.web_impact_review_request(self.request,[self.events,self.target],['get_web_service_target'],self.plan)
-        self.assertEqual(set(self.names(r)),{'mcp__security_events__search_web_access','mcp__security_events__search_wazuh_alerts'})
+        self.assertEqual(self.names(r),['mcp__security_events__search_wazuh_alerts'])
         for t in r['tools']:
             p=t['function']['parameters'];self.assertNotIn('source_ip',p['properties']);self.assertNotIn('wazuh_rule_id',p['properties'])
             self.assertEqual(p['properties']['since_kst']['enum'],[self.plan[0]['arguments']['since_kst']])
@@ -31,6 +31,10 @@ class WebImpactNavigation(unittest.TestCase):
         host=next(t for t in r['tools'] if t['function']['name'].endswith('search_wazuh_alerts'))
         self.assertEqual(host['function']['parameters']['properties']['agent_id']['enum'],['007'])
         self.assertFalse(self.target['service']['frontend_binding_verified'])
+        after=m.web_impact_review_request(self.request,[self.events,self.target],
+            ['get_web_service_target','search_wazuh_alerts'],self.plan)
+        self.assertEqual(self.names(after),['mcp__security_events__search_web_access'])
+        self.assertEqual(after['tools'][0]['function']['parameters']['properties']['target']['enum'],['c:dvwa'])
     def test_wrong_path_unconfigured_and_invalid_registration_never_supply_a_host_id(self):
         for change in ({'request_path_prefix':'/other/'},{'configured_in_file_snapshot':False}):
             bad=dict(self.target,service=dict(self.target['service'],**change))
@@ -58,10 +62,21 @@ class WebImpactNavigation(unittest.TestCase):
         g.kw['codex_ack_continuations']=1;self.assertEqual(call(g.agent,**g.kw),'original')
         attempted.append('get_web_service_target');facts.append(self.target)
         v=call(g.agent,**g.kw);self.assertEqual(v.codex_ack_continuations,2)
-        self.assertEqual(set(self.names(g.agent._build_api_kwargs())),{'mcp__security_events__search_web_access','mcp__security_events__search_wazuh_alerts'})
+        self.assertEqual(self.names(g.agent._build_api_kwargs()),['mcp__security_events__search_wazuh_alerts'])
         g.kw['codex_ack_continuations']=2;self.assertEqual(call(g.agent,**g.kw),'original')
+        attempted.append('search_wazuh_alerts')
+        v=call(g.agent,**g.kw);self.assertEqual(v.codex_ack_continuations,3)
+        self.assertEqual(self.names(g.agent._build_api_kwargs()),['mcp__security_events__search_web_access'])
+        g.kw['codex_ack_continuations']=3;self.assertEqual(call(g.agent,**g.kw),'original')
         attempted.extend(['search_web_access','search_wazuh_alerts'])
         self.assertEqual(call(g.agent,**g.kw),'original')
+
+    def test_ids_origin_requires_observed_cross_sensor_path_not_signature_inference(self):
+        ids_plan=copy.deepcopy(self.plan);ids_plan[0]['tool']='mcp__security_events__search_suricata_alerts'
+        ids={'kind':'events','source':'suricata','observations':[{'signature':'DVWA XSS','destination_ip':'192.0.2.2'}]}
+        self.assertIs(m.web_impact_review_request(self.request,[ids],[],ids_plan),self.request)
+        request=m.web_impact_review_request(self.request,[ids,self.events],[],ids_plan)
+        self.assertEqual(self.names(request),['mcp__security_events__get_web_service_target'])
 
     def test_manage_and_unrelated_readonly_requests_and_missing_tool_fail_closed(self):
         with patch.dict(m.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):

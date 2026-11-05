@@ -85,6 +85,22 @@ class Opener:
 
 
 class ControllerTests(unittest.TestCase):
+    def test_ids_shared_verification_enables_path_driven_impact_without_inventing_destination(self):
+        at=m.datetime.fromisoformat('2026-11-05T14:00:00+09:00')
+        context={'events':[], 'sensor_references':[('suricata','192.0.2.20',at.timestamp()-120,'100110')],
+                 'sensor_references_complete':True,
+                 'proposals':[{'id':'a'*32,'target':'a:incident-ip'}]}
+        store=mock.Mock();store.context.return_value=context
+        case={'id':'case','mode':'verify','session_id':None}
+        prepared=m.verification_case(store,case,at)
+        self.assertTrue(prepared['web_impact_review'])
+        self.assertIn('CAPSTONE_WEB_IMPACT_REVIEW=1',m.command_for(prepared))
+        self.assertNotIn('agent_id',str(prepared['required_sensor_reads']))
+        self.assertEqual(prepared['required_status_reads'],[{'proposal_id':'a'*32,'target':'a:incident-ip'}])
+        self.assertEqual(store.context.call_count,1)
+        context['proposals']=[]
+        self.assertFalse(m.verification_case(store,case,at)['web_impact_review'])
+
     def test_post_incident_plan_queries_recurrence_without_deciding_impact(self):
         at=m.datetime.fromisoformat('2026-11-04T19:00:00+09:00')
         stamp=m.datetime.fromisoformat('2026-11-04T14:48:02.598+09:00').timestamp()

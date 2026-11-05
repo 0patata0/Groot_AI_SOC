@@ -1615,10 +1615,10 @@ def web_impact_review_request(request, facts, attempted, sensor_requirements):
     else:
         candidate=candidates[0];scope=sensor_requirements[0]['arguments']
         interval={k:scope[k] for k in ('since_kst','until_kst','limit')}
-        if 'search_web_access' not in attempted:
-            hints['mcp__security_events__search_web_access']={'target':candidate['target'],**interval}
         if 'search_wazuh_alerts' not in attempted:
             hints['mcp__security_events__search_wazuh_alerts']={'agent_id':candidate['agent']['id'],**interval}
+        elif 'search_web_access' not in attempted:
+            hints['mcp__security_events__search_web_access']={'target':candidate['target'],**interval}
         if not hints:return request
     value=permitted_request(request,'verify');tools=[]
     for original in value.get('tools',[]):
@@ -1727,6 +1727,12 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                         for k,v in params.get('properties',{}).items() if isinstance(v,dict) and len(v.get('enum',[]))==1}
                     pending_web.append({'tool':tool['function']['name'],**({'arguments':args} if args else {})})
         required_retry=bool(pending_status or pending_sensors or pending_web)
+        pending=({'status_reads':[status_read_request(r) for r in pending_status]} if pending_status else
+                 {'sensor_reads':pending_sensors} if pending_sensors else {'candidate_backend_reads':pending_web})
+        read_key=hashlib.sha256(json.dumps(pending,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+        prior_reads=getattr(agent,'_capstone_required_read_retries',None)
+        read_retries=(prior_reads[1] if isinstance(prior_reads,tuple) and len(prior_reads)==2
+            and prior_reads[0]==turn and isinstance(prior_reads[1],tuple) else ())
         if status_requirements or sensor_requirements:
             # Bounded audit metadata only; never log model text or reasoning.
             sys.stderr.write('management_read_completion '+json.dumps({
@@ -1743,20 +1749,16 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                 r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status'))
                 for r in pending_status} if pending_status else {r['tool'] for r in pending_sensors or pending_web})
         marker = '_capstone_factual_turn' if factual else '_capstone_argument_turn' if argument_retry else '_capstone_grounding_turn'
-        if pending_web:
-            marker=('_capstone_web_discovery_turn' if any(r['tool'].endswith('__get_web_service_target') for r in pending_web)
-                    else '_capstone_web_evidence_turn')
         known_retries = sum(getattr(agent, name, None) == turn for name in
-                            ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn',
-                             '_capstone_web_discovery_turn','_capstone_web_evidence_turn'))
+                            ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn'))+len(read_retries)
         if ((completed_calls and not factual and not required_retry) or kw.get('finish_reason') != 'stop' or
                 getattr(agent, '_interrupt_requested', False) or kw.get('_pending_verification_response') is not None or
                 not isinstance(turn, str) or not turn or not isinstance(user, str) or not isinstance(messages, list)
-                or getattr(message, 'tool_calls', None) or type(counter) is not int or not 0 <= counter <= (4 if pending_web else 2)
+                or getattr(message, 'tool_calls', None) or type(counter) is not int or not 0 <= counter < (6 if required_retry else 3)
                 or counter != known_retries
                 or type(count) is not int or type(maximum) is not int or not 0 <= count < maximum - 1
                 or remaining is not None and (type(remaining) not in (int, float) or remaining < 2)
-                or getattr(agent, marker, None) == turn):
+                or (read_key in read_retries if required_retry else getattr(agent, marker, None) == turn)):
             return original(agent, **kw)
         idx = reanchor(messages, user)
         if (type(idx) is not int or not 0 <= idx < len(messages) or
@@ -1766,9 +1768,11 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                     required_read_phase=required_retry))):
             return original(agent, **kw)
         if required_retry:
-            setattr(agent,marker,turn)
-            pending=({'status_reads':[status_read_request(r) for r in pending_status]} if pending_status else {'sensor_reads':pending_sensors}
-                     if pending_sensors else {'candidate_backend_reads':pending_web})
+            # One continuation for each still-unmet requirement set. Real
+            # receipts/navigation progress must change that set before another
+            # continuation; unrelated reads cannot buy more retries. Native
+            # iteration/time budgets and the six-continuation cap still apply.
+            agent._capstone_required_read_retries=(turn,(*read_retries,read_key))
             nudge=('필수 조회 영수증이 아직 충족되지 않았습니다. 이미 실행한 다른 조회나 일부가 겹치는 구간은 '
                 '빠진 대상/구간의 확인을 대신하지 않습니다. 다음은 신뢰된 제어기가 제공한 읽기 참조이며 '
                 '성공 근거나 판단·쓰기/승인 지시가 아닙니다. 실제 등록된 MCP 도구와 정확한 인자를 직접 '

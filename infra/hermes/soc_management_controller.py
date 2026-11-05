@@ -1748,7 +1748,7 @@ def verification_case(store, case, at=None):
             if dict(case).get('incident_read_at') else datetime.now(timezone(timedelta(hours=9))))
         reads=incident_read_plan(evidence,at)['requests']+incident_followup_plan(evidence,at)['requests']
         case=dict(case,required_sensor_reads=[{'tool':r['tool'],'arguments':r['arguments']} for r in reads],
-            web_impact_review=any(r[0]=='modsecurity' for r in sensor_review_requirements(evidence))
+            web_impact_review=bool(sensor_review_requirements(evidence))
                 and any(p.get('target')=='a:incident-ip' for p in evidence['proposals']))
     return case
 

@@ -683,3 +683,5 @@ SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하�
 11/5 [과거 웹 조회 보완](../infra/mcp/web-history.md): 기존 단일deploy.sh/diag-apply/SIEM source복사 경로로 schema2 정제 이력 publisher·reader를 연결했다. 원본 읽기8MiB·최근10k는 유지하고 검색을 시간/서비스 필터 뒤 최대50행으로 제한한다. 이력은32MiB/128k행·최대8세대/TTL회전·기존 그룹읽기만 허용한다. 새 패키지/이미지/포트/키/일반권한0·고유85검사/실제MCP·C3/B2확정, 새 OS 전체 설치는 별도 미실행이다.
 
 2026-11-05 자동 후속 검증·인자 크기 보완: 기존 controller/gate/query source 복사 경로를 사용하며 새 deb/wheel/image·도구·일반 권한은 없다. 포함 gate는 SHA256 결속 압축 인자로 전달하고 root 원문을 그대로 보존한다. 신규 설치 렌더도 같은 형식·고정 상한을 검사한다. [운영·복구](../infra/hermes/shared-status-verification.md).
+
+2026-11-05 IDS 영향·라벨 보고 표: 공통1.5.32/query1.19.30의 gate/query/공통 formatter·출력 소스만 기존 반입 경로로 갱신한다. 새 deb/wheel/image·라이브러리/권한/키·포트0. 초기 설치 렌더·소스 계약40을 포함한 고유965검사와 실제 배포·화면/실패 범위를 [후속 검증](../infra/hermes/ids-impact-report.md)에 분리한다.

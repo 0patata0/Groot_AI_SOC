@@ -1,0 +1,470 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05T14:40:00+09:00",
+  "versions": {
+    "common": "1.5.32",
+    "query": "1.19.30",
+    "security_events": "1.2.2"
+  },
+  "navigation": {
+    "source_sensor_restriction_removed": true,
+    "requires_observed_modsecurity_path": true,
+    "requires_real_registration_for_agent_id": true,
+    "host_before_backend": true,
+    "frontend_binding_inferred": false,
+    "dispatch_or_risk_decision_by_helper": false,
+    "original_time_and_iteration_budgets_unchanged": true,
+    "required_completion_continuation": {
+      "pending_requirement_fingerprint_once": true,
+      "unrelated_reads_cannot_retry": true,
+      "cap": 6,
+      "native_iterations": 12,
+      "native_run_budget_seconds": 180,
+      "outer_timeout_seconds": 210
+    }
+  },
+  "formatting": {
+    "scope": "automatic management report delivery; general chat normalization unchanged",
+    "requires_parallel_labelled_list": true,
+    "existing_tables_code_quotes_html_unsupported_lists_preserved": true,
+    "new_model_calls": 0,
+    "new_tool_calls": 0,
+    "post_edit": {
+      "post_id": "q53a5hrmtjfk9kbun61db75ujc",
+      "url": "https://chat.grootlab.duckdns.org/soc/pl/q53a5hrmtjfk9kbun61db75ujc",
+      "before_sha256": "b5aa6f18d37463d23695ce443704c338a11a59712a0815eb5045837a716b09c5",
+      "after_sha256": "b386470f0ad3cda5dede0405a6cc17d2281b839e64bef75d9f7e178b8e1a39f2",
+      "author_channel_created_at_preserved": true,
+      "table_lines": 9,
+      "data_rows": 7,
+      "edit_at": 1793854688140,
+      "new_investigation_or_post": false
+    },
+    "ui": {
+      "url": "http://10.200.10.10:8065/soc/channels/soc-alerts-agent/q53a5hrmtjfk9kbun61db75ujc",
+      "title": "soc-alerts-agent - SOC Mattermost",
+      "postFound": true,
+      "postId": "post_q53a5hrmtjfk9kbun61db75ujc",
+      "tableCount": 1,
+      "preCount": 0
+    },
+    "ui_timezone": "Asia/Seoul temporary browser context only",
+    "public_https_ui_tested": false
+  },
+  "tests": {
+    "unique_total": 965,
+    "passed": 965,
+    "skip": 0,
+    "suites": {
+      "management": 289,
+      "sdk": 219,
+      "native": 391,
+      "install": 40,
+      "tables": 19,
+      "output": 7
+    },
+    "new_tests": 11,
+    "new_os_full_install": false,
+    "no_duplicate_counting": true,
+    "candidate_batch": {
+      "query": "1.19.31",
+      "unique_total": 966,
+      "passed": 966,
+      "skip": 0,
+      "extra_test": 1,
+      "operating": false
+    }
+  },
+  "deployment": {
+    "confirmed_at_epoch": 1793855419,
+    "files_verified": 15,
+    "protected_unchanged": 7,
+    "gate_sha256": "8a9d35e2c32506843c7fa80fd95890a6e51e2f2989ecbb5e2e3c4a396c9f3396",
+    "controller_sha256": "7db29069d0a85fdee0bb3cb95d3fb3e5318715565c30d0a80361f928b4b753ec",
+    "gate_matches_reference": true,
+    "ids_path_impact_enabled": true,
+    "gate_argument_bytes": 50223,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 14.626593589782715,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 10.62666368484497,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "automatic_shared_status_required": 1,
+    "sensor_reads_required": 3,
+    "initial_files": 15,
+    "progress_files": 9,
+    "initial_confirmed_kst": "2026-11-05T13:58:33+09:00",
+    "progress_confirmed_kst": "2026-11-05T14:10:20+09:00",
+    "final_operating_after_restore": {
+      "files_verified": 15,
+      "operating_query": "1.19.30",
+      "gate_sha256": "8a9d35e2c32506843c7fa80fd95890a6e51e2f2989ecbb5e2e3c4a396c9f3396",
+      "controller_sha256": "7db29069d0a85fdee0bb3cb95d3fb3e5318715565c30d0a80361f928b4b753ec",
+      "at_kst": "2026-11-05T14:38:20+09:00",
+      "protected_unchanged": 7,
+      "services_active": 4
+    }
+  },
+  "recovery": {
+    "backup": "/var/lib/capstone-ids-impact-report/20261105-r1/deployment",
+    "timer_confirmed_disabled": true,
+    "confirmed_noop": true,
+    "manual_rollback_tested": false,
+    "progress_backup": "/var/lib/capstone-ids-impact-report/20261105-r1/deployment-read-progress-r3",
+    "aborted_precondition_attempt": {
+      "path": "deployment-read-progress-r2",
+      "runtime_writes": 0,
+      "reason": "heartbeat_stale",
+      "timer_disabled_and_noop": true,
+      "duplicate_folder_removed_after_verified_preserved_r3_backup": true
+    },
+    "batch_backup": "/var/lib/capstone-ids-impact-report/20261105-r1/deployment-read-batch-r4",
+    "batch_manual_restore_tested": true,
+    "initial_and_progress_manual_restore_tested": false
+  },
+  "live_review": {
+    "runs": [
+      {
+        "run_id": "58f3046937aed18ac13b760c8ad627e2",
+        "seconds": 118.20866966247559,
+        "tool_calls": 3,
+        "errors": 0,
+        "case_state": "needs_review",
+        "missing_sensor_reads": 1,
+        "host_reads": 0
+      },
+      {
+        "run_id": "4b91efb973bd87555e8ec1e9e7ffe765",
+        "case_state": "outcome_unknown",
+        "detail": "model_subprocess_timeout_requires_review",
+        "seconds": 214.31756114959717,
+        "tools": [
+          {
+            "tool": "mcp__rule_a__get_operation_status",
+            "after_run_start_seconds": 38.996,
+            "duration_ms": 281,
+            "error": false,
+            "source": null,
+            "returned_count": null,
+            "target": "a:incident-ip"
+          },
+          {
+            "tool": "mcp__resp__list_blocks",
+            "after_run_start_seconds": 39.155,
+            "duration_ms": 155,
+            "error": false,
+            "source": null,
+            "returned_count": null,
+            "target": null
+          },
+          {
+            "tool": "mcp__security_events__search_suricata_alerts",
+            "after_run_start_seconds": 39.21,
+            "duration_ms": 50,
+            "error": false,
+            "source": "suricata",
+            "returned_count": 1,
+            "target": null
+          },
+          {
+            "tool": "mcp__security_events__search_modsecurity_alerts",
+            "after_run_start_seconds": 39.254,
+            "duration_ms": 37,
+            "error": false,
+            "source": "modsecurity",
+            "returned_count": 3,
+            "target": null
+          },
+          {
+            "tool": "mcp__security_events__search_suricata_alerts",
+            "after_run_start_seconds": 86.47,
+            "duration_ms": 31,
+            "error": false,
+            "source": "suricata",
+            "returned_count": 2,
+            "target": null
+          },
+          {
+            "tool": "mcp__security_events__get_web_service_target",
+            "after_run_start_seconds": 120.439,
+            "duration_ms": 991,
+            "error": false,
+            "source": "c_apache_access_snapshot",
+            "returned_count": null,
+            "target": "c:dvwa",
+            "agent_id": "002",
+            "frontend_binding_verified": false,
+            "logging_continuity_verified": false
+          },
+          {
+            "tool": "mcp__security_events__search_wazuh_alerts",
+            "after_run_start_seconds": 152.88,
+            "duration_ms": 24,
+            "error": false,
+            "source": "wazuh",
+            "returned_count": 6,
+            "target": null
+          },
+          {
+            "tool": "mcp__security_events__search_web_access",
+            "after_run_start_seconds": 200.084,
+            "duration_ms": 1280,
+            "error": false,
+            "source": "c_apache_access_snapshot",
+            "returned_count": 49,
+            "target": "c:dvwa",
+            "agent_id": "002",
+            "frontend_binding_verified": false,
+            "logging_continuity_verified": false,
+            "actual_request_total_count": null,
+            "retained_index_match_count": 49
+          }
+        ],
+        "uses": [
+          {
+            "tool": "mcp__rule_a__get_operation_status",
+            "arguments": {
+              "request_id": "6bf30a964082f73cfa60694cbe772267"
+            },
+            "after_run_start_seconds": 38.718
+          },
+          {
+            "tool": "mcp__resp__list_blocks",
+            "arguments": {},
+            "after_run_start_seconds": 38.997
+          },
+          {
+            "tool": "mcp__security_events__search_suricata_alerts",
+            "arguments": {
+              "source_ip": "192.168.16.232",
+              "since_kst": "2026-11-05T12:25:46.247000+09:00",
+              "until_kst": "2026-11-05T14:11:19.016174+09:00",
+              "limit": "50"
+            },
+            "after_run_start_seconds": 39.157
+          },
+          {
+            "tool": "mcp__security_events__search_modsecurity_alerts",
+            "arguments": {
+              "source_ip": "192.168.16.232",
+              "since_kst": "2026-11-05T12:25:46.247000+09:00",
+              "until_kst": "2026-11-05T14:11:19.016174+09:00",
+              "limit": "50"
+            },
+            "after_run_start_seconds": 39.212
+          },
+          {
+            "tool": "mcp__security_events__search_suricata_alerts",
+            "arguments": {
+              "limit": 50,
+              "since_kst": "2026-11-05T12:25:00+09:00",
+              "source_ip": "192.168.16.232",
+              "until_kst": "2026-11-05T12:25:59.999999+09:00"
+            },
+            "after_run_start_seconds": 86.416
+          },
+          {
+            "tool": "mcp__security_events__get_web_service_target",
+            "arguments": {
+              "target": "c:dvwa"
+            },
+            "after_run_start_seconds": 119.435
+          },
+          {
+            "tool": "mcp__security_events__search_wazuh_alerts",
+            "arguments": {
+              "agent_id": "002",
+              "limit": 50,
+              "since_kst": "2026-11-05T12:25:00.000000+09:00",
+              "until_kst": "2026-11-05T12:25:59.999999+09:00"
+            },
+            "after_run_start_seconds": 152.853
+          },
+          {
+            "tool": "mcp__security_events__search_web_access",
+            "arguments": {
+              "limit": 50,
+              "since_kst": "2026-11-05T12:25:00+09:00",
+              "target": "c:dvwa",
+              "until_kst": "2026-11-05T12:25:59.999999+09:00"
+            },
+            "after_run_start_seconds": 198.786
+          }
+        ],
+        "last_tool_after_run_start_seconds": 200.084,
+        "after_last_tool_to_terminal_seconds": 14.234,
+        "report_delivered": true
+      },
+      {
+        "run_id": "9974cd4dd94dab3b417e504bc73f4206",
+        "seconds": 87.744713306427,
+        "tool_calls": 0,
+        "errors": 0,
+        "case_state": "needs_review",
+        "detail": "shared_containment_verification_missing",
+        "batch_phase_reached": false,
+        "batch_benefit": "unproven; no causal performance comparison"
+      }
+    ],
+    "same_case_development_not_independent_evaluation": true
+  },
+  "live_suricata_read": {
+    "at_kst": "2026-11-05T14:00:12+09:00",
+    "running": true,
+    "rules_loaded": 52497,
+    "rules_failed": 0,
+    "capture_errors": 0,
+    "kernel_drops": 0,
+    "status": "degraded",
+    "code": "inspection_limit_reached",
+    "tcp_stream_depth_reached_since_start": 57,
+    "not_current_attack_proof": true,
+    "no_engine_restart": true
+  },
+  "git": {
+    "state": "not_committed_yet"
+  },
+  "api_choice_probe": {
+    "endpoint_origin": "http://10.200.10.10:11435",
+    "version": {
+      "version": "0.40.2"
+    },
+    "model": "qwen3.6:35b",
+    "synthetic_probe_only": true,
+    "actual_mcp_calls": 0,
+    "protected_changes": 0,
+    "results": [
+      {
+        "requested_tool_choice": "none",
+        "http_status": 200,
+        "seconds": 0.6273902868852019,
+        "response_model": "qwen3.6:35b",
+        "finish_reason": "stop",
+        "tool_calls": [],
+        "visible_content_characters": 2,
+        "visible_content_sha256": "2a73ed53178ab6fed984510c7f9ea2248ae5e32f1b9bca312b9d144bb33a1108",
+        "usage": {
+          "prompt_tokens": 305,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens": 3,
+          "total_tokens": 308
+        }
+      },
+      {
+        "requested_tool_choice": "required",
+        "http_status": 200,
+        "seconds": 0.12074833991937339,
+        "response_model": "qwen3.6:35b",
+        "finish_reason": "stop",
+        "tool_calls": [],
+        "visible_content_characters": 2,
+        "visible_content_sha256": "2a73ed53178ab6fed984510c7f9ea2248ae5e32f1b9bca312b9d144bb33a1108",
+        "usage": {
+          "prompt_tokens": 305,
+          "prompt_tokens_details": {
+            "cached_tokens": 301
+          },
+          "completion_tokens": 3,
+          "total_tokens": 308
+        }
+      },
+      {
+        "requested_tool_choice": {
+          "type": "function",
+          "function": {
+            "name": "mcp__rule_a__get_operation_status"
+          }
+        },
+        "http_status": 200,
+        "seconds": 0.12486299104057252,
+        "response_model": "qwen3.6:35b",
+        "finish_reason": "stop",
+        "tool_calls": [],
+        "visible_content_characters": 2,
+        "visible_content_sha256": "2a73ed53178ab6fed984510c7f9ea2248ae5e32f1b9bca312b9d144bb33a1108",
+        "usage": {
+          "prompt_tokens": 305,
+          "prompt_tokens_details": {
+            "cached_tokens": 301
+          },
+          "completion_tokens": 3,
+          "total_tokens": 308
+        }
+      }
+    ]
+  },
+  "schema_probe": {
+    "schema_probe_only": true,
+    "seconds": 1.637202924117446,
+    "finish_reason": "stop",
+    "schema_content_exact": true,
+    "native_tool_calls": 0,
+    "content_sha256": "2133bd376d3a5d58635fda9f5a47f8ff5563b539e632e8439826c701ac354c31",
+    "usage": {
+      "prompt_tokens": 304,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens": 30,
+      "total_tokens": 334
+    },
+    "actual_mcp_calls": 0,
+    "protected_changes": 0
+  },
+  "api_probe_limits": [
+    "single short synthetic prompt; actual MCP execution zero",
+    "reported API version is not binary provenance",
+    "does not identify the sole cause of every missed tool call",
+    "structured read-call decoder/adapter is not deployed"
+  ],
+  "sources": [
+    {
+      "title": "Ollama OpenAI compatibility supported fields",
+      "url": "https://docs.ollama.com/api/openai-compatibility",
+      "checked_kst": "2026-11-05",
+      "scope": "lists tools, tool_choice and response_format; not proof of observed hard enforcement"
+    },
+    {
+      "title": "Ollama tool calling",
+      "url": "https://docs.ollama.com/capabilities/tool-calling",
+      "checked_kst": "2026-11-05",
+      "scope": "single/parallel tool calling concepts; live batching benefit remains unverified"
+    }
+  ],
+  "cleanup": {
+    "removed_source_files": 437,
+    "removed_source_bytes": 6561784,
+    "removed_logs_and_candidate": 20,
+    "removed_log_candidate_bytes": 32023,
+    "removed_aborted_duplicate_files": 12,
+    "removed_aborted_bytes": 982149,
+    "runtime_files_verified": 15,
+    "protected_unchanged": 7,
+    "operating_query": "1.19.30",
+    "gate_argument_bytes": 50223,
+    "services_active": 4,
+    "recovery_backups_preserved": 3,
+    "r4_manual_restore_verified": true,
+    "all_recovery_timers_inactive": true,
+    "operating_db_approvals_chat_logs_model_weights_preserved": true,
+    "at_epoch": 1793857100.7880266,
+    "mac": {
+      "at_kst": "2026-11-05T15:05:16.026955+09:00",
+      "temp_path": "/private/tmp/capstone-ids-impact-20261105-1jacu_d5",
+      "files": 39,
+      "bytes": 11327716,
+      "directory_absent": true
+    }
+  }
+}

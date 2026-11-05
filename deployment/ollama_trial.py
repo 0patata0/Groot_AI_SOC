@@ -154,6 +154,9 @@ def source_files(source):
     files['grounding.py'] = safe(source.parent / 'hermes/soc_management_run.py')
     files['chat_contract.py'] = safe(source.parent / 'hermes/chat_contract.py')
     files['output_contract.py'] = safe(source.parent / 'hermes/output_contract.py')
+    files['workflow_contract.py'] = safe(source.parent / 'hermes/workflow_contract.py')
+    for name in ('soc-query','soc-investigate','soc-change','soc-recover'):
+        files['skill-'+name+'.md'] = safe(source.parent / ('hermes/skills/'+name+'/SKILL.md'))
     files['SKILL.md'] = safe(source.parent / 'hermes/skills/soc-output/SKILL.md')
     files['chat_markdown.py'] = safe(source.parent / 'hermes/chat_markdown.py')
     files['gateway_health.py'] = safe(source.parent / 'hermes/gateway_health.py')

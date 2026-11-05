@@ -222,7 +222,7 @@ def with_time_display(data, now=None):
                 continue
     # These are protocol-defined POSIX seconds, not milliseconds or model text.
     # Keep every original field (and therefore signed plans/hashes) unchanged.
-    fields = ('approval_expires_at', 'temporary_expires_at', 'owned_deadline',
+    fields = ('approval_expires_at', 'workflow_created_at', 'initial_apply_observed_at', 'temporary_expires_at', 'owned_deadline',
               'live_owned_deadline', 'live_observed_at', 'cooldown_until', 'closed_at')
     for field in fields:
         value = data.get(field)

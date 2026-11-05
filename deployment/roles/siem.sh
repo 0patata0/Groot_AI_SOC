@@ -147,11 +147,14 @@ def hermes_extension_files():
         'infra/hermes/gateway_health.py': 'plugins/groot-query-completion/gateway_health.py',
         'infra/hermes/chat_contract.py': 'plugins/groot-query-completion/chat_contract.py',
         'infra/hermes/output_contract.py': 'plugins/groot-query-completion/output_contract.py',
+        'infra/hermes/workflow_contract.py': 'plugins/groot-query-completion/workflow_contract.py',
         'infra/hermes/skills/soc-output/SKILL.md': 'plugins/groot-query-completion/SKILL.md',
         'infra/hermes/chat_markdown.py': 'plugins/groot-query-completion/chat_markdown.py',
         'infra/hermes/read_contract.py': 'plugins/groot-query-completion/read_contract.py',
         'infra/hermes/SOUL.groot.md': 'plugins/groot-query-completion/soc_policy.md',
-        'infra/ollama-trial/harness.py': 'plugins/groot-query-completion/chat_harness.py'}
+        'infra/ollama-trial/harness.py': 'plugins/groot-query-completion/chat_harness.py'} | {
+        'infra/hermes/skills/'+name+'/SKILL.md': 'plugins/groot-query-completion/skill-'+name+'.md'
+        for name in ('soc-query','soc-investigate','soc-change','soc-recover')}
 def query_completion_source_pins(raw=None):
     # Read literal pins from the shipped plugin without importing/executing it.
     if raw is None:

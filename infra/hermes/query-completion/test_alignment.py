@@ -26,6 +26,27 @@ def proposal(target, pid='1' * 32, **updates):
 
 
 class SharedContract(unittest.TestCase):
+    def test_workflow_context_is_replaced_once_when_request_changes(self):
+        @dataclass
+        class Request:
+            api_kwargs: object
+            api_messages: object = None
+            _original_api_kwargs: object = None
+        agent=SimpleNamespace(platform='mattermost',model='qwen3.6:35b',provider='custom',max_iterations=12,_current_turn_id='a')
+        source={'messages':[{'role':'system','content':'native\n'+C.workflow_policy(('soc-investigate',))},
+                            {'role':'user','content':'fw 룰 보여줘'}],'tools':[]}
+        original=copy.deepcopy(source)
+        wrap=alignment.request_wrapper(lambda *a,**kw:Request(copy.deepcopy(source)),PLUGIN,H)
+        for _ in range(2):
+            result=wrap(agent,original_user_message='fw 룰 보여줘',turn_id='a')
+            text='\n'.join(str(r.get('content','')) for r in result.api_kwargs['messages'])
+            self.assertEqual(text.count('SOC_WORKFLOW_QUERY_V1'),1)
+            self.assertNotIn('SOC_WORKFLOW_INVESTIGATE_V1',text)
+        agent._current_turn_id='b'
+        result=wrap(agent,original_user_message='고마워',turn_id='b')
+        self.assertNotIn('SOC_WORKFLOW_',result.api_kwargs['messages'][0]['content'])
+        self.assertEqual(source,original)
+
     def test_short_followup_resolves_before_native_tool_selection(self):
         @dataclass
         class Request:

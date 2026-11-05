@@ -49,6 +49,11 @@ GROUNDING_NUDGE = (
 
 
 KST = timezone(timedelta(hours=9), 'KST')
+CONTAINMENT_TIME_LABELS = {
+    'workflow_created_at':'요청 등록', 'initial_apply_observed_at':'최초 적용 확인',
+    'temporary_expires_at':'최초 임시기한', 'owned_deadline':'소유 기한',
+    'live_owned_deadline':'실제 차단 기한', 'live_observed_at':'관측',
+    'cooldown_until':'재차단 대기 종료', 'closed_at':'종료 처리 확인'}
 _AWARE_TIME = re.compile(r'(?<![0-9])\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:?\d{2}|[ ](?:UTC|KST))(?![0-9])')
 
 
@@ -171,8 +176,14 @@ def containment_clock(data):
             not literal_ip(data.get('ip'))):
         return None
     times = {}
-    for key in ('temporary_expires_at', 'owned_deadline', 'live_owned_deadline',
+    verified_apply=(type(data.get('initial_apply_observed_at')) is int and
+        type(data.get('workflow_created_at')) is int and type(data.get('temporary_expires_at')) is int and
+        data['workflow_created_at']<=data['initial_apply_observed_at']<=data['temporary_expires_at'] and
+        isinstance(data.get('initial_apply_observation_sha256'),str) and
+        re.fullmatch(r'[0-9a-f]{64}',data['initial_apply_observation_sha256']) is not None)
+    for key in ('workflow_created_at', 'initial_apply_observed_at', 'temporary_expires_at', 'owned_deadline', 'live_owned_deadline',
                 'live_observed_at', 'cooldown_until', 'closed_at'):
+        if key=='initial_apply_observed_at' and not verified_apply:continue
         value = data.get(key)
         if type(value) not in (int, float):
             continue
@@ -183,7 +194,8 @@ def containment_clock(data):
     if not times:
         return None
     fact = {'kind': 'containment_clock', 'request_id': data['request_id'], 'ip': data['ip'],
-            'times': times, 'live_block_state': data.get('live_block_state')}
+            'times': times, 'live_block_state': data.get('live_block_state'),
+            'initial_apply_time_verified':verified_apply}
     if (data.get('live_block_state') == 'owned' and
             {'live_owned_deadline', 'live_observed_at'} <= times.keys()):
         fact['remaining_seconds_at_observation'] = max(0, data['live_owned_deadline']-data['live_observed_at'])
@@ -206,6 +218,15 @@ def operation_time_view(raw):
         if fact is None:
             return raw
         view = dict(data)
+        if not fact['initial_apply_time_verified']:
+            view.pop('initial_apply_observed_at',None)
+            view['initial_apply_observed_at_kst']=None
+        view['containment_time_semantics']={
+            'workflow_created_at':'request registration before kernel mutation; not block start',
+            'initial_apply_observed_at':'ownership readback after initial create; not exact first-packet drop time',
+            'temporary_expires_at':'original temporary deadline; not creation or application time',
+            'closed_at':'workflow cleanup/closure observation; not exact kernel expiry',
+            'initial_apply_time_verified':fact['initial_apply_time_verified']}
         for key, value in fact['times'].items():
             view.pop(key); view[key + '_kst'] = value
         view['time_display_scope'] = 'KST display; original POSIX seconds remain in the audit receipt'
@@ -950,6 +971,33 @@ def containment_time_violations(text, facts):
         if line.lstrip().startswith('```'):
             fenced = not fenced
             continue
+        if not fenced and not line.lstrip().startswith('>'):
+            candidates=[f for rid,f in clocks.items() if rid in line]
+            if not candidates and len(clocks)==1:candidates=list(clocks.values())
+            if len(candidates)==1:
+                fact=candidates[0]
+                roles=(('initial_apply_observed_at',r'최초\s*(?:차단|적용)(?:\s*(?:확인|완료|관측))?\s*(?:시각|시간)|initial_apply_observed_at(?:_kst)?'),
+                       ('workflow_created_at',r'(?:요청|워크플로)\s*등록\s*(?:시각|시간)|workflow_created_at(?:_kst)?'))
+                instant=r'(?:\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})|\d{1,2}:\d{2}(?::\d{2})?(?:[+-]\d{2}:?\d{2})?)'
+                for key,label in roles:
+                    for match in re.finditer(r'(?:'+label+r')[\s`*"\':：=은는이]*('+instant+r')',line,re.I):
+                        if re.search(r'(?:오답|예시|잘못된)\s*[:：]?\s*$',line[max(0,match.start()-18):match.start()]):continue
+                        after=line[match.end():]
+                        if re.match(r'[\s`*"\')]*(?:은|는|이)?\s*(?:잘못|오답|예시|아님|아니|미확인)',after):continue
+                        expected=parse_instant(fact.get('times',{}).get(key))
+                        if expected is None or key=='initial_apply_observed_at' and not fact.get('initial_apply_time_verified'):
+                            issues.add('containment_initial_application_time_unverified' if key=='initial_apply_observed_at' else 'containment_registration_time_unverified')
+                            continue
+                        value=match[1];actual=parse_instant(value)
+                        if actual is not None:
+                            mismatch=abs((actual-expected).total_seconds())>=1
+                        else:
+                            offset=re.search(r'([+-]\d{2}:?\d{2})$',value)
+                            if offset and offset[1] not in ('+09:00','+0900'):
+                                issues.add('containment_time_role_requires_kst')
+                            value=re.sub(r'[+-]\d{2}:?\d{2}$','',value);parts=[int(v) for v in value.split(':')]
+                            mismatch=parts[0]!=expected.hour or parts[1]!=expected.minute or len(parts)>2 and parts[2]!=expected.second
+                        if mismatch:issues.add('containment_time_role_mismatch')
         if (fenced or line.lstrip().startswith('>') or not re.search(r'만료|기한|deadline|expires', line, re.I)
                 or re.search(r'오답|잘못|정정|예시|아님|아니|미확인', line)):
             continue
@@ -1133,15 +1181,15 @@ def literal_evidence_summary(facts):
             state = row.get('live_block_state')
             state = state if state in ('owned', 'absent', 'foreign', 'unavailable') else '미확인'
             fields = ['요청 `' + rid + '` / ' + ip, '조회시점 상태 ' + state]
-            labels = {'temporary_expires_at':'최초 만료', 'owned_deadline':'소유 기한',
-                      'live_owned_deadline':'실제 차단 기한', 'live_observed_at':'관측',
-                      'cooldown_until':'재차단 대기 종료', 'closed_at':'종료'}
+            labels = CONTAINMENT_TIME_LABELS
             by_instant = {}
             for key, label in labels.items():
                 value = row.get('times', {}).get(key)
                 if parse_instant(value):
                     by_instant.setdefault(value, []).append(label)
             fields += ['/'.join(labels) + ' ' + iso(value) for value, labels in by_instant.items()]
+            if not row.get('initial_apply_time_verified'):
+                fields.append('최초 적용 확인 시각 미기록·미확인; 만료/등록 시각이나 TTL로 역산하지 말 것')
             remaining = row.get('remaining_seconds_at_observation')
             if type(remaining) in (int, float) and remaining >= 0:
                 fields.append('해당 관측시점 남음 ' + str(remaining) + '초')
@@ -1231,12 +1279,13 @@ def factual_review_report(facts):
             rows.append((source+' 경보',result,'; '.join(basis)))
         elif kind=='containment_clock':
             state=row.get('live_block_state');state=state if state in ('owned','absent','foreign','unavailable') else '미확인'
-            labels={'temporary_expires_at':'최초 기한','live_owned_deadline':'실제 기한','live_observed_at':'관측','cooldown_until':'재차단 대기 종료','closed_at':'종료'}
+            labels=CONTAINMENT_TIME_LABELS
             by_time={}
             for key,label in labels.items():
                 v=row.get('times',{}).get(key)
                 if parse_instant(v):by_time.setdefault(stamp(v),[]).append(label)
             basis=['요청 '+str(row.get('request_id','미확인'))]+['/'.join(names)+' '+value for value,names in by_time.items()]
+            if not row.get('initial_apply_time_verified'):basis.append('최초 적용 확인 시각 미기록·미확인; 기한/TTL 역산 아님')
             rows.append(('실제 차단 관측',state+' / '+str(row.get('ip','미확인')),'; '.join(basis)))
         elif kind=='proposal_status':
             rows.append(('요청 실행 기록',row.get('status','상태 세부값 미확인'),

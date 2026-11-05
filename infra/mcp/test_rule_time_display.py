@@ -12,6 +12,15 @@ m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 
 class RuleTimeDisplayTests(unittest.TestCase):
+    def test_registration_and_application_confirmation_are_labelled_kst_without_plan_change(self):
+        original={'kind':'containment','workflow_created_at':1793707800,'initial_apply_observed_at':1793707802,
+                  'temporary_expires_at':1793708400,'payload':{'plan_sha256':'a'*64}}
+        before=copy.deepcopy(original);result=m.with_time_display(original)
+        times={r['source_field']:r['kst'] for r in result['time_display']['values']}
+        self.assertEqual(times['workflow_created_at'],'2026-11-03T21:10:00+09:00')
+        self.assertEqual(times['initial_apply_observed_at'],'2026-11-03T21:10:02+09:00')
+        self.assertEqual(original,before)
+        self.assertEqual({k:v for k,v in result.items() if k!='time_display'},before)
     def test_operation_epochs_and_live_remaining_preserve_original_receipt(self):
         now = datetime.fromisoformat('2026-11-03T21:12:00+09:00')
         end = int(datetime.fromisoformat('2026-11-03T21:20:18+09:00').timestamp())

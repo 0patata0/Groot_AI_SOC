@@ -1590,7 +1590,11 @@ explicitly distinguish agreement, disagreement/omissions, and unverified claims.
 Do not replace peer review with a fresh inventory alone. Evidence correction
 must preserve the original review task and its scope.
 """
-    return (base + "\n" + contract + "\n" + output_policy() + "\nTRUSTED_CONTROLLER_JSON\n" + canonical(control) +
+    from workflow_contract import policy as workflow_policy
+    workflows=['soc-investigate'] if references else ['soc-change']
+    if case['mode']=='manage' and 'soc-change' not in workflows:workflows.append('soc-change')
+    if re.search(r'장애|복구|systemd|Vector|storage|수집.{0,8}(?:실패|중단)',current_request,re.I):workflows.append('soc-recover')
+    return (base + "\n" + contract + "\n" + output_policy() + "\n" + workflow_policy(tuple(workflows)) + "\nTRUSTED_CONTROLLER_JSON\n" + canonical(control) +
             "\nUNTRUSTED_EVIDENCE_JSON\n" + canonical(evidence["events"]) +
             "\nTRUSTED_CURRENT_REQUEST_JSON\n" + canonical({"request": current_request}))
 

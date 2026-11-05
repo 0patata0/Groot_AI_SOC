@@ -153,6 +153,39 @@ class ContainmentTests(unittest.TestCase):
         self.tmp.cleanup()
     def propose(self):
         return self.service.propose(PUBLIC, "repeated inbound exploit alerts")
+    def test_registration_apply_confirmation_and_deadline_are_separate(self):
+        create=self.backend.create
+        def delayed(record):
+            observed=create(record);self.engine.now+=2;return observed
+        self.backend.create=delayed
+        summary=self.propose();stored=self.service._load(summary['request_id'])
+        self.assertEqual(summary['workflow_created_at'],NOW)
+        self.assertEqual(summary['initial_apply_observed_at'],NOW+2)
+        self.assertEqual(summary['temporary_expires_at'],NOW+600)
+        self.assertEqual(summary['initial_apply_observation_sha256'],c.digest(self.backend.snapshot(PUBLIC)))
+        self.assertEqual(stored['payload']['plan_sha256'],c.digest(stored['payload']['plan']))
+        self.assertNotIn('initial_apply_observed_at',stored['payload']['plan'])
+        self.assertEqual(self.backend.creates,1)
+
+    def test_legacy_record_read_does_not_backfill_application_time(self):
+        summary=self.propose();record=self.service._load(summary['request_id'])
+        record.pop('initial_apply_observed_at');record.pop('initial_apply_observation_sha256');self.service._save(record)
+        path=self.service._path(summary['request_id']);before=path.read_bytes()
+        status=self.service.status(summary['request_id'])
+        self.assertEqual(status['workflow_created_at'],NOW)
+        self.assertIsNone(status['initial_apply_observed_at'])
+        self.assertIn('not recorded',status['initial_apply_time_scope'])
+        self.assertEqual(path.read_bytes(),before)
+
+    def test_incomplete_or_corrupt_application_receipt_is_refused(self):
+        summary=self.propose();original=self.service._load(summary['request_id'])
+        changes=[{'initial_apply_observed_at':NOW-1},{'initial_apply_observed_at':True},
+                 {'initial_apply_observed_at':NOW+601},{'initial_apply_observation_sha256':'not-a-hash'}]
+        for change in changes:
+            record={**original,**change};self.service._save(record)
+            with self.assertRaises(c.ContainmentError):self.service._load(summary['request_id'])
+        record=copy.deepcopy(original);record.pop('initial_apply_observation_sha256');self.service._save(record)
+        with self.assertRaises(c.ContainmentError):self.service._load(summary['request_id'])
     def test_one_attack_flow_is_enough_and_duplicates_are_not_inflated(self):
         self.assertEqual(c.validated_evidence([event(1)], PUBLIC, NOW)['independent_flows'],1)
         self.assertEqual(c.validated_evidence([event(1),event(1)], PUBLIC, NOW)['independent_flows'],1)

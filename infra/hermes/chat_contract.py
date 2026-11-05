@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.27'
+VERSION = 'soc-chat-contract:1.5.28'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -44,6 +44,9 @@ QUERY_SECTIONS = {
         "파일의 declared_count/ids는 파일 정의 수이며 CRS/ET 전체·엔진 활성 수가 아닙니다. "
         "IDS 활성 질문은 get_service_action_target(target=a:suricata)로 실제 경로·상태를 읽습니다. -S 자체가 비활성 증거는 아닙니다. "
         "개별 SID 적재는 별도 근거가 필요합니다. get_rule_change_status/get_operation_status에는 실제 proposal/request ID를 사용합니다."
+        "차단 요청 등록·최초 적용 확인·임시 만료·현재 관측·종료 처리 확인 시각을 구분합니다. "
+        "workflow_created_at은 커널 변경 전 요청 등록이며 실제 차단 시작이 아닙니다. 최초 적용 확인 시각이 미기록이면 미확인으로 쓰고 만료에서 TTL을 빼서 실측값으로 만들지 않습니다. "
+        "PAM/SSH 인증 성공·세션 로그나 낮은 경보 레벨만으로 승인된 정상 접속·침해 부재를 단정하지 않습니다."
     ),
     '이벤트와 시간': (
         "security-events의 명시 구간은 since_kst/until_kst(초와 +09:00 포함 ISO8601)이며 lookback_minutes를 섞지 않습니다. "
@@ -246,6 +249,18 @@ def output_policy():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.policy()
+
+
+_WORKFLOW_MODULE = None
+def workflow_policy(names):
+    """Load fixed project procedures only; this never adds tools or authority."""
+    global _WORKFLOW_MODULE
+    if _WORKFLOW_MODULE is None:
+        path=Path(__file__).resolve().with_name('workflow_contract.py')
+        spec=importlib.util.spec_from_file_location('_soc_workflow_contract',path)
+        _WORKFLOW_MODULE=importlib.util.module_from_spec(spec);spec.loader.exec_module(_WORKFLOW_MODULE)
+    body=_WORKFLOW_MODULE.policy(tuple(names))
+    return '<!-- soc-workflows:start -->\n'+body+'\n<!-- soc-workflows:end -->' if body else ''
 
 
 def system_prompt(*, read_only=False, agent_role=None):

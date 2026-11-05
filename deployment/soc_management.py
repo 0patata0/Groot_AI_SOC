@@ -42,7 +42,8 @@ SOURCES = tuple("infra/mcp/" + name for name in (
     "rule_change_executor.py", "rule_change_mcp.py", "security_rule_inventory.py", "rule_readonly_install.py", "service_action_executor.py", "incident_containment.py",
     "soc_bot.py", "soc_management_events.py", "operations_approval.py", "approval_card_cleanup.py",
     "response-mcp.py", "wazuh_containment_ar.py", "managed_suricata_evidence.py", "managed_waf_evidence.py", "configure_waf_evidence.py")) + tuple("infra/hermes/" + name for name in (
-    "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md", "output_contract.py", "chat_markdown.py", "skills/soc-output/SKILL.md",
+    "soc_management_controller.py", "soc_management_run.py", "soc_alert_watch.prompt", "SOUL.groot.md", "output_contract.py", "workflow_contract.py", "chat_markdown.py", "skills/soc-output/SKILL.md",
+    "skills/soc-query/SKILL.md", "skills/soc-investigate/SKILL.md", "skills/soc-change/SKILL.md", "skills/soc-recover/SKILL.md",
     "capstone-management.service.example", "capstone-management.timer.example")) + (
     "deployment/soc_management.py", "deployment/soc_runtime.py", "deployment/soc_agent_block.py", "deployment/response_entrypoint.py",
     "deployment/report_publisher.py")
@@ -219,7 +220,8 @@ def source_bundle(s):
         data = read(s["source"] / relative)
         if relative.endswith(".py"):
             ast.parse(data)
-        result[Path(relative).name] = data
+        match=re.fullmatch(r'infra/hermes/skills/(soc-query|soc-investigate|soc-change|soc-recover)/SKILL.md',relative)
+        result['skill-'+match[1]+'.md' if match else Path(relative).name] = data
     return result
 
 
@@ -506,6 +508,9 @@ def prepare_siem(s):
     write("/opt/capstone-management/soc_management_run.py", gate, 0o750)
     write("/opt/capstone-management/soc_alert_watch.prompt", bundle["soc_alert_watch.prompt"], 0o644)
     write("/opt/capstone-management/output_contract.py", bundle["output_contract.py"], 0o644)
+    write("/opt/capstone-management/workflow_contract.py", bundle["workflow_contract.py"], 0o644)
+    for name in ('soc-query','soc-investigate','soc-change','soc-recover'):
+        write('/opt/capstone-management/skill-'+name+'.md',bundle['skill-'+name+'.md'],0o644)
     write("/opt/capstone-management/chat_markdown.py", bundle["chat_markdown.py"], 0o644)
     write("/opt/capstone-management/SKILL.md", bundle["SKILL.md"], 0o644)
     write("/etc/capstone-management/controller.env", ("RULE_BROKER_TOKEN=" + share["rule_token"] + "\nMM_WEBHOOK=" + webhook + "\n").encode())

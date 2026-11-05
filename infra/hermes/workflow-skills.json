@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-05T02:14:20+09:00",
+  "contract": "1.5.28",
+  "query": "1.19.23",
+  "skills": [
+    "soc-output",
+    "soc-query",
+    "soc-investigate",
+    "soc-change",
+    "soc-recover"
+  ],
+  "regression": {
+    "management": 262,
+    "sdk": 219,
+    "native": 391,
+    "install": 39,
+    "review": 60,
+    "workflow": 4,
+    "containment": 46,
+    "time_display": 6,
+    "approval": 14,
+    "mcp_front": 10,
+    "siem_role": 40,
+    "pass": 1091,
+    "skip": 0
+  },
+  "live": {
+    "a_files": 2,
+    "b_files": 30,
+    "protected_config_sha_unchanged": 7,
+    "three_profiles_workflow_sha_equal": true,
+    "native_uid_probe": 995,
+    "sdk_fresh_query": {
+      "seconds": 11.681230938062072,
+      "model_calls": 1,
+      "mcp_calls": 1,
+      "errors": 0,
+      "protected_calls": 0,
+      "chat_posts": 0,
+      "status": "completed"
+    },
+    "native_review": {
+      "seconds": 214.2715675830841,
+      "mcp_calls": 5,
+      "errors": 0,
+      "protected_calls": 0,
+      "status": "outcome_unknown",
+      "detail": "model_subprocess_timeout_requires_review"
+    },
+    "legacy_record_unchanged": true,
+    "legacy_initial_apply_time": "unknown"
+  },
+  "recovery": {
+    "path": "/var/lib/capstone-time-semantics/20261105-r1/deployment",
+    "a_confirmed": true,
+    "b_confirmed": true,
+    "confirmed_noop": true,
+    "manual_rollback_tested": false
+  },
+  "new_os_install_tested": false,
+  "ui_newly_tested": false,
+  "git": {
+    "source_commit": null,
+    "remote_verified": false,
+    "state": "pending"
+  },
+  "cleanup": {
+    "server": {
+      "removed_files": 453,
+      "removed_bytes": 6556918,
+      "recovery_preserved": true
+    },
+    "mac": {
+      "removed_files": 34,
+      "removed_bytes": 5930648,
+      "task_directory_absent": true,
+      "no_mac_packages_installed": true
+    }
+  }
+}

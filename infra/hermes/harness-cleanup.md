@@ -30,3 +30,5 @@ B 원본/후보33개(운영 소스30+각 소유 영수증3), 소유권·모드·
 ## IPv6 읽기 확인
 
 A15:44 KST의 `ip6 nat`3chain/2rule·`ip6 filter`7chain/5rule은 Docker 호환 체인이며 관측 카운터0이었다. Docker5네트워크의 EnableIPv6는false지만 NIC link-local/lo 주소는 존재했고 전체 커널 IPv6는 꺼지지 않았다. 전역 IPv6·기본 경로는 관측되지 않았다. 이 사실은 전체 IPv6 우회 불가 증명이 아니다. Docker 재생성·실제 커널/인터페이스 설정·관리 복구 경로 대조가 남아 이번 작업에서는 삭제하지 않았다.
+
+11/5 [공통 업무 스킬](workflow-skills.md) 보완: soc-output과 조회/사건/변경/복구4개 절차를 같은 canonical 원본으로 배포한다. 기존 단일deploy.sh의 SIEM23파일·SDK source_files·관리 source_bundle에 로더/flat 별칭을 연결하고 네 SKILL의 파일명 충돌을 검사했다. 설치 계약39·SIEM역할40PASS, 전체 서버1,091PASS/skip0. 기존 고정 의존성만 사용해 새 deb/wheel/image·키/포트는 없다. 운영은 A2/B30파일 증분 반영·확정했으며 새 OS 전체 설치는 실행하지 않았다. 권한/역할/정확 승인 강제는 SOUL와 서버 코드에 유지한다. 실제 조사 시간초과·새 UI/자동 자기개선 연결 등 남은 범위는 위 검증에 구분한다.

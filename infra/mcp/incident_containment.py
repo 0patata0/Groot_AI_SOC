@@ -466,6 +466,12 @@ class ContainmentService:
         if 'closed_at' in record and (type(record['closed_at']) is not int or
                 record['closed_at'] < record['created_at'] or record['status'] not in TERMINAL):
             raise ContainmentError('incident close time is inconsistent')
+        applied={'initial_apply_observed_at','initial_apply_observation_sha256'} & record.keys()
+        if applied and (len(applied)!=2 or type(record['initial_apply_observed_at']) is not int or
+                not record['created_at']<=record['initial_apply_observed_at']<=payload['expires_at'] or
+                not isinstance(record['initial_apply_observation_sha256'],str) or
+                not SHA.fullmatch(record['initial_apply_observation_sha256'])):
+            raise ContainmentError('initial application observation is inconsistent')
         return record
 
     def _records(self):
@@ -514,6 +520,11 @@ class ContainmentService:
     @staticmethod
     def _summary(r):
         return {"request_id": r["request_id"], "target": TARGET, "kind": "containment", "ip": r["ip"],
+                "workflow_created_at": r["created_at"],
+                "initial_apply_observed_at": r.get("initial_apply_observed_at"),
+                "initial_apply_observation_sha256": r.get("initial_apply_observation_sha256"),
+                "initial_apply_time_scope": ("kernel ownership readback after create; not first-packet drop time"
+                    if "initial_apply_observed_at" in r else "not recorded; do not infer from deadline or TTL"),
                 "status": r["status"], "temporary_expires_at": r["payload"]["expires_at"],
                 "owned_deadline": r["owned_deadline"], "keep_seconds": KEEP_SECONDS,
                 "cooldown_seconds": COOLDOWN_SECONDS,
@@ -599,7 +610,13 @@ class ContainmentService:
                           "cooldown_until": deadline + COOLDOWN_SECONDS, "result_posted": False}
                 self._save(record)  # persist ownership before touching the kernel
                 try:
-                    self.backend.create(record)
+                    applied = self.backend.create(record)
+                    observed_at = int(self.engine.clock())
+                    element = applied.get('element') if isinstance(applied,dict) else None
+                    if (isinstance(element,dict) and applied.get('ip')==ip and element.get('val')==ip and
+                            element.get('comment')==NftBackend.tag(record) and now<=observed_at<=deadline):
+                        record['initial_apply_observed_at']=observed_at
+                        record['initial_apply_observation_sha256']=digest(applied)
                     record["status"] = "awaiting_card"
                     self._save(record)
                 except Exception:

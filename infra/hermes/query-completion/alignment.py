@@ -357,6 +357,12 @@ def request_wrapper(original, query, harness):
         read_selection = bool(scope and (harness.structured_read(request) or incident_scope)
                               and all(harness.EVIDENCE.allowed(name, 'verify') for name in scope))
         data = harness.CONTRACT.normalize_openai(result.api_kwargs, scope, read_only=read_selection,agent_role='hermes')
+        workflows=harness.workflow_names(request)
+        system=next((r for r in data.get('messages',[]) if r.get('role')=='system'),None)
+        if system is not None:
+            system['content']=re.sub(r'\n?<!-- soc-workflows:start -->.*?<!-- soc-workflows:end -->','',system['content'],flags=re.S)
+            if workflows:system['content']+='\n'+harness.CONTRACT.workflow_policy(workflows)
+        agent._capstone_workflow_skills=(turn,workflows)
         for tool in data.get('tools',[]):
             f=tool.get('function',{})
             if harness.EVIDENCE.allowed(f.get('name'),'verify') and isinstance(f.get('parameters'),dict):
@@ -406,7 +412,7 @@ def request_wrapper(original, query, harness):
             targets = getattr(agent, '_capstone_alignment_diagnostic_targets', targets)
             pending = harness.missing_reads(request, calls, targets)
             if reference:pending+=harness.card_evidence_gaps(reference,calls)
-            data.setdefault('messages', []).append({'role': 'user', 'content': (harness.READ.guidance(plan, calls) if plan else harness.guidance(request))
+            data.setdefault('messages', []).append({'role': 'user', 'content': (harness.READ.guidance(plan, calls) if plan else harness.guidance(request,include_workflows=False))
                 + '\n아직 미확인: ' + ', '.join(pending)})
             agent_ids = harness.READ.verified_ids(plan, calls)
             for tool in data.get('tools', []):

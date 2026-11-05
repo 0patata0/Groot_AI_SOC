@@ -227,14 +227,14 @@ class Tests(unittest.TestCase):
         config={'mcp_servers':{'only-readonly':{}},'toolsets':['mcp-wazuh-ro']}
         baseline=copy.deepcopy(config)
         env=self.n['install_hermes_extensions'](self.n['DEST']/'bot',user,creds,config)
-        self.assertEqual(len(written),18)
-        self.assertEqual(len(reads),18)
+        self.assertEqual(len(written),23)
+        self.assertEqual(len(reads),23)
         self.assertEqual({pathlib.Path(p).name for p in written},{'__init__.py','plugin.yaml','channel_sync.py','HOOK.yaml','handler.py','grounding.py',
-            'alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py','output_contract.py','SKILL.md'})
+            'alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py','output_contract.py','workflow_contract.py','skill-soc-query.md','skill-soc-investigate.md','skill-soc-change.md','skill-soc-recover.md','SKILL.md'})
         self.assertTrue(any('/plugins/groot-mattermost-context/' in p for p in written))
         self.assertTrue(any('/hooks/groot-mattermost-channel-sync/' in p for p in written))
         self.assertEqual({pathlib.Path(p).name for p in written if '/plugins/groot-query-completion/' in p},
-                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py','output_contract.py','SKILL.md'})
+                         {'__init__.py','plugin.yaml','grounding.py','alignment.py','progress.py','chat_markdown.py','chat_contract.py','read_contract.py','soc_policy.md','chat_harness.py','gateway_health.py','output_contract.py','workflow_contract.py','skill-soc-query.md','skill-soc-investigate.md','skill-soc-change.md','skill-soc-recover.md','SKILL.md'})
         self.assertTrue(all(value[1:]==(0o600,995,986) for value in written.values()))
         self.assertTrue(all(value[1:]==(0o700,995,986) for value in created))
         self.assertEqual(config['plugins'],{'enabled':['groot-mattermost-context','groot-query-completion']})

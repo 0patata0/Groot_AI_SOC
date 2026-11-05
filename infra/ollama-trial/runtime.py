@@ -289,6 +289,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             report['status'] = 'discovered'
         else:
             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
+            report['workflow_skills']=list(harness.workflow_names(current))
             tick = time.perf_counter()
             structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference))
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])

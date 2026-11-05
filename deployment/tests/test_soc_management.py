@@ -51,6 +51,14 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_workflow_bundle_keeps_four_distinct_skills_and_common_output(self):
+        with mock.patch.object(install,'read',side_effect=lambda p:Path(p).read_bytes()):
+            bundle=install.source_bundle({'source':ROOT})
+        self.assertEqual(bundle['SKILL.md'],(ROOT/'infra/hermes/skills/soc-output/SKILL.md').read_bytes())
+        for name in ('soc-query','soc-investigate','soc-change','soc-recover'):
+            self.assertEqual(bundle['skill-'+name+'.md'],(ROOT/'infra/hermes/skills'/name/'SKILL.md').read_bytes())
+        self.assertIn('workflow_contract.py',bundle)
+
     def test_rendered_inline_gate_matches_the_root_reference_and_rejects_stale_source(self):
         m=module('soc_management_controller.py','b')
         case={'mode':'verify','session_id':None,'operator_review':True,'required_sensor_reads':[{

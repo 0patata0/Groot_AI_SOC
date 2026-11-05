@@ -1593,9 +1593,26 @@ def prior_inventory(question, evidence):
     return None
 
 
-def guidance(question):
+def workflow_names(question):
+    """Select procedural context from existing request interpretation, no action."""
+    text=normalized(question);names=[]
+    investigate=EVIDENCE.incident_investigation_request(text)
+    change=READ.wants_write(text)
+    recover=bool(diagnostic_request(question) or re.search(r'장애|복구|재시작|살려|꺼졌|저장소.{0,8}(?:오류|불가)|수집.{0,8}(?:실패|중단)',text))
+    if not investigate and not change and (structured_read(question) or tool_scope(question) or rule_scope_request(question)):
+        names.append('soc-query')
+    if investigate:names.append('soc-investigate')
+    if change:names.append('soc-change')
+    if recover:names.append('soc-recover')
+    return tuple(names)
+
+
+def guidance(question, *, include_workflows=True):
     text = normalized(question)
     result = SHARED.status_lookup_guidance(text)
+    if include_workflows:
+        workflows=workflow_names(question)
+        if workflows:result+='\n'+CONTRACT.workflow_policy(workflows)
     if EVIDENCE.incident_investigation_request(text):
         result += '\n사건의 실제 경보부터 조회한 뒤 위험·대응 필요성을 판단하세요. 현재 규칙 파일 목록만으로 조사를 대신하지 마세요.'
         result += ('\n실제 센서 사건의 최종 판단은 공개 보고 뒤에 INCIDENT_DISPOSITION: {"assessment":"benign 또는 remediated 또는 unresolved 중 하나","basis":"실제 근거와 한계를 설명하는 20~2000자","evidence_tools":["실제로 성공한 mcp__서버__도구"]} 한 줄로 기록하세요. '

@@ -10,6 +10,7 @@ import argparse
 import grp
 import gzip
 import hashlib
+import heapq
 import ipaddress
 import json
 import os
@@ -35,6 +36,10 @@ MAX_FILES = 15
 MAX_INPUT = 8 * 1024 * 1024
 MAX_SNAPSHOT = 4 * 1024 * 1024
 MAX_ROWS = 10000
+MAX_HISTORY_BYTES = 32 * 1024 * 1024
+MAX_HISTORY_ROWS = 128000
+MAX_HISTORY_FILES = 8
+HISTORY_FILE = re.compile(r'history-([0-9a-f]{64})\.jsonl\Z')
 MAX_LINE = 16384
 MAX_LIMIT = 50
 TARGETS = {
@@ -183,7 +188,36 @@ def configuration():
             'configuration_sha256': hashlib.sha256(encoded(records)).hexdigest(), 'targets': targets}
 
 
-def collect(now=None):
+class HistoryIndex:
+    """Stream sanitized rows without the recent snapshot's global row cap.
+
+    A per-source checkpoint prevents a gzip CRC failure from publishing rows
+    from its otherwise plausible prefix. Neither raw bytes nor query text enter
+    this index. The caller owns the temporary binary stream.
+    """
+    def __init__(self, stream):
+        self.stream=stream;self.rows=0;self.size=0;self.sha=hashlib.sha256();self.truncated=False
+
+    def checkpoint(self):
+        return self.rows,self.size,self.sha.copy(),self.truncated
+
+    def restore(self, saved):
+        self.rows,self.size,self.sha,self.truncated=saved
+        self.stream.seek(self.size);self.stream.truncate()
+
+    def add(self, row):
+        raw=encoded(row)
+        if self.rows>=MAX_HISTORY_ROWS or self.size+len(raw)>MAX_HISTORY_BYTES:
+            self.truncated=True;return
+        self.stream.write(raw);self.sha.update(raw);self.size+=len(raw);self.rows+=1
+
+    def manifest(self):
+        digest=self.sha.hexdigest()
+        return {'name':'history-'+digest+'.jsonl','sha256':digest,'bytes':self.size,
+                'rows':self.rows,'rows_truncated':self.truncated}
+
+
+def collect(now=None, history=None):
     now = int(time.time()) if now is None else now
     need(os.geteuid() == 0, 'collector_root_required')
     parents(LOGS)
@@ -197,6 +231,7 @@ def collect(now=None):
         if coverage['bytes_scanned'] >= MAX_INPUT:
             coverage['scan_limited'] = True
             break
+        checkpoint=history.checkpoint() if history is not None else None
         try:
             source, before = root_open(path, MAX_INPUT)
             count = 0;file_rows=[];fingerprint=hashlib.sha256()
@@ -221,6 +256,7 @@ def collect(now=None):
                             coverage['malformed_lines'] += 1
                         elif now-HISTORY <= datetime.fromisoformat(row['timestamp_kst']).timestamp() <= now:
                             file_rows.append(row)
+                            if history is not None:history.add(row)
                         if len(file_rows) >= MAX_ROWS*2:
                             coverage['rows_truncated'] = True
                             file_rows = sorted(file_rows, key=lambda r:r['timestamp_kst'], reverse=True)[:MAX_ROWS]
@@ -237,6 +273,7 @@ def collect(now=None):
                 coverage['rows_truncated']=True
                 rows=sorted(rows,key=lambda r:r['timestamp_kst'],reverse=True)[:MAX_ROWS]
         except (OSError, ValueError, EOFError):
+            if history is not None:history.restore(checkpoint)
             coverage['files_unavailable'] += 1
     coverage['scan_limited'] |= coverage['files_unavailable'] > 0 or not files
     coverage['rows_truncated'] |= len(rows) > MAX_ROWS
@@ -252,6 +289,8 @@ def collect(now=None):
     value = {'schema':1, 'host':'c', 'checked_at':now, 'expires_at':now+TTL, 'retained_seconds':HISTORY,
             'agent':agent_identity(), 'configuration':config, 'apache_unit':unit,
             'coverage':coverage, 'files':files, 'records':rows}
+    if history is not None:
+        value.update(schema=2,history_index=history.manifest())
     while len(encoded(value)) > MAX_SNAPSHOT and value['records']:
         value['coverage']['rows_truncated'] = True
         value['records'] = value['records'][:len(value['records'])//2]
@@ -260,8 +299,18 @@ def collect(now=None):
 
 def validate(value, now=None):
     now = int(time.time()) if now is None else now
-    need(isinstance(value,dict) and set(value)=={'schema','host','checked_at','expires_at','retained_seconds','agent','configuration','apache_unit','coverage','files','records'}
-         and value['schema']==1 and value['host']=='c' and type(value['checked_at']) is int
+    keys={'schema','host','checked_at','expires_at','retained_seconds','agent','configuration','apache_unit','coverage','files','records'}
+    need(isinstance(value,dict) and type(value.get('schema')) is int and value['schema'] in (1,2),'snapshot_schema_invalid')
+    if value['schema']==2:
+        keys.add('history_index');index=value.get('history_index')
+        need(isinstance(index,dict) and set(index)=={'name','sha256','bytes','rows','rows_truncated'}
+             and isinstance(index['name'],str) and HISTORY_FILE.fullmatch(index['name'])
+             and index['name']=='history-'+str(index['sha256'])+'.jsonl'
+             and type(index['bytes']) is int and 0<=index['bytes']<=MAX_HISTORY_BYTES
+             and type(index['rows']) is int and 0<=index['rows']<=MAX_HISTORY_ROWS
+             and type(index['rows_truncated']) is bool,'history_manifest_invalid')
+    need(set(value)==keys
+         and value['host']=='c' and type(value['checked_at']) is int
          and value['expires_at']==value['checked_at']+TTL and value['checked_at'] <= now+5 <= value['expires_at']+5
          and value['retained_seconds']==HISTORY, 'snapshot_invalid_or_stale')
     need(isinstance(value['configuration'],dict) and set(value['configuration']['targets'])==set(TARGETS), 'target_catalog_invalid')
@@ -300,24 +349,97 @@ def validate(value, now=None):
              and type(item['changed_during_read']) is bool,'source_file_invalid')
         files.add(item['name'])
     for row in value['records']:
-        need(isinstance(row,dict) and set(row)==FIELDS and isinstance(row['path'],str) and len(row['path'])<=240
-             and row['path'].startswith('/') and '?' not in row['path'] and '#' not in row['path']
-             and re.fullmatch('[0-9a-f]{64}',row['path_sha256']) and re.fullmatch('[0-9a-f]{64}',row['entry_sha256'])
-             and row['log_file'] in files and type(row['status']) is int and 100<=row['status']<=599
-             and type(row['query_present']) is bool and type(row['path_truncated']) is bool and row['method'] in ('GET','HEAD','POST','PUT','PATCH','DELETE','OPTIONS','CONNECT','TRACE','OTHER')
-             and (row['response_bytes'] is None or type(row['response_bytes']) is int and 0<=row['response_bytes']<=2**63-1), 'row_invalid')
-        ipaddress.ip_address(row['source_ip'])
-        stamp=datetime.fromisoformat(row['timestamp_kst'])
-        need(stamp.utcoffset()==timedelta(hours=9) and value['checked_at']-HISTORY <= stamp.timestamp() <= value['checked_at'], 'row_time')
+        validate_row(row,value['checked_at'],files)
     need(len(encoded(value))<=MAX_SNAPSHOT,'snapshot_byte_bound')
     return value
 
 
-def publish(value):
-    need(os.geteuid()==0,'publisher_root_required');validate(value)
+def validate_row(row, checked_at, files):
+    need(isinstance(row,dict) and set(row)==FIELDS and isinstance(row['path'],str) and len(row['path'])<=240
+         and row['path'].startswith('/') and '?' not in row['path'] and '#' not in row['path']
+         and re.fullmatch('[0-9a-f]{64}',row['path_sha256']) and re.fullmatch('[0-9a-f]{64}',row['entry_sha256'])
+         and row['log_file'] in files and type(row['status']) is int and 100<=row['status']<=599
+         and type(row['query_present']) is bool and type(row['path_truncated']) is bool and row['method'] in ('GET','HEAD','POST','PUT','PATCH','DELETE','OPTIONS','CONNECT','TRACE','OTHER')
+         and (row['response_bytes'] is None or type(row['response_bytes']) is int and 0<=row['response_bytes']<=2**63-1), 'row_invalid')
+    ipaddress.ip_address(row['source_ip'])
+    stamp=datetime.fromisoformat(row['timestamp_kst'])
+    need(stamp.utcoffset()==timedelta(hours=9) and checked_at-HISTORY <= stamp.timestamp() <= checked_at, 'row_time')
+
+def prepare_state():
+    need(os.geteuid()==0,'publisher_root_required')
     gid=grp.getgrnam('capstone-diagnostics').gr_gid
     STATE.mkdir(mode=0o750,parents=True,exist_ok=True);parents(STATE)
     os.chown(STATE,0,gid);os.chmod(STATE,0o750)
+    return gid
+
+
+def history_stream(snapshot):
+    """Verify the complete pinned generation, even if the query has 50 hits."""
+    need(snapshot.get('schema')==2,'historical_index_unavailable')
+    index=snapshot['history_index'];source,meta=root_open(STATE/index['name'],MAX_HISTORY_BYTES)
+    size=0;count=0;sha=hashlib.sha256();files={f['name'] for f in snapshot['files']}
+    with source:
+        need(meta.st_gid==grp.getgrnam('capstone-diagnostics').gr_gid
+             and stat.S_IMODE(meta.st_mode)==0o640 and meta.st_size==index['bytes'],'history_access_invalid')
+        while True:
+            raw=source.readline(MAX_LINE+1)
+            if not raw:break
+            size+=len(raw);count+=1
+            need(raw.endswith(b'\n') and len(raw)<=MAX_LINE and size<=index['bytes']
+                 and count<=index['rows'],'history_record_bound')
+            sha.update(raw);row=json.loads(raw,object_pairs_hook=unique)
+            validate_row(row,snapshot['checked_at'],files)
+            yield row
+        after=os.fstat(source.fileno())
+        need((after.st_ino,after.st_size)==(meta.st_ino,meta.st_size)
+             and size==index['bytes'] and count==index['rows'] and sha.hexdigest()==index['sha256'],
+             'history_generation_mismatch')
+
+
+def publish_history(history, gid, now):
+    index=history.manifest();path=STATE/index['name']
+    # Last-reference times keep a recently retired generation available for
+    # in-flight readers that already pinned the previous snapshot manifest.
+    for candidate in STATE.iterdir():
+        if not HISTORY_FILE.fullmatch(candidate.name) or candidate==path:continue
+        meta=candidate.lstat()
+        need(stat.S_ISREG(meta.st_mode) and meta.st_uid==0 and meta.st_nlink==1
+             and not meta.st_mode&0o022,'unsafe_history_generation')
+        if meta.st_mtime < now-2*TTL:candidate.unlink()
+    if not path.exists():
+        need(sum(bool(HISTORY_FILE.fullmatch(p.name)) for p in STATE.iterdir())<MAX_HISTORY_FILES,
+             'history_generation_budget')
+        fd,temporary=tempfile.mkstemp(prefix='.history-',dir=STATE)
+        try:
+            history.stream.seek(0);sha=hashlib.sha256();size=0
+            with os.fdopen(fd,'wb') as out:
+                while True:
+                    raw=history.stream.read(65536)
+                    if not raw:break
+                    size+=len(raw);need(size<=index['bytes'],'history_publication_bound')
+                    sha.update(raw);out.write(raw)
+                out.flush();os.fsync(out.fileno())
+            need(size==index['bytes'] and sha.hexdigest()==index['sha256'],'history_publication_mismatch')
+            os.chown(temporary,0,gid);os.chmod(temporary,0o640);os.replace(temporary,path)
+        finally:
+            if os.path.exists(temporary):os.unlink(temporary)
+    # Root may only reuse a byte-identical safe generation.
+    source,meta=root_open(path,MAX_HISTORY_BYTES)
+    with source:
+        need(meta.st_gid==gid and stat.S_IMODE(meta.st_mode)==0o640 and meta.st_size==index['bytes'],
+             'history_existing_access_invalid')
+        sha=hashlib.sha256()
+        for raw in iter(lambda:source.read(65536),b''):sha.update(raw)
+    need(sha.hexdigest()==index['sha256'],'history_existing_generation_mismatch')
+    os.utime(path,(now,now),follow_symlinks=False)
+
+
+def publish(value, history=None):
+    need(os.geteuid()==0,'publisher_root_required');validate(value)
+    gid=prepare_state()
+    if value['schema']==2:
+        need(history is not None and value['history_index']==history.manifest(),'history_publication_required')
+        publish_history(history,gid,int(time.time()))
     fd, temporary=tempfile.mkstemp(prefix='.snapshot-',dir=STATE)
     try:
         with os.fdopen(fd,'wb') as output:
@@ -361,7 +483,7 @@ def request(value, now=None):
     return {'operation':value['operation'],'arguments':args}
 
 
-def answer(value, snapshot, now=None):
+def answer(value, snapshot, now=None, *, history=None):
     now=datetime.now(KST) if now is None else now
     value=request(value,now);validate(snapshot,int(now.timestamp()));args=value['arguments'];target=args['target']
     result={'schema':1,'target':target,'source':'c_apache_access_snapshot','observed_at_kst':datetime.fromtimestamp(snapshot['checked_at'],KST).isoformat(),
@@ -375,19 +497,33 @@ def answer(value, snapshot, now=None):
             'evidence_scope_ko':'C Apache 접근 로그를 제한하여 정제한 파일 표본입니다. 원본 질의 문자열·헤더·쿠키·본문은 반환하지 않습니다. 설정 파일/Apache 프로세스 관측은 앱 정상·침해 부재·프런트 경로 적재 증명이 아닙니다. 반환0건은 전체 요청 부재를 증명하지 않습니다. 행 SHA는 동일 바이트 식별이며 고유 HTTP 거래 ID가 아닙니다.'}
     if value['operation']=='get_web_service_target':return result
     prefix=TARGETS[target];start,end=(datetime.fromisoformat(args[k]) for k in ('since_kst','until_kst'))
-    rows=[r for r in snapshot['records'] if (r['path'].startswith(prefix) or r['path']==prefix.rstrip('/'))
-          and start<=datetime.fromisoformat(r['timestamp_kst'])<=end
-          and ('source_ip' not in args or r['source_ip']==args['source_ip'])]
-    limit=args.get('limit',10)
-    result.update(requested_since_kst=start.isoformat(),requested_until_kst=end.isoformat(),returned_count=min(limit,len(rows)),
-                  retained_index_match_count=len(rows),actual_request_total_count=None,returned_rows_truncated=len(rows)>limit,
-                  coverage=snapshot['coverage'],source_files=snapshot['files'],records=rows[:limit])
+    limit=args.get('limit',10);matches=0;heap=[]
+    for r in snapshot['records'] if history is None else history:
+        stamp=datetime.fromisoformat(r['timestamp_kst'])
+        if ((r['path'].startswith(prefix) or r['path']==prefix.rstrip('/')) and start<=stamp<=end
+                and ('source_ip' not in args or r['source_ip']==args['source_ip'])):
+            matches+=1;item=(stamp.timestamp(),r['entry_sha256'],matches,r)
+            if len(heap)<limit:heapq.heappush(heap,item)
+            else:heapq.heappushpop(heap,item)
+    coverage=dict(snapshot['coverage'])
+    result['record_scope']='recent_snapshot' if history is None else 'query_filtered_sanitized_history'
+    if history is not None:
+        coverage['rows_truncated']=snapshot['history_index']['rows_truncated']
+        result.update(recent_snapshot_rows_truncated=snapshot['coverage']['rows_truncated'],
+                      sanitized_history_sha256=snapshot['history_index']['sha256'],
+                      sanitized_history_row_count=snapshot['history_index']['rows'])
+    result.update(requested_since_kst=start.isoformat(),requested_until_kst=end.isoformat(),returned_count=min(limit,matches),
+                  retained_index_match_count=matches,actual_request_total_count=None,returned_rows_truncated=matches>limit,
+                  coverage=coverage,source_files=snapshot['files'],records=[item[-1] for item in sorted(heap,reverse=True)])
     return result
 
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--collect',action='store_true',required=True);parser.parse_args()
-    try:publish(collect())
+    try:
+        prepare_state()
+        with tempfile.TemporaryFile(dir=STATE) as stream:
+            history=HistoryIndex(stream);publish(collect(history=history),history)
     except (OSError,ValueError,KeyError,TypeError,UnicodeError):raise SystemExit('web_evidence_collection_unavailable') from None
 
 

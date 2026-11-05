@@ -48,7 +48,9 @@ def main():
     if len(sys.argv)!=1 or os.environ.get('SSH_ORIGINAL_COMMAND',''):
         raise ValueError('reader_takes_no_command')
     module=library();request=module.request(__import__('json').loads(incoming(),object_pairs_hook=module.unique))
-    result=module.answer(request,module.read_snapshot());raw=module.encoded(result)
+    snapshot=module.read_snapshot()
+    history=module.history_stream(snapshot) if request['operation']=='search_web_access' else None
+    result=module.answer(request,snapshot,history=history);raw=module.encoded(result)
     module.need(len(raw)<=262144,'result_bound')
     syslog.syslog(syslog.LOG_NOTICE,__import__('json').dumps({'event':'web_evidence_read','target':result['target'],'operation':request['operation']}))
     sys.stdout.buffer.write(raw);sys.stdout.buffer.flush()

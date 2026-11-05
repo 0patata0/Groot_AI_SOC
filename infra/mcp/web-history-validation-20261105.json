@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05T12:06:11.170778+09:00",
+  "tests": {
+    "unique_total": 85,
+    "passed": 85,
+    "skip": 0,
+    "web_root_tests_on_c": 29,
+    "web_deployment": 6,
+    "diagnostic_deployment": 18,
+    "grounding": 5,
+    "events": 27,
+    "local_web_skip": 2,
+    "local_skip_executed_on_c": true
+  },
+  "deployment": {
+    "c": {
+      "files_verified": 3,
+      "at_epoch": 1793847682.5525599,
+      "history": {
+        "bytes": 5565738,
+        "name": "history-a6b0289ac9c39b0ecbb987d6ecc89df37328d3175634ff9f5676ab8dc9a2bf5a.jsonl",
+        "rows": 14143,
+        "rows_truncated": false,
+        "sha256": "a6b0289ac9c39b0ecbb987d6ecc89df37328d3175634ff9f5676ab8dc9a2bf5a"
+      },
+      "coverage": {
+        "bytes_scanned": 3156874,
+        "files_unavailable": 0,
+        "logging_continuity_verified": false,
+        "malformed_lines": 9,
+        "rows_truncated": true,
+        "scan_limited": false
+      },
+      "unit": "Result=success\nExecMainStatus=0\nMemoryPeak=[not set]\nCPUUsageNSec=1410894000\n",
+      "apache_restarted": false,
+      "manual_rollback_tested": false,
+      "recovery_noop": true
+    },
+    "b": {
+      "at_epoch": 1793847869.3504038,
+      "files_verified": 2,
+      "protected_unchanged": 7,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 19.330930948257446,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 10.330994367599487,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "chat_restarts": 0,
+      "manual_rollback_tested": false,
+      "recovery_noop": true
+    },
+    "new_packages_ports_keys_permissions": false,
+    "chat_restarts": 0,
+    "apache_restarts": 0,
+    "new_os_install": false,
+    "manual_rollback_tested": false
+  },
+  "actual_mcp": {
+    "seconds": 4.809140437981114,
+    "positive_reads": 4,
+    "expected_refusals": 1,
+    "older_missing_recent_row_recovered": true,
+    "older_entry_sha256": "41a3479da2309421c6a1a4eaea759f3dab63e9a851a522a6b9a06e2806209f1c",
+    "historical_rows": 14143,
+    "recent_rows": 10000,
+    "omitted_dvwa_rows": 6,
+    "attack_window_rows": 0,
+    "historical_row_truncated": false,
+    "malformed": 9,
+    "logging_continuity_verified": false,
+    "actual_request_total_count": null,
+    "model_calls": 0,
+    "protected_writes": 0
+  },
+  "bounds": {
+    "source_input_bytes": 8388608,
+    "history_generation_bytes": 33554432,
+    "history_generation_rows": 128000,
+    "history_generations": 8,
+    "result_limit": 50,
+    "snapshot_ttl": 180,
+    "history_seconds": 1209600
+  },
+  "cleanup": {
+    "state": "server_complete_mac_shared_with_active_pcap_import",
+    "c_source_files_removed": 4,
+    "c_source_bytes_removed": 56749,
+    "backups_preserved": true,
+    "operating_sanitized_history_preserved": true,
+    "mac_temp_reason": "same working directory is in use by ongoing authorized Kali PCAP import; cleanup after completion"
+  },
+  "publication": {
+    "state": "pending"
+  },
+  "remaining": [
+    "model_host_followup_and_final_case_judgment",
+    "all_log_logging_continuity",
+    "new_pcap_live_and_offline_tests",
+    "paper_latest_pdf",
+    "independent_evaluation"
+  ]
+}

@@ -24,3 +24,5 @@
 11/5 사건 실패 표·DNS 근거 보완: 기존 output_contract/관리 source_bundle·security-events·조사 SKILL·rule-change-executor 복사 경로에 같은 소스가 포함된다. 공통1.5.29/query1.19.24/events1.2.1·최종 서버1,081PASS/skip0(설치39포함), 새 패키지/키/포트0이다. `<rule><group>` 분류 표지의 정상 문법 허용은 기존 구조·정확 승인 강제를 유지한다. Wazuh 상관 [후보](../infra/validation/dns-noise/README.md)는 승인 카드 만료·미적용이므로 canonical 초기 룰을 선반영하지 않았다. 승인/운영 검증 뒤 같은 단위로 동기화한다. 증분 배포와 새 OS 전체 설치·전체 오프라인 묶음 검증을 구분한다.
 
 11/5 [필수 사건 조회 범위](../infra/hermes/required-sensor-scope.md): 공통1.5.30/query1.19.25의 정확 읽기 안내·MCP 전 검사·실제 같은 읽기만 오류 해소를 기존 공통 gate/source_bundle 복사 경로로 연결했다. 설치39를 포함한 서버995PASS/skip0·B11파일 증분 확정, 새 패키지/권한/포트/키0이다. canonical 코드의 helper/Trace와 root의 포함 gate·reference를 같은 단위로 갱신한다. 실제 사건 판단/종결·새 OS 전체 설치는 별도다.
+
+11/5 [과거 웹 조회 보완](../infra/mcp/web-history.md): 기존 단일deploy.sh/diag-apply/SIEM source복사 경로로 schema2 정제 이력 publisher·reader를 연결했다. 원본 읽기8MiB·최근10k는 유지하고 검색을 시간/서비스 필터 뒤 최대50행으로 제한한다. 이력은32MiB/128k행·최대8세대/TTL회전·기존 그룹읽기만 허용한다. 새 패키지/이미지/포트/키/일반권한0·고유85검사/실제MCP·C3/B2확정, 새 OS 전체 설치는 별도 미실행이다.

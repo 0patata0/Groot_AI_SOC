@@ -679,3 +679,5 @@ unset et_work suri_id
 SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하지 않는다. 기존 Thor의 별도 학습 환경은 [35B 컨테이너·반입 목록](../finetuning/THOR_35B.md#현재-사용하는-격리-컨테이너-경로)을 따른다. 기존 arm64 NGC25.08 이미지 digest를 고정하고 별도 venv의 설치 버전/출처/SHA를 기록한다. 폐쇄망 별도 학습 장비에는 해당 이미지·동일 플랫폼 wheel·고정 HF snapshot과 검증 manifest·데이터 포함 소스 묶음이 필요하다. 이번 Thor 직접 다운로드/격리 검증을 새 폐쇄망 전체 설치 검증으로 보지 않는다. A/B/C 서비스·포트·추론 연결은 이 학습 준비에서 바꾸지 않는다.
 
 2026-11-04 포함gate 결속: 기존 소스 묶음의 `soc_management_run.py`를 root 참조파일로도 기록하고 controller의 불변 포함코드와 SHA를 대조한다. 바이너리·deb/wheel/image·하위 의존성 추가0이며 운영에 초기 설치기를 다시 실행하지 않는다. [검증·한계](../infra/hermes/management-gate-binding.md).
+
+11/5 [과거 웹 조회 보완](../infra/mcp/web-history.md): 기존 단일deploy.sh/diag-apply/SIEM source복사 경로로 schema2 정제 이력 publisher·reader를 연결했다. 원본 읽기8MiB·최근10k는 유지하고 검색을 시간/서비스 필터 뒤 최대50행으로 제한한다. 이력은32MiB/128k행·최대8세대/TTL회전·기존 그룹읽기만 허용한다. 새 패키지/이미지/포트/키/일반권한0·고유85검사/실제MCP·C3/B2확정, 새 OS 전체 설치는 별도 미실행이다.

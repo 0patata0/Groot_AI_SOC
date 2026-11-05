@@ -205,7 +205,13 @@
   },
   "attack_or_load_or_pcap_replay": 0,
   "new_os_install": false,
-  "git_publication": "pending",
+  "git_publication": {
+    "source_commit": "e9f9a87ea46078a8cd6a9b5b390a356c0bd0a0b1",
+    "remote_main_confirmed": "e9f9a87ea46078a8cd6a9b5b390a356c0bd0a0b1",
+    "confirmed_at_kst": "2026-11-05T23:29:53.335162+09:00",
+    "receipt_note": "Publication receipt is recorded in a follow-up documentation commit; final follow-up HEAD is retained in local session evidence.",
+    "unrelated_changes_preserved": true
+  },
   "live_r1": {
     "confirmation": {
       "confirmed_at_epoch": 1793882809,

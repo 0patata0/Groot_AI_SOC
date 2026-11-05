@@ -1,6 +1,6 @@
 # Groot_AI_SOC
 
-**11/5 DNS·저장 전달:** 지정 A→DNS 정보성 흐름 예외는 정확 승인/운영 적용·실제16원문 판정까지 확인했습니다. B 저장 전달의1MiB 한도 실패는 원문 보존 회전으로 보완하고18:17 정기 실행·수집EOF/실패0을 확인했습니다. [현재 결과/잔여](STATUS.md) · [DNS](infra/validation/dns-noise/README.md) · [저장 전달](infra/automation/storage-retention/wazuh/README.md). FW/IPv6 통합과 추가 PCAP 시험은 진행 중입니다.
+**11/5 DNS·저장 전달:** 지정 A→DNS 정보성 흐름 예외는 정확 승인/운영 적용·실제16원문 판정까지 확인했습니다. B 저장 전달의1MiB 한도 실패는 원문 보존 회전으로 보완하고18:17 정기 실행·수집EOF/실패0을 확인했습니다. [현재 결과/잔여](STATUS.md) · [DNS](infra/validation/dns-noise/README.md) · [저장 전달](infra/automation/storage-retention/wazuh/README.md). FW NAT 통합과 A/B/C IPv6 제거도 운영 확정했습니다. A8→4테이블·30→17체인, 실제 정상웹200/시험SQLi403·관리/MCP 조회를 확인했습니다. capstone_fw는 사용자 지시에 따라 유지합니다. [FW 검증·복구](infra/mcp/fw-consolidation.md). 카드 이유·FW IP/규칙 표시·제한적 DDoS 보완은 새 진행 항목입니다.
 
 발표자료는11/5 새 지시에 따라 호스팅 없는 다운로드 PDF 초안20쪽으로 작성했습니다. 발표·논문·메모·검증 원문은 로컬 전용으로 유지하며 저장소에는 포함하지 않습니다. 최종 제출본·독립 평가·전 업무 완료 여부는 [현재 현황](STATUS.md)을 따릅니다.
 

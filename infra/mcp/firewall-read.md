@@ -50,3 +50,7 @@ MCP `tools/call` 예:
 ## 2026-11-03 통합 관리 검토
 
 사용자는 INPUT/OUTPUT/FORWARD/NAT/MANGLE 기준의 통합 관리와 미사용 테이블 정리를 요청했다. A현재99규칙을 빠짐없이 분류하는 오프라인 분석기와 프로젝트NAT3규칙 이관 후보를 만들었다. 기존 get_firewall_rules 응답/권한/운영 커널·봇 표시는 아직 바꾸지 않았다. 단순 테이블 수 감소를 보안·성능 향상으로 표시하지 않는다. [검토·검사·미완료](fw-consolidation.md).
+
+## 현재 테이블과 실제 읽기
+
+11/5 NAT/IPv4 적용 후 실제 Hermes→resp-a는4테이블·17체인·102규칙·9집합을 complete=true로 읽었다. capstone_fw는 유지하며 IPv6 전용 테이블은0이다. 위11/3의99규칙/미적용은 당시 기록이다. [현재 구조·검증·복구](fw-consolidation.md).

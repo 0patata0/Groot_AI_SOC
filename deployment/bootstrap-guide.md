@@ -128,3 +128,7 @@ SOC 연결의 설치 코드는 포함하되, 이 변경의 새 VM 설치 시험�
 서비스/파일 SHA와 현재 PID의 heartbeat 검사는 새 서버 전체 설치 시험을 대신하지 않는다. 실제 완료 범위는 [STATUS](../STATUS.md), 채널 사용은 [채널 안내](../infra/hermes/chat-channels.md)를 따른다.
 
 2026-10-26 관리 제어기 보완은 기존 `deployment/soc_runtime.py`의 canonical 제어기/gate 렌더링과 `deployment/review_chat.py`의 실행부 반입 경로를 사용한다. 새 패키지·이미지·포트는 추가하지 않는다. 관리 제어기와 공동채널 worker를 함께 맞추며, 시간 계산 도구를 감사 대상으로 허용하되 실제 서버 관측으로 인정하지 않는다.
+
+## IPv4 전용 기본 정책
+
+새 설치의 prerequisites는 Docker 준비 후 역할 적용 전에 `ipv4_only.py`로 호스트 IPv6 주소·수신·전용 테이블과 재생성 설정을 정리한다. 기존 운영은 초기 설치기로 덮지 않고 `deploy.sh --ipv4-only`의 per-host 복구/검증 경로를 사용한다. IPv6 Docker network가 이미 활성화된 호스트는 자동 이관하지 않는다. [실제 범위·제약](../infra/mcp/fw-consolidation.md). 새3VM 전체 설치는 미시험이다.

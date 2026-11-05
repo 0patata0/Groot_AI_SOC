@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "observed_at_kst": "2026-11-05T19:20:03+09:00",
+  "status": "live_nat_and_ipv4_confirmed",
+  "hosts": {
+    "A": {
+      "tables": [
+        8,
+        4
+      ],
+      "chains": [
+        30,
+        17
+      ]
+    },
+    "B": {
+      "tables": [
+        6,
+        4
+      ],
+      "chains": [
+        24,
+        14
+      ]
+    },
+    "C": {
+      "tables": [
+        8,
+        6
+      ],
+      "chains": [
+        28,
+        18
+      ]
+    }
+  },
+  "ipv6_host_addresses_routes_listeners_ip6_tables": 0,
+  "all_existing_container_id_pid_started_at_preserved": true,
+  "isolated_nat_phases": 4,
+  "isolated_conditions_per_phase": 3,
+  "ipv4_recovery_tests": 9,
+  "offline_prerequisite_tests": 18,
+  "mcp": {
+    "source": "Hermes -> resp-a",
+    "counts": {
+      "table": 4,
+      "chain": 17,
+      "rule": 102,
+      "set": 9
+    },
+    "complete": true
+  },
+  "web_232": {
+    "dvwa_login": 200,
+    "log4_http": 308,
+    "log4_https": 200,
+    "one_lab_sqli": 403
+  },
+  "nonadmin_10443_connected": false,
+  "admin_dashboard_http": 200,
+  "preserved_native_table": "inet capstone_fw",
+  "additional_filter_merge": "cancelled_after_isolated_incompatibility_test_by_user",
+  "not_tested": [
+    "live_manual_rollback",
+    "OS_reboot",
+    "fresh_three_host_install",
+    "full_new_LLM_containment_approval_expiry_E2E"
+  ],
+  "git": {
+    "state": "pending"
+  },
+  "sources": {
+    "deployment/basic_nat.py": "dca094465332bb97917674e31f3560ccb63ae8598bf65c79d0032f2d4376ee66",
+    "deployment/ipv4_only.py": "43c47726f82cb1ed366ba925c6dd9f41223213e897bc23ff8201d1c5c4927bd9",
+    "deployment/prerequisites.py": "bf5437b823556ba8b8f8422883931b7001b7dc0e98bd10f11ea5d4f30512ecde",
+    "infra/mcp/validate_basic_nat_isolated.py": "0f2a26ecbfdf3303b40bf61679937c522f403e4f8c8d21b80143d600363f1164"
+  }
+}

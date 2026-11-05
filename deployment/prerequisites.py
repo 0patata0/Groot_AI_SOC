@@ -218,6 +218,18 @@ def main():
     if args.action == 'apply' and not managed:
         install(args.manifest, doc)
         security_baseline(doc, installed=True)
+        # Fresh bootstrap only. Legacy live servers use deploy.sh --ipv4-only
+        # with per-host review, recovery timer and separate reachability checks.
+        import ipv4_only
+        ipv4_only.run(['systemctl', 'start', 'docker.service'])
+        ipv4_only.trusted(ipv4_only.STATE)
+        ipv4_only.STATE.mkdir(mode=0o700, exist_ok=True)
+        ipv4_result = ipv4_only.apply()
+        if ipv4_result['state'] == 'awaiting_confirmation':
+            directory = Path(ipv4_result['directory'])
+            ipv4_only.verify()
+            ipv4_only.write(directory / 'confirmed', b'confirmed\n', 0o600)
+            ipv4_only.run(['systemctl', 'stop', ipv4_result['timer']])
         if args.role == 'siem':
             # The indexer's documented minimum, scoped to this explicit admin bootstrap.
             current = int(Path('/proc/sys/vm/max_map_count').read_text())

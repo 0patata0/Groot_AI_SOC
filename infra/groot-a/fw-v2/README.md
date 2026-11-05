@@ -107,3 +107,7 @@ A의 라이브 `never_block`과 영구 설정 `/etc/nftables.d/capstone-fw.nft`�
 - **chatproxy/WAF 인바운드**: ext→br NEW 허용. **내부→A 공개서비스(80/443)** 는 drop(필요 시 `CAPSTONE-FWD` 에 추가).
 - **사전검사 함정**: 바(bare) 파일 `nft -c -f` 는 라이브 interval 셋과 겹치면 EEXIST → v2 는 delete+include 트랜잭션으로 검사(실측 확인).
 - 로그 접두사 신설(`SPOOF`, `FW_SSH_RATE`, `FW_DROP_FWD`, `FW_SHADOW_OUT`/`FW_DROP_OUT`): 이번 SSH 재점검에서 B manager `local_decoder.xml`·`local_rules.xml`에 신규 분류가 **없음**을 확인했다. 추가 후 VM 세그먼트 공격 프로브로 `alerts.json`까지 검증해야 한다(기존 `FW_DROP_IN`/`AGENT_BLOCK` 룰 100120~ 참고).
+
+## 현행 NAT·IPv4 전용 상태
+
+11/5 운영에서 프로젝트 NAT3규칙을 ip nat에 통합하고 capstone_gw/fwd를 제거했다. A8→4테이블·30→17체인, A/B/C IPv6 주소·수신·전용 테이블0이다. capstone_fw와 Docker filter/raw는 유지한다. 아래 IPv6/Docker/lo 보존 설명은 과거 상태다. 현재 생성·수신 설정은 deploy.sh --ipv4-only가 담당한다. [실제 검증·복구](../../mcp/fw-consolidation.md).

@@ -26,3 +26,7 @@
 11/5 [필수 사건 조회 범위](../infra/hermes/required-sensor-scope.md): 공통1.5.30/query1.19.25의 정확 읽기 안내·MCP 전 검사·실제 같은 읽기만 오류 해소를 기존 공통 gate/source_bundle 복사 경로로 연결했다. 설치39를 포함한 서버995PASS/skip0·B11파일 증분 확정, 새 패키지/권한/포트/키0이다. canonical 코드의 helper/Trace와 root의 포함 gate·reference를 같은 단위로 갱신한다. 실제 사건 판단/종결·새 OS 전체 설치는 별도다.
 
 11/5 [과거 웹 조회 보완](../infra/mcp/web-history.md): 기존 단일deploy.sh/diag-apply/SIEM source복사 경로로 schema2 정제 이력 publisher·reader를 연결했다. 원본 읽기8MiB·최근10k는 유지하고 검색을 시간/서비스 필터 뒤 최대50행으로 제한한다. 이력은32MiB/128k행·최대8세대/TTL회전·기존 그룹읽기만 허용한다. 새 패키지/이미지/포트/키/일반권한0·고유85검사/실제MCP·C3/B2확정, 새 OS 전체 설치는 별도 미실행이다.
+
+## FW·IPv4 경로의 현재 범위
+
+NAT 유지보수 helper와 canonical 로더/unit, fresh prerequisites의 IPv4-only 설정/검증·확정이 단일 deploy.sh에 연결됐다. IPv4 복구 경계9검사·기존 오프라인 준비18검사, 실제 legacy A/B/C 증분 검증을 통과했다. 새3VM 전체 설치·OS재부팅·운영 수동 복구는 미시험이다. [실측·복구](../infra/mcp/fw-consolidation.md).

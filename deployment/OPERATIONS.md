@@ -41,3 +41,7 @@
 11/5 [추가 패킷 시험](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md)은 별도 Kali232/233 자료 반입·232 실행이며 운영 설치 패키지를 추가하지 않는다. 기존 단일deploy.sh/보안정책은 유지했다. 시간 계측은 KST표시와 별개로 원천/수집 시각·호스트offset을 확인하고, 정상자료의TLD신호/초기HTTP미복원을 정상 통과·무조건 악성으로 세지 않는다. LLM공유참조조회/operation입력·시간초과는 실제trace와다음작업에남긴다.
 
 2026-11-05 Native 필수읽기 후속: query1.19.32/공통1.5.32, controller verify의 현재 pending-read/turn/nonce·등록 스키마를 모델 JSON과 결속해 기존 Native registry로 실행한다. 초기 설치는 같은 source 복사/불변 gate 렌더·SIEM11435 URI 치환을 사용하며 새 의존성·포트·키·권한은 없다. 고유983검사와 실제7필수조회/최종 시간초과·복구 범위는 [후속 검증](../infra/hermes/native-read-selection.md)을 따른다. 전체 사건 종결·새 OS 설치 성공은 아니다.
+
+## 방화벽·IPv4 전용 운용
+
+A는 기존 ip nat/filter/raw와 inet capstone_fw를 사용한다. 관리자 정책·차단/예외는 capstone_fw, Docker 경로는 자동 테이블에 유지한다. NAT3규칙은 기본 nat로 통합했고 IPv6 전용 테이블은 A/B/C에서 제거했다. 유지보수는 root deploy.sh --firewall-nat/--ipv4-only로 하며 LLM 일반 sudo를 추가하지 않는다. [운영 검증·복구·미시험](../infra/mcp/fw-consolidation.md).

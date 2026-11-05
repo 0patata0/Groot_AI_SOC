@@ -1,6 +1,6 @@
 [Unit]
 Description=Capstone Groot_A NAT gateway (masquerade + DOCKER-USER forward)
-Documentation=file:///etc/nftables.d/capstone-gw.nft
+Documentation=file:///usr/local/libexec/capstone-firewall-nat.py
 After=docker.service network-online.target
 Wants=docker.service network-online.target
 

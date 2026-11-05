@@ -81,6 +81,7 @@ def substitutions(p):
         "/var/lib/docker/volumes/single-node_wazuh_etc/_data": p["manager_etc"],
         "/home/groot_b/capstone/wazuh/single-node/config/wazuh_cluster/wazuh_manager.conf": root + "/siem/wazuh/config/wazuh_cluster/wazuh_manager.conf",
         "https://10.200.10.10:8445": "https://" + p["siem_host"] + ":8445",
+        "http://10.200.10.10:11435/v1": "http://" + p["siem_host"] + ":11435/v1",
         "/usr/local/bin/docker": "/usr/local/libexec/capstone-soc-docker",
         "001": p["agent_id"], "ens192": p["interface"],
         "096e90b6243e438aa8a7b392be754732": p["machine_id"],

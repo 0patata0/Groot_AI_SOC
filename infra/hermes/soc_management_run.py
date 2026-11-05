@@ -6,6 +6,8 @@ change that selection. Both dispatch layers refuse non-SOC tools. Native MCP
 approval and evidence checks remain authoritative for every physical action.
 """
 import asyncio
+import copy
+from dataclasses import replace
 import functools
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -18,6 +20,7 @@ import re
 import sys
 import threading
 import time
+import uuid
 
 READ = frozenset({'get_security_rules', 'get_rule_change_target', 'get_rule_change_status',
                   'get_service_action_target', 'get_operation_status'})
@@ -37,6 +40,7 @@ NATIVE_GROUNDING_SOURCES = {
     'agent/message_metadata.py': '77fbe25c86f2ab524fcac61a83548768cffc82c476bb8a6ff83ebdf492a5479d',
     'agent/turn_api_request.py': 'e31386cb83cf551026e4df9b589173b54bc913b36fc1a09942a520e68033b59e',
     'agent/chat_completion_helpers.py': '5231a0e674806db6ad7be60e2d40a19a4157f7d2baa238aaa9af66f61e0eea4c',
+    'agent/turn_api_call.py': 'a2b2c0232b1d37d5ebfefff2d06ce1bd3b69cfe93ab3a8c9f382d62f2a6deb8b',
 }
 GROUNDING_NUDGE = (
     '이번 조사에서 실제 MCP 호출을 완료하지 않았습니다. 현재 답변은 조회 근거가 아닙니다. '
@@ -1838,10 +1842,16 @@ def install_grounding_retry(completed_calls, facts=None, argument_errors=None, s
         unchanged = False
     if not unchanged:
         raise RuntimeError('management_native_grounding_source_changed')
-    native, loop, context, metadata = (importlib.import_module('agent.' + name) for name in
-        ('turn_final_response', 'conversation_loop', 'turn_context', 'message_metadata'))
+    native, loop, context, metadata, call, api = (importlib.import_module('agent.' + name) for name in
+        ('turn_final_response', 'conversation_loop', 'turn_context', 'message_metadata', 'turn_api_call', 'turn_api_request'))
     if loop.finish_text_response is not native.finish_text_response:
         raise RuntimeError('management_native_grounding_alias_changed')
+    if loop.perform_api_call is not call.perform_api_call:
+        raise RuntimeError('management_native_call_alias_changed')
+    if loop.build_api_request is not api.build_api_request:
+        raise RuntimeError('management_native_request_alias_changed')
+    api.build_api_request = loop.build_api_request = management_selection_request_wrapper(api.build_api_request)
+    call.perform_api_call = loop.perform_api_call = management_selection_call_wrapper(call.perform_api_call)
     native.finish_text_response = loop.finish_text_response = grounding_wrapper(
         native.finish_text_response, native, metadata.append_message,
         context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors, successful_reads,
@@ -1937,6 +1947,160 @@ def compact_target_receipt(value):
         return json.dumps({'result': json.dumps(kept, ensure_ascii=False)}, ensure_ascii=False)
     except (ValueError, KeyError, TypeError):
         return value
+
+
+def management_read_request(request, agent, *, pending=False):
+    """Encode a pending, catalog-bound read choice; native still dispatches it.
+
+    Only the controller's verify process and current authenticated requirements
+    may enter this phase. No text/log parser can arm it, add a tool or execute a
+    change. The next ordinary assessment retains its original model profile.
+    """
+    agent._capstone_management_selection = None
+    if (pending is not True or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
+            or getattr(agent, 'provider', None) != 'custom'
+            or getattr(agent, 'model', None) != 'qwen3.6:35b'
+            or getattr(agent, 'api_mode', 'chat_completions') != 'chat_completions'
+            or str(getattr(agent, 'base_url', '')).rstrip('/') != 'http://10.200.10.10:11435/v1'
+            or request.get('model') != 'qwen3.6:35b' or request.get('tool_choice') != 'required'
+            or not isinstance(getattr(agent, '_current_turn_id', None), str)
+            or not agent._current_turn_id or getattr(agent, '_interrupt_requested', False)):
+        return request
+    tools = request.get('tools')
+    if (not isinstance(tools, list) or not 1 <= len(tools) <= 4
+            or not isinstance(request.get('messages'), list)):
+        return request
+    branches=[];catalog={}
+    for tool in tools:
+        function=tool.get('function',{}) if isinstance(tool,dict) else {}
+        name=function.get('name');schema=function.get('parameters')
+        if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
+                or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
+            raise RuntimeError('management_selection_catalog_invalid')
+        catalog[name]=copy.deepcopy(schema)
+        branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
+            'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
+    nonce=uuid.uuid4().hex
+    schema={'type':'object','additionalProperties':False,'required':['request_nonce','calls'],
+        'properties':{'request_nonce':{'type':'string','const':nonce},'calls':{
+            'type':'array','minItems':1,'maxItems':len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
+    # Fail closed before sending a schema if the existing validator is absent.
+    from jsonschema import Draft202012Validator
+    Draft202012Validator.check_schema(schema)
+    result=copy.deepcopy(request)
+    result.pop('tools',None);result.pop('tool_choice',None)
+    extra=result.get('extra_body')
+    if isinstance(extra,dict):
+        if any(k in extra for k in ('messages','model')):
+            raise RuntimeError('management_selection_body_override')
+        for key in ('tools','tool_choice','response_format'):
+            extra.pop(key,None)
+    result['response_format']={'type':'json_schema','json_schema':{
+        'name':'soc_management_pending_reads','strict':True,'schema':schema}}
+    result['messages'].append({'role':'user','content':
+        '현재는 아직 완료하지 않은 실제 읽기 호출을 선택하는 단계입니다. '
+        '결과·판단·승인을 생성하지 말고 제공된 JSON Schema에 맞춰 request_nonce와 calls만 반환하세요. '
+        '등록된 도구와 정확한 인자를 직접 선택하세요. 이 응답은 조회 완료의 근거가 아니며 '
+        '실제 Native MCP 실행과 영수증 확인은 이후에 수행합니다.\n'+
+        json.dumps(schema,ensure_ascii=False,separators=(',',':'))})
+    agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,
+        'schema':copy.deepcopy(schema),'catalog':catalog}
+    return result
+
+
+def management_selection_response(response, selection, agent):
+    """Decode only this request's model JSON, never a log or prior response."""
+    from jsonschema import Draft202012Validator
+    from openai.types.chat import ChatCompletionMessageToolCall
+    if (selection.get('turn') != getattr(agent,'_current_turn_id',None)
+            or getattr(agent,'_interrupt_requested',False)
+            or getattr(agent,'model',None)!='qwen3.6:35b'
+            or getattr(response,'model',None)!='qwen3.6:35b'
+            or len(response.choices)!=1 or response.choices[0].finish_reason!='stop'):
+        raise ValueError('management_selection_response_shape')
+    message=response.choices[0].message
+    raw=message.content
+    if (getattr(message,'tool_calls',None) or getattr(message,'refusal',None)
+            or not isinstance(raw,str) or len(raw.encode())>65536):
+        raise ValueError('management_selection_response_content')
+    def unique(pairs):
+        obj={}
+        for key,value in pairs:
+            if key in obj:raise ValueError('management_selection_duplicate_key')
+            obj[key]=value
+        return obj
+    value=json.loads(raw,object_pairs_hook=unique,
+        parse_constant=lambda _value:(_ for _ in ()).throw(ValueError('nonfinite_json')))
+    Draft202012Validator(selection['schema']).validate(value)
+    seen=set()
+    for item in value['calls']:
+        name=item['tool'];arguments=item['arguments']
+        if (name in seen or name not in selection['catalog'] or not allowed(name,'verify')
+                or name not in getattr(agent,'valid_tool_names',())
+                or tool_input_rejection(name,arguments,selection['catalog'][name])):
+            raise ValueError('management_selection_read_not_authorized')
+        seen.add(name)
+    result=copy.deepcopy(response)
+    result.choices[0].message.tool_calls=[ChatCompletionMessageToolCall(
+        id='call_soc_read_'+uuid.uuid4().hex,type='function',function={
+            'name':item['tool'],'arguments':json.dumps(item['arguments'],ensure_ascii=False)}) for item in value['calls']]
+    result.choices[0].finish_reason='tool_calls'
+    return result,len(value['calls'])
+
+
+def management_selection_request_wrapper(original):
+    """Apply after native builders/read leases, before provider execution."""
+    @functools.wraps(original)
+    def wrapped(agent,**kw):
+        result=original(agent,**kw)
+        pending=getattr(agent,'_capstone_management_pending_read',None)
+        if (getattr(result,'action',None)!='fallthrough'
+                or not isinstance(getattr(result,'api_kwargs',None),dict)):
+            agent._capstone_management_selection=None
+            return result
+        active=(isinstance(pending,tuple) and len(pending)==2 and pending[1] is True
+            and pending[0]==kw.get('turn_id')==getattr(agent,'_current_turn_id',None))
+        data=management_read_request(result.api_kwargs,agent,pending=active)
+        if data is result.api_kwargs:return result
+        return replace(result,api_kwargs=data,api_messages=data['messages'],
+            _original_api_kwargs=copy.deepcopy(data))
+    return wrapped
+
+
+def management_selection_call_wrapper(original):
+    @functools.wraps(original)
+    def wrapped(agent,**kw):
+        selection=getattr(agent,'_capstone_management_selection',None)
+        request=kw.get('api_kwargs')
+        active=(os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify' and isinstance(selection,dict)
+            and selection.get('turn')==kw.get('turn_id')==getattr(agent,'_current_turn_id',None)
+            and isinstance(request,dict) and request.get('model')=='qwen3.6:35b'
+            and request.get('response_format',{}).get('json_schema',{}).get('schema')==selection['schema']
+            and not set(request.get('extra_body') or {}).intersection({'tools','tool_choice','response_format','model','messages'})
+            and not request.get('tools') and not getattr(agent,'_interrupt_requested',False))
+        if isinstance(selection,dict) and not active:
+            agent._capstone_management_selection=None
+        started=time.monotonic()
+        verdict=original(agent,**kw)  # Native transport, accounting and retries stay native.
+        if not active:return verdict
+        agent._capstone_management_selection=None  # One response consumes the lease.
+        if (getattr(verdict,'action',None)!='fallthrough'
+                or kw.get('turn_id')!=getattr(agent,'_current_turn_id',None)
+                or getattr(agent,'_interrupt_requested',False)):
+            return verdict
+        try:
+            response,count=management_selection_response(verdict.response,selection,agent)
+        except Exception as exc:
+            sys.stderr.write('management_read_selection '+json.dumps({'accepted':False,
+                'error_class':type(exc).__name__,'provider_seconds':round(time.monotonic()-started,6),
+                'actual_mcp_calls_by_adapter':0})+'\n')
+            return verdict
+        sys.stderr.write('management_read_selection '+json.dumps({'accepted':True,'selected_reads':count,
+            'provider_seconds':round(time.monotonic()-started,6),'native_dispatch':True,
+            'actual_mcp_calls_by_adapter':0,'model_json_sha256':hashlib.sha256(
+                verdict.response.choices[0].message.content.encode()).hexdigest()})+'\n')
+        return replace(verdict,response=response)
+    return wrapped
 
 
 def main():
@@ -2054,6 +2218,7 @@ def main():
             impact=web_impact_review_request(value,read_facts,attempted_wire_reads,sensor_requirements)
             pending=impact is not value
             value=impact
+        self._capstone_management_pending_read=(getattr(self,'_current_turn_id',None),pending)
         return management_reasoning(value,self,required_read_phase=True) if pending else value
 
     def guarded_result(self, result, session_id='', exit_code=0):

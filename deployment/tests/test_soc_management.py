@@ -51,6 +51,14 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_pending_read_adapter_uses_installed_siem_tunnel_profile(self):
+        data=rendered('soc_management_run.py','b').decode()
+        tree=ast.parse(data)
+        method=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='management_read_request')
+        constants={n.value for n in ast.walk(method) if isinstance(n,ast.Constant) and isinstance(n.value,str)}
+        self.assertIn('http://10.42.0.10:11435/v1',constants)
+        self.assertNotIn('http://10.200.10.10:11435/v1',constants)
+
     def test_rendered_automatic_verify_binds_status_without_operator_flag(self):
         m=module('soc_management_controller.py','b')
         req=[{'proposal_id':'a'*32,'target':'a:incident-ip'}]

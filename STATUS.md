@@ -46,6 +46,6 @@ OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3
 |---|---|
 | 운영 반영 | B첫9파일13:26:52/13:28:05확정, 인자초과 발견 후 controller/receipt2만13:32:27추가·13:32:42 고유9SHA/보호7SHA/포함인자-원문 결속·양WS/worker·4서비스 확정. 첫 Native/SDK/review 각1재시작·두 번째 채팅 재시작0 |
 | 검증/복구 | 고유935PASS/skip0·실제 operation/IDS 읽기 전용 재검토 각2/4MCP·보호0. 원본/manifest/복구2곳·독립15분타이머 해제/noop, 수동원복 미시험. 모델/FW/TTL/승인/키/포트/패키지/일반권한 변경0 |
-| 보존/정리/Git | 운영DB·채팅·승인·실패 trace·원문로그/가중치 보존. 서버 시험437source/8log SHA대조·로그 로컬복사 후 제거, Mac자체30파일7,366,481B·SSH master/임시경로 정리·해당프로세스0.13:43 운영9SHA/보호7SHA·양WSworker/4서비스 재확인. 이번19공개경로 소스 커밋·푸시/영수증은 아래 별도 확인. 직전55a2b4e와 이번 로컬 변경을 구분. 기존 NAT/Ansible8·topology5stage 보존 |
+| 보존/정리/Git | 운영DB·채팅·승인·실패 trace·원문로그/가중치 보존. 서버 시험437source/8log SHA대조·로그 로컬복사 후 제거, Mac자체30파일7,366,481B·SSH master/임시경로 정리·해당프로세스0.13:43 운영9SHA/보호7SHA·양WSworker/4서비스 재확인. 이번19공개경로 eecbdcc31a34754ea9a1d2aeb4d19edfe5fbcedb 커밋·푸시/13:46:05 KST 실제 원격main 일치 확인. 게시 영수증은 후속 문서 커밋으로 남기며 최종HEAD/원격 일치·관련경로 clean은 로컬 세션에 기록. 기존 NAT/Ansible8·topology5stage 보존 |
 
 논문 원고5.12.3에 이번 조회 회복·인자 실패·출력/영향 미완료를 반영하고 이전3본/해시 보존. 최신PDF·독립평가·전체 관제·새OS설치·최종발표는 미완료이며 발표 작성은11월둘째주 이후다. 전체목표 active·미완료를 유지한다.

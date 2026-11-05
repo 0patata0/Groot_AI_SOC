@@ -134,7 +134,13 @@
     "no full SOC completion or latency guarantee"
   ],
   "git": {
-    "state": "not_committed_yet"
+    "source_commit": "eecbdcc31a34754ea9a1d2aeb4d19edfe5fbcedb",
+    "source_remote_main": "eecbdcc31a34754ea9a1d2aeb4d19edfe5fbcedb",
+    "source_verified_at_kst": "2026-11-05T13:46:05.075881+09:00",
+    "explicit_public_paths": 19,
+    "receipt_policy": "publication receipt committed separately; final head/remote and worktree proof retained in local session",
+    "credentials_source": "project-local CREDENTIALS entry, per-process only",
+    "other_work_preserved": true
   },
   "source_recheck": {
     "case_id": "a1d596168e15badeace8dd4e0388a256",

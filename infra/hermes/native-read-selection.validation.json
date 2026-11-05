@@ -292,7 +292,11 @@
     }
   },
   "publication": {
-    "state": "pending",
-    "private_raw_papers_presentation_weights_excluded": true
+    "source_commit": "24494efea0067feca4a90cf8c55b63a64bd7b4e7",
+    "source_remote_main": "24494efea0067feca4a90cf8c55b63a64bd7b4e7",
+    "source_verified_kst": "2026-11-05T15:44:08.929066+09:00",
+    "public_paths": 16,
+    "private_raw_papers_presentation_weights_excluded": true,
+    "followup_status_receipt_commit": "final hash/remote/worktree recorded locally after publication; not self-certified"
   }
 }

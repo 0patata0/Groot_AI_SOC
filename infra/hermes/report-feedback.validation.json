@@ -1126,7 +1126,9 @@
     "existing native iteration/time budgets"
   ],
   "publication": {
-    "status": "pending selective commit and push",
-    "previous_head": "361dbb9dabb4f47eaa2d88bc7e7e15de7aa07988"
+    "source_commit": "6dba7436371e477c16078da641669e3ebda38501",
+    "remote_main_verified_at_kst": "2026-11-06T02:01:31.193050+09:00",
+    "remote_main_at_source_publication": "6dba7436371e477c16078da641669e3ebda38501",
+    "receipt_update": "This publication receipt is included in a follow-up documentation commit; final follow-up verification is local-only."
   }
 }

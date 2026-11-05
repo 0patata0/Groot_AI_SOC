@@ -186,8 +186,14 @@
     "own_path_processes_remaining": 0
   },
   "publication": {
-    "state": "pending",
-    "previous_head": "68432aafce9d5f120086f03963944ff22de515d6"
+    "state": "source_pushed_and_remote_verified",
+    "source_commit": "42d1254fd9cc227baff9cb528606bca28c3e62a8",
+    "remote_main_at_source_push": "42d1254fd9cc227baff9cb528606bca28c3e62a8",
+    "verified_at_kst": "2026-11-05T11:41:57.236453+09:00",
+    "public_files": 22,
+    "receipt_document_followup": true,
+    "final_document_head_recorded_in_local_session": true,
+    "unrelated_worktree_preserved": true
   },
   "not_done": [
     "actual_case_host_followup_and_final_judgment",

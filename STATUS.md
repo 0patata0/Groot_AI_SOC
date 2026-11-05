@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-05 11:41 KST
+# 인프라 현황 — 2026-11-05 11:42 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표와 발표 작성은11월둘째주 리마인더 이후라는 조건을 유지한다. [계획](PLAN.md) · [이번 작업 전 상세](archive/STATUS-before-impact-navigation-20261105.md) · [전체 과거 이력](archive/STATUS-history-20261101.md).
 
@@ -42,4 +42,4 @@ OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3
 
 B1차18파일11:02:00·2차14파일11:23:52 확정, 현재 고유21파일 SHA·포함gate/reference·보호7SHA·양봇WS/worker·4서비스11:35:27 재확인. 두 번의 배포에서 Native/SDK/review 각2회 재시작, 설정SOUL·모델·FW/TTL·승인·키/포트·패키지·일반 권한 변경0. 고유 회귀1,059PASS/skip0: 서버관리282/SDK219/Native391/설치39/review60/workflow4/output7/events27/table12와 설치 Native에서 chunks18. 호스트의 installed-runtime1skip은 실제 컨테이너 검사로 해소했으며 중복 합산하지 않았다. 중간 설치 fixture1실패는 새 callback 인자 대조를 갱신해39재통과했다.
 
-두 독립15분 복구 타이머 확정 해제/no-op, 원본/manifest/rollback2곳 보존·수동 원복 미시험. 시험 source/중간로그459파일6,503,664B를 SHA 대조·작은22파일 로컬 보존 후 제거. 실제 브라우저/프로필·Native 시험 임시 제거 확인, 운영DB/승인/채팅/실제trace/가중치 보존. Mac 자체37파일7,346,533B/임시 경로를 제거하고 해당 SSH 소켓 원래 부재·잔여 프로세스0을 확인했다. 기존 사용자 도구·publisher는 보존했다. Git 게시 마감은 진행 중이다. 기존 NAT/Ansible8파일·topology5stage는 보존하며 관련 공개 파일만 자동 커밋·푸시한다. 직전 최종 게시68432aa와 이번 로컬 변경을 구분하고, 소스 게시와 이후 문서 게시 영수증을 별도 기록한다.
+두 독립15분 복구 타이머 확정 해제/no-op, 원본/manifest/rollback2곳 보존·수동 원복 미시험. 시험 source/중간로그459파일6,503,664B를 SHA 대조·작은22파일 로컬 보존 후 제거. 실제 브라우저/프로필·Native 시험 임시 제거 확인, 운영DB/승인/채팅/실제trace/가중치 보존. Mac 자체37파일7,346,533B/임시 경로를 제거하고 해당 SSH 소켓 원래 부재·잔여 프로세스0을 확인했다. 기존 사용자 도구·publisher는 보존했다. 관련 공개22파일을42d1254fd9cc227baff9cb528606bca28c3e62a8로 커밋·푸시하고11:41:57 KST 실제 원격main 일치를 확인했다. 기존 NAT/Ansible8파일·topology5stage는 보존하며 이번 변경 외 파일은 커밋하지 않았다. 직전 게시68432aa와 이번 소스 게시를 구분하며, STATUS/작은 원장의 게시 영수증 보완2파일은 후속 문서 커밋·푸시로 반영한다. 그 최종HEAD/원격 일치·이번22경로와 기존 작업트리 상태는 로컬 세션 기록에 남긴다.

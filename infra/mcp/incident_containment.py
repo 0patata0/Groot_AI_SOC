@@ -18,6 +18,7 @@ from pathlib import Path
 import re
 import secrets
 import stat
+import unicodedata
 
 TARGET = "a:incident-ip"
 TEMP_SECONDS = 600
@@ -145,6 +146,27 @@ def validated_evidence(events, ip, now):
         raise ContainmentError("no recent inbound severity-1/2 attack flow observed by the trusted sensor")
     return {"sensor": "a:suricata", "window_seconds": LOOKBACK_SECONDS,
             "independent_flows": len({row['flow_id'] for row in ordered}), "events": ordered[-16:]}
+
+
+def evidence_card_summary(evidence):
+    """Bounded verified facts only: no URL, headers, signatures or packet text."""
+    sensor = evidence.get('sensor')
+    if sensor not in ('a:suricata', 'a:modsecurity'):
+        raise ContainmentError('unsupported evidence sensor for card')
+    events = evidence['events']
+    ids = sorted({int(rid) for event in events for rid in
+                  ([event['signature_id']] if 'signature_id' in event else event.get('rule_ids', []))})
+    destinations = sorted({str(ipaddress.IPv4Address(event['dest_ip'])) + ':' + str(int(event['dest_port'])) for event in events})
+    categories = sorted({event['category'] for event in events if event.get('category') in ATTACK_CATEGORIES})
+    seen = [timestamp(event['timestamp']) for event in events]
+    from datetime import timedelta, timezone
+    kst = timezone(timedelta(hours=9))
+    stamp = datetime.fromtimestamp(max(seen), kst).strftime('%Y-%m-%d %H:%M:%S KST')
+    return ('%s; %s %s; 대상 %s; %s; 최근 탐지 %s; 검증 표본 %d건' %
+            ('IDS(Suricata)' if sensor == 'a:suricata' else 'WAF(ModSecurity)',
+             'SID' if sensor == 'a:suricata' else '룰 ID', ','.join(map(str, ids[:16])),
+             ','.join(destinations[:4]), ','.join(categories) if categories else '웹 공격 룰에 의한 HTTP403',
+             stamp, len(events)))
 
 
 def _reader_namespace(path):
@@ -568,7 +590,7 @@ class ContainmentService:
         if self.engine.host != "a":
             raise ContainmentError("incident containment exists only on host A")
         checked_ip(ip)
-        if not isinstance(reason, str) or not reason.strip() or len(reason.encode()) > 1000 or any(ord(c) < 32 for c in reason):
+        if not isinstance(reason, str) or not reason.strip() or len(reason.encode()) > 1000 or any(unicodedata.category(c) in ('Cc','Cf','Zl','Zp','Cs') for c in reason):
             raise ContainmentError("reason must be nonempty single-line text up to 1000 bytes")
         if not re.fullmatch(r"[A-Za-z0-9_.:@-]{1,80}", requested_by):
             raise ContainmentError("invalid requester")
@@ -601,7 +623,8 @@ class ContainmentService:
                     raise ContainmentError("existing manual/other block is preserved")
                 plan = {"ip": ip, "action": "temporary_block", "temporary_expires_at": deadline,
                         "keep_seconds": KEEP_SECONDS, "before_observation_sha256": digest(before),
-                        "evidence_sha256": digest(evidence)}
+                        "evidence_sha256": digest(evidence), "reason": reason,
+                        "evidence_summary": evidence_card_summary(evidence)}
                 payload = {"request_id": rid, "kind": "containment", "target": TARGET, "plan": plan,
                            "plan_sha256": digest(plan), "expires_at": deadline, "requested_by": requested_by}
                 record = {"request_id": rid, "ip": ip, "reason": reason, "evidence": evidence,

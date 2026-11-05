@@ -693,3 +693,5 @@ SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하�
 ## IPv4 전용·NAT 유지보수 소스
 
 추가 반입물은 `deployment/basic_nat.py`, `deployment/ipv4_only.py`, 갱신한 prerequisites·루트 deploy.sh 및 canonical NAT 로더/unit이다. 기존 Python3·systemd·OpenSSH·nftables·iptables·Docker를 사용하며 새 deb/wheel/image는0이다. 운영 검증 버전은 Docker29.8.1/Compose5.5.1이며 다른 버전의 동등 동작을 가정하지 않는다. [검증·복구](../infra/mcp/fw-consolidation.md).
+
+웹 보호/표시 보완은 web_traffic_guard.py·기존 WAF 구성·incident_containment/operations_approval·공통 harness.py 소스 갱신이다. 기존 nginx/Python/OpenSSH/Docker를 사용하고 새deb/wheel/image/키/일반MCP권한은0이다. [실제 범위](../infra/validation/web-traffic/README.md) · [카드/FW표](../infra/mcp/containment-display.md).

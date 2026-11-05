@@ -33,13 +33,14 @@ class ProxyBoundary(unittest.TestCase):
 
     def test_real_ip_is_server_scoped_before_location_and_gateway_not_trusted(self):
         raw=(ROOT/'infra/groot-c/offline-labs/waf-log4shell-server.conf').read_text()
-        before=raw.split('    location ',1)[0]
+        before=raw.split('server_name log4shell.grootlab.duckdns.org;',1)[1].split('    location ',1)[0]
         self.assertIn('set_real_ip_from 172.18.0.3;',before)
         self.assertEqual(raw.count('set_real_ip_from '),1)
         self.assertNotIn('172.18.0.1',raw)
         proxy=(ROOT/'infra/groot-c/offline-labs/nginx-log4shell-server.conf').read_text()
-        self.assertEqual(proxy.count('proxy_pass http://172.18.0.2:8080;'),3)
-        self.assertEqual(proxy.count('proxy_set_header X-Capstone-Lab-Client "$remote_addr:$remote_port";'),3)
+        # Three managed lab routes and the ordinary Log4Shell UI/API route.
+        self.assertEqual(proxy.count('proxy_pass http://172.18.0.2:8080;'),4)
+        self.assertEqual(proxy.count('proxy_set_header X-Capstone-Lab-Client "$remote_addr:$remote_port";'),4)
 
 
 if __name__ == '__main__':unittest.main()

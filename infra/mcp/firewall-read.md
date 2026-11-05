@@ -54,3 +54,5 @@ MCP `tools/call` 예:
 ## 현재 테이블과 실제 읽기
 
 11/5 NAT/IPv4 적용 후 실제 Hermes→resp-a는4테이블·17체인·102규칙·9집합을 complete=true로 읽었다. capstone_fw는 유지하며 IPv6 전용 테이블은0이다. 위11/3의99규칙/미적용은 당시 기록이다. [현재 구조·검증·복구](fw-consolidation.md).
+
+기본 FW 질문도 IP 임시차단·남은시간·거부조건·예외 의미를 같은 완전 스냅샷에서 표시한다. xt 미해석·앞선 허용/체인·예외와실제패킷판정을구분한다. [반영·실측·한계](containment-display.md).

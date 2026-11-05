@@ -45,3 +45,5 @@
 ## 방화벽·IPv4 전용 운용
 
 A는 기존 ip nat/filter/raw와 inet capstone_fw를 사용한다. 관리자 정책·차단/예외는 capstone_fw, Docker 경로는 자동 테이블에 유지한다. NAT3규칙은 기본 nat로 통합했고 IPv6 전용 테이블은 A/B/C에서 제거했다. 유지보수는 root deploy.sh --firewall-nat/--ipv4-only로 하며 LLM 일반 sudo를 추가하지 않는다. [운영 검증·복구·미시험](../infra/mcp/fw-consolidation.md).
+
+HTTP Wazuh는같은호스트HTTPS308,관리ACL유지다. 웹 보호의429는요청제한이며그자체로IP차단/악성판정이아니다. 임시차단카드의검증근거와요청자판단사유를구분한다. 공격시험은사용자재지시전중단한다. [운영값·복구](../infra/validation/web-traffic/README.md) · [사유/조회](../infra/mcp/containment-display.md).

@@ -426,6 +426,80 @@ def firewall_state(calls):
     return data
 
 
+def firewall_ip_overview(objects):
+    """Explain observed IP sets and deny conditions without packet verdicts.
+
+    xt payloads are opaque in nft JSON. Never present their missing conditions
+    as an unconditional match, or a containment exemption as general access.
+    """
+    def cell(value):
+        return html.escape(str(value), quote=False).replace('|','&#124;').replace('`',"'").replace('\n',' ')
+    def value(v):
+        if isinstance(v,list):return ', '.join(value(x) for x in v)
+        if isinstance(v,dict):
+            if 'prefix' in v:return str(v['prefix']['addr'])+'/'+str(v['prefix']['len'])
+            if 'set' in v:return value(v['set'])
+            if 'range' in v:return ' ~ '.join(map(str,v['range']))
+            if 'payload' in v:return {'saddr':'출발지 IP','daddr':'목적지 IP','sport':'출발지 포트','dport':'목적지 포트'}.get(v['payload'].get('field'),json.dumps(v,ensure_ascii=False))
+            if 'meta' in v:return {'iifname':'입력 인터페이스','oifname':'출력 인터페이스','nfproto':'IP 계열','l4proto':'프로토콜'}.get(v['meta'].get('key'),v['meta'].get('key','메타 조건'))
+            if 'ct' in v:return '연결 '+str(v['ct'].get('key'))
+            return json.dumps(v,ensure_ascii=False,separators=(',',':'))
+        return str(v)
+    sets={}
+    for o in objects:
+        for k in ('set','element'):
+            if k in o:
+                s=o[k];key=(s.get('family'),s.get('table'),s.get('name'))
+                sets.setdefault(key,[]).extend(s.get('elem',[]))
+    rules=[o['rule'] for o in objects if 'rule' in o]
+    lines=['','**IP 차단·예외와 적용 조건**']
+    blocked=[(key,rows) for key,rows in sets.items() if key[2]=='agent_block']
+    if blocked:
+        entries=[(key,e.get('elem',e) if isinstance(e,dict) else {'val':e}) for key,rows in blocked for e in rows]
+        lines+=['','| 현재 임시차단 IP | 조회 시점 남은 시간 | 적용 집합 | 관련 요청 |','| --- | --- | --- | --- |']
+        for key,e in entries[:16]:
+            expires=e.get('expires');remaining=str(max(0,(expires+999)//1000))+'초' if type(expires)is int else '원소 만료 정보 미포함'
+            match=re.fullmatch(r'contain:([0-9a-f]{32}):[0-9]+',str(e.get('comment','')))
+            lines+=['| '+' | '.join(map(cell,[value(e.get('val')),remaining,'/'.join(map(str,key)),match[1] if match else '원소 주석으로 사건 확인 불가']))+' |']
+        if not entries:lines+=['| 없음 | — | agent_block 집합 0개 원소 | 정책에 의한 거부와 구분 |']
+        if len(entries)>16:lines+=['임시차단 원소 '+str(len(entries))+'개 중16개 표시. 전체 원문은 MCP 스냅샷에 보존했습니다.']
+    denials=[]
+    for r in rules:
+        expr=r.get('expr',[])
+        action=next(('차단(DROP)' if 'drop' in x else '거부(REJECT)' for x in expr if 'drop' in x or 'reject' in x),None)
+        if not action:continue
+        src=[];dst=[];other=[]
+        for x in expr:
+            if 'match' in x:
+                m=x['match'];left=m.get('left');right=value(m.get('right'));op=m.get('op','==')
+                text=value(left)+' '+op+' '+right
+                field=left.get('payload',{}).get('field') if isinstance(left,dict) else None
+                if field=='saddr':src.append(text)
+                elif field in ('daddr','dport'):dst.append(text)
+                else:other.append(text)
+            if 'xt' in x:other.append('확장 조건 미해석: '+str(x['xt'].get('name','xt')))
+            if 'limit' in x:other.append('속도 조건 '+value(x['limit']))
+        denials.append([str(r.get('family'))+'/'+str(r.get('table'))+'/'+str(r.get('chain'))+' #'+str(r.get('handle')),
+                        '; '.join(src) or '체인·앞선 조건 기준', '; '.join(dst) or '명시 값 없음',
+                        '; '.join(other) or '앞선 허용·예외에 미일치 시',action])
+    if denials:
+        lines+=['','| 적용 체인·handle | 출발지 IP 조건 | 대상·포트 조건 | 추가 조건 | 동작 |','| --- | --- | --- | --- | --- |']
+        for row in denials[:16]:lines+=['| '+' | '.join(cell(v) for v in row)+' |']
+        if len(denials)>16:lines+=['명시 거부 규칙 '+str(len(denials))+'개 중16개 표시. “FW 전체 규칙 상세”로 이어서 확인할 수 있습니다.']
+        lines+=['이 표는 설정 조건입니다. 앞선 허용/예외·상위 체인·규칙 순서가 적용되므로 해당 IP의 모든 통신이 차단됐다는 뜻은 아닙니다.']
+    exceptions=[]
+    for key,items in sets.items():
+        if key[2] not in ('never_block','mgmt_src'):continue
+        vals=[value(e.get('elem',e).get('val')) if isinstance(e,dict) and isinstance(e.get('elem',e),dict) and 'val' in e.get('elem',e) else value(e) for e in items]
+        exceptions.append([key[2],', '.join(vals[:16]) or '비어 있음','자동 임시차단 보호 주소·일반 접속 허용 아님' if key[2]=='never_block' else '관리 접근 규칙에서 참조하는 출발지'])
+    if exceptions:
+        lines+=['','| 예외 집합 | IP·대역 | 의미 |','| --- | --- | --- |']
+        lines+=['| '+' | '.join(map(cell,row))+' |' for row in exceptions]
+    if any('xt' in x for r in rules for x in r.get('expr',[])):
+        lines+=['Docker/iptables 확장(xt)의 일부 조건은 이 nft 응답에서 해석할 수 없습니다. 미해석 조건을 전체 허용/차단으로 단정하지 않았습니다.']
+    return lines
+
+
 def firewall_report(question, calls):
     data = firewall_state(calls)
     if not data or not data['verified_complete']:
@@ -454,6 +528,7 @@ def firewall_report(question, calls):
         rows = ['**A 서버 FW 전체 nftables 조회**', '조회 시각: ' + data['observed_at_kst'] + ' (KST)',
                 '테이블 ' + str(counts.get('table', 0)) + '개 · 체인 ' + str(counts.get('chain', 0)) + '개 · 규칙 ' + str(counts.get('rule', 0)) + '개 · 집합 ' + str(counts.get('set', 0)) + '개.',
                 '호스트 네임스페이스의 기본 정책·NAT·Docker·커스텀을 함께 조회했습니다. 다음 표는 체인별 요약입니다.']
+    rows += firewall_ip_overview(objects)
     rows += ['',
             '| family / table | chain | hook / 우선순위 | 기본 정책 | 규칙 수 |', '| --- | --- | --- | --- | --- |']
     rules = [o['rule'] for o in objects if 'rule' in o]

@@ -33,6 +33,23 @@ def operation(kind="service"):
 
 
 class OperationsTest(unittest.TestCase):
+    def test_containment_reason_and_verified_summary_bind_exact_card_plan(self):
+        req=operation('containment')
+        req['plan'].update(reason='LLM 판단: 웹 공격 의심',evidence_summary='WAF(ModSecurity); 룰 ID 942100; 대상 172.18.0.2:8080; HTTP403; 2026-11-05 12:00:00 KST')
+        req['plan_sha256']=ops.digest(req['plan']);created=self.create(req)
+        text=self.cards[-1]['attachments'][0]['text']
+        for value in ('| 차단 출발지 |','| 검증된 탐지 근거 |','942100','172.18.0.2:8080','| 요청자 판단 사유 |','웹 공격 의심'):
+            self.assertIn(value,text)
+        changed=copy.deepcopy(req);changed['plan']['reason']='다른 판단';changed['plan_sha256']=ops.digest(changed['plan'])
+        self.assertEqual(self.broker.create(changed)[1],409)
+        self.assertEqual(created['plan_sha256'],req['plan_sha256'])
+
+    def test_containment_display_fields_are_paired_bounded_and_escaped(self):
+        req=operation('containment');req['plan']['reason']='누락된 근거';req['plan_sha256']=ops.digest(req['plan'])
+        self.assertEqual(self.broker.create(req)[1],400)
+        req=operation('containment');req['plan'].update(reason='@here [링크](https://invalid.example) | <tag>',evidence_summary='검증 요약');req['plan_sha256']=ops.digest(req['plan'])
+        self.create(req);text=self.cards[-1]['attachments'][0]['text'];self.assertNotIn('@here',text);self.assertIn('&#124;',text);self.assertNotIn('<tag>',text)
+
     def setUp(self):
         self.cards = []
         self.broker = ops.OperationsBroker(post=self.post, enabled=lambda: True,

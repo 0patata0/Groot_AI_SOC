@@ -20,6 +20,10 @@ if [[ ${1:-} == --ipv4-only ]]; then
   shift
   exec python3 -IB "$HERE/deployment/ipv4_only.py" "$@"
 fi
+if [[ ${1:-} == --web-traffic ]]; then
+  shift
+  exec python3 -IB "$HERE/deployment/web_traffic_guard.py" "$@"
+fi
 if [[ ${1:-} == --model-candidate ]]; then
   shift
   exec python3 -IB "$HERE/finetuning/candidate_model.py" "$@"

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "status": "live_confirmed",
+  "applied_at_kst": "2026-11-05T19:45:33+09:00",
+  "confirmed_at_kst": "2026-11-05T19:48:12+09:00",
+  "per_ip_rps": 50,
+  "per_ip_burst": 100,
+  "per_service_rps": 300,
+  "per_service_burst": 600,
+  "per_ip_processing_connections": 50,
+  "limited_status": 429,
+  "isolated": {
+    "normal": {
+      "200": 8
+    },
+    "concurrency64": {
+      "200": 50,
+      "429": 14
+    },
+    "burst240": {
+      "200": 106,
+      "429": 134
+    },
+    "external_traffic": 0
+  },
+  "management_http_redirect": 308,
+  "production_load_test": false,
+  "container_preserved": true,
+  "evidence_policy_reenrolled": true,
+  "attack_testing": "stopped_by_user",
+  "not_tested": [
+    "operational_manual_rollback",
+    "production_capacity",
+    "large_scale_DDoS",
+    "fresh_three_VM_install"
+  ],
+  "source_sha256": "50252e4b3d5539a5ebcd63a5de1ea4fe2461b388607689ac59404b54abba9f1b",
+  "git": {
+    "state": "pending"
+  },
+  "cleanup": {
+    "Mac_task_directory_removed": true,
+    "Mac_files_removed": 95,
+    "Mac_bytes_removed": 86445121,
+    "server_source_files_removed": 342,
+    "operational_sources_and_recovery_backups_preserved": true
+  }
+}

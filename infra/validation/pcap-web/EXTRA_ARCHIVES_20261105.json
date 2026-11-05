@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "state": "compressed_archives_imported_not_extracted_or_tested",
+  "per_host_archives": 5,
+  "per_host_bytes": 81993052,
+  "hosts": [
+    {
+      "host": "232",
+      "archives": 5,
+      "bytes": 81993052,
+      "path": "/home/att/Desktop/PCAP/public-20261105-extra",
+      "capture_extraction": false,
+      "new_transmission": false
+    },
+    {
+      "host": "233",
+      "archives": 5,
+      "bytes": 81993052,
+      "path": "/home/attack/Desktop/PCAP/public-20261105-extra",
+      "capture_extraction": false,
+      "new_transmission": false
+    }
+  ],
+  "sources": [
+    {
+      "date": "2025-06-13",
+      "url": "https://www.malware-traffic-analysis.net/2025/06/13/2025-06-13-traffic-analysis-exercise.pcap.zip",
+      "file": "2025-06-13.pcap.zip",
+      "bytes": 39323449,
+      "sha256": "26aa2de5d0f5992195c905df7a0013c7dec12e7b380577ab038ae098caf6fe6c",
+      "zip_members": [
+        {
+          "name": "2025-06-13-traffic-analysis-exercise.pcap",
+          "bytes": 42888106
+        }
+      ],
+      "purpose": "isolated packet analysis only; no executable extraction or original-destination replay"
+    },
+    {
+      "date": "2024-11-26",
+      "url": "https://www.malware-traffic-analysis.net/2024/11/26/2024-11-26-traffic-analysis-exercise.pcap.zip",
+      "file": "2024-11-26.pcap.zip",
+      "bytes": 19664067,
+      "sha256": "ac4686dd75b3b8456d2901a46493afff3ea446e9fe2d29c87d04e8529640b1f2",
+      "zip_members": [
+        {
+          "name": "2024-11-26-traffic-analysis-exercise.pcap",
+          "bytes": 21281925
+        }
+      ],
+      "purpose": "isolated packet analysis only; no executable extraction or original-destination replay"
+    },
+    {
+      "date": "2024-09-04",
+      "url": "https://www.malware-traffic-analysis.net/2024/09/04/2024-09-04-traffic-analysis-exercise.pcap.zip",
+      "file": "2024-09-04.pcap.zip",
+      "bytes": 1697386,
+      "sha256": "84edaf0d73c666a9213b5aa6d1c9a68356c5495728da72ac25521cfe6346dfe6",
+      "zip_members": [
+        {
+          "name": "2024-09-04-traffic-analysis-exercise.pcap",
+          "bytes": 2129659
+        }
+      ],
+      "purpose": "isolated packet analysis only; no executable extraction or original-destination replay"
+    },
+    {
+      "date": "2024-08-15",
+      "url": "https://www.malware-traffic-analysis.net/2024/08/15/2024-08-15-traffic-analysis-exercise.pcap.zip",
+      "file": "2024-08-15.pcap.zip",
+      "bytes": 10557978,
+      "sha256": "6d4ad8479e8142b2434be4cc7a0d4988a98d354a4ccfa01cac65700fde727bde",
+      "zip_members": [
+        {
+          "name": "2024-08-15-traffic-analysis-exercise.pcap",
+          "bytes": 11965173
+        }
+      ],
+      "purpose": "isolated packet analysis only; no executable extraction or original-destination replay"
+    },
+    {
+      "date": "2024-07-30",
+      "url": "https://www.malware-traffic-analysis.net/2024/07/30/2024-07-30-traffic-analysis-exercise.pcap.zip",
+      "file": "2024-07-30.pcap.zip",
+      "bytes": 10750172,
+      "sha256": "420530cefb5f0001e12aacc554cef14f6273f1e2ec01008567a68f3471e0ed70",
+      "zip_members": [
+        {
+          "name": "2024-07-30-traffic-analysis-exercise.pcap",
+          "bytes": 11526388
+        }
+      ],
+      "purpose": "isolated packet analysis only; no executable extraction or original-destination replay"
+    }
+  ],
+  "attack_tests": "stopped_by_user"
+}

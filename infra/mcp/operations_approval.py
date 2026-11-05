@@ -14,6 +14,7 @@ the containment helper must independently expire its temporary nftables entry
 after 600 seconds even if this broker is unavailable or restarted.
 """
 import hashlib
+import html
 import ipaddress
 import json
 import re
@@ -52,6 +53,7 @@ FIELDS = frozenset(("request_id", "kind", "target", "plan", "plan_sha256", "expi
 SERVICE_FIELDS = frozenset(("action", "before_observation_sha256", "before_summary", "policy_sha256", "reason"))
 CONTAINMENT_FIELDS = frozenset(("ip", "action", "temporary_expires_at", "keep_seconds",
                               "before_observation_sha256", "evidence_sha256"))
+CONTAINMENT_DISPLAY_FIELDS = frozenset(('reason', 'evidence_summary'))
 KST = timezone(timedelta(hours=9), "KST")
 
 
@@ -120,8 +122,10 @@ class OperationsBroker:
                     not _text(plan["reason"]) or not _text(plan["before_summary"])):
                 raise ValueError("invalid service observation, policy hash or reason")
         elif req["kind"] == "containment":
-            if req["target"] != "a:incident-ip" or set(plan) != CONTAINMENT_FIELDS:
+            if req["target"] != "a:incident-ip" or set(plan) not in (CONTAINMENT_FIELDS, CONTAINMENT_FIELDS | CONTAINMENT_DISPLAY_FIELDS):
                 raise ValueError("invalid containment target or plan")
+            if 'reason' in plan and (not _text(plan['reason'], 1000, 1000) or not _text(plan['evidence_summary'], 700, 2000)):
+                raise ValueError('invalid containment display evidence')
             try:
                 address = ipaddress.IPv4Address(plan["ip"])
             except (ValueError, TypeError, ipaddress.AddressValueError):
@@ -196,7 +200,19 @@ class OperationsBroker:
                     "적용 전 상태가 달라지면 중단하며, 실행 결과는 별도 실측 SHA-256으로 보고합니다." %
                     (plan["action"], plan["policy_sha256"], display_summary_kst(plan["before_summary"]), expected,
                      SERVICE_IMPACT[rec["target"]], plan["reason"]))
-        return (header + "\n\n출발지 IP `%s`는 이미 임시 차단했습니다.\n"
+        def cell(value):
+            value = html.escape(str(value), quote=False)
+            for old, new in (('|','&#124;'), ('`','&#96;'), ('@','&#64;'), ('[','&#91;'), (']','&#93;')):
+                value = value.replace(old,new)
+            return value
+        overview = ('**임시차단 이유와 현재 조치**\n\n'
+            '| 항목 | 내용 |\n| --- | --- |\n'
+            '| 차단 출발지 | %s |\n| 검증된 탐지 근거 | %s |\n'
+            '| 요청자 판단 사유 | %s |\n| 적용 위치 | A FW · agent_block |\n'
+            '| 자동 해제 기한 | %s |\n\n' %
+            (cell(plan['ip']), cell(plan.get('evidence_summary', '구형 요청: 근거 요약 미포함 · 증거 해시로 원문 확인 필요')),
+             cell(plan.get('reason', '구형 요청: 사유 미포함')), expiry))
+        return (overview + header + "\n\n출발지 IP `%s`는 이미 임시 차단했습니다.\n"
                 "관리자 확인: 이 요청이 승인된 공격 시험인지 확인해 주세요. 내부망 실습도 먼저 차단하며, "
                 "시험 확인 후 해제하려면 아래 [해제 요청]으로 이 차단의 해제를 승인해 주세요. "
                 "시험 승인이나 일반 채팅 답변만으로 자동 해제하지 않습니다.\n"

@@ -1,6 +1,6 @@
 # Groot_AI_SOC
 
-**11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다.
+**11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다. 재개 후 실제 내부 Mattermost에서 카드1표·양봇 FW답변 각각4표를 확인했습니다. 새 짧은 FW 질문의 게시→최종 답변은 각1회 Hermes12.1초/Ollama14.0초이며 평균 성능 측정은 아닙니다.
 
 발표자료는11/5 새 지시에 따라 호스팅 없는 다운로드 PDF 초안20쪽으로 작성했습니다. 발표·논문·메모·검증 원문은 로컬 전용으로 유지하며 저장소에는 포함하지 않습니다. 최종 제출본·독립 평가·전 업무 완료 여부는 [현재 현황](STATUS.md)을 따릅니다.
 

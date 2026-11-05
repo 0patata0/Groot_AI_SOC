@@ -17,8 +17,7 @@
   "final_observed_state": "operator_approved_release",
   "automatic_expiry_tested": false,
   "new_card_api_table_and_reason_verified": true,
-  "browser_UI_verified": false,
-  "browser_UI_blocker": "cua initialization failed again; admin231 SSH timed out twice before authentication on resume",
+  "browser_UI_verified": true,
   "fw_report_characters": 4148,
   "fw_actual_snapshot_counts": {
     "table": 4,
@@ -32,7 +31,9 @@
     "source_commit": "28ee1c7d69a754499377c68a37f91712635cf731",
     "remote_branch": "main",
     "verified_at_kst": "2026-11-05T21:15:29.677706+09:00",
-    "receipt_documentation": "followup_commit_pending"
+    "receipt_documentation": "published_verified",
+    "receipt_commit": "c211d7bc8a8ffbbd78a5fa69317f2e7e725bf117",
+    "receipt_verified_at_kst": "2026-11-05T21:19:25.024220+09:00"
   },
   "cleanup": {
     "Mac_task_directory_removed": true,
@@ -40,5 +41,74 @@
     "Mac_bytes_removed": 86445121,
     "server_source_files_removed": 342,
     "operational_sources_and_recovery_backups_preserved": true
+  },
+  "browser_UI_previous_blockers": [
+    "cua kernel assets initialization failed",
+    "admin231 powered off per user; SSH restored after power-on"
+  ],
+  "resume_verification": {
+    "verified_at_kst": "2026-11-05T21:26:49+09:00",
+    "application": "existing Mattermost internal web app",
+    "card": {
+      "post_id": "groaaeb5y7nrmq6nkokaai7cta",
+      "tables": 1,
+      "pre_blocks": 0,
+      "post_unmodified": true
+    },
+    "hermes": {
+      "question_post_id": "sxwrrdptipbz7mup5gt3afbqwo",
+      "reply_post_ids": [
+        "bpotixzoqfypznuzw9tx7wczkc",
+        "bpnttw5iybfszriayxb3wnd6qe"
+      ],
+      "tables": 4,
+      "pre_blocks": 0,
+      "final_post_seconds": 12.097,
+      "reply_posts": 2
+    },
+    "ollama": {
+      "question_post_id": "snquq1r7sjr6fx6tybdibas8jh",
+      "reply_post_ids": [
+        "8gi7rjuawbbjpqhqswif5du7or"
+      ],
+      "tables": 4,
+      "pre_blocks": 0,
+      "final_post_seconds": 13.958,
+      "reply_posts": 1,
+      "actual_read_tool": "resp/get_firewall_rules",
+      "read_calls": 1,
+      "protected_calls": 0
+    },
+    "same_table_cell_text": true,
+    "question": "fw 룰 조회해줘",
+    "samples_per_bot": 1,
+    "timing_basis": "Mattermost question create_at to final reply create_at/update_at; not client paint latency or population mean",
+    "parallel_pair": true,
+    "public_https_ui_verified": false,
+    "new_attack_load_or_pcap_replay": 0,
+    "new_approval_clicks": 0,
+    "existing_card_modified": false,
+    "runtime_code_changed_on_resume": false,
+    "initial_verifier_failure": "thread reply selector targeted edited timestamp or missed RHS; corrected exact-post body selector, application unchanged"
+  },
+  "resume_health": {
+    "at_kst": "2026-11-05T21:22:15+09:00",
+    "failed_systemd_units": {
+      "A": 0,
+      "B": 0,
+      "C": 0
+    },
+    "ipv6_listeners": {
+      "A": 0,
+      "B": 0,
+      "C": 0
+    },
+    "A_counts": {
+      "table": 4,
+      "chain": 17,
+      "rule": 102,
+      "set": 9
+    },
+    "source_hashes_unchanged": true
   }
 }

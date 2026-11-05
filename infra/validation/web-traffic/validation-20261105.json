@@ -40,7 +40,9 @@
     "source_commit": "28ee1c7d69a754499377c68a37f91712635cf731",
     "remote_branch": "main",
     "verified_at_kst": "2026-11-05T21:15:29.677706+09:00",
-    "receipt_documentation": "followup_commit_pending"
+    "receipt_documentation": "published_verified",
+    "receipt_commit": "c211d7bc8a8ffbbd78a5fa69317f2e7e725bf117",
+    "receipt_verified_at_kst": "2026-11-05T21:19:25.024220+09:00"
   },
   "cleanup": {
     "Mac_task_directory_removed": true,

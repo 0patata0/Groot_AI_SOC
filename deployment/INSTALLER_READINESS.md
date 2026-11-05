@@ -33,6 +33,6 @@ NAT 유지보수 helper와 canonical 로더/unit, fresh prerequisites의 IPv4-on
 
 기존 offline_security source 복사 경로에 HTTP Wazuh 고정별칭308·웹 제한 설정을 동기화했다. 기존 두 bot renderer/승인 모듈 복사도 새 사유/조건 표를 설치한다. 설치 렌더16·프록시 경계2·해당서버104검사와 운영 증분 확인이며 새3VM 전체설치/일반 관리DNS자동발급은 미검증이다.
 
-11/5 query1.19.40의 [복합 조사 지연 보완](../infra/hermes/case-latency.md)은 기존 source복사·immutable gate렌더 경로로 신규 설치에도 포함된다. 설치계약41PASS이며 새 설정키/오프라인 패키지/이미지/포트는 없다. 운영 B11파일 증분 반영과 신규3VM 전체 설치 미실행을 구분한다.
+11/6 query1.19.44의 [복합 조사 지연](../infra/hermes/case-latency.md)·[추가 조사 보완](../infra/hermes/additional-inquiry.md)은 기존 source복사·immutable gate렌더 경로로 신규 설치에도 포함된다. 설치계약41PASS이며 새 설정키/오프라인 패키지/이미지/포트는 없다. 이번 운영 B9파일 증분 반영과 신규3VM 전체 설치 미실행을 구분한다. gate 인자65355B의65536B 제한을 이후 변경에서도 검사해야 한다.
 
 root생성 요청별 내부 CAPSTONE_REVIEW_CONTEXT_JSON은 canonical controller와 gate가 함께 처리한다. 사용자설정·공통키·오프라인 반입목록 추가0이다. 실제 새 서버 전체 설치 미시험은 유지한다.

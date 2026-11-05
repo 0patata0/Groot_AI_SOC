@@ -1,6 +1,8 @@
 # 복합 사건 조사 지연 개선
 
-2026-11-05 KST. **query1.19.40 / common1.5.32**, Thor 원본qwen3.6:35b. [현재 상태](../../STATUS.md) · [직전 실패](native-read-selection.md) · [검증 원장](case-latency.validation.json).
+2026-11-05 시점의 검증 기록. **당시 query1.19.40 / common1.5.32**, Thor 원본qwen3.6:35b. [현재 상태](../../STATUS.md) · [직전 실패](native-read-selection.md) · [검증 원장](case-latency.validation.json).
+
+최신 추가 조사 경로·운영 버전은 [후속 보완](additional-inquiry.md)을 따른다. 아래 수치를 새 버전의 전수 결과로 대체하지 않는다.
 
 ## 실제 결과와 목표
 
@@ -15,8 +17,8 @@
 | r5 |IDS55.919초|보고 전송·수집 서버/대상 혼동. 자동 후속은214.344초 시간초과 |
 | r6 |41.861초|센서 인용 누락으로 정상 보고 거절·미완료 알림 |
 | r7 |IDS42.506초|보고 전송·센서별 만료 전후 서술 혼동. WAF 추가 근거 전환은 별도 원장 |
-| **현재 r8 IDS** |**41.304초/읽기7·오류0·쓰기0·needs_review**|model_needs_review |
-| **현재 r8 WAF** |**35.518초/읽기7·오류0·쓰기0·needs_review**|model_needs_review |
+| **r8 IDS** |**41.304초/읽기7·오류0·쓰기0·needs_review**|model_needs_review |
+| **r8 WAF** |**35.518초/읽기7·오류0·쓰기0·needs_review**|model_needs_review |
 
 IDS는 대상·기한 전후 혼동 없이 영향 미확인을 유지했다. WAF는 원본침해/재시도에 불과 표현의 강도·위험 축소 가능성이 남아 의미 보완 대상으로 기록했다. 현재 사건별 세부 품질·미확인·추가조사 결과는 검증 원장에 남긴다. 실행 completed는 사건 해결이 아니다. 같은 기존 사건을 새 세션에서 재검토한 개발 시험이며 독립 평가·공유GPU 부하/캐시 통제·전 채널 평균이 아니다. 실제 공격·부하·PCAP재생0이다.
 

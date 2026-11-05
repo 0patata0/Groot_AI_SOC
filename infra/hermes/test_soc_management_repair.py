@@ -162,6 +162,7 @@ class LiteralRepair(unittest.TestCase):
         f=g.Grounding();f.setUp();f.completed.append('get_operation_status')
         f.agent._capstone_more_evidence_turn=f.agent._current_turn_id
         f.agent._capstone_full_review_turn=f.agent._current_turn_id
+        f.agent._capstone_inquiry_receipts=1
         f.kw['assistant_message'].content='추가 근거를 실제 조회하겠습니다.'
         verdict=f.call(f.agent,**f.kw)
         self.assertEqual(verdict.action,'continue')
@@ -169,5 +170,22 @@ class LiteralRepair(unittest.TestCase):
         self.assertIn('model_requested_additional_evidence',f.kw['messages'][-1]['content'])
         self.assertIsNone(f.agent._capstone_more_evidence_turn)
         self.assertEqual(f.agent._capstone_full_review_turn,f.agent._current_turn_id)
+
+    def test_additional_inquiry_requires_real_progress_and_keeps_original_budget(self):
+        import test_soc_management_grounding as g
+        f=g.Grounding();f.setUp();f.completed.append('get_operation_status')
+        f.kw['assistant_message'].content='추가 근거를 실제 조회하겠습니다.'
+        def arm(count):
+            f.agent._capstone_more_evidence_turn=f.agent._current_turn_id
+            f.agent._capstone_inquiry_receipts=count
+        arm(1);first=f.call(f.agent,**f.kw);self.assertEqual(first.action,'continue')
+        f.kw['codex_ack_continuations']=1
+        arm(1);self.assertEqual(f.call(f.agent,**f.kw),'original')
+        arm(2);second=f.call(f.agent,**f.kw);self.assertEqual(second.action,'continue')
+        f.kw['codex_ack_continuations']=2
+        arm(3);third=f.call(f.agent,**f.kw);self.assertEqual(third.action,'continue')
+        f.kw['codex_ack_continuations']=3
+        arm(4);self.assertEqual(f.call(f.agent,**f.kw),'original')
+        self.assertEqual(f.agent._capstone_inquiry_retries,(f.agent._current_turn_id,(1,2,3)))
 
 if __name__=='__main__':unittest.main()

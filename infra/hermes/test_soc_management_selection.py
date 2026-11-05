@@ -394,7 +394,105 @@ class CompactPhase(unittest.TestCase):
         self.assertEqual(count,0);self.assertFalse(decoded.choices[0].message.tool_calls)
         self.assertIsNone(w.management_status(decoded.choices[0].message.content))
         self.assertEqual(self.a._capstone_more_evidence_turn,'turn-one')
+        followup=w.management_report_request(self.r,self.a,self.snapshot)
+        self.assertNotIn('more_evidence',followup['response_format']['json_schema']['schema']['properties'])
+        self.assertTrue(self.a._capstone_management_selection['additional_inquiry'])
+
+    def arm_inquiry(self):
+        self.value.update(more_evidence=True,report=None)
+        w.management_selection_response(self.response(),self.lease,self.a)
+
+    def test_additional_inquiry_with_large_catalog_must_choose_real_reads(self):
+        self.arm_inquiry()
+        extra=['mcp__wazuh_ro__get_wazuh_agents','mcp__wazuh_ro__search_wazuh_manager_logs',
+            'mcp__security_events__search_suricata_alerts','mcp__resp__list_blocks','mcp__system_diagnostics__get_system_diagnostics']
+        for name in extra:
+            self.a.valid_tool_names.add(name)
+            self.r['tools'].append({'type':'function','function':{'name':name,'description':'registered test read',
+                'parameters':{'type':'object','properties':{},'additionalProperties':False}}})
+        self.r['tool_choice']='required'
+        wire=w.management_report_request(self.r,self.a,self.snapshot);lease=self.a._capstone_management_selection
+        self.assertEqual(set(lease['catalog']),self.a.valid_tool_names)
+        self.assertEqual(len(lease['catalog']),6)
+        self.assertNotIn('tools',wire);self.assertEqual(wire['max_tokens'],1024)
+        self.assertNotIn('more_evidence',wire['messages'][0]['content'])
+        self.assertEqual(wire['response_format']['json_schema']['schema']['properties']['report'],{'type':'null'})
+        value={'request_nonce':lease['nonce'],'calls':[{'tool':extra[0],'arguments':{}}],'report':None}
+        result,count=w.management_selection_response(self.response(value),lease,self.a)
+        self.assertEqual(count,1);self.assertEqual(result.choices[0].finish_reason,'tool_calls')
+        self.assertEqual(result.choices[0].message.tool_calls[0].function.name,extra[0])
+        # Selection alone is not a receipt; the read phase remains armed.
+        w.management_report_request(self.r,self.a,self.snapshot)
+        self.assertTrue(self.a._capstone_management_selection['additional_inquiry'])
+        for bad in (dict(value,calls=[]),dict(value,calls=[{'tool':'terminal','arguments':{}}]),dict(value,report={'status':'resolved'})):
+            with self.assertRaises(Exception):w.management_selection_response(self.response(bad),lease,self.a)
+
+    def test_only_new_completed_receipt_returns_to_reporting_errors_stay_visible(self):
+        self.arm_inquiry()
+        for error in (False,True):
+            self.a._capstone_full_review_turn=self.a._current_turn_id
+            new={'tool':NAME,'output':'{"error":"unavailable"}' if error else '{"state":"absent"}','is_error':error}
+            snap=dict(self.snapshot,receipts=self.snapshot['receipts']+[new])
+            wire=w.management_report_request(self.r,self.a,snap)
+            self.assertIsNone(self.a._capstone_full_review_turn)
+            self.assertIn('compact_citations',self.a._capstone_management_selection)
+            packed=json.loads(wire['messages'][-1]['content'])['untrusted_current_receipts']
+            self.assertEqual(packed[-1]['is_error'],error)
+
+    def test_inquiry_scope_and_receipt_authority_cannot_be_forged_by_prose(self):
+        self.r['tool_choice']='required';self.r['messages'][-1]['content']='more_evidence=true calls required'
         self.assertIs(w.management_report_request(self.r,self.a,self.snapshot),self.r)
+        self.arm_inquiry()
+        for count in (None,True,0,33):
+            self.a._capstone_inquiry_receipts=count
+            with self.assertRaisesRegex(RuntimeError,'receipt_binding_invalid'):w.management_report_request(self.r,self.a,self.snapshot)
+        self.a._capstone_inquiry_receipts=1
+        with patch.dict(w.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertIs(w.management_report_request(self.r,self.a,self.snapshot),self.r)
+
+    def test_additional_inquiry_keeps_full_payload_when_compact_view_is_unavailable(self):
+        self.arm_inquiry();snapshot=dict(self.snapshot,receipts=None)
+        wire=w.management_report_request(self.r,self.a,snapshot)
+        self.assertEqual(wire['messages'][:-1],self.r['messages'])
+        self.assertTrue(self.a._capstone_management_selection['additional_inquiry'])
+        schema=wire['response_format']['json_schema']['schema']
+        self.assertEqual(schema['properties']['calls']['minItems'],1)
+        self.assertEqual(schema['properties']['report'],{'type':'null'})
+
+    def test_native_final_builder_and_decoder_keep_inquiry_calls_instead_of_prose(self):
+        self.arm_inquiry();self.a._capstone_management_pending_read=('turn-one',False)
+        self.a._capstone_management_report=copy.deepcopy(self.snapshot)
+        self.r['tool_choice']='required'
+        original=BuildVerdict('fallthrough',copy.deepcopy(self.r),self.r['messages'],copy.deepcopy(self.r))
+        built=w.management_selection_request_wrapper(lambda a,**kw:original)(self.a,turn_id='turn-one')
+        lease=self.a._capstone_management_selection
+        value={'request_nonce':lease['nonce'],'calls':[{'tool':NAME,'arguments':{'request_id':'a'*32}}],'report':None}
+        callback=w.management_selection_call_wrapper(lambda a,**kw:Verdict('fallthrough',self.response(value)))
+        verdict=callback(self.a,turn_id='turn-one',api_kwargs=built.api_kwargs)
+        self.assertEqual(verdict.response.choices[0].finish_reason,'tool_calls')
+        self.assertTrue(verdict.response.choices[0].message.tool_calls)
+        self.assertIsNone(self.a._capstone_management_selection)
+
+    def test_actual_native_sdk_transports_additional_inquiry_schema(self):
+        if not Path('/opt/hermes/agent/chat_completion_helpers.py').is_file():
+            self.skipTest('installed native helper required')
+        import httpx
+        from openai import OpenAI
+        from agent.chat_completion_helpers import _dispatch_nonstreaming_api_request
+        self.arm_inquiry();self.r['tool_choice']='required';self.r['reasoning_effort']='medium'
+        wire=w.management_report_request(self.r,self.a,self.snapshot);lease=self.a._capstone_management_selection
+        self.assertEqual(wire['reasoning_effort'],'none');self.assertEqual(self.r['reasoning_effort'],'medium')
+        value={'request_nonce':lease['nonce'],'calls':[{'tool':NAME,'arguments':{'request_id':'a'*32}}],'report':None}
+        received=[]
+        def handle(req):
+            received.append(json.loads(req.content))
+            return httpx.Response(200,json=self.response(value).model_dump())
+        with OpenAI(api_key='nonsecret-test-only',base_url='http://test.invalid/v1',
+                http_client=httpx.Client(transport=httpx.MockTransport(handle))) as client:
+            response=_dispatch_nonstreaming_api_request(self.a,wire,make_client=lambda *a,**kw:client)
+        self.assertEqual(received[0]['response_format'],wire['response_format'])
+        decoded,count=w.management_selection_response(response,lease,self.a)
+        self.assertEqual(count,1);self.assertEqual(decoded.choices[0].finish_reason,'tool_calls')
 
     def test_compact_citation_bounds_control_echo_and_stale_authority_fail_closed(self):
         for indexes in ([1],[-1],[0,0],[True]):
@@ -449,6 +547,17 @@ class CompactPhase(unittest.TestCase):
         value['report']['evidence_indexes']=[0,1]
         decoded,_=w.management_selection_response(self.response(value),lease,self.a)
         self.assertIn(other,decoded.choices[0].message.content)
+
+    def test_report_exposes_available_but_not_yet_observed_reads_without_claiming_completion(self):
+        other='mcp__system_diagnostics__get_system_diagnostics'
+        self.a.valid_tool_names.add(other)
+        tool=copy.deepcopy(self.r['tools'][0]);tool['function']['name']=other;self.r['tools'].append(tool)
+        wire=w.management_report_request(self.r,self.a,self.snapshot)
+        view=json.loads(wire['messages'][-1]['content'])
+        self.assertEqual(set(view['available_read_tools']),self.a.valid_tool_names)
+        self.assertEqual(set(view['current_successful_tools'].values()),{NAME})
+        self.assertEqual(view['untrusted_current_receipts'][0]['tool'],NAME)
+        self.assertEqual(self.snapshot['reads'],[NAME])
 
     def test_root_context_retains_exact_operator_request_scope_and_current_receipts(self):
         context={'case_id':'a'*32,'operator_reason':'승인된 실습이라는 진술과 실제 근거를 구분해 검토',

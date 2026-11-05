@@ -745,7 +745,11 @@
     "live_db_approvals_traces_touched": false
   },
   "git": {
-    "state": "pending_commit_and_push"
+    "state": "source_commit_pushed_and_remote_verified",
+    "source_commit": "a10a8cb68aff9c87cf2d4c13281b14da592a955f",
+    "remote_main_at_verification": "a10a8cb68aff9c87cf2d4c13281b14da592a955f",
+    "verified_at_kst": "2026-11-06T01:16:13.374564+09:00",
+    "receipt_followup": "This publication receipt is included in the following documentation commit; final HEAD is recorded locally."
   },
   "mac_cleanup": {
     "removed_directory": "/private/tmp/capstone-review-scope-20261106-1vzuaeo_",

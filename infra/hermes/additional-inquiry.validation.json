@@ -758,12 +758,59 @@
   "cleanup": {
     "server_source_files": 1756,
     "test_records_copied_then_removed": 36,
-    "mac_temp_cleanup_verified": false
+    "mac_temp_cleanup_verified": true,
+    "mac_temporary_files_removed": 53,
+    "mac_temporary_bytes_removed": 17272864
   },
   "publication": {
-    "state": "pending"
+    "state": "source_and_docs_pushed_verified",
+    "source_commit": "f508ef45013c79cd14504db12e5d702ce038d19d",
+    "remote_main_at_verification": "f508ef45013c79cd14504db12e5d702ce038d19d",
+    "verified_at_kst": "2026-11-06T00:22:32.619567+09:00",
+    "receipt_in_followup_commit": true
   },
   "final_health": {
+    "confirmed_at_epoch": 1793892111,
+    "files_verified": 11,
+    "protected_unchanged": 7,
+    "gate_sha256": "06736b4075067cecdfe9ef1b3772610ce4183482021832941afa6b98a38a5570",
+    "controller_sha256": "0c9fc649efbbb8b532c3075687d94a39fd1bff941d9ecccbb19a045482a80d52",
+    "gate_matches_reference": true,
+    "ids_path_impact_enabled": true,
+    "gate_argument_bytes": 65355,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 14.725434064865112,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 6.725502014160156,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "automatic_shared_status_required": 1,
+    "sensor_reads_required": 3,
+    "at_kst": "2026-11-06T00:21:51.938724+09:00",
+    "strict_idle_check_passed": true,
+    "queues_zero_by_assertion": true
+  },
+  "separate_operational_run": {
+    "id": "72d21f019ea069020c1ba4bd773dce2b",
+    "case_id": "869b9ccc139157074d3615824126ca64",
+    "started": 1793891733.5903873,
+    "finished": 1793891947.8812847,
+    "state": "outcome_unknown",
+    "detail": "model_subprocess_timeout_requires_review",
+    "elapsed_seconds": 214.29089736938477,
+    "controlled_test": false,
+    "within_measured_operator_scope": false,
+    "attribution_to_this_change_verified": false
+  },
+  "prior_busy_health_observation": {
     "confirmed_at_epoch": 1793891869,
     "files_verified": 11,
     "protected_unchanged": 7,
@@ -795,17 +842,5 @@
     },
     "idle": false,
     "strict_idle_check_passed": false
-  },
-  "separate_operational_run": {
-    "id": "72d21f019ea069020c1ba4bd773dce2b",
-    "case_id": "869b9ccc139157074d3615824126ca64",
-    "started": 1793891733.5903873,
-    "finished": 1793891947.8812847,
-    "state": "outcome_unknown",
-    "detail": "model_subprocess_timeout_requires_review",
-    "elapsed_seconds": 214.29089736938477,
-    "controlled_test": false,
-    "within_measured_operator_scope": false,
-    "attribution_to_this_change_verified": false
   }
 }

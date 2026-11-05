@@ -1445,6 +1445,13 @@ def status_read_requirements(raw):
         raise RuntimeError('status_read_requirements_invalid') from None
 
 
+def status_read_request(row):
+    rule=row['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules')
+    return {'tool':'mcp__rule_'+row['target'][0]+'__'+
+            ('get_rule_change_status' if rule else 'get_operation_status'),
+            'arguments':{'proposal_id' if rule else 'request_id':row['proposal_id']}}
+
+
 SENSOR_SEARCH_TOOLS = {'mcp__security_events__search_modsecurity_alerts',
                        'mcp__security_events__search_suricata_alerts'}
 
@@ -1513,11 +1520,26 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
     review=os.environ.get('CAPSTONE_MANAGEMENT_REVIEW')=='1'
     missing = [r for r in requirements if not any(f.get('kind') == 'proposal_status' and
         f.get('proposal_id') == r['proposal_id'] and f.get('target') == r['target'] for f in facts)]
-    if review and missing:
-        names = {'mcp__rule_'+r['target'][0]+'__'+('get_rule_change_status' if
-            r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status') for r in missing}
+    if missing:
+        routes=[status_read_request(r) for r in missing]
+        names={r['tool'] for r in routes}
         value = permitted_request(request, 'verify')
-        reads = [t for t in value.get('tools', []) if t['function']['name'] in names]
+        reads=[]
+        for original in value.get('tools',[]):
+            name=original['function']['name']
+            rows=[r for r in routes if r['tool']==name]
+            if not rows:continue
+            tool=json.loads(json.dumps(original));base=tool['function'].get('parameters',{})
+            args=rows[0]['arguments']
+            if not set(args)<=set(base.get('properties',{})):
+                raise RuntimeError('required_status_read_schema_unavailable')
+            tool['function']['parameters']={**base,'type':'object',
+                'properties':{k:{**base['properties'][k],'enum':[v]} for k,v in args.items()},
+                'required':list(args),'additionalProperties':False}
+            tool['function']['description']=(str(tool['function'].get('description') or '')+
+                '\n현재 필수 상태 읽기 인자: '+json.dumps(args,separators=(',',':'))+
+                '. 이전 실행의 상태는 이번 조회 영수증을 대신하지 않습니다.')
+            reads.append(tool)
         if {t['function']['name'] for t in reads} != names:
             raise RuntimeError('required_status_read_tools_unavailable')
         return {**value, 'tools':reads, 'tool_choice':'required'}
@@ -1745,7 +1767,7 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
             return original(agent, **kw)
         if required_retry:
             setattr(agent,marker,turn)
-            pending=({'status_reads':pending_status} if pending_status else {'sensor_reads':pending_sensors}
+            pending=({'status_reads':[status_read_request(r) for r in pending_status]} if pending_status else {'sensor_reads':pending_sensors}
                      if pending_sensors else {'candidate_backend_reads':pending_web})
             nudge=('필수 조회 영수증이 아직 충족되지 않았습니다. 이미 실행한 다른 조회나 일부가 겹치는 구간은 '
                 '빠진 대상/구간의 확인을 대신하지 않습니다. 다음은 신뢰된 제어기가 제공한 읽기 참조이며 '

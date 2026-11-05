@@ -94,3 +94,7 @@ kernel TTL은 브로커 장애와 무관하게 만료하며, 재부팅 뒤 임�
 운영 CLI는 `python -I -B -c`의 불변 포함 코드를 실행한다. `run.py` 복사본만 갱신한 것으로 실행 코드 갱신을 판단하지 않는다. 신규 설치는 동일 렌더링 gate를 `/opt/capstone-management/soc_management_run.py`에도 root750으로 기록하고 기존 managed-files 원장에 포함한다. controller는 포함코드 SHA가 root참조와 다르면 자식 실행 전에 거절한다. 기존 운영 증분에서도 포함코드·참조·plugin/SDK 핀과 실제 MCP 구간을 함께 확인한다.
 
 현재 임시차단은 독립3흐름이 아닌 적격 ingress1흐름 또는 검증한WAF 거부 거래를 사용하는11/2이후 정책이다. 지정IDS Native 예외·원래600초·유지승인3600초·해제/만료후60초와 새근거 조건을 유지한다. 위날짜별3흐름설명은과거기록이다. [현재정책](../infra/mcp/approved-operations.md) · [실제 배포/927검사/잔여](../infra/hermes/management-gate-binding.md). 새패키지/포트/일반권한·실제새3VM설치 추가0이다.
+
+## 자동 후속 상태와 고정 실행 인자 (2026-11-05)
+
+모든 verify는 operator_review 여부와 관계없이 실제 연결된 owned/shared 제안의 현재 상태를 필수 읽기로 전달한다. 룰은 proposal_id, 서비스/차단은 request_id이며 등록 스키마 안의 정확 ID를 모델이 선택한다. 실제 센서/영향/판단·승인 경계를 대체하지 않는다. 초기 설치 렌더의 고정 `-I -B -c`는 SHA256 결속 zlib/base64 인자이며 원문 root참조와 재생성 결과가 정확히 일치해야 한다. 원본2MiB·실행 인자65,535B 상한을 실행 전에 검사한다. 이는 Linux 단일 인자 한도 초과를 막고 writable home 실행으로 우회하지 않는다. [원인·운영·935검사·한계](../infra/hermes/shared-status-verification.md).

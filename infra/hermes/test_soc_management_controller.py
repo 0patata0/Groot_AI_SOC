@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import subprocess
+import sys
 import unittest
 from unittest import mock
 
@@ -21,7 +23,7 @@ class EmbeddedGateBinding(unittest.TestCase):
             with mock.patch.object(m,'command_for',return_value=command):
                 with self.assertRaisesRegex(m.ControllerError,'embedded_gate_source_mismatch'):
                     m.verified_management_command({})
-                command[-1]=source.read_text()
+                command[-1]=m.management_gate_argument(source.read_bytes())
                 self.assertEqual(m.verified_management_command({}),command)
 
     def test_inline_gate_requires_its_regular_reference_and_unambiguous_command(self):
@@ -37,6 +39,18 @@ class EmbeddedGateBinding(unittest.TestCase):
     def test_canonical_development_file_command_is_preserved(self):
         case={'mode':'verify','session_id':None}
         self.assertEqual(m.verified_management_command(case),m.command_for(case))
+
+    def test_large_gate_executes_below_argument_limit_and_still_binds_exact_source(self):
+        source=b'# immutable gate test\n'+b'# padding\n'*20000+b'print("gate-ok")\n'
+        self.assertGreater(len(source),131072)
+        value=m.management_gate_argument(source)
+        self.assertLess(len(value.encode()),65536)
+        result=subprocess.run([sys.executable,'-I','-B','-c',value],check=True,capture_output=True,text=True)
+        self.assertEqual(result.stdout,'gate-ok\n')
+        changed=value.replace(hashlib.sha256(source).hexdigest(),'0'*64)
+        result=subprocess.run([sys.executable,'-I','-B','-c',changed],capture_output=True,text=True)
+        self.assertNotEqual(result.returncode,0)
+        self.assertEqual(result.stdout,'')
 
 
 class Response:
@@ -444,6 +458,28 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(tuple(row), ('ready', 'verify'))
         proposal = self.store.case_proposals(trace.case['id'])[0]
         self.assertEqual((proposal['owner_case_id'], proposal['status']), (owner, 'expired'))
+
+    def test_automatic_shared_verification_binds_fresh_status_without_operator_review(self):
+        trace,owner,receipt=self.shared_containment_trace('automatic-read')
+        self.tool(trace,'mcp__rule_write_a__temporarily_contain_ip',receipt,{'ip':receipt['ip']})
+        self.tool(trace,'mcp__rule_a__get_operation_status',receipt,{'request_id':receipt['request_id']})
+        self.result(trace,'승인 대기\nMANAGEMENT_STATUS: monitor');trace.finish(0)
+        self.events({'seq':1,'event_key':'automatic-expired','kind':'operation','at':1010,
+                     'payload':{**receipt,'status':'expired','result_status':'expired'}})
+        case=self.store.db.execute('select * from cases where id=?',(trace.case['id'],)).fetchone()
+        self.assertEqual(case['mode'],'verify')
+        prepared=m.verification_case(self.store,case)
+        req=[{'proposal_id':receipt['request_id'],'target':'a:incident-ip'}]
+        self.assertEqual(prepared['required_status_reads'],req)
+        command=m.command_for(prepared)
+        self.assertIn('CAPSTONE_REQUIRED_STATUS_JSON='+m.canonical(req),command)
+        self.assertNotIn('CAPSTONE_OPERATOR_REVIEW=1',command)
+        self.assertNotIn('CAPSTONE_MANAGEMENT_REVIEW=1',command)
+        self.assertEqual(prepared['session_id'],case['session_id'])
+        self.assertEqual(self.store.db.execute('select case_id from proposals where id=?',
+                                             (receipt['request_id'],)).fetchone()[0],owner)
+        with self.assertRaisesRegex(m.ControllerError,'status_read_requirements_invalid'):
+            m.command_for(dict(prepared,mode='manage'))
 
     def test_reference_status_cannot_reopen_a_terminal_broker_decision(self):
         trace, owner, receipt = self.shared_containment_trace()

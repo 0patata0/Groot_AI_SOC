@@ -51,6 +51,18 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_rendered_automatic_verify_binds_status_without_operator_flag(self):
+        m=module('soc_management_controller.py','b')
+        req=[{'proposal_id':'a'*32,'target':'a:incident-ip'}]
+        command=m.command_for({'mode':'verify','session_id':'resumed-verify',
+                              'required_status_reads':req})
+        self.assertIn('CAPSTONE_REQUIRED_STATUS_JSON='+json.dumps(req,sort_keys=True,separators=(',',':')),command)
+        self.assertNotIn('CAPSTONE_OPERATOR_REVIEW=1',command)
+        self.assertIn('--resume',command)
+        gate=module('soc_management_run.py','b')
+        self.assertEqual(gate.status_read_request(req[0]),
+                         {'tool':'mcp__rule_a__get_operation_status','arguments':{'request_id':'a'*32}})
+
     def test_workflow_bundle_keeps_four_distinct_skills_and_common_output(self):
         with mock.patch.object(install,'read',side_effect=lambda p:Path(p).read_bytes()):
             bundle=install.source_bundle({'source':ROOT})
@@ -69,7 +81,7 @@ class BindingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, mock.patch.object(m,'__file__',str(Path(d)/'controller.py')):
             reference=Path(d)/'soc_management_run.py';reference.write_bytes(gate)
             command=m.verified_management_command(case)
-            self.assertEqual(command[command.index('-c')+1].encode(),gate)
+            self.assertEqual(command[command.index('-c')+1],m.management_gate_argument(gate))
             self.assertTrue(any(x.startswith('CAPSTONE_REQUIRED_SENSOR_JSON=') for x in command))
             tree=ast.parse(gate);entry=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
             call=next(n for n in ast.walk(entry) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='install_grounding_retry')
@@ -83,7 +95,8 @@ class BindingTests(unittest.TestCase):
         command = m.command_for({'mode':'verify','session_id':None,
             'fast_readonly':True,'fast_read_tool':'list_blocks'})
         self.assertIn('CAPSTONE_FAST_READ_TOOL=list_blocks', command)
-        gate = command[command.index('-c') + 1]
+        gate = rendered('soc_management_run.py','b')
+        self.assertEqual(command[command.index('-c')+1],m.management_gate_argument(gate))
         tree = ast.parse(gate)
         reader = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'initial_review_read')
         self.assertIn('CAPSTONE_FAST_READ_TOOL', ast.unparse(reader))
@@ -191,8 +204,11 @@ class BindingTests(unittest.TestCase):
         self.assertIn("-I", command); self.assertIn("-B", command)
         self.assertIn("991:992", command); self.assertIn("3" * 64, command)
         embedded = command[command.index("-c") + 1]
-        self.assertIn("management_tool_not_allowed", embedded)
-        self.assertIn("991", embedded)
+        source=rendered('soc_management_run.py','b')
+        self.assertEqual(embedded,m.management_gate_argument(source))
+        self.assertLess(len(embedded.encode()),65536)
+        self.assertIn(b"management_tool_not_allowed",source)
+        self.assertIn(b"991",source)
 
     def test_management_gate_excludes_general_powers_and_verify_writes(self):
         m = module("soc_management_run.py", "b")

@@ -10,6 +10,7 @@ All decision/execution payloads and model traces remain private on host B.
 from __future__ import annotations
 
 import argparse
+import base64
 import contextlib
 from datetime import datetime
 import fcntl
@@ -31,6 +32,7 @@ import time
 from datetime import datetime, timedelta, timezone
 import urllib.error
 import urllib.request
+import zlib
 
 STATE = Path("/var/lib/capstone-management")
 PROMPT = Path("/opt/capstone-management/soc_alert_watch.prompt")
@@ -1429,6 +1431,13 @@ incident's actual event timestamps. Its until_kst never exceeds requested_at_kst
 Use its exact since_kst/until_kst pairs when reading those events; do not round
 the end into the future or add lookback_minutes to an explicit interval. Select
 and execute the relevant MCP tools yourself. These references are not reads.
+All explicit search intervals must end no later than requested_at_kst, including
+optional background searches. Never round the current hour up to its end.
+Operation-only events have no sensor incident timestamp: inspect the named
+operation and its actual live state, without inventing an attack time window.
+Operation results already supply KST timestamps and elapsed values. Reuse those
+literal values; calculate_time accepts full offset-aware ISO strings, never
+POSIX seconds as a numeric string. Calculation is not a fresh status read.
 Additional history can be useful, but label it as background and never put an
 old SID into the current incident's time range without actual matching events.
 unqueryable_reference_count/truncated means coverage is incomplete, not benign.
@@ -1677,7 +1686,7 @@ def command_for(case):
         command[2:2] = ["-e", "CAPSTONE_OPERATOR_REVIEW=1"]
     required = dict(case).get("required_status_reads", [])
     if required:
-        if not dict(case).get("operator_review") or case["mode"] != "verify" or len(required) > 32:
+        if case["mode"] != "verify" or len(required) > 32:
             raise ControllerError("status_read_requirements_invalid")
         command[2:2] = ["-e", "CAPSTONE_REQUIRED_STATUS_JSON=" + canonical(required)]
     sensor_reads=dict(case).get('required_sensor_reads',[])
@@ -1696,6 +1705,19 @@ def command_for(case):
     return command
 
 
+def management_gate_argument(source):
+    """Keep the immutable gate below Linux's per-argument exec limit."""
+    if not isinstance(source,bytes) or not 1<=len(source)<=MAX_RESPONSE:
+        raise ControllerError('management_gate_source_size_invalid')
+    encoded=base64.b64encode(zlib.compress(source,9)).decode('ascii')
+    value=("import base64,hashlib,zlib; s=zlib.decompress(base64.b64decode("+repr(encoded)+")); "
+           "assert hashlib.sha256(s).hexdigest()=="+repr(hashlib.sha256(source).hexdigest())+"; "
+           "exec(compile(s,'capstone-immutable-management-gate','exec'))")
+    if len(value.encode())>=65536:
+        raise ControllerError('management_gate_argument_size_invalid')
+    return value
+
+
 def verified_management_command(case):
     """An installed immutable inline gate must match its root-side source."""
     command=command_for(case)
@@ -1709,24 +1731,30 @@ def verified_management_command(case):
     expected=reference.read_bytes()
     index=command.index('-c')+1
     if (index>=len(command) or not isinstance(command[index],str) or
-            len(expected)>MAX_RESPONSE or hashlib.sha256(command[index].encode()).digest()!=hashlib.sha256(expected).digest()):
+            command[index]!=management_gate_argument(expected)):
         raise ControllerError('management_embedded_gate_source_mismatch')
     return command
 
 
-def run_hermes(store, case, prompt):
-    if dict(case).get("operator_review") and case["mode"] == "verify":
+def verification_case(store, case, at=None):
+    """Bind current reads for automatic and operator verification alike."""
+    if case['mode']=='verify':
         # Authenticated controller metadata reaches the wrapper out of band.
         # The model still selects the required read's tool/arguments and disposition.
+        evidence=store.context(case['id'])
         case = dict(case, required_status_reads=[{"proposal_id": p["id"], "target": p["target"]}
-            for p in store.context(case["id"])["proposals"]])
-    if case['mode']=='verify':
-        evidence=store.context(case['id']);at=(datetime.fromisoformat(case['incident_read_at'])
+            for p in evidence["proposals"]])
+        at=at or (datetime.fromisoformat(case['incident_read_at'])
             if dict(case).get('incident_read_at') else datetime.now(timezone(timedelta(hours=9))))
         reads=incident_read_plan(evidence,at)['requests']+incident_followup_plan(evidence,at)['requests']
         case=dict(case,required_sensor_reads=[{'tool':r['tool'],'arguments':r['arguments']} for r in reads],
             web_impact_review=any(r[0]=='modsecurity' for r in sensor_review_requirements(evidence))
                 and any(p.get('target')=='a:incident-ip' for p in evidence['proposals']))
+    return case
+
+
+def run_hermes(store, case, prompt):
+    case=verification_case(store,case)
     rid = store.start(case)
     trace, error, returncode = Trace(store, case, rid), None, 1
     path = store.root / (rid + ".jsonl")

@@ -1,0 +1,165 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05T13:45:05.931739+09:00",
+  "versions": {
+    "common": "1.5.32",
+    "query": "1.19.28",
+    "security_events": "1.2.2"
+  },
+  "cause": {
+    "automatic_verify_status_gating_was_operator_only": true,
+    "shared_reference_join_was_already_present": true,
+    "actual_operation_errors": {
+      "numeric_string_timestamp": 1,
+      "future_interval_end": 3
+    },
+    "manual_probe_target_argument_error_is_separate": true
+  },
+  "tests": {
+    "unique_total": 935,
+    "passed": 935,
+    "skipped": 0,
+    "suites": {
+      "management": 285,
+      "sdk": 219,
+      "native": 391,
+      "install": 40
+    },
+    "new_tests": 4,
+    "no_duplicate_counting": true,
+    "initial_isolated_missing_fixtures": 5,
+    "new_os_install": false
+  },
+  "deployment": {
+    "confirmed_at_epoch": 1793853162,
+    "files_verified": 9,
+    "protected_unchanged": 7,
+    "gate_sha256": "034dfa5dc8daaca92f83e3ce48f86f79cbba3c49a24459c37372c4aa6f473acd",
+    "controller_sha256": "83d61cdfae2076316f03a7a41544e58f978f1abf3399a2a8faaf4ddbe5df2b28",
+    "gate_matches_reference": true,
+    "gate_argument_bytes": 49963,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 16.68349814414978,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 8.68356728553772,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "automatic_shared_status_required": 1,
+    "sensor_reads_required": 3
+  },
+  "recovery": {
+    "first_backup": "/var/lib/capstone-shared-status/20261105-r1/deployment",
+    "argument_backup": "/var/lib/capstone-shared-status/20261105-r1/deployment-argument-r2",
+    "timers_confirmed_disabled": true,
+    "manual_restore_tested": false,
+    "fallback": "all nine original files from last working version"
+  },
+  "implementation_failure": {
+    "run_id": "d974ec8390a74cd69ae2e94191185755",
+    "state": "outcome_unknown",
+    "detail": "model_process_failure",
+    "seconds": 0.024555444717407227,
+    "mcp_calls": 0,
+    "gate_bytes_before": 130902,
+    "gate_bytes_initial_after": 132083,
+    "linux_argument_limit_bytes": 131072,
+    "corrected_argument_bytes": 49963,
+    "corrected_format": "sha256-bound zlib/base64 immutable gate"
+  },
+  "live_review": {
+    "runs": [
+      {
+        "run_id": "b0ef200c6f17931a76b31f2cdf1a9412",
+        "case_id": "6be480fe3a9c06cb2d57259e89d58d20",
+        "seconds": 73.44844436645508,
+        "run_state": "completed",
+        "case_state": "completed",
+        "detail": "model_completed_investigation",
+        "tool_calls": 2,
+        "errors": 0,
+        "protected_calls": 0,
+        "tools": [
+          "mcp__rule_a__get_operation_status",
+          "mcp__resp__list_blocks"
+        ],
+        "report_delivered": true,
+        "report_table_lines": 0,
+        "fresh_operator_review": true,
+        "independent_evaluation": false
+      },
+      {
+        "run_id": "a6f798c4a06ff23e5f14098fc340562e",
+        "case_id": "61dbec56057bc9e28b2ea1aba77f814d",
+        "seconds": 190.51943135261536,
+        "run_state": "completed",
+        "case_state": "needs_review",
+        "detail": "incident_impact_verification_missing",
+        "tool_calls": 4,
+        "errors": 0,
+        "protected_calls": 0,
+        "tools": [
+          "mcp__rule_a__get_operation_status",
+          "mcp__security_events__search_suricata_alerts",
+          "mcp__security_events__search_modsecurity_alerts",
+          "mcp__security_events__search_suricata_alerts"
+        ],
+        "report_delivered": true,
+        "report_table_lines": 5,
+        "fresh_operator_review": true,
+        "independent_evaluation": false
+      }
+    ],
+    "ids_required_status": 1,
+    "ids_required_sensors": 3,
+    "ids_successful_sensor_receipts": 3,
+    "ids_pending_status": 0,
+    "ids_pending_sensors": 0,
+    "ids_impact_missing": true,
+    "operation_report_table_missing": true
+  },
+  "limits": [
+    "same-case fresh read-only review is not independent attack evaluation or a direct before/after benchmark",
+    "IDS protected-host impact and full incident closure remain incomplete",
+    "operation report is a list, not the requested table",
+    "WAF original timestamp lacks timezone; provenance and buffering remain to be checked",
+    "no model, firewall, TTL, approval, key, permission or package changes",
+    "no full SOC completion or latency guarantee"
+  ],
+  "git": {
+    "state": "not_committed_yet"
+  },
+  "source_recheck": {
+    "case_id": "a1d596168e15badeace8dd4e0388a256",
+    "index_id": "lGXBqaEBCdk1HVdNTjjb",
+    "index_source_ip": "192.168.16.230",
+    "normalized_inbox_source_ip": "192.168.16.230",
+    "previous_mismatch_claim": "recording error, corrected after comparing the same index ID",
+    "waf_original_time_stamp": "Thu Nov  5 03:25:45 2026",
+    "waf_original_timezone_explicit": false,
+    "wazuh_outer_timestamp": "2026-11-05T03:27:06.223+0000",
+    "raw_logs_not_published": true
+  },
+  "cleanup": {
+    "server_source_files_removed": 437,
+    "server_source_bytes_removed": 6545755,
+    "server_logs_archived_locally_then_removed": 8,
+    "server_log_bytes_removed": 343409,
+    "mac_files_removed": 30,
+    "mac_bytes_removed": 7366481,
+    "mac_temp_absent": true,
+    "mac_matching_processes": 0,
+    "ssh_masters_closed_or_absent": 6,
+    "runtime_files_final_sha_verified": 9,
+    "protected_unchanged": 7,
+    "backups_preserved": 2,
+    "operating_state_preserved": true
+  }
+}

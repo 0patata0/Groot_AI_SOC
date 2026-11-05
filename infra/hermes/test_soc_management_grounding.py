@@ -147,6 +147,29 @@ class Grounding(unittest.TestCase):
             request=self.agent._build_api_kwargs()
             self.assertEqual([x['function']['name'] for x in request['tools']],['mcp__rule_a__get_operation_status'])
             self.assertIn('status_reads',self.kw['messages'][-1]['content'])
+            self.assertIn('"arguments": {"request_id": "'+ 'a'*32+'"}',self.kw['messages'][-1]['content'])
+
+    def test_automatic_verify_requires_shared_status_before_sensors_without_operator_flag(self):
+        req=[{'proposal_id':'a'*32,'target':'a:incident-ip'},
+             {'proposal_id':'b'*32,'target':'a:incident-ip'}]
+        request=self.sensor_catalog();before=copy.deepcopy(request)
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_MANAGEMENT_REVIEW':'0'}):
+            first=wrapper.initial_review_read(request,['prior_sensor'],req,[],self.sensor_plan(),[])
+            self.assertEqual(first['tool_choice'],'required')
+            self.assertEqual(len(first['tools']),1)
+            f=first['tools'][0]['function'];self.assertEqual(f['name'],'mcp__rule_a__get_operation_status')
+            self.assertEqual(f['parameters']['properties'],{'request_id':{'type':'string','enum':['a'*32]}})
+            self.assertFalse(f['parameters']['additionalProperties'])
+            receipt={'kind':'proposal_status','proposal_id':'a'*32,'target':'a:incident-ip'}
+            second=wrapper.initial_review_read(request,['get_operation_status'],req,[receipt])
+            self.assertEqual(second['tools'][0]['function']['parameters']['properties']['request_id']['enum'],['b'*32])
+            wrong=dict(receipt,target='a:waf')
+            again=wrapper.initial_review_read(request,[],req,[wrong])
+            self.assertEqual(again['tools'][0]['function']['parameters']['properties']['request_id']['enum'],['a'*32])
+            self.assertEqual(request,before)
+            with self.assertRaisesRegex(RuntimeError,'status_read_schema_unavailable'):
+                bad=copy.deepcopy(request);bad['tools']=[definition('mcp__rule_a__get_operation_status')]
+                wrapper.initial_review_read(bad,[],req,[])
 
     def test_required_retry_still_preserves_interrupt_iteration_and_readonly_boundaries(self):
         self.completed.append('get_operation_status');call=self.required_retry(self.sensor_plan(),[])
@@ -279,6 +302,11 @@ class Grounding(unittest.TestCase):
     def setUp(self):
         self.completed=[];self.original_calls=[]
         self.tools=[definition(n) for n in READ_NAMES+WRITE_NAMES+['terminal']]
+        for t in self.tools:
+            name=t['function']['name']
+            if name.endswith(('__get_rule_change_status','__get_operation_status')):
+                key='proposal_id' if name.endswith('__get_rule_change_status') else 'request_id'
+                t['function']['parameters']={'type':'object','properties':{key:{'type':'string'}}}
         self.request={'model':'qwen3.6:35b','tools':self.tools,'tool_choice':'auto',
                       'reasoning_effort':'none','extra_body':{'think':False}}
         self.builder=lambda:copy.deepcopy(self.request)

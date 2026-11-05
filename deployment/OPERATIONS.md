@@ -30,7 +30,9 @@
 
 11/5 [필수 사건 조회 범위](../infra/hermes/required-sensor-scope.md): 공통1.5.30/query1.19.25의 정확 읽기 안내·MCP 전 검사·실제 같은 읽기만 오류 해소를 기존 공통 gate/source_bundle 복사 경로로 연결했다. 설치39를 포함한 서버995PASS/skip0·B11파일 증분 확정, 새 패키지/권한/포트/키0이다. canonical 코드의 helper/Trace와 root의 포함 gate·reference를 같은 단위로 갱신한다. 실제 사건 판단/종결·새 OS 전체 설치는 별도다.
 
-11/5 [영향 조사·반복 표 오류 후속](../infra/hermes/web-impact-navigation.md): 현행 공통1.5.32/query1.19.27/security-events1.2.2. 선택적인 양끝 구분자를 공통 출력기에서 보완하고 실제 문제 게시물을 셀/작성자/채널 보존·형식만 수정, 내부 웹 앱에서 표1/pre0을 확인했다. 기존 gate/source_bundle/SDK·Native 복사 경로와 설치39검사를 사용하며 새 deb/wheel/image·키/포트·권한0이다. 실제 웹 사건 조사는 등록 탐색/백엔드까지 진행 후 시간초과로 미완료이며 과거 snapshot 잘림을 먼저 보완한다. 두 원본/원복과 운영 trace/승인/채팅을 보존한다.
+11/5 [자동 후속 상태·고정 실행 인자](../infra/hermes/shared-status-verification.md): 현행 query1.19.28/common1.5.32. 모든 verify의 실제 연결 상태 읽기와 정확 ID 안내를 보완했고, Linux 단일 인자 한도를 넘긴 이번 실패를 SHA 결속 압축 인자로 해결했다. 서버935검사·고유9파일 확정/보호7SHA 유지, 새 도구·패키지·권한·모델/FW/TTL/승인 변경0. 실제 사건 재검토 결과는 해당 원장에 구분한다. 기존 뒤 항목은 당시 검증 범위다.
+
+11/5 [영향 조사·반복 표 오류 후속](../infra/hermes/web-impact-navigation.md): 당시 공통1.5.32/query1.19.27/security-events1.2.2. 선택적인 양끝 구분자를 공통 출력기에서 보완하고 실제 문제 게시물을 셀/작성자/채널 보존·형식만 수정, 내부 웹 앱에서 표1/pre0을 확인했다. 기존 gate/source_bundle/SDK·Native 복사 경로와 설치39검사를 사용하며 새 deb/wheel/image·키/포트·권한0이다. 실제 웹 사건 조사는 등록 탐색/백엔드까지 진행 후 시간초과로 미완료이며 과거 snapshot 잘림을 먼저 보완한다. 두 원본/원복과 운영 trace/승인/채팅을 보존한다.
 
 11/5 [과거 웹 조회 보완](../infra/mcp/web-history.md): 기존 단일deploy.sh/diag-apply/SIEM source복사 경로로 schema2 정제 이력 publisher·reader를 연결했다. 원본 읽기8MiB·최근10k는 유지하고 검색을 시간/서비스 필터 뒤 최대50행으로 제한한다. 이력은32MiB/128k행·최대8세대/TTL회전·기존 그룹읽기만 허용한다. 새 패키지/이미지/포트/키/일반권한0·고유85검사/실제MCP·C3/B2확정, 새 OS 전체 설치는 별도 미실행이다.
 

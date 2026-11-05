@@ -196,7 +196,9 @@ def render(name, raw, profile, run_source=None):
         need(len(commands) == 1, "management_command_source")
         node = commands[0]
         index = next(i for i, x in enumerate(node.elts) if isinstance(x, ast.Constant) and x.value == "/opt/data/management-code/run.py")
-        node.elts[index:index + 1] = [ast.Constant("-I"), ast.Constant("-B"), ast.Constant("-c"), ast.Constant(run_source.decode())]
+        node.elts[index:index + 1] = [ast.Constant("-I"), ast.Constant("-B"), ast.Constant("-c"),
+            ast.Call(func=ast.Name(id='management_gate_argument',ctx=ast.Load()),
+                     args=[ast.Constant(run_source)],keywords=[])]
         mapping.update({"995:986": str(p["hermes_uid"]) + ":" + str(p["hermes_gid"]),
                         "hermes": p["container_ids"]["capstone-hermes"],
                         "http://10.200.10.": "http://" + p["siem_host"] + ":8065/hooks/"})

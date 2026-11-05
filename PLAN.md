@@ -32,7 +32,7 @@
 
 ## 현재 사용자 우선 작업 — 11/5 21:13 KST 재개
 
-DNS/저장 전달·NAT/IPv4·Wazuh HTTP 분기·제한적 웹 폭주 보호·차단 사유 카드/FW IP 표를 운영 반영했다. 추가 압축자료5종은 양Kali 보관/설명·SHA확인만 완료했다. 사용자가 공격시험을 중단했으므로 별도 재지시 전 공격·부하·PCAP재생은 수행하지 않는다. UI 도구 오류로 새 표 실제 렌더는 미검증이다. 21:13 KST 사용자 재개 지시에 따라 소스/Git 마감 후 기존 카드와 FW 표의 실제 UI 확인을 진행한다. 도구 초기화 실패 시 기존 서버 브라우저의 읽기 검증 경로를 확인한다. [웹](infra/validation/web-traffic/README.md) · [카드/FW표](infra/mcp/containment-display.md).
+DNS/저장 전달·NAT/IPv4·Wazuh HTTP 분기·제한적 웹 폭주 보호·차단 사유 카드/FW IP 표를 운영 반영했다. 추가 압축자료5종은 양Kali 보관/설명·SHA확인만 완료했다. 사용자가 공격시험을 중단했으므로 별도 재지시 전 공격·부하·PCAP재생은 수행하지 않는다. UI 도구 오류로 새 표 실제 렌더는 미검증이다. 21:13 KST 사용자 재개 후 소스26파일28ee1c7을 푸시·원격 확인했다. 새 카드/FW 표 UI는 CUA 초기화 오류와 관리자231 SSH 인증 전 시간초과로 대기한다. 연결 복구 뒤 기존 서버 브라우저의 읽기 검증 경로로 확인하며 다른 관리 경로로 우회하지 않는다. [웹](infra/validation/web-traffic/README.md) · [카드/FW표](infra/mcp/containment-display.md).
 
 ## 다음 실행 순서
 

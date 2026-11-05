@@ -18,7 +18,7 @@
   "automatic_expiry_tested": false,
   "new_card_api_table_and_reason_verified": true,
   "browser_UI_verified": false,
-  "browser_UI_blocker": "cua kernel assets initialization failed",
+  "browser_UI_blocker": "cua initialization failed again; admin231 SSH timed out twice before authentication on resume",
   "fw_report_characters": 4148,
   "fw_actual_snapshot_counts": {
     "table": 4,
@@ -28,7 +28,11 @@
   },
   "additional_MCP_tools": 0,
   "git": {
-    "state": "pending"
+    "state": "source_pushed_verified",
+    "source_commit": "28ee1c7d69a754499377c68a37f91712635cf731",
+    "remote_branch": "main",
+    "verified_at_kst": "2026-11-05T21:15:29.677706+09:00",
+    "receipt_documentation": "followup_commit_pending"
   },
   "cleanup": {
     "Mac_task_directory_removed": true,

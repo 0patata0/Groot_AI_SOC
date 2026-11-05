@@ -21,7 +21,7 @@ FW 기본 출력은 체인 개수만 보여주던 공통 renderer를 보완했�
 - 서버16승인·46차단·10WAF근거·27FW·5Native범위 검사:104PASS. 로컬 설치16·프록시경계2도 통과. 초기 staged SOUL.md 누락은 시험환경 실패로 보존하고 필요한 공통 문서를 반입해 후속 검사를 통과했다.
 - 실제 Hermes 컨테이너→resp-a 전체 MCP에서 `fw 룰 조회해줘` 보고4148자를 생성했다.4테이블17체인102규칙9집합의 완전 조회·두 renderer사본SHA동일, IP/예외/거부 조건 표를 확인했다. 이는 새 사용자 채팅 왕복·모델 정확도 비교가 아니다.
 - 새232 SQLi의WAF403→Codex지시의기존HermesMCP전송→검증942100/600초FW/카드 `groaaeb5y7nrmq6nkokaai7cta`를 확인했다. 실제 운영자가 release를 승인해 해제됐고 원복 관찰 SHA·FW 집합0을 확인했다. 자동 만료가 아닌 승인 해제다. 해제 뒤 FW 조회가 비어 있어 비어 있지 않은 원소의 실제 보고 시험으로 합산하지 않는다. 남은 시간·참조/경계는 별도5회귀에서 검사했다.
-- [실제 카드](https://chat.grootlab.duckdns.org/soc/pl/groaaeb5y7nrmq6nkokaai7cta)의 API 본문에 표·탐지 근거·사유를 확인했다. 브라우저 도구가 kernel assets 초기화 오류로 실패해 이번 새 카드/FW 표의 UI 렌더는 미검증이다. 기존 표 정규화기를 사용하며 UI 성공으로 대신하지 않는다.
+- [실제 카드](https://chat.grootlab.duckdns.org/soc/pl/groaaeb5y7nrmq6nkokaai7cta)의 API 본문에 표·탐지 근거·사유를 확인했다. 브라우저 도구가 kernel assets 초기화 오류로 실패했다. 21:13 재개 후에도 동일했고, 기존 서버 브라우저 확인을 위한 관리자231 SSH가 인증 전에 두 번 시간초과되어 이번 새 카드/FW 표의 UI 렌더는 미검증이다. 기존 표 정규화기를 사용하며 UI 성공으로 대신하지 않는다.
 
 ## 복구·설치
 

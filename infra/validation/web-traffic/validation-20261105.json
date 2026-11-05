@@ -36,7 +36,11 @@
   ],
   "source_sha256": "50252e4b3d5539a5ebcd63a5de1ea4fe2461b388607689ac59404b54abba9f1b",
   "git": {
-    "state": "pending"
+    "state": "source_pushed_verified",
+    "source_commit": "28ee1c7d69a754499377c68a37f91712635cf731",
+    "remote_branch": "main",
+    "verified_at_kst": "2026-11-05T21:15:29.677706+09:00",
+    "receipt_documentation": "followup_commit_pending"
   },
   "cleanup": {
     "Mac_task_directory_removed": true,

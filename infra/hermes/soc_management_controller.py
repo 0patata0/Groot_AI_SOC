@@ -1685,6 +1685,10 @@ def command_for(case):
         if case['mode']!='verify' or not isinstance(sensor_reads,list) or len(sensor_reads)>32:
             raise ControllerError('sensor_read_requirements_invalid')
         command[2:2]=['-e','CAPSTONE_REQUIRED_SENSOR_JSON='+canonical(sensor_reads)]
+    if dict(case).get('web_impact_review'):
+        if case['mode']!='verify' or not sensor_reads:
+            raise ControllerError('web_impact_review_invalid')
+        command[2:2]=['-e','CAPSTONE_WEB_IMPACT_REVIEW=1']
     if case["session_id"]:
         if not SESSION.fullmatch(case["session_id"]):
             raise ControllerError("session_id_invalid")
@@ -1720,7 +1724,9 @@ def run_hermes(store, case, prompt):
         evidence=store.context(case['id']);at=(datetime.fromisoformat(case['incident_read_at'])
             if dict(case).get('incident_read_at') else datetime.now(timezone(timedelta(hours=9))))
         reads=incident_read_plan(evidence,at)['requests']+incident_followup_plan(evidence,at)['requests']
-        case=dict(case,required_sensor_reads=[{'tool':r['tool'],'arguments':r['arguments']} for r in reads])
+        case=dict(case,required_sensor_reads=[{'tool':r['tool'],'arguments':r['arguments']} for r in reads],
+            web_impact_review=any(r[0]=='modsecurity' for r in sensor_review_requirements(evidence))
+                and any(p.get('target')=='a:incident-ip' for p in evidence['proposals']))
     rid = store.start(case)
     trace, error, returncode = Trace(store, case, rid), None, 1
     path = store.root / (rid + ".jsonl")

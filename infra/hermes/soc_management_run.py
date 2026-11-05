@@ -495,6 +495,9 @@ def event_rule_facts(data):
                 'source_ip': literal_ip(alert.get('source_ip')),
                 'destination_ip': literal_ip(alert.get('destination_ip')),
                 'sensor_agent': literal_hostname(alert.get('agent')),
+                **({'request_path':alert['request_path']} if data.get('source')=='modsecurity'
+                    and isinstance(alert.get('request_path'),str) and alert['request_path'].startswith('/')
+                    and len(alert['request_path'])<=512 and not re.search(r'[\x00-\x1f\x7f]',alert['request_path']) else {}),
                 'sensor_rule_ids': [v for x in values[:20] if (v := identifier(x)) is not None]
                     if isinstance(values, list) else []})
     return {'sensor_rule_ids': sorted(sensor), 'wazuh_rule_ids': sorted(wazuh),
@@ -1564,6 +1567,61 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
     return {**value, 'tool_choice': 'required'} if reads else value
 
 
+def web_impact_review_request(request, facts, attempted, sensor_requirements):
+    """Offer existing candidate-backend reads; no dispatch or destination verdict."""
+    if (os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify'
+            or os.environ.get('CAPSTONE_WEB_IMPACT_REVIEW')!='1' or not sensor_requirements):
+        return request
+    paths=[o.get('request_path') for f in facts if f.get('kind')=='events' and f.get('source')=='modsecurity'
+           for o in f.get('observations',[]) if isinstance(o.get('request_path'),str)]
+    if not paths:return request
+    candidates=[]
+    for f in facts:
+        service=f.get('service',{});agent=f.get('agent',{})
+        prefix=service.get('request_path_prefix') if isinstance(service,dict) else None
+        if (f.get('kind') in ('web_service','web_access') and isinstance(agent,dict)
+                and isinstance(prefix,str) and prefix.startswith('/') and len(prefix)>1
+                and service.get('configured_in_file_snapshot') is True
+                and isinstance(agent.get('id'),str) and re.fullmatch(r'[0-9]{3,8}',agent['id'])
+                and isinstance(f.get('target'),str) and re.fullmatch(r'c:[a-z0-9-]{1,32}',f['target'])
+                and any(p.startswith(prefix) or p==prefix.rstrip('/') for p in paths)):
+            candidates.append(f)
+    hints={}
+    if not candidates:
+        if 'get_web_service_target' in attempted:return request
+        hints['mcp__security_events__get_web_service_target']=None
+    else:
+        candidate=candidates[0];scope=sensor_requirements[0]['arguments']
+        interval={k:scope[k] for k in ('since_kst','until_kst','limit')}
+        if 'search_web_access' not in attempted:
+            hints['mcp__security_events__search_web_access']={'target':candidate['target'],**interval}
+        if 'search_wazuh_alerts' not in attempted:
+            hints['mcp__security_events__search_wazuh_alerts']={'agent_id':candidate['agent']['id'],**interval}
+        if not hints:return request
+    value=permitted_request(request,'verify');tools=[]
+    for original in value.get('tools',[]):
+        name=original['function']['name']
+        if name not in hints:continue
+        tool=json.loads(json.dumps(original));arguments=hints[name]
+        guidance=('사건의 실제 request_path에 해당하는 등록 target을 조회하세요. '
+                  '수집 agent는 공격자 이름이 아닙니다. C 로컬 등록·설정은 프런트 목적지 적재 증명이 아닙니다.')
+        if arguments:
+            base=tool['function'].get('parameters',{})
+            if not set(arguments)<=set(base.get('properties',{})):
+                raise RuntimeError('web_impact_read_schema_unavailable')
+            tool['function']['parameters']={**base,'type':'object',
+                'properties':{k:{**base['properties'][k],'enum':[v]} for k,v in arguments.items()},
+                'required':list(arguments),'additionalProperties':False}
+            guidance=('관측 경로와 일치하는 C 설정 후보의 추가 조사이며 목적지 확정·침해 해소가 아닙니다. '
+                      '프록시가 검증되지 않아 백엔드 접근에 공격자 source_ip 필터를 넣지 않습니다. '
+                      '실제 도구와 다음 정확 인자를 직접 선택하세요: '+json.dumps(arguments,ensure_ascii=False))
+        tool['function']['description']=str(tool['function'].get('description') or '')+'\n'+guidance
+        tools.append(tool)
+    if {t['function']['name'] for t in tools}!=set(hints):
+        raise RuntimeError('web_impact_read_tools_unavailable')
+    return {**value,'tools':tools,'tool_choice':'required'}
+
+
 def missing_cited_sensor_reads(text, successful_reads):
     """Navigation only: names may restrict existing reads, never add authority."""
     sensors = {'mcp__security_events__search_modsecurity_alerts',
@@ -1620,7 +1678,7 @@ def arm_grounding_read(agent, turn, required_reads=None, *, required_read_phase=
 
 
 def grounding_wrapper(original, native, append_message, reanchor, completed_calls, facts=None, argument_errors=None, successful_reads=None,
-                      status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=()):
+                      status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=(), attempted_reads=()):
     @functools.wraps(original)
     def wrapped(agent, **kw):
         restore = getattr(agent, '_capstone_grounding_restore', None)
@@ -1638,13 +1696,21 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         pending_status=[r for r in status_requirements if not any(f.get('kind')=='proposal_status' and
             f.get('proposal_id')==r['proposal_id'] and f.get('target')==r['target'] for f in status_receipts)] if verify else []
         pending_sensors=missing_sensor_reads(sensor_requirements,sensor_receipts) if verify and not pending_status else []
-        required_retry=bool(pending_status or pending_sensors)
+        pending_web=[]
+        if verify and not pending_status and not pending_sensors:
+            web=web_impact_review_request({'tools':getattr(agent,'tools',[])},facts or [],attempted_reads,sensor_requirements)
+            if web.get('tool_choice')=='required':
+                for tool in web['tools']:
+                    params=tool['function'].get('parameters',{});args={k:v['enum'][0]
+                        for k,v in params.get('properties',{}).items() if isinstance(v,dict) and len(v.get('enum',[]))==1}
+                    pending_web.append({'tool':tool['function']['name'],**({'arguments':args} if args else {})})
+        required_retry=bool(pending_status or pending_sensors or pending_web)
         if status_requirements or sensor_requirements:
             # Bounded audit metadata only; never log model text or reasoning.
             sys.stderr.write('management_read_completion '+json.dumps({
                 'verify':verify,'required_status':len(status_requirements),
                 'required_sensors':len(sensor_requirements),'sensor_receipts':len(sensor_receipts),
-                'pending_status':len(pending_status),'pending_sensors':len(pending_sensors),
+                'pending_status':len(pending_status),'pending_sensors':len(pending_sensors),'pending_web':len(pending_web),
                 'continuations':counter,'finish_reason':kw.get('finish_reason')})+'\n')
         factual = bool(completed_calls and issues and not required_retry)
         argument_retry = bool(not completed_calls and argument_errors and not required_retry)
@@ -1653,14 +1719,18 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
         if required_retry:
             needed_sensors=({('mcp__rule_'+r['target'][0]+'__'+('get_rule_change_status' if
                 r['target'] in ('a:modsecurity-custom','a:suricata-local','b:wazuh-local-rules') else 'get_operation_status'))
-                for r in pending_status} if pending_status else {r['tool'] for r in pending_sensors})
+                for r in pending_status} if pending_status else {r['tool'] for r in pending_sensors or pending_web})
         marker = '_capstone_factual_turn' if factual else '_capstone_argument_turn' if argument_retry else '_capstone_grounding_turn'
+        if pending_web:
+            marker=('_capstone_web_discovery_turn' if any(r['tool'].endswith('__get_web_service_target') for r in pending_web)
+                    else '_capstone_web_evidence_turn')
         known_retries = sum(getattr(agent, name, None) == turn for name in
-                            ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn'))
+                            ('_capstone_grounding_turn', '_capstone_argument_turn', '_capstone_factual_turn',
+                             '_capstone_web_discovery_turn','_capstone_web_evidence_turn'))
         if ((completed_calls and not factual and not required_retry) or kw.get('finish_reason') != 'stop' or
                 getattr(agent, '_interrupt_requested', False) or kw.get('_pending_verification_response') is not None or
                 not isinstance(turn, str) or not turn or not isinstance(user, str) or not isinstance(messages, list)
-                or getattr(message, 'tool_calls', None) or type(counter) is not int or not 0 <= counter <= 2
+                or getattr(message, 'tool_calls', None) or type(counter) is not int or not 0 <= counter <= (4 if pending_web else 2)
                 or counter != known_retries
                 or type(count) is not int or type(maximum) is not int or not 0 <= count < maximum - 1
                 or remaining is not None and (type(remaining) not in (int, float) or remaining < 2)
@@ -1674,14 +1744,19 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                     required_read_phase=required_retry))):
             return original(agent, **kw)
         if required_retry:
-            agent._capstone_grounding_turn = turn
-            pending=({'status_reads':pending_status} if pending_status else {'sensor_reads':pending_sensors})
+            setattr(agent,marker,turn)
+            pending=({'status_reads':pending_status} if pending_status else {'sensor_reads':pending_sensors}
+                     if pending_sensors else {'candidate_backend_reads':pending_web})
             nudge=('필수 조회 영수증이 아직 충족되지 않았습니다. 이미 실행한 다른 조회나 일부가 겹치는 구간은 '
                 '빠진 대상/구간의 확인을 대신하지 않습니다. 다음은 신뢰된 제어기가 제공한 읽기 참조이며 '
                 '성공 근거나 판단·쓰기/승인 지시가 아닙니다. 실제 등록된 MCP 도구와 정확한 인자를 직접 '
                 '선택해 빠진 조회를 수행한 뒤 현재 근거로 판단·보고를 이어가세요. '
                 '조회가 실패하거나 필요한 자료가 없으면 그 범위와 오류를 명시하고 종결하지 마세요.\n'+
                 json.dumps(pending,ensure_ascii=False))
+            if pending_web:
+                nudge+=('\n웹 사건의 원 경로에 맞는 실제 등록 target을 읽고, 반환된 로컬 등록 agent와 같은 사건 구간으로 '
+                        '앱 접근/호스트 경보를 조사하세요. C 후보 설정은 프런트 목적지 확정이 아닙니다. '
+                        '도구가 제시되지 않은 ID·target을 추정하지 말고 실제 inputSchema를 따르세요.')
         elif factual:
             agent._capstone_factual_turn = turn
             if not missing_evidence:
@@ -1728,7 +1803,7 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
 
 
 def install_grounding_retry(completed_calls, facts=None, argument_errors=None, successful_reads=None,
-                            status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=()):
+                            status_requirements=(), status_receipts=(), sensor_requirements=(), sensor_receipts=(), attempted_reads=()):
     root = Path('/opt/hermes')
     try:
         unchanged = all(hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
@@ -1744,7 +1819,7 @@ def install_grounding_retry(completed_calls, facts=None, argument_errors=None, s
     native.finish_text_response = loop.finish_text_response = grounding_wrapper(
         native.finish_text_response, native, metadata.append_message,
         context.reanchor_current_turn_user_idx, completed_calls, facts, argument_errors, successful_reads,
-        status_requirements,status_receipts,sensor_requirements,sensor_receipts)
+        status_requirements,status_receipts,sensor_requirements,sensor_receipts,attempted_reads)
 
 
 def review_unblock_allowed(mode):
@@ -1866,6 +1941,8 @@ def main():
     requirements = status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))
     sensor_requirements=sensor_read_requirements(os.environ.get('CAPSTONE_REQUIRED_SENSOR_JSON'))
     sensor_receipts=[]
+    attempted_wire_reads=[]
+    native_read_catalog=[]
     argument_errors = []
     output_lock = threading.Lock()
 
@@ -1892,6 +1969,8 @@ def main():
     async def gated_wire(self, name, arguments=None, *args, **kwargs):
         if not wire_allowed(name, mode):
             raise PermissionError('management_wire_tool_not_allowed')
+        if wire_allowed(name,'verify'):
+            attempted_wire_reads.append(name)
         # A received attack alert can justify provisional containment before an
         # extra model-side lookup. A's fixed helper independently validates the
         # current raw sensor event, protected IPs and bounded TTL. Verify mode
@@ -1927,6 +2006,7 @@ def main():
         init(self, *args, **kwargs)
         self.tools = permitted_tools(self.tools, mode)
         self.valid_tool_names = {t['function']['name'] for t in self.tools}
+        native_read_catalog[:]=self.tools
         if not self.valid_tool_names:
             raise RuntimeError('management_tools_unavailable')
 
@@ -1944,6 +2024,10 @@ def main():
         pending_status=any(not any(f.get('kind')=='proposal_status' and f.get('proposal_id')==r['proposal_id']
             and f.get('target')==r['target'] for f in status_receipts) for r in requirements)
         pending=mode=='verify' and (pending_status or bool(missing_sensor_reads(sensor_requirements,sensor_receipts)))
+        if not pending:
+            impact=web_impact_review_request(value,read_facts,attempted_wire_reads,sensor_requirements)
+            pending=impact is not value
+            value=impact
         return management_reasoning(value,self,required_read_phase=True) if pending else value
 
     def guarded_result(self, result, session_id='', exit_code=0):
@@ -1954,7 +2038,8 @@ def main():
         if not completed_wire_calls:
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
-        data['final_response'] = factual_review_report(read_facts) if (missing_sensor_reads(sensor_requirements,sensor_receipts)
+        web_pending=web_impact_review_request({'tools':native_read_catalog},read_facts,attempted_wire_reads,sensor_requirements).get('tool_choice')=='required'
+        data['final_response'] = factual_review_report(read_facts) if (missing_sensor_reads(sensor_requirements,sensor_receipts) or web_pending
             or evidence_claim_violations(text, read_facts, successful_read_names)) else kst_display(text)
         return original_result(self, data, session_id, exit_code)
 
@@ -2002,7 +2087,7 @@ def main():
     from tools.mcp_tool_discovery import discover_mcp_tools
     discover_mcp_tools()
     install_grounding_retry(completed_wire_calls, read_facts, argument_errors, successful_read_names,
-                            requirements,status_receipts,sensor_requirements,sensor_receipts)
+                            requirements,status_receipts,sensor_requirements,sensor_receipts,attempted_wire_reads)
     from hermes_cli.main import main as native_main
     native_main()
 

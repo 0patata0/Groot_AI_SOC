@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05T11:35:27.447172+09:00",
+  "versions": {
+    "contract": "1.5.32",
+    "query": "1.19.27",
+    "security_events": "1.2.2"
+  },
+  "tests": {
+    "unique_total": 1059,
+    "passed": 1059,
+    "skip": 0,
+    "suites": {
+      "management": 282,
+      "sdk": 219,
+      "native": 391,
+      "install": 39,
+      "review": 60,
+      "workflow": 4,
+      "output": 7,
+      "events": 27,
+      "tables": 12,
+      "chunks": 18
+    },
+    "host_chunk_skips": 1,
+    "installed_native_chunk_tests": 18,
+    "no_duplicate_counting": true,
+    "install_initial_stale_fixture_failures": 1,
+    "install_retest_pass": 39,
+    "new_os_full_install": false
+  },
+  "deployment": {
+    "r1_files": 18,
+    "r2_files": 14,
+    "current_unique_files": 21,
+    "r1_confirmed_kst": "2026-11-05T11:02:00+09:00",
+    "r2_confirmed_kst": "2026-11-05T11:23:52+09:00",
+    "final_verified_kst": "2026-11-05T11:35:27.447172+09:00",
+    "sha256_verified": {
+      "/opt/hermes-data/plugins/groot-query-completion/grounding.py": "df1b13536beaea09aeb481d60949926b987549c6164361c0381054775176ccf8",
+      "/opt/hermes-data/plugins/groot-query-completion/chat_contract.py": "b60dcb811be074da515c9fa4ef505a833b20e0fe36192d5754920a1e959087fa",
+      "/opt/capstone-ollama-trial/grounding.py": "df1b13536beaea09aeb481d60949926b987549c6164361c0381054775176ccf8",
+      "/opt/capstone-ollama-trial/chat_contract.py": "b60dcb811be074da515c9fa4ef505a833b20e0fe36192d5754920a1e959087fa",
+      "/opt/hermes-data/plugins/groot-query-completion/__init__.py": "6d39ded81d8436c32a591198704fe2d1c8b3ebba4f1226d9079030f3e01cb9ee",
+      "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": "a8286ae285336f288d9a2efe7a92503f977acefed65d526c767cc325a3147f1f",
+      "/opt/capstone-ollama-trial/query_grounding.py": "6d39ded81d8436c32a591198704fe2d1c8b3ebba4f1226d9079030f3e01cb9ee",
+      "/opt/hermes-data/management-code/run.py": "df1b13536beaea09aeb481d60949926b987549c6164361c0381054775176ccf8",
+      "/opt/capstone-management/soc_management_run.py": "df1b13536beaea09aeb481d60949926b987549c6164361c0381054775176ccf8",
+      "/opt/mcp/security-events-mcp.py": "9351251234116f9e89b2aacd0a0d3a1b1a7ec8b0ebd5eaf197b43f15289b21a7",
+      "/opt/capstone-management/SKILL.md": "473195215b98fe8c7d354f1c16f66d2f8da7a4f2a08a084c5a88454145effaf6",
+      "/opt/capstone-management/skill-soc-investigate.md": "40264df1d38107307e792063390927fe774ae907d5c4707aa26ca38fe2074d2d",
+      "/opt/capstone-ollama-trial/SKILL.md": "473195215b98fe8c7d354f1c16f66d2f8da7a4f2a08a084c5a88454145effaf6",
+      "/opt/capstone-ollama-trial/skill-soc-investigate.md": "40264df1d38107307e792063390927fe774ae907d5c4707aa26ca38fe2074d2d",
+      "/opt/hermes-data/plugins/groot-query-completion/SKILL.md": "473195215b98fe8c7d354f1c16f66d2f8da7a4f2a08a084c5a88454145effaf6",
+      "/opt/hermes-data/plugins/groot-query-completion/skill-soc-investigate.md": "40264df1d38107307e792063390927fe774ae907d5c4707aa26ca38fe2074d2d",
+      "/opt/capstone-management/soc_management_controller.py": "eeb1d65dc3a0b5ec960a1d8eb602cea6c845b8ea3f0f2e437ade22eacf3b252a",
+      "/etc/capstone-ollama-trial/receipt.json": "67b691237ea1b321de0f2d26599120fd9b8bd0411b36c9809f54d0d4797d6182",
+      "/opt/capstone-management/chat_markdown.py": "5737a8b244a6a8f2e7ba2030a0ecc9816e0a815d952068797198d07757fd42a8",
+      "/opt/capstone-ollama-trial/chat_markdown.py": "5737a8b244a6a8f2e7ba2030a0ecc9816e0a815d952068797198d07757fd42a8",
+      "/opt/hermes-data/plugins/groot-query-completion/chat_markdown.py": "5737a8b244a6a8f2e7ba2030a0ecc9816e0a815d952068797198d07757fd42a8"
+    },
+    "protected_unchanged": 7,
+    "gate_matches_reference": true,
+    "chat_restarts": {
+      "native": 2,
+      "sdk": 2,
+      "review": 2
+    },
+    "recovery_backups": 2,
+    "recovery_timers_confirmed_disabled": true,
+    "manual_rollback_tested": false,
+    "new_permissions_packages_ports_keys": false
+  },
+  "format_fix": {
+    "post_id": "6sp44kfy9pb7pnnqa86hkz65do",
+    "url": "https://chat.grootlab.duckdns.org/soc/pl/6sp44kfy9pb7pnnqa86hkz65do",
+    "editor": "socadmin",
+    "original_author_preserved": true,
+    "before_sha256": "993df936be614f100bf293021326945da7184df822c120570e57a0000434fe27",
+    "after_sha256": "d1b6f0b90cf315889ff11c1a80575ceabab9e4301114a630ff38d31ae2fcd0d0",
+    "cells_unchanged": true,
+    "table_lines": 6,
+    "edit_at": 1793845663703,
+    "new_investigation_or_post": false,
+    "ui": {
+      "at_kst": "2026-11-05T11:32:51+09:00",
+      "post_id": "post_6sp44kfy9pb7pnnqa86hkz65do",
+      "post_found": true,
+      "table_count": 1,
+      "pre_count": 0,
+      "screenshot_inspected": true,
+      "real_internal_webapp": true,
+      "public_https_browser_verified": false
+    },
+    "unique_table_regressions": 30
+  },
+  "actual_reviews": [
+    {
+      "run_id": "9961f2d3c577a1a9c27c8405b0aa5c34",
+      "case_state": "needs_review",
+      "run_state": "completed",
+      "detail": "model_needs_review",
+      "seconds": 161.18732714653015,
+      "success_reads": 7,
+      "errors": 1,
+      "protected_calls": 0,
+      "model_complete": false,
+      "tool_names": [
+        "mcp__rule_a__get_operation_status",
+        "mcp__resp__list_blocks",
+        "mcp__rule_a__get_operation_status",
+        "mcp__resp__list_blocks",
+        "mcp__security_events__search_modsecurity_alerts",
+        "mcp__security_events__search_suricata_alerts",
+        "mcp__security_events__search_modsecurity_alerts",
+        "mcp__security_events__search_suricata_alerts"
+      ]
+    },
+    {
+      "run_id": "1dc15392db9879e858cc6fcc82456593",
+      "case_state": "outcome_unknown",
+      "run_state": "outcome_unknown",
+      "detail": "model_subprocess_timeout_requires_review",
+      "seconds": 214.360200881958,
+      "success_reads": 6,
+      "errors": 0,
+      "protected_calls": 0,
+      "model_complete": false,
+      "tool_names": [
+        "mcp__rule_a__get_operation_status",
+        "mcp__security_events__search_modsecurity_alerts",
+        "mcp__security_events__search_modsecurity_alerts",
+        "mcp__security_events__search_suricata_alerts",
+        "mcp__security_events__get_web_service_target",
+        "mcp__security_events__search_web_access"
+      ]
+    }
+  ],
+  "direct_read_limits": {
+    "not_model_trial_success": true,
+    "registered_target": "c:dvwa",
+    "registered_agent_id": "002",
+    "host_samples": 7,
+    "backend_rows": 0,
+    "backend_rows_truncated": true,
+    "backend_malformed": 9,
+    "global_snapshot_limit": 10000,
+    "normal_or_closed_claimed": false
+  },
+  "cleanup": {
+    "removed_files": 459,
+    "removed_bytes": 6503664,
+    "backups_preserved": 2,
+    "operating_data_removed": false,
+    "browser": {
+      "own_browser_processes": [],
+      "own_profiles": []
+    },
+    "mac_state": "complete",
+    "mac": {
+      "at_kst": "2026-11-05T11:40:48.271395+09:00",
+      "files_removed": 37,
+      "bytes_removed": 7346533,
+      "ssh_controls": [
+        {
+          "role": "b",
+          "state": "absent"
+        },
+        {
+          "role": "a",
+          "state": "absent"
+        },
+        {
+          "role": "admin-direct",
+          "state": "absent"
+        },
+        {
+          "role": "c",
+          "state": "absent"
+        }
+      ],
+      "path_absent": true,
+      "new_local_packages_installed": 0,
+      "existing_publisher_preserved": true
+    },
+    "own_path_processes_remaining": 0
+  },
+  "publication": {
+    "state": "pending",
+    "previous_head": "68432aafce9d5f120086f03963944ff22de515d6"
+  },
+  "not_done": [
+    "actual_case_host_followup_and_final_judgment",
+    "query_specific_historical_backend_coverage",
+    "actual_new_attack_e2e",
+    "sdk_all_protected_write_parity",
+    "independent_176_evaluation",
+    "latest_paper_pdf",
+    "final_presentation",
+    "new_os_full_install"
+  ]
+}

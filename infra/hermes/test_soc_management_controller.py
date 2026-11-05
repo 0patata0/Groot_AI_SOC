@@ -302,6 +302,13 @@ class ControllerTests(unittest.TestCase):
         trace.accept({"type": "tool_result", "name": name, "is_error": error,
                       "output": json.dumps({"content": [{"type": "text", "text": json.dumps(payload)}], "isError": error})})
 
+    def test_web_impact_read_hint_cannot_enable_manage_or_without_required_sensor_scope(self):
+        args={'source_ip':'192.0.2.20','since_kst':'2026-10-30T11:00:00+09:00','until_kst':'2026-10-30T11:01:00+09:00','limit':50}
+        case={'mode':'verify','session_id':None,'web_impact_review':True,'required_sensor_reads':[{'tool':'mcp__security_events__search_modsecurity_alerts','arguments':args}]}
+        self.assertIn('CAPSTONE_WEB_IMPACT_REVIEW=1',m.command_for(case))
+        for change in ({'mode':'manage'},{'required_sensor_reads':[]}):
+            with self.assertRaises(m.ControllerError):m.command_for(dict(case,**change))
+
     def scope_trace(self):
         self.events(self.incident())
         args={'source_ip':'192.0.2.60','since_kst':'2026-11-04T14:48:02.598000+09:00',

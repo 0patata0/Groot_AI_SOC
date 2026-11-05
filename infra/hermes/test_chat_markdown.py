@@ -10,6 +10,26 @@ import review_channel_policy as policy
 TABLE='| 항목 | 상태 |\n|---|---|\n| IDS | 정상 |'
 
 class TableTests(unittest.TestCase):
+    def test_actual_incident_header_without_outer_pipes_is_canonicalized(self):
+        text='확인 항목 | 결과·판단 | 근거·범위\n|---|---|---|\n| 사건 | 미확인 | MCP 조회 |'
+        wanted='|확인 항목 | 결과·판단 | 근거·범위|\n|---|---|---|\n| 사건 | 미확인 | MCP 조회 |'
+        self.assertEqual(normalize_tables(text),wanted)
+        self.assertEqual(normalize_tables(wanted),wanted)
+
+    def test_optional_edges_keep_cells_links_and_literal_pipes(self):
+        text='A | B\n:--- | ---:\n`x\\|y` | [근거](https://example.test/a)'
+        self.assertEqual(normalize_tables(text),'|A | B|\n|:--- | ---:|\n|`x\\|y` | [근거](https://example.test/a)|')
+
+    def test_optional_edge_table_in_code_quote_or_list_is_preserved(self):
+        plain='A | B\n--- | ---\n1 | 2'
+        for text in ('```markdown\n'+plain+'\n```','\n'.join('    '+l for l in plain.splitlines()),
+                     '\n'.join('> '+l for l in plain.splitlines()),'- A | B\n--- | ---'):
+            self.assertEqual(normalize_tables(text),text)
+
+    def test_optional_edges_require_real_separator_and_matching_column_count(self):
+        for text in ('A | B\n--- | --- | ---\n1 | 2','A | B\nnot | separator'):
+            self.assertEqual(normalize_tables(text),text)
+
     def test_live_message_shape_and_idempotence(self):
         text='**확인 내역** (관찰 시각 KST)\n'+TABLE+'\n다음 안내'
         wanted='**확인 내역** (관찰 시각 KST)\n\n'+TABLE+'\n\n다음 안내'

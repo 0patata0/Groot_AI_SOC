@@ -18,6 +18,13 @@ spec.loader.exec_module(module)
 
 
 class SecurityEventsMcpTests(unittest.TestCase):
+    def test_agent_name_remains_the_collector_and_is_not_bound_to_the_source_ip(self):
+        row={'agent':{'name':'collector-sec'},'data':{'transaction':{'client_ip':'192.0.2.40'}}}
+        with patch.object(module,'indexer_search',return_value={'hits':{'hits':[{'_source':row}]}}):r=module.search('modsecurity',{})
+        self.assertEqual(r['alerts'][0]['agent'],'collector-sec');self.assertEqual(r['alerts'][0]['source_ip'],'192.0.2.40')
+        self.assertIn('collecting_wazuh_agent_name',r['field_semantics']['agent'])
+        self.assertIn('not_source_host',r['field_semantics']['agent']);self.assertNotIn('source_host_name',r['alerts'][0])
+
     def test_ddns_provider_metadata_and_query_references_are_preserved_not_classified(self):
         original={'data':{'flow_id':123456,'dns':{'id':9,'tx_id':2},'alert':{
             'signature_id':2042936,'category':'Potentially Bad Traffic','severity':2,

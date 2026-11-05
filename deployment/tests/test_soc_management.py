@@ -73,8 +73,8 @@ class BindingTests(unittest.TestCase):
             self.assertTrue(any(x.startswith('CAPSTONE_REQUIRED_SENSOR_JSON=') for x in command))
             tree=ast.parse(gate);entry=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
             call=next(n for n in ast.walk(entry) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='install_grounding_retry')
-            self.assertEqual([ast.unparse(n) for n in call.args[-4:]],
-                ['requirements','status_receipts','sensor_requirements','sensor_receipts'])
+            self.assertEqual([ast.unparse(n) for n in call.args[-5:]],
+                ['requirements','status_receipts','sensor_requirements','sensor_receipts','attempted_wire_reads'])
             reference.write_bytes(b'# stale reference\n')
             with self.assertRaisesRegex(Exception,'embedded_gate_source_mismatch'):m.verified_management_command(case)
 

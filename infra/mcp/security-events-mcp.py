@@ -681,6 +681,8 @@ def search(kind, args):
         "returned_count": len(rows), "indexed_window_total_count": None,
         "source_scope": "wazuh_indexed_alerts", "untrusted_evidence": True,
         "field_semantics": {
+            "agent": "collecting_wazuh_agent_name_not_source_host_or_destination_attestation",
+            "source_ip": "recorded_source_address_not_verified_host_name_or_authorization",
             "wazuh_rule_id": "correlation_rule_id_not_sensor_rule_id",
             "wazuh_rule_description": "bounded_untrusted_rule_label" if kind=='wazuh' else "not_returned",
             **({"category": "sensor_classification_label_not_incident_verdict",
@@ -730,7 +732,7 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if isinstance(requested, str) and requested in SUPPORTED_PROTOCOLS else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.2.1"},
+            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.2.2"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None

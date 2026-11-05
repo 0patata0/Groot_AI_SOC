@@ -1,6 +1,7 @@
 """Separate valid top-level Markdown tables from prose without changing cells.
 
-Normalization only inserts blank lines. The optional transport splitter repeats
+Normalization inserts blank lines and canonicalizes optional outer pipes.
+Cell contents remain unchanged. The optional transport splitter repeats
 table headers across posts without dropping rows. Fenced/indented code, quotes,
 raw HTML blocks, and malformed table-like text use the original splitter.
 No model or tool is called.
@@ -14,6 +15,18 @@ _RAW = re.compile(r'^ {0,3}<(pre|script|style|textarea)(?:\s|>)',re.I)
 
 def _cells(line):
     return re.split(r'(?<!\\)\|',line.strip()[1:-1])
+
+
+def _bordered_row(line):
+    if _ROW.fullmatch(line):return line
+    if (line.startswith(('    ','\t')) or _FENCE.match(line)
+            or re.match(r'^ {0,3}(?:>|<|[-*+]\s|[0-9]+[.)]\s)',line)):
+        return None
+    value=line.strip()
+    if not re.search(r'(?<!\\)\|',value):return None
+    if not value.startswith('|'):value='|'+value
+    if not value.endswith('|') or value.endswith('\\|'):value+='|'
+    return value if len(_cells(value))>=2 else None
 
 
 def normalize_tables(text):
@@ -40,15 +53,19 @@ def normalize_tables(text):
             if re.search(r'</'+raw+r'\s*>',body,re.I):raw=None
             out.append(line);i+=1;continue
         separator=lines[i+1].rstrip('\r\n') if i+1<len(lines) else ''
-        valid=(_ROW.fullmatch(body) and _ROW.fullmatch(separator)
-               and len(_cells(body))==len(_cells(separator))>=2
-               and all(re.fullmatch(r'\s*:?-{3,}:?\s*',cell) for cell in _cells(separator)))
+        header_row=_bordered_row(body);separator_row=_bordered_row(separator)
+        valid=(header_row is not None and separator_row is not None
+               and len(_cells(header_row))==len(_cells(separator_row))>=2
+               and all(re.fullmatch(r'\s*:?-{3,}:?\s*',cell) for cell in _cells(separator_row)))
         if not valid:out.append(line);i+=1;continue
         ending='\r\n' if line.endswith('\r\n') else '\n'
         if out and out[-1].strip():out.append(ending)
-        out.extend(lines[i:i+2]);i+=2
-        while i<len(lines) and _ROW.fullmatch(lines[i].rstrip('\r\n')):
-            out.append(lines[i]);i+=1
+        out.append(header_row+line[len(body):])
+        out.append(separator_row+lines[i+1][len(separator):]);i+=2
+        while i<len(lines):
+            raw_row=lines[i].rstrip('\r\n');row=_bordered_row(raw_row)
+            if row is None:break
+            out.append(row+lines[i][len(raw_row):]);i+=1
         if i<len(lines) and lines[i].strip():out.append(ending)
     return ''.join(out)
 

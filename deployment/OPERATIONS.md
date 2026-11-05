@@ -2,7 +2,7 @@
 
 웹 백엔드 접근 기록은 security-events의 `search_web_access`로 읽는다. `DVWA 접근 기록 보여줘`는 최근1시간을 서버가 계산하고 실제 표본/잘림/전체미확인을 표시한다. 고정 서비스/로컬 등록은 `get_web_service_target`, Apache/수집 상태는 기존 진단으로 확인한다. 기록0행·HTTP200·Apache active는 앱 정상/침해 부재·사건 종결 증명이 아니다. [범위·장애·복구](../infra/mcp/web-evidence.md).
 
-2026-11-04 KST. 운영의 최신 완료/실패/미확인은 [STATUS](../STATUS.md), 다음 작업은 [PLAN](../PLAN.md)을 기준으로 한다. [공식 지침 대조](SECURITY_GUIDELINES.md) · [신규 구축 준비도](INSTALLER_READINESS.md). 신규 설치기를 운영 서버에 재실행하지 않는다.
+2026-11-05 KST. 운영의 최신 완료/실패/미확인은 [STATUS](../STATUS.md), 다음 작업은 [PLAN](../PLAN.md)을 기준으로 한다. [공식 지침 대조](SECURITY_GUIDELINES.md) · [신규 구축 준비도](INSTALLER_READINESS.md). 신규 설치기를 운영 서버에 재실행하지 않는다.
 
 | 업무 | 실행·확인 기준 |
 |---|---|
@@ -29,3 +29,5 @@
 11/5 [사건관리 실패 표](../infra/hermes/incident-report-fallback.md)는 제어기 생성 실패 알림의 우회 경로를 제거했다. 기존 줄글은 이력으로 보존하고 형식 보완 게시를 구분한다. 실제 조치·승인·종결을 표 형식만으로 성공 처리하지 않는다. [DuckDNS 후보](../infra/validation/dns-noise/README.md)는 실제 정보성 metadata·질의/flow·자산/프로세스와 추가 행위를 대조하며, 같은 질의의 두 SID를 두 공격으로 세지 않는다. 원본 Bad Traffic 분류명은 보존한다. 정확 승인 카드 만료로 상관 룰 적용은 보류 상태이며 이 문서로 승인을 대신하지 않는다.
 
 11/5 [필수 사건 조회 범위](../infra/hermes/required-sensor-scope.md): 공통1.5.30/query1.19.25의 정확 읽기 안내·MCP 전 검사·실제 같은 읽기만 오류 해소를 기존 공통 gate/source_bundle 복사 경로로 연결했다. 설치39를 포함한 서버995PASS/skip0·B11파일 증분 확정, 새 패키지/권한/포트/키0이다. canonical 코드의 helper/Trace와 root의 포함 gate·reference를 같은 단위로 갱신한다. 실제 사건 판단/종결·새 OS 전체 설치는 별도다.
+
+11/5 [영향 조사·반복 표 오류 후속](../infra/hermes/web-impact-navigation.md): 현행 공통1.5.32/query1.19.27/security-events1.2.2. 선택적인 양끝 구분자를 공통 출력기에서 보완하고 실제 문제 게시물을 셀/작성자/채널 보존·형식만 수정, 내부 웹 앱에서 표1/pre0을 확인했다. 기존 gate/source_bundle/SDK·Native 복사 경로와 설치39검사를 사용하며 새 deb/wheel/image·키/포트·권한0이다. 실제 웹 사건 조사는 등록 탐색/백엔드까지 진행 후 시간초과로 미완료이며 과거 snapshot 잘림을 먼저 보완한다. 두 원본/원복과 운영 trace/승인/채팅을 보존한다.

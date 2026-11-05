@@ -33,7 +33,9 @@
     "verified_at_kst": "2026-11-05T21:15:29.677706+09:00",
     "receipt_documentation": "published_verified",
     "receipt_commit": "c211d7bc8a8ffbbd78a5fa69317f2e7e725bf117",
-    "receipt_verified_at_kst": "2026-11-05T21:19:25.024220+09:00"
+    "receipt_verified_at_kst": "2026-11-05T21:19:25.024220+09:00",
+    "UI_verification_commit": "2d9f9e52fb4a9b0c858db5cbdfc2df698b8d5db7",
+    "UI_verification_pushed_at_kst": "2026-11-05T21:30:44.586573+09:00"
   },
   "cleanup": {
     "Mac_task_directory_removed": true,
@@ -110,5 +112,14 @@
       "set": 9
     },
     "source_hashes_unchanged": true
+  },
+  "resume_cleanup": {
+    "Mac_files_removed": 14,
+    "Mac_bytes_removed": 50977,
+    "Mac_temporary_directory_absent": true,
+    "browser_profiles_remaining": 0,
+    "browser_processes_remaining": 0,
+    "temporary_sessions_logged_out": true,
+    "new_packages_or_runtime_deployment": false
   }
 }

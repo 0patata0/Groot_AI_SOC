@@ -27,3 +27,5 @@
 11/5 [공통 업무 스킬](../infra/hermes/workflow-skills.md) 보완: soc-output과 조회/사건/변경/복구4개 절차를 같은 canonical 원본으로 배포한다. 기존 단일deploy.sh의 SIEM23파일·SDK source_files·관리 source_bundle에 로더/flat 별칭을 연결하고 네 SKILL의 파일명 충돌을 검사했다. 설치 계약39·SIEM역할40PASS, 전체 서버1,091PASS/skip0. 기존 고정 의존성만 사용해 새 deb/wheel/image·키/포트는 없다. 운영은 A2/B30파일 증분 반영·확정했으며 새 OS 전체 설치는 실행하지 않았다. 권한/역할/정확 승인 강제는 SOUL와 서버 코드에 유지한다. 실제 조사 시간초과·새 UI/자동 자기개선 연결 등 남은 범위는 위 검증에 구분한다.
 
 11/5 [사건관리 실패 표](../infra/hermes/incident-report-fallback.md)는 제어기 생성 실패 알림의 우회 경로를 제거했다. 기존 줄글은 이력으로 보존하고 형식 보완 게시를 구분한다. 실제 조치·승인·종결을 표 형식만으로 성공 처리하지 않는다. [DuckDNS 후보](../infra/validation/dns-noise/README.md)는 실제 정보성 metadata·질의/flow·자산/프로세스와 추가 행위를 대조하며, 같은 질의의 두 SID를 두 공격으로 세지 않는다. 원본 Bad Traffic 분류명은 보존한다. 정확 승인 카드 만료로 상관 룰 적용은 보류 상태이며 이 문서로 승인을 대신하지 않는다.
+
+11/5 [필수 사건 조회 범위](../infra/hermes/required-sensor-scope.md): 공통1.5.30/query1.19.25의 정확 읽기 안내·MCP 전 검사·실제 같은 읽기만 오류 해소를 기존 공통 gate/source_bundle 복사 경로로 연결했다. 설치39를 포함한 서버995PASS/skip0·B11파일 증분 확정, 새 패키지/권한/포트/키0이다. canonical 코드의 helper/Trace와 root의 포함 gate·reference를 같은 단위로 갱신한다. 실제 사건 판단/종결·새 OS 전체 설치는 별도다.

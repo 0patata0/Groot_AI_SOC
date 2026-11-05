@@ -4,7 +4,7 @@ import json
 import types
 import unittest
 from unittest.mock import patch
-from test_soc_management_run import wrapper, definition, READ_NAMES, WRITE_NAMES
+from test_soc_management_run import wrapper, definition, READ_NAMES, WRITE_NAMES, Harness
 
 
 class Grounding(unittest.TestCase):
@@ -63,6 +63,45 @@ class Grounding(unittest.TestCase):
             params=request['tools'][0]['function']['parameters']
             self.assertEqual(params['properties']['since_kst']['enum'],[second['arguments']['since_kst']])
             self.assertEqual(params['properties']['until_kst']['enum'],[second['arguments']['until_kst']])
+
+    def test_required_scope_rejects_fraction_truncation_before_dispatch_without_repair(self):
+        plan=self.sensor_plan();args=plan[0]['arguments'];args['until_kst']='2026-11-04T19:00:00.598000+09:00'
+        bad=dict(args,until_kst='2026-11-04T19:00:00+09:00');before=copy.deepcopy(bad)
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            rejection=wrapper.required_sensor_input_rejection(plan[0]['tool'],bad,plan,[])
+            self.assertEqual(rejection['error'],'required_sensor_scope_mismatch')
+            self.assertFalse(rejection['executed']);self.assertFalse(rejection['mcp_executed'])
+            self.assertEqual(rejection['required_read'],plan[0]);self.assertEqual(bad,before)
+            self.assertTrue(wrapper.argument_error(rejection))
+            self.assertIsNone(wrapper.required_sensor_input_rejection(plan[0]['tool'],args,plan,[]))
+            tool=wrapper.initial_review_read(self.sensor_catalog(),[],sensor_requirements=plan)['tools'][0]
+            self.assertIn(args['until_kst'],tool['function']['description'])
+
+    def test_scope_guard_is_limited_to_pending_authenticated_sensor_reads(self):
+        plan=self.sensor_plan();name=plan[0]['tool'];args=plan[0]['arguments']
+        receipt={'tool':name,'source_ip':args['source_ip'],
+            'since':wrapper.parse_instant(args['since_kst']),'until':wrapper.parse_instant(args['until_kst'])}
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            for bad in (dict(args,source_ip='192.0.2.61'),dict(args,limit=1),dict(args,agent_id='001')):
+                self.assertIsNotNone(wrapper.required_sensor_input_rejection(name,bad,plan,[]))
+            self.assertIsNone(wrapper.required_sensor_input_rejection(name,{},plan,[receipt]))
+            self.assertIsNone(wrapper.required_sensor_input_rejection('mcp__resp__list_blocks',{},plan,[]))
+            self.assertIsNone(wrapper.required_sensor_input_rejection(name,{},[],[]))
+        with patch.dict(wrapper.os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertIsNone(wrapper.required_sensor_input_rejection(name,{},plan,[]))
+
+    @unittest.skipUnless(__import__("importlib.util").util.find_spec("jsonschema"), "server jsonschema required")
+    def test_native_dispatch_enforces_scope_without_mcp_execution_or_input_rewrite(self):
+        plan=self.sensor_plan();args=plan[0]['arguments'];args['until_kst']='2026-11-04T19:00:00.598000+09:00'
+        bad=dict(args,until_kst='2026-11-04T19:00:00+09:00')
+        h=Harness(self.sensor_catalog()['tools'])
+        def check(h):
+            denied=json.loads(h.registry.dispatch(plan[0]['tool'],bad))
+            self.assertEqual(denied['error'],'required_sensor_scope_mismatch')
+            self.assertEqual(h.dispatches,[]);self.assertEqual(h.wire_calls,[])
+            self.assertEqual(h.registry.dispatch(plan[0]['tool'],args),{'ok':True})
+            self.assertEqual(h.dispatches[0][1],args)
+        with patch.object(wrapper,'sensor_read_requirements',return_value=plan):h.run(check,'verify')
 
     def required_retry(self,plan,receipts,status=(),statuses=()):
         return wrapper.grounding_wrapper(lambda agent,**kw:'original',

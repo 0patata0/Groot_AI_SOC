@@ -916,6 +916,44 @@ def sensor_impact_verification_missing(text,requirements,receipts,linked_respons
     return bool(error) or incident_impact_missing(value,requirements,receipts,linked_response)
 
 
+def required_sensor_scope_error(name, payload, requirements):
+    """Only an unexecuted required-read refusal can be cleared by that read."""
+    for _ in range(8):
+        if isinstance(payload,str):
+            try:payload=json.loads(payload)
+            except ValueError:return None
+        elif isinstance(payload,dict) and set(payload)=={'result'}:
+            payload=payload['result']
+        elif (isinstance(payload,dict) and isinstance(payload.get('content'),list)
+                and len(payload['content'])==1 and isinstance(payload['content'][0],dict)
+                and payload['content'][0].get('type')=='text'):
+            payload=payload['content'][0].get('text')
+        else:break
+    if (not isinstance(payload,dict) or payload.get('error')!='required_sensor_scope_mismatch'
+            or payload.get('stage')!='before_mcp' or payload.get('executed') is not False
+            or payload.get('mcp_executed') is not False):
+        return None
+    wanted=payload.get('required_read')
+    if wanted not in requirements or not isinstance(wanted,dict) or wanted.get('tool')!=name:
+        return None
+    return name,canonical(wanted['arguments'])
+
+
+def corrected_required_sensor_read(name, args, payload, requirement):
+    wanted=requirement['arguments']
+    # Native progress serializes scalar arguments as text. Compare that audit
+    # representation only when the real MCP receipt confirms the numeric limit.
+    if (name!=requirement['tool'] or set(args)!=set(wanted)
+            or any(args[k]!=wanted[k] for k in ('source_ip','since_kst','until_kst'))
+            or type(args['limit']) not in (int,str) or str(args['limit'])!=str(wanted['limit'])
+            or type(payload.get('limit')) is not int or payload['limit']!=wanted['limit']):
+        return False
+    source=name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
+    return (payload.get('source_scope')=='wazuh_indexed_alerts' and payload.get('source')==source
+            and not payload.get('error') and isinstance(payload.get('alerts'),list)
+            and all(payload.get('requested_'+key)==args[key] for key in ('since_kst','until_kst')))
+
+
 class Trace:
     def __init__(self, store, case, run_id):
         self.store, self.case, self.run_id = store, case, run_id
@@ -928,6 +966,12 @@ class Trace:
         self.sca_receipts = []
         self.pending_sca_argument_errors = set()
         self.pending_event_time_errors = set()
+        required=dict(case).get('required_sensor_reads',[])
+        self.required_sensor_reads=[]
+        if required:
+            from soc_management_run import sensor_read_requirements
+            self.required_sensor_reads=sensor_read_requirements(canonical(required))
+        self.pending_required_sensor_errors=set()
         self.sensor_requirements = sensor_review_requirements(store.context(case["id"]))
         self.sensor_receipts = set()
         self.impact_receipts = set()
@@ -973,10 +1017,13 @@ class Trace:
             error = bool(event.get("is_error")) or tool_failed(event.get("output"))
             recoverable = missing_sca_policy_query(name, self.arguments[pending[0]["ordinal"]], event.get("output")) if error else None
             recoverable_time = event_time_query_scope(name, self.arguments[pending[0]["ordinal"]], event.get("output")) if error else None
+            recoverable_scope=required_sensor_scope_error(name,event.get('output'),self.required_sensor_reads) if error else None
             if recoverable:
                 self.pending_sca_argument_errors.add(recoverable)
             elif recoverable_time and self.sensor_requirements:
                 self.pending_event_time_errors.add(recoverable_time)
+            elif recoverable_scope:
+                self.pending_required_sensor_errors.add(recoverable_scope)
             else:
                 self.tool_error |= error
             with db:
@@ -1059,6 +1106,9 @@ class Trace:
                         "mcp__security_events__search_wazuh_alerts"):
                     source = name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
                     if payload.get("source_scope") == "wazuh_indexed_alerts" and payload.get("source") == source:
+                        for required in self.required_sensor_reads:
+                            if corrected_required_sensor_read(name,self.arguments[pending[0]['ordinal']],payload,required):
+                                self.pending_required_sensor_errors.discard((name,canonical(required['arguments'])))
                         self.impact_receipts.update(impact_read_timestamps(
                             name, self.arguments[pending[0]['ordinal']], payload, self.sensor_requirements))
                         for alert in payload.get("alerts", [])[:50]:
@@ -1098,7 +1148,8 @@ class Trace:
                   and self.result.get("exit_code") == 130):
                 detail = "model_interrupted_requires_review"
             state, due = "outcome_unknown", now
-        elif self.tool_error or self.pending_sca_argument_errors or self.pending_event_time_errors:
+        elif (self.tool_error or self.pending_sca_argument_errors or self.pending_event_time_errors
+                or self.pending_required_sensor_errors):
             state, detail, due = "needs_review", "model_tool_failure_requires_review", now
             # A review state must not publish the model's contradictory
             # "resolved/no further action" text after a failed tool call.

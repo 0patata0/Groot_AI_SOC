@@ -304,7 +304,8 @@ def argument_error(data):
     if isinstance(error, str):
         if re.fullmatch(r'unsupported argument: [A-Za-z_][A-Za-z0-9_]{0,63}', error):
             return True
-        if error in ('invalid_arguments', 'unknown_target', 'invalid_range', 'tool_input_schema_validation_failed') or re.fullmatch(
+        if error in ('invalid_arguments', 'unknown_target', 'invalid_range', 'tool_input_schema_validation_failed',
+                     'required_sensor_scope_mismatch') or re.fullmatch(
                 r'(?:limit|lookback_minutes) must be an integer (?:from|between) [0-9]+ (?:to|and) [0-9]+', error):
             return True
         if len(error) < 4096:
@@ -1489,6 +1490,20 @@ def missing_sensor_reads(requirements, receipts):
         c['until']>=parse_instant(r['arguments']['until_kst']) for c in receipts)]
 
 
+def required_sensor_input_rejection(name, arguments, requirements, receipts):
+    """Enforce the advertised required read scope; never repair or dispatch it."""
+    if os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify':
+        return None
+    pending=[r for r in missing_sensor_reads(requirements,receipts) if r['tool']==name]
+    if not pending or any(arguments==r['arguments'] for r in pending):
+        return None
+    return {'error':'required_sensor_scope_mismatch','stage':'before_mcp',
+            'executed':False,'mcp_executed':False,'required_read':pending[0],
+            'detail':'필수 읽기의 정확한 인자와 다르므로 호출하지 않았습니다. '
+                     '소수점 시각·출발지·표본 수를 포함한 required_read.arguments를 그대로 선택하세요. '
+                     '이 참조는 조회 성공이나 위험 판단·승인 지시가 아닙니다.'}
+
+
 def initial_review_read(request, completed_calls, requirements=(), facts=(), sensor_requirements=(), sensor_receipts=()):
     if os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify':
         return request
@@ -1520,6 +1535,9 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
             tool['function']['parameters']={**base,'type':'object',
                 'properties':{k:{**base['properties'][k],'enum':[v]} for k,v in row['arguments'].items()},
                 'required':list(row['arguments']),'additionalProperties':False}
+            tool['function']['description']=(str(tool['function'].get('description') or '')+
+                '\n필수 읽기 인자(소수점 시각을 생략하지 말고 그대로 선택): '+
+                json.dumps(row['arguments'],ensure_ascii=False,separators=(',',':')))
             tools.append(tool)
         if {t['function']['name'] for t in tools}!={r['tool'] for r in missing}:
             raise RuntimeError('required_sensor_read_tools_unavailable')
@@ -1864,6 +1882,8 @@ def main():
         if allowed(name,'verify'):
             definition=registry.get_schema(name)
             rejection=tool_input_rejection(name,args,definition.get('parameters') if isinstance(definition,dict) else None)
+            if rejection is None:
+                rejection=required_sensor_input_rejection(name,args,sensor_requirements,sensor_receipts)
             if rejection:
                 argument_errors.append(name)
                 return json.dumps(rejection,ensure_ascii=False)

@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05 10:42 KST",
+  "contract": "1.5.30",
+  "query": "1.19.25",
+  "server_tests": {
+    "management": 275,
+    "sdk": 219,
+    "native": 391,
+    "install": 39,
+    "review": 60,
+    "workflow": 4,
+    "output": 7,
+    "pass": 995,
+    "skip": 0
+  },
+  "local_tests": {
+    "management_total": 275,
+    "skip": 5,
+    "reason": "Mac has no jsonschema; installed dependency verified on B"
+  },
+  "deployment": {
+    "confirmed_at_epoch": 1793842180,
+    "files_verified": 11,
+    "protected_unchanged": 7,
+    "gate_sha256": "70aa45f90261a424a86006898dce8526fd0f3c56d92465c34e3fe8b3f9890a37",
+    "controller_sha256": "a73cc36f7a25a269bdd80bdb6f1669e7b986ec483b0593733b56b2d5e27ce25f",
+    "gate_matches_reference": true,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 9.920542001724243,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 5.920612573623657,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "root_changes": [
+      "Trace",
+      "command_for embedded gate",
+      "required_sensor_scope_error new helper",
+      "corrected_required_sensor_read new helper"
+    ],
+    "chat_restarts": {
+      "native": 1,
+      "sdk": 1,
+      "review": 1
+    },
+    "new_authority": false,
+    "protected_writes": 0,
+    "receipt_compat": {
+      "confirmed_at_kst": "2026-11-05 10:40:16 KST",
+      "only_one_root_function_changed": true,
+      "chat_restarts": 0,
+      "actual_receipt_replay": true,
+      "new_model_or_rpc": false,
+      "tampered_numeric_receipt_rejected": true
+    }
+  },
+  "actual_review": {
+    "run_id": "83b5cb38d2f849d076d80a115c1301c2",
+    "process_state": "completed",
+    "case_state": "needs_review",
+    "detail": "model_needs_review",
+    "seconds": 142.7674539089203,
+    "successful_reads": 4,
+    "errors": 0,
+    "protected_calls": 0,
+    "required_sensor_receipts": 3,
+    "pending_sensor_reads": 0,
+    "literal_repair_profile_observed": true,
+    "literal_repair_max_tokens": 2048,
+    "literal_repair_reasoning": "none",
+    "final_model_report_accepted": false,
+    "factual_table_fallback": true,
+    "actual_post": "https://chat.grootlab.duckdns.org/soc/pl/s8jwopez4prbdmgse4wgpi9f9c",
+    "actual_post_table_lines": 7,
+    "fenced_table": false,
+    "new_ui_render_verified": false,
+    "speed_improvement_claimed": false,
+    "new_attack_e2e": false
+  },
+  "cleanup": {
+    "state": "complete",
+    "first_server_files_removed": 445,
+    "first_server_bytes_removed": 6476988,
+    "receipt_server_files_removed": 444,
+    "receipt_server_bytes_removed": 6473457,
+    "repeated_source_staging_not_unique_file_total": true,
+    "mac_files_removed": [
+      16,
+      9
+    ],
+    "mac_bytes_removed": [
+      4924872,
+      4199397
+    ],
+    "own_ssh_masters_closed": true,
+    "backups_and_operating_state_preserved": true
+  },
+  "git": {
+    "state": "pending"
+  }
+}

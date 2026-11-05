@@ -302,6 +302,68 @@ class ControllerTests(unittest.TestCase):
         trace.accept({"type": "tool_result", "name": name, "is_error": error,
                       "output": json.dumps({"content": [{"type": "text", "text": json.dumps(payload)}], "isError": error})})
 
+    def scope_trace(self):
+        self.events(self.incident())
+        args={'source_ip':'192.0.2.60','since_kst':'2026-11-04T14:48:02.598000+09:00',
+              'until_kst':'2026-11-04T15:00:28.501000+09:00','limit':50}
+        required={'tool':'mcp__security_events__search_suricata_alerts','arguments':args}
+        case=dict(self.store.next_case(),mode='verify',required_sensor_reads=[required])
+        rid=self.store.start(case);trace=m.Trace(self.store,case,rid)
+        trace.accept({'type':'system','subtype':'init','session_id':'scope-repair-123'})
+        return trace,required
+
+    def scope_error(self,trace,required,**extra):
+        failure={'error':'required_sensor_scope_mismatch','stage':'before_mcp',
+                 'executed':False,'mcp_executed':False,'required_read':required,**extra}
+        bad=dict(required['arguments'],until_kst='2026-11-04T15:00:28+09:00')
+        self.tool(trace,required['tool'],failure,bad,error=True)
+
+    def scope_success(self,trace,required,**args_change):
+        args=dict(required['arguments'],**args_change)
+        payload={'source':'suricata','source_scope':'wazuh_indexed_alerts','alerts':[],
+            'limit':required['arguments']['limit'],
+            'requested_since_kst':args['since_kst'],'requested_until_kst':args['until_kst']}
+        self.tool(trace,required['tool'],payload,args)
+
+    def test_unexecuted_scope_refusal_requires_the_exact_successful_read_to_recover(self):
+        trace,required=self.scope_trace();self.scope_error(trace,required)
+        self.assertTrue(trace.pending_required_sensor_errors);self.assertFalse(trace.tool_error)
+        self.scope_success(trace,required,until_kst='2026-11-04T15:00:28+09:00')
+        self.assertTrue(trace.pending_required_sensor_errors)
+        self.scope_success(trace,required)
+        self.assertFalse(trace.pending_required_sensor_errors);self.assertFalse(trace.tool_error)
+        self.assertEqual(self.store.db.execute('select count(*) from tool_calls where run_id=? and is_error=1',
+            (trace.run_id,)).fetchone()[0],1)  # Preserve the failed attempt in the audit.
+
+    def test_scope_failure_cannot_finish_and_other_real_errors_are_never_erased(self):
+        trace,required=self.scope_trace();self.scope_error(trace,required)
+        self.result(trace,'미확인으로 남깁니다.\nMANAGEMENT_STATUS: monitor')
+        result=trace.finish(0);self.assertEqual(result['state'],'needs_review')
+        detail=self.store.db.execute('select detail from cases where id=?',(trace.case['id'],)).fetchone()[0]
+        self.assertEqual(detail,'model_tool_failure_requires_review')
+        self.scope_success(trace,required)
+        self.tool(trace,required['tool'],{'error':'transport_failure'},required['arguments'],error=True)
+        self.scope_success(trace,required);self.assertTrue(trace.tool_error)
+
+    def test_executed_or_unbound_scope_errors_do_not_enter_the_recoverable_exception(self):
+        trace,required=self.scope_trace();self.scope_error(trace,required,mcp_executed=True)
+        self.assertTrue(trace.tool_error);self.assertFalse(trace.pending_required_sensor_errors)
+        unbound=dict(required,arguments=dict(required['arguments'],source_ip='192.0.2.61'))
+        self.scope_error(trace,unbound);self.assertFalse(trace.pending_required_sensor_errors)
+
+    def test_native_text_limit_needs_the_actual_numeric_mcp_receipt(self):
+        trace,required=self.scope_trace();self.scope_error(trace,required)
+        self.scope_success(trace,required,limit='50')
+        self.assertFalse(trace.pending_required_sensor_errors)
+        args=dict(required['arguments'],limit='50')
+        payload={'source':'suricata','source_scope':'wazuh_indexed_alerts','alerts':[],
+            'limit':50,'requested_since_kst':args['since_kst'],'requested_until_kst':args['until_kst']}
+        self.assertTrue(m.corrected_required_sensor_read(required['tool'],args,payload,required))
+        for change in ({'limit':'50'},{'limit':True},{'limit':1},{'limit':None}):
+            self.assertFalse(m.corrected_required_sensor_read(required['tool'],args,dict(payload,**change),required))
+        for limit in ('050','50.0',True,1):
+            self.assertFalse(m.corrected_required_sensor_read(required['tool'],dict(args,limit=limit),payload,required))
+
     def shared_containment_trace(self, suffix='one'):
         owner = self.store.new_case('native-owner-' + suffix)
         cid = self.store.new_case('waf-reference-' + suffix)

@@ -1,6 +1,6 @@
 # Agentic SOC 실행 계획
 
-전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [이번 작업 전](archive/PLAN-before-dns-report-20261105.md) · [업무 스킬 전](archive/PLAN-before-workflow-skills-20261105.md) · [입력 검사 전](archive/PLAN-before-mcp-input-20261105.md) · [최소 종결 전](archive/PLAN-before-incident-parity-20261105.md) · [웹 읽기 전](archive/PLAN-before-web-evidence-20261104.md) · [영향 검사 전](archive/PLAN-before-incident-impact-20261104.md) · [직전 계획](archive/PLAN-before-gate-binding-20261104.md) · [사건 표 전](archive/PLAN-before-incident-review-20261104.md) · [조회 지연 전](archive/PLAN-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
+전체 목표는 **LLM이 MCP를 통해 실전 관제의 주체로 운용되고, 논문을 완성해2026-12-01 최종 발표하는 것**이다. active·미완료이며11/9까지 핵심 기능 마감을 목표로 한다. [현재 상태](STATUS.md) · [이번 작업 전](archive/PLAN-before-required-scope-20261105.md) · [실패 표/DNS 전](archive/PLAN-before-dns-report-20261105.md) · [업무 스킬 전](archive/PLAN-before-workflow-skills-20261105.md) · [입력 검사 전](archive/PLAN-before-mcp-input-20261105.md) · [최소 종결 전](archive/PLAN-before-incident-parity-20261105.md) · [웹 읽기 전](archive/PLAN-before-web-evidence-20261104.md) · [영향 검사 전](archive/PLAN-before-incident-impact-20261104.md) · [직전 계획](archive/PLAN-before-gate-binding-20261104.md) · [사건 표 전](archive/PLAN-before-incident-review-20261104.md) · [조회 지연 전](archive/PLAN-20261104-before-lookup-latency.md) · [하네스 정리 전](archive/PLAN-20261104-before-harness-cleanup.md) · [웹 E2E 전](archive/PLAN-20261104-before-web-e2e.md) · [표 보완 전](archive/PLAN-20261104-before-table-chunks.md) · [FW 대화 보완 전](archive/PLAN-20261104-before-fw-chat.md) · [FW 선택 전](archive/PLAN-20261104-before-fw-scope.md) · [룰 감사 전](archive/PLAN-20261104-before-rule-audit.md) · [웹 정책 적용 전](archive/PLAN-20261104-before-web-policy.md) · [전체 과거 이력](archive/PLAN-history-20261101.md).
 
 ## 역할과 승인
 
@@ -67,12 +67,12 @@ OpenClaw·Google Harness²·SSL VPN/모바일 푸시는 후보/검토 범위다.
 
 [Native 입력 검증](infra/hermes/mcp-input-validation.md)의 실제 새 사건은149.645초/8읽기0오류·monitor이며 실제영향/종결/보고전체정확성은 미완료다. 원본 보고/조회영수증을 보존하고 시각·의미 오류를 우선 개선한다. 보호된 조치를 오류 교정 명목으로 재실행하거나 승인 경계를 낮추지 않는다.
 
-[업무 공통 스킬](infra/hermes/workflow-skills.md)의5개 절차와 역할/권한/정확 승인 강제를 유지한다. 현재 공통1.5.29/query1.19.24/security-events1.2.1이다. [사건 실패 표](infra/hermes/incident-report-fallback.md)는 일반 오류·SILENT 경로도 실제 공통 표로 연결해 B확정/실제 게시 본문을 확인했다. 이번 UI는 CUA 오류로 미검증이며 과거 줄글을 소급 덮지 않는다.
+[업무 공통 스킬](infra/hermes/workflow-skills.md)의5개 절차와 역할/권한/정확 승인 강제를 유지한다. 현재 공통1.5.30/query1.19.25/security-events1.2.1이다. [사건 실패 표](infra/hermes/incident-report-fallback.md)는 일반 오류·SILENT 경로도 실제 공통 표로 연결해 B확정/실제 게시 본문을 확인했다. 이번 UI는 CUA 오류로 미검증이며 과거 줄글을 소급 덮지 않는다.
 
 | 바로 다음 범위 | 완료 기준·현재 한계 |
 |---|---|
 | DuckDNS 상관 후보 | [14조건 통과 후보](infra/validation/dns-noise/README.md)는 정확 카드 만료로 운영 미적용. 승인된 동일 후보만 worker의 구문/재시작·readback/건강 확인 후 canonical 초기 룰에 동기화. 이름·사설 IP·정보성 표지만으로 정상/승인 판정 금지 |
-| Native 조사·SDK 판단 | 새 Native129.206초/5성공읽기+스키마거절1·needs_review. 알려진 고정 근거 정정의 제한 프로필은 실제 미사용이므로 속도 개선 판정0. 필수 후속 시각 소수점 경계와 광고된 스키마 준수·의미 있는 오류 복구, 자산/프로세스 근거 확보·실제 영향/종결 확인 |
+| Native 조사·SDK 판단 | 소수점 구간 생략과 기본 스키마/광고 범위 차이를 [정확 범위 검사](infra/hermes/required-sensor-scope.md)로 보완·995검사/B11파일 확정. 실제 읽기 전용run20은142.767초·4성공읽기/오류0·필수센서3/3, 사실 해석은 재거절/표 대체·needs_review. Native 인자 정규화/registry와wire 경계·앱/호스트 영향 추가조사와 판단을 다음 확인 대상으로 둔다. 이전 Native129.206초/5성공읽기+스키마거절1·needs_review. 알려진 고정 근거 정정의 제한 프로필은 실제 미사용이므로 속도 개선 판정0. 필수 후속 시각 소수점 경계와 광고된 스키마 준수·의미 있는 오류 복구, 자산/프로세스 근거 확보·실제 영향/종결 확인 |
 | 사건 출력·채팅 | 실패 표의 실제 API 본문은 확인, 새 브라우저/정기 카드/초장문 행·새 SDK/Native 전체 오류와 정상 출력 회귀는 별도. 과거 게시물·실패 결과·알림 재전송의 비재실행 원칙 유지 |
 
 이번 서버 회귀1,081PASS/skip0과 networknone native14조건을 실제 네트워크 공격/모델 정확성/새 OS설치로 대체하지 않는다. 다음 공격·보호 적용·학습/176독립 비교·논문 최신PDF·발표 작성 시기 등 위 잔여를 유지한다. 자동 skill_manage 자기수정·운영 배포 권한을 추가하지 않았다.

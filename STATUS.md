@@ -13,7 +13,7 @@
 | 최종 보고 |단문7·복합9읽기/오류0/쓰기0, 실제15·19근거표/인용·unresolved/needs_review |반복 Apache 조회·모호한 후속계획/영문 혼재·Wazuh 표본 범위 표현 잔여. 같은 사건 개발시험, 공유GPU 통제 없음 |
 | 자동 후속 |이전 세션 재사용 입력227,602→247,679B, 첫 도구 선택63.063초 원인 확인 |214.652초/7읽기·오류0·쓰기0, 시간초과·outcome_unknown. 새 요청 비교와 분리 |
 | 검사·배포 |최종 고유1,051PASS/최종skip0, B9파일4회 후보·보호7, root59,735B·원복확정no-op,03:02 최종11파일/4서비스·양봇worker·세큐유휴 |후보1,058/1,059검사와 최종 숫자 구분. 새OS 설치/수동복구/공격·부하·PCAP0 |
-| 정리·Git |서버 시험소스1,756/기록32 SHA 대조 후 정리, 복구본4곳·DB/trace 보존 |Mac 자체임시 47파일 감사 후 삭제·부재 확인. 공개 파일 커밋·푸시 진행 중. 기존 topology5 stage·Ansible2·NAT3 보존 |
+| 정리·Git |서버 시험소스1,756/기록32 SHA 대조 후 정리, 복구본4곳·DB/trace 보존 |Mac 자체임시 47파일 감사 후 삭제·부재 확인. 소스/문서25ad22c 푸시·원격main 일치 확인. 게시 영수증은 후속 문서 커밋에 포함. 기존 topology5 stage·Ansible2·NAT3 보존 |
 
 [후보 비교·미채택·복구](infra/hermes/review-input.md) · [최종 검증 원장](infra/hermes/review-input.validation.json) · [직전 정정 검증](infra/hermes/report-feedback.md). 안정적인30초·최종보고 품질·일반 채팅 전체지연은 미완료다.
 

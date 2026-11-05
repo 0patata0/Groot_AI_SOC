@@ -1428,7 +1428,10 @@
     "audit": "대화기록/검증/2026-11-06-review-input/helper-audit"
   },
   "git": {
-    "source_commit": "pending",
-    "remote_verified": false
+    "source_commit": "25ad22c58e4356a6237c9f1d96597d0ad54ce733",
+    "remote_main": "25ad22c58e4356a6237c9f1d96597d0ad54ce733",
+    "remote_verified": true,
+    "verified_at_kst": "2026-11-06T03:06:19.386756+09:00",
+    "publication_receipt_followup": "This receipt is committed separately; final receipt commit is recorded in local session history."
   }
 }

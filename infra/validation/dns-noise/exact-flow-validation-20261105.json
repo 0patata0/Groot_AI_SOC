@@ -195,7 +195,10 @@
     "end_to_end_indexed_no_alert_is_not_delivery_proof": true
   },
   "git": {
-    "state": "pending"
+    "state": "source_published_remote_verified",
+    "source_commit": "b653a2826dd97bbd6f3a4455d1962cac59b4823d",
+    "verified_at_kst": "2026-11-05T18:23:50.181906+09:00",
+    "publication_receipt": "This receipt is recorded in the following documentation commit; final head is local-only."
   },
   "installer_source_sha256": "5301922c17fae6729dc0f29eb3884f01ddacce3c40a79effc5a63654596f03bc"
 }

@@ -169,7 +169,11 @@
     }
   },
   "git": {
-    "state": "pending"
+    "state": "source_published_and_verified",
+    "source_commit": "4882fd956be487eb8eac38d7e0726995943cc2b2",
+    "remote_main_at_source_publication": "4882fd956be487eb8eac38d7e0726995943cc2b2",
+    "verified_at_kst": "2026-11-05T10:18:23.307057+09:00",
+    "publication_receipt": "STATUS and this small ledger are recorded in a separate documentation commit; final receipt is local-only"
   },
   "cleanup": {
     "state": "completed_with_initial_logtest_session_limit",

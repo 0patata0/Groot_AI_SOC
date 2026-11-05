@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05 18:22 KST",
+  "cause": "one_mib_log_append_bound_reached",
+  "measurement_status": "ok",
+  "before_log_bytes": 1048268,
+  "log_limit_bytes": 1048576,
+  "before_source_sha256": "06f86308c66fedde9c9be219f2f65984fac57b7cf8a5c6d604d1cc843e18ce0c",
+  "source_sha256": "acab636ed0a35f533d6a0cef83cf5c93fdb7ec1e117239bb7d589f0cb2ba80b1",
+  "tests": {
+    "linux_native_passed": 24,
+    "strict_separate_bind_mount_full_rotation_passed": 1,
+    "operating_input_injection": 0
+  },
+  "live": {
+    "b_service_result": "success",
+    "failed_units_after_scoped_reset": 0,
+    "collector_offset_observed": 2044,
+    "old_content_preserved_bytes": 1048268,
+    "old_content_sha256": "5d7d14f55b93a6512a4ed4ca2c5834913e1af87476a6d74cf7149bd91424748d",
+    "recovery_backup": "/var/lib/capstone-storage-relay-fix/20261105-r1/deployment-r4",
+    "recovery_confirmed": true,
+    "recovery_noop_verified": true,
+    "manual_rollback_tested": false,
+    "next_natural_cycle_verified": true,
+    "natural_cycle_started_kst": "2026-11-05 18:17:00 KST",
+    "natural_cycle_exit_kst": "2026-11-05 18:17:04 KST",
+    "collector_full_sha1_matches": true
+  },
+  "initial_failures_retained": [
+    "prefix_hash_assumption_rejected",
+    "cross_bind_mount_mv_inode_postcheck_rejected_original_bytes_preserved",
+    "first_recovery_timer_fired_before_confirmation"
+  ],
+  "limits": [
+    "archive_count_1024_no_automatic_deletion",
+    "checkpoint_is_collector_evidence_not_cryptographic_source_authentication",
+    "copy_unlink_crash_requires_operator_reconciliation",
+    "portable_fresh_os_legacy_relay_not_installed_or_validated"
+  ],
+  "git": {
+    "state": "pending"
+  }
+}

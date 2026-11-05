@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-05 15:40 KST
+# 인프라 현황 — 2026-11-05 18:22 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. 핵심 기능11/9 마감 목표를 유지한다. 사용자가11/5 발표 제작을 새로 지시해 기존11월둘째주 작성 대기를 해제했고, 최종 전달 형식은 웹 호스팅 없는 다운로드 PDF로 정했다. [계획](PLAN.md) · [이번 작업 전 상세](archive/STATUS-before-native-read-20261105.md) · [전체 과거 이력](archive/STATUS-history-20261101.md).
 
@@ -6,19 +6,20 @@
 
 | 과제 | 완료·실제 확인 | 남은 범위 |
 |---|---|---|
+| 현재 사용자 우선 작업 | DNS 정확 후보21조건·승인 후 운영SHA5301922c 적용 확인. B 저장 모니터1MiB 한도 실패 원인·원본1,048,268B 보존/새 로그 전달 exit0. 233 Desktop 생성시각 조사·본인 반입 기록 밖/생성자 미확정 | 저장24native+별도bind회전1·18:17자연주기/수집EOF 성공, DNS 실제16원문→운영native제외 확인. FW 체인 통합·A/B/C IPv6 전면 비활성화·추가PCAP 시험 진행 중. 원본 세대 durable 검증 대기는 별도 추적. 20:30 KST 명시 일시정지, 20:15 이후 장기 새 작업 중단 |
 | 요청별 필수 읽기 선택 | query1.19.32/common1.5.32·고유983PASS/최종skip0·B9파일/보호7SHA 확정.6모델 JSON→Native7읽기/70.659초·현재요청/nonce/등록 스키마 검증 | 실제85ddc3c6는 추가4조회 포함11MCP/오류0 뒤214.346초 시간초과. 표본0을 부재로 해석한 사실 정정/최종 보고·일반 지연은 미완료. [범위·실측·복구](infra/hermes/native-read-selection.md) |
-| IDS 영향 안내·보고 표 | query1.19.30/common1.5.32. 실제 교차 WAF 경로→등록 후보/호스트 우선 안내·필수 읽기 진전별 제한 continuation.965PASS/skip0·B고유15/보호7SHA 확정. 기존 operation7행 표·실제 내부UI table1/pre0/KST 확인 | 4b91efb9는8조회/오류0·c:dvwa/agent002→host6·backend49행 뒤214.318초 시간초과/outcome_unknown. C 후보는 프런트 확정/침해부재가 아님. 묶음 후보966검사는통과했으나 실제0조회로 미승격·운영1.19.30 복구. 필수도구 선택 미보장/엄격 JSON무실행시험 확인·호환 어댑터는 미구현. [근거·범위](infra/hermes/ids-impact-report.md) |
+| IDS 영향 안내·보고 표 | query1.19.30/common1.5.32. 실제 교차 WAF 경로→등록 후보/호스트 우선 안내·필수 읽기 진전별 제한 continuation.965PASS/skip0·B고유15/보호7SHA 확정. 기존 operation7행 표·실제 내부UI table1/pre0/KST 확인 | 4b91efb9는8조회/오류0·c:dvwa/agent002→host6·backend49행 뒤214.318초 시간초과/outcome_unknown. C 후보는 프런트 확정/침해부재가 아님. 묶음 후보966검사는통과했으나 실제0조회로 미승격·운영1.19.30 복구. 필수도구 선택 미보장/엄격 JSON무실행시험 확인·현재는1.19.32 읽기 어댑터가 운영 반영됐으며 첫 행의 새 실측을 따른다. [근거·범위](infra/hermes/ids-impact-report.md) |
 | 자동 후속 상태·실행 인자 | query1.19.28/common1.5.32. 모든 verify에 실제 연결 owned/shared 상태 요구·정확 ID 안내. 서버935PASS/skip0·B고유9SHA/보호7SHA/자동공유요구1·센서3·양WS/worker 확인 | operation2읽기/오류0·73.448초로 변경절차 completed·이후 기존 보고의 표 형식 보완. IDS4읽기/오류0·190.519초·상태1/센서3충족, 호스트영향 미조회로 종결거절/needs_review. 이번 인자초과0MCP실패는49,963B 압축으로 수정. [원인·검증·복구](infra/hermes/shared-status-verification.md) |
 | 추가PCAP·양Kali 설명 | 새7PCAP/정답PDF2·모든파일/설명SHA양쪽동일. 232만100,006패킷 처리7/7·초기29경보. 실제HTTP97정상/3공격대조 모두예상응답, Native600초차단·카드·만료/302복구 확인 | 233송신0·새실행객체추출0/학습0. 정상DNS TLD3신호·midstream별도48HTTP복원/운영설정0. LLM검증/시각공백은아래. [파일·실제결과·한계](infra/validation/pcap-web/PUBLIC_PCAP_20261105.md) |
 | 표가 텍스트로 표시 | 공통 정규화기가 양끝 구분자 없는 머리글을 놓친 원인 수정. 사건관리/SDK/Native3복사본 배포·원 게시물 형식만 제자리 수정. 실제 Mattermost 내부 웹 앱에서 표1개/코드블록0·스크린샷 확인 | 셀·작성자·채널 유지, 중복 조사/게시0. 공개 HTTPS UI 경유와 모든 카드/초장문 행 전수는 별도. [원인·실제 게시·복구](infra/hermes/web-impact-navigation.md) |
 | 웹 영향 추가 조사 | 당시공통1.5.32/query1.19.27/security-events1.2.2. 실제 WAF 경로→등록 대상/agent→사건 구간 백엔드/호스트 읽기 안내·단계별 제한 continuation. 수집 agent와 출발지 구분·정정 보고 반복 축소 | run21 161.187초/7성공+1거절·추가조회0/needs_review. run22 214.360초/6성공·오류0/보호0·실제 대상/백엔드 조회까지 진행했으나 호스트/최종보고 전 시간초과·outcome_unknown. 판단·종결·지연 향상 미완료. [검증](infra/hermes/web-impact-navigation.md) |
 | 과거 웹 접근 근거 | 정제 이력에서 구간/서비스를 먼저 검색하도록 C3/B2파일 확정·85검사. 실제 MCP가 최근10k에서 빠진10/22 DVWA1행을 SHA동일 복구. 전체 정제14,143행/잘림false·최근10k는 유지 | 기존11/4 사건 구간은0행·malformed9/연속성 미확인. 모델 host/사후 판단·장기/전체 무손실 아님. 채팅/Apache 재시작0. [실제 검증·복구](infra/mcp/web-history.md) |
 | 필수 센서 구간 | 정확 소수점 시각·인자 안내/MCP 전 검사·같은 실제 읽기만 오류 회복. 이전 run20 필수3/3·4읽기/오류0 | 당시 본문 사실 검사 거절/표 대체. 입력 회복을 정확한 사건 판단/종결로 대체하지 않음. [이전 검증](infra/hermes/required-sensor-scope.md) |
-| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 정확 카드 만료·운영 룰 미적용. 도메인 전체 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
+| DNS 정보·상관 | 원본 Informational/Bad Traffic metadata·DNS/flow 근거·동일 질의 중복 해석 구분. Wazuh100112 후보 격리14조건 PASS | 오전 광역 정보성 후보는 만료/미적용. 새 지정 흐름·정보성SID2개만 제외하는21조건 후보는 승인/운영 SHA 확인. 새8질의의16원문→운영native100115/level0 확인·원문 보존. 수집 세대 검증 대기는 별도 추적. 도메인/악성DNS 광역 면제 없음. [후보/실제 상태](infra/validation/dns-noise/README.md) |
 | 단문·담당·공통 스킬 | 일반 조회 Ollama 우선/partial만으로 Hermes 호출0. 출력·조회·조사·변경·복구5개 SKILL 공통 연결. 새 SDK FW11.681초/1MCP·Hermes 직접 상태조회34.147초/4MCP 표본 | 공유 GPU·채팅 평균 지연/전체 역할 품질 보장 아님. Native discovery·승인·역할 강제 유지. [스킬](infra/hermes/workflow-skills.md) · [지연](infra/hermes/lookup-latency.md) |
 | 공개 웹·실제 대응 | WAF On/UI·API 경유·제어 관리자231/32+인증. 단일 DVWA SQLi WAF403→Wazuh→LLM4MCP→600초FW/카드→만료/정상HTTP 확인 | 첫 차단 약146.4초/1표본. 실제 Log4 앱503·등록 HTTP3개 기존 중지·다른 공격/유지·해제 승인/재차단·사건 종결 미완료. [경로](infra/validation/web-policy/README.md) · [단일 E2E](infra/validation/web-e2e/README.md) |
 | 룰 중복·관리 경로 | IDS7쌍 전체 룰 격리 전후14조건/유지9경보 동일. Wazuh17쌍 중8쌍 양성/음성 확인. A관리접속 관리자231/32·내부 MCP B 한주소 | 운영 룰 통합 미적용·Windows9쌍/참조/업데이트 지속성·FW/egress/B·C 컨테이너 경로 잔여. [룰 감사](infra/validation/rule-overlap/README.md) |
-| 논문·발표·초기 설치 | 논문5.12.4까지 실제 조회/실패·한계 반영·이전본 보존. 발표는 로컬 전용 폴더에16:9 PDF20쪽(본문16/부록4), 발표자 메모685초·전20쪽 시각 검수. 초기 설치는 단일deploy.sh source 복사·계약 확인 | 최신 논문PDF/제출규격·발표 리허설/최종 성능 갱신·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
+| 논문·발표·초기 설치 | 논문5.12.5까지 실제 조회/실패·한계 반영·이전본 보존. 발표는 로컬 전용 폴더에16:9 PDF20쪽(본문16/부록4), 발표자 메모685초·전20쪽 시각 검수. 초기 설치는 단일deploy.sh source 복사·계약 확인 | 최신 논문PDF/제출규격·발표 리허설/최종 성능 갱신·미사용176독립평가/전 업무/새3VM 설치 미완료. NCSC/NIS 부분 대조는 인증 아님. [구축](deployment/INSTALLER_READINESS.md) · [운영](deployment/OPERATIONS.md) |
 
 ## 유지하는 운영 조건
 
@@ -52,4 +53,4 @@ OpenClaw/Harness²·SSL VPN/모바일·GPU 드라이버 장기 원인과 새 OS3
 | 논문·발표 | 논문5.12.5에 실제 선택 회복/시간초과·한계 반영·이전본 보존. 발표 PDF20쪽/메모는 직전 검수본 유지·웹 호스팅0/Git 제외. 최신 논문PDF/최종 평가·발표 리허설은 잔여 |
 | Git | 공개16경로 소스24494ef을15:44:08 KST 커밋·푸시/실제원격main 일치 확인. 이 게시 영수증은 후속 커밋으로 분리하며 발표/논문·자격/원문/가중치는 포함하지 않음 |
 
-사용자가15:50 KST 전 이번 작업 마감을 요청했다. 새 시험은 중단하고 검증·기록·정리·게시를 마친다. 전체목표는 active·미완료다. 지정 Native 선차단 예외와 최신 LLM 선판단 원칙의 정합·독립176/전체E2E/새OS설치도 별도 잔여다.
+15:50 마감은 완료한 이전 단위다. 사용자가17:09 재개와20:30 KST 일시정지를 지정했다. 현재 DNS/저장 전달/FW·IPv6/추가PCAP 작업 중이며 아직 Git 게시 전이다. 전체목표는 active·미완료다. 지정 Native 선차단 예외와 최신 LLM 선판단 원칙의 정합·독립176/전체E2E/새OS설치도 별도 잔여다.

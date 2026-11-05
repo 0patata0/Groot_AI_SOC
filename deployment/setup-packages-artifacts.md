@@ -687,3 +687,5 @@ SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하�
 2026-11-05 IDS 영향·라벨 보고 표: 공통1.5.32/query1.19.30의 gate/query/공통 formatter·출력 소스만 기존 반입 경로로 갱신한다. 새 deb/wheel/image·라이브러리/권한/키·포트0. 초기 설치 렌더·소스 계약40을 포함한 고유965검사와 실제 배포·화면/실패 범위를 [후속 검증](../infra/hermes/ids-impact-report.md)에 분리한다.
 
 2026-11-05 Native 필수읽기 후속: query1.19.32/공통1.5.32, controller verify의 현재 pending-read/turn/nonce·등록 스키마를 모델 JSON과 결속해 기존 Native registry로 실행한다. 초기 설치는 같은 source 복사/불변 gate 렌더·SIEM11435 URI 치환을 사용하며 새 의존성·포트·키·권한은 없다. 고유983검사와 실제7필수조회/최종 시간초과·복구 범위는 [후속 검증](../infra/hermes/native-read-selection.md)을 따른다. 전체 사건 종결·새 OS 설치 성공은 아니다.
+
+2026-11-05 DNS 지정 흐름/저장 전달 후속: 승인·운영 반영된 `infra/groot-b/local_rules.xml` SHA5301922c…와 DNS 격리 재현 소스를 기존 소스 묶음에 포함한다. 단일deploy.sh의 SIEM 규칙 복사 경로는 동일하다. 기존 B relay 보완은 `infra/automation/storage-retention/wazuh/relay-b.sh`·검사·설치 계약/복구 원장을 함께 반입하며 기존 Python3와 GNU 도구만 쓴다. 새 deb/wheel/image·MCP 권한·키·포트0. portable 새 OS에 기존 랩 고정 경로 relay를 자동 설치한 것으로 표시하지 않는다. [DNS 범위](../infra/validation/dns-noise/README.md) · [전달/회전](../infra/automation/storage-retention/wazuh/README.md).

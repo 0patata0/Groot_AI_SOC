@@ -1,6 +1,8 @@
-# DuckDNS 정보성 경보와 상관 집계 후보
+# DuckDNS 정보성 경보와 지정 DNS 흐름 예외
 
-2026-11-05 KST. [현황](../../../STATUS.md) · [작은 원장](validation.json) · [정확 후보](candidate.xml) · [승인 카드](https://chat.grootlab.duckdns.org/soc/pl/ejs6odcpuifu7jc8m4a9ndpkdc). **운영 Wazuh 룰은 미적용**이다. 정확 후보 카드는10:10:56 KST 만료됐고10:12:23 실제 helper에서 expired와 운영 원본SHA 유지를 확인했다. 승인 없이 재발급·적용하지 않았다.
+2026-11-05 KST. **18:05 후속:** [지정 흐름 예외](exact-flow-candidate.xml)는21개 native 격리 조건 통과 후 [정확 카드](https://chat.grootlab.duckdns.org/soc/pl/bgkzq3gqdbbq5m4txuzhg1fiay) 승인·운영 적용/SHA 확인을 마쳤다. 아래 오전 정보성 일반 후보의 만료 이력과 구분한다. [현재 원장](exact-flow-validation-20261105.json).
+
+ [현황](../../../STATUS.md) · [작은 원장](validation.json) · [정확 후보](candidate.xml) · [승인 카드](https://chat.grootlab.duckdns.org/soc/pl/ejs6odcpuifu7jc8m4a9ndpkdc). **아래 오전 일반 정보성 후보는 미적용 이력**이다. 현재 지정 흐름 후보는 첫 문단과 아래 후속 절을 따른다. 정확 후보 카드는10:10:56 KST 만료됐고10:12:23 실제 helper에서 expired와 운영 원본SHA 유지를 확인했다. 승인 없이 재발급·적용하지 않았다.
 
 ## 실제 원인과 반영 범위
 
@@ -44,3 +46,13 @@ B context5파일09:41:48·report/helper6파일10:00:15 확정. 보호 설정7SHA
 새 SDK 질문은69.360초/모델3·실제MCP1·쓰기0/partial였다. Informational은 실제 전달됐으나 모델이 이름/사설주소만으로 정상·서비스 초기화·광역 suppress를 주장한 초안은 근거 검사에 거절됐다. 정보 전달 성공을 사건 판단 성공으로 표시하지 않는다. 등록 서비스/발신 프로세스 근거와 정확한 판단·형식 보정은 계속 보완할 항목이다.
 
 [사건 실패 표 보완](../../../infra/hermes/incident-report-fallback.md)은 별도다. 전체 모델 정확성·상관 해석·사건 종결·새 브라우저 렌더링·실제 새 DNS/공격 E2E는 미완료다.
+
+## 현재 적용한 지정 흐름 예외
+
+`src_ip=192.168.16.230`, `dest_ip=168.126.63.1`, `dest_port=53`, TCP/UDP·app_proto=dns, SID2022918/2042936, 원본 Informational·severity2/3를 모두 만족하는 경우만100115/level0/no_log로 경보/급증 집계에서 제외한다. Suricata 원문은 보존한다. 다른 출발지·리졸버·포트·악성 DNS SID·메타데이터 누락·고위험 변화는 기존 단건과8/120초 상관 경보를 유지한다. 전체 DNS나 DuckDNS 도메인을 신뢰하거나 자동 차단 보호 범위를 확대한 것이 아니다.
+
+21조건은 [재현 입력/고정 client](exact_flow_regression.py)와 원장의 범위를 따른다. 운영 worker가 정확 승인을 소비하고 native 검사를 거쳐 적용했으며, canonical `infra/groot-b/local_rules.xml`을 같은 SHA로 동기화했다. 기존 deploy.sh→SIEM 역할의 규칙 복사 경로가 같은 파일을 사용한다. 새 OS 설치는 하지 않았다.
+
+8개 실제 DNS 질의 중6응답·2timeout을 확인했지만 최초 probe가 과거 `eve.json` 파일을 읽어 새 센서 경보를 직접 대조하지 못했다. 경보0만으로 전체 경로 성공을 주장하지 않으며, 현재 관리 세대의 센서 원문과 Wazuh를 후속 대조한다. 오전 후보/카드·원 경보는 지우지 않는다.
+
+18:14 후속: 실제 활성24세대에서 위8질의의16개 SID 원문·DNS8·flow8을 확인했다. 운영 Wazuh의 별도 logtest 세션에 이 실제16개를 대조해 모두100115/level0·burst0·세션삭제를 확인했다. 이는 분석 엔진의 실제 예외 판정이며, 센서 원문 삭제나 과거 경보 소거가 아니다. 18:19 A의 새 inode와 수집 offset413,084B는 진전했으나 durable 세대 phase는 new_reader_checkpoint_pending으로 남아 별도 점검한다.

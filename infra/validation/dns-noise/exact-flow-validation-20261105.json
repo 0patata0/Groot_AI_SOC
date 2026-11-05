@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05 18:22 KST",
+  "state": "approved_applied_real_dns_source_and_native_rule_verified",
+  "before_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+  "after_sha256": "5301922c17fae6729dc0f29eb3884f01ddacce3c40a79effc5a63654596f03bc",
+  "exact_tuple": {
+    "source": "192.168.16.230",
+    "destination": "168.126.63.1",
+    "destination_port": 53,
+    "protocols": [
+      "UDP",
+      "TCP"
+    ],
+    "app_proto": "dns"
+  },
+  "additional_required_conditions": {
+    "sids": [
+      2022918,
+      2042936
+    ],
+    "severity": [
+      2,
+      3
+    ],
+    "provider_severity": "Informational"
+  },
+  "exception_leaf": {
+    "id": 100115,
+    "level": 0,
+    "no_log": true
+  },
+  "raw_sensor_evidence_retained": true,
+  "native_isolated": {
+    "passed": 21,
+    "cases": [
+      {
+        "name": "exact_udp_information",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "exact_second_sid_information",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "exact_tcp_information",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "other_source_232",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "other_source_233",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "other_resolver",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "other_port",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "not_dns",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "wrong_protocol",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "missing_metadata",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "noninformational",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "other_dns_signature",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "changed_high_severity",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "real_high_burst",
+        "burst_at": [
+          8
+        ],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "real_medium_burst",
+        "burst_at": [
+          8
+        ],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "excluded_then_one_attack",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "excluded_then_attack_burst",
+        "burst_at": [
+          24
+        ],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "other_source_information_burst",
+        "burst_at": [
+          8
+        ],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "missing_metadata_burst",
+        "burst_at": [
+          8
+        ],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "high_information_burst",
+        "burst_at": [
+          8
+        ],
+        "pass": true,
+        "session_removed": true
+      },
+      {
+        "name": "different_sources_not_combined",
+        "burst_at": [],
+        "pass": true,
+        "session_removed": true
+      }
+    ],
+    "network": "none"
+  },
+  "approval": {
+    "proposal_id": "3f50acbc9ccb9dd49bdcc77007ce3c21",
+    "post": "https://chat.grootlab.duckdns.org/soc/pl/bgkzq3gqdbbq5m4txuzhg1fiay",
+    "executor_status": "applied",
+    "result": "approved exact proposal applied and service checked"
+  },
+  "live_benign_query_trial": {
+    "queries": 8,
+    "received": 6,
+    "timeouts": 2,
+    "sensor_alerts_in_selected_eve_slice": 0,
+    "complete_e2e_claim": false,
+    "sensor_alerts_in_actual_active_generation": 16,
+    "raw_dns_events": 8,
+    "production_native_rule_100115_level0": 16,
+    "production_native_session_removed": true,
+    "raw_generation_phase": "publish_pending",
+    "end_to_end_indexed_no_alert_is_not_delivery_proof": true
+  },
+  "git": {
+    "state": "pending"
+  },
+  "installer_source_sha256": "5301922c17fae6729dc0f29eb3884f01ddacce3c40a79effc5a63654596f03bc"
+}

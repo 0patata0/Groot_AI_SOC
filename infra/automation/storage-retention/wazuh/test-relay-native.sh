@@ -50,6 +50,7 @@ setup() {
     FIXTURE=$ROOT/fixture
     SR_LIB=$FIXTURE/lib; SR_STATE=$FIXTURE/state; SR_VOLUME=$FIXTURE/volume
     SR_LOG=$SR_VOLUME/capstone-storage-b.log
+    SR_CHECKPOINT=$FIXTURE/checkpoint.json
     mkdir -m700 "$SR_LIB" "$SR_STATE" "$SR_VOLUME"
     chown 999:999 "$SR_VOLUME"; chmod 770 "$SR_VOLUME"
     cp "$HERE/status-b.jq" "$SR_LIB/status-b.jq"; chmod 400 "$SR_LIB/status-b.jq"
@@ -101,6 +102,28 @@ multi() { setup; cat "$SR_STATE/status.json" >> "$SR_STATE/status.json.copy"; ca
 symlink() { setup; mv "$SR_LOG" "$FIXTURE/protected"; ln -s "$FIXTURE/protected" "$SR_LOG"; refused; [[ ! -s $FIXTURE/protected ]]; }
 fifo() { setup; rm "$SR_LOG"; mkfifo "$SR_LOG"; refused; }
 full() { setup; truncate -s 1048575 "$SR_LOG"; printf '\n' >> "$SR_LOG"; refused; [[ $(stat -c %s "$SR_LOG") == 1048576 ]]; }
+checkpoint() {
+    local hash; hash=$(sha1sum "$SR_LOG"); hash=${hash%% *}
+    jq -nc --arg hash "$hash" --arg offset "$(stat -c %s "$SR_LOG")" \
+      '{files:[{path:"/var/ossec/logs/capstone-storage-b.log",hash:$hash,offset:$offset}]}' > "$SR_CHECKPOINT"
+}
+ready_full() { setup; truncate -s 1048575 "$SR_LOG"; printf '\n' >> "$SR_LOG"; checkpoint; }
+rotation() {
+    ready_full
+    local original; original=$(sr_hash "$SR_LOG")
+    invoke; [[ $INVOKE_RC == 0 && $(wc -l < "$SR_LOG") == 1 ]]
+    local -a archives=("$SR_STATE"/relay-archive-*)
+    [[ ${#archives[@]} == 1 && $(stat -c %s "${archives[0]}/closed.log") == 1048576 &&
+       $(sr_hash "${archives[0]}/closed.log") == "$original" ]]
+    jq -e '.phase=="preserved_new_log_ready" and .old_log_content_deleted==false' "${archives[0]}/receipt.json" >/dev/null
+    jq -e '.status=="relayed" and .appended==true' "$FIXTURE/result.json" >/dev/null
+}
+checkpoint_behind() { ready_full; sed -i 's/1048576/1048575/' "$SR_CHECKPOINT"; refused; [[ $(stat -c %s "$SR_LOG") == 1048576 ]]; }
+checkpoint_wrong_hash() { ready_full; sed -i 's/"hash":"[^"]*"/"hash":"wrong"/' "$SR_CHECKPOINT"; refused; [[ $(stat -c %s "$SR_LOG") == 1048576 ]]; }
+checkpoint_prefix_only() { ready_full; local hash; hash=$(head -c 4096 "$SR_LOG" | sha1sum); hash=${hash%% *}; sed -i "s/\"hash\":\"[^\"]*\"/\"hash\":\"$hash\"/" "$SR_CHECKPOINT"; refused; [[ $(stat -c %s "$SR_LOG") == 1048576 ]]; }
+checkpoint_duplicate() { ready_full; jq '.files += .files' "$SR_CHECKPOINT" > "$FIXTURE/next"; mv "$FIXTURE/next" "$SR_CHECKPOINT"; refused; }
+checkpoint_symlink() { ready_full; mv "$SR_CHECKPOINT" "$FIXTURE/real-checkpoint"; ln -s "$FIXTURE/real-checkpoint" "$SR_CHECKPOINT"; refused; }
+rotation_duplicate_status() { rotation; local prior; prior=$(sr_hash "$SR_LOG"); invoke; [[ $INVOKE_RC == 0 && $(sr_hash "$SR_LOG") == "$prior" ]]; }
 partial() { setup; printf 'prior-partial' > "$SR_LOG"; refused; [[ $(cat "$SR_LOG") == prior-partial ]]; }
 status_changed() {
     setup
@@ -123,6 +146,13 @@ case_run multiple_json_refused multi
 case_run symlink_target_preserved symlink
 case_run fifo_refused fifo
 case_run one_mib_bound_no_delete full
+case_run full_log_preserved_and_new_observation_relayed rotation
+case_run rotation_checkpoint_behind_preserves_log checkpoint_behind
+case_run rotation_checkpoint_wrong_hash_preserves_log checkpoint_wrong_hash
+case_run rotation_prefix_hash_is_not_eof_ack checkpoint_prefix_only
+case_run rotation_duplicate_checkpoint_refused checkpoint_duplicate
+case_run rotation_symlink_checkpoint_refused checkpoint_symlink
+case_run duplicate_status_after_rotation_not_appended rotation_duplicate_status
 case_run prior_partial_line_refused partial
 case_run status_change_refused status_changed
 case_run name_replaced_only_pinned_fd_written log_replaced_after_open

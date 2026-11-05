@@ -10,22 +10,43 @@
 
 <group name="ids,suricata,capstone,">
   <!-- ET severity: 1=high 2=medium 3=low (classification.config priority) -->
-  <rule id="100110" level="9">
+  <!-- Only the reviewed A-to-resolver DNS tuple and the two informational
+       DDNS signatures below are excluded from alerting/burst escalation. -->
+  <rule id="100115" level="0">
     <if_sid>86601</if_sid>
+    <field name="alert.signature_id" type="pcre2">^(?:2022918|2042936)$</field>
+    <field name="alert.severity" type="pcre2">^[23]$</field>
+    <field name="alert.metadata.signature_severity" type="pcre2">^(?:Informational|\["Informational"\])$</field>
+    <field name="src_ip" type="pcre2">^192\.168\.16\.230$</field>
+    <field name="dest_ip" type="pcre2">^168\.126\.63\.1$</field>
+    <field name="dest_port" type="pcre2">^53$</field>
+    <field name="proto" type="pcre2">^(?:UDP|TCP)$</field>
+    <field name="app_proto" type="pcre2">^dns$</field>
+    <description>Reviewed A DNS resolver informational DDNS observation excluded from alerts; raw sensor evidence retained</description>
+    <options>no_log</options>
+  </rule>
+  <rule id="100114" level="3">
+    <if_sid>86601</if_sid>
+    <description>Suricata IDS observation: $(alert.signature) [$(alert.category)] $(src_ip) -&gt; $(dest_ip):$(dest_port)</description>
+    <group>capstone_ids_burst_candidate,</group>
+  </rule>
+  <rule id="100110" level="9">
+    <if_sid>100114</if_sid>
     <field name="alert.severity">^1$</field>
     <description>Suricata IDS high: $(alert.signature) [$(alert.category)] $(src_ip) -> $(dest_ip):$(dest_port)</description>
     <mitre><id>T1190</id></mitre>
+    <group>capstone_ids_burst_candidate,</group>
   </rule>
   <rule id="100111" level="6">
-    <if_sid>86601</if_sid>
+    <if_sid>100114</if_sid>
     <field name="alert.severity">^2$</field>
     <description>Suricata IDS medium: $(alert.signature) [$(alert.category)] $(src_ip) -> $(dest_ip):$(dest_port)</description>
+    <group>capstone_ids_burst_candidate,</group>
   </rule>
   <rule id="100112" level="12" frequency="8" timeframe="120">
-    <if_matched_sid>86601</if_matched_sid>
+    <if_matched_group>capstone_ids_burst_candidate</if_matched_group>
     <same_field>src_ip</same_field>
-    <description>Suricata IDS: 8+ alerts from $(src_ip) within 2 min (scan/attack burst)</description>
-    <mitre><id>T1595</id></mitre>
+    <description>Suricata IDS: 8+ eligible alerts from $(src_ip) within 2 min (reviewed A resolver informational DNS excluded; investigation required)</description>
   </rule>
 </group>
 

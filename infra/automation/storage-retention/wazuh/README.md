@@ -1,4 +1,6 @@
-# 저장공간 상태의 Wazuh 연결 후보
+# 저장공간 상태의 Wazuh 연결
+
+> **2026-11-05 수정:** B의 1MiB 전달 로그가 1,048,268B에 도달해 다음 줄을 추가하지 못했고, 측정은 `ok`인데 ExecStartPost가 15분마다 실패했다. 현재 EOF·전체 SHA1 체크포인트 확인 뒤 원본 전체를 root0700 보관소에 SHA256/fsync 보존하고 새 root0600 로그를 배타 생성한다. Linux24조건과 실제 ProtectSystem의 별도 bind mount 경계1조건을 통과했다. 실제 B 전달 exit0·실패 unit0·수집 체크포인트 확인, 원문과 최초 실패/복구 기록은 보존한다. [작은 원장](rotation-validation-20261105.json).
 
 > **2026-10-31 후속:** 반복100313의 원인은 B monitor의 정상 백업 파일 거절이었다. monitor만 수정했고 decoder/규칙/relay와18키 계약은 유지했다. 01:17 KST 새 `ok` 상태의 relay SHA와 수집기 EOF776,927B를 대조했으며 실제 상태의 native 판정100310/level0도 확인했다. 수정 이후100313은 01:17:46 KST 조회에서0건이다. 정상 level0은 no_log이므로 Indexer 경보 부재만으로 전달 성공을 판단하지 않았다. 과거 카드/경보는 보존한다. [운영 영수증](../deployment-validation-2026-10-31.json).
 
@@ -50,7 +52,7 @@ relay는 고정 B/root만 받고 별도 flock을 사용한다. 상태 파일 roo
 
 목적 log는 먼저 읽기 전용 FD로 열어 named inode·root0600/nlink1을 확인한다. Bash의 최초 read-open 자체가 O_NOFOLLOW를 제공하지 않으므로 전후 non-symlink/동일 inode 검사를 통과한 FD만 사용한다. **쓰기 목적지는 검증된 `/proc/self/fd/4` 하나**이며 manager-writable 파일 이름을 다시 열어 쓰지 않는다. prefix SHA·부모/파일 identity·정확 증가량을 후검사한다. 기존 로그 마지막 행이 미완성이면 append하지 않는다.
 
-새 줄을 포함해 1MiB를 넘으면 실패·journal 진단으로 남긴다. 로그 삭제·truncate·rename 회전은 없다. 용량에 도달하기 전에 운영자가 별도의 reader·보존 계약을 검토해야 하며, 이 후보는 30일 자동 보존이나 무한 전달을 보장하지 않는다. 성공한 status SHA는 root0600 `relay-last.sha256`에 fsync/rename 보관해 동일 관측 재전달을 막는다. append 뒤 receipt 저장 전 crash는 중복 가능성이 남고 원문을 rollback하지 않는다. 어떤 native 읽기/append/fsync/metadata 검사 실패도 전달 완료 receipt로 바꾸지 않는다.
+새 줄을 포함해 1MiB를 넘을 때에는, 파일 마지막 줄과 root0600/nlink1·고정 inode를 확인한 뒤 Wazuh 체크포인트의 정확 경로·EOF·전체 소비 파일 SHA1을 요구한다. 체크포인트가 늦거나 모호하거나 prefix 해시만 일치하면 회전하지 않는다. 별도 bind mount 간 rename을 가정하지 않고, 검증한 읽기 FD의 전체를 `/var/lib/capstone-storage-monitor/relay-archive-*/closed.log`로 복사·전체 SHA256 확인·fsync한 후에만 고정된 이전 이름을 unlink하고 새 root0600 파일을 배타 생성한다. 기존 내용은 삭제·truncate하지 않는다. 원래 inode는 새 로그로 승계하지 않으며 archive와 영수증을 보존한다. 보관소1024개 한도·자동 삭제 없음이며, 무한 보존이나 모든 장애에서 exactly-once를 보장하지 않는다. 보존 직후 crash/이름 변경/새 파일 생성 실패는 journal의 단계와 보관소로 수동 조정하며 성공 영수증으로 바꾸지 않는다. 성공한 status SHA는 root0600 `relay-last.sha256`에 fsync/rename 보관해 동일 관측 재전달을 막는다. append 뒤 receipt 저장 전 crash는 중복 가능성이 남고 원문을 rollback하지 않는다. 어떤 native 읽기/append/fsync/metadata 검사 실패도 전달 완료 receipt로 바꾸지 않는다.
 
 ## 검증·배포 순서
 
@@ -69,3 +71,11 @@ python3 -B /ABS/wazuh/test-storage-rules.py --native --manager FULL_64HEX_CID
 ```
 
 공식 참고: [Wazuh localfile](https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/localfile.html), [규칙 구문·level/options](https://documentation.wazuh.com/current/user-manual/ruleset/ruleset-xml-syntax/rules.html). 실제 native 경로·decoder 결과는 문서 해석과 별도로 검증해야 한다.
+
+## 11/5 실제 실패와 복구 경계
+
+첫 회전 후보는 체크포인트를4KiB prefix로 오해해 운영 guard가 거절했다. 설치본의 EOF 해시는 전체 SHA1임을 직접 대조하고 prefix-only 거절을 추가했다. 다음 후보는 ProtectSystem의 각 ReadWritePaths가 별도 bind mount여서 GNU mv가 copy/unlink로 바뀌는 경계를 놓쳤다. 보관소에 전체 내용/SHA는 남았으나 inode 후검사가 거절했고 원래 이름이 없어졌다. 해당 전체 보존을 확인해 새 로그 이름을 배타 생성, 전달을 복구했다. 이 실패를 성공한 회전으로 세지 않는다.
+
+최종 후보는 copy/fsync 후 고정 이름만 unlink하도록 수정하고 실제 systemd 별도 bind mount의1MiB 합성 파일 전체 보존·새 관측 전달을 검증했다. 첫15분 복구 타이머는 확정 지연으로 원본 소스를 복구했으며, 다시 별도 r4 백업·타이머로 최종 소스를 적용하고 같은 실행 안에서 결과/SHA를 확인·확정했다. 과거 시험 transient unit2개의 실패 상태만 기록 보존 뒤 reset-failed했고, 과거 journal/DB/승인/백업은 지우지 않았다.
+
+기존 랩 서비스의 소스·수동 설치 계약은 위 표를 따른다. portable 단일 `deploy.sh`의 신규 Wazuh 규칙 복사와 이 기존 고정 경로 relay 자동 구성은 별개다. 후자는 이번에 새 OS에서 검증하거나 신규 서비스로 확장하지 않았다. 새 패키지·키·포트·MCP 권한은 없고 기존 Python3/GNU 도구만 사용한다.

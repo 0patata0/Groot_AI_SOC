@@ -371,36 +371,40 @@ class CompactPhase(unittest.TestCase):
         self.original=copy.deepcopy(self.r)
         self.wire=w.management_report_request(self.r,self.a,self.snapshot)
         self.lease=copy.deepcopy(self.a._capstone_management_selection)
-        self.value.pop('calls');self.value['more_evidence']=False
+        self.value['calls']=[]
         self.value['report']['evidence_indexes']=[0];self.value['report'].pop('evidence_tools')
         self.value['request_nonce']=self.lease['nonce']
 
     def test_compact_projection_preserves_controller_users_and_all_current_receipt_values(self):
         self.assertEqual(self.r,self.original)
-        self.assertEqual(self.wire['max_tokens'],800)
+        self.assertEqual(self.wire['max_tokens'],1024)
         self.assertEqual(self.wire['messages'][1],self.r['messages'][1])
         pack=json.loads(self.wire['messages'][-1]['content'])
         self.assertEqual(pack['untrusted_current_receipts'][0]['output'],json.loads(self.snapshot['receipts'][0]['output']))
         self.assertEqual(pack['current_successful_tools'],{'0':NAME})
+        self.assertEqual(pack['schema'],self.lease['schema'])
+        self.assertEqual(self.wire['response_format']['json_schema']['schema'],self.lease['schema'])
         self.assertNotIn('large native scaffold',str(self.wire))
         decoded,count=w.management_selection_response(self.response(),self.lease,self.a)
         self.assertEqual(count,0);text=decoded.choices[0].message.content
         self.assertEqual(w.management_status(text),'needs_review')
         self.assertIn(NAME,text);self.assertIn(w.literal_evidence_table(self.facts),text)
 
-    def test_more_evidence_exits_compact_phase_without_fabricating_a_read_or_judgment(self):
-        self.value.update(more_evidence=True,report=None)
+    def test_additional_read_dispatches_in_same_response_without_a_choice_only_round(self):
+        self.value.update(calls=[{'tool':NAME,'arguments':{'request_id':'a'*32}}],report=None)
         decoded,count=w.management_selection_response(self.response(),self.lease,self.a)
-        self.assertEqual(count,0);self.assertFalse(decoded.choices[0].message.tool_calls)
+        self.assertEqual(count,1)
+        self.assertEqual(decoded.choices[0].finish_reason,'tool_calls')
+        self.assertEqual(decoded.choices[0].message.tool_calls[0].function.name,NAME)
+        self.assertIsNone(getattr(self.a,'_capstone_more_evidence_turn',None))
         self.assertIsNone(w.management_status(decoded.choices[0].message.content))
-        self.assertEqual(self.a._capstone_more_evidence_turn,'turn-one')
-        followup=w.management_report_request(self.r,self.a,self.snapshot)
-        self.assertNotIn('more_evidence',followup['response_format']['json_schema']['schema']['properties'])
-        self.assertTrue(self.a._capstone_management_selection['additional_inquiry'])
+        bad=dict(self.value,calls=[],more_evidence=True)
+        with self.assertRaises(Exception):w.management_selection_response(self.response(bad),self.lease,self.a)
 
     def arm_inquiry(self):
-        self.value.update(more_evidence=True,report=None)
-        w.management_selection_response(self.response(),self.lease,self.a)
+        # Legacy in-flight inquiry state remains bound to real receipts.
+        self.a._capstone_full_review_turn=self.a._current_turn_id
+        self.a._capstone_inquiry_receipts=len(self.snapshot['receipts'])
 
     def test_additional_inquiry_with_large_catalog_must_choose_real_reads(self):
         self.arm_inquiry()

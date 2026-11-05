@@ -11,6 +11,16 @@ def timeline(verified=False):
         initial_apply_observation_sha256='d'*64 if verified else None)
 
 class Timeline(unittest.TestCase):
+    def test_many_reads_do_not_hide_earlier_containment_from_report_table(self):
+        facts=[m.containment_clock(timeline(True))]+[
+            {'kind':'diagnostics','target':f'c:fixture-{n}','returned_error_count':n} for n in range(31)]
+        original=copy.deepcopy(facts)
+        for text in (m.literal_evidence_table(facts),m.factual_review_report(facts)):
+            self.assertIn('실제 차단 관측',text)
+            self.assertIn(facts[0]['request_id'],text)
+            for n in range(31):self.assertIn(f'c:fixture-{n}:',text)
+        self.assertEqual(facts,original)
+
     def test_unrecorded_application_is_not_expiry_registration_or_ttl_subtraction(self):
         facts=[m.containment_clock(timeline())]
         for text in ('최초 차단 시각 `21:20:18+09:00`',

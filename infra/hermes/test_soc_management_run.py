@@ -427,6 +427,26 @@ class ManagementWrapper(unittest.TestCase):
             h.run(check,mode)
             self.assertEqual(h.emissions[0][0]['final_response'],wrapper.NO_OBSERVATION_REPORT)
 
+    def test_unfinished_final_answer_retains_actual_facts_without_claiming_completion(self):
+        for final in ('추가 조사를 이어가겠습니다.', '', 'MANAGEMENT_STATUS: resolved\nunfinished'):
+            h=Harness()
+            receipt={'target':'c:apache','returned_error_count':0,'requested_window_total_count':None,
+                'observed_at_kst':'2026-11-06T00:12:40+09:00','age_seconds':46,
+                'properties':{'ActiveState':'active','SubState':'running','Result':'success','Type':'forking'}}
+            def check(h):
+                asyncio.run(h.ClientSession([types.SimpleNamespace(text=json.dumps(receipt))]).call_tool(
+                    'get_system_diagnostics',{'target':'c:apache'}))
+                h.Emitter().emit_result({'final_response':final,'tool_results':[{'target':'fake'}]})
+            h.run(check,'verify')
+            output=h.emissions[0][0]['final_response']
+            self.assertIn('| 확인 항목 |',output)
+            self.assertIn('c:apache',output)
+            self.assertIn('ActiveState=active',output)
+            self.assertIn('46초',output)
+            self.assertIn('전체 오류 건수 미확인',output)
+            self.assertNotIn('fake',output)
+            self.assertEqual(wrapper.management_status(output),'needs_review')
+
     def test_wrong_uid_gid_mode_or_home_stops_before_native_cli(self):
         samples = [{"uid": 0}, {"uid": 1000}, {"gid": 0}, {"euid": 0}, {"egid": 0}, {"mode": "admin"}, {"mode": ""},
                    {"home": "/opt/data"}, {"home": "/tmp/management"}]

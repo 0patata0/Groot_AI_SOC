@@ -32,7 +32,6 @@ import time
 from datetime import datetime, timedelta, timezone
 import urllib.error
 import urllib.request
-import zlib
 
 STATE = Path("/var/lib/capstone-management")
 PROMPT = Path("/opt/capstone-management/soc_alert_watch.prompt")
@@ -1734,8 +1733,9 @@ def management_gate_argument(source):
     """Keep the immutable gate below Linux's per-argument exec limit."""
     if not isinstance(source,bytes) or not 1<=len(source)<=MAX_RESPONSE:
         raise ControllerError('management_gate_source_size_invalid')
-    encoded=base64.b64encode(zlib.compress(source,9)).decode('ascii')
-    value=("import base64,hashlib,zlib; s=zlib.decompress(base64.b64decode("+repr(encoded)+")); "
+    import lzma
+    encoded=base64.b64encode(lzma.compress(source,preset=6)).decode('ascii')
+    value=("import base64,hashlib,lzma; s=lzma.decompress(base64.b64decode("+repr(encoded)+")); "
            "assert hashlib.sha256(s).hexdigest()=="+repr(hashlib.sha256(source).hexdigest())+"; "
            "exec(compile(s,'capstone-immutable-management-gate','exec'))")
     if len(value.encode())>=65536:

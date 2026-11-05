@@ -1,0 +1,784 @@
+{
+  "at_kst": "2026-11-06 01:12 KST",
+  "version": "groot-query-completion:1.19.47",
+  "thirty_second_target_met": false,
+  "measurement": "run start to report outbox sent; excludes originating chat/queue/client rendering",
+  "independent_evaluation": false,
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "f3816cd7c53ace2e55ba5934e69d286251dcff5a0040fbc8129179a931727d68",
+    "infra/hermes/soc_management_controller.py": "b70b5b8222aab986ba0bb929c82100aedbac9911b160d3831596e1c8d50ab821",
+    "infra/hermes/test_soc_management_run.py": "fa592a5560faa0ede85b7b2cc5c62811273b8b9e8b7703d03a0b39ad09e6af54",
+    "infra/hermes/test_soc_management_selection.py": "acb83e32966d66d25fc262d611a56660d6ca1939f7971dae64ee8c7e17c8373b",
+    "infra/hermes/test_soc_management_timeline.py": "4f49635c4b339a714a1bc4c5e604efd6914bcf40ff5e4b30312d847ed42f708f",
+    "infra/hermes/query-completion/__init__.py": "4612c04d96b55aae1836a85aff1316fb9d71d1ff02dd397a2fcde09d8c058d5b",
+    "infra/hermes/query-completion/plugin.yaml": "ddc599b53e77f0c64a2ff522e2c003ffeda9ec903de69669901363b5077a697a"
+  },
+  "runs": [
+    {
+      "run_id": "5658eff2c3a29a56d67eb61e221b0f96",
+      "seconds": 64.98926854133606,
+      "reads": 8,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 65.04328179359436,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 17,
+        "case_resolved": false
+      },
+      "candidate": "r1",
+      "version": "1.19.45",
+      "manual_quality_note": "추가진단 실행·표/인용 통과. 재탐지 관측을 요약에서 미확인으로 일반화한 약점",
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.365556,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 71,
+            "prompt_tokens": 636,
+            "total_tokens": 707,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.389838,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 35,
+            "prompt_tokens": 1909,
+            "total_tokens": 1944,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.773578,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 56,
+            "prompt_tokens": 2141,
+            "total_tokens": 2197,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 98
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 18.429474,
+          "input_message_bytes": 67327,
+          "usage": {
+            "completion_tokens": 70,
+            "prompt_tokens": 18450,
+            "total_tokens": 18520,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 23.613701,
+          "input_message_bytes": 69880,
+          "usage": {
+            "completion_tokens": 270,
+            "prompt_tokens": 19166,
+            "total_tokens": 19436,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "1c4d8dda18ce8c9da05a49b48dd19869",
+      "seconds": 62.69257664680481,
+      "reads": 8,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 62.74004554748535,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 16,
+        "case_resolved": false
+      },
+      "candidate": "short-r1",
+      "version": "1.19.45",
+      "manual_quality_note": "새 짧은 요청.100자 상한에 판단/다음조치 문장 끊김",
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.031377,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 43,
+            "prompt_tokens": 632,
+            "total_tokens": 675,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.581685,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 50,
+            "prompt_tokens": 1914,
+            "total_tokens": 1964,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.603326,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 43,
+            "prompt_tokens": 2146,
+            "total_tokens": 2189,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 98
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 18.327177,
+          "input_message_bytes": 66937,
+          "usage": {
+            "completion_tokens": 79,
+            "prompt_tokens": 18340,
+            "total_tokens": 18419,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 22.464818,
+          "input_message_bytes": 67206,
+          "usage": {
+            "completion_tokens": 219,
+            "prompt_tokens": 18448,
+            "total_tokens": 18667,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "fbe03e2e85f9c1766e4e6e18a6966e50",
+      "seconds": 87.17196869850159,
+      "reads": 9,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": null,
+      "outbox": "sent",
+      "outbox_seconds": 87.23766946792603,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 17,
+        "case_resolved": false
+      },
+      "candidate": "r2",
+      "version": "1.19.46",
+      "manual_quality_note": "규격 안내 축소 후보. c:apache 대신 다른 대상/불필요 룰 조회·정형응답 거절1회·대체보고. 미채택",
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.18613,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 56,
+            "prompt_tokens": 632,
+            "total_tokens": 688,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.475319,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 40,
+            "prompt_tokens": 1914,
+            "total_tokens": 1954,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.718238,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 42,
+            "prompt_tokens": 2145,
+            "total_tokens": 2187,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 98
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 14.046373,
+          "input_message_bytes": 43085,
+          "usage": {
+            "completion_tokens": 90,
+            "prompt_tokens": 13011,
+            "total_tokens": 13101,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": null,
+          "provider_seconds": 25.190171,
+          "input_message_bytes": null,
+          "usage": null,
+          "compact_report": null,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": "stop"
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 24.270225,
+          "input_message_bytes": 70623,
+          "usage": {
+            "completion_tokens": 178,
+            "prompt_tokens": 21590,
+            "total_tokens": 21768,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "e423220fff9c47c9183610b70ad7e3b7",
+      "seconds": 85.5659966468811,
+      "reads": 8,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 85.62117123603821,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 17,
+        "case_resolved": false
+      },
+      "candidate": "r3",
+      "version": "1.19.47",
+      "manual_quality_note": "현재. 정확 c:apache·재탐지 요약·완전한 문장·실제 근거 표 확인. 정상 과대판단 재작성1회, 다음조치 구체성 잔여",
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.170179,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 49,
+            "prompt_tokens": 635,
+            "total_tokens": 684,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.636255,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 56,
+            "prompt_tokens": 1915,
+            "total_tokens": 1971,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.816748,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 39,
+            "prompt_tokens": 2142,
+            "total_tokens": 2181,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 18.217008,
+          "input_message_bytes": 67490,
+          "usage": {
+            "completion_tokens": 64,
+            "prompt_tokens": 18462,
+            "total_tokens": 18526,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 22.70062,
+          "input_message_bytes": 70043,
+          "usage": {
+            "completion_tokens": 240,
+            "prompt_tokens": 19170,
+            "total_tokens": 19410,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 21.461886,
+          "input_message_bytes": 70043,
+          "usage": {
+            "completion_tokens": 151,
+            "prompt_tokens": 19168,
+            "total_tokens": 19319,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "fc7bacf9aeb5e452f7ce3936e142027f",
+      "seconds": 63.97677230834961,
+      "reads": 9,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 64.0672218799591,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 19,
+        "case_resolved": false
+      },
+      "candidate": "short-r3",
+      "version": "1.19.47",
+      "manual_quality_note": "현재 새 짧은 요청. 표/인용 통과이나 재탐지 관측과 재발 미확인을 한 문장에 혼합; 의미 정확성 잔여",
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.076936,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 49,
+            "prompt_tokens": 632,
+            "total_tokens": 681,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.452443,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 43,
+            "prompt_tokens": 1909,
+            "total_tokens": 1952,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.54294,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 40,
+            "prompt_tokens": 2143,
+            "total_tokens": 2183,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 98
+            }
+          },
+          "compact_report": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 19.079357,
+          "input_message_bytes": 67136,
+          "usage": {
+            "completion_tokens": 103,
+            "prompt_tokens": 18391,
+            "total_tokens": 18494,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 22.636341,
+          "input_message_bytes": 71995,
+          "usage": {
+            "completion_tokens": 159,
+            "prompt_tokens": 20326,
+            "total_tokens": 20485,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "unique_passed": 1034,
+    "final_skipped": 0,
+    "management": 357,
+    "sdk": 219,
+    "native": 391,
+    "installer": 41,
+    "tables": 19,
+    "output": 7,
+    "server_skips_covered_by_native": 47
+  },
+  "confirmation": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793894601,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "f3816cd7c53ace2e55ba5934e69d286251dcff5a0040fbc8129179a931727d68",
+      "controller_sha256": "2360a08b9503c18ec30205b8879e3368bcb272e4cd3aae4678987a111f97156a",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 56887,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 10.978069067001343,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 2.978130578994751,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true
+  },
+  "server_cleanup": {
+    "removed": [
+      {
+        "run": "r1",
+        "source_files": 439,
+        "test_logs": 8,
+        "deployment_backup_preserved": true
+      },
+      {
+        "run": "r2",
+        "source_files": 439,
+        "test_logs": 8,
+        "deployment_backup_preserved": true
+      },
+      {
+        "run": "r3",
+        "source_files": 439,
+        "test_logs": 8,
+        "deployment_backup_preserved": true
+      }
+    ],
+    "live_db_approvals_traces_touched": false
+  },
+  "git": {
+    "state": "pending_commit_and_push"
+  },
+  "mac_cleanup": {
+    "removed_directory": "/private/tmp/capstone-review-scope-20261106-1vzuaeo_",
+    "removed_files": 39,
+    "removed_bytes": 12863724,
+    "verified_absent": true,
+    "source_configuration_records_preserved": true,
+    "packages_installed_on_mac": 0
+  },
+  "final_health": {
+    "confirmed_at_epoch": 1793895174,
+    "files_verified": 11,
+    "protected_unchanged": 7,
+    "gate_sha256": "f3816cd7c53ace2e55ba5934e69d286251dcff5a0040fbc8129179a931727d68",
+    "controller_sha256": "2360a08b9503c18ec30205b8879e3368bcb272e4cd3aae4678987a111f97156a",
+    "gate_matches_reference": true,
+    "ids_path_impact_enabled": true,
+    "gate_argument_bytes": 56887,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 4.498950719833374,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 16.49901843070984,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "automatic_shared_status_required": 1,
+    "sensor_reads_required": 3
+  }
+}

@@ -634,6 +634,22 @@ class ControllerTests(unittest.TestCase):
         self.assertIsNotNone(m.sensor_disposition_error(render(valid)+'\nINCIDENT_DISPOSITION:bad',{name}))
         self.assertIsNotNone(m.sensor_disposition_error('INCIDENT_DISPOSITION: {"assessment":"benign","assessment":"unresolved"}',{name}))
 
+    def test_successful_sensor_receipt_cannot_close_explicit_unknown_impact(self):
+        event=self.alert('contradictory-closure','2026-10-29T19:15:45+09:00','100110')
+        event['location']='/logs/suricata/eve.json';self.alerts(event)
+        trace=self.trace();name='mcp__security_events__search_suricata_alerts'
+        self.tool(trace,name,{'source':'suricata','source_scope':'wazuh_indexed_alerts',
+            'alerts':[{'timestamp':event['timestamp'],'source_ip':event['src_ip'],'wazuh_rule_id':'100110'}]})
+        decision={'assessment':'benign','basis':'원 경보와 반환된 탐지 표본을 대조하여 사건을 종결한다고 판단했습니다.',
+            'evidence_tools':[name]}
+        text='백엔드의 실제 데이터 유출 여부나 서비스 가용성에 대한 전체 증거는 확보되지 않았습니다.\nINCIDENT_DISPOSITION: '+json.dumps(decision,ensure_ascii=False)+'\nMANAGEMENT_STATUS: resolved'
+        self.assertEqual(m.sensor_disposition_error(text,{name}),'incident_closure_with_unknown_impact')
+        self.result(trace,text);self.assertEqual(trace.finish(0)['state'],'needs_review')
+        row=self.store.db.execute('select detail,final_text from cases where id=?',(trace.case['id'],)).fetchone()
+        self.assertEqual(row[0],'incident_closure_with_unknown_impact')
+        self.assertNotIn('MANAGEMENT_STATUS: resolved',row[1]);self.assertIn('| 종결 상태 |',row[1])
+        self.assertEqual(self.store.db.execute('select count(*) from proposals').fetchone()[0],0)
+
     def test_unresolved_report_cannot_publish_a_tool_that_did_not_run(self):
         event=self.alert('citation-failure',rule='100102');event['location']='/logs/modsec/audit.log'
         self.alerts(event);trace=self.trace()

@@ -897,9 +897,10 @@ def verified_sensor_events(requirements, receipts):
 
 def sensor_disposition_error(text, successful_tools):
     """Validate the shared explicit decision; source/closure remain separate."""
-    from soc_management_run import parse_incident_disposition
+    from soc_management_run import parse_incident_disposition, closure_uncertainty_violations
     value,error=parse_incident_disposition(text,successful_tools)
     if error:return error
+    if closure_uncertainty_violations(text):return 'incident_closure_with_unknown_impact'
     sensor_tools={'mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts'}
     if not set(value['evidence_tools'])&sensor_tools:return 'incident_disposition_evidence_missing'
     return 'incident_disposition_unresolved' if value['assessment']=='unresolved' else None
@@ -1186,7 +1187,8 @@ class Trace:
             elif missing_reference_read:
                 state, detail, due = "needs_review", "shared_containment_verification_missing", now
                 text = incomplete_report(detail)
-            elif decision_error in ('incident_disposition_evidence_missing', 'incident_disposition_invalid'):
+            elif decision_error in ('incident_disposition_evidence_missing', 'incident_disposition_invalid',
+                                     'incident_closure_with_unknown_impact'):
                 state, detail, due = "needs_review", decision_error, now
                 # A review label cannot legitimize fabricated citations. The
                 # native wrapper gets one evidence-driven correction first;
@@ -1867,6 +1869,12 @@ def run_hermes(store, case, prompt):
 
 
 def incomplete_report(detail):
+    if detail == 'incident_closure_with_unknown_impact':
+        return ("보고 내용과 종결 판단이 일치하지 않아 추가 검토로 남겼습니다.\n\n"
+                "| 확인 항목 | 검증 결과 | 다음 조치 |\n|---|---|---|\n"
+                "| 사건 영향 | 모델 보고에서 영향·대응 결과를 미확인으로 명시 | 실제 근거로 다시 판단 |\n"
+                "| 종결 상태 | 해결됨 판정을 채택하지 않음 | 영향 확인과 차단 해제 여부를 구분 |\n"
+                "| 조회 기록 | 기존 조회·실패 보고 원문 보존 | 앱·호스트 근거와 한계를 대조 |")
     if detail == 'incident_impact_verification_missing':
         return ("사건 종결의 근거가 부족해 추가 검토가 필요합니다. 종결·정상 판정은 채택하지 않았습니다.\n\n"
                 "| 확인 항목 | 검증 결과 | 미확인·다음 조치 |\n|---|---|---|\n"

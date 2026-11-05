@@ -188,4 +188,49 @@ class LiteralRepair(unittest.TestCase):
         arm(4);self.assertEqual(f.call(f.agent,**f.kw),'original')
         self.assertEqual(f.agent._capstone_inquiry_retries,(f.agent._current_turn_id,(1,2,3)))
 
+class RedetectionEvidence(unittest.TestCase):
+    def setUp(self):
+        self.facts=[{'kind':'containment_clock','ip':'192.0.2.60',
+            'times':{'temporary_expires_at':'2026-11-05T19:24:57+09:00'}},
+            {'kind':'events','source':'modsecurity','observations':[
+                {'source_ip':'192.0.2.60','timestamp_kst':'2026-11-05T19:56:29+09:00'}]}]
+
+    def test_observed_alert_denial_and_actual_mixed_summary_are_rejected(self):
+        for text in ('WAF 재탐지 미확인입니다.', '차단 만료 이후 재탐지 표본 및 백엔드 응답 이력이 상존하여 영향·재발이 확인되지 않았음.',
+                     '재탐지는 없었습니다.'):
+            self.assertEqual(m.redetection_violations(text,self.facts),['observed_redetection_reported_unknown'])
+
+    def test_impact_persistence_other_sensor_and_quoted_text_are_not_denials(self):
+        for text in ('WAF 재탐지는 확인했으나 침해 영향과 공격 지속 여부는 미확인입니다.',
+                     'WAF 재탐지 확인, IDS 재탐지 미확인입니다.', 'IDS 재탐지 미확인입니다.',
+                     '192.0.2.61 재탐지 미확인입니다.', '재탐지 없음으로 단정하지 않습니다.',
+                     '> WAF 재탐지 미확인입니다.', '```\nWAF 재탐지 미확인\n```',
+                     '| 예시 | WAF 재탐지 미확인 |', '공격 재발 여부는 미확인입니다.'):
+            with self.subTest(text=text):self.assertEqual(m.redetection_violations(text,self.facts),[])
+
+    def test_only_same_ip_after_aware_deadline_is_positive(self):
+        for change in ({'source_ip':'192.0.2.61'}, {'timestamp_kst':'2026-11-05T19:24:57+09:00'},
+                       {'timestamp_kst':'2026-11-05T19:00:00+09:00'}, {'timestamp_kst':'2026-11-05T19:56:29'}):
+            facts=copy.deepcopy(self.facts);facts[1]['observations'][0].update(change)
+            self.assertEqual(m.redetection_violations('재탐지 미확인입니다.',facts),[])
+
+    def test_disposition_basis_is_checked_without_inventing_an_assessment(self):
+        text='INCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved',
+            'basis':'WAF 재탐지 미확인으로 남기며 침해 영향도 추가 조사가 필요합니다.', 'evidence_tools':[]})
+        self.assertEqual(m.redetection_violations(text,self.facts),['observed_redetection_reported_unknown'])
+        self.assertEqual(m.redetection_violations(text,[]),[])
+
+class ClosureConsistency(unittest.TestCase):
+    def test_actual_unknown_impact_with_resolved_status_is_rejected(self):
+        body='백엔드의 실제 데이터 유출 여부나 서비스 가용성에 대한 전체 증거는 확보되지 않았습니다.'
+        self.assertEqual(m.closure_uncertainty_violations(body+'\nMANAGEMENT_STATUS: resolved'),['incident_closure_with_unknown_impact'])
+        for body in ('침해 영향은 미확인입니다.', '대응 결과가 확인되지 않았습니다.', '서비스 영향 증거가 부족합니다.'):
+            self.assertTrue(m.closure_uncertainty_violations(body+'\nMANAGEMENT_STATUS: resolved'))
+
+    def test_unknown_kept_open_or_unrelated_limitations_are_not_closed(self):
+        for body,status in [('침해 영향은 미확인입니다.','needs_review'),('침해 영향은 미확인입니다.','monitor'),
+            ('침해 영향에 미확인 사항은 없습니다.','resolved'),('침해 영향은 검증했고 보관 기한은 미확인입니다.','resolved'),
+            ('> 침해 영향 미확인\n실제 영향 검증 완료','resolved'),('| 침해 영향 | 미확인 |','resolved')]:
+            self.assertEqual(m.closure_uncertainty_violations(body+'\nMANAGEMENT_STATUS: '+status),[])
+
 if __name__=='__main__':unittest.main()

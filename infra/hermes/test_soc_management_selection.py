@@ -653,4 +653,117 @@ class IndexedReads(unittest.TestCase):
             self.assertIsNone(w.required_read_bundle(self.r,[{'target':'a:incident-ip','proposal_id':'a'*32}],[],[sensor],[]))
 
 
+@unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+class CorrectionFeedback(unittest.TestCase):
+    response=SelectionDecode.response
+    def setUp(self):
+        CompactPhase.setUp(self)
+        self.context={'case_id':'c'*32,'operator_reason':'현재 영향 확인','mode':'verify',
+            'purpose':'사건 재검토','evidence_scope':{}}
+        self.env_context=patch.dict(w.os.environ,{'CAPSTONE_REVIEW_CONTEXT_JSON':json.dumps(self.context)})
+        self.env_context.start();self.addCleanup(self.env_context.stop)
+
+    def capture(self):
+        import test_soc_management_grounding as g
+        f=g.Grounding();f.setUp()
+        f.agent._current_turn_id=self.a._current_turn_id
+        prose='차단 상태는 확인했지만 WAF 웹 서비스 정상으로 판단했고 사건 당시 영향은 미확인입니다.'
+        f.kw['assistant_message'].content='INCIDENT_DISPOSITION: '+json.dumps({
+            'assessment':'unresolved','basis':prose,'evidence_tools':[NAME]})+'\nMANAGEMENT_STATUS: needs_review'
+        callback=w.grounding_wrapper(lambda a,**kw:'original',SimpleNamespace(FinalResponseVerdict=SimpleNamespace),
+            lambda rows,row:rows.append(row),lambda rows,user:0,[NAME],self.facts,successful_reads=[NAME])
+        with patch.object(w,'evidence_claim_violations',return_value=['web_snapshot_is_not_application_health']):
+            self.assertEqual(callback(f.agent,**f.kw).action,'continue')
+        self.a._capstone_review_feedback=copy.deepcopy(f.agent._capstone_review_feedback)
+        self.r['messages']=copy.deepcopy(f.kw['messages'])
+        return self.a._capstone_review_feedback
+
+    def build(self):
+        self.wire=w.management_report_request(self.r,self.a,self.snapshot)
+        self.lease=copy.deepcopy(self.a._capstone_management_selection)
+        self.value['request_nonce']=self.lease['nonce'];self.value.pop('calls',None)
+        self.value['more_evidence']=False
+        return json.loads(self.wire['messages'][-1]['content'])
+
+    def test_real_guard_feedback_survives_root_replacement_and_preserves_receipts(self):
+        feedback=self.capture();before=copy.deepcopy(self.r);pack=self.build()
+        self.assertEqual(pack['controller_report_feedback'],feedback)
+        self.assertEqual(pack['untrusted_current_receipts'][0]['output'],json.loads(self.snapshot['receipts'][0]['output']))
+        self.assertIn(self.context['operator_reason'],self.wire['messages'][1]['content'])
+        self.assertNotIn('available_read_descriptions',pack)
+        self.assertNotIn('calls로 직접 조회',self.wire['messages'][0]['content'])
+        self.assertEqual(self.r,before);self.assertIsNone(self.a._capstone_review_feedback)
+        decoded,count=w.management_selection_response(self.response(),self.lease,self.a)
+        self.assertEqual(count,0);self.assertIn('MANAGEMENT_STATUS: needs_review',decoded.choices[0].message.content)
+        self.assertTrue(self.lease['literal_report_repair'])
+
+    def test_correction_cannot_promote_status_risk_or_select_calls(self):
+        self.capture();self.build()
+        for key,value in (('assessment','benign'),('status','resolved'),('status','monitor')):
+            bad=copy.deepcopy(self.value);bad['report'][key]=value
+            with self.assertRaises(Exception):w.management_selection_response(self.response(bad),self.lease,self.a)
+        for bad in (dict(self.value,calls=[]),dict(self.value,request_nonce='wrong')):
+            with self.assertRaises(Exception):w.management_selection_response(self.response(bad),self.lease,self.a)
+
+    def test_full_inquiry_escape_restores_schemas_and_actual_native_dispatch(self):
+        self.capture();self.build()
+        value={'request_nonce':self.lease['nonce'],'more_evidence':True,'report':None}
+        decoded,count=w.management_selection_response(self.response(value),self.lease,self.a)
+        self.assertEqual(count,0);self.assertEqual(self.a._capstone_full_review_turn,self.snapshot['turn'])
+        wire=w.management_report_request(self.r,self.a,self.snapshot);lease=self.a._capstone_management_selection
+        self.assertTrue(lease['additional_inquiry']);self.assertFalse(lease['literal_report_repair'])
+        params=wire['response_format']['json_schema']['schema']['properties']['calls']['items']['anyOf'][0]['properties']['arguments']
+        self.assertEqual(params,self.r['tools'][0]['function']['parameters'])
+        value={'request_nonce':lease['nonce'],'calls':[{'tool':NAME,'arguments':{'request_id':'a'*32}}],'report':None}
+        decoded,count=w.management_selection_response(self.response(value),lease,self.a)
+        self.assertEqual(count,1);self.assertEqual(decoded.choices[0].finish_reason,'tool_calls')
+        value['calls'][0]['tool']='mcp__resp__unblock_ip'
+        with self.assertRaises(Exception):w.management_selection_response(self.response(value),lease,self.a)
+
+    def test_stale_changed_facts_malformed_or_unsafe_feedback_retains_full_read_schema(self):
+        feedback=self.capture()
+        for key,value in (('turn','other'),('facts_sha256','bad'),('issues',['unknown_issue']),('issues',['incident_closure_with_unknown_impact']),
+                          ('issues',['unobserved_event_source:suricata']),('issues',['bad text']),
+                          ('prior_status','resolved'),('prior_assessment','benign'),('untrusted_prior_prose',None)):
+            self.a._capstone_review_feedback=dict(feedback,**{key:value})
+            wire=w.management_report_request(self.r,self.a,self.snapshot)
+            self.assertFalse(self.a._capstone_management_selection['literal_report_repair'])
+            self.assertIn('calls',wire['response_format']['json_schema']['schema']['anyOf'][0]['properties'])
+        self.a._capstone_review_feedback=feedback
+        changed=copy.deepcopy(self.snapshot);changed['facts'][0]['count']=1
+        w.management_report_request(self.r,self.a,changed)
+        self.assertFalse(self.a._capstone_management_selection['literal_report_repair'])
+
+    def test_feedback_is_one_request_only_even_when_previous_history_contains_it(self):
+        self.capture();self.build()
+        wire=w.management_report_request(self.r,self.a,self.snapshot)
+        self.assertFalse(self.a._capstone_management_selection['literal_report_repair'])
+        self.assertNotIn('controller_report_feedback',json.loads(wire['messages'][-1]['content']))
+
+    def test_native_api_transmits_correction_and_consumes_nonce_once(self):
+        self.capture()
+        self.a._capstone_management_pending_read=('turn-one',False)
+        self.a._capstone_management_report=copy.deepcopy(self.snapshot)
+        original=BuildVerdict('fallthrough',copy.deepcopy(self.r),self.r['messages'],copy.deepcopy(self.r))
+        built=w.management_selection_request_wrapper(lambda a,**kw:original)(self.a,turn_id='turn-one')
+        self.lease=copy.deepcopy(self.a._capstone_management_selection)
+        self.value.update(request_nonce=self.lease['nonce'],more_evidence=False);self.value.pop('calls')
+        self.assertIn('controller_report_feedback',built.api_kwargs['messages'][-1]['content'])
+        wrapped=w.management_selection_call_wrapper(lambda a,**kw:Verdict('fallthrough',self.response()))
+        verdict=wrapped(self.a,turn_id='turn-one',api_kwargs=built.api_kwargs)
+        self.assertIsNone(self.a._capstone_management_selection)
+        self.assertIn('MANAGEMENT_STATUS: needs_review',verdict.response.choices[0].message.content)
+        if not Path('/opt/hermes/agent/chat_completion_helpers.py').is_file():self.skipTest('native transport covered on Hermes')
+        import httpx
+        from openai import OpenAI
+        from agent.chat_completion_helpers import _dispatch_nonstreaming_api_request
+        received=[]
+        def handle(req):
+            received.append(json.loads(req.content));return httpx.Response(200,json=self.response().model_dump())
+        with OpenAI(api_key='nonsecret-test-only',base_url='http://test.invalid/v1',
+            http_client=httpx.Client(transport=httpx.MockTransport(handle))) as client:
+            _dispatch_nonstreaming_api_request(self.a,built.api_kwargs,make_client=lambda *a,**kw:client)
+        self.assertEqual(received[0]['messages'],built.api_kwargs['messages'])
+        self.assertEqual(received[0]['response_format'],built.api_kwargs['response_format'])
+
 if __name__=='__main__':unittest.main()

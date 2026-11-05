@@ -1,0 +1,71 @@
+# Additional normal DNS client from the publisher CTU-Normal-6 README.
+%YAML 1.1
+---
+vars:
+  address-groups:
+    HOME_NET: "[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,147.32.83.53/32]"
+    EXTERNAL_NET: "!$HOME_NET"
+    HTTP_SERVERS: "$HOME_NET"
+    SMTP_SERVERS: "$HOME_NET"
+    SQL_SERVERS: "$HOME_NET"
+    DNS_SERVERS: "$HOME_NET"
+    TELNET_SERVERS: "$HOME_NET"
+    AIM_SERVERS: "$EXTERNAL_NET"
+    DC_SERVERS: "$HOME_NET"
+    DNP3_SERVER: "$HOME_NET"
+    DNP3_CLIENT: "$HOME_NET"
+    MODBUS_CLIENT: "$HOME_NET"
+    MODBUS_SERVER: "$HOME_NET"
+    ENIP_CLIENT: "$HOME_NET"
+    ENIP_SERVER: "$HOME_NET"
+  port-groups:
+    HTTP_PORTS: "80"
+    SHELLCODE_PORTS: "!80"
+    ORACLE_PORTS: "1521"
+    SSH_PORTS: "22"
+    DNP3_PORTS: "20000"
+    MODBUS_PORTS: "502"
+    FILE_DATA_PORTS: "[$HTTP_PORTS,110,143]"
+    FTP_PORTS: "21"
+    GENEVE_PORTS: "6081"
+    VXLAN_PORTS: "4789"
+    TEREDO_PORTS: "3544"
+    SIP_PORTS: "[5060, 5061]"
+
+runmode: single
+max-pending-packets: 256
+stream:
+  memcap: 64mb
+  checksum-validation: no
+  reassembly:
+    memcap: 128mb
+flow:
+  memcap: 32mb
+detect:
+  profile: low
+  sgh-mpm-context: auto
+stats:
+  enabled: yes
+  interval: 60
+logging:
+  default-log-level: notice
+  outputs:
+    - console:
+        enabled: yes
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      types:
+        - alert
+        - http
+        - dns
+        - tls
+        - stats:
+            totals: yes
+            threads: no
+unix-command:
+  enabled: no
+classification-file: /home/att/Desktop/PCAP/public-20261103/tools/suricata-8.0.6/etc/classification.config
+reference-config-file: /home/att/Desktop/PCAP/public-20261103/tools/suricata-8.0.6/etc/reference.config

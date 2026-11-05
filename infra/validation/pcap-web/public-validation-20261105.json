@@ -1,0 +1,613 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05T13:09:02.191790+09:00",
+  "purpose": "additional packet validation only; no training inclusion",
+  "imports": {
+    "hosts": [
+      "192.168.16.232",
+      "192.168.16.233"
+    ],
+    "capture_count": 7,
+    "capture_bytes": 76707724,
+    "captures": [
+      {
+        "case": "mta-20260911",
+        "path": "mta-20260911/2026-09-11-traffic-analysis-exercise.pcap",
+        "bytes": 59484402,
+        "sha256": "21bb800849459709a7ceb5513573b2b20f090ffccd00eb89b9886feedd47a2df"
+      },
+      {
+        "case": "mta-20260809",
+        "path": "mta-20260809/2026-08-09-traffic-analysis-exercise.pcap",
+        "bytes": 16007378,
+        "sha256": "0ea6b597732a9ce6af9a7e3adff4512c9a91b4bce27184c8fdeb746f05cce170"
+      },
+      {
+        "case": "ctu-normal6-dns",
+        "path": "ctu-normal6-dns/2013-10-21_capture-1-only-dns.pcap",
+        "bytes": 346130,
+        "sha256": "194469ec9915933961214993e3a157972191941423391a5a6d129869a409997e"
+      },
+      {
+        "case": "ctu-malware282-1",
+        "path": "ctu-malware282-1/2017-07-06_capture-win3.pcap",
+        "bytes": 533910,
+        "sha256": "307ea1b5fb0ddd7021454054a1acac8a3f5bfcd28c222f0a27bac03933e7393c"
+      },
+      {
+        "case": "wireshark-http-post",
+        "path": "wireshark-http-post/tcp-ethereal-file1.trace",
+        "bytes": 169135,
+        "sha256": "235ae61d53ae316410d2247781603fa681b9f37e7edbd014d1a882c47307664a"
+      },
+      {
+        "case": "wireshark-http-ecn",
+        "path": "wireshark-http-ecn/tcp-ecn-sample.pcap",
+        "bytes": 118965,
+        "sha256": "e6edf98f9e2e8a9711fb41a4e16840ef3942b40c7d2694ca373b7f285c783648"
+      },
+      {
+        "case": "wireshark-http-redirects",
+        "path": "wireshark-http-redirects/http_redirects.pcapng",
+        "bytes": 47804,
+        "sha256": "ff432a6b71d06cd20720f7763e584014edd0a43c3b55981c682d1b7640207abc"
+      }
+    ],
+    "answer_pdfs": [
+      {
+        "case": "mta-20260911",
+        "path": "mta-20260911/2026-09-11-traffic-analysis-exercise-answers.pdf",
+        "bytes": 206374,
+        "sha256": "4fab99cc94f31a66c5094b5af393661e203a858a4ec612909a99af2c352885b7"
+      },
+      {
+        "case": "mta-20260809",
+        "path": "mta-20260809/2026-08-09-traffic-analysis-exercise-answers.pdf",
+        "bytes": 205347,
+        "sha256": "1570878dd902f645114a876bc1189cce84177abfea9c27bff6c6320a66b75f91"
+      }
+    ],
+    "description_paths": [
+      "/home/att/Desktop/PCAP/public-20261105/PCAP_설명.txt",
+      "/home/attack/Desktop/PCAP/public-20261105/PCAP_설명.txt"
+    ],
+    "description_initial_sha256": "af141136c025f8bcfd937a6c670efdafd464551430d800886aeea26630918e6b",
+    "description_final_sha256": "206460251a706c821c433cf54e2e5522121731bb4ef5ccf4e277b7640a612587",
+    "description_final_bytes": 9149,
+    "transport": {
+      "sha256": "f013397868b221b1ea23d3e36418eb9d32cf533323ef694c9f0ad265082f672b",
+      "bytes": 68731011,
+      "members": 20,
+      "download_files": 18
+    },
+    "same_capture_pdf_and_description_bytes_on_both": true,
+    "prior_regular_files_checked": {
+      "regular_files_size_checked": 205,
+      "same_size_candidates": 0,
+      "duplicates": [],
+      "scope": "all regular PCAP-directory files including date-named snort.log captures; size then magic then SHA",
+      "packet_transmission": false
+    },
+    "new_packets_sent_from_233": 0
+  },
+  "offline": {
+    "unique_captures": 7,
+    "unique_packets": 100006,
+    "elapsed_seconds": 252.656,
+    "engine": "Suricata8.0.6",
+    "rule_sha256": "b808ceba89dead5d1de8bd4f17cd4370e2f0d565424d979672e25426a60f7f4b",
+    "same_actual_a_cli_file_sha256": true,
+    "production_pid_preserved": 1577695,
+    "home_net": "private networks plus CTU normal6 client147.32.83.53/32; differs from live HOME_NET",
+    "checksum_validation": "disabled only offline",
+    "rows": [
+      {
+        "case": "mta-20260911",
+        "packets": 73779,
+        "engine_rc": 0,
+        "tshark_rc": 0,
+        "http_requests_tshark": 102,
+        "event_counts": {
+          "dns": 256,
+          "tls": 90,
+          "alert": 4,
+          "http": 102,
+          "stats": 1
+        },
+        "signatures": {
+          "2072003": {
+            "signature": "ET EXPLOIT_KIT LandUpdate808 Domain in DNS Lookup (aatthews .cfd)",
+            "category": "Exploit Kit Activity Detected",
+            "severity": 1,
+            "count": 2
+          },
+          "2065867": {
+            "signature": "ET INFO Observed DNS Query to .cfd TLD",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 2
+          }
+        },
+        "pcap_sha256": "21bb800849459709a7ceb5513573b2b20f090ffccd00eb89b9886feedd47a2df",
+        "pcap_bytes": 59484402
+      },
+      {
+        "case": "mta-20260809",
+        "packets": 22473,
+        "engine_rc": 0,
+        "tshark_rc": 0,
+        "http_requests_tshark": 176,
+        "event_counts": {
+          "dns": 474,
+          "alert": 22,
+          "http": 176,
+          "tls": 128,
+          "stats": 1
+        },
+        "signatures": {
+          "2031071": {
+            "signature": "ET INFO Microsoft Connection Test",
+            "category": "Misc activity",
+            "severity": 3,
+            "count": 2
+          },
+          "2050745": {
+            "signature": "ET MALWARE FormBook CnC Checkin (GET) M5",
+            "category": "Malware Command and Control Activity Detected",
+            "severity": 1,
+            "count": 18
+          },
+          "2027758": {
+            "signature": "ET DNS Query for .cc TLD",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          },
+          "2021076": {
+            "signature": "ET HUNTING SUSPICIOUS Dotted Quad Host MZ Response",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          }
+        },
+        "pcap_sha256": "0ea6b597732a9ce6af9a7e3adff4512c9a91b4bce27184c8fdeb746f05cce170",
+        "pcap_bytes": 16007378
+      },
+      {
+        "case": "ctu-normal6-dns",
+        "packets": 1720,
+        "engine_rc": 0,
+        "tshark_rc": 0,
+        "http_requests_tshark": 0,
+        "event_counts": {
+          "dns": 1720,
+          "alert": 3,
+          "stats": 1
+        },
+        "signatures": {
+          "2012811": {
+            "signature": "ET DNS Query to a .tk domain - Likely Hostile",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 2
+          },
+          "2027863": {
+            "signature": "ET INFO Observed DNS Query to .biz TLD",
+            "category": "Potentially Bad Traffic",
+            "severity": 2,
+            "count": 1
+          }
+        },
+        "pcap_sha256": "194469ec9915933961214993e3a157972191941423391a5a6d129869a409997e",
+        "pcap_bytes": 346130
+      },
+      {
+        "case": "ctu-malware282-1",
+        "packets": 1064,
+        "engine_rc": 0,
+        "tshark_rc": 0,
+        "http_requests_tshark": 3,
+        "event_counts": {
+          "dns": 38,
+          "http": 3,
+          "tls": 5,
+          "stats": 1
+        },
+        "signatures": {},
+        "pcap_sha256": "307ea1b5fb0ddd7021454054a1acac8a3f5bfcd28c222f0a27bac03933e7393c",
+        "pcap_bytes": 533910
+      },
+      {
+        "case": "wireshark-http-post",
+        "packets": 220,
+        "engine_rc": 0,
+        "tshark_rc": 0,
+        "http_requests_tshark": 1,
+        "event_counts": {
+          "http": 1,
+          "stats": 1
+        },
+        "signatures": {},
+        "pcap_sha256": "235ae61d53ae316410d2247781603fa681b9f37e7edbd014d1a882c47307664a",
+        "pcap_bytes": 169135
+      },
+      {
+        "case": "wireshark-http-ecn",
+        "packets": 479,
+        "engine_rc": 0,
+        "tshark_rc": 0,
+        "http_requests_tshark": 1,
+        "event_counts": {
+          "http": 1,
+          "stats": 1
+        },
+        "signatures": {},
+        "pcap_sha256": "e6edf98f9e2e8a9711fb41a4e16840ef3942b40c7d2694ca373b7f285c783648",
+        "pcap_bytes": 118965
+      },
+      {
+        "case": "wireshark-http-redirects",
+        "packets": 271,
+        "engine_rc": 0,
+        "tshark_rc": 0,
+        "http_requests_tshark": 48,
+        "event_counts": {
+          "stats": 1
+        },
+        "signatures": {},
+        "pcap_sha256": "ff432a6b71d06cd20720f7763e584014edd0a43c3b55981c682d1b7640207abc",
+        "pcap_bytes": 47804
+      }
+    ],
+    "total_alerts_not_true_positives": 29,
+    "redirect_midstream_followup": {
+      "same_pcap_reprocessed_not_new_sample": true,
+      "baseline_http": 0,
+      "followup_http": 48,
+      "alerts": 0,
+      "engine_rc": 0,
+      "config_sha256": "2dfc182a26e47cb36f53445f936d63d6e8b93d1b6bc01612855768ab57b16db7",
+      "live_configuration_changed": false
+    },
+    "full_groundtruth_pdf_comparison": false,
+    "packet_transmission": false
+  },
+  "live_web": {
+    "run_id": "public-pcap-20261105-kali232-web-mixed-r1",
+    "kali_started_kst": "2026-11-05T12:25:05.954+09:00",
+    "kali_ended_kst": "2026-11-05T12:25:30.827+09:00",
+    "planned": 100,
+    "attempted": 100,
+    "normal_sent": 97,
+    "normal_statuses": {
+      "302": 49,
+      "308": 48
+    },
+    "attack_sent": 3,
+    "attack_controls": [
+      {
+        "case_id": "sqli-2",
+        "status": 403,
+        "uri_sha256": "157eb9e3517527b9e354d91a7de36c650a40713904e2d5a8126a8d2e0c2ca991"
+      },
+      {
+        "case_id": "traversal-2",
+        "status": 403,
+        "uri_sha256": "274c0484760617995b264b7074595f65c35414ea1bba1be6e97c3b21e37248df"
+      },
+      {
+        "case_id": "xss-2",
+        "status": 403,
+        "uri_sha256": "693693e726c98d8a0897ab1d3c924cf65bc44c39e1cd67b987ff764d6c7468ed"
+      }
+    ],
+    "attack_sources": [
+      {
+        "case_id": "sqli-2",
+        "family": "sqli",
+        "source": "2015-03-17/snort.log.1426550408",
+        "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+        "frame": 129633
+      },
+      {
+        "case_id": "traversal-2",
+        "family": "traversal",
+        "source": "2015-03-17/snort.log.1426550408",
+        "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+        "frame": 135282
+      },
+      {
+        "case_id": "xss-2",
+        "family": "xss",
+        "source": "2015-03-17/snort.log.1426550408",
+        "pcap_sha256": "9116837bf14a7e136acba1dced9d5652c219fd1aa4e087b2955b1d3470dee546",
+        "frame": 132583
+      }
+    ],
+    "normal_sources": [
+      {
+        "case_id": "wireshark-http-ecn",
+        "frame": 4,
+        "pcap_sha256": "e6edf98f9e2e8a9711fb41a4e16840ef3942b40c7d2694ca373b7f285c783648",
+        "original_uri_sha256": "522b37830dbbc5c5ca9861e537906c2f47d1a252f36c19b2c38cfe5c3cfadbc2"
+      },
+      {
+        "case_id": "wireshark-http-redirects",
+        "frame": 1,
+        "pcap_sha256": "ff432a6b71d06cd20720f7763e584014edd0a43c3b55981c682d1b7640207abc",
+        "original_uri_sha256": "8a5edab282632443219e051e4ade2d1d5bbc671c781051bf1437897cbdfea0f1"
+      }
+    ],
+    "original_attack_capture_provenance": "existing user-provided2015 capture; external original publisher unconfirmed",
+    "transformed_new_tcp_requests_not_original_packet_replay": true,
+    "coded_target": "192.168.16.230:80 with lab Host only",
+    "malware_c2_endpoints_contacted": false,
+    "application_login_or_compromise_confirmed": false,
+    "modsecurity_mcp_rows": 3,
+    "suricata_mcp_sids": [
+      "2009714",
+      "2011142"
+    ],
+    "suricata2011142_metadata": "Informational, not automatic proof of additional attack",
+    "wazuh_rules_observed": [
+      "100102",
+      "100110",
+      "100111",
+      "100121"
+    ],
+    "runner_source_verification": {
+      "executed_sha256": "4ea8a3068c134974ad2364baa9799a7a9076a7dc11ca3342da30923df9a32978",
+      "canonical_sha256": "209c1c9f4e22c8b83daa32ab1bd96afe568b70832032ffbe935a4589e5208b10",
+      "same_executable_ast_excluding_module_docstring_and_unused_root_assignment": true
+    }
+  },
+  "containment": {
+    "request_id": "6bf30a964082f73cfa60694cbe772267",
+    "source_ip": "192.168.16.232",
+    "first_actor": "previously designated Native IDS exception",
+    "llm_first_case_mcp_calls": 6,
+    "llm_reused_existing_native_block": true,
+    "initial_apply_observed_at_kst": "2026-11-05T12:25:47+09:00",
+    "initial_apply_scope": "kernel ownership readback after create; not first-packet drop time",
+    "temporary_deadline_kst": "2026-11-05T12:35:46+09:00",
+    "closed_at_kst": "2026-11-05T12:35:47+09:00",
+    "status": "expired",
+    "cooldown_seconds": 60,
+    "keep_seconds": 3600,
+    "keep_or_release_approval_performed": false,
+    "drop_counter_packets_before": 937,
+    "drop_counter_packets_after": 940,
+    "probe": {
+      "connected": false,
+      "error": "TimeoutError",
+      "at_kst": "2026-11-05T12:31:36.558442+09:00",
+      "seconds": 3.003564547019778,
+      "local_endpoint": [
+        "192.168.16.232",
+        35965
+      ],
+      "destination": [
+        "192.168.16.230",
+        80
+      ],
+      "http_request_sent": false
+    },
+    "post_expiry_recovery": {
+      "connected": true,
+      "status": 302,
+      "response_prefix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "at_kst": "2026-11-05T12:39:44.889185+09:00",
+      "elapsed_seconds": 0.006629206007346511
+    },
+    "kernel_set_absent_after_expiry": true,
+    "card_url": "https://chat.grootlab.duckdns.org/soc/pl/tkwfwj4qk3y3ty3ni7g5bjoddy",
+    "result_url": "https://chat.grootlab.duckdns.org/soc/pl/ymsyroxphbgozbp9e16w5fi8ro"
+  },
+  "management": {
+    "not_counted_as_complete_soc_success": true,
+    "cases": [
+      {
+        "id": "61dbec56057bc9e28b2ea1aba77f814d",
+        "state": "needs_review",
+        "detail": "shared_containment_verification_missing"
+      },
+      {
+        "id": "6be480fe3a9c06cb2d57259e89d58d20",
+        "state": "needs_review",
+        "detail": "model_tool_failure_requires_review"
+      },
+      {
+        "id": "b9de155e013c6e8820a913f0edb82c1c",
+        "state": "outcome_unknown",
+        "detail": "model_subprocess_timeout_requires_review"
+      },
+      {
+        "id": "a1d596168e15badeace8dd4e0388a256",
+        "state": "outcome_unknown",
+        "detail": "model_subprocess_timeout_requires_review"
+      }
+    ],
+    "runs": [
+      {
+        "id": "6da13e94f44e981f7db19ad0e535e9dc",
+        "case": "61dbec56057bc9e28b2ea1aba77f814d",
+        "seconds": 143.3061146736145,
+        "state": "completed",
+        "detail": "awaiting_broker_event",
+        "tool_calls": 6,
+        "errors": 0
+      },
+      {
+        "id": "5e2018f25fdf0791873e3e8bfc721f0f",
+        "case": "61dbec56057bc9e28b2ea1aba77f814d",
+        "seconds": 83.53770732879639,
+        "state": "completed",
+        "detail": "shared_containment_verification_missing",
+        "tool_calls": 0,
+        "errors": 0
+      },
+      {
+        "id": "a9a316c380f8922ea0a98207edba0f38",
+        "case": "6be480fe3a9c06cb2d57259e89d58d20",
+        "seconds": 178.78522610664368,
+        "state": "completed",
+        "detail": "model_tool_failure_requires_review",
+        "tool_calls": 7,
+        "errors": 4
+      },
+      {
+        "id": "60e74b2d1dddb313a57ffa85085a1042",
+        "case": "b9de155e013c6e8820a913f0edb82c1c",
+        "seconds": 214.233788728714,
+        "state": "outcome_unknown",
+        "detail": "model_subprocess_timeout_requires_review",
+        "tool_calls": 6,
+        "errors": 0
+      },
+      {
+        "id": "439e6926032a9d6e4a3fc4d558e287fa",
+        "case": "a1d596168e15badeace8dd4e0388a256",
+        "seconds": 214.32800960540771,
+        "state": "outcome_unknown",
+        "detail": "model_subprocess_timeout_requires_review",
+        "tool_calls": 10,
+        "errors": 2
+      }
+    ],
+    "automatic_report_posts": [
+      {
+        "url": "https://chat.grootlab.duckdns.org/soc/pl/9zucmfgex7yg8gzbgzst4o8xqa",
+        "table_lines": 6
+      },
+      {
+        "url": "https://chat.grootlab.duckdns.org/soc/pl/amrzecoi5id8umnufq3bkmtj7e",
+        "table_lines": 6
+      },
+      {
+        "url": "https://chat.grootlab.duckdns.org/soc/pl/adfqqkf66bn68n378ch5debyyh",
+        "table_lines": 6
+      },
+      {
+        "url": "https://chat.grootlab.duckdns.org/soc/pl/mpmhuyx49byzjgmpfrn9kkffwa",
+        "table_lines": 6
+      },
+      {
+        "url": "https://chat.grootlab.duckdns.org/soc/pl/sgwpnfg46pnp5kz4uoy7wnjrhh",
+        "table_lines": 6
+      }
+    ],
+    "ui_new_reports_verified": false
+  },
+  "clock_measurement": {
+    "at_kst": "2026-11-05T12:37:00.455423+09:00",
+    "reference": "current Mac wall clock, not an NTP attestation",
+    "offsets": [
+      {
+        "host": "A",
+        "remote_at_kst": "2026-11-05T12:36:58.471866+09:00",
+        "roundtrip_seconds": 1.0509147644042969,
+        "offset_lower_seconds": -0.043242454528808594,
+        "offset_upper_seconds": 1.0076723098754883,
+        "offset_midpoint_seconds": 0.48221492767333984
+      },
+      {
+        "host": "B",
+        "remote_at_kst": "2026-11-05T12:36:59.204594+09:00",
+        "roundtrip_seconds": 0.7431550025939941,
+        "offset_lower_seconds": -0.05430197715759277,
+        "offset_upper_seconds": 0.6888530254364014,
+        "offset_midpoint_seconds": 0.3172755241394043
+      },
+      {
+        "host": "232",
+        "remote_at_kst": "2026-11-05T12:36:44.776797+09:00",
+        "roundtrip_seconds": 0.5768489837646484,
+        "offset_lower_seconds": -15.059623003005981,
+        "offset_upper_seconds": -14.482774019241333,
+        "offset_midpoint_seconds": -14.771198511123657
+      },
+      {
+        "host": "233",
+        "remote_at_kst": "2026-11-05T12:36:37.741758+09:00",
+        "roundtrip_seconds": 0.6180610656738281,
+        "offset_lower_seconds": -22.713142156600952,
+        "offset_upper_seconds": -22.095081090927124,
+        "offset_midpoint_seconds": -22.404111623764038
+      }
+    ],
+    "clock_changed": false
+  },
+  "cleanup": {
+    "state": "complete",
+    "kali": [
+      {
+        "captures_verified": 7,
+        "pdfs_verified": 2,
+        "description_sha256": "206460251a706c821c433cf54e2e5522121731bb4ef5ccf4e277b7640a612587",
+        "own_workers": [
+          {
+            "name": "offline-worker.json",
+            "live": false
+          },
+          {
+            "name": "web-worker.json",
+            "live": false
+          }
+        ],
+        "transport_removed_bytes": 68731011,
+        "operating_evidence_and_results_preserved": true,
+        "new_installed_packages": 0,
+        "host": "/home/att"
+      },
+      {
+        "captures_verified": 7,
+        "pdfs_verified": 2,
+        "description_sha256": "206460251a706c821c433cf54e2e5522121731bb4ef5ccf4e277b7640a612587",
+        "own_workers": [],
+        "transport_removed_bytes": 68731011,
+        "operating_evidence_and_results_preserved": true,
+        "new_installed_packages": 0,
+        "host": "/home/attack"
+      }
+    ],
+    "mac": {
+      "at_kst": "2026-11-05T13:06:34.085901+09:00",
+      "files_removed": 69,
+      "bytes_removed": 138931517,
+      "ssh_controls": [
+        {
+          "host": "cps-b",
+          "state": "absent"
+        },
+        {
+          "host": "cps-c",
+          "state": "absent"
+        },
+        {
+          "host": "cps-a",
+          "state": "absent"
+        },
+        {
+          "host": "cps-admin-direct",
+          "state": "absent"
+        },
+        {
+          "host": "cps-k",
+          "state": "absent"
+        },
+        {
+          "host": "cps-k2",
+          "state": "absent"
+        }
+      ],
+      "path_absent": true,
+      "new_local_packages_installed": 0,
+      "existing_publisher_preserved": true
+    },
+    "remaining_own_processes": 0,
+    "captures_sources_answers_reproducers_results_preserved": true
+  },
+  "publication": {
+    "state": "pending"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "purpose": "Kali-only validation; additional seven captures, not training data",
+  "test_source_ip": "192.168.16.232",
+  "import_hosts": [
+    "192.168.16.232",
+    "192.168.16.233"
+  ],
+  "selection_date_kst": "2026-11-05",
+  "cases": [
+    {
+      "id": "mta-20260911",
+      "family": "Kongtuke ClickFix infection investigation",
+      "label_scope": "publisher infection capture; individual flows require evidence, background not automatically malicious",
+      "page": "https://www.malware-traffic-analysis.net/2026/09/11/index.html",
+      "answers": "https://www.malware-traffic-analysis.net/2026/09/11/page2.html",
+      "pcap_url": "https://www.malware-traffic-analysis.net/2026/09/11/2026-09-11-traffic-analysis-exercise.pcap.zip",
+      "expected_download_bytes": 54624798,
+      "kind": "zip",
+      "archive_date": "20260911"
+    },
+    {
+      "id": "mta-20260809",
+      "family": "FormBook CnC investigation",
+      "label_scope": "publisher infection capture; individual flows require evidence, background not automatically malicious",
+      "page": "https://www.malware-traffic-analysis.net/2026/08/09/index.html",
+      "answers": "https://www.malware-traffic-analysis.net/2026/08/09/page2.html",
+      "pcap_url": "https://www.malware-traffic-analysis.net/2026/08/09/2026-08-09-traffic-analysis-exercise.pcap.zip",
+      "expected_download_bytes": 12792967,
+      "kind": "zip",
+      "archive_date": "20260809"
+    },
+    {
+      "id": "ctu-normal6-dns",
+      "family": "normal university notebook DNS",
+      "label_scope": "publisher normal DNS capture",
+      "page": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Normal-6-filtered/README.md",
+      "pcap_url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Normal-6-filtered/2013-10-21_capture-1-only-dns.pcap",
+      "kind": "pcap"
+    },
+    {
+      "id": "ctu-malware282-1",
+      "family": "probable Trojan Strictor without MITM proxy",
+      "label_scope": "publisher tentative infection name; not every flow malicious",
+      "page": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-282-1/README.md",
+      "pcap_url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-282-1/2017-07-06_capture-win3.pcap",
+      "kind": "pcap"
+    },
+    {
+      "id": "wireshark-http-post",
+      "family": "large segmented HTTP POST",
+      "label_scope": "protocol reference, not certified clean real-world corpus; inspect request contents before lab replay",
+      "page": "https://wiki.wireshark.org/SampleCaptures#hypertext-transport-protocol-http",
+      "discovery": "https://www.netresec.com/?page=PcapFiles",
+      "pcap_url": "https://wiki.wireshark.org/uploads/__moin_import__/attachments/SampleCaptures/tcp-ethereal-file1.trace",
+      "kind": "pcap"
+    },
+    {
+      "id": "wireshark-http-ecn",
+      "family": "TCP ECN HTTP transfer",
+      "label_scope": "protocol reference, not certified clean real-world corpus; inspect request contents before lab replay",
+      "page": "https://wiki.wireshark.org/SampleCaptures#hypertext-transport-protocol-http",
+      "discovery": "https://www.netresec.com/?page=PcapFiles",
+      "pcap_url": "https://wiki.wireshark.org/uploads/__moin_import__/attachments/SampleCaptures/tcp-ecn-sample.pcap",
+      "kind": "pcap"
+    },
+    {
+      "id": "wireshark-http-redirects",
+      "family": "HTTP302 redirection protocol",
+      "label_scope": "protocol reference, not certified clean real-world corpus; inspect request contents before lab replay",
+      "page": "https://wiki.wireshark.org/SampleCaptures#hypertext-transport-protocol-http",
+      "discovery": "https://www.netresec.com/?page=PcapFiles",
+      "pcap_url": "https://wiki.wireshark.org/uploads/__moin_import__/attachments/SampleCaptures/http_redirects.pcapng",
+      "kind": "pcap"
+    }
+  ],
+  "deferred": [
+    {
+      "source": "CAIDA",
+      "page": "https://www.caida.org/catalog/datasets/passive_dataset/",
+      "reason": "Restricted traces require access request and have transport headers only. Public OC48 also removes payload and leads to a usage form. Not suitable for this HTTP request replay; no access form submitted and no dataset downloaded."
+    },
+    {
+      "source": "Netresec FIRST 2015",
+      "page": "https://www.netresec.com/?page=PcapFiles",
+      "reason": "4.4GB archive may duplicate the existing 58 captures, but origin is unconfirmed. Do not download another full copy or assign provenance without a byte/member match."
+    }
+  ],
+  "terms": {
+    "stratosphere": "Publisher README permits use with project/author citation; preserve README and source URL.",
+    "mta": "Public researcher exercise; preserve page and answer links. No blanket open license or redistribution permission inferred.",
+    "wireshark": "Preserve capture-specific attribution. No blanket clean label or redistribution permission inferred.",
+    "publication": "Commit coordinates, hashes and results only; never packet bytes or archive contents."
+  },
+  "prior_capture_count": 11,
+  "text_descriptions_required_on_both_kalis": true
+}

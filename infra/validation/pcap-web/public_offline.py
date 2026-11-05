@@ -28,9 +28,10 @@ def limits():
 
 
 def run(root, config):
-    assert str(root) == '/home/att/Desktop/PCAP/public-20261103'
+    assert str(root) in ('/home/att/Desktop/PCAP/public-20261103',
+                         '/home/att/Desktop/PCAP/public-20261105')
     imported = json.loads((root / 'import-result.json').read_text())
-    tool = root / 'tools/suricata-8.0.6'
+    tool = Path('/home/att/Desktop/PCAP/public-20261103/tools/suricata-8.0.6')
     work = root / 'offline-r1'
     work.mkdir(mode=0o700, exist_ok=False)
     cfg = work / 'suricata.yaml'
@@ -93,6 +94,8 @@ def run(root, config):
     result = {'schema': 1, 'source_ip': '192.168.16.232', 'mode': 'offline-no-transmission',
               'config_sha256': hashlib.sha256(cfg.read_bytes()).hexdigest(),
               'rule_sha256': hashlib.sha256((tool / 'rules/all.rules').read_bytes()).hexdigest(),
+              'tool_root': str(tool),
+              'catalog_sha256': hashlib.sha256((root / 'imported/catalog.json').read_bytes()).hexdigest(),
               'checksum_validation': 'disabled for capture offload compatibility; not live configuration',
               'home_net': 'capture private networks; differs from production CLI HOME_NET',
               'rows': rows, 'ended_kst': now(), 'elapsed_s': round(time.monotonic() - started, 3)}

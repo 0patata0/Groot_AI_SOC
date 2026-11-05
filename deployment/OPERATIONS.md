@@ -33,3 +33,5 @@
 11/5 [영향 조사·반복 표 오류 후속](../infra/hermes/web-impact-navigation.md): 현행 공통1.5.32/query1.19.27/security-events1.2.2. 선택적인 양끝 구분자를 공통 출력기에서 보완하고 실제 문제 게시물을 셀/작성자/채널 보존·형식만 수정, 내부 웹 앱에서 표1/pre0을 확인했다. 기존 gate/source_bundle/SDK·Native 복사 경로와 설치39검사를 사용하며 새 deb/wheel/image·키/포트·권한0이다. 실제 웹 사건 조사는 등록 탐색/백엔드까지 진행 후 시간초과로 미완료이며 과거 snapshot 잘림을 먼저 보완한다. 두 원본/원복과 운영 trace/승인/채팅을 보존한다.
 
 11/5 [과거 웹 조회 보완](../infra/mcp/web-history.md): 기존 단일deploy.sh/diag-apply/SIEM source복사 경로로 schema2 정제 이력 publisher·reader를 연결했다. 원본 읽기8MiB·최근10k는 유지하고 검색을 시간/서비스 필터 뒤 최대50행으로 제한한다. 이력은32MiB/128k행·최대8세대/TTL회전·기존 그룹읽기만 허용한다. 새 패키지/이미지/포트/키/일반권한0·고유85검사/실제MCP·C3/B2확정, 새 OS 전체 설치는 별도 미실행이다.
+
+11/5 [추가 패킷 시험](../infra/validation/pcap-web/PUBLIC_PCAP_20261105.md)은 별도 Kali232/233 자료 반입·232 실행이며 운영 설치 패키지를 추가하지 않는다. 기존 단일deploy.sh/보안정책은 유지했다. 시간 계측은 KST표시와 별개로 원천/수집 시각·호스트offset을 확인하고, 정상자료의TLD신호/초기HTTP미복원을 정상 통과·무조건 악성으로 세지 않는다. LLM공유참조조회/operation입력·시간초과는 실제trace와다음작업에남긴다.

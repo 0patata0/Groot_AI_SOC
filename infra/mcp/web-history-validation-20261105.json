@@ -91,15 +91,55 @@
     "history_seconds": 1209600
   },
   "cleanup": {
-    "state": "server_complete_mac_shared_with_active_pcap_import",
+    "state": "complete",
     "c_source_files_removed": 4,
     "c_source_bytes_removed": 56749,
     "backups_preserved": true,
     "operating_sanitized_history_preserved": true,
-    "mac_temp_reason": "same working directory is in use by ongoing authorized Kali PCAP import; cleanup after completion"
+    "mac_temp_reason": "same working directory is in use by ongoing authorized Kali PCAP import; cleanup after completion",
+    "mac": {
+      "at_kst": "2026-11-05T13:06:34.085901+09:00",
+      "files_removed": 69,
+      "bytes_removed": 138931517,
+      "ssh_controls": [
+        {
+          "host": "cps-b",
+          "state": "absent"
+        },
+        {
+          "host": "cps-c",
+          "state": "absent"
+        },
+        {
+          "host": "cps-a",
+          "state": "absent"
+        },
+        {
+          "host": "cps-admin-direct",
+          "state": "absent"
+        },
+        {
+          "host": "cps-k",
+          "state": "absent"
+        },
+        {
+          "host": "cps-k2",
+          "state": "absent"
+        }
+      ],
+      "path_absent": true,
+      "new_local_packages_installed": 0,
+      "existing_publisher_preserved": true
+    },
+    "remaining_own_processes": 0
   },
   "publication": {
-    "state": "pending"
+    "state": "source_pushed_and_remote_verified",
+    "source_commit": "412b8798d1c1e7ff511b2bc71093859df2f9f0d8",
+    "remote_main_at_source_push": "412b8798d1c1e7ff511b2bc71093859df2f9f0d8",
+    "verified_at_kst": "2026-11-05T12:12:27.763080+09:00",
+    "public_files": 15,
+    "receipt_and_shared_cleanup_followup_pending": true
   },
   "remaining": [
     "model_host_followup_and_final_case_judgment",
@@ -107,5 +147,51 @@
     "new_pcap_live_and_offline_tests",
     "paper_latest_pdf",
     "independent_evaluation"
-  ]
+  ],
+  "final_live_verification": {
+    "b": {
+      "role": "B",
+      "files_verified": 2,
+      "core_sha256": "259a154f4cbb7c93d8ecd84d9874a732e6348d8f8b4744f3fb265687a084eb15",
+      "backups_present": true,
+      "at_epoch": 1793851392.8084428,
+      "protected_unchanged": 7,
+      "health": [
+        {
+          "age_seconds": 1.80887770652771,
+          "connected": true,
+          "worker_alive": true
+        },
+        {
+          "age_seconds": 12.808944940567017,
+          "connected": true,
+          "worker_alive": true
+        }
+      ],
+      "services_active": 4
+    },
+    "c": {
+      "role": "C",
+      "files_verified": 3,
+      "core_sha256": "259a154f4cbb7c93d8ecd84d9874a732e6348d8f8b4744f3fb265687a084eb15",
+      "backups_present": true,
+      "at_epoch": 1793851392.8234684,
+      "history": {
+        "bytes": 5584338,
+        "name": "history-f19bf59450212e82cecf175e823ef3e22d0ac7819e309605a508896c55b98bbd.jsonl",
+        "rows": 14193,
+        "rows_truncated": false,
+        "sha256": "f19bf59450212e82cecf175e823ef3e22d0ac7819e309605a508896c55b98bbd"
+      },
+      "coverage": {
+        "bytes_scanned": 3161588,
+        "files_unavailable": 0,
+        "logging_continuity_verified": false,
+        "malformed_lines": 9,
+        "rows_truncated": true,
+        "scan_limited": false
+      },
+      "snapshot_age_seconds": 54.41580653190613
+    }
+  }
 }

@@ -1,0 +1,1434 @@
+{
+  "version": "groot-query-completion:1.19.53",
+  "common_contract": "soc-chat-contract:1.5.32",
+  "at_kst": "2026-11-06T03:04:00.174210+09:00",
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "1fbb639636ccda30453e648529aff1959bbe709b0b9262193cac1a285aeace39",
+    "infra/hermes/test_soc_management_selection.py": "b9710e5799a444cc005e55d8859902dddedeb8ce3e03bc9cfc96d478595a8c01",
+    "infra/hermes/test_soc_management_repair.py": "20d3cb04a720ba0c0eac3c0fdc1a774e53924d5b90bd9064b2962746c39ff5ce",
+    "infra/hermes/test_soc_management_run.py": "d850f22187f6834d35ea7f880604b88846f9b8ec7afd8cea4059888722ac7700",
+    "infra/hermes/query-completion/__init__.py": "d26541b7ddcf6648abad0b2ec02384c6851539140e0991ec8fad78e881c67c40",
+    "infra/hermes/query-completion/plugin.yaml": "3ee71bda3994b50473585210e9a5de9d65e3ebb7a4f5b02923de9e18fdffe3e4"
+  },
+  "directory_candidate_adopted": false,
+  "active_read_selection": "single_call_or_report_full_registered_schema",
+  "tests": {
+    "unique_passed": 1051,
+    "final_skipped": 0,
+    "suites": [
+      {
+        "suite": "management",
+        "rc": 0,
+        "tests": 374,
+        "skip": 54
+      },
+      {
+        "suite": "sdk",
+        "rc": 0,
+        "tests": 219,
+        "skip": 0
+      },
+      {
+        "suite": "native",
+        "rc": 0,
+        "tests": 391,
+        "skip": 0
+      },
+      {
+        "suite": "install",
+        "rc": 0,
+        "tests": 41,
+        "skip": 0
+      },
+      {
+        "suite": "tables",
+        "rc": 0,
+        "tests": 19,
+        "skip": 0
+      },
+      {
+        "suite": "output",
+        "rc": 0,
+        "tests": 7,
+        "skip": 0
+      }
+    ],
+    "native_transport": {
+      "tests": 58,
+      "skip": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    "duplicate_tests": 4,
+    "skipped_covered_by_native": 54
+  },
+  "deployment": [
+    {
+      "candidate": "r1",
+      "files": {
+        "/opt/capstone-management/soc_management_run.py": {
+          "before": "951eaf395b4b99355953bb34af0b3647db11aea384f315a5d0796a1267b58369",
+          "after": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-0",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/management-code/run.py": {
+          "before": "951eaf395b4b99355953bb34af0b3647db11aea384f315a5d0796a1267b58369",
+          "after": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-1",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+          "before": "951eaf395b4b99355953bb34af0b3647db11aea384f315a5d0796a1267b58369",
+          "after": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-2",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/grounding.py": {
+          "before": "951eaf395b4b99355953bb34af0b3647db11aea384f315a5d0796a1267b58369",
+          "after": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-3",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+          "before": "c46a9ed42126bc8bc24a9b957cf201597bf68f3355b2d5f25bec101b5ccc3179",
+          "after": "496d5c5e28a9031c275fdf541e350a2eb4653229be713459a7cb8de60dc2c497",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-4",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/query_grounding.py": {
+          "before": "c46a9ed42126bc8bc24a9b957cf201597bf68f3355b2d5f25bec101b5ccc3179",
+          "after": "496d5c5e28a9031c275fdf541e350a2eb4653229be713459a7cb8de60dc2c497",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-5",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": {
+          "before": "5bad905c4d70e14d3f7b8372923df42d74ff9b11cac4ccb12f6b68981dacf3d7",
+          "after": "b6bc09972cf7d7b331a8d62646e937d6776d99f685857052504d8eb88c776519",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-6",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-management/soc_management_controller.py": {
+          "before": "458e56c989bfd2889a5d6bfd83836da4082c0d8df3019ee99104c1e52d0972c7",
+          "after": "30b46c6ef435a28c320e3fb297aec36f11717217e97e58a6cf9a3a549161a205",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-7",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/etc/capstone-ollama-trial/receipt.json": {
+          "before": "0571edcb47d61b76cc5dd5d662001d60cf5b419c5f62ce28c6d620e074361a32",
+          "after": "3df31f0d014715fd59ca6a47a86e96a10ff026747ab635102260f3da69387409",
+          "backup": "/var/lib/capstone-review-input/20261106-r1/deployment/before-8",
+          "uid": 0,
+          "gid": 0,
+          "mode": 384
+        }
+      },
+      "idle": {
+        "idle": true,
+        "active_leases": 0,
+        "heartbeat_age_seconds": 0.251
+      },
+      "recovery": "active_unconfirmed",
+      "new_packages_permissions_ports_keys_model_fw_changes": 0,
+      "at_epoch": 1793899802.526467
+    },
+    {
+      "candidate": "r2",
+      "files": {
+        "/opt/capstone-management/soc_management_run.py": {
+          "before": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "after": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-0",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/management-code/run.py": {
+          "before": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "after": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-1",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+          "before": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "after": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-2",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/grounding.py": {
+          "before": "1614b8e2b161246edd70a04b99f59e04679bd7105a1adfa5c93bec662f3167e5",
+          "after": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-3",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+          "before": "496d5c5e28a9031c275fdf541e350a2eb4653229be713459a7cb8de60dc2c497",
+          "after": "bc33980bf1ccf3f2973bbb75e80f04aede068c55164c4a6f746cb357461b13da",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-4",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/query_grounding.py": {
+          "before": "496d5c5e28a9031c275fdf541e350a2eb4653229be713459a7cb8de60dc2c497",
+          "after": "bc33980bf1ccf3f2973bbb75e80f04aede068c55164c4a6f746cb357461b13da",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-5",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": {
+          "before": "b6bc09972cf7d7b331a8d62646e937d6776d99f685857052504d8eb88c776519",
+          "after": "1d88079e23f3dcf5a995f362b3586100ccf6a61eeb4edc2a30655e1cab67a62b",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-6",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-management/soc_management_controller.py": {
+          "before": "30b46c6ef435a28c320e3fb297aec36f11717217e97e58a6cf9a3a549161a205",
+          "after": "8e4cb1729087df7e813c5cf73d7838c76505316a461aa6a4be4ff32ccbeacd80",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-7",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/etc/capstone-ollama-trial/receipt.json": {
+          "before": "3df31f0d014715fd59ca6a47a86e96a10ff026747ab635102260f3da69387409",
+          "after": "b61d9c147babdec2cd3f32aa83c07acfe55697ac8b306f700d34ba57902eb664",
+          "backup": "/var/lib/capstone-review-input/20261106-r2/deployment/before-8",
+          "uid": 0,
+          "gid": 0,
+          "mode": 384
+        }
+      },
+      "idle": {
+        "idle": true,
+        "active_leases": 0,
+        "heartbeat_age_seconds": 0.965
+      },
+      "recovery": "active_unconfirmed",
+      "new_packages_permissions_ports_keys_model_fw_changes": 0,
+      "at_epoch": 1793900190.7120879
+    },
+    {
+      "candidate": "r3",
+      "files": {
+        "/opt/capstone-management/soc_management_run.py": {
+          "before": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "after": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-0",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/management-code/run.py": {
+          "before": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "after": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-1",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+          "before": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "after": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-2",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/grounding.py": {
+          "before": "0590a3d85206fa79a2519c67931cbf316ea2edf9bb627ecf21fbdc3db916cfa7",
+          "after": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-3",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+          "before": "bc33980bf1ccf3f2973bbb75e80f04aede068c55164c4a6f746cb357461b13da",
+          "after": "cfbb1ef733056a5bdbb83a4c4ddf1ec3c6eac15a7b98a9f02518c0e514dfb5ed",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-4",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/query_grounding.py": {
+          "before": "bc33980bf1ccf3f2973bbb75e80f04aede068c55164c4a6f746cb357461b13da",
+          "after": "cfbb1ef733056a5bdbb83a4c4ddf1ec3c6eac15a7b98a9f02518c0e514dfb5ed",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-5",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": {
+          "before": "1d88079e23f3dcf5a995f362b3586100ccf6a61eeb4edc2a30655e1cab67a62b",
+          "after": "203ec9a39b61a9c4e1da1c967d62a735eb659304bf08b8ba4290b5f5a3852bcd",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-6",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-management/soc_management_controller.py": {
+          "before": "8e4cb1729087df7e813c5cf73d7838c76505316a461aa6a4be4ff32ccbeacd80",
+          "after": "d4b3c8ce2a0516770dfe4f943cea2dd5c3183133d6fb565b6552982321143b81",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-7",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/etc/capstone-ollama-trial/receipt.json": {
+          "before": "b61d9c147babdec2cd3f32aa83c07acfe55697ac8b306f700d34ba57902eb664",
+          "after": "41e7a0bd628f515a5a6321ba3b1fc10369cd7c3f34af607b9aa46251cd80b1db",
+          "backup": "/var/lib/capstone-review-input/20261106-r3/deployment/before-8",
+          "uid": 0,
+          "gid": 0,
+          "mode": 384
+        }
+      },
+      "idle": {
+        "idle": true,
+        "active_leases": 0,
+        "heartbeat_age_seconds": 27.626
+      },
+      "recovery": "active_unconfirmed",
+      "new_packages_permissions_ports_keys_model_fw_changes": 0,
+      "at_epoch": 1793900844.8026404
+    },
+    {
+      "candidate": "r4",
+      "files": {
+        "/opt/capstone-management/soc_management_run.py": {
+          "before": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "after": "1fbb639636ccda30453e648529aff1959bbe709b0b9262193cac1a285aeace39",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-0",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/management-code/run.py": {
+          "before": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "after": "1fbb639636ccda30453e648529aff1959bbe709b0b9262193cac1a285aeace39",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-1",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+          "before": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "after": "1fbb639636ccda30453e648529aff1959bbe709b0b9262193cac1a285aeace39",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-2",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/grounding.py": {
+          "before": "2174db0ec848c4b99742065165fa2f968789733a4142d531055b86fa41cf1db5",
+          "after": "1fbb639636ccda30453e648529aff1959bbe709b0b9262193cac1a285aeace39",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-3",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+          "before": "cfbb1ef733056a5bdbb83a4c4ddf1ec3c6eac15a7b98a9f02518c0e514dfb5ed",
+          "after": "d26541b7ddcf6648abad0b2ec02384c6851539140e0991ec8fad78e881c67c40",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-4",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-ollama-trial/query_grounding.py": {
+          "before": "cfbb1ef733056a5bdbb83a4c4ddf1ec3c6eac15a7b98a9f02518c0e514dfb5ed",
+          "after": "d26541b7ddcf6648abad0b2ec02384c6851539140e0991ec8fad78e881c67c40",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-5",
+          "uid": 0,
+          "gid": 981,
+          "mode": 416
+        },
+        "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": {
+          "before": "203ec9a39b61a9c4e1da1c967d62a735eb659304bf08b8ba4290b5f5a3852bcd",
+          "after": "3ee71bda3994b50473585210e9a5de9d65e3ebb7a4f5b02923de9e18fdffe3e4",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-6",
+          "uid": 995,
+          "gid": 986,
+          "mode": 384
+        },
+        "/opt/capstone-management/soc_management_controller.py": {
+          "before": "d4b3c8ce2a0516770dfe4f943cea2dd5c3183133d6fb565b6552982321143b81",
+          "after": "a28b0da5a3c96ce177ee4c647b336d046b25e2af3168672e41b3f8e15e6c61ef",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-7",
+          "uid": 0,
+          "gid": 0,
+          "mode": 420
+        },
+        "/etc/capstone-ollama-trial/receipt.json": {
+          "before": "41e7a0bd628f515a5a6321ba3b1fc10369cd7c3f34af607b9aa46251cd80b1db",
+          "after": "b030ec53b7115e305a219d8d690b2ce4ff261ffeb3d121460fef3080d84fc628",
+          "backup": "/var/lib/capstone-review-input/20261106-r4/deployment/before-8",
+          "uid": 0,
+          "gid": 0,
+          "mode": 384
+        }
+      },
+      "idle": {
+        "idle": true,
+        "active_leases": 0,
+        "heartbeat_age_seconds": 5.258
+      },
+      "recovery": "active_unconfirmed",
+      "new_packages_permissions_ports_keys_model_fw_changes": 0,
+      "at_epoch": 1793901356.3128407
+    }
+  ],
+  "final_health": {
+    "confirmed_at_epoch": 1793901720,
+    "files_verified": 11,
+    "protected_unchanged": 7,
+    "gate_sha256": "1fbb639636ccda30453e648529aff1959bbe709b0b9262193cac1a285aeace39",
+    "controller_sha256": "a28b0da5a3c96ce177ee4c647b336d046b25e2af3168672e41b3f8e15e6c61ef",
+    "gate_matches_reference": true,
+    "ids_path_impact_enabled": true,
+    "gate_argument_bytes": 59735,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 10.943940877914429,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 2.944023847579956,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "automatic_shared_status_required": 1,
+    "sensor_reads_required": 3
+  },
+  "runs": {
+    "short-r1": {
+      "run_id": "6f9de8f42a6192a635a37b4fda9c51e3",
+      "seconds": 58.17970371246338,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_requested_followup",
+      "report_state": "monitor",
+      "assessment": "remediated",
+      "outbox": "sent",
+      "outbox_seconds": 58.23132252693176,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [
+          "web_snapshot_is_not_application_health"
+        ],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 15,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.163351,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 48,
+            "prompt_tokens": 634,
+            "total_tokens": 682,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.312648,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 37,
+            "prompt_tokens": 1911,
+            "total_tokens": 1948,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.849849,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 57,
+            "prompt_tokens": 2142,
+            "total_tokens": 2199,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 98
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 17.138624,
+          "input_message_bytes": 38701,
+          "usage": {
+            "completion_tokens": 274,
+            "prompt_tokens": 12229,
+            "total_tokens": 12503,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 3.780594,
+          "input_message_bytes": 40697,
+          "usage": {
+            "completion_tokens": 51,
+            "prompt_tokens": 12834,
+            "total_tokens": 12885,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 10181
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 15.37337,
+          "input_message_bytes": 36432,
+          "usage": {
+            "completion_tokens": 238,
+            "prompt_tokens": 11650,
+            "total_tokens": 11888,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": true,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    "extra-r2": {
+      "run_id": "8498c55d86887223338542fdc53f032d",
+      "seconds": 86.1964979171753,
+      "reads": 11,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": null,
+      "outbox": "sent",
+      "outbox_seconds": 86.26795029640198,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 21,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.437348,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 47,
+            "prompt_tokens": 636,
+            "total_tokens": 683,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.337516,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 36,
+            "prompt_tokens": 1910,
+            "total_tokens": 1946,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.632928,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 41,
+            "prompt_tokens": 2144,
+            "total_tokens": 2185,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 98
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 12.376969,
+          "input_message_bytes": 39089,
+          "usage": {
+            "completion_tokens": 48,
+            "prompt_tokens": 12329,
+            "total_tokens": 12377,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 4,
+          "provider_seconds": 14.993352,
+          "input_message_bytes": 40664,
+          "usage": {
+            "completion_tokens": 183,
+            "prompt_tokens": 12605,
+            "total_tokens": 12788,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": true,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 25.329231,
+          "input_message_bytes": 71583,
+          "usage": {
+            "completion_tokens": 197,
+            "prompt_tokens": 21865,
+            "total_tokens": 22062,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 9.363241,
+          "input_message_bytes": 73300,
+          "usage": {
+            "completion_tokens": 295,
+            "prompt_tokens": 22340,
+            "total_tokens": 22635,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 19817
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    "short-r3": {
+      "run_id": "c97c5f7a8286b14190c37a923a5181a4",
+      "seconds": 69.04256415367126,
+      "reads": 9,
+      "tool_errors": 1,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_tool_failure_requires_review",
+      "report_state": "needs_review",
+      "assessment": null,
+      "outbox": "sent",
+      "outbox_seconds": 69.0953152179718,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 16,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.0103,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 42,
+            "prompt_tokens": 631,
+            "total_tokens": 673,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.396436,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 38,
+            "prompt_tokens": 1912,
+            "total_tokens": 1950,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.615342,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 39,
+            "prompt_tokens": 2142,
+            "total_tokens": 2181,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 98
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 12.075918,
+          "input_message_bytes": 38848,
+          "usage": {
+            "completion_tokens": 44,
+            "prompt_tokens": 12258,
+            "total_tokens": 12302,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 12.674099,
+          "input_message_bytes": 38511,
+          "usage": {
+            "completion_tokens": 100,
+            "prompt_tokens": 12073,
+            "total_tokens": 12173,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": true,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 15.952443,
+          "input_message_bytes": 39674,
+          "usage": {
+            "completion_tokens": 190,
+            "prompt_tokens": 12516,
+            "total_tokens": 12706,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 6.855553,
+          "input_message_bytes": 41406,
+          "usage": {
+            "completion_tokens": 195,
+            "prompt_tokens": 12969,
+            "total_tokens": 13164,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 10468
+            }
+          },
+          "compact_report": true,
+          "tool_directory": true,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    "automatic-r2": {
+      "run_id": "8b173bcdbd5809b2b0966f5a16126973",
+      "seconds": 214.59148144721985,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "outcome_unknown",
+      "run_detail": "model_subprocess_timeout_requires_review",
+      "report_state": "outcome_unknown",
+      "assessment": null,
+      "outbox": "sent",
+      "outbox_seconds": 214.65232300758362,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 15,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 1,
+          "provider_seconds": 63.062764,
+          "input_message_bytes": 227602,
+          "usage": {
+            "completion_tokens": 83,
+            "prompt_tokens": 58881,
+            "total_tokens": 58964,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 11.278355,
+          "input_message_bytes": 233552,
+          "usage": {
+            "completion_tokens": 335,
+            "prompt_tokens": 60859,
+            "total_tokens": 61194,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 56833
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 8.539777,
+          "input_message_bytes": 239148,
+          "usage": {
+            "completion_tokens": 195,
+            "prompt_tokens": 62566,
+            "total_tokens": 62761,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 58811
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 6.862864,
+          "input_message_bytes": 243584,
+          "usage": {
+            "completion_tokens": 89,
+            "prompt_tokens": 64008,
+            "total_tokens": 64097,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 60518
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 9.898394,
+          "input_message_bytes": 247679,
+          "usage": {
+            "completion_tokens": 300,
+            "prompt_tokens": 65106,
+            "total_tokens": 65406,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 61960
+            }
+          },
+          "compact_report": false,
+          "tool_directory": false,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    "short-r4": {
+      "run_id": "e90710553666a19cf2a6bb69c11cf148",
+      "seconds": 64.81589221954346,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 64.86530470848083,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 15,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.197036,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 59,
+            "prompt_tokens": 635,
+            "total_tokens": 694,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.36785,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 36,
+            "prompt_tokens": 1910,
+            "total_tokens": 1946,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.887518,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 43,
+            "prompt_tokens": 2145,
+            "total_tokens": 2188,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 21.458109,
+          "input_message_bytes": 68053,
+          "usage": {
+            "completion_tokens": 159,
+            "prompt_tokens": 18621,
+            "total_tokens": 18780,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 21.887029,
+          "input_message_bytes": 69528,
+          "usage": {
+            "completion_tokens": 140,
+            "prompt_tokens": 19019,
+            "total_tokens": 19159,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    "extra-r4": {
+      "run_id": "006c6346b6b4901b39a2cd2423740501",
+      "seconds": 87.3855345249176,
+      "reads": 9,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 87.45611834526062,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 19,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.138198,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 53,
+            "prompt_tokens": 636,
+            "total_tokens": 689,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.364653,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 37,
+            "prompt_tokens": 1911,
+            "total_tokens": 1948,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.742075,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 41,
+            "prompt_tokens": 2144,
+            "total_tokens": 2185,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 97
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 18.926273,
+          "input_message_bytes": 68431,
+          "usage": {
+            "completion_tokens": 69,
+            "prompt_tokens": 18710,
+            "total_tokens": 18779,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 19.650576,
+          "input_message_bytes": 70984,
+          "usage": {
+            "completion_tokens": 66,
+            "prompt_tokens": 19429,
+            "total_tokens": 19495,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 26.534625,
+          "input_message_bytes": 76429,
+          "usage": {
+            "completion_tokens": 269,
+            "prompt_tokens": 21375,
+            "total_tokens": 21644,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    }
+  },
+  "manual_quality_notes": {
+    "short-r1": "unsupported service health/no-impact; rejected candidate",
+    "extra-r2": "unnecessary extra diagnostics; first wrong closure; later uncertainty phrase false-positive, fallback",
+    "short-r3": "wrong server getter rejected before MCP, fallback",
+    "automatic-r2": "prior session reused; 214.652s timeout, not a fresh-request comparison",
+    "short-r4": "correct unresolved/current citations; mixed English and vague next steps remain",
+    "extra-r4": "active process correctly separated from impact; extra Apache snapshot query and vague later plan; Wazuh sample wording needs clearer scope"
+  },
+  "measurement_scope": "run start to report_outbox sent; excludes chat intake/queue/client rendering; same-case development, shared GPU uncontrolled",
+  "thirty_second_target_met": false,
+  "stable_latency_improvement_proven": false,
+  "untested": [
+    "independent new-case benchmark",
+    "full chat latency distribution",
+    "new OS full install",
+    "manual rollback",
+    "attack/load/PCAP E2E"
+  ],
+  "cleanup_server": {
+    "removed": [
+      {
+        "run": "r1",
+        "source_files": 439,
+        "test_logs": 8,
+        "deployment_backup_preserved": true
+      },
+      {
+        "run": "r2",
+        "source_files": 439,
+        "test_logs": 8,
+        "deployment_backup_preserved": true
+      },
+      {
+        "run": "r3",
+        "source_files": 439,
+        "test_logs": 8,
+        "deployment_backup_preserved": true
+      },
+      {
+        "run": "r4",
+        "source_files": 439,
+        "test_logs": 8,
+        "deployment_backup_preserved": true
+      }
+    ],
+    "live_db_approvals_traces_touched": false
+  },
+  "cleanup_mac": {
+    "at_kst": "2026-11-06T03:05:44.458689+09:00",
+    "temporary": "/private/tmp/capstone-review-input-20261106-meboa74j",
+    "removed_files": 47,
+    "removed_bytes": 17480442,
+    "removed_verified": true,
+    "new_mac_packages": 0,
+    "existing_user_files_touched": false,
+    "audit": "대화기록/검증/2026-11-06-review-input/helper-audit"
+  },
+  "git": {
+    "source_commit": "pending",
+    "remote_verified": false
+  }
+}

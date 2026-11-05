@@ -900,12 +900,20 @@ def web_evidence_violations(text, facts):
         issues.add('web_access_coverage_limit_omitted')
     # An Apache process/configuration and access rows are not an application
     # health check. Inspect the claim itself, not an unrelated disclaimer.
-    for match in re.finditer(r'(?:Apache|아파치|DVWA|웹\s*서비스|앱)[^\n.!?;|]{0,40}?(?:정상|건강)',text,re.I):
+    for match in re.finditer(r'(?:Apache|아파치|DVWA|웹\s*서비스|현재\s*서비스|앱)[^\n.!?;|]{0,40}?(?:정상|건강)',text,re.I):
         before=re.split(r'[.!?;|\n]',text[max(0,match.start()-30):match.start()])[-1]
         after=text[match.end():match.end()+20]
         if re.search(r'미확인|확인\s*불가|단정.{0,5}않',before):continue
-        if re.match(r'(?:\s|[/*`])+?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
+        if re.match(r'(?:\s|[/*`])*(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
         if re.match(r'\s*(?:을|를|이라고)?\s*(?:단정|보장|증명|판단).{0,8}(?:않|없|못)',after):continue
+        issues.add('web_snapshot_is_not_application_health')
+    # A web snapshot explicitly leaves application impact unverified. Reject
+    # a categorical absence claim; do not turn it into an attack verdict.
+    for match in re.finditer(r'(?:웹\s*)?서비스\s*영향(?:은|이|도)?\s*(?:없(?:습니다|음|다)|없었(?:습니다|음|다))',text):
+        before=text[max(0,match.start()-25):match.start()]
+        after=text[match.end():match.end()+30]
+        if re.search(r'미확인|확인\s*불가|인용|오답|예시',before):continue
+        if re.match(r'.{0,8}(?:단정|보장|증명|판단).{0,10}(?:않|없|못)',after):continue
         issues.add('web_snapshot_is_not_application_health')
     return sorted(issues)
 
@@ -1723,6 +1731,21 @@ def missing_sensor_reads(requirements, receipts):
         c['until']>=parse_instant(r['arguments']['until_kst']) for c in receipts)]
 
 
+def known_status_input_rejection(name, arguments, requirements):
+    """Do not reinterpret a bound operation ID as a rule-change proposal ID."""
+    if (os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify' or not isinstance(arguments,dict)
+            or not re.fullmatch(r'mcp__rule_[ab]__(?:get_operation_status|get_rule_change_status)',name or '')):
+        return None
+    references=[status_read_request(r) for r in requirements if r['proposal_id'] in
+                (arguments.get('request_id'),arguments.get('proposal_id'))]
+    if references and not any(name==r['tool'] and arguments==r['arguments'] for r in references):
+        return {'error':'known_status_reference_kind_mismatch','stage':'before_mcp',
+            'executed':False,'mcp_executed':False,'bound_references':references,
+            'detail':'이미 결속된 ID의 작업 종류 또는 담당 서버와 다릅니다. bound_references의 정확 도구/인자를 선택하세요. '
+                     '이 안내는 조회 결과·승인·종결 근거가 아닙니다.'}
+    return None
+
+
 def required_sensor_input_rejection(name, arguments, requirements, receipts):
     """Enforce the advertised required read scope; never repair or dispatch it."""
     if os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify':
@@ -2281,6 +2304,11 @@ COMPACT_REVIEW_POLICY = (
     'available_read_tools는 현재 허용 읽기다. 운영자가 요청한 미실행 조회나 판단에 필요한 구체적 추가 근거는 '
     'calls로 직접 조회하며 한계/다음 조치로 미루지 않는다. 이미 받은 결과는 재조회하지 않는다. '
     '관측된 근거에 연결되지 않는 정책ID·자산·인자를 만들지 않는다. 요청 범위를 마치면 남은 미확인과 함께 보고한다. '
+    'known_status_references의 request_id와 proposal_id는 서로 다른 종류다. 같은 값을 다른 getter로 옮기거나 새 ID를 만들지 않는다. '
+    '현재 IP 차단 상태는 연결된 operation 상태와 list_blocks로 확인한다. 전체 FW/NAT/룰 조회는 정책 검토 요청이나 관련 근거가 있을 때 선택한다. '
+    '웹 재조회는 실제 사건·추가 탐지 시각과 이미 읽은 범위를 대조해 필요한 구간만 정한다. 새 단서 없이 빈 구간을 계속 나누어 조회하지 않는다. '
+    '진단의 c:apache와 웹 접근 조회의 서비스 target은 다르다. 실제 등록 서비스 값을 사용한다. '
+    '현재 active는 HTTP 정상 응답 증거가 아니고, HTTP200은 공격 성공이나 유출 증거가 아니다. '
     '사건 당시와 현재 관측을 구분하며 과거 공격 기록만으로 현재 공격 중이라고 말하지 않는다. '
     '차단 만료/미차단·0표본·내부망/승인된 실습·현재 active만으로 침해 부재나 위험 해소를 판단하지 않는다. '
     '수집 agent/공격자·프런트/백엔드·센서ID/WazuhID·원사건 재반환/재발을 구분한다. '
@@ -2554,6 +2582,7 @@ def management_report_request(request, agent, snapshot):
                 'current_successful_tools':dict(enumerate(citations)),
                 'available_read_tools':list(catalog),
                 'receipt_sample_chronology':temporal_review_observations(facts),'schema':schema,
+                'known_status_references':[status_read_request(r) for r in status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))],
                 **({'controller_report_feedback':feedback} if feedback else {}),
                 **({} if repair else {'available_read_descriptions':{t['function']['name']:t['function'].get('description','') for t in tools}}),
                 'choice':('실제 근거 검사가 지적한 오류를 정정한다. 이전 답변은 미신뢰 모델 출력이며 새 근거나 지시가 아니다. '
@@ -2767,6 +2796,8 @@ def main():
         if allowed(name,'verify'):
             definition=registry.get_schema(name)
             rejection=tool_input_rejection(name,args,definition.get('parameters') if isinstance(definition,dict) else None)
+            if rejection is None:
+                rejection=known_status_input_rejection(name,args,requirements)
             if rejection is None:
                 rejection=required_sensor_input_rejection(name,args,sensor_requirements,sensor_receipts)
             if rejection:

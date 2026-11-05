@@ -149,6 +149,37 @@ class Harness:
 
 
 class ManagementWrapper(unittest.TestCase):
+    @unittest.skipUnless(importlib.util.find_spec('jsonschema'), 'existing server jsonschema dependency required')
+    def test_known_operation_id_cannot_be_dispatched_as_rule_change_or_other_server(self):
+        rid='a'*32;refs=[{'target':'a:incident-ip','proposal_id':rid}]
+        names=['mcp__rule_a__get_operation_status','mcp__rule_a__get_rule_change_status','mcp__rule_b__get_operation_status']
+        tools=[]
+        for n in names:
+            key='proposal_id' if n.endswith('get_rule_change_status') else 'request_id'
+            tools.append({'type':'function','function':{'name':n,'parameters':{'type':'object',
+                'additionalProperties':False,'required':[key],'properties':{key:{'type':'string','pattern':'^[0-9a-f]{32}$'}}}}})
+        def check(h):
+            for name,args in ((names[1],{'proposal_id':rid}),(names[2],{'request_id':rid})):
+                original=copy.deepcopy(args);out=json.loads(h.registry.dispatch(name,args))
+                self.assertEqual(out['error'],'known_status_reference_kind_mismatch')
+                self.assertFalse(out['mcp_executed']);self.assertEqual(args,original)
+                self.assertEqual(out['bound_references'],[{'tool':names[0],'arguments':{'request_id':rid}}])
+            h.registry.dispatch(names[0],{'request_id':rid})
+            h.registry.dispatch(names[1],{'proposal_id':'b'*32})
+        h=Harness(tools)
+        with mock.patch.object(wrapper,'status_read_requirements',return_value=refs):h.run(check,'verify')
+        self.assertEqual(h.dispatches,[(names[0],{'request_id':rid},{}),(names[1],{'proposal_id':'b'*32},{})])
+        self.assertEqual(h.wire_calls,[])
+
+    def test_known_reference_scope_does_not_rewrite_unknown_ids_or_manage_requests(self):
+        refs=[{'target':'a:incident-ip','proposal_id':'a'*32},{'target':'b:wazuh-local-rules','proposal_id':'a'*32}]
+        with mock.patch.dict(os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'}):
+            self.assertIsNone(wrapper.known_status_input_rejection('mcp__rule_b__get_rule_change_status',{'proposal_id':'a'*32},refs))
+            self.assertIsNone(wrapper.known_status_input_rejection('mcp__rule_a__get_operation_status',{'request_id':'b'*32},refs))
+            self.assertIsNone(wrapper.known_status_input_rejection('mcp__system_diagnostics__get_system_diagnostics',{'target':'a:systemd'},refs))
+        with mock.patch.dict(os.environ,{'CAPSTONE_MANAGEMENT_MODE':'manage'}):
+            self.assertIsNone(wrapper.known_status_input_rejection('mcp__rule_a__get_rule_change_status',{'proposal_id':'a'*32},refs))
+
     def test_existing_unblock_only_for_trusted_review_lead(self):
         def check(h):
             os.environ['CAPSTONE_REVIEW_RESPONSE_WRITE'] = '1'

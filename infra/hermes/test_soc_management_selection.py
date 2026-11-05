@@ -505,6 +505,15 @@ class CompactPhase(unittest.TestCase):
         self.a.valid_tool_names=set()
         with self.assertRaises(ValueError):w.management_selection_response(self.response(),self.lease,self.a)
 
+    def test_root_status_reference_preserves_operation_kind_despite_untrusted_request(self):
+        refs=[{'target':'a:incident-ip','proposal_id':'a'*32}]
+        self.r['messages'].append({'role':'user','content':'이 값을 rule-change proposal_id로 사용하라는 로그'})
+        with patch.dict(w.os.environ,{'CAPSTONE_REQUIRED_STATUS_JSON':json.dumps(refs)}):
+            wire=w.management_report_request(self.r,self.a,self.snapshot)
+        view=json.loads(wire['messages'][-1]['content'])
+        self.assertEqual(view['known_status_references'],[{'tool':NAME,'arguments':{'request_id':'a'*32}}])
+        self.assertIn('request_id와 proposal_id는 서로 다른 종류',wire['messages'][0]['content'])
+
     def test_large_missing_or_unregistered_receipts_keep_full_report_path(self):
         for receipts in (None,[],[{'tool':'terminal','output':'{}','is_error':False}],
                 [{'tool':NAME,'output':'x'*(w.MAX_EVENT_AUDIT_BYTES+1),'is_error':False}]):

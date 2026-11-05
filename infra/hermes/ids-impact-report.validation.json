@@ -466,5 +466,13 @@
       "bytes": 11327716,
       "directory_absent": true
     }
+  },
+  "publication": {
+    "source_commit": "306a578855ec4bf04c2ca7ecac03b865fdbb0ccf",
+    "source_remote_main": "306a578855ec4bf04c2ca7ecac03b865fdbb0ccf",
+    "source_verified_kst": "2026-11-05T15:07:54.632971+09:00",
+    "public_paths": 20,
+    "private_papers_presentation_raw_evidence_weights_credentials_included": false,
+    "followup_status_receipt_commit": "recorded after push in local session; this source receipt does not self-certify a later commit"
   }
 }

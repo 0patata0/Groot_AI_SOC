@@ -2,7 +2,7 @@
 
 11/4 웹 읽기 연계: 기존 단일deploy.sh→service diag-apply 내부 설치와 SIEM 복사 경로에 `web_access_deploy.py`·`web_evidence.py`·`read-web-evidence.py`·`web_evidence_client.py`를 연결했다. 별도 계정/SSH 강제 명령·publisher/timer 계약6과 진단18·관리38 검사를 통과했다. 기존 운영 증분 적용/MCP 조회는 [별도 근거](../infra/mcp/web-evidence.md)이며 새 OS 전체 설치 증거가 아니다.
 
-2026-11-04 KST. 단일 `deploy.sh` 기반은 구현했으나 완성된 일괄 배포 제품으로 표시하지 않는다. 실제 새3VM 설치는 사용자 조건으로 실행하지 않았다. [현황](../STATUS.md) · [운영](OPERATIONS.md) · [공식 지침 부분 대조](SECURITY_GUIDELINES.md) · [이전 점검](../archive/deployment-INSTALLER_READINESS-before-read-accuracy-ncsc-20261104.md).
+2026-11-05 KST. 단일 `deploy.sh` 기반은 구현했으나 완성된 일괄 배포 제품으로 표시하지 않는다. 실제 새3VM 설치는 사용자 조건으로 실행하지 않았다. [현황](../STATUS.md) · [운영](OPERATIONS.md) · [공식 지침 부분 대조](SECURITY_GUIDELINES.md) · [이전 점검](../archive/deployment-INSTALLER_READINESS-before-read-accuracy-ncsc-20261104.md).
 
 | 항목 | 확인한 범위 | 남은 범위 |
 |---|---|---|
@@ -20,3 +20,5 @@
 이번 설치기 변경은 소스 허용목록과 회귀검사뿐이며 운영 서버에 초기 설치/적용/재시작을 하지 않았다. 같은 기간 B 봇의 증분 보완·재시작과 혼동하지 않는다. 새 의존성·deb/wheel/image·공개 포트·자격 키는 추가하지 않는다. 기존 반입 소스만 갱신한다.
 
 11/5 [공통 업무 스킬](../infra/hermes/workflow-skills.md) 보완: soc-output과 조회/사건/변경/복구4개 절차를 같은 canonical 원본으로 배포한다. 기존 단일deploy.sh의 SIEM23파일·SDK source_files·관리 source_bundle에 로더/flat 별칭을 연결하고 네 SKILL의 파일명 충돌을 검사했다. 설치 계약39·SIEM역할40PASS, 전체 서버1,091PASS/skip0. 기존 고정 의존성만 사용해 새 deb/wheel/image·키/포트는 없다. 운영은 A2/B30파일 증분 반영·확정했으며 새 OS 전체 설치는 실행하지 않았다. 권한/역할/정확 승인 강제는 SOUL와 서버 코드에 유지한다. 실제 조사 시간초과·새 UI/자동 자기개선 연결 등 남은 범위는 위 검증에 구분한다.
+
+11/5 사건 실패 표·DNS 근거 보완: 기존 output_contract/관리 source_bundle·security-events·조사 SKILL·rule-change-executor 복사 경로에 같은 소스가 포함된다. 공통1.5.29/query1.19.24/events1.2.1·최종 서버1,081PASS/skip0(설치39포함), 새 패키지/키/포트0이다. `<rule><group>` 분류 표지의 정상 문법 허용은 기존 구조·정확 승인 강제를 유지한다. Wazuh 상관 [후보](../infra/validation/dns-noise/README.md)는 승인 카드 만료·미적용이므로 canonical 초기 룰을 선반영하지 않았다. 승인/운영 검증 뒤 같은 단위로 동기화한다. 증분 배포와 새 OS 전체 설치·전체 오프라인 묶음 검증을 구분한다.

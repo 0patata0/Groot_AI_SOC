@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "as_of_kst": "2026-11-05 10:17 KST",
+  "contract": "1.5.29",
+  "query": "1.19.24",
+  "security_events": "1.2.1",
+  "source_basis": {
+    "suricata_sids": [
+      2022918,
+      2042936
+    ],
+    "recorded_provider_severity": "Informational",
+    "wazuh_correlation_id": "100112",
+    "original_sha256": "644b298348bf476e6f538267aab531b262ce895a191aac8df1ac47b0c1e80ec0",
+    "candidate_sha256": "da609dac82a6a4eefdd62336a56d9e53b0632c66f0b2c9779e79283d7e6866f0"
+  },
+  "native_regression": {
+    "image": "sha256:f845c782483d6b439d3cde5dc05c0c9cff500b2f713b4a6e39337b8f8c48ce30",
+    "client_sha256": "59fb8b25a9315f3007aaea3bd572a8e5098012ca12046617b9615ce367672414",
+    "network": "none",
+    "cases": [
+      {
+        "name": "own_lookup_pair_repeat",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "other_ddns_information",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "single_high",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "single_medium",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "high_burst",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": [
+          8
+        ]
+      },
+      {
+        "name": "medium_burst",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": [
+          8
+        ]
+      },
+      {
+        "name": "information_then_one_attack",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "information_then_attack_burst",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": [
+          24
+        ]
+      },
+      {
+        "name": "different_attack_sources",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "unknown_metadata_retained",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "changed_high_severity_retained",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "other_malicious_dns_signature_retained",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": []
+      },
+      {
+        "name": "unknown_metadata_burst_retained",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": [
+          8
+        ]
+      },
+      {
+        "name": "changed_high_severity_burst_retained",
+        "passed": true,
+        "session_removed": true,
+        "burst_at_event_numbers": [
+          8
+        ]
+      }
+    ],
+    "candidate_pass": 14,
+    "private_sessions_removed": 28,
+    "live_attack_e2e": false
+  },
+  "server_tests": {
+    "management": 268,
+    "sdk": 219,
+    "native": 391,
+    "install": 39,
+    "review": 60,
+    "workflow": 4,
+    "output": 7,
+    "events": 26,
+    "executor": 67,
+    "pass": 1081,
+    "skip": 0
+  },
+  "live": {
+    "factual_phase_files": 15,
+    "dns_context_files": 5,
+    "report_helper_files": 6,
+    "protected_config_sha_unchanged": 7,
+    "mcp_provider_labels_verified": true,
+    "incident_failure_table_post": "https://chat.grootlab.duckdns.org/soc/pl/yioa5ni8i7r7pmyxn5ty5djwyo",
+    "table_body_verified": true,
+    "new_ui_render_verified": false,
+    "browser_error": "kernel_assets_unavailable",
+    "wazuh_rule_applied": false,
+    "approval_proposal_id": "6e134d31bbcba1c4cacd6101ab388185",
+    "approval_post": "https://chat.grootlab.duckdns.org/soc/pl/ejs6odcpuifu7jc8m4a9ndpkdc",
+    "approval_status": "expired",
+    "approval_expires_at_kst": "2026-11-05 10:10:56 KST",
+    "status_checked_at_kst": "2026-11-05 10:12:23 KST",
+    "unique_file_sha_verified": 23
+  },
+  "model_trials": {
+    "native_review": {
+      "seconds": 129.20596528053284,
+      "mcp_attempts": 6,
+      "completed_reads": 5,
+      "local_schema_errors": 1,
+      "status": "needs_review",
+      "literal_profile_observed": false,
+      "speed_improvement_attributable_to_change": false
+    },
+    "dns_sdk": {
+      "seconds": 69.36043735302519,
+      "model_calls": 3,
+      "mcp_reads": 1,
+      "protected_calls": 0,
+      "status": "partial",
+      "unsupported_benign_draft_rejected": true
+    }
+  },
+  "git": {
+    "state": "pending"
+  },
+  "cleanup": {
+    "state": "completed_with_initial_logtest_session_limit",
+    "isolated_engines_removed": 2,
+    "private_etc_copies_removed": 2,
+    "initial_logtest_sessions_removal_verified": false,
+    "server_scratch_files_removed": 474,
+    "server_scratch_bytes_removed": 6558654,
+    "small_audit_files_preserved": 38,
+    "mac_temp_files_removed": 63,
+    "mac_temp_bytes_removed": 7542458,
+    "own_ssh_masters_closed": true,
+    "backups_preserved": 3
+  }
+}

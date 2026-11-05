@@ -1,12 +1,16 @@
 # Groot_AI_SOC
 
+**사건관리 표 보완(11/5):** 일반 실패·시간초과·SILENT 검토 알림에도 상태/원인/실제 조치/다음 확인의 공통 표를 적용했습니다. 실제 형식 보완 게시의 API 본문을 확인했으며 이번 브라우저 화면은 도구 오류로 미검증입니다. 최종 서버 회귀1,081PASS/skip0. [원인·실제 게시·검증·복구](infra/hermes/incident-report-fallback.md).
+
+**DuckDNS 분류(11/5):** 원본 공급자 Informational 표지와 실제 flow/DNS 근거를 MCP로 전달하도록 보완했습니다. 정보성 DNS를 공격 급증으로 올리던 Wazuh 상관 수정 후보는 격리14조건을 통과했으나 정확 승인 카드가 만료되어 운영 룰은 미적용입니다. 도메인 전체 면제나 이름만으로 정상 판정은 하지 않습니다. [후보·현재 상태·한계](infra/validation/dns-noise/README.md).
+
 **공통 업무 스킬(11/5):** 출력·조회·사건 조사/상관·변경/승인·장애 복구를5개 SKILL로 정리해 두 봇과 자동조사/검토·초기 설치 경로에 연결했습니다. 필요한 절차만 선택하고 역할·승인·권한은 서버 검증을 유지합니다. 서버1,091검사·세프로필 원본SHA·Native 실제계정 선택, 새 SDK FW조회11.681초/1MCP·오류0·쓰기0을 확인했습니다. 복합 사건 새 검토는5읽기 뒤 시간초과로 미완료입니다. [스킬·시각 근거·복구·한계](infra/hermes/workflow-skills.md).
 
 11/4 웹 백엔드 읽기 보완: C Apache 접근 기록을 고정 MCP2도구로 조회하고 단문 요청의 불필요한 사건 평가·근거 제한 누락을 보완했습니다. 실제 운영 worker의 새 질문에서 Ollama13.369초·Hermes45.335초/각1읽기·쓰기0을 확인했습니다. 채팅 왕복 평균·실제 침해 영향/사건 종결 완료를 뜻하지 않습니다. [구성·검증·복구](infra/mcp/web-evidence.md).
 
 구축·운영의 현행 진입점은 [배포 가이드](deployment/README.md)이며, [NCSC/NIS 공식 지침 부분 대조](deployment/SECURITY_GUIDELINES.md)와 [운영 절차](deployment/OPERATIONS.md)를 연결한다. 전체 기관 준수·새3VM 설치 검증 완료를 뜻하지 않는다. [조회 정확성 보완](infra/hermes/read-accuracy.md)은 실제 관측/시작값·도구 대상·한국어 필터를 구분한다.
 
-**채팅 하네스·담당 분배(11/4):** 공통1.5.28/query1.19.23/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
+**채팅 하네스·담당 분배(11/4):** 공통1.5.29/query1.19.24/review1.1.4. 단순 조회는 Ollama가 처리하고 partial만으로 Hermes를 호출하지 않습니다. 사건·변경·명시 검증과 직접 태그를 구분하며, 공통 출력 스킬·짧은 표 정규화·정기 보고 표를 적용했습니다. 직접 Hermes 조회도 별도 읽기 프롬프트/저추론으로128.644→34.147초 표본을 확인했습니다. 사건/peer/쓰기 판단·Native discovery는 유지하며 평균 향상 보장은 아닙니다. [지연 검증·복구](infra/hermes/lookup-latency.md) · [출력·담당](infra/hermes/harness-cleanup.md) · [현황](STATUS.md).
 
 **사건 조사·입력 검증:** 두 봇의 최소 종결 근거를 공유하고 Native도 실제 도구 스키마로 읽기 인자를 전송 전에 검사합니다. 실제-32602 요청 거절은 통신 장애와 구분합니다. 서버961검사·실제9거절/wire0 및 오류 뒤 정상MCP 회복을 확인했습니다. 새 사건 재검토는149.645초·8조회0오류/추적 관찰이며 최초/만료 시각 오표기는 후속 상태API·공통 검사로 보완했으며 새 실제 조사 시간초과·영향/종결은 남습니다. [입력·실제검증·복구](infra/hermes/mcp-input-validation.md) · [최소 종결/SDK](infra/hermes/incident-closure-minimum.md).
 

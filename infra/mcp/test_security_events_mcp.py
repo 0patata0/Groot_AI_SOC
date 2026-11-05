@@ -18,6 +18,25 @@ spec.loader.exec_module(module)
 
 
 class SecurityEventsMcpTests(unittest.TestCase):
+    def test_ddns_provider_metadata_and_query_references_are_preserved_not_classified(self):
+        original={'data':{'flow_id':123456,'dns':{'id':9,'tx_id':2},'alert':{
+            'signature_id':2042936,'category':'Potentially Bad Traffic','severity':2,
+            'metadata':{'signature_severity':['Informational'],'confidence':['High']}}}}
+        row=module.summarize_suricata(original)
+        self.assertEqual(row['category'],'Potentially Bad Traffic')
+        self.assertEqual(row['signature_metadata']['signature_severity'],['Informational'])
+        self.assertEqual((row['flow_id'],row['dns_id'],row['dns_tx_id']),('123456','9','2'))
+        self.assertNotIn('benign',row);self.assertNotIn('attack',row)
+        query=module.build_query('suricata',module.validate_args('suricata',{}))
+        self.assertIn('data.alert.metadata.signature_severity',query['_source']['includes'])
+
+    def test_provider_metadata_is_bounded_and_cannot_become_instruction_or_authority(self):
+        row=module.signature_metadata({'signature_severity':['Informational']*20+['x'*49],
+            'confidence':['High','bad\ncontrol',True,{'secret':'hidden'}],'unexpected':'hidden'})
+        self.assertEqual(len(row['signature_severity']),8)
+        self.assertEqual(row['confidence'],['High']);self.assertNotIn('hidden',json.dumps(row))
+        self.assertEqual(module.signature_metadata(None),{'signature_severity':[],'confidence':[]})
+
     def test_returned_field_provenance_does_not_claim_current_mode_or_outcome(self):
         source={'rule':{'description':'private payload'},'data':{'transaction':{
             'response':{'http_code':302},'producer':{'secrules_engine':'DetectionOnly'}}}}

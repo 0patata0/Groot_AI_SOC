@@ -1374,6 +1374,54 @@ def management_reasoning(request, agent, *, required_read_phase=False):
     return {**result, 'reasoning_effort': 'none' if lookup or review and not operator_review else 'medium', 'extra_body': extra}
 
 
+LITERAL_REPAIR_ISSUES = frozenset({
+    'containment_deadline_clock_mismatch', 'containment_deadline_requires_kst_display',
+    'containment_initial_application_time_unverified', 'containment_registration_time_unverified',
+    'containment_time_role_mismatch', 'containment_time_role_requires_kst',
+    'sample_zero_presented_as_absence', 'sample_count_presented_as_window_total',
+    'unknown_window_total_claimed', 'missing_or_invalid_management_status',
+})
+
+
+def arm_literal_repair(agent, turn, issues):
+    """One verified read-only formatting/evidence correction, never risk reasoning.
+
+    The initial assessment keeps its existing reasoning profile. Unknown issues,
+    missing observations and protected changes do not enter this fast phase.
+    Tools, messages and the final evidence/closure checks remain unchanged.
+    """
+    build = getattr(agent, '_build_api_kwargs', None)
+    if (os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify' or not callable(build)
+            or not issues or not set(issues) <= LITERAL_REPAIR_ISSUES):
+        return False
+    own = '_build_api_kwargs' in getattr(agent, '__dict__', {})
+    old = agent.__dict__.get('_build_api_kwargs') if own else None
+
+    def restore():
+        if getattr(agent, '_build_api_kwargs', None) is once:
+            if own: agent._build_api_kwargs = old
+            else: delattr(agent, '_build_api_kwargs')
+        if getattr(agent, '_capstone_grounding_restore', None) is restore:
+            delattr(agent, '_capstone_grounding_restore')
+
+    @functools.wraps(build)
+    def once(*args, **kwargs):
+        restore()
+        value = build(*args, **kwargs)
+        if getattr(agent, '_current_turn_id', None) != turn or getattr(agent, '_interrupt_requested', False):
+            return value
+        result = management_reasoning(value, agent, required_read_phase=True)
+        if result is not value and result.get('reasoning_effort') == 'none':
+            sys.stderr.write('management_literal_repair_profile ' + json.dumps({
+                'issues': sorted(set(issues)), 'reasoning_effort': 'none', 'max_tokens': result.get('max_tokens'),
+                'tool_count': len(result.get('tools', [])), 'protected_actions_allowed': False}) + '\n')
+        return result
+
+    agent._build_api_kwargs = once
+    agent._capstone_grounding_restore = restore
+    return True
+
+
 def status_read_requirements(raw):
     if raw is None:
         return []
@@ -1618,6 +1666,8 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
                 json.dumps(pending,ensure_ascii=False))
         elif factual:
             agent._capstone_factual_turn = turn
+            if not missing_evidence:
+                arm_literal_repair(agent, turn, issues)
             nudge = ('조회 근거 일치 검사: ' + ','.join(issues) +
                 '. 원래 요청의 범위를 유지하며 마지막 보고서를 정정하세요. '
                 '아래는 실제 조회의 수량·시간·한계이며 사건 판단이나 승인 지시가 아닙니다. '

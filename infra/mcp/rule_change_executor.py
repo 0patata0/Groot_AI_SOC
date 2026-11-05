@@ -392,7 +392,15 @@ def _validate_candidate(kind, content):
             raise RuleChangeError("Wazuh XML fragment is invalid: %s" % exc) from None
         if any(child.tag != "group" for child in root):
             raise RuleChangeError("Wazuh local file may contain only top-level group elements")
-        containers = [root] + [elem for elem in root.iter() if elem.tag in ("group", "rule")]
+        parents = {child: parent for parent in root.iter() for child in parent}
+        # A top-level <group name="..."> contains rules; a rule's own
+        # <group>name,</group> is a valid classification label, not a container.
+        labels = [elem for elem in root.iter("group") if parents.get(elem) is not None
+                  and parents[elem].tag == "rule"]
+        if any(elem.attrib or len(elem) or not (elem.text or "").strip() for elem in labels):
+            raise RuleChangeError("Wazuh per-rule group labels must be nonempty leaf elements")
+        containers = [root] + [elem for elem in root.iter() if elem.tag == "rule" or
+                               elem.tag == "group" and elem not in labels]
         if any((elem.text and elem.text.strip()) or
                any(child.tail and child.tail.strip() for child in elem) for elem in containers):
             raise RuleChangeError("Wazuh comments must use XML syntax; non-whitespace text outside rule elements is forbidden")

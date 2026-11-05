@@ -41,6 +41,8 @@ COMMON_FIELDS = ["timestamp", "agent.name", "rule.id", "rule.level"]
 SURICATA_FIELDS = COMMON_FIELDS + [
     "data.src_ip", "data.srcip", "data.dest_ip", "data.dest_port", "data.proto",
     "data.alert.signature_id", "data.alert.signature", "data.alert.category", "data.alert.severity",
+    "data.alert.metadata.signature_severity", "data.alert.metadata.confidence",
+    "data.flow_id", "data.dns.id", "data.dns.tx_id",
     "data.dns.type", "data.dns.queries.rrname", "data.dns.queries.rrtype",
     "data.dns.rrname", "data.dns.rrtype",
 ]
@@ -580,6 +582,18 @@ def http_context(transaction):
             "user_agent_sha256": opaque_hash(headers.get("User-Agent"))}
 
 
+def signature_metadata(value):
+    """Bounded original provider labels, never a verdict or allow-list."""
+    meta = _obj(value)
+    result = {}
+    for key in ('signature_severity', 'confidence'):
+        raw = meta.get(key, [])
+        if isinstance(raw, str): raw = [raw]
+        result[key] = [v for v in raw[:8] if isinstance(v, str) and
+                       1 <= len(v) <= 48 and not CONTROL_RE.search(v)] if isinstance(raw, list) else []
+    return result
+
+
 def summarize_suricata(source):
     data = _obj(source.get("data"))
     alert = _obj(data.get("alert"))
@@ -597,6 +611,10 @@ def summarize_suricata(source):
         "severity": _scalar(alert.get("severity"), 8),
         "wazuh_rule_id": _scalar(rule.get("id"), 16),
         "wazuh_level": _scalar(rule.get("level"), 8),
+        "signature_metadata": signature_metadata(alert.get("metadata")),
+        "flow_id": _scalar(data.get("flow_id"), 32),
+        "dns_id": _scalar(_obj(data.get("dns")).get("id"), 8),
+        "dns_tx_id": _scalar(_obj(data.get("dns")).get("tx_id"), 16),
         **dns_questions(data.get("dns")),
     }
 
@@ -665,6 +683,10 @@ def search(kind, args):
         "field_semantics": {
             "wazuh_rule_id": "correlation_rule_id_not_sensor_rule_id",
             "wazuh_rule_description": "bounded_untrusted_rule_label" if kind=='wazuh' else "not_returned",
+            **({"category": "sensor_classification_label_not_incident_verdict",
+                "signature_metadata": "bounded_untrusted_recorded_provider_labels_not_benign_or_attack_verdict",
+                "flow_id": "sensor_flow_reference_not_unique_dns_query_count",
+                "dns_id": "recorded_dns_message_id_not_identity_or_authorization"} if kind == "suricata" else {}),
             **({"engine": "mode_recorded_in_event_not_current_configuration",
                 "http_status": "response_code_not_proof_of_block_actor_or_exploit_outcome",
                 "transaction_id_sha256": "sha256_of_original_id_not_original_id",
@@ -708,7 +730,7 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if isinstance(requested, str) and requested in SUPPORTED_PROTOCOLS else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.2.0"},
+            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.2.1"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None

@@ -1757,11 +1757,7 @@ def incomplete_report(detail):
                 "| 센서·대응 조회 | 조회 이력은 보존됨 | 경보 매칭·403·만료만으로 침해 해소를 판단할 수 없음 |\n"
                 "| 보호 대상 영향 | 사건 구간의 자산별 경보 조회·인용 미충족 | 실제 목적지 자산과 앱·호스트 근거 추가 조사 |\n"
                 "| 사건 상태 | 추가 검토 | 조회 성공·반환0건을 정상·종결로 바꾸지 않음 |")
-    safe = detail if detail in {"model_outer_timeout", "model_process_failure", "model_trace_limit",
-        "model_prompt_too_large", "interrupted_run_requires_review", "incomplete_model_run_requires_review",
-        "model_subprocess_timeout_requires_review", "model_interrupted_requires_review"} else "diagnostic_run_incomplete"
-    return ("자동 조사를 완료하지 못했습니다. 원인 코드: `" + safe + "`.\n"
-            "실행·승인·차단 결과를 확인하지 못했으므로 추가 검토가 필요합니다. 알림 재전송은 조사나 조치를 재실행하지 않습니다.")
+    return output_contract().incident_failure(detail)
 
 
 def deliver(webhook, text, case_id, state, report_id=None):
@@ -1775,13 +1771,13 @@ def deliver(webhook, text, case_id, state, report_id=None):
     if text in ("[SILENT]", "SILENT"):
         if not silent_review:
             return False
-        text = "자동 조사 결과가 검증되지 않아 추가 검토가 필요합니다."
+        text = incomplete_report('silent_model_result_requires_review')
     if not text:
         raise ControllerError("model_report_empty")
     # Finished-run reports; approval messages belong to the broker.
     label = {"completed": "조사 완료", "needs_review": "추가 검토 필요", "waiting_approval": "승인·실행 대기", "outcome_unknown": "자동 조사 실패·확인 필요",
              "monitor": "추가 관찰 예정"}.get(state, "상태 확인 필요")
-    notice = "\n제어기 확인 결과 추가 검토가 필요합니다. 아래는 LLM 응답입니다.\n" if state == "needs_review" and not silent_review else ""
+    notice = "\n관리 제어기에서 추가 검토가 필요한 상태로 기록했습니다.\n" if state == "needs_review" and not silent_review else ""
     reference = " · 보고 " + report_id[:12] if report_id else ""
     payload = canonical({"text": "LLM 사건 관리 · " + case_id[:12] + " · " + label + reference + notice + "\n\n" + text}).encode()
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())

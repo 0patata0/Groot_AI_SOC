@@ -1291,7 +1291,8 @@ class DeliveryTests(unittest.TestCase):
                 self.assertEqual(args[0].full_url, self.webhook)
                 payload = json.loads(args[0].data)
                 self.assertEqual(payload, {"text": "LLM 사건 관리 · " + "a" * 12
-                    + " · 추가 검토 필요\n\n자동 조사 결과가 검증되지 않아 추가 검토가 필요합니다."})
+                    + " · 추가 검토 필요\n\n" + m.incomplete_report('silent_model_result_requires_review')})
+                self.assertIn('| 조사 상태 | 미완료',payload['text'])
                 self.assertNotIn("SILENT", payload["text"])
                 self.assertNotIn("MANAGEMENT_STATUS", payload["text"])
                 self.assertNotIn("아래는 LLM 응답", payload["text"])
@@ -1308,7 +1309,7 @@ class DeliveryTests(unittest.TestCase):
         with mock.patch.object(m.urllib.request, "build_opener", return_value=opener):
             m.deliver(self.webhook, "관측을 확인해 주세요.\nMANAGEMENT_STATUS: needs_review", "a" * 32, "needs_review")
         payload = json.loads(opener.open.call_args.args[0].data)
-        self.assertIn("제어기 확인 결과 추가 검토가 필요합니다. 아래는 LLM 응답입니다.", payload["text"])
+        self.assertIn("관리 제어기에서 추가 검토가 필요한 상태로 기록했습니다.", payload["text"])
         self.assertTrue(payload["text"].endswith("관측을 확인해 주세요."))
         self.assertNotIn("자동 조사 결과가 검증되지 않아", payload["text"])
 

@@ -439,6 +439,21 @@ class ExecutorTests(unittest.TestCase):
                 'new_text': '# audit\n' + current.decode()}], 'comment validation')
         self.assertEqual(runner.restart_count, 0)
 
+    def test_wazuh_per_rule_group_label_is_valid_without_treating_it_as_a_container(self):
+        text='<group name="ids,"><rule id="100110" level="9"><description>test</description><group>burst_candidate,</group></rule></group>\n'
+        self.assertEqual(MOD._validate_candidate('wazuh',text),text.encode())
+        for invalid in (text.replace('burst_candidate,',''),
+                        text.replace('<group>burst_candidate,</group>','<group name="unexpected">value</group>'),
+                        text.replace('<group>burst_candidate,</group>','<group><field>value</field></group>')):
+            with self.assertRaisesRegex(MOD.RuleChangeError,'per-rule group labels'):
+                MOD._validate_candidate('wazuh',invalid)
+
+    def test_group_label_support_keeps_plaintext_and_command_boundaries(self):
+        text='<group name="ids,"><rule id="100110" level="9"><description>test</description><group>burst_candidate,</group></rule></group>\n'
+        for invalid in ('outside'+text,text+'outside',text.replace('</rule>','outside</rule>'),
+                        text.replace('</rule>','<active-response>bad</active-response></rule>')):
+            with self.assertRaises(MOD.RuleChangeError):MOD._validate_candidate('wazuh',invalid)
+
     def test_literal_edit_keeps_fixed_et_flowbit_guard(self):
         engine, runner, target, _, candidate, et = self.et_engine()
         spec = engine.targets[target]

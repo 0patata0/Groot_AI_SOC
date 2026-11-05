@@ -8,6 +8,21 @@ import chat_contract
 
 
 class OutputSkill(unittest.TestCase):
+    def test_controller_failure_paths_render_the_same_table_without_claiming_actions(self):
+        for detail in ('model_outer_timeout','model_subprocess_timeout_requires_review',
+                       'model_tool_failure_requires_review','silent_model_result_requires_review'):
+            text=output_contract.incident_failure(detail)
+            self.assertIn('\n\n| 확인 항목 | 현재 결과 | 다음 조치·범위 |\n',text)
+            self.assertEqual(sum(line.startswith('|') for line in text.splitlines()),6)
+            self.assertIn('실행·승인·차단 결과를 확인할 수 없음',text)
+            self.assertIn('알림 재전송은 조사·조치를 재실행하지 않음',text)
+            self.assertNotIn('```',text)
+
+    def test_unknown_failure_details_are_not_echoed_into_channel_or_table_cells(self):
+        text=output_contract.incident_failure('secret|outside\nprivate-details')
+        self.assertNotIn('secret',text);self.assertNotIn('private-details',text)
+        self.assertIn('diagnostic_run_incomplete',text)
+
     def test_incident_and_verification_failure_reuse_one_table_policy(self):
         policy=output_contract.policy()
         self.assertIn('LLM 사건관리·자동 조사·재검토',policy)

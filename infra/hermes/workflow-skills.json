@@ -61,9 +61,10 @@
   "new_os_install_tested": false,
   "ui_newly_tested": false,
   "git": {
-    "source_commit": null,
-    "remote_verified": false,
-    "state": "pending"
+    "source_commit": "6467f6153ba2207d430800587513e790fccba38a",
+    "source_published_at_kst": "2026-11-05T09:16:32.063922+09:00",
+    "remote_verified": true,
+    "state": "source_published_followup_docs_pending"
   },
   "cleanup": {
     "server": {

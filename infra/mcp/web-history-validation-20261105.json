@@ -139,7 +139,9 @@
     "remote_main_at_source_push": "412b8798d1c1e7ff511b2bc71093859df2f9f0d8",
     "verified_at_kst": "2026-11-05T12:12:27.763080+09:00",
     "public_files": 15,
-    "receipt_and_shared_cleanup_followup_pending": true
+    "receipt_and_shared_cleanup_followup_pending": false,
+    "receipt_and_shared_cleanup_published_in": "a3d35683658e1a4318ca72714643acdc58f79531",
+    "verified_at_shared_followup_kst": "2026-11-05T13:10:07.851967+09:00"
   },
   "remaining": [
     "model_host_followup_and_final_case_judgment",

@@ -409,5 +409,10 @@
     "file_count": 15,
     "bytes": 387710,
     "removed": true
+  },
+  "followup_git": {
+    "at_kst": "2026-11-06T17:11:17.468158+09:00",
+    "head": "24f1b53d135853cd27f7089c21814c58db43a86a",
+    "remote_main": "24f1b53d135853cd27f7089c21814c58db43a86a"
   }
 }

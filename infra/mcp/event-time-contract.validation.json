@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06T19:34:00+09:00",
+  "versions": {
+    "query": "1.19.78",
+    "common": "1.5.34",
+    "security_events": "1.3.1"
+  },
+  "regression": {
+    "native": 459,
+    "sdk": 232,
+    "query": 391,
+    "mcp": 81,
+    "installer": 43,
+    "review": 69,
+    "unique_pass": 1275,
+    "final_failures": 0,
+    "final_errors": 0,
+    "final_skipped": 0,
+    "initial_mcp_skips": 2,
+    "initial_installer_failures": 1,
+    "focused_6_in_native_not_extra": true
+  },
+  "live": {
+    "catalog": 44,
+    "readonly": 35,
+    "protected_available": 9,
+    "protected_executed": 0,
+    "schema_combinations": 32,
+    "successful_event_reads": 4,
+    "deployed_files": 13,
+    "protected_files_unchanged": 8,
+    "gate_argument_bytes": 63208,
+    "confirmed": true,
+    "rollback_noop": true,
+    "manual_rollback_executed": false
+  },
+  "native_retest": {
+    "seconds": 88.84870600397699,
+    "rc": 0,
+    "calls": 4,
+    "tool_errors": 0,
+    "first_selection_seconds": 11.812477,
+    "chat_e2e": false,
+    "quality_pass": false,
+    "issues": [
+      "requested_today_narrowed_to_one_hour",
+      "unsupported_rule_id_filter",
+      "one_hour_called_whole_today",
+      "zero_failed_units_overinterpreted",
+      "report_status_rewrite"
+    ],
+    "overall_30_seconds_achieved": false
+  },
+  "source_candidates": {
+    "/opt/capstone-management/soc_management_run.py": {
+      "sha256": "7f6abd8669e1f25cf4282db67e6a40c1c74c86191902c4c9434e95313efec28c",
+      "before": "3c562b1a6e1bf31bdb633345f72fbf2e5bc5e65cbe2419e1a1f6c367e49b3704",
+      "source": "infra/hermes/soc_management_run.py"
+    },
+    "/opt/hermes-data/management-code/run.py": {
+      "sha256": "7f6abd8669e1f25cf4282db67e6a40c1c74c86191902c4c9434e95313efec28c",
+      "before": "3c562b1a6e1bf31bdb633345f72fbf2e5bc5e65cbe2419e1a1f6c367e49b3704",
+      "source": "infra/hermes/soc_management_run.py"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/grounding.py": {
+      "sha256": "7f6abd8669e1f25cf4282db67e6a40c1c74c86191902c4c9434e95313efec28c",
+      "before": "3c562b1a6e1bf31bdb633345f72fbf2e5bc5e65cbe2419e1a1f6c367e49b3704",
+      "source": "infra/hermes/soc_management_run.py"
+    },
+    "/opt/capstone-ollama-trial/grounding.py": {
+      "sha256": "7f6abd8669e1f25cf4282db67e6a40c1c74c86191902c4c9434e95313efec28c",
+      "before": "3c562b1a6e1bf31bdb633345f72fbf2e5bc5e65cbe2419e1a1f6c367e49b3704",
+      "source": "infra/hermes/soc_management_run.py"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/__init__.py": {
+      "sha256": "10bea01da6402ba2aef467637fce805c7698894ef0e75a11f1b82bc615bd0cad",
+      "before": "1fb60665b4b2cb2a471bc1cd55a1b2eed4eac1eac30f3cfdb18cf0423ae4cf66",
+      "source": "infra/hermes/query-completion/__init__.py"
+    },
+    "/opt/capstone-ollama-trial/query_grounding.py": {
+      "sha256": "10bea01da6402ba2aef467637fce805c7698894ef0e75a11f1b82bc615bd0cad",
+      "before": "1fb60665b4b2cb2a471bc1cd55a1b2eed4eac1eac30f3cfdb18cf0423ae4cf66",
+      "source": "infra/hermes/query-completion/__init__.py"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/plugin.yaml": {
+      "sha256": "aef9e36ef01c976e26a7e922ccb4b3167c35953c532f8b1e547ff6d8abe362e2",
+      "before": "4a8ce791e12ac7e900775f674a3ef610d86a55015562ae8af7b6d7050ee5ce94",
+      "source": "infra/hermes/query-completion/plugin.yaml"
+    },
+    "/opt/hermes-data/plugins/groot-query-completion/chat_harness.py": {
+      "sha256": "945c3f374eab7dbf759d0b5f51a8bf24f157f8287fd13c1eef643f5c67a3b288",
+      "before": "efd8ae584bdda58eae2a4e64eca6d52aa73ada0298e848cd3b61e75e7cdc4f43",
+      "source": "infra/ollama-trial/harness.py"
+    },
+    "/opt/capstone-ollama-trial/harness.py": {
+      "sha256": "945c3f374eab7dbf759d0b5f51a8bf24f157f8287fd13c1eef643f5c67a3b288",
+      "before": "efd8ae584bdda58eae2a4e64eca6d52aa73ada0298e848cd3b61e75e7cdc4f43",
+      "source": "infra/ollama-trial/harness.py"
+    },
+    "/opt/mcp/security-events-mcp.py": {
+      "sha256": "31a87a2f4ee2335b603c8719ac38ee438ace31547a4690c26e7ff66150c945e9",
+      "before": "22a9b22be06f16d44d5a747773679f81ebffc5872386fde3a2e3e320d7f848a8",
+      "source": "infra/mcp/security-events-mcp.py"
+    },
+    "/opt/capstone-management/soc_management_controller.py": {
+      "sha256": "9790508d8cd0ff21629774fcdf3fa89175abff6dfe0552f7f106aa6f97fcac68",
+      "before": "ea9074836a4ba2cc7fef83ab30e51154e51b7742178ca5928f6bbe95a61c792a",
+      "source": "rendered immutable gate only"
+    }
+  },
+  "not_performed": [
+    "new_os_full_install",
+    "new_attack",
+    "training",
+    "model_change",
+    "latency_average_p95"
+  ],
+  "cleanup": {
+    "mac_files": 19,
+    "mac_bytes": 8168251,
+    "mac_directory_absent": true,
+    "server_test_files": 452,
+    "server_worker_files": 1,
+    "server_test_directory_absent": true,
+    "preserved": "server backups, DBs, prompts and run traces; local source and private evidence"
+  },
+  "publication": {
+    "prior_remote_head": "2145e97ffed27c6e552b2189426e7c29f29eaa4c",
+    "this_unit": "pending"
+  }
+}

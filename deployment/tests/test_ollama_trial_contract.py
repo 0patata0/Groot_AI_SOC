@@ -20,8 +20,12 @@ class InstallContract(unittest.TestCase):
         for name,args in installer.PROFILES.items():self.assertEqual(list(args),policy.PROFILES[name])
         for server,names in policy.capabilities('read-only').items():
             for name in names:self.assertFalse(policy.protected(server,name))
-        self.assertIn('get_wazuh_sca_checks',policy.capabilities('read-only')['security-events'])
-        self.assertEqual(sum(map(len,policy.capabilities('read-only').values())),32)
-        self.assertEqual(sum(map(len,policy.capabilities('hermes-parity').values())),41)
+        self.assertEqual(policy.capabilities('read-only')['security-events'], {
+            'search_wazuh_alerts', 'search_suricata_alerts', 'search_modsecurity_alerts',
+            'get_wazuh_sca_checks', 'get_web_service_target', 'search_web_access',
+            'collect_incident_evidence'})
+        self.assertEqual(sum(map(len,policy.capabilities('read-only').values())),installer.READONLY_TOOL_COUNT)
+        self.assertEqual(sum(map(len,policy.capabilities('hermes-parity').values())),
+                         installer.READONLY_TOOL_COUNT + installer.PROTECTED_TOOL_COUNT)
 
 if __name__=='__main__':unittest.main()

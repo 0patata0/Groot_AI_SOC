@@ -1,6 +1,6 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
-11/6 [복합 사건 읽기 연결](../hermes/incident-bundle.md): MCP1.3.0/진단1.2.2와 query74/common1.5.33을 함께 운영 반영했다. 현재7읽기·실제wire/내부조회 구분·정확 인용/오류 검사를 유지한다. 모델 보고30초는 미완료이며 실제 모델/읽기 수치를 구분한다.
+현재 security-events1.3.1/query78/common1.5.34는 [시간 인자 규격](event-time-contract.md)을 맞춘다. 시작+종료와 상대 구간을 구분하며 MCP·양봇 선택·실행 검사의32조합 및 실제4조회가 일치했다.7읽기/권한/쿼리 동작·진단1.2.2는 유지한다. 모델 복합 보고30초는 미완료다. [이전1.3.0 읽기 묶음](../hermes/incident-bundle.md).
 
 2026-11-06: 기존 진단 MCP가 과거 사건의 정확한 KST 구간도 읽는다. 제한된 오류 색인이며 현재 상태/전체 journal과 구분한다. [설치·권한·실측·공백](journal-history.md).
 

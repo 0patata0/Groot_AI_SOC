@@ -28,6 +28,8 @@ PROFILES = {'rule-a': ('rule-a',), 'rule-b': ('rule-b',),
 SOURCES = ('runtime.py', 'read_pool.py', 'policy.py', 'harness.py', 'requirements.lock', 'offline-manifest.json')
 PARITY_PROFILES = {**PROFILES, 'resp': ('resp-a',),
                    'rule-write-a': ('rule-write-a',), 'rule-write-b': ('rule-write-b',)}
+READONLY_TOOL_COUNT = 35
+PROTECTED_TOOL_COUNT = 9
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'LC_ALL': 'C', 'TZ': 'Asia/Seoul',
        'PYTHONDONTWRITEBYTECODE': '1', 'PIP_NO_CACHE_DIR': '1',
        'PIP_DISABLE_PIP_VERSION_CHECK': '1', 'DEBIAN_FRONTEND': 'noninteractive'}
@@ -208,10 +210,11 @@ def verify():
     probe = run(['/usr/local/sbin/capstone-ollama-trial'], input=b'{"discover_only":true}\n', timeout=120)
     data = json.loads(probe.stdout)
     parity = json.loads((ETC / 'config.json').read_text()).get('access_mode') == 'hermes-parity'
-    need(data['status'] == 'discovered' and len(data['catalog']) == (37 if parity else 28) and
+    need(data['status'] == 'discovered' and len(data['catalog']) ==
+         READONLY_TOOL_COUNT + (PROTECTED_TOOL_COUNT if parity else 0) and
          data['model_calls'] == [] and data['protected_calls'] == 0, 'trial_discovery')
-    return {'status': 'verified', 'readonly_tools': 28,
-            'protected_tools': 9 if parity else 0, 'servers': 8 if parity else 6,
+    return {'status': 'verified', 'readonly_tools': READONLY_TOOL_COUNT,
+            'protected_tools': PROTECTED_TOOL_COUNT if parity else 0, 'servers': 8 if parity else 6,
             'model_requests': 0, 'pip_check': result.returncode == 0, 'uid': user.pw_uid,
             'network_mode': 'host_process', 'daemon': False}
 

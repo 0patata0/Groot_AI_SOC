@@ -1,8 +1,8 @@
 # Groot_AI_SOC
 
-현재 query1.19.77/common1.5.34는 [실제 채팅 조회 지연](infra/hermes/chat-read-latency.md)을 개선했다. 새 readonly lead의 모델 도구 선택·여러 대상 조회·시간 인자를 보완하고, 완전한 실제 영수증의 단순 조회는 공통 표로 출력한다. 실제 Hermes ABC상태49.923→20.877초, 짧은FW140.738→17.139초(각1회)다. 고유1,198검사PASS/skip0, 기존 source_bundle·단일deploy.sh 경로 사용·추가 패키지/포트/키0. 사건 판단·승인 경계는 유지하며 복합 조사30초·새 OS 전체 설치는 미완료다. 아래76/75/74 기록은 당시 범위다.
+현재 query1.19.78/common1.5.34·security-events1.3.1은 [시간 인자 규격](infra/mcp/event-time-contract.md)을 맞춰 잘못된 조합의 도구 호출·재시도를 줄인다. Wazuh/IDS/WAF/웹 32조합과 실제4조회·등록44도구, 고유1,275회귀PASS/최종skip0을 확인했다. 초기 설치의 도구수 검사도 현재35읽기+9보호와 연결했다. 기존 source_bundle·단일deploy.sh 경로와 패키지·설정 예제를 사용하며 새 의존성/포트/키0이다. 이전77의 실제 채팅 ABC상태20.877초/FW17.139초는 각1회 결과이며, 복합 최종 보고30초·새 OS 전체 설치는 미완료다. 아래 버전별 기록은 당시 범위다.
 
-복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했으며 운영77/34를 유지한다.
+복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
 
 **11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다. 재개 후 실제 내부 Mattermost에서 카드1표·양봇 FW답변 각각4표를 확인했습니다. 새 짧은 FW 질문의 게시→최종 답변은 각1회 Hermes12.1초/Ollama14.0초이며 평균 성능 측정은 아닙니다.
 

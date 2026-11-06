@@ -2113,11 +2113,25 @@ def required_sensor_input_rejection(name, arguments, requirements, receipts):
 
 
 def chat_read_schema(name, schema):
-    """Expand the registered diagnostic time condition for provider grammars.
+    """Expand exact registered time conditions for provider grammars.
 
     Original registry validation still runs before dispatch. Only this exact
     known conditional shape is projected; unknown schemas remain unchanged.
     """
+    if name in {'mcp__security_events__'+n for n in
+            ('search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts','search_web_access')}:
+        if (schema.get('type')!='object' or schema.get('additionalProperties') is not False
+                or schema.get('dependentRequired')!={'since_kst':['until_kst']}
+                or schema.get('allOf')!=[{'not':{'required':['since_kst','lookback_minutes']}}]
+                or not {'since_kst','until_kst','lookback_minutes'}<=set(schema.get('properties',{}))):
+            return schema
+        recent=copy.deepcopy(schema);past=copy.deepcopy(schema)
+        for value in (recent,past):
+            value.pop('allOf');value.pop('dependentRequired')
+        recent['properties'].pop('since_kst')
+        past['properties'].pop('lookback_minutes')
+        past['required']=list(dict.fromkeys(past.get('required',[])+['since_kst','until_kst']))
+        return {'anyOf':[recent,past]}
     if name!='mcp__system_diagnostics__get_system_diagnostics':return schema
     rules=schema.get('allOf',[])
     expected=[{'not':{'required':['lookback_minutes','since_kst']}},
@@ -2791,7 +2805,7 @@ def management_read_request(request, agent, *, pending=False):
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
-        schema=chat_read_schema(name,selected) if chat else selected
+        schema=chat_read_schema(name,selected)
         branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
             'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
     if not branches:raise RuntimeError('management_selection_status_reference_missing')
@@ -3019,7 +3033,7 @@ def management_report_request(request, agent, snapshot):
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
-        schema=selected
+        schema=chat_read_schema(name,selected)
         branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
             'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
     nonce=uuid.uuid4().hex
@@ -3481,7 +3495,9 @@ def main():
         scope_catalog=copy.deepcopy(self.tools)
         for tool in scope_catalog:
             name=tool['function']['name']
-            if name in ('mcp__system_diagnostics__get_system_diagnostics',BUNDLE_TOOL):
+            if name in ('mcp__system_diagnostics__get_system_diagnostics',BUNDLE_TOOL) or name in {
+                    'mcp__security_events__'+n for n in ('search_suricata_alerts','search_modsecurity_alerts',
+                                                      'search_wazuh_alerts','search_web_access')}:
                 registered=registry.get_schema(name)
                 if isinstance(registered,dict) and isinstance(registered.get('parameters'),dict):
                     tool['function']['parameters']=copy.deepcopy(registered['parameters'])

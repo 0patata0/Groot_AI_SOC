@@ -2301,7 +2301,7 @@ def selection_schema(schemas, limit, reference=None):
     return {'title': 'ReadToolSelection', 'type': 'object', 'additionalProperties': False,
         'properties': {'calls': {'type': 'array', 'minItems': 1, 'maxItems': limit, 'uniqueItems': True, 'items': {'anyOf': [
             {'type': 'object', 'additionalProperties': False, 'required': ['tool', 'arguments'],
-             'properties': {'tool': {'type': 'string', 'const': name}, 'arguments': schema}}
+             'properties': {'tool': {'type': 'string', 'const': name}, 'arguments': EVIDENCE.chat_read_schema(name,schema)}}
             for name, schema in schemas.items()]}}}, 'required': ['calls']}
 
 

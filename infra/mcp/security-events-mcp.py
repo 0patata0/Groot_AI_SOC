@@ -135,6 +135,25 @@ for _operation in ('get_web_service_target','search_web_access'):
         'annotations':{'readOnlyHint':True,'destructiveHint':False,'idempotentHint':True}})
 
 
+# These are the same mutually exclusive clocks accepted by validate_args and
+# web_evidence.request. Keep properties at the top level for MCP consumers;
+# the model adapter may expand this exact condition into two object branches.
+for _tool in TOOLS:
+    if _tool['name'] not in ('search_suricata_alerts', 'search_modsecurity_alerts',
+                            'search_wazuh_alerts', 'search_web_access'):
+        continue
+    _schema = _tool['inputSchema']
+    _schema['dependentRequired'] = {'since_kst': ['until_kst']}
+    _schema['allOf'] = [{'not': {'required': ['since_kst', 'lookback_minutes']}}]
+    for _key in ('since_kst', 'until_kst'):
+        _schema['properties'][_key]['pattern'] = (
+            r'^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,6})?\+09:00$')
+    _schema['properties']['until_kst']['description'] = (
+        'Window end with seconds and +09:00, never future. Use since_kst + until_kst '
+        'for exact endpoints, or until_kst + lookback_minutes for a relative window; '
+        'never supply all three. Calendar validity, retention and maximum duration are checked at execution.')
+
+
 _fixed_modules = {}
 
 
@@ -796,7 +815,7 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if isinstance(requested, str) and requested in SUPPORTED_PROTOCOLS else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.3.0"},
+            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.3.1"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None

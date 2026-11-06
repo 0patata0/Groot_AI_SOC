@@ -1,6 +1,6 @@
 # 사건 보고의 반복 입력 개선과 실제 한계
 
-2026-11-06 KST. 현행 query1.19.62/common1.5.32. **안정적인30초 최종 보고는 아직 달성하지 못했다.** [현황](../../STATUS.md) · [수치 원장](review-payload.validation.json) · [이전 기록](automatic-review.md).
+2026-11-06 KST. 당시 query1.19.62/common1.5.32. 후속 현재 버전·실측은 [요청 범위 보완](request-scope.md)을 따른다. **안정적인30초 최종 보고는 아직 달성하지 못했다.** [현황](../../STATUS.md) · [수치 원장](review-payload.validation.json) · [이전 기록](automatic-review.md).
 
 ## 변경한 부분
 

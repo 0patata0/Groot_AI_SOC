@@ -1,5 +1,7 @@
 # 초기 설치·통합 패키지 준비 상태
 
+11/6 현행 [요청 범위 결속](../infra/hermes/request-scope.md): query1.19.65/common1.5.32/MCP1.2.1은 기존 deploy.sh source 복사/gate 렌더 경로에 포함된다. 설치41 포함 고유1077검사·B10파일/보호7SHA 확인. 새 패키지·포트·권한·사용자 설정0, 신규OS 전체 설치/최종30초 보고는 미완료다. 아래 버전별 기록은 당시 검증 범위다.
+
 11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
 
 11/4 웹 읽기 연계: 기존 단일deploy.sh→service diag-apply 내부 설치와 SIEM 복사 경로에 `web_access_deploy.py`·`web_evidence.py`·`read-web-evidence.py`·`web_evidence_client.py`를 연결했다. 별도 계정/SSH 강제 명령·publisher/timer 계약6과 진단18·관리38 검사를 통과했다. 기존 운영 증분 적용/MCP 조회는 [별도 근거](../infra/mcp/web-evidence.md)이며 새 OS 전체 설치 증거가 아니다.

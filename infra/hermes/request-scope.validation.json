@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06T11:38:02.905545+09:00",
+  "query_version": "1.19.65",
+  "common_version": "1.5.32",
+  "diagnostics_version": "1.2.1",
+  "goal_final_30_seconds_met": false,
+  "deployment_files": 10,
+  "protected_files_unchanged": 7,
+  "gate_argument_bytes": 62775,
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "50117c6dd43a041a1b82bd145d1effb1a2d058da2e59ca3e1859b072b0ac8c3c",
+    "infra/hermes/soc_management_controller.py": "149312c934b201c5e9c4a68b37e4b273ac979a35f1378db881b7cd2cdeb94c3d",
+    "infra/hermes/query-completion/__init__.py": "08d2661e162a121cfff3ffc38705d8105563e0069070ade5f8ede1a7912af43f",
+    "infra/hermes/query-completion/plugin.yaml": "36a4371c4e025c725a78509d18120031c1fa35ed7fb17ff9ba085495381c19a1",
+    "infra/mcp/system-diagnostics-mcp.py": "89a99d68f0660f86b8a085a3b905249e092bb29a2b3a5fab61f67a7f7a3f74a1",
+    "infra/hermes/test_soc_management_request_scope.py": "55971535e9ddd87ca870b152c8c7addfc052837f59803436de86ae7f87b9c8b3"
+  },
+  "tests": {
+    "unique_pass": 1077,
+    "uncovered_skip": 0,
+    "server_base_skip": 57,
+    "native_tests": 63,
+    "overlap": 6,
+    "mac_tests": 400,
+    "mac_skip": 68
+  },
+  "measurements": [
+    {
+      "query": "63",
+      "run_id": "1045cbcf9af56b2d91886ea1a424546d",
+      "seconds": 69.80018329620361,
+      "state": "completed",
+      "detail": "model_needs_review",
+      "tool_attempts": 11,
+      "tool_errors": 0,
+      "writes": 0,
+      "model_rounds": 8,
+      "model_seconds": 51.007869,
+      "model_selection_rejections": 2,
+      "tool_result_seconds": 6.419
+    },
+    {
+      "query": "64",
+      "run_id": "8fe3765fbf1cc26ce99b78b48cd9f31a",
+      "seconds": 214.43743586540222,
+      "state": "outcome_unknown",
+      "detail": "model_subprocess_timeout_requires_review",
+      "tool_attempts": 24,
+      "tool_errors": 0,
+      "writes": 0,
+      "model_rounds": 12,
+      "model_seconds": 110.774133,
+      "model_selection_rejections": 1,
+      "tool_result_seconds": 21.198
+    },
+    {
+      "query": "65",
+      "run_id": "ac1ddcfa5efef31c8a21dc047842e529",
+      "seconds": 170.87774658203125,
+      "state": "completed",
+      "detail": "model_tool_failure_requires_review",
+      "tool_attempts": 23,
+      "tool_errors": 1,
+      "writes": 0,
+      "model_rounds": 12,
+      "model_seconds": 146.475635,
+      "model_selection_rejections": 0,
+      "tool_result_seconds": 11.421
+    }
+  ],
+  "measurement_scope": "Same development case/new Native session, actual model/MCP, private state DB/no chat posting. Shared GPU/query timing not controlled; one sample per version, not an independent evaluation.",
+  "verified": [
+    "explicit registered current and exact historical service reads executed",
+    "no wrong-kind known ID reached MCP in final65",
+    "original scalar ID type preserved for grammar/validator",
+    "all registered reads retained; unknown IDs remain possible",
+    "read-only probes issued zero writes",
+    "B services and protected config hashes verified"
+  ],
+  "unresolved": [
+    "final report30s",
+    "redundant nested/overlapping web/history inquiries",
+    "model-selected unknown operation ID returned missing or ambiguous",
+    "final65 did not produce a valid investigation report",
+    "A journal collection gaps",
+    "large multi-target/window operator scope not live-tested"
+  ],
+  "not_run": [
+    "actual attack/load/PCAP",
+    "Mattermost posting/end-to-end latency",
+    "new OS full installation",
+    "manual full rollback",
+    "independent evaluation",
+    "new training/model changes"
+  ],
+  "backups": [
+    "/var/lib/capstone-request-scope/20261106-r1/deployment",
+    "/var/lib/capstone-request-scope/20261106-r4/deployment",
+    "/var/lib/capstone-request-scope/20261106-r5/deployment"
+  ],
+  "publication": {
+    "status": "pending"
+  },
+  "cleanup": {
+    "server_source_files": 2210,
+    "server_measurement_scripts": 3,
+    "mac_temporary_files": 22,
+    "mac_temporary_bytes": 4437404,
+    "verified_absent": true,
+    "new_packages_installed": 0
+  }
+}

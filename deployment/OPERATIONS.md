@@ -1,5 +1,7 @@
 # SOC 운영 절차
 
+11/6 현행 [요청 범위 결속](../infra/hermes/request-scope.md): query1.19.65/common1.5.32/MCP1.2.1은 기존 deploy.sh source 복사/gate 렌더 경로에 포함된다. 설치41 포함 고유1077검사·B10파일/보호7SHA 확인. 새 패키지·포트·권한·사용자 설정0, 신규OS 전체 설치/최종30초 보고는 미완료다. 아래 버전별 기록은 당시 검증 범위다.
+
 11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
 
 웹 백엔드 접근 기록은 security-events의 `search_web_access`로 읽는다. `DVWA 접근 기록 보여줘`는 최근1시간을 서버가 계산하고 실제 표본/잘림/전체미확인을 표시한다. 고정 서비스/로컬 등록은 `get_web_service_target`, Apache/수집 상태는 기존 진단으로 확인한다. 기록0행·HTTP200·Apache active는 앱 정상/침해 부재·사건 종결 증명이 아니다. [범위·장애·복구](../infra/mcp/web-evidence.md).
@@ -50,6 +52,6 @@ A는 기존 ip nat/filter/raw와 inet capstone_fw를 사용한다. 관리자 정
 
 HTTP Wazuh는같은호스트HTTPS308,관리ACL유지다. 웹 보호의429는요청제한이며그자체로IP차단/악성판정이아니다. 임시차단카드의검증근거와요청자판단사유를구분한다. 공격시험은사용자재지시전중단한다. [운영값·복구](../infra/validation/web-traffic/README.md) · [사유/조회](../infra/mcp/containment-display.md).
 
-복합 사건 현행은 [query1.19.62 반복 입력 보완](../infra/hermes/review-payload.md)을 따른다. 단일containment 웹 verify의 이력/문맥이 온전히 담길 때만 새 Native 세션을 쓰며 이전 DB·승인·trace를 보존한다. 쓰기·다중제안·누락/초과는 기존 경로다. 실제 잘못된 대상은 남은 등록 후보에서 모델이 다시 선택한다. 단일deploy.sh source복사/gate렌더·설치41검사, 새 사용자 설정/의존성/포트0. 12turn/180·210초·승인/TTL·현재 근거 검사를 유지한다.30초 최종 보고·자연 발생 자동 스케줄/전체 채팅 평균은 미완료다.
+복합 사건1.19.62 당시 기록은 [반복 입력 보완](../infra/hermes/review-payload.md)을 따른다. 단일containment 웹 verify의 이력/문맥이 온전히 담길 때만 새 Native 세션을 쓰며 이전 DB·승인·trace를 보존한다. 쓰기·다중제안·누락/초과는 기존 경로다. 실제 잘못된 대상은 남은 등록 후보에서 모델이 다시 선택한다. 단일deploy.sh source복사/gate렌더·설치41검사, 새 사용자 설정/의존성/포트0. 12turn/180·210초·승인/TTL·현재 근거 검사를 유지한다.30초 최종 보고·자연 발생 자동 스케줄/전체 채팅 평균은 미완료다.
 
 제어기가 단일 사건의 정확한 운영자 요청/증거 범위를 내부 CAPSTONE_REVIEW_CONTEXT_JSON으로 전달하며 원문감사는 보존한다. 모델 필수 선택256/간결 웹 검토1024토큰·기존 추론 설정·실제 인용 전체·시각 대조·추가조사 복귀를 적용한다. 새 사용자설정키는 아니다.30초 목표·예외/실패는 위 검증 원장으로 확인한다.

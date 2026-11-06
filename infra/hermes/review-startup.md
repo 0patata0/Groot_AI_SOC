@@ -1,6 +1,6 @@
 # 복합 보고30초 목표 — 초기 준비·선택 단계 분리 측정
 
-2026-11-06의 추가 진단 기록이다. **최종 보고30초 목표는 미달이며 이번 후보는 운영에 적용하지 않았다.** 운영은 query1.19.62/common1.5.32·Thor 원본35B다. [현재 상태](../../STATUS.md) · [수치·무결성 원장](review-startup.validation.json) · [이전 전체 조사 실측](review-payload.md).
+2026-11-06의 추가 진단 기록이다. **최종 보고30초 목표는 미달이며 이번 후보는 운영에 적용하지 않았다.** 이 진단 당시 운영은 query1.19.62/common1.5.32·Thor 원본35B다. [현재 상태](../../STATUS.md) · [수치·무결성 원장](review-startup.validation.json) · [이전 전체 조사 실측](review-payload.md).
 
 ## 초기 준비
 

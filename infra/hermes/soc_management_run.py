@@ -1764,6 +1764,75 @@ def known_status_input_rejection(name, arguments, requirements):
     return None
 
 
+def known_status_selection_schema(name, schema, requirements):
+    """Exclude only already-bound IDs with the wrong kind/host before generation."""
+    value=copy.deepcopy(schema)
+    if not re.fullmatch(r'mcp__rule_[ab]__(?:get_operation_status|get_rule_change_status)',name or ''):
+        return value
+    key='request_id' if name.endswith('__get_operation_status') else 'proposal_id'
+    correct={r['proposal_id'] for r in requirements if status_read_request(r)['tool']==name}
+    wrong=sorted({r['proposal_id'] for r in requirements}-correct)
+    props=value.get('properties',{})
+    if wrong and isinstance(props.get(key),dict):
+        # Keep the original string type at the property root. Some grammar
+        # compilers otherwise turn an allOf-only scalar into an empty object.
+        prior=props[key].get('not')
+        props[key]['not']={'anyOf':[prior,{'enum':wrong}]} if isinstance(prior,(dict,bool)) else {'enum':wrong}
+    return value
+
+
+def operator_diagnostic_options(request, receipts=()):
+    """Bind unambiguous literal user targets to existing catalog reads, not risk.
+
+    No aliases, prose/log inference, arbitrary unit mapping or automatic dispatch.
+    Ambiguous/negative requests stay with the ordinary model-driven inquiry.
+    An actual failed wire receipt completes an *attempt*, never a health claim.
+    """
+    if not readonly_incident_review() or os.environ.get('CAPSTONE_OPERATOR_REVIEW')!='1':return []
+    context=compact_controller_context()
+    if context is None:return []
+    reason=context['operator_reason']
+    if not re.search(r'조회|확인|보고|조사|보여|check|show|inspect',reason,re.I) or '```' in reason:
+        return []
+    name='mcp__system_diagnostics__get_system_diagnostics'
+    tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
+    if len(tools)!=1:return []
+    schema=tools[0].get('parameters',{})
+    catalogs=[r.get('then',{}).get('properties',{}).get('target',{}).get('enum')
+        for r in schema.get('allOf',[]) if isinstance(r,dict) and r.get('if')=={'required':['since_kst']}]
+    if len(catalogs)!=1 or not isinstance(catalogs[0],list):return []
+    token=r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])'
+    clauses=[]; excluded=set()
+    for clause in re.split(r'[,\n;!?]|\.(?:\s|$)',reason):
+        if re.search(r'말고|말아|제외|하지\s*마|않|아닌|아니라|\b(?:not|except|without)\b',clause,re.I):
+            excluded.update(re.findall(token,clause))
+        else:clauses.append(clause)
+    mentioned=set(re.findall(token,' '.join(clauses)))-excluded
+    targets=sorted(mentioned & {x for x in catalogs[0] if isinstance(x,str)})
+    if not 1<=len(targets)<=4:return []
+    windows=context['evidence_scope'].get('incident_windows',[])
+    # Only controller-supplied exact incident windows, never model/log dates.
+    if not isinstance(windows,list) or len(windows)>16:return []
+    valid=[]
+    for window in windows:
+        if not isinstance(window,dict) or set(window)!={'since_kst','until_kst'}:return []
+        a,b=(parse_instant(window[k]) for k in ('since_kst','until_kst'))
+        if (not a or not b or not all(window[k].endswith('+09:00') for k in window)
+                or not 0<(b-a).total_seconds()<=86400):return []
+        if datetime.now(KST)-timedelta(days=30)<=a and b<=datetime.now(KST):valid.append(window)
+    options=[]
+    for target in targets:
+        scope=' '.join(c for c in clauses if re.search(r'(?<![A-Za-z0-9_.:-])'+re.escape(target)+r'(?![A-Za-z0-9_.:-])',c))
+        historical=bool(re.search(r'과거|당시|이력|사건\s*(?:구간|시점|시간)|histor',scope,re.I))
+        current=not historical or bool(re.search(r'현재|지금|current|now',scope,re.I))
+        args=([{'target':target}] if current else [])+[
+            {'target':target,**w} for w in valid if historical]
+        for arguments in args:
+            if not any(r.get('tool')==name and r.get('arguments')==arguments for r in receipts):
+                options.append({'tool':name,'arguments':arguments})
+    return options
+
+
 def required_sensor_input_rejection(name, arguments, requirements, receipts):
     """Enforce the advertised required read scope; never repair or dispatch it."""
     if os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify':
@@ -1853,7 +1922,7 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
     return {**value, 'tool_choice': 'required'} if reads else value
 
 
-def required_read_bundle(request, requirements, facts, sensor_requirements, sensor_receipts):
+def required_read_bundle(request, requirements, facts, sensor_requirements, sensor_receipts, diagnostic_receipts=(), native_catalog=None):
     """Offer independent exact reads together; the model selects every dispatch."""
     if not readonly_incident_review():
         return None
@@ -1861,7 +1930,11 @@ def required_read_bundle(request, requirements, facts, sensor_requirements, sens
         f.get('kind')=='proposal_status' and f.get('proposal_id')==r['proposal_id']
         and f.get('target')==r['target'] for f in facts)]
     options+=copy.deepcopy(missing_sensor_reads(sensor_requirements,sensor_receipts))
-    if not 1<=len(options)<=8:return None
+    # Transport adapters may flatten conditional JSON schemas. Capability
+    # discovery comes from the registered catalog; dispatch stays in request.
+    options+=operator_diagnostic_options(request if native_catalog is None else {'tools':native_catalog},diagnostic_receipts)
+    if not options:return None
+    options=options[:8]  # Remaining requirements stay pending for the next batch.
     value=permitted_request(request,'verify')
     catalog={t['function']['name']:t for t in value.get('tools',[])}
     for option in options:
@@ -2302,6 +2375,8 @@ def management_read_request(request, agent, *, pending=False):
         if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_selection_catalog_invalid')
+        schema=known_status_selection_schema(name,schema,
+            status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         catalog[name]=copy.deepcopy(schema)
         branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
             'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
@@ -2501,6 +2576,8 @@ def management_report_request(request, agent, snapshot):
         if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_report_catalog_invalid')
+        schema=known_status_selection_schema(name,schema,
+            status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         catalog[name]=copy.deepcopy(schema)
         branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
             'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
@@ -2833,6 +2910,7 @@ def main():
     requirements = status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))
     sensor_requirements=sensor_read_requirements(os.environ.get('CAPSTONE_REQUIRED_SENSOR_JSON'))
     sensor_receipts=[]
+    diagnostic_receipts=[]
     attempted_wire_reads=[]
     native_read_catalog=[]
     argument_errors = []
@@ -2873,6 +2951,10 @@ def main():
         except Exception as exc:
             result=read_protocol_error_result(name,exc)
             if result is None:raise
+        if name=='get_system_diagnostics' and isinstance(arguments,dict):
+            diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics',
+                'arguments':copy.deepcopy(arguments)})
+            del diagnostic_receipts[:-64]
         receipt=sensor_read_receipt(name,arguments,result)
         if receipt:sensor_receipts.append(receipt)
         if argument_refusal(name, result):
@@ -2913,15 +2995,24 @@ def main():
             args = (args[0], permitted_tools(args[1], mode), *args[2:])
         if 'tools_for_api' in kwargs and kwargs['tools_for_api'] is not None:
             kwargs['tools_for_api'] = permitted_tools(kwargs['tools_for_api'], mode)
+        scope_catalog=copy.deepcopy(self.tools)
+        for tool in scope_catalog:
+            name=tool['function']['name']
+            if name=='mcp__system_diagnostics__get_system_diagnostics':
+                registered=registry.get_schema(name)
+                if isinstance(registered,dict) and isinstance(registered.get('parameters'),dict):
+                    tool['function']['parameters']=copy.deepcopy(registered['parameters'])
+        native_read_catalog[:]=copy.deepcopy(scope_catalog)
         base=management_reasoning(operation_time_request(permitted_request(builder(self, *args, **kwargs), mode)), self)
-        bundle=required_read_bundle(base,requirements,status_receipts,sensor_requirements,sensor_receipts)
+        bundle=required_read_bundle(base,requirements,status_receipts,sensor_requirements,sensor_receipts,diagnostic_receipts,scope_catalog)
         value=bundle[0] if bundle else initial_review_read(base,
             completed_wire_calls,requirements,status_receipts,sensor_requirements,sensor_receipts)
         self._capstone_pending_options=(getattr(self,'_current_turn_id',None),bundle[1]) if bundle else None
         self._capstone_navigation_facts=copy.deepcopy(read_facts)
         pending_status=any(not any(f.get('kind')=='proposal_status' and f.get('proposal_id')==r['proposal_id']
             and f.get('target')==r['target'] for f in status_receipts) for r in requirements)
-        pending=mode=='verify' and (pending_status or bool(missing_sensor_reads(sensor_requirements,sensor_receipts)))
+        pending=mode=='verify' and (pending_status or bool(missing_sensor_reads(sensor_requirements,sensor_receipts))
+            or bool(operator_diagnostic_options({'tools':scope_catalog},diagnostic_receipts)))
         if not pending:
             impact=web_impact_review_request(value,read_facts,attempted_wire_reads,sensor_requirements)
             pending=impact is not value
@@ -2947,6 +3038,7 @@ def main():
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
         web_pending=web_impact_review_request({'tools':native_read_catalog},read_facts,attempted_wire_reads,sensor_requirements).get('tool_choice')=='required'
+        web_pending=web_pending or bool(operator_diagnostic_options({'tools':native_read_catalog},diagnostic_receipts))
         data['final_response'] = factual_review_report(read_facts) if (unfinished_report or missing_sensor_reads(sensor_requirements,sensor_receipts) or web_pending
             or evidence_claim_violations(text, read_facts, successful_read_names)) else kst_display(text)
         return original_result(self, data, session_id, exit_code)

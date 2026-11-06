@@ -145,7 +145,9 @@ def tools():
                 'limit': {'type': 'integer', 'minimum': 1, 'maximum': 50, 'default': 20,
                           'description': 'Returned error sample cap: integer 1..50; values above 50 are refused. Not minutes.'}},
             'dependentRequired': {'since_kst':['until_kst'], 'until_kst':['since_kst']},
-            'allOf':[{'not':{'required':['lookback_minutes','since_kst']}}, {'not':{'required':['lookback_minutes','until_kst']}}]},
+            'allOf':[{'not':{'required':['lookback_minutes','since_kst']}}, {'not':{'required':['lookback_minutes','until_kst']}},
+                {'if':{'required':['since_kst']}, 'then':{'properties':{'target':{'enum':sorted(
+                    k for k,v in library().TARGETS.items() if isinstance(v,str))}}}}]},
         'annotations': {'title': 'Read fixed system diagnostics', 'readOnlyHint': True,
             'destructiveHint': False, 'idempotentHint': True},
     }, TIME_TOOL]
@@ -380,7 +382,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.2.0'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.2.1'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':

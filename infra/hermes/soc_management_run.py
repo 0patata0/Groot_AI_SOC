@@ -1631,6 +1631,8 @@ def literal_evidence_table(facts):
             for agent in row.get('agents',[]):
                 rows.append(('등록 에이전트',str(agent.get('name','미확인')),
                              'ID '+str(agent.get('agent_id',agent.get('id','미확인')))+' / 관측 주소 '+str(agent.get('reported_ip','미확인'))))
+        elif kind=='diagnostics':
+            rows.extend(diagnostic_contract().diagnostic_evidence_rows(row,stamp))
         else:
             # Non-event evidence already has bounded, literal labels. Do not
             # expose dictionary repr/JSON or model-provided prose as a table.
@@ -3097,12 +3099,13 @@ def management_report_request(request, agent, snapshot):
     """Current-run read-or-report schema; never suppress additional inquiry."""
     inquiry=(isinstance(snapshot,dict) and isinstance(snapshot.get('turn'),str) and bool(snapshot['turn'])
         and getattr(agent,'_capstone_full_review_turn',None)==snapshot['turn'])
+    service_chat=bool(os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1' and isinstance(snapshot,dict)
+        and (snapshot.get('service_context') or inquiry) and chat_read_context())
     if (not isinstance(snapshot,dict) or snapshot.get('turn') != getattr(agent,'_current_turn_id',None)
             or not isinstance(snapshot.get('turn'),str) or not snapshot['turn']
             or os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify'
-            or os.environ.get('CAPSTONE_MANAGEMENT_REVIEW')!='1'
-            or os.environ.get('CAPSTONE_WEB_IMPACT_REVIEW')!='1'
-            or not readonly_incident_review()
+            or (os.environ.get('CAPSTONE_MANAGEMENT_REVIEW')!='1' and not service_chat)
+            or not (readonly_incident_review() or service_chat)
             or getattr(agent,'provider',None)!='custom' or getattr(agent,'model',None)!='qwen3.6:35b'
             or getattr(agent,'api_mode','chat_completions')!='chat_completions'
             or str(getattr(agent,'base_url','')).rstrip('/')!='http://10.200.10.10:11435/v1'
@@ -3115,6 +3118,9 @@ def management_report_request(request, agent, snapshot):
             or not 1<=len(reads)<=64 or not all(allowed(n,'verify') and n in getattr(agent,'valid_tool_names',()) for n in reads)
             or not isinstance(facts,list) or not facts):
         return request
+    chosen=getattr(agent,'_capstone_service_inquiry_tools',None)
+    chosen=(chosen[1] if inquiry and isinstance(chosen,tuple) and len(chosen)==2 and chosen[0]==snapshot['turn']
+        and len(snapshot.get('receipts') or [])==getattr(agent,'_capstone_inquiry_receipts',None) else None)
     branches=[];catalog={}
     for tool in tools:
         f=tool.get('function',{}) if isinstance(tool,dict) else {};name=f.get('name');schema=f.get('parameters')
@@ -3124,7 +3130,7 @@ def management_report_request(request, agent, snapshot):
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
-        if selected is None:continue
+        if selected is None or chosen is not None and name not in chosen:continue
         schema=chat_read_schema(name,selected)
         branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
             'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
@@ -3199,6 +3205,36 @@ def management_report_request(request, agent, snapshot):
     if isinstance(extra,dict):
         if any(k in extra for k in ('messages','model')):raise RuntimeError('management_report_body_override')
         for k in ('tools','tool_choice','response_format'):extra.pop(k,None)
+    service=snapshot.get('service_context')
+    if compact and isinstance(service,dict):
+        bound=getattr(agent,'_capstone_registered_read_conditions',None)
+        registered=({'tools':[{'function':{'name':n,'parameters':s}} for n,s in bound[1].items() if n in catalog]}
+            if isinstance(bound,tuple) and len(bound)==2 and bound[0]==snapshot['turn'] and isinstance(bound[1],dict) else {})
+        service=diagnostic_contract().service_report_context(registered,service['question'],service['requested_at_kst'],
+            service['untrusted_completed_reads'],background=service['background'])
+        if service is not None and inquiry:
+            result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_inquiry','strict':True,'schema':schema}}
+            result['messages']=diagnostic_contract().service_inquiry_messages(service,
+                {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools if chosen is None or t['function']['name'] in chosen},
+                citations,schema,review_execution_view(agent,snapshot.get('read_ledger')))
+            result['max_tokens']=1024;result.pop('max_completion_tokens',None)
+            agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':copy.deepcopy(schema),
+                'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),
+                'receipt_count':len(receipts),'additional_inquiry':True}
+            agent._capstone_review_feedback=None
+            return result
+        if service is not None:
+            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog))
+            Draft202012Validator.check_schema(schema)
+            result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
+            result['messages']=diagnostic_contract().service_report_messages(service,
+                {t['function']['name']:diagnostic_contract().service_tool_description(t['function'].get('description',''),t['function']['parameters']) for t in tools},citations,feedback)
+            result['max_tokens']=1024;result.pop('max_completion_tokens',None)
+            agent._capstone_management_selection={'turn':agent._current_turn_id,'nonce':nonce,'schema':schema,
+                'catalog':catalog,'report_facts':copy.deepcopy(facts),'report_reads':list(reads),
+                'receipt_count':len(receipts),'compact_citations':citations,'service_report':True}
+            agent._capstone_review_feedback=None
+            return result
     result['response_format']={'type':'json_schema','json_schema':{'name':'soc_read_or_review','strict':True,'schema':schema}}
     if compact:
         packed=[]
@@ -3232,7 +3268,8 @@ def management_report_request(request, agent, snapshot):
         schema_view.pop('$defs',None)
         catalog_messages=([{'role':'user','content':json.dumps({
             'schema_definitions':definitions,
-            'available_read_descriptions':{t['function']['name']:t['function'].get('description','') for t in tools},
+            'available_read_descriptions':{t['function']['name']:t['function'].get('description','') for t in tools
+                if chosen is None or t['function']['name'] in chosen},
             'schema_binding':'The current schema uses these exact schema_definitions as its top-level $defs. '
                 'This is the registered read catalog, not execution evidence. Use the current request_nonce and current successful citations only.'},
             ensure_ascii=False,separators=(',',':'))}] if definitions is not None else [])
@@ -3315,6 +3352,8 @@ def management_selection_response(response, selection, agent):
     Draft202012Validator(selection['schema']).validate(value)
     if 'compact_citations' in selection:
         if value.get('more_evidence'):
+            if selection.get('service_report'):
+                agent._capstone_service_inquiry_tools=(agent._current_turn_id,list(value['read_tools']))
             agent._capstone_more_evidence_turn=agent._current_turn_id
             agent._capstone_full_review_turn=agent._current_turn_id
             agent._capstone_inquiry_receipts=selection['receipt_count']
@@ -3607,9 +3646,16 @@ def main():
         if pending:return management_reasoning(value,self,required_read_phase=True)
         cited=completed_citation_request(value,successful_read_names)
         result=completed_web_review_request(cited,self,successful_read_names,requirements_complete=bool(sensor_requirements),component_reads=component_read_names)
-        if result is not cited:
+        chat=chat_read_context()
+        service=(diagnostic_contract().service_report_context({'tools':scope_catalog},chat['request'],chat['requested_at_kst'],
+            diagnostic_receipts,background=chat['background']) if os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')=='1'
+            and chat and receipts_complete and
+            len(current_receipts)==len(diagnostic_receipts) else None)
+        if result is not cited or service or (getattr(self,'_current_turn_id',None) and
+                getattr(self,'_capstone_full_review_turn',None)==self._current_turn_id):
             self._capstone_management_report={'turn':getattr(self,'_current_turn_id',None),
                 'reads':sorted(n for n in successful_read_names if allowed(n,'verify')),'facts':copy.deepcopy(read_facts),
+                'service_context':service,
                 'read_ledger':copy.deepcopy(read_ledger) if read_ledger_complete else None,
                 'receipts':copy.deepcopy(current_receipts) if receipts_complete else None}
         return result

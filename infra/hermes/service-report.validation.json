@@ -1,0 +1,310 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T02:54:15.527009+09:00",
+  "scope": "service diagnostic evidence/report optimization",
+  "runtime": {
+    "query": "1.19.100",
+    "common": "1.5.52",
+    "routing": "1.1.5",
+    "diagnostics_mcp": "1.2.4",
+    "model": "qwen3.6:35b",
+    "changed_model": false
+  },
+  "tests": {
+    "profiles": [
+      {
+        "profile": "native",
+        "passed": 471,
+        "skipped": 0
+      },
+      {
+        "profile": "service",
+        "passed": 30,
+        "skipped": 0
+      },
+      {
+        "profile": "claims",
+        "passed": 21,
+        "skipped": 0
+      },
+      {
+        "profile": "diagnostics",
+        "passed": 65,
+        "skipped": 0
+      },
+      {
+        "profile": "sdk",
+        "passed": 253,
+        "skipped": 0
+      },
+      {
+        "profile": "query",
+        "passed": 391,
+        "skipped": 0
+      },
+      {
+        "profile": "peer",
+        "passed": 71,
+        "skipped": 0
+      },
+      {
+        "profile": "installer",
+        "passed": 20,
+        "skipped": 0
+      }
+    ],
+    "total_unique": 1322,
+    "skipped": 0,
+    "evidence_sha256": "7ded236b66c8c537f16538fea946f5b65b1b5d233c735f30d5f15088d583d55f"
+  },
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "28aed2e4d75106a186de379c927fbcc4b2dbfd10692c8e88c93da872f265acb8",
+    "infra/hermes/soc_management_run.py": "aa9cba043e00e00a97fec476ff35adaa06c4ddad48dc4dac8f5cf3bacbd2cef9",
+    "infra/hermes/query-completion/__init__.py": "d7c97553a2891a92433cfd0c2af5ca47b46b0217ac865ea545802e8dd8e18a17",
+    "infra/hermes/query-completion/plugin.yaml": "91cc82e081147c50e158bdef9535898acafaab35b608e71ae25e0f280e2333eb",
+    "infra/hermes/test_service_history_contract.py": "90c8e398ccd94f1f23426dd0afb7049193fb384e5d8f14258410bc4876f13633",
+    "infra/hermes/test_diagnostic_claim_scope.py": "a0b47efb9170c36821d8b0450a340839bb5d91c1a69d45779f9fea9abf848cd2",
+    "infra/hermes/review_channel_policy.py": "ead22c462a5ae8488c23f3f4864976f29da85351da2557b9659cbcc826a02e73",
+    "infra/hermes/test_review_channel.py": "eefb6777a999b17e9395ad0f0d55fb0bb269bf7c23701df849d8e3287b2e8f05",
+    "infra/ollama-trial/runtime.py": "ba7ad4b8fd1de0fd651b4dd82365e6d297db621220558fac5708a4eb97042c90",
+    "infra/ollama-trial/test_service_history.py": "80dc33aa55828deef426db838901379a601ce51a99ed19be29f9141e3a5cf283",
+    "infra/mcp/system_diagnostics.py": "bfc403fbb11420b9e385c800a209286a94a707ac8b10e4c91b9c1d86b7c0c5d5",
+    "infra/mcp/diagnostic_history.py": "b9e605805524d4f59e52b1a3b3d48bc307e5d079da7cca3ca49ea5688dee4d2d",
+    "infra/mcp/system-diagnostics-mcp.py": "82f8d95aad0da1def7048eec2463352b7908ce8861b415e20fc352f4f75bd026",
+    "infra/mcp/test_system_diagnostics.py": "2df63fdfc0cda24b8bea965dde4e2e4501b73614df904837629e9dd318a1070e",
+    "infra/mcp/test_diagnostic_history.py": "1be24761dbb96db57f228d54d4f37d6ec15ca172e18ff8ce4a0e81f6f42d8154"
+  },
+  "deployment": {
+    "backup": "/var/lib/capstone-service-report/20261107-gate100",
+    "changed": 6,
+    "manifest": 21,
+    "protected": 8,
+    "sdk_sources": 20,
+    "stopped_snapshot_equal": true,
+    "gate_argument_bytes": 64726,
+    "idle": {
+      "idle": true,
+      "active_leases": 0,
+      "heartbeat_age_seconds": 5.287
+    },
+    "at_kst": "2026-11-07T02:48:52.702692+09:00"
+  },
+  "health": {
+    "at_kst": "2026-11-07T02:59:01.300679+09:00",
+    "manifest": 21,
+    "protected": 8,
+    "sdk_sources": 20,
+    "services": [
+      "active",
+      "active",
+      "active"
+    ],
+    "failed": "",
+    "review_queue_pending": 0,
+    "ready": true
+  },
+  "backfill": {
+    "added": 219,
+    "existing_unchanged": 664,
+    "deleted": 0,
+    "quick_check": "ok",
+    "live_nonroot_mcp_verified": true,
+    "scope": "B only, fixed 24h; raw journal preserved"
+  },
+  "actual_chat_trials": [
+    {
+      "query": 90,
+      "engine": "hermes",
+      "first_final_seconds": 70.16,
+      "runtime_or_semantic_limitation": "report_route_not_used",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 91,
+      "engine": "hermes",
+      "first_final_seconds": 66.76,
+      "runtime_or_semantic_limitation": "unsupported_health_or_restart_claim",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 92,
+      "engine": "hermes",
+      "first_final_seconds": 90.905,
+      "runtime_or_semantic_limitation": "wrong_target_and_extra_reads",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 92,
+      "engine": "ollama",
+      "first_final_seconds": 69.131,
+      "runtime_or_semantic_limitation": "report_scope_mismatch",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 93,
+      "engine": "hermes",
+      "first_final_seconds": 120.095,
+      "runtime_or_semantic_limitation": "meaning_failure",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 93,
+      "engine": "ollama",
+      "first_final_seconds": 51.827,
+      "runtime_or_semantic_limitation": "unobserved_tool_result",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 94,
+      "engine": "hermes",
+      "first_final_seconds": 64.217,
+      "runtime_or_semantic_limitation": "unsupported_global_health",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 95,
+      "engine": "hermes",
+      "first_final_seconds": 72.17,
+      "runtime_or_semantic_limitation": "future_monitoring_false_positive_then_bad_repair",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 96,
+      "engine": "hermes",
+      "first_final_seconds": 61.32,
+      "runtime_or_semantic_limitation": "bounded_factual_answer_functional_state_unknown",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 96,
+      "engine": "ollama",
+      "first_final_seconds": 22.892,
+      "runtime_or_semantic_limitation": "unsupported_restart_history_absence",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 97,
+      "engine": "hermes",
+      "first_final_seconds": 61.922,
+      "runtime_or_semantic_limitation": "wrong_service_read_and_current_state_pair",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 97,
+      "engine": "ollama",
+      "first_final_seconds": 23.835,
+      "runtime_or_semantic_limitation": "unsupported_independence_and_no_action_needed",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 98,
+      "engine": "hermes",
+      "first_final_seconds": 31.23,
+      "runtime_or_semantic_limitation": "invented_lock_owner_lifecycle_and_benign_closure",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 98,
+      "engine": "ollama",
+      "first_final_seconds": 24.579,
+      "runtime_or_semantic_limitation": "unsupported_no_further_action_needed",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 99,
+      "engine": "hermes",
+      "first_final_seconds": 29.9,
+      "runtime_or_semantic_limitation": "English unfinished prose, collection time described as exit time, unsupported benign verdict",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 100,
+      "engine": "hermes",
+      "first_final_seconds": 84.943,
+      "runtime_or_semantic_limitation": "partial factual fallback; repeated same collection snapshot; no final judgment",
+      "fully_correct_closed_investigation": false
+    },
+    {
+      "query": 100,
+      "engine": "ollama",
+      "first_final_seconds": 39.992,
+      "runtime_or_semantic_limitation": "unsupported benign/functional-health claims rejected; partial final judgment",
+      "fully_correct_closed_investigation": false
+    }
+  ],
+  "peer_root_seconds": {
+    "hermes96_source_ollama_peer": 108.395,
+    "ollama96_source_hermes_peer": 171.316,
+    "hermes97_source_ollama_peer": 100.732,
+    "ollama97_source_hermes_peer": 153.301,
+    "hermes98_source_ollama_peer": 76.203,
+    "ollama98_source_hermes_peer": 239.851,
+    "hermes99_source_ollama_peer": 94.437,
+    "hermes100_source_ollama_peer": 149.312,
+    "ollama100_source_hermes_peer": 254.858
+  },
+  "limitations": [
+    "single fresh posts; shared GPU and prefix cache uncontrolled",
+    "first final reply excludes subsequent peer completion",
+    "runtime completed is not semantic success",
+    "overall accurate 30s/60s target not achieved",
+    "no new OS install, attack, load, protected-write E2E or long-term verification",
+    "SDK100 partial raw read bodies are not kept in the completed-read cache; the worker call hashes and timings remain, not an independent body revalidation"
+  ],
+  "publication": {
+    "state": "pending",
+    "previous_head": "97ecdede59894c9f5050571d7d67be75e30a898b"
+  },
+  "private_reasoning_probe": {
+    "report_only_thinking": true,
+    "num_predict": 2048,
+    "seconds": 52.978565976,
+    "model_seconds": 42.64826022,
+    "output_tokens": 2048,
+    "final_json_completed": false,
+    "adopted": false,
+    "actual_chat": false
+  },
+  "pipeline_mcp_read": {
+    "execution_user": "mcp",
+    "seconds": 0.388169725,
+    "observed_at_kst": "2026-11-07T02:47:32+09:00",
+    "age_seconds": 11,
+    "pending_reports": 0,
+    "overdue_cases": 0,
+    "running_cases": 0,
+    "review_required_cases": 285,
+    "interpretation": "review states, not 285 confirmed attacks or global service clearance",
+    "tool_already_existed": true,
+    "bot_discovery_and_rendering_followup_required": true
+  },
+  "cleanup": {
+    "server_fixture": {
+      "removed_files": 459,
+      "bytes": 7128313,
+      "fixture_absent": true,
+      "operational_paths_untouched": true
+    },
+    "local_temp_removed": true,
+    "local": {
+      "at_kst": "2026-11-07T02:59:10.118455+09:00",
+      "files_removed": 132,
+      "bytes_removed": 42557983,
+      "temporary_root_absent": true,
+      "project_sources_dialogue_credentials_archives_preserved": true
+    }
+  },
+  "latest_model_breakdown": {
+    "hermes": {
+      "calls": 7,
+      "seconds": 71.019386,
+      "actual_reads": 5
+    },
+    "ollama": {
+      "calls": 4,
+      "seconds": 29.330587981035933,
+      "actual_reads": 2,
+      "mcp_seconds": 0.1288468148559332
+    }
+  }
+}

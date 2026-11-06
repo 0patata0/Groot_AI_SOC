@@ -57,6 +57,32 @@ def snapshot(role='service', rows=None, fail=None):
     return d.collect(role, runner, NOW), calls
 
 
+class ControllerErrorMetadata(unittest.TestCase):
+    def test_exact_failed_envelope_on_correct_unit_becomes_safe_code(self):
+        raw='{"status":"failed","error":"controller_already_running"}'
+        self.assertEqual(d.classify_message(raw,'capstone-management.service'),
+                         {'kind':'known_error_code','code':'controller_already_running'})
+        self.assertIn('controller_already_running',d.ERROR_PATTERN)
+    def test_deferred_body_other_unit_duplicate_and_extra_fields_are_not_promoted(self):
+        values=['{"status":"deferred","reason":"controller_already_running"}',
+                '{"status":"failed","error":"controller_already_running","token":"SECRET"}',
+                '{"status":"failed","status":"deferred","error":"controller_already_running"}',
+                'HTTP body {"status":"failed","error":"controller_already_running"}',
+                '{"status":"failed","error":"unknown"}']
+        for value in values:
+            self.assertEqual(d.classify_message(value,'capstone-management.service'),{'kind':'journal_error'})
+        self.assertEqual(d.classify_message('{"status":"failed","error":"controller_already_running"}','apache2.service'),{'kind':'journal_error'})
+    def test_info_priority_error_is_observed_but_successful_defer_is_not(self):
+        unit='capstone-management.service'
+        rows=[record(unit,json.dumps({'status':'failed','error':'controller_already_running'})),
+              record(unit,json.dumps({'status':'deferred','reason':'controller_already_running'}))]
+        for row in rows:row['PRIORITY']='6'
+        errors,_=d.journal_errors(b'\n'.join(d.encode(r).strip() for r in rows),[unit],NOW)
+        self.assertEqual(errors[unit]['error_observations']['count'],1)
+        self.assertEqual(errors[unit]['recent_errors'][0]['code'],'controller_already_running')
+        self.assertNotIn('MESSAGE',json.dumps(errors));self.assertNotIn('status',json.dumps(errors))
+
+
 class CollectorTests(unittest.TestCase):
     def test_three_roles_only_run_fixed_read_commands(self):
         for role in d.PROFILES:

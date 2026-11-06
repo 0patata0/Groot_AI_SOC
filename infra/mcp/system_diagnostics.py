@@ -103,6 +103,9 @@ KINDS = frozenset(('journal_error', 'python_traceback', 'python_exception', 'pyt
                    'not_found', 'address_in_use', 'read_only_filesystem', 'operation_denied', 'known_error_code'))
 ERROR_CODES = frozenset(('publication_failed', 'pam_uid_transition_failed', 'terminal_operation_failed',
                         'sudo_operation_failed', 'sudo_root_attestation_mismatch', 'diagnostics_unavailable'))
+# Exact controller error envelopes only. A quoted/body occurrence or an
+# ordinary deferred timer run must not become a service error observation.
+STRUCTURED_ERROR_CODES = frozenset(('controller_already_running',))
 EXCEPTIONS = frozenset(('PermissionError', 'FileNotFoundError', 'ModuleNotFoundError',
     'ImportError', 'SyntaxError', 'IndentationError', 'TabError', 'ValueError', 'TypeError',
     'KeyError', 'IndexError', 'AttributeError', 'RuntimeError', 'OSError', 'TimeoutError',
@@ -114,7 +117,7 @@ RESULTS = frozenset(('success', 'exit-code', 'signal', 'core-dump', 'watchdog', 
     'start-limit-hit', 'resources', 'protocol', 'oom-kill', 'dependency', 'assert', 'condition'))
 STEPS = frozenset(('CHDIR', 'EXEC', 'USER', 'GROUP', 'NAMESPACE', 'CAPABILITIES',
     'LIMITS', 'STDIN', 'STDOUT', 'STDERR', 'SECCOMP', 'APPARMOR', 'SELINUX_CONTEXT'))
-ERROR_PATTERN = '|'.join(re.escape(item) for item in (*sorted(ERROR_CODES), *sorted(EXCEPTIONS), 'Traceback',
+ERROR_PATTERN = '|'.join(re.escape(item) for item in (*sorted(ERROR_CODES), *sorted(STRUCTURED_ERROR_CODES), *sorted(EXCEPTIONS), 'Traceback',
     'Main process exited', 'Failed with result', 'Failed at step', 'Permission denied',
     'No such file or directory', 'Address already in use', 'Read-only file system',
     'Operation not permitted', *sorted(SOURCE_NAMES)))
@@ -266,12 +269,19 @@ def parse_properties(raw, unit):
         raise DiagnosticError('properties_encoding') from None
 
 
-def classify_message(message):
+def classify_message(message, unit=None):
     # Never return raw MESSAGE, quoted command arguments, paths, headers,
     # HTTP bodies, credentials, or instructions carried in journal text.
     if not isinstance(message, str) or len(message) > 16384:
         return {'kind': 'journal_error'}
     text = message.strip()
+    if unit=='capstone-management.service' and text.startswith('{'):
+        try:
+            value=parsed(text)
+            if (isinstance(value,dict) and set(value)=={'status','error'} and value['status']=='failed'
+                    and isinstance(value['error'],str) and value['error'] in STRUCTURED_ERROR_CODES):
+                return {'kind':'known_error_code','code':value['error']}
+        except (DiagnosticError,ValueError,TypeError):pass
     for code in sorted(ERROR_CODES):
         if re.search(r'(?<![A-Za-z0-9_])' + code + r'(?![A-Za-z0-9_])', text):
             return {'kind': 'known_error_code', 'code': code}
@@ -324,7 +334,7 @@ def journal_errors(raw, units, now, source_truncated=None):
              and isinstance(priority, str) and priority in tuple('0123456'), 'journal_fields')
         at = int(stamp) // 1000000
         need(now - LOOKBACK * 60 <= at <= now, 'journal_time')
-        classified = classify_message(value.get('MESSAGE'))
+        classified = classify_message(value.get('MESSAGE'),unit)
         if int(priority) > 3 and classified['kind'] == 'journal_error':
             continue
         by_unit[unit].append({'at': at, 'priority': int(priority), **classified})
@@ -361,7 +371,7 @@ def validate_error(value, since, until):
                  and isinstance(value['exit_kind'], str) and value['exit_kind'] in ('exited', 'killed', 'dumped'), 'error_value')
         if value['kind'] == 'unit_result': need(isinstance(value['result'], str) and value['result'] in RESULTS, 'error_value')
         if value['kind'] == 'start_step': need(isinstance(value['step'], str) and value['step'] in STEPS, 'error_value')
-        if value['kind'] == 'known_error_code': need(isinstance(value['code'], str) and value['code'] in ERROR_CODES, 'error_value')
+        if value['kind'] == 'known_error_code': need(isinstance(value['code'], str) and value['code'] in ERROR_CODES | STRUCTURED_ERROR_CODES, 'error_value')
 
 
 def validate_snapshot(value, expected_host=None, now=None, require_fresh=True):

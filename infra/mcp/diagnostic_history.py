@@ -71,7 +71,7 @@ def normalize(raw, units, since, until):
                   and isinstance(priority, str) and priority in tuple('0123456'), 'history_journal_fields')
         at = int(stamp)
         core.need(since <= at <= until, 'history_journal_time')
-        classified = core.classify_message(value.get('MESSAGE'))
+        classified = core.classify_message(value.get('MESSAGE'),next(iter(matches)))
         if int(priority) > 3 and classified['kind'] == 'journal_error':
             continue  # Same fixed error-classifier scope as current diagnostics.
         record = {'at': at // 1000000, 'priority': int(priority), **classified}

@@ -26,6 +26,54 @@ class DiagnosticClaims(unittest.TestCase):
     def setUp(self):self.facts=[diagnostic(),historical()]
     def issues(self,text):return g.evidence_claim_violations(text,self.facts)
 
+    def test_structured_incident_closure_cannot_hide_behind_process_only_prose(self):
+        basis='과거 종료값 3; 현재 마지막 종료값 0으로 종료했습니다.'
+        for assessment,status in (('benign','resolved'),('remediated','resolved'),('benign','needs_review')):
+            report={'basis':basis,'assessment':assessment,'evidence_tools':['mcp__system_diagnostics__get_system_diagnostics'],
+                    'limitations':['전체 영향은 별도 검증이 필요합니다.'],'next_steps':['관측을 계속합니다.'],'status':status}
+            with self.subTest(assessment=assessment):
+                self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(g.render_model_review(report,self.facts)))
+        report.update(assessment='unresolved',status='needs_review')
+        self.assertNotIn('diagnostic_snapshot_is_not_functional_health',self.issues(g.render_model_review(report,self.facts)))
+        self.assertEqual(self.issues(basis),[])
+
+    def test_bare_state_pair_is_bound_to_subject_time_and_actual_properties(self):
+        for text in ('현재 vector.service는 activating/start 상태입니다.',
+                     '현재 vector.service는 activating/start이며 다시 확인해야 합니다.',
+                     '어제.vector.service 실패; 현재 activating/start 상태입니다.',
+                     '어제.vector.service 실패했고 현재는 activating/start 상태입니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_property_value_mismatch',self.issues(text))
+        self.assertEqual(self.issues('현재 vector.service는 inactive/dead 상태입니다.'),[])
+        self.assertEqual(self.issues('현재 vector.service는 activating/start가 아닙니다.'),[])
+        self.assertEqual(self.issues('서비스가 active/running 상태가 되는지 관측합니다.'),[])
+        self.assertIn('diagnostic_property_value_unverified',self.issues('어제 vector.service는 inactive/dead 상태였습니다.'))
+
+    def test_unqualified_restart_denial_cannot_be_inferred_from_current_snapshot(self):
+        for text in ('현재 서비스는 종료 후 대기 중이며 재시작은 발생하지 않았습니다.',
+                     '재기동이 이루어지지 않았습니다.', 'restart는 발생하지 않았습니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_restart_counter_not_history',self.issues(text))
+        self.assertEqual(self.issues('재시작을 수행하지 않았으며 읽기만 진행했습니다.'),[])
+        self.assertEqual(self.issues('재시작은 발생하지 않았다고 단정할 수 없습니다.'),[])
+
+    def test_future_monitoring_goal_is_not_an_observed_health_claim(self):
+        text='서비스의 정상 진입까지 모니터링 필요 (unresolved)'
+        self.assertEqual(self.issues(text),[])
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text+'; 서비스는 정상입니다.'))
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues('서비스의 정상 진입을 확인했습니다.'))
+
+    def test_conditional_successful_oneshot_termination_is_not_global_health(self):
+        text='현재 c:vector 서비스의 inactive/dead 상태는 정상적인 작업 완료 후 종료일 수 있습니다.'
+        self.assertEqual(self.issues(text),[])
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text+' 서비스는 완전히 정상입니다.'))
+        for key,value in [('Type','simple'),('ActiveState','activating'),('Result','exit-code')]:
+            with self.subTest(key=key):
+                self.facts=[diagnostic()];self.facts[0]['properties'][key]=value
+                self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+        self.facts=[diagnostic(code=1)]
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+        self.facts=[historical()]
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
     def test_valid_historical_exit_does_not_conflict_with_current_success(self):
         for text in ('과거 오류 표본 c:vector process_exit exit_code=3.',
                      f'과거 c:vector 종료값 3 ({STAMP})',

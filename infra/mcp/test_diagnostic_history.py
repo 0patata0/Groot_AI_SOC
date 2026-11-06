@@ -52,6 +52,20 @@ class HistoryTests(unittest.TestCase):
     def publish(self, events=None, since=NOW-86400, until=NOW, clipped=False, host='c'):
         h.publish(host,since*US,until*US,events or [],clipped)
 
+    def test_backfill_adds_missing_info_priority_error_without_rewriting_old_records(self):
+        unit='capstone-management.service';raw=record(unit,json.dumps({'status':'failed','error':'controller_already_running'}),ago=49500)
+        raw.update(__CURSOR='fixed-fixture-cursor',PRIORITY='6')
+        rows,_=h.normalize(d.encode(raw),{unit},(NOW-50000)*US,(NOW-49000)*US)
+        self.assertEqual(len(rows),1);self.assertEqual(rows[0]['error']['code'],'controller_already_running')
+        self.publish([dict(event(NOW-49510,'old',unit),error={'at':NOW-49510,'priority':3,'kind':'journal_error'})],host='b')
+        self.publish(rows,host='b');self.publish(rows,host='b')
+        args=query(target='b:management');result=h.answer(args,'b',NOW)
+        self.assertEqual(result['returned_error_count'],2)
+        self.assertEqual(result['recent_errors'][0]['code'],'controller_already_running')
+        self.assertEqual(result['recent_errors'][1]['kind'],'journal_error')
+        self.assertIs(h.validate_answer(result,args,'b',NOW),result)
+        self.assertNotIn('MESSAGE',json.dumps(result));self.assertFalse(result['raw_messages_returned'])
+
     def test_old_window_is_filtered_before_limit_and_never_becomes_current_health(self):
         rows=[event(NOW-49500,'old')]+[event(NOW-i,str(i)) for i in range(100)]
         self.publish(rows)

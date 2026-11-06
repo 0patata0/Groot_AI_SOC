@@ -294,6 +294,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             tick = time.perf_counter()
             service_plan=(harness.CONTRACT.service_history_plan(report.get('_service_catalog',{}),current,report['at_kst'])
                           if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
+            service_background=question if service_plan and question!=current else ''
             if service_plan:
                 options=service_plan['requirements']
                 schema={'type':'object','additionalProperties':False,'required':['indexes'],
@@ -313,6 +314,27 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 finally:selection_active=False
                 report['required_service_reads']={'selected':selection['indexes'],'count':len(options)}
                 question=harness.incident_observation_prompt(current,report['calls'])+harness.read_background(question,current)
+            async def service_synthesis(feedback=None):
+                if os.environ.get('CAPSTONE_SERVICE_REPORT_COMPACT','1')!='1':return None
+                service_context=(harness.CONTRACT.service_report_context(report.get('_service_catalog',{}),current,
+                    report['at_kst'],harness.service_history_receipts(report['calls']),
+                    background=service_background) if service_plan and
+                    len(report['calls'])==len(harness.service_history_receipts(report['calls'])) else None)
+                if service_context is not None:
+                    citations=sorted({r['tool'] for r in service_context['untrusted_completed_reads']})
+                    descriptions={t.name:harness.CONTRACT.service_tool_description(t.description,t.args_schema) for t in agent.adapter.tools
+                                  if harness.EVIDENCE.allowed(t.name,'verify')}
+                    schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions))
+                    value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(
+                        harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback)),90)
+                    Draft202012Validator(schema).validate(value)
+                    report['service_compact_report']={'more_evidence':value['more_evidence']}
+                    report.setdefault('service_compact_reports',[]).append({'more_evidence':value['more_evidence'],'repair':feedback is not None})
+                    if not value['more_evidence']:
+                        review=value['report'];indexes=review.pop('evidence_indexes')
+                        review['evidence_tools']=[citations[i] for i in indexes]
+                        return harness.EVIDENCE.render_model_review(review,harness.facts_for(report['calls']))
+                return None
             structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference))
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
             if policy_answer:
@@ -321,7 +343,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             elif structured and not service_plan:
                 final = ''  # The same model selects actual reads below.
             else:
-                final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
+                final = await service_synthesis()
+                if final is None:
+                    final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
             if not report['protected_calls']:
                 missing = (harness.inventory(current, report['calls'], missing_targets=True) or
                            harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ())))
@@ -355,7 +379,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     elif audit and issues:
                         instruction = harness.incident_judgment_instruction(current, str(final), report['calls'], issues)
                     read_scope = harness.incident_selection_scope(current, report['calls'],reference) or harness.tool_scope(current, report['calls'])
-                    if read_scope and not gap and budget.used < budget.limit:
+                    compact_final=(await service_synthesis({'issues':issues,'untrusted_prior_answer':str(final)[:8192]})
+                        if service_plan and not (missing or incident_gap or gap) else None)
+                    if compact_final is not None:
+                        final=compact_final
+                    elif read_scope and not gap and budget.used < budget.limit:
                         # The same LLM selects real read calls in constrained JSON
                         # when native tool calling stalls. No fixed fallback reads,
                         # protected tools, inferred approvals or incident decisions.

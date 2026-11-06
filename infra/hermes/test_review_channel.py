@@ -47,6 +47,12 @@ class API:
 
 
 class Tests(unittest.TestCase):
+    def test_public_render_hides_control_records_but_preserves_report_and_audit(self):
+        answer='실제 근거와 미확인 범위\n\n| 항목 | 결과 |\n| --- | --- |\n| 상태 | 조사 중 |\n\nINCIDENT_DISPOSITION: {"assessment":"unresolved"}\nMANAGEMENT_STATUS: needs_review'
+        original=answer
+        rendered=p.render(answer,{'source_id':'a'*26,'engine':'hermes','phase':'lead','direct':True},'https://chat.example')
+        self.assertNotIn('INCIDENT_DISPOSITION:',rendered);self.assertNotIn('MANAGEMENT_STATUS:',rendered)
+        self.assertIn('| 상태 | 조사 중 |',rendered);self.assertEqual(answer,original)
     def peer_fixture(self, replies):
         import copy
         calls=[]

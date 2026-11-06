@@ -11,6 +11,7 @@ from unittest import mock
 import review_channel as m
 import review_channel_policy as p
 import review_channel_worker as w
+import chat_contract as contract
 from types import SimpleNamespace
 from read_contract import wants_write
 
@@ -59,7 +60,10 @@ class Tests(unittest.TestCase):
                 calls.append(copy.deepcopy(messages));value=replies[min(len(calls)-1,len(replies)-1)]
                 if isinstance(value,Exception):raise value
                 return SimpleNamespace(content=json.dumps(value) if isinstance(value,dict) else value)
-        h=SimpleNamespace(CONTRACT=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'role'),
+        h=SimpleNamespace(CONTRACT=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'role',
+            SERVICE_STATE_GUIDANCE=contract.SERVICE_STATE_GUIDANCE,
+            diagnostic_exit_claim_violations=contract.diagnostic_exit_claim_violations,
+            snapshot_health_violations=contract.snapshot_health_violations),facts_for=lambda _:[],
             READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda _:None,
             EVIDENCE=SimpleNamespace(kst_display=lambda x:x),guidance=lambda _:'')
         report={'status':'completed','calls':[{'server':'system-diagnostics','name':'get_system_diagnostics',
@@ -120,8 +124,10 @@ class Tests(unittest.TestCase):
                 if self.check:return SimpleNamespace(content=json.dumps({'checks':[{'index':0,'supported':True,'reason':'fixture pass'}]}))
                 prompts.extend(messages)
                 return SimpleNamespace(content=json.dumps({'claims':[{'kind':'agree','text':'정책 일치','source_ref':'a0','missing_field':'','evidence_ref':'e0'}]}))
-        contract=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'SOC_ACTIVE_ROLE: '+kw['agent_role'])
-        h=SimpleNamespace(CONTRACT=contract,READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda *a:None,
+        fake_contract=SimpleNamespace(REASONING=False,system_prompt=lambda **kw:'SOC_ACTIVE_ROLE: '+kw['agent_role'],
+            diagnostic_exit_claim_violations=contract.diagnostic_exit_claim_violations,
+            snapshot_health_violations=contract.snapshot_health_violations)
+        h=SimpleNamespace(CONTRACT=fake_contract,READ=SimpleNamespace(identity_comparison=lambda *a:None),read_plan=lambda *a:None,
             EVIDENCE=SimpleNamespace(literal_evidence_summary=lambda x:'facts',kst_display=lambda x:x),facts_for=lambda x:[],guidance=lambda x:'')
         report={'status':'completed','calls':[{'name':'get_firewall_rules','arguments':{},'result':'policy drop'}],'final_response':'현재 FW 근거'}
         with mock.patch.dict(sys.modules,{'harness':h,'langchain_ollama':SimpleNamespace(ChatOllama=LLM)}):

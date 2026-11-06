@@ -1,6 +1,6 @@
 # SOC 운영 절차
 
-현재 query1.19.86/common1.5.41은 명시 서비스의 현재·과거 필수 읽기, 전체 진단 감사 영수증, 서비스 조회에 한정한 낮은 추론을 적용했다. 실제 새 채팅은 Hermes74.516초/Ollama66.520초로 줄었으나 둘 다 보고 해석 오류가 남아partial이며 **정확한 원인 조사60초는 미완료**다. Native의 두 읽기 범위·SHA/기간/신선도·쓰기0은 독립 확인했다. 고유1,143검사 PASS/skip0, B18SHA/보호8/양봇 연결/3서비스/독립원복 확인. 모델·권한·FW/TTL은 유지하며 기존 단일deploy.sh 복사 경로를 사용한다. 새OS 전체 설치·UI 전수·평균/p95는 미검증. [수정·실측·한계](../infra/hermes/diagnostic-navigation.md).
+현재 query1.19.89/common1.5.44는 과거/현재 종료값 검증 오탐·서비스 질문 안내 누락·peer 상태 해석·실제 속성값 대조를 보완했다. 직전 새 채팅(query88)은 Hermes64.370초/partial, Ollama47.133초/completed 표시였지만 둘 다 의미 정확성 실패다. Ollama의 실제 activating/start를 inactive/dead로 잘못 설명한 건은 최종89 운영 재검사에서 거절한다. 고유1,232 PASS/skip0·18SHA/보호8·양봇 연결/3서비스·독립원복을 확인했다. **정확한 최종 답변60초는 미완료**이며89 새 채팅 시간·평균/p95·새OS 전체 설치는 미검증이다. 모델·권한·FW/TTL과 단일deploy.sh 설치 경로는 유지한다. [수정·실측·한계](../infra/hermes/diagnostic-navigation.md).
 
 11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.
 

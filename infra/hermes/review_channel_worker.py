@@ -14,7 +14,7 @@ import time
 PEER_OUTPUT_ERRORS = frozenset({'peer_claims_shape', 'peer_claim_kind', 'peer_claim_text',
     'peer_quote_not_in_answer', 'peer_omission_not_established', 'peer_evidence_quote_not_in_result',
     'peer_json_invalid', 'empty_peer_review', 'peer_source_ref_invalid', 'peer_evidence_ref_invalid',
-    'peer_snapshot_scope_mismatch', 'peer_component_scope_mismatch'})
+    'peer_snapshot_scope_mismatch', 'peer_component_scope_mismatch', 'peer_diagnostic_claim_mismatch'})
 
 
 def peer_error_code(exc):
@@ -340,6 +340,14 @@ def bind_peer_references(value, catalog):
     return {'claims':bound}
 
 
+def validate_diagnostic_peer_claims(harness, text, observed):
+    """Apply the same typed diagnostic checks to a peer's own propositions."""
+    facts=harness.facts_for(observed)
+    if (harness.CONTRACT.diagnostic_exit_claim_violations(text,facts)
+            or harness.CONTRACT.snapshot_health_violations(text,facts)):
+        raise ValueError('peer_diagnostic_claim_mismatch')
+
+
 async def review_answer(config, request, report):
     """Separate synthesis from fresh reads; no tool/approval access in synthesis."""
     import harness
@@ -399,6 +407,8 @@ async def review_answer(config, request, report):
     # operational investigation. Supplying tool recipes here obscures negation
     # and the scope of the source's stated limitations.
     instruction += '\n원래 사용자의 질문: '+current
+    if any(c.get('name')=='get_system_diagnostics' for c in observed):
+        instruction += '\n'+harness.CONTRACT.SERVICE_STATE_GUIDANCE
     instruction += ('\n각 호출의 arguments.target과 result.target이 가리키는 서비스 범위만 검증합니다. '
                     'Wazuh manager 서버 클러스터와 OpenSearch 기반 indexer 클러스터는 서로 다른 구성요소입니다. '
                     '한쪽의 활성/비활성·색상 상태로 다른 쪽의 주장을 반박하거나 확인하지 마세요. '
@@ -442,6 +452,7 @@ async def review_answer(config, request, report):
                     raise ValueError('empty_peer_review')
                 claims = bind_peer_references(json.loads(response.content),catalog)
                 text = validate_peer_claims(claims, source, observed[:8])
+                validate_diagnostic_peer_claims(harness,text,observed[:8])
                 break
             except (ValueError, TypeError) as exc:
                 code = peer_error_code(exc)

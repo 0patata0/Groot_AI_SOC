@@ -1756,6 +1756,8 @@ def workflow_names(question):
 def guidance(question, *, include_workflows=True):
     text = normalized(question)
     result = SHARED.status_lookup_guidance(text)
+    if diagnostic_history_request(question) or diagnostic_request(question):
+        result += '\n' + CONTRACT.SERVICE_STATE_GUIDANCE
     if systemd_comparison_request(question):
         result += ('\n이번 요청은 과거 경보 표본과 현재 상태값의 비교 조회입니다. '
             'search_wazuh_alerts에 program_name=systemd와 오늘 KST 00:00부터 현재 요청 시각까지의 명시 구간을 넣고, '

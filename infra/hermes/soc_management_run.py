@@ -649,7 +649,8 @@ def observation_facts(name, result, arguments=None):
             elif name == 'get_system_diagnostics' and isinstance(data.get('target'), str):
                 keep = ('target', 'requested_since_kst', 'requested_until_kst', 'observed_at_kst',
                         'returned_error_count', 'requested_window_total_count')
-                row = {'kind': 'diagnostics', **{k: data[k] for k in keep if k in data}}
+                row = {'kind': 'diagnostics', **{k: data[k] for k in keep if k in data},
+                       **diagnostic_contract().diagnostic_observation_fields(data)}
                 if (data.get('lookback_scope')=='latest_snapshot_only_not_requested_history'
                         and data['target'] in ('a:systemd','b:systemd','c:systemd')):
                     row['lookback_scope']=data['lookback_scope']
@@ -658,7 +659,7 @@ def observation_facts(name, result, arguments=None):
                         row['metrics']={k:v for k,v in metrics.items() if
                             k in ('failed_units_total','returned_units') and type(v) is int and v>=0
                             or k=='unit_list_truncated' and type(v) is bool}
-                properties=data.get('properties',{})
+                properties=data.get('properties')
                 if isinstance(properties,dict):
                     row['properties']={k:v for k,v in properties.items() if k in ('Type','ActiveState','SubState','Result')
                         and isinstance(v,str) and re.fullmatch(r'[A-Za-z0-9_-]{1,40}',v)}
@@ -1063,49 +1064,7 @@ def waf_action_violations(text, facts):
 
 
 def snapshot_health_violations(text, facts):
-    """Process state is not functional health, for web and non-web subjects.
-
-    Keep the diagnostic subject in feedback; a Vector process observation must
-    not be reported as a failed Apache health check. No health claim is excused.
-    """
-    web=any(f.get('kind') in ('web_access','web_service') for f in facts)
-    targets={f['target'] for f in facts if f.get('kind')=='diagnostics'
-        and re.fullmatch(r'[abc]:[a-z0-9][a-z0-9_.-]{0,63}',str(f.get('target','')))}
-    if not web and not targets:return []
-    issues=set()
-    for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱|서버|호스트|systemd)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
-        before=re.split(r'[.!?;|\n]',text[max(0,match.start()-80):match.start()])[-1]
-        after=text[match.end():match.end()+64]
-        # Only a directly attached negative predicate can qualify this claim.
-        # A disclaimer elsewhere must not excuse a separate positive claim.
-        if re.match(r'\s*(?:상태\s*)?(?:임을|이라는\s*것을|인\s*것을|을|를)?\s*'
-                r'(?:증명|입증|보장|의미|뜻)(?:하는|한)\s*(?:것이|것은|건)\s*'
-                r'(?:아닙니다|아니며|아님|아니다)(?=\s|[.,;!?|*`]|$)',after):continue
-        if re.match(r'\s*(?:상태|판정|증거|근거)\s*(?:이|가|은|는)?\s*(?:아닙니다|아니며|아님|아니다)(?=\s|[.,;!?|*`]|$)',after):continue
-        if re.match(r'\s*(?:(?:이|은|는)?\s*아(?:니|님|닙)|(?:적)?이지\s*않|하지\s*않)',after):continue
-        if re.search(r'(?:미확인|확인\s*불가|단정.{0,5}않)\s*[:：]?\s*$',before):continue
-        if re.match(r'(?:\s|[/*`])*(?:화\s*)?(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
-        if re.match(r'\s*(?:을|를|이라고)?\s*(?:단정|보장|증명|판단).{0,8}(?:않|없|못)',after):continue
-        if re.match(r'\s*(?:상태\s*)?(?:을|를)?\s*(?:뜻|의미)하지\s*않',after):continue
-        if re.match(r'\s*/\s*장애\s*여부',after):continue
-        if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)(?:\s*중)?\s*(?:여부|인지|(?:은|는)?\s*미확인)',after):continue
-        subject=before+match[0]
-        named_web=bool(re.search(r'Apache|아파치|DVWA|Log4Shell|백엔드|애플리케이션|웹|앱',subject,re.I))
-        named_diagnostic=any(re.search(r'(?<![\w:])'+re.escape(name)+r'(?![\w:-])',subject,re.I)
-            for target in targets for name in (target,target.split(':',1)[1]))
-        issues.add('diagnostic_snapshot_is_not_functional_health' if targets and not named_web and
-            (named_diagnostic or not web) else 'web_snapshot_is_not_application_health')
-    # An empty current failed-unit list is not a service lifecycle receipt.
-    snapshots=[f for f in facts if f.get('kind')=='diagnostics']
-    if snapshots and all(f.get('lookback_scope')=='latest_snapshot_only_not_requested_history'
-                         for f in snapshots) and not any(f.get('kind') in ('service','runtime','proposal_status') for f in facts):
-        for claim in re.finditer(r'(?:복구|재기동|재시작)(?:되었|됐|된|완료|성공|했)',text):
-            before=re.split(r'[.!?;|\n]',text[max(0,claim.start()-100):claim.start()])[-1]
-            after=text[claim.end():claim.end()+40]
-            if not re.search(r'서비스|systemd|호스트|failed|unit',before,re.I):continue
-            if re.match(r'\s*(?:것|상태|여부)(?:인지(?:는)?|이|은|는|가)?\s*(?:미확인|아닙|아님|아니|확인되지)',after):continue
-            issues.add('diagnostic_snapshot_is_not_functional_health')
-    return sorted(issues)
+    return diagnostic_contract().snapshot_health_violations(text,facts)
 
 
 def web_evidence_violations(text, facts):
@@ -1287,14 +1246,7 @@ def evidence_claim_violations(text, facts, successful_reads=None):
         if (not any(x.get('forwarding_evidence') for x in event_facts) and
                 re.search(r'포트\s*포워딩\s*(?:시도|탐지|행위)', text)):
             issues.add('scan_misreported_as_port_forwarding')
-    diagnostics = [x for x in facts if x.get('kind') == 'diagnostics' and x.get('process_termination')]
-    for line in text.splitlines():
-        candidates = [x for x in diagnostics if x.get('target', '\0') in line] or diagnostics
-        statuses = {x['process_termination'].get('exit_status') for x in candidates}
-        clean_line = re.sub(r'[*`]', '', line)
-        for match in re.finditer(r'(?i)(?:exit[ _]*(?:code|status)|종료\s*(?:코드|값))\s*[:=]?\s*([0-9]+)', clean_line):
-            if not re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)', clean_line[match.end():]) and len(statuses) == 1 and None not in statuses and int(match[1]) not in statuses:
-                issues.add('diagnostic_exit_status_mismatch')
+    issues.update(diagnostic_contract().diagnostic_exit_claim_violations(text,facts))
     instants = [parse_instant(v) for f in facts if f.get('kind') == 'times' for v in f.get('instants', [])]
     instants = [v for v in instants if v is not None]
     for stamp in _AWARE_TIME.findall(text):

@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.41'
+VERSION = 'soc-chat-contract:1.5.44'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -19,6 +19,17 @@ REASONING = False
 REPAIR_PASSES = 2
 START = '<!-- soc-chat-contract:start -->'
 END = '<!-- soc-chat-contract:end -->'
+SERVICE_STATE_GUIDANCE = (
+    '서비스 상태는 Type/Result/ActiveState/SubState를 함께 읽습니다. Type=oneshot은 작업 후 종료할 수 있으므로 '
+    'Result=success와 exit_status=0인 inactive/dead를 지속 장애·미복구·재시작 필요로 단정하지 않습니다. '
+    '이는 프로세스 종료 관측이며 전체 기능 정상·침해 부재의 증거도 아닙니다. '
+    '현재 process_termination.exit_status와 과거 recent_errors의 process_exit.exit_code는 서로 다른 시점의 값이며 달라도 모순이 아닙니다. '
+    '과거 종료값은 해당 target·오류 시각과 함께, 현재 종료값은 수집 시각과 함께 보고합니다. '
+    'NRestarts만으로 수동 재시작·reload 이력이나 과거 active 상태의 유무를 추정하지 않습니다. '
+    'journal_history의 raw_messages_returned=false는 원문을 반환하지 않았다는 뜻이며 원문 미수집·부재의 증거가 아닙니다. '
+    '오류 표본·색인 일치 수·전체 오류 건수를 구분하고 exit1만으로 세부 원인을 만들지 않습니다. '
+    '현재/과거·확인된 원인/미확인 범위를 3~4행 표로 간결히 답하고 같은 설명을 요약에서 반복하지 않습니다.'
+)
 # SOUL owns roles, authority, reporting and bounded-response policy. These
 # sections add tool navigation and result semantics rather than repeating it.
 EVENT_FIELD_GUIDANCE = (
@@ -75,7 +86,7 @@ QUERY_SECTIONS = {
         "journal_history에는 현재 상태가 없으며 history_coverage/publisher_stale/has_more와 표본 범위를 보고합니다. exit1/exit-code만으로 세부 원인을 추정하지 않습니다. "
         "A/B/C 전체 요청은 실제 enum의 해당 대상을 빠짐없이 조회합니다. a:systemd/b:systemd/c:systemd는 현재 failed unit 목록이며 "
         "0개가 과거 장애 없음·모든 서비스 정상이라는 뜻은 아닙니다. ExecMainCode와 ExitStatus·Result를 구분하고 "
-        "성공한 oneshot의 inactive/dead만으로 재시작을 권하지 않습니다. 오류 표본과 전체 건수·현재 상태를 구분합니다. "
+        + SERVICE_STATE_GUIDANCE +
         "카드의 systemd 사건은 search_wazuh_alerts의 정확한 사건 구간·wazuh_rule_id로 조사하고 불필요한 전체 진단으로 바꾸지 않습니다. "
         "도구 미등록·조회 실패·권한 거부는 다릅니다. 실제 스키마를 확인하기 전 조사 권한이 없다고 단정하지 않습니다. "
         "OpenSearch yellow는 복제 샤드 미할당을 포함하므로 전체 정상·완전 복제로 표시하지 않습니다."
@@ -559,3 +570,170 @@ def operator_diagnostic_options(request, context, receipts=()):
             if not any(r.get('tool')==name and r.get('arguments')==arguments for r in receipts):
                 options.append({'tool':name,'arguments':arguments})
     return options
+
+
+def diagnostic_observation_fields(data):
+    """Preserve typed exit observations and their unit/time, never journal prose."""
+    out={'diagnostic_mode':'journal_history' if data.get('kind')=='journal_history' else 'snapshot'}
+    unit=data.get('unit')
+    if isinstance(unit,str) and re.fullmatch(r'[A-Za-z0-9@_.-]{1,150}\.service',unit):out['unit']=unit
+    exits=[]
+    rows=data.get('recent_errors',[])
+    for item in rows[:50] if isinstance(rows,list) else ():
+        if not isinstance(item,dict):continue
+        code=item.get('exit_code');stamp=item.get('observed_at_kst');digest=item.get('record_sha256')
+        if (item.get('kind')=='process_exit' and item.get('exit_kind')=='exited'
+                and type(code) is int and 0<=code<=255 and _diagnostic_instant(stamp)
+                and isinstance(digest,str) and re.fullmatch('[0-9a-f]{64}',digest)):
+            exits.append({'exit_status':code,'observed_at_kst':stamp,'record_sha256':digest})
+    if exits:out['error_exit_observations']=exits
+    return out
+
+
+def diagnostic_subjects(text, facts):
+    rows=[f for f in facts if f.get('kind')=='diagnostics']
+    targets=set(re.findall(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*',text))
+    targets={t.rstrip('.') for t in targets}
+    units=set(re.findall(r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',text))
+    if targets:rows=[f for f in rows if f.get('target') in targets]
+    if units:rows=[f for f in rows if f.get('unit') in units]
+    return rows
+
+
+def diagnostic_exit_claim_violations(text, facts):
+    """Compare exit claims within their stated subject and observation period.
+
+    A historical record cannot justify a current exit claim, nor can a current
+    snapshot contradict a verified historical exit. Ambiguous mixed claims do
+    not gain a blanket exception from a historical keyword elsewhere.
+    """
+    issues=set(diagnostic_property_claim_violations(text,facts))
+    current=r'현재|지금|마지막\s*메인|\bcurrent\b|\bnow\b|ExecMainStatus'
+    history=r'과거|당시|이력|어제|그제|오류\s*(?:표본|기록|내역)|실패\s*(?:기록|시각|내역)|process_exit|journal_history|recent_errors|\b(?:historical|yesterday|previous|prior)\b'
+    stamp_pattern=r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00'
+    for line in text.splitlines():
+        for clause in re.split(r';|(?<=[.!?])\s+',re.sub(r'[*`]', '',line)):
+            subjects=diagnostic_subjects(clause,facts)
+            for match in re.finditer(r'(?i)(?:ExecMainStatus|exit[ _]*(?:code|status)|종료\s*(?:코드|값))\s*[:=]?\s*([0-9]+)',clause):
+                if re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)',clause[match.end():]):continue
+                if not subjects and any(f.get('kind')=='diagnostics' for f in facts):
+                    issues.add('diagnostic_exit_subject_unverified');continue
+                before=clause[:match.start()]
+                markers=[(m.start(),'current') for m in re.finditer(current,before,re.I)]
+                markers += [(m.start(),'history') for m in re.finditer(history,before,re.I)]
+                scope=max(markers)[1] if markers else None
+                if clause[match.start():].startswith('ExecMainStatus'):scope='current'
+                stamps={_diagnostic_instant(x) for x in re.findall(stamp_pattern,clause)}
+                records=[r for f in subjects for r in f.get('error_exit_observations',[])]
+                matching=[r for r in records if _diagnostic_instant(r.get('observed_at_kst')) in stamps]
+                if scope is None and matching:scope='history'
+                code=int(match[1])
+                if scope=='history':
+                    pool=matching if stamps else records
+                    if not any(r.get('exit_status')==code for r in pool):issues.add('diagnostic_historical_exit_status_unverified')
+                else:
+                    statuses={f['process_termination'].get('exit_status') for f in subjects if f.get('process_termination')}
+                    if subjects and (not statuses or None in statuses):issues.add('diagnostic_current_exit_status_unverified')
+                    if len(statuses)==1 and None not in statuses and code not in statuses:issues.add('diagnostic_exit_status_mismatch')
+    return sorted(issues)
+
+
+def diagnostic_property_claim_violations(text, facts):
+    """Literal current properties cannot be borrowed from another snapshot."""
+    issues=set()
+    for line in text.splitlines():
+        clean=re.sub(r'[*`"\']','',line)
+        for clause in re.split(r';|(?<=[.!?])\s+',clean):
+            subjects=diagnostic_subjects(clause,facts)
+            if not subjects:continue
+            for match in re.finditer(r'\b(ActiveState|SubState|Result|Type)\s*[:=]\s*([A-Za-z0-9_-]+)',clause):
+                after=clause[match.end():]
+                if re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)',after):continue
+                if re.match(r'\s*(?:이면|라면|일\s*때)',after):continue
+                before=clause[:match.start()]
+                markers=[(m.start(),'history') for m in re.finditer(r'과거|당시|어제|그제|\byesterday\b|\bhistorical\b',before,re.I)]
+                markers += [(m.start(),'current') for m in re.finditer(r'현재|지금|\bcurrent\b|\bnow\b',before,re.I)]
+                history=bool(markers and max(markers)[1]=='history')
+                values={f.get('properties',{}).get(match[1]) for f in subjects
+                    if (f.get('diagnostic_mode')=='journal_history')==history and match[1] in f.get('properties',{})}
+                if not values:issues.add('diagnostic_property_value_unverified')
+                elif len(values)==1 and match[2] not in values:issues.add('diagnostic_property_value_mismatch')
+    return sorted(issues)
+
+
+def diagnostic_lifecycle_claim_violations(text, facts):
+    issues=set()
+    for line in text.splitlines():
+        rows=diagnostic_subjects(line,facts)
+        if (rows and re.search(r'NRestarts\s*[:=]?\s*0',line,re.I)
+                and re.search(r'한\s*번도|단\s*한\s*차례도|전혀',line)
+                and re.search(r'restart|reload|재시작|재기동|active',line,re.I)
+                and not re.search(r'추정.{0,5}(?:않|못)|의미하지\s*않|판단.{0,5}(?:불가|못)',line)):
+            issues.add('diagnostic_restart_counter_not_history')
+        succeeded=[f for f in rows if f.get('properties',{}).get('Type')=='oneshot'
+            and f['properties'].get('ActiveState')=='inactive' and f['properties'].get('SubState')=='dead'
+            and f['properties'].get('Result')=='success']
+        if not succeeded:continue
+        for clause in re.split(r';|(?<=[.!?])\s+',line):
+            if re.search(r'미확인|판단.{0,6}(?:불가|못)|단정.{0,6}(?:않|못)|아니|아님|아닙|뜻하지\s*않',clause):continue
+            if (re.search(r'현재|지금|최신|여전히|계속|지속',clause)
+                    and re.search(r'inactive|dead|oneshot|Result\s*=\s*success',clause,re.I)
+                    and re.search(r'비정상|고장|장애.{0,8}(?:존재|지속)|실패.{0,8}(?:멈|상태|채)',clause)):
+                issues.add('diagnostic_oneshot_state_is_not_failure')
+    return sorted(issues)
+
+
+def snapshot_health_violations(text, facts):
+    """Process state is not functional health, for web and non-web subjects.
+
+    Keep the diagnostic subject in feedback; a Vector process observation must
+    not be reported as a failed Apache health check. No health claim is excused.
+    """
+    web=any(f.get('kind') in ('web_access','web_service') for f in facts)
+    targets={f['target'] for f in facts if f.get('kind')=='diagnostics'
+        and re.fullmatch(r'[abc]:[a-z0-9][a-z0-9_.-]{0,63}',str(f.get('target','')))}
+    if not web and not targets:return []
+    issues=set(diagnostic_lifecycle_claim_violations(text,facts))
+    for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱|서버|호스트|systemd)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
+        before=re.split(r'[.!?;|\n]',text[max(0,match.start()-80):match.start()])[-1]
+        after=text[match.end():match.end()+64]
+        # A verified process termination is not a claim of functional health.
+        if re.match(r'\s*종료',after):
+            line=text[text.rfind('\n',0,match.start())+1:text.find('\n',match.end()) if '\n' in text[match.end():] else len(text)]
+            rows=diagnostic_subjects(line,facts)
+            values=[f['process_termination'] for f in rows if f.get('process_termination')]
+            prior=text[max(0,text.rfind('\n',0,match.start())+1):match.start()]
+            past=[m.start() for m in re.finditer(r'과거|당시|이력|오류\s*(?:표본|기록)|process_exit',prior)]
+            present=[m.start() for m in re.finditer(r'현재|지금|마지막\s*메인',prior)]
+            if ((not past or present and max(present)>max(past)) and values
+                    and all(v.get('kind')=='exited' and v.get('exit_status')==0 for v in values)):continue
+        # Only a directly attached negative predicate can qualify this claim.
+        # A disclaimer elsewhere must not excuse a separate positive claim.
+        if re.match(r'\s*(?:상태\s*)?(?:임을|이라는\s*것을|인\s*것을|을|를)?\s*'
+                r'(?:증명|입증|보장|의미|뜻)(?:하는|한)\s*(?:것이|것은|건)\s*'
+                r'(?:아닙니다|아니며|아님|아니다)(?=\s|[.,;!?|*`]|$)',after):continue
+        if re.match(r'\s*(?:상태|판정|증거|근거)\s*(?:이|가|은|는)?\s*(?:아닙니다|아니며|아님|아니다)(?=\s|[.,;!?|*`]|$)',after):continue
+        if re.match(r'\s*(?:(?:이|은|는)?\s*아(?:니|님|닙)|(?:적)?이지\s*않|하지\s*않)',after):continue
+        if re.search(r'(?:미확인|확인\s*불가|단정.{0,5}않)\s*[:：]?\s*$',before):continue
+        if re.match(r'(?:\s|[/*`])*(?:화\s*)?(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
+        if re.match(r'\s*(?:을|를|이라고)?\s*(?:단정|보장|증명|판단).{0,8}(?:않|없|못)',after):continue
+        if re.match(r'\s*(?:상태\s*)?(?:을|를)?\s*(?:뜻|의미)하지\s*않',after):continue
+        if re.match(r'\s*/\s*장애\s*여부',after):continue
+        if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)(?:\s*중)?\s*(?:여부|인지|(?:은|는)?\s*미확인)',after):continue
+        subject=before+match[0]
+        named_web=bool(re.search(r'Apache|아파치|DVWA|Log4Shell|백엔드|애플리케이션|웹|앱',subject,re.I))
+        named_diagnostic=any(re.search(r'(?<![\w:])'+re.escape(name)+r'(?![\w:-])',subject,re.I)
+            for target in targets for name in (target,target.split(':',1)[1]))
+        issues.add('diagnostic_snapshot_is_not_functional_health' if targets and not named_web and
+            (named_diagnostic or not web) else 'web_snapshot_is_not_application_health')
+    # An empty current failed-unit list is not a service lifecycle receipt.
+    snapshots=[f for f in facts if f.get('kind')=='diagnostics']
+    if snapshots and all(f.get('lookback_scope')=='latest_snapshot_only_not_requested_history'
+                         for f in snapshots) and not any(f.get('kind') in ('service','runtime','proposal_status') for f in facts):
+        for claim in re.finditer(r'(?:복구|재기동|재시작)(?:되었|됐|된|완료|성공|했)',text):
+            before=re.split(r'[.!?;|\n]',text[max(0,claim.start()-100):claim.start()])[-1]
+            after=text[claim.end():claim.end()+40]
+            if not re.search(r'서비스|systemd|호스트|failed|unit',before,re.I):continue
+            if re.match(r'\s*(?:것|상태|여부)(?:인지(?:는)?|이|은|는|가)?\s*(?:미확인|아닙|아님|아니|확인되지)',after):continue
+            issues.add('diagnostic_snapshot_is_not_functional_health')
+    return sorted(issues)

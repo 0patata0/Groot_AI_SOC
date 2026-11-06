@@ -1,6 +1,6 @@
 # Groot_AI_SOC
 
-현재 query1.19.86/common1.5.41은 명시 서비스의 현재·과거 필수 읽기, 전체 진단 감사 영수증, 서비스 조회에 한정한 낮은 추론을 적용했다. 실제 새 채팅은 Hermes74.516초/Ollama66.520초로 줄었으나 둘 다 보고 해석 오류가 남아partial이며 **정확한 원인 조사60초는 미완료**다. Native의 두 읽기 범위·SHA/기간/신선도·쓰기0은 독립 확인했다. 고유1,143검사 PASS/skip0, B18SHA/보호8/양봇 연결/3서비스/독립원복 확인. 모델·권한·FW/TTL은 유지하며 기존 단일deploy.sh 복사 경로를 사용한다. 새OS 전체 설치·UI 전수·평균/p95는 미검증. [수정·실측·한계](infra/hermes/diagnostic-navigation.md).
+현재 query1.19.89/common1.5.44는 과거/현재 종료값 검증 오탐·서비스 질문 안내 누락·peer 상태 해석·실제 속성값 대조를 보완했다. 직전 새 채팅(query88)은 Hermes64.370초/partial, Ollama47.133초/completed 표시였지만 둘 다 의미 정확성 실패다. Ollama의 실제 activating/start를 inactive/dead로 잘못 설명한 건은 최종89 운영 재검사에서 거절한다. 고유1,232 PASS/skip0·18SHA/보호8·양봇 연결/3서비스·독립원복을 확인했다. **정확한 최종 답변60초는 미완료**이며89 새 채팅 시간·평균/p95·새OS 전체 설치는 미검증이다. 모델·권한·FW/TTL과 단일deploy.sh 설치 경로는 유지한다. [수정·실측·한계](infra/hermes/diagnostic-navigation.md).
 
 복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
 

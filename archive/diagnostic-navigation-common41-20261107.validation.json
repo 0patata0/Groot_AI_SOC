@@ -1,0 +1,181 @@
+{
+  "at_kst": "2026-11-06T23:56:45.776049+09:00",
+  "versions": {
+    "query": "1.19.86",
+    "common": "1.5.41",
+    "diagnostics": "1.2.3",
+    "security_events": "1.3.2"
+  },
+  "tests": {
+    "native": 471,
+    "service": 14,
+    "sdk": 247,
+    "query": 391,
+    "installer": 20,
+    "unique_pass": 1143,
+    "skip": 0,
+    "duplicate_ids": 0
+  },
+  "prior_guidance": {
+    "versions": {
+      "query": "1.19.82",
+      "common": "1.5.39",
+      "diagnostics": "1.2.3",
+      "security_events": "1.3.2"
+    },
+    "before": {
+      "hermes_final_seconds": 98.498,
+      "worker_seconds": 98.20219406415708,
+      "mcp_reads": 3,
+      "service_current_read": false,
+      "service_history_read": false,
+      "quality_pass": false,
+      "peer_worker_seconds": 73.54571110685356,
+      "peer_status": "partial"
+    },
+    "after": {
+      "hermes_final_seconds": 142.936,
+      "worker_seconds": 142.4800141172018,
+      "mcp_reads": 4,
+      "service_current_read": true,
+      "service_history_read": false,
+      "quality_pass": false,
+      "status": "partial",
+      "peer_worker_seconds": 72.62285234313458,
+      "peer_status": "partial"
+    },
+    "control": {
+      "final_seconds": 22.266,
+      "progress_seconds": 0.821,
+      "tables": 2,
+      "exact_report_match": true,
+      "writes": 0,
+      "engine": "ollama",
+      "status": "completed",
+      "scope_complete": true,
+      "reads": 4,
+      "mcp_seconds": 1.6509605809114873,
+      "time_basis": "original completion, new root, current common39/diagnostics1.2.3"
+    },
+    "tests": {
+      "unique_pass": 716,
+      "skip": 0,
+      "mcp": 61,
+      "sdk": 244,
+      "query": 391,
+      "installer": 20
+    }
+  },
+  "trials": [
+    {
+      "query": "1.19.83",
+      "final_seconds": 21.222,
+      "reads": 0,
+      "quality_pass": false,
+      "failure": "inline gate __file__ absent; fixed84"
+    },
+    {
+      "query": "1.19.84",
+      "final_seconds": 153.171,
+      "reads": 2,
+      "read_scope_complete": true,
+      "quality_pass": false,
+      "audit_history_json_complete": false,
+      "status": "partial"
+    },
+    {
+      "query": "1.19.85",
+      "final_seconds": 141.629,
+      "reads": 2,
+      "read_scope_complete": true,
+      "quality_pass": false,
+      "audit_history_json_complete": true,
+      "service_reasoning_none_applied": false,
+      "status": "partial"
+    },
+    {
+      "query": "1.19.86",
+      "engine": "hermes",
+      "final_seconds": 74.516,
+      "worker_seconds": 73.52043813909404,
+      "reads": 2,
+      "read_scope_complete": true,
+      "quality_pass": false,
+      "audit_history_json_complete": true,
+      "service_reasoning_none_applied": true,
+      "selector_seconds": 1.835583,
+      "status": "partial",
+      "peer_worker_seconds": 86.06883273203857,
+      "peer_status": "partial"
+    },
+    {
+      "query": "1.19.86",
+      "engine": "ollama",
+      "final_seconds": 66.52,
+      "worker_seconds": 66.34928726707585,
+      "runtime_seconds": 65.23740604100749,
+      "reads": 2,
+      "mcp_seconds": 0.12997824698686597,
+      "quality_pass": false,
+      "status": "partial",
+      "remaining_issues": [
+        "diagnostic_exit_status_mismatch"
+      ],
+      "full_failed_receipt_retained": false,
+      "read_scope_independent_audit": "not_available_in_persisted_failure_summary",
+      "peer_worker_seconds": 183.20030905399472,
+      "peer_status": "partial"
+    }
+  ],
+  "interpretation": {
+    "accurate_causal_60s_achieved": false,
+    "source_question_same_new_roots": true,
+    "one_trial_each": true,
+    "shared_gpu": true,
+    "prompt_cache_uncontrolled": true,
+    "average_p95_or_sla": false,
+    "full_ui_render_verified": false
+  },
+  "deployment": {
+    "at_kst": "2026-11-06T23:47:12.989017+09:00",
+    "backup": "/var/lib/capstone-service-reads/20261106-gate86",
+    "verified_files": 18,
+    "changed": 11,
+    "protected": 8,
+    "stopped_snapshot_preserved": true,
+    "gate_bytes": 65200,
+    "initial": {
+      "idle": true,
+      "active_leases": 0,
+      "heartbeat_age_seconds": 31.528
+    },
+    "rollback_armed": true,
+    "confirmed_at_kst": "2026-11-06T23:48:16.069259+09:00",
+    "sdk_source_sha": 20,
+    "rollback": "confirmed_noop",
+    "failed_units_b": 0,
+    "gate_limit_bytes": 65536,
+    "fresh_os_install": false,
+    "final_health_at_kst": "2026-11-06T23:57:28.033967+09:00"
+  },
+  "cleanup": {
+    "server_fixture_files": 457,
+    "server_fixture_bytes": 7057881,
+    "server_fixture_absent": true,
+    "mac": {
+      "files": 35,
+      "bytes": 5426876,
+      "removed": true,
+      "absent": true
+    }
+  },
+  "git": {
+    "source_commit": "a63e4a2d8dcb37beecc539d795f4fcd69551c93a",
+    "source_remote_main": "a63e4a2d8dcb37beecc539d795f4fcd69551c93a",
+    "source_pushed_at_kst": "2026-11-06T23:59:24.514439+09:00",
+    "public_paths": 20,
+    "receipt": "followup_commit",
+    "related_worktree_at_source_push": "clean",
+    "unrelated_staged_and_worktree_changes": "preserved"
+  }
+}

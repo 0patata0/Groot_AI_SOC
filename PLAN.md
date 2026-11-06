@@ -20,7 +20,7 @@
 
 [이력/현재 비교 후속](infra/hermes/systemd-comparison.md): 직전 query82/common38·MCP1.3.2, 고유1,230PASS다. 오늘 systemd 경보 표본과 ABC 현재 실패 집계를 실제 모델이 선택·조회한 뒤 근거 표로 완성한다. 새 실제채팅 Hermes25.532초/Ollama16.746초, 각4조회/2표/범위 누락0/쓰기0. 기본limit·빈enum의 실제 실패를 수정하고 태그 경계도 별도 회귀 보완했다. 원인·위험·복구·다른 특정/혼합 요청·peer는 일반 조사 유지하며 전체 복합 조사60초·평균/p95는 미완료다. 실패한 생성 후보·실측 한계는 상세 원장, 직전 계획은 [과거 기록](archive/PLAN-before-systemd-comparison-20261106.md)에 보존한다.
 
-[서비스 현재·과거 조회 보완](infra/hermes/diagnostic-navigation.md): query86/common41 운영·1,143PASS. 두 봇의 필수 서비스 읽기를 실제 등록 catalog와 사용자 기간에 결속하고 Native 전체 진단 감사/제한 조회 추론을 적용했다. 새 실제Hermes74.516초·Ollama66.520초이나 해석/보고 정정 오류로partial이다. 다음은 oneshot·NRestarts·종료값·관측 시각 오인의 보고 정정 비용을 줄이고 정확한 최종 답변60초를 검증한다. 단순 비교 실측과 구분한다. [직전 계획](archive/PLAN-before-service-history-20261106.md).
+[서비스 현재·과거 조회 보완](infra/hermes/diagnostic-navigation.md): query89/common44 운영·1,232PASS. 종료값 시점 오탐·실제 질문 지침 누락·peer 상태 해석·실제 속성값 대조를 보완했다. query88 실제Hermes64.370초/partial·Ollama47.133초/completed였으나 둘 다 품질실패이며, SDK 오답은89 운영의 실제 영수증 재검사에서 거절한다. 입력26,130토큰/첫보고35.294초·그중prefill24.384초·MCP합0.145초 표본을 근거로 다음은 필요한 실제 근거·현재 질문·판단 지침의 중복 입력과 재작성 비용을 줄이는 별도 후보를 검증한다. 필수 읽기·추가 조사 복귀·승인·정확성 검사를 유지한다. 정확한60초·평균/p95는 미완료. [직전 계획](archive/PLAN-before-service-semantics-20261107.md).
 
 [반복 systemd 실패](infra/hermes/controller-contention.md)는 실제 잠금 충돌만 예약 실행의 정상 연기로 처리한다.19:10 B 정상518/대기53·새실패0·failed0(A/C 마지막18:44failed0)을 확인했다. 명시적 재조사/DB/권한 오류는 실패를 유지한다. 수정 전 경보 원문은 보존한다.
 

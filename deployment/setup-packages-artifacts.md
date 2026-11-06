@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+현재 query1.19.75는 [관측 범위 검사](../infra/hermes/observation-scope.md)를 두 봇과 관리 게이트에 동기화했다. 프로세스 상태와 서비스 기능 정상, 로그 연속성 미검증과 실패를 구분한다. 고유1,112검사·B9파일/보호7SHA 확인. 기존 소스 복사·내장 게이트 경로를 사용하며 추가 패키지/포트/키는 없다. 최종30초·새 OS 전체 설치는 미완료다. 아래74 기록은 당시 범위다.
+
 11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.
 
 11/4 웹 읽기 반입 소스: `deployment/web_access_deploy.py`, `deployment/soc_diagnostics.py`, `deployment/roles/siem.sh`, `infra/mcp/web_evidence.py`, `read-web-evidence.py`, `web_evidence_client.py`, `security-events-mcp.py`와 공통 read_contract/grounding/query/worker를 같은 source archive에 포함한다. 기존 Python 표준 라이브러리·OpenSSH·systemd·C Wazuh 그룹을 사용하고 새 deb/wheel/image0이다. C 전용 reader와 root publisher를 설치하며 private key는 B에 유지한다. [권한·소스/복구·실제 검증](../infra/mcp/web-evidence.md).

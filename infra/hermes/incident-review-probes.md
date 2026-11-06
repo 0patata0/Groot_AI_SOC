@@ -1,5 +1,7 @@
 # 복합 사건 재조회·정정 입력 비교 — 2026-11-06
 
+후속: [query75 관측 범위 검사](observation-scope.md)가 운영 반영됐다. 아래 버전·시간은 해당 비교 시점의 기록이다.
+
 **후보를 운영에 채택하지 않았다. 정확한 최종 보고 30초 목표도 미완료다.** 현재 운영은 query1.19.74/common1.5.33과 [조회 묶음 연결](incident-bundle.md)을 유지한다. [현재 현황](../../STATUS.md) · [수치 원장](incident-review-probes.validation.json).
 
 ## 확인 방법과 비교 결과

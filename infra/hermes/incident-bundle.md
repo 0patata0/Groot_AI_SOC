@@ -1,5 +1,7 @@
 # 복합 사건 읽기 연결·지연 검증 — 2026-11-06
 
+후속: [query75 관측 범위 검사](observation-scope.md)가 운영 반영됐다. 아래 버전·시간은 해당 비교 시점의 기록이다.
+
 두 봇과 root 사건 검증기에 [관련 MCP 읽기 묶음](../mcp/incident-evidence.md)을 연결했다. **정확한 최종 보고30초는 아직 달성하지 못했다.** [현재 상태](../../STATUS.md)와 [수치 원장](incident-bundle.validation.json)을 따른다.
 
 ## 변경한 동작

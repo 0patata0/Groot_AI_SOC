@@ -1033,6 +1033,34 @@ def waf_action_violations(text, facts):
     return sorted(issues)
 
 
+def snapshot_health_violations(text, facts):
+    """Process state is not functional health, for web and non-web subjects.
+
+    Keep the diagnostic subject in feedback; a Vector process observation must
+    not be reported as a failed Apache health check. No health claim is excused.
+    """
+    web=any(f.get('kind') in ('web_access','web_service') for f in facts)
+    targets={f['target'] for f in facts if f.get('kind')=='diagnostics'
+        and re.fullmatch(r'[abc]:[a-z0-9][a-z0-9_.-]{0,63}',str(f.get('target','')))}
+    if not web and not targets:return []
+    issues=set()
+    for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
+        before=re.split(r'[.!?;|\n]',text[max(0,match.start()-80):match.start()])[-1]
+        after=text[match.end():match.end()+35]
+        if re.match(r'\s*(?:(?:이|은|는)?\s*아(?:니|님|닙)|(?:적)?이지\s*않|하지\s*않)',after):continue
+        if re.search(r'(?:미확인|확인\s*불가|단정.{0,5}않)\s*[:：]?\s*$',before):continue
+        if re.match(r'(?:\s|[/*`])*(?:화\s*)?(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
+        if re.match(r'\s*(?:을|를|이라고)?\s*(?:단정|보장|증명|판단).{0,8}(?:않|없|못)',after):continue
+        if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)(?:\s*중)?\s*(?:여부|인지|(?:은|는)?\s*미확인)',after):continue
+        subject=before+match[0]
+        named_web=bool(re.search(r'Apache|아파치|DVWA|Log4Shell|백엔드|애플리케이션|웹|앱',subject,re.I))
+        named_diagnostic=any(re.search(r'(?<![\w:])'+re.escape(name)+r'(?![\w:-])',subject,re.I)
+            for target in targets for name in (target,target.split(':',1)[1]))
+        issues.add('diagnostic_snapshot_is_not_functional_health' if targets and not named_web and
+            (named_diagnostic or not web) else 'web_snapshot_is_not_application_health')
+    return sorted(issues)
+
+
 def web_evidence_violations(text, facts):
     rows=[f for f in facts if f.get('kind') in ('web_access','web_service')]
     if not rows:return []
@@ -1054,21 +1082,11 @@ def web_evidence_violations(text, facts):
             for clause in re.split(r'[.;]|(?:하지만|그러나)',line):
                 if not re.search(r'로그|접근\s*기록|호출\s*기록',clause):continue
                 if re.search(r'만약|장애.{0,8}(?:확인되면|발견되면)|(?:단절|불연속|중단|장애).{0,12}(?:미확인|여부|아님|아니|단정.{0,5}(?:않|못))',clause):continue
-                if re.search(r'불연속성|(?:수집|기록).{0,12}(?:단절|중단|장애)(?:이|가|로|됨|됐)|(?:수집|기록).{0,12}복구(?:되면|가\s*필요|해야)',clause):
+                failed=re.search(r'연속성.{0,20}검증.{0,8}실패',clause) and not re.search(
+                    r'실패.{0,20}(?:아니|아님|아닙|미확인|여부|단정.{0,8}(?:않|못|없))',clause)
+                if failed or re.search(r'불연속성|(?:수집|기록).{0,12}(?:단절|중단|장애)(?:이|가|로|됨|됐)|(?:수집|기록).{0,12}복구(?:되면|가\s*필요|해야)',clause):
                     issues.add('web_continuity_unverified_is_not_outage')
-    # An Apache process/configuration and access rows are not an application
-    # health check. Inspect the claim itself, not an unrelated disclaimer.
-    # Negative adjectives (비정상/불건강) are not affirmative health claims.
-    # Keep scanning the clause: a later independent "정상" can still be false.
-    for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
-        before=re.split(r'[.!?;|\n]',text[max(0,match.start()-30):match.start()])[-1]
-        after=text[match.end():match.end()+20]
-        if re.match(r'\s*(?:(?:이|은|는)?\s*아(?:니|님|닙)|(?:적)?이지\s*않|하지\s*않)',after):continue
-        if re.search(r'미확인|확인\s*불가|단정.{0,5}않',before):continue
-        if re.match(r'(?:\s|[/*`])*(?:화\s*)?(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
-        if re.match(r'\s*(?:을|를|이라고)?\s*(?:단정|보장|증명|판단).{0,8}(?:않|없|못)',after):continue
-        if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)(?:\s*중)?\s*(?:여부|인지|(?:은|는)?\s*미확인)',after):continue
-        issues.add('web_snapshot_is_not_application_health')
+    issues.update(x for x in snapshot_health_violations(text,facts) if x=='web_snapshot_is_not_application_health')
     # A web snapshot explicitly leaves application impact unverified. Reject
     # a categorical absence claim; do not turn it into an attack verdict.
     for match in re.finditer(r'(?:웹\s*)?서비스\s*영향(?:은|이|도)?\s*(?:없(?:습니다|음|다)|없었(?:습니다|음|다))',text):
@@ -1144,7 +1162,7 @@ def evidence_claim_violations(text, facts, successful_reads=None):
                  incident_binding_violations(text, facts) + containment_time_violations(text, facts) +
                  disposition_citation_violations(text, successful_reads) +
                  brief_kst_violations(text, facts) + waf_action_violations(text, facts) + web_evidence_violations(text,facts) +
-                 redetection_violations(text,facts) + closure_uncertainty_violations(text))
+                 snapshot_health_violations(text,facts) + redetection_violations(text,facts) + closure_uncertainty_violations(text))
     observed_event_sources = {x.get('source') for x in facts if x.get('kind') == 'events'}
     for source, names in (('suricata', r'Suricata|IDS'), ('modsecurity', r'WAF|ModSecurity')):
         if source in observed_event_sources:
@@ -1728,6 +1746,7 @@ LITERAL_REPAIR_ISSUES = frozenset({
     'unknown_window_total_claimed', 'missing_or_invalid_management_status',
     'invalid_disposition_tool_names',
     'web_continuity_unverified_is_not_outage',
+    'diagnostic_snapshot_is_not_functional_health',
 })
 
 

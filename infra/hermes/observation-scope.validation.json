@@ -1,0 +1,248 @@
+{
+  "as_of_kst": "2026-11-06T16:11:16.515531+09:00",
+  "version": "1.19.75",
+  "status": "scope_guard_deployed_latency_goal_not_achieved",
+  "deployed_changes": [
+    "separate diagnostic process and web application health claim subjects",
+    "reject unverified log continuity presented as a failed verification"
+  ],
+  "candidate_prompt_and_thinking_adopted": false,
+  "model_settings_unchanged": true,
+  "tests": {
+    "native_management_and_scope": 449,
+    "native_skipped": 0,
+    "sdk": 231,
+    "query": 391,
+    "installer": 41,
+    "unique_passed": 1112,
+    "initial_three_source_pin_errors_resolved": true,
+    "new_os_install_tested": false
+  },
+  "live": {
+    "final_health": {
+      "confirmed_at_epoch": 1793949076,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "9dfeb3b9f24e35430f29ba3c3f814f7fee6a663e401ea95a5fde2572146df8a4",
+      "controller_sha256": "05bd08acc5b741b9ce3458cf24f2f81985e73e24c30d2ddfead61187d12f8d3d",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 64855,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 1.768796682357788,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 14.768858432769775,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "queues_idle": 3,
+    "registered_reads": [
+      "collect_incident_evidence",
+      "get_wazuh_sca_checks",
+      "get_web_service_target",
+      "search_modsecurity_alerts",
+      "search_suricata_alerts",
+      "search_wazuh_alerts",
+      "search_web_access"
+    ]
+  },
+  "confirmation": {
+    "confirmed": true,
+    "recovery_timer_stopped": true,
+    "confirmed_rollback_noop": true
+  },
+  "backup": "/var/lib/capstone-observation-scope/20261106-r1/deployment",
+  "manual_rollback_tested": false,
+  "probes": [
+    {
+      "name": "primary-baseline",
+      "seconds": 5.496198741951957,
+      "input_bytes": 44862,
+      "prompt_tokens": 15382,
+      "cached_tokens": 13336,
+      "completion_tokens": 163,
+      "format_valid": true,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "finish_reason": "stop",
+      "historical_receipt_replay": true,
+      "new_mcp_event_reads": 0,
+      "chat_posts": 0
+    },
+    {
+      "name": "primary-candidate",
+      "seconds": 5.37824955699034,
+      "input_bytes": 44904,
+      "prompt_tokens": 15420,
+      "cached_tokens": 13336,
+      "completion_tokens": 124,
+      "format_valid": true,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "finish_reason": "stop",
+      "historical_receipt_replay": true,
+      "new_mcp_event_reads": 0,
+      "chat_posts": 0
+    },
+    {
+      "name": "ids-baseline",
+      "seconds": 6.356435281923041,
+      "input_bytes": 47437,
+      "prompt_tokens": 18717,
+      "cached_tokens": 16608,
+      "completion_tokens": 204,
+      "format_valid": true,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "finish_reason": "stop",
+      "historical_receipt_replay": true,
+      "new_mcp_event_reads": 0,
+      "chat_posts": 0
+    },
+    {
+      "name": "ids-candidate",
+      "seconds": 6.559855120955035,
+      "input_bytes": 47129,
+      "prompt_tokens": 18694,
+      "cached_tokens": 16669,
+      "completion_tokens": 207,
+      "format_valid": true,
+      "known_guard_violations": [],
+      "finish_reason": "stop",
+      "historical_receipt_replay": true,
+      "new_mcp_event_reads": 0,
+      "chat_posts": 0
+    },
+    {
+      "name": "primary-thinking",
+      "seconds": 56.66871667304076,
+      "input_bytes": 44902,
+      "prompt_tokens": 15421,
+      "cached_tokens": 13372,
+      "completion_tokens": 3072,
+      "format_valid": false,
+      "known_guard_violations": null,
+      "finish_reason": "length",
+      "historical_receipt_replay": true,
+      "new_mcp_event_reads": 0,
+      "chat_posts": 0
+    }
+  ],
+  "historical_timing_breakdown": {
+    "scope": "historical 1.19.73 trace, private investigation; not chat timing or fresh75 measurement",
+    "total_seconds": 42.973161697387695,
+    "model_seconds": 28.430782,
+    "native_loop_seconds": 33.251999855041504,
+    "before_native_init_seconds": 7.1368255615234375,
+    "after_native_result_seconds": 2.584336280822754,
+    "tool_events": [
+      {
+        "type": "system",
+        "subtype": "init",
+        "session_id": "20261106_053956_676c6d",
+        "timestamp": 1793943596871
+      },
+      {
+        "type": "tool_use",
+        "name": "mcp__rule_a__get_operation_status",
+        "timestamp": 1793943600505
+      },
+      {
+        "type": "tool_result",
+        "name": "mcp__rule_a__get_operation_status",
+        "duration_ms": 167,
+        "timestamp": 1793943600669
+      },
+      {
+        "type": "tool_use",
+        "name": "mcp__security_events__collect_incident_evidence",
+        "timestamp": 1793943600670
+      },
+      {
+        "type": "tool_result",
+        "name": "mcp__security_events__collect_incident_evidence",
+        "duration_ms": 2860,
+        "timestamp": 1793943603560
+      },
+      {
+        "type": "result",
+        "session_id": "20261106_053956_676c6d",
+        "duration_ms": 33251,
+        "timestamp": 1793943630123
+      }
+    ],
+    "recorded_at_kst": "2026-11-06T16:12:24.355538+09:00"
+  },
+  "limits": [
+    "no new75 full incident or Mattermost latency measurement",
+    "two previously used development incidents, not independent holdout",
+    "cached model-only correction times do not prove new-incident speed or semantic correctness",
+    "natural-language guards remain bounded checks, not full semantic certification"
+  ],
+  "cleanup": {
+    "at_kst": "2026-11-06T16:17:10.686904+09:00",
+    "status": "complete",
+    "local_files_removed": 20,
+    "local_bytes_removed": 19635912,
+    "temporary_directory_absent": true,
+    "container_test_directories_remaining": [],
+    "new_packages": 0,
+    "server_backup_retained": "/var/lib/capstone-observation-scope/20261106-r1/deployment",
+    "operational_databases_and_traces_retained": true
+  },
+  "git": {
+    "status": "pending"
+  },
+  "final_live_verification": {
+    "at_kst": "2026-11-06T16:16:24.902924+09:00",
+    "final_health": {
+      "confirmed_at_epoch": 1793949384,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "9dfeb3b9f24e35430f29ba3c3f814f7fee6a663e401ea95a5fde2572146df8a4",
+      "controller_sha256": "05bd08acc5b741b9ce3458cf24f2f81985e73e24c30d2ddfead61187d12f8d3d",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 64855,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 10.10221242904663,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 3.102273464202881,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "queues_idle": 3,
+    "registered_reads": [
+      "collect_incident_evidence",
+      "get_wazuh_sca_checks",
+      "get_web_service_target",
+      "search_modsecurity_alerts",
+      "search_suricata_alerts",
+      "search_wazuh_alerts",
+      "search_web_access"
+    ]
+  }
+}

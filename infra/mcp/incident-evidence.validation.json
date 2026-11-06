@@ -138,8 +138,12 @@
     "model_selection_and_new_session_latency_and_semantic_checks"
   ],
   "git": {
-    "source_published": false,
-    "previous_final_commit": "7edb3e55cf624d9ef62f83ad076dc7063644ab2f"
+    "source_published": true,
+    "previous_final_commit": "7edb3e55cf624d9ef62f83ad076dc7063644ab2f",
+    "source_commit": "607c430ff330b5fc48a445014f992a522e63e983",
+    "remote_main_verified": "607c430ff330b5fc48a445014f992a522e63e983",
+    "published_at_kst": "2026-11-06T14:12:52.069387+09:00",
+    "receipt_followup_pending": true
   },
   "cleanup": {
     "server_files": 38,

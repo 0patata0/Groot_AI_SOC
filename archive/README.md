@@ -15,3 +15,5 @@
 
 - [현황 이력](STATUS-history-20261101.md) · [계획 이력](PLAN-history-20261101.md): 정리 전 기록이며 현재 상태는 루트 STATUS/PLAN을 따른다.
 - [저장소 정리·복원](REPOSITORY_CLEANUP.md) · [파일별 원장](REPOSITORY_CLEANUP_20261101.json).
+
+- [조회 원장 작업 전 현황](STATUS-before-read-ledger-20261106.md):2026-11-06 11:37 KST 당시 기록. 현재 버전·측정은 루트 STATUS를 따른다.

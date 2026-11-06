@@ -1,5 +1,7 @@
 # 패키지·이미지·배포 자료 준비
 
+현행11/6 [조회 원장·인용 규격](../infra/hermes/read-ledger.md): query1.19.69, 기존 관리 gate/controller·양봇 공통 source 복사 경로를 함께 갱신한다. 새 deb/wheel/image·권한·포트·키0. 설치41 포함1098검사와 실제 모델의 성공/실패 범위를 구분하며 새OS 전체설치·최종30초는 미완료다.
+
 11/4 웹 읽기 반입 소스: `deployment/web_access_deploy.py`, `deployment/soc_diagnostics.py`, `deployment/roles/siem.sh`, `infra/mcp/web_evidence.py`, `read-web-evidence.py`, `web_evidence_client.py`, `security-events-mcp.py`와 공통 read_contract/grounding/query/worker를 같은 source archive에 포함한다. 기존 Python 표준 라이브러리·OpenSSH·systemd·C Wazuh 그룹을 사용하고 새 deb/wheel/image0이다. C 전용 reader와 root publisher를 설치하며 private key는 B에 유지한다. [권한·소스/복구·실제 검증](../infra/mcp/web-evidence.md).
 
 **2026-11-04 웹 보안 소스:** `deployment/web_security.py`·루트deploy.sh, offline-labs API/인증/UI/프록시/정책/bootstrap, `configure_waf_evidence.py`와 native 검증기를 기존 source bundle로 반입한다. 실제 설치된 이미지·Python/Node·systemd/Docker를 사용하며 추가 deb/wheel/이미지0이다. [운영·검증·원복](../infra/validation/web-policy/README.md).

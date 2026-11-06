@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06T12:25:49.577967+09:00",
+  "query_version": "1.19.69",
+  "common_version": "1.5.32",
+  "diagnostics_version": "1.2.1",
+  "goal_final_30_seconds_met": false,
+  "deployment_files": 10,
+  "protected_files_unchanged": 7,
+  "gate_argument_bytes": 65043,
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "a7ca6c029f59d30fb8645e6b2e0006e98ad831ac05fd4c73d1a508e0b1402567",
+    "infra/hermes/soc_management_controller.py": "489d49ca7630db07177c80c9dd538431b2bf41ccfce2caa52cc3a9cb888bb503",
+    "infra/hermes/query-completion/__init__.py": "3083172ca9c05322bd0690779b8b766416704701fcf36d9b41856af1d677c338",
+    "infra/hermes/query-completion/plugin.yaml": "1bab0124f46bf608be0b9ba74a70930c185d4e0e8d5093755512e10ccaed4316",
+    "infra/hermes/test_soc_management_read_ledger.py": "68fcf041e0fd9b654871f5e9927e3f99c7670cd96e60fbc79a53c9a8d9c93b1b",
+    "infra/hermes/test_soc_management_repair.py": "706a726308f76c8d0594d7008b025f8441b10da314cc78e8822bd7b72aa8eb36"
+  },
+  "bound_controller_sha256": "d4cdc3991771278ff39d170e5c87a514186be5c9a8f04265f92b5dc2eb11773d",
+  "tests": {
+    "unique_pass": 1098,
+    "uncovered_skip": 0,
+    "server_base_skip": 57,
+    "native_tests": 63,
+    "overlap": 6,
+    "mac_tests": 421,
+    "mac_skip": 73
+  },
+  "measurements": [
+    {
+      "query": "66",
+      "run_id": "f53237e1bd45cb976acba688465698c2",
+      "seconds": 49.59601402282715,
+      "state": "completed",
+      "detail": "model_needs_review",
+      "tool_attempts": 9,
+      "tool_errors": 0,
+      "writes": 0,
+      "model_rounds": 4,
+      "model_seconds": 33.781386,
+      "model_selection_rejections": 0,
+      "tool_result_seconds": 3.426,
+      "content_review": "연속성 미검증을 수집 장애/복구 필요로 과장",
+      "final_30_seconds_met": false,
+      "semantic_quality_pass": false
+    },
+    {
+      "tag": "r2-final",
+      "run_id": "4d2a9c41d501fa09d2b963b96a7132a1",
+      "seconds": 49.0046021938324,
+      "state": "completed",
+      "detail": "model_needs_review",
+      "tool_attempts": 9,
+      "tool_errors": 0,
+      "writes": 0,
+      "model_rounds": 4,
+      "model_seconds": 33.424167,
+      "model_selection_rejections": 0,
+      "tool_result_seconds": 3.519,
+      "query": "67",
+      "semantic_quality_pass": false,
+      "content_review": "관측된 후속 WAF 표본 부정·해소 판정"
+    },
+    {
+      "tag": "r3",
+      "run_id": "99a3771319e3dfe4469d8de68933624d",
+      "seconds": 77.40275239944458,
+      "state": "completed",
+      "detail": "model_needs_review",
+      "tool_attempts": 8,
+      "tool_errors": 0,
+      "writes": 0,
+      "model_rounds": 5,
+      "model_seconds": 61.709267999999994,
+      "model_selection_rejections": 0,
+      "tool_result_seconds": 3.535,
+      "query": "67",
+      "semantic_quality_pass": false,
+      "content_review": "과거 표본으로 현재 지속/긴급 차단 필요를 강하게 표현"
+    },
+    {
+      "tag": "r4",
+      "run_id": "2b6c3ca0975a1bc76603714e678a4671",
+      "seconds": 76.66687989234924,
+      "state": "completed",
+      "detail": "model_needs_review",
+      "tool_attempts": 9,
+      "tool_errors": 0,
+      "writes": 0,
+      "model_rounds": 5,
+      "model_seconds": 60.952802,
+      "model_selection_rejections": 2,
+      "tool_result_seconds": 3.5639999999999996,
+      "query": "68",
+      "semantic_quality_pass": false,
+      "content_review": "인용 번호 중복/누락2회·실패표"
+    },
+    {
+      "tag": "r5-final",
+      "run_id": "a42faf9da4ac1bf9e810a2b381a51640",
+      "seconds": 64.58021473884583,
+      "state": "completed",
+      "detail": "model_needs_review",
+      "tool_attempts": 9,
+      "tool_errors": 0,
+      "writes": 0,
+      "model_rounds": 5,
+      "model_seconds": 49.648039,
+      "model_selection_rejections": 0,
+      "tool_result_seconds": 3.267,
+      "content_review": "조회·인용 오류0/현재 위험 미확인 유지, 이미 수행한 웹 대상 재조회 제안은 잔여",
+      "semantic_quality_pass": false,
+      "query": "69"
+    }
+  ],
+  "measurement_scope": "Actual model/Native MCP, private copied DB, fresh sessions. Four versions of one development case plus one different previously used IDS case/question. No chat posting. Shared GPU and sensor snapshots uncontrolled; not independent evaluation or an average.",
+  "verified": [
+    "completed-dispatch exact arguments and response hashes retained",
+    "required current/history diagnostic reads retained",
+    "no MCP errors/writes in five trials",
+    "positive supplied-ID schema retains tool registry and legacy fallback",
+    "readonly candidate installed through existing gate/source paths"
+  ],
+  "unresolved": [
+    "reliable accurate final report around30s",
+    "large final prompt and model semantic errors",
+    "event recency/continuity and disposition precision",
+    "A journal collection gaps",
+    "actual chat end-to-end latency for complex cases"
+  ],
+  "not_run": [
+    "attack/load/PCAP",
+    "Mattermost posting",
+    "new OS full installation",
+    "manual full rollback",
+    "unused independent evaluation",
+    "new model/training"
+  ],
+  "backups": [
+    "/var/lib/capstone-read-ledger/20261106-r1/deployment",
+    "/var/lib/capstone-read-ledger/20261106-r2/deployment",
+    "/var/lib/capstone-read-ledger/20261106-r4/deployment",
+    "/var/lib/capstone-read-ledger/20261106-r5/deployment"
+  ],
+  "git": {
+    "state": "local documentation/source pending commit and push",
+    "base_head": "3f6e3246534a9df54a1cf0d82e145d2a5de7528b"
+  },
+  "cleanup": {
+    "server_source_files": 1772,
+    "server_measurement_scripts": 5,
+    "server_backups_db_traces_preserved": true,
+    "mac": {
+      "removed": "/private/tmp/capstone-read-ledger-20261106-xz20vtb9",
+      "files": 34,
+      "bytes": 4533746,
+      "absent_verified": true,
+      "at_kst": "2026-11-06T12:27:59.665363+09:00"
+    }
+  }
+}

@@ -898,6 +898,21 @@ def web_evidence_violations(text, facts):
         any(f.get('coverage',{}).get(k) for k in ('rows_truncated','scan_limited','files_unavailable'))) for f in rows)
     if limited and not re.search(r'잘림|상한|제한|일부.{0,10}(?:보관|색인)',text):
         issues.add('web_access_coverage_limit_omitted')
+    # Unverified continuity is not positive evidence of a collection outage.
+    # This only checks claims about the queried web logs with readable files;
+    # explicit missing files/verified continuity retain their ordinary path.
+    unknown=all(f.get('logging_continuity_verified') is False for f in rows)
+    readable=all(f.get('coverage',{}).get('files_unavailable')==0 for f in rows if f.get('kind')=='web_access')
+    if unknown and readable and any(f.get('kind')=='web_access' for f in rows):
+        fenced=False
+        for line in text.splitlines():
+            if line.lstrip().startswith('```'):fenced=not fenced;continue
+            if fenced or line.lstrip().startswith(('>','|','INCIDENT_DISPOSITION:')):continue
+            for clause in re.split(r'[.;]|(?:하지만|그러나)',line):
+                if not re.search(r'로그|접근\s*기록|호출\s*기록',clause):continue
+                if re.search(r'만약|장애.{0,8}(?:확인되면|발견되면)|(?:단절|불연속|중단|장애).{0,12}(?:미확인|여부|아님|아니|단정.{0,5}(?:않|못))',clause):continue
+                if re.search(r'불연속성|(?:수집|기록).{0,12}(?:단절|중단|장애)(?:이|가|로|됨|됐)|(?:수집|기록).{0,12}복구(?:되면|가\s*필요|해야)',clause):
+                    issues.add('web_continuity_unverified_is_not_outage')
     # An Apache process/configuration and access rows are not an application
     # health check. Inspect the claim itself, not an unrelated disclaimer.
     for match in re.finditer(r'(?:Apache|아파치|DVWA|웹\s*서비스|현재\s*서비스|서비스\s*상태|백엔드|애플리케이션|앱)[^\n.!?;|]{0,40}?(?:정상|건강)',text,re.I):
@@ -946,6 +961,7 @@ def redetection_violations(text, facts):
         # unknown in the same sentence) needs a clearer, evidence-bound report.
         term=r'재탐지' if not re.search(r'재탐지\s*표본',line) else r'(?:재탐지|재발)'
         denial=term+r'\s*(?:여부\s*)?(?:은|는|이|가|도)?\s*(?:미확인|없(?:음|다|었|습)|확인(?:되지|\s*(?:못|불가)))'
+        denial+=r'|추가(?:적인)?\s*(?:(?:공격|경보|탐지)\s*)?(?:표본|경보|탐지)(?:\s*또는\s*장애)?(?:는|가|이|도)?\s*(?:없(?:음|다|었|습)|관측되지|확인되지)'
         for match in re.finditer(denial,line):
             if re.match(r'.{0,12}(?:단정|판단|보지|아니)',line[match.end():]):continue
             named=list(re.finditer(r'WAF|ModSecurity|IDS|Suricata',line[:match.start()],re.I))
@@ -1565,6 +1581,7 @@ LITERAL_REPAIR_ISSUES = frozenset({
     'sample_zero_presented_as_absence', 'sample_count_presented_as_window_total',
     'unknown_window_total_claimed', 'missing_or_invalid_management_status',
     'invalid_disposition_tool_names',
+    'web_continuity_unverified_is_not_outage',
 })
 
 
@@ -1764,8 +1781,29 @@ def known_status_input_rejection(name, arguments, requirements):
     return None
 
 
+def review_status_ids(name):
+    """Exact authenticated references or literal operator IDs, never log strings.
+
+    None means incomplete/legacy context: retain the ordinary inquiry schema.
+    An empty list means the tool is registered but lacks a supplied identifier.
+    """
+    if not readonly_incident_review() or not re.fullmatch(
+            r'mcp__rule_[ab]__(?:get_operation_status|get_rule_change_status)',name or ''):return None
+    ctx=compact_controller_context()
+    scope=ctx['evidence_scope'] if ctx else {}
+    if scope.get('status_references_complete') is not True:return None
+    rows=scope.get('status_references')
+    if not isinstance(rows,list):return None
+    try:refs=status_read_requirements(json.dumps(rows)) if rows else []
+    except RuntimeError:return None
+    known={r['proposal_id'] for r in refs if status_read_request(r)['tool']==name}
+    explicit=set(re.findall(r'(?<![0-9A-Za-z])[0-9a-f]{32}(?![0-9A-Za-z])',ctx['operator_reason']))
+    wrong={r['proposal_id'] for r in refs}-known
+    return sorted(known|(explicit-wrong))
+
+
 def known_status_selection_schema(name, schema, requirements):
-    """Exclude only already-bound IDs with the wrong kind/host before generation."""
+    """Bind supplied references without removing registry capabilities."""
     value=copy.deepcopy(schema)
     if not re.fullmatch(r'mcp__rule_[ab]__(?:get_operation_status|get_rule_change_status)',name or ''):
         return value
@@ -1778,7 +1816,50 @@ def known_status_selection_schema(name, schema, requirements):
         # compilers otherwise turn an allOf-only scalar into an empty object.
         prior=props[key].get('not')
         props[key]['not']={'anyOf':[prior,{'enum':wrong}]} if isinstance(prior,(dict,bool)) else {'enum':wrong}
+    supplied=review_status_ids(name)
+    if supplied is not None and isinstance(props.get(key),dict):
+        if isinstance(props[key].get('enum'),list):supplied=sorted(set(supplied)&set(props[key]['enum']))
+        if not supplied:return None
+        props[key]['enum']=supplied
     return value
+
+
+def read_ledger_entry(name, arguments, result):
+    """A completed dispatch record; no health, absence, freshness or risk verdict."""
+    if not allowed(name,'verify') or not isinstance(arguments,dict):return None
+    try:
+        args=json.dumps(arguments,ensure_ascii=False,sort_keys=True,allow_nan=False)
+        raw=result if isinstance(result,str) else json.dumps(result,ensure_ascii=False,allow_nan=False)
+        if len(args.encode())>8192 or len(raw.encode())>MAX_EVENT_AUDIT_BYTES:return None
+        def unique(pairs):
+            out={}
+            for key,value in pairs:
+                if key in out:raise ValueError('duplicate')
+                out[key]=value
+            return out
+        def decode(value):
+            return json.loads(value,object_pairs_hook=unique,
+                parse_constant=lambda x:(_ for _ in ()).throw(ValueError('nonfinite')))
+        payload=decode(raw);failed=False
+        for _ in range(5):
+            if not isinstance(payload,dict):break
+            failed=failed or bool(payload.get('error') or payload.get('isError') or payload.get('is_error'))
+            if set(payload)<={'result','isError'} and isinstance(payload.get('result'),str):payload=decode(payload['result'])
+            else:break
+    except (ValueError,TypeError,RecursionError,UnicodeError):return None
+    return {'tool':name,'arguments':json.loads(args),'result_sha256':hashlib.sha256(raw.encode()).hexdigest(),
+        'result_state':'error' if failed else 'returned', 'completed_at_kst':datetime.now(KST).isoformat()}
+
+
+def read_ledger_view(rows):
+    if not isinstance(rows,list) or len(rows)>128:return None
+    for row in rows:
+        if (not isinstance(row,dict) or set(row)!={'tool','arguments','result_sha256','result_state','completed_at_kst'}
+                or not allowed(row.get('tool'),'verify') or not isinstance(row.get('arguments'),dict)
+                or not isinstance(row.get('result_sha256'),str) or not re.fullmatch(r'[0-9a-f]{64}',row['result_sha256'])
+                or row.get('result_state') not in ('returned','error') or parse_instant(row.get('completed_at_kst')) is None):return None
+    return {'scope':'actual_completed_dispatches_only; returned is not healthy or complete evidence',
+        'rows':copy.deepcopy(rows),'count':len(rows)}
 
 
 def operator_diagnostic_options(request, receipts=()):
@@ -2375,11 +2456,14 @@ def management_read_request(request, agent, *, pending=False):
         if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_selection_catalog_invalid')
-        schema=known_status_selection_schema(name,schema,
+        selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
-        catalog[name]=copy.deepcopy(schema)
+        catalog[name]=copy.deepcopy(schema if selected is None else selected)
+        if selected is None:continue
+        schema=selected
         branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
             'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
+    if not branches:raise RuntimeError('management_selection_status_reference_missing')
     nonce=uuid.uuid4().hex
     schema={'type':'object','additionalProperties':False,'required':['request_nonce','calls'],
         'properties':{'request_nonce':{'type':'string','const':nonce},'calls':{
@@ -2414,12 +2498,20 @@ COMPACT_REVIEW_POLICY = (
     '쓰기/셸/설치 권한이나 승인 생성은 없다. 추가 근거가 필요하면 등록된 읽기를 선택한다. '
     'available_read_tools는 현재 허용 읽기다. 운영자가 요청한 미실행 조회나 판단에 필요한 구체적 추가 근거는 '
     'calls로 직접 조회하며 한계/다음 조치로 미루지 않는다. 이미 받은 결과는 재조회하지 않는다. '
+    'completed_read_ledger는 실제 완료된 호출의 정확 인자다. 같은 ID·구간을 다시 읽거나 더 좁히기 전에 '
+    '원래 결과와 비교해 무엇이 새로 확인되는지 판단한다. 구간0표본·수집 공백·로그 연속성 미확인은 '
+    '같은 스냅샷 반복 조회로 해소되지 않는다. 요청한 조회를 수행했고 등록된 읽기로 추가 확인할 근거가 없다면 '
+    '미해결 판단과 구체적인 다음 조치를 보고한다. 이것은 정상·종결 허가가 아니다. '
+    'reference_bound_status_reads에 ID가 없는 도구도 등록되어 있다. 현재 사건 참조나 운영자 명시 ID 없이 '
+    '임의의 ID를 만들거나 기존 문자열 일부를 바꾸지 않는다. '
     '관측된 근거에 연결되지 않는 정책ID·자산·인자를 만들지 않는다. 요청 범위를 마치면 남은 미확인과 함께 보고한다. '
     'known_status_references의 request_id와 proposal_id는 서로 다른 종류다. 같은 값을 다른 getter로 옮기거나 새 ID를 만들지 않는다. '
     '현재 IP 차단 상태는 연결된 operation 상태와 list_blocks로 확인한다. 전체 FW/NAT/룰 조회는 정책 검토 요청이나 관련 근거가 있을 때 선택한다. '
     '웹 재조회는 실제 사건·추가 탐지 시각과 이미 읽은 범위를 대조해 필요한 구간만 정한다. 새 단서 없이 빈 구간을 계속 나누어 조회하지 않는다. '
     '진단의 c:apache와 웹 접근 조회의 서비스 target은 다르다. 실제 등록 서비스 값을 사용한다. '
     '현재 active는 HTTP 정상 응답 증거가 아니고, HTTP200은 공격 성공이나 유출 증거가 아니다. '
+    'logging_continuity_verified=false는 연속성 미검증이며 수집 중단·불연속·복구 필요의 증거가 아니다. '
+    '원문 비공개·표본0·전체 건수 미확인과 파일 부재·수집 장애를 구분한다. 확인된 장애 없이 복구를 전제하지 않는다. '
     '사건 당시와 현재 관측을 구분하며 과거 공격 기록만으로 현재 공격 중이라고 말하지 않는다. '
     '차단 만료/미차단·0표본·내부망/승인된 실습·현재 active만으로 침해 부재나 위험 해소를 판단하지 않는다. '
     '수집 agent/공격자·프런트/백엔드·센서ID/WazuhID·원사건 재반환/재발을 구분한다. '
@@ -2428,6 +2520,8 @@ COMPACT_REVIEW_POLICY = (
     '센서 destination_ip는 프런트 관측이고 backend는 등록 target/service/agent로 구별한다. '
     '후속 조사의 호스트는 등록 target/agent로 표시하고 추측한 IP·화이트리스트 여부를 덧붙이지 않는다. '
     '사건 이후 다른 센서의 탐지도 함께 비교하고 전체 부재/재발 없음은 표본만으로 단정하지 않는다. '
+    '추가 경보 표본이 있으면 그 관측 사실과 공격 성공·침해 영향의 미확인을 분리한다. '
+    '판단문을 receipt_sample_chronology의 기한 이후 표본과 대조하여 존재하는 추가 탐지를 부정하지 않는다. '
     '영수증 표 전체를 근거로 사용하므로 evidence_indexes는 제공된 성공 조회 번호를 전부 포함한다. '
     '핵심 판단1문장, 가장 중요한 근거 한계1개, 다음 조치1개만 짧고 끝맺음이 완전한 한국어로 쓴다. 표·원문·내부 안내는 출력하지 않는다. '
     'receipt_sample_chronology는 센서별 반환 표본과 임시기한의 실제 시각 대조다. '
@@ -2576,9 +2670,11 @@ def management_report_request(request, agent, snapshot):
         if (tool.get('type')!='function' or name in catalog or not allowed(name,'verify')
                 or name not in getattr(agent,'valid_tool_names',()) or not isinstance(schema,dict)):
             raise RuntimeError('management_report_catalog_invalid')
-        schema=known_status_selection_schema(name,schema,
+        selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
-        catalog[name]=copy.deepcopy(schema)
+        catalog[name]=copy.deepcopy(schema if selected is None else selected)
+        if selected is None:continue
+        schema=selected
         branches.append({'type':'object','additionalProperties':False,'required':['tool','arguments'],
             'properties':{'tool':{'type':'string','const':name},'arguments':copy.deepcopy(schema)}})
     nonce=uuid.uuid4().hex
@@ -2610,8 +2706,10 @@ def management_report_request(request, agent, snapshot):
     citations=sorted(set(reads))
     if compact:
         fields['basis']['maxLength']=240
-        fields['evidence_indexes']={'type':'array','minItems':len(citations),'maxItems':len(citations),
-            'uniqueItems':True,'items':{'type':'integer','minimum':0,'maximum':len(citations)-1}}
+        # The report already requires every successful receipt/table citation.
+        # Encode that invariant directly; do not ask the model to permute a set
+        # and spend another inference round repairing duplicates/omissions.
+        fields['evidence_indexes']={'type':'array','const':list(range(len(citations)))}
         del fields['evidence_tools']
         for k in ('limitations','next_steps'):
             fields[k]['maxItems']=1;fields[k]['items']['maxLength']=240
@@ -2638,11 +2736,13 @@ def management_report_request(request, agent, snapshot):
             {'type':'object','additionalProperties':False,'required':['request_nonce','more_evidence','report'],
              'properties':{'request_nonce':common,'more_evidence':{'const':False},'report':report}}]}
     if inquiry:
+        if not branches:raise RuntimeError('management_report_status_reference_missing')
         schema={'type':'object','additionalProperties':False,'required':['request_nonce','calls','report'],
             'properties':{'request_nonce':common,'calls':{'type':'array','minItems':1,'maxItems':4,
                 'uniqueItems':True,'items':{'anyOf':branches}},'report':{'type':'null'}}}
     definitions=None
-    if compact and not repair:
+    if not branches and not repair and not inquiry:schema['anyOf'].pop(0)
+    if compact and not repair and branches:
         # Keep every registered argument schema. Put the invariant catalog before
         # changing receipts/nonces so subsequent reads can reuse a stable prefix.
         # The provider and response validator still receive one complete schema.
@@ -2712,6 +2812,8 @@ def management_report_request(request, agent, snapshot):
                 'available_read_tools':list(catalog),
                 'receipt_sample_chronology':temporal_review_observations(facts),'schema':schema_view,
                 'known_status_references':[status_read_request(r) for r in status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))],
+                'reference_bound_status_reads':{n:ids for n in catalog if (ids:=review_status_ids(n)) is not None},
+                'completed_read_ledger':read_ledger_view(snapshot.get('read_ledger')),
                 **({'controller_report_feedback':feedback} if feedback else {}),
                 **({'current_review_task':{k:context[k] for k in ('case_id','mode','operator_reason','purpose')}}
                     if context is not None else {}),
@@ -2906,6 +3008,8 @@ def main():
     read_facts = []
     current_receipts=[]
     receipts_complete=True
+    read_ledger=[]
+    read_ledger_complete=True
     status_receipts = []
     requirements = status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))
     sensor_requirements=sensor_read_requirements(os.environ.get('CAPSTONE_REQUIRED_SENSOR_JSON'))
@@ -2924,6 +3028,7 @@ def main():
             structured_stdout.flush()
 
     def gated_dispatch(name, args, **kwargs):
+        nonlocal read_ledger_complete
         if not allowed(name, mode):
             raise PermissionError('management_tool_not_allowed')
         if allowed(name,'verify'):
@@ -2936,7 +3041,13 @@ def main():
             if rejection:
                 argument_errors.append(name)
                 return json.dumps(rejection,ensure_ascii=False)
-        return dispatch(name, args, **kwargs)
+        result=dispatch(name, args, **kwargs)
+        if mode=='verify' and allowed(name,'verify'):
+            row=read_ledger_entry(name,args,result)
+            with output_lock:
+                if row is not None and len(read_ledger)<128:read_ledger.append(row)
+                else:read_ledger_complete=False
+        return result
 
     async def gated_wire(self, name, arguments=None, *args, **kwargs):
         if not wire_allowed(name, mode):
@@ -2954,7 +3065,7 @@ def main():
         if name=='get_system_diagnostics' and isinstance(arguments,dict):
             diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics',
                 'arguments':copy.deepcopy(arguments)})
-            del diagnostic_receipts[:-64]
+            del diagnostic_receipts[:-128]
         receipt=sensor_read_receipt(name,arguments,result)
         if receipt:sensor_receipts.append(receipt)
         if argument_refusal(name, result):
@@ -3025,6 +3136,7 @@ def main():
         if result is not cited:
             self._capstone_management_report={'turn':getattr(self,'_current_turn_id',None),
                 'reads':sorted(n for n in successful_read_names if allowed(n,'verify')),'facts':copy.deepcopy(read_facts),
+                'read_ledger':copy.deepcopy(read_ledger) if read_ledger_complete else None,
                 'receipts':copy.deepcopy(current_receipts) if receipts_complete else None}
         return result
 

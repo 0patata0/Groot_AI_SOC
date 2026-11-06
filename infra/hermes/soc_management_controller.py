@@ -1825,6 +1825,10 @@ def verification_case(store, case, at=None):
         reads=incident['requests']+followup['requests']
         case=dict(case,required_sensor_reads=[{'tool':r['tool'],'arguments':r['arguments']} for r in reads],
             compact_review_evidence_scope={
+                'status_references':[{'proposal_id':p['id'],'target':p['target']}
+                    for p in evidence['proposals']+evidence.get('later_proposals',[])],
+                'status_references_complete':evidence.get('evidence_truncated') is False
+                    and evidence.get('later_proposals_truncated') is False,
                 'incident_windows':list({(r['arguments']['since_kst'],r['arguments']['until_kst']):
                     {k:r['arguments'][k] for k in ('since_kst','until_kst')} for r in incident['requests']}.values()),
                 'evidence_total':evidence.get('evidence_total'),'evidence_included':evidence.get('evidence_included'),

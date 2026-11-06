@@ -1,6 +1,6 @@
 # 복합 조사의 요청 대상·작업 종류 결속
 
-2026-11-06 KST. query1.19.65/common1.5.32, system-diagnostics MCP1.2.1. [현행 결과](../../STATUS.md) · [수치 원장](request-scope.validation.json) · [이전 실패](../mcp/journal-history.md).
+2026-11-06의 이전 검증 기록. 현재 후속은 [조회 원장·보고 보완](read-ledger.md)을 따른다. 당시 query1.19.65/common1.5.32, system-diagnostics MCP1.2.1. [현행 결과](../../STATUS.md) · [수치 원장](request-scope.validation.json) · [이전 실패](../mcp/journal-history.md).
 
 ## 보완한 경로
 

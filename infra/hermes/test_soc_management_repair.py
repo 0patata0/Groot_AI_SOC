@@ -220,6 +220,15 @@ class RedetectionEvidence(unittest.TestCase):
         self.assertEqual(m.redetection_violations(text,self.facts),['observed_redetection_reported_unknown'])
         self.assertEqual(m.redetection_violations(text,[]),[])
 
+    def test_additional_sample_denial_keeps_sensor_and_impact_distinctions(self):
+        for text in ('사건 후 WAF와 웹 서비스에서 추가적인 공격 표본 또는 장애는 관측되지 않았음.',
+                     '추가 경보는 없습니다.', 'WAF 추가 탐지가 확인되지 않았습니다.'):
+            self.assertEqual(m.redetection_violations(text,self.facts),['observed_redetection_reported_unknown'])
+        for text in ('IDS 추가 경보는 없습니다.', '추가 경보가 없다고 단정하지 않습니다.',
+                     'WAF 추가 경보가 있지만 공격 성공 여부는 미확인입니다.',
+                     '추가 공격의 성공 여부는 미확인입니다.'):
+            self.assertEqual(m.redetection_violations(text,self.facts),[])
+
 class ClosureConsistency(unittest.TestCase):
     def test_actual_unknown_impact_with_resolved_status_is_rejected(self):
         body='백엔드의 실제 데이터 유출 여부나 서비스 가용성에 대한 전체 증거는 확보되지 않았습니다.'

@@ -57,6 +57,42 @@ def snapshot(role='service', rows=None, fail=None):
     return d.collect(role, runner, NOW), calls
 
 
+class RuntimeObservationTime(unittest.TestCase):
+    def fixture(self, explicit=False):
+        h=load('diagnostic_clock_runtime','runtime_health.py');clock=[NOW]
+        def runner(argv,maximum,seconds):
+            if argv[0]=='/usr/bin/systemctl':return 0,fields(argv[-1])
+            clock[0]+=7
+            return 0,b''
+        with patch.object(d,'_runtime',h),patch.object(d.time,'time',side_effect=lambda:clock[0]), \
+             patch.object(h,'load_config',return_value={}), \
+             patch.object(h,'collect_one',side_effect=lambda target,cfg,run,at:h.observation('runtime',at)):
+            return d.collect('siem',runner,NOW if explicit else None,include_runtime=True),h
+
+    def test_runtime_observation_and_mcp_display_follow_target_time_without_extending_ttl(self):
+        value,h=self.fixture();target='b:management-pipeline'
+        self.assertEqual(value['checked_at'],NOW)
+        self.assertEqual(value['runtime'][target]['observed_at'],NOW+14)
+        self.assertEqual(value['expires_at'],NOW+d.TTL)
+        with patch.object(d,'_runtime',h):d.validate_snapshot(value,'b',NOW+20)
+        result=m.runtime_result(value,target,NOW+20)
+        self.assertEqual(result['observed_at'],NOW+14)
+        self.assertEqual(result['age_seconds'],6)
+        self.assertEqual(result['observed_at_kst'],m.datetime.fromtimestamp(NOW+14,m.timezone(m.timedelta(hours=9))).isoformat())
+        self.assertEqual(result['expires_at'],NOW+d.TTL)
+        frozen,_=self.fixture(explicit=True)
+        self.assertTrue(all(r['observed_at']==NOW for r in frozen['runtime'].values()))
+
+    def test_runtime_future_precollection_and_expiry_timestamps_remain_rejected(self):
+        value,h=self.fixture();target='b:management-pipeline'
+        with patch.object(d,'_runtime',h):
+            for stamp,now in ((NOW-1,NOW+20),(NOW+26,NOW+20),(NOW+d.TTL+1,NOW+d.TTL+2)):
+                changed=copy.deepcopy(value);changed['runtime'][target]['observed_at']=stamp
+                with self.subTest(stamp=stamp),self.assertRaises((d.DiagnosticError,ValueError)):
+                    d.validate_snapshot(changed,'b',now,require_fresh=False)
+            with self.assertRaises(d.DiagnosticError):d.validate_snapshot(value,'b',NOW+d.TTL+1)
+
+
 class ControllerErrorMetadata(unittest.TestCase):
     def test_exact_failed_envelope_on_correct_unit_becomes_safe_code(self):
         raw='{"status":"failed","error":"controller_already_running"}'

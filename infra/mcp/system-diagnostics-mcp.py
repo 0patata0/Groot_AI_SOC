@@ -309,8 +309,8 @@ def query(value):
 
 
 def runtime_result(snapshot, target, now):
-    checked = snapshot['checked_at']
     row = snapshot.get('runtime', {}).get(target)
+    checked = row['observed_at'] if row else snapshot['checked_at']
     return {'schema': 1, 'kind': 'runtime', 'target': target, 'host': snapshot['host'],
         'observed_at_kst': datetime.fromtimestamp(checked, timezone(timedelta(hours=9))).isoformat(),
         'age_seconds': max(0, now-checked), 'expires_at': snapshot['expires_at'],
@@ -402,7 +402,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.2.7'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.2.8'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':

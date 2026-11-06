@@ -424,7 +424,9 @@ def validate_snapshot(value, expected_host=None, now=None, require_fresh=True):
             validate_error(error, value['checked_at'] - LOOKBACK * 60, value['checked_at'])
     if value['schema'] == 2:
         role = next(r for r, h in ROLE_HOST.items() if h == host)
-        runtime_library().validate(value['runtime'], role, value['checked_at'])
+        runtime_library().validate(value['runtime'], role, now)
+        need(all(value['checked_at'] <= row['observed_at'] <= value['expires_at']
+                 for row in value['runtime'].values()), 'runtime_observation_window')
     need(len(encode(value)) <= MAX_SNAPSHOT, 'snapshot_byte_bound')
     return value
 
@@ -436,6 +438,7 @@ def read_snapshot(expected_host=None, now=None):
 
 def collect(role, runner=bounded_command, now=None, include_runtime=None, history_output=None):
     need(role in PROFILES, 'invalid_role')
+    live_clock = now is None
     now = int(time.time()) if now is None else now
     profile = PROFILES[role]
     value = {'schema': 1, 'host': ROLE_HOST[role], 'checked_at': now, 'expires_at': now + TTL,
@@ -485,8 +488,8 @@ def collect(role, runner=bounded_command, now=None, include_runtime=None, histor
         pass
     if include_runtime is True or (include_runtime is None and runner is bounded_command and Path('/etc/capstone-diagnostics/runtime.json').exists()):
         value['schema'] = 2
-        value['runtime'] = runtime_library().collect(role, runner, now)
-    return validate_snapshot(value, ROLE_HOST[role], now)
+        value['runtime'] = runtime_library().collect(role, runner, now, clock=time.time if live_clock else None)
+    return validate_snapshot(value, ROLE_HOST[role], int(time.time()) if live_clock else now)
 
 
 def publish(value):

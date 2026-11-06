@@ -21,6 +21,26 @@ NOW=1900000000
 
 
 class RuntimeTests(unittest.TestCase):
+    def test_live_target_clock_accepts_new_heartbeat_after_slow_prior_checks(self):
+        value={'pid':44,'process_start_ticks':55,'at':NOW+12,'last_poll':NOW+11,
+               'pending':1,'oldest_pending_at':NOW+10}
+        def one(target,cfg,runner,at):
+            if target=='b:management-pipeline':
+                metrics,codes=h.review_chat(at,runner)
+                return h.observation('management_pipeline',at,metrics,codes)
+            return h.observation('runtime',at)
+        with patch.object(h,'read_file',return_value=(json.dumps(value).encode(),NOW+12)), \
+             patch.object(h,'command',return_value='44'),patch.object(h,'process_start',return_value=55), \
+             patch.object(h,'load_config',return_value={}),patch.object(h,'collect_one',side_effect=one):
+            # Reproduce the old batch-start comparison without sleeping.
+            with self.assertRaises(ValueError):h.review_chat(NOW,None)
+            rows=h.collect('siem',None,NOW,clock=lambda:NOW+12)
+            row=rows['b:management-pipeline']
+            self.assertEqual(row['codes'],[])
+            self.assertEqual(row['observed_at'],NOW+12)
+            self.assertEqual(row['metrics']['review_chat_poll_age_seconds'],1)
+            self.assertEqual(row['metrics']['review_chat_pending_jobs'],1)
+
     def test_review_channel_health_binds_running_process_and_pending_age(self):
         value={'pid':44,'process_start_ticks':55,'at':NOW,'last_poll':NOW,'pending':1,'oldest_pending_at':NOW-10}
         with patch.object(h,'read_file',return_value=(json.dumps(value).encode(),NOW)), \

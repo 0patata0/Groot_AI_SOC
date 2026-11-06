@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T04:26:59.357688+09:00",
+  "versions": {
+    "query": "1.19.108",
+    "common": "1.5.56",
+    "routing": "1.1.6",
+    "diagnostics": "1.2.8"
+  },
+  "source_sha256": {
+    "infra/mcp/runtime_health.py": "8cdc45637067bf9782b75a03e882dde274a16e338407e853799c6663e26d2fdc",
+    "infra/mcp/system_diagnostics.py": "7a3c6406323bb890cd8f4270ebd16700c80d72b37f49431d9bb0c16307d9e28c",
+    "infra/mcp/system-diagnostics-mcp.py": "98bfc40d39ec13af03ed70f491fe95c3134e86ccd13f13ad5b2a06746c932065",
+    "infra/mcp/test_runtime_health.py": "11715a40b7334006be01d9ec60d854c05aaf0a25e0a594fe5da2925be3e2ae01",
+    "infra/mcp/test_system_diagnostics.py": "77d23ab3a80a7d85b30bb68ac1859e0d78270c1df43a616c55c12467d0253c1f"
+  },
+  "validation": {
+    "unique_pass": 1380,
+    "skips": 0,
+    "profiles": {
+      "runtime": 33,
+      "time": 6,
+      "native": 473,
+      "service": 41,
+      "claims": 21,
+      "diagnostics": 67,
+      "sdk": 256,
+      "query": 391,
+      "peer": 72,
+      "installer": 20
+    },
+    "initial_fixture_missing_xml_errors": 2,
+    "corrected_fixture_runtime_pass": 33
+  },
+  "heartbeat_before": {
+    "samples": 6,
+    "false_rejections": 2,
+    "new_valid_heartbeat_after_batch_reference_seconds": [
+      5.489,
+      5.523
+    ]
+  },
+  "heartbeat_after": {
+    "samples": 6,
+    "false_rejections": 0,
+    "matching_process_identity": 6,
+    "complete_review_metrics": 6
+  },
+  "chat": [
+    {
+      "engine": "hermes",
+      "question": "관제 처리 대기 상태 보여줘",
+      "posted_at_kst": "2026-11-07T04:23:50.755000+09:00",
+      "chat_final_seconds": 17.099,
+      "actual_mcp_calls": 1,
+      "model_calls": 1,
+      "model_seconds": 3.442042,
+      "status": "completed",
+      "result_sha256": "eead84aca096a5cc258e2d321a414134768d00d3db34c66cc6f81c7c83c56491",
+      "observed_at_kst": "2026-11-07T04:23:12+09:00",
+      "age_seconds": 52,
+      "unknown_chat_metrics": false,
+      "writes": 0
+    },
+    {
+      "engine": "ollama",
+      "question": "관제 처리 대기 상태 보여줘",
+      "posted_at_kst": "2026-11-07T04:24:39.284000+09:00",
+      "chat_final_seconds": 17.192,
+      "actual_mcp_calls": 1,
+      "model_calls": 1,
+      "model_seconds": 9.484279870986938,
+      "status": "completed",
+      "result_sha256": "d8159ea4c9103a9c3da7d8bbc7c26d9bb4c9b902e30cd749dcab287d550f885f",
+      "observed_at_kst": "2026-11-07T04:24:15+09:00",
+      "age_seconds": 40,
+      "unknown_chat_metrics": false,
+      "writes": 0
+    }
+  ],
+  "deployment": {
+    "a_reader_confirmed": true,
+    "b_confirmed": true,
+    "a_final_confirmed": true,
+    "b_manifest_files": 22,
+    "b_protected_files": 8,
+    "sdk_sources": 20,
+    "stopped_config_db_bytes_equal": true,
+    "a_source_files": 2,
+    "c_changed": false,
+    "backups": [
+      "/var/lib/capstone-runtime-clock/20261107-a-reader",
+      "/var/lib/capstone-runtime-clock/20261107-r1",
+      "/var/lib/capstone-runtime-clock/20261107-a-final"
+    ]
+  },
+  "limits": [
+    "single_new_root_per_bot_with_recent_channel_context_retained",
+    "actual_fresh_tool_calls_verified_not_answer_cache",
+    "shared_gpu_and_model_cache_uncontrolled",
+    "not_average_or_p95",
+    "ui_rendering_not_checked",
+    "complex_correct_60s_incomplete",
+    "no_attack_load_training_or_new_os_install_test"
+  ],
+  "publication": {
+    "status": "pending"
+  },
+  "cleanup": {
+    "status": "pending"
+  }
+}

@@ -509,13 +509,14 @@ def collect_one(target, cfg, runner, now):
     return row
 
 
-def collect(role, runner, now):
+def collect(role, runner, now, clock=None):
     try: cfg = load_config(role)
     except (OSError, ValueError, KeyError):
         return {t: observation('runtime', now, codes=['runtime_not_configured'], unavailable=True) for t in ROLE_TARGETS[role]}
     def one(target):
-        try: return target, collect_one(target, cfg, runner, now)
+        observed = now if clock is None else int(clock())
+        try: return target, collect_one(target, cfg, runner, observed)
         except (OSError, ValueError, KeyError, TypeError, sqlite3.Error, http.client.HTTPException, TimeoutError):
-            return target, observation('runtime', now, codes=['runtime_collection_failed'], unavailable=True)
+            return target, observation('runtime', observed, codes=['runtime_collection_failed'], unavailable=True)
     with ThreadPoolExecutor(max_workers=4) as pool: rows = dict(pool.map(one, ROLE_TARGETS[role]))
-    return validate(rows, role, now)
+    return validate(rows, role, now if clock is None else int(clock()))

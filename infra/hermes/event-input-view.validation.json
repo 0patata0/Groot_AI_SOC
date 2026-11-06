@@ -105,7 +105,10 @@
   "new_os_install_tested": false,
   "native_bundle_projection_expanded": false,
   "publication": {
-    "pending": true
+    "source_commit": "2257a6c4695ad81e3b9d4dd71e99cddfbea8acad",
+    "remote_main_verified": true,
+    "source_paths_clean_after_push": true,
+    "receipt_followup_commit": true
   },
   "cleanup": {
     "server_files_removed": 912,

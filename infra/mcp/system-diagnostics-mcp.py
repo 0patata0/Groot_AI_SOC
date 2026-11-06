@@ -10,6 +10,7 @@ import re
 import stat
 import sys
 import syslog
+import threading
 import time
 import types
 
@@ -23,6 +24,7 @@ MAX_RESULT = 65536
 _library = None
 _queries = deque()
 _audits = deque()
+_rate_lock = threading.Lock()
 
 TIME_TOOL = {
     'name': 'calculate_time',
@@ -210,11 +212,12 @@ def remote_snapshot(host, config):
 def audit(outcome, target=None):
     # One short metadata record. No request body, errors, key material or logs.
     now = int(time.time())
-    while _audits and _audits[0] <= now - 60:
-        _audits.popleft()
-    if len(_audits) >= 60:
-        return
-    _audits.append(now)
+    with _rate_lock:
+        while _audits and _audits[0] <= now - 60:
+            _audits.popleft()
+        if len(_audits) >= 60:
+            return
+        _audits.append(now)
     row = {'event': 'system_diagnostics_query', 'outcome': outcome, 'at': now}
     if isinstance(target, str) and target in library().TARGETS:
         row['target'] = target
@@ -229,10 +232,11 @@ def query(value):
         target, _, _, limit = d.history_library().request(value, now)
     else:
         target, minutes, limit = arguments(value)
-    while _queries and _queries[0] <= now - 60:
-        _queries.popleft()
-    d.need(len(_queries) < 30, 'query_rate_limit')
-    _queries.append(now)
+    with _rate_lock:
+        while _queries and _queries[0] <= now - 60:
+            _queries.popleft()
+        d.need(len(_queries) < 30, 'query_rate_limit')
+        _queries.append(now)
     if historical:
         history = d.history_library()
         host = target[0]
@@ -382,7 +386,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.2.1'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.2.2'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':

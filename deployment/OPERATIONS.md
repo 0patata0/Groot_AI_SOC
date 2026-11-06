@@ -1,6 +1,6 @@
 # SOC 운영 절차
 
-11/6 현행 [보고 부정 표현·정상 단정 검사](../infra/hermes/health-claim-check.md): query1.19.72/common1.5.32/MCP1.2.1. 기존 deploy.sh source 복사·gate 렌더와 버전/SHA 결속을 사용하며 새 패키지·권한·포트·키·모델 변경0. 설치41 포함 고유1103검사·B10파일/보호7SHA 확인. 새 OS 전체 설치와 정확한30초 최종 보고는 미완료다. 아래 버전별 기록은 당시 검증 범위다.
+11/6 [복합 사건 읽기 묶음 후보](../infra/mcp/incident-evidence.md): `incident_evidence.py`를 기존 security-events 소스·SIEM preflight/해시/복사·B 보조 배포기의 백업/복구에 포함했다. 후보 security-events1.3.0/진단1.2.2이며 `INCIDENT_BUNDLE_ENABLED=False`로 기존6도구만 제공한다. 추가 deb/wheel/image·포트·키·설정 입력0. 고유169검사·비공개 실제 읽기는 완료했지만 Native/SDK/controller 근거 연결·최종30초·새OS전체설치는 미완료다. 운영 query1.19.72·security-events1.2.2·진단1.2.1은 이번 단위에서 변경하지 않았다. [직전 운영 확정](../infra/hermes/health-claim-check.md). 아래 날짜별 기록은 당시 범위다.
 
 11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
 

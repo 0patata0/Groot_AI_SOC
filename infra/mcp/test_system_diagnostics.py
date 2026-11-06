@@ -333,6 +333,23 @@ class RouterTests(unittest.TestCase):
             for _ in range(30): m.query({'target': 'b:soc-bot'})
             with self.assertRaisesRegex(d.DiagnosticError, 'rate_limit'): m.query({'target': 'b:soc-bot'})
 
+    def test_parallel_queries_keep_shared_thirty_per_minute_limit(self):
+        from concurrent.futures import ThreadPoolExecutor
+        value, _ = snapshot('siem', [])
+        def invoke(_):
+            try:
+                m.query({'target': 'b:soc-bot'})
+                return 'read'
+            except d.DiagnosticError as exc:
+                self.assertIn('rate_limit', str(exc))
+                return 'limited'
+        with patch.object(d, 'read_snapshot', return_value=value), patch.object(m.time, 'time', return_value=NOW), patch.object(m, 'audit'):
+            with ThreadPoolExecutor(max_workers=16) as pool:
+                results = list(pool.map(invoke, range(64)))
+        self.assertEqual(results.count('read'), 30)
+        self.assertEqual(results.count('limited'), 34)
+        self.assertEqual(len(m._queries), 30)
+
     def test_kst_rendering_uses_observed_epoch_and_preserves_original_fields(self):
         checked = 1792774726
         value, _ = snapshot('siem', [])

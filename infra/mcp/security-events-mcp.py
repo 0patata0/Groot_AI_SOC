@@ -33,6 +33,9 @@ MAX_LOOKBACK_MINUTES = 1440
 MAX_LIMIT = 50
 MAX_SCAN = 250
 MAX_RESPONSE_BYTES = 8 * 1024 * 1024
+# Staged capability: enable only with agent provenance/closure integration.
+# A prompt, tool argument or client environment cannot enable this route.
+INCIDENT_BUNDLE_ENABLED = False
 RULE_ID_RE = re.compile(r"^[0-9]{1,10}$")
 CONTROL_RE = re.compile(r"[\x00-\x1f\x7f]+")
 KST = timezone(timedelta(hours=9))
@@ -132,8 +135,15 @@ for _operation in ('get_web_service_target','search_web_access'):
         'annotations':{'readOnlyHint':True,'destructiveHint':False,'idempotentHint':True}})
 
 
-def web_read(operation,args):
-    path=Path(__file__).with_name('web_evidence_client.py')
+_fixed_modules = {}
+
+
+def fixed_module(filename):
+    if filename not in ('web_evidence_client.py', 'web_evidence.py', 'incident_evidence.py'):
+        raise ValueError('read_dependency_not_allowed')
+    if filename in _fixed_modules:
+        return _fixed_modules[filename]
+    path=Path(__file__).with_name(filename)
     for parent in (path.parent,*path.parent.parents):
         meta=parent.lstat()
         if not stat.S_ISDIR(meta.st_mode) or meta.st_uid!=0 or meta.st_mode&0o022:
@@ -144,9 +154,53 @@ def web_read(operation,args):
         if not stat.S_ISREG(meta.st_mode) or meta.st_uid!=0 or meta.st_nlink!=1 or meta.st_mode&0o022 or meta.st_size>131072:
             raise ValueError('web_reader_unsafe')
         raw=source.read(131073)
-    module=types.ModuleType('fixed_web_reader');module.__file__=str(path)
+    module=types.ModuleType('fixed_read_dependency');module.__file__=str(path)
     exec(compile(raw,str(path),'exec'),module.__dict__)
-    return module.call(operation,args)
+    _fixed_modules[filename] = module
+    return module
+
+
+def web_read(operation,args):
+    return fixed_module('web_evidence_client.py').call(operation,args)
+
+
+def collect_incident_evidence(args):
+    bundle = fixed_module('incident_evidence.py')
+    args = bundle.request(args)
+    # Load dependencies on this thread before parallel reads share them.
+    client = diagnostic = web = None
+    if args.get('diagnostics') or args.get('web_context'):
+        client = fixed_module('web_evidence_client.py')
+        diagnostic = client.diagnostics()
+        diagnostic.library()
+    if args.get('web_context'):
+        web = fixed_module('web_evidence.py')
+    kinds = {'search_modsecurity_alerts': 'modsecurity', 'search_suricata_alerts': 'suricata',
+             'search_wazuh_alerts': 'wazuh'}
+
+    def validate(name, arguments):
+        if name in kinds:
+            build_query(kinds[name], validate_args(kinds[name], arguments))
+        elif name == 'get_system_diagnostics':
+            if set(arguments) & {'since_kst', 'until_kst'}:
+                diagnostic.library().history_library().request(arguments, int(datetime.now(KST).timestamp()))
+            else:
+                diagnostic.arguments(arguments)
+        elif name in ('get_web_service_target', 'search_web_access'):
+            web.request({'operation': name, 'arguments': arguments})
+        else:
+            raise ValueError('bundle_read_not_allowed')
+
+    def read(name, arguments):
+        if name in kinds:
+            return search(kinds[name], arguments)
+        if name == 'get_system_diagnostics':
+            return diagnostic.query(arguments)
+        if name in ('get_web_service_target', 'search_web_access'):
+            return client.call(name, arguments)
+        raise ValueError('bundle_read_not_allowed')
+
+    return bundle.collect(args, read, validate)
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -707,6 +761,16 @@ def tool_text(value, is_error=False):
 
 
 def call_tool(name, args):
+    if name == 'collect_incident_evidence' and INCIDENT_BUNDLE_ENABLED:
+        try:
+            reply = tool_text(collect_incident_evidence(args))
+            # Include text escaping/envelope overhead in the actual wire bound.
+            # Oversize evidence must be re-read individually, never truncated.
+            if len(json.dumps(reply, ensure_ascii=False, allow_nan=False).encode()) > 127 * 1024:
+                raise ValueError('bundle_response_bound_use_individual_reads')
+            return reply
+        except ValueError as exc:return tool_text({'error':str(exc)},True)
+        except Exception:return tool_text({'error':'incident_evidence_unavailable'},True)
     if name in ('get_web_service_target','search_web_access'):
         try:return tool_text(web_read(name,args))
         except ValueError as exc:return tool_text({'error':str(exc)},True)
@@ -732,14 +796,15 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if isinstance(requested, str) and requested in SUPPORTED_PROTOCOLS else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.2.2"},
+            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.3.0"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None
     if method == "ping":
         return {"jsonrpc": "2.0", "id": mid, "result": {}}
     if method == "tools/list":
-        return {"jsonrpc": "2.0", "id": mid, "result": {"tools": TOOLS}}
+        return {"jsonrpc": "2.0", "id": mid, "result": {"tools": [*TOOLS,
+            *([fixed_module('incident_evidence.py').tool()] if INCIDENT_BUNDLE_ENABLED else [])]}}
     if method == "tools/call":
         params = _obj(message.get("params"))
         result = call_tool(params.get("name"), params.get("arguments", {}))

@@ -1,6 +1,6 @@
 # 패키지·이미지·배포 자료 준비
 
-11/6 현행 [보고 부정 표현·정상 단정 검사](../infra/hermes/health-claim-check.md): query1.19.72/common1.5.32/MCP1.2.1. 기존 deploy.sh source 복사·gate 렌더와 버전/SHA 결속을 사용하며 새 패키지·권한·포트·키·모델 변경0. 설치41 포함 고유1103검사·B10파일/보호7SHA 확인. 새 OS 전체 설치와 정확한30초 최종 보고는 미완료다. 아래 버전별 기록은 당시 검증 범위다.
+11/6 [복합 사건 읽기 묶음 후보](../infra/mcp/incident-evidence.md): `incident_evidence.py`를 기존 security-events 소스·SIEM preflight/해시/복사·B 보조 배포기의 백업/복구에 포함했다. 후보 security-events1.3.0/진단1.2.2이며 `INCIDENT_BUNDLE_ENABLED=False`로 기존6도구만 제공한다. 추가 deb/wheel/image·포트·키·설정 입력0. 고유169검사·비공개 실제 읽기는 완료했지만 Native/SDK/controller 근거 연결·최종30초·새OS전체설치는 미완료다. 운영 query1.19.72·security-events1.2.2·진단1.2.1은 이번 단위에서 변경하지 않았다. [직전 운영 확정](../infra/hermes/health-claim-check.md). 아래 날짜별 기록은 당시 범위다.
 
 11/4 웹 읽기 반입 소스: `deployment/web_access_deploy.py`, `deployment/soc_diagnostics.py`, `deployment/roles/siem.sh`, `infra/mcp/web_evidence.py`, `read-web-evidence.py`, `web_evidence_client.py`, `security-events-mcp.py`와 공통 read_contract/grounding/query/worker를 같은 source archive에 포함한다. 기존 Python 표준 라이브러리·OpenSSH·systemd·C Wazuh 그룹을 사용하고 새 deb/wheel/image0이다. C 전용 reader와 root publisher를 설치하며 private key는 B에 유지한다. [권한·소스/복구·실제 검증](../infra/mcp/web-evidence.md).
 

@@ -384,8 +384,16 @@ class SecurityEventsMcpTests(unittest.TestCase):
             {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
             {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "search_modsecurity_alerts", "arguments": {"limit": 1000}}},
         ]
+        # The production loader requires root-owned dependencies. The protocol
+        # fixture explicitly injects the local helper, without weakening it.
+        fixture = (
+            "import importlib.util,sys; from pathlib import Path; "
+            "p=Path(sys.argv[1]); sys.path.insert(0,str(p.parent)); "
+            "import incident_evidence; s=importlib.util.spec_from_file_location('events',p); "
+            "m=importlib.util.module_from_spec(s); s.loader.exec_module(m); "
+            "m._fixed_modules['incident_evidence.py']=incident_evidence; m.INCIDENT_BUNDLE_ENABLED=True; m.main()")
         proc = subprocess.run(
-            [sys.executable, str(SERVER)],
+            [sys.executable, '-B', '-c', fixture, str(SERVER)],
             input="".join(json.dumps(msg) + "\n" for msg in messages),
             text=True, capture_output=True, check=True,
         )
@@ -393,8 +401,37 @@ class SecurityEventsMcpTests(unittest.TestCase):
         self.assertEqual([row["id"] for row in lines], [1, 2, 3])
         self.assertEqual({tool["name"] for tool in lines[1]["result"]["tools"]},
                          {"search_suricata_alerts", "search_modsecurity_alerts", "get_wazuh_sca_checks", "search_wazuh_alerts",
-                          "get_web_service_target", "search_web_access"})
+                          "get_web_service_target", "search_web_access", "collect_incident_evidence"})
         self.assertTrue(lines[2]["result"]["isError"])
+
+    def test_bundle_is_not_advertised_or_callable_before_agent_integration(self):
+        self.assertFalse(module.INCIDENT_BUNDLE_ENABLED)
+        with patch.object(module, 'fixed_module') as dependency:
+            result = module.handle({'id': 1, 'method': 'tools/list'})
+            self.assertEqual(len(result['result']['tools']), 6)
+            self.assertNotIn('collect_incident_evidence', {t['name'] for t in result['result']['tools']})
+            self.assertIsNone(module.call_tool('collect_incident_evidence', {}))
+            dependency.assert_not_called()
+
+    def test_bundle_wire_size_includes_json_escaping_and_refuses_instead_of_truncating(self):
+        with patch.object(module, 'INCIDENT_BUNDLE_ENABLED', True), \
+             patch.object(module, 'collect_incident_evidence', return_value={'text': '"'*70000}):
+            reply = module.call_tool('collect_incident_evidence', {})
+        self.assertTrue(reply['isError'])
+        self.assertEqual(json.loads(reply['content'][0]['text'])['error'], 'bundle_response_bound_use_individual_reads')
+
+    def test_event_only_bundle_does_not_require_web_or_diagnostics_dependency(self):
+        import incident_evidence
+        args = {'events': [{'sensor': 'suricata', 'arguments': {
+            'source_ip': '192.0.2.1', 'since_kst': '2026-11-05T19:11:00+09:00',
+            'until_kst': '2026-11-05T19:11:59+09:00', 'limit': 10}}]}
+        with patch.object(module, 'fixed_module', return_value=incident_evidence) as dependency, \
+             patch.object(module, 'build_query'), \
+             patch.object(module, 'search', return_value={'alerts': []}) as read:
+            result = module.collect_incident_evidence(args)
+        self.assertTrue(result['execution_complete'])
+        dependency.assert_called_once_with('incident_evidence.py')
+        read.assert_called_once_with('suricata', args['events'][0]['arguments'])
 
 
 if __name__ == "__main__":

@@ -1,14 +1,15 @@
 #!/bin/bash
 # Groot_B: 기존 mcp 계정/ForceCommand를 유지하며 보안 이벤트 읽기 MCP 서버를 추가한다.
 # 기존 B 내부 보조 배포기. 최초 설치 진입점은 루트 deploy.sh.
-# 네 소스는 같은 반입 디렉터리에 두며 C 웹 읽기 준비는 별도 검증한다.
-# 두 입력 파일은 미리 검토해 B로 반입한다. 비밀 파일 수정, sshd/Hermes 재시작 없음.
+# 읽기 소스는 같은 반입 디렉터리에 두며 C 웹 읽기 준비는 별도 검증한다.
+# 입력 파일은 미리 검토해 B로 반입한다. 비밀 파일 수정, sshd/Hermes 재시작 없음.
 set -euo pipefail
 
 EVENTS_SRC=${1:-/tmp/security-events-mcp.py}
 WRAP_SRC=${2:-/tmp/run-wazuh-ro.sh}
 CORE_SRC=${3:-$(dirname "$EVENTS_SRC")/web_evidence.py}
 CLIENT_SRC=${4:-$(dirname "$EVENTS_SRC")/web_evidence_client.py}
+BUNDLE_SRC=${5:-$(dirname "$EVENTS_SRC")/incident_evidence.py}
 EVENTS=/opt/mcp/security-events-mcp.py
 WRAP=/opt/mcp/run-wazuh-ro.sh
 STAGE=
@@ -17,6 +18,7 @@ MODIFIED=0
 HAD_EVENTS=0
 HAD_CORE=0
 HAD_CLIENT=0
+HAD_BUNDLE=0
 
 die() { echo "deploy_security_events_B: $*" >&2; exit 1; }
 cleanup() {
@@ -32,7 +34,7 @@ cleanup() {
     else
       rm -f "$EVENTS" || restored=0
     fi
-    for entry in "web_evidence.py:$HAD_CORE" "web_evidence_client.py:$HAD_CLIENT"; do
+    for entry in "web_evidence.py:$HAD_CORE" "web_evidence_client.py:$HAD_CLIENT" "incident_evidence.py:$HAD_BUNDLE"; do
       name=${entry%:*}; existed=${entry##*:}
       if [ "$existed" -eq 1 ]; then
         cp -a "$BACKUP/$name" "$STAGE/$name.restore" && mv -f "$STAGE/$name.restore" "/opt/mcp/$name" || restored=0
@@ -56,7 +58,7 @@ trap 'exit 1' HUP INT TERM
 [ -d /opt/mcp ] && id mcp >/dev/null 2>&1 && getent group mcp >/dev/null || die "기존 /opt/mcp 및 mcp 계정/그룹이 필요합니다"
 [ -f "$WRAP" ] && [ ! -L "$WRAP" ] && [ -x /opt/mcp/mcp-server-wazuh ] || die "기존 Wazuh MCP 배치를 확인하세요"
 [ -r /etc/mcp/wazuh-ro.env ] && [ -x /usr/bin/python3 ] && command -v runuser >/dev/null || die "기존 env, Python 또는 runuser가 없습니다"
-for src in "$EVENTS_SRC" "$WRAP_SRC" "$CORE_SRC" "$CLIENT_SRC"; do
+for src in "$EVENTS_SRC" "$WRAP_SRC" "$CORE_SRC" "$CLIENT_SRC" "$BUNDLE_SRC"; do
   [ -f "$src" ] && [ ! -L "$src" ] || die "일반 파일이 아닙니다: $src"
 done
 
@@ -65,7 +67,8 @@ install -o root -g mcp -m 0750 "$EVENTS_SRC" "$STAGE/security-events-mcp.py"
 install -o root -g mcp -m 0750 "$WRAP_SRC" "$STAGE/run-wazuh-ro.sh"
 install -o root -g mcp -m 0640 "$CORE_SRC" "$STAGE/web_evidence.py"
 install -o root -g mcp -m 0640 "$CLIENT_SRC" "$STAGE/web_evidence_client.py"
-/usr/bin/python3 -B -c 'import ast,sys; [ast.parse(open(p).read(),filename=p) for p in sys.argv[1:]]' "$STAGE/web_evidence.py" "$STAGE/web_evidence_client.py"
+install -o root -g mcp -m 0640 "$BUNDLE_SRC" "$STAGE/incident_evidence.py"
+/usr/bin/python3 -B -c 'import ast,sys; [ast.parse(open(p).read(),filename=p) for p in sys.argv[1:]]' "$STAGE/web_evidence.py" "$STAGE/web_evidence_client.py" "$STAGE/incident_evidence.py"
 bash -n "$STAGE/run-wazuh-ro.sh" || die "래퍼 구문 오류"
 grep -Fq 'SSH_ORIGINAL_COMMAND:-}" = security-events' "$STAGE/run-wazuh-ro.sh" || die "래퍼에 security-events 분기가 없습니다"
 grep -Fq 'exec "$BIN"' "$STAGE/run-wazuh-ro.sh" || die "래퍼에 기존 바이너리 경로가 없습니다"
@@ -95,7 +98,7 @@ except (ValueError, KeyError, StopIteration, TypeError) as exc:
     raise SystemExit("MCP %s protocol failed: %s" % (mode, type(exc).__name__))
 if names != {"search_suricata_alerts", "search_modsecurity_alerts", "search_wazuh_alerts", "get_wazuh_sca_checks", "get_web_service_target", "search_web_access"}:
     raise SystemExit("MCP %s exposed unexpected tools" % mode)
-print("MCP %s check: 6 read-only tools" % mode)
+print("MCP %s check: %d read-only tools" % (mode, len(names)))
 PY
 }
 check_tools "$STAGE/security-events-mcp.py" direct
@@ -107,11 +110,11 @@ if [ -e "$EVENTS" ]; then
   cp -a "$EVENTS" "$BACKUP/security-events-mcp.py"
   HAD_EVENTS=1
 fi
-for name in web_evidence.py web_evidence_client.py; do
+for name in web_evidence.py web_evidence_client.py incident_evidence.py; do
   if [ -e "/opt/mcp/$name" ]; then
     [ -f "/opt/mcp/$name" ] && [ ! -L "/opt/mcp/$name" ] || die "기존 보조 소스가 일반 파일이 아닙니다"
     cp -a "/opt/mcp/$name" "$BACKUP/$name"
-    if [ "$name" = web_evidence.py ]; then HAD_CORE=1; else HAD_CLIENT=1; fi
+    case "$name" in web_evidence.py) HAD_CORE=1;; web_evidence_client.py) HAD_CLIENT=1;; incident_evidence.py) HAD_BUNDLE=1;; esac
   fi
 done
 
@@ -119,6 +122,7 @@ done
 MODIFIED=1
 mv -f "$STAGE/web_evidence.py" /opt/mcp/web_evidence.py
 mv -f "$STAGE/web_evidence_client.py" /opt/mcp/web_evidence_client.py
+mv -f "$STAGE/incident_evidence.py" /opt/mcp/incident_evidence.py
 mv -f "$STAGE/security-events-mcp.py" "$EVENTS"
 mv -f "$STAGE/run-wazuh-ro.sh" "$WRAP"
 

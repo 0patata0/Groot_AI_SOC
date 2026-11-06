@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.34'
+VERSION = 'soc-chat-contract:1.5.35'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90

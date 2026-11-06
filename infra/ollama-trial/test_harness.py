@@ -70,6 +70,15 @@ class Grounding(unittest.TestCase):
         p = harness.read_plan('현재 활성 Wazuh 에이전트 목록을 보여줘')
         self.assertEqual(p['states'], ['active'])
         self.assertEqual(harness.read_plan('현재 비활성 Wazuh 에이전트 목록을 보여줘'), None)
+    def test_first_event_filters_share_the_native_explicit_evidence_boundary(self):
+        name='mcp__security_events__search_wazuh_alerts'
+        schema={'type':'object','additionalProperties':False,'properties':{'wazuh_rule_id':{'type':'string'},'source_ip':{'type':'string'},'agent_id':{'type':'string'}},'required':[]}
+        out=harness.refine_read_schemas('systemd 경보 원인 조사',{name:schema},[])
+        self.assertEqual(out[name]['properties'],{})
+        out=harness.refine_read_schemas('규칙 100120 agent ID 007 출발지 192.0.2.44 경보',{name:schema},[])
+        for key,val in [('wazuh_rule_id','100120'),('agent_id','007'),('source_ip','192.0.2.44')]:self.assertEqual(out[name]['properties'][key]['enum'],[val])
+        self.assertEqual(set(schema['properties']),{'wazuh_rule_id','source_ip','agent_id'})
+
     def test_structured_read_selection_never_offers_protected_tools(self):
         with self.assertRaises(ValueError):
             harness.selection_schema({'mcp__rule_write_a__propose_rule_edit': {'type': 'object'}}, 3)

@@ -100,12 +100,12 @@ class EventTimeContract(unittest.TestCase):
         a = agent(); a.valid_tool_names = {name}
         r = request(); r['tools'] = [{'type': 'function', 'function': {'name': name, 'parameters': schema}}]
         env = {'CAPSTONE_MANAGEMENT_MODE': 'verify', 'CAPSTONE_CHAT_READ_JSON': json.dumps({
-            'request': '오늘 경보 조회', 'background': '', 'tools': [name],
+            'request': '과거 경보 조회', 'background': '', 'tools': [name],
             'requested_at_kst': '2026-11-06T12:00:00+09:00'})}
         with patch.dict(gate.os.environ, env, clear=True):
             out = gate.management_read_request(r, a, pending=True)
         lease = a._capstone_management_selection
-        self.assertEqual(lease['catalog'][name], schema)
+        self.assertEqual(lease['catalog'][name], gate.initial_event_filter_schema(name,schema,'과거 경보 조회'))
         selected = out['response_format']['json_schema']['schema']
         for args, valid in ((dict(TIMES), False),
                             ({k: TIMES[k] for k in ('since_kst', 'until_kst')}, True)):

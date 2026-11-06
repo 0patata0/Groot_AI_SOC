@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "versions": {
+    "query": "1.19.79",
+    "common": "1.5.35",
+    "security_events": "1.3.2"
+  },
+  "tests": {
+    "native": 469,
+    "sdk": 233,
+    "query": 391,
+    "mcp": 82,
+    "installer": 43,
+    "review": 69,
+    "total_unique_pass": 1287,
+    "skipped": 0
+  },
+  "chat": {
+    "request": "오늘 systemd 경보와 지금 서버 상태를 대조해줘. 설정은 바꾸지 마.",
+    "e2e_seconds": 95.209,
+    "progress_seconds": 0.82,
+    "first_selection_seconds": 12.920023,
+    "mcp_milliseconds": [
+      50,
+      1017
+    ],
+    "post_tool_to_native_final_seconds": 66.931,
+    "quality_pass": false,
+    "issues": [
+      "missing_b_c_current_diagnostics",
+      "collector_to_host_misattribution",
+      "failed_zero_health_recovery_overclaim"
+    ],
+    "sample_size": 1,
+    "ui_render_retested": false
+  },
+  "private_candidate_adopted": false,
+  "production_inference_profile_changed": false,
+  "deployment": {
+    "files": 15,
+    "protected_sha_count": 8,
+    "applied_at_kst": "2026-11-06T20:13:57+09:00",
+    "confirmed_at_kst": "2026-11-06T20:18:19+09:00",
+    "rollback": "confirmed_noop",
+    "new_os_install_test": false
+  },
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "cc9d652d38bae29d6370c380598799633e56398931d838802463d6212efa413b",
+    "infra/hermes/chat_contract.py": "410e92af92785cac427cb05cfc04c4ce000cc7f3ad6083d9bea7dce37ba7797c",
+    "infra/hermes/query-completion/__init__.py": "9ff9841b556471964f844556b9750b7bc082f4c02c4b9bc5b549673508af656a",
+    "infra/hermes/query-completion/plugin.yaml": "8bd5820b80af1db2785c4c0720ffe810a41a835d368b6d5edf10ff89bc094f7d",
+    "infra/hermes/test_event_time_contract.py": "986b13a198626be35cfa6e87a3f4e1c5faf9cf96adecf65c22ce49f0a1ee7ecf",
+    "infra/hermes/test_soc_management_chat_scope.py": "0b4dd56d13a6be88e9d0507986f2293e954fbce03565637b64c1fb612053d683",
+    "infra/mcp/security-events-mcp.py": "ca374b65d6f7e531c74baf5df216cb3681aba52a3fa8aa2a94b5c71e417e05f3",
+    "infra/mcp/test_wazuh_event_search.py": "d899cf2333f5454a8d08a61f3892d6d528ef9ce487a5d87cff83bdd259d9fdb2",
+    "infra/ollama-trial/harness.py": "29644ccd697fa881b1bc18019161666e8df85c3465ecf8626e7b5060886e21e4",
+    "infra/ollama-trial/test_harness.py": "59801b8bb2770eedb4ee9c7525ce6a998ac641bfefa87f694920c88c5cb9a5ff"
+  },
+  "publication": {
+    "source_commit": null,
+    "remote_verified": false
+  },
+  "private_r6": {
+    "seconds": 84.19116847380064,
+    "e2e": false,
+    "mcp_calls": 4,
+    "quality_pass": false,
+    "production_unchanged": true,
+    "scope_test_methods": 1,
+    "scope_conditions": 3,
+    "issues": [
+      "initial_host_time_recovery_claim_errors",
+      "final_negative_health_statement_false_positive"
+    ]
+  },
+  "final_health": {
+    "at_kst": "2026-11-06T20:32:32+09:00",
+    "runtime_hashes_verified": 15,
+    "protected_hashes_verified": 8,
+    "both_bot_websockets_and_workers": true,
+    "active_services": 4,
+    "b_failed_units": 0,
+    "own_stdin_probes": 0
+  },
+  "cleanup": {
+    "server_fixture_files": 906,
+    "server_candidate_files": 12,
+    "server_removed_bytes": 15444983,
+    "mac_files": 61,
+    "mac_bytes": 10773269,
+    "mac_removed_verified": true,
+    "runtime_db_trace_backups_preserved": true
+  }
+}

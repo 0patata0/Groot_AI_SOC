@@ -1,6 +1,6 @@
 # MCP 계층 — 에이전트/LLM 교체가 쉬운 구조 (pluggable agent)
 
-현재 security-events1.3.1/query78/common1.5.34는 [시간 인자 규격](event-time-contract.md)을 맞춘다. 시작+종료와 상대 구간을 구분하며 MCP·양봇 선택·실행 검사의32조합 및 실제4조회가 일치했다.7읽기/권한/쿼리 동작·진단1.2.2는 유지한다. 모델 복합 보고30초는 미완료다. [이전1.3.0 읽기 묶음](../hermes/incident-bundle.md).
+현재 security-events1.3.2/query79/common1.5.35는 [시간·필터 보완](../hermes/chat-read-scope.md)을 반영한다. `search_wazuh_alerts(program_name="systemd")`는 `predecoder.program_name` 정확 검색이며 자유 DSL이 아니다. 적용 필터와 프로그램명을 반환하고7읽기·권한·진단1.2.2를 유지한다. 이전32조합은 등록/SDK 검증이었고, 최종 Native provider의 제약 손실은79에서 별도로 수정·40조합 검사했다. 고유1,287PASS; 복합 실제 채팅95.209초/품질 실패로60초 목표는 미완료다.
 
 2026-11-06: 기존 진단 MCP가 과거 사건의 정확한 KST 구간도 읽는다. 제한된 오류 색인이며 현재 상태/전체 journal과 구분한다. [설치·권한·실측·공백](journal-history.md).
 

@@ -14,6 +14,20 @@ class HistoricalWazuh(unittest.TestCase):
         for bad in ({'query':{}},{'command':'restart'},{'agent_id':'../root'},{'wazuh_rule_id':'*'}):
             with self.assertRaises(ValueError):M.validate_args('wazuh',bad)
 
+    def test_program_filter_is_exact_bounded_and_never_query_syntax(self):
+        args=M.validate_args('wazuh',{'program_name':'systemd','limit':3})
+        q=M.build_query('wazuh',args)
+        self.assertIn({'term':{'predecoder.program_name':'systemd'}},q['query']['bool']['filter'])
+        self.assertEqual(q['size'],3);self.assertFalse(q['track_total_hits'])
+        for value in ('*','systemd OR sshd','../systemd','x'*65,True,None,{'query':'x'}):
+            with self.assertRaises(ValueError):M.validate_args('wazuh',{'program_name':value})
+        for kind in ('suricata','modsecurity'):
+            with self.assertRaises(ValueError):M.validate_args(kind,{'program_name':'systemd'})
+        with patch.object(M,'indexer_search',return_value={'hits':{'hits':[]}}):
+            result=M.search('wazuh',{'program_name':'systemd'})
+        self.assertEqual(result['applied_filters'],{'program_name':'systemd'})
+        self.assertIsNone(result['indexed_window_total_count'])
+
     def test_unit_and_exit_are_projected_without_raw_log_or_command(self):
         value=M.summarize_wazuh({'timestamp':'2026-10-31T04:55:47Z','rule':{'id':'40704','description':'Service exited','level':5},
             'agent':{'id':'001','name':'host'},'full_log':'systemd[1]: example.service: Main process exited, code=exited, status=1/FAILURE secret_token=DO_NOT_EXPORT'})

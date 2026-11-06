@@ -98,6 +98,7 @@ _wazuh_schema=copy.deepcopy(TOOLS[0]['inputSchema'])
 _wazuh_schema['properties'].pop('signature_id')
 _wazuh_schema['properties'].update({
     'wazuh_rule_id':{'type':'string','pattern':'^[0-9]{1,10}$','description':'Exact Wazuh rule ID, not a sensor SID'},
+    'program_name':{'type':'string','pattern':'^[A-Za-z0-9_][A-Za-z0-9_.@-]{0,63}$','description':'Exact recorded syslog program (predecoder.program_name), e.g. systemd or sshd. Use systemd for service-failure alerts without guessing a rule ID. This is not a service unit, IP address or free-text query.'},
     'agent_id':{'type':'string','pattern':'^[0-9]{3,8}$'}})
 TOOLS.append({'name':'search_wazuh_alerts',
     'description':'Read historical Wazuh alerts in an exact KST interval, optionally by Wazuh rule ID, agent ID or source IP. Includes bounded rule description, decoder, service unit and exit status when recorded. Does not return raw logs, commands or credentials; it cannot prove recovery or attack success. limit 1..50, interval at most 24 hours and end at most 90 days old.',
@@ -404,7 +405,7 @@ def validate_args(kind, args):
     allowed = {"lookback_minutes", "limit", "source_ip", "until_kst", "since_kst"}
     id_key = {'suricata':'signature_id','modsecurity':'rule_id','wazuh':'wazuh_rule_id'}[kind]
     allowed.add(id_key)
-    if kind=='wazuh':allowed.add('agent_id')
+    if kind=='wazuh':allowed.update(('agent_id','program_name'))
     unknown = set(args) - allowed
     if unknown:
         raise ValueError("unsupported argument: %s" % sorted(unknown)[0])
@@ -444,6 +445,10 @@ def validate_args(kind, args):
     if 'agent_id' in args:
         if not isinstance(args['agent_id'],str) or not re.fullmatch('[0-9]{3,8}',args['agent_id']):raise ValueError('invalid agent_id')
         out['agent_id']=args['agent_id']
+    if 'program_name' in args:
+        if not isinstance(args['program_name'],str) or not re.fullmatch(r'[A-Za-z0-9_][A-Za-z0-9_.@-]{0,63}',args['program_name']):
+            raise ValueError('invalid program_name')
+        out['program_name']=args['program_name']
     return out
 
 
@@ -478,7 +483,7 @@ def build_query(kind, args, at=None):
     if kind == "suricata" and "signature_id" in args:
         filters.append({"term": {"data.alert.signature_id": args["signature_id"]}})
     if kind=='wazuh':
-        for arg,field in [('wazuh_rule_id','rule.id'),('agent_id','agent.id')]:
+        for arg,field in [('wazuh_rule_id','rule.id'),('agent_id','agent.id'),('program_name','predecoder.program_name')]:
             if arg in args:filters.append({'term':{field:args[arg]}})
     # A WAF rule ID may live in Wazuh's string-flattened messages array. Avoid
     # a mapping-dependent text query; inspect a capped set and filter exact IDs.
@@ -721,6 +726,7 @@ def summarize_wazuh(source):
             'agent_id':_scalar(agent.get('id'),8),'wazuh_rule_id':_scalar(rule.get('id'),16),
             'wazuh_rule_description':_scalar(rule.get('description'),240),'wazuh_level':_scalar(rule.get('level'),8),
             'decoder':_scalar(_obj(source.get('decoder')).get('name'),80),
+            'program_name':_scalar(_obj(source.get('predecoder')).get('program_name'),64),
             'source_ip':_scalar(data.get('srcip') or data.get('src_ip'),64),
             'destination_ip':_scalar(data.get('dstip'),64),'service_units':list(dict.fromkeys(units))[:4],
             'exit_status':({'code':exit_status[1],'status':exit_status[2],'label':exit_status[3]} if exit_status else None),
@@ -748,6 +754,7 @@ def search(kind, args):
             break
     return {
         "source": kind, "lookback_minutes": params["lookback_minutes"],
+        "applied_filters": {k:params[k] for k in ('source_ip','wazuh_rule_id','signature_id','rule_id','agent_id','program_name') if k in params},
         "window_mode": "explicit_bounds" if "since_kst" in params else "lookback",
         "requested_since_kst": _kst_timestamp(query["query"]["bool"]["filter"][0]["range"]["timestamp"]["gte"]),
         "requested_until_kst": _kst_timestamp(query["query"]["bool"]["filter"][0]["range"]["timestamp"]["lte"]),
@@ -815,7 +822,7 @@ def handle(message):
         return {"jsonrpc": "2.0", "id": mid, "result": {
             "protocolVersion": requested if isinstance(requested, str) and requested in SUPPORTED_PROTOCOLS else PROTOCOL,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.3.1"},
+            "serverInfo": {"name": "capstone-security-events-mcp", "version": "1.3.2"},
         }}
     if method in ("notifications/initialized", "notifications/cancelled"):
         return None

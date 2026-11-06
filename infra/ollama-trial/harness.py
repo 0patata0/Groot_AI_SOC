@@ -1966,6 +1966,10 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    if not calls:
+        requested_at=datetime.now(timezone(timedelta(hours=9))).isoformat()
+        result={name:EVIDENCE.initial_event_filter_schema(name,schema,question,requested_at)
+                for name,schema in result.items()}
     if EVIDENCE.incident_investigation_request(normalized(question)) and not READ.wants_write(question):
         known_agents = set(re.findall(r'(?:agent[_ ]?id|에이전트\s*ID)\s*[:=]?\s*[`\'\"]?(\d{3,8})(?!\d)', question, re.I))
         for call in calls:

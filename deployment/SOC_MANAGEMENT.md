@@ -1,6 +1,6 @@
 # 초기 설치의 승인형 SOC 관리 확장
 
-현재 운영은 query1.19.77/common1.5.34·security-events1.3.0/진단1.2.2다. 새 읽기 전용 채팅은 LLM이 실제 도구·인자를 선택하고 Native가 MCP를 실행한다. 누락·오류·현재 turn/인자/응답 SHA 검사를 통과한 순수 조회만 공통 표로 완성해 추가 모델 재서술을 생략한다. 과거/원인/위험 판단·교차검토·쓰기는 일반 조사와 승인 경계를 유지한다. 기존 source_bundle/불변 gate/공통 계약 복사 경로를 사용하며 추가 패키지·포트·권한은 없다. 고유1,198검사·실제 채팅20.877/17.139초와 복합 조사 미완료 범위는 [조회 지연 검증](../infra/hermes/chat-read-latency.md), 현재 상태는 [STATUS](../STATUS.md)를 따른다.
+현재 query1.19.79/common1.5.35·security-events1.3.2는 [채팅 조회 범위·입력 규격](../infra/hermes/chat-read-scope.md)을 보완했다. Native 최종 요청의 시간 제약을 복원하고, 근거 없는 초기 ID/IP 필터를 제한하며 ‘오늘’을 KST 당일로 연결한다. Wazuh는 `program_name=systemd` 정확 검색을 지원한다. 고유1,287회귀PASS·skip0, 운영15파일/보호8SHA와 실제 MCP 조회를 확인했다. 복합 실제 채팅은95.209초이고 대상 누락·호스트 오인·건강 과장으로 품질 실패다. 사용자가 조정한60초 안팎의 목표도 아직 미달이다. 단일deploy.sh·기존 source_bundle 복사 경로를 사용하며 추가 패키지/포트/키/권한은 없다. 새 OS 전체 설치는 미실행이며 아래 버전별 기록은 당시 범위다.
 
 > 이전 후보 단계의 기록: 11/6 [복합 사건 읽기 묶음 후보](../infra/mcp/incident-evidence.md): `incident_evidence.py`를 기존 security-events 소스·SIEM preflight/해시/복사·B 보조 배포기의 백업/복구에 포함했다. 후보 security-events1.3.0/진단1.2.2이며 `INCIDENT_BUNDLE_ENABLED=False`로 기존6도구만 제공한다. 추가 deb/wheel/image·포트·키·설정 입력0. 고유169검사·비공개 실제 읽기는 완료했지만 Native/SDK/controller 근거 연결·최종30초·새OS전체설치는 미완료다. 운영 query1.19.72·security-events1.2.2·진단1.2.1은 이번 단위에서 변경하지 않았다. [직전 운영 확정](../infra/hermes/health-claim-check.md). 아래 날짜별 기록은 당시 범위다.
 

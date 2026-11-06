@@ -193,6 +193,9 @@
     "server": "No source, scripts, packages or runtime files staged; probes ran from SSH/stdin. Existing service logs are operational audit, not temporary package files."
   },
   "publication": {
-    "status": "pending commit/push"
+    "status": "measurement documents committed and pushed; receipt update committed separately",
+    "source_commit": "0577808afef45d5bf2bd33fe9f0915bea655756a",
+    "remote_main_confirmed": "0577808afef45d5bf2bd33fe9f0915bea655756a",
+    "verified_at_kst": "2026-11-06T12:59:35.702416+09:00"
   }
 }

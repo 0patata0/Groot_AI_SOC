@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.38'
+VERSION = 'soc-chat-contract:1.5.39'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -69,7 +69,10 @@ QUERY_SECTIONS = {
         "파일 설정/Apache active는 프런트 WAF 경로 적재나 Java 등 프록시 앱 정상 증명이 아닙니다. active는 프로세스 실행 상태로만 쓰고 정상이라는 평가를 덧붙이지 않습니다. 필요한 c:apache·c:collection 진단과 실제 agent_id의 사건/후속 경보도 조회하고 부족한 근거는 남깁니다."
     ),
     '호스트 진단': (
-        "get_system_diagnostics는 최근 고정 스냅샷이며 과거 journal의 임의 구간 조회가 아닙니다. "
+        "get_system_diagnostics는 시간 인자 없이 현재 스냅샷을, 등록된 systemd 서비스 target에 since_kst/until_kst를 함께 주면 과거 정제 오류 메타데이터를 조회합니다. "
+        "과거 조회는 최근30일 내 최대24시간이며 lookback_minutes를 섞지 않습니다. target 설명의 실제 unit 대응을 사용하고 이름이 비슷한 다른 서비스를 대신 조회하지 않습니다. "
+        "과거 실패 원인과 현재 상태를 함께 물으면 같은 서비스의 과거 구간과 현재 스냅샷을 각각 읽습니다. 서로 독립된 읽기는 함께 선택할 수 있습니다. "
+        "journal_history에는 현재 상태가 없으며 history_coverage/publisher_stale/has_more와 표본 범위를 보고합니다. exit1/exit-code만으로 세부 원인을 추정하지 않습니다. "
         "A/B/C 전체 요청은 실제 enum의 해당 대상을 빠짐없이 조회합니다. a:systemd/b:systemd/c:systemd는 현재 failed unit 목록이며 "
         "0개가 과거 장애 없음·모든 서비스 정상이라는 뜻은 아닙니다. ExecMainCode와 ExitStatus·Result를 구분하고 "
         "성공한 oneshot의 inactive/dead만으로 재시작을 권하지 않습니다. 오류 표본과 전체 건수·현재 상태를 구분합니다. "

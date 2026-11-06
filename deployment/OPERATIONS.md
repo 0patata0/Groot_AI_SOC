@@ -1,6 +1,6 @@
 # SOC 운영 절차
 
-현재 query1.19.82/common1.5.38·security-events1.3.2의 [systemd 이력·현재 비교](../infra/hermes/systemd-comparison.md)는 실제 모델이 오늘 경보와 A/B/C를 조회한 뒤 검증된 표로 바로 완성한다. 새 Mattermost 질문→최종 답변은 Hermes25.532초/진행0.907초, Ollama16.746초/진행0.375초이며 각1회·표2개·범위 누락0·쓰기0이다. 원인·위험·복구 판단과 특정/혼합 범위는 기존 조사로 남으며 일반 복합 조사60초 목표는 미완료다. 고유1,230회귀PASS·skip0, 관리자231경유 B16파일/보호8SHA·양봇 연결/worker·3서비스 확인. 기존 deploy.sh 복사·SHA·게이트 경로를 사용하며 새 패키지·포트·키0, 새 OS 전체 설치/신규 UI 렌더 전수는 미검증이다. 실패 후보와 당시 기록은 아래/상세 원장에 보존한다.
+현재 common1.5.39·진단 MCP1.2.3은 과거 진단 지원 여부와 등록 서비스25개의 target 안내를 실제 도구에 맞춘다. query1.19.82·security-events1.3.2·모델·권한은 유지한다. 같은 원인 질문의 새 채팅은 Hermes98.498→142.936초이며 두 번 모두 과거 서비스 진단 누락으로 품질 실패했다. **일반 복합 조사60초는 미완료이며 속도 개선 성공으로 세지 않는다.** 최신 설정의 단순 비교 새채팅은 Ollama22.266초·4읽기/범위완료/쓰기0이며 원인 조사와 구분한다. 관련716검사 PASS/skip0·B17SHA/보호8·양봇 연결/3서비스·독립원복 확정. 기존 단일deploy.sh의 소스 복사 경로를 사용하며 새 패키지·포트·키0, 새OS 전체 설치·신규UI 전수 미검증. [수정·실측·남은 문제](../infra/hermes/diagnostic-navigation.md) · [직전 단순 비교 Hermes25.532/Ollama16.746초](../infra/hermes/systemd-comparison.md).
 
 11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.
 

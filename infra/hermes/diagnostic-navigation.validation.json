@@ -1,0 +1,93 @@
+{
+  "at_kst": "2026-11-06T23:00:00+09:00",
+  "versions": {
+    "query": "1.19.82",
+    "common": "1.5.39",
+    "diagnostics": "1.2.3",
+    "security_events": "1.3.2"
+  },
+  "tests": {
+    "unique_pass": 716,
+    "skip": 0,
+    "mcp": 61,
+    "sdk": 244,
+    "query": 391,
+    "installer": 20
+  },
+  "before": {
+    "hermes_final_seconds": 98.498,
+    "worker_seconds": 98.20219406415708,
+    "mcp_reads": 3,
+    "service_current_read": false,
+    "service_history_read": false,
+    "quality_pass": false,
+    "peer_worker_seconds": 73.54571110685356,
+    "peer_status": "partial"
+  },
+  "after": {
+    "hermes_final_seconds": 142.936,
+    "worker_seconds": 142.4800141172018,
+    "mcp_reads": 4,
+    "service_current_read": true,
+    "service_history_read": false,
+    "quality_pass": false,
+    "status": "partial",
+    "peer_worker_seconds": 72.62285234313458,
+    "peer_status": "partial"
+  },
+  "control": {
+    "final_seconds": 22.266,
+    "progress_seconds": 0.821,
+    "tables": 2,
+    "exact_report_match": true,
+    "writes": 0,
+    "engine": "ollama",
+    "status": "completed",
+    "scope_complete": true,
+    "reads": 4,
+    "mcp_seconds": 1.6509605809114873,
+    "time_basis": "original completion, new root, current common39/diagnostics1.2.3"
+  },
+  "interpretation": {
+    "causal_60s_achieved": false,
+    "speed_improvement_proven": false,
+    "one_trial_each": true,
+    "shared_gpu": true,
+    "different_sample_limits": [
+      50,
+      10
+    ],
+    "full_ui_render_verified": false
+  },
+  "deployment": {
+    "verified_files": 17,
+    "changed_files": 4,
+    "protected_sha": 8,
+    "history_targets": 25,
+    "sdk_source_sha": 20,
+    "services_active": 3,
+    "failed_units_b": 0,
+    "confirmed_at_kst": "2026-11-06T22:53:40+09:00",
+    "backup": "/var/lib/capstone-causal-chat/20261106-contract39",
+    "rollback_timer": "inactive",
+    "confirmed_rollback": "noop",
+    "fresh_os_install": false,
+    "gate_bytes": 65345,
+    "gate_limit_bytes": 65536,
+    "final_health_at_kst": "2026-11-06T23:04:05.609229+09:00"
+  },
+  "cleanup": {
+    "server_fixture_files": 456,
+    "server_fixture_bytes": 7026948,
+    "server_fixture_absent": true,
+    "mac": {
+      "files": 16,
+      "bytes": 4107310,
+      "removed": true,
+      "absent": true
+    }
+  },
+  "git": {
+    "status": "pending"
+  }
+}

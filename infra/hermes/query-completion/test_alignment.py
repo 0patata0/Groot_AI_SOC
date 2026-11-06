@@ -92,7 +92,7 @@ class SharedContract(unittest.TestCase):
                 text=result.api_kwargs['messages'][0]['content']
                 self.assertEqual(text.count('[SOC_RUNTIME_CLOCK]'),1)
                 self.assertIn(clocks[0],text)
-                self.assertNotIn('stale',text)
+                self.assertNotIn('[SOC_RUNTIME_CLOCK]stale[/SOC_RUNTIME_CLOCK]',text)
             self.assertEqual(clock.call_count,1)
             a._current_turn_id='b'
             result=wrap(a,original_user_message='hello',turn_id='b')

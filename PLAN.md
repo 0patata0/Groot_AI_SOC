@@ -18,7 +18,9 @@
 
 [실제 채팅 조회 개선77](infra/hermes/chat-read-latency.md): common1.5.34의 현재 룰 단문 분류와 첫 실제 읽기 선택을 연결했다. 동일 진단 도구의 여러 대상·시간 조건을 보완하고 완전한 순수 조회만 공통 표로 직접 완성한다. 실제 Hermes ABC상태49.923→20.877초, 짧은FW140.738→17.139초이며 각1회다. 전용 채널 새 FW는 Hermes11.899/Ollama10.993초. 후속 표 재정리1.529초는 새 조회와 구분한다. 고유1,198회귀PASS/skip0. LLM의 조사·판단·보호 승인·근거 검사·Native 저장/사용량/중단을 유지한다. 복합 과거/현재 질문의 과거 경보 누락·30초, 새 OS 전체 설치와 평균/p95 검증은 미완료다.
 
-[이력/현재 비교 후속](infra/hermes/systemd-comparison.md): 현재 query82/common38·MCP1.3.2, 고유1,230PASS다. 오늘 systemd 경보 표본과 ABC 현재 실패 집계를 실제 모델이 선택·조회한 뒤 근거 표로 완성한다. 새 실제채팅 Hermes25.532초/Ollama16.746초, 각4조회/2표/범위 누락0/쓰기0. 기본limit·빈enum의 실제 실패를 수정하고 태그 경계도 별도 회귀 보완했다. 원인·위험·복구·다른 특정/혼합 요청·peer는 일반 조사 유지하며 전체 복합 조사60초·평균/p95는 미완료다. 실패한 생성 후보·실측 한계는 상세 원장, 직전 계획은 [과거 기록](archive/PLAN-before-systemd-comparison-20261106.md)에 보존한다.
+[이력/현재 비교 후속](infra/hermes/systemd-comparison.md): 직전 query82/common38·MCP1.3.2, 고유1,230PASS다. 오늘 systemd 경보 표본과 ABC 현재 실패 집계를 실제 모델이 선택·조회한 뒤 근거 표로 완성한다. 새 실제채팅 Hermes25.532초/Ollama16.746초, 각4조회/2표/범위 누락0/쓰기0. 기본limit·빈enum의 실제 실패를 수정하고 태그 경계도 별도 회귀 보완했다. 원인·위험·복구·다른 특정/혼합 요청·peer는 일반 조사 유지하며 전체 복합 조사60초·평균/p95는 미완료다. 실패한 생성 후보·실측 한계는 상세 원장, 직전 계획은 [과거 기록](archive/PLAN-before-systemd-comparison-20261106.md)에 보존한다.
+
+[서비스 이력 안내 정정](infra/hermes/diagnostic-navigation.md): common39/진단1.2.3 운영·관련716PASS. 과거 지원 설명과25개 실제 unit 대응을 보완했지만 원인 질문은98.498→142.936초, 과거 서비스 진단 누락/partial로60초 미완료다. 다음은 명시 서비스의 현재·과거 필수 읽기 완료 검사, 무관한 검색 억제, 근거와 보고 대조의 개선이다. 최신 단순비교 Ollama22.266초·4조회/2표/쓰기0는 재확인했다. 원인 질문은 문구 수정만으로 정확한 선택/빠른 조사가 보장되지 않았다. [직전 계획](archive/PLAN-before-diagnostic-navigation-20261106.md).
 
 [반복 systemd 실패](infra/hermes/controller-contention.md)는 실제 잠금 충돌만 예약 실행의 정상 연기로 처리한다.19:10 B 정상518/대기53·새실패0·failed0(A/C 마지막18:44failed0)을 확인했다. 명시적 재조사/DB/권한 오류는 실패를 유지한다. 수정 전 경보 원문은 보존한다.
 

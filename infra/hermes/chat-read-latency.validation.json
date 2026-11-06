@@ -176,7 +176,12 @@
     "concurrent-user and long-running behavior"
   ],
   "git": {
-    "state": "pending commit/push"
+    "state": "source commit pushed and remote verified; receipt recorded for follow-up commit",
+    "source_commit": "1a5053a7710acc2976705b3cb48735eeba9b1009",
+    "remote_main_at_source_publication": "1a5053a7710acc2976705b3cb48735eeba9b1009",
+    "source_publication_at_kst": "2026-11-06T18:51:49.358504+09:00",
+    "public_paths": 23,
+    "prior_unrelated_staged_work_preserved": true
   },
   "cleanup": {
     "state": "complete",

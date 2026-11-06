@@ -166,7 +166,10 @@
   "new_os_full_install_test": false,
   "actual_attack_test": false,
   "publication": {
-    "status": "pending"
+    "source_commit": "f468ce60d6ae2429fb8aef2da3e73533bc82870c",
+    "remote_verified": true,
+    "verified_at_kst": "2026-11-06T21:16:14.532130+09:00",
+    "receipt_followup_commit": "recorded in local session and final response"
   },
   "final_health": {
     "at_kst": "2026-11-06T21:14:12.682321+09:00",

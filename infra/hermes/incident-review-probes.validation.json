@@ -333,8 +333,10 @@
     "retained": "local evidence, production databases/traces, previous recovery backups"
   },
   "git": {
-    "status": "pending",
-    "previous_commit": "00bb52ff970d7673f13405a13af9aa50725f9db9"
+    "status": "comparison_docs_pushed_receipt_followup_pending",
+    "comparison_commit": "8f514d7bbce6b0f03563246659336deced98567a",
+    "remote_main_verified": "8f514d7bbce6b0f03563246659336deced98567a",
+    "verified_at_kst": "2026-11-06T15:53:44.464769+09:00"
   },
   "final_live_verification": {
     "at_kst": "2026-11-06T15:44:10.490684+09:00",

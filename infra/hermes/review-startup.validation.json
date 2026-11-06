@@ -262,6 +262,10 @@
     "services_restarted": 0
   },
   "publication": {
-    "state": "pending"
+    "state": "diagnostic_documents_published",
+    "source_commit": "43be3b92da75a85ecd00f27513d9b37d4ba6c60d",
+    "remote_main_verified": "43be3b92da75a85ecd00f27513d9b37d4ba6c60d",
+    "at_kst": "2026-11-06T10:18:21.613083+09:00",
+    "receipt_followup_pending": true
   }
 }

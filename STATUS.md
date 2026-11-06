@@ -1,4 +1,4 @@
-# 인프라 현황 — 2026-11-06 16:41 KST
+# 인프라 현황 — 2026-11-06 16:50 KST
 
 전체 목표는 **LLM 실전 관제 운용·논문 완성·2026-12-01 최종 발표**이며 active·미완료다. **정확한 복합 최종 보고30초는 미완료**다. [활성 계획](PLAN.md) · [직전 상태](archive/STATUS-before-controller-contention-20261106.md).
 
@@ -6,16 +6,16 @@
 
 | 항목 | 결과 | 검증 범위·한계 |
 |---|---|---|
-| 반복 systemd 실패 | controller 잠금 충돌을 예약 실행의 정상 연기로 수정 | 최근3시간54회 원인 일치. 실제 충돌 exit0/커서·사건 불변, 해제 후 자동3회 성공·새 실패0. 장기 무재발은 미확인 |
+| 반복 systemd 실패 | controller 잠금 충돌을 예약 실행의 정상 연기로 수정 | 최근3시간54회 원인 일치. 실제 충돌 exit0/커서·사건 불변, 약10분 자동30회·대기8회·새 실패0. 장기 무재발은 미확인 |
 | 회귀·설치 | 신규6·기존365·설치42=고유413 PASS | 기존 관리검사74는 로컬 jsonschema 부재로 skip. B 신규6 재실행 PASS. 새 OS 설치 미실행 |
 | 운영 반영 | B controller1파일, 기존 query75/게이트64,855B 유지 | 관리자231 경유·15분 독립 복구 확정/no-op. 양봇WS/worker 정상, 수동원복 미실행 |
 | 관측 범위 검사 | query75의 진단/웹 상태·미검증/실패 구분 유지 | 앞선1,112검사 결과 보존. 자연어 전수 의미 검증은 아님 |
 | 속도 계측 | 비공개 실제 조사55.908/46.727초, 제목 생성용 별도 모델 호출 발견 | 계측기를 넣은 실행이며 채팅 전송 제외·독립 평가 아님. cProfile 누적시간은 스레드 중첩으로 wall time과 불일치하여 병목 합산에 사용하지 않음 |
 | 초기 연결 비교 | 전체8서버8.390초 vs 읽기6서버8.077초 | 모델 없는 기동·종료1쌍. 조회35도구 전체 schemaSHA 일치·약0.3초 차이, 운영 채택0 |
-| 30초 목표 | 정확한 복합 최종 보고30초 미달 | 새 독립 사건·실제 채팅·지속적 정확성 검증 잔여. 제목 호출 제외는 다음 후보이며 아직 미적용 |
-| Git·정리 | 소스·설치·현황14ecd5b 커밋/푸시·원격main 일치 | 서버 시험 임시 디렉터리 제거. 계측 작업용 Mac 임시 경로는 후속 작업 중, 운영 증거·복구본 보존 |
+| 30초 목표 | 정확한 복합 최종 보고30초 미달 | 새 독립 사건·실제 채팅·지속적 정확성 검증 잔여. 제목 호출 제외71.817초/원안42.558초로 이득 미입증·미채택 |
+| Git·정리 | 실패수정14ecd5b·영수증ebe8be9 푸시·원격main 일치. 후속 계측 문서는 게시 대기 | 서버 시험 임시 디렉터리 제거. Mac 임시 경로·서버 시험 스크립트4개/profile 임시본 제거, 운영 증거·복구본 보존 |
 
-[반복 실패 수정](infra/hermes/controller-contention.md) · [수치 원장](infra/hermes/controller-contention.validation.json) · [기존 관측 범위 검사](infra/hermes/observation-scope.md) · [앞선16비교](infra/hermes/incident-review-probes.md) · [조회 묶음](infra/hermes/incident-bundle.md). ‘30초 내 근거 표+후속 최종 보고’는 사용자 답변 전까지 미확정이며 최종 보고 목표를 유지한다.
+[반복 실패 수정](infra/hermes/controller-contention.md) · [수치 원장](infra/hermes/controller-contention.validation.json) · [기존 관측 범위 검사](infra/hermes/observation-scope.md) · [기동·제목 호출 비교](infra/hermes/startup-profile.md) · [앞선16비교](infra/hermes/incident-review-probes.md) · [조회 묶음](infra/hermes/incident-bundle.md). ‘30초 내 근거 표+후속 최종 보고’는 사용자 답변 전까지 미확정이며 최종 보고 목표를 유지한다.
 
 ## 그 밖의 운영 현황
 

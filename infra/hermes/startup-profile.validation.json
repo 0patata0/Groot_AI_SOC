@@ -1,0 +1,288 @@
+{
+  "as_of_kst": "2026-11-06T16:52:19.764170+09:00",
+  "scope": "private fresh-session development cases; no chat posting or attack",
+  "runs": [
+    {
+      "variant": "profile-r1",
+      "run_id": "18618fdcf5d2c281ae0582c536dc3853",
+      "elapsed_seconds": 55.90751647949219,
+      "model_calls": 3,
+      "model_seconds": 37.79763,
+      "actual_mcp_calls": 2,
+      "model_title_calls": null,
+      "before_init_seconds": 9.190404176712036,
+      "after_result_seconds": 2.608112335205078,
+      "input_tokens": [
+        782,
+        23753,
+        24176
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        21705
+      ],
+      "state": "needs_review",
+      "completed_job_not_proof_of_correct_report": true,
+      "independent_holdout": false,
+      "chat_posts": 0,
+      "full_report_quality_pass": false
+    },
+    {
+      "variant": "profile-r2",
+      "run_id": "a20f7fdd26109a100a29f8a02e236be6",
+      "elapsed_seconds": 46.72740697860718,
+      "model_calls": 2,
+      "model_seconds": 28.598004,
+      "actual_mcp_calls": 2,
+      "model_title_calls": null,
+      "before_init_seconds": 9.213632345199585,
+      "after_result_seconds": 2.988774538040161,
+      "input_tokens": [
+        783,
+        23750
+      ],
+      "cached_tokens": [
+        0,
+        0
+      ],
+      "state": "needs_review",
+      "completed_job_not_proof_of_correct_report": true,
+      "independent_holdout": false,
+      "chat_posts": 0,
+      "full_report_quality_pass": false
+    },
+    {
+      "variant": "title-disabled",
+      "run_id": "6ed64d3448878288b4aba0d1b037f054",
+      "elapsed_seconds": 71.81650114059448,
+      "model_calls": 3,
+      "model_seconds": 55.365981,
+      "actual_mcp_calls": 4,
+      "model_title_calls": 0,
+      "before_init_seconds": 8.594305753707886,
+      "after_result_seconds": 2.6671955585479736,
+      "input_tokens": [
+        784,
+        23767,
+        25977
+      ],
+      "cached_tokens": [
+        0,
+        0,
+        0
+      ],
+      "state": "needs_review",
+      "completed_job_not_proof_of_correct_report": true,
+      "independent_holdout": false,
+      "chat_posts": 0,
+      "full_report_quality_pass": false
+    },
+    {
+      "variant": "baseline",
+      "run_id": "e7fbc052925f5cb2d8bec42e8237fc5f",
+      "elapsed_seconds": 42.55777621269226,
+      "model_calls": 2,
+      "model_seconds": 27.993612000000002,
+      "actual_mcp_calls": 2,
+      "model_title_calls": 1,
+      "before_init_seconds": 7.141107082366943,
+      "after_result_seconds": 2.765669107437134,
+      "input_tokens": [
+        783,
+        23751
+      ],
+      "cached_tokens": [
+        0,
+        0
+      ],
+      "state": "needs_review",
+      "completed_job_not_proof_of_correct_report": true,
+      "independent_holdout": false,
+      "chat_posts": 0,
+      "full_report_quality_pass": false
+    }
+  ],
+  "startup_without_model": [
+    {
+      "variant": "all",
+      "phases": {
+        "registry_import": 0.04942206502892077,
+        "mcp_import": 1.4858842669054866,
+        "agent_import": 2.69406824815087,
+        "emitter_import": 0.0012608198449015617,
+        "output_guard_import": 0.050217716954648495,
+        "gate_import": 0.0598019699100405,
+        "discovery_import": 0.057424762984737754,
+        "discovery": 1.3227580420207232,
+        "cli_import": 0.15841443603858352,
+        "cleanup": 2.050950957927853
+      },
+      "python_seconds": 7.934814053121954,
+      "configured": [
+        "resp",
+        "rule-a",
+        "rule-b",
+        "rule-write-a",
+        "rule-write-b",
+        "security-events",
+        "system-diagnostics",
+        "wazuh-ro"
+      ],
+      "connected": [
+        "resp",
+        "rule-a",
+        "rule-b",
+        "rule-write-a",
+        "rule-write-b",
+        "security-events",
+        "system-diagnostics",
+        "wazuh-ro"
+      ],
+      "permitted_read_count": 35,
+      "read_schemas_sha256": "f329d3cd0e63624ba1d1883e7ef884e4ed8d6f00ad236c8a0f7e36f51c71a5f2",
+      "model_calls": 0,
+      "actual_event_reads": 0,
+      "protected_writes": 0,
+      "process_seconds": 8.389876840868965
+    },
+    {
+      "variant": "read",
+      "phases": {
+        "registry_import": 0.04932548897340894,
+        "mcp_import": 1.432696636999026,
+        "agent_import": 2.621102952165529,
+        "emitter_import": 0.0012818020768463612,
+        "output_guard_import": 0.05150949489325285,
+        "gate_import": 0.06263277004472911,
+        "discovery_import": 0.06062371609732509,
+        "discovery": 1.1111718970350921,
+        "cli_import": 0.15782095398753881,
+        "cleanup": 2.043286091880873
+      },
+      "python_seconds": 7.5961300930939615,
+      "configured": [
+        "resp",
+        "rule-a",
+        "rule-b",
+        "rule-write-a",
+        "rule-write-b",
+        "security-events",
+        "system-diagnostics",
+        "wazuh-ro"
+      ],
+      "connected": [
+        "resp",
+        "rule-a",
+        "rule-b",
+        "security-events",
+        "system-diagnostics",
+        "wazuh-ro"
+      ],
+      "permitted_read_count": 35,
+      "read_schemas_sha256": "f329d3cd0e63624ba1d1883e7ef884e4ed8d6f00ad236c8a0f7e36f51c71a5f2",
+      "model_calls": 0,
+      "actual_event_reads": 0,
+      "protected_writes": 0,
+      "process_seconds": 8.076775440014899
+    }
+  ],
+  "title_setting_adopted": false,
+  "mcp_discovery_filter_adopted": false,
+  "main_model_and_config_unchanged": true,
+  "latency_30_seconds_achieved": false,
+  "profile_caveat": "R1 normal exit missed os._exit hook; R2 profile saved with atexit but concurrent/reentrant cumulative total 83.488s exceeds wall 46.727s. Do not sum these per-function timings. Trace timestamps and provider receipts are used instead.",
+  "live_health": [
+    {
+      "final_health": {
+        "confirmed_at_epoch": 1793951351,
+        "files_verified": 9,
+        "protected_unchanged": 7,
+        "gate_sha256": "9dfeb3b9f24e35430f29ba3c3f814f7fee6a663e401ea95a5fde2572146df8a4",
+        "controller_sha256": "9d906f6959f62794c11200182aaa4fcd316d0082d44753068318a5ca3b99600e",
+        "gate_matches_reference": true,
+        "ids_path_impact_enabled": true,
+        "gate_argument_bytes": 64855,
+        "health": {
+          "/opt/hermes-data/health/chat.json": {
+            "age_seconds": 17.270991802215576,
+            "connected": true,
+            "worker_alive": true
+          },
+          "/var/lib/capstone-ollama-trial/chat/health.json": {
+            "age_seconds": 9.271055698394775,
+            "connected": true,
+            "worker_alive": true
+          }
+        },
+        "services_active": 4,
+        "manual_rollback_tested": false,
+        "automatic_shared_status_required": 1,
+        "sensor_reads_required": 3
+      },
+      "queues_idle": 3,
+      "registered_reads": [
+        "collect_incident_evidence",
+        "get_wazuh_sca_checks",
+        "get_web_service_target",
+        "search_modsecurity_alerts",
+        "search_suricata_alerts",
+        "search_wazuh_alerts",
+        "search_web_access"
+      ]
+    },
+    {
+      "container_test_directories_remaining": [],
+      "backup_retained": "/var/lib/capstone-observation-scope/20261106-r1/deployment"
+    },
+    {
+      "management_config_unchanged": true
+    }
+  ],
+  "server_cleanup": {
+    "removed_scripts": [
+      {
+        "path": "/var/lib/capstone-startup-profile/20261106-r1/measure-complex.py",
+        "sha256": "3fb9f9f48ff79e6f9b902be122f5b1df333afbd6697b4794b6b0a7e98389b36d",
+        "bytes": 3388
+      },
+      {
+        "path": "/var/lib/capstone-startup-profile/20261106-r2/measure-complex.py",
+        "sha256": "21b183ddd48dccc34806fb30cad4339447902c742998a87a616a4ee0c8f3488c",
+        "bytes": 3455
+      },
+      {
+        "path": "/var/lib/capstone-startup-profile/20261106-r3/measure-complex.py",
+        "sha256": "d7056bde7aac609c987e82fad2ec38835dea524150fe025600a376085a5e749d",
+        "bytes": 3557
+      },
+      {
+        "path": "/var/lib/capstone-startup-profile/20261106-r4/measure-complex.py",
+        "sha256": "547cd5fce627c6dede141839bba327057cb7fc230fe89eeab57822105632a065",
+        "bytes": 3491
+      }
+    ],
+    "container_temp": {
+      "profile_temp_removed": true
+    },
+    "retained": [
+      "measurement DB/trace/results r1-r4",
+      "native-profile.pstats",
+      "controller rollback/original/receipts"
+    ],
+    "since_apply_seconds": 597.0654928684235,
+    "normal_timer_polls": 30,
+    "deferred_polls": 8,
+    "new_failure_count": 0,
+    "current_failed_units": 0
+  },
+  "local_cleanup": {
+    "files": 36,
+    "bytes": 1215114,
+    "directory_removed": "/private/tmp/capstone-startup-profile-20261106-vb5hhxf6",
+    "removed": true
+  },
+  "git": {
+    "state": "pending"
+  }
+}

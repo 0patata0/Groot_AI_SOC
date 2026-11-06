@@ -1,0 +1,559 @@
+{
+  "as_of_kst": "2026-11-06T15:07:14.718631+09:00",
+  "status": "production_integrated_final_latency_target_unmet",
+  "goal_30s_final_report_met": false,
+  "live_versions": {
+    "query": "1.19.74",
+    "common": "1.5.33",
+    "security_events": "1.3.0",
+    "system_diagnostics": "1.2.2"
+  },
+  "scope": {
+    "model_changed": false,
+    "approval_or_ttl_changed": false,
+    "new_packages": 0,
+    "chat_posts": 0,
+    "attack_tests": 0,
+    "new_os_install_test": false
+  },
+  "deployment": {
+    "confirmation": {
+      "confirmed_at_epoch": 1793944534,
+      "files_verified": 17,
+      "protected_unchanged": 7,
+      "gate_sha256": "2509e829b866f66dcb67cb4a2c8490f899a4331bcea5f82f249d1100c90eba34",
+      "controller_sha256": "015579a85a6ee690b87db39b89ac8605f7ddd43559d9f1851baec72bd08a93f5",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 64565,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 2.2201812267303467,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 14.220242977142334,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "confirmed_recovery_noop": true,
+    "final_health": {
+      "final_health": {
+        "confirmed_at_epoch": 1793945112,
+        "files_verified": 17,
+        "protected_unchanged": 7,
+        "gate_sha256": "2509e829b866f66dcb67cb4a2c8490f899a4331bcea5f82f249d1100c90eba34",
+        "controller_sha256": "015579a85a6ee690b87db39b89ac8605f7ddd43559d9f1851baec72bd08a93f5",
+        "gate_matches_reference": true,
+        "ids_path_impact_enabled": true,
+        "gate_argument_bytes": 64565,
+        "health": {
+          "/opt/hermes-data/health/chat.json": {
+            "age_seconds": 20.109694242477417,
+            "connected": true,
+            "worker_alive": true
+          },
+          "/var/lib/capstone-ollama-trial/chat/health.json": {
+            "age_seconds": 12.109768390655518,
+            "connected": true,
+            "worker_alive": true
+          }
+        },
+        "services_active": 4,
+        "manual_rollback_tested": false,
+        "automatic_shared_status_required": 1,
+        "sensor_reads_required": 3
+      },
+      "queues_idle": 3,
+      "registered_reads": [
+        "collect_incident_evidence",
+        "get_wazuh_sca_checks",
+        "get_web_service_target",
+        "search_modsecurity_alerts",
+        "search_suricata_alerts",
+        "search_wazuh_alerts",
+        "search_web_access"
+      ]
+    }
+  },
+  "tests": {
+    "unique_pass": 1215,
+    "suites": [
+      {
+        "suite": "management",
+        "tests": 439,
+        "skip": 57,
+        "rc": 0
+      },
+      {
+        "suite": "sdk",
+        "tests": 231,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "native",
+        "tests": 391,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "install",
+        "tests": 41,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "tables",
+        "tests": 19,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "output",
+        "tests": 7,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "mcp-bundle",
+        "tests": 19,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "mcp-events",
+        "tests": 30,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "mcp-diagnostics",
+        "tests": 38,
+        "skip": 0,
+        "rc": 0
+      }
+    ],
+    "native_management": {
+      "tests": 439,
+      "skips": 0,
+      "failures": 0,
+      "errors": 0
+    },
+    "note": "57 Native-only skips in B venv completed in actual Hermes environment; no double-count"
+  },
+  "runs_1_19_73": [
+    {
+      "run_id": "8caf66b9e06d7a66134d8b074589f3c2",
+      "seconds": 42.973161697387695,
+      "reads": 2,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 19,
+        "case_resolved": false
+      },
+      "logical_component_reads": 8,
+      "provider_calls": [
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.055532,
+          "input_message_bytes": 2100,
+          "usage": {
+            "completion_tokens": 38,
+            "prompt_tokens": 780,
+            "total_tokens": 818,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 26.37525,
+          "input_message_bytes": 82726,
+          "usage": {
+            "completion_tokens": 174,
+            "prompt_tokens": 23737,
+            "total_tokens": 23911,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "7ec2f5e6f62b5ed7138176a7064f0f99",
+      "seconds": 166.99967074394226,
+      "reads": 8,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 27,
+        "case_resolved": false
+      },
+      "logical_component_reads": 7,
+      "provider_calls": [
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.155588,
+          "input_message_bytes": 1976,
+          "usage": {
+            "completion_tokens": 44,
+            "prompt_tokens": 710,
+            "total_tokens": 754,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 33.419318,
+          "input_message_bytes": 100864,
+          "usage": {
+            "completion_tokens": 57,
+            "prompt_tokens": 33518,
+            "total_tokens": 33575,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 33.725862,
+          "input_message_bytes": 101365,
+          "usage": {
+            "completion_tokens": 61,
+            "prompt_tokens": 33748,
+            "total_tokens": 33809,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 4,
+          "provider_seconds": 40.290355,
+          "input_message_bytes": 103124,
+          "usage": {
+            "completion_tokens": 402,
+            "prompt_tokens": 34498,
+            "total_tokens": 34900,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 40.728931,
+          "input_message_bytes": 112085,
+          "usage": {
+            "completion_tokens": 180,
+            "prompt_tokens": 37534,
+            "total_tokens": 37714,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    }
+  ],
+  "run_1_19_74": {
+    "run_id": "29f5507f8742abb441863f2646076e22",
+    "seconds": 68.87972569465637,
+    "reads": 2,
+    "tool_errors": 0,
+    "protected_writes": 0,
+    "run_state": "completed",
+    "run_detail": "model_needs_review",
+    "report_state": "needs_review",
+    "assessment": null,
+    "outbox": "pending",
+    "outbox_seconds": null,
+    "quality_checks": {
+      "internal_hint_echo": false,
+      "factual_table_exact": true,
+      "evidence_guard_violations": [],
+      "citation_error": "incident_disposition_missing",
+      "citations_current_successful": false,
+      "fact_rows": 17,
+      "case_resolved": false
+    },
+    "logical_component_reads": 7,
+    "provider_calls": [
+      {
+        "selected_reads": 2,
+        "provider_seconds": 2.091288,
+        "input_message_bytes": 1976,
+        "usage": {
+          "completion_tokens": 42,
+          "prompt_tokens": 712,
+          "total_tokens": 754,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": false,
+        "tool_directory": null,
+        "literal_report_repair": false,
+        "additional_inquiry": false,
+        "reasoning_effort": "none",
+        "error_code": null,
+        "response_finish": null
+      },
+      {
+        "selected_reads": 0,
+        "provider_seconds": 28.778071,
+        "input_message_bytes": 84949,
+        "usage": {
+          "completion_tokens": 121,
+          "prompt_tokens": 27017,
+          "total_tokens": 27138,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": true,
+        "tool_directory": null,
+        "literal_report_repair": false,
+        "additional_inquiry": false,
+        "reasoning_effort": "none",
+        "error_code": null,
+        "response_finish": null
+      },
+      {
+        "selected_reads": 0,
+        "provider_seconds": 22.825049,
+        "input_message_bytes": 47056,
+        "usage": {
+          "completion_tokens": 246,
+          "prompt_tokens": 18708,
+          "total_tokens": 18954,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "compact_report": true,
+        "tool_directory": null,
+        "literal_report_repair": true,
+        "additional_inquiry": false,
+        "reasoning_effort": "none",
+        "error_code": null,
+        "response_finish": null
+      }
+    ],
+    "valid_final_model_report": false,
+    "semantic_quality_pass": false,
+    "final_output": "fail_closed_factual_review_not_model_judgment",
+    "rejection_issues": [
+      "web_snapshot_is_not_application_health"
+    ],
+    "semantic_findings": [
+      "unfounded SNI/policy_id followup",
+      "post-expiry Suricata falsely grouped with WAF detections",
+      "Vector diagnostic phrasing caught by overly broad web-health claim matcher"
+    ]
+  },
+  "sdk_read": {
+    "seconds": 2.590590314939618,
+    "catalog_count": 7,
+    "wire_calls": 1,
+    "component_reads": 8,
+    "facts": 16,
+    "error": false,
+    "model_calls": 0,
+    "chat_posts": 0,
+    "protected_calls": 0,
+    "result_sha256": "f86a5d1d279c5907a0ac56de7badd5e181178f00f051b417e4e873b2817adc40",
+    "pool": {
+      "enabled": true,
+      "created": [
+        "security-events"
+      ],
+      "reused": [],
+      "discovery_reconnections": 0,
+      "idle_seconds": 300
+    }
+  },
+  "model_view": {
+    "ids_original_wire_bytes": 46112,
+    "ids_display_wire_bytes": 27984,
+    "original_receipt_preserved": true,
+    "lossless_rows_fields_types_order_errors": true,
+    "primary_receipt_display_unchanged": true
+  },
+  "private_candidates_rejected": [
+    {
+      "variant": "deferred-scope",
+      "seconds": 17.599434,
+      "selected_more_evidence": true,
+      "new_tools_executed": 0
+    },
+    {
+      "variant": "focused-scope",
+      "seconds": 21.54996,
+      "selected_calls": 1,
+      "selected_tool": "list_blocks",
+      "new_tools_executed": 0
+    },
+    {
+      "variant": "single-schema-ids",
+      "seconds": 27.630849996814504,
+      "input_message_bytes": 86665,
+      "prompt_tokens": 27482,
+      "selected_calls": 1,
+      "selected_tool": "list_blocks",
+      "new_tools_executed": 0,
+      "original_full_schema_validation_pass": true,
+      "production_changed": false
+    }
+  ],
+  "limits": [
+    "private fresh-session model+read tests, no chat delivery or UI timing",
+    "no controlled shared-GPU load or repeated mean/SLA",
+    "73 IDS operator-instruction waiting and generic followup wording inadequate",
+    "A historical journal coverage gap remains",
+    "74 IDS failed final judgment; 68.880 seconds is not accurate report completion",
+    "Vector service wording is overbroadly matched as web health; independent unsupported SNI plan and sensor temporal conflation also require correction",
+    "single measurements on changing observation windows cannot establish causal speedup or mean latency"
+  ],
+  "rollback": [
+    "/var/lib/capstone-bundle-integration/20261106-r1/deployment",
+    "/var/lib/capstone-bundle-integration/20261106-r2/deployment"
+  ],
+  "cleanup": {
+    "status": "complete",
+    "server": {
+      "removed_files": 453,
+      "removed_bytes": 7073209,
+      "all_absent": true,
+      "deployment_backups_preserved": true,
+      "measurement_db_trace_preserved": true
+    },
+    "mac": {
+      "removed_files": 49,
+      "removed_bytes": 9352989,
+      "all_absent": true,
+      "new_packages_installed": 0,
+      "audit_preserved_locally": true
+    },
+    "production_db_trace_backups_preserved": true
+  },
+  "git": {
+    "status": "pending",
+    "previous_remote_commit": "e00d2c3793cc9d652d3eff40972e9d34f4231595"
+  },
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "2509e829b866f66dcb67cb4a2c8490f899a4331bcea5f82f249d1100c90eba34",
+    "infra/hermes/soc_management_controller.py": "91bcb65d52f423a79053c8c67778c9e6b671799d2af3e90e475d984a4e399feb",
+    "infra/hermes/query-completion/__init__.py": "d1c7c8784537b8a88ea6bfd4d2548a818425496eb81b3da088054ce0b62e7738",
+    "infra/hermes/chat_contract.py": "50543dd7f75eddcf8a666dd72779c1fb314df4b78b8017bdbc211ecf7eae3d2b",
+    "infra/ollama-trial/harness.py": "efd8ae584bdda58eae2a4e64eca6d52aa73ada0298e848cd3b61e75e7cdc4f43",
+    "infra/ollama-trial/policy.py": "58dfc498cd458384aa8dad5468aa6ab56cd9fa46e7920cf643d4eb00de8e75e1",
+    "infra/mcp/security-events-mcp.py": "22a9b22be06f16d44d5a747773679f81ebffc5872386fde3a2e3e320d7f848a8",
+    "infra/mcp/incident_evidence.py": "351a83e0be22e8a4d8bc62a5a9aac6b60784094eac761424708772e24a6fcd1f"
+  }
+}

@@ -33,9 +33,9 @@ MAX_LOOKBACK_MINUTES = 1440
 MAX_LIMIT = 50
 MAX_SCAN = 250
 MAX_RESPONSE_BYTES = 8 * 1024 * 1024
-# Staged capability: enable only with agent provenance/closure integration.
+# Requires the shared agent provenance/closure integration deployed with it.
 # A prompt, tool argument or client environment cannot enable this route.
-INCIDENT_BUNDLE_ENABLED = False
+INCIDENT_BUNDLE_ENABLED = True
 RULE_ID_RE = re.compile(r"^[0-9]{1,10}$")
 CONTROL_RE = re.compile(r"[\x00-\x1f\x7f]+")
 KST = timezone(timedelta(hours=9))

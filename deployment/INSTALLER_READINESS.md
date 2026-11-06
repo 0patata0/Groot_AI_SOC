@@ -1,6 +1,6 @@
 # 초기 설치·통합 패키지 준비 상태
 
-11/6 [복합 사건 읽기 묶음 후보](../infra/mcp/incident-evidence.md): `incident_evidence.py`를 기존 security-events 소스·SIEM preflight/해시/복사·B 보조 배포기의 백업/복구에 포함했다. 후보 security-events1.3.0/진단1.2.2이며 `INCIDENT_BUNDLE_ENABLED=False`로 기존6도구만 제공한다. 추가 deb/wheel/image·포트·키·설정 입력0. 고유169검사·비공개 실제 읽기는 완료했지만 Native/SDK/controller 근거 연결·최종30초·새OS전체설치는 미완료다. 운영 query1.19.72·security-events1.2.2·진단1.2.1은 이번 단위에서 변경하지 않았다. [직전 운영 확정](../infra/hermes/health-claim-check.md). 아래 날짜별 기록은 당시 범위다.
+11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.
 
 11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
 

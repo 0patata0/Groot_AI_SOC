@@ -195,5 +195,6 @@
     "system-diagnostics-mcp.py": "80d630063b461d856dbe51301b352612fc132554ef13e07752fcd98649f95dc1",
     "incident_evidence.py": "351a83e0be22e8a4d8bc62a5a9aac6b60784094eac761424708772e24a6fcd1f",
     "deploy_security_events_B.sh": "81272a1dcf04bc3f371497be49ed26f93b99400612b2471918faa109edfa7852"
-  }
+  },
+  "subsequent_integration_record": "../hermes/incident-bundle.validation.json"
 }

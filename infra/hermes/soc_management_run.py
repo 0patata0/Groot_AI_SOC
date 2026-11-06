@@ -27,7 +27,8 @@ READ = frozenset({'get_security_rules', 'get_rule_change_target', 'get_rule_chan
 WRITE = frozenset({'propose_rule_edit', 'propose_rule_change',
                    'propose_service_action', 'temporarily_contain_ip'})
 EVENT_READ = frozenset({'search_wazuh_alerts', 'search_suricata_alerts', 'search_modsecurity_alerts', 'get_wazuh_sca_checks',
-                        'get_web_service_target', 'search_web_access'})
+                        'get_web_service_target', 'search_web_access', 'collect_incident_evidence'})
+BUNDLE_TOOL = 'mcp__security_events__collect_incident_evidence'
 DIAGNOSTIC_READ = frozenset({'get_system_diagnostics', 'calculate_time'})
 MAX_EVENT_AUDIT_BYTES = 128 * 1024
 NO_OBSERVATION_REPORT = ('성공한 MCP 조회 근거를 확보하지 못해 현재 상태를 확인하지 못했습니다. '
@@ -435,7 +436,138 @@ def read_protocol_error_result(name, exc):
         content=[SimpleNamespace(type='text',text=json.dumps(body,ensure_ascii=False))])
 
 
-def observation_facts(name, result):
+def incident_bundle_reads(arguments, payload):
+    """Verify nested read provenance; never turn components into wire calls.
+
+    Only an actual result bound to its actual invocation may be expanded. The
+    recorded checksum binds bytes, not trust or a risk/recovery decision.
+    None means malformed/mismatched and must leave original reads pending.
+    """
+    prefixes={'c:dvwa':'/dvwa/','c:lab-console':'/_offline-labs/',
+        'c:lab-java':'/_offline-lab-java/','c:lab-httpd49':'/_offline-lab-httpd49/',
+        'c:lab-httpd50':'/_offline-lab-httpd50/'}
+    sensors={'modsecurity':'search_modsecurity_alerts','suricata':'search_suricata_alerts'}
+    def need(value):
+        if not value:raise ValueError()
+    def encoded(value):
+        return json.dumps(value,ensure_ascii=False,allow_nan=False,sort_keys=True,separators=(',',':')).encode()
+    def interval(value):
+        start,end=(parse_instant(value.get(k)) for k in ('since_kst','until_kst'))
+        need(start and end and 0<(end-start).total_seconds()<=86400 and
+            all(isinstance(value[k],str) and value[k].endswith('+09:00') for k in ('since_kst','until_kst')))
+        need(type(value.get('limit')) is int and 1<=value['limit']<=50)
+    try:
+        need(isinstance(arguments,dict) and {'events'}<=set(arguments)<={'events','diagnostics','web_context'})
+        need(isinstance(payload,dict) and payload.get('format')=='incident_evidence_v1' and payload.get('request')==arguments
+            and payload.get('mutation_performed') is False and payload.get('untrusted_evidence') is True
+            and payload.get('execution_scope')=='only_listed_reads_not_complete_incident_coverage_or_judgment'
+            and len(encoded(payload))<=MAX_EVENT_AUDIT_BYTES and len(encoded(arguments))<=8192)
+        events=arguments['events'];diagnostics=arguments.get('diagnostics',[]);web=arguments.get('web_context')
+        need(isinstance(events,list) and 1<=len(events)<=8 and isinstance(diagnostics,list) and len(diagnostics)<=4)
+        expected=[];ips=set()
+        for event in events:
+            need(isinstance(event,dict) and set(event)=={'sensor','arguments'} and isinstance(event['sensor'],str) and event['sensor'] in sensors)
+            params=event['arguments'];extra='rule_id' if event['sensor']=='modsecurity' else 'signature_id'
+            need(isinstance(params,dict) and {'source_ip','since_kst','until_kst','limit'}<=set(params)<=
+                {'source_ip','since_kst','until_kst','limit',extra} and literal_ip(params.get('source_ip')))
+            interval(params);ips.add(params['source_ip'])
+            if extra in params:need(isinstance(params[extra],str) and re.fullmatch(r'[0-9]{1,10}',params[extra]))
+            expected.append((sensors[event['sensor']],params))
+        need(len(ips)==1 and len({encoded(x) for x in expected})==len(expected))
+        for params in diagnostics:
+            need(isinstance(params,dict) and {'target'}<=set(params)<={'target','lookback_minutes','limit','since_kst','until_kst'}
+                 and isinstance(params['target'],str) and re.fullmatch(r'[abc]:[a-z0-9-]{1,40}',params['target']))
+            expected.append(('get_system_diagnostics',params))
+        need(len({encoded(x) for x in diagnostics})==len(diagnostics))
+        if web is not None:
+            need(isinstance(web,dict) and set(web)=={'since_kst','until_kst','limit'});interval(web)
+            need(any(all(web[k]==e['arguments'][k] for k in web) for e in events))
+        parts=payload.get('components');need(isinstance(parts,list) and len(expected)<=len(parts)<=32)
+        begin,end=(parse_instant(payload.get(k)) for k in ('started_at_kst','completed_at_kst'))
+        need(begin and end and begin<=end)
+        for i,part in enumerate(parts):
+            need(isinstance(part,dict) and set(part)=={'index','tool','arguments','started_at_kst','completed_at_kst','result','is_error','result_sha256'}
+                and type(part['index']) is int and part['index']==i and isinstance(part['result'],dict)
+                and type(part['is_error']) is bool and part['is_error']==bool(part['result'].get('error') or part['result'].get('isError'))
+                and hashlib.sha256(encoded(part['result'])).hexdigest()==part['result_sha256'])
+            a,b=(parse_instant(part.get(k)) for k in ('started_at_kst','completed_at_kst'))
+            need(a and b and begin<=a<=b<=end)
+        def take(index,name,params):
+            need(index<len(parts) and parts[index]['tool']==name and parts[index]['arguments']==params)
+            return parts[index]
+        paths=set()
+        for i,(name,params) in enumerate(expected):
+            part=take(i,name,params)
+            if name=='search_modsecurity_alerts' and not part['is_error']:
+                rows=part['result'].get('alerts');need(isinstance(rows,list))
+                paths.update(r['request_path'] for r in rows if isinstance(r,dict) and isinstance(r.get('request_path'),str)
+                    and r['request_path'].startswith('/') and len(r['request_path'])<=1024)
+        candidates=[t for t,prefix in prefixes.items() if any(p.startswith(prefix) or p==prefix.rstrip('/') for p in paths)] if web else []
+        follow=[];associations=[];skipped=[]
+        for i,target in enumerate(candidates,len(expected)):
+            part=take(i,'get_web_service_target',{'target':target});result=part['result']
+            service,agent=result.get('service',{}),result.get('agent',{})
+            if (part['is_error'] or result.get('target')!=target or not isinstance(service,dict) or not isinstance(agent,dict)
+                    or service.get('configured_in_file_snapshot') is not True or service.get('request_path_prefix')!=prefixes[target]
+                    or not isinstance(agent.get('id'),str) or not re.fullmatch(r'[0-9]{3,8}',agent['id'])):
+                skipped.append({'target':target,'reason':'configuration_or_agent_unverified','component_index':i});continue
+            associations.append({'target':target,'agent_id':agent['id'],'configuration_component':i,
+                'matching_observed_paths':[p for p in sorted(paths) if p.startswith(prefixes[target]) or p==prefixes[target].rstrip('/')],
+                'scope':'configured_prefix_candidate_not_frontend_destination_or_impact_attestation'})
+            follow.append(('search_web_access',{'target':target,**web}))
+            other=('search_wazuh_alerts',{'agent_id':agent['id'],**web})
+            if other not in follow:follow.append(other)
+        for i,(name,params) in enumerate(follow,len(expected)+len(candidates)):take(i,name,params)
+        need(len(parts)==len(expected)+len(candidates)+len(follow) and payload.get('candidate_associations')==associations
+            and payload.get('unserved_candidates')==skipped and type(payload.get('execution_complete')) is bool
+            and payload['execution_complete']==(not skipped and all(not p['is_error'] for p in parts))
+            and payload.get('web_lookup')==('not_requested' if not web else
+                'no_mapped_observed_path' if not candidates else 'configuration_candidates_checked'))
+        return copy.deepcopy(parts)
+    except (ValueError,TypeError,KeyError,OverflowError,RecursionError):return None
+
+
+def incident_bundle_view(raw):
+    """Model-only lossless web tables inside an already bounded read bundle.
+
+    Original receipts, component checksums and guard facts remain untouched.
+    A projected result is not a new receipt: restore its web model_view tables
+    before comparing the original component checksum.
+    """
+    if not isinstance(raw,str) or not 4096<=len(raw.encode())<=MAX_EVENT_AUDIT_BYTES:return raw
+    def unique(pairs):
+        value={}
+        for key,item in pairs:
+            if key in value:raise ValueError('duplicate')
+            value[key]=item
+        return value
+    def load(value):
+        return json.loads(value,object_pairs_hook=unique,
+            parse_constant=lambda _:(_ for _ in ()).throw(ValueError('nonfinite')))
+    def encode(value):return json.dumps(value,ensure_ascii=False,allow_nan=False,separators=(',',':'))
+    try:
+        data=load(raw);envelopes=[]
+        for _ in range(4):
+            if isinstance(data,dict) and set(data)<={'result','isError'} and isinstance(data.get('result'),str) and not data.get('isError'):
+                envelopes.append({k:v for k,v in data.items() if k!='result'});data=load(data['result'])
+            else:break
+        if not isinstance(data,dict) or 'model_view' in data or incident_bundle_reads(data.get('request'),data) is None:return raw
+        shown=copy.deepcopy(data);changed=False
+        for part in shown['components']:
+            if part['tool']=='search_web_access' and not part['is_error']:
+                view=load(web_evidence_view(encode(part['result'])))
+                if view!=part['result']:part['result']=view;changed=True
+        if not changed:return raw
+        shown['model_view']={'format':'lossless_bundle_web_tables_v1',
+            'original_wire_sha256':hashlib.sha256(raw.encode()).hexdigest(),
+            'decode':'Restore each web result model_view table before verifying original result_sha256. All original rows, fields, types and errors are retained; this view is not a new read receipt.'}
+        for envelope in reversed(envelopes):shown={**envelope,'result':encode(shown)}
+        packed=encode(shown)
+        return packed if len(packed.encode())<len(raw.encode())*.9 else raw
+    except (ValueError,TypeError,KeyError,RecursionError):return raw
+
+
+def observation_facts(name, result, arguments=None):
     """Keep bounded literal scope facts, never event instructions or decisions."""
     if getattr(result, 'is_error', getattr(result, 'isError', False)) is not False:
         return []
@@ -452,6 +584,15 @@ def observation_facts(name, result):
                     rows.append({'kind': 'agent_inventory', 'agents': identities})
             data = _unpack(data)
             if not isinstance(data, dict) or data.get('error') or data.get('isError'):
+                continue
+            if name=='collect_incident_evidence':
+                from types import SimpleNamespace as NS
+                for part in incident_bundle_reads(arguments,data) or ():
+                    if part['is_error']:continue
+                    nested=NS(isError=False,content=[NS(text=json.dumps(part['result'],ensure_ascii=False))])
+                    rows.extend(dict(f,bundle_component={'transport_tool':BUNDLE_TOOL,'index':part['index'],
+                        'tool':part['tool'],'result_sha256':part['result_sha256']})
+                        for f in observation_facts(part['tool'],nested,part['arguments']))
                 continue
             stamps = list(dict.fromkeys(_times(data)))
             if name in ('get_rule_change_status', 'get_operation_status'):
@@ -793,11 +934,13 @@ def incident_impact_read_timestamps(name,args,payload,requirements):
     except (ValueError,TypeError,KeyError,OverflowError):return set()
 
 
-def incident_impact_missing(decision,requirements,receipts,linked_response=False):
+def incident_impact_missing(decision,requirements,receipts,linked_response=False,bundle_receipts=()):
     """An evidence postcondition, not classification or automatic investigation."""
     return bool(requirements and (linked_response or decision.get('assessment')=='remediated') and
         (any(type(stamp) not in (int,float) or stamp not in receipts for _source,_ip,stamp,_rule in requirements)
-         or 'mcp__security_events__search_wazuh_alerts' not in decision.get('evidence_tools',[])))
+         or not ('mcp__security_events__search_wazuh_alerts' in decision.get('evidence_tools',[])
+            or BUNDLE_TOOL in decision.get('evidence_tools',[]) and all(
+                stamp in bundle_receipts for _source,_ip,stamp,_rule in requirements))))
 
 
 def disposition_citation_violations(text, successful_reads):
@@ -1631,7 +1774,7 @@ def completed_citation_request(request, successful_reads):
     return request
 
 
-def completed_web_review_request(request, agent, successful_reads, *, requirements_complete=False):
+def completed_web_review_request(request, agent, successful_reads, *, requirements_complete=False, component_reads=()):
     """Lower thinking only for a completed-evidence, read-only web review.
 
     This changes model computation, not the disposition or missing-evidence
@@ -1643,7 +1786,7 @@ def completed_web_review_request(request, agent, successful_reads, *, requiremen
             or os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') != '1'
             or not readonly_incident_review()
             or os.environ.get('CAPSTONE_WEB_IMPACT_REVIEW') != '1'
-            or not required <= set(successful_reads or ())
+            or not required <= (set(successful_reads or ()) | set(component_reads))
             or getattr(agent, '_interrupt_requested', False)):
         return request
     result = management_reasoning(request, agent, required_read_phase=True)
@@ -2006,7 +2149,7 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
     return {**value, 'tool_choice': 'required'} if reads else value
 
 
-def required_read_bundle(request, requirements, facts, sensor_requirements, sensor_receipts, diagnostic_receipts=(), native_catalog=None):
+def required_read_bundle(request, requirements, facts, sensor_requirements, sensor_receipts, diagnostic_receipts=(), native_catalog=None, attempted=()):
     """Offer independent exact reads together; the model selects every dispatch."""
     if not readonly_incident_review():
         return None
@@ -2018,9 +2161,25 @@ def required_read_bundle(request, requirements, facts, sensor_requirements, sens
     # discovery comes from the registered catalog; dispatch stays in request.
     options+=operator_diagnostic_options(request if native_catalog is None else {'tools':native_catalog},diagnostic_receipts)
     if not options:return None
-    options=options[:8]  # Remaining requirements stay pending for the next batch.
     value=permitted_request(request,'verify')
     catalog={t['function']['name']:t for t in value.get('tools',[])}
+    if native_catalog is not None and BUNDLE_TOOL in catalog:
+        registered=next((t for t in native_catalog if t['function']['name']==BUNDLE_TOOL),None)
+        if registered:catalog[BUNDLE_TOOL]=copy.deepcopy(registered)
+    if BUNDLE_TOOL in catalog and 'collect_incident_evidence' not in attempted:
+        sensors=[o for o in options if o['tool'] in SENSOR_SEARCH_TOOLS]
+        diagnostics=[o for o in options if o['tool']=='mcp__system_diagnostics__get_system_diagnostics']
+        if 1<=len(sensors)<=8 and len(diagnostics)<=4 and len({s['arguments']['source_ip'] for s in sensors})==1:
+            params={'events':[{'sensor':o['tool'].removeprefix('mcp__security_events__search_').removesuffix('_alerts'),
+                'arguments':copy.deepcopy(o['arguments'])} for o in sensors]}
+            if diagnostics:params['diagnostics']=[copy.deepcopy(o['arguments']) for o in diagnostics]
+            if os.environ.get('CAPSTONE_WEB_IMPACT_REVIEW')=='1' and sensor_requirements:
+                context={k:sensor_requirements[0]['arguments'][k] for k in ('since_kst','until_kst','limit')}
+                if any(all(e['arguments'][k]==v for k,v in context.items()) for e in params['events']):params['web_context']=context
+            if not tool_input_rejection(BUNDLE_TOOL,params,catalog[BUNDLE_TOOL]['function'].get('parameters')):
+                # One model-selected wire call, not fabricated component calls.
+                options=[o for o in options if o not in sensors and o not in diagnostics]+[{'tool':BUNDLE_TOOL,'arguments':params}]
+    options=options[:8]  # Remaining requirements stay pending for the next batch.
     for option in options:
         name=option['tool']
         if name not in catalog or tool_input_rejection(name,option['arguments'],catalog[name]['function'].get('parameters')):
@@ -2773,6 +2932,7 @@ def management_report_request(request, agent, snapshot):
         for r in receipts:
             raw=r['output']
             if r['tool']=='mcp__security_events__search_web_access':raw=web_evidence_view(raw)
+            elif r['tool']==BUNDLE_TOOL:raw=incident_bundle_view(raw)
             elif re.fullmatch(r'mcp__rule_[ab]__get_operation_status',r['tool']):raw=operation_time_view(raw)
             try:value=json.loads(raw,object_pairs_hook=unique,parse_constant=lambda x:(_ for _ in ()).throw(ValueError('nonfinite')))
             except (ValueError,TypeError):value=raw
@@ -3018,7 +3178,8 @@ def main():
     sensor_requirements=sensor_read_requirements(os.environ.get('CAPSTONE_REQUIRED_SENSOR_JSON'))
     sensor_receipts=[]
     diagnostic_receipts=[]
-    attempted_wire_reads=[]
+    attempted_observation_reads=[]  # Navigation: wire calls and verified bundle components.
+    component_read_names=set()  # Profile readiness only; never wire counts or citation names.
     native_read_catalog=[]
     argument_errors = []
     output_lock = threading.Lock()
@@ -3056,7 +3217,7 @@ def main():
         if not wire_allowed(name, mode):
             raise PermissionError('management_wire_tool_not_allowed')
         if wire_allowed(name,'verify'):
-            attempted_wire_reads.append(name)
+            attempted_observation_reads.append(name)
         # A received attack alert can justify provisional containment before an
         # extra model-side lookup. A's fixed helper independently validates the
         # current raw sensor event, protected IPs and bounded TTL. Verify mode
@@ -3065,6 +3226,27 @@ def main():
         except Exception as exc:
             result=read_protocol_error_result(name,exc)
             if result is None:raise
+        if name=='collect_incident_evidence' and not getattr(result,'is_error',getattr(result,'isError',False)):
+            parts=None
+            try:
+                content=getattr(result,'content',[])
+                if len(content)==1:parts=incident_bundle_reads(arguments,_unpack(json.loads(content[0].text)))
+            except (ValueError,TypeError,AttributeError):pass
+            if parts is None:
+                from types import SimpleNamespace as NS
+                return NS(isError=True,is_error=True,content=[NS(type='text',text=json.dumps({
+                    'error':'incident_bundle_provenance_invalid','stage':'after_mcp',
+                    'executed':True,'detail':'Internal evidence is not bound to this call; individual reads remain required.'}))])
+            from types import SimpleNamespace as NS
+            for part in parts:
+                bare=part['tool'];params=part['arguments']
+                attempted_observation_reads.append(bare)
+                if bare=='get_system_diagnostics':
+                    diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics','arguments':copy.deepcopy(params)})
+                if part['is_error']:continue
+                component_read_names.add(('mcp__system_diagnostics__' if bare=='get_system_diagnostics' else 'mcp__security_events__')+bare)
+                receipt=sensor_read_receipt(bare,params,NS(isError=False,content=[NS(text=json.dumps(part['result'],ensure_ascii=False))]))
+                if receipt:sensor_receipts.append(receipt)
         if name=='get_system_diagnostics' and isinstance(arguments,dict):
             diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics',
                 'arguments':copy.deepcopy(arguments)})
@@ -3076,18 +3258,18 @@ def main():
         if wire_allowed(name, 'verify') and getattr(result, 'is_error', getattr(result, 'isError', False)) is False:
             if name != 'calculate_time':
                 completed_wire_calls.append(name)  # Arithmetic alone is never a successful SOC observation.
-            observed = observation_facts(name, result)
+            observed = observation_facts(name, result, arguments)
             read_facts.extend(observed)
             for fact in observed:
                 if fact.get('kind') == 'proposal_status' and fact not in status_receipts:
                     status_receipts.append(fact)
             del status_receipts[:-64]
-            del read_facts[:-32]
+            del read_facts[:-128]
         # Keep only real MCP text, bounded in memory, for literal-evidence checks.
         for item in getattr(result, 'content', [])[:20]:
             value = getattr(item, 'text', None)
             if isinstance(value, str):
-                evidence.append({'role': 'tool', 'content': value[:16000]})
+                evidence.append({'role': 'tool', 'content': value[:MAX_EVENT_AUDIT_BYTES if name=='collect_incident_evidence' else 16000]})
         del evidence[:-32]
         return result
 
@@ -3112,13 +3294,13 @@ def main():
         scope_catalog=copy.deepcopy(self.tools)
         for tool in scope_catalog:
             name=tool['function']['name']
-            if name=='mcp__system_diagnostics__get_system_diagnostics':
+            if name in ('mcp__system_diagnostics__get_system_diagnostics',BUNDLE_TOOL):
                 registered=registry.get_schema(name)
                 if isinstance(registered,dict) and isinstance(registered.get('parameters'),dict):
                     tool['function']['parameters']=copy.deepcopy(registered['parameters'])
         native_read_catalog[:]=copy.deepcopy(scope_catalog)
         base=management_reasoning(operation_time_request(permitted_request(builder(self, *args, **kwargs), mode)), self)
-        bundle=required_read_bundle(base,requirements,status_receipts,sensor_requirements,sensor_receipts,diagnostic_receipts,scope_catalog)
+        bundle=required_read_bundle(base,requirements,status_receipts,sensor_requirements,sensor_receipts,diagnostic_receipts,scope_catalog,attempted_observation_reads)
         value=bundle[0] if bundle else initial_review_read(base,
             completed_wire_calls,requirements,status_receipts,sensor_requirements,sensor_receipts)
         self._capstone_pending_options=(getattr(self,'_current_turn_id',None),bundle[1]) if bundle else None
@@ -3128,14 +3310,14 @@ def main():
         pending=mode=='verify' and (pending_status or bool(missing_sensor_reads(sensor_requirements,sensor_receipts))
             or bool(operator_diagnostic_options({'tools':scope_catalog},diagnostic_receipts)))
         if not pending:
-            impact=web_impact_review_request(value,read_facts,attempted_wire_reads,sensor_requirements)
+            impact=web_impact_review_request(value,read_facts,attempted_observation_reads,sensor_requirements)
             pending=impact is not value
             value=impact
         self._capstone_management_pending_read=(getattr(self,'_current_turn_id',None),pending)
         self._capstone_management_report=None
         if pending:return management_reasoning(value,self,required_read_phase=True)
         cited=completed_citation_request(value,successful_read_names)
-        result=completed_web_review_request(cited,self,successful_read_names,requirements_complete=bool(sensor_requirements))
+        result=completed_web_review_request(cited,self,successful_read_names,requirements_complete=bool(sensor_requirements),component_reads=component_read_names)
         if result is not cited:
             self._capstone_management_report={'turn':getattr(self,'_current_turn_id',None),
                 'reads':sorted(n for n in successful_read_names if allowed(n,'verify')),'facts':copy.deepcopy(read_facts),
@@ -3152,7 +3334,7 @@ def main():
         if not completed_wire_calls:
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
-        web_pending=web_impact_review_request({'tools':native_read_catalog},read_facts,attempted_wire_reads,sensor_requirements).get('tool_choice')=='required'
+        web_pending=web_impact_review_request({'tools':native_read_catalog},read_facts,attempted_observation_reads,sensor_requirements).get('tool_choice')=='required'
         web_pending=web_pending or bool(operator_diagnostic_options({'tools':native_read_catalog},diagnostic_receipts))
         data['final_response'] = factual_review_report(read_facts) if (unfinished_report or missing_sensor_reads(sensor_requirements,sensor_receipts) or web_pending
             or evidence_claim_violations(text, read_facts, successful_read_names)) else kst_display(text)
@@ -3208,7 +3390,7 @@ def main():
     from tools.mcp_tool_discovery import discover_mcp_tools
     discover_mcp_tools()
     install_grounding_retry(completed_wire_calls, read_facts, argument_errors, successful_read_names,
-                            requirements,status_receipts,sensor_requirements,sensor_receipts,attempted_wire_reads)
+                            requirements,status_receipts,sensor_requirements,sensor_receipts,attempted_observation_reads)
     from hermes_cli.main import main as native_main
     native_main()
 

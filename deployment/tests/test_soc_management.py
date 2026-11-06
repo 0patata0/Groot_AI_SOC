@@ -94,7 +94,7 @@ class BindingTests(unittest.TestCase):
             tree=ast.parse(gate);entry=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
             call=next(n for n in ast.walk(entry) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='install_grounding_retry')
             self.assertEqual([ast.unparse(n) for n in call.args[-5:]],
-                ['requirements','status_receipts','sensor_requirements','sensor_receipts','attempted_wire_reads'])
+                ['requirements','status_receipts','sensor_requirements','sensor_receipts','attempted_observation_reads'])
             reference.write_bytes(b'# stale reference\n')
             with self.assertRaisesRegex(Exception,'embedded_gate_source_mismatch'):m.verified_management_command(case)
 

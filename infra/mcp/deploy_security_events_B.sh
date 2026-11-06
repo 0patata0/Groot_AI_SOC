@@ -96,7 +96,7 @@ try:
     names = {tool["name"] for tool in tools}
 except (ValueError, KeyError, StopIteration, TypeError) as exc:
     raise SystemExit("MCP %s protocol failed: %s" % (mode, type(exc).__name__))
-if names != {"search_suricata_alerts", "search_modsecurity_alerts", "search_wazuh_alerts", "get_wazuh_sca_checks", "get_web_service_target", "search_web_access"}:
+if names != {"search_suricata_alerts", "search_modsecurity_alerts", "search_wazuh_alerts", "get_wazuh_sca_checks", "get_web_service_target", "search_web_access", "collect_incident_evidence"}:
     raise SystemExit("MCP %s exposed unexpected tools" % mode)
 print("MCP %s check: %d read-only tools" % (mode, len(names)))
 PY

@@ -665,6 +665,7 @@ def rule_detail_report(request, calls):
 
 
 def read_report(question, calls):
+    calls=evidence_reads(calls)
     notice = scope_notice(question)
     if notice: return notice
     security=security_inventory_request(question)
@@ -793,7 +794,39 @@ def inventory(question, calls, **kwargs):
     return rendered
 
 
+class _EvidenceReadView(list):
+    """Interpretation only: wire receipts remain separate and unchanged."""
+    def __init__(self, rows, wire_calls, origins, invalid):
+        super().__init__(rows)
+        self.wire_calls=tuple(wire_calls)
+        self.component_origins=origins
+        self.invalid_bundle=invalid
+
+
+def evidence_reads(calls):
+    if isinstance(calls,_EvidenceReadView):return calls
+    originals=list(calls or ());rows=[];origins={};invalid=False
+    for call in originals:
+        if call.get('server')!='security-events' or call.get('name')!='collect_incident_evidence':
+            rows.append(call);continue
+        data=payload(call)
+        parts=EVIDENCE.incident_bundle_reads(call.get('arguments'),data) if data is not None else None
+        if parts is None:
+            invalid |= data is not None
+            rows.append(call);continue
+        for part in parts:
+            raw=json.dumps(part['result'],ensure_ascii=False,allow_nan=False)
+            child={'server':'system-diagnostics' if part['tool']=='get_system_diagnostics' else 'security-events',
+                'name':part['tool'],'arguments':part['arguments'],'result':raw,'is_error':part['is_error'],
+                'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}
+            origins[id(child)]={'transport_tool':EVIDENCE.BUNDLE_TOOL,'parent_result_sha256':call['result_sha256'],
+                'index':part['index'],'tool':part['tool'],'result_sha256':part['result_sha256']}
+            rows.append(child)
+    return _EvidenceReadView(rows,originals,origins,invalid)
+
+
 def facts_for(calls):
+    calls=evidence_reads(calls)
     facts = []
     for call in calls:
         if not READ.successful(call):
@@ -801,8 +834,10 @@ def facts_for(calls):
         name = 'mcp__' + call['server'].replace('-', '_') + '__' + call['name']
         if EVIDENCE.allowed(name, 'verify'):
             try:
-                facts.extend(EVIDENCE.observation_facts(call['name'], SimpleNamespace(isError=False,
-                    content=[SimpleNamespace(text=call['result'])])))
+                observed=EVIDENCE.observation_facts(call['name'], SimpleNamespace(isError=False,
+                    content=[SimpleNamespace(text=call['result'])]),call.get('arguments'))
+                origin=calls.component_origins.get(id(call))
+                facts.extend(dict(f,bundle_component=origin) if origin else f for f in observed)
                 if call['server'] == 'wazuh-ro':
                     # Wazuh MCP returns human-readable text inside {result: ...},
                     # rather than the structured sensor schema used by Hermes.
@@ -842,6 +877,8 @@ def rule_edit_anchors(data):
 
 
 def model_view(server, name, raw):
+    if server == 'security-events' and name == 'collect_incident_evidence':
+        return EVIDENCE.incident_bundle_view(raw)
     if server == 'security-events' and name == 'search_web_access':
         return EVIDENCE.web_evidence_view(raw)
     if server in ('rule-a', 'rule-b', 'rule-write-a', 'rule-write-b') and name in ('get_operation_status', 'temporarily_contain_ip'):
@@ -894,11 +931,13 @@ def wazuh_text(raw):
 
 
 def violations(question, answer, calls, reference=None):
+    calls=evidence_reads(calls)
     facts = facts_for(calls)
     # Configuration terminology is not an event observation. Preserve other
     # claims on the same line, and use the untouched answer for JSON/time checks.
     claim_text = re.sub(r'탐지\s*(?:모드|규칙|룰|설정|정책)', '설정', answer)
     issues = EVIDENCE.evidence_claim_violations(claim_text, facts) + EVIDENCE.calculated_json_violations(answer, facts)
+    if calls.invalid_bundle:issues.append('incident_bundle_provenance_invalid')
     issues += incident_completion_issues(question,answer,calls,reference)
     text = normalized(question)
     if (not calls and not READ.wants_write(text)
@@ -949,6 +988,7 @@ def incident_field_violations(answer, calls):
     Only integrity-checked event reads are eligible. These checks are not a
     complete semantic verifier; passing them is not proof of a correct report.
     """
+    calls=evidence_reads(calls)
     rows = []
     for call in calls:
         if (call.get('server') == 'security-events'
@@ -1045,6 +1085,7 @@ def incident_evidence_gap(question, calls, reference=None):
     This does not select a tool, classify the incident or retry a protected call.
     The adapters retain their existing model/repair budgets.
     """
+    calls=evidence_reads(calls)
     text = normalized(question)
     if not EVIDENCE.incident_investigation_request(text) or READ.wants_write(text):
         return False
@@ -1056,6 +1097,7 @@ def incident_evidence_gap(question, calls, reference=None):
 
 
 def incident_evidence_instruction(question, calls=()):
+    calls=evidence_reads(calls)
     failed = []
     for call in calls:
         raw = call.get('result')
@@ -1090,14 +1132,17 @@ def incident_completion_issues(question,answer,calls,reference=None):
     Only hash-verified, completed tool receipts count. User/card prose supplies
     search scope, never an observed incident, approved response or decision.
     """
+    calls=evidence_reads(calls)
     if not EVIDENCE.incident_investigation_request(normalized(question)) or READ.wants_write(question):return []
-    requirements=set();reads=set();receipts=set();actual=[]
+    requirements=set();receipts=set();actual=[];bundle_requirements=set();bundle_receipts=set()
+    reads={'mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name','') for c in calls.wire_calls
+           if payload(c) and EVIDENCE.allowed('mcp__'+c.get('server','').replace('-','_')+'__'+c.get('name',''),'verify')}
     for call in calls:
         data=payload(call)
         if not isinstance(data,dict):continue
         name='mcp__'+call.get('server','').replace('-','_')+'__'+call.get('name','')
         if not EVIDENCE.allowed(name,'verify'):continue
-        reads.add(name);actual.append((name,call.get('arguments',{}),data))
+        actual.append((name,call.get('arguments',{}),data))
         if (name not in ('mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts')
                 or data.get('source_scope')!='wazuh_indexed_alerts' or not isinstance(data.get('alerts'),list)):continue
         source=data.get('source')
@@ -1111,7 +1156,9 @@ def incident_completion_issues(question,answer,calls,reference=None):
                 start,end=(EVIDENCE.parse_instant(reference.get(k)) for k in ('since_kst','until_kst'))
                 if not (stamp and start and end and start<=stamp<=end and source in reference.get('families',[])):continue
                 if reference.get('source_ips') and ip not in reference['source_ips']:continue
-            requirements.add((source,ip,stamp.timestamp() if stamp else None,rule))
+            item=(source,ip,stamp.timestamp() if stamp else None,rule)
+            requirements.add(item)
+            if id(call) in calls.component_origins:bundle_requirements.add(item)
     sensor_context=any(c.get('server')=='security-events' and c.get('name') in
         ('search_modsecurity_alerts','search_suricata_alerts') for c in calls)
     sensor_context|=bool(reference and set(reference.get('families',[]))&{'modsecurity','suricata'})
@@ -1119,7 +1166,8 @@ def incident_completion_issues(question,answer,calls,reference=None):
     decision,error=EVIDENCE.parse_incident_disposition(answer,reads)
     if error:return [error]
     sensor_tools={'mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts'}
-    if not set(decision['evidence_tools'])&sensor_tools:return ['incident_disposition_evidence_missing']
+    cited_bundle=(EVIDENCE.BUNDLE_TOOL in decision['evidence_tools'] and bool(requirements) and requirements<=bundle_requirements)
+    if not (set(decision['evidence_tools'])&sensor_tools or cited_bundle):return ['incident_disposition_evidence_missing']
     if decision['assessment']=='unresolved':return []
     if not requirements or any(not isinstance(ip,str) or not ip or type(stamp) not in (int,float)
                               for _source,ip,stamp,_rule in requirements):
@@ -1130,7 +1178,12 @@ def incident_completion_issues(question,answer,calls,reference=None):
         and data.get('request_id',data.get('proposal_id'))==args['request_id'] for name,args,data in actual)
     for name,args,data in actual:
         receipts.update(EVIDENCE.incident_impact_read_timestamps(name,args,data,requirements))
-    return ['incident_impact_verification_missing'] if EVIDENCE.incident_impact_missing(decision,requirements,receipts,linked) else []
+    for call in calls:
+        data=payload(call)
+        if id(call) in calls.component_origins and data:
+            name='mcp__'+call['server'].replace('-','_')+'__'+call['name']
+            bundle_receipts.update(EVIDENCE.incident_impact_read_timestamps(name,call['arguments'],data,requirements))
+    return ['incident_impact_verification_missing'] if EVIDENCE.incident_impact_missing(decision,requirements,receipts,linked,bundle_receipts) else []
 
 
 def incident_judgment_check(question, answer, calls, reference=None):
@@ -1187,8 +1240,8 @@ def repeated_judgment(audits):
 def incident_selection_scope(question, calls, reference=None):
     if not incident_evidence_gap(question, calls, reference):
         return None
-    if reference:return {'mcp__security_events__search_'+kind+'_alerts' for kind in card_evidence_gaps(reference,calls)}
-    scope = {'mcp__security_events__search_wazuh_alerts', 'mcp__security_events__search_modsecurity_alerts',
+    if reference:return {EVIDENCE.BUNDLE_TOOL}|{'mcp__security_events__search_'+kind+'_alerts' for kind in card_evidence_gaps(reference,calls)}
+    scope = {EVIDENCE.BUNDLE_TOOL, 'mcp__security_events__search_wazuh_alerts', 'mcp__security_events__search_modsecurity_alerts',
              'mcp__security_events__search_suricata_alerts'}
     # Navigation is evidence, not an event or a guessed agent assignment.
     scope.update(('mcp__wazuh_ro__get_wazuh_agents', 'mcp__security_events__get_web_service_target'))
@@ -1212,12 +1265,14 @@ def explicit_incident_interval(question):
 
 def incident_observation_prompt(question, calls):
     """Return actual selected-read evidence to the SDK model for its judgment."""
+    calls=evidence_reads(calls)
     observed = []
     for call in calls:
         if call.get('name') not in ('search_modsecurity_alerts', 'search_suricata_alerts', 'search_wazuh_alerts', 'get_wazuh_alert_summary') or not payload(call):
             continue
         shown = model_view(call['server'], call['name'], call['result'])
         observed.append({'server': call['server'], 'name': call['name'],
+                         'bundle_component': calls.component_origins.get(id(call)),
                          'arguments': call.get('arguments', {}), 'result': shown[:24000],
                          'result_truncated': len(shown) > 24000})
     return ('현재 사건 조사 요청: ' + question + '\n아래는 이번 요청에서 실제 호출한 읽기 도구의 반환 자료입니다. '
@@ -1235,6 +1290,7 @@ def action_claim_violations(question, answer, calls):
     This does not decide whether an incident warrants a change or run a tool.
     Policy-only refusal is valid; invented current state or server outcomes are not.
     """
+    calls=evidence_reads(calls)
     if not isinstance(answer, str):
         return []
     verified = []
@@ -1411,6 +1467,7 @@ def card_reference(question,current):
 
 
 def card_evidence_gaps(reference,calls):
+    calls=evidence_reads(calls)
     missing=[]
     for family in reference['families']:
         matching=[]
@@ -1770,6 +1827,7 @@ def diagnostic_observations(calls):
     An error or malformed last receipt must invalidate an earlier success.
     A similarly named tool on another server is not diagnostic evidence.
     """
+    calls=evidence_reads(calls)
     latest = {}
     for call in calls:
         server, name = call.get('server'), call.get('name')
@@ -1852,6 +1910,7 @@ def inventory_tool_scope(request):
 
 
 def missing_reads(question, calls, diagnostic_targets=()):
+    calls=evidence_reads(calls)
     if EVIDENCE.incident_investigation_request(normalized(question)):
         return ['사건 경보 조회 근거'] if incident_evidence_gap(question, calls) else []
     security=security_inventory_request(question)
@@ -1905,6 +1964,7 @@ def missing_reads(question, calls, diagnostic_targets=()):
 
 def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), reference=None):
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
+    calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
     if EVIDENCE.incident_investigation_request(normalized(question)) and not READ.wants_write(question):
         known_agents = set(re.findall(r'(?:agent[_ ]?id|에이전트\s*ID)\s*[:=]?\s*[`\'\"]?(\d{3,8})(?!\d)', question, re.I))
@@ -2269,6 +2329,7 @@ def payload(call):
 
 
 def service_report(question, calls):
+    calls=evidence_reads(calls)
     if tool_scope(question) != {'mcp__rule_a__get_service_action_target'}:
         return None
     relevant = [c for c in calls if c['server'] == 'rule-a' and c['name'] == 'get_service_action_target'
@@ -2411,6 +2472,7 @@ def runtime_diagnostic_report(targets, latest, unsupported, *, detailed=False):
 
 
 def event_report(question, calls):
+    calls=evidence_reads(calls)
     if EVIDENCE.incident_investigation_request(normalized(question)):
         return None  # Preserve the model's investigation and risk judgment.
     scope = tool_scope(question)
@@ -2458,6 +2520,7 @@ def event_report(question, calls):
 
 
 def fallback(question, calls):
+    calls=evidence_reads(calls)
     rendered = read_report(question, calls) or inventory(question, calls)
     if rendered:
         return rendered

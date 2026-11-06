@@ -404,9 +404,9 @@ class SecurityEventsMcpTests(unittest.TestCase):
                           "get_web_service_target", "search_web_access", "collect_incident_evidence"})
         self.assertTrue(lines[2]["result"]["isError"])
 
-    def test_bundle_is_not_advertised_or_callable_before_agent_integration(self):
-        self.assertFalse(module.INCIDENT_BUNDLE_ENABLED)
-        with patch.object(module, 'fixed_module') as dependency:
+    def test_bundle_rollback_switch_removes_advertisement_and_dispatch(self):
+        self.assertTrue(module.INCIDENT_BUNDLE_ENABLED)
+        with patch.object(module, 'INCIDENT_BUNDLE_ENABLED', False), patch.object(module, 'fixed_module') as dependency:
             result = module.handle({'id': 1, 'method': 'tools/list'})
             self.assertEqual(len(result['result']['tools']), 6)
             self.assertNotIn('collect_incident_evidence', {t['name'] for t in result['result']['tools']})

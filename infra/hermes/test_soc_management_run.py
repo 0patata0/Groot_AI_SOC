@@ -547,7 +547,7 @@ class ManagementWrapper(unittest.TestCase):
         self.assertEqual(json.loads(outer)["result"], inner)
 
     def test_large_event_and_sca_audit_preserves_last_row_and_original_mcp_response(self):
-        for bare in wrapper.EVENT_READ:
+        for bare in wrapper.EVENT_READ - {'collect_incident_evidence'}:
             with self.subTest(tool=bare):
                 payload = {'source_scope': 'last_stored_sca_scan' if bare == 'get_wazuh_sca_checks' else 'wazuh_indexed_alerts',
                            'alerts': [{'timestamp': '2026-10-22T04:09:02.%03d+09:00' % i,

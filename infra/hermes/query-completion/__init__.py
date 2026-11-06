@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.19.72"
+VERSION = "groot-query-completion:1.19.74"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = '522effbeb4d3038b06c3f90e8a0a57d35b471a782de9c1b30d34bfeee196c67a'
+EVIDENCE_SOURCE_SHA256 = '2509e829b866f66dcb67cb4a2c8490f899a4331bcea5f82f249d1100c90eba34'
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')
@@ -107,6 +107,7 @@ _READ_TOOL_NAMES = frozenset(
                  "get_service_action_target", "get_operation_status")
 ) | frozenset({
     "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts",
+    "mcp__security_events__collect_incident_evidence",
     "mcp__security_events__get_wazuh_sca_checks",
     "mcp__resp__list_blocks", "mcp__resp__get_firewall_rules",
     "mcp__system_diagnostics__get_system_diagnostics",
@@ -829,13 +830,20 @@ def current_evidence(rows):
                 name, cid = call['function'].get('name'), call.get('id')
                 if not EVIDENCE.allowed(name, 'verify') or not isinstance(cid, str) or cid in calls:
                     return [], [], False  # Preserve native protected operation handling.
-                calls[cid] = name
+                arguments=None
+                if name==EVIDENCE.BUNDLE_TOOL:
+                    try:
+                        arguments=call['function'].get('arguments')
+                        if isinstance(arguments,str):arguments=json.loads(arguments)
+                        if not isinstance(arguments,dict):return [],[],False
+                    except (ValueError,TypeError):return [],[],False
+                calls[cid] = (name,arguments)
         elif row.get('role') == 'tool':
             cid = row.get('tool_call_id')
             if cid not in calls or cid in used:
                 return [], [], False
             used.add(cid)
-            name = calls[cid]
+            name,arguments = calls[cid]
             raw = row.get('content')
             if not isinstance(raw, str) or len(raw) > 200000:
                 continue
@@ -848,7 +856,7 @@ def current_evidence(rows):
                 elif isinstance(data, dict) and not data.get('error') and not data.get('isError'):
                     errors.pop(name, None)
                 result = SimpleNamespace(is_error=False, content=[SimpleNamespace(text=json.dumps(data))])
-                facts.extend(EVIDENCE.observation_facts(short, result))
+                facts.extend(EVIDENCE.observation_facts(short, result, arguments))
             except (ValueError, TypeError, RecursionError):
                 continue
     return facts, sorted(errors), bool(used)

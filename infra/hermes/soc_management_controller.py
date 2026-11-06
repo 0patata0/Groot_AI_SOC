@@ -895,14 +895,16 @@ def verified_sensor_events(requirements, receipts):
                for source, ip, stamp, rule in requirements)
 
 
-def sensor_disposition_error(text, successful_tools):
+def sensor_disposition_error(text, successful_tools, bundle_receipts=(), requirements=()):
     """Validate the shared explicit decision; source/closure remain separate."""
     from soc_management_run import parse_incident_disposition, closure_uncertainty_violations
     value,error=parse_incident_disposition(text,successful_tools)
     if error:return error
     if closure_uncertainty_violations(text):return 'incident_closure_with_unknown_impact'
     sensor_tools={'mcp__security_events__search_modsecurity_alerts','mcp__security_events__search_suricata_alerts'}
-    if not set(value['evidence_tools'])&sensor_tools:return 'incident_disposition_evidence_missing'
+    cited_bundle=('mcp__security_events__collect_incident_evidence' in value['evidence_tools']
+                  and bool(requirements) and verified_sensor_events(requirements,bundle_receipts))
+    if not (set(value['evidence_tools'])&sensor_tools or cited_bundle):return 'incident_disposition_evidence_missing'
     return 'incident_disposition_unresolved' if value['assessment']=='unresolved' else None
 
 
@@ -912,10 +914,10 @@ def impact_read_timestamps(name, args, payload, requirements):
     return incident_impact_read_timestamps(name,args,payload,requirements)
 
 
-def sensor_impact_verification_missing(text,requirements,receipts,linked_response):
+def sensor_impact_verification_missing(text,requirements,receipts,linked_response,bundle_receipts=()):
     from soc_management_run import parse_incident_disposition,incident_impact_missing
     value,error=parse_incident_disposition(text)
-    return bool(error) or incident_impact_missing(value,requirements,receipts,linked_response)
+    return bool(error) or incident_impact_missing(value,requirements,receipts,linked_response,bundle_receipts)
 
 
 def required_sensor_scope_error(name, payload, requirements):
@@ -977,7 +979,29 @@ class Trace:
         self.sensor_requirements = sensor_review_requirements(store.context(case["id"]))
         self.sensor_receipts = set()
         self.impact_receipts = set()
+        self.bundle_impact_receipts = set()
+        self.bundle_sensor_receipts = set()
         self.unblocks_pending_readback = set()
+
+    def record_sensor_read(self,name,arguments,payload):
+        source = name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
+        if payload.get("source_scope") == "wazuh_indexed_alerts" and payload.get("source") == source:
+            for required in self.required_sensor_reads:
+                if corrected_required_sensor_read(name,arguments,payload,required):
+                    self.pending_required_sensor_errors.discard((name,canonical(required['arguments'])))
+            self.impact_receipts.update(impact_read_timestamps(
+                name, arguments, payload, self.sensor_requirements))
+            for alert in payload.get("alerts", [])[:50]:
+                if isinstance(alert, dict):
+                    reference = sensor_event_reference(alert, source)
+                    if reference and reference[1] is not None:
+                        self.sensor_receipts.add(reference)
+            args = arguments
+            scope = (name, canonical({k: v for k, v in args.items()
+                if k not in ('since_kst', 'until_kst', 'lookback_minutes', 'limit')}))
+            if scope in self.pending_event_time_errors and corrected_event_time_read(
+                    name, args, payload, self.sensor_requirements):
+                self.pending_event_time_errors.discard(scope)
 
     def accept(self, event):
         if not isinstance(event, dict):
@@ -1106,24 +1130,24 @@ class Trace:
                 elif not error and payload and name in (
                         "mcp__security_events__search_suricata_alerts", "mcp__security_events__search_modsecurity_alerts",
                         "mcp__security_events__search_wazuh_alerts"):
-                    source = name.removeprefix('mcp__security_events__search_').removesuffix('_alerts')
-                    if payload.get("source_scope") == "wazuh_indexed_alerts" and payload.get("source") == source:
-                        for required in self.required_sensor_reads:
-                            if corrected_required_sensor_read(name,self.arguments[pending[0]['ordinal']],payload,required):
-                                self.pending_required_sensor_errors.discard((name,canonical(required['arguments'])))
-                        self.impact_receipts.update(impact_read_timestamps(
-                            name, self.arguments[pending[0]['ordinal']], payload, self.sensor_requirements))
-                        for alert in payload.get("alerts", [])[:50]:
-                            if isinstance(alert, dict):
-                                reference = sensor_event_reference(alert, source)
-                                if reference and reference[1] is not None:
-                                    self.sensor_receipts.add(reference)
-                        args = self.arguments[pending[0]['ordinal']]
-                        scope = (name, canonical({k: v for k, v in args.items()
-                            if k not in ('since_kst', 'until_kst', 'lookback_minutes', 'limit')}))
-                        if scope in self.pending_event_time_errors and corrected_event_time_read(
-                                name, args, payload, self.sensor_requirements):
-                            self.pending_event_time_errors.discard(scope)
+                    self.record_sensor_read(name,self.arguments[pending[0]['ordinal']],payload)
+                elif not error and payload and name == 'mcp__security_events__collect_incident_evidence':
+                    from soc_management_run import incident_bundle_reads
+                    parts=incident_bundle_reads(self.arguments[pending[0]['ordinal']],payload)
+                    if parts is None:
+                        self.protocol_error=True
+                    else:
+                        for part in parts:
+                            self.tool_error |= part['is_error']
+                            if not part['is_error'] and part['tool'] in ('search_suricata_alerts','search_modsecurity_alerts','search_wazuh_alerts'):
+                                self.record_sensor_read('mcp__security_events__'+part['tool'],part['arguments'],part['result'])
+                                self.bundle_impact_receipts.update(impact_read_timestamps(
+                                    'mcp__security_events__'+part['tool'],part['arguments'],part['result'],self.sensor_requirements))
+                                source=part['tool'].removeprefix('search_').removesuffix('_alerts')
+                                if part['result'].get('source_scope')=='wazuh_indexed_alerts' and part['result'].get('source')==source:
+                                    for alert in part['result'].get('alerts',[])[:50]:
+                                        reference=sensor_event_reference(alert,source) if isinstance(alert,dict) else None
+                                        if reference and reference[1] is not None:self.bundle_sensor_receipts.add(reference)
                 elif not error and name == "mcp__resp__list_blocks":
                     self.read_receipts[("target", "a:incident-ip")] = {"observed": True}
                     ips = response_block_ips(event.get('output'))
@@ -1172,7 +1196,7 @@ class Trace:
             successful_tools = {row[0] for row in db.execute(
                 "SELECT name FROM tool_calls WHERE run_id=? AND completed=1 AND is_error=0", (self.run_id,))
                 if row[0] not in CALCULATION_TOOLS}
-            decision_error = sensor_disposition_error(text, successful_tools) if self.sensor_requirements else None
+            decision_error = sensor_disposition_error(text, successful_tools,self.bundle_sensor_receipts,self.sensor_requirements) if self.sensor_requirements else None
             missing_bound_read = any(not verified_proposal(
                 tuple(p[k] for k in ("id", "status", "result_status", "target")),
                 self.read_receipts, self.later_proposals) for p in proposals)
@@ -1207,7 +1231,7 @@ class Trace:
             elif disposition == "resolved" and decision_error:
                 state, detail, due = "needs_review", decision_error, now
             elif (disposition == "resolved" and self.sensor_requirements and
-                  sensor_impact_verification_missing(text,self.sensor_requirements,self.impact_receipts,bool(proposals))):
+                  sensor_impact_verification_missing(text,self.sensor_requirements,self.impact_receipts,bool(proposals),self.bundle_impact_receipts)):
                 state, detail, due = "needs_review", "incident_impact_verification_missing", now
                 text = incomplete_report(detail)
             elif self.case["mode"] == "manage" and not verified and disposition in ("resolved", "monitor"):
@@ -1784,8 +1808,8 @@ def management_gate_argument(source):
     if not isinstance(source,bytes) or not 1<=len(source)<=MAX_RESPONSE:
         raise ControllerError('management_gate_source_size_invalid')
     import lzma
-    encoded=base64.b64encode(lzma.compress(source,preset=6)).decode('ascii')
-    value=("import base64,hashlib,lzma; s=lzma.decompress(base64.b64decode("+repr(encoded)+")); "
+    encoded=base64.b85encode(lzma.compress(source,preset=6)).decode('ascii')
+    value=("import base64,hashlib,lzma; s=lzma.decompress(base64.b85decode("+repr(encoded)+")); "
            "assert hashlib.sha256(s).hexdigest()=="+repr(hashlib.sha256(source).hexdigest())+"; "
            "exec(compile(s,'capstone-immutable-management-gate','exec'))")
     if len(value.encode())>=65536:

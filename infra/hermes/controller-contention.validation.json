@@ -161,6 +161,11 @@
     "latest_other_indexed_sample_kst": "2026-11-06T17:38:57.526000+09:00",
     "new_server_changes": 0,
     "chat_posts": 0,
-    "note": "Wazuh sample alone does not establish complete ingestion or absence. Host journal and current systemd state independently checked."
+    "note": "Wazuh sample alone does not establish complete ingestion or absence. Host journal and current systemd state independently checked.",
+    "git": {
+      "at_kst": "2026-11-06T17:42:08.630826+09:00",
+      "head": "14398cf8a0f121f4b71b54b8a201e5063d516d8f",
+      "remote_main": "14398cf8a0f121f4b71b54b8a201e5063d516d8f"
+    }
   }
 }

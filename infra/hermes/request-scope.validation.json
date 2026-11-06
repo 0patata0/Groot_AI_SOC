@@ -100,7 +100,11 @@
     "/var/lib/capstone-request-scope/20261106-r5/deployment"
   ],
   "publication": {
-    "status": "pending"
+    "status": "source_pushed_remote_verified",
+    "commit": "4349f46fadb3f9e86970e90fa106d3dbf6181559",
+    "remote_main": "4349f46fadb3f9e86970e90fa106d3dbf6181559",
+    "at_kst": "2026-11-06T11:40:05.700209+09:00",
+    "note": "This publication receipt is included in a subsequent documentation commit. Final head is recorded locally."
   },
   "cleanup": {
     "server_source_files": 2210,

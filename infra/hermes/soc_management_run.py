@@ -1790,9 +1790,19 @@ def management_reasoning(request, agent, *, required_read_phase=False):
     if review:
         result.pop('max_completion_tokens', None)
         result['max_tokens'] = 6144 if operator_review and not lookup else 2048
-    if lookup:
+    chat=chat_read_context();catalog=request
+    bound=getattr(agent,'_capstone_registered_read_conditions',None)
+    if bound is not None:
+        catalog={'tools':[]}
+        if isinstance(bound,tuple) and len(bound)==2 and bound[0]==getattr(agent,'_current_turn_id',None) and isinstance(bound[1],dict):
+            names={t.get('function',{}).get('name') for t in request.get('tools',[])}
+            catalog={'tools':[{'function':{'name':n,'parameters':s}} for n,s in bound[1].items() if n in names]}
+    service=diagnostic_contract().service_history_plan(catalog,chat['request'],chat['requested_at_kst']) if chat else None
+    service_lookup=bool(service and service.get('only_service'))
+    if service_lookup:print('management_service_reasoning '+json.dumps({'reasoning_effort':'none','registered_targets':sorted(service['units'])}),file=sys.stderr)
+    if lookup or service_lookup:
         result.pop('max_completion_tokens',None);result['max_tokens']=2048
-    return {**result, 'reasoning_effort': 'none' if lookup or review and not operator_review else 'medium', 'extra_body': extra}
+    return {**result, 'reasoning_effort': 'none' if lookup or service_lookup or review and not operator_review else 'medium', 'extra_body': extra}
 
 
 LITERAL_REPAIR_ISSUES = frozenset({
@@ -2099,56 +2109,30 @@ def review_execution_view(agent, rows):
         'repeated_error_ledger_indexes':[v for v in failures.values() if len(v)>1]}
 
 
-def operator_diagnostic_options(request, receipts=()):
-    """Bind unambiguous literal user targets to existing catalog reads, not risk.
+@functools.lru_cache(maxsize=1)
+def diagnostic_contract():
+    path=Path(globals().get('__file__','/opt/data/management-code/run.py')).with_name('chat_contract.py')
+    if not path.is_file():path=Path('/opt/data/plugins/groot-query-completion/chat_contract.py')
+    spec=importlib.util.spec_from_file_location('_management_diagnostic_contract',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
 
-    No aliases, prose/log inference, arbitrary unit mapping or automatic dispatch.
-    Ambiguous/negative requests stay with the ordinary model-driven inquiry.
-    An actual failed wire receipt completes an *attempt*, never a health claim.
-    """
+
+def operator_diagnostic_options(request, receipts=()):
+    """Offer root-bound existing reads; a wire failure is an attempt, not health."""
+    chat=chat_read_context()
+    if chat:
+        plan=diagnostic_contract().service_history_plan(request,chat['request'],chat['requested_at_kst'])
+        return diagnostic_contract().service_history_state(plan,receipts)['pending']
     if not readonly_incident_review() or os.environ.get('CAPSTONE_OPERATOR_REVIEW')!='1':return []
     context=compact_controller_context()
-    if context is None:return []
-    reason=context['operator_reason']
-    if not re.search(r'조회|확인|보고|조사|보여|check|show|inspect',reason,re.I) or '```' in reason:
-        return []
-    name='mcp__system_diagnostics__get_system_diagnostics'
-    tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
-    if len(tools)!=1:return []
-    schema=tools[0].get('parameters',{})
-    catalogs=[r.get('then',{}).get('properties',{}).get('target',{}).get('enum')
-        for r in schema.get('allOf',[]) if isinstance(r,dict) and r.get('if')=={'required':['since_kst']}]
-    if len(catalogs)!=1 or not isinstance(catalogs[0],list):return []
-    token=r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])'
-    clauses=[]; excluded=set()
-    for clause in re.split(r'[,\n;!?]|\.(?:\s|$)',reason):
-        if re.search(r'말고|말아|제외|하지\s*마|않|아닌|아니라|\b(?:not|except|without)\b',clause,re.I):
-            excluded.update(re.findall(token,clause))
-        else:clauses.append(clause)
-    mentioned=set(re.findall(token,' '.join(clauses)))-excluded
-    targets=sorted(mentioned & {x for x in catalogs[0] if isinstance(x,str)})
-    if not 1<=len(targets)<=4:return []
-    windows=context['evidence_scope'].get('incident_windows',[])
-    # Only controller-supplied exact incident windows, never model/log dates.
-    if not isinstance(windows,list) or len(windows)>16:return []
-    valid=[]
-    for window in windows:
-        if not isinstance(window,dict) or set(window)!={'since_kst','until_kst'}:return []
-        a,b=(parse_instant(window[k]) for k in ('since_kst','until_kst'))
-        if (not a or not b or not all(window[k].endswith('+09:00') for k in window)
-                or not 0<(b-a).total_seconds()<=86400):return []
-        if datetime.now(KST)-timedelta(days=30)<=a and b<=datetime.now(KST):valid.append(window)
-    options=[]
-    for target in targets:
-        scope=' '.join(c for c in clauses if re.search(r'(?<![A-Za-z0-9_.:-])'+re.escape(target)+r'(?![A-Za-z0-9_.:-])',c))
-        historical=bool(re.search(r'과거|당시|이력|사건\s*(?:구간|시점|시간)|histor',scope,re.I))
-        current=not historical or bool(re.search(r'현재|지금|current|now',scope,re.I))
-        args=([{'target':target}] if current else [])+[
-            {'target':target,**w} for w in valid if historical]
-        for arguments in args:
-            if not any(r.get('tool')==name and r.get('arguments')==arguments for r in receipts):
-                options.append({'tool':name,'arguments':arguments})
-    return options
+    return diagnostic_contract().operator_diagnostic_options(request,context,receipts) if context else []
+
+
+def chat_diagnostic_state(request, receipts=()):
+    chat=chat_read_context()
+    plan=diagnostic_contract().service_history_plan(request,chat['request'],chat['requested_at_kst']) if chat else None
+    return diagnostic_contract().service_history_state(plan,receipts)
 
 
 def required_sensor_input_rejection(name, arguments, requirements, receipts):
@@ -2319,7 +2303,7 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
 
 def required_read_bundle(request, requirements, facts, sensor_requirements, sensor_receipts, diagnostic_receipts=(), native_catalog=None, attempted=()):
     """Offer independent exact reads together; the model selects every dispatch."""
-    if not readonly_incident_review():
+    if not (readonly_incident_review() or chat_read_context()):
         return None
     options=[status_read_request(r) for r in requirements if not any(
         f.get('kind')=='proposal_status' and f.get('proposal_id')==r['proposal_id']
@@ -3050,10 +3034,9 @@ COMPACT_REVIEW_POLICY = (
 
 def indexed_read_request(request, agent):
     """Short model-selected indexes bind to immutable, current exact read args."""
-    if not readonly_incident_review():
-        return None
     supplied=getattr(agent,'_capstone_pending_options',None)
     options=copy.deepcopy(supplied[1]) if isinstance(supplied,tuple) and supplied[0]==agent._current_turn_id else []
+    if not readonly_incident_review() and not (chat_read_context() and options):return None
     all_required=bool(options)
     catalog={}
     for tool in request['tools']:
@@ -3583,14 +3566,20 @@ def main():
                 bare=part['tool'];params=part['arguments']
                 attempted_observation_reads.append(bare)
                 if bare=='get_system_diagnostics':
-                    diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics','arguments':copy.deepcopy(params)})
+                    diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics','arguments':copy.deepcopy(params),
+                        'is_error':part['is_error'],'data':part['result']})
                 if part['is_error']:continue
                 component_read_names.add(('mcp__system_diagnostics__' if bare=='get_system_diagnostics' else 'mcp__security_events__')+bare)
                 receipt=sensor_read_receipt(bare,params,NS(isError=False,content=[NS(text=json.dumps(part['result'],ensure_ascii=False))]))
                 if receipt:sensor_receipts.append(receipt)
         if name=='get_system_diagnostics' and isinstance(arguments,dict):
+            data={}
+            try:
+                blocks=getattr(result,'content',[])
+                if len(blocks)==1:data=_unpack(json.loads(blocks[0].text))
+            except (ValueError,TypeError,AttributeError):pass
             diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics',
-                'arguments':copy.deepcopy(arguments)})
+                'arguments':copy.deepcopy(arguments),'is_error':getattr(result,'is_error',getattr(result,'isError',False)), 'data':data})
             del diagnostic_receipts[:-128]
         receipt=sensor_read_receipt(name,arguments,result)
         if receipt:sensor_receipts.append(receipt)
@@ -3683,7 +3672,7 @@ def main():
             text = NO_OBSERVATION_REPORT
         text = bind_management_status(text, str(asyncio.run(guard.guard_text(text))))
         web_pending=web_impact_review_request({'tools':native_read_catalog},read_facts,attempted_observation_reads,sensor_requirements).get('tool_choice')=='required'
-        web_pending=web_pending or bool(operator_diagnostic_options({'tools':native_read_catalog},diagnostic_receipts))
+        web_pending=web_pending or bool(operator_diagnostic_options({'tools':native_read_catalog},diagnostic_receipts)) or bool(chat_diagnostic_state({'tools':native_read_catalog},diagnostic_receipts)['incomplete'])
         data['final_response'] = factual_review_report(read_facts) if (unfinished_report or missing_sensor_reads(sensor_requirements,sensor_receipts) or web_pending
             or evidence_claim_violations(text, read_facts, successful_read_names)) else kst_display(text)
         return original_result(self, data, session_id, exit_code)
@@ -3704,7 +3693,8 @@ def main():
             if output and not (isinstance(payload, dict) and (payload.get('error') or payload.get('isError'))):
                 successful_read_names.add(tool_name)
         if event_type == 'tool.completed' and (tool_name in {'mcp__resp__get_firewall_rules',
-                'mcp__rule_a__get_security_rules','mcp__rule_b__get_security_rules'} or tool_name in {
+                'mcp__rule_a__get_security_rules','mcp__rule_b__get_security_rules',
+                'mcp__system_diagnostics__get_system_diagnostics'} or tool_name in {
                 'mcp__security_events__' + name for name in EVENT_READ}):
             # Native CLI previews stop at 5,000 characters, in the middle of JSON.
             # Keep the bounded real result for host verification, without changing

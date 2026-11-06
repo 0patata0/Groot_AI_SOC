@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.39'
+VERSION = 'soc-chat-contract:1.5.41'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -413,3 +413,149 @@ def normalize_openai(request, scope=None, *, read_only=False, agent_role=None):
     if extra or 'extra_body' in data:
         data['extra_body'] = extra
     return data
+
+
+def _diagnostic_instant(value):
+    try:
+        stamp=datetime.fromisoformat(value) if isinstance(value,str) else None
+        return stamp if stamp is not None and stamp.utcoffset()==timedelta(hours=9) else None
+    except ValueError:return None
+
+
+def service_history_plan(request, question, requested_at):
+    """Required reads for explicitly named units and unambiguous past periods.
+
+    Only registered metadata resolves units. No aliases, prior assistant text,
+    inferred host IPs, dispatch, completion or incident decision is supplied.
+    Unknown/negative/mixed time expressions retain the ordinary investigation.
+    """
+    name='mcp__system_diagnostics__get_system_diagnostics'
+    if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
+    if re.search(r'```|번역|예시|가정|정규식|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
+    if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
+    if not re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I):return None
+    at=_diagnostic_instant(requested_at)
+    if at is None:return None
+    bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',question)
+    if len(bounds)==2:
+        start,end=map(_diagnostic_instant,bounds)
+    elif not bounds and not re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|\d\s*(?:시|분|시간|일)|\d:\d',question):
+        days=set(re.findall(r'오늘|금일|어제',question))
+        if days and days<={'오늘','금일'}:
+            start,end=at.replace(hour=0,minute=0,second=0,microsecond=0),at
+        elif days=={'어제'}:
+            end=at.replace(hour=0,minute=0,second=0,microsecond=0)
+            start,end=end-timedelta(days=1),end-timedelta(microseconds=1)
+        else:return None
+    else:return None
+    if not start or not end or not 0<(end-start).total_seconds()<=86400 or not at-timedelta(days=30)<=start<end<=at:return None
+    tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
+    if len(tools)!=1:return None
+    schema=tools[0].get('parameters',{});prop=schema.get('properties',{}).get('target',{})
+    histories=[x.get('then',{}).get('properties',{}).get('target',{}).get('enum') for x in schema.get('allOf',[])
+               if isinstance(x,dict) and x.get('if')=={'required':['since_kst']}]
+    if len(histories)!=1 or not isinstance(histories[0],list) or not isinstance(prop.get('enum'),list):return None
+    pairs=re.findall(r'(?<![A-Za-z0-9_.:-])([abc]:[a-z0-9][a-z0-9_.-]*)=([A-Za-z0-9@_.-]+\.service)(?![A-Za-z0-9_-]|\.[A-Za-z0-9_-])',str(prop.get('description','')))
+    mapping=dict(pairs)
+    if not mapping or len(mapping)!=len(pairs) or set(mapping)!=set(histories[0]):return None
+    mapping={k:v for k,v in mapping.items() if k in prop['enum']}
+    explicit=set(re.findall(r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])',question))
+    units=set(re.findall(r'(?<![A-Za-z0-9@_.:-])[A-Za-z0-9@_.-]+\.service(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',question))
+    hosts={h.lower() for h in re.findall(r'(?<![A-Za-z])([ABC])\s*(?:서버|호스트|server\b|host\b)',question,re.I)}
+    if len(hosts)>1 or explicit-set(mapping):return None
+    targets=set(explicit)
+    for unit in units:
+        matches=[k for k,v in mapping.items() if v==unit and (not hosts or k[0] in hosts)]
+        if len(matches)!=1:return None
+        targets.add(matches[0])
+    if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
+    current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+    options=[]
+    for target in sorted(targets):
+        if current:options.append({'tool':name,'arguments':{'target':target}})
+        options.append({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}})
+    only_service=not re.search(r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b',question,re.I)
+    return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service}
+
+
+def service_history_state(plan, receipts, now=None):
+    """Distinguish pending attempts, failed/malformed reads and actual coverage.
+
+    Receipts come from authenticated in-process MCP calls, not chat text. A
+    failed wire attempt does not loop indefinitely and never completes evidence.
+    """
+    state={'pending':[],'incomplete':[]}
+    if not plan:return state
+    now=now or datetime.now(timezone(timedelta(hours=9)))
+    for required in plan['requirements']:
+        args=required['arguments'];target=args['target'];past='since_kst' in args
+        matches=[]
+        for row in receipts:
+            if not isinstance(row,dict):continue
+            actual=row.get('arguments',{})
+            if row.get('tool')!=required['tool'] or not isinstance(actual,dict) or actual.get('target')!=target:continue
+            if set(actual)-{'target','limit','lookback_minutes','since_kst','until_kst'}:continue
+            if past:
+                if 'lookback_minutes' in actual or any(_diagnostic_instant(actual.get(k))!=_diagnostic_instant(args[k]) for k in ('since_kst','until_kst')):continue
+            elif {'since_kst','until_kst'} & set(actual):continue
+            matches.append(row)
+        label=target+(':history' if past else ':current')
+        if not matches:state['pending'].append(required);state['incomplete'].append(label+':not_read');continue
+        row=matches[-1];data=row.get('data',{})
+        if (row.get('is_error') is not False or not isinstance(data,dict) or type(data.get('schema')) is not int or data['schema']!=1
+                or data.get('target')!=target or data.get('host')!=target[0] or data.get('unit')!=plan['units'][target]
+                or data.get('mutation_performed') is not False or data.get('publisher_stale') is True):
+            state['incomplete'].append(label+':unavailable');continue
+        stamp=_diagnostic_instant(data.get('observed_at_kst'))
+        if not stamp or not -5<=(now-stamp).total_seconds()<=180:state['incomplete'].append(label+':stale');continue
+        if past:
+            valid=(data.get('kind')=='journal_history' and 'properties' not in data
+                   and all(_diagnostic_instant(data.get('requested_'+k))==_diagnostic_instant(args[k]) for k in ('since_kst','until_kst'))
+                   and isinstance(data.get('history_coverage'),dict) and type(data.get('has_more')) is bool)
+        else:valid=data.get('kind')!='journal_history' and data.get('status')=='observed' and isinstance(data.get('properties'),dict)
+        if not valid:state['incomplete'].append(label+':scope_mismatch')
+    return state
+
+
+def operator_diagnostic_options(request, context, receipts=()):
+    """Root-authenticated operator scope; caller owns authorization and dispatch."""
+    reason=context['operator_reason']
+    if not re.search(r'조회|확인|보고|조사|보여|check|show|inspect',reason,re.I) or '```' in reason:
+        return []
+    name='mcp__system_diagnostics__get_system_diagnostics'
+    tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
+    if len(tools)!=1:return []
+    schema=tools[0].get('parameters',{})
+    catalogs=[r.get('then',{}).get('properties',{}).get('target',{}).get('enum')
+        for r in schema.get('allOf',[]) if isinstance(r,dict) and r.get('if')=={'required':['since_kst']}]
+    if len(catalogs)!=1 or not isinstance(catalogs[0],list):return []
+    token=r'(?<![A-Za-z0-9_.:-])[abc]:[a-z0-9][a-z0-9_.-]*(?![A-Za-z0-9_.:-])'
+    clauses=[]; excluded=set()
+    for clause in re.split(r'[,\n;!?]|\.(?:\s|$)',reason):
+        if re.search(r'말고|말아|제외|하지\s*마|않|아닌|아니라|\b(?:not|except|without)\b',clause,re.I):
+            excluded.update(re.findall(token,clause))
+        else:clauses.append(clause)
+    mentioned=set(re.findall(token,' '.join(clauses)))-excluded
+    targets=sorted(mentioned & {x for x in catalogs[0] if isinstance(x,str)})
+    if not 1<=len(targets)<=4:return []
+    windows=context['evidence_scope'].get('incident_windows',[])
+    # Only controller-supplied exact incident windows, never model/log dates.
+    if not isinstance(windows,list) or len(windows)>16:return []
+    valid=[]
+    for window in windows:
+        if not isinstance(window,dict) or set(window)!={'since_kst','until_kst'}:return []
+        a,b=(_diagnostic_instant(window[k]) for k in ('since_kst','until_kst'))
+        if (not a or not b or not all(window[k].endswith('+09:00') for k in window)
+                or not 0<(b-a).total_seconds()<=86400):return []
+        if datetime.now(timezone(timedelta(hours=9)))-timedelta(days=30)<=a and b<=datetime.now(timezone(timedelta(hours=9))):valid.append(window)
+    options=[]
+    for target in targets:
+        scope=' '.join(c for c in clauses if re.search(r'(?<![A-Za-z0-9_.:-])'+re.escape(target)+r'(?![A-Za-z0-9_.:-])',c))
+        historical=bool(re.search(r'과거|당시|이력|사건\s*(?:구간|시점|시간)|histor',scope,re.I))
+        current=not historical or bool(re.search(r'현재|지금|current|now',scope,re.I))
+        args=([{'target':target}] if current else [])+[
+            {'target':target,**w} for w in valid if historical]
+        for arguments in args:
+            if not any(r.get('tool')==name and r.get('arguments')==arguments for r in receipts):
+                options.append({'tool':name,'arguments':arguments})
+    return options

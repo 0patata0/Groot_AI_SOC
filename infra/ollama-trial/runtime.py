@@ -189,6 +189,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                                     'schema_sha256': digest(schema)})
                     if name == 'mcp__system_diagnostics__get_system_diagnostics':
                         report['diagnostic_targets'] = schema['properties']['target']['enum']
+                        report['_service_catalog']={'tools':[{'function':{'name':name,'parameters':schema}}]}
                     if chosen is not None and name not in chosen:
                         continue
                     schema = harness.CONTRACT.normalized_schema(name, schema)
@@ -291,12 +292,33 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             require(isinstance(question, str) and 0 < len(question) <= 16000, 'question_required')
             report['workflow_skills']=list(harness.workflow_names(current))
             tick = time.perf_counter()
+            service_plan=(harness.CONTRACT.service_history_plan(report.get('_service_catalog',{}),current,report['at_kst'])
+                          if not harness.READ.wants_write(harness.normalized(current)) and not reference else None)
+            if service_plan:
+                options=service_plan['requirements']
+                schema={'type':'object','additionalProperties':False,'required':['indexes'],
+                    'properties':{'indexes':{'type':'array','minItems':len(options),'maxItems':len(options),
+                        'uniqueItems':True,'items':{'type':'integer','minimum':0,'maximum':len(options)-1}}}}
+                selection=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke([
+                    ('system','사용자가 명시한 서비스와 기간의 필수 읽기를 확인하고 모든 필요한 번호를 함께 선택하세요. 결과·원인·정상·승인은 생성하지 않습니다. 도구 실행은 검증 후 이루어집니다.'),
+                    ('human',canonical({'request':current,'requested_at_kst':report['at_kst'],'options':options}))]),90)
+                Draft202012Validator(schema).validate(selection)
+                selected_tools={t.name:t for t in agent.adapter.tools}
+                require(all(o['tool'] in selected_tools for o in options),'service_read_tool_unavailable')
+                selection_active=True
+                try:
+                    for index in selection['indexes']:
+                        option=options[index]
+                        await selected_tools[option['tool']].ainvoke(option['arguments'])
+                finally:selection_active=False
+                report['required_service_reads']={'selected':selection['indexes'],'count':len(options)}
+                question=harness.incident_observation_prompt(current,report['calls'])+harness.read_background(question,current)
             structured = bool(harness.structured_read(current) or harness.incident_selection_scope(current, [],reference))
             policy_answer = harness.policy_explanation(current, report['_policy_tools'])
             if policy_answer:
                 report['policy_definition_rendered'] = True
                 final = policy_answer
-            elif structured:
+            elif structured and not service_plan:
                 final = ''  # The same model selects actual reads below.
             else:
                 final = await asyncio.wait_for(agent.run(question), harness.CONTRACT.TURN_TIMEOUT if mode == 'hermes-parity' else 180)
@@ -314,7 +336,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 repair_passes = 0
                 selection_failures = []
                 gap = harness.preparation_gap(current, report['calls'])
-                incident_gap = harness.incident_evidence_gap(current, report['calls'],reference)
+                incident_gap = harness.incident_evidence_gap(current, report['calls'],reference,service_plan)
                 preparation_used = False
                 while (missing or issues or incident_gap or (gap and not preparation_used)) and (incident_gap or audit or not harness.action_claim_violations(current, str(final), report['calls'])) and meter.used < steps and repair_passes < harness.CONTRACT.REPAIR_PASSES + int(structured):
                     repair_passes += 1
@@ -371,7 +393,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                                 await selected_tools[choice['tool']].ainvoke(choice['arguments'])
                         finally:
                             selection_active = False
-                        if incident_gap and not harness.incident_evidence_gap(current, report['calls'],reference):
+                        if incident_gap and not harness.incident_evidence_gap(current, report['calls'],reference,service_plan):
                             final = await asyncio.wait_for(agent.run(harness.incident_observation_prompt(current, report['calls'])+harness.read_background(question,current)), 180)
                         else:
                             final = ''  # Failed/missing reads cannot become observations.
@@ -387,7 +409,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     if report['protected_calls'] or preparation_used:
                         break
                     gap = harness.preparation_gap(current, report['calls'])
-                    incident_gap = harness.incident_evidence_gap(current, report['calls'],reference)
+                    incident_gap = harness.incident_evidence_gap(current, report['calls'],reference,service_plan)
                     missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
                     issues = [] if harness.read_report(current, report['calls']) else (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 rendered = (harness.read_report(current, report['calls']) or harness.inventory(current, report['calls']) or
@@ -396,6 +418,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                             harness.event_report(current, report['calls']))
                 issues = (harness.violations(current, str(final), report['calls'],reference) + harness.card_answer_issues(reference,str(final),report['calls']))
                 still_missing = harness.missing_reads(current, report['calls'], report.get('diagnostic_targets', ()))
+                if service_plan:
+                    still_missing+=harness.CONTRACT.service_history_state(service_plan,harness.service_history_receipts(report['calls']))['incomplete']
                 if still_missing:
                     report['unqueried'] = still_missing
                     issues.append('requested_read_scope_incomplete')
@@ -434,6 +458,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
             report.update(status='partial', final_response=harness.fallback(current, report['calls']))
     finally:
         report.pop('_policy_tools', None)
+        report.pop('_service_catalog', None)
         try:
             if pooled:
                 report['connection_reuse'] = client.metrics()

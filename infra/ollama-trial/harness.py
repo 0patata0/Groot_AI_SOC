@@ -1078,7 +1078,18 @@ def incident_context_violations(answer):
     return sorted(issues)
 
 
-def incident_evidence_gap(question, calls, reference=None):
+def service_history_receipts(calls):
+    rows=[]
+    for call in calls:
+        if (call.get('server')!='system-diagnostics' or call.get('name')!='get_system_diagnostics'
+                or not isinstance(call.get('result'),str) or not isinstance(call.get('arguments'),dict)
+                or hashlib.sha256(call['result'].encode()).hexdigest()!=call.get('result_sha256') or call.get('is_write')):continue
+        rows.append({'tool':'mcp__system_diagnostics__get_system_diagnostics','arguments':call['arguments'],
+                     'is_error':call.get('is_error',False),'data':payload(call) or {}})
+    return rows
+
+
+def incident_evidence_gap(question, calls, reference=None, service_plan=None):
     """A read-only incident judgment needs an actual event read, not an inventory.
 
     This does not select a tool, classify the incident or retry a protected call.
@@ -1088,6 +1099,8 @@ def incident_evidence_gap(question, calls, reference=None):
     text = normalized(question)
     if not EVIDENCE.incident_investigation_request(text) or READ.wants_write(text):
         return False
+    if (service_plan and service_plan.get('only_service') and not reference
+            and not CONTRACT.service_history_state(service_plan,service_history_receipts(calls))['incomplete']):return False
     if any(not EVIDENCE.allowed('mcp__' + c.get('server', '').replace('-', '_') + '__' + c.get('name', ''), 'verify') for c in calls):
         return False
     if reference:return bool(card_evidence_gaps(reference,calls))
@@ -1267,7 +1280,7 @@ def incident_observation_prompt(question, calls):
     calls=evidence_reads(calls)
     observed = []
     for call in calls:
-        if call.get('name') not in ('search_modsecurity_alerts', 'search_suricata_alerts', 'search_wazuh_alerts', 'get_wazuh_alert_summary') or not payload(call):
+        if call.get('name') not in ('search_modsecurity_alerts', 'search_suricata_alerts', 'search_wazuh_alerts', 'get_wazuh_alert_summary', 'get_system_diagnostics') or not payload(call):
             continue
         shown = model_view(call['server'], call['name'], call['result'])
         observed.append({'server': call['server'], 'name': call['name'],

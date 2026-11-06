@@ -1,6 +1,6 @@
 # Groot_AI_SOC
 
-현재 common1.5.39·진단 MCP1.2.3은 과거 진단 지원 여부와 등록 서비스25개의 target 안내를 실제 도구에 맞춘다. query1.19.82·security-events1.3.2·모델·권한은 유지한다. 같은 원인 질문의 새 채팅은 Hermes98.498→142.936초이며 두 번 모두 과거 서비스 진단 누락으로 품질 실패했다. **일반 복합 조사60초는 미완료이며 속도 개선 성공으로 세지 않는다.** 최신 설정의 단순 비교 새채팅은 Ollama22.266초·4읽기/범위완료/쓰기0이며 원인 조사와 구분한다. 관련716검사 PASS/skip0·B17SHA/보호8·양봇 연결/3서비스·독립원복 확정. 기존 단일deploy.sh의 소스 복사 경로를 사용하며 새 패키지·포트·키0, 새OS 전체 설치·신규UI 전수 미검증. [수정·실측·남은 문제](infra/hermes/diagnostic-navigation.md) · [직전 단순 비교 Hermes25.532/Ollama16.746초](infra/hermes/systemd-comparison.md).
+현재 query1.19.86/common1.5.41은 명시 서비스의 현재·과거 필수 읽기, 전체 진단 감사 영수증, 서비스 조회에 한정한 낮은 추론을 적용했다. 실제 새 채팅은 Hermes74.516초/Ollama66.520초로 줄었으나 둘 다 보고 해석 오류가 남아partial이며 **정확한 원인 조사60초는 미완료**다. Native의 두 읽기 범위·SHA/기간/신선도·쓰기0은 독립 확인했다. 고유1,143검사 PASS/skip0, B18SHA/보호8/양봇 연결/3서비스/독립원복 확인. 모델·권한·FW/TTL은 유지하며 기존 단일deploy.sh 복사 경로를 사용한다. 새OS 전체 설치·UI 전수·평균/p95는 미검증. [수정·실측·한계](infra/hermes/diagnostic-navigation.md).
 
 복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
 

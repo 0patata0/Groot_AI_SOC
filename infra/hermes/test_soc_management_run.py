@@ -580,6 +580,20 @@ class ManagementWrapper(unittest.TestCase):
             self.assertEqual(event['output'],raw);self.assertFalse(event['is_error'])
             self.assertEqual(controller.tool_payload(event['output']),payload)
 
+    def test_history_diagnostic_receipt_preserves_last_row_and_failures(self):
+        name='mcp__system_diagnostics__get_system_diagnostics'
+        payload={'schema':1,'kind':'journal_history','target':'c:apache',
+            'recent_errors':[{'kind':'process_exit','record_sha256':str(i)*64,'observed_at_kst':'2026-11-06T12:34:56+09:00'} for i in range(50)]}
+        raw=json.dumps({'result':json.dumps(payload)})
+        self.assertGreater(len(raw),5000)
+        for value,error in ((raw,False),('가'*(wrapper.MAX_EVENT_AUDIT_BYTES//3+1),False),(json.dumps({'error':'unavailable'}),True)):
+            def check(h):h.Emitter().on_tool_progress('tool.completed',name,result=value,is_error=error,tool_call_id='history-read',duration=.2)
+            h=Harness();h.run(check,'verify');event=json.loads(h.stdout.getvalue())
+            self.assertEqual(event['tool_call_id'],'history-read')
+            if value==raw:
+                self.assertEqual(event['output'],raw);self.assertEqual(controller.tool_payload(event['output']),payload)
+            else:self.assertTrue(event['is_error']);self.assertIsNone(controller.tool_payload(event['output']))
+
     def test_event_audit_utf8_limit_and_native_errors_fail_closed(self):
         for result, error in (('가' * (wrapper.MAX_EVENT_AUDIT_BYTES // 3 + 1), False),
                               (json.dumps({'error': 'denied'}), True)):

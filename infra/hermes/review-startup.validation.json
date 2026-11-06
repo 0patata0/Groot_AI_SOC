@@ -1,0 +1,267 @@
+{
+  "schema": 1,
+  "recorded_at_kst": "2026-11-06T10:17:17.420232+09:00",
+  "target_final_report_seconds": 30,
+  "achieved": false,
+  "query_version": "1.19.62",
+  "common_version": "1.5.32",
+  "production_source_changed": false,
+  "deployment_performed": false,
+  "model": "qwen3.6:35b",
+  "git_source_baseline": "9481a35d92e98f1bcb1b20441a175b555542cfc9",
+  "startup": {
+    "baseline_seconds": [
+      {
+        "tools.registry": 0.048616630025207996,
+        "mcp": 1.4854532480239868,
+        "run_agent": 2.70379104395397,
+        "hermes_cli.stream_json": 0.001302771968767047,
+        "capstone_korean_output_guard": 0.055072888964787126,
+        "tools.mcp_tool_discovery": 0.06565739889629185,
+        "discover_mcp_tools": 1.560732409125194,
+        "hermes_cli.main": 0.16373709379695356
+      },
+      {
+        "tools.registry": 0.06336271809414029,
+        "mcp": 1.4775564090814441,
+        "run_agent": 2.662952945102006,
+        "hermes_cli.stream_json": 0.0012771650217473507,
+        "capstone_korean_output_guard": 0.05156146292574704,
+        "tools.mcp_tool_discovery": 0.06361741502769291,
+        "discover_mcp_tools": 1.31401159404777,
+        "hermes_cli.main": 0.157938129035756
+      },
+      {
+        "tools.registry": 0.047420871909707785,
+        "mcp": 1.4294120278209448,
+        "run_agent": 2.6385241739917547,
+        "hermes_cli.stream_json": 0.0012207950931042433,
+        "capstone_korean_output_guard": 0.0503638070076704,
+        "tools.mcp_tool_discovery": 0.0639422161038965,
+        "discover_mcp_tools": 1.3874123350251466,
+        "hermes_cli.main": 0.15647092601284385
+      }
+    ],
+    "skip_builtin_candidate_seconds": [
+      {
+        "tools.registry": 0.0472414530813694,
+        "mcp": 1.4229771590325981,
+        "run_agent": 1.9268776110839099,
+        "hermes_cli.stream_json": 0.001558002084493637,
+        "capstone_korean_output_guard": 0.05148693290539086,
+        "tools.mcp_tool_discovery": 0.05844692303799093,
+        "discover_mcp_tools": 1.295969391008839,
+        "hermes_cli.main": 0.16495982883498073
+      },
+      {
+        "tools.registry": 0.04840684495866299,
+        "mcp": 1.4404460368677974,
+        "run_agent": 1.8241901600267738,
+        "hermes_cli.stream_json": 0.0012772600166499615,
+        "capstone_korean_output_guard": 0.05305037600919604,
+        "tools.mcp_tool_discovery": 0.061526965117082,
+        "discover_mcp_tools": 1.229508169926703,
+        "hermes_cli.main": 0.15968830604106188
+      },
+      {
+        "tools.registry": 0.04792229807935655,
+        "mcp": 1.4555646940134466,
+        "run_agent": 1.8418062289711088,
+        "hermes_cli.stream_json": 0.0012499929871410131,
+        "capstone_korean_output_guard": 0.052440694998949766,
+        "tools.mcp_tool_discovery": 0.06015290482901037,
+        "discover_mcp_tools": 2.837649380089715,
+        "hermes_cli.main": 0.17115138098597527
+      }
+    ],
+    "baseline_total_seconds": [
+      6.084363484755158,
+      5.792277838336304,
+      5.774767152965069
+    ],
+    "candidate_total_seconds": [
+      4.969517301069573,
+      4.818094118963927,
+      6.4679375749547035
+    ],
+    "mcp_read_schemas_count": 34,
+    "schemas_equal_all_three": true,
+    "adopted": false,
+    "reason": "run_agent import saves about0.8s but total variable; upstream discovery modification not justified by this target"
+  },
+  "historical_receipt_replays": [
+    {
+      "experiment": "seven-baseline",
+      "provider_seconds": 20.19647159310989,
+      "schema_valid": true,
+      "selected_calls_not_executed": 1,
+      "usage": {
+        "completion_tokens": 144,
+        "prompt_tokens": 18538,
+        "total_tokens": 18682,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      },
+      "existing_claim_guard_issues": [],
+      "review": "웹 후속 구간 추가 조회 선택. 최종 판단/전체 완료시간 아님.",
+      "adopted": false,
+      "artifact_sha256": "65391a5671a617829cd06d6c695851c4c78aa6d12d9e36c4d8586b0830150e84"
+    },
+    {
+      "experiment": "seven-decision",
+      "provider_seconds": 24.63196271797642,
+      "schema_valid": true,
+      "selected_calls_not_executed": 0,
+      "usage": {
+        "completion_tokens": 296,
+        "prompt_tokens": 18678,
+        "total_tokens": 18974,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      },
+      "existing_claim_guard_issues": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "review": "요청한 c:apache 진단·list_blocks 미조회 상태에서 보고 선택. 서로 다른 경로의403·200을 불일치로 해석.",
+      "adopted": false,
+      "artifact_sha256": "b61a4324d4ad9271ec3e21a4669998c91c103f83591063ef6900cb1932da321a"
+    },
+    {
+      "experiment": "nine-baseline",
+      "provider_seconds": 20.7025127960369,
+      "schema_valid": true,
+      "selected_calls_not_executed": 1,
+      "usage": {
+        "completion_tokens": 127,
+        "prompt_tokens": 19344,
+        "total_tokens": 19471,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      },
+      "existing_claim_guard_issues": [],
+      "review": "이미 조회한 사건 웹 구간을 다시 선택. limit 생략은 새 근거가 아님.",
+      "adopted": false,
+      "artifact_sha256": "862d72f3fa27611182846ebb1b409d3de42dbad114567ab651f9f513b12a2f34"
+    },
+    {
+      "experiment": "nine-decision",
+      "provider_seconds": 23.181458259001374,
+      "schema_valid": true,
+      "selected_calls_not_executed": 0,
+      "usage": {
+        "completion_tokens": 222,
+        "prompt_tokens": 19494,
+        "total_tokens": 19716,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      },
+      "existing_claim_guard_issues": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "review": "과거 사건 오류 조회를 완료했다고 표현했으나 현재 진단 표본의 구간 한계가 남음. 앱 정상 단정.",
+      "adopted": false,
+      "artifact_sha256": "cb875728e3fe01d6e62658a69d576dddd3f521806e3e356c3d44c4e19519bb54"
+    },
+    {
+      "experiment": "nine-ledger",
+      "provider_seconds": 10.99288212414831,
+      "schema_valid": true,
+      "selected_calls_not_executed": 0,
+      "usage": {
+        "completion_tokens": 189,
+        "prompt_tokens": 23310,
+        "total_tokens": 23499,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 17296
+        }
+      },
+      "existing_claim_guard_issues": [
+        "incident_closure_with_unknown_impact",
+        "web_snapshot_is_not_application_health"
+      ],
+      "review": "침해 영향 미확인인데 remediated/resolved. 기존 종결·웹 상태 검사가 거절.",
+      "adopted": false,
+      "artifact_sha256": "7c48ee1ba2b8291520e1d2b30e1d925b6b1c0a677ceb9fe69766e1798df7646e"
+    }
+  ],
+  "replay_scope": {
+    "same_development_case_as_previous_work": true,
+    "fixture_receipts": [
+      7,
+      9
+    ],
+    "actual_mcp_dispatches": 0,
+    "chat_posts": 0,
+    "risk_actions": 0,
+    "temperature": 0,
+    "reasoning_effort": "none",
+    "independent_holdout": false,
+    "whole_native_loop_tested": false,
+    "shared_gpu_load_controlled": false,
+    "not_end_to_end_latency": true
+  },
+  "live_verification": {
+    "live_checks": {
+      "confirmed_at_epoch": 1793927713,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "db3013407b30127a593acaaa0275c588f0872e9d8bc4a5d3bd43a8d6465a5a3a",
+      "controller_sha256": "9cd4a2a8cb09f1be9532467780852d4386d4df8a1a363bfa9d46586f3358c657",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 60963,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 3.0863072872161865,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 15.086368560791016,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "at_kst": "2026-11-06T10:15:13.252087+09:00"
+  },
+  "new_regression_suite_run": false,
+  "regression_note": "No production code change. Prior1065PASS belongs to query62 deployment; this unit checks startup, schemas and existing claim guards only.",
+  "cleanup": {
+    "mac": {
+      "removed": "/private/tmp/capstone-review-startup-20261106-rvfd7p9i",
+      "files": 20,
+      "bytes": 499970,
+      "absent": true,
+      "new_mac_packages": 0,
+      "server_staged_sources": 0,
+      "server_new_packages": 0,
+      "helper_audit": "대화기록/검증/2026-11-06-review-startup/helper-audit",
+      "remote_scripts_ran_from_stdin_and_completed": true
+    },
+    "server_staged_sources": 0,
+    "server_installed_packages": 0,
+    "services_restarted": 0
+  },
+  "publication": {
+    "state": "pending"
+  }
+}

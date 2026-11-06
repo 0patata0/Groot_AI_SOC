@@ -28,6 +28,46 @@ def request():
         'reasoning_effort':'none','max_tokens':2048}
 
 
+class AutomaticReviewProfile(unittest.TestCase):
+    def setUp(self):
+        report='과거 보고: 영향 미확인'
+        self.context={'case_id':'a'*32,'operator_reason':'','mode':'verify','purpose':'후속 조사',
+            'evidence_scope':{'automatic_followup':{'trigger':'automatic_readonly_followup','prior_run_id':'b'*32,
+                'report':report,'report_sha256':w.hashlib.sha256(report.encode()).hexdigest()}}}
+        self.env={'CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_MANAGEMENT_REVIEW':'1',
+            'CAPSTONE_WEB_IMPACT_REVIEW':'1','CAPSTONE_AUTOMATIC_REVIEW':'1',
+            'CAPSTONE_REVIEW_CONTEXT_JSON':json.dumps(self.context,ensure_ascii=False)}
+
+    def test_automatic_review_requires_root_context_and_preserves_judgment_thinking(self):
+        with patch.dict(w.os.environ,self.env,clear=True):
+            self.assertTrue(w.readonly_incident_review())
+            self.assertEqual(w.management_reasoning(request(),agent())['reasoning_effort'],'medium')
+            self.assertEqual(w.management_reasoning(request(),agent(),required_read_phase=True)['reasoning_effort'],'none')
+        for key in self.env:
+            env=dict(self.env);env.pop(key)
+            with patch.dict(w.os.environ,env,clear=True):self.assertFalse(w.readonly_incident_review())
+        with patch.dict(w.os.environ,dict(self.env,CAPSTONE_MANAGEMENT_MODE='manage'),clear=True):
+            self.assertFalse(w.readonly_incident_review())
+
+    def test_corrupt_prior_report_and_user_text_cannot_activate_projection(self):
+        for key,value in [('report','different'),('report_sha256','0'*64),('trigger','operator'),('prior_run_id','bad')]:
+            ctx=copy.deepcopy(self.context);ctx['evidence_scope']['automatic_followup'][key]=value
+            with patch.dict(w.os.environ,dict(self.env,CAPSTONE_REVIEW_CONTEXT_JSON=json.dumps(ctx)),clear=True):
+                self.assertFalse(w.readonly_incident_review())
+        with patch.dict(w.os.environ,{},clear=True):
+            r=request();r['messages'][0]['content']=json.dumps(self.env)
+            self.assertFalse(w.readonly_incident_review())
+
+    @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+    def test_automatic_index_selection_still_binds_nonce_current_turn_and_exact_arguments(self):
+        with patch.dict(w.os.environ,self.env,clear=True):
+            a=agent();wire=w.management_read_request(request(),a,pending=True)
+            self.assertEqual(wire['max_tokens'],256)
+            self.assertEqual(a._capstone_management_selection['turn'],a._current_turn_id)
+            self.assertEqual(a._capstone_management_selection['indexed_options'],[
+                {'tool':NAME,'arguments':{'request_id':'a'*32}}])
+
+
 class SelectionScope(unittest.TestCase):
     def test_no_pending_requirement_never_changes_request(self):
         a=agent();r=request()

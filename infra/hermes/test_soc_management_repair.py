@@ -237,11 +237,12 @@ class SnapshotHealth(unittest.TestCase):
     def test_process_snapshot_does_not_prove_service_health_or_no_impact(self):
         facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
         for text in ('현재 서비스는 정상 운영 중입니다.','서비스 영향은 없습니다.',
-                     '웹 서비스 영향이 없었습니다.'):
+                     '웹 서비스 영향이 없었습니다.','서비스 상태는 정상 관측.',
+                     'WAF 재탐지 표본이 있으나 서비스 상태는 정상 관측.'):
             self.assertIn('web_snapshot_is_not_application_health',m.web_evidence_violations(text,facts))
         for text in ('현재 서비스 정상 여부는 미확인입니다.',
                      '현재 서비스(또는 IP)의 정상/비정상 여부 및 공격 지속 여부는 표본만으로는 미확인입니다.',
-                     'DVWA 정상여부는 미확인입니다.',
+                     'DVWA 정상여부는 미확인입니다.','서비스 상태의 정상 여부는 미확인입니다.',
                      '서비스 영향은 없다고 단정할 수 없습니다.',
                      '서비스 영향은 미확인입니다.','Apache 프로세스는 active입니다.'):
             self.assertEqual(m.web_evidence_violations(text,facts),[])

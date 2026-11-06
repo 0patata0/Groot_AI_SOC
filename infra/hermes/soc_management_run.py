@@ -900,7 +900,7 @@ def web_evidence_violations(text, facts):
         issues.add('web_access_coverage_limit_omitted')
     # An Apache process/configuration and access rows are not an application
     # health check. Inspect the claim itself, not an unrelated disclaimer.
-    for match in re.finditer(r'(?:Apache|아파치|DVWA|웹\s*서비스|현재\s*서비스|앱)[^\n.!?;|]{0,40}?(?:정상|건강)',text,re.I):
+    for match in re.finditer(r'(?:Apache|아파치|DVWA|웹\s*서비스|현재\s*서비스|서비스\s*상태|앱)[^\n.!?;|]{0,40}?(?:정상|건강)',text,re.I):
         before=re.split(r'[.!?;|\n]',text[max(0,match.start()-30):match.start()])[-1]
         after=text[match.end():match.end()+20]
         if re.search(r'미확인|확인\s*불가|단정.{0,5}않',before):continue
@@ -1512,6 +1512,23 @@ def current_management_request(user):
     return user if len(user) <= 16384 else '원본 현재 사용자 요청을 다시 확인하세요. 권한과 증거의 구분은 유지합니다.'
 
 
+def readonly_incident_review():
+    """Root-only review profile; user/log text cannot activate a followup."""
+    if not all(os.environ.get(k)==v for k,v in (
+            ('CAPSTONE_MANAGEMENT_MODE','verify'),('CAPSTONE_MANAGEMENT_REVIEW','1'),
+            ('CAPSTONE_WEB_IMPACT_REVIEW','1'))):return False
+    if os.environ.get('CAPSTONE_OPERATOR_REVIEW')=='1':return True
+    if os.environ.get('CAPSTONE_AUTOMATIC_REVIEW')!='1':return False
+    context=compact_controller_context()
+    history=context['evidence_scope'].get('automatic_followup') if context else None
+    if not isinstance(history,dict):return False
+    report=history.get('report');prior=history.get('prior_run_id')
+    return (history.get('trigger')=='automatic_readonly_followup'
+        and isinstance(prior,str) and re.fullmatch(r'[0-9a-f]{32}',prior) is not None
+        and isinstance(report,str) and 0<len(report.encode())<=10000
+        and history.get('report_sha256')==hashlib.sha256(report.encode()).hexdigest())
+
+
 def management_reasoning(request, agent, *, required_read_phase=False):
     """Use the verified Ollama compatibility control in this process only."""
     extra = dict(request.get('extra_body') or {})
@@ -1528,7 +1545,7 @@ def management_reasoning(request, agent, *, required_read_phase=False):
     # accepts reasoning_effort, not the native /api/chat "think" field.
     # A recognized non-none effort maps to true for a boolean-only model.
     review = os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') == '1' and os.environ.get('CAPSTONE_MANAGEMENT_MODE') == 'verify'
-    operator_review = review and os.environ.get('CAPSTONE_OPERATOR_REVIEW') == '1'
+    operator_review = review and (os.environ.get('CAPSTONE_OPERATOR_REVIEW') == '1' or readonly_incident_review())
     # Only trusted, still-unmet concrete reads use this phase. The next build
     # restores the existing reasoning profile before risk/closure assessment.
     lookup=required_read_phase is True and os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
@@ -1603,7 +1620,7 @@ def completed_web_review_request(request, agent, successful_reads, *, requiremen
         'mcp__security_events__search_wazuh_alerts', 'mcp__security_events__search_web_access'}
     if (requirements_complete is not True or os.environ.get('CAPSTONE_MANAGEMENT_MODE') != 'verify'
             or os.environ.get('CAPSTONE_MANAGEMENT_REVIEW') != '1'
-            or os.environ.get('CAPSTONE_OPERATOR_REVIEW') != '1'
+            or not readonly_incident_review()
             or os.environ.get('CAPSTONE_WEB_IMPACT_REVIEW') != '1'
             or not required <= set(successful_reads or ())
             or getattr(agent, '_interrupt_requested', False)):
@@ -1837,9 +1854,7 @@ def initial_review_read(request, completed_calls, requirements=(), facts=(), sen
 
 def required_read_bundle(request, requirements, facts, sensor_requirements, sensor_receipts):
     """Offer independent exact reads together; the model selects every dispatch."""
-    if not (os.environ.get('CAPSTONE_MANAGEMENT_MODE')=='verify'
-            and all(os.environ.get(k)=='1' for k in ('CAPSTONE_OPERATOR_REVIEW',
-                'CAPSTONE_MANAGEMENT_REVIEW','CAPSTONE_WEB_IMPACT_REVIEW'))):
+    if not readonly_incident_review():
         return None
     options=[status_read_request(r) for r in requirements if not any(
         f.get('kind')=='proposal_status' and f.get('proposal_id')==r['proposal_id']
@@ -1875,9 +1890,21 @@ def web_impact_review_request(request, facts, attempted, sensor_requirements):
                 and isinstance(f.get('target'),str) and re.fullmatch(r'c:[a-z0-9-]{1,32}',f['target'])
                 and any(p.startswith(prefix) or p==prefix.rstrip('/') for p in paths)):
             candidates.append(f)
-    hints={}
+    hints={};mismatched_targets=set()
     if not candidates:
-        if 'get_web_service_target' in attempted:return request
+        if 'get_web_service_target' in attempted:
+            # A real but unrelated backend is not a completed target lookup.
+            # Offer remaining registered choices to the model; never infer or
+            # dispatch a destination from a URL or a previous model answer.
+            for f in facts:
+                service=f.get('service',{})
+                prefix=service.get('request_path_prefix') if isinstance(service,dict) else None
+                if (f.get('kind')=='web_service' and isinstance(service,dict) and service.get('configured_in_file_snapshot') is True
+                        and isinstance(prefix,str) and prefix.startswith('/') and len(prefix)>1
+                        and isinstance(f.get('target'),str)
+                        and not any(p.startswith(prefix) or p==prefix.rstrip('/') for p in paths)):
+                    mismatched_targets.add(f['target'])
+            if not mismatched_targets:return request
         hints['mcp__security_events__get_web_service_target']=None
     else:
         candidate=candidates[0];scope=sensor_requirements[0]['arguments']
@@ -1894,6 +1921,14 @@ def web_impact_review_request(request, facts, attempted, sensor_requirements):
         tool=json.loads(json.dumps(original));arguments=hints[name]
         guidance=('사건의 실제 request_path에 해당하는 등록 target을 조회하세요. '
                   '수집 agent는 공격자 이름이 아닙니다. C 로컬 등록·설정은 프런트 목적지 적재 증명이 아닙니다.')
+        if mismatched_targets:
+            target_schema=tool['function'].get('parameters',{}).get('properties',{}).get('target',{})
+            choices=target_schema.get('enum')
+            if not isinstance(choices,list):return request
+            remaining=[x for x in choices if x not in mismatched_targets]
+            if not remaining:return request
+            target_schema['enum']=remaining
+            guidance+=' 이미 조회한 설정 경로가 사건 경로와 불일치한다. 남은 등록 후보 중 적합한 대상을 다시 선택한다.'
         if arguments:
             base=tool['function'].get('parameters',{})
             if not set(arguments)<=set(base.get('properties',{})):
@@ -2329,8 +2364,7 @@ COMPACT_REVIEW_POLICY = (
 
 def indexed_read_request(request, agent):
     """Short model-selected indexes bind to immutable, current exact read args."""
-    if not all(os.environ.get(k)=='1' for k in ('CAPSTONE_OPERATOR_REVIEW',
-            'CAPSTONE_MANAGEMENT_REVIEW','CAPSTONE_WEB_IMPACT_REVIEW')):
+    if not readonly_incident_review():
         return None
     supplied=getattr(agent,'_capstone_pending_options',None)
     options=copy.deepcopy(supplied[1]) if isinstance(supplied,tuple) and supplied[0]==agent._current_turn_id else []
@@ -2447,7 +2481,7 @@ def management_report_request(request, agent, snapshot):
             or os.environ.get('CAPSTONE_MANAGEMENT_MODE')!='verify'
             or os.environ.get('CAPSTONE_MANAGEMENT_REVIEW')!='1'
             or os.environ.get('CAPSTONE_WEB_IMPACT_REVIEW')!='1'
-            or os.environ.get('CAPSTONE_OPERATOR_REVIEW')!='1'
+            or not readonly_incident_review()
             or getattr(agent,'provider',None)!='custom' or getattr(agent,'model',None)!='qwen3.6:35b'
             or getattr(agent,'api_mode','chat_completions')!='chat_completions'
             or str(getattr(agent,'base_url','')).rstrip('/')!='http://10.200.10.10:11435/v1'

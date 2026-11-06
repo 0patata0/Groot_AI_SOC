@@ -1,0 +1,1006 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06T03:44:56.324068+09:00",
+  "query_version": "1.19.57",
+  "common_version": "1.5.32",
+  "goal_30_seconds_met": false,
+  "changes": [
+    "bounded root-authenticated automatic followup context and fresh Native session",
+    "retry remaining registered web targets after observed path mismatch",
+    "service-status normal claim guard"
+  ],
+  "preserved": [
+    "LLM decisions and actual Native MCP dispatch",
+    "exact registered schemas and current-run nonce/receipts",
+    "read/write/protected-IP/exact approval/TTL boundaries",
+    "Native iteration/time budgets",
+    "production database and archived sessions"
+  ],
+  "tests": {
+    "unique_pass": 1061,
+    "uncovered_skip": 0,
+    "suites": [
+      {
+        "suite": "management",
+        "tests": 384,
+        "skip": 55,
+        "rc": 0
+      },
+      {
+        "suite": "sdk",
+        "tests": 219,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "native",
+        "tests": 391,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "install",
+        "tests": 41,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "tables",
+        "tests": 19,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "output",
+        "tests": 7,
+        "skip": 0,
+        "rc": 0
+      }
+    ],
+    "native_dependency_coverage": {
+      "tests": 61,
+      "skip": 0,
+      "duplicates": 6
+    }
+  },
+  "live_health": {
+    "confirmed_at_epoch": 1793904250,
+    "files_verified": 11,
+    "protected_unchanged": 7,
+    "gate_sha256": "f673551c4900d6bf49f8efcf3abe5f2405f64a27976b80ea959e70097f43f13e",
+    "controller_sha256": "dee11bb8582a4fb73404ae1a13ad20c58da538efb661be21455a456cfbb75ecd",
+    "gate_matches_reference": true,
+    "ids_path_impact_enabled": true,
+    "gate_argument_bytes": 60363,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 11.427608728408813,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 2.427678346633911,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "automatic_shared_status_required": 1,
+    "sensor_reads_required": 3
+  },
+  "automatic_measurements": [
+    {
+      "run_id": "010df1d51b70094ec8e9b7d8a639ad7f",
+      "seconds": 214.40711450576782,
+      "reads": 11,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "outcome_unknown",
+      "run_detail": "model_subprocess_timeout_requires_review",
+      "report_state": "outcome_unknown",
+      "assessment": null,
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 21,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.13863,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 58,
+            "prompt_tokens": 634,
+            "total_tokens": 692,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.441409,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 36,
+            "prompt_tokens": 1910,
+            "total_tokens": 1946,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 30.226659,
+          "input_message_bytes": 94088,
+          "usage": {
+            "completion_tokens": 130,
+            "prompt_tokens": 29003,
+            "total_tokens": 29133,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "2a0b09b100867ccc93769f2c72e36e77",
+      "seconds": 116.39623355865479,
+      "reads": 10,
+      "tool_errors": 1,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_tool_failure_requires_review",
+      "report_state": "needs_review",
+      "assessment": null,
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 18,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.004897,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 48,
+            "prompt_tokens": 637,
+            "total_tokens": 685,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.415832,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 39,
+            "prompt_tokens": 1913,
+            "total_tokens": 1952,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.607493,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 41,
+            "prompt_tokens": 2143,
+            "total_tokens": 2184,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 97
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 21.518457,
+          "input_message_bytes": 74682,
+          "usage": {
+            "completion_tokens": 56,
+            "prompt_tokens": 21655,
+            "total_tokens": 21711,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 22.353785,
+          "input_message_bytes": 74951,
+          "usage": {
+            "completion_tokens": 96,
+            "prompt_tokens": 21761,
+            "total_tokens": 21857,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 22.945478,
+          "input_message_bytes": 77504,
+          "usage": {
+            "completion_tokens": 108,
+            "prompt_tokens": 22478,
+            "total_tokens": 22586,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 26.665126,
+          "input_message_bytes": 78063,
+          "usage": {
+            "completion_tokens": 254,
+            "prompt_tokens": 22627,
+            "total_tokens": 22881,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "710a4cd4fbb4888504b948f27eceb1b4",
+      "seconds": 69.01682758331299,
+      "reads": 9,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 18,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 1.933884,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 44,
+            "prompt_tokens": 633,
+            "total_tokens": 677,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.398954,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 38,
+            "prompt_tokens": 1912,
+            "total_tokens": 1950,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.702757,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 41,
+            "prompt_tokens": 2144,
+            "total_tokens": 2185,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 97
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 21.932483,
+          "input_message_bytes": 74677,
+          "usage": {
+            "completion_tokens": 84,
+            "prompt_tokens": 21631,
+            "total_tokens": 21715,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 24.976729,
+          "input_message_bytes": 77499,
+          "usage": {
+            "completion_tokens": 182,
+            "prompt_tokens": 22463,
+            "total_tokens": 22645,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "95211916569cf7944aca7167769ecbed",
+      "seconds": 43.82177925109863,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 15,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 1.992318,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 47,
+            "prompt_tokens": 636,
+            "total_tokens": 683,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.468093,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 39,
+            "prompt_tokens": 1913,
+            "total_tokens": 1952,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.644749,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 42,
+            "prompt_tokens": 2145,
+            "total_tokens": 2187,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 97
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 22.302831,
+          "input_message_bytes": 72429,
+          "usage": {
+            "completion_tokens": 142,
+            "prompt_tokens": 20643,
+            "total_tokens": 20785,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    }
+  ],
+  "measurement_scope": "Production DB copies; real installed Native/MCP/model. Automatic monitor input set in memory. No operational case state/schedule/event changes or Mattermost delivery. Fourth uses latest short operator reason, first three use earlier composite reason. Development case, not held-out or shared GPU controlled.",
+  "manual_quality_failures": {
+    "measurement-three": [
+      "service status normal claim not supported",
+      "2 redetections included original sample"
+    ],
+    "operator-short-r2": [
+      "ambiguous timing of normal HTTP response",
+      "vague followup plan"
+    ]
+  },
+  "operator_measurements": [
+    {
+      "run_id": "59757ebb53a91d6c01f41e96d51834c0",
+      "seconds": 63.653217792510986,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "sent",
+      "outbox_seconds": 63.71572256088257,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 15,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.013751,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 45,
+            "prompt_tokens": 634,
+            "total_tokens": 679,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.653885,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 54,
+            "prompt_tokens": 1913,
+            "total_tokens": 1967,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.630252,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 38,
+            "prompt_tokens": 2141,
+            "total_tokens": 2179,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 97
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 20.863719,
+          "input_message_bytes": 68057,
+          "usage": {
+            "completion_tokens": 129,
+            "prompt_tokens": 18598,
+            "total_tokens": 18727,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 0,
+          "provider_seconds": 21.196772,
+          "input_message_bytes": 69324,
+          "usage": {
+            "completion_tokens": 157,
+            "prompt_tokens": 18984,
+            "total_tokens": 19141,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    },
+    {
+      "run_id": "7e39181beeefb345f420d09d6b160034",
+      "seconds": 214.45390343666077,
+      "reads": 22,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "outcome_unknown",
+      "run_detail": "model_subprocess_timeout_requires_review",
+      "report_state": "outcome_unknown",
+      "assessment": null,
+      "outbox": "sent",
+      "outbox_seconds": 214.50463223457336,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 41,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "provider_seconds": 2.037681,
+          "input_message_bytes": 1831,
+          "usage": {
+            "completion_tokens": 45,
+            "prompt_tokens": 634,
+            "total_tokens": 679,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 2.365545,
+          "input_message_bytes": 4923,
+          "usage": {
+            "completion_tokens": 36,
+            "prompt_tokens": 1910,
+            "total_tokens": 1946,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 2,
+          "provider_seconds": 2.581432,
+          "input_message_bytes": 5425,
+          "usage": {
+            "completion_tokens": 40,
+            "prompt_tokens": 2142,
+            "total_tokens": 2182,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 97
+            }
+          },
+          "compact_report": false,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 1,
+          "provider_seconds": 18.581147,
+          "input_message_bytes": 68226,
+          "usage": {
+            "completion_tokens": 53,
+            "prompt_tokens": 18644,
+            "total_tokens": 18697,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 3,
+          "provider_seconds": 24.332049,
+          "input_message_bytes": 68495,
+          "usage": {
+            "completion_tokens": 406,
+            "prompt_tokens": 18762,
+            "total_tokens": 19168,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 3,
+          "provider_seconds": 31.187179,
+          "input_message_bytes": 87082,
+          "usage": {
+            "completion_tokens": 274,
+            "prompt_tokens": 27874,
+            "total_tokens": 28148,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 4,
+          "provider_seconds": 39.610307,
+          "input_message_bytes": 98724,
+          "usage": {
+            "completion_tokens": 456,
+            "prompt_tokens": 32941,
+            "total_tokens": 33397,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        },
+        {
+          "selected_reads": 4,
+          "provider_seconds": 41.354676,
+          "input_message_bytes": 112253,
+          "usage": {
+            "completion_tokens": 202,
+            "prompt_tokens": 38493,
+            "total_tokens": 38695,
+            "completion_tokens_details": null,
+            "prompt_tokens_details": {
+              "audio_tokens": null,
+              "cached_tokens": 0
+            }
+          },
+          "compact_report": true,
+          "tool_directory": null,
+          "literal_report_repair": false,
+          "additional_inquiry": false,
+          "reasoning_effort": "none",
+          "error_code": null,
+          "response_finish": null
+        }
+      ]
+    }
+  ],
+  "deployment": {
+    "host": "B",
+    "route": "Mac -> admin231 -> A -> B",
+    "files_per_revision": 9,
+    "revisions": 4,
+    "recovery_minutes": 15,
+    "confirmed_noop_verified": true,
+    "manual_restore_tested": false,
+    "backups": [
+      "/var/lib/capstone-auto-review/20261106-r1/deployment",
+      "/var/lib/capstone-auto-review/20261106-r2/deployment",
+      "/var/lib/capstone-auto-review/20261106-r3/deployment",
+      "/var/lib/capstone-auto-review/20261106-r4/deployment"
+    ]
+  },
+  "new_packages_permissions_ports_keys_model_fw_changes": 0,
+  "attack_load_pcap_tests": false,
+  "fresh_os_install_tested": false,
+  "remaining": [
+    "30 second stable final report",
+    "typed reference choice reliability",
+    "chronology/sample semantics and actionable followup plans",
+    "natural automatic scheduling and user chat end-to-end/independent cases"
+  ],
+  "git": {
+    "status": "pending"
+  },
+  "rejected_candidate": "1.19.56 independent extra-read batch guidance removed after 214.505s operator report timeout; single-cause attribution not established",
+  "measurement_versions": {
+    "measurement-one": "1.19.54",
+    "measurement-two": "1.19.55",
+    "measurement-three": "1.19.55",
+    "measurement-four": "1.19.56",
+    "operator-short-r2": "1.19.55",
+    "operator-short-final": "1.19.56"
+  },
+  "final_version_model_run": false,
+  "cleanup": {
+    "server_sources_removed": 1756,
+    "server_test_logs_archived_and_removed": 32,
+    "measurement_scripts_removed": 4,
+    "private_measurement_db_trace_directories_preserved": 4,
+    "rollback_directories_preserved": 4,
+    "production_db_approvals_traces_touched": false,
+    "mac_temporary_cleanup": {
+      "removed_files": 56,
+      "removed_bytes": 17410242,
+      "root_absent": true
+    },
+    "new_mac_packages": 0
+  }
+}

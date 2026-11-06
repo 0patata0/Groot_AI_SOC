@@ -19,10 +19,10 @@ import re
 import time
 from types import ModuleType, SimpleNamespace
 
-VERSION = "groot-query-completion:1.19.53"
+VERSION = "groot-query-completion:1.19.57"
 # One canonical implementation is also embedded in the root management gate.
 # The installer ships it verbatim here; reject drift before executing it.
-EVIDENCE_SOURCE_SHA256 = "1fbb639636ccda30453e648529aff1959bbe709b0b9262193cac1a285aeace39"
+EVIDENCE_SOURCE_SHA256 = "f673551c4900d6bf49f8efcf3abe5f2405f64a27976b80ea959e70097f43f13e"
 
 def _load_evidence():
     path = Path(__file__).with_name('grounding.py')

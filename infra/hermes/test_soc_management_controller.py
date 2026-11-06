@@ -53,6 +53,76 @@ class EmbeddedGateBinding(unittest.TestCase):
         self.assertEqual(result.stdout,'')
 
 
+class AutomaticReviewContext(unittest.TestCase):
+    def setUp(self):
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+        self.store=m.Store(self.tmp.name);self.addCleanup(self.store.db.close)
+        self.cid='a'*32;self.rid='b'*32
+        self.case={'id':self.cid,'mode':'verify','state':'monitor','session_id':'prior-session',
+            'web_impact_review':True,'required_status_reads':[{'target':'a:incident-ip','proposal_id':'c'*32}],
+            'compact_review_evidence_scope':{'evidence_truncated':False},'required_sensor_reads':[
+                {'tool':'mcp__security_events__search_modsecurity_alerts','arguments':{}}]}
+        self.evidence={'sensor_references_complete':True,'evidence_truncated':False,
+            'later_proposals_truncated':False,'proposals':[{'id':'c'*32,'target':'a:incident-ip','status':'expired'}],
+            'later_proposals':[]}
+        self.store.db.execute("INSERT INTO cases(id,state,mode,session_id,created,updated,due,priority) VALUES(?,?,?,?,0,0,0,1)",
+            (self.cid,'monitor','verify','prior-session'))
+        self.store.db.execute("INSERT INTO runs(id,case_id,started,finished,state,session_id) VALUES(?,?,1,2,'monitor','prior-session')",(self.rid,self.cid))
+        self.report='과거 표본만 확인. 영향 미확인; 다시 조회할 것. MANAGEMENT_STATUS: monitor'
+        self.store.db.execute("INSERT INTO report_outbox(run_id,case_id,state,text,created,due) VALUES(?,?,'monitor',?,2,2)",
+            (self.rid,self.cid,self.report))
+        self.store.db.execute("INSERT INTO reviews(id,case_id,requested,reason,previous,run_id) VALUES(?,?,1,?,'{}',?)",
+            ('d'*32,self.cid,'호스트 오류도 확인',self.rid))
+        self.store.db.commit()
+
+    def test_fresh_session_preserves_exact_report_request_and_proposal_history(self):
+        prepared=m.automatic_review_case(self.store,self.case,self.evidence)
+        self.assertIsNone(prepared['session_id']);self.assertTrue(prepared['automatic_review'])
+        context=m.compact_review_context(prepared);history=context['evidence_scope']['automatic_followup']
+        self.assertEqual(history['report'],self.report);self.assertEqual(history['report_sha256'],m.digest(self.report))
+        self.assertEqual(history['latest_operator_reason'],'호스트 오류도 확인')
+        self.assertEqual(history['proposals'],self.evidence['proposals'])
+        self.assertEqual(history['prior_run_id'],self.rid);self.assertIn('+09:00',history['finished_kst'])
+        command=m.command_for(prepared)
+        self.assertIn('CAPSTONE_AUTOMATIC_REVIEW=1',command);self.assertIn('CAPSTONE_MANAGEMENT_REVIEW=1',command)
+        self.assertNotIn('CAPSTONE_OPERATOR_REVIEW=1',command);self.assertNotIn('--resume',command)
+        self.assertEqual(self.case['session_id'],'prior-session')
+        self.assertEqual(self.store.db.execute('select session_id from cases').fetchone()[0],'prior-session')
+        self.assertEqual(self.store.db.execute('select text from report_outbox').fetchone()[0],self.report)
+
+    def test_write_chat_operator_incomplete_scope_and_multiple_proposals_keep_native_path(self):
+        for changes in ({'mode':'manage'},{'chat_task':'lead'},{'operator_review':True},
+                {'state':'needs_review'},{'id':'bad'},{'session_id':None},{'web_impact_review':False},
+                {'required_status_reads':[]},{'required_status_reads':[{'target':'a:waf'}]},
+                {'required_status_reads':self.case['required_status_reads']*2}):
+            case=dict(self.case,**changes)
+            self.assertIs(m.automatic_review_case(self.store,case,self.evidence),case)
+        for changes in ({'sensor_references_complete':False},{'evidence_truncated':True},{'later_proposals_truncated':True}):
+            self.assertIs(m.automatic_review_case(self.store,self.case,dict(self.evidence,**changes)),self.case)
+
+    def test_missing_oversize_or_mismatched_prior_report_never_silently_loses_history(self):
+        for text in ('','한'*4000):
+            self.store.db.execute('update report_outbox set text=?',(text,))
+            self.assertIs(m.automatic_review_case(self.store,self.case,self.evidence),self.case)
+        self.store.db.execute('update report_outbox set text=?',(self.report,))
+        self.store.db.execute("update runs set session_id='different'")
+        self.assertIs(m.automatic_review_case(self.store,self.case,self.evidence),self.case)
+        self.store.db.execute("update runs set session_id='prior-session'")
+        self.store.db.execute('delete from report_outbox')
+        self.assertIs(m.automatic_review_case(self.store,self.case,self.evidence),self.case)
+
+    def test_bound_context_overflow_keeps_full_original_session(self):
+        evidence=dict(self.evidence,later_proposals=[{'note':'x'*17000}])
+        self.assertIs(m.automatic_review_case(self.store,self.case,evidence),self.case)
+
+    def test_automatic_profile_cannot_resume_or_impersonate_operator(self):
+        prepared=m.automatic_review_case(self.store,self.case,self.evidence)
+        for changes in ({'mode':'manage'},{'session_id':'prior-session'},{'operator_review':True},{'chat_task':'lead'},
+                {'compact_review_evidence_scope':{}}):
+            with self.assertRaisesRegex(m.ControllerError,'automatic_review_context_invalid'):
+                m.command_for(dict(prepared,**changes))
+
+
 class Response:
     def __init__(self, raw, signature):
         self.raw, self.status = raw, 200

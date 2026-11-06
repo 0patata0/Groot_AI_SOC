@@ -21,6 +21,27 @@ class WebImpactNavigation(unittest.TestCase):
         self.assertEqual(self.names(r),['mcp__security_events__get_web_service_target']);self.assertEqual(r['tool_choice'],'required')
         self.assertNotIn('arguments',r);self.assertEqual(self.request,before)
         self.assertIs(m.web_impact_review_request(self.request,[],[],self.plan),self.request)
+    def test_wrong_backend_is_reoffered_as_untried_registered_choices_without_dispatch(self):
+        choices=['c:lab-httpd50','c:dvwa','c:log4shell']
+        self.request['tools'][0]['function']['parameters']['properties']['target']['enum']=choices
+        wrong=dict(self.target,target='c:lab-httpd50',service=dict(self.target['service'],request_path_prefix='/_offline-lab-httpd50/'))
+        before=copy.deepcopy(self.request)
+        r=m.web_impact_review_request(self.request,[self.events,wrong],['get_web_service_target'],self.plan)
+        self.assertEqual(self.names(r),['mcp__security_events__get_web_service_target'])
+        self.assertEqual(r['tools'][0]['function']['parameters']['properties']['target']['enum'],['c:dvwa','c:log4shell'])
+        self.assertEqual(r['tool_choice'],'required');self.assertNotIn('arguments',r)
+        self.assertEqual(self.request,before)
+        # New successful observation, not the model's choice, enables backend reads.
+        ready=m.web_impact_review_request(self.request,[self.events,wrong,self.target],['get_web_service_target'],self.plan)
+        self.assertEqual(set(self.names(ready)),{'mcp__security_events__search_web_access','mcp__security_events__search_wazuh_alerts'})
+
+    def test_exhausted_or_unobserved_target_never_creates_a_new_target_or_loop(self):
+        self.request['tools'][0]['function']['parameters']['properties']['target']['enum']=['c:lab-httpd50']
+        wrong=dict(self.target,target='c:lab-httpd50',service=dict(self.target['service'],request_path_prefix='/_offline-lab-httpd50/'))
+        self.assertIs(m.web_impact_review_request(self.request,[self.events,wrong],['get_web_service_target'],self.plan),self.request)
+        for service in (None,{},dict(wrong['service'],configured_in_file_snapshot=False)):
+            self.assertIs(m.web_impact_review_request(self.request,[self.events,dict(wrong,service=service)],['get_web_service_target'],self.plan),self.request)
+
     def test_candidate_reads_use_only_observed_registration_and_exact_incident_bounds(self):
         r=m.web_impact_review_request(self.request,[self.events,self.target],['get_web_service_target'],self.plan)
         self.assertEqual(set(self.names(r)),{'mcp__security_events__search_wazuh_alerts','mcp__security_events__search_web_access'})

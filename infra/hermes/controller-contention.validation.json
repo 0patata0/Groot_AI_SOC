@@ -121,5 +121,46 @@
     "controller_sha256": "9d906f6959f62794c11200182aaa4fcd316d0082d44753068318a5ca3b99600e",
     "last_service_result": "Result=success\nExecMainStatus=0\nActiveState=inactive\nSubState=dead\n",
     "journal_records": 412
+  },
+  "followup_59_minutes": {
+    "as_of_kst": "2026-11-06T17:39:11.433844+09:00",
+    "since_kst": "2026-11-06T16:40:26+09:00",
+    "seconds": 3525,
+    "normal_timer_polls": 197,
+    "deferred_polls": 26,
+    "new_management_failures": 0,
+    "current_failed_units": {
+      "A": 0,
+      "B": 0,
+      "C": 0
+    },
+    "controller_sha256": "8f069ec789877fc8f35b810283d1d97bd710a8473c6e00faedcc383cad1d18a5",
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 3.65,
+        "websocket_connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 15.65,
+        "websocket_connected": true,
+        "worker_alive": true
+      }
+    },
+    "wazuh_rule_id": "40704",
+    "latest_returned_historical_alert_kst": "2026-11-06T16:32:07.554000+09:00",
+    "historical_sample_count": 50,
+    "post_fix_search": {
+      "requested_since_kst": "2026-11-06T16:40:26+09:00",
+      "requested_until_kst": "2026-11-06T17:38:23+09:00",
+      "returned_count": 0,
+      "scanned": 0,
+      "scan_capped": false,
+      "indexed_window_total_count": null
+    },
+    "latest_other_indexed_sample_kst": "2026-11-06T17:38:57.526000+09:00",
+    "new_server_changes": 0,
+    "chat_posts": 0,
+    "note": "Wazuh sample alone does not establish complete ingestion or absence. Host journal and current systemd state independently checked."
   }
 }

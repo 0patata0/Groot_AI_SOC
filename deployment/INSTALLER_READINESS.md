@@ -1,5 +1,7 @@
 # 초기 설치·통합 패키지 준비 상태
 
+11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
+
 11/4 웹 읽기 연계: 기존 단일deploy.sh→service diag-apply 내부 설치와 SIEM 복사 경로에 `web_access_deploy.py`·`web_evidence.py`·`read-web-evidence.py`·`web_evidence_client.py`를 연결했다. 별도 계정/SSH 강제 명령·publisher/timer 계약6과 진단18·관리38 검사를 통과했다. 기존 운영 증분 적용/MCP 조회는 [별도 근거](../infra/mcp/web-evidence.md)이며 새 OS 전체 설치 증거가 아니다.
 
 2026-11-05 KST. 단일 `deploy.sh` 기반은 구현했으나 완성된 일괄 배포 제품으로 표시하지 않는다. 실제 새3VM 설치는 사용자 조건으로 실행하지 않았다. [현황](../STATUS.md) · [운영](OPERATIONS.md) · [공식 지침 부분 대조](SECURITY_GUIDELINES.md) · [이전 점검](../archive/deployment-INSTALLER_READINESS-before-read-accuracy-ncsc-20261104.md).

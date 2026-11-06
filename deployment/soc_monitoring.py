@@ -98,6 +98,7 @@ def configure(s,role,layout):
     common.mkdir(ETC,0o700);common.mkdir(CODE/'canary',0o755)
     payload=files(s)
     payload[CODE/'system_diagnostics.py']=common.read(s['source']/'infra/mcp/system_diagnostics.py')
+    payload[CODE/'diagnostic_history.py']=common.read(s['source']/'infra/mcp/diagnostic_history.py')
     payload[ETC/'runtime.json']=common.canonical(cfg)
     payload.update({Path('/etc/systemd/system')/n:b for n,b in diag.unit_documents(role).items()})
     payload.update({Path('/etc/systemd/system')/n:b for n,b in units(role).items()})

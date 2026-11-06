@@ -38,6 +38,19 @@ def hc():
 
 
 class Profiles(unittest.TestCase):
+    def test_initial_install_copies_history_and_backfills_before_enabling_timer(self):
+        calls, written = [], []
+        with mock.patch.object(d, 'check'), mock.patch.object(Path, 'exists', return_value=False), \
+             mock.patch.object(d, 'group_setup', return_value=997), mock.patch.object(d.common, 'mkdir'), \
+             mock.patch.object(d, 'profile', return_value={}), \
+             mock.patch.object(d, 'source_bundle', return_value={name:b'# source' for name in d.SOURCES}), \
+             mock.patch.object(d.common, 'write', side_effect=lambda path,*a:written.append(str(path))), \
+             mock.patch.object(d.common, 'run', side_effect=lambda argv,**kw:calls.append(argv)):
+            d.install_common(settings(), 'service')
+        self.assertIn(str(d.CODE / 'diagnostic_history.py'), written)
+        backfill = ['/usr/bin/python3','-IB',str(d.CODE / 'system_diagnostics.py'),'--backfill-history','--role','service']
+        self.assertLess(calls.index(backfill), calls.index(['/usr/bin/systemctl','enable','--now',d.TIMER]))
+
     def test_private_distinct_hosts_and_custom_ssh_port(self):
         env = {**HOSTS, 'CAPSTONE_SOURCE': '/approved/source', 'SSH_PORT': '2222'}
         self.assertEqual(d.settings(env), settings(2222))

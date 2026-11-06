@@ -1,5 +1,7 @@
 # 구축·운영 가이드
 
+11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
+
 웹 백엔드 읽기는 기존 service diag-apply가 `web_access_deploy.py`를 내부 호출하고 SIEM 역할이 보조소스2개를 설치한다. C 전용 강제 reader/정제 publisher를 추가하며 새 패키지·공개 포트·private key 반출은 없다. [고정 범위·한계·실제 검증·복구](../infra/mcp/web-evidence.md). 새 서버 전체 설치 시험은 미실행이다.
 
 2026-11-04 KST. 신규 설치의 사용자 진입점은 루트 `deploy.sh` 하나다. 운영 중인 A/B/C는 초기 설치기로 덮어쓰지 않는다. 현재 구축·운영의 전 항목 정합과 전체 새 서버 설치를 완료한 상태는 아니다.

@@ -655,7 +655,7 @@ PY
 | MCP | SIEM의 검증된 ELF와 hash-only `.sha256`, 출처·SHA·아키텍처 확인 |
 | Hermes·JSON | 준비 이미지의 pin, root:root 0600 `siem.json` |
 
-고정 읽기 진단 확장은 저장소의 `infra/mcp/system_diagnostics.py`, `system-diagnostics-mcp.py`, `read-system-diagnostics.py`, `run-system-diagnostics.sh`와 `deployment/soc_diagnostics.py`를 같은 오프라인 소스로 반입한다. Python 표준 라이브러리와 기존 systemd/journalctl·OpenSSH·util-linux 도구를 사용하며 새 pip/CDN/컨테이너 이미지 반입은 없다. 배포 시 새 진단 전용 Ed25519 키를 B에서 생성하고 공개키만 전달한다. 개인키와 서버의 실제 snapshot은 Git이나 관리자 컴퓨터의 반입 묶음에 넣지 않는다.
+고정 읽기 진단 확장은 저장소의 `infra/mcp/system_diagnostics.py`, `diagnostic_history.py`, `system-diagnostics-mcp.py`, `read-system-diagnostics.py`, `run-system-diagnostics.sh`와 `deployment/soc_diagnostics.py`를 같은 오프라인 소스로 반입한다. Python 표준 라이브러리와 기존 systemd/journalctl·OpenSSH·util-linux 도구를 사용하며 새 pip/CDN/컨테이너 이미지 반입은 없다. 배포 시 새 진단 전용 Ed25519 키를 B에서 생성하고 공개키만 전달한다. 개인키와 서버의 실제 snapshot은 Git이나 관리자 컴퓨터의 반입 묶음에 넣지 않는다.
 
 운영 입력(`/opt/capstone-prereqs`), 증거, 실행에 필요한 이미지와 패키지는 보존한다. 검증이 끝난 **이번 작업의** download archive·source clone·Rustup/Cargo cache·일회용 build context만 제거한다. 예를 들어 ET 준비 폴더는 다음처럼 삭제 대상을 제한한다. 각 작업의 변수에 실제 경로가 남아 있을 때만 실행한다.
 
@@ -695,3 +695,5 @@ SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하�
 추가 반입물은 `deployment/basic_nat.py`, `deployment/ipv4_only.py`, 갱신한 prerequisites·루트 deploy.sh 및 canonical NAT 로더/unit이다. 기존 Python3·systemd·OpenSSH·nftables·iptables·Docker를 사용하며 새 deb/wheel/image는0이다. 운영 검증 버전은 Docker29.8.1/Compose5.5.1이며 다른 버전의 동등 동작을 가정하지 않는다. [검증·복구](../infra/mcp/fw-consolidation.md).
 
 웹 보호/표시 보완은 web_traffic_guard.py·기존 WAF 구성·incident_containment/operations_approval·공통 harness.py 소스 갱신이다. 기존 nginx/Python/OpenSSH/Docker를 사용하고 새deb/wheel/image/키/일반MCP권한은0이다. [실제 범위](../infra/validation/web-traffic/README.md) · [카드/FW표](../infra/mcp/containment-display.md).
+
+2026-11-06 과거 오류 색인은 기존 Python 표준 sqlite3를 사용하며 새 deb/wheel/image가 없다. 소스 묶음과 초기24시간 분할 수집·검증·원복 범위는 [계약](../infra/mcp/journal-history.md)을 따른다. 실제 journal/색인 DB와 복구본은 서버에 보존하고 반입 소스/Git에 포함하지 않는다.

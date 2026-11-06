@@ -1,0 +1,336 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06T10:52:37.421321+09:00",
+  "source_sha256": {
+    "infra/mcp/diagnostic_history.py": "3ebf8b521066ea6fd44eafb5f8034eefd973e1b712815022e6cbc0a3ebf00d28",
+    "infra/mcp/system_diagnostics.py": "10c613d02af894bfdb9b7ceb5d412f7dadf6753198a949bf5d31259e450f0735",
+    "infra/mcp/system-diagnostics-mcp.py": "69c0fe73ed590aa0af4ab92cf4acced9b711824f30f02fcd2c6ce13b284be9df",
+    "infra/mcp/read-system-diagnostics.py": "967e7b5b88745a22f0554660f2dceab9904a415081b08264b750f9bccf14cc37",
+    "infra/mcp/test_diagnostic_history.py": "5106947b7b0ad3b8294ad19cd22663ae28bc501b774e3e7f59c4e1bc894ec68f",
+    "deployment/soc_diagnostics.py": "225dd7d8823ec8617b6403bde39442ffe594f5a55a4a89382a59b414c0cf0453",
+    "deployment/soc_monitoring.py": "6fd93774554616084b0f36bc2badeb909d13e766f3dab5468ff683f2c7b236fb",
+    "deployment/tests/test_soc_diagnostics.py": "80ffbce32bb3209a99101474e4b5d31d867bf8c88a6ba92531cbe39b8adc5744"
+  },
+  "tool_version": "1.2.0",
+  "query_version_unchanged": "1.19.62",
+  "common_version_unchanged": "1.5.32",
+  "local_unique_tests": 123,
+  "linux_diagnostic_tests_each_host": 60,
+  "history_tests": 23,
+  "new_packages_ports_keys_privileges": 0,
+  "deployed_files": {
+    "a": 3,
+    "b": 4,
+    "c": 3
+  },
+  "initial_backfill": {
+    "a": {
+      "host": "a",
+      "observed_at_kst": "2026-11-06T10:42:32+09:00",
+      "collected_rows": 0,
+      "source_truncated": false,
+      "failed_window_count": 3
+    },
+    "b": {
+      "host": "b",
+      "observed_at_kst": "2026-11-06T10:41:44+09:00",
+      "collected_rows": 232,
+      "source_truncated": false,
+      "failed_window_count": 0
+    },
+    "c": {
+      "host": "c",
+      "observed_at_kst": "2026-11-06T10:43:30+09:00",
+      "collected_rows": 1,
+      "source_truncated": false,
+      "failed_window_count": 0
+    }
+  },
+  "actual_sdk_reads": [
+    {
+      "query": {
+        "target": "b:management",
+        "since_kst": "2026-11-05T19:10:00+09:00",
+        "until_kst": "2026-11-05T20:00:00+09:00"
+      },
+      "seconds": 0.012730438029393554,
+      "is_error": false,
+      "history_coverage": {
+        "retained_since_kst": "2026-10-07T10:46:48+09:00",
+        "scanned_window_count": 1,
+        "source_filters": "priority0..3_or_fixed_error_classifier4..6",
+        "status": "scanned_sample",
+        "untruncated_requested_window_scanned": true
+      },
+      "publisher_stale": false,
+      "reason": null
+    },
+    {
+      "query": {
+        "target": "c:apache",
+        "since_kst": "2026-11-05T19:10:00+09:00",
+        "until_kst": "2026-11-05T20:00:00+09:00"
+      },
+      "seconds": 0.5938215760979801,
+      "is_error": false,
+      "history_coverage": {
+        "retained_since_kst": "2026-10-07T10:47:11+09:00",
+        "scanned_window_count": 1,
+        "source_filters": "priority0..3_or_fixed_error_classifier4..6",
+        "status": "scanned_sample",
+        "untruncated_requested_window_scanned": true
+      },
+      "publisher_stale": false,
+      "reason": null
+    },
+    {
+      "query": {
+        "target": "a:vector",
+        "since_kst": "2026-11-05T19:10:00+09:00",
+        "until_kst": "2026-11-05T20:00:00+09:00"
+      },
+      "seconds": 0.7458394730929285,
+      "is_error": false,
+      "history_coverage": {
+        "retained_since_kst": "2026-10-07T02:42:32+09:00",
+        "scanned_window_count": 0,
+        "source_filters": "priority0..3_or_fixed_error_classifier4..6",
+        "status": "partial_or_unavailable",
+        "untruncated_requested_window_scanned": false
+      },
+      "publisher_stale": true,
+      "reason": null
+    },
+    {
+      "query": {
+        "target": "b:management"
+      },
+      "seconds": 0.11542190099135041,
+      "is_error": false,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": null
+    },
+    {
+      "query": {
+        "target": "c:apache"
+      },
+      "seconds": 0.4958090418949723,
+      "is_error": false,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": null
+    },
+    {
+      "query": {
+        "target": "a:vector"
+      },
+      "seconds": 0.7179932040162385,
+      "is_error": false,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": null
+    },
+    {
+      "query": {
+        "target": "c:apache",
+        "since_kst": "2026-11-05T19:10:00+09:00"
+      },
+      "seconds": 0.0010027219541370869,
+      "is_error": true,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": "history_arguments_invalid"
+    },
+    {
+      "query": {
+        "target": "c:apache",
+        "since_kst": "2026-11-05T19:10:00+09:00",
+        "until_kst": "2026-11-05T20:00:00+09:00",
+        "lookback_minutes": 15
+      },
+      "seconds": 0.0007511400617659092,
+      "is_error": true,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": "history_arguments_invalid"
+    },
+    {
+      "query": {
+        "target": "c:systemd",
+        "since_kst": "2026-11-05T19:10:00+09:00",
+        "until_kst": "2026-11-05T20:00:00+09:00"
+      },
+      "seconds": 0.0005611039232462645,
+      "is_error": true,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": "history_unit_target_required"
+    },
+    {
+      "query": {
+        "target": "c:apache",
+        "since_kst": "2026-11-05T19:10:00+09:00",
+        "until_kst": "2026-11-05T20:00:00+09:00",
+        "limit": 51
+      },
+      "seconds": 0.0007746599148958921,
+      "is_error": true,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": "limit must be an integer from 1 to 50"
+    },
+    {
+      "query": {
+        "target": "c:apache",
+        "since_kst": "2026-11-05T19:10:00+09:00",
+        "until_kst": "2026-11-05T20:00:00Z"
+      },
+      "seconds": 0.0005700839683413506,
+      "is_error": true,
+      "history_coverage": null,
+      "publisher_stale": null,
+      "reason": "history_timestamp_requires_kst"
+    }
+  ],
+  "complex_retest": {
+    "run_id": "e5a217b0a2bad7dfb4d2f54f92014266",
+    "seconds": 88.14884448051453,
+    "attempts": 17,
+    "pre_mcp_refusals": 2,
+    "actual_mcp_successes": 15,
+    "writes": 0,
+    "state": "model_tool_failure_requires_review",
+    "report_success": false,
+    "final_30_seconds_achieved": false,
+    "model_selected_history": true,
+    "requested_target": "c:apache",
+    "selected_history_target": "c:sudo-status",
+    "same_operation_id_wrong_getter_twice": true,
+    "same_development_case": true,
+    "independent_holdout": false,
+    "chat_posted": false,
+    "shared_gpu_controlled": false,
+    "improvement_claimed": false
+  },
+  "limitations": [
+    "A partial history and stale publisher",
+    "final report 30 seconds not achieved",
+    "wrong target and repeated wrong status getter persist",
+    "no new OS install, attacks, chat posting or long retention test"
+  ],
+  "publication": {
+    "status": "pending",
+    "baseline": "34e81271966a47b622756ea6273fa536e7cf2a6f"
+  },
+  "final_live": {
+    "a": {
+      "source_files": 3,
+      "snapshot_at": 1793929968,
+      "cache_bytes": 32768,
+      "counts": {
+        "events": 0,
+        "windows": 3
+      },
+      "journal_status": {
+        "a:certificate-monitor": "unavailable",
+        "a:docker": "unavailable",
+        "a:raw-suricata": "unavailable",
+        "a:raw-waf": "unavailable",
+        "a:rule-worker": "unavailable",
+        "a:storage-monitor": "unavailable",
+        "a:vector": "unavailable",
+        "a:wazuh-agent": "unavailable"
+      },
+      "publisher_stale": true,
+      "at_epoch": 1793930005.4277961,
+      "runtime_sha256": "d849fb98244997bbc3f7146d3a4943752358061fc4671b1f9b05f2e7036a3647"
+    },
+    "b": {
+      "source_files": 4,
+      "snapshot_at": 1793929911,
+      "cache_bytes": 135168,
+      "counts": {
+        "events": 247,
+        "windows": 12
+      },
+      "journal_status": {
+        "b:docker": "observed",
+        "b:management": "observed",
+        "b:rule-worker": "observed",
+        "b:soc-bot": "observed",
+        "b:vector": "observed",
+        "b:wazuh-agent": "observed"
+      },
+      "publisher_stale": false,
+      "at_epoch": 1793929958.3223758,
+      "runtime_sha256": "d849fb98244997bbc3f7146d3a4943752358061fc4671b1f9b05f2e7036a3647"
+    },
+    "c": {
+      "source_files": 3,
+      "snapshot_at": 1793929949,
+      "cache_bytes": 32768,
+      "counts": {
+        "events": 1,
+        "windows": 13
+      },
+      "journal_status": {
+        "c:apache": "observed",
+        "c:docker": "observed",
+        "c:lab-api": "observed",
+        "c:lab-broker": "observed",
+        "c:lab-guard": "observed",
+        "c:lab-terminal": "observed",
+        "c:sudo-status": "observed",
+        "c:sudo-user-manager": "observed",
+        "c:terminal-guard": "observed",
+        "c:terminal-status": "observed",
+        "c:wazuh-agent": "observed"
+      },
+      "publisher_stale": false,
+      "at_epoch": 1793930005.924251,
+      "runtime_sha256": "1d77cb44afac7ec5ed8303209c24668a00b050563ef51fbb09277c2d1d47e765"
+    }
+  },
+  "a_original_current_comparison": [
+    {
+      "source": "original",
+      "seconds": 8.414561460027471,
+      "journal_status": {
+        "a:vector": "unavailable",
+        "a:wazuh-agent": "unavailable",
+        "a:rule-worker": "unavailable",
+        "a:raw-waf": "unavailable",
+        "a:raw-suricata": "unavailable",
+        "a:certificate-monitor": "unavailable",
+        "a:storage-monitor": "unavailable",
+        "a:docker": "unavailable"
+      },
+      "now": 1793930115
+    },
+    {
+      "source": "current",
+      "seconds": 8.398361623985693,
+      "journal_status": {
+        "a:vector": "unavailable",
+        "a:wazuh-agent": "unavailable",
+        "a:rule-worker": "unavailable",
+        "a:raw-waf": "unavailable",
+        "a:raw-suricata": "unavailable",
+        "a:certificate-monitor": "unavailable",
+        "a:storage-monitor": "unavailable",
+        "a:docker": "unavailable"
+      },
+      "now": 1793930115
+    }
+  ],
+  "cleanup": {
+    "local_files": 18,
+    "local_bytes": 487972,
+    "local_temp_absent": true,
+    "server_files": 29,
+    "server_bytes": 600733,
+    "new_packages": 0,
+    "retained": "production cache, journal, backups, private case DB/traces and isolated validation caches"
+  }
+}

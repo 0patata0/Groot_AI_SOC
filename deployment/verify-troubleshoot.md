@@ -378,3 +378,5 @@ python3 -B -m unittest discover -s infra/groot-c/offline-labs/nonweb/sudo/runtim
 고정 journal grep 조회에 일치 항목이 없으면 종료 코드1과 빈 stdout·stderr를 정상적인 빈 관측으로 처리합니다. 이 경우에만 오류 수가0입니다. stderr·권한 오류·다른 조회 실패·시간 또는 출력 상한 초과는 `unavailable`과 `count=null`을 유지하며, 일반 명령의 종료 코드1을 성공으로 바꾸지 않습니다.
 
 `diagnostic_ssh_effective_policy_mismatch`이면 A/C에서 고정 진단 계정의 effective `sshd -T -C` 정책을 관리자가 확인합니다. 전역 `PermitUserEnvironment no`·`UsePAM yes`, 공개키 전용 인증, forwarding/TTY 금지와 고정 `read-snapshot` ForceCommand가 필요합니다. 초기 설치기는 이 조건을 만족시키기 위해 기존 전역 SSH 파일을 덮어쓰지 않습니다. `sshd -t`가 실패한 부분 설치도 원본 SHA와 신규 namespace·복구 백업을 검토한 별도 이관 없이 재실행하지 않습니다.
+
+과거 사건은 같은 도구에 since_kst/until_kst를 함께 지정한다. history_coverage·publisher_stale·has_more와 원문 보존 범위를 확인한다. 이력 없는0건/스캔 성공을 정상으로 표시하지 않는다. [운영 검증·상한·복구](../infra/mcp/journal-history.md).

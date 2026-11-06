@@ -1,5 +1,9 @@
 # 고정 읽기 전용 시스템 진단
 
+## 2026-11-06 과거 사건 시간 범위
+
+기존 get_system_diagnostics에 since_kst/until_kst 양끝을 추가했다. 등록 systemd25대상의 정제 오류 이력을 최근30일 안 최대24시간/50행으로 읽으며 현재 상태와 분리한다. 초기 설치·권한·부분 수집·실제 MCP 지연과 미검증 범위는 [이력 조회 계약](journal-history.md)을 따른다. 도구2개·기존 최신 snapshot 조회는 유지한다.
+
 ## 2026-10-31 현재 failed unit 집계
 
 `a:systemd`/`b:systemd`/`c:systemd`를 추가했다. 기존 등록25unit과 runtime13에 집계3개를 더한41관측 대상/coverage포함42enum이다. 최대16개의 이름·상태와 전체 수·잘림을 반환하며 설명 원문은 제외한다. 현재 로드된 failed unit만 확인하므로 과거 오류 원인·복구 여부·전체 서비스 정상을 입증하지 않는다. 미등록 상세 조회·조치는 자동 허용되지 않는다. [단문 사용·권한·검증·복구](host-service-actions.md).

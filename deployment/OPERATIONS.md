@@ -1,5 +1,7 @@
 # SOC 운영 절차
 
+11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
+
 웹 백엔드 접근 기록은 security-events의 `search_web_access`로 읽는다. `DVWA 접근 기록 보여줘`는 최근1시간을 서버가 계산하고 실제 표본/잘림/전체미확인을 표시한다. 고정 서비스/로컬 등록은 `get_web_service_target`, Apache/수집 상태는 기존 진단으로 확인한다. 기록0행·HTTP200·Apache active는 앱 정상/침해 부재·사건 종결 증명이 아니다. [범위·장애·복구](../infra/mcp/web-evidence.md).
 
 2026-11-05 KST. 운영의 최신 완료/실패/미확인은 [STATUS](../STATUS.md), 다음 작업은 [PLAN](../PLAN.md)을 기준으로 한다. [공식 지침 대조](SECURITY_GUIDELINES.md) · [신규 구축 준비도](INSTALLER_READINESS.md). 신규 설치기를 운영 서버에 재실행하지 않는다.

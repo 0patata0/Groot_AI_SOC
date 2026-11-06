@@ -63,6 +63,23 @@ RUNTIME_TARGETS = {
 TARGETS.update({t: None for values in RUNTIME_TARGETS.values() for t in values})
 TARGETS['soc:coverage'] = None
 _runtime = None
+_history = None
+
+
+def history_library():
+    global _history
+    if _history is None:
+        path = Path(__file__).with_name('diagnostic_history.py')
+        source = root_file(path, 131072)
+        module = types.ModuleType('fixed_diagnostic_history')
+        module.__file__ = str(path)
+        exec(compile(source, str(path), 'exec'), module.__dict__)
+        module.core = types.SimpleNamespace(**{name: globals()[name] for name in (
+            'need', 'DiagnosticError', 'TARGETS', 'PROFILES', 'ROLE_HOST', 'TTL', 'ERROR_PATTERN',
+            'MAX_JOURNAL_QUERY', 'MAX_JOURNAL_ROWS', 'MAX_COMBINED_JOURNAL_ROWS',
+            'parsed', 'encode', 'classify_message', 'validate_error', 'trusted_parents', 'bounded_command')})
+        _history = module
+    return _history
 
 
 def runtime_library():
@@ -407,7 +424,7 @@ def read_snapshot(expected_host=None, now=None):
     return validate_snapshot(parsed(root_file(SNAPSHOT, MAX_SNAPSHOT, 0o640, gid)), expected_host, now)
 
 
-def collect(role, runner=bounded_command, now=None, include_runtime=None):
+def collect(role, runner=bounded_command, now=None, include_runtime=None, history_output=None):
     need(role in PROFILES, 'invalid_role')
     now = int(time.time()) if now is None else now
     profile = PROFILES[role]
@@ -430,10 +447,10 @@ def collect(role, runner=bounded_command, now=None, include_runtime=None):
             'retained_errors_truncated': False}
     try:
         prefix = ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json',
-            '--output-fields=__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE',
+            '--output-fields=__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE',
             '--since=@' + str(now - LOOKBACK * 60), '--until=@' + str(now),
             '--lines=' + str(MAX_JOURNAL_ROWS), *('--unit=' + unit for unit in profile.values())]
-        parts, truncated = [], False
+        parts, batches, truncated = [], [], False
         # Service stderr can have journal priority info. Keep that stream only
         # when a fixed error classifier pattern matches; ordinary bodies never
         # become error observations. The priority ranges are disjoint.
@@ -444,9 +461,16 @@ def collect(role, runner=bounded_command, now=None, include_runtime=None):
             need(len(lines) <= MAX_JOURNAL_ROWS, 'journal_row_bound')
             truncated |= len(lines) == MAX_JOURNAL_ROWS
             parts.extend(lines)
+            batches.append(raw)
         errors, truncated = journal_errors(b'\n'.join(parts), profile.values(), now, truncated)
         for row in value['units'].values():
             row.update(**errors[row['unit']], journal_status='observed', journal_truncated=truncated)
+        if history_output is not None:
+            history = history_library()
+            collected = [row for raw in batches for row in history.normalize(
+                raw, set(profile.values()), (now - LOOKBACK * 60) * 1000000, now * 1000000)[0]]
+            history_output.update(host=ROLE_HOST[role], since=(now - LOOKBACK * 60) * 1000000,
+                                  until=now * 1000000, events=collected, truncated=truncated)
     except (DiagnosticError, OSError):
         pass
     if include_runtime is True or (include_runtime is None and runner is bounded_command and Path('/etc/capstone-diagnostics/runtime.json').exists()):
@@ -481,12 +505,19 @@ def main():
     action = parser.add_mutually_exclusive_group(required=True)
     action.add_argument('--collect', action='store_true')
     action.add_argument('--check', action='store_true')
+    action.add_argument('--backfill-history', action='store_true')
     parser.add_argument('--role', required=True, choices=tuple(PROFILES))
     args = parser.parse_args()
+    if args.backfill_history:
+        print(json.dumps(history_library().collect(args.role, hours=24), sort_keys=True))
+        return
     if args.collect:
         need(os.getuid() == os.geteuid() == 0, 'collector_root_required')
-        value = collect(args.role)
+        history = {}
+        value = collect(args.role, history_output=history)
         publish(value)
+        if history:
+            history_library().publish(**history)
     else:
         value = read_snapshot(ROLE_HOST[args.role])
     print(json.dumps({'schema': 1, 'host': value['host'], 'status': 'ready',

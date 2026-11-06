@@ -57,8 +57,10 @@
     "infra/ollama-trial/test_harness.py": "59801b8bb2770eedb4ee9c7525ce6a998ac641bfefa87f694920c88c5cb9a5ff"
   },
   "publication": {
-    "source_commit": null,
-    "remote_verified": false
+    "source_commit": "77ef6552f6f2d13e8198b9892d17736d61bc42f0",
+    "remote_verified": true,
+    "verified_at_kst": "2026-11-06T20:34:04.488856+09:00",
+    "receipt_followup_commit": "recorded in local session and final response"
   },
   "private_r6": {
     "seconds": 84.19116847380064,

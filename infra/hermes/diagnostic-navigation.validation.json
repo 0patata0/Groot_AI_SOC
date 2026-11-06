@@ -170,8 +170,12 @@
     }
   },
   "git": {
-    "source_commit": null,
-    "state": "ready_to_commit",
+    "source_commit": "a63e4a2d8dcb37beecc539d795f4fcd69551c93a",
+    "source_remote_main": "a63e4a2d8dcb37beecc539d795f4fcd69551c93a",
+    "source_pushed_at_kst": "2026-11-06T23:59:24.514439+09:00",
+    "public_paths": 20,
+    "receipt": "followup_commit",
+    "related_worktree_at_source_push": "clean",
     "unrelated_staged_and_worktree_changes": "preserved"
   }
 }

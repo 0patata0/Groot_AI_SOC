@@ -11,7 +11,7 @@
 | 필수 근거 | 실제 등록25서비스/명시 기간의 현재·과거 읽기 결속. Native두읽기·SHA/기간/신선도·쓰기0 독립확인 | SDK 실패 영구요약은 호출/시간/해시만 보존되어 전체 사후감사와 구분 |
 | 반영 | query86/common41: 필수 읽기·진단 감사5000자잘림 수정·제한 조회 추론 none | 공격/위험/대응/승인/복구/재시작은 추론 최적화 제외. 모델/권한/승인/FW 유지 |
 | 검증·운영 | 고유1143PASS/skip0, B18SHA/보호8·양WS/worker·3서비스active·Bfailed0 | DB/설정 보존·SDK20sourceSHA·독립15분원복 확정. 새OS전체설치/실제공격/UI전수 미실행 |
-| 정리·Git | 서버 자체시험457파일7,057,881B 제거·부재확인 | DB/원문/trace/채팅/복구 보존. Mac 자체 임시35파일 5,426,876B 제거/부재확인. 공개20파일 커밋/푸시 준비완료 |
+| 정리·Git | 서버 자체시험457파일7,057,881B 제거·부재확인 | DB/원문/trace/채팅/복구 보존. Mac 자체 임시35파일 5,426,876B 제거/부재확인. 공개20파일 `a63e4a2` 커밋·푸시/실원격main 일치. 게시 영수증은 후속 커밋으로 관리 |
 
 [수정·실측·복구](infra/hermes/diagnostic-navigation.md) · [수치 원장](infra/hermes/diagnostic-navigation.validation.json) · [단순 비교](infra/hermes/systemd-comparison.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 진단MCP1.2.3·security-events1.3.2·게이트65,200B·원본35B/학습/FW/TTL/권한/승인정책 유지. 실제응답은 게시→최종게시수정, 교차검토는별도(Ollama86.069초·partial). 시험중inline경로오류·provider schema로인한추론미적용과수정근거도보존했다.
 

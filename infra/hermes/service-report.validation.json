@@ -252,8 +252,10 @@
     "SDK100 partial raw read bodies are not kept in the completed-read cache; the worker call hashes and timings remain, not an independent body revalidation"
   ],
   "publication": {
-    "state": "pending",
-    "previous_head": "97ecdede59894c9f5050571d7d67be75e30a898b"
+    "source_head": "ebcb8b7d8ab396805a0808bfe2df01483b9b4376",
+    "remote_main_verified_at_kst": "2026-11-07T03:00:43.395976+09:00",
+    "source_remote_match": true,
+    "receipt_update": "this file and STATUS are published by a follow-up commit; final head recorded in local session"
   },
   "private_reasoning_probe": {
     "report_only_thinking": true,

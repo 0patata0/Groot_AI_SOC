@@ -4,10 +4,11 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import importlib.util
 import json
+import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.52'
+VERSION = 'soc-chat-contract:1.5.56'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -33,6 +34,11 @@ SERVICE_STATE_GUIDANCE = (
     '오류 표본·색인 일치 수·전체 오류 건수를 구분하고 exit1만으로 세부 원인을 만들지 않습니다. '
     '반환 표본이 0건이면 그 표본의 수만 설명하며, 최근 오류가 없다거나 문제가 없다고 확대하지 않습니다. '
     '확인된 오류 코드는 직접 실패 이유의 근거이며, 누가 잠금을 가졌는지 같은 미확인 배경과 구분합니다. '
+    'controller_already_running은 배타 잠금 획득 실패입니다. 코드만으로 재시도 시행·소유자 종료·복구를 만들지 않습니다. '
+    'b:management는 프로세스/오류 이력이고 b:management-pipeline는 현재 관제 처리·전송·검토 대기열입니다. '
+    '컨트롤러 실패가 지금도 처리에 영향을 주는지 질문하면 두 범위를 구분해 등록 도구로 확인합니다. '
+    'review_required_cases는 검토 상태의 사건 수이며 공격 확정·실행 실패 건수가 아닙니다. '
+    '전송·기한초과 대기가 0이어도 검토 완료·과거 실패 해결·전체 정상으로 확대하지 않습니다. '
     '현재/과거·확인된 원인/미확인 범위를 3~4행 표로 간결히 답하고 같은 설명을 요약에서 반복하지 않습니다.'
 )
 # SOUL owns roles, authority, reporting and bounded-response policy. These
@@ -486,12 +492,19 @@ def service_history_plan(request, question, requested_at):
         targets.add(matches[0])
     if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
     current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+    companions=prop.get('x-capstone-current-companions',{})
+    if (not isinstance(companions,dict) or any(k not in mapping or not isinstance(v,list)
+            or not 1<=len(v)<=2 or any(not isinstance(t,str) or t not in prop['enum']
+                or t in mapping or t[:2]!=k[:2] for t in v) for k,v in companions.items())):return None
     options=[]
     for target in sorted(targets):
         if current:options.append({'tool':name,'arguments':{'target':target}})
         options.append({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}})
+    related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
+    options.extend({'tool':name,'arguments':{'target':t}} for t in related)
     only_service=not re.search(r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b',question,re.I)
-    return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service}
+    return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
+            'current_companions':related}
 
 
 def service_history_state(plan, receipts, now=None):
@@ -505,6 +518,7 @@ def service_history_state(plan, receipts, now=None):
     now=now or datetime.now(timezone(timedelta(hours=9)))
     for required in plan['requirements']:
         args=required['arguments'];target=args['target'];past='since_kst' in args
+        runtime=target in plan.get('current_companions',[])
         matches=[]
         for row in receipts:
             if not isinstance(row,dict):continue
@@ -519,7 +533,8 @@ def service_history_state(plan, receipts, now=None):
         if not matches:state['pending'].append(required);state['incomplete'].append(label+':not_read');continue
         row=matches[-1];data=row.get('data',{})
         if (row.get('is_error') is not False or not isinstance(data,dict) or type(data.get('schema')) is not int or data['schema']!=1
-                or data.get('target')!=target or data.get('host')!=target[0] or data.get('unit')!=plan['units'][target]
+                or data.get('target')!=target or data.get('host')!=target[0]
+                or (not runtime and data.get('unit')!=plan['units'][target])
                 or data.get('mutation_performed') is not False or data.get('publisher_stale') is True):
             state['incomplete'].append(label+':unavailable');continue
         stamp=_diagnostic_instant(data.get('observed_at_kst'))
@@ -528,6 +543,9 @@ def service_history_state(plan, receipts, now=None):
             valid=(data.get('kind')=='journal_history' and 'properties' not in data
                    and all(_diagnostic_instant(data.get('requested_'+k))==_diagnostic_instant(args[k]) for k in ('since_kst','until_kst'))
                    and isinstance(data.get('history_coverage'),dict) and type(data.get('has_more')) is bool)
+        elif runtime:valid=(data.get('kind')=='runtime' and data.get('status') in ('ok','degraded')
+            and isinstance(data.get('metrics'),dict) and isinstance(data.get('codes'),list)
+            and data.get('lookback_scope')=='latest_snapshot_only_not_requested_history')
         else:valid=data.get('kind')!='journal_history' and data.get('status')=='observed' and isinstance(data.get('properties'),dict)
         if not valid:state['incomplete'].append(label+':scope_mismatch')
     return state
@@ -548,14 +566,35 @@ def service_report_context(request, question, requested_at, receipts, *, now=Non
     return value
 
 
-def service_report_schema(citations, nonce=None, available_reads=None):
+def diagnostic_facts_only(facts):
+    return bool(facts) and any(f.get('kind')=='diagnostics' for f in facts) and all(
+        f.get('kind') in ('diagnostics','times','time_calculation') for f in facts)
+
+
+def diagnostic_metadata_failure(facts):
+    """The existing closure veto, shared by generation and output validation."""
+    return diagnostic_facts_only(facts) and any(
+        f.get('error_code_observations') or f.get('error_exit_observations') for f in facts)
+
+
+def service_report_schema(citations, nonce=None, available_reads=None, facts=()):
     """Model may request the full read catalog; it is never forced to conclude."""
     fields={'assessment':{'enum':['benign','remediated','unresolved']},
-        'basis':{'type':'string','minLength':20,'maxLength':240},
+        'basis':{'type':'string','minLength':20,'maxLength':512,
+            'description':'한국어 한두 문장으로 확인된 원인·현재 관측을 설명. 권장160자 이내. 표의 코드·건수 반복이나 미확인 배경 추정 금지.'},
         'evidence_indexes':{'type':'array','const':list(range(len(citations)))},
-        'limitations':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':240}},
-        'next_steps':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':240}},
+        'limitations':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':512,
+            'description':'이 사건의 미확인 항목만 한국어 한 문장. 권장100자 이내. 도구 필드 사전·전체 지침을 복사하지 않는다.'}},
+        'next_steps':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':512,
+            'description':'남은 관측/검토에 연결한 실행 가능한 한국어 한 문장. 권장100자 이내. 이미 한 조회나 그 도구가 제공하지 않는 정보를 다음 조치로 쓰지 않는다.'}},
         'status':{'enum':['resolved','monitor','needs_review','awaiting_approval']}}
+    if diagnostic_metadata_failure(facts):
+        # These same receipts cannot pass the existing normal/recovered claim
+        # validator. Do not invite that invalid draft and spend a repair call.
+        # The model can still choose more evidence instead of a report; this
+        # neither dispatches a call nor decides the cause, impact or action.
+        fields['assessment']['enum']=['unresolved']
+        fields['status']['enum']=['monitor','needs_review']
     report={'type':'object','additionalProperties':False,'required':list(fields),'properties':fields}
     branches=[]
     for more in (True,False):
@@ -586,6 +625,10 @@ def service_report_messages(context, descriptions, citations, feedback=None):
         '같은 수집 스냅샷 재조회로 과거 원문이 생기지 않습니다. 실제 수집 실패와 원문 미반환을 구분합니다. '
         '실제 오류 코드가 있으면 등록 도구 설명의 의미로 직접 실패 이유를 설명하고 미확인 배경과 구분하세요. '
         '이미 마친 조회를 다음 조치로 반복 제안하지 마세요. 다음 조치는 남은 근거 공백이나 관측 추적에 연결합니다. '
+        '직접 실패 코드가 설명하는 실패 이유와 그 배경의 추가 원인을 구분합니다. 배경이 미확인이라고 이미 확인한 이유까지 답변 불가로 바꾸지 마세요. '
+        '추가 읽기는 질문에 빠진 구체적 항목을 해당 도구가 제공할 때만 선택합니다. '
+        '잠금 소유자·당시 실행 기록이 필요하더라도 무관한 서비스 이력이나 같은 대기열 재조회로 대신하지 않습니다. '
+        '확인한 이유·현재 관측·남은 미확인으로 답할 수 있으면 unresolved/needs_review 보고를 완성합니다. 이는 사건 종결이 아닙니다. '
         '다른 도구로 확인 가능한 조사를 관리자에게 떠넘기지 않습니다. '
         '표·시각·개수는 실제 근거에서 렌더링합니다. 자연어 값은 한국어로 씁니다. '
         'basis는 160자 이내의 완결된 한두 문장, 나머지는 한 항목씩 씁니다. 오류 코드·시각은 표에 있으므로 반복하다 문장을 끊지 마세요. '
@@ -679,6 +722,31 @@ def operator_diagnostic_options(request, context, receipts=()):
 def diagnostic_observation_fields(data):
     """Preserve typed exit observations and their unit/time, never journal prose."""
     out={'diagnostic_mode':'journal_history' if data.get('kind')=='journal_history' else 'snapshot'}
+    if data.get('kind')=='runtime':
+        # Keep runtime snapshots distinct from unit/error samples, including
+        # unavailable observations. Never invent a missing metric as zero.
+        out['diagnostic_mode']='runtime'
+        if data.get('status') in ('ok','degraded','unavailable','not_installed'):
+            out['runtime_status']=data['status']
+        for key in ('codes','limits'):
+            value=data.get(key)
+            if isinstance(value,list) and len(value)<=32 and all(isinstance(x,str)
+                    and re.fullmatch('[a-z][a-z0-9_]{0,95}',x) for x in value):
+                out['runtime_'+key]=value[:]
+        if (data.get('target')=='b:management-pipeline' and data.get('host')=='b'
+                and type(data.get('schema')) is int and data['schema']==1
+                and data.get('mutation_performed') is False):
+            metrics=data.get('metrics',{})
+            if isinstance(metrics,dict):
+                names=('pending_reports','running_cases','overdue_cases','review_required_cases',
+                    'oldest_report_seconds','oldest_case_seconds','oldest_overdue_seconds',
+                    'review_chat_pending_jobs','review_chat_oldest_job_seconds','review_chat_poll_age_seconds')
+                out['pipeline_metrics']={k:metrics[k] for k in names if
+                    (type(metrics.get(k)) is int or k.endswith('_seconds') and type(metrics.get(k)) is float)
+                    and math.isfinite(metrics[k]) and 0<=metrics[k]<=2**63}
+                if type(metrics.get('review_chat_installed')) is bool:
+                    out['pipeline_metrics']['review_chat_installed']=metrics['review_chat_installed']
+        return out
     unit=data.get('unit')
     if isinstance(unit,str) and re.fullmatch(r'[A-Za-z0-9@_.-]{1,150}\.service',unit):out['unit']=unit
     exits=[];codes=[];instants=[]
@@ -718,6 +786,31 @@ def diagnostic_evidence_rows(row, stamp):
     scope='관측 '+stamp(row.get('observed_at_kst'))
     if type(row.get('age_seconds')) is int and row['age_seconds']>=0:
         scope+='; 수집본 나이 '+str(row['age_seconds'])+'초(실시간 직접 조회 아님)'
+    if row.get('diagnostic_mode')=='runtime' and target=='b:management-pipeline':
+        metrics=row.get('pipeline_metrics',{})
+        status=row.get('runtime_status','미확인')
+        codes=row.get('runtime_codes',[])
+        answer=[(target+' 관측',status+(' / '+', '.join(codes) if codes else ''),
+                 scope+'; 현재 대기열 관측, 과거 원인/전체 정상 증명 아님')]
+        if status not in ('ok','degraded'):
+            return answer+[(target+' 처리 지표','조회 불가 또는 미설치','0건으로 간주하지 않음')]
+        def metric(key):
+            value=metrics.get(key)
+            return format(value,'.6g') if key.endswith('_seconds') and type(value) is float and math.isfinite(value) and value>=0 else count(value)
+        answer.append(('관제 처리·전송 대기',
+            '보고 전송 '+metric('pending_reports')+'건 / 실행 중 '+metric('running_cases')+'건 / 기한 초과 '+metric('overdue_cases')+'건',
+            '최장 전송 대기 '+metric('oldest_report_seconds')+'초 / 최장 기한 초과 '+metric('oldest_overdue_seconds')+'초'))
+        answer.append(('검토 상태 사건',metric('review_required_cases')+'건',
+            'needs_review/outcome_unknown/review_ready 합계; 공격 확정·실행 실패 건수 아님'))
+        if metrics.get('review_chat_installed') is True:
+            answer.append(('review 채팅 처리 대기',metric('review_chat_pending_jobs')+'건',
+                '최장 '+metric('review_chat_oldest_job_seconds')+'초 / 마지막 poll 나이 '+metric('review_chat_poll_age_seconds')+'초'))
+        elif metrics.get('review_chat_installed') is False:
+            answer.append(('review 채팅 처리','미설치','대기0건으로 간주하지 않음'))
+        return answer
+    if row.get('diagnostic_mode')=='runtime' and row.get('lookback_scope')!='latest_snapshot_only_not_requested_history':
+        return [(target+' 런타임 관측',row.get('runtime_status','미확인')+' / '+', '.join(row.get('runtime_codes',[])),
+                 scope+'; 현재 런타임이며 서비스 오류 이력 아님')]
     if row.get('lookback_scope')=='latest_snapshot_only_not_requested_history':
         return [(target+' 현재 실패 목록','failed unit '+count(row.get('metrics',{}).get('failed_units_total'))+'개',scope+'; 과거 장애/전체 기능 정상 판정 아님')]
     scope+='; 조회 '+stamp(row.get('requested_since_kst'))+' ~ '+stamp(row.get('requested_until_kst'))
@@ -870,9 +963,7 @@ def snapshot_health_violations(text, facts):
     # avoids the word "normal". Sanitized errors plus process attributes alone
     # cannot establish that a failed service incident was benign or remediated.
     # This veto supplies no incident verdict or replacement decision.
-    metadata_only=bool(facts) and all(f.get('kind') in ('diagnostics','times') for f in facts)
-    failed_history=any(f.get('error_code_observations') or f.get('error_exit_observations') for f in facts)
-    if metadata_only and failed_history:
+    if diagnostic_metadata_failure(facts):
         decisions=re.findall(r'^INCIDENT_DISPOSITION: ([^\r\n]+)$',text,re.M)
         if len(decisions)==1:
             try:decision=json.loads(decisions[0])

@@ -28,6 +28,48 @@ def fixture(target='a:modsecurity-custom'):
 
 
 class Grounding(unittest.TestCase):
+    def test_short_current_soc_backlog_questions_keep_existing_read_scope(self):
+        for q in ('지금 관제 보고나 조사가 밀려 있어?','관제 처리 대기열 몇 개야?',
+                  'SOC 보고 지연 현황 보여줘','관제 보고 대기 상태 확인해줘',
+                  '지금 관제 조사 대기 상태 확인해줘'):
+            with self.subTest(question=q):
+                self.assertEqual(harness.diagnostic_request(q)['requested'],['b:management-pipeline'])
+                self.assertTrue(harness.structured_read(q))
+                self.assertTrue(harness.pipeline_lookup_request(q))
+                self.assertEqual(harness.tool_scope(q),{'mcp__system_diagnostics__get_system_diagnostics'})
+        for q in ('관제 보고서 양식만 설명해줘','어제 관제 보고가 밀린 원인 조사해줘',
+                  '관제 조사 대기 사건을 삭제해줘','관제 보고가 왜 지연됐는지 원인을 분석해줘',
+                  '어제 관제 보고가 밀려 있었어?','관제 처리 대기열 지난 3시간 현황 보여줘',
+                  '관제 보고 대기열과 침해 위험을 판단해줘'):
+            with self.subTest(question=q):self.assertIsNone(harness.diagnostic_request(q))
+
+    def test_current_pipeline_lookup_shows_requested_metrics_without_detailed_keyword(self):
+        data={'schema':1,'kind':'runtime','host':'b','target':'b:management-pipeline',
+            'status':'degraded','codes':['case_review_required'],'mutation_performed':False,
+            'observed_at_kst':'2026-11-07T03:00:00+09:00','metrics':{
+                'pending_reports':3,'running_cases':2,'overdue_cases':1,'review_required_cases':9}}
+        text=harness.runtime_diagnostic_report(['b:management-pipeline'],{'b:management-pipeline':data},[])
+        for value in ('보고 전송 3건','실행 중 2건','기한 초과 1건','검토 상태 사건 | 9건'):
+            self.assertIn(value,text)
+        self.assertNotIn('개별 수치는 생략',text)
+        self.assertIn('전체 기능 정상 여부는 별개',text)
+
+    def test_failed_service_judgment_preserves_pipeline_table_instead_of_brief_prose(self):
+        data={'schema':1,'kind':'runtime','host':'b','target':'b:management-pipeline',
+            'status':'degraded','codes':['case_review_required'],'mutation_performed':False,
+            'observed_at_kst':'2026-11-07T03:00:00+09:00','metrics':{
+                'pending_reports':0,'running_cases':0,'overdue_cases':0,'review_required_cases':9}}
+        raw=json.dumps(data)
+        calls=[{'server':'system-diagnostics','name':'get_system_diagnostics',
+            'arguments':{'target':'b:management-pipeline'},'is_error':False,
+            'result':raw,'result_sha256':hashlib.sha256(raw.encode()).hexdigest()}]
+        text=harness.fallback('어제 관리 서비스 실패 원인과 지금 상태 알려줘',calls)
+        self.assertIn('| 확인 항목 | 조회 결과 | 근거·범위 |',text)
+        self.assertIn('검토 상태 사건 | 9건',text)
+        self.assertIn('공격 확정·실행 실패 건수 아님',text)
+        self.assertIn('위험 판단은 검증 미완료',text)
+        self.assertNotIn('전체 정상입니다',text)
+
     def test_historical_failures_do_not_become_current_snapshot_only(self):
         for q in ('오늘 systemd 오류랑 현재 상태 비교해줘. 설정은 바꾸지 마.',
                   '금일 서버 에러와 지금 상태 대조해줘',

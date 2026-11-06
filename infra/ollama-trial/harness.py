@@ -1903,6 +1903,12 @@ def systemd_comparison_report(question, calls, requested_at=None):
     return '\n'.join(rows)
 
 
+PIPELINE_INVESTIGATION = re.compile(
+    r'경보|반복|이력|과거|당시|어제|그제|지난|최근|아까|오늘|금일|동안|부터|까지|이후|이전|'
+    r'왜|원인|분석|판단|침해|위험|공격|조사\s*(?:해|하|좀)|해결|복구|'
+    r'\d+\s*(?:분|시간|일|시)|\d{4}-\d{2}-\d{2}')
+
+
 def diagnostic_request(question):
     text = READ.scope_text(normalized(question))
     if READ.wants_write(text): return None
@@ -1914,15 +1920,19 @@ def diagnostic_request(question):
     if plan and plan.get('kind') == 'wazuh': return None
     if (plan and plan.get('kind') == 'agent_identity'
             and not re.search(r'진단|오류|장애|실패|systemd|\.service\b|수집기',text,re.I)): return None
+    pipeline=bool(re.search(r'(?:관제|\bSOC\b).{0,12}(?:보고|조사|처리|대기열).{0,12}'
+        r'(?:밀(?:려|렸|리)|지연|대기|현황|상태|몇|확인|보여|조회)',text,re.I))
+    if pipeline and PIPELINE_INVESTIGATION.search(text): return None
     health = re.search(r'진단|상태|오류|에러|장애|실패|문제|괜찮|죽었|멈췄|살아\s*있|돌아\s*가|돌고\s*있|작동\s*중|가동\s*중|켜져|안\s*(?:돼|되|돌)|\b(?:failure|failed|alive|running|healthy|up)\b|관제.*(?:공백|건강)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text, re.I)
-    if not re.search(r'진단|관제|systemd|\.service\b|Vector|벡터|Docker|도커|서버|Hermes|헤르메스|Ollama|올라마|WAF|ModSecurity|Suricata|IDS|수리카타|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
-    if not health and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
+    if not pipeline and not re.search(r'진단|관제|systemd|\.service\b|Vector|벡터|Docker|도커|서버|Hermes|헤르메스|Ollama|올라마|WAF|ModSecurity|Suricata|IDS|수리카타|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
+    if not health and not pipeline and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
     if re.search(r'(?:전체|모든).*관제|관제.*(?:전체|공백)|A\s*/\s*B\s*/\s*C|soc:coverage',text,re.I):
         return {'all':True,'requested':[]}
     host_matches=list(re.finditer(r'(?<![A-Za-z0-9])([ABC])\s*서버',text,re.I))
     hosts=[m[1].lower() for m in host_matches]
     host=hosts[0] if len(hosts)==1 else None
     wanted=re.findall(r'(?<![A-Za-z0-9_])[abc]:[a-z][a-z0-9-]*(?![A-Za-z0-9_-])',text)
+    if pipeline:wanted.append('b:management-pipeline')
     if re.search(r'\bsystemd\b', text, re.I):
         wanted.extend(h + ':systemd' for h in (list(dict.fromkeys(hosts)) or list('abc')))
     # Known unit aliases retain their actual host; unknown units are not mapped
@@ -1947,6 +1957,12 @@ def diagnostic_request(question):
             selected=(preceding[-1] if preceding else host) or default
             if selected: wanted.append(selected+':'+name)
     return {'all':False,'requested':list(dict.fromkeys(wanted)),'unresolved':not wanted}
+
+
+def pipeline_lookup_request(question):
+    """Current queue counts only; '조사 대기' names a metric, not an investigation."""
+    return (not PIPELINE_INVESTIGATION.search(READ.scope_text(normalized(question)))
+        and diagnostic_request(question)=={'all':False,'requested':['b:management-pipeline'],'unresolved':False})
 
 
 def diagnostic_scope(question, targets):
@@ -2596,6 +2612,14 @@ def runtime_diagnostic_report(targets, latest, unsupported, *, detailed=False):
         data=latest.get(t)
         if data and data.get('kind')=='coverage': records.update(data.get('targets',{}))
         else: records[t]=data or {'status':'unavailable','codes':['조회 미완료']}
+    if (set(records)=={'b:management-pipeline'} and not unsupported
+            and records['b:management-pipeline'].get('kind')=='runtime'):
+        data=records['b:management-pipeline']
+        row={'kind':'diagnostics',**{k:data[k] for k in ('target','observed_at_kst','age_seconds') if k in data},
+            **CONTRACT.diagnostic_observation_fields(data)}
+        return ('현재 관제 처리·전송·검토 대기 지표를 조회했습니다.\n\n'+
+            EVIDENCE.literal_evidence_table([row])+
+            '\n\n설정 변경이나 사건 종결은 수행하지 않았습니다. 현재 수집본의 대기열과 전체 기능 정상 여부는 별개입니다.')
     counts={k:sum(r.get('status')==k for r in records.values()) for k in ('ok','degraded','unavailable','not_installed')}
     rows=['**요약**',f"진단 대상 {len(records)}개: 점검 통과 {counts['ok']}, 이상 징후 {counts['degraded']}, 미확인 {counts['unavailable']}, 미설치 {counts['not_installed']}. 전체 공격 탐지·대응 성공을 뜻하지 않습니다.",'','**확인 내역**','',
           '| 대상 | 판정 | 근거 | 수집 시각 KST |','| --- | --- | --- | --- |']
@@ -2678,7 +2702,8 @@ def fallback(question, calls):
     rendered = read_report(question, calls) or inventory(question, calls)
     if rendered:
         return rendered
-    if EVIDENCE.incident_investigation_request(normalized(question)):
+    if (EVIDENCE.incident_investigation_request(normalized(question))
+            or CONTRACT.diagnostic_facts_only(facts_for(calls))):
         # Use the same factual table as Native, including backend limitations;
         # the short previous-answer summary deliberately omits such detail.
         text = footer_free(EVIDENCE.factual_review_report(facts_for(calls)))

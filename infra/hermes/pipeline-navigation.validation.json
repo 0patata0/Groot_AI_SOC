@@ -1,0 +1,319 @@
+{
+  "date_kst": "2026-11-07",
+  "versions": {
+    "query": "1.19.108",
+    "common": "1.5.56",
+    "diagnostics_mcp": "1.2.7",
+    "routing": "1.1.6"
+  },
+  "tests": {
+    "unique_pass": 1345,
+    "skipped": 0,
+    "profiles": {
+      "time": 6,
+      "native": 473,
+      "service": 41,
+      "claims": 21,
+      "diagnostics": 65,
+      "sdk": 256,
+      "query": 391,
+      "peer": 72,
+      "installer": 20
+    }
+  },
+  "deployment": {
+    "route": "Mac-admin-A-B",
+    "changed_files": 10,
+    "manifest_files": 21,
+    "protected_files": 8,
+    "sdk_sources": 20,
+    "stopped_config_and_db_bytes_unchanged": true,
+    "backup": "/var/lib/capstone-pipeline/20261108-gate108",
+    "backup_label_note": "Directory label differs from actual deployment date; actual evidence is 2026-11-07 KST.",
+    "deployed_at_kst": "2026-11-07T04:02:24+09:00",
+    "confirmed_at_kst": "2026-11-07T04:03:16+09:00",
+    "gate_argument_bytes": 64915,
+    "independent_rollback_confirmed": true
+  },
+  "trials": [
+    {
+      "query_revision": 101,
+      "request_family": "service_past_cause_and_current",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 109.896,
+      "runtime_status": "partial",
+      "reported_tool_calls": 8,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "ab07bfbbc581c59361d4a08423fc121dc594470d752319114129fc562529fab2"
+    },
+    {
+      "query_revision": 101,
+      "request_family": "service_past_cause_and_current",
+      "engine": "ollama",
+      "phase": "peer",
+      "seconds_from_user_post": 165.206,
+      "runtime_status": "partial",
+      "reported_tool_calls": 2,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "ab07bfbbc581c59361d4a08423fc121dc594470d752319114129fc562529fab2"
+    },
+    {
+      "query_revision": 102,
+      "request_family": "service_past_cause_and_current",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 66.981,
+      "runtime_status": "partial",
+      "reported_tool_calls": 5,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "c5a4b64f7b41860046222c0fb2c43be8bd96c604b0b92ffa3981967e72b8df5b"
+    },
+    {
+      "query_revision": 103,
+      "request_family": "service_past_cause_and_current",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 89.125,
+      "runtime_status": "partial",
+      "reported_tool_calls": 7,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "afb1e36c6a687a246d461196c387324ab34b9f3ef9330cd6306ac69b30f49978"
+    },
+    {
+      "query_revision": 103,
+      "request_family": "service_past_cause_and_current",
+      "engine": "hermes",
+      "phase": "peer",
+      "seconds_from_user_post": 240.329,
+      "runtime_status": "partial",
+      "reported_tool_calls": 3,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "03a5b7d9347f61c52cc23497184d71a1997faccf3d4780b457a725924a01191f"
+    },
+    {
+      "query_revision": 103,
+      "request_family": "service_past_cause_and_current",
+      "engine": "ollama",
+      "phase": "lead",
+      "seconds_from_user_post": 25.044,
+      "runtime_status": "completed",
+      "reported_tool_calls": 3,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "a5a95a5b89172d08c92f864422ebd63b2326a946465d28ef973281263a171c41"
+    },
+    {
+      "query_revision": 103,
+      "request_family": "service_past_cause_and_current",
+      "engine": "ollama",
+      "phase": "peer",
+      "seconds_from_user_post": 129.993,
+      "runtime_status": "completed",
+      "reported_tool_calls": 3,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "afb1e36c6a687a246d461196c387324ab34b9f3ef9330cd6306ac69b30f49978"
+    },
+    {
+      "query_revision": 104,
+      "request_family": "current_queue_lookup",
+      "engine": "hermes",
+      "phase": "peer",
+      "seconds_from_user_post": 158.037,
+      "runtime_status": "partial",
+      "reported_tool_calls": 2,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "dff393a89c88b635726926d7d8749b7022b94de19b8deb8320c9714a46eacb8a"
+    },
+    {
+      "query_revision": 104,
+      "request_family": "current_queue_lookup",
+      "engine": "ollama",
+      "phase": "lead",
+      "seconds_from_user_post": 54.969,
+      "runtime_status": "partial",
+      "reported_tool_calls": 2,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "5a41db83140f93b005db562dad2c2e4259ef0bb9c7a56b160910388c874856db"
+    },
+    {
+      "query_revision": 104,
+      "request_family": "service_past_cause_and_current",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 66.578,
+      "runtime_status": "partial",
+      "reported_tool_calls": 6,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "ed603dcc0c8b323ff7ed52d1c5c5a46415e45fa09055db9650557b1547c32efb"
+    },
+    {
+      "query_revision": 104,
+      "request_family": "service_past_cause_and_current",
+      "engine": "ollama",
+      "phase": "peer",
+      "seconds_from_user_post": 110.528,
+      "runtime_status": "completed",
+      "reported_tool_calls": 3,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "ed603dcc0c8b323ff7ed52d1c5c5a46415e45fa09055db9650557b1547c32efb"
+    },
+    {
+      "query_revision": 105,
+      "request_family": "current_queue_lookup",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 78.866,
+      "runtime_status": "partial",
+      "reported_tool_calls": 2,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "fc2a3d301a709f5b402c26931bc434cb8666d1c76ff9e79c29c62f73e7c8e9fe"
+    },
+    {
+      "query_revision": 105,
+      "request_family": "current_queue_lookup",
+      "engine": "ollama",
+      "phase": "lead",
+      "seconds_from_user_post": 17.568,
+      "runtime_status": "completed",
+      "reported_tool_calls": 1,
+      "protected_calls": 0,
+      "quality": "factual_metrics_report_with_explicit_limits",
+      "local_raw_sha256": "9a14c36cdbcd0589e3327da435236e9f464251020506bc13fc4f2aa9625ceb69"
+    },
+    {
+      "query_revision": 105,
+      "request_family": "current_queue_lookup",
+      "engine": "ollama",
+      "phase": "peer",
+      "seconds_from_user_post": 109.523,
+      "runtime_status": "partial",
+      "reported_tool_calls": 1,
+      "protected_calls": 0,
+      "quality": "not_accepted_as_complete_quality_success",
+      "local_raw_sha256": "fc2a3d301a709f5b402c26931bc434cb8666d1c76ff9e79c29c62f73e7c8e9fe"
+    },
+    {
+      "query_revision": 106,
+      "request_family": "current_queue_lookup",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 20.32,
+      "runtime_status": "completed",
+      "reported_tool_calls": 4,
+      "protected_calls": 0,
+      "quality": "factual_report_with_extra_reads",
+      "local_raw_sha256": "6aed35e193ec84b5e23604666c4263be468c77765e6247ce33102241f3accea5"
+    },
+    {
+      "query_revision": 106,
+      "request_family": "current_queue_lookup",
+      "engine": "ollama",
+      "phase": "lead",
+      "seconds_from_user_post": 16.609,
+      "runtime_status": "completed",
+      "reported_tool_calls": 1,
+      "protected_calls": 0,
+      "quality": "factual_metrics_report_with_explicit_limits",
+      "local_raw_sha256": "6461fcb30afa6516b8c994553a0ffa08420e78dfaeac71ffa838f0f640b85428"
+    },
+    {
+      "query_revision": 107,
+      "request_family": "current_queue_lookup",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 33.623,
+      "runtime_status": "completed",
+      "reported_tool_calls": 2,
+      "protected_calls": 0,
+      "quality": "factual_report_with_extra_reads",
+      "local_raw_sha256": "df8f7421f450c2aa558cdede672aa47e2537abc61a8f300c17ec2e8767a8fc82"
+    },
+    {
+      "query_revision": 107,
+      "request_family": "current_queue_lookup",
+      "engine": "ollama",
+      "phase": "lead",
+      "seconds_from_user_post": 16.746,
+      "runtime_status": "completed",
+      "reported_tool_calls": 1,
+      "protected_calls": 0,
+      "quality": "factual_metrics_report_with_explicit_limits",
+      "local_raw_sha256": "b75e4011f3f6a0ec9c66602f6d1122156ca1b63b7e06ac552a6efebd1d0e6ec2"
+    },
+    {
+      "query_revision": 108,
+      "request_family": "current_queue_lookup",
+      "engine": "hermes",
+      "phase": "lead",
+      "seconds_from_user_post": 17.272,
+      "runtime_status": "completed",
+      "reported_tool_calls": 1,
+      "protected_calls": 0,
+      "quality": "factual_metrics_report_with_explicit_limits",
+      "local_raw_sha256": "7828ef49de1a62719e996269d214385b2a0e5b3e1dda00d5f9e6a99c68ba982d"
+    },
+    {
+      "query_revision": 108,
+      "request_family": "current_queue_lookup",
+      "engine": "ollama",
+      "phase": "lead",
+      "seconds_from_user_post": 17.074,
+      "runtime_status": "completed",
+      "reported_tool_calls": 1,
+      "protected_calls": 0,
+      "quality": "factual_metrics_report_with_explicit_limits",
+      "local_raw_sha256": "5597637801f7027425a8528fd3929258f0a86e428d3fb2e80b33223c6976e81c"
+    }
+  ],
+  "final_actual_receipt_audit": {
+    "hermes": {
+      "actual_verified_reads": 1,
+      "model_calls": 1,
+      "model_seconds": 3.404044
+    },
+    "ollama": {
+      "actual_verified_reads": 1,
+      "model_calls": 1,
+      "model_seconds": 9.48073032591492
+    }
+  },
+  "recent_service_observation": {
+    "at_kst": "2026-11-07T04:05:37.440241+09:00",
+    "window_minutes": 20,
+    "rows": 304,
+    "row_cap": 2000,
+    "systemd_message_markers": {
+      "systemd_successful_exit": 76
+    },
+    "status_text_markers_not_full_json_records": {},
+    "metadata": {
+      "JOB_RESULT": {
+        "done": 76
+      },
+      "RESULT": {},
+      "PRIORITY": {
+        "6": 304
+      }
+    }
+  },
+  "limitations": [
+    "General accurate causal investigation around 60 seconds remains unresolved.",
+    "These are individual fresh-root requests on a shared GPU, not average/p95 or controlled benchmarks.",
+    "Peer times start at the original user post and are not first-reply latency.",
+    "Runtime completed does not establish all semantic claims or full service health.",
+    "Intermittent review heartbeat evidence is reported unknown, not zero; its collector timing cause remains under investigation.",
+    "No attack/load/new training, new OS install or browser rendering sweep."
+  ]
+}

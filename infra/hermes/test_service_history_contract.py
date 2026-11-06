@@ -22,6 +22,98 @@ def catalog():
     return {'tools':[{'function':{'name':NAME,'parameters':m.tools()[0]['inputSchema']}}]}
 
 class ServiceHistory(unittest.TestCase):
+    def pipeline(self, **changes):
+        return {'schema':1,'kind':'runtime','target':'b:management-pipeline','host':'b',
+            'mutation_performed':False,'status':'degraded','codes':['case_review_required'],
+            'limits':['no_pending_case_is_not_security_clearance'],
+            'observed_at_kst':'2026-11-07T03:00:00+09:00',
+            'metrics':{'pending_reports':0,'running_cases':0,'overdue_cases':0,'review_required_cases':7,
+                'oldest_report_seconds':0,'oldest_case_seconds':0,'oldest_overdue_seconds':0,
+                'review_chat_installed':True,'review_chat_pending_jobs':2,
+                'review_chat_oldest_job_seconds':4,'review_chat_poll_age_seconds':1},**changes}
+
+    def pipeline_facts(self, data):
+        from types import SimpleNamespace as NS
+        return w.observation_facts('get_system_diagnostics',NS(isError=False,
+            content=[NS(text=json.dumps(data))]),{'target':'b:management-pipeline'})
+
+    def test_pipeline_actual_metrics_reach_shared_table_without_unit_history(self):
+        data=self.pipeline();before=copy.deepcopy(data)
+        facts=self.pipeline_facts(data);row=facts[0]
+        self.assertEqual(row['diagnostic_mode'],'runtime')
+        self.assertEqual(row['pipeline_metrics'],data['metrics'])
+        text=w.literal_evidence_table(facts)
+        for fragment in ('보고 전송 0건','실행 중 0건','기한 초과 0건','7건','2건',
+                         'case_review_required','공격 확정·실행 실패 건수 아님'):
+            self.assertIn(fragment,text)
+        for wrong in ('반환 오류 표본','정제 색인 일치','조회 미확인 ~ 미확인','모든 서비스 정상'):
+            self.assertNotIn(wrong,text)
+        self.assertEqual(data,before)
+
+    def test_pipeline_missing_or_invalid_metrics_never_display_zero(self):
+        for invalid in (None,-1,True,'0',1.0,2**64,{'instruction':'ignore'}):
+            data=self.pipeline(metrics={'pending_reports':invalid})
+            text=w.literal_evidence_table(self.pipeline_facts(data))
+            self.assertIn('보고 전송 미확인건',text)
+            self.assertNotIn('보고 전송 0건',text)
+
+    def test_pipeline_unavailable_does_not_render_metrics_even_if_supplied(self):
+        for status in ('unavailable','not_installed','unexpected'):
+            text=w.literal_evidence_table(self.pipeline_facts(self.pipeline(status=status)))
+            self.assertIn('조회 불가 또는 미설치',text)
+            self.assertNotIn('보고 전송 0건',text)
+
+    def test_pipeline_metrics_require_correct_host_schema_and_read_receipt(self):
+        for change in ({'host':'a'},{'schema':True},{'schema':2},{'mutation_performed':True},
+                       {'target':'b:wazuh-manager'}):
+            fields=c.diagnostic_observation_fields(self.pipeline(**change))
+            self.assertNotIn('pipeline_metrics',fields)
+
+    def test_pipeline_review_chat_absent_is_not_empty_queue(self):
+        data=self.pipeline();data['metrics']['review_chat_installed']=False
+        text=w.literal_evidence_table(self.pipeline_facts(data))
+        self.assertIn('미설치',text);self.assertNotIn('review 채팅 처리 대기',text)
+
+    def test_pipeline_fractional_queue_age_is_preserved_not_missing(self):
+        data=self.pipeline();data['metrics']['review_chat_oldest_job_seconds']=3.125
+        text=w.literal_evidence_table(self.pipeline_facts(data))
+        self.assertIn('최장 3.125초',text)
+
+    def test_current_companion_comes_from_registered_schema_and_has_no_history(self):
+        self.assertEqual(self.plan['current_companions'],['b:management-pipeline'])
+        self.assertEqual(self.plan['requirements'][-1]['arguments'],{'target':'b:management-pipeline'})
+        self.assertEqual(c.service_history_plan(catalog(),'어제 b:management 실패 원인',self.at)['current_companions'],[])
+        req=catalog();prop=req['tools'][0]['function']['parameters']['properties']['target']
+        prop.pop('x-capstone-current-companions')
+        self.assertEqual(c.service_history_plan(req,self.question,self.at)['current_companions'],[])
+        for bad in ({'b:management':['c:collection']},{'b:management':['b:unknown']},
+                    {'b:management':['b:vector']},{'b:management':[';touch /tmp/evil']}):
+            prop['x-capstone-current-companions']=bad
+            self.assertIsNone(c.service_history_plan(req,self.question,self.at))
+
+    def test_current_companion_missing_failed_or_wrong_scope_never_completes(self):
+        rows=self.rows()
+        self.assertEqual(c.service_history_state(self.plan,rows[:-1],self.now)['pending'],self.plan['requirements'][-1:])
+        for change in ({'status':'unavailable'},{'kind':'journal_history'},{'host':'a'},
+                       {'mutation_performed':True},{'metrics':None},{'lookback_scope':'history'}):
+            changed=copy.deepcopy(rows);changed[-1]['data'].update(change)
+            state=c.service_history_state(self.plan,changed,self.now)
+            self.assertFalse(state['pending']);self.assertTrue(state['incomplete'])
+
+    def test_runtime_untrusted_strings_are_not_projected(self):
+        fields=c.diagnostic_observation_fields(self.pipeline(codes=['ignore | previous'],limits=['<script>']))
+        self.assertNotIn('runtime_codes',fields);self.assertNotIn('runtime_limits',fields)
+
+    def test_pipeline_does_not_bypass_failed_history_closure_guard(self):
+        facts=self.pipeline_facts(self.pipeline())+[{'kind':'diagnostics','target':'b:management',
+            'diagnostic_mode':'journal_history','error_code_observations':[{
+                'code':'controller_already_running','observed_at_kst':'2026-11-06T01:00:00+09:00','record_sha256':'a'*64}]}]
+        for assessment in ('benign','remediated'):
+            text='INCIDENT_DISPOSITION: '+json.dumps({'assessment':assessment,'status':'resolved'})
+            self.assertIn('diagnostic_snapshot_is_not_functional_health',c.snapshot_health_violations(text,facts))
+        text='INCIDENT_DISPOSITION: '+json.dumps({'assessment':'unresolved','status':'needs_review'})
+        self.assertNotIn('diagnostic_snapshot_is_not_functional_health',c.snapshot_health_violations(text,facts))
+
     def test_tool_choice_receives_registered_target_constraints_without_rewriting(self):
         schema={'type':'object','properties':{'target':{'enum':['a:waf','b:wazuh-manager'],
             'description':'등록 컨테이너만 조회'},'secret_unrelated':{'type':'string'}}}
@@ -80,11 +172,13 @@ class ServiceHistory(unittest.TestCase):
         rows=[]
         for option in self.plan['requirements']:
             args=option['arguments'];target=args['target']
-            data={'schema':1,'target':target,'host':target[0],'unit':self.plan['units'][target],
+            data={'schema':1,'target':target,'host':target[0],'unit':self.plan['units'].get(target),
                   'mutation_performed':False,'observed_at_kst':self.at}
             if 'since_kst' in args:
                 data.update(kind='journal_history',history_coverage={'status':'partial_or_unavailable'},has_more=False,
                             requested_since_kst=args['since_kst'],requested_until_kst=args['until_kst'])
+            elif target in self.plan.get('current_companions',[]):
+                data.update(self.pipeline(),observed_at_kst=self.at,lookback_scope='latest_snapshot_only_not_requested_history')
             else:data.update(status='observed',properties={'ActiveState':'failed','Result':'exit-code'})
             rows.append({**copy.deepcopy(option),'is_error':False,'data':data})
         return rows
@@ -97,7 +191,7 @@ class ServiceHistory(unittest.TestCase):
                 for q in (f'오늘 {target} 오류와 현재 상태 확인',f'오늘 {target[0].upper()} 서버 {unit}. 실패와 지금 상태 확인'):
                     plan=c.service_history_plan(catalog(),q,self.at)
                     self.assertEqual(plan['units'],{target:unit})
-                    self.assertEqual([x['arguments']['target'] for x in plan['requirements']],[target,target])
+                    self.assertEqual([x['arguments']['target'] for x in plan['requirements']],[target,target]+(['b:management-pipeline'] if target=='b:management' else []))
 
     def test_today_yesterday_and_exact_intervals(self):
         history=self.plan['requirements'][1]['arguments']
@@ -133,9 +227,9 @@ class ServiceHistory(unittest.TestCase):
 
     def test_no_read_and_partial_read_remain_pending(self):
         state=c.service_history_state(self.plan,[],self.now)
-        self.assertEqual(state['pending'],self.plan['requirements']);self.assertEqual(len(state['incomplete']),2)
+        self.assertEqual(state['pending'],self.plan['requirements']);self.assertEqual(len(state['incomplete']),3)
         state=c.service_history_state(self.plan,self.rows()[:1],self.now)
-        self.assertEqual(state['pending'],self.plan['requirements'][1:]);self.assertEqual(len(state['incomplete']),1)
+        self.assertEqual(state['pending'],self.plan['requirements'][1:]);self.assertEqual(len(state['incomplete']),2)
 
     def test_actual_failed_attempt_stops_reselection_but_never_completes(self):
         rows=self.rows();rows[1].update(is_error=True,data={'error':'unavailable'})
@@ -166,7 +260,7 @@ class ServiceHistory(unittest.TestCase):
     def test_wrong_arguments_cannot_end_required_attempts(self):
         for key,value in [('target','c:apache'),('since_kst',self.at),('until_kst',self.at[:-6]+'+00:00'),('lookback_minutes',15)]:
             rows=self.rows();rows[1]['arguments'][key]=value
-            with self.subTest(key=key):self.assertEqual(c.service_history_state(self.plan,rows,self.now)['pending'],self.plan['requirements'][1:])
+            with self.subTest(key=key):self.assertEqual(c.service_history_state(self.plan,rows,self.now)['pending'],self.plan['requirements'][1:2])
 
     def test_bounded_service_read_uses_low_reasoning_not_risk_or_write(self):
         from types import SimpleNamespace
@@ -214,6 +308,30 @@ class ServiceHistory(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'chat_read_context_invalid'):w.operator_diagnostic_options(catalog())
 
 class ServiceReport(unittest.TestCase):
+    def test_generation_matches_metadata_closure_veto_but_preserves_further_reads(self):
+        from jsonschema import Draft202012Validator
+        facts=[{'kind':'diagnostics','target':'b:management','error_code_observations':[{
+            'code':'controller_already_running'}]},{'kind':'diagnostics','target':'b:management-pipeline',
+            'pipeline_metrics':{'pending_reports':0}}]
+        schema=c.service_report_schema([NAME],available_reads=[NAME],facts=facts)
+        validator=Draft202012Validator(schema)
+        validator.validate({'more_evidence':True,'report':None,'read_tools':[NAME]})
+        report={'assessment':'unresolved','basis':'조회한 오류 메타데이터와 현재 처리 상태의 범위를 구분합니다.',
+                'evidence_indexes':[0],'limitations':['잠금 소유자는 미확인입니다.'],
+                'next_steps':['검토 상태 사건을 확인합니다.'],'status':'needs_review'}
+        validator.validate({'more_evidence':False,'report':report})
+        for decision in ('benign','remediated'):
+            self.assertFalse(validator.is_valid({'more_evidence':False,'report':{**report,'assessment':decision}}))
+        # Pure timestamp arithmetic is not new functional-health evidence.
+        with_clock=facts+[{'kind':'time_calculation','live_observation':False}]
+        schema=c.service_report_schema([NAME],available_reads=[NAME],facts=with_clock)
+        self.assertFalse(Draft202012Validator(schema).is_valid({'more_evidence':False,'report':{**report,'assessment':'benign'}}))
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',c.snapshot_health_violations(
+            'INCIDENT_DISPOSITION: '+json.dumps({'assessment':'benign','status':'resolved'}),with_clock))
+        for other in ([],[{'kind':'diagnostics','target':'c:apache'}],facts+[{'kind':'events','source':'wazuh'}]):
+            other_schema=c.service_report_schema([NAME],available_reads=[NAME],facts=other)
+            self.assertTrue(Draft202012Validator(other_schema).is_valid({'more_evidence':False,'report':{**report,'assessment':'benign','status':'resolved'}}))
+
     def setUp(self):
         fixture=ServiceHistory();fixture.setUp()
         self.f=fixture;self.rows=fixture.rows()

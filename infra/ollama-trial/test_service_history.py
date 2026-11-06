@@ -34,6 +34,8 @@ class ServiceRuntime(unittest.TestCase):
                 past='since_kst' in arguments
                 if past:data.update(kind='journal_history',history_coverage={'status':'partial_or_unavailable'},has_more=False,
                     requested_since_kst=arguments['since_kst'],requested_until_kst=arguments['until_kst'],recent_errors=[])
+                elif arguments['target']=='b:management-pipeline':
+                    data.update(target='b:management-pipeline',kind='runtime',status='degraded',metrics={'review_required_cases':2},codes=['case_review_required'],lookback_scope='latest_snapshot_only_not_requested_history');data.pop('unit')
                 else:data.update(status='observed',properties={'ActiveState':'active','Result':'success'})
                 if past and failed:data={'error':'history unavailable'}
                 return types.SimpleNamespace(isError=bool(past and failed),content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
@@ -52,7 +54,7 @@ class ServiceRuntime(unittest.TestCase):
                         order.append('compact');prompts.append(messages)
                         return copy.deepcopy((compact_report[min(order.count('compact')-1,len(compact_report)-1)] if isinstance(compact_report,list) else compact_report) or {'more_evidence':True,'report':None,'read_tools':['mcp__system_diagnostics__get_system_diagnostics']})
                     order.append('select')
-                    return {'indexes':[0,1]} if selection is None else selection
+                    return {'indexes':[0,1,2]} if selection is None else selection
                 return types.SimpleNamespace(ainvoke=select)
         class Agent:
             def __init__(self,client,**kw):self.client=client
@@ -75,12 +77,12 @@ class ServiceRuntime(unittest.TestCase):
     def test_model_selects_both_reads_before_judgment_with_real_evidence(self):
         result,order,prompts,calls=self.run_case()
         self.assertNotEqual(result['status'],'failed',result)
-        self.assertEqual(order[:4],['select','read','read','compact'])
-        self.assertEqual(len(calls),2)
+        self.assertEqual(order[:5],['select','read','read','read','compact'])
+        self.assertEqual(len(calls),3)
         self.assertNotIn('since_kst',calls[0]);self.assertIn('since_kst',calls[1])
         self.assertIn('journal_history',json.dumps(prompts[0]));self.assertIn('ActiveState',json.dumps(prompts[0]));self.assertIn('assess',order)
         self.assertNotIn('unqueried',result);self.assertEqual(result['protected_calls'],0)
-        receipts=runtime.harness.service_history_receipts(result['calls']);self.assertEqual(len(receipts),2)
+        receipts=runtime.harness.service_history_receipts(result['calls']);self.assertEqual(len(receipts),3)
         tampered=[dict(c,result_sha256='0'*64) for c in result['calls']]
         self.assertEqual(runtime.harness.service_history_receipts(tampered),[])
 
@@ -91,12 +93,12 @@ class ServiceRuntime(unittest.TestCase):
             'next_steps':['추가 오류 근거를 확인합니다.'],'status':'needs_review'}}
         result,order,prompts,calls=self.run_case(compact_report=value)
         self.assertNotEqual(result['status'],'failed',result)
-        self.assertEqual(len(calls),2);self.assertEqual(result['protected_calls'],0)
+        self.assertEqual(len(calls),3);self.assertEqual(result['protected_calls'],0)
         self.assertEqual(result['service_compact_report'],{'more_evidence':False})
         self.assertNotIn('assess',order)
         body=json.loads(prompts[0][1]['content'])
         self.assertEqual(body['background'],'')
-        self.assertEqual(len(body['untrusted_completed_reads']),2)
+        self.assertEqual(len(body['untrusted_completed_reads']),3)
         self.assertIn('등록 target 스키마',body['available_read_descriptions']['mcp__system_diagnostics__get_system_diagnostics'])
         self.assertIn('b:management',body['available_read_descriptions']['mcp__system_diagnostics__get_system_diagnostics'])
 
@@ -108,18 +110,18 @@ class ServiceRuntime(unittest.TestCase):
         bad=copy.deepcopy(good);bad['report']['basis']='현재 b:management 서비스는 완전히 정상이며 모든 기능이 정상으로 복구되었습니다.'
         result,order,prompts,calls=self.run_case(compact_report=[bad,good])
         self.assertNotEqual(result['status'],'failed',result)
-        self.assertEqual(len(calls),2);self.assertNotIn('assess',order)
+        self.assertEqual(len(calls),3);self.assertNotIn('assess',order)
         self.assertEqual(order.count('compact'),2)
         body=json.loads(prompts[1][1]['content'])
         self.assertIn('diagnostic_snapshot_is_not_functional_health',body['report_validation_issues'])
-        self.assertEqual(len(body['untrusted_completed_reads']),2)
+        self.assertEqual(len(body['untrusted_completed_reads']),3)
         self.assertEqual(result['service_compact_reports'],[{'more_evidence':False,'repair':False},{'more_evidence':False,'repair':True}])
 
     def test_compact_candidate_can_be_disabled_for_recovery(self):
         result,order,prompts,calls=self.run_case(enabled=False)
         self.assertNotEqual(result['status'],'failed',result)
         self.assertNotIn('compact',order);self.assertIn('assess',order)
-        self.assertEqual(len(calls),2)
+        self.assertEqual(len(calls),3)
 
     def test_invalid_or_incomplete_selection_dispatches_nothing(self):
         for plan in ({'indexes':[0]},{'indexes':[0,0]},{'indexes':[0,2]},{'indexes':[True,1]}):

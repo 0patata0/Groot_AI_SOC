@@ -32,6 +32,8 @@ def lookup_read_scope(harness, current, phase):
         return None
     if getattr(harness,'systemd_comparison_request',lambda _:False)(current):
         return frozenset(harness.SYSTEMD_COMPARE_TOOLS)
+    if getattr(harness,'pipeline_lookup_request',lambda _:False)(current):
+        return frozenset({'mcp__system_diagnostics__get_system_diagnostics'})
     if (re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지',current)
             or getattr(harness, 'diagnostic_history_request', lambda _: False)(current)):
         return None  # Mixed historical/current inquiry is not a plain inventory.
@@ -51,6 +53,7 @@ def lookup_read_scope(harness, current, phase):
 
 def diagnostic_read_targets(harness, current):
     """Only a resolved, bounded service diagnostic; broad investigations stay native."""
+    if getattr(harness,'pipeline_lookup_request',lambda _:False)(current):return ['b:management-pipeline']
     if (re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지',current)
             or getattr(harness, 'diagnostic_history_request', lambda _: False)(current)):return []
     request = getattr(harness, 'diagnostic_request', lambda _: None)(current)

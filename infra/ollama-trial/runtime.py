@@ -324,7 +324,8 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     citations=sorted({r['tool'] for r in service_context['untrusted_completed_reads']})
                     descriptions={t.name:harness.CONTRACT.service_tool_description(t.description,t.args_schema) for t in agent.adapter.tools
                                   if harness.EVIDENCE.allowed(t.name,'verify')}
-                    schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions))
+                    schema=harness.CONTRACT.service_report_schema(citations,available_reads=list(descriptions),
+                        facts=harness.facts_for(report['calls']))
                     value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(
                         harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback)),90)
                     Draft202012Validator(schema).validate(value)

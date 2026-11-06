@@ -2577,13 +2577,23 @@ def grounding_wrapper(original, native, append_message, reanchor, completed_call
     return wrapped
 
 
+@functools.lru_cache(maxsize=1)
+def chat_lookup_harness():
+    path=Path('/opt/data/plugins/groot-query-completion/alignment.py')
+    if not path.exists():path=Path(__file__).with_name('query-completion')/'alignment.py'
+    spec=importlib.util.spec_from_file_location('_management_chat_alignment',path)
+    alignment=importlib.util.module_from_spec(spec);spec.loader.exec_module(alignment)
+    return alignment.load_harness()
+
+
 def literal_chat_lookup(context, ledger, receipts, harness):
     """Render complete plain reads; never invent a risk/incident decision."""
     if not context or not context['tools'] or not ledger or len(ledger)>32 or len(receipts)!=len(ledger):return None
     question=context['request']
     comparison=getattr(harness,'systemd_comparison_request',lambda _:False)(question)
+    plain=bool(comparison or getattr(harness,'pipeline_lookup_request',lambda _:False)(question))
     if (not harness.structured_read(question) or harness.READ.wants_write(harness.normalized(question))
-            or not comparison and re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지|위험|침해|판단|검토',question)):
+            or not plain and re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지|위험|침해|판단|검토',question)):
         return None
     calls=[];unused=list(receipts)
     for row in ledger:
@@ -2885,6 +2895,8 @@ def management_read_request(request, agent, *, pending=False):
         return request
     indexed=indexed_read_request(request,agent)
     if indexed is not None:return indexed
+    pipeline=bool(chat and chat['tools']==['mcp__system_diagnostics__get_system_diagnostics']
+        and chat_lookup_harness().pipeline_lookup_request(chat['request']))
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -2896,6 +2908,12 @@ def management_read_request(request, agent, *, pending=False):
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
             selected=initial_event_filter_schema(name,selected,chat['request'],chat['requested_at_kst'])
+        if pipeline and selected is not None:
+            target='b:management-pipeline'
+            if target not in selected.get('properties',{}).get('target',{}).get('enum',[]):
+                raise RuntimeError('chat_pipeline_target_unregistered')
+            selected={'type':'object','additionalProperties':False,'required':['target'],
+                'properties':{'target':{'type':'string','enum':[target]}}}
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
         schema=chat_read_schema(name,selected)
@@ -2905,7 +2923,7 @@ def management_read_request(request, agent, *, pending=False):
     nonce=uuid.uuid4().hex
     schema={'type':'object','additionalProperties':False,'required':['request_nonce','calls'],
         'properties':{'request_nonce':{'type':'string','const':nonce},'calls':{
-            'type':'array','minItems':1,'maxItems':4 if chat else len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
+            'type':'array','minItems':1,'maxItems':1 if pipeline else 4 if chat else len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
     from jsonschema import Draft202012Validator
     Draft202012Validator.check_schema(schema)
     result=copy.deepcopy(request)
@@ -3224,7 +3242,7 @@ def management_report_request(request, agent, snapshot):
             agent._capstone_review_feedback=None
             return result
         if service is not None:
-            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog))
+            schema=diagnostic_contract().service_report_schema(citations,nonce,list(catalog),facts=facts)
             Draft202012Validator.check_schema(schema)
             result['response_format']={'type':'json_schema','json_schema':{'name':'soc_service_review','strict':True,'schema':schema}}
             result['messages']=diagnostic_contract().service_report_messages(service,
@@ -3725,18 +3743,11 @@ def main():
     # Imports performed for the gates precede the CLI's background discovery.
     from tools.mcp_tool_discovery import discover_mcp_tools
     discover_mcp_tools()
-    chat_renderer=None
     def complete_chat_lookup():
-        nonlocal chat_renderer
         if not read_ledger_complete or not receipts_complete:return None
         ctx=chat_read_context()
         if not ctx or not ctx['tools'] or not read_ledger:return None
-        if chat_renderer is None:
-            path=Path('/opt/data/plugins/groot-query-completion/alignment.py')
-            spec=importlib.util.spec_from_file_location('_management_chat_alignment',path)
-            alignment=importlib.util.module_from_spec(spec);spec.loader.exec_module(alignment)
-            chat_renderer=alignment.load_harness()
-        text=literal_chat_lookup(ctx,read_ledger,current_receipts,chat_renderer)
+        text=literal_chat_lookup(ctx,read_ledger,current_receipts,chat_lookup_harness())
         if text and evidence_claim_violations(text,read_facts,successful_read_names):return None
         return text
     install_grounding_retry(completed_wire_calls, read_facts, argument_errors, successful_read_names,

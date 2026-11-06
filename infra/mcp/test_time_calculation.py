@@ -7,6 +7,16 @@ from test_system_diagnostics import m, d
 
 
 class TimeCalculationTests(unittest.TestCase):
+    def test_registered_schema_rejects_reference_labels_before_model_dispatch(self):
+        from jsonschema import Draft202012Validator
+        schema=m.TIME_TOOL['inputSchema'];validator=Draft202012Validator(schema)
+        for reference in ('now','2026-11-07T03:00:00+09:00','2026-11-06 18:00:00 UTC',
+                          '1969-12-31T23:59:59.999999999Z'):
+            validator.validate(self.request([('start','2026-11-06T00:00:00+09:00')],reference))
+        for reference in ('yesterday_0','start','2026-11-06T00:00:00','2026-11-06','now\ncommand'):
+            self.assertFalse(validator.is_valid(self.request([('start','2026-11-06T00:00:00+09:00')],reference)))
+        self.assertFalse(validator.is_valid(self.request([('start','2026-11-06T00:00:00')])))
+
     def request(self, values, reference=None):
         value = {'timestamps': [{'id': name, 'value': stamp} for name, stamp in values]}
         if reference is not None:

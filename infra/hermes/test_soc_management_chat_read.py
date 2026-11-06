@@ -98,6 +98,29 @@ class ChatRead(unittest.TestCase):
                            'chat_request':'x'*6001})
 
     @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
+    def test_pipeline_lookup_selection_cannot_add_unrelated_targets_or_time_filters(self):
+        from jsonschema import Draft202012Validator
+        a=agent();a.valid_tool_names={NAME};r=request();tool=copy.deepcopy(self.tool)
+        tool['function']['parameters']['properties']['target']['enum']+=['b:management-pipeline','b:management']
+        r['tools']=[tool];before=copy.deepcopy(r)
+        env=dict(self.env,CAPSTONE_CHAT_READ_JSON=json.dumps(dict(self.context,request='관제 조사 대기 상태 확인해줘')))
+        with patch.dict(w.os.environ,env,clear=True):out=w.management_read_request(r,a,pending=True)
+        schema=out['response_format']['json_schema']['schema'];nonce=a._capstone_management_selection['nonce']
+        def valid(args):return Draft202012Validator(schema).is_valid({'request_nonce':nonce,'calls':[{'tool':NAME,'arguments':args}]})
+        self.assertTrue(valid({'target':'b:management-pipeline'}))
+        self.assertEqual(schema['properties']['calls']['maxItems'],1)
+        for args in ({'target':'b:management'},{'target':'a:systemd'},
+                     {'target':'b:management-pipeline','lookback_minutes':90}):self.assertFalse(valid(args))
+        self.assertEqual(r,before)
+        # A schema-rejected model draft must not widen the next attempt.
+        with patch.dict(w.os.environ,env,clear=True):retry=w.management_read_request(r,a,pending=True)
+        self.assertEqual(retry['response_format']['json_schema']['schema']['properties']['calls'],schema['properties']['calls'])
+        a=agent();a.valid_tool_names={NAME};r['tools']=[self.tool]
+        with patch.dict(w.os.environ,env,clear=True):
+            with self.assertRaisesRegex(RuntimeError,'chat_pipeline_target_unregistered'):
+                w.management_read_request(r,a,pending=True)
+
+    @unittest.skipUnless(DEPS,'existing server jsonschema/OpenAI dependencies required')
     def test_three_hosts_can_use_one_tool_but_duplicate_arguments_are_rejected(self):
         from openai.types.chat import ChatCompletion
         a=agent();a.valid_tool_names={NAME};r=request();r['tools']=[self.tool]
@@ -175,6 +198,22 @@ class LiteralLookup(unittest.TestCase):
                 raw=json.dumps({'target':'c:systemd','status':'unavailable'})
                 receipts[-1]['output']=raw;rows[-1]['result_sha256']=hashlib.sha256(raw.encode()).hexdigest()
             with self.subTest(mutate=mutate):self.assertIsNone(w.literal_chat_lookup(self.context,rows,receipts,self.h))
+
+    def test_current_investigation_queue_metric_completes_with_exact_receipt(self):
+        ctx=dict(self.context,request='지금 관제 조사 대기 상태 확인해줘')
+        args={'target':'b:management-pipeline'}
+        data={'schema':1,'target':args['target'],'host':'b','kind':'runtime','status':'degraded',
+            'codes':['case_review_required'],'mutation_performed':False,'age_seconds':1,
+            'observed_at_kst':'2026-11-06T18:15:00+09:00','metrics':{'pending_reports':2,
+                'running_cases':1,'overdue_cases':0,'review_required_cases':7}}
+        raw=json.dumps({'result':json.dumps(data)});ledger=[w.read_ledger_entry(NAME,args,raw)]
+        receipts=[{'tool':NAME,'output':raw,'is_error':False}]
+        text=w.literal_chat_lookup(ctx,ledger,receipts,self.h)
+        self.assertIn('보고 전송 2건 / 실행 중 1건',text)
+        self.assertIn('검토 상태 사건 | 7건',text)
+        self.assertIn('공격 확정·실행 실패 건수 아님',text)
+        self.assertIsNone(w.literal_chat_lookup(ctx,ledger,self.receipts[:1],self.h))
+        self.assertIsNone(w.literal_chat_lookup(dict(ctx,request='어제 관제 조사가 밀린 원인 분석해줘'),ledger,receipts,self.h))
 
     def test_history_judgment_change_and_unscoped_requests_keep_native_reasoning(self):
         for question in ('오늘 systemd 실패 경보가 반복됐는데 지금도 장애인지 조회해줘',

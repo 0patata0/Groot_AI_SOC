@@ -631,6 +631,21 @@ assert w.lookup_read_scope(h,'침해 사건 조사해줘','lead') is None
                 else:self.assertIsNone(w.lookup_read_scope(h,q,'lead'))
                 self.assertIsNone(w.diagnostic_literal(h,q,[],['a:systemd']))
 
+    def test_queue_metric_noun_does_not_request_investigation_or_peer(self):
+        h=self.actual_harness()
+        for q in ('지금 관제 조사 대기 상태 확인해줘','관제 보고나 조사가 밀려 있어?'):
+            with self.subTest(question=q):
+                self.assertEqual(p.route(q,h),{'engine':'ollama','cross_review':False})
+                self.assertEqual(w.lookup_read_scope(h,q,'lead'),{'mcp__system_diagnostics__get_system_diagnostics'})
+                self.assertIsNone(w.lookup_read_scope(h,q,'peer'))
+                self.assertEqual(w.diagnostic_read_targets(h,q),['b:management-pipeline'])
+        for q in ('어제 관제 조사가 밀린 원인 분석해줘','b:management-pipeline 상태와 원인 판단',
+                  '관제 조사 대기열 지난 3시간 상태','관제 대기열을 삭제해줘'):
+            with self.subTest(question=q):
+                self.assertFalse(h.pipeline_lookup_request(q))
+                self.assertIsNone(w.lookup_read_scope(h,q,'lead'))
+        self.assertTrue(p.route('관제 조사 대기 상태 조회하고 서로 검증해줘',h)['cross_review'])
+
     def test_correlation_rule_definition_is_reader_work_not_an_incident(self):
         h=self.actual_harness()
         for q in ('Wazuh 상관분석 룰 조건 조회','Wazuh 상관분석 규칙 보여줘'):

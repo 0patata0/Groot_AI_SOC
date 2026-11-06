@@ -11,7 +11,7 @@ exec(compile(_format_path.read_bytes(),str(_format_path),'exec'),_format.__dict_
 normalize_tables = _format.normalize_tables
 
 ID = re.compile(r'[a-z0-9]{26}\Z')
-VERSION = 'soc-review-routing:1.1.5'
+VERSION = 'soc-review-routing:1.1.6'
 
 
 def direct_targets(question):
@@ -63,6 +63,8 @@ def route(question, harness):
                and bool(re.search(r'조회|보여|찾아|목록|요약해', text))
                and not re.search(r'조사|분석|원인|왜|위험|영향|복구|판단|검증|검토|맞는지|실제.{0,8}(?:침해|공격)', text))
     if listing:
+        investigation = False
+    if getattr(harness,'pipeline_lookup_request',lambda _:False)(question):
         investigation = False
     pure_read = bool(harness.firewall_request(question) or harness.scope_notice(question) or harness.rule_detail_request(question) or harness.read_plan(question) or harness.combined_rule_request(question)
                      or harness.inventory_question(question) or harness.ids_runtime_question(question)

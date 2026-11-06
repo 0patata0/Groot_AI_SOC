@@ -126,7 +126,11 @@
     "preserved": "server backups, DBs, prompts and run traces; local source and private evidence"
   },
   "publication": {
-    "prior_remote_head": "2145e97ffed27c6e552b2189426e7c29f29eaa4c",
-    "this_unit": "pending"
+    "source_commit": "b35297c034a94595f251097e626ca301dc22c4cd",
+    "remote_main_verified": "b35297c034a94595f251097e626ca301dc22c4cd",
+    "verified_at_kst": "2026-11-06T19:36:45.005077+09:00",
+    "receipt_followup": "this update committed separately",
+    "related_paths_clean_at_source_push": true,
+    "unrelated_stage_preserved": true
   }
 }

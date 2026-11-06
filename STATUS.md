@@ -13,7 +13,7 @@
 | 속도 계측 | 비공개 실제 조사55.908/46.727초, 제목 생성용 별도 모델 호출 발견 | 계측기를 넣은 실행이며 채팅 전송 제외·독립 평가 아님. cProfile 누적시간은 스레드 중첩으로 wall time과 불일치하여 병목 합산에 사용하지 않음 |
 | 초기 연결 비교 | 전체8서버8.390초 vs 읽기6서버8.077초 | 모델 없는 기동·종료1쌍. 조회35도구 전체 schemaSHA 일치·약0.3초 차이, 운영 채택0 |
 | 30초 목표 | 정확한 복합 최종 보고30초 미달 | 새 독립 사건·실제 채팅·지속적 정확성 검증 잔여. 제목 호출 제외71.817초/원안42.558초로 이득 미입증·미채택 |
-| Git·정리 | 실패수정14ecd5b·영수증ebe8be9 푸시·원격main 일치. 후속 계측 문서는 게시 대기 | 서버 시험 임시 디렉터리 제거. Mac 임시 경로·서버 시험 스크립트4개/profile 임시본 제거, 운영 증거·복구본 보존 |
+| Git·정리 | 실패수정14ecd5b·영수증ebe8be9 푸시·원격main 일치. 후속 계측8fcbf37 푸시·원격main 일치 | 서버 시험 임시 디렉터리 제거. Mac 임시 경로·서버 시험 스크립트4개/profile 임시본 제거, 운영 증거·복구본 보존 |
 
 [반복 실패 수정](infra/hermes/controller-contention.md) · [수치 원장](infra/hermes/controller-contention.validation.json) · [기존 관측 범위 검사](infra/hermes/observation-scope.md) · [기동·제목 호출 비교](infra/hermes/startup-profile.md) · [앞선16비교](infra/hermes/incident-review-probes.md) · [조회 묶음](infra/hermes/incident-bundle.md). ‘30초 내 근거 표+후속 최종 보고’는 사용자 답변 전까지 미확정이며 최종 보고 목표를 유지한다.
 

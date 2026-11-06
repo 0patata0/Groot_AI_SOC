@@ -283,6 +283,8 @@
     "removed": true
   },
   "git": {
-    "state": "pending"
+    "at_kst": "2026-11-06T16:52:49.980338+09:00",
+    "head": "8fcbf37b9a9ada6c71fe0f17c5e6213c67ded94c",
+    "remote_main": "8fcbf37b9a9ada6c71fe0f17c5e6213c67ded94c"
   }
 }

@@ -143,7 +143,7 @@
     "source_commit": "607c430ff330b5fc48a445014f992a522e63e983",
     "remote_main_verified": "607c430ff330b5fc48a445014f992a522e63e983",
     "published_at_kst": "2026-11-06T14:12:52.069387+09:00",
-    "receipt_followup_pending": true
+    "receipt_followup_recorded": true
   },
   "cleanup": {
     "server_files": 38,

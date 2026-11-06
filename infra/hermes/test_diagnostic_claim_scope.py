@@ -153,6 +153,57 @@ class DiagnosticClaims(unittest.TestCase):
         self.facts[0]['properties'].update(ActiveState='failed',SubState='failed',Result='exit-code')
         self.assertNotIn('diagnostic_oneshot_state_is_not_failure',self.issues('현재 c:vector는 failed, Result=exit-code로 실패 상태입니다.'))
 
+    def test_successful_oneshot_does_not_prove_failed_rerun(self):
+        for text in ('현재 c:vector는 inactive 상태로 정상 재실행되지 않았습니다.',
+                     '현재 oneshot inactive로 재가동이 되지 않았습니다.'):
+            self.assertIn('diagnostic_oneshot_state_is_not_failure',self.issues(text))
+        self.assertEqual(self.issues('현재 c:vector inactive만으로 재실행되지 않았다고 단정하지 않습니다.'),[])
+
+    def test_lock_rejection_does_not_prove_a_restart_or_retry_was_attempted(self):
+        self.facts.append({'kind':'diagnostics','target':'b:management','error_code_observations':[
+            {'code':'controller_already_running'}]})
+        for text in ('어제 controller_already_running 오류로 재시작에 실패했습니다.',
+                     'controller_already_running 발생 후 재시도를 수행했습니다.'):
+            self.assertIn('diagnostic_restart_counter_not_history',self.issues(text))
+        for text in ('controller_already_running은 배타 잠금 획득 실패입니다.',
+                     'controller_already_running만으로 재시작 실패 여부는 미확인입니다.',
+                     'controller_already_running 이후 재시도 시행은 단정하지 않습니다.'):
+            self.assertNotIn('diagnostic_restart_counter_not_history',self.issues(text))
+
+    def test_review_count_with_empty_processing_queues_does_not_prove_congestion(self):
+        row={'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{
+            'pending_reports':0,'running_cases':0,'overdue_cases':0,'review_required_cases':285}}
+        self.facts.append(row)
+        for text in ('SOC 처리대기열은 병목 상태입니다.','현재 관제 처리 지연이 있습니다.',
+                     '관제 검토 대기열은 과부하 상태입니다.','SOC 처리 대기열은 성능 저하 상태입니다.'):
+            self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+        for text in ('검토 상태 285건이며 현재 처리 병목 여부는 미확인입니다.',
+                     '이 수치만으로 관제 병목이라고 단정하지 않습니다.',
+                     '어제 관제 처리 지연이 있었습니다.',
+                     '관제 병목 가능성은 추가 확인 필요합니다.'):
+            self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+        row['pipeline_metrics']['pending_reports']=3
+        self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
+
+    def test_current_review_total_does_not_supply_calendar_arrival_counts(self):
+        self.facts=[{'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{
+            'review_required_cases':29}}]
+        for text in ('SOC 처리 대기열은 이틀 치 건수를 검토해야 합니다.',
+                     '검토 대기 29건은 어제 치 사건입니다.'):
+            self.assertIn('diagnostic_pipeline_period_unverified',self.issues(text))
+        for text in ('현재 검토 상태 합계29건입니다.', '검토 대기29건이 이틀 치인지 여부는 미확인입니다.'):
+            self.assertNotIn('diagnostic_pipeline_period_unverified',self.issues(text))
+
+    def test_congestion_guard_uses_latest_complete_target_and_keeps_other_evidence(self):
+        zero={'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{
+            'pending_reports':0,'running_cases':0,'overdue_cases':0}}
+        for latest in ({'pending_reports':2,'running_cases':0,'overdue_cases':0},
+                       {'pending_reports':0},{}):
+            self.facts=[zero,dict(zero,pipeline_metrics=latest)]
+            self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
+        self.facts=[zero,{'kind':'events'}]
+        self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
+
     def test_restart_counter_cannot_prove_manual_reload_history(self):
         self.assertIn('diagnostic_restart_counter_not_history',self.issues('NRestarts=0이므로 한 번도 restart 또는 reload되지 않았습니다.'))
         self.assertEqual(self.issues('NRestarts=0만으로 수동 재시작 이력을 판단할 수 없습니다.'),[])

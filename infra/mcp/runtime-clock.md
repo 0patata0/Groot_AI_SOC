@@ -1,6 +1,6 @@
 # 진단 수집 시각과 하트비트 검증
 
-2026-11-07 운영 반영. 진단 MCP1.2.8이며 query1.19.108/common1.5.56/routing1.1.6과 모델은 유지한다. [수치·해시 원장](runtime-clock.validation.json) · [직전 단문 개선](../hermes/pipeline-navigation.md).
+2026-11-07 수집시각 단위 운영 반영 당시 진단MCP1.2.8/query1.19.108/common1.5.56/routing1.1.6이었다. 후속 공통1.5.59의 현황·검증·복구는 [날짜 비교와 주장 검사](../hermes/calendar-service-review.md)를 따른다. 아래는 수집시각 단위의 당시 검증 기록이다. [수치·해시 원장](runtime-clock.validation.json) · [직전 단문 개선](../hermes/pipeline-navigation.md).
 
 | 구분 | 확인 결과 |
 |---|---|
@@ -29,4 +29,4 @@
 
 운영 복구본은 A `/var/lib/capstone-runtime-clock/20261107-a-reader`, `/var/lib/capstone-runtime-clock/20261107-a-final`, B `/var/lib/capstone-runtime-clock/20261107-r1`이다. 각15분 독립 원복은 건강 확인 뒤 CONFIRMED로 확정했고 타이머 중지·복구 helper noop을 검증했다. DB/원문/trace/승인/채팅/가중치를 되돌리거나 지우지 않는다.
 
-수집기 전체를 되돌릴 때는 **A final의 소스 백업을 먼저 복원해 이전 수집 방식+새 읽기 검증 상태로 만든 뒤 B를 복원**한다. A의 reader 호환성은 B가 새 관측시각을 발행하는 동안 제거하면 안 된다. 확인이 끝난 helper의 CONFIRMED를 임의로 지우지 말고, 해시 대조와 별도 정확 복구 후보를 준비한다. 구버전으로 되돌리면 이번 하트비트 오판이 다시 생길 수 있다.
+수집기 전체를 되돌릴 때는 후속 공통 배포를 최신 순서부터 먼저 검토한다. 그 다음 **A final의 소스 백업을 먼저 복원해 이전 수집 방식+새 읽기 검증 상태로 만든 뒤 B를 복원**한다. A의 reader 호환성은 B가 새 관측시각을 발행하는 동안 제거하면 안 된다. 확인이 끝난 helper의 CONFIRMED를 임의로 지우지 말고, 해시 대조와 별도 정확 복구 후보를 준비한다. 구버전으로 되돌리면 이번 하트비트 오판이 다시 생길 수 있다.

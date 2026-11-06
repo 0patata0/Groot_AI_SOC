@@ -207,10 +207,57 @@ class ServiceHistory(unittest.TestCase):
         for q in ('오늘 vector.service 오류 확인','오늘 A 서버 capstone-management.service 실패와 현재 확인',
                   '오늘 b:management 오류 조회하지 마','오늘 b:management 오류 예시 설명',
                   '오늘 b:unknown 오류 확인','오늘 192.168.16.231 b:management 오류 확인',
-                  '오늘과 어제 b:management 오류 확인','최근 b:management 오류 확인',
+                  '오늘인지 어제인지 b:management 오류 확인','최근 b:management 오류 확인',
                   '오늘 3시부터 b:management 오류 확인','오늘 b:management 말고 c:apache 오류 확인',
                   '오늘 A 서버 B 서버 vector.service 실패 확인','오늘 soc:coverage 오류 확인'):
             with self.subTest(q=q):self.assertIsNone(c.service_history_plan(catalog(),q,self.at))
+
+    def test_calendar_comparison_keeps_each_day_and_current_pipeline(self):
+        question='어제 B 서버 capstone-management.service 실패 뒤 오늘 처리 상태가 어떤지 확인해줘. 설정은 바꾸지 마.'
+        plan=c.service_history_plan(catalog(),question,self.at)
+        args=[r['arguments'] for r in plan['requirements']]
+        midnight=self.now.replace(hour=0,minute=0,second=0,microsecond=0)
+        self.assertEqual(args,[{'target':'b:management'},
+            {'target':'b:management','since_kst':(midnight-timedelta(days=1)).isoformat(),
+             'until_kst':(midnight-timedelta(microseconds=1)).isoformat()},
+            {'target':'b:management','since_kst':midnight.isoformat(),'until_kst':self.at},
+            {'target':'b:management-pipeline'}])
+        self.assertTrue(plan['only_service'])
+
+    def test_calendar_comparison_aliases_do_not_duplicate_or_merge_days(self):
+        at='2027-01-01T01:02:03.456789+09:00'
+        for question in ('어제와 오늘 b:management 오류 비교','오늘/금일과 어제 b:management 오류 비교'):
+            plan=c.service_history_plan(catalog(),question,at)
+            args=[r['arguments'] for r in plan['requirements']]
+            self.assertEqual(len(args),2)
+            self.assertEqual(args[0]['since_kst'],'2026-12-31T00:00:00+09:00')
+            self.assertEqual(args[0]['until_kst'],'2026-12-31T23:59:59.999999+09:00')
+            self.assertEqual(args[1]['since_kst'],'2027-01-01T00:00:00+09:00')
+            self.assertEqual(args[1]['until_kst'],at)
+            self.assertFalse(plan['current_companions'])
+
+    def test_calendar_comparison_requires_both_day_receipts(self):
+        self.plan=c.service_history_plan(catalog(),'어제 b:management 오류와 오늘 처리 상태',self.at)
+        rows=self.rows()
+        self.assertFalse(c.service_history_state(self.plan,rows,self.now)['incomplete'])
+        for i in (1,2):
+            state=c.service_history_state(self.plan,rows[:i]+rows[i+1:],self.now)
+            self.assertEqual(state['pending'],[self.plan['requirements'][i]])
+            self.assertTrue(state['incomplete'])
+
+    def test_rolling_day_does_not_satisfy_calendar_comparison(self):
+        plan=c.service_history_plan(catalog(),'오늘과 어제 b:management 오류 비교',self.at)
+        wrong={'tool':plan['requirements'][0]['tool'],'arguments':{'target':'b:management',
+            'since_kst':(self.now-timedelta(days=1)).isoformat(),'until_kst':self.at},'is_error':False,'data':{}}
+        self.assertEqual(c.service_history_state(plan,[wrong],self.now)['pending'],plan['requirements'])
+
+    def test_calendar_comparison_does_not_guess_exclusions_uncertainty_or_extra_time(self):
+        for question in ('어제가 아닌 오늘 b:management 오류','오늘 또는 어제 b:management 오류',
+                         '오늘이나 어제 b:management 오류','오늘인지 어제인지 b:management 오류',
+                         '어제와 오늘 3시 b:management 오류','어제부터 오늘까지 b:management 오류',
+                         '어제와 내일 b:management 오류','그제와 오늘 b:management 오류'):
+            with self.subTest(question=question):
+                self.assertIsNone(c.service_history_plan(catalog(),question,self.at))
 
     def test_catalog_drift_and_timestamp_invalid_fail_closed(self):
         for change in ('history','mapping','duplicate'):

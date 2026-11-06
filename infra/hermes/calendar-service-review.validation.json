@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T04:56:37.021925+09:00",
+  "versions": {
+    "common": "1.5.59",
+    "query": "1.19.108",
+    "diagnostics": "1.2.8",
+    "routing": "1.1.6"
+  },
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "aeea8aa645d1d834282c8a03f86e1c66c93fee3c6bd54ede491a06868415436e",
+    "infra/hermes/test_service_history_contract.py": "95f1b1f1b686efbb86d26bbf78cb48b7abad778e19a7655321bd8b89452168e3",
+    "infra/hermes/test_diagnostic_claim_scope.py": "d3e43b700e024c165e9ebd0d9c97224268dc94df196515ebd8f14b7f653a8deb"
+  },
+  "tests": {
+    "unique_pass": 1390,
+    "skip": 0,
+    "profiles": {
+      "runtime": 33,
+      "time": 6,
+      "native": 473,
+      "service": 46,
+      "claims": 26,
+      "diagnostics": 67,
+      "sdk": 256,
+      "query": 391,
+      "peer": 72,
+      "installer": 20
+    }
+  },
+  "before": {
+    "common56": {
+      "hermes_seconds": 121.296,
+      "status": "partial",
+      "reads": 3,
+      "quality_pass": false,
+      "reason": "calendar_days_replaced_by_rolling_24h"
+    },
+    "common57": {
+      "hermes_seconds": 30.905,
+      "ollama_seconds": 24.135,
+      "reads_each": 4,
+      "calendar_scopes_correct": true,
+      "quality_pass": false,
+      "reasons": [
+        "oneshot_inactive_reported_failed_rerun",
+        "review_count_reported_processing_congestion",
+        "lock_rejection_reported_restart_attempt_failure"
+      ]
+    },
+    "common58": {
+      "hermes_seconds": 31.743,
+      "reads": 4,
+      "quality_pass": false,
+      "reasons": [
+        "current_review_total_assigned_to_two_days",
+        "unsupported_overload_claim"
+      ],
+      "ollama_tested": false
+    }
+  },
+  "actual_prior_bad_prose_rejected_by_current_guard": {
+    "hermes57": true,
+    "ollama57": true,
+    "hermes58": true
+  },
+  "deployment": {
+    "backup": "/var/lib/capstone-calendar/20261107-common59",
+    "at_kst": "2026-11-07T04:46:04.116368+09:00",
+    "confirmed_at_kst": "2026-11-07T04:47:17.824245+09:00",
+    "manifest_files": 22,
+    "protected_files": 8,
+    "sdk_sources": 20,
+    "changed_files": 3,
+    "stopped_config_db_bytes_equal": true,
+    "model_permission_fw_approval_changes": false
+  },
+  "final_chat": {
+    "status": "finished",
+    "cases": [
+      {
+        "engine": "hermes",
+        "chat_final_seconds": 50.913,
+        "status": "partial",
+        "actual_mcp_calls": 4,
+        "model_calls": 3,
+        "model_seconds": 35.166134,
+        "remaining_issues": [],
+        "incident_complete": false,
+        "quality_notes": [
+          "inactive_described_as_inactive_not_service_enablement_check",
+          "next_action_vague_needs_improvement"
+        ],
+        "raw_receipt_audit": "four_full_sha_verified"
+      },
+      {
+        "engine": "ollama",
+        "chat_final_seconds": 40.091,
+        "status": "partial",
+        "actual_mcp_calls": 4,
+        "model_calls": 4,
+        "model_seconds": 30.143513361923397,
+        "remaining_issues": [
+          "diagnostic_restart_counter_not_history"
+        ],
+        "incident_complete": false,
+        "quality_notes": [
+          "invalid_restart_claim_rejected_after_bounded_repairs",
+          "evidence_table_only_no_completed_judgment"
+        ],
+        "raw_receipt_audit": "partial_result_cache_excludes_raw_calls_metadata_only"
+      }
+    ],
+    "question": "어제 B 서버 capstone-management.service 실패 뒤 오늘 처리 상태가 어떤지, 남은 문제가 있는지 확인해줘. 설정은 바꾸지 마."
+  },
+  "limits": [
+    "not_guaranteed_semantic_error_detection",
+    "fresh_root_has_recent_channel_context",
+    "shared_model_cache_gpu_uncontrolled",
+    "not_average_or_p95",
+    "general_correct_60s_incomplete",
+    "no_attack_load_new_training_or_new_os_install"
+  ],
+  "publication": {
+    "status": "pending"
+  },
+  "cleanup": {
+    "server_fixture": {
+      "removed_own_fixture": "/tmp/capstone-pipeline101-check",
+      "verified_files": 460,
+      "bytes": 7194126,
+      "absent": true
+    },
+    "mac_temp": {
+      "at_kst": "2026-11-07T04:58:41.201123+09:00",
+      "files": 162,
+      "bytes": 18540314,
+      "absent": true,
+      "task_processes_before_removal": 0,
+      "user_files_and_other_temps_preserved": true
+    },
+    "packages_installed_on_mac": 0,
+    "operational_data_and_backups_preserved": true
+  },
+  "final_short_chat": {
+    "question": "관제 조사 대기 현황 보여줘",
+    "cases": [
+      {
+        "engine": "hermes",
+        "chat_final_seconds": 19.851,
+        "status": "completed",
+        "actual_mcp_calls": 1,
+        "model_calls": 1,
+        "model_seconds": 5.154133,
+        "result_sha256": [
+          "5b55b7f778ffb871b6e2c65dafc3e57586668c912094162e6873982412752a1f"
+        ],
+        "observed_at_kst": "2026-11-07T04:51:18+09:00",
+        "age_seconds": 52,
+        "writes": 0,
+        "body_table_syntax_validated": true,
+        "full_raw_sha_verified": true,
+        "duplicate_read": false
+      },
+      {
+        "engine": "ollama",
+        "chat_final_seconds": 20.12,
+        "status": "completed",
+        "actual_mcp_calls": 2,
+        "model_calls": 1,
+        "model_seconds": 12.185320084216073,
+        "result_sha256": [
+          "a25cc6278a85d50eebe3b1ae2a9e5217eece357e117429ef96c86dba5e56ff62",
+          "a25cc6278a85d50eebe3b1ae2a9e5217eece357e117429ef96c86dba5e56ff62"
+        ],
+        "observed_at_kst": "2026-11-07T04:55:25+09:00",
+        "age_seconds": 2,
+        "writes": 0,
+        "body_table_syntax_validated": true,
+        "full_raw_sha_verified": true,
+        "duplicate_read": true
+      }
+    ],
+    "ollama_duplicate_note": "same snapshot twice; second call lookback_minutes=15; no answer cache reuse; remaining optimization"
+  },
+  "final_health": {
+    "b_at_kst": "2026-11-07T04:55:43.909848+09:00",
+    "b_manifest": 22,
+    "b_protected": 8,
+    "sdk_sources": 20,
+    "both_websocket_worker_connected": true,
+    "b_failed_units": 0,
+    "review_queue": 0,
+    "rollback_confirmed_inactive_noop": true,
+    "a_at_kst": "2026-11-07T04:50:48+09:00",
+    "a_failed_units": 0,
+    "a_observer_abc_received": true,
+    "a_alert_pending": 0
+  }
+}

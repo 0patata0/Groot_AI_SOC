@@ -104,9 +104,26 @@
     "no_attack_load_training_or_new_os_install_test"
   ],
   "publication": {
-    "status": "pending"
+    "source_commit": "b5e534d8e821471b92338eb229d35099bbcdc8b4",
+    "remote_main_verified_at_kst": "2026-11-07T04:29:39.291948+09:00",
+    "receipt_publication": "pending_followup"
   },
   "cleanup": {
-    "status": "pending"
+    "server_fixture": {
+      "removed_own_fixture": "/tmp/capstone-pipeline101-check",
+      "verified_files": 460,
+      "bytes": 7194126,
+      "absent": true
+    },
+    "mac_temp": {
+      "at_kst": "2026-11-07T04:58:41.201123+09:00",
+      "files": 162,
+      "bytes": 18540314,
+      "absent": true,
+      "task_processes_before_removal": 0,
+      "user_files_and_other_temps_preserved": true
+    },
+    "packages_installed_on_mac": 0,
+    "operational_data_and_backups_preserved": true
   }
 }

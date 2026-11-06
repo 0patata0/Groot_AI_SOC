@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.56'
+VERSION = 'soc-chat-contract:1.5.59'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -34,11 +34,13 @@ SERVICE_STATE_GUIDANCE = (
     '오류 표본·색인 일치 수·전체 오류 건수를 구분하고 exit1만으로 세부 원인을 만들지 않습니다. '
     '반환 표본이 0건이면 그 표본의 수만 설명하며, 최근 오류가 없다거나 문제가 없다고 확대하지 않습니다. '
     '확인된 오류 코드는 직접 실패 이유의 근거이며, 누가 잠금을 가졌는지 같은 미확인 배경과 구분합니다. '
-    'controller_already_running은 배타 잠금 획득 실패입니다. 코드만으로 재시도 시행·소유자 종료·복구를 만들지 않습니다. '
+    'controller_already_running은 배타 잠금 획득 실패입니다. 코드만으로 재시도·재시작 시행이나 그 성공/실패·소유자 종료·복구를 만들지 않습니다. '
     'b:management는 프로세스/오류 이력이고 b:management-pipeline는 현재 관제 처리·전송·검토 대기열입니다. '
     '컨트롤러 실패가 지금도 처리에 영향을 주는지 질문하면 두 범위를 구분해 등록 도구로 확인합니다. '
     'review_required_cases는 검토 상태의 사건 수이며 공격 확정·실행 실패 건수가 아닙니다. '
     '전송·기한초과 대기가 0이어도 검토 완료·과거 실패 해결·전체 정상으로 확대하지 않습니다. '
+    '검토 상태 건수만으로 처리 병목·실시간 지연을 단정하지 않습니다. oneshot의 inactive/dead와 성공 종료는 재실행 실패의 증거가 아닙니다. '
+    'case_review_required만 붙은 degraded는 검토 미완료 표지이며 성능 저하 측정값이 아닙니다. review_required_cases는 현재 상태 합계이지 오늘·어제·이틀 치 발생 건수가 아닙니다. '
     '현재/과거·확인된 원인/미확인 범위를 3~4행 표로 간결히 답하고 같은 설명을 요약에서 반복하지 않습니다.'
 )
 # SOUL owns roles, authority, reporting and bounded-response policy. These
@@ -449,28 +451,29 @@ def service_history_plan(request, question, requested_at):
 
     Only registered metadata resolves units. No aliases, prior assistant text,
     inferred host IPs, dispatch, completion or incident decision is supplied.
-    Unknown/negative/mixed time expressions retain the ordinary investigation.
+    Unknown/negative time expressions retain the ordinary investigation.
+    Explicit today/yesterday comparisons keep separate KST calendar windows.
     """
     name='mcp__system_diagnostics__get_system_diagnostics'
     if not isinstance(request,dict) or not isinstance(request.get('tools'),list) or not isinstance(question,str) or len(question)>6000:return None
     if re.search(r'```|번역|예시|가정|정규식|도구\s*없이|조회\s*(?:하지|말)|제외|말고|아니라',question):return None
+    if re.search(r'(?:오늘|금일|어제)(?:은|는|이|가)?\s*(?:아닌|아니고|빼고|인지|일까|일지|또는|혹은|이나)',question):return None
     if re.search(r'\b(?:\d{1,3}\.){3}\d{1,3}\b',question):return None
     if not re.search(r'오류|실패|장애|원인|왜|이력|과거|당시|failure|failed|error|history',question,re.I):return None
     at=_diagnostic_instant(requested_at)
     if at is None:return None
     bounds=re.findall(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?\+09:00',question)
+    periods=[];days=set()
     if len(bounds)==2:
-        start,end=map(_diagnostic_instant,bounds)
+        periods=[tuple(map(_diagnostic_instant,bounds))]
     elif not bounds and not re.search(r'최근|지난|그제|내일|부터|까지|이후|이전|사이|\d\s*(?:시|분|시간|일)|\d:\d',question):
         days=set(re.findall(r'오늘|금일|어제',question))
-        if days and days<={'오늘','금일'}:
-            start,end=at.replace(hour=0,minute=0,second=0,microsecond=0),at
-        elif days=={'어제'}:
-            end=at.replace(hour=0,minute=0,second=0,microsecond=0)
-            start,end=end-timedelta(days=1),end-timedelta(microseconds=1)
-        else:return None
+        midnight=at.replace(hour=0,minute=0,second=0,microsecond=0)
+        if '어제' in days:periods.append((midnight-timedelta(days=1),midnight-timedelta(microseconds=1)))
+        if days & {'오늘','금일'}:periods.append((midnight,at))
     else:return None
-    if not start or not end or not 0<(end-start).total_seconds()<=86400 or not at-timedelta(days=30)<=start<end<=at:return None
+    if not periods or any(not start or not end or not 0<(end-start).total_seconds()<=86400
+            or not at-timedelta(days=30)<=start<end<=at for start,end in periods):return None
     tools=[t.get('function',{}) for t in request.get('tools',[]) if t.get('function',{}).get('name')==name]
     if len(tools)!=1:return None
     schema=tools[0].get('parameters',{});prop=schema.get('properties',{}).get('target',{})
@@ -492,6 +495,9 @@ def service_history_plan(request, question, requested_at):
         targets.add(matches[0])
     if not 1<=len(targets)<=4 or hosts and any(t[0] not in hosts for t in targets):return None
     current=bool(re.search(r'현재|지금|\bcurrent\b|\bnow\b',question,re.I))
+    # A named today's operating state also asks for a current observation;
+    # the separate today's history is still required, never replaced by it.
+    current=current or bool(re.search(r'(?:오늘|금일)(?:은|의)?\s*(?:(?:관제|처리|서비스|운영)\s*)?상태',question))
     companions=prop.get('x-capstone-current-companions',{})
     if (not isinstance(companions,dict) or any(k not in mapping or not isinstance(v,list)
             or not 1<=len(v)<=2 or any(not isinstance(t,str) or t not in prop['enum']
@@ -499,7 +505,8 @@ def service_history_plan(request, question, requested_at):
     options=[]
     for target in sorted(targets):
         if current:options.append({'tool':name,'arguments':{'target':target}})
-        options.append({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}})
+        options.extend({'tool':name,'arguments':{'target':target,'since_kst':start.isoformat(),'until_kst':end.isoformat()}}
+                       for start,end in periods)
     related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
     options.extend({'tool':name,'arguments':{'target':t}} for t in related)
     only_service=not re.search(r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b',question,re.I)
@@ -920,7 +927,16 @@ def diagnostic_property_claim_violations(text, facts):
 
 def diagnostic_lifecycle_claim_violations(text, facts):
     issues=set()
+    lock_metadata=diagnostic_facts_only(facts) and any(
+        x.get('code')=='controller_already_running' for f in facts for x in f.get('error_code_observations',[]))
     for line in text.splitlines():
+        if lock_metadata:
+            for clause in re.split(r';|(?<=[.!?])\s+',line):
+                if (re.search(r'controller_already_running',clause)
+                        and re.search(r'재시도|재시작|재기동|재실행|재가동|\brestart\b|\bretry\b',clause,re.I)
+                        and re.search(r'실패|성공|수행|시행|완료|했|되었|됐|진행',clause)
+                        and not re.search(r'미확인|여부|단정.{0,5}(?:않|못)|근거.{0,5}없|증명.{0,5}않|필요|예정|제안|권고|승인|아니|아님',clause)):
+                    issues.add('diagnostic_restart_counter_not_history')
         rows=diagnostic_subjects(line,facts)
         if rows:
             for clause in re.split(r';|(?<=[.!?])\s+',line):
@@ -942,9 +958,35 @@ def diagnostic_lifecycle_claim_violations(text, facts):
         for clause in re.split(r';|(?<=[.!?])\s+',line):
             if re.search(r'미확인|판단.{0,6}(?:불가|못)|단정.{0,6}(?:않|못)|아니|아님|아닙|뜻하지\s*않',clause):continue
             if (re.search(r'현재|지금|최신|여전히|계속|지속',clause)
+                    and re.search(r'inactive|dead|oneshot',clause,re.I)
+                    and re.search(r'재(?:실행|시작|가동|기동)(?:이|가)?\s*(?:되지|하지|안\s*되|못)',clause)):
+                issues.add('diagnostic_oneshot_state_is_not_failure')
+            if (re.search(r'현재|지금|최신|여전히|계속|지속',clause)
                     and re.search(r'inactive|dead|oneshot|Result\s*=\s*success',clause,re.I)
                     and re.search(r'비정상|고장|장애.{0,8}(?:존재|지속)|실패.{0,8}(?:멈|상태|채)',clause)):
                 issues.add('diagnostic_oneshot_state_is_not_failure')
+    return sorted(issues)
+
+
+def diagnostic_pipeline_claim_violations(text, facts):
+    """Review-state counts are not proof of current processing congestion."""
+    if not diagnostic_facts_only(facts):return []
+    rows=[f for f in facts if f.get('kind')=='diagnostics' and f.get('target')=='b:management-pipeline']
+    metrics=rows[-1].get('pipeline_metrics',{}) if rows else {}
+    empty=all(type(metrics.get(k)) is int and metrics[k]==0
+              for k in ('pending_reports','running_cases','overdue_cases'))
+    issues=set()
+    for clause in re.split(r'\n|;|(?<=[.!?])\s+',text):
+        if not re.search(r'관제|SOC|파이프라인|대기열|처리|전송|검토',clause,re.I):continue
+        if re.search(r'미확인|여부|가능성|일\s*수|확인.{0,4}(?:필요|되지)|단정.{0,5}(?:않|못)|근거.{0,5}없|아니|아님|아닙',clause):continue
+        if (type(metrics.get('review_required_cases')) is int
+                and re.search(r'(?:오늘|어제|이틀|사흘|\d+\s*일)\s*치',clause)):
+            issues.add('diagnostic_pipeline_period_unverified')
+        if not empty or not re.search(r'병목|정체|과부하|적체|성능\s*저하|처리\s*지연',clause):continue
+        markers=[(m.start(),'past') for m in re.finditer(r'과거|어제|당시|지난',clause)]
+        markers += [(m.start(),'current') for m in re.finditer(r'현재|지금|오늘',clause)]
+        if markers and max(markers)[1]=='past':continue
+        issues.add('diagnostic_pipeline_congestion_unverified')
     return sorted(issues)
 
 
@@ -959,6 +1001,7 @@ def snapshot_health_violations(text, facts):
         and re.fullmatch(r'[abc]:[a-z0-9][a-z0-9_.-]{0,63}',str(f.get('target','')))}
     if not web and not targets:return []
     issues=set(diagnostic_lifecycle_claim_violations(text,facts))
+    issues.update(diagnostic_pipeline_claim_violations(text,facts))
     # Structured incident closure is itself a health claim, even if the prose
     # avoids the word "normal". Sanitized errors plus process attributes alone
     # cannot establish that a failed service incident was benign or remediated.

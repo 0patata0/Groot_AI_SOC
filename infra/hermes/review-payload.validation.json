@@ -661,7 +661,10 @@
     "whole user chat intake/queue/delivery and unseen cases"
   ],
   "git": {
-    "state": "pending_commit_and_push"
+    "source_commit": "7aad521ce566e0292065d468604224f2fec47e3a",
+    "source_remote_main_verified": "7aad521ce566e0292065d468604224f2fec47e3a",
+    "source_verified_at_kst": "2026-11-06T09:55:51.004859+09:00",
+    "publication_receipt": "included in followup documentation commit; final commit recorded in local session"
   },
   "source_version_vs_model_measurement": {
     "current": "1.19.62",

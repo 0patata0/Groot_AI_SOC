@@ -177,7 +177,12 @@
   "new_packages_ports_keys_permissions_models": 0,
   "new_os_install_tested": false,
   "manual_full_rollback_tested": false,
-  "publication": "pending",
+  "publication": {
+    "source_commit": "ba213292a4b21680243a999646951c8f9bc2b988",
+    "remote_main": "ba213292a4b21680243a999646951c8f9bc2b988",
+    "verified_at_kst": "2026-11-06T13:41:16.144813+09:00",
+    "receipt_update": "separate_followup_commit; final receipt HEAD retained in local session record"
+  },
   "cleanup": {
     "server_own_files_removed": 1332,
     "mac_own_files_removed": 44,

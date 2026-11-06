@@ -60,6 +60,8 @@
   "manual_rollback_tested": false,
   "backup": "/var/lib/capstone-controller-busy/20261106-r1",
   "git": {
-    "state": "pending"
+    "at_kst": "2026-11-06T16:43:39.327948+09:00",
+    "head": "14ecd5b2e5e8e6e42a4282eb81638f430e0e2d93",
+    "remote_main": "14ecd5b2e5e8e6e42a4282eb81638f430e0e2d93"
   }
 }

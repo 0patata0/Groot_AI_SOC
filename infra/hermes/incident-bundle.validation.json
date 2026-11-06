@@ -543,8 +543,11 @@
     "production_db_trace_backups_preserved": true
   },
   "git": {
-    "status": "pending",
-    "previous_remote_commit": "e00d2c3793cc9d652d3eff40972e9d34f4231595"
+    "status": "source_pushed_remote_verified",
+    "source_commit": "e2549f921df6c7106d63231f6014ca7be56c3550",
+    "source_remote_main": "e2549f921df6c7106d63231f6014ca7be56c3550",
+    "source_verified_at_kst": "2026-11-06T15:08:46.300987+09:00",
+    "publication_receipt": "included in subsequent documentation commit; final commit id recorded in local session"
   },
   "source_sha256": {
     "infra/hermes/soc_management_run.py": "2509e829b866f66dcb67cb4a2c8490f899a4331bcea5f82f249d1100c90eba34",

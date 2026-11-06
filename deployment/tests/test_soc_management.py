@@ -51,6 +51,23 @@ def module(name, role="a"):
 
 
 class BindingTests(unittest.TestCase):
+    def test_rendered_controller_defers_only_actual_timer_lock_contention(self):
+        m = module('soc_management_controller.py', 'b')
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d); prompt = root / 'prompt'; prompt.write_text('test')
+            owner, contender = m.Store(root), m.Store(root)
+            out, err = io.StringIO(), io.StringIO()
+            with owner.locked(), mock.patch.object(m, 'Store', return_value=contender), \
+                 mock.patch.object(m, 'PROMPT', prompt), \
+                 mock.patch.object(m, 'Broker', return_value=mock.Mock()), \
+                 mock.patch.object(sys, 'argv', ['controller', '--once']), \
+                 mock.patch.object(sys, 'stdout', out), mock.patch.object(sys, 'stderr', err):
+                self.assertEqual(m.main(), 0)
+            self.assertEqual(json.loads(out.getvalue()),
+                             {'status': 'deferred', 'reason': 'controller_already_running'})
+            self.assertEqual(err.getvalue(), '')
+            owner.close()
+
     def test_pending_read_adapter_uses_installed_siem_tunnel_profile(self):
         data=rendered('soc_management_run.py','b').decode()
         tree=ast.parse(data)

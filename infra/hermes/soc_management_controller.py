@@ -59,6 +59,10 @@ class ControllerError(Exception):
     """A deliberately payload-free operational diagnostic."""
 
 
+class ControllerBusy(ControllerError):
+    """Another owner holds the lock; the timer must defer without doing work."""
+
+
 def canonical(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
 
@@ -231,7 +235,7 @@ class Store:
             try:
                 fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
-                raise ControllerError("controller_already_running") from None
+                raise ControllerBusy("controller_already_running") from None
             yield
         finally:
             os.close(fd)
@@ -2047,6 +2051,14 @@ def main():
             raise ControllerError("review_case_required")
         broker = Broker(os.environ.get("RULE_BROKER_TOKEN", ""))
         print(canonical(once(store, broker, base, args.no_deliver)))
+        return 0
+    except ControllerBusy:
+        if not args.once:
+            print(canonical({"status": "failed", "error": "controller_already_running"}), file=sys.stderr)
+            return 1
+        # No broker read, recovery, model call or delivery has occurred. The
+        # existing timer retries after the current owner releases its lock.
+        print(canonical({"status": "deferred", "reason": "controller_already_running"}))
         return 0
     except (ControllerError, OSError, sqlite3.Error, ValueError) as exc:
         code = str(exc) if isinstance(exc, ControllerError) else "controller_runtime_failure"

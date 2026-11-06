@@ -1,0 +1,65 @@
+{
+  "as_of_kst": "2026-11-06T16:43:08.355490+09:00",
+  "status": "deployed_and_timer_overlap_verified",
+  "query_version_unchanged": "1.19.75",
+  "cause": "nonblocking controller lock contention classified as exit 1",
+  "historical_failure_codes": {
+    "controller_already_running": 54
+  },
+  "change": "ControllerBusy is a distinct ControllerError subtype; only --once defers with exit 0",
+  "tests": {
+    "controller_discovery": 439,
+    "controller_passed": 365,
+    "controller_skipped_missing_local_jsonschema": 74,
+    "busy_regressions": 6,
+    "installer": 42,
+    "unique_passed": 413,
+    "server_busy_repeat": 6,
+    "new_os_install": false
+  },
+  "deployment": {
+    "before": "05bd08acc5b741b9ce3458cf24f2f81985e73e24c30d2ddfead61187d12f8d3d",
+    "after": "9d906f6959f62794c11200182aaa4fcd316d0082d44753068318a5ca3b99600e",
+    "bytes": 423109,
+    "changed_functions": [
+      "ControllerBusy",
+      "Store.locked",
+      "main"
+    ],
+    "gate_unchanged": true
+  },
+  "live": {
+    "confirmed_at_epoch": 1793950876.096765,
+    "normal_timer_polls": 3,
+    "deferred_polls": 1,
+    "failure_after_apply": 0,
+    "old_3h_failure_codes": {
+      "controller_already_running": 54
+    },
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "age_seconds": 1.4947113990783691,
+        "connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "age_seconds": 14.494800329208374,
+        "connected": true,
+        "worker_alive": true
+      }
+    },
+    "gate_argument_bytes": 64855,
+    "controller_sha256": "9d906f6959f62794c11200182aaa4fcd316d0082d44753068318a5ca3b99600e",
+    "rollback_timer_stopped": true,
+    "confirmed_rollback_noop": true
+  },
+  "protected_policy_changes": 0,
+  "actual_chat_posts": 0,
+  "attack_tests": 0,
+  "new_packages": 0,
+  "manual_rollback_tested": false,
+  "backup": "/var/lib/capstone-controller-busy/20261106-r1",
+  "git": {
+    "state": "pending"
+  }
+}

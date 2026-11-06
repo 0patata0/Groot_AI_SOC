@@ -4,6 +4,8 @@
 
 **11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다. 재개 후 실제 내부 Mattermost에서 카드1표·양봇 FW답변 각각4표를 확인했습니다. 새 짧은 FW 질문의 게시→최종 답변은 각1회 Hermes12.1초/Ollama14.0초이며 평균 성능 측정은 아닙니다.
 
+반복 `systemd failure` 중 예약 조사 잠금 충돌은 정상 연기로 수정했다. 실제 오류·직접 재조사 실패는 유지한다. [원인·운영 검증](infra/hermes/controller-contention.md). 복합 최종 보고30초는 아직 미달이다.
+
 발표자료는11/5 새 지시에 따라 호스팅 없는 다운로드 PDF 초안20쪽으로 작성했습니다. 발표·논문·메모·검증 원문은 로컬 전용으로 유지하며 저장소에는 포함하지 않습니다. 최종 제출본·독립 평가·전 업무 완료 여부는 [현재 현황](STATUS.md)을 따릅니다.
 
 **복합 사건 조사 현황(11/6):** 관련 읽기 묶음을 두 봇·사건 검증기에 연결했습니다. query1.19.74/common1.5.33·MCP1.3.0/진단1.2.2, 고유1,215검사를 확인했습니다. 첫 실제 조사42.973초/모델2회와 다른IDS166.999초를 기록했고,74에서 내부 웹 로그의 무손실 표시를 추가했으나, 새 IDS68.880초 시험은 최종 판단 검증에 실패했습니다. **정확한 최종 보고30초는 아직 미완료**입니다. SDK2.591초는 조회만의 시간입니다. 추가16개 재생 비교에서도 반복 조회·표현 오류가 남아 후보를 운영에 넣지 않았습니다. [최신 비교](infra/hermes/incident-review-probes.md). [동작·실측·복구·한계](infra/hermes/incident-bundle.md) · [MCP 구성](infra/mcp/incident-evidence.md).

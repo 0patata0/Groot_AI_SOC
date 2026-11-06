@@ -44,3 +44,5 @@ NAT 유지보수 helper와 canonical 로더/unit, fresh prerequisites의 IPv4-on
 root생성 요청별 내부 CAPSTONE_REVIEW_CONTEXT_JSON은 canonical controller와 gate가 함께 처리한다. 사용자설정·공통키·오프라인 반입목록 추가0이다. 실제 새 서버 전체 설치 미시험은 유지한다.
 
 정정 피드백/종결 검사는 기존 source 복사·controller 설치 렌더에 포함된다. 실제 영향 미확인+resolved 거절을 Native/host에서 검사하며 새 패키지·설정·오프라인 반입 항목은 없다.
+
+11/6 [예약 조사 잠금 충돌](../infra/hermes/controller-contention.md)은 기존 canonical controller/source_bundle와 immutable gate 렌더 경로에 반영된다. 실제 Busy만 --once deferred/exit0, 명시적 재조사와 일반 오류는 실패 유지. 설치 렌더42PASS·B controller1파일 증분 확인이며 새 설정/키/포트/오프라인 반입 항목0. 새 OS 전체 설치는 미실행이다.

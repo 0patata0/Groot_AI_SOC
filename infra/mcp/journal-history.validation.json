@@ -211,7 +211,11 @@
     "independent_holdout": false,
     "chat_posted": false,
     "shared_gpu_controlled": false,
-    "improvement_claimed": false
+    "improvement_claimed": false,
+    "selection_provider_calls": 12,
+    "selection_provider_seconds_sum": 68.856255,
+    "tool_result_duration_seconds_sum": 6.442,
+    "tool_duration_includes_pre_dispatch_refusals": true
   },
   "limitations": [
     "A partial history and stale publisher",
@@ -220,8 +224,11 @@
     "no new OS install, attacks, chat posting or long retention test"
   ],
   "publication": {
-    "status": "pending",
-    "baseline": "34e81271966a47b622756ea6273fa536e7cf2a6f"
+    "status": "source_pushed_remote_verified",
+    "source_commit": "3078c8875aea645bd994c30f35f4ffdbb40bc88e",
+    "remote_main_at_source_push": "3078c8875aea645bd994c30f35f4ffdbb40bc88e",
+    "at_kst": "2026-11-06T10:57:16.525444+09:00",
+    "receipt_document_update": "followup commit required"
   },
   "final_live": {
     "a": {

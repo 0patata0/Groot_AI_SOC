@@ -1,0 +1,200 @@
+{
+  "as_of_kst": "2026-11-06T13:39:21.536935+09:00",
+  "query_version": "1.19.72",
+  "common_version": "1.5.32",
+  "diagnostic_mcp_version": "1.2.1",
+  "status": "deployed_confirmed",
+  "goal_30s_final_report_met": false,
+  "stable_semantic_quality_met": false,
+  "changes": [
+    "avoid_negative_adjective_and_predicate_health_false_positive",
+    "check_unqualified_service_normality_claim",
+    "retain_independent_positive_claim_checks"
+  ],
+  "report_policy_changed_from_previous_stable": false,
+  "rejected_report_policy_variant": "1.19.71; new active/recovery guidance restored after failed developer case; one sample does not isolate causal regression",
+  "gate_sha256": "522effbeb4d3038b06c3f90e8a0a57d35b471a782de9c1b30d34bfeee196c67a",
+  "tests": {
+    "unique_pass": 1103,
+    "management": 426,
+    "sdk": 219,
+    "native_plugin": 391,
+    "install": 41,
+    "tables": 19,
+    "output": 7,
+    "base_skips_filled_by_actual_native_suite": 57,
+    "actual_native_suite_pass": 63,
+    "native_overlap": 6,
+    "mac_skips": 73,
+    "not_model_accuracy_or_new_os_install": true
+  },
+  "captured_claim_comparison": {
+    "rows": [
+      {
+        "text": "c:apache 서비스의 실제 데이터 유출 또는 비정상 접근 여부를 확인한다.",
+        "before": [
+          "web_snapshot_is_not_application_health"
+        ],
+        "after": []
+      },
+      {
+        "text": "차단 해제 및 서비스 정상화 확인이나 실제 영향은 미확인입니다.",
+        "before": [],
+        "after": [
+          "web_snapshot_is_not_application_health"
+        ]
+      },
+      {
+        "text": "Apache 백엔드가 정상임을 넘어 침해 영향은 미확인입니다.",
+        "before": [
+          "web_snapshot_is_not_application_health"
+        ],
+        "after": [
+          "web_snapshot_is_not_application_health"
+        ]
+      }
+    ],
+    "report_policy_restored_to_pre_task": true,
+    "not_whole_report_quality_certificate": true
+  },
+  "native_runs": [
+    {
+      "run_id": "240ea8a9db890749f899a7ad3e321aa4",
+      "seconds": 68.44160532951355,
+      "model_rounds": 5,
+      "model_seconds": 51.555162,
+      "tool_attempts": 9,
+      "tool_errors": 0,
+      "query_version": "1.19.70",
+      "writes": 0,
+      "semantic_quality_pass": false,
+      "issues": [
+        "unsupported_service_recovery_claim"
+      ],
+      "chat_posted": false,
+      "development_cases_not_independent_eval": true
+    },
+    {
+      "run_id": "895fb7bef968c0605106842b86cd86c1",
+      "seconds": 53.09095811843872,
+      "model_rounds": 4,
+      "model_seconds": 37.030673,
+      "tool_attempts": 8,
+      "tool_errors": 0,
+      "query_version": "1.19.70",
+      "writes": 0,
+      "semantic_quality_pass": false,
+      "issues": [
+        "historical_ids_mislabelled_as_post_incident_detection"
+      ],
+      "chat_posted": false,
+      "development_cases_not_independent_eval": true
+    },
+    {
+      "run_id": "f4cafcb019d2fc2fcd5d156f96ee10fa",
+      "seconds": 128.99431133270264,
+      "model_rounds": 7,
+      "model_seconds": 111.44209,
+      "tool_attempts": 13,
+      "tool_errors": 0,
+      "query_version": "1.19.71",
+      "writes": 0,
+      "semantic_quality_pass": false,
+      "issues": [
+        "unrelated_target_expansion",
+        "repeat_completed_historical_query",
+        "unsupported_recovery_and_normality",
+        "incomplete_basis_sentence",
+        "repeat_followup_plan"
+      ],
+      "chat_posted": false,
+      "development_cases_not_independent_eval": true
+    }
+  ],
+  "model_only_probes": [
+    {
+      "variant": "binding-scope",
+      "seconds": 28.75943261804059,
+      "input_bytes": 88896,
+      "valid": true,
+      "selected_calls": 1,
+      "more_evidence": false,
+      "fixture_sha256": "802c30c47519ef13833e4c045c2036356355613713513cfd963ecf36fc6465ca",
+      "request_sha256": "932e070cbde8769fd8b1f6edd9d77b10cb10408bd16c8a6a3b43e5ef88b3f863",
+      "operationally_adopted": false,
+      "not_e2e_latency": true
+    },
+    {
+      "variant": "baseline-scope",
+      "seconds": 30.529736645054072,
+      "input_bytes": 86078,
+      "valid": true,
+      "selected_calls": 0,
+      "more_evidence": false,
+      "claim_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "fixture_sha256": "4c897a3653e576bd5dca9c364e7399f32b2d6c62df6e092d75ba3a6030cb8abf",
+      "request_sha256": "8984d29d72096fb6a47d2670280b7eeeaaac92cc6d3372a3e50fa1aa1508e787",
+      "operationally_adopted": false,
+      "not_e2e_latency": true
+    },
+    {
+      "variant": "deferred-scope",
+      "seconds": 21.822936075972393,
+      "input_bytes": 62614,
+      "valid": true,
+      "selected_calls": 0,
+      "more_evidence": true,
+      "fixture_sha256": "8c2a6b6efd18badfe7443d9667536233eb6dc0be4717dd345268cddecbb29519",
+      "request_sha256": "01dc3b3350a32a0df5f70470f021b255f23cec8b5c5f81b9648622faceb559c3",
+      "operationally_adopted": false,
+      "not_e2e_latency": true
+    }
+  ],
+  "live_read_collections": [
+    {
+      "mcp_reads": 10,
+      "seconds": 4.570261,
+      "errors": 0,
+      "model_calls": 0
+    },
+    {
+      "mcp_reads": 10,
+      "seconds": 4.4003267989028245,
+      "errors": 0,
+      "model_calls": 0
+    }
+  ],
+  "final_72_full_model_chat_benchmark": "not_run; previous 70/71 measurements are separate",
+  "rollback_paths": [
+    "/var/lib/capstone-health-claims/20261106-r1/deployment",
+    "/var/lib/capstone-health-claims/20261106-r2/deployment",
+    "/var/lib/capstone-health-claims/20261106-r3/deployment"
+  ],
+  "writes_during_tests": 0,
+  "attack_load_pcap_tests": 0,
+  "new_packages_ports_keys_permissions_models": 0,
+  "new_os_install_tested": false,
+  "manual_full_rollback_tested": false,
+  "publication": "pending",
+  "cleanup": {
+    "server_own_files_removed": 1332,
+    "mac_own_files_removed": 44,
+    "mac_own_bytes_removed": 14032368,
+    "absence_verified": true,
+    "backups_databases_traces_logs_preserved": true
+  },
+  "deployment": {
+    "files_verified": 10,
+    "protected_unchanged": 7,
+    "gate_sha256": "522effbeb4d3038b06c3f90e8a0a57d35b471a782de9c1b30d34bfeee196c67a",
+    "controller_sha256": "4d70f8a66ebb1a0bbc1376e9cbfcf0dc21a9daa0c53dd76d8bb383c2cc2700de",
+    "gate_matches_reference": true,
+    "gate_argument_bytes": 65155,
+    "services_active": 4,
+    "manual_rollback_tested": false,
+    "both_chat_websocket_workers_healthy": true,
+    "confirmed_recovery_noop": true
+  }
+}

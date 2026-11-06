@@ -1,6 +1,6 @@
 # SOC 운영 절차
 
-11/6 현행 [조회 원장·보고 보완](../infra/hermes/read-ledger.md): query1.19.69/common1.5.32/MCP1.2.1은 기존 deploy.sh source 복사/gate 렌더 경로를 사용한다. 설치41 포함 고유1098검사·B10파일/보호7SHA 확인. 새 패키지·포트·권한·사용자 설정0, 새OS 전체 설치/정확한30초 최종 보고는 미완료다. 아래 버전별 기록은 당시 검증 범위다.
+11/6 현행 [보고 부정 표현·정상 단정 검사](../infra/hermes/health-claim-check.md): query1.19.72/common1.5.32/MCP1.2.1. 기존 deploy.sh source 복사·gate 렌더와 버전/SHA 결속을 사용하며 새 패키지·권한·포트·키·모델 변경0. 설치41 포함 고유1103검사·B10파일/보호7SHA 확인. 새 OS 전체 설치와 정확한30초 최종 보고는 미완료다. 아래 버전별 기록은 당시 검증 범위다.
 
 11/6 [과거 서비스 오류 조회](../infra/mcp/journal-history.md): 단일 deploy.sh의 진단 소스 묶음에 diagnostic_history.py를 추가하고 초기24시간 분할 수집을 연결했다. 기존 timer/reader/MCP·Python 표준 SQLite 사용, 새 패키지·포트·키·권한0. A/B/C 증분 운영과 고유123검사·실제 SDK11호출 확인, A 일부 구간 공백·최종30초·새OS 전체설치 미완료는 구분한다.
 

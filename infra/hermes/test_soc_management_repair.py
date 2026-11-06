@@ -243,6 +243,65 @@ class ClosureConsistency(unittest.TestCase):
             self.assertEqual(m.closure_uncertainty_violations(body+'\nMANAGEMENT_STATUS: '+status),[])
 
 class SnapshotHealth(unittest.TestCase):
+    def test_negative_adjectives_are_not_affirmative_health_claims(self):
+        facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
+        for text in ('c:apache 서비스의 실제 데이터 유출 또는 비정상 접근 여부를 확인한다.',
+                     'DVWA 비정상 요청 여부는 미확인입니다.',
+                     '백엔드에 비정상 접근이 있었는지 조사해야 합니다.',
+                     '앱의 불건강 상태 가능성을 추가 조사한다.'):
+            with self.subTest(text=text):
+                self.assertEqual(m.web_evidence_violations(text,facts),[])
+
+    def test_explicit_negative_predicates_are_not_health_assertions(self):
+        facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
+        for text in ('DVWA는 정상이 아닙니다.', '서비스 상태는 정상은 아님.',
+                     '백엔드는 정상적이지 않습니다.', '앱은 건강하지 않습니다.'):
+            with self.subTest(text=text):
+                # This check does not certify the abnormality claim either.
+                self.assertEqual(m.web_evidence_violations(text,facts),[])
+
+    def test_independent_positive_claim_still_requires_application_evidence(self):
+        facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
+        for text in ('DVWA 비정상 요청을 차단했으므로 백엔드는 정상입니다.',
+                     '앱이 불건강하지 않으므로 현재 서비스는 정상입니다.',
+                     'Apache 백엔드가 정상임을 넘어 침해 영향은 미확인입니다.',
+                     '백엔드는 정상적이지 않습니다. 현재 서비스는 정상입니다.'):
+            with self.subTest(text=text):
+                self.assertIn('web_snapshot_is_not_application_health',m.web_evidence_violations(text,facts))
+
+    def test_completed_report_does_not_retry_for_abnormal_access_inquiry(self):
+        from unittest.mock import Mock
+        facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
+        text=('침해 영향은 미확인입니다.\n'
+              'c:apache 서비스의 실제 데이터 유출 또는 비정상 접근 여부를 확인한다.\n'
+              'MANAGEMENT_STATUS: needs_review')
+        original=Mock(return_value='native_final');append=Mock();reanchor=Mock(return_value=0)
+        wrapped=m.grounding_wrapper(original,types.SimpleNamespace(),append,reanchor,
+                                    ['search_web_access'],facts=facts)
+        agent=Agent();agent.tools=[];agent.max_iterations=8
+        kw={'assistant_message':types.SimpleNamespace(content=text,tool_calls=None),
+            'messages':[{'role':'user','content':'사건을 조사해줘'}],
+            'user_message':'사건을 조사해줘','api_call_count':3,
+            'codex_ack_continuations':0,'finish_reason':'stop'}
+        with patch.dict(os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'},clear=True):
+            self.assertEqual(wrapped(agent,**kw),'native_final')
+        original.assert_called_once_with(agent,**kw)
+        append.assert_not_called();reanchor.assert_not_called()
+        self.assertFalse(hasattr(agent,'_capstone_review_feedback'))
+
+    def test_unqualified_service_health_claim_is_not_supported_by_snapshot(self):
+        facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
+        for text in ('차단 해제 및 서비스 정상화 확인이나 실제 영향은 미확인입니다.',
+                     '서비스는 정상입니다.', '서비스가 정상으로 복구되었습니다.'):
+            with self.subTest(text=text):
+                self.assertEqual(m.web_evidence_violations(text,facts),
+                                 ['web_snapshot_is_not_application_health'])
+        for text in ('서비스 정상화 여부는 미확인입니다.',
+                     '서비스가 정상이라고 단정할 수 없습니다.',
+                     '서비스는 정상이 아닙니다.', '서비스의 비정상 접근을 조사한다.'):
+            with self.subTest(text=text):
+                self.assertEqual(m.web_evidence_violations(text,facts),[])
+
     def test_actual_backend_health_claim_requires_application_evidence(self):
         facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
         claim='사건 이후 10시간 이상 지난 시점에도 ModSecurity 및 Suricata에서 추가적인 공격 탐지가 관찰되지 않고 백엔드 서비스도 정상 동작 중입니다.'

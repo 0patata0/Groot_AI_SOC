@@ -1,6 +1,6 @@
 # 복합 사건 조회 원장과 정확한 상태 ID
 
-2026-11-06 KST. query1.19.69/common1.5.32·진단 MCP1.2.1. [현재 현황](../../STATUS.md) · [검증 원장](read-ledger.validation.json) · [직전 측정](request-scope.md).
+2026-11-06 KST 당시 query1.19.69/common1.5.32·진단 MCP1.2.1의 구현·측정 기록이다. 현행 후속 수정은 [부정 표현·정상 단정 검사](health-claim-check.md)를 따른다. [현재 현황](../../STATUS.md) · [검증 원장](read-ledger.validation.json) · [직전 측정](request-scope.md).
 
 ## 동작과 경계
 

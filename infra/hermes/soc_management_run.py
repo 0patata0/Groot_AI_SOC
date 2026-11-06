@@ -915,11 +915,14 @@ def web_evidence_violations(text, facts):
                     issues.add('web_continuity_unverified_is_not_outage')
     # An Apache process/configuration and access rows are not an application
     # health check. Inspect the claim itself, not an unrelated disclaimer.
-    for match in re.finditer(r'(?:Apache|아파치|DVWA|웹\s*서비스|현재\s*서비스|서비스\s*상태|백엔드|애플리케이션|앱)[^\n.!?;|]{0,40}?(?:정상|건강)',text,re.I):
+    # Negative adjectives (비정상/불건강) are not affirmative health claims.
+    # Keep scanning the clause: a later independent "정상" can still be false.
+    for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
         before=re.split(r'[.!?;|\n]',text[max(0,match.start()-30):match.start()])[-1]
         after=text[match.end():match.end()+20]
+        if re.match(r'\s*(?:(?:이|은|는)?\s*아(?:니|님|닙)|(?:적)?이지\s*않|하지\s*않)',after):continue
         if re.search(r'미확인|확인\s*불가|단정.{0,5}않',before):continue
-        if re.match(r'(?:\s|[/*`])*(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
+        if re.match(r'(?:\s|[/*`])*(?:화\s*)?(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
         if re.match(r'\s*(?:을|를|이라고)?\s*(?:단정|보장|증명|판단).{0,8}(?:않|없|못)',after):continue
         if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)(?:\s*중)?\s*(?:여부|인지|(?:은|는)?\s*미확인)',after):continue
         issues.add('web_snapshot_is_not_application_health')

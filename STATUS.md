@@ -11,7 +11,7 @@
 | 교차검토 | 직전/후속 Ollama worker73.546/72.623초·모두partial | 해당 사례의 근거 대조 미완료, 합의·원인 해결로 세지 않음 |
 | 반영 | common1.5.39·진단1.2.3: 현재/과거 설명과 실제25서비스 target 안내 정정 | 도구 실행/권한/검증/결과 불변. 안내 정정이며 속도 향상 입증 아님 |
 | 검증·운영 | 관련716PASS·skip0, B17파일SHA/보호8·양봇WS/worker·3서비스active·Bfailed0 | 4파일 변경·SDK20sourceSHA·독립15분원복확정. 기존단일deploy.sh 연결, 새OS 전체 설치 미실행 |
-| 정리·Git | 서버 자체시험456파일7,026,948B 제거·부재확인 | DB/원문/trace/채팅/복구 보존. Mac 자체 임시16파일 4,107,310B 제거/부재확인. 이번 공개13파일 게시 마감 중 |
+| 정리·Git | 서버 자체시험456파일7,026,948B 제거·부재확인 | DB/원문/trace/채팅/복구 보존. Mac 자체 임시16파일 4,107,310B 제거/부재확인. 공개13파일 `776a475` 커밋·푸시/실원격main 일치. 게시 영수증은 후속 커밋으로 관리 |
 
 [안내 정정·실측·복구](infra/hermes/diagnostic-navigation.md) · [수치 원장](infra/hermes/diagnostic-navigation.validation.json) · [직전 비교](infra/hermes/systemd-comparison.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). query82·security-events1.3.2·게이트65,345B·모델/학습/FW/TTL/권한/승인정책은 유지한다. 실제 응답 지연은 게시 시각→최종 게시 수정 시각이며, 뒤따른 교차검토 시간은 별도다.
 

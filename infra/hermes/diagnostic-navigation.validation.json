@@ -88,6 +88,12 @@
     }
   },
   "git": {
-    "status": "pending"
+    "source_commit": "776a4750c8a7bb5efc723f7e61c3eed6b261676e",
+    "source_remote_main": "776a4750c8a7bb5efc723f7e61c3eed6b261676e",
+    "source_pushed_at_kst": "2026-11-06T23:04:48.995207+09:00",
+    "public_paths": 13,
+    "receipt": "followup_commit",
+    "related_worktree_at_source_push": "clean",
+    "unrelated_staged_and_worktree_changes": "preserved"
   }
 }

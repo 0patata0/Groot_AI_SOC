@@ -106,5 +106,20 @@
     "bytes": 1215114,
     "directory_removed": "/private/tmp/capstone-startup-profile-20261106-vb5hhxf6",
     "removed": true
+  },
+  "followup_27_minutes": {
+    "as_of_kst": "2026-11-06T17:07:35+09:00",
+    "since_apply_seconds": 1629,
+    "normal_timer_polls": 82,
+    "deferred_polls": 21,
+    "new_failure_count": 0,
+    "current_failed_units": {
+      "A": 0,
+      "B": 0,
+      "C": 0
+    },
+    "controller_sha256": "9d906f6959f62794c11200182aaa4fcd316d0082d44753068318a5ca3b99600e",
+    "last_service_result": "Result=success\nExecMainStatus=0\nActiveState=inactive\nSubState=dead\n",
+    "journal_records": 412
   }
 }

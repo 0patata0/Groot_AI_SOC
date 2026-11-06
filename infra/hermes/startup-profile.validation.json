@@ -286,5 +286,128 @@
     "at_kst": "2026-11-06T16:52:49.980338+09:00",
     "head": "8fcbf37b9a9ada6c71fe0f17c5e6213c67ded94c",
     "remote_main": "8fcbf37b9a9ada6c71fe0f17c5e6213c67ded94c"
+  },
+  "followup_as_of_kst": "2026-11-06T17:10:12.239421+09:00",
+  "containment_scope_followup": {
+    "variant": "containment-live-scope-policy-only",
+    "run_id": "43de673ec2d44e606ed4367e36697ccf",
+    "elapsed_seconds": 214.51746153831482,
+    "state": "outcome_unknown",
+    "detail": "model_subprocess_timeout_requires_review",
+    "completed_model_calls": 8,
+    "completed_model_seconds": 170.129832,
+    "actual_mcp_calls": 10,
+    "mcp_error_results": 4,
+    "candidate_gate_sha256": "8e220b3a57d0025ded53b9e3a9536aea12ca83dcaa99f13a213b016be61e1772",
+    "candidate_inline_bytes": 65025,
+    "production_unchanged": true,
+    "adopted": false,
+    "full_report_quality_pass": false,
+    "independent_holdout": false,
+    "chat_posts": 0,
+    "attack_tests": 0,
+    "first_report_guard": "web_snapshot_is_not_application_health",
+    "first_report_requested_closure": true,
+    "repeated_identical_missing_fw_snapshot_calls": 3,
+    "native_verify_stop_nudge_observed": false,
+    "input_tokens": [
+      782,
+      23861,
+      24101,
+      24433,
+      27207,
+      27403,
+      27638,
+      27940
+    ],
+    "cached_tokens": [
+      0,
+      0,
+      0,
+      22053,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "followup_live_health": [
+    {
+      "final_health": {
+        "confirmed_at_epoch": 1793952508,
+        "files_verified": 9,
+        "protected_unchanged": 7,
+        "gate_sha256": "9dfeb3b9f24e35430f29ba3c3f814f7fee6a663e401ea95a5fde2572146df8a4",
+        "controller_sha256": "9d906f6959f62794c11200182aaa4fcd316d0082d44753068318a5ca3b99600e",
+        "gate_matches_reference": true,
+        "ids_path_impact_enabled": true,
+        "gate_argument_bytes": 64855,
+        "health": {
+          "/opt/hermes-data/health/chat.json": {
+            "age_seconds": 14.246495485305786,
+            "connected": true,
+            "worker_alive": true
+          },
+          "/var/lib/capstone-ollama-trial/chat/health.json": {
+            "age_seconds": 6.246557712554932,
+            "connected": true,
+            "worker_alive": true
+          }
+        },
+        "services_active": 4,
+        "manual_rollback_tested": false,
+        "automatic_shared_status_required": 1,
+        "sensor_reads_required": 3
+      },
+      "queues_idle": 3,
+      "registered_reads": [
+        "collect_incident_evidence",
+        "get_wazuh_sca_checks",
+        "get_web_service_target",
+        "search_modsecurity_alerts",
+        "search_suricata_alerts",
+        "search_wazuh_alerts",
+        "search_web_access"
+      ]
+    },
+    {
+      "container_test_directories_remaining": [],
+      "backup_retained": "/var/lib/capstone-observation-scope/20261106-r1/deployment"
+    },
+    {
+      "management_config_unchanged": true
+    },
+    {
+      "worker_removed": "/var/lib/capstone-containment-read/20261106-r1/measure-read.py",
+      "bytes": 68272,
+      "sha256": "f1932f37e3e1263aa36cea0d4530a8e74a41165190d0bb8803b86d6163202766",
+      "unit": "Result=success\nExecMainStatus=0\nActiveState=inactive\nSubState=dead\n",
+      "retained": [
+        "/var/lib/capstone-containment-read/20261106-r1/measurement-complex/state.sqlite3",
+        "/var/lib/capstone-containment-read/20261106-r1/measurement-complex-result.json",
+        "/var/lib/capstone-containment-read/20261106-r1/measurement-complex/43de673ec2d44e606ed4367e36697ccf.jsonl"
+      ]
+    }
+  ],
+  "followup_systemd": {
+    "as_of_kst": "2026-11-06T17:07:35+09:00",
+    "since_apply_seconds": 1629,
+    "normal_timer_polls": 82,
+    "deferred_polls": 21,
+    "new_failure_count": 0,
+    "current_failed_units": {
+      "A": 0,
+      "B": 0,
+      "C": 0
+    },
+    "controller_sha256": "9d906f6959f62794c11200182aaa4fcd316d0082d44753068318a5ca3b99600e",
+    "last_service_result": "Result=success\nExecMainStatus=0\nActiveState=inactive\nSubState=dead\n",
+    "journal_records": 412
+  },
+  "followup_cleanup": {
+    "directory": "/private/tmp/capstone-containment-read-20261106-wk2oqz6x",
+    "file_count": 15,
+    "bytes": 387710,
+    "removed": true
   }
 }

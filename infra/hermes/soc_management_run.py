@@ -2027,6 +2027,21 @@ def read_ledger_view(rows):
         'rows':copy.deepcopy(rows),'count':len(rows)}
 
 
+def review_execution_view(agent, rows):
+    """Keep native wrap-up and dispatch failures when compacting API history.
+
+    No log/prose can activate these controls. This is navigation, not evidence
+    completeness, a disposition, a retry prohibition or a new time limit.
+    """
+    ledger=read_ledger_view(rows);failures={}
+    for i,row in enumerate(ledger['rows'] if ledger else []):
+        key=(row['tool'],json.dumps(row['arguments'],sort_keys=True))
+        if row['result_state']=='error':failures.setdefault(key,[]).append(i)
+        else:failures.pop(key,None)
+    return {'native_wrapup_requested':getattr(agent,'_run_budget_wrapup_injected',False) is True,
+        'repeated_error_ledger_indexes':[v for v in failures.values() if len(v)>1]}
+
+
 def operator_diagnostic_options(request, receipts=()):
     """Bind unambiguous literal user targets to existing catalog reads, not risk.
 
@@ -2996,6 +3011,10 @@ def management_report_request(request, agent, snapshot):
                 'known_status_references':[status_read_request(r) for r in status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON'))],
                 'reference_bound_status_reads':{n:ids for n in catalog if (ids:=review_status_ids(n)) is not None},
                 'completed_read_ledger':read_ledger_view(snapshot.get('read_ledger')),
+                'execution_control':review_execution_view(agent,snapshot.get('read_ledger')),
+                'execution_control_policy':'native_wrapup_requested=true는 실행기의 종료 안내다. 새 탐색을 늘리지 말고 현재 근거·미확인·다음 조치를 보고한다. '
+                    'repeated_error_ledger_indexes는 같은 도구/인자의 실패 행 번호다. 오류를 검토하고 인자나 접근을 바꾸며 같은 실패를 반복하지 않는다. '
+                    '이 안내는 조회 성공·필수 근거 충족·위험 해소·승인이 아니다.',
                 **({'controller_report_feedback':feedback} if feedback else {}),
                 **({'current_review_task':{k:context[k] for k in ('case_id','mode','operator_reason','purpose')}}
                     if context is not None else {}),

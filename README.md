@@ -1,6 +1,6 @@
 # Groot_AI_SOC
 
-현재 query1.19.75는 [관측 범위 검사](infra/hermes/observation-scope.md)를 두 봇과 관리 게이트에 동기화했다. 프로세스 상태와 서비스 기능 정상, 로그 연속성 미검증과 실패를 구분한다. 고유1,112검사·B9파일/보호7SHA 확인. 기존 소스 복사·내장 게이트 경로를 사용하며 추가 패키지/포트/키는 없다. 최종30초·새 OS 전체 설치는 미완료다. 아래74 기록은 당시 범위다.
+현재 query1.19.76은 [실행 안내 보존](infra/hermes/review-execution-control.md)을 반영했다. Native compact 사건 재검토의 마무리 안내·반복 실패 기록을 유지하며 기존 근거/승인/종결검사는 그대로다. 고유1,122검사·B9파일/보호7SHA·양봇 정상 확인. 기존 source_bundle/내장 게이트 경로를 사용하고 추가 패키지·포트·키는 없다. 최종30초·새 OS 전체 설치는 미완료다. 아래75/74 기록은 당시 범위다.
 
 **11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다. 재개 후 실제 내부 Mattermost에서 카드1표·양봇 FW답변 각각4표를 확인했습니다. 새 짧은 FW 질문의 게시→최종 답변은 각1회 Hermes12.1초/Ollama14.0초이며 평균 성능 측정은 아닙니다.
 

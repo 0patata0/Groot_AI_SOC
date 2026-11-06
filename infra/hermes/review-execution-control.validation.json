@@ -1,0 +1,185 @@
+{
+  "as_of_kst": "2026-11-06T17:29:18.627856+09:00",
+  "version": "1.19.76",
+  "status": "deployed_and_runtime_projection_verified_full_model_report_failed",
+  "scope": "Native compact read-only incident review; shared canonical source pinned in SDK too",
+  "change": {
+    "native_control": "_run_budget_wrapup_injected is True",
+    "failure_navigation": "same tool and exact arguments; error indexes since last successful return",
+    "instructions_from_tool_text": false,
+    "new_time_limit": false,
+    "read_catalog_unchanged": true,
+    "approval_and_closure_guards_unchanged": true,
+    "controller_change": "embedded gate only; ControllerBusy preserved"
+  },
+  "tests": {
+    "native_management": 458,
+    "sdk": 231,
+    "query": 391,
+    "installer": 42,
+    "unique_passed": 1122,
+    "skipped": 0,
+    "new_execution_controls": 9,
+    "native_notice_latch_integration": true,
+    "new_os_install": false
+  },
+  "production_health": [
+    {
+      "final_health": {
+        "confirmed_at_epoch": 1793953390,
+        "files_verified": 9,
+        "protected_unchanged": 7,
+        "gate_sha256": "3fbabb5c48715a02095668f322ac63f1af1a341e1547eb46ee4ea13af1e0469a",
+        "controller_sha256": "8f069ec789877fc8f35b810283d1d97bd710a8473c6e00faedcc383cad1d18a5",
+        "gate_matches_reference": true,
+        "ids_path_impact_enabled": true,
+        "gate_argument_bytes": 65315,
+        "health": {
+          "/opt/hermes-data/health/chat.json": {
+            "age_seconds": 2.172546148300171,
+            "connected": true,
+            "worker_alive": true
+          },
+          "/var/lib/capstone-ollama-trial/chat/health.json": {
+            "age_seconds": 15.172608613967896,
+            "connected": true,
+            "worker_alive": true
+          }
+        },
+        "services_active": 4,
+        "manual_rollback_tested": false,
+        "automatic_shared_status_required": 1,
+        "sensor_reads_required": 3
+      },
+      "queues_idle": 3,
+      "registered_reads": [
+        "collect_incident_evidence",
+        "get_wazuh_sca_checks",
+        "get_web_service_target",
+        "search_modsecurity_alerts",
+        "search_suricata_alerts",
+        "search_wazuh_alerts",
+        "search_web_access"
+      ]
+    },
+    {
+      "confirmed": true,
+      "recovery_timer_stopped": true,
+      "confirmed_rollback_noop": true
+    },
+    {
+      "management_config_unchanged": true,
+      "systemd_failed": ""
+    }
+  ],
+  "gate_argument_bytes": 65315,
+  "gate_sha256": "3fbabb5c48715a02095668f322ac63f1af1a341e1547eb46ee4ea13af1e0469a",
+  "backup": "/var/lib/capstone-review-budget/20261106-r1/deployment",
+  "manual_rollback_tested": false,
+  "actual_chat_posts": 0,
+  "attack_tests": 0,
+  "new_packages": 0,
+  "latency_30_seconds_achieved": false,
+  "git": "pending",
+  "live_trial": {
+    "run_id": "86465afff2c32764aa3d54d68ed50472",
+    "elapsed_seconds": 87.72678589820862,
+    "process_state": "completed",
+    "detail": "model_needs_review",
+    "reported_management_state": "needs_review",
+    "full_report_quality_pass": false,
+    "model_calls": 4,
+    "model_seconds": 72.13716000000001,
+    "actual_mcp_calls": 4,
+    "mcp_error_results": 0,
+    "new_mcp_writes": 0,
+    "chat_posts": 0,
+    "independent_holdout": false,
+    "model_input_tokens": [
+      784,
+      23863,
+      24849,
+      16565
+    ],
+    "cached_tokens": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "native_run_budget_seconds": 180,
+    "subprocess_timeout_seconds": 210,
+    "controller_timeout_seconds": 240,
+    "near_budget_threshold_seconds": 144,
+    "near_budget_notice_exercised_by_this_run": false,
+    "repeated_failure_guidance_exercised_by_this_run": false,
+    "guard_issues": [
+      "sample_zero_presented_as_absence",
+      "web_snapshot_is_not_application_health"
+    ],
+    "notes": "Actual read-only development case; two drafts rejected, evidence-only fallback. No speed/quality uplift proved."
+  },
+  "final_health": [
+    {
+      "final_health": {
+        "confirmed_at_epoch": 1793953598,
+        "files_verified": 9,
+        "protected_unchanged": 7,
+        "gate_sha256": "3fbabb5c48715a02095668f322ac63f1af1a341e1547eb46ee4ea13af1e0469a",
+        "controller_sha256": "8f069ec789877fc8f35b810283d1d97bd710a8473c6e00faedcc383cad1d18a5",
+        "gate_matches_reference": true,
+        "ids_path_impact_enabled": true,
+        "gate_argument_bytes": 65315,
+        "health": {
+          "/opt/hermes-data/health/chat.json": {
+            "age_seconds": 10.333927631378174,
+            "connected": true,
+            "worker_alive": true
+          },
+          "/var/lib/capstone-ollama-trial/chat/health.json": {
+            "age_seconds": 2.333989143371582,
+            "connected": true,
+            "worker_alive": true
+          }
+        },
+        "services_active": 4,
+        "manual_rollback_tested": false,
+        "automatic_shared_status_required": 1,
+        "sensor_reads_required": 3
+      },
+      "queues_idle": 3,
+      "registered_reads": [
+        "collect_incident_evidence",
+        "get_wazuh_sca_checks",
+        "get_web_service_target",
+        "search_modsecurity_alerts",
+        "search_suricata_alerts",
+        "search_wazuh_alerts",
+        "search_web_access"
+      ]
+    },
+    {
+      "cleanup": {
+        "worker_removed": "/var/lib/capstone-review-budget/20261106-r1/measure.py",
+        "bytes": 2847,
+        "sha256": "c7752ae03d800c7ac6c74b51a33669676dc2a3673ea789b4d9ecc49d102f2cf1",
+        "retained": "private DB/trace/result and rollback"
+      },
+      "checked_epoch": 1793953598,
+      "management_config_unchanged": true,
+      "systemd_failed": "",
+      "normal_polls": 11,
+      "deferred_polls": 5,
+      "new_failures": 0
+    },
+    {
+      "test_temp_remaining": []
+    }
+  ],
+  "local_cleanup": {
+    "directory": "/private/tmp/capstone-review-budget-20261106-x506_vi6",
+    "files": 15,
+    "bytes": 14488740,
+    "removed": true
+  }
+}

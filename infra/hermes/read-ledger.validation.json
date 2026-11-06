@@ -143,8 +143,11 @@
     "/var/lib/capstone-read-ledger/20261106-r5/deployment"
   ],
   "git": {
-    "state": "local documentation/source pending commit and push",
-    "base_head": "3f6e3246534a9df54a1cf0d82e145d2a5de7528b"
+    "state": "source_committed_pushed_remote_matched",
+    "source_commit": "e832f29c2fcdd7deca78411fe33205984896ba21",
+    "remote_main_at_source_publication": "e832f29c2fcdd7deca78411fe33205984896ba21",
+    "source_publication_at_kst": "2026-11-06T12:28:55.207716+09:00",
+    "receipt_documentation": "source publication receipt tracked separately from source commit; final HEAD/remote agreement kept in local session record"
   },
   "cleanup": {
     "server_source_files": 1772,

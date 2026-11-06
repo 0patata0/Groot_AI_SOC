@@ -204,7 +204,10 @@
     "operational_databases_and_traces_retained": true
   },
   "git": {
-    "status": "pending"
+    "status": "source_and_docs_pushed_receipt_followup_pending",
+    "source_commit": "32b940d404b604b0bbd51bf7b65898e2dbba237b",
+    "remote_main_verified": "32b940d404b604b0bbd51bf7b65898e2dbba237b",
+    "verified_at_kst": "2026-11-06T16:17:50.145731+09:00"
   },
   "final_live_verification": {
     "at_kst": "2026-11-06T16:16:24.902924+09:00",

@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-06",
+  "version": {
+    "query": "1.19.77",
+    "common": "1.5.34"
+  },
+  "goal": "actual Mattermost question to accurate final answer around 30 seconds",
+  "tests": {
+    "native": 473,
+    "sdk": 232,
+    "query": 391,
+    "installer": 42,
+    "review": 60,
+    "unique_total": 1198,
+    "skipped_in_server_environment": 0,
+    "new_methods": 16
+  },
+  "deployment": {
+    "route": "Mac -> administrator -> A -> B",
+    "protected_sha_count": 7,
+    "model_config_unchanged": true,
+    "new_packages_ports_keys_permissions": 0,
+    "firewall_ttl_approval_changes": 0,
+    "gate_argument_bytes": 63032,
+    "argument_limit_bytes": 65536,
+    "codec": "stdlib bz2 with exact source SHA256",
+    "recovery_minutes": 15,
+    "confirmed_noop": true,
+    "manual_restore_tested": false,
+    "fresh_os_install_tested": false,
+    "unique_files_verified": 13,
+    "final_checked_at_kst": "2026-11-06T18:48:55+09:00",
+    "services_active": 4,
+    "queues_idle": 3,
+    "both_chat_workers_connected": true,
+    "automatic_incident_required_reads_preserved": true
+  },
+  "measurements": [
+    {
+      "case": "baseline_ollama_plain_fw",
+      "chat_seconds": 15.525,
+      "answer_validated": true
+    },
+    {
+      "case": "baseline_hermes_mixed_systemd",
+      "chat_seconds": 46.181,
+      "answer_validated": false,
+      "native_seconds": 45.05866551399231,
+      "model_calls": 2,
+      "input_tokens": 13714,
+      "output_tokens": 990,
+      "cache_read_tokens": 13051,
+      "mcp_attempts": 0,
+      "tool_errors": 0
+    },
+    {
+      "case": "r1_hermes_mixed_systemd",
+      "chat_seconds": null,
+      "answer_validated": false,
+      "native_seconds": 42.378668546676636,
+      "model_calls": 3,
+      "input_tokens": 24754,
+      "output_tokens": 366,
+      "cache_read_tokens": 17850,
+      "mcp_attempts": 1,
+      "tool_errors": 1
+    },
+    {
+      "case": "r2_hermes_current_systemd",
+      "chat_seconds": 49.923,
+      "answer_validated": true,
+      "native_seconds": 47.657079458236694,
+      "model_calls": 3,
+      "input_tokens": 17434,
+      "output_tokens": 932,
+      "cache_read_tokens": 14274,
+      "mcp_attempts": 3,
+      "tool_errors": 0,
+      "note": "Native final judgment rejected; host reused verified diagnostic receipts to show correct current table."
+    },
+    {
+      "case": "r2_hermes_mixed_systemd",
+      "chat_seconds": 77.417,
+      "answer_validated": false,
+      "native_seconds": 75.53616762161255,
+      "model_calls": 3,
+      "input_tokens": 37006,
+      "output_tokens": 1311,
+      "cache_read_tokens": 24249,
+      "mcp_attempts": 3,
+      "tool_errors": 0
+    },
+    {
+      "case": "r3_hermes_current_systemd",
+      "chat_seconds": 20.877,
+      "answer_validated": true,
+      "native_seconds": 18.897446393966675,
+      "model_calls": 1,
+      "input_tokens": 2188,
+      "output_tokens": 182,
+      "cache_read_tokens": 0,
+      "mcp_attempts": 3,
+      "tool_errors": 0
+    },
+    {
+      "case": "before_short_phrase_fix",
+      "chat_seconds": 140.738,
+      "answer_validated": false,
+      "native_seconds": 139.1641809940338,
+      "model_calls": 3,
+      "input_tokens": 86702,
+      "output_tokens": 2198,
+      "cache_read_tokens": 0,
+      "mcp_attempts": 1,
+      "tool_errors": 0
+    },
+    {
+      "case": "after_short_phrase_fix",
+      "chat_seconds": 17.139,
+      "answer_validated": true,
+      "native_seconds": 14.968783140182495,
+      "model_calls": 1,
+      "input_tokens": 2198,
+      "output_tokens": 55,
+      "cache_read_tokens": 0,
+      "mcp_attempts": 1,
+      "tool_errors": 0
+    },
+    {
+      "case": "verified_reformat_only",
+      "chat_seconds": 1.529,
+      "answer_validated": true,
+      "model_calls": 0,
+      "mcp_attempts": 0,
+      "note": "Existing reformat path; clearly labels no new query and prior observation time. Not new-lookup performance."
+    },
+    {
+      "case": "dedicated_hermes_fresh_short_fw",
+      "chat_seconds": 11.899,
+      "first_chunk_seconds": 11.842,
+      "answer_validated": true,
+      "native_api_call_count": 2,
+      "input_tokens": 9674,
+      "output_tokens": 61,
+      "mcp_attempts": 1,
+      "tool_errors": 0,
+      "note": "New dedicated-channel thread; latency includes both final message chunks."
+    },
+    {
+      "case": "dedicated_ollama_fresh_short_fw",
+      "chat_seconds": 10.993,
+      "answer_validated": true,
+      "worker_seconds": 10.896214469103143,
+      "model_calls": 1,
+      "model_seconds": 6.826192308915779,
+      "input_tokens": 6564,
+      "output_tokens": 25,
+      "mcp_attempts": 1,
+      "mcp_seconds": 0.02828113711439073,
+      "tool_errors": 0
+    }
+  ],
+  "limitations": [
+    "single observations; no average or p95 guarantee",
+    "shared GPU contention not controlled",
+    "same channel context exists; new native sessions and fresh MCP reads for current observations",
+    "historical/current compound inquiry remains incomplete",
+    "reformatting prior verified receipts is not a fresh read",
+    "new UI rendering visual inspection not performed"
+  ],
+  "remaining": [
+    "history query omission in mixed current/past questions",
+    "compound final report quality and around-30-second latency",
+    "issued snapshot ID binding and wider independent evaluation",
+    "concurrent-user and long-running behavior"
+  ],
+  "git": {
+    "state": "pending commit/push"
+  },
+  "cleanup": {
+    "state": "complete",
+    "local_temporary_files_removed": 35,
+    "local_temporary_bytes_removed": 38841249,
+    "local_path_absent": true,
+    "server_runtime_test_directories_remaining": 0,
+    "server_backups_db_traces_preserved": true,
+    "mac_packages_installed": 0
+  },
+  "systemd_followup": {
+    "since_kst": "2026-11-06T16:40:26+09:00",
+    "until_kst": "2026-11-06T18:48:55+09:00",
+    "normal_polls": 462,
+    "deferred_polls": 26,
+    "new_controller_failures": 0,
+    "current_failed_units_abc": 0,
+    "historical_alerts_preserved": true
+  },
+  "actual_chat_questions": 11
+}

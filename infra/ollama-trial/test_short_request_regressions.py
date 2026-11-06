@@ -20,6 +20,17 @@ def schemas():
 
 
 class ShortReadRegressions(unittest.TestCase):
+    def test_present_colloquial_questions_use_shared_inventory_scope(self):
+        for question in ('지금 fw 룰 뭐야?', '현재 방화벽 규칙 뭔데?', '지금 FW 룰 뭐 있어?'):
+            self.assertEqual(h.tool_scope(question),{FW})
+        for name,target in (('WAF','a:waf'),('IDS','a:suricata'),('Wazuh','b:wazuh')):
+            request=h.security_inventory_request('현재 '+name+' 룰 뭐야?')
+            self.assertEqual(request['targets'],[target]);self.assertEqual(request['origin'],'all')
+        self.assertIn('어느 장비',h.scope_notice('지금 룰 뭐야?'))
+        for question in ('FW 규칙이란 뭐야?', '지금 FW 룰 개념이 뭐야?',
+                         '지금 FW 룰 수정해줘', '어제 FW 룰 뭐야?', '현재 FW 룰 뭐야? 조회하지 마'):
+            self.assertIsNone(h.rule_scope_request(question),question)
+
     def test_colloquial_inventory_endings_keep_one_device_or_ask_once(self):
         for ending in ('좀 볼래?', '볼 수 있나?', '볼까요?', '봐줘', '봐줄래요?'):
             with self.subTest(ending=ending):

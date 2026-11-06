@@ -36,6 +36,14 @@ class ObservationScope(unittest.TestCase):
         text='서비스 영향은 미확인이지만 Apache는 정상입니다.'
         self.assertIn('web_snapshot_is_not_application_health',m.snapshot_health_violations(text,self.facts))
 
+    def test_explicit_health_disclaimer_is_not_a_positive_claim(self):
+        for text in ('failed 0개가 모든 서비스 정상을 뜻하지 않습니다.',
+                     '서비스 정상 상태를 의미하지 않습니다.',
+                     '서비스의 정상/장애 여부와는 무관합니다.'):
+            self.assertEqual(m.snapshot_health_violations(text,self.facts),[])
+            self.assertIn('web_snapshot_is_not_application_health',m.snapshot_health_violations(
+                text+' 하지만 DVWA는 정상입니다.',self.facts))
+
     def test_unverified_is_not_a_failed_test_or_outage(self):
         for text in ('접근 로그 연속성 검증에 실패했습니다.',
                      '로그 연속성 검증 실패로 수집 복구가 필요합니다.'):

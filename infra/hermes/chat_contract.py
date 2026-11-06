@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.33'
+VERSION = 'soc-chat-contract:1.5.34'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -201,6 +201,9 @@ def rule_scope_request(text):
         and not re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d', text))
     if (devices and not re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d',text)
             and re.search(r'어때|어떻게.{0,12}(?:되어|돼|설정|적용)',text)):
+        state_question=True
+    if (re.search(r'현재|지금',text) and
+            re.search(r'(?:뭐야|뭔데|뭐(?:가)?\s*있(?:어|지|나)|어떤\s*(?:룰|규칙)(?:이)?\s*있(?:어|지|나))[\s?？.!]*$',text)):
         state_question=True
     view_request = (re.search(READ_VIEW_ENDING, text) and
                     not re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d', text))

@@ -388,7 +388,8 @@ class Tests(unittest.TestCase):
     def test_broad_diagnostic_and_changes_do_not_get_a_single_service_shortcut(self):
         h=self.actual_harness()
         self.assertEqual(w.diagnostic_read_targets(h,'인덱서 살아있어?'),['b:wazuh-indexer'])
-        for question in ('전체 관제 공백 진단해줘','인덱서 재시작해줘','실제 공격 사건을 조사해줘'):
+        for question in ('전체 관제 공백 진단해줘','인덱서 재시작해줘','실제 공격 사건을 조사해줘',
+                         '오늘 systemd 실패 경보가 반복됐는데 지금도 장애인지 조회해서 알려줘. 설정은 바꾸지 마.'):
             self.assertEqual(w.diagnostic_read_targets(h,question),[])
 
     def test_native_receipt_unwraps_bound_result_and_refuses_missing_input(self):
@@ -588,6 +589,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(scope)
         self.assertTrue(all(h.EVIDENCE.allowed(name,'verify') for name in scope))
         for q,phase in [('두 장비 경보를 상관분석해줘','lead'),('WAF 룰 변경해줘','lead'),
+                        ('오늘 systemd 실패 경보가 반복됐는데 지금도 장애인지 조회해줘','lead'),
                         ('지금 Wazuh 에이전트 상태 보여줘','peer')]:
             self.assertIsNone(w.lookup_read_scope(h,q,phase))
 

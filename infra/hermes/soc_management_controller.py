@@ -1752,12 +1752,25 @@ def automatic_review_case(store, case, evidence):
 
 
 def command_for(case):
+    case=dict(case)
     command = ["/usr/local/bin/docker", "exec", "-i", "-u", "995:986", "-e", "HERMES_HOME=/opt/data/management",
                "-e", "CAPSTONE_MANAGEMENT_MODE=" + case["mode"], "-w", "/opt/data/management", "hermes",
                "/usr/bin/timeout", "--signal=TERM", "--kill-after=5s", "210s",
                "/opt/hermes/.venv/bin/python", "/opt/data/management-code/run.py", "chat", "--query-file", "-",
                "--format", "stream-json", "--oneshot", "--max-turns", "12", "--run-budget", "180",
                "--source", "capstone-management", "-t", ",".join(TOOLSETS)]
+    chat_read=(dict(case).get('chat_task')=='lead' and case['mode']=='verify'
+        and not dict(case).get('operator_review') and not dict(case).get('review_response_write')
+        and dict(case).get('run_count')==0 and case.get('session_id') is None)
+    if chat_read:
+        context={'request':case.get('chat_request'), 'background':case.get('chat_background',''),
+            'requested_at_kst':datetime.now(timezone(timedelta(hours=9))).isoformat(),
+            'tools':case.get('chat_lookup_tools') if case.get('chat_readonly_lookup') else None}
+        if (not isinstance(context['request'],str) or not 1<=len(context['request'])<=6000
+                or not isinstance(context['background'],str) or len(context['background'])>16000
+                or len(canonical(context).encode())>32768):raise ControllerError('chat_read_context_invalid')
+        if case.get('chat_readonly_lookup'):chat_lookup_prompt(case,{})
+        command[2:2]=['-e','CAPSTONE_CHAT_READ_JSON='+canonical(context)]
     if dict(case).get("operator_review") or dict(case).get("fast_readonly") or dict(case).get('automatic_review'):
         command[2:2] = ["-e", "CAPSTONE_MANAGEMENT_REVIEW=1"]
     if dict(case).get('automatic_review'):
@@ -1811,9 +1824,9 @@ def management_gate_argument(source):
     """Keep the immutable gate below Linux's per-argument exec limit."""
     if not isinstance(source,bytes) or not 1<=len(source)<=MAX_RESPONSE:
         raise ControllerError('management_gate_source_size_invalid')
-    import lzma
-    encoded=base64.b85encode(lzma.compress(source,preset=6)).decode('ascii')
-    value=("import base64,hashlib,lzma; s=lzma.decompress(base64.b85decode("+repr(encoded)+")); "
+    import bz2
+    encoded=base64.b85encode(bz2.compress(source)).decode('ascii')
+    value=("import base64,hashlib,bz2; s=bz2.decompress(base64.b85decode("+repr(encoded)+")); "
            "assert hashlib.sha256(s).hexdigest()=="+repr(hashlib.sha256(source).hexdigest())+"; "
            "exec(compile(s,'capstone-immutable-management-gate','exec'))")
     if len(value.encode())>=65536:

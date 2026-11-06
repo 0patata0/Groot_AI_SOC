@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06 22:36 KST",
+  "query_version": "1.19.82",
+  "common_version": "1.5.38",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "bad8130b9508c0d9066d19f8ae3992f112a879e84acc2e1313b09b4bb8eb6abd",
+    "infra/hermes/query-completion/__init__.py": "a52407645f63e52a44c635db745b2d644a0c98a1b4c880c59c82744f009381ae",
+    "infra/hermes/query-completion/plugin.yaml": "24488832132a3ede63f1a12c653cf88674895887b4fb1694d892a6782c82c44b",
+    "infra/hermes/review_channel_worker.py": "84968f47397080e526e7ef26bf5a265e4112d9631db7cdba0c6209454cd8771b",
+    "infra/hermes/soc_management_run.py": "a1b0ded9fe0b7f439ef6df85ac04e5956b2e84faf37a2da3b3d842dd227e3382",
+    "infra/ollama-trial/harness.py": "5774b3585ead314078852bb069ca7798532461ab33db2df99009631c9391329c"
+  },
+  "tests": {
+    "native": {
+      "profile": "native",
+      "tests": 482,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "sdk": {
+      "profile": "sdk",
+      "tests": 244,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "query": {
+      "profile": "query",
+      "tests": 391,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "install": {
+      "profile": "install",
+      "tests": 43,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "review": {
+      "profile": "review",
+      "tests": 70,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "unique_tests": 1230,
+  "actual_chat": [
+    {
+      "engine": "hermes",
+      "question": "@hermes 오늘 systemd 오류랑 현재 상태 비교해줘. 설정은 바꾸지 마.",
+      "final_seconds": 25.532,
+      "progress_seconds": 0.907,
+      "status": "completed",
+      "scope_complete": true,
+      "mcp_calls": 4,
+      "protected_calls": 0,
+      "api_markdown_tables": 2,
+      "new_root": true,
+      "actual_ui_render_verified": false,
+      "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/cipjfzgggffsxbt5uyoomjpz7r"
+    },
+    {
+      "engine": "ollama",
+      "question": "@ollama 금일 systemd 실패 내역과 지금 상태를 비교해서 표로 보여줘.",
+      "final_seconds": 16.746,
+      "progress_seconds": 0.375,
+      "status": "completed",
+      "scope_complete": true,
+      "mcp_calls": 4,
+      "protected_calls": 0,
+      "api_markdown_tables": 2,
+      "new_root": true,
+      "actual_ui_render_verified": false,
+      "reply_url": "https://chat.grootlab.duckdns.org/soc/pl/qcwgsux8a3gc7r5uai4doatmye"
+    }
+  ],
+  "private_native_seconds": 22.628006868064404,
+  "private_sdk_seconds": 18.3208250538446,
+  "rejected_private_candidates_seconds": [
+    200.377648,
+    83.236954,
+    66.147316
+  ],
+  "failed_actual_chat": [
+    {
+      "engine": "hermes",
+      "seconds": 79.947,
+      "reason": "optional limit omitted by model despite valid MCP default; verified receipt rejected by literal completion. DB audit shows mention was already stripped; mention handling separately regression-hardened"
+    },
+    {
+      "engine": "ollama",
+      "seconds": 7.399,
+      "reason": "HTTP400 empty history-target enum after schema narrowing; no reads"
+    }
+  ],
+  "prior_same_hermes_question": {
+    "seconds": 126.313,
+    "status": "partial",
+    "version": "81/37"
+  },
+  "limits": [
+    "one successful chat per bot, differing phrasing and shared GPU; no mean/p95/SLA or pure A/B claim",
+    "historical/current factual lookup only; general causal/risk investigation under60 remains incomplete",
+    "API Markdown verified; desktop AX body unavailable",
+    "new OS full installation and attack E2E not run"
+  ],
+  "deployment": {
+    "backup": "/var/lib/capstone-compact-chat/20261106-deploy82c",
+    "files_verified": 16,
+    "protected_hashes": 8,
+    "gate_bytes": 65345,
+    "rollback_timer_confirmed_inactive": true,
+    "new_packages_ports_keys": 0
+  },
+  "git": {
+    "state": "pending_commit_and_push"
+  },
+  "sdk_saved_receipts_independently_verified": true,
+  "sdk_render_exact_receipt_match": true
+}

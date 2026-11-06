@@ -1,5 +1,7 @@
 # 실제 채팅 조회 지연 개선 — 2026-11-06
 
+아래는 query77의 과거 검증이다. 현재82/38은 [오늘 systemd 경보·현재 비교](systemd-comparison.md)의 제한된 사실 조회도 포함한다. 일반 원인/위험/복구 판단은 표 자동 완료 대상이 아니다.
+
 query1.19.77/common1.5.34를 B의 기존 두 봇과 review worker에 반영했다. 실제 Mattermost 질문 생성부터 최종 답변 갱신까지 측정한다. **단순 조회의 개선과 복합 조사30초 목표는 별개**다. [현재 상태](../../STATUS.md) · [수치 원장](chat-read-latency.validation.json).
 
 ## 확인한 원인과 변경

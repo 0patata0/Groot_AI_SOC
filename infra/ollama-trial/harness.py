@@ -666,6 +666,7 @@ def rule_detail_report(request, calls):
 
 def read_report(question, calls):
     calls=evidence_reads(calls)
+    if systemd_comparison_request(question): return systemd_comparison_report(question,calls)
     notice = scope_notice(question)
     if notice: return notice
     security=security_inventory_request(question)
@@ -757,6 +758,7 @@ def inventory_question(question):
 
 
 def structured_read(question):
+    if systemd_comparison_request(question): return True
     if diagnostic_history_request(question): return False
     return bool(security_inventory_request(question) or firewall_request(question) or rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
                 tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
@@ -1741,6 +1743,11 @@ def workflow_names(question):
 def guidance(question, *, include_workflows=True):
     text = normalized(question)
     result = SHARED.status_lookup_guidance(text)
+    if systemd_comparison_request(question):
+        result += ('\n이번 요청은 과거 경보 표본과 현재 상태값의 비교 조회입니다. '
+            'search_wazuh_alerts에 program_name=systemd와 오늘 KST 00:00부터 현재 요청 시각까지의 명시 구간을 넣고, '
+            'get_system_diagnostics로 a:systemd, b:systemd, c:systemd를 모두 선택하세요. '
+            '독립된 네 조회를 함께 선택할 수 있습니다. 정상/복구/위험 판정이나 변경은 요청되지 않았습니다.')
     if include_workflows:
         workflows=workflow_names(question)
         if workflows:result+='\n'+CONTRACT.workflow_policy(workflows)
@@ -1776,6 +1783,109 @@ def diagnostic_history_request(question):
     failure = re.search(r'오류|에러|실패|장애|고장|\b(?:failure|failed|error)\b', text, re.I)
     period = re.search(r'오늘|금일|최근|이전|아까|방금|계속|또|비교|대조|\d+\s*(?:시간|분|일)\s*(?:전|동안|간)|\d{1,2}:\d{2}', text)
     return bool(failure and period)
+
+
+def systemd_comparison_request(question):
+    """A bounded factual comparison, never a causal or incident verdict.
+
+    Only unqualified today's indexed systemd sample plus all three current
+    snapshots is resolved here. Explicit host/unit/filter/time restrictions
+    retain the investigator until their identity and scope can be verified.
+    """
+    text = re.sub(r'^(?:\s*@(hermes|ollama)\b[\s,:]*)+', '', normalized(question), flags=re.I)
+    if READ.wants_write(text): return False
+    if re.search(r'원인|왜|분석|조사|위험|영향|침해|판단|검토|대응|조치|복구|정상|괜찮|해결|예시|개념|설명|번역|가정|도구\s*없이|조회\s*하지|제외|말고|빼고|아닌|아니라|과거\s*전체|전부|빠짐|모든\s*로그', text): return False
+    if re.search(r'(?<![A-Za-z])[abc](?![A-Za-z])|[0-9]|\.service|최근|지난|어제|내일|부터|까지|이후|이전|사이|특정|룰|규칙|agent|출발지|목적지|IP|주소|WAF|IDS|Vector|벡터|헤르메스|Hermes|Ollama|올라마', text, re.I): return False
+    # Unknown extra subjects must never disappear into a completed comparison.
+    bounded=re.sub(r'설정(?:은|을)?\s*바꾸지\s*마(?:세요)?', '', text)
+    words=r'systemd|failure|failed|error|오늘|금일|현재|지금|상태|현황|오류|에러|실패|경보|이력|내역|비교|대조|조회|테이블|목록|표|보여|알려|정리|부탁|드립니다|주세요|해줄래|해서|하고|해|줘|주|줄|수|있|나요|니|나|할|까|요|좀|이랑|랑|와|과|을|를|은|는|의|로|만'
+    if not re.fullmatch(r'(?:'+words+r'|[\s,.!?？])+',bounded,re.I): return False
+    return bool(re.search(r'\bsystemd\b', text, re.I) and re.search(r'오늘|금일', text)
+        and re.search(r'지금|현재', text) and re.search(r'비교|대조', text)
+        and re.search(r'오류|에러|실패|경보|이력|failure|failed|error', text, re.I))
+
+
+SYSTEMD_COMPARE_TOOLS = frozenset({'mcp__system_diagnostics__get_system_diagnostics',
+    'mcp__security_events__search_wazuh_alerts'})
+
+
+def systemd_comparison_state(question, calls, requested_at=None):
+    """Only hash-bound fresh reads with exact filters can complete the lookup."""
+    if not systemd_comparison_request(question): return None
+    now = datetime.now(EVIDENCE.KST)
+    at = EVIDENCE.parse_instant(requested_at) if requested_at else now
+    if not at: return None
+    at = at.astimezone(EVIDENCE.KST)
+    start = at.replace(hour=0, minute=0, second=0, microsecond=0)
+    latest = diagnostic_observations(calls)
+    missing, snapshots = [], {}
+    for host in 'abc':
+        target = host+':systemd'; data = latest.get(target) or {}
+        metrics = data.get('metrics', {})
+        stamp = EVIDENCE.parse_instant(data.get('observed_at_kst'))
+        if (data.get('host') != host or data.get('lookback_scope') != 'latest_snapshot_only_not_requested_history'
+                or data.get('status') not in ('ok','degraded') or data.get('publisher_stale') is True
+                or not stamp or not -5 <= (now-stamp).total_seconds() <= 180
+                or type(metrics.get('failed_units_total')) is not int or metrics['failed_units_total'] < 0
+                or type(metrics.get('returned_units')) is not int or metrics['returned_units'] < 0
+                or metrics['returned_units'] != min(metrics['failed_units_total'],16)
+                or metrics.get('unit_list_truncated') is not (metrics['failed_units_total'] > 16)
+                or any(not isinstance(metrics.get('failed_unit_'+str(i)),str) for i in range(metrics['returned_units']))):
+            missing.append(target)
+        else: snapshots[target] = data
+    events = None
+    for call in calls:
+        if call.get('server') != 'security-events' or call.get('name') != 'search_wazuh_alerts': continue
+        events = None  # A failed/malformed latest read invalidates the prior one.
+        data = payload(call) or {}; args = call.get('arguments') or {}
+        since, until = (EVIDENCE.parse_instant(data.get('requested_'+k+'_kst')) for k in ('since','until'))
+        alerts = data.get('alerts'); count = data.get('returned_count')
+        if (call.get('is_write') or data.get('source') != 'wazuh' or data.get('source_scope') != 'wazuh_indexed_alerts'
+                or data.get('window_mode') != 'explicit_bounds' or not since or not until
+                or since != start or not 0 <= (at-until).total_seconds() <= (0 if requested_at else 600)
+                or EVIDENCE.parse_instant(args.get('since_kst')) != since or EVIDENCE.parse_instant(args.get('until_kst')) != until
+                or args.get('program_name') != 'systemd' or data.get('applied_filters') != {'program_name':'systemd'}
+                or set(args)-{'program_name','since_kst','until_kst','limit'}
+                or type(data.get('limit')) is not int or not 1 <= data['limit'] <= 50
+                or 'limit' in args and (type(args['limit']) is not int or data['limit'] != args['limit'])
+                or type(data.get('scan_capped')) is not bool
+                or not isinstance(alerts,list) or type(count) is not int or count != len(alerts) or not 0 <= count <= data['limit']): continue
+        valid = True
+        for row in alerts:
+            stamp = EVIDENCE.parse_instant(row.get('timestamp')) if isinstance(row,dict) else None
+            if not stamp or not since <= stamp <= until or row.get('program_name') != 'systemd': valid=False; break
+        if valid: events=data
+    if events is None: missing.append('오늘 systemd 경보: 정확한 KST 구간·필터·반환 근거')
+    return {'missing':missing,'events':events,'snapshots':snapshots}
+
+
+def systemd_comparison_report(question, calls, requested_at=None):
+    state = systemd_comparison_state(question,calls,requested_at)
+    if not state or state['missing']: return None
+    events = state['events']; groups = {}
+    for row in events['alerts']:
+        units = row.get('service_units')
+        units = ', '.join(units) if isinstance(units,list) and all(isinstance(u,str) for u in units) else '미확인'
+        exit_info = row.get('exit_status')
+        exit_text = (str(exit_info.get('code'))+'/'+str(exit_info.get('status'))+'/'+str(exit_info.get('label'))
+                     if isinstance(exit_info,dict) else '미기록')
+        key = (str(row.get('agent') or '미확인')+' / '+str(row.get('agent_id') or '미확인'),
+               units or '미확인',str(row.get('wazuh_rule_id') or '미확인'),exit_text)
+        groups.setdefault(key,[]).append(EVIDENCE.kst_time(row['timestamp']))
+    rows = ['오늘 색인된 systemd 경보 **반환 표본 '+str(events['returned_count'])+'건**과 A·B·C의 현재 실패 유닛 수를 조회했습니다.',
+        '경보 검색 구간(KST): '+EVIDENCE.kst_time(events['requested_since_kst'])+' ~ '+EVIDENCE.kst_time(events['requested_until_kst']),
+        '구간 전체 경보 건수·과거 오류의 현재 복구 여부는 미확인입니다.','',
+        '**과거 경보 표본 — 같은 수집기·서비스·룰·종료값끼리 묶음**','',
+        *READ.table(['수집기 / ID','서비스','Wazuh 룰','종료값','반환 건수','첫 / 마지막 관측 KST'],
+            [(*key,len(stamps),min(stamps)+' / '+max(stamps)) for key,stamps in groups.items()]),
+        *(['반환 표본이 없습니다. 전체 경보 부재를 뜻하지 않습니다.'] if not groups else []),
+        '', '**현재 관측 — 실패 상태인 로드된 유닛만 집계**','',
+        *READ.table(['대상','failed 유닛 수','반환 유닛 / 목록 잘림','관측 KST'],[
+            (target,data['metrics']['failed_units_total'],(', '.join(data['metrics']['failed_unit_'+str(i)] for i in range(data['metrics']['returned_units'])) or '없음')+' / '+str(data['metrics']['unit_list_truncated']),EVIDENCE.kst_time(data['observed_at_kst']))
+            for target,data in state['snapshots'].items()]),
+        '', '수집기 이름을 실제 오류 발생 호스트로 단정하지 않았습니다. 현재 failed 0개와 전체 서비스의 기능 상태·무중단·과거 오류 복구는 별개이며 후자는 미확인입니다.',
+        '설정 변경은 수행하지 않았습니다. 원인·영향 판단에는 해당 서비스의 추가 근거가 필요합니다.']
+    return '\n'.join(rows)
 
 
 def diagnostic_request(question):
@@ -1859,6 +1969,7 @@ def diagnostic_observations(calls):
 
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    if systemd_comparison_request(question): return set(SYSTEMD_COMPARE_TOOLS)
     if diagnostic_history_request(question):
         return None  # Keep event/history tools available for mixed inquiries.
     if EVIDENCE.incident_investigation_request(normalized(question)):
@@ -1924,6 +2035,9 @@ def inventory_tool_scope(request):
 
 def missing_reads(question, calls, diagnostic_targets=()):
     calls=evidence_reads(calls)
+    if systemd_comparison_request(question):
+        state=systemd_comparison_state(question,calls)
+        return state['missing'] if state else ['systemd 비교 근거 미확인']
     if EVIDENCE.incident_investigation_request(normalized(question)):
         return ['사건 경보 조회 근거'] if incident_evidence_gap(question, calls) else []
     security=security_inventory_request(question)
@@ -1979,6 +2093,14 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    if systemd_comparison_request(question):
+        result={name:schema for name,schema in result.items() if name in SYSTEMD_COMPARE_TOOLS}
+        for name,schema in result.items():
+            if name.endswith('__get_system_diagnostics'):
+                schema['properties']['target']['enum']=[t for t in schema['properties']['target'].get('enum',[]) if t in ('a:systemd','b:systemd','c:systemd')]
+            elif 'program_name' in schema.get('properties',{}):
+                schema['properties']['program_name']={'const':'systemd','type':'string'}
+                schema['required']=list(dict.fromkeys([*schema.get('required',[]),'program_name']))
     if not calls:
         requested_at=datetime.now(timezone(timedelta(hours=9))).isoformat()
         result={name:EVIDENCE.initial_event_filter_schema(name,schema,question,requested_at)

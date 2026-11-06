@@ -30,6 +30,8 @@ def lookup_read_scope(harness, current, phase):
     """
     if phase != 'lead' or not getattr(harness, 'structured_read', lambda _: False)(current):
         return None
+    if getattr(harness,'systemd_comparison_request',lambda _:False)(current):
+        return frozenset(harness.SYSTEMD_COMPARE_TOOLS)
     if (re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지',current)
             or getattr(harness, 'diagnostic_history_request', lambda _: False)(current)):
         return None  # Mixed historical/current inquiry is not a plain inventory.

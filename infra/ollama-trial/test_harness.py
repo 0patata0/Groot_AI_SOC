@@ -38,8 +38,13 @@ class Grounding(unittest.TestCase):
             with self.subTest(question=q):
                 self.assertTrue(harness.diagnostic_history_request(q))
                 self.assertIsNone(harness.diagnostic_request(q))
-                self.assertIsNone(harness.tool_scope(q))
-                self.assertFalse(harness.structured_read(q))
+                if harness.systemd_comparison_request(q):
+                    self.assertEqual(harness.tool_scope(q),set(harness.SYSTEMD_COMPARE_TOOLS))
+                    self.assertTrue(harness.structured_read(q))
+                    self.assertIn('오늘 systemd 경보: 정확한 KST 구간·필터·반환 근거',harness.missing_reads(q,[]))
+                else:
+                    self.assertIsNone(harness.tool_scope(q))
+                    self.assertFalse(harness.structured_read(q))
                 self.assertIsNone(harness.diagnostic_report(q,[],['a:systemd','b:systemd','c:systemd']))
 
     def test_current_diagnostics_and_unrelated_rules_keep_fast_read_scope(self):

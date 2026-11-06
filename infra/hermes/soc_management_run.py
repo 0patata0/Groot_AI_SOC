@@ -2205,7 +2205,7 @@ def chat_read_schema(name, schema):
     past['properties'].pop('lookback_minutes',None)
     past['properties']['target']['enum']=[x for x in history if x in past['properties']['target']['enum']]
     past['required']=list(dict.fromkeys(past.get('required',[])+['since_kst','until_kst']))
-    return {'anyOf':[recent,past]}
+    return {'anyOf':[recent,past]} if past['properties']['target']['enum'] else recent
 
 
 def chat_read_context():
@@ -2643,8 +2643,9 @@ def literal_chat_lookup(context, ledger, receipts, harness):
     """Render complete plain reads; never invent a risk/incident decision."""
     if not context or not context['tools'] or not ledger or len(ledger)>32 or len(receipts)!=len(ledger):return None
     question=context['request']
+    comparison=getattr(harness,'systemd_comparison_request',lambda _:False)(question)
     if (not harness.structured_read(question) or harness.READ.wants_write(harness.normalized(question))
-            or re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지|위험|침해|판단|검토',question)):
+            or not comparison and re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지|위험|침해|판단|검토',question)):
         return None
     calls=[];unused=list(receipts)
     for row in ledger:
@@ -2672,6 +2673,9 @@ def literal_chat_lookup(context, ledger, receipts, harness):
         calls.append({'server':match[1].replace('_','-'),'name':match[2],
             'arguments':copy.deepcopy(row['arguments']),'result':raw,
             'result_sha256':hashlib.sha256(raw.encode()).hexdigest(),'is_error':False,'is_write':False})
+    if comparison:
+        literal=harness.systemd_comparison_report(question,calls,context['requested_at_kst'])
+        return literal+'\nMANAGEMENT_STATUS: resolved' if literal else None
     diagnostic=harness.diagnostic_request(question)
     targets=diagnostic.get('requested',[]) if diagnostic and not diagnostic.get('all') and not diagnostic.get('unresolved') else []
     if harness.missing_reads(question,calls,targets):return None
@@ -2902,7 +2906,7 @@ def initial_event_filter_schema(name, schema, question, requested_at_kst=None):
     # Resolve only an unqualified "today" request. More specific times keep
     # the original choice; a controller-bound interval is never overwritten.
     at=parse_instant(requested_at_kst)
-    if (at is not None and at.utcoffset()==timedelta(hours=9) and '오늘' in question
+    if (at is not None and at.utcoffset()==timedelta(hours=9) and re.search(r'오늘|금일',question)
             and not re.search(r'최근|지난|어제|내일|부터|까지|이후|이전|사이|[0-9]\s*(?:시|분|시간)|[0-9]:[0-9]',question)
             and not {'since_kst','until_kst','lookback_minutes'} & set(result.get('required',[]))
             and {'since_kst','until_kst','lookback_minutes'} <= set(result.get('properties',{}))):

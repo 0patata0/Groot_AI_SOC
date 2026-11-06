@@ -614,7 +614,9 @@ assert w.lookup_read_scope(h,'침해 사건 조사해줘','lead') is None
                   'Vector가 아까 실패했는데 지금 괜찮아?'):
             with self.subTest(question=q):
                 self.assertEqual(w.diagnostic_read_targets(h,q),[])
-                self.assertIsNone(w.lookup_read_scope(h,q,'lead'))
+                if h.systemd_comparison_request(q):
+                    self.assertEqual(w.lookup_read_scope(h,q,'lead'),h.SYSTEMD_COMPARE_TOOLS)
+                else:self.assertIsNone(w.lookup_read_scope(h,q,'lead'))
                 self.assertIsNone(w.diagnostic_literal(h,q,[],['a:systemd']))
 
     def test_correlation_rule_definition_is_reader_work_not_an_incident(self):

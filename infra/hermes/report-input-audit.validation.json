@@ -1,0 +1,198 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06T12:58:29.316160+09:00",
+  "query_version": "1.19.69",
+  "common_version": "1.5.32",
+  "production_changed": false,
+  "goal_final_30_seconds_met": false,
+  "candidate_adopted": false,
+  "measurement_scope": "Private model-only replay of nine prior actual receipts; subsequent four requests use the same ten receipts after one actual additional Native MCP read. Sequential calls; temperature0; shared GPU/cache not controlled; not independent evaluation, live end-to-end or chat latency. Current root context reconstructed from read-only case seed; ledger reconstructed only for unambiguous non-overlapping calls.",
+  "measurements": [
+    {
+      "variant": "baseline1",
+      "seconds": 21.907040651887655,
+      "input_bytes": 76382,
+      "valid": true,
+      "selected_calls": 1,
+      "more_evidence": false,
+      "request_sha256": "5ee6c02e57d66514112c17aed2434c209d5c3065e0a3111e5f9c0eb979a2fc82",
+      "fixture_sha256": "ce59eafada5d606dd977d9c3ff42084b0c30bc1b2797a8b942d1fa3a77f971c0",
+      "prompt_tokens": 21805,
+      "completion_tokens": 55,
+      "cached_tokens": 0,
+      "finish_reason": "stop",
+      "evidence_sha256": "c49465106764cb2185542f85f92355b879aaa21d95536b59bce3cd1fbf924504",
+      "report_complete": false,
+      "mcp_calls_executed_in_replay": 0
+    },
+    {
+      "variant": "deferred1",
+      "seconds": 16.560227961977944,
+      "input_bytes": 52868,
+      "valid": true,
+      "selected_calls": 0,
+      "more_evidence": true,
+      "request_sha256": "9a529a8210c57464bf99411764a2331258fc1e130523207da82999d7371823fc",
+      "fixture_sha256": "ce59eafada5d606dd977d9c3ff42084b0c30bc1b2797a8b942d1fa3a77f971c0",
+      "prompt_tokens": 16482,
+      "completion_tokens": 40,
+      "cached_tokens": 0,
+      "finish_reason": "stop",
+      "evidence_sha256": "da5682156fc832ef86924692058c46ae4ff53cacb26908abdbdbb2570b958a69",
+      "report_complete": false,
+      "mcp_calls_executed_in_replay": 0
+    },
+    {
+      "variant": "baseline-scope",
+      "seconds": 23.310329569038004,
+      "input_bytes": 76887,
+      "valid": true,
+      "selected_calls": 1,
+      "more_evidence": false,
+      "request_sha256": "a670987d864c238be910161d8329289cd32476c6a3313e3a4a3bf44d5dddf865",
+      "fixture_sha256": "ce59eafada5d606dd977d9c3ff42084b0c30bc1b2797a8b942d1fa3a77f971c0",
+      "prompt_tokens": 21909,
+      "completion_tokens": 141,
+      "cached_tokens": 0,
+      "finish_reason": "stop",
+      "evidence_sha256": "17a74025b73ff78ded3ad0b829e84652a5d4086e93108b24b3fd6e0b194d46cd",
+      "report_complete": false,
+      "mcp_calls_executed_in_replay": 0
+    },
+    {
+      "variant": "deferred-followup-scope",
+      "seconds": 21.854971264023334,
+      "input_bytes": 62569,
+      "valid": true,
+      "selected_calls": 0,
+      "more_evidence": true,
+      "request_sha256": "97b016dbf366af1fbec4f75675a9ca27d66aae3449ca6ed808146c2aa43df90f",
+      "fixture_sha256": "802c30c47519ef13833e4c045c2036356355613713513cfd963ecf36fc6465ca",
+      "prompt_tokens": 22055,
+      "completion_tokens": 44,
+      "cached_tokens": 0,
+      "finish_reason": "stop",
+      "evidence_sha256": "6a57fbc77379832eb0e5d9e200007c0d93ed96443180d881ca56a5415f0f3aa6",
+      "report_complete": false,
+      "mcp_calls_executed_in_replay": 0
+    },
+    {
+      "variant": "baseline-followup-scope",
+      "seconds": 28.825946585973725,
+      "input_bytes": 86083,
+      "valid": true,
+      "selected_calls": 1,
+      "more_evidence": false,
+      "request_sha256": "be8622333995b80b62a0234d07b15cc1e98ec8ac0ecfc98f99eb00313ae0b938",
+      "fixture_sha256": "802c30c47519ef13833e4c045c2036356355613713513cfd963ecf36fc6465ca",
+      "prompt_tokens": 27374,
+      "completion_tokens": 136,
+      "cached_tokens": 0,
+      "finish_reason": "stop",
+      "evidence_sha256": "13d05d4114d8e6739ecf2ff4a1fd8a88fb80036e85b9f8e0a8dffa1420cd2a92",
+      "report_complete": false,
+      "mcp_calls_executed_in_replay": 0
+    },
+    {
+      "variant": "catalog-followup-scope",
+      "seconds": 27.669859786052257,
+      "input_bytes": 79891,
+      "valid": true,
+      "selected_calls": 1,
+      "more_evidence": false,
+      "request_sha256": "c8fb555fa4c6010f87f8e5a0f23611dc44e8e2bc2748b77f5bea78c6ff1607e0",
+      "fixture_sha256": "802c30c47519ef13833e4c045c2036356355613713513cfd963ecf36fc6465ca",
+      "prompt_tokens": 26223,
+      "completion_tokens": 154,
+      "cached_tokens": 0,
+      "finish_reason": "stop",
+      "evidence_sha256": "0dcff32c938ace626c2cb3d3e1bea9ea72027a1b16fb204662597f12feef9d1b",
+      "report_complete": false,
+      "mcp_calls_executed_in_replay": 0
+    },
+    {
+      "variant": "low-followup-scope",
+      "seconds": 64.33358696615323,
+      "input_bytes": 86083,
+      "valid": false,
+      "request_sha256": "2ad8682d867aa47e3e243c97ab8ed7f0f50263c68abfaa9a3703f1c843fd83fc",
+      "fixture_sha256": "802c30c47519ef13833e4c045c2036356355613713513cfd963ecf36fc6465ca",
+      "prompt_tokens": 27370,
+      "completion_tokens": 2048,
+      "cached_tokens": 0,
+      "finish_reason": "length",
+      "evidence_sha256": "5e5eb9bc03e9ecb09bb148676ce43dece226c63e11e1ee2547fc7dd2ba7149d2",
+      "report_complete": false,
+      "mcp_calls_executed_in_replay": 0
+    }
+  ],
+  "actual_extra_mcp": {
+    "tool": "mcp__security_events__search_web_access",
+    "seconds": 1.3376700640656054,
+    "returned_count": 18,
+    "retained_index_match_count": 18,
+    "actual_request_total_count": null,
+    "writes": 0
+  },
+  "runtime": {
+    "ollama_version": "0.40.2",
+    "model": {
+      "name": "qwen3.6:35b",
+      "model": "qwen3.6:35b",
+      "size": 23656629533,
+      "size_vram": 23656629533,
+      "context_length": 262144,
+      "expires_at": "2026-11-06T13:04:42.875378102+09:00",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35moe",
+        "families": [
+          "qwen35moe"
+        ],
+        "parameter_size": "35.5B",
+        "quantization_level": "Q4_K_M"
+      }
+    },
+    "ps_roundtrip_seconds": 0.0028164549730718136,
+    "scope": "API-reported residency only; GPU utilization/power/thermal/concurrent load not measured."
+  },
+  "health": {
+    "at_kst": "2026-11-06T12:56:27.122541+09:00",
+    "deployment_files_verified": 10,
+    "protected_files_unchanged": 7,
+    "services_active": 4,
+    "websocket_workers": 2,
+    "queues_idle": 3,
+    "gate_argument_bytes": 65043,
+    "source_sha256": "a7ca6c029f59d30fb8645e6b2e0006e98ad831ac05fd4c73d1a508e0b1402567",
+    "controller_sha256": "d4cdc3991771278ff39d170e5c87a514186be5c9a8f04265f92b5dc2eb11773d"
+  },
+  "validation": {
+    "real_model_requests": 7,
+    "schema_valid_read_or_more_evidence": 6,
+    "truncated_without_final_report": 1,
+    "new_regression_tests": 0,
+    "previous_deployment_unique_tests": 1098,
+    "previous_tests_rerun": false,
+    "chat_posts": 0,
+    "attack_traffic": 0,
+    "service_restarts": 0,
+    "model_changes": 0,
+    "new_os_install_test": false
+  },
+  "cleanup": {
+    "mac": {
+      "temporary": "/private/tmp/capstone-report-input-20261106-ftcuc937",
+      "files_removed": 25,
+      "bytes_removed": 1334887,
+      "absence_verified": true,
+      "new_mac_packages": 0,
+      "server_temporary_staging": 0
+    },
+    "server": "No source, scripts, packages or runtime files staged; probes ran from SSH/stdin. Existing service logs are operational audit, not temporary package files."
+  },
+  "publication": {
+    "status": "pending commit/push"
+  }
+}

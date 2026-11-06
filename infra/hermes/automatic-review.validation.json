@@ -977,7 +977,9 @@
     "natural automatic scheduling and user chat end-to-end/independent cases"
   ],
   "git": {
-    "status": "pending"
+    "source_commit": "0c71daeb8982f0dd772b54a5608adb6810dce734",
+    "source_remote_main_confirmed_at_kst": "2026-11-06T09:13:34.504897+09:00",
+    "publication_receipt_in_followup_commit": true
   },
   "rejected_candidate": "1.19.56 independent extra-read batch guidance removed after 214.505s operator report timeout; single-cause attribution not established",
   "measurement_versions": {

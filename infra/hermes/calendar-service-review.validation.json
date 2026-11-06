@@ -122,7 +122,9 @@
     "no_attack_load_new_training_or_new_os_install"
   ],
   "publication": {
-    "status": "pending"
+    "source_commit": "0b34ad2ceaf52d4de0480e69606454107043f070",
+    "remote_main_verified_at_kst": "2026-11-07T04:59:01.945820+09:00",
+    "receipt": "this_followup_records_verified_source_publication; final_receipt_commit_recorded_in_local_session"
   },
   "cleanup": {
     "server_fixture": {

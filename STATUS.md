@@ -11,7 +11,7 @@
 | 운영 반영 | B9파일/보호7SHA·4서비스·양봇WS/worker·3큐·7등록 읽기 확인 | 관리자231 경유·15분 독립 복구 확정/no-op. 수동원복 미실행, 모델/키/FW/TTL 변경0 |
 | 반복 systemd 실패 | 실제 잠금 충돌만 예약 실행의 정상 연기로 처리한 수정 유지 | 직전 약27분 정상82/대기21·새 실패0, A/B/C failed0. 이번 배포 후 정상11/대기5·새 실패0·B failed0. 장기 관측 잔여 |
 | 속도·품질 | 정확한 복합 최종 보고30초 미달 | 76 새 세션87.727초·MCP4/오류0이나 정상/표본부재 확대를 반복하여 최종 판단 거절. 근거 표만 보존·성공 보고 아님 |
-| Git·정리 | 이전49e96a1까지 푸시/원격 일치. 이번 소스·문서는 게시 대기 | 운영 복구본·DB·trace 보존, 서버 worker1개·시험경로 제거, Mac 작업 임시 정리 완료 |
+| Git·정리 | 소스·검증 문서0992def 푸시/원격main 일치. 게시 영수증은 후속 커밋으로 보존 | 운영 복구본·DB·trace 보존, 서버 worker1개·시험경로 제거, Mac 작업 임시 정리 완료 |
 
 [실행 안내 보존](infra/hermes/review-execution-control.md) · [반복 실패 수정](infra/hermes/controller-contention.md) · [관측 범위 검사75](infra/hermes/observation-scope.md) · [기존 비교와 실패](infra/hermes/startup-profile.md). ‘30초 내 근거 표+후속 최종 보고’는 사용자 답변 전까지 미확정이며 최종 보고 목표를 유지한다.
 

@@ -80,7 +80,11 @@
   "attack_tests": 0,
   "new_packages": 0,
   "latency_30_seconds_achieved": false,
-  "git": "pending",
+  "git": {
+    "at_kst": "2026-11-06T17:30:24.561837+09:00",
+    "head": "0992def21a476a279f5fc5f21a43792789020960",
+    "remote_main": "0992def21a476a279f5fc5f21a43792789020960"
+  },
   "live_trial": {
     "run_id": "86465afff2c32764aa3d54d68ed50472",
     "elapsed_seconds": 87.72678589820862,

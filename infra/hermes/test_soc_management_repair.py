@@ -234,6 +234,16 @@ class ClosureConsistency(unittest.TestCase):
             self.assertEqual(m.closure_uncertainty_violations(body+'\nMANAGEMENT_STATUS: '+status),[])
 
 class SnapshotHealth(unittest.TestCase):
+    def test_actual_backend_health_claim_requires_application_evidence(self):
+        facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
+        claim='사건 이후 10시간 이상 지난 시점에도 ModSecurity 및 Suricata에서 추가적인 공격 탐지가 관찰되지 않고 백엔드 서비스도 정상 동작 중입니다.'
+        self.assertIn('web_snapshot_is_not_application_health',m.web_evidence_violations(claim,facts))
+        for text in ('백엔드 서비스의 정상 동작 여부는 미확인입니다.',
+                     '애플리케이션은 정상적으로 작동 중인지 미확인입니다.',
+                     '백엔드 정상 운영은 미확인입니다.',
+                     '백엔드가 정상이라고 단정할 수 없습니다.'):
+            self.assertEqual(m.web_evidence_violations(text,facts),[])
+
     def test_process_snapshot_does_not_prove_service_health_or_no_impact(self):
         facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
         for text in ('현재 서비스는 정상 운영 중입니다.','서비스 영향은 없습니다.',

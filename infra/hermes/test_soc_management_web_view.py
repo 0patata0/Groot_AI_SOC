@@ -67,6 +67,22 @@ class WebEvidenceView(unittest.TestCase):
         self.assertIs(type(decoded['records'][1]['response_bytes']), int)
         self.assertEqual(decoded, value)
 
+    def test_empty_or_single_record_retains_every_file_and_coverage_field(self):
+        for count in (0,1):
+            value=evidence();value['records']=value['records'][:count];value['returned_count']=count
+            value['source_files']*=3
+            for wrapped in (False,True):
+                body=json.dumps(value,ensure_ascii=False)
+                raw=json.dumps({'result':body}) if wrapped else body
+                packed=m.web_evidence_view(raw)
+                self.assertLess(len(packed.encode()),len(raw.encode())*.9)
+                shown=json.loads(json.loads(packed)['result']) if wrapped else json.loads(packed)
+                self.assertEqual(restore(shown),value)
+                self.assertEqual(shown['records'],value['records'])
+                self.assertIsNone(shown['actual_request_total_count'])
+                self.assertFalse(shown['coverage']['logging_continuity_verified'])
+                self.assertEqual(len(shown['source_files']['values']),45)
+
     def test_fail_closed_for_wrong_source_errors_count_duplicate_keys_and_non_json_numbers(self):
         cases = ['not json', json.dumps({'result': json.dumps(evidence()), 'isError': True})]
         for patch in ({'schema': True}, {'source': 'arbitrary'}, {'mutation_performed': True},

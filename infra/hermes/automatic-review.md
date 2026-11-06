@@ -1,5 +1,7 @@
 # 자동 후속 조사 문맥과 웹 대상 재선택
 
+이 문서는 query1.19.57까지의 검증 기록이다. 현행 후속 입력 배치·실측은 [review-payload](review-payload.md)을 따른다.
+
 2026-11-06 query1.19.57/common1.5.32. 이전 [입력 후보 비교](review-input.md)의 214.652초 자동 후속 시간초과를 재검토했다. 30초 최종 보고 목표는 아직 미완료다. 검증 수치와 적용 범위는 [원장](automatic-review.validation.json)·[STATUS](../../STATUS.md)를 따른다.
 
 ## 변경과 보호 경계

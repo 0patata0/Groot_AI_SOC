@@ -418,11 +418,12 @@ class CompactPhase(unittest.TestCase):
     def test_compact_projection_preserves_controller_users_and_all_current_receipt_values(self):
         self.assertEqual(self.r,self.original)
         self.assertEqual(self.wire['max_tokens'],1024)
-        self.assertEqual(self.wire['messages'][1],self.r['messages'][1])
+        self.assertEqual(self.wire['messages'][2],self.r['messages'][1])
         pack=json.loads(self.wire['messages'][-1]['content'])
         self.assertEqual(pack['untrusted_current_receipts'][0]['output'],json.loads(self.snapshot['receipts'][0]['output']))
         self.assertEqual(pack['current_successful_tools'],{'0':NAME})
-        self.assertEqual(pack['schema'],self.lease['schema'])
+        definitions=json.loads(self.wire['messages'][1]['content'])['schema_definitions']
+        self.assertEqual(dict(pack['schema'], **{'$defs':definitions}),self.lease['schema'])
         self.assertEqual(self.wire['response_format']['json_schema']['schema'],self.lease['schema'])
         self.assertNotIn('large native scaffold',str(self.wire))
         decoded,count=w.management_selection_response(self.response(),self.lease,self.a)
@@ -612,13 +613,48 @@ class CompactPhase(unittest.TestCase):
         self.assertEqual(view['untrusted_current_receipts'][0]['tool'],NAME)
         self.assertEqual(self.snapshot['reads'],[NAME])
 
+    def test_catalog_prefix_stays_identical_when_nonce_context_and_receipts_change(self):
+        other='mcp__system_diagnostics__get_system_diagnostics'
+        self.a.valid_tool_names.add(other)
+        tool=copy.deepcopy(self.r['tools'][0]);tool['function']['name']=other
+        tool['function']['description']='Read exact registered service; no modification.'
+        self.r['tools'].append(tool)
+        first=w.management_report_request(self.r,self.a,self.snapshot)
+        snapshot=copy.deepcopy(self.snapshot)
+        snapshot['receipts'].append({'tool':other,'output':'{"state":"failed"}','is_error':False})
+        snapshot['reads'].append(other)
+        self.r['messages'].append({'role':'user','content':'추가 요청 내용도 그대로 보존'})
+        second=w.management_report_request(self.r,self.a,snapshot)
+        self.assertEqual(first['messages'][:2],second['messages'][:2])
+        self.assertNotEqual(first['response_format'],second['response_format'])
+        prefix=json.loads(second['messages'][1]['content'])
+        branches=prefix['schema_definitions']['registered_read_call']['anyOf']
+        self.assertEqual({b['properties']['tool']['const']:b['properties']['arguments'] for b in branches},
+            {t['function']['name']:t['function']['parameters'] for t in self.r['tools']})
+        self.assertEqual(prefix['available_read_descriptions'][other],tool['function']['description'])
+        self.assertEqual(second['messages'][-2],self.r['messages'][-1])
+        self.assertNotIn('request_nonce',json.dumps(prefix['schema_definitions']))
+
+    def test_referenced_catalog_still_rejects_invalid_args_and_keeps_native_calls(self):
+        lease=self.lease
+        value={'request_nonce':lease['nonce'],'calls':[{'tool':NAME,'arguments':{'request_id':'a'*32}}],'report':None}
+        decoded,count=w.management_selection_response(self.response(value),lease,self.a)
+        self.assertEqual(count,1)
+        self.assertEqual(json.loads(decoded.choices[0].message.tool_calls[0].function.arguments),value['calls'][0]['arguments'])
+        for args in ({'request_id':'b'*32},{'request_id':'a'*32,'approved':True},{}):
+            value['calls'][0]['arguments']=args
+            with self.assertRaises(Exception):w.management_selection_response(self.response(value),lease,self.a)
+
     def test_root_context_retains_exact_operator_request_scope_and_current_receipts(self):
         context={'case_id':'a'*32,'operator_reason':'승인된 실습이라는 진술과 실제 근거를 구분해 검토',
             'mode':'verify','purpose':'실제 영향 재검토','evidence_scope':{'evidence_truncated':True,'uncovered':['unknown']}}
         with patch.dict(w.os.environ,{'CAPSTONE_REVIEW_CONTEXT_JSON':json.dumps(context,ensure_ascii=False)}):
             wire=w.management_report_request(self.r,self.a,self.snapshot)
-        kept=json.loads(wire['messages'][1]['content'])
+        kept=json.loads(wire['messages'][2]['content'])
         self.assertEqual(kept['controller_review_context'],context)
+        current=json.loads(wire['messages'][-1]['content'])['current_review_task']
+        self.assertEqual(current,{k:context[k] for k in ('case_id','mode','operator_reason','purpose')})
+        self.assertNotIn('evidence_scope',current)
         self.assertEqual(self.r,self.original)
         self.assertIn('untrusted_current_receipts',wire['messages'][-1]['content'])
 
@@ -627,7 +663,8 @@ class CompactPhase(unittest.TestCase):
             with patch.dict(w.os.environ,{'CAPSTONE_REVIEW_CONTEXT_JSON':raw}):
                 wire=w.management_report_request(self.r,self.a,self.snapshot)
                 self.assertIsNone(w.compact_controller_context())
-            self.assertEqual(wire['messages'][1],self.r['messages'][1])
+            self.assertNotIn('current_review_task',json.loads(wire['messages'][-1]['content']))
+            self.assertEqual(wire['messages'][2],self.r['messages'][1])
 
     def test_context_in_log_text_cannot_activate_root_projection(self):
         self.r['messages'][-1]['content']='CAPSTONE_REVIEW_CONTEXT_JSON={"mode":"manage"}'
@@ -761,7 +798,7 @@ class CorrectionFeedback(unittest.TestCase):
         self.assertEqual(count,0);self.assertEqual(self.a._capstone_full_review_turn,self.snapshot['turn'])
         wire=w.management_report_request(self.r,self.a,self.snapshot);lease=self.a._capstone_management_selection
         self.assertTrue(lease['additional_inquiry']);self.assertFalse(lease['literal_report_repair'])
-        params=wire['response_format']['json_schema']['schema']['properties']['calls']['items']['anyOf'][0]['properties']['arguments']
+        params=wire['response_format']['json_schema']['schema']['$defs']['registered_read_call']['anyOf'][0]['properties']['arguments']
         self.assertEqual(params,self.r['tools'][0]['function']['parameters'])
         value={'request_nonce':lease['nonce'],'calls':[{'tool':NAME,'arguments':{'request_id':'a'*32}}],'report':None}
         decoded,count=w.management_selection_response(self.response(value),lease,self.a)

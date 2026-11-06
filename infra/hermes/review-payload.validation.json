@@ -1,0 +1,693 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-06T09:53:01.315525+09:00",
+  "query_version": "1.19.62",
+  "common_version": "1.5.32",
+  "goal_30_seconds_met": false,
+  "changes": [
+    "stable complete registered read catalog before changing receipts/nonces",
+    "lossless web file columnar view for zero/one event",
+    "backend health overclaim guard",
+    "repeat exact root current task after evidence",
+    "thinking candidate61 rejected; previous reasoning profile retained"
+  ],
+  "preserved": [
+    "all registered tools and exact parameters",
+    "actual Native MCP, current nonce/turn and original receipts",
+    "LLM investigation and risk decisions",
+    "read/write/protected address/exact approval/TTL boundaries",
+    "Native 12-turn /180 budget /210 subprocess timeout",
+    "original sessions, production DB and evidence"
+  ],
+  "tests": {
+    "unique_pass": 1065,
+    "uncovered_skip": 0,
+    "suites": [
+      {
+        "suite": "management",
+        "tests": 388,
+        "skip": 57,
+        "rc": 0
+      },
+      {
+        "suite": "sdk",
+        "tests": 219,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "native",
+        "tests": 391,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "install",
+        "tests": 41,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "tables",
+        "tests": 19,
+        "skip": 0,
+        "rc": 0
+      },
+      {
+        "suite": "output",
+        "tests": 7,
+        "skip": 0,
+        "rc": 0
+      }
+    ],
+    "native_selection": {
+      "tests": 63,
+      "skip": 0,
+      "failures": 0,
+      "errors": 0,
+      "duplicate_tests": 6
+    }
+  },
+  "measurements": {
+    "baseline": {
+      "run_id": "c2148bf30f6cae1b8a7ddd1db3ef7281",
+      "seconds": 43.634355545043945,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_requested_followup",
+      "report_state": "monitor",
+      "assessment": "benign",
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 15,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "seconds": 1.954733,
+          "input_bytes": 1831,
+          "prompt_tokens": 635,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 2.61231,
+          "input_bytes": 4923,
+          "prompt_tokens": 1910,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 2.666958,
+          "input_bytes": 5425,
+          "prompt_tokens": 2144,
+          "cached_tokens": 97,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 0,
+          "seconds": 22.257341,
+          "input_bytes": 69442,
+          "prompt_tokens": 19043,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        }
+      ],
+      "manual_quality": {
+        "passed": false,
+        "issues": [
+          "backend_health_claim_without_application_health_evidence",
+          "vague_conditional_closure_plan"
+        ]
+      },
+      "query_version": "1.19.57"
+    },
+    "candidate": {
+      "run_id": "b66a8e9efbe483f5c6cdc58a15278b41",
+      "seconds": 70.0213794708252,
+      "reads": 10,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "completed",
+      "run_detail": "model_needs_review",
+      "report_state": "needs_review",
+      "assessment": "unresolved",
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": true,
+        "evidence_guard_violations": [],
+        "citation_error": null,
+        "citations_current_successful": true,
+        "fact_rows": 19,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "seconds": 2.076267,
+          "input_bytes": 1831,
+          "prompt_tokens": 632,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 2.347289,
+          "input_bytes": 4923,
+          "prompt_tokens": 1913,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 2.61976,
+          "input_bytes": 5425,
+          "prompt_tokens": 2141,
+          "cached_tokens": 97,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 20.022052,
+          "input_bytes": 68344,
+          "prompt_tokens": 18803,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 20.43803,
+          "input_bytes": 123780,
+          "prompt_tokens": 35512,
+          "cached_tokens": 16755,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 0,
+          "seconds": 6.29435,
+          "input_bytes": 124049,
+          "prompt_tokens": 35618,
+          "cached_tokens": 33464,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        }
+      ],
+      "manual_quality": {
+        "passed": false,
+        "issues": [
+          "past_detection_stated_as_attack_persistence",
+          "unrequested_penetration_test_as_next_action",
+          "unnecessary_full_firewall_inventory"
+        ],
+        "automatic_guard_pass_is_not_semantic_accuracy": true
+      },
+      "query_version": "1.19.58"
+    },
+    "complex": {
+      "run_id": "bdf0dd53d18d696c6928cc5f5a374607",
+      "seconds": 214.45465779304504,
+      "reads": 18,
+      "tool_errors": 1,
+      "protected_writes": 0,
+      "run_state": "outcome_unknown",
+      "run_detail": "model_subprocess_timeout_requires_review",
+      "report_state": "outcome_unknown",
+      "assessment": null,
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 31,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "seconds": 2.340023,
+          "input_bytes": 1831,
+          "prompt_tokens": 633,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 2.4744,
+          "input_bytes": 4923,
+          "prompt_tokens": 1913,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 2.811738,
+          "input_bytes": 5425,
+          "prompt_tokens": 2141,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 18.542729,
+          "input_bytes": 67035,
+          "prompt_tokens": 18383,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 5.254588,
+          "input_bytes": 69857,
+          "prompt_tokens": 19212,
+          "cached_tokens": 16335,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 6.270052,
+          "input_bytes": 74659,
+          "prompt_tokens": 21505,
+          "cached_tokens": 17164,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 4.120964,
+          "input_bytes": 75218,
+          "prompt_tokens": 21648,
+          "cached_tokens": 19457,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 0,
+          "seconds": 19.807317,
+          "input_bytes": 103293,
+          "prompt_tokens": 30556,
+          "cached_tokens": 19600,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 5.595434,
+          "input_bytes": 105770,
+          "prompt_tokens": 31250,
+          "cached_tokens": 28508,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 7.865717,
+          "input_bytes": 108095,
+          "prompt_tokens": 32842,
+          "cached_tokens": 28508,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 5.581025,
+          "input_bytes": 109171,
+          "prompt_tokens": 33259,
+          "cached_tokens": 30794,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 8.183661,
+          "input_bytes": 115517,
+          "prompt_tokens": 35932,
+          "cached_tokens": 31211,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        }
+      ],
+      "manual_quality": {
+        "passed": false,
+        "incomplete": true
+      },
+      "query_version": "1.19.59"
+    },
+    "focused": {
+      "run_id": "ede821d4bbe294cba971017315f8bae2",
+      "seconds": 214.4266974925995,
+      "reads": 24,
+      "tool_errors": 2,
+      "protected_writes": 0,
+      "run_state": "outcome_unknown",
+      "run_detail": "model_subprocess_timeout_requires_review",
+      "report_state": "outcome_unknown",
+      "assessment": null,
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 44,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "seconds": 2.17455,
+          "input_bytes": 1831,
+          "prompt_tokens": 630,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 2.392993,
+          "input_bytes": 4923,
+          "prompt_tokens": 1908,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 2.650819,
+          "input_bytes": 5425,
+          "prompt_tokens": 2141,
+          "cached_tokens": 97,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 3,
+          "seconds": 22.262627,
+          "input_bytes": 67737,
+          "prompt_tokens": 18565,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 3,
+          "seconds": 8.183322,
+          "input_bytes": 76209,
+          "prompt_tokens": 22118,
+          "cached_tokens": 16517,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 6.649204,
+          "input_bytes": 80083,
+          "prompt_tokens": 23297,
+          "cached_tokens": 20070,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 5.140241,
+          "input_bytes": 80228,
+          "prompt_tokens": 23322,
+          "cached_tokens": 20070,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 15.352264,
+          "input_bytes": 108709,
+          "prompt_tokens": 32495,
+          "cached_tokens": 20070,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 4,
+          "seconds": 21.934951,
+          "input_bytes": 113122,
+          "prompt_tokens": 34579,
+          "cached_tokens": 20070,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 0,
+          "seconds": 29.073985,
+          "input_bytes": 125752,
+          "prompt_tokens": 40544,
+          "cached_tokens": 20070,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 5.354209,
+          "input_bytes": 128152,
+          "prompt_tokens": 41203,
+          "cached_tokens": 38496,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 15.1085,
+          "input_bytes": 154138,
+          "prompt_tokens": 49678,
+          "cached_tokens": 39155,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        }
+      ],
+      "manual_quality": {
+        "passed": false,
+        "incomplete": true
+      },
+      "query_version": "1.19.60"
+    },
+    "reasoned": {
+      "run_id": "d180b45e16f16a71c74475764bd6d1a0",
+      "seconds": 214.44447875022888,
+      "reads": 7,
+      "tool_errors": 0,
+      "protected_writes": 0,
+      "run_state": "outcome_unknown",
+      "run_detail": "model_subprocess_timeout_requires_review",
+      "report_state": "outcome_unknown",
+      "assessment": null,
+      "outbox": "pending",
+      "outbox_seconds": null,
+      "quality_checks": {
+        "internal_hint_echo": false,
+        "factual_table_exact": false,
+        "evidence_guard_violations": [],
+        "citation_error": "incident_disposition_missing",
+        "citations_current_successful": false,
+        "fact_rows": 15,
+        "case_resolved": false
+      },
+      "provider_calls": [
+        {
+          "selected_reads": 4,
+          "seconds": 1.969958,
+          "input_bytes": 1831,
+          "prompt_tokens": 632,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 1,
+          "seconds": 2.368039,
+          "input_bytes": 4923,
+          "prompt_tokens": 1913,
+          "cached_tokens": 0,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": 2,
+          "seconds": 2.578912,
+          "input_bytes": 5425,
+          "prompt_tokens": 2143,
+          "cached_tokens": 97,
+          "effort": "none",
+          "finish": null,
+          "error_code": null
+        },
+        {
+          "selected_reads": null,
+          "seconds": 78.013782,
+          "input_bytes": null,
+          "prompt_tokens": null,
+          "cached_tokens": null,
+          "effort": "medium",
+          "finish": "length",
+          "error_code": "management_selection_response_shape"
+        },
+        {
+          "selected_reads": null,
+          "seconds": 66.974173,
+          "input_bytes": null,
+          "prompt_tokens": null,
+          "cached_tokens": null,
+          "effort": "medium",
+          "finish": "length",
+          "error_code": "management_selection_response_shape"
+        }
+      ],
+      "manual_quality": {
+        "passed": false,
+        "incomplete": true
+      },
+      "query_version": "1.19.61"
+    }
+  },
+  "timing_scope": "isolated development copy of an existing case, actual model and Native MCP; no chat publication. Comparison seed same, observation times/model choices/shared GPU not controlled; not independent test or average",
+  "phase_timing_reference": {
+    "scope": "one query1.19.57 reference automatic path; not average or independent test",
+    "controller_to_native_timed_run_start_seconds": 7.269855737686157,
+    "native_timed_run_seconds": 33.777,
+    "native_result_to_controller_finished_seconds": 2.5874998569488525,
+    "sum_actual_mcp_duration_seconds": 2.319,
+    "sum_measured_selection_provider_seconds": 29.491342
+  },
+  "deployment": {
+    "live_checks": {
+      "confirmed_at_epoch": 1793926263,
+      "files_verified": 9,
+      "protected_unchanged": 7,
+      "gate_sha256": "db3013407b30127a593acaaa0275c588f0872e9d8bc4a5d3bd43a8d6465a5a3a",
+      "controller_sha256": "9cd4a2a8cb09f1be9532467780852d4386d4df8a1a363bfa9d46586f3358c657",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 60963,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 13.692854881286621,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 5.692914962768555,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "at_kst": "2026-11-06T09:51:03.866140+09:00"
+  },
+  "attack_load_pcap_replay": 0,
+  "new_packages_ports_keys_permissions_model_firewall_changes": 0,
+  "remaining": [
+    "30-second completed report",
+    "first large model input and Native startup",
+    "irrelevant/repeated reads and typed-reference choices",
+    "meaning/time semantics and concrete followup plans",
+    "whole user chat intake/queue/delivery and unseen cases"
+  ],
+  "git": {
+    "state": "pending_commit_and_push"
+  },
+  "source_version_vs_model_measurement": {
+    "current": "1.19.62",
+    "gate_and_selection_tests_identical_to": "1.19.60",
+    "full_model_run_under_version62": false,
+    "thinking_candidate61_rejected": true
+  },
+  "cleanup": {
+    "server": {
+      "source_files_removed": 2195,
+      "logs_removed_after_export": 40,
+      "measurement_scripts_removed": 5,
+      "deployment_backups_retained": 5,
+      "comparison_seed_and_measurement_evidence_retained": true,
+      "production_db_approvals_traces_deleted": 0
+    },
+    "mac": {
+      "at_kst": "2026-11-06T09:54:27.884521+09:00",
+      "files_removed": 57,
+      "bytes_removed": 21534980,
+      "removal_verified": true,
+      "new_mac_packages": 0,
+      "all_task_exec_invocations_completed_before_cleanup": true,
+      "os_process_inventory_performed": false,
+      "existing_user_files_caches_environments_removed": 0
+    },
+    "new_mac_packages": 0
+  }
+}

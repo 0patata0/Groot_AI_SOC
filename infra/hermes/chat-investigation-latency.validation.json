@@ -1,0 +1,313 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-06",
+  "scope": "private fresh Native sessions with real MCP; not Mattermost end-to-end timing",
+  "production_query": "1.19.77",
+  "production_common": "1.5.34",
+  "candidate_promoted": false,
+  "measurements": [
+    {
+      "variant": "production_query77",
+      "seconds": 77.570487,
+      "exit_code": 0,
+      "actual_mcp_calls": 4,
+      "mcp_errors": 0,
+      "quality_passed": false,
+      "source_sha256": "3c562b1a6e1bf31bdb633345f72fbf2e5bc5e65cbe2419e1a1f6c367e49b3704"
+    },
+    {
+      "variant": "compact_medium_1024",
+      "seconds": 126.666287,
+      "exit_code": 1,
+      "actual_mcp_calls": 2,
+      "mcp_errors": 0,
+      "quality_passed": false,
+      "source_sha256": "2985e362fed041e8aa3a83696234aa2f314ccca20fb889bad9831959d91d07a4"
+    },
+    {
+      "variant": "compact_medium_3072",
+      "seconds": 214.334588,
+      "exit_code": 124,
+      "actual_mcp_calls": 5,
+      "mcp_errors": 3,
+      "quality_passed": false,
+      "source_sha256": "f4180f33af43461a0d4537ba3a447d59fb36dac4504e82e610775f59fe122d39"
+    }
+  ],
+  "isolated_tests": {
+    "unique_test_methods": 6,
+    "r2_pass": 6,
+    "r3_pass": 6,
+    "repeat_counts_not_added": true,
+    "all_regressions_rerun": false
+  },
+  "time_schema_audit": {
+    "source_sha256": "22a9b22be06f16d44d5a747773679f81ebffc5872386fde3a2e3e320d7f848a8",
+    "source_matches_live": true,
+    "cases": 24,
+    "schema_accepts_runtime_rejects": 9,
+    "cases_detail": [
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {},
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {
+          "until_kst": "2026-11-06T18:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {
+          "until_kst": "2026-11-06T18:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "until_kst": "2026-11-06T18:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_suricata_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "until_kst": "2026-11-06T18:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {},
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {
+          "until_kst": "2026-11-06T18:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {
+          "until_kst": "2026-11-06T18:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "until_kst": "2026-11-06T18:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_modsecurity_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "until_kst": "2026-11-06T18:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {},
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {
+          "until_kst": "2026-11-06T18:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {
+          "until_kst": "2026-11-06T18:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "until_kst": "2026-11-06T18:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": true,
+        "runtime_error": null
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00"
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      },
+      {
+        "tool": "search_wazuh_alerts",
+        "arguments": {
+          "since_kst": "2026-11-06T00:00:00+09:00",
+          "until_kst": "2026-11-06T18:00:00+09:00",
+          "lookback_minutes": 60
+        },
+        "schema_accepts": true,
+        "runtime_accepts": false,
+        "runtime_error": "since_kst requires until_kst and cannot combine with lookback_minutes"
+      }
+    ]
+  },
+  "findings": [
+    "Request day/host scope can be narrowed silently; past 1h or 15m was substituted for today, some A/B/C targets omitted.",
+    "Current failed units zero was overclaimed as all services healthy / no active outage by baseline.",
+    "Compact reasoning with max_tokens 1024 returned length four times; increasing to 3072 did not achieve quality or latency.",
+    "Event tool schema permits since_kst with lookback_minutes, but actual runtime refuses; 3 actual MCP errors reproduced.",
+    "Current systemd metrics are absent from production diagnostic fact projection; candidate preserves typed metrics but is not deployed."
+  ],
+  "next": [
+    "Align advertised, model grammar and runtime time argument contracts for all event/web read paths; retain dynamic time checks.",
+    "Validate exact requested time/device coverage before final completion; do not replace missing evidence with healthy claims.",
+    "Separate bounded read selection and investigation report budget; compare fresh requests without lowering judgment/evidence/approval gates."
+  ],
+  "live_final": {
+    "runtime_sources_verified": 13,
+    "model_config_unchanged": true,
+    "both_chat_workers_healthy": true,
+    "active_services": 4,
+    "management_runs_idle": true,
+    "failed_units": 0,
+    "normal_polls": 518,
+    "deferred_polls": 53,
+    "controller_new_failures": 0
+  },
+  "cleanup": {
+    "at_kst": "2026-11-06T19:12:55.821367+09:00",
+    "removed_files": 19,
+    "removed_bytes": 1622254,
+    "path_absent": true,
+    "server_worker_candidate_files_removed": 6,
+    "server_run_evidence_preserved": true
+  },
+  "public_chat_posts": 0,
+  "attacks_training_model_firewall_permission_changes": 0,
+  "git": {
+    "state": "pending publication"
+  }
+}

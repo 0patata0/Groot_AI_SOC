@@ -2,6 +2,8 @@
 
 현재 query1.19.77/common1.5.34는 [실제 채팅 조회 지연](infra/hermes/chat-read-latency.md)을 개선했다. 새 readonly lead의 모델 도구 선택·여러 대상 조회·시간 인자를 보완하고, 완전한 실제 영수증의 단순 조회는 공통 표로 출력한다. 실제 Hermes ABC상태49.923→20.877초, 짧은FW140.738→17.139초(각1회)다. 고유1,198검사PASS/skip0, 기존 source_bundle·단일deploy.sh 경로 사용·추가 패키지/포트/키0. 사건 판단·승인 경계는 유지하며 복합 조사30초·새 OS 전체 설치는 미완료다. 아래76/75/74 기록은 당시 범위다.
 
+복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했으며 운영77/34를 유지한다.
+
 **11/5 운영 반영:** DNS 지정 흐름·저장 전달과 NAT/IPv4 정리를 확정했습니다. 추가로 Wazuh HTTP→HTTPS 분기, 웹 요청/동시처리 제한, 차단 사유 카드와 FW IP/조건 표를 적용했습니다. [현재 결과·한계](STATUS.md) · [FW](infra/mcp/fw-consolidation.md) · [웹 보호](infra/validation/web-traffic/README.md) · [카드/조회 표](infra/mcp/containment-display.md). 공격 시험은 사용자 지시로 중단했으며 추가 PCAP 압축5종은 양Kali 보관/설명·SHA확인만 완료했습니다. 재개 후 실제 내부 Mattermost에서 카드1표·양봇 FW답변 각각4표를 확인했습니다. 새 짧은 FW 질문의 게시→최종 답변은 각1회 Hermes12.1초/Ollama14.0초이며 평균 성능 측정은 아닙니다.
 
 반복 `systemd failure` 중 예약 조사 잠금 충돌은 정상 연기로 수정했다. 실제 오류·직접 재조사 실패는 유지한다. 수정 후 약27분 정상82회·잠금대기21회·새 실패0을 확인했다. [원인·운영 검증](infra/hermes/controller-contention.md). 복합 최종 보고30초는 아직 미달이다.

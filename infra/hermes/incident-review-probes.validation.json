@@ -1,0 +1,378 @@
+{
+  "as_of_kst": "2026-11-06T15:44:08.155779+09:00",
+  "status": "compared_not_adopted",
+  "production_changed": false,
+  "model_api_calls": 18,
+  "historical_receipt_replays": true,
+  "new_mcp_calls": 0,
+  "chat_posts": 0,
+  "attack_tests": 0,
+  "runs": [
+    {
+      "variant": "ids-baseline",
+      "seconds": 6.120351135963574,
+      "input_message_bytes": 84842,
+      "prompt_tokens": 26999,
+      "cached_tokens": 25434,
+      "completion_tokens": 172,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [
+        "sample_zero_presented_as_absence"
+      ],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "ids-candidate",
+      "seconds": 27.323568413965404,
+      "input_message_bytes": 85269,
+      "prompt_tokens": 27098,
+      "cached_tokens": 0,
+      "completion_tokens": 58,
+      "valid_format": true,
+      "selected_calls": 1,
+      "selected_tools": [
+        "mcp__resp__list_blocks"
+      ],
+      "more_evidence": false,
+      "known_guard_violations": null,
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "ids-components",
+      "seconds": 9.160314437933266,
+      "input_message_bytes": 89857,
+      "prompt_tokens": 29155,
+      "cached_tokens": 25050,
+      "completion_tokens": 56,
+      "valid_format": true,
+      "selected_calls": 1,
+      "selected_tools": [
+        "mcp__resp__list_blocks"
+      ],
+      "more_evidence": false,
+      "known_guard_violations": null,
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "ids-prefix",
+      "seconds": 22.754681864986196,
+      "input_message_bytes": 80984,
+      "prompt_tokens": 26173,
+      "cached_tokens": 7355,
+      "completion_tokens": 200,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [],
+      "first_phase": {
+        "seconds": 3.1824347390793264,
+        "usage": {
+          "completion_tokens": 43,
+          "prompt_tokens": 9333,
+          "total_tokens": 9376,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 7355
+          }
+        },
+        "prefix_bytes": 39341,
+        "new_tool_calls": 0
+      },
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "ids-purpose",
+      "seconds": 31.238946472061798,
+      "input_message_bytes": 95632,
+      "prompt_tokens": 29170,
+      "cached_tokens": 0,
+      "completion_tokens": 118,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "ids-repair-baseline",
+      "seconds": 21.157489033183083,
+      "input_message_bytes": 47029,
+      "prompt_tokens": 18656,
+      "cached_tokens": 0,
+      "completion_tokens": 173,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "ids-repair-candidate",
+      "seconds": 12.876302698161453,
+      "input_message_bytes": 27990,
+      "prompt_tokens": 10145,
+      "cached_tokens": 0,
+      "completion_tokens": 173,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "ids-repair-facts-candidate",
+      "seconds": 13.844557041069493,
+      "input_message_bytes": 28152,
+      "prompt_tokens": 10200,
+      "cached_tokens": 0,
+      "completion_tokens": 220,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-baseline",
+      "seconds": 23.754692553076893,
+      "input_message_bytes": 82619,
+      "prompt_tokens": 23729,
+      "cached_tokens": 0,
+      "completion_tokens": 57,
+      "valid_format": true,
+      "selected_calls": 1,
+      "selected_tools": [
+        "mcp__resp__list_blocks"
+      ],
+      "more_evidence": false,
+      "known_guard_violations": null,
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-candidate",
+      "seconds": 25.60459339688532,
+      "input_message_bytes": 83046,
+      "prompt_tokens": 23826,
+      "cached_tokens": 0,
+      "completion_tokens": 128,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-components",
+      "seconds": 8.86297133890912,
+      "input_message_bytes": 88200,
+      "prompt_tokens": 26128,
+      "cached_tokens": 21778,
+      "completion_tokens": 158,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-prefix",
+      "seconds": 16.079731228994206,
+      "input_message_bytes": 78761,
+      "prompt_tokens": 22902,
+      "cached_tokens": 7355,
+      "completion_tokens": 58,
+      "valid_format": true,
+      "selected_calls": 1,
+      "selected_tools": [
+        "mcp__resp__list_blocks"
+      ],
+      "more_evidence": false,
+      "known_guard_violations": null,
+      "first_phase": {
+        "seconds": 9.808209741022438,
+        "usage": {
+          "completion_tokens": 41,
+          "prompt_tokens": 9403,
+          "total_tokens": 9444,
+          "completion_tokens_details": null,
+          "prompt_tokens_details": {
+            "audio_tokens": null,
+            "cached_tokens": 0
+          }
+        },
+        "prefix_bytes": 39341,
+        "new_tool_calls": 0
+      },
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-purpose",
+      "seconds": 29.491468742955476,
+      "input_message_bytes": 93409,
+      "prompt_tokens": 25902,
+      "cached_tokens": 0,
+      "completion_tokens": 251,
+      "valid_format": true,
+      "selected_calls": 2,
+      "selected_tools": [
+        "mcp__resp__list_blocks",
+        "mcp__security_events__search_web_access"
+      ],
+      "more_evidence": false,
+      "known_guard_violations": null,
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-repair-baseline",
+      "seconds": 17.613307249965146,
+      "input_message_bytes": 44858,
+      "prompt_tokens": 15384,
+      "cached_tokens": 0,
+      "completion_tokens": 164,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [
+        "web_snapshot_is_not_application_health"
+      ],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-repair-candidate",
+      "seconds": 10.35000132303685,
+      "input_message_bytes": 28078,
+      "prompt_tokens": 9697,
+      "cached_tokens": 0,
+      "completion_tokens": 55,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": true,
+      "known_guard_violations": [],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    },
+    {
+      "variant": "primary-repair-facts-candidate",
+      "seconds": 12.382210984127596,
+      "input_message_bytes": 28192,
+      "prompt_tokens": 9751,
+      "cached_tokens": 0,
+      "completion_tokens": 155,
+      "valid_format": true,
+      "selected_calls": 0,
+      "selected_tools": [],
+      "more_evidence": false,
+      "known_guard_violations": [],
+      "new_mcp_calls": 0,
+      "chat_posts": 0
+    }
+  ],
+  "assessment": {
+    "two_phase_prefix": {
+      "first_primary_total_seconds": 25.887940970016643,
+      "later_ids_total_seconds": 25.937116604065523,
+      "common_prefix_cached_tokens": 7355,
+      "final_quality_pass": false
+    },
+    "scope_only": "did not reliably remove duplicate reads; primary final failed health evidence check",
+    "purpose_field": "one non-specific unresolved IDS report; primary selected two already-completed reads",
+    "component_ledger": "primary report had unsupported service health and continuity failure, IDS still selected list_blocks",
+    "non_echo_literal_repair": "primary literal correction passed in 12.382s but next plan remained vague; IDS retained unqualified Vector health and failed guard in 13.845s",
+    "next": "correct subject/observation semantics and ensure concrete evidence-bound plans before production; keep 30s accurate final target until user changes it"
+  },
+  "limits": [
+    "not end-to-end investigation or Mattermost latency",
+    "two previously used development incidents, not independent holdout",
+    "cache hits and selected output differed; no causal speedup or SLA",
+    "existing semantic guards do not catch every unsupported claim"
+  ],
+  "report_preference_question_pending": true,
+  "cleanup": {
+    "at_kst": "2026-11-06T15:53:09.949514+09:00",
+    "status": "complete",
+    "local_files_removed": 25,
+    "local_bytes_removed": 1589030,
+    "temporary_directory_absent": true,
+    "remote_files_staged": 0,
+    "packages_installed": 0,
+    "retained": "local evidence, production databases/traces, previous recovery backups"
+  },
+  "git": {
+    "status": "pending",
+    "previous_commit": "00bb52ff970d7673f13405a13af9aa50725f9db9"
+  },
+  "final_live_verification": {
+    "at_kst": "2026-11-06T15:44:10.490684+09:00",
+    "final_health": {
+      "confirmed_at_epoch": 1793947450,
+      "files_verified": 17,
+      "protected_unchanged": 7,
+      "gate_sha256": "2509e829b866f66dcb67cb4a2c8490f899a4331bcea5f82f249d1100c90eba34",
+      "controller_sha256": "015579a85a6ee690b87db39b89ac8605f7ddd43559d9f1851baec72bd08a93f5",
+      "gate_matches_reference": true,
+      "ids_path_impact_enabled": true,
+      "gate_argument_bytes": 64565,
+      "health": {
+        "/opt/hermes-data/health/chat.json": {
+          "age_seconds": 17.85265827178955,
+          "connected": true,
+          "worker_alive": true
+        },
+        "/var/lib/capstone-ollama-trial/chat/health.json": {
+          "age_seconds": 9.852720022201538,
+          "connected": true,
+          "worker_alive": true
+        }
+      },
+      "services_active": 4,
+      "manual_rollback_tested": false,
+      "automatic_shared_status_required": 1,
+      "sensor_reads_required": 3
+    },
+    "queues_idle": 3,
+    "registered_reads": [
+      "collect_incident_evidence",
+      "get_wazuh_sca_checks",
+      "get_web_service_target",
+      "search_modsecurity_alerts",
+      "search_suricata_alerts",
+      "search_wazuh_alerts",
+      "search_web_access"
+    ]
+  }
+}

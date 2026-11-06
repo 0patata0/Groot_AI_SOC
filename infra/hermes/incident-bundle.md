@@ -39,4 +39,6 @@ query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 관리자231 경�
 
 B의 `/var/lib/capstone-bundle-integration/20261106-r1/deployment`는72→73, `20261106-r2/deployment`는73→74 백업/정확 manifest/원복 스크립트를 보존한다. 각각15분 독립 원복을 준비하고 상태 검증 후 확정했다. 확정 후 자동 원복 no-op은 확인했지만 실제 수동 원복은 실행하지 않았다. 되돌릴 때는 활성 작업이 없는지 확인하고 정확 manifest의 현재SHA를 확인한다. 이전 후보로 되돌리거나 여러 단계 원복하는 순서를 혼동하지 않는다.
 
+후속 [16개 재생 비교](incident-review-probes.md)는 별도 단위이며 신규 운영 변경은 없었다.
+
 정리·Git 게시 상태는 수치 원장과STATUS에 구분한다. 운영 DB·trace·복구본·모델은 정리 대상이 아니다.

@@ -12,7 +12,7 @@
 | 검사·설치 연결 |고유1,230PASS·skip0:482/244/391/43/70 |기존deploy.sh 복사·SHA·게이트65345B<65536. 새 의존성/포트/키0, 새 OS 전체 설치 미실행 |
 | 운영·복구 |관리자231경유 B16파일/보호8SHA·양봇WS/worker·3서비스active·Bfailed0 |최종82c 복구본 보존, 독립15분원복확정/timer비활성/no-op. 중간재연결ready false는 다시 관측해 확인, 추가 재시작으로 숨기지 않음 |
 | 실패·실측 한계 |구조화 생성3후보200.378/83.237/66.147초 모두 품질실패·미채택. 초기채팅Hermes79.947초 partial, Ollama7.399초 HTTP400 |각수정후새채팅으로검증. 단1회/공유GPU/질문표현차이이며평균·p95·SLA아님. 신규API표본문확인/데스크톱AX본문미노출로UI전수미검증 |
-| 정리·Git |서버 자체시험3,648파일56,167,515B와private실행8파일제거·부재확인 |DB/trace/prompt/terminal/채팅/복구보존. Mac자체임시52파일 정리/부재확인. 공개커밋/푸시마감중,아직게시완료로표시하지않음 |
+| 정리·Git |서버 자체시험3,648파일56,167,515B와private실행8파일제거·부재확인 |DB/trace/prompt/terminal/채팅/복구보존. Mac자체임시52파일 정리/부재확인. 공개20파일 `9a5eb37` 커밋·푸시/실원격main일치. 이 게시 영수증은 후속 커밋으로 관리 |
 
 [동작·실측·실패 후보·복구](infra/hermes/systemd-comparison.md) · [수치 원장](infra/hermes/systemd-comparison.validation.json) · [이전 무손실 입력](infra/hermes/event-input-view.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 모델/추론서버·학습·FW/TTL·MCP권한·승인정책 변경0. 단순 비교 성공으로 복합 원인/위험 조사60초나 전체 관제 완료를 선언하지 않는다.
 

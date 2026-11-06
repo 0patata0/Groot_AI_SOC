@@ -118,7 +118,10 @@
     "new_packages_ports_keys": 0
   },
   "git": {
-    "state": "pending_commit_and_push"
+    "source_commit": "9a5eb37175103893c66e2b22d60c9bb6c1d37d9b",
+    "remote_main_verified": "9a5eb37175103893c66e2b22d60c9bb6c1d37d9b",
+    "verified_at_kst": "2026-11-06T22:40:09.458386+09:00",
+    "receipt_document": "follow-up commit records this publication; final commit recorded locally"
   },
   "sdk_saved_receipts_independently_verified": true,
   "sdk_render_exact_receipt_match": true

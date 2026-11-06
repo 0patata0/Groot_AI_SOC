@@ -28,6 +28,31 @@ def fixture(target='a:modsecurity-custom'):
 
 
 class Grounding(unittest.TestCase):
+    def test_historical_failures_do_not_become_current_snapshot_only(self):
+        for q in ('오늘 systemd 오류랑 현재 상태 비교해줘. 설정은 바꾸지 마.',
+                  '금일 서버 에러와 지금 상태 대조해줘',
+                  'Vector가 아까 실패했는데 지금 괜찮아?',
+                  'systemd failure 또 나왔는데 현재는 어때?',
+                  '최근 1시간 Docker 오류 보여줘',
+                  'A/B/C 서버의 오늘 장애와 현재 상태 비교'):
+            with self.subTest(question=q):
+                self.assertTrue(harness.diagnostic_history_request(q))
+                self.assertIsNone(harness.diagnostic_request(q))
+                self.assertIsNone(harness.tool_scope(q))
+                self.assertFalse(harness.structured_read(q))
+                self.assertIsNone(harness.diagnostic_report(q,[],['a:systemd','b:systemd','c:systemd']))
+
+    def test_current_diagnostics_and_unrelated_rules_keep_fast_read_scope(self):
+        for q in ('지금 systemd 상태 보여줘', '현재 systemd failed unit 몇 개야?',
+                  '벡터 지금 살아 있나?', 'A/B/C 서버 실패한 서비스 오류 조회'):
+            with self.subTest(question=q):
+                self.assertFalse(harness.diagnostic_history_request(q))
+                self.assertEqual(harness.tool_scope(q),{'mcp__system_diagnostics__get_system_diagnostics'})
+                self.assertTrue(harness.structured_read(q))
+        for q in ('현재 FW 룰 보여줘','Wazuh 상관분석 룰 조건 조회'):
+            self.assertFalse(harness.diagnostic_history_request(q))
+            self.assertTrue(harness.structured_read(q))
+
     def detail_fixture(self, content='<group name="test"><rule id="42" level="0"><description>base &amp; test | detail</description></rule></group>'):
         call=fixture('b:wazuh-local-rules');data=json.loads(call['result']);data['content']=content
         data['sha256']=hashlib.sha256(content.encode()).hexdigest();data['rule_inventory'].update(ids=[42],source_sha256=data['sha256'])

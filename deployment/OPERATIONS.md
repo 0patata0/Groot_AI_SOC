@@ -1,6 +1,6 @@
 # SOC 운영 절차
 
-현재 query1.19.79/common1.5.35·security-events1.3.2는 [채팅 조회 범위·입력 규격](../infra/hermes/chat-read-scope.md)을 보완했다. Native 최종 요청의 시간 제약을 복원하고, 근거 없는 초기 ID/IP 필터를 제한하며 ‘오늘’을 KST 당일로 연결한다. Wazuh는 `program_name=systemd` 정확 검색을 지원한다. 고유1,287회귀PASS·skip0, 운영15파일/보호8SHA와 실제 MCP 조회를 확인했다. 복합 실제 채팅은95.209초이고 대상 누락·호스트 오인·건강 과장으로 품질 실패다. 사용자가 조정한60초 안팎의 목표도 아직 미달이다. 단일deploy.sh·기존 source_bundle 복사 경로를 사용하며 추가 패키지/포트/키/권한은 없다. 새 OS 전체 설치는 미실행이며 아래 버전별 기록은 당시 범위다.
+현재 query1.19.80/common1.5.36·security-events1.3.2는 [보고 검사·복합 요청 분류](../infra/hermes/chat-report-guard.md)를 보완했다. 부정문 오검출로 인한 불필요 재작성과 과거 오류 질문의 현재 진단만 조회하는 문제를 수정했다. 이번 고유1,215회귀PASS·skip0, 운영16파일/보호8SHA·review5/SDK20 설치 영수증을 확인했다. 실제63.050초 답변은 과거 경보 누락으로 실패였으며, 분류 수정 후 재시험143.304초도 모델 판단 정정 실패로 근거 표만 반환했다(partial). 정확한 복합 응답60초 목표는 미완료다. 단일deploy.sh 기존 canonical 복사 경로를 유지하고 패키지/포트/키/권한을 추가하지 않았다. 새 OS 전체 설치는 미실행이며 아래 버전별 기록은 당시 범위다.
 
 11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.
 

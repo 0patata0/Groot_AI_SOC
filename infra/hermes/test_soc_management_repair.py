@@ -302,6 +302,26 @@ class SnapshotHealth(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(m.web_evidence_violations(text,facts),[])
 
+    def test_negative_proof_report_finishes_without_an_extra_model_turn(self):
+        from unittest.mock import Mock
+        facts=[{'kind':'diagnostics','target':'b:systemd','metrics':{'failed_units_total':0},
+                'lookback_scope':'latest_snapshot_only_not_requested_history'}]
+        text=('현재 로드된 실패 유닛은 0개입니다. 전체 서비스 정상 상태를 증명하는 것이 아닙니다.\n'
+              '개별 서비스 영향은 미확인입니다.\nMANAGEMENT_STATUS: needs_review')
+        original=Mock(return_value='native_final');append=Mock();reanchor=Mock(return_value=0)
+        wrapped=m.grounding_wrapper(original,types.SimpleNamespace(),append,reanchor,
+                                    ['get_system_diagnostics'],facts=facts)
+        agent=Agent();agent.tools=[];agent.max_iterations=8
+        kw={'assistant_message':types.SimpleNamespace(content=text,tool_calls=None),
+            'messages':[{'role':'user','content':'지금 상태를 보고해줘'}],
+            'user_message':'지금 상태를 보고해줘','api_call_count':3,
+            'codex_ack_continuations':0,'finish_reason':'stop'}
+        with patch.dict(os.environ,{'CAPSTONE_MANAGEMENT_MODE':'verify'},clear=True):
+            self.assertEqual(wrapped(agent,**kw),'native_final')
+        original.assert_called_once_with(agent,**kw)
+        append.assert_not_called();reanchor.assert_not_called()
+        self.assertFalse(hasattr(agent,'_capstone_review_feedback'))
+
     def test_actual_backend_health_claim_requires_application_evidence(self):
         facts=[{'kind':'web_service','target':'c:dvwa','application_health_verified':False}]
         claim='사건 이후 10시간 이상 지난 시점에도 ModSecurity 및 Suricata에서 추가적인 공격 탐지가 관찰되지 않고 백엔드 서비스도 정상 동작 중입니다.'

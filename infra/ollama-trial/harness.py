@@ -757,6 +757,7 @@ def inventory_question(question):
 
 
 def structured_read(question):
+    if diagnostic_history_request(question): return False
     return bool(security_inventory_request(question) or firewall_request(question) or rule_detail_request(question) or read_plan(question) or combined_rule_request(question) or inventory_question(question) or
                 tool_scope(question) in ({'mcp__rule_a__get_service_action_target'}, {'mcp__system_diagnostics__get_system_diagnostics'}))
 
@@ -1768,9 +1769,23 @@ def guidance(question, *, include_workflows=True):
     return result
 
 
+def diagnostic_history_request(question):
+    """Historical failures need event evidence, not only a current snapshot."""
+    text = READ.scope_text(normalized(question))
+    if not re.search(r'systemd|\.service\b|서비스|서버|호스트|Vector|벡터|Docker|도커|Hermes|헤르메스|Ollama|올라마|인덱서|Indexer|Mattermost|매터모스트|파이프라인|수집기', text, re.I):
+        return False
+    if re.search(r'룰|규칙|rules?', text, re.I): return False
+    if re.search(r'경보|반복|이력|과거|당시|어제|그제|지난|원인|왜|조사|장애인지', text):
+        return True
+    failure = re.search(r'오류|에러|실패|장애|고장|\b(?:failure|failed|error)\b', text, re.I)
+    period = re.search(r'오늘|금일|최근|이전|아까|방금|계속|또|비교|대조|\d+\s*(?:시간|분|일)\s*(?:전|동안|간)|\d{1,2}:\d{2}', text)
+    return bool(failure and period)
+
+
 def diagnostic_request(question):
     text = READ.scope_text(normalized(question))
     if READ.wants_write(text): return None
+    if diagnostic_history_request(question): return None
     if request_kind(question) != 'other': return None
     if ids_runtime_question(question): return None  # Preserve the existing engine/load proof path.
     if re.search(r'무슨\s*뜻|뜻이|개념|일반적으로|사용법|설명만|번역|동작\s*원리|작동\s*원리|도구\s*없이|조회하지',text): return None
@@ -1848,6 +1863,8 @@ def diagnostic_observations(calls):
 
 def tool_scope(question, calls=None):
     """Same kind of read-turn narrowing as Hermes; does not invoke any tool."""
+    if diagnostic_history_request(question):
+        return None  # Keep event/history tools available for mixed inquiries.
     if EVIDENCE.incident_investigation_request(normalized(question)):
         return None  # Investigation can require multiple kinds of evidence.
     if scope_notice(question): return set()

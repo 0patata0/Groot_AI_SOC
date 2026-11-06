@@ -30,7 +30,8 @@ def lookup_read_scope(harness, current, phase):
     """
     if phase != 'lead' or not getattr(harness, 'structured_read', lambda _: False)(current):
         return None
-    if re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지',current):
+    if (re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지',current)
+            or getattr(harness, 'diagnostic_history_request', lambda _: False)(current)):
         return None  # Mixed historical/current inquiry is not a plain inventory.
     # Workers run with python -I, which deliberately excludes the script's
     # directory from sys.path. Load only the root-owned sibling explicitly.
@@ -48,7 +49,8 @@ def lookup_read_scope(harness, current, phase):
 
 def diagnostic_read_targets(harness, current):
     """Only a resolved, bounded service diagnostic; broad investigations stay native."""
-    if re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지',current):return []
+    if (re.search(r'경보|반복|이력|과거|당시|어제|지난|원인|왜|조사|장애인지',current)
+            or getattr(harness, 'diagnostic_history_request', lambda _: False)(current)):return []
     request = getattr(harness, 'diagnostic_request', lambda _: None)(current)
     return (request.get('requested', []) if request and not request.get('all')
             and not request.get('unresolved') else [])

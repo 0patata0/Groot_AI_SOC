@@ -42,9 +42,9 @@ class ShortContext(unittest.TestCase):
         self.assertEqual(h.native_scope_history(h.SHARED._CONTEXT_PREFIX+'[]"]\n\n룰 조회'),[])
 
     def test_short_systemd_and_known_unit_questions(self):
-        for q,targets in (('systemd failure 왜 떠?',['a:systemd','b:systemd','c:systemd']),
+        for q,targets in (('지금 systemd 실패 목록?',['a:systemd','b:systemd','c:systemd']),
                           ('B 서버 systemd 오류?',['b:systemd']),
-                          ('벡터 왜 죽었어?',['a:vector']),
+                          ('벡터 현재 상태?',['a:vector']),
                           ('A 서버 capstone-vector.service 상태?',['a:vector']),
                           ('B 서버 wazuh-agent.service 오류?',['b:wazuh-agent'])):
             with self.subTest(q=q):
@@ -53,6 +53,11 @@ class ShortContext(unittest.TestCase):
         for q in ('systemd failure 무슨 뜻이야?', 'systemd 상태 도구 없이 설명만 해줘',
                   'A 서버 Vector 재시작해줘'):
             self.assertIsNone(h.diagnostic_request(q))
+        for q in ('systemd failure 왜 떠?', '벡터 왜 죽었어?'):
+            # A cause question cannot be completed from the current snapshot.
+            self.assertIsNone(h.diagnostic_request(q))
+            self.assertIsNone(h.tool_scope(q))
+            self.assertFalse(h.structured_read(q))
 
     def test_current_failed_zero_does_not_claim_historical_cause_resolved(self):
         row={'status':'ok','kind':'runtime','metrics':{'failed_units_total':0,'returned_units':0,'unit_list_truncated':False},

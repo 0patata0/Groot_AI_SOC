@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "versions": {
+    "query": "1.19.80",
+    "common": "1.5.36",
+    "security_events": "1.3.2"
+  },
+  "tests": {
+    "native": 476,
+    "sdk": 235,
+    "query": 391,
+    "installer": 43,
+    "review": 70,
+    "total_unique_pass": 1215,
+    "skipped": 0,
+    "unchanged_mcp_82_from_prior_79_not_repeated": true
+  },
+  "chat_before_history_fix": {
+    "e2e_seconds": 63.05,
+    "progress_seconds": 0.455,
+    "sample_size": 1,
+    "quality_pass": false,
+    "issues": [
+      "historical_failure_request_restricted_to_current_diagnostics",
+      "native_needs_review_replaced_by_snapshot_table"
+    ],
+    "native_seconds": 61.36724983295426,
+    "worker_seconds": 62.53879140992649,
+    "mcp_milliseconds": [
+      1032,
+      10,
+      652,
+      660
+    ]
+  },
+  "chat_after_history_fix": {
+    "e2e_seconds": 143.304,
+    "progress_seconds": 0.092,
+    "native_seconds": 142.23141364590265,
+    "worker_seconds": 143.1754398487974,
+    "mcp_milliseconds": [
+      64,
+      944,
+      10,
+      441
+    ],
+    "first_selection_seconds": 13.414645,
+    "status": "partial",
+    "management_state": "needs_review",
+    "quality_pass": false,
+    "historical_and_current_reads_complete": true,
+    "issues": [
+      "unverified_health_recovery_and_collector_host_claims_before_guard",
+      "report_repair_did_not_produce_valid_judgment",
+      "factual_fallback_not_a_completed_investigation"
+    ],
+    "sample_size": 1,
+    "ui_render_retested": false
+  },
+  "private_candidates": [
+    {
+      "id": "r1",
+      "seconds": 171.417562976,
+      "quality_pass": false,
+      "issue": "claim_errors_and_unnecessary_inquiry"
+    },
+    {
+      "id": "r2",
+      "seconds": 48.9031562458,
+      "quality_pass": false,
+      "issue": "unverified_server_health_claim"
+    },
+    {
+      "id": "r3",
+      "seconds": 45.3390548169,
+      "quality_pass": false,
+      "issue": "event_label_and_next_step_target_capability_errors"
+    },
+    {
+      "id": "r4",
+      "seconds": 210.1047877089586,
+      "quality_pass": false,
+      "issue": "low_reasoning_report_length_retries_and_budget_exit",
+      "exit_code": 124
+    }
+  ],
+  "private_candidate_adopted": false,
+  "production_inference_profile_changed": false,
+  "deployments": [
+    {
+      "applied": true,
+      "at_kst": "2026-11-06T20:54:04.127383+09:00",
+      "changed_files": 10,
+      "verified_files": 15,
+      "protected": 8,
+      "gate_bytes": 65138,
+      "backup": "/var/lib/capstone-chat-report/20261106-deploy80",
+      "idle": {
+        "idle": true,
+        "active_leases": 0,
+        "heartbeat_age_seconds": 35.847
+      }
+    },
+    {
+      "applied": true,
+      "at_kst": "2026-11-06T21:07:01.389980+09:00",
+      "changed_files": 7,
+      "verified_files": 16,
+      "protected": 8,
+      "gate_bytes": 65138,
+      "backup": "/var/lib/capstone-chat-report/20261106-deploy80b",
+      "idle": {
+        "idle": true,
+        "active_leases": 0,
+        "heartbeat_age_seconds": 25.548
+      }
+    }
+  ],
+  "confirmations": [
+    {
+      "confirmed": true,
+      "rollback": "confirmed_noop",
+      "timer": "inactive",
+      "at_epoch": 1793966225.2777162
+    },
+    {
+      "confirmed": true,
+      "rollback": "confirmed_noop",
+      "timer": "inactive",
+      "at_epoch": 1793966955.4574008
+    }
+  ],
+  "receipt_checks": {
+    "/etc/capstone-review-chat/receipt.json": {
+      "checked": 5,
+      "mismatches": []
+    },
+    "/etc/capstone-ollama-trial/receipt.json": {
+      "checked": 20,
+      "mismatches": []
+    }
+  },
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "a25edc601c2186030804915438fd1d50c154b254eec8d8b114854074d8575cd8",
+    "infra/hermes/chat_contract.py": "22c779b27c9fe1f6e9296c472e0d756474cc9a74a09592f74f58342158b20fac",
+    "infra/hermes/query-completion/__init__.py": "fede0501be81c9d598cab922710297617d7203b6611ef9940f36dedb56c021fb",
+    "infra/hermes/query-completion/plugin.yaml": "024ed32ef157c32a940ff7656d6bbd5a6c486611a686a61697972a9ee1de7927",
+    "infra/hermes/review_channel_worker.py": "92cf5fdbe0d8625444eec4a22431f8972c00403ccb388847d224344bd2855854",
+    "infra/hermes/test_observation_scope.py": "bd9edc2b475afe71a13db046a1975b780e1c515d2ef63bc77f8bb7cc7be7ee81",
+    "infra/hermes/test_soc_management_repair.py": "d37d11cd0e4ddeba3a821f08d376fca838b2a02f74c4ebc63cee97037fc005f0",
+    "infra/hermes/test_review_channel.py": "a513f1068305c5db1baefacd221979e55c1fa3e5986f392aa978c8a421228c1a",
+    "infra/ollama-trial/harness.py": "4134f8f8eb6b1a050480dc16ca19c7d000b12d9000944d0eaf140b7130d4b3e7",
+    "infra/ollama-trial/test_harness.py": "e3167b6732210abc9279975178922d745d9684d8ccbb834e3edeeaba7abfcc1a",
+    "infra/ollama-trial/test_short_context.py": "73871f5806c5c5aa6679b7d68f8cf68a8cf8f678e70d07bfa14ab109539d4902"
+  },
+  "cleanup": {
+    "server_candidate_files": 8,
+    "server_fixture_files": 2265,
+    "server_bytes": 35946985,
+    "runtime_db_trace_backups_preserved": true,
+    "mac_pending": false,
+    "mac_files": 35,
+    "mac_bytes": 9533149,
+    "mac_removed_verified": true
+  },
+  "new_os_full_install_test": false,
+  "actual_attack_test": false,
+  "publication": {
+    "status": "pending"
+  },
+  "final_health": {
+    "at_kst": "2026-11-06T21:14:12.682321+09:00",
+    "verified_files": 16,
+    "protected": 8,
+    "health": {
+      "hermes": {
+        "checked_at": 1793967239,
+        "websocket_connected": true,
+        "worker_alive": true,
+        "pid": 158
+      },
+      "ollama": {
+        "checked_at": 1793967247,
+        "websocket_connected": true,
+        "worker_alive": true,
+        "pid": 2977303
+      }
+    },
+    "live_probe": "groot-query-completion:1.19.80 soc-chat-contract:1.5.36",
+    "gate_bytes": 65138,
+    "services": "active\nactive\nactive\nactive\n",
+    "failed_units": "",
+    "at_epoch": 1793967252.593352,
+    "queues": {
+      "review": 0,
+      "ollama": 0
+    },
+    "trial_units": {
+      "capstone-chat-report-r1.service": "inactive",
+      "capstone-chat-report-r2.service": "inactive",
+      "capstone-chat-report-r3.service": "inactive",
+      "capstone-chat-report-r4.service": "inactive"
+    },
+    "timer": "inactive"
+  }
+}

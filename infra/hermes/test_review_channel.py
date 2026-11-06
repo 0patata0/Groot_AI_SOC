@@ -607,6 +607,16 @@ assert w.lookup_read_scope(h,'침해 사건 조사해줘','lead') is None
             capture_output=True,text=True,timeout=20)
         self.assertEqual(result.returncode,0,result.stderr)
 
+    def test_mixed_failure_comparison_retains_historical_tool_catalog(self):
+        h=self.actual_harness()
+        for q in ('오늘 systemd 오류랑 현재 상태 비교해줘. 설정은 바꾸지 마.',
+                  '금일 서버 에러와 지금 상태 대조해줘',
+                  'Vector가 아까 실패했는데 지금 괜찮아?'):
+            with self.subTest(question=q):
+                self.assertEqual(w.diagnostic_read_targets(h,q),[])
+                self.assertIsNone(w.lookup_read_scope(h,q,'lead'))
+                self.assertIsNone(w.diagnostic_literal(h,q,[],['a:systemd']))
+
     def test_correlation_rule_definition_is_reader_work_not_an_incident(self):
         h=self.actual_harness()
         for q in ('Wazuh 상관분석 룰 조건 조회','Wazuh 상관분석 규칙 보여줘'):

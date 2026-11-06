@@ -1054,9 +1054,15 @@ def snapshot_health_violations(text, facts):
         and re.fullmatch(r'[abc]:[a-z0-9][a-z0-9_.-]{0,63}',str(f.get('target','')))}
     if not web and not targets:return []
     issues=set()
-    for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
+    for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱|서버|호스트|systemd)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
         before=re.split(r'[.!?;|\n]',text[max(0,match.start()-80):match.start()])[-1]
-        after=text[match.end():match.end()+35]
+        after=text[match.end():match.end()+64]
+        # Only a directly attached negative predicate can qualify this claim.
+        # A disclaimer elsewhere must not excuse a separate positive claim.
+        if re.match(r'\s*(?:상태\s*)?(?:임을|이라는\s*것을|인\s*것을|을|를)?\s*'
+                r'(?:증명|입증|보장|의미|뜻)(?:하는|한)\s*(?:것이|것은|건)\s*'
+                r'(?:아닙니다|아니며|아님|아니다)(?=\s|[.,;!?|*`]|$)',after):continue
+        if re.match(r'\s*(?:상태|판정|증거|근거)\s*(?:이|가|은|는)?\s*(?:아닙니다|아니며|아님|아니다)(?=\s|[.,;!?|*`]|$)',after):continue
         if re.match(r'\s*(?:(?:이|은|는)?\s*아(?:니|님|닙)|(?:적)?이지\s*않|하지\s*않)',after):continue
         if re.search(r'(?:미확인|확인\s*불가|단정.{0,5}않)\s*[:：]?\s*$',before):continue
         if re.match(r'(?:\s|[/*`])*(?:화\s*)?(?:비정상\s*)?(?:미확인|아님|아닙|여부|인지|판단.{0,5}(?:없|못)|증명.{0,5}않)',after):continue
@@ -1070,6 +1076,16 @@ def snapshot_health_violations(text, facts):
             for target in targets for name in (target,target.split(':',1)[1]))
         issues.add('diagnostic_snapshot_is_not_functional_health' if targets and not named_web and
             (named_diagnostic or not web) else 'web_snapshot_is_not_application_health')
+    # An empty current failed-unit list is not a service lifecycle receipt.
+    snapshots=[f for f in facts if f.get('kind')=='diagnostics']
+    if snapshots and all(f.get('lookback_scope')=='latest_snapshot_only_not_requested_history'
+                         for f in snapshots) and not any(f.get('kind') in ('service','runtime','proposal_status') for f in facts):
+        for claim in re.finditer(r'(?:복구|재기동|재시작)(?:되었|됐|된|완료|성공|했)',text):
+            before=re.split(r'[.!?;|\n]',text[max(0,claim.start()-100):claim.start()])[-1]
+            after=text[claim.end():claim.end()+40]
+            if not re.search(r'서비스|systemd|호스트|failed|unit',before,re.I):continue
+            if re.match(r'\s*(?:것|상태|여부)(?:인지(?:는)?|이|은|는|가)?\s*(?:미확인|아닙|아님|아니|확인되지)',after):continue
+            issues.add('diagnostic_snapshot_is_not_functional_health')
     return sorted(issues)
 
 
@@ -1188,6 +1204,10 @@ def evidence_claim_violations(text, facts, successful_reads=None):
                   (x.get('kind') == 'diagnostics' and x.get('requested_window_total_count') is None) or
                   (x.get('kind') == 'web_access' and x.get('actual_request_total_count') is None) for x in facts)
     if unknown:
+        # Explicit "window total 10" is still a total claim without a unit.
+        for match in re.finditer(r'구간\s*전체\s*[:=]?\s*[0-9][0-9,]*(?:\s*건)?',text):
+            if not re.match(r'\s*(?:인지|이라고|라고)?\s*(?:미확인|단정.{0,8}(?:않|없)|확인.{0,5}못)',text[match.end():match.end()+25]):
+                issues.add('unknown_window_total_claimed')
         for match in re.finditer(r'(?:총|전체)\s*[0-9][0-9,]*\s*건', text):
             before = text[max(0, match.start() - 25):match.start()]
             after = text[match.end():match.end() + 25]
@@ -2925,7 +2945,6 @@ def management_read_request(request, agent, *, pending=False):
     schema={'type':'object','additionalProperties':False,'required':['request_nonce','calls'],
         'properties':{'request_nonce':{'type':'string','const':nonce},'calls':{
             'type':'array','minItems':1,'maxItems':4 if chat else len(tools),'uniqueItems':True,'items':{'anyOf':branches}}}}
-    # Fail closed before sending a schema if the existing validator is absent.
     from jsonschema import Draft202012Validator
     Draft202012Validator.check_schema(schema)
     result=copy.deepcopy(request)
@@ -2939,8 +2958,6 @@ def management_read_request(request, agent, *, pending=False):
     result['response_format']={'type':'json_schema','json_schema':{
         'name':'soc_management_pending_reads','strict':True,'schema':schema}}
     if chat and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
-        # Select real reads before drafting an answer. Native dispatch, audit,
-        # subsequent reasoning and all evidence checks remain unchanged.
         result['max_tokens']=1024;result.pop('max_completion_tokens',None)
         result['messages']=[{'role':'system','content':
             '너는 Hermes SOC 관제 주체의 읽기 선택 단계다. 현재 사용자 요청에 필요한 등록 도구와 정확 인자를 직접 선택한다. '
@@ -3182,16 +3199,11 @@ def management_report_request(request, agent, snapshot):
     citations=sorted(set(reads))
     if compact:
         fields['basis']['maxLength']=240
-        # The report already requires every successful receipt/table citation.
-        # Encode that invariant directly; do not ask the model to permute a set
-        # and spend another inference round repairing duplicates/omissions.
         fields['evidence_indexes']={'type':'array','const':list(range(len(citations)))}
         del fields['evidence_tools']
         for k in ('limitations','next_steps'):
             fields[k]['maxItems']=1;fields[k]['items']['maxLength']=240
         report['required']=list(fields)
-        # Use the same read-or-report choice in one provider round. A separate
-        # "more evidence" response only paid another prefill to select tools.
     feedback=getattr(agent,'_capstone_review_feedback',None)
     feedback=(copy.deepcopy(feedback) if isinstance(feedback,dict) and set(feedback)=={
         'turn','issues','facts_sha256','prior_status','prior_assessment','untrusted_prior_prose'}
@@ -3203,8 +3215,6 @@ def management_report_request(request, agent, snapshot):
         and feedback['prior_status'] in ('needs_review','monitor') and set(feedback['issues']) <=
         LITERAL_REPAIR_ISSUES|{'web_snapshot_is_not_application_health','observed_redetection_reported_unknown'})
     if repair:
-        # A narrowly bound correction does not promote the risk/status label.
-        # More evidence remains an explicit escape to the complete read catalog.
         fields['assessment']={'const':'unresolved'};fields['status']={'const':feedback['prior_status']}
         schema={'anyOf':[
             {'type':'object','additionalProperties':False,'required':['request_nonce','more_evidence','report'],
@@ -3219,9 +3229,6 @@ def management_report_request(request, agent, snapshot):
     definitions=None
     if not branches and not repair and not inquiry:schema['anyOf'].pop(0)
     if compact and not repair and branches:
-        # Keep every registered argument schema. Put the invariant catalog before
-        # changing receipts/nonces so subsequent reads can reuse a stable prefix.
-        # The provider and response validator still receive one complete schema.
         definitions={'registered_read_call':{'anyOf':branches}}
         read_branch=schema if inquiry else schema['anyOf'][0]
         read_branch['properties']['calls']['items']={'$ref':'#/$defs/registered_read_call'}
@@ -3251,8 +3258,6 @@ def management_report_request(request, agent, snapshot):
             try:value=json.loads(raw,object_pairs_hook=unique,parse_constant=lambda x:(_ for _ in ()).throw(ValueError('nonfinite')))
             except (ValueError,TypeError):value=raw
             if isinstance(value,dict) and set(value)=={'result'} and isinstance(value['result'],str):
-                # The transport returns JSON inside a JSON string. Decode just
-                # that envelope; retain every inner value and mark the view.
                 try:
                     inner=json.loads(value['result'],object_pairs_hook=unique,
                         parse_constant=lambda x:(_ for _ in ()).throw(ValueError('nonfinite')))
@@ -3261,9 +3266,6 @@ def management_report_request(request, agent, snapshot):
                             'original_result_sha256':hashlib.sha256(value['result'].encode()).hexdigest()}
                 except (ValueError,TypeError):pass
             packed.append({**r,'output':value})
-        # Preserve full requests unless the authenticated root supplies the exact
-        # operator request, case identity and evidence completeness separately.
-        # Only this API copy changes; original history/audit remains intact.
         users=[copy.deepcopy(r) for r in request['messages'] if isinstance(r,dict) and r.get('role')=='user']
         context=compact_controller_context()
         if context is not None:

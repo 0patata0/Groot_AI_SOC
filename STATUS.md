@@ -12,7 +12,7 @@
 | 교차검토 | Ollama83.749초/상태 해석 거절, Hermes215.168초/미완료 | 첫 응답과 별도 worker 시간. 합의/정확성 성공으로 표시하지 않음 |
 | 필수 근거 | Native현재·11/6이력2읽기/SHA/target/unit/기간/완료당시신선도/쓰기0 독립확인 | 과거20표본/has_more·상세원인미확인. 프로세스 상태≠기능 정상/사건 종결 |
 | 검증·운영 | 고유1,232PASS/skip0·18SHA/보호8/SDK20sources·정지중DB/설정 보존·양WS/worker·3서비스active·Bfailed0·원복확정 | 새OS 전체설치·실제공격/부하·UI전수·평균/p95 미시험. gate64,110B/상한65,536 유지 |
-| 정리·Git | 자체 서버 시험본459파일 제거/부재확인, 운영DB/원문/trace/채팅/복구 보존 | Mac 자체 임시33파일 12,836,128B 제거/부재확인. 소스 커밋/푸시 마감 중. 게시 영수증은 후속 커밋으로 기록 |
+| 정리·Git | 자체 서버 시험본459파일 제거/부재확인, 운영DB/원문/trace/채팅/복구 보존 | Mac 자체 임시33파일 12,836,128B 제거/부재확인. 공개20파일 `4554c1c` 커밋·푸시/실원격main 일치. 게시 영수증은 후속 커밋으로 기록 |
 
 [수정·실측·복구](infra/hermes/diagnostic-navigation.md) · [수치 원장](infra/hermes/diagnostic-navigation.validation.json) · [단순 비교](infra/hermes/systemd-comparison.md) · [반복 systemd 수정](infra/hermes/controller-contention.md). 복구본 `/var/lib/capstone-service-semantics/20261107-gate89` 및 이전87/88/86 보존. 종료값 검증 오탐이 이전partial에 기여한 정정도 기록했다.
 

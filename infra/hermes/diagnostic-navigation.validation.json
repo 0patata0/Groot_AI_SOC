@@ -343,6 +343,11 @@
     "operational_db_logs_receipts_traces_backups_preserved": true
   },
   "git": {
-    "status": "pending_source_commit_push"
+    "source_commit": "4554c1c9b7ad0024b359e9635378b5c9c4aabb41",
+    "remote_main_at_source_publication": "4554c1c9b7ad0024b359e9635378b5c9c4aabb41",
+    "verified_at_kst": "2026-11-07T00:42:55.018831+09:00",
+    "public_files": 20,
+    "publication_receipt": "recorded in subsequent documentation commit; final commit recorded locally",
+    "unrelated_staged_diff_sha256": "b42486655e2b12c1ba0e2e94866ec28aa27eb6a49269de5b6fdb2fce938f9aeb"
   }
 }

@@ -308,6 +308,11 @@
   "public_chat_posts": 0,
   "attacks_training_model_firewall_permission_changes": 0,
   "git": {
-    "state": "pending publication"
+    "state": "evidence commit pushed and remote verified; receipt recorded for follow-up commit",
+    "evidence_commit": "c29ec44d4a05f0fa491efd00c0e246c830cd04c2",
+    "remote_main_at_publication": "c29ec44d4a05f0fa491efd00c0e246c830cd04c2",
+    "publication_at_kst": "2026-11-06T19:13:37.988821+09:00",
+    "public_paths": 5,
+    "unrelated_staged_work_preserved": true
   }
 }

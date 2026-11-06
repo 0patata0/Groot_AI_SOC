@@ -878,12 +878,8 @@ def rule_edit_anchors(data):
 
 
 def model_view(server, name, raw):
-    if server == 'security-events' and name == 'collect_incident_evidence':
-        return EVIDENCE.incident_bundle_view(raw)
-    if server == 'security-events' and name == 'search_web_access':
-        return EVIDENCE.web_evidence_view(raw)
-    if server in ('rule-a', 'rule-b', 'rule-write-a', 'rule-write-b') and name in ('get_operation_status', 'temporarily_contain_ip'):
-        return EVIDENCE.operation_time_view(raw)
+    shown = EVIDENCE.receipt_model_view('mcp__'+server.replace('-', '_')+'__'+name, raw)
+    if shown != raw: return shown
     if server in ('rule-a', 'rule-b') and name == 'get_rule_change_target':
         try:
             data = json.loads(raw)

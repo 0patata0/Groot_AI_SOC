@@ -1,0 +1,134 @@
+{
+  "versions": {
+    "query": "1.19.81",
+    "common": "1.5.37",
+    "security_events": "1.3.2"
+  },
+  "tests": {
+    "native": 482,
+    "sdk": 235,
+    "query": 391,
+    "installer": 43,
+    "review": 70,
+    "total_unique_pass": 1221,
+    "skipped": 0
+  },
+  "input": [
+    {
+      "tool": "mcp__security_events__search_wazuh_alerts",
+      "original_bytes": 26666,
+      "projected_bytes": 5504,
+      "row_count": 50,
+      "exact_roundtrip": true,
+      "original_sha256": "e22728ca1daec366e7337dedf5e6fb578182498452d0295c76c6f1c2489e2694",
+      "view_sha256": "ff9756af88eba0261b1c5deff32eb49c12ac7204cd209b93f7a9a1c077e90345"
+    }
+  ],
+  "private_trial": {
+    "seconds": 71.76266726502217,
+    "chat_e2e": false,
+    "quality_pass": false,
+    "issues": [
+      "missing_management_status_repair",
+      "unsupported_detectiononly_claim_for_systemd",
+      "unverified_collector_to_host_mapping",
+      "only_b_current_snapshot"
+    ]
+  },
+  "deployment": {
+    "applied": true,
+    "verified_files": 16,
+    "changed_files": 13,
+    "gate_bytes": 65266,
+    "protected": 8,
+    "backup": "/var/lib/capstone-event-view/20261106-deploy81",
+    "idle": {
+      "idle": true,
+      "active_leases": 0,
+      "heartbeat_age_seconds": 25.36
+    },
+    "queues": {
+      "review": 0,
+      "ollama": 0
+    },
+    "at_kst": "2026-11-06T21:35:02.219157+09:00"
+  },
+  "actual_chat": {
+    "source_id": "touja55orbbh9cdxqanbnborme",
+    "reply_id": "hs9quzobk38otrea8dm6ocb1nw",
+    "e2e_seconds": 126.313,
+    "progress_seconds": 0.117,
+    "native_seconds": 125.48605983285233,
+    "worker_seconds": 126.1642675739713,
+    "status": "partial",
+    "management_state": "needs_review",
+    "run_id": "84298cf657c36cbfcc53e07ecbb99229",
+    "quality_pass": false,
+    "issues": [
+      "collector_host_misattribution_before_guard",
+      "snapshot_health_recovery_claim_repair_failed",
+      "factual_fallback_not_completed_analysis"
+    ],
+    "actual_calls": [
+      {
+        "tool": "mcp__security_events__search_wazuh_alerts",
+        "bytes": 6271,
+        "model_bytes": 2589,
+        "mcp_ms": 49
+      },
+      {
+        "tool": "mcp__system_diagnostics__get_system_diagnostics",
+        "bytes": 662,
+        "model_bytes": 662,
+        "mcp_ms": 1509
+      },
+      {
+        "tool": "mcp__system_diagnostics__get_system_diagnostics",
+        "bytes": 662,
+        "model_bytes": 662,
+        "mcp_ms": 12
+      },
+      {
+        "tool": "mcp__system_diagnostics__get_system_diagnostics",
+        "bytes": 662,
+        "model_bytes": 662,
+        "mcp_ms": 1107
+      }
+    ],
+    "first_selection_seconds": 13.883675,
+    "sample_size": 1,
+    "ui_render_verified": false,
+    "pure_performance_ab": false,
+    "wazuh_rows": 10
+  },
+  "models_profiles_permissions_fw_ttl_training_attacks_changed": false,
+  "new_os_install_tested": false,
+  "native_bundle_projection_expanded": false,
+  "publication": {
+    "pending": true
+  },
+  "cleanup": {
+    "server_files_removed": 912,
+    "server_bytes_removed": 14255765,
+    "mac_pending": false,
+    "mac_files_removed": 20,
+    "mac_bytes_removed": 12787746,
+    "mac_absence_verified": true
+  },
+  "previous_actual_chat": {
+    "seconds": 143.304,
+    "quality_pass": false,
+    "sample_size": 1,
+    "wazuh_rows": 50,
+    "not_controlled_ab": true
+  },
+  "final_health": {
+    "runtime_hashes": 16,
+    "protected_hashes": 8,
+    "both_websocket_and_worker_alive": true,
+    "services_active": 3,
+    "failed_units": 0,
+    "queues": 0,
+    "trial_and_recovery_timer_inactive": true
+  }
+}

@@ -95,5 +95,11 @@
     "new_mac_packages": 0,
     "original_and_cleaned_archives_preserved": true,
     "server_status_repolled": false
+  },
+  "publication": {
+    "commit": "0e9db7aab96459e53457b52e82e918e7991f375c",
+    "remote_main": "0e9db7aab96459e53457b52e82e918e7991f375c",
+    "verified_at_kst": "2026-11-07T20:59:49.100788+09:00",
+    "credential_source": "project local credential file, one Git subprocess environment; helpers and HTTP trace disabled"
   }
 }

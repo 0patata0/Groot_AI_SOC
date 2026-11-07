@@ -17,7 +17,7 @@
 | 균형 본학습 독립 실행 | 사용자 선택1,220건·최대610step/1epoch.20:54 DGX PID1 실행기 등록·59SHA·독립08:30KST 종료·공유추론 양보/체크포인트재개·중간/최종loss 검증 |20:55 마지막유휴확인58초, optimizer 시작 미관측. 아침 재지시까지 현황조회 중단·서버자동진행 유지. 과거동일소스GPU2step재사용·추가27검사PASS. [실행](finetuning/BALANCED_MAIN_20261107.md) · [준비](finetuning/QUALITY_PREPARATION.md) |
 | IDS 적용 방식 질문 | 목록 대신 서비스 MCP의 실제 허용 restart/영향/-S 합본 경로를 조회. 짧은 질문도 양봇 성공 | 실제 변경/승인/무중단 적용 시험은 아님. [결과·복구](infra/hermes/ids-application-method.md) |
 | 시스템 조회 확대 | 현재25 systemd 대상 상태·정제 오류 이력 및 등록8서비스 승인형 작업 확인 | 원문 journal 범위 조회 미제공. 제한 읽기 도구·감사·비밀 보호 후속 |
-| Git·정리 | 시험Thor엔진/guard·Mac중계/임시포트 종료, primary PID715615/재시작0 유지. 서버시험56파일은 로컬SHA검증 보존 후 제거, 격리3,279파일·Mac자체임시107파일/73,704,545B 제거 확인 | 이전 최종 `4808cc1`·16:14 실원격 일치. 이번 독립학습 등록 문서는 게시 준비 중이며 별도 영수증으로 확정한다. 기존 Ansible/NAT/topology 변경·복구원본 유지 |
+| Git·정리 | 시험Thor엔진/guard·Mac중계/임시포트 종료, primary PID715615/재시작0 유지. 서버시험56파일은 로컬SHA검증 보존 후 제거, 격리3,279파일·Mac자체임시107파일/73,704,545B 제거 확인 | 이전 최종 `4808cc1`·16:14 실원격 일치. 이번 독립학습 공개7문서 `0e9db7a`·20:59:49 KST 푸시/실원격main 일치. 이 게시 영수증은 후속 문서 커밋에 반영. 기존 Ansible/NAT/topology 변경·복구원본 유지 |
 
 [이번 모델 비교·범위](finetuning/RUNTIME_COMPARISON_20261107.md) · [공통 보완·복구](infra/hermes/short-read-evidence.md) · [이전 예외 조회](infra/mcp/threshold-policy-read.md) · [이전 적용 방식](infra/hermes/ids-application-method.md) · [이전 현재 조회 범위](infra/hermes/current-diagnostic-scope.md) · [이전 필드 보존](infra/hermes/service-properties.md). 이전 복합 H30.914/O51.107초·각4읽기는 품질 미완료다.20:42 운영 재시험O53.158초/4읽기·partial로현재도품질실패. common63한계설명오탐수정은로컬32검사까지만/운영미반영이며모델분리보고후보는미채택이다. 과거 실패·원문·승인·운영DB·복구본을 보존한다.
 

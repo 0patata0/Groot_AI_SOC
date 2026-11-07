@@ -1,5 +1,7 @@
 # Groot_AI_SOC
 
+2026-11-07 후속: 균형1,220건 [DGX 독립 본학습](finetuning/BALANCED_MAIN_20261107.md) 등록·연결 종료 후 유지 확인. 실제 optimizer 진행/품질 검증은 아직 미확인이고, 운영 모델은 기본35B를 유지한다. 상세 상태는 [STATUS.md](STATUS.md)를 따른다.
+
 관리자 SSH 경보는 [정책 적용·실제 재확인](infra/validation/admin-ssh/README.md)을 따른다.11:59보고의4건은예외적용전이력이며13:00색인확인적용후0건이다. 정기보고에정책전후구분을추가했고, 현재 threshold 설정의 MCP 직접 조회와 양봇 인지도 확인했다.
 
 기존 학습 모델의 [실제 MCP 사용·원본 비교](finetuning/RUNTIME_COMPARISON_20261107.md)를 실행하고, 미조회 답변 실패와 공통 보완을 기록한다. 새 학습이나 운영 모델 전면 교체와 구분한다. [시험·채택 기준](finetuning/TRAINED_MODEL_TRIAL.md).

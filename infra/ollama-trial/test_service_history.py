@@ -22,7 +22,7 @@ mcp=load('sdk_service_mcp',ROOT/'infra/mcp/system-diagnostics-mcp.py');mcp._libr
 
 @unittest.skipUnless(importlib.util.find_spec('jsonschema'),'existing server jsonschema required')
 class ServiceRuntime(unittest.TestCase):
-    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None,question=None):
+    def run_case(self,selection=None,failed=False,compact_report=None,enabled=True,inquiry_plan=None,question=None,blocks=False,failed_blocks=False,selection_prompts=None):
         order=[];prompts=[];calls=[]
         class Connector:
             async def list_tools(self):return [types.SimpleNamespace(**mcp.tools()[0])]
@@ -50,8 +50,16 @@ class ServiceRuntime(unittest.TestCase):
                 return types.SimpleNamespace(isError=bool(past and failed),content=[types.SimpleNamespace(type='text',text=json.dumps(data))])
         class Client:
             def __init__(self,**kw):pass
-            def get_all_active_sessions(self):return {'system-diagnostics':types.SimpleNamespace(connector=Connector())}
+            def get_all_active_sessions(self):
+                sessions={'system-diagnostics':types.SimpleNamespace(connector=Connector())}
+                if blocks:sessions['resp']=types.SimpleNamespace(connector=BlockConnector())
+                return sessions
             async def close_all_sessions(self):pass
+        class BlockConnector:
+            async def list_tools(self):return [types.SimpleNamespace(name='list_blocks',description='현재 동적 차단 목록',inputSchema={'type':'object','properties':{}})]
+            async def call_tool(self,name,arguments,**kw):
+                order.append('block_read');calls.append(arguments)
+                return types.SimpleNamespace(isError=failed_blocks,content=[types.SimpleNamespace(type='text',text=json.dumps({'error':'unavailable'} if failed_blocks else {'blocks':['192.0.2.7']}))])
         class Tool:
             def __init__(self,**kw):self.__dict__.update(kw)
             async def ainvoke(self,args):return await self.coroutine(**args)
@@ -74,6 +82,8 @@ class ServiceRuntime(unittest.TestCase):
                         value.setdefault('request_nonce',args[0]['properties']['request_nonce']['const'])
                         return value
                     order.append('select')
+                    if selection_prompts is not None:selection_prompts.append(copy.deepcopy(messages))
+                    if isinstance(selection,list):return copy.deepcopy(selection[min(order.count('select')-1,len(selection)-1)])
                     return {'indexes':[0,1,2]} if selection is None else selection
                 return types.SimpleNamespace(ainvoke=select)
         class Agent:
@@ -89,10 +99,30 @@ class ServiceRuntime(unittest.TestCase):
         modules={}
         for name,values in definitions.items():
             m=types.ModuleType(name);m.__dict__.update(values);modules[name]=m
-        with patch.dict(runtime.os.environ,{'CAPSTONE_SERVICE_REPORT_COMPACT':'1' if enabled else '0'}),patch.dict(sys.modules,modules),patch.object(runtime,'capabilities',return_value={'system-diagnostics':['get_system_diagnostics']}),patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools):
+        with patch.dict(runtime.os.environ,{'CAPSTONE_SERVICE_REPORT_COMPACT':'1' if enabled else '0'}),patch.dict(sys.modules,modules),patch.object(runtime,'capabilities',return_value={'system-diagnostics':['get_system_diagnostics'],'resp':['list_blocks']}),patch.object(runtime,'filter_catalog',side_effect=lambda server,tools,mode:tools):
             result=asyncio.run(runtime.run({'model':'qwen3.6:35b','base_url':'http://fixture.invalid','access_mode':'hermes-parity',
-                'mcpServers':{'system-diagnostics':{}}},{'question':question or '오늘 B 서버 capstone-management.service 실패 원인과 지금 상태 확인해줘. 설정은 바꾸지 마.'}))
+                'mcpServers':{'system-diagnostics':{},**({'resp':{}} if blocks else {})}},{'question':question or '오늘 B 서버 capstone-management.service 실패 원인과 지금 상태 확인해줘. 설정은 바꾸지 마.'}))
         return result,order,prompts,calls
+
+    def test_compound_service_and_blocks_are_selected_read_and_passed_to_model(self):
+        question='오늘 B 서버 capstone-management.service 실패 원문과 지금 관제 처리 대기를 확인해줘. 현재 임시차단 목록도 함께 보여줘. 변경은 하지 마.'
+        result,order,prompts,calls=self.run_case(question=question,blocks=True,selection={'indexes':[0,1,2,3,4]})
+        self.assertNotEqual(result['status'],'failed',result)
+        self.assertEqual(order[:6],['select','read','read','read','read','block_read'])
+        self.assertEqual(len(calls),5);self.assertEqual(calls[-1],{})
+        self.assertEqual(result['protected_calls'],0);self.assertNotIn('compact',order)
+        self.assertIn('192.0.2.7',str(prompts));self.assertIn('journal_excerpt',str(prompts))
+        receipts=runtime.harness.service_history_receipts(result['calls'])
+        self.assertEqual(receipts[-1]['tool'],'mcp__resp__list_blocks')
+        self.assertEqual(runtime.harness.missing_reads(question,result['calls']),[])
+
+    def test_failed_companion_read_remains_partial_without_invented_empty_list(self):
+        question='오늘 B 서버 capstone-management.service 오류와 지금 상태 확인해줘. 현재 차단 목록도 보여줘.'
+        result,order,prompts,calls=self.run_case(question=question,blocks=True,failed_blocks=True,selection={'indexes':[0,1,2,3]})
+        self.assertEqual(order.count('block_read'),1)
+        self.assertEqual(result['status'],'partial',result)
+        self.assertEqual(result['protected_calls'],0)
+        self.assertIn('list_blocks: 현재 동적 차단 목록 미확인',runtime.harness.missing_reads(question,result['calls']))
 
     def test_model_selects_both_reads_before_judgment_with_real_evidence(self):
         result,order,prompts,calls=self.run_case()
@@ -268,6 +298,27 @@ class ServiceRuntime(unittest.TestCase):
             with self.subTest(plan=plan):
                 result,order,prompts,calls=self.run_case(selection=plan)
                 self.assertEqual(result['status'],'failed');self.assertEqual(calls,[]);self.assertEqual(prompts,[])
+                self.assertIsInstance(result['final_response'],str)
+                self.assertIn(result['error_type'],result['final_response'])
+                self.assertIn('확정하지 못했습니다',result['final_response'])
+                self.assertEqual(order.count('select'),2)
+                self.assertEqual(len(result['service_report_audit']),2)
+                self.assertTrue(all(x['dispatched'] is False for x in result['service_report_audit']))
+
+    def test_one_based_compound_selection_is_repaired_before_any_tool_dispatch(self):
+        question='오늘 B 서버 capstone-management.service 오류와 지금 상태 확인해줘. 현재 차단 목록도 보여줘.'
+        selected_prompts=[]
+        result,order,prompts,calls=self.run_case(question=question,blocks=True,
+            selection=[{'indexes':[1,2,3,4]},{'indexes':[0,1,2,3]}],selection_prompts=selected_prompts)
+        self.assertEqual([x['index'] for x in json.loads(selected_prompts[0][1][1])['options']],[0,1,2,3])
+        self.assertFalse(json.loads(selected_prompts[1][-1][1])['executed'])
+        self.assertEqual(order[:2],['select','select'])
+        self.assertEqual(len(calls),4);self.assertEqual(order.count('block_read'),1)
+        self.assertEqual(result['protected_calls'],0)
+        rejected=result['service_report_audit'][0]
+        self.assertEqual(rejected['response'],{'indexes':[1,2,3,4]})
+        self.assertEqual(rejected['phase'],'required_read_selection_rejected')
+        self.assertEqual(rejected['validator'],'maximum');self.assertFalse(rejected['dispatched'])
 
     def test_failed_history_is_partial_and_not_silently_complete(self):
         result,order,prompts,calls=self.run_case(failed=True)

@@ -941,4 +941,91 @@ class JournalEvidence(unittest.TestCase):
         self.assertEqual(len(facts['journal_entries']),10)
 
 
+class CompanionBlockReads(unittest.TestCase):
+    question='2026-11-06 16:20~16:40 KST B capstone-management.service 실패 원문과 지금 관제 처리 대기를 확인해줘. 현재 임시차단 목록도 함께 보여줘. 변경은 하지 마.'
+    at='2026-11-08T05:00:00+09:00'
+    name='mcp__resp__list_blocks'
+    def request(self):
+        request=catalog()
+        request['tools'].append({'function':{'name':self.name,'parameters':{'type':'object','properties':{}}}})
+        return request
+
+    def test_independent_current_clause_keeps_all_service_requirements(self):
+        for question in (self.question, self.question.replace('. 현재',' 그리고 현재'),
+                         self.question.replace('. 현재',' 및 현재'),
+                         '현재 차단 목록 보여줘. 오늘 b:management 오류와 지금 상태 확인해줘.'):
+            with self.subTest(question=question):
+                plan=c.service_history_plan(self.request(),question,self.at)
+                self.assertFalse(plan['only_service'])
+                self.assertEqual(plan['requirements'][-1],{'tool':self.name,'arguments':{}})
+                self.assertTrue(any(x['arguments'].get('since_kst') for x in plan['requirements']))
+                self.assertTrue(any(x['arguments'].get('target')=='b:management-pipeline' for x in plan['requirements']))
+        plan=c.service_history_plan(self.request(),self.question,self.at)
+        self.assertEqual(len(plan['requirements']),5)
+        self.assertEqual(plan['unavailable_capabilities'],[])
+
+    def test_quoted_negative_historical_filtered_and_write_clauses_are_not_invented(self):
+        base='오늘 b:management 오류와 지금 상태 확인해줘. '
+        for clause in ('`차단 목록 보여줘`라고 말한 이유는?', '"차단 목록 보여줘"를 번역해줘',
+                       '어제 차단 목록 보여줘', '192.0.2.5의 차단 목록 보여줘',
+                       '현재 차단 목록 보여줘. 차단 목록은 제외해줘', '현재 차단 목록 조회하지 마',
+                       '공격이면 현재 차단 목록 보여줘', '현재 차단 목록 보여줘. 192.0.2.5 차단해줘'):
+            with self.subTest(clause=clause):self.assertFalse(c.read_contract().companion_block_request(base+clause))
+
+    def test_missing_or_ambiguous_catalog_is_explicitly_incomplete(self):
+        for request in (catalog(),self.request()):
+            if len(request['tools'])>1:request['tools'].append(copy.deepcopy(request['tools'][-1]))
+            plan=c.service_history_plan(request,self.question,self.at)
+            self.assertIn('current_block_list',plan['unavailable_capabilities'])
+            self.assertNotIn(self.name,[x['tool'] for x in plan['requirements']])
+            self.assertIn('current_block_list:tool_capability_unavailable',c.service_history_state(plan,[])['incomplete'])
+
+    def block_plan(self):
+        return {'requirements':[{'tool':self.name,'arguments':{}}],'unavailable_capabilities':[]}
+    def receipt(self,**changes):
+        return {'tool':self.name,'arguments':{},'is_error':False,'data':{'blocks':[]},**changes}
+
+    def test_empty_verified_list_satisfies_read_but_missing_or_wrong_tool_does_not(self):
+        plan=self.block_plan()
+        self.assertEqual(c.service_history_state(plan,[self.receipt()])['incomplete'],[])
+        for receipts in ([],[self.receipt(tool='mcp__other__list_blocks')],[self.receipt(arguments={'ip':'192.0.2.5'})]):
+            state=c.service_history_state(plan,receipts)
+            self.assertEqual(state['pending'],plan['requirements']);self.assertTrue(state['incomplete'])
+
+    def test_latest_failure_or_malformed_payload_invalidates_old_success_without_retry_loop(self):
+        for changes in ({'is_error':True},{'data':{'blocks':['bad']}},{'data':{'blocks':['192.0.2.5']*2}},
+                        {'data':{'blocks':[],'error':'unknown'}},{'data':{'blocks':[{'elem':{'val':'::1'}}]}}):
+            with self.subTest(changes=changes):
+                state=c.service_history_state(self.block_plan(),[self.receipt(),self.receipt(**changes)])
+                self.assertEqual(state['pending'],[])
+                self.assertEqual(state['incomplete'],['current_block_list:unavailable'])
+
+    def test_native_selector_and_literal_table_keep_real_block_evidence(self):
+        from types import SimpleNamespace as NS
+        context={'request':self.question,'background':'','tools':[NAME,self.name],'requested_at_kst':self.at}
+        env={'CAPSTONE_MANAGEMENT_MODE':'verify','CAPSTONE_CHAT_READ_JSON':json.dumps(context)}
+        with patch.dict(w.os.environ,env,clear=True):
+            options=w.operator_diagnostic_options(self.request())
+            self.assertEqual(len(options),5)
+            self.assertEqual(options[-1],self.block_plan()['requirements'][0])
+        for data,expected in (({'blocks':['192.0.2.5']},'192.0.2.5'),
+                              ({'blocks':[{'elem':{'val':'192.0.2.6','expires':100}}]},'192.0.2.6')):
+            facts=w.observation_facts('list_blocks',NS(isError=False,content=[NS(text=json.dumps(data))]),{})
+            self.assertIn(expected,w.literal_evidence_table(facts))
+            self.assertEqual(facts[0]['count'],1)
+        facts=w.observation_facts('list_blocks',NS(isError=False,content=[NS(text='{"blocks":["bad"]}')]),{})
+        self.assertFalse(any(x.get('kind')=='blocks' for x in facts))
+
+    def test_new_block_attempt_invalidates_previous_current_fact_only(self):
+        diagnostic={'kind':'diagnostics','target':'b:management'}
+        observed={'kind':'blocks','count':1,'addresses':['192.0.2.5']}
+        facts=[diagnostic,observed];original=copy.deepcopy(facts)
+        w.invalidate_block_facts(facts,'get_system_diagnostics')
+        self.assertEqual(facts,original)
+        w.invalidate_block_facts(facts,'list_blocks')
+        self.assertEqual(facts,[diagnostic])
+        # Clearing happens before the new call: a failure supplies no replacement.
+        self.assertEqual(observed,original[1]);self.assertNotIn('192.0.2.5',w.literal_evidence_table(facts))
+
+
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,408 @@
+{
+  "checked_at_kst": "2026-11-08T05:53:32.402333+09:00",
+  "state": "deployed_read_coverage_fix_semantic_quality_failed",
+  "common": "1.5.74",
+  "query": "1.19.125",
+  "model": "qwen3.6:35b",
+  "source_sha256": {
+    "infra/hermes/soc_management_run.py": "d091c876aecb3b25091f890421cdd5eb2f6370828cd2a8f15f8630e70f05b9dd",
+    "infra/hermes/chat_contract.py": "43f3b521bd53a3faafb108e3727d40d1757f10261abc5024282f8fca7cf9eab1",
+    "infra/hermes/query-completion/__init__.py": "0e949d20151e6af119135b3d092b9d88b2155ab45beac432e64ce4f7e72c7d5c",
+    "infra/ollama-trial/runtime.py": "3a10ed6fa4a5fe413822962f079dc995274727b45300424e38f11cf9816f8d66",
+    "infra/hermes/read_contract.py": "755f590af66cc545bbbb0ea1de8b917d9b2c01a368457036cce12dfbc566ec5a",
+    "infra/ollama-trial/harness.py": "12c0bb5165e279b4e725ce0067dcd9910506325a287ae7f5140912bfdbf6b145",
+    "infra/hermes/test_service_history_contract.py": "48cabe8df1ce5e4eceed10228c9ba827351ff9e0ce6501043d2150f1ff5b4c59",
+    "infra/ollama-trial/test_harness.py": "ac0095f8e231976403b2b12538b98aea531122b7d2e2934b213f5b8d9128e8f3",
+    "infra/ollama-trial/test_service_history.py": "c9ab43cf96513eb84f8b25546ca91d0f0d2a4383bcf03e08ad491f34b9d17623"
+  },
+  "test_profiles": {
+    "native": {
+      "rc": 0,
+      "count": 482,
+      "skip": 0,
+      "unique_methods": 482
+    },
+    "service": {
+      "rc": 0,
+      "count": 94,
+      "skip": 0,
+      "unique_methods": 94
+    },
+    "claims": {
+      "rc": 0,
+      "count": 57,
+      "skip": 0,
+      "unique_methods": 57
+    },
+    "sdk": {
+      "rc": 0,
+      "count": 301,
+      "skip": 0,
+      "unique_methods": 301
+    },
+    "query": {
+      "rc": 0,
+      "count": 408,
+      "skip": 0,
+      "unique_methods": 408
+    },
+    "peer": {
+      "rc": 0,
+      "count": 79,
+      "skip": 0,
+      "unique_methods": 79
+    },
+    "installer": {
+      "rc": 0,
+      "count": 63,
+      "skip": 0,
+      "unique_methods": 63
+    },
+    "diagnostics": {
+      "rc": 0,
+      "count": 84,
+      "skip": 0,
+      "unique_methods": 84
+    }
+  },
+  "unique_pass": 1568,
+  "final_health": {
+    "at_kst": "2026-11-08T05:53:32.402333+09:00",
+    "query": "1.19.125",
+    "common": "1.5.74",
+    "manifest": 17,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_timer_inactive": true,
+    "hermes_additional_restart_this_revision": 0,
+    "hermes_planned_restarts_this_unit": 2,
+    "jobs": {
+      "78o3aa8robfk384zun4mosnhsw": [
+        [
+          "hermes",
+          "lead",
+          "done"
+        ]
+      ],
+      "7kdxit7od3f5xf3k4dqrzqi5eo": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ],
+      "9az693zruffa8jrxajn8m84p9w": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ],
+      "mwabpmqmpfrujq3gdgtgo1nxta": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ],
+      "59ottdan47ynbcganq3uxxa3sw": [
+        [
+          "ollama",
+          "lead",
+          "done"
+        ]
+      ]
+    },
+    "embedded_gate_matches": true,
+    "gate_bytes": 65463
+  },
+  "chat": [
+    {
+      "run_label": "hermes",
+      "engine": "hermes",
+      "status": "partial",
+      "posted_to_final_seconds": 169.215,
+      "actual_reads": 5,
+      "block_list_reads": 1,
+      "protected_calls": 0,
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "sha256_verified": [
+        "9a4d55915c09610b9df00e5a51a18caa19968694981447757924daf3e1df1472",
+        "d36a4a13b5e9377a9b79032e5cc9d33f2356c1ba1ae998344a047238f979a0c4",
+        "1751d4e3320eb8a20f08b416499b3752176a3739a48a6db395846e96916bd10a",
+        "444dc361607b9ff90f6046862ed1b163e991d2e7d46f5a3c850488e2f77d90be",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "remaining_issues": [],
+      "reply_id": "ywrmm884eidm3bchtgg8jbi4wr",
+      "content_accepted": false,
+      "journal_entries": [
+        32
+      ]
+    },
+    {
+      "run_label": "ollama_initial",
+      "engine": "ollama",
+      "status": "failed",
+      "posted_to_final_seconds": 11.74,
+      "actual_reads": null,
+      "block_list_reads": 0,
+      "protected_calls": null,
+      "markdown_tables": 0,
+      "code_fences": 0,
+      "sha256_verified": [],
+      "remaining_issues": [],
+      "reply_id": "s41fz5peojgkpj6jfkbeo8uxzr",
+      "content_accepted": false,
+      "journal_entries": [],
+      "raw_receipts_missing": true
+    },
+    {
+      "run_label": "ollama_retry",
+      "engine": "ollama",
+      "status": "partial",
+      "posted_to_final_seconds": 95.748,
+      "actual_reads": 5,
+      "block_list_reads": 1,
+      "protected_calls": 0,
+      "markdown_tables": 0,
+      "code_fences": 0,
+      "sha256_verified": [
+        "68fd98578dbf3b652e6dc83de1a371903b9f9188df40d19f5eb90f033dfc2ed6",
+        "81eebc5c37a4de6817e3e5bf7f2da362b81b84a5a6259b5d1cc6c500f5344b5b",
+        "33155bbcf63958cb6142a28927ae1613c5bc9728ca999f6795c1d6ed78f570d1",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f",
+        "cdcab6f3ca9c4b2590ae402d6d8ba0e9bf6390b062b37f0860a1cca5a907025f"
+      ],
+      "remaining_issues": [
+        "diagnostic_exit_status_mismatch",
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "reply_id": "zqtp9dbbyif9dn9n9ywmobbkea",
+      "content_accepted": false,
+      "journal_entries": [
+        32
+      ]
+    },
+    {
+      "run_label": "ollama_final",
+      "engine": "ollama",
+      "status": "failed",
+      "posted_to_final_seconds": 11.456,
+      "actual_reads": 0,
+      "block_list_reads": 0,
+      "protected_calls": 0,
+      "markdown_tables": 0,
+      "code_fences": 0,
+      "sha256_verified": [],
+      "remaining_issues": [],
+      "reply_id": "gxounsuzyibf7k6oh9ukpz3s9y",
+      "content_accepted": false,
+      "journal_entries": []
+    },
+    {
+      "run_label": "ollama_selection",
+      "engine": "ollama",
+      "status": "completed",
+      "posted_to_final_seconds": 70.26,
+      "actual_reads": 5,
+      "block_list_reads": 1,
+      "protected_calls": 0,
+      "markdown_tables": 3,
+      "code_fences": 0,
+      "sha256_verified": [
+        "73668ea9065e53a3da92e578f585fb7e77e6493d45c84d1b159b4fe9c3897468",
+        "887f218a83951b958dbd9daadacaec7e92314b87de34584aaa12b906ff569f9e",
+        "179aa3963f79b6f5879970db694f51972df3ee045961dc6d0f14ce4d799f7f2b",
+        "b72921a4a2ad33ec41d8ef2955c53b7a3fc9c2fe4a8035755d50024eb0587a53",
+        "2b385c0b69f42b36853b5bd4ee23504002d3a91b3cc9247bf1081a07b092112f"
+      ],
+      "remaining_issues": [],
+      "reply_id": "h4r3jpc7dfyq5f5e4wb65px56y",
+      "content_accepted": false,
+      "journal_entries": [
+        32
+      ],
+      "manual_review": {
+        "runtime_status": "completed",
+        "human_evidence_review": "failed",
+        "issues": [
+          "review_required_cases is a union of review states, not 287 administrator approval cards",
+          "past service failure causing the current review-state count is not established",
+          "list_blocks returns no observed_at field; a timestamp from a different diagnostic result was attributed to it"
+        ],
+        "required_reads": 5,
+        "table_count": 3,
+        "protective_actions": 0,
+        "field_meaning_and_provenance_guards_incomplete": true
+      }
+    }
+  ],
+  "last_live_selection_rejections": [],
+  "fallback_actual_receipt_replay": {
+    "actual_calls": 5,
+    "original_reply_tables": 0,
+    "replayed_tables": 1,
+    "raw_sha_verified": true,
+    "new_model_generation": false,
+    "chat_posted": false,
+    "journal_rows_preserved": 32,
+    "block_list_count": 0
+  },
+  "latency_example": {
+    "case": "actual SDK retry before final formatter fix",
+    "posted_seconds": 95.748,
+    "runtime_seconds": 93.08733030594885,
+    "model_seconds": 84.60653575789183,
+    "mcp_seconds": 0.5599385721143335,
+    "model_inputs": [
+      399,
+      36982,
+      39148,
+      41314
+    ],
+    "model_outputs": [
+      15,
+      779,
+      779,
+      779
+    ],
+    "assessment_completed": false,
+    "gpu_cache_controlled": false
+  },
+  "routing_diagnosis": {
+    "question": "2026-11-06 16:20~16:40 KST B capstone-management.service 오류 원문과 현재 관제 처리 대기 상태를 확인해줘. 그리고 현재 임시차단 목록도 보여줘. 설정 변경은 하지 마.",
+    "read_plan": null,
+    "tool_scope": null,
+    "request_kind": "other",
+    "diagnostic_history_request": true,
+    "lookup_without_explicit_cause_risk_or_change_request": true,
+    "ordinary_agent_judgment_still_used": true
+  },
+  "cleanup": {
+    "server": [
+      {
+        "path": "/tmp/capstone-compound76-20261108-r1",
+        "files": 471,
+        "bytes": 7470187,
+        "removed": true
+      },
+      {
+        "path": "/tmp/capstone-compound76-20261108-r2",
+        "files": 471,
+        "bytes": 7470221,
+        "removed": true
+      },
+      {
+        "path": "/tmp/capstone-compound76-20261108-r3",
+        "files": 471,
+        "bytes": 7470691,
+        "removed": true
+      },
+      {
+        "path": "/tmp/capstone-compound76-20261108-r4",
+        "files": 471,
+        "bytes": 7472384,
+        "removed": true
+      },
+      {
+        "path": "/tmp/capstone-compound76-20261108-r5",
+        "files": 471,
+        "bytes": 7475026,
+        "removed": true
+      }
+    ],
+    "mac": [
+      {
+        "path": "/private/tmp/capstone-compound76-20261108-g0t2j_ie",
+        "bytes": 4154611,
+        "sha256": "f93008412f14d284184bce0b9e472dde236b9cb899e517468e91bbaf0c5707e2",
+        "removed": true
+      },
+      {
+        "path": "/private/tmp/capstone-compound76-20261108-d92x1gur",
+        "bytes": 4154651,
+        "sha256": "a53757ada411e1d914b0b9b57535d4a82ca1f3ef668b7b14fb5ce12bac65105e",
+        "removed": true
+      },
+      {
+        "path": "/private/tmp/capstone-compound76-20261108-316717_y",
+        "bytes": 4154935,
+        "sha256": "f799605b7bf90f6eaaa60b0e37172da222ea05ea38f4bbc6db89b4bc2f24876b",
+        "removed": true
+      },
+      {
+        "path": "/private/tmp/capstone-compound76-20261108-d08x4pyu",
+        "bytes": 4155611,
+        "sha256": "0b52107df38a93e7dd5963ccb3abde9496d5cc59b7eaae928f9bcc55a709caba",
+        "removed": true
+      },
+      {
+        "path": "/private/tmp/capstone-compound76-20261108-gf3mnzp9",
+        "bytes": 4156819,
+        "sha256": "ef4d4bb66c9ca90e804e43bfdd7b9f93a66389271dd632bd23558633d61001e3",
+        "removed": true
+      },
+      {
+        "path": "/private/tmp/capstone-compound76-20261108-fxll_55f",
+        "bytes": 4155203,
+        "sha256": "ec6256659ee525d1f90658c5c9076860144cc124566538aee3a935b6d3fb6d35",
+        "executed": false,
+        "removed": true
+      },
+      {
+        "path": "/private/tmp/capstone-compound76-20261108-sawylwh6",
+        "bytes": 4156779,
+        "size_source": "build tool receipt",
+        "executed": false,
+        "removed": true
+      }
+    ],
+    "server_files": 2355,
+    "server_bytes": 37358509,
+    "mac_bytes": 29088609,
+    "mac_folders": 7,
+    "packages_installed_mac": 0
+  },
+  "deployment": {
+    "initial_files": 16,
+    "failure_envelope_files": 2,
+    "mixed_fallback_files": 10,
+    "selection_repair_files": 2,
+    "planned_hermes_restarts": 2,
+    "independent_rollback_minutes": 15,
+    "recovery_roots": [
+      "/var/lib/capstone-service-grounding/20261108-compound76",
+      "/var/lib/capstone-service-grounding/20261108-compound76b",
+      "/var/lib/capstone-service-grounding/20261108-compound76c",
+      "/var/lib/capstone-service-grounding/20261108-compound76d"
+    ]
+  },
+  "dgx_polled": false,
+  "attack_tests": 0,
+  "model_promoted": false,
+  "independent_evaluation": false,
+  "limitations": [
+    "last SDK completed status disagrees with manual evidence review; three unsupported claims remain",
+    "first SDK ValueError concealed original failure and raw calls; exact original cause unknown",
+    "last live valid selection did not exercise rejected-selection repair; that boundary is isolated-tested",
+    "post-fix fallback table verified with actual raw-receipt replay, not a new live model-failure reply",
+    "Native live five-read answer used query124 before final display/current-block invalidation update; final125 verified by regression and deployed hash",
+    "development case reused in new roots; GPU and cache not controlled",
+    "new OS install, manual rollback, active-block address display and all-client UI render not tested"
+  ]
+}

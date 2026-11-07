@@ -415,7 +415,7 @@ def block_list_plan(text):
     address = r'(?:(?:IPv[46]|IP|아이피)(?:\s*주소)?|주소)(?:들)?'
     subject = (r'(?:(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)'
                r'\s*' + address + r'(?:\s*(?:목록|리스트))?|차단\s*(?:목록|리스트))')
-    suffix = (r'(?:(?:만|을|를|은|는|이|가|좀|전체|모두|전부|현재|지금|표로|상세히|자세히|'
+    suffix = (r'(?:(?:만|을|를|은|는|이|가|도|함께|같이|좀|전체|모두|전부|현재|지금|표로|상세히|자세히|'
               r'정리해서|한눈에|몇\s*개|몇\s*건|있어|있나|있니|뭐야|누구야|알려줘|조회해줘|조회|'
               r'확인해줘|확인|보여줘|보여줄래|보여주세요|알려주세요|알려줄래|부탁해|조회해줄래|'
               r'정리해줘|[1-9][0-9]{0,3}\s*페이지)\s*|[?.!？])*')
@@ -425,6 +425,34 @@ def block_list_plan(text):
         return None
     page = re.search(r'([1-9][0-9]{0,3})\s*페이지', text)
     return {'kind': 'block_list', 'question': text, 'page': int(page[1]) if page else 1}
+
+
+def companion_block_request(question):
+    """Recognize an independent current-list clause without narrowing its peers."""
+    if not isinstance(question,str) or len(question)>6000:return False
+    if re.search(r'예시|가정|번역|라는\s*문장|도구\s*없이|조회\s*(?:하지|말)',question):return False
+    text=re.sub(r'```[\s\S]*?```|`[^`]*`|"[^"\n]*"|\'[^\'\n]*\'', '', question)
+    if re.search(r'차단\s*(?:목록|리스트)[^.!?\n;]{0,40}(?:제외|빼|말아|말고|하지\s*마)',text):return False
+    text=without_prohibitions(text)
+    if wants_write(text):return False
+    clauses=re.split(r'(?<=[.!?。])\s+|[;\n]|\s*(?:그리고|추가로|또한|아울러)\s*|\s+및\s+',text)
+    return any(block_list_plan(part.strip()) is not None for part in clauses if part.strip())
+
+
+def block_addresses(data):
+    """Validate the exact current-list payload, without inventing a receipt."""
+    if not isinstance(data,dict) or set(data)!={'blocks'} or not isinstance(data['blocks'],list):return None
+    addresses=[]
+    try:
+        for item in data['blocks']:
+            value=item
+            if isinstance(item,dict) and set(item)=={'elem'} and isinstance(item['elem'],dict):value=item['elem'].get('val')
+            if not isinstance(value,str):return None
+            address=str(ipaddress.IPv4Address(value))
+            if address in addresses:return None
+            addresses.append(address)
+    except ValueError:return None
+    return addresses
 
 
 def block_list_state(calls):
@@ -443,20 +471,7 @@ def block_list_state(calls):
                     or not isinstance(data['result'], str)):
                 return None
             data = json.loads(data['result'])
-        if not isinstance(data, dict) or set(data) != {'blocks'} or not isinstance(data['blocks'], list):
-            return None
-        addresses = []
-        for item in data['blocks']:
-            value = item
-            if isinstance(item, dict) and set(item) == {'elem'} and isinstance(item['elem'], dict):
-                value = item['elem'].get('val')
-            if not isinstance(value, str):
-                return None
-            address = str(ipaddress.IPv4Address(value))
-            if address in addresses:
-                return None
-            addresses.append(address)
-        return addresses
+        return block_addresses(data)
     except (ValueError, TypeError, RecursionError):
         return None
 

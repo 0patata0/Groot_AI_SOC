@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.73'
+VERSION = 'soc-chat-contract:1.5.74'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -287,6 +287,15 @@ def output_policy():
 
 
 _WORKFLOW_MODULE = None
+_READ_MODULE = None
+def read_contract():
+    global _READ_MODULE
+    if _READ_MODULE is None:
+        spec=importlib.util.spec_from_file_location('_soc_read_contract',Path(__file__).resolve().with_name('read_contract.py'))
+        _READ_MODULE=importlib.util.module_from_spec(spec);spec.loader.exec_module(_READ_MODULE)
+    return _READ_MODULE
+
+
 def workflow_policy(names):
     """Load fixed project procedures only; this never adds tools or authority."""
     global _WORKFLOW_MODULE
@@ -570,10 +579,19 @@ def service_history_plan(request, question, requested_at):
                 'until_kst':end.isoformat(),'view':'journal','limit':50}} for start,end in periods)
     related=sorted({t for target in targets for t in companions.get(target,[])}) if current else []
     options.extend({'tool':name,'arguments':{'target':t}} for t in related)
+    unavailable=['journal_excerpt'] if wants_journal and not journal_supported else []
+    if read_contract().companion_block_request(question):
+        block_name='mcp__resp__list_blocks'
+        registered=[t.get('function',{}).get('parameters',{}) for t in request['tools']
+                    if t.get('function',{}).get('name')==block_name]
+        if (len(registered)==1 and registered[0].get('type')=='object'
+                and registered[0].get('properties')=={} and not registered[0].get('required')):
+            options.append({'tool':block_name,'arguments':{}})
+        else:unavailable.append('current_block_list')
     only_service=not re.search(r'WAF|IDS|IPS|\bFW\b|방화벽|공격|침해|DNS|웹|https?|차단|경보|Wazuh|와주|위험|대응|승인|복구|재시작|종결|실행|재가동|삭제|수정|\brisk\b|\battack\b|\brestart\b|\brecover\b',question,re.I)
     return {'requirements':options,'units':{t:mapping[t] for t in sorted(targets)},'only_service':only_service,
             'current_companions':related,
-            'unavailable_capabilities':['journal_excerpt'] if wants_journal and not journal_supported else []}
+            'unavailable_capabilities':unavailable}
 
 
 def service_history_state(plan, receipts, now=None):
@@ -587,6 +605,13 @@ def service_history_state(plan, receipts, now=None):
     state['incomplete'].extend(str(x)+':tool_capability_unavailable' for x in plan.get('unavailable_capabilities',[]))
     now=now or datetime.now(timezone(timedelta(hours=9)))
     for required in plan['requirements']:
+        if required['tool']=='mcp__resp__list_blocks':
+            matches=[r for r in receipts if r.get('tool')==required['tool'] and r.get('arguments')=={}]
+            if not matches:
+                state['pending'].append(required);state['incomplete'].append('current_block_list:not_read')
+            elif matches[-1].get('is_error') is not False or read_contract().block_addresses(matches[-1].get('data')) is None:
+                state['incomplete'].append('current_block_list:unavailable')
+            continue
         args=required['arguments'];target=args['target'];past='since_kst' in args
         runtime=target in plan.get('current_companions',[])
         journal=args.get('view')=='journal'

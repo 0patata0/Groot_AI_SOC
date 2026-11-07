@@ -27,6 +27,66 @@ def fixture(target='a:modsecurity-custom'):
             'arguments': {'target': target}, 'result': raw, 'result_sha256': hashlib.sha256(raw.encode()).hexdigest(), 'is_error': False}
 
 
+class CompoundEvidence(unittest.TestCase):
+    question='오늘 b:management 오류와 지금 상태 확인해줘. 현재 임시차단 목록도 함께 보여줘.'
+    def call(self,server,name,data,arguments=None,**changes):
+        raw=json.dumps(data)
+        return {'server':server,'name':name,'arguments':arguments or {},'result':raw,
+            'result_sha256':hashlib.sha256(raw.encode()).hexdigest(),'is_error':False,**changes}
+    def block(self,**changes):return self.call('resp','list_blocks',{'blocks':[]},**changes)
+    def diagnostic(self):
+        return self.call('system-diagnostics','get_system_diagnostics',{
+            'schema':1,'kind':'runtime','host':'b','target':'b:management-pipeline',
+            'status':'degraded','codes':['case_review_required'],'mutation_performed':False,
+            'observed_at_kst':'2026-11-08T05:00:00+09:00','metrics':{
+                'pending_reports':0,'running_cases':0,'overdue_cases':0,'review_required_cases':9}},
+            {'target':'b:management-pipeline'})
+
+    def test_missing_companion_is_not_hidden_by_history_early_return(self):
+        marker='list_blocks: 현재 동적 차단 목록 미확인'
+        self.assertIn(marker,harness.missing_reads(self.question,[self.diagnostic()]))
+        self.assertNotIn(marker,harness.missing_reads(self.question,[self.diagnostic(),self.block()]))
+        for changes in ({'is_error':True},{'result_sha256':'0'*64},{'arguments':{'ip':'192.0.2.8'}}):
+            self.assertIn(marker,harness.missing_reads(self.question,[self.block(),self.block(**changes)]))
+
+    def test_receipts_require_right_server_real_sha_and_no_write(self):
+        self.assertEqual(len(harness.service_history_receipts([self.block()])),1)
+        for changes in ({'server':'other'},{'result_sha256':'0'*64},{'is_write':True}):
+            self.assertEqual(harness.service_history_receipts([dict(self.block(),**changes)]),[])
+
+    def test_model_receives_both_reads_but_no_write_or_unknown_server(self):
+        calls=[self.diagnostic(),self.call('resp','list_blocks',{'blocks':['192.0.2.8']}),
+               self.call('other','list_blocks',{'blocks':['192.0.2.99']}),
+               self.call('resp','block_ip',{'secret_marker':'WRITE_RESULT'},is_write=True)]
+        prompt=harness.incident_observation_prompt(self.question,calls)
+        self.assertIn('case_review_required',prompt);self.assertIn('192.0.2.8',prompt)
+        self.assertNotIn('192.0.2.99',prompt);self.assertNotIn('WRITE_RESULT',prompt)
+        self.assertIn('<untrusted_tool_observations>',prompt)
+
+    def test_action_claim_fallback_preserves_table_without_claiming_success(self):
+        text=harness.action_fallback(self.question,[self.diagnostic()])
+        self.assertIn('| 확인 항목 | 조회 결과 | 근거·범위 |',text)
+        self.assertIn('검토 상태 사건 | 9건',text)
+        self.assertIn('현재 차단 목록: 성공한 조회 근거 없음/미확인',text)
+        self.assertNotIn('```',text)
+        self.assertIn('정상이라는 판정이 아닙니다',text)
+        blocks=self.call('resp','list_blocks',{'blocks':['192.0.2.8']})
+        self.assertIn('192.0.2.8',harness.action_fallback(self.question,[self.diagnostic(),blocks]))
+
+    def test_semantic_failure_keeps_diagnostic_table_when_other_facts_are_present(self):
+        blocks=self.call('resp','list_blocks',{'blocks':['192.0.2.8']})
+        calls=[self.diagnostic(),blocks,self.block(is_error=True)]
+        text=harness.fallback(self.question,calls)
+        self.assertIn('| 확인 항목 | 조회 결과 | 근거·범위 |',text)
+        self.assertIn('검토 상태 사건 | 9건',text)
+        self.assertIn('보고 전송 0건',text)
+        self.assertIn('조회 실패: resp.list_blocks',text)
+        self.assertIn('위험 판단은 검증 미완료',text)
+        self.assertNotIn('192.0.2.8',text)
+        self.assertNotIn('요청 시간대 확인 필요',text)
+        self.assertNotIn('```',text)
+
+
 class Grounding(unittest.TestCase):
     def test_short_current_soc_backlog_questions_keep_existing_read_scope(self):
         for q in ('지금 관제 보고나 조사가 밀려 있어?','관제 처리 대기열 몇 개야?',

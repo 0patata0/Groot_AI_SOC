@@ -873,6 +873,7 @@ def facts_for(calls):
     calls=evidence_reads(calls)
     facts = []
     for call in calls:
+        if call.get('server')=='resp':EVIDENCE.invalidate_block_facts(facts,call.get('name'))
         if not READ.successful(call):
             continue
         name = 'mcp__' + call['server'].replace('-', '_') + '__' + call['name']
@@ -1122,10 +1123,10 @@ def incident_context_violations(answer):
 def service_history_receipts(calls):
     rows=[]
     for call in calls:
-        if (call.get('server')!='system-diagnostics' or call.get('name')!='get_system_diagnostics'
+        if ((call.get('server'),call.get('name')) not in (('system-diagnostics','get_system_diagnostics'),('resp','list_blocks'))
                 or not isinstance(call.get('result'),str) or not isinstance(call.get('arguments'),dict)
                 or hashlib.sha256(call['result'].encode()).hexdigest()!=call.get('result_sha256') or call.get('is_write')):continue
-        rows.append({'tool':'mcp__system_diagnostics__get_system_diagnostics','arguments':call['arguments'],
+        rows.append({'tool':'mcp__'+call['server'].replace('-','_')+'__'+call['name'],'arguments':call['arguments'],
                      'is_error':call.get('is_error',False),'data':payload(call) or {}})
     return rows
 
@@ -1321,7 +1322,7 @@ def incident_observation_prompt(question, calls):
     calls=evidence_reads(calls)
     observed = []
     for call in calls:
-        if call.get('name') not in ('search_modsecurity_alerts', 'search_suricata_alerts', 'search_wazuh_alerts', 'get_wazuh_alert_summary', 'get_system_diagnostics') or not payload(call):
+        if not EVIDENCE.allowed('mcp__'+str(call.get('server','')).replace('-','_')+'__'+str(call.get('name','')),'verify') or not payload(call):
             continue
         shown = model_view(call['server'], call['name'], call['result'])
         observed.append({'server': call['server'], 'name': call['name'],
@@ -1446,6 +1447,9 @@ def action_fallback(question, calls):
     reads = sorted({c.get('name', '') for c in calls if payload(c) and
                     c.get('name', '').startswith(('get_', 'list_', 'search_', 'calculate_'))})
     lines.append('- 이번 요청에서 성공한 조회·계산: ' + (', '.join(reads) if reads else '없음/미조회'))
+    facts=facts_for(calls)
+    if facts:
+        lines.extend(['',EVIDENCE.literal_evidence_table(facts),''])
     if not re.search(r'차단|해제|block|contain', question, re.I) and not attempts:
         lines.append('- 실제 조회하지 않은 도구의 반환 결과나 현재 상태를 대신 보고할 수 없습니다. 허용된 조사와 변경안 준비를 이어가야 합니다.')
         return '\n'.join(lines)
@@ -1453,7 +1457,7 @@ def action_fallback(question, calls):
         lines.append('- 차단/해제 도구 호출 기록: ' + str(len(attempts)) + '건. 실제 적용 여부는 반환 결과와 후속 상태로 확인해야 합니다.')
     else:
         lines.append('- 이번 요청에서 차단/해제 도구를 호출하지 않았습니다. 서버가 요청을 거절했다고 보고하지 않습니다.')
-    if not any(c.get('server') == 'resp' and c.get('name') == 'list_blocks' and payload(c) for c in calls):
+    if READ.block_list_state(evidence_reads(calls)) is None:
         lines.append('- 현재 차단 목록: 성공한 조회 근거 없음/미확인.')
     if not any(c.get('name') in ('search_suricata_alerts', 'search_modsecurity_alerts', 'search_wazuh_alerts', 'get_wazuh_alert_summary')
                and payload(c) for c in calls):
@@ -2133,6 +2137,13 @@ def inventory_tool_scope(request):
 
 
 def missing_reads(question, calls, diagnostic_targets=()):
+    missing=_missing_reads(question,calls,diagnostic_targets)
+    if READ.companion_block_request(normalized(question)) and READ.block_list_state(evidence_reads(calls)) is None:
+        missing=list(dict.fromkeys(missing+['list_blocks: 현재 동적 차단 목록 미확인']))
+    return missing
+
+
+def _missing_reads(question, calls, diagnostic_targets=()):
     calls=evidence_reads(calls)
     if systemd_comparison_request(question):
         state=systemd_comparison_state(question,calls)
@@ -2926,7 +2937,7 @@ def fallback(question, calls):
     if rendered:
         return rendered
     if (EVIDENCE.incident_investigation_request(normalized(question))
-            or CONTRACT.diagnostic_facts_only(facts_for(calls))):
+            or any(f.get('kind')=='diagnostics' for f in facts_for(calls))):
         # Use the same factual table as Native, including backend limitations;
         # the short previous-answer summary deliberately omits such detail.
         text = footer_free(EVIDENCE.factual_review_report(facts_for(calls)))

@@ -189,9 +189,11 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                                     'schema_sha256': digest(schema)})
                     if name == 'mcp__system_diagnostics__get_system_diagnostics':
                         report['diagnostic_targets'] = schema['properties']['target']['enum']
-                        report['_service_catalog']={'tools':[{'function':{'name':name,'parameters':schema}}]}
                     if chosen is not None and name not in chosen:
                         continue
+                    if harness.EVIDENCE.allowed(name,'verify'):
+                        report.setdefault('_service_catalog',{'tools':[]})['tools'].append(
+                            {'function':{'name':name,'parameters':json.loads(json.dumps(schema))}})
                     schema = harness.CONTRACT.normalized_schema(name, schema)
                     schema = harness.EVIDENCE.tool_input_schema(name, schema)
                     if name == 'mcp__rule_a__get_service_action_target':
@@ -300,10 +302,23 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                 schema={'type':'object','additionalProperties':False,'required':['indexes'],
                     'properties':{'indexes':{'type':'array','minItems':len(options),'maxItems':len(options),
                         'uniqueItems':True,'items':{'type':'integer','minimum':0,'maximum':len(options)-1}}}}
-                selection=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke([
-                    ('system','사용자가 명시한 서비스와 기간의 필수 읽기를 확인하고 모든 필요한 번호를 함께 선택하세요. 결과·원인·정상·승인은 생성하지 않습니다. 도구 실행은 검증 후 이루어집니다.'),
-                    ('human',canonical({'request':current,'requested_at_kst':report['at_kst'],'options':options}))]),90)
-                Draft202012Validator(schema).validate(selection)
+                selection_messages=[
+                    ('system','사용자가 명시한 서비스와 기간의 필수 읽기를 확인하고 각 항목에 표시된 index 값을 모두 선택하세요. index는 0부터 시작하며 새 번호를 만들지 않습니다. 결과·원인·정상·승인은 생성하지 않습니다. 도구 실행은 검증 후 이루어집니다.'),
+                    ('human',canonical({'request':current,'requested_at_kst':report['at_kst'],
+                        'options':[{'index':i,**option} for i,option in enumerate(options)]}))]
+                for attempt in range(2):
+                    selection=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(selection_messages),90)
+                    try:
+                        Draft202012Validator(schema).validate(selection)
+                        break
+                    except ValidationError as exc:
+                        report.setdefault('service_report_audit',[]).append({
+                            'phase':'required_read_selection_rejected','attempt':attempt+1,
+                            'response':selection,'validator':str(exc.validator),'dispatched':False,
+                            'read_result_sha256':[]})
+                        if attempt:raise
+                        selection_messages.append(('human',canonical({'selection_rejected':str(exc.validator),
+                            'executed':False,'instruction':'표시된 index를 중복·누락 없이 선택하세요. 형식 검사에 통과하기 전에는 도구가 실행되지 않습니다.'})))
                 selected_tools={t.name:t for t in agent.adapter.tools}
                 require(all(o['tool'] in selected_tools for o in options),'service_read_tool_unavailable')
                 selection_active=True
@@ -531,7 +546,9 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     harness.EVIDENCE.allowed(alias(c['server'],c['name']),'verify') for c in report['calls']):
                 report['evidence'] = {'question': current, 'at_kst': report['at_kst'], 'calls': report['calls']}
     except Exception as exc:
-        report.update(status='failed', error_type=type(exc).__name__)
+        report.update(status='failed', error_type=type(exc).__name__,
+            final_response='조회·판단 실행이 중단되어 요청의 최종 결과를 확정하지 못했습니다. '
+            '정상이나 변경 성공으로 판단하지 않았습니다. 오류 유형: '+type(exc).__name__)
         progress = harness.write_progress(current, harness.proposal_history(report['calls'], report.get('proposal_input_rejections', ())))
         if progress:
             report.update(status='partial', write_progress=progress,

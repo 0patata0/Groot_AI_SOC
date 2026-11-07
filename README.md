@@ -21,9 +21,9 @@
 
 11/8 SDK 추가근거의 실제 MCP 실행·반복 거절에 이어 common70의 자연어 KST 기간 연결을 운영 반영했습니다.1,449고유검사·새 채팅 H80.744초/O41.842초에서 필수3읽기를 확인했습니다. 당시 원문 journal 미반환·Hermes 불필요FW/수집범위 과장·Ollama의 미완료인데 completed 상태를 확인했고, 후속 원문 연결·상태 보완과 구분합니다. 이번 시간 수정은 계획된 Hermes재시작2회이며 운영 원본35B·승인/FW를 유지했습니다. [이전 시간 처리 결과·실패·복구](infra/hermes/service-periods.md) · [이전 실행 수정](infra/ollama-trial/service-inquiry.md). 기존3모델15보고 비교도 학습 우위를 입증하지 못했습니다. [조건·결과](finetuning/SERVICE_REASONING_COMPARISON_20261108.md).
 
-11/8 공통73은 다른 조회가 섞이면 관제 지표 검사가 빠지던 공백을 보완했습니다.1,553고유검사·운영 확정·이전 실제 오답 재생 거절을 확인했습니다. 새 복합 요청 H138.173초/O60.428초는 둘 다 임시차단 조회를 누락한partial이므로 전체 성공으로 세지 않습니다. [현재 한계·검증·다음 작업](infra/hermes/mixed-diagnostic-scope.md).
+11/8 common74/query125는 복합 요청의 필수 조회·실패 근거표·초기 선택 규격을 보완했습니다.1,568검사·운영확정,실제H169.215초/5조회·partial,SDK70.260초/5조회·표3을확인했습니다. SDK는completed로기록됐지만승인상태/인과/시각의근거가부족해내용검수불합격입니다. 전체정확성·60초목표는미완료입니다. [변경·실측·실패·복구](infra/hermes/compound-service-reads.md).
 
-11/8 공통72/query123은 Native/SDK 서비스 조사의 동일 성공 조회 묶음을 재실행하지 않도록 맞췄습니다.1,549고유검사·운영 확정 후 새 채팅은 Hermes135.881초/6읽기·Ollama66.992초/4읽기로 모두partial입니다. Hermes의 혼합 도구 사용 뒤 의미 검사 생략을 재현했고, 최종 오답·판단 누락은 다음 수정 대상입니다. 정확한60초 보고 달성으로 표시하지 않습니다. [변경·실측·복구](infra/hermes/service-read-parity.md).
+11/8 공통72/query123은 Native/SDK 서비스 조사의 동일 성공 조회 묶음을 재실행하지 않도록 맞췄습니다.1,549고유검사·운영 확정 후 새 채팅은 Hermes135.881초/6읽기·Ollama66.992초/4읽기로 모두partial입니다. Hermes의 혼합 도구 사용 뒤 의미 검사 생략을 재현했고, 최종 오답·판단 누락을 확인했으며 후속 상태는 [STATUS](STATUS.md)를 따릅니다. 정확한60초 보고 달성으로 표시하지 않습니다. [변경·실측·복구](infra/hermes/service-read-parity.md).
 
 서비스 원문 조회 `view=journal`을 A/B/C에 적용하고 두 봇의 원문·이력·현재 상태 구분과 SDK 미완료 상태를 보완했습니다. Linux1,544검사·실제MCP11호출(정상9/거절2)·B원문32행/오류8행SHA를 확인했습니다. 새 채팅은 Hermes140.678초/7읽기·Ollama91.518초/4읽기 모두 원문 표시 뒤 최종판단 미완료이므로 전체 정확성·60초 목표 달성은 아닙니다. 최신 결과는 [STATUS](STATUS.md)를 따릅니다. [구현·실패 수정·한계](infra/mcp/journal-excerpts.md). 후속 [입력·응답 구조12출력 대조](infra/hermes/service-report-layout.md)는 토큰 감소와 의미 정확성을 구분했고 후보를 운영에 채택하지 않았습니다.
 

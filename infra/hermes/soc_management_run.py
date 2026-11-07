@@ -588,6 +588,10 @@ def incident_bundle_view(raw):
     except (ValueError,TypeError,KeyError,RecursionError):return raw
 
 
+def invalidate_block_facts(facts,name):
+    if name=='list_blocks':facts[:]=[f for f in facts if f.get('kind')!='blocks']
+
+
 def observation_facts(name, result, arguments=None):
     """Keep bounded literal scope facts, never event instructions or decisions."""
     if getattr(result, 'is_error', getattr(result, 'isError', False)) is not False:
@@ -704,8 +708,9 @@ def observation_facts(name, result, arguments=None):
                     rows.append({'kind': 'runtime', 'target': data.get('target'), **{k: runtime[k] for k in
                         ('rule_source_path', 'combined_is_exact_et_plus_local', 'observed_at', 'started_at', 'running') if k in runtime},
                         'runtime_load_verified': False})
-            if name == 'list_blocks' and isinstance(data.get('blocks'), list):
-                rows.append({'kind': 'blocks', 'count': len(data['blocks'])})
+            if name == 'list_blocks':
+                addresses=diagnostic_contract().read_contract().block_addresses(data)
+                if addresses is not None:rows.append({'kind':'blocks','count':len(addresses),'addresses':addresses[:50]})
             if stamps:
                 rows.append({'kind': 'times', 'instants': stamps})
         except (ValueError, TypeError, RecursionError):
@@ -1560,6 +1565,7 @@ def literal_evidence_summary(facts):
                         '. 이는 현재 설정 관측과 별개입니다. reload/restart는 기존 설정 재적용/재시작이며 모드 변경 권한이 아닙니다.')
         elif kind == 'blocks':
             rows.append(f"- 차단 목록: 현재 항목 {count(row.get('count'))}개. 이 조회는 경보·서비스 상태 조회가 아닙니다.")
+            if row.get('addresses'):rows.append('표시 IP(최대50개): '+', '.join(row['addresses']))
     return '\n'.join(rows)
 
 
@@ -3577,6 +3583,7 @@ def main():
             raise PermissionError('management_wire_tool_not_allowed')
         if wire_allowed(name,'verify'):
             attempted_observation_reads.append(name)
+        invalidate_block_facts(read_facts,name)
         # A received attack alert can justify provisional containment before an
         # extra model-side lookup. A's fixed helper independently validates the
         # current raw sensor event, protected IPs and bounded TTL. Verify mode
@@ -3607,13 +3614,13 @@ def main():
                 component_read_names.add(('mcp__system_diagnostics__' if bare=='get_system_diagnostics' else 'mcp__security_events__')+bare)
                 receipt=sensor_read_receipt(bare,params,NS(isError=False,content=[NS(text=json.dumps(part['result'],ensure_ascii=False))]))
                 if receipt:sensor_receipts.append(receipt)
-        if name=='get_system_diagnostics' and isinstance(arguments,dict):
+        if name in ('get_system_diagnostics','list_blocks') and isinstance(arguments,dict):
             data={}
             try:
                 blocks=getattr(result,'content',[])
                 if len(blocks)==1:data=_unpack(json.loads(blocks[0].text))
             except (ValueError,TypeError,AttributeError):pass
-            diagnostic_receipts.append({'tool':'mcp__system_diagnostics__get_system_diagnostics',
+            diagnostic_receipts.append({'tool':('mcp__resp__' if name=='list_blocks' else 'mcp__system_diagnostics__')+name,
                 'arguments':copy.deepcopy(arguments),'is_error':getattr(result,'is_error',getattr(result,'isError',False)), 'data':data})
             del diagnostic_receipts[:-128]
         receipt=sensor_read_receipt(name,arguments,result)

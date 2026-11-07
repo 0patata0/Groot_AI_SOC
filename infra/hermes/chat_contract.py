@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.60'
+VERSION = 'soc-chat-contract:1.5.61'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -910,7 +910,7 @@ def diagnostic_property_claim_violations(text, facts):
         for clause in re.split(r';|(?<=[.!?])\s+',clean):
             subjects=diagnostic_subjects(clause,facts)
             if not subjects:continue
-            for match in re.finditer(r'\b(ActiveState|SubState|Result|Type)\s*[:=]\s*([A-Za-z0-9_-]+)',clause):
+            for match in re.finditer(r'\b(LoadState|ActiveState|SubState|Result|Type|UnitFileState)\s*[:=]\s*([A-Za-z0-9_-]+)',clause):
                 after=clause[match.end():]
                 if re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)',after):continue
                 if re.match(r'\s*(?:이면|라면|일\s*때)',after):continue

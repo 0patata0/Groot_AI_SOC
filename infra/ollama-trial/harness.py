@@ -1925,7 +1925,7 @@ def diagnostic_request(question):
     if pipeline and PIPELINE_INVESTIGATION.search(text): return None
     health = re.search(r'진단|상태|오류|에러|장애|실패|문제|괜찮|죽었|멈췄|살아\s*있|돌아\s*가|돌고\s*있|작동\s*중|가동\s*중|켜져|안\s*(?:돼|되|돌)|\b(?:failure|failed|alive|running|healthy|up)\b|관제.*(?:공백|건강)|연결.*(?:점검|진단)|수집.*(?:점검|진단)', text, re.I)
     if not pipeline and not re.search(r'진단|관제|systemd|\.service\b|Vector|벡터|Docker|도커|서버|Hermes|헤르메스|Ollama|올라마|WAF|ModSecurity|Suricata|IDS|수리카타|Wazuh\s*(?:manager|매니저)|Indexer|인덱서|Mattermost|매터모스트|LLM|모델|파이프라인|[abc]:|A\s*/\s*B\s*/\s*C', text, re.I): return None
-    if not health and not pipeline and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
+    if not health and not pipeline and not re.search(r'시작\s*설정|\b(?:LoadState|UnitFileState)\b',text,re.I) and not (re.search(r'A\s*/\s*B\s*/\s*C',text,re.I) and re.search(r'실패|오류',text)): return None
     if re.search(r'(?:전체|모든).*관제|관제.*(?:전체|공백)|A\s*/\s*B\s*/\s*C|soc:coverage',text,re.I):
         return {'all':True,'requested':[]}
     host_matches=list(re.finditer(r'(?<![A-Za-z0-9])([ABC])\s*서버',text,re.I))
@@ -1938,8 +1938,9 @@ def diagnostic_request(question):
     # Known unit aliases retain their actual host; unknown units are not mapped
     # to unrelated services. General systemd questions can discover failures.
     for unit, name, default in [('capstone-vector.service', 'vector', 'a'),
+                                ('capstone-management.service', 'management', 'b'),
                                 ('wazuh-agent.service', 'wazuh-agent', None)]:
-        if unit in text:
+        if re.search(r'(?<![A-Za-z0-9@_.:-])'+re.escape(unit)+r'(?![A-Za-z0-9_:-]|\.[A-Za-z0-9_:-])',text):
             if host or default: wanted.append((host or default) + ':' + name)
     for pattern,name,default in [
         (r'(?<![A-Za-z])Hermes(?![A-Za-z])|헤르메스','hermes','b'),
@@ -2583,7 +2584,7 @@ def diagnostic_report(question, calls, targets):
     latest = diagnostic_observations(calls)
     if not latest and not unsupported:
         return None
-    if any(v and v.get('kind') in ('runtime','coverage') for v in latest.values()):
+    if any(latest.get(t) and latest[t].get('kind') in ('runtime','coverage') for t in targets):
         return runtime_diagnostic_report(targets, latest, unsupported, detailed=detailed_output(question))
     verified = [t for t in targets if latest.get(t)]
     rows = ['**요약**', f'전체 대상 {len(targets)}개 / 유효 조회 {len(verified)}개 / 미확인 {len(targets)-len(verified)}개. 미확인 목록: ' + (', '.join(t for t in targets if t not in verified) or '없음') + '\n고정 진단 대상별 수집 스냅샷입니다. 원인과 전체 오류 발생 여부는 이 표본만으로 확정하지 않습니다.',
@@ -2598,20 +2599,24 @@ def diagnostic_report(question, calls, targets):
                 *READ.table(['요청 대상', '진단 지원', '실제 서비스 상태'], [(t, '등록 대상 미지원/미확인', '조회 미실행·미확인') for t in unsupported]),
                 '', '**조치 및 다음 단계**', '도구 목록의 지원 범위만 확인했습니다. 서비스 상태·로그 조회는 수행하지 않았고 정상·장애·오류 0건으로 판정하지 않았습니다.'])
         rows += ['| ' + ' | '.join(cell(v) for v in (t,'등록 대상 미지원','조회 미실행','미확인','미확인','미확인')) + ' |' for t in unsupported]
-    windows, errors = [], []
+    windows, errors, configurations = [], [], []
     for target in targets:
         data = latest.get(target)
         if not data:
             rows.append(f'| {cell(target)} | 미확인 | 조회 미완료/실패 | 미확인 | 미확인(0건 아님) | 미확인 |')
             continue
         props = data.get('properties', {})
+        configurations.append((target,props.get('LoadState'),props.get('UnitFileState')))
         rows.append('| ' + ' | '.join(cell(v) for v in (target, props.get('Type'),
             str(props.get('ActiveState')) + ' / ' + str(props.get('SubState')), props.get('Result'),
             data.get('returned_error_count'), data.get('observed_at_kst'))) + ' |')
         windows.append(f"- `{target}`: {cell(data.get('requested_since_kst'))} ~ {cell(data.get('requested_until_kst'))}")
         for error in data.get('recent_errors', [])[:5]:
             errors.append('- `' + target + '`: ' + cell(json.dumps(error, ensure_ascii=False)))
-    rows.extend(['', '요청 구간(KST, 대상별 조회 시각이 다름):', *windows, '',
+    rows.extend(['', '**로드·시작 설정 — 반환 속성값**', '',
+        *READ.table(['대상','LoadState','UnitFileState'],[(cell(t),cell(load),cell(install)) for t,load,install in configurations]),
+        '실행 상태와 시작 설정은 별개입니다. UnitFileState만으로 주기 실행·재시작 이력이나 전체 기능 정상을 판단하지 않습니다.',
+        '', '요청 구간(KST, 대상별 조회 시각이 다름):', *windows, '',
         '반환 오류 표본(최대10건):', *(errors[:10] or ['- 반환된 오류 표본이 없습니다. 구간 전체 오류가 없다는 뜻은 아닙니다.']),
         '', '**조치 및 다음 단계**',
         '- inactive/dead인 oneshot과 failed를 구분해야 합니다. 위 표의 상태값을 임의로 정상/장애로 바꾸지 않았습니다.',
@@ -2633,14 +2638,16 @@ def runtime_diagnostic_report(targets, latest, unsupported, *, detailed=False):
         return ('현재 관제 처리·전송·검토 대기 지표를 조회했습니다.\n\n'+
             EVIDENCE.literal_evidence_table([row])+
             '\n\n설정 변경이나 사건 종결은 수행하지 않았습니다. 현재 수집본의 대기열과 전체 기능 정상 여부는 별개입니다.')
-    counts={k:sum(r.get('status')==k for r in records.values()) for k in ('ok','degraded','unavailable','not_installed')}
-    rows=['**요약**',f"진단 대상 {len(records)}개: 점검 통과 {counts['ok']}, 이상 징후 {counts['degraded']}, 미확인 {counts['unavailable']}, 미설치 {counts['not_installed']}. 전체 공격 탐지·대응 성공을 뜻하지 않습니다.",'','**확인 내역**','',
+    counts={k:sum(r.get('status')==k for r in records.values()) for k in ('ok','degraded','unavailable','not_installed','observed')}
+    rows=['**요약**',f"진단 대상 {len(records)}개: 점검 통과 {counts['ok']}, 이상 징후 {counts['degraded']}, 미확인 {counts['unavailable']}, 미설치 {counts['not_installed']}, 속성 관측 {counts['observed']}. 전체 공격 탐지·대응 성공을 뜻하지 않습니다.",'','**확인 내역**','',
           '| 대상 | 판정 | 근거 | 수집 시각 KST |','| --- | --- | --- | --- |']
-    labels={'ok':'점검 통과','degraded':'이상 징후','unavailable':'미확인','not_installed':'미설치'}
+    labels={'ok':'점검 통과','degraded':'이상 징후','unavailable':'미확인','not_installed':'미설치','observed':'속성 관측·판단 별도'}
     details=[]
     for target,data in records.items():
         p=data.get('properties',{});codes=data.get('codes',[])
         evidence=(', '.join(codes) if codes else (' / '.join(str(p.get(k,'미확인')) for k in ('Type','ActiveState','SubState','Result')) if p else '고정 점검 항목 통과'))
+        if p:
+            evidence += '; LoadState='+str(p.get('LoadState','미확인'))+'; UnitFileState='+str(p.get('UnitFileState','미확인'))
         if target.endswith(':systemd') and data.get('status') in ('ok','degraded'):
             metrics=data.get('metrics',{})
             evidence='현재 로드된 failed unit '+str(metrics.get('failed_units_total','미확인'))+'개'

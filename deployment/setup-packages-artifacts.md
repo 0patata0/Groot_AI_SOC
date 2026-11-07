@@ -701,3 +701,7 @@ SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하�
 웹 보호/표시 보완은 web_traffic_guard.py·기존 WAF 구성·incident_containment/operations_approval·공통 harness.py 소스 갱신이다. 기존 nginx/Python/OpenSSH/Docker를 사용하고 새deb/wheel/image/키/일반MCP권한은0이다. [실제 범위](../infra/validation/web-traffic/README.md) · [카드/FW표](../infra/mcp/containment-display.md).
 
 2026-11-06 과거 오류 색인은 기존 Python 표준 sqlite3를 사용하며 새 deb/wheel/image가 없다. 소스 묶음과 초기24시간 분할 수집·검증·원복 범위는 [계약](../infra/mcp/journal-history.md)을 따른다. 실제 journal/색인 DB와 복구본은 서버에 보존하고 반입 소스/Git에 포함하지 않는다.
+
+### 서비스 속성·단문 조회 소스 보완 — 2026-11-07
+
+query1.19.112/common1.5.61: 기존 소스 묶음의 공통 gate·chat_contract·query/plugin·harness를 사용한다. 단일deploy.sh의 SIEM 플러그인 복사·root gate 렌더링과 SDK 소스 복사/영수증 경로를 유지한다. 패키지·deb/wheel·이미지·포트·키 추가0이며 운영에 초기 설치기를 실행하지 않는다. [검증·운영 범위](../infra/hermes/service-properties.md).

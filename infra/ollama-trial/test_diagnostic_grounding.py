@@ -20,6 +20,39 @@ def observation(target='a:vector', *, error=False):
 
 
 class DiagnosticGrounding(unittest.TestCase):
+    def test_unrequested_runtime_read_does_not_replace_the_service_properties_table(self):
+        data={'schema':1,'target':'b:management','status':'observed','properties':{
+            'Type':'oneshot','ActiveState':'inactive','SubState':'dead','Result':'success',
+            'LoadState':'loaded','UnitFileState':'static'}}
+        raw=json.dumps(data);call=observation('b:management');call.update(result=raw,result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+        other=observation('b:management-pipeline')
+        question='B 서버 capstone-management.service의 지금 실행 상태와 시작 설정 알려줘.'
+        text=harness.diagnostic_report(question,[call,other],['b:management','b:management-pipeline'])
+        self.assertIn('| b:management | loaded | static |',text)
+        self.assertNotIn('b:management-pipeline',text)
+        self.assertNotIn('점검 통과 0',text)
+
+    def test_mixed_runtime_and_unit_observation_retains_properties_and_count(self):
+        records={'b:management':{'status':'observed','properties':{'LoadState':'loaded','UnitFileState':'static'}},
+                 'b:management-pipeline':{'kind':'runtime','status':'degraded','codes':['case_review_required']}}
+        text=harness.runtime_diagnostic_report(list(records),records,[])
+        self.assertIn('속성 관측 1',text);self.assertIn('이상 징후 1',text)
+        self.assertIn('속성 관측·판단 별도',text)
+        self.assertIn('LoadState=loaded; UnitFileState=static',text)
+
+    def test_current_table_preserves_load_and_install_state_without_inventing_missing_values(self):
+        question='B 서버 capstone-management.service의 지금 실행 상태와 시작 설정 알려줘.'
+        for state in ('static','disabled',None):
+            data={'schema':1,'target':'b:management','kind':'unit','status':'ok',
+                  'properties':{'Type':'oneshot','ActiveState':'inactive','SubState':'dead','Result':'success','LoadState':'loaded'},
+                  'returned_error_count':0,'observed_at_kst':'2026-11-07T10:00:00+09:00'}
+            if state is not None:data['properties']['UnitFileState']=state
+            raw=json.dumps(data);call=observation('b:management');call.update(result=raw,result_sha256=hashlib.sha256(raw.encode()).hexdigest())
+            text=harness.diagnostic_report(question,[call],['b:management'])
+            self.assertIn('| 대상 | LoadState | UnitFileState |',text)
+            self.assertIn('| b:management | loaded | '+(state or '미확인')+' |',text)
+            self.assertIn('주기 실행·재시작 이력이나 전체 기능 정상',text)
+
     def test_colloquial_health_subjects_require_actual_fixed_target_reads(self):
         questions = [('벡터 살아 있니?', 'a:vector'), ('vector 잘 돌아가?', 'a:vector'),
                      ('헤르메스 돌고 있어?', 'b:hermes'), ('인덱서 running?', 'b:wazuh-indexer'),

@@ -661,7 +661,7 @@ def observation_facts(name, result, arguments=None):
                             or k=='unit_list_truncated' and type(v) is bool}
                 properties=data.get('properties')
                 if isinstance(properties,dict):
-                    row['properties']={k:v for k,v in properties.items() if k in ('Type','ActiveState','SubState','Result')
+                    row['properties']={k:v for k,v in properties.items() if k in ('LoadState','Type','ActiveState','SubState','Result','UnitFileState')
                         and isinstance(v,str) and re.fullmatch(r'[A-Za-z0-9_-]{1,40}',v)}
                 if type(data.get('age_seconds')) is int and data['age_seconds']>=0:
                     row['age_seconds']=data['age_seconds']

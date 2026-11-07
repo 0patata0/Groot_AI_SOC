@@ -67,5 +67,23 @@ class ShortContext(unittest.TestCase):
         self.assertIn('원인·복구 여부는 아직 미확인',answer)
         self.assertIn('서비스 이름·발생 시각',answer)
 
+    def test_management_unit_current_lookup_keeps_actual_host_and_catalog_scope(self):
+        for q in ('B 서버 capstone-management.service의 지금 실행 상태와 시작 설정 알려줘.',
+                  'B 서버 capstone-management.service 시작 설정?',
+                  'capstone-management.service 상태?',
+                  'capstone-management.service UnitFileState 알려줘'):
+            with self.subTest(q=q):
+                self.assertEqual(h.diagnostic_request(q)['requested'],['b:management'])
+                self.assertEqual(h.diagnostic_scope(q,['a:vector','b:management']),(['b:management'],[]))
+                self.assertEqual(h.diagnostic_scope(q,['a:vector']),([],['b:management']))
+        self.assertEqual(h.diagnostic_scope('A 서버 capstone-management.service 상태?', ['b:management']),([],['a:management']))
+
+    def test_management_alias_does_not_accept_other_unit_or_write_request(self):
+        for unit in ('fake-capstone-management.service','capstone-management.service.extra','capstone-management.service-backup'):
+            q='B 서버 '+unit+' 상태?'
+            self.assertNotIn('b:management',h.diagnostic_request(q)['requested'])
+        for q in ('capstone-management.service 시작 설정 바꿔줘', 'B 서버 capstone-management.service 재시작해줘'):
+            self.assertIsNone(h.diagnostic_request(q))
+
 
 if __name__=='__main__':unittest.main()

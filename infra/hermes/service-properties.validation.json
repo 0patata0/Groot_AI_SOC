@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T10:49:05+09:00",
+  "versions": {
+    "query": "1.19.112",
+    "common": "1.5.61",
+    "routing": "1.1.6",
+    "diagnostics": "1.2.8"
+  },
+  "sources": {
+    "infra/hermes/chat_contract.py": "c16be920281502e57d94d893aef53ef53a7c1ad31b9a152c8c1421fdd298d446",
+    "infra/hermes/soc_management_run.py": "135ddb52c17a04edc0071a89fc61f3936f0356d34801ac525044e4f032a74d55",
+    "infra/hermes/query-completion/__init__.py": "a8224034cd48dc538869f08d8cf766e609d715b01ccc6f67b9810699418a7f6c",
+    "infra/hermes/query-completion/plugin.yaml": "c82b5ebf3be7bddc949a1e02e56f161f216333b6c7719b71dc28e9184dac0463",
+    "infra/ollama-trial/harness.py": "286e1a16264cf64a70b5bde6a8ac262ef71e2e616e9b3c8f35869cf5227776db"
+  },
+  "tests": {
+    "passed": 1270,
+    "skip": 0,
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 473,
+        "unique": 473
+      },
+      "service": {
+        "rc": 0,
+        "count": 48,
+        "unique": 48
+      },
+      "claims": {
+        "rc": 0,
+        "count": 30,
+        "unique": 30
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 266,
+        "unique": 266
+      },
+      "query": {
+        "rc": 0,
+        "count": 391,
+        "unique": 391
+      },
+      "installer": {
+        "rc": 0,
+        "count": 62,
+        "unique": 62
+      }
+    }
+  },
+  "deployments": [
+    {
+      "backup": "/var/lib/capstone-service-grounding/20261107-properties61",
+      "files": 11,
+      "applied_at_kst": "2026-11-07T10:36:26.946523+09:00",
+      "confirmed_at_kst": "2026-11-07T10:37:31.942764+09:00",
+      "hermes_container_started_at_kst": "2026-11-07T10:36:26.791690+09:00"
+    },
+    {
+      "backup": "/var/lib/capstone-service-grounding/20261107-properties61-short",
+      "files": 6,
+      "applied_at_kst": "2026-11-07T10:41:27.005868+09:00",
+      "confirmed_at_kst": "2026-11-07T10:42:33.257660+09:00",
+      "hermes_container_started_at_kst": "2026-11-07T10:41:26.851906+09:00"
+    },
+    {
+      "backup": "/var/lib/capstone-service-grounding/20261107-properties61-mixed",
+      "files": 6,
+      "applied_at_kst": "2026-11-07T10:46:35.855187+09:00",
+      "confirmed_at_kst": "2026-11-07T10:47:17.409889+09:00",
+      "hermes_container_started_at_kst": "2026-11-07T10:46:35.692035+09:00"
+    }
+  ],
+  "health": {
+    "manifest_sha": 23,
+    "protected_sha": 8,
+    "sdk_receipt": 20,
+    "review_receipt": 5,
+    "bots_ws_worker": true,
+    "services_active": 4,
+    "queues": 0,
+    "b_failed_units": 0,
+    "independent_rollback_confirmed": true
+  },
+  "first_short_failure": {
+    "engine": "ollama",
+    "seconds": 6.419,
+    "runtime_status": "partial",
+    "actual_reads": 0,
+    "cause": "missing_current_unit_alias",
+    "quality_success": false
+  },
+  "actual_final_chat": {
+    "hermes": {
+      "engine": "hermes",
+      "seconds": 20.711,
+      "runtime_status": "completed",
+      "actual_read_calls": 3,
+      "target_count": 3,
+      "reads": [
+        {
+          "arguments": {
+            "target": "b:management"
+          },
+          "sha256": "d9caaaa2f3c2e2a344a96b783c7b8983daeba11a79aa8184e8f54b9ec2baaaae"
+        },
+        {
+          "arguments": {
+            "target": "a:systemd"
+          },
+          "sha256": "068e099e76ae55a87758ddc411197cbbd72ae406241677c0ea60e04b9d96acc4"
+        },
+        {
+          "arguments": {
+            "target": "c:systemd"
+          },
+          "sha256": "a37da1596c619067a5f25f17ca07d6ffabf862ab3c05aadcd48b845891a20bf1"
+        }
+      ],
+      "properties": {
+        "ActiveEnterTimestampMonotonic": 0,
+        "ActiveState": "activating",
+        "ExecMainCode": 0,
+        "ExecMainExitTimestampMonotonic": 0,
+        "ExecMainStartTimestampMonotonic": 1224041412077,
+        "ExecMainStatus": 0,
+        "InactiveEnterTimestampMonotonic": 1224025715388,
+        "LoadState": "loaded",
+        "NRestarts": 0,
+        "Result": "success",
+        "SubState": "start",
+        "Type": "oneshot",
+        "UnitFileState": "static"
+      },
+      "observed_at_kst": "2026-11-07T10:47:23+09:00",
+      "markdown_tables": 2,
+      "protected_calls": 0,
+      "displayed_fields_match_actual_raw": true,
+      "general_accuracy_claim": false
+    },
+    "ollama": {
+      "engine": "ollama",
+      "seconds": 18.107,
+      "runtime_status": "completed",
+      "actual_read_calls": 1,
+      "target_count": 1,
+      "reads": [
+        {
+          "arguments": {
+            "target": "b:management"
+          },
+          "sha256": "a9d3f9c664c8e3b9962de16fab4a633b61c4593698b24826d4125f252c126cad"
+        }
+      ],
+      "properties": {
+        "ActiveEnterTimestampMonotonic": 0,
+        "ActiveState": "activating",
+        "ExecMainCode": 0,
+        "ExecMainExitTimestampMonotonic": 0,
+        "ExecMainStartTimestampMonotonic": 1224104529100,
+        "ExecMainStatus": 0,
+        "InactiveEnterTimestampMonotonic": 1224088900714,
+        "LoadState": "loaded",
+        "NRestarts": 0,
+        "Result": "success",
+        "SubState": "start",
+        "Type": "oneshot",
+        "UnitFileState": "static"
+      },
+      "observed_at_kst": "2026-11-07T10:48:26+09:00",
+      "markdown_tables": 2,
+      "protected_calls": 0,
+      "model_calls": 1,
+      "displayed_fields_match_actual_raw": true,
+      "general_accuracy_claim": false
+    }
+  },
+  "changed_model": false,
+  "changed_inference_options": false,
+  "changed_approval_fw_ttl": false,
+  "new_packages": 0,
+  "new_os_install_tested": false,
+  "independent_evaluation": false,
+  "publication": "pending",
+  "intermediate_chat": [
+    {
+      "engine": "ollama",
+      "seconds": 20.262,
+      "reads": 2,
+      "distinct_target": 1,
+      "same_result_sha": true,
+      "field_display_pass": true,
+      "unnecessary_reads_pending": true
+    },
+    {
+      "engine": "hermes",
+      "seconds": 19.541,
+      "reads": 2,
+      "field_display_pass": false,
+      "reason": "unrequested_runtime_changed_unit_table"
+    }
+  ],
+  "server_fixture_cleanup": [
+    {
+      "root": "/tmp/capstone-service-claims-check",
+      "files": 461,
+      "bytes": 7221378,
+      "removed": true
+    },
+    {
+      "root": "/tmp/capstone-service-claims-final",
+      "files": 461,
+      "bytes": 7221378,
+      "removed": true
+    },
+    {
+      "root": "/tmp/capstone-service-claims-short",
+      "files": 461,
+      "bytes": 7224604,
+      "removed": true
+    },
+    {
+      "root": "/tmp/capstone-service-claims-mixed",
+      "files": 461,
+      "bytes": 7226514,
+      "removed": true
+    }
+  ],
+  "final_health": [
+    {
+      "at_kst": "2026-11-07T10:49:48.743521+09:00",
+      "manifest_files": 23,
+      "protected": 8,
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "failed": "",
+      "bots_connected": true
+    },
+    {
+      "final_health": true,
+      "at_kst": "2026-11-07T10:49:48.817912+09:00",
+      "query": "1.19.112",
+      "common": "1.5.61",
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "rollback_confirmed": true,
+      "actual_sdk_pid_ticks_match": true,
+      "h_started": "2026-11-07T01:46:35.692035865Z"
+    }
+  ],
+  "mac_cleanup": {
+    "at_kst": "2026-11-07T10:51:13.200952+09:00",
+    "removed": true,
+    "root": "/private/tmp/capstone-service-claims-20261107-7ngowyv_",
+    "files": 43,
+    "bytes": 45570642,
+    "new_mac_packages": 0,
+    "preserved": "project source/logs/paper, server operation/rollback, unrelated temporary directories"
+  }
+}

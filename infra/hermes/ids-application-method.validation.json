@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T14:13:12.474393+09:00",
+  "query_version": "1.19.115",
+  "sources": {
+    "infra/ollama-trial/harness.py": "359dc99e64a29159b3c6aa4c3aa2a77923bb1731d05f49ceb942a562d135f702",
+    "infra/hermes/read_contract.py": "4c7947b80c36c87dcf787f82f149679b33d4e50b233da164f7e934dfb9eaa967",
+    "infra/hermes/query-completion/__init__.py": "e97799e0eca06eef9f699f42f4ee5832e4df6a51ccf4c794eb686a5323dfd672",
+    "infra/hermes/query-completion/plugin.yaml": "16498e7a30cf853d9f78269e86d4451d53a2ff2fdbdf06901402374445fb7cf4",
+    "infra/hermes/query-completion/test_ids_method.py": "67865c0b928ee482ec8b5520fc49786e8596d54bc2b5354fcdeafb05719afbc9"
+  },
+  "tests": {
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 477,
+        "unique": 477
+      },
+      "service": {
+        "rc": 0,
+        "count": 48,
+        "unique": 48
+      },
+      "claims": {
+        "rc": 0,
+        "count": 30,
+        "unique": 30
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 276,
+        "unique": 276
+      },
+      "query": {
+        "rc": 0,
+        "count": 401,
+        "unique": 401
+      },
+      "peer": {
+        "rc": 0,
+        "count": 79,
+        "unique": 79
+      },
+      "installer": {
+        "rc": 0,
+        "count": 62,
+        "unique": 62
+      }
+    },
+    "passed": 1373,
+    "unique": 1373,
+    "skip": 0
+  },
+  "actual_chat": [
+    {
+      "case": "hermes-1",
+      "question": "IDS 룰 바꾸면 무중단으로 적용돼? 실제 도구로 확인해줘. 변경이나 재시작은 하지 마.",
+      "seconds": 22.349,
+      "actual_reads": 1,
+      "tool": "rule-a/get_service_action_target",
+      "arguments": {
+        "target": "a:suricata"
+      },
+      "result_sha256": "8f1469b243372624660615464efe6d5d203ddfc6ac8b631123dcf90c42ad0575",
+      "observed_at_kst": "2026-11-07T14:11:54+09:00",
+      "protected_calls": 0,
+      "status": "completed",
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "ids_container_unchanged": true
+    },
+    {
+      "case": "hermes-2",
+      "question": "IDS 재시작 없이 룰 바꿀 수 있어? 확인만 해줘.",
+      "seconds": 21.769,
+      "actual_reads": 1,
+      "tool": "rule-a/get_service_action_target",
+      "arguments": {
+        "target": "a:suricata"
+      },
+      "result_sha256": "644423d321a26c022b260cf4d3a3dd661e08347b308e6d849583f6aa5f144336",
+      "observed_at_kst": "2026-11-07T14:12:45+09:00",
+      "protected_calls": 0,
+      "status": "completed",
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "ids_container_unchanged": true
+    },
+    {
+      "case": "ollama-1",
+      "question": "IDS 룰 바꾸면 무중단으로 적용돼? 실제 도구로 확인해줘. 변경이나 재시작은 하지 마.",
+      "seconds": 21.697,
+      "actual_reads": 1,
+      "tool": "rule-a/get_service_action_target",
+      "arguments": {
+        "target": "a:suricata"
+      },
+      "result_sha256": "a10ba82ace04bfdc89e7c8df11b0864f3f2ad5082729cddc25ddabd47aaaf9ae",
+      "observed_at_kst": "2026-11-07T14:11:28+09:00",
+      "protected_calls": 0,
+      "status": "completed",
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "ids_container_unchanged": true
+    },
+    {
+      "case": "ollama-2",
+      "question": "IDS 재시작 없이 룰 바꿀 수 있어? 확인만 해줘.",
+      "seconds": 17.089,
+      "actual_reads": 1,
+      "tool": "rule-a/get_service_action_target",
+      "arguments": {
+        "target": "a:suricata"
+      },
+      "result_sha256": "f352877b0e7d325515f26453a25a3fbe99ceccfd4442e86edba0dd3faef36386",
+      "observed_at_kst": "2026-11-07T14:12:16+09:00",
+      "protected_calls": 0,
+      "status": "completed",
+      "markdown_tables": 1,
+      "code_fences": 0,
+      "ids_container_unchanged": true
+    }
+  ],
+  "failures_preserved": {
+    "before_change_wrong_inventory_seconds": {
+      "hermes": 23.865,
+      "ollama": 22.94
+    },
+    "first_candidate_ollama_no_tool_seconds": [
+      6.72,
+      6.982
+    ],
+    "cause": "A human-readable suffix on a missing target ID removed the registered service target during SDK schema narrowing; fixed to preserve stable target ID.",
+    "local_first_regressions_failed": 3
+  },
+  "deployment": {
+    "at_kst": "2026-11-07T14:13:12.474393+09:00",
+    "query": "1.19.115",
+    "manifest": 26,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_confirmed_noop": true,
+    "backup": "/var/lib/capstone-service-grounding/20261107-ids-method115",
+    "planned_hermes_restarts": 2,
+    "security_device_restarts": 0,
+    "operational_db_replaced": false,
+    "new_packages": 0
+  },
+  "limits": [
+    "Development regression cases, not independent benchmark or training examples.",
+    "Shared GPU/cache/channel background not controlled; no average latency claim.",
+    "Markdown body checked; new browser/mobile rendering not tested.",
+    "No actual rule change, approval, security-device restart, attack/load/PCAP, new OS install, or training."
+  ]
+}

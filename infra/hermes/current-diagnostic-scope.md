@@ -1,6 +1,6 @@
 # 현재 서비스 조회 범위와 중복 호출
 
-query1.19.114/common1.5.61. [검증 원장](current-diagnostic-scope.validation.json) · [현재 상태](../../STATUS.md) · [이전 필드 보존](service-properties.md).
+이 문서는 query1.19.114/common1.5.61 당시 검증 기록이다. 현재 후속은 [IDS 적용 방식 query115](ids-application-method.md)이며 아래 실측은 소급 변경하지 않는다. [검증 원장](current-diagnostic-scope.validation.json) · [현재 상태](../../STATUS.md) · [이전 필드 보존](service-properties.md).
 
 현재 상태만 묻는 단문은 실제 등록된 요청 대상 중 아직 조회하지 않은 대상만 선택 스키마에 남긴다. 허용 target·enum·nonce·입력 검증은 유지한다. MCP가 실제 선언한 기본값의 생략/명시만 같은 호출로 묶고 유효하지 않은 선택이 섞이면 전체 선택을 거절한다. 기간·표본 상한이 다른 호출과 비교·과거·재관측 요청은 합치지 않는다. 인수 원문을 바꾸지 않는다.
 

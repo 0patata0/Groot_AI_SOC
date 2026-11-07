@@ -673,7 +673,9 @@ def read_report(question, calls):
     security=security_inventory_request(question)
     if security:
         report=security_inventory_report(security,calls)
-        if security['ids_runtime']:report+='\n\n'+(service_report('IDS 실제 가동 상태 조회',calls) or 'IDS 구동 근거 조회 미완료')
+        if security['ids_runtime']:report+='\n\n'+(service_report(
+            'IDS 룰 적용 방식 조회' if ids_change_method_question(question) else 'IDS 실제 가동 상태 조회',calls)
+            or 'IDS 구동 근거 조회 미완료')
         return (firewall_report(question,calls)+'\n\n' if security['fw'] else '')+report
     scope = rule_scope_request(question)
     if scope and 'FW' in scope['devices']:
@@ -685,7 +687,8 @@ def read_report(question, calls):
     if combined:
         missing = missing_reads(question, calls)
         inventory_text = SHARED.render_rule_inventory(combined, linked_rows(calls))
-        service_text = service_report('IDS 실제 가동 상태 조회', calls)
+        service_text = service_report('IDS 룰 적용 방식 조회' if ids_change_method_question(question)
+                                      else 'IDS 실제 가동 상태 조회', calls)
         return '\n\n'.join(['**전체 요청 범위**\n' + ('규칙 파일과 IDS 구동 근거를 모두 확인했습니다.' if not missing else '일부 요청 항목이 미완료입니다. 전체 확인 완료가 아닙니다.'),
             inventory_text or '규칙 파일 조회 미완료/실패입니다.', service_text or 'IDS 구동 경로 조회 미완료/실패입니다.'] +
             (['미확인 항목: ' + ', '.join(missing)] if missing else []))
@@ -706,9 +709,28 @@ def rule_scope_text(question):
 
 def ids_runtime_question(question):
     text = rule_scope_text(question)
+    if ids_change_method_question(question):return True
     return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
         and re.search(r'활성|가동|적재|사용(?:\s*중|하는|하고)|구동|불러오|로드|실행\s*(?:상태|여부|중)', text)
         and not re.search(r'WAF|Wazuh', text, re.I) and not READ.wants_write(text))
+
+
+def ids_change_method_question(question):
+    """A question about application impact is not a rule-list request or consent."""
+    # Keep "재시작 없이" as the capability being asked about. The generic
+    # normalized view removes action prohibitions before routing.
+    text = READ.scope_text(CONTRACT.normalize_query_text(SHARED._unquoted_text(question)))
+    if re.search(r'도구\s*없이|조회하지|설명만|일반적으로|개념|무슨\s*뜻|뜻이|번역',text):return False
+    # Interrogative morphology is not consent to restart. Any separate action
+    # request remains on the normal protected-change path.
+    inquiry = re.sub(r'재시작(?:을)?\s*해야\s*(?:해\??|하나|하니|하는지)', '', text)
+    inquiry = re.sub(r'(적용|반영)(?:하는|할)\s*(?=방식|방법|절차)', r'\1 ', inquiry)
+    return bool(re.search(r'IDS|Suricata|수리카타', text, re.I)
+        and not re.search(r'WAF|Wazuh|방화벽|\bFW\b', text, re.I)
+        and not READ.wants_write(inquiry)
+        and not re.search(r'(?:reload|리로드|재적재)\s*(?:해(?:줘|주|라)?|하(?:고|라|세요|자))',inquiry,re.I)
+        and re.search(r'무중단|hot.?reload|재적재|리로드|reload|재시작.{0,12}(?:필요|해야|가능|없이)|(?:적용|반영).{0,8}(?:방식|방법|절차)', text, re.I)
+        and not EVIDENCE.incident_investigation_request(text))
 
 
 def _inventory_question(question):
@@ -746,9 +768,9 @@ def combined_rule_request(question):
     text = rule_scope_text(question)
     if EVIDENCE.incident_investigation_request(text):
         return None
-    if READ.wants_write(text): return None
+    if READ.wants_write(text) and not ids_change_method_question(question): return None
     runtime = re.search(r'(?:IDS|Suricata|수리카타)(?:가|는|의)?[^.!?。]{0,90}(?:local\.rules|all\.rules|구동\s*경로|실행\s*경로|룰\s*경로|실제\s*사용|사용하는지|가동\s*상태|(?:활성|적재|로드)\s*(?:상태|여부))', text, re.I)
-    if runtime and re.search(r'(?:규칙|룰|파일\s*정의).{0,35}(?:개수|목록|정의\s*수)|(?:개수|목록|정의\s*수).{0,20}(?:규칙|룰|파일\s*정의)', text):
+    if (runtime or ids_change_method_question(question)) and re.search(r'(?:규칙|룰|파일\s*정의).{0,35}(?:개수|목록|정의\s*수)|(?:개수|목록|정의\s*수).{0,20}(?:규칙|룰|파일\s*정의)', text):
         labels = [label for pattern, label in [('WAF|ModSecurity', 'WAF'), ('IDS|Suricata|수리카타', 'Suricata'), ('Wazuh|와주', 'Wazuh')] if re.search(pattern, text, re.I)]
         return '현재 '+('커스텀 파일 ' if re.search(r'커스텀\s*파일',text) else '')+'규칙 목록 보여줘 ' + ' '.join(labels) + (' 장비별로 표로 보여줘' if re.search(r'표|테이블', text) else '')
     return None
@@ -2053,7 +2075,7 @@ def tool_scope(question, calls=None):
     if inventory_request:
         return inventory_tool_scope(inventory_request)
     text = normalized(question)
-    if re.search(r'변경|수정|차단해|재시작|추가해|삭제|적용해|설치|배포', text):
+    if READ.wants_write(text) or re.search(r'변경|수정|차단해|재시작|추가해|삭제|적용해|설치|배포', text):
         return None
     if (re.search(r'IDS|Suricata|수리카타', text, re.I) and re.search(r'활성|가동|적재', text)
             and not re.search(r'WAF|Wazuh|변경|수정|차단|재시작|추가|삭제|적용해', text, re.I)):
@@ -2091,7 +2113,8 @@ def missing_reads(question, calls, diagnostic_targets=()):
     if security:
         missing=[t for t in security['targets'] if not (security_inventory_state(security,calls,t) or {}).get('complete')]
         if security['fw'] and not (firewall_state(calls) or {}).get('verified_complete'):missing.append('FW 전체 규칙: 조회 미완료')
-        if security['ids_runtime']:missing+=missing_reads('IDS 실제 가동 상태 조회',calls)
+        if security['ids_runtime']:missing+=missing_reads(
+            'IDS 룰 적용 방식 조회' if ids_change_method_question(question) else 'IDS 실제 가동 상태 조회',calls)
         return missing
     request = rule_scope_request(question)
     if request and 'FW' in request['devices']:
@@ -2107,7 +2130,8 @@ def missing_reads(question, calls, diagnostic_targets=()):
         return [t for t in detail['targets'] if t not in verified]
     combined = combined_rule_request(question)
     if combined:
-        return missing_reads(combined, calls, diagnostic_targets) + missing_reads('IDS 실제 가동 상태 조회', calls, diagnostic_targets)
+        return missing_reads(combined, calls, diagnostic_targets) + missing_reads(
+            'IDS 룰 적용 방식 조회' if ids_change_method_question(question) else 'IDS 실제 가동 상태 조회', calls, diagnostic_targets)
     plan = read_plan(question)
     if plan:
         return READ.missing(plan, calls, EVIDENCE)
@@ -2124,9 +2148,14 @@ def missing_reads(question, calls, diagnostic_targets=()):
     successful = [c for c in calls if not c.get('is_error') and c.get('result')]
     names = {'mcp__' + c['server'].replace('-', '_') + '__' + c['name'] for c in successful}
     if scope == {'mcp__rule_a__get_service_action_target'}:
-        return [] if any(c.get('server') == 'rule-a' and c.get('name') == 'get_service_action_target'
-                         and c.get('arguments', {}).get('target') == 'a:suricata'
-                         and payload(c) for c in successful) else ['a:suricata']
+        relevant=[c for c in calls if c.get('server')=='rule-a' and c.get('name')=='get_service_action_target'
+                  and c.get('arguments',{}).get('target')=='a:suricata']
+        data=payload(relevant[-1]) if relevant else None
+        valid=bool(data and data.get('target')=='a:suricata' and isinstance(data.get('observation'),dict))
+        if ids_change_method_question(question):
+            valid=bool(valid and ids_actions_verified(data) and isinstance(data.get('impact'),str) and data['impact'].strip())
+        # Keep the target ID machine-readable: schema narrowing consumes it.
+        return [] if valid else ['a:suricata']
     if scope == {'mcp__system_diagnostics__get_system_diagnostics'}:
         done = {t for t, data in diagnostic_observations(calls).items() if data}
         selected, unsupported = diagnostic_scope(question, diagnostic_targets)
@@ -2563,6 +2592,18 @@ def payload(call):
         return {'result': raw} if call.get('server') == 'wazuh-ro' else None
 
 
+def ids_actions_verified(data):
+    actions=data.get('allowed_actions')
+    return (isinstance(actions,list) and bool(actions) and
+            all(isinstance(a,str) and a in ('restart','reload') for a in actions) and len(set(actions))==len(actions))
+
+
+def ids_observed_kst(value):
+    if type(value) not in (int,float):return '미확인'
+    try:return datetime.fromtimestamp(value,EVIDENCE.KST).isoformat()
+    except (ValueError,OverflowError,OSError):return '미확인'
+
+
 def service_report(question, calls):
     calls=evidence_reads(calls)
     if tool_scope(question) != {'mcp__rule_a__get_service_action_target'}:
@@ -2574,6 +2615,30 @@ def service_report(question, calls):
     data = payload(relevant[-1])
     if not data or data.get('target') != 'a:suricata' or not isinstance(data.get('observation'), dict):
         return 'IDS 상태 조회에 실패하여 현재 가동 여부를 확인하지 못했습니다. 비활성이나 정상으로 판단하지 않습니다.'
+    if ids_change_method_question(question):
+        actions = data.get('allowed_actions')
+        runtime = data.get('rule_source_evidence', {})
+        verified = ids_actions_verified(data)
+        verdict = ('현재 서비스 MCP는 재시작만 허용하므로 무중단 적용 경로가 아닙니다.'
+                   if verified and actions == ['restart'] else
+                   '재적재 작업이 허용 목록에 있습니다. 실제 무중단 적용 성공은 아직 확인하지 않았습니다.'
+                   if verified and 'reload' in actions else
+                   '허용 작업 근거가 불완전하여 무중단 적용 가능 여부를 확인하지 못했습니다.')
+        observed = runtime.get('observed_at') if isinstance(runtime,dict) else None
+        at = ids_observed_kst(observed)
+        source = (str(runtime.get('rule_source_option'))+' '+str(runtime.get('rule_source_path'))
+                  if isinstance(runtime,dict) and runtime.get('combined_is_exact_et_plus_local') is True
+                  and runtime.get('rule_source_option') in ('-S','-s') and isinstance(runtime.get('rule_source_path'),str)
+                  and runtime['rule_source_path'].startswith('/') else '미확인')
+        return '\n'.join(['**IDS 적용 방식 확인**',verdict,'',
+            '| 확인 항목 | 실제 조회 결과 |','| --- | --- |',
+            '| 대상 | a:suricata |',
+            '| 허용 작업 | '+cell(', '.join(actions) if verified else None)+' |',
+            '| 실행 룰 지정 | '+cell(source)+' |',
+            '| 관측 시각 KST | '+cell(at)+' |','',
+            '도구가 반환한 작업 영향: '+operational_text(data.get('impact')),
+            '이번 확인은 읽기 조회입니다. 실제 변경은 정확한 후보에 대한 관리자 승인이 필요합니다.',
+            '현재 허용 작업과 적용 성공은 별개입니다. 승인 후에는 실행 결과와 엔진 적재 상태를 다시 확인해야 합니다.'])
     observation = data['observation']
     running = observation.get('running')
     status = '실행 중' if running is True else '실행 중이 아님' if running is False else '실행 여부 미확인'
@@ -2587,9 +2652,7 @@ def service_report(question, calls):
         rows.append('- 실행 룰 지정: `' + cell(runtime.get('rule_source_option')) + ' ' + cell(runtime.get('rule_source_path')) + '`')
         rows.append('- ET+local 파일 바이트의 정확한 결합: `' + cell(runtime.get('combined_is_exact_et_plus_local')) + '`')
         observed = runtime.get('observed_at')
-        if type(observed) in (int, float):
-            from datetime import datetime
-            rows.append('- 근거 관측 시각: ' + datetime.fromtimestamp(observed, EVIDENCE.KST).isoformat())
+        rows.append('- 근거 관측 시각: ' + ids_observed_kst(observed))
     engine = data.get('rule_engine_evidence')
     valid_engine = (isinstance(engine, dict) and engine.get('status') == 'observed'
                     and engine.get('scope') == 'single_tenant_engine_counters'

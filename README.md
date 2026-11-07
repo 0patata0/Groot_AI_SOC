@@ -3,7 +3,7 @@
 관리자 SSH 경보는 [정책 적용·실제 재확인](infra/validation/admin-ssh/README.md)을 따른다.11:59보고의4건은예외적용전이력이며13:00색인확인적용후0건이다. 정기보고에정책전후구분을추가했다.
 
 현재 작업 상태는 [STATUS.md](STATUS.md), 추가 PCAP 기반 학습 후보의 출처·검수·DGX 반입 결과는 [검수 기록](finetuning/PCAP_LEARNING_REVIEW.md)을 따른다. [후속 학습 준비](finetuning/PCAP_TRAINING_PREPARATION.md)는8,719건·실제토큰/마스크 검증·DGX반입과13:22 KST 독립 GPU사전시험2단계를 완료했다. SSH 단절 독립 실행을 확인했으며 본학습 자동 시작0이다. [품질 보완 준비](finetuning/QUALITY_PREPARATION.md)는 균형 후보1,220건·중간 평가/최선 보존·별도 평가32건·비교 설정6개를 구성하고13:46 새 GPU사전시험을 완료했다. 정확도 비교·본학습·운영 승격은 아직이다. 로컬 데이터는 [원본1개·정제본1개 압축으로 통합](datasets/STORAGE_POLICY.md)하고 전수 복원 검증 후 중복 해제본을 정리했다.
-현재 query1.19.114/common1.5.61·routing1.1.6/진단MCP1.2.8이다. **정확성을 속도보다 우선**한다. 현재 단순 조회는 실제 등록된 요청 대상만 선택하고 MCP 기본값이 같은 중복 호출을 제거한다. Native inline 실행 실패를 수정한7프로필1,364고유PASS/skip0·운영24SHA/보호8·양봇/두큐0/Bfailed0·독립원복을 확인했다. 같은 단문 실채팅 H18.476/O18.396초·각1읽기/2표·원문SHA 일치이며 각1회·공유조건 비통제다. 복합 판단 품질은 미완료다. 모델/옵션·권한/승인/FW/TTL·패키지 변경0·새OS 전체설치 미시험. [변경·한계·복구](infra/hermes/current-diagnostic-scope.md) · [현황](STATUS.md).
+현재 query1.19.115/common1.5.61·routing1.1.6/진단MCP1.2.8이다. **정확성을 속도보다 우선**한다. 단순 조회 범위/중복 제거를 유지하고 “IDS 재시작 없이 룰 바꿀 수 있어?” 같은 적용 방식 질문의 오분류를 수정했다. 7프로필1,373고유PASS·26소스/보호8·양봇/큐0/Bfailed0·독립원복 확정. 새 채팅2표현×양봇은 H22.349/21.769초·O21.697/17.089초, 각 실제1읽기/쓰기0·원문SHA/작업 영향/KST 일치다. 첫 SDK 후보의 조회0 실패도 보존했다. 개발 회귀이며 평균/독립 정확도·전체 복합 조사·새OS 설치 성공이 아니다. 모델/권한/승인/FW/TTL·보안장비 변경0. [변경·한계·복구](infra/hermes/ids-application-method.md) · [현황](STATUS.md).
 
 복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
 

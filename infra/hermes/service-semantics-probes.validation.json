@@ -1,0 +1,468 @@
+{
+  "checked_at_kst": "2026-11-08T01:11:33.088414+09:00",
+  "production_common": "1.5.67",
+  "production_query": "1.19.120",
+  "production_source_sha256": {
+    "infra/hermes/chat_contract.py": "eb31001f495ccf357d20af177b2e590f9be3538bd663adb16df47cdbfd45be46",
+    "infra/hermes/soc_management_run.py": "f91f699aae06b5f93b192523e8b94d1227c40a908c0c6c7ff3b870e41296952f",
+    "infra/ollama-trial/harness.py": "806425662664ce9954329ecab6fda905449f2032c2237217d8dd2feee7a49b34",
+    "infra/ollama-trial/runtime.py": "5cccc19b3adf9abfe7943b041afd8d7060e5be4e379c8bbd24f5e1c05d0c42e7"
+  },
+  "method": "frozen actual receipts and one explicit counterfactual; no live chat or independent accuracy benchmark",
+  "manual_reviewer": "Codex; no independent expert adjudication",
+  "model_metadata": {
+    "model": "qwen3.6:35b",
+    "details": {
+      "parent_model": "qwen3.6-source:35b-a3b-mtp-q4_K_M-20260824",
+      "format": "gguf",
+      "family": "qwen35moe",
+      "families": [
+        "qwen35moe"
+      ],
+      "parameter_size": "35.5B",
+      "quantization_level": "Q4_K_M",
+      "runner": "llamacpp"
+    },
+    "capabilities": [
+      "completion",
+      "vision",
+      "tools",
+      "thinking"
+    ],
+    "parameters": "repeat_penalty                 1\ntemperature                    1\ntop_k                          20\ntop_p                          0.95\ndraft_num_predict              2\nmin_p                          0\npresence_penalty               1.5",
+    "template_bytes": 13,
+    "template_sha256": "b507b9c2f6ca642bffcd06665ea7c91f235fd32daeefdf875a0f938db05fb315",
+    "system_bytes": 0,
+    "system_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "context_info": {
+      "general.parameter_count": 35505251456,
+      "qwen35moe.context_length": 262144,
+      "qwen35moe.expert_count": 256,
+      "qwen35moe.expert_used_count": 8
+    },
+    "loaded": [
+      {
+        "name": "qwen3.6:35b",
+        "context_length": 262144,
+        "size_vram": 23656629533
+      }
+    ]
+  },
+  "sdk_options": {
+    "presence_penalty_constructor_field": false,
+    "ollama_options_supported": [
+      "repeat_penalty",
+      "presence_penalty",
+      "frequency_penalty"
+    ],
+    "per_call_options_replace_defaults": true
+  },
+  "results": [
+    {
+      "id": "hermes66-control",
+      "variant": "sdk_existing_policy",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 12.757161454996094,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "fbf39a4345587a03c60b6283986d1deac6f922136ac90ad6368f376c2e0664aa",
+      "source_result_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [
+        "diagnostic_pipeline_count_mismatch"
+      ],
+      "manual_quality": "failed",
+      "failures": [
+        "review_count_as_processing_backlog",
+        "unavailable_lock_owner_from_pipeline"
+      ],
+      "metrics": {
+        "total_duration": 12637668497,
+        "load_duration": 5222918,
+        "prompt_eval_count": 8870,
+        "prompt_eval_duration": 8092453000,
+        "eval_count": 195,
+        "eval_duration": 4452154000
+      },
+      "usage": {
+        "input_tokens": 8870,
+        "output_tokens": 195,
+        "total_tokens": 9065
+      },
+      "wire_options": null,
+      "response_file_sha256": "3b7d5b4e55802ef92362f2bf11e9e133681324cbf51df454c0fdeeedff0c3467"
+    },
+    {
+      "id": "ollama66-control",
+      "variant": "sdk_existing_policy",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 12.672278519021347,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "03719befcae2f25b7a6301cc38de45911b4c68e144e1bb43b7e9dd2687f79577",
+      "source_result_sha256": [
+        "c8802e296b454d136d34b881b2e999451e08df837ed2973b6e358e6d1f85b5d1",
+        "98d0c2c36fc0a8e94fe01e700303d8cf4aea32ce79daebeb709ac97ae990be3e",
+        "10007ae27a7a7a1703009926d8d73b023416fbda122615261716af055b6f43b5"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [
+        "diagnostic_pipeline_trend_unverified"
+      ],
+      "manual_quality": "failed",
+      "failures": [
+        "single_observation_as_review_increase",
+        "unavailable_lock_owner_from_pipeline"
+      ],
+      "metrics": {
+        "total_duration": 12553082365,
+        "load_duration": 8790462,
+        "prompt_eval_count": 8660,
+        "prompt_eval_duration": 8004027000,
+        "eval_count": 199,
+        "eval_duration": 4414946000
+      },
+      "usage": {
+        "input_tokens": 8660,
+        "output_tokens": 199,
+        "total_tokens": 8859
+      },
+      "wire_options": null,
+      "response_file_sha256": "8a57960b821308a9a85861068f9663902c8df69a62ed755d9ba19aeff2f07ece"
+    },
+    {
+      "id": "hermes66-field_glossary",
+      "variant": "field_glossary",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 13.474870412843302,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "b0808974f27579420de321eb0291398639489ba074dc391e73e745014a88481d",
+      "source_result_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [
+        "diagnostic_pipeline_congestion_unverified",
+        "diagnostic_pipeline_count_mismatch"
+      ],
+      "manual_quality": "failed",
+      "failures": [
+        "review_count_as_processing_backlog",
+        "unsupported_congestion",
+        "unavailable_detail_read"
+      ],
+      "metrics": {
+        "total_duration": 13354751027,
+        "load_duration": 5815756,
+        "prompt_eval_count": 10151,
+        "prompt_eval_duration": 9282777000,
+        "eval_count": 141,
+        "eval_duration": 3932711000
+      },
+      "usage": {
+        "input_tokens": 10151,
+        "output_tokens": 141,
+        "total_tokens": 10292
+      },
+      "wire_options": null,
+      "response_file_sha256": "b4d86e228981ed080cc2fe76d5b3475429059ea9f6fc766aa06f4e9687c6f3e2"
+    },
+    {
+      "id": "ollama66-field_glossary",
+      "variant": "field_glossary",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 13.167748919920996,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "cfb675b4c172930cc1f80136d99fe3670dae8e64df5d38f6a30fb205d7bd85d0",
+      "source_result_sha256": [
+        "c8802e296b454d136d34b881b2e999451e08df837ed2973b6e358e6d1f85b5d1",
+        "98d0c2c36fc0a8e94fe01e700303d8cf4aea32ce79daebeb709ac97ae990be3e",
+        "10007ae27a7a7a1703009926d8d73b023416fbda122615261716af055b6f43b5"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [],
+      "manual_quality": "failed",
+      "failures": [
+        "unsupported_raw_journal_followup"
+      ],
+      "metrics": {
+        "total_duration": 13051850058,
+        "load_duration": 6115809,
+        "prompt_eval_count": 9539,
+        "prompt_eval_duration": 8700924000,
+        "eval_count": 141,
+        "eval_duration": 4251082999
+      },
+      "usage": {
+        "input_tokens": 9539,
+        "output_tokens": 141,
+        "total_tokens": 9680
+      },
+      "wire_options": null,
+      "response_file_sha256": "10cb0b7df635bd4d4eccf0eaf2f10bd24b25c03e99b94aca0df2dac6544a42b0"
+    },
+    {
+      "id": "synthetic_backlog-field_glossary",
+      "variant": "field_glossary_counterfactual",
+      "source_kind": "explicit_counterfactual_fixture_not_live",
+      "seconds": 12.68785672611557,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "7eb478464fd5234306388151845678ec3dc04dc8eac77605e61efe4db8f6ba3a",
+      "source_result_sha256": [
+        "c8802e296b454d136d34b881b2e999451e08df837ed2973b6e358e6d1f85b5d1",
+        "98d0c2c36fc0a8e94fe01e700303d8cf4aea32ce79daebeb709ac97ae990be3e",
+        "713f11c6f19758d7623f30d9f87c0a96783d66ee431000d5cc4a54e44ec9166a"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [],
+      "manual_quality": "failed",
+      "failures": [
+        "provided_backlog_treated_unavailable",
+        "repeat_already_completed_read"
+      ],
+      "metrics": {
+        "total_duration": 12574440026,
+        "load_duration": 7597411,
+        "prompt_eval_count": 9552,
+        "prompt_eval_duration": 8726751000,
+        "eval_count": 141,
+        "eval_duration": 3760890000
+      },
+      "usage": {
+        "input_tokens": 9552,
+        "output_tokens": 141,
+        "total_tokens": 9693
+      },
+      "wire_options": null,
+      "response_file_sha256": "b44ccb0ef0eebab3a64254bf0dd77c1a33c2b54d0ebfb2fb8f16f0a9da62a17c"
+    },
+    {
+      "id": "hermes66-compact",
+      "variant": "compact_policy_optional_action",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 14.359260825905949,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "02ff64351fe043f18bf860db1b9ba6dc3dc33b4d7bc7d2a93803fa96a8918812",
+      "source_result_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [],
+      "manual_quality": "failed",
+      "failures": [
+        "successful_oneshot_inactive_as_abnormal"
+      ],
+      "metrics": {
+        "total_duration": 14243176091,
+        "load_duration": 5401994,
+        "prompt_eval_count": 9204,
+        "prompt_eval_duration": 8442174999,
+        "eval_count": 238,
+        "eval_duration": 5666204000
+      },
+      "usage": {
+        "input_tokens": 9204,
+        "output_tokens": 238,
+        "total_tokens": 9442
+      },
+      "wire_options": null,
+      "response_file_sha256": "f498b141fc715b4d890ddb887a4ce283cc582e7fbdb99ad350ac4a7cab934c6f"
+    },
+    {
+      "id": "hermes66-native-default",
+      "variant": "native_api_control",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 6.696563231991604,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "8c335d004049a377154bda565051280cf705aceca1976cf65da73d557fe341b3",
+      "source_result_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [],
+      "manual_quality": "failed",
+      "failures": [
+        "unavailable_lock_owner_from_pipeline",
+        "delegates_existing_metrics_to_admin"
+      ],
+      "metrics": {
+        "total_duration": 6617713636,
+        "load_duration": 5951762,
+        "prompt_eval_count": 8870,
+        "prompt_eval_duration": 2029869000,
+        "eval_count": 193,
+        "eval_duration": 4425782000,
+        "done_reason": "stop"
+      },
+      "usage": null,
+      "wire_options": {
+        "temperature": 0,
+        "top_p": 0.95,
+        "num_predict": 2048
+      },
+      "response_file_sha256": "8e6c7ee6c32f799e2f1d370735d2c9f21238e88d08c88b0a58197d2e440e4ae1"
+    },
+    {
+      "id": "hermes66-neutral",
+      "variant": "native_presence_penalty_zero",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 6.036989139858633,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "f60b7ae917a9daa69c57c82a75131ecf3fc0a4c509467a5324173d9f63303082",
+      "source_result_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [],
+      "manual_quality": "failed",
+      "failures": [
+        "restart_unnecessary_from_process_state",
+        "nonexistent_raw_messages_returned_input"
+      ],
+      "metrics": {
+        "total_duration": 5964291192,
+        "load_duration": 6043918,
+        "prompt_eval_count": 8870,
+        "prompt_eval_duration": 2010374000,
+        "eval_count": 157,
+        "eval_duration": 3831796000,
+        "done_reason": "stop"
+      },
+      "usage": null,
+      "wire_options": {
+        "temperature": 0,
+        "top_p": 0.95,
+        "num_predict": 2048,
+        "presence_penalty": 0
+      },
+      "response_file_sha256": "dc87c089141a1e44be7bc817f729b62980b63b92b5f4266e5a9fb995feb9a1d7"
+    },
+    {
+      "id": "ollama66-neutral",
+      "variant": "native_presence_penalty_zero_exploratory",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 6.06977313500829,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "f6f5082e9c3e4d521a1cdda60233fe2c35e90c103f4d733a5ff13e5593d0496a",
+      "source_result_sha256": [
+        "c8802e296b454d136d34b881b2e999451e08df837ed2973b6e358e6d1f85b5d1",
+        "98d0c2c36fc0a8e94fe01e700303d8cf4aea32ce79daebeb709ac97ae990be3e",
+        "10007ae27a7a7a1703009926d8d73b023416fbda122615261716af055b6f43b5"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [
+        "diagnostic_pipeline_congestion_unverified",
+        "diagnostic_pipeline_count_mismatch"
+      ],
+      "manual_quality": "failed",
+      "failures": [
+        "review_count_as_processing_backlog",
+        "unsupported_congestion"
+      ],
+      "metrics": {
+        "total_duration": 5996363927,
+        "load_duration": 5809602,
+        "prompt_eval_count": 8660,
+        "prompt_eval_duration": 2017371000,
+        "eval_count": 183,
+        "eval_duration": 3822781000,
+        "done_reason": "stop"
+      },
+      "usage": null,
+      "wire_options": {
+        "temperature": 0,
+        "top_p": 0.95,
+        "num_predict": 2048,
+        "presence_penalty": 0
+      },
+      "response_file_sha256": "ceb086a94b28d726b3a51899fa64edb14c486246f137e4246f87e999886021a8"
+    },
+    {
+      "id": "hermes66-reasoned",
+      "variant": "compact_glossary_reasoning_4096",
+      "source_kind": "actual_frozen_receipts",
+      "seconds": 62.69974272721447,
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "input_sha256": "16cc4e72c65c58d81dcadb7797d1553ba2b7106f85d3dcc0374e57eb83394f6f",
+      "source_result_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
+      ],
+      "schema_valid": true,
+      "automatic_guard_issues": [
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "manual_quality": "failed",
+      "failures": [
+        "review_count_as_processing_delay",
+        "sample_absence_generalized",
+        "unavailable_detail_read"
+      ],
+      "metrics": {
+        "total_duration": 62628021209,
+        "load_duration": 6070890,
+        "prompt_eval_count": 9202,
+        "prompt_eval_duration": 2027897000,
+        "eval_count": 3422,
+        "eval_duration": 60426356000,
+        "done_reason": "stop"
+      },
+      "usage": null,
+      "wire_options": {
+        "temperature": 0,
+        "top_p": 0.95,
+        "num_predict": 4096
+      },
+      "response_file_sha256": "54c46bb9e84d55f8e41ed317587c3fdfd2c52cbb5fb0ed957f232289ad3ffd25"
+    }
+  ],
+  "adopted": false,
+  "reason": "No candidate eliminated factual/temporal/impact or action-feasibility errors. Keep deployed settings.",
+  "limitations": [
+    "single runs; shared GPU and prompt cache uncontrolled",
+    "native non-streamed API and SDK streamed runs are separate conditions; only Hermes native default/zero is a direct penalty pair",
+    "generated schema-valid JSON and automatic guard acceptance do not prove semantic correctness",
+    "one counterfactual tests existing backlog; it is not a real incident or training data",
+    "no DGX status poll, training change, protected write, attack replay, or new production deployment",
+    "internal reasoning content not retained"
+  ],
+  "next_work": [
+    "bind follow-up plans to actual input schemas and capabilities",
+    "separate unavailable capability requests from executable actions",
+    "use trained model only after permitted training-result check and independent/runtime comparison"
+  ],
+  "source_files": {
+    "inner.py": "e3d363beaecfd5f461e12af07603245bc8dfa2119d9b1f73bcb461a1bd299ab7",
+    "compact-inner.py": "73346303578d5b3236bdc8ef94ec50486f7fe8dfe0f02aabab9e738078b26b64",
+    "penalty-inner.py": "0777cbe6b8b07a110a77a21851dfbffa813f0f57c7bf5166926a98e85188a684",
+    "reasoned-inner.py": "15bb8ce121e40f52cb4eb2e6b87795869b2116ac745b591e2b14f83140ab7910",
+    "field-glossary.json": "76a272a20d97357162debe969e68418a2ed8d1b4715a0a821d28a7a922561f5f"
+  }
+}

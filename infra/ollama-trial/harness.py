@@ -2124,6 +2124,17 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
     """Narrow actual read schemas to unmet requirements; never dispatch calls."""
     calls=evidence_reads(calls)
     result = json.loads(json.dumps(schemas))
+    if pipeline_lookup_request(question):
+        name='mcp__system_diagnostics__get_system_diagnostics'
+        schema=result.get(name,{})
+        target=schema.get('properties',{}).get('target',{})
+        if ('b:management-pipeline' not in target.get('enum',[])
+                or set(schema.get('required',[]))-{'target'}):
+            return {}  # No invented target or weakened registered requirement.
+        if not missing_reads(question,calls,diagnostic_targets):return {}
+        schema['properties']={'target':{**target,'enum':['b:management-pipeline']}}
+        schema['required']=['target'];schema['additionalProperties']=False
+        return {name:schema}
     if systemd_comparison_request(question):
         result={name:schema for name,schema in result.items() if name in SYSTEMD_COMPARE_TOOLS}
         for name,schema in result.items():
@@ -2456,10 +2467,12 @@ def validated_selection(value, schema):
     return result, removed
 
 
-def selection_schema(schemas, limit, reference=None):
+def selection_schema(schemas, limit, reference=None, *, question=''):
     if not schemas or not 1 <= limit <= 40 or any(not EVIDENCE.allowed(n, 'verify') for n in schemas):
         raise ValueError('read_selection_scope')
     if set(schemas) == {'mcp__resp__get_firewall_rules'}:
+        limit = 1
+    if pipeline_lookup_request(question):
         limit = 1
     # Keep a complete plan within the existing 2048-token generation budget.
     # Further batches retain the request-wide model/tool caps and missing scope.

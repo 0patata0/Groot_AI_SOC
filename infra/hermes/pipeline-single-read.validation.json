@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T09:30:32.850847+09:00",
+  "versions": {
+    "query": "1.19.109",
+    "common": "1.5.59",
+    "diagnostics": "1.2.8",
+    "routing": "1.1.6"
+  },
+  "source_sha256": {
+    "infra/ollama-trial/harness.py": "f01c4369be2e634400cab296b8bd614f8273259ae208d3d03b0fd6879c80a0cf",
+    "infra/ollama-trial/runtime.py": "34f0d5e82ce544998dc5740a736f55de86b8b9fea3e62a005f9c848a447e79be",
+    "infra/hermes/query-completion/__init__.py": "a3afa26161de1a5cb63358336cdc12d87ca1ac54d0e41f9b8efc03e485d97d91",
+    "infra/hermes/query-completion/plugin.yaml": "7e4d78272d30bab72c1596d9c59ddd19e3f6ee68b6980352eb7348f5dccc698c",
+    "infra/ollama-trial/test_pipeline_selection.py": "527ce4d8649986f5304fac5745511b7d0fc5fe400ff464019acf9524f95fbcc6"
+  },
+  "tests": {
+    "unique_pass": 1395,
+    "skip": 0,
+    "profiles": {
+      "runtime": 33,
+      "time": 6,
+      "native": 473,
+      "service": 46,
+      "claims": 26,
+      "diagnostics": 67,
+      "sdk": 261,
+      "query": 391,
+      "peer": 72,
+      "installer": 20
+    }
+  },
+  "deployment": {
+    "at_kst": "2026-11-07T09:25:03.581809+09:00",
+    "backup": "/var/lib/capstone-resume/20261107-query109",
+    "changed": 7,
+    "manifest": 22,
+    "protected": 8,
+    "idle_before": {
+      "idle": true,
+      "active_leases": 0,
+      "heartbeat_age_seconds": 27.885
+    },
+    "queues_before": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "stopped_config_db_bytes_equal": true,
+    "independent_rollback": "confirmed_timer_inactive_noop",
+    "confirmed_at_kst": "2026-11-07T09:26:13.948610+09:00"
+  },
+  "health": {
+    "at_kst": "2026-11-07T09:31:42.202269+09:00",
+    "manifest": 22,
+    "protected": 8,
+    "sdk_sources": 20,
+    "review_files": 5,
+    "health": {
+      "/opt/hermes-data/health/chat.json": {
+        "schema": 1,
+        "engine": "hermes",
+        "pid": 162,
+        "process_start_ticks": 121910409,
+        "checked_at": 1794011497,
+        "websocket_connected": true,
+        "worker_alive": true
+      },
+      "/var/lib/capstone-ollama-trial/chat/health.json": {
+        "schema": 1,
+        "engine": "ollama",
+        "pid": 1311647,
+        "process_start_ticks": 121910166,
+        "checked_at": 1794011485,
+        "websocket_connected": true,
+        "worker_alive": true
+      }
+    },
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "failed": "",
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "ready": true
+  },
+  "chat": [
+    {
+      "engine": "hermes",
+      "question": "지금 관제 처리 대기 몇 건이야?",
+      "chat_final_seconds": 16.476,
+      "actual_mcp_calls": 1,
+      "model_calls": 1,
+      "model_seconds": 3.530874,
+      "status": "completed",
+      "result_sha256": "7bfd3093080c28da57e2d13bce8f72d435f112e907a168a1a33c2186bb4da616",
+      "observed_at_kst": "2026-11-07T09:28:18+09:00",
+      "age_seconds": 57,
+      "full_raw_sha_verified": true,
+      "writes": 0,
+      "table_syntax_verified": true
+    },
+    {
+      "engine": "ollama",
+      "question": "지금 관제 처리 대기 몇 건이야?",
+      "chat_final_seconds": 17.272,
+      "actual_mcp_calls": 1,
+      "model_calls": 1,
+      "model_seconds": 10.147022053133696,
+      "status": "completed",
+      "result_sha256": "eb2982b5f7ef785b3cb31ae9f0dc26caae34494e72208729f4b93baba64d6abb",
+      "observed_at_kst": "2026-11-07T09:26:15+09:00",
+      "age_seconds": 35,
+      "full_raw_sha_verified": true,
+      "writes": 0,
+      "table_syntax_verified": true
+    }
+  ],
+  "limits": [
+    "single_new_root_per_bot_recent_channel_context_retained",
+    "shared_gpu_model_cache_uncontrolled",
+    "not_average_or_p95",
+    "ui_rendering_not_checked",
+    "general_compound_accuracy_incomplete",
+    "no_attack_load_training_or_new_os_install"
+  ],
+  "publication": {
+    "status": "pending"
+  },
+  "cleanup": {
+    "task_temp_and_test_fixture": "retained_for_same_active_followup_until_17KST",
+    "packages_installed_on_mac": 0,
+    "operational_data_and_backups_preserved": true
+  }
+}

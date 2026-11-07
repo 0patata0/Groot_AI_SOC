@@ -393,7 +393,7 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                         schemas = harness.refine_read_schemas(current, schemas, report['calls'], report.get('diagnostic_targets', ()),harness.card_reference(question,current))
                         if not schemas:
                             break  # Report a verified terminal failure; no blind repeat.
-                        schema = harness.selection_schema(schemas, budget.limit - budget.used,reference)
+                        schema = harness.selection_schema(schemas, budget.limit - budget.used,reference,question=current)
                         report['repair']['method'] = 'structured_read_selection'
                         selector = llm.with_structured_output(schema, method='json_schema')
                         plan = await asyncio.wait_for(selector.ainvoke([

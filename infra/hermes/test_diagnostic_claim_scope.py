@@ -69,6 +69,34 @@ class DiagnosticClaims(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertNotIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
 
+    def test_negated_functional_fault_is_an_unverified_health_claim(self):
+        self.facts=[diagnostic()]
+        for text in ('현재는 inactive 상태이나 oneshot의 정상 종료이므로 기능 장애가 아닙니다.',
+                     '현재 서비스 장애는 없습니다.', '기능상 문제 없음.',
+                     '관제 이상은 없다.', '기능 장애가 아니며 전체 영향은 미확인입니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
+    def test_negated_fault_qualification_does_not_assert_health(self):
+        self.facts=[diagnostic()]
+        for text in ('기능 장애가 없다고 단정할 수 없습니다.',
+                     '기능 장애가 없다는 판정은 미확인입니다.',
+                     '기능 장애가 아니라는 것은 미확인입니다.',
+                     '기능 장애가 없음을 보장하지 않습니다.',
+                     '미확인: 기능 장애가 없습니다.', '기능 장애가 아닙니다?',
+                     '프로세스 종료값0이 기능 장애 부재를 증명하는 것은 아닙니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
+    def test_qualified_negated_fault_does_not_excuse_second_assertion(self):
+        self.facts=[diagnostic()]
+        text='기능 장애가 없다고 단정할 수 없습니다. 서비스 장애는 없습니다.'
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
+    def test_negated_fault_keeps_web_and_diagnostic_feedback_subject(self):
+        facts=[diagnostic(),{'kind':'web_access'}]
+        self.assertIn('web_snapshot_is_not_application_health',c.snapshot_health_violations('백엔드 기능 장애가 없습니다.',facts))
+        self.assertIn('diagnostic_snapshot_is_not_functional_health',c.snapshot_health_violations('vector 서비스 기능 장애가 없습니다.',facts))
+        self.assertEqual(c.snapshot_health_violations('기능 장애가 없습니다.',[]),[])
+
     def test_disclaimer_does_not_excuse_positive_or_double_negative_claim(self):
         for text in ('서비스의 정상 가동 상태를 증명합니다.',
                      '서비스의 정상 동작을 보장하지 않는 것은 아닙니다.',

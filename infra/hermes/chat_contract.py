@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.79'
+VERSION = 'soc-chat-contract:1.5.80'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -908,7 +908,7 @@ def service_report_messages(context, descriptions, citations, feedback=None, str
             if isinstance(x,str) and re.fullmatch(r'[a-z][a-z0-9_:.-]{0,127}',x)))[:32]
         explanations={
             'sample_zero_presented_as_absence':'제한된 표본을 전체 부재로 확대한 오류입니다. 표본 범위와 전체 구간의 미확인을 구분하세요.',
-            'diagnostic_snapshot_is_not_functional_health':'프로세스 속성을 전체 기능 정상으로 확대한 오류입니다. 실제 프로세스 관측과 기능 검증을 구분하세요.',
+            'diagnostic_snapshot_is_not_functional_health':'프로세스 속성을 전체 기능 정상으로 확대한 오류입니다. 정상 종료만으로 기능 장애가 없거나 장애가 아니라고 단정할 수도 없습니다. 실제 프로세스 관측과 기능 검증을 구분하세요.',
             'diagnostic_restart_counter_not_history':'현재 속성/자동 재시작 횟수로 과거 재시작 부재를 단정한 오류입니다. 수동 재시작·reload 이력은 해당 실행 기록이 없으면 미확인입니다.',
             'diagnostic_lock_metadata_not_restart_history':'controller_already_running의 직접 의미는 배타 잠금 획득 실패입니다. 이것을 재시도·재시작 시행 또는 그 성공/실패로 바꾼 주장을 제거하세요. 잠금 소유자와 실행 계기는 별도 근거가 없으면 미확인입니다.',
             'diagnostic_enablement_unverified':'실행 상태 inactive와 자동 시작 설정 disabled를 혼동했습니다. UnitFileState 등 실제 설정 근거가 없으면 비활성화 설정을 주장하지 마세요.',
@@ -1522,6 +1522,24 @@ def snapshot_health_violations(text, facts):
             except (ValueError,TypeError):decision=None
             if isinstance(decision,dict) and decision.get('assessment') in ('benign','remediated'):
                 issues.add('diagnostic_snapshot_is_not_functional_health')
+    # Denying a functional fault asserts health just as "normal" does. An
+    # adjacent uncertainty qualifier can withdraw that claim; a disclaimer
+    # elsewhere cannot excuse it. This does not classify the service as faulty.
+    for claim in re.finditer(r'(?:기능(?:상|적)?\s*(?:장애|이상|문제)|'
+            r'(?:서비스|애플리케이션|백엔드|관제)\s*(?:기능\s*)?(?:장애|이상|문제))'
+            r'\s*(?:이|가|는|은)?\s*(?:없(?:다고|다는|습니다|음|는|다)|아니(?:다|며|라는|라고)|아닙니다|아님)',text):
+        after=text[claim.end():claim.end()+100]
+        before=text[max(0,claim.start()-50):claim.start()]
+        qualified=re.match(r'[\s\"\'`]*(?:(?:상태|것|뜻|판정)(?:이|은|는|을|임을)?\s*)?'
+            r'(?:(?:다는|다고|라고|이라는|을|임을)\s*)?'
+            r'(?:(?:단정|판단|보장|입증|증명)(?:할\s*수)?\s*(?:없|못|하지\s*않)|'
+            r'미확인|확인\s*(?:불가|필요)|(?:아님|아닙니다|아니다)|여부|인지)',after)
+        withdrawn=qualified and not re.match(r'\s*(?:는\s*)?(?:것은|건)\s*아니',after[qualified.end():])
+        if withdrawn or re.match(r'\s*\?',after) or re.search(r'(?:미확인|단정\s*불가)\s*[:：]\s*$',before):continue
+        subject=re.split(r'[.!?;|\n]',before)[-1]+claim[0]
+        named_web=bool(re.search(r'Apache|아파치|DVWA|Log4Shell|백엔드|애플리케이션|웹|앱',subject,re.I))
+        issues.add('web_snapshot_is_not_application_health' if web and named_web else
+                   'diagnostic_snapshot_is_not_functional_health' if targets else 'web_snapshot_is_not_application_health')
     for match in re.finditer(r'(?:Apache|아파치|DVWA|서비스|백엔드|애플리케이션|앱|서버|호스트|systemd)[^\n.!?;|]{0,40}?(?:(?<!비)정상|(?<!불)건강)',text,re.I):
         before=re.split(r'[.!?;|\n]',text[max(0,match.start()-80):match.start()])[-1]
         after=text[match.end():match.end()+64]

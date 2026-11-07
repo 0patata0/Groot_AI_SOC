@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-08",
+  "common_version": "1.5.80",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "3b0350a95220b19ddea2609121baa8d058daa0d144555c6535bc02c4888eb245",
+    "infra/hermes/test_diagnostic_claim_scope.py": "12e8626ff9e146bc6314dc1bd8785a6e054ab24dcd568d0c0fcdc2d6c2620274"
+  },
+  "tests": {
+    "native": {
+      "rc": 0,
+      "count": 482,
+      "unique": 467,
+      "skip": 0
+    },
+    "service": {
+      "rc": 0,
+      "count": 105,
+      "unique": 97,
+      "skip": 0
+    },
+    "claims": {
+      "rc": 0,
+      "count": 70,
+      "unique": 70,
+      "skip": 0
+    },
+    "sdk": {
+      "rc": 0,
+      "count": 303,
+      "unique": 303,
+      "skip": 0
+    },
+    "query": {
+      "rc": 0,
+      "count": 408,
+      "unique": 403,
+      "skip": 0
+    },
+    "peer": {
+      "rc": 0,
+      "count": 88,
+      "unique": 88,
+      "skip": 0
+    },
+    "installer": {
+      "rc": 0,
+      "count": 63,
+      "unique": 63,
+      "skip": 0
+    },
+    "diagnostics": {
+      "rc": 0,
+      "count": 88,
+      "unique": 88,
+      "skip": 0
+    },
+    "total": 1607,
+    "unique_all": 1579
+  },
+  "comparisons": [
+    {
+      "case": "actual_deferred_zero",
+      "variant": "control",
+      "seconds": 13.530484223971143,
+      "schema_valid": true,
+      "old_issues": [],
+      "new_issues": [],
+      "result_sha256": "9acb311805cb1e38376af93e16f1b6076bde72c59747366d5cda0c5234b37541"
+    },
+    {
+      "case": "actual_deferred_zero",
+      "variant": "field_feedback",
+      "seconds": 12.685732791898772,
+      "schema_valid": true,
+      "old_issues": [],
+      "new_issues": [],
+      "result_sha256": "b21bf42357c466404eba4f5e41e1ba4f58278203bffe1ad424152d4b7211ee82"
+    },
+    {
+      "case": "synthetic_nonzero_distinct",
+      "variant": "control",
+      "seconds": 12.351255137939006,
+      "schema_valid": true,
+      "old_issues": [],
+      "new_issues": [],
+      "result_sha256": "63b749d39a39e9386ef458bdfe19166844cb7d53c1d4a66e4bc92a9b2b0be71b"
+    },
+    {
+      "case": "synthetic_nonzero_distinct",
+      "variant": "field_feedback",
+      "seconds": 12.340779562015086,
+      "schema_valid": true,
+      "old_issues": [],
+      "new_issues": [
+        "diagnostic_snapshot_is_not_functional_health"
+      ],
+      "result_sha256": "711e93781aa439de256d52acfc838a2d8047f773da8a46d197ce09b8b5875f33"
+    },
+    {
+      "case": "synthetic_review_unknown",
+      "variant": "control",
+      "seconds": 12.532737625064328,
+      "schema_valid": true,
+      "old_issues": [],
+      "new_issues": [],
+      "result_sha256": "a97ae6000fd6b3ccf8b4a5ad8dc52ce88f9da97418aac4720a17b16ff894f74e"
+    },
+    {
+      "case": "synthetic_review_unknown",
+      "variant": "field_feedback",
+      "seconds": 12.27824501786381,
+      "schema_valid": true,
+      "old_issues": [],
+      "new_issues": [],
+      "result_sha256": "0be4a31be6136583940d21ca32c6ef8d9bc60a476a25666119ba3a5c8c5bf619"
+    }
+  ],
+  "field_feedback_adopted": false,
+  "reasoning_trial": {
+    "reasoning": true,
+    "output_limit": 4096,
+    "response_timeout_seconds": 75,
+    "generated_answer_obtained": false,
+    "server_cancellation_verified": false,
+    "operating_option_changed": false
+  },
+  "installed_replay": {
+    "source_sha256": "3b0350a95220b19ddea2609121baa8d058daa0d144555c6535bc02c4888eb245",
+    "actual_model_draft_newly_rejected": true,
+    "issues": [
+      "diagnostic_snapshot_is_not_functional_health"
+    ],
+    "qualified_checks": [
+      {
+        "text": "현재 서비스는 Result=success로 종료했습니다. 기능 장애가 없다고 단정할 수 없습니다.",
+        "issues": []
+      },
+      {
+        "text": "기능 장애가 없다는 판정은 미확인입니다.",
+        "issues": []
+      }
+    ],
+    "new_model_calls": 0,
+    "new_mcp_calls": 0,
+    "posted": false
+  },
+  "confirmed": {
+    "at_kst": "2026-11-08T08:11:04.081795+09:00",
+    "query": "1.19.128",
+    "common": "1.5.80",
+    "manifest": 24,
+    "protected": 10,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_confirmed_noop": true,
+    "hermes_planned_restart": 0
+  },
+  "new_chat_test": false,
+  "new_os_install_test": false,
+  "whole_goal_complete": false,
+  "dgx_polled": false,
+  "attack_tests": false,
+  "final_health": {
+    "at_kst": "2026-11-08T08:13:01.787874+09:00",
+    "query": "1.19.128",
+    "common": "1.5.80",
+    "manifest": 24,
+    "protected": 10,
+    "sdk_sources": 20,
+    "review_sources": 5,
+    "bots_ws_worker": true,
+    "services": [
+      "active",
+      "active",
+      "active",
+      "active"
+    ],
+    "queues": {
+      "/var/lib/capstone-review-chat/queue.sqlite": 0,
+      "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+    },
+    "b_failed_units": 0,
+    "rollback_timer_inactive": true,
+    "hermes_planned_restart_this_revision": 0,
+    "hermes_planned_restarts_this_unit": 0,
+    "embedded_gate_matches": true,
+    "gate_bytes": 65383
+  },
+  "cleanup": {
+    "mac": {
+      "path": "/private/tmp/capstone-claim82-20261108-y1ohysff",
+      "bytes": 4178952,
+      "sha256": "1ac405f8d035951b860db58c78535429a0a3338fe8e9d17b506a2eb653dab28b",
+      "removed": true
+    },
+    "server": {
+      "files": 471,
+      "bytes": 7521898,
+      "removed": true
+    },
+    "unapplied_stage": {
+      "removed_unapplied_staging": true,
+      "files": 2,
+      "bytes": 244146,
+      "operating_backup_preserved": "20261108-claim82b"
+    }
+  }
+}

@@ -2,8 +2,9 @@
 """Fresh-host installation of bounded, read-only A/B/C diagnostic snapshots.
 
 This is an administrator bootstrap helper, never an MCP command executor.
-Runtime collectors publish fixed summaries; the remote account can read one
-snapshot only and receives no sudo, Docker, shell, port-forward or journal API.
+Runtime collectors publish fixed summaries. A separate fixed-unit reader serves
+masked journal excerpts locally. Remote accounts receive no general journal
+membership, sudo, Docker, shell, port-forward or arbitrary journal command.
 """
 import argparse
 import ast
@@ -34,10 +35,11 @@ READER_HOME = STATE / 'reader'
 MCP_USER = 'capstone-mcp'
 ROLE_HOST = {'security': 'a', 'siem': 'b', 'service': 'c'}
 HOST_ENV = {'security': 'SECURITY_HOST', 'siem': 'SIEM_HOST', 'service': 'SERVICE_HOST'}
-SOURCES = ('system_diagnostics.py', 'diagnostic_history.py', 'runtime_health.py', 'system-diagnostics-mcp.py',
+SOURCES = ('system_diagnostics.py', 'diagnostic_history.py', 'diagnostic_journal.py', 'runtime_health.py', 'system-diagnostics-mcp.py',
            'read-system-diagnostics.py', 'run-system-diagnostics.sh')
 SERVICE = 'capstone-system-diagnostics.service'
 TIMER = 'capstone-system-diagnostics.timer'
+JOURNAL_SERVICE = 'capstone-journal-reader.service'
 FIXED_ENV = common.FIXED_ENV
 need = common.need
 
@@ -88,7 +90,17 @@ def unit_documents(role):
     timer = ('[Unit]\nDescription=Refresh bounded Capstone diagnostic snapshots\n'
         '[Timer]\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=5s\nUnit=' + SERVICE + '\n'
         '[Install]\nWantedBy=timers.target\n')
-    return {SERVICE: service.encode(), TIMER: timer.encode()}
+    journal = ('[Unit]\nDescription=Fixed-unit masked journal excerpt reader\nAfter=systemd-journald.service\n'
+        '[Service]\nType=simple\nUser=root\nGroup=capstone-diagnostics\n'
+        'ExecStart=/usr/bin/python3 -IB /opt/capstone-diagnostics/system_diagnostics.py --serve-journal --role ' + role + '\n'
+        'RuntimeDirectory=capstone-journal\nRuntimeDirectoryMode=0750\nUMask=0007\n'
+        'NoNewPrivileges=yes\nProtectSystem=strict\nProtectHome=yes\nPrivateTmp=yes\nPrivateNetwork=yes\n'
+        'ReadWritePaths=/run/capstone-journal\nRestrictAddressFamilies=AF_UNIX\n'
+        'CapabilityBoundingSet=CAP_DAC_READ_SEARCH\nProtectKernelTunables=yes\nProtectControlGroups=yes\n'
+        'RestrictSUIDSGID=yes\nLockPersonality=yes\nKillMode=control-group\n'
+        'MemoryMax=128M\nTasksMax=8\nLimitNOFILE=1024\nTimeoutStopSec=10\n'
+        'Restart=on-failure\nRestartSec=5\n[Install]\nWantedBy=multi-user.target\n')
+    return {SERVICE: service.encode(), TIMER: timer.encode(), JOURNAL_SERVICE:journal.encode()}
 
 
 def account_absent(name, kind):
@@ -114,7 +126,8 @@ def check(s, role):
              'partial_diagnostic_installation_requires_review')
         return {'status': 'existing_requires_verify', 'role': role}
     for path in (CODE, ROUTER_CONFIG, KEYDIR, Path('/etc/systemd/system') / SERVICE,
-                 Path('/etc/systemd/system') / TIMER, Path('/etc/ssh/sshd_config.d/63-capstone-diagnostics.conf')):
+                 Path('/etc/systemd/system') / TIMER, Path('/etc/systemd/system') / JOURNAL_SERVICE,
+                 Path('/run/capstone-journal'), Path('/etc/ssh/sshd_config.d/63-capstone-diagnostics.conf')):
         need(not os.path.lexists(path), 'unmanaged_diagnostic_namespace_exists')
     account_absent(GROUP, 'group')
     if role != 'siem': account_absent(ACCOUNT, 'account')
@@ -151,7 +164,7 @@ def install_common(s, role):
     common.mkdir(STATE, 0o750, 0, gid); common.mkdir(PRIVATE)
     common.write(PRIVATE / 'intent.json', common.canonical(profile(s, role)))
     common.mkdir(CODE, 0o755)
-    for name in ('system_diagnostics.py','diagnostic_history.py','runtime_health.py'):
+    for name in ('system_diagnostics.py','diagnostic_history.py','diagnostic_journal.py','runtime_health.py'):
         common.write(CODE / name, source_bundle(s)[name], 0o644)
     for name, raw in unit_documents(role).items():
         common.write(Path('/etc/systemd/system') / name, raw, 0o644)
@@ -159,6 +172,7 @@ def install_common(s, role):
     common.run(['/usr/bin/systemctl', 'start', SERVICE], timeout=100)
     common.run(['/usr/bin/python3', '-IB', str(CODE / 'system_diagnostics.py'), '--backfill-history', '--role', role], timeout=110)
     common.run(['/usr/bin/systemctl', 'enable', '--now', TIMER])
+    common.run(['/usr/bin/systemctl', 'enable', '--now', JOURNAL_SERVICE])
     return gid
 
 
@@ -189,7 +203,7 @@ def prepare_siem(s):
     bundle = source_bundle(s)
     for name in ('system-diagnostics-mcp.py', 'run-system-diagnostics.sh'):
         common.write(MCP / name, bundle[name], 0o550, 0, mc.pw_gid)
-    files = [CODE / 'system_diagnostics.py', CODE / 'diagnostic_history.py', CODE / 'runtime_health.py', KEYDIR / 'id_ed25519', KEYDIR / 'id_ed25519.pub',
+    files = [CODE / 'system_diagnostics.py', CODE / 'diagnostic_history.py', CODE / 'diagnostic_journal.py', CODE / 'runtime_health.py', KEYDIR / 'id_ed25519', KEYDIR / 'id_ed25519.pub',
              MCP / 'system-diagnostics-mcp.py', MCP / 'run-system-diagnostics.sh']
     files += [Path('/etc/systemd/system') / n for n in unit_documents('siem')]
     saved = {'schema': 1, 'profile': profile(s, 'siem'), 'files': {str(p): installed_record(p) for p in files}}
@@ -263,7 +277,7 @@ def apply_reader(s, role, raw):
     common.write(sshd, reader_ssh_configuration(), 0o644)
     common.run(['/usr/sbin/sshd', '-t']); verify_ssh_policy(s, role)
     common.run(['/usr/bin/systemctl', 'reload', 'ssh'])
-    files = [CODE / 'system_diagnostics.py', CODE / 'diagnostic_history.py', CODE / 'runtime_health.py', reader, launcher, keys, sshd]
+    files = [CODE / 'system_diagnostics.py', CODE / 'diagnostic_history.py', CODE / 'diagnostic_journal.py', CODE / 'runtime_health.py', reader, launcher, keys, sshd]
     files += [Path('/etc/systemd/system') / n for n in unit_documents(role)]
     common.write(PRIVATE / 'active.json', common.canonical({'schema': 1, 'profile': profile(s, role),
         'reader_public_key': public, 'files': {str(p): installed_record(p) for p in files}}))
@@ -445,6 +459,8 @@ def verify(s, role):
         need(installed_record(path) == record, 'diagnostic_installed_file_changed')
     common.run(['/usr/bin/systemctl', 'is-enabled', TIMER])
     common.run(['/usr/bin/systemctl', 'is-active', TIMER])
+    common.run(['/usr/bin/systemctl', 'is-enabled', JOURNAL_SERVICE])
+    common.run(['/usr/bin/systemctl', 'is-active', JOURNAL_SERVICE])
     raw = common.run(['/usr/bin/python3', '-IB', str(CODE / 'system_diagnostics.py'), '--check', '--role', role], timeout=60)
     value = common.parse(raw)
     need(value.get('schema') == 1 and value.get('host') == ROLE_HOST[role] and value.get('status') == 'ready',
@@ -468,7 +484,7 @@ def verify(s, role):
         snapshot_module().validate_snapshot(common.parse(raw), expected_host=ROLE_HOST[role])
     return {'schema': 1, 'status': 'verified', 'role': role, 'host': ROLE_HOST[role],
             'snapshot_units': value.get('units'), 'arbitrary_commands': False, 'sudo_granted': False,
-            'raw_journal_returned': False}
+            'raw_journal_returned': False, 'bounded_masked_journal_reader': True}
 
 
 def main():

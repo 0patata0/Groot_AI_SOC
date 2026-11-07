@@ -1,5 +1,7 @@
 # 구축·운영 가이드
 
+11/8 [제한된 journal 원문 조회 후보](../infra/mcp/journal-excerpts.md): 기존 `deploy.sh` 진단 단계에 `diagnostic_journal.py`와 역할별 `capstone-journal-reader.service`를 연결했다. 로컬 Unix socket·기존 진단 그룹, 신규 TCP 포트/패키지/이미지/일반 sudo·Docker 권한0. 파일 한도1,024·stderr 거절·unit/기간/마스킹/크기/감사를 적용한다. Mac설치20 포함104검사·B Linux83·실제 비특권 읽기는 격리 후보이며 **운영 A/B/C 배포·봇 연결·새 OS 전체 설치는 미완료**다.
+
 11/7: SSH·실습 관리 주소, Wazuh 웹 관리 주소, 자동 차단 보호 주소를 별도로 입력한다. 관리자 SSH의 특정 횟수 경보만 예외 처리하고 다른 공격/인증 로그를 유지한다. [정책과 정기보고의 적용 전후 구분](../infra/validation/admin-ssh/README.md).
 
 현재 query1.19.75는 [관측 범위 검사](../infra/hermes/observation-scope.md)를 두 봇과 관리 게이트에 동기화했다. 프로세스 상태와 서비스 기능 정상, 로그 연속성 미검증과 실패를 구분한다. 고유1,112검사·B9파일/보호7SHA 확인. 기존 소스 복사·내장 게이트 경로를 사용하며 추가 패키지/포트/키는 없다. 최종30초·새 OS 전체 설치는 미완료다. 아래74 기록은 당시 범위다.

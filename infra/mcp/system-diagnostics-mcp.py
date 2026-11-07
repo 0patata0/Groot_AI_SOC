@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only, bounded diagnostics from fixed root-published A/B/C snapshots."""
+"""Read-only fixed A/B/C snapshots, history and bounded journal excerpts."""
 from collections import deque
 from datetime import datetime, timedelta, timezone
 import ipaddress
@@ -143,6 +143,10 @@ def tools():
             'For a past incident, supply BOTH since_kst and until_kst (+09:00) to read archived sanitized journal error metadata for a registered systemd unit; '
             'the interval is at most24 hours within30 days. Do not supply lookback_minutes with explicit bounds. Runtime/coverage targets do not support history. '
             'History returns no current service state, raw journal or security clearance; inspect history_coverage and publisher_stale. '
+            'For actual journal message excerpts use view="journal" with BOTH since_kst/until_kst and a registered unit target. '
+            'This performs a bounded live journal read with secret masking; message_excerpt is transformed evidence, not unredacted raw text. '
+            'journal_scope="errors" (default) selects fixed error candidates including info-priority known errors; "all" includes all priorities. '
+            'Check message_state, has_more, source message SHA, limits and retention uncertainty. No shell, file path, arbitrary filter or service mutation is allowed. '
             'known_error_code controller_already_running is the controller reporting a failed exclusive-lock acquisition. '
             'It does not prove the lock owner is healthy or progressing. Ordinary status=deferred timer runs are not failure records. '
             'limit is an integer 1..50 (default 20), not a duration. Without explicit bounds, lookback_minutes is 1..240. '
@@ -160,10 +164,14 @@ def tools():
                 'lookback_minutes': {'type': 'integer', 'minimum': 1, 'maximum': 240, 'default': 15},
                 'since_kst': {'type':'string', 'maxLength':40, 'description':'Historical interval start with seconds and +09:00; requires until_kst, excludes lookback_minutes.'},
                 'until_kst': {'type':'string', 'maxLength':40, 'description':'Historical interval end with seconds and +09:00; at most24 hours after since_kst and never future.'},
+                'view': {'type':'string', 'enum':['journal'], 'description':'Explicitly request live, masked journal message excerpts instead of the sanitized history index. Requires both time bounds.'},
+                'journal_scope': {'type':'string', 'enum':['errors','all'], 'default':'errors', 'description':'Only with view=journal. Fixed error candidates or all-priority available journal sample.'},
                 'limit': {'type': 'integer', 'minimum': 1, 'maximum': 50, 'default': 20,
                           'description': 'Returned error sample cap: integer 1..50; values above 50 are refused. Not minutes.'}},
             'dependentRequired': {'since_kst':['until_kst'], 'until_kst':['since_kst']},
             'allOf':[{'not':{'required':['lookback_minutes','since_kst']}}, {'not':{'required':['lookback_minutes','until_kst']}},
+                {'if':{'required':['view']}, 'then':{'required':['since_kst','until_kst']}},
+                {'if':{'required':['journal_scope']}, 'then':{'required':['view']}},
                 {'if':{'required':['since_kst']}, 'then':{'properties':{'target':{'enum':sorted(
                     k for k,v in library().TARGETS.items() if isinstance(v,str))}}}}]},
         'annotations': {'title': 'Read fixed system diagnostics', 'readOnlyHint': True,
@@ -243,8 +251,11 @@ def audit(outcome, target=None):
 def query(value):
     d = library()
     now = int(time.time())
+    journal = isinstance(value, dict) and bool(set(value) & {'view','journal_scope'})
     historical = isinstance(value, dict) and bool(set(value) & {'since_kst', 'until_kst'})
-    if historical:
+    if journal:
+        target, _, _, _, _ = d.journal_library().request(value, now)
+    elif historical:
         target, _, _, limit = d.history_library().request(value, now)
     else:
         target, minutes, limit = arguments(value)
@@ -253,6 +264,17 @@ def query(value):
             _queries.popleft()
         d.need(len(_queries) < 30, 'query_rate_limit')
         _queries.append(now)
+    if journal:
+        reader = d.journal_library(); host = target[0]
+        if host == 'b':
+            answer = reader.query_local(value, host)
+        else:
+            code, raw = d.bounded_command(remote_command(host, route_config()), reader.MAX_RESULT, 16, input_data=d.encode(value))
+            d.need(code == 0, 'journal_remote_unavailable')
+            answer = d.parsed(raw)
+        reader.validate_answer(answer, value, host)
+        audit('journal_observed', target)
+        return answer
     if historical:
         history = d.history_library()
         host = target[0]
@@ -402,7 +424,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.2.8'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.3.0'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':

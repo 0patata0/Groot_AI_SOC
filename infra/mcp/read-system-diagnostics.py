@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Forced-command reader of one fixed, sanitized root-owned snapshot. No sudo."""
+"""Forced reader of fixed snapshots/history or masked journal excerpts. No sudo."""
 import json
 import os
 from pathlib import Path
@@ -34,12 +34,18 @@ def main():
     raw_request = incoming()
     if raw_request:
         value = d.parsed(raw_request)
-        history = d.history_library()
-        target, _, _, _ = history.request(value)
-        result = history.answer(value, target[0])
+        journal = isinstance(value, dict) and bool(set(value) & {'view','journal_scope'})
+        if journal:
+            reader = d.journal_library()
+            target, _, _, _, _ = reader.request(value)
+            result = reader.query_local(value, target[0])
+        else:
+            history = d.history_library()
+            target, _, _, _ = history.request(value)
+            result = history.answer(value, target[0])
         raw = d.encode(result)
         d.need(len(raw) <= 65536, 'history_result_bound')
-        syslog.syslog(syslog.LOG_NOTICE, json.dumps({'event':'system_diagnostics_history_read', 'target':target}))
+        syslog.syslog(syslog.LOG_NOTICE, json.dumps({'event':'system_diagnostics_journal_read' if journal else 'system_diagnostics_history_read', 'target':target}))
         sys.stdout.buffer.write(raw); sys.stdout.buffer.flush()
         return
     snapshot = d.read_snapshot()

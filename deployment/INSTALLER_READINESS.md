@@ -1,5 +1,7 @@
 # 초기 설치·통합 패키지 준비 상태
 
+11/8 [제한된 journal 원문 조회 후보](../infra/mcp/journal-excerpts.md): 기존 `deploy.sh` 진단 단계에 `diagnostic_journal.py`와 역할별 `capstone-journal-reader.service`를 연결했다. 로컬 Unix socket·기존 진단 그룹, 신규 TCP 포트/패키지/이미지/일반 sudo·Docker 권한0. 파일 한도1,024·stderr 거절·unit/기간/마스킹/크기/감사를 적용한다. Mac설치20 포함104검사·B Linux83·실제 비특권 읽기는 격리 후보이며 **운영 A/B/C 배포·봇 연결·새 OS 전체 설치는 미완료**다.
+
 11/7 관리자 정책: 단일deploy.sh에서SSH/실습관리·Wazuh웹·차단보호CIDR을별도로입력하고명시빈값을존중한다. 관리SSH22의SID2001219만예외생성·초기입력/정책74검사,정기보고정책전후분리30검사/운영dry확인을마쳤다. 초기보고변경이력은빈목록·추가패키지/포트0·새OS전체설치0. [검증·실제적용범위](../infra/validation/admin-ssh/README.md).
 
 현재 query1.19.118/common1.5.62·routing1.1.6/진단MCP1.2.8이다. 짧은 FW 정책·상관 룰 첫N개·임시차단 질문의 실제 근거 연결과 Native 인자 제한을 보완했다. Linux1,390검사/skip0·최종 양봇6채팅10.337~20.621초/각1읽기·쓰기0·대상/원문/표본문 일치·16:02독립원복 확정. 학습본 포함3군 SDK는 각30/30이나 개발 회귀이며 독립 정확도나 학습 우위가 아니다. 운영 원본35B를 유지한다. [변경·실패·복구](../infra/hermes/short-read-evidence.md).

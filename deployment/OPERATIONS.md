@@ -1,5 +1,7 @@
 # SOC 운영 절차
 
+11/8 [제한된 journal 원문 조회 후보](../infra/mcp/journal-excerpts.md): 기존 `deploy.sh` 진단 단계에 `diagnostic_journal.py`와 역할별 `capstone-journal-reader.service`를 연결했다. 로컬 Unix socket·기존 진단 그룹, 신규 TCP 포트/패키지/이미지/일반 sudo·Docker 권한0. 파일 한도1,024·stderr 거절·unit/기간/마스킹/크기/감사를 적용한다. Mac설치20 포함104검사·B Linux83·실제 비특권 읽기는 격리 후보이며 **운영 A/B/C 배포·봇 연결·새 OS 전체 설치는 미완료**다.
+
 현재 query1.19.118/common1.5.62·routing1.1.6/진단MCP1.2.8이다. 짧은 FW 정책·상관 룰 첫N개·임시차단 질문의 실제 근거 연결과 Native 인자 제한을 보완했다. Linux1,390검사/skip0·최종 양봇6채팅10.337~20.621초/각1읽기·쓰기0·대상/원문/표본문 일치·16:02독립원복 확정. 학습본 포함3군 SDK는 각30/30이나 개발 회귀이며 독립 정확도나 학습 우위가 아니다. 운영 원본35B를 유지한다. [변경·실패·복구](../infra/hermes/short-read-evidence.md).
 
 11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.

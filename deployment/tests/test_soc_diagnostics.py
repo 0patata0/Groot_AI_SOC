@@ -48,6 +48,8 @@ class Profiles(unittest.TestCase):
              mock.patch.object(d.common, 'run', side_effect=lambda argv,**kw:calls.append(argv)):
             d.install_common(settings(), 'service')
         self.assertIn(str(d.CODE / 'diagnostic_history.py'), written)
+        self.assertIn(str(d.CODE / 'diagnostic_journal.py'), written)
+        self.assertIn(['/usr/bin/systemctl','enable','--now',d.JOURNAL_SERVICE], calls)
         backfill = ['/usr/bin/python3','-IB',str(d.CODE / 'system_diagnostics.py'),'--backfill-history','--role','service']
         self.assertLess(calls.index(backfill), calls.index(['/usr/bin/systemctl','enable','--now',d.TIMER]))
 
@@ -84,7 +86,7 @@ class Profiles(unittest.TestCase):
     def test_units_collect_only_the_fixed_role_and_write_only_snapshot_state(self):
         for role in d.ROLE_HOST:
             docs = d.unit_documents(role)
-            self.assertEqual(set(docs), {d.SERVICE, d.TIMER})
+            self.assertEqual(set(docs), {d.SERVICE, d.TIMER, d.JOURNAL_SERVICE})
             service, timer = docs[d.SERVICE].decode(), docs[d.TIMER].decode()
             self.assertIn('--collect --role ' + role + '\n', service)
             self.assertIn('ReadWritePaths=/var/lib/capstone-diagnostics\n', service)
@@ -96,6 +98,17 @@ class Profiles(unittest.TestCase):
             for forbidden in ('sudo ', 'docker ', 'journalctl ', 'SSH', '/etc/sudoers'):
                 self.assertNotIn(forbidden, service)
         with self.assertRaises(ValueError): d.unit_documents('service;id')
+
+    def test_journal_reader_is_local_fixed_role_and_has_no_generic_command_grant(self):
+        for role in d.ROLE_HOST:
+            unit = d.unit_documents(role)[d.JOURNAL_SERVICE].decode()
+            for text in ('--serve-journal --role '+role, 'RestrictAddressFamilies=AF_UNIX',
+                         'ReadWritePaths=/run/capstone-journal', 'PrivateNetwork=yes',
+                         'ProtectSystem=strict', 'NoNewPrivileges=yes', 'MemoryMax=128M',
+                         'CapabilityBoundingSet=CAP_DAC_READ_SEARCH'):
+                self.assertIn(text, unit)
+            for text in ('sudo ', '/bin/sh', 'docker ', 'AF_INET', 'AmbientCapabilities'):
+                self.assertNotIn(text, unit)
 
     def test_check_never_installs_or_starts_services(self):
         with mock.patch.object(d, 'source_bundle'), mock.patch.object(d.sys, 'platform', 'linux'), \

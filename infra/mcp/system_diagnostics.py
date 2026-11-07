@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fixed systemd observations. Journal bodies never leave the local collector."""
+"""Fixed systemd observations and an optional bounded, masked journal reader."""
 import argparse
 import grp
 import json
@@ -64,6 +64,23 @@ TARGETS.update({t: None for values in RUNTIME_TARGETS.values() for t in values})
 TARGETS['soc:coverage'] = None
 _runtime = None
 _history = None
+_journal = None
+
+
+def journal_library():
+    global _journal
+    if _journal is None:
+        path = Path(__file__).with_name('diagnostic_journal.py')
+        source = root_file(path, 131072)
+        module = types.ModuleType('fixed_diagnostic_journal')
+        module.__file__ = str(path)
+        exec(compile(source, str(path), 'exec'), module.__dict__)
+        module.core = types.SimpleNamespace(**{name: globals()[name] for name in (
+            'need', 'DiagnosticError', 'TARGETS', 'PROFILES', 'ROLE_HOST', 'ERROR_PATTERN',
+            'ERROR_CODES', 'STRUCTURED_ERROR_CODES', 'SOURCE_NAMES',
+            'parsed', 'encode', 'trusted_parents', 'bounded_command', 'history_library')})
+        _journal = module
+    return _journal
 
 
 def history_library():
@@ -182,17 +199,17 @@ def root_file(path, maximum, mode=None, gid=None):
 
 def bounded_command(argv, maximum, seconds, input_data=None):
     """No shell or inherited credentials. Never retain or return stderr."""
-    checked_grep = (argv[:4] == ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json']
-        and argv[-2:] == ['--priority=warning..info', '--grep=' + ERROR_PATTERN])
+    checked_journal = argv[:4] == ['/usr/bin/journalctl', '--no-pager', '--quiet', '--output=json']
+    checked_grep = checked_journal and argv[-2:] == ['--priority=warning..info', '--grep=' + ERROR_PATTERN]
     process = subprocess.Popen(argv, stdin=subprocess.PIPE if input_data is not None else subprocess.DEVNULL,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE if checked_grep else subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE if checked_journal else subprocess.DEVNULL,
         env=ENV, close_fds=True, start_new_session=True)
     result = bytearray()
     stderr_bytes = 0
     deadline = time.monotonic() + seconds
     selector = selectors.DefaultSelector()
     selector.register(process.stdout, selectors.EVENT_READ, 'stdout')
-    if checked_grep:
+    if checked_journal:
         selector.register(process.stderr, selectors.EVENT_READ, 'stderr')
     try:
         if input_data is not None:
@@ -217,8 +234,9 @@ def bounded_command(argv, maximum, seconds, input_data=None):
         remaining = deadline - time.monotonic()
         need(remaining > 0, 'command_timeout')
         code = process.wait(timeout=remaining)
-        if checked_grep:
+        if checked_journal:
             need(stderr_bytes == 0, 'journal_query_stderr')
+        if checked_grep:
             # journalctl --grep returns 1 for no matching entries. Only the
             # fixed grep query with both output streams empty is a valid empty
             # observation; other failures keep their code and remain unavailable.
@@ -519,8 +537,12 @@ def main():
     action.add_argument('--collect', action='store_true')
     action.add_argument('--check', action='store_true')
     action.add_argument('--backfill-history', action='store_true')
+    action.add_argument('--serve-journal', action='store_true')
     parser.add_argument('--role', required=True, choices=tuple(PROFILES))
     args = parser.parse_args()
+    if args.serve_journal:
+        journal_library().serve(args.role)
+        return
     if args.backfill_history:
         print(json.dumps(history_library().collect(args.role, hours=24), sort_keys=True))
         return

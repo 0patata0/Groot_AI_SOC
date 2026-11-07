@@ -10,6 +10,7 @@ import sys
 import hashlib
 import importlib.util
 import time
+from collections import Counter
 
 PEER_OUTPUT_ERRORS = frozenset({'peer_claims_shape', 'peer_claim_kind', 'peer_claim_text',
     'peer_quote_not_in_answer', 'peer_omission_not_established', 'peer_evidence_quote_not_in_result',
@@ -153,7 +154,7 @@ def compare_diagnostic_receipts(harness,current,source,observed,report):
     return report
 
 
-def read_trace_calls(store, run_id):
+def read_trace_calls(store, run_id, *, partial=False):
     """Reconstruct only matched native CLI tool receipts from this fresh run."""
     path = store.root / (run_id + '.jsonl')
     if not re.fullmatch('[0-9a-f]{32}', run_id) or path.is_symlink() or path.stat().st_size > 32*1024*1024:
@@ -201,9 +202,60 @@ def read_trace_calls(store, run_id):
                 calls.append({'server': match[1].replace('_', '-'), 'name': match[2],
                               'arguments': prior.get('input', {}), 'is_error': bool(event.get('is_error')),
                               'result': raw, 'result_sha256': hashlib.sha256(raw.encode()).hexdigest()})
+    if partial:
+        return {'calls':calls,'pending_tools':[e['name'] for e in pending.values()],
+                'trailing_output_incomplete':bool(buffer.strip())}
     if pending or buffer.strip():
         raise ValueError('incomplete_tool_receipts')
     return calls
+
+
+def native_failure_evidence(harness, store, run_id, calls):
+    """Keep actual read receipts when final generation fails; never complete/cache.
+
+    Strict matching still rejects malformed or unbound records. Only a trailing
+    unfinished native message/tool is tolerated, and its missing scope is shown.
+    Any write keeps the existing protected-operation failure handling.
+    """
+    if any(c.get('is_write') for c in calls):return None
+    prefix='LLM 실행이 완료되지 않아 최종 판단은 미완료입니다.'
+    result={'text':prefix+' 확인된 조회 자료가 없어 정상이나 0건으로 판단하지 않습니다.',
+            'calls':[],'unqueried':['native_final_judgment_unavailable']}
+    completed=[c for c in calls if c.get('completed')==1]
+    if not completed:return result
+    try:
+        snapshot=read_trace_calls(store,run_id,partial=True)
+        allowed=harness.EVIDENCE.allowed
+        if any(not allowed(n,'verify') for n in snapshot['pending_tools']):
+            raise ValueError('pending_non_read_operation')
+        registered=Counter((c['name'],bool(c['is_error'])) for c in completed)
+        observed=Counter()
+        for c in snapshot['calls']:
+            name='mcp__'+c['server'].replace('-','_')+'__'+c['name']
+            if not allowed(name,'verify'):raise ValueError('non_read_trace_receipt')
+            observed[(name,c['is_error'])]+=1
+        if any(n>registered[k] for k,n in observed.items()):raise ValueError('trace_not_in_run_ledger')
+        missing_names=set(snapshot['pending_tools'])|{name for name,error in registered-observed}
+        visible=[c for c in snapshot['calls'] if not (c['server']=='resp' and c['name']=='list_blocks'
+            and 'mcp__resp__list_blocks' in missing_names)]
+        facts=harness.facts_for(visible)
+        result['calls']=snapshot['calls']
+        result['unqueried']+=['pending:'+n for n in snapshot['pending_tools']]
+        if snapshot['trailing_output_incomplete']:result['unqueried'].append('native_output_incomplete')
+        if registered-observed:result['unqueried'].append('some_completed_receipts_unavailable')
+        failed=sorted({c['server']+'.'+c['name'] for c in snapshot['calls'] if c['is_error']})
+        if facts:
+            result['text']=(prefix+' 아래는 이번 실행에서 응답을 받은 조회 자료입니다.\n\n'
+                +harness.EVIDENCE.literal_evidence_table(facts)+'\n\n'
+                '조회 당시의 자료이며 답변 시점의 최신 상태를 보장하지 않습니다. '
+                '요청 전체의 완료나 정상·복구·변경 성공을 뜻하지 않습니다.')
+        if failed:result['text']+='\n조회 실패: '+', '.join(failed)
+        if snapshot['pending_tools'] or snapshot['trailing_output_incomplete'] or registered-observed:
+            result['text']+='\n일부 조회 또는 후속 응답이 끝나지 않아 요청 범위 전체는 미확인입니다.'
+        return result
+    except (ValueError,TypeError,KeyError,OSError):
+        result['unqueried'].append('native_read_receipts_unavailable')
+        return result
 
 
 def peer_source_answer(question):
@@ -618,6 +670,9 @@ def main():
             text = result['text'] or m.incomplete_report('incomplete_model_run_requires_review')
             scope_complete = False
             peer_review = None
+            failed_evidence=(native_failure_evidence(harness,store,result['run_id'],calls)
+                             if not result['completed'] else None)
+            if failed_evidence:text=failed_evidence['text']
             if result['completed'] and not any(c['is_write'] for c in calls):
                 sys.path.insert(0, '/opt/capstone-ollama-trial')
                 import harness
@@ -639,11 +694,11 @@ def main():
                             scope_complete = scope_complete and comparison['complete']
             inventory_scope=getattr(harness,'security_inventory_request',lambda _:None)(current)
             incomplete=(incomplete_inventory_text(harness,current,read_trace_calls(store,result['run_id']))
-                        if inventory_scope and inventory_scope['targets'] else None)
+                        if result['completed'] and inventory_scope and inventory_scope['targets'] else None)
             if incomplete and not any(c['is_write'] for c in calls):
                 text=incomplete
                 scope_complete=False
-            status = 'completed' if result['state'] in ('completed', 'waiting_approval') else 'partial'
+            status = 'completed' if result['completed'] and result['state'] in ('completed', 'waiting_approval') else 'partial'
             if (harness.read_plan(current) or fw_only or diagnostic_targets or inventory_scope) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)
@@ -655,7 +710,9 @@ def main():
                               'final_response': text,
                               'management_state': result['state'], 'case_id': cid, 'run_id': result['run_id'],
                               'structured_scope_complete': scope_complete,
-                              'calls': calls, 'protected_calls': sum(c['is_write'] for c in calls)}, ensure_ascii=False))
+                              'calls': failed_evidence['calls'] if failed_evidence else calls,
+                              **({'unqueried':failed_evidence['unqueried']} if failed_evidence else {}),
+                              'protected_calls': sum(c['is_write'] for c in calls)}, ensure_ascii=False))
     finally:
         store.close()
 

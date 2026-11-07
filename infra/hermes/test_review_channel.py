@@ -995,5 +995,98 @@ assert w.lookup_read_scope(h,'침해 사건 조사해줘','lead') is None
         with self.assertRaises(ValueError):p.job_id('q' * 26, 'peer-again')
 
 
+class NativeFailureEvidence(unittest.TestCase):
+    def setUp(self):
+        import importlib.util
+        self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
+        self.root=Path(self.tmp.name);self.rid='9'*32;self.store=SimpleNamespace(root=self.root)
+        spec=importlib.util.spec_from_file_location('_failure_actual_harness',Path(__file__).resolve().parents[1]/'ollama-trial/harness.py')
+        self.h=importlib.util.module_from_spec(spec);spec.loader.exec_module(self.h)
+        self.name='mcp__resp__list_blocks'
+
+    def pair(self,key='one',error=False):
+        return [{'type':'tool_use','tool_call_id':key,'name':self.name,'input':{}},
+                {'type':'tool_result','tool_call_id':key,'name':self.name,'is_error':error,
+                 'output':json.dumps({'error':'unavailable'} if error else {'blocks':['192.0.2.7']})}]
+
+    def trace(self,events,tail=''):
+        raw=''.join(json.dumps(e)+'\n' for e in events)+tail
+        (self.root/(self.rid+'.jsonl')).write_text('\n'.join(json.dumps({'channel':'stdout','chunk':x}) for x in (raw[:23],raw[23:])))
+
+    def ledger(self,error=False):
+        return {'name':self.name,'is_write':0,'completed':1,'is_error':int(error)}
+
+    def test_completed_receipts_survive_pending_read_and_truncated_final_message(self):
+        pending={'type':'tool_use','tool_call_id':'next','name':'mcp__system_diagnostics__get_system_diagnostics','input':{'target':'b:management'}}
+        self.trace(self.pair()+[pending],'{"type":"assistant')
+        with self.assertRaisesRegex(ValueError,'incomplete_tool_receipts'):w.read_trace_calls(self.store,self.rid)
+        result=w.native_failure_evidence(self.h,self.store,self.rid,[self.ledger()])
+        self.assertEqual(len(result['calls']),1);self.assertIn('192.0.2.7',result['text'])
+        self.assertIn('최종 판단은 미완료',result['text']);self.assertIn('| 확인 항목 |',result['text'])
+        self.assertIn('native_output_incomplete',result['unqueried'])
+        self.assertNotIn('MANAGEMENT_STATUS: resolved',result['text'])
+
+    def test_trace_must_match_completed_run_ledger_not_another_run_or_status(self):
+        self.trace(self.pair())
+        for ledger in ([self.ledger(True)],[{**self.ledger(),'name':'mcp__resp__get_firewall_rules'}]):
+            result=w.native_failure_evidence(self.h,self.store,self.rid,ledger)
+            self.assertEqual(result['calls'],[]);self.assertNotIn('192.0.2.7',result['text'])
+            self.assertIn('native_read_receipts_unavailable',result['unqueried'])
+
+    def test_unbound_or_corrupt_records_never_become_partial_receipts(self):
+        for events in (self.pair()[1:],self.pair()+self.pair('two')[1:]):
+            self.trace(events)
+            result=w.native_failure_evidence(self.h,self.store,self.rid,[self.ledger()])
+            self.assertEqual(result['calls'],[]);self.assertNotIn('192.0.2.7',result['text'])
+
+    def test_pending_or_failed_block_lookup_invalidates_earlier_current_inventory(self):
+        for end,ledger in ((self.pair('next')[:1],[self.ledger()]),
+                           (self.pair('next',True),[self.ledger(),self.ledger(True)]),
+                           ([],[self.ledger(),self.ledger(True)])):
+            self.trace(self.pair()+end)
+            result=w.native_failure_evidence(self.h,self.store,self.rid,ledger)
+            self.assertNotIn('192.0.2.7',result['text']);self.assertNotIn('항목 0개',result['text'])
+            self.assertTrue(result['calls'])  # Audit retains earlier receipts without reusing them as current facts.
+
+    def test_protected_write_or_pending_write_cannot_reuse_prior_read_state(self):
+        with mock.patch.object(w,'read_trace_calls') as reader:
+            self.assertIsNone(w.native_failure_evidence(self.h,self.store,self.rid,[{**self.ledger(),'is_write':1}]))
+            reader.assert_not_called()
+        self.trace(self.pair()+[{'type':'tool_use','tool_call_id':'write','name':'mcp__resp__block_ip','input':{'ip':'192.0.2.8'}}])
+        result=w.native_failure_evidence(self.h,self.store,self.rid,[self.ledger()])
+        self.assertEqual(result['calls'],[])
+
+    def test_absent_or_oversized_trace_keeps_original_failure_without_zero_claim(self):
+        result=w.native_failure_evidence(self.h,self.store,self.rid,[self.ledger()])
+        self.assertEqual(result['calls'],[]);self.assertIn('정상이나 0건으로 판단하지',result['text'])
+        self.assertIn('native_read_receipts_unavailable',result['unqueried'])
+        with (self.root/(self.rid+'.jsonl')).open('wb') as f:f.truncate(32*1024*1024+1)
+        result=w.native_failure_evidence(self.h,self.store,self.rid,[self.ledger()])
+        self.assertEqual(result['calls'],[]);self.assertIn('native_read_receipts_unavailable',result['unqueried'])
+
+    def test_failed_worker_posts_partial_facts_and_never_returns_reusable_evidence(self):
+        from contextlib import nullcontext
+        self.trace(self.pair());owner=self
+        class DB:
+            def execute(self,sql,args=()):
+                if 'tool_calls' in sql:return [owner.ledger()]
+                return SimpleNamespace(fetchone=lambda:None if 'SELECT 1' in sql else {'id':'c'*32,'mode':'verify','run_count':0,'session_id':None})
+            def commit(self):pass
+        store=SimpleNamespace(root=self.root,db=DB(),locked=lambda:nullcontext(),reporting=lambda _:nullcontext(),new_case=lambda *a:'c'*32,context=lambda _:[],close=lambda:None)
+        controller=SimpleNamespace(Store=lambda _:store,digest=lambda _:'b'*32,TOOLSETS=('all',),
+            run_hermes=lambda *a:{'completed':False,'state':'completed','text':'UNVERIFIED_MODEL_HEALTHY','run_id':self.rid},
+            prompt_for=lambda *a:'prompt',incomplete_report=lambda _:'incomplete')
+        request={'id':'a'*32,'phase':'lead','question':'현재 차단 목록 보여줘'};output=io.StringIO()
+        with mock.patch.dict(sys.modules,{'harness':self.h,'soc_management_controller':controller}),mock.patch.object(sys,'argv',['worker','hermes']), \
+             mock.patch.object(sys,'stdin',SimpleNamespace(buffer=io.BytesIO(json.dumps(request).encode()))),mock.patch.object(sys,'stdout',output),mock.patch.object(w.os,'geteuid',return_value=0):
+            w.main()
+        report=json.loads(output.getvalue())
+        self.assertEqual(report['status'],'partial');self.assertFalse(report['structured_scope_complete']);self.assertIsNone(report['evidence'])
+        self.assertIn('192.0.2.7',report['final_response']);self.assertNotIn('UNVERIFIED_MODEL_HEALTHY',report['final_response'])
+        audit=json.loads(m.private_read_audit(report,self.h.EVIDENCE.allowed))
+        self.assertFalse(audit['reusable_evidence']);self.assertEqual(len(audit['calls']),1)
+        self.assertEqual(json.loads(audit['calls'][0]['result']),{'blocks':['192.0.2.7']})
+
+
 if __name__ == '__main__':
     unittest.main()

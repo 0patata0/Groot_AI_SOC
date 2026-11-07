@@ -2,10 +2,10 @@
 
 관리자 SSH 경보는 [정책 적용·실제 재확인](infra/validation/admin-ssh/README.md)을 따른다.11:59보고의4건은예외적용전이력이며13:00색인확인적용후0건이다. 정기보고에정책전후구분을추가했고, 현재 threshold 설정의 MCP 직접 조회와 양봇 인지도 확인했다.
 
-기존 학습 모델의 [실제 시험 사용·원본 비교 계획](finetuning/TRAINED_MODEL_TRIAL.md)을 준비한다. 운영 모델 교체는 아직 하지 않았다.
+기존 학습 모델의 [실제 MCP 사용·원본 비교](finetuning/RUNTIME_COMPARISON_20261107.md)를 실행하고, 미조회 답변 실패와 공통 보완을 기록한다. 새 학습이나 운영 모델 전면 교체와 구분한다. [시험·채택 기준](finetuning/TRAINED_MODEL_TRIAL.md).
 
 현재 작업 상태는 [STATUS.md](STATUS.md), 추가 PCAP 기반 학습 후보의 출처·검수·DGX 반입 결과는 [검수 기록](finetuning/PCAP_LEARNING_REVIEW.md)을 따른다. [후속 학습 준비](finetuning/PCAP_TRAINING_PREPARATION.md)는8,719건·실제토큰/마스크 검증·DGX반입과13:22 KST 독립 GPU사전시험2단계를 완료했다. SSH 단절 독립 실행을 확인했으며 본학습 자동 시작0이다. [품질 보완 준비](finetuning/QUALITY_PREPARATION.md)는 균형 후보1,220건·중간 평가/최선 보존·별도 평가32건·비교 설정6개를 구성하고13:46 새 GPU사전시험을 완료했다. 정확도 비교·본학습·운영 승격은 아직이다. 로컬 데이터는 [원본1개·정제본1개 압축으로 통합](datasets/STORAGE_POLICY.md)하고 전수 복원 검증 후 중복 해제본을 정리했다.
-현재 query1.19.116/common1.5.61·routing1.1.6/진단MCP1.2.8이다. IDS 관리자 예외의 실제 threshold 조회와 양봇 단문 표를 반영했다.10프로필1,585고유PASS·새채팅4건16.542~24.548초/각IDS1읽기·쓰기0·정책SHA/방향/주소/KST 일치. A/B원복확정·IDS룰/센서 변경0. 개발 회귀이며 독립 정확도·UI전수·전체 장비 예외 검증은 아니다. [검증·복구](infra/mcp/threshold-policy-read.md).
+현재 query1.19.118/common1.5.62·routing1.1.6/진단MCP1.2.8이다. 짧은 FW 정책·상관 룰 첫N개·임시차단 질문의 실제 근거 연결과 Native 인자 제한을 보완했다. Linux1,390검사/skip0·최종 양봇6채팅10.337~20.621초/각1읽기·쓰기0·대상/원문/표본문 일치·16:02독립원복 확정. 학습본 포함3군 SDK는 각30/30이나 개발 회귀이며 독립 정확도나 학습 우위가 아니다. 운영 원본35B를 유지한다. [변경·실패·복구](infra/hermes/short-read-evidence.md).
 
 복합 조사 후속은 [시간 규격·요청 범위·출력 예산 실측](infra/hermes/chat-investigation-latency.md)을 따른다. 두 후보는 실패로 비채택했다. 후속78은 시간 규격 수정이며 해당 후보의 압축 보고·출력 예산 변경을 채택하지 않는다.
 

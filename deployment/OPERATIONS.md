@@ -1,6 +1,6 @@
 # SOC 운영 절차
 
-현재 query1.19.116/common1.5.61·routing1.1.6/진단MCP1.2.8이다. IDS 관리자 예외의 실제 threshold 조회와 양봇 단문 표를 반영했다.10프로필1,585고유PASS·새채팅4건16.542~24.548초/각IDS1읽기·쓰기0·정책SHA/방향/주소/KST 일치. A/B원복확정·IDS룰/센서 변경0. 개발 회귀이며 독립 정확도·UI전수·전체 장비 예외 검증은 아니다. [검증·복구](../infra/mcp/threshold-policy-read.md).
+현재 query1.19.118/common1.5.62·routing1.1.6/진단MCP1.2.8이다. 짧은 FW 정책·상관 룰 첫N개·임시차단 질문의 실제 근거 연결과 Native 인자 제한을 보완했다. Linux1,390검사/skip0·최종 양봇6채팅10.337~20.621초/각1읽기·쓰기0·대상/원문/표본문 일치·16:02독립원복 확정. 학습본 포함3군 SDK는 각30/30이나 개발 회귀이며 독립 정확도나 학습 우위가 아니다. 운영 원본35B를 유지한다. [변경·실패·복구](../infra/hermes/short-read-evidence.md).
 
 11/6 [복합 사건 읽기 연결](../infra/hermes/incident-bundle.md): query1.19.74/common1.5.33·security-events1.3.0/진단1.2.2를 함께 반영했다. `incident_evidence.py`와 기존 SIEM/SDK/관리 소스 복사·백업/원복을 사용하며 내부 MCP 검증은7읽기다. 원본 근거/인용/권한 검사를 유지하고 모델 표시만 무손실 압축한다. 고유1,215검사·운영17파일/보호7SHA 확인. 추가 deb/wheel/image·포트·키·입력 설정0. 최종30초/실제 새OS 설치는 미완료다. 아래 날짜별 기록은 당시 범위다.
 

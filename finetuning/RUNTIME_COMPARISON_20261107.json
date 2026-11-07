@@ -1,0 +1,367 @@
+{
+  "schema": 1,
+  "at_kst": "2026-11-07T16:11:34.511637+09:00",
+  "development_evaluation_only": true,
+  "independent_incident_accuracy": false,
+  "production_promoted": false,
+  "baseline": {
+    "trained": {
+      "model": "soc-qwen36:35b-operator-q4km-20261103",
+      "digest": "5bfc2d9d3f245df44041db799cc24c32e09fd85af6fbf856a8aa109ddcbb90af",
+      "result_sha256": "42324b4e06760831d59c4a404b66352079e78e681447f02383379306ddf68206",
+      "started_at_kst": "2026-11-07T15:01:43.813125+09:00",
+      "finished_at_kst": "2026-11-07T15:08:13.566883+09:00",
+      "receipt_passed_corrected": 19,
+      "answer_passed": 18,
+      "read_total": 24,
+      "clarifications_without_model": 2,
+      "fabricated_observation_answers": 2,
+      "judgment_fact_boundary_time_passed": 10,
+      "judgment_total": 10,
+      "read_seconds_excluding_clarification": {
+        "median": 7.662,
+        "mean": 15.655,
+        "max": 97.862
+      },
+      "judgment_seconds_median": 3.225,
+      "prepare_seconds": 53.66,
+      "initial_cold_load_seconds": 53.66,
+      "retry_reused_loaded_model": false
+    },
+    "original": {
+      "model": "qwen3.6:35b",
+      "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+      "result_sha256": "dad0973fb06d21ff5d2fa0bf6c42bdb15054fc941f0009442a1e51128467f463",
+      "started_at_kst": "2026-11-07T15:09:10.002376+09:00",
+      "finished_at_kst": "2026-11-07T15:16:52.632535+09:00",
+      "receipt_passed_corrected": 20,
+      "answer_passed": 19,
+      "read_total": 24,
+      "clarifications_without_model": 2,
+      "fabricated_observation_answers": 2,
+      "judgment_fact_boundary_time_passed": 7,
+      "judgment_total": 10,
+      "read_seconds_excluding_clarification": {
+        "median": 7.689,
+        "mean": 17.971,
+        "max": 105.161
+      },
+      "judgment_seconds_median": 5.859,
+      "prepare_seconds": 54.666,
+      "initial_cold_load_seconds": 54.666,
+      "retry_reused_loaded_model": false
+    },
+    "hf-base": {
+      "model": "soc-qwen36:35b-base-q4km-20261027",
+      "digest": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad",
+      "result_sha256": "0cc3f924d460c34c96b4dfc210421092fe4d920e23fc3ddb5827446764a713b5",
+      "started_at_kst": "2026-11-07T15:25:28.764174+09:00",
+      "finished_at_kst": "2026-11-07T15:31:30.189710+09:00",
+      "receipt_passed_corrected": 20,
+      "answer_passed": 18,
+      "read_total": 24,
+      "clarifications_without_model": 2,
+      "fabricated_observation_answers": 4,
+      "judgment_fact_boundary_time_passed": 8,
+      "judgment_total": 10,
+      "read_seconds_excluding_clarification": {
+        "median": 7.532,
+        "mean": 14.172,
+        "max": 48.931
+      },
+      "judgment_seconds_median": 3.9,
+      "prepare_seconds": 0.067,
+      "initial_cold_load_seconds": 53.881,
+      "retry_reused_loaded_model": true
+    }
+  },
+  "repair_regression": {
+    "status": "completed",
+    "arms": {
+      "trained": {
+        "model": "soc-qwen36:35b-operator-q4km-20261103",
+        "digest": "5bfc2d9d3f245df44041db799cc24c32e09fd85af6fbf856a8aa109ddcbb90af",
+        "result_sha256": "44e919679331c9b59bf40c3ef17f5db46734c62808b1ba623bf84fd52c6a089b",
+        "source_pins": {
+          "channel_sync.py": "8ec7d367d36dee7d3fa4a2312373210941dd3a2b11e2f84bb56610dd05315656",
+          "chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+          "chat_contract.py": "0bde036705ee5e6dd3aec020616556be3b5e239f280edf240bd594304d8b8a30",
+          "chat_markdown.py": "e829b47059ff4e273e182f8675739ed2f5a9a0ea9206403e4e4a4b09548bd795",
+          "chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+          "gateway_health.py": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85",
+          "grounding.py": "ef75bd49a3468d026f54d84c34f735638abacf3ac3459bb92659b6bd6e3688cb",
+          "harness.py": "49781fb75b9b6d43d6a7b11891236e3e9679269d8890aa3375d5648827d83632",
+          "output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+          "policy.py": "58dfc498cd458384aa8dad5468aa6ab56cd9fa46e7920cf643d4eb00de8e75e1",
+          "query_grounding.py": "e236e4f8a6b786326dae1d11f3664db80609282aae387900074c32e1bc777d75",
+          "read_contract.py": "b25c9f22a137ffc483795d552a12d28ef37cf7389b29437b674be3fe45f0dbd2",
+          "read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+          "runtime.py": "5cccc19b3adf9abfe7943b041afd8d7060e5be4e379c8bbd24f5e1c05d0c42e7",
+          "workflow_contract.py": "f17c0bea6ef1b47a18acbce25171e33296605b2678dcb6fb3ea10b72813a908a"
+        },
+        "read_total": 30,
+        "answer_passed": 30,
+        "clarifications_without_model": 2,
+        "actual_read_calls": 36,
+        "protected_calls": 0,
+        "same_original_12_questions_passed": 24,
+        "new_expression_cases_passed": 6,
+        "read_seconds_excluding_clarification": {
+          "median": 5.1,
+          "mean": 7.115,
+          "max": 47.7
+        },
+        "fixed_3_questions_seconds": {
+          "median": 4.842,
+          "min": 3.258,
+          "max": 47.7
+        },
+        "started_at_kst": "2026-11-07T15:32:34.242547+09:00",
+        "finished_at_kst": "2026-11-07T15:35:53.976193+09:00"
+      },
+      "original": {
+        "model": "qwen3.6:35b",
+        "digest": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c",
+        "result_sha256": "f18f6690abf9c19a028f6f445658f067462f154216b023f38f36197d21f94aca",
+        "source_pins": {
+          "channel_sync.py": "8ec7d367d36dee7d3fa4a2312373210941dd3a2b11e2f84bb56610dd05315656",
+          "chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+          "chat_contract.py": "0bde036705ee5e6dd3aec020616556be3b5e239f280edf240bd594304d8b8a30",
+          "chat_markdown.py": "e829b47059ff4e273e182f8675739ed2f5a9a0ea9206403e4e4a4b09548bd795",
+          "chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+          "gateway_health.py": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85",
+          "grounding.py": "ef75bd49a3468d026f54d84c34f735638abacf3ac3459bb92659b6bd6e3688cb",
+          "harness.py": "49781fb75b9b6d43d6a7b11891236e3e9679269d8890aa3375d5648827d83632",
+          "output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+          "policy.py": "58dfc498cd458384aa8dad5468aa6ab56cd9fa46e7920cf643d4eb00de8e75e1",
+          "query_grounding.py": "e236e4f8a6b786326dae1d11f3664db80609282aae387900074c32e1bc777d75",
+          "read_contract.py": "b25c9f22a137ffc483795d552a12d28ef37cf7389b29437b674be3fe45f0dbd2",
+          "read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+          "runtime.py": "5cccc19b3adf9abfe7943b041afd8d7060e5be4e379c8bbd24f5e1c05d0c42e7",
+          "workflow_contract.py": "f17c0bea6ef1b47a18acbce25171e33296605b2678dcb6fb3ea10b72813a908a"
+        },
+        "read_total": 30,
+        "answer_passed": 30,
+        "clarifications_without_model": 2,
+        "actual_read_calls": 36,
+        "protected_calls": 0,
+        "same_original_12_questions_passed": 24,
+        "new_expression_cases_passed": 6,
+        "read_seconds_excluding_clarification": {
+          "median": 5.805,
+          "mean": 7.309,
+          "max": 52.5
+        },
+        "fixed_3_questions_seconds": {
+          "median": 5.003,
+          "min": 2.94,
+          "max": 52.5
+        },
+        "started_at_kst": "2026-11-07T15:36:50.205563+09:00",
+        "finished_at_kst": "2026-11-07T15:40:15.322145+09:00"
+      },
+      "hf-base": {
+        "model": "soc-qwen36:35b-base-q4km-20261027",
+        "digest": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad",
+        "result_sha256": "6b54e1dbe1893c022ab54d851b2892ef9c7974587a243ed03f77023a3b54373b",
+        "source_pins": {
+          "channel_sync.py": "8ec7d367d36dee7d3fa4a2312373210941dd3a2b11e2f84bb56610dd05315656",
+          "chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+          "chat_contract.py": "0bde036705ee5e6dd3aec020616556be3b5e239f280edf240bd594304d8b8a30",
+          "chat_markdown.py": "e829b47059ff4e273e182f8675739ed2f5a9a0ea9206403e4e4a4b09548bd795",
+          "chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+          "gateway_health.py": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85",
+          "grounding.py": "ef75bd49a3468d026f54d84c34f735638abacf3ac3459bb92659b6bd6e3688cb",
+          "harness.py": "49781fb75b9b6d43d6a7b11891236e3e9679269d8890aa3375d5648827d83632",
+          "output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+          "policy.py": "58dfc498cd458384aa8dad5468aa6ab56cd9fa46e7920cf643d4eb00de8e75e1",
+          "query_grounding.py": "e236e4f8a6b786326dae1d11f3664db80609282aae387900074c32e1bc777d75",
+          "read_contract.py": "b25c9f22a137ffc483795d552a12d28ef37cf7389b29437b674be3fe45f0dbd2",
+          "read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+          "runtime.py": "5cccc19b3adf9abfe7943b041afd8d7060e5be4e379c8bbd24f5e1c05d0c42e7",
+          "workflow_contract.py": "f17c0bea6ef1b47a18acbce25171e33296605b2678dcb6fb3ea10b72813a908a"
+        },
+        "read_total": 30,
+        "answer_passed": 30,
+        "clarifications_without_model": 2,
+        "actual_read_calls": 36,
+        "protected_calls": 0,
+        "same_original_12_questions_passed": 24,
+        "new_expression_cases_passed": 6,
+        "read_seconds_excluding_clarification": {
+          "median": 6.175,
+          "mean": 7.369,
+          "max": 48.246
+        },
+        "fixed_3_questions_seconds": {
+          "median": 5.083,
+          "min": 3.36,
+          "max": 48.246
+        },
+        "started_at_kst": "2026-11-07T15:41:10.826376+09:00",
+        "finished_at_kst": "2026-11-07T15:44:37.733626+09:00"
+      }
+    },
+    "final_guard_delta": {
+      "live_comparison_harness_sha256": "49781fb75b9b6d43d6a7b11891236e3e9679269d8890aa3375d5648827d83632",
+      "final_guard_harness_sha256": "84375a8f7a39219342ff5de4f94566366be28bfbbadb96fca1557ae878b8ecd6",
+      "delta": "reject current list statement when table header only says IP address; existing plain tool-definition sentence remains valid",
+      "comparison_source_unchanged_during_run": true,
+      "validation": "8 captured fabricated observations rejected; 90 successful answers re-rendered and allowed; final Linux regression and six original-model production chats passed (see production_runtime_validation)"
+    },
+    "all_90_final_answers_match_bound_render": true,
+    "all_90_allowed_by_final_guard": true,
+    "captured_unobserved_answers_rejected_by_final_guard": 8,
+    "final_guard_delta_validation": "Frozen 90 SDK runs used the repair plan pins. Final guard separately rejected 8 captured fabricated answers and accepted identical rendering of all 90; later Native-only schema/failure fix passed 1390 Linux tests and 6 live original-model chats."
+  },
+  "limits": [
+    "Fresh read requests use the same pinned SDK, not Mattermost end-to-end.",
+    "Live evidence, cache, order and shared GPU not controlled.",
+    "Manual final-answer review by Codex, not independent expert review.",
+    "Deterministic clarification/rendering are harness results, not learned model skills.",
+    "Schema action enum mismatches are not accuracy scores."
+  ],
+  "network_interruption": {
+    "from_kst": "2026-11-07T15:21:00+09:00",
+    "reconnected_kst": "2026-11-07T15:24:00+09:00",
+    "affected_arm": "hf-base",
+    "action": "original partial preserved; HF arm repeated completely; network failures excluded from model grading"
+  },
+  "production_runtime_validation": {
+    "model": "qwen3.6:35b",
+    "query": "1.19.118",
+    "common": "1.5.62",
+    "chat_cases": [
+      {
+        "engine": "hermes",
+        "case": "fw",
+        "question": "FW 지금 정책 표로 볼래",
+        "elapsed_seconds": 16.866,
+        "native_seconds": 16.08029029518366,
+        "tool": "get_firewall_rules",
+        "arguments": {},
+        "protected_calls": 0,
+        "answer_matches_evidence": true,
+        "markdown_fenced": false,
+        "raw_receipt_sha256": "195c5503a57ddacd36b99b44b40b83078ab0765b27416e6a38d81b9ddaa9d13d"
+      },
+      {
+        "engine": "hermes",
+        "case": "corr",
+        "question": "Wazuh 상관분석 룰 첫 5개만 표로",
+        "elapsed_seconds": 20.621,
+        "native_seconds": 19.283393781865016,
+        "tool": "get_security_rules",
+        "arguments": {
+          "target": "b:wazuh",
+          "origin": "all",
+          "view": "details",
+          "correlation_only": true,
+          "offset": 0,
+          "limit": 5
+        },
+        "protected_calls": 0,
+        "answer_matches_evidence": true,
+        "markdown_fenced": false,
+        "raw_receipt_sha256": "576e3fc9152db93f900f749bf9d98f9c1730fabb0e833c685e61af673c6f4313"
+      },
+      {
+        "engine": "hermes",
+        "case": "blocks",
+        "question": "지금 임시로 차단된 주소 있어?",
+        "elapsed_seconds": 18.417,
+        "native_seconds": 16.649011984933168,
+        "tool": "list_blocks",
+        "arguments": {},
+        "protected_calls": 0,
+        "answer_matches_evidence": true,
+        "markdown_fenced": false,
+        "raw_receipt_sha256": "89b4feb95e92566de3b14161bdee27829b3bb597db2dd4e0acdfb43a2e570c0f"
+      },
+      {
+        "engine": "ollama",
+        "case": "fw",
+        "question": "FW 지금 정책 표로 볼래",
+        "elapsed_seconds": 11.486,
+        "native_seconds": null,
+        "tool": "get_firewall_rules",
+        "arguments": {
+          "limit": 200
+        },
+        "protected_calls": 0,
+        "answer_matches_evidence": true,
+        "markdown_fenced": false,
+        "raw_receipt_sha256": "93d5e38915474345144863b808b3501ed78639d726d7c441ca3a9806dd12d55c"
+      },
+      {
+        "engine": "ollama",
+        "case": "corr",
+        "question": "Wazuh 상관분석 룰 첫 5개만 표로",
+        "elapsed_seconds": 14.628,
+        "native_seconds": null,
+        "tool": "get_security_rules",
+        "arguments": {
+          "target": "b:wazuh",
+          "origin": "all",
+          "view": "details",
+          "correlation_only": true,
+          "offset": 0,
+          "limit": 5
+        },
+        "protected_calls": 0,
+        "answer_matches_evidence": true,
+        "markdown_fenced": false,
+        "raw_receipt_sha256": "538d737d39d9d4c0a8712fcd29b288fa5c65df91e33d7bd4617ed9c5329989f5"
+      },
+      {
+        "engine": "ollama",
+        "case": "blocks",
+        "question": "지금 임시로 차단된 주소 있어?",
+        "elapsed_seconds": 10.337,
+        "native_seconds": null,
+        "tool": "list_blocks",
+        "arguments": {},
+        "protected_calls": 0,
+        "answer_matches_evidence": true,
+        "markdown_fenced": false,
+        "raw_receipt_sha256": "7d1e171232a7698c645bc458fa88acb8f09f7cdd2a726e125fcbc8e7bd114b71"
+      }
+    ],
+    "linux_tests_unique_passed": 1390,
+    "linux_tests_skipped": 0,
+    "verified": {
+      "at_kst": "2026-11-07T16:11:34.511637+09:00",
+      "query": "1.19.118",
+      "manifest": 29,
+      "protected": 8,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "bots_ws_worker": true,
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "b_failed_units": 0,
+      "rollback_confirmed_noop": true
+    },
+    "source_replica_failure_corrected": true,
+    "hermes_first_correlation_wrong_target_seconds": 70.38,
+    "production_promoted": false,
+    "later_status_only_correction": {
+      "scope": "incomplete requested inventory remains partial even when model state says completed",
+      "same_model_and_tools": true,
+      "live_recheck_seconds": 20.453,
+      "actual_reads": 1,
+      "protected_calls": 0,
+      "answer_matches_receipt": true,
+      "hermes_restart": false,
+      "rollback_directory": "/var/lib/capstone-service-grounding/20261107-read118-tail"
+    }
+  }
+}

@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime, timezone, timedelta
 import hashlib
 import json
+import re
 from pathlib import Path
 import statistics
 import sys
@@ -35,6 +36,8 @@ def source_pins(root):
 
 def grade_read(case, report):
     """A receipt is necessary: completed prose without the expected read fails."""
+    if case.get('strict_receipts'):
+        return grade_read_strict(case, report)
     calls=report.get('calls',[])
     if report.get('protected_calls') or any(c.get('is_write') for c in calls):return False,'protected_call'
     if case.get('clarification'):
@@ -50,6 +53,87 @@ def grade_read(case, report):
         if any(effective.get(k)!=v for k,v in case.get('arguments',{}).items()):continue
         return True,'bound_expected_read'
     return False,'missing_expected_receipt'
+
+
+def grade_read_strict(case, report):
+    """Check all dispatched reads, not just one plausible success.
+
+    This is an execution/coverage gate. Narrative correctness still requires
+    reviewing the answer against the captured evidence; it is not model accuracy.
+    Gold requirements are never sent to the inference server.
+    """
+    calls = report.get('calls', [])
+    if report.get('protected_calls') or any(c.get('is_write') for c in calls):
+        return False, 'protected_call'
+    if case.get('clarification'):
+        valid = not calls and report.get('scope_resolution') == 'clarification_required'
+        return bool(valid and report.get('final_response')), 'target_clarification'
+    if report.get('status') != 'completed' or report.get('remaining_issues') or report.get('unqueried'):
+        return False, 'incomplete'
+    final = report.get('final_response', '')
+    if not isinstance(final, str) or not final.strip():
+        return False, 'missing_answer'
+    if case.get('table_required'):
+        if not re.search(r'^\|\s*:?-{3,}:?\s*\|', final, re.M) or re.search(r'```[^\n]*\n[^`]*\|', final):
+            return False, 'missing_renderable_table'
+    required = case.get('required_reads', [case])
+    matched = set()
+    snapshots = []
+    for call in calls:
+        raw = call.get('result')
+        if call.get('is_error') or not isinstance(raw, str) or sha(raw.encode()) != call.get('result_sha256'):
+            return False, 'invalid_or_failed_receipt'
+        candidates = [i for i, expected in enumerate(required)
+                      if call.get('server') == expected['server'] and call.get('name') == expected['tool']
+                      and all({**expected.get('argument_defaults', {}), **call.get('arguments', {})}.get(k) == v
+                              for k, v in expected.get('arguments', {}).items())]
+        if not candidates:
+            return False, 'unexpected_read_scope'
+        try:
+            payload = json.loads(raw)
+        except (ValueError, TypeError):
+            # The registered Wazuh agent tool deliberately returns text. Its
+            # native contract must not be mistaken for a model/JSON failure.
+            # Agent identities, completeness and final claims are reviewed
+            # separately against this exact hash-bound text.
+            is_agent_tool = call.get('server') == 'wazuh-ro' and call.get('name') == 'get_wazuh_agents'
+            is_inventory = re.search(r'^Agent ID: \d+[^\n]*\nName: [^\n]+\nStatus: [^\n]+', raw) is not None
+            is_empty = re.fullmatch(r'No Wazuh agents matching the specified criteria(?: \(status: [a-z_]+\))? found matching the specified criteria\.\s*', raw) is not None
+            if not is_agent_tool or not (is_inventory or is_empty):
+                return False, 'unstructured_receipt'
+            payload = {'native_text_receipt': True}
+        if not isinstance(payload, dict) or payload.get('error') or payload.get('status') in ('failed', 'error', 'unavailable'):
+            return False, 'unsuccessful_payload'
+        for i in candidates:
+            expected = required[i]
+            for path, value in expected.get('receipt_fields', {}).items():
+                observed = payload
+                for part in path.split('.'):
+                    observed = observed.get(part) if isinstance(observed, dict) else None
+                if observed != value or type(observed) is not type(value):
+                    return False, 'receipt_field_mismatch:' + path
+            matched.add(i)
+        if case.get('complete_firewall_snapshot'):
+            snapshots.append(payload)
+    if len(matched) != len(required):
+        return False, 'missing_required_read'
+    if snapshots:
+        cursor = 0
+        identity = snapshots[0].get('snapshot')
+        total = snapshots[0].get('total_objects')
+        if not isinstance(identity, str) or not identity or type(total) is not int:
+            return False, 'invalid_snapshot_identity'
+        for page in snapshots:
+            objects = page.get('objects')
+            if (page.get('snapshot') != identity or page.get('total_objects') != total
+                    or page.get('offset') != cursor or not isinstance(objects, list)):
+                return False, 'snapshot_gap_or_drift'
+            cursor += len(objects)
+            if page.get('next_offset') != (cursor if cursor < total else None):
+                return False, 'invalid_page_boundary'
+        if cursor != total or snapshots[-1].get('complete') is not True:
+            return False, 'incomplete_snapshot'
+    return True, 'all_expected_receipts_verified_narrative_review_required'
 
 
 def grade_judgment(case, value):
@@ -92,7 +176,11 @@ async def run(args):
         'digest':plan['models'][args.model],'plan_sha256':sha(plan_raw),'source_pins':pins,
         'contract':harness.CONTRACT.VERSION,'system_prompt_sha256':harness.CONTRACT.fingerprint(agent_role='ollama'),
         'runtime':'mcp-use/ChatOllama','gpu_before':loaded,'reads':[],'judgments':[],
-        'real_protected_writes':False,'mattermost_e2e':False,'candidate_review_code_included':False}
+        'real_protected_writes':False,'mattermost_e2e':False,'candidate_review_code_included':False,
+        'read_grading': 'execution_receipts_only_manual_answer_review_required',
+        'options': {'temperature':harness.CONTRACT.TEMPERATURE,'top_p':harness.CONTRACT.TOP_P,
+                    'reasoning':harness.CONTRACT.REASONING,'num_predict':harness.CONTRACT.OUTPUT_TOKENS},
+        'fresh_request_each_case':True,'connection_pool_used':False}
     persist(args.output,result)
     for repeat in range(plan['read_repetitions']):
         cases=list(plan['reads'])

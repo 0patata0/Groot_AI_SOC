@@ -277,9 +277,14 @@ def security_inventory_request(question):
     detailed=bool(table or ids or re.search(r'원문|JSON|전체\s*필드|상세|자세|조건|설명|레벨|상관|참조|frequency|timeframe|description|level|msg|severity',text,re.I))
     all_details=bool(re.search(r'(?:전체|모든).{0,12}(?:상세|목록|ID|SID)|(?:상세|목록).{0,12}(?:전체|모두)',text,re.I)
                      or table and re.search(r'전체|모든|전부|모두',text))
+    first_count = re.search(r'(?:첫|처음)\s*([0-9]+)\s*(?:개|건)(?![0-9])',text)
+    if first_count and len(first_count[1]) > 3:return None
+    first_limit = int(first_count[1]) if first_count else None
+    if first_limit is not None and (not 1 <= first_limit <= 100 or all_details):return None
     return {'targets':targets, 'origin':'custom' if request['custom_only'] else 'builtin' if request['basic_only'] else 'all',
             'view':'details' if detailed or all_details else 'summary', 'rule_id':ids[0] if ids else None,
             'correlation_only':bool(re.search(r'상관',text)), 'all_details':all_details, 'fw':'FW' in devices,
+            'first_limit':first_limit,
             'raw_output':bool(re.search(r'원문|\bJSON\b|전체\s*필드',text,re.I)),
             'table_output':table, 'display_page':int(re.search(r'([1-9][0-9]{0,3})\s*페이지',text)[1]) if re.search(r'([1-9][0-9]{0,3})\s*페이지',text) else 1,
             'ids_runtime':bool(combined_rule_request(question))}
@@ -322,6 +327,7 @@ def security_inventory_state(plan,calls,target):
         maximum=counts[expected['origin']] if expected['origin']!='all' else counts['definitions']
         if data['matched_count']>maximum:continue
         if data['offset']!=args.get('offset',0) or data['limit']!=args.get('limit',20):continue
+        if plan.get('first_limit') is not None and data['limit'] != plan['first_limit']:continue
         if data['offset']==0:
             pages=[];next_offset=0;snapshot=data.get('snapshot_id')
         if data['offset']!=next_offset or data.get('snapshot_id')!=snapshot or (pages and args.get('snapshot_id')!=snapshot):continue
@@ -1346,6 +1352,13 @@ def action_claim_violations(question, answer, calls):
         if isinstance(raw, str) and hashlib.sha256(raw.encode()).hexdigest() == call.get('result_sha256'):
             verified.append(call)
     block_reads = READ.block_list_state(calls) is not None
+    fw = firewall_state(calls)
+    # A complete FW receipt contains the same live agent_block set. It is valid
+    # evidence for the FW renderer without an additional list_blocks request.
+    block_reads = block_reads or bool(fw and fw.get('verified_complete') and any(
+        isinstance(o.get('set'),dict) and
+        (o['set'].get('family'),o['set'].get('table'),o['set'].get('name'),o['set'].get('type')) ==
+        ('inet','capstone_fw','agent_block','ipv4_addr') for o in fw['objects']))
     event_reads = any(c.get('name') in ('search_suricata_alerts', 'search_modsecurity_alerts', 'search_wazuh_alerts',
                       'get_wazuh_alert_summary') and payload(c) for c in verified)
     actual_actions = [c for c in verified if (c.get('server'), c.get('name')) in (
@@ -1355,7 +1368,7 @@ def action_claim_violations(question, answer, calls):
     rule_observation = (request_kind(question) == 'other'
         and (CONTRACT.bare_firewall_view(normalized(question)) or
              re.search(r'룰|규칙|\brules?\b', normalized(question), re.I)
-             and re.search(r'뭐|무엇|어떤|몇|현재|지금|조회|확인|보여|볼|봐|있어|있나|있니', normalized(question)))
+             and re.search(r'뭐|무엇|어떤|몇|현재|지금|조회|확인|보여|볼|봐|있어|있나|있니|표로|테이블로', normalized(question)))
         and not re.search(r'개념|원리|예시|예제|번역|설명|정의|차이|방법', normalized(question)))
     rule_reads = bool((firewall_state(calls) or {}).get('verified_complete')) or any(
         c.get('server') in ('rule-a', 'rule-b') and
@@ -1367,7 +1380,12 @@ def action_claim_violations(question, answer, calls):
                          r'\s*(?:IPv[46]|IP|아이피|주소)(?:들)?')
         hypothetical = re.search(r'(?:없|있)(?:다면|으면)|조회\s*(?:전(?![가-힣])|시(?![가-힣])|하면)|정책\s*설명|가정', clean)
         if (not block_reads and not unobserved and not hypothetical and re.search(block_subject, clean, re.I)
-                and re.search(r'없|비어|포함|등록|있습니다|있음|0\s*(?:건|개)', clean)):
+                and re.search(r'없|비어|포함|등록|있습니다|있음|확인했|0\s*(?:건|개)|(?:현재|지금).*(?:목록|리스트)(?:은|는|입니다)', clean)):
+            issues.add('unobserved_block_list_claim')
+        if (not block_reads and not unobserved and not hypothetical and '|' in clean
+                and re.search(block_subject,clean,re.I)
+                and re.search(r'현재|지금|임시|막힌|차단된|차단\s*(?:목록|IP|주소)',normalized(question),re.I)
+                and not re.search(r'개념|예시|예제|번역|가정',normalized(question))):
             issues.add('unobserved_block_list_claim')
         if (rule_observation and not rule_reads and not unobserved
                 and re.search(r'룰|규칙|WAF|IDS|Suricata|Wazuh', clean, re.I)
@@ -1385,7 +1403,7 @@ def action_claim_violations(question, answer, calls):
                      or re.search(r'(?:서버|도구).{0,40}(?:거부했|거절했|거부되었|거절되었|거부됐|거절됐|거부됨|거절됨)', clean))):
             issues.add('unobserved_protected_execution_claim')
         if not re.search(r'호출하지|조회하지|미조회|미호출|조회할|확인할|확인해야|조회해야|호출해야|호출할', clean):
-            claimed = re.findall(r'\b((?:get_|list_|search_|calculate_)[a-z_]+)\s*(?:\([^)]*\))?\s*(?:조회\s*결과|반환\s*결과|결과)', clean)
+            claimed = re.findall(r'\b((?:get_|list_|search_|calculate_)[a-z_]+)\s*(?:\([^)]*\))?\s*(?:조회\s*결과|반환\s*(?:결과|표본|자료)|결과)', clean)
             for name in claimed:
                 if not any(c.get('name') == name and payload(c) for c in verified):
                     issues.add('unobserved_tool_result_claim')
@@ -2277,7 +2295,8 @@ def refine_read_schemas(question, schemas, calls, diagnostic_targets=(), referen
                 if any(c.get('server')=='rule-'+host and c.get('name')=='get_security_rules' and c.get('arguments',{}).get('target')==target and c.get('is_error') for c in calls):continue
                 exact={'target':target,'origin':security['origin'],'view':security['view'],
                        'correlation_only':security['correlation_only'] and target=='b:wazuh',
-                       'offset':state['next_offset'] if state else 0,'limit':100 if security['all_details'] else 20}
+                       'offset':state['next_offset'] if state else 0,
+                       'limit':security.get('first_limit') or (100 if security['all_details'] else 20)}
                 if security['rule_id'] is not None:exact['rule_id']=security['rule_id']
                 if state:exact['snapshot_id']=state['snapshot_id']
                 variants.append({'type':'object','properties':{k:{'enum':[v]} for k,v in exact.items()},

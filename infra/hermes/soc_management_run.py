@@ -2903,6 +2903,8 @@ def management_read_request(request, agent, *, pending=False):
     ids_tool='mcp__rule_a__get_service_action_target'
     ids_policy=bool(chat and chat['tools']==[ids_tool]
         and chat_lookup_harness().ids_policy_question(chat['request']))
+    security=chat_lookup_harness().security_inventory_request(chat['request']) if chat and chat['tools'] else None
+    security_scope=chat_lookup_harness().tool_scope(chat['request']) if security else None
     branches=[];catalog={}
     for tool in tools:
         function=tool.get('function',{}) if isinstance(tool,dict) else {}
@@ -2912,6 +2914,7 @@ def management_read_request(request, agent, *, pending=False):
             raise RuntimeError('management_selection_catalog_invalid')
         if current and name!=diagnostic:continue
         if ids_policy and name!=ids_tool:continue
+        if security_scope is not None and name not in security_scope:continue
         selected=known_status_selection_schema(name,schema,
             status_read_requirements(os.environ.get('CAPSTONE_REQUIRED_STATUS_JSON')))
         if chat and selected is not None and getattr(agent,'_capstone_chat_selection_turn',None)!=agent._current_turn_id:
@@ -2928,6 +2931,9 @@ def management_read_request(request, agent, *, pending=False):
         if ids_policy and selected is not None:
             selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
             if selected is None:raise RuntimeError('chat_ids_policy_target_unregistered')
+        if security and selected is not None:
+            selected=chat_lookup_harness().refine_read_schemas(chat['request'],{name:selected},[]).get(name)
+            if selected is None:raise RuntimeError('chat_inventory_scope_unregistered')
         catalog[name]=copy.deepcopy(schema if selected is None else selected)
         if selected is None:continue
         schema=chat_read_schema(name,selected)

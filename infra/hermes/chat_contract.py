@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.61'
+VERSION = 'soc-chat-contract:1.5.62'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -216,7 +216,10 @@ def rule_scope_request(text):
                (r'(?<![A-Za-z])(?:WAF|ModSecurity)(?![A-Za-z])','WAF'),
                (r'(?<![A-Za-z])(?:IDS|Suricata)(?![A-Za-z])','Suricata'),
                (r'(?<![A-Za-z])Wazuh(?![A-Za-z])','Wazuh')) if re.search(pattern, text, re.I)]
-    fw_fields = devices == ['FW'] and bool(firewall_display_scope(text) or re.search(r'기본\s*정책|체인|\bNAT\b|집합|상세|자세', text, re.I))
+    policy_view = (re.search(r'정책', text) and
+                   re.search(r'조회|보여|목록|표로|테이블로|' + READ_VIEW_ENDING, text) and
+                   not re.search(r'안전|위험|평가|검토|적절|괜찮|문제|비교', text))
+    fw_fields = devices == ['FW'] and bool(firewall_display_scope(text) or policy_view or re.search(r'기본\s*정책|체인|\bNAT\b|집합|상세|자세', text, re.I))
     if not re.search(r'룰|규칙|(?<![A-Za-z])rules?(?![A-Za-z])', text, re.I):
         if not fw_fields and not (devices == ['FW'] and re.fullmatch(r'[\s?？.!]*(?:현재\s*|지금\s*)?FW\s*(?:보여줘|조회|출력|목록)[\s?？.!]*', text, re.I)):
             return None
@@ -233,7 +236,8 @@ def rule_scope_request(text):
     if (re.search(r'현재|지금',text) and
             re.search(r'(?:뭐야|뭔데|뭐(?:가)?\s*있(?:어|지|나)|어떤\s*(?:룰|규칙)(?:이)?\s*있(?:어|지|나))[\s?？.!]*$',text)):
         state_question=True
-    view_request = (re.search(READ_VIEW_ENDING, text) and
+    view_request = ((re.search(READ_VIEW_ENDING, text) or
+                     re.search(r'(?:표|테이블)로\s*(?:정리(?:해줘|해주세요|해줄래)?)?[\s?？.!]*$', text)) and
                     not re.search(r'어제|그제|지난|과거|내일|예정|\d{1,4}[-/.]\d', text))
     if not fw_fields and not state_question and not view_request and not re.search(r'조회|확인|보여|알려|목록|리스트|출력|개수|몇|\b(?:show|list)\b', text, re.I):
         return None

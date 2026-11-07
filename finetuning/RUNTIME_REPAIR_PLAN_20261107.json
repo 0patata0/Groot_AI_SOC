@@ -1,0 +1,272 @@
+{
+  "schema": 2,
+  "purpose": "separate common harness repair regression, not training improvement",
+  "created_at_kst": "2026-11-07T15:28:00+09:00",
+  "source_pins": {
+    "channel_sync.py": "8ec7d367d36dee7d3fa4a2312373210941dd3a2b11e2f84bb56610dd05315656",
+    "chat.py": "498dee3acf5e81fbc9487512b70691d0cc6f4c68bea1f8a0be98561f68927a30",
+    "chat_contract.py": "0bde036705ee5e6dd3aec020616556be3b5e239f280edf240bd594304d8b8a30",
+    "chat_markdown.py": "e829b47059ff4e273e182f8675739ed2f5a9a0ea9206403e4e4a4b09548bd795",
+    "chat_policy.py": "3965671c34ee1d94feacd70876a926f36069fb31969510473d2b213ea421bf72",
+    "gateway_health.py": "fa6401d48f8afed2f0842d3b89c32f421b1c2151217af99497e9b71553ba1d85",
+    "grounding.py": "ef75bd49a3468d026f54d84c34f735638abacf3ac3459bb92659b6bd6e3688cb",
+    "harness.py": "49781fb75b9b6d43d6a7b11891236e3e9679269d8890aa3375d5648827d83632",
+    "output_contract.py": "3dc64ce32a92f61a60dbbf18b94ddc514e06ebf02483893483292563cbdad6e6",
+    "policy.py": "58dfc498cd458384aa8dad5468aa6ab56cd9fa46e7920cf643d4eb00de8e75e1",
+    "query_grounding.py": "e236e4f8a6b786326dae1d11f3664db80609282aae387900074c32e1bc777d75",
+    "read_contract.py": "b25c9f22a137ffc483795d552a12d28ef37cf7389b29437b674be3fe45f0dbd2",
+    "read_pool.py": "bbe2c1a1c7776326fca7c9fc8a631ffb6c55bad65641b26d8907ad19ec9dd2a5",
+    "runtime.py": "5cccc19b3adf9abfe7943b041afd8d7060e5be4e379c8bbd24f5e1c05d0c42e7",
+    "workflow_contract.py": "f17c0bea6ef1b47a18acbce25171e33296605b2678dcb6fb3ea10b72813a908a"
+  },
+  "models": {
+    "soc-qwen36:35b-base-q4km-20261027": "f82a08f68070d7ec5bf2eb0c6f7bd15b0bec1becc01c6f627188cf08bde828ad",
+    "soc-qwen36:35b-operator-q4km-20261103": "5bfc2d9d3f245df44041db799cc24c32e09fd85af6fbf856a8aa109ddcbb90af",
+    "qwen3.6:35b": "a7eb95c53bcf96b4bdd008d0fab4a5dac88047d9c1a7a9ab88ed453423fbd87c"
+  },
+  "read_repetitions": 2,
+  "reads": [
+    {
+      "id": "fw-all",
+      "question": "FW 지금 정책 표로 볼래",
+      "server": "resp",
+      "tool": "get_firewall_rules",
+      "arguments": {},
+      "strict_receipts": true,
+      "complete_firewall_snapshot": true,
+      "table_required": true,
+      "receipt_fields": {
+        "target": "a:firewall"
+      }
+    },
+    {
+      "id": "fw-followup",
+      "question": "개별 룰도 표로",
+      "server": "resp",
+      "tool": "get_firewall_rules",
+      "arguments": {},
+      "strict_receipts": true,
+      "history": [
+        "방화벽 전체 정책 보여줘"
+      ],
+      "complete_firewall_snapshot": true,
+      "table_required": true,
+      "receipt_fields": {
+        "target": "a:firewall"
+      }
+    },
+    {
+      "id": "waf-counts",
+      "question": "WAF 기본 룰이랑 커스텀 룰 몇 개야?",
+      "server": "rule-a",
+      "tool": "get_security_rules",
+      "arguments": {
+        "target": "a:waf",
+        "origin": "all"
+      },
+      "strict_receipts": true,
+      "argument_defaults": {
+        "origin": "all"
+      },
+      "receipt_fields": {
+        "target": "a:waf"
+      }
+    },
+    {
+      "id": "ids-running",
+      "question": "IDS 룰 적재 상태 어때?",
+      "server": "rule-a",
+      "tool": "get_service_action_target",
+      "arguments": {
+        "target": "a:suricata"
+      },
+      "strict_receipts": true,
+      "receipt_fields": {
+        "target": "a:suricata"
+      }
+    },
+    {
+      "id": "ids-admin-policy",
+      "question": "IDS 관리자 예외 뭐야?",
+      "server": "rule-a",
+      "tool": "get_service_action_target",
+      "arguments": {
+        "target": "a:suricata"
+      },
+      "strict_receipts": true,
+      "receipt_fields": {
+        "target": "a:suricata"
+      }
+    },
+    {
+      "id": "wazuh-correlation",
+      "question": "Wazuh 상관분석 룰 첫 5개만 표로",
+      "server": "rule-b",
+      "tool": "get_security_rules",
+      "arguments": {
+        "target": "b:wazuh",
+        "origin": "all",
+        "correlation_only": true
+      },
+      "strict_receipts": true,
+      "argument_defaults": {
+        "origin": "all",
+        "correlation_only": false
+      },
+      "table_required": true,
+      "receipt_fields": {
+        "target": "b:wazuh"
+      }
+    },
+    {
+      "id": "vector-current",
+      "question": "벡터 지금 정상 가동 중이야?",
+      "server": "system-diagnostics",
+      "tool": "get_system_diagnostics",
+      "arguments": {
+        "target": "a:vector"
+      },
+      "strict_receipts": true,
+      "receipt_fields": {
+        "target": "a:vector"
+      }
+    },
+    {
+      "id": "indexer-current",
+      "question": "인덱서 상태 어때?",
+      "server": "system-diagnostics",
+      "tool": "get_system_diagnostics",
+      "arguments": {
+        "target": "b:wazuh-indexer"
+      },
+      "strict_receipts": true,
+      "receipt_fields": {
+        "target": "b:wazuh-indexer"
+      }
+    },
+    {
+      "id": "two-services",
+      "question": "헤르메스랑 벡터 지금 가동 상태 같이 알려줘",
+      "server": "system-diagnostics",
+      "tool": "get_system_diagnostics",
+      "arguments": {},
+      "strict_receipts": true,
+      "required_reads": [
+        {
+          "server": "system-diagnostics",
+          "tool": "get_system_diagnostics",
+          "arguments": {
+            "target": "b:hermes"
+          },
+          "receipt_fields": {
+            "target": "b:hermes"
+          }
+        },
+        {
+          "server": "system-diagnostics",
+          "tool": "get_system_diagnostics",
+          "arguments": {
+            "target": "a:vector"
+          },
+          "receipt_fields": {
+            "target": "a:vector"
+          }
+        }
+      ]
+    },
+    {
+      "id": "blocks",
+      "question": "지금 임시로 차단된 주소 있어?",
+      "server": "resp",
+      "tool": "list_blocks",
+      "arguments": {},
+      "strict_receipts": true
+    },
+    {
+      "id": "wazuh-agents",
+      "question": "Wazuh 에이전트 뭐 등록됐어?",
+      "server": "wazuh-ro",
+      "tool": "get_wazuh_agents",
+      "arguments": {},
+      "strict_receipts": true
+    },
+    {
+      "id": "unclear-rules",
+      "question": "룰 조회해줘",
+      "server": null,
+      "tool": null,
+      "arguments": {},
+      "strict_receipts": true,
+      "clarification": true
+    },
+    {
+      "id": "fw-all-variant",
+      "question": "현재 방화벽 정책 볼 수 있어?",
+      "server": "resp",
+      "tool": "get_firewall_rules",
+      "arguments": {},
+      "strict_receipts": true,
+      "complete_firewall_snapshot": true,
+      "table_required": true,
+      "receipt_fields": {
+        "target": "a:firewall"
+      }
+    },
+    {
+      "id": "wazuh-correlation-variant",
+      "question": "Wazuh 상관분석 규칙 처음 3개만 표로",
+      "server": "rule-b",
+      "tool": "get_security_rules",
+      "arguments": {
+        "target": "b:wazuh",
+        "origin": "all",
+        "correlation_only": true,
+        "limit": 3
+      },
+      "strict_receipts": true,
+      "argument_defaults": {
+        "origin": "all",
+        "correlation_only": false
+      },
+      "table_required": true,
+      "receipt_fields": {
+        "target": "b:wazuh",
+        "limit": 3
+      }
+    },
+    {
+      "id": "blocks-variant",
+      "question": "임시 차단 IP 목록 보여줄래?",
+      "server": "resp",
+      "tool": "list_blocks",
+      "arguments": {},
+      "strict_receipts": true
+    }
+  ],
+  "judgments": [],
+  "scoring": {
+    "critical_case_penalty": 20,
+    "other_case_penalty": 5,
+    "manual_narrative_review_required": true,
+    "latent_incident_accuracy_claim": false
+  },
+  "limits": [
+    "project-authored fixtures; not institutional incident truth",
+    "labels kept on B, never supplied to inference",
+    "no real protected write or Mattermost E2E",
+    "unreleased review worker changes excluded",
+    "same fixed SDK runtime; native Hermes separate issue",
+    "No additional judgment repetition; unchanged system policy. Before/after questions reused for regression, not independent evaluation."
+  ],
+  "interpretation": {
+    "read_gate": "receipt/target/coverage/format, not final narrative accuracy",
+    "manual_review_required": true,
+    "harness_clarification_is_not_model_skill": true,
+    "live_evidence_changes_between_arms": true,
+    "not_independent_incident_accuracy": true,
+    "connection_pool": false,
+    "production_model_unchanged": true,
+    "transport": "B loopback -> SSH via admin/A and Mac relay -> Thor loopback; all three arms identical",
+    "candidate_review_code_included": false
+  }
+}

@@ -411,7 +411,7 @@ def block_list_plan(text):
     history, a write, or an explanation. Unrecognized requests stay with the
     ordinary agent; this function never dispatches an MCP call.
     """
-    prefix = r'(?:(?:지금|현재|FW|의|에서|에)\s*)*'
+    prefix = r'(?:(?:지금|현재|FW|의|에서|에|임시(?:로)?)\s*)*'
     address = r'(?:(?:IPv[46]|IP|아이피)(?:\s*주소)?|주소)(?:들)?'
     subject = (r'(?:(?:차단\s*(?:된|중인|중|돼\s*있는|되어\s*있는)?|막힌|막혀\s*있는)'
                r'\s*' + address + r'(?:\s*(?:목록|리스트))?|차단\s*(?:목록|리스트))')

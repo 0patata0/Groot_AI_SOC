@@ -51,6 +51,15 @@ def lookup_read_scope(harness, current, phase):
     return frozenset(scope)
 
 
+def incomplete_inventory_text(harness, current, calls):
+    if not harness.security_inventory_request(current):return None
+    missing=harness.missing_reads(current,calls)
+    if not missing:return None
+    return ('요청한 규칙 조회를 완료하지 못했습니다. 다른 장비의 조회 결과로 대신하지 않았습니다.\n\n'
+            '| 미확인 대상 | 상태 |\n| --- | --- |\n'+
+            '\n'.join('| '+str(x).replace('|','\\|')+' | 실제 조회 근거 부족 |' for x in missing))
+
+
 def diagnostic_read_targets(harness, current):
     """Only a resolved, bounded service diagnostic; broad investigations stay native."""
     if getattr(harness,'pipeline_lookup_request',lambda _:False)(current):return ['b:management-pipeline']
@@ -628,8 +637,14 @@ def main():
                             text = comparison['text']
                             peer_review = comparison['verdict']
                             scope_complete = scope_complete and comparison['complete']
+            inventory_scope=getattr(harness,'security_inventory_request',lambda _:None)(current)
+            incomplete=(incomplete_inventory_text(harness,current,read_trace_calls(store,result['run_id']))
+                        if inventory_scope and inventory_scope['targets'] else None)
+            if incomplete and not any(c['is_write'] for c in calls):
+                text=incomplete
+                scope_complete=False
             status = 'completed' if result['state'] in ('completed', 'waiting_approval') else 'partial'
-            if (harness.read_plan(current) or fw_only or diagnostic_targets) and not scope_complete and not any(c['is_write'] for c in calls):
+            if (harness.read_plan(current) or fw_only or diagnostic_targets or inventory_scope) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)
             if result['completed'] and scope_complete and (response_read or diagnostic_targets or (plan and

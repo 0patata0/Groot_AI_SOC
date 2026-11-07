@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.62'
+VERSION = 'soc-chat-contract:1.5.63'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -36,9 +36,9 @@ SERVICE_STATE_GUIDANCE = (
     '반환 표본이 0건이면 그 표본의 수만 설명하며, 최근 오류가 없다거나 문제가 없다고 확대하지 않습니다. '
     '확인된 오류 코드는 직접 실패 이유의 근거이며, 누가 잠금을 가졌는지 같은 미확인 배경과 구분합니다. '
     'controller_already_running은 배타 잠금 획득 실패입니다. 코드만으로 재시도·재시작 시행이나 그 성공/실패·소유자 종료·복구를 만들지 않습니다. '
-    'b:management는 프로세스/오류 이력이고 b:management-pipeline는 현재 관제 처리·전송·검토 대기열입니다. '
+    'b:management는 프로세스/오류 이력이고 b:management-pipeline는 현재 실행·전송 대기 지표와 별도의 사건 검토 상태입니다. '
     '컨트롤러 실패가 지금도 처리에 영향을 주는지 질문하면 두 범위를 구분해 등록 도구로 확인합니다. '
-    'review_required_cases는 검토 상태의 사건 수이며 공격 확정·실행 실패 건수가 아닙니다. '
+    'review_required_cases는 검토 상태의 사건 수이며 처리·전송 대기 건수나 공격 확정·실행 실패 건수가 아닙니다. '
     '전송·기한초과 대기가 0이어도 검토 완료·과거 실패 해결·전체 정상으로 확대하지 않습니다. '
     '검토 상태 건수만으로 처리 병목·실시간 지연을 단정하지 않습니다. oneshot의 inactive/dead와 성공 종료는 재실행 실패의 증거가 아닙니다. '
     'case_review_required만 붙은 degraded는 검토 미완료 표지이며 성능 저하 측정값이 아닙니다. review_required_cases는 현재 상태 합계이지 오늘·어제·이틀 치 발생 건수가 아닙니다. '
@@ -1052,6 +1052,9 @@ def snapshot_health_violations(text, facts):
                     and all(v.get('kind')=='exited' and v.get('exit_status')==0 for v in values)):continue
         # Only a directly attached negative predicate can qualify this claim.
         # A disclaimer elsewhere must not excuse a separate positive claim.
+        if re.match(r'\s*(?:적으로\s*)?(?:동작|작동|운영|가동)\s*(?:상태\s*)?'
+                r'(?:을|를|임을|함을)?\s*(?:증명|입증|보장|의미|뜻)하지\s*않'
+                r'(?:습니다|으며|는다|음)(?=\s|[.,;!?|*`)]|$)',after):continue
         if re.match(r'\s*진입까지\s*(?:모니터링|확인|검증)(?:이|은|는)?\s*필요(?=\s|합니다|[.,;!?|*`(]|$)',after):continue
         if re.match(r'\s*(?:상태\s*)?(?:임을|이라는\s*것을|인\s*것을|을|를)?\s*'
                 r'(?:증명|입증|보장|의미|뜻)(?:하는|한)\s*(?:것이|것은|건)\s*'

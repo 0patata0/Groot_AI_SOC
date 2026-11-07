@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "component": "soc-chat-contract:1.5.63",
+  "query": "groot-query-completion:1.19.118",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "c511133b4b34d3c9b10b3fb10f6741d7ed34f689ed0ddc3b90b6f39eb33c4168",
+    "infra/hermes/test_diagnostic_claim_scope.py": "ac313d88d3898d967b4d8fff9bdebce0557a79b18c8fab9ba1c54927902269e2"
+  },
+  "changes": [
+    "Direct negative functional-health disclaimer is not a positive health assertion.",
+    "Separate review-required case status from execution/delivery queue counts in shared guidance."
+  ],
+  "unit_tests": {
+    "profiles": {
+      "native": {
+        "rc": 0,
+        "count": 481,
+        "unique": 481
+      },
+      "service": {
+        "rc": 0,
+        "count": 48,
+        "unique": 48
+      },
+      "claims": {
+        "rc": 0,
+        "count": 32,
+        "unique": 32
+      },
+      "sdk": {
+        "rc": 0,
+        "count": 282,
+        "unique": 282
+      },
+      "query": {
+        "rc": 0,
+        "count": 408,
+        "unique": 408
+      },
+      "peer": {
+        "rc": 0,
+        "count": 79,
+        "unique": 79
+      },
+      "installer": {
+        "rc": 0,
+        "count": 62,
+        "unique": 62
+      }
+    },
+    "total": 1392,
+    "skipped": 0
+  },
+  "deployment": {
+    "applied_at_kst": "2026-11-07T21:06:20.099357+09:00",
+    "changed_files": 3,
+    "protected_files_unchanged": 8,
+    "backup": "/var/lib/capstone-service-grounding/20261107-complex63",
+    "hermes_planned_restarts": 1,
+    "rollback_confirmed": true,
+    "verified_at_kst": "2026-11-07T21:11:40.944833+09:00",
+    "verified_source_files": 14,
+    "sdk_source_files": 20,
+    "review_source_files": 5,
+    "b_failed_units": 0,
+    "queues_empty": true,
+    "websockets_and_workers_ready": true,
+    "startup_health_first_attempt": "Not ready before heartbeat refresh; second full check and final check passed."
+  },
+  "new_root_chat": [
+    {
+      "bot": "ollama",
+      "phase": "before",
+      "seconds": 53.158,
+      "status": "partial",
+      "read_calls": 4,
+      "protected_calls": 0,
+      "quality_pass": false,
+      "remaining_issues": [
+        "diagnostic_property_value_mismatch",
+        "diagnostic_property_value_unverified"
+      ]
+    },
+    {
+      "bot": "hermes",
+      "phase": "before",
+      "seconds": 31.835,
+      "status": "partial",
+      "read_calls": 4,
+      "protected_calls": 0,
+      "quality_pass": false,
+      "remaining_issues": []
+    },
+    {
+      "bot": "ollama",
+      "phase": "after",
+      "seconds": 53.258,
+      "status": "partial",
+      "read_calls": 4,
+      "protected_calls": 0,
+      "quality_pass": false,
+      "remaining_issues": [
+        "diagnostic_lock_metadata_not_restart_history",
+        "diagnostic_pipeline_congestion_unverified",
+        "diagnostic_property_value_unverified"
+      ]
+    },
+    {
+      "bot": "hermes",
+      "phase": "after",
+      "seconds": 50.595,
+      "status": "partial",
+      "read_calls": 4,
+      "protected_calls": 0,
+      "quality_pass": false,
+      "remaining_issues": [
+        "Successful history read misdescribed as collection/return failure in published limitations.",
+        "Current queue evidence not adequately distinguished from historical coverage limits.",
+        "Follow-up delegated to administrator instead of further scoped LLM investigation."
+      ]
+    }
+  ],
+  "limitations": [
+    "Development regression; not independent SOC accuracy.",
+    "Shared inference load and context cache were not controlled.",
+    "Model, authorization, tool schema, firewall, training and attack traffic unchanged.",
+    "Complex semantic claims still require follow-up; partial is not correct completion.",
+    "DGX last training check remains 20:55 KST; polling suspended until user morning instruction.",
+    "Read validation success does not establish collection continuity; published Hermes prose still overstates evidence unavailability."
+  ],
+  "cleanup": {
+    "server_test_files": 469,
+    "server_test_bytes": 7331218,
+    "mac_pending": false,
+    "mac": {
+      "at_kst": "2026-11-07T21:15:05.458487+09:00",
+      "removed_files": 2,
+      "removed_bytes": 10085539,
+      "absent": true,
+      "processes_using_workspace": 0
+    }
+  },
+  "publication": {
+    "status": "pending"
+  }
+}

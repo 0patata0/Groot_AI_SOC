@@ -61,6 +61,23 @@ class DiagnosticClaims(unittest.TestCase):
         self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text+'; 서비스는 정상입니다.'))
         self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues('서비스의 정상 진입을 확인했습니다.'))
 
+    def test_direct_functional_health_disclaimer_is_not_a_positive_claim(self):
+        for text in ('장기 실행 서비스의 정상 가동 상태를 증명하지 않습니다.',
+                     '서비스의 정상 동작을 보장하지 않습니다.',
+                     '서비스가 정상적으로 작동함을 뜻하지 않습니다.',
+                     '현재 서비스의 정상 운영 상태임을 입증하지 않습니다.'):
+            with self.subTest(text=text):
+                self.assertNotIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
+    def test_disclaimer_does_not_excuse_positive_or_double_negative_claim(self):
+        for text in ('서비스의 정상 가동 상태를 증명합니다.',
+                     '서비스의 정상 동작을 보장하지 않는 것은 아닙니다.',
+                     '서비스의 정상 동작을 보장하지 않습니다. 서비스는 정상입니다.',
+                     '서비스는 정상입니다. 전체 기능은 미확인입니다.',
+                     '서비스의 정상 동작을 보장하지 않았습니다. 현재 서비스는 정상입니다.'):
+            with self.subTest(text=text):
+                self.assertIn('diagnostic_snapshot_is_not_functional_health',self.issues(text))
+
     def test_conditional_successful_oneshot_termination_is_not_global_health(self):
         text='현재 c:vector 서비스의 inactive/dead 상태는 정상적인 작업 완료 후 종료일 수 있습니다.'
         self.assertEqual(self.issues(text),[])

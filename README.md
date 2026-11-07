@@ -21,7 +21,7 @@
 
 11/8 SDK 추가근거의 실제 MCP 실행·반복 거절에 이어 common70의 자연어 KST 기간 연결을 운영 반영했습니다.1,449고유검사·새 채팅 H80.744초/O41.842초에서 필수3읽기를 확인했습니다. 당시 원문 journal 미반환·Hermes 불필요FW/수집범위 과장·Ollama의 미완료인데 completed 상태를 확인했고, 후속 원문 연결·상태 보완과 구분합니다. 이번 시간 수정은 계획된 Hermes재시작2회이며 운영 원본35B·승인/FW를 유지했습니다. [이전 시간 처리 결과·실패·복구](infra/hermes/service-periods.md) · [이전 실행 수정](infra/ollama-trial/service-inquiry.md). 기존3모델15보고 비교도 학습 우위를 입증하지 못했습니다. [조건·결과](finetuning/SERVICE_REASONING_COMPARISON_20261108.md).
 
-서비스 원문 조회 `view=journal`을 A/B/C에 적용하고 두 봇의 원문·이력·현재 상태 구분과 SDK 미완료 상태를 보완했습니다. Linux1,544검사·실제MCP11호출(정상9/거절2)·B원문32행/오류8행SHA를 확인했습니다. 새 Hermes 채팅은 원문 표시까지 성공했으나140.678초/7읽기·최종판단 미완료이므로 전체 정확성·60초 목표 달성은 아닙니다. 최신 결과는 [STATUS](STATUS.md)를 따릅니다. [구현·실패 수정·한계](infra/mcp/journal-excerpts.md).
+서비스 원문 조회 `view=journal`을 A/B/C에 적용하고 두 봇의 원문·이력·현재 상태 구분과 SDK 미완료 상태를 보완했습니다. Linux1,544검사·실제MCP11호출(정상9/거절2)·B원문32행/오류8행SHA를 확인했습니다. 새 채팅은 Hermes140.678초/7읽기·Ollama91.518초/4읽기 모두 원문 표시 뒤 최종판단 미완료이므로 전체 정확성·60초 목표 달성은 아닙니다. 최신 결과는 [STATUS](STATUS.md)를 따릅니다. [구현·실패 수정·한계](infra/mcp/journal-excerpts.md). 후속 [입력·응답 구조12출력 대조](infra/hermes/service-report-layout.md)는 토큰 감소와 의미 정확성을 구분했고 후보를 운영에 채택하지 않았습니다.
 
 11/8 복합 판단 후속은 필드 의미 설명·보고 지침 정리·반복 억제·추론 옵션의10출력(제어군 포함)을 대조했으나 모두 비채택했습니다. 추론 활성62.700초도 의미 오류가 남았고, 운영 설정은 유지합니다. [실제 설정·비채택 근거·다음 작업](infra/hermes/service-semantics-probes.md).
 

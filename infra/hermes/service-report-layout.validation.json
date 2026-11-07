@@ -1,0 +1,659 @@
+{
+  "checked_at_kst": "2026-11-08T04:28:51.711500+09:00",
+  "state": "development_candidates_not_adopted",
+  "model": "qwen3.6:35b",
+  "common": "1.5.71",
+  "frozen_cases": 2,
+  "generated_outputs": 12,
+  "schema_pass": 12,
+  "report_selection_outputs": 10,
+  "requested_more_evidence": 8,
+  "incorrect_reports": 2,
+  "inquiry_outputs": 2,
+  "exact_repeated_inquiries": 2,
+  "new_mcp_calls": 0,
+  "protected_calls": 0,
+  "production_changes": 0,
+  "restarts": 0,
+  "dgx_status_polled": false,
+  "independent_evaluation": false,
+  "trained_on_evaluation": false,
+  "source_sha256": {
+    "runtime.py": "2668788ab8f62d1877693eb27f51e73e6f83a371b009768e31bf86694e1be5ac",
+    "chat_contract.py": "d9b24ea6811920e7bbc134b5b8de3435903ad747752fe77f4144b7900716e2ae",
+    "harness.py": "806425662664ce9954329ecab6fda905449f2032c2237217d8dd2feee7a49b34",
+    "grounding.py": "4cd0fa574df76dd2ff060d6cff860596680172eaa4f8f0fe557a7e22b3b7ae8f"
+  },
+  "candidate_source_sha256": {
+    "layout.py": "d88f5ffdbbb599a4bdd19fb00acbd08556281ac8bc0b92b07d8fea84815521a0",
+    "compare-inner.py": "2d9e5271e0ea79940ba3e5c10c46b86e926898026029c72ad9fee4f3475ad7fe",
+    "inquiry-inner.py": "1c695440238dc5a8703b41533b5361099c28f88268e5047f605406e8ef73349c",
+    "inquiry-inner-r2.py": "60fbbc9aa6bfc4f92d38ad584d7bb8a0beeaec863cf313a3014a45a1132eb471",
+    "schema-order-inner.py": "f1e72f30b932e2fdcd61522844bcb2761d51a2bf024585386d7de2ac3b7aa5d0",
+    "order-inner.py": "7088a72bd477273dcef704248d1f4763d333e6f8f1c170d31a115ba40d9a9967"
+  },
+  "rows": [
+    {
+      "case": "hermes73",
+      "variant": "control",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "e0c6013a2b9600733e547ee6dd38a306f8bd4bc5f161cedabfc64c9881f578b6",
+      "schema_sha256": "6bab3233594a670b42fa961c8e060b41714e8af118324869f6df78df58f193d3",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 17.6153451660648,
+      "usage": {
+        "input_tokens": 17595,
+        "output_tokens": 45,
+        "total_tokens": 17640
+      },
+      "metrics": {
+        "total_duration": 17540582787,
+        "load_duration": 10588217,
+        "prompt_eval_count": 17595,
+        "prompt_eval_duration": 16359659000,
+        "eval_count": 45,
+        "eval_duration": 1042111000
+      },
+      "user_bytes": 40378,
+      "system_bytes": 6449,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:21:32.375696+09:00",
+      "original_receipt_sha256": "ea1caae44edcf163d33e06aa4eb0050cd8db1bd232a1b132c779c64a57d0404c",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    },
+    {
+      "case": "hermes73",
+      "variant": "evidence_last",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "ee9af75a4c15001663c28d71c3903e545c02bb72c890ede26bc1b90d93f5b13d",
+      "schema_sha256": "6bab3233594a670b42fa961c8e060b41714e8af118324869f6df78df58f193d3",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 20.172975240973756,
+      "usage": {
+        "input_tokens": 17595,
+        "output_tokens": 151,
+        "total_tokens": 17746
+      },
+      "metrics": {
+        "total_duration": 20056656809,
+        "load_duration": 10110347,
+        "prompt_eval_count": 17595,
+        "prompt_eval_duration": 16269099000,
+        "eval_count": 151,
+        "eval_duration": 3645558000
+      },
+      "user_bytes": 40378,
+      "system_bytes": 6449,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:27:42.685477+09:00",
+      "original_receipt_sha256": "17f8025c9c25fbcdf7837b4126eb7afa97b5347f78c4f8b28a5d7c0a030b6df1",
+      "value": {
+        "more_evidence": false,
+        "report": {
+          "assessment": "unresolved",
+          "basis": "요청 시점의 오류 원인은 배타 잠금 실패(controller_already_running)이며, 현재 관제 처리는 검토 대기 건수(287건)로 인해 병목 상태입니다.",
+          "evidence_indexes": [
+            0
+          ],
+          "limitations": [
+            "controller_already_running은 잠금 획득 실패를 의미하나, 잠금을 보유한 프로세스의 상태나 정상 종료 여부는 확인되지 않았습니다."
+          ],
+          "next_steps": [],
+          "status": "needs_review"
+        }
+      },
+      "guard_issues": [
+        "diagnostic_error_code_total_unverified",
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "incorrect_review_count_as_processing_bottleneck"
+    },
+    {
+      "case": "hermes73",
+      "variant": "control",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "f05fab9628d4b0d80fb726e8c90b12d679566d631e1e6bdc4cd64bd8ab968781",
+      "schema_sha256": "3f765d54df68b9b73691f4dee8db6b18ceebc2c3f06d9d1aaf536c6f80badad2",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 15.912757412996143,
+      "usage": {
+        "input_tokens": 16059,
+        "output_tokens": 41,
+        "total_tokens": 16100
+      },
+      "metrics": {
+        "total_duration": 15839058017,
+        "load_duration": 8671562,
+        "prompt_eval_count": 16059,
+        "prompt_eval_duration": 14891158000,
+        "eval_count": 41,
+        "eval_duration": 811641000
+      },
+      "user_bytes": 37312,
+      "system_bytes": 765,
+      "schema_bytes": 8608,
+      "at_kst": "2026-11-08T04:24:33.540191+09:00",
+      "original_receipt_sha256": "e7e643d1bcf3c27a1e2f8dbfb7fe78b64c6ed3c329f5db1b2096ac2ca505c92e",
+      "value": {
+        "calls": [
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "b:management-pipeline"
+            }
+          }
+        ],
+        "request_nonce": "layout-development-inquiry",
+        "report": null
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "inquiry_args",
+      "exact_repeated_calls": [
+        {
+          "tool": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:management-pipeline"
+          }
+        }
+      ],
+      "observation": "selected_already_completed_pipeline_read",
+      "post_generation_checker_error": "AttributeError"
+    },
+    {
+      "case": "hermes73",
+      "variant": "packed",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "69a5ce9f05a3755bd79af89d38c6c53dab0d3f507ac0fe68ed101f647b264bab",
+      "schema_sha256": "3f765d54df68b9b73691f4dee8db6b18ceebc2c3f06d9d1aaf536c6f80badad2",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 11.977522211149335,
+      "usage": {
+        "input_tokens": 11961,
+        "output_tokens": 41,
+        "total_tokens": 12002
+      },
+      "metrics": {
+        "total_duration": 11903861034,
+        "load_duration": 6104582,
+        "prompt_eval_count": 11961,
+        "prompt_eval_duration": 10957092000,
+        "eval_count": 41,
+        "eval_duration": 797673000
+      },
+      "user_bytes": 30056,
+      "system_bytes": 944,
+      "schema_bytes": 8608,
+      "at_kst": "2026-11-08T04:25:03.525700+09:00",
+      "original_receipt_sha256": "cf676e6a6b0e225bf8611dde68353736b7f4b6aaffa72c5f9c232c2f103ae10e",
+      "value": {
+        "calls": [
+          {
+            "tool": "mcp__system_diagnostics__get_system_diagnostics",
+            "arguments": {
+              "target": "b:management-pipeline"
+            }
+          }
+        ],
+        "request_nonce": "layout-development-inquiry",
+        "report": null
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "inquiry_args",
+      "exact_repeated_calls": [
+        {
+          "tool": "mcp__system_diagnostics__get_system_diagnostics",
+          "arguments": {
+            "target": "b:management-pipeline"
+          }
+        }
+      ],
+      "observation": "selected_already_completed_pipeline_read",
+      "post_generation_checker_error": "AttributeError"
+    },
+    {
+      "case": "hermes73",
+      "variant": "packed",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "862ca2249d6183d223f6daaeaf08941ac89ab98d74ed523ec5c0b8c78adec3aa",
+      "schema_sha256": "6bab3233594a670b42fa961c8e060b41714e8af118324869f6df78df58f193d3",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 13.724893052130938,
+      "usage": {
+        "input_tokens": 13507,
+        "output_tokens": 45,
+        "total_tokens": 13552
+      },
+      "metrics": {
+        "total_duration": 13649872286,
+        "load_duration": 9341016,
+        "prompt_eval_count": 13507,
+        "prompt_eval_duration": 12514508000,
+        "eval_count": 45,
+        "eval_duration": 949400000
+      },
+      "user_bytes": 33122,
+      "system_bytes": 6677,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:22:06.278220+09:00",
+      "original_receipt_sha256": "28b92b9fcf7317ace4bbaa46682f321a1d7a04fe0e41b33f8ead152ee909d8eb",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    },
+    {
+      "case": "hermes73",
+      "variant": "report_first",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "e0c6013a2b9600733e547ee6dd38a306f8bd4bc5f161cedabfc64c9881f578b6",
+      "schema_sha256": "6be94777dd762afca13d3e8354a439f2d1323a703384e5b1d8b67809f7f3eb82",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 1.5566904509905726,
+      "usage": {
+        "input_tokens": 17595,
+        "output_tokens": 45,
+        "total_tokens": 17640
+      },
+      "metrics": {
+        "total_duration": 1481632963,
+        "load_duration": 10111314,
+        "prompt_eval_count": 17595,
+        "prompt_eval_duration": 138271000,
+        "eval_count": 45,
+        "eval_duration": 1118050000
+      },
+      "user_bytes": 40378,
+      "system_bytes": 6449,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:25:35.576958+09:00",
+      "original_receipt_sha256": "b55eeb03f4784f97ff77bdbed075202b3bb7a088a5d2359da4e2e3ec767dc69a",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    },
+    {
+      "case": "hermes73",
+      "variant": "sections",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "73418e0b6a53ab74c11797bceb6777f62eb016faf3a20d68682cb3ba412d0594",
+      "schema_sha256": "3014d4da4223796f326c305cc6b8accd7373138bc42fb7a55dea1b31c7e85537",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 13.700923511991277,
+      "usage": {
+        "input_tokens": 13543,
+        "output_tokens": 45,
+        "total_tokens": 13588
+      },
+      "metrics": {
+        "total_duration": 13621536341,
+        "load_duration": 9316070,
+        "prompt_eval_count": 13543,
+        "prompt_eval_duration": 12382478000,
+        "eval_count": 45,
+        "eval_duration": 1053398999
+      },
+      "user_bytes": 33122,
+      "system_bytes": 6847,
+      "schema_bytes": 38312,
+      "at_kst": "2026-11-08T04:22:35.997856+09:00",
+      "original_receipt_sha256": "c4a9b108c327147a3623c207cdf1473372a26037c874f157bcf114065f4acfc2",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    },
+    {
+      "case": "hermes73",
+      "variant": "visible_contract",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "f83d5fb02e6ed882c78fd66831951ee8609e6ad05777534cb7f5b128dfe784fa",
+        "461d747ca7cb325f12322da6f859f11e84f8d1e8b2d8f9841b7c599165854952",
+        "6588d0094ab31cdb689716ee3b4c6e123ddec34e4de4c640752e10cb35cac75a",
+        "ecf4660a6d82c07b7e322ef47b80f2d136c898bcd9033af2fb35a151b9103d73"
+      ],
+      "messages_sha256": "16655bdf674850e6dc6a07c081dda079f66576c54e5fb665d9188bdaff9f765e",
+      "schema_sha256": "6bab3233594a670b42fa961c8e060b41714e8af118324869f6df78df58f193d3",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 15.578478514915332,
+      "usage": {
+        "input_tokens": 27135,
+        "output_tokens": 185,
+        "total_tokens": 27320
+      },
+      "metrics": {
+        "total_duration": 15459632865,
+        "load_duration": 14461027,
+        "prompt_eval_count": 27135,
+        "prompt_eval_duration": 11543119000,
+        "eval_count": 185,
+        "eval_duration": 3741898000
+      },
+      "user_bytes": 75706,
+      "system_bytes": 6449,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:26:26.903586+09:00",
+      "original_receipt_sha256": "d556101f32d322e523d693de8b108845ffe5b7f544d19f5dc073e0e0c540ec89",
+      "value": {
+        "more_evidence": false,
+        "report": {
+          "assessment": "unresolved",
+          "basis": "2026-11-06 16:20~16:40 KST 구간에서 capstone-management.service는 controller_already_running(배타 잠금 실패) 오류로 연속 재시도 실패했으며, 현재 서비스는 oneshot 타입의 정상 종료(inactive/dead) 상태입니다.",
+          "evidence_indexes": [
+            0
+          ],
+          "limitations": [
+            "구간 내 실제 원문 메시지 확인이 불가능하며, SOC 처리 밀려 여부(전송 대기/검토 지연 등)에 대한 현재 시점의 상세 지표는 미확인입니다."
+          ],
+          "next_steps": [],
+          "status": "needs_review"
+        }
+      },
+      "guard_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "incorrect_restart_claim_and_denied_available_journal_and_pipeline"
+    },
+    {
+      "case": "ollama73",
+      "variant": "control",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "e139ea76a13314f95430ae334f74f7523cf26cc90f2286c1e2aa8212ec0b3bfa",
+        "031b5787900f2ba1d75a32a147e7adfafc7e1ab0c9c8b6d99327340b06f625b7",
+        "f1de39fb653b2a6ff73688c8172f758a8d04ee115d99db20a6a05988c98b5337",
+        "af5bda003cf27df903702e45c28af8c2fca5e9083e21888e3afb373f07d9cf5b"
+      ],
+      "messages_sha256": "2409df02a2edf858909e81cc4fa0fcd2562ecec0a77e36cdf2519381abc5edb2",
+      "schema_sha256": "6bab3233594a670b42fa961c8e060b41714e8af118324869f6df78df58f193d3",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 17.64848995907232,
+      "usage": {
+        "input_tokens": 17567,
+        "output_tokens": 45,
+        "total_tokens": 17612
+      },
+      "metrics": {
+        "total_duration": 17572670491,
+        "load_duration": 12587726,
+        "prompt_eval_count": 17567,
+        "prompt_eval_duration": 16366753000,
+        "eval_count": 45,
+        "eval_duration": 1011961000
+      },
+      "user_bytes": 40360,
+      "system_bytes": 6449,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:23:10.168926+09:00",
+      "original_receipt_sha256": "71d385f528390eac8bd203b06f885c793bad9cfb543dc0d2c58150b1cac773da",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    },
+    {
+      "case": "ollama73",
+      "variant": "evidence_last",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "e139ea76a13314f95430ae334f74f7523cf26cc90f2286c1e2aa8212ec0b3bfa",
+        "031b5787900f2ba1d75a32a147e7adfafc7e1ab0c9c8b6d99327340b06f625b7",
+        "f1de39fb653b2a6ff73688c8172f758a8d04ee115d99db20a6a05988c98b5337",
+        "af5bda003cf27df903702e45c28af8c2fca5e9083e21888e3afb373f07d9cf5b"
+      ],
+      "messages_sha256": "231d8b46a64446164e71124196852d53a1040b29d2b1a169193d1fbaf9a7e6c2",
+      "schema_sha256": "6bab3233594a670b42fa961c8e060b41714e8af118324869f6df78df58f193d3",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 17.59126410121098,
+      "usage": {
+        "input_tokens": 17567,
+        "output_tokens": 45,
+        "total_tokens": 17612
+      },
+      "metrics": {
+        "total_duration": 17513445464,
+        "load_duration": 9908047,
+        "prompt_eval_count": 17567,
+        "prompt_eval_duration": 16314527000,
+        "eval_count": 45,
+        "eval_duration": 1009977000
+      },
+      "user_bytes": 40360,
+      "system_bytes": 6449,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:28:51.711500+09:00",
+      "original_receipt_sha256": "cbb82e5e6e6b9ed0341f9bedde3fb2eb0cfa51f67670df1eadff4bf805a7a35d",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    },
+    {
+      "case": "ollama73",
+      "variant": "packed",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "e139ea76a13314f95430ae334f74f7523cf26cc90f2286c1e2aa8212ec0b3bfa",
+        "031b5787900f2ba1d75a32a147e7adfafc7e1ab0c9c8b6d99327340b06f625b7",
+        "f1de39fb653b2a6ff73688c8172f758a8d04ee115d99db20a6a05988c98b5337",
+        "af5bda003cf27df903702e45c28af8c2fca5e9083e21888e3afb373f07d9cf5b"
+      ],
+      "messages_sha256": "488fa812e40797fefafffce830c3cef297e0c2ebad1b63028584c7ac5b827549",
+      "schema_sha256": "6bab3233594a670b42fa961c8e060b41714e8af118324869f6df78df58f193d3",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 13.784792261896655,
+      "usage": {
+        "input_tokens": 13479,
+        "output_tokens": 45,
+        "total_tokens": 13524
+      },
+      "metrics": {
+        "total_duration": 13708178920,
+        "load_duration": 9451697,
+        "prompt_eval_count": 13479,
+        "prompt_eval_duration": 12528104000,
+        "eval_count": 45,
+        "eval_duration": 994263000
+      },
+      "user_bytes": 33104,
+      "system_bytes": 6677,
+      "schema_bytes": 37512,
+      "at_kst": "2026-11-08T04:23:41.874284+09:00",
+      "original_receipt_sha256": "dac690670754476f7d120c3b214c65d87a50a51e6bf5131d4de158f7185ee4d8",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    },
+    {
+      "case": "ollama73",
+      "variant": "sections",
+      "source_kind": "actual_frozen_reads_development",
+      "read_sha256": [
+        "e139ea76a13314f95430ae334f74f7523cf26cc90f2286c1e2aa8212ec0b3bfa",
+        "031b5787900f2ba1d75a32a147e7adfafc7e1ab0c9c8b6d99327340b06f625b7",
+        "f1de39fb653b2a6ff73688c8172f758a8d04ee115d99db20a6a05988c98b5337",
+        "af5bda003cf27df903702e45c28af8c2fca5e9083e21888e3afb373f07d9cf5b"
+      ],
+      "messages_sha256": "68b2b4bddb34a1124b5a1b6284e85cb7111459c8bf9ca9a8f7b2910bfd030ee6",
+      "schema_sha256": "3014d4da4223796f326c305cc6b8accd7373138bc42fb7a55dea1b31c7e85537",
+      "registered_read_tools": 35,
+      "actual_tool_calls": 0,
+      "seconds": 13.705166708910838,
+      "usage": {
+        "input_tokens": 13515,
+        "output_tokens": 45,
+        "total_tokens": 13560
+      },
+      "metrics": {
+        "total_duration": 13628622708,
+        "load_duration": 9074666,
+        "prompt_eval_count": 13515,
+        "prompt_eval_duration": 12495686000,
+        "eval_count": 45,
+        "eval_duration": 1002177000
+      },
+      "user_bytes": 33104,
+      "system_bytes": 6847,
+      "schema_bytes": 38312,
+      "at_kst": "2026-11-08T04:24:01.776564+09:00",
+      "original_receipt_sha256": "0620a3c752982308e71ccc52fdca8f81e4eeb7e662c81cceb031183491dbbdfa",
+      "value": {
+        "more_evidence": true,
+        "report": null,
+        "read_tools": [
+          "mcp__system_diagnostics__get_system_diagnostics"
+        ]
+      },
+      "guard_issues": [],
+      "model_valid": true,
+      "production_changed": false,
+      "stage": "report_or_more",
+      "observation": "requested_more_evidence_no_report"
+    }
+  ],
+  "limits": [
+    "Decision/argument-generation comparisons, not new end-to-end chats or independent evaluation",
+    "Two frozen observation sets from the same development incident and question; generation cache and shared GPU not controlled",
+    "Two inquiry post-generation checkers had AttributeError; generated output/schema validated and exact repetition recomputed locally without regenerating",
+    "Packing losslessly retains every original row/value/hash; no truncation or supplied final verdict",
+    "Only twelve executed wrappers counted; other prepared wrappers were not executed"
+  ],
+  "cleanup": {
+    "mac_new_packages": 0,
+    "mac_downloads": 0,
+    "remote_staged_files": 0,
+    "remote_execution": "in-memory source, runuser soc-ollama, existing SDK environment",
+    "local_sources_and_evidence": "preserved as local excluded project records"
+  },
+  "next": [
+    "Inspect ambiguity in collector rollup status versus case workflow and processing metrics",
+    "Keep runtime evidence scopes separate and bind each claim to actual source values",
+    "Bring native and SDK repeat-read handling into parity without suppressing new evidence",
+    "Retest different questions/cases and preserve counterexamples before production adoption"
+  ],
+  "inference_client": "Existing B SDK ChatOllama for every generation; Hermes/Ollama labels identify frozen receipt origins, not separate tested runtimes"
+}

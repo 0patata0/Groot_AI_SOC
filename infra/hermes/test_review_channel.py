@@ -47,6 +47,108 @@ class API:
 
 
 class Tests(unittest.TestCase):
+    def test_completed_service_keeps_drafts_private_and_caches_only_actual_reads(self):
+        self.actual_harness();self.post['message']='WAF 커스텀 룰 상세 조회';self.d.add(self.post)
+        job=self.job();self.d.placeholder(job);call=self.rule_fixture()
+        draft={'response':{'basis':'REJECTED_BEFORE_COMPLETION'},'repair':False}
+        future=concurrent.futures.Future();future.set_result({'status':'completed',
+            'final_response':'실제 조회 결과입니다.','protected_calls':0,'calls':[call],
+            'service_report_audit':[draft,{'response':{'basis':'corrected'},'repair':True}]})
+        self.d.active['ollama']=(future,job['id']);self.d.tick(mock.Mock())
+        audit=json.loads(self.d.db.execute('SELECT audit FROM request_audits WHERE job_id=?',(job['id'],)).fetchone()[0])
+        self.assertEqual(audit['status'],'completed');self.assertFalse(audit['reusable_evidence'])
+        self.assertEqual(len(audit['model_drafts']),2)
+        cached=self.d.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(job['id'],)).fetchone()[0]
+        self.assertEqual(json.loads(cached)['calls'][0]['result'],call['result'])
+        self.assertNotIn('REJECTED_BEFORE_COMPLETION',cached)
+        public=self.d.db.execute('SELECT result FROM jobs WHERE id=?',(job['id'],)).fetchone()[0]
+        self.assertNotIn('REJECTED_BEFORE_COMPLETION',public)
+        self.assertNotIn('REJECTED_BEFORE_COMPLETION',json.dumps(self.apis['ollama'].sent))
+        self.assertNotIn('REJECTED_BEFORE_COMPLETION',self.follow('같은 조회 결과로 다시 설명해줘')['question'])
+
+    def test_partial_read_audit_is_private_and_never_a_reusable_receipt(self):
+        import hashlib
+        self.actual_harness();self.post['message']='WAF 커스텀 룰 상세 조회';self.d.add(self.post)
+        job=self.job();self.d.placeholder(job);call=self.rule_fixture()
+        draft={'response':{'basis':'UNSUPPORTED_PRIVATE_DRAFT'},'repair':False,
+               'read_result_sha256':[call['result_sha256']]}
+        future=concurrent.futures.Future();future.set_result({'status':'partial',
+            'final_response':'확인한 사실만 보고하며 판단은 미완료입니다.',
+            'protected_calls':0,'calls':[call],'service_report_audit':[draft]})
+        self.d.active['ollama']=(future,job['id']);self.d.tick(mock.Mock())
+        row=self.d.db.execute('SELECT audit,sha256 FROM request_audits WHERE job_id=?',(job['id'],)).fetchone()
+        self.assertEqual(hashlib.sha256(row[0].encode()).hexdigest(),row[1])
+        audit=json.loads(row[0]);self.assertFalse(audit['reusable_evidence'])
+        self.assertEqual(audit['calls'][0]['result'],call['result'])
+        self.assertEqual(audit['model_drafts'][0]['untrusted_model_output'],draft)
+        self.assertIsNone(self.d.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(job['id'],)).fetchone())
+        public=self.d.db.execute('SELECT result FROM jobs WHERE id=?',(job['id'],)).fetchone()[0]
+        self.assertNotIn('UNSUPPORTED_PRIVATE_DRAFT',public)
+        self.assertNotIn('UNSUPPORTED_PRIVATE_DRAFT',json.dumps(self.apis['ollama'].sent))
+        follow=self.follow('같은 조회 결과로 다시 설명해줘')
+        self.assertNotIn('UNSUPPORTED_PRIVATE_DRAFT',follow['question'])
+
+    def test_private_audit_refuses_tampered_or_write_raw_bodies(self):
+        import hashlib
+        allow=lambda name,phase:name=='mcp__system_diagnostics__get_system_diagnostics'
+        call={'server':'system-diagnostics','name':'get_system_diagnostics','arguments':{'target':'b:management'},
+              'is_error':False,'result':'PRIVATE_RAW','result_sha256':'0'*64}
+        report={'status':'partial','calls':[call,dict(call,is_write=True),dict(call,name='unknown')]}
+        audit=json.loads(m.private_read_audit(report,allow))
+        self.assertEqual(len(audit['calls']),1)
+        self.assertEqual(audit['calls'][0]['result_omitted'],'sha_mismatch')
+        self.assertNotIn('PRIVATE_RAW',json.dumps(audit))
+        self.assertEqual(audit['calls'][0]['result_sha256'],hashlib.sha256(b'PRIVATE_RAW').hexdigest())
+        self.assertIsNone(m.private_read_audit(dict(report,status='completed'),allow))
+
+    def test_private_audit_bounds_large_results_without_silent_fullness_claim(self):
+        import hashlib
+        text='r'*250000
+        call={'server':'system-diagnostics','name':'get_system_diagnostics','arguments':{'target':'b:management'},
+              'result':text,'result_sha256':hashlib.sha256(text.encode()).hexdigest()}
+        report={'status':'failed','calls':[call]*6,'service_report_audit':[{'response':'draft'*4000}]*13}
+        raw=m.private_read_audit(report,lambda *_:True,max_bytes=65536)
+        self.assertLessEqual(len(raw.encode()),65536)
+        audit=json.loads(raw);self.assertIn('aggregate_size_limit',audit['limits'])
+        self.assertEqual(len(audit['calls']),6);self.assertEqual(len(audit['model_drafts']),12)
+        self.assertTrue(all(x['result_omitted']=='aggregate_size_limit' for x in audit['calls']))
+        self.assertTrue(all(x['output_omitted']=='per_draft_size_limit' for x in audit['model_drafts']))
+        self.assertNotIn('draftdraft',raw)
+
+    def test_private_audit_keeps_native_trace_reference_without_fabricating_raw(self):
+        report={'status':'partial','run_id':'a'*32,'case_id':'b'*32,
+            'calls':[{'server':'system-diagnostics','name':'get_system_diagnostics','is_error':False}]}
+        audit=json.loads(m.private_read_audit(report,lambda *_:True))
+        self.assertEqual(audit['run_id'],'a'*32)
+        self.assertEqual(audit['calls'][0]['result_omitted'],'raw_not_returned')
+        self.assertNotIn('result_sha256',audit['calls'][0])
+
+    def test_invalid_audit_values_do_not_prevent_failed_reply_delivery(self):
+        report={'status':'failed','service_report_audit':[{'response':float('nan')}],
+            'calls':[{'server':'system-diagnostics','name':'get_system_diagnostics',
+                'arguments':{'bad':float('nan')}}]}
+        audit=json.loads(m.private_read_audit(report,lambda *_:True))
+        self.assertIn('invalid_draft_json_omitted',audit['limits'])
+        self.assertEqual(audit['calls'][0]['arguments_omitted'],'invalid_json')
+        self.assertEqual(audit['model_drafts'],[])
+
+    def test_private_failure_audit_retention_keeps_latest_two_hundred(self):
+        self.actual_harness();self.post['message']='WAF 커스텀 룰 상세 조회';self.d.add(self.post)
+        job=self.job();self.d.placeholder(job)
+        with self.d.db:
+            for i in range(201):
+                jid='old-'+str(i)
+                self.d.db.execute('INSERT INTO jobs(id,source_id,engine,phase,cross_review,status,question,created) '
+                    'VALUES(?,?,?,?,?,?,?,?)',(jid,'old-source-'+str(i),'ollama','lead',0,'done','prior',-1000+i))
+                self.d.db.execute('INSERT INTO request_audits VALUES(?,?,?)',(jid,'{}','prior'))
+        future=concurrent.futures.Future();future.set_result({'status':'partial','final_response':'확인 미완료',
+            'calls':[],'protected_calls':0})
+        self.d.active['ollama']=(future,job['id']);self.d.tick(mock.Mock())
+        self.assertEqual(self.d.db.execute('SELECT count(*) FROM request_audits').fetchone()[0],200)
+        self.assertIsNotNone(self.d.db.execute('SELECT audit FROM request_audits WHERE job_id=?',(job['id'],)).fetchone())
+        self.assertIsNone(self.d.db.execute('SELECT audit FROM request_audits WHERE job_id=?',('old-0',)).fetchone())
+        self.assertIsNone(self.d.db.execute('SELECT evidence FROM request_evidence WHERE job_id=?',(job['id'],)).fetchone())
+
     def test_public_render_hides_control_records_but_preserves_report_and_audit(self):
         answer='실제 근거와 미확인 범위\n\n| 항목 | 결과 |\n| --- | --- |\n| 상태 | 조사 중 |\n\nINCIDENT_DISPOSITION: {"assessment":"unresolved"}\nMANAGEMENT_STATUS: needs_review'
         original=answer

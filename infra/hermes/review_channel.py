@@ -43,6 +43,75 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+def private_read_audit(report, allowed, max_bytes=1048576):
+    """Keep bounded failures and service drafts apart from reusable evidence."""
+    drafts=report.get('service_report_audit',[])
+    if not isinstance(drafts,list):drafts=[]
+    if report.get('status') not in ('partial', 'failed') and not (
+            report.get('status')=='completed' and drafts):
+        return None
+    def encoded(value):
+        return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(',', ':'))
+    audit={'schema':1, 'kind':'read_turn_audit', 'reusable_evidence':False,
+        'status':report['status'], 'calls':[], 'model_drafts':[], 'limits':[]}
+    for name in ('run_id', 'case_id'):
+        value=report.get(name)
+        if isinstance(value,str) and len(value)==32 and all(c in '0123456789abcdef' for c in value):
+            audit[name]=value
+    calls=report.get('calls',[])
+    if not isinstance(calls,list):calls=[]
+    if len(calls)>32:audit['limits'].append('calls_after_32_omitted')
+    for call in calls[:32]:
+        if not isinstance(call,dict):continue
+        server,name=call.get('server'),call.get('name')
+        if not isinstance(server,str) or not isinstance(name,str):continue
+        qualified='mcp__'+server.replace('-','_')+'__'+name
+        if not allowed(qualified,'verify') or call.get('is_write'):
+            audit['limits'].append('non_read_call_excluded');continue
+        row={'server':server,'name':name,'is_error':bool(call.get('is_error'))}
+        args=call.get('arguments')
+        if isinstance(args,dict):
+            try:raw=encoded(args).encode()
+            except (TypeError,ValueError):row['arguments_omitted']='invalid_json'
+            else:
+                row['arguments_sha256']=hashlib.sha256(raw).hexdigest()
+                if len(raw)<=8192:row['arguments']=args
+                else:row['arguments_omitted']=True
+        body=call.get('result');digest=call.get('result_sha256')
+        if isinstance(body,str):
+            raw=body.encode();actual=hashlib.sha256(raw).hexdigest()
+            row.update(result_sha256=actual,result_bytes=len(raw))
+            if digest!=actual:row['result_omitted']='sha_mismatch'
+            elif len(raw)>262144:row['result_omitted']='per_result_size_limit'
+            else:row['result']=body
+        else:row['result_omitted']='raw_not_returned'
+        audit['calls'].append(row)
+    if len(drafts)>12:audit['limits'].append('drafts_before_last_12_omitted')
+    for draft in drafts[-12:]:
+        if not isinstance(draft,dict):continue
+        try:raw=encoded(draft).encode()
+        except (TypeError,ValueError):
+            audit['limits'].append('invalid_draft_json_omitted');continue
+        row={'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)}
+        if len(raw)<=16384:row['untrusted_model_output']=draft
+        else:row['output_omitted']='per_draft_size_limit'
+        audit['model_drafts'].append(row)
+    text=encoded(audit)
+    if len(text.encode())>max_bytes:
+        audit['limits'].append('aggregate_size_limit')
+        for row in audit['calls']:
+            if row.pop('result',None) is not None:row['result_omitted']='aggregate_size_limit'
+            if row.pop('arguments',None) is not None:row['arguments_omitted']=True
+        for row in audit['model_drafts']:
+            if row.pop('untrusted_model_output',None) is not None:row['output_omitted']='aggregate_size_limit'
+        text=encoded(audit)
+    if len(text.encode())>max_bytes:
+        text=encoded({'schema':1,'kind':'read_turn_audit','reusable_evidence':False,
+            'status':report['status'],'limits':['metadata_size_limit'],
+            'audit_sha256':hashlib.sha256(text.encode()).hexdigest()})
+    return text
+
+
 class API:
     def __init__(self, base, token):
         self.base, self.token = base + '/api/v4', token
@@ -112,6 +181,8 @@ class Dispatcher:
         self.db.execute('CREATE TABLE IF NOT EXISTS request_context ('
                         'source_id TEXT PRIMARY KEY, current_question TEXT NOT NULL, parent_source_id TEXT)')
         self.db.execute('CREATE TABLE IF NOT EXISTS request_evidence (job_id TEXT PRIMARY KEY, evidence TEXT NOT NULL)')
+        self.db.execute('CREATE TABLE IF NOT EXISTS request_audits ('
+                        'job_id TEXT PRIMARY KEY, audit TEXT NOT NULL, sha256 TEXT NOT NULL)')
         with self.db:
             self.db.execute("UPDATE jobs SET status='delivery',result=? WHERE status='running'",
                             (json.dumps({'status': 'failed', 'final_response': FAILURE}),))
@@ -267,6 +338,14 @@ class Dispatcher:
                 summary['worker_seconds'] = max(0, time.monotonic()-self.progress_clock.get(jid,time.monotonic()))
                 with self.db:
                     self.db.execute("UPDATE jobs SET result=?,status='delivery' WHERE id=?", (json.dumps(summary, ensure_ascii=False), jid))
+                    verifier=getattr(getattr(self.harness,'EVIDENCE',None),'allowed',lambda *_:False)
+                    private_audit=private_read_audit(report,verifier)
+                    if private_audit is not None:
+                        self.db.execute('INSERT OR REPLACE INTO request_audits VALUES(?,?,?)',
+                            (jid,private_audit,hashlib.sha256(private_audit.encode()).hexdigest()))
+                        self.db.execute('DELETE FROM request_audits WHERE job_id NOT IN ('
+                            'SELECT a.job_id FROM request_audits a JOIN jobs j ON j.id=a.job_id '
+                            'ORDER BY j.created DESC,j.id DESC LIMIT 200)')
                     # Private, bounded read receipts. Bot prose and write results
                     # are never cached as an authority for a later request.
                     job=self.db.execute('SELECT phase,source_id FROM jobs WHERE id=?',(jid,)).fetchone()

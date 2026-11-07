@@ -116,6 +116,13 @@ class ServiceRuntime(unittest.TestCase):
         self.assertIn('diagnostic_snapshot_is_not_functional_health',body['report_validation_issues'])
         self.assertEqual(len(body['untrusted_completed_reads']),3)
         self.assertEqual(result['service_compact_reports'],[{'more_evidence':False,'repair':False},{'more_evidence':False,'repair':True}])
+        saved=result['service_report_audit']
+        self.assertEqual(saved[0]['response'],bad)
+        self.assertEqual(saved[1]['response'],good)
+        self.assertFalse(saved[0]['repair']);self.assertTrue(saved[1]['repair'])
+        self.assertEqual(saved[0]['read_result_sha256'],[c['result_sha256'] for c in result['calls']])
+        self.assertNotIn(bad['report']['basis'],result['final_response'])
+        self.assertNotIn(bad['report']['basis'],str(prompts[1]))
 
     def test_compact_candidate_can_be_disabled_for_recovery(self):
         result,order,prompts,calls=self.run_case(enabled=False)

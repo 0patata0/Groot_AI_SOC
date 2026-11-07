@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "date_kst": "2026-11-07",
+  "versions": {
+    "query": "1.19.109",
+    "common": "1.5.60",
+    "routing": "1.1.6",
+    "diagnostics": "1.2.8",
+    "model": "qwen3.6:35b"
+  },
+  "scope": "private service report JSON and failed read audit; not a semantic accuracy fix",
+  "sources": {
+    "infra/hermes/review_channel.py": "08f3f4d7ff86a34ce0a4d322c1277279b22dcbef3a39821035adf4a5d922472c",
+    "infra/hermes/test_review_channel.py": "506bc6ac92aa2fecce51d357f4427c548ff8aaa3623f72585ee9bb8556913d4b",
+    "infra/ollama-trial/runtime.py": "5cccc19b3adf9abfe7943b041afd8d7060e5be4e379c8bbd24f5e1c05d0c42e7",
+    "infra/ollama-trial/test_service_history.py": "364ceb797b76940158a3e8e46769619aa9331ae781322af0f7b171ece76c4a43"
+  },
+  "tests": {
+    "unique_pass": 1405,
+    "skip": 0,
+    "profiles": {
+      "runtime": 33,
+      "time": 6,
+      "native": 473,
+      "service": 48,
+      "claims": 27,
+      "diagnostics": 67,
+      "sdk": 261,
+      "query": 391,
+      "peer": 79,
+      "installer": 20
+    },
+    "files": 461,
+    "errors": [],
+    "verification_note": "Final dispatcher delta: peer79 rerun; unchanged nine profiles from tests-retry. No skips."
+  },
+  "deployment": {
+    "first": {
+      "at_kst": "2026-11-07T10:09:32.948061+09:00",
+      "changed_files": 4,
+      "source_manifest": 23,
+      "protected": 8,
+      "backup": "/var/lib/capstone-service-grounding/20261107-audit1",
+      "rollback": "armed_15min",
+      "hermes_restarted": false,
+      "database_replaced": false
+    },
+    "followup": {
+      "at_kst": "2026-11-07T10:13:48.154954+09:00",
+      "changed_files": 2,
+      "source_manifest": 23,
+      "protected": 8,
+      "backup": "/var/lib/capstone-service-grounding/20261107-audit2",
+      "rollback": "armed_15min",
+      "hermes_restarted": false,
+      "database_replaced": false
+    },
+    "health": {
+      "at_kst": "2026-11-07T10:14:03.074712+09:00",
+      "source_files": 23,
+      "protected": 8,
+      "receipts": {
+        "sources": 20,
+        "files": 5
+      },
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "failed": "",
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "audit_table": true,
+      "audit_rows": 0,
+      "queue_mode": "0600/root",
+      "hermes_started_unchanged": true,
+      "rollback_confirmed": true,
+      "rollback_timer": "inactive",
+      "rollback_noop": "confirmed_noop"
+    },
+    "final_health": {
+      "at_kst": "2026-11-07T10:18:58.683286+09:00",
+      "source_files": 23,
+      "protected": 8,
+      "receipts": {
+        "sources": 20,
+        "files": 5
+      },
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "failed": "",
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "audit_table": true,
+      "audit_rows": 2,
+      "queue_mode": "0600/root",
+      "hermes_started_unchanged": true,
+      "rollback_confirmed": true,
+      "rollback_timer": "inactive",
+      "rollback_noop": "confirmed_noop"
+    }
+  },
+  "chat": [
+    {
+      "engine": "ollama",
+      "stage": "failed_only_audit1",
+      "chat_seconds": 52.75,
+      "runtime_status": "completed",
+      "service_drafts_saved": 0,
+      "quality": "review_required_not_counted_as_correct",
+      "limitation": "review count called processing queue; restart/config suggestion without scheduler evidence"
+    },
+    {
+      "engine": "ollama",
+      "stage": "service_drafts_audit2",
+      "chat_seconds": 51.107,
+      "runtime_status": "completed",
+      "reads": 4,
+      "model_calls": 4,
+      "model_seconds": 40.955511970678344,
+      "sha_verified_read_results": 4,
+      "service_drafts_saved": 3,
+      "private_audit_sha256": "2772f7d3c124ff079e3a6cfd058c0e28950ec33a1aa21bd9b40bab7c2d385cc6",
+      "rejected_drafts_in_public_post": false,
+      "quality": "review_required_not_counted_as_correct",
+      "limitation": "review count still called processing queue; next-step available scope and actual follow-through unresolved"
+    },
+    {
+      "engine": "hermes",
+      "stage": "audit2_native_reference",
+      "chat_seconds": 30.914,
+      "runtime_status": "partial",
+      "reads": 4,
+      "sha_verified_read_results": 4,
+      "private_audit_sha256": "ff3890c5b4e80295aff8cffdb2e0dd9378e8c7dc6413b49f65b84cf698c3d72f",
+      "native_trace_sha256": "e3e503bfb79c2616140930339142021a0708bbc371b99058558e0e8417b584a6",
+      "audit_contains_raw_reads": false,
+      "completed_evidence_cache_count": 0,
+      "quality": "partial_not_counted_as_correct",
+      "limitation": "already-read pipeline proposed again; target b:management-pipeline described as tool; unsupported tool-absence claim"
+    }
+  ],
+  "candidate_replays": [
+    {
+      "candidate": "field_dictionary",
+      "model_seconds": 13.393,
+      "output_tokens": 202,
+      "adopted": false,
+      "failure": "lock_failure_claimed_restart_failure"
+    },
+    {
+      "candidate": "deferred_unread_tool_specs",
+      "model_seconds": 11.776,
+      "output_tokens": 184,
+      "adopted": false,
+      "failure": "lock_restart_and_review_congestion"
+    },
+    {
+      "candidate": "reasoning_true_num_predict_4096",
+      "remote_operation_seconds": 81.749,
+      "model_seconds": null,
+      "actual_output_tokens": null,
+      "adopted": false,
+      "failure": "schema_invalid_empty_report"
+    }
+  ],
+  "limitations": [
+    "same regression question, recent channel context and shared GPU cache not controlled",
+    "runtime completed is not correctness or incident closure",
+    "native existing trace references; no fabricated SDK JSON or native raw receipts",
+    "latest200 logical records, not permanent audit retention or database/WAL size guarantee",
+    "new OS installation, attack/load, UI visual regression and independent evaluation not performed"
+  ],
+  "publication": {
+    "source_commit": null,
+    "remote_verified": false,
+    "note": "pending this unit"
+  },
+  "cleanup": {
+    "server_fixture": {
+      "removed": true,
+      "files": 461,
+      "bytes": 7218168,
+      "manifest_sha256": "1b6829df78889e21c023037ba54398f32bc1d8730658f81fa64c5874a00ff1ec",
+      "operational_sources_or_state_removed": false
+    },
+    "mac": {
+      "at_kst": "2026-11-07T10:20:42.625641+09:00",
+      "file_count": 24,
+      "bytes": 10129283,
+      "active_processes": 0,
+      "new_mac_packages": 0,
+      "removed": true
+    }
+  }
+}

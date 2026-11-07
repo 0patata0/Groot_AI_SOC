@@ -329,6 +329,13 @@ async def run(config, request, *, on_protected_start=None, connection_pool=None,
                     value=await asyncio.wait_for(llm.with_structured_output(schema,method='json_schema').ainvoke(
                         harness.CONTRACT.service_report_messages(service_context,descriptions,citations,feedback)),90)
                     Draft202012Validator(schema).validate(value)
+                    # Private generated JSON, not internal reasoning or reusable
+                    # evidence. Retain before rendering mutates evidence_indexes.
+                    report.setdefault('service_report_audit', []).append({
+                        'response': json.loads(json.dumps(value, ensure_ascii=False)),
+                        'repair': feedback is not None,
+                        'read_result_sha256': [c.get('result_sha256') for c in report['calls']]})
+                    report['service_report_audit'] = report['service_report_audit'][-12:]
                     report['service_compact_report']={'more_evidence':value['more_evidence']}
                     report.setdefault('service_compact_reports',[]).append({'more_evidence':value['more_evidence'],'repair':feedback is not None})
                     if not value['more_evidence']:

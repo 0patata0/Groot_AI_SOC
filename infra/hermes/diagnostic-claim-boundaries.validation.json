@@ -579,5 +579,49 @@
       "bytes": 16607,
       "retained_project_source_helpers": 4
     }
+  },
+  "rejected_claim_verifier": {
+    "method": "same model, frozen real receipts, shuffled 10 manual development claims; not independent evaluation",
+    "results": [
+      {
+        "order": 1,
+        "model_seconds": 18.850031066918746,
+        "input_tokens": 4819,
+        "output_tokens": 799,
+        "supported_gate_agreement": 9,
+        "total_claims": 10,
+        "false_supported_ids": [
+          "p1"
+        ],
+        "three_way_exact_agreement": 5,
+        "schema_valid": true,
+        "receipt_sha_verified": true,
+        "result_sha256": "d40cba25d4a05d8567a3e906324b1158b160c109cf54924be68f4f6b5ba46220",
+        "adopted": false
+      },
+      {
+        "order": 2,
+        "model_seconds": 17.522486744215712,
+        "input_tokens": 4819,
+        "output_tokens": 890,
+        "supported_gate_agreement": 9,
+        "total_claims": 10,
+        "false_supported_ids": [
+          "p1"
+        ],
+        "three_way_exact_agreement": 4,
+        "schema_valid": true,
+        "receipt_sha_verified": true,
+        "result_sha256": "d046e81057729b5851ff23fbea720038ae7868f5c16b9e00931a53af62a6330a",
+        "adopted": false
+      }
+    ],
+    "manual_finding": "both accept ambiguous/misassigned processing count using review_required_cases; both also confuse lack of evidence with contradiction",
+    "operating_changes": 0,
+    "new_mcp_calls": 0,
+    "catalog_reads": 2,
+    "internal_reasoning_saved": false,
+    "dgx_queries": 0,
+    "decision": "reject; no latency added to production"
   }
 }

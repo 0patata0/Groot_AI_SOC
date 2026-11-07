@@ -255,6 +255,92 @@ class DiagnosticClaims(unittest.TestCase):
         row['pipeline_metrics']['pending_reports']=3
         self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues('관제 처리 병목 상태입니다.'))
 
+    def pipeline(self):
+        return {'kind':'diagnostics','target':'b:management-pipeline','observed_at_kst':STAMP,
+            'pipeline_metrics':{'pending_reports':0,'running_cases':0,'overdue_cases':0,'review_required_cases':285}}
+
+    def test_direct_pipeline_disclaimer_is_not_congestion(self):
+        self.facts=[self.pipeline()]
+        for text in ('degraded 상태는 검토 미완료 표지이며 성능 저하를 의미하지 않습니다.',
+                     '관제 병목이라고 단정하지 않습니다.',
+                     '검토 상태 수만으로 처리 지연을 입증하지 않습니다.'):
+            with self.subTest(text=text):self.assertEqual(self.issues(text),[])
+
+    def test_pipeline_other_uncertainty_does_not_excuse_positive_claim(self):
+        self.facts=[self.pipeline()]
+        for text in ('관제 검토 대기 증가로 저하 상태이며 원인은 미확인입니다.',
+                     '관제 병목은 미확인이나 성능 저하는 발생했습니다.',
+                     '관제 성능 저하를 의미하지 않는 것은 아닙니다.',
+                     '관제 성능 저하를 의미하지 않습니다. 처리 병목이 있습니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+
+    def test_one_pipeline_observation_cannot_supply_review_count_trend(self):
+        self.facts=[self.pipeline()]
+        self.assertIn('diagnostic_pipeline_trend_unverified',self.issues('검토 상태 사건이 증가했습니다.'))
+        self.assertEqual(self.issues('검토 상태 사건의 증가 여부는 미확인입니다.'),[])
+        self.assertEqual(self.issues('검토 상태 사건이 증가하면 해당 사건을 확인합니다.'),[])
+        self.assertEqual(self.issues('관제 병목이 발생하면 처리 지표를 확인합니다.'),[])
+        self.facts.append(copy.deepcopy(self.facts[0]))
+        self.assertIn('diagnostic_pipeline_trend_unverified',self.issues('검토 상태 사건이 증가했습니다.'))
+        self.facts[-1].update(observed_at_kst='2026-10-30T12:35:56+09:00')
+        self.facts[-1]['pipeline_metrics']['review_required_cases']=286
+        self.assertNotIn('diagnostic_pipeline_trend_unverified',self.issues('검토 상태 사건이 증가했습니다.'))
+
+    def test_zero_processing_metrics_cannot_be_reported_as_pending(self):
+        self.facts=[self.pipeline()]
+        for text in ('현재 처리 대기 건수는 존재합니다.', '관제 전송 대기가 있습니다.', '관제 기한 초과 사건이 남아 있습니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_pipeline_pending_unverified',self.issues(text))
+        for text in ('현재 검토 대기 사건은 있습니다.', '처리 대기는 존재하지 않습니다.', '어제 처리 대기 건수가 있었습니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_pipeline_pending_unverified',self.issues(text))
+
+    def test_pipeline_metrics_do_not_describe_a_different_explicit_target(self):
+        self.facts=[self.pipeline(),diagnostic()]
+        for text in ('c:vector 처리 지연이 있습니다.', 'c:vector 처리 대기 건수는 존재합니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+
+    def test_natural_pipeline_subject_after_service_name_keeps_claim_guard(self):
+        self.facts=[self.pipeline(),diagnostic('b:management')]
+        for text in ('어제 b:management 오류 후 오늘 SOC 처리 파이프라인은 검토 대기 때문에 병목 상태입니다.',
+                     'b:management는 종료됐으나 관제 처리 파이프라인은 성능 저하 상태입니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
+
+    def test_today_observation_marker_does_not_borrow_past_state(self):
+        self.assertEqual(self.issues('어제 실패했으나 오늘(10/30) 수집 시각 기준 inactive/dead 상태입니다.'),[])
+        self.assertEqual(self.issues('어제 실패했으나 오늘 관측 시점 기준 ActiveState=inactive입니다.'),[])
+        self.assertIn('diagnostic_property_value_mismatch',self.issues('어제 실패했으나 오늘 관측 시점 기준 ActiveState=active입니다.'))
+        self.assertIn('diagnostic_property_value_unverified',self.issues('어제 수집 시각 기준 ActiveState=inactive였습니다.'))
+        self.assertIn('diagnostic_property_value_unverified',self.issues('어제와 오늘의 과거 ActiveState=inactive 이력입니다.'))
+
+    def history_samples(self,target='c:vector',day='2026-10-29',count=2):
+        return dict(historical(target),observed_at_kst=STAMP,returned_error_count=count,
+            requested_since_kst=day+'T00:00:00+09:00',requested_until_kst=day+'T23:59:59.999999+09:00',
+            error_sample_instants=[day+'T12:00:00+09:00'] if count else [],history_coverage_status='scanned_sample')
+
+    def test_returned_history_cannot_be_reported_as_failed_read(self):
+        self.facts=[self.history_samples()]
+        for text in ('어제 c:vector 오류 이력 조회가 실패했습니다.',
+                     '2026-10-29 c:vector 오류 표본 반환이 안 됐습니다.',
+                     'c:vector 오류 이력 확보가 불가합니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_history_return_denied',self.issues(text))
+        for text in ('어제 c:vector 오류 이력 조회 실패가 아닙니다.',
+                     '어제 c:vector 원문 이력 조회가 불가합니다.',
+                     'c:vector 오류 표본을 조회했으나 전체 구간의 수집 완전성은 미확인입니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_history_return_denied',self.issues(text))
+
+    def test_read_success_is_bound_to_target_and_period(self):
+        self.facts=[self.history_samples(),self.history_samples(day='2026-10-30',count=0)]
+        for text in ('오늘 c:vector 오류 이력 조회가 실패했습니다.',
+                     '어제 a:vector 오류 이력 조회가 실패했습니다.',
+                     '2026-10-28 c:vector 오류 이력 조회가 실패했습니다.',
+                     'c:vector 오류 이력 조회가 실패했습니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_history_return_denied',self.issues(text))
+        self.assertIn('diagnostic_history_return_denied',self.issues('어제 c:vector 오류 이력 조회가 실패했습니다.'))
+
+    def test_missing_or_invalid_counts_do_not_establish_returned_history(self):
+        for count in (0,None,True,'2'):
+            self.facts=[self.history_samples(count=count)]
+            self.assertNotIn('diagnostic_history_return_denied',self.issues('어제 c:vector 오류 이력 조회가 실패했습니다.'))
+
     def test_current_review_total_does_not_supply_calendar_arrival_counts(self):
         self.facts=[{'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{
             'review_required_cases':29}}]

@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.63'
+VERSION = 'soc-chat-contract:1.5.64'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -671,6 +671,10 @@ def service_report_messages(context, descriptions, citations, feedback=None):
             'diagnostic_oneshot_state_is_not_failure':'성공 종료한 oneshot의 inactive/dead로 지속 장애나 재실행 실패를 단정했습니다. 현재 실행 상태·종료 결과와 전체 기능 검증을 구분하세요.',
             'diagnostic_pipeline_congestion_unverified':'검토 상태 수만으로 관제 과부하·병목을 단정했습니다. 처리·전송 대기와 기한 초과 지표를 실제 관측 범위에서 설명하세요.',
             'diagnostic_pipeline_period_unverified':'현재 상태 합계를 오늘·어제 발생 건수로 바꿨습니다. 기간별 유입 건수를 확인한 근거가 없으면 현재 합계로만 설명하세요.',
+            'diagnostic_pipeline_trend_unverified':'한 시점의 검토 상태 합계로 증가·감소 추세를 만들었습니다. 서로 다른 관측 시점의 비교값이 없으면 현재 합계만 설명하세요.',
+            'diagnostic_pipeline_pending_unverified':'실제 처리·전송·기한 초과 지표가0인데 대기가 존재한다고 했습니다. 검토 상태의 사건 합계와 구분하세요.',
+            'diagnostic_history_return_denied':'해당 구간의 정제 오류 표본이 실제 반환됐는데 전체 조회·반환 실패라고 했습니다. 확보한 표본과 전체 수집 범위·원문 미반환을 분리하세요.',
+            'diagnostic_property_value_unverified':'속성을 확인한 대상·시점과 문장 범위가 맞지 않습니다. 현재 스냅샷의 속성은 현재 관측으로, 과거 오류 이력은 해당 과거 구간으로 따로 설명하세요.',
         }
         policy+=(' 검증기가 이전 초안의 오류를 지적했습니다. 거절된 주장을 그대로 반복하지 마세요. '
             +' '.join(code+': '+explanations[code] for code in issues if code in explanations)
@@ -920,7 +924,7 @@ def diagnostic_property_claim_violations(text, facts):
                 if re.match(r'\s*(?:이면|라면|일\s*때)',after):continue
                 before=clause[:match.start()]
                 markers=[(m.start(),'history') for m in re.finditer(r'과거|당시|어제|그제|\byesterday\b|\bhistorical\b',before,re.I)]
-                markers += [(m.start(),'current') for m in re.finditer(r'현재|지금|\bcurrent\b|\bnow\b',before,re.I)]
+                markers += [(m.start(),'current') for m in re.finditer(_DIAGNOSTIC_CURRENT_MARKER,before,re.I)]
                 history=bool(markers and max(markers)[1]=='history')
                 values={f.get('properties',{}).get(match[1]) for f in subjects
                     if (f.get('diagnostic_mode')=='journal_history')==history and match[1] in f.get('properties',{})}
@@ -928,9 +932,9 @@ def diagnostic_property_claim_violations(text, facts):
                 elif len(values)==1 and match[2] not in values:issues.add('diagnostic_property_value_mismatch')
             for match in re.finditer(r'\b(active|inactive|activating|deactivating|failed|reloading|maintenance|refreshing)/([a-z][a-z_-]*)(?![A-Za-z_-])',clause):
                 before=clause[:match.start()];after=clause[match.end():]
-                if not re.search(r'현재|지금|과거|어제|당시|\bcurrent\b|\bnow\b',before,re.I):continue
+                if not re.search(_DIAGNOSTIC_CURRENT_MARKER+r'|과거|어제|당시',before,re.I):continue
                 if re.match(r'\s*(?:이|가)?\s*(?:아니|아닙|잘못)',after):continue
-                markers=[(m.start(),m.group()) for m in re.finditer(r'현재|지금|과거|어제|당시|\bcurrent\b|\bnow\b',before,re.I)]
+                markers=[(m.start(),m.group()) for m in re.finditer(_DIAGNOSTIC_CURRENT_MARKER+r'|과거|어제|당시',before,re.I)]
                 history=max(markers)[1] in ('과거','어제','당시')
                 values={(f['properties'].get('ActiveState'),f['properties'].get('SubState')) for f in subjects
                     if isinstance(f.get('properties'),dict) and (f.get('diagnostic_mode')=='journal_history')==history}
@@ -987,6 +991,50 @@ def diagnostic_lifecycle_claim_violations(text, facts):
     return sorted(issues)
 
 
+_DIAGNOSTIC_CURRENT_MARKER=(r'현재|지금|\bcurrent\b|\bnow\b|'
+    r'오늘(?:\([^()\n]{1,24}\))?\s*(?:수집|조회|관측)\s*(?:시각|시점|스냅샷)\s*기준')
+
+
+def _claim_is_unasserted(after):
+    """Only uncertainty/negation attached to this claim; not a whole-line veto."""
+    prefix=r'\s*(?:(?:상태|현상|상황|문제)\s*)?(?:(?:이라는|이라고|이란|으로|를|을|이|가|은|는)\s*)?'
+    if re.match(prefix+r'(?:한다면|하면|할\s*경우|했는지|하는지|발생(?:하면|할\s*경우))',after):return True
+    if re.match(prefix+r'(?:(?:인지|인지는)\s*)?(?:여부|가능성|일\s*수|미확인|확인\s*(?:필요|불가)|단정\s*(?:불가|못))',after):return True
+    negative=re.match(prefix+r'(?:(?:의미|뜻|증명|입증|보장|단정)하지\s*(?:않습니다|않음|않으며|않는다)|아닙니다|아니며|아님)',after)
+    if not negative:return False
+    return not re.match(r'\s*(?:는\s*)?(?:것은|건)\s*아니',after[negative.end():])
+
+
+def diagnostic_history_return_violations(text, facts):
+    """A bound positive sample cannot be described as a wholly failed return."""
+    if not diagnostic_facts_only(facts):return []
+    issues=set()
+    for clause in re.split(r'\n|;|(?<=[.!?])\s+',re.sub(r'[*`]', '',text)):
+        if not re.search(r'이력|오류\s*(?:표본|기록|내역)|journal_history',clause):continue
+        # Raw text absence and partial coverage remain valid limitations.
+        if re.search(r'원문|전체|일부|구간\s*누락|완전',clause):continue
+        failure=re.search(r'(?:조회|반환|확보)(?:가|는|이|에)?\s*(?:실패|불가|되지\s*않|되지\s*못|안\s*됐)',clause)
+        if not failure or _claim_is_unasserted(clause[failure.end():]):continue
+        rows=[f for f in diagnostic_subjects(clause,facts) if f.get('diagnostic_mode')=='journal_history']
+        periods={(f.get('target'),f.get('requested_since_kst'),f.get('requested_until_kst')) for f in rows}
+        # Do not borrow yesterday's samples to contradict a failure today.
+        if re.search(r'오늘|어제|그제|\d{4}-\d{2}-\d{2}',clause):
+            scoped=[]
+            for f in rows:
+                start=_diagnostic_instant(f.get('requested_since_kst'));end=_diagnostic_instant(f.get('requested_until_kst'))
+                observed=_diagnostic_instant(f.get('observed_at_kst'))
+                if not start or not end or not observed or start.date()!=end.date():continue
+                days=[observed.date()-timedelta(days=d) for word,d in [('오늘',0),('어제',1),('그제',2)] if word in clause]
+                dates=re.findall(r'(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)',clause)
+                if days and len(set(days))==1 and start.date()==days[0] or dates and set(dates)=={start.date().isoformat()}:scoped.append(f)
+            rows=scoped
+        elif len(periods)!=1:continue
+        if rows and all(type(f.get('returned_error_count')) is int and f['returned_error_count']>0
+                        and f.get('error_sample_instants') for f in rows):
+            issues.add('diagnostic_history_return_denied')
+    return sorted(issues)
+
+
 def diagnostic_pipeline_claim_violations(text, facts):
     """Review-state counts are not proof of current processing congestion."""
     if not diagnostic_facts_only(facts):return []
@@ -997,15 +1045,27 @@ def diagnostic_pipeline_claim_violations(text, facts):
     issues=set()
     for clause in re.split(r'\n|;|(?<=[.!?])\s+',text):
         if not re.search(r'관제|SOC|파이프라인|대기열|처리|전송|검토',clause,re.I):continue
-        if re.search(r'미확인|여부|가능성|일\s*수|확인.{0,4}(?:필요|되지)|단정.{0,5}(?:않|못)|근거.{0,5}없|아니|아님|아닙',clause):continue
+        if (not diagnostic_subjects(clause,rows)
+                and not re.search(r'\bSOC\b|(?:관제\s*)?처리\s*파이프라인',clause,re.I)):continue
         if (type(metrics.get('review_required_cases')) is int
-                and re.search(r'(?:오늘|어제|이틀|사흘|\d+\s*일)\s*치',clause)):
+                and (period:=re.search(r'(?:오늘|어제|이틀|사흘|\d+\s*일)\s*치(?:\s*(?:건수|사건))?',clause))
+                and not _claim_is_unasserted(clause[period.end():])):
             issues.add('diagnostic_pipeline_period_unverified')
-        if not empty or not re.search(r'병목|정체|과부하|적체|성능\s*저하|처리\s*지연',clause):continue
+        if type(metrics.get('review_required_cases')) is int and re.search(r'검토',clause):
+            observations={(f.get('observed_at_kst'),f.get('pipeline_metrics',{}).get('review_required_cases')) for f in rows
+                if _diagnostic_instant(f.get('observed_at_kst')) and type(f.get('pipeline_metrics',{}).get('review_required_cases')) is int}
+            if len({x[0] for x in observations})<2:
+                for trend in re.finditer(r'(?:검토[^.!?;\n]{0,24}?)(증가|감소|늘어|줄어)',clause):
+                    if not _claim_is_unasserted(clause[trend.end():]):issues.add('diagnostic_pipeline_trend_unverified')
+        if not empty:continue
         markers=[(m.start(),'past') for m in re.finditer(r'과거|어제|당시|지난',clause)]
         markers += [(m.start(),'current') for m in re.finditer(r'현재|지금|오늘',clause)]
         if markers and max(markers)[1]=='past':continue
-        issues.add('diagnostic_pipeline_congestion_unverified')
+        if re.search(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|건|사건|항목))?'
+                r'(?:은|는|이|가)?\s*(?:존재합니다|있습니다|남아\s*있습니다)',clause):
+            issues.add('diagnostic_pipeline_pending_unverified')
+        for claim in re.finditer(r'병목|정체|과부하|적체|(?:성능\s*)?저하|처리\s*지연',clause):
+            if not _claim_is_unasserted(clause[claim.end():]):issues.add('diagnostic_pipeline_congestion_unverified')
     return sorted(issues)
 
 
@@ -1021,6 +1081,7 @@ def snapshot_health_violations(text, facts):
     if not web and not targets:return []
     issues=set(diagnostic_lifecycle_claim_violations(text,facts))
     issues.update(diagnostic_pipeline_claim_violations(text,facts))
+    issues.update(diagnostic_history_return_violations(text,facts))
     # Structured incident closure is itself a health claim, even if the prose
     # avoids the word "normal". Sanitized errors plus process attributes alone
     # cannot establish that a failed service incident was benign or remediated.

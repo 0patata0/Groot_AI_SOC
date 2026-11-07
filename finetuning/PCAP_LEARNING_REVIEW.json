@@ -1,0 +1,217 @@
+{
+  "schema": "groot-pcap-learning-review-v1",
+  "at_kst": "2026-11-07 12:20 KST",
+  "scope": "local curation; DGX cleaned candidates only; no training",
+  "source_kind": "University controlled malware captures with background and normal traffic, not three independently confirmed enterprise intrusions",
+  "citation": {
+    "authors": [
+      "Sebastian Garcia",
+      "Martin Grill",
+      "Jan Stiborek",
+      "Alejandro Zunino"
+    ],
+    "title": "An empirical comparison of botnet detection methods",
+    "journal": "Computers & Security",
+    "year": 2014,
+    "volume": 45,
+    "pages": "100-123",
+    "doi": "10.1016/j.cose.2014.05.011"
+  },
+  "permission": "Dataset README permits use with project/author attribution; official FAQ requires appropriate citation. No SPDX license inferred.",
+  "sources": [
+    {
+      "path": "ctu13-05/README.md",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-46/README.md",
+      "bytes": 4580,
+      "sha256": "ce95fb1e2127a3887acb2157ba74bef6ca82341089682739dda76cd0262f9458",
+      "downloaded_at_kst": "2026-11-07T12:06:54.815219+09:00",
+      "headers": {
+        "Last-Modified": "Sat, 21 Jan 2023 10:43:05 GMT",
+        "ETag": "\"11e4-5f2c3d4c565de\"",
+        "Content-Type": "text/markdown"
+      },
+      "upstream_sha256": null,
+      "tls_verification": "macOS native curl trust store; verified, no redirect"
+    },
+    {
+      "path": "ctu13-05/capture20110815-2.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-46/detailed-bidirectional-flow-labels/capture20110815-2.binetflow",
+      "bytes": 17766203,
+      "sha256": "ef5c9ed6895d4ca5aec723449dae30054ccd1f6b091713a52ffcb681ff78a02c",
+      "downloaded_at_kst": "2026-11-07T12:07:01.733650+09:00",
+      "headers": {
+        "Last-Modified": "Tue, 31 Jan 2017 07:16:41 GMT",
+        "ETag": "\"10f173b-5475eb6bd2cf5\"",
+        "Content-Type": null
+      },
+      "upstream_sha256": null,
+      "tls_verification": "macOS native curl trust store; verified, no redirect"
+    },
+    {
+      "path": "ctu13-07/README.md",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-48/README.md",
+      "bytes": 5373,
+      "sha256": "5ce46cac4acedf167ca3834461c40747f31f5a259384c7d2f12d6596006c322f",
+      "downloaded_at_kst": "2026-11-07T12:06:54.809844+09:00",
+      "headers": {
+        "Last-Modified": "Sat, 21 Jan 2023 10:45:29 GMT",
+        "ETag": "\"14fd-5f2c3dd5b4e0b\"",
+        "Content-Type": "text/markdown"
+      },
+      "upstream_sha256": null,
+      "tls_verification": "macOS native curl trust store; verified, no redirect"
+    },
+    {
+      "path": "ctu13-07/capture20110816-2.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-48/detailed-bidirectional-flow-labels/capture20110816-2.binetflow",
+      "bytes": 15630512,
+      "sha256": "df0b5338190b967bd340a0d6c1bb3c34d1bbfb4b7ffa764c2dd26f77f1a26680",
+      "downloaded_at_kst": "2026-11-07T12:07:05.082384+09:00",
+      "headers": {
+        "Last-Modified": "Fri, 30 Jan 2015 16:22:46 GMT",
+        "ETag": "\"ee80b0-50de103cb2180\"",
+        "Content-Type": null
+      },
+      "upstream_sha256": null,
+      "tls_verification": "macOS native curl trust store; verified, no redirect"
+    },
+    {
+      "path": "ctu13-11/README.md",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-52/README.md",
+      "bytes": 5339,
+      "sha256": "30c5d50675523038b49f812071d9940b27add56b953c4af92d19bd5aca7aa876",
+      "downloaded_at_kst": "2026-11-07T12:06:55.658316+09:00",
+      "headers": {
+        "Last-Modified": "Sat, 21 Jan 2023 10:59:28 GMT",
+        "ETag": "\"14db-5f2c40f58b9f1\"",
+        "Content-Type": "text/markdown"
+      },
+      "upstream_sha256": null,
+      "tls_verification": "macOS native curl trust store; verified, no redirect"
+    },
+    {
+      "path": "ctu13-11/capture20110818-2.binetflow",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-52/detailed-bidirectional-flow-labels/capture20110818-2.binetflow",
+      "bytes": 14596615,
+      "sha256": "cee542d4b5efe4fa1cd59b87ece5aaea9a13d8f0abe56cd07cee31590736428c",
+      "downloaded_at_kst": "2026-11-07T12:07:06.008205+09:00",
+      "headers": {
+        "Last-Modified": "Mon, 02 Feb 2015 08:54:31 GMT",
+        "ETag": "\"deba07-50e171a401fc0\"",
+        "Content-Type": null
+      },
+      "upstream_sha256": null,
+      "tls_verification": "macOS native curl trust store; verified, no redirect"
+    }
+  ],
+  "cases": [
+    {
+      "case": "ctu13-05",
+      "raw_rows": 129832,
+      "curated_rows": 129832,
+      "categories": {
+        "background_unresolved": 124252,
+        "provider_normal_activity_direction_unspecified": 8,
+        "provider_normal_origin": 4639,
+        "provider_normal_server_low_confidence": 21,
+        "inbound_to_normal_not_confirmed_benign": 11,
+        "provider_botnet_origin": 901
+      }
+    },
+    {
+      "case": "ctu13-07",
+      "raw_rows": 114077,
+      "curated_rows": 114077,
+      "categories": {
+        "background_unresolved": 112337,
+        "provider_normal_origin": 1619,
+        "inbound_to_normal_not_confirmed_benign": 8,
+        "provider_normal_server_low_confidence": 50,
+        "provider_botnet_origin": 63
+      }
+    },
+    {
+      "case": "ctu13-11",
+      "raw_rows": 107251,
+      "curated_rows": 107251,
+      "categories": {
+        "background_unresolved": 96369,
+        "provider_normal_origin": 2705,
+        "provider_normal_server_low_confidence": 4,
+        "inbound_to_normal_not_confirmed_benign": 8,
+        "provider_normal_activity_direction_unspecified": 1,
+        "provider_botnet_origin": 8164
+      }
+    }
+  ],
+  "raw_rows": 351160,
+  "retained_observations": 351160,
+  "independent_collection_scenarios": 3,
+  "independent_soc_incidents": null,
+  "sft_conversations": 0,
+  "training_eligible": false,
+  "training_started": false,
+  "split": "unassigned",
+  "leakage_group": "CTU-13-shared-campus-and-hosts",
+  "training_input_allowlist": [],
+  "model_tokens_checked": false,
+  "prior_corpus_check": {
+    "search": "CTU-13 case-insensitive name, selected filenames and source SHA in datasets/raw, datasets/processed, finetuning/data-* text",
+    "matches": 0,
+    "semantic_derivative_exclusion_complete": false
+  },
+  "quality_notes": [
+    "Capture48 README contains an inconsistent Aug10/Neris passage; excluded from timeline/answer evidence.",
+    "README host flow totals differ from CSV row counts in some cases; CSV counts reported separately, not silently doubled.",
+    "Source clock timezone not established by CSV alone. README CEST annotations do not prove export clock settings.",
+    "Endpoint identifiers are deterministic pseudonyms, not irreversible anonymization. Raw labels/names/addresses stay in local original archive."
+  ],
+  "label_limits": [
+    "Botnet-origin does not prove every connection was an attack or succeeded.",
+    "Inbound, background and server labels are not confirmed benign/malicious.",
+    "Provider labels are stored in reference files and prohibited from inference inputs."
+  ],
+  "code": {
+    "script": "finetuning/pcap_source_candidates.py",
+    "sha256": "15ab9509d1b0d0a4530f686984e8a681252e00cf42ee0e9c39bbb9e050d2567c",
+    "sampling": "none; all validated unique observations retained",
+    "labels": "separate references; provider origin and certainty retained"
+  },
+  "verification": {
+    "source_pairs_checked": 351160,
+    "duplicate_observations": 0,
+    "endpoint_collisions": 0,
+    "regression_tests": 14,
+    "local_restored_files": 10
+  },
+  "transfer": {
+    "archive_bytes": 29109734,
+    "archive_sha256": "4914723bc6a389577a7f98799138d2f59b5de92dc88fe3526daf78cb1620c60d",
+    "manifest_sha256": "9ebf4c3a9e58d05086e1895924822f4acef2982bf4d8f8360757ee6af259ce17",
+    "status": "verified",
+    "verified_at_kst": "2026-11-07T12:19:07.896878+09:00",
+    "destination": "~/Capstone_Groot_training/pcap-candidates-20261107/verified",
+    "remote_verified_files": 10,
+    "raw_sources_received": false,
+    "transfer_archive_removed": true
+  },
+  "storage": {
+    "fixed_original": "datasets/archives/original.tar.gz",
+    "fixed_cleaned": "datasets/archives/cleaned.tar.gz",
+    "legacy_migration": "pending after DGX import as instructed"
+  },
+  "not_imported": [
+    {
+      "source": "Malware Traffic Analysis",
+      "reason": "recent exercises already acquired for development; exact learning/redistribution terms and leakage review pending"
+    },
+    {
+      "source": "Netresec index/FIRST/Nitroba",
+      "reason": "original attribution/overlap or restricted solution unresolved; no download"
+    },
+    {
+      "source": "CAIDA DDoS2007",
+      "reason": "public access exists but attack/response only without payload/normal baseline; dataset-specific AUA and separate DDoS review pending; no download"
+    }
+  ]
+}

@@ -301,3 +301,5 @@ curl -L -H "Authorization: Bearer $HF_TOKEN" -o primus-instruct-alert_explanatio
 - AttackLM dataset: https://github.com/Veedubin/attacklm-dataset , Minerva-CTI: https://arxiv.org/abs/2602.00513
 - LLM 경보 트리아지 평가 하네스: https://github.com/Shubhmane9503/llm-alert-triage-eval
 - KISA 사이버보안 AI 데이터셋 보도: https://www.edaily.co.kr/news/read?newsId=02561686629018088 , 한국어 instruction 모음: https://github.com/HeegyuKim/open-korean-instructions
+
+**2026-11-07 CTU-13 보완 후보:** 시나리오3개/351,160흐름을 로컬 정제·원문 대조 후 DGX에 반입했다. 학습 문답/독립 사건 수가 아니며 후보 상태·학습0이다. [검수와 반입](../finetuning/PCAP_LEARNING_REVIEW.md). 기존 전체 자료의 원본1+정제본1 통합 이전은 현재 진행 중이며 기존 해제본을 제거했다고 표시하지 않는다.

@@ -694,3 +694,7 @@ Cisco 두 후보의 [Instruct NOTICE](https://huggingface.co/fdtn-ai/Foundation-
 | 기존 R1/R2 정제 모듈 | `DEFENSIVE_SOURCE_REVIEW.json`/`INVESTIGATION_SOURCE_REVIEW.json` | 장비시험train5451/eval1495,참고1159절,조사질문349/모의관측615및평가/근거 | 기존자료 재포장, 신규독립자료로중복집계하지않음; 새로운MCP정답0 |
 
 [실측·해시·보류·서버반입 원장](JOINT_SOURCE_REVIEW.json). 문헌신뢰도,원데이터의출처,공급자라벨,프로젝트질문/정제/분할과실제관제품질은서로다르다. 공격실험기록을현재서버실사건/보편적악성판정으로일반화하지않는다. 논문에는 provider case/고유ID/관측block/SFTdialogue 단위를 구별하고 OTRF/외부HF보류를 함께 명시한다.
+
+## CTU-13 양방향 흐름 보완 후보 — 2026-11-07 KST
+
+사용자 지정 네 PCAP 사이트를 대조해 CTU-13 시나리오5/7/11을 선정했다. 원본351,160행을 로컬 정제·전수 대조하고 DGX에 정제 후보만 반입했다. 라벨/관측 분리·주소 대체·불확실성/원문 좌표 보존,3캡처 단일 누수 그룹·분할 미배정이다. SFT대화0·새학습0이며 본학습 적격 완료로 표시하지 않는다. [출처·인용·제외·한계](PCAP_LEARNING_REVIEW.md) · [작은 원장](PCAP_LEARNING_REVIEW.json). 기존 자료와 함께 통합 압축 이전은 후속 작업이다.

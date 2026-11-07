@@ -457,6 +457,21 @@ class ServiceReport(unittest.TestCase):
         for bad in ({'request_nonce':'old','more_evidence':True,'report':None,'read_tools':[NAME]},
                     {'request_nonce':'nonce','more_evidence':False,'report':None}):
             with self.assertRaises(ValidationError):v.validate(bad)
+
+    def test_service_report_schema_rejects_empty_prose_in_each_field(self):
+        from jsonschema import Draft202012Validator,ValidationError
+        validator=Draft202012Validator(c.service_report_schema([NAME]))
+        good={'more_evidence':False,'report':{'assessment':'unresolved',
+            'basis':'확인한 종료 정보와 실제 기능 검증 범위를 구분합니다.',
+            'evidence_indexes':[0],'limitations':['잠금 소유자는 미확인입니다.'],
+            'next_steps':['등록된 사건 기록에서 남은 검토 항목을 확인합니다.'],'status':'needs_review'}}
+        validator.validate(good)
+        for field in ('basis','limitations','next_steps'):
+            for empty in (',','...','\u200b','123',' '*25,','*25):
+                value=copy.deepcopy(good)
+                value['report'][field]=empty if field=='basis' else [empty]
+                with self.subTest(field=field,empty=empty),self.assertRaises(ValidationError):validator.validate(value)
+
     def wire(self,context=None):
         from types import SimpleNamespace
         req=catalog();req['tools'][0]['type']='function'

@@ -304,6 +304,51 @@ class DiagnosticClaims(unittest.TestCase):
                      'b:management는 종료됐으나 관제 처리 파이프라인은 성능 저하 상태입니다.'):
             with self.subTest(text=text):self.assertIn('diagnostic_pipeline_congestion_unverified',self.issues(text))
 
+    def test_service_then_natural_queue_cannot_borrow_review_count(self):
+        self.facts=[self.pipeline(),diagnostic('b:management')]
+        text='어제 capstone-management.service가 실패했으며 현재 관제 처리 대기열은 285건으로 지연 중입니다.'
+        issues=self.issues(text)
+        self.assertIn('diagnostic_pipeline_count_mismatch',issues)
+        self.assertIn('diagnostic_pipeline_congestion_unverified',issues)
+
+    def test_processing_queue_count_guard_preserves_review_and_negation(self):
+        self.facts=[self.pipeline()]
+        for text in ('관제 검토 상태 사건은 285건입니다.', '현재 처리 대기열은 0건입니다.',
+                     '관제 처리 대기열은 285건이 아닙니다.', '어제 처리 대기열은 285건이었습니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_pipeline_count_mismatch',self.issues(text))
+        self.facts[0]['pipeline_metrics']['pending_reports']=2
+        self.assertNotIn('diagnostic_pipeline_count_mismatch',self.issues('처리 대기열은 2건입니다.'))
+
+    def code_samples(self):
+        return {**historical('b:management'),'unit':'capstone-management.service','indexed_error_count':876,
+            'error_code_observations':[{'code':'controller_already_running','observed_at_kst':STAMP,'record_sha256':str(i)*64} for i in range(5)]}
+
+    def test_whole_index_count_is_not_a_known_code_count(self):
+        self.facts=[self.code_samples()]
+        for text in ('capstone-management.service는 controller_already_running(876회)으로 잠금 획득에 실패했습니다.',
+                     'controller_already_running 876건이 발생했습니다.',
+                     'controller_already_running 5회 발생했습니다.'):
+            with self.subTest(text=text):self.assertIn('diagnostic_error_code_total_unverified',self.issues(text))
+
+    def test_error_code_sample_count_is_bound_to_that_code(self):
+        self.facts=[self.code_samples()]
+        self.assertNotIn('diagnostic_error_code_total_unverified',self.issues('controller_already_running / 표본 5건'))
+        self.assertNotIn('diagnostic_error_code_sample_mismatch',self.issues('반환 controller_already_running 5건'))
+        self.assertIn('diagnostic_error_code_sample_mismatch',self.issues('controller_already_running 표본 20건'))
+        self.facts.append(copy.deepcopy(self.facts[0]))
+        self.assertNotIn('diagnostic_error_code_sample_mismatch',self.issues('controller_already_running 표본 5건'))
+
+    def test_code_count_denial_does_not_make_a_count_claim(self):
+        self.facts=[self.code_samples()]
+        for text in ('controller_already_running 876회라고 단정하지 않습니다.',
+                     'controller_already_running(876회)이 아닙니다.',
+                     'controller_already_running 횟수는 미확인입니다.'):
+            with self.subTest(text=text):self.assertNotIn('diagnostic_error_code_total_unverified',self.issues(text))
+
+    def test_code_count_guard_does_not_borrow_another_target(self):
+        self.facts=[self.code_samples(),historical('c:vector')]
+        self.assertNotIn('diagnostic_error_code_sample_mismatch',self.issues('c:vector controller_already_running 표본 20건'))
+
     def test_today_observation_marker_does_not_borrow_past_state(self):
         self.assertEqual(self.issues('어제 실패했으나 오늘(10/30) 수집 시각 기준 inactive/dead 상태입니다.'),[])
         self.assertEqual(self.issues('어제 실패했으나 오늘 관측 시점 기준 ActiveState=inactive입니다.'),[])
@@ -340,6 +385,33 @@ class DiagnosticClaims(unittest.TestCase):
         for count in (0,None,True,'2'):
             self.facts=[self.history_samples(count=count)]
             self.assertNotIn('diagnostic_history_return_denied',self.issues('어제 c:vector 오류 이력 조회가 실패했습니다.'))
+
+    def report_prose(self,basis='현재 수집한 프로세스 상태만 확인했습니다.',limit='원문은 미확인입니다.',step='남은 사건 검토 항목을 확인합니다.'):
+        return ('**판단**\n'+basis+'\n\n| 확인 항목 | 값 |\n|---|---|\n| 근거 | 표본 |\n\n'
+            '**미확인·한계**\n- '+limit+'\n\n**다음 조치**\n- '+step+'\n\n'
+            'INCIDENT_DISPOSITION: {"assessment":"unresolved"}\nMANAGEMENT_STATUS: needs_review')
+
+    def test_projected_report_rejects_punctuation_only_action(self):
+        for empty in (',','...','\u200b','123',' '):
+            with self.subTest(empty=empty):
+                self.assertIn('diagnostic_report_empty_field',self.issues(self.report_prose(step=empty)))
+
+    def test_empty_basis_cannot_borrow_words_from_evidence_table(self):
+        self.assertIn('diagnostic_report_empty_field',self.issues(self.report_prose(basis='')))
+        self.assertIn('diagnostic_report_empty_field',self.issues(self.report_prose(limit=',')))
+
+    def test_valid_projected_prose_keeps_its_literal_action(self):
+        for step in ('관리자에게 원문 보관 위치를 확인합니다.','b:management 상태 관측을 다음 실행 시각에 대조합니다.'):
+            text=self.report_prose(step=step)
+            self.assertNotIn('diagnostic_report_empty_field',self.issues(text))
+            self.assertIn(step,text)
+
+    def test_one_valid_action_does_not_hide_an_empty_item(self):
+        self.assertIn('diagnostic_report_empty_field',self.issues(self.report_prose(step='사건을 검토합니다.\n- ,')))
+
+    def test_empty_field_guard_does_not_rewrite_plain_failures_or_other_reports(self):
+        self.assertNotIn('diagnostic_report_empty_field',self.issues('조회 근거 부족으로 판단을 완료하지 못했습니다.'))
+        self.assertEqual(c.diagnostic_report_text_violations(self.report_prose(step=','),[{'kind':'rules'}]),[])
 
     def test_current_review_total_does_not_supply_calendar_arrival_counts(self):
         self.facts=[{'kind':'diagnostics','target':'b:management-pipeline','pipeline_metrics':{

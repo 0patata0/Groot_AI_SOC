@@ -1,16 +1,13 @@
 {
-  "schema": 1,
-  "as_of_kst": "2026-11-07T22:11:14.172349+09:00",
-  "common_version": "soc-chat-contract:1.5.64",
-  "query_version": "groot-query-completion:1.19.118",
-  "scope": "diagnostic claim validation and repair feedback only",
-  "sources": {
-    "infra/hermes/chat_contract.py": "8147b3bbf9c9cb1cae196d3821623b3bff1b61e992dd2ba60cd63c913e8cea1c",
-    "infra/hermes/test_diagnostic_claim_scope.py": "e81236d3d04e71b98a826d27859ed0916b9561e8d4b29cccd39a3c44f85c3259"
+  "version": "soc-chat-contract:1.5.66",
+  "quality": "incomplete",
+  "source_sha256": {
+    "infra/hermes/chat_contract.py": "4997c9a1325c45cce307b27154f398496333e8c14f760c87d835a96516214b46",
+    "infra/hermes/test_diagnostic_claim_scope.py": "c5d1bcfdf40bdfbc9a124d3959e9fc165cb0b1465b7c8c74981bc74cc16d320b",
+    "infra/hermes/test_service_history_contract.py": "932c72d07d9c11eebe3504e4b50fddbfd38ee1e34f76b7eede27d89b771c3cd9"
   },
   "isolated_tests": {
-    "unique": 1402,
-    "skip": 0,
+    "unique": 1414,
     "files": 469,
     "profiles": {
       "native": {
@@ -20,13 +17,13 @@
       },
       "service": {
         "rc": 0,
-        "count": 48,
-        "unique": 48
+        "count": 49,
+        "unique": 49
       },
       "claims": {
         "rc": 0,
-        "count": 42,
-        "unique": 42
+        "count": 53,
+        "unique": 53
       },
       "sdk": {
         "rc": 0,
@@ -48,104 +45,259 @@
         "count": 62,
         "unique": 62
       }
-    }
+    },
+    "skip": 0
   },
-  "recorded_report_rechecks": {
-    "count": 9,
-    "newly_caught_previous_false_passes": 2,
-    "manual_quality_passes": 0,
-    "negative_claim_false_positive_removed": 1
-  },
-  "rejected_prompt_candidate": {
-    "model_replays": 4,
-    "control_seconds": [
-      7.345602665,
-      7.478321308
-    ],
-    "candidate_seconds": [
-      14.041316196,
-      14.121216086
-    ],
-    "quality_passes": 0,
-    "deployed": false,
-    "not_chat_latency_comparison": true
-  },
-  "live_chats": [
-    {
-      "engine": "hermes",
-      "source_id": "ej3hsmz6cibr9m3qinopatostw",
-      "reply_id": "dhkc7epo1id8fdgumtfdgq5eqw",
-      "elapsed_seconds": 30.967,
-      "reads": 3,
+  "live_chats": {
+    "hermes": {
+      "elapsed_seconds": 68.867,
+      "reads": 4,
       "protected_calls": 0,
       "reported_status": "partial",
-      "quality": "incomplete",
-      "result_sha256_verified": true,
-      "facts": [
-        {
-          "target": "b:management",
-          "requested_since_kst": "2026-11-07T21:51:25+09:00",
-          "returned_error_count": 0,
-          "result_sha256": "b11e84c7dc2b67ed09e6d88a383689694b8e3bfcad2e96c063230c1333a7333b"
-        },
-        {
-          "target": "b:management",
-          "requested_since_kst": "2026-11-06T00:00:00+09:00",
-          "returned_error_count": 20,
-          "result_sha256": "57bf587848c30901e9ffd2a088bf87ab0a35eada3807c67d4b760cf41f55bdc9"
-        },
-        {
-          "target": "b:management-pipeline",
-          "requested_since_kst": null,
-          "returned_error_count": null,
-          "result_sha256": "6909356d7304c13b1ae21d58a96cd66f27f8f2b3a5075c3f7d9e0e16990d2267"
-        }
+      "quality": "failed",
+      "source_id": "d4rhdftrsib88m5mey6pmn3ppe",
+      "reply_id": "uucbbpfhepgsierq3zz6gqthqy",
+      "result_sha256": [
+        "4300afb37c581ebec10c40fbfd1a7d869559824a52115ed1f144a31936415c27",
+        "fe18566c19deb64ae123d2865b86ef6ffca0ceb8707645fc3652fc164d766fe8",
+        "46ca145260c8066305ecd7e7a379b0535a91d1906799e500cd5baebe92ee02eb",
+        "a676fbfcb2f7b628efbee33817ae8968cfe5949977c2ceff7b2511f11a67146b"
       ],
-      "reasons": [
-        "no_explicit_pipeline_impact_conclusion",
-        "empty_next_step_comma",
-        "raw_absence_vs_collection_limit_conflation"
+      "failures": [
+        "paraphrased_review_count_reported_as_processing_backlog",
+        "same_pipeline_snapshot_repeated",
+        "unsupported_restart_followup",
+        "malformed_korean_prose"
       ]
     },
-    {
-      "engine": "ollama",
-      "source_id": "iy9pcmqzebg68ehh43kq7mxhxy",
-      "reply_id": "w5w4r1wa5ffxzburrjppki4a7e",
-      "elapsed_seconds": 50.526,
+    "ollama": {
+      "elapsed_seconds": 51.221,
       "reads": 3,
       "protected_calls": 0,
       "reported_status": "partial",
-      "quality": "incomplete",
-      "result_sha256_verified": true,
-      "facts": [
-        {
-          "target": "b:management",
-          "requested_since_kst": "2026-11-07T21:54:38+09:00",
-          "returned_error_count": 0,
-          "result_sha256": "038bce87f0a07f3a78696045668f6e475fa2a6d22999f4ec44aa05172a7469c1"
-        },
-        {
-          "target": "b:management",
-          "requested_since_kst": "2026-11-06T00:00:00+09:00",
-          "returned_error_count": 20,
-          "result_sha256": "abd7cd7cd50e5794338048174e900b4403066854cbd2052b1ddc5a29cbbe9f0e"
-        },
-        {
-          "target": "b:management-pipeline",
-          "requested_since_kst": null,
-          "returned_error_count": null,
-          "result_sha256": "c19eae0b6cad77eabbcb71335809d9704942f6ee20eaa3ce4dadb1f27ebf66b6"
-        }
+      "quality": "failed",
+      "source_id": "3ayyrt4ptf8iddfirc8sqwqmic",
+      "reply_id": "do3n85gzfj8rzjdac6qg7ar3hc",
+      "result_sha256": [
+        "c8802e296b454d136d34b881b2e999451e08df837ed2973b6e358e6d1f85b5d1",
+        "98d0c2c36fc0a8e94fe01e700303d8cf4aea32ce79daebeb709ac97ae990be3e",
+        "10007ae27a7a7a1703009926d8d73b023416fbda122615261716af055b6f43b5"
       ],
-      "reasons": [
-        "three_rejected_drafts_repeat_false_restart_trend_and_congestion",
-        "unverified_answer_with_observed_fact_table"
+      "failures": [
+        "repeated_unsupported_trend",
+        "model_judgment_unfinished_facts_only_output"
       ]
+    }
+  },
+  "rejected_candidates": [
+    {
+      "source": "replay-english.json",
+      "case": "H64",
+      "variant": "control",
+      "seconds": 13.290528488811105,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 187,
+      "adopted": false
+    },
+    {
+      "source": "replay-english.json",
+      "case": "H64",
+      "variant": "concise_english",
+      "seconds": 17.492128242971376,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_exit_status_mismatch",
+        "sample_zero_presented_as_absence"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 465,
+      "adopted": false
+    },
+    {
+      "source": "replay-english.json",
+      "case": "O64",
+      "variant": "control",
+      "seconds": 13.037467105081305,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history",
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 205,
+      "adopted": false
+    },
+    {
+      "source": "replay-english.json",
+      "case": "O64",
+      "variant": "concise_english",
+      "seconds": 16.90468774200417,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_exit_status_mismatch",
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 407,
+      "adopted": false
+    },
+    {
+      "source": "replay-format.json",
+      "case": "H64",
+      "variant": "control",
+      "seconds": 7.381184041965753,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 214,
+      "adopted": false
+    },
+    {
+      "source": "replay-format.json",
+      "case": "H64",
+      "variant": "no_duplicate_table_instruction",
+      "seconds": 13.672993527026847,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 238,
+      "adopted": false
+    },
+    {
+      "source": "replay-format.json",
+      "case": "O64",
+      "variant": "control",
+      "seconds": 6.970571315148845,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history",
+        "diagnostic_pipeline_congestion_unverified"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 200,
+      "adopted": false
+    },
+    {
+      "source": "replay-format.json",
+      "case": "O64",
+      "variant": "no_duplicate_table_instruction",
+      "seconds": 12.835650912020355,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 206,
+      "adopted": false
+    },
+    {
+      "source": "replay-bound-hermes.json",
+      "case": "hermes65",
+      "variant": "control",
+      "seconds": 12.71187325194478,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 186,
+      "adopted": false
+    },
+    {
+      "source": "replay-bound-hermes.json",
+      "case": "hermes65",
+      "variant": "bound_findings",
+      "seconds": 15.809353246819228,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_exit_subject_unverified",
+        "diagnostic_snapshot_is_not_functional_health"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 351,
+      "adopted": false
+    },
+    {
+      "source": "replay-bound-ollama.json",
+      "case": "ollama65",
+      "variant": "control",
+      "seconds": 12.844115442829207,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_lock_metadata_not_restart_history"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 193,
+      "adopted": false
+    },
+    {
+      "source": "replay-bound-ollama.json",
+      "case": "ollama65",
+      "variant": "bound_findings",
+      "seconds": 16.360401599900797,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_exit_subject_unverified",
+        "diagnostic_snapshot_is_not_functional_health",
+        "sample_zero_presented_as_absence"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 386,
+      "adopted": false
+    },
+    {
+      "source": "replay-meaning-hermes.json",
+      "case": "hermes65",
+      "variant": "bound_findings",
+      "seconds": 10.857008449966088,
+      "schema_returned": true,
+      "automatic_issues": [
+        "diagnostic_exit_subject_unverified",
+        "diagnostic_pipeline_congestion_unverified",
+        "diagnostic_snapshot_is_not_functional_health"
+      ],
+      "error_type": null,
+      "manual_quality": "failed",
+      "output_tokens": 386,
+      "adopted": false
+    },
+    {
+      "source": "replay-meaning-hermes.json",
+      "case": "hermes65",
+      "variant": "interpretation_only",
+      "seconds": 45.97348287887871,
+      "schema_returned": false,
+      "automatic_issues": [],
+      "error_type": "ValidationError",
+      "manual_quality": "failed",
+      "output_tokens": 2048,
+      "adopted": false
     }
   ],
   "health": {
-    "at_kst": "2026-11-07T22:11:14.172349+09:00",
+    "at_kst": "2026-11-07T23:12:06.181989+09:00",
     "query": "1.19.118",
+    "common": "1.5.66",
     "manifest": 14,
     "protected": 8,
     "sdk_sources": 20,
@@ -165,59 +317,267 @@
     "rollback_confirmed_noop": true
   },
   "deployment": {
-    "route": "Mac-admin231-A-B",
-    "changed_files": 3,
-    "planned_hermes_restarts": 3,
-    "initial_candidate_rolled_back_kst": "2026-11-07T22:03:33+09:00",
-    "final_applied_kst": "2026-11-07T22:04:34.597296+09:00",
-    "backup": "/var/lib/capstone-service-grounding/20261107-claims64-fixed",
-    "protected_settings_unchanged": 8,
-    "operating_db_unchanged_while_stopped": true,
+    "files": 3,
+    "planned_hermes_restarts": 2,
+    "protected_settings": 8,
+    "protected_db_unchanged_while_stopped": true,
     "model_promotions": 0,
     "new_packages_ports_keys": 0,
-    "new_os_install_test": false
+    "new_os_install_test": false,
+    "backups": [
+      "/var/lib/capstone-service-grounding/20261107-report65",
+      "/var/lib/capstone-service-grounding/20261107-report66"
+    ]
   },
-  "cleanup": {
-    "server": {
-      "verified_removed": [
-        {
-          "path": "/tmp/capstone-claims64-20261107",
-          "files": 469,
-          "bytes": 7342733
-        },
-        {
-          "path": "/tmp/capstone-claims64-final-20261107",
-          "files": 469,
-          "bytes": 7342541
-        },
-        {
-          "path": "/tmp/capstone-claims64-fixed-20261107",
-          "files": 469,
-          "bytes": 7343422
-        }
-      ],
-      "count": 1407
-    },
-    "mac": {
-      "path": "/private/tmp/capstone-claims64-20261107-qumef5b0",
-      "count": 7,
-      "bytes": 29983285,
-      "related_processes": [],
-      "removed_verified": true
-    }
-  },
-  "held_constraints": {
-    "dgx_status_polling_after_2055": 0,
-    "new_attack_or_pcap_replay": 0,
+  "constraints": {
+    "dgx_polling_after_2055": 0,
+    "attack_replay": 0,
     "production_model": "original35B"
   },
   "limitations": [
-    "complex_investigation_quality_incomplete",
-    "same_shared_gpu_uncontrolled_single_chat_each",
-    "three_reads_not_comparable_to_previous_four_read_scope",
-    "raw_journal_unavailable_is_not_failed_sanitized_history_read",
-    "not_universal_semantic_validator",
-    "runtime_read_only_test_not_protected_write_e2e",
-    "all_client_table_rendering_not_retested"
-  ]
+    "both_live_complex_answers_failed_quality",
+    "hermes66_delivered_incorrect_paraphrase_despite_guard",
+    "not_general_semantic_verification",
+    "same_snapshot_repeated",
+    "unsupported_followup_actions",
+    "raw_schema_failure_not_preserved",
+    "shared_gpu_cache_uncontrolled",
+    "not_heldout_176_or_protected_write_e2e"
+  ],
+  "previous_common64": {
+    "schema": 1,
+    "as_of_kst": "2026-11-07T22:11:14.172349+09:00",
+    "common_version": "soc-chat-contract:1.5.64",
+    "query_version": "groot-query-completion:1.19.118",
+    "scope": "diagnostic claim validation and repair feedback only",
+    "sources": {
+      "infra/hermes/chat_contract.py": "8147b3bbf9c9cb1cae196d3821623b3bff1b61e992dd2ba60cd63c913e8cea1c",
+      "infra/hermes/test_diagnostic_claim_scope.py": "e81236d3d04e71b98a826d27859ed0916b9561e8d4b29cccd39a3c44f85c3259"
+    },
+    "isolated_tests": {
+      "unique": 1402,
+      "skip": 0,
+      "files": 469,
+      "profiles": {
+        "native": {
+          "rc": 0,
+          "count": 481,
+          "unique": 481
+        },
+        "service": {
+          "rc": 0,
+          "count": 48,
+          "unique": 48
+        },
+        "claims": {
+          "rc": 0,
+          "count": 42,
+          "unique": 42
+        },
+        "sdk": {
+          "rc": 0,
+          "count": 282,
+          "unique": 282
+        },
+        "query": {
+          "rc": 0,
+          "count": 408,
+          "unique": 408
+        },
+        "peer": {
+          "rc": 0,
+          "count": 79,
+          "unique": 79
+        },
+        "installer": {
+          "rc": 0,
+          "count": 62,
+          "unique": 62
+        }
+      }
+    },
+    "recorded_report_rechecks": {
+      "count": 9,
+      "newly_caught_previous_false_passes": 2,
+      "manual_quality_passes": 0,
+      "negative_claim_false_positive_removed": 1
+    },
+    "rejected_prompt_candidate": {
+      "model_replays": 4,
+      "control_seconds": [
+        7.345602665,
+        7.478321308
+      ],
+      "candidate_seconds": [
+        14.041316196,
+        14.121216086
+      ],
+      "quality_passes": 0,
+      "deployed": false,
+      "not_chat_latency_comparison": true
+    },
+    "live_chats": [
+      {
+        "engine": "hermes",
+        "source_id": "ej3hsmz6cibr9m3qinopatostw",
+        "reply_id": "dhkc7epo1id8fdgumtfdgq5eqw",
+        "elapsed_seconds": 30.967,
+        "reads": 3,
+        "protected_calls": 0,
+        "reported_status": "partial",
+        "quality": "incomplete",
+        "result_sha256_verified": true,
+        "facts": [
+          {
+            "target": "b:management",
+            "requested_since_kst": "2026-11-07T21:51:25+09:00",
+            "returned_error_count": 0,
+            "result_sha256": "b11e84c7dc2b67ed09e6d88a383689694b8e3bfcad2e96c063230c1333a7333b"
+          },
+          {
+            "target": "b:management",
+            "requested_since_kst": "2026-11-06T00:00:00+09:00",
+            "returned_error_count": 20,
+            "result_sha256": "57bf587848c30901e9ffd2a088bf87ab0a35eada3807c67d4b760cf41f55bdc9"
+          },
+          {
+            "target": "b:management-pipeline",
+            "requested_since_kst": null,
+            "returned_error_count": null,
+            "result_sha256": "6909356d7304c13b1ae21d58a96cd66f27f8f2b3a5075c3f7d9e0e16990d2267"
+          }
+        ],
+        "reasons": [
+          "no_explicit_pipeline_impact_conclusion",
+          "empty_next_step_comma",
+          "raw_absence_vs_collection_limit_conflation"
+        ]
+      },
+      {
+        "engine": "ollama",
+        "source_id": "iy9pcmqzebg68ehh43kq7mxhxy",
+        "reply_id": "w5w4r1wa5ffxzburrjppki4a7e",
+        "elapsed_seconds": 50.526,
+        "reads": 3,
+        "protected_calls": 0,
+        "reported_status": "partial",
+        "quality": "incomplete",
+        "result_sha256_verified": true,
+        "facts": [
+          {
+            "target": "b:management",
+            "requested_since_kst": "2026-11-07T21:54:38+09:00",
+            "returned_error_count": 0,
+            "result_sha256": "038bce87f0a07f3a78696045668f6e475fa2a6d22999f4ec44aa05172a7469c1"
+          },
+          {
+            "target": "b:management",
+            "requested_since_kst": "2026-11-06T00:00:00+09:00",
+            "returned_error_count": 20,
+            "result_sha256": "abd7cd7cd50e5794338048174e900b4403066854cbd2052b1ddc5a29cbbe9f0e"
+          },
+          {
+            "target": "b:management-pipeline",
+            "requested_since_kst": null,
+            "returned_error_count": null,
+            "result_sha256": "c19eae0b6cad77eabbcb71335809d9704942f6ee20eaa3ce4dadb1f27ebf66b6"
+          }
+        ],
+        "reasons": [
+          "three_rejected_drafts_repeat_false_restart_trend_and_congestion",
+          "unverified_answer_with_observed_fact_table"
+        ]
+      }
+    ],
+    "health": {
+      "at_kst": "2026-11-07T22:11:14.172349+09:00",
+      "query": "1.19.118",
+      "manifest": 14,
+      "protected": 8,
+      "sdk_sources": 20,
+      "review_sources": 5,
+      "bots_ws_worker": true,
+      "services": [
+        "active",
+        "active",
+        "active",
+        "active"
+      ],
+      "queues": {
+        "/var/lib/capstone-review-chat/queue.sqlite": 0,
+        "/var/lib/capstone-ollama-trial/chat/queue.sqlite": 0
+      },
+      "b_failed_units": 0,
+      "rollback_confirmed_noop": true
+    },
+    "deployment": {
+      "route": "Mac-admin231-A-B",
+      "changed_files": 3,
+      "planned_hermes_restarts": 3,
+      "initial_candidate_rolled_back_kst": "2026-11-07T22:03:33+09:00",
+      "final_applied_kst": "2026-11-07T22:04:34.597296+09:00",
+      "backup": "/var/lib/capstone-service-grounding/20261107-claims64-fixed",
+      "protected_settings_unchanged": 8,
+      "operating_db_unchanged_while_stopped": true,
+      "model_promotions": 0,
+      "new_packages_ports_keys": 0,
+      "new_os_install_test": false
+    },
+    "cleanup": {
+      "server": {
+        "verified_removed": [
+          {
+            "path": "/tmp/capstone-claims64-20261107",
+            "files": 469,
+            "bytes": 7342733
+          },
+          {
+            "path": "/tmp/capstone-claims64-final-20261107",
+            "files": 469,
+            "bytes": 7342541
+          },
+          {
+            "path": "/tmp/capstone-claims64-fixed-20261107",
+            "files": 469,
+            "bytes": 7343422
+          }
+        ],
+        "count": 1407
+      },
+      "mac": {
+        "path": "/private/tmp/capstone-claims64-20261107-qumef5b0",
+        "count": 7,
+        "bytes": 29983285,
+        "related_processes": [],
+        "removed_verified": true
+      }
+    },
+    "held_constraints": {
+      "dgx_status_polling_after_2055": 0,
+      "new_attack_or_pcap_replay": 0,
+      "production_model": "original35B"
+    },
+    "limitations": [
+      "complex_investigation_quality_incomplete",
+      "same_shared_gpu_uncontrolled_single_chat_each",
+      "three_reads_not_comparable_to_previous_four_read_scope",
+      "raw_journal_unavailable_is_not_failed_sanitized_history_read",
+      "not_universal_semantic_validator",
+      "runtime_read_only_test_not_protected_write_e2e",
+      "all_client_table_rendering_not_retested"
+    ]
+  },
+  "cleanup": {
+    "server_fixtures_verified_removed": 938,
+    "mac65_verified_removed_files": 2,
+    "mac65_verified_removed_bytes": 10000830,
+    "mac66_initial_temporary_directory": "absent_at_followup; deletion_actor_and_predelete_hash_unverified",
+    "mac66_resume_cleanup": {
+      "at_kst": "2026-11-07T23:21:52.152658+09:00",
+      "removed_verified": true,
+      "count": 3,
+      "bytes": 16607,
+      "retained_project_source_helpers": 4
+    }
+  }
 }

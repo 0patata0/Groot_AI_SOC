@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import re
 
-VERSION = 'soc-chat-contract:1.5.64'
+VERSION = 'soc-chat-contract:1.5.66'
 MODEL_STEPS = 12
 TOOL_CALLS = 32
 READ_TIMEOUT = 90
@@ -592,12 +592,12 @@ def diagnostic_metadata_failure(facts):
 def service_report_schema(citations, nonce=None, available_reads=None, facts=()):
     """Model may request the full read catalog; it is never forced to conclude."""
     fields={'assessment':{'enum':['benign','remediated','unresolved']},
-        'basis':{'type':'string','minLength':20,'maxLength':512,
+        'basis':{'type':'string','minLength':20,'maxLength':512,'pattern':'[A-Za-z가-힣]',
             'description':'한국어 한두 문장으로 확인된 원인·현재 관측을 설명. 권장160자 이내. 표의 코드·건수 반복이나 미확인 배경 추정 금지.'},
         'evidence_indexes':{'type':'array','const':list(range(len(citations)))},
-        'limitations':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':512,
+        'limitations':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':512,'pattern':'[A-Za-z가-힣]',
             'description':'이 사건의 미확인 항목만 한국어 한 문장. 권장100자 이내. 도구 필드 사전·전체 지침을 복사하지 않는다.'}},
-        'next_steps':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':512,
+        'next_steps':{'type':'array','minItems':1,'maxItems':1,'items':{'type':'string','minLength':1,'maxLength':512,'pattern':'[A-Za-z가-힣]',
             'description':'남은 관측/검토에 연결한 실행 가능한 한국어 한 문장. 권장100자 이내. 이미 한 조회나 그 도구가 제공하지 않는 정보를 다음 조치로 쓰지 않는다.'}},
         'status':{'enum':['resolved','monitor','needs_review','awaiting_approval']}}
     if diagnostic_metadata_failure(facts):
@@ -675,6 +675,10 @@ def service_report_messages(context, descriptions, citations, feedback=None):
             'diagnostic_pipeline_pending_unverified':'실제 처리·전송·기한 초과 지표가0인데 대기가 존재한다고 했습니다. 검토 상태의 사건 합계와 구분하세요.',
             'diagnostic_history_return_denied':'해당 구간의 정제 오류 표본이 실제 반환됐는데 전체 조회·반환 실패라고 했습니다. 확보한 표본과 전체 수집 범위·원문 미반환을 분리하세요.',
             'diagnostic_property_value_unverified':'속성을 확인한 대상·시점과 문장 범위가 맞지 않습니다. 현재 스냅샷의 속성은 현재 관측으로, 과거 오류 이력은 해당 과거 구간으로 따로 설명하세요.',
+            'diagnostic_report_empty_field':'판단·한계·다음 조치에 빈 값이나 문장부호만 있는 항목이 있습니다. 실제 근거에 연결되는 문장으로 작성하세요. 칸을 채우려고 불필요한 작업을 만들지 마세요.',
+            'diagnostic_error_code_total_unverified':'오류 색인 전체 수를 특정 코드의 발생 횟수로 옮겼습니다. 코드별로 반환된 표본과 색인 전체 일치 건수를 구분하세요. 해당 코드의 전체 횟수는 확인되지 않았습니다.',
+            'diagnostic_error_code_sample_mismatch':'명시한 코드의 반환 표본 수가 실제 코드별 표본과 다릅니다. 다른 오류 유형이나 전체 색인 수를 해당 코드 표본 수로 사용하지 마세요.',
+            'diagnostic_pipeline_count_mismatch':'검토 상태 사건 수를 처리·전송 대기 또는 기한 초과 건수로 바꿨습니다. 이름이 다른 지표의 숫자를 옮겨 쓰지 마세요.',
         }
         policy+=(' 검증기가 이전 초안의 오류를 지적했습니다. 거절된 주장을 그대로 반복하지 마세요. '
             +' '.join(code+': '+explanations[code] for code in issues if code in explanations)
@@ -1046,7 +1050,7 @@ def diagnostic_pipeline_claim_violations(text, facts):
     for clause in re.split(r'\n|;|(?<=[.!?])\s+',text):
         if not re.search(r'관제|SOC|파이프라인|대기열|처리|전송|검토',clause,re.I):continue
         if (not diagnostic_subjects(clause,rows)
-                and not re.search(r'\bSOC\b|(?:관제\s*)?처리\s*파이프라인',clause,re.I)):continue
+                and not re.search(r'\bSOC\b|(?:관제\s*)?처리\s*파이프라인|관제\s*(?:처리\s*)?대기열',clause,re.I)):continue
         if (type(metrics.get('review_required_cases')) is int
                 and (period:=re.search(r'(?:오늘|어제|이틀|사흘|\d+\s*일)\s*치(?:\s*(?:건수|사건))?',clause))
                 and not _claim_is_unasserted(clause[period.end():])):
@@ -1064,9 +1068,53 @@ def diagnostic_pipeline_claim_violations(text, facts):
         if re.search(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|건|사건|항목))?'
                 r'(?:은|는|이|가)?\s*(?:존재합니다|있습니다|남아\s*있습니다)',clause):
             issues.add('diagnostic_pipeline_pending_unverified')
-        for claim in re.finditer(r'병목|정체|과부하|적체|(?:성능\s*)?저하|처리\s*지연',clause):
+        for count in re.finditer(r'(?:처리\s*대기(?:열)?|전송\s*대기|기한\s*초과)(?:\s*(?:건수|사건))?'
+                r'\s*(?:은|는|이|가|:|=)?\s*([0-9][0-9,]*)\s*건',clause):
+            if int(count[1].replace(',',''))>0 and not _claim_is_unasserted(clause[count.end():]):
+                issues.add('diagnostic_pipeline_count_mismatch')
+        for claim in re.finditer(r'병목|정체|과부하|적체|(?:성능\s*)?저하|처리\s*지연|지연\s*(?:중|상태|발생|확인)',clause):
             if not _claim_is_unasserted(clause[claim.end():]):issues.add('diagnostic_pipeline_congestion_unverified')
     return sorted(issues)
+
+
+def diagnostic_error_code_count_violations(text, facts):
+    """A whole error index cannot establish one code's occurrence count."""
+    if not diagnostic_facts_only(facts):return []
+    issues=set()
+    for clause in re.split(r'\n|;|(?<=[.!?])\s+',re.sub(r'[*`]', '',text)):
+        rows=diagnostic_subjects(clause,facts)
+        codes={item.get('code') for row in rows for item in row.get('error_code_observations',[])
+               if isinstance(item,dict) and re.fullmatch('[a-z][a-z0-9_]{1,80}',str(item.get('code','')))}
+        for code in codes:
+            pattern=re.escape(code)+r'([^\n.!?;|0-9]{0,24})([0-9][0-9,]*)\s*(?:건|회)'
+            for match in re.finditer(pattern,clause):
+                after=clause[match.end():].lstrip(' )')
+                if (_claim_is_unasserted(after) or re.match(r'(?:이라고|라고|으로)?\s*(?:단정|확정).{0,12}(?:않|못|없)',after)):continue
+                count=int(match[2].replace(',',''))
+                label=clause[max(0,match.start()-12):match.start()]+match[1]
+                if not re.search(r'표본|반환',label):
+                    issues.add('diagnostic_error_code_total_unverified');continue
+                sample_counts={sum(x.get('code')==code for x in row.get('error_code_observations',[]))
+                    for row in rows if any(x.get('code')==code for x in row.get('error_code_observations',[]))}
+                if len(sample_counts)==1 and count not in sample_counts:
+                    issues.add('diagnostic_error_code_sample_mismatch')
+    return sorted(issues)
+
+
+def diagnostic_report_text_violations(text, facts):
+    """Catch empty projected fields, without inventing a replacement action."""
+    if not diagnostic_facts_only(facts):return []
+    headings=('판단','미확인·한계','다음 조치')
+    if not all('**'+name+'**' in text for name in headings):return []
+    for name in headings:
+        match=re.search(r'^\*\*'+re.escape(name)+r'\*\*\s*\n(.*?)(?=\n\*\*|\nINCIDENT_DISPOSITION:|\Z)',text,re.M|re.S)
+        if not match:continue
+        # Evidence cells cannot supply prose missing from the judgment field.
+        lines=[line.strip().lstrip('- ').strip() for line in match[1].splitlines()
+               if line.strip() and not line.lstrip().startswith('|')]
+        if not lines or any(not re.search('[A-Za-z가-힣]',line) for line in lines):
+            return ['diagnostic_report_empty_field']
+    return []
 
 
 def snapshot_health_violations(text, facts):
@@ -1082,6 +1130,8 @@ def snapshot_health_violations(text, facts):
     issues=set(diagnostic_lifecycle_claim_violations(text,facts))
     issues.update(diagnostic_pipeline_claim_violations(text,facts))
     issues.update(diagnostic_history_return_violations(text,facts))
+    issues.update(diagnostic_report_text_violations(text,facts))
+    issues.update(diagnostic_error_code_count_violations(text,facts))
     # Structured incident closure is itself a health claim, even if the prose
     # avoids the word "normal". Sanitized errors plus process attributes alone
     # cannot establish that a failed service incident was benign or remediated.

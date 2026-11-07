@@ -60,6 +60,11 @@ else echo "  /soc exists (token reused)"; fi
 
 say "P3 env + systemd"
 install -d -o root -g socbot -m 0750 /etc/socbot
+if [ ! -e /etc/socbot/report_policy_changes.json ]; then
+  printf '%s\n' '{"schema":1,"changes":[]}' > /etc/socbot/report_policy_changes.json
+  chown root:socbot /etc/socbot/report_policy_changes.json
+  chmod 0640 /etc/socbot/report_policy_changes.json
+fi
 umask 027
 BROKER_TOKEN=${BROKER_TOKEN:-$(python3 -c "import secrets;print(secrets.token_hex(24))")}   # 응답 서버(A) hitl.env 의 RESP_BROKER_TOKEN 과 동일해야 함
 READ_TOKEN=${READ_TOKEN:-$(python3 -c "import secrets;print(secrets.token_hex(24))")}       # Hermes 모니터 스크립트(SOC_READ_TOKEN)

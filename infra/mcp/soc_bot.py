@@ -31,6 +31,7 @@ APPROVERS 또는 RULE_APPROVERS, RULE_MM_SOURCE_CIDRS(Mattermost 서버 TCP peer
 """
 import hashlib, hmac, ipaddress, json, math, os, re, ssl, sys, unicodedata, urllib.request, urllib.parse, time, secrets, threading
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 CTX = ssl._create_unverified_context()   # 자체서명 인덱서/API
@@ -225,6 +226,61 @@ def action_report(minutes):
     return report_table(['조치 기록', '로그 수', '최근 시각(KST)', '최근 result'], rows)
 
 
+def report_policy_changes(value):
+    """Validate operator-recorded change receipts; never suppress alert queries."""
+    if not isinstance(value,dict) or set(value)!={'schema','changes'} or value['schema']!=1:
+        raise ValueError('policy_receipt_schema')
+    changes=value['changes']
+    if not isinstance(changes,list) or len(changes)>8:raise ValueError('policy_receipt_limit')
+    for row in changes:
+        required={'name','signature_id','source_ip','destination_ip','destination_port','effective_at','evidence_sha256'}
+        if not isinstance(row,dict) or set(row)!=required:raise ValueError('policy_receipt_fields')
+        if not isinstance(row['name'],str) or not 1<=len(row['name'])<=120:raise ValueError('policy_receipt_name')
+        if type(row['signature_id'])is not int or row['signature_id']<=0:raise ValueError('policy_receipt_sid')
+        for field in ('source_ip','destination_ip'):
+            if str(ipaddress.IPv4Address(row[field]))!=row[field]:raise ValueError('policy_receipt_ip')
+        if type(row['destination_port'])is not int or not 1<=row['destination_port']<=65535:raise ValueError('policy_receipt_port')
+        dt=datetime.fromisoformat(row['effective_at'])
+        if dt.utcoffset()!=timedelta(hours=9):raise ValueError('policy_receipt_kst')
+        if not re.fullmatch('[a-f0-9]{64}',row['evidence_sha256']):raise ValueError('policy_receipt_hash')
+    return changes
+
+
+def policy_change_report(minutes):
+    path=Path('/etc/socbot/report_policy_changes.json')
+    try:
+        if not path.exists():return ''
+        st=path.stat()
+        if path.is_symlink() or not path.is_file() or st.st_uid!=0 or st.st_mode&0o022 or st.st_size>8192:
+            raise ValueError('unsafe_policy_receipt')
+        changes=report_policy_changes(json.loads(path.read_text()))
+        if not changes:return ''
+        rows=[]
+        for change in changes:
+            when=change['effective_at']
+            body={'size':0,'query':{'bool':{'filter':[
+                {'range':{'timestamp':{'gte':'now-%dm'%minutes}}},
+                {'range':{'rule.level':{'gte':5}}},
+                {'term':{'data.alert.signature_id':str(change['signature_id'])}},
+                {'term':{'data.src_ip':change['source_ip']}},
+                {'term':{'data.dest_ip':change['destination_ip']}},
+                {'term':{'data.dest_port':str(change['destination_port'])}}]}},
+                'aggs':{'periods':{'filters':{'filters':{
+                    'before':{'range':{'timestamp':{'lt':when}}},
+                    'after':{'range':{'timestamp':{'gte':when}}}}}}}}
+            value=idx_search('wazuh-alerts-*',body)
+            if value.get('timed_out') or value.get('_shards',{}).get('failed',0):raise ValueError('partial_policy_query')
+            buckets=value['aggregations']['periods']['buckets'];counts=[buckets[k]['doc_count']for k in ('before','after')]
+            if any(type(n)is not int or n<0 for n in counts):raise ValueError('invalid_policy_count')
+            rows.append([change['name'],_alert_time_kst(when),*counts])
+        return ('**정책 적용 전·후 경보 구분** (이번 보고 구간의 정확한 SID·출발지·목적지·포트)\n\n'+
+                report_table(['확정된 변경','적용 시각(KST)','적용 전 기록','적용 후 새 경보'],rows)+
+                '\n\n적용 전 경보는 아래 전체 집계에도 포함된 과거 기록입니다. 삭제하거나 새 경보로 세지 않습니다. '
+                '변경 영수증과 색인 집계이며 현재 정책 재검증·공격 부재 판정은 아닙니다.')
+    except Exception:
+        return '**정책 전후 경보 조회 실패** — 적용 후 0건 또는 해결 완료로 판단하지 않습니다.'
+
+
 def build_summary(hours=12):
     """Telemetry only: lookup failures and empty results are not SOC judgments."""
     mins = hours * 60
@@ -243,6 +299,8 @@ def build_summary(hours=12):
         ['취약점 groot-web',vc if vc is not None else '조회 실패','색인 건수; 실제 악용 여부 미확인']])
     text = ('최근 %dh 수집 상태입니다. 이 발행기는 자료 조회·보고만 수행하며, 판단·대응은 LLM 관리 에이전트가 주도합니다.\n\n' % hours +
             overview + '\n\n**기록된 조치** (색인 로그이며 현재 상태/사건 종결 증명이 아님)\n\n' + action_report(mins))
+    policy=policy_change_report(mins)
+    if policy:text+='\n\n'+policy
     if agg and agg.get('rules'):
         text += '\n\n**상위 규칙**\n\n' + report_table(['탐지 규칙','집계 건수'],agg['rules'][:5])
         if len(agg['rules']) > 5:
@@ -306,6 +364,8 @@ def build_report(minutes):
         return {"error": "경보 집계 조회 성공, 상세 경보 조회 실패; 분석 결과를 생성하지 않았습니다."}
     text = ('최근 %d분 level≥5 경보 **%d건**의 색인 집계·최근 표본입니다.\n\n' % (minutes,agg['total']) +
             report_table(['보고 내용','확인된 수행','다음 확인'],[['경보·조치 기록 조회','자료 수집·집계·보고','LLM 관리 에이전트의 사건 판단·조치 검증']]))
+    policy=policy_change_report(minutes)
+    if policy:text+='\n\n'+policy
     if agg['rules']:
         text += '\n\n**탐지 규칙(상위)**\n\n'+report_table(['규칙 설명','집계 건수'],agg['rules'])
     text += '\n\n**기록된 조치** (색인 로그이며 현재 차단/복구 상태와 구분)\n\n'+action_report(minutes)

@@ -1,5 +1,7 @@
 # GROOT_A IPS Phase-A 변경셋 — 무중단 탐지/로깅/자산 (2026-10-02, 검증 반영)
 
+> **11/7 현행 정정:** 관리자 예외는 구192.168.10.0/24가 아니라231/32·SID2001219만이다. 실제 `/rules/threshold.in`과 ET+local `/rules/all.rules`를 사용하며 현재 `-S`에서는 무중단 reload가 거절돼 검증 후 재시작한다. 아래10월 절차는 과거 이력이다. [정책·경보·보고 검증](../infra/validation/admin-ssh/README.md).
+
 <!-- current-project-context:2026-10-24 -->
 > **현행 기준 — 2026-10-24:** [라이브 확인·완료/미완료](../STATUS.md) · [실행 계획](../PLAN.md).
 > 이 문서의 제출/검사/적용 기록은 해당 날짜의 범위다. 공식 규칙 후보27개는 조사 자료이며 자동 설치·운영 반영 완료가 아니다. Suricata passive 탐지, DVWA WAF와 실습 WAF의 서로 다른 모드, 정확 후보 승인 경계를 구분한다.

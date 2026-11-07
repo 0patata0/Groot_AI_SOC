@@ -188,14 +188,15 @@ PY
     LOG_SOURCE_SHA=$(log_pipeline fingerprint | jq -er '.source_sha256') || die 'log source fingerprint failed'
     LOG_INSTALLER_SHA=$(hash "$CAPSTONE_SOURCE/deployment/log_pipeline.py")
     SSH_MACS_SHA=$(hash "$CAPSTONE_SOURCE/deployment/ssh_macs.py")
-    export SSH_MACS_SHA
+    HOST_POLICY_SHA=$(hash "$CAPSTONE_SOURCE/deployment/host_security.py")
+    export SSH_MACS_SHA HOST_POLICY_SHA
     export LAB_PROFILE SECURITY_SCRIPT_SHA LOG_SOURCE_SHA LOG_INSTALLER_SHA
     ET_SHA=$(hash "$ET_RULES_FILE"); LOCAL_SHA=$(hash "$CAPSTONE_SOURCE/new_rule/GROOT_A_local.rules")
     WAF_SHA=$(hash "$CAPSTONE_SOURCE/new_rule/GROOT_A_WAF.conf")
     export ET_SHA LOCAL_SHA WAF_SHA CA_SHA
     PROFILE=$(python3 - <<'PY'
 import hashlib,json,os
-keys=('CAPSTONE_ROOT','SECURITY_HOST','SIEM_HOST','SERVICE_HOST','MONITOR_INTERFACE','WEB_BACKEND_PORT','WAF_PORT','SURI_ID','WAF_ID','ET_SHA','LOCAL_SHA','WAF_SHA','CA_SHA','LAB_PROFILE','SECURITY_SCRIPT_SHA','LOG_SOURCE_SHA','LOG_INSTALLER_SHA','SSH_MACS_SHA','LOG_PROTECTED_IPS','ADMIN_PROTECTED_CIDRS','TZ')
+keys=('CAPSTONE_ROOT','SECURITY_HOST','SIEM_HOST','SERVICE_HOST','MONITOR_INTERFACE','WEB_BACKEND_PORT','WAF_PORT','SURI_ID','WAF_ID','ET_SHA','LOCAL_SHA','WAF_SHA','CA_SHA','LAB_PROFILE','SECURITY_SCRIPT_SHA','LOG_SOURCE_SHA','LOG_INSTALLER_SHA','SSH_MACS_SHA','HOST_POLICY_SHA','MANAGEMENT_ALLOWED_CIDRS','SSH_PORT','LOG_PROTECTED_IPS','ADMIN_PROTECTED_CIDRS','TZ')
 print(hashlib.sha256(json.dumps({k:os.environ[k] for k in keys},sort_keys=True,separators=(',',':')).encode()).hexdigest())
 PY
 )
@@ -234,7 +235,7 @@ r=pathlib.Path(sys.argv[1]); m=json.loads((r/'manifest.json').read_text())
 assert set(m)=={'schema_version','profile_sha256','local_rules','site_specific_sids_excluded','files'}
 assert m['schema_version']==2 and m['local_rules']==11 and m['site_specific_sids_excluded']==[1000000,2034802,2034806]
 assert m['profile_sha256']==os.environ['PROFILE']
-assert set(m['files'])=={'compose.json','config/GROOT_A_WAF.conf','config/wazuh-root-ca.pem','config/firewall.nft','rules/suricata.rules','rules/local.rules','rules/all.rules','config/lab-edge.conf','config/lab-waf.conf','config/lab-policy.conf','tls/lab.crt','tls/lab.key'}
+assert set(m['files'])=={'compose.json','config/GROOT_A_WAF.conf','config/wazuh-root-ca.pem','config/firewall.nft','rules/suricata.rules','rules/local.rules','rules/all.rules','rules/threshold.in','config/lab-edge.conf','config/lab-waf.conf','config/lab-policy.conf','tls/lab.crt','tls/lab.key'}
 for name,sha in m['files'].items():
     p=r/name; s=p.lstat()
     assert stat.S_ISREG(s.st_mode) and s.st_nlink==1 and s.st_uid==(101 if name=='tls/lab.key' else 0) and not(s.st_mode&0o022)
@@ -363,6 +364,11 @@ et=(r/'rules/suricata.rules').read_bytes(); assert b'\0' not in et and et.strip(
 active_et=b'\n'.join(line for line in et.splitlines() if not line.lstrip().startswith(b'#'))
 assert not re.search(rb'\bsid\s*:\s*10000[0-9]{2}\s*;',active_et), 'ET prerequisite contains reserved local SID'
 (r/'rules/all.rules').write_bytes(et+(b'' if et.endswith(b'\n') else b'\n')+local)
+import sys
+sys.path.insert(0,str(source/'deployment'))
+from host_security import management_ssh_thresholds
+(r/'rules/threshold.in').write_text(management_ssh_thresholds(
+    [x for x in os.environ.get('MANAGEMENT_ALLOWED_CIDRS','').split(',') if x],int(os.environ['SSH_PORT'])))
 home='['+','.join(os.environ[k]+'/32' for k in ('SECURITY_HOST','SIEM_HOST','SERVICE_HOST'))+']'
 labels={'io.capstone.portable.role':'security','io.capstone.portable.profile':os.environ['PROFILE']}
 compose={'services':{
@@ -370,13 +376,13 @@ compose={'services':{
  'environment':{'TZ':'Asia/Seoul','BACKEND':'http://'+os.environ['SERVICE_HOST']+':'+os.environ['WEB_BACKEND_PORT'],'SERVER_NAME':'capstone-service','PORT':'8080','SSL_PORT':'8443','NGINX_X_FORWARDED_PORT':os.environ['WAF_PORT'],'BLOCKING_PARANOIA':'1','MODSEC_RULE_ENGINE':'On','MODSEC_AUDIT_ENGINE':'RelevantOnly','MODSEC_AUDIT_LOG_FORMAT':'JSON','MODSEC_AUDIT_LOG_TYPE':'Serial','MODSEC_AUDIT_LOG':'/var/log/modsecurity/audit.log'},
  'ports':[os.environ['SECURITY_HOST']+':'+os.environ['WAF_PORT']+':8080'],'volumes':[str(r/'logs/modsecurity')+':/var/log/modsecurity',str(r/'config/GROOT_A_WAF.conf')+':/etc/modsecurity.d/owasp-crs/rules/REQUEST-948-GROOT_A_WAF.conf:ro'],'networks':['waf'],'logging':{'driver':'json-file','options':{'max-size':'10m','max-file':'3'}}},
  'suricata':{'image':os.environ['SURI_ID'],'container_name':'capstone-security-suricata','restart':'always','labels':labels,'network_mode':'host','cap_add':['NET_ADMIN','NET_RAW','SYS_NICE'],
- 'command':['-i',os.environ['MONITOR_INTERFACE'],'-S','/rules/all.rules','--set','vars.address-groups.HOME_NET='+home,'--set','stats.interval=60','--set','unix-command.enabled=yes'],
+ 'command':['-i',os.environ['MONITOR_INTERFACE'],'-S','/rules/all.rules','--set','vars.address-groups.HOME_NET='+home,'--set','stats.interval=60','--set','unix-command.enabled=yes','--set','threshold-file=/rules/threshold.in'],
  'environment':{'TZ':'Asia/Seoul'},'volumes':[str(r/'rules')+':/rules:ro',str(r/'logs/suricata')+':/var/log/suricata','suricata-lib:/var/lib/suricata'],'logging':{'driver':'json-file','options':{'max-size':'10m','max-file':'3'}}}},
  'networks':{'waf':{'driver':'bridge'}},'volumes':{'suricata-lib':{}}}
 (r/'compose.json').write_text(json.dumps(compose,sort_keys=True,indent=2)+'\n')
 addresses=','.join(os.environ[k] for k in ('SECURITY_HOST','SIEM_HOST','SERVICE_HOST'))
 (r/'config/firewall.nft').write_text('table inet capstone_portable {\n set protected_v4 { type ipv4_addr; elements = { '+addresses+' }; }\n chain input { type filter hook input priority -5; policy accept; ct state established,related accept; tcp dport 22 accept; }\n}\n')
-for p in (r/'rules/local.rules',r/'rules/all.rules',r/'compose.json',r/'config/firewall.nft'):p.chmod(0o444)
+for p in (r/'rules/local.rules',r/'rules/all.rules',r/'rules/threshold.in',r/'compose.json',r/'config/firewall.nft'):p.chmod(0o444)
 manifest={'schema_version':2,'profile_sha256':os.environ['PROFILE'],'local_rules':11,'site_specific_sids_excluded':sorted(skipped),'files':{str(p.relative_to(r)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [r/'compose.json',*sorted((r/'config').iterdir()),*sorted((r/'rules').iterdir())]}}
 (r/'manifest.json').write_text(json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n')
 for p in [r/'manifest.json',r/'compose.json',*list((r/'config').iterdir()),*list((r/'rules').iterdir())]:
@@ -390,7 +396,7 @@ PY
     TEST_CID=$(bounded 30s docker create --pull never --name "$TEST_NAME" --label "io.capstone.portable.rulecheck=$PROFILE" --network none --read-only \
         --tmpfs /tmp --tmpfs /etc/suricata --tmpfs /var/log/suricata --tmpfs /var/run \
         --mount "type=bind,source=$ROLE_DIR/rules,target=/rules,readonly" \
-        "$SURI_ID" -T -c /etc/suricata/suricata.yaml -S /rules/all.rules -l /var/log/suricata) || die 'private syntax-test creation failed; inspect before retry'
+        "$SURI_ID" -T -c /etc/suricata/suricata.yaml -S /rules/all.rules --set threshold-file=/rules/threshold.in -l /var/log/suricata) || die 'private syntax-test creation failed; inspect before retry'
     [[ $TEST_CID =~ ^[0-9a-f]{64}$ ]] || die 'private syntax-test identity invalid'
     printf '%s\n' "$TEST_CID" >"$ROLE_DIR/native-test.cid"; sync -f "$ROLE_DIR/native-test.cid"
     bounded 240s docker start --attach "$TEST_CID" >"$ROLE_DIR/suricata-config-test.log" 2>&1 || die 'Suricata native rule test failed (private log retained)'

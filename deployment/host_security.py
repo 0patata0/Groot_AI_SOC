@@ -23,6 +23,29 @@ UNIT = Path("/etc/systemd/system/capstone-host-security.service")
 RECEIPT = Path("/var/lib/capstone-host-security/receipt.json")
 
 
+def management_ssh_thresholds(cidrs, ssh_port=22):
+    """Suppress only ET's SYN-count heuristic for explicitly trusted SSH sources.
+
+    Block-protection networks do not grant this exception. Other signatures,
+    authentication failures and ordinary SSH connection logs remain intact.
+    The reviewed ET signature targets port22; other SSH ports get no exception.
+    """
+    if not isinstance(cidrs, list) or len(cidrs) > 128 or type(ssh_port) is not int or not 1 <= ssh_port <= 65535:
+        raise ValueError('management_threshold_arguments')
+    networks = set()
+    for value in cidrs:
+        if not isinstance(value, str):
+            raise ValueError('management_threshold_source')
+        network = ipaddress.IPv4Network(value, strict=True)
+        if str(network) != value or not network.prefixlen or network.is_multicast or network.is_unspecified:
+            raise ValueError('management_threshold_source')
+        networks.add(str(network))
+    header = ('# Explicit SSH management sources; only ET SYN-count SID2001219.\n'
+              '# Other attack signatures and host SSH authentication logs remain enabled.\n')
+    return header + ''.join('suppress gen_id 1, sig_id 2001219, track by_src, ip ' + value + '\n'
+                            for value in sorted(networks) if ssh_port == 22)
+
+
 def configuration(value):
     required = {"schema", "role", "security_host", "siem_host", "service_host",
                 "interface", "ssh_port", "web_port", "legacy_bridge",

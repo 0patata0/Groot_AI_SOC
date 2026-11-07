@@ -62,6 +62,8 @@ ADMIN_PROTECTED_CIDRS=
 ADMIN_INPUT_SET=0
 MANAGEMENT_ALLOWED_CIDRS=
 DASHBOARD_ALLOWED_CIDRS=
+MANAGEMENT_INPUT_SET=0
+DASHBOARD_INPUT_SET=0
 DASHBOARD_DENIED_CIDRS=192.168.15.0/24
 CHAT_ALLOWED_CIDRS=
 CAPSTONE_ROOT=/opt/capstone
@@ -131,6 +133,8 @@ if [[ -n $CONFIG ]]; then
         [[ $value != *$'\t'* ]] || die "tab in configuration: $key"
         printf -v "$key" '%s' "$value"
         if [[ $key == ADMIN_PROTECTED_CIDRS ]]; then ADMIN_INPUT_SET=1; fi
+        if [[ $key == MANAGEMENT_ALLOWED_CIDRS ]]; then MANAGEMENT_INPUT_SET=1; fi
+        if [[ $key == DASHBOARD_ALLOWED_CIDRS ]]; then DASHBOARD_INPUT_SET=1; fi
         ;;
       *) die "unsupported configuration key: $key" ;;
     esac
@@ -160,6 +164,14 @@ fi
 prompt LAB_PUBLIC_ORIGIN 'Log4Shell HTTPS 주소 (예: https://lab.example.org)'
 prompt LAB_ALLOWED_CIDRS '실습 웹 허용 내부망/VPN CIDR (쉼표 구분, 모든 출발지는 all)'
 prompt LLM_BASE_URL 'Ollama/OpenAI 호환 API 주소 (예: http://192.0.2.40:11434/v1)'
+if [[ $MANAGEMENT_INPUT_SET == 0 && $BATCH == 0 && -t 0 ]]; then
+  printf 'SSH·실습 제어 관리자 IPv4/CIDR (쉼표 구분, Enter=추가 허용 없음·현재 설치 접속만 보호): ' >&2
+  IFS= read -r MANAGEMENT_ALLOWED_CIDRS || die 'input cancelled'
+fi
+if [[ $DASHBOARD_INPUT_SET == 0 && $BATCH == 0 && -t 0 ]]; then
+  printf 'Wazuh 관리 웹 허용 IPv4/CIDR (쉼표 구분, Enter=직접 클라이언트 허용 없음): ' >&2
+  IFS= read -r DASHBOARD_ALLOWED_CIDRS || die 'input cancelled'
+fi
 if [[ $ADMIN_INPUT_SET == 0 && $BATCH == 0 && -t 0 ]]; then
   printf '차단 예외 관리자 IPv4 또는 CIDR 대역 (쉼표 구분, 없으면 Enter): ' >&2
   IFS= read -r ADMIN_PROTECTED_CIDRS || die 'input cancelled'
@@ -218,6 +230,8 @@ done
 say "입력: security=$SECURITY_HOST, siem=$SIEM_HOST, service=$SERVICE_HOST"
 say '순서: 반입물·패키지 → 역할 사전검사 → SIEM → 공통 키·등록 자격 → service → security → 승인·대응 → 로그 처리·상관분석 → SOC 대시보드 → 고정 읽기 진단 → 전체 검증'
 say 'SOC 구성: 정확 후보 승인 MCP·제한된 대응·Vector 정제/회전/보존·관측 모니터·통합 대시보드'
+say "SSH·실습 제어 관리자: ${MANAGEMENT_ALLOWED_CIDRS:-추가 지정 없음}; Wazuh 관리 웹: ${DASHBOARD_ALLOWED_CIDRS:-직접 허용 없음}"
+say 'IDS SSH 횟수 경보 예외는 명시한 SSH 관리자 주소와 22번 포트의 SID2001219에만 적용됩니다.'
 if [[ -n $ADMIN_PROTECTED_CIDRS ]]; then
   say "관리자 IP 차단 예외: $ADMIN_PROTECTED_CIDRS"
 else

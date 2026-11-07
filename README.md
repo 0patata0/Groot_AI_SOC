@@ -1,5 +1,7 @@
 # Groot_AI_SOC
 
+관리자 SSH 경보는 [정책 적용·실제 재확인](infra/validation/admin-ssh/README.md)을 따른다.11:59보고의4건은예외적용전이력이며13:00색인확인적용후0건이다. 정기보고에정책전후구분을추가했다.
+
 현재 작업 상태는 [STATUS.md](STATUS.md), 추가 PCAP 기반 학습 후보의 출처·검수·DGX 반입 결과는 [검수 기록](finetuning/PCAP_LEARNING_REVIEW.md)을 따른다. [후속 학습 준비](finetuning/PCAP_TRAINING_PREPARATION.md)는8,719건·실제토큰/마스크 검증·DGX반입까지 완료했으며 GPU사전시험/본학습은 아직 시작하지 않았다. 로컬 데이터는 [원본1개·정제본1개 압축으로 통합](datasets/STORAGE_POLICY.md)하고 전수 복원 검증 후 중복 해제본을 정리했다.
 현재 query1.19.114/common1.5.61·routing1.1.6/진단MCP1.2.8이다. **정확성을 속도보다 우선**한다. 현재 단순 조회는 실제 등록된 요청 대상만 선택하고 MCP 기본값이 같은 중복 호출을 제거한다. Native inline 실행 실패를 수정한7프로필1,364고유PASS/skip0·운영24SHA/보호8·양봇/두큐0/Bfailed0·독립원복을 확인했다. 같은 단문 실채팅 H18.476/O18.396초·각1읽기/2표·원문SHA 일치이며 각1회·공유조건 비통제다. 복합 판단 품질은 미완료다. 모델/옵션·권한/승인/FW/TTL·패키지 변경0·새OS 전체설치 미시험. [변경·한계·복구](infra/hermes/current-diagnostic-scope.md) · [현황](STATUS.md).
 

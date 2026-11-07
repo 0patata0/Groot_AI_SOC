@@ -707,3 +707,5 @@ SOC 초기 설치는 계속 루트 `deploy.sh`이며 학습을 자동 실행하�
 query1.19.112/common1.5.61: 기존 소스 묶음의 공통 gate·chat_contract·query/plugin·harness를 사용한다. 단일deploy.sh의 SIEM 플러그인 복사·root gate 렌더링과 SDK 소스 복사/영수증 경로를 유지한다. 패키지·deb/wheel·이미지·포트·키 추가0이며 운영에 초기 설치기를 실행하지 않는다. [검증·운영 범위](../infra/hermes/service-properties.md).
 
 query1.19.114: 현재 선택 범위·등록 기본값 중복 제거·파일명 없는 Native gate fallback을 기존 gate/alignment/query/harness 소스에 반영한다. 같은 SIEM/SDK 복사·root 렌더·영수증 경로이며 새 패키지·포트·키0. [검증·복구](../infra/hermes/current-diagnostic-scope.md).
+
+11/7 관리자 SSH/보고 이력 보완은 기존 Python·Suricata·soc_bot.py 설치 경로와 생성 JSON을 사용한다. 추가 deb/wheel/이미지 반입 항목은 없으며 초기 보고 이력은 빈 목록이다. [검증 범위](../infra/validation/admin-ssh/README.md).

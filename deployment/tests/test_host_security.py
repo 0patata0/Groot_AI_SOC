@@ -8,6 +8,24 @@ m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 
 
 class Policy(unittest.TestCase):
+    def test_named_admin_threshold_does_not_exempt_other_rules_or_old_network(self):
+        text = m.management_ssh_thresholds(['192.168.16.231/32'])
+        active = [line for line in text.splitlines() if not line.startswith('#')]
+        self.assertEqual(active, ['suppress gen_id 1, sig_id 2001219, track by_src, ip 192.168.16.231/32'])
+        self.assertNotIn('192.168.10.0', text)
+        self.assertNotIn('sig_id 0', text)
+
+    def test_threshold_refuses_global_ipv6_noncanonical_and_injected_sources(self):
+        for value in ('0.0.0.0/0', '::/0', '192.168.16.231/24', '192.168.16.231/32\nsuppress gen_id 1, sig_id 0', 231):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                m.management_ssh_thresholds([value])
+
+    def test_other_ssh_port_and_empty_management_have_no_ssh22_exception(self):
+        for cidrs, port in (([], 22), (['192.168.16.231/32'], 2222)):
+            self.assertFalse(any(line.startswith('suppress ') for line in m.management_ssh_thresholds(cidrs, port).splitlines()))
+        for port in (True, 0, 65536, '22'):
+            with self.assertRaises(ValueError):m.management_ssh_thresholds([], port)
+
     def config(self, role='siem'):
         return {'schema':1,'role':role,'security_host':'10.200.10.1','siem_host':'10.200.10.10',
                 'service_host':'10.200.10.20','interface':'ens160','ssh_port':22,'web_port':80,

@@ -420,12 +420,40 @@ class ControllerContract(unittest.TestCase):
     def test_interactive_admin_prompt_accepts_empty_enter(self):
         master,slave=pty.openpty()
         try:
-            os.write(master,b'\n')
+            os.write(master,b'\n\n\n')
             result=subprocess.run(['bash',str(self.root/'deploy.sh'),'--plan','--config',str(self.config)],
                                   stdin=slave,capture_output=True,text=True,env=self.env,timeout=10)
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertIn('없으면 Enter',result.stderr)
+            self.assertIn('SSH·실습 제어 관리자',result.stderr)
+            self.assertIn('Wazuh 관리 웹 허용',result.stderr)
             self.assertIn('관리자 IP 차단 예외: 추가 지정 없음',result.stdout)
+        finally:
+            os.close(master);os.close(slave)
+
+    def test_interactive_admin_scopes_stay_separate_and_normalize_hosts(self):
+        master,slave=pty.openpty()
+        try:
+            os.write(master,b'192.168.16.231\n192.168.16.232\n192.168.16.233\n')
+            result=subprocess.run(['bash',str(self.root/'deploy.sh'),'--plan','--config',str(self.config)],
+                                  stdin=slave,capture_output=True,text=True,env=self.env,timeout=10)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('SSH·실습 제어 관리자: 192.168.16.231/32; Wazuh 관리 웹: 192.168.16.232/32',result.stdout)
+            self.assertIn('관리자 IP 차단 예외: 192.168.16.233/32',result.stdout)
+            self.assertEqual(self.events(),[])
+        finally:
+            os.close(master);os.close(slave)
+
+    def test_explicit_empty_admin_scopes_do_not_prompt_or_gain_other_exemptions(self):
+        with self.config.open('a') as stream:
+            stream.write('MANAGEMENT_ALLOWED_CIDRS=\nDASHBOARD_ALLOWED_CIDRS=\nADMIN_PROTECTED_CIDRS=192.168.16.231/32\n')
+        master,slave=pty.openpty()
+        try:
+            result=subprocess.run(['bash',str(self.root/'deploy.sh'),'--plan','--config',str(self.config)],
+                                  stdin=slave,capture_output=True,text=True,env=self.env,timeout=10)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertNotIn('IPv4/CIDR',result.stderr)
+            self.assertIn('SSH·실습 제어 관리자: 추가 지정 없음; Wazuh 관리 웹: 직접 허용 없음',result.stdout)
         finally:
             os.close(master);os.close(slave)
 

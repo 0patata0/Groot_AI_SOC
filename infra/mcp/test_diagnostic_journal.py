@@ -53,12 +53,41 @@ class Journal(unittest.TestCase):
         self.assertEqual(len(calls),2)
         for argv,maximum,seconds in calls:
             self.assertEqual(argv[0],'/usr/bin/journalctl');self.assertIn('--unit=capstone-management.service',argv)
-            self.assertEqual(maximum,1048576);self.assertEqual(seconds,4)
+            self.assertEqual(maximum,1048576);self.assertEqual(seconds,12)
 
     def test_all_priority_includes_non_errors_and_uses_one_read(self):
         result,calls=self.read([row('Started worker',priority='7')],args(journal_scope='all'))
         self.assertEqual(len(calls),1);self.assertEqual(result['entries'][0]['priority'],7)
         self.assertFalse(any(x.startswith('--priority') for x in calls[0][0]))
+        self.assertEqual(calls[0][2],12)
+
+    def test_queries_share_total_deadline_and_second_read_gets_remaining_budget(self):
+        clock=[100.0];budgets=[]
+        def run(argv,maximum,seconds):
+            budgets.append(seconds);clock[0]+=11
+            return 0,b''
+        with patch.object(j.time,'monotonic',side_effect=lambda:clock[0]),self.assertRaisesRegex(ValueError,'journal_query_timeout'):
+            j.answer(args(),'b',NOW,run)
+        self.assertEqual(budgets,[12,9])
+
+    def test_expired_total_budget_prevents_second_query(self):
+        clock=[100.0];calls=[]
+        def run(argv,maximum,seconds):
+            calls.append(argv);clock[0]+=20
+            return 0,b''
+        with patch.object(j.time,'monotonic',side_effect=lambda:clock[0]),self.assertRaisesRegex(ValueError,'journal_query_timeout'):
+            j.answer(args(),'b',NOW,run)
+        self.assertEqual(len(calls),1)
+
+    def test_six_second_search_within_budget_returns_evidence_without_retention_claim(self):
+        clock=[100.0]
+        def run(argv,maximum,seconds):
+            clock[0]+=0.04 if '--priority=err' in argv else 6.03
+            return 0,b'' if '--priority=err' in argv else d.encode(row())
+        with patch.object(j.time,'monotonic',side_effect=lambda:clock[0]):
+            result=j.answer(args(),'b',NOW,run)
+        self.assertEqual(result['returned_entries'],1)
+        self.assertFalse(result['journal_retention_verified']);self.assertIsNone(result['requested_window_total_count'])
 
     def test_request_never_accepts_arbitrary_host_unit_path_command_filter_or_bounds(self):
         bad=[dict(args(),target='b:systemd'),dict(args(),target='c:apache'),
@@ -206,6 +235,28 @@ class Journal(unittest.TestCase):
         with patch.object(m,'route_config',return_value={}),patch.object(m,'remote_command',return_value=['fixed']) as command,patch.object(d,'bounded_command',return_value=(0,d.encode(remote))) as run:
             self.assertEqual(m.query(q),remote);command.assert_called_once_with('c',{})
             self.assertEqual(run.call_args.kwargs,{'input_data':d.encode(q)})
+            self.assertEqual(run.call_args.args,(['fixed'],j.MAX_RESULT,36))
+
+    def test_local_transport_outlives_query_budget_and_validates_response(self):
+        from types import SimpleNamespace
+        import stat
+        good,_=self.read()
+        class Connection:
+            def __enter__(self):return self
+            def __exit__(self,*unused):pass
+            def settimeout(self,n):pass
+            def connect(self,path):pass
+            def getsockopt(self,*unused):return struct.pack('3i',123,0,0)
+            def sendall(self,data):self.sent=data
+            def shutdown(self,*unused):pass
+        conn=Connection()
+        with patch.object(j.socket,'SO_PEERCRED',17,create=True),patch.object(j.socket,'socket',return_value=conn), \
+             patch.object(d,'trusted_parents'),patch.object(j.Path,'lstat',return_value=SimpleNamespace(st_mode=stat.S_IFSOCK|0o660,st_uid=0,st_gid=987)), \
+             patch.object(j.grp,'getgrnam',return_value=SimpleNamespace(gr_gid=987)),patch.object(j,'receive',return_value=d.encode(good)) as receive:
+            self.assertEqual(j.query_local(args(),'b'),good)
+        receive.assert_called_once_with(conn,j.MAX_RESULT,24)
+        self.assertGreater(j.LOCAL_RESPONSE_TIMEOUT,j.QUERY_TIMEOUT)
+        self.assertGreater(j.REMOTE_QUERY_TIMEOUT,j.LOCAL_RESPONSE_TIMEOUT)
 
     def test_forced_reader_routes_journal_view_without_snapshot_or_general_command(self):
         import io

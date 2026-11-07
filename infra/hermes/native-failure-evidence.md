@@ -10,7 +10,7 @@
 - 쓰기 실행이 섞인 실패는 기존 보호 작업 실패 처리로 유지한다. 새 권한·자동 조치·일반 셸 실행은 추가하지 않는다.
 - 실패한 답변은 `partial`, 범위 미완료 및 비재사용 감사 기록으로 남긴다. 모델이 생성한 미검증 문장을 완료 답변으로 게시하지 않는다.
 
-적용 범위는 `review_channel_worker.py`의 Native 실행 실패 답변이다. 자동 SOC controller의 실패 outbox 및 직접 Hermes gateway의 모든 실패 경로를 검증한 것은 아니다. 모델이 최종 보고를 생성했으나 의미 판단이 틀린 문제도 별도다.
+적용 범위는 `review_channel_worker.py`의 Native 실패 답변이다. 후속 수정은 CLI 완료+도구 실패에도 같은 근거 보존을 적용했다. [실제 실패 재생·시간 제한 보완](../mcp/journal-query-budget.md). 자동 SOC controller의 실패 outbox 및 직접 Hermes gateway의 모든 실패 경로를 검증한 것은 아니다. 모델이 최종 보고를 생성했으나 의미 판단이 틀린 문제도 별도다.
 
 ## 검증
 

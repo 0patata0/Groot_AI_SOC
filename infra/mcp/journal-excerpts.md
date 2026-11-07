@@ -23,7 +23,7 @@
 - A/B/C의 `capstone-journal-reader.service`가 root로 고정 읽기만 수행한다. 연결은 root 소유 `/run/capstone-journal/read.sock`(0660, 기존 진단 그룹)으로 제한하며 외부 TCP 포트를 열지 않는다.
 - 클라이언트는 socket 서버의 root UID를 확인하고, 서버는 `SO_PEERCRED`로 기존 MCP/강제 읽기 계정 또는 root를 확인한다. 계정에 journal 그룹·일반 sudo·셸·Docker 권한을 부여하지 않는다. A/C는 기존 호스트 키 고정 SSH 강제 reader를 경유한다.
 - unit·명령·파일 경로·정규식·SSH 옵션을 호출자에게 받지 않는다. 등록 target은 고정 `journalctl` argv로만 변환한다. source query의 초 단위 경계를 넓힌 경우 반환 전 마이크로초 구간을 재검증한다.
-- 입력4KiB, journal 각 조회1MiB, 조회 합계 최대8초, 메시지8KiB, 결과60,000바이트, 계정당10회/분·전체30회/분이다. 바이트 제한으로 일부 행을 빼면 `response_size_limited`와 `has_more`를 명시한다. 큰 메시지·비문자 메시지는 사유와 함께 본문을 미반환한다.
+- 입력4KiB, journal 각 조회1MiB, 초기 조회 합계 최대8초(후속: 명령12초/공유20초·socket24초/원격36초, [시간 보완](journal-query-budget.md)), 메시지8KiB, 결과60,000바이트, 계정당10회/분·전체30회/분이다. 바이트 제한으로 일부 행을 빼면 `response_size_limited`와 `has_more`를 명시한다. 큰 메시지·비문자 메시지는 사유와 함께 본문을 미반환한다.
 - 메시지의 password/token/key·인증/쿠키·URL 자격·환경/HTTP 본문·개인키·불투명 문자열을 마스킹한다. 알려진 고정 진단 코드·등록 unit은 보존한다. 임의 비밀을 모두 탐지한다고 보장하지 않는다. 제어 문자·방향 전환 문자도 처리한다.
 - 원문 메시지 SHA·반환 excerpt SHA·커서 SHA·시각·우선순위·변형/미반환 상태를 구분한다. 마스킹 전 본문·환경·커서 자체는 별도 파일에 저장하거나 반환하지 않는다. 감사에는 요청 대상/기간·결과 건수/해시·고정 실패 코드만 남긴다.
 - `raw_messages_returned=false`, `redacted_excerpts_returned=true`다. 원문 바이트와 동일한 자료라고 주장하지 않는다. 반환 로그는 신뢰하지 않는 증거이며 지시·승인으로 취급하지 않는다.

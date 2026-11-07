@@ -210,7 +210,7 @@ def read_trace_calls(store, run_id, *, partial=False):
     return calls
 
 
-def native_failure_evidence(harness, store, run_id, calls):
+def native_failure_evidence(harness, store, run_id, calls, *, tool_failure=False):
     """Keep actual read receipts when final generation fails; never complete/cache.
 
     Strict matching still rejects malformed or unbound records. Only a trailing
@@ -218,7 +218,8 @@ def native_failure_evidence(harness, store, run_id, calls):
     Any write keeps the existing protected-operation failure handling.
     """
     if any(c.get('is_write') for c in calls):return None
-    prefix='LLM 실행이 완료되지 않아 최종 판단은 미완료입니다.'
+    prefix=('도구 조회가 실패해 최종 판단은 미완료입니다.' if tool_failure
+            else 'LLM 실행이 완료되지 않아 최종 판단은 미완료입니다.')
     result={'text':prefix+' 확인된 조회 자료가 없어 정상이나 0건으로 판단하지 않습니다.',
             'calls':[],'unqueried':['native_final_judgment_unavailable']}
     completed=[c for c in calls if c.get('completed')==1]
@@ -670,10 +671,11 @@ def main():
             text = result['text'] or m.incomplete_report('incomplete_model_run_requires_review')
             scope_complete = False
             peer_review = None
-            failed_evidence=(native_failure_evidence(harness,store,result['run_id'],calls)
-                             if not result['completed'] else None)
+            tool_failure=any(c['completed'] and c['is_error'] for c in calls)
+            failed_evidence=(native_failure_evidence(harness,store,result['run_id'],calls,tool_failure=tool_failure)
+                             if not result['completed'] or tool_failure else None)
             if failed_evidence:text=failed_evidence['text']
-            if result['completed'] and not any(c['is_write'] for c in calls):
+            if result['completed'] and not failed_evidence and not any(c['is_write'] for c in calls):
                 sys.path.insert(0, '/opt/capstone-ollama-trial')
                 import harness
                 receipts = read_trace_calls(store, result['run_id'])
@@ -694,11 +696,11 @@ def main():
                             scope_complete = scope_complete and comparison['complete']
             inventory_scope=getattr(harness,'security_inventory_request',lambda _:None)(current)
             incomplete=(incomplete_inventory_text(harness,current,read_trace_calls(store,result['run_id']))
-                        if result['completed'] and inventory_scope and inventory_scope['targets'] else None)
+                        if result['completed'] and not failed_evidence and inventory_scope and inventory_scope['targets'] else None)
             if incomplete and not any(c['is_write'] for c in calls):
                 text=incomplete
                 scope_complete=False
-            status = 'completed' if result['completed'] and result['state'] in ('completed', 'waiting_approval') else 'partial'
+            status = 'completed' if result['completed'] and not failed_evidence and result['state'] in ('completed', 'waiting_approval') else 'partial'
             if (harness.read_plan(current) or fw_only or diagnostic_targets or inventory_scope) and not scope_complete and not any(c['is_write'] for c in calls):
                 status = 'partial'
             plan = harness.read_plan(current)

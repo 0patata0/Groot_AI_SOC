@@ -269,7 +269,7 @@ def query(value):
         if host == 'b':
             answer = reader.query_local(value, host)
         else:
-            code, raw = d.bounded_command(remote_command(host, route_config()), reader.MAX_RESULT, 16, input_data=d.encode(value))
+            code, raw = d.bounded_command(remote_command(host, route_config()), reader.MAX_RESULT, reader.REMOTE_QUERY_TIMEOUT, input_data=d.encode(value))
             d.need(code == 0, 'journal_remote_unavailable')
             answer = d.parsed(raw)
         reader.validate_answer(answer, value, host)
@@ -424,7 +424,7 @@ def handle(message):
             return {'jsonrpc': '2.0', 'id': identifier, 'error': {'code': -32602, 'message': 'invalid params'}}
         protocol = params.get('protocolVersion')
         value = {'protocolVersion': protocol if protocol in PROTOCOLS else PROTOCOLS[-1],
-            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.3.0'}}
+            'capabilities': {'tools': {}}, 'serverInfo': {'name': 'capstone-system-diagnostics', 'version': '1.3.1'}}
     elif method == 'ping':
         value = {}
     elif method == 'tools/list':

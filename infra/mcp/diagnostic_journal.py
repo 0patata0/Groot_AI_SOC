@@ -23,6 +23,10 @@ SOCKET = Path('/run/capstone-journal/read.sock')
 MAX_REQUEST = 4096
 MAX_RESULT = 60000
 MAX_MESSAGE = 8192
+COMMAND_TIMEOUT = 12
+QUERY_TIMEOUT = 20
+LOCAL_RESPONSE_TIMEOUT = QUERY_TIMEOUT + 4
+REMOTE_QUERY_TIMEOUT = LOCAL_RESPONSE_TIMEOUT + 12
 READERS = ('mcp', 'capstone-mcp', 'capstone-diagnostics')
 FIELDS = '__CURSOR,__REALTIME_TIMESTAMP,_SYSTEMD_UNIT,UNIT,OBJECT_SYSTEMD_UNIT,PRIORITY,MESSAGE'
 SECRET_KEY = r'(?:pass(?:word|wd)?|pwd|token|secret|api[_-]?key|access[_-]?key|private[_-]?key|authorization|cookie|set-cookie|credential|session[_-]?id)'
@@ -93,8 +97,11 @@ def answer(value, host, now=None, runner=None):
     filters = ([['--priority=err'], ['--priority=warning..info', '--grep=' + core.ERROR_PATTERN]]
                if scope == 'errors' else [[]])
     rows, source_limited = {}, False
+    deadline = time.monotonic() + QUERY_TIMEOUT
     for suffix in filters:
-        code, raw = runner(prefix + suffix, 1048576, 4 if scope == 'errors' else 8)
+        remaining = deadline - time.monotonic()
+        core.need(remaining > 0, 'journal_query_timeout')
+        code, raw = runner(prefix + suffix, 1048576, min(COMMAND_TIMEOUT, remaining))
         core.need(code == 0, 'journal_read_unavailable')
         lines = raw.splitlines()
         core.need(len(lines) <= limit + 1, 'journal_row_bound')
@@ -120,6 +127,7 @@ def answer(value, host, now=None, runner=None):
             key = row['record_sha256']
             core.need(key not in rows or rows[key] == row, 'journal_cursor_conflict')
             rows[key] = row
+    core.need(time.monotonic() <= deadline, 'journal_query_timeout')
     ordered = sorted(rows.values(), key=lambda r:(r['at_kst'], r['record_sha256']), reverse=True)
     result = {'schema':1, 'kind':'journal_excerpt', 'target':target, 'host':host, 'unit':unit,
         'observed_at_kst':core.history_library().shown(now * 1000000),
@@ -217,7 +225,7 @@ def query_local(value, host):
         _, uid, _ = struct.unpack('3i', conn.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, 12))
         core.need(uid == 0, 'journal_reader_identity')
         conn.sendall(raw); conn.shutdown(socket.SHUT_WR)
-        result = core.parsed(receive(conn, MAX_RESULT, 12))
+        result = core.parsed(receive(conn, MAX_RESULT, LOCAL_RESPONSE_TIMEOUT))
     core.need(not isinstance(result, dict) or result.get('status') != 'unavailable', 'journal_read_unavailable')
     return validate_answer(result, value, host)
 
